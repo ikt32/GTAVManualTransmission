@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="script.cpp" />
+    <ClCompile Include="main.cpp">
+      <Filter>include</Filter>
+    </ClCompile>
+    <ClCompile Include="NativeMemory.cpp" />
+    <ClCompile Include="VehicleExtensions.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="script.h" />
+    <ClInclude Include="..\..\inc\enums.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\inc\natives.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\inc\types.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\inc\main.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="NativeMemory.hpp" />
+    <ClInclude Include="VehicleExtensions.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{95f1263b-983e-4501-adb9-faf39ba9270e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
