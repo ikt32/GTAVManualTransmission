@@ -1,3 +1,5 @@
+// Implementation provided by LeFix
+
 #pragma once
 
 #include <cstdint>

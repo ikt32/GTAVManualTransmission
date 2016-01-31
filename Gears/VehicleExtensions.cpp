@@ -1,58 +1,53 @@
 #include "VehicleExtensions.hpp"
 
 namespace VehExt {
-	VehicleExtensions::VehicleExtensions(Vehicle vehicle) {
-		handle = vehicle;
-	}
-
-	// am i going to get murdered for this hacky thing i stole from scripthookvdotnet????
-	uint64_t VehicleExtensions::GetAddress() {
+	uint64_t VehicleExtensions::GetAddress(Vehicle handle) {
 		uint64_t address = mem.GetAddressOfEntity(handle);
 		return address;
 	}
 
-	uint32_t VehicleExtensions::GetGears()
+	uint32_t VehicleExtensions::GetGears(Vehicle handle)
 	{
-		unsigned char *const address = reinterpret_cast<unsigned char *>(mem.GetAddressOfEntity(handle));
+		const uint64_t address = mem.GetAddressOfEntity(handle);
 
 		int offset = 0x7a0;
 
 		return address == 0 ? 0 : *reinterpret_cast<const uint32_t *>(address + offset);
 	}
 
-	void VehicleExtensions::SetGears(uint32_t value)
-	{
-		unsigned char *const address = reinterpret_cast<unsigned char *>(mem.GetAddressOfEntity(handle));
-
-		int offset = 0x7a0;
-
-		*(address + offset) = value;
-	}
-	float VehicleExtensions::GetCurrentRPM()
+	void VehicleExtensions::SetGears(Vehicle handle, uint32_t value)
 	{
 		const uint64_t address = mem.GetAddressOfEntity(handle);
 
-		int offset = 2004;
+		int offset = 0x7a0;
 
-		return address == 0 ? 0.0f : *reinterpret_cast<const float *>(address + offset);
+		*reinterpret_cast<uint32_t *>(address + offset) = value;
 	}
-	void VehicleExtensions::SetCurrentRPM(float rpm)
+	float VehicleExtensions::GetCurrentRPM(Vehicle handle)
 	{
-		uint64_t address = mem.GetAddressOfEntity(handle);
+		const uint64_t address = mem.GetAddressOfEntity(handle);
 
 		int offset = 0x7D4;
 
-		*reinterpret_cast<float *>(address + offset) = rpm;
+		return address == 0 ? 0.0f : *reinterpret_cast<const float *>(address + offset);
 	}
-	float VehicleExtensions::GetClutch()
+	void VehicleExtensions::SetCurrentRPM(Vehicle handle, float value)
 	{
-		unsigned char *const address = reinterpret_cast<unsigned char *>(mem.GetAddressOfEntity(handle));
+		const uint64_t address = mem.GetAddressOfEntity(handle);
+
+		int offset = 0x7D4;
+
+		*reinterpret_cast<float *>(address + offset) = value;
+	}
+	float VehicleExtensions::GetClutch(Vehicle handle)
+	{
+		const uint64_t address = mem.GetAddressOfEntity(handle);
 
 		int offset = 0x7E0;
 
 		return address == 0 ? 0 : *reinterpret_cast<const float *>(address + offset);
 	}
-	void VehicleExtensions::SetClutch(float value)
+	void VehicleExtensions::SetClutch(Vehicle handle, float value)
 	{
 		uint64_t address = mem.GetAddressOfEntity(handle);
 
@@ -60,15 +55,15 @@ namespace VehExt {
 
 		*reinterpret_cast<float *>(address + offset) = value;
 	}
-	float VehicleExtensions::GetTurbo()
+	float VehicleExtensions::GetTurbo(Vehicle handle)
 	{
-		unsigned char *const address = reinterpret_cast<unsigned char *>(mem.GetAddressOfEntity(handle));
+		const uint64_t address = mem.GetAddressOfEntity(handle);
 
 		int offset = 0x7F8;
 
 		return address == 0 ? 0 : *reinterpret_cast<const float *>(address + offset);
 	}
-	void VehicleExtensions::SetTurbo(float value)
+	void VehicleExtensions::SetTurbo(Vehicle handle, float value)
 	{
 		uint64_t address = mem.GetAddressOfEntity(handle);
 
@@ -76,7 +71,7 @@ namespace VehExt {
 
 		*reinterpret_cast<float *>(address + offset) = value;
 	}
-	float VehicleExtensions::GetThrottle()
+	float VehicleExtensions::GetThrottle(Vehicle handle)
 	{
 		uint64_t address = mem.GetAddressOfEntity(handle);
 
@@ -84,7 +79,7 @@ namespace VehExt {
 
 		return *reinterpret_cast<float *>(address + offset);
 	}
-	void VehicleExtensions::SetThrottle(float value)
+	void VehicleExtensions::SetThrottle(Vehicle handle, float value)
 	{
 		uint64_t address = mem.GetAddressOfEntity(handle);
 

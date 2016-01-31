@@ -7,23 +7,19 @@
 namespace VehExt {
 	class VehicleExtensions {
 	public:
-		VehicleExtensions(Vehicle vehicle);
-		
-		uint64_t GetAddress();
-		uint32_t GetGears();
-		void SetGears(uint32_t value);
-		float GetCurrentRPM();
-		void SetCurrentRPM(float value);
-		float GetClutch();
-		void SetClutch(float value);
-		float GetTurbo();
-		void SetTurbo(float value);
-		float GetThrottle();
-		void SetThrottle(float value);
+		uint64_t GetAddress(Vehicle handle);
+		uint32_t GetGears(Vehicle handle);
+		void SetGears(Vehicle handle, uint32_t value);
+		float GetCurrentRPM(Vehicle handle);
+		void SetCurrentRPM(Vehicle handle, float value);
+		float GetClutch(Vehicle handle);
+		void SetClutch(Vehicle handle, float value);
+		float GetTurbo(Vehicle handle);
+		void SetTurbo(Vehicle handle, float value);
+		float GetThrottle(Vehicle handle);
+		void SetThrottle(Vehicle handle, float value);
 
 	private:
 		MemoryAccess mem;
-		Vehicle handle;
-
 	};
 }
