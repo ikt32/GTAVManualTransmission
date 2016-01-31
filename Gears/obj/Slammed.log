@@ -1,4 +1,0 @@
-﻿  script.cpp
-script.cpp(18): warning C4800: 'int': forcing value to bool 'true' or 'false' (performance warning)
-  Slammed.vcxproj -> C:\Users\MT\Desktop\ScriptHookV_SDK_1.0.393.4a\projects\Slammed\bin\Gears.asi
-  Slammed.vcxproj -> bin\Gears.pdb (Full PDB)

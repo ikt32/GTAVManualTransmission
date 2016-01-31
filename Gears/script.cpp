@@ -10,7 +10,7 @@ enum ControlType {
 	Clutch
 };
 
-bool Enable = true;
+/*bool Enable = true;
 bool EnableKeyCurrent = false;
 bool EnableKeyPrevious = false;
 
@@ -22,11 +22,11 @@ bool isEnableKeyJustPressed(uint key) {
 	}
 	EnableKeyPrevious = EnableKeyCurrent;
 	return false;
-}
+}*/
 
 void update() {
-	if (isEnableKeyJustPressed(VK_OEM_5))
-		Enable = !Enable;
+	//if (isEnableKeyJustPressed(VK_OEM_5))
+	//	Enable = !Enable;
 	
 	Player player = PLAYER::PLAYER_ID();
 	Ped playerPed = PLAYER::PLAYER_PED_ID();
@@ -92,8 +92,8 @@ void update() {
 		UI::_DRAW_TEXT(0.01f, 0.5f);
 	}
 
-	if (!Enable)
-		return;
+	//if (!Enable)
+	//	return;
 
 	// Park/Reverse. Gear 0. Prevent going forward in gear 0.
 	if (currGear == 0 && !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && speed < 1.0f) {
