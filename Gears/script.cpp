@@ -31,7 +31,6 @@ uint32_t nextGear;
 uint32_t lockGears = 0x00010001;
 float speed;
 
-float lockRPM = 1.1f;
 bool isBike;
 
 void readSettings() {
@@ -142,14 +141,18 @@ void update() {
 	// Reverse behavior
 	if (!isBike) {
 		// Park/Reverse. Gear 0. Prevent going forward in gear 0.
-		if (currGear == 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
-			&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && speed < 2.0f) {
+		//if (currGear == 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
+		//	&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && speed < 2.0f) {
+		if (currGear == 0
+			&& throttle > 0) {
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 		}
 		// Forward gears. Prevent reversing.
-		else if (currGear > 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake)
-			&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && speed < 2.0f) {
+		//else if (currGear > 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake)
+		//	&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && speed < 2.0f) {
+		else if (currGear > 0
+			&& throttle < 0) {
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 		}
@@ -170,13 +173,14 @@ void update() {
 	}
 
 	int accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
+	float accelvalf = (accelval - 127) / 127.0f;
 
 	// Game wants to shift up. Triggered at high RPM, high speed.
 	// Desired result: high RPM, same gear (currGear)
 	// Also user is pressing gas hard and game disagrees
 	if (currGear < nextGear && speed > 2.0f || (clutch < 1.0 && accelval > 200)) {
 		ext.SetClutch(vehicle, 1.0f);
-		ext.SetCurrentRPM(vehicle, lockRPM);
+		ext.SetCurrentRPM(vehicle, accelvalf * 1.1f);
 	}
 
 	// Game wants to shift down. Usually triggered when user accelerates
@@ -192,7 +196,9 @@ void update() {
 	// Shift up
 	if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls[ShiftUp])) {
 		if (currGear < 8) {
-			ext.SetThrottle(vehicle, 0.0f);
+			// Blowoff valve sound when game does this. Unknown why this can't
+			// be emulated this way. Probably writing these values isn't working.
+			ext.SetThrottle(vehicle, 0.0f); 
 			ext.SetClutch(vehicle, 0.1f);
 			lockGears = currGear + 1 | ((currGear + 1) << 16);
 		}
@@ -212,7 +218,7 @@ void update() {
 	// Press clutch (doesn't actually do shit)
 	if (CONTROLS::IS_CONTROL_PRESSED(0, controls[Clutch])) {
 		ext.SetClutch(vehicle, 0.05f);
-		ext.SetCurrentRPM(vehicle, ((CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate) - 127) / 127)*1.1f);
+		ext.SetCurrentRPM(vehicle, accelvalf * 1.1f);
 	}
 }
 

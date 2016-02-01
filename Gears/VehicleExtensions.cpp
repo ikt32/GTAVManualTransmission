@@ -10,7 +10,7 @@ namespace VehExt {
 	{
 		const uint64_t address = mem.GetAddressOfEntity(handle);
 
-		int offset = 0x7a0;
+		int offset = (getGameVersion() > 3 ? 0x7A0 : 0x790);
 
 		return address == 0 ? 0 : *reinterpret_cast<const uint32_t *>(address + offset);
 	}
@@ -19,7 +19,7 @@ namespace VehExt {
 	{
 		const uint64_t address = mem.GetAddressOfEntity(handle);
 
-		int offset = 0x7a0;
+		int offset = (getGameVersion() > 3 ? 0x7A0 : 0x790);
 
 		*reinterpret_cast<uint32_t *>(address + offset) = value;
 	}
@@ -27,7 +27,7 @@ namespace VehExt {
 	{
 		const uint64_t address = mem.GetAddressOfEntity(handle);
 
-		int offset = 0x7D4;
+		int offset = (getGameVersion() > 3 ? 0x7D4 : 0x7C4);
 
 		return address == 0 ? 0.0f : *reinterpret_cast<const float *>(address + offset);
 	}
@@ -35,7 +35,7 @@ namespace VehExt {
 	{
 		const uint64_t address = mem.GetAddressOfEntity(handle);
 
-		int offset = 0x7D4;
+		int offset = (getGameVersion() > 3 ? 0x7D4 : 0x7C4);
 
 		*reinterpret_cast<float *>(address + offset) = value;
 	}
@@ -43,7 +43,7 @@ namespace VehExt {
 	{
 		const uint64_t address = mem.GetAddressOfEntity(handle);
 
-		int offset = 0x7E0;
+		int offset = (getGameVersion() > 3 ? 0x7E0 : 0x7D0);
 
 		return address == 0 ? 0 : *reinterpret_cast<const float *>(address + offset);
 	}
@@ -51,7 +51,7 @@ namespace VehExt {
 	{
 		uint64_t address = mem.GetAddressOfEntity(handle);
 
-		int offset = 0x7E0;
+		int offset = (getGameVersion() > 3 ? 0x7E0 : 0x7D0);
 
 		*reinterpret_cast<float *>(address + offset) = value;
 	}
@@ -59,7 +59,7 @@ namespace VehExt {
 	{
 		const uint64_t address = mem.GetAddressOfEntity(handle);
 
-		int offset = 0x7F8;
+		int offset = (getGameVersion() > 3 ? 0x7F8 : 0x7D8);
 
 		return address == 0 ? 0 : *reinterpret_cast<const float *>(address + offset);
 	}
@@ -67,7 +67,7 @@ namespace VehExt {
 	{
 		uint64_t address = mem.GetAddressOfEntity(handle);
 
-		int offset = 0x7F8;
+		int offset = (getGameVersion() > 3 ? 0x7F8 : 0x7D8);
 
 		*reinterpret_cast<float *>(address + offset) = value;
 	}
@@ -75,7 +75,7 @@ namespace VehExt {
 	{
 		uint64_t address = mem.GetAddressOfEntity(handle);
 
-		int offset = 0x7E4;
+		int offset = (getGameVersion() > 3 ? 0x7E4 : 0x7D4);
 
 		return *reinterpret_cast<float *>(address + offset);
 	}
@@ -83,7 +83,7 @@ namespace VehExt {
 	{
 		uint64_t address = mem.GetAddressOfEntity(handle);
 
-		int offset = 0x7E4;
+		int offset = (getGameVersion() > 3 ? 0x7E4 : 0x7D4);
 
 		*reinterpret_cast<float *>(address + offset) = value;
 	}
