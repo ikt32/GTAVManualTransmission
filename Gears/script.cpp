@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <iomanip>
 #include "VehicleExtensions.hpp"
 
 enum ControlType {
@@ -18,6 +19,20 @@ int controls[3];
 bool enableManual = true;
 bool enableKeyPrev;
 bool enableKeyCurr;
+
+uint64_t address;
+uint32_t gears;
+float rpm;
+float clutch;
+float throttle;
+float turbo;
+uint32_t currGear;
+uint32_t nextGear;
+uint32_t lockGears = 0x00010001;
+float speed;
+
+float lockRPM = 1.1f;
+bool isBike;
 
 void readSettings() {
 	debug = GetPrivateProfileInt(L"DEBUG", L"Info", 0, L"./Gears.ini");
@@ -44,8 +59,17 @@ bool isEnableKeyJustPressed(DWORD Key) {
 }
 
 void update() {
-	if (isEnableKeyJustPressed(controls[Toggle]))
+	if (isEnableKeyJustPressed(controls[Toggle])) {
 		enableManual = !enableManual;
+		if (vehicle) {
+			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+		}
+	}
+
+	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, ControlEnter)) {
+		readSettings();
+		lockGears = 0x00010001;
+	}
 
 	Player player = PLAYER::PLAYER_ID();
 	Ped playerPed = PLAYER::PLAYER_PED_ID();
@@ -63,35 +87,41 @@ void update() {
 	if (!vehicle)
 		return;
 
-	if (!(VEHICLE::IS_THIS_MODEL_A_CAR(ENTITY::GET_ENTITY_MODEL(vehicle))
+	if ( !(VEHICLE::IS_THIS_MODEL_A_CAR(ENTITY::GET_ENTITY_MODEL(vehicle))
 		|| VEHICLE::IS_THIS_MODEL_A_BIKE(ENTITY::GET_ENTITY_MODEL(vehicle))
 		|| VEHICLE::IS_THIS_MODEL_A_QUADBIKE(ENTITY::GET_ENTITY_MODEL(vehicle))
-		))
+		)|| VEHICLE::IS_THIS_MODEL_A_BICYCLE(ENTITY::GET_ENTITY_MODEL(vehicle)) )
 		return;
 
-	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, ControlEnter))
-		readSettings();
 
-	uint64_t address = ext.GetAddress(vehicle);
-	uint32_t gears = ext.GetGears(vehicle);
-	float rpm = ext.GetCurrentRPM(vehicle);
-	float clutch = ext.GetClutch(vehicle);
-	float throttle = ext.GetThrottle(vehicle);
-	float turbo = ext.GetTurbo(vehicle);
-	uint16_t currGear = (0xFFFF0000 & gears) >> 16;
-	uint16_t nextGear = 0x0000FFFF & gears;
-	float speed = ENTITY::GET_ENTITY_SPEED(vehicle);
+	if (VEHICLE::IS_THIS_MODEL_A_BIKE(ENTITY::GET_ENTITY_MODEL(vehicle))) {
+		isBike = true;
+	}
+	else {
+		isBike = false;
+	}
+
+	address = ext.GetAddress(vehicle);
+	gears = ext.GetGears(vehicle);
+	rpm = ext.GetCurrentRPM(vehicle);
+	clutch = ext.GetClutch(vehicle);
+	throttle = ext.GetThrottle(vehicle);
+	turbo = ext.GetTurbo(vehicle);
+	currGear = (0xFFFF0000 & gears) >> 16;
+	nextGear = 0x0000FFFF & gears;
+	speed = ENTITY::GET_ENTITY_SPEED(vehicle);
 
 	if (debug) {
 		std::stringstream infos;
 
-		infos << "RPM: " << rpm <<
+		infos << "RPM: " << std::setprecision(4) << rpm <<
 			"\nCurrGear: " << currGear <<
 			"\nNextGear: " << nextGear <<
-			"\nClutch: " << clutch <<
-			"\nThrottle: " << throttle <<
-			"\nTurbo: " << turbo <<
-			"\nAddress: " << std::hex << address;
+			"\nClutch: " << std::setprecision(4) << clutch <<
+			"\nThrottle: " << std::setprecision(4) << throttle <<
+			"\nTurbo: " << std::setprecision(4) << turbo <<
+			//"\nAddress: " << std::hex << address <<
+			"\nEnabled: " << (enableManual ? "Yes" : "No");
 		const char *infoc = infos.str().c_str();
 
 		UI::SET_TEXT_FONT(0);
@@ -109,30 +139,44 @@ void update() {
 	if (!enableManual)
 		return;
 
-	// Park/Reverse. Gear 0. Prevent going forward in gear 0.
-	if (currGear == 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
-		&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && speed < 2.0f) {
-		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-	}
-	// Forward gears. Prevent reversing.
-	else if (currGear > 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake)
-		&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && speed < 2.0f) {
-		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+	// Reverse behavior
+	if (!isBike) {
+		// Park/Reverse. Gear 0. Prevent going forward in gear 0.
+		if (currGear == 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
+			&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && speed < 2.0f) {
+			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+		}
+		// Forward gears. Prevent reversing.
+		else if (currGear > 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake)
+			&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && speed < 2.0f) {
+			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+		}
+		else {
+			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+		}
 	}
 	else {
-		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+		// For bikes, do this automatically.
+		if (currGear == 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
+			&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && speed < 2.0f) {
+			lockGears = 0x00010001;
+		}
+		else if (currGear > 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake)
+			&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && speed < 2.0f) {
+			lockGears = 0x00000000;
+		}
 	}
+
+	int accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
 
 	// Game wants to shift up. Triggered at high RPM, high speed.
 	// Desired result: high RPM, same gear (currGear)
-	if (currGear < nextGear) {
-		ext.SetGears(vehicle, currGear | (currGear << 16));
-		ext.SetCurrentRPM(vehicle, 0.9f);
-		ext.SetClutch(vehicle, 1.2f);
-		ext.SetThrottle(vehicle, 1.2f);
-		ext.SetCurrentRPM(vehicle, 1.1f);
+	// Also user is pressing gas hard and game disagrees
+	if (currGear < nextGear && speed > 2.0f || (clutch < 1.0 && accelval > 200)) {
+		ext.SetClutch(vehicle, 1.0f);
+		ext.SetCurrentRPM(vehicle, lockRPM);
 	}
 
 	// Game wants to shift down. Usually triggered when user accelerates
@@ -140,31 +184,34 @@ void update() {
 	// Desired result: low RPM or stall, even. Stay in current gear!
 	// Otherwise: force car to drive anyway to keep RPM up.
 	// Current: Game cuts engine power
-	if (currGear > nextGear) {
-		ext.SetGears(vehicle, currGear | (currGear << 16));
-		ext.SetClutch(vehicle, 1.2f);
-		ext.SetThrottle(vehicle, 1.2f);
+	if (currGear > nextGear && speed > 2.0f) {
+		ext.SetClutch(vehicle, 1.0f);
+		ext.SetThrottle(vehicle, 1.0f);
 	}
-
+		
 	// Shift up
 	if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls[ShiftUp])) {
 		if (currGear < 8) {
-			ext.SetGears(vehicle, currGear + 1 | ((currGear + 1) << 16));
+			ext.SetThrottle(vehicle, 0.0f);
 			ext.SetClutch(vehicle, 0.1f);
-			ext.SetThrottle(vehicle, 0.5f);
+			lockGears = currGear + 1 | ((currGear + 1) << 16);
 		}
 	}
 
 	// Shift down
 	if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls[ShiftDown])) {
 		if (currGear > 0) {
-			ext.SetGears(vehicle, currGear - 1 | ((currGear - 1) << 16));
+			ext.SetThrottle(vehicle, 0.0f);
+			ext.SetClutch(vehicle, 0.1f);
+			lockGears = currGear - 1 | ((currGear - 1) << 16);
 		}
 	}
 
+	ext.SetGears(vehicle, lockGears);
+
 	// Press clutch (doesn't actually do shit)
 	if (CONTROLS::IS_CONTROL_PRESSED(0, controls[Clutch])) {
-		ext.SetClutch(vehicle, 0.1f);
+		ext.SetClutch(vehicle, 0.05f);
 		ext.SetCurrentRPM(vehicle, ((CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate) - 127) / 127)*1.1f);
 	}
 }
