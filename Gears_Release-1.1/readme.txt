@@ -1,7 +1,7 @@
 ###############################################################################
 Manual Transmission for GTA V by ikt
 ###############################################################################
-1.0
+1.1
 
 This mod allows you to drive like with a manual vehicle. Each vehicle retains
 its original characteristics, but now under your control.
