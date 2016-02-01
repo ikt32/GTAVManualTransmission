@@ -7,16 +7,46 @@
 enum ControlType {
 	ShiftUp,
 	ShiftDown,
-	Clutch
+	Clutch,
+	Toggle
 };
 
 Vehicle vehicle;
 VehExt::VehicleExtensions ext;
+int debug;
+int controls[3];
+bool enableManual = true;
+bool enableKeyPrev;
+bool enableKeyCurr;
+
+void readSettings() {
+	debug = GetPrivateProfileInt(L"DEBUG", L"Info", 0, L"./Gears.ini");
+	controls[ShiftUp] = GetPrivateProfileInt(L"CONTROLS", L"ShiftUp", ControlVehicleDuck, L"./Gears.ini");
+	controls[ShiftDown] = GetPrivateProfileInt(L"CONTROLS", L"ShiftDown", ControlVehicleSelectNextWeapon, L"./Gears.ini");
+	controls[Clutch] = GetPrivateProfileInt(L"CONTROLS", L"Clutch", ControlVehicleAim, L"./Gears.ini");
+	controls[Toggle] = GetPrivateProfileInt(L"CONTROLS", L"Toggle", VK_OEM_5, L"./Gears.ini");
+}
+
+bool isEnableKeyJustPressed(DWORD Key) {
+	if (GetAsyncKeyState(Key) & 0x8000)
+		enableKeyCurr = true;
+	else
+		enableKeyCurr = false;
+
+	// raising edge
+	if (enableKeyCurr == true && enableKeyPrev == false) {
+		enableKeyPrev = enableKeyCurr;
+		return true;
+	}
+
+	enableKeyPrev = enableKeyCurr;
+	return false;
+}
 
 void update() {
-	//if (isEnableKeyJustPressed(VK_OEM_5))
-	//	Enable = !Enable;
-	
+	if (isEnableKeyJustPressed(controls[Toggle]))
+		enableManual = !enableManual;
+
 	Player player = PLAYER::PLAYER_ID();
 	Ped playerPed = PLAYER::PLAYER_PED_ID();
 
@@ -33,18 +63,14 @@ void update() {
 	if (!vehicle)
 		return;
 
-	if (!(VEHICLE::IS_THIS_MODEL_A_CAR(ENTITY::GET_ENTITY_MODEL(vehicle)) || 
-		VEHICLE::IS_THIS_MODEL_A_BIKE(ENTITY::GET_ENTITY_MODEL(vehicle)) ||
-		VEHICLE::IS_THIS_MODEL_A_QUADBIKE(ENTITY::GET_ENTITY_MODEL(vehicle))
-		) )
+	if (!(VEHICLE::IS_THIS_MODEL_A_CAR(ENTITY::GET_ENTITY_MODEL(vehicle))
+		|| VEHICLE::IS_THIS_MODEL_A_BIKE(ENTITY::GET_ENTITY_MODEL(vehicle))
+		|| VEHICLE::IS_THIS_MODEL_A_QUADBIKE(ENTITY::GET_ENTITY_MODEL(vehicle))
+		))
 		return;
 
-	int debug = GetPrivateProfileInt(L"DEBUG", L"Info", 0, L"./Gears.ini");
-	int Controls[3];
-	Controls[ShiftUp] = GetPrivateProfileInt(L"CONTROLS", L"ShiftUp", ControlVehicleDuck, L"./Gears.ini");
-	Controls[ShiftDown] = GetPrivateProfileInt(L"CONTROLS", L"ShiftDown", ControlVehicleSelectNextWeapon, L"./Gears.ini");
-	Controls[Clutch] = GetPrivateProfileInt(L"CONTROLS", L"Clutch", ControlVehicleAim, L"./Gears.ini");
-
+	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, ControlEnter))
+		readSettings();
 
 	uint64_t address = ext.GetAddress(vehicle);
 	uint32_t gears = ext.GetGears(vehicle);
@@ -80,13 +106,18 @@ void update() {
 		UI::_DRAW_TEXT(0.01f, 0.5f);
 	}
 
+	if (!enableManual)
+		return;
+
 	// Park/Reverse. Gear 0. Prevent going forward in gear 0.
-	if (currGear == 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && speed < 1.0f) {
+	if (currGear == 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
+		&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && speed < 2.0f) {
 		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
 		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 	}
 	// Forward gears. Prevent reversing.
-	else if (currGear > 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && speed < 1.0f) {
+	else if (currGear > 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake)
+		&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && speed < 2.0f) {
 		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
 		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 	}
@@ -116,32 +147,30 @@ void update() {
 	}
 
 	// Shift up
-	if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, Controls[ShiftUp])) {
-		ext.SetGears(vehicle, currGear + 1 | ((currGear + 1) << 16));
-		ext.SetClutch(vehicle, 0.1f);
-		ext.SetThrottle(vehicle, 0.5f);
+	if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls[ShiftUp])) {
+		if (currGear < 8) {
+			ext.SetGears(vehicle, currGear + 1 | ((currGear + 1) << 16));
+			ext.SetClutch(vehicle, 0.1f);
+			ext.SetThrottle(vehicle, 0.5f);
+		}
 	}
 
 	// Shift down
-	if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, Controls[ShiftDown])) {
+	if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls[ShiftDown])) {
 		if (currGear > 0) {
 			ext.SetGears(vehicle, currGear - 1 | ((currGear - 1) << 16));
-			if (VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) == false) {
-				VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
-			}
 		}
 	}
 
 	// Press clutch (doesn't actually do shit)
-	if (CONTROLS::IS_CONTROL_PRESSED(0, Controls[Clutch])) {
+	if (CONTROLS::IS_CONTROL_PRESSED(0, controls[Clutch])) {
 		ext.SetClutch(vehicle, 0.1f);
-		ext.SetCurrentRPM(vehicle, ((CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate)-127)/127)*1.1f);
+		ext.SetCurrentRPM(vehicle, ((CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate) - 127) / 127)*1.1f);
 	}
 }
 
-
-
 void main() {
+	readSettings();
 	while (true) {
 		update();
 		WAIT(0);
