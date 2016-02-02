@@ -1,7 +1,7 @@
 ###############################################################################
 Manual Transmission for GTA V by ikt
 ###############################################################################
-1.0
+1.3
 
 This mod allows you to drive like with a manual vehicle. Each vehicle retains
 its original characteristics, but now under your control.
@@ -21,7 +21,27 @@ https://www.gta5-mods.com/scripts/speedometer-improvedalexbladeversion
 ###############################################################################
 Installation
 ###############################################################################
-Extract Gears.asi and Gears.ini to your GTA V game folder.
+Extract Gears.asi and Gears.ini to your GTA V game folder. Configure the ini
+settings to your likings.
+
+###############################################################################
+Usage
+###############################################################################
+Switch between manual or automatic:
+Press the |\ key on your keyboard.
+
+Manual sequential:
+	Shift Up:	Controller A	or Keyboard Numpad 9
+	Shift Down:	Controller X	or Keyboard Numpad 7
+	Clutch:		Controller LB	or Keyboard Numpad 8
+
+H-pattern shifting:
+	Numpad is mapped to gear. Map your wheel's H-shifter to this.
+	
+To reverse: Put in reverse gear and press brake.
+
+Clutch isn't needed to shift. Going below RPM in high gears causes stalling,
+so shift down when this happens until the gear catches again.
 
 ###############################################################################
 Configuration and Gears.ini usage instructions
@@ -29,27 +49,82 @@ Configuration and Gears.ini usage instructions
 Default values:
 -------------------------------------------------------------------------------
 [CONTROLS]
-ShiftUp = 61		
-ShiftDown = 62		
-Clutch = 68
+; Controller buttons
+ShiftUp		= 201		
+ShiftDown	= 203	
+Clutch		= 205
+
+; Keyboard buttons
+KShiftUp 	= 0x69
+KShiftDown 	= 0x67
+KClutch 	= 0x68
+
+; Enable or disable H-shifter
+EnableH = 0
+; Keyboard buttons
+HR	= 0x60
+H1	= 0x61
+H2	= 0x62
+H3	= 0x63
+H4	= 0x64
+H5	= 0x65
+H6	= 0x66
+H7	= 0x67
+H8	= 0x68
+
+;Button to toggle manual
 Toggle = 0xDC
 
 [DEBUG]
-Info = 1
+Info = 0
+
+; Default values
+;ShiftUp	= 201		Controller A
+;ShiftDown	= 203		Controller X
+;Clutch		= 205		Controller LB
+
+; Keyboard buttons
+;KShiftUp 	= 0x69		Numpad 9
+;KShiftDown = 0x67		Numpad 7
+;KClutch 	= 0x68		Numpad 8
+
+; H-shifter
+;EnableH = 0			0 - Sequential, 1 - H-shifter
+;HR	= 0x60				Numpad 0
+;H1	= 0x61				Numpad 1
+;H2	= 0x62				Numpad 2
+;H3	= 0x63				Numpad 3
+;H4	= 0x64				Numpad 4
+;H5	= 0x65				Numpad 5
+;H6	= 0x66				Numpad 6
+;H7	= 0x67				Numpad 7
+;H8	= 0x68				Numpad 8
+
+; Disable/Enable
+;Toggle = 0xDC			|\ Key
 -------------------------------------------------------------------------------
 ShiftUp:
 Control to shift up. Press this to raise the current gear by 1. The keys are in
-the table at the bottom of this file, with the Control values.
+the table in Controls.txt, with the Control values.
 This is gamepad-compatible.
 
 ShiftDown:
 Control to shift down. Press this to lower the current gear by 1. The keys are
-in the table at the bottom of this file, with the Control values.
+in the Controls.txt, with the Control values.
 This is gamepad-compatible.
 
 Clutch:
-Control to clutch. Press this to roll free. The keys are in the table below
+Control to clutch. Press this to roll free. The keys are in Controls.txt
 with the Control values. This is gamepad-compatible.
+
+KShiftUp:
+KShiftDown:
+KClutch:
+Same as above, but for exclusively keyboard. All keys can be used.
+The keys are in the
+following link or in VK_Keycodes.txt. These map to the keyboard:
+THESE ARE NOT GAMEPAD COMPATIBLE.
+https://msdn.microsoft.com/en-us/library/windows/desktop/dd375731%28v=vs.85%29.aspx
 
 Toggle:
 Control to disable or enable manual transmission control. The keys are in the
@@ -69,14 +144,11 @@ Issues:
 		  the max car gear.
 	- Unreliable clutch/throttle control.
 		- Can't set clutch/throttle when redlining. Clutch disengages when
-		  the speed is too low.
+		  the speed is too low, can't set it either.
 
 You're very welcome to help with these things. Message me on GTAForums or
 post in the thread if you have anything. GTA5-Mods.com is also fine if you
 don't have an account there.
-
-Todo:
-	- H-pattern gears
 
 ###############################################################################
 Elaboration on GTA V transmission and this mod
@@ -118,6 +190,17 @@ Transmission optimizations
 Disabled for bicycles
 Fixed motorcycle support
 
+1.2
+Fix version 573 compatibility issues
+Tweaked reverse behavior
+Fix overrevving behavior
+
+1.3
+Full keyboard support
+H-Shifter support - map to keyboard buttons
+Preliminary compatiblity with LeFix Speedometer for gear shift indicators
+Disable/enable manual notification
+Changes in ini
 
 ###############################################################################
 Credits
@@ -130,176 +213,3 @@ Have fun!
 
 Source available at
 https://github.com/E66666666/GTAVManualTransmission
-
-
-
-
-###############################################################################
-Control table
-###############################################################################
-The full list can be found in Alexander Blade's ScriptHookV SDK, in enums.h.
-This list is shortened for convenience.
-enum eControl
-{
-	ControlNextCamera = 0,
-	ControlLookLeftRight = 1,
-	ControlLookUpDown = 2,
-	ControlLookUpOnly = 3,
-	ControlLookDownOnly = 4,
-	ControlLookLeftOnly = 5,
-	ControlLookRightOnly = 6,
-	ControlPhone = 27,
-	ControlVehicleMoveLeftRight = 59,
-	ControlVehicleMoveUpDown = 60,
-	ControlVehicleMoveUpOnly = 61,
-	ControlVehicleMoveDownOnly = 62,
-	ControlVehicleMoveLeftOnly = 63,
-	ControlVehicleMoveRightOnly = 64,
-	ControlVehicleSpecial = 65,
-	ControlVehicleGunLeftRight = 66,
-	ControlVehicleGunUpDown = 67,
-	ControlVehicleAim = 68,
-	ControlVehicleAttack = 69,
-	ControlVehicleAttack2 = 70,
-	ControlVehicleAccelerate = 71,
-	ControlVehicleBrake = 72,
-	ControlVehicleDuck = 73,
-	ControlVehicleHeadlight = 74,
-	ControlVehicleExit = 75,
-	ControlVehicleHandbrake = 76,
-	ControlVehicleHotwireLeft = 77,
-	ControlVehicleHotwireRight = 78,
-	ControlVehicleLookBehind = 79,
-	ControlVehicleCinCam = 80,
-	ControlVehicleNextRadio = 81,
-	ControlVehiclePrevRadio = 82,
-	ControlVehicleNextRadioTrack = 83,
-	ControlVehiclePrevRadioTrack = 84,
-	ControlVehicleRadioWheel = 85,
-	ControlVehicleHorn = 86,
-	ControlVehicleFlyThrottleUp = 87,
-	ControlVehicleFlyThrottleDown = 88,
-	ControlVehicleFlyYawLeft = 89,
-	ControlVehicleFlyYawRight = 90,
-	ControlVehiclePassengerAim = 91,
-	ControlVehiclePassengerAttack = 92,
-	ControlVehicleSpecialAbilityFranklin = 93,
-	ControlVehicleStuntUpDown = 94,
-	ControlVehicleCinematicUpDown = 95,
-	ControlVehicleCinematicUpOnly = 96,
-	ControlVehicleCinematicDownOnly = 97,
-	ControlVehicleCinematicLeftRight = 98,
-	ControlVehicleSelectNextWeapon = 99,
-	ControlVehicleSelectPrevWeapon = 100,
-	ControlVehicleRoof = 101,
-	ControlVehicleJump = 102,
-	ControlVehicleGrapplingHook = 103,
-	ControlVehicleShuffle = 104,
-	ControlVehicleDropProjectile = 105,
-	ControlVehicleMouseControlOverride = 106,
-	ControlVehicleFlyRollLeftRight = 107,
-	ControlVehicleFlyRollLeftOnly = 108,
-	ControlVehicleFlyRollRightOnly = 109,
-	ControlVehicleFlyPitchUpDown = 110,
-	ControlVehicleFlyPitchUpOnly = 111,
-	ControlVehicleFlyPitchDownOnly = 112,
-	ControlVehicleFlyUnderCarriage = 113,
-	ControlVehicleFlyAttack = 114,
-	ControlVehicleFlySelectNextWeapon = 115,
-	ControlVehicleFlySelectPrevWeapon = 116,
-	ControlVehicleFlySelectTargetLeft = 117,
-	ControlVehicleFlySelectTargetRight = 118,
-	ControlVehicleFlyVerticalFlightMode = 119,
-	ControlVehicleFlyDuck = 120,
-	ControlVehicleFlyAttackCamera = 121,
-	ControlVehicleFlyMouseControlOverride = 122,
-	ControlVehicleSubTurnLeftRight = 123,
-	ControlVehicleSubTurnLeftOnly = 124,
-	ControlVehicleSubTurnRightOnly = 125,
-	ControlVehicleSubPitchUpDown = 126,
-	ControlVehicleSubPitchUpOnly = 127,
-	ControlVehicleSubPitchDownOnly = 128,
-	ControlVehicleSubThrottleUp = 129,
-	ControlVehicleSubThrottleDown = 130,
-	ControlVehicleSubAscend = 131,
-	ControlVehicleSubDescend = 132,
-	ControlVehicleSubTurnHardLeft = 133,
-	ControlVehicleSubTurnHardRight = 134,
-	ControlVehicleSubMouseControlOverride = 135,
-	ControlVehiclePushbikePedal = 136,
-	ControlVehiclePushbikeSprint = 137,
-	ControlVehiclePushbikeFrontBrake = 138,
-	ControlVehiclePushbikeRearBrake = 139,
-	ControlPhoneUp = 172,
-	ControlPhoneDown = 173,
-	ControlPhoneLeft = 174,
-	ControlPhoneRight = 175,
-	ControlPhoneSelect = 176,
-	ControlPhoneCancel = 177,
-	ControlPhoneOption = 178,
-	ControlPhoneExtraOption = 179,
-	ControlPhoneScrollForward = 180,
-	ControlPhoneScrollBackward = 181,
-	ControlPhoneCameraFocusLock = 182,
-	ControlPhoneCameraGrid = 183,
-	ControlPhoneCameraSelfie = 184,
-	ControlPhoneCameraDOF = 185,
-	ControlPhoneCameraExpression = 186,
-	ControlScriptLeftAxisX = 218,
-	ControlScriptLeftAxisY = 219,
-	ControlScriptRightAxisX = 220,
-	ControlScriptRightAxisY = 221,
-	ControlScriptRUp = 222,
-	ControlScriptRDown = 223,
-	ControlScriptRLeft = 224,
-	ControlScriptRRight = 225,
-	ControlScriptLB = 226,
-	ControlScriptRB = 227,
-	ControlScriptLT = 228,
-	ControlScriptRT = 229,
-	ControlScriptLS = 230,
-	ControlScriptRS = 231,
-	ControlScriptPadUp = 232,
-	ControlScriptPadDown = 233,
-	ControlScriptPadLeft = 234,
-	ControlScriptPadRight = 235,
-	ControlScriptSelect = 236,
-	ControlCursorAccept = 237,
-	ControlCursorCancel = 238,
-	ControlCursorX = 239,
-	ControlCursorY = 240,
-	ControlCursorScrollUp = 241,
-	ControlCursorScrollDown = 242,
-	ControlEnterCheatCode = 243,
-	ControlInteractionMenu = 244,
-	ControlMoveLeft = 266,
-	ControlMoveRight = 267,
-	ControlMoveUp = 268,
-	ControlMoveDown = 269,
-	ControlLookLeft = 270,
-	ControlLookRight = 271,
-	ControlLookUp = 272,
-	ControlLookDown = 273,
-	ControlVehicleMoveLeft = 278,
-	ControlVehicleMoveRight = 279,
-	ControlVehicleMoveUp = 280,
-	ControlVehicleMoveDown = 281,
-	ControlVehicleGunLeft = 282,
-	ControlVehicleGunRight = 283,
-	ControlVehicleGunUp = 284,
-	ControlVehicleGunDown = 285,
-	ControlVehicleLookLeft = 286,
-	ControlVehicleLookRight = 287,
-	ControlScaledLookLeftRight = 290,
-	ControlScaledLookUpDown = 291,
-	ControlScaledLookUpOnly = 292,
-	ControlScaledLookDownOnly = 293,
-	ControlScaledLookLeftOnly = 294,
-	ControlScaledLookRightOnly = 295,
-	ControlVehicleDriveLook = 329,
-	ControlVehicleDriveLook2 = 330,
-	ControlVehicleFlyAttack2 = 331,
-	ControlVehicleSlowMoUpDown = 334,
-	ControlVehicleSlowMoUpOnly = 335,
-	ControlVehicleSlowMoDownOnly = 336
-};
