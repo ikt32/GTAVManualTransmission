@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include "..\..\inc\types.h"
-#include "..\..\inc\main.h"
 #include "NativeMemory.hpp"
 
 namespace VehExt {
@@ -19,8 +18,6 @@ namespace VehExt {
 		void SetTurbo(Vehicle handle, float value);
 		float GetThrottle(Vehicle handle);
 		void SetThrottle(Vehicle handle, float value);
-		float GetTopGear1(Vehicle handle);
-		float GetTopGear2(Vehicle handle);
 
 	private:
 		MemoryAccess mem;

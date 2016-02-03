@@ -6,7 +6,7 @@
 #include "VehicleExtensions.hpp"
 
 enum ControlType {
-	HR,
+	HR = 0,
 	H1,
 	H2,
 	H3,
@@ -21,7 +21,8 @@ enum ControlType {
 	Toggle,
 	KShiftUp,
 	KShiftDown,
-	KClutch
+	KClutch,
+	SIZE_OF_ARRAY
 };
 
 Vehicle vehicle;
@@ -30,9 +31,9 @@ VehExt::VehicleExtensions ext;
 bool enableManual = true;
 int hshifter;
 int debug;
-int controls[16];
-bool controlCurr[16];
-bool controlPrev[16];
+int controls[SIZE_OF_ARRAY];
+bool controlCurr[SIZE_OF_ARRAY];
+bool controlPrev[SIZE_OF_ARRAY];
 
 
 bool isBike;
@@ -56,9 +57,9 @@ void readSettings() {
 	controls[ShiftDown] = GetPrivateProfileInt(L"CONTROLS", L"ShiftDown",	ControlFrontendX,		L"./Gears.ini");
 	controls[Clutch]	= GetPrivateProfileInt(L"CONTROLS", L"Clutch",		ControlFrontendLb,		L"./Gears.ini");
 	
-	controls[KShiftUp] =	GetPrivateProfileInt(L"CONTROLS", L"KShiftUp", VK_NUMPAD9, L"./Gears.ini");
-	controls[KShiftDown] =	GetPrivateProfileInt(L"CONTROLS", L"KShiftDown", VK_NUMPAD7, L"./Gears.ini");
-	controls[KClutch] =		GetPrivateProfileInt(L"CONTROLS", L"KClutch", VK_NUMPAD8, L"./Gears.ini");
+	controls[KShiftUp] =	GetPrivateProfileInt(L"CONTROLS", L"KShiftUp", 		VK_NUMPAD9, L"./Gears.ini");
+	controls[KShiftDown] =	GetPrivateProfileInt(L"CONTROLS", L"KShiftDown",	VK_NUMPAD7, L"./Gears.ini");
+	controls[KClutch] =		GetPrivateProfileInt(L"CONTROLS", L"KClutch", 		VK_NUMPAD8, L"./Gears.ini");
 
 	hshifter = GetPrivateProfileInt(L"CONTROLS", L"EnableH", 0, L"./Gears.ini");
 	controls[HR] = GetPrivateProfileInt(L"CONTROLS", L"HR", VK_NUMPAD0, L"./Gears.ini");
