@@ -31,8 +31,10 @@ Player player;
 Ped playerPed;
 
 bool enableManual = true;
+bool autoGear1 = false;
+bool autoReverse = false;
+bool debug = false;
 int hshifter;
-int debug;
 int controls[SIZE_OF_ARRAY];
 bool controlCurr[SIZE_OF_ARRAY];
 bool controlPrev[SIZE_OF_ARRAY];
@@ -51,7 +53,10 @@ uint32_t nextGear;
 uint32_t lockGears = 0x00010001;
 
 void readSettings() {
-	debug = GetPrivateProfileInt(L"DEBUG", L"Info", 0, L"./Gears.ini");
+	enableManual = (GetPrivateProfileInt(L"MAIN", L"DefaultEnable", 1, L"./Gears.ini") == 1);
+	autoGear1 = (GetPrivateProfileInt(L"MAIN", L"AutoGear1", 0, L"./Gears.ini") == 1);
+	autoReverse = (GetPrivateProfileInt(L"MAIN", L"AutoReverse", 0, L"./Gears.ini") == 1);
+	controls[Toggle] = GetPrivateProfileInt(L"MAIN", L"Toggle", VK_OEM_5, L"./Gears.ini");
 
 	controls[ShiftUp]	= GetPrivateProfileInt(L"CONTROLS", L"ShiftUp",		ControlFrontendAccept,	L"./Gears.ini");
 	controls[ShiftDown] = GetPrivateProfileInt(L"CONTROLS", L"ShiftDown",	ControlFrontendX,		L"./Gears.ini");
@@ -72,7 +77,11 @@ void readSettings() {
 	controls[H7] = GetPrivateProfileInt(L"CONTROLS", L"H7", VK_NUMPAD0, L"./Gears.ini");
 	controls[H8] = GetPrivateProfileInt(L"CONTROLS", L"H8", VK_NUMPAD0, L"./Gears.ini");
 
-	controls[Toggle]	= GetPrivateProfileInt(L"CONTROLS", L"Toggle",		VK_OEM_5,	L"./Gears.ini");
+	debug = (GetPrivateProfileInt(L"DEBUG", L"Info", 0, L"./Gears.ini") == 1);
+}
+
+void writeSettings() {
+	WritePrivateProfileString(L"MAIN", L"DefaultEnable", (enableManual ? L" 1" : L" 0"), L"./Gears.ini");
 }
 
 bool isKeyPressed(int key) {
@@ -126,6 +135,7 @@ void update() {
 		if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
+		writeSettings();
 		readSettings();
 	}
 
@@ -207,7 +217,18 @@ void update() {
 		return;
 
 	// Reverse behavior
-	if (!isBike) {
+	if (isBike || autoReverse) {
+		// For bikes, do this automatically.
+		if (currGear == 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
+			&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && speed < 2.0f) {
+			lockGears = 0x00010001;
+		}
+		else if (currGear > 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake)
+			&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && speed < 2.0f) {
+			lockGears = 0x00000000;
+		}
+	}
+	else {
 		// Park/Reverse. Gear 0. Prevent going forward in gear 0.
 		if (currGear == 0
 			&& throttle > 0) {
@@ -224,16 +245,10 @@ void update() {
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
 	}
-	else {
-		// For bikes, do this automatically.
-		if (currGear == 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
-			&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && speed < 2.0f) {
-			lockGears = 0x00010001;
-		}
-		else if (currGear > 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake)
-			&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && speed < 2.0f) {
-			lockGears = 0x00000000;
-		}
+
+	// Automatically engage first gear when stationary
+	if (autoGear1 && throttle < 0.1f && speed < 0.1f && currGear > 1) {
+		lockGears = 0x00010001;
 	}
 
 	int accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
