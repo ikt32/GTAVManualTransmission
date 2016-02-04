@@ -27,6 +27,8 @@ enum ControlType {
 
 Vehicle vehicle;
 VehExt::VehicleExtensions ext;
+Player player;
+Ped playerPed;
 
 bool enableManual = true;
 int hshifter;
@@ -37,7 +39,7 @@ bool controlPrev[SIZE_OF_ARRAY];
 
 
 bool isBike;
-uint64_t address;
+//uint64_t address;
 uint32_t gears;
 float rpm;
 float clutch;
@@ -47,8 +49,6 @@ float speed;
 uint32_t currGear;
 uint32_t nextGear;
 uint32_t lockGears = 0x00010001;
-
-uint32_t showTicks = 0;
 
 void readSettings() {
 	debug = GetPrivateProfileInt(L"DEBUG", L"Info", 0, L"./Gears.ini");
@@ -80,6 +80,7 @@ bool isKeyPressed(int key) {
 		return true;
 	return false;
 }
+
 bool isKeyJustPressed(int key, ControlType control) {
 	if (GetAsyncKeyState(key) & 0x8000)
 		controlCurr[control] = true;
@@ -122,9 +123,10 @@ void update() {
 		message << "Manual Transmission " <<
 			(enableManual ? "Enabled" : "Disabled");
 		showNotification((char *)message.str().c_str());
-		if (vehicle) {
+		if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
+		readSettings();
 	}
 
 	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, ControlEnter)) {
@@ -132,8 +134,8 @@ void update() {
 		lockGears = 0x00010001;
 	}
 
-	Player player = PLAYER::PLAYER_ID();
-	Ped playerPed = PLAYER::PLAYER_PED_ID();
+	player = PLAYER::PLAYER_ID();
+	playerPed = PLAYER::PLAYER_PED_ID();
 
 	// check if player ped exists and control is on (e.g. not in a cutscene)
 	if (!ENTITY::DOES_ENTITY_EXIST(playerPed) || !PLAYER::IS_PLAYER_CONTROL_ON(player))
@@ -145,7 +147,7 @@ void update() {
 
 	vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
 
-	if (!vehicle)
+	if (!ENTITY::DOES_ENTITY_EXIST(vehicle))
 		return;
 
 	if (!(VEHICLE::IS_THIS_MODEL_A_CAR(ENTITY::GET_ENTITY_MODEL(vehicle))
@@ -161,16 +163,30 @@ void update() {
 	else {
 		isBike = false;
 	}
-
-	address = ext.GetAddress(vehicle);
+	
+	//address = ext.GetAddress(vehicle);
 	gears = ext.GetGears(vehicle);
-	rpm = ext.GetCurrentRPM(vehicle);
-	clutch = ext.GetClutch(vehicle);
-	throttle = ext.GetThrottle(vehicle);
-	turbo = ext.GetTurbo(vehicle);
 	currGear = (0xFFFF0000 & gears) >> 16;
 	nextGear = 0x0000FFFF & gears;
-	speed = ENTITY::GET_ENTITY_SPEED(vehicle);
+
+	if (enableManual || debug) {
+		rpm = ext.GetCurrentRPM(vehicle);
+		clutch = ext.GetClutch(vehicle);
+		throttle = ext.GetThrottle(vehicle);
+		turbo = ext.GetTurbo(vehicle);
+		speed = ENTITY::GET_ENTITY_SPEED(vehicle);
+	}
+
+	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
+	if (currGear == nextGear) {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 0);
+	}
+	else if (currGear < nextGear) {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1);
+	}
+	else if (currGear > nextGear) {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 2);
+	}
 
 	if (debug) {
 		std::stringstream infos;
@@ -187,23 +203,7 @@ void update() {
 		showText(0.01f, 0.5f, 0.4f, (char *)infoc);
 	}
 
-	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
-	//50 ticks before the arrow should disappear
-	if (currGear == nextGear) {
-		showTicks++;
-		if (showTicks > 50) {
-			DECORATOR::DECOR_SET_INT(vehicle, "Carwash_Vehicle_Decorator", 0);
-			showTicks = 0;
-		}
-	}
-	else if (currGear < nextGear) {
-		DECORATOR::DECOR_SET_INT(vehicle, "Carwash_Vehicle_Decorator", 1);
-	}
-	else if (currGear > nextGear) {
-		DECORATOR::DECOR_SET_INT(vehicle, "Carwash_Vehicle_Decorator", 2);
-	}
-
-	if (!enableManual)
+	if (!enableManual || !VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false))
 		return;
 
 	// Reverse behavior
@@ -240,21 +240,26 @@ void update() {
 	float accelvalf = (accelval - 127) / 127.0f;
 
 	// Game wants to shift up. Triggered at high RPM, high speed.
-	// Desired result: high RPM, same gear (currGear)
 	// Also user is pressing gas hard and game disagrees
-	if (currGear < nextGear && speed > 2.0f || (clutch < 1.0 && accelval > 200)) {
-		ext.SetThrottle(vehicle, 1.0f);
-		ext.SetClutch(vehicle, 1.0f);
-		ext.SetCurrentRPM(vehicle, accelvalf * 1.0f);
+	// Desired result: high RPM, same gear (currGear)
+	// Current: Game fully depresses clutch and throttle
+	// Want:	Clutch and throttle full override
+	if ((currGear < nextGear && speed > 2.0f) || (clutch < 0.5 && accelvalf > 0.1f)) {
+		ext.SetCurrentRPM(vehicle, accelvalf * 0.9f);
+		ext.SetClutch(vehicle, 1.0f);	// Why won't this work
+		ext.SetThrottle(vehicle, 1.0f);	// Why won't this work
+		ext.SetCurrentRPM(vehicle, accelvalf * 1.1f);
 	}
 
 	// Game wants to shift down. Usually triggered when user accelerates
 	// while in a too high gear.
 	// Desired result: low RPM or stall, even. Stay in current gear!
 	// Otherwise: force car to drive anyway to keep RPM up.
-	// Current: Game cuts engine power
+	// Current: Game fully depresses clutch and throttle
+	// Update:	Game somewhat cooperates at low accelval?
+	// Want:	Clutch override
 	if (currGear > nextGear) {
-		ext.SetClutch(vehicle, accelvalf);
+		ext.SetClutch(vehicle, 1.0f);
 		ext.SetThrottle(vehicle, accelvalf);
 	}
 
@@ -295,15 +300,15 @@ void update() {
 		}
 	}
 
-	ext.SetGears(vehicle, lockGears);
-
-	// Press clutch (doesn't actually do shit)
+	// Press clutch (doesn't actually do anything yet)
 	if (CONTROLS::IS_CONTROL_PRESSED(0, controls[Clutch])
 		|| isKeyPressed(controls[KClutch])) {
 		ext.SetClutch(vehicle, 0.0f);
 		//ext.SetCurrentRPM(vehicle, accelvalf * 1.1f);
 		ext.SetThrottle(vehicle, accelvalf);
 	}
+
+	ext.SetGears(vehicle, lockGears);
 }
 
 void main() {
