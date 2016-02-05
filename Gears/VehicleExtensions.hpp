@@ -18,7 +18,10 @@ namespace VehExt {
 		void SetTurbo(Vehicle handle, float value);
 		float GetThrottle(Vehicle handle);
 		void SetThrottle(Vehicle handle, float value);
-
+		float GetThrottleP(Vehicle handle);
+		void SetThrottleP(Vehicle handle, float value);
+		float GetBrakeP(Vehicle handle);
+		void SetBrakeP(Vehicle handle, float value);
 	private:
 		MemoryAccess mem;
 	};

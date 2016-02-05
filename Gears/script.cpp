@@ -22,6 +22,10 @@ enum ControlType {
 	KShiftUp,
 	KShiftDown,
 	KClutch,
+	CThrottle,
+	CBrake,
+	KThrottle,
+	KBrake,
 	SIZE_OF_ARRAY
 };
 
@@ -33,6 +37,7 @@ Ped playerPed;
 bool enableManual = true;
 bool autoGear1 = false;
 bool autoReverse = false;
+bool oldReverse = false;
 bool debug = false;
 int hshifter;
 int controls[SIZE_OF_ARRAY];
@@ -48,14 +53,19 @@ float clutch;
 float throttle;
 float turbo;
 float speed;
+float velocity;
 uint32_t currGear;
 uint32_t nextGear;
 uint32_t lockGears = 0x00010001;
+
+float ltvalf = 0.0f;
+float rtvalf = 0.0f;
 
 void readSettings() {
 	enableManual = (GetPrivateProfileInt(L"MAIN", L"DefaultEnable", 1, L"./Gears.ini") == 1);
 	autoGear1 = (GetPrivateProfileInt(L"MAIN", L"AutoGear1", 0, L"./Gears.ini") == 1);
 	autoReverse = (GetPrivateProfileInt(L"MAIN", L"AutoReverse", 0, L"./Gears.ini") == 1);
+	oldReverse = (GetPrivateProfileInt(L"MAIN", L"OldReverse", 0, L"./Gears.ini") == 1);
 	controls[Toggle] = GetPrivateProfileInt(L"MAIN", L"Toggle", VK_OEM_5, L"./Gears.ini");
 
 	controls[ShiftUp]	= GetPrivateProfileInt(L"CONTROLS", L"ShiftUp",		ControlFrontendAccept,	L"./Gears.ini");
@@ -76,6 +86,11 @@ void readSettings() {
 	controls[H6] = GetPrivateProfileInt(L"CONTROLS", L"H6", VK_NUMPAD0, L"./Gears.ini");
 	controls[H7] = GetPrivateProfileInt(L"CONTROLS", L"H7", VK_NUMPAD0, L"./Gears.ini");
 	controls[H8] = GetPrivateProfileInt(L"CONTROLS", L"H8", VK_NUMPAD0, L"./Gears.ini");
+
+	controls[CThrottle] = GetPrivateProfileInt(L"CONTROLS", L"CThrottle",	ControlFrontendRt, L"./Gears.ini");
+	controls[CBrake]	= GetPrivateProfileInt(L"CONTROLS", L"CBrake",		ControlFrontendLt, L"./Gears.ini");
+	controls[KThrottle] = GetPrivateProfileInt(L"CONTROLS", L"CThrottle",	0x57, L"./Gears.ini");
+	controls[KBrake]	= GetPrivateProfileInt(L"CONTROLS", L"CBrake",		0x53, L"./Gears.ini");
 
 	debug = (GetPrivateProfileInt(L"DEBUG", L"Info", 0, L"./Gears.ini") == 1);
 }
@@ -185,9 +200,20 @@ void update() {
 		throttle = ext.GetThrottle(vehicle);
 		turbo = ext.GetTurbo(vehicle);
 		speed = ENTITY::GET_ENTITY_SPEED(vehicle);
+		velocity = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
+	}
+
+	if (CONTROLS::_GET_LAST_INPUT_METHOD(2)) {
+		rtvalf = (isKeyPressed(controls[KThrottle]) ? 1.0f : 0.0f);
+		ltvalf = (isKeyPressed(controls[KBrake]) ? 1.0f : 0.0f);
+	}
+	else {
+		rtvalf = (CONTROLS::GET_CONTROL_VALUE(0, controls[CThrottle]) - 127) / 127.0f;
+		ltvalf = (CONTROLS::GET_CONTROL_VALUE(0, controls[CBrake]) - 127) / 127.0f;
 	}
 
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
+	
 	if (currGear == nextGear) {
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 0);
 	}
@@ -207,6 +233,7 @@ void update() {
 			"\nClutch: " << std::setprecision(3) << clutch <<
 			"\nThrottle: " << std::setprecision(3) << throttle <<
 			"\nTurbo: " << std::setprecision(3) << turbo <<
+			"\nV:" << std::setprecision(3) << velocity <<
 			//"\nAddress: " << std::hex << address <<
 			"\nE: " << (enableManual ? "Y" : "N");
 		const char *infoc = infos.str().c_str();
@@ -217,7 +244,7 @@ void update() {
 		return;
 
 	// Reverse behavior
-	if (isBike || autoReverse) {
+	if (isBike || (oldReverse && autoReverse)) {
 		// For bikes, do this automatically.
 		if (currGear == 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
 			&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && speed < 2.0f) {
@@ -229,20 +256,77 @@ void update() {
 		}
 	}
 	else {
-		// Park/Reverse. Gear 0. Prevent going forward in gear 0.
-		if (currGear == 0
-			&& throttle > 0) {
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+		if (oldReverse) {
+			//Park/Reverse. Gear 0. Prevent going forward in gear 0.
+			if (currGear == 0
+				&& throttle > 0) {
+				VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+			}
+			// Forward gears. Prevent reversing.
+			else if (currGear > 0
+				&& throttle < 0) {
+				VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+			}
+			else {
+				VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+			}
 		}
-		// Forward gears. Prevent reversing.
-		else if (currGear > 0
-			&& throttle < 0) {
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-		}
+		// Throttle pedal does old reverse stuff thing
 		else {
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+			// Case forward gear
+			// Desired: Only brake
+			if (currGear > 0) {
+				// LT behavior when still
+				if (ltvalf > 0.0f && rtvalf < ltvalf &&
+					velocity >= -0.1f && velocity <= 0.5f) {
+					VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+					CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
+					ext.SetThrottle(vehicle, 0.0f);
+					ext.SetThrottleP(vehicle, 0.1f);
+					VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+				}
+				else {
+					VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+				}
+				// LT behavior when reversing
+				if (ltvalf > 0.0f && rtvalf < ltvalf &&
+					velocity < -0.1f) {
+					VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+					CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
+					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, ltvalf);
+					ext.SetThrottle(vehicle, 0.0f);
+					ext.SetThrottleP(vehicle, 0.1f);
+				}
+			}
+			// Case reverse gear
+			// Desired: RT reverses, LT brakes
+			if (currGear == 0) {
+				// RT behavior
+				if (rtvalf > 0.0f && rtvalf > ltvalf) {
+					CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
+					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, rtvalf);
+				}
+				// LT behavior when still
+				if (ltvalf > 0.0f && rtvalf < ltvalf &&
+					velocity > -0.55f && velocity <= 0.5f) {
+					VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+					CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
+					ext.SetThrottle(vehicle, 0.0f);
+					ext.SetThrottleP(vehicle, 0.1f);
+					VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+				}
+				else {
+					VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+				}
+				// LT behavior when reversing
+				if (ltvalf > 0.0f &&
+					velocity <= -0.5f) {
+					CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
+					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, ltvalf);
+				}
+			}
 		}
 	}
 

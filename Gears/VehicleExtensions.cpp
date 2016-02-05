@@ -87,4 +87,36 @@ namespace VehExt {
 
 		*reinterpret_cast<float *>(address + offset) = value;
 	}
+	float VehicleExtensions::GetThrottleP(Vehicle handle)
+	{
+		uint64_t address = mem.GetAddressOfEntity(handle);
+
+		int offset = (getGameVersion() > 3 ? 0x8B4 : 0x8A4);
+
+		return *reinterpret_cast<float *>(address + offset);
+	}
+	void VehicleExtensions::SetThrottleP(Vehicle handle, float value)
+	{
+		uint64_t address = mem.GetAddressOfEntity(handle);
+
+		int offset = (getGameVersion() > 3 ? 0x8B4 : 0x8A4);
+
+		*reinterpret_cast<float *>(address + offset) = value;
+	}
+	float VehicleExtensions::GetBrakeP(Vehicle handle)
+	{
+		uint64_t address = mem.GetAddressOfEntity(handle);
+
+		int offset = (getGameVersion() > 3 ? 0x8B8 : 0x8A8);
+
+		return *reinterpret_cast<float *>(address + offset);
+	}
+	void VehicleExtensions::SetBrakeP(Vehicle handle, float value)
+	{
+		uint64_t address = mem.GetAddressOfEntity(handle);
+
+		int offset = (getGameVersion() > 3 ? 0x8B8 : 0x8A8);
+
+		*reinterpret_cast<float *>(address + offset) = value;
+	}
 }
