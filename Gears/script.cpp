@@ -89,8 +89,8 @@ void readSettings() {
 
 	controls[CThrottle] = GetPrivateProfileInt(L"CONTROLS", L"CThrottle",	ControlFrontendRt, L"./Gears.ini");
 	controls[CBrake]	= GetPrivateProfileInt(L"CONTROLS", L"CBrake",		ControlFrontendLt, L"./Gears.ini");
-	controls[KThrottle] = GetPrivateProfileInt(L"CONTROLS", L"CThrottle",	0x57, L"./Gears.ini");
-	controls[KBrake]	= GetPrivateProfileInt(L"CONTROLS", L"CBrake",		0x53, L"./Gears.ini");
+	controls[KThrottle] = GetPrivateProfileInt(L"CONTROLS", L"KThrottle",	0x57, L"./Gears.ini");
+	controls[KBrake]	= GetPrivateProfileInt(L"CONTROLS", L"KBrake",		0x53, L"./Gears.ini");
 
 	debug = (GetPrivateProfileInt(L"DEBUG", L"Info", 0, L"./Gears.ini") == 1);
 }
@@ -213,7 +213,6 @@ void update() {
 	}
 
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
-	
 	if (currGear == nextGear) {
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 0);
 	}
