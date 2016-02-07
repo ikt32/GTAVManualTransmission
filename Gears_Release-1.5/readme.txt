@@ -245,7 +245,7 @@ Alexander Blade
 LeFix
 XMOD
 InfamousSabre
-Leftas
+leftas
 kagikn
 
 Have fun!
