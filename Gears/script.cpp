@@ -26,6 +26,8 @@ enum ControlType {
 	CBrake,
 	KThrottle,
 	KBrake,
+	Engine,
+	KEngine,
 	SIZE_OF_ARRAY
 };
 
@@ -38,6 +40,8 @@ bool enableManual = true;
 bool autoGear1 = false;
 bool autoReverse = false;
 bool oldReverse = false;
+bool engDamage = false;
+bool engStall = false;
 bool debug = false;
 int hshifter;
 int controls[SIZE_OF_ARRAY];
@@ -46,7 +50,7 @@ bool controlPrev[SIZE_OF_ARRAY];
 
 
 bool isBike;
-//uint64_t address;
+uint64_t address;
 uint32_t gears;
 float rpm;
 float clutch;
@@ -60,21 +64,27 @@ uint32_t lockGears = 0x00010001;
 
 float ltvalf = 0.0f;
 float rtvalf = 0.0f;
+float clutchvalf = 0.0f;
 
 void readSettings() {
 	enableManual = (GetPrivateProfileInt(L"MAIN", L"DefaultEnable", 1, L"./Gears.ini") == 1);
 	autoGear1 = (GetPrivateProfileInt(L"MAIN", L"AutoGear1", 0, L"./Gears.ini") == 1);
 	autoReverse = (GetPrivateProfileInt(L"MAIN", L"AutoReverse", 0, L"./Gears.ini") == 1);
 	oldReverse = (GetPrivateProfileInt(L"MAIN", L"OldReverse", 0, L"./Gears.ini") == 1);
+	engDamage = (GetPrivateProfileInt(L"MAIN", L"EngineDamage", 0, L"./Gears.ini") == 1);
+	engStall = (GetPrivateProfileInt(L"MAIN", L"EngineStalling", 0, L"./Gears.ini") == 1);
+
 	controls[Toggle] = GetPrivateProfileInt(L"MAIN", L"Toggle", VK_OEM_5, L"./Gears.ini");
 
 	controls[ShiftUp]	= GetPrivateProfileInt(L"CONTROLS", L"ShiftUp",		ControlFrontendAccept,	L"./Gears.ini");
 	controls[ShiftDown] = GetPrivateProfileInt(L"CONTROLS", L"ShiftDown",	ControlFrontendX,		L"./Gears.ini");
 	controls[Clutch]	= GetPrivateProfileInt(L"CONTROLS", L"Clutch",		ControlFrontendLb,		L"./Gears.ini");
-	
-	controls[KShiftUp] =	GetPrivateProfileInt(L"CONTROLS", L"KShiftUp", 		VK_NUMPAD9, L"./Gears.ini");
-	controls[KShiftDown] =	GetPrivateProfileInt(L"CONTROLS", L"KShiftDown",	VK_NUMPAD7, L"./Gears.ini");
-	controls[KClutch] =		GetPrivateProfileInt(L"CONTROLS", L"KClutch", 		VK_NUMPAD8, L"./Gears.ini");
+	controls[Engine]	= GetPrivateProfileInt(L"CONTROLS", L"Engine",		ControlFrontendLs,		L"./Gears.ini");
+
+	controls[KShiftUp]		= GetPrivateProfileInt(L"CONTROLS", L"KShiftUp",	VK_NUMPAD9, L"./Gears.ini");
+	controls[KShiftDown]	= GetPrivateProfileInt(L"CONTROLS", L"KShiftDown",	VK_NUMPAD7, L"./Gears.ini");
+	controls[KClutch]		= GetPrivateProfileInt(L"CONTROLS", L"KClutch", 	VK_NUMPAD8, L"./Gears.ini");
+	controls[KEngine]		= GetPrivateProfileInt(L"CONTROLS", L"KEngine",		0x45,		L"./Gears.ini");
 
 	hshifter = GetPrivateProfileInt(L"CONTROLS", L"EnableH", 0, L"./Gears.ini");
 	controls[HR] = GetPrivateProfileInt(L"CONTROLS", L"HR", VK_NUMPAD0, L"./Gears.ini");
@@ -89,6 +99,7 @@ void readSettings() {
 
 	controls[CThrottle] = GetPrivateProfileInt(L"CONTROLS", L"CThrottle",	ControlFrontendRt, L"./Gears.ini");
 	controls[CBrake]	= GetPrivateProfileInt(L"CONTROLS", L"CBrake",		ControlFrontendLt, L"./Gears.ini");
+	
 	controls[KThrottle] = GetPrivateProfileInt(L"CONTROLS", L"KThrottle",	0x57, L"./Gears.ini");
 	controls[KBrake]	= GetPrivateProfileInt(L"CONTROLS", L"KBrake",		0x53, L"./Gears.ini");
 
@@ -152,11 +163,13 @@ void update() {
 		}
 		writeSettings();
 		readSettings();
+		ext.PatchClutchAddress();
 	}
 
 	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, ControlEnter)) {
 		readSettings();
 		lockGears = 0x00010001;
+		ext.PatchClutchAddress();
 	}
 
 	player = PLAYER::PLAYER_ID();
@@ -189,7 +202,7 @@ void update() {
 		isBike = false;
 	}
 	
-	//address = ext.GetAddress(vehicle);
+	address = ext.GetAddress(vehicle);
 	gears = ext.GetGears(vehicle);
 	currGear = (0xFFFF0000 & gears) >> 16;
 	nextGear = 0x0000FFFF & gears;
@@ -206,10 +219,12 @@ void update() {
 	if (CONTROLS::_GET_LAST_INPUT_METHOD(2)) {
 		rtvalf = (isKeyPressed(controls[KThrottle]) ? 1.0f : 0.0f);
 		ltvalf = (isKeyPressed(controls[KBrake]) ? 1.0f : 0.0f);
+		clutchvalf = (isKeyPressed(controls[KClutch]) ? 1.0f : 0.0f);
 	}
 	else {
-		rtvalf = (CONTROLS::GET_CONTROL_VALUE(0, controls[CThrottle]) - 127) / 127.0f;
-		ltvalf = (CONTROLS::GET_CONTROL_VALUE(0, controls[CBrake]) - 127) / 127.0f;
+		rtvalf		= (CONTROLS::GET_CONTROL_VALUE(0, controls[CThrottle]) - 127) / 127.0f;
+		ltvalf		= (CONTROLS::GET_CONTROL_VALUE(0, controls[CBrake]) - 127) / 127.0f;
+		clutchvalf	= (CONTROLS::GET_CONTROL_VALUE(0, controls[Clutch]) - 127) / 127.0f;
 	}
 
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
@@ -231,15 +246,17 @@ void update() {
 			"\nNextGear: " << nextGear <<
 			"\nClutch: " << std::setprecision(3) << clutch <<
 			"\nThrottle: " << std::setprecision(3) << throttle <<
-			"\nTurbo: " << std::setprecision(3) << turbo <<
-			"\nV:" << std::setprecision(3) << velocity <<
-			//"\nAddress: " << std::hex << address <<
+			//"\nTurbo: " << std::setprecision(3) << turbo <<
+			//"\nV:" << std::setprecision(3) << velocity <<
+			"\nAddress: " << std::hex << address <<
 			"\nE: " << (enableManual ? "Y" : "N");
 		const char *infoc = infos.str().c_str();
 		showText(0.01f, 0.5f, 0.4f, (char *)infoc);
 	}
 
-	if (!enableManual || !VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false))
+	if (!enableManual
+		|| (!VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false)
+			&& VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f))
 		return;
 
 	// Reverse behavior
@@ -344,7 +361,6 @@ void update() {
 	// Want:	Clutch and throttle full override
 	if ((currGear < nextGear && speed > 2.0f) || (clutch < 0.5 && accelvalf > 0.1f)) {
 		ext.SetCurrentRPM(vehicle, accelvalf * 0.9f);
-		ext.SetClutch(vehicle, 1.0f);	// Why won't this work
 		ext.SetThrottle(vehicle, 1.0f);	// Why won't this work
 		ext.SetCurrentRPM(vehicle, accelvalf * 1.1f);
 	}
@@ -355,12 +371,34 @@ void update() {
 	// Otherwise: force car to drive anyway to keep RPM up.
 	// Current: Game fully depresses clutch and throttle
 	// Update:	Game somewhat cooperates at low accelval?
-	// Want:	Clutch override
+	// Want:	Clutch and throttle full override
+	// Update:	Patching the instruction fixed this entirely.
 	if (currGear > nextGear) {
-		ext.SetClutch(vehicle, 1.0f);
-		ext.SetThrottle(vehicle, accelvalf);
+		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, rpm * 1.75f);
 	}
 
+
+	// Engine damage
+	if (engDamage &&
+		rpm > 0.96f && accelvalf > 0.99f) {
+		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (0.25f*accelvalf));
+		if (VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < 0.0f) {
+			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
+		}
+	}
+
+	// Stalling
+	if (engStall &&
+		currGear > nextGear && currGear > 2 &&
+		rpm < 0.25f && speed < 5.0f && clutchvalf < 0.8f) {
+		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
+	}
+
+	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
+		CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls[Engine]) ||
+		isKeyJustPressed(controls[KEngine], KEngine)) {
+		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
+	}
 
 	// sequential or h?
 	if (!hshifter) {
@@ -371,7 +409,7 @@ void update() {
 				// Blowoff valve sound when game does this. Unknown why this can't
 				// be emulated this way. Probably writing these values isn't working.
 				ext.SetThrottle(vehicle, 0.0f);
-				ext.SetClutch(vehicle, 0.1f);
+				clutchvalf = 0.1f;
 				lockGears = currGear + 1 | ((currGear + 1) << 16);
 			}
 		}
@@ -382,7 +420,7 @@ void update() {
 			|| isKeyJustPressed(controls[KShiftDown], KShiftDown)) {
 			if (currGear > 0) {
 				ext.SetThrottle(vehicle, 0.0f);
-				ext.SetClutch(vehicle, 0.1f);
+				clutchvalf = 0.1f;
 				lockGears = currGear - 1 | ((currGear - 1) << 16);
 			}
 		}
@@ -392,25 +430,21 @@ void update() {
 		for (int i = 0; i <= 8; i++) {
 			if (isKeyJustPressed(controls[i], (ControlType)i)) {
 				ext.SetThrottle(vehicle, 0.0f);
-				ext.SetClutch(vehicle, 0.1f);
+				clutchvalf = 0.1f;
 				lockGears = i | (i << 16);
 			}
 		}
 	}
 
-	// Press clutch (doesn't actually do anything yet)
-	if (CONTROLS::IS_CONTROL_PRESSED(0, controls[Clutch])
-		|| isKeyPressed(controls[KClutch])) {
-		ext.SetClutch(vehicle, 0.0f);
-		//ext.SetCurrentRPM(vehicle, accelvalf * 1.1f);
-		ext.SetThrottle(vehicle, accelvalf);
-	}
+	// Clutch override working now
+	ext.SetClutch(vehicle, 1.0f-clutchvalf);
 
 	ext.SetGears(vehicle, lockGears);
 }
 
 void main() {
 	readSettings();
+	ext.PatchClutchAddress();
 	while (true) {
 		update();
 		WAIT(0);
