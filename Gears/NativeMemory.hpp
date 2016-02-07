@@ -3,8 +3,8 @@
 #pragma once
 
 #include <cstdint>
-#include "..\..\inc\main.h"
-#include "..\..\inc\types.h"
+#include "..\..\ScriptHookV_SDK\inc\main.h"
+#include "..\..\ScriptHookV_SDK\inc\types.h"
 #include <Windows.h>
 #include <Psapi.h>
 

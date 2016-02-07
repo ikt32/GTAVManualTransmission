@@ -134,7 +134,7 @@
       <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
-      <AdditionalOptions>..\..\lib\ScriptHookV.lib %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>..\..\ScriptHookV_SDK\lib\ScriptHookV.lib %(AdditionalOptions)</AdditionalOptions>
       <Version>1.0</Version>
     </Link>
     <BuildLog>
@@ -148,10 +148,10 @@
     <ClCompile Include="VehicleExtensions.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\inc\enums.h" />
-    <ClInclude Include="..\..\inc\main.h" />
-    <ClInclude Include="..\..\inc\natives.h" />
-    <ClInclude Include="..\..\inc\types.h" />
+    <ClInclude Include="..\..\ScriptHookV_SDK\inc\enums.h" />
+    <ClInclude Include="..\..\ScriptHookV_SDK\inc\main.h" />
+    <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h" />
+    <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h" />
     <ClInclude Include="NativeMemory.hpp" />
     <ClInclude Include="script.h" />
     <ClInclude Include="VehicleExtensions.hpp" />
