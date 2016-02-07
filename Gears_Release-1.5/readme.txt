@@ -178,7 +178,7 @@ Shows information about the game engine/transmission values.
 Issues and todo's
 ###############################################################################
 Issues:
-	- Top gear is not known yet.
+	- ?
 
 You're very welcome to help with these things. Message me on GTAForums or
 post in the thread if you have anything. GTA5-Mods.com is also fine if you
@@ -231,6 +231,7 @@ Enable/Disable automatic reverse gear
 Enable throttle to be used for reverse
 
 1.5
+Top gear known (Thank you, kagikn!)
 Full clutch control (Thank you, leftas!)
 Allow analog clutch control
 Add engine damage
@@ -240,10 +241,12 @@ Changed build parameters - should work for more people now
 ###############################################################################
 Credits
 ###############################################################################
-LeFix & XMOD - ScriptHookV memory access
-Alexander Blade - ScriptHookV, performance
+Alexander Blade
+LeFix
+XMOD
 InfamousSabre
 Leftas
+kagikn
 
 Have fun!
 - ikt
