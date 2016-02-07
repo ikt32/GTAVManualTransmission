@@ -367,7 +367,7 @@ void update() {
 		// Shift up
 		if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls[ShiftUp])
 			|| isKeyJustPressed(controls[KShiftUp], KShiftUp)) {
-			if (currGear < 8) {
+			if (currGear < ext.GetTopGear(vehicle)) {
 				// Blowoff valve sound when game does this. Unknown why this can't
 				// be emulated this way. Probably writing these values isn't working.
 				ext.SetThrottle(vehicle, 0.0f);

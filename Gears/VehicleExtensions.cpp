@@ -23,6 +23,16 @@ namespace VehExt {
 
 		*reinterpret_cast<uint32_t *>(address + offset) = value;
 	}
+
+	uint32_t VehicleExtensions::GetTopGear(Vehicle handle)
+	{
+		const uint64_t address = mem.GetAddressOfEntity(handle);
+
+		int offset = (getGameVersion() > 3 ? 0x7A6 : 0x796);
+
+		return address == 0 ? 0 : *reinterpret_cast<const unsigned char *>(address + offset);
+	}
+
 	float VehicleExtensions::GetCurrentRPM(Vehicle handle)
 	{
 		const uint64_t address = mem.GetAddressOfEntity(handle);
