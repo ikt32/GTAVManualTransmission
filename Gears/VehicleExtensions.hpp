@@ -12,6 +12,7 @@ namespace VehExt {
 		uint64_t GetAddress(Vehicle handle);
 		uint32_t GetGears(Vehicle handle);
 		void SetGears(Vehicle handle, uint32_t value);
+		uint32_t GetTopGear(Vehicle handle);
 		float GetCurrentRPM(Vehicle handle);
 		void SetCurrentRPM(Vehicle handle, float value);
 		float GetClutch(Vehicle handle);
