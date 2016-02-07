@@ -13,8 +13,16 @@ namespace VehExt {
 				*reinterpret_cast<byte *>(address + i) = 0x90;
 			}
 		}
-
 		return address;
+	}
+
+	void VehicleExtensions::RestoreClutchInstr(uintptr_t address) {
+		byte instrArr[7] = { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D };
+		if (address) {
+			for (int i = 0; i < 7; i++) {
+				*reinterpret_cast<byte *>(address + i) = instrArr[i];
+			}
+		}
 	}
 
 	uint64_t VehicleExtensions::GetAddress(Vehicle handle) {

@@ -35,6 +35,7 @@ Vehicle vehicle;
 VehExt::VehicleExtensions ext;
 Player player;
 Ped playerPed;
+uintptr_t clutchInstrAddr;
 
 bool enableManual = true;
 bool autoGear1 = false;
@@ -161,15 +162,32 @@ void update() {
 		if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
+		if (enableManual) {
+			clutchInstrAddr = ext.PatchClutchAddress();
+			if (clutchInstrAddr) {
+				showNotification("Clutch patched");
+			}
+		}
+		else {
+			if (clutchInstrAddr) {
+				ext.RestoreClutchInstr(clutchInstrAddr);
+				showNotification("Clutch restored");
+			}
+			else
+			{
+				showNotification("Clutch restore failed");
+			}
+		}
 		writeSettings();
 		readSettings();
-		ext.PatchClutchAddress();
 	}
 
 	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, ControlEnter)) {
 		readSettings();
 		lockGears = 0x00010001;
-		ext.PatchClutchAddress();
+		if (ext.PatchClutchAddress()) {
+			showNotification("Clutch patched");
+		}
 	}
 
 	player = PLAYER::PLAYER_ID();
@@ -427,7 +445,7 @@ void update() {
 	}
 	else
 	{
-		for (int i = 0; i <= 8; i++) {
+		for (uint8_t i = 0; i <= ext.GetTopGear(vehicle); i++) {
 			if (isKeyJustPressed(controls[i], (ControlType)i)) {
 				ext.SetThrottle(vehicle, 0.0f);
 				clutchvalf = 0.1f;
@@ -444,10 +462,12 @@ void update() {
 
 void main() {
 	readSettings();
-	ext.PatchClutchAddress();
 	while (true) {
 		update();
 		WAIT(0);
+	}
+	if (clutchInstrAddr) {
+		ext.RestoreClutchInstr(clutchInstrAddr);
 	}
 }
 
