@@ -7,6 +7,8 @@
 namespace VehExt {
 	class VehicleExtensions {
 	public:
+		uintptr_t PatchClutchAddress();
+
 		uint64_t GetAddress(Vehicle handle);
 		uint32_t GetGears(Vehicle handle);
 		void SetGears(Vehicle handle, uint32_t value);
@@ -22,6 +24,11 @@ namespace VehExt {
 		void SetThrottleP(Vehicle handle, float value);
 		float GetBrakeP(Vehicle handle);
 		void SetBrakeP(Vehicle handle, float value);
+		float GetFuelLevel(Vehicle handle);
+		void SetFuelLevel(Vehicle handle, float value);
+		uint64_t GetWheelsPtr(Vehicle handle);
+		uint64_t GetWheelPtr(uint64_t address, int index);
+		void SetWheelsHealth(Vehicle handle, float health);
 	private:
 		MemoryAccess mem;
 	};
