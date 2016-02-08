@@ -1,7 +1,7 @@
 #include "VehicleExtensions.hpp"
 
 namespace VehExt {
-	uintptr_t VehicleExtensions::PatchClutchAddress() {
+	uintptr_t VehicleExtensions::PatchClutchLow() {
 		// Tested on build 350 and build 617
 		// We're only interested in the first 7 bytes but we need the correct one
 		// C7 43 40 CD CC CC 3D is what we're looking for, the second occurrence, at 
@@ -15,11 +15,49 @@ namespace VehExt {
 		}
 		return address;
 	}
-
-	void VehicleExtensions::RestoreClutchInstr(uintptr_t address) {
+	void VehicleExtensions::RestoreClutchLow(uintptr_t address) {
 		byte instrArr[7] = { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D };
 		if (address) {
 			for (int i = 0; i < 7; i++) {
+				*reinterpret_cast<byte *>(address + i) = instrArr[i];
+			}
+		}
+	}
+
+	uintptr_t VehicleExtensions::PatchClutchStationary01() {
+		uintptr_t address = mem.FindPattern("\xC7\x43\x40\xCD\xCC\xCC\x3D\xE9\xF6\x04\x00\x00", "xxxxxxxx????");
+
+		if (address) {
+			for (int i = 0; i < 7; i++) {
+				*reinterpret_cast<byte *>(address + i) = 0x90;
+			}
+		}
+		return address;
+	}
+	void VehicleExtensions::RestoreClutchStationary01(uintptr_t address) {
+		byte instrArr[7] = { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D };
+		if (address) {
+			for (int i = 0; i < 7; i++) {
+				*reinterpret_cast<byte *>(address + i) = instrArr[i];
+			}
+		}
+	}
+
+	uintptr_t VehicleExtensions::PatchClutchStationary04() {
+		// ?????
+		uintptr_t address = mem.FindPattern("\xF3\x0F\x11\x47\x40\xF3\x0F\x59\x3D\xDA\x9C\x8E\x00", "xxxxxxxxxxxxx");
+
+		if (address) {
+			for (int i = 0; i < 5; i++) {
+				*reinterpret_cast<byte *>(address + i) = 0x90;
+			}
+		}
+		return address;
+	}
+	void VehicleExtensions::RestoreClutchStationary04(uintptr_t address) {
+		byte instrArr[5] = { 0xF3, 0x0F, 0x11, 0x47, 0x40 };
+		if (address) {
+			for (int i = 0; i < 5; i++) {
 				*reinterpret_cast<byte *>(address + i) = instrArr[i];
 			}
 		}

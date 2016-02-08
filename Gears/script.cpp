@@ -35,7 +35,14 @@ Vehicle vehicle;
 VehExt::VehicleExtensions ext;
 Player player;
 Ped playerPed;
-uintptr_t clutchInstrAddr;
+uintptr_t clutchInstrLowAddr = 0;
+uintptr_t clutchInstrLowTemp = 0;
+
+uintptr_t clutchS01Addr = 0;
+uintptr_t clutchS01Temp = 0;
+
+uintptr_t clutchS04Addr = 0;
+uintptr_t clutchS04Temp = 0;
 
 bool enableManual = true;
 bool autoGear1 = false;
@@ -48,7 +55,6 @@ int hshifter;
 int controls[SIZE_OF_ARRAY];
 bool controlCurr[SIZE_OF_ARRAY];
 bool controlPrev[SIZE_OF_ARRAY];
-
 
 bool isBike;
 uint64_t address;
@@ -66,6 +72,9 @@ uint32_t lockGears = 0x00010001;
 float ltvalf = 0.0f;
 float rtvalf = 0.0f;
 float clutchvalf = 0.0f;
+
+int accelval;
+float accelvalf = 0.0f;
 
 void readSettings() {
 	enableManual = (GetPrivateProfileInt(L"MAIN", L"DefaultEnable", 1, L"./Gears.ini") == 1);
@@ -152,6 +161,50 @@ void showNotification(char *message) {
 	UI::_DRAW_NOTIFICATION(false, false);
 }
 
+void patchClutchInstructions() {
+	clutchInstrLowTemp = ext.PatchClutchLow();
+	if (clutchInstrLowTemp) {
+		clutchInstrLowAddr = clutchInstrLowTemp;
+		showNotification("Clutch patched");
+	}
+
+	clutchS01Temp = ext.PatchClutchStationary01();
+	if (clutchS01Temp && !clutchS01Addr) {
+		clutchS01Addr = clutchS01Temp;
+		showNotification("0.1 Patched");
+	}
+
+	clutchS04Temp = ext.PatchClutchStationary04();
+	if (clutchS04Temp) {
+		clutchS04Addr = clutchS04Temp;
+		showNotification("0.4 Patched");
+	}
+}
+
+void restoreClutchInstructions() {
+	if (clutchInstrLowAddr) {
+		ext.RestoreClutchLow(clutchInstrLowAddr);
+		showNotification("Clutch restored");
+		clutchInstrLowAddr = 0;
+	}
+	else
+	{
+		showNotification("Clutch restore failed");
+	}
+
+	if (clutchS01Addr) {
+		ext.RestoreClutchStationary01(clutchS01Addr);
+		showNotification("0.1 Restored");
+		clutchS01Addr = 0;
+	}
+
+	if (clutchS04Addr) {
+		ext.RestoreClutchStationary04(clutchS04Addr);
+		showNotification("0.4 Restored");
+		clutchS04Addr = 0;
+	}
+}
+
 void update() {
 	if (isKeyJustPressed(controls[Toggle], Toggle)) {
 		enableManual = !enableManual;
@@ -163,20 +216,10 @@ void update() {
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
 		if (enableManual) {
-			clutchInstrAddr = ext.PatchClutchAddress();
-			if (clutchInstrAddr) {
-				showNotification("Clutch patched");
-			}
+			patchClutchInstructions();
 		}
 		else {
-			if (clutchInstrAddr) {
-				ext.RestoreClutchInstr(clutchInstrAddr);
-				showNotification("Clutch restored");
-			}
-			else
-			{
-				showNotification("Clutch restore failed");
-			}
+			restoreClutchInstructions();
 		}
 		writeSettings();
 		readSettings();
@@ -185,8 +228,8 @@ void update() {
 	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, ControlEnter)) {
 		readSettings();
 		lockGears = 0x00010001;
-		if (ext.PatchClutchAddress()) {
-			showNotification("Clutch patched");
+		if (enableManual) {
+			patchClutchInstructions();
 		}
 	}
 
@@ -245,6 +288,9 @@ void update() {
 		clutchvalf	= (CONTROLS::GET_CONTROL_VALUE(0, controls[Clutch]) - 127) / 127.0f;
 	}
 
+	accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
+	accelvalf = (accelval - 127) / 127.0f;
+
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
 	if (currGear == nextGear) {
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 0);
@@ -278,8 +324,10 @@ void update() {
 		return;
 
 	// Reverse behavior
+
+	// For bikes, do this automatically.
+	// Also if the user chooses to.
 	if (isBike || (oldReverse && autoReverse)) {
-		// For bikes, do this automatically.
 		if (currGear == 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
 			&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && speed < 2.0f) {
 			lockGears = 0x00010001;
@@ -289,7 +337,9 @@ void update() {
 			lockGears = 0x00000000;
 		}
 	}
+	// Reverse gears:
 	else {
+		// Throttle pedal does old reverse stuff thing
 		if (oldReverse) {
 			//Park/Reverse. Gear 0. Prevent going forward in gear 0.
 			if (currGear == 0
@@ -307,24 +357,25 @@ void update() {
 				VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 			}
 		}
-		// Throttle pedal does old reverse stuff thing
+		// New reverse: Reverse with throttle
 		else {
 			// Case forward gear
 			// Desired: Only brake
 			if (currGear > 0) {
 				// LT behavior when still
+				//if (ltvalf > 0.0f && rtvalf < ltvalf &&
+				//	velocity >= -0.1f && velocity <= 0.5f) {
 				if (ltvalf > 0.0f && rtvalf < ltvalf &&
-					velocity >= -0.1f && velocity <= 0.5f) {
-					VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+					velocity <= 0.5f && velocity >= -0.1f) {
 					CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-					ext.SetThrottle(vehicle, 0.0f);
-					ext.SetThrottleP(vehicle, 0.1f);
+					ext.SetThrottleP(vehicle, 0.0f);
+					VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 					VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
 				}
 				else {
 					VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 				}
-				// LT behavior when reversing
+				// LT behavior when rolling back
 				if (ltvalf > 0.0f && rtvalf < ltvalf &&
 					velocity < -0.1f) {
 					VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
@@ -337,18 +388,17 @@ void update() {
 			// Case reverse gear
 			// Desired: RT reverses, LT brakes
 			if (currGear == 0) {
+				ext.SetThrottleP(vehicle, -0.1f);
 				// RT behavior
 				if (rtvalf > 0.0f && rtvalf > ltvalf) {
 					CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
 					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, rtvalf);
 				}
 				// LT behavior when still
-				if (ltvalf > 0.0f && rtvalf < ltvalf &&
+				if (ltvalf > 0.0f && rtvalf <= ltvalf &&
 					velocity > -0.55f && velocity <= 0.5f) {
 					VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 					CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-					ext.SetThrottle(vehicle, 0.0f);
-					ext.SetThrottleP(vehicle, 0.1f);
 					VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
 				}
 				else {
@@ -369,9 +419,6 @@ void update() {
 		lockGears = 0x00010001;
 	}
 
-	int accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
-	float accelvalf = (accelval - 127) / 127.0f;
-
 	// Game wants to shift up. Triggered at high RPM, high speed.
 	// Also user is pressing gas hard and game disagrees
 	// Desired result: high RPM, same gear (currGear)
@@ -379,7 +426,7 @@ void update() {
 	// Want:	Clutch and throttle full override
 	if ((currGear < nextGear && speed > 2.0f) || (clutch < 0.5 && accelvalf > 0.1f)) {
 		ext.SetCurrentRPM(vehicle, accelvalf * 0.9f);
-		ext.SetThrottle(vehicle, 1.0f);	// Why won't this work
+		ext.SetThrottle(vehicle, 1.0f);
 		ext.SetCurrentRPM(vehicle, accelvalf * 1.1f);
 	}
 
@@ -392,7 +439,7 @@ void update() {
 	// Want:	Clutch and throttle full override
 	// Update:	Patching the instruction fixed this entirely.
 	if (currGear > nextGear) {
-		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, rpm * 1.75f);
+		//VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, rpm * 1.75f);
 	}
 
 
@@ -406,15 +453,13 @@ void update() {
 	}
 
 	// Stalling
-	if (engStall &&
-		currGear > nextGear && currGear > 2 &&
-		rpm < 0.25f && speed < 5.0f && clutchvalf < 0.8f) {
+	if (engStall && currGear > 2 &&
+		rpm < 0.25f && speed < 5.0f && clutchvalf < 0.33f) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 	}
 
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
-		CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls[Engine]) ||
-		isKeyJustPressed(controls[KEngine], KEngine)) {
+		(CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls[Engine]) || isKeyJustPressed(controls[KEngine], KEngine))) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 
@@ -456,7 +501,6 @@ void update() {
 
 	// Clutch override working now
 	ext.SetClutch(vehicle, 1.0f-clutchvalf);
-
 	ext.SetGears(vehicle, lockGears);
 }
 
@@ -466,8 +510,8 @@ void main() {
 		update();
 		WAIT(0);
 	}
-	if (clutchInstrAddr) {
-		ext.RestoreClutchInstr(clutchInstrAddr);
+	if (clutchInstrLowAddr) {
+		ext.RestoreClutchLow(clutchInstrLowAddr);
 	}
 }
 

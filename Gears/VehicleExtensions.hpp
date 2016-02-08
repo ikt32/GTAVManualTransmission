@@ -7,8 +7,14 @@
 namespace VehExt {
 	class VehicleExtensions {
 	public:
-		uintptr_t PatchClutchAddress();
-		void RestoreClutchInstr(uintptr_t address);
+		uintptr_t PatchClutchLow();
+		void RestoreClutchLow(uintptr_t address);
+
+		uintptr_t PatchClutchStationary01();
+		void RestoreClutchStationary01(uintptr_t address);
+
+		uintptr_t PatchClutchStationary04();
+		void RestoreClutchStationary04(uintptr_t address);
 
 		uint64_t GetAddress(Vehicle handle);
 		uint32_t GetGears(Vehicle handle);
