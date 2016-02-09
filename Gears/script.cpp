@@ -1,8 +1,6 @@
 #include "script.h"
 // itching for a proper refactoring
 
-time_t start;
-
 void clearLog() {
 	std::ofstream logFile;
 	logFile.open("Gears.log", std::ofstream::out | std::ofstream::trunc);
@@ -64,6 +62,7 @@ uintptr_t clutchS01Temp = 0;
 uintptr_t clutchS04Addr = 0;
 uintptr_t clutchS04Temp = 0;
 
+bool runOnceRan = false;
 int patched = 0;
 
 bool enableManual = true;
@@ -367,8 +366,19 @@ void update() {
 			&& VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f))
 		return;
 
-	// Reverse behavior
+	// Patch clutch on game start if player is in vehicle
+	if (enableManual && !runOnceRan) {
+		writeToLog("Patching clutch on start");
+		patchClutchInstructions();
+		runOnceRan = true;
+	}
 
+	// Automatically engage first gear when stationary
+	if (autoGear1 && throttle < 0.1f && speed < 0.1f && currGear > 1) {
+		lockGears = 0x00010001;
+	}
+
+	// Reverse behavior
 	// For bikes, do this automatically.
 	// Also if the user chooses to.
 	if (isBike || (oldReverse && autoReverse)) {
@@ -381,9 +391,9 @@ void update() {
 			lockGears = 0x00000000;
 		}
 	}
-	// Reverse gears:
+	// Reversing behavior: blocking
 	else {
-		// Throttle pedal does old reverse stuff thing
+		// Block and reverse with brake in reverse gear
 		if (oldReverse) {
 			//Park/Reverse. Gear 0. Prevent going forward in gear 0.
 			if (currGear == 0
@@ -458,11 +468,6 @@ void update() {
 		}
 	}
 
-	// Automatically engage first gear when stationary
-	if (autoGear1 && throttle < 0.1f && speed < 0.1f && currGear > 1) {
-		lockGears = 0x00010001;
-	}
-
 	// Game wants to shift up. Triggered at high RPM, high speed.
 	// Also user is pressing gas hard and game disagrees
 	// Desired result: high RPM, same gear (currGear)
@@ -485,7 +490,6 @@ void update() {
 	if (currGear > nextGear) {
 		//VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, rpm * 1.75f);
 	}
-
 
 	// Engine damage
 	if (engDamage &&
@@ -534,6 +538,7 @@ void update() {
 	}
 	else
 	{
+		// All keys checking
 		for (uint8_t i = 0; i <= ext.GetTopGear(vehicle); i++) {
 			if (isKeyJustPressed(controls[i], (ControlType)i)) {
 				ext.SetThrottle(vehicle, 0.0f);

@@ -15,7 +15,6 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 	case DLL_PROCESS_ATTACH:
 		clearLog();
 		writeToLog("Script loaded");
-		start = time(0);
 		scriptRegister(hInstance, ScriptMain);
 		break;
 	case DLL_PROCESS_DETACH:

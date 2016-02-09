@@ -21,8 +21,6 @@ http://dev-c.com
 #include <iomanip>
 #include "VehicleExtensions.hpp"
 
-extern time_t start;
-
 extern VehExt::VehicleExtensions ext;
 
 extern uintptr_t clutchInstrLowAddr;
