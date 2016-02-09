@@ -25,6 +25,8 @@ namespace VehExt {
 	}
 
 	uintptr_t VehicleExtensions::PatchClutchStationary01() {
+		// Also looking for C7 43 40 CD CC CC 3D
+		// This pattern also works on 350 and 617
 		uintptr_t address = mem.FindPattern("\xC7\x43\x40\xCD\xCC\xCC\x3D\xE9\xF6\x04\x00\x00", "xxxxxxxx????");
 
 		if (address) {
@@ -44,8 +46,9 @@ namespace VehExt {
 	}
 
 	uintptr_t VehicleExtensions::PatchClutchStationary04() {
-		// ?????
-		uintptr_t address = mem.FindPattern("\xF3\x0F\x11\x47\x40\xF3\x0F\x59\x3D\xDA\x9C\x8E\x00", "xxxxxxxxxxxxx");
+		// Looking for F3 0F 11 47 40
+		// This pattern works on 350 and 617
+		uintptr_t address = mem.FindPattern("\xF3\x0F\x11\x47\x40\xF3\x0F\x59\x3D\xDA\x9C\x8E\x00", "xxxxxxxxx????");
 
 		if (address) {
 			for (int i = 0; i < 5; i++) {
