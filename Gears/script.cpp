@@ -5,6 +5,32 @@
 #include <iomanip>
 #include "VehicleExtensions.hpp"
 
+#include <fstream>
+#include <time.h>
+time_t start;
+
+void clearLog() {
+	std::ofstream logFile;
+	logFile.open("Gears.log", std::ofstream::out | std::ofstream::trunc);
+	logFile.close();
+}
+
+void writeToLog(const std::string &text)
+{
+	std::ofstream logFile(
+		"Gears.log", std::ios_base::out | std::ios_base::app);
+	uint32_t currTime = (uint32_t)difftime(time(0), start);
+	uint8_t seconds = currTime % 60;
+	uint8_t minutes = currTime / 60;
+	uint8_t hours = minutes / 60;
+	minutes = minutes % 60;
+	logFile <<
+		std::setw(2) << std::setfill('0') << (int)hours << ":" <<
+		std::setw(2) << std::setfill('0') << (int)minutes << ":" <<
+		std::setw(2) << std::setfill('0') << (int)seconds << " - " <<
+		text << std::endl;
+}
+
 enum ControlType {
 	HR = 0,
 	H1,
@@ -114,6 +140,7 @@ void readSettings() {
 	controls[KBrake]	= GetPrivateProfileInt(L"CONTROLS", L"KBrake",		0x53, L"./Gears.ini");
 
 	debug = (GetPrivateProfileInt(L"DEBUG", L"Info", 0, L"./Gears.ini") == 1);
+	writeToLog("Settings loaded");
 }
 
 void writeSettings() {
@@ -165,43 +192,48 @@ void patchClutchInstructions() {
 	clutchInstrLowTemp = ext.PatchClutchLow();
 	if (clutchInstrLowTemp) {
 		clutchInstrLowAddr = clutchInstrLowTemp;
-		showNotification("Clutch patched");
+		writeToLog("Clutch patched");
 	}
 
 	clutchS01Temp = ext.PatchClutchStationary01();
 	if (clutchS01Temp && !clutchS01Addr) {
 		clutchS01Addr = clutchS01Temp;
-		showNotification("0.1 Patched");
+		writeToLog("0.1 Patched");
 	}
 
 	clutchS04Temp = ext.PatchClutchStationary04();
 	if (clutchS04Temp) {
 		clutchS04Addr = clutchS04Temp;
-		showNotification("0.4 Patched");
+		writeToLog("0.4 Patched");
 	}
 }
 
 void restoreClutchInstructions() {
 	if (clutchInstrLowAddr) {
 		ext.RestoreClutchLow(clutchInstrLowAddr);
-		showNotification("Clutch restored");
+		writeToLog("Clutch restored");
 		clutchInstrLowAddr = 0;
 	}
-	else
-	{
-		showNotification("Clutch restore failed");
+	else {
+		writeToLog("Clutch not restored");
 	}
 
 	if (clutchS01Addr) {
 		ext.RestoreClutchStationary01(clutchS01Addr);
-		showNotification("0.1 Restored");
+		writeToLog("0.1 Restored");
 		clutchS01Addr = 0;
+	}
+	else {
+		writeToLog("0.1 not restored");
 	}
 
 	if (clutchS04Addr) {
 		ext.RestoreClutchStationary04(clutchS04Addr);
-		showNotification("0.4 Restored");
+		writeToLog("0.4 Restored");
 		clutchS04Addr = 0;
+	}
+	else {
+		writeToLog("0.4 not restored");
 	}
 }
 
@@ -505,14 +537,15 @@ void update() {
 }
 
 void main() {
+	clearLog();
+	start = time(0);
 	readSettings();
 	while (true) {
 		update();
 		WAIT(0);
 	}
-	if (clutchInstrLowAddr) {
-		ext.RestoreClutchLow(clutchInstrLowAddr);
-	}
+	restoreClutchInstructions();
+	writeToLog("Shut down script");
 }
 
 void ScriptMain() {
