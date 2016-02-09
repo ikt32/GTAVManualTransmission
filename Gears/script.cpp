@@ -50,6 +50,7 @@ enum ControlType {
 };
 
 Vehicle vehicle;
+Hash model;
 VehExt::VehicleExtensions ext;
 Player player;
 Ped playerPed;
@@ -98,26 +99,26 @@ int accelval;
 float accelvalf = 0.0f;
 
 void readSettings() {
-	enableManual = (GetPrivateProfileInt(L"MAIN", L"DefaultEnable", 1, L"./Gears.ini") == 1);
-	autoGear1 = (GetPrivateProfileInt(L"MAIN", L"AutoGear1", 0, L"./Gears.ini") == 1);
-	autoReverse = (GetPrivateProfileInt(L"MAIN", L"AutoReverse", 0, L"./Gears.ini") == 1);
-	oldReverse = (GetPrivateProfileInt(L"MAIN", L"OldReverse", 0, L"./Gears.ini") == 1);
-	engDamage = (GetPrivateProfileInt(L"MAIN", L"EngineDamage", 0, L"./Gears.ini") == 1);
-	engStall = (GetPrivateProfileInt(L"MAIN", L"EngineStalling", 0, L"./Gears.ini") == 1);
+	enableManual = (GetPrivateProfileInt(L"MAIN", L"DefaultEnable",  1, L"./Gears.ini") == 1);
+	autoGear1    = (GetPrivateProfileInt(L"MAIN", L"AutoGear1",      0, L"./Gears.ini") == 1);
+	autoReverse  = (GetPrivateProfileInt(L"MAIN", L"AutoReverse",    0, L"./Gears.ini") == 1);
+	oldReverse   = (GetPrivateProfileInt(L"MAIN", L"OldReverse",     0, L"./Gears.ini") == 1);
+	engDamage    = (GetPrivateProfileInt(L"MAIN", L"EngineDamage",   0, L"./Gears.ini") == 1);
+	engStall     = (GetPrivateProfileInt(L"MAIN", L"EngineStalling", 0, L"./Gears.ini") == 1);
 
 	controls[Toggle] = GetPrivateProfileInt(L"MAIN", L"Toggle", VK_OEM_5, L"./Gears.ini");
 
-	controls[ShiftUp]	= GetPrivateProfileInt(L"CONTROLS", L"ShiftUp",		ControlFrontendAccept,	L"./Gears.ini");
-	controls[ShiftDown] = GetPrivateProfileInt(L"CONTROLS", L"ShiftDown",	ControlFrontendX,		L"./Gears.ini");
-	controls[Clutch]	= GetPrivateProfileInt(L"CONTROLS", L"Clutch",		ControlFrontendLb,		L"./Gears.ini");
-	controls[Engine]	= GetPrivateProfileInt(L"CONTROLS", L"Engine",		ControlFrontendLs,		L"./Gears.ini");
+	controls[ShiftUp]   = GetPrivateProfileInt(L"CONTROLS", L"ShiftUp",   ControlFrontendAccept, L"./Gears.ini");
+	controls[ShiftDown] = GetPrivateProfileInt(L"CONTROLS", L"ShiftDown", ControlFrontendX,      L"./Gears.ini");
+	controls[Clutch]    = GetPrivateProfileInt(L"CONTROLS", L"Clutch",    ControlFrontendLb,     L"./Gears.ini");
+	controls[Engine]    = GetPrivateProfileInt(L"CONTROLS", L"Engine",    ControlFrontendLs,     L"./Gears.ini");
 
-	controls[KShiftUp]		= GetPrivateProfileInt(L"CONTROLS", L"KShiftUp",	VK_NUMPAD9, L"./Gears.ini");
-	controls[KShiftDown]	= GetPrivateProfileInt(L"CONTROLS", L"KShiftDown",	VK_NUMPAD7, L"./Gears.ini");
-	controls[KClutch]		= GetPrivateProfileInt(L"CONTROLS", L"KClutch", 	VK_NUMPAD8, L"./Gears.ini");
-	controls[KEngine]		= GetPrivateProfileInt(L"CONTROLS", L"KEngine",		0x45,		L"./Gears.ini");
+	controls[KShiftUp]   = GetPrivateProfileInt(L"CONTROLS", L"KShiftUp",	VK_NUMPAD9, L"./Gears.ini");
+	controls[KShiftDown] = GetPrivateProfileInt(L"CONTROLS", L"KShiftDown",	VK_NUMPAD7, L"./Gears.ini");
+	controls[KClutch]    = GetPrivateProfileInt(L"CONTROLS", L"KClutch", 	VK_NUMPAD8, L"./Gears.ini");
+	controls[KEngine]    = GetPrivateProfileInt(L"CONTROLS", L"KEngine",		0x45,		L"./Gears.ini");
 
-	hshifter = GetPrivateProfileInt(L"CONTROLS", L"EnableH", 0, L"./Gears.ini");
+	hshifter     = GetPrivateProfileInt(L"CONTROLS", L"EnableH", 0, L"./Gears.ini");
 	controls[HR] = GetPrivateProfileInt(L"CONTROLS", L"HR", VK_NUMPAD0, L"./Gears.ini");
 	controls[H1] = GetPrivateProfileInt(L"CONTROLS", L"H1", VK_NUMPAD0, L"./Gears.ini");
 	controls[H2] = GetPrivateProfileInt(L"CONTROLS", L"H2", VK_NUMPAD0, L"./Gears.ini");
@@ -128,11 +129,11 @@ void readSettings() {
 	controls[H7] = GetPrivateProfileInt(L"CONTROLS", L"H7", VK_NUMPAD0, L"./Gears.ini");
 	controls[H8] = GetPrivateProfileInt(L"CONTROLS", L"H8", VK_NUMPAD0, L"./Gears.ini");
 
-	controls[CThrottle] = GetPrivateProfileInt(L"CONTROLS", L"CThrottle",	ControlFrontendRt, L"./Gears.ini");
-	controls[CBrake]	= GetPrivateProfileInt(L"CONTROLS", L"CBrake",		ControlFrontendLt, L"./Gears.ini");
+	controls[CThrottle] = GetPrivateProfileInt(L"CONTROLS", L"CThrottle", ControlFrontendRt, L"./Gears.ini");
+	controls[CBrake]    = GetPrivateProfileInt(L"CONTROLS", L"CBrake",    ControlFrontendLt, L"./Gears.ini");
 	
-	controls[KThrottle] = GetPrivateProfileInt(L"CONTROLS", L"KThrottle",	0x57, L"./Gears.ini");
-	controls[KBrake]	= GetPrivateProfileInt(L"CONTROLS", L"KBrake",		0x53, L"./Gears.ini");
+	controls[KThrottle] = GetPrivateProfileInt(L"CONTROLS", L"KThrottle", 0x57, L"./Gears.ini");
+	controls[KBrake]    = GetPrivateProfileInt(L"CONTROLS", L"KBrake",	  0x53, L"./Gears.ini");
 
 	debug = (GetPrivateProfileInt(L"DEBUG", L"Info", 0, L"./Gears.ini") == 1);
 	writeToLog("Settings loaded");
@@ -288,18 +289,18 @@ void update() {
 		return;
 
 	vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
-
+	model = ENTITY::GET_ENTITY_MODEL(vehicle);
 	if (!ENTITY::DOES_ENTITY_EXIST(vehicle))
 		return;
 
-	if (!(VEHICLE::IS_THIS_MODEL_A_CAR(ENTITY::GET_ENTITY_MODEL(vehicle))
-		|| VEHICLE::IS_THIS_MODEL_A_BIKE(ENTITY::GET_ENTITY_MODEL(vehicle))
-		|| VEHICLE::IS_THIS_MODEL_A_QUADBIKE(ENTITY::GET_ENTITY_MODEL(vehicle))
-		) || VEHICLE::IS_THIS_MODEL_A_BICYCLE(ENTITY::GET_ENTITY_MODEL(vehicle)))
+	if (VEHICLE::IS_THIS_MODEL_A_BICYCLE(model) ||
+		!(VEHICLE::IS_THIS_MODEL_A_CAR(model) ||
+			VEHICLE::IS_THIS_MODEL_A_BIKE(model) ||
+			VEHICLE::IS_THIS_MODEL_A_QUADBIKE(model) ) )
 		return;
 
 
-	if (VEHICLE::IS_THIS_MODEL_A_BIKE(ENTITY::GET_ENTITY_MODEL(vehicle))) {
+	if (VEHICLE::IS_THIS_MODEL_A_BIKE(model)) {
 		isBike = true;
 	}
 	else {
@@ -312,23 +313,23 @@ void update() {
 	nextGear = 0x0000FFFF & gears;
 
 	if (enableManual || debug) {
-		rpm = ext.GetCurrentRPM(vehicle);
-		clutch = ext.GetClutch(vehicle);
+		rpm      = ext.GetCurrentRPM(vehicle);
+		clutch   = ext.GetClutch(vehicle);
 		throttle = ext.GetThrottle(vehicle);
-		turbo = ext.GetTurbo(vehicle);
-		speed = ENTITY::GET_ENTITY_SPEED(vehicle);
+		turbo    = ext.GetTurbo(vehicle);
+		speed    = ENTITY::GET_ENTITY_SPEED(vehicle);
 		velocity = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
 	}
 
 	if (CONTROLS::_GET_LAST_INPUT_METHOD(2)) {
-		rtvalf = (isKeyPressed(controls[KThrottle]) ? 1.0f : 0.0f);
-		ltvalf = (isKeyPressed(controls[KBrake]) ? 1.0f : 0.0f);
+		rtvalf     = (isKeyPressed(controls[KThrottle]) ? 1.0f : 0.0f);
+		ltvalf     = (isKeyPressed(controls[KBrake]) ? 1.0f : 0.0f);
 		clutchvalf = (isKeyPressed(controls[KClutch]) ? 1.0f : 0.0f);
 	}
 	else {
-		rtvalf		= (CONTROLS::GET_CONTROL_VALUE(0, controls[CThrottle]) - 127) / 127.0f;
-		ltvalf		= (CONTROLS::GET_CONTROL_VALUE(0, controls[CBrake]) - 127) / 127.0f;
-		clutchvalf	= (CONTROLS::GET_CONTROL_VALUE(0, controls[Clutch]) - 127) / 127.0f;
+		rtvalf     = (CONTROLS::GET_CONTROL_VALUE(0, controls[CThrottle]) - 127) / 127.0f;
+		ltvalf     = (CONTROLS::GET_CONTROL_VALUE(0, controls[CBrake]) - 127) / 127.0f;
+		clutchvalf = (CONTROLS::GET_CONTROL_VALUE(0, controls[Clutch]) - 127) / 127.0f;
 	}
 
 	accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
@@ -348,14 +349,14 @@ void update() {
 	if (debug) {
 		std::stringstream infos;
 
-		infos << "RPM: " << std::setprecision(3) << rpm <<
+		infos << "RPM: "   << std::setprecision(3) << rpm <<
 			"\nCurrGear: " << currGear <<
 			"\nNextGear: " << nextGear <<
-			"\nClutch: " << std::setprecision(3) << clutch <<
+			"\nClutch: "   << std::setprecision(3) << clutch <<
 			"\nThrottle: " << std::setprecision(3) << throttle <<
 			//"\nTurbo: " << std::setprecision(3) << turbo <<
 			//"\nV:" << std::setprecision(3) << velocity <<
-			"\nAddress: " << std::hex << address <<
+			"\nAddress: "  << std::hex << address <<
 			"\nE: " << (enableManual ? "Y" : "N");
 		const char *infoc = infos.str().c_str();
 		showText(0.01f, 0.5f, 0.4f, (char *)infoc);
