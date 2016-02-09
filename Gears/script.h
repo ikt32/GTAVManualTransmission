@@ -12,4 +12,34 @@ http://dev-c.com
 
 #include "..\..\ScriptHookV_SDK\inc\main.h"
 
+#include <fstream>
+#include <chrono>
+
+#include <vector>
+#include <string>
+#include <sstream>
+#include <iomanip>
+#include "VehicleExtensions.hpp"
+
+extern time_t start;
+
+extern VehExt::VehicleExtensions ext;
+
+extern uintptr_t clutchInstrLowAddr;
+extern uintptr_t clutchInstrLowTemp;
+
+extern uintptr_t clutchS01Addr;
+extern uintptr_t clutchS01Temp;
+
+extern uintptr_t clutchS04Addr;
+extern uintptr_t clutchS04Temp;
+
 void ScriptMain();
+
+extern void clearLog();
+
+extern void writeToLog(const std::string &text);
+
+extern void patchClutchInstructions();
+
+extern bool restoreClutchInstructions();

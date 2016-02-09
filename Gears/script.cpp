@@ -1,12 +1,6 @@
 #include "script.h"
-#include <vector>
-#include <string>
-#include <sstream>
-#include <iomanip>
-#include "VehicleExtensions.hpp"
+// itching for a proper refactoring
 
-#include <fstream>
-#include <time.h>
 time_t start;
 
 void clearLog() {
@@ -19,7 +13,7 @@ void writeToLog(const std::string &text)
 {
 	std::ofstream logFile(
 		"Gears.log", std::ios_base::out | std::ios_base::app);
-	uint32_t currTime = (uint32_t)difftime(time(0), start);
+	uint32_t currTime = (uint32_t)time(0);
 	uint8_t seconds = currTime % 60;
 	uint8_t minutes = currTime / 60;
 	uint8_t hours = minutes / 60;
@@ -69,6 +63,8 @@ uintptr_t clutchS01Temp = 0;
 
 uintptr_t clutchS04Addr = 0;
 uintptr_t clutchS04Temp = 0;
+
+int patched = 0;
 
 bool enableManual = true;
 bool autoGear1 = false;
@@ -189,30 +185,37 @@ void showNotification(char *message) {
 }
 
 void patchClutchInstructions() {
+	int success = 0;
 	clutchInstrLowTemp = ext.PatchClutchLow();
 	if (clutchInstrLowTemp) {
 		clutchInstrLowAddr = clutchInstrLowTemp;
 		writeToLog("Clutch patched");
+		patched++;
 	}
 
 	clutchS01Temp = ext.PatchClutchStationary01();
 	if (clutchS01Temp && !clutchS01Addr) {
 		clutchS01Addr = clutchS01Temp;
 		writeToLog("0.1 Patched");
+		patched++;
 	}
 
 	clutchS04Temp = ext.PatchClutchStationary04();
 	if (clutchS04Temp) {
 		clutchS04Addr = clutchS04Temp;
 		writeToLog("0.4 Patched");
+		patched++;
 	}
 }
 
-void restoreClutchInstructions() {
+bool restoreClutchInstructions() {
+	int success = 0;
 	if (clutchInstrLowAddr) {
 		ext.RestoreClutchLow(clutchInstrLowAddr);
 		writeToLog("Clutch restored");
 		clutchInstrLowAddr = 0;
+		success++;
+		patched--;
 	}
 	else {
 		writeToLog("Clutch not restored");
@@ -222,6 +225,8 @@ void restoreClutchInstructions() {
 		ext.RestoreClutchStationary01(clutchS01Addr);
 		writeToLog("0.1 Restored");
 		clutchS01Addr = 0;
+		success++;
+		patched--;
 	}
 	else {
 		writeToLog("0.1 not restored");
@@ -231,10 +236,17 @@ void restoreClutchInstructions() {
 		ext.RestoreClutchStationary04(clutchS04Addr);
 		writeToLog("0.4 Restored");
 		clutchS04Addr = 0;
+		success++;
+		patched--;
 	}
 	else {
 		writeToLog("0.4 not restored");
 	}
+
+	if (success == 3 || patched == 0)
+		return true;
+
+	return false;
 }
 
 void update() {
@@ -537,15 +549,11 @@ void update() {
 }
 
 void main() {
-	clearLog();
-	start = time(0);
 	readSettings();
 	while (true) {
 		update();
 		WAIT(0);
 	}
-	restoreClutchInstructions();
-	writeToLog("Shut down script");
 }
 
 void ScriptMain() {
