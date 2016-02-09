@@ -221,6 +221,8 @@ void patchClutchInstructions() {
 		writeToLog("0.4 Patched");
 		patched++;
 	}
+
+	runOnceRan = true;
 }
 
 bool restoreClutchInstructions() {
@@ -271,6 +273,7 @@ void update() {
 		message << "Manual Transmission " <<
 			(enableManual ? "Enabled" : "Disabled");
 		showNotification((char *)message.str().c_str());
+		writeToLog(message.str());
 		if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
@@ -481,7 +484,7 @@ void update() {
 	// Desired result: low RPM or stall. Same gear. Low torque.
 	// Result:	Patching the clutch ops results in above
 	if (currGear > nextGear) {
-		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, rpm * 1.5f);
+		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, rpm);
 	}
 
 	// Engine damage
