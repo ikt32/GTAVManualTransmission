@@ -11,15 +11,13 @@ void writeToLog(const std::string &text)
 {
 	std::ofstream logFile(
 		"Gears.log", std::ios_base::out | std::ios_base::app);
-	uint32_t currTime = (uint32_t)time(0);
-	uint8_t seconds = currTime % 60;
-	uint8_t minutes = currTime / 60;
-	uint8_t hours = minutes / 60;
-	minutes = minutes % 60;
-	logFile <<
-		std::setw(2) << std::setfill('0') << (int)hours << ":" <<
-		std::setw(2) << std::setfill('0') << (int)minutes << ":" <<
-		std::setw(2) << std::setfill('0') << (int)seconds << " - " <<
+	SYSTEMTIME curTime;
+	GetLocalTime(&curTime);
+	logFile << "[" <<
+		std::setw(2) << std::setfill('0') << curTime.wHour << ":" <<
+		std::setw(2) << std::setfill('0') << curTime.wMinute << ":" <<
+		std::setw(2) << std::setfill('0') << curTime.wSecond << "." <<
+		std::setw(3) << std::setfill('0') << curTime.wMilliseconds << "] " <<
 		text << std::endl;
 }
 
@@ -116,7 +114,7 @@ void readSettings() {
 	controls[KShiftUp]   = GetPrivateProfileInt(L"CONTROLS", L"KShiftUp",	VK_NUMPAD9, L"./Gears.ini");
 	controls[KShiftDown] = GetPrivateProfileInt(L"CONTROLS", L"KShiftDown",	VK_NUMPAD7, L"./Gears.ini");
 	controls[KClutch]    = GetPrivateProfileInt(L"CONTROLS", L"KClutch", 	VK_NUMPAD8, L"./Gears.ini");
-	controls[KEngine]    = GetPrivateProfileInt(L"CONTROLS", L"KEngine",		0x45,		L"./Gears.ini");
+	controls[KEngine]    = GetPrivateProfileInt(L"CONTROLS", L"KEngine",    0x45,       L"./Gears.ini");
 
 	hshifter     = GetPrivateProfileInt(L"CONTROLS", L"EnableH", 0, L"./Gears.ini");
 	controls[HR] = GetPrivateProfileInt(L"CONTROLS", L"HR", VK_NUMPAD0, L"./Gears.ini");
@@ -184,8 +182,25 @@ void showNotification(char *message) {
 	UI::_DRAW_NOTIFICATION(false, false);
 }
 
+void showDebugInfo() {
+	std::stringstream infos;
+
+	infos << "RPM: " << std::setprecision(3) << rpm <<
+		"\nCurrGear: " << currGear <<
+		"\nNextGear: " << nextGear <<
+		"\nClutch: " << std::setprecision(3) << clutch <<
+		"\nThrottle: " << std::setprecision(3) << throttle <<
+		//"\nTurbo: " << std::setprecision(3) << turbo <<
+		//"\nV:" << std::setprecision(3) << velocity <<
+		"\nAddress: " << std::hex << address <<
+		"\nE: " << (enableManual ? "Y" : "N");
+	const char *infoc = infos.str().c_str();
+	showText(0.01f, 0.5f, 0.4f, (char *)infoc);
+}
+
 void patchClutchInstructions() {
 	int success = 0;
+
 	clutchInstrLowTemp = ext.PatchClutchLow();
 	if (clutchInstrLowTemp) {
 		clutchInstrLowAddr = clutchInstrLowTemp;
@@ -268,13 +283,17 @@ void update() {
 		writeSettings();
 		readSettings();
 	}
+	
+	// Patch clutch on game start
+	if (enableManual && !runOnceRan) {
+		writeToLog("Patching clutch on start");
+		patchClutchInstructions();
+		runOnceRan = true;
+	}
 
 	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, ControlEnter)) {
 		readSettings();
 		lockGears = 0x00010001;
-		if (enableManual) {
-			patchClutchInstructions();
-		}
 	}
 
 	player = PLAYER::PLAYER_ID();
@@ -294,18 +313,16 @@ void update() {
 		return;
 
 	if (VEHICLE::IS_THIS_MODEL_A_BICYCLE(model) ||
-		!(VEHICLE::IS_THIS_MODEL_A_CAR(model) ||
-			VEHICLE::IS_THIS_MODEL_A_BIKE(model) ||
-			VEHICLE::IS_THIS_MODEL_A_QUADBIKE(model) ) )
+		!(VEHICLE::IS_THIS_MODEL_A_CAR(model)   ||
+		VEHICLE::IS_THIS_MODEL_A_BIKE(model)    ||
+		VEHICLE::IS_THIS_MODEL_A_QUADBIKE(model) ) )
 		return;
 
 
-	if (VEHICLE::IS_THIS_MODEL_A_BIKE(model)) {
+	if (VEHICLE::IS_THIS_MODEL_A_BIKE(model))
 		isBike = true;
-	}
-	else {
+	else
 		isBike = false;
-	}
 	
 	address = ext.GetAddress(vehicle);
 	gears = ext.GetGears(vehicle);
@@ -347,32 +364,13 @@ void update() {
 	}
 
 	if (debug) {
-		std::stringstream infos;
-
-		infos << "RPM: "   << std::setprecision(3) << rpm <<
-			"\nCurrGear: " << currGear <<
-			"\nNextGear: " << nextGear <<
-			"\nClutch: "   << std::setprecision(3) << clutch <<
-			"\nThrottle: " << std::setprecision(3) << throttle <<
-			//"\nTurbo: " << std::setprecision(3) << turbo <<
-			//"\nV:" << std::setprecision(3) << velocity <<
-			"\nAddress: "  << std::hex << address <<
-			"\nE: " << (enableManual ? "Y" : "N");
-		const char *infoc = infos.str().c_str();
-		showText(0.01f, 0.5f, 0.4f, (char *)infoc);
+		showDebugInfo();
 	}
 
-	if (!enableManual
-		|| (!VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false)
-			&& VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f))
+	if (!enableManual ||
+		(!VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false) &&
+		VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f) )
 		return;
-
-	// Patch clutch on game start if player is in vehicle
-	if (enableManual && !runOnceRan) {
-		writeToLog("Patching clutch on start");
-		patchClutchInstructions();
-		runOnceRan = true;
-	}
 
 	// Automatically engage first gear when stationary
 	if (autoGear1 && throttle < 0.1f && speed < 0.1f && currGear > 1) {
@@ -470,10 +468,8 @@ void update() {
 	}
 
 	// Game wants to shift up. Triggered at high RPM, high speed.
-	// Also user is pressing gas hard and game disagrees
-	// Desired result: high RPM, same gear (currGear)
-	// Current: Game fully depresses clutch and throttle
-	// Want:	Clutch and throttle full override
+	// Desired result: high RPM, same gear, no more accelerating
+	// Result:	Is as desired. Speed may drop a bit because of game clutch.
 	if ((currGear < nextGear && speed > 2.0f) || (clutch < 0.5 && accelvalf > 0.1f)) {
 		ext.SetCurrentRPM(vehicle, accelvalf * 0.9f);
 		ext.SetThrottle(vehicle, 1.0f);
@@ -482,14 +478,10 @@ void update() {
 
 	// Game wants to shift down. Usually triggered when user accelerates
 	// while in a too high gear.
-	// Desired result: low RPM or stall, even. Stay in current gear!
-	// Otherwise: force car to drive anyway to keep RPM up.
-	// Current: Game fully depresses clutch and throttle
-	// Update:	Game somewhat cooperates at low accelval?
-	// Want:	Clutch and throttle full override
-	// Update:	Patching the instruction fixed this entirely.
+	// Desired result: low RPM or stall. Same gear. Low torque.
+	// Result:	Patching the clutch ops results in above
 	if (currGear > nextGear) {
-		//VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, rpm * 1.75f);
+		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, rpm * 1.5f);
 	}
 
 	// Engine damage

@@ -13,7 +13,7 @@ http://dev-c.com
 #include "..\..\ScriptHookV_SDK\inc\main.h"
 
 #include <fstream>
-#include <chrono>
+#include <Windows.h>
 
 #include <vector>
 #include <string>
