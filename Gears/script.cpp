@@ -516,7 +516,9 @@ void update() {
 				// Blowoff valve sound when game does this. Unknown why this can't
 				// be emulated this way. Probably writing these values isn't working.
 				ext.SetThrottle(vehicle, 0.0f);
-				clutchvalf = 0.1f;
+				if (clutchvalf > 0.8f) {
+					clutchvalf = 1.0f;
+				}
 				lockGears = currGear + 1 | ((currGear + 1) << 16);
 			}
 		}
@@ -527,7 +529,9 @@ void update() {
 			|| isKeyJustPressed(controls[KShiftDown], KShiftDown)) {
 			if (currGear > 0) {
 				ext.SetThrottle(vehicle, 0.0f);
-				clutchvalf = 0.1f;
+				if (clutchvalf > 0.8f) {
+					clutchvalf = 1.0f;
+				}
 				lockGears = currGear - 1 | ((currGear - 1) << 16);
 			}
 		}
@@ -538,7 +542,9 @@ void update() {
 		for (uint8_t i = 0; i <= ext.GetTopGear(vehicle); i++) {
 			if (isKeyJustPressed(controls[i], (ControlType)i)) {
 				ext.SetThrottle(vehicle, 0.0f);
-				clutchvalf = 0.1f;
+				if (clutchvalf > 0.8f) {
+					clutchvalf = 1.0f;
+				}
 				lockGears = i | (i << 16);
 			}
 		}
