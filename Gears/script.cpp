@@ -97,6 +97,7 @@ bool autoReverse = false;
 bool oldReverse = false;
 bool engDamage = false;
 bool engStall = false;
+bool engBrake = true;
 bool debug = false;
 int hshifter;
 int controls[SIZE_OF_ARRAY];
@@ -140,6 +141,7 @@ void readSettings() {
 	oldReverse   = (GetPrivateProfileInt(L"MAIN", L"OldReverse",     0, L"./Gears.ini") == 1);
 	engDamage    = (GetPrivateProfileInt(L"MAIN", L"EngineDamage",   0, L"./Gears.ini") == 1);
 	engStall     = (GetPrivateProfileInt(L"MAIN", L"EngineStalling", 0, L"./Gears.ini") == 1);
+	engBrake     = (GetPrivateProfileInt(L"MAIN", L"EngineBraking",  1, L"./Gears.ini") == 1);
 
 	controls[Toggle] = GetPrivateProfileInt(L"MAIN", L"Toggle", VK_OEM_5, L"./Gears.ini");
 
@@ -549,10 +551,10 @@ void update() {
 	// Save the speed this happened at until next shift up and don't let truck go faster by doing
 	// the clutch thing by ourselves instead.
 	if (currGear < nextGear) {
-		if (!isTruck && prevGear > currGear && velocity > lockSpeed && lockSpeed > 0.01f) {
-			// Prevent saving new speed in car
+		if (isTruck) {
+			lockSpeed = velocity;
 		}
-		else {
+		else if (prevGear <= currGear || velocity <= lockSpeed || lockSpeed < 0.01f) {
 			lockSpeed = velocity;
 		}
 		lockTruck = isTruck;
@@ -569,10 +571,10 @@ void update() {
 		}
 	}
 	// Since we know prevGear and the speed for that, let's simulate "engine" braking.
-	else
+	else if (engBrake)
 	{
 		if (lockSpeed > 0.01f && velocity > lockSpeed &&
-			prevGear > currGear && rtvalf < 0.99 && rpm > 0.99) {
+			prevGear > currGear && rtvalf < 0.99 && rpm > 0.9) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, (1.0f - clutchvalf)*0.8f*rpm);
 			if (ltvalf < 0.1f) {
 				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
@@ -591,10 +593,10 @@ void update() {
 	// Game wants to shift up. Triggered at high RPM, high speed.
 	// Desired result: high RPM, same gear, no more accelerating
 	// Result:	Is as desired. Speed may drop a bit because of game clutch.
-	if ((currGear < nextGear && speed > 2.0f) || (clutch < 0.5 && accelvalf > 0.1f)) {
-		ext.SetCurrentRPM(vehicle, accelvalf * 0.9f);
-		ext.SetThrottle(vehicle, 1.0f);
-		ext.SetCurrentRPM(vehicle, accelvalf * 1.07f);
+	if (currGear > 0 &&
+		((currGear < nextGear && speed > 2.0f) || (clutch < 0.5 && rtvalf > 0.6f))) {
+		ext.SetThrottle(vehicle, 1.2f);
+		ext.SetCurrentRPM(vehicle, 1.07f);
 	}
 
 	// Game wants to shift down. Usually triggered when user accelerates
@@ -682,7 +684,7 @@ void update() {
 	}
 
 	// Clutch override working now
-	ext.SetClutch(vehicle, 1.0f-clutchvalf);
+	ext.SetClutch(vehicle, 1.0f - clutchvalf);
 	ext.SetGears(vehicle, lockGears);
 }
 
