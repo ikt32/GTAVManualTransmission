@@ -12,12 +12,12 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 	switch (reason)
 	{
 	case DLL_PROCESS_ATTACH:
+		scriptRegister(hInstance, ScriptMain);
 		clearLog();
 		writeToLog("Script loaded");
-		scriptRegister(hInstance, ScriptMain);
 		break;
 	case DLL_PROCESS_DETACH:
-		scriptUnregister(hInstance);
+		writeToLog("Init shutdown");
 		bool success = restoreClutchInstructions();
 		if (success) {
 			writeToLog("Shut down script successfully");
@@ -25,6 +25,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 		else {
 			writeToLog("Shut down script with leftovers");
 		}
+		scriptUnregister(hInstance);
 		break;
 	}
 	return TRUE;
