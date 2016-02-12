@@ -11,13 +11,13 @@ void writeToLog(const std::string &text)
 {
 	std::ofstream logFile(
 		"Gears.log", std::ios_base::out | std::ios_base::app);
-	SYSTEMTIME curTime;
-	GetLocalTime(&curTime);
+	SYSTEMTIME currTimeLog;
+	GetLocalTime(&currTimeLog);
 	logFile << "[" <<
-		std::setw(2) << std::setfill('0') << curTime.wHour << ":" <<
-		std::setw(2) << std::setfill('0') << curTime.wMinute << ":" <<
-		std::setw(2) << std::setfill('0') << curTime.wSecond << "." <<
-		std::setw(3) << std::setfill('0') << curTime.wMilliseconds << "] " <<
+		std::setw(2) << std::setfill('0') << currTimeLog.wHour << ":" <<
+		std::setw(2) << std::setfill('0') << currTimeLog.wMinute << ":" <<
+		std::setw(2) << std::setfill('0') << currTimeLog.wSecond << "." <<
+		std::setw(3) << std::setfill('0') << currTimeLog.wMilliseconds << "] " <<
 		text << std::endl;
 }
 
@@ -47,7 +47,34 @@ enum ControlType {
 	SIZE_OF_ARRAY
 };
 
+std::array <char *, 22> badModelNames =
+{
+	"BENSON",
+	"BIFF",
+	"HAULER",
+	"PACKER",
+	"PHANTOM",
+	"POUNDER",
+	"FIRETRUK",
+	"DUMP",
+	"FLATBED",
+	"MIXER",
+	"MIXER2",
+	"RUBBLE",
+	"TIPTRUCK",
+	"TIPTRUCK2",
+	"BARRACKS",
+	"BARRACKS2",
+	"BARRACKS3",
+	"RIPLEY",
+	"SCRAP",
+	"UTILLITRUCK",
+	"UTILLITRUCK2",
+	"UTILLITRUCK3"
+};
+
 Vehicle vehicle;
+Vehicle prevVehicle;
 Hash model;
 VehExt::VehicleExtensions ext;
 Player player;
@@ -77,6 +104,7 @@ bool controlCurr[SIZE_OF_ARRAY];
 bool controlPrev[SIZE_OF_ARRAY];
 
 bool isBike;
+bool isTruck;
 uint64_t address;
 uint32_t gears;
 float rpm;
@@ -88,6 +116,10 @@ float velocity;
 uint32_t currGear;
 uint32_t nextGear;
 uint32_t lockGears = 0x00010001;
+uint8_t prevGear;
+float lockSpeed;
+bool lockTruck;
+std::vector<float> lockSpeedV;
 
 float ltvalf = 0.0f;
 float rtvalf = 0.0f;
@@ -95,6 +127,10 @@ float clutchvalf = 0.0f;
 
 int accelval;
 float accelvalf = 0.0f;
+
+//long long currTime;
+//long long prevTime;
+//long long elapsed;
 
 void readSettings() {
 	enableManual = (GetPrivateProfileInt(L"MAIN", L"DefaultEnable",  1, L"./Gears.ini") == 1);
@@ -266,7 +302,39 @@ bool restoreClutchInstructions() {
 	return false;
 }
 
+bool isBadTruck(char *name) {
+	for (int i = 0; i < badModelNames.size(); i++) {
+		if (strcmp(name, badModelNames[i]) == 0)
+			return true;
+	}
+	return false;
+}
+
+void reInit() {
+	readSettings();
+	lockGears = 0x00010001;
+}
+
+/*
+long long milliseconds_now() {
+	static LARGE_INTEGER s_frequency;
+	static BOOL s_use_qpc = QueryPerformanceFrequency(&s_frequency);
+	if (s_use_qpc) {
+		LARGE_INTEGER now;
+		QueryPerformanceCounter(&now);
+		return (1000LL * now.QuadPart) / s_frequency.QuadPart;
+	}
+	else {
+		return GetTickCount();
+	}
+}
+*/
+
 void update() {
+	//prevTime = currTime;
+	//currTime = milliseconds_now();
+	//elapsed = currTime - prevTime;
+
 	if (isKeyJustPressed(controls[Toggle], Toggle)) {
 		enableManual = !enableManual;
 		std::stringstream message;
@@ -295,8 +363,7 @@ void update() {
 	}
 
 	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, ControlEnter)) {
-		readSettings();
-		lockGears = 0x00010001;
+		reInit();
 	}
 
 	player = PLAYER::PLAYER_ID();
@@ -321,11 +388,13 @@ void update() {
 		VEHICLE::IS_THIS_MODEL_A_QUADBIKE(model) ) )
 		return;
 
-
-	if (VEHICLE::IS_THIS_MODEL_A_BIKE(model))
-		isBike = true;
-	else
-		isBike = false;
+	if (vehicle != prevVehicle)
+	{
+		isBike = VEHICLE::IS_THIS_MODEL_A_BIKE(model) == TRUE;
+		isTruck = isBadTruck(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
+		reInit();
+	}
+	prevVehicle = vehicle;
 	
 	address = ext.GetAddress(vehicle);
 	gears = ext.GetGears(vehicle);
@@ -470,13 +539,56 @@ void update() {
 		}
 	}
 
+	// Since trucks don't stop accelerating and don't disengage the clutch at currGear < nextGear
+	// Save the speed this happened at until next shift up and don't let truck go faster by doing
+	// the clutch thing by ourselves instead.
+	if (currGear < nextGear) {
+		if (!isTruck && prevGear > currGear && velocity > lockSpeed && lockSpeed > 0.01f) {
+			// Prevent saving new speed in car
+		}
+		else {
+			lockSpeed = velocity;
+		}
+		lockTruck = isTruck;
+	}
+
+	// Disengage the clutch when cap is reached to cap speed
+	if (isTruck) {
+		if ((velocity > lockSpeed && lockTruck) ||
+			(velocity > lockSpeed && prevGear > currGear)) {
+			clutchvalf = 1.0f;
+			VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, 0.0f);
+			VEHICLE::_SET_VEHICLE_ENGINE_POWER_MULTIPLIER(vehicle, 0.0f);
+			ext.SetThrottle(vehicle, 0.0f);
+		}
+	}
+	// Since we know prevGear and the speed for that, let's simulate "engine" braking.
+	else
+	{
+		if (lockSpeed > 0.01f && velocity > lockSpeed &&
+			prevGear > currGear && rtvalf < 0.99 && rpm > 0.99) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, (1.0f - clutchvalf)*0.8f*rpm);
+			if (ltvalf < 0.1f) {
+				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
+			}
+			else {
+				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+			}
+		}
+		if (ltvalf < 0.1f) {
+			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
+		}
+	}
+	// it brakelights when going from too hi 'n brake to normal
+	// so when it just released the brakes
+
 	// Game wants to shift up. Triggered at high RPM, high speed.
 	// Desired result: high RPM, same gear, no more accelerating
 	// Result:	Is as desired. Speed may drop a bit because of game clutch.
 	if ((currGear < nextGear && speed > 2.0f) || (clutch < 0.5 && accelvalf > 0.1f)) {
 		ext.SetCurrentRPM(vehicle, accelvalf * 0.9f);
 		ext.SetThrottle(vehicle, 1.0f);
-		ext.SetCurrentRPM(vehicle, accelvalf * 1.1f);
+		ext.SetCurrentRPM(vehicle, accelvalf * 1.07f);
 	}
 
 	// Game wants to shift down. Usually triggered when user accelerates
@@ -485,6 +597,7 @@ void update() {
 	// Result:	Patching the clutch ops results in above
 	if (currGear > nextGear) {
 		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, rpm);
+		// RPM mismatch on transition currGear > nextGear to currGear == nextGear?
 	}
 
 	// Engine damage
@@ -513,26 +626,34 @@ void update() {
 		if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls[ShiftUp])
 			|| isKeyJustPressed(controls[KShiftUp], KShiftUp)) {
 			if (currGear < ext.GetTopGear(vehicle)) {
-				// Blowoff valve sound when game does this. Unknown why this can't
-				// be emulated this way. Probably writing these values isn't working.
-				ext.SetThrottle(vehicle, 0.0f);
-				if (clutchvalf > 0.8f) {
+				if (clutchvalf < 0.1f) {
 					clutchvalf = 1.0f;
 				}
+				ext.SetThrottle(vehicle, 0.0f);
 				lockGears = currGear + 1 | ((currGear + 1) << 16);
+				lockTruck = false;
+				prevGear = currGear;
+				if (currGear > 0) {
+					lockSpeedV.push_back(lockSpeed);
+				}
 			}
 		}
-
 
 		// Shift down
 		if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls[ShiftDown])
 			|| isKeyJustPressed(controls[KShiftDown], KShiftDown)) {
 			if (currGear > 0) {
-				ext.SetThrottle(vehicle, 0.0f);
-				if (clutchvalf > 0.8f) {
+				if (clutchvalf < 0.1f) {
 					clutchvalf = 1.0f;
 				}
+				ext.SetThrottle(vehicle, 0.0f);
 				lockGears = currGear - 1 | ((currGear - 1) << 16);
+				lockTruck = false;
+				prevGear = currGear;
+				if (currGear > 1) {
+					lockSpeed = lockSpeedV.back();
+					lockSpeedV.pop_back();
+				}
 			}
 		}
 	}
@@ -541,11 +662,13 @@ void update() {
 		// All keys checking
 		for (uint8_t i = 0; i <= ext.GetTopGear(vehicle); i++) {
 			if (isKeyJustPressed(controls[i], (ControlType)i)) {
-				ext.SetThrottle(vehicle, 0.0f);
-				if (clutchvalf > 0.8f) {
+				if (clutchvalf < 0.1f) {
 					clutchvalf = 1.0f;
 				}
+				ext.SetThrottle(vehicle, 0.0f);
 				lockGears = i | (i << 16);
+				lockTruck = false;
+				prevGear = currGear;
 			}
 		}
 	}

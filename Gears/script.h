@@ -15,6 +15,7 @@ http://dev-c.com
 #include <fstream>
 #include <Windows.h>
 
+#include <array>
 #include <vector>
 #include <string>
 #include <sstream>
