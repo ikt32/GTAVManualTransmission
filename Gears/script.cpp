@@ -113,6 +113,7 @@ float throttle;
 float turbo;
 float speed;
 float velocity;
+uint8_t topGear;
 uint32_t currGear;
 uint32_t nextGear;
 uint32_t lockGears = 0x00010001;
@@ -256,6 +257,10 @@ void patchClutchInstructions() {
 		clutchS04Addr = clutchS04Temp;
 		writeToLog("0.4 Patched");
 		patched++;
+	}
+
+	if (patched != 3) {
+		writeToLog("Patching failed");
 	}
 
 	runOnceRan = true;
@@ -406,6 +411,7 @@ void update() {
 		clutch   = ext.GetClutch(vehicle);
 		throttle = ext.GetThrottle(vehicle);
 		turbo    = ext.GetTurbo(vehicle);
+		topGear  = ext.GetTopGear(vehicle);
 		speed    = ENTITY::GET_ENTITY_SPEED(vehicle);
 		velocity = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
 	}
@@ -625,7 +631,7 @@ void update() {
 		// Shift up
 		if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls[ShiftUp])
 			|| isKeyJustPressed(controls[KShiftUp], KShiftUp)) {
-			if (currGear < ext.GetTopGear(vehicle)) {
+			if (currGear < topGear) {
 				if (clutchvalf < 0.1f) {
 					clutchvalf = 1.0f;
 				}
@@ -660,7 +666,9 @@ void update() {
 	else
 	{
 		// All keys checking
-		for (uint8_t i = 0; i <= ext.GetTopGear(vehicle); i++) {
+		for (uint8_t i = 0; i <= topGear; i++) {
+			if (i > H8)
+				i = H8;
 			if (isKeyJustPressed(controls[i], (ControlType)i)) {
 				if (clutchvalf < 0.1f) {
 					clutchvalf = 1.0f;
