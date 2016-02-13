@@ -351,6 +351,7 @@ void update() {
 		writeToLog(message.str());
 		if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 		}
 		if (enableManual) {
 			patchClutchInstructions();
@@ -573,6 +574,7 @@ void update() {
 	// Since we know prevGear and the speed for that, let's simulate "engine" braking.
 	else if (engBrake && currGear > 0)
 	{
+		// Only when free rolling at high speeds
 		if (velocity > lockSpeeds.at(currGear) &&
 			rtvalf < 0.99 && rpm > 0.9) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, (1.0f - clutchvalf)*0.8f*rpm);
@@ -587,8 +589,6 @@ void update() {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
 		}
 	}
-	// it brakelights when going from too hi 'n brake to normal
-	// so when it just released the brakes
 
 	// Game wants to shift up. Triggered at high RPM, high speed.
 	// Desired result: high RPM, same gear, no more accelerating
@@ -631,8 +631,8 @@ void update() {
 	// sequential or h?
 	if (!hshifter) {
 		// Shift up
-		if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls[ShiftUp])
-			|| isKeyJustPressed(controls[KShiftUp], KShiftUp)) {
+		if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls[ShiftUp]) ||
+			isKeyJustPressed(controls[KShiftUp], KShiftUp)) {
 			if (currGear < topGear) {
 				if (clutchvalf < 0.1f) {
 					clutchvalf = 1.0f;
@@ -646,8 +646,8 @@ void update() {
 		}
 
 		// Shift down
-		if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls[ShiftDown])
-			|| isKeyJustPressed(controls[KShiftDown], KShiftDown)) {
+		if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls[ShiftDown]) ||
+			isKeyJustPressed(controls[KShiftDown], KShiftDown)) {
 			if (currGear > 0) {
 				if (clutchvalf < 0.1f) {
 					clutchvalf = 1.0f;
