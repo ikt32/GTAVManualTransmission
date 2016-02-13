@@ -121,7 +121,7 @@ uint32_t lockGears = 0x00010001;
 uint8_t prevGear;
 float lockSpeed;
 bool lockTruck;
-std::vector<float> lockSpeedV;
+std::vector<float> lockSpeeds(20);
 
 float ltvalf = 0.0f;
 float rtvalf = 0.0f;
@@ -571,10 +571,10 @@ void update() {
 		}
 	}
 	// Since we know prevGear and the speed for that, let's simulate "engine" braking.
-	else if (engBrake)
+	else if (engBrake && currGear > 0)
 	{
-		if (lockSpeed > 0.01f && velocity > lockSpeed &&
-			prevGear > currGear && rtvalf < 0.99 && rpm > 0.9) {
+		if (velocity > lockSpeeds.at(currGear) &&
+			rtvalf < 0.99 && rpm > 0.9) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, (1.0f - clutchvalf)*0.8f*rpm);
 			if (ltvalf < 0.1f) {
 				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
@@ -610,8 +610,8 @@ void update() {
 
 	// Engine damage
 	if (engDamage &&
-		rpm > 0.96f && accelvalf > 0.99f) {
-		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (0.25f*accelvalf));
+		rpm > 0.98f && accelvalf > 0.99f) {
+		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (0.2f*accelvalf));
 		if (VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < 0.0f) {
 			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 		}
@@ -641,9 +641,7 @@ void update() {
 				lockGears = currGear + 1 | ((currGear + 1) << 16);
 				lockTruck = false;
 				prevGear = currGear;
-				if (currGear > 0) {
-					lockSpeedV.push_back(lockSpeed);
-				}
+				lockSpeeds[currGear] = velocity;
 			}
 		}
 
@@ -658,10 +656,7 @@ void update() {
 				lockGears = currGear - 1 | ((currGear - 1) << 16);
 				lockTruck = false;
 				prevGear = currGear;
-				if (currGear > 1) {
-					lockSpeed = lockSpeedV.back();
-					lockSpeedV.pop_back();
-				}
+				lockSpeeds[currGear] = velocity;
 			}
 		}
 	}
@@ -679,6 +674,7 @@ void update() {
 				lockGears = i | (i << 16);
 				lockTruck = false;
 				prevGear = currGear;
+				lockSpeeds[currGear] = velocity;
 			}
 		}
 	}
