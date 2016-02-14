@@ -14,6 +14,7 @@ http://dev-c.com
 
 #include <fstream>
 #include <Windows.h>
+#include <time.h>
 
 #include <array>
 #include <vector>
