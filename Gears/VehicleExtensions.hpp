@@ -16,6 +16,9 @@ namespace VehExt {
 		uintptr_t PatchClutchStationary04();
 		void RestoreClutchStationary04(uintptr_t address);
 
+		uintptr_t PatchThrottleRedline();
+		void RestoreThrottleRedline(uintptr_t address);
+
 		uint64_t GetAddress(Vehicle handle);
 		uint32_t GetGears(Vehicle handle);
 		void SetGears(Vehicle handle, uint32_t value);

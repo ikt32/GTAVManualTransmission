@@ -60,6 +60,24 @@ namespace VehExt {
 		}
 	}
 
+	uintptr_t VehicleExtensions::PatchThrottleRedline() {
+		// Looking for 44 89 71 44
+		uintptr_t address = mem.FindPattern("\x44\x89\x71\x44\xF3\x0F\x11\x75\x47", "xxxxxxx??");
+
+		if (address) {
+			memset((void *)address, 0x90, 4);
+		}
+		return address;
+	}
+	void VehicleExtensions::RestoreThrottleRedline(uintptr_t address) {
+		byte instrArr[4] = { 0x44, 0x89, 0x71, 0x44 };
+		if (address) {
+			for (int i = 0; i < 4; i++) {
+				memset((void *)(address + i), instrArr[i], 1);
+			}
+		}
+	}
+
 	uint64_t VehicleExtensions::GetAddress(Vehicle handle) {
 		uint64_t address = mem.GetAddressOfEntity(handle);
 		return address;
@@ -192,7 +210,7 @@ namespace VehExt {
 	uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {
 		uint64_t address = mem.GetAddressOfEntity(handle);
 
-		int offset = (getGameVersion() > 3 ? 0xAA0 : 0xA90);
+		int offset = (getGameVersion() > 3 ? 0xAA0 : 0xA80);
 
 		return *reinterpret_cast<uint64_t *>(address + offset);
 	}
