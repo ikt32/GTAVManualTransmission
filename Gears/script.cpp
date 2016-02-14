@@ -44,6 +44,7 @@ enum ControlType {
 	KBrake,
 	Engine,
 	KEngine,
+	CToggle,
 	SIZE_OF_ARRAY
 };
 
@@ -88,8 +89,12 @@ uintptr_t clutchS01Temp = 0;
 uintptr_t clutchS04Addr = 0;
 uintptr_t clutchS04Temp = 0;
 
+uintptr_t throttleCutAddr = 0;
+uintptr_t throttleCutTemp = 0;
+
 bool runOnceRan = false;
 int patched = 0;
+int prevNotification = 0;
 
 bool enableManual = true;
 bool autoGear1 = false;
@@ -130,6 +135,10 @@ float clutchvalf = 0.0f;
 int accelval;
 float accelvalf = 0.0f;
 
+struct timeval currTime;
+long long pressTime;
+long long releaseTime;
+
 //long long currTime;
 //long long prevTime;
 //long long elapsed;
@@ -143,7 +152,8 @@ void readSettings() {
 	engStall     = (GetPrivateProfileInt(L"MAIN", L"EngineStalling", 0, L"./Gears.ini") == 1);
 	engBrake     = (GetPrivateProfileInt(L"MAIN", L"EngineBraking",  1, L"./Gears.ini") == 1);
 
-	controls[Toggle] = GetPrivateProfileInt(L"MAIN", L"Toggle", VK_OEM_5, L"./Gears.ini");
+	controls[Toggle]  = GetPrivateProfileInt(L"MAIN", L"Toggle",  VK_OEM_5, L"./Gears.ini");
+	controls[CToggle] = GetPrivateProfileInt(L"MAIN", L"CToggle", ControlVehicleDuck, L"./Gears.ini");
 
 	controls[ShiftUp]   = GetPrivateProfileInt(L"CONTROLS", L"ShiftUp",   ControlFrontendAccept, L"./Gears.ini");
 	controls[ShiftDown] = GetPrivateProfileInt(L"CONTROLS", L"ShiftDown", ControlFrontendX,      L"./Gears.ini");
@@ -180,6 +190,19 @@ void writeSettings() {
 	WritePrivateProfileString(L"MAIN", L"DefaultEnable", (enableManual ? L" 1" : L" 0"), L"./Gears.ini");
 }
 
+long long milliseconds_now() {
+	static LARGE_INTEGER s_frequency;
+	static BOOL s_use_qpc = QueryPerformanceFrequency(&s_frequency);
+	if (s_use_qpc) {
+		LARGE_INTEGER now;
+		QueryPerformanceCounter(&now);
+		return (1000LL * now.QuadPart) / s_frequency.QuadPart;
+	}
+	else {
+		return GetTickCount();
+	}
+}
+
 bool isKeyPressed(int key) {
 	if (GetAsyncKeyState(key) & 0x8000)
 		return true;
@@ -202,6 +225,22 @@ bool isKeyJustPressed(int key, ControlType control) {
 	return false;
 }
 
+bool wasControlPressedForMs(int control, int ms) {
+	if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, control)) {
+		pressTime = milliseconds_now();
+	}
+	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, control)) {
+		releaseTime = milliseconds_now();
+	}
+
+	if ((releaseTime - pressTime) >= ms) {
+		pressTime = 0;
+		releaseTime = 0;
+		return true;
+	}
+	return false;
+}
+
 void showText(float x, float y, float scale, char * text) {
 	UI::SET_TEXT_FONT(0);
 	UI::SET_TEXT_SCALE(scale, scale);
@@ -216,9 +255,11 @@ void showText(float x, float y, float scale, char * text) {
 }
 
 void showNotification(char *message) {
+	if (prevNotification)
+		UI::_REMOVE_NOTIFICATION(prevNotification);
 	UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
 	UI::_ADD_TEXT_COMPONENT_STRING(message);
-	UI::_DRAW_NOTIFICATION(false, false);
+	prevNotification = UI::_DRAW_NOTIFICATION(false, false);
 }
 
 void showDebugInfo() {
@@ -261,7 +302,14 @@ void patchClutchInstructions() {
 		patched++;
 	}
 
-	if (patched != 3) {
+	throttleCutTemp = ext.PatchThrottleRedline();
+	if (throttleCutTemp) {
+		throttleCutAddr = throttleCutTemp;
+		writeToLog("Throttle Patched");
+		patched++;
+	}
+
+	if (patched != 4) {
 		writeToLog("Patching failed");
 	}
 
@@ -303,7 +351,18 @@ bool restoreClutchInstructions() {
 		writeToLog("0.4 not restored");
 	}
 
-	if (success == 3 || patched == 0)
+	if (throttleCutAddr) {
+		ext.RestoreThrottleRedline(throttleCutAddr);
+		writeToLog("Throttle Restored");
+		throttleCutAddr = 0;
+		success++;
+		patched--;
+	}
+	else {
+		writeToLog("Throttle not restored");
+	}
+
+	if (success == 4 || patched == 0)
 		return true;
 
 	return false;
@@ -322,20 +381,29 @@ void reInit() {
 	lockGears = 0x00010001;
 }
 
-/*
-long long milliseconds_now() {
-	static LARGE_INTEGER s_frequency;
-	static BOOL s_use_qpc = QueryPerformanceFrequency(&s_frequency);
-	if (s_use_qpc) {
-		LARGE_INTEGER now;
-		QueryPerformanceCounter(&now);
-		return (1000LL * now.QuadPart) / s_frequency.QuadPart;
+
+void toggleManual() {
+	enableManual = !enableManual;
+	std::stringstream message;
+	message << "Manual Transmission " <<
+		(enableManual ? "Enabled" : "Disabled");
+	showNotification((char *)message.str().c_str());
+	writeToLog(message.str());
+	if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
+		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
+	}
+	if (enableManual) {
+		patchClutchInstructions();
 	}
 	else {
-		return GetTickCount();
+		restoreClutchInstructions();
 	}
+	writeSettings();
+	readSettings();
 }
-*/
+
+uintptr_t addrThrottle;
 
 void update() {
 	//prevTime = currTime;
@@ -343,24 +411,7 @@ void update() {
 	//elapsed = currTime - prevTime;
 
 	if (isKeyJustPressed(controls[Toggle], Toggle)) {
-		enableManual = !enableManual;
-		std::stringstream message;
-		message << "Manual Transmission " <<
-			(enableManual ? "Enabled" : "Disabled");
-		showNotification((char *)message.str().c_str());
-		writeToLog(message.str());
-		if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
-			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
-		}
-		if (enableManual) {
-			patchClutchInstructions();
-		}
-		else {
-			restoreClutchInstructions();
-		}
-		writeSettings();
-		readSettings();
+		toggleManual();
 	}
 	
 	// Patch clutch on game start
@@ -403,6 +454,10 @@ void update() {
 		reInit();
 	}
 	prevVehicle = vehicle;
+
+	if (wasControlPressedForMs(controls[CToggle], 500)) {
+		toggleManual();
+	}
 	
 	address = ext.GetAddress(vehicle);
 	gears = ext.GetGears(vehicle);
