@@ -314,6 +314,7 @@ void patchClutchInstructions() {
 	if (clutchStationaryLowTemp) {
 		clutchStationaryLowAddr = clutchStationaryLowTemp;
 		writeToLog("S_Low Patched");
+		patched++;
 	}
 
 	if (patched != 5) {
