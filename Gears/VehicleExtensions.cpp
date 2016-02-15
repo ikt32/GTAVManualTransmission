@@ -77,6 +77,26 @@ void VehicleExtensions::RestoreThrottleRedline(uintptr_t address) {
 	}
 }
 
+
+uintptr_t VehicleExtensions::PatchClutchStationaryLow() {
+	// F3 0F 11 43 40 <- Looking for this
+	// 0F B7 43 04    <- Next instruction
+	uintptr_t address = mem.FindPattern("\xF3\x0F\x11\x43\x40\x0F\xB7\x43\x04", "xxxxxxx??");
+
+	if (address) {
+		memset((void *)address, 0x90, 5);
+	}
+	return address;
+}
+void VehicleExtensions::RestoreClutchStationaryLow(uintptr_t address) {
+	byte instrArr[7] = { 0xF3, 0x0F, 0x11, 0x43, 0x40 };
+	if (address) {
+		for (int i = 0; i < 5; i++) {
+			memset((void *)(address + i), instrArr[i], 1);
+		}
+	}
+}
+
 uint64_t VehicleExtensions::GetAddress(Vehicle handle) {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 	return address;

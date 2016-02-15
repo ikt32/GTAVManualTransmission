@@ -6,17 +6,27 @@
 
 class VehicleExtensions {
 public:
+	// Clutch disengage @ Low Speed High Gear 
 	uintptr_t PatchClutchLow();
 	void RestoreClutchLow(uintptr_t address);
 
+	// Clutch 0.1 @ Stationary
 	uintptr_t PatchClutchStationary01();
 	void RestoreClutchStationary01(uintptr_t address);
 
+	// Clutch 0.4 @ Stationary
 	uintptr_t PatchClutchStationary04();
 	void RestoreClutchStationary04(uintptr_t address);
 
+	// Throttle disengage at redline
 	uintptr_t PatchThrottleRedline();
 	void RestoreThrottleRedline(uintptr_t address);
+
+	// Clutch small value @ full press
+	uintptr_t PatchClutchStationaryLow();
+	void RestoreClutchStationaryLow(uintptr_t address);
+
+	// Keep Clutch disengage at redline
 
 	uint64_t GetAddress(Vehicle handle);
 	uint32_t GetGears(Vehicle handle);

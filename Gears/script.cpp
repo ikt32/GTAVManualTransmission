@@ -92,6 +92,9 @@ uintptr_t clutchS04Temp = 0;
 uintptr_t throttleCutAddr = 0;
 uintptr_t throttleCutTemp = 0;
 
+uintptr_t clutchStationaryLowAddr = 0;
+uintptr_t clutchStationaryLowTemp = 0;
+
 bool runOnceRan = false;
 int patched = 0;
 int prevNotification = 0;
@@ -307,7 +310,13 @@ void patchClutchInstructions() {
 		patched++;
 	}
 
-	if (patched != 4) {
+	clutchStationaryLowTemp = ext.PatchClutchStationaryLow();
+	if (clutchStationaryLowTemp) {
+		clutchStationaryLowAddr = clutchStationaryLowTemp;
+		writeToLog("S_Low Patched");
+	}
+
+	if (patched != 5) {
 		writeToLog("Patching failed");
 	}
 
@@ -360,7 +369,18 @@ bool restoreClutchInstructions() {
 		writeToLog("Throttle not restored");
 	}
 
-	if (success == 4 || patched == 0)
+	if (clutchStationaryLowAddr) {
+		ext.RestoreThrottleRedline(clutchStationaryLowAddr);
+		writeToLog("S_Low Restored");
+		clutchStationaryLowAddr = 0;
+		success++;
+		patched--;
+	}
+	else {
+		writeToLog("S_Low not restored");
+	}
+
+	if (success == 5 || patched == 0)
 		return true;
 
 	return false;
