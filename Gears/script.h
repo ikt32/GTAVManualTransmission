@@ -23,7 +23,7 @@ http://dev-c.com
 #include <iomanip>
 #include "VehicleExtensions.hpp"
 
-extern VehExt::VehicleExtensions ext;
+extern VehicleExtensions ext;
 
 extern uintptr_t clutchInstrLowAddr;
 extern uintptr_t clutchInstrLowTemp;

@@ -77,7 +77,7 @@ std::array <char *, 22> badModelNames =
 Vehicle vehicle;
 Vehicle prevVehicle;
 Hash model;
-VehExt::VehicleExtensions ext;
+VehicleExtensions ext;
 Player player;
 Ped playerPed;
 uintptr_t clutchInstrLowAddr = 0;
