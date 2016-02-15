@@ -25,15 +25,6 @@ http://dev-c.com
 
 extern VehicleExtensions ext;
 
-extern uintptr_t clutchInstrLowAddr;
-extern uintptr_t clutchInstrLowTemp;
-
-extern uintptr_t clutchS01Addr;
-extern uintptr_t clutchS01Temp;
-
-extern uintptr_t clutchS04Addr;
-extern uintptr_t clutchS04Temp;
-
 void ScriptMain();
 
 extern void clearLog();
