@@ -106,6 +106,7 @@ bool engBrake = true;
 bool debug = false;
 int hshifter;
 int controls[SIZE_OF_ARRAY];
+int cToggleTime;
 bool controlCurr[SIZE_OF_ARRAY];
 bool controlPrev[SIZE_OF_ARRAY];
 
@@ -139,10 +140,6 @@ struct timeval currTime;
 long long pressTime;
 long long releaseTime;
 
-//long long currTime;
-//long long prevTime;
-//long long elapsed;
-
 void readSettings() {
 	enableManual = (GetPrivateProfileInt(L"MAIN", L"DefaultEnable",  1, L"./Gears.ini") == 1);
 	autoGear1    = (GetPrivateProfileInt(L"MAIN", L"AutoGear1",      0, L"./Gears.ini") == 1);
@@ -153,7 +150,8 @@ void readSettings() {
 	engBrake     = (GetPrivateProfileInt(L"MAIN", L"EngineBraking",  1, L"./Gears.ini") == 1);
 
 	controls[Toggle]  = GetPrivateProfileInt(L"MAIN", L"Toggle",  VK_OEM_5, L"./Gears.ini");
-	controls[CToggle] = GetPrivateProfileInt(L"MAIN", L"CToggle", ControlVehicleDuck, L"./Gears.ini");
+	controls[CToggle] = GetPrivateProfileInt(L"MAIN", L"CToggle", ControlScriptPadDown, L"./Gears.ini");
+	cToggleTime       = GetPrivateProfileInt(L"MAIN", L"CToggleTime", 500, L"./Gears.ini");
 
 	controls[ShiftUp]   = GetPrivateProfileInt(L"CONTROLS", L"ShiftUp",   ControlFrontendAccept, L"./Gears.ini");
 	controls[ShiftDown] = GetPrivateProfileInt(L"CONTROLS", L"ShiftDown", ControlFrontendX,      L"./Gears.ini");
@@ -455,7 +453,7 @@ void update() {
 	}
 	prevVehicle = vehicle;
 
-	if (wasControlPressedForMs(controls[CToggle], 500)) {
+	if (wasControlPressedForMs(controls[CToggle], cToggleTime)) {
 		toggleManual();
 	}
 	
