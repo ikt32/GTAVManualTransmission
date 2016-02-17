@@ -149,17 +149,28 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NativeMemory.cpp" />
+    <ClCompile Include="Logger.cpp" />
     <ClCompile Include="script.cpp" />
+    <ClCompile Include="ScriptControls.cpp" />
+    <ClCompile Include="ScriptSettings.cpp" />
+    <ClCompile Include="VehicleData.cpp" />
     <ClCompile Include="VehicleExtensions.cpp" />
+    <ClCompile Include="MemoryPatcher.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\enums.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\main.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h" />
+    <ClInclude Include="TimeHelper.h" />
     <ClInclude Include="NativeMemory.hpp" />
+    <ClInclude Include="Logger.h" />
     <ClInclude Include="script.h" />
+    <ClInclude Include="ScriptControls.h" />
+    <ClInclude Include="ScriptSettings.h" />
+    <ClInclude Include="VehicleData.h" />
     <ClInclude Include="VehicleExtensions.hpp" />
+    <ClInclude Include="MemoryPatcher.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

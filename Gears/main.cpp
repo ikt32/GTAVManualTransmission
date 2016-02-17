@@ -6,24 +6,29 @@ http://dev-c.com
 
 #include "..\..\ScriptHookV_SDK\inc\main.h"
 #include "script.h"
+#include "Logger.h"
+#include "MemoryPatcher.h"
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 {
+	Logger logger("./Gears.log");
+
 	switch (reason)
 	{
 	case DLL_PROCESS_ATTACH:
 		scriptRegister(hInstance, ScriptMain);
-		clearLog();
-		writeToLog("Script loaded");
+		logger.Clear();
+		logger.Write("Script loaded");
 		break;
 	case DLL_PROCESS_DETACH:
-		writeToLog("Init shutdown");
-		bool success = restoreClutchInstructions();
+		logger.Write("Init shutdown");
+
+		bool success = MemoryPatcher::RestoreInstructions();
 		if (success) {
-			writeToLog("Shut down script successfully");
+			logger.Write("Shut down script successfully");
 		}
 		else {
-			writeToLog("Shut down script with leftovers");
+			logger.Write("Shut down script with leftovers");
 		}
 		scriptUnregister(hInstance);
 		break;

@@ -12,25 +12,11 @@ http://dev-c.com
 
 #include "..\..\ScriptHookV_SDK\inc\main.h"
 
-#include <fstream>
-#include <Windows.h>
-#include <time.h>
-
-#include <array>
-#include <vector>
 #include <string>
 #include <sstream>
 #include <iomanip>
-#include "VehicleExtensions.hpp"
+#include <array>
 
-extern VehicleExtensions ext;
 
 void ScriptMain();
 
-extern void clearLog();
-
-extern void writeToLog(const std::string &text);
-
-extern void patchClutchInstructions();
-
-extern bool restoreClutchInstructions();
