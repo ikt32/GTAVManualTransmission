@@ -1,7 +1,5 @@
 #include "ScriptSettings.h"
 
-#include "Logger.h"
-
 ScriptSettings::ScriptSettings() {
 	EnableManual = false;
 	AutoGear1    = false;
