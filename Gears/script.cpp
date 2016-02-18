@@ -97,17 +97,6 @@ void update() {
 	if (controls.IsKeyJustPressed(controls.Control[ScriptControls::Toggle], ScriptControls::Toggle)) {
 		toggleManual();
 	}
-	
-	// Patch clutch on game start
-	if (settings.EnableManual && !runOnceRan) {
-		logger.Write("Patching functions on start");
-		patched = MemoryPatcher::PatchInstructions();
-		runOnceRan = true;
-	}
-
-	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, ControlEnter)) {
-		reInit();
-	}
 
 	player = PLAYER::PLAYER_ID();
 	playerPed = PLAYER::PLAYER_PED_ID();
@@ -131,16 +120,28 @@ void update() {
 		VEHICLE::IS_THIS_MODEL_A_QUADBIKE(model) ) )
 		return;
 
-	// is the dude a driver?
+	// check if player ped is driver
 	if (playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
 		if (patched) {
-			MemoryPatcher::RestoreInstructions();
+			logger.Write("Not a driver:");
+			patched = !MemoryPatcher::RestoreInstructions();
 		}
 		return;
 	}
 
-	if (vehicle != prevVehicle)
-	{
+	// Patch clutch on game start
+	if (settings.EnableManual && !runOnceRan) {
+		logger.Write("Patching functions on start");
+		patched = MemoryPatcher::PatchInstructions();
+		runOnceRan = true;
+	}
+
+	if (!patched && settings.EnableManual) {
+		logger.Write("Re-patching functions");
+		patched = MemoryPatcher::PatchInstructions();
+	}
+
+	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, ControlEnter) || vehicle != prevVehicle) {
 		reInit();
 	}
 	prevVehicle = vehicle;
