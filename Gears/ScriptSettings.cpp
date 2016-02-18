@@ -26,7 +26,7 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	Hshifter = (GetPrivateProfileInt(L"CONTROLS", L"EnableH", 0, L"./Gears.ini") == 1);
 
 	scriptControl->Control[ScriptControls::ControlType::Toggle] = GetPrivateProfileInt(L"MAIN", L"Toggle", VK_OEM_5, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::CToggle] = GetPrivateProfileInt(L"MAIN", L"CToggle", ControlVehicleDuck, L"./Gears.ini");
+	scriptControl->Control[ScriptControls::ControlType::CToggle] = GetPrivateProfileInt(L"MAIN", L"CToggle", ControlScriptPadRight, L"./Gears.ini");
 	scriptControl->CToggleTime = GetPrivateProfileInt(L"MAIN", L"CToggleTime", 500, L"./Gears.ini");
 				 
 	scriptControl->Control[ScriptControls::ControlType::ShiftUp] = GetPrivateProfileInt(L"CONTROLS", L"ShiftUp", ControlFrontendAccept, L"./Gears.ini");
