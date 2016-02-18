@@ -12,11 +12,5 @@ http://dev-c.com
 
 #include "..\..\ScriptHookV_SDK\inc\main.h"
 
-#include <string>
-#include <sstream>
-#include <iomanip>
-#include <array>
-
-
 void ScriptMain();
 

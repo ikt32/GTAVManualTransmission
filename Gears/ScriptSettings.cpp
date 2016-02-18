@@ -1,4 +1,4 @@
-#include "ScriptSettings.h"
+#include "ScriptSettings.hpp"
 #include "..\..\ScriptHookV_SDK\inc\enums.h"
 
 ScriptSettings::ScriptSettings() {

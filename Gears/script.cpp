@@ -1,10 +1,15 @@
 #include "script.h"
 
-#include "ScriptSettings.h"
-#include "ScriptControls.h"
-#include "Logger.h"
-#include "VehicleData.h"
-#include "MemoryPatcher.h"
+#include <string>
+#include <sstream>
+#include <iomanip>
+#include <array>
+
+#include "ScriptSettings.hpp"
+#include "ScriptControls.hpp"
+#include "Logger.hpp"
+#include "VehicleData.hpp"
+#include "MemoryPatcher.hpp"
 
 Logger logger("Gears.log");
 

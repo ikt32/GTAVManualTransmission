@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Windows.h>
-#include "ScriptControls.h"
+#include "ScriptControls.hpp"
 
 class ScriptSettings
 {

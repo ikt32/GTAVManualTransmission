@@ -6,8 +6,8 @@ http://dev-c.com
 
 #include "..\..\ScriptHookV_SDK\inc\main.h"
 #include "script.h"
-#include "Logger.h"
-#include "MemoryPatcher.h"
+#include "Logger.hpp"
+#include "MemoryPatcher.hpp"
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 {

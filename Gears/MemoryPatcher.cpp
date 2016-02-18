@@ -1,8 +1,8 @@
-#include "MemoryPatcher.h"
+#include "MemoryPatcher.hpp"
 
 #include <iomanip>
 #include <sstream>
-#include "Logger.h"
+#include "Logger.hpp"
 
 namespace MemoryPatcher {
 	int total = 5;
