@@ -3,55 +3,53 @@
 #include "NativeMemory.hpp"
 #include "Logger.h"
 
-class MemoryPatcher
+namespace MemoryPatcher
 {
-public:
-	static bool PatchInstructions();
-	static bool RestoreInstructions();
+	extern bool PatchInstructions();
+	extern bool RestoreInstructions();
 	
-private:
 	// Clutch disengage @ Low Speed High Gear 
-	static uintptr_t PatchClutchLow();
-	static void RestoreClutchLow(uintptr_t address);
+	extern uintptr_t PatchClutchLow();
+	extern void RestoreClutchLow(uintptr_t address);
 
 	// Clutch 0.1 @ Stationary
-	static uintptr_t PatchClutchStationary01();
-	static void RestoreClutchStationary01(uintptr_t address);
+	extern uintptr_t PatchClutchStationary01();
+	extern void RestoreClutchStationary01(uintptr_t address);
 
 	// Clutch 0.4 @ Stationary
-	static uintptr_t PatchClutchStationary04();
-	static void RestoreClutchStationary04(uintptr_t address);
+	extern uintptr_t PatchClutchStationary04();
+	extern void RestoreClutchStationary04(uintptr_t address);
 
 	// Throttle disengage at redline
-	static uintptr_t PatchThrottleRedline();
-	static void RestoreThrottleRedline(uintptr_t address);
+	extern uintptr_t PatchThrottleRedline();
+	extern void RestoreThrottleRedline(uintptr_t address);
 
 	// Clutch small value @ full press
-	static uintptr_t PatchClutchStationaryLow();
-	static void RestoreClutchStationaryLow(uintptr_t address);
+	extern uintptr_t PatchClutchStationaryLow();
+	extern void RestoreClutchStationaryLow(uintptr_t address);
 
 	// Keep Clutch disengage at redline
 
 	// 5 things need to be patched
 	// How do I make this less crap?
-	static int total;
-	static int patched;
+	extern int total;
+	extern int patched;
 
-	static MemoryAccess mem;
+	extern MemoryAccess mem;
 
-	static uintptr_t clutchLowAddr;
-	static uintptr_t clutchLowTemp;
+	extern uintptr_t clutchLowAddr;
+	extern uintptr_t clutchLowTemp;
 
-	static uintptr_t clutchS01Addr;
-	static uintptr_t clutchS01Temp;
+	extern uintptr_t clutchS01Addr;
+	extern uintptr_t clutchS01Temp;
 
-	static uintptr_t clutchS04Addr;
-	static uintptr_t clutchS04Temp;
+	extern uintptr_t clutchS04Addr;
+	extern uintptr_t clutchS04Temp;
 
-	static uintptr_t throttleCutAddr;
-	static uintptr_t throttleCutTemp;
+	extern uintptr_t throttleCutAddr;
+	extern uintptr_t throttleCutTemp;
 
-	static uintptr_t clutchStationaryLowAddr;
-	static uintptr_t clutchStationaryLowTemp;
+	extern uintptr_t clutchStationaryLowAddr;
+	extern uintptr_t clutchStationaryLowTemp;
 };
 
