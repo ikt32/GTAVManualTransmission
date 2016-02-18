@@ -2,9 +2,6 @@
 
 #include "..\..\ScriptHookV_SDK\inc\natives.h"
 
-#include <Windows.h>
-#include "TimeHelper.h"
-
 class ScriptControls
 {
 public:
@@ -36,6 +33,7 @@ public:
 		SIZE_OF_ARRAY
 	};
 
+public:
 	ScriptControls();
 	~ScriptControls();
 	bool IsKeyPressed(int key);

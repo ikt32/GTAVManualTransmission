@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Windows.h>
-#include "..\..\ScriptHookV_SDK\inc\enums.h"
 #include "ScriptControls.h"
 
 class ScriptSettings

@@ -1,4 +1,5 @@
 #include "ScriptSettings.h"
+#include "..\..\ScriptHookV_SDK\inc\enums.h"
 
 ScriptSettings::ScriptSettings() {
 	EnableManual = false;

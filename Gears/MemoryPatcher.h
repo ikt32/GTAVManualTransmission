@@ -1,7 +1,5 @@
 #pragma once
-
 #include "NativeMemory.hpp"
-#include "Logger.h"
 
 namespace MemoryPatcher
 {

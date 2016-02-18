@@ -34,7 +34,6 @@ public:
 	float LockSpeed;
 	bool LockTruck;
 
-	// Why C++?!
 	std::vector<float> LockSpeeds = std::vector<float>(20);
 
 private:

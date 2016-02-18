@@ -1,5 +1,8 @@
 #include "ScriptControls.h"
 
+#include <Windows.h>
+#include "TimeHelper.h"
+
 ScriptControls::ScriptControls()
 {
 }
