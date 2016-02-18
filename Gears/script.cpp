@@ -1,5 +1,4 @@
 #include "script.h"
-// itching for a proper refactoring
 
 #include "ScriptSettings.h"
 #include "ScriptControls.h"
@@ -81,6 +80,9 @@ void toggleManual() {
 	else {
 		MemoryPatcher::RestoreInstructions();
 	}
+	if (!runOnceRan)
+		runOnceRan = true;
+
 	settings.Save();
 	settings.Read(&controls);
 }
@@ -92,7 +94,7 @@ void update() {
 	
 	// Patch clutch on game start
 	if (settings.EnableManual && !runOnceRan) {
-		logger.Write("Patching clutch on start");
+		logger.Write("Patching functions on start");
 		MemoryPatcher::PatchInstructions();
 		runOnceRan = true;
 	}
