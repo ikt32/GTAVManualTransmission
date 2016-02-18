@@ -25,6 +25,7 @@ Player player;
 Ped playerPed;
 
 bool runOnceRan = false;
+bool patched = false;
 int prevNotification = 0;
 
 void showText(float x, float y, float scale, char * text) {
@@ -80,10 +81,10 @@ void toggleManual() {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 	if (settings.EnableManual) {
-		MemoryPatcher::PatchInstructions();
+		patched = MemoryPatcher::PatchInstructions();
 	}
 	else {
-		MemoryPatcher::RestoreInstructions();
+		patched = !MemoryPatcher::RestoreInstructions();
 	}
 	if (!runOnceRan)
 		runOnceRan = true;
@@ -100,7 +101,7 @@ void update() {
 	// Patch clutch on game start
 	if (settings.EnableManual && !runOnceRan) {
 		logger.Write("Patching functions on start");
-		MemoryPatcher::PatchInstructions();
+		patched = MemoryPatcher::PatchInstructions();
 		runOnceRan = true;
 	}
 
@@ -129,6 +130,14 @@ void update() {
 		VEHICLE::IS_THIS_MODEL_A_BIKE(model)    ||
 		VEHICLE::IS_THIS_MODEL_A_QUADBIKE(model) ) )
 		return;
+
+	// is the dude a driver?
+	if (playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
+		if (patched) {
+			MemoryPatcher::RestoreInstructions();
+		}
+		return;
+	}
 
 	if (vehicle != prevVehicle)
 	{
@@ -351,13 +360,13 @@ void update() {
 
 	// Stalling
 	if (settings.EngStall && vehData.CurrGear > 2 &&
-		vehData.Rpm < 0.25f && vehData.Speed < 5.0f && vehData.Clutch < 0.33f) {
+		vehData.Rpm < 0.25f && vehData.Speed < 5.0f && vehData.Clutch > 0.33f) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 	}
 
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
 		(CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls.Control[ScriptControls::Engine]) ||
-			controls.IsKeyJustPressed(controls.Control[ScriptControls::KEngine], ScriptControls::KEngine))) {
+		controls.IsKeyJustPressed(controls.Control[ScriptControls::KEngine], ScriptControls::KEngine))) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 
