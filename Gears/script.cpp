@@ -93,6 +93,10 @@ void toggleManual() {
 	settings.Read(&controls);
 }
 
+bool lastKeyboard() {
+	return CONTROLS::_GET_LAST_INPUT_METHOD(2) == TRUE;
+}
+
 void update() {
 	if (controls.IsKeyJustPressed(controls.Control[ScriptControls::Toggle], ScriptControls::Toggle)) {
 		toggleManual();
@@ -146,7 +150,8 @@ void update() {
 	}
 	prevVehicle = vehicle;
 
-	if (controls.WasControlPressedForMs(controls.Control[ScriptControls::CToggle], controls.CToggleTime)) {
+	if (controls.WasControlPressedForMs(controls.Control[ScriptControls::CToggle], controls.CToggleTime) &&
+		!lastKeyboard()) {
 		toggleManual();
 	}
 
@@ -160,7 +165,7 @@ void update() {
 
 	vehData.ReadMemData(ext, vehicle);
 
-	if (CONTROLS::_GET_LAST_INPUT_METHOD(2)) {
+	if (lastKeyboard()) {
 		controls.Rtvalf     = (controls.IsKeyPressed(controls.Control[ScriptControls::KThrottle]) ? 1.0f : 0.0f);
 		controls.Ltvalf     = (controls.IsKeyPressed(controls.Control[ScriptControls::KBrake]) ? 1.0f : 0.0f);
 		controls.Clutchvalf = (controls.IsKeyPressed(controls.Control[ScriptControls::KClutch]) ? 1.0f : 0.0f);
@@ -374,7 +379,7 @@ void update() {
 	// sequential or h?
 	if (!settings.Hshifter) {
 		// Shift up
-		if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls.Control[ScriptControls::ShiftUp]) ||
+		if ((CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls.Control[ScriptControls::ShiftUp]) && !lastKeyboard()) ||
 			controls.IsKeyJustPressed(controls.Control[ScriptControls::KShiftUp], ScriptControls::KShiftUp)) {
 			if (vehData.CurrGear < vehData.TopGear) {
 				if (controls.Clutchvalf < 0.1f) {
@@ -389,7 +394,7 @@ void update() {
 		}
 
 		// Shift down
-		if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls.Control[ScriptControls::ShiftDown]) ||
+		if ((CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls.Control[ScriptControls::ShiftDown]) && !lastKeyboard()) ||
 			controls.IsKeyJustPressed(controls.Control[ScriptControls::KShiftDown], ScriptControls::KShiftDown)) {
 			if (vehData.CurrGear > 0) {
 				if (controls.Clutchvalf < 0.1f) {
