@@ -59,5 +59,5 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 
 void ScriptSettings::Save() {
 	WritePrivateProfileString(L"MAIN", L"DefaultEnable", (EnableManual ? L" 1" : L" 0"), L"./Gears.ini");
-	WritePrivateProfileString(L"CONTROLS", L"ToggleH", (Hshifter ? L" 1" : L" 0"), L"./Gears.ini");
+	WritePrivateProfileString(L"CONTROLS", L"EnableH", (Hshifter ? L" 1" : L" 0"), L"./Gears.ini");
 }
