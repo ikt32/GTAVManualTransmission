@@ -4,7 +4,9 @@
 namespace MemoryPatcher
 {
 	extern bool PatchInstructions();
+	extern bool PatchJustS_LOW();
 	extern bool RestoreInstructions();
+	extern bool RestoreJustS_LOW();
 	
 	// Clutch disengage @ Low Speed High Gear 
 	extern uintptr_t PatchClutchLow();
@@ -32,6 +34,9 @@ namespace MemoryPatcher
 	// How do I make this less crap?
 	extern int total;
 	extern int patched;
+
+	extern int t_S_LOW;
+	extern int p_S_LOW;
 
 	extern MemoryAccess mem;
 

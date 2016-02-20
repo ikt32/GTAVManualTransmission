@@ -5,8 +5,11 @@
 #include "Logger.hpp"
 
 namespace MemoryPatcher {
-	int total = 5;
+	int total = 4;
 	int patched = 0;
+
+	int t_S_LOW = 1;
+	int p_S_LOW = 0;
 
 	MemoryAccess mem;
 
@@ -32,6 +35,9 @@ namespace MemoryPatcher {
 		if (clutchLowTemp) {
 			clutchLowAddr = clutchLowTemp;
 			patched++;
+			std::stringstream hexaddr;
+			hexaddr << std::hex << clutchLowAddr;
+			logger.Write("clutchLow @ " + hexaddr.str());
 		}
 		else {
 			logger.Write("Clutch_Normal not patched");
@@ -41,6 +47,9 @@ namespace MemoryPatcher {
 		if (clutchS01Temp && !clutchS01Addr) {
 			clutchS01Addr = clutchS01Temp;
 			patched++;
+			std::stringstream hexaddr;
+			hexaddr << std::hex << clutchS01Addr;
+			logger.Write("clutchS01 @ " + hexaddr.str());
 		}
 		else {
 			logger.Write("Clutch_Stationary_01 not patched");
@@ -50,6 +59,9 @@ namespace MemoryPatcher {
 		if (clutchS04Temp) {
 			clutchS04Addr = clutchS04Temp;
 			patched++;
+			std::stringstream hexaddr;
+			hexaddr << std::hex << clutchS04Addr;
+			logger.Write("clutchS04 @ " + hexaddr.str());
 		}
 		else {
 			logger.Write("Clutch_Stationary_04 not patched");
@@ -59,18 +71,12 @@ namespace MemoryPatcher {
 		if (throttleCutTemp) {
 			throttleCutAddr = throttleCutTemp;
 			patched++;
+			std::stringstream hexaddr;
+			hexaddr << std::hex << throttleCutAddr;
+			logger.Write("tCut @ " + hexaddr.str());
 		}
 		else {
 			logger.Write("Throttle_Redline not patched");
-		}
-
-		clutchStationaryLowTemp = PatchClutchStationaryLow();
-		if (clutchStationaryLowTemp) {
-			clutchStationaryLowAddr = clutchStationaryLowTemp;
-			patched++;
-		}
-		else {
-			logger.Write("Clutch_Stationary_Low not patched");
 		}
 
 		if (patched == total) {
@@ -123,21 +129,56 @@ namespace MemoryPatcher {
 			logger.Write("Throttle not restored");
 		}
 
-		if (clutchStationaryLowAddr) {
-			RestoreClutchStationaryLow(clutchStationaryLowAddr);
-			clutchStationaryLowAddr = 0;
-			patched--;
-		}
-		else {
-			logger.Write("S_Low not restored");
-		}
-
 		if (patched == 0) {
 			logger.Write("Restore success");
 			return true;
 		}
 		else {
 			logger.Write("Restore failed");
+			return false;
+		}
+	}
+
+	bool PatchJustS_LOW() {
+		Logger logger("./Gears.log");
+		clutchStationaryLowTemp = PatchClutchStationaryLow();
+		if (clutchStationaryLowTemp) {
+			clutchStationaryLowAddr = clutchStationaryLowTemp;
+			p_S_LOW++;
+			std::stringstream hexaddr;
+			hexaddr << std::hex << clutchStationaryLowAddr;
+			logger.Write("clutchS_L @ " + hexaddr.str());
+		}
+		else {
+			logger.Write("Clutch_Stationary_Low not patched");
+		}
+		if (p_S_LOW == t_S_LOW) {
+			logger.Write("Patching ClutchSpecial success");
+			return true;
+		}
+		else {
+			logger.Write("Patching ClutchSpecial failed");
+			return false;
+		}
+	}
+
+	bool RestoreJustS_LOW() {
+		Logger logger("./Gears.log");
+		if (clutchStationaryLowAddr) {
+			RestoreClutchStationaryLow(clutchStationaryLowAddr);
+			clutchStationaryLowAddr = 0;
+			p_S_LOW--;
+		}
+		else {
+			logger.Write("S_Low not restored");
+		}
+
+		if (p_S_LOW == 0) {
+			logger.Write("Restore ClutchSpecial success");
+			return true;
+		}
+		else {
+			logger.Write("Restore ClutchSpecial failed");
 			return false;
 		}
 	}

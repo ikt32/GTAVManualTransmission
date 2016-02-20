@@ -26,6 +26,7 @@ Ped playerPed;
 
 bool runOnceRan = false;
 bool patched = false;
+bool patchedSpecial = false;
 int prevNotification = 0;
 
 void showText(float x, float y, float scale, char * text) {
@@ -81,7 +82,7 @@ void toggleManual() {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 	if (settings.EnableManual) {
-		patched = MemoryPatcher::PatchInstructions();
+		//patched = MemoryPatcher::PatchInstructions();
 	}
 	else {
 		patched = !MemoryPatcher::RestoreInstructions();
@@ -124,25 +125,11 @@ void update() {
 		VEHICLE::IS_THIS_MODEL_A_QUADBIKE(model) ) )
 		return;
 
-	// check if player ped is driver
-	if (playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
-		if (patched) {
-			logger.Write("Not a driver:");
-			patched = !MemoryPatcher::RestoreInstructions();
-		}
-		return;
-	}
-
 	// Patch clutch on game start
 	if (settings.EnableManual && !runOnceRan) {
 		logger.Write("Patching functions on start");
 		patched = MemoryPatcher::PatchInstructions();
 		runOnceRan = true;
-	}
-
-	if (!patched && settings.EnableManual) {
-		logger.Write("Re-patching functions");
-		patched = MemoryPatcher::PatchInstructions();
 	}
 
 	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, ControlEnter) || vehicle != prevVehicle) {
@@ -192,6 +179,35 @@ void update() {
 
 	if (settings.Debug) {
 		showDebugInfo();
+	}
+
+	// check if player ped is driver
+	if (playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
+		if (patched) {
+			logger.Write("Not a driver:");
+			patched = !MemoryPatcher::RestoreInstructions();
+		}
+		return;
+	}
+
+	if (!patched && settings.EnableManual) {
+		logger.Write("Re-patching functions");
+		patched = MemoryPatcher::PatchInstructions();
+	}
+
+	// Special case for clutch used by all vehicles
+	// Only patch if user desires to have their clutch @ 0
+	if (controls.Clutchvalf > 0.9) {
+		if (!patchedSpecial) {
+			logger.Write("Patch low-end clutch");
+			patchedSpecial = MemoryPatcher::PatchJustS_LOW();
+		}
+	}
+	else {
+		if (patchedSpecial) {
+			logger.Write("Restoring low-end clutch");
+			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
+		}
 	}
 
 	if (!settings.EnableManual ||

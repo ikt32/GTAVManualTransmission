@@ -23,7 +23,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 	case DLL_PROCESS_DETACH:
 		logger.Write("Init shutdown");
 
-		bool success = MemoryPatcher::RestoreInstructions();
+		bool success = MemoryPatcher::RestoreInstructions() && MemoryPatcher::RestoreJustS_LOW();
 		if (success) {
 			logger.Write("Shut down script successfully");
 		}
