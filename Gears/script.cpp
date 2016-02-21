@@ -81,10 +81,7 @@ void toggleManual() {
 		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
-	if (settings.EnableManual) {
-		//patched = MemoryPatcher::PatchInstructions();
-	}
-	else {
+	if (!settings.EnableManual) {
 		patched = !MemoryPatcher::RestoreInstructions();
 	}
 	if (!runOnceRan)
@@ -167,19 +164,25 @@ void update() {
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
-	if (vehData.CurrGear == vehData.NextGear) {
+	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {//vehData.CurrGear > vehData.NextGear) {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 2);
+	}
+	else if (vehData.CurrGear == vehData.NextGear) {
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 0);
 	}
 	else if (vehData.CurrGear < vehData.NextGear) {
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1);
 	}
-	else if (vehData.CurrGear > vehData.NextGear) {
-		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 2);
-	}
+
 
 	if (settings.Debug) {
 		showDebugInfo();
 	}
+
+	if (!settings.EnableManual ||
+		(!VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false) &&
+			VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f))
+		return;
 
 	// check if player ped is driver
 	if (playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
@@ -209,11 +212,6 @@ void update() {
 			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
 		}
 	}
-
-	if (!settings.EnableManual ||
-		(!VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false) &&
-		VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f) )
-		return;
 
 	// Automatically engage first gear when stationary
 	if (settings.AutoGear1 &&
@@ -366,9 +364,17 @@ void update() {
 	// while in a too high gear.
 	// Desired result: low RPM or stall. Same gear. Low torque.
 	// Result:	Patching the clutch ops results in above
+	// New result: Additional patching made this superfluous.
+	/*
 	if (vehData.CurrGear > vehData.NextGear) {
 		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, vehData.Rpm);
 		// RPM mismatch on transition currGear > nextGear to currGear == nextGear?
+	}
+	*/
+
+	// Emulate previous "shift down wanted" behavior.
+	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f ) {
+		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, vehData.Rpm * 2.5f);
 	}
 
 	// Engine damage

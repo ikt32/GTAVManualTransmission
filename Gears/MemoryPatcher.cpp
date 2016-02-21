@@ -5,7 +5,7 @@
 #include "Logger.hpp"
 
 namespace MemoryPatcher {
-	int total = 4;
+	int total = 5;
 	int patched = 0;
 
 	int t_S_LOW = 1;
@@ -27,6 +27,9 @@ namespace MemoryPatcher {
 
 	uintptr_t clutchStationaryLowAddr = 0;
 	uintptr_t clutchStationaryLowTemp = 0;
+
+	uintptr_t gear7A0Addr = 0;
+	uintptr_t gear7A0Temp = 0;
 
 	bool PatchInstructions() {
 		Logger logger("./Gears.log");
@@ -73,10 +76,22 @@ namespace MemoryPatcher {
 			patched++;
 			std::stringstream hexaddr;
 			hexaddr << std::hex << throttleCutAddr;
-			logger.Write("tCut @ " + hexaddr.str());
+			logger.Write("throttleC @ " + hexaddr.str());
 		}
 		else {
 			logger.Write("Throttle_Redline not patched");
+		}
+
+		gear7A0Temp = PatchGear7A0();
+		if (gear7A0Temp) {
+			gear7A0Addr = gear7A0Temp;
+			patched++;
+			std::stringstream hexaddr;
+			hexaddr << std::hex << gear7A0Addr;
+			logger.Write("gear 7A0  @ " + hexaddr.str());
+		}
+		else {
+			logger.Write("gear 7A0  not patched");
 		}
 
 		if (patched == total) {
@@ -127,6 +142,15 @@ namespace MemoryPatcher {
 		}
 		else {
 			logger.Write("Throttle not restored");
+		}
+
+		if (gear7A0Addr) {
+			RestoreGear7A0(gear7A0Addr);
+			gear7A0Addr = 0;
+			patched--;
+		}
+		else {
+			logger.Write("Gear@7A0 not restored");
 		}
 
 		if (patched == 0) {
@@ -274,6 +298,25 @@ namespace MemoryPatcher {
 		byte instrArr[5] = { 0xF3, 0x0F, 0x11, 0x43, 0x40 };
 		if (address) {
 			for (int i = 0; i < 5; i++) {
+				memset((void *)(address + i), instrArr[i], 1);
+			}
+		}
+	}
+	uintptr_t PatchGear7A0() {
+		// 66 89 13 <- Looking for this
+		// 89 73 5C <- Next instruction
+		// EB 0A    <- Next next instruction
+		uintptr_t address = mem.FindPattern("\x66\x89\x13\x89\x73\x5C", "xxxxxx");
+
+		if (address) {
+			memset((void *)address, 0x90, 3);
+		}
+		return address;
+	}
+	void RestoreGear7A0(uintptr_t address) {
+		byte instrArr[3] = { 0x66, 0x89, 0x13 };
+		if (address) {
+			for (int i = 0; i < 3; i++) {
 				memset((void *)(address + i), instrArr[i], 1);
 			}
 		}

@@ -5,6 +5,22 @@ uint64_t VehicleExtensions::GetAddress(Vehicle handle) {
 	return address;
 }
 
+uint16_t VehicleExtensions::GetGearCurr(Vehicle handle) {
+	const uint64_t address = mem.GetAddressOfEntity(handle);
+
+	int offset = (getGameVersion() > 3 ? 0x7A2 : 0x792);
+
+	return address == 0 ? 0 : *reinterpret_cast<const uint16_t *>(address + offset);
+}
+
+uint16_t VehicleExtensions::GetGearNext(Vehicle handle) {
+	const uint64_t address = mem.GetAddressOfEntity(handle);
+
+	int offset = (getGameVersion() > 3 ? 0x7A0 : 0x790);
+
+	return address == 0 ? 0 : *reinterpret_cast<const uint16_t *>(address + offset);
+}
+
 uint32_t VehicleExtensions::GetGears(Vehicle handle) {
 	const uint64_t address = mem.GetAddressOfEntity(handle);
 
@@ -17,6 +33,22 @@ void VehicleExtensions::SetGears(Vehicle handle, uint32_t value) {
 	const uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0x7A0 : 0x790);
+
+	*reinterpret_cast<uint32_t *>(address + offset) = value;
+}
+
+void VehicleExtensions::SetGearCurr(Vehicle handle, uint16_t value) {
+	const uint64_t address = mem.GetAddressOfEntity(handle);
+
+	int offset = (getGameVersion() > 3 ? 0x7A0 : 0x790);
+
+	*reinterpret_cast<uint32_t *>(address + offset) = value;
+}
+
+void VehicleExtensions::SetGearNext(Vehicle handle, uint16_t value) {
+	const uint64_t address = mem.GetAddressOfEntity(handle);
+
+	int offset = (getGameVersion() > 3 ? 0x7A2 : 0x792);
 
 	*reinterpret_cast<uint32_t *>(address + offset) = value;
 }

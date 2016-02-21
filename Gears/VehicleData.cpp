@@ -20,8 +20,8 @@ void VehicleData::ReadMemData(VehicleExtensions ext, Vehicle vehicle) {
 
 	Address = ext.GetAddress(vehicle);
 	Gears = ext.GetGears(vehicle);
-	CurrGear = (0xFFFF0000 & Gears) >> 16;
-	NextGear = 0x0000FFFF & Gears;
+	CurrGear = ext.GetGearCurr(vehicle); //(0xFFFF0000 & Gears) >> 16;
+	NextGear = ext.GetGearNext(vehicle); // 0x0000FFFF & Gears;
 	Rpm = ext.GetCurrentRPM(vehicle);
 	Clutch = ext.GetClutch(vehicle);
 	Throttle = ext.GetThrottle(vehicle);

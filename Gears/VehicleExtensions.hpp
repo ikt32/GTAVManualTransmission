@@ -7,8 +7,12 @@
 class VehicleExtensions {
 public:
 	uint64_t GetAddress(Vehicle handle);
+	uint16_t GetGearCurr(Vehicle handle);
+	uint16_t GetGearNext(Vehicle handle);
 	uint32_t GetGears(Vehicle handle);
 	void SetGears(Vehicle handle, uint32_t value);
+	void SetGearCurr(Vehicle handle, uint16_t value);
+	void SetGearNext(Vehicle handle, uint16_t value);
 	uint32_t GetTopGear(Vehicle handle);
 	float GetCurrentRPM(Vehicle handle);
 	void SetCurrentRPM(Vehicle handle, float value);

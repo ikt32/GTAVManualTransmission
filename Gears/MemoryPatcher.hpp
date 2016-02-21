@@ -28,6 +28,9 @@ namespace MemoryPatcher
 	extern uintptr_t PatchClutchStationaryLow();
 	extern void RestoreClutchStationaryLow(uintptr_t address);
 
+	extern uintptr_t PatchGear7A0();
+	extern void RestoreGear7A0(uintptr_t address);
+
 	// Keep Clutch disengage at redline
 
 	// 5 things need to be patched
