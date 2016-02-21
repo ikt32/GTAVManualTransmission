@@ -37,7 +37,7 @@ public:
 	std::vector<float> LockSpeeds = std::vector<float>(20);
 
 private:
-	std::array <char *, 22> badModelNames = {
+	std::array <char *, 20> badModelNames = {
 		"BENSON",
 		"BIFF",
 		"HAULER",
@@ -57,9 +57,7 @@ private:
 		"BARRACKS3",
 		"RIPLEY",
 		"SCRAP",
-		"UTILLITRUCK",
-		"UTILLITRUCK2",
-		"UTILLITRUCK3"
+		"UTILTRUC"
 	};
 	bool isBadTruck(char *name);
 };
