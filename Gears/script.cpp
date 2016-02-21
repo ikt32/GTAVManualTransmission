@@ -202,13 +202,13 @@ void update() {
 	// Only patch if user desires to have their clutch @ 0
 	if (controls.Clutchvalf > 0.9) {
 		if (!patchedSpecial) {
-			logger.Write("Patch low-end clutch");
+			//logger.Write("Patching ClutchSpecial");
 			patchedSpecial = MemoryPatcher::PatchJustS_LOW();
 		}
 	}
 	else {
 		if (patchedSpecial) {
-			logger.Write("Restoring low-end clutch");
+			//logger.Write("Restoring ClutchSpecial");
 			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
 		}
 	}
@@ -330,15 +330,17 @@ void update() {
 			VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, 0.0f);
 			VEHICLE::_SET_VEHICLE_ENGINE_POWER_MULTIPLIER(vehicle, 0.0f);
 			ext.SetThrottle(vehicle, 0.0f);
+			DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1); // Uglyyyyy
 		}
 	}
+
 	// Since we know prevGear and the speed for that, let's simulate "engine" braking.
-	else if (settings.EngBrake && vehData.CurrGear > 0)
+	if (settings.EngBrake && vehData.CurrGear > 0)
 	{
 		// Only when free rolling at high speeds
 		if (vehData.Velocity > vehData.LockSpeeds.at(vehData.CurrGear) &&
 			controls.Rtvalf < 0.99 && vehData.Rpm > 0.9) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, (1.0f - controls.Clutchvalf) * 0.8f * vehData.Rpm);
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, (1.0f - controls.Clutchvalf) * 0.5f * vehData.Rpm);
 			if (controls.Ltvalf < 0.1f) {
 				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
 			}
