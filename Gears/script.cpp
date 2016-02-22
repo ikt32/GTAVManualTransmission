@@ -357,7 +357,7 @@ void update() {
 	// Desired result: high RPM, same gear, no more accelerating
 	// Result:	Is as desired. Speed may drop a bit because of game clutch.
 	if (vehData.CurrGear > 0 &&
-		((vehData.CurrGear < vehData.NextGear && vehData.Speed > 2.0f) || (vehData.Clutch < 0.5 && controls.Rtvalf > 0.6f))) {
+		(vehData.CurrGear < vehData.NextGear && vehData.Speed > 2.0f)) {
 		ext.SetThrottle(vehicle, 1.2f);
 		ext.SetCurrentRPM(vehicle, 1.07f);
 	}
@@ -389,15 +389,56 @@ void update() {
 	}
 
 	// Stalling
-	if (settings.EngStall && vehData.CurrGear > 2 &&
-		vehData.Rpm < 0.25f && vehData.Speed < 5.0f && vehData.Clutch > 0.33f) {
-		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
-	}
+	//if (settings.EngStall && vehData.CurrGear > 2 &&
+	//	vehData.Rpm < 0.25f && vehData.Speed < 5.0f && vehData.Clutch > 0.33f) {
+	//	VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
+	//}
 
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
 		(CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls.Control[ScriptControls::Engine]) ||
 		controls.IsKeyJustPressed(controls.Control[ScriptControls::KEngine], ScriptControls::KEngine))) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
+	}
+
+	// Game doesn't really support revving on disengaged clutch in any gear but 1
+	// Simulate this
+	//if ()
+
+
+	// Simulate "catch point"
+	// Default behavior - No catch point exists. Car just idles happily with
+	// fully engaged clutch. We wanna have it, like this
+	// Clutch - 0.0 -> Free engine rev
+	// Clutch - 0.2 -> Catch point
+	// Clutch - 0.2 to 0.4 -> Starts rolling??
+	// Clutch > 0.4 -> Stalling unless rolling in any gear OR hi RPM (> 0.5)
+	if (vehData.Clutch >= 0.2f && vehData.Speed < vehData.CurrGear * 2.2f) {
+		showText(0.5f, 0.5f, 0.5f, "ROLL");
+		if (vehData.Throttle < 0.25f) {
+			if (vehData.CurrGear > 0) {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.37f);
+			}
+			else {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.37f);
+			}
+		}
+	}
+
+	// Stalling
+	if (vehData.Clutch > 0.57f && vehData.Speed < vehData.CurrGear * 1.4f && vehData.Rpm < 0.35f) {
+		showText(0.5f, 0.5f, 0.5f, "DIE");
+		if (VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle)) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.5f);
+			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
+		}
+	}
+
+
+	if (vehData.Velocity > 0 && vehData.CurrGear == 0 && controls.Clutchvalf < 0.3f) {
+		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+	}
+	if (vehData.Velocity < 0 && vehData.CurrGear > 0 && controls.Clutchvalf < 0.3f) {
+		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
 	}
 
 	// sequential or h?
