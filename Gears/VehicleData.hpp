@@ -33,6 +33,7 @@ public:
 	uint8_t PrevGear;
 	float LockSpeed;
 	bool LockTruck;
+	bool SimulatedNeutral = true;
 
 	std::vector<float> LockSpeeds = std::vector<float>(20);
 

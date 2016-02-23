@@ -50,6 +50,7 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	scriptControl->Control[ScriptControls::ControlType::H6] = GetPrivateProfileInt(L"CONTROLS", L"H6", VK_NUMPAD0, L"./Gears.ini");
 	scriptControl->Control[ScriptControls::ControlType::H7] = GetPrivateProfileInt(L"CONTROLS", L"H7", VK_NUMPAD0, L"./Gears.ini");
 	scriptControl->Control[ScriptControls::ControlType::H8] = GetPrivateProfileInt(L"CONTROLS", L"H8", VK_NUMPAD0, L"./Gears.ini");
+	scriptControl->Control[ScriptControls::KEngageNeutral] = GetPrivateProfileInt(L"CONTROLS", L"Neutral", VK_DECIMAL, L"./Gears.ini");
 				 
 	scriptControl->Control[ScriptControls::ControlType::CThrottle] = GetPrivateProfileInt(L"CONTROLS", L"CThrottle", ControlFrontendRt, L"./Gears.ini");
 	scriptControl->Control[ScriptControls::ControlType::CBrake] = GetPrivateProfileInt(L"CONTROLS", L"CBrake", ControlFrontendLt, L"./Gears.ini");

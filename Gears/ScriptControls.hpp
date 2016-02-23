@@ -30,6 +30,7 @@ public:
 		Engine,
 		KEngine,
 		CToggle,
+		KEngageNeutral,
 		SIZE_OF_ARRAY
 	};
 
