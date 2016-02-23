@@ -160,6 +160,11 @@ void update() {
 		controls.Clutchvalf = (CONTROLS::GET_CONTROL_VALUE(0, controls.Control[ScriptControls::Clutch]) - 127) / 127.0f;
 	}
 
+	// Put here to override last control readout for Clutchvalf
+	if (vehData.SimulatedNeutral) {
+		controls.Clutchvalf = 1.0f; // same difference in gameplay
+	}
+
 	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
@@ -383,9 +388,6 @@ void update() {
 	if (settings.EngDamage &&
 		vehData.Rpm > 0.98f && controls.Accelvalf > 0.99f) {
 		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (0.2f*controls.Accelvalf));
-		if (VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < 0.0f) {
-			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
-		}
 	}
 
 	// Stalling, old behavior
@@ -416,32 +418,53 @@ void update() {
 	// Clutch - 0.2 to 0.4 -> Starts rolling??
 	// Clutch > 0.4 -> Stalling unless rolling in any gear OR hi RPM (> 0.5)
 	if (settings.ClutchCatching &&
-		vehData.Clutch >= 0.2f && vehData.Speed < vehData.CurrGear * 2.2f) {
-		showText(0.5f, 0.5f, 0.5f, "ROLL");
+		vehData.Clutch >= 0.2f &&
+		((vehData.Speed < vehData.CurrGear * 2.2f) || ( vehData.CurrGear == 0 ) )) {
+		showText(0.1f, 0.1f, 0.5f, "CATCHPOINT");
 		if (vehData.Throttle < 0.25f) {
 			if (vehData.CurrGear > 0) {
 				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.37f);
 			}
-			else {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.37f);
+			else if ( vehData.Velocity > -2.2f) {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.30f);
 			}
 		}
 	}
 	
 	// New Stalling - Speed dependent
 	if (settings.EngStall == 2 && 
-		vehData.Clutch > 0.6f && vehData.Speed < vehData.CurrGear * 1.4f && vehData.Rpm < 0.35f) {
-		showText(0.5f, 0.5f, 0.5f, "DIE");
+		vehData.Clutch > 0.65f &&
+		((vehData.Speed < vehData.CurrGear * 1.4f) || ( vehData.CurrGear == 0 && vehData.Speed < 1.0f ))
+		&& vehData.Rpm < 0.27f) {
+		showText(0.1f, 0.2f, 0.5f, "NEWSTALL");
 		if (VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle)) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.5f);
+			if (vehData.CurrGear > 0) {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 1.5f);
+			}
+			else {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 1.5f);
+			}
 			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 		}
 	}
 
+	// Simulated neutral gear
+	if (controls.IsKeyJustPressed(controls.Control[ScriptControls::KEngageNeutral], ScriptControls::KEngageNeutral) ||
+		controls.WasControlPressedForMs(controls.Control[ScriptControls::ShiftDown], controls.CToggleTime)) {
+		if (!vehData.SimulatedNeutral) {
+			vehData.SimulatedNeutral = true;
+		}
+		else {
+			vehData.SimulatedNeutral = false;
+		}
+		return;
+	}
+	showText(0.5, 0.5, 1.5, vehData.SimulatedNeutral ? "N" : "G");
+
 	// sequential or h?
 	if (!settings.Hshifter) {
 		// Shift up
-		if ((CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls.Control[ScriptControls::ShiftUp]) && !lastKeyboard()) ||
+		if ((CONTROLS::IS_CONTROL_JUST_RELEASED(0, controls.Control[ScriptControls::ShiftUp]) && !lastKeyboard()) ||
 			controls.IsKeyJustPressed(controls.Control[ScriptControls::KShiftUp], ScriptControls::KShiftUp)) {
 			if (vehData.CurrGear < vehData.TopGear) {
 				if (controls.Clutchvalf < 0.1f) {
@@ -456,7 +479,7 @@ void update() {
 		}
 
 		// Shift down
-		if ((CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls.Control[ScriptControls::ShiftDown]) && !lastKeyboard()) ||
+		if ((CONTROLS::IS_CONTROL_JUST_RELEASED(0, controls.Control[ScriptControls::ShiftDown]) && !lastKeyboard()) ||
 			controls.IsKeyJustPressed(controls.Control[ScriptControls::KShiftDown], ScriptControls::KShiftDown)) {
 			if (vehData.CurrGear > 0) {
 				if (controls.Clutchvalf < 0.1f) {
