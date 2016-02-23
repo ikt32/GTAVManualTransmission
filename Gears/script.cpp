@@ -461,8 +461,26 @@ void update() {
 	}
 	showText(0.5, 0.5, 1.5, vehData.SimulatedNeutral ? "N" : "G");
 
-	// sequential or h?
-	if (!settings.Hshifter) {
+	// Manual shifting
+	if (settings.Hshifter)
+	{
+		// All keys checking
+		for (uint8_t i = 0; i <= vehData.TopGear; i++) {
+			if (i > ScriptControls::H8) // this shit is just silly can I rly do dis?
+				i = ScriptControls::H8; // holy shit bad, bad, hacky idea
+			if (controls.IsKeyJustPressed(controls.Control[i], (ScriptControls::ControlType)i)) {
+				if (controls.Clutchvalf < 0.1f) {
+					controls.Clutchvalf = 1.0f;
+				}
+				ext.SetThrottle(vehicle, 0.0f);
+				vehData.LockGears = i | (i << 16);
+				vehData.LockTruck = false;
+				vehData.PrevGear = vehData.CurrGear;
+				vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
+			}
+		}
+	}
+	else {
 		// Shift up
 		if ((CONTROLS::IS_CONTROL_JUST_RELEASED(0, controls.Control[ScriptControls::ShiftUp]) && !lastKeyboard()) ||
 			controls.IsKeyJustPressed(controls.Control[ScriptControls::KShiftUp], ScriptControls::KShiftUp)) {
@@ -493,26 +511,8 @@ void update() {
 			}
 		}
 	}
-	else
-	{
-		// All keys checking
-		for (uint8_t i = 0; i <= vehData.TopGear; i++) {
-			if (i > ScriptControls::H8) // this shit is just silly can I rly do dis?
-				i = ScriptControls::H8; // holy shit bad, bad, hacky idea
-			if (controls.IsKeyJustPressed(controls.Control[i], (ScriptControls::ControlType)i)) {
-				if (controls.Clutchvalf < 0.1f) {
-					controls.Clutchvalf = 1.0f;
-				}
-				ext.SetThrottle(vehicle, 0.0f);
-				vehData.LockGears = i | (i << 16);
-				vehData.LockTruck = false;
-				vehData.PrevGear = vehData.CurrGear;
-				vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
-			}
-		}
-	}
 
-	// Clutch override working now
+	// Manually control clutch all the time
 	ext.SetClutch(vehicle, 1.0f - controls.Clutchvalf);
 	ext.SetGears(vehicle, vehData.LockGears);
 }
