@@ -388,11 +388,11 @@ void update() {
 		}
 	}
 
-	// Stalling
-	//if (settings.EngStall && vehData.CurrGear > 2 &&
-	//	vehData.Rpm < 0.25f && vehData.Speed < 5.0f && vehData.Clutch > 0.33f) {
-	//	VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
-	//}
+	// Stalling, old behavior
+	if (settings.EngStall == 1 && vehData.CurrGear > 2 &&
+		vehData.Rpm < 0.25f && vehData.Speed < 5.0f && vehData.Clutch > 0.33f) {
+		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
+	}
 
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
 		(CONTROLS::IS_CONTROL_JUST_PRESSED(0, controls.Control[ScriptControls::Engine]) ||
@@ -402,9 +402,12 @@ void update() {
 
 	// Game doesn't really support revving on disengaged clutch in any gear but 1
 	// Simulate this
-	//if ()
-
-
+	if (vehData.CurrGear > 1 && vehData.Clutch <= 0.6f) { // && vehData.Throttle > 0.6f) {
+		float revValue = vehData.Throttle - (vehData.Clutch);
+		if (revValue > 0.2f)
+		ext.SetCurrentRPM(vehicle, revValue <= 1.0f ? revValue : 1.0f );
+	}
+	
 	// Simulate "catch point"
 	// Default behavior - No catch point exists. Car just idles happily with
 	// fully engaged clutch. We wanna have it, like this
@@ -412,7 +415,8 @@ void update() {
 	// Clutch - 0.2 -> Catch point
 	// Clutch - 0.2 to 0.4 -> Starts rolling??
 	// Clutch > 0.4 -> Stalling unless rolling in any gear OR hi RPM (> 0.5)
-	if (vehData.Clutch >= 0.2f && vehData.Speed < vehData.CurrGear * 2.2f) {
+	if (settings.ClutchCatching &&
+		vehData.Clutch >= 0.2f && vehData.Speed < vehData.CurrGear * 2.2f) {
 		showText(0.5f, 0.5f, 0.5f, "ROLL");
 		if (vehData.Throttle < 0.25f) {
 			if (vehData.CurrGear > 0) {
@@ -424,21 +428,14 @@ void update() {
 		}
 	}
 
-	// Stalling
-	if (vehData.Clutch > 0.57f && vehData.Speed < vehData.CurrGear * 1.4f && vehData.Rpm < 0.35f) {
+	// New Stalling - Speed dependent
+	if (settings.EngStall == 2 && 
+		vehData.Clutch > 0.6f && vehData.Speed < vehData.CurrGear * 1.4f && vehData.Rpm < 0.35f) {
 		showText(0.5f, 0.5f, 0.5f, "DIE");
 		if (VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle)) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.5f);
 			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 		}
-	}
-
-
-	if (vehData.Velocity > 0 && vehData.CurrGear == 0 && controls.Clutchvalf < 0.3f) {
-		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-	}
-	if (vehData.Velocity < 0 && vehData.CurrGear > 0 && controls.Clutchvalf < 0.3f) {
-		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
 	}
 
 	// sequential or h?
