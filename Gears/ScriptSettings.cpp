@@ -20,8 +20,9 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	AutoReverse = (GetPrivateProfileInt(L"MAIN", L"AutoReverse", 0, L"./Gears.ini") == 1);
 	OldReverse = (GetPrivateProfileInt(L"MAIN", L"OldReverse", 0, L"./Gears.ini") == 1);
 	EngDamage = (GetPrivateProfileInt(L"MAIN", L"EngineDamage", 0, L"./Gears.ini") == 1);
-	EngStall = (GetPrivateProfileInt(L"MAIN", L"EngineStalling", 0, L"./Gears.ini") == 1);
-	EngBrake = (GetPrivateProfileInt(L"MAIN", L"EngineBraking", 1, L"./Gears.ini") == 1);
+	EngStall = GetPrivateProfileInt(L"MAIN", L"EngineStalling", 0, L"./Gears.ini");
+	EngBrake = (GetPrivateProfileInt(L"MAIN", L"EngineBraking", 0, L"./Gears.ini") == 1);
+	ClutchCatching = (GetPrivateProfileInt(L"MAIN", L"ClutchCatching", 0, L"./Gears.ini") == 1);
 	Debug = (GetPrivateProfileInt(L"DEBUG", L"Info", 0, L"./Gears.ini") == 1);
 	Hshifter = (GetPrivateProfileInt(L"CONTROLS", L"EnableH", 0, L"./Gears.ini") == 1);
 

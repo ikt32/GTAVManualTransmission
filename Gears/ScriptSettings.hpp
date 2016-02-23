@@ -16,8 +16,9 @@ public:
 	bool AutoReverse;
 	bool OldReverse;
 	bool EngDamage;
-	bool EngStall;
+	int EngStall;
 	bool EngBrake;
+	bool ClutchCatching;
 	bool Hshifter;
 	bool Debug;
 };
