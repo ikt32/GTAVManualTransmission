@@ -427,7 +427,7 @@ void update() {
 			}
 		}
 	}
-
+	
 	// New Stalling - Speed dependent
 	if (settings.EngStall == 2 && 
 		vehData.Clutch > 0.6f && vehData.Speed < vehData.CurrGear * 1.4f && vehData.Rpm < 0.35f) {
