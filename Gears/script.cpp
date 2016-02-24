@@ -27,6 +27,7 @@ Ped playerPed;
 bool runOnceRan = false;
 bool patched = false;
 bool patchedSpecial = false;
+bool simpleBike;
 int prevNotification = 0;
 
 void showText(float x, float y, float scale, char * text) {
@@ -68,7 +69,12 @@ void showDebugInfo() {
 void reInit() {
 	settings.Read(&controls);
 	vehData.LockGears = 0x00010001;
-	vehData.SimulatedNeutral = settings.DefaultNeutral;
+	if (simpleBike) {
+		vehData.SimulatedNeutral = false;
+	}
+	else {
+		vehData.SimulatedNeutral = settings.DefaultNeutral;
+	}
 }
 
 void toggleManual() {
@@ -88,9 +94,8 @@ void toggleManual() {
 	}
 	if (!runOnceRan)
 		runOnceRan = true;
-
 	settings.Save();
-	settings.Read(&controls);
+	reInit();
 }
 
 bool lastKeyboard() {
@@ -98,6 +103,10 @@ bool lastKeyboard() {
 }
 
 void update() {
+	if (simpleBike) {
+		showText(0.1, 0.1, 0.5, "SimpleBike");
+	}
+
 	if (controls.IsKeyJustPressed(controls.Control[ScriptControls::Toggle], ScriptControls::Toggle)) {
 		toggleManual();
 	}
@@ -150,6 +159,7 @@ void update() {
 	}
 
 	vehData.ReadMemData(ext, vehicle);
+	simpleBike = vehData.IsBike && settings.SimpleBike;
 
 	if (lastKeyboard()) {
 		controls.Rtvalf     = (controls.IsKeyPressed(controls.Control[ScriptControls::KThrottle]) ? 1.0f : 0.0f);
@@ -160,6 +170,10 @@ void update() {
 		controls.Rtvalf     = (CONTROLS::GET_CONTROL_VALUE(0, controls.Control[ScriptControls::CThrottle]) - 127) / 127.0f;
 		controls.Ltvalf     = (CONTROLS::GET_CONTROL_VALUE(0, controls.Control[ScriptControls::CBrake]) - 127) / 127.0f;
 		controls.Clutchvalf = (CONTROLS::GET_CONTROL_VALUE(0, controls.Control[ScriptControls::Clutch]) - 127) / 127.0f;
+	}
+
+	if (simpleBike) {
+		controls.Clutchvalf = 0.0f;
 	}
 
 	// Put here to override last control readout for Clutchvalf
@@ -384,6 +398,7 @@ void update() {
 	// Emulate previous "shift down wanted" behavior.
 	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f ) {
 		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, vehData.Rpm * 2.5f);
+		//VEHICLE::_SET_VEHICLE_ENGINE_POWER_MULTIPLIER(vehicle, vehData.Rpm * 2.5f);
 	}
 
 	// Engine damage
@@ -393,7 +408,8 @@ void update() {
 	}
 
 	// Stalling, old behavior
-	if (settings.EngStall == 1 && vehData.CurrGear > 2 &&
+	if (settings.EngStall == 1 && !simpleBike &&
+		vehData.CurrGear > 2 &&
 		vehData.Rpm < 0.25f && vehData.Speed < 5.0f && vehData.Clutch > 0.33f) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 	}
@@ -411,7 +427,6 @@ void update() {
 		if (revValue > 0.2f) {
 			ext.SetCurrentRPM(vehicle, revValue <= 0.99f ? revValue : 1.05f);
 		}
-		showText(0.4, 0.4, 1.6, "REV");
 	}
 	
 	// Simulate "catch point"
@@ -421,7 +436,7 @@ void update() {
 	// Clutch - 0.2 -> Catch point
 	// Clutch - 0.2 to 0.4 -> Starts rolling??
 	// Clutch > 0.4 -> Stalling unless rolling in any gear OR hi RPM (> 0.5)
-	if (settings.ClutchCatching &&
+	if (settings.ClutchCatching && !simpleBike &&
 		vehData.Clutch >= 0.2f &&
 		((vehData.Speed < vehData.CurrGear * 2.2f) || ( vehData.CurrGear == 0 ) )) {
 		if (vehData.Throttle < 0.25f) {
@@ -435,7 +450,7 @@ void update() {
 	}
 	
 	// New Stalling - Speed dependent
-	if (settings.EngStall == 2 && 
+	if (settings.EngStall == 2 && !simpleBike &&
 		vehData.Clutch > 0.65f &&
 		((vehData.Speed < vehData.CurrGear * 1.4f) || ( vehData.CurrGear == 0 && vehData.Speed < 1.0f ))
 		&& vehData.Rpm < 0.27f) {

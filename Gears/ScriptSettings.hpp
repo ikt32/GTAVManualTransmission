@@ -15,6 +15,8 @@ public:
 	bool AutoGear1;
 	bool AutoReverse;
 	bool OldReverse;
+	bool SimpleBike;
+
 	bool EngDamage;
 	int EngStall;
 	bool EngBrake;

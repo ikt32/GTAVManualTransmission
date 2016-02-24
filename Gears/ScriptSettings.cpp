@@ -19,6 +19,7 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	AutoGear1 = (GetPrivateProfileInt(L"MAIN", L"AutoGear1", 0, L"./Gears.ini") == 1);
 	AutoReverse = (GetPrivateProfileInt(L"MAIN", L"AutoReverse", 0, L"./Gears.ini") == 1);
 	OldReverse = (GetPrivateProfileInt(L"MAIN", L"OldReverse", 0, L"./Gears.ini") == 1);
+	SimpleBike = (GetPrivateProfileInt(L"MAIN", L"SimpleBike", 0, L"./Gears.ini") == 1);
 	EngDamage = (GetPrivateProfileInt(L"MAIN", L"EngineDamage", 0, L"./Gears.ini") == 1);
 	EngStall = GetPrivateProfileInt(L"MAIN", L"EngineStalling", 0, L"./Gears.ini");
 	EngBrake = (GetPrivateProfileInt(L"MAIN", L"EngineBraking", 0, L"./Gears.ini") == 1);
