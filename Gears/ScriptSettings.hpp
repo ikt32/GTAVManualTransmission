@@ -20,6 +20,7 @@ public:
 	bool EngBrake;
 	bool ClutchCatching;
 	bool DefaultNeutral;
+	bool UITips;
 	bool Hshifter;
 	bool Debug;
 };

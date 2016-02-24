@@ -24,6 +24,7 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	EngBrake = (GetPrivateProfileInt(L"MAIN", L"EngineBraking", 0, L"./Gears.ini") == 1);
 	ClutchCatching = (GetPrivateProfileInt(L"MAIN", L"ClutchCatching", 0, L"./Gears.ini") == 1);
 	DefaultNeutral = (GetPrivateProfileInt(L"MAIN", L"DefaultNeutral", 0, L"./Gears.ini") == 1);
+	UITips = (GetPrivateProfileInt(L"MAIN", L"UITips", 1, L"./Gears.ini") == 1);
 	Hshifter = (GetPrivateProfileInt(L"CONTROLS", L"EnableH", 0, L"./Gears.ini") == 1);
 	Debug = (GetPrivateProfileInt(L"DEBUG", L"Info", 0, L"./Gears.ini") == 1);
 
