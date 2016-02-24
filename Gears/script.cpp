@@ -84,6 +84,7 @@ void toggleManual() {
 	}
 	if (!settings.EnableManual) {
 		patched = !MemoryPatcher::RestoreInstructions();
+		patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
 	}
 	if (!runOnceRan)
 		runOnceRan = true;
@@ -405,11 +406,12 @@ void update() {
 
 	// Game doesn't really support revving on disengaged clutch in any gear but 1
 	// Simulate this
-	if (vehData.CurrGear > 1 && controls.Clutchvalf > 0.4f) {// vehData.Clutch <= 0.6f) { // && vehData.Throttle > 0.6f) {
-		float revValue = vehData.Throttle - (vehData.Clutch);
+	if (vehData.CurrGear > 1 && controls.Clutchvalf > 0.4f && !vehData.LockTruck) {// vehData.Clutch <= 0.6f) { // && vehData.Throttle > 0.6f) {
+		float revValue = vehData.Throttle;
 		if (revValue > 0.2f) {
-			ext.SetCurrentRPM(vehicle, revValue <= 1.0f ? revValue : 1.0f);
+			ext.SetCurrentRPM(vehicle, revValue <= 0.99f ? revValue : 1.05f);
 		}
+		showText(0.4, 0.4, 1.6, "REV");
 	}
 	
 	// Simulate "catch point"
