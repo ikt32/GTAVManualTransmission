@@ -19,6 +19,7 @@ public:
 	int EngStall;
 	bool EngBrake;
 	bool ClutchCatching;
+	bool DefaultNeutral;
 	bool Hshifter;
 	bool Debug;
 };
