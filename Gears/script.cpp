@@ -69,12 +69,8 @@ void showDebugInfo() {
 void reInit() {
 	settings.Read(&controls);
 	vehData.LockGears = 0x00010001;
-	if (simpleBike) {
-		vehData.SimulatedNeutral = false;
-	}
-	else {
-		vehData.SimulatedNeutral = settings.DefaultNeutral;
-	}
+	vehData.LockGear = 1;
+	vehData.SimulatedNeutral = settings.DefaultNeutral;
 }
 
 void toggleManual() {
@@ -91,6 +87,7 @@ void toggleManual() {
 	if (!settings.EnableManual) {
 		patched = !MemoryPatcher::RestoreInstructions();
 		patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
+		vehData.SimulatedNeutral = false;
 	}
 	if (!runOnceRan)
 		runOnceRan = true;
@@ -103,10 +100,6 @@ bool lastKeyboard() {
 }
 
 void update() {
-	if (simpleBike) {
-		showText(0.1, 0.1, 0.5, "SimpleBike");
-	}
-
 	if (controls.IsKeyJustPressed(controls.Control[ScriptControls::Toggle], ScriptControls::Toggle)) {
 		toggleManual();
 	}
@@ -159,6 +152,7 @@ void update() {
 	}
 
 	vehData.ReadMemData(ext, vehicle);
+	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
 	simpleBike = vehData.IsBike && settings.SimpleBike;
 
 	if (lastKeyboard()) {
@@ -172,17 +166,31 @@ void update() {
 		controls.Clutchvalf = (CONTROLS::GET_CONTROL_VALUE(0, controls.Control[ScriptControls::Clutch]) - 127) / 127.0f;
 	}
 
-	if (simpleBike) {
-		controls.Clutchvalf = 0.0f;
-	}
-
+	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
+	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
+	
 	// Put here to override last control readout for Clutchvalf
 	if (vehData.SimulatedNeutral) {
 		controls.Clutchvalf = 1.0f; // same difference in gameplay
 	}
 
-	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
-	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
+	// Override SimulatedNeutral on a bike
+	if (simpleBike) {
+		controls.Clutchvalf = 0.0f;
+	}
+
+	// Simulated neutral gear
+	if (settings.EnableManual &&
+		controls.IsKeyJustPressed(controls.Control[ScriptControls::KEngageNeutral], ScriptControls::KEngageNeutral) ||
+		(controls.WasControlPressedForMs(controls.Control[ScriptControls::ShiftDown], controls.CToggleTime) &&
+			!lastKeyboard())) {
+		vehData.SimulatedNeutral = !vehData.SimulatedNeutral;
+		return;
+	}
+
+	if (settings.UITips && vehData.SimulatedNeutral && !simpleBike) {
+		showText(0.95f, 0.90f, 1.4f, "N");
+	}
 
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
 	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {//vehData.CurrGear > vehData.NextGear) {
@@ -243,8 +251,7 @@ void update() {
 	// Reverse behavior
 	// For bikes, do this automatically.
 	// Also if the user chooses to.
-	if (vehData.IsBike ||
-		(settings.OldReverse && settings.AutoReverse)) {
+	if (vehData.IsBike || settings.AutoReverse) {
 		if (vehData.CurrGear == 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
 			&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && vehData.Speed < 2.0f) {
 			vehData.LockGears = 0x00010001;
@@ -254,28 +261,8 @@ void update() {
 			vehData.LockGears = 0x00000000;
 		}
 	}
-	// Reversing behavior: blocking
-	else if (settings.OldReverse) {
-		// Block and reverse with brake in reverse gear
-
-		//Park/Reverse. Gear 0. Prevent going forward in gear 0.
-		if (vehData.CurrGear == 0
-			&& vehData.Throttle > 0) {
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-		}
-		// Forward gears. Prevent reversing.
-		else if (vehData.CurrGear > 0
-			&& vehData.Throttle < 0) {
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-		}
-		else {
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
-		}
-	}
 	// New reverse: Reverse with throttle
-	else {
+	if (settings.RealReverse) {
 		// Case forward gear
 		// Desired: Only brake
 		if (vehData.CurrGear > 0) {
@@ -327,6 +314,26 @@ void update() {
 				CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.Ltvalf);
 			}
+		}
+	}
+	// Reversing behavior: blocking
+	if (!settings.RealReverse) {
+		// Block and reverse with brake in reverse gear
+
+		//Park/Reverse. Gear 0. Prevent going forward in gear 0.
+		if (vehData.CurrGear == 0
+			&& vehData.Throttle > 0) {
+			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+		}
+		// Forward gears. Prevent reversing.
+		else if (vehData.CurrGear > 0
+			&& vehData.Throttle < 0) {
+			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+		}
+		else {
+			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
 	}
 
@@ -382,18 +389,6 @@ void update() {
 		ext.SetThrottle(vehicle, 1.2f);
 		ext.SetCurrentRPM(vehicle, 1.07f);
 	}
-
-	// Game wants to shift down. Usually triggered when user accelerates
-	// while in a too high gear.
-	// Desired result: low RPM or stall. Same gear. Low torque.
-	// Result:	Patching the clutch ops results in above
-	// New result: Additional patching made this superfluous.
-	/*
-	if (vehData.CurrGear > vehData.NextGear) {
-		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, vehData.Rpm);
-		// RPM mismatch on transition currGear > nextGear to currGear == nextGear?
-	}
-	*/
 
 	// Emulate previous "shift down wanted" behavior.
 	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f ) {
@@ -465,21 +460,6 @@ void update() {
 		}
 	}
 
-	// Simulated neutral gear
-	if (controls.IsKeyJustPressed(controls.Control[ScriptControls::KEngageNeutral], ScriptControls::KEngageNeutral) ||
-		controls.WasControlPressedForMs(controls.Control[ScriptControls::ShiftDown], controls.CToggleTime)) {
-		if (!vehData.SimulatedNeutral) {
-			vehData.SimulatedNeutral = true;
-		}
-		else {
-			vehData.SimulatedNeutral = false;
-		}
-		return;
-	}
-	if (settings.UITips && vehData.SimulatedNeutral) {
-		showText(0.95f, 0.90f, 1.4f, "N");
-	}
-
 	// Manual shifting
 	if (settings.Hshifter)
 	{
@@ -508,7 +488,8 @@ void update() {
 					controls.Clutchvalf = 1.0f;
 				}
 				ext.SetThrottle(vehicle, 0.0f);
-				vehData.LockGears = vehData.CurrGear + 1 | ((vehData.CurrGear + 1) << 16);
+				//vehData.LockGears = vehData.CurrGear + 1 | ((vehData.CurrGear + 1) << 16);
+				vehData.LockGears = vehData.LockGear + 1 | ((vehData.LockGear + 1) << 16);
 				vehData.LockTruck = false;
 				vehData.PrevGear = vehData.CurrGear;
 				vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
@@ -523,7 +504,7 @@ void update() {
 					controls.Clutchvalf = 1.0f;
 				}
 				ext.SetThrottle(vehicle, 0.0f);
-				vehData.LockGears = vehData.CurrGear - 1 | ((vehData.CurrGear - 1) << 16);
+				vehData.LockGears = vehData.LockGear - 1 | ((vehData.LockGear - 1) << 16);
 				vehData.LockTruck = false;
 				vehData.PrevGear = vehData.CurrGear;
 				vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
