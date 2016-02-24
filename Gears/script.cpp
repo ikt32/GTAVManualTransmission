@@ -68,6 +68,7 @@ void showDebugInfo() {
 void reInit() {
 	settings.Read(&controls);
 	vehData.LockGears = 0x00010001;
+	vehData.SimulatedNeutral = settings.DefaultNeutral;
 }
 
 void toggleManual() {
@@ -420,7 +421,6 @@ void update() {
 	if (settings.ClutchCatching &&
 		vehData.Clutch >= 0.2f &&
 		((vehData.Speed < vehData.CurrGear * 2.2f) || ( vehData.CurrGear == 0 ) )) {
-		showText(0.1f, 0.1f, 0.5f, "CATCHPOINT");
 		if (vehData.Throttle < 0.25f) {
 			if (vehData.CurrGear > 0) {
 				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.37f);
@@ -436,7 +436,6 @@ void update() {
 		vehData.Clutch > 0.65f &&
 		((vehData.Speed < vehData.CurrGear * 1.4f) || ( vehData.CurrGear == 0 && vehData.Speed < 1.0f ))
 		&& vehData.Rpm < 0.27f) {
-		showText(0.1f, 0.2f, 0.5f, "NEWSTALL");
 		if (VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle)) {
 			if (vehData.CurrGear > 0) {
 				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 1.5f);
@@ -459,7 +458,9 @@ void update() {
 		}
 		return;
 	}
-	showText(0.5, 0.5, 1.5, vehData.SimulatedNeutral ? "N" : "G");
+	if (vehData.SimulatedNeutral) {
+		showText(0.95f, 0.90f, 1.4f, "N");
+	}
 
 	// Manual shifting
 	if (settings.Hshifter)
