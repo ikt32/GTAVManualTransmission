@@ -6,7 +6,6 @@ This is an ASI script allowing for manual control over the ingame gearbox.
 ## Requirements
 
 * [C++ ScriptHook by Alexander Blade](http://www.dev-c.com/gtav/scripthookv/)
-* [Visual C++ Redistributable for Visual Studio 2015 x64](https://www.microsoft.com/en-us/download/details.aspx?id=48145)
 
 ## Downloads
 
