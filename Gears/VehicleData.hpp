@@ -27,6 +27,7 @@ public:
 	float Speed;
 	float Velocity;
 	uint8_t TopGear;
+	uint8_t LockGear;
 	uint32_t CurrGear;
 	uint32_t NextGear;
 	uint32_t LockGears = 0x00010001;

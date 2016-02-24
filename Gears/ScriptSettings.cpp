@@ -5,7 +5,7 @@ ScriptSettings::ScriptSettings() {
 	EnableManual = false;
 	AutoGear1    = false;
 	AutoReverse  = false;
-	OldReverse   = false;
+	RealReverse  = true;
 	EngDamage    = false;
 	EngStall     = false;
 	EngBrake     = false;
@@ -18,7 +18,7 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	EnableManual = (GetPrivateProfileInt(L"MAIN", L"DefaultEnable", 1, L"./Gears.ini") == 1);
 	AutoGear1 = (GetPrivateProfileInt(L"MAIN", L"AutoGear1", 0, L"./Gears.ini") == 1);
 	AutoReverse = (GetPrivateProfileInt(L"MAIN", L"AutoReverse", 0, L"./Gears.ini") == 1);
-	OldReverse = (GetPrivateProfileInt(L"MAIN", L"OldReverse", 0, L"./Gears.ini") == 1);
+	RealReverse = (GetPrivateProfileInt(L"MAIN", L"RealReverse", 0, L"./Gears.ini") == 1);
 	SimpleBike = (GetPrivateProfileInt(L"MAIN", L"SimpleBike", 0, L"./Gears.ini") == 1);
 	EngDamage = (GetPrivateProfileInt(L"MAIN", L"EngineDamage", 0, L"./Gears.ini") == 1);
 	EngStall = GetPrivateProfileInt(L"MAIN", L"EngineStalling", 0, L"./Gears.ini");

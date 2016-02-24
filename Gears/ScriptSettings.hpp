@@ -14,7 +14,7 @@ public:
 	bool EnableManual;
 	bool AutoGear1;
 	bool AutoReverse;
-	bool OldReverse;
+	bool RealReverse;
 	bool SimpleBike;
 
 	bool EngDamage;
