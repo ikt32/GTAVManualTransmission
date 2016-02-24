@@ -345,7 +345,7 @@ void update() {
 	{
 		// Only when free rolling at high speeds
 		if (vehData.Velocity > vehData.LockSpeeds.at(vehData.CurrGear) &&
-			controls.Rtvalf < 0.99 && vehData.Rpm > 0.9) {
+			controls.Rtvalf < 0.1 && vehData.Rpm > 0.97) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, (1.0f - controls.Clutchvalf) * 0.5f * vehData.Rpm);
 			if (controls.Ltvalf < 0.1f) {
 				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
@@ -405,10 +405,11 @@ void update() {
 
 	// Game doesn't really support revving on disengaged clutch in any gear but 1
 	// Simulate this
-	if (vehData.CurrGear > 1 && vehData.Clutch <= 0.6f) { // && vehData.Throttle > 0.6f) {
+	if (vehData.CurrGear > 1 && controls.Clutchvalf > 0.4f) {// vehData.Clutch <= 0.6f) { // && vehData.Throttle > 0.6f) {
 		float revValue = vehData.Throttle - (vehData.Clutch);
-		if (revValue > 0.2f)
-		ext.SetCurrentRPM(vehicle, revValue <= 1.0f ? revValue : 1.0f );
+		if (revValue > 0.2f) {
+			ext.SetCurrentRPM(vehicle, revValue <= 1.0f ? revValue : 1.0f);
+		}
 	}
 	
 	// Simulate "catch point"
@@ -458,7 +459,7 @@ void update() {
 		}
 		return;
 	}
-	if (vehData.SimulatedNeutral) {
+	if (settings.UITips && vehData.SimulatedNeutral) {
 		showText(0.95f, 0.90f, 1.4f, "N");
 	}
 
