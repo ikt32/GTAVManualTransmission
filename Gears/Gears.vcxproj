@@ -136,7 +136,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
-      <AdditionalOptions>..\..\ScriptHookV_SDK\lib\ScriptHookV.lib %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>..\..\ScriptHookV_SDK\lib\ScriptHookV.lib XInput.lib %(AdditionalOptions)</AdditionalOptions>
       <GenerateDebugInformation>No</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -156,6 +156,7 @@
     <ClCompile Include="VehicleData.cpp" />
     <ClCompile Include="VehicleExtensions.cpp" />
     <ClCompile Include="MemoryPatcher.cpp" />
+    <ClCompile Include="XboxController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\enums.h" />
@@ -171,6 +172,7 @@
     <ClInclude Include="VehicleData.hpp" />
     <ClInclude Include="VehicleExtensions.hpp" />
     <ClInclude Include="MemoryPatcher.hpp" />
+    <ClInclude Include="XboxController.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -10,6 +10,7 @@
 #include "Logger.hpp"
 #include "VehicleData.hpp"
 #include "MemoryPatcher.hpp"
+#include "XboxController.hpp"
 
 Logger logger("Gears.log");
 
@@ -23,6 +24,8 @@ Hash model;
 VehicleExtensions ext;
 Player player;
 Ped playerPed;
+
+XboxController* controller;
 
 bool runOnceRan = false;
 bool patched = false;
