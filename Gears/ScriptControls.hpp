@@ -31,7 +31,7 @@ public:
 		KEngine,
 		CToggle,
 		KEngageNeutral,
-		SIZE_OF_ARRAY
+		SIZEOF_ControlType
 	};
 
 public:
@@ -42,15 +42,14 @@ public:
 
 	bool WasControlPressedForMs(int control, int ms);
 
-	int Control[SIZE_OF_ARRAY];
+	int Control[SIZEOF_ControlType];
 	int CToggleTime;
-	bool ControlCurr[SIZE_OF_ARRAY];
-	bool ControlPrev[SIZE_OF_ARRAY];
+	bool ControlCurr[SIZEOF_ControlType];
+	bool ControlPrev[SIZEOF_ControlType];
 
 	float Ltvalf = 0.0f;
 	float Rtvalf = 0.0f;
 	float Clutchvalf = 0.0f;
-
 	int Accelval;
 	float Accelvalf = 0.0f;
 
@@ -58,4 +57,3 @@ private:
 	long long pressTime;
 	long long releaseTime;
 };
-
