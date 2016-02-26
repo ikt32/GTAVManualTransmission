@@ -103,10 +103,11 @@ public:
 	bool IsConnected();
 	void Vibrate(int leftval = 0, int rightval = 0);
 
-	bool IsButtonPressed(XboxButtons buttonType);
-	bool IsButtonJustPressed(XboxButtons buttonType);
-	bool IsButtonJustReleased(XboxButtons buttonType);
-	bool WasButtonHeldForMs(XboxButtons buttonType, int milliseconds);
+	bool IsButtonPressed(XboxButtons buttonType, WORD buttonState);
+	bool IsButtonJustPressed(XboxButtons buttonType, WORD buttonState);
+	bool IsButtonJustReleased(XboxButtons buttonType, WORD buttonState);
+	bool WasButtonHeldForMs(XboxButtons buttonType, WORD buttonState, int milliseconds);
+	void UpdateButtonChangeStates();
 
 	bool XboxButtonCurr[SIZEOF_XboxButtons];
 	bool XboxButtonPrev[SIZEOF_XboxButtons];
@@ -114,6 +115,6 @@ public:
 	XboxButtons StringToButton(std::string buttonString);
 
 	// Returns a 0.0 to 1.0 value for any button
-	float GetAnalogValue(XboxButtons buttonType);
+	float GetAnalogValue(XboxButtons buttonType, WORD buttonState);
 };
 
