@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <Xinput.h>
 #include <string>
+#include <array>
 
 class XboxController
 {
@@ -35,7 +36,7 @@ public:
 		SIZEOF_XboxButtons
 	};
 
-	int XboxButtonMasks[SIZEOF_XboxButtons] = {
+	std::array<int, SIZEOF_XboxButtons> XboxButtonMasks = {
 		XINPUT_GAMEPAD_DPAD_UP,
 		XINPUT_GAMEPAD_DPAD_DOWN,
 		XINPUT_GAMEPAD_DPAD_LEFT,
@@ -63,7 +64,7 @@ public:
 		0
 	};
 
-	std::string XboxButtonsHelper[SIZEOF_XboxButtons] = {
+	std::array<std::string, SIZEOF_XboxButtons> XboxButtonsHelper = {
 		"DpadUp",
 		"DpadDown",
 		"DpadLeft",
@@ -94,8 +95,8 @@ public:
 private:
 	XINPUT_STATE controllerState;
 	int controllerNum;
-	__int64 pressTime[SIZEOF_XboxButtons];
-	__int64 releaseTime[SIZEOF_XboxButtons];
+	std::array<__int64, SIZEOF_XboxButtons> pressTime;
+	std::array<__int64, SIZEOF_XboxButtons> releaseTime;
 
 public:
 	XboxController(int playerNumber);
@@ -109,8 +110,8 @@ public:
 	bool WasButtonHeldForMs(XboxButtons buttonType, WORD buttonState, int milliseconds);
 	void UpdateButtonChangeStates();
 
-	bool XboxButtonCurr[SIZEOF_XboxButtons];
-	bool XboxButtonPrev[SIZEOF_XboxButtons];
+	std::array<bool, SIZEOF_XboxButtons> XboxButtonCurr;
+	std::array<bool, SIZEOF_XboxButtons> XboxButtonPrev;
 
 	XboxButtons StringToButton(std::string buttonString);
 
