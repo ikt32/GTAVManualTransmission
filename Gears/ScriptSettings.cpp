@@ -29,14 +29,37 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	Hshifter = (GetPrivateProfileInt(L"CONTROLS", L"EnableH", 0, L"./Gears.ini") == 1);
 	Debug = (GetPrivateProfileInt(L"DEBUG", L"Info", 0, L"./Gears.ini") == 1);
 
-	scriptControl->Control[ScriptControls::ControlType::Toggle] = GetPrivateProfileInt(L"MAIN", L"Toggle", VK_OEM_5, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::CToggle] = GetPrivateProfileInt(L"MAIN", L"CToggle", ControlScriptPadRight, L"./Gears.ini");
-	scriptControl->CToggleTime = GetPrivateProfileInt(L"MAIN", L"CToggleTime", 500, L"./Gears.ini");
+	char buffer[24] = {0};
+	GetPrivateProfileStringA("CONTROLS", "ShiftUp", "A", buffer, (DWORD)24, "./Gears.ini");
+	scriptControl->ControlXbox[ScriptControls::ControlType::ShiftUp] = buffer;
 
-	scriptControl->Control[ScriptControls::ControlType::ShiftUp] = GetPrivateProfileInt(L"CONTROLS", L"ShiftUp", ControlFrontendAccept, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::ShiftDown] = GetPrivateProfileInt(L"CONTROLS", L"ShiftDown", ControlFrontendX, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::Clutch] = GetPrivateProfileInt(L"CONTROLS", L"Clutch", ControlFrontendLb, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::Engine] = GetPrivateProfileInt(L"CONTROLS", L"Engine", ControlFrontendLs, L"./Gears.ini");
+	memset(&buffer[0], 0, sizeof(buffer));
+	GetPrivateProfileStringA("CONTROLS", "ShiftDown", "X", buffer, (DWORD)24, "./Gears.ini");
+	scriptControl->ControlXbox[ScriptControls::ControlType::ShiftDown] = buffer;
+
+	memset(&buffer[0], 0, sizeof(buffer));
+	GetPrivateProfileStringA("CONTROLS", "Clutch", "LeftThumbDown", buffer, (DWORD)24, "./Gears.ini");
+	scriptControl->ControlXbox[ScriptControls::ControlType::Clutch] = buffer;
+
+	memset(&buffer[0], 0, sizeof(buffer));
+	GetPrivateProfileStringA("CONTROLS", "Engine", "DpadDown", buffer, (DWORD)24, "./Gears.ini");
+	scriptControl->ControlXbox[ScriptControls::ControlType::Engine] = buffer;
+	
+	memset(&buffer[0], 0, sizeof(buffer));
+	GetPrivateProfileStringA("MAIN", "CToggle", "DpadRight", buffer, (DWORD)24, "./Gears.ini");
+	scriptControl->ControlXbox[ScriptControls::ControlType::CToggle] = buffer;
+
+	scriptControl->CToggleTime = GetPrivateProfileInt(L"MAIN", L"CToggleTime", 500, L"./Gears.ini");
+	
+	memset(&buffer[0], 0, sizeof(buffer));
+	GetPrivateProfileStringA("MAIN", "CThrottle", "RightTrigger", buffer, (DWORD)24, "./Gears.ini");
+	scriptControl->ControlXbox[ScriptControls::ControlType::CThrottle] = buffer;
+
+	memset(&buffer[0], 0, sizeof(buffer));
+	GetPrivateProfileStringA("MAIN", "CBrake", "LeftTrigger", buffer, (DWORD)24, "./Gears.ini");
+	scriptControl->ControlXbox[ScriptControls::ControlType::CBrake] = buffer;
+	
+	scriptControl->Control[ScriptControls::ControlType::KToggle] = GetPrivateProfileInt(L"MAIN", L"KToggle", VK_OEM_5, L"./Gears.ini");
 
 	scriptControl->Control[ScriptControls::ControlType::KShiftUp] = GetPrivateProfileInt(L"CONTROLS", L"KShiftUp", VK_NUMPAD9, L"./Gears.ini");
 	scriptControl->Control[ScriptControls::ControlType::KShiftDown] = GetPrivateProfileInt(L"CONTROLS", L"KShiftDown", VK_NUMPAD7, L"./Gears.ini");
@@ -54,9 +77,6 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	scriptControl->Control[ScriptControls::ControlType::H7] = GetPrivateProfileInt(L"CONTROLS", L"H7", VK_NUMPAD0, L"./Gears.ini");
 	scriptControl->Control[ScriptControls::ControlType::H8] = GetPrivateProfileInt(L"CONTROLS", L"H8", VK_NUMPAD0, L"./Gears.ini");
 	scriptControl->Control[ScriptControls::KEngageNeutral] = GetPrivateProfileInt(L"CONTROLS", L"KNeutral", VK_DECIMAL, L"./Gears.ini");
-
-	scriptControl->Control[ScriptControls::ControlType::CThrottle] = GetPrivateProfileInt(L"CONTROLS", L"CThrottle", ControlFrontendRt, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::CBrake] = GetPrivateProfileInt(L"CONTROLS", L"CBrake", ControlFrontendLt, L"./Gears.ini");
 
 	scriptControl->Control[ScriptControls::ControlType::KThrottle] = GetPrivateProfileInt(L"CONTROLS", L"KThrottle", 0x57, L"./Gears.ini");
 	scriptControl->Control[ScriptControls::ControlType::KBrake] = GetPrivateProfileInt(L"CONTROLS", L"KBrake", 0x53, L"./Gears.ini");

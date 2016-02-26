@@ -1,6 +1,7 @@
 #pragma once
 
 #include "..\..\ScriptHookV_SDK\inc\natives.h"
+#include <string>
 
 class ScriptControls
 {
@@ -18,7 +19,7 @@ public:
 		ShiftUp,
 		ShiftDown,
 		Clutch,
-		Toggle,
+		KToggle,
 		ToggleH,
 		KShiftUp,
 		KShiftDown,
@@ -52,6 +53,8 @@ public:
 	float Clutchvalf = 0.0f;
 	int Accelval;
 	float Accelvalf = 0.0f;
+
+	std::string ControlXbox[SIZEOF_ControlType];
 
 private:
 	long long pressTime;
