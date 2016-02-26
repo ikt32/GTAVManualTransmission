@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <Xinput.h>
+#include <string>
 
 class XboxController
 {
@@ -20,6 +21,17 @@ public:
 		B,
 		X,
 		Y,
+		LeftTrigger,
+		RightTrigger,
+		LeftThumbLeft,
+		LeftThumbRight,
+		RightThumbLeft,
+		RightThumbRight,
+		LeftThumbUp,
+		LeftThumbDown,
+		RightThumbUp,
+		RightThumbDown,
+		UNKNOWN,
 		SIZEOF_XboxButtons
 	};
 
@@ -37,7 +49,46 @@ public:
 		XINPUT_GAMEPAD_A,
 		XINPUT_GAMEPAD_B,
 		XINPUT_GAMEPAD_X,
-		XINPUT_GAMEPAD_Y
+		XINPUT_GAMEPAD_Y,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0
+	};
+
+	std::string XboxButtonsHelper[SIZEOF_XboxButtons] = {
+		"DpadUp",
+		"DpadDown",
+		"DpadLeft",
+		"DpadRight",
+		"Start",
+		"Back",
+		"LeftThumb",
+		"RightThumb",
+		"LeftShoulder",
+		"RightShoulder",
+		"A",
+		"B",
+		"X",
+		"Y",
+		"LeftTrigger",
+		"RightTrigger",
+		"LeftThumbLeft",
+		"LeftThumbRight",
+		"RightThumbLeft",
+		"RightThumbRight",
+		"LeftThumbUp",
+		"LeftThumbDown",
+		"RightThumbUp",
+		"RightThumbDown",
+		"UNKNOWN"
 	};
 
 private:
@@ -52,11 +103,17 @@ public:
 	bool IsConnected();
 	void Vibrate(int leftval = 0, int rightval = 0);
 
-	bool IsButtonJustPressed(WORD buttonState, XboxButtons buttonType);
-	bool IsButtonJustReleased(WORD buttonState, XboxButtons buttonType);
-	bool WasButtonHeldForMs(WORD buttonState, XboxButtons buttonType, int milliseconds);
+	bool IsButtonPressed(XboxButtons buttonType);
+	bool IsButtonJustPressed(XboxButtons buttonType);
+	bool IsButtonJustReleased(XboxButtons buttonType);
+	bool WasButtonHeldForMs(XboxButtons buttonType, int milliseconds);
 
 	bool XboxButtonCurr[SIZEOF_XboxButtons];
 	bool XboxButtonPrev[SIZEOF_XboxButtons];
+
+	XboxButtons StringToButton(std::string buttonString);
+
+	// Returns a 0.0 to 1.0 value for any button
+	float GetAnalogValue(XboxButtons buttonType);
 };
 
