@@ -25,7 +25,7 @@ VehicleExtensions ext;
 Player player;
 Ped playerPed;
 
-XboxController* controller = new XboxController(1);
+XboxController controller(1);
 WORD buttonState;
 
 bool runOnceRan = false;
@@ -104,9 +104,9 @@ bool lastKeyboard() {
 }
 
 void update() {
-	if (controller && controller->IsConnected()) {
-		buttonState = controller->GetState().Gamepad.wButtons;
-		controller->UpdateButtonChangeStates();
+	if (controller.IsConnected()) {
+		buttonState = controller.GetState().Gamepad.wButtons;
+		controller.UpdateButtonChangeStates();
 	}
 
 	if (controls.IsKeyJustPressed(controls.Control[ScriptControls::KToggle], ScriptControls::KToggle)) {
@@ -147,7 +147,7 @@ void update() {
 	}
 	prevVehicle = vehicle;
 
-	if (controller->WasButtonHeldForMs(controller->StringToButton(controls.ControlXbox[ScriptControls::CToggle]), buttonState, controls.CToggleTime) &&
+	if (controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[ScriptControls::CToggle]), buttonState, controls.CToggleTime) &&
 		!lastKeyboard()) {
 		toggleManual();
 	}
@@ -170,9 +170,9 @@ void update() {
 		controls.Clutchvalf = (controls.IsKeyPressed(controls.Control[ScriptControls::KClutch]) ? 1.0f : 0.0f);
 	}
 	else {
-		controls.Rtvalf     = controller->GetAnalogValue(controller->StringToButton(controls.ControlXbox[ScriptControls::CThrottle]), buttonState);
-		controls.Ltvalf     = controller->GetAnalogValue(controller->StringToButton(controls.ControlXbox[ScriptControls::CBrake]), buttonState);
-		controls.Clutchvalf = controller->GetAnalogValue(controller->StringToButton(controls.ControlXbox[ScriptControls::Clutch]), buttonState);
+		controls.Rtvalf     = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[ScriptControls::CThrottle]), buttonState);
+		controls.Ltvalf     = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[ScriptControls::CBrake]), buttonState);
+		controls.Clutchvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[ScriptControls::Clutch]), buttonState);
 	}
 
 	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
@@ -191,18 +191,19 @@ void update() {
 	// Simulated neutral gear
 	if (settings.EnableManual &&
 		controls.IsKeyJustPressed(controls.Control[ScriptControls::KEngageNeutral], ScriptControls::KEngageNeutral) ||
-		(controller->WasButtonHeldForMs(controller->StringToButton(controls.ControlXbox[ScriptControls::ShiftDown]), buttonState, controls.CToggleTime) &&
+		(controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[ScriptControls::ShiftDown]), buttonState, controls.CToggleTime) &&
 			!lastKeyboard())) {
 		vehData.SimulatedNeutral = !vehData.SimulatedNeutral;
 		return;
 	}
 
-	if (settings.UITips && vehData.SimulatedNeutral && !simpleBike) {
+	if (settings.EnableManual &&
+		settings.UITips && vehData.SimulatedNeutral && !simpleBike) {
 		showText(0.95f, 0.90f, 1.4f, "N");
 	}
 
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
-	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {//vehData.CurrGear > vehData.NextGear) {
+	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 2);
 	}
 	else if (vehData.CurrGear == vehData.NextGear) {
@@ -224,9 +225,9 @@ void update() {
 
 	// check if player ped is driver
 	if (playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
-		if (patched) {
+		if (patchedSpecial) {
 			logger.Write("Not a driver:");
-			patched = !MemoryPatcher::RestoreInstructions();
+			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
 		}
 		return;
 	}
@@ -240,13 +241,11 @@ void update() {
 	// Only patch if user desires to have their clutch @ 0
 	if (controls.Clutchvalf > 0.9) {
 		if (!patchedSpecial) {
-			//logger.Write("Patching ClutchSpecial");
 			patchedSpecial = MemoryPatcher::PatchJustS_LOW();
 		}
 	}
 	else {
 		if (patchedSpecial) {
-			//logger.Write("Restoring ClutchSpecial");
 			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
 		}
 	}
@@ -276,8 +275,6 @@ void update() {
 		// Desired: Only brake
 		if (vehData.CurrGear > 0) {
 			// LT behavior when still
-			//if (ltvalf > 0.0f && rtvalf < ltvalf &&
-			//	velocity >= -0.1f && velocity <= 0.5f) {
 			if (controls.Ltvalf > 0.0f && controls.Rtvalf < controls.Ltvalf &&
 				vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
 				CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
@@ -419,7 +416,7 @@ void update() {
 	}
 
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
-		(controller->IsButtonJustPressed(controller->StringToButton(controls.ControlXbox[ScriptControls::Engine]), buttonState) ||
+		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[ScriptControls::Engine]), buttonState) ||
 		controls.IsKeyJustPressed(controls.Control[ScriptControls::KEngine], ScriptControls::KEngine))) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
@@ -490,7 +487,7 @@ void update() {
 	}
 	else {
 		// Shift up
-		if (controller->IsButtonJustReleased(controller->StringToButton(controls.ControlXbox[ScriptControls::ShiftUp]), buttonState) ||
+		if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[ScriptControls::ShiftUp]), buttonState) ||
 			controls.IsKeyJustPressed(controls.Control[ScriptControls::KShiftUp], ScriptControls::KShiftUp)) {
 			if (vehData.CurrGear < vehData.TopGear) {
 				if (controls.Clutchvalf < 0.1f) {
@@ -505,7 +502,7 @@ void update() {
 		}
 
 		// Shift down
-		if (controller->IsButtonJustReleased(controller->StringToButton(controls.ControlXbox[ScriptControls::ShiftDown]), buttonState) ||
+		if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[ScriptControls::ShiftDown]), buttonState) ||
 			controls.IsKeyJustPressed(controls.Control[ScriptControls::KShiftDown], ScriptControls::KShiftDown)) {
 			if (vehData.CurrGear > 0) {
 				if (controls.Clutchvalf < 0.1f) {
