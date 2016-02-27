@@ -97,6 +97,7 @@ private:
 	int controllerNum;
 	std::array<__int64, SIZEOF_XboxButtons> pressTime;
 	std::array<__int64, SIZEOF_XboxButtons> releaseTime;
+	float filterDeadzone(XboxButtons buttonType, int input);
 
 public:
 	XboxController(int playerNumber);

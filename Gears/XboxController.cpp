@@ -127,23 +127,59 @@ float XboxController::GetAnalogValue(XboxButtons buttonType, WORD buttonState) {
 	case RightTrigger:
 		return (float)controllerState.Gamepad.bRightTrigger / 255;
 	case LeftThumbLeft:
-		return fmaxf(0, -(float)controllerState.Gamepad.sThumbLX / 32767);
+		return filterDeadzone(buttonType, controllerState.Gamepad.sThumbLX);
 	case LeftThumbRight:
-		return fmaxf(0, (float)controllerState.Gamepad.sThumbLX / 32767);
+		return filterDeadzone(buttonType, controllerState.Gamepad.sThumbLX);
 	case RightThumbLeft:
-		return fmaxf(0, -(float)controllerState.Gamepad.sThumbRX / 32767);
+		return filterDeadzone(buttonType, controllerState.Gamepad.sThumbRX);
 	case RightThumbRight:
-		return fmaxf(0, (float)controllerState.Gamepad.sThumbRX / 32767);
+		return filterDeadzone(buttonType, controllerState.Gamepad.sThumbRX);
 	case LeftThumbUp:
-		return fmaxf(0, (float)controllerState.Gamepad.sThumbLY / 32767);
+		return filterDeadzone(buttonType, controllerState.Gamepad.sThumbLY);
 	case LeftThumbDown:
-		return fmaxf(0, -(float)controllerState.Gamepad.sThumbLY / 32767);
+		return filterDeadzone(buttonType, controllerState.Gamepad.sThumbLY);
 	case RightThumbUp:
-		return fmaxf(0, (float)controllerState.Gamepad.sThumbRY / 32767);
+		return filterDeadzone(buttonType, controllerState.Gamepad.sThumbRY);
 	case RightThumbDown:
-		return fmaxf(0, -(float)controllerState.Gamepad.sThumbRY / 32767);
+		return filterDeadzone(buttonType, controllerState.Gamepad.sThumbRY);
 	default:
 		return IsButtonPressed(buttonType, buttonState) ? 1.0f : 0.0f;
 	}
 }
 
+float XboxController::filterDeadzone(XboxButtons buttonType, int input) {
+	int deadzone;
+	switch (buttonType) {
+	case LeftThumbLeft:
+	case LeftThumbRight:
+	case LeftThumbUp:
+	case LeftThumbDown:
+		deadzone = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+		break;
+	case RightThumbLeft:
+	case RightThumbRight:
+	case RightThumbUp:
+	case RightThumbDown:
+		deadzone = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+		break;
+	}
+
+	if (buttonType == LeftThumbLeft ||
+		buttonType == LeftThumbDown ||
+		buttonType == RightThumbLeft ||
+		buttonType == RightThumbDown) {
+		input = -input;
+	}
+
+	if (input > deadzone) {
+		if (input > 32767) {
+			input = 32767;
+		}
+
+		input -= deadzone;
+		return (float)input / (float)(32767 - deadzone);
+	}
+	else {
+		return 0.0f;
+	}
+}
