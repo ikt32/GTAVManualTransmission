@@ -33,32 +33,25 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	GetPrivateProfileStringA("CONTROLS", "ShiftUp", "A", buffer, (DWORD)24, "./Gears.ini");
 	scriptControl->ControlXbox[ScriptControls::ControlType::ShiftUp] = buffer;
 
-	memset(&buffer[0], 0, sizeof(buffer));
 	GetPrivateProfileStringA("CONTROLS", "ShiftDown", "X", buffer, (DWORD)24, "./Gears.ini");
 	scriptControl->ControlXbox[ScriptControls::ControlType::ShiftDown] = buffer;
 
-	memset(&buffer[0], 0, sizeof(buffer));
 	GetPrivateProfileStringA("CONTROLS", "Clutch", "LeftThumbDown", buffer, (DWORD)24, "./Gears.ini");
 	scriptControl->ControlXbox[ScriptControls::ControlType::Clutch] = buffer;
 
-	memset(&buffer[0], 0, sizeof(buffer));
 	GetPrivateProfileStringA("CONTROLS", "Engine", "DpadDown", buffer, (DWORD)24, "./Gears.ini");
 	scriptControl->ControlXbox[ScriptControls::ControlType::Engine] = buffer;
 	
-	memset(&buffer[0], 0, sizeof(buffer));
 	GetPrivateProfileStringA("MAIN", "CToggle", "DpadRight", buffer, (DWORD)24, "./Gears.ini");
 	scriptControl->ControlXbox[ScriptControls::ControlType::CToggle] = buffer;
 
-	scriptControl->CToggleTime = GetPrivateProfileInt(L"MAIN", L"CToggleTime", 500, L"./Gears.ini");
-	
-	memset(&buffer[0], 0, sizeof(buffer));
 	GetPrivateProfileStringA("MAIN", "CThrottle", "RightTrigger", buffer, (DWORD)24, "./Gears.ini");
 	scriptControl->ControlXbox[ScriptControls::ControlType::CThrottle] = buffer;
 
-	memset(&buffer[0], 0, sizeof(buffer));
 	GetPrivateProfileStringA("MAIN", "CBrake", "LeftTrigger", buffer, (DWORD)24, "./Gears.ini");
 	scriptControl->ControlXbox[ScriptControls::ControlType::CBrake] = buffer;
-	
+
+	scriptControl->CToggleTime = GetPrivateProfileInt(L"MAIN", L"CToggleTime", 500, L"./Gears.ini");
 	scriptControl->Control[ScriptControls::ControlType::KToggle] = GetPrivateProfileInt(L"MAIN", L"KToggle", VK_OEM_5, L"./Gears.ini");
 
 	scriptControl->Control[ScriptControls::ControlType::KShiftUp] = GetPrivateProfileInt(L"CONTROLS", L"KShiftUp", VK_NUMPAD9, L"./Gears.ini");
