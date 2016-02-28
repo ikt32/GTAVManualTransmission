@@ -18,7 +18,7 @@ public:
 	bool SimpleBike;
 
 	bool EngDamage;
-	int EngStall;
+	bool EngStall;
 	bool EngBrake;
 	bool ClutchCatching;
 	bool DefaultNeutral;
