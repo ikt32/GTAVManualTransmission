@@ -99,7 +99,6 @@ void update() {
 	vehData.ReadMemData(ext, vehicle);
 	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
 	simpleBike = vehData.IsBike && settings.SimpleBike;
-	vehData.LockTruck = vehData.IsTruck;
 
 	if (lastKeyboard()) {
 		controls.Rtvalf     = (controls.IsKeyPressed(controls.Control[ScriptControls::KThrottle]) ? 1.0f : 0.0f);
@@ -450,6 +449,14 @@ void functionEngBrake() {
 		float brakeForce = -0.1f * (1.0f - controls.Clutchvalf) * vehData.Rpm;
 		ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, brakeForce, 0.0f, true, true, true, true);
 	}
+
+	// Reverse Gear
+	if (vehData.CurrGear == 0 && vehData.Velocity > 0.0f && vehData.Clutch > 0.4f) {
+		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+	}
+	else {
+		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+	}
 }
 
 void functionRevBehavior() {
@@ -457,9 +464,10 @@ void functionRevBehavior() {
 }
 
 void functionTruckLimiting() {
-	// Save speed
+	// Update speed
 	if (vehData.CurrGear < vehData.NextGear) {
 		vehData.LockSpeed = vehData.Velocity;
+		vehData.LockTruck = true;
 	}
 
 	// Limit
