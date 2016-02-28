@@ -53,36 +53,35 @@ void update() {
 	player = PLAYER::PLAYER_ID();
 	playerPed = PLAYER::PLAYER_PED_ID();
 
-	// check if player ped exists and control is on (e.g. not in a cutscene)
-	if (!ENTITY::DOES_ENTITY_EXIST(playerPed) || !PLAYER::IS_PLAYER_CONTROL_ON(player))
-		return;
-
-	// check for player ped death and player arrest
-	if (ENTITY::IS_ENTITY_DEAD(playerPed) || PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE))
+	if (!ENTITY::DOES_ENTITY_EXIST(playerPed) ||
+		!PLAYER::IS_PLAYER_CONTROL_ON(player) || 
+		ENTITY::IS_ENTITY_DEAD(playerPed) || 
+		PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE))
 		return;
 
 	vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
 	model = ENTITY::GET_ENTITY_MODEL(vehicle);
-	if (!ENTITY::DOES_ENTITY_EXIST(vehicle))
-		return;
+	prevVehicle = vehicle;
 
-	if (VEHICLE::IS_THIS_MODEL_A_BICYCLE(model) ||
-		!(VEHICLE::IS_THIS_MODEL_A_CAR(model)   ||
-		VEHICLE::IS_THIS_MODEL_A_BIKE(model)    ||
-		VEHICLE::IS_THIS_MODEL_A_QUADBIKE(model) ) )
+	if (!ENTITY::DOES_ENTITY_EXIST(vehicle) ||
+		VEHICLE::IS_THIS_MODEL_A_BICYCLE(model) ||
+		!(	VEHICLE::IS_THIS_MODEL_A_CAR(model) ||
+			VEHICLE::IS_THIS_MODEL_A_BIKE(model) ||
+			VEHICLE::IS_THIS_MODEL_A_QUADBIKE(model)
+		))
 		return;
 
 	// Patch clutch on game start
 	if (settings.EnableManual && !runOnceRan) {
 		logger.Write("Patching functions on start");
 		patched = MemoryPatcher::PatchInstructions();
+		vehData.SimulatedNeutral = settings.DefaultNeutral;
 		runOnceRan = true;
 	}
 
 	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, ControlEnter) || vehicle != prevVehicle) {
 		reInit();
 	}
-	prevVehicle = vehicle;
 
 	if (controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[ScriptControls::CToggle]), buttonState, controls.CToggleTime) &&
 		!lastKeyboard()) {
@@ -100,6 +99,7 @@ void update() {
 	vehData.ReadMemData(ext, vehicle);
 	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
 	simpleBike = vehData.IsBike && settings.SimpleBike;
+	vehData.LockTruck = vehData.IsTruck;
 
 	if (lastKeyboard()) {
 		controls.Rtvalf     = (controls.IsKeyPressed(controls.Control[ScriptControls::KThrottle]) ? 1.0f : 0.0f);
@@ -111,7 +111,6 @@ void update() {
 		controls.Ltvalf     = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[ScriptControls::CBrake]), buttonState);
 		controls.Clutchvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[ScriptControls::Clutch]), buttonState);
 	}
-
 	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
@@ -123,20 +122,6 @@ void update() {
 	// Override SimulatedNeutral on a bike
 	if (simpleBike) {
 		controls.Clutchvalf = 0.0f;
-	}
-
-	// Simulated neutral gear
-	if (settings.EnableManual &&
-		controls.IsKeyJustPressed(controls.Control[ScriptControls::KEngageNeutral], ScriptControls::KEngageNeutral) ||
-		(controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[ScriptControls::ShiftDown]), buttonState, controls.CToggleTime) &&
-			!lastKeyboard())) {
-		vehData.SimulatedNeutral = !vehData.SimulatedNeutral;
-		return;
-	}
-
-	if (settings.EnableManual &&
-		settings.UITips && vehData.SimulatedNeutral && !simpleBike) {
-		showText(0.95f, 0.90f, 1.4f, "N");
 	}
 
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
@@ -159,7 +144,8 @@ void update() {
 			VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f))
 		return;
 
-	// check if player ped is driver
+	// Active whenever Manual is enabled from here
+
 	if (playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
 		if (patchedSpecial) {
 			logger.Write("Not a driver:");
@@ -186,141 +172,49 @@ void update() {
 		}
 	}
 
+	// Simulated neutral gear
+	if (controls.IsKeyJustPressed(controls.Control[ScriptControls::KEngageNeutral], ScriptControls::KEngageNeutral) ||
+		(controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[ScriptControls::ShiftDown]), buttonState, controls.CToggleTime) &&
+			!lastKeyboard())) {
+		vehData.SimulatedNeutral = !vehData.SimulatedNeutral;
+		return; //cuz we don't wanna shift this loop! hacky af but *shrug*
+	}
+
+	if (settings.UITips && vehData.SimulatedNeutral && !simpleBike) {
+		showText(0.95f, 0.90f, 1.4f, "N");
+	}
+
+	// BELOW THIS LINE THE FUNCTIONAL STUFF
+
 	// Automatically engage first gear when stationary
-	if (settings.AutoGear1 &&
-		vehData.Throttle < 0.1f && vehData.Speed < 0.1f && vehData.CurrGear > 1) {
-		vehData.LockGears = 0x00010001;
+	if (settings.AutoGear1) {
+		functionAutoGear1();
 	}
 
 	// Reverse behavior
 	// For bikes, do this automatically.
 	// Also if the user chooses to.
 	if (vehData.IsBike || settings.AutoReverse) {
-		if (vehData.CurrGear == 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
-			&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && vehData.Speed < 2.0f) {
-			vehData.LockGears = 0x00010001;
-		}
-		else if (vehData.CurrGear > 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake)
-			&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && vehData.Speed < 2.0f) {
-			vehData.LockGears = 0x00000000;
-		}
+		functionAutoReverse();
 	}
+
 	// New reverse: Reverse with throttle
 	if (settings.RealReverse) {
-		// Case forward gear
-		// Desired: Only brake
-		if (vehData.CurrGear > 0) {
-			// LT behavior when still
-			if (controls.Ltvalf > 0.0f && controls.Rtvalf < controls.Ltvalf &&
-				vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
-				CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-				ext.SetThrottleP(vehicle, 0.0f);
-				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-				VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-			}
-			else {
-				VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
-			}
-			// LT behavior when rolling back
-			if (controls.Ltvalf > 0.0f && controls.Rtvalf < controls.Ltvalf &&
-				vehData.Velocity < -0.1f) {
-				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-				CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.Ltvalf);
-				ext.SetThrottle(vehicle, 0.0f);
-				ext.SetThrottleP(vehicle, 0.1f);
-			}
-		}
-		// Case reverse gear
-		// Desired: RT reverses, LT brakes
-		if (vehData.CurrGear == 0) {
-			ext.SetThrottleP(vehicle, -0.1f);
-			// RT behavior
-			if (controls.Rtvalf > 0.0f && controls.Rtvalf > controls.Ltvalf) {
-				CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, controls.Rtvalf);
-			}
-			// LT behavior when still
-			if (controls.Ltvalf > 0.0f && controls.Rtvalf <= controls.Ltvalf &&
-				vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
-				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-				CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-				VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-			}
-			else {
-				VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
-			}
-			// LT behavior when reversing
-			if (controls.Ltvalf > 0.0f &&
-				vehData.Velocity <= -0.5f) {
-				CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.Ltvalf);
-			}
-		}
+		functionRealReverse();
 	}
 	// Reversing behavior: blocking
 	if (!settings.RealReverse) {
-		// Block and reverse with brake in reverse gear
-
-		//Park/Reverse. Gear 0. Prevent going forward in gear 0.
-		if (vehData.CurrGear == 0
-			&& vehData.Throttle > 0) {
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-		}
-		// Forward gears. Prevent reversing.
-		else if (vehData.CurrGear > 0
-			&& vehData.Throttle < 0) {
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-		}
-		else {
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
-		}
+		functionBlockingReverse();
 	}
 
-	// Since trucks don't stop accelerating and don't disengage the clutch at currGear < nextGear
-	// Save the speed this happened at until next shift up and don't let truck go faster by doing
-	// the clutch thing by ourselves instead.
-	if (vehData.CurrGear < vehData.NextGear) {
-		if (vehData.IsTruck) {
-			vehData.LockSpeed = vehData.Velocity;
-		}
-		else if (vehData.PrevGear <= vehData.CurrGear || vehData.Velocity <= vehData.LockSpeed || vehData.LockSpeed < 0.01f) {
-			vehData.LockSpeed = vehData.Velocity;
-		}
-		vehData.LockTruck = vehData.IsTruck;
-	}
-
-	// Disengage the clutch when cap is reached to cap speed
+	// Limit truck speed per gear upon game wanting to shift, but we block it.
 	if (vehData.IsTruck) {
-		if ((vehData.Velocity > vehData.LockSpeed && vehData.LockTruck) ||
-			(vehData.Velocity > vehData.LockSpeed && vehData.PrevGear > vehData.CurrGear)) {
-			controls.Clutchvalf = 1.0f;
-			VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, 0.0f);
-			VEHICLE::_SET_VEHICLE_ENGINE_POWER_MULTIPLIER(vehicle, 0.0f);
-			ext.SetThrottle(vehicle, 0.0f);
-			DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1); // Uglyyyyy
-		}
+		functionTruckLimiting();
 	}
 
 	// Since we know prevGear and the speed for that, let's simulate "engine" braking.
-	if (settings.EngBrake && vehData.CurrGear > 0)
-	{
-		// Only when free rolling at high speeds
-		if (vehData.Velocity > vehData.LockSpeeds.at(vehData.CurrGear) &&
-			controls.Rtvalf < 0.1 && vehData.Rpm > 0.97) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, (1.0f - controls.Clutchvalf) * 0.5f * vehData.Rpm);
-			if (controls.Ltvalf < 0.1f) {
-				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
-			}
-			else {
-				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-			}
-		}
-		if (controls.Ltvalf < 0.1f) {
-			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
-		}
+	if (settings.EngBrake) {
+		functionEngBrake();
 	}
 
 	// Game wants to shift up. Triggered at high RPM, high speed.
@@ -338,111 +232,41 @@ void update() {
 		//VEHICLE::_SET_VEHICLE_ENGINE_POWER_MULTIPLIER(vehicle, vehData.Rpm * 2.5f);
 	}
 
-	// Engine damage
-	if (settings.EngDamage &&
-		vehData.Rpm > 0.98f && controls.Accelvalf > 0.99f) {
-		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (0.2f*controls.Accelvalf));
-	}
-
-	// Stalling
-	if (settings.EngStall && !simpleBike &&
-		vehData.Clutch > 0.65f &&
-		((vehData.Speed < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && vehData.Speed < 1.0f))
-		&& vehData.Rpm < 0.27f) {
-		if (VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle)) {
-			// Maybe add "jerk" on sudden stall?
-			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
-		}
-	}
-	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
-		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[ScriptControls::Engine]), buttonState) ||
-		controls.IsKeyJustPressed(controls.Control[ScriptControls::KEngine], ScriptControls::KEngine))) {
-		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
-	}
-
 	// Game doesn't really support revving on disengaged clutch in any gear but 1
 	// Simulate this
-	if (vehData.CurrGear > 1 && controls.Clutchvalf > 0.4f && !vehData.LockTruck) {// vehData.Clutch <= 0.6f) { // && vehData.Throttle > 0.6f) {
+	if (vehData.CurrGear > 1 && controls.Clutchvalf > 0.4f && !vehData.LockTruck) {
 		float revValue = vehData.Throttle;
 		if (revValue > 0.2f) {
 			ext.SetCurrentRPM(vehicle, revValue <= 0.99f ? revValue : 1.05f);
 		}
 	}
+
+	// Engine damage
+	if (settings.EngDamage) {
+		functionEngDamage();
+	}
+
+	// Stalling
+	if (settings.EngStall && !simpleBike) {
+		functionEngStall();
+	}
 	
 	// Simulate "catch point"
-	// Default behavior - No catch point exists. Car just idles happily with
-	// fully engaged clutch. We wanna have it, like this
-	// Clutch - 0.0 -> Free engine rev
-	// Clutch - 0.2 -> Catch point
-	// Clutch - 0.2 to 0.4 -> Starts rolling??
-	// Clutch > 0.4 -> Stalling unless rolling in any gear OR hi RPM (> 0.5)
-	if (settings.ClutchCatching && !simpleBike &&
-		vehData.Clutch >= 0.2f &&
-		((vehData.Speed < vehData.CurrGear * 2.2f) || ( vehData.CurrGear == 0 ) )) {
-		if (vehData.Throttle < 0.25f) {
-			if (vehData.CurrGear > 0) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.37f);
-			}
-			else if ( vehData.Velocity > -2.2f && controls.Ltvalf < 0.1f) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.30f);
-			}
-		}
+	// When the clutch "grabs" and the car starts moving without input
+	// TODO Differentiate between diesel en gasoline?
+	if (settings.ClutchCatching && !simpleBike) {
+		functionClutchCatch();
 	}
-
-
 
 	// Manual shifting
-	if (settings.Hshifter)
-	{
-		// All keys checking
-		for (uint8_t i = 0; i <= vehData.TopGear; i++) {
-			if (i > ScriptControls::H8) // this shit is just silly can I rly do dis?
-				i = ScriptControls::H8; // holy shit bad, bad, hacky idea
-			if (controls.IsKeyJustPressed(controls.Control[i], (ScriptControls::ControlType)i)) {
-				if (controls.Clutchvalf < 0.1f) {
-					controls.Clutchvalf = 1.0f;
-				}
-				ext.SetThrottle(vehicle, 0.0f);
-				vehData.LockGears = i | (i << 16);
-				vehData.LockTruck = false;
-				vehData.PrevGear = vehData.CurrGear;
-				vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
-			}
-		}
+	if (settings.Hshifter) {
+		functionHShift();
 	}
 	else {
-		// Shift up
-		if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[ScriptControls::ShiftUp]), buttonState) ||
-			controls.IsKeyJustPressed(controls.Control[ScriptControls::KShiftUp], ScriptControls::KShiftUp)) {
-			if (vehData.CurrGear < vehData.TopGear) {
-				if (controls.Clutchvalf < 0.1f) {
-					controls.Clutchvalf = 1.0f;
-				}
-				ext.SetThrottle(vehicle, 0.0f);
-				vehData.LockGears = vehData.LockGear + 1 | ((vehData.LockGear + 1) << 16);
-				vehData.LockTruck = false;
-				vehData.PrevGear = vehData.CurrGear;
-				vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
-			}
-		}
-
-		// Shift down
-		if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[ScriptControls::ShiftDown]), buttonState) ||
-			controls.IsKeyJustPressed(controls.Control[ScriptControls::KShiftDown], ScriptControls::KShiftDown)) {
-			if (vehData.CurrGear > 0) {
-				if (controls.Clutchvalf < 0.1f) {
-					controls.Clutchvalf = 1.0f;
-				}
-				ext.SetThrottle(vehicle, 0.0f);
-				vehData.LockGears = vehData.LockGear - 1 | ((vehData.LockGear - 1) << 16);
-				vehData.LockTruck = false;
-				vehData.PrevGear = vehData.CurrGear;
-				vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
-			}
-		}
+		functionSShift();
 	}
 
-	// Manually control clutch all the time
+	// Finally, update memory each loop
 	ext.SetClutch(vehicle, 1.0f - controls.Clutchvalf);
 	ext.SetGears(vehicle, vehData.LockGears);
 }
@@ -489,7 +313,6 @@ void showDebugInfo() {
 		"\nClutch: " << std::setprecision(3) << vehData.Clutch <<
 		"\nThrottle: " << std::setprecision(3) << vehData.Throttle <<
 		"\nTurbo: " << std::setprecision(3) << vehData.Turbo <<
-		//"\nV:" << std::setprecision(3) << velocity <<
 		"\nAddress: " << std::hex << vehData.Address <<
 		"\nE: " << (settings.EnableManual ? "Y" : "N");
 	const char *infoc = infos.str().c_str();
@@ -498,9 +321,7 @@ void showDebugInfo() {
 
 void reInit() {
 	settings.Read(&controls);
-	if (vehData.CurrGear < 1) {
-		vehData.LockGears = 0x00010001;
-	}
+	vehData.LockGears = 0x00010001;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
 }
 
@@ -518,7 +339,6 @@ void toggleManual() {
 	if (!settings.EnableManual) {
 		patched = !MemoryPatcher::RestoreInstructions();
 		patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
-		vehData.SimulatedNeutral = false;
 	}
 	if (!runOnceRan)
 		runOnceRan = true;
@@ -528,4 +348,216 @@ void toggleManual() {
 
 bool lastKeyboard() {
 	return CONTROLS::_GET_LAST_INPUT_METHOD(2) == TRUE;
+}
+
+void functionHShift() {
+	// All keys checking
+	for (uint8_t i = 0; i <= vehData.TopGear; i++) {
+		if (i > ScriptControls::H8) // this shit is just silly can I rly do dis?
+			i = ScriptControls::H8; // holy shit bad, bad, hacky idea
+		if (controls.IsKeyJustPressed(controls.Control[i], (ScriptControls::ControlType)i)) {
+			if (controls.Clutchvalf < 0.1f) {
+				controls.Clutchvalf = 1.0f;
+			}
+			ext.SetThrottle(vehicle, 0.0f);
+			vehData.LockGears = i | (i << 16);
+			vehData.LockTruck = false;
+			vehData.PrevGear = vehData.CurrGear;
+			vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
+		}
+	}
+}
+
+void functionSShift() {
+	// Shift up
+	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[ScriptControls::ShiftUp]), buttonState) ||
+		controls.IsKeyJustPressed(controls.Control[ScriptControls::KShiftUp], ScriptControls::KShiftUp)) {
+		if (vehData.CurrGear < vehData.TopGear) {
+			if (controls.Clutchvalf < 0.1f) {
+				controls.Clutchvalf = 1.0f;
+			}
+			ext.SetThrottle(vehicle, 0.0f);
+			vehData.LockGears = vehData.LockGear + 1 | ((vehData.LockGear + 1) << 16);
+			vehData.LockTruck = false;
+			vehData.PrevGear = vehData.CurrGear;
+			vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
+		}
+	}
+
+	// Shift down
+	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[ScriptControls::ShiftDown]), buttonState) ||
+		controls.IsKeyJustPressed(controls.Control[ScriptControls::KShiftDown], ScriptControls::KShiftDown)) {
+		if (vehData.CurrGear > 0) {
+			if (controls.Clutchvalf < 0.1f) {
+				controls.Clutchvalf = 1.0f;
+			}
+			ext.SetThrottle(vehicle, 0.0f);
+			vehData.LockGears = vehData.LockGear - 1 | ((vehData.LockGear - 1) << 16);
+			vehData.LockTruck = false;
+			vehData.PrevGear = vehData.CurrGear;
+			vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
+		}
+	}
+
+}
+
+void functionClutchCatch() {
+	if (vehData.Clutch >= 0.2f &&
+		((vehData.Speed < vehData.CurrGear * 2.2f) || (vehData.CurrGear == 0))) {
+		if (vehData.Throttle < 0.25f) {
+			if (vehData.CurrGear > 0) {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.37f);
+			}
+			else if (vehData.Velocity > -2.2f && controls.Ltvalf < 0.1f) {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.30f);
+			}
+		}
+	}
+}
+
+void functionEngStall() {
+	if (vehData.Clutch > 0.65f &&
+		((vehData.Speed < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && vehData.Speed < 1.0f))
+		&& vehData.Rpm < 0.27f) {
+		if (VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle)) {
+			// Maybe add "jerk" on sudden stall?
+			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
+		}
+	}
+	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
+		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[ScriptControls::Engine]), buttonState) ||
+			controls.IsKeyJustPressed(controls.Control[ScriptControls::KEngine], ScriptControls::KEngine))) {
+		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
+	}
+}
+
+void functionEngDamage() {
+	if ( vehData.Rpm > 0.98f && controls.Accelvalf > 0.99f) {
+		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (0.2f*controls.Accelvalf));
+	}
+}
+
+void functionEngBrake() {
+	// Save speed @ shift
+	if (vehData.CurrGear < vehData.NextGear) {
+		if (vehData.PrevGear <= vehData.CurrGear || vehData.Velocity <= vehData.LockSpeed || vehData.LockSpeed < 0.01f) {
+			vehData.LockSpeed = vehData.Velocity;
+		}
+	}
+	// Braking
+	if (vehData.CurrGear > 0 && vehData.Velocity > vehData.LockSpeeds.at(vehData.CurrGear) &&
+		controls.Rtvalf < 0.1 && vehData.Rpm > 0.80) {
+		float brakeForce = -0.1f * (1.0f - controls.Clutchvalf) * vehData.Rpm;
+		ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, brakeForce, 0.0f, true, true, true, true);
+	}
+}
+
+void functionRevBehavior() {
+
+}
+
+void functionTruckLimiting() {
+	// Save speed
+	if (vehData.CurrGear < vehData.NextGear) {
+		vehData.LockSpeed = vehData.Velocity;
+	}
+
+	// Limit
+	if ((vehData.Velocity > vehData.LockSpeed && vehData.LockTruck) ||
+		(vehData.Velocity > vehData.LockSpeed && vehData.PrevGear > vehData.CurrGear)) {
+		controls.Clutchvalf = 1.0f;
+		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, 0.0f);
+		VEHICLE::_SET_VEHICLE_ENGINE_POWER_MULTIPLIER(vehicle, 0.0f);
+		ext.SetThrottle(vehicle, 0.0f);
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1); // Uglyyyyy
+	}
+}
+
+// Still a bit huge but OH WELL
+void functionRealReverse() {
+	// Forward gear
+	// Desired: Only brake
+	if (vehData.CurrGear > 0) {
+		// LT behavior when still
+		if (controls.Ltvalf > 0.0f && controls.Rtvalf < controls.Ltvalf &&
+			vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
+			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
+			ext.SetThrottleP(vehicle, 0.0f);
+			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+		}
+		else {
+			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+		}
+		// LT behavior when rolling back
+		if (controls.Ltvalf > 0.0f && controls.Rtvalf < controls.Ltvalf &&
+			vehData.Velocity < -0.1f) {
+			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.Ltvalf);
+			ext.SetThrottle(vehicle, 0.0f);
+			ext.SetThrottleP(vehicle, 0.1f);
+		}
+	}
+	// Reverse gear
+	// Desired: RT reverses, LT brakes
+	if (vehData.CurrGear == 0) {
+		ext.SetThrottleP(vehicle, -0.1f);
+		// RT behavior
+		if (controls.Rtvalf > 0.0f && controls.Rtvalf > controls.Ltvalf) {
+			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, controls.Rtvalf);
+		}
+		// LT behavior when still
+		if (controls.Ltvalf > 0.0f && controls.Rtvalf <= controls.Ltvalf &&
+			vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
+			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
+			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+		}
+		else {
+			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+		}
+		// LT behavior when reversing
+		if (controls.Ltvalf > 0.0f &&
+			vehData.Velocity <= -0.5f) {
+			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.Ltvalf);
+		}
+	}
+}
+
+void functionBlockingReverse() {
+	//Park/Reverse. Gear 0. Prevent going forward in gear 0.
+	if (vehData.CurrGear == 0
+		&& vehData.Throttle > 0) {
+		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+	}
+	// Forward gears. Prevent reversing.
+	else if (vehData.CurrGear > 0
+		&& vehData.Throttle < 0) {
+		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+	}
+	else {
+		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+	}
+}
+
+void functionAutoReverse() {
+	if (vehData.CurrGear == 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
+		&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && vehData.Speed < 2.0f) {
+		vehData.LockGears = 0x00010001;
+	}
+	else if (vehData.CurrGear > 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake)
+		&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && vehData.Speed < 2.0f) {
+		vehData.LockGears = 0x00000000;
+	}
+}
+
+void functionAutoGear1() {
+	if (vehData.Throttle < 0.1f && vehData.Speed < 0.1f && vehData.CurrGear > 1) {
+		vehData.LockGears = 0x00010001;
+	}
 }

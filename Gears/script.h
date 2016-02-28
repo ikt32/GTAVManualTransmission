@@ -13,3 +13,17 @@ http://dev-c.com
 #include "..\..\ScriptHookV_SDK\inc\main.h"
 
 void ScriptMain();
+
+// Eh.
+
+void functionAutoGear1();
+void functionAutoReverse();
+void functionRealReverse();
+void functionBlockingReverse();
+void functionTruckLimiting();
+void functionEngBrake();
+void functionEngDamage();
+void functionEngStall();
+void functionClutchCatch();
+void functionHShift();
+void functionSShift();
