@@ -13,19 +13,18 @@
 #include "XboxController.hpp"
 
 Logger logger("Gears.log");
-
 ScriptControls controls;
 ScriptSettings settings;
 VehicleData vehData;
+VehicleExtensions ext;
+XboxController controller(1);
 
 Vehicle vehicle;
 Vehicle prevVehicle;
 Hash model;
-VehicleExtensions ext;
 Player player;
 Ped playerPed;
 
-XboxController controller(1);
 WORD buttonState;
 
 bool runOnceRan = false;
@@ -34,74 +33,12 @@ bool patchedSpecial = false;
 bool simpleBike;
 int prevNotification = 0;
 
-void showText(float x, float y, float scale, char * text) {
-	UI::SET_TEXT_FONT(0);
-	UI::SET_TEXT_SCALE(scale, scale);
-	UI::SET_TEXT_COLOUR(255, 255, 255, 255);
-	UI::SET_TEXT_WRAP(0.0, 1.0);
-	UI::SET_TEXT_CENTRE(0);
-	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
-	UI::SET_TEXT_EDGE(1, 0, 0, 0, 205);
-	UI::_SET_TEXT_ENTRY("STRING");
-	UI::_ADD_TEXT_COMPONENT_STRING(text);
-	UI::_DRAW_TEXT(x, y);
-}
-
-void showNotification(char *message) {
-	if (prevNotification)
-		UI::_REMOVE_NOTIFICATION(prevNotification);
-	UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
-	UI::_ADD_TEXT_COMPONENT_STRING(message);
-	prevNotification = UI::_DRAW_NOTIFICATION(false, false);
-}
-
-void showDebugInfo() {
-	std::stringstream infos;
-	infos << "RPM: " << std::setprecision(3) << vehData.Rpm <<
-		"\nCurrGear: " << vehData.CurrGear <<
-		"\nNextGear: " << vehData.NextGear <<
-		"\nClutch: " << std::setprecision(3) << vehData.Clutch <<
-		"\nThrottle: " << std::setprecision(3) << vehData.Throttle <<
-		"\nTurbo: " << std::setprecision(3) << vehData.Turbo <<
-		//"\nV:" << std::setprecision(3) << velocity <<
-		"\nAddress: " << std::hex << vehData.Address <<
-		"\nE: " << (settings.EnableManual ? "Y" : "N");
-	const char *infoc = infos.str().c_str();
-	showText(0.01f, 0.5f, 0.4f, (char *)infoc);
-}
-
-void reInit() {
-	settings.Read(&controls);
-	vehData.LockGears = 0x00010001;
-	vehData.LockGear = 1;
-	vehData.SimulatedNeutral = settings.DefaultNeutral;
-}
-
-void toggleManual() {
-	settings.EnableManual = !settings.EnableManual;
-	std::stringstream message;
-	message << "Manual Transmission " <<
-		(settings.EnableManual ? "Enabled" : "Disabled");
-	showNotification((char *)message.str().c_str());
-	logger.Write((char *)message.str().c_str());
-	if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
-		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
-		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
-	}
-	if (!settings.EnableManual) {
-		patched = !MemoryPatcher::RestoreInstructions();
-		patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
-		vehData.SimulatedNeutral = false;
-	}
-	if (!runOnceRan)
-		runOnceRan = true;
-	settings.Save();
-	reInit();
-}
-
-bool lastKeyboard() {
-	return CONTROLS::_GET_LAST_INPUT_METHOD(2) == TRUE;
-}
+void showText(float x, float y, float scale, char * text);
+void showNotification(char *message);
+void showDebugInfo();
+void reInit();
+void toggleManual();
+bool lastKeyboard();
 
 void update() {
 	if (controller.IsConnected()) {
@@ -212,7 +149,6 @@ void update() {
 	else if (vehData.CurrGear < vehData.NextGear) {
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1);
 	}
-
 
 	if (settings.Debug) {
 		showDebugInfo();
@@ -408,13 +344,16 @@ void update() {
 		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (0.2f*controls.Accelvalf));
 	}
 
-	// Stalling, old behavior
-	if (settings.EngStall == 1 && !simpleBike &&
-		vehData.CurrGear > 2 &&
-		vehData.Rpm < 0.25f && vehData.Speed < 5.0f && vehData.Clutch > 0.33f) {
-		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
+	// Stalling
+	if (settings.EngStall && !simpleBike &&
+		vehData.Clutch > 0.65f &&
+		((vehData.Speed < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && vehData.Speed < 1.0f))
+		&& vehData.Rpm < 0.27f) {
+		if (VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle)) {
+			// Maybe add "jerk" on sudden stall?
+			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
+		}
 	}
-
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
 		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[ScriptControls::Engine]), buttonState) ||
 		controls.IsKeyJustPressed(controls.Control[ScriptControls::KEngine], ScriptControls::KEngine))) {
@@ -444,27 +383,13 @@ void update() {
 			if (vehData.CurrGear > 0) {
 				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.37f);
 			}
-			else if ( vehData.Velocity > -2.2f) {
+			else if ( vehData.Velocity > -2.2f && controls.Ltvalf < 0.1f) {
 				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.30f);
 			}
 		}
 	}
-	
-	// New Stalling - Speed dependent
-	if (settings.EngStall == 2 && !simpleBike &&
-		vehData.Clutch > 0.65f &&
-		((vehData.Speed < vehData.CurrGear * 1.4f) || ( vehData.CurrGear == 0 && vehData.Speed < 1.0f ))
-		&& vehData.Rpm < 0.27f) {
-		if (VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle)) {
-			if (vehData.CurrGear > 0) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 1.5f);
-			}
-			else {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 1.5f);
-			}
-			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
-		}
-	}
+
+
 
 	// Manual shifting
 	if (settings.Hshifter)
@@ -533,4 +458,74 @@ void main() {
 void ScriptMain() {
 	srand(GetTickCount());
 	main();
+}
+
+void showText(float x, float y, float scale, char * text) {
+	UI::SET_TEXT_FONT(0);
+	UI::SET_TEXT_SCALE(scale, scale);
+	UI::SET_TEXT_COLOUR(255, 255, 255, 255);
+	UI::SET_TEXT_WRAP(0.0, 1.0);
+	UI::SET_TEXT_CENTRE(0);
+	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
+	UI::SET_TEXT_EDGE(1, 0, 0, 0, 205);
+	UI::_SET_TEXT_ENTRY("STRING");
+	UI::_ADD_TEXT_COMPONENT_STRING(text);
+	UI::_DRAW_TEXT(x, y);
+}
+
+void showNotification(char *message) {
+	if (prevNotification)
+		UI::_REMOVE_NOTIFICATION(prevNotification);
+	UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
+	UI::_ADD_TEXT_COMPONENT_STRING(message);
+	prevNotification = UI::_DRAW_NOTIFICATION(false, false);
+}
+
+void showDebugInfo() {
+	std::stringstream infos;
+	infos << "RPM: " << std::setprecision(3) << vehData.Rpm <<
+		"\nCurrGear: " << vehData.CurrGear <<
+		"\nNextGear: " << vehData.NextGear <<
+		"\nClutch: " << std::setprecision(3) << vehData.Clutch <<
+		"\nThrottle: " << std::setprecision(3) << vehData.Throttle <<
+		"\nTurbo: " << std::setprecision(3) << vehData.Turbo <<
+		//"\nV:" << std::setprecision(3) << velocity <<
+		"\nAddress: " << std::hex << vehData.Address <<
+		"\nE: " << (settings.EnableManual ? "Y" : "N");
+	const char *infoc = infos.str().c_str();
+	showText(0.01f, 0.5f, 0.4f, (char *)infoc);
+}
+
+void reInit() {
+	settings.Read(&controls);
+	if (vehData.CurrGear < 1) {
+		vehData.LockGears = 0x00010001;
+	}
+	vehData.SimulatedNeutral = settings.DefaultNeutral;
+}
+
+void toggleManual() {
+	settings.EnableManual = !settings.EnableManual;
+	std::stringstream message;
+	message << "Manual Transmission " <<
+		(settings.EnableManual ? "Enabled" : "Disabled");
+	showNotification((char *)message.str().c_str());
+	logger.Write((char *)message.str().c_str());
+	if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
+		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
+	}
+	if (!settings.EnableManual) {
+		patched = !MemoryPatcher::RestoreInstructions();
+		patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
+		vehData.SimulatedNeutral = false;
+	}
+	if (!runOnceRan)
+		runOnceRan = true;
+	settings.Save();
+	reInit();
+}
+
+bool lastKeyboard() {
+	return CONTROLS::_GET_LAST_INPUT_METHOD(2) == TRUE;
 }
