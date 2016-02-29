@@ -547,11 +547,11 @@ void functionBlockingReverse() {
 
 void functionAutoReverse() {
 	if (vehData.CurrGear == 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
-		&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake)) {
+		&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && vehData.Velocity > -1.0f) {
 		vehData.LockGears = 0x00010001;
 	}
 	else if (vehData.CurrGear > 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake)
-		&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)) {
+		&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && vehData.Velocity < 1.0f) {
 		vehData.LockGears = 0x00000000;
 	}
 }
