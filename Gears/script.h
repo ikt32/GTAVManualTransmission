@@ -28,3 +28,4 @@ void functionClutchCatch();
 void functionHShift();
 void functionSShift();
 void shiftTo(int gear);
+void handleRPM();

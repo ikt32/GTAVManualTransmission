@@ -216,30 +216,6 @@ void update() {
 		functionEngBrake();
 	}
 
-	// Game wants to shift up. Triggered at high RPM, high speed.
-	// Desired result: high RPM, same gear, no more accelerating
-	// Result:	Is as desired. Speed may drop a bit because of game clutch.
-	if (vehData.CurrGear > 0 &&
-		(vehData.CurrGear < vehData.NextGear && vehData.Speed > 2.0f)) {
-		ext.SetThrottle(vehicle, 1.2f);
-		ext.SetCurrentRPM(vehicle, 1.07f);
-	}
-
-	// Emulate previous "shift down wanted" behavior.
-	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f ) {
-		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, vehData.Rpm * 2.5f);
-		//VEHICLE::_SET_VEHICLE_ENGINE_POWER_MULTIPLIER(vehicle, vehData.Rpm * 2.5f);
-	}
-
-	// Game doesn't really support revving on disengaged clutch in any gear but 1
-	// Simulate this
-	if (vehData.CurrGear > 1 && controls.Clutchvalf > 0.4f && !vehData.LockTruck) {
-		float revValue = vehData.Throttle;
-		if (revValue > 0.2f) {
-			ext.SetCurrentRPM(vehicle, revValue <= 0.99f ? revValue : 1.05f);
-		}
-	}
-
 	// Engine damage
 	if (settings.EngDamage) {
 		functionEngDamage();
@@ -266,6 +242,7 @@ void update() {
 	}
 
 	// Finally, update memory each loop
+	handleRPM();
 	ext.SetClutch(vehicle, 1.0f - controls.Clutchvalf);
 	ext.SetGears(vehicle, vehData.LockGears);
 }
@@ -441,8 +418,31 @@ void functionEngBrake() {
 	}
 }
 
-void functionRevBehavior() {
+// Handles gear locking, RPM behaviors
+void handleRPM() {
+	// Game wants to shift up. Triggered at high RPM, high speed.
+	// Desired result: high RPM, same gear, no more accelerating
+	// Result:	Is as desired. Speed may drop a bit because of game clutch.
+	if (vehData.CurrGear > 0 &&
+		(vehData.CurrGear < vehData.NextGear && vehData.Speed > 2.0f)) {
+		ext.SetThrottle(vehicle, 1.2f);
+		ext.SetCurrentRPM(vehicle, 1.07f);
+	}
 
+	// Emulate previous "shift down wanted" behavior.
+	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
+		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, vehData.Rpm * 2.5f);
+		//VEHICLE::_SET_VEHICLE_ENGINE_POWER_MULTIPLIER(vehicle, vehData.Rpm * 2.5f);
+	}
+
+	// Game doesn't really support revving on disengaged clutch in any gear but 1
+	// Simulate this
+	if (vehData.CurrGear > 1 && controls.Clutchvalf > 0.4f && !vehData.LockTruck) {
+		float revValue = vehData.Throttle;
+		if (revValue > 0.2f) {
+			ext.SetCurrentRPM(vehicle, revValue <= 0.99f ? revValue : 1.05f);
+		}
+	}
 }
 
 void functionTruckLimiting() {
