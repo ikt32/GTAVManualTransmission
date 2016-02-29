@@ -355,14 +355,7 @@ void functionHShift() {
 		if (i > ScriptControls::H8) // this shit is just silly can I rly do dis?
 			i = ScriptControls::H8; // holy shit bad, bad, hacky idea
 		if (controls.IsKeyJustPressed(controls.Control[i], (ScriptControls::ControlType)i)) {
-			if (controls.Clutchvalf < 0.1f) {
-				controls.Clutchvalf = 1.0f;
-			}
-			ext.SetThrottle(vehicle, 0.0f);
-			vehData.LockGears = i | (i << 16);
-			vehData.LockTruck = false;
-			vehData.PrevGear = vehData.CurrGear;
-			vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
+			shiftTo(i);
 		}
 	}
 }
@@ -372,14 +365,7 @@ void functionSShift() {
 	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[ScriptControls::ShiftUp]), buttonState) ||
 		controls.IsKeyJustPressed(controls.Control[ScriptControls::KShiftUp], ScriptControls::KShiftUp)) {
 		if (vehData.CurrGear < vehData.TopGear) {
-			if (controls.Clutchvalf < 0.1f) {
-				controls.Clutchvalf = 1.0f;
-			}
-			ext.SetThrottle(vehicle, 0.0f);
-			vehData.LockGears = vehData.LockGear + 1 | ((vehData.LockGear + 1) << 16);
-			vehData.LockTruck = false;
-			vehData.PrevGear = vehData.CurrGear;
-			vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
+			shiftTo(vehData.LockGear + 1);
 		}
 	}
 
@@ -387,17 +373,21 @@ void functionSShift() {
 	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[ScriptControls::ShiftDown]), buttonState) ||
 		controls.IsKeyJustPressed(controls.Control[ScriptControls::KShiftDown], ScriptControls::KShiftDown)) {
 		if (vehData.CurrGear > 0) {
-			if (controls.Clutchvalf < 0.1f) {
-				controls.Clutchvalf = 1.0f;
-			}
-			ext.SetThrottle(vehicle, 0.0f);
-			vehData.LockGears = vehData.LockGear - 1 | ((vehData.LockGear - 1) << 16);
-			vehData.LockTruck = false;
-			vehData.PrevGear = vehData.CurrGear;
-			vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
+			shiftTo(vehData.LockGear - 1);
 		}
 	}
 
+}
+
+void shiftTo(int gear) {
+	if (controls.Clutchvalf < 0.1f) {
+		controls.Clutchvalf = 1.0f;
+	}
+	ext.SetThrottle(vehicle, 0.0f);
+	vehData.LockGears = gear | (gear << 16);
+	vehData.LockTruck = false;
+	vehData.PrevGear = vehData.CurrGear;
+	vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
 }
 
 void functionClutchCatch() {
