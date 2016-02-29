@@ -1,6 +1,8 @@
 #include "ScriptSettings.hpp"
 #include "..\..\ScriptHookV_SDK\inc\enums.h"
 
+#include "Logger.hpp"
+
 ScriptSettings::ScriptSettings() {
 	EnableManual = false;
 	AutoGear1    = false;
@@ -15,19 +17,19 @@ ScriptSettings::ScriptSettings() {
 
 
 void ScriptSettings::Read(ScriptControls *scriptControl) {
-	EnableManual = (GetPrivateProfileInt(L"MAIN", L"DefaultEnable", 1, L"./Gears.ini") == 1);
-	AutoGear1 = (GetPrivateProfileInt(L"MAIN", L"AutoGear1", 0, L"./Gears.ini") == 1);
-	AutoReverse = (GetPrivateProfileInt(L"MAIN", L"AutoReverse", 0, L"./Gears.ini") == 1);
-	RealReverse = (GetPrivateProfileInt(L"MAIN", L"RealReverse", 0, L"./Gears.ini") == 1);
-	SimpleBike = (GetPrivateProfileInt(L"MAIN", L"SimpleBike", 0, L"./Gears.ini") == 1);
-	EngDamage = (GetPrivateProfileInt(L"MAIN", L"EngineDamage", 0, L"./Gears.ini") == 1);
-	EngStall = (GetPrivateProfileInt(L"MAIN", L"EngineStalling", 0, L"./Gears.ini") == 1);
-	EngBrake = (GetPrivateProfileInt(L"MAIN", L"EngineBraking", 0, L"./Gears.ini") == 1);
+	EnableManual =   (GetPrivateProfileInt(L"MAIN", L"DefaultEnable",  1, L"./Gears.ini") == 1);
+	AutoGear1 =      (GetPrivateProfileInt(L"MAIN", L"AutoGear1",      0, L"./Gears.ini") == 1);
+	AutoReverse =    (GetPrivateProfileInt(L"MAIN", L"AutoReverse",    0, L"./Gears.ini") == 1);
+	RealReverse =    (GetPrivateProfileInt(L"MAIN", L"RealReverse",    1, L"./Gears.ini") == 1);
+	SimpleBike =     (GetPrivateProfileInt(L"MAIN", L"SimpleBike",     1, L"./Gears.ini") == 1);
+	EngDamage =      (GetPrivateProfileInt(L"MAIN", L"EngineDamage",   0, L"./Gears.ini") == 1);
+	EngStall =       (GetPrivateProfileInt(L"MAIN", L"EngineStalling", 0, L"./Gears.ini") == 1);
+	EngBrake =       (GetPrivateProfileInt(L"MAIN", L"EngineBraking",  0, L"./Gears.ini") == 1);
 	ClutchCatching = (GetPrivateProfileInt(L"MAIN", L"ClutchCatching", 0, L"./Gears.ini") == 1);
 	DefaultNeutral = (GetPrivateProfileInt(L"MAIN", L"DefaultNeutral", 0, L"./Gears.ini") == 1);
-	UITips = (GetPrivateProfileInt(L"MAIN", L"UITips", 1, L"./Gears.ini") == 1);
-	Hshifter = (GetPrivateProfileInt(L"CONTROLS", L"EnableH", 0, L"./Gears.ini") == 1);
-	Debug = (GetPrivateProfileInt(L"DEBUG", L"Info", 0, L"./Gears.ini") == 1);
+	UITips =         (GetPrivateProfileInt(L"MAIN", L"UITips", 1, L"./Gears.ini") == 1);
+	Hshifter =       (GetPrivateProfileInt(L"CONTROLS", L"EnableH", 0, L"./Gears.ini") == 1);
+	Debug =          (GetPrivateProfileInt(L"DEBUG", L"Info", 0, L"./Gears.ini") == 1);
 
 	char buffer[24] = {0};
 	GetPrivateProfileStringA("MAIN", "CToggle", "DpadRight", buffer, (DWORD)24, "./Gears.ini");
@@ -73,9 +75,20 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 
 	scriptControl->Control[ScriptControls::ControlType::KThrottle] = GetPrivateProfileInt(L"CONTROLS", L"KThrottle", 0x57, L"./Gears.ini");
 	scriptControl->Control[ScriptControls::ControlType::KBrake] = GetPrivateProfileInt(L"CONTROLS", L"KBrake", 0x53, L"./Gears.ini");
+	Check();
 }
 
 void ScriptSettings::Save() {
 	WritePrivateProfileString(L"MAIN", L"DefaultEnable", (EnableManual ? L" 1" : L" 0"), L"./Gears.ini");
 	WritePrivateProfileString(L"CONTROLS", L"EnableH", (Hshifter ? L" 1" : L" 0"), L"./Gears.ini");
+}
+
+// Checks for conflicting settings and adjusts them
+void ScriptSettings::Check() {
+	if (AutoReverse && RealReverse) {
+		Logger logger("./Gears.log");
+		logger.Write("AutoReverse and RealReverse conflict. Adjusting to RealReverse");
+		AutoReverse = false;
+		WritePrivateProfileString(L"MAIN", L"AutoReverse", L" 0", L"./Gears.ini");
+	}
 }

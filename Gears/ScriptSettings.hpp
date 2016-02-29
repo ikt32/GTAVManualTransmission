@@ -25,5 +25,7 @@ public:
 	bool UITips;
 	bool Hshifter;
 	bool Debug;
+private:
+	void Check();
 };
 
