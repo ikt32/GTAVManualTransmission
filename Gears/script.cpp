@@ -431,12 +431,11 @@ void handleRPM() {
 	// Emulate previous "shift down wanted" behavior.
 	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
 		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, vehData.Rpm * 2.5f);
-		//VEHICLE::_SET_VEHICLE_ENGINE_POWER_MULTIPLIER(vehicle, vehData.Rpm * 2.5f);
 	}
 
 	// Game doesn't really support revving on disengaged clutch in any gear but 1
 	// Simulate this
-	if (vehData.CurrGear > 1 && controls.Clutchvalf > 0.4f && !vehData.LockTruck) {
+	if (vehData.CurrGear > 1 && controls.Clutchvalf > 0.4f) {
 		float revValue = vehData.Throttle;
 		if (revValue > 0.2f) {
 			ext.SetCurrentRPM(vehicle, revValue <= 0.99f ? revValue : 1.05f);
@@ -455,8 +454,6 @@ void functionTruckLimiting() {
 	if ((vehData.Velocity > vehData.LockSpeed && vehData.LockTruck) ||
 		(vehData.Velocity > vehData.LockSpeed && vehData.PrevGear > vehData.CurrGear)) {
 		controls.Clutchvalf = 1.0f;
-		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, 0.0f);
-		VEHICLE::_SET_VEHICLE_ENGINE_POWER_MULTIPLIER(vehicle, 0.0f);
 		ext.SetThrottle(vehicle, 0.0f);
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1); // Uglyyyyy
 	}
