@@ -374,9 +374,9 @@ void functionClutchCatch() {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.37f);
 		}
 		// Reverse
-		else if (vehData.CurrGear == 0 && vehData.Velocity > -2.2f && controls.Rtvalf < 0.25f && controls.Ltvalf < 0.25f) {
+		/*else if (vehData.CurrGear == 0 && vehData.Velocity > -2.2f && controls.Rtvalf < 0.25f && controls.Ltvalf < 0.25f) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.30f);
-		}
+		}*/
 	}
 }
 
