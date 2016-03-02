@@ -368,15 +368,14 @@ void shiftTo(int gear) {
 }
 
 void functionClutchCatch() {
-	if (vehData.Clutch >= 0.2f &&
-		((vehData.Speed < vehData.CurrGear * 2.2f) || (vehData.CurrGear == 0))) {
-		if (vehData.Throttle < 0.25f) {
-			if (vehData.CurrGear > 0) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.37f);
-			}
-			else if (vehData.Velocity > -2.2f && controls.Ltvalf < 0.1f) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.30f);
-			}
+	if (vehData.Clutch >= 0.2f) {
+		// Forward
+		if (vehData.CurrGear > 0 && vehData.Velocity < vehData.CurrGear * 2.2f && controls.Rtvalf < 0.25f) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.37f);
+		}
+		// Reverse
+		else if (vehData.CurrGear == 0 && vehData.Velocity > -2.2f && controls.Rtvalf < 0.25f && controls.Ltvalf < 0.25f) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.30f);
 		}
 	}
 }
