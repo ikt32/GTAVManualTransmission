@@ -17,6 +17,7 @@ This is an ASI script allowing for manual control over the ingame gearbox.
 ### Requirements
 * [ScriptHookV SDK by Alexander Blade](http://www.dev-c.com/gtav/scripthookv/)
 * [DirectX SDK (June 2010)](https://www.microsoft.com/en-us/download/details.aspx?id=6812) for XInput 1.3
+* [Logitech Steering Wheel SDK](http://gaming.logitech.com/en-us/developers)
 
 Download the [ScriptHookV SDK](http://www.dev-c.com/gtav/scripthookv/) and extract it's contents to ScriptHookV_SDK. 
 Clone this repository to the same folder ScriptHookV_SDK was extracted so you have ScriptHookV_SDK and GTAVManualTransmission in the same folder.
