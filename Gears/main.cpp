@@ -11,7 +11,7 @@ http://dev-c.com
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 {
-	Logger logger("./Gears.log");
+	Logger logger(LOGFILE);
 
 	switch (reason)
 	{

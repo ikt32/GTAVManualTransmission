@@ -12,7 +12,7 @@
 #include "MemoryPatcher.hpp"
 #include "XboxController.hpp"
 
-Logger logger("Gears.log");
+Logger logger(LOGFILE);
 ScriptControls controls;
 ScriptSettings settings;
 VehicleData vehData;

@@ -5,6 +5,8 @@
 #include <fstream>
 #include <iomanip>
 
+#define LOGFILE "Gears.log"
+
 class Logger {
 public:
 	Logger(char *fileName);

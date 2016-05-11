@@ -86,7 +86,7 @@ void ScriptSettings::Save() {
 // Checks for conflicting settings and adjusts them
 void ScriptSettings::Check() {
 	if (AutoReverse && RealReverse) {
-		Logger logger("./Gears.log");
+		Logger logger(LOGFILE);
 		logger.Write("AutoReverse and RealReverse conflict. Adjusting to RealReverse");
 		AutoReverse = false;
 		WritePrivateProfileStringA("MAIN", "AutoReverse", " 0", SETTINGSFILE);
