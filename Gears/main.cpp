@@ -5,6 +5,7 @@ http://dev-c.com
 */
 
 #include "..\..\ScriptHookV_SDK\inc\main.h"
+
 #include "script.h"
 #include "Logger.hpp"
 #include "MemoryPatcher.hpp"
@@ -22,6 +23,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 		break;
 	case DLL_PROCESS_DETACH:
 		logger.Write("Init shutdown");
+		LogiSteeringShutdown();
 		bool successI = MemoryPatcher::RestoreInstructions();
 		bool successJ = MemoryPatcher::RestoreJustS_LOW();
 
@@ -29,7 +31,10 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 			logger.Write("Shut down script successfully");
 		}
 		else {
-			logger.Write("Shut down script with leftovers");
+			if (!successI)
+				logger.Write("Shut down script with instructions not restored");
+			if (!successJ)
+				logger.Write("Shut down script with S_LOW not restored");
 		}
 		scriptUnregister(hInstance);
 		break;
