@@ -17,70 +17,70 @@ ScriptSettings::ScriptSettings() {
 
 
 void ScriptSettings::Read(ScriptControls *scriptControl) {
-	EnableManual =   (GetPrivateProfileInt(L"MAIN", L"DefaultEnable",  1, L"./Gears.ini") == 1);
-	AutoGear1 =      (GetPrivateProfileInt(L"MAIN", L"AutoGear1",      0, L"./Gears.ini") == 1);
-	AutoReverse =    (GetPrivateProfileInt(L"MAIN", L"AutoReverse",    0, L"./Gears.ini") == 1);
-	RealReverse =    (GetPrivateProfileInt(L"MAIN", L"RealReverse",    1, L"./Gears.ini") == 1);
-	SimpleBike =     (GetPrivateProfileInt(L"MAIN", L"SimpleBike",     1, L"./Gears.ini") == 1);
-	EngDamage =      (GetPrivateProfileInt(L"MAIN", L"EngineDamage",   0, L"./Gears.ini") == 1);
-	EngStall =       (GetPrivateProfileInt(L"MAIN", L"EngineStalling", 0, L"./Gears.ini") == 1);
-	EngBrake =       (GetPrivateProfileInt(L"MAIN", L"EngineBraking",  0, L"./Gears.ini") == 1);
-	ClutchCatching = (GetPrivateProfileInt(L"MAIN", L"ClutchCatching", 0, L"./Gears.ini") == 1);
-	DefaultNeutral = (GetPrivateProfileInt(L"MAIN", L"DefaultNeutral", 0, L"./Gears.ini") == 1);
-	UITips =         (GetPrivateProfileInt(L"MAIN", L"UITips", 1, L"./Gears.ini") == 1);
-	Hshifter =       (GetPrivateProfileInt(L"CONTROLS", L"EnableH", 0, L"./Gears.ini") == 1);
-	Debug =          (GetPrivateProfileInt(L"DEBUG", L"Info", 0, L"./Gears.ini") == 1);
+	EnableManual =   (GetPrivateProfileIntA("MAIN", "DefaultEnable",  1, SETTINGSFILE) == 1);
+	AutoGear1 =      (GetPrivateProfileIntA("MAIN", "AutoGear1",      0, SETTINGSFILE) == 1);
+	AutoReverse =    (GetPrivateProfileIntA("MAIN", "AutoReverse",    0, SETTINGSFILE) == 1);
+	RealReverse =    (GetPrivateProfileIntA("MAIN", "RealReverse",    1, SETTINGSFILE) == 1);
+	SimpleBike =     (GetPrivateProfileIntA("MAIN", "SimpleBike",     1, SETTINGSFILE) == 1);
+	EngDamage =      (GetPrivateProfileIntA("MAIN", "EngineDamage",   0, SETTINGSFILE) == 1);
+	EngStall =       (GetPrivateProfileIntA("MAIN", "EngineStalling", 0, SETTINGSFILE) == 1);
+	EngBrake =       (GetPrivateProfileIntA("MAIN", "EngineBraking",  0, SETTINGSFILE) == 1);
+	ClutchCatching = (GetPrivateProfileIntA("MAIN", "ClutchCatching", 0, SETTINGSFILE) == 1);
+	DefaultNeutral = (GetPrivateProfileIntA("MAIN", "DefaultNeutral", 0, SETTINGSFILE) == 1);
+	UITips =         (GetPrivateProfileIntA("MAIN", "UITips",         1, SETTINGSFILE) == 1);
+	Hshifter =       (GetPrivateProfileIntA("CONTROLS", "EnableH",    0, SETTINGSFILE) == 1);
+	Debug =          (GetPrivateProfileIntA("DEBUG", "Info",          0, SETTINGSFILE) == 1);
 
 	char buffer[24] = {0};
-	GetPrivateProfileStringA("MAIN", "CToggle", "DpadRight", buffer, (DWORD)24, "./Gears.ini");
+	GetPrivateProfileStringA("MAIN", "CToggle", "DpadRight", buffer, (DWORD)24, SETTINGSFILE);
 	scriptControl->ControlXbox[ScriptControls::ControlType::CToggle] = buffer; 
 	
-	GetPrivateProfileStringA("CONTROLS", "ShiftUp", "A", buffer, (DWORD)24, "./Gears.ini");
+	GetPrivateProfileStringA("CONTROLS", "ShiftUp", "A", buffer, (DWORD)24, SETTINGSFILE);
 	scriptControl->ControlXbox[ScriptControls::ControlType::ShiftUp] = buffer;
 
-	GetPrivateProfileStringA("CONTROLS", "ShiftDown", "X", buffer, (DWORD)24, "./Gears.ini");
+	GetPrivateProfileStringA("CONTROLS", "ShiftDown", "X", buffer, (DWORD)24, SETTINGSFILE);
 	scriptControl->ControlXbox[ScriptControls::ControlType::ShiftDown] = buffer;
 
-	GetPrivateProfileStringA("CONTROLS", "Clutch", "LeftThumbDown", buffer, (DWORD)24, "./Gears.ini");
+	GetPrivateProfileStringA("CONTROLS", "Clutch", "LeftThumbDown", buffer, (DWORD)24, SETTINGSFILE);
 	scriptControl->ControlXbox[ScriptControls::ControlType::Clutch] = buffer;
 
-	GetPrivateProfileStringA("CONTROLS", "Engine", "DpadDown", buffer, (DWORD)24, "./Gears.ini");
+	GetPrivateProfileStringA("CONTROLS", "Engine", "DpadDown", buffer, (DWORD)24, SETTINGSFILE);
 	scriptControl->ControlXbox[ScriptControls::ControlType::Engine] = buffer;
 
-	GetPrivateProfileStringA("CONTROLS", "CThrottle", "RightTrigger", buffer, (DWORD)24, "./Gears.ini");
+	GetPrivateProfileStringA("CONTROLS", "CThrottle", "RightTrigger", buffer, (DWORD)24, SETTINGSFILE);
 	scriptControl->ControlXbox[ScriptControls::ControlType::CThrottle] = buffer;
 
-	GetPrivateProfileStringA("CONTROLS", "CBrake", "LeftTrigger", buffer, (DWORD)24, "./Gears.ini");
+	GetPrivateProfileStringA("CONTROLS", "CBrake", "LeftTrigger", buffer, (DWORD)24, SETTINGSFILE);
 	scriptControl->ControlXbox[ScriptControls::ControlType::CBrake] = buffer;
 
-	scriptControl->CToggleTime = GetPrivateProfileInt(L"MAIN", L"CToggleTime", 500, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::KToggle] = GetPrivateProfileInt(L"MAIN", L"KToggle", VK_OEM_5, L"./Gears.ini");
+	scriptControl->CToggleTime = GetPrivateProfileIntA("MAIN", "CToggleTime", 500, SETTINGSFILE);
+	scriptControl->Control[ScriptControls::ControlType::KToggle] = GetPrivateProfileIntA("MAIN", "KToggle", VK_OEM_5, SETTINGSFILE);
 
-	scriptControl->Control[ScriptControls::ControlType::KShiftUp] = GetPrivateProfileInt(L"CONTROLS", L"KShiftUp", VK_NUMPAD9, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::KShiftDown] = GetPrivateProfileInt(L"CONTROLS", L"KShiftDown", VK_NUMPAD7, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::KClutch] = GetPrivateProfileInt(L"CONTROLS", L"KClutch", VK_NUMPAD8, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::KEngine] = GetPrivateProfileInt(L"CONTROLS", L"KEngine", 0x45, L"./Gears.ini");
+	scriptControl->Control[ScriptControls::ControlType::KShiftUp] = GetPrivateProfileIntA("CONTROLS", "KShiftUp", VK_NUMPAD9, SETTINGSFILE);
+	scriptControl->Control[ScriptControls::ControlType::KShiftDown] = GetPrivateProfileIntA("CONTROLS", "KShiftDown", VK_NUMPAD7, SETTINGSFILE);
+	scriptControl->Control[ScriptControls::ControlType::KClutch] = GetPrivateProfileIntA("CONTROLS", "KClutch", VK_NUMPAD8, SETTINGSFILE);
+	scriptControl->Control[ScriptControls::ControlType::KEngine] = GetPrivateProfileIntA("CONTROLS", "KEngine", 0x45, SETTINGSFILE);
 
-	scriptControl->Control[ScriptControls::ControlType::ToggleH] = GetPrivateProfileInt(L"CONTROLS", L"ToggleH", VK_OEM_6, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::HR] = GetPrivateProfileInt(L"CONTROLS", L"HR", VK_NUMPAD0, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::H1] = GetPrivateProfileInt(L"CONTROLS", L"H1", VK_NUMPAD0, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::H2] = GetPrivateProfileInt(L"CONTROLS", L"H2", VK_NUMPAD0, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::H3] = GetPrivateProfileInt(L"CONTROLS", L"H3", VK_NUMPAD0, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::H4] = GetPrivateProfileInt(L"CONTROLS", L"H4", VK_NUMPAD0, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::H5] = GetPrivateProfileInt(L"CONTROLS", L"H5", VK_NUMPAD0, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::H6] = GetPrivateProfileInt(L"CONTROLS", L"H6", VK_NUMPAD0, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::H7] = GetPrivateProfileInt(L"CONTROLS", L"H7", VK_NUMPAD0, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::H8] = GetPrivateProfileInt(L"CONTROLS", L"H8", VK_NUMPAD0, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::KEngageNeutral] = GetPrivateProfileInt(L"CONTROLS", L"KNeutral", VK_DECIMAL, L"./Gears.ini");
+	scriptControl->Control[ScriptControls::ControlType::ToggleH] = GetPrivateProfileIntA("CONTROLS", "ToggleH", VK_OEM_6, SETTINGSFILE);
+	scriptControl->Control[ScriptControls::ControlType::HR] = GetPrivateProfileIntA("CONTROLS", "HR", VK_NUMPAD0, SETTINGSFILE);
+	scriptControl->Control[ScriptControls::ControlType::H1] = GetPrivateProfileIntA("CONTROLS", "H1", VK_NUMPAD0, SETTINGSFILE);
+	scriptControl->Control[ScriptControls::ControlType::H2] = GetPrivateProfileIntA("CONTROLS", "H2", VK_NUMPAD0, SETTINGSFILE);
+	scriptControl->Control[ScriptControls::ControlType::H3] = GetPrivateProfileIntA("CONTROLS", "H3", VK_NUMPAD0, SETTINGSFILE);
+	scriptControl->Control[ScriptControls::ControlType::H4] = GetPrivateProfileIntA("CONTROLS", "H4", VK_NUMPAD0, SETTINGSFILE);
+	scriptControl->Control[ScriptControls::ControlType::H5] = GetPrivateProfileIntA("CONTROLS", "H5", VK_NUMPAD0, SETTINGSFILE);
+	scriptControl->Control[ScriptControls::ControlType::H6] = GetPrivateProfileIntA("CONTROLS", "H6", VK_NUMPAD0, SETTINGSFILE);
+	scriptControl->Control[ScriptControls::ControlType::H7] = GetPrivateProfileIntA("CONTROLS", "H7", VK_NUMPAD0, SETTINGSFILE);
+	scriptControl->Control[ScriptControls::ControlType::H8] = GetPrivateProfileIntA("CONTROLS", "H8", VK_NUMPAD0, SETTINGSFILE);
+	scriptControl->Control[ScriptControls::KEngageNeutral] = GetPrivateProfileIntA("CONTROLS", "KNeutral", VK_DECIMAL, SETTINGSFILE);
 
-	scriptControl->Control[ScriptControls::ControlType::KThrottle] = GetPrivateProfileInt(L"CONTROLS", L"KThrottle", 0x57, L"./Gears.ini");
-	scriptControl->Control[ScriptControls::ControlType::KBrake] = GetPrivateProfileInt(L"CONTROLS", L"KBrake", 0x53, L"./Gears.ini");
+	scriptControl->Control[ScriptControls::ControlType::KThrottle] = GetPrivateProfileIntA("CONTROLS", "KThrottle", 0x57, SETTINGSFILE);
+	scriptControl->Control[ScriptControls::ControlType::KBrake] = GetPrivateProfileIntA("CONTROLS", "KBrake", 0x53, SETTINGSFILE);
 	Check();
 }
 
 void ScriptSettings::Save() {
-	WritePrivateProfileString(L"MAIN", L"DefaultEnable", (EnableManual ? L" 1" : L" 0"), L"./Gears.ini");
-	WritePrivateProfileString(L"CONTROLS", L"EnableH", (Hshifter ? L" 1" : L" 0"), L"./Gears.ini");
+	WritePrivateProfileStringA("MAIN", "DefaultEnable", (EnableManual ? " 1" : " 0"), SETTINGSFILE);
+	WritePrivateProfileStringA("CONTROLS", "EnableH", (Hshifter ? " 1" : " 0"), SETTINGSFILE);
 }
 
 // Checks for conflicting settings and adjusts them
@@ -89,6 +89,6 @@ void ScriptSettings::Check() {
 		Logger logger("./Gears.log");
 		logger.Write("AutoReverse and RealReverse conflict. Adjusting to RealReverse");
 		AutoReverse = false;
-		WritePrivateProfileString(L"MAIN", L"AutoReverse", L" 0", L"./Gears.ini");
+		WritePrivateProfileStringA("MAIN", "AutoReverse", " 0", SETTINGSFILE);
 	}
 }

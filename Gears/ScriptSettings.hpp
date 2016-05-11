@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include "ScriptControls.hpp"
 
+#define SETTINGSFILE "Gears.ini"
+
 class ScriptSettings
 {
 public:
