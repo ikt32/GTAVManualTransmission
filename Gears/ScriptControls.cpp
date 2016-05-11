@@ -20,15 +20,15 @@ bool ScriptControls::IsKeyPressed(int key) {
 }
 
 bool ScriptControls::IsKeyJustPressed(int key, ControlType control) {
-	ControlCurr[control] = (GetAsyncKeyState(key) & 0x8000) != 0;
+	ControlCurr[(int)control] = (GetAsyncKeyState(key) & 0x8000) != 0;
 
 	// raising edge
-	if (ControlCurr[control] && !ControlPrev[control]) {
-		ControlPrev[control] = ControlCurr[control];
+	if (ControlCurr[(int)control] && !ControlPrev[(int)control]) {
+		ControlPrev[(int)control] = ControlCurr[(int)control];
 		return true;
 	}
 
-	ControlPrev[control] = ControlCurr[control];
+	ControlPrev[(int)control] = ControlCurr[(int)control];
 	return false;
 }
 

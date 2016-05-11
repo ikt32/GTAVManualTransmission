@@ -9,8 +9,9 @@ http://dev-c.com
 #include "..\..\ScriptHookV_SDK\inc\natives.h"
 #include "..\..\ScriptHookV_SDK\inc\types.h"
 #include "..\..\ScriptHookV_SDK\inc\enums.h"
-
 #include "..\..\ScriptHookV_SDK\inc\main.h"
+
+#include "..\..\LogitechSteeringWheelSDK\Include\LogitechSteeringWheelLib.h"
 
 void ScriptMain();
 
@@ -27,5 +28,6 @@ void functionEngStall();
 void functionClutchCatch();
 void functionHShift();
 void functionSShift();
+void functionLogitechShift();
 void shiftTo(int gear);
 void handleRPM();

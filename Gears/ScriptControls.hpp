@@ -6,7 +6,8 @@
 class ScriptControls
 {
 public:
-	enum ControlType {
+	// todo: Something about these enums and scopes
+	enum class ControlType {
 		HR = 0,
 		H1,
 		H2,
@@ -34,6 +35,26 @@ public:
 		KEngageNeutral,
 		SIZEOF_ControlType
 	};
+	
+	enum class LogiControlType {
+		HR = 0,
+		H1,
+		H2,
+		H3,
+		H4,
+		H5,
+		H6,
+		N,
+		ShiftUp,
+		ShiftDown,
+		Clutch,
+		Throttle,
+		Brake,
+		Engine,
+		Toggle,
+		SIZEOF_LogiControlType
+	};
+	
 
 public:
 	ScriptControls();
@@ -43,10 +64,12 @@ public:
 
 	bool WasControlPressedForMs(int control, int ms);
 
-	int Control[SIZEOF_ControlType];
+	int Control[(int)ControlType::SIZEOF_ControlType];
+	int LogiControl[(int)LogiControlType::SIZEOF_LogiControlType];
+
 	int CToggleTime;
-	bool ControlCurr[SIZEOF_ControlType];
-	bool ControlPrev[SIZEOF_ControlType];
+	bool ControlCurr[(int)ControlType::SIZEOF_ControlType];
+	bool ControlPrev[(int)ControlType::SIZEOF_ControlType];
 
 	float Ltvalf = 0.0f;
 	float Rtvalf = 0.0f;
@@ -54,7 +77,7 @@ public:
 	int Accelval;
 	float Accelvalf = 0.0f;
 
-	std::string ControlXbox[SIZEOF_ControlType];
+	std::string ControlXbox[(int)ControlType::SIZEOF_ControlType];
 
 private:
 	long long pressTime;

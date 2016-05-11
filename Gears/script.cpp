@@ -18,6 +18,7 @@ ScriptSettings settings;
 VehicleData vehData;
 VehicleExtensions ext;
 XboxController controller(1);
+int logiIndex = 0;
 
 Vehicle vehicle;
 Vehicle prevVehicle;
@@ -41,12 +42,17 @@ void toggleManual();
 bool lastKeyboard();
 
 void update() {
+	if (settings.LogiWheel) {
+		if (!LogiUpdate())
+			logger.Write("LogiUpdate failed");
+	}
+
 	if (controller.IsConnected()) {
 		buttonState = controller.GetState().Gamepad.wButtons;
 		controller.UpdateButtonChangeStates();
 	}
 
-	if (controls.IsKeyJustPressed(controls.Control[ScriptControls::KToggle], ScriptControls::KToggle)) {
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KToggle], ScriptControls::ControlType::KToggle)) {
 		toggleManual();
 	}
 
@@ -83,12 +89,12 @@ void update() {
 		reInit();
 	}
 
-	if (controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[ScriptControls::CToggle]), buttonState, controls.CToggleTime) &&
+	if (controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CToggle]), buttonState, controls.CToggleTime) &&
 		!lastKeyboard()) {
 		toggleManual();
 	}
 
-	if (controls.IsKeyJustPressed(controls.Control[ScriptControls::ToggleH], ScriptControls::ToggleH)) {
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::ToggleH], ScriptControls::ControlType::ToggleH)) {
 		settings.Hshifter = !settings.Hshifter;
 		std::stringstream message;
 		message << "Mode: " <<
@@ -101,15 +107,16 @@ void update() {
 	simpleBike = vehData.IsBike && settings.SimpleBike;
 
 	if (lastKeyboard()) {
-		controls.Rtvalf     = (controls.IsKeyPressed(controls.Control[ScriptControls::KThrottle]) ? 1.0f : 0.0f);
-		controls.Ltvalf     = (controls.IsKeyPressed(controls.Control[ScriptControls::KBrake]) ? 1.0f : 0.0f);
-		controls.Clutchvalf = (controls.IsKeyPressed(controls.Control[ScriptControls::KClutch]) ? 1.0f : 0.0f);
+		controls.Rtvalf     = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KThrottle]) ? 1.0f : 0.0f);
+		controls.Ltvalf     = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KBrake]) ? 1.0f : 0.0f);
+		controls.Clutchvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KClutch]) ? 1.0f : 0.0f);
 	}
 	else {
-		controls.Rtvalf     = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[ScriptControls::CThrottle]), buttonState);
-		controls.Ltvalf     = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[ScriptControls::CBrake]), buttonState);
-		controls.Clutchvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[ScriptControls::Clutch]), buttonState);
+		controls.Rtvalf     = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CThrottle]), buttonState);
+		controls.Ltvalf     = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CBrake]), buttonState);
+		controls.Clutchvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::Clutch]), buttonState);
 	}
+
 	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
@@ -172,8 +179,8 @@ void update() {
 	}
 
 	// Simulated neutral gear
-	if (controls.IsKeyJustPressed(controls.Control[ScriptControls::KEngageNeutral], ScriptControls::KEngageNeutral) ||
-		(controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[ScriptControls::ShiftDown]), buttonState, controls.CToggleTime) &&
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KEngageNeutral], ScriptControls::ControlType::KEngageNeutral) ||
+		(controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::ShiftDown]), buttonState, controls.CToggleTime) &&
 			!lastKeyboard())) {
 		vehData.SimulatedNeutral = !vehData.SimulatedNeutral;
 		return; //cuz we don't wanna shift this loop! hacky af but *shrug*
@@ -241,6 +248,10 @@ void update() {
 		functionSShift();
 	}
 
+	if (settings.LogiWheel) {
+		functionLogitechShift();
+	}
+
 	// Finally, update memory each loop
 	handleRPM();
 	ext.SetClutch(vehicle, 1.0f - controls.Clutchvalf);
@@ -249,6 +260,14 @@ void update() {
 
 void main() {
 	settings.Read(&controls);
+
+	if (settings.LogiWheel) {
+		LogiSteeringInitialize(TRUE);
+		if (LogiUpdate() && LogiIsConnected(logiIndex)) {
+			logger.Write("Wheel initialized");
+		}
+	}
+
 	while (true) {
 		update();
 		WAIT(0);
@@ -329,26 +348,46 @@ bool lastKeyboard() {
 void functionHShift() {
 	// All keys checking
 	for (uint8_t i = 0; i <= vehData.TopGear; i++) {
-		if (i > ScriptControls::H8) // this shit is just silly can I rly do dis?
-			i = ScriptControls::H8; // holy shit bad, bad, hacky idea
+		if (i > (int)ScriptControls::ControlType::H8) // this shit is just silly can I rly do dis?
+			i = (int)ScriptControls::ControlType::H8; // holy shit bad, bad, hacky idea
 		if (controls.IsKeyJustPressed(controls.Control[i], (ScriptControls::ControlType)i)) {
 			shiftTo(i);
 		}
 	}
 }
 
+void functionLogitechShift() {
+	if (LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::HR]))
+		shiftTo(0);
+	if (LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::H1]))
+		shiftTo(1);
+	if (LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::H2]))
+		shiftTo(2);
+	if (LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::H3]))
+		shiftTo(3);
+	if (LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::H4]))
+		shiftTo(4);
+	if (LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::H5]))
+		shiftTo(5);
+	if (LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::H6]))
+		shiftTo(6);
+
+}
+
 void functionSShift() {
 	// Shift up
-	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[ScriptControls::ShiftUp]), buttonState) ||
-		controls.IsKeyJustPressed(controls.Control[ScriptControls::KShiftUp], ScriptControls::KShiftUp)) {
+	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::ShiftUp]), buttonState) ||
+		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KShiftUp], ScriptControls::ControlType::KShiftUp) ||
+		LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftUp])) {
 		if (vehData.CurrGear < vehData.TopGear) {
 			shiftTo(vehData.LockGear + 1);
 		}
 	}
 
 	// Shift down
-	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[ScriptControls::ShiftDown]), buttonState) ||
-		controls.IsKeyJustPressed(controls.Control[ScriptControls::KShiftDown], ScriptControls::KShiftDown)) {
+	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::ShiftDown]), buttonState) ||
+		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KShiftDown], ScriptControls::ControlType::KShiftDown) ||
+		LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftDown])) {
 		if (vehData.CurrGear > 0) {
 			shiftTo(vehData.LockGear - 1);
 		}
@@ -390,8 +429,8 @@ void functionEngStall() {
 		}
 	}
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
-		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[ScriptControls::Engine]), buttonState) ||
-			controls.IsKeyJustPressed(controls.Control[ScriptControls::KEngine], ScriptControls::KEngine))) {
+		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::Engine]), buttonState) ||
+			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KEngine], ScriptControls::ControlType::KEngine))) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 }

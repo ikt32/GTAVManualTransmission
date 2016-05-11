@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include "ScriptControls.hpp"
 
-#define SETTINGSFILE "Gears.ini"
+#define SETTINGSFILE "./Gears.ini"
 
 class ScriptSettings
 {
@@ -26,6 +26,8 @@ public:
 	bool DefaultNeutral;
 	bool UITips;
 	bool Hshifter;
+	bool LogiWheel;
+
 	bool Debug;
 private:
 	void Check();

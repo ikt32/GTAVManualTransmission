@@ -5,7 +5,7 @@
 #include <fstream>
 #include <iomanip>
 
-#define LOGFILE "Gears.log"
+#define LOGFILE "./Gears.log"
 
 class Logger {
 public:
