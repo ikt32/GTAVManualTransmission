@@ -8,7 +8,7 @@ namespace MemoryPatcher
 	extern bool RestoreInstructions();
 	extern bool RestoreJustS_LOW();
 	
-	// Clutch disengage @ Low Speed High Gear 
+	// Clutch disengage @ Low Speed High Gear, low RPM
 	extern uintptr_t PatchClutchLow();
 	extern void RestoreClutchLow(uintptr_t address);
 
@@ -25,6 +25,7 @@ namespace MemoryPatcher
 	extern void RestoreThrottleRedline(uintptr_t address);
 
 	// Clutch small value @ full press
+	// Affects other vehicles!
 	extern uintptr_t PatchClutchStationaryLow();
 	extern void RestoreClutchStationaryLow(uintptr_t address);
 
