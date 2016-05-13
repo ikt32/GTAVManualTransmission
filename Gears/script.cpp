@@ -354,7 +354,7 @@ void functionHShift() {
 			shiftTo(i);
 		}
 	}
-	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KEngageNeutral], ScriptControls::ControlType::KEngageNeutral)) {
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::HN], ScriptControls::ControlType::HN)) {
 		vehData.SimulatedNeutral = !vehData.SimulatedNeutral;
 	}
 }
