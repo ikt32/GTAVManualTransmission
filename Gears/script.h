@@ -15,12 +15,9 @@ http://dev-c.com
 
 void ScriptMain();
 
-// Eh.
-
-void functionAutoGear1();
 void functionAutoReverse();
 void functionRealReverse();
-void functionBlockingReverse();
+void functionSimpleReverse();
 void functionTruckLimiting();
 void functionEngBrake();
 void functionEngDamage();

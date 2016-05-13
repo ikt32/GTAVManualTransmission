@@ -199,25 +199,18 @@ void update() {
 
 	// BELOW THIS LINE THE FUNCTIONAL STUFF
 
-	// Automatically engage first gear when stationary
-	if (settings.AutoGear1) {
-		functionAutoGear1();
-	}
-
 	// Reverse behavior
 	// For bikes, do this automatically.
-	// Also if the user chooses to.
-	if (vehData.IsBike || settings.AutoReverse) {
 		functionAutoReverse();
 	}
 
 	// New reverse: Reverse with throttle
-	if (settings.RealReverse) {
+	if (settings.RealReverse && !vehData.IsBike) {
 		functionRealReverse();
 	}
-	// Reversing behavior: blocking
+	// Reversing behavior: just block the direction you don't wanna go to
 	if (!settings.RealReverse) {
-		functionBlockingReverse();
+		functionSimpleReverse();
 	}
 
 	// Limit truck speed per gear upon game wanting to shift, but we block it.
@@ -238,6 +231,11 @@ void update() {
 	// Stalling
 	if (settings.EngStall && !simpleBike) {
 		functionEngStall();
+	}
+	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
+		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::Engine]), buttonState) ||
+			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KEngine], ScriptControls::ControlType::KEngine))) {
+		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 	
 	// Simulate "catch point"
@@ -457,17 +455,11 @@ void functionClutchCatch() {
 }
 
 void functionEngStall() {
-	/*if (vehData.Clutch > 0.65f &&
-		((vehData.Speed < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && vehData.Speed < 1.0f))
-		&& vehData.Rpm < 0.27f) {
+	if (vehData.Clutch > 0.75f	&& vehData.Rpm < 0.25f &&
+		((vehData.Speed < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && vehData.Speed < 1.0f))) {
 		if (VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle)) {
 			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 		}
-	}*/
-	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
-		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::Engine]), buttonState) ||
-			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KEngine], ScriptControls::ControlType::KEngine))) {
-		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 }
 
@@ -588,37 +580,38 @@ void functionRealReverse() {
 	}
 }
 
-void functionBlockingReverse() {
-	//Park/Reverse. Gear 0. Prevent going forward in gear 0.
-	if (vehData.CurrGear == 0
-		&& vehData.Throttle > 0) {
-		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+void functionSimpleReverse() {
+	// Prevent going forward in gear 0.
+	if (vehData.CurrGear == 0 && vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f
+		&& controls.Rtvalf > 0) {
 		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
 	}
-	// Forward gears. Prevent reversing.
-	else if (vehData.CurrGear > 0
-		&& vehData.Throttle < 0) {
-		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+	// Prevent reversing in gear >= 1.
+	if (vehData.CurrGear > 0 && vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f
+		&& controls.Ltvalf > 0 ) {
 		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-	}
-	else {
-		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 	}
 }
 
 void functionAutoReverse() {
-	if (vehData.CurrGear == 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
+	// Go forward
+	if (CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
 		&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && vehData.Velocity > -1.0f) {
-		vehData.LockGears = 0x00010001;
+		if (vehData.CurrGear == 0) {
+			vehData.LockGears = 0x00010001;
+		}
 	}
-	else if (vehData.CurrGear > 0 && CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake)
-		&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && vehData.Velocity < 1.0f) {
-		vehData.LockGears = 0x00000000;
-	}
-}
 
-void functionAutoGear1() {
-	if (vehData.Throttle < 0.1f && vehData.Speed < 0.1f && vehData.CurrGear > 1) {
-		vehData.LockGears = 0x00010001;
+	// Reverse
+	if (CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake)
+		&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && vehData.Velocity < 1.0f) {
+		if (vehData.CurrGear > 0) {	
+			if (vehData.SimulatedNeutral) {
+				vehData.SimulatedNeutral = false;
+			}
+			vehData.LockGears = 0x00000000;
+		}
 	}
 }
