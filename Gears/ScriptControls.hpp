@@ -6,6 +6,39 @@
 class ScriptControls
 {
 public:
+	enum class ControllerControlType {
+		ShiftUp,
+		ShiftDown,
+		Clutch,
+		CThrottle,
+		CBrake,
+		CToggle,
+		Engine,
+		SIZEOF_ControllerControlType
+	};
+
+	enum class KeyboardControlType {
+		HR = 0,
+		H1,
+		H2,
+		H3,
+		H4,
+		H5,
+		H6,
+		H7,
+		H8,
+		HN,
+		KToggle,
+		ToggleH,
+		KShiftUp,
+		KShiftDown,
+		KClutch,
+		KThrottle,
+		KBrake,
+		KEngine,
+		SIZEOF_KeyboardControlType
+	};
+
 	// todo: Something about these enums and scopes
 	enum class ControlType {
 		HR = 0,
@@ -17,6 +50,7 @@ public:
 		H6,
 		H7,
 		H8,
+		HN,
 		ShiftUp,
 		ShiftDown,
 		Clutch,
@@ -32,7 +66,6 @@ public:
 		Engine,
 		KEngine,
 		CToggle,
-		KEngageNeutral,
 		SIZEOF_ControlType
 	};
 	
