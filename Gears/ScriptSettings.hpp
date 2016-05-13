@@ -29,7 +29,11 @@ public:
 	bool LogiWheel;
 
 	bool Debug;
+
+	float UITips_X;
+	float UITips_Y;
+	float UITips_Size;
 //private:
-	//void Check();
+	void Check();
 };
 

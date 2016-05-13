@@ -191,10 +191,10 @@ void update() {
 	
 	if (settings.UITips) {
 		if (vehData.SimulatedNeutral) {
-			showText(0.9f, 0.9f, 1.5f, "N");
+			showText(settings.UITips_X, settings.UITips_Y, settings.UITips_Size, "N");
 		}
 		else {
-			showText(0.9f, 0.9f, 1.5f, (char *)std::to_string(vehData.CurrGear).c_str());
+			showText(settings.UITips_X, settings.UITips_Y, settings.UITips_Size, (char *)std::to_string(vehData.CurrGear).c_str());
 		}
 	}
 	

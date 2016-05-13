@@ -29,9 +29,15 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	ClutchCatching = (GetPrivateProfileIntA("MAIN", "ClutchCatching", 0, SETTINGSFILE) == 1);
 	DefaultNeutral = (GetPrivateProfileIntA("MAIN", "DefaultNeutral", 0, SETTINGSFILE) == 1);
 	UITips =         (GetPrivateProfileIntA("MAIN", "UITips",         1, SETTINGSFILE) == 1);
+	UITips_X =       GetPrivateProfileIntA("MAIN", "UITips_X",      95, SETTINGSFILE)/100.0f;
+	UITips_Y =       GetPrivateProfileIntA("MAIN", "UITips_Y",      95, SETTINGSFILE)/100.0f;
+	UITips_Size =    GetPrivateProfileIntA("MAIN", "UITips_Size",   15, SETTINGSFILE)/100.0f;
+
 	Hshifter =       (GetPrivateProfileIntA("CONTROLS", "EnableH",    0, SETTINGSFILE) == 1);
 	LogiWheel =      (GetPrivateProfileIntA("LOGITECHWHEEL", "Enable",0, SETTINGSFILE) == 1);
 	Debug =          (GetPrivateProfileIntA("DEBUG", "Info",          0, SETTINGSFILE) == 1);
+
+	Check();
 
 	char buffer[24] = {0};
 	GetPrivateProfileStringA("MAIN", "CToggle", "DpadRight", buffer, (DWORD)24, SETTINGSFILE);
@@ -107,3 +113,17 @@ void ScriptSettings::Check() {
 	}
 }
 */
+
+void ScriptSettings::Check() {
+	Logger logger(LOGFILE);
+	if (UITips_X > 100) {
+		UITips_X = 100;
+		logger.Write("UITips_X higher than 100, reverting");
+		WritePrivateProfileStringA("MAIN", "UITips_X", "100", SETTINGSFILE);
+	}
+	if (UITips_Y > 100) {
+		UITips_Y = 100;
+		logger.Write("UITips_Y higher than 100, reverting");
+		WritePrivateProfileStringA("MAIN", "UITips_Y", "100", SETTINGSFILE);
+	}
+}
