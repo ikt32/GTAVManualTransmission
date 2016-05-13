@@ -201,6 +201,7 @@ void update() {
 
 	// Reverse behavior
 	// For bikes, do this automatically.
+	if (vehData.IsBike) {
 		functionAutoReverse();
 	}
 
