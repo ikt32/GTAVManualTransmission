@@ -11,7 +11,7 @@ http://dev-c.com
 #include "..\..\ScriptHookV_SDK\inc\enums.h"
 #include "..\..\ScriptHookV_SDK\inc\main.h"
 
-#include "..\..\LogitechSteeringWheelSDK\Include\LogitechSteeringWheelLib.h"
+#include "..\..\LogitechSteeringWheel_SDK\Include\LogitechSteeringWheelLib.h"
 
 void ScriptMain();
 
