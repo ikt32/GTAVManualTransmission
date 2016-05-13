@@ -182,12 +182,12 @@ void update() {
 
 	
 	// Simulated neutral gear
-	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KEngageNeutral], ScriptControls::ControlType::KEngageNeutral) ||
+	/*if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KEngageNeutral], ScriptControls::ControlType::KEngageNeutral) ||
 		(controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::ShiftDown]), buttonState, controls.CToggleTime) &&
 			!lastKeyboard())) {
 		vehData.SimulatedNeutral = !vehData.SimulatedNeutral;
 		return; //cuz we don't wanna shift this loop! hacky af but *shrug*
-	}
+	}*/
 	
 	if (settings.UITips) {
 		if (vehData.SimulatedNeutral) {
@@ -362,6 +362,9 @@ void functionHShift() {
 		if (controls.IsKeyJustPressed(controls.Control[i], (ScriptControls::ControlType)i)) {
 			shiftTo(i);
 		}
+	}
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KEngageNeutral], ScriptControls::ControlType::KEngageNeutral)) {
+		vehData.SimulatedNeutral = !vehData.SimulatedNeutral;
 	}
 }
 
