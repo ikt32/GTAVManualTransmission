@@ -59,11 +59,18 @@ void update() {
 	player = PLAYER::PLAYER_ID();
 	playerPed = PLAYER::PLAYER_PED_ID();
 
+
 	if (!ENTITY::DOES_ENTITY_EXIST(playerPed) ||
 		!PLAYER::IS_PLAYER_CONTROL_ON(player) || 
 		ENTITY::IS_ENTITY_DEAD(playerPed) || 
 		PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE))
 		return;
+
+	if (!PED::IS_PED_IN_ANY_VEHICLE(playerPed, true)) {
+		if (patchedSpecial) {
+			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
+		}
+	}
 
 	vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
 	model = ENTITY::GET_ENTITY_MODEL(vehicle);
