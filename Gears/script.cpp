@@ -122,13 +122,8 @@ void update() {
 
 	// Put here to override last control readout for Clutchvalf
 	if (vehData.SimulatedNeutral) {
-		controls.Clutchvalf = 1.0f; // same difference in gameplay
+		controls.Clutchvalf = 1.0f;
 	}
-
-	// Override SimulatedNeutral on a bike
-	/*if (simpleBike) {
-		controls.Clutchvalf = 0.0f;
-	}*/
 
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
 	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
@@ -233,6 +228,7 @@ void update() {
 	if (settings.EngStall && !simpleBike) {
 		functionEngStall();
 	}
+
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
 		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::Engine]), buttonState) ||
 			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KEngine], ScriptControls::ControlType::KEngine))) {
@@ -445,13 +441,10 @@ void shiftTo(int gear) {
 void functionClutchCatch() {
 	if (vehData.Clutch >= 0.2f) {
 		// Forward
-		if (vehData.CurrGear > 0 && vehData.Velocity < vehData.CurrGear * 2.2f && controls.Rtvalf < 0.25f) {
+		if (vehData.CurrGear > 0 && vehData.Velocity < vehData.CurrGear * 2.2f &&
+			controls.Rtvalf < 0.25f && controls.Ltvalf < 0.95 ) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.37f);
 		}
-		// Reverse
-		/*else if (vehData.CurrGear == 0 && vehData.Velocity > -2.2f && controls.Rtvalf < 0.25f && controls.Ltvalf < 0.25f) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.30f);
-		}*/
 	}
 }
 
