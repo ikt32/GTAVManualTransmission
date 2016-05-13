@@ -179,15 +179,6 @@ void update() {
 			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
 		}
 	}
-
-	
-	// Simulated neutral gear
-	/*if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KEngageNeutral], ScriptControls::ControlType::KEngageNeutral) ||
-		(controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::ShiftDown]), buttonState, controls.CToggleTime) &&
-			!lastKeyboard())) {
-		vehData.SimulatedNeutral = !vehData.SimulatedNeutral;
-		return; //cuz we don't wanna shift this loop! hacky af but *shrug*
-	}*/
 	
 	if (settings.UITips) {
 		if (vehData.SimulatedNeutral) {
@@ -383,7 +374,6 @@ void functionLogitechShift() {
 		shiftTo(5);
 	if (LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::H6]))
 		shiftTo(6);
-
 }
 
 void functionSShift() {
