@@ -14,8 +14,8 @@ public:
 	void Save();
 
 	bool EnableManual;
-	bool AutoGear1;
-	bool AutoReverse;
+	//bool AutoGear1;
+	//bool AutoReverse;
 	bool RealReverse;
 	bool SimpleBike;
 
@@ -29,7 +29,7 @@ public:
 	bool LogiWheel;
 
 	bool Debug;
-private:
-	void Check();
+//private:
+	//void Check();
 };
 
