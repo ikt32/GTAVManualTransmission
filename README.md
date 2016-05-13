@@ -21,3 +21,8 @@ This is an ASI script allowing for manual control over the ingame gearbox.
 
 Download the [ScriptHookV SDK](http://www.dev-c.com/gtav/scripthookv/) and extract it's contents to ScriptHookV_SDK. 
 Clone this repository to the same folder ScriptHookV_SDK was extracted so you have ScriptHookV_SDK and GTAVManualTransmission in the same folder.
+
+Download the [Logitech Steering Wheel SDK](http://gaming.logitech.com/en-us/developers) and extract it's contents to LogitechSteeringWheel_SDK. 
+Clone this repository to the same folder LogitechSteeringWheel_SDK was extracted so you have LogitechSteeringWheel_SDK and GTAVManualTransmission in the same folder.
+
+
