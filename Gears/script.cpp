@@ -43,8 +43,8 @@ bool lastKeyboard();
 
 void update() {
 	if (settings.LogiWheel) {
-		if (!LogiUpdate())
-			logger.Write("LogiUpdate failed");
+		if (!LogiUpdate() || !LogiIsConnected(logiIndex))
+			logger.Write("Wheel not connected");
 	}
 
 	if (controller.IsConnected()) {
@@ -126,9 +126,9 @@ void update() {
 	}
 
 	// Override SimulatedNeutral on a bike
-	if (simpleBike) {
+	/*if (simpleBike) {
 		controls.Clutchvalf = 0.0f;
-	}
+	}*/
 
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
 	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
@@ -178,6 +178,7 @@ void update() {
 		}
 	}
 
+	
 	// Simulated neutral gear
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KEngageNeutral], ScriptControls::ControlType::KEngageNeutral) ||
 		(controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::ShiftDown]), buttonState, controls.CToggleTime) &&
@@ -185,10 +186,16 @@ void update() {
 		vehData.SimulatedNeutral = !vehData.SimulatedNeutral;
 		return; //cuz we don't wanna shift this loop! hacky af but *shrug*
 	}
-
-	if (settings.UITips && vehData.SimulatedNeutral && !simpleBike) {
-		showText(0.95f, 0.90f, 1.4f, "N");
+	
+	if (settings.UITips) {
+		if (vehData.SimulatedNeutral) {
+			showText(0.9f, 0.9f, 1.5f, "N");
+		}
+		else {
+			showText(0.9f, 0.9f, 1.5f, (char *)std::to_string(vehData.CurrGear).c_str());
+		}
 	}
+	
 
 	// BELOW THIS LINE THE FUNCTIONAL STUFF
 
@@ -379,6 +386,21 @@ void functionSShift() {
 	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::ShiftUp]), buttonState) ||
 		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KShiftUp], ScriptControls::ControlType::KShiftUp) ||
 		LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftUp])) {
+		
+		// Reverse to Neutral
+		if (vehData.CurrGear == 0 && !vehData.SimulatedNeutral) {
+			shiftTo(1);
+			vehData.SimulatedNeutral = true;
+			return;
+		}
+
+		// Neutral to 1
+		if (vehData.CurrGear == 1 && vehData.SimulatedNeutral) {
+			vehData.SimulatedNeutral = false;
+			return;
+		}
+		
+		// 1 to X
 		if (vehData.CurrGear < vehData.TopGear) {
 			shiftTo(vehData.LockGear + 1);
 		}
@@ -388,7 +410,22 @@ void functionSShift() {
 	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::ShiftDown]), buttonState) ||
 		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KShiftDown], ScriptControls::ControlType::KShiftDown) ||
 		LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftDown])) {
-		if (vehData.CurrGear > 0) {
+		
+		// 1 to Neutral
+		if (vehData.CurrGear == 1 && !vehData.SimulatedNeutral) {
+			vehData.SimulatedNeutral = true;
+			return;
+		}
+
+		// Neutral to R
+		if (vehData.CurrGear == 1 && vehData.SimulatedNeutral) {
+			shiftTo(0);
+			vehData.SimulatedNeutral = false;
+			return;
+		}
+
+		// X to 1
+		if (vehData.CurrGear > 1) {
 			shiftTo(vehData.LockGear - 1);
 		}
 	}
@@ -420,14 +457,13 @@ void functionClutchCatch() {
 }
 
 void functionEngStall() {
-	if (vehData.Clutch > 0.65f &&
+	/*if (vehData.Clutch > 0.65f &&
 		((vehData.Speed < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && vehData.Speed < 1.0f))
 		&& vehData.Rpm < 0.27f) {
 		if (VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle)) {
-			// Maybe add "jerk" on sudden stall?
 			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 		}
-	}
+	}*/
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
 		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::Engine]), buttonState) ||
 			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KEngine], ScriptControls::ControlType::KEngine))) {
