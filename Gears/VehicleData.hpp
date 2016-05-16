@@ -24,8 +24,14 @@ public:
 	float Clutch;
 	float Throttle;
 	float Turbo;
+
+	// Absolute speed, in m/s
 	float Speed;
+
+	// Directional speed, in m/s
 	float Velocity;
+
+
 	uint8_t TopGear;
 	uint8_t LockGear;
 	uint32_t CurrGear;
