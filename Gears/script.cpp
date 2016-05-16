@@ -122,6 +122,7 @@ void update() {
 		message << "Mode: " <<
 			(settings.Hshifter ? "H-Shifter" : "Sequential");
 		showNotification((char *)message.str().c_str());
+		settings.Save();
 	}
 
 	vehData.ReadMemData(ext, vehicle);
@@ -143,21 +144,17 @@ void update() {
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
 	if (logiWheelActive) {
-
 		LogiPlayLeds(index_, vehData.Rpm, 0.3f, 1.0f);
 
 		int damperforce = 0;
-
-		damperforce = 100 - 20 * vehData.Speed;
-
-		if (vehData.Speed > 5.0f) {
-			damperforce = 20;
+		damperforce = 100 - 3*(int)(vehData.Speed);
+		if (vehData.Speed > 20.0f) {
+			damperforce = 40;
 		}
-
 		LogiPlayDamperForce(index_, damperforce);
 		
 		if (vehData.Speed > 2.0f) {
-			LogiPlaySpringForce(index_, 0, 100, vehData.Speed);
+			LogiPlaySpringForce(index_, 0, 100, (int)(vehData.Speed));
 		}
 
 		curSteeringWheelPos = LogiGetState(index_)->lX;
@@ -166,35 +163,46 @@ void update() {
 		curClutchPos = LogiGetState(index_)->rglSlider[1];
 
 		curWheel = ((float)curSteeringWheelPos) / 65536.0f * .2f * -1;
-		curThrottle = ((float)curThrottlePos) / 65536.0 * -1 + 0.5f;
+		curThrottle = ((float)curThrottlePos) / -65536.0f + 0.5f;
 		curBrake = ((float)curBrakePos) / 65536.0f * -1 + 0.5f;
 		curClutch = ((float)curClutchPos) / 65536.0f + 0.5f;
 		
+		
+		if (controller.SetAnalogValue(XboxController::RightTrigger, (int)(curThrottle * 255)) &&
+			controller.SetAnalogValue(XboxController::LeftTrigger, (int)(curBrake * 255))) {
+
+		}
+		else {
+			showText(0.4, 0.16, 0.4, "ptr = null");
+		}
+		
+
 		//controls.Rtvalf = curThrottle;
 		//controls.Ltvalf = curBrake;
+		controls.Rtvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CThrottle]), buttonState);
+		controls.Ltvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CBrake]), buttonState);
+
 		controls.Clutchvalf = 1 - curClutch;
 
 
 		// Anti-deadzone
+		int additionalOffset = 2560;
 		float antiDeadzoned = 0.0f;
 		antiDeadzoned = curSteeringWheelPos / 32768.0f;
 		if (//curSteeringWheelPos > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
 			curSteeringWheelPos <= 0) {
-			antiDeadzoned = (curSteeringWheelPos - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) / (32768.0f - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+			antiDeadzoned = (curSteeringWheelPos - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE - additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
 		}
 		if (//curSteeringWheelPos > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
 			curSteeringWheelPos > 0) {
-			antiDeadzoned = (curSteeringWheelPos + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+			antiDeadzoned = (curSteeringWheelPos + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
 		}
-
-		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, curSteeringWheelPos / 32768.0f);
+		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
 
 		//CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleAccelerate, curThrottle);
 		//CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleBrake, curBrake);
-		
-		
-		//CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleMoveLeftRight, true);
-		//VEHICLE::SET_VEHICLE_STEER_BIAS(vehicle, steerval);
+
+
 
 		if (settings.Debug) {
 			std::stringstream throttleDisplay;
@@ -203,12 +211,15 @@ void update() {
 			brakeDisplay << "B: " << curBrake;
 			std::stringstream clutchDisplay;
 			clutchDisplay << "C: " << curClutch;
-			float steerval = -0.1f * (curSteeringWheelPos / 32768.0f);
-			showText(0.4, 0.2, 1.0, (char *)std::to_string(curSteeringWheelPos).c_str());
-			showText(0.4, 0.27, 1.0, (char *)std::to_string(steerval).c_str());
 			showText(0.45, 0.04, 0.4, (char *)throttleDisplay.str().c_str());
 			showText(0.45, 0.06, 0.4, (char *)brakeDisplay.str().c_str());
 			showText(0.45, 0.08, 0.4, (char *)clutchDisplay.str().c_str());
+
+
+			float steerval = -0.1f * (curSteeringWheelPos / 32768.0f);
+			showText(0.4, 0.10, 0.4, (char *)std::to_string(curSteeringWheelPos).c_str());
+			showText(0.4, 0.12, 0.4, (char *)std::to_string(steerval).c_str());
+			showText(0.4, 0.14, 0.4, (char *)std::to_string(antiDeadzoned).c_str());
 		}
 	}
 
