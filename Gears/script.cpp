@@ -167,6 +167,8 @@ void update() {
 		curBrake = ((float)curBrakePos) / 65536.0f * -1 + 0.5f;
 		curClutch = ((float)curClutchPos) / 65536.0f + 0.5f;
 		
+		// oke misschien niet
+		/*
 		
 		if (controller.SetAnalogValue(XboxController::RightTrigger, (int)(curThrottle * 255)) &&
 			controller.SetAnalogValue(XboxController::LeftTrigger, (int)(curBrake * 255))) {
@@ -175,10 +177,10 @@ void update() {
 		else {
 			showText(0.4, 0.16, 0.4, "ptr = null");
 		}
-		
+		*/
 
-		//controls.Rtvalf = curThrottle;
-		//controls.Ltvalf = curBrake;
+		controls.Rtvalf = curThrottle;
+		controls.Ltvalf = curBrake;
 		controls.Rtvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CThrottle]), buttonState);
 		controls.Ltvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CBrake]), buttonState);
 
@@ -350,6 +352,7 @@ void update() {
 	else {
 		functionSShift();
 	}
+	//functionLogiWheelInputs();
 
 	// Finally, update memory each loop
 	handleRPM();
@@ -675,6 +678,24 @@ void functionRealReverse() {
 	// Forward gear
 	// Desired: Only brake
 	if (vehData.CurrGear > 0) {
+		// Throttle Pedal normal
+		if (curThrottle > 0.02f) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, curThrottle);
+		}
+		// Brake Pedal normal
+		if (curBrake > 0.02f) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, curBrake);
+		}
+		// Brake Pedal still
+		if (curBrake > 0.02f && curThrottle < curBrake &&
+			vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
+			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
+			ext.SetThrottleP(vehicle, 0.0f);
+			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+		}
+
+
 		// LT behavior when still
 		if (controls.Ltvalf > 0.0f && controls.Rtvalf < controls.Ltvalf &&
 			vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
@@ -699,6 +720,24 @@ void functionRealReverse() {
 	// Reverse gear
 	// Desired: RT reverses, LT brakes
 	if (vehData.CurrGear == 0) {
+		// Throttle Pedal Reverse
+		if (curThrottle > 0.02f && curThrottle > curBrake) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, curThrottle);
+		}
+		// Brake Pedal stationary
+		if (curBrake > 0.02f && curThrottle <= curBrake &&
+			vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
+			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
+			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+		}
+
+		// Brake Pedal Reverse
+		if (curBrake > 0.02f &&
+			vehData.Velocity <= -0.5f) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, curBrake);
+		}
+
 		ext.SetThrottleP(vehicle, -0.1f);
 		// RT behavior
 		if (controls.Rtvalf > 0.0f && controls.Rtvalf > controls.Ltvalf) {
