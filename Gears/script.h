@@ -11,6 +11,9 @@ http://dev-c.com
 #include "..\..\ScriptHookV_SDK\inc\enums.h"
 #include "..\..\ScriptHookV_SDK\inc\main.h"
 
+#ifndef DIRECTINPUT_VERSION
+#define DIRECTINPUT_VERSION 0x0800
+#endif
 #include "..\..\LogitechSteeringWheel_SDK\Include\LogitechSteeringWheelLib.h"
 
 void ScriptMain();
