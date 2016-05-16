@@ -148,7 +148,7 @@ float XboxController::GetAnalogValue(XboxButtons buttonType, WORD buttonState) {
 }
 
 // Don't use this it will kill you because pointers
-bool XboxController::SetAnalogValue(XboxButtons buttonType, BYTE value) {
+/*bool XboxController::SetAnalogValue(XboxButtons buttonType, BYTE value) {
 	XINPUT_STATE* statePtr = nullptr;
 	XInputGetState(controllerNum, statePtr);
 	if (statePtr != nullptr) {
@@ -163,7 +163,7 @@ bool XboxController::SetAnalogValue(XboxButtons buttonType, BYTE value) {
 		return true;
 	}
 	return false;
-}
+}*/
 
 float XboxController::filterDeadzone(XboxButtons buttonType, int input) {
 	int deadzone;
