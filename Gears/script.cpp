@@ -393,7 +393,7 @@ void showText(float x, float y, float scale, char * text) {
 	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
 	UI::SET_TEXT_EDGE(1, 0, 0, 0, 205);
 	UI::_SET_TEXT_ENTRY("STRING");
-	UI::_ADD_TEXT_COMPONENT_STRING(text);
+	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text);
 	UI::_DRAW_TEXT(x, y);
 }
 
@@ -401,7 +401,7 @@ void showNotification(char *message) {
 	if (prevNotification)
 		UI::_REMOVE_NOTIFICATION(prevNotification);
 	UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
-	UI::_ADD_TEXT_COMPONENT_STRING(message);
+	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(message);
 	prevNotification = UI::_DRAW_NOTIFICATION(false, false);
 }
 
@@ -447,7 +447,7 @@ void toggleManual() {
 }
 
 bool lastKeyboard() {
-	return CONTROLS::_GET_LAST_INPUT_METHOD(2) == TRUE;
+	return CONTROLS::_IS_INPUT_DISABLED(0) == TRUE;
 }
 
 void functionHShift() {
