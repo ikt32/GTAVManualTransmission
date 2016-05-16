@@ -454,7 +454,7 @@ void functionHShift() {
 }
 
 void functionHShiftLogitech() {
-	for (uint8_t i = 0; i <= vehData.TopGear; i++) {
+	/*for (uint8_t i = 0; i <= vehData.TopGear; i++) {
 		if (i > (int)ScriptControls::LogiControlType::H6) // this shit is just silly can I rly do dis?
 			i = (int)ScriptControls::LogiControlType::H6; // holy shit bad, bad, hacky idea
 		if (LogiButtonTriggered(index_, controls.LogiControl[i])) {
@@ -464,9 +464,9 @@ void functionHShiftLogitech() {
 		if (LogiButtonReleased(index_, controls.LogiControl[i])) {
 			vehData.SimulatedNeutral = true;
 		}
-	}
+	}*/
 
-	/*
+	
 	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::HR])) {
 		shiftTo(0);
 	}
@@ -507,12 +507,12 @@ void functionHShiftLogitech() {
 		LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H5]) ||
 		LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H6])) {
 		vehData.SimulatedNeutral = true;
-	}*/
+	}
 	
-	//if (LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::HR])) {
-	//	shiftTo(1);
-	//	vehData.SimulatedNeutral = false;
-	//}
+	if (LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::HR])) {
+		shiftTo(1);
+		vehData.SimulatedNeutral = false;
+	}
 }
 
 void functionSShift() {
