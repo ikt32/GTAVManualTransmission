@@ -147,6 +147,24 @@ float XboxController::GetAnalogValue(XboxButtons buttonType, WORD buttonState) {
 	}
 }
 
+// Don't use this it will kill you because pointers
+bool XboxController::SetAnalogValue(XboxButtons buttonType, BYTE value) {
+	XINPUT_STATE* statePtr = nullptr;
+	XInputGetState(controllerNum, statePtr);
+	if (statePtr != nullptr) {
+		switch (buttonType) {
+		case LeftTrigger:
+			statePtr->Gamepad.bLeftTrigger = value;
+			break;
+		case RightTrigger:
+			statePtr->Gamepad.bRightTrigger = value;
+			break;
+		}
+		return true;
+	}
+	return false;
+}
+
 float XboxController::filterDeadzone(XboxButtons buttonType, int input) {
 	int deadzone;
 	switch (buttonType) {
