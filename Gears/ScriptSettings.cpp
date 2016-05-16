@@ -34,7 +34,6 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	UITips_Size =    GetPrivateProfileIntA("MAIN", "UITips_Size",   15, SETTINGSFILE)/100.0f;
 
 	Hshifter =       (GetPrivateProfileIntA("CONTROLS", "EnableH",    0, SETTINGSFILE) == 1);
-	LogiWheel =      (GetPrivateProfileIntA("LOGITECHWHEEL", "Enable",0, SETTINGSFILE) == 1);
 	Debug =          (GetPrivateProfileIntA("DEBUG", "Info",          0, SETTINGSFILE) == 1);
 
 	Check();
@@ -86,8 +85,7 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	scriptControl->Control[(int)ScriptControls::ControlType::KThrottle] = GetPrivateProfileIntA("KEYBOARD", "KThrottle", 0x57, SETTINGSFILE);
 	scriptControl->Control[(int)ScriptControls::ControlType::KBrake] = GetPrivateProfileIntA("KEYBOARD", "KBrake", 0x53, SETTINGSFILE);
 
-	//Check();
-
+	LogiWheel = (GetPrivateProfileIntA("LOGITECHWHEEL", "Enable", 0, SETTINGSFILE) == 1);
 	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::ShiftUp] = GetPrivateProfileIntA("LOGITECHWHEEL", "ShiftUp", 4, SETTINGSFILE);
 	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::ShiftDown] = GetPrivateProfileIntA("LOGITECHWHEEL", "ShiftDown", 5, SETTINGSFILE);
 	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::HR] = GetPrivateProfileIntA("LOGITECHWHEEL", "HR", 14, SETTINGSFILE);

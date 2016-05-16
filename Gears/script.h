@@ -25,6 +25,6 @@ void functionEngStall();
 void functionClutchCatch();
 void functionHShift();
 void functionSShift();
-void functionLogitechShift();
+void functionHShiftLogitech();
 void shiftTo(int gear);
 void handleRPM();
