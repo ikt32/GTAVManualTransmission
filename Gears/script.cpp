@@ -18,7 +18,8 @@ ScriptSettings settings;
 VehicleData vehData;
 VehicleExtensions ext;
 XboxController controller(1);
-int logiIndex = 0;
+int index_ = 0;
+bool logiWheelActive = false;
 
 Vehicle vehicle;
 Vehicle prevVehicle;
@@ -41,21 +42,17 @@ void reInit();
 void toggleManual();
 bool lastKeyboard();
 
+long curSteeringWheelPos;
+long curThrottlePos;
+long curBrakePos;
+long curClutchPos;
+
+float curWheel;
+float curThrottle;
+float curBrake;
+float curClutch;
+
 void update() {
-	if (settings.LogiWheel) {
-		if (!LogiUpdate() || !LogiIsConnected(logiIndex))
-			logger.Write("Wheel not connected");
-	}
-
-	if (controller.IsConnected()) {
-		buttonState = controller.GetState().Gamepad.wButtons;
-		controller.UpdateButtonChangeStates();
-	}
-
-	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KToggle], ScriptControls::ControlType::KToggle)) {
-		toggleManual();
-	}
-
 	player = PLAYER::PLAYER_ID();
 	playerPed = PLAYER::PLAYER_PED_ID();
 
@@ -84,6 +81,22 @@ void update() {
 		))
 		return;
 
+	if (settings.LogiWheel && LogiUpdate() && LogiIsConnected(index_)) {
+		logiWheelActive = true;
+	}
+	else {
+		logiWheelActive = false;
+	}
+
+	if (controller.IsConnected()) {
+		buttonState = controller.GetState().Gamepad.wButtons;
+		controller.UpdateButtonChangeStates();
+	}
+
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KToggle], ScriptControls::ControlType::KToggle)) {
+		toggleManual();
+	}
+
 	// Patch clutch on game start
 	if (settings.EnableManual && !runOnceRan) {
 		logger.Write("Patching functions on start");
@@ -101,7 +114,9 @@ void update() {
 		toggleManual();
 	}
 
-	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::ToggleH], ScriptControls::ControlType::ToggleH)) {
+	// LogiButton index 21 should be button 22, is the right bottom on the G27.
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::ToggleH], ScriptControls::ControlType::ToggleH) ||
+		LogiButtonTriggered(index_, 21)) {
 		settings.Hshifter = !settings.Hshifter;
 		std::stringstream message;
 		message << "Mode: " <<
@@ -126,6 +141,77 @@ void update() {
 
 	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
+
+	if (logiWheelActive) {
+
+		LogiPlayLeds(index_, vehData.Rpm, 0.3f, 1.0f);
+
+		int damperforce = 0;
+
+		damperforce = 100 - 20 * vehData.Speed;
+
+		if (vehData.Speed > 5.0f) {
+			damperforce = 20;
+		}
+
+		LogiPlayDamperForce(index_, damperforce);
+		
+		if (vehData.Speed > 2.0f) {
+			LogiPlaySpringForce(index_, 0, 100, vehData.Speed);
+		}
+
+		curSteeringWheelPos = LogiGetState(index_)->lX;
+		curThrottlePos = LogiGetState(index_)->lY;
+		curBrakePos = LogiGetState(index_)->lRz;
+		curClutchPos = LogiGetState(index_)->rglSlider[1];
+
+		curWheel = ((float)curSteeringWheelPos) / 65536.0f * .2f * -1;
+		curThrottle = ((float)curThrottlePos) / 65536.0 * -1 + 0.5f;
+		curBrake = ((float)curBrakePos) / 65536.0f * -1 + 0.5f;
+		curClutch = ((float)curClutchPos) / 65536.0f + 0.5f;
+		
+		//controls.Rtvalf = curThrottle;
+		//controls.Ltvalf = curBrake;
+		controls.Clutchvalf = 1 - curClutch;
+
+
+		// Anti-deadzone
+		float antiDeadzoned = 0.0f;
+		antiDeadzoned = curSteeringWheelPos / 32768.0f;
+		if (//curSteeringWheelPos > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
+			curSteeringWheelPos <= 0) {
+			antiDeadzoned = (curSteeringWheelPos - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) / (32768.0f - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+		}
+		if (//curSteeringWheelPos > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
+			curSteeringWheelPos > 0) {
+			antiDeadzoned = (curSteeringWheelPos + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+		}
+
+		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, curSteeringWheelPos / 32768.0f);
+
+		//CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleAccelerate, curThrottle);
+		//CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleBrake, curBrake);
+		
+		
+		//CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleMoveLeftRight, true);
+		//VEHICLE::SET_VEHICLE_STEER_BIAS(vehicle, steerval);
+
+		if (settings.Debug) {
+			std::stringstream throttleDisplay;
+			throttleDisplay << "T: " << curThrottle;
+			std::stringstream brakeDisplay;
+			brakeDisplay << "B: " << curBrake;
+			std::stringstream clutchDisplay;
+			clutchDisplay << "C: " << curClutch;
+			float steerval = -0.1f * (curSteeringWheelPos / 32768.0f);
+			showText(0.4, 0.2, 1.0, (char *)std::to_string(curSteeringWheelPos).c_str());
+			showText(0.4, 0.27, 1.0, (char *)std::to_string(steerval).c_str());
+			showText(0.45, 0.04, 0.4, (char *)throttleDisplay.str().c_str());
+			showText(0.45, 0.06, 0.4, (char *)brakeDisplay.str().c_str());
+			showText(0.45, 0.08, 0.4, (char *)clutchDisplay.str().c_str());
+		}
+	}
+
 
 	// Put here to override last control readout for Clutchvalf
 	if (vehData.SimulatedNeutral) {
@@ -152,7 +238,9 @@ void update() {
 			VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f))
 		return;
 
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Active whenever Manual is enabled from here
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	if (playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
 		if (patchedSpecial) {
@@ -189,8 +277,9 @@ void update() {
 		}
 	}
 	
-
-	// BELOW THIS LINE THE FUNCTIONAL STUFF
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// BELOW THIS LINE THE FUNCTIONAL STUFF - I REALLY OUGHT TO FIX THIS CRAP
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// Reverse behavior
 	// For bikes, do this automatically.
@@ -243,13 +332,12 @@ void update() {
 	// Manual shifting
 	if (settings.Hshifter) {
 		functionHShift();
+		if (logiWheelActive) {
+			functionHShiftLogitech();
+		}
 	}
 	else {
 		functionSShift();
-	}
-
-	if (settings.LogiWheel) {
-		functionLogitechShift();
 	}
 
 	// Finally, update memory each loop
@@ -263,9 +351,15 @@ void main() {
 
 	if (settings.LogiWheel) {
 		LogiSteeringInitialize(TRUE);
-		if (LogiUpdate() && LogiIsConnected(logiIndex)) {
+		if (LogiUpdate() && LogiIsConnected(index_)) {
 			logger.Write("Wheel initialized");
 		}
+		else {
+			logger.Write("No wheel detected");
+		}
+	}
+	else {
+		logger.Write("Wheel disabled");
 	}
 
 	while (true) {
@@ -359,28 +453,73 @@ void functionHShift() {
 	}
 }
 
-void functionLogitechShift() {
-	if (LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::HR]))
+void functionHShiftLogitech() {
+	for (uint8_t i = 0; i <= vehData.TopGear; i++) {
+		if (i > (int)ScriptControls::LogiControlType::H6) // this shit is just silly can I rly do dis?
+			i = (int)ScriptControls::LogiControlType::H6; // holy shit bad, bad, hacky idea
+		if (LogiButtonTriggered(index_, controls.LogiControl[i])) {
+			shiftTo(i);
+			vehData.SimulatedNeutral = false;
+		}
+		if (LogiButtonReleased(index_, controls.LogiControl[i])) {
+			vehData.SimulatedNeutral = true;
+		}
+	}
+
+	/*
+	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::HR])) {
 		shiftTo(0);
-	if (LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::H1]))
+	}
+	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H1])) {
 		shiftTo(1);
-	if (LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::H2]))
+	}
+	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H2])) {
 		shiftTo(2);
-	if (LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::H3]))
+	}
+	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H3])) {
 		shiftTo(3);
-	if (LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::H4]))
+	}
+	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H4])) {
 		shiftTo(4);
-	if (LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::H5]))
+	}
+	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H5])) {
 		shiftTo(5);
-	if (LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::H6]))
+	}
+	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H6])) {
 		shiftTo(6);
+	}
+
+	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::HR]) ||
+	LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H1]) ||
+	LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H2]) ||
+	LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H3]) ||
+	LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H4]) ||
+	LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H5]) ||
+	LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H6])) {
+	vehData.SimulatedNeutral = false;
+	}
+	
+
+	if (LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H1]) ||
+		LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H2]) ||
+		LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H3]) ||
+		LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H4]) ||
+		LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H5]) ||
+		LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H6])) {
+		vehData.SimulatedNeutral = true;
+	}*/
+	
+	//if (LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::HR])) {
+	//	shiftTo(1);
+	//	vehData.SimulatedNeutral = false;
+	//}
 }
 
 void functionSShift() {
 	// Shift up
 	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::ShiftUp]), buttonState) ||
 		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KShiftUp], ScriptControls::ControlType::KShiftUp) ||
-		LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftUp])) {
+		(logiWheelActive && LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftUp]))) {
 		
 		// Reverse to Neutral
 		if (vehData.CurrGear == 0 && !vehData.SimulatedNeutral) {
@@ -404,7 +543,7 @@ void functionSShift() {
 	// Shift down
 	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::ShiftDown]), buttonState) ||
 		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KShiftDown], ScriptControls::ControlType::KShiftDown) ||
-		LogiButtonTriggered(logiIndex, controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftDown])) {
+		(logiWheelActive && LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftDown]))) {
 		
 		// 1 to Neutral
 		if (vehData.CurrGear == 1 && !vehData.SimulatedNeutral) {
