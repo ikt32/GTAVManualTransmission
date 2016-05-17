@@ -31,6 +31,7 @@ void functionSShift();
 void functionHShiftLogitech();
 void shiftTo(int gear);
 void handleRPM();
+void handlePedalsDefault();
 void handlePedalsRealReverse();
 void handleVehicleButtons();
 void playWheelEffects();

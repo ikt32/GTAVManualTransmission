@@ -256,6 +256,9 @@ void update() {
 		// Reversing behavior: just block the direction you don't wanna go to
 		else {
 			functionSimpleReverse();
+			if (logiWheelActive) {
+				handlePedalsDefault();
+			}
 		}
 	}
 	
