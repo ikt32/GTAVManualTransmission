@@ -144,17 +144,20 @@ void update() {
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
 	if (logiWheelActive) {
-		LogiPlayLeds(index_, vehData.Rpm, 0.3f, 1.0f);
+		LogiPlayLeds(index_, vehData.Rpm, 0.5f, 1.0f);
 
 		int damperforce = 0;
-		damperforce = 100 - 3*(int)(vehData.Speed);
-		if (vehData.Speed > 20.0f) {
-			damperforce = 40;
+		damperforce = 100 - 5*(int)(vehData.Speed);
+		if (vehData.Speed > 10.0f ) {
+			damperforce = 50 + (int)(vehData.Speed - 10.0f);
+			if (damperforce >= 80) {
+				damperforce = 80;
+			}
 		}
 		LogiPlayDamperForce(index_, damperforce);
 		
 		if (vehData.Speed > 2.0f) {
-			LogiPlaySpringForce(index_, 0, 100, (int)(vehData.Speed));
+			LogiPlaySpringForce(index_, 0, 100, (int)(vehData.Speed*2.0f));
 		}
 
 		curSteeringWheelPos = LogiGetState(index_)->lX;
@@ -166,18 +169,6 @@ void update() {
 		curThrottle = ((float)curThrottlePos) / -65536.0f + 0.5f;
 		curBrake = ((float)curBrakePos) / 65536.0f * -1 + 0.5f;
 		curClutch = ((float)curClutchPos) / 65536.0f + 0.5f;
-		
-		// oke misschien niet
-		/*
-		
-		if (controller.SetAnalogValue(XboxController::RightTrigger, (int)(curThrottle * 255)) &&
-			controller.SetAnalogValue(XboxController::LeftTrigger, (int)(curBrake * 255))) {
-
-		}
-		else {
-			showText(0.4, 0.16, 0.4, "ptr = null");
-		}
-		*/
 
 		controls.Rtvalf = curThrottle;
 		controls.Ltvalf = curBrake;
@@ -185,7 +176,6 @@ void update() {
 		controls.Ltvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CBrake]), buttonState);
 
 		controls.Clutchvalf = 1 - curClutch;
-
 
 		// Anti-deadzone
 		int additionalOffset = 2560;
@@ -200,11 +190,6 @@ void update() {
 			antiDeadzoned = (curSteeringWheelPos + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
 		}
 		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
-
-		//CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleAccelerate, curThrottle);
-		//CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleBrake, curBrake);
-
-
 
 		if (settings.Debug) {
 			std::stringstream throttleDisplay;

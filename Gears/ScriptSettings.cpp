@@ -5,8 +5,6 @@
 
 ScriptSettings::ScriptSettings() {
 	EnableManual = false;
-	//AutoGear1    = false;
-	//AutoReverse  = false;
 	RealReverse  = true;
 	EngDamage    = false;
 	EngStall     = false;
@@ -19,8 +17,6 @@ ScriptSettings::ScriptSettings() {
 
 void ScriptSettings::Read(ScriptControls *scriptControl) {
 	EnableManual =   (GetPrivateProfileIntA("MAIN", "DefaultEnable",  1, SETTINGSFILE) == 1);
-	//AutoGear1 =      (GetPrivateProfileIntA("MAIN", "AutoGear1",      1, SETTINGSFILE) == 1);
-	//AutoReverse =    (GetPrivateProfileIntA("MAIN", "AutoReverse",    0, SETTINGSFILE) == 1);
 	RealReverse =    (GetPrivateProfileIntA("MAIN", "RealReverse",    1, SETTINGSFILE) == 1);
 	SimpleBike =     (GetPrivateProfileIntA("MAIN", "SimpleBike",     1, SETTINGSFILE) == 1);
 	EngDamage =      (GetPrivateProfileIntA("MAIN", "EngineDamage",   0, SETTINGSFILE) == 1);
@@ -36,7 +32,7 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	Hshifter =       (GetPrivateProfileIntA("CONTROLS", "EnableH",    0, SETTINGSFILE) == 1);
 	Debug =          (GetPrivateProfileIntA("DEBUG", "Info",          0, SETTINGSFILE) == 1);
 
-	Check();
+	CheckSettings();
 
 	scriptControl->CToggleTime = GetPrivateProfileIntA("MAIN", "CToggleTime", 500, SETTINGSFILE);
 
@@ -103,18 +99,7 @@ void ScriptSettings::Save() {
 }
 
 // Checks for conflicting settings and adjusts them
-/*
-void ScriptSettings::Check() {
-	if (AutoReverse && RealReverse) {
-		Logger logger(LOGFILE);
-		logger.Write("AutoReverse and RealReverse conflict. Adjusting to RealReverse");
-		AutoReverse = false;
-		WritePrivateProfileStringA("MAIN", "AutoReverse", " 0", SETTINGSFILE);
-	}
-}
-*/
-
-void ScriptSettings::Check() {
+void ScriptSettings::CheckSettings() {
 	Logger logger(LOGFILE);
 	if (UITips_X > 100) {
 		UITips_X = 100;

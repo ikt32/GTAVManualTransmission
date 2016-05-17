@@ -118,5 +118,4 @@ public:
 
 	// Returns a 0.0 to 1.0 value for any button
 	float GetAnalogValue(XboxButtons buttonType, WORD buttonState);
-	//bool SetAnalogValue(XboxButtons buttonType, BYTE value);
 };

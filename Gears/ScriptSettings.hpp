@@ -14,8 +14,6 @@ public:
 	void Save();
 
 	bool EnableManual;
-	//bool AutoGear1;
-	//bool AutoReverse;
 	bool RealReverse;
 	bool SimpleBike;
 
@@ -34,6 +32,6 @@ public:
 	float UITips_Y;
 	float UITips_Size;
 //private:
-	void Check();
+	void CheckSettings();
 };
 
