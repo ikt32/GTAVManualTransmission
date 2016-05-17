@@ -42,15 +42,15 @@ void reInit();
 void toggleManual();
 bool lastKeyboard();
 
-long curSteeringWheelPos;
-long curThrottlePos;
-long curBrakePos;
-long curClutchPos;
+long logiSteeringWheelPos;
+long logiThrottlePos;
+long logiBrakePos;
+long logiClutchPos;
 
-float curWheel;
-float curThrottle;
-float curBrake;
-float curClutch;
+float logiWheel;
+float logiThrottleVal;
+float logiBrakeVal;
+float logiClutchVal;
 
 void update() {
 	player = PLAYER::PLAYER_ID();
@@ -104,10 +104,6 @@ void update() {
 		runOnceRan = true;
 	}
 
-	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, ControlEnter) || vehicle != prevVehicle) {
-		reInit();
-	}
-
 	if (controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CToggle]), buttonState, controls.CToggleTime) &&
 		!lastKeyboard()) {
 		toggleManual();
@@ -138,81 +134,38 @@ void update() {
 		controls.Ltvalf     = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CBrake]), buttonState);
 		controls.Clutchvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::Clutch]), buttonState);
 	}
+	// Currently: Doesn't work fully?
+	if (logiWheelActive) {
+		updateLogiValues(); 
+		controls.Rtvalf = logiThrottleVal;
+		controls.Ltvalf = logiBrakeVal;
+		controls.Clutchvalf = 1 - logiClutchVal;
+	}
 
 	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
-	if (logiWheelActive) {
-		LogiPlayLeds(index_, vehData.Rpm, 0.5f, 1.0f);
-
-		int damperforce = 0;
-		damperforce = 100 - 5*(int)(vehData.Speed);
-		if (vehData.Speed > 10.0f ) {
-			damperforce = 50 + (int)(vehData.Speed - 10.0f);
-			if (damperforce >= 80) {
-				damperforce = 80;
-			}
-		}
-		LogiPlayDamperForce(index_, damperforce);
-		
-		if (vehData.Speed > 2.0f) {
-			LogiPlaySpringForce(index_, 0, 100, (int)(vehData.Speed*2.0f));
-		}
-
-		curSteeringWheelPos = LogiGetState(index_)->lX;
-		curThrottlePos = LogiGetState(index_)->lY;
-		curBrakePos = LogiGetState(index_)->lRz;
-		curClutchPos = LogiGetState(index_)->rglSlider[1];
-
-		curWheel = ((float)curSteeringWheelPos) / 65536.0f * .2f * -1;
-		curThrottle = ((float)curThrottlePos) / -65536.0f + 0.5f;
-		curBrake = ((float)curBrakePos) / 65536.0f * -1 + 0.5f;
-		curClutch = ((float)curClutchPos) / 65536.0f + 0.5f;
-
-		controls.Rtvalf = curThrottle;
-		controls.Ltvalf = curBrake;
-		controls.Rtvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CThrottle]), buttonState);
-		controls.Ltvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CBrake]), buttonState);
-
-		controls.Clutchvalf = 1 - curClutch;
-
-		// Anti-deadzone
-		int additionalOffset = 2560;
-		float antiDeadzoned = 0.0f;
-		antiDeadzoned = curSteeringWheelPos / 32768.0f;
-		if (//curSteeringWheelPos > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
-			curSteeringWheelPos <= 0) {
-			antiDeadzoned = (curSteeringWheelPos - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE - additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
-		}
-		if (//curSteeringWheelPos > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
-			curSteeringWheelPos > 0) {
-			antiDeadzoned = (curSteeringWheelPos + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
-		}
-		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
-
-		if (settings.Debug) {
-			std::stringstream throttleDisplay;
-			throttleDisplay << "T: " << curThrottle;
-			std::stringstream brakeDisplay;
-			brakeDisplay << "B: " << curBrake;
-			std::stringstream clutchDisplay;
-			clutchDisplay << "C: " << curClutch;
-			showText(0.45, 0.04, 0.4, (char *)throttleDisplay.str().c_str());
-			showText(0.45, 0.06, 0.4, (char *)brakeDisplay.str().c_str());
-			showText(0.45, 0.08, 0.4, (char *)clutchDisplay.str().c_str());
-
-
-			float steerval = -0.1f * (curSteeringWheelPos / 32768.0f);
-			showText(0.4, 0.10, 0.4, (char *)std::to_string(curSteeringWheelPos).c_str());
-			showText(0.4, 0.12, 0.4, (char *)std::to_string(steerval).c_str());
-			showText(0.4, 0.14, 0.4, (char *)std::to_string(antiDeadzoned).c_str());
-		}
-	}
-
-
 	// Put here to override last control readout for Clutchvalf
 	if (vehData.SimulatedNeutral) {
 		controls.Clutchvalf = 1.0f;
+	}
+
+	if (logiWheelActive) {
+		playWheelEffects();
+		
+		// Anti-deadzone
+		int additionalOffset = 2560;
+		float antiDeadzoned = 0.0f;
+		antiDeadzoned = logiSteeringWheelPos / 32768.0f;
+		if (//logiSteeringWheelPos > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
+			logiSteeringWheelPos <= 0) {
+			antiDeadzoned = (logiSteeringWheelPos - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE - additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
+		}
+		if (//logiSteeringWheelPos > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
+			logiSteeringWheelPos > 0) {
+			antiDeadzoned = (logiSteeringWheelPos + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
+		}
+		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
 	}
 
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
@@ -287,7 +240,9 @@ void update() {
 		// New reverse: Reverse with throttle
 		if (settings.RealReverse) {
 			functionRealReverse();
-			handlePedalsRealReverse();
+			if (logiWheelActive) {
+				handlePedalsRealReverse();
+			}
 		}
 		// Reversing behavior: just block the direction you don't wanna go to
 		else {
@@ -343,19 +298,7 @@ void update() {
 
 void main() {
 	settings.Read(&controls);
-
-	if (settings.LogiWheel) {
-		LogiSteeringInitialize(TRUE);
-		if (LogiUpdate() && LogiIsConnected(index_)) {
-			logger.Write("Wheel initialized");
-		}
-		else {
-			logger.Write("No wheel detected");
-		}
-	}
-	else {
-		logger.Write("Wheel disabled");
-	}
+	initWheel();
 
 	while (true) {
 		update();
@@ -401,12 +344,25 @@ void showDebugInfo() {
 		"\nE: " << (settings.EnableManual ? "Y" : "N");
 	const char *infoc = infos.str().c_str();
 	showText(0.01f, 0.5f, 0.4f, (char *)infoc);
+
+	if (logiWheelActive) {
+		std::stringstream throttleDisplay;
+		throttleDisplay << "T: " << logiThrottleVal;
+		std::stringstream brakeDisplay;
+		brakeDisplay << "B: " << logiBrakeVal;
+		std::stringstream clutchDisplay;
+		clutchDisplay << "C: " << logiClutchVal;
+		showText(0.45, 0.04, 0.4, (char *)throttleDisplay.str().c_str());
+		showText(0.45, 0.06, 0.4, (char *)brakeDisplay.str().c_str());
+		showText(0.45, 0.08, 0.4, (char *)clutchDisplay.str().c_str());
+	}
 }
 
 void reInit() {
 	settings.Read(&controls);
 	vehData.LockGears = 0x00010001;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
+	initWheel();
 }
 
 void toggleManual() {
@@ -431,7 +387,7 @@ void toggleManual() {
 }
 
 bool lastKeyboard() {
-	return CONTROLS::_IS_INPUT_DISABLED(0) == TRUE;
+	return CONTROLS::_IS_INPUT_DISABLED(2) == TRUE;
 }
 
 void functionHShift() {
@@ -449,19 +405,6 @@ void functionHShift() {
 }
 
 void functionHShiftLogitech() {
-	/*for (uint8_t i = 0; i <= vehData.TopGear; i++) {
-		if (i > (int)ScriptControls::LogiControlType::H6) // this shit is just silly can I rly do dis?
-			i = (int)ScriptControls::LogiControlType::H6; // holy shit bad, bad, hacky idea
-		if (LogiButtonTriggered(index_, controls.LogiControl[i])) {
-			shiftTo(i);
-			vehData.SimulatedNeutral = false;
-		}
-		if (LogiButtonReleased(index_, controls.LogiControl[i])) {
-			vehData.SimulatedNeutral = true;
-		}
-	}*/
-
-	
 	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::HR])) {
 		shiftTo(0);
 	}
@@ -494,7 +437,6 @@ void functionHShiftLogitech() {
 	vehData.SimulatedNeutral = false;
 	}
 	
-
 	if (LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H1]) ||
 		LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H2]) ||
 		LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H3]) ||
@@ -660,7 +602,7 @@ void functionRealReverse() {
 	// Desired: Only brake
 	if (vehData.CurrGear > 0) {
 		// LT behavior when still
-		if (controls.Ltvalf > 0.0f && controls.Rtvalf < controls.Ltvalf &&
+		if (controls.Ltvalf > 0.02f && controls.Rtvalf < controls.Ltvalf &&
 			vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			ext.SetThrottleP(vehicle, 0.0f);
@@ -671,7 +613,7 @@ void functionRealReverse() {
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
 		// LT behavior when rolling back
-		if (controls.Ltvalf > 0.0f && controls.Rtvalf < controls.Ltvalf &&
+		if (controls.Ltvalf > 0.02f && controls.Rtvalf < controls.Ltvalf &&
 			vehData.Velocity < -0.1f) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
@@ -685,7 +627,7 @@ void functionRealReverse() {
 	if (vehData.CurrGear == 0) {
 		ext.SetThrottleP(vehicle, -0.1f);
 		// RT behavior
-		if (controls.Rtvalf > 0.0f && controls.Rtvalf > controls.Ltvalf) {
+		if (controls.Rtvalf > 0.02f && controls.Rtvalf > controls.Ltvalf) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, controls.Rtvalf);
 		}
@@ -700,7 +642,7 @@ void functionRealReverse() {
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
 		// LT behavior when reversing
-		if (controls.Ltvalf > 0.0f &&
+		if (controls.Ltvalf > 0.02f &&
 			vehData.Velocity <= -0.5f) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.Ltvalf);
@@ -714,15 +656,15 @@ void functionRealReverse() {
 void handlePedalsRealReverse() {
 	if (vehData.CurrGear > 0) {
 		// Throttle Pedal normal
-		if (curThrottle > 0.02f) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, curThrottle);
+		if (logiThrottleVal > 0.02f) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, logiThrottleVal);
 		}
 		// Brake Pedal normal
-		if (curBrake > 0.02f) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, curBrake);
+		if (logiBrakeVal > 0.02f) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, logiBrakeVal);
 		}
 		// Brake Pedal still
-		if (curBrake > 0.02f && curThrottle < curBrake &&
+		if (logiBrakeVal > 0.02f && logiThrottleVal < logiBrakeVal &&
 			vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			ext.SetThrottleP(vehicle, 0.0f);
@@ -733,11 +675,11 @@ void handlePedalsRealReverse() {
 	
 	if (vehData.CurrGear == 0) {
 		// Throttle Pedal Reverse
-		if (curThrottle > 0.02f && curThrottle > curBrake) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, curThrottle);
+		if (logiThrottleVal > 0.02f && logiThrottleVal > logiBrakeVal) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, logiThrottleVal);
 		}
 		// Brake Pedal stationary
-		if (curBrake > 0.02f && curThrottle <= curBrake &&
+		if (logiBrakeVal > 0.02f && logiThrottleVal <= logiBrakeVal &&
 			vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
@@ -745,11 +687,17 @@ void handlePedalsRealReverse() {
 		}
 
 		// Brake Pedal Reverse
-		if (curBrake > 0.02f &&
+		if (logiBrakeVal > 0.02f &&
 			vehData.Velocity <= -0.5f) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, curBrake);
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, logiBrakeVal);
 		}
 	}
+}
+
+// Pedals behave like RT/LT
+void handlePedalsDefault() {
+	CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, logiThrottleVal);
+	CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, logiBrakeVal);
 }
 
 void functionSimpleReverse() {
@@ -793,5 +741,51 @@ void handleVehicleButtons() {
 		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::Engine]), buttonState) ||
 			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KEngine], ScriptControls::ControlType::KEngine))) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
+	}
+}
+
+void playWheelEffects() {
+	LogiPlayLeds(index_, vehData.Rpm, 0.5f, 1.0f);
+
+	int damperforce = 0;
+	damperforce = 100 - 5 * (int)(vehData.Speed);
+	if (vehData.Speed > 10.0f) {
+		damperforce = 50 + (int)(vehData.Speed - 10.0f);
+		if (damperforce >= 80) {
+			damperforce = 80;
+		}
+	}
+	LogiPlayDamperForce(index_, damperforce);
+
+	if (vehData.Speed > 2.0f) {
+		LogiPlaySpringForce(index_, 0, 100, (int)(vehData.Speed*2.0f));
+	}
+}
+
+// Updates logiWheel, logiThrottleVal, logiBrakeVal, logiClutchVal
+void updateLogiValues() {
+	logiSteeringWheelPos = LogiGetState(index_)->lX;
+	logiThrottlePos = LogiGetState(index_)->lY;
+	logiBrakePos = LogiGetState(index_)->lRz;
+	logiClutchPos = LogiGetState(index_)->rglSlider[1];
+
+	logiWheel = ((float)logiSteeringWheelPos) / 65536.0f * .2f * -1;
+	logiThrottleVal = ((float)logiThrottlePos) / -65536.0f + 0.5f;
+	logiBrakeVal = ((float)logiBrakePos) / 65536.0f * -1 + 0.5f;
+	logiClutchVal = ((float)logiClutchPos) / 65536.0f + 0.5f;
+}
+
+void initWheel() {
+	if (settings.LogiWheel) {
+		LogiSteeringInitialize(TRUE);
+		if (LogiUpdate() && LogiIsConnected(index_)) {
+			logger.Write("Wheel initialized");
+		}
+		else {
+			logger.Write("No wheel detected");
+		}
+	}
+	else {
+		logger.Write("Wheel disabled");
 	}
 }

@@ -33,3 +33,5 @@ void shiftTo(int gear);
 void handleRPM();
 void handlePedalsRealReverse();
 void handleVehicleButtons();
+void playWheelEffects();
+void updateLogiValues();
