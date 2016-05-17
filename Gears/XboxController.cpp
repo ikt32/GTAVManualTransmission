@@ -60,7 +60,7 @@ bool XboxController::IsButtonPressed(XboxButtons buttonType, WORD buttonState) {
 		buttonType == LeftThumbDown ||
 		buttonType == RightThumbUp ||
 		buttonType == RightThumbDown) {
-		return(GetAnalogValue(buttonType, buttonState) > 0.75f);
+		return(GetAnalogValue(buttonType, buttonState) > 0.25f);
 	}
 	else {
 		return (buttonState & XboxButtonMasks[buttonType]) != 0;

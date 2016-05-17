@@ -133,7 +133,20 @@ void update() {
 	if (logiWheelActive) {
 		updateLogiValues();
 	}
-	prevInput = getLastInputDevice(prevInput);
+	if (prevInput != getLastInputDevice(prevInput)) {
+		prevInput = getLastInputDevice(prevInput);
+		switch (prevInput) {
+		case InputDevices::Keyboard:
+			showNotification("Switched to keyboard/mouse");
+			break;
+		case InputDevices::Controller: // Controller
+			showNotification("Switched to controller");
+			break;
+		case InputDevices::Wheel: // Wheel
+			showNotification("Switched to wheel");
+			break;
+		}
+	}
 	switch (prevInput) {
 	case InputDevices::Keyboard:
 		controls.Rtvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KThrottle]) ? 1.0f : 0.0f);
@@ -149,7 +162,6 @@ void update() {
 		controls.Rtvalf = logiThrottleVal;
 		controls.Ltvalf = logiBrakeVal;
 		controls.Clutchvalf = 1 - logiClutchVal;
-
 		break;
 	}
 
@@ -161,7 +173,7 @@ void update() {
 		controls.Clutchvalf = 1.0f;
 	}*/
 
-	if (logiWheelActive) {
+	if (logiWheelActive && prevInput == InputDevices::Wheel) {
 		playWheelEffects();
 		
 		// Anti-deadzone
@@ -253,14 +265,14 @@ void update() {
 		// New reverse: Reverse with throttle
 		if (settings.RealReverse) {
 			functionRealReverse();
-			if (logiWheelActive) {
+			if (logiWheelActive && prevInput == InputDevices::Wheel) {
 				handlePedalsRealReverse();
 			}
 		}
 		// Reversing behavior: just block the direction you don't wanna go to
 		else {
 			functionSimpleReverse();
-			if (logiWheelActive) {
+			if (logiWheelActive && prevInput == InputDevices::Wheel) {
 				handlePedalsDefault();
 			}
 		}
@@ -297,7 +309,7 @@ void update() {
 	// Manual shifting
 	if (settings.Hshifter && !vehData.IsBike) {
 		functionHShift();
-		if (logiWheelActive) {
+		if (logiWheelActive && prevInput == InputDevices::Wheel) {
 			functionHShiftLogitech();
 		}
 	}
@@ -484,7 +496,7 @@ void functionHShiftLogitech() {
 		vehData.SimulatedNeutral = true;
 	}
 	
-	//showText(0.1, 0.1, 1.0, (char *)std::to_string(controls.Clutchvalf).c_str());
+	showText(0.1, 0.1, 1.0, (char *)std::to_string(controls.Clutchvalf).c_str());
 
 	if (LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::HR])) {
 		shiftTo(1, true);
@@ -820,7 +832,7 @@ void updateLogiValues() {
 	logiWheel =       ((float)logiSteeringWheelPos) /  65536.0f * -.2f;
 	logiThrottleVal = (float)(logiThrottlePos - 32767) / -65535.0f;
 	logiBrakeVal =    (float)(logiBrakePos - 32767) / -65535.0f;
-	logiClutchVal =   1.0f-(float)(logiClutchPos - 32767) / 65535.0f;
+	logiClutchVal =   1.0f+(float)(logiClutchPos - 32767) / 65535.0f;
 }
 
 void initWheel() {
@@ -849,9 +861,11 @@ int getLastInputDevice(int previousInput) {
 		return InputDevices::Controller;
 	}
 	if (logiWheelActive &&
-		(logiThrottleVal > 0.5f ||
-		logiBrakeVal > 0.5f)) {
+		(logiThrottleVal > 0.1f ||
+			logiBrakeVal > 0.1f ||
+			logiClutchVal < 0.9f)) {
 		return InputDevices::Wheel;
 	}
 	return previousInput;
 }
+
