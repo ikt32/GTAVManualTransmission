@@ -42,6 +42,8 @@ void reInit();
 void toggleManual();
 bool lastKeyboard();
 
+int prevInput = 0;
+
 long logiSteeringWheelPos;
 long logiThrottlePos;
 long logiBrakePos;
@@ -124,22 +126,29 @@ void update() {
 	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
 	simpleBike = vehData.IsBike && settings.SimpleBike;
 
-	if (lastKeyboard()) {
-		controls.Rtvalf     = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KThrottle]) ? 1.0f : 0.0f);
-		controls.Ltvalf     = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KBrake]) ? 1.0f : 0.0f);
-		controls.Clutchvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KClutch]) ? 1.0f : 0.0f);
-	}
-	else {
-		controls.Rtvalf     = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CThrottle]), buttonState);
-		controls.Ltvalf     = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CBrake]), buttonState);
-		controls.Clutchvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::Clutch]), buttonState);
-	}
-	// Currently: Doesn't work fully?
+	// Laten we lomp beslissen aan de hand van welk device het laatst op de gasknop/trigger/pedaal hebt gedrukt
+	// omdat dat gewoon werkt(TM)
+	
 	if (logiWheelActive) {
-		updateLogiValues(); 
+		updateLogiValues();
+	}
+	prevInput = getLastInputDevice(prevInput);
+	switch (prevInput) {
+	case 0: // Keyboard
+		controls.Rtvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KThrottle]) ? 1.0f : 0.0f);
+		controls.Ltvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KBrake]) ? 1.0f : 0.0f);
+		controls.Clutchvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KClutch]) ? 1.0f : 0.0f);
+		break;
+	case 1: // Controller
+		controls.Rtvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CThrottle]), buttonState);
+		controls.Ltvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CBrake]), buttonState);
+		controls.Clutchvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::Clutch]), buttonState);
+		break;
+	case 2: // Wheel
 		controls.Rtvalf = logiThrottleVal;
 		controls.Ltvalf = logiBrakeVal;
 		controls.Clutchvalf = 1 - logiClutchVal;
+		break;
 	}
 
 	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
@@ -542,12 +551,15 @@ void functionEngDamage() {
 void functionEngBrake() {
 	// Save speed @ shift
 	if (vehData.CurrGear < vehData.NextGear) {
-		if (vehData.PrevGear <= vehData.CurrGear || vehData.Velocity <= vehData.LockSpeed || vehData.LockSpeed < 0.01f) {
+		if (vehData.PrevGear <= vehData.CurrGear ||
+			vehData.Velocity <= vehData.LockSpeed ||
+			vehData.LockSpeed < 0.01f) {
 			vehData.LockSpeed = vehData.Velocity;
 		}
 	}
 	// Braking
-	if (vehData.CurrGear > 0 && vehData.Velocity > vehData.LockSpeeds.at(vehData.CurrGear) &&
+	if (vehData.CurrGear > 0 &&
+		vehData.Velocity > vehData.LockSpeeds.at(vehData.CurrGear) &&
 		controls.Rtvalf < 0.1 && vehData.Rpm > 0.80) {
 		float brakeForce = -0.1f * (1.0f - controls.Clutchvalf) * vehData.Rpm;
 		ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, brakeForce, 0.0f, true, true, true, true);
@@ -788,4 +800,23 @@ void initWheel() {
 	else {
 		logger.Write("Wheel disabled");
 	}
+}
+
+// Limitations: Detects on pressing throttle on any of the 3 input methods
+int getLastInputDevice(int previousInput) {
+	// 0: Keyboard
+	// 1: Controller
+	// 2: Wheel
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KThrottle], ScriptControls::ControlType::KThrottle) ||
+		controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KThrottle])) {
+		return 0;
+	}
+	if (controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CThrottle]), buttonState) ||
+		controller.IsButtonPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CThrottle]), buttonState)) {
+		return 1;
+	}
+	if (logiWheelActive && logiThrottleVal > 0.5f) {
+		return 2;
+	}
+	return previousInput;
 }

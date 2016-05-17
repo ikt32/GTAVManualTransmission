@@ -35,3 +35,5 @@ void handlePedalsRealReverse();
 void handleVehicleButtons();
 void playWheelEffects();
 void updateLogiValues();
+void initWheel();
+int getLastInputDevice(int previousInput);
