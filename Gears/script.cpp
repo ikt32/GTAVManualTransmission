@@ -40,7 +40,6 @@ void showNotification(char *message);
 void showDebugInfo();
 void reInit();
 void toggleManual();
-bool lastKeyboard();
 
 int prevInput = 0;
 
@@ -98,6 +97,11 @@ void update() {
 		toggleManual();
 	}
 
+	if (controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CToggle]), buttonState, controls.CToggleTime) &&
+		prevInput == InputDevices::Controller) {
+		toggleManual();
+	}
+
 	// Patch clutch on game start
 	if (settings.EnableManual && !runOnceRan) {
 		logger.Write("Patching functions on start");
@@ -106,10 +110,7 @@ void update() {
 		runOnceRan = true;
 	}
 
-	if (controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CToggle]), buttonState, controls.CToggleTime) &&
-		!lastKeyboard()) {
-		toggleManual();
-	}
+
 
 	// LogiButton index 21 should be button 22, is the right bottom on the G27.
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::ToggleH], ScriptControls::ControlType::ToggleH) ||
@@ -134,20 +135,21 @@ void update() {
 	}
 	prevInput = getLastInputDevice(prevInput);
 	switch (prevInput) {
-	case 0: // Keyboard
+	case InputDevices::Keyboard:
 		controls.Rtvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KThrottle]) ? 1.0f : 0.0f);
 		controls.Ltvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KBrake]) ? 1.0f : 0.0f);
 		controls.Clutchvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KClutch]) ? 1.0f : 0.0f);
 		break;
-	case 1: // Controller
+	case InputDevices::Controller: // Controller
 		controls.Rtvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CThrottle]), buttonState);
 		controls.Ltvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CBrake]), buttonState);
 		controls.Clutchvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::Clutch]), buttonState);
 		break;
-	case 2: // Wheel
+	case InputDevices::Wheel: // Wheel
 		controls.Rtvalf = logiThrottleVal;
 		controls.Ltvalf = logiBrakeVal;
 		controls.Clutchvalf = 1 - logiClutchVal;
+
 		break;
 	}
 
@@ -366,14 +368,23 @@ void showDebugInfo() {
 
 	if (logiWheelActive) {
 		std::stringstream throttleDisplay;
-		throttleDisplay << "T: " << logiThrottleVal;
+		throttleDisplay << "TVal: " << logiThrottleVal;
 		std::stringstream brakeDisplay;
-		brakeDisplay << "B: " << logiBrakeVal;
+		brakeDisplay << "BVal: " << logiBrakeVal;
 		std::stringstream clutchDisplay;
-		clutchDisplay << "C: " << logiClutchVal;
-		showText(0.45, 0.04, 0.4, (char *)throttleDisplay.str().c_str());
-		showText(0.45, 0.06, 0.4, (char *)brakeDisplay.str().c_str());
-		showText(0.45, 0.08, 0.4, (char *)clutchDisplay.str().c_str());
+		clutchDisplay << "CVal: " << logiClutchVal;
+		showText(0.01, 0.04, 0.4, (char *)throttleDisplay.str().c_str());
+		showText(0.01, 0.06, 0.4, (char *)brakeDisplay.str().c_str());
+		showText(0.01, 0.08, 0.4, (char *)clutchDisplay.str().c_str());
+		std::stringstream throttleXDisplay;
+		throttleXDisplay << "TPos: " << logiThrottlePos;
+		std::stringstream brakeXDisplay;
+		brakeXDisplay << "BPos: " << logiBrakePos;
+		std::stringstream clutchXDisplay;
+		clutchXDisplay << "CPos: " << logiClutchPos;
+		showText(0.01, 0.10, 0.4, (char *)throttleXDisplay.str().c_str());
+		showText(0.01, 0.12, 0.4, (char *)brakeXDisplay.str().c_str());
+		showText(0.01, 0.14, 0.4, (char *)clutchXDisplay.str().c_str());
 	}
 }
 
@@ -728,8 +739,12 @@ void handlePedalsRealReverse() {
 
 // Pedals behave like RT/LT
 void handlePedalsDefault() {
-	CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, logiThrottleVal);
-	CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, logiBrakeVal);
+	if (logiThrottleVal > 0.02f) {
+		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, logiThrottleVal);
+	}
+	if (logiBrakeVal > 0.02f) {
+		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, logiBrakeVal);
+	}
 }
 
 void functionSimpleReverse() {
@@ -800,11 +815,12 @@ void updateLogiValues() {
 	logiThrottlePos = LogiGetState(index_)->lY;
 	logiBrakePos = LogiGetState(index_)->lRz;
 	logiClutchPos = LogiGetState(index_)->rglSlider[1];
-
-	logiWheel = ((float)logiSteeringWheelPos) / 65536.0f * .2f * -1;
-	logiThrottleVal = ((float)logiThrottlePos) / -65536.0f + 0.5f;
-	logiBrakeVal = ((float)logiBrakePos) / 65536.0f * -1 + 0.5f;
-	logiClutchVal = ((float)logiClutchPos) / 65536.0f + 0.5f;
+	//  32767 @ nope | 0
+	// -32768 @ full | 1
+	logiWheel =       ((float)logiSteeringWheelPos) /  65536.0f * -.2f;
+	logiThrottleVal = (float)(logiThrottlePos - 32767) / -65535.0f;
+	logiBrakeVal =    (float)(logiBrakePos - 32767) / -65535.0f;
+	logiClutchVal =   1.0f-(float)(logiClutchPos - 32767) / 65535.0f;
 }
 
 void initWheel() {
@@ -824,19 +840,18 @@ void initWheel() {
 
 // Limitations: Detects on pressing throttle on any of the 3 input methods
 int getLastInputDevice(int previousInput) {
-	// 0: Keyboard
-	// 1: Controller
-	// 2: Wheel
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KThrottle], ScriptControls::ControlType::KThrottle) ||
 		controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KThrottle])) {
-		return 0;
+		return InputDevices::Keyboard;
 	}
 	if (controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CThrottle]), buttonState) ||
 		controller.IsButtonPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CThrottle]), buttonState)) {
-		return 1;
+		return InputDevices::Controller;
 	}
-	if (logiWheelActive && logiThrottleVal > 0.5f) {
-		return 2;
+	if (logiWheelActive &&
+		(logiThrottleVal > 0.5f ||
+		logiBrakeVal > 0.5f)) {
+		return InputDevices::Wheel;
 	}
 	return previousInput;
 }
