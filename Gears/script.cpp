@@ -56,7 +56,6 @@ void update() {
 	player = PLAYER::PLAYER_ID();
 	playerPed = PLAYER::PLAYER_PED_ID();
 
-
 	if (!ENTITY::DOES_ENTITY_EXIST(playerPed) ||
 		!PLAYER::IS_PLAYER_CONTROL_ON(player) || 
 		ENTITY::IS_ENTITY_DEAD(playerPed) || 
@@ -284,15 +283,18 @@ void update() {
 	if (vehData.IsBike) {
 		functionAutoReverse();
 	}
-
-	// New reverse: Reverse with throttle
-	if (settings.RealReverse && !vehData.IsBike) {
-		functionRealReverse();
+	else {
+		// New reverse: Reverse with throttle
+		if (settings.RealReverse) {
+			functionRealReverse();
+			handlePedalsRealReverse();
+		}
+		// Reversing behavior: just block the direction you don't wanna go to
+		else {
+			functionSimpleReverse();
+		}
 	}
-	// Reversing behavior: just block the direction you don't wanna go to
-	if (!settings.RealReverse) {
-		functionSimpleReverse();
-	}
+	
 
 	// Limit truck speed per gear upon game wanting to shift, but we block it.
 	if (vehData.IsTruck) {
@@ -314,12 +316,6 @@ void update() {
 		functionEngStall();
 	}
 
-	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
-		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::Engine]), buttonState) ||
-			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KEngine], ScriptControls::ControlType::KEngine))) {
-		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
-	}
-	
 	// Simulate "catch point"
 	// When the clutch "grabs" and the car starts moving without input
 	// TODO Differentiate between diesel en gasoline?
@@ -328,7 +324,7 @@ void update() {
 	}
 
 	// Manual shifting
-	if (settings.Hshifter) {
+	if (settings.Hshifter && !vehData.IsBike) {
 		functionHShift();
 		if (logiWheelActive) {
 			functionHShiftLogitech();
@@ -337,8 +333,8 @@ void update() {
 	else {
 		functionSShift();
 	}
-	//functionLogiWheelInputs();
 
+	handleVehicleButtons();
 	// Finally, update memory each loop
 	handleRPM();
 	ext.SetClutch(vehicle, 1.0f - controls.Clutchvalf);
@@ -663,24 +659,6 @@ void functionRealReverse() {
 	// Forward gear
 	// Desired: Only brake
 	if (vehData.CurrGear > 0) {
-		// Throttle Pedal normal
-		if (curThrottle > 0.02f) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, curThrottle);
-		}
-		// Brake Pedal normal
-		if (curBrake > 0.02f) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, curBrake);
-		}
-		// Brake Pedal still
-		if (curBrake > 0.02f && curThrottle < curBrake &&
-			vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
-			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-			ext.SetThrottleP(vehicle, 0.0f);
-			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-		}
-
-
 		// LT behavior when still
 		if (controls.Ltvalf > 0.0f && controls.Rtvalf < controls.Ltvalf &&
 			vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
@@ -705,24 +683,6 @@ void functionRealReverse() {
 	// Reverse gear
 	// Desired: RT reverses, LT brakes
 	if (vehData.CurrGear == 0) {
-		// Throttle Pedal Reverse
-		if (curThrottle > 0.02f && curThrottle > curBrake) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, curThrottle);
-		}
-		// Brake Pedal stationary
-		if (curBrake > 0.02f && curThrottle <= curBrake &&
-			vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
-			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-		}
-
-		// Brake Pedal Reverse
-		if (curBrake > 0.02f &&
-			vehData.Velocity <= -0.5f) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, curBrake);
-		}
-
 		ext.SetThrottleP(vehicle, -0.1f);
 		// RT behavior
 		if (controls.Rtvalf > 0.0f && controls.Rtvalf > controls.Ltvalf) {
@@ -744,6 +704,50 @@ void functionRealReverse() {
 			vehData.Velocity <= -0.5f) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.Ltvalf);
+		}
+	}
+}
+
+
+// Forward gear: Throttle accelerates, Brake brakes (exclusive)
+// Reverse gear: Throttle reverses, Brake brakes (exclusive)
+void handlePedalsRealReverse() {
+	if (vehData.CurrGear > 0) {
+		// Throttle Pedal normal
+		if (curThrottle > 0.02f) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, curThrottle);
+		}
+		// Brake Pedal normal
+		if (curBrake > 0.02f) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, curBrake);
+		}
+		// Brake Pedal still
+		if (curBrake > 0.02f && curThrottle < curBrake &&
+			vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
+			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
+			ext.SetThrottleP(vehicle, 0.0f);
+			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+		}
+	}
+	
+	if (vehData.CurrGear == 0) {
+		// Throttle Pedal Reverse
+		if (curThrottle > 0.02f && curThrottle > curBrake) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, curThrottle);
+		}
+		// Brake Pedal stationary
+		if (curBrake > 0.02f && curThrottle <= curBrake &&
+			vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
+			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
+			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+		}
+
+		// Brake Pedal Reverse
+		if (curBrake > 0.02f &&
+			vehData.Velocity <= -0.5f) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, curBrake);
 		}
 	}
 }
@@ -781,5 +785,13 @@ void functionAutoReverse() {
 			}
 			vehData.LockGears = 0x00000000;
 		}
+	}
+}
+
+void handleVehicleButtons() {
+	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
+		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::Engine]), buttonState) ||
+			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KEngine], ScriptControls::ControlType::KEngine))) {
+		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 }
