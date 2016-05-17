@@ -1,7 +1,10 @@
 GTA V Manual Transmission
 =========================
 
-This is an ASI script allowing for manual control over the ingame gearbox.
+This is an ASI script allowing for manual control over the ingame gearbox. As a secondary function, this mod has full racing wheel support. Supported features are steering, the throttle, brake and throttle pedals, sequential shifting and using the H-shifter.
+
+Discuss the mod over at [GTAForums.com](http://gtaforums.com/topic/840830-manual-transmission/).
+
 
 ## Requirements
 * Grand Theft Auto V
@@ -24,5 +27,3 @@ Clone this repository to the same folder ScriptHookV_SDK was extracted so you ha
 
 Download the [Logitech Steering Wheel SDK](http://gaming.logitech.com/en-us/developers) and extract it's contents to LogitechSteeringWheel_SDK. 
 Clone this repository to the same folder LogitechSteeringWheel_SDK was extracted so you have LogitechSteeringWheel_SDK and GTAVManualTransmission in the same folder.
-
-
