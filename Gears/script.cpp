@@ -155,9 +155,9 @@ void update() {
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
 	// Put here to override last control readout for Clutchvalf
-	if (vehData.SimulatedNeutral) {
+	/*if (vehData.SimulatedNeutral) {
 		controls.Clutchvalf = 1.0f;
-	}
+	}*/
 
 	if (logiWheelActive) {
 		playWheelEffects();
@@ -216,14 +216,16 @@ void update() {
 
 	// Special case for clutch used by all vehicles
 	// Only patch if user desires to have their clutch @ 0
-	if (controls.Clutchvalf > 0.9) {
-		if (!patchedSpecial) {
-			patchedSpecial = MemoryPatcher::PatchJustS_LOW();
+	if (!settings.DisableFullClutch) {
+		if (vehData.SimulatedNeutral || controls.Clutchvalf >= 0.96f) {
+			if (!patchedSpecial) {
+				patchedSpecial = MemoryPatcher::PatchJustS_LOW();
+			}
 		}
-	}
-	else {
-		if (patchedSpecial) {
-			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
+		else {
+			if (patchedSpecial) {
+				patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
+			}
 		}
 	}
 	
@@ -304,7 +306,12 @@ void update() {
 	handleVehicleButtons();
 	// Finally, update memory each loop
 	handleRPM();
-	ext.SetClutch(vehicle, 1.0f - controls.Clutchvalf);
+	if (vehData.SimulatedNeutral) {
+		ext.SetClutch(vehicle, 0.0f);
+	}
+	else {
+		ext.SetClutch(vehicle, 1.0f - controls.Clutchvalf);
+	}
 	ext.SetGears(vehicle, vehData.LockGears);
 }
 
@@ -398,17 +405,26 @@ void toggleManual() {
 	reInit();
 }
 
-bool lastKeyboard() {
-	return CONTROLS::_IS_INPUT_DISABLED(2) == TRUE;
-}
-
 void functionHShift() {
 	// All keys checking
 	for (uint8_t i = 0; i <= vehData.TopGear; i++) {
 		if (i > (int)ScriptControls::ControlType::H8) // this shit is just silly can I rly do dis?
 			i = (int)ScriptControls::ControlType::H8; // holy shit bad, bad, hacky idea
 		if (controls.IsKeyJustPressed(controls.Control[i], (ScriptControls::ControlType)i)) {
-			shiftTo(i);
+			if (settings.ClutchShifting) {
+				if (controls.Clutchvalf > 0.75f) {
+					shiftTo(i, false);
+				}
+				else {
+					vehData.SimulatedNeutral = true;
+					if (settings.EngDamage) {
+						VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - 50);
+					}
+				}
+			}
+			else {
+				shiftTo(i, true);
+			}
 		}
 	}
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::HN], ScriptControls::ControlType::HN)) {
@@ -417,36 +433,27 @@ void functionHShift() {
 }
 
 void functionHShiftLogitech() {
-	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::HR])) {
-		shiftTo(0);
-	}
-	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H1])) {
-		shiftTo(1);
-	}
-	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H2])) {
-		shiftTo(2);
-	}
-	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H3])) {
-		shiftTo(3);
-	}
-	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H4])) {
-		shiftTo(4);
-	}
-	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H5])) {
-		shiftTo(5);
-	}
-	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H6])) {
-		shiftTo(6);
-	}
-
-	if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::HR]) ||
-	LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H1]) ||
-	LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H2]) ||
-	LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H3]) ||
-	LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H4]) ||
-	LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H5]) ||
-	LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H6])) {
-	vehData.SimulatedNeutral = false;
+	for (uint i = 0; i < vehData.TopGear; i++) {
+		if (i > (int)ScriptControls::LogiControlType::H6)
+			i = (int)ScriptControls::LogiControlType::H6;
+		if (LogiButtonTriggered(index_, controls.LogiControl[i])) {
+			if (settings.ClutchShifting) {
+				if (controls.Clutchvalf > 0.75f) {
+					shiftTo(i, false);
+					vehData.SimulatedNeutral = false;
+				}
+				else {
+					vehData.SimulatedNeutral = true;
+					if (settings.EngDamage) {
+						VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - 50);
+					}
+				}
+			}
+			else {
+				shiftTo(i, true);
+				vehData.SimulatedNeutral = false;
+			}
+		}
 	}
 	
 	if (LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H1]) ||
@@ -455,12 +462,22 @@ void functionHShiftLogitech() {
 		LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H4]) ||
 		LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H5]) ||
 		LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::H6])) {
+		if (settings.ClutchShifting && settings.EngDamage) {
+			if (controls.Clutchvalf > 0.75f) {
+				// nuffin
+			}
+			else {
+				VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - 50);
+			}
+		}
 		vehData.SimulatedNeutral = true;
 	}
 	
+	//showText(0.1, 0.1, 1.0, (char *)std::to_string(controls.Clutchvalf).c_str());
+
 	if (LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::HR])) {
-		shiftTo(1);
-		vehData.SimulatedNeutral = false;
+		shiftTo(1, true);
+		vehData.SimulatedNeutral = true;
 	}
 }
 
@@ -472,7 +489,7 @@ void functionSShift() {
 		
 		// Reverse to Neutral
 		if (vehData.CurrGear == 0 && !vehData.SimulatedNeutral) {
-			shiftTo(1);
+			shiftTo(1, true);
 			vehData.SimulatedNeutral = true;
 			return;
 		}
@@ -485,7 +502,7 @@ void functionSShift() {
 		
 		// 1 to X
 		if (vehData.CurrGear < vehData.TopGear) {
-			shiftTo(vehData.LockGear + 1);
+			shiftTo(vehData.LockGear + 1, true);
 		}
 	}
 
@@ -502,24 +519,24 @@ void functionSShift() {
 
 		// Neutral to R
 		if (vehData.CurrGear == 1 && vehData.SimulatedNeutral) {
-			shiftTo(0);
+			shiftTo(0, true);
 			vehData.SimulatedNeutral = false;
 			return;
 		}
 
 		// X to 1
 		if (vehData.CurrGear > 1) {
-			shiftTo(vehData.LockGear - 1);
+			shiftTo(vehData.LockGear - 1, true);
 		}
 	}
 
 }
 
-void shiftTo(int gear) {
-	if (controls.Clutchvalf < 0.1f) {
+void shiftTo(int gear, bool autoClutch) {
+	if (autoClutch) {
 		controls.Clutchvalf = 1.0f;
+		ext.SetThrottle(vehicle, 0.0f);
 	}
-	ext.SetThrottle(vehicle, 0.0f);
 	vehData.LockGears = gear | (gear << 16);
 	vehData.LockTruck = false;
 	vehData.PrevGear = vehData.CurrGear;

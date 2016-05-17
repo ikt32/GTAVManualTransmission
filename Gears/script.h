@@ -29,7 +29,7 @@ void functionClutchCatch();
 void functionHShift();
 void functionSShift();
 void functionHShiftLogitech();
-void shiftTo(int gear);
+void shiftTo(int gear, bool autoClutch);
 void handleRPM();
 void handlePedalsDefault();
 void handlePedalsRealReverse();

@@ -23,6 +23,7 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	EngStall =       (GetPrivateProfileIntA("MAIN", "EngineStalling", 0, SETTINGSFILE) == 1);
 	EngBrake =       (GetPrivateProfileIntA("MAIN", "EngineBraking",  0, SETTINGSFILE) == 1);
 	ClutchCatching = (GetPrivateProfileIntA("MAIN", "ClutchCatching", 0, SETTINGSFILE) == 1);
+	ClutchShifting = (GetPrivateProfileIntA("MAIN", "ClutchShifting", 0, SETTINGSFILE) == 1);
 	DefaultNeutral = (GetPrivateProfileIntA("MAIN", "DefaultNeutral", 0, SETTINGSFILE) == 1);
 	UITips =         (GetPrivateProfileIntA("MAIN", "UITips",         1, SETTINGSFILE) == 1);
 	UITips_X =       GetPrivateProfileIntA("MAIN", "UITips_X",      95, SETTINGSFILE)/100.0f;
@@ -31,6 +32,7 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 
 	Hshifter =       (GetPrivateProfileIntA("CONTROLS", "EnableH",    0, SETTINGSFILE) == 1);
 	Debug =          (GetPrivateProfileIntA("DEBUG", "Info",          0, SETTINGSFILE) == 1);
+	DisableFullClutch = (GetPrivateProfileIntA("DEBUG", "DisableFullClutch", 0, SETTINGSFILE) == 1);
 
 	CheckSettings();
 

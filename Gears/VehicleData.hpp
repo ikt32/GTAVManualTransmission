@@ -21,6 +21,8 @@ public:
 	uint64_t Address;
 	uint32_t Gears;
 	float Rpm;
+
+	// 1 = Not pressed, 0 = Fully pressed
 	float Clutch;
 	float Throttle;
 	float Turbo;

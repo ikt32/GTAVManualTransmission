@@ -106,6 +106,7 @@ public:
 
 	float Ltvalf = 0.0f;
 	float Rtvalf = 0.0f;
+	// 1 = Pressed, 0 = Not pressed
 	float Clutchvalf = 0.0f;
 	int Accelval;
 	float Accelvalf = 0.0f;

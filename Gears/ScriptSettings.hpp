@@ -21,12 +21,14 @@ public:
 	bool EngStall;
 	bool EngBrake;
 	bool ClutchCatching;
+	bool ClutchShifting;
 	bool DefaultNeutral;
 	bool UITips;
 	bool Hshifter;
 	bool LogiWheel;
 
 	bool Debug;
+	bool DisableFullClutch;
 
 	float UITips_X;
 	float UITips_Y;
