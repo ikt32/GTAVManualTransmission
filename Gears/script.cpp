@@ -772,8 +772,8 @@ void playWheelEffects() {
 	}
 	LogiPlayDamperForce(index_, damperforce);
 
-	if (vehData.Speed > 2.0f) {
-		LogiPlaySpringForce(index_, 0, 100, (int)(vehData.Speed*2.0f));
+	if (vehData.Speed > 3.0f) {
+		LogiPlaySpringForce(index_, 0, 80, (int)(vehData.Speed*2.0f));
 	}
 }
 
