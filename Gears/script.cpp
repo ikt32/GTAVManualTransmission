@@ -93,11 +93,11 @@ void update() {
 		controller.UpdateButtonChangeStates();
 	}
 
-	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KToggle], ScriptControls::KeyboardControlType::KToggle)) {
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Toggle], ScriptControls::KeyboardControlType::Toggle)) {
 		toggleManual();
 	}
 
-	if (controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::CToggle]), buttonState, controls.CToggleTime) &&
+	if (controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Toggle]), buttonState, controls.CToggleTime) &&
 		prevInput == InputDevices::Controller) {
 		toggleManual();
 	}
@@ -127,7 +127,6 @@ void update() {
 
 	// Laten we lomp beslissen aan de hand van welk device het laatst op de gasknop/trigger/pedaal hebt gedrukt
 	// omdat dat gewoon werkt(TM)
-	
 	if (logiWheelActive) {
 		updateLogiValues();
 	}
@@ -154,13 +153,13 @@ void update() {
 	}
 	switch (prevInput) {
 	case InputDevices::Keyboard:
-		controls.Rtvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KThrottle]) ? 1.0f : 0.0f);
-		controls.Ltvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KBrake]) ? 1.0f : 0.0f);
-		controls.Clutchvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KClutch]) ? 1.0f : 0.0f);
+		controls.Rtvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Throttle]) ? 1.0f : 0.0f);
+		controls.Ltvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Brake]) ? 1.0f : 0.0f);
+		controls.Clutchvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Clutch]) ? 1.0f : 0.0f);
 		break;
 	case InputDevices::Controller: // Controller
-		controls.Rtvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::CThrottle]), buttonState);
-		controls.Ltvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::CBrake]), buttonState);
+		controls.Rtvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Throttle]), buttonState);
+		controls.Ltvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Brake]), buttonState);
 		controls.Clutchvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Clutch]), buttonState);
 		break;
 	case InputDevices::Wheel: // Wheel
@@ -505,7 +504,7 @@ void functionHShiftLogitech() {
 void functionSShift() {
 	// Shift up
 	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::ShiftUp]), buttonState) ||
-		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KShiftUp], ScriptControls::KeyboardControlType::KShiftUp) ||
+		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ShiftUp], ScriptControls::KeyboardControlType::ShiftUp) ||
 		(logiWheelActive && LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftUp]))) {
 		
 		// Reverse to Neutral
@@ -529,7 +528,7 @@ void functionSShift() {
 
 	// Shift down
 	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::ShiftDown]), buttonState) ||
-		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KShiftDown], ScriptControls::KeyboardControlType::KShiftDown) ||
+		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ShiftDown], ScriptControls::KeyboardControlType::ShiftDown) ||
 		(logiWheelActive && LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftDown]))) {
 		
 		// 1 to Neutral
@@ -796,7 +795,7 @@ void functionAutoReverse() {
 void handleVehicleButtons() {
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
 		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Engine]), buttonState) ||
-			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KEngine], ScriptControls::KeyboardControlType::KEngine))) {
+			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Engine], ScriptControls::KeyboardControlType::Engine))) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 }
@@ -850,12 +849,12 @@ void initWheel() {
 
 // Limitations: Detects on pressing throttle on any of the 3 input methods
 int getLastInputDevice(int previousInput) {
-	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KThrottle], ScriptControls::KeyboardControlType::KThrottle) ||
-		controls.IsKeyPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KThrottle])) {
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Throttle], ScriptControls::KeyboardControlType::Throttle) ||
+		controls.IsKeyPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Throttle])) {
 		return InputDevices::Keyboard;
 	}
-	if (controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::CThrottle]), buttonState) ||
-		controller.IsButtonPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::CThrottle]), buttonState)) {
+	if (controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Throttle]), buttonState) ||
+		controller.IsButtonPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Throttle]), buttonState)) {
 		return InputDevices::Controller;
 	}
 	if (logiWheelActive &&

@@ -40,7 +40,7 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 
 	char buffer[24] = {0};
 	GetPrivateProfileStringA("MAIN", "CToggle", "DpadRight", buffer, (DWORD)24, SETTINGSFILE);
-	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::CToggle] = buffer; 
+	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::Toggle] = buffer; 
 	
 	GetPrivateProfileStringA("CONTROLLER", "ShiftUp", "A", buffer, (DWORD)24, SETTINGSFILE);
 	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::ShiftUp] = buffer;
@@ -55,18 +55,18 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::Engine] = buffer;
 
 	GetPrivateProfileStringA("CONTROLLER", "CThrottle", "RightTrigger", buffer, (DWORD)24, SETTINGSFILE);
-	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::CThrottle] = buffer;
+	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::Throttle] = buffer;
 
 	GetPrivateProfileStringA("CONTROLLER", "CBrake", "LeftTrigger", buffer, (DWORD)24, SETTINGSFILE);
-	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::CBrake] = buffer;
+	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::Brake] = buffer;
 
 
-	scriptControl->Control[(int)ScriptControls::KeyboardControlType::KToggle] = GetPrivateProfileIntA("MAIN", "KToggle", VK_OEM_5, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Toggle] = GetPrivateProfileIntA("MAIN", "KToggle", VK_OEM_5, SETTINGSFILE);
 
-	scriptControl->Control[(int)ScriptControls::KeyboardControlType::KShiftUp] = GetPrivateProfileIntA("KEYBOARD", "KShiftUp", VK_NUMPAD9, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::KeyboardControlType::KShiftDown] = GetPrivateProfileIntA("KEYBOARD", "KShiftDown", VK_NUMPAD7, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::KeyboardControlType::KClutch] = GetPrivateProfileIntA("KEYBOARD", "KClutch", VK_NUMPAD8, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::KeyboardControlType::KEngine] = GetPrivateProfileIntA("KEYBOARD", "KEngine", 0x45, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::ShiftUp] = GetPrivateProfileIntA("KEYBOARD", "KShiftUp", VK_NUMPAD9, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::ShiftDown] = GetPrivateProfileIntA("KEYBOARD", "KShiftDown", VK_NUMPAD7, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Clutch] = GetPrivateProfileIntA("KEYBOARD", "KClutch", VK_NUMPAD8, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Engine] = GetPrivateProfileIntA("KEYBOARD", "KEngine", 0x45, SETTINGSFILE);
 
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::ToggleH] = GetPrivateProfileIntA("KEYBOARD", "ToggleH", VK_OEM_6, SETTINGSFILE);
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::HR] = GetPrivateProfileIntA("KEYBOARD", "HR", VK_NUMPAD0, SETTINGSFILE);
@@ -80,8 +80,8 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::H8] = GetPrivateProfileIntA("KEYBOARD", "H8", VK_NUMPAD8, SETTINGSFILE);
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::HN] = GetPrivateProfileIntA("KEYBOARD", "HN", VK_NUMPAD9, SETTINGSFILE);
 
-	scriptControl->Control[(int)ScriptControls::KeyboardControlType::KThrottle] = GetPrivateProfileIntA("KEYBOARD", "KThrottle", 0x57, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::KeyboardControlType::KBrake] = GetPrivateProfileIntA("KEYBOARD", "KBrake", 0x53, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Throttle] = GetPrivateProfileIntA("KEYBOARD", "KThrottle", 0x57, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Brake] = GetPrivateProfileIntA("KEYBOARD", "KBrake", 0x53, SETTINGSFILE);
 
 	LogiWheel = (GetPrivateProfileIntA("LOGITECHWHEEL", "Enable", 0, SETTINGSFILE) == 1);
 	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::ShiftUp] = GetPrivateProfileIntA("LOGITECHWHEEL", "ShiftUp", 4, SETTINGSFILE);

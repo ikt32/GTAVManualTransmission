@@ -31,21 +31,3 @@ bool ScriptControls::IsKeyJustPressed(int key, KeyboardControlType control) {
 	ControlPrev[(int)control] = ControlCurr[(int)control];
 	return false;
 }
-
-/*
-bool ScriptControls::WasControlPressedForMs(int control, int ms) {
-	if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, control)) {
-		pressTime = milliseconds_now();
-	}
-	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, control)) {
-		releaseTime = milliseconds_now();
-	}
-
-	if ((releaseTime - pressTime) >= ms) {
-		pressTime = 0;
-		releaseTime = 0;
-		return true;
-	}
-	return false;
-}
-*/

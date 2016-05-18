@@ -10,9 +10,9 @@ public:
 		ShiftUp,
 		ShiftDown,
 		Clutch,
-		CThrottle,
-		CBrake,
-		CToggle,
+		Throttle,
+		Brake,
+		Toggle,
 		Engine,
 		SIZEOF_ControllerControlType
 	};
@@ -28,46 +28,16 @@ public:
 		H7,
 		H8,
 		HN,
-		KToggle,
+		Toggle,
 		ToggleH,
-		KShiftUp,
-		KShiftDown,
-		KClutch,
-		KThrottle,
-		KBrake,
-		KEngine,
-		SIZEOF_KeyboardControlType
-	};
-
-	// todo: Something about these enums and scopes
-	/*enum class ControlType {
-		HR = 0,
-		H1,
-		H2,
-		H3,
-		H4,
-		H5,
-		H6,
-		H7,
-		H8,
-		HN,
 		ShiftUp,
 		ShiftDown,
 		Clutch,
-		KToggle,
-		ToggleH,
-		KShiftUp,
-		KShiftDown,
-		KClutch,
-		CThrottle,
-		CBrake,
-		KThrottle,
-		KBrake,
+		Throttle,
+		Brake,
 		Engine,
-		KEngine,
-		CToggle,
-		SIZEOF_ControlType
-	};*/
+		SIZEOF_KeyboardControlType
+	};
 	
 	enum class LogiControlType {
 		HR = 0,
@@ -94,8 +64,6 @@ public:
 	~ScriptControls();
 	bool IsKeyPressed(int key);
 	bool IsKeyJustPressed(int key, KeyboardControlType control);
-
-	//bool WasControlPressedForMs(int control, int ms);
 
 	int Control[(int)KeyboardControlType::SIZEOF_KeyboardControlType];
 	int LogiControl[(int)LogiControlType::SIZEOF_LogiControlType];
