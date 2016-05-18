@@ -16,59 +16,52 @@ ScriptSettings::ScriptSettings() {
 
 
 void ScriptSettings::Read(ScriptControls *scriptControl) {
-	EnableManual =   (GetPrivateProfileIntA("MAIN", "DefaultEnable",  1, SETTINGSFILE) == 1);
-	RealReverse =    (GetPrivateProfileIntA("MAIN", "RealReverse",    1, SETTINGSFILE) == 1);
-	SimpleBike =     (GetPrivateProfileIntA("MAIN", "SimpleBike",     1, SETTINGSFILE) == 1);
-	EngDamage =      (GetPrivateProfileIntA("MAIN", "EngineDamage",   0, SETTINGSFILE) == 1);
-	EngStall =       (GetPrivateProfileIntA("MAIN", "EngineStalling", 0, SETTINGSFILE) == 1);
-	EngBrake =       (GetPrivateProfileIntA("MAIN", "EngineBraking",  0, SETTINGSFILE) == 1);
-	ClutchCatching = (GetPrivateProfileIntA("MAIN", "ClutchCatching", 0, SETTINGSFILE) == 1);
-	ClutchShifting = (GetPrivateProfileIntA("MAIN", "ClutchShifting", 0, SETTINGSFILE) == 1);
-	DefaultNeutral = (GetPrivateProfileIntA("MAIN", "DefaultNeutral", 0, SETTINGSFILE) == 1);
-	UITips =         (GetPrivateProfileIntA("MAIN", "UITips",         1, SETTINGSFILE) == 1);
-	UITips_X =       GetPrivateProfileIntA("MAIN", "UITips_X",      95, SETTINGSFILE)/100.0f;
-	UITips_Y =       GetPrivateProfileIntA("MAIN", "UITips_Y",      95, SETTINGSFILE)/100.0f;
-	UITips_Size =    GetPrivateProfileIntA("MAIN", "UITips_Size",   15, SETTINGSFILE)/100.0f;
-
-	Hshifter =       (GetPrivateProfileIntA("CONTROLS", "EnableH",    0, SETTINGSFILE) == 1);
+	EnableManual =   (GetPrivateProfileIntA("OPTIONS", "Enable",         1, SETTINGSFILE) == 1);
+	Hshifter =       (GetPrivateProfileIntA("OPTIONS", "EnableH",        0, SETTINGSFILE) == 1);
+	RealReverse =    (GetPrivateProfileIntA("OPTIONS", "RealReverse",    1, SETTINGSFILE) == 1);
+	SimpleBike =     (GetPrivateProfileIntA("OPTIONS", "SimpleBike",     1, SETTINGSFILE) == 1);
+	EngDamage =      (GetPrivateProfileIntA("OPTIONS", "EngineDamage",   0, SETTINGSFILE) == 1);
+	EngStall =       (GetPrivateProfileIntA("OPTIONS", "EngineStalling", 0, SETTINGSFILE) == 1);
+	EngBrake =       (GetPrivateProfileIntA("OPTIONS", "EngineBraking",  0, SETTINGSFILE) == 1);
+	ClutchCatching = (GetPrivateProfileIntA("OPTIONS", "ClutchCatching", 0, SETTINGSFILE) == 1);
+	ClutchShifting = (GetPrivateProfileIntA("OPTIONS", "ClutchShifting", 0, SETTINGSFILE) == 1);
+	DefaultNeutral = (GetPrivateProfileIntA("OPTIONS", "DefaultNeutral", 0, SETTINGSFILE) == 1);
+	UITips =         (GetPrivateProfileIntA("OPTIONS", "UITips",         1, SETTINGSFILE) == 1);
+	UITips_X =       GetPrivateProfileIntA("OPTIONS", "UITips_X",       95, SETTINGSFILE)/100.0f;
+	UITips_Y =       GetPrivateProfileIntA("OPTIONS", "UITips_Y",       95, SETTINGSFILE)/100.0f;
+	UITips_Size =    GetPrivateProfileIntA("OPTIONS", "UITips_Size",    15, SETTINGSFILE)/100.0f;
 	Debug =          (GetPrivateProfileIntA("DEBUG", "Info",          0, SETTINGSFILE) == 1);
 	DisableFullClutch = (GetPrivateProfileIntA("DEBUG", "DisableFullClutch", 0, SETTINGSFILE) == 1);
 
 	CheckSettings();
 
-	scriptControl->CToggleTime = GetPrivateProfileIntA("MAIN", "CToggleTime", 500, SETTINGSFILE);
-
+	// Start Controller section
 	char buffer[24] = {0};
-	GetPrivateProfileStringA("MAIN", "CToggle", "DpadRight", buffer, (DWORD)24, SETTINGSFILE);
+	GetPrivateProfileStringA("CONTROLLER", "Toggle", "DpadRight", buffer, (DWORD)24, SETTINGSFILE);
 	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::Toggle] = buffer; 
-	
+	scriptControl->CToggleTime = GetPrivateProfileIntA("CONTROLLER", "ToggleTime", 500, SETTINGSFILE);
 	GetPrivateProfileStringA("CONTROLLER", "ShiftUp", "A", buffer, (DWORD)24, SETTINGSFILE);
 	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::ShiftUp] = buffer;
-
 	GetPrivateProfileStringA("CONTROLLER", "ShiftDown", "X", buffer, (DWORD)24, SETTINGSFILE);
 	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::ShiftDown] = buffer;
-
 	GetPrivateProfileStringA("CONTROLLER", "Clutch", "LeftThumbDown", buffer, (DWORD)24, SETTINGSFILE);
 	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::Clutch] = buffer;
-
 	GetPrivateProfileStringA("CONTROLLER", "Engine", "DpadDown", buffer, (DWORD)24, SETTINGSFILE);
 	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::Engine] = buffer;
-
-	GetPrivateProfileStringA("CONTROLLER", "CThrottle", "RightTrigger", buffer, (DWORD)24, SETTINGSFILE);
+	GetPrivateProfileStringA("CONTROLLER", "Throttle", "RightTrigger", buffer, (DWORD)24, SETTINGSFILE);
 	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::Throttle] = buffer;
-
-	GetPrivateProfileStringA("CONTROLLER", "CBrake", "LeftTrigger", buffer, (DWORD)24, SETTINGSFILE);
+	GetPrivateProfileStringA("CONTROLLER", "Brake", "LeftTrigger", buffer, (DWORD)24, SETTINGSFILE);
 	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::Brake] = buffer;
 
-
-	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Toggle] = GetPrivateProfileIntA("MAIN", "KToggle", VK_OEM_5, SETTINGSFILE);
-
-	scriptControl->Control[(int)ScriptControls::KeyboardControlType::ShiftUp] = GetPrivateProfileIntA("KEYBOARD", "KShiftUp", VK_NUMPAD9, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::KeyboardControlType::ShiftDown] = GetPrivateProfileIntA("KEYBOARD", "KShiftDown", VK_NUMPAD7, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Clutch] = GetPrivateProfileIntA("KEYBOARD", "KClutch", VK_NUMPAD8, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Engine] = GetPrivateProfileIntA("KEYBOARD", "KEngine", 0x45, SETTINGSFILE);
-
+	// Start Keyboard section
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Toggle]  = GetPrivateProfileIntA("KEYBOARD", "Toggle",  VK_OEM_5, SETTINGSFILE);
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::ToggleH] = GetPrivateProfileIntA("KEYBOARD", "ToggleH", VK_OEM_6, SETTINGSFILE);
+	
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::ShiftUp]   = GetPrivateProfileIntA("KEYBOARD", "ShiftUp",   VK_NUMPAD9, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::ShiftDown] = GetPrivateProfileIntA("KEYBOARD", "ShiftDown", VK_NUMPAD7, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Clutch]    = GetPrivateProfileIntA("KEYBOARD", "Clutch",    VK_NUMPAD8, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Engine]    = GetPrivateProfileIntA("KEYBOARD", "Engine",    0x45,       SETTINGSFILE);
+
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::HR] = GetPrivateProfileIntA("KEYBOARD", "HR", VK_NUMPAD0, SETTINGSFILE);
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::H1] = GetPrivateProfileIntA("KEYBOARD", "H1", VK_NUMPAD1, SETTINGSFILE);
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::H2] = GetPrivateProfileIntA("KEYBOARD", "H2", VK_NUMPAD2, SETTINGSFILE);
@@ -80,9 +73,10 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::H8] = GetPrivateProfileIntA("KEYBOARD", "H8", VK_NUMPAD8, SETTINGSFILE);
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::HN] = GetPrivateProfileIntA("KEYBOARD", "HN", VK_NUMPAD9, SETTINGSFILE);
 
-	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Throttle] = GetPrivateProfileIntA("KEYBOARD", "KThrottle", 0x57, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Brake] = GetPrivateProfileIntA("KEYBOARD", "KBrake", 0x53, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Throttle] = GetPrivateProfileIntA("KEYBOARD", "Throttle", 0x57, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Brake] = GetPrivateProfileIntA("KEYBOARD", "Brake", 0x53, SETTINGSFILE);
 
+	// Start wheel section
 	LogiWheel = (GetPrivateProfileIntA("LOGITECHWHEEL", "Enable", 0, SETTINGSFILE) == 1);
 	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::ShiftUp] = GetPrivateProfileIntA("LOGITECHWHEEL", "ShiftUp", 4, SETTINGSFILE);
 	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::ShiftDown] = GetPrivateProfileIntA("LOGITECHWHEEL", "ShiftDown", 5, SETTINGSFILE);
@@ -96,7 +90,7 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 }
 
 void ScriptSettings::Save() {
-	WritePrivateProfileStringA("MAIN", "DefaultEnable", (EnableManual ? " 1" : " 0"), SETTINGSFILE);
+	WritePrivateProfileStringA("OPTIONS", "Enable", (EnableManual ? " 1" : " 0"), SETTINGSFILE);
 	WritePrivateProfileStringA("CONTROLS", "EnableH", (Hshifter ? " 1" : " 0"), SETTINGSFILE);
 }
 
@@ -106,11 +100,11 @@ void ScriptSettings::CheckSettings() {
 	if (UITips_X > 100) {
 		UITips_X = 100;
 		logger.Write("UITips_X higher than 100, reverting");
-		WritePrivateProfileStringA("MAIN", "UITips_X", "100", SETTINGSFILE);
+		WritePrivateProfileStringA("OPTIONS", "UITips_X", "100", SETTINGSFILE);
 	}
 	if (UITips_Y > 100) {
 		UITips_Y = 100;
 		logger.Write("UITips_Y higher than 100, reverting");
-		WritePrivateProfileStringA("MAIN", "UITips_Y", "100", SETTINGSFILE);
+		WritePrivateProfileStringA("OPTIONS", "UITips_Y", "100", SETTINGSFILE);
 	}
 }
