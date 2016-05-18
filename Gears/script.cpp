@@ -824,16 +824,14 @@ void handleVehicleButtons() {
 		}
 		switch (LogiGetState(index_)->rgdwPOV[0]) {
 		case 0:
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleNextRadio, 1.0f);
 			break;
 		case 9000:
-			CONTROLS::_SET_CONTROL_NORMAL(1, ControlLookRight, 1.0f);
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleNextRadio, 1.0f);
 			break;
 		case 18000:
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehiclePrevRadio, 1.0f);
 			break;
 		case 27000:
-			CONTROLS::_SET_CONTROL_NORMAL(1, ControlVehicleLookLeft, 1.0f);
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehiclePrevRadio, 1.0f);
 			break;
 		}
 	}
