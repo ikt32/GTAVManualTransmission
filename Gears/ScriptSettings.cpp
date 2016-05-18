@@ -103,7 +103,7 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 
 void ScriptSettings::Save() {
 	WritePrivateProfileStringA("OPTIONS", "Enable", (EnableManual ? " 1" : " 0"), SETTINGSFILE);
-	WritePrivateProfileStringA("CONTROLS", "EnableH", (Hshifter ? " 1" : " 0"), SETTINGSFILE);
+	WritePrivateProfileStringA("OPTIONS", "EnableH", (Hshifter ? " 1" : " 0"), SETTINGSFILE);
 }
 
 // Checks for conflicting settings and adjusts them
