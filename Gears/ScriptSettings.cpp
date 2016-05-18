@@ -56,12 +56,10 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	// Start Keyboard section
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Toggle]  = GetPrivateProfileIntA("KEYBOARD", "Toggle",  VK_OEM_5, SETTINGSFILE);
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::ToggleH] = GetPrivateProfileIntA("KEYBOARD", "ToggleH", VK_OEM_6, SETTINGSFILE);
-	
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::ShiftUp]   = GetPrivateProfileIntA("KEYBOARD", "ShiftUp",   VK_NUMPAD9, SETTINGSFILE);
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::ShiftDown] = GetPrivateProfileIntA("KEYBOARD", "ShiftDown", VK_NUMPAD7, SETTINGSFILE);
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Clutch]    = GetPrivateProfileIntA("KEYBOARD", "Clutch",    VK_NUMPAD8, SETTINGSFILE);
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Engine]    = GetPrivateProfileIntA("KEYBOARD", "Engine",    0x45,       SETTINGSFILE);
-
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::HR] = GetPrivateProfileIntA("KEYBOARD", "HR", VK_NUMPAD0, SETTINGSFILE);
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::H1] = GetPrivateProfileIntA("KEYBOARD", "H1", VK_NUMPAD1, SETTINGSFILE);
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::H2] = GetPrivateProfileIntA("KEYBOARD", "H2", VK_NUMPAD2, SETTINGSFILE);
@@ -72,21 +70,35 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::H7] = GetPrivateProfileIntA("KEYBOARD", "H7", VK_NUMPAD7, SETTINGSFILE);
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::H8] = GetPrivateProfileIntA("KEYBOARD", "H8", VK_NUMPAD8, SETTINGSFILE);
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::HN] = GetPrivateProfileIntA("KEYBOARD", "HN", VK_NUMPAD9, SETTINGSFILE);
-
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Throttle] = GetPrivateProfileIntA("KEYBOARD", "Throttle", 0x57, SETTINGSFILE);
 	scriptControl->Control[(int)ScriptControls::KeyboardControlType::Brake] = GetPrivateProfileIntA("KEYBOARD", "Brake", 0x53, SETTINGSFILE);
 
 	// Start wheel section
 	LogiWheel = (GetPrivateProfileIntA("LOGITECHWHEEL", "Enable", 0, SETTINGSFILE) == 1);
-	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::ShiftUp] = GetPrivateProfileIntA("LOGITECHWHEEL", "ShiftUp", 4, SETTINGSFILE);
+
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::Toggle] = GetPrivateProfileIntA("LOGITECHWHEEL", "Toggle", 17, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::ToggleH] = GetPrivateProfileIntA("LOGITECHWHEEL", "ToggleH", 6, SETTINGSFILE);
+
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::ShiftUp]   = GetPrivateProfileIntA("LOGITECHWHEEL", "ShiftUp", 4, SETTINGSFILE);
 	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::ShiftDown] = GetPrivateProfileIntA("LOGITECHWHEEL", "ShiftDown", 5, SETTINGSFILE);
-	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::HR] = GetPrivateProfileIntA("LOGITECHWHEEL", "HR", 14, SETTINGSFILE);
-	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::H1] = GetPrivateProfileIntA("LOGITECHWHEEL", "H1", 8, SETTINGSFILE);
-	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::H2] = GetPrivateProfileIntA("LOGITECHWHEEL", "H2", 9, SETTINGSFILE);
-	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::H3] = GetPrivateProfileIntA("LOGITECHWHEEL", "H3", 10, SETTINGSFILE);
-	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::H4] = GetPrivateProfileIntA("LOGITECHWHEEL", "H4", 11, SETTINGSFILE);
-	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::H5] = GetPrivateProfileIntA("LOGITECHWHEEL", "H5", 12, SETTINGSFILE);
-	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::H6] = GetPrivateProfileIntA("LOGITECHWHEEL", "H6", 13, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::HR]        = GetPrivateProfileIntA("LOGITECHWHEEL", "HR", 14, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::H1]        = GetPrivateProfileIntA("LOGITECHWHEEL", "H1", 8, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::H2]        = GetPrivateProfileIntA("LOGITECHWHEEL", "H2", 9, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::H3]        = GetPrivateProfileIntA("LOGITECHWHEEL", "H3", 10, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::H4]        = GetPrivateProfileIntA("LOGITECHWHEEL", "H4", 11, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::H5]        = GetPrivateProfileIntA("LOGITECHWHEEL", "H5", 12, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::H6]        = GetPrivateProfileIntA("LOGITECHWHEEL", "H6", 13, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::Handbrake] = GetPrivateProfileIntA("LOGITECHWHEEL", "Handbrake", 19, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::Engine]    = GetPrivateProfileIntA("LOGITECHWHEEL", "Engine", 21, SETTINGSFILE);
+
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::Horn]      = GetPrivateProfileIntA("LOGITECHWHEEL", "Horn", 20, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::Lights]    = GetPrivateProfileIntA("LOGITECHWHEEL", "Lights", 7, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::LookBack]  = GetPrivateProfileIntA("LOGITECHWHEEL", "LookBack", 22, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::Camera]    = GetPrivateProfileIntA("LOGITECHWHEEL", "Camera", 0, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::RadioPrev] = GetPrivateProfileIntA("LOGITECHWHEEL", "RadioPrev", 1, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::RadioNext] = GetPrivateProfileIntA("LOGITECHWHEEL", "RadioNext", 2, SETTINGSFILE);
+
+
 }
 
 void ScriptSettings::Save() {

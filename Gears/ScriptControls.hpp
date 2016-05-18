@@ -55,6 +55,14 @@ public:
 		Brake,
 		Engine,
 		Toggle,
+		ToggleH,
+		Handbrake,
+		Horn,
+		Lights,
+		LookBack,
+		Camera,
+		RadioPrev,
+		RadioNext,
 		SIZEOF_LogiControlType
 	};
 	

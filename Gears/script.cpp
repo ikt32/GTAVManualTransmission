@@ -48,7 +48,7 @@ long logiThrottlePos;
 long logiBrakePos;
 long logiClutchPos;
 
-float logiWheel;
+float logiWheelVal;
 float logiThrottleVal;
 float logiBrakeVal;
 float logiClutchVal;
@@ -93,12 +93,9 @@ void update() {
 		controller.UpdateButtonChangeStates();
 	}
 
-	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Toggle], ScriptControls::KeyboardControlType::Toggle)) {
-		toggleManual();
-	}
-
-	if (controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Toggle]), buttonState, controls.CToggleTime) &&
-		prevInput == InputDevices::Controller) {
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Toggle], ScriptControls::KeyboardControlType::Toggle) || 
+		controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Toggle]), buttonState, controls.CToggleTime) ||
+		LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::Toggle])) {
 		toggleManual();
 	}
 
@@ -112,7 +109,7 @@ void update() {
 	
 	// LogiButton index 21 should be button 22, is the right bottom on the G27.
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ToggleH], ScriptControls::KeyboardControlType::ToggleH) ||
-		LogiButtonTriggered(index_, 21)) {
+		LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::ToggleH])) {
 		settings.Hshifter = !settings.Hshifter;
 		std::stringstream message;
 		message << "Mode: " <<
@@ -193,6 +190,7 @@ void update() {
 			antiDeadzoned = (logiSteeringWheelPos + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
 		}
 		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
+		//VEHICLE::SET_VEHICLE_STEER_BIAS(vehicle, logiWheelVal*0.2f);
 	}
 
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
@@ -403,6 +401,9 @@ void showDebugInfo() {
 		showText(0.01, 0.10, 0.4, (char *)throttleXDisplay.str().c_str());
 		showText(0.01, 0.12, 0.4, (char *)brakeXDisplay.str().c_str());
 		showText(0.01, 0.14, 0.4, (char *)clutchXDisplay.str().c_str());
+		std::stringstream wheelDisplay;
+		wheelDisplay << "Wheel:" << logiWheelVal;
+		showText(0.01, 0.16, 0.4, (char *)wheelDisplay.str().c_str());
 	}
 }
 
@@ -794,9 +795,47 @@ void functionAutoReverse() {
 
 void handleVehicleButtons() {
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
-		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Engine]), buttonState) ||
-			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Engine], ScriptControls::KeyboardControlType::Engine))) {
+		(	controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Engine]), buttonState) ||
+			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Engine], ScriptControls::KeyboardControlType::Engine) ||
+			LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::Engine]))) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
+	}
+	if (logiWheelActive) {
+		if (LogiGetState(index_)->rgbButtons[controls.LogiControl[(int)ScriptControls::LogiControlType::Handbrake]]) {
+			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+		}
+		if (LogiGetState(index_)->rgbButtons[controls.LogiControl[(int)ScriptControls::LogiControlType::Horn]]) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHorn, 1.0f);
+		}
+		if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::Lights])) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHeadlight, 1.0f);
+		}
+		if (LogiGetState(index_)->rgbButtons[controls.LogiControl[(int)ScriptControls::LogiControlType::LookBack]]) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleLookBehind, 1.0f);
+		}
+		if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::Camera])) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlNextCamera, 1.0f);
+		}
+		if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::RadioNext])) {
+			AUDIO::SET_RADIO_TO_STATION_INDEX(AUDIO::GET_PLAYER_RADIO_STATION_INDEX() + 1);
+		}
+		if (LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::RadioPrev])) {
+			AUDIO::SET_RADIO_TO_STATION_INDEX(AUDIO::GET_PLAYER_RADIO_STATION_INDEX() - 1);
+		}
+		switch (LogiGetState(index_)->rgdwPOV[0]) {
+		case 0:
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleNextRadio, 1.0f);
+			break;
+		case 9000:
+			CONTROLS::_SET_CONTROL_NORMAL(1, ControlLookRight, 1.0f);
+			break;
+		case 18000:
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehiclePrevRadio, 1.0f);
+			break;
+		case 27000:
+			CONTROLS::_SET_CONTROL_NORMAL(1, ControlVehicleLookLeft, 1.0f);
+			break;
+		}
 	}
 }
 
@@ -826,7 +865,7 @@ void updateLogiValues() {
 	logiClutchPos = LogiGetState(index_)->rglSlider[1];
 	//  32767 @ nope | 0
 	// -32768 @ full | 1
-	logiWheel =       ((float)logiSteeringWheelPos) /  65536.0f * -.2f;
+	logiWheelVal = ((float)(logiSteeringWheelPos - 32767) / -65535.0f)-0.5f;
 	logiThrottleVal = (float)(logiThrottlePos - 32767) / -65535.0f;
 	logiBrakeVal =    (float)(logiBrakePos - 32767) / -65535.0f;
 	logiClutchVal =   1.0f+(float)(logiClutchPos - 32767) / 65535.0f;
