@@ -93,11 +93,11 @@ void update() {
 		controller.UpdateButtonChangeStates();
 	}
 
-	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KToggle], ScriptControls::ControlType::KToggle)) {
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KToggle], ScriptControls::KeyboardControlType::KToggle)) {
 		toggleManual();
 	}
 
-	if (controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CToggle]), buttonState, controls.CToggleTime) &&
+	if (controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::CToggle]), buttonState, controls.CToggleTime) &&
 		prevInput == InputDevices::Controller) {
 		toggleManual();
 	}
@@ -113,7 +113,7 @@ void update() {
 
 
 	// LogiButton index 21 should be button 22, is the right bottom on the G27.
-	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::ToggleH], ScriptControls::ControlType::ToggleH) ||
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ToggleH], ScriptControls::KeyboardControlType::ToggleH) ||
 		LogiButtonTriggered(index_, 21)) {
 		settings.Hshifter = !settings.Hshifter;
 		std::stringstream message;
@@ -149,14 +149,14 @@ void update() {
 	}
 	switch (prevInput) {
 	case InputDevices::Keyboard:
-		controls.Rtvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KThrottle]) ? 1.0f : 0.0f);
-		controls.Ltvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KBrake]) ? 1.0f : 0.0f);
-		controls.Clutchvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KClutch]) ? 1.0f : 0.0f);
+		controls.Rtvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KThrottle]) ? 1.0f : 0.0f);
+		controls.Ltvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KBrake]) ? 1.0f : 0.0f);
+		controls.Clutchvalf = (controls.IsKeyPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KClutch]) ? 1.0f : 0.0f);
 		break;
 	case InputDevices::Controller: // Controller
-		controls.Rtvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CThrottle]), buttonState);
-		controls.Ltvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CBrake]), buttonState);
-		controls.Clutchvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::Clutch]), buttonState);
+		controls.Rtvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::CThrottle]), buttonState);
+		controls.Ltvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::CBrake]), buttonState);
+		controls.Clutchvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Clutch]), buttonState);
 		break;
 	case InputDevices::Wheel: // Wheel
 		controls.Rtvalf = logiThrottleVal;
@@ -431,9 +431,9 @@ void toggleManual() {
 void functionHShift() {
 	// All keys checking
 	for (uint8_t i = 0; i <= vehData.TopGear; i++) {
-		if (i > (int)ScriptControls::ControlType::H8) // this shit is just silly can I rly do dis?
-			i = (int)ScriptControls::ControlType::H8; // holy shit bad, bad, hacky idea
-		if (controls.IsKeyJustPressed(controls.Control[i], (ScriptControls::ControlType)i)) {
+		if (i > (int)ScriptControls::KeyboardControlType::H8) // this shit is just silly can I rly do dis?
+			i = (int)ScriptControls::KeyboardControlType::H8; // holy shit bad, bad, hacky idea
+		if (controls.IsKeyJustPressed(controls.Control[i], (ScriptControls::KeyboardControlType)i)) {
 			if (settings.ClutchShifting) {
 				if (controls.Clutchvalf > 0.75f) {
 					shiftTo(i, false);
@@ -450,7 +450,7 @@ void functionHShift() {
 			}
 		}
 	}
-	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::HN], ScriptControls::ControlType::HN)) {
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::HN], ScriptControls::KeyboardControlType::HN)) {
 		vehData.SimulatedNeutral = !vehData.SimulatedNeutral;
 	}
 }
@@ -506,8 +506,8 @@ void functionHShiftLogitech() {
 
 void functionSShift() {
 	// Shift up
-	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::ShiftUp]), buttonState) ||
-		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KShiftUp], ScriptControls::ControlType::KShiftUp) ||
+	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::ShiftUp]), buttonState) ||
+		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KShiftUp], ScriptControls::KeyboardControlType::KShiftUp) ||
 		(logiWheelActive && LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftUp]))) {
 		
 		// Reverse to Neutral
@@ -530,8 +530,8 @@ void functionSShift() {
 	}
 
 	// Shift down
-	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::ShiftDown]), buttonState) ||
-		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KShiftDown], ScriptControls::ControlType::KShiftDown) ||
+	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::ShiftDown]), buttonState) ||
+		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KShiftDown], ScriptControls::KeyboardControlType::KShiftDown) ||
 		(logiWheelActive && LogiButtonTriggered(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftDown]))) {
 		
 		// 1 to Neutral
@@ -797,8 +797,8 @@ void functionAutoReverse() {
 
 void handleVehicleButtons() {
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
-		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::Engine]), buttonState) ||
-			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KEngine], ScriptControls::ControlType::KEngine))) {
+		(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Engine]), buttonState) ||
+			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KEngine], ScriptControls::KeyboardControlType::KEngine))) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 }
@@ -852,12 +852,12 @@ void initWheel() {
 
 // Limitations: Detects on pressing throttle on any of the 3 input methods
 int getLastInputDevice(int previousInput) {
-	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::ControlType::KThrottle], ScriptControls::ControlType::KThrottle) ||
-		controls.IsKeyPressed(controls.Control[(int)ScriptControls::ControlType::KThrottle])) {
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KThrottle], ScriptControls::KeyboardControlType::KThrottle) ||
+		controls.IsKeyPressed(controls.Control[(int)ScriptControls::KeyboardControlType::KThrottle])) {
 		return InputDevices::Keyboard;
 	}
-	if (controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CThrottle]), buttonState) ||
-		controller.IsButtonPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControlType::CThrottle]), buttonState)) {
+	if (controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::CThrottle]), buttonState) ||
+		controller.IsButtonPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::CThrottle]), buttonState)) {
 		return InputDevices::Controller;
 	}
 	if (logiWheelActive &&

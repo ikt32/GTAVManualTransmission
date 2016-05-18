@@ -40,7 +40,7 @@ public:
 	};
 
 	// todo: Something about these enums and scopes
-	enum class ControlType {
+	/*enum class ControlType {
 		HR = 0,
 		H1,
 		H2,
@@ -67,7 +67,7 @@ public:
 		KEngine,
 		CToggle,
 		SIZEOF_ControlType
-	};
+	};*/
 	
 	enum class LogiControlType {
 		HR = 0,
@@ -93,16 +93,16 @@ public:
 	ScriptControls();
 	~ScriptControls();
 	bool IsKeyPressed(int key);
-	bool IsKeyJustPressed(int key, ControlType control);
+	bool IsKeyJustPressed(int key, KeyboardControlType control);
 
-	bool WasControlPressedForMs(int control, int ms);
+	//bool WasControlPressedForMs(int control, int ms);
 
-	int Control[(int)ControlType::SIZEOF_ControlType];
+	int Control[(int)KeyboardControlType::SIZEOF_KeyboardControlType];
 	int LogiControl[(int)LogiControlType::SIZEOF_LogiControlType];
 
 	int CToggleTime;
-	bool ControlCurr[(int)ControlType::SIZEOF_ControlType];
-	bool ControlPrev[(int)ControlType::SIZEOF_ControlType];
+	bool ControlCurr[(int)KeyboardControlType::SIZEOF_KeyboardControlType];
+	bool ControlPrev[(int)KeyboardControlType::SIZEOF_KeyboardControlType];
 
 	float Ltvalf = 0.0f;
 	float Rtvalf = 0.0f;
@@ -111,7 +111,7 @@ public:
 	int Accelval;
 	float Accelvalf = 0.0f;
 
-	std::string ControlXbox[(int)ControlType::SIZEOF_ControlType];
+	std::string ControlXbox[(int)ControllerControlType::SIZEOF_ControllerControlType];
 
 private:
 	long long pressTime;

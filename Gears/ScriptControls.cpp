@@ -19,7 +19,7 @@ bool ScriptControls::IsKeyPressed(int key) {
 	return false;
 }
 
-bool ScriptControls::IsKeyJustPressed(int key, ControlType control) {
+bool ScriptControls::IsKeyJustPressed(int key, KeyboardControlType control) {
 	ControlCurr[(int)control] = (GetAsyncKeyState(key) & 0x8000) != 0;
 
 	// raising edge
@@ -32,6 +32,7 @@ bool ScriptControls::IsKeyJustPressed(int key, ControlType control) {
 	return false;
 }
 
+/*
 bool ScriptControls::WasControlPressedForMs(int control, int ms) {
 	if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, control)) {
 		pressTime = milliseconds_now();
@@ -47,3 +48,4 @@ bool ScriptControls::WasControlPressedForMs(int control, int ms) {
 	}
 	return false;
 }
+*/

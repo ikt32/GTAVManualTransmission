@@ -40,48 +40,48 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 
 	char buffer[24] = {0};
 	GetPrivateProfileStringA("MAIN", "CToggle", "DpadRight", buffer, (DWORD)24, SETTINGSFILE);
-	scriptControl->ControlXbox[(int)ScriptControls::ControlType::CToggle] = buffer; 
+	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::CToggle] = buffer; 
 	
 	GetPrivateProfileStringA("CONTROLLER", "ShiftUp", "A", buffer, (DWORD)24, SETTINGSFILE);
-	scriptControl->ControlXbox[(int)ScriptControls::ControlType::ShiftUp] = buffer;
+	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::ShiftUp] = buffer;
 
 	GetPrivateProfileStringA("CONTROLLER", "ShiftDown", "X", buffer, (DWORD)24, SETTINGSFILE);
-	scriptControl->ControlXbox[(int)ScriptControls::ControlType::ShiftDown] = buffer;
+	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::ShiftDown] = buffer;
 
 	GetPrivateProfileStringA("CONTROLLER", "Clutch", "LeftThumbDown", buffer, (DWORD)24, SETTINGSFILE);
-	scriptControl->ControlXbox[(int)ScriptControls::ControlType::Clutch] = buffer;
+	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::Clutch] = buffer;
 
 	GetPrivateProfileStringA("CONTROLLER", "Engine", "DpadDown", buffer, (DWORD)24, SETTINGSFILE);
-	scriptControl->ControlXbox[(int)ScriptControls::ControlType::Engine] = buffer;
+	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::Engine] = buffer;
 
 	GetPrivateProfileStringA("CONTROLLER", "CThrottle", "RightTrigger", buffer, (DWORD)24, SETTINGSFILE);
-	scriptControl->ControlXbox[(int)ScriptControls::ControlType::CThrottle] = buffer;
+	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::CThrottle] = buffer;
 
 	GetPrivateProfileStringA("CONTROLLER", "CBrake", "LeftTrigger", buffer, (DWORD)24, SETTINGSFILE);
-	scriptControl->ControlXbox[(int)ScriptControls::ControlType::CBrake] = buffer;
+	scriptControl->ControlXbox[(int)ScriptControls::ControllerControlType::CBrake] = buffer;
 
 
-	scriptControl->Control[(int)ScriptControls::ControlType::KToggle] = GetPrivateProfileIntA("MAIN", "KToggle", VK_OEM_5, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::KToggle] = GetPrivateProfileIntA("MAIN", "KToggle", VK_OEM_5, SETTINGSFILE);
 
-	scriptControl->Control[(int)ScriptControls::ControlType::KShiftUp] = GetPrivateProfileIntA("KEYBOARD", "KShiftUp", VK_NUMPAD9, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::ControlType::KShiftDown] = GetPrivateProfileIntA("KEYBOARD", "KShiftDown", VK_NUMPAD7, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::ControlType::KClutch] = GetPrivateProfileIntA("KEYBOARD", "KClutch", VK_NUMPAD8, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::ControlType::KEngine] = GetPrivateProfileIntA("KEYBOARD", "KEngine", 0x45, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::KShiftUp] = GetPrivateProfileIntA("KEYBOARD", "KShiftUp", VK_NUMPAD9, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::KShiftDown] = GetPrivateProfileIntA("KEYBOARD", "KShiftDown", VK_NUMPAD7, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::KClutch] = GetPrivateProfileIntA("KEYBOARD", "KClutch", VK_NUMPAD8, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::KEngine] = GetPrivateProfileIntA("KEYBOARD", "KEngine", 0x45, SETTINGSFILE);
 
-	scriptControl->Control[(int)ScriptControls::ControlType::ToggleH] = GetPrivateProfileIntA("KEYBOARD", "ToggleH", VK_OEM_6, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::ControlType::HR] = GetPrivateProfileIntA("KEYBOARD", "HR", VK_NUMPAD0, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::ControlType::H1] = GetPrivateProfileIntA("KEYBOARD", "H1", VK_NUMPAD1, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::ControlType::H2] = GetPrivateProfileIntA("KEYBOARD", "H2", VK_NUMPAD2, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::ControlType::H3] = GetPrivateProfileIntA("KEYBOARD", "H3", VK_NUMPAD3, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::ControlType::H4] = GetPrivateProfileIntA("KEYBOARD", "H4", VK_NUMPAD4, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::ControlType::H5] = GetPrivateProfileIntA("KEYBOARD", "H5", VK_NUMPAD5, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::ControlType::H6] = GetPrivateProfileIntA("KEYBOARD", "H6", VK_NUMPAD6, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::ControlType::H7] = GetPrivateProfileIntA("KEYBOARD", "H7", VK_NUMPAD7, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::ControlType::H8] = GetPrivateProfileIntA("KEYBOARD", "H8", VK_NUMPAD8, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::ControlType::HN] = GetPrivateProfileIntA("KEYBOARD", "HN", VK_NUMPAD9, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::ToggleH] = GetPrivateProfileIntA("KEYBOARD", "ToggleH", VK_OEM_6, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::HR] = GetPrivateProfileIntA("KEYBOARD", "HR", VK_NUMPAD0, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::H1] = GetPrivateProfileIntA("KEYBOARD", "H1", VK_NUMPAD1, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::H2] = GetPrivateProfileIntA("KEYBOARD", "H2", VK_NUMPAD2, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::H3] = GetPrivateProfileIntA("KEYBOARD", "H3", VK_NUMPAD3, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::H4] = GetPrivateProfileIntA("KEYBOARD", "H4", VK_NUMPAD4, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::H5] = GetPrivateProfileIntA("KEYBOARD", "H5", VK_NUMPAD5, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::H6] = GetPrivateProfileIntA("KEYBOARD", "H6", VK_NUMPAD6, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::H7] = GetPrivateProfileIntA("KEYBOARD", "H7", VK_NUMPAD7, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::H8] = GetPrivateProfileIntA("KEYBOARD", "H8", VK_NUMPAD8, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::HN] = GetPrivateProfileIntA("KEYBOARD", "HN", VK_NUMPAD9, SETTINGSFILE);
 
-	scriptControl->Control[(int)ScriptControls::ControlType::KThrottle] = GetPrivateProfileIntA("KEYBOARD", "KThrottle", 0x57, SETTINGSFILE);
-	scriptControl->Control[(int)ScriptControls::ControlType::KBrake] = GetPrivateProfileIntA("KEYBOARD", "KBrake", 0x53, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::KThrottle] = GetPrivateProfileIntA("KEYBOARD", "KThrottle", 0x57, SETTINGSFILE);
+	scriptControl->Control[(int)ScriptControls::KeyboardControlType::KBrake] = GetPrivateProfileIntA("KEYBOARD", "KBrake", 0x53, SETTINGSFILE);
 
 	LogiWheel = (GetPrivateProfileIntA("LOGITECHWHEEL", "Enable", 0, SETTINGSFILE) == 1);
 	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::ShiftUp] = GetPrivateProfileIntA("LOGITECHWHEEL", "ShiftUp", 4, SETTINGSFILE);
