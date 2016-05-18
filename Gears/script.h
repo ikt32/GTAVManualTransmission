@@ -45,3 +45,10 @@ void playWheelEffects();
 void updateLogiValues();
 void initWheel();
 int getLastInputDevice(int previousInput);
+
+
+void showText(float x, float y, float scale, char * text);
+void showNotification(char *message);
+void showDebugInfo();
+void reInit();
+void toggleManual();

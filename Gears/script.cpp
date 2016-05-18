@@ -15,39 +15,32 @@
 Logger logger(LOGFILE);
 ScriptControls controls;
 ScriptSettings settings;
-VehicleData vehData;
-VehicleExtensions ext;
-XboxController controller(1);
-int index_ = 0;
-bool logiWheelActive = false;
 
-Vehicle vehicle;
-Vehicle prevVehicle;
-Hash model;
 Player player;
 Ped playerPed;
+Vehicle vehicle;
+Vehicle prevVehicle;
+VehicleData vehData;
+VehicleExtensions ext;
+Hash model;
 
+XboxController controller(1);
 WORD buttonState;
 
 bool runOnceRan = false;
 bool patched = false;
 bool patchedSpecial = false;
-bool simpleBike;
+bool simpleBike = false;
 int prevNotification = 0;
-
-void showText(float x, float y, float scale, char * text);
-void showNotification(char *message);
-void showDebugInfo();
-void reInit();
-void toggleManual();
-
 int prevInput = 0;
 
+// TODO: Refactor into LogitechWheel class
+int index_ = 0;
+bool logiWheelActive = false;
 long logiSteeringWheelPos;
 long logiThrottlePos;
 long logiBrakePos;
 long logiClutchPos;
-
 float logiWheelVal;
 float logiThrottleVal;
 float logiBrakeVal;
@@ -122,8 +115,6 @@ void update() {
 	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
 	simpleBike = vehData.IsBike && settings.SimpleBike;
 
-	// Laten we lomp beslissen aan de hand van welk device het laatst op de gasknop/trigger/pedaal hebt gedrukt
-	// omdat dat gewoon werkt(TM)
 	if (logiWheelActive) {
 		updateLogiValues();
 	}
@@ -169,11 +160,6 @@ void update() {
 	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
-	// Put here to override last control readout for Clutchvalf
-	/*if (vehData.SimulatedNeutral) {
-		controls.Clutchvalf = 1.0f;
-	}*/
-
 	if (logiWheelActive && prevInput == InputDevices::Wheel) {
 		playWheelEffects();
 		
@@ -213,9 +199,9 @@ void update() {
 			VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f))
 		return;
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
 	// Active whenever Manual is enabled from here
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
 
 	if (playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
 		if (patchedSpecial) {
@@ -254,9 +240,9 @@ void update() {
 		}
 	}
 	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// BELOW THIS LINE THE FUNCTIONAL STUFF - I REALLY OUGHT TO FIX THIS CRAP
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
+	// Actual mod operations
+	///////////////////////////////////////////////////////////////////////////
 
 	// Reverse behavior
 	// For bikes, do this automatically.
@@ -348,6 +334,10 @@ void ScriptMain() {
 	main();
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//                           Helper functions/tools
+///////////////////////////////////////////////////////////////////////////////
+
 void showText(float x, float y, float scale, char * text) {
 	UI::SET_TEXT_FONT(0);
 	UI::SET_TEXT_SCALE(scale, scale);
@@ -407,6 +397,29 @@ void showDebugInfo() {
 	}
 }
 
+// Limitations: Detects on pressing throttle on any of the 3 input methods
+int getLastInputDevice(int previousInput) {
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Throttle], ScriptControls::KeyboardControlType::Throttle) ||
+		controls.IsKeyPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Throttle])) {
+		return InputDevices::Keyboard;
+	}
+	if (controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Throttle]), buttonState) ||
+		controller.IsButtonPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Throttle]), buttonState)) {
+		return InputDevices::Controller;
+	}
+	if (logiWheelActive &&
+		(logiThrottleVal > 0.1f ||
+			logiBrakeVal > 0.1f ||
+			logiClutchVal < 0.9f)) {
+		return InputDevices::Wheel;
+	}
+	return previousInput;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//                           Mod functions: Mod control
+///////////////////////////////////////////////////////////////////////////////
+
 void reInit() {
 	settings.Read(&controls);
 	vehData.LockGears = 0x00010001;
@@ -433,6 +446,21 @@ void toggleManual() {
 		runOnceRan = true;
 	settings.Save();
 	reInit();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//                           Mod functions: Shifting
+///////////////////////////////////////////////////////////////////////////////
+
+void shiftTo(int gear, bool autoClutch) {
+	if (autoClutch) {
+		controls.Clutchvalf = 1.0f;
+		ext.SetThrottle(vehicle, 0.0f);
+	}
+	vehData.LockGears = gear | (gear << 16);
+	vehData.LockTruck = false;
+	vehData.PrevGear = vehData.CurrGear;
+	vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
 }
 
 void functionHShiftTo(int i) {
@@ -494,8 +522,6 @@ void functionHShiftLogitech() {
 		vehData.SimulatedNeutral = true;
 	}
 	
-	showText(0.1, 0.1, 1.0, (char *)std::to_string(controls.Clutchvalf).c_str());
-
 	if (LogiButtonReleased(index_, controls.LogiControl[(int)ScriptControls::LogiControlType::HR])) {
 		shiftTo(1, true);
 		vehData.SimulatedNeutral = true;
@@ -553,16 +579,9 @@ void functionSShift() {
 
 }
 
-void shiftTo(int gear, bool autoClutch) {
-	if (autoClutch) {
-		controls.Clutchvalf = 1.0f;
-		ext.SetThrottle(vehicle, 0.0f);
-	}
-	vehData.LockGears = gear | (gear << 16);
-	vehData.LockTruck = false;
-	vehData.PrevGear = vehData.CurrGear;
-	vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
-}
+///////////////////////////////////////////////////////////////////////////////
+//                          Mod functions: Features
+///////////////////////////////////////////////////////////////////////////////
 
 void functionClutchCatch() {
 	if (vehData.Clutch >= 0.2f) {
@@ -607,7 +626,9 @@ void functionEngBrake() {
 	}
 }
 
-// Handles gear locking, RPM behaviors
+///////////////////////////////////////////////////////////////////////////////
+//                       Mod functions: Gearbox control
+///////////////////////////////////////////////////////////////////////////////
 void handleRPM() {
 	// Game wants to shift up. Triggered at high RPM, high speed.
 	// Desired result: high RPM, same gear, no more accelerating
@@ -649,7 +670,9 @@ void functionTruckLimiting() {
 	}
 }
 
-// Still a bit huge but OH WELL
+///////////////////////////////////////////////////////////////////////////////
+//                       Mod functions: Reverse
+///////////////////////////////////////////////////////////////////////////////
 void functionRealReverse() {
 	// Forward gear
 	// Desired: Only brake
@@ -793,6 +816,9 @@ void functionAutoReverse() {
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//                       Mod functions: Buttons
+///////////////////////////////////////////////////////////////////////////////
 void handleVehicleButtons() {
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
 		(	controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Engine]), buttonState) ||
@@ -837,6 +863,9 @@ void handleVehicleButtons() {
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//                             Wheel functions
+///////////////////////////////////////////////////////////////////////////////
 void playWheelEffects() {
 	LogiPlayLeds(index_, vehData.Rpm, 0.5f, 1.0f);
 
@@ -855,7 +884,7 @@ void playWheelEffects() {
 	}
 }
 
-// Updates logiWheel, logiThrottleVal, logiBrakeVal, logiClutchVal
+// Updates logiWheelVal, logiThrottleVal, logiBrakeVal, logiClutchVal
 void updateLogiValues() {
 	logiSteeringWheelPos = LogiGetState(index_)->lX;
 	logiThrottlePos = LogiGetState(index_)->lY;
@@ -882,24 +911,5 @@ void initWheel() {
 	else {
 		logger.Write("Wheel disabled");
 	}
-}
-
-// Limitations: Detects on pressing throttle on any of the 3 input methods
-int getLastInputDevice(int previousInput) {
-	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Throttle], ScriptControls::KeyboardControlType::Throttle) ||
-		controls.IsKeyPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Throttle])) {
-		return InputDevices::Keyboard;
-	}
-	if (controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Throttle]), buttonState) ||
-		controller.IsButtonPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Throttle]), buttonState)) {
-		return InputDevices::Controller;
-	}
-	if (logiWheelActive &&
-		(logiThrottleVal > 0.1f ||
-			logiBrakeVal > 0.1f ||
-			logiClutchVal < 0.9f)) {
-		return InputDevices::Wheel;
-	}
-	return previousInput;
 }
 
