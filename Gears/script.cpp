@@ -109,9 +109,7 @@ void update() {
 		vehData.SimulatedNeutral = settings.DefaultNeutral;
 		runOnceRan = true;
 	}
-
-
-
+	
 	// LogiButton index 21 should be button 22, is the right bottom on the G27.
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ToggleH], ScriptControls::KeyboardControlType::ToggleH) ||
 		LogiButtonTriggered(index_, 21)) {
@@ -140,7 +138,14 @@ void update() {
 			showNotification("Switched to keyboard/mouse");
 			break;
 		case InputDevices::Controller: // Controller
-			showNotification("Switched to controller");
+			if (settings.Hshifter) {
+				showNotification("Switched to controller\nSequential re-initiated");
+				settings.Hshifter = false;
+				settings.Save();
+			}
+			else {
+				showNotification("Switched to controller");
+			}			
 			break;
 		case InputDevices::Wheel: // Wheel
 			showNotification("Switched to wheel");
