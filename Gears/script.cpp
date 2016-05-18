@@ -308,9 +308,11 @@ void update() {
 
 	// Manual shifting
 	if (settings.Hshifter && !vehData.IsBike) {
-		functionHShift();
 		if (logiWheelActive && prevInput == InputDevices::Wheel) {
 			functionHShiftLogitech();
+		}
+		else {
+			functionHShiftKeyboard();
 		}
 	}
 	else {
@@ -428,26 +430,32 @@ void toggleManual() {
 	reInit();
 }
 
-void functionHShift() {
+void functionHShiftTo(int i) {
+	if (settings.ClutchShifting) {
+		if (controls.Clutchvalf > 0.75f) {
+			shiftTo(i, false);
+			vehData.SimulatedNeutral = false;
+		}
+		else {
+			vehData.SimulatedNeutral = true;
+			if (settings.EngDamage) {
+				VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - 50);
+			}
+		}
+	}
+	else {
+		shiftTo(i, true);
+		vehData.SimulatedNeutral = false;
+	}
+}
+
+void functionHShiftKeyboard() {
 	// All keys checking
 	for (uint8_t i = 0; i <= vehData.TopGear; i++) {
 		if (i > (int)ScriptControls::KeyboardControlType::H8) // this shit is just silly can I rly do dis?
 			i = (int)ScriptControls::KeyboardControlType::H8; // holy shit bad, bad, hacky idea
 		if (controls.IsKeyJustPressed(controls.Control[i], (ScriptControls::KeyboardControlType)i)) {
-			if (settings.ClutchShifting) {
-				if (controls.Clutchvalf > 0.75f) {
-					shiftTo(i, false);
-				}
-				else {
-					vehData.SimulatedNeutral = true;
-					if (settings.EngDamage) {
-						VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - 50);
-					}
-				}
-			}
-			else {
-				shiftTo(i, true);
-			}
+			functionHShiftTo(i);
 		}
 	}
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::HN], ScriptControls::KeyboardControlType::HN)) {
@@ -460,22 +468,7 @@ void functionHShiftLogitech() {
 		if (i > (int)ScriptControls::LogiControlType::H6)
 			i = (int)ScriptControls::LogiControlType::H6;
 		if (LogiButtonTriggered(index_, controls.LogiControl[i])) {
-			if (settings.ClutchShifting) {
-				if (controls.Clutchvalf > 0.75f) {
-					shiftTo(i, false);
-					vehData.SimulatedNeutral = false;
-				}
-				else {
-					vehData.SimulatedNeutral = true;
-					if (settings.EngDamage) {
-						VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - 50);
-					}
-				}
-			}
-			else {
-				shiftTo(i, true);
-				vehData.SimulatedNeutral = false;
-			}
+			functionHShiftTo(i);
 		}
 	}
 	
