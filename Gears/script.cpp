@@ -858,7 +858,10 @@ void playWheelEffects() {
 	int damperforce = 0;
 	damperforce = 80 - 4 * (int)(vehData.Speed);
 	if (vehData.Speed > 10.0f) {
-		damperforce = 40;// +(int)(0.5f * (vehData.Speed - 20.0f));
+		damperforce = 40 +(int)(0.5f * (vehData.Speed - 10.0f));
+	}
+	if (damperforce > 60) {
+		damperforce = 60;
 	}
 	LogiPlayDamperForce(index_, damperforce);
 
@@ -902,6 +905,8 @@ void updateLogiValues() {
 	logiThrottlePos = LogiGetState(index_)->lY;
 	logiBrakePos = LogiGetState(index_)->lRz;
 	logiClutchPos = LogiGetState(index_)->rglSlider[1];
+	//LogiGenerateNonLinearValues(index_, 33);
+	//logiSteeringWheelPos = LogiGetNonLinearValue(index_, LogiGetState(index_)->lX);
 	//  32767 @ nope | 0
 	// -32768 @ full | 1
 	logiWheelVal = ((float)(logiSteeringWheelPos - 32767) / -65535.0f)-0.5f;
@@ -923,12 +928,8 @@ void doWheelSteering() {
 		logiSteeringWheelPos > 0) {
 		antiDeadzoned = (logiSteeringWheelPos + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
 	}
-	// This is indirect but smooth and controllable
+	// Gotta find a way to make this no-delay
 	CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
-	
-	// This is direct and fast but twitchy
-	//float curWheel = ((float)logiSteeringWheelPos) / 65536.0f * .2f * -1;
-	//VEHICLE::SET_VEHICLE_STEER_BIAS(vehicle, logiWheelVal*0.2f);
 }
 
 void initWheel() {
