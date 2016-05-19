@@ -856,17 +856,34 @@ void playWheelEffects() {
 	LogiPlayLeds(index_, vehData.Rpm, 0.5f, 0.95f);
 
 	int damperforce = 0;
+	if (settings.FFDamperStationary < settings.FFDamperMoving) {
+		settings.FFDamperMoving = settings.FFDamperStationary;
+	}
+	int ratio = (settings.FFDamperStationary - settings.FFDamperMoving) / 10;
+
+	damperforce = settings.FFDamperStationary - ratio * (int)(vehData.Speed);
+	if (vehData.Speed > 10.0f) {
+		damperforce = settings.FFDamperMoving + (int)(0.5f * (vehData.Speed - 10.0f));
+	}
+
+	/*
 	damperforce = 80 - 4 * (int)(vehData.Speed);
 	if (vehData.Speed > 10.0f) {
-		damperforce = 40 +(int)(0.5f * (vehData.Speed - 10.0f));
+		damperforce = 40 + (int)(0.5f * (vehData.Speed - 10.0f));
 	}
-	if (damperforce > 60) {
+
+	if (damperforce > 60 {
 		damperforce = 60;
+	}
+	*/
+
+	if (damperforce > (settings.FFDamperStationary + settings.FFDamperMoving) / 2) {
+		damperforce = (settings.FFDamperStationary + settings.FFDamperMoving) / 2;
 	}
 	LogiPlayDamperForce(index_, damperforce);
 
 	Vector3 accelVals = vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true));
-	LogiPlayConstantForce(index_, (int)(-40.0f*accelVals.x));
+	LogiPlayConstantForce(index_, (int)(-settings.FFPhysics*accelVals.x));
 	LogiPlaySpringForce(index_, 0, (int)vehData.Speed, (int)vehData.Speed);
 
 	if (!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f) {

@@ -26,6 +26,9 @@ public:
 	bool UITips;
 	bool Hshifter;
 	bool LogiWheel;
+	int FFDamperStationary;
+	int FFDamperMoving;
+	int FFPhysics;
 
 	bool Debug;
 	bool DisableFullClutch;
