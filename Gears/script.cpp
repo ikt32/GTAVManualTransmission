@@ -74,7 +74,7 @@ void update() {
 		))
 		return;
 
-	if (settings.LogiWheel && LogiUpdate() && LogiIsConnected(index_)) {
+	if (settings.LogiWheel && LogiUpdate()) {
 		logiWheelActive = true;
 	}
 	else {
@@ -867,21 +867,67 @@ void handleVehicleButtons() {
 //                             Wheel functions
 ///////////////////////////////////////////////////////////////////////////////
 void playWheelEffects() {
-	LogiPlayLeds(index_, vehData.Rpm, 0.5f, 1.0f);
+	LogiPlayLeds(index_, vehData.Rpm, 0.5f, 0.95f);
 
 	int damperforce = 0;
-	damperforce = 100 - 5 * (int)(vehData.Speed);
-	if (vehData.Speed > 10.0f) {
-		damperforce = 50 + (int)(vehData.Speed - 10.0f);
-		if (damperforce >= 80) {
-			damperforce = 80;
-		}
+	damperforce = 100 - 3 * (int)(vehData.Speed);
+	if (vehData.Speed > 20.0f) {
+		damperforce = 40 + (int)(0.5f * (vehData.Speed - 20.0f));
+	}
+	if (damperforce >= 80) {
+		damperforce = 80;
 	}
 	LogiPlayDamperForce(index_, damperforce);
 
-	if (vehData.Speed > 3.0f) {
-		LogiPlaySpringForce(index_, 0, 80, (int)(vehData.Speed*2.0f));
+	if (vehData.Velocity > 1.5f) {
+		Vector3 rel_vector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
+		float sign = (rel_vector.x > 0 ? -1.0f : 1.0f);
+		float angle = acos(rel_vector.y / vehData.Speed)* 180.0f / 3.14159265f * sign;
+		if (isnan(angle))
+			angle = 0.0;
+		if (angle > 90) {
+			angle = 90;
+		}
+		if (angle < -90) {
+			angle = -90;
+		}
+		angle = angle*(100 / 90);
+		LogiPlayConstantForce(index_, (int)angle);
 	}
+	else {
+		LogiStopConstantForce(index_);
+	}
+
+	showText(0.4, 0.1, 2.0, (char *)std::to_string(ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle)).c_str());
+	if (!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f) {
+		LogiPlayCarAirborne(index_);
+	}
+	else if (LogiIsPlaying(index_, LOGI_FORCE_CAR_AIRBORNE)) {
+		LogiStopCarAirborne(index_);
+	}
+
+	/*if (PLAYER::GET_TIME_SINCE_PLAYER_HIT_VEHICLE(player) < 5) {
+		LogiPlayFrontalCollisionForce(index_, -50);
+		showNotification("Crash");
+	}
+
+	if (PLAYER::GET_TIME_SINCE_PLAYER_HIT_PED(player) < 5) {
+		LogiPlayBumpyRoadEffect(index_, 10);
+		showNotification("Bump");
+	}
+	else if (LogiIsPlaying(index_, LOGI_FORCE_BUMPY_ROAD)) {
+		LogiStopBumpyRoadEffect(index_);
+	}*/
+
+	Vector3 vehCoords = ENTITY::GET_ENTITY_COORDS(vehicle, true);
+	if (!PATHFIND::IS_POINT_ON_ROAD(vehCoords.x, vehCoords.y, vehCoords.z, vehicle)) {
+		LogiPlayDirtRoadEffect(index_, 30*powf((int)vehData.Speed, 0.25f));
+	}
+	else if (LogiIsPlaying(index_, LOGI_FORCE_DIRT_ROAD)) {
+		LogiStopDirtRoadEffect(index_);
+	}
+
+
 }
 
 // Updates logiWheelVal, logiThrottleVal, logiBrakeVal, logiClutchVal
@@ -902,7 +948,7 @@ void initWheel() {
 	if (settings.LogiWheel) {
 		LogiSteeringInitialize(TRUE);
 		if (LogiUpdate() && LogiIsConnected(index_)) {
-			logger.Write("Wheel initialized");
+			logger.Write("Wheel detected");
 		}
 		else {
 			logger.Write("No wheel detected");
