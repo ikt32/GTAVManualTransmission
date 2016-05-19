@@ -162,21 +162,7 @@ void update() {
 
 	if (logiWheelActive && prevInput == InputDevices::Wheel) {
 		playWheelEffects();
-		
-		// Anti-deadzone
-		int additionalOffset = 2560;
-		float antiDeadzoned = 0.0f;
-		antiDeadzoned = logiSteeringWheelPos / 32768.0f;
-		if (//logiSteeringWheelPos > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
-			logiSteeringWheelPos <= 0) {
-			antiDeadzoned = (logiSteeringWheelPos - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE - additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
-		}
-		if (//logiSteeringWheelPos > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
-			logiSteeringWheelPos > 0) {
-			antiDeadzoned = (logiSteeringWheelPos + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
-		}
-		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
-		//VEHICLE::SET_VEHICLE_STEER_BIAS(vehicle, logiWheelVal*0.2f);
+		doWheelSteering();
 	}
 
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
@@ -870,35 +856,16 @@ void playWheelEffects() {
 	LogiPlayLeds(index_, vehData.Rpm, 0.5f, 0.95f);
 
 	int damperforce = 0;
-	damperforce = 100 - 3 * (int)(vehData.Speed);
-	if (vehData.Speed > 20.0f) {
-		damperforce = 40 + (int)(0.5f * (vehData.Speed - 20.0f));
-	}
-	if (damperforce >= 80) {
-		damperforce = 80;
+	damperforce = 80 - 4 * (int)(vehData.Speed);
+	if (vehData.Speed > 10.0f) {
+		damperforce = 40;// +(int)(0.5f * (vehData.Speed - 20.0f));
 	}
 	LogiPlayDamperForce(index_, damperforce);
 
-	if (vehData.Velocity > 1.5f) {
-		Vector3 rel_vector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
-		float sign = (rel_vector.x > 0 ? -1.0f : 1.0f);
-		float angle = acos(rel_vector.y / vehData.Speed)* 180.0f / 3.14159265f * sign;
-		if (isnan(angle))
-			angle = 0.0;
-		if (angle > 90) {
-			angle = 90;
-		}
-		if (angle < -90) {
-			angle = -90;
-		}
-		angle = angle*(100 / 90);
-		LogiPlayConstantForce(index_, (int)angle);
-	}
-	else {
-		LogiStopConstantForce(index_);
-	}
+	Vector3 accelVals = vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true));
+	LogiPlayConstantForce(index_, (int)(-40.0f*accelVals.x));
+	LogiPlaySpringForce(index_, 0, (int)vehData.Speed, (int)vehData.Speed);
 
-	showText(0.4, 0.1, 2.0, (char *)std::to_string(ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle)).c_str());
 	if (!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f) {
 		LogiPlayCarAirborne(index_);
 	}
@@ -907,27 +874,26 @@ void playWheelEffects() {
 	}
 
 	/*if (PLAYER::GET_TIME_SINCE_PLAYER_HIT_VEHICLE(player) < 5) {
-		LogiPlayFrontalCollisionForce(index_, -50);
+		LogiPlayFrontalCollisionForce(index_, 25);
 		showNotification("Crash");
-	}
-
+	}*/
+	
+	/*
 	if (PLAYER::GET_TIME_SINCE_PLAYER_HIT_PED(player) < 5) {
 		LogiPlayBumpyRoadEffect(index_, 10);
 		showNotification("Bump");
 	}
 	else if (LogiIsPlaying(index_, LOGI_FORCE_BUMPY_ROAD)) {
 		LogiStopBumpyRoadEffect(index_);
-	}*/
+	}
 
 	Vector3 vehCoords = ENTITY::GET_ENTITY_COORDS(vehicle, true);
 	if (!PATHFIND::IS_POINT_ON_ROAD(vehCoords.x, vehCoords.y, vehCoords.z, vehicle)) {
-		LogiPlayDirtRoadEffect(index_, 30*powf((int)vehData.Speed, 0.25f));
+		LogiPlayDirtRoadEffect(index_, (int)(6.0f*powf(vehData.Speed, 0.25f)));
 	}
 	else if (LogiIsPlaying(index_, LOGI_FORCE_DIRT_ROAD)) {
 		LogiStopDirtRoadEffect(index_);
-	}
-
-
+	}*/
 }
 
 // Updates logiWheelVal, logiThrottleVal, logiBrakeVal, logiClutchVal
@@ -944,6 +910,27 @@ void updateLogiValues() {
 	logiClutchVal =   1.0f+(float)(logiClutchPos - 32767) / 65535.0f;
 }
 
+void doWheelSteering() {
+	// Anti-deadzone
+	int additionalOffset = 2560;
+	float antiDeadzoned = 0.0f;
+	antiDeadzoned = logiSteeringWheelPos / 32768.0f;
+	if (//logiSteeringWheelPos > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
+		logiSteeringWheelPos <= 0) {
+		antiDeadzoned = (logiSteeringWheelPos - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE - additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
+	}
+	if (//logiSteeringWheelPos > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
+		logiSteeringWheelPos > 0) {
+		antiDeadzoned = (logiSteeringWheelPos + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
+	}
+	// This is indirect but smooth and controllable
+	CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
+	
+	// This is direct and fast but twitchy
+	//float curWheel = ((float)logiSteeringWheelPos) / 65536.0f * .2f * -1;
+	//VEHICLE::SET_VEHICLE_STEER_BIAS(vehicle, logiWheelVal*0.2f);
+}
+
 void initWheel() {
 	if (settings.LogiWheel) {
 		LogiSteeringInitialize(TRUE);
@@ -958,4 +945,3 @@ void initWheel() {
 		logger.Write("Wheel disabled");
 	}
 }
-

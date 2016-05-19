@@ -45,6 +45,7 @@ void playWheelEffects();
 void updateLogiValues();
 void initWheel();
 int getLastInputDevice(int previousInput);
+void doWheelSteering();
 
 
 void showText(float x, float y, float scale, char * text);
