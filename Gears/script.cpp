@@ -263,7 +263,7 @@ void update() {
 		functionEngBrake();
 	}
 
-	// Engine damage
+	// Engine damage: RPM Damage
 	if (settings.EngDamage) {
 		functionEngDamage();
 	}
@@ -458,7 +458,7 @@ void functionHShiftTo(int i) {
 		else {
 			vehData.SimulatedNeutral = true;
 			if (settings.EngDamage) {
-				VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - 50);
+				VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.MisshiftDamage);
 			}
 		}
 	}
@@ -570,7 +570,7 @@ void functionSShift() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void functionClutchCatch() {
-	if (vehData.Clutch >= 0.2f) {
+	if (vehData.Clutch >= settings.ClutchCatchpoint) {
 		// Forward
 		if (vehData.CurrGear > 0 && vehData.Velocity < vehData.CurrGear * 2.2f &&
 			controls.Rtvalf < 0.25f && controls.Ltvalf < 0.95 ) {
@@ -580,7 +580,7 @@ void functionClutchCatch() {
 }
 
 void functionEngStall() {
-	if (vehData.Clutch > 0.75f	&& vehData.Rpm < 0.25f &&
+	if (vehData.Clutch > 1.0f-settings.StallingThreshold && vehData.Rpm < 0.25f &&
 		((vehData.Speed < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && vehData.Speed < 1.0f))) {
 		if (VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle)) {
 			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
@@ -590,7 +590,7 @@ void functionEngStall() {
 
 void functionEngDamage() {
 	if ( vehData.Rpm > 0.98f && controls.Accelvalf > 0.99f) {
-		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (0.2f*controls.Accelvalf));
+		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (settings.RPMDamage));
 	}
 }
 

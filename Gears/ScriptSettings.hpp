@@ -36,6 +36,11 @@ public:
 	float UITips_X;
 	float UITips_Y;
 	float UITips_Size;
+
+	float ClutchCatchpoint;
+	float StallingThreshold;
+	float RPMDamage;
+	int MisshiftDamage;
 //private:
 	void CheckSettings();
 };

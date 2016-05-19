@@ -33,6 +33,12 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	Debug =          (GetPrivateProfileIntA("DEBUG", "Info",          0, SETTINGSFILE) == 1);
 	DisableFullClutch = (GetPrivateProfileIntA("DEBUG", "DisableFullClutch", 0, SETTINGSFILE) == 1);
 
+	ClutchCatchpoint = GetPrivateProfileIntA("OPTIONS", "ClutchCatchpoint", 20, SETTINGSFILE) / 100.0f;
+	StallingThreshold = GetPrivateProfileIntA("OPTIONS", "StallingThreshold", 25, SETTINGSFILE) / 100.0f;
+
+	RPMDamage = GetPrivateProfileIntA("OPTIONS", "RPMDamage", 15, SETTINGSFILE) / 100.0f;
+	MisshiftDamage = GetPrivateProfileIntA("OPTIONS", "MisshiftDamage", 10, SETTINGSFILE);
+
 	CheckSettings();
 
 	// Start Controller section
