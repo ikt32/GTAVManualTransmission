@@ -7,6 +7,8 @@
 #include <array>
 #include <vector>
 #include "VehicleExtensions.hpp"
+#include <chrono>
+
 
 class VehicleData
 {
@@ -45,6 +47,7 @@ public:
 	bool SimulatedNeutral;
 
 	std::vector<float> LockSpeeds = std::vector<float>(20);
+	Vector3 getAccelerationVectors(Vector3 velocities);
 
 private:
 	std::array <char *, 20> badModelNames = {
@@ -70,5 +73,7 @@ private:
 		"UTILTRUC"
 	};
 	bool isBadTruck(char *name);
+	Vector3 prevVelocities;
+	long long prevTime;
 };
 
