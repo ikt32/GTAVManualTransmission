@@ -175,14 +175,6 @@ void update() {
 		active = true;
 	}
 
-	// Patch clutch on game start
-	//if (settings.EnableManual && !runOnceRan) {
-	//	logger.Write("Patching functions on start");
-	//	patched = MemoryPatcher::PatchInstructions();
-	//	vehData.SimulatedNeutral = settings.DefaultNeutral;
-	//	runOnceRan = true;
-	//}
-
 	///////////////////////////////////////////////////////////////////////////
 	// Active whenever Manual is enabled from here
 	///////////////////////////////////////////////////////////////////////////
@@ -888,121 +880,6 @@ void handleVehicleButtons() {
 ///////////////////////////////////////////////////////////////////////////////
 //                             Wheel functions
 ///////////////////////////////////////////////////////////////////////////////
-/*
-void playWheelEffects() {
-	LogiPlayLeds(logiWheel.GetIndex(), vehData.Rpm, 0.5f, 0.95f);
-
-	int damperforce = 0;
-	if (settings.FFDamperStationary < settings.FFDamperMoving) {
-		settings.FFDamperMoving = settings.FFDamperStationary;
-	}
-	int ratio = (settings.FFDamperStationary - settings.FFDamperMoving) / 10;
-
-	damperforce = settings.FFDamperStationary - ratio * (int)(vehData.Speed);
-	if (vehData.Speed > 10.0f) {
-		damperforce = settings.FFDamperMoving + (int)(0.5f * (vehData.Speed - 10.0f));
-	}
-
-	
-	//damperforce = 80 - 4 * (int)(vehData.Speed);
-	//if (vehData.Speed > 10.0f) {
-	//	damperforce = 40 + (int)(0.5f * (vehData.Speed - 10.0f));
-	//}
-	//
-	//if (damperforce > 60 {
-	//	damperforce = 60;
-	//}
-	
-
-	if (damperforce > (settings.FFDamperStationary + settings.FFDamperMoving) / 2) {
-		damperforce = (settings.FFDamperStationary + settings.FFDamperMoving) / 2;
-	}
-	LogiPlayDamperForce(logiWheel.GetIndex(), damperforce);
-
-	Vector3 accelVals = vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true));
-	LogiPlayConstantForce(logiWheel.GetIndex(), (int)(-settings.FFPhysics*accelVals.x));
-	LogiPlaySpringForce(logiWheel.GetIndex(), 0, (int)vehData.Speed, (int)vehData.Speed);
-
-	if (!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f) {
-		LogiPlayCarAirborne(logiWheel.GetIndex());
-	}
-	else if (LogiIsPlaying(logiWheel.GetIndex(), LOGI_FORCE_CAR_AIRBORNE)) {
-		LogiStopCarAirborne(logiWheel.GetIndex());
-	}
-
-	//if (PLAYER::GET_TIME_SINCE_PLAYER_HIT_VEHICLE(player) < 5) {
-	//	LogiPlayFrontalCollisionForce(logiWheel.GetIndex(), 25);
-	//	showNotification("Crash");
-	//}
-	
-	
-	//if (PLAYER::GET_TIME_SINCE_PLAYER_HIT_PED(player) < 5) {
-	//	LogiPlayBumpyRoadEffect(logiWheel.GetIndex(), 10);
-	//	showNotification("Bump");
-	//}
-	//else if (LogiIsPlaying(logiWheel.GetIndex(), LOGI_FORCE_BUMPY_ROAD)) {
-	//	LogiStopBumpyRoadEffect(logiWheel.GetIndex());
-	//}
-	//
-	//Vector3 vehCoords = ENTITY::GET_ENTITY_COORDS(vehicle, true);
-	//if (!PATHFIND::IS_POINT_ON_ROAD(vehCoords.x, vehCoords.y, vehCoords.z, vehicle)) {
-	//	LogiPlayDirtRoadEffect(logiWheel.GetIndex(), (int)(6.0f*powf(vehData.Speed, 0.25f)));
-	//}
-	//else if (LogiIsPlaying(logiWheel.GetIndex(), LOGI_FORCE_DIRT_ROAD)) {
-	//	LogiStopDirtRoadEffect(logiWheel.GetIndex());
-	//}
-}
-
-// Updates logiWheelVal, logiThrottleVal, logiBrakeVal, logiClutchVal
-void updateLogiValues() {
-	logiSteeringWheelPos = LogiGetState(logiWheel.GetIndex())->lX;
-	logiThrottlePos = LogiGetState(logiWheel.GetIndex())->lY;
-	logiBrakePos = LogiGetState(logiWheel.GetIndex())->lRz;
-	logiClutchPos = LogiGetState(logiWheel.GetIndex())->rglSlider[1];
-	//LogiGenerateNonLinearValues(logiWheel.GetIndex(), 33);
-	//logiSteeringWheelPos = LogiGetNonLinearValue(logiWheel.GetIndex(), LogiGetState(logiWheel.GetIndex())->lX);
-	//  32767 @ nope | 0
-	// -32768 @ full | 1
-	logiWheelVal = ((float)(logiSteeringWheelPos - 32767) / -65535.0f)-0.5f;
-	logiThrottleVal = (float)(logiThrottlePos - 32767) / -65535.0f;
-	logiBrakeVal =    (float)(logiBrakePos - 32767) / -65535.0f;
-	logiClutchVal =   1.0f+(float)(logiClutchPos - 32767) / 65535.0f;
-}
-
-void doWheelSteering() {
-	// Anti-deadzone
-	int additionalOffset = 2560;
-	float antiDeadzoned = 0.0f;
-	antiDeadzoned = logiSteeringWheelPos / 32768.0f;
-	if (//logiSteeringWheelPos > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
-		logiSteeringWheelPos <= 0) {
-		antiDeadzoned = (logiSteeringWheelPos - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE - additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
-	}
-	if (//logiSteeringWheelPos > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
-		logiSteeringWheelPos > 0) {
-		antiDeadzoned = (logiSteeringWheelPos + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
-	}
-	// Gotta find a way to make this no-delay
-	CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
-}
-
-void initWheel() {
-	if (settings.LogiWheel) {
-		LogiSteeringInitialize(TRUE);
-		if (LogiUpdate() && LogiIsConnected(logiWheel.GetIndex())) {
-			logger.Write("Wheel detected");
-		}
-		else {
-			logger.Write("No wheel detected");
-		}
-	}
-	else {
-		logger.Write("Wheel disabled");
-	}
-}
-*/
-
-
 // Despair: Won't work if arguments are passed?!
 void playWheelEffects() {
 	Vector3 accelVals = vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true));
@@ -1021,7 +898,6 @@ void playWheelEffects() {
 	}
 
 	damperforce += (int)(-10.0f * accelVals.y);
-	//showText(0.1, 0.1, 1.0, (char *)std::to_string(accelVals.y).c_str());
 
 	if (damperforce > (settings.FFDamperStationary + settings.FFDamperMoving) / 2) {
 		damperforce = (settings.FFDamperStationary + settings.FFDamperMoving) / 2;
@@ -1040,7 +916,6 @@ void playWheelEffects() {
 
 	if (accelVals.y > 5.0f || accelVals.y < -5.0f ) {
 		LogiPlayFrontalCollisionForce(logiWheel.GetIndex(), abs((int)(accelVals.y*4.0f)));
-		//showNotification("Crash");
 	}
 }
 
