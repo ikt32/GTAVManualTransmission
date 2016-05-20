@@ -210,7 +210,7 @@ void update() {
 	// Special case for clutch used by all vehicles
 	// Only patch if user desires to have their clutch @ 0
 	if (!settings.DisableFullClutch) {
-		if (vehData.SimulatedNeutral || controls.Clutchvalf >= 0.96f) {
+		if ( controls.Accelvalf > 0.04f && (vehData.SimulatedNeutral || controls.Clutchvalf >= 0.96f)) {
 			if (!patchedSpecial) {
 				patchedSpecial = MemoryPatcher::PatchJustS_LOW();
 			}
@@ -1021,7 +1021,7 @@ void playWheelEffects() {
 	}
 
 	damperforce += (int)(-10.0f * accelVals.y);
-	showText(0.1, 0.1, 1.0, (char *)std::to_string(accelVals.y).c_str());
+	//showText(0.1, 0.1, 1.0, (char *)std::to_string(accelVals.y).c_str());
 
 	if (damperforce > (settings.FFDamperStationary + settings.FFDamperMoving) / 2) {
 		damperforce = (settings.FFDamperStationary + settings.FFDamperMoving) / 2;
@@ -1029,7 +1029,7 @@ void playWheelEffects() {
 	LogiPlayDamperForce(logiWheel.GetIndex(), damperforce);
 
 	LogiPlayConstantForce(logiWheel.GetIndex(), (int)(-settings.FFPhysics*accelVals.x));
-	LogiPlaySpringForce(logiWheel.GetIndex(), 0, (int)vehData.Speed, (int)vehData.Speed);
+	LogiPlaySpringForce(logiWheel.GetIndex(), 0, 2*(int)vehData.Speed, 2*(int)vehData.Speed);
 
 	if (!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f) {
 		LogiPlayCarAirborne(logiWheel.GetIndex());
