@@ -38,17 +38,6 @@ void WheelInput::PlayWheelEffects(
 		damperforce = settings.FFDamperMoving + (int)(0.5f * (vehData.Speed - 10.0f));
 	}
 
-	/*
-	damperforce = 80 - 4 * (int)(vehData.Speed);
-	if (vehData.Speed > 10.0f) {
-	damperforce = 40 + (int)(0.5f * (vehData.Speed - 10.0f));
-	}
-
-	if (damperforce > 60 {
-	damperforce = 60;
-	}
-	*/
-
 	if (damperforce > (settings.FFDamperStationary + settings.FFDamperMoving) / 2) {
 		damperforce = (settings.FFDamperStationary + settings.FFDamperMoving) / 2;
 	}
@@ -64,28 +53,6 @@ void WheelInput::PlayWheelEffects(
 	else if (LogiIsPlaying(index_, LOGI_FORCE_CAR_AIRBORNE)) {
 		LogiStopCarAirborne(index_);
 	}
-
-	/*if (PLAYER::GET_TIME_SINCE_PLAYER_HIT_VEHICLE(player) < 5) {
-	LogiPlayFrontalCollisionForce(index_, 25);
-	showNotification("Crash");
-	}*/
-
-	/*
-	if (PLAYER::GET_TIME_SINCE_PLAYER_HIT_PED(player) < 5) {
-	LogiPlayBumpyRoadEffect(index_, 10);
-	showNotification("Bump");
-	}
-	else if (LogiIsPlaying(index_, LOGI_FORCE_BUMPY_ROAD)) {
-	LogiStopBumpyRoadEffect(index_);
-	}
-
-	Vector3 vehCoords = ENTITY::GET_ENTITY_COORDS(vehicle, true);
-	if (!PATHFIND::IS_POINT_ON_ROAD(vehCoords.x, vehCoords.y, vehCoords.z, vehicle)) {
-	LogiPlayDirtRoadEffect(index_, (int)(6.0f*powf(vehData.Speed, 0.25f)));
-	}
-	else if (LogiIsPlaying(index_, LOGI_FORCE_DIRT_ROAD)) {
-	LogiStopDirtRoadEffect(index_);
-	}*/
 }
 
 // Updates logiWheelVal, logiThrottleVal, logiBrakeVal, logiClutchVal
