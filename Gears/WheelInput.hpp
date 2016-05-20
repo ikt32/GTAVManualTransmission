@@ -26,7 +26,7 @@ public:
 		VehicleData vehData,
 		Vehicle vehicle);
 	void UpdateLogiValues();
-	void InitWheel(ScriptSettings settings, Logger logger);
+	bool InitWheel(ScriptSettings settings, Logger logger);
 	void PlayWheelVisuals(float rpm);
 	bool IsActive = false;
 	int GetIndex();

@@ -67,11 +67,12 @@ void update() {
 		return;
 	}
 
-	if (settings.LogiWheel && LogiUpdate()) {
+	if (settings.LogiWheel && LogiIsConnected(logiWheel.GetIndex()) && LogiUpdate()) {
 		logiWheel.IsActive = true;
 	}
 	else {
 		logiWheel.IsActive = false;
+
 	}
 
 	if (controller.IsConnected()) {
@@ -81,14 +82,12 @@ void update() {
 
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Toggle], ScriptControls::KeyboardControlType::Toggle) || 
 		controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Toggle]), buttonState, controls.CToggleTime) ||
-		LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Toggle])) {
+		(logiWheel.IsActive && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Toggle]))) {
 		toggleManual();
 	}
-
-	
 	
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ToggleH], ScriptControls::KeyboardControlType::ToggleH) ||
-		LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ToggleH])) {
+		(logiWheel.IsActive && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ToggleH]))) {
 		settings.Hshifter = !settings.Hshifter;
 		std::stringstream message;
 		message << "Mode: " <<
@@ -104,6 +103,7 @@ void update() {
 	if (logiWheel.IsActive) {
 		logiWheel.UpdateLogiValues();
 	}
+
 	if (prevInput != getLastInputDevice(prevInput)) {
 		prevInput = getLastInputDevice(prevInput);
 		switch (prevInput) {
@@ -227,7 +227,6 @@ void update() {
 			showText(settings.UITips_X, settings.UITips_Y, settings.UITips_Size, (char *)std::to_string(vehData.CurrGear).c_str());
 		}
 	}
-	
 	///////////////////////////////////////////////////////////////////////////
 	// Actual mod operations
 	///////////////////////////////////////////////////////////////////////////
@@ -423,7 +422,7 @@ void reInit() {
 	vehData.LockGears = 0x00010001;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
 	if (settings.LogiWheel) {
-		logiWheel.InitWheel(settings, logger);
+		logiWheel.IsActive = logiWheel.InitWheel(settings, logger);
 	}
 	else {
 		logger.Write("Wheel disabled");
@@ -842,7 +841,7 @@ void handleVehicleButtons() {
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
 		(	controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Engine]), buttonState) ||
 			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Engine], ScriptControls::KeyboardControlType::Engine) ||
-			LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Engine]))) {
+			(logiWheel.IsActive && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Engine])))) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 	if (logiWheel.IsActive) {

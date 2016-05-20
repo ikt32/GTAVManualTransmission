@@ -2,8 +2,6 @@
 
 WheelInput::WheelInput(int index) {
 	index_ = index;
-	LogiGetCurrentControllerProperties(index_, properties);
-	properties.wheelRange = 900;
 }
 
 
@@ -88,18 +86,21 @@ void WheelInput::DoWheelSteering() {
 	CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
 }
 
-void WheelInput::InitWheel(ScriptSettings settings, Logger logger) {
+bool WheelInput::InitWheel(ScriptSettings settings, Logger logger) {
 	if (settings.LogiWheel) {
 		LogiSteeringInitialize(TRUE);
 		if (LogiUpdate() && LogiIsConnected(index_)) {
 			logger.Write("Wheel detected");
+			return true;
 		}
 		else {
 			logger.Write("No wheel detected");
+			return false;
 		}
 	}
 	else {
 		logger.Write("Wheel disabled");
+		return false;
 	}
 }
 
