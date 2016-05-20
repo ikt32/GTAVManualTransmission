@@ -371,29 +371,16 @@ void showDebugInfo() {
 	const char *infoc = infos.str().c_str();
 	showText(0.01f, 0.5f, 0.4f, (char *)infoc);
 
-	// pls no you see dumping data is annoying if you're lazy and then refactor
 	/*if (logiWheel.IsActive) {
 		std::stringstream throttleDisplay;
-		throttleDisplay << "TVal: " << logiThrottleVal;
+		throttleDisplay << "TVal: " << logiWheel.GetLogiThrottleVal();
 		std::stringstream brakeDisplay;
-		brakeDisplay << "BVal: " << logiBrakeVal;
+		brakeDisplay << "BVal: " << logiWheel.GetLogiBrakeVal();
 		std::stringstream clutchDisplay;
-		clutchDisplay << "CVal: " << logiClutchVal;
+		clutchDisplay << "CVal: " << logiWheel.GetLogiClutchVal();
 		showText(0.01, 0.04, 0.4, (char *)throttleDisplay.str().c_str());
 		showText(0.01, 0.06, 0.4, (char *)brakeDisplay.str().c_str());
 		showText(0.01, 0.08, 0.4, (char *)clutchDisplay.str().c_str());
-		std::stringstream throttleXDisplay;
-		throttleXDisplay << "TPos: " << logiThrottlePos;
-		std::stringstream brakeXDisplay;
-		brakeXDisplay << "BPos: " << logiBrakePos;
-		std::stringstream clutchXDisplay;
-		clutchXDisplay << "CPos: " << logiClutchPos;
-		showText(0.01, 0.10, 0.4, (char *)throttleXDisplay.str().c_str());
-		showText(0.01, 0.12, 0.4, (char *)brakeXDisplay.str().c_str());
-		showText(0.01, 0.14, 0.4, (char *)clutchXDisplay.str().c_str());
-		std::stringstream wheelDisplay;
-		wheelDisplay << "Wheel:" << logiWheelVal;
-		showText(0.01, 0.16, 0.4, (char *)wheelDisplay.str().c_str());
 	}*/
 }
 
@@ -439,8 +426,12 @@ void reset() {
 		}
 		vehData.Clear();
 		vehicle = 0;
-		patched = !MemoryPatcher::RestoreInstructions();
-		patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
+		if (patched) {
+			patched = !MemoryPatcher::RestoreInstructions();
+		}
+		if (patchedSpecial) {
+			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
+		}
 		active = false;
 	}
 }
@@ -457,8 +448,12 @@ void toggleManual() {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 	if (!settings.EnableManual) {
-		patched = !MemoryPatcher::RestoreInstructions();
-		patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
+		if (patched) {
+			patched = !MemoryPatcher::RestoreInstructions();
+		}
+		if (patchedSpecial) {
+			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
+		}
 	}
 	//if (!runOnceRan)
 	//	runOnceRan = true;
@@ -503,10 +498,12 @@ void functionHShiftTo(int i) {
 }
 
 void functionHShiftKeyboard() {
-	// All keys checking
-	for (uint8_t i = 0; i <= vehData.TopGear; i++) {
-		if (i > (int)ScriptControls::KeyboardControlType::H8) // this shit is just silly can I rly do dis?
-			i = (int)ScriptControls::KeyboardControlType::H8; // holy shit bad, bad, hacky idea
+	// Highest shifter button == 8
+	int clamp = 8;
+	if (vehData.TopGear <= clamp) {
+		clamp = vehData.TopGear;
+	}
+	for (uint8_t i = 0; i <= clamp; i++) {
 		if (controls.IsKeyJustPressed(controls.Control[i], (ScriptControls::KeyboardControlType)i)) {
 			functionHShiftTo(i);
 		}
@@ -517,13 +514,17 @@ void functionHShiftKeyboard() {
 }
 
 void functionHShiftLogitech() {
-	for (uint i = 0; i <= vehData.TopGear; i++) {
-		if (i > (int)ScriptControls::LogiControlType::H6)
-			i = (int)ScriptControls::LogiControlType::H6;
+	// Highest shifter button == 6
+	int clamp = 6;
+	if (vehData.TopGear <= clamp) {
+		clamp = vehData.TopGear;
+	}
+	for (uint8_t i = 0; i <= clamp; i++) {
 		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[i])) {
 			functionHShiftTo(i);
 		}
 	}
+
 	
 	if (LogiButtonReleased(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::H1]) ||
 		LogiButtonReleased(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::H2]) ||
