@@ -11,6 +11,7 @@
     <ClCompile Include="VehicleData.cpp" />
     <ClCompile Include="MemoryPatcher.cpp" />
     <ClCompile Include="XboxController.cpp" />
+    <ClCompile Include="WheelInput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NativeMemory.hpp" />
@@ -35,6 +36,7 @@
     <ClInclude Include="TimeHelper.hpp" />
     <ClInclude Include="VehicleData.hpp" />
     <ClInclude Include="XboxController.hpp" />
+    <ClInclude Include="WheelInput.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

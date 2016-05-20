@@ -38,14 +38,14 @@ void functionSShift();
 void functionHShiftLogitech();
 void shiftTo(int gear, bool autoClutch);
 void handleRPM();
-void handlePedalsDefault();
-void handlePedalsRealReverse();
+void handlePedalsDefault(float logiThrottleVal, float logiBrakeVal);
+void handlePedalsRealReverse(float logiThrottleVal, float logiBrakeVal);
 void handleVehicleButtons();
-void playWheelEffects();
-void updateLogiValues();
-void initWheel();
+//void playWheelEffects();
+//void updateLogiValues();
+//void initWheel();
 int getLastInputDevice(int previousInput);
-void doWheelSteering();
+//void doWheelSteering();
 
 
 void showText(float x, float y, float scale, char * text);
