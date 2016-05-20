@@ -89,6 +89,9 @@ void update() {
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ToggleH], ScriptControls::KeyboardControlType::ToggleH) ||
 		(logiWheel.IsActive && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ToggleH]))) {
 		settings.Hshifter = !settings.Hshifter;
+		if (!settings.Hshifter && vehData.CurrGear > 1) {
+			vehData.SimulatedNeutral = false;
+		}
 		std::stringstream message;
 		message << "Mode: " <<
 			(settings.Hshifter ? "H-Shifter" : "Sequential");
