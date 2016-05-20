@@ -41,7 +41,7 @@ void handleRPM();
 void handlePedalsDefault(float logiThrottleVal, float logiBrakeVal);
 void handlePedalsRealReverse(float logiThrottleVal, float logiBrakeVal);
 void handleVehicleButtons();
-//void playWheelEffects();
+void playWheelEffects(); //
 //void updateLogiValues();
 //void initWheel();
 int getLastInputDevice(int previousInput);

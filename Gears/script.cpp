@@ -165,7 +165,8 @@ void update() {
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
 	if (logiWheel.IsActive && prevInput == InputDevices::Wheel) {
-		logiWheel.PlayWheelEffects(settings, vehData, vehicle);
+		playWheelEffects();
+		//logiWheel.PlayWheelEffects(settings, vehData, vehicle);
 		logiWheel.DoWheelSteering();
 		std::stringstream infos;
 		//infos << "Physics: " << settings.FFPhysics << std::endl;
@@ -475,7 +476,7 @@ void shiftTo(int gear, bool autoClutch) {
 
 void functionHShiftTo(int i) {
 	if (settings.ClutchShifting) {
-		if (controls.Clutchvalf > 0.75f) {
+		if (controls.Clutchvalf > 1.0f-settings.ClutchCatchpoint) {
 			shiftTo(i, false);
 			vehData.SimulatedNeutral = false;
 		}
@@ -524,10 +525,7 @@ void functionHShiftLogitech() {
 		LogiButtonReleased(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::H5]) ||
 		LogiButtonReleased(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::H6])) {
 		if (settings.ClutchShifting && settings.EngDamage) {
-			if (controls.Clutchvalf > 0.75f) {
-				// nuffin
-			}
-			else {
+			if (controls.Clutchvalf < 1.0-settings.ClutchCatchpoint) {
 				VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
 					vehicle,
 					VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.MisshiftDamage/10);
@@ -995,3 +993,42 @@ void initWheel() {
 	}
 }
 */
+
+
+// Desperation
+
+void playWheelEffects() {
+	LogiPlayLeds(logiWheel.GetIndex(), vehData.Rpm, 0.5f, 0.95f);
+
+	int damperforce = 0;
+	if (settings.FFDamperStationary < settings.FFDamperMoving) {
+		settings.FFDamperMoving = settings.FFDamperStationary;
+	}
+	int ratio = (settings.FFDamperStationary - settings.FFDamperMoving) / 10;
+
+	damperforce = settings.FFDamperStationary - ratio * (int)(vehData.Speed);
+	if (vehData.Speed > 10.0f) {
+		damperforce = settings.FFDamperMoving + (int)(0.5f * (vehData.Speed - 10.0f));
+	}
+
+	if (damperforce > (settings.FFDamperStationary + settings.FFDamperMoving) / 2) {
+		damperforce = (settings.FFDamperStationary + settings.FFDamperMoving) / 2;
+	}
+	LogiPlayDamperForce(logiWheel.GetIndex(), damperforce);
+
+	Vector3 accelVals = vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true));
+	LogiPlayConstantForce(logiWheel.GetIndex(), (int)(-settings.FFPhysics*accelVals.x));
+	LogiPlaySpringForce(logiWheel.GetIndex(), 0, (int)vehData.Speed, (int)vehData.Speed);
+
+	if (!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f) {
+		LogiPlayCarAirborne(logiWheel.GetIndex());
+	}
+	else if (LogiIsPlaying(logiWheel.GetIndex(), LOGI_FORCE_CAR_AIRBORNE)) {
+		LogiStopCarAirborne(logiWheel.GetIndex());
+	}
+
+	if (accelVals.y > 5.0f || accelVals.y < -5.0f ) {
+		LogiPlayFrontalCollisionForce(logiWheel.GetIndex(), abs((int)(accelVals.y*4.0f)));
+		showNotification("Crash");
+	}
+}
