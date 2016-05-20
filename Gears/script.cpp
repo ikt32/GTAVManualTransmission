@@ -514,7 +514,7 @@ void functionHShiftKeyboard() {
 }
 
 void functionHShiftLogitech() {
-	for (uint i = 0; i < vehData.TopGear; i++) {
+	for (uint i = 0; i <= vehData.TopGear; i++) {
 		if (i > (int)ScriptControls::LogiControlType::H6)
 			i = (int)ScriptControls::LogiControlType::H6;
 		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[i])) {
