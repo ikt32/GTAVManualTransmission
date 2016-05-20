@@ -23,7 +23,9 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 		break;
 	case DLL_PROCESS_DETACH:
 		logger.Write("Init shutdown");
-		LogiSteeringShutdown();
+		if (LogiIsConnected(0)) {
+			LogiSteeringShutdown();
+		}
 		bool successI = MemoryPatcher::RestoreInstructions();
 		bool successJ = MemoryPatcher::RestoreJustS_LOW();
 

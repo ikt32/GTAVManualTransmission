@@ -7,6 +7,31 @@ VehicleData::VehicleData() {
 VehicleData::~VehicleData() {
 }
 
+void VehicleData::Clear() {
+	IsBike = false;
+	IsTruck = false;
+	Address = 0;
+	Gears = 0;
+	Rpm = 0.0f;
+	Clutch = 1.0f;
+	Throttle = 0.0f;
+	Turbo = 0.0f;
+	Speed = 0.0f;
+	Velocity = 0.0f;
+	TopGear = 1;
+	LockGear = 1;
+	CurrGear = 1;
+	NextGear = 1;
+	LockGears = 0x00010001;
+	PrevGear = 1;
+	LockSpeed = 0.0f;
+	LockTruck = false;
+	SimulatedNeutral = false;
+	prevVelocities.x = 0;
+	prevVelocities.y = 0;
+	prevVelocities.z = 0;
+}
+
 bool VehicleData::isBadTruck(char *name) {
 	for (int i = 0; i < badModelNames.size(); i++) {
 		if (strcmp(name, badModelNames[i]) == 0)

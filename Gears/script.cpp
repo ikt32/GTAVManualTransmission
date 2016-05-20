@@ -20,7 +20,6 @@ ScriptSettings settings;
 Player player;
 Ped playerPed;
 Vehicle vehicle;
-Vehicle prevVehicle;
 VehicleData vehData;
 VehicleExtensions ext;
 Hash model;
@@ -30,53 +29,43 @@ WORD buttonState;
 
 WheelInput logiWheel(0);
 
-bool runOnceRan = false;
+bool active = false;
+//bool runOnceRan = false;
 bool patched = false;
 bool patchedSpecial = false;
 bool simpleBike = false;
 int prevNotification = 0;
 int prevInput = 0;
 
-// TODO: Refactor into LogitechWheel class
-/*int logiWheel.GetIndex() = 0;
-bool logiWheelActive = false;
-long logiSteeringWheelPos;
-long logiThrottlePos;
-long logiBrakePos;
-long logiClutchPos;
-float logiWheelVal;
-float logiThrottleVal;
-float logiBrakeVal;
-float logiClutchVal;
-*/
-
 void update() {
 	player = PLAYER::PLAYER_ID();
 	playerPed = PLAYER::PLAYER_PED_ID();
 
 	if (!ENTITY::DOES_ENTITY_EXIST(playerPed) ||
-		!PLAYER::IS_PLAYER_CONTROL_ON(player) || 
-		ENTITY::IS_ENTITY_DEAD(playerPed) || 
-		PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE))
+		!PLAYER::IS_PLAYER_CONTROL_ON(player) ||
+		ENTITY::IS_ENTITY_DEAD(playerPed) ||
+		PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE)) {
+		reset();
 		return;
+	}
 
 	if (!PED::IS_PED_IN_ANY_VEHICLE(playerPed, true)) {
-		if (patchedSpecial) {
-			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
-		}
+		reset();
+		return;
 	}
 
 	vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
 	model = ENTITY::GET_ENTITY_MODEL(vehicle);
-	prevVehicle = vehicle;
 
 	if (!ENTITY::DOES_ENTITY_EXIST(vehicle) ||
 		VEHICLE::IS_THIS_MODEL_A_BICYCLE(model) ||
-		!(	VEHICLE::IS_THIS_MODEL_A_CAR(model) ||
+		!(VEHICLE::IS_THIS_MODEL_A_CAR(model) ||
 			VEHICLE::IS_THIS_MODEL_A_BIKE(model) ||
 			VEHICLE::IS_THIS_MODEL_A_QUADBIKE(model)
-		))
+			)) {
+		reset();
 		return;
+	}
 
 	if (settings.LogiWheel && LogiUpdate()) {
 		logiWheel.IsActive = true;
@@ -96,15 +85,8 @@ void update() {
 		toggleManual();
 	}
 
-	// Patch clutch on game start
-	if (settings.EnableManual && !runOnceRan) {
-		logger.Write("Patching functions on start");
-		patched = MemoryPatcher::PatchInstructions();
-		vehData.SimulatedNeutral = settings.DefaultNeutral;
-		runOnceRan = true;
-	}
 	
-	// LogiButton index 21 should be button 22, is the right bottom on the G27.
+	
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ToggleH], ScriptControls::KeyboardControlType::ToggleH) ||
 		LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ToggleH])) {
 		settings.Hshifter = !settings.Hshifter;
@@ -141,6 +123,8 @@ void update() {
 		case InputDevices::Wheel: // Wheel
 			showNotification("Switched to wheel");
 			break;
+		default:
+			break;
 		}
 	}
 	switch (prevInput) {
@@ -164,17 +148,6 @@ void update() {
 	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
-	if (logiWheel.IsActive && prevInput == InputDevices::Wheel) {
-		playWheelEffects();
-		//logiWheel.PlayWheelEffects(settings, vehData, vehicle);
-		logiWheel.DoWheelSteering();
-		std::stringstream infos;
-		//infos << "Physics: " << settings.FFPhysics << std::endl;
-		//infos << "AccelX : " << vehData.getAccelerationVectors(
-		//	ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)).x << std::endl;
-		//showText(0.1, 0.1, 1.0, (char *)infos.str().c_str());
-	}
-
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
 	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 2);
@@ -190,14 +163,33 @@ void update() {
 		showDebugInfo();
 	}
 
-	if (!settings.EnableManual ||
+	if (!settings.EnableManual || 
 		(!VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false) &&
-			VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f))
+			VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f)) {
 		return;
+	}
+	else {
+		active = true;
+	}
+
+	// Patch clutch on game start
+	//if (settings.EnableManual && !runOnceRan) {
+	//	logger.Write("Patching functions on start");
+	//	patched = MemoryPatcher::PatchInstructions();
+	//	vehData.SimulatedNeutral = settings.DefaultNeutral;
+	//	runOnceRan = true;
+	//}
 
 	///////////////////////////////////////////////////////////////////////////
 	// Active whenever Manual is enabled from here
 	///////////////////////////////////////////////////////////////////////////
+
+	if (logiWheel.IsActive && prevInput == InputDevices::Wheel) {
+		playWheelEffects();
+		//logiWheel.PlayWheelEffects(settings, vehData, vehicle);
+		logiWheel.DoWheelSteering();
+		std::stringstream infos;
+	}
 
 	if (playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
 		if (patchedSpecial) {
@@ -438,6 +430,19 @@ void reInit() {
 	}
 }
 
+void reset() {
+	if (active) {
+		if (logiWheel.IsActive) {
+			resetWheelFeedback(logiWheel.GetIndex());
+		}
+		vehData.Clear();
+		vehicle = 0;
+		patched = !MemoryPatcher::RestoreInstructions();
+		patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
+		active = false;
+	}
+}
+
 void toggleManual() {
 	settings.EnableManual = !settings.EnableManual;
 	std::stringstream message;
@@ -453,8 +458,8 @@ void toggleManual() {
 		patched = !MemoryPatcher::RestoreInstructions();
 		patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
 	}
-	if (!runOnceRan)
-		runOnceRan = true;
+	//if (!runOnceRan)
+	//	runOnceRan = true;
 	settings.Save();
 	reInit();
 }
@@ -1034,4 +1039,18 @@ void playWheelEffects() {
 		LogiPlayFrontalCollisionForce(logiWheel.GetIndex(), abs((int)(accelVals.y*4.0f)));
 		//showNotification("Crash");
 	}
+}
+
+// Since playing back is f'd - This too, will be in the main class
+void resetWheelFeedback(int index)
+{
+	LogiStopSpringForce(index);
+	LogiStopConstantForce(index);
+	LogiStopDamperForce(index);
+	LogiStopDirtRoadEffect(index);
+	LogiStopBumpyRoadEffect(index);
+	LogiStopSlipperyRoadEffect(index);
+	LogiStopSurfaceEffect(index);
+	LogiStopCarAirborne(index);
+	LogiStopSoftstopForce(index);
 }

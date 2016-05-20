@@ -15,6 +15,7 @@ class VehicleData
 public:
 	VehicleData();
 	~VehicleData();
+	void Clear();
 
 	void ReadMemData(VehicleExtensions ext, Vehicle vehicle);
 
