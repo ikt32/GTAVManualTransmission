@@ -995,9 +995,10 @@ void initWheel() {
 */
 
 
-// Desperation
-
+// Despair: Won't work if arguments are passed?!
 void playWheelEffects() {
+	Vector3 accelVals = vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true));
+	
 	LogiPlayLeds(logiWheel.GetIndex(), vehData.Rpm, 0.5f, 0.95f);
 
 	int damperforce = 0;
@@ -1011,12 +1012,14 @@ void playWheelEffects() {
 		damperforce = settings.FFDamperMoving + (int)(0.5f * (vehData.Speed - 10.0f));
 	}
 
+	damperforce += (int)(-10.0f * accelVals.y);
+	showText(0.1, 0.1, 1.0, (char *)std::to_string(accelVals.y).c_str());
+
 	if (damperforce > (settings.FFDamperStationary + settings.FFDamperMoving) / 2) {
 		damperforce = (settings.FFDamperStationary + settings.FFDamperMoving) / 2;
 	}
 	LogiPlayDamperForce(logiWheel.GetIndex(), damperforce);
 
-	Vector3 accelVals = vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true));
 	LogiPlayConstantForce(logiWheel.GetIndex(), (int)(-settings.FFPhysics*accelVals.x));
 	LogiPlaySpringForce(logiWheel.GetIndex(), 0, (int)vehData.Speed, (int)vehData.Speed);
 
@@ -1029,6 +1032,6 @@ void playWheelEffects() {
 
 	if (accelVals.y > 5.0f || accelVals.y < -5.0f ) {
 		LogiPlayFrontalCollisionForce(logiWheel.GetIndex(), abs((int)(accelVals.y*4.0f)));
-		showNotification("Crash");
+		//showNotification("Crash");
 	}
 }
