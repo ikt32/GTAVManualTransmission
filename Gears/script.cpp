@@ -30,7 +30,6 @@ WORD buttonState;
 WheelInput logiWheel(0);
 
 bool active = false;
-//bool runOnceRan = false;
 bool patched = false;
 bool patchedSpecial = false;
 bool simpleBike = false;
@@ -447,8 +446,6 @@ void toggleManual() {
 			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
 		}
 	}
-	//if (!runOnceRan)
-	//	runOnceRan = true;
 	settings.Save();
 	reInit();
 }
