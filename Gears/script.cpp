@@ -20,6 +20,7 @@ ScriptSettings settings;
 Player player;
 Ped playerPed;
 Vehicle vehicle;
+Vehicle prevVehicle;
 VehicleData vehData;
 VehicleExtensions ext;
 Hash model;
@@ -65,6 +66,12 @@ void update() {
 		reset();
 		return;
 	}
+
+	if (prevVehicle != vehicle) {
+		vehData.SimulatedNeutral = settings.DefaultNeutral;
+	}
+	prevVehicle = vehicle;
+
 
 	if (controller.IsConnected()) {
 		buttonState = controller.GetState().Gamepad.wButtons;
@@ -410,8 +417,8 @@ void reset() {
 		if (logiWheel.IsActive(settings)) {
 			resetWheelFeedback(logiWheel.GetIndex());
 		}
-		vehData.Clear();
-		vehicle = 0;
+		//vehData.Clear();
+		//vehicle = 0;
 		if (patched) {
 			patched = !MemoryPatcher::RestoreInstructions();
 		}
