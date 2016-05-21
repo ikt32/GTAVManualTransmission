@@ -84,7 +84,39 @@ void update() {
 		(logiWheel.IsActive && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Toggle]))) {
 		toggleManual();
 	}
-	
+
+	vehData.ReadMemData(ext, vehicle);
+	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
+	simpleBike = vehData.IsBike && settings.SimpleBike;
+
+	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
+	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 2);
+	}
+	else if (vehData.CurrGear == vehData.NextGear) {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 0);
+	}
+	else if (vehData.CurrGear < vehData.NextGear) {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1);
+	}
+
+	if (settings.Debug) {
+		showDebugInfo();
+	}
+
+	if (!settings.EnableManual ||
+		(!VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false) &&
+			VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f)) {
+		return;
+	}
+	else {
+		active = true;
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	// Active whenever Manual is enabled from here
+	///////////////////////////////////////////////////////////////////////////
+
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ToggleH], ScriptControls::KeyboardControlType::ToggleH) ||
 		(logiWheel.IsActive && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ToggleH]))) {
 		settings.Hshifter = !settings.Hshifter;
@@ -97,10 +129,6 @@ void update() {
 		showNotification((char *)message.str().c_str());
 		settings.Save();
 	}
-
-	vehData.ReadMemData(ext, vehicle);
-	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
-	simpleBike = vehData.IsBike && settings.SimpleBike;
 
 	if (logiWheel.IsActive) {
 		logiWheel.UpdateLogiValues();
@@ -150,40 +178,17 @@ void update() {
 	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
-	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
-	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
-		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 2);
-	}
-	else if (vehData.CurrGear == vehData.NextGear) {
-		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 0);
-	}
-	else if (vehData.CurrGear < vehData.NextGear) {
-		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1);
-	}
-
-	if (settings.Debug) {
-		showDebugInfo();
-	}
-
-	if (!settings.EnableManual || 
-		(!VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false) &&
-			VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f)) {
-		return;
-	}
-	else {
-		active = true;
-	}
-
-	///////////////////////////////////////////////////////////////////////////
-	// Active whenever Manual is enabled from here
-	///////////////////////////////////////////////////////////////////////////
-
 	if (logiWheel.IsActive && prevInput == InputDevices::Wheel) {
 		playWheelEffects();
 		//logiWheel.PlayWheelEffects(settings, vehData, vehicle);
 		logiWheel.DoWheelSteering();
 		std::stringstream infos;
 	}
+
+	///////////////////////////////////////////////////////////////////////////
+	//                            Patching
+	///////////////////////////////////////////////////////////////////////////
+
 
 	if (playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
 		if (patchedSpecial) {
