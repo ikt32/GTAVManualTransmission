@@ -24,6 +24,19 @@ enum InputDevices {
 
 void ScriptMain();
 
+void showText(float x, float y, float scale, char * text);
+void showNotification(char *message);
+void showDebugInfo();
+void reInit();
+void toggleManual();
+void reset();
+int getLastInputDevice(int previousInput);
+
+void resetWheelFeedback(int index);
+void handlePedalsDefault(float logiThrottleVal, float logiBrakeVal);
+void handlePedalsRealReverse(float logiThrottleVal, float logiBrakeVal);
+void handleVehicleButtons();
+
 void functionAutoReverse();
 void functionRealReverse();
 void functionSimpleReverse();
@@ -36,21 +49,7 @@ void functionHShiftTo(int i);
 void functionHShiftKeyboard();
 void functionSShift();
 void functionHShiftLogitech();
+
 void shiftTo(int gear, bool autoClutch);
 void handleRPM();
-void handlePedalsDefault(float logiThrottleVal, float logiBrakeVal);
-void handlePedalsRealReverse(float logiThrottleVal, float logiBrakeVal);
-void handleVehicleButtons();
-void playWheelEffects(); // BLAH
-//void updateLogiValues();
-//void initWheel();
-int getLastInputDevice(int previousInput);
-//void doWheelSteering();
 
-void showText(float x, float y, float scale, char * text);
-void showNotification(char *message);
-void showDebugInfo();
-void reInit();
-void toggleManual();
-void reset();
-void resetWheelFeedback(int index);

@@ -36,7 +36,6 @@ public:
 	float GetLogiClutchVal();
 
 private:
-	// TODO: Refactor into LogitechWheel class
 	int index_ = 0;
 	long logiSteeringWheelPos;
 	long logiThrottlePos;
