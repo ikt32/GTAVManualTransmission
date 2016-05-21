@@ -71,6 +71,10 @@ void update() {
 		controller.UpdateButtonChangeStates();
 	}
 
+	if (settings.LogiWheel) {
+		LogiUpdate();
+	}
+
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Toggle], ScriptControls::KeyboardControlType::Toggle) || 
 		controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Toggle]), buttonState, controls.CToggleTime) ||
 		(logiWheel.IsActive(settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Toggle]))) {

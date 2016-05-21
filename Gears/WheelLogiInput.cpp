@@ -89,7 +89,7 @@ void WheelLogiInput::DoWheelSteering() {
 bool WheelLogiInput::InitWheel(ScriptSettings settings, Logger logger) {
 	if (settings.LogiWheel) {
 		LogiSteeringInitialize(TRUE);
-		if (LogiUpdate() && LogiIsConnected(index_)) {
+		if (LogiIsConnected(index_)) {
 			LogiGetCurrentControllerProperties(index_, properties);
 			properties.wheelRange = settings.WheelRange;
 			LogiSetPreferredControllerProperties(properties);
@@ -121,5 +121,10 @@ float WheelLogiInput::GetLogiClutchVal() {
 }
 
 bool  WheelLogiInput::IsActive(ScriptSettings settings) {
-	return (settings.LogiWheel && LogiIsConnected(index_) && LogiUpdate());
+	Logger log("Gears_.log");
+	if (settings.LogiWheel && LogiIsConnected(index_)) {
+		return true;
+	}
+	log.Write("Fuck!");
+	return false;
 }
