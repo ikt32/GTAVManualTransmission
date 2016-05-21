@@ -26,6 +26,7 @@ public:
 	bool UITips;
 	bool Hshifter;
 	bool LogiWheel;
+	int WheelRange;
 	int FFDamperStationary;
 	int FFDamperMoving;
 	int FFPhysics;

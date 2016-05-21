@@ -90,6 +90,9 @@ bool WheelInput::InitWheel(ScriptSettings settings, Logger logger) {
 	if (settings.LogiWheel) {
 		LogiSteeringInitialize(TRUE);
 		if (LogiUpdate() && LogiIsConnected(index_)) {
+			LogiGetCurrentControllerProperties(index_, properties);
+			properties.wheelRange = settings.WheelRange;
+			LogiSetPreferredControllerProperties(properties);
 			logger.Write("Wheel detected");
 			return true;
 		}
