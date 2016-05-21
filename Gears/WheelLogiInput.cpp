@@ -1,27 +1,27 @@
-#include "WheelInput.hpp"
+#include "WheelLogiInput.hpp"
 
-WheelInput::WheelInput(int index) {
+WheelLogiInput::WheelLogiInput(int index) {
 	index_ = index;
 }
 
 
-WheelInput::~WheelInput()
+WheelLogiInput::~WheelLogiInput()
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 //                             Wheel functions
 ///////////////////////////////////////////////////////////////////////////////
-void WheelInput::PlayWheelVisuals(float rpm) {
+void WheelLogiInput::PlayWheelVisuals(float rpm) {
 	LogiPlayLeds(index_, rpm, 0.5f, 0.95f);
 }
 
-int WheelInput::GetIndex()
+int WheelLogiInput::GetIndex()
 {
 	return index_;
 }
 
-void WheelInput::PlayWheelEffects(
+void WheelLogiInput::PlayWheelEffects(
 	ScriptSettings settings,
 	VehicleData vehData,
 	Vehicle vehicle) {
@@ -54,7 +54,7 @@ void WheelInput::PlayWheelEffects(
 }
 
 // Updates logiWheelVal, logiThrottleVal, logiBrakeVal, logiClutchVal
-void WheelInput::UpdateLogiValues() {
+void WheelLogiInput::UpdateLogiValues() {
 	logiSteeringWheelPos = LogiGetState(index_)->lX;
 	logiThrottlePos = LogiGetState(index_)->lY;
 	logiBrakePos = LogiGetState(index_)->lRz;
@@ -69,7 +69,7 @@ void WheelInput::UpdateLogiValues() {
 	logiClutchVal = 1.0f + (float)(logiClutchPos - 32767) / 65535.0f;
 }
 
-void WheelInput::DoWheelSteering() {
+void WheelLogiInput::DoWheelSteering() {
 	// Anti-deadzone
 	int additionalOffset = 2560;
 	float antiDeadzoned = 0.0f;
@@ -86,35 +86,9 @@ void WheelInput::DoWheelSteering() {
 	CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
 }
 
-bool WheelInput::InitWheel(ScriptSettings settings, Logger logger) {
+bool WheelLogiInput::InitWheel(ScriptSettings settings, Logger logger) {
 	if (settings.LogiWheel) {
 		LogiSteeringInitialize(TRUE);
-		
-		wchar_t buffer[32];
-		LogiGetFriendlyProductName(0, buffer, 32);
-		std::wstring wstring0(buffer);
-		std::string string0(wstring0.begin(), wstring0.end());
-		std::string result = "0: " + string0;
-		logger.Write(result);
-
-		LogiGetFriendlyProductName(1, buffer, 32);
-		std::wstring wstring1(buffer);
-		std::string string1(wstring1.begin(), wstring1.end());
-		result = "1: " + string1;
-		logger.Write(result);
-
-		LogiGetFriendlyProductName(2, buffer, 32);
-		std::wstring wstring2(buffer);
-		std::string string2(wstring2.begin(), wstring2.end());
-		result = "2: " + string2;
-		logger.Write(result);
-
-		LogiGetFriendlyProductName(3, buffer, 32);
-		std::wstring wstring3(buffer);
-		std::string string3(wstring3.begin(), wstring3.end());
-		result = "3: " + string3;
-		logger.Write(result);
-
 		if (LogiUpdate() && LogiIsConnected(index_)) {
 			LogiGetCurrentControllerProperties(index_, properties);
 			properties.wheelRange = settings.WheelRange;
@@ -133,15 +107,19 @@ bool WheelInput::InitWheel(ScriptSettings settings, Logger logger) {
 	}
 }
 
-float WheelInput::GetLogiWheelVal() {
+float WheelLogiInput::GetLogiWheelVal() {
 	return logiWheelVal;
 }
-float WheelInput::GetLogiThrottleVal() {
+float WheelLogiInput::GetLogiThrottleVal() {
 	return logiThrottleVal;
 }
-float WheelInput::GetLogiBrakeVal() {
+float WheelLogiInput::GetLogiBrakeVal() {
 	return logiBrakeVal;
 }
-float WheelInput::GetLogiClutchVal() {
+float WheelLogiInput::GetLogiClutchVal() {
 	return logiClutchVal;
+}
+
+bool  WheelLogiInput::IsActive(ScriptSettings settings) {
+	return (settings.LogiWheel && LogiIsConnected(index_) && LogiUpdate());
 }

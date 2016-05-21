@@ -15,11 +15,11 @@
 #endif
 #include "..\..\LogitechSteeringWheel_SDK\Include\LogitechSteeringWheelLib.h"
 
-class WheelInput
+class WheelLogiInput
 {
 public:
-	WheelInput(int index);
-	~WheelInput();
+	WheelLogiInput(int index);
+	~WheelLogiInput();
 	void DoWheelSteering();
 	void PlayWheelEffects(
 		ScriptSettings settings,
@@ -28,12 +28,13 @@ public:
 	void UpdateLogiValues();
 	bool InitWheel(ScriptSettings settings, Logger logger);
 	void PlayWheelVisuals(float rpm);
-	bool IsActive = false;
+	//bool IsActive = false;
 	int GetIndex();
 	float GetLogiWheelVal();
 	float GetLogiThrottleVal();
 	float GetLogiBrakeVal();
 	float GetLogiClutchVal();
+	bool IsActive(ScriptSettings settings);
 
 private:
 	int index_ = 0;

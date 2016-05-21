@@ -66,14 +66,6 @@ void update() {
 		return;
 	}
 
-	if (settings.LogiWheel && LogiIsConnected(logiWheel.GetIndex()) && LogiUpdate()) {
-		logiWheel.IsActive = true;
-	}
-	else {
-		logiWheel.IsActive = false;
-
-	}
-
 	if (controller.IsConnected()) {
 		buttonState = controller.GetState().Gamepad.wButtons;
 		controller.UpdateButtonChangeStates();
@@ -81,7 +73,7 @@ void update() {
 
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Toggle], ScriptControls::KeyboardControlType::Toggle) || 
 		controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Toggle]), buttonState, controls.CToggleTime) ||
-		(logiWheel.IsActive && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Toggle]))) {
+		(logiWheel.IsActive(settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Toggle]))) {
 		toggleManual();
 	}
 
@@ -118,7 +110,7 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ToggleH], ScriptControls::KeyboardControlType::ToggleH) ||
-		(logiWheel.IsActive && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ToggleH]))) {
+		(logiWheel.IsActive(settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ToggleH]))) {
 		settings.Hshifter = !settings.Hshifter;
 		if (!settings.Hshifter && vehData.CurrGear > 1) {
 			vehData.SimulatedNeutral = false;
@@ -130,7 +122,7 @@ void update() {
 		settings.Save();
 	}
 
-	if (logiWheel.IsActive) {
+	if (logiWheel.IsActive(settings)) {
 		logiWheel.UpdateLogiValues();
 	}
 
@@ -178,7 +170,7 @@ void update() {
 	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
-	if (logiWheel.IsActive && prevInput == InputDevices::Wheel) {
+	if (logiWheel.IsActive(settings) && prevInput == InputDevices::Wheel) {
 		playWheelEffects();
 		//logiWheel.PlayWheelEffects(settings, vehData, vehicle);
 		logiWheel.DoWheelSteering();
@@ -239,7 +231,7 @@ void update() {
 		// New reverse: Reverse with throttle
 		if (settings.RealReverse) {
 			functionRealReverse();
-			if (logiWheel.IsActive && prevInput == InputDevices::Wheel) {
+			if (logiWheel.IsActive(settings) && prevInput == InputDevices::Wheel) {
 				handlePedalsRealReverse(
 					logiWheel.GetLogiThrottleVal(),
 					logiWheel.GetLogiBrakeVal());
@@ -248,7 +240,7 @@ void update() {
 		// Reversing behavior: just block the direction you don't wanna go to
 		else {
 			functionSimpleReverse();
-			if (logiWheel.IsActive && prevInput == InputDevices::Wheel) {
+			if (logiWheel.IsActive(settings) && prevInput == InputDevices::Wheel) {
 				handlePedalsDefault(
 					logiWheel.GetLogiThrottleVal(),
 					logiWheel.GetLogiBrakeVal());
@@ -286,7 +278,7 @@ void update() {
 
 	// Manual shifting
 	if (settings.Hshifter && !vehData.IsBike) {
-		if (logiWheel.IsActive && prevInput == InputDevices::Wheel) {
+		if (logiWheel.IsActive(settings) && prevInput == InputDevices::Wheel) {
 			functionHShiftLogitech();
 		}
 		else {
@@ -313,9 +305,6 @@ void main() {
 	settings.Read(&controls);
 	if (settings.LogiWheel) {
 		logiWheel.InitWheel(settings, logger);
-	}
-	else {
-		logger.Write("Wheel disabled");
 	}
 
 	while (true) {
@@ -367,7 +356,7 @@ void showDebugInfo() {
 	const char *infoc = infos.str().c_str();
 	showText(0.01f, 0.5f, 0.4f, (char *)infoc);
 
-	/*if (logiWheel.IsActive) {
+	/*if (logiWheel.IsActive(settings)) {
 		std::stringstream throttleDisplay;
 		throttleDisplay << "TVal: " << logiWheel.GetLogiThrottleVal();
 		std::stringstream brakeDisplay;
@@ -390,7 +379,7 @@ int getLastInputDevice(int previousInput) {
 		controller.IsButtonPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Throttle]), buttonState)) {
 		return InputDevices::Controller;
 	}
-	if (logiWheel.IsActive &&
+	if (logiWheel.IsActive(settings) &&
 		(logiWheel.GetLogiThrottleVal() > 0.1f ||
 			logiWheel.GetLogiBrakeVal() > 0.1f ||
 			logiWheel.GetLogiClutchVal() < 0.9f)) {
@@ -408,16 +397,13 @@ void reInit() {
 	vehData.LockGears = 0x00010001;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
 	if (settings.LogiWheel) {
-		logiWheel.IsActive = logiWheel.InitWheel(settings, logger);
-	}
-	else {
-		logger.Write("Wheel disabled");
+		logiWheel.InitWheel(settings, logger);
 	}
 }
 
 void reset() {
 	if (active) {
-		if (logiWheel.IsActive) {
+		if (logiWheel.IsActive(settings)) {
 			resetWheelFeedback(logiWheel.GetIndex());
 		}
 		vehData.Clear();
@@ -546,7 +532,7 @@ void functionSShift() {
 	// Shift up
 	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::ShiftUp]), buttonState) ||
 		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ShiftUp], ScriptControls::KeyboardControlType::ShiftUp) ||
-		(logiWheel.IsActive && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftUp]))) {
+		(logiWheel.IsActive(settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftUp]))) {
 		
 		// Reverse to Neutral
 		if (vehData.CurrGear == 0 && !vehData.SimulatedNeutral) {
@@ -570,7 +556,7 @@ void functionSShift() {
 	// Shift down
 	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::ShiftDown]), buttonState) ||
 		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ShiftDown], ScriptControls::KeyboardControlType::ShiftDown) ||
-		(logiWheel.IsActive && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftDown]))) {
+		(logiWheel.IsActive(settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftDown]))) {
 		
 		// 1 to Neutral
 		if (vehData.CurrGear == 1 && !vehData.SimulatedNeutral) {
@@ -839,10 +825,10 @@ void handleVehicleButtons() {
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
 		(	controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Engine]), buttonState) ||
 			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Engine], ScriptControls::KeyboardControlType::Engine) ||
-			(logiWheel.IsActive && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Engine])))) {
+			(logiWheel.IsActive(settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Engine])))) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
-	if (logiWheel.IsActive) {
+	if (logiWheel.IsActive(settings)) {
 		if (LogiGetState(logiWheel.GetIndex())->rgbButtons[controls.LogiControl[(int)ScriptControls::LogiControlType::Handbrake]]) {
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
 		}
@@ -918,8 +904,7 @@ void playWheelEffects() {
 }
 
 // Since playing back is f'd - This too, will be in the main class
-void resetWheelFeedback(int index)
-{
+void resetWheelFeedback(int index) {
 	LogiStopSpringForce(index);
 	LogiStopConstantForce(index);
 	LogiStopDamperForce(index);

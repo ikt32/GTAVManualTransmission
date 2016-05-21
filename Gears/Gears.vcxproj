@@ -158,7 +158,7 @@
     <ClCompile Include="VehicleData.cpp" />
     <ClCompile Include="VehicleExtensions.cpp" />
     <ClCompile Include="MemoryPatcher.cpp" />
-    <ClCompile Include="WheelInput.cpp" />
+    <ClCompile Include="WheelLogiInput.cpp" />
     <ClCompile Include="XboxController.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -175,7 +175,7 @@
     <ClInclude Include="VehicleData.hpp" />
     <ClInclude Include="VehicleExtensions.hpp" />
     <ClInclude Include="MemoryPatcher.hpp" />
-    <ClInclude Include="WheelInput.hpp" />
+    <ClInclude Include="WheelLogiInput.hpp" />
     <ClInclude Include="XboxController.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
