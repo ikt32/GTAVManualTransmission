@@ -910,10 +910,6 @@ void playWheelEffects() {
 	else if (LogiIsPlaying(logiWheel.GetIndex(), LOGI_FORCE_CAR_AIRBORNE)) {
 		LogiStopCarAirborne(logiWheel.GetIndex());
 	}
-
-	if (accelVals.y > 5.0f || accelVals.y < -5.0f ) {
-		LogiPlayFrontalCollisionForce(logiWheel.GetIndex(), abs((int)(accelVals.y*4.0f)));
-	}
 }
 
 // Since playing back is f'd - This too, will be in the main class
