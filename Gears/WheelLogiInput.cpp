@@ -121,10 +121,5 @@ float WheelLogiInput::GetLogiClutchVal() {
 }
 
 bool  WheelLogiInput::IsActive(ScriptSettings settings) {
-	Logger log("Gears_.log");
-	if (settings.LogiWheel && LogiIsConnected(index_)) {
-		return true;
-	}
-	log.Write("Fuck!");
-	return false;
+	return (settings.LogiWheel && LogiIsConnected(index_));
 }
