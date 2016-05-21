@@ -29,6 +29,7 @@ public:
 	int FFDamperStationary;
 	int FFDamperMoving;
 	int FFPhysics;
+	float FFCenterSpring;
 
 	bool Debug;
 	bool DisableFullClutch;

@@ -36,6 +36,7 @@ void resetWheelFeedback(int index);
 void handlePedalsDefault(float logiThrottleVal, float logiBrakeVal);
 void handlePedalsRealReverse(float logiThrottleVal, float logiBrakeVal);
 void handleVehicleButtons();
+void playWheelEffects();
 
 void functionAutoReverse();
 void functionRealReverse();
