@@ -69,6 +69,7 @@ void update() {
 
 	if (prevVehicle != vehicle) {
 		vehData.SimulatedNeutral = settings.DefaultNeutral;
+		shiftTo(1, true);
 	}
 	prevVehicle = vehicle;
 
