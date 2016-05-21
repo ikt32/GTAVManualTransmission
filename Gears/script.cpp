@@ -11,7 +11,7 @@
 #include "VehicleData.hpp"
 #include "MemoryPatcher.hpp"
 #include "XboxController.hpp"
-#include "WheelInput.hpp"
+#include "WheelLogiInput.hpp"
 
 Logger logger(LOGFILE);
 ScriptControls controls;
@@ -27,7 +27,7 @@ Hash model;
 XboxController controller(1);
 WORD buttonState;
 
-WheelInput logiWheel(0);
+WheelLogiInput logiWheel(0);
 
 bool active = false;
 bool patched = false;

@@ -89,6 +89,32 @@ void WheelInput::DoWheelSteering() {
 bool WheelInput::InitWheel(ScriptSettings settings, Logger logger) {
 	if (settings.LogiWheel) {
 		LogiSteeringInitialize(TRUE);
+		
+		wchar_t buffer[32];
+		LogiGetFriendlyProductName(0, buffer, 32);
+		std::wstring wstring0(buffer);
+		std::string string0(wstring0.begin(), wstring0.end());
+		std::string result = "0: " + string0;
+		logger.Write(result);
+
+		LogiGetFriendlyProductName(1, buffer, 32);
+		std::wstring wstring1(buffer);
+		std::string string1(wstring1.begin(), wstring1.end());
+		result = "1: " + string1;
+		logger.Write(result);
+
+		LogiGetFriendlyProductName(2, buffer, 32);
+		std::wstring wstring2(buffer);
+		std::string string2(wstring2.begin(), wstring2.end());
+		result = "2: " + string2;
+		logger.Write(result);
+
+		LogiGetFriendlyProductName(3, buffer, 32);
+		std::wstring wstring3(buffer);
+		std::string string3(wstring3.begin(), wstring3.end());
+		result = "3: " + string3;
+		logger.Write(result);
+
 		if (LogiUpdate() && LogiIsConnected(index_)) {
 			LogiGetCurrentControllerProperties(index_, properties);
 			properties.wheelRange = settings.WheelRange;
