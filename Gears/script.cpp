@@ -641,8 +641,8 @@ void handleRPM() {
 	// Result:	Is as desired. Speed may drop a bit because of game clutch.
 	if (vehData.CurrGear > 0 &&
 		(vehData.CurrGear < vehData.NextGear && vehData.Speed > 2.0f)) {
-		ext.SetThrottle(vehicle, 1.2f);
-		ext.SetCurrentRPM(vehicle, 1.07f);
+		ext.SetThrottle(vehicle, 1.0f);
+		ext.SetCurrentRPM(vehicle, 1.0f);
 	}
 
 	// Emulate previous "shift down wanted" behavior.
@@ -650,14 +650,42 @@ void handleRPM() {
 		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, vehData.Rpm * 2.5f);
 	}
 
-	// Game doesn't really support revving on disengaged clutch in any gear but 1
-	// Simulate this
-	if (vehData.CurrGear > 1 && controls.Clutchvalf > 0.4f) {
-		float revValue = vehData.Throttle;
-		if (revValue > 0.2f) {
-			ext.SetCurrentRPM(vehicle, revValue <= 0.99f ? revValue : 1.05f);
+	// Game doesn't rev on disengaged clutch in any gear but 1
+	// This workaround tries to emulate this
+	// vehData.Clutch >= 0.6: Normal
+	// vehData.Clutch < 0.6: Nothing happens
+	if (vehData.CurrGear > 1 && vehData.Clutch < 0.6f) {
+		if (controls.Clutchvalf > 0.1f && controls.Accelvalf > 0.05f &&
+			!vehData.SimulatedNeutral) {
+			//showText(0.4, 0.1, 2.0, "Workaround active");
+			float revValue;
+			revValue = controls.Accelvalf- (1.0f - controls.Clutchvalf);
+			if (revValue > 0.2f) {
+				ext.SetCurrentRPM(vehicle, revValue);
+				ext.SetThrottle(vehicle, 1.0f); // For a fuller sound
+				ext.SetClutch(vehicle, (1.0f - controls.Clutchvalf)*0.5f+0.5f);
+				return; //Don't set clutch in the end
+			}
+			//showText(0.4, 0.2, 2.0, (char *)std::to_string(revValue).c_str());
+		}
+		if (vehData.SimulatedNeutral) {
+			float revValue;
+			revValue = controls.Accelvalf;
+			if (revValue > 0.2f) {
+				ext.SetCurrentRPM(vehicle, revValue);
+				ext.SetThrottle(vehicle, 1.0f); // For a fuller sound
+			}
 		}
 	}
+
+	// Set the clutch depending on neutral status
+	if (vehData.SimulatedNeutral) {
+		ext.SetClutch(vehicle, 0.0f);
+	}
+	else {
+		ext.SetClutch(vehicle, 1.0f - controls.Clutchvalf);
+	}
+
 }
 
 void functionTruckLimiting() {
@@ -878,7 +906,7 @@ void handleVehicleButtons() {
 void playWheelEffects() {
 	Vector3 accelVals = vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true));
 	
-	LogiPlayLeds(logiWheel.GetIndex(), vehData.Rpm, 0.5f, 0.95f);
+	LogiPlayLeds(logiWheel.GetIndex(), vehData.Rpm, 0.66f, 0.99f);
 
 	int damperforce = 0;
 	if (settings.FFDamperStationary < settings.FFDamperMoving) {
