@@ -653,23 +653,24 @@ void handleRPM() {
 		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, vehData.Rpm * 2.5f);
 	}
 
-	// Game doesn't rev on disengaged clutch in any gear but 1
-	// This workaround tries to emulate this
-	// vehData.Clutch >= 0.6: Normal
-	// vehData.Clutch < 0.6: Nothing happens
+	/*
+		Game doesn't rev on disengaged clutch in any gear but 1
+		This workaround tries to emulate this
+		Default: vehData.Clutch >= 0.6: Normal
+		Default: vehData.Clutch < 0.6: Nothing happens
+		Fix: Emulate 0.6 to 1.0.
+	*/
 	if (vehData.CurrGear > 1 && vehData.Clutch < 0.6f) {
 		if (controls.Clutchvalf > 0.1f && controls.Accelvalf > 0.05f &&
 			!vehData.SimulatedNeutral) {
-			//showText(0.4, 0.1, 2.0, "Workaround active");
 			float revValue;
 			revValue = controls.Accelvalf- (1.0f - controls.Clutchvalf);
 			if (revValue > 0.2f) {
 				ext.SetCurrentRPM(vehicle, revValue);
 				ext.SetThrottle(vehicle, 1.0f); // For a fuller sound
 				ext.SetClutch(vehicle, (1.0f - controls.Clutchvalf)*0.5f+0.5f);
-				return; //Don't set clutch in the end
+				return; // Skip "normal" clutch thing.
 			}
-			//showText(0.4, 0.2, 2.0, (char *)std::to_string(revValue).c_str());
 		}
 		if (vehData.SimulatedNeutral) {
 			float revValue;
@@ -683,6 +684,12 @@ void handleRPM() {
 
 	// Set the clutch depending on neutral status
 	if (vehData.SimulatedNeutral || controls.Clutchvalf > 0.95) {
+		/*
+			To prevent a the clutch not being registered as fully pressed
+			by the game. Negative values seem to work, but this amount
+			differs from vehicle to vehicle, so it is at -0.10f to cover
+			every case. Stronger negative values don't seem problematic.
+		*/
 		ext.SetClutch(vehicle, -0.10f);
 	}
 	else {
