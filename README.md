@@ -23,7 +23,7 @@ Discuss the mod over at [GTAForums.com](http://gtaforums.com/topic/840830-manual
 * [Logitech Steering Wheel SDK](http://gaming.logitech.com/en-us/developers)
 
 Download the [ScriptHookV SDK](http://www.dev-c.com/gtav/scripthookv/) and extract it's contents to ScriptHookV_SDK. 
-Clone this repository to the same folder ScriptHookV_SDK was extracted so you have ScriptHookV_SDK and GTAVManualTransmission in the same folder.
+Clone this repository to the same folder ScriptHookV_SDK was extracted so you have ScriptHookV_SDK and GTAVManualTransmission in the same folder. If you get build errors about missing functions, update your [natives.h](http://www.dev-c.com/nativedb/natives.h).
 
 Download the [Logitech Steering Wheel SDK](http://gaming.logitech.com/en-us/developers) and extract it's contents to LogitechSteeringWheel_SDK. 
 Clone this repository to the same folder LogitechSteeringWheel_SDK was extracted so you have LogitechSteeringWheel_SDK and GTAVManualTransmission in the same folder.
