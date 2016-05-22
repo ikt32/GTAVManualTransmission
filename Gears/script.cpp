@@ -680,7 +680,7 @@ void handleRPM() {
 
 	// Set the clutch depending on neutral status
 	if (vehData.SimulatedNeutral || controls.Clutchvalf > 0.95) {
-		ext.SetClutch(vehicle, -0.05f);
+		ext.SetClutch(vehicle, -0.07f);
 	}
 	else {
 		ext.SetClutch(vehicle, 1.0f - controls.Clutchvalf);
