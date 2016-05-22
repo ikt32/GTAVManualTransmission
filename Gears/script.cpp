@@ -32,7 +32,7 @@ WheelLogiInput logiWheel(0);
 
 bool active = false;
 bool patched = false;
-bool patchedSpecial = false;
+//bool patchedSpecial = false;
 bool simpleBike = false;
 int prevNotification = 0;
 int prevInput = 0;
@@ -194,13 +194,13 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 
 
-	if (playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
+	/*if (playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
 		if (patchedSpecial) {
 			logger.Write("Not a driver:");
 			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
 		}
 		return;
-	}
+	}*/
 
 	if (!patched && settings.EnableManual) {
 		logger.Write("Re-patching functions");
@@ -209,7 +209,7 @@ void update() {
 
 	// Special case for clutch used by all vehicles
 	// Only patch if user desires to have their clutch @ 0
-	if (!settings.DisableFullClutch) {
+	/*if (!settings.DisableFullClutch) {
 		if ( controls.Accelvalf > 0.04f && (vehData.SimulatedNeutral || controls.Clutchvalf >= 0.96f)) {
 			if (!patchedSpecial) {
 				patchedSpecial = MemoryPatcher::PatchJustS_LOW();
@@ -220,7 +220,7 @@ void update() {
 				patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
 			}
 		}
-	}
+	}*/
 	
 	if (settings.UITips) {
 		if (vehData.SimulatedNeutral) {
@@ -304,12 +304,6 @@ void update() {
 	handleVehicleButtons();
 	// Finally, update memory each loop
 	handleRPM();
-	if (vehData.SimulatedNeutral) {
-		ext.SetClutch(vehicle, 0.0f);
-	}
-	else {
-		ext.SetClutch(vehicle, 1.0f - controls.Clutchvalf);
-	}
 	ext.SetGears(vehicle, vehData.LockGears);
 }
 
@@ -423,9 +417,9 @@ void reset() {
 		if (patched) {
 			patched = !MemoryPatcher::RestoreInstructions();
 		}
-		if (patchedSpecial) {
+		/*if (patchedSpecial) {
 			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
-		}
+		}*/
 		active = false;
 	}
 }
@@ -445,9 +439,9 @@ void toggleManual() {
 		if (patched) {
 			patched = !MemoryPatcher::RestoreInstructions();
 		}
-		if (patchedSpecial) {
+		/*if (patchedSpecial) {
 			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
-		}
+		}*/
 	}
 	settings.Save();
 	reInit();
