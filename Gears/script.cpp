@@ -238,6 +238,9 @@ void update() {
 	// For bikes, do this automatically.
 	if (vehData.IsBike) {
 		functionAutoReverse();
+		handlePedalsDefault(
+			logiWheel.GetLogiThrottleVal(),
+			logiWheel.GetLogiBrakeVal());
 	}
 	else {
 		// New reverse: Reverse with throttle
