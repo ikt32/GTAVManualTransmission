@@ -31,6 +31,9 @@ namespace MemoryPatcher {
 	uintptr_t gear7A0Addr = 0;
 	uintptr_t gear7A0Temp = 0;
 
+	uintptr_t RevLimiterAddr = 0;
+	uintptr_t RevLimiterTemp = 0;
+
 	bool PatchInstructions() {
 		Logger logger(LOGFILE);
 		logger.Write("Patching instructions");
@@ -46,6 +49,20 @@ namespace MemoryPatcher {
 		else {
 			logger.Write("clutchLow not patched");
 		}
+
+		//RevLimiterTemp = PatchRevLimiter();
+		//if (RevLimiterTemp) {
+		//	RevLimiterAddr = RevLimiterTemp;
+		//	patched++;
+		//	std::stringstream hexaddr;
+		//	hexaddr << std::hex << RevLimiterAddr;
+		//	logger.Write("RevLimiter @ " + hexaddr.str());
+		//}
+		//else {
+		//	logger.Write("RevLimiter patch failed!");
+		//}
+
+
 		///////////////////////////////////////////////////
 
 		//clutchS01Temp = PatchClutchStationary01();
@@ -119,6 +136,15 @@ namespace MemoryPatcher {
 		else {
 			logger.Write("clutchLow not restored");
 		}
+
+		//if (RevLimiterAddr) {
+		//	RestoreRevLimiter(RevLimiterAddr);
+		//	RevLimiterAddr = 0;
+		//	patched--;
+		//}
+		//else {
+		//	logger.Write("RevLimiter not restored");
+		//}
 		
 		//if (clutchS01Addr) {
 		//	RestoreClutchStationary01(clutchS01Addr);
@@ -226,6 +252,28 @@ namespace MemoryPatcher {
 		byte instrArr[7] = { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D };
 		if (address) {
 			for (int i = 0; i < 7; i++) {
+				memset((void *)(address + i), instrArr[i], 1);
+			}
+		}
+	}
+
+	uintptr_t PatchRevLimiter() {
+		// 44 89 7B 60 is prevprev
+		// 89 73 5C is previous instruction
+		// 66 89 13 is what we're looking for.
+		uint8_t offset = 7;
+		uintptr_t address = mem.FindPattern("\x44\x89\x7B\x60\x89\x73\x5C\x66\x89\x13", "xxxxxxxxxx");
+
+		if (address) {
+			memset((void *)(address+offset), 0x90, 3);
+			return (address + offset);
+		}
+		return 0;
+	}
+	void RestoreRevLimiter(uintptr_t address) {
+		byte instrArr[3] = { 0x66, 0x89, 0x13 };
+		if (address) {
+			for (int i = 0; i < 3; i++) {
 				memset((void *)(address + i), instrArr[i], 1);
 			}
 		}

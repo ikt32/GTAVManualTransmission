@@ -30,8 +30,16 @@ namespace MemoryPatcher
 	//extern void RestoreClutchStationaryLow(uintptr_t address);
 
 	// Individually: Disable "shifting down" wanted
+	// 7A0 is NextGear, or what it appears like in my mod.
 	extern uintptr_t PatchGear7A0();
 	extern void RestoreGear7A0(uintptr_t address);
+
+	// Disable 1st gear limiter. This will probably bite me in the ass.
+	// Changes 7A0.
+	// Also apparently it stops the gear from changing.
+	// We don't want this at all
+	extern uintptr_t PatchRevLimiter();
+	extern void RestoreRevLimiter(uintptr_t address);
 
 	extern int total;
 	extern int patched;
@@ -58,5 +66,8 @@ namespace MemoryPatcher
 
 	extern uintptr_t gear7A0Addr;
 	extern uintptr_t gear7A0Temp;
+
+	extern uintptr_t RevLimiterAddr;
+	extern uintptr_t RevLimiterTemp;
 };
 
