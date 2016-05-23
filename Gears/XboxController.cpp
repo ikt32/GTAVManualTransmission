@@ -162,6 +162,9 @@ float XboxController::filterDeadzone(XboxButtons buttonType, int input) {
 	case RightThumbDown:
 		deadzone = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
 		break;
+	default:
+		deadzone = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+		break;
 	}
 
 	if (buttonType == LeftThumbLeft ||
