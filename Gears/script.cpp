@@ -37,6 +37,8 @@ bool simpleBike = false;
 int prevNotification = 0;
 int prevInput = 0;
 
+float prevRpm;
+
 void update() {
 	player = PLAYER::PLAYER_ID();
 	playerPed = PLAYER::PLAYER_PED_ID();
@@ -639,13 +641,22 @@ void functionEngBrake() {
 //                       Mod functions: Gearbox control
 ///////////////////////////////////////////////////////////////////////////////
 void handleRPM() {
+	float finalClutch;
+
 	// Game wants to shift up. Triggered at high RPM, high speed.
 	// Desired result: high RPM, same gear, no more accelerating
 	// Result:	Is as desired. Speed may drop a bit because of game clutch.
+
 	if (vehData.CurrGear > 0 &&
 		(vehData.CurrGear < vehData.NextGear && vehData.Speed > 2.0f)) {
 		ext.SetThrottle(vehicle, 1.0f);
-		ext.SetCurrentRPM(vehicle, 1.0f);
+		float rpmVal;
+		rpmVal = vehData.Rpm + (prevRpm > vehData.Rpm ? prevRpm - vehData.Rpm : 0.0f) + controls.Accelvalf / 50.0f;
+		if (rpmVal > 1.0f) {
+			rpmVal = 1.0f;
+		}
+
+		ext.SetCurrentRPM(vehicle, rpmVal); // last time's Rpm value...?
 	}
 
 	// Emulate previous "shift down wanted" behavior.
