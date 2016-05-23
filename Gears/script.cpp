@@ -681,7 +681,8 @@ void handleRPM() {
 				ext.SetThrottle(vehicle, 1.0f); // For a fuller sound
 				float tempVal = (1.0f - controls.Clutchvalf)*0.5f + 0.5f;
 				if (controls.Clutchvalf > 0.95) {
-					tempVal = -0.2f;
+					finalClutch = -0.5f;
+					tempVal = -0.5f;
 				}
 				ext.SetClutch(vehicle, tempVal);
 				return; // Skip "normal" clutch thing.
@@ -702,15 +703,20 @@ void handleRPM() {
 		/*
 			To prevent a the clutch not being registered as fully pressed
 			by the game. Negative values seem to work, but this amount
-			differs from vehicle to vehicle, so it is at -0.10f to cover
+			differs from vehicle to vehicle, so it is at -0.1f to cover
 			every case. Stronger negative values don't seem problematic.
+			+Supercars seem to have a higher offset. -0.2f now,
+			+Tuning the transmission messes this up, so just use -0.5f.
 		*/
-		ext.SetClutch(vehicle, -0.2f);
+		//ext.SetClutch(vehicle, -0.5f);
+		finalClutch = -0.5f;
 	}
 	else {
-		ext.SetClutch(vehicle, 1.0f - controls.Clutchvalf);
+		//ext.SetClutch(vehicle, 1.0f - controls.Clutchvalf);
+		finalClutch = 1.0f - controls.Clutchvalf;
 	}
 
+	ext.SetClutch(vehicle, finalClutch);
 }
 
 void functionTruckLimiting() {
