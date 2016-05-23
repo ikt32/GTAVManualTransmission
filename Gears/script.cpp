@@ -668,7 +668,11 @@ void handleRPM() {
 			if (revValue > 0.2f) {
 				ext.SetCurrentRPM(vehicle, revValue);
 				ext.SetThrottle(vehicle, 1.0f); // For a fuller sound
-				ext.SetClutch(vehicle, (1.0f - controls.Clutchvalf)*0.5f+0.5f);
+				float tempVal = (1.0f - controls.Clutchvalf)*0.5f + 0.5f;
+				if (controls.Clutchvalf > 0.95) {
+					tempVal = -0.2f;
+				}
+				ext.SetClutch(vehicle, tempVal);
 				return; // Skip "normal" clutch thing.
 			}
 		}
@@ -690,7 +694,7 @@ void handleRPM() {
 			differs from vehicle to vehicle, so it is at -0.10f to cover
 			every case. Stronger negative values don't seem problematic.
 		*/
-		ext.SetClutch(vehicle, -0.10f);
+		ext.SetClutch(vehicle, -0.2f);
 	}
 	else {
 		ext.SetClutch(vehicle, 1.0f - controls.Clutchvalf);
