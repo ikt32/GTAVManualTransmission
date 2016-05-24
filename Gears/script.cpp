@@ -653,12 +653,10 @@ void handleRPM() {
 		ext.SetThrottle(vehicle, 1.0f);
 		float rpmVal;
 		rpmVal = vehData.Rpm + (prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm)*1.1f : 0.0f) + controls.Accelvalf / 50.0f;
-		if (rpmVal > 1.0f) {
-			rpmVal = 1.0f;
+		if (rpmVal > 1.012f) {
+			rpmVal = 1.012f;
 		}
-
-		ext.SetCurrentRPM(vehicle, rpmVal); // last time's Rpm value...?
-		//showText(0.1, 0.1, 1.0, "RPM Setting");
+		ext.SetCurrentRPM(vehicle, rpmVal);
 	}
 	prevRpm = vehData.Rpm;
 
@@ -681,10 +679,9 @@ void handleRPM() {
 			!vehData.SimulatedNeutral) {
 			float rpmVal;
 			rpmVal = vehData.Rpm + (prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm)*1.1f : 0.0f) + controls.Accelvalf / 50.0f;
-			if (rpmVal > 1.0f) {
-				rpmVal = 1.0f;
+			if (rpmVal > 1.012f) {
+				rpmVal = 1.012f;
 			}
-
 			ext.SetCurrentRPM(vehicle, rpmVal); // last time's Rpm value...?			
 			ext.SetThrottle(vehicle, controls.Accelvalf);
 			float tempVal = (1.0f - controls.Clutchvalf)*0.4f + 0.6f;
@@ -698,12 +695,11 @@ void handleRPM() {
 		if (vehData.SimulatedNeutral) {
 			float rpmVal;
 			rpmVal = vehData.Rpm + (prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm)*1.1f : 0.0f) + controls.Accelvalf / 50.0f;
-			if (rpmVal > 1.0f) {
-				rpmVal = 1.0f;
+			if (rpmVal > 1.012f) {
+				rpmVal = 1.012f;
 			}
-			ext.SetCurrentRPM(vehicle, rpmVal); // last time's Rpm value...?
 			ext.SetThrottle(vehicle, 1.0f); // For a fuller sound
-			showText(0.1, 0.3, 1.0, "Neutral > 1 Rev");
+			ext.SetCurrentRPM(vehicle, rpmVal); // last time's Rpm value...?
 		}
 	}
 
@@ -718,15 +714,11 @@ void handleRPM() {
 			+Tuning the transmission messes this up, so just use -0.5f.
 			+Still messes up the T20 @ Max Transmission upgrade.
 		*/
-		//ext.SetClutch(vehicle, -0.5f);
 		finalClutch = -0.5f;
-		//showText(0.1, 0.4, 1.0, "Neutral/Clutch F");
 	}
 	else {
-		//ext.SetClutch(vehicle, 1.0f - controls.Clutchvalf);
 		if (!skip) {
 			finalClutch = 1.0f - controls.Clutchvalf;
-			//showText(0.1, 0.5, 1.0, "Normal clutch + slip");
 		}
 	}
 	ext.SetClutch(vehicle, finalClutch);
@@ -971,8 +963,7 @@ void playWheelEffects() {
 	LogiPlayDamperForce(logiWheel.GetIndex(), damperforce);
 
 	LogiPlayConstantForce(logiWheel.GetIndex(), (int)(-settings.FFPhysics*accelVals.x));
-	showText(0.1, 0.1, 1.0, (char *)std::to_string(accelVals.y).c_str());
-	int centerForcePercentage = settings.FFCenterSpring * 100 * (int)accelVals.y;
+	int centerForcePercentage = (int)(settings.FFCenterSpring * 100 * accelVals.y);
 	if (centerForcePercentage < 0) {
 		centerForcePercentage = 0;
 	}
