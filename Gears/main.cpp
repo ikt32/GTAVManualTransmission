@@ -24,6 +24,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 	case DLL_PROCESS_DETACH:
 		logger.Write("Init shutdown");
 		if (LogiIsConnected(0)) {
+			resetWheelFeedback(0);
 			LogiSteeringShutdown();
 		}
 		bool successI = MemoryPatcher::RestoreInstructions();
