@@ -658,7 +658,7 @@ void handleRPM() {
 		}
 
 		ext.SetCurrentRPM(vehicle, rpmVal); // last time's Rpm value...?
-		showText(0.1, 0.1, 1.0, "RPM Setting");
+		//showText(0.1, 0.1, 1.0, "RPM Setting");
 	}
 	prevRpm = vehData.Rpm;
 
@@ -691,7 +691,7 @@ void handleRPM() {
 			}
 
 			ext.SetCurrentRPM(vehicle, rpmVal); // last time's Rpm value...?
-			showText(0.6, 0.1, 1.0, "RPM Setting");
+			//showText(0.6, 0.1, 1.0, "RPM Setting");
 			
 			ext.SetThrottle(vehicle, controls.Accelvalf);
 			float tempVal = (1.0f - controls.Clutchvalf)*0.4f + 0.6f;
@@ -700,7 +700,7 @@ void handleRPM() {
 			}
 			finalClutch = tempVal;
 			skip = true;
-			showText(0.1, 0.2, 1.0, "Clutch slip emu");
+			//showText(0.1, 0.2, 1.0, "Clutch slip emu");
 			/////
 			/*if (revValue > 0.2f) {
 				ext.SetCurrentRPM(vehicle, revValue);
@@ -723,7 +723,7 @@ void handleRPM() {
 			if (revValue > 0.2f) {
 				ext.SetCurrentRPM(vehicle, revValue);
 				ext.SetThrottle(vehicle, 1.0f); // For a fuller sound
-				showText(0.1, 0.3, 1.0, "Neutral > 1 Rev");
+				//showText(0.1, 0.3, 1.0, "Neutral > 1 Rev");
 			}
 		}
 	}
@@ -741,13 +741,13 @@ void handleRPM() {
 		*/
 		//ext.SetClutch(vehicle, -0.5f);
 		finalClutch = -0.5f;
-		showText(0.1, 0.4, 1.0, "Neutral/Clutch F");
+		//showText(0.1, 0.4, 1.0, "Neutral/Clutch F");
 	}
 	else {
 		//ext.SetClutch(vehicle, 1.0f - controls.Clutchvalf);
 		if (!skip) {
 			finalClutch = 1.0f - controls.Clutchvalf;
-			showText(0.1, 0.5, 1.0, "Normal clutch + slip");
+			//showText(0.1, 0.5, 1.0, "Normal clutch + slip");
 		}
 	}
 	ext.SetClutch(vehicle, finalClutch);
