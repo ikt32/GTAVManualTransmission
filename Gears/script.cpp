@@ -992,8 +992,18 @@ void playWheelEffects() {
 	LogiPlayDamperForce(logiWheel.GetIndex(), damperforce);
 
 	LogiPlayConstantForce(logiWheel.GetIndex(), (int)(-settings.FFPhysics*accelVals.x));
-	LogiPlaySpringForce(logiWheel.GetIndex(), 0, (int)(settings.FFCenterSpring*vehData.Speed), (int)(settings.FFCenterSpring*vehData.Speed));
+	showText(0.1, 0.1, 1.0, (char *)std::to_string(accelVals.y).c_str());
+	int centerForcePercentage = settings.FFCenterSpring * 100 * (int)accelVals.y;
+	if (centerForcePercentage < 0) {
+		centerForcePercentage = 0;
+	}
 
+	LogiPlaySpringForce(
+		logiWheel.GetIndex(),
+		0,
+		(int)(settings.FFCenterSpring*vehData.Speed + centerForcePercentage),
+		(int)(settings.FFCenterSpring*vehData.Speed + centerForcePercentage));
+	
 	if (!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f) {
 		LogiPlayCarAirborne(logiWheel.GetIndex());
 	}
