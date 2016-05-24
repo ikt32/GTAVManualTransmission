@@ -681,7 +681,28 @@ void handleRPM() {
 			!vehData.SimulatedNeutral) {
 			float revValue;
 			revValue = controls.Accelvalf- (1.0f - controls.Clutchvalf);
-			if (revValue > 0.2f) {
+			/////
+			//ext.SetCurrentRPM(vehicle, controls.Accelvalf);
+			
+			float rpmVal;
+			rpmVal = vehData.Rpm + (prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm)*1.1f : 0.0f) + controls.Accelvalf / 50.0f;
+			if (rpmVal > 1.0f) {
+				rpmVal = 1.0f;
+			}
+
+			ext.SetCurrentRPM(vehicle, rpmVal); // last time's Rpm value...?
+			showText(0.6, 0.1, 1.0, "RPM Setting");
+			
+			ext.SetThrottle(vehicle, controls.Accelvalf);
+			float tempVal = (1.0f - controls.Clutchvalf)*0.4f + 0.6f;
+			if (controls.Clutchvalf > 0.95) {
+				tempVal = -0.5f;
+			}
+			finalClutch = tempVal;
+			skip = true;
+			showText(0.1, 0.2, 1.0, "Clutch slip emu");
+			/////
+			/*if (revValue > 0.2f) {
 				ext.SetCurrentRPM(vehicle, revValue);
 				ext.SetThrottle(vehicle, 1.0f); // For a fuller sound
 				float tempVal = (1.0f - controls.Clutchvalf)*0.4f+0.6f;
@@ -693,7 +714,7 @@ void handleRPM() {
 				showText(0.1, 0.2, 1.0, "Clutch slip emu");
 				//ext.SetClutch(vehicle, tempVal);
 				//return; // Skip "normal" clutch thing.
-			}
+			}*/
 		}
 		// Don't care about clutch slippage, just handle RPM now
 		if (vehData.SimulatedNeutral) {
