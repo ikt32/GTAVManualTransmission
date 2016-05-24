@@ -447,6 +447,7 @@ void toggleManual() {
 		/*if (patchedSpecial) {
 			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
 		}*/
+		reset();
 	}
 	settings.Save();
 	reInit();
