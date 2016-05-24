@@ -640,6 +640,23 @@ void functionEngBrake() {
 ///////////////////////////////////////////////////////////////////////////////
 //                       Mod functions: Gearbox control
 ///////////////////////////////////////////////////////////////////////////////
+void fakeRev() {
+	float accelRatio = 55.0; // This value works for 75-50FPS.
+	//float accelRatio = 1.0f / SYSTEM::TIMESTEP();// This is FPS-dependant.
+	// Best is that it's low fps, more value, high fps, less value.
+
+	float rpmVal;
+	rpmVal = 
+		vehData.Rpm + // Base value
+		(prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm)*1.1f : 0.0f) + // Constant
+		controls.Accelvalf / accelRatio; // Addition value, depends on delta T
+	if (rpmVal > 1.012f) {
+		rpmVal = 1.012f;
+	}
+	ext.SetCurrentRPM(vehicle, rpmVal);
+}
+
+
 void handleRPM() {
 	float finalClutch;
 	bool skip = false;
@@ -651,14 +668,8 @@ void handleRPM() {
 	if (vehData.CurrGear > 0 &&
 		(vehData.CurrGear < vehData.NextGear && vehData.Speed > 2.0f)) {
 		ext.SetThrottle(vehicle, 1.0f);
-		float rpmVal;
-		rpmVal = vehData.Rpm + (prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm)*1.1f : 0.0f) + controls.Accelvalf / 50.0f;
-		if (rpmVal > 1.012f) {
-			rpmVal = 1.012f;
-		}
-		ext.SetCurrentRPM(vehicle, rpmVal);
+		fakeRev();
 	}
-	prevRpm = vehData.Rpm;
 
 	// Emulate previous "shift down wanted" behavior.
 	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
@@ -677,12 +688,7 @@ void handleRPM() {
 		// When pressing clutch and throttle, handle clutch and RPM
 		if (controls.Clutchvalf > 0.4f && controls.Accelvalf > 0.05f &&
 			!vehData.SimulatedNeutral) {
-			float rpmVal;
-			rpmVal = vehData.Rpm + (prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm)*1.1f : 0.0f) + controls.Accelvalf / 50.0f;
-			if (rpmVal > 1.012f) {
-				rpmVal = 1.012f;
-			}
-			ext.SetCurrentRPM(vehicle, rpmVal); // last time's Rpm value...?			
+			fakeRev();		
 			ext.SetThrottle(vehicle, controls.Accelvalf);
 			float tempVal = (1.0f - controls.Clutchvalf)*0.4f + 0.6f;
 			if (controls.Clutchvalf > 0.95) {
@@ -693,13 +699,8 @@ void handleRPM() {
 		}
 		// Don't care about clutch slippage, just handle RPM now
 		if (vehData.SimulatedNeutral) {
-			float rpmVal;
-			rpmVal = vehData.Rpm + (prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm)*1.1f : 0.0f) + controls.Accelvalf / 50.0f;
-			if (rpmVal > 1.012f) {
-				rpmVal = 1.012f;
-			}
+			fakeRev();
 			ext.SetThrottle(vehicle, 1.0f); // For a fuller sound
-			ext.SetCurrentRPM(vehicle, rpmVal); // last time's Rpm value...?
 		}
 	}
 
@@ -721,6 +722,7 @@ void handleRPM() {
 			finalClutch = 1.0f - controls.Clutchvalf;
 		}
 	}
+	prevRpm = vehData.Rpm;
 	ext.SetClutch(vehicle, finalClutch);
 }
 
