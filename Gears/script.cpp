@@ -40,6 +40,9 @@ int prevInput = 0;
 float prevRpm;
 
 void update() {
+	///////////////////////////////////////////////////////////////////////////
+	//                    Gathering data
+	///////////////////////////////////////////////////////////////////////////
 	player = PLAYER::PLAYER_ID();
 	playerPed = PLAYER::PLAYER_PED_ID();
 
@@ -194,35 +197,10 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 	//                            Patching
 	///////////////////////////////////////////////////////////////////////////
-
-
-	/*if (playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
-		if (patchedSpecial) {
-			logger.Write("Not a driver:");
-			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
-		}
-		return;
-	}*/
-
 	if (!patched && settings.EnableManual) {
 		logger.Write("Re-patching functions");
 		patched = MemoryPatcher::PatchInstructions();
 	}
-
-	// Special case for clutch used by all vehicles
-	// Only patch if user desires to have their clutch @ 0
-	/*if (!settings.DisableFullClutch) {
-		if ( controls.Accelvalf > 0.04f && (vehData.SimulatedNeutral || controls.Clutchvalf >= 0.96f)) {
-			if (!patchedSpecial) {
-				patchedSpecial = MemoryPatcher::PatchJustS_LOW();
-			}
-		}
-		else {
-			if (patchedSpecial) {
-				patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
-			}
-		}
-	}*/
 	
 	if (settings.UITips) {
 		if (vehData.SimulatedNeutral) {
@@ -417,14 +395,9 @@ void reset() {
 		if (logiWheel.IsActive(settings)) {
 			resetWheelFeedback(logiWheel.GetIndex());
 		}
-		//vehData.Clear();
-		//vehicle = 0;
 		if (patched) {
 			patched = !MemoryPatcher::RestoreInstructions();
 		}
-		/*if (patchedSpecial) {
-			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
-		}*/
 		active = false;
 	}
 }
@@ -444,9 +417,6 @@ void toggleManual() {
 		if (patched) {
 			patched = !MemoryPatcher::RestoreInstructions();
 		}
-		/*if (patchedSpecial) {
-			patchedSpecial = !MemoryPatcher::RestoreJustS_LOW();
-		}*/
 		reset();
 	}
 	settings.Save();
@@ -930,6 +900,7 @@ void handleVehicleButtons() {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleNextRadio, 1.0f);
 			break;
 		case 18000:
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
 			break;
 		case 27000:
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehiclePrevRadio, 1.0f);
