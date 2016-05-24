@@ -642,6 +642,7 @@ void functionEngBrake() {
 ///////////////////////////////////////////////////////////////////////////////
 void handleRPM() {
 	float finalClutch;
+	bool skip = false;
 
 	// Game wants to shift up. Triggered at high RPM, high speed.
 	// Desired result: high RPM, same gear, no more accelerating
@@ -651,13 +652,15 @@ void handleRPM() {
 		(vehData.CurrGear < vehData.NextGear && vehData.Speed > 2.0f)) {
 		ext.SetThrottle(vehicle, 1.0f);
 		float rpmVal;
-		rpmVal = vehData.Rpm + (prevRpm > vehData.Rpm ? prevRpm - vehData.Rpm : 0.0f) + controls.Accelvalf / 50.0f;
+		rpmVal = vehData.Rpm + (prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm)*1.1f : 0.0f) + controls.Accelvalf / 50.0f;
 		if (rpmVal > 1.0f) {
 			rpmVal = 1.0f;
 		}
 
 		ext.SetCurrentRPM(vehicle, rpmVal); // last time's Rpm value...?
+		showText(0.1, 0.1, 1.0, "RPM Setting");
 	}
+	prevRpm = vehData.Rpm;
 
 	// Emulate previous "shift down wanted" behavior.
 	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
@@ -669,9 +672,11 @@ void handleRPM() {
 		This workaround tries to emulate this
 		Default: vehData.Clutch >= 0.6: Normal
 		Default: vehData.Clutch < 0.6: Nothing happens
-		Fix: Emulate 0.6 to 1.0.
+		Fix: Map 0.0-1.0 to 0.6-1.0 (clutchdata)
+		Fix: Map 0.0-1.0 to 1.0-0.6 (control)
 	*/
-	if (vehData.CurrGear > 1 && vehData.Clutch < 0.6f) {
+	if (vehData.CurrGear > 1 && controls.Clutchvalf > 0.4f) {
+		// When pressing clutch and throttle, handle clutch and RPM
 		if (controls.Clutchvalf > 0.1f && controls.Accelvalf > 0.05f &&
 			!vehData.SimulatedNeutral) {
 			float revValue;
@@ -679,21 +684,25 @@ void handleRPM() {
 			if (revValue > 0.2f) {
 				ext.SetCurrentRPM(vehicle, revValue);
 				ext.SetThrottle(vehicle, 1.0f); // For a fuller sound
-				float tempVal = (1.0f - controls.Clutchvalf)*0.5f + 0.5f;
+				float tempVal = (1.0f - controls.Clutchvalf)*0.4f+0.6f;
 				if (controls.Clutchvalf > 0.95) {
-					finalClutch = -0.5f;
 					tempVal = -0.5f;
 				}
-				ext.SetClutch(vehicle, tempVal);
-				return; // Skip "normal" clutch thing.
+				finalClutch = tempVal;
+				skip = true;
+				showText(0.1, 0.2, 1.0, "Clutch slip emu");
+				//ext.SetClutch(vehicle, tempVal);
+				//return; // Skip "normal" clutch thing.
 			}
 		}
+		// Don't care about clutch slippage, just handle RPM now
 		if (vehData.SimulatedNeutral) {
 			float revValue;
 			revValue = controls.Accelvalf;
 			if (revValue > 0.2f) {
 				ext.SetCurrentRPM(vehicle, revValue);
 				ext.SetThrottle(vehicle, 1.0f); // For a fuller sound
+				showText(0.1, 0.3, 1.0, "Neutral > 1 Rev");
 			}
 		}
 	}
@@ -707,15 +716,19 @@ void handleRPM() {
 			every case. Stronger negative values don't seem problematic.
 			+Supercars seem to have a higher offset. -0.2f now,
 			+Tuning the transmission messes this up, so just use -0.5f.
+			+Still messes up the T20 @ Max Transmission upgrade.
 		*/
 		//ext.SetClutch(vehicle, -0.5f);
 		finalClutch = -0.5f;
+		showText(0.1, 0.4, 1.0, "Neutral/Clutch F");
 	}
 	else {
 		//ext.SetClutch(vehicle, 1.0f - controls.Clutchvalf);
-		finalClutch = 1.0f - controls.Clutchvalf;
+		if (!skip) {
+			finalClutch = 1.0f - controls.Clutchvalf;
+			showText(0.1, 0.5, 1.0, "Normal clutch + slip");
+		}
 	}
-
 	ext.SetClutch(vehicle, finalClutch);
 }
 
