@@ -72,8 +72,20 @@ void update() {
 		return;
 	}
 
+	vehData.ReadMemData(ext, vehicle);
+	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
+	simpleBike = vehData.IsBike && settings.SimpleBike;
+
 	if (prevVehicle != vehicle) {
-		vehData.SimulatedNeutral = settings.DefaultNeutral;
+		//std::stringstream vehName;
+		//vehName << "New: " << VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model);
+		//showNotification((char *)vehName.str().c_str());
+		if (vehData.NoClutch) {
+			vehData.SimulatedNeutral = false;
+		}
+		else {
+			vehData.SimulatedNeutral = settings.DefaultNeutral;
+		}
 		shiftTo(1, true);
 	}
 	prevVehicle = vehicle;
@@ -93,10 +105,6 @@ void update() {
 		(logiWheel.IsActive(settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Toggle]))) {
 		toggleManual();
 	}
-
-	vehData.ReadMemData(ext, vehicle);
-	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
-	simpleBike = vehData.IsBike && settings.SimpleBike;
 
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
 	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
@@ -213,6 +221,14 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 	// Actual mod operations
 	///////////////////////////////////////////////////////////////////////////
+
+	if (vehData.NoClutch) {
+		showText(0.1, 0.1, 1.0, "No clutch");
+	}
+	else {
+		showText(0.1, 0.1, 1.0, "Has clutch");
+	}
+	showText(0.1, 0.2, 1.0, VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
 
 	// Reverse behavior
 	// For bikes, do this automatically.
