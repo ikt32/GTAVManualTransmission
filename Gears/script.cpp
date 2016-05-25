@@ -411,6 +411,7 @@ void reset() {
 		if (logiWheel.IsActive(settings)) {
 			resetWheelFeedback(logiWheel.GetIndex());
 		}
+		prevVehicle = 0;
 		if (patched) {
 			patched = !MemoryPatcher::RestoreInstructions();
 		}
