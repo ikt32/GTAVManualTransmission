@@ -922,6 +922,9 @@ void playWheelEffects() {
 	if (settings.FFDamperStationary < settings.FFDamperMoving) {
 		settings.FFDamperMoving = settings.FFDamperStationary;
 	}
+	if (settings.FFDamperMoving < 1) {
+		settings.FFDamperMoving = 1;
+	}
 	float ratio = (float)(settings.FFDamperStationary - settings.FFDamperMoving)/settings.FFDamperMoving;
 	int damperforce = settings.FFDamperStationary - (int)(8 * ratio * ratio * vehData.Speed*vehData.Speed);
 	if (damperforce < settings.FFDamperMoving) {
