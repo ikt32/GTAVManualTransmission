@@ -394,6 +394,7 @@ void reset() {
 	if (active) {
 		if (logiWheel.IsActive(settings)) {
 			resetWheelFeedback(logiWheel.GetIndex());
+			LogiSteeringShutdown();
 		}
 		if (patched) {
 			patched = !MemoryPatcher::RestoreInstructions();
