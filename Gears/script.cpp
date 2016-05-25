@@ -222,14 +222,6 @@ void update() {
 	// Actual mod operations
 	///////////////////////////////////////////////////////////////////////////
 
-	if (vehData.NoClutch) {
-		showText(0.1, 0.1, 1.0, "No clutch");
-	}
-	else {
-		showText(0.1, 0.1, 1.0, "Has clutch");
-	}
-	showText(0.1, 0.2, 1.0, VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
-
 	// Reverse behavior
 	// For bikes, do this automatically.
 	if (vehData.IsBike) {
@@ -457,7 +449,7 @@ void shiftTo(int gear, bool autoClutch) {
 }
 
 void functionHShiftTo(int i) {
-	if (settings.ClutchShifting) {
+	if (settings.ClutchShifting && !vehData.NoClutch) {
 		if (controls.Clutchvalf > 1.0f-settings.ClutchCatchpoint) {
 			shiftTo(i, false);
 			vehData.SimulatedNeutral = false;
@@ -488,7 +480,8 @@ void functionHShiftKeyboard() {
 			functionHShiftTo(i);
 		}
 	}
-	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::HN], ScriptControls::KeyboardControlType::HN)) {
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::HN], ScriptControls::KeyboardControlType::HN)
+		&& !vehData.NoClutch) {
 		vehData.SimulatedNeutral = !vehData.SimulatedNeutral;
 	}
 }
@@ -512,19 +505,19 @@ void functionHShiftLogitech() {
 		LogiButtonReleased(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::H4]) ||
 		LogiButtonReleased(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::H5]) ||
 		LogiButtonReleased(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::H6])) {
-		if (settings.ClutchShifting && settings.EngDamage) {
+		if (settings.ClutchShifting && settings.EngDamage && !vehData.NoClutch) {
 			if (controls.Clutchvalf < 1.0-settings.ClutchCatchpoint) {
 				VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
 					vehicle,
 					VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.MisshiftDamage/10);
 			}
 		}
-		vehData.SimulatedNeutral = true;
+		vehData.SimulatedNeutral = !vehData.NoClutch;
 	}
 	
 	if (LogiButtonReleased(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::HR])) {
 		shiftTo(1, true);
-		vehData.SimulatedNeutral = true;
+		vehData.SimulatedNeutral = !vehData.NoClutch;
 	}
 }
 
@@ -534,6 +527,13 @@ void functionSShift() {
 		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ShiftUp], ScriptControls::KeyboardControlType::ShiftUp) ||
 		(logiWheel.IsActive(settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftUp]))) {
 		
+		if (vehData.NoClutch) {
+			if (vehData.CurrGear < vehData.TopGear) {
+				shiftTo(vehData.LockGear + 1, true);
+			}
+			return;
+		}
+
 		// Reverse to Neutral
 		if (vehData.CurrGear == 0 && !vehData.SimulatedNeutral) {
 			shiftTo(1, true);
@@ -558,6 +558,13 @@ void functionSShift() {
 		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ShiftDown], ScriptControls::KeyboardControlType::ShiftDown) ||
 		(logiWheel.IsActive(settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftDown]))) {
 		
+		if (vehData.NoClutch) {
+			if (vehData.CurrGear > 0) {
+				shiftTo(vehData.LockGear - 1, true);
+			}
+			return;
+		}
+
 		// 1 to Neutral
 		if (vehData.CurrGear == 1 && !vehData.SimulatedNeutral) {
 			vehData.SimulatedNeutral = true;
@@ -633,7 +640,6 @@ void fakeRev() {
 	float accelRatio = 55.0; // This value works for 75-50FPS.
 	//float accelRatio = 1.0f / SYSTEM::TIMESTEP();// This is FPS-dependant.
 	// Best is that it's low fps, more value, high fps, less value.
-
 	float rpmVal;
 	rpmVal = 
 		vehData.Rpm + // Base value
