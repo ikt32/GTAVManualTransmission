@@ -919,21 +919,17 @@ void playWheelEffects() {
 	
 	LogiPlayLeds(logiWheel.GetIndex(), vehData.Rpm, 0.66f, 0.99f);
 
-	int damperforce = 0;
 	if (settings.FFDamperStationary < settings.FFDamperMoving) {
 		settings.FFDamperMoving = settings.FFDamperStationary;
 	}
-	int ratio = (settings.FFDamperStationary - settings.FFDamperMoving) / 10;
-
-	damperforce = settings.FFDamperStationary - ratio * (int)(vehData.Speed);
-	if (vehData.Speed > 10.0f) {
-		damperforce = settings.FFDamperMoving + (int)(0.5f * (vehData.Speed - 10.0f));
+	float ratio = (float)(settings.FFDamperStationary - settings.FFDamperMoving)/settings.FFDamperMoving;
+	int damperforce = settings.FFDamperStationary - (int)(ratio * ratio * vehData.Speed*vehData.Speed);
+	if (damperforce < settings.FFDamperMoving) {
+		damperforce = settings.FFDamperMoving + (int)(vehData.Speed * ratio);
 	}
-
-	damperforce += (int)(-10.0f * accelVals.y);
-
-	if (damperforce > (settings.FFDamperStationary + settings.FFDamperMoving) / 2) {
-		damperforce = (settings.FFDamperStationary + settings.FFDamperMoving) / 2;
+	damperforce -= (int)(ratio * accelVals.y);
+	if (damperforce > settings.FFDamperStationary) {
+		damperforce = settings.FFDamperStationary;
 	}
 	LogiPlayDamperForce(logiWheel.GetIndex(), damperforce);
 
