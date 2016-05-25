@@ -20,6 +20,7 @@ public:
 	void ReadMemData(VehicleExtensions ext, Vehicle vehicle);
 
 	bool IsBike;
+	bool NoClutch;
 	bool IsTruck;
 	uint64_t Address;
 	uint32_t Gears;
@@ -74,6 +75,18 @@ private:
 		"UTILTRUC"
 	};
 	bool isBadTruck(char *name);
+
+	std::array <char *, 7> noClutchModelNames = {
+		"SURGE",
+		"VOLTIC",
+		"KHAMEL",
+		"CADDY",
+		"AIRTUG",
+		"RHINO",
+		"BULLDOZE"
+	};
+	bool noClutch(char *name);
+
 	Vector3 prevVelocities;
 	long long prevTime;
 };

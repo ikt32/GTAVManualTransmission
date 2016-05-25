@@ -40,6 +40,14 @@ bool VehicleData::isBadTruck(char *name) {
 	return false;
 }
 
+bool VehicleData::noClutch(char *name) {
+	for (int i = 0; i < noClutchModelNames.size(); i++) {
+		if (strcmp(name, noClutchModelNames[i]) == 0)
+			return true;
+	}
+	return false;
+}
+
 void VehicleData::ReadMemData(VehicleExtensions ext, Vehicle vehicle) {
 	Hash model = ENTITY::GET_ENTITY_MODEL(vehicle);
 
@@ -56,6 +64,7 @@ void VehicleData::ReadMemData(VehicleExtensions ext, Vehicle vehicle) {
 	Velocity = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
 	IsBike = VEHICLE::IS_THIS_MODEL_A_BIKE(model) == TRUE;
 	IsTruck = isBadTruck(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
+	NoClutch = noClutch(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
 }
 
 
