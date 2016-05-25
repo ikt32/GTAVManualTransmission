@@ -353,17 +353,21 @@ void showDebugInfo() {
 	const char *infoc = infos.str().c_str();
 	showText(0.01f, 0.5f, 0.4f, (char *)infoc);
 
-	/*if (logiWheel.IsActive(settings)) {
+	if (logiWheel.IsActive(settings)) {
 		std::stringstream throttleDisplay;
-		throttleDisplay << "TVal: " << logiWheel.GetLogiThrottleVal();
+		throttleDisplay << "ThrottleVal: " << logiWheel.GetLogiThrottleVal() << std::endl <<
+			"ThrottleRaw: " << LogiGetState(0)->lY;
 		std::stringstream brakeDisplay;
-		brakeDisplay << "BVal: " << logiWheel.GetLogiBrakeVal();
+		brakeDisplay	<< "Brake Value: " << logiWheel.GetLogiBrakeVal() << std::endl <<
+			"Brake   Raw: " << LogiGetState(0)->lRz;
 		std::stringstream clutchDisplay;
-		clutchDisplay << "CVal: " << logiWheel.GetLogiClutchVal();
-		showText(0.01, 0.04, 0.4, (char *)throttleDisplay.str().c_str());
-		showText(0.01, 0.06, 0.4, (char *)brakeDisplay.str().c_str());
-		showText(0.01, 0.08, 0.4, (char *)clutchDisplay.str().c_str());
-	}*/
+		clutchDisplay	<< "ClutchValue: " << logiWheel.GetLogiClutchVal() << std::endl <<
+			"Clutch  Raw: " << LogiGetState(0)->rglSlider[1];
+
+		showText(0.85, 0.04, 0.4, (char *)throttleDisplay.str().c_str());
+		showText(0.85, 0.10, 0.4, (char *)brakeDisplay.str().c_str());
+		showText(0.85, 0.16, 0.4, (char *)clutchDisplay.str().c_str());
+	}
 }
 
 // Limitations: Detects on pressing throttle on any of the 3 input methods
