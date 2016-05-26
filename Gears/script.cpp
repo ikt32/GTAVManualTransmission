@@ -647,7 +647,7 @@ void fakeRev() {
 	float rpmVal;
 	rpmVal = 
 		vehData.Rpm + // Base value
-		(prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm)*1.1f : 0.0f) + // Constant
+		(prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm)*2.0f : 0.0f) + // Keep it constant
 		controls.Accelvalf / accelRatio; // Addition value, depends on delta T
 	if (rpmVal > 1.012f) {
 		rpmVal = 1.012f;
