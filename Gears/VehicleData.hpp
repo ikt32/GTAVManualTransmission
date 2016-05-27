@@ -9,12 +9,13 @@
 #include "VehicleExtensions.hpp"
 #include <chrono>
 
+#define SAMPLES 10
+
 
 class VehicleData
 {
 public:
 	VehicleData();
-	~VehicleData();
 	void Clear();
 
 	void ReadMemData(VehicleExtensions ext, Vehicle vehicle);
@@ -50,6 +51,9 @@ public:
 
 	std::vector<float> LockSpeeds = std::vector<float>(20);
 	Vector3 getAccelerationVectors(Vector3 velocities);
+
+	// Should be called after getAccelerationVectors has been called in a loop
+	Vector3 getAccelerationVectorsAverage();
 
 private:
 	std::array <char *, 20> badModelNames = {
@@ -89,5 +93,9 @@ private:
 
 	Vector3 prevVelocities;
 	long long prevTime;
+	Vector3 samples[SAMPLES];
+	int averageIndex = 0;
+	void zeroSamples();
+
 };
 

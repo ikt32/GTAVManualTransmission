@@ -1,10 +1,7 @@
 #include "VehicleData.hpp"
 
 VehicleData::VehicleData() {
-}
-
-
-VehicleData::~VehicleData() {
+	zeroSamples();
 }
 
 void VehicleData::Clear() {
@@ -30,6 +27,7 @@ void VehicleData::Clear() {
 	prevVelocities.x = 0;
 	prevVelocities.y = 0;
 	prevVelocities.z = 0;
+	zeroSamples();
 }
 
 bool VehicleData::isBadTruck(char *name) {
@@ -77,5 +75,34 @@ Vector3 VehicleData::getAccelerationVectors(Vector3 velocities) {
 	result.z = (velocities.z - prevVelocities.z)*1000000.0f / (time - prevTime);
 	prevTime = time;
 	prevVelocities = velocities;
+	
+	samples[averageIndex] = result;
+	averageIndex = (averageIndex + 1) % (SAMPLES - 1);
+
 	return result;
+}
+
+Vector3 VehicleData::getAccelerationVectorsAverage() {
+	Vector3 result;
+
+	for (int i = 0; i < SAMPLES; i++) {
+		result.x += samples[i].x;
+		result.y += samples[i].y;
+		result.z += samples[i].z;
+	}
+
+	result.x = result.x / SAMPLES;
+	result.y = result.y / SAMPLES;
+	result.z = result.z / SAMPLES;
+	return result;
+}
+
+
+
+void VehicleData::zeroSamples() {
+	for (int i = 0; i < SAMPLES; i++) {
+		samples[i].x = 0.0f;
+		samples[i].y = 0.0f;
+		samples[i].z = 0.0f;
+	}
 }
