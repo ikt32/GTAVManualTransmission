@@ -27,13 +27,13 @@ public:
 	bool Hshifter;
 	bool LogiWheel;
 	int WheelRange;
+	bool FFEnable;
 	int FFDamperStationary;
 	int FFDamperMoving;
 	int FFPhysics;
 	float FFCenterSpring;
 
 	bool Debug;
-	bool DisableFullClutch;
 
 	float UITips_X;
 	float UITips_Y;

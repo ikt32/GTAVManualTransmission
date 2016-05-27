@@ -195,7 +195,7 @@ void update() {
 	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
-	if (logiWheel.IsActive(settings) && prevInput == InputDevices::Wheel) {
+	if (logiWheel.IsActive(settings) && prevInput == InputDevices::Wheel && settings.FFEnable) {
 		playWheelEffects();
 		//logiWheel.PlayWheelEffects(settings, vehData, vehicle);
 		logiWheel.DoWheelSteering();

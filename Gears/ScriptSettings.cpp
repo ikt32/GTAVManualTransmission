@@ -31,8 +31,6 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	UITips_Y =       GetPrivateProfileIntA("OPTIONS", "UITips_Y",       95, SETTINGSFILE)/100.0f;
 	UITips_Size =    GetPrivateProfileIntA("OPTIONS", "UITips_Size",    15, SETTINGSFILE)/100.0f;
 	Debug =          (GetPrivateProfileIntA("DEBUG", "Info",          0, SETTINGSFILE) == 1);
-	DisableFullClutch = (GetPrivateProfileIntA("DEBUG", "DisableFullClutch", 0, SETTINGSFILE) == 1);
-
 	ClutchCatchpoint = GetPrivateProfileIntA("OPTIONS", "ClutchCatchpoint", 20, SETTINGSFILE) / 100.0f;
 	StallingThreshold = GetPrivateProfileIntA("OPTIONS", "StallingThreshold", 25, SETTINGSFILE) / 100.0f;
 
@@ -105,6 +103,7 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::RadioNext] = GetPrivateProfileIntA("LOGITECHWHEEL", "RadioNext", 2, SETTINGSFILE);
 
 	WheelRange = GetPrivateProfileIntA("LOGITECHWHEEL", "WheelRange", 180, SETTINGSFILE);
+	FFEnable = GetPrivateProfileIntA("LOGITECHWHEEL", "FFEnable", 1, SETTINGSFILE);
 	FFDamperStationary = GetPrivateProfileIntA("LOGITECHWHEEL", "FFDamperStationary", 80, SETTINGSFILE);
 	FFDamperMoving = GetPrivateProfileIntA("LOGITECHWHEEL", "FFDamperMoving", 40, SETTINGSFILE);
 	FFPhysics = GetPrivateProfileIntA("LOGITECHWHEEL", "FFPhysics", 40, SETTINGSFILE);
