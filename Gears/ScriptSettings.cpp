@@ -103,7 +103,7 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::RadioNext] = GetPrivateProfileIntA("LOGITECHWHEEL", "RadioNext", 2, SETTINGSFILE);
 
 	WheelRange = GetPrivateProfileIntA("LOGITECHWHEEL", "WheelRange", 180, SETTINGSFILE);
-	FFEnable = GetPrivateProfileIntA("LOGITECHWHEEL", "FFEnable", 1, SETTINGSFILE);
+	FFEnable = GetPrivateProfileIntA("LOGITECHWHEEL", "FFEnable", 1, SETTINGSFILE) == 1;
 	FFDamperStationary = GetPrivateProfileIntA("LOGITECHWHEEL", "FFDamperStationary", 80, SETTINGSFILE);
 	FFDamperMoving = GetPrivateProfileIntA("LOGITECHWHEEL", "FFDamperMoving", 40, SETTINGSFILE);
 	FFPhysics = GetPrivateProfileIntA("LOGITECHWHEEL", "FFPhysics", 40, SETTINGSFILE);
