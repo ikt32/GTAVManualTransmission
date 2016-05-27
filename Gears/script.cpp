@@ -645,9 +645,13 @@ void fakeRev() {
 	//float accelRatio = 1.0f / SYSTEM::TIMESTEP();// This is FPS-dependant.
 	// Best is that it's low fps, more value, high fps, less value.
 	float rpmVal;
+	float rpmValTemp = (prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm) : 0.0f);
+	if (vehData.CurrGear == 1) {
+		rpmValTemp *= 2.0f;
+	}
 	rpmVal = 
 		vehData.Rpm + // Base value
-		(prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm)*2.0f : 0.0f) + // Keep it constant
+		rpmValTemp + // Keep it constant
 		controls.Accelvalf / accelRatio; // Addition value, depends on delta T
 	if (rpmVal > 1.012f) {
 		rpmVal = 1.012f;
