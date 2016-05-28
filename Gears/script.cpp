@@ -948,15 +948,6 @@ void handleVehicleButtons() {
 void playWheelEffects() {
 	Vector3 accelVals = vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true));
 	Vector3 accelValsAvg = vehData.getAccelerationVectorsAverage();
-
-	if (settings.Debug) {
-		std::string accelValsXTxt = "X: " + std::to_string(accelValsAvg.x);
-		std::string accelValsYTxt = "Y: " + std::to_string(accelValsAvg.y); 
-		std::string accelValsZTxt = "Z: " + std::to_string(accelValsAvg.z); 
-		showText(0.1, 0.1, 1.0, (char *)accelValsXTxt.c_str());
-		showText(0.1, 0.15, 1.0, (char *)accelValsYTxt.c_str());
-		showText(0.1, 0.20, 1.0, (char *)accelValsZTxt.c_str());
-	}
 	
 	LogiPlayLeds(logiWheel.GetIndex(), vehData.Rpm, 0.66f, 0.99f);
 
@@ -977,7 +968,8 @@ void playWheelEffects() {
 	}
 	LogiPlayDamperForce(logiWheel.GetIndex(), damperforce);
 
-	LogiPlayConstantForce(logiWheel.GetIndex(), (int)(-settings.FFPhysics*accelValsAvg.x));
+	LogiPlayConstantForce(logiWheel.GetIndex(), (int)(-settings.FFPhysics*(3*accelValsAvg.x+accelVals.x)/4));
+
 	int centerForcePercentage = (int)(settings.FFCenterSpring * 100 * accelValsAvg.y);
 	if (centerForcePercentage < 0) {
 		centerForcePercentage = 0;
