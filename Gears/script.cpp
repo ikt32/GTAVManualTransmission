@@ -1,9 +1,9 @@
-#include "script.h"
-
 #include <string>
 #include <sstream>
 #include <iomanip>
 #include <array>
+
+#include "script.h"
 
 #include "ScriptSettings.hpp"
 #include "ScriptControls.hpp"
