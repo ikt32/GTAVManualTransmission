@@ -756,7 +756,7 @@ void functionRealReverse() {
 	// Forward gear
 	// Desired: Only brake
 	if (vehData.CurrGear > 0) {
-		// LT behavior when still
+		// LT behavior when still: Just brake
 		if (controls.Ltvalf > 0.02f && controls.Rtvalf < controls.Ltvalf &&
 			vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
@@ -767,7 +767,7 @@ void functionRealReverse() {
 		else {
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
-		// LT behavior when rolling back
+		// LT behavior when rolling back: Brake
 		if (controls.Ltvalf > 0.02f && controls.Rtvalf < controls.Ltvalf &&
 			vehData.Velocity < -0.1f) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
@@ -775,6 +775,14 @@ void functionRealReverse() {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.Ltvalf);
 			ext.SetThrottle(vehicle, 0.0f);
 			ext.SetThrottleP(vehicle, 0.1f);
+		}
+		// RT behavior when rolling back: Burnout
+		if (vehData.CurrGear == 1 &&
+			controls.Rtvalf > 0.5f && vehData.Velocity < -1.0f) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, controls.Rtvalf);
+			if (controls.Ltvalf < 0.1f) {
+				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
+			}
 		}
 	}
 	// Reverse gear
