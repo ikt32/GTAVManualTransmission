@@ -22,28 +22,28 @@ int WheelLogiInput::GetIndex()
 }
 
 void WheelLogiInput::PlayWheelEffects(
-	ScriptSettings settings,
-	VehicleData vehData,
+	ScriptSettings *settings,
+	VehicleData *vehData,
 	Vehicle vehicle) {
 	int damperforce = 0;
-	if (settings.FFDamperStationary < settings.FFDamperMoving) {
-		settings.FFDamperMoving = settings.FFDamperStationary;
+	if (settings->FFDamperStationary < settings->FFDamperMoving) {
+		settings->FFDamperMoving = settings->FFDamperStationary;
 	}
-	int ratio = (settings.FFDamperStationary - settings.FFDamperMoving) / 10;
+	int ratio = (settings->FFDamperStationary - settings->FFDamperMoving) / 10;
 
-	damperforce = settings.FFDamperStationary - ratio * (int)(vehData.Speed);
-	if (vehData.Speed > 10.0f) {
-		damperforce = settings.FFDamperMoving + (int)(0.5f * (vehData.Speed - 10.0f));
+	damperforce = settings->FFDamperStationary - ratio * (int)(vehData->Speed);
+	if (vehData->Speed > 10.0f) {
+		damperforce = settings->FFDamperMoving + (int)(0.5f * (vehData->Speed - 10.0f));
 	}
 
-	if (damperforce > (settings.FFDamperStationary + settings.FFDamperMoving) / 2) {
-		damperforce = (settings.FFDamperStationary + settings.FFDamperMoving) / 2;
+	if (damperforce > (settings->FFDamperStationary + settings->FFDamperMoving) / 2) {
+		damperforce = (settings->FFDamperStationary + settings->FFDamperMoving) / 2;
 	}
 	LogiPlayDamperForce(index_, damperforce);
 
-	Vector3 accelVals = vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true));
-	LogiPlayConstantForce(index_, (int)(-settings.FFPhysics*accelVals.x));
-	LogiPlaySpringForce(index_, 0, (int)vehData.Speed, (int)vehData.Speed);
+	Vector3 accelVals = vehData->getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true));
+	LogiPlayConstantForce(index_, (int)(-settings->FFPhysics*accelVals.x));
+	LogiPlaySpringForce(index_, 0, (int)vehData->Speed, (int)vehData->Speed);
 
 	if (!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f) {
 		LogiPlayCarAirborne(index_);
@@ -69,9 +69,9 @@ void WheelLogiInput::UpdateLogiValues() {
 	logiClutchVal = 1.0f + (float)(logiClutchPos - 32767) / 65535.0f;
 }
 
-void WheelLogiInput::DoWheelSteering(Vehicle vehicle, float steerVal) {
+void WheelLogiInput::DoWheelSteering(float steerVal) {
 	// Anti-deadzone
-	/*float steerVal_ = logiSteeringWheelPos / (32768.0f);
+	//float steerVal_ = logiSteeringWheelPos / (32768.0f);
 	
 	int additionalOffset = 2560;
 	float antiDeadzoned = 0.0f;
@@ -85,28 +85,27 @@ void WheelLogiInput::DoWheelSteering(Vehicle vehicle, float steerVal) {
 		antiDeadzoned = (logiSteeringWheelPos + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
 	}
 	// Gotta find a way to make this no-delay
-	// CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
-	VEHICLE::SET_VEHICLE_STEER_BIAS(vehicle, -steerVal_);*/
-	VEHICLE::SET_VEHICLE_STEER_BIAS(vehicle, steerVal);
+	CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
+	//VEHICLE::SET_VEHICLE_STEER_BIAS(vehicle, -steerVal_);
 }
 
-bool WheelLogiInput::InitWheel(ScriptSettings settings, Logger logger) {
-	if (settings.LogiWheel) {
+bool WheelLogiInput::InitWheel(ScriptSettings *settings, Logger *logger) {
+	if (settings->LogiWheel) {
 		LogiSteeringInitialize(TRUE);
 		if (LogiIsConnected(index_)) {
+			logger->Write("Wheel detected");
 			LogiGetCurrentControllerProperties(index_, properties);
-			properties.wheelRange = settings.WheelRange;
+			properties.wheelRange = settings->WheelRange;
 			LogiSetPreferredControllerProperties(properties);
-			logger.Write("Wheel detected");
 			return true;
 		}
 		else {
-			logger.Write("No wheel detected");
+			logger->Write("No wheel detected");
 			return false;
 		}
 	}
 	else {
-		logger.Write("Wheel disabled");
+		logger->Write("Wheel disabled");
 		return false;
 	}
 }
@@ -124,6 +123,6 @@ float WheelLogiInput::GetLogiClutchVal() {
 	return logiClutchVal;
 }
 
-bool  WheelLogiInput::IsActive(ScriptSettings settings) {
-	return (settings.LogiWheel && LogiIsConnected(index_));
+bool  WheelLogiInput::IsActive(ScriptSettings *settings) {
+	return (settings->LogiWheel && LogiIsConnected(index_));
 }
