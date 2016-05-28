@@ -20,7 +20,7 @@ class WheelLogiInput
 public:
 	WheelLogiInput(int index);
 	~WheelLogiInput();
-	void DoWheelSteering();
+	void DoWheelSteering(Vehicle vehicle, float steerVal);
 	void PlayWheelEffects(
 		ScriptSettings settings,
 		VehicleData vehData,

@@ -69,8 +69,10 @@ void WheelLogiInput::UpdateLogiValues() {
 	logiClutchVal = 1.0f + (float)(logiClutchPos - 32767) / 65535.0f;
 }
 
-void WheelLogiInput::DoWheelSteering() {
+void WheelLogiInput::DoWheelSteering(Vehicle vehicle, float steerVal) {
 	// Anti-deadzone
+	/*float steerVal_ = logiSteeringWheelPos / (32768.0f);
+	
 	int additionalOffset = 2560;
 	float antiDeadzoned = 0.0f;
 	antiDeadzoned = logiSteeringWheelPos / 32768.0f;
@@ -83,7 +85,9 @@ void WheelLogiInput::DoWheelSteering() {
 		antiDeadzoned = (logiSteeringWheelPos + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
 	}
 	// Gotta find a way to make this no-delay
-	CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
+	// CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
+	VEHICLE::SET_VEHICLE_STEER_BIAS(vehicle, -steerVal_);*/
+	VEHICLE::SET_VEHICLE_STEER_BIAS(vehicle, steerVal);
 }
 
 bool WheelLogiInput::InitWheel(ScriptSettings settings, Logger logger) {
