@@ -9,7 +9,7 @@
 #include "VehicleExtensions.hpp"
 #include <chrono>
 
-#define SAMPLES 10
+#define SAMPLES 4
 
 
 class VehicleData
