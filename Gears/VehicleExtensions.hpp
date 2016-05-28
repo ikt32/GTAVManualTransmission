@@ -31,6 +31,11 @@ public:
 	uint64_t GetWheelsPtr(Vehicle handle);
 	uint64_t GetWheelPtr(uint64_t address, int index);
 	void SetWheelsHealth(Vehicle handle, float health);
+	float GetSteeringAngle1(Vehicle handle);
+	void SetSteeringAngle1(Vehicle handle, float value);
+	float GetSteeringAngle2(Vehicle handle);
+	void SetSteeringAngle2(Vehicle handle, float value);
+
 private:
 	MemoryAccess mem;
 };

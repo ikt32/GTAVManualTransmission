@@ -190,3 +190,32 @@ void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) {
 		}
 	}
 }
+
+float VehicleExtensions::GetSteeringAngle1(Vehicle handle) {
+	uint64_t address = mem.GetAddressOfEntity(handle);
+
+	int offset = (getGameVersion() > 3 ? 0x8A4 : 0x894);
+
+	return *reinterpret_cast<float *>(address + offset);
+}
+void VehicleExtensions::SetSteeringAngle1(Vehicle handle, float value) {
+	uint64_t address = mem.GetAddressOfEntity(handle);
+
+	int offset = (getGameVersion() > 3 ? 0x8A4 : 0x894);
+
+	*reinterpret_cast<float *>(address + offset) = value;
+}
+float VehicleExtensions::GetSteeringAngle2(Vehicle handle) {
+	uint64_t address = mem.GetAddressOfEntity(handle);
+
+	int offset = (getGameVersion() > 3 ? 0x8AC : 0x89C);
+
+	return *reinterpret_cast<float *>(address + offset);
+}
+void VehicleExtensions::SetSteeringAngle2(Vehicle handle, float value) {
+	uint64_t address = mem.GetAddressOfEntity(handle);
+
+	int offset = (getGameVersion() > 3 ? 0x8AC : 0x89C);
+
+	*reinterpret_cast<float *>(address + offset) = value;
+}
