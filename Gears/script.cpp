@@ -168,6 +168,7 @@ void update() {
 			}			
 			break;
 		case InputDevices::Wheel: // Wheel
+			//CONTROLS::DISABLE_ALL_CONTROL_ACTIONS
 			showNotification("Switched to wheel");
 			break;
 		default:
@@ -199,7 +200,7 @@ void update() {
 		if (settings.FFEnable)
 			playWheelEffects();
 		float steerVal = (LogiGetState(0)->lX) / (-32768.0f);
-		showText(0.05, 0.05, 1.0, (char *)std::to_string(steerVal).c_str());
+		//showText(0.05, 0.05, 1.0, (char *)std::to_string(steerVal).c_str());
 		ext.SetSteeringAngle1(vehicle, steerVal);
 		//logiWheel.DoWheelSteering(vehicle, steerVal);
 
@@ -272,7 +273,7 @@ void update() {
 	}
 
 	// Stalling
-	if (settings.EngStall && !simpleBike) {
+	if (settings.EngStall && !simpleBike && !vehData.NoClutch) {
 		functionEngStall();
 	}
 
