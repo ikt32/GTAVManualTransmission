@@ -195,10 +195,14 @@ void update() {
 	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
-	if (logiWheel.IsActive(settings) && prevInput == InputDevices::Wheel && settings.FFEnable) {
-		playWheelEffects();
-		//logiWheel.PlayWheelEffects(settings, vehData, vehicle);
-		logiWheel.DoWheelSteering();
+	if (logiWheel.IsActive(settings) && prevInput == InputDevices::Wheel) {
+		if (settings.FFEnable)
+			playWheelEffects();
+		float steerVal = (LogiGetState(0)->lX) / (-32768.0f);
+		showText(0.05, 0.05, 1.0, (char *)std::to_string(steerVal).c_str());
+		ext.SetSteeringAngle1(vehicle, steerVal);
+		//logiWheel.DoWheelSteering(vehicle, steerVal);
+
 		std::stringstream infos;
 	}
 
