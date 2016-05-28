@@ -272,17 +272,19 @@ void update() {
 		functionEngDamage();
 	}
 
-	// Stalling
-	if (settings.EngStall && !simpleBike && !vehData.NoClutch) {
-		functionEngStall();
-	}
+	if (!vehData.SimulatedNeutral && !simpleBike && !vehData.NoClutch) {
+		// Stalling
+		if (settings.EngStall) {
+			functionEngStall();
+		}
 
-	// Simulate "catch point"
-	// When the clutch "grabs" and the car starts moving without input
-	// TODO Differentiate between diesel en gasoline?
-	if (settings.ClutchCatching && !simpleBike) {
-		functionClutchCatch();
+		// Simulate "catch point"
+		// When the clutch "grabs" and the car starts moving without input
+		if (settings.ClutchCatching) {
+			functionClutchCatch();
+		}
 	}
+	
 
 	// Manual shifting
 	if (settings.Hshifter && !vehData.IsBike) {
@@ -600,7 +602,7 @@ void functionSShift() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void functionClutchCatch() {
-	if (vehData.Clutch >= settings.ClutchCatchpoint) {
+	if (controls.Clutchvalf < 1.0f-settings.ClutchCatchpoint) {
 		// Forward
 		if (vehData.CurrGear > 0 && vehData.Velocity < vehData.CurrGear * 2.2f &&
 			controls.Rtvalf < 0.25f && controls.Ltvalf < 0.95 ) {
@@ -610,7 +612,7 @@ void functionClutchCatch() {
 }
 
 void functionEngStall() {
-	if (vehData.Clutch > 1.0f-settings.StallingThreshold && vehData.Rpm < 0.25f &&
+	if (controls.Clutchvalf < 1.0f-settings.StallingThreshold && vehData.Rpm < 0.25f &&
 		((vehData.Speed < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && vehData.Speed < 1.0f))) {
 		if (VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle)) {
 			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
