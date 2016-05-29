@@ -32,7 +32,6 @@ WheelLogiInput logiWheel(0);
 
 bool active = false;
 bool patched = false;
-//bool patchedSpecial = false;
 bool simpleBike = false;
 int prevNotification = 0;
 int prevInput = 0;
@@ -121,6 +120,8 @@ void update() {
 		showDebugInfo();
 	}
 
+	handleVehicleButtons();
+
 	if (!settings.EnableManual ||
 		(!VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false) &&
 			VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f)) {
@@ -129,9 +130,6 @@ void update() {
 	else {
 		active = true;
 	}
-
-	handleVehicleButtons();
-
 	///////////////////////////////////////////////////////////////////////////
 	// Active whenever Manual is enabled from here
 	///////////////////////////////////////////////////////////////////////////
