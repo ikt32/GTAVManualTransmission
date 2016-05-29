@@ -130,6 +130,8 @@ void update() {
 		active = true;
 	}
 
+	handleVehicleButtons();
+
 	///////////////////////////////////////////////////////////////////////////
 	// Active whenever Manual is enabled from here
 	///////////////////////////////////////////////////////////////////////////
@@ -297,7 +299,6 @@ void update() {
 		functionSShift();
 	}
 
-	handleVehicleButtons();
 	// Finally, update memory each loop
 	handleRPM();
 	ext.SetGears(vehicle, vehData.LockGears);
@@ -913,7 +914,8 @@ void handleVehicleButtons() {
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
 		(	controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Engine]), buttonState) ||
 			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Engine], ScriptControls::KeyboardControlType::Engine) ||
-			(logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Engine])))) {
+			(logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Engine])) ||
+			controls.Rtvalf > 0.9f)) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 	if (logiWheel.IsActive(&settings)) {
