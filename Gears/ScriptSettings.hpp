@@ -30,7 +30,7 @@ public:
 	bool FFEnable;
 	int FFDamperStationary;
 	int FFDamperMoving;
-	int FFPhysics;
+	float FFPhysics;
 	float FFCenterSpring;
 
 	bool Debug;

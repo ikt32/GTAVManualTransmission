@@ -104,10 +104,10 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 
 	WheelRange = GetPrivateProfileIntA("LOGITECHWHEEL", "WheelRange", 180, SETTINGSFILE);
 	FFEnable = GetPrivateProfileIntA("LOGITECHWHEEL", "FFEnable", 1, SETTINGSFILE) == 1;
-	FFDamperStationary = GetPrivateProfileIntA("LOGITECHWHEEL", "FFDamperStationary", 80, SETTINGSFILE);
-	FFDamperMoving = GetPrivateProfileIntA("LOGITECHWHEEL", "FFDamperMoving", 40, SETTINGSFILE);
-	FFPhysics = GetPrivateProfileIntA("LOGITECHWHEEL", "FFPhysics", 40, SETTINGSFILE);
-	FFCenterSpring = GetPrivateProfileIntA("LOGITECHWHEEL", "FFCenterSpring", 200, SETTINGSFILE)/100.0f;
+	FFDamperStationary = GetPrivateProfileIntA("LOGITECHWHEEL", "FFDamperStationary", 60, SETTINGSFILE);
+	FFDamperMoving = GetPrivateProfileIntA("LOGITECHWHEEL", "FFDamperMoving", 30, SETTINGSFILE);
+	FFPhysics = GetPrivateProfileIntA("LOGITECHWHEEL", "FFPhysics", 150, SETTINGSFILE)/100.0f;
+	FFCenterSpring = GetPrivateProfileIntA("LOGITECHWHEEL", "FFCenterSpring", 100, SETTINGSFILE)/100.0f;
 }
 
 void ScriptSettings::Save() {
