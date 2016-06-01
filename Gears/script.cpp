@@ -981,10 +981,10 @@ void playWheelEffects() {
 	}
 	LogiPlayDamperForce(logiWheel.GetIndex(), damperforce);
 
-	int constantForce = (int)(-settings.FFPhysics*(3 * accelValsAvg.x + accelVals.x) / 4);
+	int constantForce = (int)(-settings.FFPhysics*((3 * accelValsAvg.x + 2 * accelVals.x)));
 	LogiPlayConstantForce(logiWheel.GetIndex(), constantForce);
-
-	int centerForcePercentage = (int)(settings.FFCenterSpring * 100 * accelValsAvg.y);
+	
+	int centerForcePercentage = (int)(settings.FFCenterSpring * accelValsAvg.y);
 	if (centerForcePercentage < 0) {
 		centerForcePercentage = 0;
 	}
