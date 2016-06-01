@@ -68,11 +68,13 @@ void VehicleData::ReadMemData(VehicleExtensions ext, Vehicle vehicle) {
 
 // Takes velocities in m/s, returns acceleration vectors in m/s^2
 Vector3 VehicleData::getAccelerationVectors(Vector3 velocities) {
-	long long time = std::chrono::system_clock::now().time_since_epoch().count();
+	long long time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
+
 	Vector3 result;
-	result.x = (velocities.x - prevVelocities.x)*1000000.0f / (time - prevTime);
-	result.y = (velocities.y - prevVelocities.y)*1000000.0f / (time - prevTime);
-	result.z = (velocities.z - prevVelocities.z)*1000000.0f / (time - prevTime);
+	result.x = (velocities.x - prevVelocities.x) / ((time - prevTime)/1e9f);
+	result.y = (velocities.y - prevVelocities.y) / ((time - prevTime)/1e9f);
+	result.z = (velocities.z - prevVelocities.z) / ((time - prevTime)/1e9f);
+
 	prevTime = time;
 	prevVelocities = velocities;
 	
