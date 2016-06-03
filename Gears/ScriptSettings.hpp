@@ -32,6 +32,7 @@ public:
 	int FFDamperMoving;
 	float FFPhysics;
 	float FFCenterSpring;
+	bool DisableDpad;
 
 	bool Debug;
 

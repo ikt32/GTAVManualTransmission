@@ -23,6 +23,7 @@ ScriptSettings::ScriptSettings() {
 	FFDamperMoving = 30;
 	FFPhysics = 1.0f;
 	FFCenterSpring = 1.0f;
+	DisableDpad = false;
 
 	Debug = false;
 
@@ -101,6 +102,7 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 
 	// Start wheel section
 	LogiWheel = (GetPrivateProfileIntA("LOGITECHWHEEL", "Enable", 0, SETTINGSFILE) == 1);
+	DisableDpad = (GetPrivateProfileIntA("LOGITECHWHEEL", "DisableDpad", 0, SETTINGSFILE) == 1);
 
 	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::Toggle] = GetPrivateProfileIntA("LOGITECHWHEEL", "Toggle", 17, SETTINGSFILE);
 	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::ToggleH] = GetPrivateProfileIntA("LOGITECHWHEEL", "ToggleH", 6, SETTINGSFILE);

@@ -990,19 +990,22 @@ void handleVehicleButtons() {
 			}
 		}
 
-		switch (LogiGetState(logiWheel.GetIndex())->rgdwPOV[0]) {
-		case 0:
-			break;
-		case 9000:
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleNextRadio, 1.0f);
-			break;
-		case 18000:
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
-			break;
-		case 27000:
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehiclePrevRadio, 1.0f);
-			break;
+		if (!settings.DisableDpad) {
+			switch (LogiGetState(logiWheel.GetIndex())->rgdwPOV[0]) {
+			case 0:
+				break;
+			case 9000:
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleNextRadio, 1.0f);
+				break;
+			case 18000:
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
+				break;
+			case 27000:
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehiclePrevRadio, 1.0f);
+				break;
+			}
 		}
+
 	}
 }
 
