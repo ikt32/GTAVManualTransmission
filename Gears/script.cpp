@@ -38,6 +38,11 @@ int prevInput = 0;
 
 float prevRpm;
 
+// This gonna be refactored into vehData or LogiInput somehow
+bool blinkerLeft = false;
+bool blinkerRight = false;
+bool blinkerHazard = false;
+
 void update() {
 	///////////////////////////////////////////////////////////////////////////
 	//                    Gathering data
@@ -937,16 +942,52 @@ void handleVehicleButtons() {
 		}
 
 		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorLeft])) {
-			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, false, false);
-			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, true, true);
+			if (!blinkerLeft) {
+				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);	// L
+				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true);	// R
+				blinkerLeft = true;
+				blinkerRight = false;
+				blinkerHazard = false;
+			}
+			else {
+				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
+				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
+				blinkerLeft = false;
+				blinkerRight = false;
+				blinkerHazard = false;
+			}
 		}
 		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorRight])) {
-			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, false, true);
-			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, true, false);
+			if (!blinkerRight) {
+				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true);	// L
+				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);	// R
+				blinkerLeft = false;
+				blinkerRight = true;
+				blinkerHazard = false;
+			}
+			else {
+				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
+				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
+				blinkerLeft = false;
+				blinkerRight = false;
+				blinkerHazard = false;
+			}
 		}
 		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorHazard])) {
-			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, true, true);
-			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, false, true);
+			if (!blinkerHazard) {
+				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true);	// L
+				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true);	// R
+				blinkerLeft = false;
+				blinkerRight = false;
+				blinkerHazard = true;
+			}
+			else {
+				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
+				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
+				blinkerLeft = false;
+				blinkerRight = false;
+				blinkerHazard = false;
+			}
 		}
 
 		switch (LogiGetState(logiWheel.GetIndex())->rgdwPOV[0]) {
