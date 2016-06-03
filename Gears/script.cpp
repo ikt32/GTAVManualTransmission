@@ -78,7 +78,7 @@ void update() {
 	if (prevVehicle != vehicle) {
 		//std::stringstream vehName;
 		//vehName << "New: " << VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model);
-		//showNotification((char *)vehName.str().c_str());
+		//showNotification(vehName.str().c_str());
 		if (vehData.NoClutch) {
 			vehData.SimulatedNeutral = false;
 		}
@@ -200,7 +200,7 @@ void update() {
 		if (settings.FFEnable)
 			playWheelEffects();
 		float steerVal = (LogiGetState(0)->lX) / (-32768.0f);
-		//showText(0.05, 0.05, 1.0, (char *)std::to_string(steerVal).c_str());
+		//showText(0.05, 0.05, 1.0, std::to_string(steerVal).c_str());
 		ext.SetSteeringAngle1(vehicle, steerVal);
 		logiWheel.DoWheelSteering(steerVal);
 	}
@@ -323,7 +323,7 @@ void ScriptMain() {
 //                           Helper functions/tools
 ///////////////////////////////////////////////////////////////////////////////
 
-void showText(float x, float y, float scale, char * text) {
+void showText(float x, float y, float scale, const char * text) {
 	UI::SET_TEXT_FONT(0);
 	UI::SET_TEXT_SCALE(scale, scale);
 	UI::SET_TEXT_COLOUR(255, 255, 255, 255);
@@ -332,7 +332,7 @@ void showText(float x, float y, float scale, char * text) {
 	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
 	UI::SET_TEXT_EDGE(1, 0, 0, 0, 205);
 	UI::_SET_TEXT_ENTRY("STRING");
-	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text);
+	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char *)text);
 	UI::_DRAW_TEXT(x, y);
 }
 
@@ -355,7 +355,7 @@ void showDebugInfo() {
 		"\nAddress: " << std::hex << vehData.Address <<
 		"\nE: " << (settings.EnableManual ? "Y" : "N");
 	const char *infoc = infos.str().c_str();
-	showText(0.01f, 0.5f, 0.4f, (char *)infoc);
+	showText(0.01f, 0.5f, 0.4f, infoc);
 
 	if (logiWheel.IsActive(&settings)) {
 		std::stringstream throttleDisplay;
@@ -368,9 +368,9 @@ void showDebugInfo() {
 		clutchDisplay	<< "ClutchValue: " << logiWheel.GetLogiClutchVal() << std::endl <<
 			"Clutch  Raw: " << LogiGetState(0)->rglSlider[1];
 
-		showText(0.85, 0.04, 0.4, (char *)throttleDisplay.str().c_str());
-		showText(0.85, 0.10, 0.4, (char *)brakeDisplay.str().c_str());
-		showText(0.85, 0.16, 0.4, (char *)clutchDisplay.str().c_str());
+		showText(0.85, 0.04, 0.4, throttleDisplay.str().c_str());
+		showText(0.85, 0.10, 0.4, brakeDisplay.str().c_str());
+		showText(0.85, 0.16, 0.4, clutchDisplay.str().c_str());
 	}
 }
 

@@ -24,7 +24,7 @@ enum InputDevices {
 
 void ScriptMain();
 
-void showText(float x, float y, float scale, char * text);
+void showText(float x, float y, float scale, const char * text);
 void showNotification(char *message);
 void showDebugInfo();
 void reInit();
