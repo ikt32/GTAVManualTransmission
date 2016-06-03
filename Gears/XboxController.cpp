@@ -148,7 +148,7 @@ float XboxController::GetAnalogValue(XboxButtons buttonType, WORD buttonState) {
 }
 
 float XboxController::filterDeadzone(XboxButtons buttonType, int input) {
-	int deadzone;
+	int deadzone = 0;
 	switch (buttonType) {
 	case LeftThumbLeft:
 	case LeftThumbRight:

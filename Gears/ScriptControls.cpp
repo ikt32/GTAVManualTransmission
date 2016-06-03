@@ -3,13 +3,11 @@
 #include <Windows.h>
 #include "TimeHelper.hpp"
 
-ScriptControls::ScriptControls()
-{
+ScriptControls::ScriptControls() {
 }
 
 
-ScriptControls::~ScriptControls()
-{
+ScriptControls::~ScriptControls() {
 }
 
 

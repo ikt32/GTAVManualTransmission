@@ -11,6 +11,6 @@ static long long milliseconds_now() {
 		return (1000LL * now.QuadPart) / s_frequency.QuadPart;
 	}
 	else {
-		return GetTickCount();
+		return GetTickCount64();
 	}
 }

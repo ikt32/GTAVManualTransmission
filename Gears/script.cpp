@@ -648,7 +648,7 @@ void fakeRev() {
 	float accelRatio = 55.0; // This value works for 75-50FPS.
 	//float accelRatio = 1.0f / SYSTEM::TIMESTEP();// This is FPS-dependant.
 	// Best is that it's low fps, more value, high fps, less value.
-	float rpmVal;
+	float rpmVal = 0.0f;
 	float rpmValTemp = (prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm) : 0.0f);
 	if (vehData.CurrGear == 1) {
 		rpmValTemp *= 2.0f;
@@ -665,7 +665,7 @@ void fakeRev() {
 
 
 void handleRPM() {
-	float finalClutch;
+	float finalClutch = 0.0f;
 	bool skip = false;
 
 	// Game wants to shift up. Triggered at high RPM, high speed.

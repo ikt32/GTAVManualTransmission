@@ -4,14 +4,36 @@
 #include "Logger.hpp"
 
 ScriptSettings::ScriptSettings() {
-	EnableManual = false;
-	RealReverse  = true;
-	EngDamage    = false;
-	EngStall     = false;
-	EngBrake     = false;
-	Debug        = false;
-	Hshifter     = false;
-	LogiWheel    = false;
+	EnableManual = true;
+	RealReverse = true;
+	SimpleBike = true;
+	
+	EngDamage = false;
+	EngStall = false;
+	EngBrake = false;
+	ClutchCatching = false;
+	ClutchShifting = false;
+	DefaultNeutral = false;
+	UITips = false;
+	Hshifter = false;
+	LogiWheel = false;
+	WheelRange = 180;
+	FFEnable = true;
+	FFDamperStationary = 60;
+	FFDamperMoving = 30;
+	FFPhysics = 1.0f;
+	FFCenterSpring = 1.0f;
+
+	Debug = false;
+
+	UITips_X = 0.0f;
+	UITips_Y = 0.0f;
+	UITips_Size = 0.0f;
+
+	ClutchCatchpoint = 0.0f;
+	StallingThreshold = 0.0f;
+	RPMDamage = 0.0f;
+	MisshiftDamage = 0;
 }
 
 

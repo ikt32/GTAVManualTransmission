@@ -2,6 +2,15 @@
 
 WheelLogiInput::WheelLogiInput(int index) {
 	index_ = index;
+	logiSteeringWheelPos = 0;
+	logiThrottlePos = 0;
+	logiBrakePos = 0;
+	logiClutchPos = 0;
+	logiWheelVal = 0.0f;
+	logiThrottleVal = 0.0f;
+	logiBrakeVal = 0.0f;
+	logiClutchVal = 0.0f;
+	LogiGetCurrentControllerProperties(index_, properties);
 }
 
 

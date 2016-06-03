@@ -181,7 +181,7 @@ void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) {
 	uint64_t wheelPtr;
 	wheelPtr = *reinterpret_cast<uint64_t *>(address + offset);
 
-	uint64_t wheels[6];
+	uint64_t wheels[6] = {};
 
 	for (int i = 0; i < 6; i++) {
 		wheels[i] = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);

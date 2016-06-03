@@ -43,7 +43,7 @@ public:
 	float StallingThreshold;
 	float RPMDamage;
 	int MisshiftDamage;
-//private:
+private:
 	void CheckSettings();
 };
 

@@ -20,34 +20,34 @@ public:
 
 	void ReadMemData(VehicleExtensions ext, Vehicle vehicle);
 
-	bool IsBike;
-	bool NoClutch;
-	bool IsTruck;
-	uint64_t Address;
-	uint32_t Gears;
-	float Rpm;
+	bool IsBike = false;
+	bool NoClutch = false;
+	bool IsTruck = false;
+	uint64_t Address = 0;
+	uint32_t Gears = 0x00010001;
+	float Rpm = 0.0f;
 
 	// 1 = Not pressed, 0 = Fully pressed
-	float Clutch;
-	float Throttle;
-	float Turbo;
+	float Clutch = 0.0f;
+	float Throttle = 0.0f;
+	float Turbo = 0.0f;
 
 	// Absolute speed, in m/s
-	float Speed;
+	float Speed = 0.0f;
 
 	// Directional speed, in m/s
-	float Velocity;
+	float Velocity = 0.0f;
 
 
-	uint8_t TopGear;
-	uint8_t LockGear;
-	uint32_t CurrGear;
-	uint32_t NextGear;
+	uint8_t TopGear = 0;
+	uint8_t LockGear = 0;
+	uint32_t CurrGear = 0;
+	uint32_t NextGear = 0;
 	uint32_t LockGears = 0x00010001;
-	uint8_t PrevGear;
-	float LockSpeed;
-	bool LockTruck;
-	bool SimulatedNeutral;
+	uint8_t PrevGear = 0;
+	float LockSpeed = 0;
+	bool LockTruck = false;
+	bool SimulatedNeutral = false;
 
 	std::vector<float> LockSpeeds = std::vector<float>(20);
 	Vector3 getAccelerationVectors(Vector3 velocities);
@@ -91,9 +91,9 @@ private:
 	};
 	bool noClutch(char *name);
 
-	Vector3 prevVelocities;
-	long long prevTime;
-	Vector3 samples[SAMPLES];
+	Vector3 prevVelocities = {};
+	long long prevTime = 0;
+	Vector3 samples[SAMPLES] = { {} };
 	int averageIndex = 0;
 	void zeroSamples();
 
