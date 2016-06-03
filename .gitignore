@@ -21,3 +21,4 @@ Thumbs.db
 
 # NuGet stuff
 [Pp]ackages/
+packages.config
