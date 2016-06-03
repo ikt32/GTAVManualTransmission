@@ -124,6 +124,10 @@ void ScriptSettings::Read(ScriptControls *scriptControl) {
 	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::RadioPrev] = GetPrivateProfileIntA("LOGITECHWHEEL", "RadioPrev", 1, SETTINGSFILE);
 	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::RadioNext] = GetPrivateProfileIntA("LOGITECHWHEEL", "RadioNext", 2, SETTINGSFILE);
 
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::IndicatorLeft] = GetPrivateProfileIntA("LOGITECHWHEEL", "IndicatorLeft", 19, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::IndicatorRight] = GetPrivateProfileIntA("LOGITECHWHEEL", "IndicatorRight", 21, SETTINGSFILE);
+	scriptControl->LogiControl[(int)ScriptControls::LogiControlType::IndicatorHazard] = GetPrivateProfileIntA("LOGITECHWHEEL", "IndicatorHazard", 15, SETTINGSFILE);
+
 	WheelRange = GetPrivateProfileIntA("LOGITECHWHEEL", "WheelRange", 180, SETTINGSFILE);
 	FFEnable = GetPrivateProfileIntA("LOGITECHWHEEL", "FFEnable", 1, SETTINGSFILE) == 1;
 	FFDamperStationary = GetPrivateProfileIntA("LOGITECHWHEEL", "FFDamperStationary", 60, SETTINGSFILE);

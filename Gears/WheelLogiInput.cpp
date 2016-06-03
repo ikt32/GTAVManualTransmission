@@ -132,6 +132,6 @@ float WheelLogiInput::GetLogiClutchVal() {
 	return logiClutchVal;
 }
 
-bool  WheelLogiInput::IsActive(ScriptSettings *settings) {
+bool WheelLogiInput::IsActive(ScriptSettings *settings) {
 	return (settings->LogiWheel && LogiIsConnected(index_));
 }

@@ -938,6 +938,20 @@ void handleVehicleButtons() {
 		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::RadioPrev])) {
 			AUDIO::SET_RADIO_TO_STATION_INDEX(AUDIO::GET_PLAYER_RADIO_STATION_INDEX() - 1);
 		}
+
+		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorLeft])) {
+			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, false, false);
+			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, true, true);
+		}
+		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorRight])) {
+			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, false, true);
+			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, true, false);
+		}
+		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorHazard])) {
+			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, true, true);
+			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, false, true);
+		}
+
 		switch (LogiGetState(logiWheel.GetIndex())->rgdwPOV[0]) {
 		case 0:
 			break;

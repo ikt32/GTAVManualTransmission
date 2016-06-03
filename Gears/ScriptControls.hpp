@@ -63,6 +63,9 @@ public:
 		Camera,
 		RadioPrev,
 		RadioNext,
+		IndicatorLeft,
+		IndicatorRight,
+		IndicatorHazard,
 		SIZEOF_LogiControlType
 	};
 	
