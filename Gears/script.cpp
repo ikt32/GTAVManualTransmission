@@ -645,9 +645,8 @@ void functionEngBrake() {
 //                       Mod functions: Gearbox control
 ///////////////////////////////////////////////////////////////////////////////
 void fakeRev() {
-	float accelRatio = 55.0; // This value works for 75-50FPS.
-	//float accelRatio = 1.0f / SYSTEM::TIMESTEP();// This is FPS-dependant.
-	// Best is that it's low fps, more value, high fps, less value.
+	float timeStep = SYSTEM::TIMESTEP();
+	float accelRatio = 2*timeStep;
 	float rpmVal = 0.0f;
 	float rpmValTemp = (prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm) : 0.0f);
 	if (vehData.CurrGear == 1) {
@@ -656,10 +655,8 @@ void fakeRev() {
 	rpmVal = 
 		vehData.Rpm + // Base value
 		rpmValTemp + // Keep it constant
-		controls.Accelvalf / accelRatio; // Addition value, depends on delta T
-	if (rpmVal > 1.012f) {
-		rpmVal = 1.012f;
-	}
+		controls.Accelvalf * accelRatio; // Addition value, depends on delta T
+
 	ext.SetCurrentRPM(vehicle, rpmVal);
 }
 
