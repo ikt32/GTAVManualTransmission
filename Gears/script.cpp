@@ -213,7 +213,6 @@ void update() {
 	//                            Patching
 	///////////////////////////////////////////////////////////////////////////
 	if (!patched && settings.EnableManual) {
-		logger.Write("Re-patching functions");
 		patched = MemoryPatcher::PatchInstructions();
 	}
 	
@@ -425,6 +424,7 @@ void reset() {
 
 void toggleManual() {
 	settings.EnableManual = !settings.EnableManual;
+	settings.Save();
 	std::stringstream message;
 	message << "Manual Transmission " <<
 		(settings.EnableManual ? "Enabled" : "Disabled");
@@ -435,14 +435,12 @@ void toggleManual() {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 	if (!settings.EnableManual) {
-		if (patched) {
-			patched = !MemoryPatcher::RestoreInstructions();
-		}
 		reset();
 		LogiSteeringShutdown();
 	}
-	settings.Save();
-	reInit();
+	else {
+		reInit();
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
