@@ -438,9 +438,7 @@ void toggleManual() {
 		reset();
 		LogiSteeringShutdown();
 	}
-	else {
-		reInit();
-	}
+	reInit();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
