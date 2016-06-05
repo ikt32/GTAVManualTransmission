@@ -125,8 +125,6 @@ void update() {
 		showDebugInfo();
 	}
 
-	handleVehicleButtons();
-
 	if (!settings.EnableManual ||
 		(!VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false) &&
 			VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f)) {
@@ -138,6 +136,7 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 	// Active whenever Manual is enabled from here
 	///////////////////////////////////////////////////////////////////////////
+	handleVehicleButtons();
 
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ToggleH], ScriptControls::KeyboardControlType::ToggleH) ||
 		(logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ToggleH]))) {
