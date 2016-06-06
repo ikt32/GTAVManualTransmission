@@ -42,6 +42,7 @@ float prevRpm;
 bool blinkerLeft = false;
 bool blinkerRight = false;
 bool blinkerHazard = false;
+bool truckShiftUp = false;
 
 void update() {
 	///////////////////////////////////////////////////////////////////////////
@@ -110,16 +111,7 @@ void update() {
 		toggleManual();
 	}
 
-	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
-	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
-		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 2);
-	}
-	else if (vehData.CurrGear == vehData.NextGear) {
-		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 0);
-	}
-	else if (vehData.CurrGear < vehData.NextGear) {
-		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1);
-	}
+	crossScriptComms();
 
 	if (settings.Debug) {
 		showDebugInfo();
@@ -742,7 +734,10 @@ void functionTruckLimiting() {
 		(vehData.Velocity > vehData.LockSpeed && vehData.PrevGear > vehData.CurrGear)) {
 		controls.Clutchvalf = 1.0f;
 		ext.SetThrottle(vehicle, 0.0f);
-		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1); // Uglyyyyy
+		truckShiftUp = true;
+	}
+	else {
+		truckShiftUp = false;
 	}
 }
 
@@ -1064,4 +1059,24 @@ void resetWheelFeedback(int index) {
 	LogiStopSurfaceEffect(index);
 	LogiStopCarAirborne(index);
 	LogiStopSoftstopForce(index);
+}
+
+void crossScriptComms() {
+	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
+	if (vehData.CurrGear < vehData.NextGear || truckShiftUp) {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1);
+	}
+	else if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 2);
+	}
+	else if (vehData.CurrGear == vehData.NextGear) {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 0);
+	}
+
+	if (vehData.SimulatedNeutral) {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_weapon", 1);
+	}
+	else {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_weapon", 0);
+	}
 }

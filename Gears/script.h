@@ -24,6 +24,8 @@ enum InputDevices {
 
 void ScriptMain();
 
+void crossScriptComms();
+
 void showText(float x, float y, float scale, const char * text);
 void showNotification(char *message);
 void showDebugInfo();
@@ -53,4 +55,3 @@ void functionHShiftLogitech();
 
 void shiftTo(int gear, bool autoClutch);
 void handleRPM();
-
