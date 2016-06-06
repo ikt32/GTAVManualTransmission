@@ -28,3 +28,22 @@ Clone this repository to the same folder ScriptHookV_SDK was extracted so you ha
 
 Download the [Logitech Steering Wheel SDK](http://gaming.logitech.com/en-us/developers) and extract it's contents to LogitechSteeringWheel_SDK. 
 Clone this repository to the same folder LogitechSteeringWheel_SDK was extracted so you have LogitechSteeringWheel_SDK and GTAVManualTransmission in the same folder.
+
+## Mod support
+You can read decorators to get some info about this mod.
+
+Example: ```DECORATOR::DECOR_GET_INT(vehicle, "hunt_score");``` gets the current shift up/down status. Currently this mod exposes 2 variables which can be used in other scripts.
+
+Speedometers shift up/down indicator:
+* "hunt_score" 0 - Nothing
+* "hunt_score" 1 - Shift up
+* "hunt_score" 2 - Shift down
+
+Scripts changing torque
+* "hunt_score" 2 - Torque is decreased 
+
+Speedometers Neutral gear:
+* "hunt_weapon" 0 - In gear
+* "hunt_weapon" 1 - Neutral
+
+Please note that the neutral gear is the gearbox simulated neutral gear, which isn't affected by the hand brake!
