@@ -30,7 +30,6 @@ WORD buttonState;
 
 WheelLogiInput logiWheel(0);
 
-bool active = false;
 bool patched = false;
 bool simpleBike = false;
 int prevNotification = 0;
@@ -121,9 +120,6 @@ void update() {
 		(!VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false) &&
 			VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f)) {
 		return;
-	}
-	else {
-		active = true;
 	}
 	///////////////////////////////////////////////////////////////////////////
 	// Active whenever Manual is enabled from here
@@ -402,15 +398,12 @@ void reInit() {
 }
 
 void reset() {
-	if (active) {
-		if (logiWheel.IsActive(&settings)) {
-			resetWheelFeedback(logiWheel.GetIndex());
-		}
-		prevVehicle = 0;
-		if (patched) {
-			patched = !MemoryPatcher::RestoreInstructions();
-		}
-		active = false;
+	if (logiWheel.IsActive(&settings)) {
+		resetWheelFeedback(logiWheel.GetIndex());
+	}
+	prevVehicle = 0;
+	if (patched) {
+		patched = !MemoryPatcher::RestoreInstructions();
 	}
 }
 
@@ -880,22 +873,18 @@ void functionSimpleReverse() {
 
 void functionAutoReverse() {
 	// Go forward
-	if (CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate)
-		&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && vehData.Velocity > -1.0f) {
-		if (vehData.CurrGear == 0) {
-			vehData.LockGears = 0x00010001;
-		}
+	if (CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) &&
+		vehData.Velocity > -1.0f &&
+		vehData.CurrGear == 0) {
+		vehData.LockGears = 0x00010001;
 	}
 
 	// Reverse
-	if (CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake)
-		&& !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && vehData.Velocity < 1.0f) {
-		if (vehData.CurrGear > 0) {	
-			if (vehData.SimulatedNeutral) {
-				vehData.SimulatedNeutral = false;
-			}
-			vehData.LockGears = 0x00000000;
-		}
+	if (CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) &&
+		vehData.Velocity < 1.0f &&
+		vehData.CurrGear > 0) {
+		vehData.SimulatedNeutral = false;
+		vehData.LockGears = 0x00000000;
 	}
 }
 
