@@ -445,6 +445,9 @@ void shiftTo(int gear, bool autoClutch) {
 	vehData.LockGears = gear | (gear << 16);
 	vehData.LockTruck = false;
 	vehData.PrevGear = vehData.CurrGear;
+	if (vehData.IsTruck && vehData.Rpm < 0.9) {
+		return;
+	}
 	vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
 }
 
@@ -626,7 +629,7 @@ void functionEngBrake() {
 	}
 	// Braking
 	if (vehData.CurrGear > 0 &&
-		vehData.Velocity > vehData.LockSpeeds.at(vehData.CurrGear) &&
+		vehData.Velocity > vehData.LockSpeeds[vehData.CurrGear] &&
 		controls.Rtvalf < 0.1 && vehData.Rpm > 0.80) {
 		float brakeForce = -0.1f * (1.0f - controls.Clutchvalf) * vehData.Rpm;
 		ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, brakeForce, 0.0f, true, true, true, true);
@@ -733,7 +736,6 @@ void functionTruckLimiting() {
 	if ((vehData.Velocity > vehData.LockSpeed && vehData.LockTruck) ||
 		(vehData.Velocity > vehData.LockSpeed && vehData.PrevGear > vehData.CurrGear)) {
 		controls.Clutchvalf = 1.0f;
-		ext.SetThrottle(vehicle, 0.0f);
 		truckShiftUp = true;
 	}
 	else {
