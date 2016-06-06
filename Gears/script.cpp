@@ -42,6 +42,8 @@ bool blinkerLeft = false;
 bool blinkerRight = false;
 bool blinkerHazard = false;
 bool truckShiftUp = false;
+DIJOYSTATE2 *logiState;
+
 
 void update() {
 	///////////////////////////////////////////////////////////////////////////
@@ -141,6 +143,7 @@ void update() {
 
 	if (logiWheel.IsActive(&settings)) {
 		logiWheel.UpdateLogiValues();
+		logiState = LogiGetState(logiWheel.GetIndex());
 	}
 
 	if (prevInput != getLastInputDevice(prevInput)) {
@@ -188,11 +191,10 @@ void update() {
 	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
-	if (logiWheel.IsActive(&settings) && prevInput == InputDevices::Wheel) {
+	if (logiWheel.IsActive(&settings) && logiState != NULL && prevInput == InputDevices::Wheel) {
 		if (settings.FFEnable)
 			playWheelEffects();
-		float steerVal = (LogiGetState(0)->lX) / (-32768.0f);
-		//showText(0.05, 0.05, 1.0, std::to_string(steerVal).c_str());
+		float steerVal = (logiState->lX) / (-32768.0f);
 		ext.SetSteeringAngle1(vehicle, steerVal);
 		logiWheel.DoWheelSteering(steerVal);
 	}
@@ -348,16 +350,16 @@ void showDebugInfo() {
 	const char *infoc = infos.str().c_str();
 	showText(0.01f, 0.5f, 0.4f, infoc);
 
-	if (logiWheel.IsActive(&settings)) {
+	if (logiWheel.IsActive(&settings) && logiState != NULL) {
 		std::stringstream throttleDisplay;
 		throttleDisplay << "ThrottleVal: " << logiWheel.GetLogiThrottleVal() << std::endl <<
-			"ThrottleRaw: " << LogiGetState(0)->lY;
+			"ThrottleRaw: " << logiState->lY;
 		std::stringstream brakeDisplay;
 		brakeDisplay	<< "Brake Value: " << logiWheel.GetLogiBrakeVal() << std::endl <<
-			"Brake   Raw: " << LogiGetState(0)->lRz;
+			"Brake   Raw: " << logiState->lRz;
 		std::stringstream clutchDisplay;
 		clutchDisplay	<< "ClutchValue: " << logiWheel.GetLogiClutchVal() << std::endl <<
-			"Clutch  Raw: " << LogiGetState(0)->rglSlider[1];
+			"Clutch  Raw: " << logiState->rglSlider[1];
 
 		showText(0.85, 0.04, 0.4, throttleDisplay.str().c_str());
 		showText(0.85, 0.10, 0.4, brakeDisplay.str().c_str());
@@ -899,30 +901,40 @@ void handleVehicleButtons() {
 			controls.Rtvalf > 0.9f)) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
-	if (logiWheel.IsActive(&settings)) {
-		if (LogiGetState(logiWheel.GetIndex())->rgbButtons[controls.LogiControl[(int)ScriptControls::LogiControlType::Handbrake]]) {
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+
+	if (logiWheel.IsActive(&settings) && logiState != NULL) {
+		if ((logiState->rgbButtons[controls.LogiControl[(int)ScriptControls::LogiControlType::Handbrake]] & 0x80) == 0x80 &&
+			controls.LogiControl[(int)ScriptControls::LogiControlType::Handbrake] != -1) {
+			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
 		}
-		if (LogiGetState(logiWheel.GetIndex())->rgbButtons[controls.LogiControl[(int)ScriptControls::LogiControlType::Horn]]) {
+		if ((logiState->rgbButtons[controls.LogiControl[(int)ScriptControls::LogiControlType::Horn]] & 0x80) == 0x80 &&
+			controls.LogiControl[(int)ScriptControls::LogiControlType::Horn] != -1) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHorn, 1.0f);
 		}
-		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Lights])) {
+		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Lights]) &&
+			controls.LogiControl[(int)ScriptControls::LogiControlType::Lights] != -1) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHeadlight, 1.0f);
 		}
-		if (LogiGetState(logiWheel.GetIndex())->rgbButtons[controls.LogiControl[(int)ScriptControls::LogiControlType::LookBack]]) {
+		if ((logiState->rgbButtons[controls.LogiControl[(int)ScriptControls::LogiControlType::LookBack]] & 0x80) == 0x80 &&
+			controls.LogiControl[(int)ScriptControls::LogiControlType::LookBack] != -1) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleLookBehind, 1.0f);
 		}
-		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Camera])) {
+		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Camera]) &&
+			controls.LogiControl[(int)ScriptControls::LogiControlType::Camera] != -1) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlNextCamera, 1.0f);
 		}
-		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::RadioNext])) {
+		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::RadioNext]) &&
+			controls.LogiControl[(int)ScriptControls::LogiControlType::RadioNext] != -1) {
 			AUDIO::SET_RADIO_TO_STATION_INDEX(AUDIO::GET_PLAYER_RADIO_STATION_INDEX() + 1);
 		}
-		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::RadioPrev])) {
+		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::RadioPrev]) &&
+			controls.LogiControl[(int)ScriptControls::LogiControlType::RadioPrev] != -1) {
 			AUDIO::SET_RADIO_TO_STATION_INDEX(AUDIO::GET_PLAYER_RADIO_STATION_INDEX() - 1);
 		}
 
-		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorLeft])) {
+		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorLeft]) &&
+			controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorLeft] != -1) {
 			if (!blinkerLeft) {
 				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);	// L
 				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true);	// R
@@ -938,7 +950,8 @@ void handleVehicleButtons() {
 				blinkerHazard = false;
 			}
 		}
-		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorRight])) {
+		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorRight]) &&
+			controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorRight] != -1) {
 			if (!blinkerRight) {
 				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true);	// L
 				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);	// R
@@ -954,7 +967,8 @@ void handleVehicleButtons() {
 				blinkerHazard = false;
 			}
 		}
-		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorHazard])) {
+		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorHazard]) &&
+			controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorHazard] != -1) {
 			if (!blinkerHazard) {
 				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true);	// L
 				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true);	// R
@@ -972,7 +986,7 @@ void handleVehicleButtons() {
 		}
 
 		if (!settings.DisableDpad) {
-			switch (LogiGetState(logiWheel.GetIndex())->rgdwPOV[0]) {
+			switch (logiState->rgdwPOV[0]) {
 			case 0:
 				break;
 			case 9000:
