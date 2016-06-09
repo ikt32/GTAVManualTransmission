@@ -113,6 +113,7 @@
     <ClCompile Include="VehicleData.cpp" />
     <ClCompile Include="VehicleExtensions.cpp" />
     <ClCompile Include="MemoryPatcher.cpp" />
+    <ClCompile Include="WheelDirectInput.cpp" />
     <ClCompile Include="WheelLogiInput.cpp" />
     <ClCompile Include="XboxController.cpp" />
   </ItemGroup>
@@ -130,6 +131,7 @@
     <ClInclude Include="VehicleData.hpp" />
     <ClInclude Include="VehicleExtensions.hpp" />
     <ClInclude Include="MemoryPatcher.hpp" />
+    <ClInclude Include="WheelDirectInput.hpp" />
     <ClInclude Include="WheelLogiInput.hpp" />
     <ClInclude Include="XboxController.hpp" />
   </ItemGroup>
