@@ -112,7 +112,7 @@ void update() {
 		toggleManual();
 	}
 
-	crossScriptComms();
+	//crossScriptComms();
 
 	if (settings.Debug) {
 		showDebugInfo();
@@ -1066,6 +1066,7 @@ void resetWheelFeedback(int index) {
 	LogiStopSoftstopForce(index);
 }
 
+/*
 void crossScriptComms() {
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
 	if (vehData.CurrGear < vehData.NextGear || truckShiftUp) {
@@ -1085,3 +1086,4 @@ void crossScriptComms() {
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_weapon", 0);
 	}
 }
+*/
