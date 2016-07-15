@@ -13,12 +13,15 @@ http://dev-c.com
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 {
 	Logger logger(LOGFILE);
-
+	std::string ver;
 	switch (reason)
 	{
 	case DLL_PROCESS_ATTACH:
 		scriptRegister(hInstance, ScriptMain);
 		logger.Clear();
+		ver = "Version ";
+		ver.append(std::to_string(getGameVersion()));
+		logger.Write(ver); 
 		logger.Write("Script loaded");
 		break;
 	case DLL_PROCESS_DETACH:
