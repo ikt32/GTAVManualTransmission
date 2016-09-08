@@ -28,7 +28,7 @@ Hash model;
 XboxController controller(1);
 WORD buttonState;
 
-WheelLogiInput logiWheel(0);
+//WheelLogiInput logiWheel(0);
 
 bool patched = false;
 bool simpleBike = false;
@@ -107,8 +107,8 @@ void update() {
 	}
 
 	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Toggle], ScriptControls::KeyboardControlType::Toggle) || 
-		controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Toggle]), buttonState, controls.CToggleTime) ||
-		(LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Toggle]))) {
+		controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Toggle]), buttonState, controls.CToggleTime) ) {
+		// ||	(LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Toggle]))) {
 		toggleManual();
 	}
 
@@ -128,8 +128,8 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 	handleVehicleButtons();
 
-	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ToggleH], ScriptControls::KeyboardControlType::ToggleH) ||
-		(logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ToggleH]))) {
+	if (controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ToggleH], ScriptControls::KeyboardControlType::ToggleH)) {
+		// || (logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ToggleH]))) {
 		settings.Hshifter = !settings.Hshifter;
 		if (!settings.Hshifter && vehData.CurrGear > 1) {
 			vehData.SimulatedNeutral = false;
@@ -141,10 +141,10 @@ void update() {
 		settings.Save();
 	}
 
-	if (logiWheel.IsActive(&settings)) {
+	/*if (logiWheel.IsActive(&settings)) {
 		logiWheel.UpdateLogiValues();
 		logiState = LogiGetState(logiWheel.GetIndex());
-	}
+	}*/
 
 	if (prevInput != getLastInputDevice(prevInput)) {
 		prevInput = getLastInputDevice(prevInput);
@@ -162,10 +162,10 @@ void update() {
 				showNotification("Switched to controller");
 			}			
 			break;
-		case InputDevices::Wheel: // Wheel
-			//CONTROLS::DISABLE_ALL_CONTROL_ACTIONS
-			showNotification("Switched to wheel");
-			break;
+		//case InputDevices::Wheel: // Wheel
+		//	//CONTROLS::DISABLE_ALL_CONTROL_ACTIONS
+		//	showNotification("Switched to wheel");
+		//	break;
 		default:
 			break;
 		}
@@ -181,23 +181,23 @@ void update() {
 		controls.Ltvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Brake]), buttonState);
 		controls.Clutchvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Clutch]), buttonState);
 		break;
-	case InputDevices::Wheel: // Wheel
-		controls.Rtvalf = logiWheel.GetLogiThrottleVal();
-		controls.Ltvalf = logiWheel.GetLogiBrakeVal();
-		controls.Clutchvalf = 1 - logiWheel.GetLogiClutchVal();
-		break;
+	//case InputDevices::Wheel: // Wheel
+	//	controls.Rtvalf = logiWheel.GetLogiThrottleVal();
+	//	controls.Ltvalf = logiWheel.GetLogiBrakeVal();
+	//	controls.Clutchvalf = 1 - logiWheel.GetLogiClutchVal();
+	//	break;
 	}
 
 	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
 	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
-	if (logiWheel.IsActive(&settings) && logiState != NULL && prevInput == InputDevices::Wheel) {
+	/*if (logiWheel.IsActive(&settings) && logiState != NULL && prevInput == InputDevices::Wheel) {
 		if (settings.FFEnable)
 			playWheelEffects();
 		float steerVal = (logiState->lX) / (-32768.0f);
 		ext.SetSteeringAngle1(vehicle, steerVal);
 		logiWheel.DoWheelSteering(steerVal);
-	}
+	}*/
 
 	///////////////////////////////////////////////////////////////////////////
 	//                            Patching
@@ -222,28 +222,28 @@ void update() {
 	// For bikes, do this automatically.
 	if (vehData.IsBike) {
 		functionAutoReverse();
-		handlePedalsDefault(
+		/*handlePedalsDefault(
 			logiWheel.GetLogiThrottleVal(),
-			logiWheel.GetLogiBrakeVal());
+			logiWheel.GetLogiBrakeVal());*/
 	}
 	else {
 		// New reverse: Reverse with throttle
 		if (settings.RealReverse) {
 			functionRealReverse();
-			if (logiWheel.IsActive(&settings) && prevInput == InputDevices::Wheel) {
+			/*if (logiWheel.IsActive(&settings) && prevInput == InputDevices::Wheel) {
 				handlePedalsRealReverse(
 					logiWheel.GetLogiThrottleVal(),
 					logiWheel.GetLogiBrakeVal());
-			}
+			}*/
 		}
 		// Reversing behavior: just block the direction you don't wanna go to
 		else {
 			functionSimpleReverse();
-			if (logiWheel.IsActive(&settings) && prevInput == InputDevices::Wheel) {
+			/*if (logiWheel.IsActive(&settings) && prevInput == InputDevices::Wheel) {
 				handlePedalsDefault(
 					logiWheel.GetLogiThrottleVal(),
 					logiWheel.GetLogiBrakeVal());
-			}
+			}*/
 		}
 	}
 	
@@ -279,12 +279,13 @@ void update() {
 
 	// Manual shifting
 	if (settings.Hshifter && !vehData.IsBike) {
-		if (logiWheel.IsActive(&settings) && prevInput == InputDevices::Wheel) {
+		/*if (logiWheel.IsActive(&settings) && prevInput == InputDevices::Wheel) {
 			functionHShiftLogitech();
 		}
 		else {
 			functionHShiftKeyboard();
-		}
+		}*/
+		functionHShiftKeyboard();
 	}
 	else {
 		functionSShift();
@@ -297,9 +298,9 @@ void update() {
 
 void main() {
 	settings.Read(&controls);
-	if (settings.LogiWheel) {
+	/*if (settings.LogiWheel) {
 		logiWheel.InitWheel(&settings, &logger);
-	}
+	}*/
 
 	while (true) {
 		update();
@@ -350,7 +351,7 @@ void showDebugInfo() {
 	const char *infoc = infos.str().c_str();
 	showText(0.01f, 0.5f, 0.4f, infoc);
 
-	if (logiWheel.IsActive(&settings) && logiState != NULL) {
+	/*if (logiWheel.IsActive(&settings) && logiState != NULL) {
 		std::stringstream throttleDisplay;
 		throttleDisplay << "ThrottleVal: " << logiWheel.GetLogiThrottleVal() << std::endl <<
 			"ThrottleRaw: " << logiState->lY;
@@ -364,7 +365,7 @@ void showDebugInfo() {
 		showText(0.85, 0.04, 0.4, throttleDisplay.str().c_str());
 		showText(0.85, 0.10, 0.4, brakeDisplay.str().c_str());
 		showText(0.85, 0.16, 0.4, clutchDisplay.str().c_str());
-	}
+	}*/
 }
 
 // Limitations: Detects on pressing throttle on any of the 3 input methods
@@ -377,12 +378,12 @@ int getLastInputDevice(int previousInput) {
 		controller.IsButtonPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Throttle]), buttonState)) {
 		return InputDevices::Controller;
 	}
-	if (logiWheel.IsActive(&settings) &&
+	/*if (logiWheel.IsActive(&settings) &&
 		(logiWheel.GetLogiThrottleVal() > 0.1f ||
 			logiWheel.GetLogiBrakeVal() > 0.1f ||
 			logiWheel.GetLogiClutchVal() < 0.9f)) {
 		return InputDevices::Wheel;
-	}
+	}*/
 	return previousInput;
 }
 
@@ -394,15 +395,15 @@ void reInit() {
 	settings.Read(&controls);
 	vehData.LockGears = 0x00010001;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
-	if (settings.LogiWheel) {
+	/*if (settings.LogiWheel) {
 		logiWheel.InitWheel(&settings, &logger);
-	}
+	}*/
 }
 
 void reset() {
-	if (logiWheel.IsActive(&settings)) {
+	/*if (logiWheel.IsActive(&settings)) {
 		resetWheelFeedback(logiWheel.GetIndex());
-	}
+	}*/
 	prevVehicle = 0;
 	if (patched) {
 		patched = !MemoryPatcher::RestoreInstructions();
@@ -484,46 +485,47 @@ void functionHShiftKeyboard() {
 	}
 }
 
-void functionHShiftLogitech() {
-	// Highest shifter button == 6
-	int clamp = 6;
-	if (vehData.TopGear <= clamp) {
-		clamp = vehData.TopGear;
-	}
-	for (uint8_t i = 0; i <= clamp; i++) {
-		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[i])) {
-			functionHShiftTo(i);
-		}
-	}
+//void functionhshiftlogitech() {
+//	// highest shifter button == 6
+//	int clamp = 6;
+//	if (vehdata.topgear <= clamp) {
+//		clamp = vehdata.topgear;
+//	}
+//	for (uint8_t i = 0; i <= clamp; i++) {
+//		if (logibuttontriggered(logiwheel.getindex(), controls.logicontrol[i])) {
+//			functionhshiftto(i);
+//		}
+//	}
+//
+//	
+//	if (logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h1]) ||
+//		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h2]) ||
+//		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h3]) ||
+//		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h4]) ||
+//		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h5]) ||
+//		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h6])) {
+//		if (settings.clutchshifting && settings.engdamage && !vehdata.noclutch) {
+//			if (controls.clutchvalf < 1.0-settings.clutchcatchpoint) {
+//				vehicle::set_vehicle_engine_health(
+//					vehicle,
+//					vehicle::get_vehicle_engine_health(vehicle) - settings.misshiftdamage/10);
+//			}
+//		}
+//		vehdata.simulatedneutral = !vehdata.noclutch;
+//	}
+//	
+//	if (logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::hr])) {
+//		shiftto(1, true);
+//		vehdata.simulatedneutral = !vehdata.noclutch;
+//	}
+//}
 
-	
-	if (LogiButtonReleased(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::H1]) ||
-		LogiButtonReleased(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::H2]) ||
-		LogiButtonReleased(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::H3]) ||
-		LogiButtonReleased(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::H4]) ||
-		LogiButtonReleased(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::H5]) ||
-		LogiButtonReleased(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::H6])) {
-		if (settings.ClutchShifting && settings.EngDamage && !vehData.NoClutch) {
-			if (controls.Clutchvalf < 1.0-settings.ClutchCatchpoint) {
-				VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
-					vehicle,
-					VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.MisshiftDamage/10);
-			}
-		}
-		vehData.SimulatedNeutral = !vehData.NoClutch;
-	}
-	
-	if (LogiButtonReleased(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::HR])) {
-		shiftTo(1, true);
-		vehData.SimulatedNeutral = !vehData.NoClutch;
-	}
-}
 
 void functionSShift() {
 	// Shift up
 	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::ShiftUp]), buttonState) ||
-		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ShiftUp], ScriptControls::KeyboardControlType::ShiftUp) ||
-		(logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftUp]))) {
+		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ShiftUp], ScriptControls::KeyboardControlType::ShiftUp)) {
+		//|| (logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftUp]))) {
 		
 		if (vehData.NoClutch) {
 			if (vehData.CurrGear < vehData.TopGear) {
@@ -553,8 +555,8 @@ void functionSShift() {
 
 	// Shift down
 	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::ShiftDown]), buttonState) ||
-		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ShiftDown], ScriptControls::KeyboardControlType::ShiftDown) ||
-		(logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftDown]))) {
+		controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::ShiftDown], ScriptControls::KeyboardControlType::ShiftDown)) {
+		// || (logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftDown]))) {
 		
 		if (vehData.NoClutch) {
 			if (vehData.CurrGear > 0) {
@@ -896,175 +898,175 @@ void functionAutoReverse() {
 void handleVehicleButtons() {
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
 		(	controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[(int)ScriptControls::ControllerControlType::Engine]), buttonState) ||
-			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Engine], ScriptControls::KeyboardControlType::Engine) ||
-			(logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Engine])) ||
-			controls.Rtvalf > 0.9f)) {
+			controls.IsKeyJustPressed(controls.Control[(int)ScriptControls::KeyboardControlType::Engine], ScriptControls::KeyboardControlType::Engine) )) {
+		// ||			(logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Engine])) ||
+		//	controls.Rtvalf > 0.9f)) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 
-	if (logiWheel.IsActive(&settings) && logiState != NULL) {
-		if ((logiState->rgbButtons[controls.LogiControl[(int)ScriptControls::LogiControlType::Handbrake]] & 0x80) == 0x80 &&
-			controls.LogiControl[(int)ScriptControls::LogiControlType::Handbrake] != -1) {
-			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
-		}
-		if ((logiState->rgbButtons[controls.LogiControl[(int)ScriptControls::LogiControlType::Horn]] & 0x80) == 0x80 &&
-			controls.LogiControl[(int)ScriptControls::LogiControlType::Horn] != -1) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHorn, 1.0f);
-		}
-		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Lights]) &&
-			controls.LogiControl[(int)ScriptControls::LogiControlType::Lights] != -1) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHeadlight, 1.0f);
-		}
-		if ((logiState->rgbButtons[controls.LogiControl[(int)ScriptControls::LogiControlType::LookBack]] & 0x80) == 0x80 &&
-			controls.LogiControl[(int)ScriptControls::LogiControlType::LookBack] != -1) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleLookBehind, 1.0f);
-		}
-		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Camera]) &&
-			controls.LogiControl[(int)ScriptControls::LogiControlType::Camera] != -1) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlNextCamera, 1.0f);
-		}
-		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::RadioNext]) &&
-			controls.LogiControl[(int)ScriptControls::LogiControlType::RadioNext] != -1) {
-			AUDIO::SET_RADIO_TO_STATION_INDEX(AUDIO::GET_PLAYER_RADIO_STATION_INDEX() + 1);
-		}
-		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::RadioPrev]) &&
-			controls.LogiControl[(int)ScriptControls::LogiControlType::RadioPrev] != -1) {
-			AUDIO::SET_RADIO_TO_STATION_INDEX(AUDIO::GET_PLAYER_RADIO_STATION_INDEX() - 1);
-		}
+	//if (logiWheel.IsActive(&settings) && logiState != NULL) {
+	//	if ((logiState->rgbButtons[controls.LogiControl[(int)ScriptControls::LogiControlType::Handbrake]] & 0x80) == 0x80 &&
+	//		controls.LogiControl[(int)ScriptControls::LogiControlType::Handbrake] != -1) {
+	//		//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+	//		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
+	//	}
+	//	if ((logiState->rgbButtons[controls.LogiControl[(int)ScriptControls::LogiControlType::Horn]] & 0x80) == 0x80 &&
+	//		controls.LogiControl[(int)ScriptControls::LogiControlType::Horn] != -1) {
+	//		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHorn, 1.0f);
+	//	}
+	//	if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Lights]) &&
+	//		controls.LogiControl[(int)ScriptControls::LogiControlType::Lights] != -1) {
+	//		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHeadlight, 1.0f);
+	//	}
+	//	if ((logiState->rgbButtons[controls.LogiControl[(int)ScriptControls::LogiControlType::LookBack]] & 0x80) == 0x80 &&
+	//		controls.LogiControl[(int)ScriptControls::LogiControlType::LookBack] != -1) {
+	//		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleLookBehind, 1.0f);
+	//	}
+	//	if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Camera]) &&
+	//		controls.LogiControl[(int)ScriptControls::LogiControlType::Camera] != -1) {
+	//		CONTROLS::_SET_CONTROL_NORMAL(0, ControlNextCamera, 1.0f);
+	//	}
+	//	if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::RadioNext]) &&
+	//		controls.LogiControl[(int)ScriptControls::LogiControlType::RadioNext] != -1) {
+	//		AUDIO::SET_RADIO_TO_STATION_INDEX(AUDIO::GET_PLAYER_RADIO_STATION_INDEX() + 1);
+	//	}
+	//	if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::RadioPrev]) &&
+	//		controls.LogiControl[(int)ScriptControls::LogiControlType::RadioPrev] != -1) {
+	//		AUDIO::SET_RADIO_TO_STATION_INDEX(AUDIO::GET_PLAYER_RADIO_STATION_INDEX() - 1);
+	//	}
 
-		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorLeft]) &&
-			controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorLeft] != -1) {
-			if (!blinkerLeft) {
-				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);	// L
-				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true);	// R
-				blinkerLeft = true;
-				blinkerRight = false;
-				blinkerHazard = false;
-			}
-			else {
-				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
-				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-				blinkerLeft = false;
-				blinkerRight = false;
-				blinkerHazard = false;
-			}
-		}
-		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorRight]) &&
-			controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorRight] != -1) {
-			if (!blinkerRight) {
-				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true);	// L
-				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);	// R
-				blinkerLeft = false;
-				blinkerRight = true;
-				blinkerHazard = false;
-			}
-			else {
-				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
-				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-				blinkerLeft = false;
-				blinkerRight = false;
-				blinkerHazard = false;
-			}
-		}
-		if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorHazard]) &&
-			controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorHazard] != -1) {
-			if (!blinkerHazard) {
-				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true);	// L
-				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true);	// R
-				blinkerLeft = false;
-				blinkerRight = false;
-				blinkerHazard = true;
-			}
-			else {
-				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
-				VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-				blinkerLeft = false;
-				blinkerRight = false;
-				blinkerHazard = false;
-			}
-		}
+	//	if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorLeft]) &&
+	//		controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorLeft] != -1) {
+	//		if (!blinkerLeft) {
+	//			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);	// L
+	//			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true);	// R
+	//			blinkerLeft = true;
+	//			blinkerRight = false;
+	//			blinkerHazard = false;
+	//		}
+	//		else {
+	//			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
+	//			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
+	//			blinkerLeft = false;
+	//			blinkerRight = false;
+	//			blinkerHazard = false;
+	//		}
+	//	}
+	//	if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorRight]) &&
+	//		controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorRight] != -1) {
+	//		if (!blinkerRight) {
+	//			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true);	// L
+	//			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);	// R
+	//			blinkerLeft = false;
+	//			blinkerRight = true;
+	//			blinkerHazard = false;
+	//		}
+	//		else {
+	//			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
+	//			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
+	//			blinkerLeft = false;
+	//			blinkerRight = false;
+	//			blinkerHazard = false;
+	//		}
+	//	}
+	//	if (LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorHazard]) &&
+	//		controls.LogiControl[(int)ScriptControls::LogiControlType::IndicatorHazard] != -1) {
+	//		if (!blinkerHazard) {
+	//			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true);	// L
+	//			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true);	// R
+	//			blinkerLeft = false;
+	//			blinkerRight = false;
+	//			blinkerHazard = true;
+	//		}
+	//		else {
+	//			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
+	//			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
+	//			blinkerLeft = false;
+	//			blinkerRight = false;
+	//			blinkerHazard = false;
+	//		}
+	//	}
 
-		if (!settings.DisableDpad) {
-			switch (logiState->rgdwPOV[0]) {
-			case 0:
-				break;
-			case 9000:
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleNextRadio, 1.0f);
-				break;
-			case 18000:
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
-				break;
-			case 27000:
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehiclePrevRadio, 1.0f);
-				break;
-			}
-		}
+	//	if (!settings.DisableDpad) {
+	//		switch (logiState->rgdwPOV[0]) {
+	//		case 0:
+	//			break;
+	//		case 9000:
+	//			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleNextRadio, 1.0f);
+	//			break;
+	//		case 18000:
+	//			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
+	//			break;
+	//		case 27000:
+	//			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehiclePrevRadio, 1.0f);
+	//			break;
+	//		}
+	//	}
 
-	}
+	//}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 //                             Wheel functions
 ///////////////////////////////////////////////////////////////////////////////
 // Despair: Won't work if arguments are passed?!
-void playWheelEffects() {
-	Vector3 accelVals = vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true));
-	Vector3 accelValsAvg = vehData.getAccelerationVectorsAverage();
-	
-	LogiPlayLeds(logiWheel.GetIndex(), vehData.Rpm, 0.66f, 0.99f);
-
-	if (settings.FFDamperStationary < settings.FFDamperMoving) {
-		settings.FFDamperMoving = settings.FFDamperStationary;
-	}
-	if (settings.FFDamperMoving < 1) {
-		settings.FFDamperMoving = 1;
-	}
-	float ratio = (float)(settings.FFDamperStationary - settings.FFDamperMoving)/settings.FFDamperMoving;
-	int damperforce = settings.FFDamperStationary - (int)(8 * ratio * ratio * vehData.Speed*vehData.Speed);
-	if (damperforce < settings.FFDamperMoving) {
-		damperforce = settings.FFDamperMoving + (int)(vehData.Speed * ratio);
-	}
-	damperforce -= (int)(ratio * accelValsAvg.y);
-	if (damperforce > settings.FFDamperStationary) {
-		damperforce = settings.FFDamperStationary;
-	}
-	LogiPlayDamperForce(logiWheel.GetIndex(), damperforce);
-
-	int constantForce = (int)(-settings.FFPhysics*((3 * accelValsAvg.x + 2 * accelVals.x)));
-	LogiPlayConstantForce(logiWheel.GetIndex(), constantForce);
-	
-	int centerForcePercentage = (int)(settings.FFCenterSpring * accelValsAvg.y);
-	if (centerForcePercentage < 0) {
-		centerForcePercentage = 0;
-	}
-
-	LogiPlaySpringForce(
-		logiWheel.GetIndex(),
-		0,
-		(int)(settings.FFCenterSpring*vehData.Speed + centerForcePercentage),
-		(int)(settings.FFCenterSpring*vehData.Speed + centerForcePercentage));
-	
-	if (!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f) {
-		LogiPlayCarAirborne(logiWheel.GetIndex());
-	}
-	else if (LogiIsPlaying(logiWheel.GetIndex(), LOGI_FORCE_CAR_AIRBORNE)) {
-		LogiStopCarAirborne(logiWheel.GetIndex());
-	}
-}
+//void playWheelEffects() {
+//	Vector3 accelVals = vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true));
+//	Vector3 accelValsAvg = vehData.getAccelerationVectorsAverage();
+//	
+//	LogiPlayLeds(logiWheel.GetIndex(), vehData.Rpm, 0.66f, 0.99f);
+//
+//	if (settings.FFDamperStationary < settings.FFDamperMoving) {
+//		settings.FFDamperMoving = settings.FFDamperStationary;
+//	}
+//	if (settings.FFDamperMoving < 1) {
+//		settings.FFDamperMoving = 1;
+//	}
+//	float ratio = (float)(settings.FFDamperStationary - settings.FFDamperMoving)/settings.FFDamperMoving;
+//	int damperforce = settings.FFDamperStationary - (int)(8 * ratio * ratio * vehData.Speed*vehData.Speed);
+//	if (damperforce < settings.FFDamperMoving) {
+//		damperforce = settings.FFDamperMoving + (int)(vehData.Speed * ratio);
+//	}
+//	damperforce -= (int)(ratio * accelValsAvg.y);
+//	if (damperforce > settings.FFDamperStationary) {
+//		damperforce = settings.FFDamperStationary;
+//	}
+//	LogiPlayDamperForce(logiWheel.GetIndex(), damperforce);
+//
+//	int constantForce = (int)(-settings.FFPhysics*((3 * accelValsAvg.x + 2 * accelVals.x)));
+//	LogiPlayConstantForce(logiWheel.GetIndex(), constantForce);
+//	
+//	int centerForcePercentage = (int)(settings.FFCenterSpring * accelValsAvg.y);
+//	if (centerForcePercentage < 0) {
+//		centerForcePercentage = 0;
+//	}
+//
+//	LogiPlaySpringForce(
+//		logiWheel.GetIndex(),
+//		0,
+//		(int)(settings.FFCenterSpring*vehData.Speed + centerForcePercentage),
+//		(int)(settings.FFCenterSpring*vehData.Speed + centerForcePercentage));
+//	
+//	if (!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f) {
+//		LogiPlayCarAirborne(logiWheel.GetIndex());
+//	}
+//	else if (LogiIsPlaying(logiWheel.GetIndex(), LOGI_FORCE_CAR_AIRBORNE)) {
+//		LogiStopCarAirborne(logiWheel.GetIndex());
+//	}
+//}
 
 // Since playing back is f'd - This too, will be in the main class
-void resetWheelFeedback(int index) {
-	LogiStopSpringForce(index);
-	LogiStopConstantForce(index);
-	LogiStopDamperForce(index);
-	LogiStopDirtRoadEffect(index);
-	LogiStopBumpyRoadEffect(index);
-	LogiStopSlipperyRoadEffect(index);
-	LogiStopSurfaceEffect(index);
-	LogiStopCarAirborne(index);
-	LogiStopSoftstopForce(index);
-}
+//void resetWheelFeedback(int index) {
+//	LogiStopSpringForce(index);
+//	LogiStopConstantForce(index);
+//	LogiStopDamperForce(index);
+//	LogiStopDirtRoadEffect(index);
+//	LogiStopBumpyRoadEffect(index);
+//	LogiStopSlipperyRoadEffect(index);
+//	LogiStopSurfaceEffect(index);
+//	LogiStopCarAirborne(index);
+//	LogiStopSoftstopForce(index);
+//}
 
 void crossScriptComms() {
 	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down

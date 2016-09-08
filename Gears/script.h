@@ -34,11 +34,11 @@ void toggleManual();
 void reset();
 int getLastInputDevice(int previousInput);
 
-void resetWheelFeedback(int index);
+//void resetWheelFeedback(int index);
 void handlePedalsDefault(float logiThrottleVal, float logiBrakeVal);
 void handlePedalsRealReverse(float logiThrottleVal, float logiBrakeVal);
 void handleVehicleButtons();
-void playWheelEffects();
+//void playWheelEffects();
 
 void functionAutoReverse();
 void functionRealReverse();
@@ -51,7 +51,7 @@ void functionClutchCatch();
 void functionHShiftTo(int i);
 void functionHShiftKeyboard();
 void functionSShift();
-void functionHShiftLogitech();
+//void functionHShiftLogitech();
 
 void shiftTo(int gear, bool autoClutch);
 void handleRPM();

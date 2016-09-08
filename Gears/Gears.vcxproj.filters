@@ -12,6 +12,7 @@
     <ClCompile Include="MemoryPatcher.cpp" />
     <ClCompile Include="XboxController.cpp" />
     <ClCompile Include="WheelLogiInput.cpp" />
+    <ClCompile Include="WheelDirectInput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NativeMemory.hpp" />
@@ -38,6 +39,7 @@
     <ClInclude Include="XboxController.hpp" />
     <ClInclude Include="WheelLogiInput.hpp" />
     <ClInclude Include="Util.hpp" />
+    <ClInclude Include="WheelDirectInput.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
