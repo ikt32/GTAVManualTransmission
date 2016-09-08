@@ -1,5 +1,7 @@
 #include "NativeMemory.hpp"
 
+#include "..\..\ScriptHookV_SDK\inc\main.h"
+#include <Windows.h>
 #include <Psapi.h>
 
 MemoryAccess::MemoryAccess()

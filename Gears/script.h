@@ -6,15 +6,10 @@ http://dev-c.com
 
 #pragma once
 
-#include "..\..\ScriptHookV_SDK\inc\natives.h"
-#include "..\..\ScriptHookV_SDK\inc\types.h"
-#include "..\..\ScriptHookV_SDK\inc\enums.h"
-#include "..\..\ScriptHookV_SDK\inc\main.h"
-
 #ifndef DIRECTINPUT_VERSION
 #define DIRECTINPUT_VERSION 0x0800
 #endif
-#include "..\..\LogitechSteeringWheel_SDK\Include\LogitechSteeringWheelLib.h"
+//#include "..\..\LogitechSteeringWheel_SDK\Include\LogitechSteeringWheelLib.h"
 
 enum InputDevices {
 	Keyboard = 0,

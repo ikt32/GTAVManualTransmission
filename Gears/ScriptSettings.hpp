@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Windows.h>
 #include "ScriptControls.hpp"
 
 #define SETTINGSFILE "./Gears.ini"

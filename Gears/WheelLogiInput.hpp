@@ -3,8 +3,7 @@
 #include <Xinput.h>
 
 #include "..\..\ScriptHookV_SDK\inc\types.h"
-#include "..\..\ScriptHookV_SDK\inc\natives.h"
-#include "..\..\ScriptHookV_SDK\inc\enums.h"
+
 
 #include "ScriptSettings.hpp"
 #include "VehicleData.hpp"

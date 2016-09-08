@@ -3,10 +3,7 @@
 #pragma once
 
 #include <cstdint>
-#include "..\..\ScriptHookV_SDK\inc\main.h"
-#include "..\..\ScriptHookV_SDK\inc\types.h"
-#include <Windows.h>
-#include <Psapi.h>
+
 
 struct MemoryPool
 {

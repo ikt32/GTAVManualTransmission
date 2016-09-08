@@ -1,4 +1,6 @@
 #include "WheelLogiInput.hpp"
+#include "../../ScriptHookV_SDK/inc/natives.h"
+#include "../../ScriptHookV_SDK/inc/enums.h"
 
 WheelLogiInput::WheelLogiInput(int index) {
 	index_ = index;
@@ -34,7 +36,7 @@ void WheelLogiInput::PlayWheelEffects(
 	ScriptSettings *settings,
 	VehicleData *vehData,
 	Vehicle vehicle) {
-	int damperforce = 0;
+	int damperforce;
 	if (settings->FFDamperStationary < settings->FFDamperMoving) {
 		settings->FFDamperMoving = settings->FFDamperStationary;
 	}
@@ -83,7 +85,7 @@ void WheelLogiInput::DoWheelSteering(float steerVal) {
 	//float steerVal_ = logiSteeringWheelPos / (32768.0f);
 	
 	int additionalOffset = 2560;
-	float antiDeadzoned = 0.0f;
+	float antiDeadzoned;
 	antiDeadzoned = logiSteeringWheelPos / 32768.0f;
 	if (//logiSteeringWheelPos > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
 		logiSteeringWheelPos <= 0) {

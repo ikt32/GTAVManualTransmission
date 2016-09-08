@@ -1,5 +1,6 @@
 #include "XboxController.hpp"
 #include "TimeHelper.hpp"
+#include <string>
 
 XboxController::XboxController(int playerNumber) {
 	controllerNum = playerNumber - 1;
@@ -148,7 +149,7 @@ float XboxController::GetAnalogValue(XboxButtons buttonType, WORD buttonState) {
 }
 
 float XboxController::filterDeadzone(XboxButtons buttonType, int input) {
-	int deadzone = 0;
+	int deadzone;
 	switch (buttonType) {
 	case LeftThumbLeft:
 	case LeftThumbRight:

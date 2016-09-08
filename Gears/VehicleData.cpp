@@ -1,3 +1,5 @@
+#include "..\..\ScriptHookV_SDK\inc\natives.h"
+
 #include "VehicleData.hpp"
 
 VehicleData::VehicleData() {

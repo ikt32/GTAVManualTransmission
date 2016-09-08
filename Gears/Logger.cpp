@@ -1,3 +1,7 @@
+#include <Windows.h>
+#include <string>
+#include <fstream>
+
 #include "Logger.hpp"
 
 Logger::Logger(char *fileName) {

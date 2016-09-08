@@ -1,4 +1,5 @@
 #include "VehicleExtensions.hpp"
+#include "../../ScriptHookV_SDK/inc/nativeCaller.h"
 
 uint64_t VehicleExtensions::GetAddress(Vehicle handle) {
 	uint64_t address = mem.GetAddressOfEntity(handle);

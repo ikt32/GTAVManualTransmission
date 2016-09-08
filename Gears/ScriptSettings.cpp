@@ -1,5 +1,5 @@
 #include "ScriptSettings.hpp"
-#include "..\..\ScriptHookV_SDK\inc\enums.h"
+#include <Windows.h>
 
 #include "Logger.hpp"
 

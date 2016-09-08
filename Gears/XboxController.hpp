@@ -1,7 +1,6 @@
 #pragma once
 #include <Windows.h>
 #include <Xinput.h>
-#include <string>
 #include <array>
 
 class XboxController

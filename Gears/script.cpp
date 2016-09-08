@@ -1,7 +1,11 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
-#include <array>
+
+#include "../../ScriptHookV_SDK/inc/natives.h"
+#include "../../ScriptHookV_SDK/inc/types.h"
+#include "../../ScriptHookV_SDK/inc/enums.h"
+#include "../../ScriptHookV_SDK/inc/main.h"
 
 #include "script.h"
 
@@ -639,7 +643,7 @@ void functionEngBrake() {
 void fakeRev() {
 	float timeStep = SYSTEM::TIMESTEP();
 	float accelRatio = 2*timeStep;
-	float rpmVal = 0.0f;
+	float rpmVal;
 	float rpmValTemp = (prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm) : 0.0f);
 	if (vehData.CurrGear == 1) {
 		rpmValTemp *= 2.0f;

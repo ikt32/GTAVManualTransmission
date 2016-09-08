@@ -10,6 +10,7 @@ http://dev-c.com
 #include "Logger.hpp"
 #include "MemoryPatcher.hpp"
 #include "Util.hpp"
+//#include "../../LogitechSteeringWheel_SDK/Include/LogitechSteeringWheelLib.h"
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 {
@@ -24,10 +25,10 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
 		break;
 	case DLL_PROCESS_DETACH:
 		logger.Write("Init shutdown");
-		if (LogiIsConnected(0)) {
+		//if (LogiIsConnected(0)) {
 			//resetWheelFeedback(0);
-			LogiSteeringShutdown();
-		}
+		//	LogiSteeringShutdown();
+		//}
 		bool successI = MemoryPatcher::RestoreInstructions();
 
 		if (successI) {
