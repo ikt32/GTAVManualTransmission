@@ -10,7 +10,7 @@ public:
 	ScriptSettings();
 
 	void Read(ScriptControls *scriptControl);
-	void Save();
+	void Save() const;
 
 	bool EnableManual;
 	bool RealReverse;

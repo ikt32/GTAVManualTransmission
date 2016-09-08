@@ -8,14 +8,13 @@ Logger::Logger(char *fileName) {
 	file = fileName;
 }
 
-void Logger::Clear() {
+void Logger::Clear() const {
 	std::ofstream logFile;
 	logFile.open(file, std::ofstream::out | std::ofstream::trunc);
 	logFile.close();
 }
 
-void Logger::Write(const std::string &text)
-{
+void Logger::Write(const std::string &text) const {
 	std::ofstream logFile(file, std::ios_base::out | std::ios_base::app);
 	SYSTEMTIME currTimeLog;
 	GetLocalTime(&currTimeLog);

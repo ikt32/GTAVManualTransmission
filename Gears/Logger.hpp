@@ -7,8 +7,8 @@
 class Logger {
 public:
 	Logger(char *fileName);
-	void Clear();
-	void Write(const std::string &text);
+	void Clear() const;
+	void Write(const std::string &text) const;
 
 private:
 	char *file;

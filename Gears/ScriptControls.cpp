@@ -17,14 +17,14 @@ bool ScriptControls::IsKeyPressed(int key) {
 }
 
 bool ScriptControls::IsKeyJustPressed(int key, KeyboardControlType control) {
-	ControlCurr[(int)control] = (GetAsyncKeyState(key) & 0x8000) != 0;
+	ControlCurr[static_cast<int>(control)] = (GetAsyncKeyState(key) & 0x8000) != 0;
 
 	// raising edge
-	if (ControlCurr[(int)control] && !ControlPrev[(int)control]) {
-		ControlPrev[(int)control] = ControlCurr[(int)control];
+	if (ControlCurr[static_cast<int>(control)] && !ControlPrev[static_cast<int>(control)]) {
+		ControlPrev[static_cast<int>(control)] = ControlCurr[static_cast<int>(control)];
 		return true;
 	}
 
-	ControlPrev[(int)control] = ControlCurr[(int)control];
+	ControlPrev[static_cast<int>(control)] = ControlCurr[static_cast<int>(control)];
 	return false;
 }

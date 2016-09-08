@@ -73,15 +73,15 @@ public:
 public:
 	ScriptControls();
 	~ScriptControls();
-	bool IsKeyPressed(int key);
+	static bool IsKeyPressed(int key);
 	bool IsKeyJustPressed(int key, KeyboardControlType control);
 
-	int Control[(int)KeyboardControlType::SIZEOF_KeyboardControlType] = {};
-	int LogiControl[(int)LogiControlType::SIZEOF_LogiControlType] = {};
+	int Control[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
+	int LogiControl[static_cast<int>(LogiControlType::SIZEOF_LogiControlType)] = {};
 
 	int CToggleTime = 0;
-	bool ControlCurr[(int)KeyboardControlType::SIZEOF_KeyboardControlType] = {};
-	bool ControlPrev[(int)KeyboardControlType::SIZEOF_KeyboardControlType] = {};
+	bool ControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
+	bool ControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 
 	float Ltvalf = 0.0f;
 	float Rtvalf = 0.0f;
@@ -90,7 +90,7 @@ public:
 	int Accelval = 0;
 	float Accelvalf = 0.0f;
 
-	std::string ControlXbox[(int)ControllerControlType::SIZEOF_ControllerControlType] = {};
+	std::string ControlXbox[static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)] = {};
 
 private:
 	long long pressTime = 0;

@@ -86,7 +86,8 @@ Vector3 VehicleData::getAccelerationVectors(Vector3 velocities) {
 	return result;
 }
 
-Vector3 VehicleData::getAccelerationVectorsAverage() {
+Vector3 VehicleData::getAccelerationVectorsAverage() const
+{
 	Vector3 result;
 	result.x = 0;
 	result.y = 0;

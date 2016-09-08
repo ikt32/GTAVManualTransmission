@@ -96,13 +96,13 @@ private:
 	int controllerNum;
 	std::array<__int64, SIZEOF_XboxButtons> pressTime;
 	std::array<__int64, SIZEOF_XboxButtons> releaseTime;
-	float filterDeadzone(XboxButtons buttonType, int input);
+	static float filterDeadzone(XboxButtons buttonType, int input);
 
 public:
 	XboxController(int playerNumber);
 	XINPUT_STATE GetState();
 	bool IsConnected();
-	void Vibrate(int leftval = 0, int rightval = 0);
+	void Vibrate(int leftval = 0, int rightval = 0) const;
 
 	bool IsButtonPressed(XboxButtons buttonType, WORD buttonState);
 	bool IsButtonJustPressed(XboxButtons buttonType, WORD buttonState);

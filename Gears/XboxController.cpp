@@ -34,7 +34,7 @@ bool XboxController::IsConnected()
 	}
 }
 
-void XboxController::Vibrate(int leftVal, int rightVal)
+void XboxController::Vibrate(int leftVal, int rightVal) const
 {
 	// Create a Vibraton State
 	XINPUT_VIBRATION Vibration;
@@ -115,7 +115,7 @@ void XboxController::UpdateButtonChangeStates()
 XboxController::XboxButtons XboxController::StringToButton(std::string buttonString) {
 	for (int i = 0; i < SIZEOF_XboxButtons; i++) {
 		if (buttonString == XboxButtonsHelper[i]) {
-			return (XboxButtons)i;
+			return static_cast<XboxButtons>(i);
 		}
 	}
 	return UNKNOWN;
@@ -124,9 +124,9 @@ XboxController::XboxButtons XboxController::StringToButton(std::string buttonStr
 float XboxController::GetAnalogValue(XboxButtons buttonType, WORD buttonState) {
 	switch (buttonType) {
 	case LeftTrigger:
-		return (float)controllerState.Gamepad.bLeftTrigger / 255;
+		return static_cast<float>(controllerState.Gamepad.bLeftTrigger) / 255;
 	case RightTrigger:
-		return (float)controllerState.Gamepad.bRightTrigger / 255;
+		return static_cast<float>(controllerState.Gamepad.bRightTrigger) / 255;
 	case LeftThumbLeft:
 		return filterDeadzone(buttonType, controllerState.Gamepad.sThumbLX);
 	case LeftThumbRight:
@@ -181,7 +181,7 @@ float XboxController::filterDeadzone(XboxButtons buttonType, int input) {
 		}
 
 		input -= deadzone;
-		return (float)input / (float)(32767 - deadzone);
+		return static_cast<float>(input) / static_cast<float>(32767 - deadzone);
 	}
 	else {
 		return 0.0f;

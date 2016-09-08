@@ -17,24 +17,24 @@ int MemoryAccess::HandleToIndex(int Handle)
 	return Handle >> 8; // == Handle / 256
 }
 
-uintptr_t MemoryAccess::GetAddressOfEntity(int Handle)
+uintptr_t MemoryAccess::GetAddressOfEntity(int Handle) const
 {
 	return *reinterpret_cast<uintptr_t*>(GetAddressOfItemInPool(*sAddressEntityPool, Handle) + 8);
 }
 
-uint32_t MemoryAccess::GetMemValue(int handle, int offset)
+uint32_t MemoryAccess::GetMemValue(int handle, int offset) const
 {
 	uintptr_t addr = GetAddressOfEntity(handle);
 	if (addr == 0)
 	{
 		return 0;
 	}
-	return *(uint32_t*)(addr + offset);
+	return *reinterpret_cast<uint32_t*>(addr + offset);
 }
 
 uintptr_t MemoryAccess::FindPattern(const char *pattern, const char *mask)
 {
-	MODULEINFO modInfo = { 0 };
+	MODULEINFO modInfo = { nullptr };
 	GetModuleInformation(GetCurrentProcess(), GetModuleHandle(nullptr), &modInfo, sizeof(MODULEINFO));
 
 	const char *start_offset = reinterpret_cast<const char *>(modInfo.lpBaseOfDll);

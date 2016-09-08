@@ -52,7 +52,7 @@ public:
 	Vector3 getAccelerationVectors(Vector3 velocities);
 
 	// Should be called after getAccelerationVectors has been called in a loop
-	Vector3 getAccelerationVectorsAverage();
+	Vector3 getAccelerationVectorsAverage() const;
 
 private:
 	std::array <char *, 20> badModelNames = {

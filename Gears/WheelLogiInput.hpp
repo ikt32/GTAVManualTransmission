@@ -19,21 +19,21 @@ class WheelLogiInput
 public:
 	WheelLogiInput(int index);
 	~WheelLogiInput();
-	void DoWheelSteering(float steerVal);
+	void DoWheelSteering(float steerVal) const;
 	void PlayWheelEffects(
 		ScriptSettings *settings,
 		VehicleData *vehData,
-		Vehicle vehicle);
+		Vehicle vehicle) const;
 	void UpdateLogiValues();
 	bool InitWheel(ScriptSettings *settings, Logger *logger);
-	void PlayWheelVisuals(float rpm);
+	void PlayWheelVisuals(float rpm) const;
 	//bool IsActive = false;
-	int GetIndex();
-	float GetLogiWheelVal();
-	float GetLogiThrottleVal();
-	float GetLogiBrakeVal();
-	float GetLogiClutchVal();
-	bool IsActive(ScriptSettings *settings);
+	int GetIndex() const;
+	float GetLogiWheelVal() const;
+	float GetLogiThrottleVal() const;
+	float GetLogiBrakeVal() const;
+	float GetLogiClutchVal() const;
+	bool IsActive(ScriptSettings *settings) const;
 
 private:
 	int index_ = 0;
