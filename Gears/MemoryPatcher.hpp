@@ -1,13 +1,12 @@
 #pragma once
 #include "NativeMemory.hpp"
 
-namespace MemoryPatcher
-{
+namespace MemoryPatcher {
 	extern bool PatchInstructions();
 	//extern bool PatchJustS_LOW();
 	extern bool RestoreInstructions();
 	//extern bool RestoreJustS_LOW();
-	
+
 	// Clutch disengage @ Low Speed High Gear, low RPM
 	extern uintptr_t PatchClutchLow();
 	extern void RestoreClutchLow(uintptr_t address);
@@ -70,4 +69,3 @@ namespace MemoryPatcher
 	extern uintptr_t RevLimiterAddr;
 	extern uintptr_t RevLimiterTemp;
 };
-

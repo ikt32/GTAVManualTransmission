@@ -4,7 +4,7 @@
 
 #include "Logger.hpp"
 
-Logger::Logger(char *fileName) {
+Logger::Logger(char* fileName) {
 	file = fileName;
 }
 
@@ -14,14 +14,14 @@ void Logger::Clear() const {
 	logFile.close();
 }
 
-void Logger::Write(const std::string &text) const {
+void Logger::Write(const std::string& text) const {
 	std::ofstream logFile(file, std::ios_base::out | std::ios_base::app);
 	SYSTEMTIME currTimeLog;
 	GetLocalTime(&currTimeLog);
 	logFile << "[" <<
-		std::setw(2) << std::setfill('0') << currTimeLog.wHour << ":" <<
-		std::setw(2) << std::setfill('0') << currTimeLog.wMinute << ":" <<
-		std::setw(2) << std::setfill('0') << currTimeLog.wSecond << "." <<
-		std::setw(3) << std::setfill('0') << currTimeLog.wMilliseconds << "] " <<
-		text << std::endl;
+			std::setw(2) << std::setfill('0') << currTimeLog.wHour << ":" <<
+			std::setw(2) << std::setfill('0') << currTimeLog.wMinute << ":" <<
+			std::setw(2) << std::setfill('0') << currTimeLog.wSecond << "." <<
+			std::setw(3) << std::setfill('0') << currTimeLog.wMilliseconds << "] " <<
+			text << std::endl;
 }

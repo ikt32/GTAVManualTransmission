@@ -11,8 +11,7 @@
 #define SAMPLES 4
 
 
-class VehicleData
-{
+class VehicleData {
 public:
 	VehicleData();
 	void Clear();
@@ -55,7 +54,7 @@ public:
 	Vector3 getAccelerationVectorsAverage() const;
 
 private:
-	std::array <char *, 20> badModelNames = {
+	std::array<char *, 20> badModelNames = {
 		"BENSON",
 		"BIFF",
 		"HAULER",
@@ -77,9 +76,9 @@ private:
 		"SCRAP",
 		"UTILTRUC"
 	};
-	bool isBadTruck(char *name);
+	bool isBadTruck(char* name);
 
-	std::array <char *, 7> noClutchModelNames = {
+	std::array<char *, 7> noClutchModelNames = {
 		"SURGE",
 		"VOLTIC",
 		"KHAMEL",
@@ -88,13 +87,12 @@ private:
 		"RHINO",
 		"BULLDOZE"
 	};
-	bool noClutch(char *name);
+	bool noClutch(char* name);
 
 	Vector3 prevVelocities = {};
 	long long prevTime = 0;
-	Vector3 samples[SAMPLES] = { {} };
+	Vector3 samples[SAMPLES] = {{}};
 	int averageIndex = 0;
 	void zeroSamples();
 
 };
-

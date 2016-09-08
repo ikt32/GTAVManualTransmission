@@ -12,34 +12,32 @@ http://dev-c.com
 #include "Util.hpp"
 //#include "../../LogitechSteeringWheel_SDK/Include/LogitechSteeringWheelLib.h"
 
-BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved)
-{
+BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 	Logger logger(LOGFILE);
-	switch (reason)
-	{
-	case DLL_PROCESS_ATTACH:
-		scriptRegister(hInstance, ScriptMain);
-		logger.Clear();
-		logger.Write(eGameVersionToString(getGameVersion()));
-		logger.Write("Script loaded");
-		break;
-	case DLL_PROCESS_DETACH:
-		logger.Write("Init shutdown");
-		//if (LogiIsConnected(0)) {
+	switch (reason) {
+		case DLL_PROCESS_ATTACH:
+			scriptRegister(hInstance, ScriptMain);
+			logger.Clear();
+			logger.Write(eGameVersionToString(getGameVersion()));
+			logger.Write("Script loaded");
+			break;
+		case DLL_PROCESS_DETACH:
+			logger.Write("Init shutdown");
+			//if (LogiIsConnected(0)) {
 			//resetWheelFeedback(0);
-		//	LogiSteeringShutdown();
-		//}
-		bool successI = MemoryPatcher::RestoreInstructions();
+			//	LogiSteeringShutdown();
+			//}
+			bool successI = MemoryPatcher::RestoreInstructions();
 
-		if (successI) {
-			logger.Write("Shut down script successfully");
-		}
-		else {
-			if (!successI)
-				logger.Write("Shut down script with instructions not restored");
-		}
-		scriptUnregister(hInstance);
-		break;
+			if (successI) {
+				logger.Write("Shut down script successfully");
+			}
+			else {
+				if (!successI)
+					logger.Write("Shut down script with instructions not restored");
+			}
+			scriptUnregister(hInstance);
+			break;
 	}
 	return TRUE;
 }

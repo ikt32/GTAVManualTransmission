@@ -16,28 +16,23 @@ WheelLogiInput::WheelLogiInput(int index) {
 }
 
 
-WheelLogiInput::~WheelLogiInput()
-{
-}
+WheelLogiInput::~WheelLogiInput() {}
 
 ///////////////////////////////////////////////////////////////////////////////
 //                             Wheel functions
 ///////////////////////////////////////////////////////////////////////////////
-void WheelLogiInput::PlayWheelVisuals(float rpm) const
-{
+void WheelLogiInput::PlayWheelVisuals(float rpm) const {
 	LogiPlayLeds(index_, rpm, 0.5f, 0.95f);
 }
 
-int WheelLogiInput::GetIndex() const
-{
+int WheelLogiInput::GetIndex() const {
 	return index_;
 }
 
 void WheelLogiInput::PlayWheelEffects(
-	ScriptSettings *settings,
-	VehicleData *vehData,
-	Vehicle vehicle) const
-{
+	ScriptSettings* settings,
+	VehicleData* vehData,
+	Vehicle vehicle) const {
 	int damperforce;
 	if (settings->FFDamperStationary < settings->FFDamperMoving) {
 		settings->FFDamperMoving = settings->FFDamperStationary;
@@ -82,11 +77,10 @@ void WheelLogiInput::UpdateLogiValues() {
 	logiClutchVal = 1.0f + static_cast<float>(logiClutchPos - 32767) / 65535.0f;
 }
 
-void WheelLogiInput::DoWheelSteering(float steerVal) const
-{
+void WheelLogiInput::DoWheelSteering(float steerVal) const {
 	// Anti-deadzone
 	//float steerVal_ = logiSteeringWheelPos / (32768.0f);
-	
+
 	int additionalOffset = 2560;
 	float antiDeadzoned;
 	antiDeadzoned = logiSteeringWheelPos / 32768.0f;
@@ -103,7 +97,7 @@ void WheelLogiInput::DoWheelSteering(float steerVal) const
 	//VEHICLE::SET_VEHICLE_STEER_BIAS(vehicle, -steerVal_);
 }
 
-bool WheelLogiInput::InitWheel(ScriptSettings *settings, Logger *logger) {
+bool WheelLogiInput::InitWheel(ScriptSettings* settings, Logger* logger) {
 	if (settings->LogiWheel) {
 		LogiSteeringInitialize(true);
 		if (LogiIsConnected(index_)) {
@@ -124,24 +118,22 @@ bool WheelLogiInput::InitWheel(ScriptSettings *settings, Logger *logger) {
 	}
 }
 
-float WheelLogiInput::GetLogiWheelVal() const
-{
+float WheelLogiInput::GetLogiWheelVal() const {
 	return logiWheelVal;
 }
-float WheelLogiInput::GetLogiThrottleVal() const
-{
+
+float WheelLogiInput::GetLogiThrottleVal() const {
 	return logiThrottleVal;
 }
-float WheelLogiInput::GetLogiBrakeVal() const
-{
+
+float WheelLogiInput::GetLogiBrakeVal() const {
 	return logiBrakeVal;
 }
-float WheelLogiInput::GetLogiClutchVal() const
-{
+
+float WheelLogiInput::GetLogiClutchVal() const {
 	return logiClutchVal;
 }
 
-bool WheelLogiInput::IsActive(ScriptSettings *settings) const
-{
+bool WheelLogiInput::IsActive(ScriptSettings* settings) const {
 	return (settings->LogiWheel && LogiIsConnected(index_));
 }

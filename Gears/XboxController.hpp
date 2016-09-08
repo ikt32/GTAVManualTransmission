@@ -3,8 +3,7 @@
 #include <Xinput.h>
 #include <array>
 
-class XboxController
-{
+class XboxController {
 public:
 	enum XboxButtons {
 		DpadUp,

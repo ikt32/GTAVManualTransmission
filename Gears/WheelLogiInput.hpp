@@ -14,18 +14,17 @@
 #endif
 #include "..\..\LogitechSteeringWheel_SDK\Include\LogitechSteeringWheelLib.h"
 
-class WheelLogiInput
-{
+class WheelLogiInput {
 public:
 	WheelLogiInput(int index);
 	~WheelLogiInput();
 	void DoWheelSteering(float steerVal) const;
 	void PlayWheelEffects(
-		ScriptSettings *settings,
-		VehicleData *vehData,
+		ScriptSettings* settings,
+		VehicleData* vehData,
 		Vehicle vehicle) const;
 	void UpdateLogiValues();
-	bool InitWheel(ScriptSettings *settings, Logger *logger);
+	bool InitWheel(ScriptSettings* settings, Logger* logger);
 	void PlayWheelVisuals(float rpm) const;
 	//bool IsActive = false;
 	int GetIndex() const;
@@ -33,7 +32,7 @@ public:
 	float GetLogiThrottleVal() const;
 	float GetLogiBrakeVal() const;
 	float GetLogiClutchVal() const;
-	bool IsActive(ScriptSettings *settings) const;
+	bool IsActive(ScriptSettings* settings) const;
 
 private:
 	int index_ = 0;
@@ -47,4 +46,3 @@ private:
 	float logiClutchVal;
 	LogiControllerPropertiesData properties;
 };
-

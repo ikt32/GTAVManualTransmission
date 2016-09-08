@@ -3,8 +3,7 @@
 #include "..\..\ScriptHookV_SDK\inc\natives.h"
 #include <string>
 
-class ScriptControls
-{
+class ScriptControls {
 public:
 	enum class ControllerControlType {
 		ShiftUp,
@@ -38,7 +37,7 @@ public:
 		Engine,
 		SIZEOF_KeyboardControlType
 	};
-	
+
 	enum class LogiControlType {
 		HR = 0,
 		H1,
@@ -68,7 +67,7 @@ public:
 		IndicatorHazard,
 		SIZEOF_LogiControlType
 	};
-	
+
 
 public:
 	ScriptControls();

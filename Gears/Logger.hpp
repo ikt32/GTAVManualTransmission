@@ -6,10 +6,10 @@
 
 class Logger {
 public:
-	Logger(char *fileName);
+	Logger(char* fileName);
 	void Clear() const;
-	void Write(const std::string &text) const;
+	void Write(const std::string& text) const;
 
 private:
-	char *file;
+	char* file;
 };

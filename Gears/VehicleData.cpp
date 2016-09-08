@@ -32,7 +32,7 @@ void VehicleData::Clear() {
 	zeroSamples();
 }
 
-bool VehicleData::isBadTruck(char *name) {
+bool VehicleData::isBadTruck(char* name) {
 	for (int i = 0; i < badModelNames.size(); i++) {
 		if (strcmp(name, badModelNames[i]) == 0)
 			return true;
@@ -40,7 +40,7 @@ bool VehicleData::isBadTruck(char *name) {
 	return false;
 }
 
-bool VehicleData::noClutch(char *name) {
+bool VehicleData::noClutch(char* name) {
 	for (int i = 0; i < noClutchModelNames.size(); i++) {
 		if (strcmp(name, noClutchModelNames[i]) == 0)
 			return true;
@@ -73,21 +73,20 @@ Vector3 VehicleData::getAccelerationVectors(Vector3 velocities) {
 	long long time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 
 	Vector3 result;
-	result.x = (velocities.x - prevVelocities.x) / ((time - prevTime)/1e9f);
-	result.y = (velocities.y - prevVelocities.y) / ((time - prevTime)/1e9f);
-	result.z = (velocities.z - prevVelocities.z) / ((time - prevTime)/1e9f);
+	result.x = (velocities.x - prevVelocities.x) / ((time - prevTime) / 1e9f);
+	result.y = (velocities.y - prevVelocities.y) / ((time - prevTime) / 1e9f);
+	result.z = (velocities.z - prevVelocities.z) / ((time - prevTime) / 1e9f);
 
 	prevTime = time;
 	prevVelocities = velocities;
-	
+
 	samples[averageIndex] = result;
 	averageIndex = (averageIndex + 1) % (SAMPLES - 1);
 
 	return result;
 }
 
-Vector3 VehicleData::getAccelerationVectorsAverage() const
-{
+Vector3 VehicleData::getAccelerationVectorsAverage() const {
 	Vector3 result;
 	result.x = 0;
 	result.y = 0;
@@ -104,7 +103,6 @@ Vector3 VehicleData::getAccelerationVectorsAverage() const
 	result.z = result.z / SAMPLES;
 	return result;
 }
-
 
 
 void VehicleData::zeroSamples() {

@@ -2,12 +2,10 @@
 
 #include <Windows.h>
 
-ScriptControls::ScriptControls() {
-}
+ScriptControls::ScriptControls() {}
 
 
-ScriptControls::~ScriptControls() {
-}
+ScriptControls::~ScriptControls() {}
 
 
 bool ScriptControls::IsKeyPressed(int key) {

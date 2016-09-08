@@ -4,12 +4,11 @@
 
 #define SETTINGSFILE "./Gears.ini"
 
-class ScriptSettings
-{
+class ScriptSettings {
 public:
 	ScriptSettings();
 
-	void Read(ScriptControls *scriptControl);
+	void Read(ScriptControls* scriptControl);
 	void Save() const;
 
 	bool EnableManual;
@@ -46,4 +45,3 @@ public:
 private:
 	void CheckSettings();
 };
-

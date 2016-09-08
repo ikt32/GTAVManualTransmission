@@ -4,4 +4,3 @@
 
 #include "..\..\ScriptHookV_SDK\inc\types.h"
 #include "ScriptSettings.hpp"
-
