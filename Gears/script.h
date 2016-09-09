@@ -11,12 +11,6 @@ http://dev-c.com
 #endif
 //#include "..\..\LogitechSteeringWheel_SDK\Include\LogitechSteeringWheelLib.h"
 
-enum InputDevices {
-	Keyboard = 0,
-	Controller = 1,
-	Wheel = 2
-};
-
 void ScriptMain();
 
 void crossScriptComms();
@@ -27,7 +21,6 @@ void showDebugInfo();
 void reInit();
 void toggleManual();
 void reset();
-int getLastInputDevice(int previousInput);
 
 //void resetWheelFeedback(int index);
 void handlePedalsDefault(float logiThrottleVal, float logiBrakeVal);

@@ -14,11 +14,10 @@
 #include "Logger.hpp"
 #include "VehicleData.hpp"
 #include "MemoryPatcher.hpp"
-#include "XboxController.hpp"
 #include "WheelLogiInput.hpp"
 
 Logger logger(LOGFILE);
-ScriptControls controls;
+ScriptControls controls = ScriptControls();
 ScriptSettings settings;
 
 Player player;
@@ -29,15 +28,12 @@ VehicleData vehData;
 VehicleExtensions ext;
 Hash model;
 
-XboxController controller(1);
-WORD buttonState;
-
 //WheelLogiInput logiWheel(0);
 
 bool patched = false;
 bool simpleBike = false;
 int prevNotification = 0;
-int prevInput = 0;
+ScriptControls::InputDevices prevInput;
 
 float prevRpm;
 
@@ -100,19 +96,14 @@ void update() {
 	}
 	prevVehicle = vehicle;
 
+	//if (settings.LogiWheel) {
+	//	LogiUpdate();
+	//}
 
-	if (controller.IsConnected()) {
-		buttonState = controller.GetState().Gamepad.wButtons;
-		controller.UpdateButtonChangeStates();
-	}
+	controls.UpdateValues(prevInput);
 
-	if (settings.LogiWheel) {
-		LogiUpdate();
-	}
-
-	if (controls.IsKeyJustPressed(controls.Control[static_cast<int>(ScriptControls::KeyboardControlType::Toggle)], ScriptControls::KeyboardControlType::Toggle) ||
-		controller.WasButtonHeldForMs(controller.StringToButton(controls.ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Toggle)]), buttonState, controls.CToggleTime)) {
-		// ||	(LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Toggle]))) {
+	if (controls.ButtonPressed(ScriptControls::KeyboardControlType::Toggle) ||
+		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle)) {
 		toggleManual();
 	}
 
@@ -150,13 +141,13 @@ void update() {
 		logiState = LogiGetState(logiWheel.GetIndex());
 	}*/
 
-	if (prevInput != getLastInputDevice(prevInput)) {
-		prevInput = getLastInputDevice(prevInput);
+	if (prevInput != controls.GetLastInputDevice(prevInput)) {
+		prevInput = controls.GetLastInputDevice(prevInput);
 		switch (prevInput) {
-			case InputDevices::Keyboard:
+			case ScriptControls::Keyboard:
 				showNotification("Switched to keyboard/mouse");
 				break;
-			case InputDevices::Controller: // Controller
+			case ScriptControls::Controller: // Controller
 				if (settings.Hshifter) {
 					showNotification("Switched to controller\nSequential re-initiated");
 					settings.Hshifter = false;
@@ -174,26 +165,6 @@ void update() {
 				break;
 		}
 	}
-	switch (prevInput) {
-		case InputDevices::Keyboard:
-			controls.Rtvalf = (controls.IsKeyPressed(controls.Control[static_cast<int>(ScriptControls::KeyboardControlType::Throttle)]) ? 1.0f : 0.0f);
-			controls.Ltvalf = (controls.IsKeyPressed(controls.Control[static_cast<int>(ScriptControls::KeyboardControlType::Brake)]) ? 1.0f : 0.0f);
-			controls.Clutchvalf = (controls.IsKeyPressed(controls.Control[static_cast<int>(ScriptControls::KeyboardControlType::Clutch)]) ? 1.0f : 0.0f);
-			break;
-		case InputDevices::Controller: // Controller
-			controls.Rtvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Throttle)]), buttonState);
-			controls.Ltvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Brake)]), buttonState);
-			controls.Clutchvalf = controller.GetAnalogValue(controller.StringToButton(controls.ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Clutch)]), buttonState);
-			break;
-			//case InputDevices::Wheel: // Wheel
-			//	controls.Rtvalf = logiWheel.GetLogiThrottleVal();
-			//	controls.Ltvalf = logiWheel.GetLogiBrakeVal();
-			//	controls.Clutchvalf = 1 - logiWheel.GetLogiClutchVal();
-			//	break;
-	}
-
-	controls.Accelval = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
-	controls.Accelvalf = (controls.Accelval - 127) / 127.0f;
 
 	/*if (logiWheel.IsActive(&settings) && logiState != NULL && prevInput == InputDevices::Wheel) {
 		if (settings.FFEnable)
@@ -372,25 +343,6 @@ void showDebugInfo() {
 	}*/
 }
 
-// Limitations: Detects on pressing throttle on any of the 3 input methods
-int getLastInputDevice(int previousInput) {
-	if (controls.IsKeyJustPressed(controls.Control[static_cast<int>(ScriptControls::KeyboardControlType::Throttle)], ScriptControls::KeyboardControlType::Throttle) ||
-		controls.IsKeyPressed(controls.Control[static_cast<int>(ScriptControls::KeyboardControlType::Throttle)])) {
-		return InputDevices::Keyboard;
-	}
-	if (controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Throttle)]), buttonState) ||
-		controller.IsButtonPressed(controller.StringToButton(controls.ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Throttle)]), buttonState)) {
-		return InputDevices::Controller;
-	}
-	/*if (logiWheel.IsActive(&settings) &&
-		(logiWheel.GetLogiThrottleVal() > 0.1f ||
-			logiWheel.GetLogiBrakeVal() > 0.1f ||
-			logiWheel.GetLogiClutchVal() < 0.9f)) {
-		return InputDevices::Wheel;
-	}*/
-	return previousInput;
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 //                           Mod functions: Mod control
 ///////////////////////////////////////////////////////////////////////////////
@@ -439,7 +391,7 @@ void toggleManual() {
 
 void shiftTo(int gear, bool autoClutch) {
 	if (autoClutch) {
-		controls.Clutchvalf = 1.0f;
+		controls.ClutchVal = 1.0f;
 		ext.SetThrottle(vehicle, 0.0f);
 	}
 	vehData.LockGears = gear | (gear << 16);
@@ -453,7 +405,7 @@ void shiftTo(int gear, bool autoClutch) {
 
 void functionHShiftTo(int i) {
 	if (settings.ClutchShifting && !vehData.NoClutch) {
-		if (controls.Clutchvalf > 1.0f - settings.ClutchCatchpoint) {
+		if (controls.ClutchVal > 1.0f - settings.ClutchCatchpoint) {
 			shiftTo(i, false);
 			vehData.SimulatedNeutral = false;
 		}
@@ -527,10 +479,8 @@ void functionHShiftKeyboard() {
 
 void functionSShift() {
 	// Shift up
-	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)]), buttonState) ||
-		controls.IsKeyJustPressed(controls.Control[static_cast<int>(ScriptControls::KeyboardControlType::ShiftUp)], ScriptControls::KeyboardControlType::ShiftUp)) {
-		//|| (logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftUp]))) {
-
+	if (controls.ButtonPressed(ScriptControls::ControllerControlType::ShiftUp) ||
+		controls.ButtonPressed(ScriptControls::KeyboardControlType::ShiftUp)) {
 		if (vehData.NoClutch) {
 			if (vehData.CurrGear < vehData.TopGear) {
 				shiftTo(vehData.LockGear + 1, true);
@@ -558,10 +508,9 @@ void functionSShift() {
 	}
 
 	// Shift down
-	if (controller.IsButtonJustReleased(controller.StringToButton(controls.ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)]), buttonState) ||
-		controls.IsKeyJustPressed(controls.Control[static_cast<int>(ScriptControls::KeyboardControlType::ShiftDown)], ScriptControls::KeyboardControlType::ShiftDown)) {
-		// || (logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ShiftDown]))) {
-
+	
+	if (controls.ButtonPressed(ScriptControls::ControllerControlType::ShiftDown) ||
+		controls.ButtonPressed(ScriptControls::KeyboardControlType::ShiftDown)) {
 		if (vehData.NoClutch) {
 			if (vehData.CurrGear > 0) {
 				shiftTo(vehData.LockGear - 1, true);
@@ -595,17 +544,17 @@ void functionSShift() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void functionClutchCatch() {
-	if (controls.Clutchvalf < 1.0f - settings.ClutchCatchpoint) {
+	if (controls.ClutchVal < 1.0f - settings.ClutchCatchpoint) {
 		// Forward
 		if (vehData.CurrGear > 0 && vehData.Velocity < vehData.CurrGear * 2.2f &&
-			controls.Rtvalf < 0.25f && controls.Ltvalf < 0.95) {
+			controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.37f);
 		}
 	}
 }
 
 void functionEngStall() {
-	if (controls.Clutchvalf < 1.0f - settings.StallingThreshold && vehData.Rpm < 0.25f &&
+	if (controls.ClutchVal < 1.0f - settings.StallingThreshold && vehData.Rpm < 0.25f &&
 		((vehData.Speed < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && vehData.Speed < 1.0f))) {
 		if (VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle)) {
 			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
@@ -614,7 +563,7 @@ void functionEngStall() {
 }
 
 void functionEngDamage() {
-	if (vehData.Rpm > 0.98f && controls.Accelvalf > 0.99f) {
+	if (vehData.Rpm > 0.98f && controls.AccelValGTAf > 0.99f) {
 		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (settings.RPMDamage));
 	}
 }
@@ -631,8 +580,8 @@ void functionEngBrake() {
 	// Braking
 	if (vehData.CurrGear > 0 &&
 		vehData.Velocity > vehData.LockSpeeds[vehData.CurrGear] &&
-		controls.Rtvalf < 0.1 && vehData.Rpm > 0.80) {
-		float brakeForce = -0.1f * (1.0f - controls.Clutchvalf) * vehData.Rpm;
+		controls.ThrottleVal < 0.1 && vehData.Rpm > 0.80) {
+		float brakeForce = -0.1f * (1.0f - controls.ClutchVal) * vehData.Rpm;
 		ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, brakeForce, 0.0f, true, true, true, true);
 	}
 }
@@ -651,7 +600,7 @@ void fakeRev() {
 	rpmVal =
 			vehData.Rpm + // Base value
 			rpmValTemp + // Keep it constant
-			controls.Accelvalf * accelRatio; // Addition value, depends on delta T
+			controls.AccelValGTAf * accelRatio; // Addition value, depends on delta T
 
 	ext.SetCurrentRPM(vehicle, rpmVal);
 }
@@ -686,12 +635,12 @@ void handleRPM() {
 	*/
 	if (vehData.CurrGear > 1) {
 		// When pressing clutch and throttle, handle clutch and RPM
-		if (controls.Clutchvalf > 0.4f && controls.Accelvalf > 0.05f &&
+		if (controls.ClutchVal > 0.4f && controls.AccelValGTAf > 0.05f &&
 			!vehData.SimulatedNeutral) {
 			fakeRev();
-			ext.SetThrottle(vehicle, controls.Accelvalf);
-			float tempVal = (1.0f - controls.Clutchvalf) * 0.4f + 0.6f;
-			if (controls.Clutchvalf > 0.95) {
+			ext.SetThrottle(vehicle, controls.AccelValGTAf);
+			float tempVal = (1.0f - controls.ClutchVal) * 0.4f + 0.6f;
+			if (controls.ClutchVal > 0.95) {
 				tempVal = -0.5f;
 			}
 			finalClutch = tempVal;
@@ -705,7 +654,7 @@ void handleRPM() {
 	}
 
 	// Set the clutch depending on neutral status
-	if (vehData.SimulatedNeutral || controls.Clutchvalf > 0.95) {
+	if (vehData.SimulatedNeutral || controls.ClutchVal > 0.95) {
 		/*
 			To prevent a the clutch not being registered as fully pressed
 			by the game. Negative values seem to work, but this amount
@@ -719,7 +668,7 @@ void handleRPM() {
 	}
 	else {
 		if (!skip) {
-			finalClutch = 1.0f - controls.Clutchvalf;
+			finalClutch = 1.0f - controls.ClutchVal;
 		}
 	}
 	prevRpm = vehData.Rpm;
@@ -736,7 +685,7 @@ void functionTruckLimiting() {
 	// Limit
 	if ((vehData.Velocity > vehData.LockSpeed && vehData.LockTruck) ||
 		(vehData.Velocity > vehData.LockSpeed && vehData.PrevGear > vehData.CurrGear)) {
-		controls.Clutchvalf = 1.0f;
+		controls.ClutchVal = 1.0f;
 		truckShiftUp = true;
 	}
 	else {
@@ -752,7 +701,7 @@ void functionRealReverse() {
 	// Desired: Only brake
 	if (vehData.CurrGear > 0) {
 		// LT behavior when still: Just brake
-		if (controls.Ltvalf > 0.02f && controls.Rtvalf < controls.Ltvalf &&
+		if (controls.BrakeVal > 0.02f && controls.ThrottleVal < controls.BrakeVal &&
 			vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			ext.SetThrottleP(vehicle, 0.0f);
@@ -763,19 +712,19 @@ void functionRealReverse() {
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
 		// LT behavior when rolling back: Brake
-		if (controls.Ltvalf > 0.02f && controls.Rtvalf < controls.Ltvalf &&
+		if (controls.BrakeVal > 0.02f && controls.ThrottleVal < controls.BrakeVal &&
 			vehData.Velocity < -0.1f) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.Ltvalf);
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.BrakeVal);
 			ext.SetThrottle(vehicle, 0.0f);
 			ext.SetThrottleP(vehicle, 0.1f);
 		}
 		// RT behavior when rolling back: Burnout
 		if (vehData.CurrGear == 1 &&
-			controls.Rtvalf > 0.5f && vehData.Velocity < -1.0f) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, controls.Rtvalf);
-			if (controls.Ltvalf < 0.1f) {
+			controls.ThrottleVal > 0.5f && vehData.Velocity < -1.0f) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, controls.ThrottleVal);
+			if (controls.BrakeVal < 0.1f) {
 				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
 			}
 		}
@@ -785,12 +734,12 @@ void functionRealReverse() {
 	if (vehData.CurrGear == 0) {
 		ext.SetThrottleP(vehicle, -0.1f);
 		// RT behavior
-		if (controls.Rtvalf > 0.02f && controls.Rtvalf > controls.Ltvalf) {
+		if (controls.ThrottleVal > 0.02f && controls.ThrottleVal > controls.BrakeVal) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, controls.Rtvalf);
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, controls.ThrottleVal);
 		}
 		// LT behavior when still
-		if (controls.Ltvalf > 0.0f && controls.Rtvalf <= controls.Ltvalf &&
+		if (controls.BrakeVal > 0.0f && controls.ThrottleVal <= controls.BrakeVal &&
 			vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
@@ -800,10 +749,10 @@ void functionRealReverse() {
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
 		// LT behavior when reversing
-		if (controls.Ltvalf > 0.02f &&
+		if (controls.BrakeVal > 0.02f &&
 			vehData.Velocity <= -0.5f) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.Ltvalf);
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.BrakeVal);
 		}
 	}
 }
@@ -867,13 +816,13 @@ void handlePedalsDefault(float logiThrottleVal, float logiBrakeVal) {
 void functionSimpleReverse() {
 	// Prevent going forward in gear 0.
 	if (vehData.CurrGear == 0 && vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f
-		&& controls.Rtvalf > 0) {
+		&& controls.ThrottleVal > 0) {
 		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
 	}
 	// Prevent reversing in gear >= 1.
 	if (vehData.CurrGear > 0 && vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f
-		&& controls.Ltvalf > 0) {
+		&& controls.BrakeVal > 0) {
 		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 	}
@@ -901,10 +850,11 @@ void functionAutoReverse() {
 ///////////////////////////////////////////////////////////////////////////////
 void handleVehicleButtons() {
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
-	(controller.IsButtonJustPressed(controller.StringToButton(controls.ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Engine)]), buttonState) ||
-		controls.IsKeyJustPressed(controls.Control[static_cast<int>(ScriptControls::KeyboardControlType::Engine)], ScriptControls::KeyboardControlType::Engine))) {
-		// ||			(logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Engine])) ||
-		//	controls.Rtvalf > 0.9f)) {
+		controls.ButtonPressed(ScriptControls::ControllerControlType::Engine) ||
+		controls.ButtonPressed(ScriptControls::KeyboardControlType::Engine)) {
+
+			// ||			(logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Engine])) ||
+		//	controls.ThrottleVal > 0.9f)) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 

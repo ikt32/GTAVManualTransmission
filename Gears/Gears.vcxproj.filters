@@ -1,23 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="NativeMemory.cpp" />
     <ClCompile Include="script.cpp" />
-    <ClCompile Include="VehicleExtensions.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Logger.cpp" />
-    <ClCompile Include="ScriptControls.cpp" />
     <ClCompile Include="ScriptSettings.cpp" />
     <ClCompile Include="VehicleData.cpp" />
-    <ClCompile Include="MemoryPatcher.cpp" />
-    <ClCompile Include="XboxController.cpp" />
-    <ClCompile Include="WheelLogiInput.cpp" />
-    <ClCompile Include="WheelDirectInput.cpp" />
+    <ClCompile Include="VehicleExtensions.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="NativeMemory.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryPatcher.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptControls.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="WheelDirectInput.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="WheelLogiInput.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="XboxController.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="NativeMemory.hpp" />
     <ClInclude Include="script.h" />
-    <ClInclude Include="VehicleExtensions.hpp" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\main.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -30,20 +44,51 @@
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="Logger.hpp" />
-    <ClInclude Include="MemoryPatcher.hpp" />
-    <ClInclude Include="ScriptControls.hpp" />
     <ClInclude Include="ScriptSettings.hpp" />
-    <ClInclude Include="TimeHelper.hpp" />
     <ClInclude Include="VehicleData.hpp" />
-    <ClInclude Include="XboxController.hpp" />
-    <ClInclude Include="WheelLogiInput.hpp" />
-    <ClInclude Include="Util.hpp" />
-    <ClInclude Include="WheelDirectInput.hpp" />
+    <ClInclude Include="VehicleExtensions.hpp">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="NativeMemory.hpp">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryPatcher.hpp">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Util.hpp">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.hpp">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptControls.hpp">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="WheelDirectInput.hpp">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="WheelLogiInput.hpp">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="XboxController.hpp">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeHelper.hpp">
+      <Filter>Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
       <UniqueIdentifier>{01012e73-37b7-4874-b66a-9390e9a83264}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{09af856a-dd6f-4abb-aa1d-57e413924122}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{6656e964-569c-448b-ac00-d586f48acb8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{b0a5ce99-5818-4a5c-8c45-00ae3b8148c4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

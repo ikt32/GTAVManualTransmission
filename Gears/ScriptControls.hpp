@@ -1,7 +1,6 @@
 #pragma once
 
-#include "..\..\ScriptHookV_SDK\inc\natives.h"
-#include <string>
+#include "XboxController.hpp"
 
 class ScriptControls {
 public:
@@ -46,7 +45,7 @@ public:
 		H4,
 		H5,
 		H6,
-		N,
+		HN,
 		ShiftUp,
 		ShiftDown,
 		Clutch,
@@ -68,12 +67,24 @@ public:
 		SIZEOF_LogiControlType
 	};
 
+	enum InputDevices {
+		Keyboard = 0,
+		Controller = 1,
+		Wheel = 2
+	};
 
 public:
 	ScriptControls();
 	~ScriptControls();
+
+	InputDevices GetLastInputDevice(InputDevices previous);
+	void UpdateValues(InputDevices prevInput);
+
 	static bool IsKeyPressed(int key);
 	bool IsKeyJustPressed(int key, KeyboardControlType control);
+
+
+
 
 	int Control[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	int LogiControl[static_cast<int>(LogiControlType::SIZEOF_LogiControlType)] = {};
@@ -82,16 +93,39 @@ public:
 	bool ControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	bool ControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 
-	float Ltvalf = 0.0f;
-	float Rtvalf = 0.0f;
-	// 1 = Pressed, 0 = Not pressed
-	float Clutchvalf = 0.0f;
-	int Accelval = 0;
-	float Accelvalf = 0.0f;
 
+
+	float BrakeVal = 0.0f;
+	float ThrottleVal = 0.0f;
+	// 1 = Pressed, 0 = Not pressed
+	float ClutchVal = 0.0f;
+
+	// Perceived accelerator value
+	int AccelValGTA = 0;
+
+	// Perceived accelerator value, float
+	float AccelValGTAf = 0.0f;
+
+	// Array gets filled by ScriptSettings
 	std::string ControlXbox[static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)] = {};
+
+
+
+	// Ddd more when desired
+
+	bool ButtonPressed(ControllerControlType control);
+
+	bool ButtonPressed(KeyboardControlType control);
+
+	bool ButtonHeld(ControllerControlType control);
+
 
 private:
 	long long pressTime = 0;
 	long long releaseTime = 0;
+	//InputDevices prevInput;
+	
+	XboxController controller;
+	WORD buttonState;
+
 };
