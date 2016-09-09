@@ -4,8 +4,7 @@
 #include "../../ScriptHookV_SDK/inc/natives.h"
 #include "../../ScriptHookV_SDK/inc/enums.h"
 
-ScriptControls::ScriptControls(): controller(1) {}
-
+ScriptControls::ScriptControls(): controller(1), buttonState(0) {}
 
 ScriptControls::~ScriptControls() {}
 
@@ -28,10 +27,10 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 			break;
 		default: break;
 			//case InputDevices::Wheel: // Wheel
-		//	ThrottleVal = logiWheel.GetLogiThrottleVal();
-		//	BrakeVal = logiWheel.GetLogiBrakeVal();
-		//	ClutchVal = 1 - logiWheel.GetLogiClutchVal();
-		//	break;
+			//	ThrottleVal = logiWheel.GetLogiThrottleVal();
+			//	BrakeVal = logiWheel.GetLogiBrakeVal();
+			//	ClutchVal = 1 - logiWheel.GetLogiClutchVal();
+			//	break;
 	}
 
 	AccelValGTA = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);

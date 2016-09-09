@@ -84,15 +84,12 @@ public:
 	bool IsKeyJustPressed(int key, KeyboardControlType control);
 
 
-
-
 	int Control[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	int LogiControl[static_cast<int>(LogiControlType::SIZEOF_LogiControlType)] = {};
 
 	int CToggleTime = 0;
 	bool ControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	bool ControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
-
 
 
 	float BrakeVal = 0.0f;
@@ -110,7 +107,6 @@ public:
 	std::string ControlXbox[static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)] = {};
 
 
-
 	// Ddd more when desired
 
 	bool ButtonPressed(ControllerControlType control);
@@ -124,7 +120,7 @@ private:
 	long long pressTime = 0;
 	long long releaseTime = 0;
 	//InputDevices prevInput;
-	
+
 	XboxController controller;
 	WORD buttonState;
 

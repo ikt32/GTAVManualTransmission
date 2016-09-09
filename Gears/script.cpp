@@ -508,7 +508,7 @@ void functionSShift() {
 	}
 
 	// Shift down
-	
+
 	if (controls.ButtonPressed(ScriptControls::ControllerControlType::ShiftDown) ||
 		controls.ButtonPressed(ScriptControls::KeyboardControlType::ShiftDown)) {
 		if (vehData.NoClutch) {
@@ -853,7 +853,7 @@ void handleVehicleButtons() {
 		controls.ButtonPressed(ScriptControls::ControllerControlType::Engine) ||
 		controls.ButtonPressed(ScriptControls::KeyboardControlType::Engine)) {
 
-			// ||			(logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Engine])) ||
+		// ||			(logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Engine])) ||
 		//	controls.ThrottleVal > 0.9f)) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
