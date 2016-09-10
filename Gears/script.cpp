@@ -3,7 +3,6 @@
 #include <iomanip>
 
 #include "../../ScriptHookV_SDK/inc/natives.h"
-#include "../../ScriptHookV_SDK/inc/types.h"
 #include "../../ScriptHookV_SDK/inc/enums.h"
 #include "../../ScriptHookV_SDK/inc/main.h"
 
@@ -125,7 +124,7 @@ void update() {
 	handleVehicleButtons();
 	doWheelSteering();
 
-	controls.PlayWheelEffects(
+	playWheelEffects(
 		vehData.Speed,
 		vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
 		vehData.getAccelerationVectorsAverage(),
@@ -975,4 +974,93 @@ void doWheelSteering() {
 		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
 		//VEHICLE::SET_VEHICLE_STEER_BIAS(vehicle, -steerVal_);
 	}
+}
+
+void playWheelEffects(
+	float speed,
+	Vector3 accelVals,
+	Vector3 accelValsAvg,
+	ScriptSettings* settings,
+	bool airborne) {
+
+	if (settings == nullptr) {
+		return;
+	}
+
+	/*if (settings->FFDamperStationary < settings->FFDamperMoving) {
+	settings->FFDamperMoving = settings->FFDamperStationary;
+	}
+	if (settings->FFDamperMoving < 1) {
+	settings->FFDamperMoving = 1;
+	}
+	float ratio = (float)(settings->FFDamperStationary - settings->FFDamperMoving) / settings->FFDamperMoving;
+	int damperforce = settings->FFDamperStationary - (int)(8 * ratio * ratio * speed*speed);
+	if (damperforce < settings->FFDamperMoving) {
+	damperforce = settings->FFDamperMoving + (int)(speed * ratio);
+	}
+	damperforce -= (int)(ratio * accelValsAvg.y);
+	if (damperforce > settings->FFDamperStationary) {
+	damperforce = settings->FFDamperStationary;
+	}
+	*/
+
+
+	//loggeriPlayDamperForce(loggeriWheel.GetIndex(), damperforce);
+
+	int constantForce = 100 * static_cast<int>(-settings->FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
+
+	
+	HRESULT hr = controls.Wheelptr->SetForce(constantForce);
+	switch (hr) {
+	case DI_DOWNLOADSKIPPED:
+		logger.Write("SetForce DI_DOWNLOADSKIPPED");
+		break;
+	case DI_EFFECTRESTARTED:
+		logger.Write("SetForce DI_EFFECTRESTARTED");
+		break;
+	case DI_OK:
+		logger.Write("SetForce DI_OK");
+		break;
+	case DI_TRUNCATED:
+		logger.Write("SetForce DI_TRUNCATED");
+		break;
+	case DI_TRUNCATEDANDRESTARTED:
+		logger.Write("SetForce DI_TRUNCATEDANDRESTARTED");
+		break;
+	case DIERR_NOTINITIALIZED:
+		logger.Write("SetForce DIERR_NOTINITIALIZED");
+		break;
+	case DIERR_INCOMPLETEEFFECT:
+		logger.Write("SetForce DIERR_INCOMPLETEEFFECT");
+		break;
+	case DIERR_INPUTLOST:
+		logger.Write("SetForce DIERR_INPUTLOST");
+		break;
+	case DIERR_INVALIDPARAM:
+		logger.Write("SetForce DIERR_INVALIDPARAM");
+		break;
+	case DIERR_EFFECTPLAYING:
+		logger.Write("SetForce DIERR_EFFECTPLAYING");
+		break;
+	}
+
+	//loggeriPlayConstantForce(loggeriWheel.GetIndex(), constantForce);
+
+	/*int centerForcePercentage = (int)(settings->FFCenterSpring * accelValsAvg.y);
+	if (centerForcePercentage < 0) {
+	centerForcePercentage = 0;
+	}
+
+	loggeriPlaySpringForce(
+	loggeriWheel.GetIndex(),
+	0,
+	(int)(settings->FFCenterSpring*speed + centerForcePercentage),
+	(int)(settings->FFCenterSpring*speed + centerForcePercentage));
+
+	if (!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f) {
+	loggeriPlayCarAirborne(loggeriWheel.GetIndex());
+	}
+	else if (loggeriIsPlaying(loggeriWheel.GetIndex(), loggerI_FORCE_CAR_AIRBORNE)) {
+	loggeriStopCarAirborne(loggeriWheel.GetIndex());
+	}*/
 }

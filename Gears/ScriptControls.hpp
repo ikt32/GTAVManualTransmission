@@ -2,11 +2,6 @@
 
 #include "XboxController.hpp"
 #include "WheelDirectInput.hpp"
-#include "Logger.hpp"
-#include "ScriptSettings.hpp"
-
-class ScriptSettings;
-class WheelInput;
 
 class ScriptControls {
 public:
@@ -116,13 +111,9 @@ public:
 	bool ButtonIn(WheelControlType control);
 	bool ButtonIn(ControllerControlType control);
 
-	void PlayWheelEffects(float speed,
-		Vector3 accelVals,
-		Vector3 accelValsAvg,
-		ScriptSettings* settings,
-		bool airborne);
-
+	WheelInput* Wheelptr;
 	const DIJOYSTATE2* wheelState;
+
 private:
 	long long pressTime = 0;
 	long long releaseTime = 0;
@@ -131,7 +122,6 @@ private:
 	XboxController* controller;
 	WORD buttonState;
 
-	WheelInput* wheel;
 
 	static bool IsKeyPressed(int key);
 	bool IsKeyJustPressed(int key, KeyboardControlType control);

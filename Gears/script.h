@@ -6,11 +6,13 @@ http://dev-c.com
 
 #pragma once
 
+#include "../../ScriptHookV_SDK/inc/types.h"
+
 #ifndef DIRECTINPUT_VERSION
 #define DIRECTINPUT_VERSION 0x0800
 #endif
-//#include "..\..\LogitechSteeringWheel_SDK\Include\LogitechSteeringWheelLib.h"
 
+class ScriptSettings;
 void ScriptMain();
 
 void crossScriptComms();
@@ -25,11 +27,15 @@ void reset();
 void updateLastInputDevice();
 
 
-//void resetWheelFeedback(int index);
 void handlePedalsDefault(float logiThrottleVal, float logiBrakeVal);
 void handlePedalsRealReverse(float logiThrottleVal, float logiBrakeVal);
 void handleVehicleButtons();
-//void playWheelEffects();
+void playWheelEffects(
+	float speed,
+	Vector3 accelVals,
+	Vector3 accelValsAvg,
+	ScriptSettings* settings,
+	bool airborne);
 void doWheelSteering();
 
 void functionAutoReverse();

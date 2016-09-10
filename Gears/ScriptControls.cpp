@@ -5,7 +5,7 @@
 #include "../../ScriptHookV_SDK/inc/enums.h"
 
 ScriptControls::ScriptControls(): wheelState(nullptr), buttonState(0) {
-	wheel = new WheelInput();
+	Wheelptr = new WheelInput();
 	controller = new XboxController(1);
 }
 
@@ -17,9 +17,9 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 		controller->UpdateButtonChangeStates();
 	}
 
-	if (wheel->IsConnected()) {
-		wheelState = wheel->GetState();
-		wheel->UpdateButtonChangeStates();
+	if (Wheelptr->IsConnected()) {
+		wheelState = Wheelptr->GetState();
+		Wheelptr->UpdateButtonChangeStates();
 		SteerVal = wheelState->lX;
 	}
 	
@@ -56,7 +56,7 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
 		controller->IsButtonPressed(controller->StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState)) {
 		return Controller;
 	}
-	if (wheel->IsConnected() &&
+	if (Wheelptr->IsConnected() &&
 		wheelState != nullptr &&
 		1.0f - static_cast<float>(wheelState->lY) / 65535.0f > 0.5f) {
 		return Wheel;
@@ -128,49 +128,36 @@ bool ScriptControls::ButtonIn(ControllerControlType control) {
 	return false;
 }
 
-void ScriptControls::PlayWheelEffects(float speed,
-	Vector3 accelVals,
-	Vector3 accelValsAvg,
-	ScriptSettings* settings,
-	bool airborne) {
-	wheel->PlayWheelEffects(
-		speed,
-		accelVals,
-		accelValsAvg,
-		settings,
-		airborne );
-}
-
 /*
  * Wheel section
  */
 
 bool ScriptControls::ButtonReleased(WheelControlType control) {
-	if (!wheel->IsConnected() ||
+	if (!Wheelptr->IsConnected() ||
 		WheelControl[static_cast<int>(control)] == -1) {
 		return false;
 	}
-	if (wheel->IsButtonJustReleased(WheelControl[static_cast<int>(control)]))
+	if (Wheelptr->IsButtonJustReleased(WheelControl[static_cast<int>(control)]))
 		return true;
 	return false;
 }
 
 bool ScriptControls::ButtonJustPressed(WheelControlType control) {
-	if (!wheel->IsConnected() ||
+	if (!Wheelptr->IsConnected() ||
 		WheelControl[static_cast<int>(control)] == -1) {
 		return false;
 	}
-	if (wheel->IsButtonJustPressed(WheelControl[static_cast<int>(control)]))
+	if (Wheelptr->IsButtonJustPressed(WheelControl[static_cast<int>(control)]))
 		return true;
 	return false;
 }
 
 bool ScriptControls::ButtonIn(WheelControlType control) {
-	if (!wheel->IsConnected() ||
+	if (!Wheelptr->IsConnected() ||
 		WheelControl[static_cast<int>(control)] == -1) {
 		return false;
 	}
-	if (wheel->IsButtonPressed(WheelControl[static_cast<int>(control)]))
+	if (Wheelptr->IsButtonPressed(WheelControl[static_cast<int>(control)]))
 		return true;
 	return false;
 }
