@@ -85,7 +85,7 @@ public:
 	int KBControl[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	int WheelControl[static_cast<int>(WheelControlType::SIZEOF_WheelControlType)] = {};
 
-	int CToggleTime = 0;
+	int CToggleTime = 1000;
 	bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 
@@ -114,8 +114,6 @@ public:
 	bool ButtonReleased(WheelControlType control);
 
 	bool ButtonHeld(ControllerControlType control);
-
-
 private:
 	long long pressTime = 0;
 	long long releaseTime = 0;

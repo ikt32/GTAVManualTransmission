@@ -99,7 +99,8 @@ void update() {
 	controls.UpdateValues(prevInput);
 
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
-		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle)) {
+		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
+		controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle)) {
 		toggleManual();
 	}
 
@@ -350,7 +351,8 @@ void showDebugInfo() {
 	showText(0.85, 0.04, 0.4, throttleDisplay.str().c_str());
 	showText(0.85, 0.10, 0.4, brakeDisplay.str().c_str());
 	showText(0.85, 0.16, 0.4, clutchDisplay.str().c_str());
-	showText(0.85, 0.20, 0.4, steerDisplay.str().c_str());
+	showText(0.85, 0.22, 0.4, steerDisplay.str().c_str());
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -458,7 +460,7 @@ void functionHShiftWheel() {
 		clamp = vehData.TopGear;
 	}
 	for (uint8_t i = 0; i <= clamp; i++) {
-		if (controls.ButtonJustPressed(static_cast<ScriptControls::ControllerControlType>(i))) {
+		if (controls.ButtonJustPressed(static_cast<ScriptControls::WheelControlType>(i))) {
 			functionHShiftTo(i);
 		}
 	}
@@ -485,34 +487,14 @@ void functionHShiftWheel() {
 		shiftTo(1, true);
 		vehData.SimulatedNeutral = !vehData.NoClutch;
 	}
-
-	/*if (controls.ButtonReleased(controls.WheelControl[(int)ScriptControls::WheelControlType::H1]) ||
-		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h2]) ||
-		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h3]) ||
-		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h4]) ||
-		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h5]) ||
-		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h6])) {
-		if (settings.clutchshifting && settings.engdamage && !vehdata.noclutch) {
-			if (controls.clutchvalf < 1.0-settings.clutchcatchpoint) {
-				vehicle::set_vehicle_engine_health(
-					vehicle,
-					vehicle::get_vehicle_engine_health(vehicle) - settings.misshiftdamage/10);
-			}
-		}
-		vehdata.simulatedneutral = !vehdata.noclutch;
-	}
-	
-	if (logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::hr])) {
-		shiftto(1, true);
-		vehdata.simulatedneutral = !vehdata.noclutch;
-	}*/
 }
 
 
 void functionSShift() {
 	// Shift up
 	if (controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftUp) ||
-		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftUp)) {
+		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftUp) ||
+		controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftUp)) {
 		if (vehData.NoClutch) {
 			if (vehData.CurrGear < vehData.TopGear) {
 				shiftTo(vehData.LockGear + 1, true);
@@ -542,7 +524,8 @@ void functionSShift() {
 	// Shift down
 
 	if (controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftDown) ||
-		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftDown)) {
+		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftDown) ||
+		controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftDown)) {
 		if (vehData.NoClutch) {
 			if (vehData.CurrGear > 0) {
 				shiftTo(vehData.LockGear - 1, true);

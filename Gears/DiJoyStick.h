@@ -1,10 +1,14 @@
+/*
+* Massive thanks to t-mat on GitHub for having a simple C++ DInput
+* application! https://gist.github.com/t-mat/1391291
+*/
+
 #pragma once
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
-// I honestly don't know.
 class DiJoyStick {
 public:
 	struct Entry {
