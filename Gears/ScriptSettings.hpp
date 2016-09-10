@@ -4,6 +4,8 @@
 
 #define SETTINGSFILE "./Gears.ini"
 
+class ScriptControls;
+
 class ScriptSettings {
 public:
 	ScriptSettings();
@@ -42,6 +44,8 @@ public:
 	float StallingThreshold;
 	float RPMDamage;
 	int MisshiftDamage;
+	bool WheelWithoutManual;
+
 private:
 	void CheckSettings();
 };

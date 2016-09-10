@@ -4,7 +4,7 @@
 #include "../../ScriptHookV_SDK/inc/natives.h"
 #include "../../ScriptHookV_SDK/inc/enums.h"
 
-ScriptControls::ScriptControls(): buttonState(0), wheelState(nullptr) {
+ScriptControls::ScriptControls(): wheelState(nullptr), buttonState(0) {
 	wheel = new WheelInput();
 	controller = new XboxController(1);
 }
@@ -46,6 +46,28 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 	AccelValGTAf = (AccelValGTA - 127) / 127.0f;
 }
 
+// Limitation: Only works for hardcoded input types. Currently throttle.
+ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices previousInput) {
+	if (IsKeyJustPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)], KeyboardControlType::Throttle) ||
+		IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)])) {
+		return Keyboard;
+	}
+	if (controller->IsButtonJustPressed(controller->StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState) ||
+		controller->IsButtonPressed(controller->StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState)) {
+		return Controller;
+	}
+	if (wheel->IsConnected() &&
+		wheelState != nullptr &&
+		1.0f - static_cast<float>(wheelState->lY) / 65535.0f > 0.5f) {
+		return Wheel;
+	}
+	return previousInput;
+}
+
+/*
+ * Keyboard section
+ */
+
 bool ScriptControls::IsKeyPressed(int key) {
 	if (GetAsyncKeyState(key) & 0x8000)
 		return true;
@@ -65,63 +87,90 @@ bool ScriptControls::IsKeyJustPressed(int key, KeyboardControlType control) {
 	return false;
 }
 
-// Limitation: Only works for hardcoded input types. Currently throttle.
-ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices previousInput) {
-	if (IsKeyJustPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)], KeyboardControlType::Throttle) ||
-		IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)])) {
-		return Keyboard;
-	}
-	if (controller->IsButtonJustPressed(controller->StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState) ||
-		controller->IsButtonPressed(controller->StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState)) {
-		return Controller;
-	}
-	if (wheel->IsConnected() &&
-		wheelState != nullptr &&
-		1.0f - static_cast<float>(wheelState->lY) / 65535.0f > 0.5f) {
-		return Wheel;
-	}
-	return previousInput;
+bool ScriptControls::ButtonJustPressed(KeyboardControlType control) {
+	if (IsKeyJustPressed(KBControl[static_cast<int>(control)], control))
+		return true;
+	return false;
 }
 
+/*
+* Controller section
+*/
 
 bool ScriptControls::ButtonJustPressed(ControllerControlType control) {
-	if (controller->IsButtonJustPressed(controller->StringToButton(ControlXbox[static_cast<int>(control)]), buttonState)) {
+	if (!controller->IsConnected())
+		return false;
+	if (controller->IsButtonJustPressed(controller->StringToButton(ControlXbox[static_cast<int>(control)]), buttonState))
 		return true;
-	}
 	return false;
 }
-
-bool ScriptControls::ButtonJustPressed(KeyboardControlType control) {
-	if (IsKeyJustPressed(KBControl[static_cast<int>(control)], control)) {
-		return true;
-	}
-	return false;
-}
-
-bool ScriptControls::ButtonJustPressed(WheelControlType control) {
-	if (wheel->IsButtonJustPressed(WheelControl[static_cast<int>(control)])) {
-		return true;
-	}
-	return false;
-}
-
 bool ScriptControls::ButtonReleased(ControllerControlType control) {
-	if (controller->IsButtonJustReleased(controller->StringToButton(ControlXbox[static_cast<int>(control)]), buttonState)) {
+	if (!controller->IsConnected())
+		return false;
+	if (controller->IsButtonJustReleased(controller->StringToButton(ControlXbox[static_cast<int>(control)]), buttonState))
 		return true;
-	}
-	return false;
-}
-
-bool ScriptControls::ButtonReleased(WheelControlType control) {
-	if (wheel->IsButtonJustReleased(WheelControl[static_cast<int>(control)])) {
-		return true;
-	}
 	return false;
 }
 
 bool ScriptControls::ButtonHeld(ControllerControlType control) {
-	if (controller->WasButtonHeldForMs(controller->StringToButton(ControlXbox[static_cast<int>(control)]), buttonState, CToggleTime)) {
+	if (!controller->IsConnected())
+		return false;
+	if (controller->WasButtonHeldForMs(controller->StringToButton(ControlXbox[static_cast<int>(control)]), buttonState, CToggleTime))
 		return true;
+	return false;
+}
+
+bool ScriptControls::ButtonIn(ControllerControlType control) {
+	if (!controller->IsConnected())
+		return false;
+	if (controller->IsButtonPressed(controller->StringToButton(ControlXbox[static_cast<int>(control)]), buttonState))
+		return true;
+	return false;
+}
+
+void ScriptControls::PlayWheelEffects(float speed,
+	Vector3 accelVals,
+	Vector3 accelValsAvg,
+	ScriptSettings* settings,
+	bool airborne) {
+	wheel->PlayWheelEffects(
+		speed,
+		accelVals,
+		accelValsAvg,
+		settings,
+		airborne );
+}
+
+/*
+ * Wheel section
+ */
+
+bool ScriptControls::ButtonReleased(WheelControlType control) {
+	if (!wheel->IsConnected() ||
+		WheelControl[static_cast<int>(control)] == -1) {
+		return false;
 	}
+	if (wheel->IsButtonJustReleased(WheelControl[static_cast<int>(control)]))
+		return true;
+	return false;
+}
+
+bool ScriptControls::ButtonJustPressed(WheelControlType control) {
+	if (!wheel->IsConnected() ||
+		WheelControl[static_cast<int>(control)] == -1) {
+		return false;
+	}
+	if (wheel->IsButtonJustPressed(WheelControl[static_cast<int>(control)]))
+		return true;
+	return false;
+}
+
+bool ScriptControls::ButtonIn(WheelControlType control) {
+	if (!wheel->IsConnected() ||
+		WheelControl[static_cast<int>(control)] == -1) {
+		return false;
+	}
+	if (wheel->IsButtonPressed(WheelControl[static_cast<int>(control)]))
+		return true;
 	return false;
 }

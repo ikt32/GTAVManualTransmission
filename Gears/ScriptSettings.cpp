@@ -35,6 +35,7 @@ ScriptSettings::ScriptSettings() {
 	StallingThreshold = 0.0f;
 	RPMDamage = 0.0f;
 	MisshiftDamage = 0;
+	WheelWithoutManual = true;
 }
 
 
@@ -59,6 +60,7 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 
 	RPMDamage = GetPrivateProfileIntA("OPTIONS", "RPMDamage", 15, SETTINGSFILE) / 100.0f;
 	MisshiftDamage = GetPrivateProfileIntA("OPTIONS", "MisshiftDamage", 10, SETTINGSFILE);
+
 
 	CheckSettings();
 
@@ -102,6 +104,7 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 
 	// Start wheel section
 	LogiWheel = (GetPrivateProfileIntA("LOGITECHWHEEL", "Enable", 0, SETTINGSFILE) == 1);
+	WheelWithoutManual = (GetPrivateProfileIntA("LOGITECHWHEEL", "WheelWithoutManual", 1, SETTINGSFILE) == 1);
 	DisableDpad = (GetPrivateProfileIntA("LOGITECHWHEEL", "DisableDpad", 0, SETTINGSFILE) == 1);
 
 	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Toggle)] = GetPrivateProfileIntA("LOGITECHWHEEL", "Toggle", 17, SETTINGSFILE);

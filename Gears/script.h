@@ -22,11 +22,15 @@ void reInit();
 void toggleManual();
 void reset();
 
+void updateLastInputDevice();
+
+
 //void resetWheelFeedback(int index);
 void handlePedalsDefault(float logiThrottleVal, float logiBrakeVal);
 void handlePedalsRealReverse(float logiThrottleVal, float logiBrakeVal);
 void handleVehicleButtons();
 //void playWheelEffects();
+void doWheelSteering();
 
 void functionAutoReverse();
 void functionRealReverse();

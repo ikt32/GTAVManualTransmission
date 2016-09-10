@@ -3,6 +3,10 @@
 #include "XboxController.hpp"
 #include "WheelDirectInput.hpp"
 #include "Logger.hpp"
+#include "ScriptSettings.hpp"
+
+class ScriptSettings;
+class WheelInput;
 
 class ScriptControls {
 public:
@@ -82,18 +86,11 @@ public:
 	void UpdateValues(InputDevices prevInput);
 
 	
-	int KBControl[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
-	int WheelControl[static_cast<int>(WheelControlType::SIZEOF_WheelControlType)] = {};
-
-	int CToggleTime = 1000;
-	bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
-	bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
-
-
 	float BrakeVal = 0.0f;
 	float ThrottleVal = 0.0f;
 	// 1 = Pressed, 0 = Not pressed
 	float ClutchVal = 0.0f;
+	LONG SteerVal = 0;
 
 	// Perceived accelerator value
 	int AccelValGTA = 0;
@@ -103,17 +100,29 @@ public:
 
 	// Array gets filled by ScriptSettings
 	std::string ControlXbox[static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)] = {};
-	LONG SteerVal = 0;
+	int KBControl[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
+	int WheelControl[static_cast<int>(WheelControlType::SIZEOF_WheelControlType)] = {};
+	int CToggleTime = 1000;
 
+	
 	// Add more when desired
-
 	bool ButtonJustPressed(ControllerControlType control);
 	bool ButtonJustPressed(KeyboardControlType control);
 	bool ButtonJustPressed(WheelControlType control);
 	bool ButtonReleased(ControllerControlType control);
 	bool ButtonReleased(WheelControlType control);
-
+	// Held for specified milliseconds in .ini
 	bool ButtonHeld(ControllerControlType control);
+	bool ButtonIn(WheelControlType control);
+	bool ButtonIn(ControllerControlType control);
+
+	void PlayWheelEffects(float speed,
+		Vector3 accelVals,
+		Vector3 accelValsAvg,
+		ScriptSettings* settings,
+		bool airborne);
+
+	const DIJOYSTATE2* wheelState;
 private:
 	long long pressTime = 0;
 	long long releaseTime = 0;
@@ -123,8 +132,10 @@ private:
 	WORD buttonState;
 
 	WheelInput* wheel;
-	const DIJOYSTATE2* wheelState;
 
 	static bool IsKeyPressed(int key);
 	bool IsKeyJustPressed(int key, KeyboardControlType control);
+
+	bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
+	bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 };
