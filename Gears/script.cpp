@@ -123,7 +123,6 @@ void update() {
 	updateLastInputDevice();
 	handleVehicleButtons();
 	doWheelSteering();
-
 	playWheelEffects(
 		vehData.Speed,
 		vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
@@ -311,11 +310,11 @@ void showDebugInfo() {
 	showText(0.85, 0.16, 0.4, clutchDisplay.str().c_str());
 	showText(0.85, 0.22, 0.4, steerDisplay.str().c_str());
 
-	for (int i = 0; i < MAX_RGBBUTTONS; i++) {
+	/*for (int i = 0; i < MAX_RGBBUTTONS; i++) {
 		if (controls.wheelState->rgbButtons[i]) {
 			showText(0.4, 0.4, 2.0, std::to_string(i).c_str());
 		}
-	}
+	}*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -112,7 +112,6 @@ public:
 	bool ButtonIn(ControllerControlType control);
 
 	WheelInput* Wheelptr;
-	const DIJOYSTATE2* wheelState;
 
 private:
 	long long pressTime = 0;
@@ -121,7 +120,7 @@ private:
 
 	XboxController* controller;
 	WORD buttonState;
-
+	const DIJOYSTATE2* wheelState;
 
 	static bool IsKeyPressed(int key);
 	bool IsKeyJustPressed(int key, KeyboardControlType control);
