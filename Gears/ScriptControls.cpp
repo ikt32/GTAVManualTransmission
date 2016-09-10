@@ -4,12 +4,14 @@
 #include "../../ScriptHookV_SDK/inc/natives.h"
 #include "../../ScriptHookV_SDK/inc/enums.h"
 
-ScriptControls::ScriptControls(): wheelState(nullptr), buttonState(0) {
+ScriptControls::ScriptControls(): wheelState(nullptr),
+                                  buttonState(0) {
 	Wheelptr = new WheelInput();
 	controller = new XboxController(1);
 }
 
-ScriptControls::~ScriptControls() {}
+ScriptControls::~ScriptControls() {
+}
 
 void ScriptControls::UpdateValues(InputDevices prevInput) {
 	if (controller->IsConnected()) {
@@ -22,7 +24,7 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 		Wheelptr->UpdateButtonChangeStates();
 		SteerVal = wheelState->lX;
 	}
-	
+
 	switch (prevInput) {
 		case Keyboard:
 			ThrottleVal = (IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)]) ? 1.0f : 0.0f);
@@ -104,6 +106,7 @@ bool ScriptControls::ButtonJustPressed(ControllerControlType control) {
 		return true;
 	return false;
 }
+
 bool ScriptControls::ButtonReleased(ControllerControlType control) {
 	if (!controller->IsConnected())
 		return false;

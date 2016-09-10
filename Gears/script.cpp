@@ -106,7 +106,7 @@ void update() {
 
 	if (!settings.EnableManual &&
 		settings.WheelWithoutManual) {
-		updateLastInputDevice(); 
+		updateLastInputDevice();
 		handleVehicleButtons();
 		handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
 		doWheelSteering();
@@ -135,7 +135,7 @@ void update() {
 		vehData.getAccelerationVectorsAverage(),
 		&settings,
 		false);
-	
+
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ToggleH) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::ToggleH)) {
 		settings.Hshifter = !settings.Hshifter;
@@ -144,17 +144,23 @@ void update() {
 		}
 		std::stringstream message;
 		message << "Mode: " <<
-				(settings.Hshifter ? "H-Shifter" : "Sequential");
+		           (settings.Hshifter ? "H-Shifter" : "Sequential");
 		showNotification(const_cast<char *>(message.str().c_str()));
 		settings.Save();
 	}
 
 	if (settings.UITips) {
 		if (vehData.SimulatedNeutral) {
-			showText(settings.UITips_X, settings.UITips_Y, settings.UITips_Size, "N");
+			showText(settings.UITips_X,
+			         settings.UITips_Y,
+			         settings.UITips_Size,
+			         "N");
 		}
 		else {
-			showText(settings.UITips_X, settings.UITips_Y, settings.UITips_Size, const_cast<char *>(std::to_string(vehData.CurrGear).c_str()));
+			showText(settings.UITips_X,
+			         settings.UITips_Y,
+			         settings.UITips_Size,
+			         const_cast<char *>(std::to_string(vehData.CurrGear).c_str()));
 		}
 	}
 
@@ -292,13 +298,13 @@ void showNotification(char* message) {
 void showDebugInfo() {
 	std::stringstream infos;
 	infos << "RPM: " << std::setprecision(3) << vehData.Rpm <<
-			"\nCurrGear: " << vehData.CurrGear <<
-			"\nNextGear: " << vehData.NextGear <<
-			"\nClutch: " << std::setprecision(3) << vehData.Clutch <<
-			"\nThrottle: " << std::setprecision(3) << vehData.Throttle <<
-			"\nTurbo: " << std::setprecision(3) << vehData.Turbo <<
-			"\nAddress: " << std::hex << vehData.Address <<
-			"\nE: " << (settings.EnableManual ? "Y" : "N");
+	         "\nCurrGear: " << vehData.CurrGear <<
+	         "\nNextGear: " << vehData.NextGear <<
+	         "\nClutch: " << std::setprecision(3) << vehData.Clutch <<
+	         "\nThrottle: " << std::setprecision(3) << vehData.Throttle <<
+	         "\nTurbo: " << std::setprecision(3) << vehData.Turbo <<
+	         "\nAddress: " << std::hex << vehData.Address <<
+	         "\nE: " << (settings.EnableManual ? "Y" : "N");
 	const char* infoc = infos.str().c_str();
 	showText(0.01f, 0.5f, 0.4f, infoc);
 
@@ -331,15 +337,9 @@ void reInit() {
 	settings.Read(&controls);
 	vehData.LockGears = 0x00010001;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
-	/*if (settings.LogiWheel) {
-		logiWheel.InitWheel(&settings, &logger);
-	}*/
 }
 
 void reset() {
-	/*if (logiWheel.IsActive(&settings)) {
-		resetWheelFeedback(logiWheel.GetIndex());
-	}*/
 	prevVehicle = 0;
 	if (patched) {
 		patched = !MemoryPatcher::RestoreInstructions();
@@ -351,7 +351,7 @@ void toggleManual() {
 	settings.Save();
 	std::stringstream message;
 	message << "Manual Transmission " <<
-			(settings.EnableManual ? "Enabled" : "Disabled");
+	           (settings.EnableManual ? "Enabled" : "Disabled");
 	showNotification(const_cast<char *>(message.str().c_str()));
 	logger.Write(const_cast<char *>(message.str().c_str()));
 	if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
@@ -438,7 +438,7 @@ void functionHShiftWheel() {
 		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H4)) ||
 		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H5)) ||
 		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H6))
-		) {
+	) {
 		if (settings.ClutchShifting &&
 			settings.EngDamage &&
 			!vehData.NoClutch) {
@@ -530,18 +530,18 @@ void functionClutchCatch() {
 	if (controls.ClutchVal < 1.0f - settings.ClutchCatchpoint) {
 		// Forward
 		if (vehData.CurrGear > 0 && vehData.Velocity < vehData.CurrGear * 2.2f &&
-			controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
+		                            controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.37f);
 		}
 	}
 }
 
 void functionEngStall() {
-	if (controls.ClutchVal < 1.0f - settings.StallingThreshold && vehData.Rpm < 0.25f &&
-		((vehData.Speed < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && vehData.Speed < 1.0f))) {
-		if (VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle)) {
-			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
-		}
+	if (controls.ClutchVal < 1.0f - settings.StallingThreshold &&
+		vehData.Rpm < 0.25f &&
+		((vehData.Speed < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && vehData.Speed < 1.0f)) &&
+		VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle)) {
+		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 	}
 }
 
@@ -619,7 +619,7 @@ void handleRPM() {
 	if (vehData.CurrGear > 1) {
 		// When pressing clutch and throttle, handle clutch and RPM
 		if (controls.ClutchVal > 0.4f && controls.AccelValGTAf > 0.05f &&
-			!vehData.SimulatedNeutral) {
+		                                 !vehData.SimulatedNeutral) {
 			fakeRev();
 			ext.SetThrottle(vehicle, controls.AccelValGTAf);
 			float tempVal = (1.0f - controls.ClutchVal) * 0.4f + 0.6f;
@@ -685,7 +685,7 @@ void functionRealReverse() {
 	if (vehData.CurrGear > 0) {
 		// LT behavior when still: Just brake
 		if (controls.BrakeVal > 0.02f && controls.ThrottleVal < controls.BrakeVal &&
-			vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
+		                                 vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			ext.SetThrottleP(vehicle, 0.0f);
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
@@ -696,7 +696,7 @@ void functionRealReverse() {
 		}
 		// LT behavior when rolling back: Brake
 		if (controls.BrakeVal > 0.02f && controls.ThrottleVal < controls.BrakeVal &&
-			vehData.Velocity < -0.1f) {
+		                                 vehData.Velocity < -0.1f) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.BrakeVal);
@@ -723,7 +723,7 @@ void functionRealReverse() {
 		}
 		// LT behavior when still
 		if (controls.BrakeVal > 0.0f && controls.ThrottleVal <= controls.BrakeVal &&
-			vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
+		                                vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
@@ -756,7 +756,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 		}
 		// Brake Pedal still
 		if (wheelBrakeVal > 0.02f && wheelThrottleVal < wheelBrakeVal &&
-			vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
+		                             vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			ext.SetThrottleP(vehicle, 0.0f);
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
@@ -771,7 +771,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 		}
 		// Brake Pedal stationary
 		if (wheelBrakeVal > 0.02f && wheelThrottleVal <= wheelBrakeVal &&
-			vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
+		                             vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
@@ -799,13 +799,13 @@ void handlePedalsDefault(float wheelThrottleVal, float wheelBrakeVal) {
 void functionSimpleReverse() {
 	// Prevent going forward in gear 0.
 	if (vehData.CurrGear == 0 && vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f
-		&& controls.ThrottleVal > 0) {
+	                             && controls.ThrottleVal > 0) {
 		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
 	}
 	// Prevent reversing in gear >= 1.
 	if (vehData.CurrGear > 0 && vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f
-		&& controls.BrakeVal > 0) {
+	                            && controls.BrakeVal > 0) {
 		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 	}
@@ -814,15 +814,15 @@ void functionSimpleReverse() {
 void functionAutoReverse() {
 	// Go forward
 	if (CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) &&
-		vehData.Velocity > -1.0f &&
-		vehData.CurrGear == 0) {
+	                                                                 vehData.Velocity > -1.0f &&
+	                                                                 vehData.CurrGear == 0) {
 		vehData.LockGears = 0x00010001;
 	}
 
 	// Reverse
 	if (CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) &&
-		vehData.Velocity < 1.0f &&
-		vehData.CurrGear > 0) {
+	                                                            vehData.Velocity < 1.0f &&
+	                                                            vehData.CurrGear > 0) {
 		vehData.SimulatedNeutral = false;
 		vehData.LockGears = 0x00000000;
 	}
@@ -833,10 +833,10 @@ void functionAutoReverse() {
 ///////////////////////////////////////////////////////////////////////////////
 void handleVehicleButtons() {
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
-			controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) ||
-			controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
-			controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine) ||
-			controls.ThrottleVal > 0.98f && controls.ClutchVal > settings.ClutchCatchpoint) {
+		controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) ||
+		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
+		controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine) ||
+		controls.ThrottleVal > 0.98f && controls.ClutchVal > settings.ClutchCatchpoint) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 
@@ -866,8 +866,8 @@ void handleVehicleButtons() {
 
 	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::IndicatorLeft)) {
 		if (!blinkerLeft) {
-			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);	// L
-			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true);	// R
+			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false); // L
+			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true); // R
 			blinkerLeft = true;
 			blinkerRight = false;
 			blinkerHazard = false;
@@ -882,8 +882,8 @@ void handleVehicleButtons() {
 	}
 	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::IndicatorRight)) {
 		if (!blinkerRight) {
-			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true);	// L
-			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);	// R
+			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true); // L
+			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false); // R
 			blinkerLeft = false;
 			blinkerRight = true;
 			blinkerHazard = false;
@@ -898,8 +898,8 @@ void handleVehicleButtons() {
 	}
 	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::IndicatorHazard)) {
 		if (!blinkerHazard) {
-			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true);	// L
-			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true);	// R
+			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true); // L
+			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true); // R
 			blinkerLeft = false;
 			blinkerRight = false;
 			blinkerHazard = true;
@@ -938,25 +938,25 @@ void updateLastInputDevice() {
 	if (prevInput != controls.GetLastInputDevice(prevInput)) {
 		prevInput = controls.GetLastInputDevice(prevInput);
 		switch (prevInput) {
-		case ScriptControls::Keyboard:
-			showNotification("Switched to keyboard/mouse");
-			break;
-		case ScriptControls::Controller: // Controller
-			if (settings.Hshifter) {
-				showNotification("Switched to controller\nSequential re-initiated");
-				settings.Hshifter = false;
-				settings.Save();
-			}
-			else {
-				showNotification("Switched to controller");
-			}
-			break;
-		case ScriptControls::Wheel:
-			//CONTROLS::DISABLE_ALL_CONTROL_ACTIONS
-			showNotification("Switched to wheel");
-			break;
-		default:
-			break;
+			case ScriptControls::Keyboard:
+				showNotification("Switched to keyboard/mouse");
+				break;
+			case ScriptControls::Controller: // Controller
+				if (settings.Hshifter) {
+					showNotification("Switched to controller\nSequential re-initiated");
+					settings.Hshifter = false;
+					settings.Save();
+				}
+				else {
+					showNotification("Switched to controller");
+				}
+				break;
+			case ScriptControls::Wheel:
+				//CONTROLS::DISABLE_ALL_CONTROL_ACTIONS
+				showNotification("Switched to wheel");
+				break;
+			default:
+				break;
 		}
 	}
 }
@@ -969,11 +969,13 @@ void doWheelSteering() {
 		antiDeadzoned = (controls.SteerVal - 32768) / 32768.0f;
 		if (//logiSteeringWheelPos > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
 			controls.SteerVal <= 0) {
-			antiDeadzoned = (controls.SteerVal - 32768 - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE - additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
+			antiDeadzoned = (controls.SteerVal - 32768 - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE - additionalOffset) /
+					(32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
 		}
 		if (//logiSteeringWheelPos > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
 			controls.SteerVal > 0) {
-			antiDeadzoned = (controls.SteerVal - 32768 + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
+			antiDeadzoned = (controls.SteerVal - 32768 + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset) /
+					(32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
 		}
 		// Gotta find a way to make this no-delay
 		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
@@ -990,7 +992,7 @@ void playWheelEffects(
 
 	if (settings == nullptr)
 		return;
-		
+
 
 	if (prevInput != ScriptControls::Wheel) {
 		return;
@@ -1022,9 +1024,9 @@ void playWheelEffects(
 
 	int constantForce = 100 * static_cast<int>(-settings->FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
 
-	
+
 	HRESULT hr = controls.Wheelptr->SetForce(constantForce);
-	switch (hr) {
+	/*switch (hr) {
 	case DI_DOWNLOADSKIPPED:
 		logger.Write("SetForce DI_DOWNLOADSKIPPED");
 		break;
@@ -1055,7 +1057,7 @@ void playWheelEffects(
 	case DIERR_EFFECTPLAYING:
 		logger.Write("SetForce DIERR_EFFECTPLAYING");
 		break;
-	}
+	}*/
 
 	//loggeriPlayConstantForce(loggeriWheel.GetIndex(), constantForce);
 

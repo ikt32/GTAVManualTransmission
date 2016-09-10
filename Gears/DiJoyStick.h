@@ -12,13 +12,16 @@
 class DiJoyStick {
 public:
 	struct Entry {
-		DIDEVICEINSTANCE        diDeviceInstance;
-		DIDEVCAPS               diDevCaps;
-		LPDIRECTINPUTDEVICE8    diDevice;
-		DIJOYSTATE2             joystate;
+		DIDEVICEINSTANCE diDeviceInstance;
+		DIDEVCAPS diDevCaps;
+		LPDIRECTINPUTDEVICE8 diDevice;
+		DIJOYSTATE2 joystate;
 	};
 
-	DiJoyStick() : entry(0), maxEntry(0), nEntry(0), di(0) {
+	DiJoyStick() : entry(0),
+	               maxEntry(0),
+	               nEntry(0),
+	               di(0) {
 	}
 
 	~DiJoyStick() {
@@ -87,12 +90,12 @@ protected:
 
 	BOOL DIEnumDevicesCallback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef) {
 		if (nEntry < maxEntry) {
-			Entry e = { 0 };
+			Entry e = {0};
 
 			memcpy(&e.diDeviceInstance, lpddi, sizeof(e.diDeviceInstance));
 			e.diDevCaps.dwSize = sizeof(e.diDevCaps);
 
-			LPDIRECTINPUTDEVICE8    did = 0;
+			LPDIRECTINPUTDEVICE8 did = 0;
 
 			if (SUCCEEDED(di->CreateDevice(lpddi->guidInstance, (LPDIRECTINPUTDEVICE*)&did, 0))) {
 				if (SUCCEEDED(did->SetDataFormat(lpdf))) {
@@ -107,9 +110,9 @@ protected:
 	}
 
 	//
-	Entry*          entry;
-	int             maxEntry;
-	int             nEntry;
-	LPDIRECTINPUT   di;
+	Entry* entry;
+	int maxEntry;
+	int nEntry;
+	LPDIRECTINPUT di;
 	LPCDIDATAFORMAT lpdf;
 };

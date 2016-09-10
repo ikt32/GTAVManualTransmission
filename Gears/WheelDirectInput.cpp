@@ -11,9 +11,9 @@ WheelInput::WheelInput() {
 
 	if (e) {
 		e->diDevice->SetCooperativeLevel(
-			GetForegroundWindow()
-			, DISCL_EXCLUSIVE |
-			DISCL_FOREGROUND);
+			 GetForegroundWindow()
+			 , DISCL_EXCLUSIVE |
+			 DISCL_FOREGROUND);
 
 		e->diDevice->Acquire();
 		if (g_pEffect != nullptr) {
@@ -91,6 +91,7 @@ bool WheelInput::WasButtonHeldForMs(int buttonType, int millis) {
 	}
 	return false;
 }
+
 void WheelInput::UpdateButtonChangeStates() {
 	for (int i = 0; i < MAX_RGBBUTTONS; i++) {
 		rgbButtonPrev[i] = rgbButtonCurr[i];
@@ -98,9 +99,9 @@ void WheelInput::UpdateButtonChangeStates() {
 }
 
 bool WheelInput::CreateEffect() {
-	DWORD rgdwAxes[1] = { DIJOFS_X };
-	LONG rglDirection[1] = { 0 };
-	DICONSTANTFORCE cf = { 0 };
+	DWORD rgdwAxes[1] = {DIJOFS_X};
+	LONG rglDirection[1] = {0};
+	DICONSTANTFORCE cf = {0};
 
 	DIEFFECT eff;
 	ZeroMemory(&eff, sizeof(eff));
@@ -122,10 +123,10 @@ bool WheelInput::CreateEffect() {
 	const DiJoyStick::Entry* e = djs.getEntry(0);
 	if (e) {
 		e->diDevice->CreateEffect(
-					GUID_ConstantForce,
-					&eff,
-					&g_pEffect,
-					nullptr);
+			 GUID_ConstantForce,
+			 &eff,
+			 &g_pEffect,
+			 nullptr);
 		if (!g_pEffect) {
 			return false;
 		}
@@ -142,7 +143,7 @@ HRESULT WheelInput::SetForce(int force) {
 		if (g_pEffect)
 			g_pEffect->Start(1, 0);
 	}
-	LONG rglDirection[1] = { 0 };
+	LONG rglDirection[1] = {0};
 	DICONSTANTFORCE cf;
 	cf.lMagnitude = force;
 
@@ -158,6 +159,6 @@ HRESULT WheelInput::SetForce(int force) {
 	eff.dwStartDelay = 0;
 
 	return g_pEffect->SetParameters(&eff, DIEP_DIRECTION |
-		DIEP_TYPESPECIFICPARAMS |
-		DIEP_START);
+	                                DIEP_TYPESPECIFICPARAMS |
+	                                DIEP_START);
 }

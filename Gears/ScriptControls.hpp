@@ -80,7 +80,6 @@ public:
 	InputDevices GetLastInputDevice(InputDevices previous);
 	void UpdateValues(InputDevices prevInput);
 
-	
 	float BrakeVal = 0.0f;
 	float ThrottleVal = 0.0f;
 	// 1 = Pressed, 0 = Not pressed
@@ -99,7 +98,7 @@ public:
 	int WheelControl[static_cast<int>(WheelControlType::SIZEOF_WheelControlType)] = {};
 	int CToggleTime = 1000;
 
-	
+
 	// Add more when desired
 	bool ButtonJustPressed(ControllerControlType control);
 	bool ButtonJustPressed(KeyboardControlType control);

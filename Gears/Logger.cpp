@@ -19,9 +19,9 @@ void Logger::Write(const std::string& text) const {
 	SYSTEMTIME currTimeLog;
 	GetLocalTime(&currTimeLog);
 	logFile << "[" <<
-			std::setw(2) << std::setfill('0') << currTimeLog.wHour << ":" <<
-			std::setw(2) << std::setfill('0') << currTimeLog.wMinute << ":" <<
-			std::setw(2) << std::setfill('0') << currTimeLog.wSecond << "." <<
-			std::setw(3) << std::setfill('0') << currTimeLog.wMilliseconds << "] " <<
-			text << std::endl;
+	           std::setw(2) << std::setfill('0') << currTimeLog.wHour << ":" <<
+	           std::setw(2) << std::setfill('0') << currTimeLog.wMinute << ":" <<
+	           std::setw(2) << std::setfill('0') << currTimeLog.wSecond << "." <<
+	           std::setw(3) << std::setfill('0') << currTimeLog.wMilliseconds << "] " <<
+	           text << std::endl;
 }
