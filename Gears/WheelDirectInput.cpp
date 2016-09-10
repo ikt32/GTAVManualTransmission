@@ -1,4 +1,5 @@
 #include "WheelDirectInput.hpp"
+#include "TimeHelper.hpp"
 
 WheelInput::WheelInput() {
 	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(0), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&lpDi, 0))) {
@@ -16,6 +17,7 @@ const DIJOYSTATE2* WheelInput::GetState() {
 	if (e) {
 
 		const DIJOYSTATE2* js = &e->joystate;
+		joyState = e->joystate;
 		return js;
 		/*
 		int pov = js->rgdwPOV[0];
@@ -52,19 +54,50 @@ bool WheelInput::IsConnected() const {
 	return false;
 }
 
-bool WheelInput::IsButtonPressed() {
+bool WheelInput::IsButtonPressed(int buttonType) {
+	if (joyState.rgbButtons[buttonType]) {
+		return true;
+	}
 	return false;
 }
 
-bool WheelInput::IsButtonJustPressed() {
+bool WheelInput::IsButtonJustPressed(int buttonType) {
+	rgbButtonCurr[buttonType] = IsButtonPressed(buttonType);
+
+	// raising edge
+	if (rgbButtonCurr[buttonType] && !rgbButtonPrev[buttonType]) {
+		return true;
+	}
 	return false;
 }
 
-bool WheelInput::IsButtonJustReleased() {
+bool WheelInput::IsButtonJustReleased(int buttonType) {
+	rgbButtonCurr[buttonType] = IsButtonPressed(buttonType);
+
+	// falling edge
+	if (!rgbButtonCurr[buttonType] && rgbButtonPrev[buttonType]) {
+		return true;
+	}
 	return false;
 }
 
-bool WheelInput::WasButtonHeldForMs() {
+bool WheelInput::WasButtonHeldForMs(int buttonType, int millis) {
+	if (IsButtonJustPressed(buttonType)) {
+		pressTime[buttonType] = milliseconds_now();
+	}
+	if (IsButtonJustReleased(buttonType)) {
+		releaseTime[buttonType] = milliseconds_now();
+	}
+
+	if ((releaseTime[buttonType] - pressTime[buttonType]) >= millis) {
+		pressTime[buttonType] = 0;
+		releaseTime[buttonType] = 0;
+		return true;
+	}
 	return false;
 }
-void WheelInput::UpdateButtonChangeStates() {}
+void WheelInput::UpdateButtonChangeStates() {
+	for (int i = 0; i < MAX_RGBBUTTONS; i++) {
+		rgbButtonPrev[i] = rgbButtonCurr[i];
+	}
+}

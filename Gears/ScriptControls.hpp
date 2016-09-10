@@ -103,13 +103,15 @@ public:
 
 	// Array gets filled by ScriptSettings
 	std::string ControlXbox[static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)] = {};
-
+	LONG SteerVal = 0;
 
 	// Add more when desired
 
-	bool ButtonPressed(ControllerControlType control);
-	bool ButtonPressed(KeyboardControlType control);
-	bool ButtonPressed(WheelControlType control);
+	bool ButtonJustPressed(ControllerControlType control);
+	bool ButtonJustPressed(KeyboardControlType control);
+	bool ButtonJustPressed(WheelControlType control);
+	bool ButtonReleased(ControllerControlType control);
+	bool ButtonReleased(WheelControlType control);
 
 	bool ButtonHeld(ControllerControlType control);
 

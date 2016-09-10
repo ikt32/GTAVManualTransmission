@@ -39,7 +39,7 @@ void functionClutchCatch();
 void functionHShiftTo(int i);
 void functionHShiftKeyboard();
 void functionSShift();
-//void functionHShiftLogitech();
+void functionHShiftWheel();
 
 void shiftTo(int gear, bool autoClutch);
 void handleRPM();

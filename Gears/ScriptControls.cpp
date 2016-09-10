@@ -20,6 +20,7 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 	if (wheel->IsConnected()) {
 		wheelState = wheel->GetState();
 		wheel->UpdateButtonChangeStates();
+		SteerVal = wheelState->lX;
 	}
 	
 	switch (prevInput) {
@@ -83,22 +84,38 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
 }
 
 
-bool ScriptControls::ButtonPressed(ControllerControlType control) {
+bool ScriptControls::ButtonJustPressed(ControllerControlType control) {
 	if (controller->IsButtonJustPressed(controller->StringToButton(ControlXbox[static_cast<int>(control)]), buttonState)) {
 		return true;
 	}
 	return false;
 }
 
-bool ScriptControls::ButtonPressed(KeyboardControlType control) {
+bool ScriptControls::ButtonJustPressed(KeyboardControlType control) {
 	if (IsKeyJustPressed(KBControl[static_cast<int>(control)], control)) {
 		return true;
 	}
 	return false;
 }
 
-//TODO: Implement for DInput
-bool ScriptControls::ButtonPressed(WheelControlType control) {
+bool ScriptControls::ButtonJustPressed(WheelControlType control) {
+	if (wheel->IsButtonJustPressed(WheelControl[static_cast<int>(control)])) {
+		return true;
+	}
+	return false;
+}
+
+bool ScriptControls::ButtonReleased(ControllerControlType control) {
+	if (controller->IsButtonJustReleased(controller->StringToButton(ControlXbox[static_cast<int>(control)]), buttonState)) {
+		return true;
+	}
+	return false;
+}
+
+bool ScriptControls::ButtonReleased(WheelControlType control) {
+	if (wheel->IsButtonJustReleased(WheelControl[static_cast<int>(control)])) {
+		return true;
+	}
 	return false;
 }
 

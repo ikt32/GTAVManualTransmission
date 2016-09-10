@@ -100,7 +100,6 @@ bool XboxController::WasButtonHeldForMs(XboxButtons buttonType, WORD buttonState
 	return false;
 }
 
-// KILL ME NOW
 void XboxController::UpdateButtonChangeStates() {
 	for (int i = 0; i < SIZEOF_XboxButtons; i++) {
 		xboxButtonPrev[i] = xboxButtonCurr[i];

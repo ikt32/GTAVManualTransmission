@@ -98,7 +98,7 @@ void update() {
 
 	controls.UpdateValues(prevInput);
 
-	if (controls.ButtonPressed(ScriptControls::KeyboardControlType::Toggle) ||
+	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
 		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle)) {
 		toggleManual();
 	}
@@ -121,7 +121,7 @@ void update() {
 
 	//if (controls.IsKeyJustPressed(controls.KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ToggleH)], ScriptControls::KeyboardControlType::ToggleH)) {
 		// || (logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ToggleH]))) {
-	if (controls.ButtonPressed(ScriptControls::KeyboardControlType::ToggleH)) {
+	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ToggleH)) {
 		settings.Hshifter = !settings.Hshifter;
 		if (!settings.Hshifter && vehData.CurrGear > 1) {
 			vehData.SimulatedNeutral = false;
@@ -166,6 +166,25 @@ void update() {
 		logiWheel.DoWheelSteering(steerVal);
 	}*/
 
+	// Ze wheel inp00t
+	if (prevInput == ScriptControls::InputDevices::Wheel) {
+		ext.SetSteeringAngle1(vehicle, (controls.SteerVal-32768)/(-32768.0f));
+		int additionalOffset = 2560;
+		float antiDeadzoned;
+		antiDeadzoned = (controls.SteerVal - 32768) / 32768.0f;
+		if (//logiSteeringWheelPos > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
+			controls.SteerVal <= 0) {
+			antiDeadzoned = (controls.SteerVal - 32768 - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE - additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
+		}
+		if (//logiSteeringWheelPos > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
+			controls.SteerVal > 0) {
+			antiDeadzoned = (controls.SteerVal - 32768 + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset) / (32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
+		}
+		// Gotta find a way to make this no-delay
+		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
+		//VEHICLE::SET_VEHICLE_STEER_BIAS(vehicle, -steerVal_);
+	}
+
 	///////////////////////////////////////////////////////////////////////////
 	//                            Patching
 	///////////////////////////////////////////////////////////////////////////
@@ -189,28 +208,28 @@ void update() {
 	// For bikes, do this automatically.
 	if (vehData.IsBike) {
 		functionAutoReverse();
-		/*handlePedalsDefault(
-			logiWheel.GetLogiThrottleVal(),
-			logiWheel.GetLogiBrakeVal());*/
+		handlePedalsDefault(
+			controls.ThrottleVal,
+			controls.BrakeVal);
 	}
 	else {
 		// New reverse: Reverse with throttle
 		if (settings.RealReverse) {
 			functionRealReverse();
-			/*if (logiWheel.IsActive(&settings) && prevInput == InputDevices::Wheel) {
+			if (prevInput == ScriptControls::InputDevices::Wheel) {
 				handlePedalsRealReverse(
-					logiWheel.GetLogiThrottleVal(),
-					logiWheel.GetLogiBrakeVal());
-			}*/
+					controls.ThrottleVal,
+					controls.BrakeVal);
+			}
 		}
 		// Reversing behavior: just block the direction you don't wanna go to
 		else {
 			functionSimpleReverse();
-			/*if (logiWheel.IsActive(&settings) && prevInput == InputDevices::Wheel) {
+			if (prevInput == ScriptControls::InputDevices::Wheel) {
 				handlePedalsDefault(
-					logiWheel.GetLogiThrottleVal(),
-					logiWheel.GetLogiBrakeVal());
-			}*/
+					controls.ThrottleVal,
+					controls.BrakeVal);
+			}
 		}
 	}
 
@@ -252,6 +271,7 @@ void update() {
 		else {
 			functionHShiftKeyboard();
 		}*/
+		functionHShiftWheel();
 		functionHShiftKeyboard();
 	}
 	else {
@@ -324,10 +344,13 @@ void showDebugInfo() {
 	brakeDisplay << "Brake Value: " << controls.BrakeVal << std::endl;
 	std::stringstream clutchDisplay;
 	clutchDisplay << "ClutchValue: " << controls.ClutchVal << std::endl;
+	std::stringstream steerDisplay;
+	steerDisplay << "SteerValue: " << controls.SteerVal << std::endl;
 
 	showText(0.85, 0.04, 0.4, throttleDisplay.str().c_str());
 	showText(0.85, 0.10, 0.4, brakeDisplay.str().c_str());
 	showText(0.85, 0.16, 0.4, clutchDisplay.str().c_str());
+	showText(0.85, 0.20, 0.4, steerDisplay.str().c_str());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -411,7 +434,6 @@ void functionHShiftTo(int i) {
 	}
 }
 
-// TODO: Check if still works
 void functionHShiftKeyboard() {
 	// Highest shifter button == 8
 	int clamp = 8;
@@ -419,58 +441,78 @@ void functionHShiftKeyboard() {
 		clamp = vehData.TopGear;
 	}
 	for (uint8_t i = 0; i <= clamp; i++) {
-		//if (controls.IsKeyJustPressed(controls.KBControl[i], static_cast<ScriptControls::KeyboardControlType>(i))) {
-		if (controls.ButtonPressed(static_cast<ScriptControls::KeyboardControlType>(i))) {
+		if (controls.ButtonJustPressed(static_cast<ScriptControls::KeyboardControlType>(i))) {
 			functionHShiftTo(i);
 		}
 	}
-	//if (controls.IsKeyJustPressed(controls.KBControl[static_cast<int>(ScriptControls::KeyboardControlType::HN)], ScriptControls::KeyboardControlType::HN)
-	if (controls.ButtonPressed(ScriptControls::KeyboardControlType::HN) &&
+	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::HN) &&
 		!vehData.NoClutch) {
 		vehData.SimulatedNeutral = !vehData.SimulatedNeutral;
 	}
 }
 
-//void functionhshiftlogitech() {
-//	// highest shifter button == 6
-//	int clamp = 6;
-//	if (vehdata.topgear <= clamp) {
-//		clamp = vehdata.topgear;
-//	}
-//	for (uint8_t i = 0; i <= clamp; i++) {
-//		if (logibuttontriggered(logiwheel.getindex(), controls.logicontrol[i])) {
-//			functionhshiftto(i);
-//		}
-//	}
-//
-//	
-//	if (logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h1]) ||
-//		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h2]) ||
-//		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h3]) ||
-//		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h4]) ||
-//		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h5]) ||
-//		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h6])) {
-//		if (settings.clutchshifting && settings.engdamage && !vehdata.noclutch) {
-//			if (controls.clutchvalf < 1.0-settings.clutchcatchpoint) {
-//				vehicle::set_vehicle_engine_health(
-//					vehicle,
-//					vehicle::get_vehicle_engine_health(vehicle) - settings.misshiftdamage/10);
-//			}
-//		}
-//		vehdata.simulatedneutral = !vehdata.noclutch;
-//	}
-//	
-//	if (logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::hr])) {
-//		shiftto(1, true);
-//		vehdata.simulatedneutral = !vehdata.noclutch;
-//	}
-//}
+void functionHShiftWheel() {
+	// highest shifter button == 6
+	int clamp = 6;
+	if (vehData.TopGear <= clamp) {
+		clamp = vehData.TopGear;
+	}
+	for (uint8_t i = 0; i <= clamp; i++) {
+		if (controls.ButtonJustPressed(static_cast<ScriptControls::ControllerControlType>(i))) {
+			functionHShiftTo(i);
+		}
+	}
+	if (controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H1)) ||
+		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H2)) ||
+		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H3)) ||
+		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H4)) ||
+		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H5)) ||
+		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H6))
+		) {
+		if (settings.ClutchShifting &&
+			settings.EngDamage &&
+			!vehData.NoClutch) {
+			if (controls.ClutchVal < 1.0 - settings.ClutchCatchpoint) {
+				VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
+					vehicle,
+					VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.MisshiftDamage / 10);
+			}
+		}
+		vehData.SimulatedNeutral = !vehData.NoClutch;
+	}
+
+	if (controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::HR))) {
+		shiftTo(1, true);
+		vehData.SimulatedNeutral = !vehData.NoClutch;
+	}
+
+	/*if (controls.ButtonReleased(controls.WheelControl[(int)ScriptControls::WheelControlType::H1]) ||
+		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h2]) ||
+		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h3]) ||
+		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h4]) ||
+		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h5]) ||
+		logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::h6])) {
+		if (settings.clutchshifting && settings.engdamage && !vehdata.noclutch) {
+			if (controls.clutchvalf < 1.0-settings.clutchcatchpoint) {
+				vehicle::set_vehicle_engine_health(
+					vehicle,
+					vehicle::get_vehicle_engine_health(vehicle) - settings.misshiftdamage/10);
+			}
+		}
+		vehdata.simulatedneutral = !vehdata.noclutch;
+	}
+	
+	if (logibuttonreleased(logiwheel.getindex(), controls.logicontrol[(int)scriptcontrols::logicontroltype::hr])) {
+		shiftto(1, true);
+		vehdata.simulatedneutral = !vehdata.noclutch;
+	}*/
+}
 
 
 void functionSShift() {
 	// Shift up
-	if (controls.ButtonPressed(ScriptControls::ControllerControlType::ShiftUp) ||
-		controls.ButtonPressed(ScriptControls::KeyboardControlType::ShiftUp)) {
+	if (controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftUp) ||
+		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftUp)) {
 		if (vehData.NoClutch) {
 			if (vehData.CurrGear < vehData.TopGear) {
 				shiftTo(vehData.LockGear + 1, true);
@@ -499,8 +541,8 @@ void functionSShift() {
 
 	// Shift down
 
-	if (controls.ButtonPressed(ScriptControls::ControllerControlType::ShiftDown) ||
-		controls.ButtonPressed(ScriptControls::KeyboardControlType::ShiftDown)) {
+	if (controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftDown) ||
+		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftDown)) {
 		if (vehData.NoClutch) {
 			if (vehData.CurrGear > 0) {
 				shiftTo(vehData.LockGear - 1, true);
@@ -751,18 +793,18 @@ void functionRealReverse() {
 // Forward gear: Throttle accelerates, Brake brakes (exclusive)
 // Reverse gear: Throttle reverses, Brake brakes (exclusive)
 
-void handlePedalsRealReverse(float logiThrottleVal, float logiBrakeVal) {
+void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 	if (vehData.CurrGear > 0) {
 		// Throttle Pedal normal
-		if (logiThrottleVal > 0.02f) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, logiThrottleVal);
+		if (wheelThrottleVal > 0.02f) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
 		}
 		// Brake Pedal normal
-		if (logiBrakeVal > 0.02f) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, logiBrakeVal);
+		if (wheelBrakeVal > 0.02f) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelBrakeVal);
 		}
 		// Brake Pedal still
-		if (logiBrakeVal > 0.02f && logiThrottleVal < logiBrakeVal &&
+		if (wheelBrakeVal > 0.02f && wheelThrottleVal < wheelBrakeVal &&
 			vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			ext.SetThrottleP(vehicle, 0.0f);
@@ -773,11 +815,11 @@ void handlePedalsRealReverse(float logiThrottleVal, float logiBrakeVal) {
 
 	if (vehData.CurrGear == 0) {
 		// Throttle Pedal Reverse
-		if (logiThrottleVal > 0.02f && logiThrottleVal > logiBrakeVal) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, logiThrottleVal);
+		if (wheelThrottleVal > 0.02f && wheelThrottleVal > wheelBrakeVal) {
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelThrottleVal);
 		}
 		// Brake Pedal stationary
-		if (logiBrakeVal > 0.02f && logiThrottleVal <= logiBrakeVal &&
+		if (wheelBrakeVal > 0.02f && wheelThrottleVal <= wheelBrakeVal &&
 			vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
@@ -785,20 +827,20 @@ void handlePedalsRealReverse(float logiThrottleVal, float logiBrakeVal) {
 		}
 
 		// Brake Pedal Reverse
-		if (logiBrakeVal > 0.02f &&
+		if (wheelBrakeVal > 0.02f &&
 			vehData.Velocity <= -0.5f) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, logiBrakeVal);
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelBrakeVal);
 		}
 	}
 }
 
 // Pedals behave like RT/LT
-void handlePedalsDefault(float logiThrottleVal, float logiBrakeVal) {
-	if (logiThrottleVal > 0.02f) {
-		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, logiThrottleVal);
+void handlePedalsDefault(float wheelThrottleVal, float wheelBrakeVal) {
+	if (wheelThrottleVal > 0.02f) {
+		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
 	}
-	if (logiBrakeVal > 0.02f) {
-		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, logiBrakeVal);
+	if (wheelBrakeVal > 0.02f) {
+		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelBrakeVal);
 	}
 }
 
@@ -840,8 +882,8 @@ void functionAutoReverse() {
 ///////////////////////////////////////////////////////////////////////////////
 void handleVehicleButtons() {
 	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
-		controls.ButtonPressed(ScriptControls::ControllerControlType::Engine) ||
-		controls.ButtonPressed(ScriptControls::KeyboardControlType::Engine)) {
+		controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) ||
+		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine)) {
 
 		// ||			(logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::Engine])) ||
 		//	controls.ThrottleVal > 0.9f)) {
