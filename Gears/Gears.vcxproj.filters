@@ -23,9 +23,6 @@
     <ClCompile Include="WheelDirectInput.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="WheelLogiInput.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
     <ClCompile Include="XboxController.cpp">
       <Filter>Input</Filter>
     </ClCompile>
@@ -67,14 +64,14 @@
     <ClInclude Include="WheelDirectInput.hpp">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="WheelLogiInput.hpp">
-      <Filter>Input</Filter>
-    </ClInclude>
     <ClInclude Include="XboxController.hpp">
       <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="TimeHelper.hpp">
       <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="DiJoyStick.h">
+      <Filter>Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

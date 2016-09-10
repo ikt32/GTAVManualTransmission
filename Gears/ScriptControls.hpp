@@ -1,6 +1,8 @@
 #pragma once
 
 #include "XboxController.hpp"
+#include "WheelDirectInput.hpp"
+#include "Logger.hpp"
 
 class ScriptControls {
 public:
@@ -37,7 +39,7 @@ public:
 		SIZEOF_KeyboardControlType
 	};
 
-	enum class LogiControlType {
+	enum class WheelControlType {
 		HR = 0,
 		H1,
 		H2,
@@ -64,7 +66,7 @@ public:
 		IndicatorLeft,
 		IndicatorRight,
 		IndicatorHazard,
-		SIZEOF_LogiControlType
+		SIZEOF_WheelControlType
 	};
 
 	enum InputDevices {
@@ -73,23 +75,19 @@ public:
 		Wheel = 2
 	};
 
-public:
 	ScriptControls();
 	~ScriptControls();
 
 	InputDevices GetLastInputDevice(InputDevices previous);
 	void UpdateValues(InputDevices prevInput);
 
-	static bool IsKeyPressed(int key);
-	bool IsKeyJustPressed(int key, KeyboardControlType control);
-
-
-	int Control[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
-	int LogiControl[static_cast<int>(LogiControlType::SIZEOF_LogiControlType)] = {};
+	
+	int KBControl[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
+	int WheelControl[static_cast<int>(WheelControlType::SIZEOF_WheelControlType)] = {};
 
 	int CToggleTime = 0;
-	bool ControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
-	bool ControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
+	bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
+	bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 
 
 	float BrakeVal = 0.0f;
@@ -107,11 +105,11 @@ public:
 	std::string ControlXbox[static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)] = {};
 
 
-	// Ddd more when desired
+	// Add more when desired
 
 	bool ButtonPressed(ControllerControlType control);
-
 	bool ButtonPressed(KeyboardControlType control);
+	bool ButtonPressed(WheelControlType control);
 
 	bool ButtonHeld(ControllerControlType control);
 
@@ -121,7 +119,12 @@ private:
 	long long releaseTime = 0;
 	//InputDevices prevInput;
 
-	XboxController controller;
+	XboxController* controller;
 	WORD buttonState;
 
+	WheelInput* wheel;
+	const DIJOYSTATE2* wheelState;
+
+	static bool IsKeyPressed(int key);
+	bool IsKeyJustPressed(int key, KeyboardControlType control);
 };

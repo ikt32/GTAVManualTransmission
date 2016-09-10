@@ -65,20 +65,20 @@ bool XboxController::IsButtonPressed(XboxButtons buttonType, WORD buttonState) {
 }
 
 bool XboxController::IsButtonJustPressed(XboxButtons buttonType, WORD buttonState) {
-	XboxButtonCurr[buttonType] = IsButtonPressed(buttonType, buttonState);
+	xboxButtonCurr[buttonType] = IsButtonPressed(buttonType, buttonState);
 
 	// raising edge
-	if (XboxButtonCurr[buttonType] && !XboxButtonPrev[buttonType]) {
+	if (xboxButtonCurr[buttonType] && !xboxButtonPrev[buttonType]) {
 		return true;
 	}
 	return false;
 }
 
 bool XboxController::IsButtonJustReleased(XboxButtons buttonType, WORD buttonState) {
-	XboxButtonCurr[buttonType] = IsButtonPressed(buttonType, buttonState);
+	xboxButtonCurr[buttonType] = IsButtonPressed(buttonType, buttonState);
 
 	// falling edge
-	if (!XboxButtonCurr[buttonType] && XboxButtonPrev[buttonType]) {
+	if (!xboxButtonCurr[buttonType] && xboxButtonPrev[buttonType]) {
 		return true;
 	}
 	return false;
@@ -103,7 +103,7 @@ bool XboxController::WasButtonHeldForMs(XboxButtons buttonType, WORD buttonState
 // KILL ME NOW
 void XboxController::UpdateButtonChangeStates() {
 	for (int i = 0; i < SIZEOF_XboxButtons; i++) {
-		XboxButtonPrev[i] = XboxButtonCurr[i];
+		xboxButtonPrev[i] = xboxButtonCurr[i];
 	}
 }
 

@@ -118,7 +118,6 @@
     <ClCompile Include="VehicleExtensions.cpp" />
     <ClCompile Include="MemoryPatcher.cpp" />
     <ClCompile Include="WheelDirectInput.cpp" />
-    <ClCompile Include="WheelLogiInput.cpp" />
     <ClCompile Include="XboxController.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -126,6 +125,7 @@
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\main.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h" />
+    <ClInclude Include="DiJoyStick.h" />
     <ClInclude Include="TimeHelper.hpp" />
     <ClInclude Include="NativeMemory.hpp" />
     <ClInclude Include="Logger.hpp" />
@@ -137,7 +137,6 @@
     <ClInclude Include="VehicleExtensions.hpp" />
     <ClInclude Include="MemoryPatcher.hpp" />
     <ClInclude Include="WheelDirectInput.hpp" />
-    <ClInclude Include="WheelLogiInput.hpp" />
     <ClInclude Include="XboxController.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

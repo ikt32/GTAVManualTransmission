@@ -14,7 +14,7 @@
 #include "Logger.hpp"
 #include "VehicleData.hpp"
 #include "MemoryPatcher.hpp"
-#include "WheelLogiInput.hpp"
+//#include "WheelLogiInput.hpp"
 
 Logger logger(LOGFILE);
 ScriptControls controls = ScriptControls();
@@ -42,7 +42,7 @@ bool blinkerLeft = false;
 bool blinkerRight = false;
 bool blinkerHazard = false;
 bool truckShiftUp = false;
-DIJOYSTATE2* logiState;
+//DIJOYSTATE2* logiState;
 
 
 void update() {
@@ -96,10 +96,6 @@ void update() {
 	}
 	prevVehicle = vehicle;
 
-	//if (settings.LogiWheel) {
-	//	LogiUpdate();
-	//}
-
 	controls.UpdateValues(prevInput);
 
 	if (controls.ButtonPressed(ScriptControls::KeyboardControlType::Toggle) ||
@@ -123,8 +119,9 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 	handleVehicleButtons();
 
-	if (controls.IsKeyJustPressed(controls.Control[static_cast<int>(ScriptControls::KeyboardControlType::ToggleH)], ScriptControls::KeyboardControlType::ToggleH)) {
+	//if (controls.IsKeyJustPressed(controls.KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ToggleH)], ScriptControls::KeyboardControlType::ToggleH)) {
 		// || (logiWheel.IsActive(&settings) && LogiButtonTriggered(logiWheel.GetIndex(), controls.LogiControl[(int)ScriptControls::LogiControlType::ToggleH]))) {
+	if (controls.ButtonPressed(ScriptControls::KeyboardControlType::ToggleH)) {
 		settings.Hshifter = !settings.Hshifter;
 		if (!settings.Hshifter && vehData.CurrGear > 1) {
 			vehData.SimulatedNeutral = false;
@@ -135,11 +132,6 @@ void update() {
 		showNotification(const_cast<char *>(message.str().c_str()));
 		settings.Save();
 	}
-
-	/*if (logiWheel.IsActive(&settings)) {
-		logiWheel.UpdateLogiValues();
-		logiState = LogiGetState(logiWheel.GetIndex());
-	}*/
 
 	if (prevInput != controls.GetLastInputDevice(prevInput)) {
 		prevInput = controls.GetLastInputDevice(prevInput);
@@ -157,10 +149,10 @@ void update() {
 					showNotification("Switched to controller");
 				}
 				break;
-				//case InputDevices::Wheel: // Wheel
-				//	//CONTROLS::DISABLE_ALL_CONTROL_ACTIONS
-				//	showNotification("Switched to wheel");
-				//	break;
+				case ScriptControls::Wheel:
+					//CONTROLS::DISABLE_ALL_CONTROL_ACTIONS
+					showNotification("Switched to wheel");
+					break;
 			default:
 				break;
 		}
@@ -326,21 +318,16 @@ void showDebugInfo() {
 	const char* infoc = infos.str().c_str();
 	showText(0.01f, 0.5f, 0.4f, infoc);
 
-	/*if (logiWheel.IsActive(&settings) && logiState != NULL) {
-		std::stringstream throttleDisplay;
-		throttleDisplay << "ThrottleVal: " << logiWheel.GetLogiThrottleVal() << std::endl <<
-			"ThrottleRaw: " << logiState->lY;
-		std::stringstream brakeDisplay;
-		brakeDisplay	<< "Brake Value: " << logiWheel.GetLogiBrakeVal() << std::endl <<
-			"Brake   Raw: " << logiState->lRz;
-		std::stringstream clutchDisplay;
-		clutchDisplay	<< "ClutchValue: " << logiWheel.GetLogiClutchVal() << std::endl <<
-			"Clutch  Raw: " << logiState->rglSlider[1];
+	std::stringstream throttleDisplay;
+	throttleDisplay << "ThrottleVal: " << controls.ThrottleVal << std::endl;
+	std::stringstream brakeDisplay;
+	brakeDisplay << "Brake Value: " << controls.BrakeVal << std::endl;
+	std::stringstream clutchDisplay;
+	clutchDisplay << "ClutchValue: " << controls.ClutchVal << std::endl;
 
-		showText(0.85, 0.04, 0.4, throttleDisplay.str().c_str());
-		showText(0.85, 0.10, 0.4, brakeDisplay.str().c_str());
-		showText(0.85, 0.16, 0.4, clutchDisplay.str().c_str());
-	}*/
+	showText(0.85, 0.04, 0.4, throttleDisplay.str().c_str());
+	showText(0.85, 0.10, 0.4, brakeDisplay.str().c_str());
+	showText(0.85, 0.16, 0.4, clutchDisplay.str().c_str());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -380,7 +367,7 @@ void toggleManual() {
 	}
 	if (!settings.EnableManual) {
 		reset();
-		LogiSteeringShutdown();
+		//LogiSteeringShutdown();
 	}
 	reInit();
 }
@@ -424,6 +411,7 @@ void functionHShiftTo(int i) {
 	}
 }
 
+// TODO: Check if still works
 void functionHShiftKeyboard() {
 	// Highest shifter button == 8
 	int clamp = 8;
@@ -431,12 +419,14 @@ void functionHShiftKeyboard() {
 		clamp = vehData.TopGear;
 	}
 	for (uint8_t i = 0; i <= clamp; i++) {
-		if (controls.IsKeyJustPressed(controls.Control[i], static_cast<ScriptControls::KeyboardControlType>(i))) {
+		//if (controls.IsKeyJustPressed(controls.KBControl[i], static_cast<ScriptControls::KeyboardControlType>(i))) {
+		if (controls.ButtonPressed(static_cast<ScriptControls::KeyboardControlType>(i))) {
 			functionHShiftTo(i);
 		}
 	}
-	if (controls.IsKeyJustPressed(controls.Control[static_cast<int>(ScriptControls::KeyboardControlType::HN)], ScriptControls::KeyboardControlType::HN)
-		&& !vehData.NoClutch) {
+	//if (controls.IsKeyJustPressed(controls.KBControl[static_cast<int>(ScriptControls::KeyboardControlType::HN)], ScriptControls::KeyboardControlType::HN)
+	if (controls.ButtonPressed(ScriptControls::KeyboardControlType::HN) &&
+		!vehData.NoClutch) {
 		vehData.SimulatedNeutral = !vehData.SimulatedNeutral;
 	}
 }

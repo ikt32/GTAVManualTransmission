@@ -96,6 +96,8 @@ private:
 	std::array<__int64, SIZEOF_XboxButtons> pressTime;
 	std::array<__int64, SIZEOF_XboxButtons> releaseTime;
 	static float filterDeadzone(XboxButtons buttonType, int input);
+	std::array<bool, SIZEOF_XboxButtons> xboxButtonCurr;
+	std::array<bool, SIZEOF_XboxButtons> xboxButtonPrev;
 
 public:
 	XboxController(int playerNumber);
@@ -109,8 +111,6 @@ public:
 	bool WasButtonHeldForMs(XboxButtons buttonType, WORD buttonState, int milliseconds);
 	void UpdateButtonChangeStates();
 
-	std::array<bool, SIZEOF_XboxButtons> XboxButtonCurr;
-	std::array<bool, SIZEOF_XboxButtons> XboxButtonPrev;
 
 	XboxButtons StringToButton(std::string buttonString);
 
