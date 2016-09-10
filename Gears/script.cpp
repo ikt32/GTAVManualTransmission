@@ -110,6 +110,12 @@ void update() {
 		handleVehicleButtons();
 		handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
 		doWheelSteering();
+		playWheelEffects(
+			vehData.Speed,
+			vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
+			vehData.getAccelerationVectorsAverage(),
+			&settings,
+			false);
 	}
 
 	if (!settings.EnableManual ||
@@ -982,7 +988,15 @@ void playWheelEffects(
 	ScriptSettings* settings,
 	bool airborne) {
 
-	if (settings == nullptr) {
+	if (settings == nullptr)
+		return;
+		
+
+	if (prevInput != ScriptControls::Wheel) {
+		return;
+	}
+
+	if (controls.Wheelptr == nullptr) {
 		return;
 	}
 
