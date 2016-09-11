@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <Windows.h>
 #include "Logger.hpp"
 
 namespace MemoryPatcher {
@@ -15,7 +16,7 @@ namespace MemoryPatcher {
 
 	uintptr_t clutchLowAddr = 0;
 	uintptr_t clutchLowTemp = 0;
-	
+
 	//uintptr_t clutchS01Addr = 0;
 	//uintptr_t clutchS01Temp = 0;
 	//
@@ -89,7 +90,7 @@ namespace MemoryPatcher {
 		//	logger.Write("Clutch_Stationary_04 not patched");
 		//}
 
-		
+
 		//throttleCutTemp = PatchThrottleRedline();
 		//if (throttleCutTemp) {
 		//	throttleCutAddr = throttleCutTemp;
@@ -118,10 +119,8 @@ namespace MemoryPatcher {
 			logger.Write("Patching success");
 			return true;
 		}
-		else {
-			logger.Write("Patching failed");
-			return false;
-		}
+		logger.Write("Patching failed");
+		return false;
 	}
 
 	bool RestoreInstructions() {
@@ -145,7 +144,7 @@ namespace MemoryPatcher {
 		//else {
 		//	logger.Write("RevLimiter not restored");
 		//}
-		
+
 		//if (clutchS01Addr) {
 		//	RestoreClutchStationary01(clutchS01Addr);
 		//	clutchS01Addr = 0;
@@ -186,10 +185,8 @@ namespace MemoryPatcher {
 			logger.Write("Restore success");
 			return true;
 		}
-		else {
-			logger.Write("Restore failed");
-			return false;
-		}
+		logger.Write("Restore failed");
+		return false;
 	}
 
 	/*bool PatchJustS_LOW() {
@@ -244,15 +241,16 @@ namespace MemoryPatcher {
 		uintptr_t address = mem.FindPattern("\xC7\x43\x40\xCD\xCC\xCC\x3D\x66\x44\x89\x43\x04", "xxxxxxxxxxxx");
 
 		if (address) {
-			memset((void *)address, 0x90, 7);
+			memset(reinterpret_cast<void *>(address), 0x90, 7);
 		}
 		return address;
 	}
+
 	void RestoreClutchLow(uintptr_t address) {
-		byte instrArr[7] = { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D };
+		byte instrArr[7] = {0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D};
 		if (address) {
 			for (int i = 0; i < 7; i++) {
-				memset((void *)(address + i), instrArr[i], 1);
+				memset(reinterpret_cast<void *>(address + i), instrArr[i], 1);
 			}
 		}
 	}
@@ -265,16 +263,17 @@ namespace MemoryPatcher {
 		uintptr_t address = mem.FindPattern("\x44\x89\x7B\x60\x89\x73\x5C\x66\x89\x13", "xxxxxxxxxx");
 
 		if (address) {
-			memset((void *)(address+offset), 0x90, 3);
+			memset(reinterpret_cast<void *>(address + offset), 0x90, 3);
 			return (address + offset);
 		}
 		return 0;
 	}
+
 	void RestoreRevLimiter(uintptr_t address) {
-		byte instrArr[3] = { 0x66, 0x89, 0x13 };
+		byte instrArr[3] = {0x66, 0x89, 0x13};
 		if (address) {
 			for (int i = 0; i < 3; i++) {
-				memset((void *)(address + i), instrArr[i], 1);
+				memset(reinterpret_cast<void *>(address + i), instrArr[i], 1);
 			}
 		}
 	}
@@ -286,15 +285,16 @@ namespace MemoryPatcher {
 		uintptr_t address = mem.FindPattern("\x66\x89\x13\x89\x73\x5C", "xxxxxx");
 
 		if (address) {
-			memset((void *)address, 0x90, 3);
+			memset(reinterpret_cast<void *>(address), 0x90, 3);
 		}
 		return address;
 	}
+
 	void RestoreGear7A0(uintptr_t address) {
-		byte instrArr[3] = { 0x66, 0x89, 0x13 };
+		byte instrArr[3] = {0x66, 0x89, 0x13};
 		if (address) {
 			for (int i = 0; i < 3; i++) {
-				memset((void *)(address + i), instrArr[i], 1);
+				memset(reinterpret_cast<void *>(address + i), instrArr[i], 1);
 			}
 		}
 	}

@@ -1,17 +1,17 @@
 #pragma once
 
-#include <Windows.h>
 #include "ScriptControls.hpp"
 
 #define SETTINGSFILE "./Gears.ini"
 
-class ScriptSettings
-{
+class ScriptControls;
+
+class ScriptSettings {
 public:
 	ScriptSettings();
 
-	void Read(ScriptControls *scriptControl);
-	void Save();
+	void Read(ScriptControls* scriptControl);
+	void Save() const;
 
 	bool EnableManual;
 	bool RealReverse;
@@ -44,7 +44,8 @@ public:
 	float StallingThreshold;
 	float RPMDamage;
 	int MisshiftDamage;
+	bool WheelWithoutManual;
+
 private:
 	void CheckSettings();
 };
-

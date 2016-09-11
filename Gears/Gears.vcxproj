@@ -92,7 +92,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
-      <AdditionalOptions>..\..\ScriptHookV_SDK\lib\ScriptHookV.lib ..\..\LogitechSteeringWheel_SDK\lib\x64\LogitechSteeringWheelLib.lib</AdditionalOptions>
+      <AdditionalOptions>..\..\ScriptHookV_SDK\lib\ScriptHookV.lib</AdditionalOptions>
       <GenerateDebugInformation>No</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -102,6 +102,9 @@
     <BuildLog>
       <Path>$(IntDir)$(MSBuildProjectName).log</Path>
     </BuildLog>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -113,7 +116,7 @@
     <ClCompile Include="VehicleData.cpp" />
     <ClCompile Include="VehicleExtensions.cpp" />
     <ClCompile Include="MemoryPatcher.cpp" />
-    <ClCompile Include="WheelLogiInput.cpp" />
+    <ClCompile Include="WheelDirectInput.cpp" />
     <ClCompile Include="XboxController.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +124,7 @@
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\main.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h" />
+    <ClInclude Include="DiJoyStick.h" />
     <ClInclude Include="TimeHelper.hpp" />
     <ClInclude Include="NativeMemory.hpp" />
     <ClInclude Include="Logger.hpp" />
@@ -131,7 +135,7 @@
     <ClInclude Include="VehicleData.hpp" />
     <ClInclude Include="VehicleExtensions.hpp" />
     <ClInclude Include="MemoryPatcher.hpp" />
-    <ClInclude Include="WheelLogiInput.hpp" />
+    <ClInclude Include="WheelDirectInput.hpp" />
     <ClInclude Include="XboxController.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

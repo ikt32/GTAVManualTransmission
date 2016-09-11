@@ -6,39 +6,37 @@ http://dev-c.com
 
 #pragma once
 
-#include "..\..\ScriptHookV_SDK\inc\natives.h"
-#include "..\..\ScriptHookV_SDK\inc\types.h"
-#include "..\..\ScriptHookV_SDK\inc\enums.h"
-#include "..\..\ScriptHookV_SDK\inc\main.h"
+#include "../../ScriptHookV_SDK/inc/types.h"
 
 #ifndef DIRECTINPUT_VERSION
 #define DIRECTINPUT_VERSION 0x0800
 #endif
-#include "..\..\LogitechSteeringWheel_SDK\Include\LogitechSteeringWheelLib.h"
 
-enum InputDevices {
-	Keyboard = 0,
-	Controller = 1,
-	Wheel = 2
-};
-
+class ScriptSettings;
 void ScriptMain();
 
 void crossScriptComms();
 
-void showText(float x, float y, float scale, const char * text);
-void showNotification(char *message);
+void showText(float x, float y, float scale, const char* text);
+void showNotification(char* message);
 void showDebugInfo();
 void reInit();
 void toggleManual();
 void reset();
-int getLastInputDevice(int previousInput);
 
-void resetWheelFeedback(int index);
+void updateLastInputDevice();
+
+
 void handlePedalsDefault(float logiThrottleVal, float logiBrakeVal);
 void handlePedalsRealReverse(float logiThrottleVal, float logiBrakeVal);
 void handleVehicleButtons();
-void playWheelEffects();
+void playWheelEffects(
+	float speed,
+	Vector3 accelVals,
+	Vector3 accelValsAvg,
+	ScriptSettings* settings,
+	bool airborne);
+void doWheelSteering();
 
 void functionAutoReverse();
 void functionRealReverse();
@@ -51,7 +49,7 @@ void functionClutchCatch();
 void functionHShiftTo(int i);
 void functionHShiftKeyboard();
 void functionSShift();
-void functionHShiftLogitech();
+void functionHShiftWheel();
 
 void shiftTo(int gear, bool autoClutch);
 void handleRPM();

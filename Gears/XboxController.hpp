@@ -1,11 +1,9 @@
 #pragma once
 #include <Windows.h>
 #include <Xinput.h>
-#include <string>
 #include <array>
 
-class XboxController
-{
+class XboxController {
 public:
 	enum XboxButtons {
 		DpadUp,
@@ -97,13 +95,15 @@ private:
 	int controllerNum;
 	std::array<__int64, SIZEOF_XboxButtons> pressTime;
 	std::array<__int64, SIZEOF_XboxButtons> releaseTime;
-	float filterDeadzone(XboxButtons buttonType, int input);
+	static float filterDeadzone(XboxButtons buttonType, int input);
+	std::array<bool, SIZEOF_XboxButtons> xboxButtonCurr;
+	std::array<bool, SIZEOF_XboxButtons> xboxButtonPrev;
 
 public:
 	XboxController(int playerNumber);
 	XINPUT_STATE GetState();
 	bool IsConnected();
-	void Vibrate(int leftval = 0, int rightval = 0);
+	void Vibrate(int leftval = 0, int rightval = 0) const;
 
 	bool IsButtonPressed(XboxButtons buttonType, WORD buttonState);
 	bool IsButtonJustPressed(XboxButtons buttonType, WORD buttonState);
@@ -111,8 +111,6 @@ public:
 	bool WasButtonHeldForMs(XboxButtons buttonType, WORD buttonState, int milliseconds);
 	void UpdateButtonChangeStates();
 
-	std::array<bool, SIZEOF_XboxButtons> XboxButtonCurr;
-	std::array<bool, SIZEOF_XboxButtons> XboxButtonPrev;
 
 	XboxButtons StringToButton(std::string buttonString);
 

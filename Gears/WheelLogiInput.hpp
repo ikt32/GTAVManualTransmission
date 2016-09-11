@@ -3,8 +3,7 @@
 #include <Xinput.h>
 
 #include "..\..\ScriptHookV_SDK\inc\types.h"
-#include "..\..\ScriptHookV_SDK\inc\natives.h"
-#include "..\..\ScriptHookV_SDK\inc\enums.h"
+
 
 #include "ScriptSettings.hpp"
 #include "VehicleData.hpp"
@@ -15,26 +14,25 @@
 #endif
 #include "..\..\LogitechSteeringWheel_SDK\Include\LogitechSteeringWheelLib.h"
 
-class WheelLogiInput
-{
+class WheelLogiInput {
 public:
 	WheelLogiInput(int index);
 	~WheelLogiInput();
-	void DoWheelSteering(float steerVal);
+	void DoWheelSteering(float steerVal) const;
 	void PlayWheelEffects(
-		ScriptSettings *settings,
-		VehicleData *vehData,
-		Vehicle vehicle);
+		ScriptSettings* settings,
+		VehicleData* vehData,
+		Vehicle vehicle) const;
 	void UpdateLogiValues();
-	bool InitWheel(ScriptSettings *settings, Logger *logger);
-	void PlayWheelVisuals(float rpm);
+	bool InitWheel(ScriptSettings* settings, Logger* logger);
+	void PlayWheelVisuals(float rpm) const;
 	//bool IsActive = false;
-	int GetIndex();
-	float GetLogiWheelVal();
-	float GetLogiThrottleVal();
-	float GetLogiBrakeVal();
-	float GetLogiClutchVal();
-	bool IsActive(ScriptSettings *settings);
+	int GetIndex() const;
+	float GetLogiWheelVal() const;
+	float GetLogiThrottleVal() const;
+	float GetLogiBrakeVal() const;
+	float GetLogiClutchVal() const;
+	bool IsActive(ScriptSettings* settings) const;
 
 private:
 	int index_ = 0;
@@ -48,4 +46,3 @@ private:
 	float logiClutchVal;
 	LogiControllerPropertiesData properties;
 };
-
