@@ -43,7 +43,6 @@ Speedometers Neutral gear:
 * "hunt_weapon" 0 - In gear
 * "hunt_weapon" 1 - Neutral
 
-Please note that the neutral gear is the gearbox simulated neutral gear, which isn't affected by the hand brake!
+Please note that the neutral gear is a simulated neutral gear, which is clutch in gear 1. Take this in consideration for your speedometer implementation.
 
-__Important note:__ Usage of decorators out of base game context isn't guaranteed to work. Think CitizenFX-based mods. The reason behind this is that we're just hijacking some existing base game scripts and hope nothing conflicts.
-
+__Important note:__ Usage of decorators out of base game context isn't guaranteed to work. CitizenFX-based mods will crash. Cross-script communication can be simply disabled using the ```CrossScript = 0``` in ```Gears.ini``` for these situations.

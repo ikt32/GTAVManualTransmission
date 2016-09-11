@@ -34,6 +34,7 @@ public:
 	float FFCenterSpring;
 	bool DisableDpad;
 
+	bool CrossScript;
 	bool Debug;
 
 	float UITips_X;

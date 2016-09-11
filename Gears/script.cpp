@@ -98,7 +98,9 @@ void update() {
 		toggleManual();
 	}
 
-	//crossScriptComms();
+	if (settings.CrossScript) {
+		crossScriptComms();
+	}
 
 	if (settings.Debug) {
 		showDebugInfo();
