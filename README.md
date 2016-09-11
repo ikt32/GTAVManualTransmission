@@ -15,7 +15,7 @@ Discuss the mod over at [GTAForums.com](http://gtaforums.com/topic/840830-manual
 
 * [GTA5-Mods.com](https://www.gta5-mods.com/scripts/manual-transmission-ikt)
 * [Releases page](https://github.com/E66666666/GTAVManualTransmission/releases)
-* [AppVeyor build fragments](https://ci.appveyor.com/project/E66666666/gtavmanualtransmission)
+* [AppVeyor build artifacts](https://ci.appveyor.com/project/E66666666/gtavmanualtransmission/build/artifacts)
 
 ## Building
 
