@@ -5,7 +5,7 @@
 #include "../../ScriptHookV_SDK/inc/enums.h"
 
 ScriptControls::ScriptControls(): buttonState(0) {
-	WheelDI = new WheelDirectInput();
+	WheelDI = new WheelDirectInput(FFAxis);
 	controller = new XboxController(1);
 }
 
@@ -14,11 +14,11 @@ ScriptControls::~ScriptControls() {
 
 void ScriptControls::ReInitWheel() {
 	if (WheelDI == nullptr) {
-		WheelDI = new WheelDirectInput();
+		WheelDI = new WheelDirectInput(FFAxis);
 	}
 	if (!WheelDI->IsConnected()) {
 		delete(WheelDI);
-		WheelDI = new WheelDirectInput();
+		WheelDI = new WheelDirectInput(FFAxis);
 	}
 }
 

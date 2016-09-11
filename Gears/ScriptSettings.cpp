@@ -141,7 +141,10 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] = buffer;
 	GetPrivateProfileStringA("WHEELAXIS", "Steer", "lX", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)] = buffer;
-
+	
+	GetPrivateProfileStringA("WHEELAXIS", "FFAxis", "X", buffer, static_cast<DWORD>(24), SETTINGSFILE);
+	scriptControl->FFAxis = buffer;
+	scriptControl->FFInvert = (GetPrivateProfileIntA("WHEELAXIS", "InvertFF", 0, SETTINGSFILE) == 1);
 
 	WheelRange = GetPrivateProfileIntA("WHEEL", "WheelRange", 180, SETTINGSFILE);
 	FFEnable = GetPrivateProfileIntA("WHEEL", "FFEnable", 1, SETTINGSFILE) == 1;

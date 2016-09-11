@@ -84,8 +84,10 @@ public:
 		"rglFSlider1",
 		"UNKNOWN"
 	};
+
 public:
-	WheelDirectInput();
+	//WheelDirectInput();
+	WheelDirectInput(std::string ffAxis);
 	~WheelDirectInput();
 
 	// Should be called every update()
@@ -100,6 +102,7 @@ public:
 	void UpdateButtonChangeStates();
 
 	HRESULT SetForce(int force) const;
+	HRESULT SetConditionalForce();
 	DIAxis StringToAxis(std::string axisString);
 	DIJOYSTATE2 JoyState;
 
@@ -109,9 +112,9 @@ private:
 	DiJoyStick djs;
 	LPDIRECTINPUT lpDi = nullptr;
 
-	LPDIRECTINPUTEFFECT g_pEffect;
-
-	bool CreateEffect();
+	LPDIRECTINPUTEFFECT pCFEffect;
+	LPDIRECTINPUTEFFECT pFREffect;
+	bool CreateEffect(std::string axis);
 	std::array<__int64, MAX_RGBBUTTONS> pressTime;
 	std::array<__int64, MAX_RGBBUTTONS> releaseTime;
 	std::array<bool, MAX_RGBBUTTONS> rgbButtonCurr;
