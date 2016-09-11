@@ -998,7 +998,7 @@ void playWheelEffects(
 		return;
 	}
 
-	if (controls.Wheelptr == nullptr) {
+	if (controls.WheelDI == nullptr) {
 		return;
 	}
 
@@ -1025,7 +1025,7 @@ void playWheelEffects(
 	int constantForce = 100 * static_cast<int>(-settings->FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
 
 
-	HRESULT hr = controls.Wheelptr->SetForce(constantForce);
+	controls.WheelDI->SetForce(constantForce);
 	/*switch (hr) {
 	case DI_DOWNLOADSKIPPED:
 		logger.Write("SetForce DI_DOWNLOADSKIPPED");

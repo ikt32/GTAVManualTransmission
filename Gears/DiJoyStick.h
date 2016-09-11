@@ -21,7 +21,8 @@ public:
 	DiJoyStick() : entry(0),
 	               maxEntry(0),
 	               nEntry(0),
-	               di(0) {
+	               di(0),
+	               lpdf{nullptr} {
 	}
 
 	~DiJoyStick() {

@@ -119,10 +119,8 @@ namespace MemoryPatcher {
 			logger.Write("Patching success");
 			return true;
 		}
-		else {
-			logger.Write("Patching failed");
-			return false;
-		}
+		logger.Write("Patching failed");
+		return false;
 	}
 
 	bool RestoreInstructions() {
@@ -187,10 +185,8 @@ namespace MemoryPatcher {
 			logger.Write("Restore success");
 			return true;
 		}
-		else {
-			logger.Write("Restore failed");
-			return false;
-		}
+		logger.Write("Restore failed");
+		return false;
 	}
 
 	/*bool PatchJustS_LOW() {

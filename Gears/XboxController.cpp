@@ -26,9 +26,7 @@ bool XboxController::IsConnected() {
 	if (Result == ERROR_SUCCESS) {
 		return true;
 	}
-	else {
-		return false;
-	}
+	return false;
 }
 
 void XboxController::Vibrate(int leftVal, int rightVal) const {
@@ -59,9 +57,7 @@ bool XboxController::IsButtonPressed(XboxButtons buttonType, WORD buttonState) {
 		buttonType == RightThumbDown) {
 		return (GetAnalogValue(buttonType, buttonState) > 0.25f);
 	}
-	else {
-		return (buttonState & XboxButtonMasks[buttonType]) != 0;
-	}
+	return (buttonState & XboxButtonMasks[buttonType]) != 0;
 }
 
 bool XboxController::IsButtonJustPressed(XboxButtons buttonType, WORD buttonState) {
@@ -177,7 +173,5 @@ float XboxController::filterDeadzone(XboxButtons buttonType, int input) {
 		input -= deadzone;
 		return static_cast<float>(input) / static_cast<float>(32767 - deadzone);
 	}
-	else {
-		return 0.0f;
-	}
+	return 0.0f;
 }

@@ -37,9 +37,9 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 			ClutchVal = controller->GetAnalogValue(controller->StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Clutch)]), buttonState);
 			break;
 		case Wheel:
-			ThrottleVal = 1.0f - static_cast<float>(wheelState->lY) / 65535.0f;
-			BrakeVal = 1.0f - static_cast<float>(wheelState->lRz) / 65535.0f;
-			ClutchVal = 1.0f - static_cast<float>(wheelState->rglSlider[1]) / 65535.0f;
+			ThrottleVal = 1.0f - static_cast<float>(WheelDI->JoyState.lY) / 65535.0f;
+			BrakeVal = 1.0f - static_cast<float>(WheelDI->JoyState.lRz) / 65535.0f;
+			ClutchVal = 1.0f - static_cast<float>(WheelDI->JoyState.rglSlider[1]) / 65535.0f;
 			break;
 		default: break;
 	}
