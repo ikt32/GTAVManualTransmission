@@ -12,6 +12,16 @@ ScriptControls::ScriptControls(): buttonState(0) {
 ScriptControls::~ScriptControls() {
 }
 
+void ScriptControls::ReInitWheel() {
+	if (WheelDI == nullptr) {
+		WheelDI = new WheelDirectInput();
+	}
+	if (!WheelDI->IsConnected()) {
+		delete(WheelDI);
+		WheelDI = new WheelDirectInput();
+	}
+}
+
 void ScriptControls::UpdateValues(InputDevices prevInput) {
 	if (controller->IsConnected()) {
 		buttonState = controller->GetState().Gamepad.wButtons;

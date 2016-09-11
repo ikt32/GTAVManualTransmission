@@ -15,7 +15,7 @@
 #include "MemoryPatcher.hpp"
 
 Logger logger(LOGFILE);
-ScriptControls controls = ScriptControls();
+ScriptControls controls;
 ScriptSettings settings;
 
 Player player;
@@ -105,7 +105,8 @@ void update() {
 	}
 
 	if (!settings.EnableManual &&
-		settings.WheelWithoutManual) {
+		settings.WheelWithoutManual &&
+		controls.WheelDI->IsConnected()) {
 		updateLastInputDevice();
 		handleVehicleButtons();
 		handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
@@ -128,13 +129,17 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 	updateLastInputDevice();
 	handleVehicleButtons();
-	doWheelSteering();
-	playWheelEffects(
-		vehData.Speed,
-		vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
-		vehData.getAccelerationVectorsAverage(),
-		&settings,
-		false);
+
+	if (controls.WheelDI->IsConnected()) {
+		doWheelSteering();
+		playWheelEffects(
+			vehData.Speed,
+			vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
+			vehData.getAccelerationVectorsAverage(),
+			&settings,
+			false);
+	}
+	
 
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ToggleH) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::ToggleH)) {
@@ -255,10 +260,6 @@ void update() {
 
 void main() {
 	settings.Read(&controls);
-	/*if (settings.LogiWheel) {
-		logiWheel.InitWheel(&settings, &logger);
-	}*/
-
 	while (true) {
 		update();
 		WAIT(0);
@@ -316,11 +317,14 @@ void showDebugInfo() {
 	clutchDisplay << "ClutchValue: " << controls.ClutchVal << std::endl;
 	std::stringstream steerDisplay;
 	steerDisplay << "SteerValue: " << controls.SteerVal << std::endl;
+	std::stringstream dinputDisplay;
+	dinputDisplay << "Wheel Avail: " << controls.WheelDI->IsConnected() << std::endl;
 
 	showText(0.85, 0.04, 0.4, throttleDisplay.str().c_str());
-	showText(0.85, 0.10, 0.4, brakeDisplay.str().c_str());
-	showText(0.85, 0.16, 0.4, clutchDisplay.str().c_str());
-	showText(0.85, 0.22, 0.4, steerDisplay.str().c_str());
+	showText(0.85, 0.08, 0.4, brakeDisplay.str().c_str());
+	showText(0.85, 0.12, 0.4, clutchDisplay.str().c_str());
+	showText(0.85, 0.16, 0.4, steerDisplay.str().c_str());
+	showText(0.85, 0.20, 0.4, dinputDisplay.str().c_str());
 
 	/*for (int i = 0; i < MAX_RGBBUTTONS; i++) {
 		if (controls.wheelState->rgbButtons[i]) {
@@ -363,6 +367,10 @@ void toggleManual() {
 		//LogiSteeringShutdown();
 	}
 	reInit();
+	if (settings.LogiWheel) {
+		if (!controls.WheelDI->IsConnected())
+			controls.ReInitWheel();
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -998,7 +1006,8 @@ void playWheelEffects(
 		return;
 	}
 
-	if (controls.WheelDI == nullptr) {
+	if (controls.WheelDI == nullptr ||
+		!controls.WheelDI->IsConnected()) {
 		return;
 	}
 

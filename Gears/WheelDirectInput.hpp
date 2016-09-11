@@ -18,7 +18,7 @@ public:
 	// Should be called every update()
 	void UpdateState();
 
-	bool IsConnected() const;
+	bool IsConnected();
 
 	bool IsButtonPressed(int btn);
 	bool IsButtonJustPressed(int btn);

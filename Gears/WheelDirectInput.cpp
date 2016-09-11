@@ -1,5 +1,6 @@
 #include "WheelDirectInput.hpp"
 #include "TimeHelper.hpp"
+#define FAILED(hr) (((HRESULT)(hr)) < 0)
 
 WheelDirectInput::WheelDirectInput() {
 	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(nullptr), DIRECTINPUT_VERSION, IID_IDirectInput8, reinterpret_cast<void**>(&lpDi), nullptr))) {
@@ -39,9 +40,21 @@ void WheelDirectInput::UpdateState() {
 	}
 }
 
-bool WheelDirectInput::IsConnected() const {
-	if (djs.getEntryCount() > 0)
+bool WheelDirectInput::IsConnected() {
+	const DiJoyStick::Entry* e = djs.getEntry(0);
+
+	if (e) {
+		HRESULT hr;
+		if ( FAILED( hr = e->diDevice->GetDeviceState( sizeof( DIJOYSTATE2 ), &JoyState ) ) ) {
+			return false;
+		}
+	} else {
+		return false;
+	}
+
+	if (djs.getEntryCount() > 0) {
 		return true;
+	}
 	return false;
 }
 
@@ -132,7 +145,7 @@ bool WheelDirectInput::CreateEffect() {
 }
 
 HRESULT WheelDirectInput::SetForce(int force) const {
-
+	
 	const DiJoyStick::Entry* e = djs.getEntry(0);
 	if (e) {
 		e->diDevice->Acquire();

@@ -76,6 +76,7 @@ public:
 
 	ScriptControls();
 	~ScriptControls();
+	void ReInitWheel();
 
 	InputDevices GetLastInputDevice(InputDevices previous);
 	void UpdateValues(InputDevices prevInput);
