@@ -1,8 +1,8 @@
 #include "WheelDirectInput.hpp"
 #include "TimeHelper.hpp"
 
-WheelInput::WheelInput() {
-	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(0), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&lpDi, 0))) {
+WheelDirectInput::WheelDirectInput() {
+	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(nullptr), DIRECTINPUT_VERSION, IID_IDirectInput8, reinterpret_cast<void**>(&lpDi), nullptr))) {
 		djs.enumerate(lpDi);
 	}
 
@@ -25,38 +25,34 @@ WheelInput::WheelInput() {
 
 }
 
-WheelInput::~WheelInput() {
+WheelDirectInput::~WheelDirectInput() {
 
 }
 
-const DIJOYSTATE2* WheelInput::GetState() {
+void WheelDirectInput::UpdateState() {
 	djs.update();
 
 	const DiJoyStick::Entry* e = djs.getEntry(0);
 
 	if (e) {
-
-		const DIJOYSTATE2* js = &e->joystate;
-		joyState = e->joystate;
-		return js;
+		JoyState = e->joystate;;
 	}
-	return nullptr;
 }
 
-bool WheelInput::IsConnected() const {
+bool WheelDirectInput::IsConnected() const {
 	if (djs.getEntryCount() > 0)
 		return true;
 	return false;
 }
 
-bool WheelInput::IsButtonPressed(int buttonType) {
-	if (joyState.rgbButtons[buttonType]) {
+bool WheelDirectInput::IsButtonPressed(int buttonType) {
+	if (JoyState.rgbButtons[buttonType]) {
 		return true;
 	}
 	return false;
 }
 
-bool WheelInput::IsButtonJustPressed(int buttonType) {
+bool WheelDirectInput::IsButtonJustPressed(int buttonType) {
 	rgbButtonCurr[buttonType] = IsButtonPressed(buttonType);
 
 	// raising edge
@@ -66,7 +62,7 @@ bool WheelInput::IsButtonJustPressed(int buttonType) {
 	return false;
 }
 
-bool WheelInput::IsButtonJustReleased(int buttonType) {
+bool WheelDirectInput::IsButtonJustReleased(int buttonType) {
 	rgbButtonCurr[buttonType] = IsButtonPressed(buttonType);
 
 	// falling edge
@@ -76,7 +72,7 @@ bool WheelInput::IsButtonJustReleased(int buttonType) {
 	return false;
 }
 
-bool WheelInput::WasButtonHeldForMs(int buttonType, int millis) {
+bool WheelDirectInput::WasButtonHeldForMs(int buttonType, int millis) {
 	if (IsButtonJustPressed(buttonType)) {
 		pressTime[buttonType] = milliseconds_now();
 	}
@@ -92,13 +88,13 @@ bool WheelInput::WasButtonHeldForMs(int buttonType, int millis) {
 	return false;
 }
 
-void WheelInput::UpdateButtonChangeStates() {
+void WheelDirectInput::UpdateButtonChangeStates() {
 	for (int i = 0; i < MAX_RGBBUTTONS; i++) {
 		rgbButtonPrev[i] = rgbButtonCurr[i];
 	}
 }
 
-bool WheelInput::CreateEffect() {
+bool WheelDirectInput::CreateEffect() {
 	DWORD rgdwAxes[1] = {DIJOFS_X};
 	LONG rglDirection[1] = {0};
 	DICONSTANTFORCE cf = {0};
@@ -115,7 +111,7 @@ bool WheelInput::CreateEffect() {
 	eff.cAxes = 1;
 	eff.rgdwAxes = rgdwAxes;
 	eff.rglDirection = rglDirection;
-	eff.lpEnvelope = 0;
+	eff.lpEnvelope = nullptr;
 	eff.cbTypeSpecificParams = sizeof(DICONSTANTFORCE);
 	eff.lpvTypeSpecificParams = &cf;
 	eff.dwStartDelay = 0;
@@ -135,7 +131,7 @@ bool WheelInput::CreateEffect() {
 	return false;
 }
 
-HRESULT WheelInput::SetForce(int force) {
+HRESULT WheelDirectInput::SetForce(int force) const {
 
 	const DiJoyStick::Entry* e = djs.getEntry(0);
 	if (e) {
@@ -153,7 +149,7 @@ HRESULT WheelInput::SetForce(int force) {
 	eff.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
 	eff.cAxes = 1;
 	eff.rglDirection = rglDirection;
-	eff.lpEnvelope = 0;
+	eff.lpEnvelope = nullptr;
 	eff.cbTypeSpecificParams = sizeof(DICONSTANTFORCE);
 	eff.lpvTypeSpecificParams = &cf;
 	eff.dwStartDelay = 0;

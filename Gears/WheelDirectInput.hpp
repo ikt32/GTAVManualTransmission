@@ -10,12 +10,13 @@
 
 #define MAX_RGBBUTTONS 128
 
-class WheelInput {
+class WheelDirectInput {
 public:
-	WheelInput();
-	~WheelInput();
+	WheelDirectInput();
+	~WheelDirectInput();
+
 	// Should be called every update()
-	const DIJOYSTATE2* GetState();
+	void UpdateState();
 
 	bool IsConnected() const;
 
@@ -25,11 +26,13 @@ public:
 	bool WasButtonHeldForMs(int btn, int millis);
 	void UpdateButtonChangeStates();
 
-	HRESULT SetForce(int force);
+	HRESULT SetForce(int force) const;
+
+	DIJOYSTATE2 JoyState;
+
 private:
 	DiJoyStick djs;
-	LPDIRECTINPUT lpDi = 0;
-	DIJOYSTATE2 joyState;
+	LPDIRECTINPUT lpDi = nullptr;
 
 	LPDIRECTINPUTEFFECT g_pEffect;
 
