@@ -127,6 +127,7 @@
     <ClInclude Include="script.h" />
     <ClInclude Include="ScriptControls.hpp" />
     <ClInclude Include="ScriptSettings.hpp" />
+    <ClInclude Include="Util.hpp" />
     <ClInclude Include="VehicleData.hpp" />
     <ClInclude Include="VehicleExtensions.hpp" />
     <ClInclude Include="MemoryPatcher.hpp" />

@@ -47,3 +47,6 @@ Speedometers Neutral gear:
 * "hunt_weapon" 1 - Neutral
 
 Please note that the neutral gear is the gearbox simulated neutral gear, which isn't affected by the hand brake!
+
+__Important note:__ Usage of decorators out of base game context isn't guaranteed to work. Think CitizenFX-based mods. The reason behind this is that we're just hijacking some existing base game scripts and hope nothing conflicts.
+

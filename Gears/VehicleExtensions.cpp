@@ -165,6 +165,7 @@ uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0xAA0 : 0xA80);
+	offset = (getGameVersion() > 23 ? 0xAB0 : offset);
 
 	return *reinterpret_cast<uint64_t *>(address + offset);
 }
@@ -177,6 +178,7 @@ void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0xAA0 : 0xA80);
+	offset = (getGameVersion() > 23 ? 0xAB0 : offset);
 
 	uint64_t wheelPtr;
 	wheelPtr = *reinterpret_cast<uint64_t *>(address + offset);

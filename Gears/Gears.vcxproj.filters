@@ -37,6 +37,7 @@
     <ClInclude Include="VehicleData.hpp" />
     <ClInclude Include="XboxController.hpp" />
     <ClInclude Include="WheelLogiInput.hpp" />
+    <ClInclude Include="Util.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
