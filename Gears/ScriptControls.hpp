@@ -68,6 +68,14 @@ public:
 		SIZEOF_WheelControlType
 	};
 
+	enum class WheelAxisType {
+		Throttle,
+		Brake,
+		Clutch,
+		Steer,
+		SIZEOF_WheelAxisType
+	};
+
 	enum InputDevices {
 		Keyboard = 0,
 		Controller = 1,
@@ -97,6 +105,7 @@ public:
 	std::string ControlXbox[static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)] = {};
 	int KBControl[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	int WheelControl[static_cast<int>(WheelControlType::SIZEOF_WheelControlType)] = {};
+	std::string WheelAxes[static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)] = {};
 	int CToggleTime = 1000;
 
 

@@ -31,25 +31,37 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 	if (WheelDI->IsConnected()) {
 		WheelDI->UpdateState();
 		WheelDI->UpdateButtonChangeStates();
-		SteerVal = WheelDI->JoyState.lX;
+		//SteerVal = WheelDI->JoyState.lX;
 	}
 
+	//Update ThrottleVal, BrakeVal and ClutchVal ranging from 0.0f (no touch) to 1.0f (full press)
 	switch (prevInput) {
-		case Keyboard:
+		case Keyboard: {
 			ThrottleVal = (IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)]) ? 1.0f : 0.0f);
 			BrakeVal = (IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Brake)]) ? 1.0f : 0.0f);
 			ClutchVal = (IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Clutch)]) ? 1.0f : 0.0f);
 			break;
-		case Controller:
+		}			
+		case Controller: {
 			ThrottleVal = controller->GetAnalogValue(controller->StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState);
 			BrakeVal = controller->GetAnalogValue(controller->StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Brake)]), buttonState);
 			ClutchVal = controller->GetAnalogValue(controller->StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Clutch)]), buttonState);
 			break;
-		case Wheel:
-			ThrottleVal = 1.0f - static_cast<float>(WheelDI->JoyState.lY) / 65535.0f;
-			BrakeVal = 1.0f - static_cast<float>(WheelDI->JoyState.lRz) / 65535.0f;
-			ClutchVal = 1.0f - static_cast<float>(WheelDI->JoyState.rglSlider[1]) / 65535.0f;
+		}
+		case Wheel: {
+			int RawT = WheelDI->GetAxisValue(WheelDI->StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]));
+			int RawB = WheelDI->GetAxisValue(WheelDI->StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Brake)]));
+			int RawC = WheelDI->GetAxisValue(WheelDI->StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]));
+			int RawS = WheelDI->GetAxisValue(WheelDI->StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]));
+			ThrottleVal = 1.0f - static_cast<float>(RawT) / 65535.0f;
+			BrakeVal = 1.0f - static_cast<float>(RawB) / 65535.0f;
+			ClutchVal = 1.0f - static_cast<float>(RawC) / 65535.0f;
+			SteerVal = RawS;
+			//ThrottleVal = 1.0f - static_cast<float>(WheelDI->JoyState.lY) / 65535.0f;
+			//BrakeVal = 1.0f - static_cast<float>(WheelDI->JoyState.lRz) / 65535.0f;
+			//ClutchVal = 1.0f - static_cast<float>(WheelDI->JoyState.rglSlider[1]) / 65535.0f;
 			break;
+		}
 		default: break;
 	}
 

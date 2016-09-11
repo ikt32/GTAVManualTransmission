@@ -1,8 +1,12 @@
 #include "WheelDirectInput.hpp"
 #include "TimeHelper.hpp"
+#include "Logger.hpp"
+
 #define FAILED(hr) (((HRESULT)(hr)) < 0)
 
 WheelDirectInput::WheelDirectInput() {
+	Logger logger(LOGFILE);
+	
 	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(nullptr), DIRECTINPUT_VERSION, IID_IDirectInput8, reinterpret_cast<void**>(&lpDi), nullptr))) {
 		djs.enumerate(lpDi);
 	}
@@ -22,8 +26,8 @@ WheelDirectInput::WheelDirectInput() {
 			}
 			g_pEffect->Start(1, 0);
 		}
+		logger.Write("Found joy/wheel");
 	}
-
 }
 
 WheelDirectInput::~WheelDirectInput() {
@@ -171,3 +175,55 @@ HRESULT WheelDirectInput::SetForce(int force) const {
 	                                DIEP_TYPESPECIFICPARAMS |
 	                                DIEP_START);
 }
+
+WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string axisString) {
+	for (int i = 0; i < SIZEOF_DIAxis; i++) {
+		if (axisString == DIAxisHelper[i]) {
+			return static_cast<DIAxis>(i);
+		}
+	}
+	return UNKNOWN;
+}
+
+
+// fucking hell why
+int WheelDirectInput::GetAxisValue(DIAxis axis) {
+	if (!IsConnected())
+		return 0;
+	switch (axis) {
+		case lX:			return JoyState.lX;
+		case lY:			return JoyState.lY;
+		case lZ:			return JoyState.lZ;
+		case lRx:			return JoyState.lRx;
+		case lRy:			return JoyState.lRy;
+		case lRz:			return JoyState.lRz;
+		case rglSlider0:	return JoyState.rglSlider[0];
+		case rglSlider1:	return JoyState.rglSlider[1];
+		case lVX:			return JoyState.lVX;
+		case lVY:			return JoyState.lVY;
+		case lVZ:			return JoyState.lVZ;
+		case lVRx:			return JoyState.lVRx;
+		case lVRy:			return JoyState.lVRy;
+		case lVRz:			return JoyState.lVRz;
+		case rglVSlider0:	return JoyState.rglVSlider[0];
+		case rglVSlider1:	return JoyState.rglVSlider[1];
+		case lAX:			return JoyState.lAX;
+		case lAY:			return JoyState.lAY;
+		case lAZ:			return JoyState.lAZ;
+		case lARx:			return JoyState.lARx;
+		case lARy:			return JoyState.lARy;
+		case lARz:			return JoyState.lARz;
+		case rglASlider0:	return JoyState.rglASlider[0];
+		case rglASlider1:	return JoyState.rglASlider[1];
+		case lFX:			return JoyState.lFX;
+		case lFY:			return JoyState.lFY;
+		case lFZ:			return JoyState.lFZ;
+		case lFRx:			return JoyState.lFRx;
+		case lFRy:			return JoyState.lFRy;
+		case lFRz:			return JoyState.lFRz;
+		case rglFSlider0:	return JoyState.rglFSlider[0];
+		case rglFSlider1:	return JoyState.rglFSlider[0];
+		default:			return 0;
+	}
+}
+

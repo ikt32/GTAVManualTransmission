@@ -103,42 +103,52 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Brake)] = GetPrivateProfileIntA("KEYBOARD", "Brake", 0x53, SETTINGSFILE);
 
 	// Start wheel section
-	LogiWheel = (GetPrivateProfileIntA("LOGITECHWHEEL", "Enable", 0, SETTINGSFILE) == 1);
-	WheelWithoutManual = (GetPrivateProfileIntA("LOGITECHWHEEL", "WheelWithoutManual", 1, SETTINGSFILE) == 1);
-	DisableDpad = (GetPrivateProfileIntA("LOGITECHWHEEL", "DisableDpad", 0, SETTINGSFILE) == 1);
+	LogiWheel = (GetPrivateProfileIntA("WHEEL", "Enable", 0, SETTINGSFILE) == 1);
+	WheelWithoutManual = (GetPrivateProfileIntA("WHEEL", "WheelWithoutManual", 1, SETTINGSFILE) == 1);
+	DisableDpad = (GetPrivateProfileIntA("WHEEL", "DisableDpad", 0, SETTINGSFILE) == 1);
 
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Toggle)] = GetPrivateProfileIntA("LOGITECHWHEEL", "Toggle", 17, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ToggleH)] = GetPrivateProfileIntA("LOGITECHWHEEL", "ToggleH", 6, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Toggle)] = GetPrivateProfileIntA("WHEEL", "Toggle", 17, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ToggleH)] = GetPrivateProfileIntA("WHEEL", "ToggleH", 6, SETTINGSFILE);
 
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ShiftUp)] = GetPrivateProfileIntA("LOGITECHWHEEL", "ShiftUp", 4, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ShiftDown)] = GetPrivateProfileIntA("LOGITECHWHEEL", "ShiftDown", 5, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::HR)] = GetPrivateProfileIntA("LOGITECHWHEEL", "HR", 14, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H1)] = GetPrivateProfileIntA("LOGITECHWHEEL", "H1", 8, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H2)] = GetPrivateProfileIntA("LOGITECHWHEEL", "H2", 9, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H3)] = GetPrivateProfileIntA("LOGITECHWHEEL", "H3", 10, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H4)] = GetPrivateProfileIntA("LOGITECHWHEEL", "H4", 11, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H5)] = GetPrivateProfileIntA("LOGITECHWHEEL", "H5", 12, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H6)] = GetPrivateProfileIntA("LOGITECHWHEEL", "H6", 13, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Handbrake)] = GetPrivateProfileIntA("LOGITECHWHEEL", "Handbrake", 19, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Engine)] = GetPrivateProfileIntA("LOGITECHWHEEL", "Engine", 21, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ShiftUp)] = GetPrivateProfileIntA("WHEEL", "ShiftUp", 4, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ShiftDown)] = GetPrivateProfileIntA("WHEEL", "ShiftDown", 5, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::HR)] = GetPrivateProfileIntA("WHEEL", "HR", 14, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H1)] = GetPrivateProfileIntA("WHEEL", "H1", 8, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H2)] = GetPrivateProfileIntA("WHEEL", "H2", 9, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H3)] = GetPrivateProfileIntA("WHEEL", "H3", 10, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H4)] = GetPrivateProfileIntA("WHEEL", "H4", 11, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H5)] = GetPrivateProfileIntA("WHEEL", "H5", 12, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H6)] = GetPrivateProfileIntA("WHEEL", "H6", 13, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Handbrake)] = GetPrivateProfileIntA("WHEEL", "Handbrake", 19, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Engine)] = GetPrivateProfileIntA("WHEEL", "Engine", 21, SETTINGSFILE);
 
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Horn)] = GetPrivateProfileIntA("LOGITECHWHEEL", "Horn", 20, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Lights)] = GetPrivateProfileIntA("LOGITECHWHEEL", "Lights", 7, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::LookBack)] = GetPrivateProfileIntA("LOGITECHWHEEL", "LookBack", 22, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Camera)] = GetPrivateProfileIntA("LOGITECHWHEEL", "Camera", 0, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::RadioPrev)] = GetPrivateProfileIntA("LOGITECHWHEEL", "RadioPrev", 1, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::RadioNext)] = GetPrivateProfileIntA("LOGITECHWHEEL", "RadioNext", 2, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Horn)] = GetPrivateProfileIntA("WHEEL", "Horn", 20, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Lights)] = GetPrivateProfileIntA("WHEEL", "Lights", 7, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::LookBack)] = GetPrivateProfileIntA("WHEEL", "LookBack", 22, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Camera)] = GetPrivateProfileIntA("WHEEL", "Camera", 0, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::RadioPrev)] = GetPrivateProfileIntA("WHEEL", "RadioPrev", 1, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::RadioNext)] = GetPrivateProfileIntA("WHEEL", "RadioNext", 2, SETTINGSFILE);
 
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorLeft)] = GetPrivateProfileIntA("LOGITECHWHEEL", "IndicatorLeft", 19, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorRight)] = GetPrivateProfileIntA("LOGITECHWHEEL", "IndicatorRight", 21, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorHazard)] = GetPrivateProfileIntA("LOGITECHWHEEL", "IndicatorHazard", 15, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorLeft)] = GetPrivateProfileIntA("WHEEL", "IndicatorLeft", 19, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorRight)] = GetPrivateProfileIntA("WHEEL", "IndicatorRight", 21, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorHazard)] = GetPrivateProfileIntA("WHEEL", "IndicatorHazard", 15, SETTINGSFILE);
 
-	WheelRange = GetPrivateProfileIntA("LOGITECHWHEEL", "WheelRange", 180, SETTINGSFILE);
-	FFEnable = GetPrivateProfileIntA("LOGITECHWHEEL", "FFEnable", 1, SETTINGSFILE) == 1;
-	FFDamperStationary = GetPrivateProfileIntA("LOGITECHWHEEL", "FFDamperStationary", 60, SETTINGSFILE);
-	FFDamperMoving = GetPrivateProfileIntA("LOGITECHWHEEL", "FFDamperMoving", 30, SETTINGSFILE);
-	FFPhysics = GetPrivateProfileIntA("LOGITECHWHEEL", "FFPhysics", 150, SETTINGSFILE) / 100.0f;
-	FFCenterSpring = GetPrivateProfileIntA("LOGITECHWHEEL", "FFCenterSpring", 100, SETTINGSFILE) / 100.0f;
+	GetPrivateProfileStringA("WHEELAXIS", "Throttle", "lY", buffer, static_cast<DWORD>(24), SETTINGSFILE);
+	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Throttle)] = buffer; 
+	GetPrivateProfileStringA("WHEELAXIS", "Brake", "lRz", buffer, static_cast<DWORD>(24), SETTINGSFILE);
+	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Brake)] = buffer;
+	GetPrivateProfileStringA("WHEELAXIS", "Clutch", "rglSlider1", buffer, static_cast<DWORD>(24), SETTINGSFILE);
+	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] = buffer;
+	GetPrivateProfileStringA("WHEELAXIS", "Steer", "lX", buffer, static_cast<DWORD>(24), SETTINGSFILE);
+	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)] = buffer;
+
+
+	WheelRange = GetPrivateProfileIntA("WHEEL", "WheelRange", 180, SETTINGSFILE);
+	FFEnable = GetPrivateProfileIntA("WHEEL", "FFEnable", 1, SETTINGSFILE) == 1;
+	FFDamperStationary = GetPrivateProfileIntA("WHEEL", "FFDamperStationary", 60, SETTINGSFILE);
+	FFDamperMoving = GetPrivateProfileIntA("WHEEL", "FFDamperMoving", 30, SETTINGSFILE);
+	FFPhysics = GetPrivateProfileIntA("WHEEL", "FFPhysics", 150, SETTINGSFILE) / 100.0f;
+	FFCenterSpring = GetPrivateProfileIntA("WHEEL", "FFCenterSpring", 100, SETTINGSFILE) / 100.0f;
 }
 
 void ScriptSettings::Save() const {

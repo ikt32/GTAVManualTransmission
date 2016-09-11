@@ -113,28 +113,17 @@ XboxController::XboxButtons XboxController::StringToButton(std::string buttonStr
 
 float XboxController::GetAnalogValue(XboxButtons buttonType, WORD buttonState) {
 	switch (buttonType) {
-		case LeftTrigger:
-			return static_cast<float>(controllerState.Gamepad.bLeftTrigger) / 255;
-		case RightTrigger:
-			return static_cast<float>(controllerState.Gamepad.bRightTrigger) / 255;
-		case LeftThumbLeft:
-			return filterDeadzone(buttonType, controllerState.Gamepad.sThumbLX);
-		case LeftThumbRight:
-			return filterDeadzone(buttonType, controllerState.Gamepad.sThumbLX);
-		case RightThumbLeft:
-			return filterDeadzone(buttonType, controllerState.Gamepad.sThumbRX);
-		case RightThumbRight:
-			return filterDeadzone(buttonType, controllerState.Gamepad.sThumbRX);
-		case LeftThumbUp:
-			return filterDeadzone(buttonType, controllerState.Gamepad.sThumbLY);
-		case LeftThumbDown:
-			return filterDeadzone(buttonType, controllerState.Gamepad.sThumbLY);
-		case RightThumbUp:
-			return filterDeadzone(buttonType, controllerState.Gamepad.sThumbRY);
-		case RightThumbDown:
-			return filterDeadzone(buttonType, controllerState.Gamepad.sThumbRY);
-		default:
-			return IsButtonPressed(buttonType, buttonState) ? 1.0f : 0.0f;
+		case LeftTrigger:		return static_cast<float>(controllerState.Gamepad.bLeftTrigger) / 255;
+		case RightTrigger:		return static_cast<float>(controllerState.Gamepad.bRightTrigger) / 255;
+		case LeftThumbLeft:		return filterDeadzone(buttonType, controllerState.Gamepad.sThumbLX);
+		case LeftThumbRight:	return filterDeadzone(buttonType, controllerState.Gamepad.sThumbLX);
+		case RightThumbLeft:	return filterDeadzone(buttonType, controllerState.Gamepad.sThumbRX);
+		case RightThumbRight:	return filterDeadzone(buttonType, controllerState.Gamepad.sThumbRX);
+		case LeftThumbUp:		return filterDeadzone(buttonType, controllerState.Gamepad.sThumbLY);
+		case LeftThumbDown:		return filterDeadzone(buttonType, controllerState.Gamepad.sThumbLY);
+		case RightThumbUp:		return filterDeadzone(buttonType, controllerState.Gamepad.sThumbRY);
+		case RightThumbDown:	return filterDeadzone(buttonType, controllerState.Gamepad.sThumbRY);
+		default:				return IsButtonPressed(buttonType, buttonState) ? 1.0f : 0.0f;
 	}
 }
 
@@ -144,18 +133,15 @@ float XboxController::filterDeadzone(XboxButtons buttonType, int input) {
 		case LeftThumbLeft:
 		case LeftThumbRight:
 		case LeftThumbUp:
-		case LeftThumbDown:
-			deadzone = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
-			break;
+		case LeftThumbDown:		deadzone = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+								break;
 		case RightThumbLeft:
 		case RightThumbRight:
 		case RightThumbUp:
-		case RightThumbDown:
-			deadzone = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
-			break;
-		default:
-			deadzone = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
-			break;
+		case RightThumbDown:	deadzone = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+								break;
+		default:				deadzone = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+								break;
 	}
 
 	if (buttonType == LeftThumbLeft ||
