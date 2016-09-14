@@ -33,17 +33,51 @@ bool WheelDirectInput::InitWheel(std::string ffAxis) {
 			if (FAILED( hr = e->diDevice->SetCooperativeLevel(
 					GetForegroundWindow(),
 					DISCL_EXCLUSIVE | DISCL_FOREGROUND))) {
+				std::string hrStr;
+				switch (hr) {
+					case DI_OK:
+						hrStr = "DI_OK";
+						break;
+					case DIERR_INVALIDPARAM:
+						hrStr = "DIERR_INVALIDPARAM";
+						break;
+					case DIERR_NOTINITIALIZED:
+						hrStr = "DIERR_NOTINITIALIZED";
+						break;
+					case DIERR_ALREADYINITIALIZED:
+						hrStr = "DIERR_ALREADYINITIALIZED";
+						break;
+					case DIERR_INPUTLOST:
+						hrStr = "DIERR_INPUTLOST";
+						break;
+					case DIERR_ACQUIRED:
+						hrStr = "DIERR_ACQUIRED";
+						break;
+					case DIERR_NOTACQUIRED:
+						hrStr = "DIERR_NOTACQUIRED";
+						break;
+					case E_HANDLE:
+						hrStr = "E_HANDLE";
+						break;
+					default:
+						hrStr = "UNKNOWN";
+						break;
+				}
+				logger.Write("HRESULT = " + hrStr);
 				std::stringstream ss;
 				ss << std::hex << hr;
-				logger.Write("Error " + ss.str());
-				//E_HANDLE;
-				//}
+				logger.Write("Error: " + ss.str());
+				ss.str(std::string());
+				ss << std::hex << GetForegroundWindow();
+				logger.Write("HWND: " + ss.str());
 				return false;
 			}
-
-			logger.Write("Axis: " + ffAxis);
+			logger.Write("Init FF SUCCESS");
+			
+			logger.Write("Init FF Effects on axis " + ffAxis);
 			if (!CreateConstantForceEffect(ffAxis)) {
 				logger.Write("Error initializing Constant Force Effect");
+				return false;
 			}
 			/*if (!CreateCustomForceEffect(ffAxis, GUID_Friction)) {
 				logger.Write("Error initializing Friction Force Effect");
@@ -51,6 +85,7 @@ bool WheelDirectInput::InitWheel(std::string ffAxis) {
 			if (!CreateCustomForceEffect(ffAxis, GUID_Damper)) {
 				logger.Write("Error initializing Damper Force Effect");
 			}*/
+			logger.Write("Init FF Effects SUCCESS");
 			JoyState = e->joystate;
 			logger.Write("Initializing wheel success");
 			return true;
@@ -139,7 +174,6 @@ void WheelDirectInput::UpdateButtonChangeStates() {
 bool WheelDirectInput::CreateConstantForceEffect(std::string axis) {
 	DWORD ffAxis = DIJOFS_X;
 	Logger log(LOGFILE);
-	log.Write(axis);
 	if (axis == "X") {
 		ffAxis = DIJOFS_X;
 	}
