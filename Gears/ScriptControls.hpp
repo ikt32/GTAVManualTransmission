@@ -84,7 +84,7 @@ public:
 
 	ScriptControls();
 	~ScriptControls();
-	void ReInitWheel();
+	void InitWheel();
 
 	InputDevices GetLastInputDevice(InputDevices previous);
 	void UpdateValues(InputDevices prevInput);
@@ -123,14 +123,14 @@ public:
 	bool ButtonIn(WheelControlType control);
 	bool ButtonIn(ControllerControlType control);
 
-	WheelDirectInput* WheelDI;
+	WheelDirectInput WheelDI;
 
 private:
 	long long pressTime = 0;
 	long long releaseTime = 0;
 	//InputDevices prevInput;
 
-	XboxController* controller;
+	XboxController controller;
 	WORD buttonState;
 
 	static bool IsKeyPressed(int key);

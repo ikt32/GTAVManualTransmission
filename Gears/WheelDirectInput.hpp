@@ -21,30 +21,6 @@ public:
 		lRz,
 		rglSlider0,
 		rglSlider1,
-		lVX,
-		lVY,
-		lVZ,
-		lVRx,
-		lVRy,
-		lVRz,
-		rglVSlider0,
-		rglVSlider1, 
-		lAX,
-		lAY,
-		lAZ,
-		lARx,
-		lARy,
-		lARz,
-		rglASlider0,
-		rglASlider1,
-		lFX,
-		lFY,
-		lFZ,
-		lFRx,
-		lFRy,
-		lFRz,
-		rglFSlider0,
-		rglFSlider1,
 		UNKNOWN,
 		SIZEOF_DIAxis
 	};
@@ -58,36 +34,12 @@ public:
 		"lRz",
 		"rglSlider0",
 		"rglSlider1",
-		"lVX",
-		"lVY",
-		"lVZ",
-		"lVRx",
-		"lVRy",
-		"lVRz",
-		"rglVSlider0",
-		"rglVSlider1",
-		"lAX",
-		"lAY",
-		"lAZ",
-		"lARx",
-		"lARy",
-		"lARz",
-		"rglASlider0",
-		"rglASlider1",
-		"lFX",
-		"lFY",
-		"lFZ",
-		"lFRx",
-		"lFRy",
-		"lFRz",
-		"rglFSlider0",
-		"rglFSlider1",
 		"UNKNOWN"
 	};
 
 public:
-	//WheelDirectInput();
-	WheelDirectInput(std::string ffAxis);
+	WheelDirectInput();
+	bool InitWheel(std::string ffAxis);
 	~WheelDirectInput();
 
 	// Should be called every update()
@@ -101,8 +53,9 @@ public:
 	bool WasButtonHeldForMs(int btn, int millis);
 	void UpdateButtonChangeStates();
 
-	HRESULT SetForce(int force) const;
-	HRESULT SetConditionalForce();
+	HRESULT SetConstantForce(int force) const;
+	HRESULT SetCustomForce(int frict, int damp);
+
 	DIAxis StringToAxis(std::string axisString);
 	DIJOYSTATE2 JoyState;
 
@@ -114,11 +67,11 @@ private:
 
 	LPDIRECTINPUTEFFECT pCFEffect;
 	LPDIRECTINPUTEFFECT pFREffect;
-	bool CreateEffect(std::string axis);
+	bool CreateConstantForceEffect(std::string axis);
+	bool CreateCustomForceEffect(std::string axis, GUID effectGUID);
 	std::array<__int64, MAX_RGBBUTTONS> pressTime;
 	std::array<__int64, MAX_RGBBUTTONS> releaseTime;
 	std::array<bool, MAX_RGBBUTTONS> rgbButtonCurr;
 	std::array<bool, MAX_RGBBUTTONS> rgbButtonPrev;
-
 
 };

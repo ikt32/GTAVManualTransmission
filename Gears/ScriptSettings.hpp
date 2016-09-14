@@ -25,7 +25,7 @@ public:
 	bool DefaultNeutral;
 	bool UITips;
 	bool Hshifter;
-	bool LogiWheel;
+	bool WheelEnabled;
 	int WheelRange;
 	bool FFEnable;
 	int FFDamperStationary;

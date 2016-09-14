@@ -6,7 +6,7 @@
 
 class Logger {
 public:
-	Logger(char* fileName);
+	explicit Logger(char* fileName);
 	void Clear() const;
 	void Write(const std::string& text) const;
 

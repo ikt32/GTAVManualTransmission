@@ -259,10 +259,11 @@ namespace MemoryPatcher {
 		// 44 89 7B 60 is prevprev
 		// 89 73 5C is previous instruction
 		// 66 89 13 is what we're looking for.
-		uint8_t offset = 7;
+		
 		uintptr_t address = mem.FindPattern("\x44\x89\x7B\x60\x89\x73\x5C\x66\x89\x13", "xxxxxxxxxx");
 
 		if (address) {
+			uint8_t offset = 7;
 			memset(reinterpret_cast<void *>(address + offset), 0x90, 3);
 			return (address + offset);
 		}

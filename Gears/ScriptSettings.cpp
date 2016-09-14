@@ -16,7 +16,7 @@ ScriptSettings::ScriptSettings() {
 	DefaultNeutral = false;
 	UITips = false;
 	Hshifter = false;
-	LogiWheel = false;
+	WheelEnabled = false;
 	WheelRange = 180;
 	FFEnable = true;
 	FFDamperStationary = 60;
@@ -36,6 +36,7 @@ ScriptSettings::ScriptSettings() {
 	RPMDamage = 0.0f;
 	MisshiftDamage = 0;
 	WheelWithoutManual = true;
+	CrossScript = false;
 }
 
 
@@ -104,7 +105,7 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Brake)] = GetPrivateProfileIntA("KEYBOARD", "Brake", 0x53, SETTINGSFILE);
 
 	// Start wheel section
-	LogiWheel = (GetPrivateProfileIntA("WHEEL", "Enable", 0, SETTINGSFILE) == 1);
+	WheelEnabled = (GetPrivateProfileIntA("WHEEL", "Enable", 0, SETTINGSFILE) == 1);
 	WheelWithoutManual = (GetPrivateProfileIntA("WHEEL", "WheelWithoutManual", 1, SETTINGSFILE) == 1);
 	DisableDpad = (GetPrivateProfileIntA("WHEEL", "DisableDpad", 0, SETTINGSFILE) == 1);
 

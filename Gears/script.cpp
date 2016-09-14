@@ -106,33 +106,43 @@ void update() {
 		showDebugInfo();
 	}
 
+
+	if (!VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false) &&
+		VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f) {
+		return;
+	}
+
+	//TODO THINGS
 	if (!settings.EnableManual &&
 		settings.WheelWithoutManual &&
-		controls.WheelDI->IsConnected()) {
+		//controls.WheelDI != nullptr &&
+		controls.WheelDI.IsConnected()) {
 		updateLastInputDevice();
 		handleVehicleButtons();
 		handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
 		doWheelSteering();
 		playWheelEffects(
-			vehData.Speed,
-			vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
-			vehData.getAccelerationVectorsAverage(),
-			&settings,
-			false);
+		vehData.Speed,
+		vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
+		vehData.getAccelerationVectorsAverage(),
+		&settings,
+		false);
 	}
 
-	if (!settings.EnableManual ||
-	(!VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false) &&
-		VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f)) {
+	if (!settings.EnableManual) {
 		return;
 	}
+
+
+
 	///////////////////////////////////////////////////////////////////////////
 	// Active whenever Manual is enabled from here
 	///////////////////////////////////////////////////////////////////////////
 	updateLastInputDevice();
 	handleVehicleButtons();
 
-	if (controls.WheelDI->IsConnected()) {
+	if (//controls.WheelDI != nullptr &&
+		controls.WheelDI.IsConnected()) {
 		doWheelSteering();
 		playWheelEffects(
 			vehData.Speed,
@@ -242,12 +252,6 @@ void update() {
 
 	// Manual shifting
 	if (settings.Hshifter && !vehData.IsBike) {
-		/*if (logiWheel.IsActive(&settings) && prevInput == InputDevices::Wheel) {
-			functionHShiftLogitech();
-		}
-		else {
-			functionHShiftKeyboard();
-		}*/
 		functionHShiftWheel();
 		functionHShiftKeyboard();
 	}
@@ -265,7 +269,9 @@ void update() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void main() {
-	settings.Read(&controls);
+	//settings.Read(&controls);
+	reInit();
+	logger.Write("Settings read");
 	while (true) {
 		update();
 		WAIT(0);
@@ -312,8 +318,7 @@ void showDebugInfo() {
 	         "\nTurbo: " << std::setprecision(3) << vehData.Turbo <<
 	         "\nAddress: " << std::hex << vehData.Address <<
 	         "\nE: " << (settings.EnableManual ? "Y" : "N");
-	const char* infoc = infos.str().c_str();
-	showText(0.01f, 0.5f, 0.4f, infoc);
+	showText(0.01f, 0.5f, 0.4f, infos.str().c_str());
 
 	std::stringstream throttleDisplay;
 	throttleDisplay << "ThrottleVal: " << controls.ThrottleVal << std::endl;
@@ -321,16 +326,21 @@ void showDebugInfo() {
 	brakeDisplay << "Brake Value: " << controls.BrakeVal << std::endl;
 	std::stringstream clutchDisplay;
 	clutchDisplay << "ClutchValue: " << controls.ClutchVal << std::endl;
-	std::stringstream steerDisplay;
-	steerDisplay << "SteerValue: " << controls.SteerVal << std::endl;
-	std::stringstream dinputDisplay;
-	dinputDisplay << "Wheel Avail: " << controls.WheelDI->IsConnected() << std::endl;
+	
+	
+	if (settings.WheelEnabled) {
+		std::stringstream dinputDisplay;
+		dinputDisplay << "Wheel Avail: " << controls.WheelDI.IsConnected() << std::endl;
+		showText(0.85, 0.20, 0.4, dinputDisplay.str().c_str());
+	  std::stringstream steerDisplay;
+	  steerDisplay << "SteerValue: " << controls.SteerVal << std::endl;
+	  showText(0.85, 0.16, 0.4, steerDisplay.str().c_str());
+	}
+	
 
 	showText(0.85, 0.04, 0.4, throttleDisplay.str().c_str());
 	showText(0.85, 0.08, 0.4, brakeDisplay.str().c_str());
 	showText(0.85, 0.12, 0.4, clutchDisplay.str().c_str());
-	showText(0.85, 0.16, 0.4, steerDisplay.str().c_str());
-	showText(0.85, 0.20, 0.4, dinputDisplay.str().c_str());
 
 	/*for (int i = 0; i < MAX_RGBBUTTONS; i++) {
 		if (controls.wheelState->rgbButtons[i]) {
@@ -347,6 +357,11 @@ void reInit() {
 	settings.Read(&controls);
 	vehData.LockGears = 0x00010001;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
+	if (settings.WheelEnabled) {
+		if (//controls.WheelDI != nullptr &&
+			!controls.WheelDI.IsConnected())
+			controls.InitWheel();
+	}
 }
 
 void reset() {
@@ -373,10 +388,6 @@ void toggleManual() {
 		//LogiSteeringShutdown();
 	}
 	reInit();
-	if (settings.LogiWheel) {
-		if (!controls.WheelDI->IsConnected())
-			controls.ReInitWheel();
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1012,10 +1023,15 @@ void playWheelEffects(
 		return;
 	}
 
-	if (controls.WheelDI == nullptr ||
-		!controls.WheelDI->IsConnected()) {
+	/*if (controls.WheelDI == nullptr)
+		return;*/
+
+	if (!controls.WheelDI.IsConnected()) {
 		return;
 	}
+
+	/*int constantForce = 100 * static_cast<int>(-settings->FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
+	controls.WheelDI->SetConstantForce(constantForce);*/
 
 	/*if (settings->FFDamperStationary < settings->FFDamperMoving) {
 	settings->FFDamperMoving = settings->FFDamperStationary;
@@ -1037,10 +1053,7 @@ void playWheelEffects(
 
 	//loggeriPlayDamperForce(loggeriWheel.GetIndex(), damperforce);
 
-	int constantForce = 100 * static_cast<int>(-settings->FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
 
-
-	controls.WheelDI->SetForce(constantForce);
 	/*switch (hr) {
 	case DI_DOWNLOADSKIPPED:
 		logger.Write("SetForce DI_DOWNLOADSKIPPED");

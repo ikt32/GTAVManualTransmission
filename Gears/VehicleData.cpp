@@ -76,6 +76,9 @@ Vector3 VehicleData::getAccelerationVectors(Vector3 velocities) {
 	result.x = (velocities.x - prevVelocities.x) / ((time - prevTime) / 1e9f);
 	result.y = (velocities.y - prevVelocities.y) / ((time - prevTime) / 1e9f);
 	result.z = (velocities.z - prevVelocities.z) / ((time - prevTime) / 1e9f);
+	result._paddingx = 0;
+	result._paddingy = 0;
+	result._paddingz = 0;
 
 	prevTime = time;
 	prevVelocities = velocities;

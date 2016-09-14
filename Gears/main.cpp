@@ -10,7 +10,6 @@ http://dev-c.com
 #include "Logger.hpp"
 #include "MemoryPatcher.hpp"
 #include "Util.hpp"
-//#include "../../LogitechSteeringWheel_SDK/Include/LogitechSteeringWheelLib.h"
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 	Logger logger(LOGFILE);

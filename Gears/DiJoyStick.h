@@ -40,7 +40,12 @@ public:
 	}
 
 	//dwDevType = DI8DEVTYPE_JOYSTICK
-	void enumerate(LPDIRECTINPUT di, DWORD dwDevType = DI8DEVTYPE_DRIVING, LPCDIDATAFORMAT lpdf = &c_dfDIJoystick2, DWORD dwFlags = DIEDFL_ATTACHEDONLY, int maxEntry = 16) {
+	void enumerate(
+		LPDIRECTINPUT di,
+		DWORD dwDevType = DI8DEVTYPE_DRIVING,
+		LPCDIDATAFORMAT lpdf = &c_dfDIJoystick2,
+		DWORD dwFlags = DIEDFL_ATTACHEDONLY,
+		int maxEntry = 16) {
 		clear();
 
 		entry = new Entry[maxEntry];

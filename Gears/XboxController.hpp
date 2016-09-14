@@ -100,7 +100,7 @@ private:
 	std::array<bool, SIZEOF_XboxButtons> xboxButtonPrev;
 
 public:
-	XboxController(int playerNumber);
+	explicit XboxController(int playerNumber);
 	XINPUT_STATE GetState();
 	bool IsConnected();
 	void Vibrate(int leftval = 0, int rightval = 0) const;
