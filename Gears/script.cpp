@@ -1030,8 +1030,8 @@ void playWheelEffects(
 		return;
 	}
 
-	/*int constantForce = 100 * static_cast<int>(-settings->FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
-	controls.WheelDI->SetConstantForce(constantForce);*/
+	int constantForce = 100 * static_cast<int>(-settings->FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
+	controls.WheelDI.SetConstantForce(constantForce);
 
 	/*if (settings->FFDamperStationary < settings->FFDamperMoving) {
 	settings->FFDamperMoving = settings->FFDamperStationary;

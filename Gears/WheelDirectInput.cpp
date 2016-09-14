@@ -28,12 +28,11 @@ bool WheelDirectInput::InitWheel(std::string ffAxis) {
 
 		if (e) {
 			logger.Write("Initializing Force Feedback");
+			e->diDevice->Unacquire();
 			HRESULT hr;
 			if (FAILED( hr = e->diDevice->SetCooperativeLevel(
 					GetForegroundWindow(),
-					//nullptr, // wtf
 					DISCL_EXCLUSIVE | DISCL_FOREGROUND))) {
-				//if (hr == E_HANDLE) {
 				std::stringstream ss;
 				ss << std::hex << hr;
 				logger.Write("Error " + ss.str());
@@ -272,7 +271,7 @@ HRESULT WheelDirectInput::SetConstantForce(int force) const {
 		if (pCFEffect)
 			pCFEffect->Start(1, 0);
 	} else {
-		return E_FAIL;
+		return E_HANDLE;
 	}
 
 	return hr;
