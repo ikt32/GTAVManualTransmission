@@ -107,7 +107,6 @@ public:
 	int WheelControl[static_cast<int>(WheelControlType::SIZEOF_WheelControlType)] = {};
 	std::string WheelAxes[static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)] = {};
 	std::string FFAxis;
-	bool FFInvert;
 
 	int CToggleTime = 1000;
 

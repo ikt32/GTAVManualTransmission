@@ -125,7 +125,7 @@ void update() {
 		vehData.Speed,
 		vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
 		vehData.getAccelerationVectorsAverage(),
-		&settings,
+		settings,
 		false);
 	}
 
@@ -148,7 +148,7 @@ void update() {
 			vehData.Speed,
 			vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
 			vehData.getAccelerationVectorsAverage(),
-			&settings,
+			settings,
 			false);
 	}
 	
@@ -332,9 +332,9 @@ void showDebugInfo() {
 		std::stringstream dinputDisplay;
 		dinputDisplay << "Wheel Avail: " << controls.WheelDI.IsConnected() << std::endl;
 		showText(0.85, 0.20, 0.4, dinputDisplay.str().c_str());
-	  std::stringstream steerDisplay;
-	  steerDisplay << "SteerValue: " << controls.SteerVal << std::endl;
-	  showText(0.85, 0.16, 0.4, steerDisplay.str().c_str());
+		std::stringstream steerDisplay;
+		steerDisplay << "SteerValue: " << controls.SteerVal << std::endl;
+		showText(0.85, 0.16, 0.4, steerDisplay.str().c_str());
 	}
 	
 
@@ -1008,102 +1008,44 @@ void doWheelSteering() {
 	}
 }
 
-void playWheelEffects(
-	float speed,
-	Vector3 accelVals,
-	Vector3 accelValsAvg,
-	ScriptSettings* settings,
-	bool airborne) {
-
-	if (settings == nullptr)
-		return;
-
-
+void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, ScriptSettings& settings, bool airborne) {
 	if (prevInput != ScriptControls::Wheel) {
 		return;
 	}
-
-	/*if (controls.WheelDI == nullptr)
-		return;*/
 
 	if (!controls.WheelDI.IsConnected()) {
 		return;
 	}
 
-	int constantForce = 100 * static_cast<int>(-settings->FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
-	controls.WheelDI.SetConstantForce(constantForce);
+	int constantForce = 100 * static_cast<int>(settings.FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
+	std::stringstream forceDisplay;
+	forceDisplay << "ConstForce: " << constantForce << std::endl;
+	showText(0.85, 0.28, 0.4, forceDisplay.str().c_str());
 
-	/*if (settings->FFDamperStationary < settings->FFDamperMoving) {
-	settings->FFDamperMoving = settings->FFDamperStationary;
-	}
-	if (settings->FFDamperMoving < 1) {
-	settings->FFDamperMoving = 1;
-	}
-	float ratio = (float)(settings->FFDamperStationary - settings->FFDamperMoving) / settings->FFDamperMoving;
-	int damperforce = settings->FFDamperStationary - (int)(8 * ratio * ratio * speed*speed);
-	if (damperforce < settings->FFDamperMoving) {
-	damperforce = settings->FFDamperMoving + (int)(speed * ratio);
-	}
-	damperforce -= (int)(ratio * accelValsAvg.y);
-	if (damperforce > settings->FFDamperStationary) {
-	damperforce = settings->FFDamperStationary;
-	}
-	*/
-
-
-	//loggeriPlayDamperForce(loggeriWheel.GetIndex(), damperforce);
-
-
-	/*switch (hr) {
-	case DI_DOWNLOADSKIPPED:
-		logger.Write("SetForce DI_DOWNLOADSKIPPED");
-		break;
-	case DI_EFFECTRESTARTED:
-		logger.Write("SetForce DI_EFFECTRESTARTED");
-		break;
-	case DI_OK:
-		logger.Write("SetForce DI_OK");
-		break;
-	case DI_TRUNCATED:
-		logger.Write("SetForce DI_TRUNCATED");
-		break;
-	case DI_TRUNCATEDANDRESTARTED:
-		logger.Write("SetForce DI_TRUNCATEDANDRESTARTED");
-		break;
-	case DIERR_NOTINITIALIZED:
-		logger.Write("SetForce DIERR_NOTINITIALIZED");
-		break;
-	case DIERR_INCOMPLETEEFFECT:
-		logger.Write("SetForce DIERR_INCOMPLETEEFFECT");
-		break;
-	case DIERR_INPUTLOST:
-		logger.Write("SetForce DIERR_INPUTLOST");
-		break;
-	case DIERR_INVALIDPARAM:
-		logger.Write("SetForce DIERR_INVALIDPARAM");
-		break;
-	case DIERR_EFFECTPLAYING:
-		logger.Write("SetForce DIERR_EFFECTPLAYING");
-		break;
-	}*/
-
-	//loggeriPlayConstantForce(loggeriWheel.GetIndex(), constantForce);
-
-	/*int centerForcePercentage = (int)(settings->FFCenterSpring * accelValsAvg.y);
-	if (centerForcePercentage < 0) {
-	centerForcePercentage = 0;
+	// targetSpeed in m/s
+	// targetSpeed is the speed at which the damperForce is at minimum
+	// damperForce is maximum at 0 and keeps decreasing
+	float adjustRatio = settings.DamperMax / settings.TargetSpeed;
+	int damperForce = settings.DamperMax - speed * adjustRatio;
+	if (damperForce < settings.DamperMin) {
+		damperForce = settings.DamperMin;
 	}
 
-	loggeriPlaySpringForce(
-	loggeriWheel.GetIndex(),
-	0,
-	(int)(settings->FFCenterSpring*speed + centerForcePercentage),
-	(int)(settings->FFCenterSpring*speed + centerForcePercentage));
+	auto steerSpeed = controls.WheelDI.GetAxisSpeed(controls.WheelDI.lX)/20;
 
-	if (!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f) {
-	loggeriPlayCarAirborne(loggeriWheel.GetIndex());
+	std::stringstream steerDisplay;
+	steerDisplay << "SteerSpeed: " << steerSpeed << std::endl;
+	showText(0.85, 0.24, 0.4, steerDisplay.str().c_str());
+
+	if (airborne) {
+		constantForce = 0;
 	}
-	else if (loggeriIsPlaying(loggeriWheel.GetIndex(), loggerI_FORCE_CAR_AIRBORNE)) {
-	loggeriStopCarAirborne(loggeriWheel.GetIndex());
-	}*/
+
+	auto totalForce = (steerSpeed * damperForce * 0.1) - constantForce;
+
+	controls.WheelDI.SetConstantForce(totalForce);
+
+	std::stringstream damperF;
+	damperF << "damperF: " << damperForce << std::endl;
+	showText(0.85, 0.32, 0.4, damperF.str().c_str());
 }

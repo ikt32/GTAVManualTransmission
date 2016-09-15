@@ -28,10 +28,9 @@ public:
 	bool WheelEnabled;
 	int WheelRange;
 	bool FFEnable;
-	int FFDamperStationary;
-	int FFDamperMoving;
+	int DamperMax;
+	int DamperMin;
 	float FFPhysics;
-	float FFCenterSpring;
 	bool DisableDpad;
 
 	bool CrossScript;
@@ -46,7 +45,7 @@ public:
 	float RPMDamage;
 	int MisshiftDamage;
 	bool WheelWithoutManual;
-
+	int TargetSpeed;
 private:
 	void CheckSettings();
 };

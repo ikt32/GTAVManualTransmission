@@ -3,14 +3,9 @@
 #include <Windows.h>
 #include "../../ScriptHookV_SDK/inc/natives.h"
 #include "../../ScriptHookV_SDK/inc/enums.h"
-#include "Logger.hpp"
 
-ScriptControls::ScriptControls(): FFInvert{false},
-                                  controller{1},
+ScriptControls::ScriptControls(): controller{1},
                                   buttonState(0) {
-	Logger logger(LOGFILE);
-	//controller = new XboxController(1); // I love you XInput.
-	//WheelDI = new WheelDirectInput(FFAxis); // I hate you DInput.
 }
 
 ScriptControls::~ScriptControls() {
@@ -55,9 +50,6 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 			BrakeVal = 1.0f - static_cast<float>(RawB) / 65535.0f;
 			ClutchVal = 1.0f - static_cast<float>(RawC) / 65535.0f;
 			SteerVal = RawS;
-			//ThrottleVal = 1.0f - static_cast<float>(WheelDI.JoyState.lY) / 65535.0f;
-			//BrakeVal = 1.0f - static_cast<float>(WheelDI.JoyState.lRz) / 65535.0f;
-			//ClutchVal = 1.0f - static_cast<float>(WheelDI.JoyState.rglSlider[1]) / 65535.0f;
 			break;
 		}
 		default: break;

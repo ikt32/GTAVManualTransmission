@@ -19,10 +19,9 @@ ScriptSettings::ScriptSettings() {
 	WheelEnabled = false;
 	WheelRange = 180;
 	FFEnable = true;
-	FFDamperStationary = 60;
-	FFDamperMoving = 30;
+	DamperMax = 60;
+	DamperMin = 30;
 	FFPhysics = 1.0f;
-	FFCenterSpring = 1.0f;
 	DisableDpad = false;
 
 	Debug = false;
@@ -37,6 +36,7 @@ ScriptSettings::ScriptSettings() {
 	MisshiftDamage = 0;
 	WheelWithoutManual = true;
 	CrossScript = false;
+	TargetSpeed = 10;
 }
 
 
@@ -146,14 +146,13 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	
 	GetPrivateProfileStringA("WHEELAXIS", "FFAxis", "X", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->FFAxis = buffer;
-	scriptControl->FFInvert = (GetPrivateProfileIntA("WHEELAXIS", "InvertFF", 0, SETTINGSFILE) == 1);
 
 	WheelRange = GetPrivateProfileIntA("WHEEL", "WheelRange", 180, SETTINGSFILE);
 	FFEnable = GetPrivateProfileIntA("WHEEL", "FFEnable", 1, SETTINGSFILE) == 1;
-	FFDamperStationary = GetPrivateProfileIntA("WHEEL", "FFDamperStationary", 60, SETTINGSFILE);
-	FFDamperMoving = GetPrivateProfileIntA("WHEEL", "FFDamperMoving", 30, SETTINGSFILE);
+	DamperMax = GetPrivateProfileIntA("WHEEL", "FFDamperStationary", 60, SETTINGSFILE);
+	DamperMin = GetPrivateProfileIntA("WHEEL", "FFDamperMoving", 30, SETTINGSFILE);
+	TargetSpeed = GetPrivateProfileIntA("WHEEL", "TargetSpeed", 10, SETTINGSFILE);
 	FFPhysics = GetPrivateProfileIntA("WHEEL", "FFPhysics", 150, SETTINGSFILE) / 100.0f;
-	FFCenterSpring = GetPrivateProfileIntA("WHEEL", "FFCenterSpring", 100, SETTINGSFILE) / 100.0f;
 }
 
 void ScriptSettings::Save() const {

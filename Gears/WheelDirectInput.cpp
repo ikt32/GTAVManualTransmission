@@ -5,6 +5,7 @@
 
 //#define FAILED(hr) (((HRESULT)(hr)) < 0)
 #include <winerror.h>
+#include <chrono>
 
 WheelDirectInput::WheelDirectInput(): pCFEffect{nullptr},
                                       pFREffect{nullptr} {
@@ -12,8 +13,6 @@ WheelDirectInput::WheelDirectInput(): pCFEffect{nullptr},
 
 bool WheelDirectInput::InitWheel(std::string ffAxis) {
 	Logger logger(LOGFILE);
-	//logger.Clear();
-	//logger.Write("Entered WheelDirectInput constructor");
 
 	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(nullptr),
 									 DIRECTINPUT_VERSION, 
@@ -74,19 +73,14 @@ bool WheelDirectInput::InitWheel(std::string ffAxis) {
 			}
 			logger.Write("Init FF SUCCESS");
 			
-			logger.Write("Init FF Effects on axis " + ffAxis);
+			logger.Write("Init FF Effect on axis " + ffAxis);
 			if (!CreateConstantForceEffect(ffAxis)) {
 				logger.Write("Error initializing Constant Force Effect");
 				return false;
 			}
-			/*if (!CreateCustomForceEffect(ffAxis, GUID_Friction)) {
-				logger.Write("Error initializing Friction Force Effect");
-			}
-			if (!CreateCustomForceEffect(ffAxis, GUID_Damper)) {
-				logger.Write("Error initializing Damper Force Effect");
-			}*/
-			logger.Write("Init FF Effects SUCCESS");
+			logger.Write("Init FF Effect SUCCESS");
 			JoyState = e->joystate;
+			prevPosition = JoyState.lX;
 			logger.Write("Initializing wheel success");
 			return true;
 		}
@@ -172,8 +166,7 @@ void WheelDirectInput::UpdateButtonChangeStates() {
 }
 
 bool WheelDirectInput::CreateConstantForceEffect(std::string axis) {
-	DWORD ffAxis = DIJOFS_X;
-	Logger log(LOGFILE);
+	DWORD ffAxis;
 	if (axis == "X") {
 		ffAxis = DIJOFS_X;
 	}
@@ -224,58 +217,6 @@ bool WheelDirectInput::CreateConstantForceEffect(std::string axis) {
 	return true;
 }
 
-bool WheelDirectInput::CreateCustomForceEffect(std::string axis, GUID effectGUID) {
-	DWORD ffAxis = DIJOFS_X;
-	if (axis == "X") {
-		ffAxis = DIJOFS_X;
-	}
-	else if (axis == "Y") {
-		ffAxis = DIJOFS_Y;
-	}
-	else if (axis == "Z") {
-		ffAxis = DIJOFS_Z;
-	}
-	else {
-		return false;
-	}
-
-	DWORD rgdwAxes[1] = { ffAxis };
-	LONG rglDirection[1] = { 0 };
-	DICUSTOMFORCE cf = { 0 };
-
-	DIEFFECT eff;
-	ZeroMemory(&eff, sizeof(eff));
-	eff.dwSize = sizeof(DIEFFECT);
-	eff.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
-	eff.dwDuration = INFINITE;
-	eff.dwSamplePeriod = 0;
-	eff.dwGain = DI_FFNOMINALMAX;
-	eff.dwTriggerButton = DIEB_NOTRIGGER;
-	eff.dwTriggerRepeatInterval = 0;
-	eff.cAxes = 1;
-	eff.rgdwAxes = rgdwAxes;
-	eff.rglDirection = rglDirection;
-	eff.lpEnvelope = nullptr;
-	eff.cbTypeSpecificParams = sizeof(DICUSTOMFORCE);
-	eff.lpvTypeSpecificParams = &cf;
-	eff.dwStartDelay = 0;
-
-	const DiJoyStick::Entry* e = djs.getEntry(0);
-	if (e) {
-		e->diDevice->CreateEffect(
-			effectGUID,
-			&eff,
-			&pCFEffect,
-			nullptr);
-	}
-
-	if (!pCFEffect) {
-		return false;
-	}
-
-	return true;
-}
-
 HRESULT WheelDirectInput::SetConstantForce(int force) const {
 	HRESULT hr;
 	LONG rglDirection[1] = {0};
@@ -311,67 +252,6 @@ HRESULT WheelDirectInput::SetConstantForce(int force) const {
 	return hr;
 }
 
-HRESULT WheelDirectInput::SetCustomForce(int fric, int damp) {
-	/*const DiJoyStick::Entry* e = djs.getEntry(0);
-	if (e) {
-		e->diDevice->Acquire();
-		if (pCFEffect)
-			pCFEffect->Start(1, 0);
-		if (pFREffect)
-			pFREffect->Start(1, 0);
-	}
-	LONG rglDirection[1] = { 0 };
-
-
-	DICUSTOMFORCE cfFric;
-	DICUSTOMFORCE cfDamp;
-
-	cfFric.cChannels = 1;
-
-	cf.lMagnitude = force;
-
-	DIEFFECT cfEffect;
-	ZeroMemory(&cfEffect, sizeof(cfEffect));
-	cfEffect.dwSize = sizeof(DIEFFECT);
-	cfEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
-	cfEffect.cAxes = 1;
-	cfEffect.rglDirection = rglDirection;
-	cfEffect.lpEnvelope = nullptr;
-	cfEffect.cbTypeSpecificParams = sizeof(DICONSTANTFORCE);
-	cfEffect.lpvTypeSpecificParams = &cf;
-	cfEffect.dwStartDelay = 0;
-
-	return pCFEffect->SetParameters(&cfEffect, DIEP_DIRECTION |
-		DIEP_TYPESPECIFICPARAMS |
-		DIEP_START);
-	//ConditionalEffect *eff = static_cast<ConditionalEffect*>(effect->getForceEffect());
-
-	//DWORD           rgdwAxes[2] = { DIJOFS_X, DIJOFS_Y };
-	//LONG            rglDirection[2] = { 0, 0 };
-	//DIENVELOPE      diEnvelope;
-	//DICONDITION     cf;
-	//DIEFFECT        diEffect;
-
-	//cf.lOffset = eff->deadband;
-	//cf.lPositiveCoefficient = eff->rightCoeff;
-	//cf.lNegativeCoefficient = eff->leftCoeff;
-	//cf.dwPositiveSaturation = eff->rightSaturation;
-	//cf.dwNegativeSaturation = eff->leftSaturation;
-	//cf.lDeadBand = eff->deadband;
-
-	//_setCommonProperties(&diEffect, rgdwAxes, rglDirection, &diEnvelope, sizeof(DICONDITION), &cf, effect, 0);
-
-	//switch (effect->type)
-	//{
-	//case OIS::Effect::Friction:	_upload(GUID_Friction, &diEffect, effect); break;
-	//case OIS::Effect::Damper: _upload(GUID_Damper, &diEffect, effect); break;
-	//case OIS::Effect::Inertia: _upload(GUID_Inertia, &diEffect, effect); break;
-	//case OIS::Effect::Spring: _upload(GUID_Spring, &diEffect, effect); break;
-	//default: break;
-	//}*/
-	return NULL;
-}
-
 WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string axisString) {
 	for (int i = 0; i < SIZEOF_DIAxis; i++) {
 		if (axisString == DIAxisHelper[i]) {
@@ -396,5 +276,25 @@ int WheelDirectInput::GetAxisValue(DIAxis axis) {
 		case rglSlider1:	return JoyState.rglSlider[1];
 		default:			return 0;
 	}
+}
+
+// Returns in units/s
+float WheelDirectInput::GetAxisSpeed(DIAxis axis) {
+	auto time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
+	auto position = GetAxisValue(axis);
+	auto result = (position - prevPosition) / ((time - prevTime) / 1e9f);
+	
+	prevTime = time;
+	prevPosition = position;
+
+	samples[averageIndex] = result;
+	averageIndex = (averageIndex + 1) % (SAMPLES - 1);
+
+	//return result;
+	auto sum = 0.0f;
+	for (auto i = 0; i < SAMPLES; i++) {
+		sum += samples[i];
+	}
+	return sum / SAMPLES;
 }
 

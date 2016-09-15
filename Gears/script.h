@@ -34,7 +34,7 @@ void playWheelEffects(
 	float speed,
 	Vector3 accelVals,
 	Vector3 accelValsAvg,
-	ScriptSettings* settings,
+	ScriptSettings& settings,
 	bool airborne);
 void doWheelSteering();
 

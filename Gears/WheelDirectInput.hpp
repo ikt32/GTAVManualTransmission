@@ -9,6 +9,7 @@
 #include <array>
 
 #define MAX_RGBBUTTONS 128
+#define SAMPLES 4
 
 class WheelDirectInput {
 public:
@@ -54,12 +55,12 @@ public:
 	void UpdateButtonChangeStates();
 
 	HRESULT SetConstantForce(int force) const;
-	HRESULT SetCustomForce(int frict, int damp);
 
 	DIAxis StringToAxis(std::string axisString);
 	DIJOYSTATE2 JoyState;
 
 	int GetAxisValue(DIAxis axis);
+	float GetAxisSpeed(DIAxis axis);
 
 private:
 	DiJoyStick djs;
@@ -68,10 +69,15 @@ private:
 	LPDIRECTINPUTEFFECT pCFEffect;
 	LPDIRECTINPUTEFFECT pFREffect;
 	bool CreateConstantForceEffect(std::string axis);
-	bool CreateCustomForceEffect(std::string axis, GUID effectGUID);
 	std::array<__int64, MAX_RGBBUTTONS> pressTime;
 	std::array<__int64, MAX_RGBBUTTONS> releaseTime;
 	std::array<bool, MAX_RGBBUTTONS> rgbButtonCurr;
 	std::array<bool, MAX_RGBBUTTONS> rgbButtonPrev;
+
+	int prevPosition;
+	long long prevTime = 0;
+	float samples[SAMPLES] = { };
+	int averageIndex = 0;
+
 
 };
