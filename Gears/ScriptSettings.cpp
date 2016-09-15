@@ -158,6 +158,9 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	GetPrivateProfileStringA("WHEELAXIS", "FFAxis", "X", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->FFAxis = buffer;
 
+	scriptControl->ClutchDisable = (GetPrivateProfileIntA("WHEELAXIS", "SteerRight", 0, SETTINGSFILE) == 1);
+
+
 	WheelRange = GetPrivateProfileIntA("WHEEL", "WheelRange", 180, SETTINGSFILE);
 	FFEnable = GetPrivateProfileIntA("WHEEL", "FFEnable", 1, SETTINGSFILE) == 1;
 	DamperMax = GetPrivateProfileIntA("WHEEL", "FFDamperStationary", 60, SETTINGSFILE);

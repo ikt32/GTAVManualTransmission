@@ -98,6 +98,9 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 				BrakeVal = 1.0f - static_cast<float>(RawB) / 65535.0f;
 				ClutchVal = 1.0f - static_cast<float>(RawC) / 65535.0f;
 			}
+			if (ClutchDisable) {
+				ClutchVal = 0;
+			}
 			SteerVal = RawS;
 			break;
 		}
