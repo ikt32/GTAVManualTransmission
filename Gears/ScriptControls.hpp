@@ -117,6 +117,7 @@ public:
 	int ClutchMax;
 	int SteerLeft;
 	int SteerRight;
+	bool ClutchDisable;
 
 	// Add more when desired
 	bool ButtonJustPressed(ControllerControlType control);
