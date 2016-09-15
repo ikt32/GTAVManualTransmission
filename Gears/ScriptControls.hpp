@@ -109,7 +109,14 @@ public:
 	std::string FFAxis;
 
 	int CToggleTime = 1000;
-
+	int ThrottleMin;
+	int ThrottleMax;
+	int BrakeMin;
+	int BrakeMax;
+	int ClutchMin;
+	int ClutchMax;
+	int SteerLeft;
+	int SteerRight;
 
 	// Add more when desired
 	bool ButtonJustPressed(ControllerControlType control);
@@ -137,4 +144,6 @@ private:
 
 	bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
+	int findPivot(int throttle_min, int throttle_max, int brake_min, int brake_max);
+
 };

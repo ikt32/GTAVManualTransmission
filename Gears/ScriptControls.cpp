@@ -46,9 +46,58 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 			int RawB = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Brake)]));
 			int RawC = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]));
 			int RawS = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]));
-			ThrottleVal = 1.0f - static_cast<float>(RawT) / 65535.0f;
-			BrakeVal = 1.0f - static_cast<float>(RawB) / 65535.0f;
-			ClutchVal = 1.0f - static_cast<float>(RawC) / 65535.0f;
+			
+			// You're outta luck if you have a single-axis 3-pedal freak combo or something
+			if (WheelAxes[static_cast<int>(WheelAxisType::Throttle)] == WheelAxes[static_cast<int>(WheelAxisType::Brake)]) {
+				ClutchVal = 1.0f - static_cast<float>(RawC) / 65535.0f;
+				int pivot;
+				if (ThrottleMin == BrakeMin) {
+					pivot = BrakeMin;
+				} else
+				if (ThrottleMax == BrakeMin) {
+					pivot = BrakeMin;
+				} else
+				if (ThrottleMin == BrakeMax) {
+					pivot = BrakeMax;
+				} else
+				if (ThrottleMax == BrakeMax) {
+					pivot = BrakeMax;
+				} else {
+					// you fucked up bro
+					return;
+				}
+
+				if (pivot == BrakeMin) {
+					if (BrakeMax > pivot) {
+						// here we know all details from the axis
+						if (RawT < pivot) {
+							// Throttle
+							ThrottleVal = 1.0f - (float)(RawT - ThrottleMax) / (float)pivot;
+							BrakeVal = 0;
+						} else {
+							// Brake
+							ThrottleVal = 0;
+							BrakeVal = (float)(RawT - BrakeMin) / (float)pivot;
+						}
+					}
+					else {
+
+					}
+				}
+				if (pivot == BrakeMax) {
+					if (BrakeMin > pivot) {
+						
+					}
+					else {
+						
+					}
+				}
+			}
+ 			else {
+				ThrottleVal = 1.0f - static_cast<float>(RawT) / 65535.0f;
+				BrakeVal = 1.0f - static_cast<float>(RawB) / 65535.0f;
+				ClutchVal = 1.0f - static_cast<float>(RawC) / 65535.0f;
+			}
 			SteerVal = RawS;
 			break;
 		}

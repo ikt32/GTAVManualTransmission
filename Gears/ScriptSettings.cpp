@@ -137,12 +137,23 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 
 	GetPrivateProfileStringA("WHEELAXIS", "Throttle", "lY", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Throttle)] = buffer; 
+	scriptControl->ThrottleMin = GetPrivateProfileIntA("WHEELAXIS", "ThrottleMin", -1000, SETTINGSFILE);
+	scriptControl->ThrottleMax = GetPrivateProfileIntA("WHEELAXIS", "ThrottleMax", 1000, SETTINGSFILE);
+	
 	GetPrivateProfileStringA("WHEELAXIS", "Brake", "lRz", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Brake)] = buffer;
+	scriptControl->BrakeMin = GetPrivateProfileIntA("WHEELAXIS", "BrakeMin", -1000, SETTINGSFILE);
+	scriptControl->BrakeMax = GetPrivateProfileIntA("WHEELAXIS", "BrakeMax", 1000, SETTINGSFILE);
+
 	GetPrivateProfileStringA("WHEELAXIS", "Clutch", "rglSlider1", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] = buffer;
+	scriptControl->ClutchMin = GetPrivateProfileIntA("WHEELAXIS", "ClutchMin", -1000, SETTINGSFILE);
+	scriptControl->ClutchMax = GetPrivateProfileIntA("WHEELAXIS", "ClutchMax", 1000, SETTINGSFILE);
+
 	GetPrivateProfileStringA("WHEELAXIS", "Steer", "lX", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)] = buffer;
+	scriptControl->SteerLeft = GetPrivateProfileIntA("WHEELAXIS", "SteerLeft", -1000, SETTINGSFILE);
+	scriptControl->SteerRight = GetPrivateProfileIntA("WHEELAXIS", "SteerRight", 1000, SETTINGSFILE);
 	
 	GetPrivateProfileStringA("WHEELAXIS", "FFAxis", "X", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->FFAxis = buffer;
