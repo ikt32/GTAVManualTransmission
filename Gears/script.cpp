@@ -1035,7 +1035,12 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		damperForce = settings.DamperMin;
 	}
 
-	auto steerSpeed = controls.WheelDI.GetAxisSpeed(controls.WheelDI.lX)/20;
+	// Holy batman readability = 0
+	auto steerSpeed = controls.WheelDI.GetAxisSpeed(
+		controls.WheelDI.StringToAxis(
+			controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Throttle)]
+		)
+	)/20;
 
 	std::stringstream steerDisplay;
 	steerDisplay << "SteerSpeed: " << steerSpeed << std::endl;

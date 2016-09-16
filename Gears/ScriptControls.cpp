@@ -24,10 +24,9 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 	if (WheelDI.IsConnected()) {
 		WheelDI.UpdateState();
 		WheelDI.UpdateButtonChangeStates();
-		//SteerVal = WheelDI.JoyState.lX;
 	}
 
-	//Update ThrottleVal, BrakeVal and ClutchVal ranging from 0.0f (no touch) to 1.0f (full press)
+	// Update ThrottleVal, BrakeVal and ClutchVal ranging from 0.0f (no touch) to 1.0f (full press)
 	switch (prevInput) {
 		case Keyboard: {
 			ThrottleVal = (IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)]) ? 1.0f : 0.0f);
@@ -115,7 +114,7 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 						}
 					}
 				}
-			}
+			} // End single-axis mumbo jumbo
  			else {
 				ThrottleVal = 1.0f - static_cast<float>(RawT) / 65535.0f;
 				BrakeVal = 1.0f - static_cast<float>(RawB) / 65535.0f;

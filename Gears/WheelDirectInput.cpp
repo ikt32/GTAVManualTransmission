@@ -3,7 +3,6 @@
 #include "Logger.hpp"
 #include <sstream>
 
-//#define FAILED(hr) (((HRESULT)(hr)) < 0)
 #include <winerror.h>
 #include <chrono>
 

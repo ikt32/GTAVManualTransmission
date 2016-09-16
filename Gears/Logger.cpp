@@ -23,5 +23,5 @@ void Logger::Write(const std::string& text) const {
 	           std::setw(2) << std::setfill('0') << currTimeLog.wMinute << ":" <<
 	           std::setw(2) << std::setfill('0') << currTimeLog.wSecond << "." <<
 	           std::setw(3) << std::setfill('0') << currTimeLog.wMilliseconds << "] " <<
-	           text << std::endl;
+	           text << "\n";
 }

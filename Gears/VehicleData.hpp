@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\..\ScriptHookV_SDK\inc\types.h"
+#include "../../ScriptHookV_SDK/inc/types.h"
 
 #include <Windows.h>
 #include <array>
@@ -27,6 +27,7 @@ public:
 
 	// 1 = Not pressed, 0 = Fully pressed
 	float Clutch = 0.0f;
+	
 	float Throttle = 0.0f;
 	float Turbo = 0.0f;
 

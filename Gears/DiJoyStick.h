@@ -39,7 +39,8 @@ public:
 		di = nullptr;
 	}
 
-	//dwDevType = DI8DEVTYPE_JOYSTICK
+	// All on https://msdn.microsoft.com/en-us/library/windows/desktop/microsoft.directx_sdk.reference.dideviceinstance(v=vs.85).aspx
+	// dwDevType = DI8DEVTYPE_JOYSTICK
 	void enumerate(
 		LPDIRECTINPUT di,
 		DWORD dwDevType = DI8DEVTYPE_DRIVING,
@@ -60,7 +61,6 @@ public:
 	}
 
 	int getEntryCount() const {
-		//printf("Entries: %i", nEntry);
 		return nEntry;
 	}
 
