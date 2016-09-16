@@ -116,14 +116,14 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 				}
 			} // End single-axis mumbo jumbo
  			else {
-				ThrottleVal = 1.0f - static_cast<float>(RawT) / 65535.0f;
-				BrakeVal = 1.0f - static_cast<float>(RawB) / 65535.0f;
-				ClutchVal = 1.0f - static_cast<float>(RawC) / 65535.0f;
+				ThrottleVal = 1.0f - static_cast<float>(RawT) / static_cast<float>(ThrottleMax - ThrottleMin);
+				BrakeVal = 1.0f - static_cast<float>(RawB) / static_cast<float>(BrakeMax - BrakeMin);
+				ClutchVal = 1.0f - static_cast<float>(RawC) / static_cast<float>(ClutchMax - ClutchMin);
 			}
 			if (ClutchDisable) {
 				ClutchVal = 0.0f;
 			}
-			SteerVal = RawS;
+			SteerVal = RawS; // Todo - Give a value or something idk
 			break;
 		}
 		default: break;
