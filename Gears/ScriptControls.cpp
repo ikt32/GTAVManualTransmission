@@ -144,7 +144,7 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
 		return Controller;
 	}
 	if (WheelDI.IsConnected() &&
-		1.0f - static_cast<float>(WheelDI.JoyState.lY) / 65535.0f > 0.5f) {
+		1.0f - static_cast<float>(WheelDI.JoyState.lY) / 65535.0f > 0.5f) { // TODO - Generaize!
 		return Wheel;
 	}
 	return previousInput;

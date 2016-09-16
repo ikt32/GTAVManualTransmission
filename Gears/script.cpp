@@ -1038,7 +1038,7 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 	// Holy batman readability = 0
 	auto steerSpeed = controls.WheelDI.GetAxisSpeed(
 		controls.WheelDI.StringToAxis(
-			controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Throttle)]
+			controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)]
 		)
 	)/20;
 
