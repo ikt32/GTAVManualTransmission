@@ -102,7 +102,7 @@ void XboxController::UpdateButtonChangeStates() {
 	}
 }
 
-XboxController::XboxButtons XboxController::StringToButton(std::string buttonString) {
+XboxController::XboxButtons XboxController::StringToButton(std::string& buttonString) {
 	for (int i = 0; i < SIZEOF_XboxButtons; i++) {
 		if (buttonString == XboxButtonsHelper[i]) {
 			return static_cast<XboxButtons>(i);

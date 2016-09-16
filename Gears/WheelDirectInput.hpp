@@ -40,7 +40,7 @@ public:
 
 public:
 	WheelDirectInput();
-	bool InitWheel(std::string ffAxis);
+	bool InitWheel(std::string& ffAxis);
 	~WheelDirectInput();
 
 	// Should be called every update()
@@ -56,7 +56,7 @@ public:
 
 	HRESULT SetConstantForce(int force) const;
 
-	DIAxis StringToAxis(std::string axisString);
+	DIAxis StringToAxis(std::string& axisString);
 	DIJOYSTATE2 JoyState;
 
 	int GetAxisValue(DIAxis axis);
@@ -68,7 +68,7 @@ private:
 
 	LPDIRECTINPUTEFFECT pCFEffect;
 	LPDIRECTINPUTEFFECT pFREffect;
-	bool CreateConstantForceEffect(std::string axis);
+	bool CreateConstantForceEffect(std::string& axis);
 	std::array<__int64, MAX_RGBBUTTONS> pressTime;
 	std::array<__int64, MAX_RGBBUTTONS> releaseTime;
 	std::array<bool, MAX_RGBBUTTONS> rgbButtonCurr;

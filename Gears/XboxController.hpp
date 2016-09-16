@@ -112,7 +112,7 @@ public:
 	void UpdateButtonChangeStates();
 
 
-	XboxButtons StringToButton(std::string buttonString);
+	XboxButtons StringToButton(std::string& buttonString);
 
 	// Returns a 0.0 to 1.0 value for any button
 	float GetAnalogValue(XboxButtons buttonType, WORD buttonState);

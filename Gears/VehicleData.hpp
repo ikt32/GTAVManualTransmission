@@ -16,7 +16,7 @@ public:
 	VehicleData();
 	void Clear();
 
-	void ReadMemData(VehicleExtensions ext, Vehicle vehicle);
+	void ReadMemData(VehicleExtensions& ext, Vehicle vehicle);
 
 	bool IsBike = false;
 	bool NoClutch = false;

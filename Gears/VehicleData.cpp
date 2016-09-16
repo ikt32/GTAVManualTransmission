@@ -48,7 +48,7 @@ bool VehicleData::noClutch(char* name) {
 	return false;
 }
 
-void VehicleData::ReadMemData(VehicleExtensions ext, Vehicle vehicle) {
+void VehicleData::ReadMemData(VehicleExtensions& ext, Vehicle vehicle) {
 	Hash model = ENTITY::GET_ENTITY_MODEL(vehicle);
 
 	Address = ext.GetAddress(vehicle);

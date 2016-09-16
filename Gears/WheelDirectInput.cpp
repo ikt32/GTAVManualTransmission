@@ -11,7 +11,7 @@ WheelDirectInput::WheelDirectInput(): pCFEffect{nullptr}
                                     , pFREffect{nullptr}  {
 }
 
-bool WheelDirectInput::InitWheel(std::string ffAxis) {
+bool WheelDirectInput::InitWheel(std::string &ffAxis) {
 	Logger logger(LOGFILE);
 
 	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(nullptr),
@@ -166,7 +166,7 @@ void WheelDirectInput::UpdateButtonChangeStates() {
 	}
 }
 
-bool WheelDirectInput::CreateConstantForceEffect(std::string axis) {
+bool WheelDirectInput::CreateConstantForceEffect(std::string &axis) {
 	DWORD ffAxis;
 	if (axis == "X") {
 		ffAxis = DIJOFS_X;
@@ -253,7 +253,7 @@ HRESULT WheelDirectInput::SetConstantForce(int force) const {
 	return hr;
 }
 
-WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string axisString) {
+WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string& axisString) {
 	for (int i = 0; i < SIZEOF_DIAxis; i++) {
 		if (axisString == DIAxisHelper[i]) {
 			return static_cast<DIAxis>(i);
