@@ -105,7 +105,7 @@ void WheelDirectInput::UpdateState() {
 	}
 }
 
-bool WheelDirectInput::IsConnected() {
+bool WheelDirectInput::IsConnected() const {
 	auto e = djs.getEntry(0);
 
 	if (!e) {

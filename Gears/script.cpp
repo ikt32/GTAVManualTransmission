@@ -1029,8 +1029,8 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 	// targetSpeed in m/s
 	// targetSpeed is the speed at which the damperForce is at minimum
 	// damperForce is maximum at 0 and keeps decreasing
-	float adjustRatio = settings.DamperMax / settings.TargetSpeed;
-	int damperForce = settings.DamperMax - speed * adjustRatio;
+	float adjustRatio = static_cast<float>(settings.DamperMax) / static_cast<float>(settings.TargetSpeed);
+	int damperForce = settings.DamperMax - static_cast<int>(speed * adjustRatio);
 	if (damperForce < settings.DamperMin) {
 		damperForce = settings.DamperMin;
 	}
@@ -1046,7 +1046,7 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		damperForce = settings.DamperMin;
 	}
 
-	auto totalForce = (steerSpeed * damperForce * 0.1) - constantForce;
+	int totalForce = static_cast<int>(steerSpeed * damperForce * 0.1) - constantForce;
 
 	controls.WheelDI.SetConstantForce(totalForce);
 
