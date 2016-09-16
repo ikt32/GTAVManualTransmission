@@ -1039,6 +1039,7 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 
 	if (airborne) {
 		constantForce = 0;
+		damperForce = settings.DamperMin;
 	}
 
 	auto totalForce = (steerSpeed * damperForce * 0.1) - constantForce;
