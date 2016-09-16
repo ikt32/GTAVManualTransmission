@@ -163,10 +163,10 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	
 	WheelRange = GetPrivateProfileIntA("WHEEL", "WheelRange", 180, SETTINGSFILE);
 	FFEnable = GetPrivateProfileIntA("WHEEL", "FFEnable", 1, SETTINGSFILE) == 1;
-	DamperMax = GetPrivateProfileIntA("WHEEL", "FFDamperStationary", 60, SETTINGSFILE);
-	DamperMin = GetPrivateProfileIntA("WHEEL", "FFDamperMoving", 30, SETTINGSFILE);
-	TargetSpeed = GetPrivateProfileIntA("WHEEL", "TargetSpeed", 10, SETTINGSFILE);
-	FFPhysics = GetPrivateProfileIntA("WHEEL", "FFPhysics", 150, SETTINGSFILE) / 100.0f;
+	DamperMax = GetPrivateProfileIntA("WHEEL", "DamperMax", 50, SETTINGSFILE);
+	DamperMin = GetPrivateProfileIntA("WHEEL", "DamperMin", 20, SETTINGSFILE);
+	TargetSpeed = GetPrivateProfileIntA("WHEEL", "DamperTargetSpeed", 10, SETTINGSFILE);
+	FFPhysics = GetPrivateProfileIntA("WHEEL", "PhysicsStrength", 170, SETTINGSFILE) / 100.0f;
 }
 
 void ScriptSettings::Save() const {
