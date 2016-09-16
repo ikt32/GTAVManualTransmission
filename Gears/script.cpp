@@ -321,26 +321,30 @@ void showDebugInfo() {
 	showText(0.01f, 0.5f, 0.4f, infos.str().c_str());
 
 	std::stringstream throttleDisplay;
-	throttleDisplay << "ThrottleVal: " << controls.ThrottleVal << std::endl;
+	throttleDisplay << "ThrottleVal: " << controls.ThrottleVal;
 	std::stringstream brakeDisplay;
-	brakeDisplay << "Brake Value: " << controls.BrakeVal << std::endl;
+	brakeDisplay << "Brake Value: " << controls.BrakeVal;
 	std::stringstream clutchDisplay;
-	clutchDisplay << "ClutchValue: " << controls.ClutchVal << std::endl;
-	
-	
-	if (settings.WheelEnabled) {
-		std::stringstream dinputDisplay;
-		dinputDisplay << "Wheel Avail: " << controls.WheelDI.IsConnected() << std::endl;
-		showText(0.85, 0.20, 0.4, dinputDisplay.str().c_str());
-		std::stringstream steerDisplay;
-		steerDisplay << "SteerValue: " << controls.SteerVal << std::endl;
-		showText(0.85, 0.16, 0.4, steerDisplay.str().c_str());
-	}
-	
+	clutchDisplay << "ClutchValue: " << controls.ClutchVal;
+	std::stringstream clutcheDisplay;
+	clutcheDisplay << "Disabled: " << (controls.ClutchDisable ? "Y" : "N");
 
 	showText(0.85, 0.04, 0.4, throttleDisplay.str().c_str());
 	showText(0.85, 0.08, 0.4, brakeDisplay.str().c_str());
 	showText(0.85, 0.12, 0.4, clutchDisplay.str().c_str());
+	showText(0.70, 0.12, 0.4, clutcheDisplay.str().c_str());
+
+
+	if (settings.WheelEnabled) {
+		std::stringstream dinputDisplay;
+		dinputDisplay << "Wheel Avail: " << controls.WheelDI.IsConnected();
+		showText(0.85, 0.20, 0.4, dinputDisplay.str().c_str());
+		std::stringstream steerDisplay;
+		steerDisplay << "SteerValue: " << controls.SteerVal;
+		showText(0.85, 0.16, 0.4, steerDisplay.str().c_str());
+	}
+	
+
 
 	/*for (int i = 0; i < MAX_RGBBUTTONS; i++) {
 		if (controls.wheelState->rgbButtons[i]) {
