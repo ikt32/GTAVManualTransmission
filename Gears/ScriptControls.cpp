@@ -99,7 +99,7 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 				ClutchVal = 1.0f - static_cast<float>(RawC) / 65535.0f;
 			}
 			if (ClutchDisable) {
-				ClutchVal = 0;
+				ClutchVal = 0.0f;
 			}
 			SteerVal = RawS;
 			break;
