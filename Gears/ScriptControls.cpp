@@ -67,29 +67,52 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 					return;
 				}
 
+				// oh my god fucking kill me I'm too dumb for this shit
 				if (pivot == BrakeMin) {
-					if (BrakeMax > pivot) {
-						// here we know all details from the axis
-						if (RawT < pivot) {
-							// Throttle
+					if (BrakeMax > pivot) { // TMIN = BMIN
+						// 0 TMAX < TMIN/PIVOT/BMIN < BMAX 65535
+						if (RawT < pivot) { // Throttle
 							ThrottleVal = 1.0f - (float)(RawT - ThrottleMax) / (float)pivot;
 							BrakeVal = 0;
-						} else {
-							// Brake
+						} else { // Brake
 							ThrottleVal = 0;
 							BrakeVal = (float)(RawT - BrakeMin) / (float)pivot;
 						}
-					}
-					else {
-
+					} // Only this has been verified
+					else { // TMAX = BMIN
+						// 0 BMAX < BMIN/PIVOT/TMAX < TMIN 65535
+						if (RawT > pivot) { // Throttle
+							ThrottleVal = 1.0f - (float)(RawT - ThrottleMax) / (float)pivot;
+							BrakeVal = 0;
+						}
+						else { // Brake
+							ThrottleVal = 0;
+							BrakeVal = 1.0f - (float)(RawT - BrakeMax) / (float)pivot;
+						}
 					}
 				}
 				if (pivot == BrakeMax) {
-					if (BrakeMin > pivot) {
-						
+					if (BrakeMin > pivot) { //TMIN = BMAX
+						// TMAX X < TMIN/PIVOT/BMAX < BMIN 65535
+						if (RawT < pivot) { // Throttle
+							ThrottleVal = 1.0f - (float)(RawT - ThrottleMax) / (float)pivot;
+							BrakeVal = 0;
+						}
+						else { // Brake
+							ThrottleVal = 0;
+							BrakeVal = 1.0f - (float)(RawT - BrakeMax) / (float)pivot;
+						}
 					}
-					else {
-						
+					else { // TMAX = BMAX
+						// 0 BMIN < BMAX/PIVOT/TMAX < TMIN 65535
+						if (RawT > pivot) { // Throttle
+							ThrottleVal = 1.0f - (float)(RawT - ThrottleMax) / (float)pivot;
+							BrakeVal = 0;
+						}
+						else { // Brake
+							ThrottleVal = 0;
+							BrakeVal = (float)(RawT - BrakeMin) / (float)pivot;
+						}
 					}
 				}
 			}
