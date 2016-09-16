@@ -143,9 +143,27 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
 		controller.IsButtonPressed(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState)) {
 		return Controller;
 	}
-	if (WheelDI.IsConnected() &&
-		1.0f - static_cast<float>(WheelDI.JoyState.lY) / 65535.0f > 0.5f) { // TODO - Generaize!
-		return Wheel;
+	if (WheelDI.IsConnected()) {
+		// Oh my god I hate single-axis throttle/brake steering wheels
+		// Looking at you DFGT.
+		int RawT = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]));
+		if (WheelAxes[static_cast<int>(WheelAxisType::Throttle)] == WheelAxes[static_cast<int>(WheelAxisType::Brake)]) {
+			
+			// get throttle range
+			if (ThrottleMax > ThrottleMin &&
+				RawT < ThrottleMax &&
+				RawT > ThrottleMin + (ThrottleMax - ThrottleMin)*0.5) {
+				return Wheel;
+			}
+			if (ThrottleMax < ThrottleMin && // Which twisted mind came up with this
+				RawT > ThrottleMax &&
+				RawT < ThrottleMin - (ThrottleMin - ThrottleMax)*0.5) {
+				return Wheel;
+			}
+		}
+		else if (1.0f - static_cast<float>(RawT) / 65535.0f > 0.5f) {
+			return Wheel;
+		}
 	}
 	return previousInput;
 }
