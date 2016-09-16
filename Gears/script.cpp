@@ -72,7 +72,7 @@ void update() {
 		return;
 	}
 
-	vehData.ReadMemData(ext, vehicle);
+	vehData.UpdateValues(ext, vehicle);
 	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
 	simpleBike = vehData.IsBike && settings.SimpleBike;
 
@@ -190,6 +190,20 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 	// Actual mod operations
 	///////////////////////////////////////////////////////////////////////////
+	
+	// Hill-start effect, gravity and stuff
+	// Courtesy of XMOD
+	if (settings.HillBrakeWorkaround) {
+		if (vehData.CurrGear > 0 && controls.ThrottleVal < 0.2 && !controls.BrakeVal)
+		{
+			if (vehData.Pitch < 0 || controls.ClutchVal)
+				ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, -1 * (vehData.Pitch / 150.0f) * 1.1f, 0.0f, true, true, true, true);
+
+			if (vehData.Pitch > 10.0f || controls.ClutchVal)
+				ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, -1 * (vehData.Pitch / 90.0f) * 0.35f, 0.0f, true, true, true, true);
+		}
+	}
+
 
 	// Reverse behavior
 	// For bikes, do this automatically.

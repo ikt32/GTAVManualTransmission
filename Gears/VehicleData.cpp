@@ -48,7 +48,8 @@ bool VehicleData::noClutch(char* name) {
 	return false;
 }
 
-void VehicleData::ReadMemData(VehicleExtensions& ext, Vehicle vehicle) {
+// Updates values from memory and natives
+void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 	Hash model = ENTITY::GET_ENTITY_MODEL(vehicle);
 
 	Address = ext.GetAddress(vehicle);
@@ -65,6 +66,7 @@ void VehicleData::ReadMemData(VehicleExtensions& ext, Vehicle vehicle) {
 	IsBike = VEHICLE::IS_THIS_MODEL_A_BIKE(model) == TRUE;
 	IsTruck = isBadTruck(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
 	NoClutch = noClutch(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
+	Pitch = ENTITY::GET_ENTITY_PITCH(vehicle);
 }
 
 

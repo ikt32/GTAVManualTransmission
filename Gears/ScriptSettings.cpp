@@ -37,6 +37,7 @@ ScriptSettings::ScriptSettings() {
 	WheelWithoutManual = true;
 	CrossScript = false;
 	TargetSpeed = 10;
+	HillBrakeWorkaround = false;
 }
 
 
@@ -62,7 +63,7 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	RPMDamage = GetPrivateProfileIntA("OPTIONS", "RPMDamage", 15, SETTINGSFILE) / 100.0f;
 	MisshiftDamage = GetPrivateProfileIntA("OPTIONS", "MisshiftDamage", 10, SETTINGSFILE);
 	CrossScript = (GetPrivateProfileIntA("OPTIONS", "CrossScript", 0, SETTINGSFILE) == 1);
-
+	HillBrakeWorkaround = (GetPrivateProfileIntA("OPTIONS", "HillBrakeWorkaround", 0, SETTINGSFILE) == 1);
 
 	CheckSettings();
 

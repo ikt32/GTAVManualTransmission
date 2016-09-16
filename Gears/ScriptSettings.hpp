@@ -46,6 +46,7 @@ public:
 	int MisshiftDamage;
 	bool WheelWithoutManual;
 	int TargetSpeed;
+	bool HillBrakeWorkaround;
 private:
 	void CheckSettings();
 };

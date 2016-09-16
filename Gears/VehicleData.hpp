@@ -16,7 +16,7 @@ public:
 	VehicleData();
 	void Clear();
 
-	void ReadMemData(VehicleExtensions& ext, Vehicle vehicle);
+	void UpdateValues(VehicleExtensions& ext, Vehicle vehicle);
 
 	bool IsBike = false;
 	bool NoClutch = false;
@@ -49,6 +49,9 @@ public:
 	bool SimulatedNeutral = false;
 
 	std::vector<float> LockSpeeds = std::vector<float>(20);
+	float Pitch = 0;
+
+
 	Vector3 getAccelerationVectors(Vector3 velocities);
 
 	// Should be called after getAccelerationVectors has been called in a loop
