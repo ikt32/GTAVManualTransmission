@@ -34,32 +34,23 @@ bool WheelDirectInput::InitWheel(std::string &ffAxis) {
 					DISCL_EXCLUSIVE | DISCL_FOREGROUND))) {
 				std::string hrStr;
 				switch (hr) {
-					case DI_OK:
-						hrStr = "DI_OK";
+					case DI_OK: hrStr = "DI_OK";
 						break;
-					case DIERR_INVALIDPARAM:
-						hrStr = "DIERR_INVALIDPARAM";
+					case DIERR_INVALIDPARAM: hrStr = "DIERR_INVALIDPARAM";
 						break;
-					case DIERR_NOTINITIALIZED:
-						hrStr = "DIERR_NOTINITIALIZED";
+					case DIERR_NOTINITIALIZED: hrStr = "DIERR_NOTINITIALIZED";
 						break;
-					case DIERR_ALREADYINITIALIZED:
-						hrStr = "DIERR_ALREADYINITIALIZED";
+					case DIERR_ALREADYINITIALIZED: hrStr = "DIERR_ALREADYINITIALIZED";
 						break;
-					case DIERR_INPUTLOST:
-						hrStr = "DIERR_INPUTLOST";
+					case DIERR_INPUTLOST: hrStr = "DIERR_INPUTLOST";
 						break;
-					case DIERR_ACQUIRED:
-						hrStr = "DIERR_ACQUIRED";
+					case DIERR_ACQUIRED: hrStr = "DIERR_ACQUIRED";
 						break;
-					case DIERR_NOTACQUIRED:
-						hrStr = "DIERR_NOTACQUIRED";
+					case DIERR_NOTACQUIRED: hrStr = "DIERR_NOTACQUIRED";
 						break;
-					case E_HANDLE:
-						hrStr = "E_HANDLE";
+					case E_HANDLE: hrStr = "E_HANDLE";
 						break;
-					default:
-						hrStr = "UNKNOWN";
+					default: hrStr = "UNKNOWN";
 						break;
 				}
 				logger.Write("HRESULT = " + hrStr);
@@ -80,7 +71,6 @@ bool WheelDirectInput::InitWheel(std::string &ffAxis) {
 			}
 			logger.Write("Init FF Effect SUCCESS");
 			JoyState = e->joystate;
-			prevPosition = JoyState.lX; //TODO: Make this generic
 			prevTime = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 			logger.Write("Initializing wheel success");
 			return true;
