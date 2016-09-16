@@ -102,10 +102,11 @@ public:
 	float AccelValGTAf = 0.0f;
 
 	// Array gets filled by ScriptSettings
-	std::string ControlXbox[static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)] = {};
-	int KBControl[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
-	int WheelControl[static_cast<int>(WheelControlType::SIZEOF_WheelControlType)] = {};
-	std::string WheelAxes[static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)] = {};
+	std::array < std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
+	std::array < std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
+	std::array<int, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
+	std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelControl = {};
+
 	std::string FFAxis;
 
 	int CToggleTime = 1000;
@@ -135,7 +136,6 @@ public:
 private:
 	long long pressTime = 0;
 	long long releaseTime = 0;
-	//InputDevices prevInput;
 
 	XboxController controller;
 	WORD buttonState;
@@ -145,6 +145,4 @@ private:
 
 	bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
-	int findPivot(int throttle_min, int throttle_max, int brake_min, int brake_max);
-
 };

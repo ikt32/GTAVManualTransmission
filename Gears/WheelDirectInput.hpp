@@ -76,8 +76,6 @@ private:
 
 	int prevPosition = 0;
 	long long prevTime = 0;
-	float samples[SAMPLES] = { };
+	std::array<float, SAMPLES> samples = {};
 	int averageIndex = 0;
-
-
 };

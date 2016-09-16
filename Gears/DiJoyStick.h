@@ -18,10 +18,10 @@ public:
 		DIJOYSTATE2 joystate;
 	};
 
-	DiJoyStick() : entry(0),
+	DiJoyStick() : entry(nullptr),
 	               maxEntry(0),
 	               nEntry(0),
-	               di(0),
+	               di(nullptr),
 	               lpdf{nullptr} {
 	}
 
@@ -32,11 +32,11 @@ public:
 	void clear() {
 		if (entry) {
 			delete[] entry;
-			entry = 0;
+			entry = nullptr;
 		}
 		maxEntry = 0;
 		nEntry = 0;
-		di = 0;
+		di = nullptr;
 	}
 
 	//dwDevType = DI8DEVTYPE_JOYSTICK
@@ -56,7 +56,7 @@ public:
 
 		di->EnumDevices(dwDevType, DIEnumDevicesCallback_static, this, dwFlags);
 
-		this->di = 0;
+		this->di = nullptr;
 	}
 
 	int getEntryCount() const {
@@ -65,14 +65,14 @@ public:
 	}
 
 	const Entry* getEntry(int index) const {
-		const Entry* e = 0;
+		const Entry* e = nullptr;
 		if (index >= 0 && index < nEntry) {
 			e = &entry[index];
 		}
 		return e;
 	}
 
-	void update() {
+	void update() const {
 		for (int iEntry = 0; iEntry < nEntry; ++iEntry) {
 			Entry& e = entry[iEntry];
 			LPDIRECTINPUTDEVICE8 d = e.diDevice;
@@ -101,9 +101,9 @@ protected:
 			memcpy(&e.diDeviceInstance, lpddi, sizeof(e.diDeviceInstance));
 			e.diDevCaps.dwSize = sizeof(e.diDevCaps);
 
-			LPDIRECTINPUTDEVICE8 did = 0;
+			LPDIRECTINPUTDEVICE8 did = nullptr;
 
-			if (SUCCEEDED(di->CreateDevice(lpddi->guidInstance, (LPDIRECTINPUTDEVICE*)&did, 0))) {
+			if (SUCCEEDED(di->CreateDevice(lpddi->guidInstance, reinterpret_cast<LPDIRECTINPUTDEVICE*>(&did), nullptr))) {
 				if (SUCCEEDED(did->SetDataFormat(lpdf))) {
 					if (SUCCEEDED(did->GetCapabilities(&e.diDevCaps))) {
 						e.diDevice = did;

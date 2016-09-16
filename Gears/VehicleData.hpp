@@ -91,8 +91,7 @@ private:
 
 	Vector3 prevVelocities = {};
 	long long prevTime = 0;
-	Vector3 samples[SAMPLES] = {{}};
+	std::array<Vector3, SAMPLES> samples = {};
 	int averageIndex = 0;
 	void zeroSamples();
-
 };
