@@ -13,6 +13,7 @@
 #include "Logger.hpp"
 #include "VehicleData.hpp"
 #include "MemoryPatcher.hpp"
+#include "Util.hpp"
 
 Logger logger(LOGFILE);
 ScriptControls controls;
@@ -112,7 +113,6 @@ void update() {
 		return;
 	}
 
-	//TODO THINGS
 	if (!settings.EnableManual &&
 		settings.WheelWithoutManual &&
 		//controls.WheelDI != nullptr &&
@@ -126,7 +126,7 @@ void update() {
 		vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
 		vehData.getAccelerationVectorsAverage(),
 		settings,
-		false);
+		!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f);
 	}
 
 	if (!settings.EnableManual) {
@@ -149,7 +149,7 @@ void update() {
 			vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
 			vehData.getAccelerationVectorsAverage(),
 			settings,
-			false);
+			!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f);
 	}
 	
 
@@ -1026,6 +1026,7 @@ void doWheelSteering() {
 	}
 }
 
+// This will probably stay in the main source forever
 void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, ScriptSettings& settings, bool airborne) {
 	if (prevInput != ScriptControls::Wheel) {
 		return;
@@ -1036,15 +1037,17 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 	}
 
 	int constantForce = 100 * static_cast<int>(settings.FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
-	std::stringstream forceDisplay;
-	forceDisplay << "ConstForce: " << constantForce << std::endl;
-	showText(0.85, 0.28, 0.4, forceDisplay.str().c_str());
+	
 
 	// targetSpeed in m/s
 	// targetSpeed is the speed at which the damperForce is at minimum
 	// damperForce is maximum at 0 and keeps decreasing
 	float adjustRatio = static_cast<float>(settings.DamperMax) / static_cast<float>(settings.TargetSpeed);
 	int damperForce = settings.DamperMax - static_cast<int>(speed * adjustRatio);
+
+	// Acceleration also affects damper force
+	damperForce -= static_cast<int>(adjustRatio * accelValsAvg.y * std::copysignf(1.0, vehData.Velocity));
+	
 	if (damperForce < settings.DamperMin) {
 		damperForce = settings.DamperMin;
 	}
@@ -1056,10 +1059,6 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		)
 	)/20;
 
-	std::stringstream steerDisplay;
-	steerDisplay << "SteerSpeed: " << steerSpeed << std::endl;
-	showText(0.85, 0.24, 0.4, steerDisplay.str().c_str());
-
 	if (airborne) {
 		constantForce = 0;
 		damperForce = settings.DamperMin;
@@ -1069,7 +1068,15 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 
 	controls.WheelDI.SetConstantForce(totalForce);
 
-	std::stringstream damperF;
-	damperF << "damperF: " << damperForce << std::endl;
-	showText(0.85, 0.32, 0.4, damperF.str().c_str());
+	if (settings.Debug) {
+		std::stringstream damperF;
+		damperF << "damperF: " << damperForce << std::endl;
+		showText(0.85, 0.32, 0.4, damperF.str().c_str());
+		std::stringstream steerDisplay;
+		steerDisplay << "SteerSpeed: " << steerSpeed << std::endl;
+		showText(0.85, 0.24, 0.4, steerDisplay.str().c_str());
+		std::stringstream forceDisplay;
+		forceDisplay << "ConstForce: " << constantForce << std::endl;
+		showText(0.85, 0.28, 0.4, forceDisplay.str().c_str());
+	}
 }
