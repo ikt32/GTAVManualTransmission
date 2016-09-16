@@ -109,15 +109,15 @@ public:
 	std::string FFAxis;
 
 	int CToggleTime = 1000;
-	int ThrottleMin;
-	int ThrottleMax;
-	int BrakeMin;
-	int BrakeMax;
-	int ClutchMin;
-	int ClutchMax;
-	int SteerLeft;
-	int SteerRight;
-	bool ClutchDisable;
+	int ThrottleMin	   = 0;
+	int ThrottleMax	   = 0;
+	int BrakeMin	   = 0;
+	int BrakeMax	   = 0;
+	int ClutchMin	   = 0;
+	int ClutchMax	   = 0;
+	int SteerLeft	   = 0;
+	int SteerRight	   = 0;
+	bool ClutchDisable = 0;
 
 	// Add more when desired
 	bool ButtonJustPressed(ControllerControlType control);

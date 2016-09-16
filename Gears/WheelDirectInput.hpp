@@ -74,7 +74,7 @@ private:
 	std::array<bool, MAX_RGBBUTTONS> rgbButtonCurr;
 	std::array<bool, MAX_RGBBUTTONS> rgbButtonPrev;
 
-	int prevPosition;
+	int prevPosition = 0;
 	long long prevTime = 0;
 	float samples[SAMPLES] = { };
 	int averageIndex = 0;

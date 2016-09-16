@@ -7,8 +7,8 @@
 #include <winerror.h>
 #include <chrono>
 
-WheelDirectInput::WheelDirectInput(): pCFEffect{nullptr},
-                                      pFREffect{nullptr} {
+WheelDirectInput::WheelDirectInput(): pCFEffect{nullptr}
+                                    , pFREffect{nullptr}  {
 }
 
 bool WheelDirectInput::InitWheel(std::string ffAxis) {
@@ -80,7 +80,8 @@ bool WheelDirectInput::InitWheel(std::string ffAxis) {
 			}
 			logger.Write("Init FF Effect SUCCESS");
 			JoyState = e->joystate;
-			prevPosition = JoyState.lX;
+			prevPosition = JoyState.lX; //TODO: Make this generic
+			prevTime = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 			logger.Write("Initializing wheel success");
 			return true;
 		}
