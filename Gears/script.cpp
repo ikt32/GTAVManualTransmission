@@ -886,7 +886,6 @@ void handleVehicleButtons() {
 	if (controls.ButtonIn(ScriptControls::WheelControlType::Handbrake)) {
 		//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
 		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
-		showText(0.5, 0.5, 5.0, "E");
 	}
 	if (controls.ButtonIn(ScriptControls::WheelControlType::Horn)) {
 		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHorn, 1.0f);

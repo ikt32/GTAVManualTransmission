@@ -22,7 +22,7 @@ public:
 		lRz,
 		rglSlider0,
 		rglSlider1,
-		UNKNOWN,
+		UNKNOWN_AXIS,
 		SIZEOF_DIAxis
 	};
 
@@ -35,7 +35,20 @@ public:
 		"lRz",
 		"rglSlider0",
 		"rglSlider1",
-		"UNKNOWN"
+		"UNKNOWN_AXIS"
+	};
+
+	enum POV {
+		N = 3600,
+		NE = 4500,
+		E = 9000,
+		SE = 13500,
+		S = 18000,
+		SW = 22500,
+		W = 27000,
+		NW = 31500,
+		UNKNOWN_POV,
+		SIZEOF_POV
 	};
 
 public:
@@ -47,7 +60,6 @@ public:
 	void UpdateState();
 
 	bool IsConnected() const;
-
 	bool IsButtonPressed(int btn);
 	bool IsButtonJustPressed(int btn);
 	bool IsButtonJustReleased(int btn);
@@ -69,10 +81,18 @@ private:
 	LPDIRECTINPUTEFFECT pCFEffect;
 	LPDIRECTINPUTEFFECT pFREffect;
 	bool CreateConstantForceEffect(std::string& axis);
-	std::array<__int64, MAX_RGBBUTTONS> pressTime;
-	std::array<__int64, MAX_RGBBUTTONS> releaseTime;
+	std::array<__int64, MAX_RGBBUTTONS> rgbPressTime;
+	std::array<__int64, MAX_RGBBUTTONS> rgbReleaseTime;
 	std::array<bool, MAX_RGBBUTTONS> rgbButtonCurr;
 	std::array<bool, MAX_RGBBUTTONS> rgbButtonPrev;
+
+	// hooooo boi a big array I only use 8 values of
+	std::array<__int64, SIZEOF_POV> povPressTime;
+	std::array<__int64, SIZEOF_POV> povReleaseTime;
+	std::array<bool, SIZEOF_POV> povButtonCurr;
+	std::array<bool, SIZEOF_POV> povButtonPrev;
+
+
 
 	int prevPosition = 0;
 	long long prevTime = 0;

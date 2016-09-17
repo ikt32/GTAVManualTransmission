@@ -106,7 +106,29 @@ bool WheelDirectInput::IsConnected() const {
 	return false;
 }
 
+// Mental note: buttonType in these args means physical button number
+// like how they are in DirectInput.
+// If it matches the cardinal stuff the button is a POV hat thing
+
 bool WheelDirectInput::IsButtonPressed(int buttonType) {
+	if (buttonType > 127) {
+		switch (buttonType) {
+		case N:
+			if (JoyState.rgdwPOV[0] == 0)
+				return true;
+		case NE:
+		case E:
+		case SE:
+		case S:
+		case SW:
+		case W:
+		case NW:
+			if (buttonType == JoyState.rgdwPOV[0])
+				return true;
+		default:
+			return false;
+		}
+	}	
 	if (JoyState.rgbButtons[buttonType]) {
 		return true;
 	}
@@ -114,6 +136,15 @@ bool WheelDirectInput::IsButtonPressed(int buttonType) {
 }
 
 bool WheelDirectInput::IsButtonJustPressed(int buttonType) {
+	if (buttonType > 127) { // POV
+		povButtonCurr[buttonType] = IsButtonPressed(buttonType);
+
+		// raising edge
+		if (povButtonCurr[buttonType] && !povButtonPrev[buttonType]) {
+			return true;
+		}
+		return false;
+	}
 	rgbButtonCurr[buttonType] = IsButtonPressed(buttonType);
 
 	// raising edge
@@ -124,6 +155,15 @@ bool WheelDirectInput::IsButtonJustPressed(int buttonType) {
 }
 
 bool WheelDirectInput::IsButtonJustReleased(int buttonType) {
+	if (buttonType > 127) { // POV
+		povButtonCurr[buttonType] = IsButtonPressed(buttonType);
+
+		// falling edge
+		if (!povButtonCurr[buttonType] && povButtonPrev[buttonType]) {
+			return true;
+		}
+		return false;
+	}
 	rgbButtonCurr[buttonType] = IsButtonPressed(buttonType);
 
 	// falling edge
@@ -134,16 +174,31 @@ bool WheelDirectInput::IsButtonJustReleased(int buttonType) {
 }
 
 bool WheelDirectInput::WasButtonHeldForMs(int buttonType, int millis) {
+	if (buttonType > 127) { // POV
+		if (IsButtonJustPressed(buttonType)) {
+			povPressTime[buttonType] = milliseconds_now();
+		}
+		if (IsButtonJustReleased(buttonType)) {
+			povReleaseTime[buttonType] = milliseconds_now();
+		}
+
+		if ((povReleaseTime[buttonType] - povPressTime[buttonType]) >= millis) {
+			povPressTime[buttonType] = 0;
+			povReleaseTime[buttonType] = 0;
+			return true;
+		}
+		return false;
+	}
 	if (IsButtonJustPressed(buttonType)) {
-		pressTime[buttonType] = milliseconds_now();
+		rgbPressTime[buttonType] = milliseconds_now();
 	}
 	if (IsButtonJustReleased(buttonType)) {
-		releaseTime[buttonType] = milliseconds_now();
+		rgbReleaseTime[buttonType] = milliseconds_now();
 	}
 
-	if ((releaseTime[buttonType] - pressTime[buttonType]) >= millis) {
-		pressTime[buttonType] = 0;
-		releaseTime[buttonType] = 0;
+	if ((rgbReleaseTime[buttonType] - rgbPressTime[buttonType]) >= millis) {
+		rgbPressTime[buttonType] = 0;
+		rgbReleaseTime[buttonType] = 0;
 		return true;
 	}
 	return false;
@@ -152,6 +207,9 @@ bool WheelDirectInput::WasButtonHeldForMs(int buttonType, int millis) {
 void WheelDirectInput::UpdateButtonChangeStates() {
 	for (int i = 0; i < MAX_RGBBUTTONS; i++) {
 		rgbButtonPrev[i] = rgbButtonCurr[i];
+	}
+	for (int i = 0; i < SIZEOF_POV; i++) {
+		povButtonPrev[i] = povButtonCurr[i];
 	}
 }
 
@@ -248,7 +306,7 @@ WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string& axisString)
 			return static_cast<DIAxis>(i);
 		}
 	}
-	return UNKNOWN;
+	return UNKNOWN_AXIS;
 }
 
 
