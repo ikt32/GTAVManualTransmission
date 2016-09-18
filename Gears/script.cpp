@@ -384,6 +384,9 @@ void reset() {
 	if (patched) {
 		patched = !MemoryPatcher::RestoreInstructions();
 	}
+	if (controls.WheelDI.IsConnected()) {
+		controls.WheelDI.SetConstantForce(0);
+	}
 }
 
 void toggleManual() {
