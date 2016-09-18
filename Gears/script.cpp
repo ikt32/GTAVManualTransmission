@@ -1062,6 +1062,50 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 	int centerForce = static_cast<int>((wheelCenterDeviation / 6.5535) * speed * 0.25) + 
 					  static_cast<int>((wheelCenterDeviation / 6.5535) * std::abs(accelValsAvg.y) * 0.25);
 
+
+	// start oversteer detect
+	float oversteer = 0.0f;
+
+	Vector3 rel_vector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
+
+	float angle = acos(rel_vector.y / speed)* 180.0f / 3.14159265f;
+	if (isnan(angle))
+		angle = 0.0;
+
+	if (angle > 10 && vehData.Velocity > 1.0f) {
+		oversteer = angle/90.0f;
+	}
+	// end oversteer detect
+
+	// begin understeer detect
+	float understeer = 0.0f;	
+	float relWheelDev = (float)wheelCenterDeviation / (float)centerPos;
+
+	std::stringstream rwd;
+	rwd << "rwd: " << relWheelDev << std::endl;
+	showText(0.85, 0.66, 0.4, rwd.str().c_str());
+
+	if ((relWheelDev > 0.1f || relWheelDev < -0.1f) && // some steering happened
+		accelValsAvg.x < 1.0f && accelValsAvg.x > -1.0f && // < 0.2G side force
+		vehData.Velocity > 1.0f) {
+		understeer = std::abs(relWheelDev);
+	}
+	// end understeer detect
+	
+	if (oversteer > 0.1f) {
+		understeer = 0.0f;
+	}
+
+	if (understeer > 0.1f && vehData.Velocity > 8.0f) {
+		centerForce = static_cast<int>((1.0f - understeer) * centerForce);
+	}
+
+	if (vehData.Velocity < 0.0f ||				// Don't apply damper and centering while reversing
+		oversteer > 0.1f) {
+		centerForce = 0;
+		damperForce = settings.DamperMin;
+	}
+
 	if (airborne) {
 		constantForce = 0;
 		centerForce = 0;
@@ -1074,18 +1118,29 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 
 	controls.WheelDI.SetConstantForce(totalForce);
 
+	
+
 	if (settings.Debug) {
-		std::stringstream damperF;
-		damperF << "damperF: " << damperForce << std::endl;
-		showText(0.85, 0.32, 0.4, damperF.str().c_str());
 		std::stringstream steerDisplay;
 		steerDisplay << "SteerSpeed: " << steerSpeed << std::endl;
 		showText(0.85, 0.24, 0.4, steerDisplay.str().c_str());
+		
 		std::stringstream forceDisplay;
 		forceDisplay << "ConstForce: " << constantForce << std::endl;
 		showText(0.85, 0.28, 0.4, forceDisplay.str().c_str());
+
+		std::stringstream damperF;
+		damperF << "damperF: " << damperForce << std::endl;
+		showText(0.85, 0.32, 0.4, damperF.str().c_str());
+
 		std::stringstream centerDisplay;
 		centerDisplay << "CenterForce: " << centerForce << std::endl;
 		showText(0.85, 0.36, 0.4, centerDisplay.str().c_str());
+		
+		if (understeer > 0.1f)
+			showText(0.85, 0.40, 0.4, "UNDERSTEER");
+
+		if (oversteer > 0.1f)
+			showText(0.85, 0.40, 0.4, " OVERSTEER");
 	}
 }
