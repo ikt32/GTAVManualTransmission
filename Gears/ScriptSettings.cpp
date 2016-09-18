@@ -2,6 +2,7 @@
 #include <Windows.h>
 
 #include "Logger.hpp"
+#include <string>
 
 ScriptSettings::ScriptSettings() {
 	EnableManual = true;
@@ -15,7 +16,7 @@ ScriptSettings::ScriptSettings() {
 	ClutchShifting = false;
 	DefaultNeutral = false;
 	UITips = false;
-	Hshifter = false;
+	ShiftMode = 0;
 	WheelEnabled = false;
 	WheelRange = 180;
 	FFEnable = true;
@@ -44,7 +45,7 @@ ScriptSettings::ScriptSettings() {
 
 void ScriptSettings::Read(ScriptControls* scriptControl) {
 	EnableManual = (GetPrivateProfileIntA("OPTIONS", "Enable", 1, SETTINGSFILE) == 1);
-	Hshifter = (GetPrivateProfileIntA("OPTIONS", "EnableH", 0, SETTINGSFILE) == 1);
+	ShiftMode = GetPrivateProfileIntA("OPTIONS", "ShiftMode", 0, SETTINGSFILE);
 	RealReverse = (GetPrivateProfileIntA("OPTIONS", "RealReverse", 1, SETTINGSFILE) == 1);
 	SimpleBike = (GetPrivateProfileIntA("OPTIONS", "SimpleBike", 1, SETTINGSFILE) == 1);
 	EngDamage = (GetPrivateProfileIntA("OPTIONS", "EngineDamage", 0, SETTINGSFILE) == 1);
@@ -173,7 +174,7 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 
 void ScriptSettings::Save() const {
 	WritePrivateProfileStringA("OPTIONS", "Enable", (EnableManual ? " 1" : " 0"), SETTINGSFILE);
-	WritePrivateProfileStringA("OPTIONS", "EnableH", (Hshifter ? " 1" : " 0"), SETTINGSFILE);
+	WritePrivateProfileStringA("OPTIONS", "ShiftMode", std::to_string(ShiftMode).c_str(), SETTINGSFILE);
 }
 
 // Checks for conflicting settings and adjusts them

@@ -49,6 +49,7 @@ void functionClutchCatch();
 void functionHShiftTo(int i);
 void functionHShiftKeyboard();
 void functionSShift();
+void functionAShift();
 void functionHShiftWheel();
 
 void shiftTo(int gear, bool autoClutch);

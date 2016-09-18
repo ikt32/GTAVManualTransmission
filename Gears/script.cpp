@@ -153,13 +153,26 @@ void update() {
 
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ToggleH) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::ToggleH)) {
-		settings.Hshifter = !settings.Hshifter;
-		if (!settings.Hshifter && vehData.CurrGear > 1) {
+		//settings.ShiftMode = !settings.ShiftMode;
+		settings.ShiftMode++;
+		if (settings.ShiftMode > 2) {
+			settings.ShiftMode = 0;
+		}
+		if (settings.ShiftMode == 0 && vehData.CurrGear > 1) {
 			vehData.SimulatedNeutral = false;
 		}
 		std::stringstream message;
-		message << "Mode: " <<
-		           (settings.Hshifter ? "H-Shifter" : "Sequential");
+		std::string mode;
+		switch (settings.ShiftMode) {
+			case 0:	mode = "Sequential";
+				break;
+			case 1: mode = "H-Shifter";
+				break;
+			case 2: mode = "Automatic";
+				break;
+		}
+		message << "Mode: " << mode;
+		           //(settings.ShiftMode ? "H-Shifter" : "Sequential");
 		showNotification(const_cast<char *>(message.str().c_str()));
 		settings.Save();
 	}
@@ -263,12 +276,15 @@ void update() {
 
 
 	// Manual shifting
-	if (settings.Hshifter && !vehData.IsBike) {
+	if (settings.ShiftMode == 1 && !vehData.IsBike) {
 		functionHShiftWheel();
 		functionHShiftKeyboard();
 	}
-	else {
+	else if (settings.ShiftMode == 0){
 		functionSShift();
+	}
+	else {
+		functionAShift();
 	}
 
 	// Finally, update memory each loop
@@ -562,7 +578,56 @@ void functionSShift() {
 			shiftTo(vehData.LockGear - 1, true);
 		}
 	}
+}
 
+void functionAShift() {
+	// Shift up
+	if (controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftUp) ||
+		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftUp) ||
+		controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftUp)) {
+		// Reverse to Neutral
+		if (vehData.CurrGear == 0 && !vehData.SimulatedNeutral) {
+			shiftTo(1, true);
+			vehData.SimulatedNeutral = true;
+			return;
+		}
+
+		// Neutral to 1
+		if (vehData.CurrGear == 1 && vehData.SimulatedNeutral) {
+			vehData.SimulatedNeutral = false;
+			return;
+		}
+	}
+
+	// Shift down
+
+	if (controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftDown) ||
+		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftDown) ||
+		controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftDown)) {
+		// 1 to Neutral
+		if (vehData.CurrGear == 1 && !vehData.SimulatedNeutral) {
+			vehData.SimulatedNeutral = true;
+			return;
+		}
+
+		// Neutral to R
+		if (vehData.CurrGear == 1 && vehData.SimulatedNeutral) {
+			shiftTo(0, true);
+			vehData.SimulatedNeutral = false;
+			return;
+		}
+	}
+
+	// Shift up
+	if (vehData.CurrGear > 0 &&
+		(vehData.CurrGear < vehData.NextGear && vehData.Speed > 2.0f)) {
+		shiftTo(vehData.CurrGear + 1, true);
+	}
+
+	// Shift down
+	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
+		shiftTo(vehData.CurrGear - 1, true);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -984,9 +1049,9 @@ void updateLastInputDevice() {
 				showNotification("Switched to keyboard/mouse");
 				break;
 			case ScriptControls::Controller: // Controller
-				if (settings.Hshifter) {
+				if (settings.ShiftMode == 1) {
 					showNotification("Switched to controller\nSequential re-initiated");
-					settings.Hshifter = false;
+					settings.ShiftMode = 0;
 					settings.Save();
 				}
 				else {

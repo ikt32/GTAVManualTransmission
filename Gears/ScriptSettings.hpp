@@ -24,7 +24,8 @@ public:
 	bool ClutchShifting;
 	bool DefaultNeutral;
 	bool UITips;
-	bool Hshifter;
+	// 0 Seq, 1 H, 2 Auto
+	int ShiftMode;
 	bool WheelEnabled;
 	int WheelRange;
 	bool FFEnable;
