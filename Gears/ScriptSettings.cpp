@@ -22,6 +22,7 @@ ScriptSettings::ScriptSettings() {
 	DamperMax = 60;
 	DamperMin = 30;
 	FFPhysics = 1.0f;
+	CenterStrength = 1.0f;
 	DisableDpad = false;
 
 	Debug = false;
@@ -167,6 +168,7 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	DamperMin = GetPrivateProfileIntA("WHEEL", "DamperMin", 20, SETTINGSFILE);
 	TargetSpeed = GetPrivateProfileIntA("WHEEL", "DamperTargetSpeed", 10, SETTINGSFILE);
 	FFPhysics = GetPrivateProfileIntA("WHEEL", "PhysicsStrength", 170, SETTINGSFILE) / 100.0f;
+	CenterStrength = GetPrivateProfileIntA("WHEEL", "CenterStrength", 100, SETTINGSFILE) / 100.0f;
 }
 
 void ScriptSettings::Save() const {

@@ -115,7 +115,6 @@ void update() {
 
 	if (!settings.EnableManual &&
 		settings.WheelWithoutManual &&
-		//controls.WheelDI != nullptr &&
 		controls.WheelDI.IsConnected()) {
 		updateLastInputDevice();
 		handleVehicleButtons();
@@ -141,8 +140,7 @@ void update() {
 	updateLastInputDevice();
 	handleVehicleButtons();
 
-	if (//controls.WheelDI != nullptr &&
-		controls.WheelDI.IsConnected()) {
+	if (controls.WheelDI.IsConnected()) {
 		doWheelSteering();
 		playWheelEffects(
 			vehData.Speed,
@@ -376,8 +374,7 @@ void reInit() {
 	vehData.LockGears = 0x00010001;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
 	if (settings.WheelEnabled) {
-		if (//controls.WheelDI != nullptr &&
-			!controls.WheelDI.IsConnected())
+		if (!controls.WheelDI.IsConnected())
 			controls.InitWheel();
 	}
 }
@@ -1035,7 +1032,7 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		return;
 	}
 
-	int constantForce = 100 * static_cast<int>(settings.FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
+	int constantForce = -100 * static_cast<int>(settings.FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
 	
 
 	// targetSpeed in m/s
@@ -1058,12 +1055,22 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		)
 	)/20;
 
+	int wheelMin = 0;
+	int wheelMax = 65535;
+	int centerPos = (wheelMin+wheelMax)/2;
+	int wheelCenterDeviation = controls.WheelDI.JoyState.lX - centerPos;
+	int centerForce = static_cast<int>((wheelCenterDeviation / 6.5535) * speed * 0.25) + 
+					  static_cast<int>((wheelCenterDeviation / 6.5535) * std::abs(accelValsAvg.y) * 0.25);
+
 	if (airborne) {
 		constantForce = 0;
+		centerForce = 0;
 		damperForce = settings.DamperMin;
 	}
 
-	int totalForce = static_cast<int>(steerSpeed * damperForce * 0.1) - constantForce;
+	int totalForce = static_cast<int>(steerSpeed * damperForce * 0.1) + 
+		constantForce +
+		static_cast<int>(settings.CenterStrength * centerForce);
 
 	controls.WheelDI.SetConstantForce(totalForce);
 
@@ -1077,5 +1084,8 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		std::stringstream forceDisplay;
 		forceDisplay << "ConstForce: " << constantForce << std::endl;
 		showText(0.85, 0.28, 0.4, forceDisplay.str().c_str());
+		std::stringstream centerDisplay;
+		centerDisplay << "CenterForce: " << centerForce << std::endl;
+		showText(0.85, 0.36, 0.4, centerDisplay.str().c_str());
 	}
 }

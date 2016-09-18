@@ -31,6 +31,7 @@ public:
 	int DamperMax;
 	int DamperMin;
 	float FFPhysics;
+	float CenterStrength;
 	bool DisableDpad;
 
 	bool CrossScript;
