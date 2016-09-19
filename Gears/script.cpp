@@ -263,7 +263,8 @@ void update() {
 	}
 
 	// Engine damage: RPM Damage
-	if (settings.EngDamage) {
+	if (settings.EngDamage &&
+		!vehData.NoClutch) {
 		functionEngDamage();
 	}
 
@@ -456,7 +457,8 @@ void functionHShiftTo(int i) {
 		}
 		else {
 			vehData.SimulatedNeutral = true;
-			if (settings.EngDamage) {
+			if (settings.EngDamage &&
+				!vehData.NoClutch) {
 				VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
 					vehicle,
 					VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.MisshiftDamage);
@@ -660,7 +662,8 @@ void functionEngStall() {
 }
 
 void functionEngDamage() {
-	if (vehData.Rpm > 0.98f && controls.AccelValGTAf > 0.99f) {
+	if (vehData.Rpm > 0.98f &&
+		controls.AccelValGTAf > 0.99f) {
 		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (settings.RPMDamage));
 	}
 }
