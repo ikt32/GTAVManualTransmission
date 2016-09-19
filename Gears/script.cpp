@@ -1155,10 +1155,6 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 	float understeer = 0.0f;	
 	float relWheelDev = (float)wheelCenterDeviation / (float)centerPos;
 
-	std::stringstream rwd;
-	rwd << "rwd: " << relWheelDev << std::endl;
-	showText(0.85, 0.66, 0.4, rwd.str().c_str());
-
 	if ((relWheelDev > 0.1f || relWheelDev < -0.1f) && // some steering happened
 		accelValsAvg.x < 0.5f && accelValsAvg.x > -0.5f && // < 0.1G side force
 		vehData.Velocity > 2.0f) {
