@@ -1,0 +1,267 @@
+<b>Manual Transmission for GTA V</b>
+This mod will enable manual transmission for vehicles, using the games' real gear box! This means real gears - not speed capping. There are plenty of features to emulate how real transmissions work.
+
+<b>Steering Wheel Support for GTA V</b>
+Additionally, this mod has <b>full</b> support for steering wheels since version 4.0! All steering wheels properly compatible with DirectInput should work. Force feedback is fully supported.
+
+<b>Features:</b>
+<ul>
+<li>Controller, keyboard and wheel input support</li>
+<li>Support for all land-based engine-powered vehicles</li>
+<li>Fully configurable</li>
+<li>Common transmission systems:
+    <ul>
+        <li>Sequential gearbox</li>
+        <li>H-pattern gearbox</li>
+        <li>Automatic gearbox</li>
+    </ul>
+</li>
+<li>Dynamic top gear detection</li>
+<li>Reverse with accelerator</li>
+<li>Engine and transmission mechanics:
+    <ul>
+        <li>Engine braking</li>
+        <li>Engine damage</li>
+        <li>Engine stalling</li>
+        <li>Clutch grabbing</li>
+    </ul>
+</li>
+<li>DirectInput Steering Wheel support:
+    <ul>
+        <li>All analog inputs</li>
+        <li>All buttons and Dpad</li>
+        <li>Force Feedback supported</li>
+    </ul>
+</li>
+<li>Seamless input device switching</li>
+</ul>
+
+<b>Installation</b>
+Extract Gears.asi and Gears.ini to your GTA V main folder. Configure the ini however you like, please read Configuration.pdf for this. The .ini itself also contains useful information.
+
+<b>Requirements</b>
+GTA V
+<a href=http://www.dev-c.com/gtav/scripthookv/>Alexander Blade's C++ ScriptHookV</a>
+
+<b>Controls</b>
+Look these up in Gears.ini!
+
+<b>Recommended mods</b>
+<a href=https://www.gta5-mods.com/scripts/speedometer-improvedalexbladeversion>Speedometer by LeFix</a>
+<a href=https://www.gta5-mods.com/scripts/nfsgauge-rpm-gear-speedometer>NFS Gauge by XMOD</a>
+<a href=https://www.gta5-mods.com/scripts/custom-steering>Custom Steering by InfamousSabre</a> for proper wheel mapping
+
+Any and all feedback is very welcome. Simply post here, post on GTAForums, post on GTA5-Mods forums or message me on Steam if you have anything.
+
+<b>Big thanks to:</b>
+Alexander Blade
+LeFix
+XMOD
+InfamousSabre
+leftas
+kagikn
+Everybody else who helped me
+
+<b>Mod developers</b>
+You can read decorators to get some info about this mod.
+Speedometers shift up/down indicator: 
+"hunt_score" 0 - Nothing
+"hunt_score" 1 - Shift up 
+"hunt_score" 2 - Shift down
+
+Speedometers Neutral gear:
+"hunt_weapon" 0 - In gear
+"hunt_weapon" 1 - Neutral
+
+Scripts changing torque
+"hunt_score" 2 - Torque is decreased
+
+<b>Source available on</b> <a href=https://github.com/E66666666/GTAVManualTransmission>GitHub</a>
+
+<b>Download alternative versions</b>
+<a href=https://github.com/E66666666/GTAVManualTransmission/releases/tag/v3.0.2>The last stable version (3.0.2) can be downloaded from GitHub.</a>
+<a href=https://ci.appveyor.com/project/E66666666/gtavmanualtransmission/build/artifacts>The newest (untested) builds can be found on AppVeyor</a>
+
+
+<b>Changelog</b>
+<b>4.0</b>
+This release is primarily focused on making the mod compatible with all wheels.
+<ul>
+    <li>Remove Logitech specific wheel support</li>
+    <li>Add DirectInput for almost ALL wheels! All inputs should be supported:
+        <ul>
+            <li>All analog input axes                       </li>
+            <li>All buttons                                 </li>
+            <li>8 Dpad directions                           </li>
+            <li>Support for combined pedals                 </li>
+            <li>Analog ranges fully configurable            </li>
+            <li>Clutch can be disabled for 2-pedal wheels   </li>
+        </ul>
+    </li>
+    <li>Use wheel for driving without manual transmission
+        <ul>
+            <li>Force feedback enabled!</li>
+        </ul>
+    </li>
+    <li>Rewrote FFB from scratch
+        <ul>
+            <li>More detailed and responsive                                     </li>
+            <li>Understeer and oversteer conditions for force feedback parameters</li>
+        </ul>
+    </li>
+    <li>Included a tool to read the raw axes, to help you configure your wheel
+        <ul>
+            <li>A G27 with separate axes example available</li>
+            <li>A G27 with combined axes example available</li>
+        </ul>
+    </li>
+</ul>
+
+Non-wheel related changes
+<ul>
+    <li>Add an automatic gear box, implemented as R-N-D.                     </li>
+    <li>Add a hill starting effect, compensating for GTA V’s automatic brakes</li>
+    <li>Allow turning off cross-script communication for CitizenFX-based mods</li>
+    <li>Dropped SimpleReverse</li>
+</ul>
+
+
+<b>3.0.2</b>
+Fix keys not being disabled properly from wheel
+Add cross-script communication support (Decorator)
+Tweak truck speed limiter to be less harsh when shifting early
+
+<b>3.0.1</b>
+Fix handbrake staying engaged when disabling the mod
+
+<b>3.0</b>
+Check the release notes on GitHub for more details from the betas, or the commit messages. Changes
+listed below are in respect to 2.0.2.
+Add Logitech Wheel support
+-  Steering wheel support
+-  Pedal input support
+-  Force Feedback, physics-based and fully configurable
+-  0-delay steering input (controller input is/was still smoothed out)
+-  Useful vehicle functions available and mappable on wheel
+Add automatic input detection and isolation
+-  Switch to sequential on controller input
+Change reverse in first gear behavior to do a burnout if the vehicle is strong enough
+Add separate neutral to be in between R and 1st: R-N-1-2-3... for sequential shifting
+Add clutch requirement option for H-shifting
+Add engine restart by pressing throttle
+Fix specific first gear only vehicles having a nonfunctional neutral (remove neutral for these)
+Rework neutral/clutch revving to be more gradual and natural
+Change clutch slipping in higher gears to be gradual
+Cleaner vehicle swap/leave procedure
+Fix vehicle change detection
+Fix other cars not moving when clutch pressed
+Minimize patching of game functions
+-  Less risky
+-  No AI impact
+-  Performance improvement
+Change .ini format
+
+<b>2.0.2</b>
+Disable clutch catching in reverse gear
+Enable free revving for trucks
+
+<b>2.0.1</b>
+Add check for invalid configurations
+Improve requirement for AutoReverse
+Remove lockup when choosing reverse, going forwards
+
+<b>2.0</b>
+Additions:
++ Add neutral gear functionality
++ Add exception for motorcycles
++ Add Clutch catching mechanism
+Changes:
+* Switch to XInput controller readout
+* Change engine braking to use apply force
+* Engine braking locks up engine (handbrake) when going forward in reverse gear
+* Reworked engine stalling with awareness of current gear (old version still available)
+* Rework revving in higher gears
+Fixes and tweaks:
+- RPM Disparity at high gear low RPM fixed
+- Fix Utility Trucks not being recognized
+- Tweaked engine braking and allow for trucks
+- Remove engine stalling on lots of damage
+Misc:
++ Add configuration presets
+
+<b>1.8.2</b>
+Only conditionally patch lower-end full clutch
+
+<b>1.8.1</b>
+Fix keyboard-controller detection
+Fix ToggleH button being overwritten instead of EnableH
+
+<b>1.8</b>
+Refactor project
+Add controller button for toggle (Dpad Right for 0.5s)
+Add keyboard key for toggle H-shifter (default: }] key)
+Fix clutch fully depressed vehicle still moving
+Disable patches and manual control as passenger
+Tweak notifications behavior
+
+<b>1.7</b>
+Add engine braking
+Fix big trucks accelerating infinitely
+Reset gear on changing vehicle
+Turn on engine when toggling mod
+
+<b>1.6.2</b>
+Better compatibility: Dropped Microsoft Visual C++ Redistributable 2015 (x64) requirement
+
+<b>1.6.1</b>
+Fix wrong key in Gears.ini
+Update readme.txt properly
+
+<b>1.6</b>
+Enable Logging to Gears.log to clean up notifications
+Improve clutch control patching and restore
+Improve clutch control at very low speeds
+Change stalling conditions
+Turn on reverse light in reverse gear
+
+<b>1.5</b>
+Top gear known (Thank you, kagikn!)
+Full clutch control (Thank you, leftas!)
+Allow analog clutch control
+Add engine damage
+Add engine stalling
+Changed build parameters - should work for more people now
+
+<b>1.4</b>
+Enable accelerator to be used for reverse acceleration and brake pedal to only brake and not reverse. Like a real car.
+
+<b>1.3.2</b>
+Enable/Disable manual gears by default in .ini
+Persistent enable/disable manual gears
+Enable/Disable engaging first gear on stopping
+Enable/Disable automatic reverse gear
+
+<b>1.3.1</b>
+Full compatibility with LeFix Speedometer for gear shift indicators
+Restore 1.2 overrevving behavior
+Tweak low-RPM low-throttle behavior
+
+<b>1.3</b>
+Full keyboard support
+H-Shifter support - mapped to keyboard buttons
+Preliminary compatiblity with LeFix Speedometer for gear shift indicators
+Disable/enable manual notification
+Changes in ini and default config
+
+<b>1.2</b>
+Fix version 350 compatibility issues
+Tweaked reverse behavior
+Fix overrevving behavior
+
+<b>1.1</b>
+Transmission optimizations
+Disabled for bicycles
+Fixed motorcycle support
+
+<b>1.0</b>
+Initial release
