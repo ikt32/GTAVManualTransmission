@@ -14,7 +14,7 @@ public:
 	void Save() const;
 
 	bool EnableManual;
-	bool RealReverse;
+	//bool RealReverse;
 	bool SimpleBike;
 
 	bool EngDamage;
@@ -27,7 +27,7 @@ public:
 	// 0 Seq, 1 H, 2 Auto
 	int ShiftMode;
 	bool WheelEnabled;
-	int WheelRange;
+	//int WheelRange;
 	bool FFEnable;
 	int DamperMax;
 	int DamperMin;

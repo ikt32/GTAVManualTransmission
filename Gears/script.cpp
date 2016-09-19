@@ -225,24 +225,30 @@ void update() {
 			controls.BrakeVal);
 	}
 	else {
-		// New reverse: Reverse with throttle
-		if (settings.RealReverse) {
-			functionRealReverse();
-			if (prevInput == ScriptControls::InputDevices::Wheel) {
-				handlePedalsRealReverse(
-					controls.ThrottleVal,
-					controls.BrakeVal);
-			}
+		functionRealReverse();
+		if (prevInput == ScriptControls::InputDevices::Wheel) {
+			handlePedalsRealReverse(
+				controls.ThrottleVal,
+				controls.BrakeVal);
 		}
-		// Reversing behavior: just block the direction you don't wanna go to
-		else {
-			functionSimpleReverse();
-			if (prevInput == ScriptControls::InputDevices::Wheel) {
-				handlePedalsDefault(
-					controls.ThrottleVal,
-					controls.BrakeVal);
-			}
-		}
+		//// New reverse: Reverse with throttle
+		//if (settings.RealReverse) {
+		//	functionRealReverse();
+		//	if (prevInput == ScriptControls::InputDevices::Wheel) {
+		//		handlePedalsRealReverse(
+		//			controls.ThrottleVal,
+		//			controls.BrakeVal);
+		//	}
+		//}
+		//// Reversing behavior: just block the direction you don't wanna go to
+		//else {
+		//	functionSimpleReverse();
+		//	if (prevInput == ScriptControls::InputDevices::Wheel) {
+		//		handlePedalsDefault(
+		//			controls.ThrottleVal,
+		//			controls.BrakeVal);
+		//	}
+		//}
 	}
 
 
@@ -904,20 +910,20 @@ void handlePedalsDefault(float wheelThrottleVal, float wheelBrakeVal) {
 }
 
 
-void functionSimpleReverse() {
-	// Prevent going forward in gear 0.
-	if (vehData.CurrGear == 0 && vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f
-	                             && controls.ThrottleVal > 0) {
-		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
-	}
-	// Prevent reversing in gear >= 1.
-	if (vehData.CurrGear > 0 && vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f
-	                            && controls.BrakeVal > 0) {
-		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-	}
-}
+//void functionSimpleReverse() {
+//	// Prevent going forward in gear 0.
+//	if (vehData.CurrGear == 0 && vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f
+//	                             && controls.ThrottleVal > 0) {
+//		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+//		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
+//	}
+//	// Prevent reversing in gear >= 1.
+//	if (vehData.CurrGear > 0 && vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f
+//	                            && controls.BrakeVal > 0) {
+//		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+//		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
+//	}
+//}
 
 void functionAutoReverse() {
 	// Go forward

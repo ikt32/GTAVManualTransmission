@@ -6,7 +6,7 @@
 
 ScriptSettings::ScriptSettings() {
 	EnableManual = true;
-	RealReverse = true;
+//	RealReverse = true;
 	SimpleBike = true;
 
 	EngDamage = false;
@@ -18,7 +18,7 @@ ScriptSettings::ScriptSettings() {
 	UITips = false;
 	ShiftMode = 0;
 	WheelEnabled = false;
-	WheelRange = 180;
+	//WheelRange = 180;
 	FFEnable = true;
 	DamperMax = 60;
 	DamperMin = 30;
@@ -46,7 +46,7 @@ ScriptSettings::ScriptSettings() {
 void ScriptSettings::Read(ScriptControls* scriptControl) {
 	EnableManual = (GetPrivateProfileIntA("OPTIONS", "Enable", 1, SETTINGSFILE) == 1);
 	ShiftMode = GetPrivateProfileIntA("OPTIONS", "ShiftMode", 0, SETTINGSFILE);
-	RealReverse = (GetPrivateProfileIntA("OPTIONS", "RealReverse", 1, SETTINGSFILE) == 1);
+//	RealReverse = (GetPrivateProfileIntA("OPTIONS", "RealReverse", 1, SETTINGSFILE) == 1);
 	SimpleBike = (GetPrivateProfileIntA("OPTIONS", "SimpleBike", 1, SETTINGSFILE) == 1);
 	EngDamage = (GetPrivateProfileIntA("OPTIONS", "EngineDamage", 0, SETTINGSFILE) == 1);
 	EngStall = (GetPrivateProfileIntA("OPTIONS", "EngineStalling", 0, SETTINGSFILE) == 1);
@@ -66,8 +66,6 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	MisshiftDamage = GetPrivateProfileIntA("OPTIONS", "MisshiftDamage", 10, SETTINGSFILE);
 	CrossScript = (GetPrivateProfileIntA("OPTIONS", "CrossScript", 0, SETTINGSFILE) == 1);
 	HillBrakeWorkaround = (GetPrivateProfileIntA("OPTIONS", "HillBrakeWorkaround", 0, SETTINGSFILE) == 1);
-
-	CheckSettings();
 
 	// Start Controller section
 	char buffer[24] = {0};
@@ -140,36 +138,42 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 
 	GetPrivateProfileStringA("WHEELAXIS", "Throttle", "lY", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Throttle)] = buffer; 
-	scriptControl->ThrottleMin = GetPrivateProfileIntA("WHEELAXIS", "ThrottleMin", -1000, SETTINGSFILE);
-	scriptControl->ThrottleMax = GetPrivateProfileIntA("WHEELAXIS", "ThrottleMax", 1000, SETTINGSFILE);
+	scriptControl->ThrottleMin = GetPrivateProfileIntA("WHEELAXIS", "ThrottleMin", 0, SETTINGSFILE);
+	scriptControl->ThrottleMax = GetPrivateProfileIntA("WHEELAXIS", "ThrottleMax", 65535, SETTINGSFILE);
 	
 	GetPrivateProfileStringA("WHEELAXIS", "Brake", "lRz", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Brake)] = buffer;
-	scriptControl->BrakeMin = GetPrivateProfileIntA("WHEELAXIS", "BrakeMin", -1000, SETTINGSFILE);
-	scriptControl->BrakeMax = GetPrivateProfileIntA("WHEELAXIS", "BrakeMax", 1000, SETTINGSFILE);
+	scriptControl->BrakeMin = GetPrivateProfileIntA("WHEELAXIS", "BrakeMin", 0, SETTINGSFILE);
+	scriptControl->BrakeMax = GetPrivateProfileIntA("WHEELAXIS", "BrakeMax", 65535, SETTINGSFILE);
 
 	GetPrivateProfileStringA("WHEELAXIS", "Clutch", "rglSlider1", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] = buffer;
-	scriptControl->ClutchMin = GetPrivateProfileIntA("WHEELAXIS", "ClutchMin", -1000, SETTINGSFILE);
-	scriptControl->ClutchMax = GetPrivateProfileIntA("WHEELAXIS", "ClutchMax", 1000, SETTINGSFILE);
+	scriptControl->ClutchMin = GetPrivateProfileIntA("WHEELAXIS", "ClutchMin", 0, SETTINGSFILE);
+	scriptControl->ClutchMax = GetPrivateProfileIntA("WHEELAXIS", "ClutchMax", 65535, SETTINGSFILE);
 
 	GetPrivateProfileStringA("WHEELAXIS", "Steer", "lX", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)] = buffer;
-	scriptControl->SteerLeft = GetPrivateProfileIntA("WHEELAXIS", "SteerLeft", -1000, SETTINGSFILE);
-	scriptControl->SteerRight = GetPrivateProfileIntA("WHEELAXIS", "SteerRight", 1000, SETTINGSFILE);
+	scriptControl->SteerLeft = GetPrivateProfileIntA("WHEELAXIS", "SteerLeft", 0, SETTINGSFILE);
+	scriptControl->SteerRight = GetPrivateProfileIntA("WHEELAXIS", "SteerRight", 65535, SETTINGSFILE);
 	
 	GetPrivateProfileStringA("WHEELAXIS", "FFAxis", "X", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->FFAxis = buffer;
 
 	scriptControl->ClutchDisable = (GetPrivateProfileIntA("WHEELAXIS", "ClutchDisable", 0, SETTINGSFILE) == 1);
 	
-	WheelRange = GetPrivateProfileIntA("WHEEL", "WheelRange", 180, SETTINGSFILE);
+	//WheelRange = GetPrivateProfileIntA("WHEEL", "WheelRange", 180, SETTINGSFILE);
 	FFEnable = GetPrivateProfileIntA("WHEEL", "FFEnable", 1, SETTINGSFILE) == 1;
 	DamperMax = GetPrivateProfileIntA("WHEEL", "DamperMax", 50, SETTINGSFILE);
 	DamperMin = GetPrivateProfileIntA("WHEEL", "DamperMin", 20, SETTINGSFILE);
 	TargetSpeed = GetPrivateProfileIntA("WHEEL", "DamperTargetSpeed", 10, SETTINGSFILE);
 	FFPhysics = GetPrivateProfileIntA("WHEEL", "PhysicsStrength", 170, SETTINGSFILE) / 100.0f;
 	CenterStrength = GetPrivateProfileIntA("WHEEL", "CenterStrength", 100, SETTINGSFILE) / 100.0f;
+
+	CheckSettings();
+	if (scriptControl->ClutchDisable) {
+		ClutchShifting = false;
+		WritePrivateProfileStringA("OPTIONS", "ClutchShifting", "0", SETTINGSFILE);
+	}
 }
 
 void ScriptSettings::Save() const {

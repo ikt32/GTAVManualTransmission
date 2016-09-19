@@ -40,7 +40,7 @@ void doWheelSteering();
 
 void functionAutoReverse();
 void functionRealReverse();
-void functionSimpleReverse();
+//void functionSimpleReverse();
 void functionTruckLimiting();
 void functionEngBrake();
 void functionEngDamage();
