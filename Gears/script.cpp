@@ -1160,8 +1160,8 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 	showText(0.85, 0.66, 0.4, rwd.str().c_str());
 
 	if ((relWheelDev > 0.1f || relWheelDev < -0.1f) && // some steering happened
-		accelValsAvg.x < 1.0f && accelValsAvg.x > -1.0f && // < 0.2G side force
-		vehData.Velocity > 1.0f) {
+		accelValsAvg.x < 0.5f && accelValsAvg.x > -0.5f && // < 0.1G side force
+		vehData.Velocity > 2.0f) {
 		understeer = std::abs(relWheelDev);
 	}
 	// end understeer detect
