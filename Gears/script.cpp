@@ -1143,7 +1143,7 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 	float oversteer = 0.0f;
 
 	Vector3 rel_vector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
-
+	
 	float angle = acos(rel_vector.y / speed)* 180.0f / 3.14159265f;
 	if (isnan(angle))
 		angle = 0.0;
@@ -1168,12 +1168,21 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		understeer = 1.0f;
 	}
 
-	if (understeer > 0.01f && vehData.Velocity > 4.0f) {
-		centerForce = static_cast<int>((1.0f - understeer) * centerForce);
+	if (oversteer > 1.0f) {
+		oversteer = 1.0f;
 	}
 
-	if (vehData.Velocity < -0.1f ||				// Don't apply damper and centering while reversing
-		oversteer > 0.1f) {
+	float gripSpeedThreshold = 4.0f;
+
+	if (understeer > 0.01f && vehData.Velocity > gripSpeedThreshold) {
+		centerForce = static_cast<int>((1.0f - understeer) * centerForce);
+	}
+	if (oversteer > 0.01f && vehData.Velocity > gripSpeedThreshold) {
+		centerForce = 0;
+		damperForce = settings.DamperMin + static_cast<int>(oversteer * (settings.DamperMax - settings.DamperMin));
+	}
+
+	if (vehData.Velocity < -0.1f) {
 		centerForce = 0;
 		damperForce = settings.DamperMin;
 	}
@@ -1189,8 +1198,6 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		static_cast<int>(settings.CenterStrength * centerForce);
 
 	controls.WheelDI.SetConstantForce(totalForce);
-
-	
 
 	if (settings.Debug) {
 		std::stringstream steerDisplay;
