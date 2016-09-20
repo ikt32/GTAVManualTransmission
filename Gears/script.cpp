@@ -655,7 +655,7 @@ void functionEngStall() {
 	if (controls.ClutchVal < 1.0f - settings.StallingThreshold &&
 		vehData.Rpm < 0.25f &&
 		((vehData.Speed < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && vehData.Speed < 1.0f)) &&
-		VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle)) {
+		VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 	}
 }
@@ -948,7 +948,7 @@ void functionAutoReverse() {
 //                       Mod functions: Buttons
 ///////////////////////////////////////////////////////////////////////////////
 void handleVehicleButtons() {
-	if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicle) &&
+	if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
 		controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) ||
 		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine) ||
