@@ -1172,7 +1172,7 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		centerForce = static_cast<int>((1.0f - understeer) * centerForce);
 	}
 
-	if (vehData.Velocity < 0.0f ||				// Don't apply damper and centering while reversing
+	if (vehData.Velocity < -0.1f ||				// Don't apply damper and centering while reversing
 		oversteer > 0.1f) {
 		centerForce = 0;
 		damperForce = settings.DamperMin;
