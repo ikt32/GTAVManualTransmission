@@ -63,10 +63,12 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 	TopGear = ext.GetTopGear(vehicle);
 	Speed = ENTITY::GET_ENTITY_SPEED(vehicle);
 	Velocity = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
+	RotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(vehicle);
 	IsBike = VEHICLE::IS_THIS_MODEL_A_BIKE(model) == TRUE;
 	IsTruck = isBadTruck(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
 	NoClutch = noClutch(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
 	Pitch = ENTITY::GET_ENTITY_PITCH(vehicle);
+	SteeringAngle = ext.GetSteeringAngle(vehicle);
 }
 
 

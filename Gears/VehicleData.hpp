@@ -51,7 +51,8 @@ public:
 	std::vector<float> LockSpeeds = std::vector<float>(20);
 	float Pitch = 0;
 
-
+	float SteeringAngle;
+	Vector3 RotationVelocity;
 	Vector3 getAccelerationVectors(Vector3 velocities);
 
 	// Should be called after getAccelerationVectors has been called in a loop

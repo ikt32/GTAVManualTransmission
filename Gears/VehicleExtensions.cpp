@@ -207,7 +207,8 @@ void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) const {
 	}
 }
 
-float VehicleExtensions::GetSteeringAngle1(Vehicle handle) const {
+// Steering input angle, steering lock independent
+float VehicleExtensions::GetSteeringInputAngle(Vehicle handle) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0x8A4 : 0x894);
@@ -215,7 +216,7 @@ float VehicleExtensions::GetSteeringAngle1(Vehicle handle) const {
 	return *reinterpret_cast<float *>(address + offset);
 }
 
-void VehicleExtensions::SetSteeringAngle1(Vehicle handle, float value) const {
+void VehicleExtensions::SetSteeringInputAngle(Vehicle handle, float value) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0x8A4 : 0x894);
@@ -223,7 +224,8 @@ void VehicleExtensions::SetSteeringAngle1(Vehicle handle, float value) const {
 	*reinterpret_cast<float *>(address + offset) = value;
 }
 
-float VehicleExtensions::GetSteeringAngle2(Vehicle handle) const {
+// Wheel angle, steering lock dependent
+float VehicleExtensions::GetSteeringAngle(Vehicle handle) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0x8AC : 0x89C);
@@ -231,7 +233,7 @@ float VehicleExtensions::GetSteeringAngle2(Vehicle handle) const {
 	return *reinterpret_cast<float *>(address + offset);
 }
 
-void VehicleExtensions::SetSteeringAngle2(Vehicle handle, float value) const {
+void VehicleExtensions::SetSteeringAngle(Vehicle handle, float value) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0x8AC : 0x89C);

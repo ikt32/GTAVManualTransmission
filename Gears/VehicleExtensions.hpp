@@ -31,10 +31,10 @@ public:
 	uint64_t GetWheelsPtr(Vehicle handle) const;
 	static uint64_t GetWheelPtr(uint64_t address, int index);
 	void SetWheelsHealth(Vehicle handle, float health) const;
-	float GetSteeringAngle1(Vehicle handle) const;
-	void SetSteeringAngle1(Vehicle handle, float value) const;
-	float GetSteeringAngle2(Vehicle handle) const;
-	void SetSteeringAngle2(Vehicle handle, float value) const;
+	float GetSteeringInputAngle(Vehicle handle) const;
+	void SetSteeringInputAngle(Vehicle handle, float value) const;
+	float GetSteeringAngle(Vehicle handle) const;
+	void SetSteeringAngle(Vehicle handle, float value) const;
 
 private:
 	MemoryAccess mem;

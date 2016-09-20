@@ -131,8 +131,7 @@ void update() {
 	if (!settings.EnableManual) {
 		return;
 	}
-
-
+	
 
 	///////////////////////////////////////////////////////////////////////////
 	// Active whenever Manual is enabled from here
@@ -1079,7 +1078,7 @@ void updateLastInputDevice() {
 
 void doWheelSteering() {
 	if (prevInput == ScriptControls::InputDevices::Wheel) {
-		ext.SetSteeringAngle1(vehicle, (controls.SteerVal - 32768) / (-32768.0f));
+		ext.SetSteeringInputAngle(vehicle, (controls.SteerVal - 32768) / (-32768.0f));
 		int additionalOffset = 2560;
 		float antiDeadzoned;
 		antiDeadzoned = (controls.SteerVal - 32768) / 32768.0f;
@@ -1155,21 +1154,21 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 	// end oversteer detect
 
 	// begin understeer detect
-	float understeer = 0.0f;	
-	float relWheelDev = (float)wheelCenterDeviation / (float)centerPos;
-
-	if ((relWheelDev > 0.1f || relWheelDev < -0.1f) && // some steering happened
-		accelValsAvg.x < 0.5f && accelValsAvg.x > -0.5f && // < 0.1G side force
-		vehData.Velocity > 2.0f) {
-		understeer = std::abs(relWheelDev);
+	float understeer = 0.0f;
+	if (abs(vehData.SteeringAngle*std::sqrt(vehData.Velocity)) > abs(vehData.RotationVelocity.z) &&
+		vehData.Velocity > 0.1f) {
+		understeer = abs(vehData.SteeringAngle*sqrt(vehData.Velocity) - vehData.RotationVelocity.z);
 	}
 	// end understeer detect
 	
-	if (oversteer > 0.1f) {
+	if (oversteer > 0.05f) {
 		understeer = 0.0f;
 	}
+	if (understeer > 1.0f) {
+		understeer = 1.0f;
+	}
 
-	if (understeer > 0.1f && vehData.Velocity > 8.0f) {
+	if (understeer > 0.01f && vehData.Velocity > 4.0f) {
 		centerForce = static_cast<int>((1.0f - understeer) * centerForce);
 	}
 
