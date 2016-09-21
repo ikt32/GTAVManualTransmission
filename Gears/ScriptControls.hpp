@@ -133,6 +133,8 @@ public:
 
 	WheelDirectInput WheelDI;
 
+	void SetXboxTrigger(int value);
+
 private:
 	long long pressTime = 0;
 	long long releaseTime = 0;

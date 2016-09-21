@@ -90,6 +90,8 @@ public:
 		"UNKNOWN"
 	};
 
+	float TriggerValue = 0.75f;
+
 private:
 	XINPUT_STATE controllerState;
 	int controllerNum;

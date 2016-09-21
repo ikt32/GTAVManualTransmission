@@ -233,6 +233,10 @@ bool ScriptControls::ButtonIn(ControllerControlType control) {
 	return false;
 }
 
+void ScriptControls::SetXboxTrigger(int value) {
+	controller.TriggerValue = static_cast<float>(value) / 100.0f;
+}
+
 /*
  * Wheel section
  */

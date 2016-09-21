@@ -85,6 +85,13 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	GetPrivateProfileStringA("CONTROLLER", "Brake", "LeftTrigger", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Brake)] = buffer;
 
+	int tval = GetPrivateProfileIntA("CONTROLLER", "TriggerValue", 75, SETTINGSFILE);
+	if (tval > 100 || tval < 0) {
+		tval = 75;
+	}
+	scriptControl->SetXboxTrigger(tval);
+
+
 	// Start Keyboard section
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Toggle)] = GetPrivateProfileIntA("KEYBOARD", "Toggle", VK_OEM_5, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ToggleH)] = GetPrivateProfileIntA("KEYBOARD", "ToggleH", VK_OEM_6, SETTINGSFILE);
