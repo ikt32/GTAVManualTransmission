@@ -40,6 +40,12 @@ bool blinkerRight = false;
 bool blinkerHazard = false;
 bool truckShiftUp = false;
 
+enum Shifter {
+	Sequential = 0,
+	HPattern = 1,
+	Automatic = 2
+};
+
 void update() {
 	///////////////////////////////////////////////////////////////////////////
 	//                    Gathering data
@@ -157,21 +163,20 @@ void update() {
 		if (settings.ShiftMode > 2) {
 			settings.ShiftMode = 0;
 		}
-		if (settings.ShiftMode == 0 && vehData.CurrGear > 1) {
+		if (settings.ShiftMode == Sequential && vehData.CurrGear > 1) {
 			vehData.SimulatedNeutral = false;
 		}
 		std::stringstream message;
 		std::string mode;
 		switch (settings.ShiftMode) {
-			case 0:	mode = "Sequential";
+			case Sequential:	mode = "Sequential";
 				break;
-			case 1: mode = "H-Shifter";
+			case HPattern: mode = "H-Pattern";
 				break;
-			case 2: mode = "Automatic";
+			case Automatic: mode = "Automatic";
 				break;
 		}
 		message << "Mode: " << mode;
-		           //(settings.ShiftMode ? "H-Shifter" : "Sequential");
 		showNotification(const_cast<char *>(message.str().c_str()));
 		settings.Save();
 	}
@@ -269,7 +274,7 @@ void update() {
 
 	if (!vehData.SimulatedNeutral && !simpleBike && !vehData.NoClutch) {
 		// Stalling
-		if (settings.EngStall) {
+		if (settings.EngStall && settings.ShiftMode != Automatic) {
 			functionEngStall();
 		}
 
@@ -289,7 +294,7 @@ void update() {
 	else if (settings.ShiftMode == 0){
 		functionSShift();
 	}
-	else {
+	else { // Automatic
 		functionAShift();
 	}
 
