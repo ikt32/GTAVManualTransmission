@@ -46,7 +46,6 @@ ScriptSettings::ScriptSettings() {
 void ScriptSettings::Read(ScriptControls* scriptControl) {
 	EnableManual = (GetPrivateProfileIntA("OPTIONS", "Enable", 1, SETTINGSFILE) == 1);
 	ShiftMode = GetPrivateProfileIntA("OPTIONS", "ShiftMode", 0, SETTINGSFILE);
-//	RealReverse = (GetPrivateProfileIntA("OPTIONS", "RealReverse", 1, SETTINGSFILE) == 1);
 	SimpleBike = (GetPrivateProfileIntA("OPTIONS", "SimpleBike", 1, SETTINGSFILE) == 1);
 	EngDamage = (GetPrivateProfileIntA("OPTIONS", "EngineDamage", 0, SETTINGSFILE) == 1);
 	EngStall = (GetPrivateProfileIntA("OPTIONS", "EngineStalling", 0, SETTINGSFILE) == 1);
@@ -175,6 +174,10 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	TargetSpeed = GetPrivateProfileIntA("WHEEL", "DamperTargetSpeed", 10, SETTINGSFILE);
 	FFPhysics = GetPrivateProfileIntA("WHEEL", "PhysicsStrength", 170, SETTINGSFILE) / 100.0f;
 	CenterStrength = GetPrivateProfileIntA("WHEEL", "CenterStrength", 100, SETTINGSFILE) / 100.0f;
+
+	for (int i = 0; i < MAX_RGBBUTTONS; i++) { // Ouch
+		scriptControl->WheelToKey[i] = GetPrivateProfileIntA("WHEELKEYBOARD", std::to_string(i).c_str(), -1, SETTINGSFILE);
+	}
 
 	CheckSettings();
 	if (scriptControl->ClutchDisable) {

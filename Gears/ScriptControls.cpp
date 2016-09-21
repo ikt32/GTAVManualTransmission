@@ -24,6 +24,7 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 	if (WheelDI.IsConnected()) {
 		WheelDI.UpdateState();
 		WheelDI.UpdateButtonChangeStates();
+		CheckCustomButtons();
 	}
 
 	// Update ThrottleVal, BrakeVal and ClutchVal ranging from 0.0f (no touch) to 1.0f (full press)
@@ -131,6 +132,7 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 
 	AccelValGTA = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
 	AccelValGTAf = (AccelValGTA - 127) / 127.0f;
+
 }
 
 // Limitation: Only works for hardcoded input types. Currently throttle.
@@ -269,4 +271,28 @@ bool ScriptControls::ButtonIn(WheelControlType control) {
 	if (WheelDI.IsButtonPressed(WheelControl[static_cast<int>(control)]))
 		return true;
 	return false;
+}
+
+void ScriptControls::CheckCustomButtons() {
+	if (!WheelDI.IsConnected()) {
+		return;
+	}
+	for (int i = 0; i < MAX_RGBBUTTONS; i++) {
+		if (WheelToKey[i] != -1) {
+			INPUT input;
+			input.type = INPUT_KEYBOARD;
+			input.ki.dwExtraInfo = 0;
+			input.ki.wVk = 0;
+			input.ki.wScan = MapVirtualKey(WheelToKey[i], 0);
+
+			if (WheelDI.IsButtonJustPressed(i)) {
+				input.ki.dwFlags = 0;
+				SendInput(1, &input, sizeof(INPUT));
+			}
+			if (WheelDI.IsButtonJustReleased(i)) {
+				input.ki.dwFlags = KEYEVENTF_KEYUP;
+				SendInput(1, &input, sizeof(INPUT));
+			}
+		}
+	}
 }

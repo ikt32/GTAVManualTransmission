@@ -101,12 +101,12 @@ public:
 	// Perceived accelerator value, float
 	float AccelValGTAf = 0.0f;
 
-	// Array gets filled by ScriptSettings
-	std::array < std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
-	std::array < std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
+	// Values are filled by ScriptSettings
+	std::array<std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
+	std::array<std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
 	std::array<int, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
 	std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelControl = {};
-
+	std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
 	std::string FFAxis;
 
 	int CToggleTime = 1000;
@@ -129,6 +129,7 @@ public:
 	// Held for specified milliseconds in .ini
 	bool ButtonHeld(ControllerControlType control);
 	bool ButtonIn(WheelControlType control);
+	void CheckCustomButtons();
 	bool ButtonIn(ControllerControlType control);
 
 	WheelDirectInput WheelDI;
