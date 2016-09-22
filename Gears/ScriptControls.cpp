@@ -283,14 +283,14 @@ void ScriptControls::CheckCustomButtons() {
 			input.type = INPUT_KEYBOARD;
 			input.ki.dwExtraInfo = 0;
 			input.ki.wVk = 0;
-			input.ki.wScan = MapVirtualKey(WheelToKey[i], 0);
+			input.ki.wScan = MapVirtualKey(WheelToKey[i], MAPVK_VK_TO_VSC);
 
 			if (WheelDI.IsButtonJustPressed(i)) {
-				input.ki.dwFlags = 0;
+				input.ki.dwFlags = KEYEVENTF_SCANCODE;
 				SendInput(1, &input, sizeof(INPUT));
 			}
 			if (WheelDI.IsButtonJustReleased(i)) {
-				input.ki.dwFlags = KEYEVENTF_KEYUP;
+				input.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
 				SendInput(1, &input, sizeof(INPUT));
 			}
 		}
