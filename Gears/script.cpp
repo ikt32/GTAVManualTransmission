@@ -349,15 +349,41 @@ void showNotification(char* message) {
 
 void showDebugInfo() {
 	std::stringstream infos;
-	infos << "RPM: " << std::setprecision(3) << vehData.Rpm <<
-	         "\nCurrGear: " << vehData.CurrGear <<
-	         "\nNextGear: " << vehData.NextGear <<
-	         "\nClutch: " << std::setprecision(3) << vehData.Clutch <<
-	         "\nThrottle: " << std::setprecision(3) << vehData.Throttle <<
-	         "\nTurbo: " << std::setprecision(3) << vehData.Turbo <<
-	         "\nAddress: " << std::hex << vehData.Address <<
-	         "\nE: " << (settings.EnableManual ? "Y" : "N");
-	showText(0.01f, 0.5f, 0.4f, infos.str().c_str());
+	infos << "RPM: " << std::setprecision(3) << vehData.Rpm;
+	showText(0.01f, 0.300f, 0.4f, infos.str().c_str());
+
+	std::stringstream nCurrGear;
+	nCurrGear << "CurrGear: " << vehData.CurrGear;
+	showText(0.01f, 0.325f, 0.4f, nCurrGear.str().c_str());
+
+	std::stringstream nNextGear;
+	nNextGear << "NextGear: " << vehData.NextGear;
+	showText(0.01f, 0.350f, 0.4f, nNextGear.str().c_str());
+
+	std::stringstream nClutch;
+	nClutch << "Clutch: " << std::setprecision(3) << vehData.Clutch;
+	showText(0.01f, 0.375f, 0.4f, nClutch.str().c_str());
+
+	std::stringstream nThrottle;
+	nThrottle << "Throttle: " << std::setprecision(3) << vehData.Throttle;
+	showText(0.01f, 0.400f, 0.4f, nThrottle.str().c_str());
+
+	std::stringstream nTurbo;
+	nTurbo << "Turbo: " << std::setprecision(3) << vehData.Turbo;
+	showText(0.01f, 0.425f, 0.4f, nTurbo.str().c_str());
+
+	std::stringstream nAddress;
+	nAddress << "Address: " << std::hex << vehData.Address;
+	showText(0.01f, 0.450f, 0.4f, nAddress.str().c_str());
+
+	std::stringstream nE;
+	nE << "E: " << (settings.EnableManual ? "Y" : "N");
+	showText(0.01f, 0.475f, 0.4f, nE.str().c_str());
+
+	std::stringstream nWheelAddr;
+	nWheelAddr << "WheelAddress: " << std::hex << ext.GetWheelsPtr(vehicle);
+	showText(0.01f, 0.500, 0.4f, nWheelAddr.str().c_str());
+
 
 	std::stringstream throttleDisplay;
 	throttleDisplay << "ThrottleVal: " << controls.ThrottleVal;
@@ -366,21 +392,18 @@ void showDebugInfo() {
 	std::stringstream clutchDisplay;
 	clutchDisplay << "ClutchValue: " << controls.ClutchVal;
 	std::stringstream clutcheDisplay;
-	clutcheDisplay << "Disabled: " << (controls.ClutchDisable ? "Y" : "N");
+	clutcheDisplay << "E: " << (controls.ClutchDisable ? "Y" : "N");
 
-	showText(0.85, 0.04, 0.4, throttleDisplay.str().c_str());
-	showText(0.85, 0.08, 0.4, brakeDisplay.str().c_str());
-	showText(0.85, 0.12, 0.4, clutchDisplay.str().c_str());
-	showText(0.70, 0.12, 0.4, clutcheDisplay.str().c_str());
+	showText(0.85, 0.050, 0.4, throttleDisplay.str().c_str());
+	showText(0.85, 0.075, 0.4, brakeDisplay.str().c_str());
+	showText(0.85, 0.100, 0.4, clutchDisplay.str().c_str());
+	showText(0.80, 0.100, 0.4, clutcheDisplay.str().c_str());
 
 
 	if (settings.WheelEnabled) {
 		std::stringstream dinputDisplay;
 		dinputDisplay << "Wheel Avail: " << controls.WheelDI.IsConnected();
-		showText(0.85, 0.20, 0.4, dinputDisplay.str().c_str());
-		std::stringstream steerDisplay;
-		steerDisplay << "SteerValue: " << controls.SteerVal;
-		showText(0.85, 0.16, 0.4, steerDisplay.str().c_str());
+		showText(0.85, 0.150, 0.4, dinputDisplay.str().c_str());
 	}
 	
 
@@ -1204,26 +1227,30 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 	controls.WheelDI.SetConstantForce(totalForce);
 
 	if (settings.Debug) {
+		std::stringstream SteerValue;
+		SteerValue << "SteerValue: " << controls.SteerVal;
+		showText(0.85, 0.175, 0.4, SteerValue.str().c_str());
+
 		std::stringstream steerDisplay;
 		steerDisplay << "SteerSpeed: " << steerSpeed << std::endl;
-		showText(0.85, 0.24, 0.4, steerDisplay.str().c_str());
+		showText(0.85, 0.200, 0.4, steerDisplay.str().c_str());
 		
 		std::stringstream forceDisplay;
 		forceDisplay << "ConstForce: " << constantForce << std::endl;
-		showText(0.85, 0.28, 0.4, forceDisplay.str().c_str());
+		showText(0.85, 0.225, 0.4, forceDisplay.str().c_str());
 
 		std::stringstream damperF;
-		damperF << "damperF: " << damperForce << std::endl;
-		showText(0.85, 0.32, 0.4, damperF.str().c_str());
+		damperF << "DampForce: " << damperForce << std::endl;
+		showText(0.85, 0.250, 0.4, damperF.str().c_str());
 
 		std::stringstream centerDisplay;
 		centerDisplay << "CenterForce: " << centerForce << std::endl;
-		showText(0.85, 0.36, 0.4, centerDisplay.str().c_str());
+		showText(0.85, 0.275, 0.4, centerDisplay.str().c_str());
 		
 		if (understeer > 0.1f)
-			showText(0.85, 0.40, 0.4, "UNDERSTEER");
+			showText(0.85, 0.300, 0.4, "UNDERSTEER");
 
 		if (oversteer > 0.1f)
-			showText(0.85, 0.40, 0.4, " OVERSTEER");
+			showText(0.85, 0.300, 0.4, "OVERSTEER");
 	}
 }
