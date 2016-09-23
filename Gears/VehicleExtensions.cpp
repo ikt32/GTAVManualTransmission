@@ -1,5 +1,6 @@
 #include "VehicleExtensions.hpp"
 #include "../../ScriptHookV_SDK/inc/nativeCaller.h"
+#include <vector>
 
 uint64_t VehicleExtensions::GetAddress(Vehicle handle) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
@@ -194,17 +195,39 @@ void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) const {
 	int offset = (getGameVersion() > 3 ? 0xAA0 : 0xA80);
 	offset = (getGameVersion() > 23 ? 0xAB0 : offset);
 
-	uint64_t wheelPtr;
+	uint64_t wheelPtr;  // pointer to wheel pointers
 	wheelPtr = *reinterpret_cast<uint64_t *>(address + offset);
 
 	uint64_t wheels[6] = {};
 
 	for (int i = 0; i < 6; i++) {
-		wheels[i] = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
+		wheels[i] = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i); // iterate through wheels
 		if (wheels[i]) {
 			*reinterpret_cast<float *>(wheels[i] + (getGameVersion() > 3 ? 0x1E0 : 0x1D0)) = health;
 		}
 	}
+}
+
+std::vector<float> VehicleExtensions::GetWheelsCompression(Vehicle handle) const {
+	uint64_t address = mem.GetAddressOfEntity(handle);
+
+	int offset = (getGameVersion() > 3 ? 0xAA0 : 0xA80);
+	offset = (getGameVersion() > 23 ? 0xAB0 : offset);
+
+	uint64_t wheelPtr; // pointer to wheel pointers
+	wheelPtr = *reinterpret_cast<uint64_t *>(address + offset);
+
+	uint64_t wheels[6] = {};
+	std::vector<float> compressions;
+
+	for (int i = 0; i < 6; i++) {
+		wheels[i] = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i); // iterate through wheels
+		if (wheels[i]) {
+			compressions.push_back(*reinterpret_cast<float *>(wheels[i] + (getGameVersion() > 3 ? 0x160 : 0x150)));
+		}
+	}
+
+	return compressions;
 }
 
 // Steering input angle, steering lock independent

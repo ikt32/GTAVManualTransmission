@@ -3,6 +3,8 @@
 #include <cstdint>
 #include "../../ScriptHookV_SDK/inc/types.h"
 #include "NativeMemory.hpp"
+#include <memory>
+#include <vector>
 
 class VehicleExtensions {
 public:
@@ -31,6 +33,7 @@ public:
 	uint64_t GetWheelsPtr(Vehicle handle) const;
 	static uint64_t GetWheelPtr(uint64_t address, int index);
 	void SetWheelsHealth(Vehicle handle, float health) const;
+	std::vector<float> GetWheelsCompression(Vehicle handle) const;
 	float GetSteeringInputAngle(Vehicle handle) const;
 	void SetSteeringInputAngle(Vehicle handle, float value) const;
 	float GetSteeringAngle(Vehicle handle) const;
