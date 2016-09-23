@@ -53,6 +53,7 @@ public:
 
 	float SteeringAngle;
 	Vector3 RotationVelocity;
+	std::vector<float> WheelCompressions;
 	Vector3 getAccelerationVectors(Vector3 velocities);
 
 	// Should be called after getAccelerationVectors has been called in a loop
@@ -95,8 +96,8 @@ private:
 	bool noClutch(char* name);
 
 	Vector3 prevVelocities = {};
-	long long prevTime = 0;
-	std::array<Vector3, SAMPLES> samples = {};
-	int averageIndex = 0;
+	long long prevAccelTime = 0;
+	std::array<Vector3, SAMPLES> accelSamples = {};
+	int averageAccelIndex = 0;
 	void zeroSamples();
 };

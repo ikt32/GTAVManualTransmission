@@ -406,12 +406,6 @@ void showDebugInfo() {
 		showText(0.85, 0.150, 0.4, dinputDisplay.str().c_str());
 	}
 
-	auto wheelCompressions = ext.GetWheelsCompression(vehicle);
-
-	showText(0.01, 0.550, 0.4, std::to_string(wheelCompressions.at(0)).c_str());
-	showText(0.01, 0.575, 0.4, std::to_string(wheelCompressions.at(1)).c_str());
-
-
 	/*for (int i = 0; i < MAX_RGBBUTTONS; i++) {
 		if (controls.wheelState->rgbButtons[i]) {
 			showText(0.4, 0.4, 2.0, std::to_string(i).c_str());
@@ -1216,7 +1210,7 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 	if (vehData.Velocity < -0.1f) {
 		centerForce = 0;
 		damperForce = settings.DamperMin;
-	}
+	}	
 
 	if (airborne) {
 		constantForce = 0;
