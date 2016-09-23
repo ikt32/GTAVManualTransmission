@@ -401,8 +401,7 @@ void reInit() {
 	vehData.LockGears = 0x00010001;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
 	if (settings.WheelEnabled) {
-		if (!controls.WheelDI.IsConnected())
-			controls.InitWheel();
+		controls.InitWheel();
 	}
 }
 
