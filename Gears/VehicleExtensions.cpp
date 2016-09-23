@@ -208,6 +208,7 @@ void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) const {
 	}
 }
 
+// Don't use this on non-cars
 std::vector<float> VehicleExtensions::GetWheelsCompression(Vehicle handle) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 

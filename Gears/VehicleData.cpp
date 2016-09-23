@@ -69,7 +69,24 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 	NoClutch = noClutch(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
 	Pitch = ENTITY::GET_ENTITY_PITCH(vehicle);
 	SteeringAngle = ext.GetSteeringAngle(vehicle);
-	WheelCompressions = ext.GetWheelsCompression(vehicle);
+	if (!IsBike) {
+		WheelCompressions[0] = ext.GetWheelsCompression(vehicle).at(0);
+		WheelCompressions[1] = ext.GetWheelsCompression(vehicle).at(1);
+	}
+}
+
+// Only does this for the first two wheels because I'm lazy, damn it
+std::array<float, 2> VehicleData::GetWheelCompressionSpeeds() {
+	long long time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
+
+	std::array<float, 2> result;
+	result[0] = (WheelCompressions[0] - prevCompressions[0]) / ((time - prevCompressTime) / 1e9f);
+	result[1] = (WheelCompressions[1] - prevCompressions[1]) / ((time - prevCompressTime) / 1e9f);
+
+	prevCompressTime = time;
+	prevCompressions = WheelCompressions;
+
+	return result;
 }
 
 

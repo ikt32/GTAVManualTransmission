@@ -174,6 +174,8 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	TargetSpeed = GetPrivateProfileIntA("WHEEL", "DamperTargetSpeed", 10, SETTINGSFILE);
 	FFPhysics = GetPrivateProfileIntA("WHEEL", "PhysicsStrength", 170, SETTINGSFILE) / 100.0f;
 	CenterStrength = GetPrivateProfileIntA("WHEEL", "CenterStrength", 100, SETTINGSFILE) / 100.0f;
+	DetailStrength = GetPrivateProfileIntA("WHEEL", "DetailStrength", 100, SETTINGSFILE) / 1.0f;
+
 
 	for (int i = 0; i < MAX_RGBBUTTONS; i++) { // Ouch
 		scriptControl->WheelToKey[i] = GetPrivateProfileIntA("WHEELKEYBOARD", std::to_string(i).c_str(), -1, SETTINGSFILE);

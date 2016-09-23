@@ -49,6 +49,7 @@ public:
 	bool WheelWithoutManual;
 	int TargetSpeed;
 	bool HillBrakeWorkaround;
+	float DetailStrength;
 private:
 	void CheckSettings();
 };

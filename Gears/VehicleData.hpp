@@ -17,7 +17,7 @@ public:
 	void Clear();
 
 	void UpdateValues(VehicleExtensions& ext, Vehicle vehicle);
-
+	std::array<float, 2> GetWheelCompressionSpeeds();
 	bool IsBike = false;
 	bool NoClutch = false;
 	bool IsTruck = false;
@@ -53,7 +53,7 @@ public:
 
 	float SteeringAngle;
 	Vector3 RotationVelocity;
-	std::vector<float> WheelCompressions;
+	std::array<float, 2> WheelCompressions;
 	Vector3 getAccelerationVectors(Vector3 velocities);
 
 	// Should be called after getAccelerationVectors has been called in a loop
@@ -96,7 +96,11 @@ private:
 	bool noClutch(char* name);
 
 	Vector3 prevVelocities = {};
+	std::array<float, 2> prevCompressions = {};
+
 	long long prevAccelTime = 0;
+	long long prevCompressTime = 0;
+
 	std::array<Vector3, SAMPLES> accelSamples = {};
 	int averageAccelIndex = 0;
 	void zeroSamples();

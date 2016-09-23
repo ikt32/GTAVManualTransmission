@@ -1210,7 +1210,18 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 	if (vehData.Velocity < -0.1f) {
 		centerForce = 0;
 		damperForce = settings.DamperMin;
-	}	
+	}
+
+	float compSpeedTotal = 0.0f;
+	if (!vehData.IsBike) {
+		auto compSpeed = vehData.GetWheelCompressionSpeeds();
+		//showText(0.01, 0.550, 0.4, std::to_string(compSpeed.at(0)).c_str());
+		//showText(0.01, 0.575, 0.4, std::to_string(compSpeed.at(1)).c_str());
+		// left should pull left, right should pull right
+		compSpeedTotal = -compSpeed[0] + compSpeed[1];
+	}
+
+
 
 	if (airborne) {
 		constantForce = 0;
@@ -1220,7 +1231,8 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 
 	int totalForce = static_cast<int>(steerSpeed * damperForce * 0.1) + 
 		constantForce +
-		static_cast<int>(settings.CenterStrength * centerForce);
+		static_cast<int>(settings.CenterStrength * centerForce) +
+		static_cast<int>(10.0f * settings.DetailStrength * compSpeedTotal);
 
 	controls.WheelDI.SetConstantForce(totalForce);
 
