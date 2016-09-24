@@ -724,7 +724,7 @@ void functionEngBrake() {
 	if (vehData.CurrGear > 0 &&
 		vehData.Velocity > vehData.LockSpeeds[vehData.CurrGear] &&
 		controls.ThrottleVal < 0.1 && vehData.Rpm > 0.80) {
-		float brakeForce = -0.1f * (1.0f - controls.ClutchVal) * vehData.Rpm;
+		float brakeForce = -0.20f * (1.0f - controls.ClutchVal) * vehData.Rpm;
 		ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, brakeForce, 0.0f, true, true, true, true);
 	}
 }
