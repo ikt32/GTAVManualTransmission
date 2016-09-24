@@ -158,7 +158,6 @@ void update() {
 
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ToggleH) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::ToggleH)) {
-		//settings.ShiftMode = !settings.ShiftMode;
 		settings.ShiftMode++;
 		if (settings.ShiftMode > 2) {
 			settings.ShiftMode = 0;
@@ -211,7 +210,7 @@ void update() {
 	// Hill-start effect, gravity and stuff
 	// Courtesy of XMOD
 	if (settings.HillBrakeWorkaround) {
-		if (vehData.CurrGear > 0 && controls.ThrottleVal < 0.2 && !controls.BrakeVal)
+		if (vehData.CurrGear > 0 && controls.ThrottleVal < 0.2 && !controls.BrakeVal && vehData.Speed < 2.0f)
 		{
 			if (vehData.Pitch < 0 || controls.ClutchVal)
 				ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, -1 * (vehData.Pitch / 150.0f) * 1.1f, 0.0f, true, true, true, true);
@@ -765,7 +764,8 @@ void handleRPM() {
 
 	// Emulate previous "shift down wanted" behavior.
 	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
-		VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, vehData.Rpm * 2.5f);
+		// Don't artificially lower this any more
+		//VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, vehData.Rpm * 2.5f);
 	}
 
 	/*
@@ -954,7 +954,6 @@ void handlePedalsDefault(float wheelThrottleVal, float wheelBrakeVal) {
 		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelBrakeVal);
 	}
 }
-
 
 //void functionSimpleReverse() {
 //	// Prevent going forward in gear 0.
@@ -1181,12 +1180,11 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		)
 	)/20;
 
-	int wheelMin = 0;
-	int wheelMax = 65535;
-	int centerPos = (wheelMin+wheelMax)/2;
-	int wheelCenterDeviation = controls.WheelDI.JoyState.lX - centerPos;
-	int centerForce = static_cast<int>((wheelCenterDeviation / 6.5535) * speed * 0.25) + 
-					  static_cast<int>((wheelCenterDeviation / 6.5535) * std::abs(accelValsAvg.y) * 0.25);
+	int centerPos = (controls.SteerLeft + controls.SteerRight)/2;
+	float divisor = (controls.SteerRight - controls.SteerLeft) / 10000.0f;
+	int wheelCenterDeviation = controls.SteerVal - centerPos;
+	int centerForce = static_cast<int>((wheelCenterDeviation / divisor) * speed * 0.25) +
+					  static_cast<int>((wheelCenterDeviation / divisor) * std::abs(accelValsAvg.y) * 0.25);
 
 
 	// start oversteer detect
@@ -1240,8 +1238,7 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 	float compSpeedTotal = 0.0f;
 	if (!vehData.IsBike) {
 		auto compSpeed = vehData.GetWheelCompressionSpeeds();
-		//showText(0.01, 0.550, 0.4, std::to_string(compSpeed.at(0)).c_str());
-		//showText(0.01, 0.575, 0.4, std::to_string(compSpeed.at(1)).c_str());
+
 		// left should pull left, right should pull right
 		compSpeedTotal = -compSpeed[0] + compSpeed[1];
 	}
