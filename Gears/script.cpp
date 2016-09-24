@@ -350,56 +350,58 @@ void showNotification(char* message) {
 }
 
 void showDebugInfo() {
-	std::stringstream infos;
-	infos << "RPM: " << std::setprecision(3) << vehData.Rpm;
-	showText(0.01f, 0.300f, 0.4f, infos.str().c_str());
+	std::stringstream ssRPM;
+	ssRPM << "RPM: " << std::setprecision(3) << vehData.Rpm;
+	showText(0.01f, 0.300f, 0.4f, ssRPM.str().c_str());
 
-	std::stringstream nCurrGear;
-	nCurrGear << "CurrGear: " << vehData.CurrGear;
-	showText(0.01f, 0.325f, 0.4f, nCurrGear.str().c_str());
+	std::stringstream ssCurrGear;
+	ssCurrGear << "CurrGear: " << vehData.CurrGear;
+	showText(0.01f, 0.325f, 0.4f, ssCurrGear.str().c_str());
 
-	std::stringstream nNextGear;
-	nNextGear << "NextGear: " << vehData.NextGear;
-	showText(0.01f, 0.350f, 0.4f, nNextGear.str().c_str());
+	std::stringstream ssNextGear;
+	ssNextGear << "NextGear: " << vehData.NextGear;
+	showText(0.01f, 0.350f, 0.4f, ssNextGear.str().c_str());
 
-	std::stringstream nClutch;
-	nClutch << "Clutch: " << std::setprecision(3) << vehData.Clutch;
-	showText(0.01f, 0.375f, 0.4f, nClutch.str().c_str());
+	std::stringstream ssClutch;
+	ssClutch << "Clutch: " << std::setprecision(3) << vehData.Clutch;
+	showText(0.01f, 0.375f, 0.4f, ssClutch.str().c_str());
 
-	std::stringstream nThrottle;
-	nThrottle << "Throttle: " << std::setprecision(3) << vehData.Throttle;
-	showText(0.01f, 0.400f, 0.4f, nThrottle.str().c_str());
+	std::stringstream ssThrottle;
+	ssThrottle << "Throttle: " << std::setprecision(3) << vehData.Throttle;
+	showText(0.01f, 0.400f, 0.4f, ssThrottle.str().c_str());
 
-	std::stringstream nTurbo;
-	nTurbo << "Turbo: " << std::setprecision(3) << vehData.Turbo;
-	showText(0.01f, 0.425f, 0.4f, nTurbo.str().c_str());
+	std::stringstream ssTurbo;
+	ssTurbo << "Turbo: " << std::setprecision(3) << vehData.Turbo;
+	showText(0.01f, 0.425f, 0.4f, ssTurbo.str().c_str());
 
-	std::stringstream nAddress;
-	nAddress << "Address: " << std::hex << vehData.Address;
-	showText(0.01f, 0.450f, 0.4f, nAddress.str().c_str());
+	std::stringstream ssAddress;
+	ssAddress << "Address: " << std::hex << vehData.Address;
+	showText(0.01f, 0.450f, 0.4f, ssAddress.str().c_str());
 
-	std::stringstream nE;
-	nE << "E: " << (settings.EnableManual ? "Y" : "N");
-	showText(0.01f, 0.475f, 0.4f, nE.str().c_str());
+	std::stringstream ssEnabled;
+	ssEnabled << "Mod " << (settings.EnableManual ? "Enabled" : "Disabled");
+	showText(0.01f, 0.475f, 0.4f, ssEnabled.str().c_str());
 
-	std::stringstream nWheelAddr;
-	nWheelAddr << "WheelAddress: " << std::hex << ext.GetWheelsPtr(vehicle);
-	showText(0.01f, 0.500, 0.4f, nWheelAddr.str().c_str());
+	/*std::stringstream ssWheelAddr;
+	ssWheelAddr << "WheelAddress: " << std::hex << ext.GetWheelsPtr(vehicle);
+	showText(0.01f, 0.500, 0.4f, ssWheelAddr.str().c_str());*/
 
+	std::stringstream ssThrottleInput;
+	ssThrottleInput << "ThrottleVal: " << controls.ThrottleVal;
 
-	std::stringstream throttleDisplay;
-	throttleDisplay << "ThrottleVal: " << controls.ThrottleVal;
-	std::stringstream brakeDisplay;
-	brakeDisplay << "Brake Value: " << controls.BrakeVal;
-	std::stringstream clutchDisplay;
-	clutchDisplay << "ClutchValue: " << controls.ClutchVal;
-	std::stringstream clutcheDisplay;
-	clutcheDisplay << "E: " << (controls.ClutchDisable ? "Y" : "N");
+	std::stringstream ssBrakeInput;
+	ssBrakeInput << "Brake Value: " << controls.BrakeVal;
 
-	showText(0.85, 0.050, 0.4, throttleDisplay.str().c_str());
-	showText(0.85, 0.075, 0.4, brakeDisplay.str().c_str());
-	showText(0.85, 0.100, 0.4, clutchDisplay.str().c_str());
-	showText(0.80, 0.100, 0.4, clutcheDisplay.str().c_str());
+	std::stringstream ssClutchInput;
+	ssClutchInput << "ClutchValue: " << controls.ClutchVal;
+
+	std::stringstream ssClutchDisable;
+	ssClutchDisable << (controls.ClutchDisable ? "Disabled:" : "");
+
+	showText(0.85, 0.050, 0.4, ssThrottleInput.str().c_str());
+	showText(0.85, 0.075, 0.4, ssBrakeInput.str().c_str());
+	showText(0.85, 0.100, 0.4, ssClutchInput.str().c_str());
+	showText(0.795, 0.100, 0.4, ssClutchDisable.str().c_str());
 
 
 	if (settings.WheelEnabled) {
@@ -407,12 +409,6 @@ void showDebugInfo() {
 		dinputDisplay << "Wheel Avail: " << controls.WheelDI.IsConnected();
 		showText(0.85, 0.150, 0.4, dinputDisplay.str().c_str());
 	}
-
-	/*for (int i = 0; i < MAX_RGBBUTTONS; i++) {
-		if (controls.wheelState->rgbButtons[i]) {
-			showText(0.4, 0.4, 2.0, std::to_string(i).c_str());
-		}
-	}*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////
