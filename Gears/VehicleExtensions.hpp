@@ -3,7 +3,6 @@
 #include <cstdint>
 #include "../../ScriptHookV_SDK/inc/types.h"
 #include "NativeMemory.hpp"
-#include <memory>
 #include <vector>
 
 class VehicleExtensions {

@@ -14,13 +14,14 @@ http://dev-c.com
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 	Logger logger(LOGFILE);
 	switch (reason) {
-		case DLL_PROCESS_ATTACH:
+		case DLL_PROCESS_ATTACH: {
 			scriptRegister(hInstance, ScriptMain);
 			logger.Clear();
 			logger.Write(eGameVersionToString(getGameVersion()));
 			logger.Write("Script loaded");
 			break;
-		case DLL_PROCESS_DETACH:
+		}
+		case DLL_PROCESS_DETACH: {
 			logger.Write("Init shutdown");
 			//if (LogiIsConnected(0)) {
 			//resetWheelFeedback(0);
@@ -36,6 +37,10 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 					logger.Write("Shut down script with instructions not restored");
 			}
 			scriptUnregister(hInstance);
+			break;
+		}
+		default:
+			// Yeah no
 			break;
 	}
 	return TRUE;

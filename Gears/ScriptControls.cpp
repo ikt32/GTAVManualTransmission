@@ -72,22 +72,22 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 					if (BrakeMax > pivot) { // TMIN = BMIN
 						// 0 TMAX < TMIN/PIVOT/BMIN < BMAX 65535
 						if (RawT < pivot) { // Throttle
-							ThrottleVal = 1.0f - (float)(RawT - ThrottleMax) / (float)pivot;
+							ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleMax) / static_cast<float>(pivot);
 							BrakeVal = 0;
 						} else { // Brake
 							ThrottleVal = 0;
-							BrakeVal = (float)(RawT - BrakeMin) / (float)pivot;
+							BrakeVal = static_cast<float>(RawT - BrakeMin) / static_cast<float>(pivot);
 						}
 					} // Only this has been verified
 					else { // TMAX = BMIN
 						// 0 BMAX < BMIN/PIVOT/TMAX < TMIN 65535
 						if (RawT > pivot) { // Throttle
-							ThrottleVal = 1.0f - (float)(RawT - ThrottleMax) / (float)pivot;
+							ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleMax) / static_cast<float>(pivot);
 							BrakeVal = 0;
 						}
 						else { // Brake
 							ThrottleVal = 0;
-							BrakeVal = 1.0f - (float)(RawT - BrakeMax) / (float)pivot;
+							BrakeVal = 1.0f - static_cast<float>(RawT - BrakeMax) / static_cast<float>(pivot);
 						}
 					}
 				}
@@ -95,23 +95,23 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 					if (BrakeMin > pivot) { //TMIN = BMAX
 						// TMAX X < TMIN/PIVOT/BMAX < BMIN 65535
 						if (RawT < pivot) { // Throttle
-							ThrottleVal = 1.0f - (float)(RawT - ThrottleMax) / (float)pivot;
+							ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleMax) / static_cast<float>(pivot);
 							BrakeVal = 0;
 						}
 						else { // Brake
 							ThrottleVal = 0;
-							BrakeVal = 1.0f - (float)(RawT - BrakeMax) / (float)pivot;
+							BrakeVal = 1.0f - static_cast<float>(RawT - BrakeMax) / static_cast<float>(pivot);
 						}
 					}
 					else { // TMAX = BMAX
 						// 0 BMIN < BMAX/PIVOT/TMAX < TMIN 65535
 						if (RawT > pivot) { // Throttle
-							ThrottleVal = 1.0f - (float)(RawT - ThrottleMax) / (float)pivot;
+							ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleMax) / static_cast<float>(pivot);
 							BrakeVal = 0;
 						}
 						else { // Brake
 							ThrottleVal = 0;
-							BrakeVal = (float)(RawT - BrakeMin) / (float)pivot;
+							BrakeVal = static_cast<float>(RawT - BrakeMin) / static_cast<float>(pivot);
 						}
 					}
 				}

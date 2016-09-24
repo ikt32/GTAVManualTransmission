@@ -175,6 +175,8 @@ void update() {
 				break;
 			case Automatic: mode = "Automatic";
 				break;
+			default: // yeah no
+				break;
 		}
 		message << "Mode: " << mode;
 		showNotification(const_cast<char *>(message.str().c_str()));

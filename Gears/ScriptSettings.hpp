@@ -33,7 +33,6 @@ public:
 	int DamperMin;
 	float FFPhysics;
 	float CenterStrength;
-	bool DisableDpad;
 
 	bool CrossScript;
 	bool Debug;

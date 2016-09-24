@@ -24,7 +24,7 @@ ScriptSettings::ScriptSettings() {
 	DamperMin = 30;
 	FFPhysics = 1.0f;
 	CenterStrength = 1.0f;
-	DisableDpad = false;
+	DetailStrength = 100.0f;
 
 	Debug = false;
 
@@ -114,7 +114,6 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	// Start wheel section
 	WheelEnabled = (GetPrivateProfileIntA("WHEEL", "Enable", 0, SETTINGSFILE) == 1);
 	WheelWithoutManual = (GetPrivateProfileIntA("WHEEL", "WheelWithoutManual", 1, SETTINGSFILE) == 1);
-	DisableDpad = (GetPrivateProfileIntA("WHEEL", "DisableDpad", 0, SETTINGSFILE) == 1);
 
 	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Toggle)] = GetPrivateProfileIntA("WHEEL", "Toggle", 17, SETTINGSFILE);
 	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ToggleH)] = GetPrivateProfileIntA("WHEEL", "ToggleH", 6, SETTINGSFILE);
