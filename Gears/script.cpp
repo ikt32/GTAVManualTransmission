@@ -1157,12 +1157,11 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		return;
 	}
 
+	// Macro FFB effects on the car body
 	int constantForce = -100 * static_cast<int>(settings.FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
 	
-
-	// targetSpeed in m/s
 	// targetSpeed is the speed at which the damperForce is at minimum
-	// damperForce is maximum at 0 and keeps decreasing
+	// damperForce is maximum at speed 0 and decreases with speed increase
 	float adjustRatio = static_cast<float>(settings.DamperMax) / static_cast<float>(settings.TargetSpeed);
 	int damperForce = settings.DamperMax - static_cast<int>(speed * adjustRatio);
 
@@ -1173,13 +1172,14 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		damperForce = settings.DamperMin;
 	}
 
-	// Holy batman readability = 0
+	// steerSpeed is to dampen the steering wheel
 	auto steerSpeed = controls.WheelDI.GetAxisSpeed(
 		controls.WheelDI.StringToAxis(
 			controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)]
 		)
 	)/20;
 
+	// Centering
 	int centerPos = (controls.SteerLeft + controls.SteerRight)/2;
 	float divisor = (controls.SteerRight - controls.SteerLeft) / 10000.0f;
 	int wheelCenterDeviation = controls.SteerVal - centerPos;
@@ -1222,9 +1222,12 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 
 	float gripSpeedThreshold = 4.0f;
 
+	// On understeering conditions, lower "grippy" feel
 	if (understeer > 0.01f && vehData.Velocity > gripSpeedThreshold) {
 		centerForce = static_cast<int>((1.0f - understeer) * centerForce);
 	}
+
+	// On oversteering conditions, let physics dictate the feel
 	if (oversteer > 0.01f && vehData.Velocity > gripSpeedThreshold) {
 		centerForce = 0;
 		damperForce = settings.DamperMin + static_cast<int>(oversteer * (settings.DamperMax - settings.DamperMin));
@@ -1235,6 +1238,7 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		damperForce = settings.DamperMin;
 	}
 
+	// Detail feel / suspension compression based
 	float compSpeedTotal = 0.0f;
 	if (!vehData.IsBike) {
 		auto compSpeed = vehData.GetWheelCompressionSpeeds();
@@ -1243,8 +1247,7 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		compSpeedTotal = -compSpeed[0] + compSpeed[1];
 	}
 
-
-
+	// Cancel all effects except dampening
 	if (airborne) {
 		constantForce = 0;
 		centerForce = 0;
@@ -1264,25 +1267,27 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		showText(0.85, 0.175, 0.4, SteerValue.str().c_str());
 
 		std::stringstream steerDisplay;
-		steerDisplay << "SteerSpeed: " << steerSpeed << std::endl;
+		steerDisplay << "SteerSpeed: " << steerSpeed;
 		showText(0.85, 0.200, 0.4, steerDisplay.str().c_str());
 		
 		std::stringstream forceDisplay;
-		forceDisplay << "ConstForce: " << constantForce << std::endl;
+		forceDisplay << "ConstForce: " << constantForce;
 		showText(0.85, 0.225, 0.4, forceDisplay.str().c_str());
 
 		std::stringstream damperF;
-		damperF << "DampForce: " << damperForce << std::endl;
+		damperF << "DampForce: " << damperForce;
 		showText(0.85, 0.250, 0.4, damperF.str().c_str());
 
 		std::stringstream centerDisplay;
-		centerDisplay << "CenterForce: " << centerForce << std::endl;
+		centerDisplay << "CenterForce: " << centerForce;
 		showText(0.85, 0.275, 0.4, centerDisplay.str().c_str());
 		
-		if (understeer > 0.1f)
-			showText(0.85, 0.300, 0.4, "UNDERSTEER");
+		std::stringstream ssUnderSteer;
+		ssUnderSteer << "Understeer: " << understeer;
+		showText(0.85, 0.300, 0.4, ssUnderSteer.str().c_str());
 
-		if (oversteer > 0.1f)
-			showText(0.85, 0.300, 0.4, "OVERSTEER");
+		std::stringstream ssOverSteer;
+		ssOverSteer << "Oversteer: " << oversteer;
+		showText(0.85, 0.325, 0.4, ssOverSteer.str().c_str());
 	}
 }

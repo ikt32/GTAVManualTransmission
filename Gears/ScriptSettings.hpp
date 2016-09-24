@@ -46,6 +46,8 @@ public:
 	float RPMDamage;
 	int MisshiftDamage;
 	bool WheelWithoutManual;
+
+	// TargetSpeed in m/s
 	int TargetSpeed;
 	bool HillBrakeWorkaround;
 	float DetailStrength;
