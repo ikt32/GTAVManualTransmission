@@ -673,15 +673,35 @@ void functionClutchCatch() {
 	if (controls.ClutchVal < 1.0f - settings.ClutchCatchpoint) {
 		// Forward
 		if (vehData.CurrGear > 0 && vehData.Velocity < vehData.CurrGear * 2.2f &&
-		                            controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.37f);
+		    controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
+			if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.37f);
+			}
+			else {
+				if (vehData.Rpm < 0.3f) {
+					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.28f);
+				} else {
+					ext.SetCurrentRPM(vehicle, 0.28f);
+				}
+			}
+		}
+
+		// Reverse
+		if (vehData.CurrGear == 0 && vehData.Velocity > -2.2f &&
+			controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
+			if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.37f);
+			}
+			else if (vehData.Rpm < 0.3f) {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.28f);
+			}
 		}
 	}
 }
 
 void functionEngStall() {
 	if (controls.ClutchVal < 1.0f - settings.StallingThreshold &&
-		vehData.Rpm < 0.25f &&
+		vehData.Rpm < 0.21f &&
 		((vehData.Speed < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && vehData.Speed < 1.0f)) &&
 		VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
