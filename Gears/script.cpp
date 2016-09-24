@@ -656,7 +656,7 @@ void functionAShift() {
 
 	// Shift down
 	if ((vehData.CurrGear > 1 && vehData.Rpm < 0.4f) ||
-		(vehData.CurrGear > 1 && vehData.Rpm < 0.65f) && vehData.Throttle > 0.95f) {
+		(vehData.CurrGear > 1 && vehData.Rpm < 0.5f) && vehData.Throttle > 0.95f) {
 		shiftTo(vehData.CurrGear - 1, true);
 	}
 }
@@ -992,12 +992,18 @@ void functionAutoReverse() {
 //                       Mod functions: Buttons
 ///////////////////////////////////////////////////////////////////////////////
 void handleVehicleButtons() {
-	if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
-		controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) ||
+	if  (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
+		(controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) ||
 		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine) ||
-		controls.ThrottleVal > 0.98f && controls.ClutchVal > settings.ClutchCatchpoint) {
+		controls.ThrottleVal > 0.98f && controls.ClutchVal > settings.ClutchCatchpoint)) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
+	}
+	if  (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
+		(controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) ||
+		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
+		controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine))) {
+		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 	}
 
 	if (controls.ButtonIn(ScriptControls::WheelControlType::Handbrake)) {
