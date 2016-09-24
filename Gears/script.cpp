@@ -659,7 +659,8 @@ void functionAShift() {
 	}
 
 	// Shift down
-	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
+	if ((vehData.CurrGear > 1 && vehData.Rpm < 0.4f) ||
+		(vehData.CurrGear > 1 && vehData.Rpm < 0.65f) && vehData.Throttle > 0.95f) {
 		shiftTo(vehData.CurrGear - 1, true);
 	}
 }
