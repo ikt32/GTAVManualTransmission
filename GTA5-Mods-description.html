@@ -95,7 +95,6 @@ Scripts changing torque
 <b>4.0</b>
 This release is primarily focused on making the mod compatible with all wheels.
 <ul>
-    <li>Remove Logitech specific wheel support</li>
     <li>Add DirectInput for almost ALL wheels! All inputs should be supported:
         <ul>
             <li>All analog input axes                       </li>
@@ -111,18 +110,22 @@ This release is primarily focused on making the mod compatible with all wheels.
             <li>Force feedback enabled!</li>
         </ul>
     </li>
+    <li>Add wheel to keyboard assignments</li>
     <li>Rewrote FFB from scratch
         <ul>
-            <li>More detailed and responsive                                     </li>
+            <li>More force feedback details on wheel level</li>
+            <li>Better responsiveness</li>
             <li>Understeer and oversteer conditions for force feedback parameters</li>
         </ul>
     </li>
     <li>Included a tool to read the raw axes, to help you configure your wheel
         <ul>
-            <li>A G27 with separate axes example available</li>
-            <li>A G27 with combined axes example available</li>
+            <li>A G27 with separate axes example available in Gears.ini</li>
+            <li>A G27 with combined axes example available in Gears.ini</li>
         </ul>
     </li>
+    <li>Properly re-acquire wheel on mod toggle</li>
+    <li>Removed Logitech specific wheel support</li>
 </ul>
 Non-wheel related changes
 <ul>
@@ -130,23 +133,14 @@ Non-wheel related changes
     <li>Add a hill starting effect, compensating for GTA V’s automatic brakes</li>
     <li>Allow turning off cross-script communication for CitizenFX-based mods</li>
     <li>Dropped SimpleReverse</li>
-</ul>
-
-Beta2 -> Beta3 changes
-<ul>
     <li>Disable engine damage for electric vehicles</li>
-    <li>Remove debug text</li>
-    <li>Change understeer calculation</li>
-    <li>Change oversteer transition</li>
     <li>Add user defined controller analog-as-button trigger value</li>
-    <li>Disable stalling in auto gearbox</li>
-    <li>Add wheel to keyboard input</li>
-    <li>Added Joystick.exe to archive</li>
-</ul>
-
-Beta3 -> Beta3 changes (no version change)
-<ul>
-    <li>Fix/Improve wheel to keyboard input</li>
+    <li>Change onscreen debug text format</li>
+    <li>Increase engine braking strength</li>
+    <li>Enable clutch catching for reverse (driver might play animation weirdly)</li>
+    <li>Fix clutch catching when car is upside down</li>
+    <li>Add engine off toggle for engine button</li>
+    <li>Disable low RPM power loss</li>
 </ul>
 
 <b>3.0.2</b>
