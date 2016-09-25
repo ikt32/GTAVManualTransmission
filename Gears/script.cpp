@@ -1157,6 +1157,10 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		return;
 	}
 
+	if (controls.WheelDI.NoFeedback) {
+		return;
+	}
+
 	// Macro FFB effects on the car body
 	int constantForce = -100 * static_cast<int>(settings.FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
 	

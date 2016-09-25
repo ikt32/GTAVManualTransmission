@@ -65,7 +65,8 @@ bool WheelDirectInput::InitWheel(std::string &ffAxis) {
 			
 			logger.Write("Init FF Effect on axis " + ffAxis);
 			if (!CreateConstantForceEffect(ffAxis)) {
-				logger.Write("Error initializing Constant Force Effect");
+				logger.Write("Error initializing FF - wrong axis?");
+				NoFeedback = true;
 				return false;
 			}
 			logger.Write("Init FF Effect SUCCESS");
@@ -214,6 +215,9 @@ void WheelDirectInput::UpdateButtonChangeStates() {
 }
 
 bool WheelDirectInput::CreateConstantForceEffect(std::string &axis) {
+	if (NoFeedback)
+		return false;
+
 	DWORD ffAxis;
 	if (axis == "X") {
 		ffAxis = DIJOFS_X;
@@ -266,6 +270,9 @@ bool WheelDirectInput::CreateConstantForceEffect(std::string &axis) {
 }
 
 HRESULT WheelDirectInput::SetConstantForce(int force) const {
+	if (NoFeedback)
+		return false; 
+	
 	HRESULT hr;
 	LONG rglDirection[1] = {0};
 	

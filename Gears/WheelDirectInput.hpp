@@ -37,6 +37,7 @@ public:
 		"rglSlider1",
 		"UNKNOWN_AXIS"
 	};
+	bool NoFeedback = false;
 
 	enum POV {
 		N = 3600,
