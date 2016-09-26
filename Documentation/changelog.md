@@ -7,6 +7,7 @@ A few small fixes
 *   Fix crash when force feedback can't be initialized
 *   Fix wheel radio button toggled on reset
 *   Fix wheel jerk on reset
+*   Fix jerky reverse animation
 *   Disable automatic reversal on motorbikes if `SimpleBike` is turned off
 *   Add an option to only show the Neutral gear `N`
 *   Change gear `0` display to `R`
