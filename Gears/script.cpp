@@ -187,6 +187,12 @@ void update() {
 			         settings.UITips_Size,
 			         "N");
 		}
+		else if (vehData.CurrGear == 0) {
+			showText(settings.UITips_X,
+					 settings.UITips_Y,
+					 settings.UITips_Size,
+					 "R");
+		}
 		else {
 			showText(settings.UITips_X,
 			         settings.UITips_Y,
