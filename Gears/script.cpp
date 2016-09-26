@@ -1014,6 +1014,10 @@ void handleVehicleButtons() {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 	}
 
+	if (!controls.WheelDI.IsConnected() || controls.WheelDI.NoFeedback || prevInput != ScriptControls::Wheel) {
+		return;
+	}
+
 	if (controls.ButtonIn(ScriptControls::WheelControlType::Handbrake)) {
 		//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
 		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);

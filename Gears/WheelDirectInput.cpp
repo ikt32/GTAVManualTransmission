@@ -69,6 +69,7 @@ bool WheelDirectInput::InitWheel(std::string &ffAxis) {
 			}
 			logger.Write("Initializing force feedback success");
 			UpdateState();
+			UpdateState(); // kill me
 			prevTime = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 			logger.Write("Initializing wheel success");
 			return true;
@@ -89,7 +90,7 @@ void WheelDirectInput::UpdateState() {
 
 	const DiJoyStick::Entry* e = djs.getEntry(0);
 	if (e) {
-		JoyState = e->joystate;;
+		JoyState = e->joystate;
 	}
 }
 
