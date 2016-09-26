@@ -51,6 +51,7 @@ public:
 	int TargetSpeed;
 	bool HillBrakeWorkaround;
 	float DetailStrength;
+	bool UITips_OnlyNeutral;
 private:
 	void CheckSettings();
 };

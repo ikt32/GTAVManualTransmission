@@ -16,6 +16,7 @@ ScriptSettings::ScriptSettings() {
 	ClutchShifting = false;
 	DefaultNeutral = false;
 	UITips = false;
+	UITips_OnlyNeutral = false;
 	ShiftMode = 0;
 	WheelEnabled = false;
 	//WheelRange = 180;
@@ -54,6 +55,7 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	ClutchShifting = (GetPrivateProfileIntA("OPTIONS", "ClutchShifting", 0, SETTINGSFILE) == 1);
 	DefaultNeutral = (GetPrivateProfileIntA("OPTIONS", "DefaultNeutral", 0, SETTINGSFILE) == 1);
 	UITips = (GetPrivateProfileIntA("OPTIONS", "UITips", 1, SETTINGSFILE) == 1);
+	UITips_OnlyNeutral = (GetPrivateProfileIntA("OPTIONS", "UITips_OnlyNeutral", 0, SETTINGSFILE) == 1);
 	UITips_X = GetPrivateProfileIntA("OPTIONS", "UITips_X", 95, SETTINGSFILE) / 100.0f;
 	UITips_Y = GetPrivateProfileIntA("OPTIONS", "UITips_Y", 95, SETTINGSFILE) / 100.0f;
 	UITips_Size = GetPrivateProfileIntA("OPTIONS", "UITips_Size", 15, SETTINGSFILE) / 100.0f;

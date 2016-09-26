@@ -187,13 +187,13 @@ void update() {
 			         settings.UITips_Size,
 			         "N");
 		}
-		else if (vehData.CurrGear == 0) {
+		else if (vehData.CurrGear == 0 && !settings.UITips_OnlyNeutral) {
 			showText(settings.UITips_X,
 					 settings.UITips_Y,
 					 settings.UITips_Size,
 					 "R");
 		}
-		else {
+		else if (!settings.UITips_OnlyNeutral) {
 			showText(settings.UITips_X,
 			         settings.UITips_Y,
 			         settings.UITips_Size,
@@ -881,12 +881,12 @@ void functionRealReverse() {
 	if (vehData.CurrGear == 0) {
 		ext.SetThrottleP(vehicle, -0.1f);
 		// RT behavior
-		if (controls.ThrottleVal > 0.02f && controls.ThrottleVal > controls.BrakeVal) {
+		if (controls.ThrottleVal > 0.01f && controls.ThrottleVal > controls.BrakeVal) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, controls.ThrottleVal);
 		}
 		// LT behavior when still
-		if (controls.BrakeVal > 0.0f && controls.ThrottleVal <= controls.BrakeVal &&
+		if (controls.BrakeVal > 0.01f && controls.ThrottleVal <= controls.BrakeVal &&
 		                                vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
@@ -896,7 +896,7 @@ void functionRealReverse() {
 			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
 		// LT behavior when reversing
-		if (controls.BrakeVal > 0.02f &&
+		if (controls.BrakeVal > 0.01f &&
 			vehData.Velocity <= -0.5f) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.BrakeVal);
