@@ -5,68 +5,35 @@
 #include <string>
 
 ScriptSettings::ScriptSettings() {
-	EnableManual = true;
-//	RealReverse = true;
-	SimpleBike = true;
-
-	EngDamage = false;
-	EngStall = false;
-	EngBrake = false;
-	ClutchCatching = false;
-	ClutchShifting = false;
-	DefaultNeutral = false;
-	UITips = false;
-	UITips_OnlyNeutral = false;
-	ShiftMode = 0;
-	WheelEnabled = false;
-	//WheelRange = 180;
-	FFEnable = true;
-	DamperMax = 60;
-	DamperMin = 30;
-	FFPhysics = 1.0f;
-	CenterStrength = 1.0f;
-	DetailStrength = 100.0f;
-
-	Debug = false;
-
-	UITips_X = 0.0f;
-	UITips_Y = 0.0f;
-	UITips_Size = 0.0f;
-
-	ClutchCatchpoint = 0.0f;
-	StallingThreshold = 0.0f;
-	RPMDamage = 0.0f;
-	MisshiftDamage = 0;
-	WheelWithoutManual = true;
-	CrossScript = false;
-	TargetSpeed = 10;
-	HillBrakeWorkaround = false;
 }
 
 
 void ScriptSettings::Read(ScriptControls* scriptControl) {
 	EnableManual = (GetPrivateProfileIntA("OPTIONS", "Enable", 1, SETTINGSFILE) == 1);
 	ShiftMode = GetPrivateProfileIntA("OPTIONS", "ShiftMode", 0, SETTINGSFILE);
-	SimpleBike = (GetPrivateProfileIntA("OPTIONS", "SimpleBike", 1, SETTINGSFILE) == 1);
+	SimpleBike = (GetPrivateProfileIntA("OPTIONS", "SimpleBike", 0, SETTINGSFILE) == 1);
+	CrossScript = (GetPrivateProfileIntA("OPTIONS", "CrossScript", 0, SETTINGSFILE) == 1);
+	HillBrakeWorkaround = (GetPrivateProfileIntA("OPTIONS", "HillBrakeWorkaround", 0, SETTINGSFILE) == 1);
+
 	EngDamage = (GetPrivateProfileIntA("OPTIONS", "EngineDamage", 0, SETTINGSFILE) == 1);
 	EngStall = (GetPrivateProfileIntA("OPTIONS", "EngineStalling", 0, SETTINGSFILE) == 1);
 	EngBrake = (GetPrivateProfileIntA("OPTIONS", "EngineBraking", 0, SETTINGSFILE) == 1);
+	RPMDamage = GetPrivateProfileIntA("OPTIONS", "RPMDamage", 15, SETTINGSFILE) / 100.0f;
+	MisshiftDamage = GetPrivateProfileIntA("OPTIONS", "MisshiftDamage", 10, SETTINGSFILE);
+
 	ClutchCatching = (GetPrivateProfileIntA("OPTIONS", "ClutchCatching", 0, SETTINGSFILE) == 1);
 	ClutchShifting = (GetPrivateProfileIntA("OPTIONS", "ClutchShifting", 0, SETTINGSFILE) == 1);
+	ClutchCatchpoint = GetPrivateProfileIntA("OPTIONS", "ClutchCatchpoint", 15, SETTINGSFILE) / 100.0f;
+	StallingThreshold = GetPrivateProfileIntA("OPTIONS", "StallingThreshold", 75, SETTINGSFILE) / 100.0f;
 	DefaultNeutral = (GetPrivateProfileIntA("OPTIONS", "DefaultNeutral", 0, SETTINGSFILE) == 1);
+	
 	UITips = (GetPrivateProfileIntA("OPTIONS", "UITips", 1, SETTINGSFILE) == 1);
 	UITips_OnlyNeutral = (GetPrivateProfileIntA("OPTIONS", "UITips_OnlyNeutral", 0, SETTINGSFILE) == 1);
 	UITips_X = GetPrivateProfileIntA("OPTIONS", "UITips_X", 95, SETTINGSFILE) / 100.0f;
 	UITips_Y = GetPrivateProfileIntA("OPTIONS", "UITips_Y", 95, SETTINGSFILE) / 100.0f;
 	UITips_Size = GetPrivateProfileIntA("OPTIONS", "UITips_Size", 15, SETTINGSFILE) / 100.0f;
-	Debug = (GetPrivateProfileIntA("DEBUG", "Info", 0, SETTINGSFILE) == 1);
-	ClutchCatchpoint = GetPrivateProfileIntA("OPTIONS", "ClutchCatchpoint", 20, SETTINGSFILE) / 100.0f;
-	StallingThreshold = GetPrivateProfileIntA("OPTIONS", "StallingThreshold", 25, SETTINGSFILE) / 100.0f;
 
-	RPMDamage = GetPrivateProfileIntA("OPTIONS", "RPMDamage", 15, SETTINGSFILE) / 100.0f;
-	MisshiftDamage = GetPrivateProfileIntA("OPTIONS", "MisshiftDamage", 10, SETTINGSFILE);
-	CrossScript = (GetPrivateProfileIntA("OPTIONS", "CrossScript", 0, SETTINGSFILE) == 1);
-	HillBrakeWorkaround = (GetPrivateProfileIntA("OPTIONS", "HillBrakeWorkaround", 0, SETTINGSFILE) == 1);
+	Debug = (GetPrivateProfileIntA("DEBUG", "Info", 0, SETTINGSFILE) == 1);
 
 	// Start Controller section
 	char buffer[24] = {0};

@@ -13,45 +13,47 @@ public:
 	void Read(ScriptControls* scriptControl);
 	void Save() const;
 
-	bool EnableManual;
-	//bool RealReverse;
-	bool SimpleBike;
+	bool EnableManual = true;
+	int ShiftMode = 0; 	// 0 Seq, 1 H, 2 Auto
+	bool SimpleBike = false;
+	bool CrossScript = false;
+	bool HillBrakeWorkaround = false;
 
-	bool EngDamage;
-	bool EngStall;
-	bool EngBrake;
-	bool ClutchCatching;
-	bool ClutchShifting;
-	bool DefaultNeutral;
-	bool UITips;
-	// 0 Seq, 1 H, 2 Auto
-	int ShiftMode;
-	bool WheelEnabled;
+	bool EngDamage = false;
+	bool EngStall = false;
+	bool EngBrake = false;
+	float RPMDamage = 1.5f;
+	int MisshiftDamage = 10;
+
+	bool ClutchCatching = false;
+	bool ClutchShifting = false;
+	float ClutchCatchpoint = 0.15f;
+	float StallingThreshold = 0.75f;
+	bool DefaultNeutral = false;
+
+	
+	bool UITips = true;
+	bool UITips_OnlyNeutral = false;
+	float UITips_X = 0.95f;
+	float UITips_Y = 0.95f;
+	float UITips_Size = 1.0f;
+
+	bool Debug = false;
+
+	bool WheelEnabled = false;
+	bool WheelWithoutManual = true;
+
 	//int WheelRange;
-	bool FFEnable;
-	int DamperMax;
-	int DamperMin;
-	float FFPhysics;
-	float CenterStrength;
-
-	bool CrossScript;
-	bool Debug;
-
-	float UITips_X;
-	float UITips_Y;
-	float UITips_Size;
-
-	float ClutchCatchpoint;
-	float StallingThreshold;
-	float RPMDamage;
-	int MisshiftDamage;
-	bool WheelWithoutManual;
-
+	bool FFEnable = true;
+	int DamperMax = 50;
+	int DamperMin = 10;
 	// TargetSpeed in m/s
-	int TargetSpeed;
-	bool HillBrakeWorkaround;
-	float DetailStrength;
-	bool UITips_OnlyNeutral;
+	int TargetSpeed = 10;
+	float FFPhysics = 1.0f;
+	float CenterStrength = 1.0f;
+	float DetailStrength = 100.0f;
+
+
 private:
 	void CheckSettings();
 };
