@@ -25,7 +25,7 @@ bool WheelDirectInput::InitWheel(std::string &ffAxis) {
 		auto e = djs.getEntry(0);
 
 		if (e) {
-			logger.Write("Initializing Force Feedback");
+			logger.Write("Initializing force feedback");
 			e->diDevice->Unacquire();
 			HRESULT hr;
 			if (FAILED( hr = e->diDevice->SetCooperativeLevel(
@@ -61,13 +61,13 @@ bool WheelDirectInput::InitWheel(std::string &ffAxis) {
 				logger.Write("HWND: " + ss.str());
 				return false;
 			}
-			logger.Write("Init FF Effect on axis " + ffAxis);
+			logger.Write("Initializing force feedback effect on axis " + ffAxis);
 			if (!CreateConstantForceEffect(ffAxis)) {
 				logger.Write("Error initializing FF - wrong axis?");
 				NoFeedback = true;
 				return false;
 			}
-			logger.Write("Init FF Effect SUCCESS");
+			logger.Write("Initializing force feedback success");
 			UpdateState();
 			prevTime = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 			logger.Write("Initializing wheel success");
