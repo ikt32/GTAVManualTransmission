@@ -28,7 +28,6 @@ VehicleExtensions ext;
 Hash model;
 
 bool patched = false;
-bool simpleBike = false;
 int prevNotification = 0;
 ScriptControls::InputDevices prevInput;
 
@@ -81,7 +80,6 @@ void update() {
 
 	vehData.UpdateValues(ext, vehicle);
 	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
-	simpleBike = vehData.IsBike && settings.SimpleBike;
 
 	if (prevVehicle != vehicle) {
 		//std::stringstream vehName;
@@ -223,7 +221,7 @@ void update() {
 
 	// Reverse behavior
 	// For bikes, do this automatically.
-	if (vehData.IsBike) {
+	if (vehData.IsBike && settings.SimpleBike) {
 		functionAutoReverse();
 		handlePedalsDefault(
 			controls.ThrottleVal,
@@ -273,7 +271,7 @@ void update() {
 		functionEngDamage();
 	}
 
-	if (!vehData.SimulatedNeutral && !simpleBike && !vehData.NoClutch) {
+	if (!vehData.SimulatedNeutral && !(settings.SimpleBike && vehData.IsBike) && !vehData.NoClutch) {
 		// Stalling
 		if (settings.EngStall && settings.ShiftMode != Automatic) {
 			functionEngStall();
