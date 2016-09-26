@@ -1158,15 +1158,7 @@ void doWheelSteering() {
 
 // This will probably stay in the main source forever
 void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, ScriptSettings& settings, bool airborne) {
-	if (prevInput != ScriptControls::Wheel) {
-		return;
-	}
-
-	if (!controls.WheelDI.IsConnected()) {
-		return;
-	}
-
-	if (controls.WheelDI.NoFeedback) {
+	if (!controls.WheelDI.IsConnected() || controls.WheelDI.NoFeedback || prevInput != ScriptControls::Wheel) {
 		return;
 	}
 

@@ -61,8 +61,6 @@ bool WheelDirectInput::InitWheel(std::string &ffAxis) {
 				logger.Write("HWND: " + ss.str());
 				return false;
 			}
-			logger.Write("Init FF SUCCESS");
-			
 			logger.Write("Init FF Effect on axis " + ffAxis);
 			if (!CreateConstantForceEffect(ffAxis)) {
 				logger.Write("Error initializing FF - wrong axis?");
@@ -70,7 +68,7 @@ bool WheelDirectInput::InitWheel(std::string &ffAxis) {
 				return false;
 			}
 			logger.Write("Init FF Effect SUCCESS");
-			JoyState = e->joystate;
+			UpdateState();
 			prevTime = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 			logger.Write("Initializing wheel success");
 			return true;
@@ -101,10 +99,7 @@ bool WheelDirectInput::IsConnected() const {
 	if (!e) {
 		return false;
 	}	
-	if (djs.getEntryCount() > 0) {
-		return true;
-	}
-	return false;
+	return true;
 }
 
 // Mental note: buttonType in these args means physical button number
@@ -115,8 +110,9 @@ bool WheelDirectInput::IsButtonPressed(int buttonType) {
 	if (buttonType > 127) {
 		switch (buttonType) {
 		case N:
-			if (JoyState.rgdwPOV[0] == 0)
+			if (JoyState.rgdwPOV[0] == 0) {
 				return true;
+			}
 		case NE:
 		case E:
 		case SE:
@@ -130,9 +126,8 @@ bool WheelDirectInput::IsButtonPressed(int buttonType) {
 			return false;
 		}
 	}	
-	if (JoyState.rgbButtons[buttonType]) {
+	if (JoyState.rgbButtons[buttonType])
 		return true;
-	}
 	return false;
 }
 
