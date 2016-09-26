@@ -112,10 +112,10 @@ void update() {
 	}
 
 
-	if (!VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false) &&
-		VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f) {
-		return;
-	}
+	//if (!VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false) &&
+	//	VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f) {
+	//	return;
+	//}
 
 	if (!settings.EnableManual &&
 		settings.WheelWithoutManual &&
@@ -686,8 +686,13 @@ void functionClutchCatch() {
 		}
 
 		// Reverse
-		if (vehData.CurrGear == 0 && vehData.Velocity > -2.2f &&
+		if (vehData.CurrGear == 0 &&
 			controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
+			if (vehData.Velocity < -2.2f) {
+				controls.ClutchVal = 1.0f;
+				//CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.20f);
+				//return;
+			}
 			if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
 				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.37f);
 			}
