@@ -160,6 +160,11 @@ void update() {
 		if (settings.ShiftMode > 2) {
 			settings.ShiftMode = 0;
 		}
+
+		if (settings.ShiftMode == HPattern  && vehData.IsBike) {
+			settings.ShiftMode = Automatic;
+		}
+
 		if (settings.ShiftMode == Sequential && vehData.CurrGear > 1) {
 			vehData.SimulatedNeutral = false;
 		}
@@ -292,7 +297,7 @@ void update() {
 
 
 	// Manual shifting
-	if (settings.ShiftMode == 1 && !vehData.IsBike) {
+	if (settings.ShiftMode == 1) {
 		functionHShiftWheel();
 		functionHShiftKeyboard();
 	}
