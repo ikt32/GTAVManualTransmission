@@ -32,6 +32,7 @@ int prevNotification = 0;
 ScriptControls::InputDevices prevInput;
 
 float prevRpm;
+int prevExtShift = 0;
 
 // This gonna be refactored into vehData or LogiInput somehow
 bool blinkerLeft = false;
@@ -44,6 +45,46 @@ enum Shifter {
 	HPattern = 1,
 	Automatic = 2
 };
+
+
+
+void setShiftMode(int shiftMode) {
+	if (shiftMode > 2 || shiftMode < 0)
+		return;
+
+	if (settings.ShiftMode == HPattern  && vehData.IsBike) {
+		settings.ShiftMode = Automatic;
+	}
+
+	if (settings.ShiftMode == Sequential && vehData.CurrGear > 1) {
+		vehData.SimulatedNeutral = false;
+	}
+
+	std::stringstream message;
+	std::string mode;
+	switch (settings.ShiftMode) {
+		case Sequential: mode = "Sequential";
+			break;
+		case HPattern: mode = "H-Pattern";
+			break;
+		case Automatic: mode = "Automatic";
+			break;
+		default: // yeah no
+			break;
+	}
+	message << "Mode: " << mode;
+	showNotification(const_cast<char *>(message.str().c_str()));
+}
+
+void cycleShiftMode() {
+	settings.ShiftMode++;
+	if (settings.ShiftMode > 2) {
+		settings.ShiftMode = 0;
+	}
+
+	setShiftMode(settings.ShiftMode);
+	settings.Save();
+}
 
 void update() {
 	///////////////////////////////////////////////////////////////////////////
@@ -156,33 +197,7 @@ void update() {
 
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ToggleH) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::ToggleH)) {
-		settings.ShiftMode++;
-		if (settings.ShiftMode > 2) {
-			settings.ShiftMode = 0;
-		}
-
-		if (settings.ShiftMode == HPattern  && vehData.IsBike) {
-			settings.ShiftMode = Automatic;
-		}
-
-		if (settings.ShiftMode == Sequential && vehData.CurrGear > 1) {
-			vehData.SimulatedNeutral = false;
-		}
-		std::stringstream message;
-		std::string mode;
-		switch (settings.ShiftMode) {
-			case Sequential:	mode = "Sequential";
-				break;
-			case HPattern: mode = "H-Pattern";
-				break;
-			case Automatic: mode = "Automatic";
-				break;
-			default: // yeah no
-				break;
-		}
-		message << "Mode: " << mode;
-		showNotification(const_cast<char *>(message.str().c_str()));
-		settings.Save();
+		cycleShiftMode();
 	}
 
 	if (settings.UITips) {
@@ -1114,6 +1129,13 @@ void crossScriptComms() {
 	else {
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_weapon", 0);
 	}
+
+	int currExtShift = DECORATOR::DECOR_GET_INT(vehicle, "hunt_chal_weapon");
+	if (prevExtShift != currExtShift && currExtShift > 0) {
+		// 1 Seq, 2 H, 3 Auto
+		setShiftMode(currExtShift - 1);
+	}
+	prevExtShift = currExtShift;
 }
 
 void updateLastInputDevice() {
