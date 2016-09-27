@@ -87,7 +87,7 @@ public:
 	void InitWheel();
 
 	InputDevices GetLastInputDevice(InputDevices previous);
-	void UpdateValues(InputDevices prevInput);
+	void UpdateValues(InputDevices prevInput, bool ignoreClutch);
 
 	float BrakeVal = 0.0f;
 	float ThrottleVal = 0.0f;

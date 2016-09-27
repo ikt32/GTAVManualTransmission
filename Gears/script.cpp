@@ -95,7 +95,7 @@ void update() {
 	}
 	prevVehicle = vehicle;
 
-	controls.UpdateValues(prevInput);
+	controls.UpdateValues(prevInput, settings.ShiftMode == Automatic);
 
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
 		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||

@@ -15,7 +15,7 @@ void ScriptControls::InitWheel() {
 	WheelDI.InitWheel(FFAxis);
 }
 
-void ScriptControls::UpdateValues(InputDevices prevInput) {
+void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
 	if (controller.IsConnected()) {
 		buttonState = controller.GetState().Gamepad.wButtons;
 		controller.UpdateButtonChangeStates();
@@ -129,6 +129,8 @@ void ScriptControls::UpdateValues(InputDevices prevInput) {
 		}
 		default: break;
 	}
+	if (ignoreClutch)
+		ClutchVal = 0.0f;
 
 	AccelValGTA = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
 	AccelValGTAf = (AccelValGTA - 127) / 127.0f;
