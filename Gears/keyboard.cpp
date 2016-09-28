@@ -26,7 +26,8 @@ void OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BOOL isExtended, 
 	}
 }
 
-const int NOW_PERIOD = 100, MAX_DOWN = 5000; // ms
+// >5 minute holding W or S is improbable
+const int NOW_PERIOD = 100, MAX_DOWN = 300000; // ms
 
 bool IsKeyDown(DWORD key)
 {
