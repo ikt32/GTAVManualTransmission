@@ -26,6 +26,9 @@
     <ClCompile Include="XboxController.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="keyboard.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -71,6 +74,9 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="DiJoyStick.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="keyboard.h">
       <Filter>Input</Filter>
     </ClInclude>
   </ItemGroup>

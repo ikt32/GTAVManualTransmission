@@ -10,12 +10,14 @@ http://dev-c.com
 #include "Logger.hpp"
 #include "MemoryPatcher.hpp"
 #include "Util.hpp"
+#include "keyboard.h"
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 	Logger logger(LOGFILE);
 	switch (reason) {
 		case DLL_PROCESS_ATTACH: {
 			scriptRegister(hInstance, ScriptMain);
+			keyboardHandlerRegister(OnKeyboardMessage);
 			logger.Clear();
 			logger.Write(eGameVersionToString(getGameVersion()));
 			logger.Write("Script loaded");
@@ -37,11 +39,9 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 					logger.Write("Shut down script with instructions not restored");
 			}
 			scriptUnregister(hInstance);
+			keyboardHandlerUnregister(OnKeyboardMessage);
 			break;
 		}
-		default:
-			// Yeah no
-			break;
 	}
 	return TRUE;
 }

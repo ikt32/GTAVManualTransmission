@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include "../../ScriptHookV_SDK/inc/natives.h"
 #include "../../ScriptHookV_SDK/inc/enums.h"
+#include "keyboard.h"
 
 ScriptControls::ScriptControls(): controller{1},
                                   buttonState(0) {
@@ -177,14 +178,16 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
  */
 
 bool ScriptControls::IsKeyPressed(int key) {
-	if (GetAsyncKeyState(key) & 0x8000)
+	//if (GetAsyncKeyState(key) & 0x8000)
+	if (IsKeyDown(key))
 		return true;
 	return false;
 }
 
 bool ScriptControls::IsKeyJustPressed(int key, KeyboardControlType control) {
-	KBControlCurr[static_cast<int>(control)] = (GetAsyncKeyState(key) & 0x8000) != 0;
-
+	//KBControlCurr[static_cast<int>(control)] = (GetAsyncKeyState(key) & 0x8000) != 0;
+	KBControlCurr[static_cast<int>(control)] = IsKeyDown(key);
+	
 	// raising edge
 	if (KBControlCurr[static_cast<int>(control)] && !KBControlPrev[static_cast<int>(control)]) {
 		KBControlPrev[static_cast<int>(control)] = KBControlCurr[static_cast<int>(control)];

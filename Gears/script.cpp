@@ -69,8 +69,6 @@ void setShiftMode(int shiftMode) {
 			break;
 		case Automatic: mode = "Automatic";
 			break;
-		default: // yeah no
-			break;
 	}
 	message << "Mode: " << mode;
 	showNotification(const_cast<char *>(message.str().c_str()));
@@ -1158,8 +1156,6 @@ void updateLastInputDevice() {
 			case ScriptControls::Wheel:
 				//CONTROLS::DISABLE_ALL_CONTROL_ACTIONS
 				showNotification("Switched to wheel");
-				break;
-			default:
 				break;
 		}
 	}

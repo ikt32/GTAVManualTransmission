@@ -60,6 +60,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="keyboard.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NativeMemory.cpp" />
     <ClCompile Include="Logger.cpp" />
@@ -78,6 +79,7 @@
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h" />
     <ClInclude Include="DiJoyStick.h" />
+    <ClInclude Include="keyboard.h" />
     <ClInclude Include="TimeHelper.hpp" />
     <ClInclude Include="NativeMemory.hpp" />
     <ClInclude Include="Logger.hpp" />
