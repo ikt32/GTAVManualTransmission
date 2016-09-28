@@ -46,47 +46,9 @@ enum Shifter {
 	Automatic = 2
 };
 
-
-
-void setShiftMode(int shiftMode) {
-	if (shiftMode > 2 || shiftMode < 0)
-		return;
-
-	if (settings.ShiftMode == HPattern  && vehData.IsBike) {
-		settings.ShiftMode = Automatic;
-	}
-
-	if (settings.ShiftMode == Sequential && vehData.CurrGear > 1) {
-		vehData.SimulatedNeutral = false;
-	}
-
-	std::stringstream message;
-	std::string mode;
-	switch (settings.ShiftMode) {
-		case Sequential: mode = "Sequential";
-			break;
-		case HPattern: mode = "H-Pattern";
-			break;
-		case Automatic: mode = "Automatic";
-			break;
-	}
-	message << "Mode: " << mode;
-	showNotification(const_cast<char *>(message.str().c_str()));
-}
-
-void cycleShiftMode() {
-	settings.ShiftMode++;
-	if (settings.ShiftMode > 2) {
-		settings.ShiftMode = 0;
-	}
-
-	setShiftMode(settings.ShiftMode);
-	settings.Save();
-}
-
 void update() {
 	///////////////////////////////////////////////////////////////////////////
-	//                    Gathering data
+	//                           Gathering data
 	///////////////////////////////////////////////////////////////////////////
 	player = PLAYER::PLAYER_ID();
 	playerPed = PLAYER::PLAYER_PED_ID();
@@ -150,12 +112,6 @@ void update() {
 		showDebugInfo();
 	}
 
-
-	//if (!VEHICLE::IS_VEHICLE_DRIVEABLE(vehicle, false) &&
-	//	VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) < -100.0f) {
-	//	return;
-	//}
-
 	if (!settings.EnableManual &&
 		settings.WheelWithoutManual &&
 		controls.WheelDI.IsConnected()) {
@@ -177,7 +133,8 @@ void update() {
 	
 
 	///////////////////////////////////////////////////////////////////////////
-	// Active whenever Manual is enabled from here
+	//          Active whenever Manual is enabled from here
+	//						UI stuff and whatever
 	///////////////////////////////////////////////////////////////////////////
 	updateLastInputDevice();
 	handleVehicleButtons();
@@ -235,13 +192,14 @@ void update() {
 		if (vehData.CurrGear > 0 && controls.ThrottleVal < 0.2 && !controls.BrakeVal && vehData.Speed < 2.0f)
 		{
 			if (vehData.Pitch < 0 || controls.ClutchVal)
-				ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, -1 * (vehData.Pitch / 150.0f) * 1.1f, 0.0f, true, true, true, true);
+				ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
+					vehicle, 1, 0.0f, -1 * (vehData.Pitch / 150.0f) * 1.1f, 0.0f, true, true, true, true);
 
 			if (vehData.Pitch > 10.0f || controls.ClutchVal)
-				ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, -1 * (vehData.Pitch / 90.0f) * 0.35f, 0.0f, true, true, true, true);
+				ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
+					vehicle, 1, 0.0f, -1 * (vehData.Pitch / 90.0f) * 0.35f, 0.0f, true, true, true, true);
 		}
 	}
-
 
 	// Reverse behavior
 	// For bikes, do this automatically.
@@ -258,26 +216,7 @@ void update() {
 				controls.ThrottleVal,
 				controls.BrakeVal);
 		}
-		//// New reverse: Reverse with throttle
-		//if (settings.RealReverse) {
-		//	functionRealReverse();
-		//	if (prevInput == ScriptControls::InputDevices::Wheel) {
-		//		handlePedalsRealReverse(
-		//			controls.ThrottleVal,
-		//			controls.BrakeVal);
-		//	}
-		//}
-		//// Reversing behavior: just block the direction you don't wanna go to
-		//else {
-		//	functionSimpleReverse();
-		//	if (prevInput == ScriptControls::InputDevices::Wheel) {
-		//		handlePedalsDefault(
-		//			controls.ThrottleVal,
-		//			controls.BrakeVal);
-		//	}
-		//}
 	}
-
 
 	// Limit truck speed per gear upon game wanting to shift, but we block it.
 	if (vehData.IsTruck) {
@@ -308,7 +247,6 @@ void update() {
 		}
 	}
 
-
 	// Manual shifting
 	if (settings.ShiftMode == 1) {
 		functionHShiftWheel();
@@ -328,25 +266,6 @@ void update() {
 	// Finally, update memory each loop
 	handleRPM();
 	ext.SetGears(vehicle, vehData.LockGears);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-//                              Script entry
-///////////////////////////////////////////////////////////////////////////////
-
-void main() {
-	//settings.Read(&controls);
-	reInit();
-	logger.Write("Settings read");
-	while (true) {
-		update();
-		WAIT(0);
-	}
-}
-
-void ScriptMain() {
-	srand(GetTickCount());
-	main();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -428,12 +347,39 @@ void showDebugInfo() {
 	showText(0.85, 0.100, 0.4, ssClutchInput.str().c_str());
 	showText(0.795, 0.100, 0.4, ssClutchDisable.str().c_str());
 
-
 	if (settings.WheelEnabled) {
 		std::stringstream dinputDisplay;
 		dinputDisplay << "Wheel Avail: " << controls.WheelDI.IsConnected();
 		showText(0.85, 0.150, 0.4, dinputDisplay.str().c_str());
 	}
+}
+
+void crossScriptComms() {
+	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
+	if (vehData.CurrGear < vehData.NextGear || truckShiftUp) {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1);
+	}
+	else if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 2);
+	}
+	else if (vehData.CurrGear == vehData.NextGear) {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 0);
+	}
+
+	if (vehData.SimulatedNeutral) {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_weapon", 1);
+	}
+	else {
+		DECORATOR::DECOR_SET_INT(vehicle, "hunt_weapon", 0);
+	}
+
+	// External shifting
+	int currExtShift = DECORATOR::DECOR_GET_INT(vehicle, "hunt_chal_weapon");
+	if (prevExtShift != currExtShift && currExtShift > 0) {
+		// 1 Seq, 2 H, 3 Auto
+		setShiftMode(currExtShift - 1);
+	}
+	prevExtShift = currExtShift;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -478,9 +424,70 @@ void toggleManual() {
 	reInit();
 }
 
+void updateLastInputDevice() {
+	if (prevInput != controls.GetLastInputDevice(prevInput)) {
+		prevInput = controls.GetLastInputDevice(prevInput);
+		switch (prevInput) {
+			case ScriptControls::Keyboard:
+				showNotification("Switched to keyboard/mouse");
+				break;
+			case ScriptControls::Controller: // Controller
+				if (settings.ShiftMode == 1) {
+					showNotification("Switched to controller\nSequential re-initiated");
+					settings.ShiftMode = 0;
+					settings.Save();
+				}
+				else {
+					showNotification("Switched to controller");
+				}
+				break;
+			case ScriptControls::Wheel:
+				//CONTROLS::DISABLE_ALL_CONTROL_ACTIONS
+				showNotification("Switched to wheel");
+				break;
+		}
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //                           Mod functions: Shifting
 ///////////////////////////////////////////////////////////////////////////////
+
+void setShiftMode(int shiftMode) {
+	if (shiftMode > 2 || shiftMode < 0)
+		return;
+
+	if (settings.ShiftMode == HPattern  && vehData.IsBike) {
+		settings.ShiftMode = Automatic;
+	}
+
+	if (settings.ShiftMode == Sequential && vehData.CurrGear > 1) {
+		vehData.SimulatedNeutral = false;
+	}
+
+	std::stringstream message;
+	std::string mode;
+	switch (settings.ShiftMode) {
+		case Sequential: mode = "Sequential";
+			break;
+		case HPattern: mode = "H-Pattern";
+			break;
+		case Automatic: mode = "Automatic";
+			break;
+	}
+	message << "Mode: " << mode;
+	showNotification(const_cast<char *>(message.str().c_str()));
+}
+
+void cycleShiftMode() {
+	settings.ShiftMode++;
+	if (settings.ShiftMode > 2) {
+		settings.ShiftMode = 0;
+	}
+
+	setShiftMode(settings.ShiftMode);
+	settings.Save();
+}
 
 void shiftTo(int gear, bool autoClutch) {
 	if (autoClutch) {
@@ -570,7 +577,6 @@ void functionHShiftWheel() {
 		vehData.SimulatedNeutral = !vehData.NoClutch;
 	}
 }
-
 
 void functionSShift() {
 	// Shift up
@@ -687,7 +693,7 @@ void functionAShift() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//                          Mod functions: Features
+//                   Mod functions: Gearbox features
 ///////////////////////////////////////////////////////////////////////////////
 
 void functionClutchCatch() {
@@ -737,7 +743,8 @@ void functionEngStall() {
 void functionEngDamage() {
 	if (vehData.Rpm > 0.98f &&
 		controls.AccelValGTAf > 0.99f) {
-		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (settings.RPMDamage));
+		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
+			vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (settings.RPMDamage));
 	}
 }
 
@@ -762,6 +769,7 @@ void functionEngBrake() {
 ///////////////////////////////////////////////////////////////////////////////
 //                       Mod functions: Gearbox control
 ///////////////////////////////////////////////////////////////////////////////
+
 void fakeRev() {
 	float timeStep = SYSTEM::TIMESTEP();
 	float accelRatio = 2 * timeStep;
@@ -777,7 +785,6 @@ void fakeRev() {
 
 	ext.SetCurrentRPM(vehicle, rpmVal);
 }
-
 
 void handleRPM() {
 	float finalClutch = 0.0f;
@@ -868,8 +875,9 @@ void functionTruckLimiting() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//                       Mod functions: Reverse
+//                   Mod functions: Reverse/Pedal handling
 ///////////////////////////////////////////////////////////////////////////////
+
 void functionRealReverse() {
 	// Forward gear
 	// Desired: Only brake
@@ -931,10 +939,8 @@ void functionRealReverse() {
 	}
 }
 
-
 // Forward gear: Throttle accelerates, Brake brakes (exclusive)
 // Reverse gear: Throttle reverses, Brake brakes (exclusive)
-
 void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 	if (vehData.CurrGear > 0) {
 		// Throttle Pedal normal
@@ -986,47 +992,29 @@ void handlePedalsDefault(float wheelThrottleVal, float wheelBrakeVal) {
 	}
 }
 
-//void functionSimpleReverse() {
-//	// Prevent going forward in gear 0.
-//	if (vehData.CurrGear == 0 && vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f
-//	                             && controls.ThrottleVal > 0) {
-//		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-//		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
-//	}
-//	// Prevent reversing in gear >= 1.
-//	if (vehData.CurrGear > 0 && vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f
-//	                            && controls.BrakeVal > 0) {
-//		VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-//		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-//	}
-//}
-
 void functionAutoReverse() {
 	// Go forward
-	if (CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) &&
-	                                                                 vehData.Velocity > -1.0f &&
-	                                                                 vehData.CurrGear == 0) {
+	if (CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && 
+		!CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) &&
+	    vehData.Velocity > -1.0f &&
+	    vehData.CurrGear == 0) {
 		vehData.LockGears = 0x00010001;
 	}
 
 	// Reverse
-	if (CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) &&
-	                                                            vehData.Velocity < 1.0f &&
-	                                                            vehData.CurrGear > 0) {
+	if (CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && 
+		!CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) &&
+	    vehData.Velocity < 1.0f &&
+	    vehData.CurrGear > 0) {
 		vehData.SimulatedNeutral = false;
 		vehData.LockGears = 0x00000000;
-	}
-}
-
-void functionAutoLookback() {
-	if (vehData.CurrGear == 0) {
-		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleLookBehind, 1.0f);
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 //                       Mod functions: Buttons
 ///////////////////////////////////////////////////////////////////////////////
+
 void handleVehicleButtons() {
 	if  (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
 		(controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) ||
@@ -1042,7 +1030,9 @@ void handleVehicleButtons() {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 	}
 
-	if (!controls.WheelDI.IsConnected() || controls.WheelDI.NoFeedback || prevInput != ScriptControls::Wheel) {
+	if (!controls.WheelDI.IsConnected() ||
+		controls.WheelDI.NoFeedback ||
+		prevInput != ScriptControls::Wheel) {
 		return;
 	}
 
@@ -1119,57 +1109,9 @@ void handleVehicleButtons() {
 	}
 }
 
-void crossScriptComms() {
-	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
-	if (vehData.CurrGear < vehData.NextGear || truckShiftUp) {
-		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1);
-	}
-	else if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
-		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 2);
-	}
-	else if (vehData.CurrGear == vehData.NextGear) {
-		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 0);
-	}
-
-	if (vehData.SimulatedNeutral) {
-		DECORATOR::DECOR_SET_INT(vehicle, "hunt_weapon", 1);
-	}
-	else {
-		DECORATOR::DECOR_SET_INT(vehicle, "hunt_weapon", 0);
-	}
-
-	int currExtShift = DECORATOR::DECOR_GET_INT(vehicle, "hunt_chal_weapon");
-	if (prevExtShift != currExtShift && currExtShift > 0) {
-		// 1 Seq, 2 H, 3 Auto
-		setShiftMode(currExtShift - 1);
-	}
-	prevExtShift = currExtShift;
-}
-
-void updateLastInputDevice() {
-	if (prevInput != controls.GetLastInputDevice(prevInput)) {
-		prevInput = controls.GetLastInputDevice(prevInput);
-		switch (prevInput) {
-			case ScriptControls::Keyboard:
-				showNotification("Switched to keyboard/mouse");
-				break;
-			case ScriptControls::Controller: // Controller
-				if (settings.ShiftMode == 1) {
-					showNotification("Switched to controller\nSequential re-initiated");
-					settings.ShiftMode = 0;
-					settings.Save();
-				}
-				else {
-					showNotification("Switched to controller");
-				}
-				break;
-			case ScriptControls::Wheel:
-				//CONTROLS::DISABLE_ALL_CONTROL_ACTIONS
-				showNotification("Switched to wheel");
-				break;
-		}
-	}
-}
+///////////////////////////////////////////////////////////////////////////////
+//                    Wheel input and force feedback
+///////////////////////////////////////////////////////////////////////////////
 
 void doWheelSteering() {
 	if (prevInput == ScriptControls::InputDevices::Wheel) {
@@ -1193,7 +1135,6 @@ void doWheelSteering() {
 	}
 }
 
-// This will probably stay in the main source forever
 void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, ScriptSettings& settings, bool airborne) {
 	if (!controls.WheelDI.IsConnected() || controls.WheelDI.NoFeedback || prevInput != ScriptControls::Wheel) {
 		return;
@@ -1332,4 +1273,33 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 		ssOverSteer << "Oversteer: " << oversteer;
 		showText(0.85, 0.325, 0.4, ssOverSteer.str().c_str());
 	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//                             Misc features
+///////////////////////////////////////////////////////////////////////////////
+
+void functionAutoLookback() {
+	if (vehData.CurrGear == 0) {
+		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleLookBehind, 1.0f);
+	}
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//                              Script entry
+///////////////////////////////////////////////////////////////////////////////
+
+void main() {
+	reInit();
+	logger.Write("Settings read");
+	while (true) {
+		update();
+		WAIT(0);
+	}
+}
+
+void ScriptMain() {
+	srand(GetTickCount());
+	main();
 }
