@@ -65,65 +65,60 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 
 	// Start Keyboard section
 	// How it feels to chew 5 gum
-	char kbKeyBuffer[2048];
+	char kbKeyBuffer[24];
 	
-	GetPrivateProfileStringA("KEYBOARD", "Toggle", "VK_OEM_5", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "Toggle", "VK_OEM_5", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Toggle)]   = str2key(kbKeyBuffer);
 
-	GetPrivateProfileStringA("KEYBOARD", "ToggleH", "VK_OEM_6", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "ToggleH", "VK_OEM_6", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ToggleH)]   = str2key(kbKeyBuffer);
 
-	GetPrivateProfileStringA("KEYBOARD", "ShiftUp", "SHIFT", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "ShiftUp", "SHIFT", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ShiftUp)]   = str2key(kbKeyBuffer);
-	Logger logX("./GKeys.log");
-	logX.Write(kbKeyBuffer);
-	logX.Write(std::to_string(str2key(kbKeyBuffer)));
 
-	GetPrivateProfileStringA("KEYBOARD", "ShiftDown", "CTRL", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "ShiftDown", "CTRL", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ShiftDown)] = str2key(kbKeyBuffer);
-	logX.Write(kbKeyBuffer);
-	logX.Write(std::to_string(str2key(kbKeyBuffer)));
 
-	GetPrivateProfileStringA("KEYBOARD", "Clutch", "X", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "Clutch", "X", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Clutch)]    = str2key(kbKeyBuffer);
 	
-	GetPrivateProfileStringA("KEYBOARD", "Engine", "C", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "Engine", "C", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Engine)]    = str2key(kbKeyBuffer);
 	
-	GetPrivateProfileStringA("KEYBOARD", "HR", "NUM0", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "HR", "NUM0", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::HR)]        = str2key(kbKeyBuffer);
 	
-	GetPrivateProfileStringA("KEYBOARD", "H1", "NUM1", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "H1", "NUM1", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H1)]        = str2key(kbKeyBuffer);
 	
-	GetPrivateProfileStringA("KEYBOARD", "H2", "NUM2", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "H2", "NUM2", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H2)]        = str2key(kbKeyBuffer);
 	
-	GetPrivateProfileStringA("KEYBOARD", "H3", "NUM3", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "H3", "NUM3", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H3)]        = str2key(kbKeyBuffer);
 	
-	GetPrivateProfileStringA("KEYBOARD", "H4", "NUM4", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "H4", "NUM4", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H4)]        = str2key(kbKeyBuffer);
 	
-	GetPrivateProfileStringA("KEYBOARD", "H5", "NUM5", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "H5", "NUM5", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H5)]        = str2key(kbKeyBuffer);
 	
-	GetPrivateProfileStringA("KEYBOARD", "H6", "NUM6", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "H6", "NUM6", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H6)]        = str2key(kbKeyBuffer);
 	
-	GetPrivateProfileStringA("KEYBOARD", "H7", "NUM7", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "H7", "NUM7", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H7)]        = str2key(kbKeyBuffer);
 	
-	GetPrivateProfileStringA("KEYBOARD", "H8", "NUM8", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "H8", "NUM8", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H8)]        = str2key(kbKeyBuffer);
 	
-	GetPrivateProfileStringA("KEYBOARD", "HN", "NUM9", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "HN", "NUM9", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::HN)]        = str2key(kbKeyBuffer);
 	
-	GetPrivateProfileStringA("KEYBOARD", "Throttle", "W", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "Throttle", "W", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Throttle)]  = str2key(kbKeyBuffer);
 
-	GetPrivateProfileStringA("KEYBOARD", "Brake", "S", kbKeyBuffer, 2048, SETTINGSFILE);
+	GetPrivateProfileStringA("KEYBOARD", "Brake", "S", kbKeyBuffer, 24, SETTINGSFILE);
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Brake)]     = str2key(kbKeyBuffer);
 
 	// Start wheel section
@@ -190,9 +185,15 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	CenterStrength = GetPrivateProfileIntA("WHEEL", "CenterStrength", 100, SETTINGSFILE) / 100.0f;
 	DetailStrength = GetPrivateProfileIntA("WHEEL", "DetailStrength", 100, SETTINGSFILE) / 1.0f;
 
-
+	char w2kBuffer[24];
 	for (int i = 0; i < MAX_RGBBUTTONS; i++) { // Ouch
-		scriptControl->WheelToKey[i] = GetPrivateProfileIntA("WHEELKEYBOARD", std::to_string(i).c_str(), -1, SETTINGSFILE);
+		GetPrivateProfileStringA("WHEELKEYBOARD", std::to_string(i).c_str(), "NOPE", w2kBuffer, 24, SETTINGSFILE);
+		if (std::string(w2kBuffer).compare("NOPE") == 0) {
+			scriptControl->WheelToKey[i] = -1;
+		}
+		else {
+			scriptControl->WheelToKey[i] = str2key(w2kBuffer);
+		}
 	}
 
 	CheckSettings();
