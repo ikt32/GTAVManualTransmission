@@ -13,6 +13,8 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	ShiftMode = GetPrivateProfileIntA("OPTIONS", "ShiftMode", 0, SETTINGSFILE);
 	SimpleBike = (GetPrivateProfileIntA("OPTIONS", "SimpleBike", 0, SETTINGSFILE) == 1);
 	CrossScript = (GetPrivateProfileIntA("OPTIONS", "CrossScript", 0, SETTINGSFILE) == 1);
+	
+	AutoLookBack = (GetPrivateProfileIntA("OPTIONS", "AutoLookBack", 0, SETTINGSFILE) == 1);
 	HillBrakeWorkaround = (GetPrivateProfileIntA("OPTIONS", "HillBrakeWorkaround", 0, SETTINGSFILE) == 1);
 
 	EngDamage = (GetPrivateProfileIntA("OPTIONS", "EngineDamage", 0, SETTINGSFILE) == 1);

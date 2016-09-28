@@ -55,3 +55,4 @@ void functionHShiftWheel();
 void shiftTo(int gear, bool autoClutch);
 void handleRPM();
 
+void functionAutoLookback();

@@ -52,7 +52,7 @@ public:
 	float FFPhysics = 1.0f;
 	float CenterStrength = 1.0f;
 	float DetailStrength = 100.0f;
-
+	bool AutoLookBack = false;
 
 private:
 	void CheckSettings();

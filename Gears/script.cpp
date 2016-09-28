@@ -321,6 +321,10 @@ void update() {
 		functionAShift();
 	}
 
+	if (settings.AutoLookBack) {
+		functionAutoLookback();
+	}
+
 	// Finally, update memory each loop
 	handleRPM();
 	ext.SetGears(vehicle, vehData.LockGears);
@@ -1011,6 +1015,12 @@ void functionAutoReverse() {
 	                                                            vehData.CurrGear > 0) {
 		vehData.SimulatedNeutral = false;
 		vehData.LockGears = 0x00000000;
+	}
+}
+
+void functionAutoLookback() {
+	if (vehData.CurrGear == 0) {
+		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleLookBehind, 1.0f);
 	}
 }
 
