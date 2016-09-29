@@ -12,6 +12,7 @@ http://dev-c.com
 #define DIRECTINPUT_VERSION 0x0800
 #endif
 
+struct Color;
 class ScriptSettings;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,6 +20,7 @@ class ScriptSettings;
 ///////////////////////////////////////////////////////////////////////////////
 
 void showText(float x, float y, float scale, const char* text);
+void showText(float x, float y, float scale, const char* text, Color rgba);
 void showNotification(char* message);
 void showDebugInfo();
 void crossScriptComms();

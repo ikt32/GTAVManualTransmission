@@ -51,3 +51,10 @@ static std::string eGameVersionToString(int version) {
 
 	return GameVersionString[version];
 }
+
+struct Color {
+	int R;
+	int G;
+	int B;
+	int A;
+};

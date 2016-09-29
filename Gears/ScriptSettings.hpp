@@ -37,6 +37,9 @@ public:
 	float UITips_X = 0.95f;
 	float UITips_Y = 0.95f;
 	float UITips_Size = 1.0f;
+	int UITips_TopGearC_R = 255;
+	int UITips_TopGearC_G = 255;
+	int UITips_TopGearC_B = 255;
 
 	bool Debug = false;
 

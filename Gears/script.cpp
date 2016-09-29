@@ -171,10 +171,24 @@ void update() {
 					 "R");
 		}
 		else if (!settings.UITips_OnlyNeutral) {
-			showText(settings.UITips_X,
-			         settings.UITips_Y,
-			         settings.UITips_Size,
-			         const_cast<char *>(std::to_string(vehData.CurrGear).c_str()));
+			if (vehData.CurrGear != vehData.TopGear) {
+				showText(settings.UITips_X,
+						 settings.UITips_Y,
+						 settings.UITips_Size,
+						 const_cast<char *>(std::to_string(vehData.CurrGear).c_str()));
+			} else {
+				Color c;
+				c.R = settings.UITips_TopGearC_R;
+				c.G = settings.UITips_TopGearC_G;
+				c.B = settings.UITips_TopGearC_B;
+				c.A = 255;
+				showText(settings.UITips_X,
+						 settings.UITips_Y,
+						 settings.UITips_Size,
+						 const_cast<char *>(std::to_string(vehData.CurrGear).c_str()),
+						 c);
+			}
+			
 		}
 	}
 
@@ -282,6 +296,20 @@ void showText(float x, float y, float scale, const char* text) {
 	UI::SET_TEXT_CENTRE(0);
 	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
 	UI::SET_TEXT_EDGE(1, 0, 0, 0, 205);
+	UI::_SET_TEXT_ENTRY("STRING");
+	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(const_cast<char *>(text));
+	UI::_DRAW_TEXT(x, y);
+}
+
+void showText(float x, float y, float scale, const char* text, Color rgba) {
+	UI::SET_TEXT_FONT(0);
+	UI::SET_TEXT_SCALE(scale, scale);
+	UI::SET_TEXT_COLOUR(255, 255, 255, 255);
+	UI::SET_TEXT_WRAP(0.0, 1.0);
+	UI::SET_TEXT_CENTRE(0);
+	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
+	UI::SET_TEXT_EDGE(1, 0, 0, 0, 205);
+	UI::SET_TEXT_COLOUR(rgba.R, rgba.G, rgba.B, rgba.A);
 	UI::_SET_TEXT_ENTRY("STRING");
 	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(const_cast<char *>(text));
 	UI::_DRAW_TEXT(x, y);

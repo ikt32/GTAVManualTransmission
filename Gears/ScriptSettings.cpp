@@ -35,6 +35,9 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	UITips_X = GetPrivateProfileIntA("OPTIONS", "UITips_X", 95, SETTINGSFILE) / 100.0f;
 	UITips_Y = GetPrivateProfileIntA("OPTIONS", "UITips_Y", 95, SETTINGSFILE) / 100.0f;
 	UITips_Size = GetPrivateProfileIntA("OPTIONS", "UITips_Size", 15, SETTINGSFILE) / 100.0f;
+	UITips_TopGearC_R = GetPrivateProfileIntA("OPTIONS", "UITips_TopGearC_R", 255, SETTINGSFILE);
+	UITips_TopGearC_G = GetPrivateProfileIntA("OPTIONS", "UITips_TopGearC_G", 255, SETTINGSFILE);
+	UITips_TopGearC_B = GetPrivateProfileIntA("OPTIONS", "UITips_TopGearC_B", 255, SETTINGSFILE);
 
 	Debug = (GetPrivateProfileIntA("DEBUG", "Info", 0, SETTINGSFILE) == 1);
 
