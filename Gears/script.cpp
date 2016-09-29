@@ -1100,7 +1100,7 @@ void handleVehicleButtons() {
 		}
 	}
 
-	float centerPos = (controls.SteerLeft + controls.SteerRight) / 2;
+	float centerPos = static_cast<float>(controls.SteerLeft + controls.SteerRight) / 2;
 	float wheelCenterDeviation = controls.SteerVal - centerPos;
 
 	if (blinkerTicks == 1 && abs(wheelCenterDeviation/ centerPos) > 0.2f)
