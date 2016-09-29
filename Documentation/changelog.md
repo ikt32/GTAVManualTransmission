@@ -1,5 +1,21 @@
 # Changelog
 
+## 4.0.2
+
+New things
+
+*   Implement Cross-Script shift mode setting
+*   Restore auto look back in reverse gear as option
+*   Add color for top gear indicator
+*   Change .ini to use human readable keyboard keys
+*   Make blinkers self-cancel
+
+More small fixes
+
+*   Fix key presses being detected with GTA V in the background
+*   Ignore clutch pedal properly in automatic mode
+*   Skip non-working H-shifter mode for motorbikes
+
 ## 4.0.1
 
 A few small fixes
