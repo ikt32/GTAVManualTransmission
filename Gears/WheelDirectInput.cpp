@@ -68,8 +68,11 @@ bool WheelDirectInput::InitWheel(std::string &ffAxis) {
 				return false;
 			}
 			logger.Write("Initializing force feedback success");
+			while (JoyState.rgdwPOV[0] != -1) { // whoop di doo this is probably going to fuck me in the ass when I get home
+				UpdateState();
+
+			}
 			UpdateState();
-			UpdateState(); // kill me
 			prevTime = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 			logger.Write("Initializing wheel success");
 			return true;
