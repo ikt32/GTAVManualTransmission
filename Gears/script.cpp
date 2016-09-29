@@ -38,6 +38,8 @@ int prevExtShift = 0;
 bool blinkerLeft = false;
 bool blinkerRight = false;
 bool blinkerHazard = false;
+int blinkerTicks = 0;
+
 bool truckShiftUp = false;
 
 enum Shifter {
@@ -1061,6 +1063,7 @@ void handleVehicleButtons() {
 
 	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::IndicatorLeft)) {
 		if (!blinkerLeft) {
+			blinkerTicks = 1;
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false); // L
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true); // R
 			blinkerLeft = true;
@@ -1068,6 +1071,7 @@ void handleVehicleButtons() {
 			blinkerHazard = false;
 		}
 		else {
+			blinkerTicks = 0;
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
 			blinkerLeft = false;
@@ -1077,6 +1081,7 @@ void handleVehicleButtons() {
 	}
 	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::IndicatorRight)) {
 		if (!blinkerRight) {
+			blinkerTicks = 1;
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true); // L
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false); // R
 			blinkerLeft = false;
@@ -1084,6 +1089,7 @@ void handleVehicleButtons() {
 			blinkerHazard = false;
 		}
 		else {
+			blinkerTicks = 0;
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
 			blinkerLeft = false;
@@ -1091,6 +1097,25 @@ void handleVehicleButtons() {
 			blinkerHazard = false;
 		}
 	}
+
+	int centerPos = (controls.SteerLeft + controls.SteerRight) / 2;
+	float divisor = (controls.SteerRight - controls.SteerLeft) / 10000.0f;
+	int wheelCenterDeviation = controls.SteerVal - centerPos;
+	if (blinkerTicks == 1 && abs(wheelCenterDeviation/divisor) > 0.2f)
+	{
+		blinkerTicks = 2;
+	}
+
+	if (blinkerTicks == 2 && abs(wheelCenterDeviation / divisor) < 0.1f)
+	{
+		blinkerTicks = 0;
+		VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
+		VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
+		blinkerLeft = false;
+		blinkerRight = false;
+		blinkerHazard = false;
+	}
+
 	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::IndicatorHazard)) {
 		if (!blinkerHazard) {
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true); // L
