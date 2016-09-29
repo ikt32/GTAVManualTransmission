@@ -14,6 +14,7 @@ http://dev-c.com
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 	Logger logger(LOGFILE);
+	// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 	switch (reason) {
 		case DLL_PROCESS_ATTACH: {
 			scriptRegister(hInstance, ScriptMain);

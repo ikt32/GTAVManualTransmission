@@ -429,6 +429,7 @@ void toggleManual() {
 void updateLastInputDevice() {
 	if (prevInput != controls.GetLastInputDevice(prevInput)) {
 		prevInput = controls.GetLastInputDevice(prevInput);
+		// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 		switch (prevInput) {
 			case ScriptControls::Keyboard:
 				showNotification("Switched to keyboard/mouse");
@@ -469,6 +470,7 @@ void setShiftMode(int shiftMode) {
 
 	std::stringstream message;
 	std::string mode;
+	// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 	switch (settings.ShiftMode) {
 		case Sequential: mode = "Sequential";
 			break;
