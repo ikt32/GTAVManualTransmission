@@ -1100,15 +1100,15 @@ void handleVehicleButtons() {
 		}
 	}
 
-	int centerPos = (controls.SteerLeft + controls.SteerRight) / 2;
-	float divisor = (controls.SteerRight - controls.SteerLeft) / 10000.0f;
-	int wheelCenterDeviation = controls.SteerVal - centerPos;
-	if (blinkerTicks == 1 && abs(wheelCenterDeviation/divisor) > 0.2f)
+	float centerPos = (controls.SteerLeft + controls.SteerRight) / 2;
+	float wheelCenterDeviation = controls.SteerVal - centerPos;
+
+	if (blinkerTicks == 1 && abs(wheelCenterDeviation/ centerPos) > 0.2f)
 	{
 		blinkerTicks = 2;
 	}
 
-	if (blinkerTicks == 2 && abs(wheelCenterDeviation / divisor) < 0.1f)
+	if (blinkerTicks == 2 && abs(wheelCenterDeviation / centerPos) < 0.1f)
 	{
 		blinkerTicks = 0;
 		VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
