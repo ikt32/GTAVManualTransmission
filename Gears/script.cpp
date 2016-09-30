@@ -919,11 +919,12 @@ void functionRealReverse() {
 		                                 vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			ext.SetThrottleP(vehicle, 0.0f);
+			VEHICLE::_SET_VEHICLE_HALT(vehicle, 0.0f, false, false);
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
 		}
 		else {
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
 		// LT behavior when rolling back: Brake
 		if (controls.BrakeVal > 0.02f && controls.ThrottleVal < controls.BrakeVal &&
@@ -957,14 +958,15 @@ void functionRealReverse() {
 		                                vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+			VEHICLE::_SET_VEHICLE_HALT(vehicle, 0.0f, 0, false);
 		}
 		else {
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
+			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
 		// LT behavior when reversing
 		if (controls.BrakeVal > 0.01f &&
-			vehData.Velocity <= -0.5f) {
+			vehData.Velocity <= -0.1f) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.BrakeVal);
 		}
@@ -976,39 +978,42 @@ void functionRealReverse() {
 void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 	if (vehData.CurrGear > 0) {
 		// Throttle Pedal normal
-		if (wheelThrottleVal > 0.02f) {
+		if (wheelThrottleVal > 0.01f) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
 		}
 		// Brake Pedal normal
-		if (wheelBrakeVal > 0.02f) {
+		if (wheelBrakeVal > 0.01f) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelBrakeVal);
 		}
 		// Brake Pedal still
-		if (wheelBrakeVal > 0.02f && wheelThrottleVal < wheelBrakeVal &&
-		                             vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
+		if (	wheelBrakeVal > 0.01f &&
+				wheelThrottleVal < wheelBrakeVal &&
+				vehData.Velocity <= 0.1f && vehData.Velocity >= -0.1f) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			ext.SetThrottleP(vehicle, 0.0f);
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+			VEHICLE::_SET_VEHICLE_HALT(vehicle, 0.0f, 0, false);
 		}
 	}
 
 	if (vehData.CurrGear == 0) {
 		// Throttle Pedal Reverse
-		if (wheelThrottleVal > 0.02f && wheelThrottleVal > wheelBrakeVal) {
+		if (wheelThrottleVal > 0.01f && wheelThrottleVal > wheelBrakeVal) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelThrottleVal);
 		}
 		// Brake Pedal stationary
-		if (wheelBrakeVal > 0.02f && wheelThrottleVal <= wheelBrakeVal &&
-		                             vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
+		if (wheelBrakeVal > 0.01f && wheelThrottleVal <= wheelBrakeVal &&
+		                             vehData.Velocity > -0.1f && vehData.Velocity <= 0.1f) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-			VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
+			VEHICLE::_SET_VEHICLE_HALT(vehicle, 0.0f, 0, false);
 		}
 
 		// Brake Pedal Reverse
-		if (wheelBrakeVal > 0.02f &&
-			vehData.Velocity <= -0.5f) {
+		if (wheelBrakeVal > 0.01f &&
+			vehData.Velocity <= -0.1f) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelBrakeVal);
 		}
 	}
@@ -1016,10 +1021,10 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 
 // Pedals behave like RT/LT
 void handlePedalsDefault(float wheelThrottleVal, float wheelBrakeVal) {
-	if (wheelThrottleVal > 0.02f) {
+	if (wheelThrottleVal > 0.01f) {
 		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
 	}
-	if (wheelBrakeVal > 0.02f) {
+	if (wheelBrakeVal > 0.01f) {
 		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelBrakeVal);
 	}
 }
