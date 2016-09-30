@@ -21,10 +21,12 @@ Discuss the mod over at [GTAForums.com](http://gtaforums.com/topic/840830-manual
 
 ### Requirements
 * [ScriptHookV SDK by Alexander Blade](http://www.dev-c.com/gtav/scripthookv/)
-* [DirectX SDK (June 2010)](https://www.microsoft.com/en-us/download/details.aspx?id=6812) for XInput 1.3 and DirectInput
+* Windows/DirectX SDK with Xinput >=1.3
 
 Download the [ScriptHookV SDK](http://www.dev-c.com/gtav/scripthookv/) and extract it's contents to ScriptHookV_SDK. 
 Clone this repository to the same folder ScriptHookV_SDK was extracted so you have ScriptHookV_SDK and GTAVManualTransmission in the same folder. If you get build errors about missing functions, update your [natives.h](http://www.dev-c.com/nativedb/natives.h).
+
+Visual Studio should come with the DirectX SDK in it. Otherwise - download [the Windows SDK](https://developer.microsoft.com/en-us/windows/downloads/sdk-archive) standalone.
 
 ## Mod support
 You can read decorators to get some info about this mod.
