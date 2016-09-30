@@ -1195,7 +1195,7 @@ void doWheelSteering() {
 }
 
 void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, ScriptSettings& settings, bool airborne) {
-	if (!controls.WheelDI.IsConnected() || controls.WheelDI.NoFeedback || prevInput != ScriptControls::Wheel) {
+	if (!controls.WheelDI.IsConnected() || controls.WheelDI.NoFeedback || prevInput != ScriptControls::Wheel || !settings.FFEnable) {
 		return;
 	}
 
@@ -1271,7 +1271,8 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 
 	// On oversteering conditions, let physics dictate the feel
 	if (oversteer > 0.01f && vehData.Velocity > gripSpeedThreshold) {
-		centerForce = 0;
+		//centerForce = 0;
+		centerForce = static_cast<int>((1.0f - oversteer) * centerForce);
 		damperForce = settings.DamperMin + static_cast<int>(oversteer * (settings.DamperMax - settings.DamperMin));
 	}
 
