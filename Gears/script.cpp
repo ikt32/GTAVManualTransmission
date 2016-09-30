@@ -34,7 +34,7 @@ ScriptControls::InputDevices prevInput;
 float prevRpm;
 int prevExtShift = 0;
 
-// This gonna be refactored into vehData or LogiInput somehow
+// This gonna be refactored into vehData somehow
 bool blinkerLeft = false;
 bool blinkerRight = false;
 bool blinkerHazard = false;
@@ -449,7 +449,6 @@ void toggleManual() {
 	}
 	if (!settings.EnableManual) {
 		reset();
-		//LogiSteeringShutdown();
 	}
 	reInit();
 }
