@@ -492,7 +492,7 @@ void setShiftMode(int shiftMode) {
 		settings.ShiftMode = Automatic;
 	}
 
-	if (settings.ShiftMode == Sequential && vehData.CurrGear > 1) {
+	if ((settings.ShiftMode == Automatic || settings.ShiftMode == Sequential) && vehData.CurrGear > 1) {
 		vehData.SimulatedNeutral = false;
 	}
 
