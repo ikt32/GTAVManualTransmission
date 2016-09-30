@@ -191,9 +191,13 @@ uint64_t VehicleExtensions::GetWheelPtr(uint64_t address, int index) {
 
 void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
-
-	int offset = (getGameVersion() > 3 ? 0xAA0 : 0xA80);
-	offset = (getGameVersion() > 23 ? 0xAB0 : offset);
+	
+	eGameVersion ver = getGameVersion();
+	int offset = (ver > 3 ? 0xAA0 : 0xA80);
+	offset = (ver > 23 ? 0xAB0 : offset);
+	if (ver == 06 || ver == 07) {
+		offset = 0xA90;
+	}
 
 	uint64_t wheelPtr;  // pointer to wheel pointers
 	wheelPtr = *reinterpret_cast<uint64_t *>(address + offset);
@@ -213,7 +217,6 @@ std::vector<float> VehicleExtensions::GetWheelsCompression(Vehicle handle) const
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	eGameVersion ver = getGameVersion();
-
 	int offset = (ver > 3 ? 0xAA0 : 0xA80);
 	offset = (ver > 23 ? 0xAB0 : offset);
 	if (ver == 06 || ver == 07) {
