@@ -178,32 +178,19 @@ void VehicleExtensions::SetFuelLevel(Vehicle handle, float value) const {
 uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
-	int offset = (getGameVersion() > 3 ? 0xAA0 : 0xA80);
-	offset = (getGameVersion() > 23 ? 0xAB0 : offset);
-
-	return *reinterpret_cast<uint64_t *>(address + offset);
-}
-
-uint64_t VehicleExtensions::GetWheelPtr(uint64_t address, int index) {
-
-	return *reinterpret_cast<uint64_t *>(address + index * 8);
-}
-
-void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) const {
-	uint64_t address = mem.GetAddressOfEntity(handle);
-	
 	eGameVersion ver = getGameVersion();
 	int offset = (ver > 3 ? 0xAA0 : 0xA80);
 	offset = (ver > 23 ? 0xAB0 : offset);
 	if (ver == 06 || ver == 07) {
 		offset = 0xA90;
 	}
+	return *reinterpret_cast<uint64_t *>(address + offset);
+}
 
-	uint64_t wheelPtr;  // pointer to wheel pointers
-	wheelPtr = *reinterpret_cast<uint64_t *>(address + offset);
+void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) const {
+	uint64_t wheelPtr = GetWheelsPtr(handle);  // pointer to wheel pointers
 
 	uint64_t wheels[6] = {};
-
 	for (int i = 0; i < 6; i++) {
 		wheels[i] = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i); // iterate through wheels
 		if (wheels[i]) {
@@ -214,28 +201,17 @@ void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) const {
 
 // Don't use this on non-cars
 std::vector<float> VehicleExtensions::GetWheelsCompression(Vehicle handle) const {
-	uint64_t address = mem.GetAddressOfEntity(handle);
+	uint64_t wheelPtr = GetWheelsPtr(handle);
 
-	eGameVersion ver = getGameVersion();
-	int offset = (ver > 3 ? 0xAA0 : 0xA80);
-	offset = (ver > 23 ? 0xAB0 : offset);
-	if (ver == 06 || ver == 07) {
-		offset = 0xA90;
-	}
-
-	uint64_t wheelPtr; // pointer to wheel pointers
-	wheelPtr = *reinterpret_cast<uint64_t *>(address + offset);
-
-	uint64_t wheels[2] = {};
+	uint64_t wheels[6] = {};
 	std::vector<float> compressions;
 
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 6; i++) {
 		wheels[i] = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i); // iterate through wheels
 		if (wheels[i]) {
-			compressions.push_back(*reinterpret_cast<float *>(wheels[i] + (ver > 3 ? 0x160 : 0x150)));
+			compressions.push_back(*reinterpret_cast<float *>(wheels[i] + (getGameVersion() > 3 ? 0x160 : 0x150)));
 		}
 	}
-
 	return compressions;
 }
 
