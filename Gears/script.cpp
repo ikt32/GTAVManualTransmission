@@ -918,7 +918,8 @@ void functionRealReverse() {
 		                                 vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			ext.SetThrottleP(vehicle, 0.0f);
-			VEHICLE::_SET_VEHICLE_HALT(vehicle, 0.0f, false, false);
+			ext.SetBrakeP(vehicle, 1.0f);
+			//VEHICLE::_SET_VEHICLE_HALT(vehicle, 0.0f, false, false);
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
 		}
@@ -933,6 +934,7 @@ void functionRealReverse() {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.BrakeVal);
 			ext.SetThrottle(vehicle, 0.0f);
 			ext.SetThrottleP(vehicle, 0.1f);
+			ext.SetBrakeP(vehicle, 1.0f);
 		}
 		// RT behavior when rolling back: Burnout
 		if (vehData.CurrGear == 1 &&
@@ -958,7 +960,9 @@ void functionRealReverse() {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-			VEHICLE::_SET_VEHICLE_HALT(vehicle, 0.0f, 0, false);
+			//VEHICLE::_SET_VEHICLE_HALT(vehicle, 0.0f, 0, false);
+			ext.SetBrakeP(vehicle, 1.0f);
+
 		}
 		else {
 			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
@@ -992,7 +996,9 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 			ext.SetThrottleP(vehicle, 0.0f);
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-			VEHICLE::_SET_VEHICLE_HALT(vehicle, 0.0f, 0, false);
+			//VEHICLE::_SET_VEHICLE_HALT(vehicle, 0.0f, 0, false);
+			ext.SetBrakeP(vehicle, 1.0f);
+
 		}
 	}
 
@@ -1007,7 +1013,8 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-			VEHICLE::_SET_VEHICLE_HALT(vehicle, 0.0f, 0, false);
+			//VEHICLE::_SET_VEHICLE_HALT(vehicle, 0.0f, 0, false);
+			ext.SetBrakeP(vehicle, 1.0f);
 		}
 
 		// Brake Pedal Reverse
