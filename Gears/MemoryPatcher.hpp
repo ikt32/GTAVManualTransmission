@@ -40,6 +40,9 @@ namespace MemoryPatcher {
 	extern uintptr_t PatchRevLimiter();
 	extern void RestoreRevLimiter(uintptr_t address);
 
+	//extern uintptr_t PatchSteering();
+	//extern void RestoreSteering(uintptr_t address);
+
 	extern int total;
 	extern int patched;
 
@@ -68,4 +71,9 @@ namespace MemoryPatcher {
 
 	extern uintptr_t RevLimiterAddr;
 	extern uintptr_t RevLimiterTemp;
+
+	//extern uintptr_t SteeringAddr;
+	//extern uintptr_t SteeringTemp;
+
+
 };

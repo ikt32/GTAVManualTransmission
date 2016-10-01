@@ -35,6 +35,10 @@ namespace MemoryPatcher {
 	uintptr_t RevLimiterAddr = 0;
 	uintptr_t RevLimiterTemp = 0;
 
+	//uintptr_t SteeringAddr = 0;
+	//uintptr_t SteeringTemp = 0;
+
+
 	bool PatchInstructions() {
 		Logger logger(LOGFILE);
 		logger.Write("Patching instructions");
@@ -115,6 +119,17 @@ namespace MemoryPatcher {
 			logger.Write("gear 7A0  not patched");
 		}
 
+		/*SteeringTemp = PatchSteering();
+		if (SteeringTemp) {
+			SteeringAddr = SteeringTemp;
+			patched++;
+			std::stringstream hexaddr;
+			hexaddr << std::hex << SteeringAddr;
+			logger.Write("Steering @ " + hexaddr.str());
+		} else {
+			logger.Write("Steering  not patched");
+		}*/
+
 		if (patched == total) {
 			logger.Write("Patching success");
 			return true;
@@ -180,6 +195,17 @@ namespace MemoryPatcher {
 		else {
 			logger.Write("Gear@7A0 not restored");
 		}
+
+		//if (SteeringAddr) {
+		//	RestoreSteering(SteeringAddr);
+		//	SteeringAddr = 0;
+		//	patched--;
+		//}
+		//else {
+		//	logger.Write("Steering not restored");
+		//} // eh
+
+
 
 		if (patched == 0) {
 			logger.Write("Restore success");
@@ -374,4 +400,35 @@ namespace MemoryPatcher {
 			}
 		}
 	}*/
+	//uintptr_t PatchSteering() {
+	//	// in 791_2
+	//	// 45 84 E4	(Prev)
+
+	//	// 0F 84 D0 01 00 00 = JE	[some address]
+	//	// becomes
+	//	// E9 D1 01 00 00 90 = JMP	[some address]
+
+	//	// 0F 28 4B 70 (Next)
+	//	uintptr_t address = mem.FindPattern("\x45\x84\xE4\x0F\x84\xD0\x01\x00\x00\x0F\x28\x4B\x70", "???xxxxxxxx??");
+
+	//	if (address) {
+	//		uint8_t offset = 3;
+	//		address = address + offset;
+	//		byte instrArr[6] = { 0xE9, 0xD1, 0x01, 0x00, 0x00, 0x90 };
+	//		for (int i = 0; i < 6; i++) {
+	//			memset(reinterpret_cast<void *>(address + i), instrArr[i], 1);
+	//		}
+	//		return address;
+	//	}
+	//	return 0;
+	//}
+
+	//void RestoreSteering(uintptr_t address) {
+	//	byte instrArr[6] = { 0x0F, 0x84, 0xD0, 0x01, 0x00, 0x00 };
+	//	if (address) {
+	//		for (int i = 0; i < 6; i++) {
+	//			memset(reinterpret_cast<void *>(address + i), instrArr[i], 1);
+	//		}
+	//	}
+	//}
 }
