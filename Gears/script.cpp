@@ -81,13 +81,11 @@ void update() {
 		return;
 	}
 
+
 	vehData.UpdateValues(ext, vehicle);
 	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
 
 	if (prevVehicle != vehicle) {
-		//std::stringstream vehName;
-		//vehName << "New: " << VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model);
-		//showNotification(vehName.str().c_str());
 		if (vehData.NoClutch) {
 			vehData.SimulatedNeutral = false;
 		}
@@ -128,6 +126,7 @@ void update() {
 		settings,
 		!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f);
 	}
+
 
 	if (!settings.EnableManual) {
 		return;
@@ -672,7 +671,7 @@ void functionSShift() {
 	}
 }
 
-void functionAShift() {
+void functionAShift() { // Automatic
 	// Shift up
 	if (controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftUp) ||
 		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftUp) ||
@@ -714,12 +713,15 @@ void functionAShift() {
 	if (vehData.CurrGear > 0 &&
 		(vehData.CurrGear < vehData.NextGear && vehData.Speed > 2.0f)) {
 		shiftTo(vehData.CurrGear + 1, true);
+		vehData.SimulatedNeutral = false;
 	}
 
 	// Shift down
 	if ((vehData.CurrGear > 1 && vehData.Rpm < 0.4f) ||
 		(vehData.CurrGear > 1 && vehData.Rpm < 0.5f) && vehData.Throttle > 0.95f) {
 		shiftTo(vehData.CurrGear - 1, true);
+		vehData.NextGear = vehData.CurrGear - 1;
+		vehData.SimulatedNeutral = false;
 	}
 }
 
