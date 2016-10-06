@@ -9,12 +9,17 @@ New things
 *   Add color for top gear indicator
 *   Change .ini to use human readable keyboard keys
 *   Make blinkers self-cancel
+*   Use smoother oversteer transition
 
 More small fixes
 
+*   Support for Bikers DLC
+*   Fix FFDisable ignored
 *   Fix key presses being detected with GTA V in the background
-*   Ignore clutch pedal properly in automatic mode
-*   Skip non-working H-shifter mode for motorbikes
+*   Fix Neutral gear still selected when car is in auto in a high gear
+*   Fix clutch pedal read in automatic mode (ignore it now)
+*   Fix non-working H-shifter mode for motorbikes (skip over it)
+*   Replace normal-stop handbrake with another way to keep the car on its place
 
 ## 4.0.1
 
