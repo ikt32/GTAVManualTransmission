@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.3
+*   Revert XInput 1.4 usage
+*   Fix support for older game versions
+*   Fix default settings
+*   Increase version number for clarity
+
 ## 4.0.2
 
 New things
