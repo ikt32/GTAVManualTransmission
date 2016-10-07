@@ -148,7 +148,7 @@ float VehicleExtensions::GetThrottleP(Vehicle handle) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0x8B4 : 0x8A4);
-	offset = (getGameVersion() > 3 ? 0x8D4 : offset);
+	offset = (getGameVersion() > 25 ? 0x8D4 : offset);
 
 	return *reinterpret_cast<float *>(address + offset);
 }
@@ -157,7 +157,7 @@ void VehicleExtensions::SetThrottleP(Vehicle handle, float value) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0x8B4 : 0x8A4);
-	offset = (getGameVersion() > 3 ? 0x8D4 : offset);
+	offset = (getGameVersion() > 25 ? 0x8D4 : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }
@@ -166,7 +166,7 @@ float VehicleExtensions::GetBrakeP(Vehicle handle) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0x8B8 : 0x8A8);
-	offset = (getGameVersion() > 3 ? 0x8D8 : offset);
+	offset = (getGameVersion() > 25 ? 0x8D8 : offset);
 
 	return *reinterpret_cast<float *>(address + offset);
 }
@@ -175,7 +175,7 @@ void VehicleExtensions::SetBrakeP(Vehicle handle, float value) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0x8B8 : 0x8A8);
-	offset = (getGameVersion() > 3 ? 0x8D8 : offset);
+	offset = (getGameVersion() > 25 ? 0x8D8 : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }
@@ -184,7 +184,7 @@ float VehicleExtensions::GetFuelLevel(Vehicle handle) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0x768 : 0x758);
-	offset = (getGameVersion() > 3 ? 0x788 : offset);
+	offset = (getGameVersion() > 25 ? 0x788 : offset);
 
 	return *reinterpret_cast<float *>(address + offset);
 }
@@ -193,7 +193,7 @@ void VehicleExtensions::SetFuelLevel(Vehicle handle, float value) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0x768 : 0x758);
-	offset = (getGameVersion() > 3 ? 0x788 : offset);
+	offset = (getGameVersion() > 25 ? 0x788 : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }
@@ -245,7 +245,7 @@ float VehicleExtensions::GetSteeringInputAngle(Vehicle handle) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0x8A4 : 0x894);
-	offset = (getGameVersion() > 3 ? 0x8C4 : offset);
+	offset = (getGameVersion() > 25 ? 0x8C4 : offset);
 
 	return *reinterpret_cast<float *>(address + offset);
 }
@@ -254,7 +254,7 @@ void VehicleExtensions::SetSteeringInputAngle(Vehicle handle, float value) const
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0x8A4 : 0x894);
-	offset = (getGameVersion() > 3 ? 0x8C4 : offset);
+	offset = (getGameVersion() > 25 ? 0x8C4 : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }
@@ -264,7 +264,7 @@ float VehicleExtensions::GetSteeringAngle(Vehicle handle) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0x8AC : 0x89C);
-	offset = (getGameVersion() > 3 ? 0x8CC : offset);
+	offset = (getGameVersion() > 25 ? 0x8CC : offset);
 
 	return *reinterpret_cast<float *>(address + offset);
 }
@@ -273,7 +273,7 @@ void VehicleExtensions::SetSteeringAngle(Vehicle handle, float value) const {
 	uint64_t address = mem.GetAddressOfEntity(handle);
 
 	int offset = (getGameVersion() > 3 ? 0x8AC : 0x89C);
-	offset = (getGameVersion() > 3 ? 0x8CC : offset);
+	offset = (getGameVersion() > 25 ? 0x8CC : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }
