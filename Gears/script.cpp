@@ -1280,9 +1280,14 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 
 	// On oversteering conditions, let physics dictate the feel
 	if (oversteer > 0.01f && vehData.Velocity > gripSpeedThreshold) {
-		//centerForce = 0;
-		centerForce = static_cast<int>((1.0f - oversteer) * centerForce);
-		damperForce = settings.DamperMin + static_cast<int>(oversteer * (settings.DamperMax - settings.DamperMin));
+		float cfRatio = (1.0f - (5.0f * oversteer)); // 20% oversteer = 0% center
+		cfRatio = cfRatio < 0.0f ? 0.0f : cfRatio; // clamp 0.0
+		centerForce = static_cast<int>(cfRatio * centerForce);
+		
+		//float dRatio = 1.0f- cfRatio;
+		//damperForce = settings.DamperMin + 
+		//	static_cast<int>(dRatio * (settings.DamperMax - settings.DamperMin));
+
 	}
 
 	if (vehData.Velocity < -0.1f) {
