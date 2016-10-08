@@ -1,4 +1,7 @@
 # Changelog
+## 4.0.4
+*   Fix Dpad press register on toggle
+*   Print version number
 
 ## 4.0.3
 *   Revert XInput 1.4 usage
