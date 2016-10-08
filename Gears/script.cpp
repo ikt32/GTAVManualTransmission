@@ -220,16 +220,14 @@ void update() {
 	// For bikes, do this automatically.
 	if (vehData.IsBike && settings.SimpleBike) {
 		functionAutoReverse();
-		handlePedalsDefault(
-			controls.ThrottleVal,
-			controls.BrakeVal);
+		if (prevInput == ScriptControls::InputDevices::Wheel) {
+			handlePedalsDefault( controls.ThrottleVal, controls.BrakeVal);
+		}
 	}
 	else {
 		functionRealReverse();
 		if (prevInput == ScriptControls::InputDevices::Wheel) {
-			handlePedalsRealReverse(
-				controls.ThrottleVal,
-				controls.BrakeVal);
+			handlePedalsRealReverse( controls.ThrottleVal, controls.BrakeVal);
 		}
 	}
 
@@ -986,9 +984,11 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 		if (wheelThrottleVal > 0.01f) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
 		}
-		// Brake Pedal normal
 		if (wheelBrakeVal > 0.01f) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelBrakeVal);
+			if (vehData.Velocity > 0.1f)
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelBrakeVal);
+			else if (vehData.Velocity < -.1f)
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelBrakeVal);
 		}
 		// Brake Pedal still
 		if (	wheelBrakeVal > 0.01f &&
