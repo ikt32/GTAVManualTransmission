@@ -56,7 +56,8 @@ public:
 	float CenterStrength = 1.0f;
 	float DetailStrength = 100.0f;
 	bool AutoLookBack = false;
-
+	float SteerAngleMax = 900.0f;
+	float SteerAngleMod = 720.0f;
 private:
 	void CheckSettings();
 };

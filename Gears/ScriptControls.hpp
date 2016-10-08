@@ -93,7 +93,7 @@ public:
 	float ThrottleVal = 0.0f;
 	// 1 = Pressed, 0 = Not pressed
 	float ClutchVal = 0.0f;
-	LONG SteerVal = 0;
+	float SteerVal = 0.5f;
 
 	// Perceived accelerator value
 	int AccelValGTA = 0;

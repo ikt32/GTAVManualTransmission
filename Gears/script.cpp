@@ -1141,7 +1141,7 @@ void handleVehicleButtons() {
 		}
 	}
 
-	float centerPos = static_cast<float>(controls.SteerLeft + controls.SteerRight) / 2;
+	float centerPos = 0.5f;//static_cast<float>(controls.SteerLeft + controls.SteerRight) / 2;
 	float wheelCenterDeviation = controls.SteerVal - centerPos;
 
 	if (blinkerTicks == 1 && abs(wheelCenterDeviation/ centerPos) > 0.2f)
@@ -1183,23 +1183,25 @@ void handleVehicleButtons() {
 
 void doWheelSteering() {
 	if (prevInput == ScriptControls::InputDevices::Wheel) {
-		ext.SetSteeringInputAngle(vehicle, (controls.SteerVal - 32768) / (-32768.0f));
-		int additionalOffset = 2560;
+		float steerMult = settings.SteerAngleMax / settings.SteerAngleMod;
+		float effSteer = steerMult * 2.0 * (controls.SteerVal - 0.5f);
+		showText(0.4, 0.4, 1.0, std::to_string(effSteer).c_str());
+
+		ext.SetSteeringInputAngle(vehicle, steerMult * -2.0f * (controls.SteerVal - 0.5f));
+
+		float range = ( controls.SteerRight - controls.SteerLeft );
+		
 		float antiDeadzoned;
-		antiDeadzoned = (controls.SteerVal - 32768) / 32768.0f;
-		if (//logiSteeringWheelPos > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
-			controls.SteerVal <= 0) {
-			antiDeadzoned = (controls.SteerVal - 32768 - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE - additionalOffset) /
-					(32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
+		antiDeadzoned = (controls.SteerVal*range - 32768) / 32768.0f;
+		if (effSteer < -0.95) {
+			antiDeadzoned = (controls.SteerVal*range - 32768 - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) /
+				(32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
 		}
-		if (//logiSteeringWheelPos > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
-			controls.SteerVal > 0) {
-			antiDeadzoned = (controls.SteerVal - 32768 + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset) /
-					(32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE + additionalOffset);
+		if (effSteer > 0.95) {
+			antiDeadzoned = (controls.SteerVal*range - 32768 + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) /
+				(32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
 		}
-		// Gotta find a way to make this no-delay
-		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, antiDeadzoned);
-		//VEHICLE::SET_VEHICLE_STEER_BIAS(vehicle, -steerVal_);
+		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, steerMult * antiDeadzoned);
 	}
 }
 
@@ -1231,9 +1233,9 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 	)/20;
 
 	// Centering
-	int centerPos = (controls.SteerLeft + controls.SteerRight)/2;
-	float divisor = (controls.SteerRight - controls.SteerLeft) / 10000.0f;
-	int wheelCenterDeviation = controls.SteerVal - centerPos;
+	float centerPos = 0.5f;// (controls.SteerLeft + controls.SteerRight) / 2;
+	float divisor = 0.0001f;// (controls.SteerRight - controls.SteerLeft) / 10000.0f;
+	float wheelCenterDeviation = controls.SteerVal - centerPos;
 	int centerForce = static_cast<int>((wheelCenterDeviation / divisor) * speed * 0.25) +
 					  static_cast<int>((wheelCenterDeviation / divisor) * std::abs(accelValsAvg.y) * 0.25);
 

@@ -178,6 +178,9 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	scriptControl->FFAxis = buffer;
 
 	scriptControl->ClutchDisable = (GetPrivateProfileIntA("WHEELAXIS", "ClutchDisable", 0, SETTINGSFILE) == 1);
+
+	SteerAngleMax = GetPrivateProfileIntA("WHEELAXIS", "SteerAngleMax", 900, SETTINGSFILE) / 1.0f;
+	SteerAngleMod = GetPrivateProfileIntA("WHEELAXIS", "SteerAngleMod", 720, SETTINGSFILE) / 1.0f;
 	
 	//WheelRange = GetPrivateProfileIntA("WHEEL", "WheelRange", 180, SETTINGSFILE);
 	FFEnable = GetPrivateProfileIntA("WHEEL", "FFEnable", 1, SETTINGSFILE) == 1;
