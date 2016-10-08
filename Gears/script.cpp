@@ -1184,12 +1184,11 @@ void handleVehicleButtons() {
 void doWheelSteering() {
 	if (prevInput == ScriptControls::InputDevices::Wheel) {
 		float steerMult = settings.SteerAngleMax / settings.SteerAngleMod;
-		float effSteer = steerMult * 2.0 * (controls.SteerVal - 0.5f);
-		showText(0.4, 0.4, 1.0, std::to_string(effSteer).c_str());
+		float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 
 		ext.SetSteeringInputAngle(vehicle, steerMult * -2.0f * (controls.SteerVal - 0.5f));
 
-		float range = ( controls.SteerRight - controls.SteerLeft );
+		float range = (float)( controls.SteerRight - controls.SteerLeft );
 		
 		float antiDeadzoned;
 		antiDeadzoned = (controls.SteerVal*range - 32768) / 32768.0f;
@@ -1209,6 +1208,9 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 	if (!controls.WheelDI.IsConnected() || controls.WheelDI.NoFeedback || prevInput != ScriptControls::Wheel || !settings.FFEnable) {
 		return;
 	}
+
+	float steerMult = settings.SteerAngleMax / settings.SteerAngleMod;
+	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 
 	// Macro FFB effects on the car body
 	int constantForce = -100 * static_cast<int>(settings.FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
@@ -1314,11 +1316,23 @@ void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, Scr
 	}
 
 	int totalForce = static_cast<int>(steerSpeed * damperForce * 0.1) + 
-		constantForce +
-		static_cast<int>(settings.CenterStrength * centerForce) +
+		constantForce/steerMult +
+		static_cast<int>(settings.CenterStrength * centerForce)*steerMult +
 		static_cast<int>(10.0f * settings.DetailStrength * compSpeedTotal);
 
+	if (effSteer > 1.0f) {
+		totalForce = (effSteer - 1.0f) * 100000 + static_cast<int>(steerSpeed * settings.DamperMax * 0.1);
+		if (effSteer > 1.05f) {
+			totalForce = 10000;
+		}
+	} else if (effSteer < -1.0f) {
+		totalForce = (-effSteer - 1.0f) * -100000 + static_cast<int>(steerSpeed * settings.DamperMax * 0.1);
+		if (effSteer < -1.05f) {
+			totalForce = -10000;
+		}
+	}
 	controls.WheelDI.SetConstantForce(totalForce);
+
 
 	if (settings.Debug) {
 		std::stringstream SteerValue;
