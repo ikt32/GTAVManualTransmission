@@ -1,5 +1,10 @@
 # Changelog
 ## 4.0.4
+*   Fix engine revving while braking with steering wheel while rolling back in a non-reverse gear
+*   Decrease Centerforce faster during oversteer: 0% centerforce @ 20% oversteer
+*   Remove dampener adjustment for oversteer
+
+## 4.0.4
 *   Fix Dpad press register on toggle
 *   Print version number
 
