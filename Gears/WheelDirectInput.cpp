@@ -68,10 +68,8 @@ bool WheelDirectInput::InitWheel(std::string &ffAxis) {
 				return false;
 			}
 			logger.Write("Initializing force feedback success");
-			while (JoyState.rgdwPOV[0] != -1) {
-				UpdateState();
-			}
-			UpdateState();
+			UpdateState(); // I don't understand
+			UpdateState(); // Why do I need to call this twice?
 			prevTime = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 			logger.Write("Initializing wheel success");
 			return true;
