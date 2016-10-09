@@ -7,6 +7,7 @@ Gears.ini has changed!
 
 Fixes:
 *   Fix engine revving while braking with steering wheel while rolling back in a non-reverse gear
+*   Fix engine revving while braking with steering wheel in reverse near stop
 *   Decrease Centerforce faster during oversteer: 0% centerforce @ 20% oversteer
 *   Remove dampener adjustment for oversteer
 

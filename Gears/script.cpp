@@ -206,8 +206,8 @@ void update() {
 	// Hill-start effect, gravity and stuff
 	// Courtesy of XMOD
 	if (settings.HillBrakeWorkaround) {
-		if (vehData.CurrGear > 0 && controls.ThrottleVal < 0.2 && !controls.BrakeVal && vehData.Speed < 2.0f)
-		{
+		if (vehData.CurrGear > 0 && controls.ThrottleVal < 0.2 && !controls.BrakeVal && vehData.Speed < 2.0f &&
+			VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle))	{
 			if (vehData.Pitch < 0 || controls.ClutchVal)
 				ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
 					vehicle, 1, 0.0f, -1 * (vehData.Pitch / 150.0f) * 1.1f, 0.0f, true, true, true, true);
@@ -953,14 +953,14 @@ void functionRealReverse() {
 		}
 		// LT behavior when still
 		if (controls.BrakeVal > 0.01f && controls.ThrottleVal <= controls.BrakeVal &&
-		                                vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
+		    vehData.Velocity > -0.5f && vehData.Velocity <= 0.1f) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			ext.SetBrakeP(vehicle, 1.0f);
 		}
 		// LT behavior when reversing
 		if (controls.BrakeVal > 0.01f &&
-			vehData.Velocity <= -0.1f) {
+			vehData.Velocity <= -0.5f) {
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.BrakeVal);
 		}
@@ -987,7 +987,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 		}
 		// Brake Pedal Reverse
 		if (wheelBrakeVal > 0.01f &&
-			vehData.Velocity <= -0.1f) {
+			vehData.Velocity <= -0.5f) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelBrakeVal);
 		}
 	}
