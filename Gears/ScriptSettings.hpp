@@ -57,7 +57,8 @@ public:
 	float DetailStrength = 100.0f;
 	bool AutoLookBack = false;
 	float SteerAngleMax = 900.0f;
-	float SteerAngleMod = 720.0f;
+	float SteerAngleCar = 720.0f;
+	float SteerAngleBike = 180.0f;
 private:
 	void CheckSettings();
 };

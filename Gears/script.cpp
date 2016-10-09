@@ -118,13 +118,14 @@ void update() {
 		updateLastInputDevice();
 		handleVehicleButtons();
 		handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
-		doWheelSteering();
+		doWheelSteering(vehData.IsBike);
 		playWheelEffects(
-		vehData.Speed,
-		vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
-		vehData.getAccelerationVectorsAverage(),
-		settings,
-		!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f);
+		                 vehData.Speed,
+		                 vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
+		                 vehData.getAccelerationVectorsAverage(),
+		                 settings,
+		                 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f,
+			vehData.IsBike);
 	}
 
 
@@ -141,13 +142,14 @@ void update() {
 	handleVehicleButtons();
 
 	if (controls.WheelDI.IsConnected()) {
-		doWheelSteering();
+		doWheelSteering(vehData.IsBike);
 		playWheelEffects(
-			vehData.Speed,
-			vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
-			vehData.getAccelerationVectorsAverage(),
-			settings,
-			!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f);
+		                 vehData.Speed,
+		                 vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
+		                 vehData.getAccelerationVectorsAverage(),
+		                 settings,
+		                 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f,
+			vehData.IsBike);
 	}
 	
 
@@ -1181,9 +1183,14 @@ void handleVehicleButtons() {
 //                    Wheel input and force feedback
 ///////////////////////////////////////////////////////////////////////////////
 
-void doWheelSteering() {
+void doWheelSteering(bool isBike) {
 	if (prevInput == ScriptControls::InputDevices::Wheel) {
-		float steerMult = settings.SteerAngleMax / settings.SteerAngleMod;
+		float steerMult;
+		if (isBike)
+			steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
+		else
+			steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
+
 		float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 
 		ext.SetSteeringInputAngle(vehicle, steerMult * -2.0f * (controls.SteerVal - 0.5f));
@@ -1204,12 +1211,17 @@ void doWheelSteering() {
 	}
 }
 
-void playWheelEffects(	float speed, Vector3 accelVals, Vector3 accelValsAvg, ScriptSettings& settings, bool airborne) {
+void playWheelEffects(float speed, Vector3 accelVals, Vector3 accelValsAvg, ScriptSettings& settings, bool airborne, bool isBike) {
 	if (!controls.WheelDI.IsConnected() || controls.WheelDI.NoFeedback || prevInput != ScriptControls::Wheel || !settings.FFEnable) {
 		return;
 	}
 
-	float steerMult = settings.SteerAngleMax / settings.SteerAngleMod;
+	float steerMult;
+	if (isBike)
+		steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
+	else
+		steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
+
 	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 
 	// Macro FFB effects on the car body

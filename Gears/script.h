@@ -89,8 +89,8 @@ void playWheelEffects(
 	Vector3 accelVals,
 	Vector3 accelValsAvg,
 	ScriptSettings& settings,
-	bool airborne);
-void doWheelSteering();
+	bool airborne, bool isBike);
+void doWheelSteering(bool isBike);
 
 ///////////////////////////////////////////////////////////////////////////////
 //                             Misc features

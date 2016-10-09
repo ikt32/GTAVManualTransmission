@@ -1,5 +1,11 @@
 # Changelog
-## 4.0.4
+
+## 4.1
+Gears.ini has changed!
+*   Add steering input degree choices
+*   Add soft lock @ steering input degrees
+
+Fixes:
 *   Fix engine revving while braking with steering wheel while rolling back in a non-reverse gear
 *   Decrease Centerforce faster during oversteer: 0% centerforce @ 20% oversteer
 *   Remove dampener adjustment for oversteer
