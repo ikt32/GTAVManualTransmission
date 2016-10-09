@@ -1297,12 +1297,12 @@ void playWheelEffects(float speed, Vector3 accelVals, Vector3 accelValsAvg, Scri
 		static_cast<int>(10.0f * settings.DetailStrength * compSpeedTotal);
 
 	if (effSteer > 1.0f) {
-		totalForce = (effSteer - 1.0f) * 100000 + static_cast<int>(steerSpeed * settings.DamperMax * 0.1);
+		totalForce = (effSteer - 1.0f) * 100000 + totalForce;
 		if (effSteer > 1.05f) {
 			totalForce = 10000;
 		}
 	} else if (effSteer < -1.0f) {
-		totalForce = (-effSteer - 1.0f) * -100000 + static_cast<int>(steerSpeed * settings.DamperMax * 0.1);
+		totalForce = (-effSteer - 1.0f) * -100000 + totalForce;
 		if (effSteer < -1.05f) {
 			totalForce = -10000;
 		}
