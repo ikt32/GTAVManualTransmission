@@ -223,13 +223,13 @@ void update() {
 	if (vehData.IsBike && settings.SimpleBike) {
 		functionAutoReverse();
 		if (prevInput == ScriptControls::InputDevices::Wheel) {
-			handlePedalsDefault( controls.ThrottleVal, controls.BrakeVal);
+			handlePedalsDefault( controls.ThrottleVal, controls.BrakeVal );
 		}
 	}
 	else {
 		functionRealReverse();
 		if (prevInput == ScriptControls::InputDevices::Wheel) {
-			handlePedalsRealReverse( controls.ThrottleVal, controls.BrakeVal);
+			handlePedalsRealReverse( controls.ThrottleVal, controls.BrakeVal );
 		}
 	}
 
@@ -915,22 +915,17 @@ void functionRealReverse() {
 	// Forward gear
 	// Desired: Only brake
 	if (vehData.CurrGear > 0) {
-		// LT behavior when still: Just brake
-		if (controls.BrakeVal > 0.02f && controls.ThrottleVal < controls.BrakeVal &&
-		                                 vehData.Velocity <= 0.5f && vehData.Velocity >= -0.1f) {
+		// LT behavior when stopped: Just brake
+		if (controls.BrakeVal > 0.01f && controls.ThrottleVal < controls.BrakeVal &&
+		    vehData.Velocity < 0.5f && vehData.Velocity >= -0.1f) { // < 0.5 so reverse never triggers
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-			ext.SetThrottleP(vehicle, 0.0f);
+			ext.SetThrottleP(vehicle, 0.1f);
 			ext.SetBrakeP(vehicle, 1.0f);
-			//VEHICLE::_SET_VEHICLE_HALT(vehicle, 0.0f, false, false);
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-		}
-		else {
-			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
 		// LT behavior when rolling back: Brake
-		if (controls.BrakeVal > 0.02f && controls.ThrottleVal < controls.BrakeVal &&
-		                                 vehData.Velocity < -0.1f) {
+		if (controls.BrakeVal > 0.01f && controls.ThrottleVal < controls.BrakeVal &&
+		    vehData.Velocity < -0.1f) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.BrakeVal);
@@ -961,13 +956,7 @@ void functionRealReverse() {
 		                                vehData.Velocity > -0.55f && vehData.Velocity <= 0.5f) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-			//VEHICLE::_SET_VEHICLE_HALT(vehicle, 0.0f, 0, false);
 			ext.SetBrakeP(vehicle, 1.0f);
-
-		}
-		else {
-			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		}
 		// LT behavior when reversing
 		if (controls.BrakeVal > 0.01f &&
@@ -987,22 +976,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
 		}
 		if (wheelBrakeVal > 0.01f) {
-			if (vehData.Velocity > 0.1f)
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelBrakeVal);
-			else if (vehData.Velocity < -.1f)
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelBrakeVal);
-		}
-		// Brake Pedal still
-		if (	wheelBrakeVal > 0.01f &&
-				wheelThrottleVal < wheelBrakeVal &&
-				vehData.Velocity <= 0.1f && vehData.Velocity >= -0.1f) {
-			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-			ext.SetThrottleP(vehicle, 0.0f);
-			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-			//VEHICLE::_SET_VEHICLE_HALT(vehicle, 0.0f, 0, false);
-			ext.SetBrakeP(vehicle, 1.0f);
-
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelBrakeVal);
 		}
 	}
 
@@ -1011,16 +985,6 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 		if (wheelThrottleVal > 0.01f && wheelThrottleVal > wheelBrakeVal) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelThrottleVal);
 		}
-		// Brake Pedal stationary
-		if (wheelBrakeVal > 0.01f && wheelThrottleVal <= wheelBrakeVal &&
-		                             vehData.Velocity > -0.1f && vehData.Velocity <= 0.1f) {
-			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-			//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
-			//VEHICLE::_SET_VEHICLE_HALT(vehicle, 0.0f, 0, false);
-			ext.SetBrakeP(vehicle, 1.0f);
-		}
-
 		// Brake Pedal Reverse
 		if (wheelBrakeVal > 0.01f &&
 			vehData.Velocity <= -0.1f) {
