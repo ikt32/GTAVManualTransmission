@@ -40,6 +40,8 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	UITips_TopGearC_B = GetPrivateProfileIntA("OPTIONS", "UITips_TopGearC_B", 255, SETTINGSFILE);
 
 	Debug = (GetPrivateProfileIntA("DEBUG", "Info", 0, SETTINGSFILE) == 1);
+	AltControls = (GetPrivateProfileIntA("DEBUG", "AltControls", 0, SETTINGSFILE) == 1);
+	SteerAngleAlt = GetPrivateProfileIntA("DEBUG", "AltAngle", 180, SETTINGSFILE) / 1.0f;
 
 	// Start Controller section
 	char buffer[24] = {0};
@@ -182,7 +184,7 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	SteerAngleMax = GetPrivateProfileIntA("WHEELAXIS", "SteerAngleMax", 900, SETTINGSFILE) / 1.0f;
 	SteerAngleCar = GetPrivateProfileIntA("WHEELAXIS", "SteerAngleCar", 720, SETTINGSFILE) / 1.0f;
 	SteerAngleBike = GetPrivateProfileIntA("WHEELAXIS", "SteerAngleBike", 180, SETTINGSFILE) / 1.0f;
-	
+
 	//WheelRange = GetPrivateProfileIntA("WHEEL", "WheelRange", 180, SETTINGSFILE);
 	FFEnable = GetPrivateProfileIntA("WHEEL", "FFEnable", 1, SETTINGSFILE) == 1;
 	DamperMax = GetPrivateProfileIntA("WHEEL", "DamperMax", 50, SETTINGSFILE);

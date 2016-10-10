@@ -59,6 +59,8 @@ public:
 	float SteerAngleMax = 900.0f;
 	float SteerAngleCar = 720.0f;
 	float SteerAngleBike = 180.0f;
+	bool AltControls = false;
+	float SteerAngleAlt = 180.0f;
 private:
 	void CheckSettings();
 };

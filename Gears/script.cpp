@@ -74,7 +74,7 @@ void update() {
 		reset();
 		return;
 	}
-	 
+
 	model = ENTITY::GET_ENTITY_MODEL(vehicle);
 
 	///////////////////////////////////////////////////////////////////////////
@@ -92,53 +92,71 @@ void update() {
 	//                            Alt vehicle controls
 	///////////////////////////////////////////////////////////////////////////
 
-	// Unsupported
-	if (controls.WheelDI.IsConnected() && !(VEHICLE::IS_THIS_MODEL_A_CAR(model) || VEHICLE::IS_THIS_MODEL_A_BIKE(model))) {
-		if (VEHICLE::IS_THIS_MODEL_A_BOAT(model)) {
-			showText(0.3, 0.1, 1.0, "BOAT!");
-			updateLastInputDevice();
-			handleVehicleButtons();
-			handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
-			doWheelSteering(true);
-			playWheelEffects(0,
-							 vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
-							 vehData.getAccelerationVectorsAverage(),
-							 settings,
-							 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f,
-							 true);
+	// Alt Support
+	if (!(VEHICLE::IS_THIS_MODEL_A_CAR(model) || 
+		VEHICLE::IS_THIS_MODEL_A_BIKE(model)  ||
+		VEHICLE::IS_THIS_MODEL_A_QUADBIKE(model))) {
+		if (settings.AltControls && controls.WheelDI.IsConnected()) {
+			if (VEHICLE::IS_THIS_MODEL_A_BOAT(model)) {
+				showText(0.3, 0.1, 1.0, "BOAT!");
+				updateLastInputDevice();
+				handleVehicleButtons();
+				handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
+				doWheelSteering(true);
+				playWheelEffects(0,
+								 vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
+								 vehData.getAccelerationVectorsAverage(),
+								 settings,
+								 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f,
+								 true);
+				return;
+			}
+
+			if (VEHICLE::IS_THIS_MODEL_A_PLANE(model)) {
+				showText(0.3, 0.1, 1.0, "PLANE!");
+				updateLastInputDevice();
+
+				if (controls.ButtonIn(ScriptControls::WheelControlType::H3))
+					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleUp, 1.0f);
+
+				if (controls.ButtonIn(ScriptControls::WheelControlType::H4))
+					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleDown, 1.0f);
+
+				float steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
+				float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
+
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyRollLeftRight, effSteer);
+
+				if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftUp))
+					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyPitchUpDown, 1.0f);
+
+				if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftDown))
+					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyPitchUpDown, -1.0f);
+
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyYawLeft, controls.ClutchVal);
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyYawRight, controls.ThrottleVal);
+
+
+				playWheelEffects(0,
+								 vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
+								 vehData.getAccelerationVectorsAverage(),
+								 settings,
+								 false,
+								 true);
+				return;
+			}
+
+			reset();
 			return;
 		}
 
-		if (VEHICLE::IS_THIS_MODEL_A_PLANE(model)) {
-			showText(0.3, 0.1, 1.0, "PLANE!");
-			updateLastInputDevice();
+		reset();
+		return;
+	}
 
-			if (controls.ButtonIn(ScriptControls::WheelControlType::H3))
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleUp, 1.0f);
-
-			if (controls.ButtonIn(ScriptControls::WheelControlType::H4))
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleDown, 1.0f);
-
-			float steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
-			float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
-
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyRollLeftRight, effSteer);
-
-			if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftUp))
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyPitchUpOnly, 1.0f);
-
-			if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftDown))
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyPitchDownOnly, 1.0f);
-
-			playWheelEffects(0,
-							 vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
-							 vehData.getAccelerationVectorsAverage(),
-							 settings,
-							 false,
-							 true);
-			return;
-		}
-
+	// Nope
+	if (VEHICLE::IS_THIS_MODEL_A_BICYCLE(model)) {
+		reset();
 		return;
 	}
 	
