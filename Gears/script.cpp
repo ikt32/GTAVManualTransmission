@@ -71,7 +71,10 @@ void update() {
 	vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
 	model = ENTITY::GET_ENTITY_MODEL(vehicle);
 
-	if (!ENTITY::DOES_ENTITY_EXIST(vehicle) ||
+	if (!ENTITY::DOES_ENTITY_EXIST(vehicle)) {
+		reset();
+		return;
+	}/* ||
 		VEHICLE::IS_THIS_MODEL_A_BICYCLE(model) ||
 		!(VEHICLE::IS_THIS_MODEL_A_CAR(model) ||
 			VEHICLE::IS_THIS_MODEL_A_BIKE(model) ||
@@ -79,23 +82,9 @@ void update() {
 		)) {
 		reset();
 		return;
-	}
-
+	}*/
 
 	vehData.UpdateValues(ext, vehicle);
-	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
-
-	if (prevVehicle != vehicle) {
-		if (vehData.NoClutch) {
-			vehData.SimulatedNeutral = false;
-		}
-		else {
-			vehData.SimulatedNeutral = settings.DefaultNeutral;
-		}
-		shiftTo(1, true);
-	}
-	prevVehicle = vehicle;
-
 	controls.UpdateValues(prevInput, settings.ShiftMode == Automatic);
 
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
@@ -112,6 +101,49 @@ void update() {
 		showDebugInfo();
 	}
 
+	if ( VEHICLE::IS_THIS_MODEL_A_BOAT(model) ) {
+		updateLastInputDevice();
+		handleVehicleButtons();
+		handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
+		doWheelSteering(true);
+		playWheelEffects(vehData.Speed,
+						 vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
+						 vehData.getAccelerationVectorsAverage(),
+						 settings,
+						 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f,
+						 true);
+		return;
+	}
+
+	if ( VEHICLE::IS_THIS_MODEL_A_PLANE(model) ) {
+		showText(0.3, 0.1, 1.0, "PLANE!");
+		updateLastInputDevice();
+
+		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleUp, controls.ThrottleVal);
+		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleDown, controls.BrakeVal);
+
+		float steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
+		float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
+
+		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyRollLeftRight, effSteer);
+
+		if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftUp))
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyPitchUpOnly, 1.0f);
+
+		if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftDown))
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyPitchDownOnly, 1.0f);
+
+		playWheelEffects(vehData.Speed,
+						 vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
+						 vehData.getAccelerationVectorsAverage(),
+						 settings,
+						 false,
+						 true);
+		return;
+	}
+
+
+
 	if (!settings.EnableManual &&
 		settings.WheelWithoutManual &&
 		controls.WheelDI.IsConnected()) {
@@ -119,14 +151,25 @@ void update() {
 		handleVehicleButtons();
 		handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
 		doWheelSteering(vehData.IsBike);
-		playWheelEffects(
-		                 vehData.Speed,
+		playWheelEffects(vehData.Speed,
 		                 vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
 		                 vehData.getAccelerationVectorsAverage(),
 		                 settings,
 		                 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f,
 			vehData.IsBike);
+	}	
+	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
+
+	if (prevVehicle != vehicle) {
+		if (vehData.NoClutch) {
+			vehData.SimulatedNeutral = false;
+		}
+		else {
+			vehData.SimulatedNeutral = settings.DefaultNeutral;
+		}
+		shiftTo(1, true);
 	}
+	prevVehicle = vehicle;
 
 
 	if (!settings.EnableManual) {
@@ -1277,7 +1320,7 @@ void playWheelEffects(float speed, Vector3 accelVals, Vector3 accelValsAvg, Scri
 
 	// Detail feel / suspension compression based
 	float compSpeedTotal = 0.0f;
-	if (!vehData.IsBike) {
+	if (VEHICLE::IS_THIS_MODEL_A_CAR(model) == TRUE) {
 		auto compSpeed = vehData.GetWheelCompressionSpeeds();
 
 		// left should pull left, right should pull right
