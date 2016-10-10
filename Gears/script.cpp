@@ -50,7 +50,7 @@ enum Shifter {
 
 void update() {
 	///////////////////////////////////////////////////////////////////////////
-	//                           Gathering data
+	//                     Are we in a supported vehicle?
 	///////////////////////////////////////////////////////////////////////////
 	player = PLAYER::PLAYER_ID();
 	playerPed = PLAYER::PLAYER_PED_ID();
@@ -69,80 +69,87 @@ void update() {
 	}
 
 	vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
-	model = ENTITY::GET_ENTITY_MODEL(vehicle);
 
 	if (!ENTITY::DOES_ENTITY_EXIST(vehicle)) {
 		reset();
 		return;
-	}/* ||
-		VEHICLE::IS_THIS_MODEL_A_BICYCLE(model) ||
-		!(VEHICLE::IS_THIS_MODEL_A_CAR(model) ||
-			VEHICLE::IS_THIS_MODEL_A_BIKE(model) ||
-			VEHICLE::IS_THIS_MODEL_A_QUADBIKE(model)
-		)) {
-		reset();
-		return;
-	}*/
+	}
+	 
+	model = ENTITY::GET_ENTITY_MODEL(vehicle);
+
+	///////////////////////////////////////////////////////////////////////////
+	//                           Update stuff
+	///////////////////////////////////////////////////////////////////////////
 
 	vehData.UpdateValues(ext, vehicle);
-	controls.UpdateValues(prevInput, settings.ShiftMode == Automatic);
-
-	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
-		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
-		controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle)) {
-		toggleManual();
-	}
-
-	if (settings.CrossScript) {
-		crossScriptComms();
-	}
+	controls.UpdateValues(prevInput, settings.ShiftMode == Automatic || settings.SimpleBike);
 
 	if (settings.Debug) {
 		showDebugInfo();
 	}
 
-	if ( VEHICLE::IS_THIS_MODEL_A_BOAT(model) ) {
-		updateLastInputDevice();
-		handleVehicleButtons();
-		handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
-		doWheelSteering(true);
-		playWheelEffects(vehData.Speed,
-						 vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
-						 vehData.getAccelerationVectorsAverage(),
-						 settings,
-						 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f,
-						 true);
+	///////////////////////////////////////////////////////////////////////////
+	//                            Alt vehicle controls
+	///////////////////////////////////////////////////////////////////////////
+
+	// Unsupported
+	if (controls.WheelDI.IsConnected() && !(VEHICLE::IS_THIS_MODEL_A_CAR(model) || VEHICLE::IS_THIS_MODEL_A_BIKE(model))) {
+		if (VEHICLE::IS_THIS_MODEL_A_BOAT(model)) {
+			showText(0.3, 0.1, 1.0, "BOAT!");
+			updateLastInputDevice();
+			handleVehicleButtons();
+			handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
+			doWheelSteering(true);
+			playWheelEffects(0,
+							 vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
+							 vehData.getAccelerationVectorsAverage(),
+							 settings,
+							 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f,
+							 true);
+			return;
+		}
+
+		if (VEHICLE::IS_THIS_MODEL_A_PLANE(model)) {
+			showText(0.3, 0.1, 1.0, "PLANE!");
+			updateLastInputDevice();
+
+			if (controls.ButtonIn(ScriptControls::WheelControlType::H3))
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleUp, 1.0f);
+
+			if (controls.ButtonIn(ScriptControls::WheelControlType::H4))
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleDown, 1.0f);
+
+			float steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
+			float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
+
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyRollLeftRight, effSteer);
+
+			if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftUp))
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyPitchUpOnly, 1.0f);
+
+			if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftDown))
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyPitchDownOnly, 1.0f);
+
+			playWheelEffects(0,
+							 vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
+							 vehData.getAccelerationVectorsAverage(),
+							 settings,
+							 false,
+							 true);
+			return;
+		}
+
 		return;
 	}
-
-	if ( VEHICLE::IS_THIS_MODEL_A_PLANE(model) ) {
-		showText(0.3, 0.1, 1.0, "PLANE!");
-		updateLastInputDevice();
-
-		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleUp, controls.ThrottleVal);
-		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleDown, controls.BrakeVal);
-
-		float steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
-		float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
-
-		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyRollLeftRight, effSteer);
-
-		if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftUp))
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyPitchUpOnly, 1.0f);
-
-		if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftDown))
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyPitchDownOnly, 1.0f);
-
-		playWheelEffects(vehData.Speed,
-						 vehData.getAccelerationVectors(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true)),
-						 vehData.getAccelerationVectorsAverage(),
-						 settings,
-						 false,
-						 true);
-		return;
+	
+	///////////////////////////////////////////////////////////////////////////
+	//                          Ground vehicle controls
+	///////////////////////////////////////////////////////////////////////////
+	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
+		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
+		controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle)) {
+		toggleManual();
 	}
-
-
 
 	if (!settings.EnableManual &&
 		settings.WheelWithoutManual &&
@@ -170,12 +177,14 @@ void update() {
 		shiftTo(1, true);
 	}
 	prevVehicle = vehicle;
-
+	
+	if (settings.CrossScript) {
+		crossScriptComms();
+	}
 
 	if (!settings.EnableManual) {
 		return;
 	}
-	
 
 	///////////////////////////////////////////////////////////////////////////
 	//          Active whenever Manual is enabled from here
