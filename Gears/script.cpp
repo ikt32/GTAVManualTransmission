@@ -163,6 +163,8 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 	//                          Ground vehicle controls
 	///////////////////////////////////////////////////////////////////////////
+
+
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
 		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle)) {
@@ -1361,18 +1363,18 @@ void playWheelEffects(float speed, Vector3 accelVals, Vector3 accelValsAvg, Scri
 		damperForce = settings.DamperMin;
 	}
 
-	int totalForce = static_cast<int>(steerSpeed * damperForce * 0.1) + 
-		constantForce/steerMult +
-		static_cast<int>(settings.CenterStrength * centerForce)*steerMult +
+	int totalForce = static_cast<int>(steerSpeed * damperForce * 0.1) +
+		static_cast<int>(constantForce / steerMult) +
+		static_cast<int>(settings.CenterStrength * centerForce * steerMult) +
 		static_cast<int>(10.0f * settings.DetailStrength * compSpeedTotal);
 
 	if (effSteer > 1.0f) {
-		totalForce = (effSteer - 1.0f) * 100000 + totalForce;
+		totalForce = static_cast<int>((effSteer - 1.0f) * 100000) + totalForce;
 		if (effSteer > 1.05f) {
 			totalForce = 10000;
 		}
 	} else if (effSteer < -1.0f) {
-		totalForce = (-effSteer - 1.0f) * -100000 + totalForce;
+		totalForce = static_cast<int>((-effSteer - 1.0f) * -100000) + totalForce;
 		if (effSteer < -1.05f) {
 			totalForce = -10000;
 		}
