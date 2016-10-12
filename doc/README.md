@@ -23,9 +23,7 @@ also works without manual transmission!
 - [Installation](#installation)
 	- [Additional steps for wheel users](#additional-steps-for-wheel-users)
 - [Basic usage and controls](#basic-usage-and-controls)
-	- [Keyboard:](#keyboard)
-	- [Controller:](#controller)
-	- [Wheel:](#wheel)
+	- [Controls](#controls)
 	- [Usage](#usage)
 - [Troubleshooting](#troubleshooting)
 	- [Installation dependencies](#installation-dependencies)
@@ -40,6 +38,7 @@ also works without manual transmission!
 	- [`[WHEEL]`](#wheel)
 	- [`[WHEELAXIS]`](#wheelaxis)
 	- [`[WHEELKEYBOARD]`](#wheelkeyboard)
+	- [`[DEBUG]`](#debug)
 - [Thanks](#thanks)
 - [Source code](#source-code)
 
@@ -79,17 +78,18 @@ Basic knowledge of a manually operated vehicle is required, such as what a
 clutch is and what it does. You can play with these things disabled too, for
 a more arcade gameplay.
 
-## Keyboard:
+## Controls
+### Keyboard
 * Press `|\` to disable or enable manual transmission.
 * Press `}]` to switch between a sequential gearbox, H-pattern gearbox or the
 automatic gearbox.
 
-## Controller:
+### Controller
 * Hold Dpad Right to disable or enable manual transmission.
 * Hold ???? ????? to switch between a sequential gearbox, H-pattern gearbox or
 the automatic gearbox.
 
-## Wheel:
+### Wheel
 * Use the assigned buttons to toggle the mod and switch between gearboxes.
 * Refer to `Gears.ini` for these buttons.
 
@@ -99,6 +99,31 @@ automatically switch between these inputs.
 
 Specifically for wheel users, you  might need to fully depress the throttle
 pedal (once) if the mod keeps swapping away from the keyboard/controller.
+
+### Driving with Manual Transmission
+To drive forward, ensure that
+* the vehicle is not in neutral
+* the vehicle is not in reverse
+
+and press the accelerator key, button or
+pedal. Depending on your settings, you might or might not
+need to operate the clutch to make a smooth start.
+
+To brake, press the brake/reverse key, button or pedal. When coming to a halt,
+the vehicle will not reverse.
+
+To reverse, shift into the reverse gear. Press the accelerator key, button or
+pedal. Depending on your settings, you might or might not need to operator the
+clutch to get moving.
+
+#### Wheel-specific
+Additional functionality is available for vehicles, like operating the lights,
+horn, blinkers et cetera from the wheel. Refer to the `[WHEEL]` section for
+details.
+
+#### Wheel usage without Manual Transmission
+The throttle and the brake work like the accelerator and brake/reverse inputs.
+A clutch pedal won't have any action. The rest of the functions still work.
 
 # Troubleshooting
 ## Installation dependencies
@@ -331,7 +356,8 @@ When assigning axes and buttons, __use Joystick.exe__! This tool will report the
 correct values for the .ini.
 
 ### `Enable` : `0` or `1`
-Disable detection and usage of a DirectInput Wheel. Turn this on if you want to use your racing wheel with GTA V and this mod.
+Disable detection and usage of a DirectInput Wheel. Turn this on if you want to
+use your racing wheel with GTA V and this mod.
 
 
 ### Most controls
@@ -484,12 +510,37 @@ as comments in `Gears.ini`. They are listed here again for completeness.
 	ClutchDisable = 1
 	FFAxis      = X
 
+
+### `SteerAngleMax` : Any
+Physical steering wheel steering degrees, in angles. Match this with your wheel
+spec.
+
+### `SteerAngleCar` : Any less than `SteerAngleMax`
+Soft lock for in cars.
+
+### `SteerAngleBike` : Any less than `SteerAngleMax`
+Soft lock for on bikes.
+
 ## `[WHEELKEYBOARD]`
 In this section you can assign wheel buttons to keyboard keys. A few examples
 have been given. The format is `[BUTTON] = [KEY]`. Up to 128 buttons
 are supported. Any keyboard key can be chosen, but Num Lock needs to be OFF for
 keys to be interpreted correctly.
 Use the included __Keys.txt__ for reference!
+
+## `[DEBUG]`
+
+### `Info`: `0` or `1`
+Disable or enable onscreen debug info, with engine parameters and wheel/input
+parameters.
+
+### `AltControls` : `0` or `1`
+__EXPERIMENTAL__ <br>
+Support for wheel input for boats and airplanes.
+
+### `AltAngle` : Any
+__EXPERIMENTAL__ <br>
+Steering wheel angle for alternative vehicles.
 
 # Thanks
 * Alexander Blade
