@@ -33,17 +33,24 @@ You can read decorators to get some info about this mod.
 Example: ```DECORATOR::DECOR_GET_INT(vehicle, "hunt_score");``` gets the current shift up/down status. Currently this mod exposes 2 variables which can be used in other scripts.
 
 Speedometers shift up/down indicator:
-* "hunt_score" 0 - Nothing
-* "hunt_score" 1 - Shift up
-* "hunt_score" 2 - Shift down
+* `hunt_score`: `0` - Nothing
+* `hunt_score`: `1` - Shift up
+* `hunt_score`: `2` - Shift down
 
 Scripts changing torque
-* "hunt_score" 2 - Torque is decreased
+* `hunt_score`: `2` - Torque is decreased
 
 Speedometers Neutral gear:
-* "hunt_weapon" 0 - In gear
-* "hunt_weapon" 1 - Neutral
+* `hunt_weapon`: `0` - In gear
+* `hunt_weapon`: `1` - Neutral
 
 Please note that the neutral gear is a simulated neutral gear, which is clutch in gear 1. Take this in consideration for your speedometer implementation.
+
+Since version `4.0.2` it's possible to set shifting mode externally.
+
+* `hunt_chal_weapon`: `0` - No change
+* `hunt_chal_weapon`: `1` - Sequential
+* `hunt_chal_weapon`: `2` - H-pattern
+* `hunt_chal_weapon`: `3` - Automatic
 
 __Important note:__ Usage of decorators out of base game context isn't guaranteed to work. CitizenFX-based mods will crash. Cross-script communication can be simply disabled using the ```CrossScript = 0``` in ```Gears.ini``` for these situations.
