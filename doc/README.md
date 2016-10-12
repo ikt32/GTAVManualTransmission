@@ -38,8 +38,10 @@ also works without manual transmission!
 	- [`[CONTROLLER]`](#controller)
 	- [`[KEYBOARD]`](#keyboard)
 	- [`[WHEEL]`](#wheel)
+	- [`[WHEELAXIS]`](#wheelaxis)
+	- [`[WHEELKEYBOARD]`](#wheelkeyboard)
 - [Thanks](#thanks)
-- [Source](#source)
+- [Source code](#source-code)
 
 <!-- /TOC -->
 
@@ -126,6 +128,10 @@ new Logitech software which will mess up older Logitech steering wheels.
 # Configuration
 This guide will explain the usage of Gears.ini and what the options mean. It’s
 highly recommended to play with this mod using a controller or a wheel.
+
+Generally, if only `0` or `1` the following holds for that feature:
+* `0`: Disabled
+* `1`: Enabled
 
 ## `[OPTIONS]`
 The `[OPTIONS]` section is where you can configure how the mod behaves globally
@@ -234,20 +240,20 @@ your engine will be damaged by __MisshiftDamage__. When you shift into Neutral
 with an insufficiently pressed clutch, your engine will be damaged by
 __MisshiftDamage/10__.
 
-### `HillBrakeWorkaround`: `0` or `1`
+### `HillBrakeWorkaround` : `0` or `1`
 Turn this on to emulate a hill start and car roll on a hill. It gives your car
 a little push. Idea and implementation by XMOD.
 
 * `0`: No change
 * `1`: Workaround enabled. A force will push the car down a slope.
 
-### `AutoLookBack`: `0` or `1`
+### `AutoLookBack` : `0` or `1`
 Turn this on to automatically look back while in the reverse gear.
 
 * `0`: No change
 * `1`: Look back automatically
 
-### `UITips`: `0` or `1`
+### `UITips` : `0` or `1`
 This is a simple gear display, which might be of help to determine if you’re
 in Neutral or not. It also indicates if the gear you're in is the top gear with
 the specified color.
@@ -260,7 +266,7 @@ the specified color.
 * `UITips_TopGearC_G`: `0` to `255`: Green
 * `UITips_TopGearC_B`: `0` to `255`: Blue
 
-### `CrossScript`: `0` or `1`
+### `CrossScript` : `0` or `1`
 Turn this off to disable communication (shift indicators and neutral gear) to
 other mods. Leaving this on in a CitizenFX-based mod __crashes the game__.
 
@@ -315,31 +321,175 @@ You __need__ to correctly set these to get braking and a standstill and
 reversing with the throttle to work.
 
 ## `[WHEEL]`
+DirectInput steering wheels are fully supported! Every axis, button and 8
+directions on the D-pad are supported for inputs. Additionally, steering wheel
+input has been built in even if you don’t want to drive with any gearbox and
+just want the default behavior. __Force Feedback is fully present and active in
+all modes.__
+
+When assigning axes and buttons, __use Joystick.exe__! This tool will report the
+correct values for the .ini.
+
+### `Enable` : `0` or `1`
+Disable detection and usage of a DirectInput Wheel. Turn this on if you want to use your racing wheel with GTA V and this mod.
 
 
+### Most controls
+
+|Control|Usage|Effect|
+|-------|-----|------|
+|Toggle|Press|Toggle Manual Transmission on/off|
+|ToggleH|Press|Switch between sequential, H-shifter or automatic|
+|ShiftUp|Press|Shift up 1 gear (sequential/auto)|
+|ShiftDown|Press|Shift down 1 gear (sequential/auto)|
+|HN|Press/Hold|Shift into gear N (H-shifter)|
+|Handbrake|Hold|Applies the hand brake|
+|Horn|Hold|Sound the horn|
+|LookBack|Hold|Look back|
+|Engine|Press|Restart the engine or turn it off|
+|Lights|Press|Switch between off, low beam and full beam|
+|Camera|Press|Switch through cameras|
+|RadioNext|Press|Next radio channel|
+|RadioPrev|Press|Previous radio channel|
+|IndicatorLeft|Press|Switch on/off left indicator|
+|IndicatorRight|Press|Switch on/off right indicator|
+|IndicatorHazard|Press|Switch on/off hazard lights|
+
+### `FFEnable` : `0` or `1`
+Disable or enable force feedback.
+
+### `DamperMax` : `0` to `100`
+Controls the friction feel when the vehicle is at a stop. A higher
+value means more friction. Keep this higher than __DamperMin__.
+
+### `DamperMin` : `0` to `100`
+Controls the friction feel when the vehicle is moving. A higher
+value means more friction. Keep this lower than __DamperMax__.
+
+### `DamperTargetSpeed` : `0` to any (in m/s)
+Sets the speed at which the damper effect is minimal. This is in
+meters per second!
+
+### `CenterStrength` : `0` to any
+How strong the centering force is. Influenced by speed and
+ acceleration.
+
+### `PhysicsStrength` : Any
+How much physics affect your steering wheel. A higher value
+means a stronger force feedback.
+
+### `DetailStrength` : `0` to any
+How strong the feedback is from suspension compression. Think for terrain
+details like road texture, potholes, manhole covers, sidewalk curbs etc.
+
+## `[WHEELAXIS]`
+__To properly configure your wheel, use Joystick.exe!__
+
+This section maps your wheel input axes.
+
+### Supported input axes and ranges
+
+	lX
+	lY
+	lZ
+	lRx
+	lRy
+	lRz
+	rglSlider0
+	rglSlider1
+
+* XMin – Value of axis while pedal is not pressed
+* XMax – Value of axis while pedal is fully pressed
+
+For ranges, values `0` to `65535` are usually reported.
+
+### Supported force feedback axes:
+	X
+	Y
+	Z
 
 
+### `ClutchDisable` : `0` or `1`
+__If you do not have a clutch pedal, enable this__. Remember to turn off
+Clutch-related functions like Clutch Catching, Clutch shifting etc.
 
+### Existing configurations
+Some friendly users have provided settings for their wheels. These can be found
+as comments in `Gears.ini`. They are listed here again for completeness.
 
+	G27 Throttle and Brake on different axis
+	Throttle    = lY
+	ThrottleMin = 0
+	ThrottleMax = 65535
+	Brake       = lRz
+	BrakeMin    = 0
+	BrakeMax    = 65535
+	Clutch      = rglSlider1
+	ClutchMin   = 0
+	ClutchMax   = 65535
+	ClutchDisable = 0
+	FFAxis 			= X
 
+	G27 Throttle and Brake on same axis
+	Throttle    = rglSlider0
+	ThrottleMin = 32767
+	ThrottleMax = 0
+	Brake       = rglSlider0
+	BrakeMin    = 32767
+	BrakeMax    = 65535
+	Clutch      = rglSlider1
+	ClutchMin   = 0
+	ClutchMax   = 65535
+	ClutchDisable = 0
+	FFAxis 			= X
 
+	Logitech G29
+	Throttle 		= lY
+	Brake 			= lRz
+	Clutch 			= rglSlider0
+	H1					= 12
+	H2					= 13
+	H3					= 14
+	H4					= 15
+	H5					= 16
+	H6					= 17
+	HR					= 18
 
+	Thrustmaster Italia 458, courtesy of Pslytely Psycho
+	Throttle 	= lRz
+	ThrottleMin = 0
+	ThrottleMax = 65535
+	Brake 		= lY
+	BrakeMin 	= 0
+	BrakeMax 	= 65535
+	Steer 		= lX
+	SteerLeft 	= 0
+	SteerRight 	= 65535
+	ClutchDisable = 1
+	FFAxis 		= X
 
+	Thrustmaster T150, courtesy of jojos38
+	Throttle    = lRz
+	ThrottleMin = 0
+	ThrottleMax = 65535
+	Brake       = lY
+	BrakeMin    = 0
+	BrakeMax    = 65535
+	Clutch      = rglSlider1
+	ClutchMin   = 0
+	ClutchMax   = 65535
+	Steer       = lX
+	SteerLeft   = 0
+	SteerRight  = 65535
+	ClutchDisable = 1
+	FFAxis      = X
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## `[WHEELKEYBOARD]`
+In this section you can assign wheel buttons to keyboard keys. A few examples
+have been given. The format is `[BUTTON] = [KEY]`. Up to 128 buttons
+are supported. Any keyboard key can be chosen, but Num Lock needs to be OFF for
+keys to be interpreted correctly.
+Use the included __Keys.txt__ for reference!
 
 # Thanks
 * Alexander Blade
@@ -350,6 +500,6 @@ reversing with the throttle to work.
 * kagikn
 * aXurez
 
-# Source
+# Source code
 This mod is fully open source. The source code is available at
 https://github.com/E66666666/GTAVManualTransmission
