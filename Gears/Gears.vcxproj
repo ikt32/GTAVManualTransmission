@@ -60,38 +60,38 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="keyboard.cpp" />
+    <ClCompile Include="Input\keyboard.cpp" />
+    <ClCompile Include="Input\ScriptControls.cpp" />
+    <ClCompile Include="Input\WheelDirectInput.cpp" />
+    <ClCompile Include="Input\XboxController.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="NativeMemory.cpp" />
-    <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="Memory\MemoryPatcher.cpp" />
+    <ClCompile Include="Memory\NativeMemory.cpp" />
+    <ClCompile Include="Memory\VehicleExtensions.cpp" />
     <ClCompile Include="script.cpp" />
-    <ClCompile Include="ScriptControls.cpp" />
     <ClCompile Include="ScriptSettings.cpp" />
+    <ClCompile Include="Util\Logger.cpp" />
     <ClCompile Include="VehicleData.cpp" />
-    <ClCompile Include="VehicleExtensions.cpp" />
-    <ClCompile Include="MemoryPatcher.cpp" />
-    <ClCompile Include="WheelDirectInput.cpp" />
-    <ClCompile Include="XboxController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\enums.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\main.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h" />
-    <ClInclude Include="DiJoyStick.h" />
-    <ClInclude Include="keyboard.h" />
-    <ClInclude Include="TimeHelper.hpp" />
-    <ClInclude Include="NativeMemory.hpp" />
-    <ClInclude Include="Logger.hpp" />
+    <ClInclude Include="Input\DiJoyStick.h" />
+    <ClInclude Include="Input\keyboard.h" />
+    <ClInclude Include="Input\ScriptControls.hpp" />
+    <ClInclude Include="Input\WheelDirectInput.hpp" />
+    <ClInclude Include="Input\XboxController.hpp" />
+    <ClInclude Include="Memory\MemoryPatcher.hpp" />
+    <ClInclude Include="Memory\NativeMemory.hpp" />
+    <ClInclude Include="Memory\VehicleExtensions.hpp" />
     <ClInclude Include="script.h" />
-    <ClInclude Include="ScriptControls.hpp" />
     <ClInclude Include="ScriptSettings.hpp" />
-    <ClInclude Include="Util.hpp" />
+    <ClInclude Include="Util\Logger.hpp" />
+    <ClInclude Include="Util\TimeHelper.hpp" />
+    <ClInclude Include="Util\Util.hpp" />
     <ClInclude Include="VehicleData.hpp" />
-    <ClInclude Include="VehicleExtensions.hpp" />
-    <ClInclude Include="MemoryPatcher.hpp" />
-    <ClInclude Include="WheelDirectInput.hpp" />
-    <ClInclude Include="XboxController.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

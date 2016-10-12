@@ -3,7 +3,7 @@
 #include <iomanip>
 #include <sstream>
 #include <Windows.h>
-#include "Logger.hpp"
+#include "../Util/Logger.hpp"
 
 namespace MemoryPatcher {
 	int total = 2;

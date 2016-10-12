@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include "../../ScriptHookV_SDK/inc/types.h"
+#include "../../../ScriptHookV_SDK/inc/types.h"
 #include "NativeMemory.hpp"
 #include <vector>
 

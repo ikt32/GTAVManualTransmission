@@ -1,9 +1,9 @@
 #include "ScriptSettings.hpp"
 #include <Windows.h>
 
-#include "Logger.hpp"
+#include "Util/Logger.hpp"
 #include <string>
-#include "keyboard.h"
+#include "Input/keyboard.h"
 
 ScriptSettings::ScriptSettings() {
 }

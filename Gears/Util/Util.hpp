@@ -24,7 +24,7 @@ static std::vector<std::string> GameVersionString = {
 
 	"VER_1_0_505_2_STEAM", // 12
 	"VER_1_0_505_2_NOSTEAM", // 13
-
+	
 	"VER_1_0_573_1_STEAM", // 14
 	"VER_1_0_573_1_NOSTEAM", // 15
 

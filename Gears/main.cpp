@@ -7,10 +7,10 @@ http://dev-c.com
 #include "..\..\ScriptHookV_SDK\inc\main.h"
 
 #include "script.h"
-#include "Logger.hpp"
-#include "MemoryPatcher.hpp"
-#include "Util.hpp"
-#include "keyboard.h"
+#include "Input/keyboard.h"
+#include "Util/Logger.hpp"
+#include "Util/Util.hpp"
+#include "Memory/MemoryPatcher.hpp"
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 	Logger logger(LOGFILE);

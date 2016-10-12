@@ -5,29 +5,27 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ScriptSettings.cpp" />
     <ClCompile Include="VehicleData.cpp" />
-    <ClCompile Include="VehicleExtensions.cpp">
+    <ClCompile Include="Input\ScriptControls.cpp" />
+    <ClCompile Include="Input\keyboard.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\XboxController.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\WheelDirectInput.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\MemoryPatcher.cpp">
       <Filter>Memory</Filter>
     </ClCompile>
-    <ClCompile Include="NativeMemory.cpp">
+    <ClCompile Include="Memory\NativeMemory.cpp">
       <Filter>Memory</Filter>
     </ClCompile>
-    <ClCompile Include="MemoryPatcher.cpp">
+    <ClCompile Include="Memory\VehicleExtensions.cpp">
       <Filter>Memory</Filter>
     </ClCompile>
-    <ClCompile Include="Logger.cpp">
+    <ClCompile Include="Util\Logger.cpp">
       <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="ScriptControls.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
-    <ClCompile Include="WheelDirectInput.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
-    <ClCompile Include="XboxController.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
-    <ClCompile Include="keyboard.cpp">
-      <Filter>Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -46,38 +44,36 @@
     </ClInclude>
     <ClInclude Include="ScriptSettings.hpp" />
     <ClInclude Include="VehicleData.hpp" />
-    <ClInclude Include="VehicleExtensions.hpp">
+    <ClInclude Include="Input\ScriptControls.hpp" />
+    <ClInclude Include="Input\DiJoyStick.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\keyboard.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\XboxController.hpp">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\WheelDirectInput.hpp">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\MemoryPatcher.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
-    <ClInclude Include="NativeMemory.hpp">
+    <ClInclude Include="Memory\NativeMemory.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
-    <ClInclude Include="MemoryPatcher.hpp">
+    <ClInclude Include="Memory\VehicleExtensions.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
-    <ClInclude Include="Util.hpp">
+    <ClInclude Include="Util\Util.hpp">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="Logger.hpp">
+    <ClInclude Include="Util\Logger.hpp">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="ScriptControls.hpp">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="WheelDirectInput.hpp">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="XboxController.hpp">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="TimeHelper.hpp">
+    <ClInclude Include="Util\TimeHelper.hpp">
       <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="DiJoyStick.h">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="keyboard.h">
-      <Filter>Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

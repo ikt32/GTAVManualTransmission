@@ -1,6 +1,6 @@
 #include "WheelDirectInput.hpp"
-#include "TimeHelper.hpp"
-#include "Logger.hpp"
+#include "../Util/TimeHelper.hpp"
+#include "../Util/Logger.hpp"
 #include <sstream>
 
 #include <winerror.h>

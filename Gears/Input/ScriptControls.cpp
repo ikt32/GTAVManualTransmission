@@ -1,8 +1,8 @@
 #include "ScriptControls.hpp"
 
 #include <Windows.h>
-#include "../../ScriptHookV_SDK/inc/natives.h"
-#include "../../ScriptHookV_SDK/inc/enums.h"
+#include "../../../ScriptHookV_SDK/inc/natives.h"
+#include "../../../ScriptHookV_SDK/inc/enums.h"
 #include "keyboard.h"
 
 ScriptControls::ScriptControls(): controller{1},

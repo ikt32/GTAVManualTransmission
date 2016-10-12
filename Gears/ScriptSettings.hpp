@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ScriptControls.hpp"
+#include "Input/ScriptControls.hpp"
 
 #define SETTINGSFILE "./Gears.ini"
 

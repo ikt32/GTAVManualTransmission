@@ -1,5 +1,5 @@
 #include "XboxController.hpp"
-#include "TimeHelper.hpp"
+#include "../Util/TimeHelper.hpp"
 #include <string>
 
 XboxController::XboxController(int playerNumber) {

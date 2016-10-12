@@ -9,11 +9,12 @@
 #include "script.h"
 
 #include "ScriptSettings.hpp"
-#include "ScriptControls.hpp"
-#include "Logger.hpp"
 #include "VehicleData.hpp"
-#include "MemoryPatcher.hpp"
-#include "Util.hpp"
+
+#include "Input/ScriptControls.hpp"
+#include "Memory/MemoryPatcher.hpp"
+#include "Util/Logger.hpp"
+#include "Util/Util.hpp"
 
 Logger logger(LOGFILE);
 ScriptControls controls;
