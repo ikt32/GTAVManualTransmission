@@ -116,6 +116,9 @@ void update() {
 				showText(0.3, 0.1, 1.0, "PLANE!");
 				updateLastInputDevice();
 
+				// Shitty hack for clutch pedal to work again
+				setShiftMode(HPattern);
+
 				if (controls.ButtonIn(ScriptControls::WheelControlType::H3))
 					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleUp, 1.0f);
 
