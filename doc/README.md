@@ -1,4 +1,4 @@
-[comment]: <> (User README.md)
+[comment]: # (User README.md)
 Manual Transmission & Steering Wheel Support
 ===========
 

@@ -1,4 +1,4 @@
-[comment]: <> (GitHub README.md)
+[comment]: # (GitHub README.md)
 GTA V Manual Transmission
 =========================
 [![Build status](https://ci.appveyor.com/api/projects/status/gy6yh17lp5l1k48d?svg=true)](https://ci.appveyor.com/project/E66666666/gtavmanualtransmission)
