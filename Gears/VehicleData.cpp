@@ -7,7 +7,7 @@ VehicleData::VehicleData() {
 }
 
 void VehicleData::Clear() {
-	IsBike = false;
+	Class = VehicleClass::Car;
 	IsTruck = false;
 	Address = 0;
 	Gears = 0;
@@ -62,9 +62,10 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 	Turbo = ext.GetTurbo(vehicle);
 	TopGear = ext.GetTopGear(vehicle);
 	Speed = ENTITY::GET_ENTITY_SPEED(vehicle);
-	Velocity = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
+	V3Velocities = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
+	Velocity = V3Velocities.y;
 	RotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(vehicle);
-	IsBike = VEHICLE::IS_THIS_MODEL_A_BIKE(model) == TRUE;
+	Class = findClass(model);
 	IsTruck = isBadTruck(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
 	NoClutch = noClutch(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
 	Pitch = ENTITY::GET_ENTITY_PITCH(vehicle);
@@ -73,6 +74,25 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 		WheelCompressions[0] = ext.GetWheelsCompression(vehicle).at(0);
 		WheelCompressions[1] = ext.GetWheelsCompression(vehicle).at(1);
 	}
+}
+
+VehicleData::VehicleClass VehicleData::findClass(Hash model) {
+	if (VEHICLE::IS_THIS_MODEL_A_CAR(model))
+		return VehicleClass::Car;
+	if (VEHICLE::IS_THIS_MODEL_A_BIKE(model))
+		return VehicleClass::Bike;
+	if (VEHICLE::IS_THIS_MODEL_A_BICYCLE(model))
+		return VehicleClass::Bicycle;
+	if (VEHICLE::IS_THIS_MODEL_A_BOAT(model))
+		return VehicleClass::Boat;
+	if (VEHICLE::IS_THIS_MODEL_A_PLANE(model))
+		return VehicleClass::Plane;
+	if (VEHICLE::IS_THIS_MODEL_A_HELI(model))
+		return VehicleClass::Heli;
+	if (VEHICLE::IS_THIS_MODEL_A_QUADBIKE(model))
+		return VehicleClass::Quad;
+
+	return VehicleClass::Unknown;
 }
 
 // Only does this for the first two wheels because I'm lazy, damn it

@@ -1,3 +1,7 @@
+/*
+ * What a mess. 
+ */
+
 #pragma once
 
 #include "../../ScriptHookV_SDK/inc/types.h"
@@ -16,9 +20,21 @@ public:
 	VehicleData();
 	void Clear();
 
+	enum class VehicleClass {
+		Car,
+		Bike,
+		Bicycle,
+		Boat,
+		Plane,
+		Heli,
+		Quad,
+		Unknown
+	};
+
 	void UpdateValues(VehicleExtensions& ext, Vehicle vehicle);
 	std::array<float, 2> GetWheelCompressionSpeeds();
-	bool IsBike = false;
+	//bool IsBike = false;
+	VehicleClass Class = VehicleClass::Car;
 	bool NoClutch = false;
 	bool IsTruck = false;
 	uint64_t Address = 0;
@@ -54,6 +70,7 @@ public:
 	float SteeringAngle = 0.0f;
 	Vector3 RotationVelocity = {};
 	std::array<float, 2> WheelCompressions = {};
+	Vector3 V3Velocities;
 	Vector3 getAccelerationVectors(Vector3 velocities);
 
 	// Should be called after getAccelerationVectors has been called in a loop
@@ -83,6 +100,7 @@ private:
 		"UTILTRUC"
 	};
 	bool isBadTruck(char* name);
+	VehicleClass findClass(Hash model);
 
 	std::array<char *, 7> noClutchModelNames = {
 		"SURGE",

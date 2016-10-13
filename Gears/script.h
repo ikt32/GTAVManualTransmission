@@ -12,6 +12,7 @@ http://dev-c.com
 #define DIRECTINPUT_VERSION 0x0800
 #endif
 
+class VehicleData;
 struct Color;
 class ScriptSettings;
 
@@ -84,13 +85,11 @@ void handleVehicleButtons();
 //                    Wheel input and force feedback
 ///////////////////////////////////////////////////////////////////////////////
 
-void playWheelEffects(
-	float speed,
-	Vector3 accelVals,
-	Vector3 accelValsAvg,
-	ScriptSettings& settings,
-	bool airborne, bool isBike);
+void playWheelEffects(ScriptSettings& settings,
+                      bool airborne, VehicleData vehData, bool ignoreSpeed = false);
 void doWheelSteering(bool isBike);
+void doWheelSteeringBoat();
+void doWheelSteeringPlane();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                             Misc features
