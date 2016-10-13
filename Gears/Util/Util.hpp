@@ -41,7 +41,7 @@ static std::vector<std::string> GameVersionString = {
 	"VER_1_0_757_4_NOSTEAM", // 23
 
 	"VER_1_0_791_2_STEAM", // 24
-	"VER_1_0_791_2_NOSTEAM" // 25
+	"VER_1_0_791_2_NOSTEAM", // 25
 
 	"VER_1_0_877_1_STEAM", // 26
 	"VER_1_0_877_1_NOSTEAM" // 27
@@ -53,7 +53,6 @@ static std::string eGameVersionToString(int version) {
 	if (version > GameVersionString.size() - 1) {
 		return std::to_string(version);
 	}
-
 	return GameVersionString[version];
 }
 
