@@ -25,12 +25,6 @@ also works without manual transmission!
 - [Basic usage and controls](#basic-usage-and-controls)
 	- [Controls](#controls)
 	- [Usage](#usage)
-- [Troubleshooting](#troubleshooting)
-	- [Installation dependencies](#installation-dependencies)
-	- [Non-conflicting software](#non-conflicting-software)
-	- [Conflicting software](#conflicting-software)
-	- [Steering wheel reports strange values](#steering-wheel-reports-strange-values)
-	- [Steering wheel not detected](#steering-wheel-not-detected)
 - [Configuration](#configuration)
 	- [`[OPTIONS]`](#options)
 	- [`[CONTROLLER]`](#controller)
@@ -39,6 +33,12 @@ also works without manual transmission!
 	- [`[WHEELAXIS]`](#wheelaxis)
 	- [`[WHEELKEYBOARD]`](#wheelkeyboard)
 	- [`[DEBUG]`](#debug)
+- [Troubleshooting](#troubleshooting)
+	- [Installation dependencies](#installation-dependencies)
+	- [Non-conflicting software](#non-conflicting-software)
+	- [Conflicting software](#conflicting-software)
+	- [Steering wheel reports strange values](#steering-wheel-reports-strange-values)
+	- [Steering wheel not detected](#steering-wheel-not-detected)
 - [Thanks](#thanks)
 - [Source code](#source-code)
 
@@ -124,31 +124,6 @@ details.
 #### Wheel usage without Manual Transmission
 The throttle and the brake work like the accelerator and brake/reverse inputs.
 A clutch pedal won't have any action. The rest of the functions still work.
-
-# Troubleshooting
-## Installation dependencies
-This mod should work on a bare system with only GTA V, build 350 to 877.1 and
-the necessary programs to run GTA V and ScriptHookV supporting that version of
-GTA V.
-
-## Non-conflicting software
-The mod has been tested with GTA V version 350, 617, 678, 791.2 with
-ScriptHookV, ScriptHookVDotNet, RAGEPluginHook, ENB Series, OpenIV and FoV 1.33
-without any incompatibilities. Switching off Cross Script communications also
-makes it compatible with CitizenFX-based mods like FiveReborn.
-
-## Conflicting software
-x360ce will conflict with input detection if throttle, brake or steering clutch
-are mapped, but the mod should still register your wheel. Assigning inputs
-without overlap is no problem.
-
-## Steering wheel reports strange values
-Check if your wheel is recognized correctly, a recent Windows 10 update forces
-new Logitech software which will mess up older Logitech steering wheels.
-
-## Steering wheel not detected
-* Try toggling the mod (|\ key).
-* Ensure you have removed xinput dlls from the GTA V directory.
 
 # Configuration
 This guide will explain the usage of Gears.ini and what the options mean. It’s
@@ -562,6 +537,41 @@ Support for wheel input for boats and airplanes.
 ### `AltAngle` : Any
 __EXPERIMENTAL__ <br>
 Steering wheel angle for alternative vehicles.
+
+# Troubleshooting
+## Installation dependencies
+This mod should work on a bare system with only GTA V, build 350 to 877.1 and
+the necessary programs to run GTA V and ScriptHookV supporting that version of
+GTA V.
+
+## Non-conflicting software
+The mod has been tested with GTA V version 350, 617, 678, 791.2 and 877.1 with:
+* ScriptHookV
+* ScriptHookVDotNet
+* RAGEPluginHook
+* ENB Series
+* OpenIV
+* FoV 1.33
+
+The mod runs with these other mods without any incompatibilities. Switching off
+ Cross Script communications also makes it compatible with
+ CitizenFX-based mods like FiveReborn.
+
+## Conflicting software
+* x360ce will conflict with input detection if throttle, brake or steering clutch
+are mapped, but the mod should still register your wheel. Assigning inputs
+without overlap is no problem.
+* Forward/Reverse conflicts with
+[Strapped](https://www.gta5-mods.com/scripts/pull-out-strap). Remove Strapped if
+you experience input conflicts.
+
+## Steering wheel reports strange values
+Check if your wheel is recognized correctly, a recent Windows 10 update forces
+new Logitech software which will mess up older Logitech steering wheels.
+
+## Steering wheel not detected
+* Try toggling the mod (|\ key).
+* Ensure you have removed xinput dlls from the GTA V directory.
 
 # Thanks
 * Alexander Blade
