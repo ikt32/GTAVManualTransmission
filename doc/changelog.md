@@ -2,8 +2,9 @@
 
 ## 4.1
 Gears.ini has changed!
-*   Add steering input degree choices
 *   Add soft lock @ steering input degrees
+*	Experimental: Add support for non-car vehicles
+*	Moved [WHEELKEYBOARD] below [WHEELAXIS]
 
 Fixes:
 *   Fix engine revving while braking with steering wheel while rolling back in a non-reverse gear
