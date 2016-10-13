@@ -339,6 +339,20 @@ options are available.
     RightThumbUp
     RightThumbDown
 
+### `Toggle`
+Hold this button to toggle Manual Transmission on or off
+
+### `ToggleShift`
+Hold this button to toggle between Automatic and Sequential Transmission
+
+### `ToggleTime` : Any (milliseconds)
+How long it takes for a button hold to register. Example, `ToggleTime = 500`
+means you need to hold it half a second to trigger.
+
+### `TriggerValue` : `0` to `100`
+How many % the analog axis needs to be pressed in or pushed to, to register as
+a button press.
+
 ### `Throttle` and `Brake`
 You __need__ to correctly set these to get braking and a standstill and
 reversing with the throttle to work.

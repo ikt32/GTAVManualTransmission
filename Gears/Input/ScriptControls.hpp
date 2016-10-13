@@ -12,6 +12,7 @@ public:
 		Throttle,
 		Brake,
 		Toggle,
+		ToggleH,
 		Engine,
 		SIZEOF_ControllerControlType
 	};

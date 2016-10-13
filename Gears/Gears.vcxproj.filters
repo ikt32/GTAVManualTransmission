@@ -5,7 +5,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ScriptSettings.cpp" />
     <ClCompile Include="VehicleData.cpp" />
-    <ClCompile Include="Input\ScriptControls.cpp" />
     <ClCompile Include="Input\keyboard.cpp">
       <Filter>Input</Filter>
     </ClCompile>
@@ -27,6 +26,9 @@
     <ClCompile Include="Util\Logger.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="Input\ScriptControls.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -44,7 +46,6 @@
     </ClInclude>
     <ClInclude Include="ScriptSettings.hpp" />
     <ClInclude Include="VehicleData.hpp" />
-    <ClInclude Include="Input\ScriptControls.hpp" />
     <ClInclude Include="Input\DiJoyStick.h">
       <Filter>Input</Filter>
     </ClInclude>
@@ -74,6 +75,9 @@
     </ClInclude>
     <ClInclude Include="Util\TimeHelper.hpp">
       <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\ScriptControls.hpp">
+      <Filter>Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

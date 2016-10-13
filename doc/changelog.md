@@ -3,14 +3,17 @@
 ## 4.1
 Gears.ini has changed!
 *   Add soft lock @ steering input degrees
-*	Experimental: Add support for non-car vehicles
-*	Moved [WHEELKEYBOARD] below [WHEELAXIS]
+*   Experimental: Add support for non-car vehicles
+*   Moved `[WHEELKEYBOARD]` below `[WHEELAXIS]`
+*   Added back AutoGear1 for sequential as option
+*   Add gearbox change to Controller layout
 
 Fixes:
 *   Fix engine revving while braking with steering wheel while rolling back in a non-reverse gear
 *   Fix engine revving while braking with steering wheel in reverse near stop
 *   Decrease Centerforce faster during oversteer: 0% centerforce @ 20% oversteer
 *   Remove dampener adjustment for oversteer
+*   Fix version printing
 
 ## 4.0.4
 *   Fix Dpad press register on toggle

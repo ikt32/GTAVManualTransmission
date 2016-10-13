@@ -230,6 +230,7 @@ void update() {
 	
 
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ToggleH) ||
+		controls.ButtonHeld(ScriptControls::ControllerControlType::ToggleH) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::ToggleH)) {
 		cycleShiftMode();
 	}
@@ -540,9 +541,9 @@ void updateLastInputDevice() {
 				showNotification("Switched to keyboard/mouse");
 				break;
 			case ScriptControls::Controller: // Controller
-				if (settings.ShiftMode == 1) {
+				if (settings.ShiftMode == HPattern) {
 					showNotification("Switched to controller\nSequential re-initiated");
-					settings.ShiftMode = 0;
+					settings.ShiftMode = Sequential;
 					settings.Save();
 				}
 				else {
@@ -565,7 +566,7 @@ void setShiftMode(int shiftMode) {
 	if (shiftMode > 2 || shiftMode < 0)
 		return;
 
-	if (settings.ShiftMode == HPattern  && vehData.IsBike) {
+	if (settings.ShiftMode == HPattern  && (vehData.IsBike || prevInput == ScriptControls::Controller)) {
 		settings.ShiftMode = Automatic;
 	}
 

@@ -48,7 +48,8 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	char buffer[24] = {0};
 	GetPrivateProfileStringA("CONTROLLER", "Toggle", "DpadRight", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Toggle)] = buffer;
-	scriptControl->CToggleTime = GetPrivateProfileIntA("CONTROLLER", "ToggleTime", 500, SETTINGSFILE);
+	GetPrivateProfileStringA("CONTROLLER", "ToggleShift", "B", buffer, static_cast<DWORD>(24), SETTINGSFILE);
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ToggleH)] = buffer;
 	GetPrivateProfileStringA("CONTROLLER", "ShiftUp", "A", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)] = buffer;
 	GetPrivateProfileStringA("CONTROLLER", "ShiftDown", "X", buffer, static_cast<DWORD>(24), SETTINGSFILE);
@@ -61,6 +62,9 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Throttle)] = buffer;
 	GetPrivateProfileStringA("CONTROLLER", "Brake", "LeftTrigger", buffer, static_cast<DWORD>(24), SETTINGSFILE);
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Brake)] = buffer;
+
+	scriptControl->CToggleTime = GetPrivateProfileIntA("CONTROLLER", "ToggleTime", 500, SETTINGSFILE);
+
 
 	int tval = GetPrivateProfileIntA("CONTROLLER", "TriggerValue", 75, SETTINGSFILE);
 	if (tval > 100 || tval < 0) {
