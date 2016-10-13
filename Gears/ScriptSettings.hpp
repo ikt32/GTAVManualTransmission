@@ -61,6 +61,7 @@ public:
 	float SteerAngleBike = 180.0f;
 	bool AltControls = false;
 	float SteerAngleAlt = 180.0f;
+	bool AutoGear1 = false;
 private:
 	void CheckSettings();
 };

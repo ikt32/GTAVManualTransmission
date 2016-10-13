@@ -345,6 +345,9 @@ void update() {
 	}
 	else if (settings.ShiftMode == 0){
 		functionSShift();
+		if (settings.AutoGear1) {
+			functionAutoGear1();
+		}
 	}
 	else { // Automatic
 		functionAShift();
@@ -1424,6 +1427,12 @@ void playWheelEffects(float speed, Vector3 accelVals, Vector3 accelValsAvg, Scri
 void functionAutoLookback() {
 	if (vehData.CurrGear == 0) {
 		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleLookBehind, 1.0f);
+	}
+}
+
+void functionAutoGear1() {
+	if (vehData.Throttle < 0.1f && vehData.Speed < 0.1f && vehData.CurrGear > 1) {
+		vehData.LockGears = 0x00010001;
 	}
 }
 

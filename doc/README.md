@@ -272,6 +272,13 @@ a little push. Idea and implementation by XMOD.
 * `0`: No change
 * `1`: Workaround enabled. A force will push the car down a slope.
 
+### `AutoGear1` : `0` or `1`
+Turn this on to automatically shift into first gear when stopped, with a
+sequential gearbox.
+
+* `0`: No change
+* `1`: Shift into first gear on stop while using the sequential gear box.
+
 ### `AutoLookBack` : `0` or `1`
 Turn this on to automatically look back while in the reverse gear.
 

@@ -16,6 +16,7 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	CrossScript = (GetPrivateProfileIntA("OPTIONS", "CrossScript", 0, SETTINGSFILE) == 1);
 	
 	AutoLookBack = (GetPrivateProfileIntA("OPTIONS", "AutoLookBack", 0, SETTINGSFILE) == 1);
+	AutoGear1 = (GetPrivateProfileIntA("OPTIONS", "AutoGear1", 0, SETTINGSFILE) == 1);
 	HillBrakeWorkaround = (GetPrivateProfileIntA("OPTIONS", "HillBrakeWorkaround", 0, SETTINGSFILE) == 1);
 
 	EngDamage = (GetPrivateProfileIntA("OPTIONS", "EngineDamage", 0, SETTINGSFILE) == 1);
