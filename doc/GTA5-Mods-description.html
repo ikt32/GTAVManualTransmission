@@ -52,7 +52,10 @@ GTA V
 <a href=https://www.gta5-mods.com/scripts/custom-steering>Custom Steering</a>
 
 <b>Controls</b>
-<b>Please</b> read the documents or check <b>Gears.ini</b>.
+<a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md>README</a>
+
+Controls also viewable in Gears.ini.
+
 
 <b>Recommended mods</b>
 <a href=https://www.gta5-mods.com/scripts/speedometer-improvedalexbladeversion>Speedometer by LeFix</a>
@@ -72,9 +75,9 @@ Everybody else who helped me
 
 <b>Mod developers</b>
 You can read decorators to get some info about this mod.
-Speedometers shift up/down indicator: 
+Speedometers shift up/down indicator:
 "hunt_score" 0 - Nothing
-"hunt_score" 1 - Shift up 
+"hunt_score" 1 - Shift up
 "hunt_score" 2 - Shift down
 
 Speedometers Neutral gear:
@@ -84,11 +87,12 @@ Speedometers Neutral gear:
 Scripts changing torque
 "hunt_score" 2 - Torque is decreased
 
-<b>Source available on</b> <a href=https://github.com/E66666666/GTAVManualTransmission>GitHub</a>
+<b>Source code available </b> <a href=https://github.com/E66666666/GTAVManualTransmission>on GitHub</a>
+<b>Full changelog available </b> <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/changelog.md>on GitHub</a>
 
 <b>Alternative downloads</b>
-<a href=https://github.com/E66666666/GTAVManualTransmission/releases/tag/v3.0.2>The last stable version (3.0.2) can be downloaded from GitHub.</a> You can also find older versions there, and in-between alpha/beta releases.
-<a href=https://ci.appveyor.com/project/E66666666/gtavmanualtransmission/build/artifacts>The newest automated builds can be found on AppVeyor.</a> These are bleeding edge builds with the newest developments, but might be unstable.
+Past releases: <a href=https://github.com/E66666666/GTAVManualTransmission/releases>GitHub Releases</a>
+Latest builds: <a href=https://ci.appveyor.com/project/E66666666/gtavmanualtransmission/build/artifacts>AppVeyor Artifacts</a> (unstable)
 
 
 <b>Changelog</b>
@@ -186,143 +190,3 @@ Non-wheel related changes
     <li>Add engine off toggle for engine button</li>
     <li>Disable low RPM power loss</li>
 </ul>
-
-<b>3.0.2</b>
-Fix keys not being disabled properly from wheel
-Add cross-script communication support (Decorator)
-Tweak truck speed limiter to be less harsh when shifting early
-
-<b>3.0.1</b>
-Fix handbrake staying engaged when disabling the mod
-
-<b>3.0</b>
-Check the release notes on GitHub for more details from the betas, or the commit messages. Changes
-listed below are in respect to 2.0.2.
-Add Logitech Wheel support
--  Steering wheel support
--  Pedal input support
--  Force Feedback, physics-based and fully configurable
--  0-delay steering input (controller input is/was still smoothed out)
--  Useful vehicle functions available and mappable on wheel
-Add automatic input detection and isolation
--  Switch to sequential on controller input
-Change reverse in first gear behavior to do a burnout if the vehicle is strong enough
-Add separate neutral to be in between R and 1st: R-N-1-2-3... for sequential shifting
-Add clutch requirement option for H-shifting
-Add engine restart by pressing throttle
-Fix specific first gear only vehicles having a nonfunctional neutral (remove neutral for these)
-Rework neutral/clutch revving to be more gradual and natural
-Change clutch slipping in higher gears to be gradual
-Cleaner vehicle swap/leave procedure
-Fix vehicle change detection
-Fix other cars not moving when clutch pressed
-Minimize patching of game functions
--  Less risky
--  No AI impact
--  Performance improvement
-Change .ini format
-
-<b>2.0.2</b>
-Disable clutch catching in reverse gear
-Enable free revving for trucks
-
-<b>2.0.1</b>
-Add check for invalid configurations
-Improve requirement for AutoReverse
-Remove lockup when choosing reverse, going forwards
-
-<b>2.0</b>
-Additions:
-+ Add neutral gear functionality
-+ Add exception for motorcycles
-+ Add Clutch catching mechanism
-Changes:
-* Switch to XInput controller readout
-* Change engine braking to use apply force
-* Engine braking locks up engine (handbrake) when going forward in reverse gear
-* Reworked engine stalling with awareness of current gear (old version still available)
-* Rework revving in higher gears
-Fixes and tweaks:
-- RPM Disparity at high gear low RPM fixed
-- Fix Utility Trucks not being recognized
-- Tweaked engine braking and allow for trucks
-- Remove engine stalling on lots of damage
-Misc:
-+ Add configuration presets
-
-<b>1.8.2</b>
-Only conditionally patch lower-end full clutch
-
-<b>1.8.1</b>
-Fix keyboard-controller detection
-Fix ToggleH button being overwritten instead of EnableH
-
-<b>1.8</b>
-Refactor project
-Add controller button for toggle (Dpad Right for 0.5s)
-Add keyboard key for toggle H-shifter (default: }] key)
-Fix clutch fully depressed vehicle still moving
-Disable patches and manual control as passenger
-Tweak notifications behavior
-
-<b>1.7</b>
-Add engine braking
-Fix big trucks accelerating infinitely
-Reset gear on changing vehicle
-Turn on engine when toggling mod
-
-<b>1.6.2</b>
-Better compatibility: Dropped Microsoft Visual C++ Redistributable 2015 (x64) requirement
-
-<b>1.6.1</b>
-Fix wrong key in Gears.ini
-Update readme.txt properly
-
-<b>1.6</b>
-Enable Logging to Gears.log to clean up notifications
-Improve clutch control patching and restore
-Improve clutch control at very low speeds
-Change stalling conditions
-Turn on reverse light in reverse gear
-
-<b>1.5</b>
-Top gear known (Thank you, kagikn!)
-Full clutch control (Thank you, leftas!)
-Allow analog clutch control
-Add engine damage
-Add engine stalling
-Changed build parameters - should work for more people now
-
-<b>1.4</b>
-Enable accelerator to be used for reverse acceleration and brake pedal to only brake and not reverse. Like a real car.
-
-<b>1.3.2</b>
-Enable/Disable manual gears by default in .ini
-Persistent enable/disable manual gears
-Enable/Disable engaging first gear on stopping
-Enable/Disable automatic reverse gear
-
-<b>1.3.1</b>
-Full compatibility with LeFix Speedometer for gear shift indicators
-Restore 1.2 overrevving behavior
-Tweak low-RPM low-throttle behavior
-
-<b>1.3</b>
-Full keyboard support
-H-Shifter support - mapped to keyboard buttons
-Preliminary compatiblity with LeFix Speedometer for gear shift indicators
-Disable/enable manual notification
-Changes in ini and default config
-
-<b>1.2</b>
-Fix version 350 compatibility issues
-Tweaked reverse behavior
-Fix overrevving behavior
-
-<b>1.1</b>
-Transmission optimizations
-Disabled for bicycles
-Fixed motorcycle support
-
-<b>1.0</b>
-Initial release
