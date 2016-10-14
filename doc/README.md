@@ -86,7 +86,7 @@ automatic gearbox.
 
 ### Controller
 * Hold Dpad Right to disable or enable manual transmission.
-* Hold ???? ????? to switch between a sequential gearbox, H-pattern gearbox or
+* Hold B to switch between a sequential gearbox, H-pattern gearbox or
 the automatic gearbox.
 
 ### Wheel
