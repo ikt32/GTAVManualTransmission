@@ -70,7 +70,7 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 	NoClutch = noClutch(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
 	Pitch = ENTITY::GET_ENTITY_PITCH(vehicle);
 	SteeringAngle = ext.GetSteeringAngle(vehicle);
-	if (VEHICLE::IS_THIS_MODEL_A_CAR(model) == TRUE) {
+	if (Class == VehicleClass::Car || Class == VehicleClass::Quad) {
 		WheelCompressions[0] = ext.GetWheelsCompression(vehicle).at(0);
 		WheelCompressions[1] = ext.GetWheelsCompression(vehicle).at(1);
 	}

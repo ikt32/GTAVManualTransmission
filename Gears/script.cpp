@@ -1365,7 +1365,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 
 	// Detail feel / suspension compression based
 	float compSpeedTotal = 0.0f;
-	if (vehData.Class == VehicleData::VehicleClass::Car) {
+	if (vehData.Class == VehicleData::VehicleClass::Car || vehData.Class == VehicleData::VehicleClass::Quad) {
 		auto compSpeed = vehData.GetWheelCompressionSpeeds();
 
 		// left should pull left, right should pull right
@@ -1402,7 +1402,6 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	}
 	controls.WheelDI.SetConstantForce(totalForce);
 
-
 	if (settings.Debug) {
 		std::stringstream SteerRaw;
 		SteerRaw << "SteerRaw: " << controls.SteerVal;
@@ -1417,15 +1416,15 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 		showText(0.85, 0.225, 0.4, steerDisplay.str().c_str());
 		
 		std::stringstream forceDisplay;
-		forceDisplay << "ConstForce: " << constantForce;
+		forceDisplay << "ConstForce: " << constantForce / steerMult;
 		showText(0.85, 0.250, 0.4, forceDisplay.str().c_str());
 
 		std::stringstream damperF;
-		damperF << "DampForce: " << damperForce;
+		damperF << "DampForce: " << steerSpeed * damperForce * 0.1;
 		showText(0.85, 0.275, 0.4, damperF.str().c_str());
 
 		std::stringstream centerDisplay;
-		centerDisplay << "CenterForce: " << centerForce;
+		centerDisplay << "CenterForce: " << settings.CenterStrength * centerForce * steerMult;
 		showText(0.85, 0.300, 0.4, centerDisplay.str().c_str());
 		
 		std::stringstream ssUnderSteer;
