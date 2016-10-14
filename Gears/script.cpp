@@ -150,7 +150,7 @@ void update() {
 		updateLastInputDevice();
 		handleVehicleButtons();
 		handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
-		doWheelSteering(vehData.Class == VehicleData::VehicleClass::Bike);
+		doWheelSteering();
 		playWheelEffects(settings, vehData, 
 		                 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f );
 	}	
@@ -172,7 +172,7 @@ void update() {
 	handleVehicleButtons();
 
 	if (controls.WheelDI.IsConnected()) {
-		doWheelSteering(vehData.Class == VehicleData::VehicleClass::Bike);
+		doWheelSteering();
 		playWheelEffects(settings, vehData, 
 		                 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f
 		                 );
@@ -1179,54 +1179,30 @@ void handleVehicleButtons() {
 //                    Wheel input and force feedback
 ///////////////////////////////////////////////////////////////////////////////
 
-void doWheelSteering(bool isBike) {
+void doWheelSteering() {
 	if (prevInput == ScriptControls::InputDevices::Wheel) {
 		float steerMult;
-		if (isBike)
+		if (vehData.Class == VehicleData::VehicleClass::Bike || vehData.Class == VehicleData::VehicleClass::Quad)
 			steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
-		else
+		else if (vehData.Class == VehicleData::VehicleClass::Car)
 			steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
+		else {
+			steerMult = settings.SteerAngleMax / settings.SteerAngleAlt;
+		}
 
 		float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 
-		ext.SetSteeringInputAngle(vehicle, steerMult * -2.0f * (controls.SteerVal - 0.5f));
-
-		float range = (float)( controls.SteerRight - controls.SteerLeft );
-		
-		float antiDeadzoned;
-		antiDeadzoned = (controls.SteerVal*range - 32768) / 32768.0f;
-		if (effSteer < -0.95) {
-			antiDeadzoned = (controls.SteerVal*range - 32768 - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) /
-				(32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
-		}
-		if (effSteer > 0.95) {
-			antiDeadzoned = (controls.SteerVal*range - 32768 + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) /
-				(32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
-		}
-		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, steerMult * antiDeadzoned);
+		ext.SetSteeringInputAngle(vehicle, -effSteer);
+		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, effSteer);
 	}
 }
 
 void doWheelSteeringBoat() {
 	float steerMult = settings.SteerAngleMax / settings.SteerAngleAlt;
-
 	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 
-	ext.SetSteeringInputAngle(vehicle, steerMult * -2.0f * (controls.SteerVal - 0.5f));
-
-	float range = (float)(controls.SteerRight - controls.SteerLeft);
-
-	float antiDeadzoned;
-	antiDeadzoned = (controls.SteerVal*range - 32768) / 32768.0f;
-	if (effSteer < -0.95) {
-		antiDeadzoned = (controls.SteerVal*range - 32768 - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) /
-			(32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
-	}
-	if (effSteer > 0.95) {
-		antiDeadzoned = (controls.SteerVal*range - 32768 + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) /
-			(32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
-	}
-	CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, steerMult * antiDeadzoned);
+	ext.SetSteeringInputAngle(vehicle, -effSteer);
+	CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, effSteer);
 }
 
 void doWheelSteeringPlane() {
@@ -1290,7 +1266,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	Vector3 accelValsAvg = vehData.getAccelerationVectorsAverage();
 
 	float steerMult;
-	if (vehData.Class == VehicleData::VehicleClass::Bike)
+	if (vehData.Class == VehicleData::VehicleClass::Bike || vehData.Class == VehicleData::VehicleClass::Quad)
 		steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
 	else if (vehData.Class == VehicleData::VehicleClass::Car)
 		steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
@@ -1428,33 +1404,37 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 
 
 	if (settings.Debug) {
-		std::stringstream SteerValue;
-		SteerValue << "SteerValue: " << controls.SteerVal;
-		showText(0.85, 0.175, 0.4, SteerValue.str().c_str());
+		std::stringstream SteerRaw;
+		SteerRaw << "SteerRaw: " << controls.SteerVal;
+		showText(0.85, 0.175, 0.4, SteerRaw.str().c_str());
+
+		std::stringstream SteerNorm;
+		SteerNorm << "SteerNorm: " << effSteer;
+		showText(0.85, 0.200, 0.4, SteerNorm.str().c_str());
 
 		std::stringstream steerDisplay;
 		steerDisplay << "SteerSpeed: " << steerSpeed;
-		showText(0.85, 0.200, 0.4, steerDisplay.str().c_str());
+		showText(0.85, 0.225, 0.4, steerDisplay.str().c_str());
 		
 		std::stringstream forceDisplay;
 		forceDisplay << "ConstForce: " << constantForce;
-		showText(0.85, 0.225, 0.4, forceDisplay.str().c_str());
+		showText(0.85, 0.250, 0.4, forceDisplay.str().c_str());
 
 		std::stringstream damperF;
 		damperF << "DampForce: " << damperForce;
-		showText(0.85, 0.250, 0.4, damperF.str().c_str());
+		showText(0.85, 0.275, 0.4, damperF.str().c_str());
 
 		std::stringstream centerDisplay;
 		centerDisplay << "CenterForce: " << centerForce;
-		showText(0.85, 0.275, 0.4, centerDisplay.str().c_str());
+		showText(0.85, 0.300, 0.4, centerDisplay.str().c_str());
 		
 		std::stringstream ssUnderSteer;
 		ssUnderSteer << "Understeer: " << understeer;
-		showText(0.85, 0.300, 0.4, ssUnderSteer.str().c_str());
+		showText(0.85, 0.325, 0.4, ssUnderSteer.str().c_str());
 
 		std::stringstream ssOverSteer;
 		ssOverSteer << "Oversteer: " << oversteer;
-		showText(0.85, 0.325, 0.4, ssOverSteer.str().c_str());
+		showText(0.85, 0.350, 0.4, ssOverSteer.str().c_str());
 	}
 }
 
