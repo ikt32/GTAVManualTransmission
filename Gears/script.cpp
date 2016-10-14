@@ -117,19 +117,13 @@ void update() {
 					handleVehicleButtons();
 					handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
 					doWheelSteeringBoat();
-					playWheelEffects(settings,
-					                 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f,
-					                 vehData,
-					                 true);
+					playWheelEffects(settings, vehData, false, true);
 				}
 
 				// Planes
 				if (vehData.Class == VehicleData::VehicleClass::Plane) {
 					doWheelSteeringPlane();
-					playWheelEffects(settings,
-					                 false,
-					                 vehData,
-					                 true);
+					playWheelEffects(settings, vehData, false, true);
 				}
 				return;
 			}
@@ -157,9 +151,8 @@ void update() {
 		handleVehicleButtons();
 		handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
 		doWheelSteering(vehData.Class == VehicleData::VehicleClass::Bike);
-		playWheelEffects(settings,
-		                 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f,
-		                 vehData);
+		playWheelEffects(settings, vehData, 
+		                 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f );
 	}	
 	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
 	
@@ -180,9 +173,9 @@ void update() {
 
 	if (controls.WheelDI.IsConnected()) {
 		doWheelSteering(vehData.Class == VehicleData::VehicleClass::Bike);
-		playWheelEffects(settings,
-		                 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f,
-		                 vehData);
+		playWheelEffects(settings, vehData, 
+		                 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f
+		                 );
 	}
 	
 
@@ -1284,7 +1277,7 @@ void doWheelSteeringPlane() {
 	CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyRollLeftRight, antiDeadzoned);
 }
 
-void playWheelEffects(ScriptSettings& settings, bool airborne, VehicleData vehData, bool ignoreSpeed) {
+void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airborne, bool ignoreSpeed) {
 	if (!controls.WheelDI.IsConnected() ||
 		controls.WheelDI.NoFeedback ||
 		prevInput != ScriptControls::Wheel ||
@@ -1294,14 +1287,7 @@ void playWheelEffects(ScriptSettings& settings, bool airborne, VehicleData vehDa
 
 	// why so smol?!
 	Vector3 accelVals = vehData.getAccelerationVectors(vehData.V3Velocities);
-	showText(0.3, 0.3, 0.5, std::to_string(accelVals.x).c_str());
-	showText(0.3, 0.35, 0.5, std::to_string(accelVals.y).c_str());
-	showText(0.3, 0.4, 0.5, std::to_string(accelVals.z).c_str());
-
 	Vector3 accelValsAvg = vehData.getAccelerationVectorsAverage();
-	showText(0.3, 0.45, 0.5, std::to_string(accelValsAvg.x).c_str());
-	showText(0.3, 0.5, 0.5, std::to_string(accelValsAvg.y).c_str());
-	showText(0.3, 0.55, 0.5, std::to_string(accelValsAvg.z).c_str());
 
 	float steerMult;
 	if (vehData.Class == VehicleData::VehicleClass::Bike)
