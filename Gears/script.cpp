@@ -1238,11 +1238,22 @@ void doWheelSteeringBoat() {
 
 void doWheelSteeringPlane() {
 
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H1))
+		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleUp, 0.33f);
 
 	if (controls.ButtonIn(ScriptControls::WheelControlType::H3))
+		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleUp, 0.66f);
+
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H5))
 		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleUp, 1.0f);
 
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H2))
+		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleDown, 0.33f);
+
 	if (controls.ButtonIn(ScriptControls::WheelControlType::H4))
+		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleDown, 0.66f);
+
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H6))
 		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleDown, 1.0f);
 
 	float steerMult = settings.SteerAngleMax / settings.SteerAngleAlt;
@@ -1263,17 +1274,14 @@ void doWheelSteeringPlane() {
 	float range = (float)(controls.SteerRight - controls.SteerLeft);
 
 	float antiDeadzoned;
-	antiDeadzoned = (controls.SteerVal*range - 32768) / 32768.0f;
-	if (effSteer < -0.95) {
-		antiDeadzoned = (controls.SteerVal*range - 32768 - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) /
-			(32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+	antiDeadzoned = effSteer;
+	if (effSteer < -0.02) {
+		antiDeadzoned = effSteer - 0.20f;
 	}
-	if (effSteer > 0.95) {
-		antiDeadzoned = (controls.SteerVal*range - 32768 + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) /
-			(32768.0f + XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+	if (effSteer > 0.02) {
+		antiDeadzoned = effSteer + 0.20f;
 	}
-	//CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, steerMult * antiDeadzoned);
-	CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyRollLeftRight, steerMult * antiDeadzoned);
+	CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyRollLeftRight, antiDeadzoned);
 }
 
 void playWheelEffects(ScriptSettings& settings, bool airborne, VehicleData vehData, bool ignoreSpeed) {
