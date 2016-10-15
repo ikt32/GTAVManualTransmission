@@ -532,7 +532,22 @@ parameters.
 
 ### `AltControls` : `0` or `1`
 __EXPERIMENTAL__ <br>
-Support for wheel input for boats and airplanes.
+Support for wheel input for boats and airplanes. Control boats like how you
+ control cars. For plane, the layout is a bit different and requires a H-pattern
+ shifter.
+| Control | Effect |
+|---------|--------|
+| Throttle | Yaw right |
+| Clutch | Yaw left |
+| Wheel | Roll left / right |
+| Shift up paddle | Pitch up |
+| Shift down paddle | Pitch down |
+| Gear 1| 33% power |
+| Gear 3| 66% power |
+| Gear 5| 100% power |
+| Gear 2| 33% brake / reverse |
+| Gear 4| 66% brake / reverse |
+| Gear 6| 100% brake / reverse |
 
 ### `AltAngle` : Any
 __EXPERIMENTAL__ <br>
