@@ -34,6 +34,7 @@ public:
 	void UpdateValues(VehicleExtensions& ext, Vehicle vehicle);
 	std::array<float, 2> GetWheelCompressionSpeeds();
 	//bool IsBike = false;
+
 	VehicleClass Class = VehicleClass::Car;
 	bool NoClutch = false;
 	bool IsTruck = false;

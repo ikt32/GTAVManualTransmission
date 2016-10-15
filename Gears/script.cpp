@@ -109,27 +109,31 @@ void update() {
 		vehData.Class != VehicleData::VehicleClass::Bike &&
 		vehData.Class != VehicleData::VehicleClass::Quad) {
 		// Alt Support
-		if (settings.AltControls) {
-			updateLastInputDevice();
 
-			if (controls.WheelDI.IsConnected() && prevInput == ScriptControls::Wheel) {
-				if (vehData.Class == VehicleData::VehicleClass::Boat) {
-					handleVehicleButtons();
-					handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
-					doWheelSteeringBoat();
-					playWheelEffects(settings, vehData, false, true);
-				}
+		updateLastInputDevice();
 
-				// Planes
-				if (vehData.Class == VehicleData::VehicleClass::Plane) {
-					doWheelSteeringPlane();
-					playWheelEffects(settings, vehData, false, true);
-				}
-				return;
+		if (settings.AltControls &&
+			controls.WheelDI.IsConnected() && prevInput == ScriptControls::Wheel) {
+			if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
+				controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
+				controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle)) {
+				reInit();
+			}
+
+			if (vehData.Class == VehicleData::VehicleClass::Boat) {
+				handleVehicleButtons();
+				handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
+				doWheelSteeringBoat();
+				playWheelEffects(settings, vehData, false, true);
+			}
+
+			// Planes
+			if (vehData.Class == VehicleData::VehicleClass::Plane) {
+				doWheelSteeringPlane();
+				playWheelEffects(settings, vehData, false, true);
 			}
 			return;
 		}
-
 		return;
 	}
 	

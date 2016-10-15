@@ -79,10 +79,10 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 VehicleData::VehicleClass VehicleData::findClass(Hash model) {
 	if (VEHICLE::IS_THIS_MODEL_A_CAR(model))
 		return VehicleClass::Car;
+	if (VEHICLE::IS_THIS_MODEL_A_BICYCLE(model))	// >bicycle is a bike. wth R*?
+		return VehicleClass::Bicycle;
 	if (VEHICLE::IS_THIS_MODEL_A_BIKE(model))
 		return VehicleClass::Bike;
-	if (VEHICLE::IS_THIS_MODEL_A_BICYCLE(model))
-		return VehicleClass::Bicycle;
 	if (VEHICLE::IS_THIS_MODEL_A_BOAT(model))
 		return VehicleClass::Boat;
 	if (VEHICLE::IS_THIS_MODEL_A_PLANE(model))
