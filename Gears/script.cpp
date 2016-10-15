@@ -1384,6 +1384,19 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 		damperForce = settings.DamperMin;
 	}
 
+	if (vehData.Class == VehicleData::VehicleClass::Car || vehData.Class == VehicleData::VehicleClass::Quad) {
+		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true) && VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
+			centerForce = 0;
+			damperForce = settings.DamperMin;
+		}
+	}
+	if (vehData.Class == VehicleData::VehicleClass::Bike) {
+		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
+			centerForce = 0;
+			damperForce = settings.DamperMin;
+		}
+	}
+
 	int totalForce = static_cast<int>(steerSpeed * damperForce * 0.1) +
 		static_cast<int>(constantForce / steerMult) +
 		static_cast<int>(settings.CenterStrength * centerForce * steerMult) +
