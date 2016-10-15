@@ -1,19 +1,23 @@
 # Changelog
 
 ## 4.1
-Gears.ini has changed!
-*   Add soft lock @ steering input degrees
-*   Experimental: Add support for non-car vehicles
-*   Moved `[WHEELKEYBOARD]` below `[WHEELAXIS]`
-*   Added back AutoGear1 for sequential as option
-*   Add gearbox change to Controller layout
+__This update changes Gears.ini__
 
-Fixes:
+Feature changes:
+*   Add wheel soft lock options
+*   Add FFB effects for burst tyres
+*   Add detail FFB effects for quads
+*   Add AutoGear1 for sequential as option
+*   Add gearbox change to Controller layout
+*   Experimental: Add support for boats and planes
+
+Changes/Fixes:
+*   Fix version printing
 *   Fix engine revving while braking with steering wheel while rolling back in a non-reverse gear
 *   Fix engine revving while braking with steering wheel in reverse near stop
-*   Decrease Centerforce faster during oversteer: 0% centerforce @ 20% oversteer
+*   Decrease CenterForce faster during oversteer: 0% centerforce @ 20% oversteer
 *   Remove dampener adjustment for oversteer
-*   Fix version printing
+*   Change README format
 
 ## 4.0.4
 *   Fix Dpad press register on toggle
