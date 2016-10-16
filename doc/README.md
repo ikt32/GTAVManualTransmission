@@ -14,31 +14,31 @@ feedback is fully supported. Steering wheel support is always turned on, so it
 also works without manual transmission!
 
 # Table of Contents
-<!-- TOC depthFrom:1 depthTo:2 withLinks:1 updateOnSave:1 orderedList:0 -->
+<!-- TOC depthFrom:1 depthTo:2 orderedList:false updateOnSave:false withLinks:true -->
 
 - [Manual Transmission for GTA V](#manual-transmission-for-gta-v)
 - [Steering Wheel Support for GTA V](#steering-wheel-support-for-gta-v)
 - [Table of Contents](#table-of-contents)
 - [Requirements](#requirements)
 - [Installation](#installation)
-	- [Additional steps for wheel users](#additional-steps-for-wheel-users)
+    - [Additional steps for wheel users](#additional-steps-for-wheel-users)
 - [Basic usage and controls](#basic-usage-and-controls)
-	- [Controls](#controls)
-	- [Usage](#usage)
+    - [Controls](#controls)
+    - [Usage](#usage)
 - [Configuration](#configuration)
-	- [`[OPTIONS]`](#options)
-	- [`[CONTROLLER]`](#controller)
-	- [`[KEYBOARD]`](#keyboard)
-	- [`[WHEEL]`](#wheel)
-	- [`[WHEELAXIS]`](#wheelaxis)
-	- [`[WHEELKEYBOARD]`](#wheelkeyboard)
-	- [`[DEBUG]`](#debug)
+    - [`[OPTIONS]`](#options)
+    - [`[CONTROLLER]`](#controller)
+    - [`[KEYBOARD]`](#keyboard)
+    - [`[WHEEL]`](#wheel)
+    - [`[WHEELAXIS]`](#wheelaxis)
+    - [`[WHEELKEYBOARD]`](#wheelkeyboard)
+    - [`[DEBUG]`](#debug)
 - [Troubleshooting](#troubleshooting)
-	- [Installation dependencies](#installation-dependencies)
-	- [Non-conflicting software](#non-conflicting-software)
-	- [Conflicting software](#conflicting-software)
-	- [Steering wheel reports strange values](#steering-wheel-reports-strange-values)
-	- [Steering wheel not detected](#steering-wheel-not-detected)
+    - [Installation dependencies](#installation-dependencies)
+    - [Non-conflicting software](#non-conflicting-software)
+    - [Conflicting software](#conflicting-software)
+    - [Steering wheel reports strange values](#steering-wheel-reports-strange-values)
+    - [Steering wheel not detected](#steering-wheel-not-detected)
 - [Thanks](#thanks)
 - [Source code](#source-code)
 
@@ -89,7 +89,7 @@ automatic gearbox.
 * Hold B to switch between a sequential gearbox, H-pattern gearbox or
 the automatic gearbox.
 
-### Wheel
+### Steering wheel
 * Use the assigned buttons to toggle the mod and switch between gearboxes.
 * Refer to `Gears.ini` for these buttons.
 
