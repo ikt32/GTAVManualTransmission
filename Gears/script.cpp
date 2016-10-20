@@ -5,6 +5,7 @@
 #include "../../ScriptHookV_SDK/inc/natives.h"
 #include "../../ScriptHookV_SDK/inc/enums.h"
 #include "../../ScriptHookV_SDK/inc/main.h"
+#include "../../ScriptHookV_SDK/inc/types.h"
 
 #include "script.h"
 
@@ -1248,8 +1249,6 @@ void doWheelSteeringPlane() {
 	CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyYawRight, controls.ThrottleVal);
 
 	//////////////////////////////////////////////////////////////////////////////
-
-	float range = (float)(controls.SteerRight - controls.SteerLeft);
 
 	float antiDeadzoned;
 	antiDeadzoned = effSteer;

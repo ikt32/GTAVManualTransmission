@@ -173,7 +173,7 @@ DWORD str2key(std::string humanReadableKey)
 
 		if ((letter >= 0x30 && letter <= 0x39) || (letter >= 0x41 && letter <= 0x5A))
 		{
-			return (int)letter;
+			return static_cast<int>(letter);
 		}
 	}
 
