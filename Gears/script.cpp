@@ -72,7 +72,8 @@ void update() {
 
 	vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
 
-	if (!ENTITY::DOES_ENTITY_EXIST(vehicle)) {
+	if (!ENTITY::DOES_ENTITY_EXIST(vehicle) ||
+		playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, 0)) {
 		reset();
 		return;
 	}
