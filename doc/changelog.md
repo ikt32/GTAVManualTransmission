@@ -1,4 +1,9 @@
 # Changelog
+## 4.1.2
+No changes to Gears.ini
+*   Fix clutch not read in car when SimpleBike is on
+*   Fix gearbox control still active if player isn't the driver
+
 ## 4.1.1
 No changes to Gears.ini
 *   Fix wheel used in bicycles
