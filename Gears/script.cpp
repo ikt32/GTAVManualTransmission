@@ -85,8 +85,18 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 
 	vehData.UpdateValues(ext, vehicle);
-	controls.UpdateValues(prevInput, (settings.ShiftMode == Automatic || settings.SimpleBike) &&
-		vehData.Class != VehicleData::VehicleClass::Plane);
+	bool ignoreClutch = false;
+	if (settings.ShiftMode == Automatic) {
+		ignoreClutch = true;
+	}
+	if (vehData.Class == VehicleData::VehicleClass::Bike && settings.SimpleBike) {
+		ignoreClutch = true;
+	}
+	if (vehData.Class == VehicleData::VehicleClass::Plane) {
+		ignoreClutch = false;
+	}
+
+	controls.UpdateValues(prevInput, ignoreClutch);
 
 	if (settings.Debug) {
 		showDebugInfo();
