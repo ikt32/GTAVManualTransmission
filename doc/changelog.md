@@ -1,4 +1,8 @@
 # Changelog
+## 4.1.3
+No changes to Gears.ini
+*   Fix LeFix Speedometer compatibility
+
 ## 4.1.2
 No changes to Gears.ini
 *   Fix clutch not read in car when SimpleBike is on
