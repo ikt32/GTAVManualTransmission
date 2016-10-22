@@ -443,7 +443,7 @@ void crossScriptComms() {
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 0);
 	}
 
-	if (vehData.SimulatedNeutral) {
+	if (vehData.SimulatedNeutral && settings.EnableManual) {
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_weapon", 1);
 	}
 	else {
