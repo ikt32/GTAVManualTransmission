@@ -397,8 +397,8 @@ How strong the centering force is. Influenced by speed and
  acceleration.
 
 ### `PhysicsStrength` : Any
-How much physics affect your steering wheel. A higher value
-means a stronger force feedback.
+How much physics affect your steering wheel and pulls it left or right. A higher 
+value means a stronger force feedback.
 
 ### `DetailStrength` : `0` to any
 How strong the feedback is from suspension compression. Think for terrain
