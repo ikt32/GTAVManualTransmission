@@ -1421,14 +1421,15 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 		static_cast<int>(settings.CenterStrength * centerForce * steerMult) +
 		static_cast<int>(10.0f * settings.DetailStrength * compSpeedTotal);
 
+	// Soft lock
 	if (effSteer > 1.0f) {
 		totalForce = static_cast<int>((effSteer - 1.0f) * 100000) + totalForce;
-		if (effSteer > 1.05f) {
+		if (effSteer > 1.1f) {
 			totalForce = 10000;
 		}
 	} else if (effSteer < -1.0f) {
 		totalForce = static_cast<int>((-effSteer - 1.0f) * -100000) + totalForce;
-		if (effSteer < -1.05f) {
+		if (effSteer < -1.1f) {
 			totalForce = -10000;
 		}
 	}
