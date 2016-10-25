@@ -668,6 +668,12 @@ void functionSShift() {
 			return;
 		}
 
+		// Shift block /w clutch shifting for seq.
+		if (settings.ClutchShiftingS && 
+			controls.ClutchVal < 1.0f - settings.ClutchCatchpoint) {
+			return;
+		}
+
 		// Reverse to Neutral
 		if (vehData.CurrGear == 0 && !vehData.SimulatedNeutral) {
 			shiftTo(1, true);
@@ -696,6 +702,12 @@ void functionSShift() {
 			if (vehData.CurrGear > 0) {
 				shiftTo(vehData.LockGear - 1, true);
 			}
+			return;
+		}
+
+		// Shift block /w clutch shifting for seq.
+		if (settings.ClutchShiftingS &&
+			controls.ClutchVal < 1.0f - settings.ClutchCatchpoint) {
 			return;
 		}
 
