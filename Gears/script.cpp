@@ -102,6 +102,16 @@ void update() {
 		showDebugInfo();
 	}
 
+	if (!settings.IsCorrectVersion()) {
+		Color red;
+		red.R = 255;
+		red.G = 0;
+		red.B = 0;
+		red.A = 255;
+
+		showText(0.2, 0.45, 2.0, "UPDATE GEARS.INI", red);
+	}
+
 	if (prevVehicle != vehicle) {
 		if (vehData.NoClutch) {
 			vehData.SimulatedNeutral = false;

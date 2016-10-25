@@ -3,6 +3,7 @@
 #include "Input/ScriptControls.hpp"
 
 #define SETTINGSFILE "./Gears.ini"
+#define CORRECTVERSION "4.2"
 
 class ScriptControls;
 
@@ -12,6 +13,7 @@ public:
 
 	void Read(ScriptControls* scriptControl);
 	void Save() const;
+	bool IsCorrectVersion() const;
 
 	// [OPTIONS]
 	bool EnableManual = true;
@@ -68,7 +70,7 @@ public:
 	bool AltControls = false;
 	float SteerAngleAlt = 180.0f;
 
-
 private:
 	void CheckSettings();
+	bool CorrectVersion = false;
 };

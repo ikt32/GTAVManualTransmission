@@ -200,6 +200,10 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	Debug = (GetPrivateProfileIntA("DEBUG", "Info", 0, SETTINGSFILE) == 1);
 	AltControls = (GetPrivateProfileIntA("DEBUG", "AltControls", 0, SETTINGSFILE) == 1);
 	SteerAngleAlt = GetPrivateProfileIntA("DEBUG", "AltAngle", 180, SETTINGSFILE) / 1.0f;
+	
+	// .ini version check
+	GetPrivateProfileStringA("DEBUG", "INIver", "0.0", buffer, static_cast<DWORD>(24), SETTINGSFILE);
+	CorrectVersion = buffer == CORRECTVERSION;
 
 	CheckSettings();
 	if (scriptControl->ClutchDisable) {
@@ -226,4 +230,8 @@ void ScriptSettings::CheckSettings() {
 		logger.Write("UITips_Y higher than 100, reverting");
 		WritePrivateProfileStringA("OPTIONS", "UITips_Y", "100", SETTINGSFILE);
 	}
+}
+
+bool ScriptSettings::IsCorrectVersion() const {
+	return CorrectVersion;
 }
