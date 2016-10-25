@@ -70,6 +70,8 @@
     <ClCompile Include="Memory\VehicleExtensions.cpp" />
     <ClCompile Include="script.cpp" />
     <ClCompile Include="ScriptSettings.cpp" />
+    <ClCompile Include="Util\inih\cpp\INIReader.cpp" />
+    <ClCompile Include="Util\inih\ini.c" />
     <ClCompile Include="Util\Logger.cpp" />
     <ClCompile Include="VehicleData.cpp" />
   </ItemGroup>
@@ -88,6 +90,8 @@
     <ClInclude Include="Memory\VehicleExtensions.hpp" />
     <ClInclude Include="script.h" />
     <ClInclude Include="ScriptSettings.hpp" />
+    <ClInclude Include="Util\inih\cpp\INIReader.h" />
+    <ClInclude Include="Util\inih\ini.h" />
     <ClInclude Include="Util\Logger.hpp" />
     <ClInclude Include="Util\TimeHelper.hpp" />
     <ClInclude Include="Util\Util.hpp" />

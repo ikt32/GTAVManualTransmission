@@ -29,6 +29,12 @@
     <ClCompile Include="Input\ScriptControls.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="Util\inih\ini.c">
+      <Filter>Util\inih</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\inih\cpp\INIReader.cpp">
+      <Filter>Util\inih</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -79,6 +85,12 @@
     <ClInclude Include="Input\ScriptControls.hpp">
       <Filter>Input</Filter>
     </ClInclude>
+    <ClInclude Include="Util\inih\ini.h">
+      <Filter>Util\inih</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\inih\cpp\INIReader.h">
+      <Filter>Util\inih</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -92,6 +104,9 @@
     </Filter>
     <Filter Include="Input">
       <UniqueIdentifier>{b0a5ce99-5818-4a5c-8c45-00ae3b8148c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util\inih">
+      <UniqueIdentifier>{57f1bf04-f93a-435d-ac2c-83b3b9698d13}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
