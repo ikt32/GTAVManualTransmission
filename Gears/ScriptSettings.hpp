@@ -50,6 +50,7 @@ public:
 	bool WheelWithoutManual = true;
 	
 	bool FFEnable = true;
+	float FFGlobalMult = 1.0f;
 	int DamperMax = 50;
 	int DamperMin = 10;
 	int TargetSpeed = 10; // TargetSpeed in m/s

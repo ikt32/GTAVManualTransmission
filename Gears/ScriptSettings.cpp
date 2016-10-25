@@ -119,6 +119,7 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	WheelWithoutManual = (GetPrivateProfileIntA("WHEELOPTIONS", "WheelWithoutManual", 1, SETTINGSFILE) == 1);
 
 	FFEnable =		GetPrivateProfileIntA("WHEELOPTIONS", "FFEnable", 1, SETTINGSFILE) == 1;
+	FFGlobalMult =	GetPrivateProfileIntA("WHEELOPTIONS", "FFGlobalMult", 100, SETTINGSFILE) / 100.0f;
 	DamperMax =		GetPrivateProfileIntA("WHEELOPTIONS", "DamperMax", 50, SETTINGSFILE);
 	DamperMin =		GetPrivateProfileIntA("WHEELOPTIONS", "DamperMin", 20, SETTINGSFILE);
 	TargetSpeed =	GetPrivateProfileIntA("WHEELOPTIONS", "DamperTargetSpeed", 10, SETTINGSFILE);

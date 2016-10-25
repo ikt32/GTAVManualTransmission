@@ -1428,10 +1428,10 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 		}
 	}
 
-	int totalForce = static_cast<int>(steerSpeed * damperForce * 0.1) +
+	int totalForce = (static_cast<int>(steerSpeed * damperForce * 0.1) +
 		static_cast<int>(constantForce / steerMult) +
 		static_cast<int>(settings.CenterStrength * centerForce * steerMult) +
-		static_cast<int>(10.0f * settings.DetailStrength * compSpeedTotal);
+		static_cast<int>(10.0f * settings.DetailStrength * compSpeedTotal))*settings.FFGlobalMult;
 
 	// Soft lock
 	if (effSteer > 1.0f) {
