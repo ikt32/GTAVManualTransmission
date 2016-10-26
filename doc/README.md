@@ -458,8 +458,8 @@ as comments in `Gears.ini`. They are listed here again for completeness.
 
 ```
 Throttle    = lY
-ThrottleMin = 0
-ThrottleMax = 65535
+ThrottleMin = 32767
+ThrottleMax = 0
 Brake       = lRz
 BrakeMin    = 0
 BrakeMax    = 65535
@@ -488,9 +488,6 @@ FFAxis		= X
 * Logitech G29
 
 ```
-Throttle 	= lY
-Brake 		= lRz
-Clutch		= rglSlider0
 H1			= 12
 H2			= 13
 H3			= 14
@@ -498,6 +495,18 @@ H4			= 15
 H5			= 16
 H6			= 17
 HR			= 18
+
+Throttle	= lY
+ThrottleMin = 32767
+ThrottleMax = 0
+Brake		= lRz
+BrakeMin    = 0
+BrakeMax    = 65535
+Clutch		= rglSlider0
+ClutchMin   = 0
+ClutchMax   = 65535
+ClutchDisable = 0
+FFAxis		= X
 ```
 
 * Thrustmaster Italia 458
