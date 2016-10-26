@@ -454,72 +454,71 @@ Clutch-related functions like Clutch Catching, Clutch shifting etc.
 Some friendly users have provided settings for their wheels. These can be found
 as comments in `Gears.ini`. They are listed here again for completeness.
 
-	G27 Throttle and Brake on different axis
-	Throttle    = lY
-	ThrottleMin = 0
-	ThrottleMax = 65535
-	Brake       = lRz
-	BrakeMin    = 0
-	BrakeMax    = 65535
-	Clutch      = rglSlider1
-	ClutchMin   = 0
-	ClutchMax   = 65535
-	ClutchDisable = 0
-	FFAxis 			= X
+* G27 Throttle and Brake on different axis
 
-	G27 Throttle and Brake on same axis
-	Throttle    = rglSlider0
-	ThrottleMin = 32767
-	ThrottleMax = 0
-	Brake       = rglSlider0
-	BrakeMin    = 32767
-	BrakeMax    = 65535
-	Clutch      = rglSlider1
-	ClutchMin   = 0
-	ClutchMax   = 65535
-	ClutchDisable = 0
-	FFAxis 			= X
+```
+Throttle    = lY
+ThrottleMin = 0
+ThrottleMax = 65535
+Brake       = lRz
+BrakeMin    = 0
+BrakeMax    = 65535
+Clutch      = rglSlider1
+ClutchMin   = 0
+ClutchMax   = 65535
+ClutchDisable = 0
+FFAxis		= X
+```
 
-	Logitech G29
-	Throttle 		= lY
-	Brake 			= lRz
-	Clutch 			= rglSlider0
-	H1					= 12
-	H2					= 13
-	H3					= 14
-	H4					= 15
-	H5					= 16
-	H6					= 17
-	HR					= 18
+* G27 Throttle and Brake on same axis
+```
+Throttle    = rglSlider0
+ThrottleMin = 32767
+ThrottleMax = 0
+Brake       = rglSlider0
+BrakeMin    = 32767
+BrakeMax    = 65535
+Clutch      = rglSlider1
+ClutchMin   = 0
+ClutchMax   = 65535
+ClutchDisable = 0
+FFAxis		= X
+```
 
-	Thrustmaster Italia 458, courtesy of Pslytely Psycho
-	Throttle 	= lRz
-	ThrottleMin = 0
-	ThrottleMax = 65535
-	Brake 		= lY
-	BrakeMin 	= 0
-	BrakeMax 	= 65535
-	Steer 		= lX
-	SteerLeft 	= 0
-	SteerRight 	= 65535
-	ClutchDisable = 1
-	FFAxis 		= X
+* Logitech G29
 
-	Thrustmaster T150, courtesy of jojos38
-	Throttle    = lRz
-	ThrottleMin = 0
-	ThrottleMax = 65535
-	Brake       = lY
-	BrakeMin    = 0
-	BrakeMax    = 65535
-	Clutch      = rglSlider1
-	ClutchMin   = 0
-	ClutchMax   = 65535
-	Steer       = lX
-	SteerLeft   = 0
-	SteerRight  = 65535
-	ClutchDisable = 1
-	FFAxis      = X
+```
+Throttle 	= lY
+Brake 		= lRz
+Clutch		= rglSlider0
+H1			= 12
+H2			= 13
+H3			= 14
+H4			= 15
+H5			= 16
+H6			= 17
+HR			= 18
+```
+
+* Thrustmaster Italia 458
+* Thrustmaster T150
+* Thrustmaster TMX
+```
+Throttle    = lRz
+ThrottleMin = 0
+ThrottleMax = 65535
+Brake       = lY
+BrakeMin    = 0
+BrakeMax    = 65535
+Clutch      = rglSlider1
+ClutchMin   = 0
+ClutchMax   = 65535
+Steer       = lX
+SteerLeft   = 0
+SteerRight  = 65535
+ClutchDisable = 1
+FFAxis      = X
+```
 
 
 ### `SteerAngleMax` : Any
