@@ -205,6 +205,14 @@ This option controls the requirement to hold the clutch for H-shifting.
 * `1`: Need to hold the clutch while shifting. Gearbox pops into neutral when
 not holding the clutch.
 
+### `ClutchShiftingS` : `0` or `1`
+This option controls the requirement to hold the clutch for sequential shifting.
+This feature is available from 4.2.0 on.
+
+* `0`: No need to hold the clutch while shifting
+* `1`: Need to hold the clutch while shifting. Gearbox pops into neutral when
+not holding the clutch.
+
 ### `DefaultNeutral` : `0` or `1`
 This option controls whether new vehicles start in neutral or not when you enter
  them. This is useful to turn on when you have __ClutchCatching__ and
@@ -264,6 +272,9 @@ Turn this on to automatically look back while in the reverse gear.
 This is a simple gear display, which might be of help to determine if you’re
 in Neutral or not. It also indicates if the gear you're in is the top gear with
 the specified color.
+
+* `0`: No indicator
+* `1`: Indicator active
 
 * `UITips_X`: `0` is left, `100` is right.
 * `UITips_Y`: `0` is top, `100` is bottom.
@@ -379,6 +390,10 @@ use your racing wheel with GTA V and this mod.
 
 ### `FFEnable` : `0` or `1`
 Disable or enable force feedback.
+
+### `FFGlobalMult` : Any
+Multiplier in percentage of how strong all forces are.
+This feature is available from 4.2.0 on.
 
 ### `DamperMax` : `0` to `100`
 Controls the friction feel when the vehicle is at a stop. A higher
@@ -523,6 +538,16 @@ have been given. The format is `[BUTTON] = [KEY]`. Up to 128 buttons
 are supported. Any keyboard key can be chosen, but Num Lock needs to be OFF for
 keys to be interpreted correctly.
 Use the included __Keys.txt__ for reference!
+
+Examples:
+
+* `7 = H` makes `Button 7` act as the `H` key, which turns on the headlights.
+* `20 = E` makes `Button 20` act as the `E` key, which is the horn or emergency lights.
+* `18 = X` makes `Button 18` act as the `X` key. If [Slam It](https://www.gta5-mods.com/scripts/slam-it)
+is installed, it'll lower the car.
+* `16 = LEFT` makes `Button 16` act as the `LEFT` key. If [Windscreen Wipers](https://www.gta5-mods.com/scripts/car-wipers)
+is installed and a compatible car is used, the wipers are turned on.
+
 
 ## `[DEBUG]`
 
