@@ -203,7 +203,7 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	
 	// .ini version check
 	GetPrivateProfileStringA("DEBUG", "INIver", "0.0", buffer, static_cast<DWORD>(24), SETTINGSFILE);
-	CorrectVersion = buffer == CORRECTVERSION;
+	INIver = buffer;
 
 	CheckSettings();
 	if (scriptControl->ClutchDisable) {
@@ -233,5 +233,5 @@ void ScriptSettings::CheckSettings() {
 }
 
 bool ScriptSettings::IsCorrectVersion() const {
-	return CorrectVersion;
+	return CORRECTVERSION == INIver;
 }

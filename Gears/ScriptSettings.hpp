@@ -3,7 +3,7 @@
 #include "Input/ScriptControls.hpp"
 
 #define SETTINGSFILE "./Gears.ini"
-#define CORRECTVERSION "4.2"
+#define CORRECTVERSION "4.2.0"
 
 class ScriptControls;
 
@@ -72,5 +72,5 @@ public:
 
 private:
 	void CheckSettings();
-	bool CorrectVersion = false;
+	std::string INIver = "0.0.0";
 };
