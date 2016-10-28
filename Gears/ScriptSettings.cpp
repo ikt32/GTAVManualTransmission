@@ -4,43 +4,47 @@
 #include "Util/Logger.hpp"
 #include <string>
 #include "Input/keyboard.h"
+#include "Util/inih/cpp/INIReader.h"
 
 ScriptSettings::ScriptSettings() {
 }
 
 
 void ScriptSettings::Read(ScriptControls* scriptControl) {
+	INIReader reader(SETTINGSFILE);
+
+	reader.GetBoolean("OPTIONS", "Enable", true);
 	// [OPTIONS]
-	EnableManual = (GetPrivateProfileIntA("OPTIONS", "Enable", 1, SETTINGSFILE) == 1);
-	ShiftMode = GetPrivateProfileIntA("OPTIONS", "ShiftMode", 0, SETTINGSFILE);
-	SimpleBike = (GetPrivateProfileIntA("OPTIONS", "SimpleBike", 0, SETTINGSFILE) == 1);
-	EngDamage = (GetPrivateProfileIntA("OPTIONS", "EngineDamage", 0, SETTINGSFILE) == 1);
-	EngStall = (GetPrivateProfileIntA("OPTIONS", "EngineStalling", 0, SETTINGSFILE) == 1);
-	EngBrake = (GetPrivateProfileIntA("OPTIONS", "EngineBraking", 0, SETTINGSFILE) == 1);
-	ClutchCatching = (GetPrivateProfileIntA("OPTIONS", "ClutchCatching", 0, SETTINGSFILE) == 1);
-	ClutchShifting = (GetPrivateProfileIntA("OPTIONS", "ClutchShifting", 0, SETTINGSFILE) == 1);
-	ClutchShiftingS = (GetPrivateProfileIntA("OPTIONS", "ClutchShiftingS", 0, SETTINGSFILE) == 1);
-	DefaultNeutral = (GetPrivateProfileIntA("OPTIONS", "DefaultNeutral", 0, SETTINGSFILE) == 1);
+	EnableManual = reader.GetBoolean("OPTIONS", "Enable", true);
+	ShiftMode = reader.GetInteger("OPTIONS", "ShiftMode", 0);
+	SimpleBike = reader.GetBoolean("OPTIONS", "SimpleBike", false);
+	EngDamage = reader.GetBoolean("OPTIONS", "EngineDamage", false);
+	EngStall = reader.GetBoolean("OPTIONS", "EngineStalling", false);
+	EngBrake = reader.GetBoolean("OPTIONS", "EngineBraking", false);
+	ClutchCatching = reader.GetBoolean("OPTIONS", "ClutchCathing", false);
+	ClutchShifting = reader.GetBoolean("OPTIONS", "ClutchShifting", false);
+	ClutchShiftingS = reader.GetBoolean("OPTIONS", "ClutchShiftingS", false);
+	DefaultNeutral = reader.GetBoolean("OPTIONS", "DefaultNeutral", true);
 	
-	ClutchCatchpoint = GetPrivateProfileIntA("OPTIONS", "ClutchCatchpoint", 15, SETTINGSFILE) / 100.0f;
-	StallingThreshold = GetPrivateProfileIntA("OPTIONS", "StallingThreshold", 75, SETTINGSFILE) / 100.0f;
-	RPMDamage = GetPrivateProfileIntA("OPTIONS", "RPMDamage", 15, SETTINGSFILE) / 100.0f;
-	MisshiftDamage = GetPrivateProfileIntA("OPTIONS", "MisshiftDamage", 10, SETTINGSFILE);
+	ClutchCatchpoint = reader.GetReal("OPTIONS", "ClutchCatchpoint", 15.0) / 100.0f;
+	StallingThreshold = reader.GetReal("OPTIONS", "StallingThreshold", 75.0) / 100.0f;
+	RPMDamage = reader.GetReal("OPTIONS", "RPMDamage", 15.0) / 100.0f;
+	MisshiftDamage = reader.GetReal("OPTIONS", "MisshiftDamage", 10.0);
 
-	AutoLookBack = (GetPrivateProfileIntA("OPTIONS", "AutoLookBack", 0, SETTINGSFILE) == 1);
-	AutoGear1 = (GetPrivateProfileIntA("OPTIONS", "AutoGear1", 0, SETTINGSFILE) == 1);
-	HillBrakeWorkaround = (GetPrivateProfileIntA("OPTIONS", "HillBrakeWorkaround", 0, SETTINGSFILE) == 1);
+	AutoLookBack = reader.GetBoolean("OPTIONS", "AutoLookBack", false);
+	AutoGear1 = reader.GetBoolean("OPTIONS", "AutoGear1", false);
+	HillBrakeWorkaround = reader.GetBoolean("OPTIONS", "HillBrakeWorkaround", false);
 	
-	UITips = (GetPrivateProfileIntA("OPTIONS", "UITips", 1, SETTINGSFILE) == 1);
-	UITips_OnlyNeutral = (GetPrivateProfileIntA("OPTIONS", "UITips_OnlyNeutral", 0, SETTINGSFILE) == 1);
-	UITips_X = GetPrivateProfileIntA("OPTIONS", "UITips_X", 95, SETTINGSFILE) / 100.0f;
-	UITips_Y = GetPrivateProfileIntA("OPTIONS", "UITips_Y", 95, SETTINGSFILE) / 100.0f;
-	UITips_Size = GetPrivateProfileIntA("OPTIONS", "UITips_Size", 15, SETTINGSFILE) / 100.0f;
-	UITips_TopGearC_R = GetPrivateProfileIntA("OPTIONS", "UITips_TopGearC_R", 255, SETTINGSFILE);
-	UITips_TopGearC_G = GetPrivateProfileIntA("OPTIONS", "UITips_TopGearC_G", 255, SETTINGSFILE);
-	UITips_TopGearC_B = GetPrivateProfileIntA("OPTIONS", "UITips_TopGearC_B", 255, SETTINGSFILE);
+	UITips = reader.GetBoolean("OPTIONS", "UITips", true);
+	UITips_OnlyNeutral = reader.GetBoolean("OPTIONS", "UITips_OnlyNeutral", false);
+	UITips_X = reader.GetReal("OPTIONS", "UITips_X", 95.0) / 100.0f;
+	UITips_Y = reader.GetReal("OPTIONS", "UITips_Y", 95.0) / 100.0f;
+	UITips_Size = reader.GetReal("OPTIONS", "UITips_Size", 15.0) / 100.0f;
+	UITips_TopGearC_R = reader.GetInteger("OPTIONS", "UITips_TopGearC_R", 255);
+	UITips_TopGearC_G = reader.GetInteger("OPTIONS", "UITips_TopGearC_G", 255);
+	UITips_TopGearC_B = reader.GetInteger("OPTIONS", "UITips_TopGearC_B", 255);
 
-	CrossScript = (GetPrivateProfileIntA("OPTIONS", "CrossScript", 0, SETTINGSFILE) == 1);
+	CrossScript = reader.GetBoolean("OPTIONS", "CrossScript", false);
 
 	// [CONTROLLER]
 	char buffer[24] = {0};
