@@ -11,6 +11,8 @@ ScriptSettings::ScriptSettings() {
 
 
 void ScriptSettings::Read(ScriptControls* scriptControl) {
+#pragma warning(push)
+#pragma warning(disable: 4244) // Make everything doubles later...
 	INIReader reader(SETTINGSFILE);
 
 	reader.GetBoolean("OPTIONS", "Enable", true);
@@ -47,173 +49,140 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	CrossScript = reader.GetBoolean("OPTIONS", "CrossScript", false);
 
 	// [CONTROLLER]
-	char buffer[24] = {0};
-	GetPrivateProfileStringA("CONTROLLER", "Toggle", "DpadRight", buffer, static_cast<DWORD>(24), SETTINGSFILE);
-	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Toggle)] = buffer;
-	GetPrivateProfileStringA("CONTROLLER", "ToggleShift", "B", buffer, static_cast<DWORD>(24), SETTINGSFILE);
-	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ToggleH)] = buffer;
-	scriptControl->CToggleTime = GetPrivateProfileIntA("CONTROLLER", "ToggleTime", 500, SETTINGSFILE);
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Toggle)] = reader.Get("CONTROLLER", "Toggle", "DpadRight");
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ToggleH)] = reader.Get("CONTROLLER", "ToggleShift", "B");
+	scriptControl->CToggleTime = reader.GetInteger("CONTROLLER", "ToggleTime", 500);
 
-	int tval = GetPrivateProfileIntA("CONTROLLER", "TriggerValue", 75, SETTINGSFILE);
+	int tval = reader.GetInteger("CONTROLLER", "TriggerValue", 75);
 	if (tval > 100 || tval < 0) {
 		tval = 75;
 	}
 	scriptControl->SetXboxTrigger(tval);
 
-	GetPrivateProfileStringA("CONTROLLER", "ShiftUp", "A", buffer, static_cast<DWORD>(24), SETTINGSFILE);
-	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)] = buffer;
-	GetPrivateProfileStringA("CONTROLLER", "ShiftDown", "X", buffer, static_cast<DWORD>(24), SETTINGSFILE);
-	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)] = buffer;
-	GetPrivateProfileStringA("CONTROLLER", "Clutch", "LeftThumbDown", buffer, static_cast<DWORD>(24), SETTINGSFILE);
-	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Clutch)] = buffer;
-	GetPrivateProfileStringA("CONTROLLER", "Engine", "DpadDown", buffer, static_cast<DWORD>(24), SETTINGSFILE);
-	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Engine)] = buffer;
-
-	GetPrivateProfileStringA("CONTROLLER", "Throttle", "RightTrigger", buffer, static_cast<DWORD>(24), SETTINGSFILE);
-	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Throttle)] = buffer;
-	GetPrivateProfileStringA("CONTROLLER", "Brake", "LeftTrigger", buffer, static_cast<DWORD>(24), SETTINGSFILE);
-	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Brake)] = buffer;
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)] = reader.Get("CONTROLLER", "ShiftUp", "A");
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)] = reader.Get("CONTROLLER", "ShiftDown", "X");
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Clutch)] = reader.Get("CONTROLLER", "Clutch", "LeftThumbDown");
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Engine)] = reader.Get("CONTROLLER", "Engine", "DpadDown");
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Throttle)] = reader.Get("CONTROLLER", "Throttle", "RightTrigger");
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Brake)] = reader.Get("CONTROLLER", "Brake", "LeftTrigger");
 
 	// [KEYBOARD]
-	char kbKeyBuffer[24];
 	
-	GetPrivateProfileStringA("KEYBOARD", "Toggle", "VK_OEM_5", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Toggle)]   = str2key(kbKeyBuffer);
-	GetPrivateProfileStringA("KEYBOARD", "ToggleH", "VK_OEM_6", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ToggleH)]   = str2key(kbKeyBuffer);
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Toggle)] = str2key(reader.Get("KEYBOARD", "Toggle", "VK_OEM_5"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ToggleH)] = str2key(reader.Get("KEYBOARD", "ToggleH", "VK_OEM_6"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ShiftUp)] = str2key(reader.Get("KEYBOARD", "ShiftUp", "SHIFT"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ShiftDown)] = str2key(reader.Get("KEYBOARD", "ShiftDown", "CTRL"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Clutch)] = str2key(reader.Get("KEYBOARD", "Clutch", "X"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Engine)] = str2key(reader.Get("KEYBOARD", "Engine", "C"));
 
-	GetPrivateProfileStringA("KEYBOARD", "ShiftUp", "SHIFT", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ShiftUp)]   = str2key(kbKeyBuffer);
-	GetPrivateProfileStringA("KEYBOARD", "ShiftDown", "CTRL", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ShiftDown)] = str2key(kbKeyBuffer);
-	GetPrivateProfileStringA("KEYBOARD", "Clutch", "X", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Clutch)]    = str2key(kbKeyBuffer);
-	GetPrivateProfileStringA("KEYBOARD", "Engine", "C", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Engine)]    = str2key(kbKeyBuffer);
-	
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Throttle)] = str2key(reader.Get("KEYBOARD", "Throttle", "W"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Brake)] = str2key(reader.Get("KEYBOARD", "Brake", "S"));
 
-	GetPrivateProfileStringA("KEYBOARD", "Throttle", "W", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Throttle)] = str2key(kbKeyBuffer);
-	GetPrivateProfileStringA("KEYBOARD", "Brake", "S", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Brake)] = str2key(kbKeyBuffer);
-
-	GetPrivateProfileStringA("KEYBOARD", "HR", "NUM0", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::HR)]        = str2key(kbKeyBuffer);
-	GetPrivateProfileStringA("KEYBOARD", "H1", "NUM1", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H1)]        = str2key(kbKeyBuffer);
-	GetPrivateProfileStringA("KEYBOARD", "H2", "NUM2", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H2)]        = str2key(kbKeyBuffer);
-	GetPrivateProfileStringA("KEYBOARD", "H3", "NUM3", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H3)]        = str2key(kbKeyBuffer);
-	GetPrivateProfileStringA("KEYBOARD", "H4", "NUM4", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H4)]        = str2key(kbKeyBuffer);
-	GetPrivateProfileStringA("KEYBOARD", "H5", "NUM5", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H5)]        = str2key(kbKeyBuffer);
-	GetPrivateProfileStringA("KEYBOARD", "H6", "NUM6", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H6)]        = str2key(kbKeyBuffer);
-	GetPrivateProfileStringA("KEYBOARD", "H7", "NUM7", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H7)]        = str2key(kbKeyBuffer);
-	GetPrivateProfileStringA("KEYBOARD", "H8", "NUM8", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H8)]        = str2key(kbKeyBuffer);
-	GetPrivateProfileStringA("KEYBOARD", "HN", "NUM9", kbKeyBuffer, 24, SETTINGSFILE);
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::HN)]        = str2key(kbKeyBuffer);
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::HR)]        = str2key(reader.Get("KEYBOARD", "HR", "NUM0"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H1)]        = str2key(reader.Get("KEYBOARD", "H1", "NUM1"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H2)]        = str2key(reader.Get("KEYBOARD", "H2", "NUM2"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H3)]        = str2key(reader.Get("KEYBOARD", "H3", "NUM3"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H4)]        = str2key(reader.Get("KEYBOARD", "H4", "NUM4"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H5)]        = str2key(reader.Get("KEYBOARD", "H5", "NUM5"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H6)]        = str2key(reader.Get("KEYBOARD", "H6", "NUM6"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H7)]        = str2key(reader.Get("KEYBOARD", "H7", "NUM7"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H8)]        = str2key(reader.Get("KEYBOARD", "H8", "NUM8"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::HN)]        = str2key(reader.Get("KEYBOARD", "HN", "NUM9"));
 
 	// [WHEELOPTIONS]
-	WheelEnabled = (GetPrivateProfileIntA("WHEELOPTIONS", "Enable", 0, SETTINGSFILE) == 1);
-	WheelWithoutManual = (GetPrivateProfileIntA("WHEELOPTIONS", "WheelWithoutManual", 1, SETTINGSFILE) == 1);
+	WheelEnabled = reader.GetBoolean("WHEELOPTIONS", "Enable", false);
+	WheelWithoutManual = reader.GetBoolean("WHEELOPTIONS", "WheelWithoutManual", true);
 
-	FFEnable =		GetPrivateProfileIntA("WHEELOPTIONS", "FFEnable", 1, SETTINGSFILE) == 1;
-	FFGlobalMult =	GetPrivateProfileIntA("WHEELOPTIONS", "FFGlobalMult", 100, SETTINGSFILE) / 100.0f;
-	DamperMax =		GetPrivateProfileIntA("WHEELOPTIONS", "DamperMax", 50, SETTINGSFILE);
-	DamperMin =		GetPrivateProfileIntA("WHEELOPTIONS", "DamperMin", 20, SETTINGSFILE);
-	TargetSpeed =	GetPrivateProfileIntA("WHEELOPTIONS", "DamperTargetSpeed", 10, SETTINGSFILE);
-	FFPhysics =		GetPrivateProfileIntA("WHEELOPTIONS", "PhysicsStrength", 170, SETTINGSFILE) / 100.0f;
-	CenterStrength = GetPrivateProfileIntA("WHEELOPTIONS", "CenterStrength", 100, SETTINGSFILE) / 100.0f;
-	DetailStrength = GetPrivateProfileIntA("WHEELOPTIONS", "DetailStrength", 100, SETTINGSFILE) / 1.0f;
+	FFEnable = reader.GetBoolean("WHEELOPTIONS", "FFEnable", true);
+	FFGlobalMult =	reader.GetReal("WHEELOPTIONS", "FFGlobalMult", 100.0) / 100.0f;
+	DamperMax =		reader.GetInteger("WHEELOPTIONS", "DamperMax", 50);
+	DamperMin = reader.GetInteger("WHEELOPTIONS", "DamperMin", 20);
+	TargetSpeed = reader.GetInteger("WHEELOPTIONS", "DamperTargetSpeed", 10);
+	FFPhysics = reader.GetReal("WHEELOPTIONS", "PhysicsStrength", 100.0) / 100.0f;
+	CenterStrength = reader.GetReal("WHEELOPTIONS", "CenterStrength", 100.0) / 100.0f;
+	DetailStrength = reader.GetReal("WHEELOPTIONS", "DetailStrength", 100.0) / 1.0f;
 
 	// [WHEELCONTROLS]
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Toggle)] =		GetPrivateProfileIntA("WHEELCONTROLS", "Toggle", 17, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ToggleH)] =		GetPrivateProfileIntA("WHEELCONTROLS", "ToggleH", 6, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Toggle)] =		reader.GetInteger("WHEELCONTROLS", "Toggle", 17);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ToggleH)] =		reader.GetInteger("WHEELCONTROLS", "ToggleH", 6);
 
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ShiftUp)] =		GetPrivateProfileIntA("WHEELCONTROLS", "ShiftUp", 4, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ShiftDown)] =	GetPrivateProfileIntA("WHEELCONTROLS", "ShiftDown", 5, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::HR)] =			GetPrivateProfileIntA("WHEELCONTROLS", "HR", 14, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H1)] =			GetPrivateProfileIntA("WHEELCONTROLS", "H1", 8, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H2)] =			GetPrivateProfileIntA("WHEELCONTROLS", "H2", 9, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H3)] =			GetPrivateProfileIntA("WHEELCONTROLS", "H3", 10, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H4)] =			GetPrivateProfileIntA("WHEELCONTROLS", "H4", 11, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H5)] =			GetPrivateProfileIntA("WHEELCONTROLS", "H5", 12, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H6)] =			GetPrivateProfileIntA("WHEELCONTROLS", "H6", 13, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Handbrake)] =	GetPrivateProfileIntA("WHEELCONTROLS", "Handbrake", 19, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Engine)] =		GetPrivateProfileIntA("WHEELCONTROLS", "Engine", 21, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ShiftUp)] =		reader.GetInteger("WHEELCONTROLS", "ShiftUp", 4);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ShiftDown)] =	reader.GetInteger("WHEELCONTROLS", "ShiftDown", 5);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::HR)] =			reader.GetInteger("WHEELCONTROLS", "HR", 14);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H1)] =			reader.GetInteger("WHEELCONTROLS", "H1", 8 );
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H2)] =			reader.GetInteger("WHEELCONTROLS", "H2", 9 );
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H3)] =			reader.GetInteger("WHEELCONTROLS", "H3", 10);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H4)] =			reader.GetInteger("WHEELCONTROLS", "H4", 11);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H5)] =			reader.GetInteger("WHEELCONTROLS", "H5", 12);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H6)] =			reader.GetInteger("WHEELCONTROLS", "H6", 13);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Handbrake)] =	reader.GetInteger("WHEELCONTROLS", "Handbrake", 19);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Engine)] =		reader.GetInteger("WHEELCONTROLS", "Engine", 21   );
 
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Horn)] =			GetPrivateProfileIntA("WHEELCONTROLS", "Horn", 20, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Lights)] =		GetPrivateProfileIntA("WHEELCONTROLS", "Lights", 7, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::LookBack)] =		GetPrivateProfileIntA("WHEELCONTROLS", "LookBack", 22, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Camera)] =		GetPrivateProfileIntA("WHEELCONTROLS", "Camera", 0, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::RadioPrev)] =	GetPrivateProfileIntA("WHEELCONTROLS", "RadioPrev", 1, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::RadioNext)] =	GetPrivateProfileIntA("WHEELCONTROLS", "RadioNext", 2, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Horn)] =			reader.GetInteger("WHEELCONTROLS", "Horn", 20 );
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Lights)] =		reader.GetInteger("WHEELCONTROLS", "Lights", 7);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::LookBack)] =		reader.GetInteger("WHEELCONTROLS", "LookBack", 22);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Camera)] =		reader.GetInteger("WHEELCONTROLS", "Camera", 0);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::RadioPrev)] =	reader.GetInteger("WHEELCONTROLS", "RadioPrev", 1);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::RadioNext)] =	reader.GetInteger("WHEELCONTROLS", "RadioNext", 2);
 
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorLeft)] =	GetPrivateProfileIntA("WHEELCONTROLS", "IndicatorLeft", 19, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorRight)] =	GetPrivateProfileIntA("WHEELCONTROLS", "IndicatorRight", 21, SETTINGSFILE);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorHazard)] =	GetPrivateProfileIntA("WHEELCONTROLS", "IndicatorHazard", 15, SETTINGSFILE);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorLeft)] =	reader.GetInteger("WHEELCONTROLS", "IndicatorLeft", 19  );
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorRight)] =	reader.GetInteger("WHEELCONTROLS", "IndicatorRight", 21 );
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorHazard)] =	reader.GetInteger("WHEELCONTROLS", "IndicatorHazard", 15);
 
 	// [WHEELAXIS]
-	GetPrivateProfileStringA("WHEELAXIS", "Throttle", "lY", buffer, static_cast<DWORD>(24), SETTINGSFILE);
-	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Throttle)] = buffer; 
-	scriptControl->ThrottleMin = GetPrivateProfileIntA("WHEELAXIS", "ThrottleMin", 0, SETTINGSFILE);
-	scriptControl->ThrottleMax = GetPrivateProfileIntA("WHEELAXIS", "ThrottleMax", 65535, SETTINGSFILE);
 	
-	GetPrivateProfileStringA("WHEELAXIS", "Brake", "lRz", buffer, static_cast<DWORD>(24), SETTINGSFILE);
-	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Brake)] = buffer;
-	scriptControl->BrakeMin = GetPrivateProfileIntA("WHEELAXIS", "BrakeMin", 0, SETTINGSFILE);
-	scriptControl->BrakeMax = GetPrivateProfileIntA("WHEELAXIS", "BrakeMax", 65535, SETTINGSFILE);
-
-	GetPrivateProfileStringA("WHEELAXIS", "Clutch", "rglSlider1", buffer, static_cast<DWORD>(24), SETTINGSFILE);
-	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] = buffer;
-	scriptControl->ClutchMin = GetPrivateProfileIntA("WHEELAXIS", "ClutchMin", 0, SETTINGSFILE);
-	scriptControl->ClutchMax = GetPrivateProfileIntA("WHEELAXIS", "ClutchMax", 65535, SETTINGSFILE);
-
-	GetPrivateProfileStringA("WHEELAXIS", "Steer", "lX", buffer, static_cast<DWORD>(24), SETTINGSFILE);
-	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)] = buffer;
-	scriptControl->SteerLeft = GetPrivateProfileIntA("WHEELAXIS", "SteerLeft", 0, SETTINGSFILE);
-	scriptControl->SteerRight = GetPrivateProfileIntA("WHEELAXIS", "SteerRight", 65535, SETTINGSFILE);
+	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Throttle)] = reader.Get("WHEELAXIS", "Throttle", "lY");
+	scriptControl->ThrottleMin = reader.GetInteger("WHEELAXIS", "ThrottleMin", 0);
+	scriptControl->ThrottleMax = reader.GetInteger("WHEELAXIS", "ThrottleMax", 65535);
 	
-	GetPrivateProfileStringA("WHEELAXIS", "FFAxis", "X", buffer, static_cast<DWORD>(24), SETTINGSFILE);
-	scriptControl->FFAxis = buffer;
+	
+	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Brake)] = reader.Get("WHEELAXIS", "Brake", "lRz");
+	scriptControl->BrakeMin = reader.GetInteger("WHEELAXIS", "BrakeMin", 0);
+	scriptControl->BrakeMax = reader.GetInteger("WHEELAXIS", "BrakeMax", 65535);
 
-	scriptControl->ClutchDisable = (GetPrivateProfileIntA("WHEELAXIS", "ClutchDisable", 0, SETTINGSFILE) == 1);
+	
+	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] = reader.Get("WHEELAXIS", "Clutch", "rglSlider1");
+	scriptControl->ClutchMin = reader.GetInteger("WHEELAXIS", "ClutchMin", 0);
+	scriptControl->ClutchMax = reader.GetInteger("WHEELAXIS", "ClutchMax", 65535);
 
-	SteerAngleMax = GetPrivateProfileIntA("WHEELAXIS", "SteerAngleMax", 900, SETTINGSFILE) / 1.0f;
-	SteerAngleCar = GetPrivateProfileIntA("WHEELAXIS", "SteerAngleCar", 720, SETTINGSFILE) / 1.0f;
-	SteerAngleBike = GetPrivateProfileIntA("WHEELAXIS", "SteerAngleBike", 180, SETTINGSFILE) / 1.0f;
+	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)] = reader.Get("WHEELAXIS", "Steer", "lX");
+
+	scriptControl->SteerLeft =  reader.GetInteger("WHEELAXIS", "SteerLeft", 0);
+	scriptControl->SteerRight = reader.GetInteger("WHEELAXIS", "SteerRight", 65535);
+	
+	scriptControl->FFAxis = reader.Get("WHEELAXIS", "FFAxis", "X");
+
+	scriptControl->ClutchDisable = reader.GetBoolean("WHEELAXIS", "ClutchDisable", false);
+
+	SteerAngleMax = reader.GetReal("WHEELAXIS", "SteerAngleMax", 900.0);
+	SteerAngleCar = reader.GetReal("WHEELAXIS", "SteerAngleCar", 720.0);
+	SteerAngleBike = reader.GetReal("WHEELAXIS", "SteerAngleBike", 180.0);
 
 	// [WHEELKEYBOARD]
-	char w2kBuffer[24];
 	for (int i = 0; i < MAX_RGBBUTTONS; i++) { // Ouch
-		GetPrivateProfileStringA("WHEELKEYBOARD", std::to_string(i).c_str(), "NOPE", w2kBuffer, 24, SETTINGSFILE);
-		if (std::string(w2kBuffer).compare("NOPE") == 0) {
+		std::string entryString = reader.Get("WHEELKEYBOARD", std::to_string(i).c_str(), "NOPE");
+		if (std::string(entryString).compare("NOPE") == 0) {
 			scriptControl->WheelToKey[i] = -1;
 		}
 		else {
-			scriptControl->WheelToKey[i] = str2key(w2kBuffer);
+			scriptControl->WheelToKey[i] = str2key(entryString);
 		}
 	}
 
 	// [DEBUG]
-	Debug = (GetPrivateProfileIntA("DEBUG", "Info", 0, SETTINGSFILE) == 1);
-	AltControls = (GetPrivateProfileIntA("DEBUG", "AltControls", 0, SETTINGSFILE) == 1);
-	SteerAngleAlt = GetPrivateProfileIntA("DEBUG", "AltAngle", 180, SETTINGSFILE) / 1.0f;
+	Debug = reader.GetBoolean("DEBUG", "Info", false);
+	AltControls = reader.GetBoolean("DEBUG", "AltControls", false);
+	SteerAngleAlt = reader.GetReal("DEBUG", "AltAngle", 180.0);
 	
 	// .ini version check
-	GetPrivateProfileStringA("DEBUG", "INIver", "0.0", buffer, static_cast<DWORD>(24), SETTINGSFILE);
-	INIver = buffer;
+	INIver = reader.Get("DEBUG", "INIver", "0.0");
 
 	CheckSettings();
 	if (scriptControl->ClutchDisable) {
 		ClutchShifting = false;
 		WritePrivateProfileStringA("OPTIONS", "ClutchShifting", "0", SETTINGSFILE);
 	}
+#pragma warning(pop)
 }
 
 void ScriptSettings::Save() const {
