@@ -71,6 +71,5 @@ public:
 	float SteerAngleAlt = 180.0f;
 
 private:
-	void CheckSettings();
 	std::string INIver = "0.0.0";
 };

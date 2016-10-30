@@ -180,11 +180,6 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	// .ini version check
 	INIver = ini.GetValue("DEBUG", "INIver", "0.0");
 
-	CheckSettings();
-	if (scriptControl->ClutchDisable) {
-		ClutchShifting = false;
-		WritePrivateProfileStringA("OPTIONS", "ClutchShifting", "0", SETTINGSFILE);
-	}
 #pragma warning(pop)
 }
 
@@ -193,19 +188,6 @@ void ScriptSettings::Save() const {
 	WritePrivateProfileStringA("OPTIONS", "ShiftMode", std::to_string(ShiftMode).c_str(), SETTINGSFILE);
 }
 
-// Checks for conflicting settings and adjusts them
-void ScriptSettings::CheckSettings() {
-	Logger logger(LOGFILE);
-	if (UITips_X > 100) {
-		UITips_X = 100;
-		logger.Write("UITips_X higher than 100, reverting");
-		WritePrivateProfileStringA("OPTIONS", "UITips_X", "100", SETTINGSFILE);
-	}
-	if (UITips_Y > 100) {
-		UITips_Y = 100;
-		logger.Write("UITips_Y higher than 100, reverting");
-		WritePrivateProfileStringA("OPTIONS", "UITips_Y", "100", SETTINGSFILE);
-	}
 }
 
 bool ScriptSettings::IsCorrectVersion() const {
