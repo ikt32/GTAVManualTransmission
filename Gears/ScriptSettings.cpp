@@ -188,7 +188,7 @@ void ScriptSettings::Save() const {
 	ini.SetUnicode();
 	ini.LoadFile(SETTINGSFILE);
 	ini.SetValue("OPTIONS", "Enable", EnableManual ? " 1" : " 0");
-	ini.SetValue("OPTIONS", "ShiftMode", ' ' + std::to_string(ShiftMode).c_str());
+	ini.SetLongValue("OPTIONS", "ShiftMode", ShiftMode);
 	ini.SaveFile(SETTINGSFILE);
 }
 
