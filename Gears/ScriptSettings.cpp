@@ -4,7 +4,6 @@
 #include "Util/Logger.hpp"
 #include <string>
 #include "Input/keyboard.h"
-//#include "Util/inih/cpp/INIReader.h"
 #include "Util/simpleini/SimpleIni.h"
 
 ScriptSettings::ScriptSettings() {
