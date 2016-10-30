@@ -93,6 +93,7 @@
     <ClInclude Include="Util\inih\cpp\INIReader.h" />
     <ClInclude Include="Util\inih\ini.h" />
     <ClInclude Include="Util\Logger.hpp" />
+    <ClInclude Include="Util\simpleini\SimpleIni.h" />
     <ClInclude Include="Util\TimeHelper.hpp" />
     <ClInclude Include="Util\Util.hpp" />
     <ClInclude Include="VehicleData.hpp" />

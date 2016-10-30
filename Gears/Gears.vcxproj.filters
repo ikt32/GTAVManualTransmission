@@ -91,6 +91,9 @@
     <ClInclude Include="Util\inih\cpp\INIReader.h">
       <Filter>Util\inih</Filter>
     </ClInclude>
+    <ClInclude Include="Util\simpleini\SimpleIni.h">
+      <Filter>Util\simpleini</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -107,6 +110,9 @@
     </Filter>
     <Filter Include="Util\inih">
       <UniqueIdentifier>{57f1bf04-f93a-435d-ac2c-83b3b9698d13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util\simpleini">
+      <UniqueIdentifier>{d51e90e7-b382-4e70-afc1-502831bccebd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
