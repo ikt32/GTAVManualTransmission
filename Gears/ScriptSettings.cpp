@@ -25,7 +25,7 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	EngDamage           = ini.GetBoolValue("OPTIONS", "EngineDamage", false);
 	EngStall            = ini.GetBoolValue("OPTIONS", "EngineStalling", false);
 	EngBrake            = ini.GetBoolValue("OPTIONS", "EngineBraking", false);
-	ClutchCatching      = ini.GetBoolValue("OPTIONS", "ClutchCathing", false);
+	ClutchCatching      = ini.GetBoolValue("OPTIONS", "ClutchCatching", false);
 	ClutchShifting      = ini.GetBoolValue("OPTIONS", "ClutchShifting", false);
 	ClutchShiftingS     = ini.GetBoolValue("OPTIONS", "ClutchShiftingS", false);
 	DefaultNeutral      = ini.GetBoolValue("OPTIONS", "DefaultNeutral", true);
