@@ -843,7 +843,8 @@ void functionEngStall() {
 	if (controls.ClutchVal < 1.0f - settings.StallingThreshold &&
 		vehData.Rpm < 0.21f &&
 		((vehData.Speed < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && vehData.Speed < 1.0f)) &&
-		VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
+		VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
+		VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 	}
 }
