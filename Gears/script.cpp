@@ -1318,7 +1318,15 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 
 	// Macro FFB effects on the car body
-	int constantForce = -100 * static_cast<int>(settings.FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
+	//int constantForce = -100 * static_cast<int>(settings.FFPhysics * ((3 * accelValsAvg.x + 2 * accelVals.x)));
+
+	/*
+	 *  The wheels should not care, it's the rotation + grip.
+	 *  See G-force for proper cornering feel calculation. 
+	 *  This is left for effects and emulate the grip thing.
+	 *  This is also in G.
+	 */
+	//double sideForce = accelValsAvg.x/9.81;
 	
 	// targetSpeed is the speed at which the damperForce is at minimum
 	// damperForce is maximum at speed 0 and decreases with speed increase
@@ -1340,19 +1348,23 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	)/20;
 
 	// Centering
-	float centerPos = 0.5f;// (controls.SteerLeft + controls.SteerRight) / 2;
-	float divisor = 0.0001f;// (controls.SteerRight - controls.SteerLeft) / 10000.0f;
-	float wheelCenterDeviation = controls.SteerVal - centerPos;
-	int centerForce = static_cast<int>((wheelCenterDeviation / divisor) * vehData.Speed * 0.25) +
-					  static_cast<int>((wheelCenterDeviation / divisor) * std::abs(accelValsAvg.y) * 0.25);
+	//float centerPos = 0.5f;// (controls.SteerLeft + controls.SteerRight) / 2;
+	//float divisor = 0.0001f;// (controls.SteerRight - controls.SteerLeft) / 10000.0f;
+	//float wheelCenterDeviation = controls.SteerVal - centerPos;
+	//int centerForce = static_cast<int>((wheelCenterDeviation / divisor) * vehData.Speed * 0.25) +
+	//				  static_cast<int>((wheelCenterDeviation / divisor) * std::abs(accelValsAvg.y) * 0.25);
 
+	/*                    a                                        v^2
+	 * Because G Force = ---- and a = v * omega, verified with a = ---   using a speedo and 
+	 *                   9.81                                       r    r = ypg205t16a length
+	 * No need to crappily emulate centering any more.
+	 */
+	double GForce = (vehData.RotationVelocity.z * vehData.Velocity) / 9.81f;
 
 	// start oversteer detect
 	float oversteer = 0.0f;
-
-	Vector3 rel_vector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
 	
-	float angle = acos(rel_vector.y / vehData.Speed)* 180.0f / 3.14159265f;
+	float angle = acos(vehData.Velocity / vehData.Speed)* 180.0f / 3.14159265f;
 	if (isnan(angle))
 		angle = 0.0;
 
@@ -1384,23 +1396,22 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 
 	// On understeering conditions, lower "grippy" feel
 	if (understeer > 0.01f && vehData.Velocity > gripSpeedThreshold) {
-		centerForce = static_cast<int>((1.0f - understeer) * centerForce);
+		//centerForce = static_cast<int>((1.0f - understeer) * centerForce);
+		GForce = (1.0f - understeer) * GForce;
 	}
 
-	// On oversteering conditions, let physics dictate the feel
-	if (oversteer > 0.01f && vehData.Velocity > gripSpeedThreshold) {
-		float cfRatio = (1.0f - (5.0f * oversteer)); // 20% oversteer = 0% center
-		cfRatio = cfRatio < 0.0f ? 0.0f : cfRatio; // clamp 0.0
-		centerForce = static_cast<int>(cfRatio * centerForce);
-		
-		//float dRatio = 1.0f- cfRatio;
-		//damperForce = settings.DamperMin + 
-		//	static_cast<int>(dRatio * (settings.DamperMax - settings.DamperMin));
-
-	}
+	//// On oversteering conditions, let physics dictate the feel
+	//if (oversteer > 0.01f && vehData.Velocity > gripSpeedThreshold) {
+	//	float cfRatio = (1.0f - (5.0f * oversteer)); // 20% oversteer = 0% center
+	//	cfRatio = cfRatio < 0.0f ? 0.0f : cfRatio; // clamp 0.0
+	//	centerForce = static_cast<int>(cfRatio * centerForce);
+	//	//float dRatio = 1.0f- cfRatio;
+	//	//damperForce = settings.DamperMin + 
+	//	//	static_cast<int>(dRatio * (settings.DamperMax - settings.DamperMin));
+	//}
 
 	if (vehData.Velocity < -0.1f) {
-		centerForce = 0;
+		//centerForce = 0;
 		damperForce = settings.DamperMin;
 	}
 
@@ -1415,33 +1426,40 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 
 	// Cancel all effects except dampening
 	if (airborne) {
-		constantForce = 0;
-		centerForce = 0;
+		/*constantForce = 0;
+		centerForce = 0;*/
+		GForce = 0.0;
+		//sideForce = 0.0;
 		damperForce = settings.DamperMin;
 	}
 
 	if (ignoreSpeed) {
-		centerForce = 0;
+		//centerForce = 0;
 		damperForce = settings.DamperMin;
 	}
 
 	if (vehData.Class == VehicleData::VehicleClass::Car || vehData.Class == VehicleData::VehicleClass::Quad) {
 		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true) && VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
-			centerForce = 0;
+			//centerForce = 0;
+			GForce = GForce * 0.1;
 			damperForce = settings.DamperMin;
 		}
 	}
 	if (vehData.Class == VehicleData::VehicleClass::Bike) {
 		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
-			centerForce = 0;
+			//centerForce = 0;
+			GForce = GForce * 0.1;
 			damperForce = settings.DamperMin;
 		}
 	}
 
-	int totalForce = static_cast<int>(steerSpeed * damperForce * 0.1) +
-		static_cast<int>(constantForce / steerMult) +
-		static_cast<int>(settings.CenterStrength * centerForce * steerMult) +
-		static_cast<int>(10.0f * settings.DetailStrength * compSpeedTotal*settings.FFGlobalMult);
+	int totalForce = 
+		static_cast<int>(-GForce * 5000 * settings.FFPhysics * settings.FFGlobalMult) + // 2G = max force, Koenigsegg One:1 only does 1.7g!
+		static_cast<int>(steerSpeed * damperForce * 0.1) +
+		//static_cast<int>(constantForce / steerMult) +
+		//static_cast<int>(settings.CenterStrength * centerForce * steerMult) +
+		static_cast<int>(10.0f * settings.DetailStrength * compSpeedTotal*settings.FFGlobalMult) +
+		0;
 
 	// Soft lock
 	if (effSteer > 1.0f) {
@@ -1457,6 +1475,13 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	}
 	controls.WheelDI.SetConstantForce(totalForce);
 
+	std::string forceDisplay2 = std::string("Accel X: ") + std::to_string(accelValsAvg.x);
+	showText(0.45, 0.025, 0.4, forceDisplay2.c_str());
+
+	std::string userForce = std::string("GForceFinal: ") + std::to_string(-GForce * 5000 * settings.FFPhysics * settings.FFGlobalMult);
+	showText(0.45, 0.050, 0.4, userForce.c_str());
+
+
 	if (settings.Debug) {
 		std::stringstream SteerRaw;
 		SteerRaw << "SteerRaw: " << controls.SteerVal;
@@ -1470,17 +1495,17 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 		steerDisplay << "SteerSpeed: " << steerSpeed;
 		showText(0.85, 0.225, 0.4, steerDisplay.str().c_str());
 		
-		std::stringstream forceDisplay;
-		forceDisplay << "ConstForce: " << constantForce / steerMult;
-		showText(0.85, 0.250, 0.4, forceDisplay.str().c_str());
+		//std::stringstream forceDisplay;
+		//forceDisplay << "ConstForce: " << constantForce / steerMult;
+		//showText(0.85, 0.250, 0.4, forceDisplay.str().c_str());
 
 		std::stringstream damperF;
 		damperF << "DampForce: " << steerSpeed * damperForce * 0.1;
 		showText(0.85, 0.275, 0.4, damperF.str().c_str());
 
-		std::stringstream centerDisplay;
+		/*std::stringstream centerDisplay;
 		centerDisplay << "CenterForce: " << settings.CenterStrength * centerForce * steerMult;
-		showText(0.85, 0.300, 0.4, centerDisplay.str().c_str());
+		showText(0.85, 0.300, 0.4, centerDisplay.str().c_str());*/
 		
 		std::stringstream ssUnderSteer;
 		ssUnderSteer << "Understeer: " << understeer;
