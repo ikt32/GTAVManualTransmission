@@ -1,4 +1,20 @@
 # Changelog
+## 4.2.0
+Big changes to Gears.ini!
+
+Fundamental changes:
+* Rework Force Feedback completely
+* Restructure Gears.ini wheel options
+
+Feature changes:
+* Add clutch shifting for sequential option
+* Add global FF multiplier
+
+Small changes:
+* Use a smoother soft lock transition
+* Only stall if all wheels are on the ground
+* Add warning if an update to the .ini has been ignored
+
 ## 4.1.3
 No changes to Gears.ini
 *   Fix LeFix Speedometer compatibility

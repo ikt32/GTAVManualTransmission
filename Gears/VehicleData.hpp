@@ -68,6 +68,7 @@ public:
 	std::vector<float> LockSpeeds = std::vector<float>(20);
 	float Pitch = 0;
 
+	// In radians
 	float SteeringAngle = 0.0f;
 	Vector3 RotationVelocity = {};
 	std::array<float, 2> WheelCompressions = {};

@@ -101,7 +101,6 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	DamperMin = ini.GetLongValue("WHEELOPTIONS", "DamperMin", 20);
 	TargetSpeed = ini.GetLongValue("WHEELOPTIONS", "DamperTargetSpeed", 10);
 	FFPhysics = ini.GetDoubleValue("WHEELOPTIONS", "PhysicsStrength", 100.0) / 100.0f;
-	CenterStrength = ini.GetDoubleValue("WHEELOPTIONS", "CenterStrength", 100.0) / 100.0f;
 	DetailStrength = ini.GetDoubleValue("WHEELOPTIONS", "DetailStrength", 100.0) / 1.0f;
 
 	// [WHEELCONTROLS]

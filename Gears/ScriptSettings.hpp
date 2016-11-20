@@ -57,7 +57,6 @@ public:
 	int DamperMin = 10;
 	int TargetSpeed = 10; // TargetSpeed in m/s
 	float FFPhysics = 1.0f;
-	float CenterStrength = 1.0f;
 	float DetailStrength = 100.0f;
 
 	// [WHEELAXIS]
