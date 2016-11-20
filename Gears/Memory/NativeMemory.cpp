@@ -43,6 +43,18 @@ uintptr_t MemoryAccess::FindPattern(const char* pattern, const char* mask) {
 //	return Handle >> 8; // == Handle / 256
 //}
 
+//uintptr_t MemoryAccess::GetAddressOfEntity(int Handle) const {
+//	return *reinterpret_cast<uintptr_t*>(GetAddressOfItemInPool(*sAddressEntityPool, Handle) + 8);
+//}
+
+//uint32_t MemoryAccess::GetMemValue(int handle, int offset) const {
+//	uintptr_t addr = GetAddressOfEntity(handle);
+//	if (addr == 0) {
+//		return 0;
+//	}
+//	return *reinterpret_cast<uint32_t*>(addr + offset);
+//}
+
 //uintptr_t MemoryAccess::GetAddressOfItemInPool(MemoryPool* PoolAddress, int Handle) {
 //	if (PoolAddress == nullptr) {
 //		return 0;
@@ -58,17 +70,3 @@ uintptr_t MemoryAccess::FindPattern(const char* pattern, const char* mask) {
 //
 //	return (PoolAddress->ListAddr + index * PoolAddress->ItemSize);
 //}
-
-
-//uintptr_t MemoryAccess::GetAddressOfEntity(int Handle) const {
-//	return *reinterpret_cast<uintptr_t*>(GetAddressOfItemInPool(*sAddressEntityPool, Handle) + 8);
-//}
-
-//uint32_t MemoryAccess::GetMemValue(int handle, int offset) const {
-//	uintptr_t addr = GetAddressOfEntity(handle);
-//	if (addr == 0) {
-//		return 0;
-//	}
-//	return *reinterpret_cast<uint32_t*>(addr + offset);
-//}
-
