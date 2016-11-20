@@ -11,21 +11,7 @@ MemoryAccess::MemoryAccess() {
 	sAddressEntityPool = reinterpret_cast<MemoryPool **>(*reinterpret_cast<int *>(patternAddress + 3) + patternAddress + 7);
 }
 
-int MemoryAccess::HandleToIndex(int Handle) {
-	return Handle >> 8; // == Handle / 256
-}
 
-uintptr_t MemoryAccess::GetAddressOfEntity(int Handle) const {
-	return *reinterpret_cast<uintptr_t*>(GetAddressOfItemInPool(*sAddressEntityPool, Handle) + 8);
-}
-
-uint32_t MemoryAccess::GetMemValue(int handle, int offset) const {
-	uintptr_t addr = GetAddressOfEntity(handle);
-	if (addr == 0) {
-		return 0;
-	}
-	return *reinterpret_cast<uint32_t*>(addr + offset);
-}
 
 uintptr_t MemoryAccess::FindPattern(const char* pattern, const char* mask) {
 	MODULEINFO modInfo = {nullptr};
@@ -53,18 +39,36 @@ uintptr_t MemoryAccess::FindPattern(const char* pattern, const char* mask) {
 	return 0;
 }
 
-uintptr_t MemoryAccess::GetAddressOfItemInPool(MemoryPool* PoolAddress, int Handle) {
-	if (PoolAddress == nullptr) {
-		return 0;
-	}
+//int MemoryAccess::HandleToIndex(int Handle) {
+//	return Handle >> 8; // == Handle / 256
+//}
 
-	const int index = HandleToIndex(Handle);
-	const int flag = PoolAddress->BoolAdr[index]; // flag should be equal to 2 if everything is ok
+//uintptr_t MemoryAccess::GetAddressOfItemInPool(MemoryPool* PoolAddress, int Handle) {
+//	if (PoolAddress == nullptr) {
+//		return 0;
+//	}
+//
+//	const int index = HandleToIndex(Handle);
+//	const int flag = PoolAddress->BoolAdr[index]; // flag should be equal to 2 if everything is ok
+//
+//	// parity check? (taken from ScriptHookDotNet for IV
+//	if (flag & 0x80 || flag != (Handle & 0xFF)) {
+//		return 0;
+//	}
+//
+//	return (PoolAddress->ListAddr + index * PoolAddress->ItemSize);
+//}
 
-	// parity check? (taken from ScriptHookDotNet for IV
-	if (flag & 0x80 || flag != (Handle & 0xFF)) {
-		return 0;
-	}
 
-	return (PoolAddress->ListAddr + index * PoolAddress->ItemSize);
-}
+//uintptr_t MemoryAccess::GetAddressOfEntity(int Handle) const {
+//	return *reinterpret_cast<uintptr_t*>(GetAddressOfItemInPool(*sAddressEntityPool, Handle) + 8);
+//}
+
+//uint32_t MemoryAccess::GetMemValue(int handle, int offset) const {
+//	uintptr_t addr = GetAddressOfEntity(handle);
+//	if (addr == 0) {
+//		return 0;
+//	}
+//	return *reinterpret_cast<uint32_t*>(addr + offset);
+//}
+
