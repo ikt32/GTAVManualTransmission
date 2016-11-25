@@ -47,85 +47,94 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
 			int RawB = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Brake)]));
 			int RawC = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]));
 			int RawS = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]));
+			int RawH = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Handbrake)]));
 			
 			// You're outta luck if you have a single-axis 3-pedal freak combo or something
 			if (WheelAxes[static_cast<int>(WheelAxisType::Throttle)] == WheelAxes[static_cast<int>(WheelAxisType::Brake)]) {
-				ClutchVal = 1.0f - static_cast<float>(RawC) / (ClutchMax - ClutchMin);
+				ClutchVal = 1.0f - static_cast<float>(RawC) / (ClutchDown - ClutchUp);
 				int pivot;
-				if (ThrottleMin == BrakeMin) {
-					pivot = BrakeMin;
+				if (ThrottleUp == BrakeUp) {
+					pivot = BrakeUp;
 				} else
-				if (ThrottleMax == BrakeMin) {
-					pivot = BrakeMin;
+				if (ThrottleDown == BrakeUp) {
+					pivot = BrakeUp;
 				} else
-				if (ThrottleMin == BrakeMax) {
-					pivot = BrakeMax;
+				if (ThrottleUp == BrakeDown) {
+					pivot = BrakeDown;
 				} else
-				if (ThrottleMax == BrakeMax) {
-					pivot = BrakeMax;
+				if (ThrottleDown == BrakeDown) {
+					pivot = BrakeDown;
 				} else {
 					// you fucked up bro
 					return;
 				}
 
 				// oh my god fucking kill me I'm too dumb for this shit
-				if (pivot == BrakeMin) {
-					if (BrakeMax > pivot) { // TMIN = BMIN
+				if (pivot == BrakeUp) {
+					if (BrakeDown > pivot) { // TMIN = BMIN
 						// 0 TMAX < TMIN/PIVOT/BMIN < BMAX 65535
 						if (RawT < pivot) { // Throttle
-							ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleMax) / static_cast<float>(pivot);
+							ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleDown) / static_cast<float>(pivot);
 							BrakeVal = 0;
 						} else { // Brake
 							ThrottleVal = 0;
-							BrakeVal = static_cast<float>(RawT - BrakeMin) / static_cast<float>(pivot);
+							BrakeVal = static_cast<float>(RawT - BrakeUp) / static_cast<float>(pivot);
 						}
 					} // Only this has been verified
 					else { // TMAX = BMIN
 						// 0 BMAX < BMIN/PIVOT/TMAX < TMIN 65535
 						if (RawT > pivot) { // Throttle
-							ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleMax) / static_cast<float>(pivot);
+							ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleDown) / static_cast<float>(pivot);
 							BrakeVal = 0;
 						}
 						else { // Brake
 							ThrottleVal = 0;
-							BrakeVal = 1.0f - static_cast<float>(RawT - BrakeMax) / static_cast<float>(pivot);
+							BrakeVal = 1.0f - static_cast<float>(RawT - BrakeDown) / static_cast<float>(pivot);
 						}
 					}
 				}
-				if (pivot == BrakeMax) {
-					if (BrakeMin > pivot) { //TMIN = BMAX
+				if (pivot == BrakeDown) {
+					if (BrakeUp > pivot) { //TMIN = BMAX
 						// TMAX X < TMIN/PIVOT/BMAX < BMIN 65535
 						if (RawT < pivot) { // Throttle
-							ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleMax) / static_cast<float>(pivot);
+							ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleDown) / static_cast<float>(pivot);
 							BrakeVal = 0;
 						}
 						else { // Brake
 							ThrottleVal = 0;
-							BrakeVal = 1.0f - static_cast<float>(RawT - BrakeMax) / static_cast<float>(pivot);
+							BrakeVal = 1.0f - static_cast<float>(RawT - BrakeDown) / static_cast<float>(pivot);
 						}
 					}
 					else { // TMAX = BMAX
 						// 0 BMIN < BMAX/PIVOT/TMAX < TMIN 65535
 						if (RawT > pivot) { // Throttle
-							ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleMax) / static_cast<float>(pivot);
+							ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleDown) / static_cast<float>(pivot);
 							BrakeVal = 0;
 						}
 						else { // Brake
 							ThrottleVal = 0;
-							BrakeVal = static_cast<float>(RawT - BrakeMin) / static_cast<float>(pivot);
+							BrakeVal = static_cast<float>(RawT - BrakeUp) / static_cast<float>(pivot);
 						}
 					}
 				}
 			} // End single-axis mumbo jumbo
  			else {
-				ThrottleVal = 1.0f - static_cast<float>(RawT) / static_cast<float>(ThrottleMax - ThrottleMin);
-				BrakeVal = 1.0f - static_cast<float>(RawB) / static_cast<float>(BrakeMax - BrakeMin);
-				ClutchVal = 1.0f - static_cast<float>(RawC) / static_cast<float>(ClutchMax - ClutchMin);
+				ThrottleVal = 0.0f + 1.0f / (ThrottleDown - ThrottleUp)*(static_cast<float>(RawT) - ThrottleUp);
+				BrakeVal = 0.0f + 1.0f / (BrakeDown - BrakeUp)*(static_cast<float>(RawB) - BrakeUp);
+				ClutchVal = 0.0f + 1.0f/(ClutchDown - ClutchUp)*(static_cast<float>(RawC) - ClutchUp);
 			}
-			if (ClutchDisable) {
+			if (ClutchDisable || 
+				WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]) == WheelDirectInput::UNKNOWN_AXIS) {
 				ClutchVal = 0.0f;
 			}
-			SteerVal = static_cast<float>(RawS) / (SteerRight - SteerLeft);//RawS; // Todo - Give a value or something idk
+			HandbrakeVal = 0.0f + 1.0f / (HandbrakeUp - HandbrakeDown)*(static_cast<float>(RawH) - HandbrakeDown);
+
+			if (WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Handbrake)]) == WheelDirectInput::UNKNOWN_AXIS) {
+				HandbrakeVal = 0.0f;
+			}
+			SteerVal = 0.0f + 1.0f / (SteerRight - SteerLeft)*(static_cast<float>(RawS) - SteerLeft);
+			//if (SteerVal < 0.0)
+			//	SteerVal = 1.0f + SteerVal;
 			break;
 		}
 		default: break;
@@ -155,14 +164,14 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
 		if (WheelAxes[static_cast<int>(WheelAxisType::Throttle)] == WheelAxes[static_cast<int>(WheelAxisType::Brake)]) {
 			
 			// get throttle range
-			if (ThrottleMax > ThrottleMin &&
-				RawT < ThrottleMax &&
-				RawT > ThrottleMin + (ThrottleMax - ThrottleMin)*0.5) {
+			if (ThrottleDown > ThrottleUp &&
+				RawT < ThrottleDown &&
+				RawT > ThrottleUp + (ThrottleDown - ThrottleUp)*0.5) {
 				return Wheel;
 			}
-			if (ThrottleMax < ThrottleMin && // Which twisted mind came up with this
-				RawT > ThrottleMax &&
-				RawT < ThrottleMin - (ThrottleMin - ThrottleMax)*0.5) {
+			if (ThrottleDown < ThrottleUp && // Which twisted mind came up with this
+				RawT > ThrottleDown &&
+				RawT < ThrottleUp - (ThrottleUp - ThrottleDown)*0.5) {
 				return Wheel;
 			}
 		}

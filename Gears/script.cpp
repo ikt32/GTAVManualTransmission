@@ -426,13 +426,17 @@ void showDebugInfo() {
 	std::stringstream ssClutchInput;
 	ssClutchInput << "ClutchValue: " << controls.ClutchVal;
 
-	std::stringstream ssClutchDisable;
-	ssClutchDisable << (controls.ClutchDisable ? "Disabled:" : "");
+	/*std::stringstream ssClutchDisable;
+	ssClutchDisable << (controls.ClutchDisable ? "Disabled:" : "");*/
+
+	std::stringstream ssHandbrakInput;
+	ssHandbrakInput << "HbrakeVal: " << controls.HandbrakeVal;
 
 	showText(0.85, 0.050, 0.4, ssThrottleInput.str().c_str());
 	showText(0.85, 0.075, 0.4, ssBrakeInput.str().c_str());
 	showText(0.85, 0.100, 0.4, ssClutchInput.str().c_str());
-	showText(0.795, 0.100, 0.4, ssClutchDisable.str().c_str());
+	//showText(0.795, 0.100, 0.4, ssClutchDisable.str().c_str());
+	showText(0.85, 0.125, 0.4, ssHandbrakInput.str().c_str());
 
 	if (settings.WheelEnabled) {
 		std::stringstream dinputDisplay;
@@ -592,7 +596,7 @@ void shiftTo(int gear, bool autoClutch) {
 }
 
 void functionHShiftTo(int i) {
-	if (settings.ClutchShifting && !vehData.NoClutch) {
+	if (settings.ClutchShiftingH && !vehData.NoClutch) {
 		if (controls.ClutchVal > 1.0f - settings.ClutchCatchpoint) {
 			shiftTo(i, false);
 			vehData.SimulatedNeutral = false;
@@ -648,7 +652,7 @@ void functionHShiftWheel() {
 		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H5)) ||
 		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H6))
 	) {
-		if (settings.ClutchShifting &&
+		if (settings.ClutchShiftingH &&
 			settings.EngDamage &&
 			!vehData.NoClutch) {
 			if (controls.ClutchVal < 1.0 - settings.ClutchCatchpoint) {
@@ -1121,6 +1125,11 @@ void handleVehicleButtons() {
 		controls.WheelDI.NoFeedback ||
 		prevInput != ScriptControls::Wheel) {
 		return;
+	}
+
+	// This is an axis but idk where I should have put it...
+	if (controls.HandbrakeVal > 0.1f) {
+		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, controls.HandbrakeVal);
 	}
 
 	if (controls.ButtonIn(ScriptControls::WheelControlType::Handbrake)) {

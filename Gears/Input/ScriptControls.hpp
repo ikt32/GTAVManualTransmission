@@ -26,16 +26,15 @@ public:
 		H5,
 		H6,
 		H7,
-		H8,
 		HN,
-		Toggle,
-		ToggleH,
 		ShiftUp,
 		ShiftDown,
 		Clutch,
 		Throttle,
 		Brake,
 		Engine,
+		Toggle,
+		ToggleH, 
 		SIZEOF_KeyboardControlType
 	};
 
@@ -47,6 +46,7 @@ public:
 		H4,
 		H5,
 		H6,
+		H7,
 		HN,
 		ShiftUp,
 		ShiftDown,
@@ -74,6 +74,7 @@ public:
 		Brake,
 		Clutch,
 		Steer,
+		Handbrake,
 		SIZEOF_WheelAxisType
 	};
 
@@ -95,6 +96,7 @@ public:
 	// 1 = Pressed, 0 = Not pressed
 	float ClutchVal = 0.0f;
 	float SteerVal = 0.5f;
+	float HandbrakeVal = 0.0f;
 
 	// Perceived accelerator value
 	int AccelValGTA = 0;
@@ -110,15 +112,17 @@ public:
 	std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
 	std::string FFAxis;
 
-	int CToggleTime = 1000;
-	int ThrottleMin	   = 0;
-	int ThrottleMax	   = 0;
-	int BrakeMin	   = 0;
-	int BrakeMax	   = 0;
-	int ClutchMin	   = 0;
-	int ClutchMax	   = 0;
+	int CToggleTime    = 1000;
+	int ThrottleUp	   = 0;
+	int ThrottleDown	   = 0;
+	int BrakeUp	   = 0;
+	int BrakeDown	   = 0;
+	int ClutchUp	   = 0;
+	int ClutchDown	   = 0;
 	int SteerLeft	   = 0;
 	int SteerRight	   = 0;
+	int HandbrakeUp   = 0;
+	int HandbrakeDown   = 0;
 	bool ClutchDisable = false;
 
 	// Add more when desired

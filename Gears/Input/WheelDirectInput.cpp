@@ -304,6 +304,9 @@ HRESULT WheelDirectInput::SetConstantForce(int force) const {
 }
 
 WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string& axisString) {
+	if (axisString == "UNKNOWN_AXIS")
+		return UNKNOWN_AXIS;
+
 	for (int i = 0; i < SIZEOF_DIAxis; i++) {
 		if (axisString == DIAxisHelper[i]) {
 			return static_cast<DIAxis>(i);

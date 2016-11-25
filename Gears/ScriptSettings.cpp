@@ -26,7 +26,7 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	EngStall            = ini.GetBoolValue("OPTIONS", "EngineStalling", false);
 	EngBrake            = ini.GetBoolValue("OPTIONS", "EngineBraking", false);
 	ClutchCatching      = ini.GetBoolValue("OPTIONS", "ClutchCatching", false);
-	ClutchShifting      = ini.GetBoolValue("OPTIONS", "ClutchShifting", false);
+	ClutchShiftingH      = ini.GetBoolValue("OPTIONS", "ClutchShiftingH", false);
 	ClutchShiftingS     = ini.GetBoolValue("OPTIONS", "ClutchShiftingS", false);
 	DefaultNeutral      = ini.GetBoolValue("OPTIONS", "DefaultNeutral", true);
 	
@@ -88,7 +88,6 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H5)]            = str2key(ini.GetValue("KEYBOARD", "H5", "NUM5"));
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H6)]            = str2key(ini.GetValue("KEYBOARD", "H6", "NUM6"));
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H7)]            = str2key(ini.GetValue("KEYBOARD", "H7", "NUM7"));
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H8)]            = str2key(ini.GetValue("KEYBOARD", "H8", "NUM8"));
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::HN)]            = str2key(ini.GetValue("KEYBOARD", "HN", "NUM9"));
 
 	// [WHEELOPTIONS]
@@ -104,52 +103,56 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	DetailStrength = ini.GetDoubleValue("WHEELOPTIONS", "DetailStrength", 100.0) / 1.0f;
 
 	// [WHEELCONTROLS]
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Toggle)]          =	ini.GetLongValue("WHEELCONTROLS", "Toggle", 17);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ToggleH)]         =	ini.GetLongValue("WHEELCONTROLS", "ToggleH", 6);
-
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ShiftUp)]         =	ini.GetLongValue("WHEELCONTROLS", "ShiftUp", 4);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ShiftDown)]       =	ini.GetLongValue("WHEELCONTROLS", "ShiftDown", 5);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::HR)]              =	ini.GetLongValue("WHEELCONTROLS", "HR", 14);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H1)]              =	ini.GetLongValue("WHEELCONTROLS", "H1", 8 );
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H2)]              =	ini.GetLongValue("WHEELCONTROLS", "H2", 9 );
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H3)]              =	ini.GetLongValue("WHEELCONTROLS", "H3", 10);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H4)]              =	ini.GetLongValue("WHEELCONTROLS", "H4", 11);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H5)]              =	ini.GetLongValue("WHEELCONTROLS", "H5", 12);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H6)]              =	ini.GetLongValue("WHEELCONTROLS", "H6", 13);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Handbrake)]       =	ini.GetLongValue("WHEELCONTROLS", "Handbrake", 19);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Engine)]          =	ini.GetLongValue("WHEELCONTROLS", "Engine", 21   );
-
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Horn)]            =	ini.GetLongValue("WHEELCONTROLS", "Horn", 20 );
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Lights)]          =	ini.GetLongValue("WHEELCONTROLS", "Lights", 7);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::LookBack)]        =	ini.GetLongValue("WHEELCONTROLS", "LookBack", 22);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Camera)]          =	ini.GetLongValue("WHEELCONTROLS", "Camera", 0);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::RadioPrev)]       =	ini.GetLongValue("WHEELCONTROLS", "RadioPrev", 1);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::RadioNext)]       =	ini.GetLongValue("WHEELCONTROLS", "RadioNext", 2);
-
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorLeft)]   =	ini.GetLongValue("WHEELCONTROLS", "IndicatorLeft", 19  );
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorRight)]  =	ini.GetLongValue("WHEELCONTROLS", "IndicatorRight", 21 );
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorHazard)] =	ini.GetLongValue("WHEELCONTROLS", "IndicatorHazard", 15);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Toggle)]          = ini.GetLongValue("WHEELCONTROLS", "Toggle", 17);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ToggleH)]         = ini.GetLongValue("WHEELCONTROLS", "ToggleH", 6);
+																									   
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ShiftUp)]         = ini.GetLongValue("WHEELCONTROLS", "ShiftUp", 4);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::ShiftDown)]       = ini.GetLongValue("WHEELCONTROLS", "ShiftDown", 5);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::HR)]              = ini.GetLongValue("WHEELCONTROLS", "HR", 14);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H1)]              = ini.GetLongValue("WHEELCONTROLS", "H1", 8 );
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H2)]              = ini.GetLongValue("WHEELCONTROLS", "H2", 9 );
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H3)]              = ini.GetLongValue("WHEELCONTROLS", "H3", 10);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H4)]              = ini.GetLongValue("WHEELCONTROLS", "H4", 11);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H5)]              = ini.GetLongValue("WHEELCONTROLS", "H5", 12);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H6)]              = ini.GetLongValue("WHEELCONTROLS", "H6", 13);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H6)]              = ini.GetLongValue("WHEELCONTROLS", "H7", -1);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Handbrake)]       = ini.GetLongValue("WHEELCONTROLS", "Handbrake", 19);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Engine)]          = ini.GetLongValue("WHEELCONTROLS", "Engine", 21   );
+																									   
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Horn)]            = ini.GetLongValue("WHEELCONTROLS", "Horn", 20 );
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Lights)]          = ini.GetLongValue("WHEELCONTROLS", "Lights", 7);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::LookBack)]        = ini.GetLongValue("WHEELCONTROLS", "LookBack", 22);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Camera)]          = ini.GetLongValue("WHEELCONTROLS", "Camera", 0);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::RadioPrev)]       = ini.GetLongValue("WHEELCONTROLS", "RadioPrev", 1);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::RadioNext)]       = ini.GetLongValue("WHEELCONTROLS", "RadioNext", 2);
+																									   
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorLeft)]   = ini.GetLongValue("WHEELCONTROLS", "IndicatorLeft", 19  );
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorRight)]  = ini.GetLongValue("WHEELCONTROLS", "IndicatorRight", 21 );
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::IndicatorHazard)] = ini.GetLongValue("WHEELCONTROLS", "IndicatorHazard", 15);
 
 	// [WHEELAXIS]
 	
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Throttle)] = ini.GetValue("WHEELAXIS", "Throttle", "lY");
-	scriptControl->ThrottleMin = ini.GetLongValue("WHEELAXIS", "ThrottleMin", 0);
-	scriptControl->ThrottleMax = ini.GetLongValue("WHEELAXIS", "ThrottleMax", 65535);
+	scriptControl->ThrottleUp = ini.GetLongValue("WHEELAXIS", "ThrottleUp", 65535);
+	scriptControl->ThrottleDown = ini.GetLongValue("WHEELAXIS", "ThrottleDown", 0);
 	
 	
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Brake)] = ini.GetValue("WHEELAXIS", "Brake", "lRz");
-	scriptControl->BrakeMin = ini.GetLongValue("WHEELAXIS", "BrakeMin", 0);
-	scriptControl->BrakeMax = ini.GetLongValue("WHEELAXIS", "BrakeMax", 65535);
+	scriptControl->BrakeUp = ini.GetLongValue("WHEELAXIS", "BrakeUp", 65535);
+	scriptControl->BrakeDown = ini.GetLongValue("WHEELAXIS", "BrakeDown", 0);
 
 	
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] = ini.GetValue("WHEELAXIS", "Clutch", "rglSlider1");
-	scriptControl->ClutchMin = ini.GetLongValue("WHEELAXIS", "ClutchMin", 0);
-	scriptControl->ClutchMax = ini.GetLongValue("WHEELAXIS", "ClutchMax", 65535);
+	scriptControl->ClutchUp = ini.GetLongValue("WHEELAXIS", "ClutchUp", 65535);
+	scriptControl->ClutchDown = ini.GetLongValue("WHEELAXIS", "ClutchDown", 0);
 
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)] = ini.GetValue("WHEELAXIS", "Steer", "lX");
-
 	scriptControl->SteerLeft =  ini.GetLongValue("WHEELAXIS", "SteerLeft", 0);
 	scriptControl->SteerRight = ini.GetLongValue("WHEELAXIS", "SteerRight", 65535);
+
+	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Handbrake)] = ini.GetValue("WHEELAXIS", "Handbrake", "UNKNOWN");
+	scriptControl->HandbrakeDown = ini.GetLongValue("WHEELAXIS", "HandbrakeDown", 0);
+	scriptControl->HandbrakeUp = ini.GetLongValue("WHEELAXIS", "HandbrakeUp", 65535);
 	
 	scriptControl->FFAxis = ini.GetValue("WHEELAXIS", "FFAxis", "X");
 
@@ -161,8 +164,8 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 
 	// [WHEELKEYBOARD]
 	for (int i = 0; i < MAX_RGBBUTTONS; i++) { // Ouch
-		std::string entryString = ini.GetValue("WHEELKEYBOARD", std::to_string(i).c_str(), "NOPE");
-		if (std::string(entryString).compare("NOPE") == 0) {
+		std::string entryString = ini.GetValue("WHEELKEYBOARD", std::to_string(i).c_str(), "UNKNOWN");
+		if (std::string(entryString).compare("UNKNOWN") == 0) {
 			scriptControl->WheelToKey[i] = -1;
 		}
 		else {

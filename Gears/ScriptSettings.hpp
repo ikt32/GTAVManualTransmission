@@ -23,7 +23,7 @@ public:
 	bool EngStall = false;
 	bool EngBrake = false;
 	bool ClutchCatching = false;
-	bool ClutchShifting = false;
+	bool ClutchShiftingH = false;
 	bool ClutchShiftingS = false;
 	bool DefaultNeutral = false;
 
