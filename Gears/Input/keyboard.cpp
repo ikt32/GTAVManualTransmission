@@ -176,7 +176,7 @@ DWORD str2key(std::string humanReadableKey)
 			return static_cast<int>(letter);
 		}
 	}
-
-
-	return keymap[humanReadableKey];
+	
+	//return keymap[humanReadableKey];
+	return GetWithDef(keymap, humanReadableKey, -1);
 }
