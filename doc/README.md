@@ -79,17 +79,17 @@ clutch is and what it does. You can play with these things disabled too, for
 a more arcade gameplay.
 
 ## Controls
-### Keyboard
+### Keyboard defaults
 * Press `|\` to disable or enable manual transmission.
 * Press `}]` to switch between a sequential gearbox, H-pattern gearbox or the
 automatic gearbox.
 
-### Controller
+### Controller defaults
 * Hold Dpad Right to disable or enable manual transmission.
 * Hold B to switch between a sequential gearbox, H-pattern gearbox or
 the automatic gearbox.
 
-### Steering wheel
+### Steering wheel settings
 * Use the assigned buttons to toggle the mod and switch between gearboxes.
 * Refer to `Gears.ini` for these buttons.
 
