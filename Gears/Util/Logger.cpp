@@ -4,7 +4,7 @@
 
 #include "Logger.hpp"
 
-Logger::Logger(char* fileName) {
+Logger::Logger(std::string fileName) {
 	file = fileName;
 }
 
