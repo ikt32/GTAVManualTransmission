@@ -115,7 +115,7 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H4)]              = ini.GetLongValue("WHEELCONTROLS", "H4", 11);
 	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H5)]              = ini.GetLongValue("WHEELCONTROLS", "H5", 12);
 	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H6)]              = ini.GetLongValue("WHEELCONTROLS", "H6", 13);
-	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H6)]              = ini.GetLongValue("WHEELCONTROLS", "H7", -1);
+	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::H7)]              = ini.GetLongValue("WHEELCONTROLS", "H7", -1);
 	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Handbrake)]       = ini.GetLongValue("WHEELCONTROLS", "Handbrake", 19);
 	scriptControl->WheelControl[static_cast<int>(ScriptControls::WheelControlType::Engine)]          = ini.GetLongValue("WHEELCONTROLS", "Engine", 21   );
 																									   
