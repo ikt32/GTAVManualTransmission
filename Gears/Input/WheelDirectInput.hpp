@@ -7,6 +7,7 @@
 
 #include "DiJoyStick.h"
 #include <array>
+#include "../Util/Logger.hpp"
 
 #define MAX_RGBBUTTONS 128
 #define SAMPLES 4
@@ -54,6 +55,7 @@ public:
 
 public:
 	WheelDirectInput();
+	bool InitFFB(std::string& ffAxis, Logger logger, const DiJoyStick::Entry* e);
 	bool InitWheel(std::string& ffAxis);
 	~WheelDirectInput();
 

@@ -5,74 +5,89 @@
 
 #include <winerror.h>
 #include <chrono>
+#include <vector>
 
 WheelDirectInput::WheelDirectInput(): pCFEffect{nullptr}
                                     , pFREffect{nullptr}  {
+}
+
+bool WheelDirectInput::InitFFB(std::string& ffAxis, Logger logger, const DiJoyStick::Entry* e) {
+	logger.Write("Initializing force feedback");
+	e->diDevice->Unacquire();
+	HRESULT hr;
+	if (FAILED( hr = e->diDevice->SetCooperativeLevel(
+			GetForegroundWindow(),
+		DISCL_EXCLUSIVE | DISCL_FOREGROUND))) {
+		std::string hrStr;
+		switch (hr) {
+		case DI_OK: hrStr = "DI_OK";
+			break;
+		case DIERR_INVALIDPARAM: hrStr = "DIERR_INVALIDPARAM";
+			break;
+		case DIERR_NOTINITIALIZED: hrStr = "DIERR_NOTINITIALIZED";
+			break;
+		case DIERR_ALREADYINITIALIZED: hrStr = "DIERR_ALREADYINITIALIZED";
+			break;
+		case DIERR_INPUTLOST: hrStr = "DIERR_INPUTLOST";
+			break;
+		case DIERR_ACQUIRED: hrStr = "DIERR_ACQUIRED";
+			break;
+		case DIERR_NOTACQUIRED: hrStr = "DIERR_NOTACQUIRED";
+			break;
+		case E_HANDLE: hrStr = "E_HANDLE";
+			break;
+		default: hrStr = "UNKNOWN";
+			break;
+		}
+		logger.Write("HRESULT = " + hrStr);
+		std::stringstream ss;
+		ss << std::hex << hr;
+		logger.Write("Error: " + ss.str());
+		ss.str(std::string());
+		ss << std::hex << GetForegroundWindow();
+		logger.Write("HWND: " + ss.str());
+		return false;
+	}
+	logger.Write("Initializing force feedback effect on axis " + ffAxis);
+	if (!CreateConstantForceEffect(ffAxis)) {
+		logger.Write("Error initializing FF - wrong axis?");
+		NoFeedback = true;
+		return false;
+	}
+	logger.Write("Initializing force feedback success");
+	UpdateState(); // I don't understand
+	UpdateState(); // Why do I need to call this twice?
+	prevTime = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
+	logger.Write("Initializing wheel success");
+	return true;
 }
 
 bool WheelDirectInput::InitWheel(std::string &ffAxis) {
 	Logger logger(LOGFILE);
 
 	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(nullptr),
-									 DIRECTINPUT_VERSION, 
-									 IID_IDirectInput8, 
-									 reinterpret_cast<void**>(&lpDi), 
-									 nullptr))) {
+	DIRECTINPUT_VERSION, 
+	IID_IDirectInput8, 
+	reinterpret_cast<void**>(&lpDi), 
+	nullptr))) {
 		logger.Write("Initializing steering wheel");
+
+		int nEntry = djs.getEntryCount();
 
 		djs.enumerate(lpDi);
 		djs.update();
+		logger.Write("Found" + std::to_string(nEntry) + " devices");
+
+		std::vector<DiJoyStick::Entry const*> entries;
+		
+		for (int i = 0; i < nEntry; i++) {
+			entries.push_back(djs.getEntry(i));
+		}
+		
 		auto e = djs.getEntry(0);
 
 		if (e) {
-			logger.Write("Initializing force feedback");
-			e->diDevice->Unacquire();
-			HRESULT hr;
-			if (FAILED( hr = e->diDevice->SetCooperativeLevel(
-					GetForegroundWindow(),
-					DISCL_EXCLUSIVE | DISCL_FOREGROUND))) {
-				std::string hrStr;
-				switch (hr) {
-					case DI_OK: hrStr = "DI_OK";
-						break;
-					case DIERR_INVALIDPARAM: hrStr = "DIERR_INVALIDPARAM";
-						break;
-					case DIERR_NOTINITIALIZED: hrStr = "DIERR_NOTINITIALIZED";
-						break;
-					case DIERR_ALREADYINITIALIZED: hrStr = "DIERR_ALREADYINITIALIZED";
-						break;
-					case DIERR_INPUTLOST: hrStr = "DIERR_INPUTLOST";
-						break;
-					case DIERR_ACQUIRED: hrStr = "DIERR_ACQUIRED";
-						break;
-					case DIERR_NOTACQUIRED: hrStr = "DIERR_NOTACQUIRED";
-						break;
-					case E_HANDLE: hrStr = "E_HANDLE";
-						break;
-					default: hrStr = "UNKNOWN";
-						break;
-				}
-				logger.Write("HRESULT = " + hrStr);
-				std::stringstream ss;
-				ss << std::hex << hr;
-				logger.Write("Error: " + ss.str());
-				ss.str(std::string());
-				ss << std::hex << GetForegroundWindow();
-				logger.Write("HWND: " + ss.str());
-				return false;
-			}
-			logger.Write("Initializing force feedback effect on axis " + ffAxis);
-			if (!CreateConstantForceEffect(ffAxis)) {
-				logger.Write("Error initializing FF - wrong axis?");
-				NoFeedback = true;
-				return false;
-			}
-			logger.Write("Initializing force feedback success");
-			UpdateState(); // I don't understand
-			UpdateState(); // Why do I need to call this twice?
-			prevTime = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
-			logger.Write("Initializing wheel success");
-			return true;
+			return InitFFB(ffAxis, logger, e);
 		}
 	}
 	logger.Write("No wheel detected");
