@@ -618,8 +618,8 @@ void functionHShiftTo(int i) {
 }
 
 void functionHShiftKeyboard() {
-	// Highest shifter button == 8
-	int clamp = 8;
+	// highest vehicle gear is 7th
+	int clamp = 7;
 	if (vehData.TopGear <= clamp) {
 		clamp = vehData.TopGear;
 	}
@@ -635,8 +635,8 @@ void functionHShiftKeyboard() {
 }
 
 void functionHShiftWheel() {
-	// highest shifter button == 6
-	int clamp = 6;
+	// highest vehicle gear is 7th
+	int clamp = 7;
 	if (vehData.TopGear <= clamp) {
 		clamp = vehData.TopGear;
 	}
@@ -645,12 +645,14 @@ void functionHShiftWheel() {
 			functionHShiftTo(i);
 		}
 	}
+	// Bleh
 	if (controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H1)) ||
 		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H2)) ||
 		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H3)) ||
 		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H4)) ||
 		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H5)) ||
-		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H6))
+		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H6)) ||
+		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H7))
 	) {
 		if (settings.ClutchShiftingH &&
 			settings.EngDamage &&
