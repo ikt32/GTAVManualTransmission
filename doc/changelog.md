@@ -9,11 +9,15 @@ Fundamental changes:
 Feature changes:
 * Add clutch shifting for sequential option
 * Add global FF multiplier
+* Add axis support for handbrake (not analog, >50% activates)
 
 Small changes:
 * Use a smoother soft lock transition
 * Only stall if all wheels are on the ground
 * Add warning if an update to the .ini has been ignored
+* Remove 8th gear for numpad
+* Add 7th gear for H-shifter
+* General bug fixes :^)
 
 ## 4.1.3
 No changes to Gears.ini
