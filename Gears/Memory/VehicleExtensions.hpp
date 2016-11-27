@@ -2,41 +2,40 @@
 
 #include <cstdint>
 #include "../../../ScriptHookV_SDK/inc/types.h"
-#include "NativeMemory.hpp"
 #include <vector>
 
 class VehicleExtensions {
 public:
-	static uint64_t GetAddress(Vehicle handle);
-	static uint16_t GetGearCurr(Vehicle handle);
-	static uint16_t GetGearNext(Vehicle handle);
-	static uint32_t GetGears(Vehicle handle);
-	static void SetGears(Vehicle handle, uint32_t value);
-	static void SetGearCurr(Vehicle handle, uint16_t value);
-	static void SetGearNext(Vehicle handle, uint16_t value);
-	static uint32_t GetTopGear(Vehicle handle);
-	static float GetCurrentRPM(Vehicle handle);
-	static void SetCurrentRPM(Vehicle handle, float value);
-	static float GetClutch(Vehicle handle);
-	static void SetClutch(Vehicle handle, float value);
-	static float GetTurbo(Vehicle handle);
-	static void SetTurbo(Vehicle handle, float value);
-	static float GetThrottle(Vehicle handle);
-	static void SetThrottle(Vehicle handle, float value);
-	static float GetThrottleP(Vehicle handle);
-	static void SetThrottleP(Vehicle handle, float value);
-	static float GetBrakeP(Vehicle handle);
-	static void SetBrakeP(Vehicle handle, float value);
-	static float GetFuelLevel(Vehicle handle);
-	static void SetFuelLevel(Vehicle handle, float value);
-	static uint64_t GetWheelsPtr(Vehicle handle);
-	static void SetWheelsHealth(Vehicle handle, float health);
-	static std::vector<float> GetWheelsCompression(Vehicle handle);
-	static float GetSteeringInputAngle(Vehicle handle);
-	static void SetSteeringInputAngle(Vehicle handle, float value);
-	static float GetSteeringAngle(Vehicle handle);
-	static void SetSteeringAngle(Vehicle handle, float value);
-
+	void ClearAddress();
+	BYTE *GetAddress(Vehicle handle);
+	uint16_t GetGearCurr(Vehicle handle);
+	uint16_t GetGearNext(Vehicle handle);
+	uint32_t GetGears(Vehicle handle);
+	void SetGears(Vehicle handle, uint32_t value);
+	void SetGearCurr(Vehicle handle, uint16_t value);
+	void SetGearNext(Vehicle handle, uint16_t value);
+	uint32_t GetTopGear(Vehicle handle);
+	float GetCurrentRPM(Vehicle handle);
+	void SetCurrentRPM(Vehicle handle, float value);
+	float GetClutch(Vehicle handle);
+	void SetClutch(Vehicle handle, float value);
+	float GetTurbo(Vehicle handle);
+	void SetTurbo(Vehicle handle, float value);
+	float GetThrottle(Vehicle handle);
+	void SetThrottle(Vehicle handle, float value);
+	float GetThrottleP(Vehicle handle);
+	void SetThrottleP(Vehicle handle, float value);
+	float GetBrakeP(Vehicle handle);
+	void SetBrakeP(Vehicle handle, float value);
+	float GetFuelLevel(Vehicle handle);
+	void SetFuelLevel(Vehicle handle, float value);
+	uint64_t GetWheelsPtr(Vehicle handle);
+	void SetWheelsHealth(Vehicle handle, float health);
+	std::vector<float> GetWheelsCompression(Vehicle handle);
+	float GetSteeringInputAngle(Vehicle handle);
+	void SetSteeringInputAngle(Vehicle handle, float value);
+	float GetSteeringAngle(Vehicle handle);
+	void SetSteeringAngle(Vehicle handle, float value);
 private:
-	MemoryAccess mem;
+	BYTE* currAddress = nullptr;
 };

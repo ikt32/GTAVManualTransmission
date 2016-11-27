@@ -2,13 +2,19 @@
 #include "../../../ScriptHookV_SDK/inc/nativeCaller.h"
 #include <vector>
 
-uint64_t VehicleExtensions::GetAddress(Vehicle handle) {
-	auto address = getScriptHandleBaseAddress(handle);
-	return reinterpret_cast<uint64_t>(address);
+void VehicleExtensions::ClearAddress() {
+	currAddress = nullptr;
+}
+
+BYTE *VehicleExtensions::GetAddress(Vehicle handle) {
+	if (currAddress == nullptr) {
+		currAddress = getScriptHandleBaseAddress(handle);
+	}
+	return currAddress;// reinterpret_cast<uint64_t>(currAddress);
 }
 
 uint16_t VehicleExtensions::GetGearCurr(Vehicle handle) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x7A2 : 0x792);
 	offset = (getGameVersion() > 25 ? 0x7C2 : offset);
@@ -17,7 +23,7 @@ uint16_t VehicleExtensions::GetGearCurr(Vehicle handle) {
 }
 
 uint16_t VehicleExtensions::GetGearNext(Vehicle handle) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x7A0 : 0x790);
 	offset = (getGameVersion() > 25 ? 0x7C0 : offset);
@@ -26,7 +32,7 @@ uint16_t VehicleExtensions::GetGearNext(Vehicle handle) {
 }
 
 uint32_t VehicleExtensions::GetGears(Vehicle handle) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x7A0 : 0x790);
 	offset = (getGameVersion() > 25 ? 0x7C0 : offset);
@@ -35,7 +41,7 @@ uint32_t VehicleExtensions::GetGears(Vehicle handle) {
 }
 
 void VehicleExtensions::SetGears(Vehicle handle, uint32_t value) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x7A0 : 0x790);
 	offset = (getGameVersion() > 25 ? 0x7C0 : offset);
@@ -44,7 +50,7 @@ void VehicleExtensions::SetGears(Vehicle handle, uint32_t value) {
 }
 
 void VehicleExtensions::SetGearCurr(Vehicle handle, uint16_t value) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x7A0 : 0x790);
 	offset = (getGameVersion() > 25 ? 0x7C0 : offset);
@@ -53,7 +59,7 @@ void VehicleExtensions::SetGearCurr(Vehicle handle, uint16_t value) {
 }
 
 void VehicleExtensions::SetGearNext(Vehicle handle, uint16_t value) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x7A2 : 0x792);
 	offset = (getGameVersion() > 25 ? 0x7C2 : offset);
@@ -62,7 +68,7 @@ void VehicleExtensions::SetGearNext(Vehicle handle, uint16_t value) {
 }
 
 uint32_t VehicleExtensions::GetTopGear(Vehicle handle) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x7A6 : 0x796);
 	offset = (getGameVersion() > 25 ? 0x7C6 : offset);
@@ -71,7 +77,7 @@ uint32_t VehicleExtensions::GetTopGear(Vehicle handle) {
 }
 
 float VehicleExtensions::GetCurrentRPM(Vehicle handle) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x7D4 : 0x7C4);
 	offset = (getGameVersion() > 25 ? 0x7F4 : offset);
@@ -80,7 +86,7 @@ float VehicleExtensions::GetCurrentRPM(Vehicle handle) {
 }
 
 void VehicleExtensions::SetCurrentRPM(Vehicle handle, float value) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x7D4 : 0x7C4);
 	offset = (getGameVersion() > 25 ? 0x7F4 : offset);
@@ -89,7 +95,7 @@ void VehicleExtensions::SetCurrentRPM(Vehicle handle, float value) {
 }
 
 float VehicleExtensions::GetClutch(Vehicle handle) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x7E0 : 0x7D0);
 	offset = (getGameVersion() > 25 ? 0x800 : offset);
@@ -98,7 +104,7 @@ float VehicleExtensions::GetClutch(Vehicle handle) {
 }
 
 void VehicleExtensions::SetClutch(Vehicle handle, float value) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x7E0 : 0x7D0);
 	offset = (getGameVersion() > 25 ? 0x800 : offset);
@@ -107,7 +113,7 @@ void VehicleExtensions::SetClutch(Vehicle handle, float value) {
 }
 
 float VehicleExtensions::GetTurbo(Vehicle handle) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x7F8 : 0x7D8);
 	offset = (getGameVersion() > 25 ? 0x818 : offset);
@@ -116,7 +122,7 @@ float VehicleExtensions::GetTurbo(Vehicle handle) {
 }
 
 void VehicleExtensions::SetTurbo(Vehicle handle, float value) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x7F8 : 0x7D8);
 	offset = (getGameVersion() > 25 ? 0x818 : offset);
@@ -126,7 +132,7 @@ void VehicleExtensions::SetTurbo(Vehicle handle, float value) {
 }
 
 float VehicleExtensions::GetThrottle(Vehicle handle) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x7E4 : 0x7D4);
 	offset = (getGameVersion() > 25 ? 0x804 : offset);
@@ -136,7 +142,7 @@ float VehicleExtensions::GetThrottle(Vehicle handle) {
 }
 
 void VehicleExtensions::SetThrottle(Vehicle handle, float value) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x7E4 : 0x7D4);
 	offset = (getGameVersion() > 25 ? 0x804 : offset);
@@ -145,7 +151,7 @@ void VehicleExtensions::SetThrottle(Vehicle handle, float value) {
 }
 
 float VehicleExtensions::GetThrottleP(Vehicle handle) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x8B4 : 0x8A4);
 	offset = (getGameVersion() > 25 ? 0x8D4 : offset);
@@ -154,7 +160,7 @@ float VehicleExtensions::GetThrottleP(Vehicle handle) {
 }
 
 void VehicleExtensions::SetThrottleP(Vehicle handle, float value) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x8B4 : 0x8A4);
 	offset = (getGameVersion() > 25 ? 0x8D4 : offset);
@@ -163,7 +169,7 @@ void VehicleExtensions::SetThrottleP(Vehicle handle, float value) {
 }
 
 float VehicleExtensions::GetBrakeP(Vehicle handle) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x8B8 : 0x8A8);
 	offset = (getGameVersion() > 25 ? 0x8D8 : offset);
@@ -172,7 +178,7 @@ float VehicleExtensions::GetBrakeP(Vehicle handle) {
 }
 
 void VehicleExtensions::SetBrakeP(Vehicle handle, float value) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x8B8 : 0x8A8);
 	offset = (getGameVersion() > 25 ? 0x8D8 : offset);
@@ -181,7 +187,7 @@ void VehicleExtensions::SetBrakeP(Vehicle handle, float value) {
 }
 
 float VehicleExtensions::GetFuelLevel(Vehicle handle) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x768 : 0x758);
 	offset = (getGameVersion() > 25 ? 0x788 : offset);
@@ -190,7 +196,7 @@ float VehicleExtensions::GetFuelLevel(Vehicle handle) {
 }
 
 void VehicleExtensions::SetFuelLevel(Vehicle handle, float value) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x768 : 0x758);
 	offset = (getGameVersion() > 25 ? 0x788 : offset);
@@ -199,7 +205,7 @@ void VehicleExtensions::SetFuelLevel(Vehicle handle, float value) {
 }
 
 uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	eGameVersion ver = getGameVersion();
 	auto offset = (ver > 3 ? 0xAA0 : 0xA80);
@@ -242,7 +248,7 @@ std::vector<float> VehicleExtensions::GetWheelsCompression(Vehicle handle) {
 
 // Steering input angle, steering lock independent
 float VehicleExtensions::GetSteeringInputAngle(Vehicle handle) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x8A4 : 0x894);
 	offset = (getGameVersion() > 25 ? 0x8C4 : offset);
@@ -251,7 +257,7 @@ float VehicleExtensions::GetSteeringInputAngle(Vehicle handle) {
 }
 
 void VehicleExtensions::SetSteeringInputAngle(Vehicle handle, float value) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x8A4 : 0x894);
 	offset = (getGameVersion() > 25 ? 0x8C4 : offset);
@@ -261,7 +267,7 @@ void VehicleExtensions::SetSteeringInputAngle(Vehicle handle, float value) {
 
 // Wheel angle, steering lock dependent
 float VehicleExtensions::GetSteeringAngle(Vehicle handle) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x8AC : 0x89C);
 	offset = (getGameVersion() > 25 ? 0x8CC : offset);
@@ -270,7 +276,7 @@ float VehicleExtensions::GetSteeringAngle(Vehicle handle) {
 }
 
 void VehicleExtensions::SetSteeringAngle(Vehicle handle, float value) {
-	auto address = getScriptHandleBaseAddress(handle);
+	auto address = GetAddress(handle);
 
 	auto offset = (getGameVersion() > 3 ? 0x8AC : 0x89C);
 	offset = (getGameVersion() > 25 ? 0x8CC : offset);

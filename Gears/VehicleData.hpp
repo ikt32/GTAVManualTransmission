@@ -38,7 +38,7 @@ public:
 	VehicleClass Class = VehicleClass::Car;
 	bool NoClutch = false;
 	bool IsTruck = false;
-	uint64_t Address = 0;
+	BYTE *Address = nullptr;
 	uint32_t Gears = 0x00010001;
 	float Rpm = 0.0f;
 

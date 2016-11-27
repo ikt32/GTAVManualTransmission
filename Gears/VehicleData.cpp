@@ -9,7 +9,7 @@ VehicleData::VehicleData() {
 void VehicleData::Clear() {
 	Class = VehicleClass::Car;
 	IsTruck = false;
-	Address = 0;
+	Address = nullptr;
 	Gears = 0;
 	Rpm = 0.0f;
 	Clutch = 1.0f;

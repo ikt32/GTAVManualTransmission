@@ -84,6 +84,19 @@ void update() {
 	//                           Update stuff
 	///////////////////////////////////////////////////////////////////////////
 
+	if (prevVehicle != vehicle) {
+		ext.ClearAddress();
+		ext.GetAddress(vehicle);
+		if (vehData.NoClutch) {
+			vehData.SimulatedNeutral = false;
+		}
+		else {
+			vehData.SimulatedNeutral = settings.DefaultNeutral;
+		}
+		shiftTo(1, true);
+	}
+	prevVehicle = vehicle;
+
 	vehData.UpdateValues(ext, vehicle);
 	bool ignoreClutch = false;
 	if (settings.ShiftMode == Automatic) {
@@ -111,17 +124,6 @@ void update() {
 
 		showText(0.2, 0.45, 2.0, "UPDATE GEARS.INI", red);
 	}
-
-	if (prevVehicle != vehicle) {
-		if (vehData.NoClutch) {
-			vehData.SimulatedNeutral = false;
-		}
-		else {
-			vehData.SimulatedNeutral = settings.DefaultNeutral;
-		}
-		shiftTo(1, true);
-	}
-	prevVehicle = vehicle;
 
 	///////////////////////////////////////////////////////////////////////////
 	//                            Alt vehicle controls
@@ -406,7 +408,7 @@ void showDebugInfo() {
 	showText(0.01f, 0.425f, 0.4f, ssTurbo.str().c_str());
 
 	std::stringstream ssAddress;
-	ssAddress << "Address: " << std::hex << vehData.Address;
+	ssAddress << "Address: " << std::hex << reinterpret_cast<uint64_t>(vehData.Address);
 	showText(0.01f, 0.450f, 0.4f, ssAddress.str().c_str());
 
 	std::stringstream ssEnabled;
