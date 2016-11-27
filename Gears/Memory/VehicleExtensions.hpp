@@ -1,8 +1,9 @@
 #pragma once
 
+#include <vector>
 #include <cstdint>
 #include "../../../ScriptHookV_SDK/inc/types.h"
-#include <vector>
+#include "../../../ScriptHookV_SDK/inc/nativeCaller.h"
 
 class VehicleExtensions {
 public:
@@ -38,4 +39,5 @@ public:
 	void SetSteeringAngle(Vehicle handle, float value);
 private:
 	BYTE* currAddress = nullptr;
+	eGameVersion gameVersion = getGameVersion();
 };
