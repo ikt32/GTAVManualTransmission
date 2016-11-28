@@ -108,7 +108,7 @@ public:
 	std::array<std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
 	std::array<std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
 	std::array<int, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
-	std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelControl = {};
+	std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
 	std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
 	std::string FFAxis;
 

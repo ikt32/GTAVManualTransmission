@@ -2,15 +2,16 @@
 
 #include "Input/ScriptControls.hpp"
 
+// blah
 #define SETTINGSFILE "./Gears.ini"
-#define CORRECTVERSION "4.2.0"
+#define SETTINGSWHEEL "./ManualTransmission/settings_wheel.ini"
+#define CORRECTVERSION 420
 
 class ScriptControls;
 
 class ScriptSettings {
 public:
 	ScriptSettings();
-
 	void Read(ScriptControls* scriptControl);
 	void Save() const;
 	bool IsCorrectVersion() const;
@@ -70,5 +71,7 @@ public:
 	float SteerAngleAlt = 180.0f;
 	bool ThrottleStart = false;
 private:
-	std::string INIver = "0.0.0";
+	int INIver = 0;
+	void parseSettingsWheel(ScriptControls *scriptControl);
+
 };

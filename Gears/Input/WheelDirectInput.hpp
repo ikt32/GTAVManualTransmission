@@ -8,6 +8,7 @@
 #include "DiJoyStick.h"
 #include <array>
 #include "../Util/Logger.hpp"
+#include <vector>
 
 #define MAX_RGBBUTTONS 128
 #define SAMPLES 4
@@ -55,9 +56,9 @@ public:
 
 public:
 	WheelDirectInput();
-	bool InitFFB(std::string& ffAxis, Logger logger, const DiJoyStick::Entry* e);
-	bool InitWheel(std::string& ffAxis);
 	~WheelDirectInput();
+	bool InitWheel(std::string axis);
+	bool InitFFB(Logger logger, const DiJoyStick::Entry* e);
 
 	// Should be called every update()
 	void UpdateState();
@@ -79,8 +80,8 @@ public:
 
 private:
 	DiJoyStick djs;
+	
 	LPDIRECTINPUT lpDi = nullptr;
-
 	LPDIRECTINPUTEFFECT pCFEffect;
 	LPDIRECTINPUTEFFECT pFREffect;
 	bool CreateConstantForceEffect(std::string& axis);
@@ -96,9 +97,11 @@ private:
 	std::array<bool, SIZEOF_POV> povButtonPrev;
 
 
-
 	int prevPosition = 0;
 	long long prevTime = 0;
 	std::array<float, SAMPLES> samples = {};
 	int averageIndex = 0;
+
+	std::string ffAxis;
+	//std::vector<const DiJoyStick::Entry *>entries;
 };

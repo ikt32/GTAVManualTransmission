@@ -41,9 +41,10 @@ public:
 
 	// All on https://msdn.microsoft.com/en-us/library/windows/desktop/microsoft.directx_sdk.reference.dideviceinstance(v=vs.85).aspx
 	// dwDevType = DI8DEVTYPE_JOYSTICK
+	// dwDevType = DI8DEVTYPE_DRIVING
 	void enumerate(
 		LPDIRECTINPUT di,
-		DWORD dwDevType = DI8DEVTYPE_DRIVING,
+		DWORD dwDevType = DI8DEVCLASS_GAMECTRL, //catch-all
 		LPCDIDATAFORMAT lpdf = &c_dfDIJoystick2,
 		DWORD dwFlags = DIEDFL_ATTACHEDONLY,
 		int maxEntry = 16) {
@@ -52,7 +53,7 @@ public:
 		entry = new Entry[maxEntry];
 		this->di = di;
 		this->maxEntry = maxEntry;
-		nEntry = getEntryCount();
+		nEntry = 0;
 		this->lpdf = lpdf;
 
 		di->EnumDevices(dwDevType, DIEnumDevicesCallback_static, this, dwFlags);

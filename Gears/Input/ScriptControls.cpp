@@ -259,30 +259,30 @@ void ScriptControls::SetXboxTrigger(int value) {
 
 bool ScriptControls::ButtonReleased(WheelControlType control) {
 	if (!WheelDI.IsConnected() ||
-		WheelControl[static_cast<int>(control)] == -1) {
+		WheelButton[static_cast<int>(control)] == -1) {
 		return false;
 	}
-	if (WheelDI.IsButtonJustReleased(WheelControl[static_cast<int>(control)]))
+	if (WheelDI.IsButtonJustReleased(WheelButton[static_cast<int>(control)]))
 		return true;
 	return false;
 }
 
 bool ScriptControls::ButtonJustPressed(WheelControlType control) {
 	if (!WheelDI.IsConnected() ||
-		WheelControl[static_cast<int>(control)] == -1) {
+		WheelButton[static_cast<int>(control)] == -1) {
 		return false;
 	}
-	if (WheelDI.IsButtonJustPressed(WheelControl[static_cast<int>(control)]))
+	if (WheelDI.IsButtonJustPressed(WheelButton[static_cast<int>(control)]))
 		return true;
 	return false;
 }
 
 bool ScriptControls::ButtonIn(WheelControlType control) {
 	if (!WheelDI.IsConnected() ||
-		WheelControl[static_cast<int>(control)] == -1) {
+		WheelButton[static_cast<int>(control)] == -1) {
 		return false;
 	}
-	if (WheelDI.IsButtonPressed(WheelControl[static_cast<int>(control)]))
+	if (WheelDI.IsButtonPressed(WheelButton[static_cast<int>(control)]))
 		return true;
 	return false;
 }

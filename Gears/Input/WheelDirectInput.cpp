@@ -7,37 +7,81 @@
 #include <chrono>
 #include <vector>
 
-WheelDirectInput::WheelDirectInput(): pCFEffect{nullptr}
-                                    , pFREffect{nullptr}  {
+WheelDirectInput::WheelDirectInput() :
+	pCFEffect{nullptr},
+	pFREffect{nullptr} { }
+
+WheelDirectInput::~WheelDirectInput() {}
+
+
+bool WheelDirectInput::InitWheel(std::string axis) {
+	//entries.clear();
+	ffAxis = axis;
+
+	Logger logger(LOGFILE);
+
+	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(nullptr),
+		DIRECTINPUT_VERSION,
+		IID_IDirectInput8,
+		reinterpret_cast<void**>(&lpDi),
+		nullptr))) {
+		logger.Write("Initializing steering wheel");
+
+		djs.enumerate(lpDi);
+		int nEntry = djs.getEntryCount();
+		logger.Write("Found " + std::to_string(nEntry) + " device(s)");
+
+		for (int i = 0; i < nEntry; i++) {
+			//entries.push_back(djs.getEntry(i));
+			std::wstring wDevName = djs.getEntry(i)->diDeviceInstance.tszInstanceName;
+			GUID guid = djs.getEntry(i)->diDeviceInstance.guidInstance;
+			LPOLESTR* bstrGuid;
+			StringFromCLSID(guid, bstrGuid);
+			std::wstring wGuid = std::wstring(*bstrGuid);
+			logger.Write("Device: " + std::string(wDevName.begin(), wDevName.end()));
+			logger.Write("GUID:   " + std::string(wGuid.begin(), wGuid.end()));
+		}
+
+		djs.update();
+
+
+		if (nEntry > 0) {
+			auto e = djs.getEntry(0);
+			return InitFFB(logger, e);
+		}
+	}
+	logger.Write("No wheel detected");
+	return false;
 }
 
-bool WheelDirectInput::InitFFB(std::string& ffAxis, Logger logger, const DiJoyStick::Entry* e) {
+
+bool WheelDirectInput::InitFFB(Logger logger, const DiJoyStick::Entry *e) {
 	logger.Write("Initializing force feedback");
 	e->diDevice->Unacquire();
 	HRESULT hr;
-	if (FAILED( hr = e->diDevice->SetCooperativeLevel(
+	if (FAILED(hr = e->diDevice->SetCooperativeLevel(
 			GetForegroundWindow(),
 		DISCL_EXCLUSIVE | DISCL_FOREGROUND))) {
 		std::string hrStr;
 		switch (hr) {
-		case DI_OK: hrStr = "DI_OK";
-			break;
-		case DIERR_INVALIDPARAM: hrStr = "DIERR_INVALIDPARAM";
-			break;
-		case DIERR_NOTINITIALIZED: hrStr = "DIERR_NOTINITIALIZED";
-			break;
-		case DIERR_ALREADYINITIALIZED: hrStr = "DIERR_ALREADYINITIALIZED";
-			break;
-		case DIERR_INPUTLOST: hrStr = "DIERR_INPUTLOST";
-			break;
-		case DIERR_ACQUIRED: hrStr = "DIERR_ACQUIRED";
-			break;
-		case DIERR_NOTACQUIRED: hrStr = "DIERR_NOTACQUIRED";
-			break;
-		case E_HANDLE: hrStr = "E_HANDLE";
-			break;
-		default: hrStr = "UNKNOWN";
-			break;
+			case DI_OK: hrStr = "DI_OK";
+				break;
+			case DIERR_INVALIDPARAM: hrStr = "DIERR_INVALIDPARAM";
+				break;
+			case DIERR_NOTINITIALIZED: hrStr = "DIERR_NOTINITIALIZED";
+				break;
+			case DIERR_ALREADYINITIALIZED: hrStr = "DIERR_ALREADYINITIALIZED";
+				break;
+			case DIERR_INPUTLOST: hrStr = "DIERR_INPUTLOST";
+				break;
+			case DIERR_ACQUIRED: hrStr = "DIERR_ACQUIRED";
+				break;
+			case DIERR_NOTACQUIRED: hrStr = "DIERR_NOTACQUIRED";
+				break;
+			case E_HANDLE: hrStr = "E_HANDLE";
+				break;
+			default: hrStr = "UNKNOWN";
+				break;
 		}
 		logger.Write("HRESULT = " + hrStr);
 		std::stringstream ss;
@@ -62,48 +106,10 @@ bool WheelDirectInput::InitFFB(std::string& ffAxis, Logger logger, const DiJoySt
 	return true;
 }
 
-bool WheelDirectInput::InitWheel(std::string &ffAxis) {
-	Logger logger(LOGFILE);
-
-	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(nullptr),
-	DIRECTINPUT_VERSION, 
-	IID_IDirectInput8, 
-	reinterpret_cast<void**>(&lpDi), 
-	nullptr))) {
-		logger.Write("Initializing steering wheel");
-
-		int nEntry = djs.getEntryCount();
-
-		djs.enumerate(lpDi);
-		djs.update();
-		logger.Write("Found" + std::to_string(nEntry) + " devices");
-
-		std::vector<DiJoyStick::Entry const*> entries;
-		
-		for (int i = 0; i < nEntry; i++) {
-			entries.push_back(djs.getEntry(i));
-		}
-		
-		auto e = djs.getEntry(0);
-
-		if (e) {
-			return InitFFB(ffAxis, logger, e);
-		}
-	}
-	logger.Write("No wheel detected");
-	return false;
-}
-
-
-
-WheelDirectInput::~WheelDirectInput() {
-
-}
-
 void WheelDirectInput::UpdateState() {
 	djs.update();
 
-	const DiJoyStick::Entry* e = djs.getEntry(0);
+	const DiJoyStick::Entry *e = djs.getEntry(0);
 	if (e) {
 		JoyState = e->joystate;
 	}
@@ -114,7 +120,7 @@ bool WheelDirectInput::IsConnected() const {
 
 	if (!e) {
 		return false;
-	}	
+	}
 	return true;
 }
 
@@ -125,23 +131,23 @@ bool WheelDirectInput::IsConnected() const {
 bool WheelDirectInput::IsButtonPressed(int buttonType) {
 	if (buttonType > 127) {
 		switch (buttonType) {
-		case N:
-			if (JoyState.rgdwPOV[0] == 0) {
-				return true;
-			}
-		case NE:
-		case E:
-		case SE:
-		case S:
-		case SW:
-		case W:
-		case NW:
-			if (buttonType == JoyState.rgdwPOV[0])
-				return true;
-		default:
-			return false;
+			case N:
+				if (JoyState.rgdwPOV[0] == 0) {
+					return true;
+				}
+			case NE:
+			case E:
+			case SE:
+			case S:
+			case SW:
+			case W:
+			case NW:
+				if (buttonType == JoyState.rgdwPOV[0])
+					return true;
+			default:
+				return false;
 		}
-	}	
+	}
 	if (JoyState.rgbButtons[buttonType])
 		return true;
 	return false;
@@ -235,7 +241,7 @@ bool WheelDirectInput::CreateConstantForceEffect(std::string &axis) {
 	}
 	else if (axis == "Y") {
 		ffAxis = DIJOFS_Y;
-	} 
+	}
 	else if (axis == "Z") {
 		ffAxis = DIJOFS_Z;
 	}
@@ -243,10 +249,10 @@ bool WheelDirectInput::CreateConstantForceEffect(std::string &axis) {
 		return false;
 	}
 
-	DWORD rgdwAxes[1] = { ffAxis };
+	DWORD rgdwAxes[1] = {ffAxis};
 	LONG rglDirection[1] = {0};
 	DICONSTANTFORCE cf = {0};
-	
+
 	DIEFFECT eff;
 	ZeroMemory(&eff, sizeof(eff));
 	eff.dwSize = sizeof(DIEFFECT);
@@ -264,7 +270,7 @@ bool WheelDirectInput::CreateConstantForceEffect(std::string &axis) {
 	eff.lpvTypeSpecificParams = &cf;
 	eff.dwStartDelay = 0;
 
-	const DiJoyStick::Entry* e = djs.getEntry(0);
+	const DiJoyStick::Entry *e = djs.getEntry(0);
 	if (e) {
 		e->diDevice->CreateEffect(
 			 GUID_ConstantForce,
@@ -276,18 +282,18 @@ bool WheelDirectInput::CreateConstantForceEffect(std::string &axis) {
 	if (!pCFEffect) {
 		return false;
 	}
-	
+
 	return true;
 }
 
 HRESULT WheelDirectInput::SetConstantForce(int force) const {
 	if (NoFeedback)
-		return false; 
-	
+		return false;
+
 	HRESULT hr;
 	LONG rglDirection[1] = {0};
-	
-	
+
+
 	DICONSTANTFORCE cf;
 	cf.lMagnitude = force;
 
@@ -301,24 +307,25 @@ HRESULT WheelDirectInput::SetConstantForce(int force) const {
 	cfEffect.cbTypeSpecificParams = sizeof(DICONSTANTFORCE);
 	cfEffect.lpvTypeSpecificParams = &cf;
 	cfEffect.dwStartDelay = 0;
-	
-	hr = pCFEffect->SetParameters(&cfEffect, DIEP_DIRECTION |
-	                                DIEP_TYPESPECIFICPARAMS |
-	                                DIEP_START);
 
-	const DiJoyStick::Entry* e = djs.getEntry(0);
+	hr = pCFEffect->SetParameters(&cfEffect, DIEP_DIRECTION |
+	                              DIEP_TYPESPECIFICPARAMS |
+	                              DIEP_START);
+
+	const DiJoyStick::Entry *e = djs.getEntry(0);
 	if (e) {
 		e->diDevice->Acquire();
 		if (pCFEffect)
 			pCFEffect->Start(1, 0);
-	} else {
+	}
+	else {
 		return E_HANDLE;
 	}
 
 	return hr;
 }
 
-WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string& axisString) {
+WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString) {
 	if (axisString == "UNKNOWN_AXIS")
 		return UNKNOWN_AXIS;
 
@@ -335,15 +342,15 @@ int WheelDirectInput::GetAxisValue(DIAxis axis) {
 	if (!IsConnected())
 		return 0;
 	switch (axis) {
-		case lX:			return JoyState.lX;
-		case lY:			return JoyState.lY;
-		case lZ:			return JoyState.lZ;
-		case lRx:			return JoyState.lRx;
-		case lRy:			return JoyState.lRy;
-		case lRz:			return JoyState.lRz;
-		case rglSlider0:	return JoyState.rglSlider[0];
-		case rglSlider1:	return JoyState.rglSlider[1];
-		default:			return 0;
+		case lX: return JoyState.lX;
+		case lY: return JoyState.lY;
+		case lZ: return JoyState.lZ;
+		case lRx: return JoyState.lRx;
+		case lRy: return JoyState.lRy;
+		case lRz: return JoyState.lRz;
+		case rglSlider0: return JoyState.rglSlider[0];
+		case rglSlider1: return JoyState.rglSlider[1];
+		default: return 0;
 	}
 }
 
@@ -352,7 +359,7 @@ float WheelDirectInput::GetAxisSpeed(DIAxis axis) {
 	auto time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 	auto position = GetAxisValue(axis);
 	auto result = (position - prevPosition) / ((time - prevTime) / 1e9f);
-	
+
 	prevTime = time;
 	prevPosition = position;
 
@@ -366,4 +373,3 @@ float WheelDirectInput::GetAxisSpeed(DIAxis axis) {
 	}
 	return sum / SAMPLES;
 }
-
