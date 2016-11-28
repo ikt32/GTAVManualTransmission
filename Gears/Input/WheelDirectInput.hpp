@@ -57,8 +57,8 @@ public:
 public:
 	WheelDirectInput();
 	~WheelDirectInput();
-	bool InitWheel(std::string axis);
-	bool InitFFB(Logger logger, const DiJoyStick::Entry* e);
+	bool InitWheel(std::string ffAxis);
+	bool InitFFB(const DiJoyStick::Entry* e, std::string ffAxis);
 
 	// Should be called every update()
 	void UpdateState();
@@ -79,6 +79,8 @@ public:
 	float GetAxisSpeed(DIAxis axis);
 
 private:
+	Logger logger;// (LOGFILE);
+
 	DiJoyStick djs;
 	
 	LPDIRECTINPUT lpDi = nullptr;
@@ -102,6 +104,5 @@ private:
 	std::array<float, SAMPLES> samples = {};
 	int averageIndex = 0;
 
-	std::string ffAxis;
 	//std::vector<const DiJoyStick::Entry *>entries;
 };

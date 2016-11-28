@@ -14,12 +14,7 @@ WheelDirectInput::WheelDirectInput() :
 WheelDirectInput::~WheelDirectInput() {}
 
 
-bool WheelDirectInput::InitWheel(std::string axis) {
-	//entries.clear();
-	ffAxis = axis;
-
-	Logger logger(LOGFILE);
-
+bool WheelDirectInput::InitWheel(std::string ffAxis) {
 	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(nullptr),
 		DIRECTINPUT_VERSION,
 		IID_IDirectInput8,
@@ -47,7 +42,7 @@ bool WheelDirectInput::InitWheel(std::string axis) {
 
 		if (nEntry > 0) {
 			auto e = djs.getEntry(0);
-			return InitFFB(logger, e);
+			return InitFFB(e,ffAxis);
 		}
 	}
 	logger.Write("No wheel detected");
@@ -55,7 +50,7 @@ bool WheelDirectInput::InitWheel(std::string axis) {
 }
 
 
-bool WheelDirectInput::InitFFB(Logger logger, const DiJoyStick::Entry *e) {
+bool WheelDirectInput::InitFFB(const DiJoyStick::Entry *e, std::string ffAxis) {
 	logger.Write("Initializing force feedback");
 	e->diDevice->Unacquire();
 	HRESULT hr;

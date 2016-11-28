@@ -13,7 +13,7 @@ ScriptControls::~ScriptControls() {
 }
 
 void ScriptControls::InitWheel() {
-	WheelDI.InitWheel(FFAxis);
+	WheelDI.InitWheel(WheelAxes[static_cast<int>(WheelAxisType::Steer)]);
 }
 
 void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
@@ -123,8 +123,7 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
 				BrakeVal = 0.0f + 1.0f / (BrakeDown - BrakeUp)*(static_cast<float>(RawB) - BrakeUp);
 				ClutchVal = 0.0f + 1.0f/(ClutchDown - ClutchUp)*(static_cast<float>(RawC) - ClutchUp);
 			}
-			if (ClutchDisable || 
-				WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]) == WheelDirectInput::UNKNOWN_AXIS) {
+			if (WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]) == WheelDirectInput::UNKNOWN_AXIS) {
 				ClutchVal = 0.0f;
 			}
 			HandbrakeVal = 0.0f + 1.0f / (HandbrakeUp - HandbrakeDown)*(static_cast<float>(RawH) - HandbrakeDown);

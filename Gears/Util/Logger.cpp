@@ -4,6 +4,10 @@
 
 #include "Logger.hpp"
 
+Logger::Logger() {
+	file = LOGFILE;
+}
+
 Logger::Logger(std::string fileName) {
 	file = fileName;
 }

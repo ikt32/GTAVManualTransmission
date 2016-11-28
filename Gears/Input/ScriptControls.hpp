@@ -116,7 +116,7 @@ public:
 	std::array<std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
 	std::array<std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxesDevices = {};
 	
-	std::string FFAxis;
+	//std::string FFAxis;
 
 	int CToggleTime    = 1000;
 	int ThrottleUp	   = 0;
@@ -129,7 +129,7 @@ public:
 	int SteerRight	   = 0;
 	int HandbrakeUp   = 0;
 	int HandbrakeDown   = 0;
-	bool ClutchDisable = false;
+	//bool ClutchDisable = false;
 
 	// Add more when desired
 	bool ButtonJustPressed(ControllerControlType control);
