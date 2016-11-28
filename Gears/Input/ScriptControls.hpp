@@ -106,10 +106,16 @@ public:
 
 	// Values are filled by ScriptSettings
 	std::array<std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
-	std::array<std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
+	
 	std::array<int, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
+	
 	std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
+	std::array<std::string, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButtonDevices = {};
 	std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
+	
+	std::array<std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
+	std::array<std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxesDevices = {};
+	
 	std::string FFAxis;
 
 	int CToggleTime    = 1000;

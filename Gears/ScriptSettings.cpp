@@ -97,7 +97,6 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 
 	// [DEBUG]
 	Debug = settingsGeneral.GetBoolValue("DEBUG", "Info", false);
-	SteerAngleAlt = settingsGeneral.GetDoubleValue("DEBUG", "AltAngle", 180.0);
 	
 	// .ini version check
 	INIver = settingsGeneral.GetLongValue("DEBUG", "INIver", 0);
@@ -167,14 +166,60 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	}
 
 	// I fucking hate this
-
+	// THERE HAS TO BE A BETTER WAY RIGHT send help
 	// [TOGGLE_MOD]
-	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::Toggle)] = settingsWheel.GetLongValue("WHEELCONTROLS", "Toggle", 17);
+	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::Toggle)] =
+		settingsWheel.GetValue("TOGGLE_MOD", "DEVICE", "");
+	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::Toggle)] =
+		settingsWheel.GetLongValue("TOGGLE_MOD", "BUTTON", -1);
+
+	// [CHANGE_SHIFTMODE]
+	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::ToggleH)] =
+		settingsWheel.GetValue("CHANGE_SHIFTMODE", "DEVICE", "");
+	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::ToggleH)] =
+		settingsWheel.GetLongValue("CHANGE_SHIFTMODE", "BUTTON", -1);
+
+
+	// [STEER]
+	scriptControl->WheelAxesDevices[static_cast<int>(ScriptControls::WheelAxisType::Steer)] =
+		settingsWheel.GetValue("STEER", "DEVICE", "");
+	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)] =
+		settingsWheel.GetValue("STEER", "AXLE", "");
+	scriptControl->SteerLeft = settingsWheel.GetLongValue("STEER", "MIN", -1);
+	scriptControl->SteerRight = settingsWheel.GetLongValue("STEER", "MAX", -1);
+	SteerAngleMax = settingsWheel.GetDoubleValue("STEER", "SteerAngleMax", 900.0);
+	SteerAngleCar = settingsWheel.GetDoubleValue("STEER", "SteerAngleCar", 720.0);
+	SteerAngleBike = settingsWheel.GetDoubleValue("STEER", "SteerAngleBike", 180.0);
+	SteerAngleAlt = settingsWheel.GetDoubleValue("STEER", "SteerAngleAlt", 180.0);
+
+	// Todo: process this below
+	// Todo: Also think about disableClutch and stuff
+	// Todo: Also error checking
+	// Todo: Also a life
+	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Throttle)] = settingsWheel.GetValue("WHEELAXIS", "Throttle", "lY");
+	scriptControl->ThrottleUp = settingsWheel.GetLongValue("WHEELAXIS", "ThrottleUp", 65535);
+	scriptControl->ThrottleDown = settingsWheel.GetLongValue("WHEELAXIS", "ThrottleDown", 0);
+
+
+	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Brake)] = settingsWheel.GetValue("WHEELAXIS", "Brake", "lRz");
+	scriptControl->BrakeUp = settingsWheel.GetLongValue("WHEELAXIS", "BrakeUp", 65535);
+	scriptControl->BrakeDown = settingsWheel.GetLongValue("WHEELAXIS", "BrakeDown", 0);
+
+
+	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] = settingsWheel.GetValue("WHEELAXIS", "Clutch", "rglSlider1");
+	scriptControl->ClutchUp = settingsWheel.GetLongValue("WHEELAXIS", "ClutchUp", 65535);
+	scriptControl->ClutchDown = settingsWheel.GetLongValue("WHEELAXIS", "ClutchDown", 0);
+
+	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Handbrake)] = settingsWheel.GetValue("WHEELAXIS", "Handbrake", "UNKNOWN");
+	scriptControl->HandbrakeDown = settingsWheel.GetLongValue("WHEELAXIS", "HandbrakeDown", 0);
+	scriptControl->HandbrakeUp = settingsWheel.GetLongValue("WHEELAXIS", "HandbrakeUp", 65535);
+
+	scriptControl->FFAxis = settingsWheel.GetValue("WHEELAXIS", "FFAxis", "X");
+
+	scriptControl->ClutchDisable = settingsWheel.GetBoolValue("WHEELAXIS", "ClutchDisable", false);
 
 
 
-	// [WHEELCONTROLS]
-	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::ToggleH)] = settingsWheel.GetLongValue("WHEELCONTROLS", "ToggleH", 6);
 
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::ShiftUp)] = settingsWheel.GetLongValue("WHEELCONTROLS", "ShiftUp", 4);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::ShiftDown)] = settingsWheel.GetLongValue("WHEELCONTROLS", "ShiftDown", 5);
@@ -200,38 +245,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::IndicatorRight)] = settingsWheel.GetLongValue("WHEELCONTROLS", "IndicatorRight", 21);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::IndicatorHazard)] = settingsWheel.GetLongValue("WHEELCONTROLS", "IndicatorHazard", 15);
 
-	// [WHEELAXIS]
-
-	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Throttle)] = settingsWheel.GetValue("WHEELAXIS", "Throttle", "lY");
-	scriptControl->ThrottleUp = settingsWheel.GetLongValue("WHEELAXIS", "ThrottleUp", 65535);
-	scriptControl->ThrottleDown = settingsWheel.GetLongValue("WHEELAXIS", "ThrottleDown", 0);
-
-
-	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Brake)] = settingsWheel.GetValue("WHEELAXIS", "Brake", "lRz");
-	scriptControl->BrakeUp = settingsWheel.GetLongValue("WHEELAXIS", "BrakeUp", 65535);
-	scriptControl->BrakeDown = settingsWheel.GetLongValue("WHEELAXIS", "BrakeDown", 0);
-
-
-	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] = settingsWheel.GetValue("WHEELAXIS", "Clutch", "rglSlider1");
-	scriptControl->ClutchUp = settingsWheel.GetLongValue("WHEELAXIS", "ClutchUp", 65535);
-	scriptControl->ClutchDown = settingsWheel.GetLongValue("WHEELAXIS", "ClutchDown", 0);
-
-	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)] = settingsWheel.GetValue("WHEELAXIS", "Steer", "lX");
-	scriptControl->SteerLeft = settingsWheel.GetLongValue("WHEELAXIS", "SteerLeft", 0);
-	scriptControl->SteerRight = settingsWheel.GetLongValue("WHEELAXIS", "SteerRight", 65535);
-
-	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Handbrake)] = settingsWheel.GetValue("WHEELAXIS", "Handbrake", "UNKNOWN");
-	scriptControl->HandbrakeDown = settingsWheel.GetLongValue("WHEELAXIS", "HandbrakeDown", 0);
-	scriptControl->HandbrakeUp = settingsWheel.GetLongValue("WHEELAXIS", "HandbrakeUp", 65535);
-
-	scriptControl->FFAxis = settingsWheel.GetValue("WHEELAXIS", "FFAxis", "X");
-
-	scriptControl->ClutchDisable = settingsWheel.GetBoolValue("WHEELAXIS", "ClutchDisable", false);
-
-	SteerAngleMax = settingsWheel.GetDoubleValue("WHEELAXIS", "SteerAngleMax", 900.0);
-	SteerAngleCar = settingsWheel.GetDoubleValue("WHEELAXIS", "SteerAngleCar", 720.0);
-	SteerAngleBike = settingsWheel.GetDoubleValue("WHEELAXIS", "SteerAngleBike", 180.0);
-
+	
 	// [WHEELKEYBOARD]
 	for (int i = 0; i < MAX_RGBBUTTONS; i++) { // Ouch
 		std::string entryString = settingsWheel.GetValue("WHEELKEYBOARD", std::to_string(i).c_str(), "UNKNOWN");

@@ -236,13 +236,13 @@ bool WheelDirectInput::CreateConstantForceEffect(std::string &axis) {
 		return false;
 
 	DWORD ffAxis;
-	if (axis == "X") {
+	if (axis == "lX") {
 		ffAxis = DIJOFS_X;
 	}
-	else if (axis == "Y") {
+	else if (axis == "lY") {
 		ffAxis = DIJOFS_Y;
 	}
-	else if (axis == "Z") {
+	else if (axis == "lZ") {
 		ffAxis = DIJOFS_Z;
 	}
 	else {
