@@ -40,6 +40,9 @@ namespace MemoryPatcher {
 	extern uintptr_t PatchRevLimiter();
 	extern void RestoreRevLimiter(uintptr_t address);
 
+	// Does the same as Custom Steering by InfamousSabre
+	// Kept for emergency/backup purposes in the case InfamousSabre
+	// stops support earlier than I do. (not trying to compete here!)
 	//extern uintptr_t PatchSteering();
 	//extern void RestoreSteering(uintptr_t address);
 

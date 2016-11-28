@@ -68,7 +68,7 @@ public:
 	bool Debug = false;
 	bool AltControls = false;
 	float SteerAngleAlt = 180.0f;
-
+	bool ThrottleStart = false;
 private:
 	std::string INIver = "0.0.0";
 };

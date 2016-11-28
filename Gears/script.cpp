@@ -1115,7 +1115,7 @@ void handleVehicleButtons() {
 		(controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) ||
 		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine) ||
-		controls.ThrottleVal > 0.98f && controls.ClutchVal > settings.ClutchCatchpoint)) {
+		settings.ThrottleStart && controls.ThrottleVal > 0.98f && controls.ClutchVal > settings.ClutchCatchpoint)) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 	if  (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&

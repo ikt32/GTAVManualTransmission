@@ -26,7 +26,7 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	EngStall            = ini.GetBoolValue("OPTIONS", "EngineStalling", false);
 	EngBrake            = ini.GetBoolValue("OPTIONS", "EngineBraking", false);
 	ClutchCatching      = ini.GetBoolValue("OPTIONS", "ClutchCatching", false);
-	ClutchShiftingH      = ini.GetBoolValue("OPTIONS", "ClutchShiftingH", false);
+	ClutchShiftingH     = ini.GetBoolValue("OPTIONS", "ClutchShiftingH", false);
 	ClutchShiftingS     = ini.GetBoolValue("OPTIONS", "ClutchShiftingS", false);
 	DefaultNeutral      = ini.GetBoolValue("OPTIONS", "DefaultNeutral", true);
 	
@@ -35,10 +35,11 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	RPMDamage           = ini.GetDoubleValue("OPTIONS", "RPMDamage", 15.0) / 100.0f;
 	MisshiftDamage      = ini.GetDoubleValue("OPTIONS", "MisshiftDamage", 10.0);
 
-	AutoLookBack        = ini.GetBoolValue("OPTIONS", "AutoLookBack", false);
-	AutoGear1           = ini.GetBoolValue("OPTIONS", "AutoGear1", false);
 	HillBrakeWorkaround = ini.GetBoolValue("OPTIONS", "HillBrakeWorkaround", false);
-	
+	AutoGear1           = ini.GetBoolValue("OPTIONS", "AutoGear1", false);
+	AutoLookBack        = ini.GetBoolValue("OPTIONS", "AutoLookBack", false);
+	ThrottleStart       = ini.GetBoolValue("OPTIONS", "ThrottleStart", false);
+
 	UITips              = ini.GetBoolValue("OPTIONS", "UITips", true);
 	UITips_OnlyNeutral  = ini.GetBoolValue("OPTIONS", "UITips_OnlyNeutral", false);
 	UITips_X            = ini.GetDoubleValue("OPTIONS", "UITips_X", 95.0) / 100.0f;

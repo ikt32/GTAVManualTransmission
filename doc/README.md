@@ -268,6 +268,14 @@ Turn this on to automatically look back while in the reverse gear.
 * `0`: No change
 * `1`: Look back automatically
 
+### `ThrottleStart` : `0` or `1`
+Turn this on to be able to start the engine by pressing clutch + throttle,
+like in some other games. This works alongside the usual button to start
+the engine.
+
+* `0`: Can only start engine with button
+* `1`: Can start engine with button and clutch + throttle
+
 ### `UITips` : `0` or `1`
 This is a simple gear display, which might be of help to determine if you’re
 in Neutral or not. It also indicates if the gear you're in is the top gear with
