@@ -2,8 +2,7 @@
 
 #include "Input/ScriptControls.hpp"
 
-// blah
-#define SETTINGSFILE "./Gears.ini"
+#define SETTINGSGENERAL "./ManualTransmission/settings_general.ini"
 #define SETTINGSWHEEL "./ManualTransmission/settings_wheel.ini"
 #define CORRECTVERSION 420
 

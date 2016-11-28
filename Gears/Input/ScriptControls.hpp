@@ -111,6 +111,7 @@ public:
 	
 	std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
 	std::array<std::string, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButtonDevices = {};
+	std::string WheelToKeyDevice = "";
 	std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
 	
 	std::array<std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
