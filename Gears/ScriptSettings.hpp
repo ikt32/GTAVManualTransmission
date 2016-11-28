@@ -3,8 +3,10 @@
 #include "Input/ScriptControls.hpp"
 
 #define SETTINGSGENERAL "./ManualTransmission/settings_general.ini"
+#define CORRECTVGENERAL 420
+
 #define SETTINGSWHEEL "./ManualTransmission/settings_wheel.ini"
-#define CORRECTVERSION 420
+#define CORRECTVWHEEL 420
 
 class ScriptControls;
 
@@ -13,7 +15,7 @@ public:
 	ScriptSettings();
 	void Read(ScriptControls* scriptControl);
 	void Save() const;
-	bool IsCorrectVersion() const;
+	void IsCorrectVersion() const;
 
 	// [OPTIONS]
 	bool EnableManual = true;
@@ -70,7 +72,8 @@ public:
 	float SteerAngleAlt = 180.0f;
 	bool ThrottleStart = false;
 private:
-	int INIver = 0;
+	int settings_general_version = 0;
+	int settings_wheel_version = 0;
 	void parseSettingsWheel(ScriptControls *scriptControl);
 
 };

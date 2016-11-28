@@ -98,8 +98,8 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	// [DEBUG]
 	Debug = settingsGeneral.GetBoolValue("DEBUG", "Info", false);
 	
-	// .ini version check
-	INIver = settingsGeneral.GetLongValue("DEBUG", "INIver", 0);
+	// [FILEVERSION]
+	settings_general_version = settingsGeneral.GetLongValue("FILEVERSION", "VERSION", 0);
 
 #pragma warning(pop)
 }
@@ -113,8 +113,11 @@ void ScriptSettings::Save() const {
 	ini.SaveFile(SETTINGSGENERAL);
 }
 
-bool ScriptSettings::IsCorrectVersion() const {
-	return CORRECTVERSION == INIver;
+void ScriptSettings::IsCorrectVersion() const {
+	if (settings_general_version != CORRECTVGENERAL)
+		throw std::runtime_error("Wrong settings_general.ini version");
+	if (settings_wheel_version != CORRECTVWHEEL)
+		throw std::runtime_error("Wrong settings_wheel.ini version");
 }
 
 void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
