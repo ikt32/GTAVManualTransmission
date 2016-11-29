@@ -105,6 +105,7 @@ void update() {
 	if (vehData.Class == VehicleData::VehicleClass::Bike && settings.SimpleBike) {
 		ignoreClutch = true;
 	}
+	// Clutch pedal serves as rudder control
 	if (vehData.Class == VehicleData::VehicleClass::Plane) {
 		ignoreClutch = false;
 	}
@@ -1134,13 +1135,10 @@ void handleVehicleButtons() {
 		return;
 	}
 
-	// This is an axis but idk where I should have put it...
 	if (controls.HandbrakeVal > 0.1f) {
 		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, controls.HandbrakeVal);
 	}
-
 	if (controls.ButtonIn(ScriptControls::WheelControlType::Handbrake)) {
-		//VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, true);
 		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
 	}
 	if (controls.ButtonIn(ScriptControls::WheelControlType::Horn)) {

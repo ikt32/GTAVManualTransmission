@@ -43,11 +43,11 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
 			break;
 		}
 		case Wheel: {
-			int RawT = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]));
-			int RawB = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Brake)]));
-			int RawC = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]));
-			int RawS = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]));
-			int RawH = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Handbrake)]));
+			int RawT = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]),);
+			int RawB = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Brake)]),);
+			int RawC = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]),);
+			int RawS = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]),);
+			int RawH = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Handbrake)]),);
 			
 			// You're outta luck if you have a single-axis 3-pedal freak combo or something
 			if (WheelAxes[static_cast<int>(WheelAxisType::Throttle)] == WheelAxes[static_cast<int>(WheelAxisType::Brake)]) {
@@ -55,21 +55,18 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
 				int pivot;
 				if (ThrottleUp == BrakeUp) {
 					pivot = BrakeUp;
-				} else
-				if (ThrottleDown == BrakeUp) {
+				} else if (ThrottleDown == BrakeUp) {
 					pivot = BrakeUp;
-				} else
-				if (ThrottleUp == BrakeDown) {
+				} else if (ThrottleUp == BrakeDown) {
 					pivot = BrakeDown;
-				} else
-				if (ThrottleDown == BrakeDown) {
+				} else if (ThrottleDown == BrakeDown) {
 					pivot = BrakeDown;
 				} else {
-					// you fucked up bro
+					// something to notify the user the should fix their thing
 					return;
 				}
 
-				// oh my god fucking kill me I'm too dumb for this shit
+				// there has to be a better way
 				if (pivot == BrakeUp) {
 					if (BrakeDown > pivot) { // TMIN = BMIN
 						// 0 TMAX < TMIN/PIVOT/BMIN < BMAX 65535
@@ -159,7 +156,7 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
 	if (WheelDI.IsConnected()) {
 		// Oh my god I hate single-axis throttle/brake steering wheels
 		// Looking at you DFGT.
-		int RawT = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]));
+		int RawT = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]),);
 		if (WheelAxes[static_cast<int>(WheelAxisType::Throttle)] == WheelAxes[static_cast<int>(WheelAxisType::Brake)]) {
 			
 			// get throttle range

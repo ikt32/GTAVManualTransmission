@@ -60,20 +60,21 @@ public:
 	int TargetSpeed = 10; // TargetSpeed in m/s
 	float FFPhysics = 1.0f;
 	float DetailStrength = 100.0f;
+	bool AltControls = false;
+	bool ThrottleStart = false;
 
 	// [WHEELAXIS]
 	float SteerAngleMax = 900.0f;
 	float SteerAngleCar = 720.0f;
 	float SteerAngleBike = 180.0f;
+	float SteerAngleAlt = 180.0f;
 
 	// [DEBUG]
 	bool Debug = false;
-	bool AltControls = false;
-	float SteerAngleAlt = 180.0f;
-	bool ThrottleStart = false;
 private:
 	int settings_general_version = 0;
 	int settings_wheel_version = 0;
+	void mapDevice2GUID(ScriptControls *scriptControl);
 	void parseSettingsWheel(ScriptControls *scriptControl);
 
 };

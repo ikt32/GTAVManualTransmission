@@ -1,15 +1,12 @@
 #include "ScriptSettings.hpp"
 #include <Windows.h>
 
-#include "Util/Logger.hpp"
 #include <string>
 #include "Input/keyboard.h"
 #include "Util/simpleini/SimpleIni.h"
 
 ScriptSettings::ScriptSettings() {
 }
-
-
 
 void ScriptSettings::Read(ScriptControls* scriptControl) {
 #pragma warning(push)
@@ -108,7 +105,7 @@ void ScriptSettings::Save() const {
 	CSimpleIniA ini;
 	ini.SetUnicode();
 	ini.LoadFile(SETTINGSGENERAL);
-	ini.SetValue("OPTIONS", "Enable", EnableManual ? " 1" : " 0");
+	ini.SetBoolValue("OPTIONS", "Enable", EnableManual);
 	ini.SetLongValue("OPTIONS", "ShiftMode", ShiftMode);
 	ini.SaveFile(SETTINGSGENERAL);
 }
@@ -118,6 +115,17 @@ void ScriptSettings::IsCorrectVersion() const {
 		throw std::runtime_error("Wrong settings_general.ini version");
 	if (settings_wheel_version != CORRECTVWHEEL)
 		throw std::runtime_error("Wrong settings_wheel.ini version");
+}
+
+void ScriptSettings::mapDevice2GUID(ScriptControls *scriptControl) {
+	for (int i=0; i<static_cast<int>(ScriptControls::WheelAxisType::SIZEOF_WheelAxisType);i++)
+	{
+		for ()
+	}
+
+	scriptControl->WheelAxesGUIDs;
+
+
 }
 
 void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
@@ -140,10 +148,11 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	DetailStrength = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DetailStrength", 100.0) / 1.0f;
 
 
-	// So the settings reader should not give a singlest FUCK about DirectInput mumbo jump
+	// The DEVICE in the following sections should only be read by the directinput control parts
 	// I'll need to write a program that fills these or at least configures this part of the file
 	// idk somebody buy me a fancy fanatec set of stuff so i can pretend to care
 	// i need a handbrake
+	// santa pls
 
 	// [INPUT_DEVICES]
 	bool searching = true;
@@ -168,8 +177,6 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 		guids.emplace_back(currDevice, bstrGuid);
 	}
 
-	// I fucking hate this
-	// THERE HAS TO BE A BETTER WAY RIGHT send help
 	// [TOGGLE_MOD]
 	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::Toggle)] =
 		settingsWheel.GetValue("TOGGLE_MOD", "DEVICE", "");
@@ -341,4 +348,5 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	// [FILEVERSION]
 	settings_general_version = settingsWheel.GetLongValue("FILEVERSION", "VERSION", 0);
 
+	mapDevice2GUID(scriptControl);
 }

@@ -27,7 +27,6 @@ bool WheelDirectInput::InitWheel(std::string ffAxis) {
 		logger.Write("Found " + std::to_string(nEntry) + " device(s)");
 
 		for (int i = 0; i < nEntry; i++) {
-			//entries.push_back(djs.getEntry(i));
 			std::wstring wDevName = djs.getEntry(i)->diDeviceInstance.tszInstanceName;
 			GUID guid = djs.getEntry(i)->diDeviceInstance.guidInstance;
 			LPOLESTR* bstrGuid;
@@ -39,10 +38,16 @@ bool WheelDirectInput::InitWheel(std::string ffAxis) {
 
 		djs.update();
 
-
 		if (nEntry > 0) {
-			auto e = djs.getEntry(0);
-			return InitFFB(e,ffAxis);
+			std::pair<DIJOYSTATE2, GUID>
+
+
+			const DiJoyStick::Entry* e;// = djs.getEntry(0);
+			for (int i = 0; i < nEntry; i++) {
+				auto tempEntry = djs.getEntry(i);
+				GUID guid = tempEntry->diDeviceInstance.guidInstance;
+			}
+			return InitFFB(e,ffAxis,);
 		}
 	}
 	logger.Write("No wheel detected");
@@ -50,7 +55,7 @@ bool WheelDirectInput::InitWheel(std::string ffAxis) {
 }
 
 
-bool WheelDirectInput::InitFFB(const DiJoyStick::Entry *e, std::string ffAxis) {
+bool WheelDirectInput::InitFFB(const DiJoyStick::Entry *e, std::string ffAxis, GUID device) {
 	logger.Write("Initializing force feedback");
 	e->diDevice->Unacquire();
 	HRESULT hr;
@@ -104,9 +109,15 @@ bool WheelDirectInput::InitFFB(const DiJoyStick::Entry *e, std::string ffAxis) {
 void WheelDirectInput::UpdateState() {
 	djs.update();
 
+	for(int i = 0; i < djs.getEntryCount(); i++) {
+		if (djs.getEntry(i)) {
+			
+		}
+	}
+
 	const DiJoyStick::Entry *e = djs.getEntry(0);
 	if (e) {
-		JoyState = e->joystate;
+		JoyStates = e->joystate;
 	}
 }
 
@@ -127,7 +138,7 @@ bool WheelDirectInput::IsButtonPressed(int buttonType) {
 	if (buttonType > 127) {
 		switch (buttonType) {
 			case N:
-				if (JoyState.rgdwPOV[0] == 0) {
+				if (JoyStates.rgdwPOV[0] == 0) {
 					return true;
 				}
 			case NE:
@@ -137,13 +148,13 @@ bool WheelDirectInput::IsButtonPressed(int buttonType) {
 			case SW:
 			case W:
 			case NW:
-				if (buttonType == JoyState.rgdwPOV[0])
+				if (buttonType == JoyStates.rgdwPOV[0])
 					return true;
 			default:
 				return false;
 		}
 	}
-	if (JoyState.rgbButtons[buttonType])
+	if (JoyStates.rgbButtons[buttonType])
 		return true;
 	return false;
 }
@@ -321,9 +332,6 @@ HRESULT WheelDirectInput::SetConstantForce(int force) const {
 }
 
 WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString) {
-	if (axisString == "UNKNOWN_AXIS")
-		return UNKNOWN_AXIS;
-
 	for (int i = 0; i < SIZEOF_DIAxis; i++) {
 		if (axisString == DIAxisHelper[i]) {
 			return static_cast<DIAxis>(i);
@@ -333,18 +341,18 @@ WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString)
 }
 
 
-int WheelDirectInput::GetAxisValue(DIAxis axis) {
+int WheelDirectInput::GetAxisValue(DIAxis axis, GUID guid) {
 	if (!IsConnected())
 		return 0;
 	switch (axis) {
-		case lX: return JoyState.lX;
-		case lY: return JoyState.lY;
-		case lZ: return JoyState.lZ;
-		case lRx: return JoyState.lRx;
-		case lRy: return JoyState.lRy;
-		case lRz: return JoyState.lRz;
-		case rglSlider0: return JoyState.rglSlider[0];
-		case rglSlider1: return JoyState.rglSlider[1];
+		case lX: return JoyStates.lX;
+		case lY: return JoyStates.lY;
+		case lZ: return JoyStates.lZ;
+		case lRx: return JoyStates.lRx;
+		case lRy: return JoyStates.lRy;
+		case lRz: return JoyStates.lRz;
+		case rglSlider0: return JoyStates.rglSlider[0];
+		case rglSlider1: return JoyStates.rglSlider[1];
 		default: return 0;
 	}
 }
@@ -352,7 +360,7 @@ int WheelDirectInput::GetAxisValue(DIAxis axis) {
 // Returns in units/s
 float WheelDirectInput::GetAxisSpeed(DIAxis axis) {
 	auto time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
-	auto position = GetAxisValue(axis);
+	auto position = GetAxisValue(axis,);
 	auto result = (position - prevPosition) / ((time - prevTime) / 1e9f);
 
 	prevTime = time;
