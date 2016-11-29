@@ -1352,11 +1352,13 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	}
 
 	// steerSpeed is to dampen the steering wheel
-	auto steerSpeed = controls.WheelDI.GetAxisSpeed(
-		controls.WheelDI.StringToAxis(
-			controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)]
-		)
-	)/20;
+	auto steerSpeed =
+		controls.WheelDI.GetAxisSpeed(
+			controls.WheelDI.StringToAxis(
+				controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)]
+			),
+			controls.WheelAxesDevices[static_cast<int>(ScriptControls::WheelAxisType::Steer)]
+		) / 20; // wtf ikt
 
 	/*                    a                                        v^2
 	 * Because G Force = ---- and a = v * omega, verified with a = ---   using a speedo and 

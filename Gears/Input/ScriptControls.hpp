@@ -110,13 +110,13 @@ public:
 	std::array<int, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
 	
 	std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
-	std::array<std::string, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButtonDevices = {};
+	std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButtonDevices = {};
 	std::array<GUID, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelButtonGUIDs = {};
 	std::string WheelToKeyDevice = "";
 	std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
 	
 	std::array<std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
-	std::array<std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxesDevices = {};
+	std::array<int, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxesDevices = {};
 	std::array<GUID, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxesGUIDs = {};
 	
 	int CToggleTime    = 1000;

@@ -11,10 +11,7 @@ WheelDirectInput::WheelDirectInput() :
 	pCFEffect{nullptr},
 	pFREffect{nullptr} { }
 
-WheelDirectInput::~WheelDirectInput() {}
-
-
-bool WheelDirectInput::InitWheel(std::string ffAxis) {
+bool WheelDirectInput::InitWheel(DIAxis ffAxis) {
 	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(nullptr),
 		DIRECTINPUT_VERSION,
 		IID_IDirectInput8,
@@ -27,36 +24,65 @@ bool WheelDirectInput::InitWheel(std::string ffAxis) {
 		logger.Write("Found " + std::to_string(nEntry) + " device(s)");
 
 		for (int i = 0; i < nEntry; i++) {
-			std::wstring wDevName = djs.getEntry(i)->diDeviceInstance.tszInstanceName;
-			GUID guid = djs.getEntry(i)->diDeviceInstance.guidInstance;
-			LPOLESTR* bstrGuid;
-			StringFromCLSID(guid, bstrGuid);
-			std::wstring wGuid = std::wstring(*bstrGuid);
+			auto device = djs.getEntry(i);
+			std::wstring wDevName = device->diDeviceInstance.tszInstanceName;
 			logger.Write("Device: " + std::string(wDevName.begin(), wDevName.end()));
+
+			GUID guid = device->diDeviceInstance.guidInstance;
+			//LPOLESTR* bstrGuid = nullptr;
+			/*StringFromCLSID(guid, bstrGuid);
+			std::wstring wGuid = std::wstring(*bstrGuid);
+			logger.Write("GUID:   " + std::string(wGuid.begin(), wGuid.end()));*/
+			wchar_t szGuidW[40] = { 0 };
+			char szGuidA[40] = { 0 };
+			CoCreateGuid(&guid);
+			StringFromGUID2(guid, szGuidW, 40);
+			std::wstring wGuid = szGuidW;//std::wstring(szGuidW);
 			logger.Write("GUID:   " + std::string(wGuid.begin(), wGuid.end()));
 		}
 
 		djs.update();
 
-		if (nEntry > 0) {
-			std::pair<DIJOYSTATE2, GUID>
-
-
-			const DiJoyStick::Entry* e;// = djs.getEntry(0);
+		/*if (nEntry > 0) {
 			for (int i = 0; i < nEntry; i++) {
 				auto tempEntry = djs.getEntry(i);
-				GUID guid = tempEntry->diDeviceInstance.guidInstance;
+				if (ffGUID == tempEntry->diDeviceInstance.guidInstance) {
+					return InitFFB(tempEntry, ffAxis);
+				}
 			}
-			return InitFFB(e,ffAxis,);
-		}
+		}*/
+		return true;
 	}
 	logger.Write("No wheel detected");
 	return false;
 }
 
+// if an empty GUID is given, just try the first device
+const DiJoyStick::Entry *WheelDirectInput::findEntryFromGUID(GUID guid) {
+	int nEntry = djs.getEntryCount();
+	if (nEntry > 0) {
+		if (guid == GUID_NULL)
+			return  djs.getEntry(0);
 
-bool WheelDirectInput::InitFFB(const DiJoyStick::Entry *e, std::string ffAxis, GUID device) {
-	logger.Write("Initializing force feedback");
+		for (int i = 0; i < nEntry; i++) {
+			auto tempEntry = djs.getEntry(i);
+			if (guid == tempEntry->diDeviceInstance.guidInstance) {
+				return tempEntry;
+			}
+		}
+	}
+	return nullptr;
+}
+
+bool WheelDirectInput::InitFFB(GUID guid, WheelDirectInput::DIAxis ffAxis) {
+	logger.Write("Initializing force feedback device");
+	auto e = findEntryFromGUID(guid);
+	
+	if (!e) {
+		logger.Write("Force feedback device not found");
+		return false;
+	}
+
 	e->diDevice->Unacquire();
 	HRESULT hr;
 	if (FAILED(hr = e->diDevice->SetCooperativeLevel(
@@ -92,9 +118,9 @@ bool WheelDirectInput::InitFFB(const DiJoyStick::Entry *e, std::string ffAxis, G
 		logger.Write("HWND: " + ss.str());
 		return false;
 	}
-	logger.Write("Initializing force feedback effect on axis " + ffAxis);
-	if (!CreateConstantForceEffect(ffAxis)) {
-		logger.Write("Error initializing FF - wrong axis?");
+	logger.Write("Initializing force feedback effect");
+	if (!CreateConstantForceEffect(e, ffAxis)) {
+		logger.Write("That steering axis doesn't support force feedback");
 		NoFeedback = true;
 		return false;
 	}
@@ -237,25 +263,25 @@ void WheelDirectInput::UpdateButtonChangeStates() {
 	}
 }
 
-bool WheelDirectInput::CreateConstantForceEffect(std::string &axis) {
+bool WheelDirectInput::CreateConstantForceEffect(const DiJoyStick::Entry *e, WheelDirectInput::DIAxis ffAxis) {
 	if (NoFeedback)
 		return false;
 
-	DWORD ffAxis;
-	if (axis == "lX") {
-		ffAxis = DIJOFS_X;
+	DWORD axis;
+	if (ffAxis == lX) {
+		axis = DIJOFS_X;
 	}
-	else if (axis == "lY") {
-		ffAxis = DIJOFS_Y;
+	else if (ffAxis == lY) {
+		axis = DIJOFS_Y;
 	}
-	else if (axis == "lZ") {
-		ffAxis = DIJOFS_Z;
+	else if (ffAxis == lZ) {
+		axis = DIJOFS_Z;
 	}
 	else {
 		return false;
 	}
 
-	DWORD rgdwAxes[1] = {ffAxis};
+	DWORD rgdwAxes[1] = { axis };
 	LONG rglDirection[1] = {0};
 	DICONSTANTFORCE cf = {0};
 
@@ -276,7 +302,6 @@ bool WheelDirectInput::CreateConstantForceEffect(std::string &axis) {
 	eff.lpvTypeSpecificParams = &cf;
 	eff.dwStartDelay = 0;
 
-	const DiJoyStick::Entry *e = djs.getEntry(0);
 	if (e) {
 		e->diDevice->CreateEffect(
 			 GUID_ConstantForce,
@@ -341,7 +366,7 @@ WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString)
 }
 
 
-int WheelDirectInput::GetAxisValue(DIAxis axis, GUID guid) {
+int WheelDirectInput::GetAxisValue(DIAxis axis, int device) {
 	if (!IsConnected())
 		return 0;
 	switch (axis) {
@@ -358,9 +383,9 @@ int WheelDirectInput::GetAxisValue(DIAxis axis, GUID guid) {
 }
 
 // Returns in units/s
-float WheelDirectInput::GetAxisSpeed(DIAxis axis) {
+float WheelDirectInput::GetAxisSpeed(DIAxis axis, int device) {
 	auto time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
-	auto position = GetAxisValue(axis,);
+	auto position = GetAxisValue(axis , device);
 	auto result = (position - prevPosition) / ((time - prevTime) / 1e9f);
 
 	prevTime = time;

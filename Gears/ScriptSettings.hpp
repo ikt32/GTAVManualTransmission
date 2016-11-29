@@ -74,7 +74,7 @@ public:
 private:
 	int settings_general_version = 0;
 	int settings_wheel_version = 0;
-	void mapDevice2GUID(ScriptControls *scriptControl);
 	void parseSettingsWheel(ScriptControls *scriptControl);
+	int nDevices;
 
 };
