@@ -101,7 +101,33 @@ int main()
 		SetConsoleCursorPosition(hConsole, coordScreen);
 		di.UpdateState();
 		di.UpdateButtonChangeStates();
-		std::cout << di.GetAxisValue(WheelDirectInput::lX, 0);
+		std::cout << "Axes:\n";
+		for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis; i++) {
+			std::cout << "    " << di.DIAxisHelper[i] << ": " << di.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), 0) << "\n";
+		}
+		
+		std::cout << "Buttons: ";
+		for (int i = 0; i < 255; i++) {
+			if (di.IsButtonPressed(i))
+				std::cout << i << " ";
+		}
+		std::cout << "\n";
+
+		std::cout << "POV hat: ";
+		std::vector<int> directions;
+		directions.push_back(WheelDirectInput::POV::N);
+		directions.push_back(WheelDirectInput::POV::NE);
+		directions.push_back(WheelDirectInput::POV::E);
+		directions.push_back(WheelDirectInput::POV::SE);
+		directions.push_back(WheelDirectInput::POV::S);
+		directions.push_back(WheelDirectInput::POV::SW);
+		directions.push_back(WheelDirectInput::POV::W);
+		directions.push_back(WheelDirectInput::POV::NW);
+		for (auto d : directions) {
+			if (di.IsButtonPressed(d))
+				std::cout << d << " ";
+		}
+
 
 		SetConsoleCursorPosition(hConsole, { 0 , csbi.srWindow.Bottom });
 		std::cout << "Hit any key to exit";
