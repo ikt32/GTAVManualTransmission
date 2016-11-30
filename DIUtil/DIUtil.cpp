@@ -17,11 +17,12 @@ int main()
 	std::string axis = "lX";
 	di.InitWheel(di.StringToAxis(axis));
 
-	// the fuck, Microsoft?
-	LPWSTR clsidStr = LPWSTR("{F69653F0-19B9-11E6-8002-444553540000}");
+	std::string guidStr = "{F69653F0-19B9-11E6-8002-444553540000}";
+	std::wstring clsidStr;
+	clsidStr.assign(guidStr.begin(), guidStr.end());
 
 	GUID guid;
-	HRESULT hr = CLSIDFromString(clsidStr, (LPCLSID)&guid);
+	HRESULT hr = CLSIDFromString(clsidStr.c_str(), &guid);
 	if (hr != NOERROR) {
 		std::string errStr;
 		switch (hr) {
