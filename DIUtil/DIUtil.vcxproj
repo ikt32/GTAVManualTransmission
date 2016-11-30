@@ -147,20 +147,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\Gears\Input\DiJoyStick.h" />
     <ClInclude Include="..\Gears\Input\WheelDirectInput.hpp" />
     <ClInclude Include="..\Gears\Util\Logger.hpp" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Gears\Input\WheelDirectInput.cpp" />
     <ClCompile Include="..\Gears\Util\Logger.cpp" />
     <ClCompile Include="DIUtil.cpp" />
-    <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
