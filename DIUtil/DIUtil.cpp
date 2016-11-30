@@ -49,6 +49,14 @@ void cls(HANDLE hConsole)
 	return;
 }
 
+void setCursorPosition(int x, int y)
+{
+	static const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	std::cout.flush();
+	COORD coord = { (SHORT)x, (SHORT)y };
+	SetConsoleCursorPosition(hOut, coord);
+}
+
 int main()
 {
 	Logger logger(LOGFILE);
@@ -95,14 +103,14 @@ int main()
 
 	while (!_kbhit())
 	{
+		cls(hConsole);
 		CONSOLE_SCREEN_BUFFER_INFO csbi;
-		COORD coordScreen = { 0, 0 };
 		GetConsoleScreenBufferInfo(hConsole, &csbi);
-		SetConsoleCursorPosition(hConsole, coordScreen);
+		setCursorPosition(0, 0);
 		di.UpdateState();
 		di.UpdateButtonChangeStates();
 		std::cout << "Axes:\n";
-		for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis; i++) {
+		for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis-1; i++) {
 			std::cout << "    " << di.DIAxisHelper[i] << ": " << di.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), 0) << "\n";
 		}
 		
@@ -129,11 +137,9 @@ int main()
 		}
 
 
-		SetConsoleCursorPosition(hConsole, { 0 , csbi.srWindow.Bottom });
+		setCursorPosition(0 , csbi.srWindow.Bottom);
 		std::cout << "Hit any key to exit";
-		std::cout.flush();
 		Sleep(1);
-		cls(hConsole);
 	}
 	std::cin.get();
     return 0;
