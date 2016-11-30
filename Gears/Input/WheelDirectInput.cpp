@@ -29,13 +29,9 @@ bool WheelDirectInput::InitWheel(DIAxis ffAxis) {
 			logger.Write("Device: " + std::string(wDevName.begin(), wDevName.end()));
 
 			GUID guid = device->diDeviceInstance.guidInstance;
-			//LPOLESTR* bstrGuid = nullptr;
-			/*StringFromCLSID(guid, bstrGuid);
-			std::wstring wGuid = std::wstring(*bstrGuid);
-			logger.Write("GUID:   " + std::string(wGuid.begin(), wGuid.end()));*/
 			wchar_t szGuidW[40] = { 0 };
 			char szGuidA[40] = { 0 };
-			CoCreateGuid(&guid);
+			//CoCreateGuid(&guid);
 			StringFromGUID2(guid, szGuidW, 40);
 			std::wstring wGuid = szGuidW;//std::wstring(szGuidW);
 			logger.Write("GUID:   " + std::string(wGuid.begin(), wGuid.end()));
@@ -61,8 +57,10 @@ bool WheelDirectInput::InitWheel(DIAxis ffAxis) {
 const DiJoyStick::Entry *WheelDirectInput::findEntryFromGUID(GUID guid) {
 	int nEntry = djs.getEntryCount();
 	if (nEntry > 0) {
-		if (guid == GUID_NULL)
+		if (guid == GUID_NULL) {
+			logger.Write("No GUID specified");
 			return  djs.getEntry(0);
+		}
 
 		for (int i = 0; i < nEntry; i++) {
 			auto tempEntry = djs.getEntry(i);
