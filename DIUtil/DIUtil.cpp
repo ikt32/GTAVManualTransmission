@@ -1,10 +1,53 @@
 // DIUtil.cpp : Defines the entry point for the console application.
 //
 
-//#include "stdafx.h"
+#include <conio.h>  
+#include <stdio.h>  
 #include <iostream>
 #include "../Gears/Input/WheelDirectInput.hpp"
 
+/* Standard error macro for reporting API errors */
+#define PERR(bSuccess, api){if(!(bSuccess)) printf("%s:Error %d from %s on line %d\n", __FILE__, GetLastError(), api, __LINE__);}
+
+void cls(HANDLE hConsole)
+{
+	COORD coordScreen = { 0, 0 };    /* here's where we'll home the
+									 cursor */
+	BOOL bSuccess;
+	DWORD cCharsWritten;
+	CONSOLE_SCREEN_BUFFER_INFO csbi; /* to get buffer info */
+	DWORD dwConSize;                 /* number of character cells in
+									 the current buffer */
+
+									 /* get the number of character cells in the current buffer */
+
+	bSuccess = GetConsoleScreenBufferInfo(hConsole, &csbi);
+	PERR(bSuccess, "GetConsoleScreenBufferInfo");
+	dwConSize = csbi.dwSize.X * csbi.dwSize.Y;
+
+	/* fill the entire screen with blanks */
+
+	bSuccess = FillConsoleOutputCharacter(hConsole, (TCHAR) ' ',
+										  dwConSize, coordScreen, &cCharsWritten);
+	PERR(bSuccess, "FillConsoleOutputCharacter");
+
+	/* get the current text attribute */
+
+	bSuccess = GetConsoleScreenBufferInfo(hConsole, &csbi);
+	PERR(bSuccess, "ConsoleScreenBufferInfo");
+
+	/* now set the buffer's attributes accordingly */
+
+	bSuccess = FillConsoleOutputAttribute(hConsole, csbi.wAttributes,
+										  dwConSize, coordScreen, &cCharsWritten);
+	PERR(bSuccess, "FillConsoleOutputAttribute");
+
+	/* put the cursor at (0, 0) */
+
+	bSuccess = SetConsoleCursorPosition(hConsole, coordScreen);
+	PERR(bSuccess, "SetConsoleCursorPosition");
+	return;
+}
 
 int main()
 {
@@ -43,21 +86,29 @@ int main()
 	}
 	di.InitFFB(guid, di.StringToAxis(axis));
 
+	unsigned long long i = 0;
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_CURSOR_INFO     cursorInfo;
+	GetConsoleCursorInfo(hConsole, &cursorInfo);
+	cursorInfo.bVisible = false; 
+	SetConsoleCursorInfo(hConsole, &cursorInfo);
 
-	/*GUID guid = { MAKELONG(0x045E, 0x028E), 0x0000, 0x0000, { 0x00, 0x00, 0x50, 0x49, 0x44, 0x56, 0x49, 0x44 } };
-	LPOLESTR* bstrGuid;
-	StringFromCLSID(guid, bstrGuid);
-	std::wstring wGuid = std::wstring(*bstrGuid);
-	logger.Write("360 :   " + std::string(wGuid.begin(), wGuid.end()));*/
+	while (!_kbhit())
+	{
+		CONSOLE_SCREEN_BUFFER_INFO csbi;
+		COORD coordScreen = { 0, 0 };
+		GetConsoleScreenBufferInfo(hConsole, &csbi);
+		SetConsoleCursorPosition(hConsole, coordScreen);
+		di.UpdateState();
+		di.UpdateButtonChangeStates();
+		std::cout << di.GetAxisValue(WheelDirectInput::lX, 0);
 
-	//while (true) {
-	//	std::cout << "Test\n";
-	//	// Do stuff
-
-	//	if (std::cin.get())
-	//		break;
-	//}
+		SetConsoleCursorPosition(hConsole, { 0 , csbi.srWindow.Bottom });
+		std::cout << "Hit any key to exit";
+		std::cout.flush();
+		Sleep(1);
+		cls(hConsole);
+	}
 	std::cin.get();
     return 0;
 }
-
