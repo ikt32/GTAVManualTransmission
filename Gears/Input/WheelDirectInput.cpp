@@ -58,7 +58,7 @@ const DiJoyStick::Entry *WheelDirectInput::findEntryFromGUID(GUID guid) {
 	int nEntry = djs.getEntryCount();
 	if (nEntry > 0) {
 		if (guid == GUID_NULL) {
-			logger.Write("No GUID specified");
+			logger.Write("No GUID specified, using first detected device");
 			return  djs.getEntry(0);
 		}
 
