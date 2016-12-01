@@ -98,12 +98,6 @@ public:
 	float SteerVal = 0.5f;
 	float HandbrakeVal = 0.0f;
 
-	// Perceived accelerator value
-	int AccelValGTA = 0;
-
-	// Perceived accelerator value, float
-	float AccelValGTAf = 0.0f;
-
 	// Values are filled by ScriptSettings
 	std::array<std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
 	

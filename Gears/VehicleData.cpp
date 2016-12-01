@@ -1,6 +1,7 @@
 #include "../../ScriptHookV_SDK/inc/natives.h"
 
 #include "VehicleData.hpp"
+#include "../../ScriptHookV_SDK/inc/enums.h"
 
 VehicleData::VehicleData() {
 	zeroSamples();
@@ -74,6 +75,8 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 		WheelCompressions[0] = ext.GetWheelsCompression(vehicle).at(0);
 		WheelCompressions[1] = ext.GetWheelsCompression(vehicle).at(1);
 	}
+
+	ControlAccelerate = (CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate) - 127) / 127.0f;
 }
 
 VehicleData::VehicleClass VehicleData::findClass(Hash model) {

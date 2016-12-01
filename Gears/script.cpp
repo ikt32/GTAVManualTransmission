@@ -863,7 +863,7 @@ void functionEngStall() {
 
 void functionEngDamage() {
 	if (vehData.Rpm > 0.98f &&
-		controls.AccelValGTAf > 0.99f) {
+		vehData.ControlAccelerate > 0.99f) {
 		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
 			vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (settings.RPMDamage));
 	}
@@ -900,9 +900,9 @@ void fakeRev() {
 		rpmValTemp *= 2.0f;
 	}
 	rpmVal =
-			vehData.Rpm + // Base value
-			rpmValTemp + // Keep it constant
-			controls.AccelValGTAf * accelRatio; // Addition value, depends on delta T
+		vehData.Rpm + // Base value
+		rpmValTemp + // Keep it constant
+		vehData.ControlAccelerate * accelRatio; // Addition value, depends on delta T
 
 	ext.SetCurrentRPM(vehicle, rpmVal);
 }
@@ -937,10 +937,10 @@ void handleRPM() {
 	*/
 	if (vehData.CurrGear > 1) {
 		// When pressing clutch and throttle, handle clutch and RPM
-		if (controls.ClutchVal > 0.4f && controls.AccelValGTAf > 0.05f &&
+		if (controls.ClutchVal > 0.4f && vehData.ControlAccelerate > 0.05f &&
 		                                 !vehData.SimulatedNeutral) {
 			fakeRev();
-			ext.SetThrottle(vehicle, controls.AccelValGTAf);
+			ext.SetThrottle(vehicle, vehData.ControlAccelerate);
 			float tempVal = (1.0f - controls.ClutchVal) * 0.4f + 0.6f;
 			if (controls.ClutchVal > 0.95) {
 				tempVal = -0.5f;

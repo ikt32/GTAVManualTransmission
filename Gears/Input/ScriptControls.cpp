@@ -1,8 +1,6 @@
 #include "ScriptControls.hpp"
 
 #include <Windows.h>
-#include "../../../ScriptHookV_SDK/inc/natives.h"
-#include "../../../ScriptHookV_SDK/inc/enums.h"
 #include "keyboard.h"
 
 ScriptControls::ScriptControls(): controller{1},
@@ -137,10 +135,6 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
 	}
 	if (ignoreClutch)
 		ClutchVal = 0.0f;
-
-	AccelValGTA = CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate);
-	AccelValGTAf = (AccelValGTA - 127) / 127.0f;
-
 }
 
 // Limitation: Only works for hardcoded input types. Currently throttle.

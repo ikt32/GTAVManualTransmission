@@ -78,6 +78,10 @@ public:
 	// Should be called after getAccelerationVectors has been called in a loop
 	Vector3 getAccelerationVectorsAverage() const;
 
+	// Moved out of ScriptControls to make it standalone
+	// Perceived accelerator value, float
+	float ControlAccelerate = 0.0f;
+
 private:
 	std::array<char *, 20> badModelNames = {
 		"BENSON",
