@@ -147,8 +147,8 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	int it = 0;
 	std::vector<std::pair<std::string, GUID>> guids;
 	while (true) {
-		std::string currDevIndex = "DEV" + it;
-		std::string currGuidIndex = "GUID" + it;
+		std::string currDevIndex = std::string("DEV") + std::to_string(it);
+		std::string currGuidIndex = std::string("GUID") + std::to_string(it);
 
 		std::string currDevice = settingsWheel.GetValue("INPUT_DEVICES", currDevIndex.c_str(), "");
 		if (currDevice == "")
