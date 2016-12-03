@@ -7,11 +7,11 @@
 #include <chrono>
 #include <vector>
 
-WheelDirectInput::WheelDirectInput() :
-	pCFEffect{nullptr},
-	pFREffect{nullptr} { }
+WheelDirectInput::WheelDirectInput() : logger(LOGFILE),
+                                       pCFEffect{nullptr},
+                                       pFREffect{nullptr} { }
 
-bool WheelDirectInput::InitWheel(DIAxis ffAxis) {
+bool WheelDirectInput::InitWheel() {
 	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(nullptr),
 		DIRECTINPUT_VERSION,
 		IID_IDirectInput8,
@@ -30,23 +30,12 @@ bool WheelDirectInput::InitWheel(DIAxis ffAxis) {
 
 			GUID guid = device->diDeviceInstance.guidInstance;
 			wchar_t szGuidW[40] = { 0 };
-			char szGuidA[40] = { 0 };
-			//CoCreateGuid(&guid);
 			StringFromGUID2(guid, szGuidW, 40);
 			std::wstring wGuid = szGuidW;//std::wstring(szGuidW);
 			logger.Write("GUID:   " + std::string(wGuid.begin(), wGuid.end()));
 		}
 
 		djs.update();
-
-		/*if (nEntry > 0) {
-			for (int i = 0; i < nEntry; i++) {
-				auto tempEntry = djs.getEntry(i);
-				if (ffGUID == tempEntry->diDeviceInstance.guidInstance) {
-					return InitFFB(tempEntry, ffAxis);
-				}
-			}
-		}*/
 		return true;
 	}
 	logger.Write("No wheel detected");
@@ -56,9 +45,9 @@ bool WheelDirectInput::InitWheel(DIAxis ffAxis) {
 // if an empty GUID is given, just try the first device
 const DiJoyStick::Entry *WheelDirectInput::findEntryFromGUID(GUID guid) {
 	int nEntry = djs.getEntryCount();
+
 	if (nEntry > 0) {
 		if (guid == GUID_NULL) {
-			logger.Write("No GUID specified, using first detected device");
 			return  djs.getEntry(0);
 		}
 
@@ -133,7 +122,7 @@ bool WheelDirectInput::InitFFB(GUID guid, WheelDirectInput::DIAxis ffAxis) {
 void WheelDirectInput::UpdateState() {
 	djs.update();
 
-	for(int i = 0; i < djs.getEntryCount(); i++) {
+	/*for(int i = 0; i < djs.getEntryCount(); i++) {
 		if (djs.getEntry(i)) {
 			
 		}
@@ -142,9 +131,10 @@ void WheelDirectInput::UpdateState() {
 	const DiJoyStick::Entry *e = djs.getEntry(0);
 	if (e) {
 		JoyStates = e->joystate;
-	}
+	}*/
 }
 
+//TODO: For ALL!
 bool WheelDirectInput::IsConnected() const {
 	auto e = djs.getEntry(0);
 
@@ -158,11 +148,23 @@ bool WheelDirectInput::IsConnected() const {
 // like how they are in DirectInput.
 // If it matches the cardinal stuff the button is a POV hat thing
 
-bool WheelDirectInput::IsButtonPressed(int buttonType) {
+bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
+	Logger log(LOGFILE);
+	auto e = findEntryFromGUID(device);
+
+	if (!e) {
+		wchar_t szGuidW[40] = { 0 };
+		StringFromGUID2(device, szGuidW, 40);
+		std::wstring wGuid = szGuidW;
+		log.Write("DBG: Button " + std::to_string(buttonType) + " with GUID " + std::string(wGuid.begin(), wGuid.end()));
+
+		return false;
+	}
+
 	if (buttonType > 127) {
 		switch (buttonType) {
 			case N:
-				if (JoyStates.rgdwPOV[0] == 0) {
+				if (e->joystate.rgdwPOV[0] == 0) {
 					return true;
 				}
 			case NE:
@@ -172,20 +174,20 @@ bool WheelDirectInput::IsButtonPressed(int buttonType) {
 			case SW:
 			case W:
 			case NW:
-				if (buttonType == JoyStates.rgdwPOV[0])
+				if (buttonType == e->joystate.rgdwPOV[0])
 					return true;
 			default:
 				return false;
 		}
 	}
-	if (JoyStates.rgbButtons[buttonType])
+	if (e->joystate.rgbButtons[buttonType])
 		return true;
 	return false;
 }
 
-bool WheelDirectInput::IsButtonJustPressed(int buttonType) {
+bool WheelDirectInput::IsButtonJustPressed(int buttonType, GUID device) {
 	if (buttonType > 127) { // POV
-		povButtonCurr[buttonType] = IsButtonPressed(buttonType);
+		povButtonCurr[buttonType] = IsButtonPressed(buttonType,device);
 
 		// raising edge
 		if (povButtonCurr[buttonType] && !povButtonPrev[buttonType]) {
@@ -193,7 +195,7 @@ bool WheelDirectInput::IsButtonJustPressed(int buttonType) {
 		}
 		return false;
 	}
-	rgbButtonCurr[buttonType] = IsButtonPressed(buttonType);
+	rgbButtonCurr[buttonType] = IsButtonPressed(buttonType,device);
 
 	// raising edge
 	if (rgbButtonCurr[buttonType] && !rgbButtonPrev[buttonType]) {
@@ -202,9 +204,9 @@ bool WheelDirectInput::IsButtonJustPressed(int buttonType) {
 	return false;
 }
 
-bool WheelDirectInput::IsButtonJustReleased(int buttonType) {
+bool WheelDirectInput::IsButtonJustReleased(int buttonType, GUID device) {
 	if (buttonType > 127) { // POV
-		povButtonCurr[buttonType] = IsButtonPressed(buttonType);
+		povButtonCurr[buttonType] = IsButtonPressed(buttonType,device);
 
 		// falling edge
 		if (!povButtonCurr[buttonType] && povButtonPrev[buttonType]) {
@@ -212,7 +214,7 @@ bool WheelDirectInput::IsButtonJustReleased(int buttonType) {
 		}
 		return false;
 	}
-	rgbButtonCurr[buttonType] = IsButtonPressed(buttonType);
+	rgbButtonCurr[buttonType] = IsButtonPressed(buttonType,device);
 
 	// falling edge
 	if (!rgbButtonCurr[buttonType] && rgbButtonPrev[buttonType]) {
@@ -221,12 +223,12 @@ bool WheelDirectInput::IsButtonJustReleased(int buttonType) {
 	return false;
 }
 
-bool WheelDirectInput::WasButtonHeldForMs(int buttonType, int millis) {
+bool WheelDirectInput::WasButtonHeldForMs(int buttonType, GUID device, int millis) {
 	if (buttonType > 127) { // POV
-		if (IsButtonJustPressed(buttonType)) {
+		if (IsButtonJustPressed(buttonType,device)) {
 			povPressTime[buttonType] = milliseconds_now();
 		}
-		if (IsButtonJustReleased(buttonType)) {
+		if (IsButtonJustReleased(buttonType,device)) {
 			povReleaseTime[buttonType] = milliseconds_now();
 		}
 
@@ -237,10 +239,10 @@ bool WheelDirectInput::WasButtonHeldForMs(int buttonType, int millis) {
 		}
 		return false;
 	}
-	if (IsButtonJustPressed(buttonType)) {
+	if (IsButtonJustPressed(buttonType,device)) {
 		rgbPressTime[buttonType] = milliseconds_now();
 	}
-	if (IsButtonJustReleased(buttonType)) {
+	if (IsButtonJustReleased(buttonType,device)) {
 		rgbReleaseTime[buttonType] = milliseconds_now();
 	}
 
@@ -364,24 +366,24 @@ WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString)
 }
 
 
-int WheelDirectInput::GetAxisValue(DIAxis axis, int device) {
+int WheelDirectInput::GetAxisValue(DIAxis axis, GUID device) {
 	if (!IsConnected())
 		return 0;
 	switch (axis) {
-		case lX: return JoyStates.lX;
-		case lY: return JoyStates.lY;
-		case lZ: return JoyStates.lZ;
-		case lRx: return JoyStates.lRx;
-		case lRy: return JoyStates.lRy;
-		case lRz: return JoyStates.lRz;
-		case rglSlider0: return JoyStates.rglSlider[0];
-		case rglSlider1: return JoyStates.rglSlider[1];
+		case lX: return findEntryFromGUID(device)->joystate.lX;
+		case lY: return findEntryFromGUID(device)->joystate.lY;
+		case lZ: return findEntryFromGUID(device)->joystate.lZ;
+		case lRx: return findEntryFromGUID(device)->joystate.lRx;
+		case lRy: return findEntryFromGUID(device)->joystate.lRy;
+		case lRz: return findEntryFromGUID(device)->joystate.lRz;
+		case rglSlider0: return findEntryFromGUID(device)->joystate.rglSlider[0];
+		case rglSlider1: return findEntryFromGUID(device)->joystate.rglSlider[1];
 		default: return 0;
 	}
 }
 
 // Returns in units/s
-float WheelDirectInput::GetAxisSpeed(DIAxis axis, int device) {
+float WheelDirectInput::GetAxisSpeed(DIAxis axis, GUID device) {
 	auto time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 	auto position = GetAxisValue(axis , device);
 	auto result = (position - prevPosition) / ((time - prevTime) / 1e9f);

@@ -24,6 +24,9 @@
     <ClInclude Include="..\Gears\Util\Logger.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Gears\Util\TimeHelper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DIUtil.cpp">
@@ -33,6 +36,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Gears\Util\Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Gears\Util\TimeHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -50,6 +50,8 @@ enum Shifter {
 	Automatic = 2
 };
 
+bool testDone = false;
+
 void update() {
 	///////////////////////////////////////////////////////////////////////////
 	//                     Are we in a supported vehicle?
@@ -111,10 +113,12 @@ void update() {
 	}
 
 	controls.UpdateValues(prevInput, ignoreClutch);
+	
 
 	if (settings.Debug) {
 		showDebugInfo();
 	}
+
 
 	try {
 		settings.IsCorrectVersion();
@@ -132,7 +136,6 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 	//                            Alt vehicle controls
 	///////////////////////////////////////////////////////////////////////////
-	
 	if (vehData.Class != VehicleData::VehicleClass::Car &&
 		vehData.Class != VehicleData::VehicleClass::Bike &&
 		vehData.Class != VehicleData::VehicleClass::Quad) {
@@ -169,6 +172,18 @@ void update() {
 	//                          Ground vehicle controls
 	///////////////////////////////////////////////////////////////////////////
 
+	if (!testDone) {
+		auto it = 0;
+		for (auto x : controls.WheelButtonGUIDs) {
+			wchar_t szGuidW[40] = { 0 };
+			StringFromGUID2(x, szGuidW, 40);
+			std::wstring wGuid = szGuidW;
+			logger.Write("DBG: " + std::to_string(it) + " " + std::string(wGuid.begin(), wGuid.end()));
+			it++;
+		}
+		testDone = true;
+	}
+
 
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
 		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
@@ -179,6 +194,7 @@ void update() {
 	if (!settings.EnableManual &&
 		settings.WheelWithoutManual &&
 		controls.WheelDI.IsConnected()) {
+
 		updateLastInputDevice();
 		handleVehicleButtons();
 		handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
@@ -186,6 +202,7 @@ void update() {
 		playWheelEffects(settings, vehData, 
 		                 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f );
 	}	
+
 	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
 	
 	if (settings.CrossScript) {
@@ -195,7 +212,6 @@ void update() {
 	if (!settings.EnableManual) {
 		return;
 	}
-
 	///////////////////////////////////////////////////////////////////////////
 	//          Active whenever Manual is enabled from here
 	//						UI stuff and whatever
@@ -485,11 +501,21 @@ void crossScriptComms() {
 
 void reInit() {
 	settings.Read(&controls);
+	logger.Write("Settings read");
+
+	for (auto g : controls.WheelAxesGUIDs) {
+		wchar_t szGuidW[40] = { 0 };
+		StringFromGUID2(g, szGuidW, 40);
+		std::wstring wGuid = szGuidW;
+		logger.Write("Settings GUIDs:   " + std::string(wGuid.begin(), wGuid.end()));
+	}
+
 	vehData.LockGears = 0x00010001;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
 	if (settings.WheelEnabled) {
 		controls.InitWheel();
 	}
+	logger.Write("Initialization finished");
 }
 
 void reset() {
@@ -1354,11 +1380,11 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	// steerSpeed is to dampen the steering wheel
 	auto steerSpeed =
 		controls.WheelDI.GetAxisSpeed(
-			controls.WheelDI.StringToAxis(
-				controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)]
-			),
-			controls.WheelAxesDevices[static_cast<int>(ScriptControls::WheelAxisType::Steer)]
-		) / 20; // wtf ikt
+			        controls.WheelDI.StringToAxis(
+				                controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)]
+			                ),
+			        controls.WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)]
+		        ) / 20; // wtf ikt
 
 	/*                    a                                        v^2
 	 * Because G Force = ---- and a = v * omega, verified with a = ---   using a speedo and 
@@ -1518,7 +1544,6 @@ void functionAutoGear1() {
 
 void main() {
 	reInit();
-	logger.Write("Settings read");
 	while (true) {
 		update();
 		WAIT(0);

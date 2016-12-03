@@ -151,10 +151,12 @@
     <ClInclude Include="..\Gears\Input\DiJoyStick.h" />
     <ClInclude Include="..\Gears\Input\WheelDirectInput.hpp" />
     <ClInclude Include="..\Gears\Util\Logger.hpp" />
+    <ClInclude Include="..\Gears\Util\TimeHelper.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Gears\Input\WheelDirectInput.cpp" />
     <ClCompile Include="..\Gears\Util\Logger.cpp" />
+    <ClCompile Include="..\Gears\Util\TimeHelper.cpp" />
     <ClCompile Include="DIUtil.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

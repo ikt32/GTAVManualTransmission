@@ -1,5 +1,7 @@
 #pragma once
 #include "../Gears/Util/Logger.hpp"
+//#include "../Gears/Input/WheelDirectInput.hpp"
+//#include "../Gears/ScriptSettings.hpp"
 
 namespace GearsUI {
 
@@ -23,12 +25,19 @@ namespace GearsUI {
 			//TODO: Add the constructor code here
 			//
 			logger = new Logger("./Config.log");
+			//wheel = new WheelDirectInput();
+			// Assumption - we're running this from the same directory as dir stuff.
+			//settings = new ScriptSettings("./settings_general.ini", "./settings_wheel.ini");
+			//controls = new ScriptControls();
 			logger->Clear();
 			logger->Write("Manual Transmission v4.2.0 Configuration Tool");
 		}
 
 	private:
 		Logger *logger;
+		//WheelDirectInput *wheel;
+		//ScriptSettings *settings;
+		//ScriptControls *controls;
 
 	protected:
 		/// <summary>
@@ -37,10 +46,16 @@ namespace GearsUI {
 		~MainForm()
 		{
 			if (components)
-			{
 				delete components;
-			}
-			delete logger;
+
+			if (logger)
+				delete logger;
+			
+			/*delete wheel;
+			if (settings)
+				delete settings;
+
+			delete controls;*/
 		}
 	private: System::Windows::Forms::TabPage^  tabWheel;
 	private: System::Windows::Forms::TabPage^  tabMain;

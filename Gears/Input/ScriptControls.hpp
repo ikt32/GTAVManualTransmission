@@ -103,15 +103,14 @@ public:
 	
 	std::array<int, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
 	
-	std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
-	std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButtonDevices = {};
-	std::array<GUID, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelButtonGUIDs = {};
-	std::string WheelToKeyDevice = "";
-	std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
-	
 	std::array<std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
-	std::array<int, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxesDevices = {};
 	std::array<GUID, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxesGUIDs = {};
+
+	std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
+	std::array<GUID, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButtonGUIDs = {}; //Wahahahaha FUCK.
+
+	std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
+	GUID WheelToKeyGUID = {};
 	
 	int CToggleTime    = 1000;
 	int ThrottleUp	   = 0;
@@ -149,7 +148,7 @@ private:
 	XboxController controller;
 	WORD buttonState;
 
-	static bool IsKeyPressed(int key);
+	bool IsKeyPressed(int key);
 	bool IsKeyJustPressed(int key, KeyboardControlType control);
 
 	bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};

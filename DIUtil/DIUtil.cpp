@@ -61,7 +61,7 @@ int main()
 	WheelDirectInput di;
 
 	std::string axis = "lX";
-	di.InitWheel(di.StringToAxis(axis));
+	di.InitWheel();
 
 	std::string guidStr = "{F69653F0-19B9-11E6-8002-444553540000}";
 	std::wstring clsidStr;
@@ -105,13 +105,15 @@ int main()
 		di.UpdateButtonChangeStates();
 		std::cout << "Axes:\n";
 		for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis-1; i++) {
-			std::cout << "    " << di.DIAxisHelper[i] << ": " << di.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), 0) << "\n";
+			std::cout << "    " << di.DIAxisHelper[i] << ": " << di.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid) << "\n";
 		}
 		
 		std::cout << "Buttons: ";
 		for (int i = 0; i < 255; i++) {
-			if (di.IsButtonPressed(i))
+			if (di.IsButtonPressed(i, guid))
 				std::cout << i << " ";
+			if (di.IsButtonJustPressed(i, guid))
+				std::cout << "!" << i << " ";
 		}
 		std::cout << "\n";
 
@@ -126,7 +128,7 @@ int main()
 		directions.push_back(WheelDirectInput::POV::W);
 		directions.push_back(WheelDirectInput::POV::NW);
 		for (auto d : directions) {
-			if (di.IsButtonPressed(d))
+			if (di.IsButtonPressed(d, guid))
 				std::cout << d << " ";
 		}
 

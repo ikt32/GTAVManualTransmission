@@ -70,6 +70,7 @@
     <ClCompile Include="Memory\VehicleExtensions.cpp" />
     <ClCompile Include="script.cpp" />
     <ClCompile Include="ScriptSettings.cpp" />
+    <ClCompile Include="Util\TimeHelper.cpp" />
     <ClCompile Include="Util\Logger.cpp" />
     <ClCompile Include="VehicleData.cpp" />
   </ItemGroup>

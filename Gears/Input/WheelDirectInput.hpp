@@ -56,7 +56,7 @@ public:
 	};
 
 	WheelDirectInput();
-	bool InitWheel(DIAxis ffAxis);
+	bool InitWheel();
 	const DiJoyStick::Entry *findEntryFromGUID(GUID guid);
 	const DiJoyStick::Entry *findEntryFromGUID();
 	bool InitFFB(GUID guid, DIAxis ffAxis);
@@ -65,19 +65,19 @@ public:
 	void UpdateState();
 
 	bool IsConnected() const;
-	bool IsButtonPressed(int btn);
-	bool IsButtonJustPressed(int btn);
-	bool IsButtonJustReleased(int btn);
-	bool WasButtonHeldForMs(int btn, int millis);
+	bool IsButtonPressed(int btn, GUID device);
+	bool IsButtonJustPressed(int btn, GUID device);
+	bool IsButtonJustReleased(int btn, GUID device);
+	bool WasButtonHeldForMs(int btn, GUID device, int millis);
 	void UpdateButtonChangeStates();
 
 	HRESULT SetConstantForce(int force) const;
 
 	DIAxis StringToAxis(std::string& axisString);
-	DIJOYSTATE2 JoyStates;
+	//DIJOYSTATE2 JoyStates;
 
-	int GetAxisValue(DIAxis axis, int device);
-	float GetAxisSpeed(DIAxis axis, int device);
+	int GetAxisValue(DIAxis axis, GUID device);
+	float GetAxisSpeed(DIAxis axis, GUID device);
 
 private:
 	Logger logger;// (LOGFILE);

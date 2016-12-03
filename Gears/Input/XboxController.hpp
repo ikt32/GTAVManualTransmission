@@ -97,7 +97,7 @@ private:
 	int controllerNum;
 	std::array<__int64, SIZEOF_XboxButtons> pressTime;
 	std::array<__int64, SIZEOF_XboxButtons> releaseTime;
-	static float filterDeadzone(XboxButtons buttonType, int input);
+	float filterDeadzone(XboxButtons buttonType, int input);
 	std::array<bool, SIZEOF_XboxButtons> xboxButtonCurr;
 	std::array<bool, SIZEOF_XboxButtons> xboxButtonPrev;
 

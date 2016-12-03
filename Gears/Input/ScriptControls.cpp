@@ -11,7 +11,9 @@ ScriptControls::~ScriptControls() {
 }
 
 void ScriptControls::InitWheel() {
-	WheelDI.InitWheel(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]));
+	WheelDI.InitWheel();
+	WheelDI.InitFFB(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)],
+					WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]));
 }
 
 void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
@@ -41,11 +43,16 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
 			break;
 		}
 		case Wheel: {
-			int RawT = WheelDI.GetAxisValue( WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]), WheelAxesDevices[static_cast<int>(WheelAxisType::Throttle)]);
-			int RawB = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Brake)]), WheelAxesDevices[static_cast<int>(WheelAxisType::Brake)]);
-			int RawC = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]), WheelAxesDevices[static_cast<int>(WheelAxisType::Clutch)]);
-			int RawS = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]), WheelAxesDevices[static_cast<int>(WheelAxisType::Steer)]);
-			int RawH = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Handbrake)]), WheelAxesDevices[static_cast<int>(WheelAxisType::Handbrake)]);
+			int RawT = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]), 
+			                                WheelAxesGUIDs[static_cast<int>(WheelAxisType::Throttle)]);
+			int RawB = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Brake)]), 
+			                                WheelAxesGUIDs[static_cast<int>(WheelAxisType::Brake)]);
+			int RawC = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]), 
+			                                WheelAxesGUIDs[static_cast<int>(WheelAxisType::Clutch)]);
+			int RawS = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]), 
+			                                WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)]);
+			int RawH = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Handbrake)]), 
+			                                WheelAxesGUIDs[static_cast<int>(WheelAxisType::Handbrake)]);
 			
 			// You're outta luck if you have a single-axis 3-pedal freak combo or something
 			if (WheelAxes[static_cast<int>(WheelAxisType::Throttle)] == WheelAxes[static_cast<int>(WheelAxisType::Brake)]) {
@@ -150,7 +157,8 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
 	if (WheelDI.IsConnected()) {
 		// Oh my god I hate single-axis throttle/brake steering wheels
 		// Looking at you DFGT.
-		int RawT = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]), WheelAxesDevices[static_cast<int>(WheelAxisType::Throttle)]);
+		int RawT = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]), 
+		                                WheelAxesGUIDs[static_cast<int>(WheelAxisType::Throttle)]);
 		if (WheelAxes[static_cast<int>(WheelAxisType::Throttle)] == WheelAxes[static_cast<int>(WheelAxisType::Brake)]) {
 			
 			// get throttle range
@@ -252,7 +260,7 @@ bool ScriptControls::ButtonReleased(WheelControlType control) {
 		WheelButton[static_cast<int>(control)] == -1) {
 		return false;
 	}
-	if (WheelDI.IsButtonJustReleased(WheelButton[static_cast<int>(control)]))
+	if (WheelDI.IsButtonJustReleased(WheelButton[static_cast<int>(control)], WheelButtonGUIDs[static_cast<int>(control)]))
 		return true;
 	return false;
 }
@@ -262,7 +270,7 @@ bool ScriptControls::ButtonJustPressed(WheelControlType control) {
 		WheelButton[static_cast<int>(control)] == -1) {
 		return false;
 	}
-	if (WheelDI.IsButtonJustPressed(WheelButton[static_cast<int>(control)]))
+	if (WheelDI.IsButtonJustPressed(WheelButton[static_cast<int>(control)], WheelButtonGUIDs[static_cast<int>(control)]))
 		return true;
 	return false;
 }
@@ -272,7 +280,7 @@ bool ScriptControls::ButtonIn(WheelControlType control) {
 		WheelButton[static_cast<int>(control)] == -1) {
 		return false;
 	}
-	if (WheelDI.IsButtonPressed(WheelButton[static_cast<int>(control)]))
+	if (WheelDI.IsButtonPressed(WheelButton[static_cast<int>(control)], WheelButtonGUIDs[static_cast<int>(control)]))
 		return true;
 	return false;
 }
@@ -289,11 +297,11 @@ void ScriptControls::CheckCustomButtons() {
 			input.ki.wVk = 0;
 			input.ki.wScan = MapVirtualKey(WheelToKey[i], MAPVK_VK_TO_VSC);
 
-			if (WheelDI.IsButtonJustPressed(i)) {
+			if (WheelDI.IsButtonJustPressed(i,WheelToKeyGUID)) {
 				input.ki.dwFlags = KEYEVENTF_SCANCODE;
 				SendInput(1, &input, sizeof(INPUT));
 			}
-			if (WheelDI.IsButtonJustReleased(i)) {
+			if (WheelDI.IsButtonJustReleased(i, WheelToKeyGUID)) {
 				input.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
 				SendInput(1, &input, sizeof(INPUT));
 			}

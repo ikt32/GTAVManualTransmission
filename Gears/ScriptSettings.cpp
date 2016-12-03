@@ -1,11 +1,19 @@
 #include "ScriptSettings.hpp"
-#include <Windows.h>
 
 #include <string>
 #include "Input/keyboard.h"
 #include "Util/simpleini/SimpleIni.h"
+#include "Input/ScriptControls.hpp"
+
+// TODO: This Device<->GUID->Control thing is very broken pls fix
 
 ScriptSettings::ScriptSettings() {
+	// Defaults
+}
+
+ScriptSettings::ScriptSettings(std::string general, std::string wheel) {
+	settingsGeneralFile = general;
+	settingsWheelFile = wheel;
 }
 
 void ScriptSettings::Read(ScriptControls* scriptControl) {
@@ -13,7 +21,7 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 #pragma warning(disable: 4244) // Make everything doubles later...
 	CSimpleIniA settingsGeneral;
 	settingsGeneral.SetUnicode();
-	settingsGeneral.LoadFile(SETTINGSGENERAL);
+	settingsGeneral.LoadFile(settingsGeneralFile.c_str());
 
 	settingsGeneral.GetBoolValue("OPTIONS", "Enable", true);
 	// [OPTIONS]
@@ -104,13 +112,15 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 void ScriptSettings::Save() const {
 	CSimpleIniA ini;
 	ini.SetUnicode();
-	ini.LoadFile(SETTINGSGENERAL);
+	ini.LoadFile(settingsGeneralFile.c_str());
 	ini.SetBoolValue("OPTIONS", "Enable", EnableManual);
 	ini.SetLongValue("OPTIONS", "ShiftMode", ShiftMode);
-	ini.SaveFile(SETTINGSGENERAL);
+	ini.SaveFile(settingsGeneralFile.c_str());
 }
 
 void ScriptSettings::IsCorrectVersion() const {
+	if (settings_general_version != CORRECTVGENERAL && settings_wheel_version != CORRECTVWHEEL)
+		throw std::runtime_error("Wrong settings_general.ini and \nsettings_wheel.ini version");
 	if (settings_general_version != CORRECTVGENERAL)
 		throw std::runtime_error("Wrong settings_general.ini version");
 	if (settings_wheel_version != CORRECTVWHEEL)
@@ -118,9 +128,12 @@ void ScriptSettings::IsCorrectVersion() const {
 }
 
 void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
+#pragma warning(push)
+#pragma warning(disable: 4244) // Make everything doubles later...
+	Logger logger(LOGFILE);
 	CSimpleIniA settingsWheel;
 	settingsWheel.SetUnicode();
-	settingsWheel.LoadFile(SETTINGSWHEEL);
+	settingsWheel.LoadFile(settingsWheelFile.c_str());
 
 	// [OPTIONS]
 	WheelEnabled = settingsWheel.GetBoolValue("OPTIONS", "EnableWheel", false);
@@ -145,7 +158,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 
 	// [INPUT_DEVICES]
 	int it = 0;
-	std::vector<std::pair<std::string, GUID>> guids;
+	std::vector<GUID> guids;
 	while (true) {
 		std::string currDevIndex = std::string("DEV") + std::to_string(it);
 		std::string currGuidIndex = std::string("GUID") + std::to_string(it);
@@ -157,32 +170,56 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 		if (currGuid == "")
 			break;
 
-		// the fuck, Microsoft?
-		LPCOLESTR the_fuck = LPWSTR(currGuid.c_str());
+		//// the fuck, Microsoft?
+		//LPCOLESTR the_fuck = LPWSTR(currGuid.c_str());
 
-		GUID bstrGuid;
-		CLSIDFromString(the_fuck, &bstrGuid);
-		guids.emplace_back(currDevice, bstrGuid);
+		//GUID bstrGuid;
+		//CLSIDFromString(the_fuck, &bstrGuid);
+		////guids.emplace_back(it, bstrGuid);
+		//guids.push_back(bstrGuid);
+		std::wstring clsidStr;
+		clsidStr.assign(currGuid.begin(), currGuid.end());
+		GUID guid;
+		HRESULT hr = CLSIDFromString(clsidStr.c_str(), &guid);
+		if (hr != NOERROR) {
+			std::string errStr;
+			switch (hr) {
+				case CO_E_CLASSSTRING:
+					errStr = "The class string was improperly formatted.";
+					break;
+				case REGDB_E_CLASSNOTREG:
+					errStr = "The CLSID corresponding to the class string was not found in the registry.";
+					break;
+				case REGDB_E_READREGDB:
+					errStr = "The registry could not be opened for reading.";
+					break;
+				default:
+					errStr = "Something went terribly wrong.";
+					break;
+			}
+			logger.Write("CLSIDFromString error: " + errStr);
+		}
+		guids.push_back(guid);		
 		it++;
 	}
 	nDevices = it;
 
 	// [TOGGLE_MOD]
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::Toggle)] =
-		settingsWheel.GetLongValue("TOGGLE_MOD", "DEVICE", -1);
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::Toggle)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("TOGGLE_MOD", "DEVICE", -1), guids);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::Toggle)] =
 		settingsWheel.GetLongValue("TOGGLE_MOD", "BUTTON", -1);
 
 	// [CHANGE_SHIFTMODE]
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::ToggleH)] =
-		settingsWheel.GetLongValue("CHANGE_SHIFTMODE", "DEVICE", -1);
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::ToggleH)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("CHANGE_SHIFTMODE", "DEVICE", -1), guids);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::ToggleH)] =
 		settingsWheel.GetLongValue("CHANGE_SHIFTMODE", "BUTTON", -1);
 
 
 	// [STEER]
-	scriptControl->WheelAxesDevices[static_cast<int>(ScriptControls::WheelAxisType::Steer)] =
-		settingsWheel.GetLongValue("STEER", "DEVICE", -1);
+	scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("STEER", "DEVICE", -1), guids);
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)] =
 		settingsWheel.GetValue("STEER", "AXLE", "");
 	scriptControl->SteerLeft = settingsWheel.GetLongValue("STEER", "MIN", -1);
@@ -193,47 +230,47 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	SteerAngleAlt = settingsWheel.GetDoubleValue("STEER", "SteerAngleAlt", 180.0);
 
 	// [THROTTLE]
-	scriptControl->WheelAxesDevices[static_cast<int>(ScriptControls::WheelAxisType::Throttle)] =
-		settingsWheel.GetLongValue("THROTTLE", "DEVICE", -1);
+	scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Throttle)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("THROTTLE", "DEVICE", -1), guids);
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Throttle)] =
 		settingsWheel.GetValue("THROTTLE", "AXLE", "");
 	scriptControl->ThrottleUp = settingsWheel.GetLongValue("THROTTLE", "MIN", -1);
 	scriptControl->ThrottleDown = settingsWheel.GetLongValue("THROTTLE", "MAX", -1);
 
 	// [BRAKES]
-	scriptControl->WheelAxesDevices[static_cast<int>(ScriptControls::WheelAxisType::Brake)] =
-		settingsWheel.GetLongValue("BRAKES", "DEVICE", -1);
+	scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Brake)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("BRAKES", "DEVICE", -1), guids);
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Brake)] =
 		settingsWheel.GetValue("BRAKES", "AXLE", "");
 	scriptControl->BrakeUp = settingsWheel.GetLongValue("BRAKES", "MIN", -1);
 	scriptControl->BrakeDown = settingsWheel.GetLongValue("BRAKES", "MAX", -1);
 
 	// [CLUTCH]
-	scriptControl->WheelAxesDevices[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] =
-		settingsWheel.GetLongValue("CLUTCH", "DEVICE", -1);
+	scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("CLUTCH", "DEVICE", -1), guids);
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] =
 		settingsWheel.GetValue("CLUTCH", "AXLE", "");
 	scriptControl->ClutchUp = settingsWheel.GetLongValue("CLUTCH", "MIN", -1);
 	scriptControl->ClutchDown = settingsWheel.GetLongValue("CLUTCH", "MAX", -1);
 
 	// [HANDBRAKE_ANALOG]
-	scriptControl->WheelAxesDevices[static_cast<int>(ScriptControls::WheelAxisType::Handbrake)] =
-		settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "DEVICE", -1);
+	scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Handbrake)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "DEVICE", -1), guids);
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Handbrake)] =
 		settingsWheel.GetValue("HANDBRAKE_ANALOG", "AXLE", "");
 	scriptControl->HandbrakeDown = settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "MIN", -1);
 	scriptControl->HandbrakeUp = settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "MAX", -1);
 
 	// [SHIFTER]
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::H1)] =
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::H2)] =
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::H3)] =
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::H4)] =
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::H5)] =
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::H6)] =
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::H7)] =
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::HR)] =
-		settingsWheel.GetLongValue("SHIFTER", "DEVICE", -1); // lmao kill me
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::H1)] =
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::H2)] =
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::H3)] =
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::H4)] =
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::H5)] =
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::H6)] =
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::H7)] =
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::HR)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("SHIFTER", "DEVICE", -1), guids);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::H1)] =
 		settingsWheel.GetLongValue("SHIFTER", "GEAR_1", -1);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::H2)] =
@@ -252,79 +289,86 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 		settingsWheel.GetLongValue("SHIFTER", "GEAR_R", -1);
 
 	// [SHIFT_UP]
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::ShiftUp)] =
-		settingsWheel.GetLongValue("SHIFT_UP", "DEVICE", -1);
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::ShiftUp)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("SHIFT_UP", "DEVICE", -1), guids);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::ShiftUp)] =
 		settingsWheel.GetLongValue("SHIFT_UP", "BUTTON", -1);
 
 	// [SHIFT_DOWN]
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::ShiftDown)] =
-		settingsWheel.GetLongValue("SHIFT_DOWN", "DEVICE", -1);
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::ShiftDown)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("SHIFT_DOWN", "DEVICE", -1), guids);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::ShiftDown)] =
 		settingsWheel.GetLongValue("SHIFT_DOWN", "BUTTON", -1);
 
+	// [HANDBRAKE]
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::Handbrake)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("HANDBRAKE", "DEVICE", -1), guids);
+	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::Handbrake)] =
+		settingsWheel.GetLongValue("HANDBRAKE", "BUTTON", -1);
+
 	// [ENGINE]
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::Engine)] =
-		settingsWheel.GetLongValue("ENGINE", "DEVICE", -1);
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::Engine)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("ENGINE", "DEVICE", -1), guids);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::Engine)] =
 		settingsWheel.GetLongValue("ENGINE", "BUTTON", -1);
 
 	// [LIGHTS]
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::Lights)] =
-		settingsWheel.GetLongValue("LIGHTS", "DEVICE", -1);
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::Lights)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("LIGHTS", "DEVICE", -1), guids);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::Lights)] =
 		settingsWheel.GetLongValue("LIGHTS", "BUTTON", -1);
 
 	// [HORN]
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::Horn)] =
-		settingsWheel.GetLongValue("HORN", "DEVICE", -1);
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::Horn)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("HORN", "DEVICE", -1), guids);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::Horn)] =
 		settingsWheel.GetLongValue("HORN", "BUTTON", -1);
 
 	// [LOOK_BACK]
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::LookBack)] =
-		settingsWheel.GetLongValue("LOOK_BACK", "DEVICE", -1);
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::LookBack)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("LOOK_BACK", "DEVICE", -1), guids);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::LookBack)] =
 		settingsWheel.GetLongValue("LOOK_BACK", "BUTTON", -1);
 
 	// [CHANGE_CAMERA]
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::Camera)] =
-		settingsWheel.GetLongValue("CHANGE_CAMERA", "DEVICE", -1);
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::Camera)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("CHANGE_CAMERA", "DEVICE", -1), guids);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::Camera)] =
 		settingsWheel.GetLongValue("CHANGE_CAMERA", "BUTTON", -1);
 
 	// [RADIO_NEXT]
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::RadioNext)] =
-		settingsWheel.GetLongValue("RADIO_NEXT", "DEVICE", -1);
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::RadioNext)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("RADIO_NEXT", "DEVICE", -1), guids);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::RadioNext)] =
 		settingsWheel.GetLongValue("RADIO_NEXT", "BUTTON", -1);
 
 	// [RADIO_PREVIOUS]
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::RadioPrev)] =
-		settingsWheel.GetLongValue("RADIO_PREVIOUS", "DEVICE", -1);
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::RadioPrev)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("RADIO_PREVIOUS", "DEVICE", -1), guids);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::RadioPrev)] =
 		settingsWheel.GetLongValue("RADIO_PREVIOUS", "BUTTON", -1);
 
 	// [INDICATOR_LEFT]
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::IndicatorLeft)] =
-		settingsWheel.GetLongValue("INDICATOR_LEFT", "DEVICE", -1);
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::IndicatorLeft)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("INDICATOR_LEFT", "DEVICE", -1), guids);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::IndicatorLeft)] =
 		settingsWheel.GetLongValue("INDICATOR_LEFT", "BUTTON", -1);
 
 	// [INDICATOR_RIGHT]
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::IndicatorRight)] =
-		settingsWheel.GetLongValue("INDICATOR_RIGHT", "DEVICE", -1);
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::IndicatorRight)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("INDICATOR_RIGHT", "DEVICE", -1), guids);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::IndicatorRight)] =
 		settingsWheel.GetLongValue("INDICATOR_RIGHT", "BUTTON", -1);
 
 	// [INDICATOR_HAZARD]
-	scriptControl->WheelButtonDevices[static_cast<int>(ScriptControls::WheelControlType::IndicatorHazard)] =
-		settingsWheel.GetLongValue("INDICATOR_HAZARD", "DEVICE", -1);
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::IndicatorHazard)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("INDICATOR_HAZARD", "DEVICE", -1), guids);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::IndicatorHazard)] =
 		settingsWheel.GetLongValue("INDICATOR_HAZARD", "BUTTON", -1);
 	
 	// [TO_KEYBOARD]
-	scriptControl->WheelToKeyDevice = settingsWheel.GetLongValue("TO_KEYBOARD", "DEVICE", -1);
+	scriptControl->WheelToKeyGUID = 
+		DeviceIndexToGUID(settingsWheel.GetLongValue("TO_KEYBOARD", "DEVICE", -1), guids);
 	for (int i = 0; i < MAX_RGBBUTTONS; i++) { // Ouch
 		std::string entryString = settingsWheel.GetValue("TO_KEYBOARD", std::to_string(i).c_str(), "UNKNOWN");
 		if (std::string(entryString).compare("UNKNOWN") == 0) {
@@ -336,5 +380,20 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	}
 
 	// [FILEVERSION]
-	settings_general_version = settingsWheel.GetLongValue("FILEVERSION", "VERSION", 0);
+	settings_wheel_version = settingsWheel.GetLongValue("FILEVERSION", "VERSION", 0);
+#pragma warning(pop)
+
+}
+
+GUID ScriptSettings::DeviceIndexToGUID(int device, std::vector<GUID> guids) {
+	Logger log(LOGFILE);
+	if (device < 0) {
+		log.Write("Invalid device index (<0)");
+		return{};
+	}
+	if (device > nDevices - 1) {
+		log.Write("Invalid device index: " + device);
+		return{};
+	}
+	return guids[device];
 }

@@ -122,7 +122,7 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>"$(DXSDK_DIR)\Lib\x64\XInput.lib";%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>"$(DXSDK_DIR)Lib\x64\XInput.lib";%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>main</EntryPointSymbol>
     </Link>
@@ -135,11 +135,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Gears\Input\keyboard.cpp" />
+    <ClCompile Include="..\Gears\Input\ScriptControls.cpp" />
+    <ClCompile Include="..\Gears\Input\WheelDirectInput.cpp" />
+    <ClCompile Include="..\Gears\Input\XboxController.cpp" />
     <ClCompile Include="..\Gears\Util\Logger.cpp" />
+    <ClCompile Include="..\Gears\Util\TimeHelper.cpp" />
     <ClCompile Include="MainForm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Gears\Input\DiJoyStick.h" />
+    <ClInclude Include="..\Gears\Input\keyboard.h" />
+    <ClInclude Include="..\Gears\Input\ScriptControls.hpp" />
+    <ClInclude Include="..\Gears\Input\WheelDirectInput.hpp" />
+    <ClInclude Include="..\Gears\Input\XboxController.hpp" />
     <ClInclude Include="..\Gears\Util\Logger.hpp" />
+    <ClInclude Include="..\Gears\Util\simpleini\SimpleIni.h" />
     <ClInclude Include="MainForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>

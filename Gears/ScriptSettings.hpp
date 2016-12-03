@@ -1,18 +1,16 @@
 #pragma once
-
-#include "Input/ScriptControls.hpp"
-
-#define SETTINGSGENERAL "./ManualTransmission/settings_general.ini"
+#include <Windows.h>
 #define CORRECTVGENERAL 420
-
-#define SETTINGSWHEEL "./ManualTransmission/settings_wheel.ini"
 #define CORRECTVWHEEL 420
+#include <string>
+#include <vector>
 
 class ScriptControls;
 
 class ScriptSettings {
 public:
 	ScriptSettings();
+	ScriptSettings(std::string general, std::string wheel);
 	void Read(ScriptControls* scriptControl);
 	void Save() const;
 	void IsCorrectVersion() const;
@@ -75,6 +73,8 @@ private:
 	int settings_general_version = 0;
 	int settings_wheel_version = 0;
 	void parseSettingsWheel(ScriptControls *scriptControl);
+	GUID DeviceIndexToGUID(int device, std::vector<GUID> guids);
 	int nDevices;
-
+	std::string settingsWheelFile = "./ManualTransmission/settings_wheel.ini";
+	std::string settingsGeneralFile = "./ManualTransmission/settings_general.ini";
 };
