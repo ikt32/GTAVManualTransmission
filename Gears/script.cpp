@@ -145,7 +145,7 @@ void update() {
 		updateLastInputDevice();
 
 		if (settings.AltControls &&
-			controls.WheelDI.IsConnected() && prevInput == ScriptControls::Wheel) {
+			controls.WheelDI.IsConnected(controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)]) && prevInput == ScriptControls::Wheel) {
 			if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
 				controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
 				controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle)) {
@@ -173,17 +173,17 @@ void update() {
 	//                          Ground vehicle controls
 	///////////////////////////////////////////////////////////////////////////
 
-	if (!testDone) {
-		auto it = 0;
-		for (auto x : controls.WheelButtonGUIDs) {
-			wchar_t szGuidW[40] = { 0 };
-			StringFromGUID2(x, szGuidW, 40);
-			std::wstring wGuid = szGuidW;
-			logger.Write("DBG: " + std::to_string(it) + " " + std::string(wGuid.begin(), wGuid.end()));
-			it++;
-		}
-		testDone = true;
-	}
+	//if (!testDone) {
+	//	auto it = 0;
+	//	for (auto x : controls.WheelButtonGUIDs) {
+	//		wchar_t szGuidW[40] = { 0 };
+	//		StringFromGUID2(x, szGuidW, 40);
+	//		std::wstring wGuid = szGuidW;
+	//		logger.Write("DBG: " + std::to_string(it) + " " + std::string(wGuid.begin(), wGuid.end()));
+	//		it++;
+	//	}
+	//	testDone = true;
+	//}
 
 
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
@@ -194,7 +194,7 @@ void update() {
 
 	if (!settings.EnableManual &&
 		settings.WheelWithoutManual &&
-		controls.WheelDI.IsConnected()) {
+		controls.WheelDI.IsConnected(controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)])) {
 
 		updateLastInputDevice();
 		handleVehicleButtons();
@@ -220,7 +220,7 @@ void update() {
 	updateLastInputDevice();
 	handleVehicleButtons();
 
-	if (controls.WheelDI.IsConnected()) {
+	if (controls.WheelDI.IsConnected(controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)])) {
 		doWheelSteering();
 		playWheelEffects(settings, vehData, 
 		                 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f
@@ -463,7 +463,7 @@ void showDebugInfo() {
 
 	if (settings.WheelEnabled) {
 		std::stringstream dinputDisplay;
-		dinputDisplay << "Wheel Avail: " << controls.WheelDI.IsConnected();
+		dinputDisplay << "Wheel Avail: " << controls.WheelDI.IsConnected(controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)]);
 		showText(0.85, 0.150, 0.4, dinputDisplay.str().c_str());
 	}
 }
@@ -503,14 +503,6 @@ void crossScriptComms() {
 void reInit() {
 	settings.Read(&controls);
 	logger.Write("Settings read");
-
-	for (auto g : controls.WheelAxesGUIDs) {
-		wchar_t szGuidW[40] = { 0 };
-		StringFromGUID2(g, szGuidW, 40);
-		std::wstring wGuid = szGuidW;
-		logger.Write("Settings GUIDs:   " + std::string(wGuid.begin(), wGuid.end()));
-	}
-
 	vehData.LockGears = 0x00010001;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
 	if (settings.WheelEnabled) {
@@ -524,7 +516,7 @@ void reset() {
 	if (patched) {
 		patched = !MemoryPatcher::RestoreInstructions();
 	}
-	if (controls.WheelDI.IsConnected()) {
+	if (controls.WheelDI.IsConnected(controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)])) {
 		controls.WheelDI.SetConstantForce(0);
 	}
 }
@@ -559,7 +551,11 @@ void pressSomeKey() {
 	input.ki.dwExtraInfo = 0;
 	input.ki.wVk = 0;
 	input.ki.wScan = MapVirtualKey(str2key("E"), MAPVK_VK_TO_VSC);
+	
 	input.ki.dwFlags = KEYEVENTF_SCANCODE;
+	SendInput(1, &input, sizeof(INPUT));
+
+	input.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
 	SendInput(1, &input, sizeof(INPUT));
 }
 
@@ -1172,7 +1168,7 @@ void handleVehicleButtons() {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 	}
 
-	if (!controls.WheelDI.IsConnected() ||
+	if (!controls.WheelDI.IsConnected(controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)]) ||
 		controls.WheelDI.NoFeedback ||
 		prevInput != ScriptControls::Wheel) {
 		return;
@@ -1353,7 +1349,7 @@ void doWheelSteeringPlane() {
 }
 
 void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airborne, bool ignoreSpeed) {
-	if (!controls.WheelDI.IsConnected() ||
+	if (!controls.WheelDI.IsConnected(controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)]) ||
 		controls.WheelDI.NoFeedback ||
 		prevInput != ScriptControls::Wheel ||
 		!settings.FFEnable) {

@@ -22,7 +22,7 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
 		controller.UpdateButtonChangeStates();
 	}
 
-	if (WheelDI.IsConnected()) {
+	if (WheelDI.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
 		WheelDI.UpdateState();
 		WheelDI.UpdateButtonChangeStates();
 		CheckCustomButtons();
@@ -154,7 +154,7 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
 		controller.IsButtonPressed(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState)) {
 		return Controller;
 	}
-	if (WheelDI.IsConnected()) {
+	if (WheelDI.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
 		// Oh my god I hate single-axis throttle/brake steering wheels
 		// Looking at you DFGT.
 		int RawT = WheelDI.GetAxisValue(WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]), 
@@ -256,7 +256,7 @@ void ScriptControls::SetXboxTrigger(int value) {
  */
 
 bool ScriptControls::ButtonReleased(WheelControlType control) {
-	if (!WheelDI.IsConnected() ||
+	if (!WheelDI.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)]) ||
 		WheelButton[static_cast<int>(control)] == -1) {
 		return false;
 	}
@@ -266,7 +266,7 @@ bool ScriptControls::ButtonReleased(WheelControlType control) {
 }
 
 bool ScriptControls::ButtonJustPressed(WheelControlType control) {
-	if (!WheelDI.IsConnected() ||
+	if (!WheelDI.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)]) ||
 		WheelButton[static_cast<int>(control)] == -1) {
 		return false;
 	}
@@ -276,7 +276,7 @@ bool ScriptControls::ButtonJustPressed(WheelControlType control) {
 }
 
 bool ScriptControls::ButtonIn(WheelControlType control) {
-	if (!WheelDI.IsConnected() ||
+	if (!WheelDI.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)]) ||
 		WheelButton[static_cast<int>(control)] == -1) {
 		return false;
 	}
@@ -286,7 +286,7 @@ bool ScriptControls::ButtonIn(WheelControlType control) {
 }
 
 void ScriptControls::CheckCustomButtons() {
-	if (!WheelDI.IsConnected()) {
+	if (!WheelDI.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
 		return;
 	}
 	for (int i = 0; i < MAX_RGBBUTTONS; i++) {

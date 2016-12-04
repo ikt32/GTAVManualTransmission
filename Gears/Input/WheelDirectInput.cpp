@@ -20,7 +20,7 @@ bool WheelDirectInput::InitWheel() {
 		logger.Write("Initializing steering wheel");
 
 		djs.enumerate(lpDi);
-		int nEntry = djs.getEntryCount();
+		nEntry = djs.getEntryCount();
 		logger.Write("Found " + std::to_string(nEntry) + " device(s)");
 
 		for (int i = 0; i < nEntry; i++) {
@@ -42,13 +42,16 @@ bool WheelDirectInput::InitWheel() {
 	return false;
 }
 
-// if an empty GUID is given, just try the first device
+/* 
+ * if an empty GUID is given, just try the first device
+ * Update - That was a horrible idea. Just return null and handle it whenever idk fuck this SHIT FUCK
+ */
 const DiJoyStick::Entry *WheelDirectInput::findEntryFromGUID(GUID guid) {
-	int nEntry = djs.getEntryCount();
+	//int nEntry = djs.getEntryCount();
 
 	if (nEntry > 0) {
 		if (guid == GUID_NULL) {
-			return  djs.getEntry(0);
+			return nullptr;
 		}
 
 		for (int i = 0; i < nEntry; i++) {
@@ -121,23 +124,10 @@ bool WheelDirectInput::InitFFB(GUID guid, WheelDirectInput::DIAxis ffAxis) {
 
 void WheelDirectInput::UpdateState() {
 	djs.update();
-
-	/*for(int i = 0; i < djs.getEntryCount(); i++) {
-		if (djs.getEntry(i)) {
-			
-		}
-	}
-
-	const DiJoyStick::Entry *e = djs.getEntry(0);
-	if (e) {
-		JoyStates = e->joystate;
-	}*/
 }
 
-//TODO: For ALL!
-bool WheelDirectInput::IsConnected() const {
-	auto e = djs.getEntry(0);
-
+bool WheelDirectInput::IsConnected(GUID device) {
+	auto e = findEntryFromGUID(device);
 	if (!e) {
 		return false;
 	}
@@ -153,11 +143,10 @@ bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
 	auto e = findEntryFromGUID(device);
 
 	if (!e) {
-		wchar_t szGuidW[40] = { 0 };
+		/*wchar_t szGuidW[40] = { 0 };
 		StringFromGUID2(device, szGuidW, 40);
 		std::wstring wGuid = szGuidW;
-		log.Write("DBG: Button " + std::to_string(buttonType) + " with GUID " + std::string(wGuid.begin(), wGuid.end()));
-
+		log.Write("DBG: Button " + std::to_string(buttonType) + " with GUID " + std::string(wGuid.begin(), wGuid.end()));*/
 		return false;
 	}
 
@@ -367,17 +356,18 @@ WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString)
 
 
 int WheelDirectInput::GetAxisValue(DIAxis axis, GUID device) {
-	if (!IsConnected())
+	auto e = findEntryFromGUID(device);
+	if (!IsConnected(device) || e == nullptr)
 		return 0;
 	switch (axis) {
-		case lX: return findEntryFromGUID(device)->joystate.lX;
-		case lY: return findEntryFromGUID(device)->joystate.lY;
-		case lZ: return findEntryFromGUID(device)->joystate.lZ;
-		case lRx: return findEntryFromGUID(device)->joystate.lRx;
-		case lRy: return findEntryFromGUID(device)->joystate.lRy;
-		case lRz: return findEntryFromGUID(device)->joystate.lRz;
-		case rglSlider0: return findEntryFromGUID(device)->joystate.rglSlider[0];
-		case rglSlider1: return findEntryFromGUID(device)->joystate.rglSlider[1];
+		case lX: return  e->joystate.lX;
+		case lY: return  e->joystate.lY;
+		case lZ: return  e->joystate.lZ;
+		case lRx: return e->joystate.lRx;
+		case lRy: return e->joystate.lRy;
+		case lRz: return e->joystate.lRz;
+		case rglSlider0: return e->joystate.rglSlider[0];
+		case rglSlider1: return e->joystate.rglSlider[1];
 		default: return 0;
 	}
 }

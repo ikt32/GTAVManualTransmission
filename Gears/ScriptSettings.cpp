@@ -388,11 +388,11 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 GUID ScriptSettings::DeviceIndexToGUID(int device, std::vector<GUID> guids) {
 	Logger log(LOGFILE);
 	if (device < 0) {
-		log.Write("Invalid device index (<0)");
+		//log.Write("Invalid device index (<0)");
 		return{};
 	}
 	if (device > nDevices - 1) {
-		log.Write("Invalid device index: " + device);
+		//log.Write("Invalid device index: " + device);
 		return{};
 	}
 	return guids[device];

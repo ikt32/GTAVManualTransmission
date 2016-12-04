@@ -41,6 +41,7 @@ public:
 		"UNKNOWN_AXIS"
 	};
 	bool NoFeedback = false;
+	int nEntry;
 
 	enum POV {
 		N = 3600,
@@ -64,7 +65,7 @@ public:
 	// Should be called every update()
 	void UpdateState();
 
-	bool IsConnected() const;
+	bool IsConnected(GUID device);
 	bool IsButtonPressed(int btn, GUID device);
 	bool IsButtonJustPressed(int btn, GUID device);
 	bool IsButtonJustReleased(int btn, GUID device);
