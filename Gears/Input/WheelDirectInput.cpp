@@ -259,7 +259,7 @@ void WheelDirectInput::UpdateButtonChangeStates() {
 }
 
 bool WheelDirectInput::CreateConstantForceEffect(const DiJoyStick::Entry *e, WheelDirectInput::DIAxis ffAxis) {
-	if (NoFeedback)
+	if (!e || NoFeedback)
 		return false;
 
 	DWORD axis;
@@ -400,4 +400,52 @@ float WheelDirectInput::GetAxisSpeed(DIAxis axis, GUID device) {
 
 std::vector<GUID> WheelDirectInput::GetGuids() {
 	return foundGuids;
+}
+
+void WheelDirectInput::PlayLedsDInput(GUID guid, CONST FLOAT currentRPM, CONST FLOAT rpmFirstLedTurnsOn, CONST FLOAT rpmRedLine)
+{
+	auto e = findEntryFromGUID(guid);
+
+	if (!e)
+	{
+		return;
+	}
+
+	CONST DWORD ESCAPE_COMMAND_LEDS = 0;
+	CONST DWORD LEDS_VERSION_NUMBER = 0x00000001;
+
+	struct LedsRpmData
+	{
+		FLOAT currentRPM;
+		FLOAT rpmFirstLedTurnsOn;
+		FLOAT rpmRedLine;
+	};
+
+	struct WheelData
+	{
+		DWORD size;
+		DWORD versionNbr;
+		LedsRpmData rpmData;
+	};
+
+	
+	WheelData wheelData_;
+	ZeroMemory(&wheelData_, sizeof(wheelData_));
+
+	wheelData_.size = sizeof(WheelData);
+	wheelData_.versionNbr = LEDS_VERSION_NUMBER;
+	wheelData_.rpmData.currentRPM = currentRPM;
+	wheelData_.rpmData.rpmFirstLedTurnsOn = rpmFirstLedTurnsOn;
+	wheelData_.rpmData.rpmRedLine = rpmRedLine;
+
+	DIEFFESCAPE data_;
+	ZeroMemory(&data_, sizeof(data_));
+
+	data_.dwSize = sizeof(DIEFFESCAPE);
+	data_.dwCommand = ESCAPE_COMMAND_LEDS;
+	data_.lpvInBuffer = &wheelData_;
+	data_.cbInBuffer = sizeof(wheelData_);
+
+	HRESULT hr;
+	hr = e->diDevice->Escape(&data_);
 }

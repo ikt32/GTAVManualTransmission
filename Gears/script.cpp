@@ -1414,12 +1414,15 @@ void doWheelSteeringPlane() {
 }
 
 void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airborne, bool ignoreSpeed) {
-	if (!controls.WheelDI.IsConnected(controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)]) ||
+	GUID steerGuid = controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)];
+	if (!controls.WheelDI.IsConnected(steerGuid) ||
 		controls.WheelDI.NoFeedback ||
 		prevInput != ScriptControls::Wheel ||
 		!settings.FFEnable) {
 		return;
 	}
+
+	controls.WheelDI.PlayLedsDInput(steerGuid, vehData.Rpm, 0.3, 0.95);
 
 	Vector3 accelVals = vehData.getAccelerationVectors(vehData.V3Velocities);
 	Vector3 accelValsAvg = vehData.getAccelerationVectorsAverage();
@@ -1461,7 +1464,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 			        controls.WheelDI.StringToAxis(
 				                controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)]
 			                ),
-			        controls.WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)]
+			        steerGuid
 		        ) / 20; // wtf ikt
 
 	/*                    a                                        v^2

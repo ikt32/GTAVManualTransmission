@@ -81,7 +81,7 @@ public:
 	int GetAxisValue(DIAxis axis, GUID device);
 	float GetAxisSpeed(DIAxis axis, GUID device);
 	std::vector<GUID> GetGuids();
-
+	void PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine);
 private:
 	Logger logger;// (LOGFILE);
 	DiJoyStick djs;
