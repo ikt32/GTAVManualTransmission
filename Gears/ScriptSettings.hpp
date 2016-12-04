@@ -14,7 +14,7 @@ public:
 	void Read(ScriptControls* scriptControl);
 	void Save() const;
 	void IsCorrectVersion() const;
-
+	std::vector<GUID> GetGuids();
 	// [OPTIONS]
 	bool EnableManual = true;
 	int ShiftMode = 0; 	// 0 Seq, 1 H, 2 Auto
@@ -70,7 +70,7 @@ public:
 	// [DEBUG]
 	bool Debug = false;
 
-	std::vector<GUID> Guids;
+	std::vector<GUID> reggdGuids;
 
 private:
 	int settings_general_version = 0;

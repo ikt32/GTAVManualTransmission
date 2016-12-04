@@ -70,7 +70,7 @@ int main()
 
 	logger.Write("Registered GUIDs: ");
 	GUID temp;
-	for (auto g : settings.Guids) {
+	for (auto g : settings.reggdGuids) {
 		wchar_t szGuidW[40] = { 0 };
 		StringFromGUID2(g, szGuidW, 40);
 		std::wstring wGuid = szGuidW;

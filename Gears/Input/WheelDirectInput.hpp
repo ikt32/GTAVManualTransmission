@@ -80,6 +80,7 @@ public:
 
 	int GetAxisValue(DIAxis axis, GUID device);
 	float GetAxisSpeed(DIAxis axis, GUID device);
+	std::vector<GUID> GetGuids();
 
 private:
 	Logger logger;// (LOGFILE);
@@ -105,4 +106,5 @@ private:
 	long long prevTime = 0;
 	std::array<float, SAMPLES> samples = {};
 	int averageIndex = 0;
+	std::vector<GUID> foundGuids;
 };

@@ -24,6 +24,7 @@ bool WheelDirectInput::InitWheel() {
 		nullptr))) {
 		logger.Write("Initializing steering wheel");
 
+		foundGuids.clear();
 		djs.enumerate(lpDi);
 		nEntry = djs.getEntryCount();
 		logger.Write("Found " + std::to_string(nEntry) + " device(s)");
@@ -38,6 +39,7 @@ bool WheelDirectInput::InitWheel() {
 			StringFromGUID2(guid, szGuidW, 40);
 			std::wstring wGuid = szGuidW;//std::wstring(szGuidW);
 			logger.Write("GUID:   " + std::string(wGuid.begin(), wGuid.end()));
+			foundGuids.push_back(guid);
 		}
 
 		djs.update();
@@ -394,4 +396,8 @@ float WheelDirectInput::GetAxisSpeed(DIAxis axis, GUID device) {
 		sum += samples[i];
 	}
 	return sum / SAMPLES;
+}
+
+std::vector<GUID> WheelDirectInput::GetGuids() {
+	return foundGuids;
 }
