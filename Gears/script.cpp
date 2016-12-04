@@ -1422,7 +1422,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 		return;
 	}
 
-	controls.WheelDI.PlayLedsDInput(steerGuid, vehData.Rpm, 0.3, 0.95);
+	controls.WheelDI.PlayLedsDInput(steerGuid, vehData.Rpm, 0.45, 0.95);
 
 	Vector3 accelVals = vehData.getAccelerationVectors(vehData.V3Velocities);
 	Vector3 accelValsAvg = vehData.getAccelerationVectorsAverage();
