@@ -5,6 +5,8 @@
 #include <stdio.h>  
 #include <iostream>
 #include "../Gears/Input/WheelDirectInput.hpp"
+#include "../Gears/ScriptSettings.hpp"
+#include "../Gears/Input/ScriptControls.hpp"
 
 /* Standard error macro for reporting API errors */
 #define PERR(bSuccess, api){if(!(bSuccess)) printf("%s:Error %d from %s on line %d\n", __FILE__, GetLastError(), api, __LINE__);}
@@ -52,42 +54,33 @@ void setCursorPosition(int x, int y)
 	SetConsoleCursorPosition(hOut, coord);
 }
 
+ScriptControls controls;
+ScriptSettings settings("./settings_general.ini","./settings_wheel.ini");
+
 int main()
 {
-	Logger logger(LOGFILE);
+	Logger logger("./DIUtil.log");
 	logger.Clear();
-	logger.Write("Something to test DirectInput devices and stuff");
+	logger.Write("Manual Transmission v4.2.0 - DirectInput utility");
 
-	WheelDirectInput di;
+	WheelDirectInput wheel(logger);
+	wheel.InitWheel();
 
-	std::string axis = "lX";
-	di.InitWheel();
+	settings.Read(&controls);
 
-	std::string guidStr = "{F69653F0-19B9-11E6-8002-444553540000}";
-	std::wstring clsidStr;
-	clsidStr.assign(guidStr.begin(), guidStr.end());
+	logger.Write("Registered GUIDs: ");
+	GUID temp;
+	for (auto g : settings.Guids) {
+		wchar_t szGuidW[40] = { 0 };
+		StringFromGUID2(g, szGuidW, 40);
+		std::wstring wGuid = szGuidW;
+		logger.Write("GUID:   " + std::string(wGuid.begin(), wGuid.end()));
 
-	GUID guid;
-	HRESULT hr = CLSIDFromString(clsidStr.c_str(), &guid);
-	if (hr != NOERROR) {
-		std::string errStr;
-		switch (hr) {
-			case CO_E_CLASSSTRING:
-				errStr = "The class string was improperly formatted.";
-				break;
-			case REGDB_E_CLASSNOTREG	:
-				errStr = "The CLSID corresponding to the class string was not found in the registry.";
-				break;
-			case REGDB_E_READREGDB:
-				errStr = "The registry could not be opened for reading.";
-				break;
-			default:
-				errStr = "Something went terribly wrong.";
-				break;
-		}
-		logger.Write("CLSIDFromString error: " + errStr);
+		temp = g;
 	}
-	di.InitFFB(guid, di.StringToAxis(axis));
+
+	GUID guid = temp;
+	wheel.InitFFB(guid, controls.WheelDI.StringToAxis(controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)]));
 
 	unsigned long long i = 0;
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -101,19 +94,17 @@ int main()
 		CONSOLE_SCREEN_BUFFER_INFO csbi;
 		GetConsoleScreenBufferInfo(hConsole, &csbi);
 		setCursorPosition(0, 0);
-		di.UpdateState();
-		di.UpdateButtonChangeStates();
+		wheel.UpdateState();
+		wheel.UpdateButtonChangeStates();
 		std::cout << "Axes:\n";
 		for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis-1; i++) {
-			std::cout << "    " << di.DIAxisHelper[i] << ": " << di.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid) << "\n";
+			std::cout << "    " << wheel.DIAxisHelper[i] << ": " << wheel.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid) << "\n";
 		}
 		
 		std::cout << "Buttons: ";
 		for (int i = 0; i < 255; i++) {
-			if (di.IsButtonPressed(i, guid))
+			if (wheel.IsButtonPressed(i, guid))
 				std::cout << i << " ";
-			if (di.IsButtonJustPressed(i, guid))
-				std::cout << "!" << i << " ";
 		}
 		std::cout << "\n";
 
@@ -128,15 +119,14 @@ int main()
 		directions.push_back(WheelDirectInput::POV::W);
 		directions.push_back(WheelDirectInput::POV::NW);
 		for (auto d : directions) {
-			if (di.IsButtonPressed(d, guid))
+			if (wheel.IsButtonPressed(d, guid))
 				std::cout << d << " ";
 		}
-
 
 		setCursorPosition(0 , csbi.srWindow.Bottom-1);
 		std::cout << "Hit any key to exit";
 		std::cout.flush();
-		Sleep(4);
+		Sleep(8);
 		cls();
 	}
 	return 0;

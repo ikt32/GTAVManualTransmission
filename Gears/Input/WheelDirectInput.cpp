@@ -11,6 +11,11 @@ WheelDirectInput::WheelDirectInput() : logger(LOGFILE),
                                        pCFEffect{nullptr},
                                        pFREffect{nullptr} { }
 
+WheelDirectInput::WheelDirectInput(Logger logAlt) : logger(logAlt),
+													pCFEffect{ nullptr },
+													pFREffect{ nullptr } { }
+
+
 bool WheelDirectInput::InitWheel() {
 	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(nullptr),
 		DIRECTINPUT_VERSION,
@@ -139,7 +144,6 @@ bool WheelDirectInput::IsConnected(GUID device) {
 // If it matches the cardinal stuff the button is a POV hat thing
 
 bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
-	Logger log(LOGFILE);
 	auto e = findEntryFromGUID(device);
 
 	if (!e) {

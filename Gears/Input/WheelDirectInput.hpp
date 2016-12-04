@@ -57,6 +57,7 @@ public:
 	};
 
 	WheelDirectInput();
+	WheelDirectInput(Logger logAlt);
 	bool InitWheel();
 	const DiJoyStick::Entry *findEntryFromGUID(GUID guid);
 	const DiJoyStick::Entry *findEntryFromGUID();

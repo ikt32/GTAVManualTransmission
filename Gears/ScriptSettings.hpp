@@ -69,6 +69,9 @@ public:
 
 	// [DEBUG]
 	bool Debug = false;
+
+	std::vector<GUID> Guids;
+
 private:
 	int settings_general_version = 0;
 	int settings_wheel_version = 0;

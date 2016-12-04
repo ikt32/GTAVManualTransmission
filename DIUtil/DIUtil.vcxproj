@@ -145,16 +145,25 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>"$(DXSDK_DIR)\Lib\x64\XInput.lib";%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Gears\Input\DiJoyStick.h" />
+    <ClInclude Include="..\Gears\Input\keyboard.h" />
+    <ClInclude Include="..\Gears\Input\ScriptControls.hpp" />
     <ClInclude Include="..\Gears\Input\WheelDirectInput.hpp" />
+    <ClInclude Include="..\Gears\Input\XboxController.hpp" />
+    <ClInclude Include="..\Gears\ScriptSettings.hpp" />
     <ClInclude Include="..\Gears\Util\Logger.hpp" />
     <ClInclude Include="..\Gears\Util\TimeHelper.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Gears\Input\keyboard.cpp" />
+    <ClCompile Include="..\Gears\Input\ScriptControls.cpp" />
     <ClCompile Include="..\Gears\Input\WheelDirectInput.cpp" />
+    <ClCompile Include="..\Gears\Input\XboxController.cpp" />
+    <ClCompile Include="..\Gears\ScriptSettings.cpp" />
     <ClCompile Include="..\Gears\Util\Logger.cpp" />
     <ClCompile Include="..\Gears\Util\TimeHelper.cpp" />
     <ClCompile Include="DIUtil.cpp" />
