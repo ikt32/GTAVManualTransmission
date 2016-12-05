@@ -7,6 +7,7 @@
 #include "../Gears/Input/WheelDirectInput.hpp"
 #include "../Gears/ScriptSettings.hpp"
 #include "../Gears/Input/ScriptControls.hpp"
+#include <thread>
 
 /* Standard error macro for reporting API errors */
 #define PERR(bSuccess, api){if(!(bSuccess)) printf("%s:Error %d from %s on line %d\n", __FILE__, GetLastError(), api, __LINE__);}
@@ -96,11 +97,20 @@ int main()
 
 	int activeGuids = controls.WheelDI.GetGuids().size();
 	int totalWidth = (activeGuids+0.5) * 32;
+	if (totalWidth < 80) {
+		totalWidth = 80;
+	}
 	std::string modeStr = "MODE " + std::to_string(totalWidth) + ",32";
 	system(modeStr.c_str());
 	
-	while (!_kbhit())
+	while (true)
 	{
+		if (_kbhit()) {
+			char c = _getch();
+			if (c == 0x1B) {
+				break;
+			}
+		}
 		controls.GetLastInputDevice(ScriptControls::InputDevices::Wheel);
 		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
 		
@@ -123,14 +133,18 @@ int main()
 
 			for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
 				setCursorPosition(32 * guidIt, pRow);
-				pRow++;
+				std::cout << "                                ";
+				setCursorPosition(32 * guidIt, pRow);
 				std::cout << "    " << controls.WheelDI.DIAxisHelper[i] << ": " << controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid) << "\n";
+				pRow++;
 			}
 
 			setCursorPosition(32 * guidIt, pRow);
 			pRow++;
 
 			std::cout << "Buttons: ";
+			setCursorPosition(32 * guidIt, pRow);
+			std::cout << "                                ";
 			setCursorPosition(32 * guidIt, pRow);
 			for (int i = 0; i < 255; i++) {
 				if (controls.WheelDI.IsButtonPressed(i, guid)) {
@@ -140,8 +154,7 @@ int main()
 			pRow++;
 
 			setCursorPosition(32 * guidIt, pRow);
-			pRow++; 
-			std::cout << ""; // newline
+			pRow++; // newline
 
 			setCursorPosition(32 * guidIt, pRow);
 			pRow++;
@@ -156,6 +169,8 @@ int main()
 			directions.push_back(WheelDirectInput::POV::W);
 			directions.push_back(WheelDirectInput::POV::NW);
 			setCursorPosition(32 * guidIt, pRow);
+			std::cout << "                                ";
+			setCursorPosition(32 * guidIt, pRow);
 			for (auto d : directions) {
 				if (controls.WheelDI.IsButtonPressed(d, guid)) {
 					std::cout << d << " ";
@@ -164,27 +179,62 @@ int main()
 			pRow++;
 
 			setCursorPosition(32 * guidIt, pRow);
-			pRow++;
-			std::cout << ""; // newline
+			pRow++; // newline
+
 			pRowMax = pRow;
 			guidIt++;
 		}
+
+		setCursorPosition(8, pRowMax+0);
+		std::cout << "                                ";
+		setCursorPosition(8, pRowMax+1);
+		std::cout << "                                ";
+		setCursorPosition(8, pRowMax+2);
+		std::cout << "                                ";
+		setCursorPosition(8, pRowMax+3);
+		std::cout << "                                ";
+		setCursorPosition(8, pRowMax+4);
+		std::cout << "                                ";
+		setCursorPosition(8, pRowMax+5);
+		std::cout << "                                ";
 
 		setCursorPosition(0, pRowMax);
 		std::cout << "Throttle  " << controls.ThrottleVal << "\n";
 		std::cout << "Brake     " << controls.BrakeVal << "\n";
 		std::cout << "Clutch    " << controls.ClutchVal << "\n";
-		std::cout << "Handbrake " << controls.HandbrakeVal << " (Analog)" << "\n";
+		std::cout << "Handbrake " << controls.HandbrakeVal << "\n";
 		std::cout << "Steer     " << controls.SteerVal << "\n";
+
+		std::string gear = "N";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H1))
+			gear = "1";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H2))
+			gear = "2";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H3))
+			gear = "3";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H4))
+			gear = "4";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H5))
+			gear = "5";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H6))
+			gear = "6";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H7))
+			gear = "7";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::HR))
+			gear = "R";
+
+		std::cout << "Gear      " << gear << "\n";
+
 
 		controls.WheelDI.PlayLedsDInput(steerGuid, controls.ThrottleVal, 0.5f, 0.95f);
 		controls.WheelDI.SetConstantForce(steerGuid, static_cast<int>(controls.ThrottleVal * 20000.0f * 2.0f * (controls.SteerVal - 0.5f)));
 
-		setCursorPosition(0 , csbi.srWindow.Bottom-1);
-		std::cout << "Hit any key to exit";
+		setCursorPosition(0 , csbi.srWindow.Bottom);
+		std::cout << "Press ESC to exit.";
 		std::cout.flush();
-		Sleep(8);
-		cls();
+		std::this_thread::yield();
+		std::this_thread::sleep_for(std::chrono::milliseconds(16));
+		//cls();
 	}
 	return 0;
-}
+}	
