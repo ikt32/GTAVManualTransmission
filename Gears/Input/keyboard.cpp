@@ -24,6 +24,7 @@ void OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BOOL isExtended, 
 		keyStates[key].isWithAlt = isWithAlt;
 		keyStates[key].wasDownBefore = wasDownBefore;
 		keyStates[key].isUpNow = isUpNow;
+		
 	}
 }
 
