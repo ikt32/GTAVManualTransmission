@@ -60,7 +60,6 @@ public:
 	WheelDirectInput(Logger logAlt);
 	bool InitWheel();
 	const DiJoyStick::Entry *findEntryFromGUID(GUID guid);
-	const DiJoyStick::Entry *findEntryFromGUID();
 	bool InitFFB(GUID guid, DIAxis ffAxis);
 
 	// Should be called every update()
@@ -73,7 +72,7 @@ public:
 	bool WasButtonHeldForMs(int btn, GUID device, int millis);
 	void UpdateButtonChangeStates();
 
-	HRESULT SetConstantForce(int force) const;
+	HRESULT SetConstantForce(GUID device, int force);
 
 	DIAxis StringToAxis(std::string& axisString);
 	//DIJOYSTATE2 JoyStates;

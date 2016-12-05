@@ -54,8 +54,6 @@ bool WheelDirectInput::InitWheel() {
  * Update - That was a horrible idea. Just return null and handle it whenever idk fuck this SHIT FUCK
  */
 const DiJoyStick::Entry *WheelDirectInput::findEntryFromGUID(GUID guid) {
-	//int nEntry = djs.getEntryCount();
-
 	if (nEntry > 0) {
 		if (guid == GUID_NULL) {
 			return nullptr;
@@ -312,7 +310,7 @@ bool WheelDirectInput::CreateConstantForceEffect(const DiJoyStick::Entry *e, Whe
 	return true;
 }
 
-HRESULT WheelDirectInput::SetConstantForce(int force) const {
+HRESULT WheelDirectInput::SetConstantForce(GUID device, int force) {
 	if (NoFeedback)
 		return false;
 
@@ -338,7 +336,7 @@ HRESULT WheelDirectInput::SetConstantForce(int force) const {
 	                              DIEP_TYPESPECIFICPARAMS |
 	                              DIEP_START);
 
-	const DiJoyStick::Entry *e = djs.getEntry(0);
+	auto e = findEntryFromGUID(device);
 	if (e) {
 		e->diDevice->Acquire();
 		if (pCFEffect)

@@ -581,8 +581,9 @@ void reset() {
 	if (patched) {
 		patched = !MemoryPatcher::RestoreInstructions();
 	}
-	if (controls.WheelDI.IsConnected(controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)])) {
-		controls.WheelDI.SetConstantForce(0);
+	GUID steerGUID = controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)];
+	if (controls.WheelDI.IsConnected(steerGUID)) {
+		controls.WheelDI.SetConstantForce(steerGUID, 0);
 	}
 }
 
@@ -1568,7 +1569,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 			totalForce = -10000;
 		}
 	}
-	controls.WheelDI.SetConstantForce(totalForce);
+	controls.WheelDI.SetConstantForce(steerGuid, totalForce);
 
 	if (settings.Debug) {
 		std::stringstream SteerRaw;
