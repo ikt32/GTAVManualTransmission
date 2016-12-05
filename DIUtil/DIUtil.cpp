@@ -57,53 +57,63 @@ void setCursorPosition(int x, int y)
 ScriptControls controls;
 ScriptSettings settings("./settings_general.ini","./settings_wheel.ini");
 
+std::string GUID2Str(GUID g) {
+	wchar_t szGuidW[40] = { 0 };
+	StringFromGUID2(g, szGuidW, 40);
+	std::wstring wGuid = szGuidW;
+	return std::string(wGuid.begin(), wGuid.end());
+}
+
 int main()
 {
-	Logger logger("./DIUtil.log");
-	logger.Clear();
-	logger.Write("Manual Transmission v4.2.0 - DirectInput utility");
-
-	WheelDirectInput wheel(logger);
-	wheel.InitWheel();
-
-	settings.Read(&controls);
-
-	logger.Write("Registered GUIDs: ");
-	GUID temp;
-	for (auto g : settings.reggdGuids) {
-		wchar_t szGuidW[40] = { 0 };
-		StringFromGUID2(g, szGuidW, 40);
-		std::wstring wGuid = szGuidW;
-		logger.Write("GUID:   " + std::string(wGuid.begin(), wGuid.end()));
-
-		temp = g;
-	}
-
-	GUID guid = temp;
-	wheel.InitFFB(guid, controls.WheelDI.StringToAxis(controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)]));
-
 	unsigned long long i = 0;
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO     cursorInfo;
 	GetConsoleCursorInfo(hConsole, &cursorInfo);
-	cursorInfo.bVisible = false; 
+	cursorInfo.bVisible = false;
 	SetConsoleCursorInfo(hConsole, &cursorInfo);
+
+	Logger logger("./DIUtil.log");
+	logger.Clear();
+	logger.Write("Manual Transmission v4.2.0 - DirectInput utility");
+	settings.Read(&controls);
+
+	//WheelDirectInput wheel(logger);
+	//wheel.InitWheel();
+	controls.InitWheel();
+
+	logger.Write("Registered GUIDs: ");
+	GUID temp;
+	std::string strGuid;
+	for (auto g : settings.reggdGuids) {
+		logger.Write("GUID:   " + GUID2Str(g));
+		temp = g;
+	}
+
+	GUID guid = temp;
+
+	//wheel.InitFFB(guid, controls.WheelDI.StringToAxis(controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)]));
 
 	while (!_kbhit())
 	{
 		CONSOLE_SCREEN_BUFFER_INFO csbi;
 		GetConsoleScreenBufferInfo(hConsole, &csbi);
 		setCursorPosition(0, 0);
-		wheel.UpdateState();
-		wheel.UpdateButtonChangeStates();
+		std::cout << GUID2Str(guid) << "\n";
+
+		//wheel.UpdateState();
+		//wheel.UpdateButtonChangeStates();
+
+		controls.GetLastInputDevice(ScriptControls::InputDevices::Wheel);
+		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
 		std::cout << "Axes:\n";
 		for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis-1; i++) {
-			std::cout << "    " << wheel.DIAxisHelper[i] << ": " << wheel.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid) << "\n";
+			std::cout << "    " << controls.WheelDI.DIAxisHelper[i] << ": " << controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid) << "\n";
 		}
 		
 		std::cout << "Buttons: ";
 		for (int i = 0; i < 255; i++) {
-			if (wheel.IsButtonPressed(i, guid))
+			if (controls.WheelDI.IsButtonPressed(i, guid))
 				std::cout << i << " ";
 		}
 		std::cout << "\n";
@@ -119,9 +129,18 @@ int main()
 		directions.push_back(WheelDirectInput::POV::W);
 		directions.push_back(WheelDirectInput::POV::NW);
 		for (auto d : directions) {
-			if (wheel.IsButtonPressed(d, guid))
+			if (controls.WheelDI.IsButtonPressed(d, guid))
 				std::cout << d << " ";
 		}
+		std::cout << "\n";
+
+		std::cout << "Throttle " << controls.ThrottleVal << "\n";
+		std::cout << "Brake    " << controls.BrakeVal << "\n";
+		std::cout << "Clutch   " << controls.ClutchVal << "\n";
+		std::cout << "Steer    " << controls.SteerVal << "\n";
+
+		controls.WheelDI.PlayLedsDInput(guid, controls.ThrottleVal, 0.5, 0.95);
+		controls.WheelDI.SetConstantForce(guid, controls.ThrottleVal * 20000 * 2.0f * (controls.SteerVal - 0.5f));
 
 		setCursorPosition(0 , csbi.srWindow.Bottom-1);
 		std::cout << "Hit any key to exit";
