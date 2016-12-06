@@ -12,8 +12,10 @@ ScriptControls::~ScriptControls() {
 
 void ScriptControls::InitWheel() {
 	WheelDI.InitWheel();
-	WheelDI.InitFFB(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)],
-					WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]));
+	if (!WheelDI.InitFFB(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)],
+					WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]))) {
+		WheelDI.NoFeedback = true;
+	}
 }
 
 void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
@@ -22,11 +24,11 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
 		controller.UpdateButtonChangeStates();
 	}
 
-	if (WheelDI.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
+	//if (/*WheelDI.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])*/1) {
 		WheelDI.UpdateState();
 		WheelDI.UpdateButtonChangeStates();
 		CheckCustomButtons();
-	}
+	//}
 
 	// Update ThrottleVal, BrakeVal and ClutchVal ranging from 0.0f (no touch) to 1.0f (full press)
 	switch (prevInput) {
@@ -256,7 +258,7 @@ void ScriptControls::SetXboxTrigger(int value) {
  */
 
 bool ScriptControls::ButtonReleased(WheelControlType control) {
-	if (!WheelDI.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)]) ||
+	if (!WheelDI.IsConnected(WheelButtonGUIDs[static_cast<int>(control)]) ||
 		WheelButton[static_cast<int>(control)] == -1) {
 		return false;
 	}
@@ -266,7 +268,7 @@ bool ScriptControls::ButtonReleased(WheelControlType control) {
 }
 
 bool ScriptControls::ButtonJustPressed(WheelControlType control) {
-	if (!WheelDI.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)]) ||
+	if (!WheelDI.IsConnected(WheelButtonGUIDs[static_cast<int>(control)]) ||
 		WheelButton[static_cast<int>(control)] == -1) {
 		return false;
 	}
@@ -276,7 +278,7 @@ bool ScriptControls::ButtonJustPressed(WheelControlType control) {
 }
 
 bool ScriptControls::ButtonIn(WheelControlType control) {
-	if (!WheelDI.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)]) ||
+	if (!WheelDI.IsConnected(WheelButtonGUIDs[static_cast<int>(control)]) ||
 		WheelButton[static_cast<int>(control)] == -1) {
 		return false;
 	}

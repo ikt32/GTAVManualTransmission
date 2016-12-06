@@ -119,7 +119,7 @@ int main()
 
 		int guidIt = 0;
 		int pRowMax = 0;
-		for (auto guid : guids) {
+		for (auto guid : controls.WheelDI.GetGuids()) {
 			int pRow = 0;
 
 			setCursorPosition(32 * guidIt, pRow);
