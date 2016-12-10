@@ -605,26 +605,6 @@ void toggleManual() {
 	reInit();
 }
 
-/*
- * This thing is here to press a keyboard key. Doing this will stop the game from
- * seeing the controller as active and stops its rumbling :)
- * 
- * For now, we'll do "E", which should be the horn.
- */
-void pressSomeKey() {
-	INPUT input;
-	input.type = INPUT_KEYBOARD;
-	input.ki.dwExtraInfo = 0;
-	input.ki.wVk = 0;
-	input.ki.wScan = MapVirtualKey(str2key("E"), MAPVK_VK_TO_VSC);
-	
-	input.ki.dwFlags = KEYEVENTF_SCANCODE;
-	SendInput(1, &input, sizeof(INPUT));
-
-	input.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
-	SendInput(1, &input, sizeof(INPUT));
-}
-
 void updateLastInputDevice() {
 	if (prevInput != controls.GetLastInputDevice(prevInput)) {
 		prevInput = controls.GetLastInputDevice(prevInput);
@@ -644,10 +624,12 @@ void updateLastInputDevice() {
 				}
 				break;
 			case ScriptControls::Wheel:
-				pressSomeKey();
 				showNotification("Switched to wheel");
 				break;
 		}
+	}
+	if (prevInput == ScriptControls::Wheel) {
+		CONTROLS::STOP_PAD_SHAKE(0);
 	}
 }
 
