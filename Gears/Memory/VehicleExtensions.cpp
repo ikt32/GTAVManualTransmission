@@ -1,6 +1,6 @@
 #include "VehicleExtensions.hpp"
-#include "../../../ScriptHookV_SDK/inc/nativeCaller.h"
 #include <vector>
+#include "NativeMemory.hpp"
 
 void VehicleExtensions::ClearAddress() {
 	currAddress = nullptr;
@@ -8,9 +8,10 @@ void VehicleExtensions::ClearAddress() {
 
 BYTE *VehicleExtensions::GetAddress(Vehicle handle) {
 	if (currAddress == nullptr) {
-		currAddress = getScriptHandleBaseAddress(handle);
+		MemoryAccess mem;
+		currAddress = reinterpret_cast<BYTE *>(mem.GetAddressOfEntity(handle));
 	}
-	return currAddress;// reinterpret_cast<uint64_t>(currAddress);
+	return currAddress;
 }
 
 uint16_t VehicleExtensions::GetGearCurr(Vehicle handle) {
