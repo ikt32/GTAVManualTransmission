@@ -1,22 +1,28 @@
 # Changelog
 ## 4.2.0
-Big changes to Gears.ini!
+Big changes to configuration!
 
-Fundamental changes:
+Structural changes:
+* Add a configuration tool
+* Restructured settings to ManualTransmission folder
+* Separated wheel settings and normal settings
+* Show warning for incorrect .ini versions
+
+Wheel changes:
+* Add support for multiple DirectInput devices
+* Add axis support for handbrake
+* Add back G27/G29 LEDs
+* Add option for global FF multiplier
 * Rework Force Feedback completely
-* Restructure Gears.ini wheel options
+* Tweaks to soft lock
+* Add 7th gear support for H-shifter
+* Disable controller rumble while wheel is active
 
-Feature changes:
-* Add clutch shifting for sequential option
-* Add global FF multiplier
-* Add axis support for handbrake (not analog, >50% activates)
-
-Small changes:
-* Use a smoother soft lock transition
+Changes:
+* Add option to turn on/off throttle+clutch engine starting
+* Add option for clutch shifting in sequential
 * Only stall if all wheels are on the ground
-* Add warning if an update to the .ini has been ignored
 * Remove 8th gear for numpad
-* Add 7th gear for H-shifter
 * General bug fixes :^)
 
 ## 4.1.3
