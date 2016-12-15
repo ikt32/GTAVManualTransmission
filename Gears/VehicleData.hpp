@@ -39,7 +39,6 @@ public:
 	bool NoClutch = false;
 	bool IsTruck = false;
 	BYTE *Address = nullptr;
-	uint32_t Gears = 0x00010001;
 	float Rpm = 0.0f;
 
 	// 1 = Not pressed, 0 = Fully pressed

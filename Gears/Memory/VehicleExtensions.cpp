@@ -19,6 +19,7 @@ uint16_t VehicleExtensions::GetGearCurr(Vehicle handle) {
 
 	auto offset = (gameVersion > 3 ? 0x7A2 : 0x792);
 	offset = (gameVersion > 25 ? 0x7C2 : offset);
+	offset = (gameVersion > 27 ? 0x7E2 : offset);
 
 	return address == nullptr ? 0 : *reinterpret_cast<const uint16_t *>(address + offset);
 }
@@ -28,6 +29,7 @@ uint16_t VehicleExtensions::GetGearNext(Vehicle handle) {
 
 	auto offset = (gameVersion > 3 ? 0x7A0 : 0x790);
 	offset = (gameVersion > 25 ? 0x7C0 : offset);
+	offset = (gameVersion > 27 ? 0x7E0 : offset);
 
 	return address == nullptr ? 0 : *reinterpret_cast<const uint16_t *>(address + offset);
 }
@@ -37,6 +39,7 @@ uint32_t VehicleExtensions::GetGears(Vehicle handle) {
 
 	auto offset = (gameVersion > 3 ? 0x7A0 : 0x790);
 	offset = (gameVersion > 25 ? 0x7C0 : offset);
+	offset = (gameVersion > 27 ? 0x7E0 : offset);
 
 	return address == nullptr ? 0 : *reinterpret_cast<const uint32_t *>(address + offset);
 }
@@ -46,6 +49,7 @@ void VehicleExtensions::SetGears(Vehicle handle, uint32_t value) {
 
 	auto offset = (gameVersion > 3 ? 0x7A0 : 0x790);
 	offset = (gameVersion > 25 ? 0x7C0 : offset);
+	offset = (gameVersion > 27 ? 0x7E0 : offset);
 
 	*reinterpret_cast<uint32_t *>(address + offset) = value;
 }
@@ -55,6 +59,7 @@ void VehicleExtensions::SetGearCurr(Vehicle handle, uint16_t value) {
 
 	auto offset = (gameVersion > 3 ? 0x7A0 : 0x790);
 	offset = (gameVersion > 25 ? 0x7C0 : offset);
+	offset = (gameVersion > 27 ? 0x7E0 : offset);
 
 	*reinterpret_cast<uint32_t *>(address + offset) = value;
 }
@@ -64,6 +69,7 @@ void VehicleExtensions::SetGearNext(Vehicle handle, uint16_t value) {
 
 	auto offset = (gameVersion > 3 ? 0x7A2 : 0x792);
 	offset = (gameVersion > 25 ? 0x7C2 : offset);
+	offset = (gameVersion > 27 ? 0x7E2 : offset);
 
 	*reinterpret_cast<uint32_t *>(address + offset) = value;
 }
@@ -73,6 +79,7 @@ uint32_t VehicleExtensions::GetTopGear(Vehicle handle) {
 
 	auto offset = (gameVersion > 3 ? 0x7A6 : 0x796);
 	offset = (gameVersion > 25 ? 0x7C6 : offset);
+	offset = (gameVersion > 27 ? 0x7E6 : offset);
 
 	return address == nullptr ? 0 : *reinterpret_cast<const unsigned char *>(address + offset);
 }
@@ -82,6 +89,7 @@ float VehicleExtensions::GetCurrentRPM(Vehicle handle) {
 
 	auto offset = (gameVersion > 3 ? 0x7D4 : 0x7C4);
 	offset = (gameVersion > 25 ? 0x7F4 : offset);
+	offset = (gameVersion > 27 ? 0x814 : offset);
 
 	return address == nullptr ? 0.0f : *reinterpret_cast<const float *>(address + offset);
 }
@@ -91,6 +99,7 @@ void VehicleExtensions::SetCurrentRPM(Vehicle handle, float value) {
 
 	auto offset = (gameVersion > 3 ? 0x7D4 : 0x7C4);
 	offset = (gameVersion > 25 ? 0x7F4 : offset);
+	offset = (gameVersion > 27 ? 0x814 : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }
@@ -100,6 +109,7 @@ float VehicleExtensions::GetClutch(Vehicle handle) {
 
 	auto offset = (gameVersion > 3 ? 0x7E0 : 0x7D0);
 	offset = (gameVersion > 25 ? 0x800 : offset);
+	offset = (gameVersion > 27 ? 0x820 : offset);
 
 	return address == nullptr ? 0 : *reinterpret_cast<const float *>(address + offset);
 }
@@ -109,6 +119,7 @@ void VehicleExtensions::SetClutch(Vehicle handle, float value) {
 
 	auto offset = (gameVersion > 3 ? 0x7E0 : 0x7D0);
 	offset = (gameVersion > 25 ? 0x800 : offset);
+	offset = (gameVersion > 27 ? 0x820 : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }
@@ -118,6 +129,7 @@ float VehicleExtensions::GetTurbo(Vehicle handle) {
 
 	auto offset = (gameVersion > 3 ? 0x7F8 : 0x7D8);
 	offset = (gameVersion > 25 ? 0x818 : offset);
+	offset = (gameVersion > 27 ? 0x838 : offset);
 
 	return address == nullptr ? 0 : *reinterpret_cast<const float *>(address + offset);
 }
@@ -127,7 +139,7 @@ void VehicleExtensions::SetTurbo(Vehicle handle, float value) {
 
 	auto offset = (gameVersion > 3 ? 0x7F8 : 0x7D8);
 	offset = (gameVersion > 25 ? 0x818 : offset);
-
+	offset = (gameVersion > 27 ? 0x838 : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }
@@ -137,7 +149,7 @@ float VehicleExtensions::GetThrottle(Vehicle handle) {
 
 	auto offset = (gameVersion > 3 ? 0x7E4 : 0x7D4);
 	offset = (gameVersion > 25 ? 0x804 : offset);
-
+	offset = (gameVersion > 27 ? 0x824 : offset);
 
 	return *reinterpret_cast<float *>(address + offset);
 }
@@ -147,6 +159,7 @@ void VehicleExtensions::SetThrottle(Vehicle handle, float value) {
 
 	auto offset = (gameVersion > 3 ? 0x7E4 : 0x7D4);
 	offset = (gameVersion > 25 ? 0x804 : offset);
+	offset = (gameVersion > 27 ? 0x824 : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }
@@ -156,6 +169,7 @@ float VehicleExtensions::GetThrottleP(Vehicle handle) {
 
 	auto offset = (gameVersion > 3 ? 0x8B4 : 0x8A4);
 	offset = (gameVersion > 25 ? 0x8D4 : offset);
+	offset = (gameVersion > 27 ? 0x8F4 : offset);
 
 	return *reinterpret_cast<float *>(address + offset);
 }
@@ -165,6 +179,7 @@ void VehicleExtensions::SetThrottleP(Vehicle handle, float value) {
 
 	auto offset = (gameVersion > 3 ? 0x8B4 : 0x8A4);
 	offset = (gameVersion > 25 ? 0x8D4 : offset);
+	offset = (gameVersion > 27 ? 0x8F4 : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }
@@ -174,6 +189,7 @@ float VehicleExtensions::GetBrakeP(Vehicle handle) {
 
 	auto offset = (gameVersion > 3 ? 0x8B8 : 0x8A8);
 	offset = (gameVersion > 25 ? 0x8D8 : offset);
+	offset = (gameVersion > 27 ? 0x8F8 : offset);
 
 	return *reinterpret_cast<float *>(address + offset);
 }
@@ -183,6 +199,7 @@ void VehicleExtensions::SetBrakeP(Vehicle handle, float value) {
 
 	auto offset = (gameVersion > 3 ? 0x8B8 : 0x8A8);
 	offset = (gameVersion > 25 ? 0x8D8 : offset);
+	offset = (gameVersion > 27 ? 0x8F8 : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }
@@ -192,6 +209,7 @@ float VehicleExtensions::GetFuelLevel(Vehicle handle) {
 
 	auto offset = (gameVersion > 3 ? 0x768 : 0x758);
 	offset = (gameVersion > 25 ? 0x788 : offset);
+	offset = (gameVersion > 27 ? 0x7A8 : offset);
 
 	return *reinterpret_cast<float *>(address + offset);
 }
@@ -201,6 +219,7 @@ void VehicleExtensions::SetFuelLevel(Vehicle handle, float value) {
 
 	auto offset = (gameVersion > 3 ? 0x768 : 0x758);
 	offset = (gameVersion > 25 ? 0x788 : offset);
+	offset = (gameVersion > 27 ? 0x7A8 : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }
@@ -208,14 +227,14 @@ void VehicleExtensions::SetFuelLevel(Vehicle handle, float value) {
 uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {
 	auto address = GetAddress(handle);
 
-	eGameVersion ver = gameVersion;
-	auto offset = (ver > 3 ? 0xAA0 : 0xA80);
-	offset = (ver > 23 ? 0xAB0 : offset);
-	if (ver == 06 || ver == 07) {
-		offset = 0xA90;
+	auto offset = (gameVersion > 3 ? 0xAA0 : 0xA80);
+	offset = (gameVersion > 23 ? 0xAB0 : offset);
+	if (gameVersion == 06 || gameVersion == 07) {
+		offset = 0xA90; // FiveM
 	}
-	offset = (ver > 25 ? 0xAE0 : offset);
-	
+	offset = (gameVersion > 25 ? 0xAE0 : offset);
+	offset = (gameVersion > 27 ? 0xB10 : offset);
+
 	return *reinterpret_cast<uint64_t *>(address + offset);
 }
 
@@ -253,6 +272,7 @@ float VehicleExtensions::GetSteeringInputAngle(Vehicle handle) {
 
 	auto offset = (gameVersion > 3 ? 0x8A4 : 0x894);
 	offset = (gameVersion > 25 ? 0x8C4 : offset);
+	offset = (gameVersion > 27 ? 0x8EC : offset);
 
 	return *reinterpret_cast<float *>(address + offset);
 }
@@ -262,6 +282,7 @@ void VehicleExtensions::SetSteeringInputAngle(Vehicle handle, float value) {
 
 	auto offset = (gameVersion > 3 ? 0x8A4 : 0x894);
 	offset = (gameVersion > 25 ? 0x8C4 : offset);
+	offset = (gameVersion > 27 ? 0x8EC : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }
@@ -272,6 +293,7 @@ float VehicleExtensions::GetSteeringAngle(Vehicle handle) {
 
 	auto offset = (gameVersion > 3 ? 0x8AC : 0x89C);
 	offset = (gameVersion > 25 ? 0x8CC : offset);
+	offset = (gameVersion > 27 ? 0x8F4 : offset);
 
 	return *reinterpret_cast<float *>(address + offset);
 }
@@ -281,6 +303,7 @@ void VehicleExtensions::SetSteeringAngle(Vehicle handle, float value) {
 
 	auto offset = (gameVersion > 3 ? 0x8AC : 0x89C);
 	offset = (gameVersion > 25 ? 0x8CC : offset);
+	offset = (gameVersion > 27 ? 0x8F4 : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }

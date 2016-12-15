@@ -11,7 +11,6 @@ void VehicleData::Clear() {
 	Class = VehicleClass::Car;
 	IsTruck = false;
 	Address = nullptr;
-	Gears = 0;
 	Rpm = 0.0f;
 	Clutch = 1.0f;
 	Throttle = 0.0f;
@@ -54,9 +53,8 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 	Hash model = ENTITY::GET_ENTITY_MODEL(vehicle);
 
 	Address = ext.GetAddress(vehicle);
-	Gears = ext.GetGears(vehicle);
-	CurrGear = ext.GetGearCurr(vehicle); //(0xFFFF0000 & Gears) >> 16;
-	NextGear = ext.GetGearNext(vehicle); // 0x0000FFFF & Gears;
+	CurrGear = ext.GetGearCurr(vehicle);
+	NextGear = ext.GetGearNext(vehicle);
 	Rpm = ext.GetCurrentRPM(vehicle);
 	Clutch = ext.GetClutch(vehicle);
 	Throttle = ext.GetThrottle(vehicle);
