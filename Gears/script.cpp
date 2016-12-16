@@ -103,6 +103,8 @@ void update() {
 	}
 
 	if (prevVehicle != vehicle) {
+		ext.ClearAddress();
+		ext.GetAddress(vehicle);
 		if (vehData.NoClutch) {
 			vehData.SimulatedNeutral = false;
 		}
@@ -396,7 +398,7 @@ void showDebugInfo() {
 	showText(0.01f, 0.425f, 0.4f, ssTurbo.str().c_str());
 
 	std::stringstream ssAddress;
-	ssAddress << "Address: " << std::hex << vehData.Address;
+	ssAddress << "Address: " << static_cast<void*>(vehData.Address);
 	showText(0.01f, 0.450f, 0.4f, ssAddress.str().c_str());
 
 	std::stringstream ssEnabled;
