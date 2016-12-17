@@ -15,6 +15,11 @@ WheelDirectInput::WheelDirectInput(Logger logAlt) : logger(logAlt),
 													pCFEffect{ nullptr },
 													pFREffect{ nullptr } { }
 
+WheelDirectInput::~WheelDirectInput() {
+	for (GUID guid : GetGuids()) {
+		PlayLedsDInput(guid, 0.0, 0.5, 1.0);
+	}
+}
 
 bool WheelDirectInput::InitWheel() {
 	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(nullptr),

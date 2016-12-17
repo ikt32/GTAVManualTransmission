@@ -627,6 +627,11 @@ void updateLastInputDevice() {
 				showNotification("Switched to wheel");
 				break;
 		}
+		if (prevInput != ScriptControls::Wheel) {
+			for (GUID guid : controls.WheelDI.GetGuids()) {
+				controls.WheelDI.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
+			}
+		}
 	}
 	if (prevInput == ScriptControls::Wheel) {
 		CONTROLS::STOP_PAD_SHAKE(0);

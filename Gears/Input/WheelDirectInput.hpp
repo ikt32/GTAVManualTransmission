@@ -58,6 +58,7 @@ public:
 
 	WheelDirectInput();
 	WheelDirectInput(Logger logAlt);
+	~WheelDirectInput();
 	bool InitWheel();
 	const DiJoyStick::Entry *findEntryFromGUID(GUID guid);
 	bool InitFFB(GUID guid, DIAxis ffAxis);
