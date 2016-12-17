@@ -169,7 +169,7 @@ float VehicleExtensions::GetThrottleP(Vehicle handle) {
 
 	auto offset = (gameVersion > 3 ? 0x8B4 : 0x8A4);
 	offset = (gameVersion > 25 ? 0x8D4 : offset);
-	offset = (gameVersion > 27 ? 0x8F4 : offset);
+	offset = (gameVersion > 27 ? 0x8FC : offset);
 
 	return *reinterpret_cast<float *>(address + offset);
 }
@@ -179,7 +179,7 @@ void VehicleExtensions::SetThrottleP(Vehicle handle, float value) {
 
 	auto offset = (gameVersion > 3 ? 0x8B4 : 0x8A4);
 	offset = (gameVersion > 25 ? 0x8D4 : offset);
-	offset = (gameVersion > 27 ? 0x8F4 : offset);
+	offset = (gameVersion > 27 ? 0x8FC : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }
@@ -189,7 +189,7 @@ float VehicleExtensions::GetBrakeP(Vehicle handle) {
 
 	auto offset = (gameVersion > 3 ? 0x8B8 : 0x8A8);
 	offset = (gameVersion > 25 ? 0x8D8 : offset);
-	offset = (gameVersion > 27 ? 0x8F8 : offset);
+	offset = (gameVersion > 27 ? 0x900 : offset);
 
 	return *reinterpret_cast<float *>(address + offset);
 }
@@ -199,7 +199,7 @@ void VehicleExtensions::SetBrakeP(Vehicle handle, float value) {
 
 	auto offset = (gameVersion > 3 ? 0x8B8 : 0x8A8);
 	offset = (gameVersion > 25 ? 0x8D8 : offset);
-	offset = (gameVersion > 27 ? 0x8F8 : offset);
+	offset = (gameVersion > 27 ? 0x900 : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }

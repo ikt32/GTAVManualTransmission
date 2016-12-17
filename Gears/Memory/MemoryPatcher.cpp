@@ -401,18 +401,20 @@ namespace MemoryPatcher {
 		}
 	}*/
 	//uintptr_t PatchSteering() {
-	//	// in 791_2
-	//	// 45 84 E4	(Prev)
-
+	//	// in 791.2, 877.1 and 944.2
 	//	// 0F 84 D0 01 00 00 = JE	[some address]
 	//	// becomes
 	//	// E9 D1 01 00 00 90 = JMP	[some address]
 
 	//	// 0F 28 4B 70 (Next)
-	//	uintptr_t address = mem.FindPattern("\x45\x84\xE4\x0F\x84\xD0\x01\x00\x00\x0F\x28\x4B\x70", "???xxxxxxxx??");
+    //  // F3 0F10 25 06F09300
+    //  // F3 0F10 1D 3ED39F00
+
+    //  // 
+	//	uintptr_t address = mem.FindPattern("\x0F\x84\x00\x00\x00\x00\x0F\x28\x4B\x70\xF3\x0F\x10\x25\x00\x00\x00\x00\xF3\x0F\x10\x1D\x00\x00\x00\x00", "xx????xxxxxxxx????xxxx????");
 
 	//	if (address) {
-	//		uint8_t offset = 3;
+	//		uint8_t offset = 0;
 	//		address = address + offset;
 	//		byte instrArr[6] = { 0xE9, 0xD1, 0x01, 0x00, 0x00, 0x90 };
 	//		for (int i = 0; i < 6; i++) {
