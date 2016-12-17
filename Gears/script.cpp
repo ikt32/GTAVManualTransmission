@@ -83,6 +83,18 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 	//                           Update stuff
 	///////////////////////////////////////////////////////////////////////////
+	if (prevVehicle != vehicle) {
+		ext.ClearAddress();
+		ext.GetAddress(vehicle);
+		if (vehData.NoClutch) {
+			vehData.SimulatedNeutral = false;
+		}
+		else {
+			vehData.SimulatedNeutral = settings.DefaultNeutral;
+		}
+		shiftTo(1, true);
+	}
+	prevVehicle = vehicle;
 
 	vehData.UpdateValues(ext, vehicle);
 	bool ignoreClutch = false;
@@ -102,18 +114,7 @@ void update() {
 		showDebugInfo();
 	}
 
-	if (prevVehicle != vehicle) {
-		ext.ClearAddress();
-		ext.GetAddress(vehicle);
-		if (vehData.NoClutch) {
-			vehData.SimulatedNeutral = false;
-		}
-		else {
-			vehData.SimulatedNeutral = settings.DefaultNeutral;
-		}
-		shiftTo(1, true);
-	}
-	prevVehicle = vehicle;
+
 
 	///////////////////////////////////////////////////////////////////////////
 	//                            Alt vehicle controls
