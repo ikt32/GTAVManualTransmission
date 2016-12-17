@@ -95,8 +95,8 @@ int main()
 		guids.push_back(g);
 	}
 
-	int activeGuids = controls.WheelDI.GetGuids().size();
-	int totalWidth = (activeGuids+0.5) * 32;
+	int activeGuids = static_cast<int>(controls.WheelDI.GetGuids().size());
+	int totalWidth = static_cast<int>((activeGuids + 0.5) * 32);
 	if (totalWidth < 80) {
 		totalWidth = 80;
 	}
