@@ -1507,8 +1507,10 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 		GForce = (1.0f - understeer) * GForce;
 	}
 
+	// Simulate positive caster or something idk
 	if (vehData.Velocity < -0.1f) {
 		damperForce = settings.DamperMin;
+		GForce = -GForce;
 	}
 
 	// Detail feel / suspension compression based
