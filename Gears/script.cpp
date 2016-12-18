@@ -468,8 +468,12 @@ void showDebugInfo() {
 	}
 }
 
+// To expose some variables to other scripts
 void crossScriptComms() {
-	// Other scripts. 0 = nothing, 1 = Shift up, 2 = Shift down
+	// Current gear
+	DECORATOR::DECOR_SET_INT(vehicle, "doe_elk", vehData.CurrGear);
+
+	// Shift indicator: 0 = nothing, 1 = Shift up, 2 = Shift down
 	if (vehData.CurrGear < vehData.NextGear || truckShiftUp) {
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1);
 	}
@@ -480,6 +484,7 @@ void crossScriptComms() {
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 0);
 	}
 
+	// Simulated Neutral
 	if (vehData.SimulatedNeutral && settings.EnableManual) {
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_weapon", 1);
 	}
