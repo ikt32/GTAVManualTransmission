@@ -367,7 +367,7 @@ WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString)
 int WheelDirectInput::GetAxisValue(DIAxis axis, GUID device) {
 	auto e = findEntryFromGUID(device);
 	if (!IsConnected(device) || e == nullptr)
-		return 0;
+		return -1;
 	switch (axis) {
 		case lX: return  e->joystate.lX;
 		case lY: return  e->joystate.lY;
