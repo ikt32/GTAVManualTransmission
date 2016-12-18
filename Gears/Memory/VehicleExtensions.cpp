@@ -307,3 +307,35 @@ void VehicleExtensions::SetSteeringAngle(Vehicle handle, float value) {
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }
+
+float VehicleExtensions::GetEngineTemp(Vehicle handle) {
+	auto address = GetAddress(handle);
+
+	auto offset = (gameVersion > 27 ? 0x9AC : -1);
+	if (offset == -1)
+		return 0;
+
+	return *reinterpret_cast<float *>(address + offset);
+}
+
+float VehicleExtensions::GetDirtLevel(Vehicle handle) {
+	auto address = GetAddress(handle);
+
+
+	auto offset = (gameVersion > 27 ? 0x938 : -1);
+	if (offset == -1)
+		return 0;
+
+	return *reinterpret_cast<float *>(address + offset);
+}
+
+float VehicleExtensions::GetDashSpeed(Vehicle handle) {
+	auto address = GetAddress(handle);
+
+
+	auto offset = (gameVersion > 27 ? 0x9F0 : -1);
+	if (offset == -1)
+		return 0;
+
+	return *reinterpret_cast<float *>(address + offset);
+}
