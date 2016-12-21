@@ -11,9 +11,9 @@ WheelDirectInput::WheelDirectInput() : logger(LOGFILE),
                                        pCFEffect{nullptr},
                                        pFREffect{nullptr} { }
 
-WheelDirectInput::WheelDirectInput(Logger logAlt) : logger(logAlt),
-													pCFEffect{ nullptr },
-													pFREffect{ nullptr } { }
+//WheelDirectInput::WheelDirectInput(Logger logAlt) : logger(logAlt),
+//													pCFEffect{ nullptr },
+//													pFREffect{ nullptr } { }
 
 WheelDirectInput::~WheelDirectInput() {
 	for (GUID guid : GetGuids()) {
@@ -128,6 +128,7 @@ bool WheelDirectInput::InitFFB(GUID guid, WheelDirectInput::DIAxis ffAxis) {
 	UpdateState(); // I don't understand
 	UpdateState(); // Why do I need to call this twice?
 	prevTime = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
+	prevPosition = GetAxisValue(ffAxis, guid);
 	logger.Write("Initializing wheel success");
 	return true;
 }

@@ -9,7 +9,6 @@
 #include <array>
 #include "../Util/Logger.hpp"
 #include <vector>
-#include <unordered_set> 
 
 #define MAX_RGBBUTTONS 128
 #define SAMPLES 4
