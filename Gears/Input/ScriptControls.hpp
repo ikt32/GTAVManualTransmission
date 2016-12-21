@@ -84,7 +84,7 @@ public:
 		Wheel = 2
 	};
 
-	ScriptControls();
+	ScriptControls(Logger &logger);
 	~ScriptControls();
 	void InitWheel();
 

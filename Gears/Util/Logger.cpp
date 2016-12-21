@@ -4,12 +4,7 @@
 
 #include "Logger.hpp"
 
-//Logger::Logger() {
-//	file = LOGFILE;
-//}
-
-Logger::Logger(std::string fileName) {
-	file = fileName;
+Logger::Logger(std::string fileName) : file(fileName) {
 }
 
 void Logger::Clear() const {

@@ -7,13 +7,10 @@
 #include <chrono>
 #include <vector>
 
-WheelDirectInput::WheelDirectInput() : logger(LOGFILE),
-                                       pCFEffect{nullptr},
-                                       pFREffect{nullptr} { }
-
-//WheelDirectInput::WheelDirectInput(Logger logAlt) : logger(logAlt),
-//													pCFEffect{ nullptr },
-//													pFREffect{ nullptr } { }
+WheelDirectInput::WheelDirectInput(Logger &logAlt) : nEntry(0),
+                                                    logger(logAlt),
+                                                    pCFEffect{nullptr},
+                                                    pFREffect{nullptr} { }
 
 WheelDirectInput::~WheelDirectInput() {
 	for (GUID guid : GetGuids()) {
@@ -406,7 +403,7 @@ std::vector<GUID> WheelDirectInput::GetGuids() {
 	return foundGuids;
 }
 
-void WheelDirectInput::PlayLedsDInput(GUID guid, CONST FLOAT currentRPM, CONST FLOAT rpmFirstLedTurnsOn, CONST FLOAT rpmRedLine)
+void WheelDirectInput::PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine)
 {
 	auto e = findEntryFromGUID(guid);
 

@@ -3,7 +3,8 @@
 #include <Windows.h>
 #include "keyboard.h"
 
-ScriptControls::ScriptControls(): controller{1},
+ScriptControls::ScriptControls(Logger &logger): WheelDI(logger),
+	                              controller{1},
                                   buttonState(0) {
 }
 

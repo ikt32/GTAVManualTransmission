@@ -20,9 +20,9 @@
 #include "Util/Util.hpp"
 #include "Input/keyboard.h"
 
-Logger logger(LOGFILE);
-ScriptControls controls;
-ScriptSettings settings;
+Logger logger(GEARSLOGPATH);
+ScriptControls controls(logger);
+ScriptSettings settings("./ManualTransmission/settings_general.ini", "./ManualTransmission/settings_wheel.ini", logger);
 
 Player player;
 Ped playerPed;

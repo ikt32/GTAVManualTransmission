@@ -13,7 +13,7 @@ http://dev-c.com
 #include "Memory/MemoryPatcher.hpp"
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
-	Logger logger(LOGFILE);
+	Logger logger(GEARSLOGPATH);
 	// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 	switch (reason) {
 		case DLL_PROCESS_ATTACH: {

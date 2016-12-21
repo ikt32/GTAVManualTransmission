@@ -40,7 +40,7 @@ namespace MemoryPatcher {
 
 
 	bool PatchInstructions() {
-		Logger logger(LOGFILE);
+		Logger logger(GEARSLOGPATH);
 		logger.Write("Patching instructions");
 
 		clutchLowTemp = PatchClutchLow();
@@ -139,7 +139,7 @@ namespace MemoryPatcher {
 	}
 
 	bool RestoreInstructions() {
-		Logger logger(LOGFILE);
+		Logger logger(GEARSLOGPATH);
 		logger.Write("Restoring instructions");
 
 		if (clutchLowAddr) {
@@ -216,7 +216,7 @@ namespace MemoryPatcher {
 	}
 
 	/*bool PatchJustS_LOW() {
-		Logger logger(LOGFILE);
+		Logger logger(GEARSLOGPATH);
 		clutchStationaryLowTemp = PatchClutchStationaryLow();
 		//if (clutchStationaryLowTemp) {
 		//	clutchStationaryLowAddr = clutchStationaryLowTemp;
@@ -239,7 +239,7 @@ namespace MemoryPatcher {
 	}
 
 	bool RestoreJustS_LOW() {
-		Logger logger(LOGFILE);
+		Logger logger(GEARSLOGPATH);
 		//if (clutchStationaryLowAddr) {
 		//	RestoreClutchStationaryLow(clutchStationaryLowAddr);
 		//	clutchStationaryLowAddr = 0;

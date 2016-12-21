@@ -55,8 +55,7 @@ public:
 		SIZEOF_POV
 	};
 
-	WheelDirectInput();
-	WheelDirectInput(Logger logAlt);
+	WheelDirectInput(Logger &logAlt);
 	~WheelDirectInput();
 	bool InitWheel();
 	const DiJoyStick::Entry *findEntryFromGUID(GUID guid);
@@ -82,7 +81,7 @@ public:
 	std::vector<GUID> GetGuids();
 	void PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine);
 private:
-	Logger logger;// (LOGFILE);
+	Logger logger;
 	DiJoyStick djs;
 
 

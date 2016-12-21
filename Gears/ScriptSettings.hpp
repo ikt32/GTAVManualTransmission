@@ -4,13 +4,15 @@
 #define CORRECTVWHEEL 420
 #include <string>
 #include <vector>
+#include "Util/Logger.hpp"
 
+class Logger;
 class ScriptControls;
 
 class ScriptSettings {
 public:
-	ScriptSettings();
-	ScriptSettings(std::string general, std::string wheel);
+	//ScriptSettings();
+	ScriptSettings(std::string general, std::string wheel, Logger &logger);
 	void Read(ScriptControls* scriptControl);
 	void Save() const;
 	void IsCorrectVersion() const;
@@ -71,13 +73,13 @@ public:
 	bool Debug = false;
 
 	std::vector<GUID> reggdGuids;
-
 private:
 	int settings_general_version = 0;
 	int settings_wheel_version = 0;
+	Logger logger;
 	void parseSettingsWheel(ScriptControls *scriptControl);
 	GUID DeviceIndexToGUID(int device, std::vector<GUID> guids);
 	int nDevices;
-	std::string settingsWheelFile = "./ManualTransmission/settings_wheel.ini";
-	std::string settingsGeneralFile = "./ManualTransmission/settings_general.ini";
+	std::string settingsGeneralFile;// = "./ManualTransmission/settings_general.ini";
+	std::string settingsWheelFile;// = "./ManualTransmission/settings_wheel.ini";
 };

@@ -7,13 +7,18 @@
 
 // TODO: This Device<->GUID->Control thing is very broken pls fix
 
-ScriptSettings::ScriptSettings() {
-	// Defaults
-}
+//ScriptSettings::ScriptSettings(): nDevices(0) {
+//	// Defaults
+//}
 
-ScriptSettings::ScriptSettings(std::string general, std::string wheel) {
-	settingsGeneralFile = general;
-	settingsWheelFile = wheel;
+ScriptSettings::ScriptSettings(std::string general,
+	                           std::string wheel,
+	                           Logger &logger) : logger(logger),
+                                                 nDevices(0),
+                                                 settingsGeneralFile(general),
+                                                 settingsWheelFile(wheel) {
+	//settingsGeneralFile = general;
+	//settingsWheelFile = wheel;
 }
 
 void ScriptSettings::Read(ScriptControls* scriptControl) {
@@ -134,7 +139,6 @@ std::vector<GUID> ScriptSettings::GetGuids() {
 void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 #pragma warning(push)
 #pragma warning(disable: 4244) // Make everything doubles later...
-	Logger logger(LOGFILE);
 	CSimpleIniA settingsWheel;
 	settingsWheel.SetUnicode();
 	settingsWheel.LoadFile(settingsWheelFile.c_str());
@@ -174,13 +178,6 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 		if (currGuid == "")
 			break;
 
-		//// the fuck, Microsoft?
-		//LPCOLESTR the_fuck = LPWSTR(currGuid.c_str());
-
-		//GUID bstrGuid;
-		//CLSIDFromString(the_fuck, &bstrGuid);
-		////guids.emplace_back(it, bstrGuid);
-		//guids.push_back(bstrGuid);
 		std::wstring clsidStr;
 		clsidStr.assign(currGuid.begin(), currGuid.end());
 		GUID guid;
@@ -390,13 +387,10 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 }
 
 GUID ScriptSettings::DeviceIndexToGUID(int device, std::vector<GUID> guids) {
-	Logger log(LOGFILE);
 	if (device < 0) {
-		//log.Write("Invalid device index (<0)");
 		return{};
 	}
 	if (device > nDevices - 1) {
-		//log.Write("Invalid device index: " + device);
 		return{};
 	}
 	return guids[device];
