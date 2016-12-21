@@ -1,6 +1,8 @@
+#define NOMINMAX
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <algorithm>
 
 #include "../../ScriptHookV_SDK/inc/natives.h"
 #include "../../ScriptHookV_SDK/inc/enums.h"
@@ -1428,16 +1430,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	else {
 		steerMult = settings.SteerAngleMax / settings.SteerAngleAlt;
 	}
-
 	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
-
-	/*
-	 *  The wheels should not care, it's the rotation + grip.
-	 *  See G-force for proper cornering feel calculation. 
-	 *  This is left for effects and emulate the grip thing.
-	 *  This is also in G.
-	 */
-	//double sideForce = accelValsAvg.x/9.81;
 	
 	// targetSpeed is the speed at which the damperForce is at minimum
 	// damperForce is maximum at speed 0 and decreases with speed increase
@@ -1464,6 +1457,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	 * Because G Force = ---- and a = v * omega, verified with a = ---   using a speedo and 
 	 *                   9.81                                       r    r = ypg205t16a length
 	 * No need to crappily emulate centering any more.
+	 * Do: Find something for self-aligning torque
 	 */
 	double GForce = (vehData.RotationVelocity.z * vehData.Velocity) / 9.81f;
 
@@ -1479,7 +1473,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 		angle = 0.0;
 
 	if (angle > 10 && vehData.Velocity > 1.0f) {
-		oversteer = angle/90.0f;
+		oversteer = std::min(1.0f, angle/90.0f);
 	}
 	// end oversteer detect
 
@@ -1487,29 +1481,15 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	float understeer = 0.0f;
 	if (abs(vehData.SteeringAngle*std::sqrt(vehData.Velocity)) > abs(vehData.RotationVelocity.z) &&
 		vehData.Velocity > 0.1f) {
-		understeer = abs(vehData.SteeringAngle*sqrt(vehData.Velocity) - vehData.RotationVelocity.z);
+		understeer = std::min(1.0f, abs(vehData.SteeringAngle*sqrt(vehData.Velocity) - vehData.RotationVelocity.z));
 	}
 	// end understeer detect
-	
-	if (understeer > 1.0f) {
-		understeer = 1.0f;
-	}
-
-	if (oversteer > 1.0f) {
-		oversteer = 1.0f;
-	}
-
-	float gripSpeedThreshold = 4.0f;
 
 	// On understeering conditions, lower "grippy" feel
-	if (understeer > 0.01f && vehData.Velocity > gripSpeedThreshold) {
-		//centerForce = static_cast<int>((1.0f - understeer) * centerForce);
-		GForce = (1.0f - understeer) * GForce;
-	}
+	GForce = std::min(1.0f, std::max(0.0f, 1.0f - understeer + oversteer)) * GForce;
 
 	// Simulate caster instability
 	if (vehData.Velocity < -0.1f) {
-		damperForce = settings.DamperMin;
 		GForce = -GForce;
 	}
 
