@@ -58,11 +58,69 @@ Logger logger("./DIUtil.log");
 ScriptControls controls(logger);
 ScriptSettings settings("./settings_general.ini","./settings_wheel.ini", logger);
 
-std::string GUID2Str(GUID g) {
+// TODO: This is pulled straight from Gears/script.cpp and should be refactored lmao
+// TODO: Move this shit
+bool operator < (const GUID &guid1, const GUID &guid2) {
+	if (guid1.Data1 != guid2.Data1) {
+		return guid1.Data1 < guid2.Data1;
+	}
+	if (guid1.Data2 != guid2.Data2) {
+		return guid1.Data2 < guid2.Data2;
+	}
+	if (guid1.Data3 != guid2.Data3) {
+		return guid1.Data3 < guid2.Data3;
+	}
+	for (int i = 0; i<8; i++) {
+		if (guid1.Data4[i] != guid2.Data4[i]) {
+			return guid1.Data4[i] < guid2.Data4[i];
+		}
+	}
+	return false;
+}
+
+std::string GUID2String(GUID g) {
 	wchar_t szGuidW[40] = { 0 };
 	StringFromGUID2(g, szGuidW, 40);
 	std::wstring wGuid = szGuidW;
 	return std::string(wGuid.begin(), wGuid.end());
+}
+
+void checkGUIDs(const std::vector<_GUID> & guids) {
+	auto foundGuids = controls.WheelDI.GetGuids();
+	auto reggdGuids = settings.GetGuids();
+	// We're only checking for devices that should be used but aren't found
+	std::sort(foundGuids.begin(), foundGuids.end());
+	std::sort(reggdGuids.begin(), reggdGuids.end());
+	std::vector<GUID> missingReg;
+	std::vector<GUID> missingFnd;
+
+	// Mental note since I'm dumb:
+	// The difference of two sets is formed by the elements that are present in
+	// the first set, but not in the second one.
+
+	// Registered but not enumerated
+	std::set_difference(
+		reggdGuids.begin(), reggdGuids.end(),
+		foundGuids.begin(), foundGuids.end(), std::back_inserter(missingReg));
+
+	if (missingReg.size() > 0) {
+		logger.Write("Registered but not available: ");
+		for (auto g : missingReg) {
+			logger.Write(std::string("    ") + GUID2String(g));
+		}
+	}
+
+	// Enumerated but not registered
+	std::set_difference(
+		foundGuids.begin(), foundGuids.end(),
+		reggdGuids.begin(), reggdGuids.end(), std::back_inserter(missingFnd));
+
+	if (missingFnd.size() > 0) {
+		logger.Write("Enumerated but not registered: (available for use in settings_wheel.ini)");
+		for (auto g : missingFnd) {
+			logger.Write(std::string("    ") + GUID2String(g));
+		}
+	}
 }
 
 int main()
@@ -85,14 +143,7 @@ int main()
 	GUID steerGuid = controls.WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)];
 
 	controls.InitWheel();
-
-	logger.Write("Registered GUIDs: ");
-	
-	std::vector<GUID> guids;
-	for (auto g : settings.reggdGuids) {
-		logger.Write("GUID:   " + GUID2Str(g));
-		guids.push_back(g);
-	}
+	checkGUIDs(settings.reggdGuids);
 
 	int activeGuids = static_cast<int>(controls.WheelDI.GetGuids().size());
 	int totalWidth = static_cast<int>((activeGuids + 0.5) * 32);
@@ -112,6 +163,10 @@ int main()
 		}
 		controls.GetLastInputDevice(ScriptControls::InputDevices::Wheel);
 		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
+
+		float steerMult;
+		steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
+		float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 		
 		CONSOLE_SCREEN_BUFFER_INFO csbi;
 		GetConsoleScreenBufferInfo(hConsole, &csbi);
@@ -203,6 +258,7 @@ int main()
 		std::cout << "Clutch    " << controls.ClutchVal << "\n";
 		std::cout << "Handbrake " << controls.HandbrakeVal << "\n";
 		std::cout << "Steer     " << controls.SteerVal << "\n";
+		std::cout << std::fixed << "Softlock  " << effSteer << "\n";
 
 		std::string gear = "N";
 		if (controls.ButtonIn(ScriptControls::WheelControlType::H1))
@@ -226,7 +282,21 @@ int main()
 
 
 		controls.WheelDI.PlayLedsDInput(steerGuid, controls.ThrottleVal, 0.5f, 0.95f);
-		controls.WheelDI.SetConstantForce(steerGuid, static_cast<int>(controls.ThrottleVal * 20000.0f * 2.0f * (controls.SteerVal - 0.5f)));
+
+		auto totalForce = static_cast<int>(controls.ThrottleVal * 20000.0f * 2.0f * (controls.SteerVal - 0.5f));
+		if (effSteer > 1.0f) {
+			totalForce = static_cast<int>((effSteer - 1.0f) * 100000) + totalForce;
+			if (effSteer > 1.1f) {
+				totalForce = 10000;
+			}
+		}
+		else if (effSteer < -1.0f) {
+			totalForce = static_cast<int>((-effSteer - 1.0f) * -100000) + totalForce;
+			if (effSteer < -1.1f) {
+				totalForce = -10000;
+			}
+		}
+		controls.WheelDI.SetConstantForce(steerGuid, totalForce);
 
 		setCursorPosition(0 , csbi.srWindow.Bottom);
 		std::cout << "Press ESC to exit.";
