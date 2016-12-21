@@ -60,8 +60,9 @@ END_MESSAGE_MAP()
 
 CGearsAppDlg::CGearsAppDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_GEARSAPP_DIALOG, pParent),
-	settings("./settings_general.ini", "./settings_wheel.ini"),
-	logger("./Gears.log")
+	logger("./Settings.log"),
+	controls(logger),
+	settings("./settings_general.ini", "./settings_wheel.ini", logger)
 {
 
 	logger.Clear();

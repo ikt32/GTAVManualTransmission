@@ -36,7 +36,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedOk();
+	Logger logger;
 	ScriptControls controls;
 	ScriptSettings settings;
-	Logger logger;
 };
