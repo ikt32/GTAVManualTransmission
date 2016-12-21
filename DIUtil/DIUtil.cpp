@@ -54,9 +54,9 @@ void setCursorPosition(int x, int y)
 	COORD coord = { (SHORT)x, (SHORT)y };
 	SetConsoleCursorPosition(hOut, coord);
 }
-
-ScriptControls controls;
-ScriptSettings settings("./settings_general.ini","./settings_wheel.ini");
+Logger logger("./DIUtil.log");
+ScriptControls controls(logger);
+ScriptSettings settings("./settings_general.ini","./settings_wheel.ini", logger);
 
 std::string GUID2Str(GUID g) {
 	wchar_t szGuidW[40] = { 0 };
@@ -78,7 +78,6 @@ int main()
 	HWND consoleWindow = GetConsoleWindow();
 	GetWindowRect(consoleWindow, &r);
 
-	Logger logger("./DIUtil.log");
 	logger.Clear();
 	logger.Write("Manual Transmission v4.2.0 - DirectInput utility");
 	settings.Read(&controls);
