@@ -284,6 +284,24 @@ int main()
 		controls.WheelDI.PlayLedsDInput(steerGuid, controls.ThrottleVal, 0.5f, 0.95f);
 
 		auto totalForce = static_cast<int>(controls.ThrottleVal * 20000.0f * 2.0f * (controls.SteerVal - 0.5f));
+
+		auto adjustRatio = static_cast<float>(settings.DamperMax) / static_cast<float>(settings.TargetSpeed);
+		auto damperForce = settings.DamperMax - static_cast<int>(10 * (1.0-controls.BrakeVal) * adjustRatio);
+
+		if (damperForce < settings.DamperMin) {
+			damperForce = settings.DamperMin;
+		}
+		// steerSpeed is to dampen the steering wheel
+		auto steerSpeed =
+			controls.WheelDI.GetAxisSpeed(
+			controls.WheelDI.StringToAxis(
+			controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)]
+			),
+			steerGuid
+			) / 20; // wtf ikt
+
+		totalForce += (damperForce * 0.1 * steerSpeed);
+
 		if (effSteer > 1.0f) {
 			totalForce = static_cast<int>((effSteer - 1.0f) * 100000) + totalForce;
 			if (effSteer > 1.1f) {
