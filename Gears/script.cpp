@@ -1489,9 +1489,9 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	GForce = std::min(1.0f, std::max(0.0f, 1.0f - understeer + oversteer)) * GForce;
 
 	// Simulate caster instability
-	if (vehData.Velocity < -0.1f) {
-		GForce = -GForce;
-	}
+	//if (vehData.Velocity < -0.1f) {
+	//	GForce = -GForce;
+	//}
 
 	// Detail feel / suspension compression based
 	float compSpeedTotal = 0.0f;
