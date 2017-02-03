@@ -1222,7 +1222,7 @@ void handleVehicleButtons() {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 	if  (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
-		(controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) ||
+		((controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) && settings.ToggleEngine) ||
 		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine))) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);

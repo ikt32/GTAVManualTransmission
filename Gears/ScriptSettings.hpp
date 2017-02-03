@@ -49,6 +49,9 @@ public:
 	
 	bool CrossScript = false;
 
+	// [CONTROLLER]
+	bool ToggleEngine;
+
 	// [WHEELOPTIONS]
 	bool WheelEnabled = false;
 	bool WheelWithoutManual = true;

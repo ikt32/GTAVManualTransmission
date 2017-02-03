@@ -73,6 +73,8 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	}
 	scriptControl->SetXboxTrigger(tval);
 
+	ToggleEngine = settingsGeneral.GetBoolValue("CONTROLLER", "ToggleEngine", "0");
+
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)]   = settingsGeneral.GetValue("CONTROLLER", "ShiftUp", "A");
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)] = settingsGeneral.GetValue("CONTROLLER", "ShiftDown", "X");
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Clutch)]    = settingsGeneral.GetValue("CONTROLLER", "Clutch", "LeftThumbDown");
