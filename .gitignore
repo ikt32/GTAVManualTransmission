@@ -24,3 +24,4 @@ Thumbs.db
 [Pp]ackages/
 packages.config
 
+*.log
