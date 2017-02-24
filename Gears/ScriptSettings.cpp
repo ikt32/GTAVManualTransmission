@@ -17,8 +17,7 @@ ScriptSettings::ScriptSettings(std::string general,
                                                  nDevices(0),
                                                  settingsGeneralFile(general),
                                                  settingsWheelFile(wheel) {
-	//settingsGeneralFile = general;
-	//settingsWheelFile = wheel;
+
 }
 
 void ScriptSettings::Read(ScriptControls* scriptControl) {
@@ -149,6 +148,8 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	WheelEnabled = settingsWheel.GetBoolValue("OPTIONS", "EnableWheel", false);
 	WheelWithoutManual = settingsWheel.GetBoolValue("OPTIONS", "WheelWithoutManual", true);
 	AltControls = settingsWheel.GetBoolValue("OPTIONS", "WheelBoatPlanes", false);
+	PatchSteering = settingsWheel.GetBoolValue("OPTIONS", "PatchSteering", false);
+	PatchSteeringAlways = settingsWheel.GetBoolValue("OPTIONS", "PatchSteeringAlways", false);
 
 	// [FORCE_FEEDBACK]
 	FFEnable = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "FFEnable", true);

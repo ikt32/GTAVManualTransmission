@@ -5,6 +5,13 @@ namespace MemoryPatcher {
 	extern bool PatchInstructions();
 	extern bool RestoreInstructions();
 
+	extern bool PatchSteeringCorrection();
+	extern bool RestoreSteeringCorrection();
+
+	/*
+	 * TODO: Try making some of the things below not extern, me.
+	 */
+
 	// Clutch disengage @ Low Speed High Gear, low RPM
 	extern uintptr_t PatchClutchLow();
 	extern void RestoreClutchLow(uintptr_t address);
@@ -20,8 +27,9 @@ namespace MemoryPatcher {
 	extern uintptr_t PatchSteering();
 	extern void RestoreSteering(uintptr_t address);
 
-	extern int total;
-	extern int patched;
+	extern int TotalToPatch;
+	extern int TotalPatched;
+	extern bool SteeringPatched;
 
 	extern MemoryAccess mem;
 

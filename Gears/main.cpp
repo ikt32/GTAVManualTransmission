@@ -28,13 +28,16 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 		case DLL_PROCESS_DETACH: {
 			logger.Write("Init shutdown");
 			bool successI = MemoryPatcher::RestoreInstructions();
+			bool successS = MemoryPatcher::RestoreSteeringCorrection();
 
-			if (successI) {
+			if (successI && successS) {
 				logger.Write("Shut down script successfully");
 			}
 			else {
 				if (!successI)
 					logger.Write("Shut down script with instructions not restored");
+				if (!successS)
+					logger.Write("Shut down script with steering not restored");
 			}
 			scriptUnregister(hInstance);
 			keyboardHandlerUnregister(OnKeyboardMessage);

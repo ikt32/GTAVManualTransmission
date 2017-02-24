@@ -11,12 +11,15 @@ class ScriptControls;
 
 class ScriptSettings {
 public:
-	//ScriptSettings();
 	ScriptSettings(std::string general, std::string wheel, Logger &logger);
 	void Read(ScriptControls* scriptControl);
 	void Save() const;
 	void IsCorrectVersion() const;
+
+	// Only use this AFTER wheel settings are read.
 	std::vector<GUID> GetGuids();
+
+	// settings_general.ini parts
 	// [OPTIONS]
 	bool EnableManual = true;
 	int ShiftMode = 0; 	// 0 Seq, 1 H, 2 Auto
@@ -37,6 +40,7 @@ public:
 	bool HillBrakeWorkaround = false;
 	bool AutoGear1 = false;
 	bool AutoLookBack = false;
+	bool ThrottleStart = false;
 
 	bool UITips = true;
 	bool UITips_OnlyNeutral = false;
@@ -50,12 +54,22 @@ public:
 	bool CrossScript = false;
 
 	// [CONTROLLER]
-	bool ToggleEngine;
+	bool ToggleEngine = false; // false makes it just turn ON the engine
 
-	// [WHEELOPTIONS]
+	// [DEBUG]
+	bool Debug = false;
+
+	std::vector<GUID> reggdGuids;
+
+	// settings_wheel.ini parts
+	// [OPTIONS]
 	bool WheelEnabled = false;
 	bool WheelWithoutManual = true;
-	
+	bool AltControls = false;
+	bool PatchSteering = false;
+	bool PatchSteeringAlways = false;
+
+	// [FORCE_FEEDBACK]
 	bool FFEnable = true;
 	float FFGlobalMult = 1.0f;
 	int DamperMax = 50;
@@ -63,26 +77,20 @@ public:
 	int TargetSpeed = 10; // TargetSpeed in m/s
 	float FFPhysics = 1.0f;
 	float DetailStrength = 100.0f;
-	bool AltControls = false;
-	bool ThrottleStart = false;
 
-	// [WHEELAXIS]
+	// [STEER]
 	float SteerAngleMax = 900.0f;
 	float SteerAngleCar = 720.0f;
 	float SteerAngleBike = 180.0f;
 	float SteerAngleAlt = 180.0f;
 
-	// [DEBUG]
-	bool Debug = false;
-
-	std::vector<GUID> reggdGuids;
 private:
 	int settings_general_version = 0;
 	int settings_wheel_version = 0;
 	Logger logger;
 	void parseSettingsWheel(ScriptControls *scriptControl);
 	GUID DeviceIndexToGUID(int device, std::vector<GUID> guids);
-	int nDevices;
-	std::string settingsGeneralFile;// = "./ManualTransmission/settings_general.ini";
-	std::string settingsWheelFile;// = "./ManualTransmission/settings_wheel.ini";
+	int nDevices = 0;
+	std::string settingsGeneralFile;
+	std::string settingsWheelFile;
 };

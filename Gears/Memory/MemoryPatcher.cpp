@@ -12,10 +12,10 @@ namespace MemoryPatcher {
 	 * "total" refers to the "package" of patches needed to get the gearbox
 	 * and clutch stuff working.
 	 */
-	int total = 2;
-	int patched = 0;
+	int TotalToPatch = 2;
+	int TotalPatched = 0;
 
-	bool steeringPatched = false;
+	bool SteeringPatched = false;
 
 	uintptr_t clutchLowAddr = 0;
 	uintptr_t clutchLowTemp = 0;
@@ -37,7 +37,7 @@ namespace MemoryPatcher {
 		clutchLowTemp = PatchClutchLow();
 		if (clutchLowTemp) {
 			clutchLowAddr = clutchLowTemp;
-			patched++;
+			TotalPatched++;
 			std::stringstream hexaddr;
 			hexaddr << std::hex << clutchLowAddr;
 			logger.Write("clutchLow @ " + hexaddr.str());
@@ -49,7 +49,7 @@ namespace MemoryPatcher {
 		gear7A0Temp = PatchGear7A0();
 		if (gear7A0Temp) {
 			gear7A0Addr = gear7A0Temp;
-			patched++;
+			TotalPatched++;
 			std::stringstream hexaddr;
 			hexaddr << std::hex << gear7A0Addr;
 			logger.Write("gear 7A0  @ " + hexaddr.str());
@@ -58,7 +58,7 @@ namespace MemoryPatcher {
 			logger.Write("gear 7A0  not patched");
 		}
 
-		if (patched == total) {
+		if (TotalPatched == TotalToPatch) {
 			logger.Write("Patching success");
 			return true;
 		}
@@ -73,7 +73,7 @@ namespace MemoryPatcher {
 		if (clutchLowAddr) {
 			RestoreClutchLow(clutchLowAddr);
 			clutchLowAddr = 0;
-			patched--;
+			TotalPatched--;
 		}
 		else {
 			logger.Write("clutchLow not restored");
@@ -82,13 +82,13 @@ namespace MemoryPatcher {
 		if (gear7A0Addr) {
 			RestoreGear7A0(gear7A0Addr);
 			gear7A0Addr = 0;
-			patched--;
+			TotalPatched--;
 		}
 		else {
 			logger.Write("Gear@7A0 not restored");
 		}
 
-		if (patched == 0) {
+		if (TotalPatched == 0) {
 			logger.Write("Restore success");
 			return true;
 		}
@@ -98,34 +98,37 @@ namespace MemoryPatcher {
 
 	bool PatchSteeringCorrection() {
 		Logger logger(GEARSLOGPATH);
-		logger.Write("Patching instructions");
+		logger.Write("Patching steering correction");
 
 		SteeringTemp = PatchSteering();
 		if (SteeringTemp) {
 			SteeringAddr = SteeringTemp;
-			steeringPatched = true;
+			SteeringPatched = true;
 			std::stringstream hexaddr;
 			hexaddr << std::hex << SteeringAddr;
 			logger.Write("Steering @ " + hexaddr.str());
+			logger.Write("Patching steering correction success");
 			return true;
 		}
 
-		logger.Write("Steering not patched");
+		logger.Write("Steering correction patch failed");
 		return false;
 	}
 
 	bool RestoreSteeringCorrection() {
 		Logger logger(GEARSLOGPATH);
-		logger.Write("Restoring instructions");
+		logger.Write("Restoring steering correction");
 
 		if (SteeringAddr) {
 			RestoreSteering(SteeringAddr);
 			SteeringAddr = 0;
-			steeringPatched = false;
+			SteeringPatched = false;
+			logger.Write("Restore steering correction success");
+
 			return true;
 		}
 
-		logger.Write("Steering not restored");
+		logger.Write("Steering correction restore failed");
 		return false;
 	}
 

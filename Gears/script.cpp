@@ -32,14 +32,16 @@ VehicleData vehData;
 VehicleExtensions ext;
 Hash model;
 
+// TODO: This thing _should_ PROBABLY use the extern in MemoryPatcher
 bool patched = false;
+
 int prevNotification = 0;
 ScriptControls::InputDevices prevInput;
 
 float prevRpm;
 int prevExtShift = 0;
 
-// This gonna be refactored into vehData somehow
+// TODO: This gonna be refactored into vehData somehow
 bool blinkerLeft = false;
 bool blinkerRight = false;
 bool blinkerHazard = false;
@@ -276,6 +278,10 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 	if (!patched && settings.EnableManual) {
 		patched = MemoryPatcher::PatchInstructions();
+	}
+
+	if (!MemoryPatcher::SteeringPatched && settings.PatchSteering && settings.PatchSteeringAlways) {
+		MemoryPatcher::PatchSteeringCorrection();
 	}
 	///////////////////////////////////////////////////////////////////////////
 	// Actual mod operations
@@ -588,6 +594,9 @@ void reset() {
 	if (patched) {
 		patched = !MemoryPatcher::RestoreInstructions();
 	}
+	if (MemoryPatcher::SteeringPatched) {
+		MemoryPatcher::RestoreSteeringCorrection();
+	}
 	GUID steerGUID = controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)];
 	if (controls.WheelDI.IsConnected(steerGUID)) {
 		controls.WheelDI.SetConstantForce(steerGUID, 0);
@@ -632,11 +641,17 @@ void updateLastInputDevice() {
 				break;
 			case ScriptControls::Wheel:
 				showNotification("Switched to wheel");
+				if (!MemoryPatcher::SteeringPatched && settings.PatchSteering) {
+					MemoryPatcher::PatchSteeringCorrection();
+				}
 				break;
 		}
 		if (prevInput != ScriptControls::Wheel) {
 			for (GUID guid : controls.WheelDI.GetGuids()) {
 				controls.WheelDI.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
+			}
+			if (MemoryPatcher::SteeringPatched && settings.PatchSteering && !settings.PatchSteeringAlways) {
+				MemoryPatcher::RestoreSteeringCorrection();
 			}
 		}
 	}
