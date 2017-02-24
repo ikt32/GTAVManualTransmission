@@ -10,6 +10,7 @@ Structural changes:
 
 Wheel changes:
 * Add support for multiple DirectInput devices
+* Add countersteering and reduction patch
 * Add axis support for handbrake
 * Add back G27/G29 LEDs
 * Add option for global FF multiplier
@@ -23,7 +24,7 @@ Changes:
 * Add option for clutch shifting in sequential
 * Only stall if all wheels are on the ground
 * Remove 8th gear for numpad
-* General bug fixes :^)
+* General bug fixes
 
 ## 4.1.3
 No changes to Gears.ini
