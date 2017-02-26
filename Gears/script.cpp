@@ -18,7 +18,6 @@
 #include "Memory/MemoryPatcher.hpp"
 #include "Util/Logger.hpp"
 #include "Util/Util.hpp"
-#include "Input/keyboard.h"
 
 Logger logger(GEARSLOGPATH);
 ScriptControls controls(logger);
@@ -31,9 +30,6 @@ Vehicle prevVehicle;
 VehicleData vehData;
 VehicleExtensions ext;
 Hash model;
-
-// TODO: This thing _should_ PROBABLY use the extern in MemoryPatcher
-bool patched = false;
 
 int prevNotification = 0;
 ScriptControls::InputDevices prevInput;
@@ -54,8 +50,6 @@ enum Shifter {
 	HPattern = 1,
 	Automatic = 2
 };
-
-bool testDone = false;
 
 void update() {
 	///////////////////////////////////////////////////////////////////////////
@@ -177,19 +171,6 @@ void update() {
 	//                          Ground vehicle controls
 	///////////////////////////////////////////////////////////////////////////
 
-	//if (!testDone) {
-	//	auto it = 0;
-	//	for (auto x : controls.WheelButtonGUIDs) {
-	//		wchar_t szGuidW[40] = { 0 };
-	//		StringFromGUID2(x, szGuidW, 40);
-	//		std::wstring wGuid = szGuidW;
-	//		logger.Write("DBG: " + std::to_string(it) + " " + std::string(wGuid.begin(), wGuid.end()));
-	//		it++;
-	//	}
-	//	testDone = true;
-	//}
-
-
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
 		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle)) {
@@ -276,8 +257,8 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 	//                            Patching
 	///////////////////////////////////////////////////////////////////////////
-	if (!patched && settings.EnableManual) {
-		patched = MemoryPatcher::PatchInstructions();
+	if (MemoryPatcher::TotalPatched != MemoryPatcher::TotalToPatch && settings.EnableManual) {
+		MemoryPatcher::PatchInstructions();
 	}
 
 	if (!MemoryPatcher::SteeringPatched && settings.PatchSteering && settings.PatchSteeringAlways) {
@@ -591,8 +572,8 @@ void reInit() {
 
 void reset() {
 	prevVehicle = 0;
-	if (patched) {
-		patched = !MemoryPatcher::RestoreInstructions();
+	if (MemoryPatcher::TotalPatched == MemoryPatcher::TotalToPatch) {
+		MemoryPatcher::RestoreInstructions();
 	}
 	if (MemoryPatcher::SteeringPatched) {
 		MemoryPatcher::RestoreSteeringCorrection();
@@ -641,22 +622,23 @@ void updateLastInputDevice() {
 				break;
 			case ScriptControls::Wheel:
 				showNotification("Switched to wheel");
-				if (!MemoryPatcher::SteeringPatched && settings.PatchSteering) {
-					MemoryPatcher::PatchSteeringCorrection();
-				}
 				break;
 		}
 		if (prevInput != ScriptControls::Wheel) {
 			for (GUID guid : controls.WheelDI.GetGuids()) {
 				controls.WheelDI.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
 			}
-			if (MemoryPatcher::SteeringPatched && settings.PatchSteering && !settings.PatchSteeringAlways) {
-				MemoryPatcher::RestoreSteeringCorrection();
-			}
 		}
 	}
 	if (prevInput == ScriptControls::Wheel) {
 		CONTROLS::STOP_PAD_SHAKE(0);
+		if (!MemoryPatcher::SteeringPatched && settings.PatchSteering) {
+			MemoryPatcher::PatchSteeringCorrection();
+		}
+	} else {
+		if (MemoryPatcher::SteeringPatched && settings.PatchSteering && !settings.PatchSteeringAlways) {
+			MemoryPatcher::RestoreSteeringCorrection();
+		}
 	}
 }
 
