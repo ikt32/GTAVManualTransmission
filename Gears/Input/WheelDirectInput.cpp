@@ -7,6 +7,10 @@
 #include <chrono>
 #include <vector>
 
+// TODO Force feedback enumeration
+// TODO Fix unknown/non-G27 layout detections
+// TODO Look into crashes
+
 WheelDirectInput::WheelDirectInput(Logger &logAlt) : nEntry(0),
                                                     logger(logAlt),
                                                     pCFEffect{nullptr},
@@ -50,7 +54,6 @@ bool WheelDirectInput::InitWheel() {
 	logger.Write("No wheel detected");
 	return false;
 }
-
 /* 
  * if an empty GUID is given, just try the first device
  * Update - That was a horrible idea. Just return null and handle it whenever idk fuck this SHIT FUCK
@@ -71,7 +74,7 @@ const DiJoyStick::Entry *WheelDirectInput::findEntryFromGUID(GUID guid) {
 	return nullptr;
 }
 
-bool WheelDirectInput::InitFFB(GUID guid, WheelDirectInput::DIAxis ffAxis) {
+bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
 	logger.Write("Initializing force feedback device");
 	auto e = findEntryFromGUID(guid);
 	
@@ -117,13 +120,14 @@ bool WheelDirectInput::InitFFB(GUID guid, WheelDirectInput::DIAxis ffAxis) {
 	}
 	logger.Write("Initializing force feedback effect");
 	if (!CreateConstantForceEffect(e, ffAxis)) {
-		logger.Write("That steering axis doesn't support force feedback");
+		//logger.Write("That steering axis doesn't support force feedback");
+		logger.Write("Initialize force feedback failed");
 		NoFeedback = true;
 		return false;
 	}
 	logger.Write("Initializing force feedback success");
 	UpdateState(); // I don't understand
-	UpdateState(); // Why do I need to call this twice?
+	UpdateState(); // TODO: Why do I need to call this twice?
 	prevTime = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 	prevPosition = GetAxisValue(ffAxis, guid);
 	logger.Write("Initializing wheel success");
@@ -259,9 +263,19 @@ void WheelDirectInput::UpdateButtonChangeStates() {
 	}
 }
 
-bool WheelDirectInput::CreateConstantForceEffect(const DiJoyStick::Entry *e, WheelDirectInput::DIAxis ffAxis) {
+bool WheelDirectInput::CreateConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis) {
 	if (!e || NoFeedback)
 		return false;
+
+	// This somehow doesn't work well
+	/*DIDEVCAPS didevcaps;
+
+	e->diDevice->GetCapabilities(&didevcaps);
+
+	if (!(didevcaps.dwFlags & DIDC_FORCEFEEDBACK)) {
+		logger.Write("Device doesn't have force feedback");
+		return false;
+	}*/
 
 	DWORD axis;
 	if (ffAxis == lX) {
@@ -272,6 +286,15 @@ bool WheelDirectInput::CreateConstantForceEffect(const DiJoyStick::Entry *e, Whe
 	}
 	else if (ffAxis == lZ) {
 		axis = DIJOFS_Z;
+	}
+	else if (ffAxis == lRx) {
+		axis = DIJOFS_RX;
+	}
+	else if (ffAxis == lRy) {
+		axis = DIJOFS_RY;
+	}
+	else if (ffAxis == lRz) {
+		axis = DIJOFS_RZ;
 	}
 	else {
 		return false;
@@ -298,13 +321,11 @@ bool WheelDirectInput::CreateConstantForceEffect(const DiJoyStick::Entry *e, Whe
 	eff.lpvTypeSpecificParams = &cf;
 	eff.dwStartDelay = 0;
 
-	if (e) {
-		e->diDevice->CreateEffect(
-			 GUID_ConstantForce,
-			 &eff,
-			 &pCFEffect,
-			 nullptr);
-	}
+	e->diDevice->CreateEffect(
+			GUID_ConstantForce,
+			&eff,
+			&pCFEffect,
+			nullptr);
 
 	if (!pCFEffect) {
 		return false;
@@ -447,6 +468,7 @@ void WheelDirectInput::PlayLedsDInput(GUID guid, const FLOAT currentRPM, const F
 	data_.lpvInBuffer = &wheelData_;
 	data_.cbInBuffer = sizeof(wheelData_);
 
-	HRESULT hr;
-	hr = e->diDevice->Escape(&data_);
+	//HRESULT hr;
+	//hr = e->diDevice->Escape(&data_);
+	e->diDevice->Escape(&data_);
 }
