@@ -23,37 +23,47 @@ WheelDirectInput::~WheelDirectInput() {
 }
 
 bool WheelDirectInput::InitWheel() {
-	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(nullptr),
+	logger.Write("WHEEL: Init steering wheel"); 
+	
+	// Setting up DirectInput Object
+	if (FAILED(DirectInput8Create(GetModuleHandle(nullptr),
 		DIRECTINPUT_VERSION,
 		IID_IDirectInput8,
 		reinterpret_cast<void**>(&lpDi),
 		nullptr))) {
-		logger.Write("Initializing steering wheel");
-
-		foundGuids.clear();
-		djs.enumerate(lpDi);
-		nEntry = djs.getEntryCount();
-		logger.Write("Found " + std::to_string(nEntry) + " device(s)");
-
-		for (int i = 0; i < nEntry; i++) {
-			auto device = djs.getEntry(i);
-			std::wstring wDevName = device->diDeviceInstance.tszInstanceName;
-			logger.Write("Device: " + std::string(wDevName.begin(), wDevName.end()));
-
-			GUID guid = device->diDeviceInstance.guidInstance;
-			wchar_t szGuidW[40] = { 0 };
-			StringFromGUID2(guid, szGuidW, 40);
-			std::wstring wGuid = szGuidW;//std::wstring(szGuidW);
-			logger.Write("GUID:   " + std::string(wGuid.begin(), wGuid.end()));
-			foundGuids.push_back(guid);
-		}
-
-		djs.update();
-		logger.Write("Initializing steering wheel success");
-		return true;
+		NoFeedback = true;
+		logger.Write("WHEEL: DirectInput create failed");
+		return false;
 	}
-	logger.Write("No wheel detected");
-	return false;
+
+
+	foundGuids.clear();
+	djs.enumerate(lpDi);
+	nEntry = djs.getEntryCount();
+	logger.Write("WHEEL: Found " + std::to_string(nEntry) + " device(s)");
+
+	if (nEntry < 1) {
+		NoFeedback = true;
+		logger.Write("WHEEL: No wheel detected");
+		return false;
+	}
+
+	for (int i = 0; i < nEntry; i++) {
+		auto device = djs.getEntry(i);
+		std::wstring wDevName = device->diDeviceInstance.tszInstanceName;
+		logger.Write("WHEEL: Device: " + std::string(wDevName.begin(), wDevName.end()));
+
+		GUID guid = device->diDeviceInstance.guidInstance;
+		wchar_t szGuidW[40] = { 0 };
+		StringFromGUID2(guid, szGuidW, 40);
+		std::wstring wGuid = szGuidW;//std::wstring(szGuidW);
+		logger.Write("WHEEL: GUID:   " + std::string(wGuid.begin(), wGuid.end()));
+		foundGuids.push_back(guid);
+	}
+
+	djs.update();
+	logger.Write("WHEEL: Init steering wheel success");
+	return true;
 }
 
 bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
