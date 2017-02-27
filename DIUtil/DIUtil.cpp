@@ -177,7 +177,7 @@ int main()
 
 			setCursorPosition(32 * guidIt, pRow);
 			pRow++;
-			std::wstring wDevName = controls.WheelDI.findEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
+			std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
 			std::cout << std::string(wDevName.begin(), wDevName.end());
 			
 			setCursorPosition(32 * guidIt, pRow);
@@ -299,7 +299,7 @@ int main()
 			steerGuid
 			) / 20; // wtf ikt
 
-		totalForce += (damperForce * 0.1 * steerSpeed);
+		totalForce += (int)(damperForce * 0.1f * steerSpeed);
 
 		if (effSteer > 1.0f) {
 			totalForce = static_cast<int>((effSteer - 1.0f) * 100000) + totalForce;

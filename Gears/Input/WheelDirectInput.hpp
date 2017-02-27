@@ -58,8 +58,9 @@ public:
 	WheelDirectInput(Logger &logAlt);
 	~WheelDirectInput();
 	bool InitWheel();
-	const DiJoyStick::Entry *findEntryFromGUID(GUID guid);
 	bool InitFFB(GUID guid, DIAxis ffAxis);
+	void UpdateCenterSteering(GUID guid, DIAxis steerAxis);
+	const DiJoyStick::Entry *FindEntryFromGUID(GUID guid);
 
 	// Should be called every update()
 	void UpdateState();

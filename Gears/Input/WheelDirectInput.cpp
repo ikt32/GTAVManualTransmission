@@ -49,34 +49,16 @@ bool WheelDirectInput::InitWheel() {
 		}
 
 		djs.update();
+		logger.Write("Initializing steering wheel success");
 		return true;
 	}
 	logger.Write("No wheel detected");
 	return false;
 }
-/* 
- * if an empty GUID is given, just try the first device
- * Update - That was a horrible idea. Just return null and handle it whenever idk fuck this SHIT FUCK
- */
-const DiJoyStick::Entry *WheelDirectInput::findEntryFromGUID(GUID guid) {
-	if (nEntry > 0) {
-		if (guid == GUID_NULL) {
-			return nullptr;
-		}
-
-		for (int i = 0; i < nEntry; i++) {
-			auto tempEntry = djs.getEntry(i);
-			if (guid == tempEntry->diDeviceInstance.guidInstance) {
-				return tempEntry;
-			}
-		}
-	}
-	return nullptr;
-}
 
 bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
 	logger.Write("Initializing force feedback device");
-	auto e = findEntryFromGUID(guid);
+	auto e = FindEntryFromGUID(guid);
 	
 	if (!e) {
 		logger.Write("Force feedback device not found");
@@ -120,18 +102,43 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
 	}
 	logger.Write("Initializing force feedback effect");
 	if (!CreateConstantForceEffect(e, ffAxis)) {
-		//logger.Write("That steering axis doesn't support force feedback");
-		logger.Write("Initialize force feedback failed");
+		logger.Write("That axis doesn't support force feedback");
 		NoFeedback = true;
-		return false;
+		//return false;
+	} else {
+		logger.Write("Initializing force feedback effect success");
 	}
 	logger.Write("Initializing force feedback success");
+	return true;
+}
+
+void WheelDirectInput::UpdateCenterSteering(GUID guid, DIAxis steerAxis) {
+	UpdateState();
+	UpdateState();
 	UpdateState(); // I don't understand
 	UpdateState(); // TODO: Why do I need to call this twice?
 	prevTime = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
-	prevPosition = GetAxisValue(ffAxis, guid);
-	logger.Write("Initializing wheel success");
-	return true;
+	prevPosition = GetAxisValue(steerAxis, guid);
+}
+
+/*
+* if an empty GUID is given, just try the first device
+* Update - That was a horrible idea. Just return null and handle it whenever idk fuck this SHIT FUCK
+*/
+const DiJoyStick::Entry *WheelDirectInput::FindEntryFromGUID(GUID guid) {
+	if (nEntry > 0) {
+		if (guid == GUID_NULL) {
+			return nullptr;
+		}
+
+		for (int i = 0; i < nEntry; i++) {
+			auto tempEntry = djs.getEntry(i);
+			if (guid == tempEntry->diDeviceInstance.guidInstance) {
+				return tempEntry;
+			}
+		}
+	}
+	return nullptr;
 }
 
 void WheelDirectInput::UpdateState() {
@@ -139,7 +146,7 @@ void WheelDirectInput::UpdateState() {
 }
 
 bool WheelDirectInput::IsConnected(GUID device) {
-	auto e = findEntryFromGUID(device);
+	auto e = FindEntryFromGUID(device);
 	if (!e) {
 		return false;
 	}
@@ -151,7 +158,7 @@ bool WheelDirectInput::IsConnected(GUID device) {
 // If it matches the cardinal stuff the button is a POV hat thing
 
 bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
-	auto e = findEntryFromGUID(device);
+	auto e = FindEntryFromGUID(device);
 
 	if (!e) {
 		/*wchar_t szGuidW[40] = { 0 };
@@ -360,7 +367,7 @@ HRESULT WheelDirectInput::SetConstantForce(GUID device, int force) {
 	                              DIEP_TYPESPECIFICPARAMS |
 	                              DIEP_START);
 
-	auto e = findEntryFromGUID(device);
+	auto e = FindEntryFromGUID(device);
 	if (e) {
 		e->diDevice->Acquire();
 		if (pCFEffect)
@@ -384,7 +391,7 @@ WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString)
 
 
 int WheelDirectInput::GetAxisValue(DIAxis axis, GUID device) {
-	auto e = findEntryFromGUID(device);
+	auto e = FindEntryFromGUID(device);
 	if (!IsConnected(device) || e == nullptr)
 		return -1;
 	switch (axis) {
@@ -426,7 +433,7 @@ std::vector<GUID> WheelDirectInput::GetGuids() {
 
 void WheelDirectInput::PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine)
 {
-	auto e = findEntryFromGUID(guid);
+	auto e = FindEntryFromGUID(guid);
 
 	if (!e)
 	{

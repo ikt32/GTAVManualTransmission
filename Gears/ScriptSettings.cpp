@@ -226,6 +226,8 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 		DeviceIndexToGUID(settingsWheel.GetLongValue("STEER", "DEVICE", -1), reggdGuids);
 	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)] =
 		settingsWheel.GetValue("STEER", "AXLE", "");
+	scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::ForceFeedback)] =
+		settingsWheel.GetValue("STEER", "FFB", "");
 	scriptControl->SteerLeft = settingsWheel.GetLongValue("STEER", "MIN", -1);
 	scriptControl->SteerRight = settingsWheel.GetLongValue("STEER", "MAX", -1);
 	SteerAngleMax = settingsWheel.GetDoubleValue("STEER", "SteerAngleMax", 900.0);

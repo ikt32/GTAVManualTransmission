@@ -75,6 +75,7 @@ public:
 		Clutch,
 		Steer,
 		Handbrake,
+		ForceFeedback,
 		SIZEOF_WheelAxisType
 	};
 

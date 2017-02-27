@@ -14,8 +14,11 @@ ScriptControls::~ScriptControls() {
 void ScriptControls::InitWheel() {
 	WheelDI.InitWheel();
 	if (!WheelDI.InitFFB(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)],
-					WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]))) {
+					WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)]))) {
 		WheelDI.NoFeedback = true;
+	} else {
+		WheelDI.UpdateCenterSteering(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)],
+									 WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]));
 	}
 }
 
