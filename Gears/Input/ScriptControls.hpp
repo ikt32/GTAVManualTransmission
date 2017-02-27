@@ -108,7 +108,7 @@ public:
 	std::array<GUID, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxesGUIDs = {};
 
 	std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
-	std::array<GUID, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButtonGUIDs = {}; //Wahahahaha FUCK.
+	std::array<GUID, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButtonGUIDs = {};
 
 	std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
 	GUID WheelToKeyGUID = {};

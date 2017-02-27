@@ -1406,7 +1406,10 @@ void doWheelSteeringPlane() {
 }
 
 void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airborne, bool ignoreSpeed) {
-	GUID steerGuid = controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)];
+	auto steerAxisType = ScriptControls::WheelAxisType::Steer;
+	GUID steerGuid = controls.WheelButtonGUIDs[static_cast<int>(steerAxisType)];
+	auto steerAxis = controls.WheelDI.StringToAxis(controls.WheelAxes[static_cast<int>(steerAxisType)]);
+
 	if (!controls.WheelDI.IsConnected(steerGuid) ||
 		controls.WheelDI.NoFeedback ||
 		prevInput != ScriptControls::Wheel ||
@@ -1442,13 +1445,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	}
 
 	// steerSpeed is to dampen the steering wheel
-	auto steerSpeed =
-		controls.WheelDI.GetAxisSpeed(
-			        controls.WheelDI.StringToAxis(
-				                controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)]
-			                ),
-			        steerGuid
-		        ) / 20; // wtf ikt
+	auto steerSpeed = controls.WheelDI.GetAxisSpeed(steerAxis, steerGuid ) / 20;
 
 	/*                    a                                        v^2
 	 * Because G Force = ---- and a = v * omega, verified with a = ---   using a speedo and 

@@ -5,20 +5,19 @@
 
 ScriptControls::ScriptControls(Logger &logger): WheelDI(logger),
 	                              controller{1},
-                                  buttonState(0) {
-}
+                                  buttonState(0) { }
 
-ScriptControls::~ScriptControls() {
-}
+ScriptControls::~ScriptControls() { }
 
 void ScriptControls::InitWheel() {
 	WheelDI.InitWheel();
-	if (!WheelDI.InitFFB(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)],
-					WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)]))) {
+	auto steerGUID = WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)];
+	auto steerAxis = WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)]);
+	auto ffAxis = WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]);
+	if (!WheelDI.InitFFB(steerGUID, steerAxis)) {
 		WheelDI.NoFeedback = true;
 	} else {
-		WheelDI.UpdateCenterSteering(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)],
-									 WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]));
+		WheelDI.UpdateCenterSteering(steerGUID, ffAxis);
 	}
 }
 
@@ -28,11 +27,9 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
 		controller.UpdateButtonChangeStates();
 	}
 
-	//if (/*WheelDI.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])*/1) {
-		WheelDI.UpdateState();
-		WheelDI.UpdateButtonChangeStates();
-		CheckCustomButtons();
-	//}
+	WheelDI.UpdateState();
+	WheelDI.UpdateButtonChangeStates();
+	CheckCustomButtons();
 
 	// Update ThrottleVal, BrakeVal and ClutchVal ranging from 0.0f (no touch) to 1.0f (full press)
 	switch (prevInput) {
