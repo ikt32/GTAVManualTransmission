@@ -57,11 +57,11 @@ bool WheelDirectInput::InitWheel() {
 }
 
 bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
-	logger.Write("Initializing force feedback device");
+	logger.Write("WHEEL: Init FFB device");
 	auto e = FindEntryFromGUID(guid);
 	
 	if (!e) {
-		logger.Write("Force feedback device not found");
+		logger.Write("WHEEL: FFB device not found");
 		return false;
 	}
 
@@ -91,24 +91,23 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
 			default: hrStr = "UNKNOWN";
 				break;
 		}
-		logger.Write("HRESULT = " + hrStr);
+		logger.Write("WHEEL: Acquire FFB device error");
+		logger.Write("WHEEL: HRESULT = " + hrStr);
 		std::stringstream ss;
 		ss << std::hex << hr;
-		logger.Write("Error: " + ss.str());
+		logger.Write("WHEEL: ERRCODE = " + ss.str());
 		ss.str(std::string());
 		ss << std::hex << GetForegroundWindow();
-		logger.Write("HWND: " + ss.str());
+		logger.Write("WHEEL: HWND =    " + ss.str());
 		return false;
 	}
-	logger.Write("Initializing force feedback effect");
+	logger.Write("WHEEL: Init FFB effect on axis " + DIAxisHelper[ffAxis]);
 	if (!CreateConstantForceEffect(e, ffAxis)) {
-		logger.Write("That axis doesn't support force feedback");
+		logger.Write("WHEEL: Init FFB effect failed");
 		NoFeedback = true;
-		//return false;
 	} else {
-		logger.Write("Initializing force feedback effect success");
+		logger.Write("WHEEL: Init FFB success");
 	}
-	logger.Write("Initializing force feedback success");
 	return true;
 }
 
@@ -122,9 +121,8 @@ void WheelDirectInput::UpdateCenterSteering(GUID guid, DIAxis steerAxis) {
 }
 
 /*
-* if an empty GUID is given, just try the first device
-* Update - That was a horrible idea. Just return null and handle it whenever idk fuck this SHIT FUCK
-*/
+ * Return NULL when device isn't found
+ */
 const DiJoyStick::Entry *WheelDirectInput::FindEntryFromGUID(GUID guid) {
 	if (nEntry > 0) {
 		if (guid == GUID_NULL) {
@@ -431,6 +429,7 @@ std::vector<GUID> WheelDirectInput::GetGuids() {
 	return foundGuids;
 }
 
+// Only confirmed to work on my own G27
 void WheelDirectInput::PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine)
 {
 	auto e = FindEntryFromGUID(guid);

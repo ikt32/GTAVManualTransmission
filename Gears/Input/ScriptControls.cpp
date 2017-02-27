@@ -10,7 +10,12 @@ ScriptControls::ScriptControls(Logger &logger): WheelDI(logger),
 ScriptControls::~ScriptControls() { }
 
 void ScriptControls::InitWheel() {
-	WheelDI.InitWheel();
+	
+	if (!WheelDI.InitWheel()) {
+		// Initialization failed somehow, so we skip
+		return;
+	}
+
 	auto steerGUID = WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)];
 	auto steerAxis = WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)]);
 	auto ffAxis = WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]);
