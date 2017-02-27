@@ -16,9 +16,9 @@ It’s highly recommended to play with this mod using a controller or a wheel.
 * multiple input devices supported since 4.2.0
 
 # Downloads
-[GTA5-Mods.com](https://www.gta5-mods.com/scripts/manual-transmission-ikt)
-[GitHub release (older versions)](https://github.com/E66666666/GTAVManualTransmission/releases)
-[Latest automated builds (unstable, probably)](https://ci.appveyor.com/project/E66666666/gtavmanualtransmission/build/artifacts)
+* [GTA5-Mods.com](https://www.gta5-mods.com/scripts/manual-transmission-ikt)
+* [GitHub release (older versions)](https://github.com/E66666666/GTAVManualTransmission/releases)
+* [Latest automated builds (unstable, probably)](https://ci.appveyor.com/project/E66666666/gtavmanualtransmission/build/artifacts)
 
 # Table of Contents
 <!-- TOC depthFrom:1 depthTo:2 orderedList:false updateOnSave:true withLinks:true -->
