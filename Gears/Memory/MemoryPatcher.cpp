@@ -49,7 +49,9 @@ namespace MemoryPatcher {
 			return true;
 		}
 
-		clutchLowTemp = PatchClutchLow();
+		if (!clutchLowTemp)
+			clutchLowTemp = PatchClutchLow();
+
 		if (clutchLowTemp) {
 			clutchLowAddr = clutchLowTemp;
 			TotalPatched++;
@@ -61,7 +63,9 @@ namespace MemoryPatcher {
 			logger.Write("GEARBOX: clutchLow patch failed");
 		}
 
-		gear7A0Temp = PatchGear7A0();
+		if (!gear7A0Temp)
+			gear7A0Temp = PatchGear7A0();
+
 		if (gear7A0Temp) {
 			gear7A0Addr = gear7A0Temp;
 			TotalPatched++;
@@ -125,7 +129,9 @@ namespace MemoryPatcher {
 			return true;
 		}
 
-		SteeringTemp = PatchSteering();
+		if (!SteeringTemp)
+			SteeringTemp = PatchSteering();
+
 		if (SteeringTemp) {
 			SteeringAddr = SteeringTemp;
 			SteeringPatched = true;
