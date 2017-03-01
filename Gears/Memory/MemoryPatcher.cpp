@@ -30,14 +30,14 @@ namespace MemoryPatcher {
 
 	bool SteeringPatched = false;
 
-	uintptr_t clutchLowAddr = 0;
-	uintptr_t clutchLowTemp = 0;
+	uintptr_t clutchLowAddr = NULL;
+	uintptr_t clutchLowTemp = NULL;
 
-	uintptr_t gear7A0Addr = 0;
-	uintptr_t gear7A0Temp = 0;
+	uintptr_t gear7A0Addr = NULL;
+	uintptr_t gear7A0Temp = NULL;
 
-	uintptr_t SteeringAddr = 0;
-	uintptr_t SteeringTemp = 0;
+	uintptr_t SteeringAddr = NULL;
+	uintptr_t SteeringTemp = NULL;
 
 
 	bool PatchInstructions() {
@@ -49,8 +49,7 @@ namespace MemoryPatcher {
 			return true;
 		}
 
-		if (!clutchLowTemp)
-			clutchLowTemp = PatchClutchLow();
+		clutchLowTemp = PatchClutchLow();
 
 		if (clutchLowTemp) {
 			clutchLowAddr = clutchLowTemp;
@@ -63,8 +62,7 @@ namespace MemoryPatcher {
 			logger.Write("GEARBOX: clutchLow patch failed");
 		}
 
-		if (!gear7A0Temp)
-			gear7A0Temp = PatchGear7A0();
+		gear7A0Temp = PatchGear7A0();
 
 		if (gear7A0Temp) {
 			gear7A0Addr = gear7A0Temp;
@@ -129,8 +127,7 @@ namespace MemoryPatcher {
 			return true;
 		}
 
-		if (!SteeringTemp)
-			SteeringTemp = PatchSteering();
+		SteeringTemp = PatchSteering();
 
 		if (SteeringTemp) {
 			SteeringAddr = SteeringTemp;
@@ -173,7 +170,12 @@ namespace MemoryPatcher {
 		// We're only interested in the first 7 bytes but we need the correct one
 		// C7 43 40 CD CC CC 3D is what we're looking for, the second occurrence, at 
 		// 7FF6555FE34A or GTA5.exe+ECE34A in build 617.
-		uintptr_t address = mem.FindPattern("\xC7\x43\x40\xCD\xCC\xCC\x3D\x66\x44\x89\x43\x04", "xxxxxxxxxxxx");
+
+		uintptr_t address = NULL;
+		if (clutchLowTemp != NULL)
+			address = clutchLowTemp;
+		else
+			address = mem.FindPattern("\xC7\x43\x40\xCD\xCC\xCC\x3D\x66\x44\x89\x43\x04", "xxxxxxxxxxxx");
 
 		if (address) {
 			memset(reinterpret_cast<void *>(address), 0x90, 7);
@@ -194,7 +196,11 @@ namespace MemoryPatcher {
 		// 66 89 13 <- Looking for this
 		// 89 73 5C <- Next instruction
 		// EB 0A    <- Next next instruction
-		uintptr_t address = mem.FindPattern("\x66\x89\x13\x89\x73\x5C", "xxxxxx");
+		uintptr_t address = NULL;
+		if (gear7A0Temp != 0)
+			address = gear7A0Temp;
+		else 
+			address = mem.FindPattern("\x66\x89\x13\x89\x73\x5C", "xxxxxx");
 
 		if (address) {
 			memset(reinterpret_cast<void *>(address), 0x90, 3);
@@ -221,7 +227,11 @@ namespace MemoryPatcher {
 		// F3 0F10 25 06F09300
 		// F3 0F10 1D 3ED39F00
 
-		uintptr_t address = mem.FindPattern(
+		uintptr_t address = NULL;
+		if (SteeringTemp != NULL)
+			address = SteeringTemp;
+		else 
+			address = mem.FindPattern(
 			"\x0F\x84\x00\x00\x00\x00\x0F\x28\x4B\x70\xF3\x0F\x10\x25\x00\x00\x00\x00\xF3\x0F\x10\x1D\x00\x00\x00\x00", 
 			"xx????xxxxxxxx????xxxx????");
 
