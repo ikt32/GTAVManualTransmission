@@ -143,10 +143,19 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
 			}
 			SteerVal = 0.0f + 1.0f / (SteerRight - SteerLeft)*(static_cast<float>(RawS) - SteerLeft);
 
-			RawH == -1 && ((HandbrakeVal = 0.0f));
-			RawC == -1 && ((ClutchVal = 0.0f));
-			RawT == -1 && ((ThrottleVal = 0.0f));
-			RawB == -1 && ((BrakeVal = 0.0f));
+			if (RawH == -1) { HandbrakeVal = 0.0f; }
+			if (RawC == -1) { ClutchVal = 0.0f; }
+			if (RawT == -1) { ThrottleVal = 0.0f; }
+			if (RawB == -1) { BrakeVal = 0.0f; }
+
+			if (ThrottleVal > 1.0f) { ThrottleVal = 1.0f; }
+			if (BrakeVal > 1.0f) { BrakeVal = 1.0f; }
+			if (ClutchVal > 1.0f) { ClutchVal = 1.0f; }
+
+			if (ThrottleVal < 0.0f) { ThrottleVal = 0.0f; }
+			if (BrakeVal < 0.0f) { BrakeVal = 0.0f; }
+			if (ClutchVal < 0.0f) { ClutchVal = 0.0f; }
+
 
 			break;
 		}
