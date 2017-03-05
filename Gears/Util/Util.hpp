@@ -47,10 +47,54 @@ static std::vector<std::string> GameVersionString = {
 	"VER_1_0_877_1_NOSTEAM", // 27
 
 	"VER_1_0_944_2_STEAM", // 28
-	"VER_1_0_944_2_NOSTEAM", // 29
+	"VER_1_0_944_2_NOSTEAM" // 29
+};
 
-	"VER_1_0_975_1_STEAM", // 30
-	"VER_1_0_975_1_NOSTEAM" // 31
+enum G_GameVersion : int {
+	G_VER_1_0_335_2_STEAM, // 00
+	G_VER_1_0_335_2_NOSTEAM, // 01
+	
+	G_VER_1_0_350_1_STEAM, // 02
+	G_VER_1_0_350_2_NOSTEAM, // 03
+	
+	G_VER_1_0_372_2_STEAM, // 04
+	G_VER_1_0_372_2_NOSTEAM, // 05
+	
+	G_VER_1_0_393_2_STEAM, // 06
+	G_VER_1_0_393_2_NOSTEAM, // 07
+	
+	G_VER_1_0_393_4_STEAM, // 08
+	G_VER_1_0_393_4_NOSTEAM, // 09
+	
+	G_VER_1_0_463_1_STEAM, // 10
+	G_VER_1_0_463_1_NOSTEAM, // 11
+	
+	G_VER_1_0_505_2_STEAM, // 12
+	G_VER_1_0_505_2_NOSTEAM, // 13
+	
+	G_VER_1_0_573_1_STEAM, // 14
+	G_VER_1_0_573_1_NOSTEAM, // 15
+	
+	G_VER_1_0_617_1_STEAM, // 16
+	G_VER_1_0_617_1_NOSTEAM, // 17
+	
+	G_VER_1_0_678_1_STEAM, // 18
+	G_VER_1_0_678_1_NOSTEAM, // 19
+	
+	G_VER_1_0_757_2_STEAM, // 20
+	G_VER_1_0_757_2_NOSTEAM, // 21
+	
+	G_VER_1_0_757_4_STEAM, // 22
+	G_VER_1_0_757_4_NOSTEAM, // 23
+	
+	G_VER_1_0_791_2_STEAM, // 24
+	G_VER_1_0_791_2_NOSTEAM, // 25
+	
+	G_VER_1_0_877_1_STEAM, // 26
+	G_VER_1_0_877_1_NOSTEAM, // 27
+	
+	G_VER_1_0_944_2_STEAM, // 28
+	G_VER_1_0_944_2_NOSTEAM // 29
 };
 
 static std::string eGameVersionToString(int version) {
