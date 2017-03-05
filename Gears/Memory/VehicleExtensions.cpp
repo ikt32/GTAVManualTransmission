@@ -228,13 +228,15 @@ void VehicleExtensions::SetFuelLevel(Vehicle handle, float value) {
 uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {
 	auto address = GetAddress(handle);
 
-	auto offset = (gameVersion > 3 ? 0xAA0 : 0xA80);
-	offset = (gameVersion > 23 ? 0xAB0 : offset);
-	if (gameVersion == 06 || gameVersion == 07) {
-		offset = 0xA90; // FiveM
-	}
-	offset = (gameVersion > 25 ? 0xAE0 : offset);
-	offset = (gameVersion > 27 ? 0xB10 : offset);
+	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0xAA0 : 0xA80);
+	offset = (gameVersion > G_VER_1_0_757_4_NOSTEAM ? 0xAB0 : offset);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0xAE0 : offset);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0xB10 : offset);
+
+	// FiveM ?
+	//if (gameVersion == VER_1_0_393_2_NOSTEAM) {
+	//	offset = 0xA90;
+	//}
 
 	return *reinterpret_cast<uint64_t *>(address + offset);
 }
