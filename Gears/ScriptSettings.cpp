@@ -5,7 +5,8 @@
 #include "Util/simpleini/SimpleIni.h"
 #include "Input/ScriptControls.hpp"
 
-// TODO: This Device<->GUID->Control thing is very broken pls fix
+// TO/DO This Device<->GUID->Control thing is very broken pls fix
+// Update: Things should be good now.
 
 //ScriptSettings::ScriptSettings(): nDevices(0) {
 //	// Defaults

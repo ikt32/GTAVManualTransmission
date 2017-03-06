@@ -136,6 +136,7 @@ public:
 	bool ButtonHeld(ControllerControlType control);
 	bool ButtonIn(WheelControlType control);
 	void CheckCustomButtons();
+	void CheckGUIDs(const std::vector<_GUID> &guids);
 	bool ButtonIn(ControllerControlType control);
 
 	WheelDirectInput WheelDI;
@@ -154,4 +155,9 @@ private:
 
 	bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
+	Logger logger;
 };
+
+// GUID stuff
+bool operator < (const GUID &guid1, const GUID &guid2);
+std::string GUID2String(GUID guid);

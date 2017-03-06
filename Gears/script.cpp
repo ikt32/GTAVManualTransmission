@@ -494,70 +494,6 @@ void crossScriptComms() {
 //                           Mod functions: Mod control
 ///////////////////////////////////////////////////////////////////////////////
 
-// TODO: Move this shit
-bool operator < (const GUID &guid1, const GUID &guid2) {
-	if (guid1.Data1 != guid2.Data1) {
-		return guid1.Data1 < guid2.Data1;
-	}
-	if (guid1.Data2 != guid2.Data2) {
-		return guid1.Data2 < guid2.Data2;
-	}
-	if (guid1.Data3 != guid2.Data3) {
-		return guid1.Data3 < guid2.Data3;
-	}
-	for (int i = 0; i<8; i++) {
-		if (guid1.Data4[i] != guid2.Data4[i]) {
-			return guid1.Data4[i] < guid2.Data4[i];
-		}
-	}
-	return false;
-}
-
-std::string GUID2String(GUID guid) {
-	wchar_t szGuidW[40] = { 0 };
-	StringFromGUID2(guid, szGuidW, 40);
-	std::wstring wGuid = szGuidW;//std::wstring(szGuidW);
-	return(std::string(wGuid.begin(), wGuid.end()));
-}
-
-void checkGUIDs(const std::vector<_GUID> & guids) {
-	auto foundGuids = controls.WheelDI.GetGuids();
-	auto reggdGuids = settings.GetGuids();
-	// We're only checking for devices that should be used but aren't found
-	std::sort(foundGuids.begin(), foundGuids.end());
-	std::sort(reggdGuids.begin(), reggdGuids.end());
-	std::vector<GUID> missingReg;
-	std::vector<GUID> missingFnd;
-
-	// Mental note since I'm dumb:
-	// The difference of two sets is formed by the elements that are present in
-	// the first set, but not in the second one.
-
-	// Registered but not enumerated
-	std::set_difference(
-		reggdGuids.begin(), reggdGuids.end(),
-		foundGuids.begin(), foundGuids.end(), std::back_inserter(missingReg));
-
-	if (missingReg.size() > 0) {
-		logger.Write("WHEEL: Registered but not available: ");
-		for (auto g : missingReg) {
-			logger.Write(std::string("    ") + GUID2String(g));
-		}
-	}
-	
-	// Enumerated but not registered
-	std::set_difference(
-		foundGuids.begin(), foundGuids.end(), 
-		reggdGuids.begin(), reggdGuids.end(), std::back_inserter(missingFnd));
-	
-	if (missingFnd.size() > 0) {
-		logger.Write("WHEEL: Enumerated but not registered: ");
-		for (auto g : missingFnd) {
-			logger.Write(std::string("    ") + GUID2String(g));
-		}
-	}
-}
-
 void reInit() {
 	settings.Read(&controls);
 	logger.Write("Settings read");
@@ -565,7 +501,7 @@ void reInit() {
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
 	if (settings.WheelEnabled) {
 		controls.InitWheel();
-		checkGUIDs(settings.reggdGuids);
+		controls.CheckGUIDs(settings.reggdGuids);
 	}
 	logger.Write("Initialization finished");
 }
