@@ -7,9 +7,17 @@
 #include <chrono>
 #include <vector>
 
-// TODO Force feedback enumeration
-// TODO Fix unknown/non-G27 layout detections
+// TO/DO Force feedback enumeration
+// Update: FFB Enumeration is skipped in favor of a user-specified axis
+
+// TO/DO Fix unknown/non-G27 layout detections
+// Update: G920 gives trouble, G29 "works perfectly". Not sure, but all DInput
+// axes are handled. Anyway if this to-do has been here for a while, it's been
+// handled by the new all-inputs-have-a-device set up.
+
 // TODO Look into crashes
+// Update: G920 gives trouble. Disable RPM LEDs on demand. Untested but should
+// be fixed if writing to random addresses didn't already hurt.
 
 WheelDirectInput::WheelDirectInput(Logger &logAlt) : nEntry(0),
                                                     logger(logAlt),
@@ -33,7 +41,6 @@ bool WheelDirectInput::InitWheel() {
 		logger.Write("WHEEL: DirectInput create failed");
 		return false;
 	}
-
 
 	foundGuids.clear();
 	djs.enumerate(lpDi);
@@ -120,10 +127,8 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
 }
 
 void WheelDirectInput::UpdateCenterSteering(GUID guid, DIAxis steerAxis) {
-	UpdateState();
-	UpdateState();
-	UpdateState(); // I don't understand
-	UpdateState(); // TODO: Why do I need to call this twice?
+	UpdateState(); // TODO: I don't understand
+	UpdateState(); // Why do I need to call this twice?
 	prevTime = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 	prevPosition = GetAxisValue(steerAxis, guid);
 }
@@ -348,6 +353,10 @@ bool WheelDirectInput::CreateConstantForceEffect(const DiJoyStick::Entry *e, DIA
 }
 
 HRESULT WheelDirectInput::SetConstantForce(GUID device, int force) {
+	auto e = FindEntryFromGUID(device);
+	if (!e)
+		return E_HANDLE;
+
 	if (NoFeedback)
 		return false;
 
@@ -373,15 +382,9 @@ HRESULT WheelDirectInput::SetConstantForce(GUID device, int force) {
 	                              DIEP_TYPESPECIFICPARAMS |
 	                              DIEP_START);
 
-	auto e = FindEntryFromGUID(device);
-	if (e) {
-		e->diDevice->Acquire();
-		if (pCFEffect)
-			pCFEffect->Start(1, 0);
-	}
-	else {
-		return E_HANDLE;
-	}
+	e->diDevice->Acquire();
+	if (pCFEffect)
+		pCFEffect->Start(1, 0);
 
 	return hr;
 }
@@ -395,7 +398,7 @@ WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString)
 	return UNKNOWN_AXIS;
 }
 
-
+// -1 means device not accessible
 int WheelDirectInput::GetAxisValue(DIAxis axis, GUID device) {
 	auto e = FindEntryFromGUID(device);
 	if (!IsConnected(device) || e == nullptr)
@@ -438,14 +441,11 @@ std::vector<GUID> WheelDirectInput::GetGuids() {
 }
 
 // Only confirmed to work on my own G27
-void WheelDirectInput::PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine)
-{
+void WheelDirectInput::PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine) {
 	auto e = FindEntryFromGUID(guid);
 
 	if (!e)
-	{
 		return;
-	}
 
 	CONST DWORD ESCAPE_COMMAND_LEDS = 0;
 	CONST DWORD LEDS_VERSION_NUMBER = 0x00000001;

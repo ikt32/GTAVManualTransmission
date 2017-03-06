@@ -28,7 +28,7 @@ void cls()
 
 	// Figure out the current width and height of the console window
 	if (!GetConsoleScreenBufferInfo(hOut, &csbi)) {
-		// TODO: Handle failure!
+		// TO/DO Handle failure!
 		abort();
 	}
 	DWORD length = csbi.dwSize.X * csbi.dwSize.Y;
@@ -58,7 +58,6 @@ ScriptControls controls(logger);
 ScriptSettings settings("./settings_general.ini","./settings_wheel.ini", logger);
 
 // TODO: This is pulled straight from Gears/script.cpp and should be refactored lmao
-// TODO: Move this shit
 bool operator < (const GUID &guid1, const GUID &guid2) {
 	if (guid1.Data1 != guid2.Data1) {
 		return guid1.Data1 < guid2.Data1;
