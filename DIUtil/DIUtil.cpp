@@ -280,8 +280,9 @@ int main()
 
 		std::cout << "Gear      " << gear << "\n";
 
-
-		controls.WheelDI.PlayLedsDInput(steerGuid, controls.ThrottleVal, 0.5f, 0.95f);
+		if (settings.LogiLEDs) {
+			controls.WheelDI.PlayLedsDInput(steerGuid, controls.ThrottleVal, 0.5f, 0.95f);
+		}
 
 		auto totalForce = static_cast<int>(controls.ThrottleVal * 20000.0f * 2.0f * (controls.SteerVal - 0.5f));
 

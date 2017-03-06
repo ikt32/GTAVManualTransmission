@@ -624,7 +624,7 @@ void updateLastInputDevice() {
 				showNotification("Switched to wheel");
 				break;
 		}
-		if (prevInput != ScriptControls::Wheel) {
+		if (prevInput != ScriptControls::Wheel && settings.LogiLEDs) {
 			for (GUID guid : controls.WheelDI.GetGuids()) {
 				controls.WheelDI.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
 			}
@@ -1417,7 +1417,9 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 		return;
 	}
 
-	controls.WheelDI.PlayLedsDInput(steerGuid, vehData.Rpm, 0.45, 0.95);
+	if (settings.LogiLEDs) {
+		controls.WheelDI.PlayLedsDInput(steerGuid, vehData.Rpm, 0.45, 0.95);
+	}
 
 	Vector3 accelVals = vehData.getAccelerationVectors(vehData.V3Velocities);
 	Vector3 accelValsAvg = vehData.getAccelerationVectorsAverage();

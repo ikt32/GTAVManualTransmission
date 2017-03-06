@@ -17,9 +17,7 @@ WheelDirectInput::WheelDirectInput(Logger &logAlt) : nEntry(0),
                                                     pFREffect{nullptr} { }
 
 WheelDirectInput::~WheelDirectInput() {
-	for (GUID guid : GetGuids()) {
-		PlayLedsDInput(guid, 0.0, 0.5, 1.0);
-	}
+
 }
 
 bool WheelDirectInput::InitWheel() {

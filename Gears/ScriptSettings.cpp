@@ -150,6 +150,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	AltControls = settingsWheel.GetBoolValue("OPTIONS", "WheelBoatPlanes", false);
 	PatchSteering = settingsWheel.GetBoolValue("OPTIONS", "PatchSteering", false);
 	PatchSteeringAlways = settingsWheel.GetBoolValue("OPTIONS", "PatchSteeringAlways", false);
+	LogiLEDs = settingsWheel.GetBoolValue("OPTIONS", "LogitechLEDs", false);
 
 	// [FORCE_FEEDBACK]
 	FFEnable = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "FFEnable", true);

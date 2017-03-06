@@ -68,6 +68,7 @@ public:
 	bool AltControls = false;
 	bool PatchSteering = false;
 	bool PatchSteeringAlways = false;
+	bool LogiLEDs = false;
 
 	// [FORCE_FEEDBACK]
 	bool FFEnable = true;
@@ -83,7 +84,6 @@ public:
 	float SteerAngleCar = 720.0f;
 	float SteerAngleBike = 180.0f;
 	float SteerAngleAlt = 180.0f;
-
 private:
 	int settings_general_version = 0;
 	int settings_wheel_version = 0;
