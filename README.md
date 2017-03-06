@@ -53,4 +53,8 @@ Since version `4.0.2` it's possible to set shifting mode externally.
 * `hunt_chal_weapon`: `2` - H-pattern
 * `hunt_chal_weapon`: `3` - Automatic
 
-__Important note:__ Usage of decorators out of base game context isn't guaranteed to work. CitizenFX-based mods will crash. Cross-script communication can be simply disabled using the ```CrossScript = 0``` in ```Gears.ini``` for these situations.
+## FiveM Notes
+Usage of decorators out of base game context isn't guaranteed to work. CitizenFX-based mods will crash. Cross-script communication can be simply disabled using the ```CrossScript = 0``` in ```Gears.ini``` for these situations.
+
+### FiveM Update
+From version 4.2.0 onwards, using a steering wheel with FiveM is not supported. Due to the future [change to the ScriptHookV compatibility within FiveM](https://forum.fivem.net/t/opening-reading-crash-dumps/7695/2), all support will be dropped for FiveM, until further details are clear.
