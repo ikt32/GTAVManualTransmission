@@ -19,6 +19,7 @@ class VehicleData {
 public:
 	VehicleData();
 	void Clear();
+	void UpdateRpm(); // call end of script loop only once
 
 	enum class VehicleClass {
 		Car,
@@ -80,6 +81,17 @@ public:
 	// Moved out of ScriptControls to make it standalone
 	// Perceived accelerator value, float
 	float ControlAccelerate = 0.0f;
+
+	// TODO: make these private or something idk
+
+	float PrevRpm = 0.0f;
+
+	bool BlinkerLeft = false;
+	bool BlinkerRight = false;
+	bool BlinkerHazard = false;
+	int BlinkerTicks = 0;
+
+	bool TruckShiftUp = false;
 
 private:
 	std::array<char *, 20> badModelNames = {

@@ -21,7 +21,8 @@
 
 Logger logger(GEARSLOGPATH);
 ScriptControls controls(logger);
-ScriptSettings settings("./ManualTransmission/settings_general.ini", "./ManualTransmission/settings_wheel.ini", logger);
+ScriptSettings settings("./ManualTransmission/settings_general.ini", 
+	"./ManualTransmission/settings_wheel.ini", logger);
 
 Player player;
 Ped playerPed;
@@ -29,23 +30,11 @@ Vehicle vehicle;
 Vehicle prevVehicle;
 VehicleData vehData;
 VehicleExtensions ext;
-Hash model;
 
 int prevNotification = 0;
-ScriptControls::InputDevices prevInput;
-
-float prevRpm;
 int prevExtShift = 0;
 
-// TODO: This gonna be refactored into vehData somehow
-bool blinkerLeft = false;
-bool blinkerRight = false;
-bool blinkerHazard = false;
-int blinkerTicks = 0;
-
-bool truckShiftUp = false;
-
-enum Shifter {
+enum ShiftModes {
 	Sequential = 0,
 	HPattern = 1,
 	Automatic = 2
@@ -79,8 +68,6 @@ void update() {
 		return;
 	}
 
-	model = ENTITY::GET_ENTITY_MODEL(vehicle);
-
 	///////////////////////////////////////////////////////////////////////////
 	//                           Update stuff
 	///////////////////////////////////////////////////////////////////////////
@@ -111,13 +98,11 @@ void update() {
 		ignoreClutch = false;
 	}
 
-	controls.UpdateValues(prevInput, ignoreClutch);
-	
+	controls.UpdateValues(controls.PrevInput, ignoreClutch);
 
 	if (settings.Debug) {
 		showDebugInfo();
 	}
-
 
 	try {
 		settings.IsCorrectVersion();
@@ -143,7 +128,8 @@ void update() {
 		updateLastInputDevice();
 
 		if (settings.AltControls &&
-			controls.WheelDI.IsConnected(controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)]) && prevInput == ScriptControls::Wheel) {
+			controls.WheelDI.IsConnected(controls.SteerGUID) &&
+			controls.PrevInput == ScriptControls::Wheel) {
 			if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
 				controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
 				controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle)) {
@@ -179,7 +165,7 @@ void update() {
 
 	if (!settings.EnableManual &&
 		settings.WheelWithoutManual &&
-		controls.WheelDI.IsConnected(controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)])) {
+		controls.WheelDI.IsConnected(controls.SteerGUID)) {
 
 		updateLastInputDevice();
 		handleVehicleButtons();
@@ -205,7 +191,7 @@ void update() {
 	updateLastInputDevice();
 	handleVehicleButtons();
 
-	if (controls.WheelDI.IsConnected(controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)])) {
+	if (controls.WheelDI.IsConnected(controls.SteerGUID)) {
 		doWheelSteering();
 		playWheelEffects(settings, vehData, 
 		                 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f
@@ -287,13 +273,13 @@ void update() {
 	// For bikes, do this automatically.
 	if (vehData.Class == VehicleData::VehicleClass::Bike && settings.SimpleBike) {
 		functionAutoReverse();
-		if (prevInput == ScriptControls::InputDevices::Wheel) {
+		if (controls.PrevInput == ScriptControls::InputDevices::Wheel) {
 			handlePedalsDefault( controls.ThrottleVal, controls.BrakeVal );
 		}
 	}
 	else {
 		functionRealReverse();
-		if (prevInput == ScriptControls::InputDevices::Wheel) {
+		if (controls.PrevInput == ScriptControls::InputDevices::Wheel) {
 			handlePedalsRealReverse( controls.ThrottleVal, controls.BrakeVal );
 		}
 	}
@@ -452,7 +438,7 @@ void showDebugInfo() {
 
 	if (settings.WheelEnabled) {
 		std::stringstream dinputDisplay;
-		dinputDisplay << "Wheel Avail: " << controls.WheelDI.IsConnected(controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)]);
+		dinputDisplay << "Wheel Avail: " << controls.WheelDI.IsConnected(controls.SteerGUID);
 		showText(0.85, 0.150, 0.4, dinputDisplay.str().c_str());
 	}
 }
@@ -463,7 +449,7 @@ void crossScriptComms() {
 	DECORATOR::DECOR_SET_INT(vehicle, "doe_elk", vehData.CurrGear);
 
 	// Shift indicator: 0 = nothing, 1 = Shift up, 2 = Shift down
-	if (vehData.CurrGear < vehData.NextGear || truckShiftUp) {
+	if (vehData.CurrGear < vehData.NextGear || vehData.TruckShiftUp) {
 		DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1);
 	}
 	else if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
@@ -503,6 +489,9 @@ void reInit() {
 		controls.InitWheel();
 		controls.CheckGUIDs(settings.reggdGuids);
 	}
+	controls.SteerAxisType = ScriptControls::WheelAxisType::Steer;
+	controls.SteerGUID = controls.WheelAxesGUIDs[static_cast<int>(controls.SteerAxisType)];
+
 	logger.Write("Initialization finished");
 }
 
@@ -514,9 +503,8 @@ void reset() {
 	if (MemoryPatcher::SteeringPatched) {
 		MemoryPatcher::RestoreSteeringCorrection();
 	}
-	GUID steerGUID = controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)];
-	if (controls.WheelDI.IsConnected(steerGUID)) {
-		controls.WheelDI.SetConstantForce(steerGUID, 0);
+	if (controls.WheelDI.IsConnected(controls.SteerGUID)) {
+		controls.WheelDI.SetConstantForce(controls.SteerGUID, 0);
 	}
 }
 
@@ -539,10 +527,10 @@ void toggleManual() {
 }
 
 void updateLastInputDevice() {
-	if (prevInput != controls.GetLastInputDevice(prevInput)) {
-		prevInput = controls.GetLastInputDevice(prevInput);
+	if (controls.PrevInput != controls.GetLastInputDevice(controls.PrevInput)) {
+		controls.PrevInput = controls.GetLastInputDevice(controls.PrevInput);
 		// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
-		switch (prevInput) {
+		switch (controls.PrevInput) {
 			case ScriptControls::Keyboard:
 				showNotification("Switched to keyboard/mouse");
 				break;
@@ -560,13 +548,13 @@ void updateLastInputDevice() {
 				showNotification("Switched to wheel");
 				break;
 		}
-		if (prevInput != ScriptControls::Wheel && settings.LogiLEDs) {
+		if (controls.PrevInput != ScriptControls::Wheel && settings.LogiLEDs) {
 			for (GUID guid : controls.WheelDI.GetGuids()) {
 				controls.WheelDI.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
 			}
 		}
 	}
-	if (prevInput == ScriptControls::Wheel) {
+	if (controls.PrevInput == ScriptControls::Wheel) {
 		CONTROLS::STOP_PAD_SHAKE(0);
 		if (!MemoryPatcher::SteeringPatched && settings.PatchSteering) {
 			MemoryPatcher::PatchSteeringCorrection();
@@ -586,7 +574,7 @@ void setShiftMode(int shiftMode) {
 	if (shiftMode > 2 || shiftMode < 0)
 		return;
 
-	if (settings.ShiftMode == HPattern  && (vehData.Class == VehicleData::VehicleClass::Bike || prevInput == ScriptControls::Controller)) {
+	if (settings.ShiftMode == HPattern  && (vehData.Class == VehicleData::VehicleClass::Bike || controls.PrevInput == ScriptControls::Controller)) {
 		settings.ShiftMode = Automatic;
 	}
 
@@ -927,7 +915,7 @@ void fakeRev() {
 	float timeStep = SYSTEM::TIMESTEP();
 	float accelRatio = 2 * timeStep;
 	float rpmVal;
-	float rpmValTemp = (prevRpm > vehData.Rpm ? (prevRpm - vehData.Rpm) : 0.0f);
+	float rpmValTemp = (vehData.PrevRpm > vehData.Rpm ? (vehData.PrevRpm - vehData.Rpm) : 0.0f);
 	if (vehData.CurrGear == 1) {
 		rpmValTemp *= 2.0f;
 	}
@@ -1005,7 +993,7 @@ void handleRPM() {
 			finalClutch = 1.0f - controls.ClutchVal;
 		}
 	}
-	prevRpm = vehData.Rpm;
+	vehData.UpdateRpm();
 	ext.SetClutch(vehicle, finalClutch);
 }
 
@@ -1020,10 +1008,10 @@ void functionTruckLimiting() {
 	if ((vehData.Velocity > vehData.LockSpeed && vehData.LockTruck) ||
 		(vehData.Velocity > vehData.LockSpeed && vehData.PrevGear > vehData.CurrGear)) {
 		controls.ClutchVal = 1.0f;
-		truckShiftUp = true;
+		vehData.TruckShiftUp = true;
 	}
 	else {
-		truckShiftUp = false;
+		vehData.TruckShiftUp = false;
 	}
 }
 
@@ -1161,9 +1149,9 @@ void handleVehicleButtons() {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 	}
 
-	if (!controls.WheelDI.IsConnected(controls.WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)]) ||
+	if (!controls.WheelDI.IsConnected(controls.SteerGUID) ||
 		controls.WheelDI.NoFeedback ||
-		prevInput != ScriptControls::Wheel) {
+		controls.PrevInput != ScriptControls::Wheel) {
 		return;
 	}
 
@@ -1193,74 +1181,74 @@ void handleVehicleButtons() {
 	}
 
 	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::IndicatorLeft)) {
-		if (!blinkerLeft) {
-			blinkerTicks = 1;
+		if (!vehData.BlinkerLeft) {
+			vehData.BlinkerTicks = 1;
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false); // L
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true); // R
-			blinkerLeft = true;
-			blinkerRight = false;
-			blinkerHazard = false;
+			vehData.BlinkerLeft = true;
+			vehData.BlinkerRight = false;
+			vehData.BlinkerHazard = false;
 		}
 		else {
-			blinkerTicks = 0;
+			vehData.BlinkerTicks = 0;
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-			blinkerLeft = false;
-			blinkerRight = false;
-			blinkerHazard = false;
+			vehData.BlinkerLeft = false;
+			vehData.BlinkerRight = false;
+			vehData.BlinkerHazard = false;
 		}
 	}
 	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::IndicatorRight)) {
-		if (!blinkerRight) {
-			blinkerTicks = 1;
+		if (!vehData.BlinkerRight) {
+			vehData.BlinkerTicks = 1;
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true); // L
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false); // R
-			blinkerLeft = false;
-			blinkerRight = true;
-			blinkerHazard = false;
+			vehData.BlinkerLeft = false;
+			vehData.BlinkerRight = true;
+			vehData.BlinkerHazard = false;
 		}
 		else {
-			blinkerTicks = 0;
+			vehData.BlinkerTicks = 0;
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-			blinkerLeft = false;
-			blinkerRight = false;
-			blinkerHazard = false;
+			vehData.BlinkerLeft = false;
+			vehData.BlinkerRight = false;
+			vehData.BlinkerHazard = false;
 		}
 	}
 
 	float centerPos = 0.5f;//static_cast<float>(controls.SteerLeft + controls.SteerRight) / 2;
 	float wheelCenterDeviation = controls.SteerVal - centerPos;
 
-	if (blinkerTicks == 1 && abs(wheelCenterDeviation/ centerPos) > 0.2f)
+	if (vehData.BlinkerTicks == 1 && abs(wheelCenterDeviation/ centerPos) > 0.2f)
 	{
-		blinkerTicks = 2;
+		vehData.BlinkerTicks = 2;
 	}
 
-	if (blinkerTicks == 2 && abs(wheelCenterDeviation / centerPos) < 0.1f)
+	if (vehData.BlinkerTicks == 2 && abs(wheelCenterDeviation / centerPos) < 0.1f)
 	{
-		blinkerTicks = 0;
+		vehData.BlinkerTicks = 0;
 		VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
 		VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-		blinkerLeft = false;
-		blinkerRight = false;
-		blinkerHazard = false;
+		vehData.BlinkerLeft = false;
+		vehData.BlinkerRight = false;
+		vehData.BlinkerHazard = false;
 	}
 
 	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::IndicatorHazard)) {
-		if (!blinkerHazard) {
+		if (!vehData.BlinkerHazard) {
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true); // L
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true); // R
-			blinkerLeft = false;
-			blinkerRight = false;
-			blinkerHazard = true;
+			vehData.BlinkerLeft = false;
+			vehData.BlinkerRight = false;
+			vehData.BlinkerHazard = true;
 		}
 		else {
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
 			VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-			blinkerLeft = false;
-			blinkerRight = false;
-			blinkerHazard = false;
+			vehData.BlinkerLeft = false;
+			vehData.BlinkerRight = false;
+			vehData.BlinkerHazard = false;
 		}
 	}
 }
@@ -1270,7 +1258,7 @@ void handleVehicleButtons() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void doWheelSteering() {
-	if (prevInput == ScriptControls::InputDevices::Wheel) {
+	if (controls.PrevInput == ScriptControls::InputDevices::Wheel) {
 		float steerMult;
 		if (vehData.Class == VehicleData::VehicleClass::Bike || vehData.Class == VehicleData::VehicleClass::Quad)
 			steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
@@ -1342,19 +1330,17 @@ void doWheelSteeringPlane() {
 }
 
 void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airborne, bool ignoreSpeed) {
-	auto steerAxisType = ScriptControls::WheelAxisType::Steer;
-	GUID steerGuid = controls.WheelButtonGUIDs[static_cast<int>(steerAxisType)];
-	auto steerAxis = controls.WheelDI.StringToAxis(controls.WheelAxes[static_cast<int>(steerAxisType)]);
+	auto steerAxis = controls.WheelDI.StringToAxis(controls.WheelAxes[static_cast<int>(controls.SteerAxisType)]);
 
-	if (!controls.WheelDI.IsConnected(steerGuid) ||
+	if (!controls.WheelDI.IsConnected(controls.SteerGUID) ||
 		controls.WheelDI.NoFeedback ||
-		prevInput != ScriptControls::Wheel ||
+		controls.PrevInput != ScriptControls::Wheel ||
 		!settings.FFEnable) {
 		return;
 	}
 
 	if (settings.LogiLEDs) {
-		controls.WheelDI.PlayLedsDInput(steerGuid, vehData.Rpm, 0.45, 0.95);
+		controls.WheelDI.PlayLedsDInput(controls.SteerGUID, vehData.Rpm, 0.45, 0.95);
 	}
 
 	Vector3 accelVals = vehData.getAccelerationVectors(vehData.V3Velocities);
@@ -1383,7 +1369,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	}
 
 	// steerSpeed is to dampen the steering wheel
-	auto steerSpeed = controls.WheelDI.GetAxisSpeed(steerAxis, steerGuid ) / 20;
+	auto steerSpeed = controls.WheelDI.GetAxisSpeed(steerAxis, controls.SteerGUID) / 20;
 
 	/*                    a                                        v^2
 	 * Because G Force = ---- and a = v * omega, verified with a = ---   using a speedo and 
@@ -1475,7 +1461,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 			totalForce = -10000;
 		}
 	}
-	controls.WheelDI.SetConstantForce(steerGuid, totalForce);
+	controls.WheelDI.SetConstantForce(controls.SteerGUID, totalForce);
 
 	if (settings.Debug) {
 		std::stringstream SteerRaw;

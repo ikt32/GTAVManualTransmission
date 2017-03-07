@@ -32,6 +32,11 @@ void VehicleData::Clear() {
 	zeroSamples();
 }
 
+void VehicleData::UpdateRpm() {
+	PrevRpm = Rpm;
+
+}
+
 bool VehicleData::isBadTruck(char* name) {
 	for (int i = 0; i < badModelNames.size(); i++) {
 		if (strcmp(name, badModelNames[i]) == 0)

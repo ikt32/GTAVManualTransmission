@@ -142,6 +142,11 @@ public:
 	WheelDirectInput WheelDI;
 
 	void SetXboxTrigger(int value);
+	InputDevices PrevInput;
+
+
+	GUID SteerGUID;
+	WheelAxisType SteerAxisType;
 
 private:
 	long long pressTime = 0;
