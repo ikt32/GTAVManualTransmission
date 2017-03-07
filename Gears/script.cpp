@@ -365,9 +365,9 @@ void showText(float x, float y, float scale, const char* text) {
 	UI::SET_TEXT_CENTRE(0);
 	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
 	UI::SET_TEXT_EDGE(1, 0, 0, 0, 205);
-	UI::_SET_TEXT_ENTRY("STRING");
+	UI::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
 	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(const_cast<char *>(text));
-	UI::_DRAW_TEXT(x, y);
+	UI::END_TEXT_COMMAND_DISPLAY_TEXT(x, y);
 }
 
 void showText(float x, float y, float scale, const char* text, Color rgba) {
@@ -379,9 +379,9 @@ void showText(float x, float y, float scale, const char* text, Color rgba) {
 	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
 	UI::SET_TEXT_EDGE(1, 0, 0, 0, 205);
 	UI::SET_TEXT_COLOUR(rgba.R, rgba.G, rgba.B, rgba.A);
-	UI::_SET_TEXT_ENTRY("STRING");
+	UI::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
 	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(const_cast<char *>(text));
-	UI::_DRAW_TEXT(x, y);
+	UI::END_TEXT_COMMAND_DISPLAY_TEXT(x, y);
 }
 
 void showNotification(char* message) {
