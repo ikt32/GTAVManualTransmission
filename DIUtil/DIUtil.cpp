@@ -11,6 +11,12 @@
 /* Standard error macro for reporting API errors */
 #define PERR(bSuccess, api){if(!(bSuccess)) printf("%s:Error %d from %s on line %d\n", __FILE__, GetLastError(), api, __LINE__);}
 
+
+int activeGuids = 0;
+int totalWidth = 0;
+std::string modeStr = "MODE 64,32";
+CONSOLE_SCREEN_BUFFER_INFO csbi;
+
 void cls()
 {
 	// Get the Win32 handle representing standard output.
@@ -57,6 +63,57 @@ Logger logger("./DIUtil.log");
 ScriptControls controls(logger);
 ScriptSettings settings("./settings_general.ini","./settings_wheel.ini", logger);
 
+void init() {
+	settings.Read(&controls);
+	logger.Write("Settings read");
+
+	controls.InitWheel();
+	controls.CheckGUIDs(settings.reggdGuids);
+	controls.SteerAxisType = ScriptControls::WheelAxisType::Steer;
+	controls.SteerGUID = controls.WheelAxesGUIDs[static_cast<int>(controls.SteerAxisType)];
+	activeGuids = static_cast<int>(controls.WheelDI.GetGuids().size());
+	totalWidth = static_cast<int>((activeGuids + 0.5) * 32);
+	if (totalWidth < 80) {
+		totalWidth = 80;
+	}
+	modeStr = "MODE " + std::to_string(totalWidth) + ",32";
+	system(modeStr.c_str());
+}
+
+void playWheelEffects(float effSteer) {
+	if (settings.LogiLEDs) {
+		controls.WheelDI.PlayLedsDInput(controls.SteerGUID, controls.ThrottleVal, 0.5f, 0.95f);
+	}
+
+	auto totalForce = static_cast<int>(controls.ThrottleVal * 20000.0f * 2.0f * (controls.SteerVal - 0.5f));
+
+	auto adjustRatio = static_cast<float>(settings.DamperMax) / static_cast<float>(settings.TargetSpeed);
+	auto damperForce = settings.DamperMax - static_cast<int>(10 * (1.0-controls.BrakeVal) * adjustRatio);
+
+	if (damperForce < settings.DamperMin) {
+		damperForce = settings.DamperMin;
+	}
+	// steerSpeed is to dampen the steering wheel
+	auto steerAxis = controls.WheelDI.StringToAxis(controls.WheelAxes[static_cast<int>(controls.SteerAxisType)]);
+	auto steerSpeed = controls.WheelDI.GetAxisSpeed(steerAxis, controls.SteerGUID) / 20;
+
+	totalForce += (int)(damperForce * 0.1f * steerSpeed);
+
+	if (effSteer > 1.0f) {
+		totalForce = static_cast<int>((effSteer - 1.0f) * 100000) + totalForce;
+		if (effSteer > 1.1f) {
+			totalForce = 10000;
+		}
+	}
+	else if (effSteer < -1.0f) {
+		totalForce = static_cast<int>((-effSteer - 1.0f) * -100000) + totalForce;
+		if (effSteer < -1.1f) {
+			totalForce = -10000;
+		}
+	}
+	controls.WheelDI.SetConstantForce(controls.SteerGUID, totalForce);
+}
+
 int main()
 {
 	unsigned long long i = 0;
@@ -72,28 +129,18 @@ int main()
 
 	logger.Clear();
 	logger.Write("Manual Transmission v4.2.0 - DirectInput utility");
-	settings.Read(&controls);
-	logger.Write("Settings read");
 
-	GUID steerGuid = controls.WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)];
-
-	controls.InitWheel();
-	controls.CheckGUIDs(settings.reggdGuids);
-
-	int activeGuids = static_cast<int>(controls.WheelDI.GetGuids().size());
-	int totalWidth = static_cast<int>((activeGuids + 0.5) * 32);
-	if (totalWidth < 80) {
-		totalWidth = 80;
-	}
-	std::string modeStr = "MODE " + std::to_string(totalWidth) + ",32";
-	system(modeStr.c_str());
+	init();
 	
 	while (true)
 	{
 		if (_kbhit()) {
 			char c = _getch();
-			if (c == 0x1B) {
+			if (c == 0x1B) { // ESC
 				break;
+			}
+			if (c == ' ') {
+				init();
 			}
 		}
 		controls.GetLastInputDevice(ScriptControls::InputDevices::Wheel);
@@ -103,7 +150,6 @@ int main()
 		steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
 		float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 		
-		CONSOLE_SCREEN_BUFFER_INFO csbi;
 		GetConsoleScreenBufferInfo(hConsole, &csbi);
 
 		int guidIt = 0;
@@ -215,45 +261,11 @@ int main()
 
 		std::cout << "Gear      " << gear << "\n";
 
-		if (settings.LogiLEDs) {
-			controls.WheelDI.PlayLedsDInput(steerGuid, controls.ThrottleVal, 0.5f, 0.95f);
-		}
+		if (!controls.WheelDI.NoFeedback && controls.WheelDI.IsConnected(controls.SteerGUID))
+			playWheelEffects(effSteer);
 
-		auto totalForce = static_cast<int>(controls.ThrottleVal * 20000.0f * 2.0f * (controls.SteerVal - 0.5f));
-
-		auto adjustRatio = static_cast<float>(settings.DamperMax) / static_cast<float>(settings.TargetSpeed);
-		auto damperForce = settings.DamperMax - static_cast<int>(10 * (1.0-controls.BrakeVal) * adjustRatio);
-
-		if (damperForce < settings.DamperMin) {
-			damperForce = settings.DamperMin;
-		}
-		// steerSpeed is to dampen the steering wheel
-		auto steerSpeed =
-			controls.WheelDI.GetAxisSpeed(
-			controls.WheelDI.StringToAxis(
-			controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)]
-			),
-			steerGuid
-			) / 20; // wtf ikt
-
-		totalForce += (int)(damperForce * 0.1f * steerSpeed);
-
-		if (effSteer > 1.0f) {
-			totalForce = static_cast<int>((effSteer - 1.0f) * 100000) + totalForce;
-			if (effSteer > 1.1f) {
-				totalForce = 10000;
-			}
-		}
-		else if (effSteer < -1.0f) {
-			totalForce = static_cast<int>((-effSteer - 1.0f) * -100000) + totalForce;
-			if (effSteer < -1.1f) {
-				totalForce = -10000;
-			}
-		}
-		controls.WheelDI.SetConstantForce(steerGuid, totalForce);
-
-		setCursorPosition(0 , csbi.srWindow.Bottom);
-		std::cout << "Press ESC to exit.";
+		setCursorPosition(0, csbi.srWindow.Bottom);
+		std::cout << "ESC: Exit | Space: Reload";
 		std::cout.flush();
 		std::this_thread::yield();
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
