@@ -250,7 +250,7 @@ void configAxis(char c) {
 						setCursorPosition(0, pRow);
 						std::cout << "                                ";
 						setCursorPosition(0, pRow);
-						std::cout << controls.WheelDI.DIAxisHelper[i] << ": " << controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), devGUID) << "\n";
+						std::cout << std::to_string(i+1) << ". " << controls.WheelDI.DIAxisHelper[i] << ": " << controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), devGUID) << "\n";
 						pRow++;
 					}
 
@@ -300,6 +300,7 @@ void configAxis(char c) {
 					printf("Saved changes");
 					std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 					cls();
+					init();
 					return;
 				}
 			}
