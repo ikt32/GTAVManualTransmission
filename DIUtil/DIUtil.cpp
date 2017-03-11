@@ -296,7 +296,10 @@ void configAxis(char c) {
 			break;
 			default: { // save all the shit
 				int index = settings.SteeringAppendDevice(devGUID, std::string(wDevName.begin(), wDevName.end()).c_str());
-				settings.SteeringSave(confTag, index, devAxisH[devAxis - 1], minVal, maxVal);
+				settings.SteeringSaveAxis(confTag, index, devAxisH[devAxis - 1], minVal, maxVal);
+				if ( gameAxis == "steering") {
+					settings.SteeringSaveFFBAxis(confTag, index, devAxisH[devAxis - 1]);
+				}
 				cls();
 				setCursorPosition(0, csbi.srWindow.Bottom);
 				printf("Saved changes");
@@ -316,6 +319,309 @@ void configAxis(char c) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
 	}
 }
+
+void configButtons(char c) {
+	if (c != '+' && c != '-' && c != '=' && c != '_') {
+		return;
+	}
+	std::string gameButton;
+	std::string confTag;
+	int buttonsActive = 0;
+	if (c == '+' || c == '=') {
+		gameButton = "shift up";
+		confTag = "SHIFT_UP";
+	}
+	if (c == '-' || c == '_') {
+		gameButton = "shift down";
+		confTag = "SHIFT_DOWN";
+	}
+	GUID devGUID = {};
+	int button;
+	std::string devName;
+
+	cls();
+	while (true) {
+		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
+		if (_kbhit()) {
+			cls();
+			char c = _getch();
+			if (c == 0x1B) { // ESC
+				return;
+			}
+			if (c == 0x0D) { // RETURN
+				if (buttonsActive > 1) {
+					setCursorPosition(0, 0);
+					for (int i = 0; i < csbi.srWindow.Right * 5; i++) {
+						printf(" ");
+					}
+					setCursorPosition(0, 0);
+					printf("More than 1 button pressed. You can only select one.");
+					std::this_thread::yield();
+					std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+				}
+				else if (buttonsActive == 0) {
+					setCursorPosition(0, 0);
+					for (int i = 0; i < csbi.srWindow.Right * 5; i++) {
+						printf(" ");
+					}
+					setCursorPosition(0, 0);
+					printf("No buttons pressed. Select one.");
+					std::this_thread::yield();
+					std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+				} else {
+					int index = settings.SteeringAppendDevice(devGUID, devName.c_str());
+					settings.SteeringSaveButton(confTag, index, button);
+					cls();
+					setCursorPosition(0, csbi.srWindow.Bottom);
+					printf("Saved changes");
+					std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+					cls();
+					init();
+					return;
+				}
+
+			}
+		}
+
+		// blank 5 lines
+		setCursorPosition(0, 0);
+		for (int i = 0; i < csbi.srWindow.Right * 5; i++) {
+			printf(" ");
+		}
+		buttonsActive = 0;
+		devGUID = {};
+		button = -1;
+		setCursorPosition(0, 0);
+		printf("Button for %s: ", gameButton.c_str());
+
+		for(auto guid : controls.WheelDI.GetGuids()) {
+			std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
+			devName = std::string(wDevName.begin(), wDevName.end()).c_str();
+			for (int i = 0; i < 255; i++) {
+				if (controls.WheelDI.IsButtonPressed(i, guid)) {
+					printf("%d @ %s", i, devName.c_str());
+					buttonsActive++;
+					button = i;
+					devGUID = guid;
+				}
+			}
+			//POV hat shit
+			std::string directionsStr = "?";
+			std::vector<int> directions;
+			directions.push_back(WheelDirectInput::POV::N);
+			directions.push_back(WheelDirectInput::POV::NE);
+			directions.push_back(WheelDirectInput::POV::E);
+			directions.push_back(WheelDirectInput::POV::SE);
+			directions.push_back(WheelDirectInput::POV::S);
+			directions.push_back(WheelDirectInput::POV::SW);
+			directions.push_back(WheelDirectInput::POV::W);
+			directions.push_back(WheelDirectInput::POV::NW);
+			for (auto d : directions) {
+				if (controls.WheelDI.IsButtonPressed(d, guid)) {
+					if (d == WheelDirectInput::N) directionsStr  = "N ";
+					if (d == WheelDirectInput::NE) directionsStr = "NE";
+					if (d == WheelDirectInput::E) directionsStr  = " E";
+					if (d == WheelDirectInput::SE) directionsStr = "SE";
+					if (d == WheelDirectInput::S) directionsStr  = "S ";
+					if (d == WheelDirectInput::SW) directionsStr = "SW";
+					if (d == WheelDirectInput::W) directionsStr  = " W";
+					if (d == WheelDirectInput::NW) directionsStr = "NW";
+					printf("%s (POV hat) @ %s", directionsStr.c_str(), devName.c_str());
+					buttonsActive++;
+					button = d;
+					devGUID = guid;
+				}
+			}
+		}
+
+		setCursorPosition(0, csbi.srWindow.Bottom - 1);
+		printf("Configuring %s", gameButton.c_str());
+		setCursorPosition(0, csbi.srWindow.Bottom);
+		std::cout << "ESC: Cancel config - ENTER: Confirm selection";
+		std::cout.flush();
+		std::this_thread::yield();
+		std::this_thread::sleep_for(std::chrono::milliseconds(16));
+	}
+}
+
+/*
+ * 2. User presses g to config h-shifter
+ *		- Show "Select device"
+ * 3. User presses [device]
+ *		- Show "Select 1st gear and press Enter"
+ * 4. User presses RETURN
+ *		- Show "Select 2nd gear and press Enter"
+ * X. User presses RETURN
+ *		- Show "Select reverse gear and press Enter"
+ * X. User presses RETURN
+ *		- User is done
+ * 0. User presses ESC
+ *		- Cancel at any time, do not save.
+ */
+void configHShift(char c) {
+	if (c != 'g')
+		return;
+	std::string gameButton;
+	std::string confTag;
+	if (c == 'g') {
+		gameButton = "H-shifter";
+		confTag = "SHIFTER";
+	}
+
+	int devEntry = -1;
+
+	int buttonsActive = 0;
+	GUID devGUID = {};
+	std::array<int, 8> buttonArray; // There are gears 1-7 + R
+	std::fill(buttonArray.begin(), buttonArray.end(), -1);
+	std::string devName;
+	std::wstring wDevName;
+	cls();
+	int progress = 0;
+
+	while(true) {
+		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
+		if (_kbhit()) {
+			cls();
+			char c = _getch();
+			if (c == 0x1B) { // ESC
+				return;
+			}
+			if (progress == 0) { // Device selection
+				for (int i = 0; i < controls.WheelDI.nEntry; i++) {
+					if (c == i + '0') {
+						devEntry = i;
+						int devNumber = 0;
+						for (auto guid : controls.WheelDI.GetGuids()) {
+							if (devNumber == devEntry) {
+								devGUID = guid;
+							}
+							devNumber++;
+						}
+						progress++;
+					}
+				}
+				continue;
+			}
+			if (progress >= 1 && progress <= 8) { // Gear config (8 is for reverse)
+				// Gear reverse goes in [0] btw way
+				if (c == 0x0D) { // RETURN
+					if (buttonsActive > 1) {
+						setCursorPosition(0, 0);
+						for (int i = 0; i < csbi.srWindow.Right * 5; i++) {
+							printf(" ");
+						}
+						setCursorPosition(0, 0);
+						printf("More than 1 button pressed. You can only select one.");
+						std::this_thread::yield();
+						std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+					}
+					else if (buttonsActive == 0) {
+						setCursorPosition(0, 0);
+						for (int i = 0; i < csbi.srWindow.Right * 5; i++) {
+							printf(" ");
+						}
+						setCursorPosition(0, 0);
+						printf("No buttons pressed. Skipping this gear!");
+						std::this_thread::yield();
+						std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+						progress++;
+					} else {
+						progress++;
+					}
+				}
+			}
+		}
+
+		setCursorPosition(0, 0);
+		for (int i = 0; i < csbi.srWindow.Right * 5; i++) {
+			printf(" ");
+		}
+		buttonsActive = 0;
+
+		switch (progress) {
+			case 0: { // Device selection
+				setCursorPosition(0, 0);
+				int devNumber = 0;
+				for (auto guid : controls.WheelDI.GetGuids()) {
+					wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
+					devName = std::string(wDevName.begin(), wDevName.end()).c_str();
+					std::cout << devNumber << ": " << devName << "\n";
+					devNumber++;
+				}
+
+				setCursorPosition(0, csbi.srWindow.Bottom - 2);
+				printf("Select device for %s (0 to %d)", gameButton.c_str(), controls.WheelDI.nEntry - 1);
+			}
+			break;
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7: { // Muh GEARS
+				setCursorPosition(0, 0);
+				printf("Select for gear %d:", progress);
+				setCursorPosition(0, 1);
+				for (int i = 0; i < 255; i++) {
+					if (controls.WheelDI.IsButtonPressed(i, devGUID)) {
+						devName = std::string(wDevName.begin(), wDevName.end()).c_str();
+						printf("%d @ %s", i, devName.c_str());
+						buttonsActive++;
+						buttonArray[progress] = i;
+					}
+				}
+				if (buttonsActive==0) {
+					buttonArray[progress] = -1;
+				}
+				setCursorPosition(0, csbi.srWindow.Bottom - 3);
+				printf("Press ENTER to confirm or skip");
+				setCursorPosition(0, csbi.srWindow.Bottom - 2);
+				printf("Using device %d: %s", devEntry, devName.c_str());
+			}
+			break;
+			case 8: { // Reverse gear
+				setCursorPosition(0, 0);
+				printf("Select for reverse gear");
+				setCursorPosition(0, 1);
+				for (int i = 0; i < 255; i++) {
+					if (controls.WheelDI.IsButtonPressed(i, devGUID)) {
+						devName = std::string(wDevName.begin(), wDevName.end()).c_str();
+						printf("%d @ %s", i, devName.c_str());
+						buttonsActive++;
+						buttonArray[0] = i;
+					}
+				}
+				if (buttonsActive == 0) {
+					buttonArray[0] = -1;
+				}
+				setCursorPosition(0, csbi.srWindow.Bottom - 3);
+				printf("Press ENTER to confirm, save and exit");
+				setCursorPosition(0, csbi.srWindow.Bottom - 2);
+				printf("Using device %d: %s", devEntry, devName.c_str());
+			}
+			break;
+			default: { // save all the shit
+				int index = settings.SteeringAppendDevice(devGUID, devName);
+				settings.SteeringSaveHShifter(confTag, index, buttonArray.data());
+				cls();
+				setCursorPosition(0, csbi.srWindow.Bottom);
+				printf("Saved changes");
+				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+				cls();
+				init();
+				return;
+			}
+		}
+
+		setCursorPosition(0, csbi.srWindow.Bottom - 1);
+		printf("Configuring %s", gameButton.c_str());
+		setCursorPosition(0, csbi.srWindow.Bottom);
+		std::cout << "ESC: Cancel config - ENTER: Confirm selection";
+		std::cout.flush();
+		std::this_thread::yield();
+		std::this_thread::sleep_for(std::chrono::milliseconds(16));
 	}
 }
 
@@ -346,6 +652,8 @@ int main()
 					return 0;
 				default:
 					configAxis(c);
+					configButtons(c);
+					configHShift(c);
 					break;
 			}
 		}
@@ -401,6 +709,7 @@ int main()
 			pRow++;
 			std::cout << "POV hat: ";
 			std::vector<int> directions;
+			std::string directionsStr;
 			directions.push_back(WheelDirectInput::POV::N);
 			directions.push_back(WheelDirectInput::POV::NE);
 			directions.push_back(WheelDirectInput::POV::E);
@@ -413,8 +722,16 @@ int main()
 			std::cout << "                                ";
 			setCursorPosition(32 * guidIt, pRow);
 			for (auto d : directions) {
+				if (d == WheelDirectInput::N) directionsStr  = "N ";
+				if (d == WheelDirectInput::NE) directionsStr = "NE";
+				if (d == WheelDirectInput::E) directionsStr  = " E";
+				if (d == WheelDirectInput::SE) directionsStr = "SE";
+				if (d == WheelDirectInput::S) directionsStr  = "S ";
+				if (d == WheelDirectInput::SW) directionsStr = "SW";
+				if (d == WheelDirectInput::W) directionsStr  = " W";
+				if (d == WheelDirectInput::NW) directionsStr = "NW";
 				if (controls.WheelDI.IsButtonPressed(d, guid)) {
-					std::cout << d << " ";
+					printf("%05d (%s)", d, directionsStr.c_str());
 				}
 			}
 			pRow++;
@@ -470,6 +787,10 @@ int main()
 		if (!controls.WheelDI.NoFeedback && controls.WheelDI.IsConnected(controls.SteerGUID))
 			playWheelEffects(effSteer);
 
+		setCursorPosition(0, csbi.srWindow.Bottom - 4);
+		std::cout << "Assign buttons:";
+		setCursorPosition(0, csbi.srWindow.Bottom - 3);
+		std::cout << "g: shifter - +/=: shift up - -/_: shift down";
 		setCursorPosition(0, csbi.srWindow.Bottom-2);
 		std::cout << "Assign axes:";
 		setCursorPosition(0, csbi.srWindow.Bottom-1);
