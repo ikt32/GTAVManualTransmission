@@ -409,8 +409,8 @@ int ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, std::string dev_n
 	CSimpleIniA settingsWheel;
 	settingsWheel.SetUnicode();
 	settingsWheel.LoadFile(settingsWheelFile.c_str());
-	settingsWheel.SetValue("[INPUT_DEVICES]", newDEV.c_str(), dev_name.c_str());
-	settingsWheel.SetValue("[INPUT_DEVICES]", newGUID.c_str(), GUID2String(dev_guid).c_str());
+	settingsWheel.SetValue("INPUT_DEVICES", newDEV.c_str(), dev_name.c_str());
+	settingsWheel.SetValue("INPUT_DEVICES", newGUID.c_str(), GUID2String(dev_guid).c_str());
 	int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
 	if (err < 0)
 		logger.Write("Unable to save file");

@@ -138,28 +138,28 @@ void playWheelEffects(float effSteer) {
  */
 // Why did I make this monstrosity?!
 void configAxis(char c) {
-	if (c == 'w' || c == 'w' || c == 'c' || c == 'a' || c == 'd' || c == 'h') {
+	if (c == 'w' || c == 's' || c == 'c' || c == 'a' || c == 'd' || c == 'h') {
 		std::string gameAxis;
 		std::string confTag;
 		if (c == 'w') {
 			gameAxis = "throttle";
-			confTag = "[THROTTLE]";
+			confTag = "THROTTLE";
 		}
 		if (c == 's') {
 			gameAxis = "brake";
-			confTag = "[BRAKES]";
+			confTag = "BRAKES";
 		}
 		if (c == 'c') {
 			gameAxis = "clutch";
-			confTag = "[CLUTCH]";
+			confTag = "CLUTCH";
 		}
 		if (c == 'a' || c == 'd') {
 			gameAxis = "steering";
-			confTag = "[STEER]";
+			confTag = "STEER";
 		}
 		if (c == 'h') {
 			gameAxis = "handbrake";
-			confTag = "[HANDBRAKE_ANALOG]";
+			confTag = "HANDBRAKE_ANALOG";
 		}
 
 		int progress = 0;
