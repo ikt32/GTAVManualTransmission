@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "Util/Logger.hpp"
+#include <algorithm>
 
 class Logger;
 class ScriptControls;
@@ -18,7 +19,7 @@ public:
 
 	// Only use this AFTER wheel settings are read.
 	std::vector<GUID> GetGuids();
-
+	
 	// settings_general.ini parts
 	// [OPTIONS]
 	bool EnableManual = true;
@@ -84,12 +85,24 @@ public:
 	float SteerAngleCar = 720.0f;
 	float SteerAngleBike = 180.0f;
 	float SteerAngleAlt = 180.0f;
+
+	// Methods
+	/*
+	 *  Checks if GUID already exists and returns device index
+	 *  otherwise appends GUID and returns new device index
+	 */
+	int SteeringAppendDevice(const GUID & dev_guid, std::string dev_name);
+	void SteeringSave(const std::string & cs, int index, const std::basic_string<char> & basic_string, int min_val, int max_val);
+
 private:
 	int settings_general_version = 0;
 	int settings_wheel_version = 0;
 	Logger logger;
 	void parseSettingsWheel(ScriptControls *scriptControl);
+
+	// Just looks up which GUID corresponds with what number and returns the GUID.
 	GUID DeviceIndexToGUID(int device, std::vector<GUID> guids);
+
 	int nDevices = 0;
 	std::string settingsGeneralFile;
 	std::string settingsWheelFile;

@@ -393,6 +393,42 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 
 }
 
+int ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, std::string dev_name) {
+	auto found = find(reggdGuids.begin(), reggdGuids.end(), dev_guid);
+	if (found != reggdGuids.end()) {
+		// present! Return index
+		// Dependent on implementation of reading this but it should work(TM). Lotsa assumptions.
+		return distance(reggdGuids.begin(), found);
+	}
+	// missing! Add & return index afterwards
+	int newIndex = distance(reggdGuids.begin(), reggdGuids.end());
+	std::string newDEV = "DEV" + std::to_string(newIndex);
+	std::string newGUID = "GUID" + std::to_string(newIndex);
+
+
+	CSimpleIniA settingsWheel;
+	settingsWheel.SetUnicode();
+	settingsWheel.LoadFile(settingsWheelFile.c_str());
+	settingsWheel.SetValue("[INPUT_DEVICES]", newDEV.c_str(), dev_name.c_str());
+	settingsWheel.SetValue("[INPUT_DEVICES]", newGUID.c_str(), GUID2String(dev_guid).c_str());
+	int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
+	if (err < 0)
+		logger.Write("Unable to save file");
+	return newIndex;
+}
+void ScriptSettings::SteeringSave(const std::string &confTag, int index, const std::basic_string<char> &basic_string, int min_val, int max_val) {
+	CSimpleIniA settingsWheel;
+	settingsWheel.SetUnicode();
+	settingsWheel.LoadFile(settingsWheelFile.c_str());
+	settingsWheel.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
+	settingsWheel.SetValue(confTag.c_str(), "AXLE", basic_string.c_str());
+	settingsWheel.SetValue(confTag.c_str(), "MIN", std::to_string(min_val).c_str());
+	settingsWheel.SetValue(confTag.c_str(), "MAX", std::to_string(max_val).c_str());
+	int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
+	if (err < 0)
+		logger.Write("Unable to save file");
+}
+
 GUID ScriptSettings::DeviceIndexToGUID(int device, std::vector<GUID> guids) {
 	if (device < 0) {
 		return{};
