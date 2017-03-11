@@ -19,7 +19,6 @@ public:
 
 	// Only use this AFTER wheel settings are read.
 	std::vector<GUID> GetGuids();
-	
 	// settings_general.ini parts
 	// [OPTIONS]
 	bool EnableManual = true;
@@ -92,8 +91,10 @@ public:
 	 *  otherwise appends GUID and returns new device index
 	 */
 	int SteeringAppendDevice(const GUID & dev_guid, std::string dev_name);
-	void SteeringSave(std::string confTag, int index, std::string axis, int minVal, int maxVal);
-
+	void SteeringSaveAxis(std::string confTag, int index, std::string axis, int minVal, int maxVal);
+	void SteeringSaveFFBAxis(std::string confTag, int index, std::string axis);
+	void SteeringSaveButton(std::string confTag, int index, int button);
+	void SteeringSaveHShifter(std::string confTag, int index, int button[8]);
 private:
 	int settings_general_version = 0;
 	int settings_wheel_version = 0;

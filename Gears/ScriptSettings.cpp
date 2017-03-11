@@ -416,7 +416,7 @@ int ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, std::string dev_n
 		logger.Write("Unable to save file");
 	return newIndex;
 }
-void ScriptSettings::SteeringSave(std::string confTag, int index, std::string axis, int minVal, int maxVal) {
+void ScriptSettings::SteeringSaveAxis(std::string confTag, int index, std::string axis, int minVal, int maxVal) {
 	CSimpleIniA settingsWheel;
 	settingsWheel.SetUnicode();
 	settingsWheel.LoadFile(settingsWheelFile.c_str());
@@ -424,6 +424,46 @@ void ScriptSettings::SteeringSave(std::string confTag, int index, std::string ax
 	settingsWheel.SetValue(confTag.c_str(), "AXLE", axis.c_str());
 	settingsWheel.SetValue(confTag.c_str(), "MIN", std::to_string(minVal).c_str());
 	settingsWheel.SetValue(confTag.c_str(), "MAX", std::to_string(maxVal).c_str());
+	int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
+	if (err < 0)
+		logger.Write("Unable to save file");
+}
+
+void ScriptSettings::SteeringSaveFFBAxis(std::string confTag, int index, std::string axis) {
+	CSimpleIniA settingsWheel;
+	settingsWheel.SetUnicode();
+	settingsWheel.LoadFile(settingsWheelFile.c_str());
+	settingsWheel.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
+	settingsWheel.SetValue(confTag.c_str(), "FFB", axis.c_str());
+	int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
+	if (err < 0)
+		logger.Write("Unable to save file");
+}
+
+void ScriptSettings::SteeringSaveButton(std::string confTag, int index, int button) {
+	CSimpleIniA settingsWheel;
+	settingsWheel.SetUnicode();
+	settingsWheel.LoadFile(settingsWheelFile.c_str());
+	settingsWheel.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
+	settingsWheel.SetLongValue(confTag.c_str(), "BUTTON", button);
+	int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
+	if (err < 0)
+		logger.Write("Unable to save file");
+}
+
+void ScriptSettings::SteeringSaveHShifter(std::string confTag, int index, int button[8]) {
+	CSimpleIniA settingsWheel;
+	settingsWheel.SetUnicode();
+	settingsWheel.LoadFile(settingsWheelFile.c_str());
+	settingsWheel.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
+	settingsWheel.SetLongValue(confTag.c_str(), "GEAR_R", button[0]);
+	settingsWheel.SetLongValue(confTag.c_str(), "GEAR_1", button[1]);
+	settingsWheel.SetLongValue(confTag.c_str(), "GEAR_2", button[2]);
+	settingsWheel.SetLongValue(confTag.c_str(), "GEAR_3", button[3]);
+	settingsWheel.SetLongValue(confTag.c_str(), "GEAR_4", button[4]);
+	settingsWheel.SetLongValue(confTag.c_str(), "GEAR_5", button[5]);
+	settingsWheel.SetLongValue(confTag.c_str(), "GEAR_6", button[6]);
+	settingsWheel.SetLongValue(confTag.c_str(), "GEAR_7", button[7]);
 	int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
 	if (err < 0)
 		logger.Write("Unable to save file");
