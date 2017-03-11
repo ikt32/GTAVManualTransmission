@@ -23,6 +23,7 @@ void ScriptControls::InitWheel() {
 	if (!WheelDI.InitFFB(steerGUID, steerAxis)) {
 		WheelDI.NoFeedback = true;
 	} else {
+		WheelDI.NoFeedback = false;
 		WheelDI.UpdateCenterSteering(steerGUID, ffAxis);
 	}
 }
