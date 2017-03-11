@@ -92,7 +92,7 @@ public:
 	 *  otherwise appends GUID and returns new device index
 	 */
 	int SteeringAppendDevice(const GUID & dev_guid, std::string dev_name);
-	void SteeringSave(const std::string & cs, int index, const std::basic_string<char> & basic_string, int min_val, int max_val);
+	void SteeringSave(std::string cs, int index, std::string axis, int minVal, int maxVal);
 
 private:
 	int settings_general_version = 0;

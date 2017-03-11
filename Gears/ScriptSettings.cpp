@@ -416,14 +416,14 @@ int ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, std::string dev_n
 		logger.Write("Unable to save file");
 	return newIndex;
 }
-void ScriptSettings::SteeringSave(const std::string &confTag, int index, const std::basic_string<char> &basic_string, int min_val, int max_val) {
+void ScriptSettings::SteeringSave(std::string confTag, int index, std::string axis, int minVal, int maxVal) {
 	CSimpleIniA settingsWheel;
 	settingsWheel.SetUnicode();
 	settingsWheel.LoadFile(settingsWheelFile.c_str());
 	settingsWheel.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
-	settingsWheel.SetValue(confTag.c_str(), "AXLE", basic_string.c_str());
-	settingsWheel.SetValue(confTag.c_str(), "MIN", std::to_string(min_val).c_str());
-	settingsWheel.SetValue(confTag.c_str(), "MAX", std::to_string(max_val).c_str());
+	settingsWheel.SetValue(confTag.c_str(), "AXLE", axis.c_str());
+	settingsWheel.SetValue(confTag.c_str(), "MIN", std::to_string(minVal).c_str());
+	settingsWheel.SetValue(confTag.c_str(), "MAX", std::to_string(maxVal).c_str());
 	int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
 	if (err < 0)
 		logger.Write("Unable to save file");
