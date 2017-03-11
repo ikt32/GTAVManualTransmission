@@ -243,12 +243,21 @@ void configAxis(char c) {
 				}
 				break;
 				case 1: { // Axis selection
+					setCursorPosition(0, 0);
+					std::cout << "Axes: ";
+					int pRow = 1;
+					for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
+						setCursorPosition(0, pRow);
+						std::cout << "                                ";
+						setCursorPosition(0, pRow);
+						std::cout << controls.WheelDI.DIAxisHelper[i] << ": " << controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), devGUID) << "\n";
+						pRow++;
+					}
+
 					setCursorPosition(0, csbi.srWindow.Bottom - 2);
 					printf("Using device %d: %s", devEntry, std::string(wDevName.begin(), wDevName.end()).c_str());
-					setCursorPosition(0, csbi.srWindow.Bottom - 4);
-					printf("Select axis for %s: 1: lX, 2: lY, 3: lZ, 4: lRx", gameAxis.c_str());
 					setCursorPosition(0, csbi.srWindow.Bottom - 3);
-					printf("5: lRy, 6: lRz, 7: rglSlider0, 8: rglSlider1");
+					printf("Select axis for %s", gameAxis.c_str());
 				}
 				break;
 				case 2: { // Min (no input) register
@@ -457,8 +466,12 @@ int main()
 		if (!controls.WheelDI.NoFeedback && controls.WheelDI.IsConnected(controls.SteerGUID))
 			playWheelEffects(effSteer);
 
+		setCursorPosition(0, csbi.srWindow.Bottom-2);
+		std::cout << "Assign axes:";
+		setCursorPosition(0, csbi.srWindow.Bottom-1);
+		std::cout << "w: throttle - s: brake - a or d: steer - c: clutch - h: handbrake";
 		setCursorPosition(0, csbi.srWindow.Bottom);
-		std::cout << "ESC: Exit | Space: Reload";
+		std::cout << "ESC: Exit - Space: Reload";
 		std::cout.flush();
 		std::this_thread::yield();
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
