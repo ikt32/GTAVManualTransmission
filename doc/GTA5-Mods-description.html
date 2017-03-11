@@ -51,30 +51,25 @@ With manual transmission enabled, you'll want to be able to properly control you
 
 <b>Installation</b>
 Put Gears.asi and the folder ManualTransmission in your GTA V folder (overwrite when asked)
-
-Read the README and configure ManualTransmission/settings_general.ini to your preferences
+Read <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md>the README</a> and configure ManualTransmission/settings_general.ini to your preferences
+<b>Wheel installation</b>
+Wheel users should refer to the readme on GitHub for instructions.
 
 <b>Requirements</b>
 GTA V
 <a href=http://www.dev-c.com/gtav/scripthookv/>ScriptHookV</a>
 
-<b>Essential for wheel users</b>
-<a href=https://www.gta5-mods.com/scripts/custom-steering>Custom Steering</a>
-
 <b>Controls</b>
 <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md>README</a>
-
-Controls also viewable in Gears.ini.
-
+Alternatively, check settings_general.ini for controls.
 
 <b>Recommended mods</b>
 <a href=https://www.gta5-mods.com/scripts/speedometer-improvedalexbladeversion>Speedometer by LeFix</a>
 <a href=https://www.gta5-mods.com/scripts/nfsgauge-rpm-gear-speedometer>NFS Gauge by XMOD</a>
-<a href=https://www.gta5-mods.com/scripts/custom-steering>Custom Steering by InfamousSabre</a> for proper wheel mapping
-
-Any and all feedback is very welcome. Simply post here, post on GTAForums, post on GTA5-Mods forums or message me on Steam if you have anything.
+Custom Steering hasn't been updated for 1.0.944.2, but this mod has steering correction disable patching since 4.2.0.
 
 <b>Big thanks to:</b>
+Rockstar Games
 Alexander Blade
 LeFix
 XMOD
@@ -92,144 +87,40 @@ Latest builds: <a href=https://ci.appveyor.com/project/E66666666/gtavmanualtrans
 
 
 <b>Changelog</b>
-<b>4.1.3</b>
-No Gears.ini changes
-<ul>
-  <li>Fix LeFix Speedometer compatibility</li>
-</ul>
-
-<b>4.1.2</b>
-No Gears.ini changes
-<ul>
-  <li>Fix clutch not read in car when SimpleBike is on</li>
-  <li>Fix gearbox control still active if player isn't the driver</li>
-</ul>
 
 
-<b>4.1.1</b>
-No Gears.ini changes
-<ul>
-    <li>Fix wheel used in bicycles</li>
-</ul>
+<b>4.2.0</b>
+Big changes to configuration!
 
-<b>4.1.0</b>
-This update changes Gears.ini
-
-Feature changes:
 <ul>
-  <li>Add wheel soft lock options</li>
-  <li>Add FFB effects for burst tyres</li>
-  <li>Add detail FFB effects for quads</li>
-  <li>Add AutoGear1 for sequential as option</li>
-  <li>Add gearbox change to Controller layout</li>
-  <li>Experimental: Add support for boats and planes</li>
-</ul>
-
-Changes/Fixes:
-<ul>
-  <li>Fix version printing</li>
-  <li>Fix engine revving while braking with steering wheel while rolling back in a non-reverse gear</li>
-  <li>Fix engine revving while braking with steering wheel in reverse near stop</li>
-  <li>Decrease CenterForce faster during oversteer: 0% centerforce @ 20% oversteer</li>
-  <li>Remove dampener adjustment for oversteer</li>
-  <li>Change README format</li>
-</ul>
-
-<b>4.0.4</b>
-<ul>
-  <li>Fix Dpad press register on toggle</li>
-  <li>Print version number</li>
-</ul>
-
-<b>4.0.3</b>
-<ul>
-  <li>Revert XInput 1.4 usage</li>
-  <li>Fix support for older game versions</li>
-  <li>Fix default settings</li>
-  <li>Increase version number for clarity</li>
-</ul>
-
-<b>4.0.2</b>
-New things
-<ul>
-    <li>Implement Cross-Script shift mode setting       </li>
-    <li>Restore auto look back in reverse gear as option</li>
-    <li>Add color for top gear indicator                </li>
-    <li>Change .ini to use human readable keyboard keys </li>
-    <li>Make blinkers self-cancel                       </li>
-    <li>Use smoother oversteer transition               </li>
-</ul>
-
-More small fixes
-<ul>
-    <li>Support for Bikers DLC                                                     </li>
-    <li>Fix FFDisable ignored                                                      </li>
-    <li>Fix key presses being detected with GTA V in the background                </li>
-    <li>Fix Neutral gear still selected when car is in auto in a high gear         </li>
-    <li>Fix clutch pedal read in automatic mode (ignore it now)                    </li>
-    <li>Fix non-working H-shifter mode for motorbikes (skip over it)               </li>
-    <li>Replace normal-stop handbrake with another way to keep the car on its place</li>
-</ul>
-
-<b>4.0.1</b>
-A few small fixes
-<ul>
-    <li>Fix wheel radio button toggled on reset</li>
-    <li>Fix wheel jerk on reset</li>
-    <li>Fix crash when force feedback can't be initialized</li>
-    <li>Fix jerky reverse animation</li>
-    <li>Disable automatic reversal on motorbikes if `SimpleBike` is turned off</li>
-    <li>Add an option to only show the Neutral gear `N`</li>
-    <li>Change gear `0` display to `R`</li>
-</ul>
-
-<b>4.0</b>
-This release is primarily focused on making the mod compatible with all wheels.
-<ul>
-    <li>Add DirectInput for almost ALL wheels! All inputs should be supported:
-        <ul>
-            <li>All analog input axes                       </li>
-            <li>All buttons                                 </li>
-            <li>8 Dpad directions                           </li>
-            <li>Support for combined pedals                 </li>
-            <li>Analog ranges fully configurable            </li>
-            <li>Clutch can be disabled for 2-pedal wheels   </li>
-        </ul>
-    </li>
-    <li>Use wheel for driving without manual transmission
-        <ul>
-            <li>Force feedback enabled!</li>
-        </ul>
-    </li>
-    <li>Add wheel to keyboard assignments</li>
-    <li>Rewrote FFB from scratch
-        <ul>
-            <li>More force feedback details on wheel level</li>
-            <li>Better responsiveness</li>
-            <li>Understeer and oversteer conditions for force feedback parameters</li>
-        </ul>
-    </li>
-    <li>Included a tool to read the raw axes, to help you configure your wheel
-        <ul>
-            <li>A G27 with separate axes example available in Gears.ini</li>
-            <li>A G27 with combined axes example available in Gears.ini</li>
-        </ul>
-    </li>
-    <li>Properly re-acquire wheel on mod toggle</li>
-    <li>Removed Logitech specific wheel support</li>
-</ul>
-Non-wheel related changes
-<ul>
-    <li>Add an automatic gear box, implemented as R-N-D.</li>
-    <li>Add a hill starting effect, compensating for GTA V’s automatic brakes</li>
-    <li>Allow turning off cross-script communication for CitizenFX-based mods</li>
-    <li>Dropped SimpleReverse</li>
-    <li>Disable engine damage for electric vehicles</li>
-    <li>Add user defined controller analog-as-button trigger value</li>
-    <li>Change onscreen debug text format</li>
-    <li>Increase engine braking strength</li>
-    <li>Enable clutch catching for reverse (driver might play animation weirdly)</li>
-    <li>Fix clutch catching when car is upside down</li>
-    <li>Add engine off toggle for engine button</li>
-    <li>Disable low RPM power loss</li>
+	<li> Structural changes:
+		<ul>
+			<li>Add a rudimentary configuration tool               </li>
+			<li>Restructured settings to ManualTransmission folder </li>
+			<li>Separated wheel settings and normal settings       </li>
+			<li>Show warning for incorrect .ini versions           </li>
+		</ul>
+	</li>
+	<li> Wheel changes:
+		<ul>
+			<li>Add support for multiple DirectInput devices   </li>
+			<li>Add countersteering and reduction patch        </li>
+			<li>Add axis support for handbrake                 </li>
+			<li>Add back G27/G29 LEDs                          </li>
+			<li>Add option for global FF multiplier            </li>
+			<li>Rework Force Feedback completely               </li>
+			<li>Tweaks to soft lock                            </li>
+			<li>Add 7th gear support for H-shifter             </li>
+			<li>Disable controller rumble while wheel is active</li>
+		</ul>
+	</li>
+	<li>Changes:
+		<ul>
+			<li>Add option to turn on/off throttle+clutch engine starting</li>
+			<li>Add option for clutch shifting in sequential             </li>
+			<li>Only stall if all wheels are on the ground               </li>
+			<li>Remove 8th gear for numpad                               </li>
+			<li>General bug fixes                                        </li>
+		</ul>
+	</li>
 </ul>
