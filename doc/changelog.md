@@ -3,7 +3,7 @@
 Big changes to configuration!
 
 Structural changes:
-* Add a configuration tool
+* Add a rudimentary configuration tool
 * Restructured settings to ManualTransmission folder
 * Separated wheel settings and normal settings
 * Show warning for incorrect .ini versions
