@@ -483,6 +483,9 @@ can be safely left on if there's playing with controllers or keyboard and mouse.
 Override the automatic unpatching, so the steering is still mapped 1:1 to your controller
 or keyboard input. Recommended to leaving this off, for gameplay purposes.
 
+### `LogitechLEDs` : `0` or `1`
+Enable the RPM LEDs on Logitech wheels
+
 ## `[FORCE_FEEDBACK]`
 ### `Enable` : `0` or `1`
 Disable or enable force feedback.
