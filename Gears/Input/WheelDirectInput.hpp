@@ -73,7 +73,7 @@ public:
 	bool WasButtonHeldForMs(int btn, GUID device, int millis);
 	void UpdateButtonChangeStates();
 
-	bool SetConstantForce(GUID device, int force);
+	void SetConstantForce(GUID device, int force);
 
 	DIAxis StringToAxis(std::string& axisString);
 	//DIJOYSTATE2 JoyStates;

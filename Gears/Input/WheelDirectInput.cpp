@@ -28,7 +28,6 @@ bool WheelDirectInput::InitWheel() {
 		IID_IDirectInput8,
 		reinterpret_cast<void**>(&lpDi),
 		nullptr))) {
-		NoFeedback = true;
 		logger.Write("WHEEL: DirectInput create failed");
 		return false;
 	}
@@ -38,7 +37,6 @@ bool WheelDirectInput::InitWheel() {
 	logger.Write("WHEEL: Found " + std::to_string(nEntry) + " device(s)");
 
 	if (nEntry < 1) {
-		NoFeedback = true;
 		logger.Write("WHEEL: No wheel detected");
 		return false;
 	}
@@ -277,101 +275,90 @@ void WheelDirectInput::UpdateButtonChangeStates() {
 }
 
 bool WheelDirectInput::CreateConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis) {
-	if (!e || NoFeedback)
+	if (!e)
 		return false;
+
+	HRESULT hr;
 
 	DWORD axis;
-	if (ffAxis == lX) {
-		axis = DIJOFS_X;
-	}
-	else if (ffAxis == lY) {
-		axis = DIJOFS_Y;
-	}
-	else if (ffAxis == lZ) {
-		axis = DIJOFS_Z;
-	}
-	else if (ffAxis == lRx) {
-		axis = DIJOFS_RX;
-	}
-	else if (ffAxis == lRy) {
-		axis = DIJOFS_RY;
-	}
-	else if (ffAxis == lRz) {
-		axis = DIJOFS_RZ;
-	}
-	else {
-		return false;
-	}
+	if		(ffAxis == lX)	{ axis = DIJOFS_X; }
+	else if (ffAxis == lY)	{ axis = DIJOFS_Y; }
+	else if (ffAxis == lZ)	{ axis = DIJOFS_Z; }
+	else if (ffAxis == lRx) { axis = DIJOFS_RX; }
+	else if (ffAxis == lRy) { axis = DIJOFS_RY; }
+	else if (ffAxis == lRz) { axis = DIJOFS_RZ; }
+	else { return false; }
 
+	// I'm focusing on steering wheels, so you get one axis.
 	DWORD rgdwAxes[1] = { axis };
-	LONG rglDirection[1] = {0};
-	DICONSTANTFORCE cf = {0};
+	LONG rglDirection[1] = { 0 };
+	DICONSTANTFORCE cf = { 0 };
 
-	DIEFFECT eff;
-	ZeroMemory(&eff, sizeof(eff));
-	eff.dwSize = sizeof(DIEFFECT);
-	eff.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
-	eff.dwDuration = INFINITE;
-	eff.dwSamplePeriod = 0;
-	eff.dwGain = DI_FFNOMINALMAX;
-	eff.dwTriggerButton = DIEB_NOTRIGGER;
-	eff.dwTriggerRepeatInterval = 0;
-	eff.cAxes = 1;
-	eff.rgdwAxes = rgdwAxes;
-	eff.rglDirection = rglDirection;
-	eff.lpEnvelope = nullptr;
-	eff.cbTypeSpecificParams = sizeof(DICONSTANTFORCE);
-	eff.lpvTypeSpecificParams = &cf;
-	eff.dwStartDelay = 0;
+	/* 
+	 * I don't know why we need to init DIEFFECT if we're using a new DIEFFECT
+	 * afterwards anyway.
+	 */
+	DIEFFECT diEffect;
+	ZeroMemory(&diEffect, sizeof(diEffect));
+	diEffect.dwSize = sizeof(DIEFFECT);
+	diEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
+	diEffect.dwDuration = INFINITE;
+	diEffect.dwSamplePeriod = 0;
+	diEffect.dwGain = DI_FFNOMINALMAX;
+	diEffect.dwTriggerButton = DIEB_NOTRIGGER;
+	diEffect.dwTriggerRepeatInterval = 0;
+	diEffect.cAxes = 1;
+	diEffect.rgdwAxes = rgdwAxes;
+	diEffect.rglDirection = rglDirection;
+	diEffect.lpEnvelope = nullptr;
+	diEffect.cbTypeSpecificParams = sizeof(DICONSTANTFORCE);
+	diEffect.lpvTypeSpecificParams = &cf;
+	diEffect.dwStartDelay = 0;
 
-	e->diDevice->CreateEffect(
-			GUID_ConstantForce,
-			&eff,
-			&pCFEffect,
-			nullptr);
-
-	if (!pCFEffect) {
+	hr = e->diDevice->CreateEffect(GUID_ConstantForce, &diEffect, &pCFEffect, nullptr);
+	
+	if (FAILED(hr) || !pCFEffect) {
 		return false;
 	}
 
 	return true;
 }
 
-bool WheelDirectInput::SetConstantForce(GUID device, int force) {
+void WheelDirectInput::SetConstantForce(GUID device, int force) {
 	auto e = FindEntryFromGUID(device);
-	if (!e || NoFeedback)
-		return false;
+	if (!e || !pCFEffect || NoFeedback)
+		return;
 
-	HRESULT hr;
 	LONG rglDirection[1] = {0};
-
 
 	DICONSTANTFORCE cf;
 	cf.lMagnitude = force;
 
-	DIEFFECT cfEffect;
-	ZeroMemory(&cfEffect, sizeof(cfEffect));
-	cfEffect.dwSize = sizeof(DIEFFECT);
-	cfEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
-	cfEffect.cAxes = 1;
-	cfEffect.rglDirection = rglDirection;
-	cfEffect.lpEnvelope = nullptr;
-	cfEffect.cbTypeSpecificParams = sizeof(DICONSTANTFORCE);
-	cfEffect.lpvTypeSpecificParams = &cf;
-	cfEffect.dwStartDelay = 0;
+	DIEFFECT diEffect;
+	ZeroMemory(&diEffect, sizeof(diEffect));
+	diEffect.dwSize = sizeof(DIEFFECT);
+	diEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
+	diEffect.cAxes = 1;
+	diEffect.rglDirection = rglDirection;
+	diEffect.lpEnvelope = nullptr;
+	diEffect.cbTypeSpecificParams = sizeof(DICONSTANTFORCE);
+	diEffect.lpvTypeSpecificParams = &cf;
+	diEffect.dwStartDelay = 0;
+	
+	// This should also automagically play.
+	pCFEffect->SetParameters(&diEffect, 
+		DIEP_DIRECTION |  DIEP_TYPESPECIFICPARAMS | DIEP_START);
 
-	if (!pCFEffect) {
-		return false;
-	}
-	hr = pCFEffect->SetParameters(&cfEffect, DIEP_DIRECTION |
-	                              DIEP_TYPESPECIFICPARAMS |
-	                              DIEP_START);
-
-	e->diDevice->Acquire();
-	if (pCFEffect)
+	// When window focus is lost this should reacquire stuff I guess
+	/*if (FAILED(e->diDevice->Poll())) {
+		HRESULT hr = e->diDevice->Acquire();
+		while (hr == DIERR_INPUTLOST) {
+			hr = e->diDevice->Acquire();
+		}
 		pCFEffect->Start(1, 0);
-
-	return SUCCEEDED(hr);
+	}*/
+	/*e->diDevice->Acquire();
+	pCFEffect->Start(1, 0);*/
 }
 
 WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString) {
