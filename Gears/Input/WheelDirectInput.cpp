@@ -7,17 +7,7 @@
 #include <chrono>
 #include <vector>
 
-// TO/DO Force feedback enumeration
-// Update: FFB Enumeration is skipped in favor of a user-specified axis
-
-// TO/DO Fix unknown/non-G27 layout detections
-// Update: G920 gives trouble, G29 "works perfectly". Not sure, but all DInput
-// axes are handled. Anyway if this to-do has been here for a while, it's been
-// handled by the new all-inputs-have-a-device set up.
-
 // TODO Look into crashes
-// Update: G920 gives trouble. Disable RPM LEDs on demand. Untested but should
-// be fixed if writing to random addresses didn't already hurt.
 
 WheelDirectInput::WheelDirectInput(Logger &logAlt) : nEntry(0),
                                                     logger(logAlt),
@@ -31,7 +21,8 @@ WheelDirectInput::~WheelDirectInput() {
 bool WheelDirectInput::InitWheel() {
 	logger.Write("WHEEL: Init steering wheel"); 
 	
-	// Setting up DirectInput Object
+	// Register with the DirectInput subsystem and get a pointer
+	// to a IDirectInput interface we can use.
 	if (FAILED(DirectInput8Create(GetModuleHandle(nullptr),
 		DIRECTINPUT_VERSION,
 		IID_IDirectInput8,
@@ -42,7 +33,6 @@ bool WheelDirectInput::InitWheel() {
 		return false;
 	}
 
-	foundGuids.clear();
 	djs.enumerate(lpDi);
 	nEntry = djs.getEntryCount();
 	logger.Write("WHEEL: Found " + std::to_string(nEntry) + " device(s)");
@@ -53,6 +43,7 @@ bool WheelDirectInput::InitWheel() {
 		return false;
 	}
 
+	foundGuids.clear();
 	for (int i = 0; i < nEntry; i++) {
 		auto device = djs.getEntry(i);
 		std::wstring wDevName = device->diDeviceInstance.tszInstanceName;
@@ -71,6 +62,29 @@ bool WheelDirectInput::InitWheel() {
 	return true;
 }
 
+void WheelDirectInput::formatError(HRESULT hr, std::string &hrStr) {
+	switch (hr) {
+		case DI_OK: hrStr = "DI_OK";
+			break;
+		case DIERR_INVALIDPARAM: hrStr = "DIERR_INVALIDPARAM";
+			break;
+		case DIERR_NOTINITIALIZED: hrStr = "DIERR_NOTINITIALIZED";
+			break;
+		case DIERR_ALREADYINITIALIZED: hrStr = "DIERR_ALREADYINITIALIZED";
+			break;
+		case DIERR_INPUTLOST: hrStr = "DIERR_INPUTLOST";
+			break;
+		case DIERR_ACQUIRED: hrStr = "DIERR_ACQUIRED";
+			break;
+		case DIERR_NOTACQUIRED: hrStr = "DIERR_NOTACQUIRED";
+			break;
+		case E_HANDLE: hrStr = "E_HANDLE";
+			break;
+		default: hrStr = "UNKNOWN";
+			break;
+	}
+}
+
 bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
 	logger.Write("WHEEL: Init FFB device");
 	auto e = FindEntryFromGUID(guid);
@@ -82,30 +96,11 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
 
 	e->diDevice->Unacquire();
 	HRESULT hr;
-	if (FAILED(hr = e->diDevice->SetCooperativeLevel(
-			GetForegroundWindow(),
-		DISCL_EXCLUSIVE | DISCL_FOREGROUND))) {
+	if (FAILED(hr = e->diDevice->SetCooperativeLevel(GetForegroundWindow(),
+													 DISCL_EXCLUSIVE | 
+													 DISCL_FOREGROUND))) {
 		std::string hrStr;
-		switch (hr) {
-			case DI_OK: hrStr = "DI_OK";
-				break;
-			case DIERR_INVALIDPARAM: hrStr = "DIERR_INVALIDPARAM";
-				break;
-			case DIERR_NOTINITIALIZED: hrStr = "DIERR_NOTINITIALIZED";
-				break;
-			case DIERR_ALREADYINITIALIZED: hrStr = "DIERR_ALREADYINITIALIZED";
-				break;
-			case DIERR_INPUTLOST: hrStr = "DIERR_INPUTLOST";
-				break;
-			case DIERR_ACQUIRED: hrStr = "DIERR_ACQUIRED";
-				break;
-			case DIERR_NOTACQUIRED: hrStr = "DIERR_NOTACQUIRED";
-				break;
-			case E_HANDLE: hrStr = "E_HANDLE";
-				break;
-			default: hrStr = "UNKNOWN";
-				break;
-		}
+		formatError(hr, hrStr);
 		logger.Write("WHEEL: Acquire FFB device error");
 		logger.Write("WHEEL: HRESULT = " + hrStr);
 		std::stringstream ss;
@@ -131,7 +126,7 @@ void WheelDirectInput::UpdateCenterSteering(GUID guid, DIAxis steerAxis) {
 	UpdateState(); // Why do I need to call this twice?
 	prevTime = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 	prevPosition = GetAxisValue(steerAxis, guid);
-}
+}																																						
 
 /*
  * Return NULL when device isn't found
@@ -285,16 +280,6 @@ bool WheelDirectInput::CreateConstantForceEffect(const DiJoyStick::Entry *e, DIA
 	if (!e || NoFeedback)
 		return false;
 
-	// This somehow doesn't work well
-	/*DIDEVCAPS didevcaps;
-
-	e->diDevice->GetCapabilities(&didevcaps);
-
-	if (!(didevcaps.dwFlags & DIDC_FORCEFEEDBACK)) {
-		logger.Write("Device doesn't have force feedback");
-		return false;
-	}*/
-
 	DWORD axis;
 	if (ffAxis == lX) {
 		axis = DIJOFS_X;
@@ -352,12 +337,9 @@ bool WheelDirectInput::CreateConstantForceEffect(const DiJoyStick::Entry *e, DIA
 	return true;
 }
 
-HRESULT WheelDirectInput::SetConstantForce(GUID device, int force) {
+bool WheelDirectInput::SetConstantForce(GUID device, int force) {
 	auto e = FindEntryFromGUID(device);
-	if (!e)
-		return E_HANDLE;
-
-	if (NoFeedback)
+	if (!e || NoFeedback)
 		return false;
 
 	HRESULT hr;
@@ -378,6 +360,9 @@ HRESULT WheelDirectInput::SetConstantForce(GUID device, int force) {
 	cfEffect.lpvTypeSpecificParams = &cf;
 	cfEffect.dwStartDelay = 0;
 
+	if (!pCFEffect) {
+		return false;
+	}
 	hr = pCFEffect->SetParameters(&cfEffect, DIEP_DIRECTION |
 	                              DIEP_TYPESPECIFICPARAMS |
 	                              DIEP_START);
@@ -386,7 +371,7 @@ HRESULT WheelDirectInput::SetConstantForce(GUID device, int force) {
 	if (pCFEffect)
 		pCFEffect->Start(1, 0);
 
-	return hr;
+	return SUCCEEDED(hr);
 }
 
 WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString) {

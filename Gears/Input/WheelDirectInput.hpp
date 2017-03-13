@@ -40,7 +40,7 @@ public:
 		"UNKNOWN_AXIS"
 	};
 	bool NoFeedback = false;
-	int nEntry;
+	int nEntry = 0;
 
 	enum POV {
 		N = 3600,
@@ -58,6 +58,7 @@ public:
 	WheelDirectInput(Logger &logAlt);
 	~WheelDirectInput();
 	bool InitWheel();
+	void formatError(HRESULT hr, std::string &hrStr);
 	bool InitFFB(GUID guid, DIAxis ffAxis);
 	void UpdateCenterSteering(GUID guid, DIAxis steerAxis);
 	const DiJoyStick::Entry *FindEntryFromGUID(GUID guid);
@@ -72,7 +73,7 @@ public:
 	bool WasButtonHeldForMs(int btn, GUID device, int millis);
 	void UpdateButtonChangeStates();
 
-	HRESULT SetConstantForce(GUID device, int force);
+	bool SetConstantForce(GUID device, int force);
 
 	DIAxis StringToAxis(std::string& axisString);
 	//DIJOYSTATE2 JoyStates;

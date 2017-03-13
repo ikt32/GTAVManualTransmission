@@ -1,5 +1,12 @@
 # Changelog
-## 4.2.0
+
+## 4.2.0 - beta 1 -> beta 2
+No configuration changes
+
+Wheel changes:
+* Fix crash if force feedback is applied on a nonexisting device after re-initialization
+
+## 4.2.0 - beta 1
 Big changes to configuration!
 
 Structural changes:
