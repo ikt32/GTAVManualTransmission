@@ -171,8 +171,9 @@ void update() {
 		handleVehicleButtons();
 		handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
 		doWheelSteering();
-		playWheelEffects(settings, vehData, 
-		                 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f );
+		bool airborne = !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) &&
+			ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f;
+		playWheelEffects(settings, vehData, airborne);
 	}	
 
 	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
@@ -193,9 +194,9 @@ void update() {
 
 	if (controls.WheelDI.IsConnected(controls.SteerGUID)) {
 		doWheelSteering();
-		playWheelEffects(settings, vehData, 
-		                 !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f
-		                 );
+		bool airborne = !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) &&
+			ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f;
+		playWheelEffects(settings, vehData, airborne );
 	}
 	
 

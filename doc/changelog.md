@@ -5,6 +5,7 @@ No configuration changes
 
 Wheel changes:
 * Fix crash if force feedback is applied on a nonexisting device after re-initialization
+* Clean up DirectInput Force Feedback code
 
 ## 4.2.0 - beta 1
 Big changes to configuration!
