@@ -182,6 +182,11 @@ void saveAxis(std::string gameAxis, std::string confTag, std::tuple<GUID, std::s
 	}
 }
 
+void saveButton(int button, std::string confTag, GUID devGUID, std::string devName) {
+	int index = settings.SteeringAppendDevice(devGUID, devName.c_str());
+	settings.SteeringSaveButton(confTag, index, button);
+}
+
 /*
  * 1. User selects input to be configured
  *		- Show "Press w/a/s/d"
@@ -194,6 +199,8 @@ void configDynamicAxes(char c) {
 	if (c != 'w' && c != 's' && c != 'c' && c != 'd' && c != 'h') {
 		return;
 	}
+	cls();
+
 	std::string gameAxis;
 	std::string confTag;
 	std::string additionalInfo;
@@ -242,9 +249,8 @@ void configDynamicAxes(char c) {
 	bool positive = true;
 
 	int startValue;
-	int endValue = -1;
+	int endValue;
 
-	cls();
 	while (true) {
 		if (_kbhit()) {
 			cls();
@@ -259,7 +265,6 @@ void configDynamicAxes(char c) {
 			cls();
 			break;
 		}
-
 
 		setCursorPosition(0, csbi.srWindow.Bottom - 3);
 		printf("If nothing seems to happen, press ESC and try again");
@@ -287,7 +292,7 @@ void configDynamicAxes(char c) {
 		cls();
 		setCursorPosition(0, csbi.srWindow.Bottom);
 		printf("Saved changes");
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 		cls();
 		init();
 		return;
@@ -350,19 +355,17 @@ void configDynamicAxes(char c) {
 	cls();
 	setCursorPosition(0, csbi.srWindow.Bottom);
 	printf("Saved changes");
-	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 	cls();
 	init();
 }
 
-void configDynamicButtons() {
-	
-}
-
-void configButtons(char c) {
+void configDynamicButtons(char c) {
 	if (c != '+' && c != '-' && c != '=' && c != '_') {
 		return;
 	}
+	cls();
+
 	std::string gameButton;
 	std::string confTag;
 	int buttonsActive = 0;
@@ -374,91 +377,97 @@ void configButtons(char c) {
 		gameButton = "shift down";
 		confTag = "SHIFT_DOWN";
 	}
-	GUID devGUID = {};
-	int button;
+
 	std::string devName;
 
-	cls();
+	std::array<int, 8> directions = {
+		WheelDirectInput::POV::N,
+		WheelDirectInput::POV::NE,
+		WheelDirectInput::POV::E,
+		WheelDirectInput::POV::SE,
+		WheelDirectInput::POV::S,
+		WheelDirectInput::POV::SW,
+		WheelDirectInput::POV::W,
+		WheelDirectInput::POV::NW,
+	};
+
+	// Check whether any buttons had been pressed already
+	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
+
+	for (auto guid : controls.WheelDI.GetGuids()) {
+		for (int i = 0; i < 255; i++) {
+			if (controls.WheelDI.IsButtonPressed(i, guid)) {
+				buttonsActive++;
+			}
+		}
+		for (auto d : directions) {
+			if (controls.WheelDI.IsButtonPressed(d, guid)) {
+				buttonsActive++;
+			}
+		}
+	}
+
+	if (buttonsActive > 0) {
+		setCursorPosition(0, 0);
+		printf("Some button was already pressed on start. Stop pressing that and try again.");
+		std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+		cls();
+		init();
+		return;
+	}
+
 	while (true) {
-		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
 		if (_kbhit()) {
 			cls();
 			char c = _getch();
 			if (c == 0x1B) { // ESC
 				return;
 			}
-			if (c == 0x0D) { // RETURN
-				if (buttonsActive > 1) {
-					blankLines(0, 5);
-					setCursorPosition(0, 0);
-					printf("More than 1 button pressed. You can only select one.");
-					std::this_thread::yield();
-					std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-				}
-				else if (buttonsActive == 0) {
-					blankLines(0, 5);
-					setCursorPosition(0, 0);
-					printf("No buttons pressed. Select one.");
-					std::this_thread::yield();
-					std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-				} else {
-					int index = settings.SteeringAppendDevice(devGUID, devName.c_str());
-					settings.SteeringSaveButton(confTag, index, button);
-					cls();
-					setCursorPosition(0, csbi.srWindow.Bottom);
-					printf("Saved changes");
-					std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-					cls();
-					init();
-					return;
-				}
-
-			}
 		}
+		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
 
-		blankLines(0, 5);
-		buttonsActive = 0;
-		devGUID = {};
-		button = -1;
+		blankLines(0, 5); 
 		setCursorPosition(0, 0);
 		printf("Button for %s: ", gameButton.c_str());
 
-		for(auto guid : controls.WheelDI.GetGuids()) {
+		for (auto guid : controls.WheelDI.GetGuids()) {
 			std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
 			devName = std::string(wDevName.begin(), wDevName.end()).c_str();
 			for (int i = 0; i < 255; i++) {
 				if (controls.WheelDI.IsButtonPressed(i, guid)) {
 					printf("%d @ %s", i, devName.c_str());
-					buttonsActive++;
-					button = i;
-					devGUID = guid;
+					saveButton(i, confTag, guid, devName);
+					blankLines(csbi.srWindow.Bottom - 5, 6);
+					setCursorPosition(0, csbi.srWindow.Bottom);
+					printf("Saved changes");
+					std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+					cls();
+					init();
+					return;
 				}
 			}
+
 			//POV hat shit
 			std::string directionsStr = "?";
-			std::vector<int> directions;
-			directions.push_back(WheelDirectInput::POV::N);
-			directions.push_back(WheelDirectInput::POV::NE);
-			directions.push_back(WheelDirectInput::POV::E);
-			directions.push_back(WheelDirectInput::POV::SE);
-			directions.push_back(WheelDirectInput::POV::S);
-			directions.push_back(WheelDirectInput::POV::SW);
-			directions.push_back(WheelDirectInput::POV::W);
-			directions.push_back(WheelDirectInput::POV::NW);
 			for (auto d : directions) {
 				if (controls.WheelDI.IsButtonPressed(d, guid)) {
-					if (d == WheelDirectInput::N) directionsStr  = "N ";
+					if (d == WheelDirectInput::N) directionsStr = "N ";
 					if (d == WheelDirectInput::NE) directionsStr = "NE";
-					if (d == WheelDirectInput::E) directionsStr  = " E";
+					if (d == WheelDirectInput::E) directionsStr = " E";
 					if (d == WheelDirectInput::SE) directionsStr = "SE";
-					if (d == WheelDirectInput::S) directionsStr  = "S ";
+					if (d == WheelDirectInput::S) directionsStr = "S ";
 					if (d == WheelDirectInput::SW) directionsStr = "SW";
-					if (d == WheelDirectInput::W) directionsStr  = " W";
+					if (d == WheelDirectInput::W) directionsStr = " W";
 					if (d == WheelDirectInput::NW) directionsStr = "NW";
 					printf("%s (POV hat) @ %s", directionsStr.c_str(), devName.c_str());
-					buttonsActive++;
-					button = d;
-					devGUID = guid;
+					saveButton(d, confTag, guid, devName);
+					blankLines(csbi.srWindow.Bottom - 5, 6);
+					setCursorPosition(0, csbi.srWindow.Bottom);
+					printf("Saved changes");
+					std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+					cls();
+					init();
+					return;
 				}
 			}
 		}
@@ -474,6 +483,9 @@ void configButtons(char c) {
 }
 
 /*
+ * Sadly this doesn't seem viable to make it dynamically detect stuff
+ * But pressing [RETURN] a bunch of times shouldn't be *that* problematic ;)
+ * 
  * 2. User presses g to config h-shifter
  *		- Show "Select device"
  * 3. User presses [device]
@@ -540,14 +552,14 @@ void configHShift(char c) {
 						setCursorPosition(0, 0);
 						printf("More than 1 button pressed. You can only select one.");
 						std::this_thread::yield();
-						std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+						std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 					}
 					else if (buttonsActive == 0) {
 						blankLines(0, 5);
 						setCursorPosition(0, 0);
 						printf("No buttons pressed. Skipping this gear!");
 						std::this_thread::yield();
-						std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+						std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 						progress++;
 					} else {
 						progress++;
@@ -628,7 +640,7 @@ void configHShift(char c) {
 				cls();
 				setCursorPosition(0, csbi.srWindow.Bottom);
 				printf("Saved changes");
-				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 				cls();
 				init();
 				return;
@@ -672,7 +684,7 @@ int main()
 				case 0x1B: // ESC
 					return 0;
 				default:
-					configButtons(c);
+					configDynamicButtons(c);
 					configHShift(c);
 					configDynamicAxes(c);
 					break;

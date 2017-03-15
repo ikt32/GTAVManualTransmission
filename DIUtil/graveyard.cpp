@@ -203,4 +203,120 @@ void configAxis(char c) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
 	}
 }
+
+void configButtons(char c) {
+	if (c != '+' && c != '-' && c != '=' && c != '_') {
+		return;
+	}
+	std::string gameButton;
+	std::string confTag;
+	int buttonsActive = 0;
+	if (c == '+' || c == '=') {
+		gameButton = "shift up";
+		confTag = "SHIFT_UP";
+	}
+	if (c == '-' || c == '_') {
+		gameButton = "shift down";
+		confTag = "SHIFT_DOWN";
+	}
+	GUID devGUID = {};
+	int button;
+	std::string devName;
+
+	cls();
+	while (true) {
+		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
+		if (_kbhit()) {
+			cls();
+			char c = _getch();
+			if (c == 0x1B) { // ESC
+				return;
+			}
+			if (c == 0x0D) { // RETURN
+				if (buttonsActive > 1) {
+					blankLines(0, 5);
+					setCursorPosition(0, 0);
+					printf("More than 1 button pressed. You can only select one.");
+					std::this_thread::yield();
+					std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+				}
+				else if (buttonsActive == 0) {
+					blankLines(0, 5);
+					setCursorPosition(0, 0);
+					printf("No buttons pressed. Select one.");
+					std::this_thread::yield();
+					std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+				}
+				else {
+					int index = settings.SteeringAppendDevice(devGUID, devName.c_str());
+					settings.SteeringSaveButton(confTag, index, button);
+					cls();
+					setCursorPosition(0, csbi.srWindow.Bottom);
+					printf("Saved changes");
+					std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+					cls();
+					init();
+					return;
+				}
+
+			}
+		}
+
+		blankLines(0, 5);
+		buttonsActive = 0;
+		devGUID = {};
+		button = -1;
+		setCursorPosition(0, 0);
+		printf("Button for %s: ", gameButton.c_str());
+
+		for (auto guid : controls.WheelDI.GetGuids()) {
+			std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
+			devName = std::string(wDevName.begin(), wDevName.end()).c_str();
+			for (int i = 0; i < 255; i++) {
+				if (controls.WheelDI.IsButtonPressed(i, guid)) {
+					printf("%d @ %s", i, devName.c_str());
+					buttonsActive++;
+					button = i;
+					devGUID = guid;
+				}
+			}
+			//POV hat shit
+			std::string directionsStr = "?";
+			std::vector<int> directions;
+			directions.push_back(WheelDirectInput::POV::N);
+			directions.push_back(WheelDirectInput::POV::NE);
+			directions.push_back(WheelDirectInput::POV::E);
+			directions.push_back(WheelDirectInput::POV::SE);
+			directions.push_back(WheelDirectInput::POV::S);
+			directions.push_back(WheelDirectInput::POV::SW);
+			directions.push_back(WheelDirectInput::POV::W);
+			directions.push_back(WheelDirectInput::POV::NW);
+			for (auto d : directions) {
+				if (controls.WheelDI.IsButtonPressed(d, guid)) {
+					if (d == WheelDirectInput::N) directionsStr = "N ";
+					if (d == WheelDirectInput::NE) directionsStr = "NE";
+					if (d == WheelDirectInput::E) directionsStr = " E";
+					if (d == WheelDirectInput::SE) directionsStr = "SE";
+					if (d == WheelDirectInput::S) directionsStr = "S ";
+					if (d == WheelDirectInput::SW) directionsStr = "SW";
+					if (d == WheelDirectInput::W) directionsStr = " W";
+					if (d == WheelDirectInput::NW) directionsStr = "NW";
+					printf("%s (POV hat) @ %s", directionsStr.c_str(), devName.c_str());
+					buttonsActive++;
+					button = d;
+					devGUID = guid;
+				}
+			}
+		}
+
+		setCursorPosition(0, csbi.srWindow.Bottom - 1);
+		printf("Configuring %s", gameButton.c_str());
+		setCursorPosition(0, csbi.srWindow.Bottom);
+		std::cout << "ESC: Cancel config - ENTER: Confirm selection";
+		std::cout.flush();
+		std::this_thread::yield();
+		std::this_thread::sleep_for(std::chrono::milliseconds(16));
+	}
+}
+
 #endif
