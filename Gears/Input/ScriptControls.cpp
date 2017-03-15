@@ -66,7 +66,6 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
 			
 			// You're outta luck if you have a single-axis 3-pedal freak combo or something
 			if (WheelAxes[static_cast<int>(WheelAxisType::Throttle)] == WheelAxes[static_cast<int>(WheelAxisType::Brake)]) {
-				ClutchVal = 1.0f - static_cast<float>(RawC) / (ClutchDown - ClutchUp);
 				int pivot;
 				if (ThrottleUp == BrakeUp) {
 					pivot = BrakeUp;
@@ -129,6 +128,7 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
 						}
 					}
 				}
+				ClutchVal = 0.0f + 1.0f / (ClutchDown - ClutchUp)*(static_cast<float>(RawC) - ClutchUp);
 			} // End single-axis mumbo jumbo
  			else {
 				ThrottleVal = 0.0f + 1.0f / (ThrottleDown - ThrottleUp)*(static_cast<float>(RawT) - ThrottleUp);
