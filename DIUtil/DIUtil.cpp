@@ -119,21 +119,80 @@ void playWheelEffects(float effSteer) {
 	controls.WheelDI.SetConstantForce(controls.SteerGUID, totalForce);
 }
 
+bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> startStates, std::tuple<GUID, std::string> &selectedDevice, int hyst, bool &positive, int &startValue_) {
+	for (auto guid : controls.WheelDI.GetGuids()) {
+		for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
+			for (auto startState : startStates) {
+				std::string axisName = controls.WheelDI.DIAxisHelper[i];
+				int axisValue = controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid);
+				int startValue = std::get<2>(startState);
+				if (std::get<0>(startState) == guid &&
+					std::get<1>(startState) == axisName) {
+					startValue_ = startValue;
+					if (axisValue > startValue + hyst) { // 0 (min) - 65535 (max)
+						selectedDevice = std::tuple<GUID, std::string>(guid, axisName);
+						positive = true;
+						return true;
+					}
+					if (axisValue < startValue - hyst) { // 65535 (min) - 0 (max)
+						selectedDevice = std::tuple<GUID, std::string>(guid, axisName);
+						positive = false;
+						return true;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+void saveAxis(std::string gameAxis, std::string confTag, std::tuple<GUID, std::string> selectedDevice, int min, int max) {
+	std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
+	std::string devName = std::string(wDevName.begin(), wDevName.end());
+	int index = settings.SteeringAppendDevice(std::get<0>(selectedDevice), devName);
+	settings.SteeringSaveAxis(confTag, index, std::get<1>(selectedDevice), min, max);
+	if (gameAxis == "steering") {
+		settings.SteeringSaveFFBAxis(confTag, index, std::get<1>(selectedDevice));
+	}
+}
+
 /*
  * 1. User selects input to be configured
- *		- Show "Press something yo"
+ *		- Show "Press w/a/s/d"
  * 2. User presses input to be tied to game axis
  *		- Show "AWAITING INPUT"
  * 3. Save result
  * 0. User can exit at any time
  */
 void configDynamicAxes(char c) {
-	if (c != 'x') return;
+	if (c != 'w' && c != 's' && c != 'c' && c != 'd' && c != 'h') {
+		return;
+	}
 	std::string gameAxis;
 	std::string confTag;
-	if (c == 'x') {
+	std::string additionalInfo;
+
+	if (c == 'w') {
 		gameAxis = "throttle";
 		confTag = "THROTTLE";
+	}
+	if (c == 's') {
+		gameAxis = "brake";
+		confTag = "BRAKES";
+	}
+	if (c == 'c') {
+		gameAxis = "clutch";
+		confTag = "CLUTCH";
+	}
+	if (c == 'd') {
+		gameAxis = "steering";
+		confTag = "STEER";
+		additionalInfo = "Steer right to register axis";
+	}
+	if (c == 'h') {
+		gameAxis = "handbrake";
+		confTag = "HANDBRAKE_ANALOG";
+		additionalInfo = "Pull handbrake to register axis";
 	}
 
 	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
@@ -150,8 +209,14 @@ void configDynamicAxes(char c) {
 
 	std::tuple<GUID, std::string> selectedDevice;
 
-	int hyst = 256;
+	// Ignore inputs before selection if they moved less than hyst
+	int hyst = 65536/8;
+
+	// To track direction of physical <-> digital value.
 	bool positive = true;
+
+	int startValue;
+	int endValue = -1;
 
 	cls();
 	while (true) {
@@ -164,32 +229,21 @@ void configDynamicAxes(char c) {
 		}
 		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
 
-		for (auto guid : controls.WheelDI.GetGuids()) {
-			for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
-				std::string axisName = controls.WheelDI.DIAxisHelper[i];
-				int axisValue = controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid);
-				for (auto startState : startStates) {
-					int startValue = std::get<2>(startState);
-					if (std::get<0>(startState) == guid &&
-						std::get<1>(startState) == axisName) {
-
-						if (axisValue > startValue + hyst) { // 0 (min) - 65535 (max)
-							selectedDevice = std::tuple<GUID, std::string>(guid, axisName);
-							positive = true;
-							goto wew_lad;
-						}
-						if (axisValue < startValue - hyst) { // 65535 (min) - 0 (max)
-							selectedDevice = std::tuple<GUID, std::string>(guid, axisName);
-							positive = false;
-							goto wew_lad;
-						}
-					}
-				}
-			}
+		if (getConfigAxisWithValues(startStates, selectedDevice, hyst, positive, startValue)) {
+			cls();
+			break;
 		}
 
 
-
+		setCursorPosition(0, csbi.srWindow.Bottom - 3);
+		printf("If nothing seems to happen, press ESC and try again");
+		setCursorPosition(0, csbi.srWindow.Bottom - 2);
+		if (additionalInfo.empty()) {
+			printf("Fully press and release the %s pedal to register axis", gameAxis.c_str());
+		}
+		else {
+			printf("%s", additionalInfo.c_str());
+		}
 		setCursorPosition(0, csbi.srWindow.Bottom - 1);
 		printf("Configuring %s, awaiting input...", gameAxis.c_str());
 		setCursorPosition(0, csbi.srWindow.Bottom);
@@ -199,223 +253,88 @@ void configDynamicAxes(char c) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
 	}
 
-wew_lad:
-	std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
-	std::string devName = std::string(wDevName.begin(), wDevName.end());
-	int min = (positive ? 0 : 65535);
-	int max = (positive ? 65535 : 0);
-	int index = settings.SteeringAppendDevice(std::get<0>(selectedDevice), devName);
-	settings.SteeringSaveAxis(confTag, index, std::get<1>(selectedDevice), min, max);
 	if (gameAxis == "steering") {
-		settings.SteeringSaveFFBAxis(confTag, index, std::get<1>(selectedDevice));
-	}
-	cls();
-	setCursorPosition(0, csbi.srWindow.Bottom);
-	printf("Saved changes");
-	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-	cls();
-	init();
-	return;
-}
-
-/*
- * 1. User selects input to be configured
- *		- Show "Press W/A/S/D/Z for steer/throttle etc"
- * 2. User presses WASDZ to config axis
- *		- Show "Press 1-6 for axis etc"
- * 3. User presses 1-6 to choose which game axis is which hw axis
- *		- Show "Steer left/lift foot etc"
- *		- Show "Press Enter to register"
- * 4. User presses RETURN
- *		- Show "Steer right/press pedal to desired max pos"
- *		- Show "Press Enter to register"
- * 5. User presses RETURN
- *		- Save to file
- *		- We done now!
- * 0. User presses ESC
- *		- Cancel at any time, do not save.
- */
-// Why did I make this monstrosity?!
-void configAxis(char c) {
-	if (c != 'w' && c != 's' && c != 'c' && c != 'a' && c != 'd' && c != 'h') {
+		int min = (positive ? 0 : 65535);
+		int max = (positive ? 65535 : 0);
+		saveAxis(gameAxis, confTag, selectedDevice, min, max);
+		cls();
+		setCursorPosition(0, csbi.srWindow.Bottom);
+		printf("Saved changes");
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		cls();
+		init();
 		return;
 	}
-	std::string gameAxis;
-	std::string confTag;
-	if (c == 'w') {
-		gameAxis = "throttle";
-		confTag = "THROTTLE";
-	}
-	if (c == 's') {
-		gameAxis = "brake";
-		confTag = "BRAKES";
-	}
-	if (c == 'c') {
-		gameAxis = "clutch";
-		confTag = "CLUTCH";
-	}
-	if (c == 'a' || c == 'd') {
-		gameAxis = "steering";
-		confTag = "STEER";
-	}
-	if (c == 'h') {
-		gameAxis = "handbrake";
-		confTag = "HANDBRAKE_ANALOG";
-	}
 
-	int progress = 0;
-	int devEntry = -1;
-	int devAxis = -1;
-	std::array<std::string, 8> devAxisH {
-		"lX	",
-		"lY	",
-		"lZ	",
-		"lRx",
-		"lRy",
-		"lRz",
-		"rglSlider0",
-		"rglSlider1"
-	};
-	GUID devGUID = {};
-	std::wstring wDevName;
-	int minVal = -1;
-	int maxVal = -1;
-
-	cls();
-	while (true) {
-		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
+	int prevAxisValue = controls.WheelDI.GetAxisValue(controls.WheelDI.StringToAxis(std::get<1>(selectedDevice)), std::get<0>(selectedDevice));
+	std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
+	std::string selectedDevName = std::string(wDevName.begin(), wDevName.end()).c_str();
+	std::string selectedAxis = std::get<1>(selectedDevice);
+	while(true) {
 		if (_kbhit()) {
 			cls();
 			char c = _getch();
 			if (c == 0x1B) { // ESC
 				return;
 			}
-			if (progress == 0) { // Device selection
-				for (int i = 0; i < controls.WheelDI.nEntry; i++) {
-					if (c == i + '0') {
-						devEntry = i;
-						int devNumber = 0;
-						for (auto guid : controls.WheelDI.GetGuids()) {
-							if (devNumber == devEntry) {
-								devGUID = guid;
-							}
-							devNumber++;
-						}
-						progress++;
-					}
-				}
-				continue;
-			}
-			if (progress == 1) { // Axis selection
-				for (int i = 1; i <= 8; i++) {
-					if (c == i + '0') {
-						devAxis = i;
-						progress++;
-					}
-				}
-				continue;
-			}
-			if (progress == 2 || progress == 3) { // Input setting
-				if (c == 0x0D) { // Return
-					if (progress == 2) { // save min
-						minVal = controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(devAxis - 1), devGUID);
-					}
-					if (progress == 3) { // save max
-						maxVal = controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(devAxis - 1), devGUID);
-					}
-					progress++;
-				}
-				continue;
-			}
+		}
+		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
+		
+		int axisValue = controls.WheelDI.GetAxisValue(controls.WheelDI.StringToAxis(std::get<1>(selectedDevice)), std::get<0>(selectedDevice));
+
+		if (positive && axisValue < prevAxisValue) {
+			endValue = prevAxisValue;
+			cls();
+			break;
 		}
 
-		switch (progress) {
-			case 0: { // Device selection
-				setCursorPosition(0, 0);
-				int devNumber = 0;
-				for (auto guid : controls.WheelDI.GetGuids()) {
-					wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
-					std::cout << devNumber << ": " << std::string(wDevName.begin(), wDevName.end()) << "\n";
-					devNumber++;
-				}
-
-				setCursorPosition(0, csbi.srWindow.Bottom - 2);
-				printf("Select device for %s (0 to %d)", gameAxis.c_str(), controls.WheelDI.nEntry - 1);
-			}
+		if (!positive && axisValue > prevAxisValue) {
+			endValue = prevAxisValue;
+			cls();
 			break;
-			case 1: { // Axis selection
-				setCursorPosition(0, 0);
-				std::cout << "Axes: ";
-				int pRow = 1;
-				for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
-					setCursorPosition(0, pRow);
-					std::cout << "                                ";
-					setCursorPosition(0, pRow);
-					std::cout << std::to_string(i+1) << ". " << controls.WheelDI.DIAxisHelper[i] << ": " << controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), devGUID) << "\n";
-					pRow++;
-				}
-
-				setCursorPosition(0, csbi.srWindow.Bottom - 2);
-				printf("Using device %d: %s", devEntry, std::string(wDevName.begin(), wDevName.end()).c_str());
-				setCursorPosition(0, csbi.srWindow.Bottom - 3);
-				printf("Select axis for %s", gameAxis.c_str());
-			}
-			break;
-			case 2: { // Min (no input) register
-				setCursorPosition(0, 0);
-				for (int i = 0; i < csbi.srWindow.Right; i++) {
-					printf(" ");
-				}
-				setCursorPosition(0, 0);
-				printf("Min position: %d", controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(devAxis - 1), devGUID));
-
-				setCursorPosition(0, csbi.srWindow.Bottom - 4);
-				printf("Using axis %s", devAxisH[devAxis - 1].c_str());
-				setCursorPosition(0, csbi.srWindow.Bottom - 2);
-				printf("Using device %d: %s", devEntry, std::string(wDevName.begin(), wDevName.end()).c_str());
-				setCursorPosition(0, csbi.srWindow.Bottom - 3);
-				printf("Min position for %s, Enter to confirm", gameAxis.c_str());
-			}
-			break;
-			case 3: { // Max (full stomp) register
-				setCursorPosition(0, 0);
-				for (int i = 0; i < csbi.srWindow.Right; i++) {
-					printf(" ");
-				}
-				setCursorPosition(0, 0);
-				printf("Max position: %d", controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(devAxis - 1), devGUID));
-
-				setCursorPosition(0, csbi.srWindow.Bottom - 4);
-				printf("Using axis %s", devAxisH[devAxis - 1].c_str());
-				setCursorPosition(0, csbi.srWindow.Bottom - 2);
-				printf("Using device %d: %s", devEntry, std::string(wDevName.begin(), wDevName.end()).c_str());
-				setCursorPosition(0, csbi.srWindow.Bottom - 3);
-				printf("Max position for %s, Enter to confirm", gameAxis.c_str());
-			}
-			break;
-			default: { // save all the shit
-				int index = settings.SteeringAppendDevice(devGUID, std::string(wDevName.begin(), wDevName.end()).c_str());
-				settings.SteeringSaveAxis(confTag, index, devAxisH[devAxis - 1], minVal, maxVal);
-				if ( gameAxis == "steering") {
-					settings.SteeringSaveFFBAxis(confTag, index, devAxisH[devAxis - 1]);
-				}
-				cls();
-				setCursorPosition(0, csbi.srWindow.Bottom);
-				printf("Saved changes");
-				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-				cls();
-				init();
-				return;
-			}
 		}
 
+		prevAxisValue = axisValue;
+
+		setCursorPosition(0, csbi.srWindow.Bottom - 3);
+		printf("If nothing seems to happen, press ESC and try again");
+		setCursorPosition(0, csbi.srWindow.Bottom - 2);
+		if (additionalInfo.empty()) {
+			printf("Fully press and release the %s pedal to register axis", gameAxis.c_str());
+		}
+		else {
+			printf("%s", additionalInfo.c_str());
+		}
+		setCursorPosition(0, 0);
+		printf("Using axis %s on %s", selectedAxis.c_str(), selectedDevName.c_str());
 		setCursorPosition(0, csbi.srWindow.Bottom - 1);
-		printf("Configuring %s", gameAxis.c_str());
+		printf("Configuring %s, awaiting input...", gameAxis.c_str());
 		setCursorPosition(0, csbi.srWindow.Bottom);
 		std::cout << "ESC: Cancel config";
 		std::cout.flush();
 		std::this_thread::yield();
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
+	}
+
+	int min = startValue;// (positive ? 0 : 65535);
+	int max = endValue;// (positive ? 65535 : 0);
+	saveAxis(gameAxis, confTag, selectedDevice, min, max);
+	cls();
+	setCursorPosition(0, csbi.srWindow.Bottom);
+	printf("Saved changes");
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	cls();
+	init();
+}
+
+void configDynamicButtons() {
+	
+}
+
+void blankLines(int y, int lines) {
+	setCursorPosition(0, y);
+	for (int i = 0; i < csbi.srWindow.Right * lines; i++) {
+		printf(" ");
 	}
 }
 
@@ -449,20 +368,14 @@ void configButtons(char c) {
 			}
 			if (c == 0x0D) { // RETURN
 				if (buttonsActive > 1) {
-					setCursorPosition(0, 0);
-					for (int i = 0; i < csbi.srWindow.Right * 5; i++) {
-						printf(" ");
-					}
+					blankLines(0, 5);
 					setCursorPosition(0, 0);
 					printf("More than 1 button pressed. You can only select one.");
 					std::this_thread::yield();
 					std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 				}
 				else if (buttonsActive == 0) {
-					setCursorPosition(0, 0);
-					for (int i = 0; i < csbi.srWindow.Right * 5; i++) {
-						printf(" ");
-					}
+					blankLines(0, 5);
 					setCursorPosition(0, 0);
 					printf("No buttons pressed. Select one.");
 					std::this_thread::yield();
@@ -482,11 +395,7 @@ void configButtons(char c) {
 			}
 		}
 
-		// blank 5 lines
-		setCursorPosition(0, 0);
-		for (int i = 0; i < csbi.srWindow.Right * 5; i++) {
-			printf(" ");
-		}
+		blankLines(0, 5);
 		buttonsActive = 0;
 		devGUID = {};
 		button = -1;
@@ -606,20 +515,14 @@ void configHShift(char c) {
 				// Gear reverse goes in [0] btw way
 				if (c == 0x0D) { // RETURN
 					if (buttonsActive > 1) {
-						setCursorPosition(0, 0);
-						for (int i = 0; i < csbi.srWindow.Right * 5; i++) {
-							printf(" ");
-						}
+						blankLines(0, 5);
 						setCursorPosition(0, 0);
 						printf("More than 1 button pressed. You can only select one.");
 						std::this_thread::yield();
 						std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 					}
 					else if (buttonsActive == 0) {
-						setCursorPosition(0, 0);
-						for (int i = 0; i < csbi.srWindow.Right * 5; i++) {
-							printf(" ");
-						}
+						blankLines(0, 5);
 						setCursorPosition(0, 0);
 						printf("No buttons pressed. Skipping this gear!");
 						std::this_thread::yield();
@@ -632,10 +535,7 @@ void configHShift(char c) {
 			}
 		}
 
-		setCursorPosition(0, 0);
-		for (int i = 0; i < csbi.srWindow.Right * 5; i++) {
-			printf(" ");
-		}
+		blankLines(0, 5);
 		buttonsActive = 0;
 
 		switch (progress) {
@@ -750,7 +650,7 @@ int main()
 				case 0x1B: // ESC
 					return 0;
 				default:
-					configAxis(c);
+					//configAxis(c);
 					configButtons(c);
 					configHShift(c);
 					configDynamicAxes(c);
@@ -888,13 +788,13 @@ int main()
 			playWheelEffects(effSteer);
 
 		setCursorPosition(0, csbi.srWindow.Bottom - 4);
-		std::cout << "Assign buttons:";
+		std::cout << "Press a key to assign a button:";
 		setCursorPosition(0, csbi.srWindow.Bottom - 3);
 		std::cout << "g: shifter - +/=: shift up - -/_: shift down";
 		setCursorPosition(0, csbi.srWindow.Bottom-2);
-		std::cout << "Assign axes:";
+		std::cout << "Press a key to assign an axis:";
 		setCursorPosition(0, csbi.srWindow.Bottom-1);
-		std::cout << "w: throttle - s: brake - a or d: steer - c: clutch - h: handbrake";
+		std::cout << "w: throttle - s: brake - d: steer - c: clutch - h: handbrake";
 		setCursorPosition(0, csbi.srWindow.Bottom);
 		std::cout << "ESC: Exit - Space: Reload";
 		std::cout.flush();
