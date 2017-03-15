@@ -8,15 +8,19 @@
 #include "../Gears/Input/ScriptControls.hpp"
 #include <thread>
 
-/* Standard error macro for reporting API errors */
-#define PERR(bSuccess, api){if(!(bSuccess)) printf("%s:Error %d from %s on line %d\n", __FILE__, GetLastError(), api, __LINE__);}
-
 HANDLE hConsole;
 CONSOLE_CURSOR_INFO cursorInfo;
 RECT r;
 HWND consoleWindow;
 CONSOLE_SCREEN_BUFFER_INFO csbi;
 
+Logger logger("./DIUtil.log");
+ScriptControls controls(logger);
+ScriptSettings settings("./settings_general.ini", "./settings_wheel.ini", logger);
+
+/*
+ * Console stuff
+ */
 void cls()
 {
 	// Get the Win32 handle representing standard output.
@@ -59,10 +63,26 @@ void setCursorPosition(int x, int y)
 	COORD coord = { (SHORT)x, (SHORT)y };
 	SetConsoleCursorPosition(hOut, coord);
 }
-Logger logger("./DIUtil.log");
-ScriptControls controls(logger);
-ScriptSettings settings("./settings_general.ini","./settings_wheel.ini", logger);
 
+void blankLines(int y, int lines) {
+	setCursorPosition(0, y);
+	for (int i = 0; i < csbi.srWindow.Right * lines; i++) {
+		printf(" ");
+	}
+}
+
+void blankBlock(int x, int y, int lines, int rows) {
+	for (int l = 0; l < lines; l++) {
+		setCursorPosition(x, y + l);
+		for (int r = 0; r < rows; r++) {
+			printf(" ");
+		}
+	}
+}
+
+/*
+ * Similar to reInit() in Gears but with console stuff
+ */
 void init() {
 	settings.Read(&controls);
 	logger.Write("Settings read");
@@ -85,6 +105,9 @@ void init() {
 	system(modeStr.c_str());
 }
 
+/*
+ * Simplified playWheelEffects() from in Gears
+ */
 void playWheelEffects(float effSteer) {
 	if (settings.LogiLEDs) {
 		controls.WheelDI.PlayLedsDInput(controls.SteerGUID, controls.ThrottleVal, 0.5f, 0.95f);
@@ -119,6 +142,9 @@ void playWheelEffects(float effSteer) {
 	controls.WheelDI.SetConstantForce(controls.SteerGUID, totalForce);
 }
 
+/*
+ * Fun starts here!
+ */
 bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> startStates, std::tuple<GUID, std::string> &selectedDevice, int hyst, bool &positive, int &startValue_) {
 	for (auto guid : controls.WheelDI.GetGuids()) {
 		for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
@@ -253,6 +279,7 @@ void configDynamicAxes(char c) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
 	}
 
+	// I'll just assume no manufacturer uses inane non-full range steering wheel values
 	if (gameAxis == "steering") {
 		int min = (positive ? 0 : 65535);
 		int max = (positive ? 65535 : 0);
@@ -270,6 +297,7 @@ void configDynamicAxes(char c) {
 	std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
 	std::string selectedDevName = std::string(wDevName.begin(), wDevName.end()).c_str();
 	std::string selectedAxis = std::get<1>(selectedDevice);
+	GUID selectedGUID = std::get<0>(selectedDevice);
 	while(true) {
 		if (_kbhit()) {
 			cls();
@@ -280,7 +308,7 @@ void configDynamicAxes(char c) {
 		}
 		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
 		
-		int axisValue = controls.WheelDI.GetAxisValue(controls.WheelDI.StringToAxis(std::get<1>(selectedDevice)), std::get<0>(selectedDevice));
+		int axisValue = controls.WheelDI.GetAxisValue(controls.WheelDI.StringToAxis(selectedAxis), selectedGUID);
 
 		if (positive && axisValue < prevAxisValue) {
 			endValue = prevAxisValue;
@@ -316,8 +344,8 @@ void configDynamicAxes(char c) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
 	}
 
-	int min = startValue;// (positive ? 0 : 65535);
-	int max = endValue;// (positive ? 65535 : 0);
+	int min = startValue;
+	int max = endValue;
 	saveAxis(gameAxis, confTag, selectedDevice, min, max);
 	cls();
 	setCursorPosition(0, csbi.srWindow.Bottom);
@@ -329,13 +357,6 @@ void configDynamicAxes(char c) {
 
 void configDynamicButtons() {
 	
-}
-
-void blankLines(int y, int lines) {
-	setCursorPosition(0, y);
-	for (int i = 0; i < csbi.srWindow.Right * lines; i++) {
-		printf(" ");
-	}
 }
 
 void configButtons(char c) {
@@ -624,6 +645,7 @@ void configHShift(char c) {
 	}
 }
 
+
 int main()
 {
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -650,7 +672,6 @@ int main()
 				case 0x1B: // ESC
 					return 0;
 				default:
-					//configAxis(c);
 					configButtons(c);
 					configHShift(c);
 					configDynamicAxes(c);
@@ -681,10 +702,11 @@ int main()
 			std::cout << "Axes: ";
 
 			for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
+				blankBlock(32 * guidIt, pRow, 1, 32);
 				setCursorPosition(32 * guidIt, pRow);
-				std::cout << "                                ";
-				setCursorPosition(32 * guidIt, pRow);
-				std::cout << "    " << controls.WheelDI.DIAxisHelper[i] << ": " << controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid) << "\n";
+				printf("    %s: %d",
+					   controls.WheelDI.DIAxisHelper[i].c_str(),
+					   controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid));
 				pRow++;
 			}
 
@@ -692,8 +714,7 @@ int main()
 			pRow++;
 
 			std::cout << "Buttons: ";
-			setCursorPosition(32 * guidIt, pRow);
-			std::cout << "                                ";
+			blankBlock(32 * guidIt, pRow, 1, 32);
 			setCursorPosition(32 * guidIt, pRow);
 			for (int i = 0; i < 255; i++) {
 				if (controls.WheelDI.IsButtonPressed(i, guid)) {
@@ -708,18 +729,19 @@ int main()
 			setCursorPosition(32 * guidIt, pRow);
 			pRow++;
 			std::cout << "POV hat: ";
-			std::vector<int> directions;
+			std::array<int, 8> directions = {
+				WheelDirectInput::POV::N,
+				WheelDirectInput::POV::NE,
+				WheelDirectInput::POV::E,
+				WheelDirectInput::POV::SE,
+				WheelDirectInput::POV::S,
+				WheelDirectInput::POV::SW,
+				WheelDirectInput::POV::W,
+				WheelDirectInput::POV::NW,
+			};
+
 			std::string directionsStr;
-			directions.push_back(WheelDirectInput::POV::N);
-			directions.push_back(WheelDirectInput::POV::NE);
-			directions.push_back(WheelDirectInput::POV::E);
-			directions.push_back(WheelDirectInput::POV::SE);
-			directions.push_back(WheelDirectInput::POV::S);
-			directions.push_back(WheelDirectInput::POV::SW);
-			directions.push_back(WheelDirectInput::POV::W);
-			directions.push_back(WheelDirectInput::POV::NW);
-			setCursorPosition(32 * guidIt, pRow);
-			std::cout << "                                ";
+			blankBlock(32 * guidIt, pRow, 1, 32);
 			setCursorPosition(32 * guidIt, pRow);
 			for (auto d : directions) {
 				if (d == WheelDirectInput::N) directionsStr  = "N ";
@@ -743,18 +765,7 @@ int main()
 			guidIt++;
 		}
 
-		setCursorPosition(8, pRowMax+0);
-		std::cout << "                                ";
-		setCursorPosition(8, pRowMax+1);
-		std::cout << "                                ";
-		setCursorPosition(8, pRowMax+2);
-		std::cout << "                                ";
-		setCursorPosition(8, pRowMax+3);
-		std::cout << "                                ";
-		setCursorPosition(8, pRowMax+4);
-		std::cout << "                                ";
-		setCursorPosition(8, pRowMax+5);
-		std::cout << "                                ";
+		blankBlock(8, pRowMax, 7, 32);
 
 		setCursorPosition(0, pRowMax);
 		std::cout << "Throttle  " << controls.ThrottleVal << "\n";
@@ -765,6 +776,8 @@ int main()
 		std::cout << std::fixed << "Softlock  " << effSteer << "\n";
 
 		std::string gear = "N";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::HR)) 
+			gear = "R";
 		if (controls.ButtonIn(ScriptControls::WheelControlType::H1))
 			gear = "1";
 		if (controls.ButtonIn(ScriptControls::WheelControlType::H2))
@@ -779,8 +792,6 @@ int main()
 			gear = "6";
 		if (controls.ButtonIn(ScriptControls::WheelControlType::H7))
 			gear = "7";
-		if (controls.ButtonIn(ScriptControls::WheelControlType::HR))
-			gear = "R";
 
 		std::cout << "Gear      " << gear << "\n";
 
