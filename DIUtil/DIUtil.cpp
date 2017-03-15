@@ -778,7 +778,6 @@ int main()
 		}
 
 		blankBlock(8, pRowMax, 7, 32);
-
 		setCursorPosition(0, pRowMax);
 		std::cout << "Throttle  " << controls.ThrottleVal << "\n";
 		std::cout << "Brake     " << controls.BrakeVal << "\n";
@@ -788,24 +787,35 @@ int main()
 		std::cout << std::fixed << "Softlock  " << effSteer << "\n";
 
 		std::string gear = "N";
-		if (controls.ButtonIn(ScriptControls::WheelControlType::HR)) 
-			gear = "R";
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H1))
-			gear = "1";
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H2))
-			gear = "2";
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H3))
-			gear = "3";
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H4))
-			gear = "4";
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H5))
-			gear = "5";
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H6))
-			gear = "6";
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H7))
-			gear = "7";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::HR)) gear = "R";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H1)) gear = "1";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H2)) gear = "2";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H3)) gear = "3";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H4)) gear = "4";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H5)) gear = "5";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H6)) gear = "6";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H7)) gear = "7";
+		std::cout << "Gear      " << gear;
+		pRowMax += 6; // Because we printed text 6 lines
 
-		std::cout << "Gear      " << gear << "\n";
+		blankLines(pRowMax+2, 1); // Because we want a blank link in between
+		setCursorPosition(0, pRowMax+2);
+		std::cout << "Active buttons: ";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftUp)) std::cout << "ShiftUp ";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftDown)) std::cout << "ShiftDown ";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Engine)) std::cout << "Engine ";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Handbrake)) std::cout << "Handbrake ";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Horn)) std::cout << "Horn ";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Lights)) std::cout << "Lights ";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::LookBack)) std::cout << "LookBack ";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Camera)) std::cout << "Camera ";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::RadioNext)) std::cout << "RadioNext ";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::RadioPrev)) std::cout << "RadioPrev ";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorLeft)) std::cout << "IndicatorLeft ";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorRight)) std::cout << "IndicatorRight ";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorHazard)) std::cout << "IndicatorHazard ";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Toggle)) std::cout << "ToggleMod ";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::ToggleH)) std::cout << "ToggleShifting ";
 
 		if (!controls.WheelDI.NoFeedback && controls.WheelDI.IsConnected(controls.SteerGUID))
 			playWheelEffects(effSteer);
