@@ -8,6 +8,9 @@
 #include "../Gears/Input/ScriptControls.hpp"
 #include <thread>
 
+#define ESC 0x1B
+#define TAB 0x09
+
 HANDLE hConsole;
 CONSOLE_CURSOR_INFO cursorInfo;
 RECT r;
@@ -17,6 +20,48 @@ CONSOLE_SCREEN_BUFFER_INFO csbi;
 Logger logger("./DIUtil.log");
 ScriptControls controls(logger);
 ScriptSettings settings("./settings_general.ini", "./settings_wheel.ini", logger);
+
+std::array<int, 8> directions = {
+	WheelDirectInput::POV::N,
+	WheelDirectInput::POV::NE,
+	WheelDirectInput::POV::E,
+	WheelDirectInput::POV::SE,
+	WheelDirectInput::POV::S,
+	WheelDirectInput::POV::SW,
+	WheelDirectInput::POV::W,
+	WheelDirectInput::POV::NW,
+};
+
+// acceptedKeys, gameButton, confTag
+std::vector<std::tuple<char, std::string, std::string>> buttonInfos = {
+	std::make_tuple('+', "shift up",          "SHIFT_UP"),
+	std::make_tuple('=', "shift up",          "SHIFT_UP"),
+	std::make_tuple('-', "shift down",        "SHIFT_DOWN"),
+	std::make_tuple('_', "shift down",        "SHIFT_DOWN"),
+	std::make_tuple('x', "engine",            "ENGINE"),
+	std::make_tuple(' ', "handbrake",         "HANDBRAKE"),
+	std::make_tuple('e', "horn",              "HORN"),
+	std::make_tuple('h', "lights",            "LIGHTS"),
+	std::make_tuple('c', "look back",         "LOOK_BACK"),
+	std::make_tuple('v', "camera",            "CHANGE_CAMERA"),
+	std::make_tuple('q', "radio next",        "RADIO_NEXT"),
+	std::make_tuple('r', "radio previous",    "RADIO_PREVIOUS"),
+	std::make_tuple(',', "indicator left",    "INDICATOR_LEFT"),
+	std::make_tuple('.', "indicator right",   "INDICATOR_RIGHT"),
+	std::make_tuple('/', "indicator hazard",  "INDICATOR_HAZARD"),
+	std::make_tuple('\\', "toggle mod",       "TOGGLE_MOD"),
+	std::make_tuple('|', "toggle mod",        "TOGGLE_MOD"),
+	std::make_tuple(']', "change shift mode", "CHANGE_SHIFTMODE"),
+	std::make_tuple('}', "change shift mode", "CHANGE_SHIFTMODE")
+};
+
+std::vector<std::tuple<char, std::string, std::string>> axisInfos = {
+	std::make_tuple('w', "throttle",          "THROTTLE"),
+	std::make_tuple('s', "brakes",            "BRAKES"),
+	std::make_tuple('a', "clutch",            "CLUTCH"),
+	std::make_tuple('d', "steering",          "STEER"),
+	std::make_tuple('f', "handbrake",         "HANDBRAKE_ANALOG"),
+};
 
 /*
  * Console stuff
@@ -101,7 +146,7 @@ void init() {
 	if (totalWidth < 80) {
 		totalWidth = 80;
 	}
-	std::string modeStr = "MODE " + std::to_string(totalWidth) + ",32";
+	std::string modeStr = "MODE " + std::to_string(totalWidth) + ",36";
 	system(modeStr.c_str());
 }
 
@@ -187,6 +232,15 @@ void saveButton(int button, std::string confTag, GUID devGUID, std::string devNa
 	settings.SteeringSaveButton(confTag, index, button);
 }
 
+
+std::tuple<char, std::string, std::string> isAcceptedAxisChar(char c) {
+	for (auto t : axisInfos) {
+		if (c == std::get<0>(t))
+			return t;
+	}
+	return{};
+}
+
 /*
  * 1. User selects input to be configured
  *		- Show "Press w/a/s/d"
@@ -196,35 +250,31 @@ void saveButton(int button, std::string confTag, GUID devGUID, std::string devNa
  * 0. User can exit at any time
  */
 void configDynamicAxes(char c) {
-	if (c != 'w' && c != 's' && c != 'c' && c != 'd' && c != 'h') {
+	auto axisInfo = isAcceptedAxisChar(c);
+	if (std::get<1>(axisInfo) == "") {
 		return;
 	}
+
 	cls();
 
-	std::string gameAxis;
-	std::string confTag;
+	std::string gameAxis = std::get<1>(axisInfo);
+	std::string confTag = std::get<2>(axisInfo);
+
 	std::string additionalInfo;
 
-	if (c == 'w') {
-		gameAxis = "throttle";
-		confTag = "THROTTLE";
-	}
-	if (c == 's') {
-		gameAxis = "brake";
-		confTag = "BRAKES";
-	}
-	if (c == 'c') {
-		gameAxis = "clutch";
-		confTag = "CLUTCH";
-	}
-	if (c == 'd') {
-		gameAxis = "steering";
-		confTag = "STEER";
+	auto axisInfosSteerIt = std::find_if(std::begin(axisInfos), std::end(axisInfos), [](auto&& e) {
+		return std::get<1>(e) == "steering";
+	});
+	auto steerTupleIndex = axisInfosSteerIt - axisInfos.begin();
+	if (c == std::get<0>(axisInfos.at(steerTupleIndex))) {
 		additionalInfo = "Steer right to register axis";
 	}
-	if (c == 'h') {
-		gameAxis = "handbrake";
-		confTag = "HANDBRAKE_ANALOG";
+
+	auto axisInfosHBrkIt = std::find_if(std::begin(axisInfos), std::end(axisInfos), [](auto&& e) {
+		return std::get<1>(e) == "handbrake";
+	});
+	auto hBrkTupleIndex = axisInfosHBrkIt - axisInfos.begin();
+	if (c == std::get<0>(axisInfos.at(hBrkTupleIndex))) {
 		additionalInfo = "Pull handbrake to register axis";
 	}
 
@@ -255,7 +305,7 @@ void configDynamicAxes(char c) {
 		if (_kbhit()) {
 			cls();
 			char c = _getch();
-			if (c == 0x1B) { // ESC
+			if (c == ESC) {
 				return;
 			}
 		}
@@ -307,7 +357,7 @@ void configDynamicAxes(char c) {
 		if (_kbhit()) {
 			cls();
 			char c = _getch();
-			if (c == 0x1B) { // ESC
+			if (c == ESC) {
 				return;
 			}
 		}
@@ -360,36 +410,27 @@ void configDynamicAxes(char c) {
 	init();
 }
 
+std::tuple<char, std::string, std::string> isAcceptedButtonChar(char c) {
+	for (auto t : buttonInfos) {
+		if (c == std::get<0>(t))
+			return t;
+	}
+	return {};
+}
+
 void configDynamicButtons(char c) {
-	if (c != '+' && c != '-' && c != '=' && c != '_') {
+	auto buttonInfo = isAcceptedButtonChar(c);
+	if (std::get<1>(buttonInfo) == "") {
 		return;
 	}
+
 	cls();
 
-	std::string gameButton;
-	std::string confTag;
+	std::string gameButton = std::get<1>(buttonInfo);
+	std::string confTag = std::get<2>(buttonInfo);
 	int buttonsActive = 0;
-	if (c == '+' || c == '=') {
-		gameButton = "shift up";
-		confTag = "SHIFT_UP";
-	}
-	if (c == '-' || c == '_') {
-		gameButton = "shift down";
-		confTag = "SHIFT_DOWN";
-	}
 
 	std::string devName;
-
-	std::array<int, 8> directions = {
-		WheelDirectInput::POV::N,
-		WheelDirectInput::POV::NE,
-		WheelDirectInput::POV::E,
-		WheelDirectInput::POV::SE,
-		WheelDirectInput::POV::S,
-		WheelDirectInput::POV::SW,
-		WheelDirectInput::POV::W,
-		WheelDirectInput::POV::NW,
-	};
 
 	// Check whether any buttons had been pressed already
 	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
@@ -420,7 +461,7 @@ void configDynamicButtons(char c) {
 		if (_kbhit()) {
 			cls();
 			char c = _getch();
-			if (c == 0x1B) { // ESC
+			if (c == ESC) {
 				return;
 			}
 		}
@@ -525,7 +566,7 @@ void configHShift(char c) {
 		if (_kbhit()) {
 			cls();
 			char c = _getch();
-			if (c == 0x1B) { // ESC
+			if (c == ESC) {
 				return;
 			}
 			if (progress == 0) { // Device selection
@@ -660,6 +701,9 @@ void configHShift(char c) {
 
 int main()
 {
+	int axisTextHeight = 0;
+	int buttonTextHeight = 0;
+
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	GetConsoleCursorInfo(hConsole, &cursorInfo);
 	cursorInfo.bVisible = false;
@@ -677,17 +721,16 @@ int main()
 	{
 		if (_kbhit()) {
 			char c = _getch();
-			switch (c) {
-				case ' ':
-					init();
-					break;
-				case 0x1B: // ESC
-					return 0;
-				default:
-					configDynamicButtons(c);
-					configHShift(c);
-					configDynamicAxes(c);
-					break;
+			if (c == TAB) {
+				init();
+			}
+			else if (c == ESC) {
+				return 0;
+			}
+			else {
+				configDynamicButtons(c);
+				configHShift(c);
+				configDynamicAxes(c);
 			}
 		}
 		controls.GetLastInputDevice(ScriptControls::InputDevices::Wheel);
@@ -741,16 +784,6 @@ int main()
 			setCursorPosition(32 * guidIt, pRow);
 			pRow++;
 			std::cout << "POV hat: ";
-			std::array<int, 8> directions = {
-				WheelDirectInput::POV::N,
-				WheelDirectInput::POV::NE,
-				WheelDirectInput::POV::E,
-				WheelDirectInput::POV::SE,
-				WheelDirectInput::POV::S,
-				WheelDirectInput::POV::SW,
-				WheelDirectInput::POV::W,
-				WheelDirectInput::POV::NW,
-			};
 
 			std::string directionsStr;
 			blankBlock(32 * guidIt, pRow, 1, 32);
@@ -815,21 +848,30 @@ int main()
 		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorRight)) std::cout << "IndicatorRight ";
 		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorHazard)) std::cout << "IndicatorHazard ";
 		if (controls.ButtonIn(ScriptControls::WheelControlType::Toggle)) std::cout << "ToggleMod ";
-		if (controls.ButtonIn(ScriptControls::WheelControlType::ToggleH)) std::cout << "ToggleShifting ";
+		if (controls.ButtonIn(ScriptControls::WheelControlType::ToggleH)) std::cout << "ChangeShiftMode ";
 
 		if (!controls.WheelDI.NoFeedback && controls.WheelDI.IsConnected(controls.SteerGUID))
 			playWheelEffects(effSteer);
-
-		setCursorPosition(0, csbi.srWindow.Bottom - 4);
+		
+		// why the fuck am I doing this
+		setCursorPosition(0, csbi.srWindow.Bottom - 9);
 		std::cout << "Press a key to assign a button:";
-		setCursorPosition(0, csbi.srWindow.Bottom - 3);
-		std::cout << "g: shifter - +/=: shift up - -/_: shift down";
-		setCursorPosition(0, csbi.srWindow.Bottom-2);
+		setCursorPosition(0, csbi.srWindow.Bottom - 8);
+		int buttonTextChars = 0;
+		for (auto t : buttonInfos) {
+			buttonTextChars += printf("(%c: %s) ", std::get<0>(t), std::get<1>(t).c_str());
+		}
+
+		setCursorPosition(0, csbi.srWindow.Bottom - 2);
 		std::cout << "Press a key to assign an axis:";
-		setCursorPosition(0, csbi.srWindow.Bottom-1);
-		std::cout << "w: throttle - s: brake - d: steer - c: clutch - h: handbrake";
+		setCursorPosition(0, csbi.srWindow.Bottom - 1);
+		int axisTextChars = 0;
+		for (auto t : axisInfos) {
+			axisTextChars += printf("(%c: %s) ", std::get<0>(t), std::get<1>(t).c_str());
+		}
+
 		setCursorPosition(0, csbi.srWindow.Bottom);
-		std::cout << "ESC: Exit - Space: Reload";
+		std::cout << "ESC: Exit - Tab: Reload";
 		std::cout.flush();
 		std::this_thread::yield();
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
