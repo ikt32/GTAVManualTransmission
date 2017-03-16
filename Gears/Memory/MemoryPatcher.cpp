@@ -39,8 +39,16 @@ namespace MemoryPatcher {
 	uintptr_t SteeringAddr = NULL;
 	uintptr_t SteeringTemp = NULL;
 
+	const int maxTries = 4;
+	int gearTries = 0;
+	int steerTries = 0;
+
 
 	bool PatchInstructions() {
+		if (gearTries > maxTries) {
+			return false;
+		}
+
 		Logger logger(GEARSLOGPATH);
 		logger.Write("GEARBOX: Patching");
 
@@ -77,9 +85,16 @@ namespace MemoryPatcher {
 
 		if (TotalPatched == TotalToPatch) {
 			logger.Write("GEARBOX: Patch success");
+			gearTries = 0;
 			return true;
 		}
 		logger.Write("GEARBOX: Patching failed");
+		gearTries++;
+
+		if (gearTries > maxTries) {
+			logger.Write("GEARBOX: Patch attempt limit exceeded");
+			logger.Write("GEARBOX: Patching disabled");
+		}
 		return false;
 	}
 
@@ -112,6 +127,7 @@ namespace MemoryPatcher {
 
 		if (TotalPatched == 0) {
 			logger.Write("GEARBOX: Restore success");
+			gearTries = 0;
 			return true;
 		}
 		logger.Write("GEARBOX: Restore failed");
@@ -119,6 +135,10 @@ namespace MemoryPatcher {
 	}
 
 	bool PatchSteeringCorrection() {
+		if (steerTries > maxTries) {
+			return false;
+		}
+
 		Logger logger(GEARSLOGPATH);
 		logger.Write("STEERING: Patching");
 
@@ -136,10 +156,17 @@ namespace MemoryPatcher {
 			hexaddr << std::hex << SteeringAddr;
 			logger.Write("STEERING: Steering @ " + hexaddr.str());
 			logger.Write("STEERING: Patch success");
+			steerTries = 0;
 			return true;
 		}
 
 		logger.Write("STEERING: Patch failed");
+		steerTries++;
+
+		if (steerTries > maxTries) {
+			logger.Write("STEERING: Patch attempt limit exceeded");
+			logger.Write("STEERING: Patching disabled");
+		}
 		return false;
 	}
 
@@ -157,7 +184,7 @@ namespace MemoryPatcher {
 			SteeringAddr = 0;
 			SteeringPatched = false;
 			logger.Write("STEERING: Restore success");
-
+			steerTries = 0;
 			return true;
 		}
 

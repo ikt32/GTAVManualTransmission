@@ -21,7 +21,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 			keyboardHandlerRegister(OnKeyboardMessage);
 			logger.Clear();
 			logger.Write("GTAVManualTransmission v4.2.0");
-			logger.Write(eGameVersionToString(getGameVersion()));
+			logger.Write("Game version " + eGameVersionToString(getGameVersion()));
 			logger.Write("Script loaded");
 			break;
 		}
