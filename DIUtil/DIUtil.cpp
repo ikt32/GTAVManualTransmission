@@ -34,10 +34,8 @@ std::array<int, 8> directions = {
 
 // acceptedKeys, gameButton, confTag
 std::vector<std::tuple<char, std::string, std::string>> buttonInfos = {
-	std::make_tuple('+', "shift up",          "SHIFT_UP"),
 	std::make_tuple('=', "shift up",          "SHIFT_UP"),
 	std::make_tuple('-', "shift down",        "SHIFT_DOWN"),
-	std::make_tuple('_', "shift down",        "SHIFT_DOWN"),
 	std::make_tuple('x', "engine",            "ENGINE"),
 	std::make_tuple(' ', "handbrake",         "HANDBRAKE"),
 	std::make_tuple('e', "horn",              "HORN"),
@@ -50,9 +48,7 @@ std::vector<std::tuple<char, std::string, std::string>> buttonInfos = {
 	std::make_tuple('.', "indicator right",   "INDICATOR_RIGHT"),
 	std::make_tuple('/', "indicator hazard",  "INDICATOR_HAZARD"),
 	std::make_tuple('\\', "toggle mod",       "TOGGLE_MOD"),
-	std::make_tuple('|', "toggle mod",        "TOGGLE_MOD"),
 	std::make_tuple(']', "change shift mode", "CHANGE_SHIFTMODE"),
-	std::make_tuple('}', "change shift mode", "CHANGE_SHIFTMODE")
 };
 
 std::vector<std::tuple<char, std::string, std::string>> axisInfos = {
