@@ -142,6 +142,7 @@ void init() {
 	if (totalWidth < 80) {
 		totalWidth = 80;
 	}
+
 	std::string modeStr = "MODE " + std::to_string(totalWidth) + ",36";
 	system(modeStr.c_str());
 }
@@ -849,21 +850,30 @@ int main()
 		if (!controls.WheelDI.NoFeedback && controls.WheelDI.IsConnected(controls.SteerGUID))
 			playWheelEffects(effSteer);
 		
-		// why the fuck am I doing this
 		setCursorPosition(0, csbi.srWindow.Bottom - 9);
 		std::cout << "Press a key to assign a button:";
 		setCursorPosition(0, csbi.srWindow.Bottom - 8);
-		int buttonTextChars = 0;
+		int charsPrinted = 0;
 		for (auto t : buttonInfos) {
-			buttonTextChars += printf("(%c: %s) ", std::get<0>(t), std::get<1>(t).c_str());
+			char tempCharBuff[256];
+			sprintf_s(tempCharBuff, "(%c: %s) ", std::get<0>(t), std::get<1>(t).c_str());
+			if (charsPrinted % csbi.srWindow.Right + strlen(tempCharBuff) >= csbi.srWindow.Right) {
+				charsPrinted += printf("\n");
+			}
+			charsPrinted += printf("(%c: %s) ", std::get<0>(t), std::get<1>(t).c_str());
 		}
 
 		setCursorPosition(0, csbi.srWindow.Bottom - 2);
 		std::cout << "Press a key to assign an axis:";
 		setCursorPosition(0, csbi.srWindow.Bottom - 1);
-		int axisTextChars = 0;
+		charsPrinted = 0;
 		for (auto t : axisInfos) {
-			axisTextChars += printf("(%c: %s) ", std::get<0>(t), std::get<1>(t).c_str());
+			char tempCharBuff[256];
+			sprintf_s(tempCharBuff, "(%c: %s) ", std::get<0>(t), std::get<1>(t).c_str());
+			if (charsPrinted % csbi.srWindow.Right + strlen(tempCharBuff) >= csbi.srWindow.Right) {
+				charsPrinted += printf("\n");
+			}
+			charsPrinted += printf("(%c: %s) ", std::get<0>(t), std::get<1>(t).c_str());
 		}
 
 		setCursorPosition(0, csbi.srWindow.Bottom);
