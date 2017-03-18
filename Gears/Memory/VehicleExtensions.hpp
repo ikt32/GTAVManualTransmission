@@ -30,6 +30,7 @@ public:
 	void SetBrakeP(Vehicle handle, float value);
 	float GetFuelLevel(Vehicle handle);
 	void SetFuelLevel(Vehicle handle, float value);
+	uint8_t GetNumWheels(Vehicle handle);
 	uint64_t GetWheelsPtr(Vehicle handle);
 	void SetWheelsHealth(Vehicle handle, float health);
 	std::vector<float> GetWheelsCompression(Vehicle handle);
