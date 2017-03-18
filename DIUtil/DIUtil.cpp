@@ -276,7 +276,7 @@ void configDynamicAxes(char c) {
 		additionalInfo = "Pull handbrake to register axis";
 	}
 
-	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
+	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
 	
 	// Save current state
 	std::vector<std::tuple<GUID, std::string, int>> startStates;
@@ -307,7 +307,7 @@ void configDynamicAxes(char c) {
 				return;
 			}
 		}
-		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
+		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
 
 		if (getConfigAxisWithValues(startStates, selectedDevice, hyst, positive, startValue)) {
 			cls();
@@ -359,7 +359,7 @@ void configDynamicAxes(char c) {
 				return;
 			}
 		}
-		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
+		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
 		
 		int axisValue = controls.WheelDI.GetAxisValue(controls.WheelDI.StringToAxis(selectedAxis), selectedGUID);
 
@@ -431,7 +431,7 @@ void configDynamicButtons(char c) {
 	std::string devName;
 
 	// Check whether any buttons had been pressed already
-	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
+	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
 
 	for (auto guid : controls.WheelDI.GetGuids()) {
 		for (int i = 0; i < 255; i++) {
@@ -463,7 +463,7 @@ void configDynamicButtons(char c) {
 				return;
 			}
 		}
-		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
+		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
 
 		blankLines(0, 5); 
 		setCursorPosition(0, 0);
@@ -560,7 +560,7 @@ void configHShift(char c) {
 	int progress = 0;
 
 	while(true) {
-		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
+		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
 		if (_kbhit()) {
 			cls();
 			char c = _getch();
@@ -714,7 +714,7 @@ int main()
 	logger.Write("Manual Transmission v4.2.0 - DirectInput utility");
 
 	init();
-	
+	bool justPeeking = true;
 	while (true)
 	{
 		if (_kbhit()) {
@@ -725,6 +725,11 @@ int main()
 			else if (c == ESC) {
 				return 0;
 			}
+			else if (c == 'p') {
+				justPeeking = !justPeeking;
+				setCursorPosition(0, csbi.srWindow.Bottom);
+				blankLines(csbi.srWindow.Bottom, 1);
+			}
 			else {
 				configDynamicButtons(c);
 				configHShift(c);
@@ -732,7 +737,7 @@ int main()
 			}
 		}
 		controls.GetLastInputDevice(ScriptControls::InputDevices::Wheel);
-		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false);
+		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, justPeeking);
 
 		float steerMult;
 		steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
@@ -882,7 +887,8 @@ int main()
 		}
 
 		setCursorPosition(0, csbi.srWindow.Bottom);
-		std::cout << "ESC: Exit - Tab: Reload";
+		std::string peekTxt = justPeeking ? "Enable Wheel2Keyboard" : "Disable Wheel2Keyboard";
+		printf("ESC: Exit - Tab: Reload - P: %s", peekTxt.c_str());
 		std::cout.flush();
 		std::this_thread::yield();
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));

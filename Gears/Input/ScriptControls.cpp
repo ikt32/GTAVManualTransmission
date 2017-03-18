@@ -28,7 +28,7 @@ void ScriptControls::InitWheel() {
 	}
 }
 
-void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
+void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, bool justPeekingWheelKb) {
 	if (controller.IsConnected()) {
 		buttonState = controller.GetState().Gamepad.wButtons;
 		controller.UpdateButtonChangeStates();
@@ -36,7 +36,7 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch) {
 
 	WheelDI.UpdateState();
 	WheelDI.UpdateButtonChangeStates();
-	CheckCustomButtons();
+	CheckCustomButtons(justPeekingWheelKb);
 
 	// Update ThrottleVal, BrakeVal and ClutchVal ranging from 0.0f (no touch) to 1.0f (full press)
 	switch (prevInput) {
@@ -308,8 +308,11 @@ bool ScriptControls::ButtonIn(WheelControlType control) {
 	return false;
 }
 
-void ScriptControls::CheckCustomButtons() {
+void ScriptControls::CheckCustomButtons(bool justPeeking) {
 	if (!WheelDI.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
+		return;
+	}
+	if (justPeeking) { // we do not want to send keyboard codes if we just test the device
 		return;
 	}
 	for (int i = 0; i < MAX_RGBBUTTONS; i++) {

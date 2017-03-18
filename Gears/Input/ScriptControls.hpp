@@ -90,7 +90,7 @@ public:
 	void InitWheel();
 
 	InputDevices GetLastInputDevice(InputDevices previous);
-	void UpdateValues(InputDevices prevInput, bool ignoreClutch);
+	void UpdateValues(InputDevices prevInput, bool ignoreClutch, bool justPeekingWheelKb);
 
 	float BrakeVal = 0.0f;
 	float ThrottleVal = 0.0f;
@@ -135,7 +135,7 @@ public:
 	// Held for specified milliseconds in .ini
 	bool ButtonHeld(ControllerControlType control);
 	bool ButtonIn(WheelControlType control);
-	void CheckCustomButtons();
+	void CheckCustomButtons(bool justPeeking);
 	void CheckGUIDs(const std::vector<_GUID> &guids);
 	bool ButtonIn(ControllerControlType control);
 

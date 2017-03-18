@@ -98,7 +98,7 @@ void update() {
 		ignoreClutch = false;
 	}
 
-	controls.UpdateValues(controls.PrevInput, ignoreClutch);
+	controls.UpdateValues(controls.PrevInput, ignoreClutch, false);
 
 	if (settings.Debug) {
 		showDebugInfo();
