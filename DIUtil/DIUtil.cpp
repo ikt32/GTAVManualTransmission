@@ -10,6 +10,7 @@
 
 #define ESC 0x1B
 #define TAB 0x09
+#define DEVWIDTH 32
 
 HANDLE hConsole;
 CONSOLE_CURSOR_INFO cursorInfo;
@@ -135,8 +136,8 @@ void init() {
 	
 	int totalWidth = 0;
 	for (auto guid : controls.WheelDI.GetGuids()) {
-		std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
-		totalWidth += static_cast<int>(wDevName.length()) + 4;
+		//std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
+		totalWidth += DEVWIDTH;//static_cast<int>(wDevName.length()) + 4;
 	}
 	
 	if (totalWidth < 80) {
@@ -743,31 +744,37 @@ int main()
 		int pRowMax = 0;
 		for (auto guid : controls.WheelDI.GetGuids()) {
 			int pRow = 0;
-
-			setCursorPosition(32 * guidIt, pRow);
+			int xCursorPos = DEVWIDTH * guidIt;
+			setCursorPosition(xCursorPos, pRow);
 			pRow++;
 			std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
-			std::cout << std::string(wDevName.begin(), wDevName.end());
-			
-			setCursorPosition(32 * guidIt, pRow);
+			std::string devName = std::string(wDevName.begin(), wDevName.end());
+			if (devName.length() > DEVWIDTH) {
+				devName[DEVWIDTH - 4] = '.';
+				devName[DEVWIDTH - 3] = '.';
+				devName[DEVWIDTH - 2] = '.';
+				devName[DEVWIDTH - 1] = '\0';
+			}
+			printf("%s", devName.c_str());
+			setCursorPosition(xCursorPos, pRow);
 			pRow++;
 			std::cout << "Axes: ";
 
 			for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
-				blankBlock(32 * guidIt, pRow, 1, 32);
-				setCursorPosition(32 * guidIt, pRow);
+				blankBlock(xCursorPos, pRow, 1, 32);
+				setCursorPosition(xCursorPos, pRow);
 				printf("    %s: %d",
 					   controls.WheelDI.DIAxisHelper[i].c_str(),
 					   controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid));
 				pRow++;
 			}
 
-			setCursorPosition(32 * guidIt, pRow);
+			setCursorPosition(xCursorPos, pRow);
 			pRow++;
 
 			std::cout << "Buttons: ";
-			blankBlock(32 * guidIt, pRow, 1, 32);
-			setCursorPosition(32 * guidIt, pRow);
+			blankBlock(xCursorPos, pRow, 1, 32);
+			setCursorPosition(xCursorPos, pRow);
 			for (int i = 0; i < 255; i++) {
 				if (controls.WheelDI.IsButtonPressed(i, guid)) {
 					std::cout << i << " ";
@@ -775,16 +782,16 @@ int main()
 			}
 			pRow++;
 
-			setCursorPosition(32 * guidIt, pRow);
+			setCursorPosition(xCursorPos, pRow);
 			pRow++; // newline
 
-			setCursorPosition(32 * guidIt, pRow);
+			setCursorPosition(xCursorPos, pRow);
 			pRow++;
 			std::cout << "POV hat: ";
 
 			std::string directionsStr;
-			blankBlock(32 * guidIt, pRow, 1, 32);
-			setCursorPosition(32 * guidIt, pRow);
+			blankBlock(xCursorPos, pRow, 1, 32);
+			setCursorPosition(xCursorPos, pRow);
 			for (auto d : directions) {
 				if (d == WheelDirectInput::N) directionsStr  = "N ";
 				if (d == WheelDirectInput::NE) directionsStr = "NE";
@@ -800,7 +807,7 @@ int main()
 			}
 			pRow++;
 
-			setCursorPosition(32 * guidIt, pRow);
+			setCursorPosition(xCursorPos, pRow);
 			pRow++; // newline
 
 			pRowMax = pRow;
