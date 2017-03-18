@@ -10,7 +10,7 @@
 
 #define ESC 0x1B
 #define TAB 0x09
-#define DEVWIDTH 32
+#define DEVWIDTH 36
 
 HANDLE hConsole;
 CONSOLE_CURSOR_INFO cursorInfo;
@@ -750,9 +750,7 @@ int main()
 			std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
 			std::string devName = std::string(wDevName.begin(), wDevName.end());
 			if (devName.length() > DEVWIDTH) {
-				devName[DEVWIDTH - 4] = '.';
-				devName[DEVWIDTH - 3] = '.';
-				devName[DEVWIDTH - 2] = '.';
+				devName.replace(DEVWIDTH - 4, 3, "...");
 				devName[DEVWIDTH - 1] = '\0';
 			}
 			printf("%s", devName.c_str());
@@ -761,7 +759,7 @@ int main()
 			std::cout << "Axes: ";
 
 			for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
-				blankBlock(xCursorPos, pRow, 1, 32);
+				blankBlock(xCursorPos, pRow, 1, DEVWIDTH);
 				setCursorPosition(xCursorPos, pRow);
 				printf("    %s: %d",
 					   controls.WheelDI.DIAxisHelper[i].c_str(),
@@ -773,7 +771,7 @@ int main()
 			pRow++;
 
 			std::cout << "Buttons: ";
-			blankBlock(xCursorPos, pRow, 1, 32);
+			blankBlock(xCursorPos, pRow, 1, DEVWIDTH);
 			setCursorPosition(xCursorPos, pRow);
 			for (int i = 0; i < 255; i++) {
 				if (controls.WheelDI.IsButtonPressed(i, guid)) {
@@ -790,16 +788,16 @@ int main()
 			std::cout << "POV hat: ";
 
 			std::string directionsStr;
-			blankBlock(xCursorPos, pRow, 1, 32);
+			blankBlock(xCursorPos, pRow, 1, DEVWIDTH);
 			setCursorPosition(xCursorPos, pRow);
 			for (auto d : directions) {
-				if (d == WheelDirectInput::N) directionsStr  = "N ";
+				if (d == WheelDirectInput::N ) directionsStr = "N ";
 				if (d == WheelDirectInput::NE) directionsStr = "NE";
-				if (d == WheelDirectInput::E) directionsStr  = " E";
+				if (d == WheelDirectInput::E ) directionsStr = " E";
 				if (d == WheelDirectInput::SE) directionsStr = "SE";
-				if (d == WheelDirectInput::S) directionsStr  = "S ";
+				if (d == WheelDirectInput::S ) directionsStr = "S ";
 				if (d == WheelDirectInput::SW) directionsStr = "SW";
-				if (d == WheelDirectInput::W) directionsStr  = " W";
+				if (d == WheelDirectInput::W ) directionsStr = " W";
 				if (d == WheelDirectInput::NW) directionsStr = "NW";
 				if (controls.WheelDI.IsButtonPressed(d, guid)) {
 					printf("%05d (%s)", d, directionsStr.c_str());
