@@ -93,6 +93,7 @@ public:
 
 	bool TruckShiftUp = false;
 
+	int RadioStationIndex;
 private:
 	std::array<char *, 20> badModelNames = {
 		"BENSON",

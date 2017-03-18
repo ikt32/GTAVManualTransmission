@@ -16,6 +16,30 @@ class VehicleData;
 struct Color;
 class ScriptSettings;
 
+//http://pastebin.com/Kj9t38KF
+enum eRadioStations {
+	LosSantosRockRadio,
+	NonStopPopFM,
+	RadioLosSantos,
+	ChannelX,
+	WestCoastTalkRadio,
+	RebelRadio,
+	SoulwaxFM,
+	EastLosFM,
+	WestCoastClassics,
+	BlueArk,
+	WorldideFM,
+	FlyLoFM,
+	TheLowdown,
+	TheLab,
+	RadioMirrorPark,
+	Space1032,
+	VinewoodBlvdRadio,
+	SelfRadio,
+	BlaineCountyRadio,
+	RadioOff = 255
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 //                           Helper functions/tools
 ///////////////////////////////////////////////////////////////////////////////

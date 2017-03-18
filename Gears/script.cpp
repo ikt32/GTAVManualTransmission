@@ -1174,16 +1174,31 @@ void handleVehicleButtons() {
 	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::Camera)) {
 		CONTROLS::_SET_CONTROL_NORMAL(0, ControlNextCamera, 1.0f);
 	}
-	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::RadioNext)) {
-		AUDIO::SET_RADIO_TO_STATION_INDEX(AUDIO::GET_PLAYER_RADIO_STATION_INDEX() + 1);
-	}
-	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::RadioPrev)) {
-		AUDIO::SET_RADIO_TO_STATION_INDEX(AUDIO::GET_PLAYER_RADIO_STATION_INDEX() - 1);
-	}
-	if (controls.ButtonHeld(ScriptControls::WheelControlType::RadioPrev) || 
+
+
+	if (controls.ButtonHeld(ScriptControls::WheelControlType::RadioPrev) ||
 		controls.ButtonHeld(ScriptControls::WheelControlType::RadioNext)) {
+		if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() != RadioOff) {
+			vehData.RadioStationIndex = AUDIO::GET_PLAYER_RADIO_STATION_INDEX();
+		}
 		AUDIO::SET_VEH_RADIO_STATION(vehicle, "OFF");
+		return;
 	}
+	if (controls.ButtonReleased(ScriptControls::WheelControlType::RadioNext)) {
+		if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() == RadioOff) {
+			AUDIO::SET_RADIO_TO_STATION_INDEX(vehData.RadioStationIndex);
+			return;
+		}
+		AUDIO::_0xFF266D1D0EB1195D(); // Next radio station
+	}
+	if (controls.ButtonReleased(ScriptControls::WheelControlType::RadioPrev)) {
+		if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() == RadioOff) {
+			AUDIO::SET_RADIO_TO_STATION_INDEX(vehData.RadioStationIndex);
+			return;
+		}
+		AUDIO::_0xDD6BCF9E94425DF9(); // Prev radio station
+	}
+
 
 	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::IndicatorLeft)) {
 		if (!vehData.BlinkerLeft) {
