@@ -125,6 +125,7 @@ public:
 	int HandbrakeUp   = 0;
 	int HandbrakeDown   = 0;
 	//bool ClutchDisable = false;
+	int WButtonHeld = 1000;
 
 	// Add more when desired
 	bool ButtonJustPressed(ControllerControlType control);
@@ -132,6 +133,7 @@ public:
 	bool ButtonJustPressed(WheelControlType control);
 	bool ButtonReleased(ControllerControlType control);
 	bool ButtonReleased(WheelControlType control);
+	bool ButtonHeld(WheelControlType control);
 	// Held for specified milliseconds in .ini
 	bool ButtonHeld(ControllerControlType control);
 	bool ButtonIn(WheelControlType control);

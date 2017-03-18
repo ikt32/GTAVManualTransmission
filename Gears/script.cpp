@@ -1180,6 +1180,10 @@ void handleVehicleButtons() {
 	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::RadioPrev)) {
 		AUDIO::SET_RADIO_TO_STATION_INDEX(AUDIO::GET_PLAYER_RADIO_STATION_INDEX() - 1);
 	}
+	if (controls.ButtonHeld(ScriptControls::WheelControlType::RadioPrev) || 
+		controls.ButtonHeld(ScriptControls::WheelControlType::RadioNext)) {
+		AUDIO::SET_VEH_RADIO_STATION(vehicle, "OFF");
+	}
 
 	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::IndicatorLeft)) {
 		if (!vehData.BlinkerLeft) {
