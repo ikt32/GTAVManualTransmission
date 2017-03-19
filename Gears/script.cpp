@@ -344,41 +344,6 @@ void update() {
 //                           Helper functions/tools
 ///////////////////////////////////////////////////////////////////////////////
 
-void showText(float x, float y, float scale, const char* text) {
-	UI::SET_TEXT_FONT(0);
-	UI::SET_TEXT_SCALE(scale, scale);
-	UI::SET_TEXT_COLOUR(255, 255, 255, 255);
-	UI::SET_TEXT_WRAP(0.0, 1.0);
-	UI::SET_TEXT_CENTRE(0);
-	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
-	UI::SET_TEXT_EDGE(1, 0, 0, 0, 205);
-	UI::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
-	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(const_cast<char *>(text));
-	UI::END_TEXT_COMMAND_DISPLAY_TEXT(x, y);
-}
-
-void showText(float x, float y, float scale, const char* text, Color rgba) {
-	UI::SET_TEXT_FONT(0);
-	UI::SET_TEXT_SCALE(scale, scale);
-	UI::SET_TEXT_COLOUR(255, 255, 255, 255);
-	UI::SET_TEXT_WRAP(0.0, 1.0);
-	UI::SET_TEXT_CENTRE(0);
-	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
-	UI::SET_TEXT_EDGE(1, 0, 0, 0, 205);
-	UI::SET_TEXT_COLOUR(rgba.R, rgba.G, rgba.B, rgba.A);
-	UI::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
-	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(const_cast<char *>(text));
-	UI::END_TEXT_COMMAND_DISPLAY_TEXT(x, y);
-}
-
-void showNotification(char* message) {
-	if (prevNotification)
-		UI::_REMOVE_NOTIFICATION(prevNotification);
-	UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
-	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(message);
-	prevNotification = UI::_DRAW_NOTIFICATION(false, false);
-}
-
 void showDebugInfo() {
 	std::stringstream ssRPM;
 	ssRPM << "RPM: " << std::setprecision(3) << vehData.Rpm;
@@ -515,7 +480,7 @@ void toggleManual() {
 	std::stringstream message;
 	message << "Manual Transmission " <<
 	           (settings.EnableManual ? "Enabled" : "Disabled");
-	showNotification(const_cast<char *>(message.str().c_str()));
+	prevNotification = showNotification(const_cast<char *>(message.str().c_str()), prevNotification);
 	logger.Write(const_cast<char *>(message.str().c_str()));
 	if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
 		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
@@ -533,20 +498,20 @@ void updateLastInputDevice() {
 		// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 		switch (controls.PrevInput) {
 			case ScriptControls::Keyboard:
-				showNotification("Switched to keyboard/mouse");
+				prevNotification = showNotification("Switched to keyboard/mouse", prevNotification);
 				break;
 			case ScriptControls::Controller: // Controller
 				if (settings.ShiftMode == HPattern) {
-					showNotification("Switched to controller\nSequential re-initiated");
+					prevNotification = showNotification("Switched to controller\nSequential re-initiated", prevNotification);
 					settings.ShiftMode = Sequential;
 					settings.Save();
 				}
 				else {
-					showNotification("Switched to controller");
+					prevNotification = showNotification("Switched to controller", prevNotification);
 				}
 				break;
 			case ScriptControls::Wheel:
-				showNotification("Switched to wheel");
+				prevNotification = showNotification("Switched to wheel", prevNotification);
 				break;
 		}
 		if (controls.PrevInput != ScriptControls::Wheel && settings.LogiLEDs) {
@@ -595,7 +560,7 @@ void setShiftMode(int shiftMode) {
 			break;
 	}
 	message << "Mode: " << mode;
-	showNotification(const_cast<char *>(message.str().c_str()));
+	prevNotification = showNotification(const_cast<char *>(message.str().c_str()), prevNotification);
 }
 
 void cycleShiftMode() {

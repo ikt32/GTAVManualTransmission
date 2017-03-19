@@ -116,3 +116,10 @@ struct Color {
 	int B;
 	int A;
 };
+
+// Natives called
+void showText(float x, float y, float scale, const char* text);
+void showText(float x, float y, float scale, const char* text, Color rgba);
+int showNotification(char* message, int prevNotification);
+
+

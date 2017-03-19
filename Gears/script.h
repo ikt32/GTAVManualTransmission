@@ -44,9 +44,6 @@ enum eRadioStations {
 //                           Helper functions/tools
 ///////////////////////////////////////////////////////////////////////////////
 
-void showText(float x, float y, float scale, const char* text);
-void showText(float x, float y, float scale, const char* text, Color rgba);
-void showNotification(char* message);
 void showDebugInfo();
 void crossScriptComms();
 
