@@ -7,7 +7,7 @@ Version 4.2.0
 <sub> <sub>
 If you ended up here for version 4.1 to version 4.1.3, use 
 [this](https://github.com/E66666666/GTAVManualTransmission/blob/v4.1.3-b944.2/doc/README.md)
-guide :sweat_smile:
+guide :)
 </sub> </sub>
 
 # Manual Transmission for GTA V
@@ -43,7 +43,9 @@ natively! A few features:
 - [Table of Contents](#table-of-contents)
 - [Requirements](#requirements)
 - [Installation](#installation)
-    - [Additional steps for wheel users (manual method)](#additional-steps-for-wheel-users-manual-method)
+    - [Additional steps for wheel users](#additional-steps-for-wheel-users)
+- [Updating](#updating)
+- [Recommended mods](#recommended-mods)
 - [Basic usage and controls](#basic-usage-and-controls)
     - [Controls](#controls)
     - [Usage](#usage)
@@ -91,16 +93,24 @@ When reloading the mod by toggling it off and on, the settings are read again
 and the steering wheel (if connected) is reset again. You can use this to fine-
 tune your settings and change things on-the-fly, without restarting the game.
 
-### Recommended mods
-* Any speedometer supporting RPM/Gear reading from memory
+# Updating
+Replace `Gears.asi` and the folder `ManualTransmission` in your GTA V folder.
+If the changelog indicated settings version numbers changed, you might want to
+check the options. Otherwise it should be fine to keep `settings_wheel.ini`
+and `settings_general.ini`.
+
+# Recommended mods
+You might want to install some additional mods to enhance your experience.
+
+Any speedometer supporting RPM/Gear reading from memory
 * [NFS Speedo](https://www.gta5-mods.com/scripts/nfsgauge-rpm-gear-speedometer)
 * [LeFix Speedometer](https://www.gta5-mods.com/scripts/speedometer-improvedalexbladeversion)
 
-* Any handling mod that aims to improve handling accuracy
+Any handling mod that aims to improve handling accuracy
 * [Realistic Driving V](https://www.gta5-mods.com/vehicles/realistic-driving-v)
 * [Sim-cade Handling](https://www.gta5-mods.com/vehicles/sim-cade-handling)
 
-* Mods that counter the power loss when sliding sideways
+Mods that counter the power loss when sliding sideways
 * [InversePower](https://www.gta5-mods.com/scripts/inversepower)
 * [Drift Assist](https://www.gta5-mods.com/scripts/drift-assist)
 
@@ -109,7 +119,8 @@ tune your settings and change things on-the-fly, without restarting the game.
 
 Custom Steering hasn't been updated for the latest GTA V updates*. Once it gets 
 updated, using this is fine. Before this happens, remove it if it crashes your
-game.
+game. It was needed to cancel the automatic countersteer and steering reduction
+at speed, but this is included in this mod starting with version 4.2.0.
 
 <sub>As of 11 March 2017, it hasn't been updated for v1.0.944.2</sub>
 </sub>

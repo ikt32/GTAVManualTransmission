@@ -1,16 +1,16 @@
 # Changelog
 
-## 4.2.0 - beta 1 -> beta 2
+## 4.2.0 - beta 2
 No configuration changes
 
 Changes:
 * Fix messed up clutch for single-axis throttle/brake settings
 * Fix lag when patching fails: Limit patching attempts
 * Update strings for game version 1.0.1011.1
+* Fix vehicle moving before clutch catch point if throttle is pressed
 
 Wheel changes:
 * Fix crash when FFB applied on a null device after re-initialization
-* Fix vehicle moving before clutch catch point if throttle is pressed
 * Cleaner DirectInput Force Feedback code
 * Cleaner wheel compression retrieval method for FFB detail
 * Improve radio changing
