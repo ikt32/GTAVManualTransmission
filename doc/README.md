@@ -1,4 +1,5 @@
 [comment]: # (User README.md)
+
 Manual Transmission & Steering Wheel Support
 ===========
 Version 4.2.0
@@ -78,25 +79,30 @@ natively! A few features:
 1.	Put `Gears.asi` and the folder `ManualTransmission` in your GTA V folder (overwrite when asked)
 2.	Read this README and configure `ManualTransmission/settings_general.ini` to your preferences
 
-## Additional steps for wheel users (manual method)
+## Additional steps for wheel users
 3.	Remove or disable any XInput or DirectInput DLL files for your wheel for GTA V
-4.	Launch `DIUtil.exe` in the `ManualTransmission` folder and follow the instructions
-5.  Configure throttle, brake, clutch, steering and the H-shifter.
-6.	Configure the rest of `ManualTransmission/settings_wheel.ini`
-7.	Check DIUtil.log for any other devices you might want to use
-8.	Add entries in settings_wheel.ini as `DEV[n] = name`, `GUID[n] = {GUID STRING}`
-9.	For all other entries, choose `"DEVICE = n`. You can keep DIUtil.exe open to look up button numbers.
-10.	Change rotation limits for steering if you so desire.
+4.	Launch `DIUtil.exe` in the `ManualTransmission` folder
+5.	Press the keys mentioned onscreen to configure the axles, buttons and shifter
+6.	Configure the rest of `ManualTransmission/settings_wheel.ini` for Force Feedback etc
 
-When using DIUtil, pressing space reloads the config file and re-scans connected devices.
+When using DIUtil, reloading will re-load the config file and check for device changes.
 
 When reloading the mod by toggling it off and on, the settings are read again
 and the steering wheel (if connected) is reset again. You can use this to fine-
 tune your settings and change things on-the-fly, without restarting the game.
 
 ### Recommended mods
+* Any speedometer supporting RPM/Gear reading from memory
 * [NFS Speedo](https://www.gta5-mods.com/scripts/nfsgauge-rpm-gear-speedometer)
-* Any speedometer supporting RPM/Gear reading from memory.
+* [LeFix Speedometer](https://www.gta5-mods.com/scripts/speedometer-improvedalexbladeversion)
+
+* Any handling mod that aims to improve handling accuracy
+* [Realistic Driving V](https://www.gta5-mods.com/vehicles/realistic-driving-v)
+* [Sim-cade Handling](https://www.gta5-mods.com/vehicles/sim-cade-handling)
+
+* Mods that counter the power loss when sliding sideways
+* [InversePower](https://www.gta5-mods.com/scripts/inversepower)
+* [Drift Assist](https://www.gta5-mods.com/scripts/drift-assist)
 
 <sub>Outdated:
 * [~~Custom Steering~~](https://www.gta5-mods.com/scripts/custom-steering) 

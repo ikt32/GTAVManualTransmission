@@ -3,9 +3,25 @@
 ## 4.2.0 - beta 1 -> beta 2
 No configuration changes
 
+Changes:
+* Fix messed up clutch for single-axis throttle/brake settings
+* Fix lag when patching fails: Limit patching attempts
+* Update strings for game version 1.0.1011.1
+
 Wheel changes:
-* Fix crash if force feedback is applied on a nonexisting device after re-initialization
-* Clean up DirectInput Force Feedback code
+* Fix crash when FFB applied on a null device after re-initialization
+* Fix vehicle moving before clutch catch point if throttle is pressed
+* Cleaner DirectInput Force Feedback code
+* Cleaner wheel compression retrieval method for FFB detail
+* Improve radio changing
+* Add hold radio buttons to turn radio off
+
+DIUtil changes:
+* Fix a crash when refreshing after removing all devices
+* Add dynamic device & axis detection
+* Add dynamic device & button detection
+* Add current function display for buttons
+* Add wheel->keyboard input blocking option
 
 ## 4.2.0 - beta 1
 Big changes to configuration!
