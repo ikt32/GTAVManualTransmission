@@ -390,7 +390,7 @@ void ScriptControls::CheckGUIDs(const std::vector<_GUID> & guids) {
 		foundGuids.begin(), foundGuids.end(), std::back_inserter(missingReg));
 
 	if (missingReg.size() > 0) {
-		logger.Write("WHEEL: Registered but not available: ");
+		logger.Write("WHEEL: Used in .ini but not available: ");
 		for (auto g : missingReg) {
 			logger.Write(std::string("    ") + GUID2String(g));
 		}
@@ -402,7 +402,7 @@ void ScriptControls::CheckGUIDs(const std::vector<_GUID> & guids) {
 		reggdGuids.begin(), reggdGuids.end(), std::back_inserter(missingFnd));
 
 	if (missingFnd.size() > 0) {
-		logger.Write("WHEEL: Enumerated but not registered: ");
+		logger.Write("WHEEL: Available for use in .ini: ");
 		for (auto g : missingFnd) {
 			logger.Write(std::string("    ") + GUID2String(g));
 		}
