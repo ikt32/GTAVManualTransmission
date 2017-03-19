@@ -13,6 +13,7 @@ class ScriptControls;
 class ScriptSettings {
 public:
 	ScriptSettings(std::string general, std::string wheel, Logger &logger);
+	void parseSettingsGeneral(ScriptControls *scriptControl);
 	void Read(ScriptControls* scriptControl);
 	void Save() const;
 	void IsCorrectVersion() const;
@@ -90,11 +91,11 @@ public:
 	 *  Checks if GUID already exists and returns device index
 	 *  otherwise appends GUID and returns new device index
 	 */
-	int SteeringAppendDevice(const GUID & dev_guid, std::string dev_name);
-	void SteeringSaveAxis(std::string confTag, int index, std::string axis, int minVal, int maxVal);
-	void SteeringSaveFFBAxis(std::string confTag, int index, std::string axis);
-	void SteeringSaveButton(std::string confTag, int index, int button);
-	void SteeringSaveHShifter(std::string confTag, int index, int button[8]);
+	ptrdiff_t SteeringAppendDevice(const GUID & dev_guid, std::string dev_name);
+	void SteeringSaveAxis(std::string confTag, ptrdiff_t index, std::string axis, int minVal, int maxVal);
+	void SteeringSaveFFBAxis(std::string confTag, ptrdiff_t index, std::string axis);
+	void SteeringSaveButton(std::string confTag, ptrdiff_t index, int button);
+	void SteeringSaveHShifter(std::string confTag, ptrdiff_t index, int button[8]);
 private:
 	int settings_general_version = 0;
 	int settings_wheel_version = 0;

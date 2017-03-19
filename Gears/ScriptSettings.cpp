@@ -21,99 +21,10 @@ ScriptSettings::ScriptSettings(std::string general,
 
 }
 
+
 void ScriptSettings::Read(ScriptControls* scriptControl) {
-#pragma warning(push)
-#pragma warning(disable: 4244) // Make everything doubles later...
-	CSimpleIniA settingsGeneral;
-	settingsGeneral.SetUnicode();
-	settingsGeneral.LoadFile(settingsGeneralFile.c_str());
-
-	settingsGeneral.GetBoolValue("OPTIONS", "Enable", true);
-	// [OPTIONS]
-	EnableManual        = settingsGeneral.GetBoolValue("OPTIONS", "Enable", true);
-	ShiftMode           = settingsGeneral.GetLongValue("OPTIONS", "ShiftMode", 0);
-	SimpleBike          = settingsGeneral.GetBoolValue("OPTIONS", "SimpleBike", false);
-	EngDamage           = settingsGeneral.GetBoolValue("OPTIONS", "EngineDamage", false);
-	EngStall            = settingsGeneral.GetBoolValue("OPTIONS", "EngineStalling", false);
-	EngBrake            = settingsGeneral.GetBoolValue("OPTIONS", "EngineBraking", false);
-	ClutchCatching      = settingsGeneral.GetBoolValue("OPTIONS", "ClutchCatching", false);
-	ClutchShiftingH     = settingsGeneral.GetBoolValue("OPTIONS", "ClutchShiftingH", false);
-	ClutchShiftingS     = settingsGeneral.GetBoolValue("OPTIONS", "ClutchShiftingS", false);
-	DefaultNeutral      = settingsGeneral.GetBoolValue("OPTIONS", "DefaultNeutral", true);
-	
-	ClutchCatchpoint    = settingsGeneral.GetDoubleValue("OPTIONS", "ClutchCatchpoint", 15.0) / 100.0f;
-	StallingThreshold   = settingsGeneral.GetDoubleValue("OPTIONS", "StallingThreshold", 75.0) / 100.0f;
-	RPMDamage           = settingsGeneral.GetDoubleValue("OPTIONS", "RPMDamage", 15.0) / 100.0f;
-	MisshiftDamage      = settingsGeneral.GetDoubleValue("OPTIONS", "MisshiftDamage", 10.0);
-
-	HillBrakeWorkaround = settingsGeneral.GetBoolValue("OPTIONS", "HillBrakeWorkaround", false);
-	AutoGear1           = settingsGeneral.GetBoolValue("OPTIONS", "AutoGear1", false);
-	AutoLookBack        = settingsGeneral.GetBoolValue("OPTIONS", "AutoLookBack", false);
-	ThrottleStart       = settingsGeneral.GetBoolValue("OPTIONS", "ThrottleStart", false);
-
-	UITips              = settingsGeneral.GetBoolValue("OPTIONS", "UITips", true);
-	UITips_OnlyNeutral  = settingsGeneral.GetBoolValue("OPTIONS", "UITips_OnlyNeutral", false);
-	UITips_X            = settingsGeneral.GetDoubleValue("OPTIONS", "UITips_X", 95.0) / 100.0f;
-	UITips_Y            = settingsGeneral.GetDoubleValue("OPTIONS", "UITips_Y", 95.0) / 100.0f;
-	UITips_Size         = settingsGeneral.GetDoubleValue("OPTIONS", "UITips_Size", 15.0) / 100.0f;
-	UITips_TopGearC_R   = settingsGeneral.GetLongValue("OPTIONS", "UITips_TopGearC_R", 255);
-	UITips_TopGearC_G   = settingsGeneral.GetLongValue("OPTIONS", "UITips_TopGearC_G", 255);
-	UITips_TopGearC_B   = settingsGeneral.GetLongValue("OPTIONS", "UITips_TopGearC_B", 255);
-
-	CrossScript         = settingsGeneral.GetBoolValue("OPTIONS", "CrossScript", false);
-
-	// [CONTROLLER]
-	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Toggle)]  = settingsGeneral.GetValue("CONTROLLER", "Toggle", "DpadRight");
-	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ToggleH)] = settingsGeneral.GetValue("CONTROLLER", "ToggleShift", "B");
-	scriptControl->CToggleTime = settingsGeneral.GetLongValue("CONTROLLER", "ToggleTime", 500);
-
-	int tval = settingsGeneral.GetLongValue("CONTROLLER", "TriggerValue", 75);
-	if (tval > 100 || tval < 0) {
-		tval = 75;
-	}
-	scriptControl->SetXboxTrigger(tval);
-
-	ToggleEngine = settingsGeneral.GetBoolValue("CONTROLLER", "ToggleEngine", "0");
-
-	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)]   = settingsGeneral.GetValue("CONTROLLER", "ShiftUp", "A");
-	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)] = settingsGeneral.GetValue("CONTROLLER", "ShiftDown", "X");
-	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Clutch)]    = settingsGeneral.GetValue("CONTROLLER", "Clutch", "LeftThumbDown");
-	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Engine)]    = settingsGeneral.GetValue("CONTROLLER", "Engine", "DpadDown");
-	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Throttle)]  = settingsGeneral.GetValue("CONTROLLER", "Throttle", "RightTrigger");
-	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Brake)]     = settingsGeneral.GetValue("CONTROLLER", "Brake", "LeftTrigger");
-
-	// [KEYBOARD]
-	
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Toggle)]        = str2key(settingsGeneral.GetValue("KEYBOARD", "Toggle", "VK_OEM_5"));
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ToggleH)]       = str2key(settingsGeneral.GetValue("KEYBOARD", "ToggleH", "VK_OEM_6"));
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ShiftUp)]       = str2key(settingsGeneral.GetValue("KEYBOARD", "ShiftUp", "SHIFT"));
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ShiftDown)]     = str2key(settingsGeneral.GetValue("KEYBOARD", "ShiftDown", "CTRL"));
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Clutch)]        = str2key(settingsGeneral.GetValue("KEYBOARD", "Clutch", "X"));
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Engine)]        = str2key(settingsGeneral.GetValue("KEYBOARD", "Engine", "C"));
-
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Throttle)]      = str2key(settingsGeneral.GetValue("KEYBOARD", "Throttle", "W"));
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Brake)]         = str2key(settingsGeneral.GetValue("KEYBOARD", "Brake", "S"));
-
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::HR)]            = str2key(settingsGeneral.GetValue("KEYBOARD", "HR", "NUM0"));
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H1)]            = str2key(settingsGeneral.GetValue("KEYBOARD", "H1", "NUM1"));
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H2)]            = str2key(settingsGeneral.GetValue("KEYBOARD", "H2", "NUM2"));
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H3)]            = str2key(settingsGeneral.GetValue("KEYBOARD", "H3", "NUM3"));
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H4)]            = str2key(settingsGeneral.GetValue("KEYBOARD", "H4", "NUM4"));
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H5)]            = str2key(settingsGeneral.GetValue("KEYBOARD", "H5", "NUM5"));
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H6)]            = str2key(settingsGeneral.GetValue("KEYBOARD", "H6", "NUM6"));
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H7)]            = str2key(settingsGeneral.GetValue("KEYBOARD", "H7", "NUM7"));
-	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::HN)]            = str2key(settingsGeneral.GetValue("KEYBOARD", "HN", "NUM9"));
-
-
+	parseSettingsGeneral(scriptControl);
 	parseSettingsWheel(scriptControl);
-
-	// [DEBUG]
-	Debug = settingsGeneral.GetBoolValue("DEBUG", "Info", false);
-	
-	// [FILEVERSION]
-	settings_general_version = settingsGeneral.GetLongValue("FILEVERSION", "VERSION", 0);
-
-#pragma warning(pop)
 }
 
 void ScriptSettings::Save() const {
@@ -136,6 +47,100 @@ void ScriptSettings::IsCorrectVersion() const {
 
 std::vector<GUID> ScriptSettings::GetGuids() {
 	return reggdGuids;
+}
+
+void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
+#pragma warning(push)
+#pragma warning(disable: 4244) // Make everything doubles later...
+	CSimpleIniA settingsGeneral;
+	settingsGeneral.SetUnicode();
+	settingsGeneral.LoadFile(settingsGeneralFile.c_str());
+
+	settingsGeneral.GetBoolValue("OPTIONS", "Enable", true);
+	// [OPTIONS]
+	EnableManual = settingsGeneral.GetBoolValue("OPTIONS", "Enable", true);
+	ShiftMode = settingsGeneral.GetLongValue("OPTIONS", "ShiftMode", 0);
+	SimpleBike = settingsGeneral.GetBoolValue("OPTIONS", "SimpleBike", false);
+	EngDamage = settingsGeneral.GetBoolValue("OPTIONS", "EngineDamage", false);
+	EngStall = settingsGeneral.GetBoolValue("OPTIONS", "EngineStalling", false);
+	EngBrake = settingsGeneral.GetBoolValue("OPTIONS", "EngineBraking", false);
+	ClutchCatching = settingsGeneral.GetBoolValue("OPTIONS", "ClutchCatching", false);
+	ClutchShiftingH = settingsGeneral.GetBoolValue("OPTIONS", "ClutchShiftingH", false);
+	ClutchShiftingS = settingsGeneral.GetBoolValue("OPTIONS", "ClutchShiftingS", false);
+	DefaultNeutral = settingsGeneral.GetBoolValue("OPTIONS", "DefaultNeutral", true);
+
+	ClutchCatchpoint = settingsGeneral.GetDoubleValue("OPTIONS", "ClutchCatchpoint", 15.0) / 100.0f;
+	StallingThreshold = settingsGeneral.GetDoubleValue("OPTIONS", "StallingThreshold", 75.0) / 100.0f;
+	RPMDamage = settingsGeneral.GetDoubleValue("OPTIONS", "RPMDamage", 15.0) / 100.0f;
+	MisshiftDamage = settingsGeneral.GetDoubleValue("OPTIONS", "MisshiftDamage", 10.0);
+
+	HillBrakeWorkaround = settingsGeneral.GetBoolValue("OPTIONS", "HillBrakeWorkaround", false);
+	AutoGear1 = settingsGeneral.GetBoolValue("OPTIONS", "AutoGear1", false);
+	AutoLookBack = settingsGeneral.GetBoolValue("OPTIONS", "AutoLookBack", false);
+	ThrottleStart = settingsGeneral.GetBoolValue("OPTIONS", "ThrottleStart", false);
+
+	UITips = settingsGeneral.GetBoolValue("OPTIONS", "UITips", true);
+	UITips_OnlyNeutral = settingsGeneral.GetBoolValue("OPTIONS", "UITips_OnlyNeutral", false);
+	UITips_X = settingsGeneral.GetDoubleValue("OPTIONS", "UITips_X", 95.0) / 100.0f;
+	UITips_Y = settingsGeneral.GetDoubleValue("OPTIONS", "UITips_Y", 95.0) / 100.0f;
+	UITips_Size = settingsGeneral.GetDoubleValue("OPTIONS", "UITips_Size", 15.0) / 100.0f;
+	UITips_TopGearC_R = settingsGeneral.GetLongValue("OPTIONS", "UITips_TopGearC_R", 255);
+	UITips_TopGearC_G = settingsGeneral.GetLongValue("OPTIONS", "UITips_TopGearC_G", 255);
+	UITips_TopGearC_B = settingsGeneral.GetLongValue("OPTIONS", "UITips_TopGearC_B", 255);
+
+	CrossScript = settingsGeneral.GetBoolValue("OPTIONS", "CrossScript", false);
+
+	// [CONTROLLER]
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Toggle)] = settingsGeneral.GetValue("CONTROLLER", "Toggle", "DpadRight");
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ToggleH)] = settingsGeneral.GetValue("CONTROLLER", "ToggleShift", "B");
+	scriptControl->CToggleTime = settingsGeneral.GetLongValue("CONTROLLER", "ToggleTime", 500);
+
+	int tval = settingsGeneral.GetLongValue("CONTROLLER", "TriggerValue", 75);
+	if (tval > 100 || tval < 0) {
+		tval = 75;
+	}
+	scriptControl->SetXboxTrigger(tval);
+
+	ToggleEngine = settingsGeneral.GetBoolValue("CONTROLLER", "ToggleEngine", "0");
+
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)] = settingsGeneral.GetValue("CONTROLLER", "ShiftUp", "A");
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)] = settingsGeneral.GetValue("CONTROLLER", "ShiftDown", "X");
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Clutch)] = settingsGeneral.GetValue("CONTROLLER", "Clutch", "LeftThumbDown");
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Engine)] = settingsGeneral.GetValue("CONTROLLER", "Engine", "DpadDown");
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Throttle)] = settingsGeneral.GetValue("CONTROLLER", "Throttle", "RightTrigger");
+	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Brake)] = settingsGeneral.GetValue("CONTROLLER", "Brake", "LeftTrigger");
+
+	// [KEYBOARD]
+
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Toggle)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Toggle", "VK_OEM_5"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ToggleH)] = str2key(settingsGeneral.GetValue("KEYBOARD", "ToggleH", "VK_OEM_6"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ShiftUp)] = str2key(settingsGeneral.GetValue("KEYBOARD", "ShiftUp", "SHIFT"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ShiftDown)] = str2key(settingsGeneral.GetValue("KEYBOARD", "ShiftDown", "CTRL"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Clutch)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Clutch", "X"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Engine)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Engine", "C"));
+
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Throttle)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Throttle", "W"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Brake)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Brake", "S"));
+
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::HR)] = str2key(settingsGeneral.GetValue("KEYBOARD", "HR", "NUM0"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H1)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H1", "NUM1"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H2)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H2", "NUM2"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H3)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H3", "NUM3"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H4)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H4", "NUM4"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H5)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H5", "NUM5"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H6)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H6", "NUM6"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H7)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H7", "NUM7"));
+	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::HN)] = str2key(settingsGeneral.GetValue("KEYBOARD", "HN", "NUM9"));
+
+
+
+	// [DEBUG]
+	Debug = settingsGeneral.GetBoolValue("DEBUG", "Info", false);
+
+	// [FILEVERSION]
+	settings_general_version = settingsGeneral.GetLongValue("FILEVERSION", "VERSION", 0);
+#pragma warning(pop)
+
 }
 
 void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
@@ -393,7 +398,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 
 }
 
-int ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, std::string dev_name) {
+ptrdiff_t ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, std::string dev_name) {
 	auto found = find(reggdGuids.begin(), reggdGuids.end(), dev_guid);
 	if (found != reggdGuids.end()) {
 		// present! Return index
@@ -401,7 +406,7 @@ int ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, std::string dev_n
 		return distance(reggdGuids.begin(), found);
 	}
 	// missing! Add & return index afterwards
-	int newIndex = distance(reggdGuids.begin(), reggdGuids.end());
+	auto newIndex = distance(reggdGuids.begin(), reggdGuids.end());
 	std::string newDEV = "DEV" + std::to_string(newIndex);
 	std::string newGUID = "GUID" + std::to_string(newIndex);
 
@@ -416,7 +421,7 @@ int ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, std::string dev_n
 		logger.Write("Unable to save file");
 	return newIndex;
 }
-void ScriptSettings::SteeringSaveAxis(std::string confTag, int index, std::string axis, int minVal, int maxVal) {
+void ScriptSettings::SteeringSaveAxis(std::string confTag, ptrdiff_t index, std::string axis, int minVal, int maxVal) {
 	CSimpleIniA settingsWheel;
 	settingsWheel.SetUnicode();
 	settingsWheel.LoadFile(settingsWheelFile.c_str());
@@ -429,7 +434,7 @@ void ScriptSettings::SteeringSaveAxis(std::string confTag, int index, std::strin
 		logger.Write("Unable to save file");
 }
 
-void ScriptSettings::SteeringSaveFFBAxis(std::string confTag, int index, std::string axis) {
+void ScriptSettings::SteeringSaveFFBAxis(std::string confTag, ptrdiff_t index, std::string axis) {
 	CSimpleIniA settingsWheel;
 	settingsWheel.SetUnicode();
 	settingsWheel.LoadFile(settingsWheelFile.c_str());
@@ -440,7 +445,7 @@ void ScriptSettings::SteeringSaveFFBAxis(std::string confTag, int index, std::st
 		logger.Write("Unable to save file");
 }
 
-void ScriptSettings::SteeringSaveButton(std::string confTag, int index, int button) {
+void ScriptSettings::SteeringSaveButton(std::string confTag, ptrdiff_t index, int button) {
 	CSimpleIniA settingsWheel;
 	settingsWheel.SetUnicode();
 	settingsWheel.LoadFile(settingsWheelFile.c_str());
@@ -451,7 +456,7 @@ void ScriptSettings::SteeringSaveButton(std::string confTag, int index, int butt
 		logger.Write("Unable to save file");
 }
 
-void ScriptSettings::SteeringSaveHShifter(std::string confTag, int index, int button[8]) {
+void ScriptSettings::SteeringSaveHShifter(std::string confTag, ptrdiff_t index, int button[8]) {
 	CSimpleIniA settingsWheel;
 	settingsWheel.SetUnicode();
 	settingsWheel.LoadFile(settingsWheelFile.c_str());
