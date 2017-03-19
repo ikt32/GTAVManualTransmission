@@ -33,7 +33,7 @@ public:
 	};
 
 	void UpdateValues(VehicleExtensions& ext, Vehicle vehicle);
-	std::array<float, 2> GetWheelCompressionSpeeds();
+	std::vector<float> GetWheelCompressionSpeeds();
 	//bool IsBike = false;
 
 	VehicleClass Class = VehicleClass::Car;
@@ -71,7 +71,7 @@ public:
 	// In radians
 	float SteeringAngle = 0.0f;
 	Vector3 RotationVelocity = {};
-	std::array<float, 2> WheelCompressions = {};
+	std::vector<float> WheelCompressions = {};
 	Vector3 V3Velocities;
 	Vector3 getAccelerationVectors(Vector3 velocities);
 
@@ -132,7 +132,7 @@ private:
 	bool noClutch(char* name);
 
 	Vector3 prevVelocities = {};
-	std::array<float, 2> prevCompressions = {};
+	std::vector<float> prevCompressions = {};
 
 	long long prevAccelTime = 0;
 	long long prevCompressTime = 0;

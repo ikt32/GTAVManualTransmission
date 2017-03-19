@@ -29,6 +29,8 @@ void VehicleData::Clear() {
 	prevVelocities.x = 0;
 	prevVelocities.y = 0;
 	prevVelocities.z = 0;
+	WheelCompressions.clear();
+	prevCompressions.clear();
 	zeroSamples();
 }
 
@@ -74,9 +76,9 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 	NoClutch = noClutch(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
 	Pitch = ENTITY::GET_ENTITY_PITCH(vehicle);
 	SteeringAngle = ext.GetSteeringAngle(vehicle);
-	if (Class == VehicleClass::Car || Class == VehicleClass::Quad) {
-		WheelCompressions[0] = ext.GetWheelsCompression(vehicle).at(0);
-		WheelCompressions[1] = ext.GetWheelsCompression(vehicle).at(1);
+	WheelCompressions = ext.GetWheelsCompression(vehicle);
+	if (prevCompressions.size() != WheelCompressions.size()) {
+		prevCompressions = WheelCompressions;
 	}
 
 	ControlAccelerate = (CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate) - 127) / 127.0f;
@@ -102,13 +104,14 @@ VehicleData::VehicleClass VehicleData::findClass(Hash model) {
 }
 
 // Only does this for the first two wheels because I'm lazy, damn it
-std::array<float, 2> VehicleData::GetWheelCompressionSpeeds() {
+std::vector<float> VehicleData::GetWheelCompressionSpeeds() {
 	long long time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 
-	std::array<float, 2> result;
-	result[0] = (WheelCompressions[0] - prevCompressions[0]) / ((time - prevCompressTime) / 1e9f);
-	result[1] = (WheelCompressions[1] - prevCompressions[1]) / ((time - prevCompressTime) / 1e9f);
-
+	std::vector<float> result;
+	for (int i = 0; i < WheelCompressions.size(); i++) {
+		result.push_back((WheelCompressions[i] - prevCompressions[i]) / ((time - prevCompressTime) / 1e9f));
+	}
+	
 	prevCompressTime = time;
 	prevCompressions = WheelCompressions;
 

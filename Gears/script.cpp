@@ -1433,9 +1433,10 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 
 	// Detail feel / suspension compression based
 	float compSpeedTotal = 0.0f;
-	if (vehData.Class == VehicleData::VehicleClass::Car || vehData.Class == VehicleData::VehicleClass::Quad) {
-		auto compSpeed = vehData.GetWheelCompressionSpeeds();
+	auto compSpeed = vehData.GetWheelCompressionSpeeds();
 
+	// More than 2 wheels! Trikes should be ok, etc.
+	if (ext.GetNumWheels(vehicle) > 2) {
 		// left should pull left, right should pull right
 		compSpeedTotal = -compSpeed[0] + compSpeed[1];
 	}
