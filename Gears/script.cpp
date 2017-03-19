@@ -942,7 +942,7 @@ void handleRPM() {
 	}
 
 	// Set the clutch depending on neutral status
-	if (vehData.SimulatedNeutral || controls.ClutchVal > 0.95) {
+	if (vehData.SimulatedNeutral || controls.ClutchVal > 1.0 - settings.ClutchCatchpoint) {
 		/*
 			To prevent a the clutch not being registered as fully pressed
 			by the game. Negative values seem to work, but this amount
