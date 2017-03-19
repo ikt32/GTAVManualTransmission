@@ -218,7 +218,7 @@ bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> sta
 void saveAxis(std::string gameAxis, std::string confTag, std::tuple<GUID, std::string> selectedDevice, int min, int max) {
 	std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
 	std::string devName = std::string(wDevName.begin(), wDevName.end());
-	int index = settings.SteeringAppendDevice(std::get<0>(selectedDevice), devName);
+	auto index = settings.SteeringAppendDevice(std::get<0>(selectedDevice), devName);
 	settings.SteeringSaveAxis(confTag, index, std::get<1>(selectedDevice), min, max);
 	if (gameAxis == "steering") {
 		settings.SteeringSaveFFBAxis(confTag, index, std::get<1>(selectedDevice));
@@ -226,7 +226,7 @@ void saveAxis(std::string gameAxis, std::string confTag, std::tuple<GUID, std::s
 }
 
 void saveButton(int button, std::string confTag, GUID devGUID, std::string devName) {
-	int index = settings.SteeringAppendDevice(devGUID, devName.c_str());
+	auto index = settings.SteeringAppendDevice(devGUID, devName.c_str());
 	settings.SteeringSaveButton(confTag, index, button);
 }
 
@@ -622,7 +622,7 @@ void configHShift(char c) {
 				}
 
 				setCursorPosition(0, csbi.srWindow.Bottom - 2);
-				printf("Select device for %s (0 to %d)", gameButton.c_str(), controls.WheelDI.nEntry - 1);
+				printf("Select device for %s", gameButton.c_str());
 			}
 			break;
 			case 1:
@@ -674,7 +674,7 @@ void configHShift(char c) {
 			}
 			break;
 			default: { // save all the shit
-				int index = settings.SteeringAppendDevice(devGUID, devName);
+				auto index = settings.SteeringAppendDevice(devGUID, devName);
 				settings.SteeringSaveHShifter(confTag, index, buttonArray.data());
 				cls();
 				setCursorPosition(0, csbi.srWindow.Bottom);
@@ -748,6 +748,11 @@ int main()
 		int guidIt = 0;
 		int pRowMax = 0;
 		for (auto guid : controls.WheelDI.GetGuids()) {
+			if (!controls.WheelDI.FindEntryFromGUID(guid)) {
+				init();
+				break;
+			}
+
 			int pRow = 0;
 			int xCursorPos = DEVWIDTH * guidIt;
 			setCursorPosition(xCursorPos, pRow);
@@ -871,6 +876,9 @@ int main()
 				charsPrinted += printf("\n");
 			}
 			charsPrinted += printf("(%c: %s) ", std::get<0>(t), std::get<1>(t).c_str());
+			if (t == buttonInfos.back()) {
+				printf("(g: h-shifter)");
+			}
 		}
 
 		setCursorPosition(0, csbi.srWindow.Bottom - 2);
