@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.2.0 - beta 3 / RC
+No configuration changes
+
+Changes:
+* Fix getWheelCompressions for FiveM
+* Fix steering corrections patching for FiveM
+* Ignore CrossScript for FiveM
+
 ## 4.2.0 - beta 2
 No configuration changes
 

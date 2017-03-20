@@ -355,7 +355,7 @@ the specified color.
 
 ### `CrossScript` : `0` or `1`
 Turn this off to disable communication (shift indicators and neutral gear) to
-other mods. Leaving this on in a CitizenFX-based mod __crashes the game__.
+other mods. This functionality is automatically disabled when running FiveM. Any executable with version 1.0.505.2!
 
 * `0`: No mod info available for other mods
 * `1`: Mod info available for other mods
@@ -661,8 +661,6 @@ The mod has been tested with GTA V version 350, 617, 678, 791.2, 877.1 and 944.2
 * FoV 1.33
 
 ## Conflicting software
-* __FiveM__ will remove their compatibility layer with ScriptHookV. Wheel support is
-a no-go. Alternative methods can be discussable if the FiveM team permits it.
 * __x360ce__ will conflict with input detection if throttle, brake or steering clutch
 are mapped, but the mod should still register your wheel. Assigning inputs
 without overlap is no problem.
