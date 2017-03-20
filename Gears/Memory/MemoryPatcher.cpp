@@ -21,7 +21,7 @@ namespace MemoryPatcher {
 	// Kept for emergency/backup purposes in the case InfamousSabre
 	// stops support earlier than I do. (not trying to compete here!)
 	uintptr_t PatchSteering();
-	void RestoreSteering(uintptr_t address);
+	void RestoreSteering(uintptr_t address, byte *origInstr, int origInstrSz);
 
 	MemoryAccess mem;
 
@@ -38,6 +38,9 @@ namespace MemoryPatcher {
 
 	uintptr_t SteeringAddr = NULL;
 	uintptr_t SteeringTemp = NULL;
+
+	byte origSteerInstr[6] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	byte origSteerInstrDest[4] = {0x00, 0x00, 0x00, 0x00};
 
 	const int maxTries = 4;
 	int gearTries = 0;
@@ -154,8 +157,11 @@ namespace MemoryPatcher {
 			SteeringPatched = true;
 			std::stringstream hexaddr;
 			hexaddr << std::hex << SteeringAddr;
+			std::stringstream instructs;
+			for (int i = 0; i < sizeof(origSteerInstr) / sizeof(byte); ++i)
+				instructs << std::hex << std::setfill('0') << std::setw(2) << (int)origSteerInstr[i] << " ";
 			logger.Write("STEERING: Steering @ " + hexaddr.str());
-			logger.Write("STEERING: Patch success");
+			logger.Write("STEERING: Patch success, orig: " + instructs.str());
 			steerTries = 0;
 			return true;
 		}
@@ -180,7 +186,7 @@ namespace MemoryPatcher {
 		}
 
 		if (SteeringAddr) {
-			RestoreSteering(SteeringAddr);
+			RestoreSteering(SteeringAddr,origSteerInstr, sizeof(origSteerInstr) / sizeof(byte));
 			SteeringAddr = 0;
 			SteeringPatched = false;
 			logger.Write("STEERING: Restore success");
@@ -245,41 +251,77 @@ namespace MemoryPatcher {
 	}
 
 	uintptr_t PatchSteering() {
+		// F3 44 0F 10 15 03 31 94 00
+		// 45 84 ED				// test		r13l,r13l
+		// 0F 84 C8010000		// je		GTA5.exe+EXE53E // means jump if 0 in this case
+		// 0F 28 4B 70 (Next)	// movaps	xmm1,[rbx+70]
+		// F3 0F10 25 06F09300
+		// F3 0F10 1D 3ED39F00
+		
 		// in 791.2, 877.1 and 944.2
 		// 0F 84 D0 01 00 00 = JE	[some address]
 		// becomes
 		// E9 D1 01 00 00 90 = JMP	[some address]
 
-		// 0F 28 4B 70 (Next)
-		// F3 0F10 25 06F09300
-		// F3 0F10 1D 3ED39F00
+		// InfamousSabre
+		// "\x0F\x84\x00\x00\x00\x00\x0F\x28\x4B\x70\xF3\x0F\x10\x25\x00\x00\x00\x00\xF3\x0F\x10\x1D\x00\x00\x00\x00" is what I scan for.
+
+		// F3 44 0F10 15 03319400
+		// 45 84 ED             
+		// 0F84 D0010000        
+		// 0F28 4B 70           
+		// F3 0F10 25 92309400  
+		// F3 0F10 1D 6A309400  
 
 		uintptr_t address = NULL;
-		if (SteeringTemp != NULL)
+		if (SteeringTemp != NULL) {
 			address = SteeringTemp;
-		else 
+
+		}
+		else {
 			address = mem.FindPattern(
-			"\x0F\x84\x00\x00\x00\x00\x0F\x28\x4B\x70\xF3\x0F\x10\x25\x00\x00\x00\x00\xF3\x0F\x10\x1D\x00\x00\x00\x00", 
-			"xx????xxxxxxxx????xxxx????");
+				//"\x45\x84\xED"
+				"\x0F\x84\xD0\x01\x00\x00" // <- This one
+				"\x0F\x28\x4B\x70"
+				"\xF3\x0F\x10\x25\x00\x00\x00\x00"
+				"\xF3\x0F\x10\x1D\x00\x00\x00\x00"
+				"\x0F\x28\xC1"
+				"\x0F\x28\xD1",
+				//"xx?"
+				"xx????" // <- This one
+				"xx??"
+				"xxxx????"
+				"xxxx????"
+				"xx?"
+				"xx?");
+		}
 
 		if (address) {
-			uint8_t offset = 0;
-			address = address + offset;
-			byte instrArr[6] = { 0xE9, 0xD1, 0x01, 0x00, 0x00, 0x90 };
-			for (int i = 0; i < 6; i++) {
-				memset(reinterpret_cast<void *>(address + i), instrArr[i], 1);
-			}
+			/*ptrdiff_t offset = 0;
+			address = address + offset;*/
+			byte instrArr[6] = { 0xE9, 0xD1, 0x01, 0x00, 0x00, 0x90 };	// make preliminary instruction: JMP to <adrr>
+
+			memcpy(origSteerInstr, (void*)address, 6);					// save whole orig instruction
+			memcpy(origSteerInstrDest, (void*)(address + 2), 4);		// save the address it writes to
+			memcpy(instrArr + 1, origSteerInstrDest, 4);				// use saved address in new instruction
+			memcpy((void*)address, instrArr, 6);						// patch with new fixed instruction
+
 			return address;
 		}
 		return 0;
 	}
 
-	void RestoreSteering(uintptr_t address) {
-		byte instrArr[6] = { 0x0F, 0x84, 0xD0, 0x01, 0x00, 0x00 };
+	void RestoreSteering(uintptr_t address, byte *origInstr, int origInstrSz) {
+		//byte instrArr[6] = { 0x0F, 0x84, 0xD0, 0x01, 0x00, 0x00 };
+		/*byte instrArr[6] = { 0x0F, 0x84, 0xD0, 0x01, 0x00, 0x00 };
+		for (int i = 0; i < 6; i++) {
+			memset(instrArr + i, origSteerInstr[i], 1);
+		}*/
 		if (address) {
-			for (int i = 0; i < 6; i++) {
+			memcpy((void*)address, origInstr, origInstrSz);
+			/*for (int i = 0; i < 6; i++) {
 				memset(reinterpret_cast<void *>(address + i), instrArr[i], 1);
-			}
+			}*/
 		}
 	}
 }
