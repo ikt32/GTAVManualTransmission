@@ -411,6 +411,9 @@ void showDebugInfo() {
 
 // To expose some variables to other scripts
 void crossScriptComms() {
+	// FiveM "support": Just don't do anything if that version is detected.
+	if (getGameVersion() == VER_1_0_505_2_NOSTEAM) return;
+
 	// Current gear
 	DECORATOR::DECOR_SET_INT(vehicle, "doe_elk", vehData.CurrGear);
 
