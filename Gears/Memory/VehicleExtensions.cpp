@@ -229,6 +229,8 @@ uint8_t VehicleExtensions::GetNumWheels(Vehicle handle) {
 	auto address = GetAddress(handle);
 
 	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0xAA0 : 0xA80);
+	// FiveM should report 1.0.505.2 now :)
+	offset = (gameVersion > G_VER_1_0_463_1_NOSTEAM ? 0xA90 : offset);
 	offset = (gameVersion > G_VER_1_0_757_4_NOSTEAM ? 0xAB0 : offset);
 	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0xAE0 : offset);
 	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0xB10 : offset);
@@ -241,6 +243,8 @@ uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {
 	auto address = GetAddress(handle);
 
 	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0xAA0 : 0xA80);
+	// FiveM should report 1.0.505.2 now :)
+	offset = (gameVersion > G_VER_1_0_463_1_NOSTEAM ? 0xA90 : offset); 
 	offset = (gameVersion > G_VER_1_0_757_4_NOSTEAM ? 0xAB0 : offset);
 	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0xAE0 : offset);
 	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0xB10 : offset);
