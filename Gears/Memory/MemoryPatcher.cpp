@@ -301,6 +301,7 @@ namespace MemoryPatcher {
 
 			memcpy(origSteerInstr, (void*)address, 6);					// save whole orig instruction
 			memcpy(origSteerInstrDest, (void*)(address + 2), 4);		// save the address it writes to
+			origSteerInstrDest[0] += 1;									// Increment first address by 1
 			memcpy(instrArr + 1, origSteerInstrDest, 4);				// use saved address in new instruction
 			memcpy((void*)address, instrArr, 6);						// patch with new fixed instruction
 
