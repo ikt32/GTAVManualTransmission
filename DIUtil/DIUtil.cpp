@@ -10,7 +10,9 @@
 
 #define ESC 0x1B
 #define TAB 0x09
-#define DEVWIDTH 36
+
+static const int devWidth = 36;
+static const int numGears = 8;
 
 HANDLE hConsole;
 CONSOLE_CURSOR_INFO cursorInfo;
@@ -137,7 +139,7 @@ void init() {
 	int totalWidth = 0;
 	for (auto guid : controls.WheelDI.GetGuids()) {
 		//std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
-		totalWidth += DEVWIDTH;//static_cast<int>(wDevName.length()) + 4;
+		totalWidth += devWidth;//static_cast<int>(wDevName.length()) + 4;
 	}
 	
 	if (totalWidth < 80) {
@@ -246,6 +248,7 @@ std::tuple<char, std::string, std::string> isAcceptedAxisChar(char c) {
  *		- Show "AWAITING INPUT"
  * 3. Save result
  * 0. User can exit at any time
+ * 0. Pressing TAB erases the config.
  */
 void configDynamicAxes(char c) {
 	auto axisInfo = isAcceptedAxisChar(c);
@@ -306,6 +309,16 @@ void configDynamicAxes(char c) {
 			if (c == ESC) {
 				return;
 			}
+			if (c == TAB) {
+				settings.SteeringSaveAxis(confTag, -1, "", 0, 0);
+				cls();
+				setCursorPosition(0, csbi.srWindow.Bottom);
+				printf("Cleared axis settings");
+				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+				cls();
+				init();
+				return;
+			}
 		}
 		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
 
@@ -326,7 +339,7 @@ void configDynamicAxes(char c) {
 		setCursorPosition(0, csbi.srWindow.Bottom - 1);
 		printf("Configuring %s, awaiting input...", gameAxis.c_str());
 		setCursorPosition(0, csbi.srWindow.Bottom);
-		std::cout << "ESC: Cancel config";
+		std::cout << "ESC: Cancel config - TAB: Clear setting";
 		std::cout.flush();
 		std::this_thread::yield();
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
@@ -356,6 +369,16 @@ void configDynamicAxes(char c) {
 			cls();
 			char c = _getch();
 			if (c == ESC) {
+				return;
+			}
+			if (c == TAB) {
+				settings.SteeringSaveAxis(confTag, -1, "", 0, 0);
+				cls();
+				setCursorPosition(0, csbi.srWindow.Bottom);
+				printf("Cleared axis settings");
+				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+				cls();
+				init();
 				return;
 			}
 		}
@@ -391,7 +414,7 @@ void configDynamicAxes(char c) {
 		setCursorPosition(0, csbi.srWindow.Bottom - 1);
 		printf("Configuring %s, awaiting input...", gameAxis.c_str());
 		setCursorPosition(0, csbi.srWindow.Bottom);
-		std::cout << "ESC: Cancel config";
+		std::cout << "ESC: Cancel config - TAB: Clear setting";
 		std::cout.flush();
 		std::this_thread::yield();
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
@@ -462,6 +485,16 @@ void configDynamicButtons(char c) {
 			if (c == ESC) {
 				return;
 			}
+			if (c == TAB) {
+				settings.SteeringSaveButton(confTag, -1, -1);
+				cls();
+				setCursorPosition(0, csbi.srWindow.Bottom);
+				printf("Cleared button settings");
+				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+				cls();
+				init();
+				return;
+			}
 		}
 		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
 
@@ -514,7 +547,7 @@ void configDynamicButtons(char c) {
 		setCursorPosition(0, csbi.srWindow.Bottom - 1);
 		printf("Configuring %s", gameButton.c_str());
 		setCursorPosition(0, csbi.srWindow.Bottom);
-		std::cout << "ESC: Cancel config - ENTER: Confirm selection";
+		std::cout << "ESC: Cancel config - TAB: Clear button";
 		std::cout.flush();
 		std::this_thread::yield();
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
@@ -552,7 +585,7 @@ void configHShift(char c) {
 
 	int buttonsActive = 0;
 	GUID devGUID = {};
-	std::array<int, 8> buttonArray; // There are gears 1-7 + R
+	std::array<int, numGears> buttonArray; // There are gears 1-7 + R
 	std::fill(buttonArray.begin(), buttonArray.end(), -1);
 	std::string devName;
 	std::wstring wDevName;
@@ -565,6 +598,17 @@ void configHShift(char c) {
 			cls();
 			char c = _getch();
 			if (c == ESC) {
+				return;
+			}
+			if (c == TAB) {
+				int empty[numGears] = {};
+				settings.SteeringSaveHShifter(confTag, -1, empty);
+				cls();
+				setCursorPosition(0, csbi.srWindow.Bottom);
+				printf("Cleared H-shifter settings");
+				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+				cls();
+				init();
 				return;
 			}
 			if (progress == 0) { // Device selection
@@ -583,7 +627,7 @@ void configHShift(char c) {
 				}
 				continue;
 			}
-			if (progress >= 1 && progress <= 8) { // Gear config (8 is for reverse)
+			if (progress >= 1 && progress <= numGears) { // Gear config (8 is for reverse)
 				// Gear reverse goes in [0] btw way
 				if (c == 0x0D) { // RETURN
 					if (buttonsActive > 1) {
@@ -689,7 +733,7 @@ void configHShift(char c) {
 		setCursorPosition(0, csbi.srWindow.Bottom - 1);
 		printf("Configuring %s", gameButton.c_str());
 		setCursorPosition(0, csbi.srWindow.Bottom);
-		std::cout << "ESC: Cancel config - ENTER: Confirm selection";
+		std::cout << "ESC: Cancel config - ENTER: Confirm selection - TAB: Clear H-shifter";
 		std::cout.flush();
 		std::this_thread::yield();
 		std::this_thread::sleep_for(std::chrono::milliseconds(16));
@@ -754,14 +798,14 @@ int main()
 			}
 
 			int pRow = 0;
-			int xCursorPos = DEVWIDTH * guidIt;
+			int xCursorPos = devWidth * guidIt;
 			setCursorPosition(xCursorPos, pRow);
 			pRow++;
 			std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
 			std::string devName = std::string(wDevName.begin(), wDevName.end());
-			if (devName.length() > DEVWIDTH) {
-				devName.replace(DEVWIDTH - 4, 3, "...");
-				devName[DEVWIDTH - 1] = '\0';
+			if (devName.length() > devWidth) {
+				devName.replace(devWidth - 4, 3, "...");
+				devName[devWidth - 1] = '\0';
 			}
 			printf("%s", devName.c_str());
 			setCursorPosition(xCursorPos, pRow);
@@ -769,7 +813,7 @@ int main()
 			std::cout << "Axes: ";
 
 			for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
-				blankBlock(xCursorPos, pRow, 1, DEVWIDTH);
+				blankBlock(xCursorPos, pRow, 1, devWidth);
 				setCursorPosition(xCursorPos, pRow);
 				printf("    %s: %d",
 					   controls.WheelDI.DIAxisHelper[i].c_str(),
@@ -781,7 +825,7 @@ int main()
 			pRow++;
 
 			std::cout << "Buttons: ";
-			blankBlock(xCursorPos, pRow, 1, DEVWIDTH);
+			blankBlock(xCursorPos, pRow, 1, devWidth);
 			setCursorPosition(xCursorPos, pRow);
 			for (int i = 0; i < 255; i++) {
 				if (controls.WheelDI.IsButtonPressed(i, guid)) {
@@ -798,7 +842,7 @@ int main()
 			std::cout << "POV hat: ";
 
 			std::string directionsStr;
-			blankBlock(xCursorPos, pRow, 1, DEVWIDTH);
+			blankBlock(xCursorPos, pRow, 1, devWidth);
 			setCursorPosition(xCursorPos, pRow);
 			for (auto d : directions) {
 				if (d == WheelDirectInput::N ) directionsStr = "N ";
