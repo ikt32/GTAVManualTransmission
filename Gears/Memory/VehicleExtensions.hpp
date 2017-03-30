@@ -28,6 +28,7 @@ public:
 	void SetThrottleP(Vehicle handle, float value);
 	float GetBrakeP(Vehicle handle);
 	void SetBrakeP(Vehicle handle, float value);
+	bool GetHandbrake(Vehicle handle);
 	float GetFuelLevel(Vehicle handle);
 	void SetFuelLevel(Vehicle handle, float value);
 	uint8_t GetNumWheels(Vehicle handle);

@@ -205,6 +205,16 @@ void VehicleExtensions::SetBrakeP(Vehicle handle, float value) {
 	*reinterpret_cast<float *>(address + offset) = value;
 }
 
+bool VehicleExtensions::GetHandbrake(Vehicle handle) {
+	auto address = GetAddress(handle);
+
+	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x8BC : 0x8AC);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x8DC : offset);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x904 : offset);
+
+	return *reinterpret_cast<bool *>(address + offset);
+}
+
 float VehicleExtensions::GetFuelLevel(Vehicle handle) {
 	auto address = GetAddress(handle);
 
