@@ -120,6 +120,26 @@ struct Color {
 // Natives called
 void showText(float x, float y, float scale, const char* text);
 void showText(float x, float y, float scale, const char* text, Color rgba);
-int showNotification(char* message, int prevNotification);
+void showText(float x, float y, float scale, const char* text, int font, Color rgba);
+void showNotification(const char* message, int *prevNotification);
 
+//http://stackoverflow.com/questions/36789380/how-to-store-a-const-char-to-a-char
+class CharAdapter
+{
+public:
+	CharAdapter(const char* s) : m_s(::_strdup(s)) { }
+	CharAdapter(const CharAdapter& other) = delete; // non construction-copyable
+	CharAdapter& operator=(const CharAdapter&) = delete; // non copyable
+	
+	~CharAdapter() /*free memory on destruction*/
+	{
+		::free(m_s); /*use free to release strdup memory*/
+	}
+	operator char*() /*implicit cast to char* */
+	{
+		return m_s;
+	}
 
+private:
+	char* m_s;
+};

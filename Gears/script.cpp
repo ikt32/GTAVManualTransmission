@@ -224,7 +224,7 @@ void update() {
 				showText(settings.UITips_X,
 						 settings.UITips_Y,
 						 settings.UITips_Size,
-						 const_cast<char *>(std::to_string(vehData.CurrGear).c_str()));
+						 CharAdapter(std::to_string(vehData.CurrGear).c_str()));
 			} else {
 				Color c;
 				c.R = settings.UITips_TopGearC_R;
@@ -234,7 +234,7 @@ void update() {
 				showText(settings.UITips_X,
 						 settings.UITips_Y,
 						 settings.UITips_Size,
-						 const_cast<char *>(std::to_string(vehData.CurrGear).c_str()),
+						 CharAdapter(std::to_string(vehData.CurrGear).c_str()),
 						 c);
 			}
 			
@@ -267,6 +267,10 @@ void update() {
 			if (vehData.Pitch > 10.0f || controls.ClutchVal)
 				ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
 					vehicle, 1, 0.0f, -1 * (vehData.Pitch / 90.0f) * 0.35f, 0.0f, true, true, true, true);
+		}
+		if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) &&
+			(vehData.SimulatedNeutral ||
+			controls.ClutchVal > settings.ClutchCatchpoint)) {
 		}
 	}
 
@@ -449,7 +453,7 @@ void crossScriptComms() {
 //                           Mod functions: Mod control
 ///////////////////////////////////////////////////////////////////////////////
 
-void reInit() {
+void	reInit() {
 	settings.Read(&controls);
 	logger.Write("Settings read");
 	vehData.LockGears = 0x00010001;
@@ -483,8 +487,8 @@ void toggleManual() {
 	std::stringstream message;
 	message << "Manual Transmission " <<
 	           (settings.EnableManual ? "Enabled" : "Disabled");
-	prevNotification = showNotification(const_cast<char *>(message.str().c_str()), prevNotification);
-	logger.Write(const_cast<char *>(message.str().c_str()));
+	showNotification(CharAdapter(message.str().c_str()), &prevNotification);
+	logger.Write(message.str());
 	if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
 		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
@@ -501,20 +505,20 @@ void updateLastInputDevice() {
 		// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 		switch (controls.PrevInput) {
 			case ScriptControls::Keyboard:
-				prevNotification = showNotification("Switched to keyboard/mouse", prevNotification);
+				showNotification("Switched to keyboard/mouse", &prevNotification);
 				break;
 			case ScriptControls::Controller: // Controller
 				if (settings.ShiftMode == HPattern) {
-					prevNotification = showNotification("Switched to controller\nSequential re-initiated", prevNotification);
+					showNotification("Switched to controller\nSequential re-initiated", &prevNotification);
 					settings.ShiftMode = Sequential;
 					settings.Save();
 				}
 				else {
-					prevNotification = showNotification("Switched to controller", prevNotification);
+					showNotification("Switched to controller", &prevNotification);
 				}
 				break;
 			case ScriptControls::Wheel:
-				prevNotification = showNotification("Switched to wheel", prevNotification);
+				showNotification("Switched to wheel", &prevNotification);
 				break;
 		}
 		if (controls.PrevInput != ScriptControls::Wheel && settings.LogiLEDs) {
@@ -563,7 +567,7 @@ void setShiftMode(int shiftMode) {
 			break;
 	}
 	message << "Mode: " << mode;
-	prevNotification = showNotification(const_cast<char *>(message.str().c_str()), prevNotification);
+	showNotification(CharAdapter(message.str().c_str()), &prevNotification);
 }
 
 void cycleShiftMode() {
