@@ -65,6 +65,9 @@ public:
 	bool LockTruck = false;
 	bool SimulatedNeutral = false;
 
+	// just hardcode 20 gears because we only have 8 (0 thru 7) and if R* is changing
+	// so much stuff that this breaks, other shit breaks too so this can be changed too
+	// no need to overcomplicate stuff........................ i guess.
 	std::vector<float> LockSpeeds = std::vector<float>(20);
 	float Pitch = 0;
 

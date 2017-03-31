@@ -591,7 +591,11 @@ void shiftTo(int gear, bool autoClutch) {
 	if (vehData.IsTruck && vehData.Rpm < 0.9) {
 		return;
 	}
-	vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
+	// for engine braking, but we're not doing anything if that isn't enabled
+	// Only increase the limiter speed
+	if (vehData.Velocity > vehData.LockSpeeds[vehData.CurrGear]) {
+		vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
+	}
 }
 
 void functionHShiftTo(int i) {
@@ -863,19 +867,12 @@ void functionEngDamage() {
 }
 
 void functionEngBrake() {
-	// Save speed @ shift
-	if (vehData.CurrGear < vehData.NextGear) {
-		if (vehData.PrevGear <= vehData.CurrGear ||
-			vehData.Velocity <= vehData.LockSpeed ||
-			vehData.LockSpeed < 0.01f) {
-			vehData.LockSpeed = vehData.Velocity;
-		}
-	}
 	// Braking
-	if (vehData.CurrGear > 0 &&
-		vehData.Velocity > vehData.LockSpeeds[vehData.CurrGear] &&
-		controls.ThrottleVal < 0.1 && vehData.Rpm > 0.80) {
-		float brakeForce = -0.20f * (1.0f - controls.ClutchVal) * vehData.Rpm;
+	if (vehData.LockSpeeds[vehData.CurrGear] > 1.0f &&
+		vehData.CurrGear != 0 && vehData.CurrGear != vehData.TopGear &&
+		vehData.Velocity > vehData.LockSpeeds[vehData.CurrGear]+2.0f &&
+		vehData.Rpm >= 1.00) {
+		float brakeForce = -0.20f * (1.0f - controls.ClutchVal);
 		ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, brakeForce, 0.0f, true, true, true, true);
 	}
 }
@@ -971,6 +968,15 @@ void handleRPM() {
 }
 
 void functionTruckLimiting() {
+	// Save speed @ shift
+	if (vehData.CurrGear < vehData.NextGear) {
+		if (vehData.PrevGear <= vehData.CurrGear ||
+			vehData.Velocity <= vehData.LockSpeed ||
+			vehData.LockSpeed < 0.01f) {
+			vehData.LockSpeed = vehData.Velocity;
+		}
+	}
+
 	// Update speed
 	if (vehData.CurrGear < vehData.NextGear) {
 		vehData.LockSpeed = vehData.Velocity;

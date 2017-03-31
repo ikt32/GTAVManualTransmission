@@ -31,6 +31,7 @@ void VehicleData::Clear() {
 	prevVelocities.z = 0;
 	WheelCompressions.clear();
 	prevCompressions.clear();
+	std::fill(LockSpeeds.begin(), LockSpeeds.end(), 0.0f);
 	zeroSamples();
 }
 
