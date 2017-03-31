@@ -12,7 +12,7 @@ class ScriptControls;
 
 class ScriptSettings {
 public:
-	ScriptSettings(std::string general, std::string wheel, Logger &logger);
+	ScriptSettings(const std::string &general, const std::string &wheel, Logger &logger);
 	void parseSettingsGeneral(ScriptControls *scriptControl);
 	void Read(ScriptControls* scriptControl);
 	void Save() const;
@@ -92,10 +92,10 @@ public:
 	 *  otherwise appends GUID and returns new device index
 	 */
 	ptrdiff_t SteeringAppendDevice(const GUID & dev_guid, std::string dev_name);
-	void SteeringSaveAxis(std::string confTag, ptrdiff_t index, std::string axis, int minVal, int maxVal);
-	void SteeringSaveFFBAxis(std::string confTag, ptrdiff_t index, std::string axis);
-	void SteeringSaveButton(std::string confTag, ptrdiff_t index, int button);
-	void SteeringSaveHShifter(std::string confTag, ptrdiff_t index, int button[8]);
+	void SteeringSaveAxis(const std::string &confTag, ptrdiff_t index, const std::string &axis, int minVal, int maxVal);
+	void SteeringSaveFFBAxis(const std::string &confTag, ptrdiff_t index, const std::string &axis);
+	void SteeringSaveButton(const std::string &confTag, ptrdiff_t index, int button);
+	void SteeringSaveHShifter(const std::string &confTag, ptrdiff_t index, int button[]);
 private:
 	int settings_general_version = 0;
 	int settings_wheel_version = 0;

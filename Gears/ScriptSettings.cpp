@@ -12,8 +12,8 @@
 //	// Defaults
 //}
 
-ScriptSettings::ScriptSettings(std::string general,
-	                           std::string wheel,
+ScriptSettings::ScriptSettings(const std::string &general,
+	                           const std::string &wheel,
 	                           Logger &logger) : logger(logger),
                                                  nDevices(0),
                                                  settingsGeneralFile(general),
@@ -421,7 +421,7 @@ ptrdiff_t ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, std::string
 		logger.Write("Unable to save file");
 	return newIndex;
 }
-void ScriptSettings::SteeringSaveAxis(std::string confTag, ptrdiff_t index, std::string axis, int minVal, int maxVal) {
+void ScriptSettings::SteeringSaveAxis(const std::string &confTag, ptrdiff_t index, const std::string & axis, int minVal, int maxVal) {
 	CSimpleIniA settingsWheel;
 	settingsWheel.SetUnicode();
 	settingsWheel.LoadFile(settingsWheelFile.c_str());
@@ -434,7 +434,7 @@ void ScriptSettings::SteeringSaveAxis(std::string confTag, ptrdiff_t index, std:
 		logger.Write("Unable to save file");
 }
 
-void ScriptSettings::SteeringSaveFFBAxis(std::string confTag, ptrdiff_t index, std::string axis) {
+void ScriptSettings::SteeringSaveFFBAxis(const std::string & confTag, ptrdiff_t index, const std::string & axis) {
 	CSimpleIniA settingsWheel;
 	settingsWheel.SetUnicode();
 	settingsWheel.LoadFile(settingsWheelFile.c_str());
@@ -445,7 +445,7 @@ void ScriptSettings::SteeringSaveFFBAxis(std::string confTag, ptrdiff_t index, s
 		logger.Write("Unable to save file");
 }
 
-void ScriptSettings::SteeringSaveButton(std::string confTag, ptrdiff_t index, int button) {
+void ScriptSettings::SteeringSaveButton(const std::string & confTag, ptrdiff_t index, int button) {
 	CSimpleIniA settingsWheel;
 	settingsWheel.SetUnicode();
 	settingsWheel.LoadFile(settingsWheelFile.c_str());
@@ -456,7 +456,7 @@ void ScriptSettings::SteeringSaveButton(std::string confTag, ptrdiff_t index, in
 		logger.Write("Unable to save file");
 }
 
-void ScriptSettings::SteeringSaveHShifter(std::string confTag, ptrdiff_t index, int button[8]) {
+void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t index, int button[8]) {
 	CSimpleIniA settingsWheel;
 	settingsWheel.SetUnicode();
 	settingsWheel.LoadFile(settingsWheelFile.c_str());

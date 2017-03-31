@@ -217,7 +217,7 @@ bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> sta
 	return false;
 }
 
-void saveAxis(std::string gameAxis, std::string confTag, std::tuple<GUID, std::string> selectedDevice, int min, int max) {
+void saveAxis(const std::string &gameAxis, const std::string &confTag, std::tuple<GUID, std::string> selectedDevice, int min, int max) {
 	std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
 	std::string devName = std::string(wDevName.begin(), wDevName.end());
 	auto index = settings.SteeringAppendDevice(std::get<0>(selectedDevice), devName);

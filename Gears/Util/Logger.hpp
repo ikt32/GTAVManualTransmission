@@ -9,7 +9,7 @@
 
 class Logger {
 public:
-	Logger(std::string fileName);
+	Logger(const std::string &fileName);
 	void Clear() const;
 	void Write(const std::string& text) const;
 

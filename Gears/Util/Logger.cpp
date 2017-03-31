@@ -4,7 +4,7 @@
 
 #include "Logger.hpp"
 
-Logger::Logger(std::string fileName) : file(fileName) {
+Logger::Logger(const std::string &fileName) : file(fileName) {
 }
 
 void Logger::Clear() const {

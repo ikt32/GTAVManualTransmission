@@ -4,6 +4,8 @@
 #include "keyboard.h"
 
 ScriptControls::ScriptControls(Logger &logger): WheelDI(logger),
+                                                PrevInput(Keyboard),
+                                                SteerAxisType(WheelAxisType::Steer),
                                                 controller{1},
                                                 buttonState(0),
                                                 logger(logger) { }
