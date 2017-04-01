@@ -258,19 +258,17 @@ void update() {
 	// Hill-start effect, gravity and stuff
 	// Courtesy of XMOD
 	if (settings.HillBrakeWorkaround) {
-		if (vehData.CurrGear > 0 && controls.ThrottleVal < 0.2 && !controls.BrakeVal && vehData.Speed < 2.0f &&
+		if (!controls.BrakeVal 
+			&& vehData.Speed < 2.0f &&
 			VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle))	{
-			if (vehData.Pitch < 0 || controls.ClutchVal)
+			float clutchNeutral = vehData.SimulatedNeutral ? 1.0 : controls.ClutchVal;
+			if (vehData.Pitch < 0 || controls.ClutchVal) {
 				ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
-					vehicle, 1, 0.0f, -1 * (vehData.Pitch / 150.0f) * 1.1f, 0.0f, true, true, true, true);
-
+					vehicle, 1, 0.0f, -1 * (vehData.Pitch / 150.0f) * 1.1f * clutchNeutral, 0.0f, true, true, true, true);
+			}
 			if (vehData.Pitch > 10.0f || controls.ClutchVal)
 				ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
-					vehicle, 1, 0.0f, -1 * (vehData.Pitch / 90.0f) * 0.35f, 0.0f, true, true, true, true);
-		}
-		if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) &&
-			(vehData.SimulatedNeutral ||
-			controls.ClutchVal > settings.ClutchCatchpoint)) {
+					vehicle, 1, 0.0f, -1 * (vehData.Pitch / 90.0f) * 0.35f * clutchNeutral, 0.0f, true, true, true, true);
 		}
 	}
 
