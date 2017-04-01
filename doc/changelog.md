@@ -4,9 +4,14 @@
 No configuration changes
 
 Changes:
+* Rename DIUtil to WheelConfigurator
+* Adjust engine braking to be more reliable
+* Adjust hill start effect so it's not affected by throttle position
+* Fix a few reversing brake/throttle swap issues so it's more consistent now
 * Fix getWheelCompressions for FiveM
 * Fix steering corrections patching for FiveM
 * Ignore CrossScript for FiveM
+* Minor internal code optimizations
 
 ## 4.2.0 - beta 2
 No configuration changes
