@@ -1005,6 +1005,7 @@ void functionRealReverse() {
 		// LT behavior when stopped: Just brake
 		if (controls.BrakeVal > 0.01f && controls.ThrottleVal < controls.BrakeVal &&
 		    vehData.Velocity < 0.5f && vehData.Velocity >= -0.5f) { // < 0.5 so reverse never triggers
+			//showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Stop");
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			ext.SetThrottleP(vehicle, 0.1f);
 			ext.SetBrakeP(vehicle, 1.0f);
@@ -1013,6 +1014,7 @@ void functionRealReverse() {
 		// LT behavior when rolling back: Brake
 		if (controls.BrakeVal > 0.01f && controls.ThrottleVal < controls.BrakeVal &&
 		    vehData.Velocity < -0.5f) {
+			//showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Rollback");
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.BrakeVal);
@@ -1023,6 +1025,8 @@ void functionRealReverse() {
 		// RT behavior when rolling back: Burnout
 		if (vehData.CurrGear == 1 &&
 			controls.ThrottleVal > 0.5f && vehData.Velocity < -1.0f) {
+			//showText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Rollback");
+
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, controls.ThrottleVal);
 			if (controls.BrakeVal < 0.1f) {
 				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
@@ -1035,22 +1039,52 @@ void functionRealReverse() {
 		// Enables reverse lights
 		ext.SetThrottleP(vehicle, -0.1f);
 		// RT behavior
+		int throttleAndSomeBrake = 0;
 		if (controls.ThrottleVal > 0.01f && controls.ThrottleVal > controls.BrakeVal) {
+			throttleAndSomeBrake++;
+			//showText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Active Reverse");
+			
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, controls.ThrottleVal);
-		}
-		// LT behavior when still
-		if (controls.BrakeVal > 0.01f && controls.ThrottleVal <= controls.BrakeVal &&
-		    vehData.Velocity > -0.5f && vehData.Velocity <= 0.1f) {
-			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
-			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-			ext.SetBrakeP(vehicle, 1.0f);
 		}
 		// LT behavior when reversing
 		if (controls.BrakeVal > 0.01f &&
 			vehData.Velocity <= -0.5f) {
+			throttleAndSomeBrake++;
+			//showText(0.3, 0.35, 0.5, "functionRealReverse: Brake @ Reverse");
+
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.BrakeVal);
+		}
+		// Throttle > brake  && BrakeVal > 0.1f
+		if (throttleAndSomeBrake >= 2) {
+			//showText(0.3, 0.4, 0.5, "functionRealReverse: Weird combo + rev it");
+
+			CONTROLS::ENABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.BrakeVal);
+			fakeRev();
+		}
+
+		// LT behavior when forward
+		if (controls.BrakeVal > 0.01f && controls.ThrottleVal <= controls.BrakeVal &&
+			vehData.Velocity > 0.1f) {
+			//showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Rollforwrd");
+
+			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, controls.BrakeVal);
+
+			//CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
+			ext.SetBrakeP(vehicle, 1.0f);
+		}
+
+		// LT behavior when still
+		if (controls.BrakeVal > 0.01f && controls.ThrottleVal <= controls.BrakeVal &&
+		    vehData.Velocity > -0.5f && vehData.Velocity <= 0.1f) {
+			//showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Stopped");
+
+			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
+			ext.SetBrakeP(vehicle, 1.0f);
 		}
 	}
 }
@@ -1068,17 +1102,18 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 		}
 	}
 
-	if (vehData.CurrGear == 0) {
-		// Throttle Pedal Reverse
-		if (wheelThrottleVal > 0.01f && wheelThrottleVal > wheelBrakeVal) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelThrottleVal);
-		}
-		// Brake Pedal Reverse
-		if (wheelBrakeVal > 0.01f &&
-			vehData.Velocity <= -0.5f) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelBrakeVal);
-		}
-	}
+	// why did this even exist?
+	//if (vehData.CurrGear == 0) {
+	//	// Throttle Pedal Reverse
+	//	if (wheelThrottleVal > 0.01f && wheelThrottleVal > wheelBrakeVal) {
+	//		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelThrottleVal);
+	//	}
+	//	// Brake Pedal Reverse
+	//	if (wheelBrakeVal > 0.01f &&
+	//		vehData.Velocity <= -0.5f) {
+	//		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelBrakeVal);
+	//	}
+	//}
 }
 
 // Pedals behave like RT/LT
