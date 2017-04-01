@@ -1004,7 +1004,7 @@ void functionRealReverse() {
 	if (vehData.CurrGear > 0) {
 		// LT behavior when stopped: Just brake
 		if (controls.BrakeVal > 0.01f && controls.ThrottleVal < controls.BrakeVal &&
-		    vehData.Velocity < 0.5f && vehData.Velocity >= -0.1f) { // < 0.5 so reverse never triggers
+		    vehData.Velocity < 0.5f && vehData.Velocity >= -0.5f) { // < 0.5 so reverse never triggers
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			ext.SetThrottleP(vehicle, 0.1f);
 			ext.SetBrakeP(vehicle, 1.0f);
@@ -1012,7 +1012,7 @@ void functionRealReverse() {
 		}
 		// LT behavior when rolling back: Brake
 		if (controls.BrakeVal > 0.01f && controls.ThrottleVal < controls.BrakeVal &&
-		    vehData.Velocity < -0.1f) {
+		    vehData.Velocity < -0.5f) {
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.BrakeVal);
@@ -1032,6 +1032,7 @@ void functionRealReverse() {
 	// Reverse gear
 	// Desired: RT reverses, LT brakes
 	if (vehData.CurrGear == 0) {
+		// Enables reverse lights
 		ext.SetThrottleP(vehicle, -0.1f);
 		// RT behavior
 		if (controls.ThrottleVal > 0.01f && controls.ThrottleVal > controls.BrakeVal) {
