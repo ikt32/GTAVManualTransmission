@@ -15,6 +15,7 @@ ipch/
 *.sdf
 *.suo
 *.db
+.vs/
 
 # Temporary OS files
 .DS_Store
