@@ -1,7 +1,6 @@
 #pragma once
 #include <Windows.h>
-#define CORRECTVGENERAL "420R"
-#define CORRECTVWHEEL	"420"
+
 #include <string>
 #include <vector>
 #include "Util/Logger.hpp"
@@ -11,13 +10,17 @@
 class Logger;
 class ScriptControls;
 
+const std::string CORRECTVGENERAL	= "420R";
+const std::string CORRECTVWHEEL		= "420";
+
 class ScriptSettings {
 public:
 	ScriptSettings(const std::string &general, const std::string &wheel, Logger &logger);
 	void parseSettingsGeneral(ScriptControls *scriptControl);
 	void Read(ScriptControls* scriptControl);
 	void Save() const;
-	void IsCorrectVersion() const;
+	bool IsCorrectVersion() const;
+	std::string GetVersionError();
 
 	// Only use this AFTER wheel settings are read.
 	std::vector<GUID> GetGuids();

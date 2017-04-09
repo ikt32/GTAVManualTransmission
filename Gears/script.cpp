@@ -104,17 +104,14 @@ void update() {
 		showDebugInfo();
 	}
 
-	try {
-		settings.IsCorrectVersion();
-	}
-	catch (std::runtime_error ex) {
+	if (!settings.IsCorrectVersion()) {
 		Color red;
 		red.R = 255;
 		red.G = 0;
 		red.B = 0;
 		red.A = 255;
 
-		showText(0.05, 0.05, 1.0, ex.what(), red);
+		showText(0.05, 0.05, 1.0, CharAdapter(settings.GetVersionError().c_str()), red);
 	}
 
 	///////////////////////////////////////////////////////////////////////////

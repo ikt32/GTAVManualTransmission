@@ -29,13 +29,20 @@ void ScriptSettings::Save() const {
 	ini.SaveFile(settingsGeneralFile.c_str());
 }
 
-void ScriptSettings::IsCorrectVersion() const {
+bool ScriptSettings::IsCorrectVersion() const {
+	if (settings_general_version != CORRECTVGENERAL || settings_wheel_version != CORRECTVWHEEL)
+		return false;
+	return true;
+}
+
+std::string ScriptSettings::GetVersionError() {
 	if (settings_general_version != CORRECTVGENERAL && settings_wheel_version != CORRECTVWHEEL)
-		throw std::runtime_error("Wrong settings_general.ini and \nsettings_wheel.ini version");
+		return std::string("Wrong settings_general.ini version\nWrong settings_wheel.ini version");
 	if (settings_general_version != CORRECTVGENERAL)
-		throw std::runtime_error("Wrong settings_general.ini version");
+		return std::string("Wrong settings_general.ini version");
 	if (settings_wheel_version != CORRECTVWHEEL)
-		throw std::runtime_error("Wrong settings_wheel.ini version");
+		return std::string("Wrong settings_wheel.ini version");
+	return "";
 }
 
 std::vector<GUID> ScriptSettings::GetGuids() {
@@ -78,14 +85,14 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	HUD = settingsGeneral.GetBoolValue			("HUD", "EnableHUD", true);
 	GearXpos = settingsGeneral.GetDoubleValue	("HUD", "GearXpos", 0.95);
 	GearYpos = settingsGeneral.GetDoubleValue	("HUD", "GearYpos", 0.95);
-	GearSize = settingsGeneral.GetDoubleValue	("HUD", "GearSize", 0.15);
+	GearSize = settingsGeneral.GetDoubleValue	("HUD", "GearSize", 1.50);
 	GearTopColorR = settingsGeneral.GetLongValue("HUD", "GearTopColorR", 255);
 	GearTopColorG = settingsGeneral.GetLongValue("HUD", "GearTopColorG", 0);
 	GearTopColorB = settingsGeneral.GetLongValue("HUD", "GearTopColorB", 0);
 
 	ShiftModeXpos = settingsGeneral.GetDoubleValue("HUD", "ShiftModeXpos", 0.925);
 	ShiftModeYpos = settingsGeneral.GetDoubleValue("HUD", "ShiftModeYpos", 0.90);
-	ShiftModeSize = settingsGeneral.GetDoubleValue("HUD", "ShiftModeSize", 0.15);
+	ShiftModeSize = settingsGeneral.GetDoubleValue("HUD", "ShiftModeSize", 1.50);
 
 
 	// [CONTROLLER]
@@ -136,7 +143,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	Debug = settingsGeneral.GetBoolValue("DEBUG", "Info", false);
 
 	// [FILEVERSION]
-	settings_general_version = settingsGeneral.GetLongValue("FILEVERSION", "VERSION", 0);
+	settings_general_version = settingsGeneral.GetValue("FILEVERSION", "VERSION", "000");
 #pragma warning(pop)
 
 }
@@ -391,7 +398,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	}
 
 	// [FILEVERSION]
-	settings_wheel_version = settingsWheel.GetLongValue("FILEVERSION", "VERSION", 0);
+	settings_wheel_version = settingsWheel.GetValue("FILEVERSION", "VERSION", "000");
 #pragma warning(pop)
 
 }
