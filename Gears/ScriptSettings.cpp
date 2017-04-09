@@ -94,6 +94,11 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	ShiftModeYpos = settingsGeneral.GetDoubleValue("HUD", "ShiftModeYpos", 0.90);
 	ShiftModeSize = settingsGeneral.GetDoubleValue("HUD", "ShiftModeSize", 1.50);
 
+	Speedo = settingsGeneral.GetValue("HUD", "Speedo", "kph");
+	SpeedoXpos = settingsGeneral.GetDoubleValue("HUD", "SpeedoXpos", 0.90);
+	SpeedoYpos = settingsGeneral.GetDoubleValue("HUD", "SpeedoYpos", 0.85);
+	SpeedoSize = settingsGeneral.GetDoubleValue("HUD", "SpeedoSize", 1.00);
+
 	RPMIndicator = settingsGeneral.GetBoolValue("HUD", "EnableRPMIndicator", true);
 	RPMIndicatorXpos = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorXpos", 0.475);
 	RPMIndicatorYpos = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorYpos", 0.950);

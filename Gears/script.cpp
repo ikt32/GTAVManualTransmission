@@ -323,6 +323,70 @@ void drawRPMIndicator(float x, float y, float width, float height, Color fg, Col
 }
 
 void showHUD() {
+
+	// Gear number indication
+	if (vehData.SimulatedNeutral) {
+		showText(settings.GearXpos, settings.GearYpos, settings.GearSize, "N");
+	}
+	else if (vehData.CurrGear == 0) {
+		showText(settings.GearXpos, settings.GearYpos, settings.GearSize, "R");
+	}
+	else {
+		char * gear = CharAdapter(std::to_string(vehData.CurrGear).c_str());
+		Color c;
+		if (vehData.CurrGear == vehData.TopGear) {
+			c.R = settings.GearTopColorR;
+			c.G = settings.GearTopColorG;
+			c.B = settings.GearTopColorB;
+			c.A = 255;
+		}
+		else {
+			c.R = 255;
+			c.G = 255;
+			c.B = 255;
+			c.A = 255;
+		}
+		showText(settings.GearXpos, settings.GearYpos, settings.GearSize, gear, c);
+	}
+
+	// Shift mode indicator
+	char * shiftModeText;
+	switch (settings.ShiftMode) {
+	case Sequential: shiftModeText = "S";
+		break;
+	case HPattern: shiftModeText = "H";
+		break;
+	case Automatic: shiftModeText = "A";
+		break;
+	default: shiftModeText = "";
+		break;
+	}
+	showText(settings.ShiftModeXpos, settings.ShiftModeYpos, settings.ShiftModeSize, shiftModeText);
+
+	// Speedometer using dashboard speed
+	if (settings.Speedo == "kph" ||
+		settings.Speedo == "mph" ||
+		settings.Speedo == "ms") {
+		char * speedoText = "";
+		std::stringstream speedoFormat;
+
+		float dashms = ext.GetDashSpeed(vehicle);
+
+		if (settings.Speedo == "kph" ) {
+			speedoFormat << static_cast<int>(std::round(dashms * 3.6f));
+			speedoText = CharAdapter(speedoFormat.str().c_str());
+		}
+		if (settings.Speedo == "mph" ) {
+			speedoFormat << static_cast<int>(std::round(dashms / 0.44704f));
+			speedoText = CharAdapter(speedoFormat.str().c_str());
+		}
+		if (settings.Speedo == "ms") {
+			speedoFormat << static_cast<int>(std::round(dashms));
+			speedoText = CharAdapter(speedoFormat.str().c_str());
+		}
+		showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize, speedoText);
+	}
+
 	// RPM Indicator!
 	if (settings.RPMIndicator) {
 		Color background = {
@@ -351,52 +415,14 @@ void showHUD() {
 			rpmcolor = redline;
 
 		drawRPMIndicator(
-			settings.RPMIndicatorXpos, 
-			settings.RPMIndicatorYpos, 
-			settings.RPMIndicatorSize*0.25f, 
-			settings.RPMIndicatorSize*0.05f, 
-			rpmcolor, 
+			settings.RPMIndicatorXpos,
+			settings.RPMIndicatorYpos,
+			settings.RPMIndicatorSize*0.25f,
+			settings.RPMIndicatorSize*0.05f,
+			rpmcolor,
 			background,
 			vehData.Rpm
 		);
-	}
-
-	// Shift mode indicator
-	char * shiftModeText;
-	switch (settings.ShiftMode) {
-	case Sequential: shiftModeText = "S";
-		break;
-	case HPattern: shiftModeText = "H";
-		break;
-	case Automatic: shiftModeText = "A";
-		break;
-	}
-	showText(settings.ShiftModeXpos, settings.ShiftModeYpos, settings.ShiftModeSize, shiftModeText);
-
-
-	// Gear number indication
-	if (vehData.SimulatedNeutral) {
-		showText(settings.GearXpos, settings.GearYpos, settings.GearSize, "N");
-	}
-	else if (vehData.CurrGear == 0) {
-		showText(settings.GearXpos, settings.GearYpos, settings.GearSize, "R");
-	}
-	else {
-		char * gear = CharAdapter(std::to_string(vehData.CurrGear).c_str());
-		Color c;
-		if (vehData.CurrGear == vehData.TopGear) {
-			c.R = settings.GearTopColorR;
-			c.G = settings.GearTopColorG;
-			c.B = settings.GearTopColorB;
-			c.A = 255;
-		}
-		else {
-			c.R = 255;
-			c.G = 255;
-			c.B = 255;
-			c.A = 255;
-		}
-		showText(settings.GearXpos, settings.GearYpos, settings.GearSize, gear, c);
 	}
 }
 

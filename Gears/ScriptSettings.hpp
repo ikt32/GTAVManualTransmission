@@ -61,8 +61,12 @@ public:
 	float ShiftModeYpos = 0.95f;
 	float ShiftModeSize = 1.0f;
 
-	bool RPMIndicator;
+	std::string Speedo;
+	double SpeedoSize;
+	double SpeedoYpos;
+	double SpeedoXpos;
 
+	bool RPMIndicator;
 	float RPMIndicatorXpos;
 	float RPMIndicatorYpos;
 	float RPMIndicatorSize;
@@ -112,7 +116,6 @@ public:
 	float SteerAngleCar = 720.0f;
 	float SteerAngleBike = 180.0f;
 	float SteerAngleAlt = 180.0f;
-
 
 	// Methods
 	/*
