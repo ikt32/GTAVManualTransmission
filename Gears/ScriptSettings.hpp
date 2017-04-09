@@ -62,9 +62,9 @@ public:
 	float ShiftModeSize = 1.0f;
 
 	std::string Speedo;
-	double SpeedoSize;
-	double SpeedoYpos;
-	double SpeedoXpos;
+	float SpeedoSize;
+	float SpeedoYpos;
+	float SpeedoXpos;
 
 	bool RPMIndicator;
 	float RPMIndicatorXpos;

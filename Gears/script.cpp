@@ -319,7 +319,7 @@ void drawRPMIndicator(float x, float y, float width, float height, Color fg, Col
 
 
 	// rpm thingy
-	GRAPHICS::DRAW_RECT(x-width*0.5+rpm*width*0.5, y, width*rpm, height, fg.R, fg.G, fg.B, fg.A);
+	GRAPHICS::DRAW_RECT(x-width*0.5f+rpm*width*0.5f, y, width*rpm, height, fg.R, fg.G, fg.B, fg.A);
 }
 
 void showHUD() {
