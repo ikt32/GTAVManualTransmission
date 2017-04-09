@@ -46,7 +46,9 @@ public:
 	bool AutoGear1 = false;
 	bool AutoLookBack = false;
 	bool ThrottleStart = false;
+	bool CrossScript = false;
 
+	// [HUD]
 	bool HUD = true;
 	float GearXpos = 0.95f;
 	float GearYpos = 0.95f;
@@ -59,8 +61,25 @@ public:
 	float ShiftModeYpos = 0.95f;
 	float ShiftModeSize = 1.0f;
 
-	
-	bool CrossScript = false;
+	bool RPMIndicator;
+
+	float RPMIndicatorXpos;
+	float RPMIndicatorYpos;
+	float RPMIndicatorSize;
+	float RPMIndicatorRedline;
+
+	int RPMIndicatorBackgroundR;
+	int RPMIndicatorBackgroundG;
+	int RPMIndicatorBackgroundB;
+	int RPMIndicatorBackgroundA;
+	int RPMIndicatorForegroundR;
+	int RPMIndicatorForegroundG;
+	int RPMIndicatorForegroundB;
+	int RPMIndicatorForegroundA;
+	int RPMIndicatorRedlineR;
+	int RPMIndicatorRedlineG;
+	int RPMIndicatorRedlineB;
+	int RPMIndicatorRedlineA;
 
 	// [CONTROLLER]
 	bool ToggleEngine = false; // false makes it just turn ON the engine
@@ -93,6 +112,7 @@ public:
 	float SteerAngleCar = 720.0f;
 	float SteerAngleBike = 180.0f;
 	float SteerAngleAlt = 180.0f;
+
 
 	// Methods
 	/*

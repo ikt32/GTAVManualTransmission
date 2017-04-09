@@ -311,8 +311,56 @@ void update() {
 ///////////////////////////////////////////////////////////////////////////////
 //                           Helper functions/tools
 ///////////////////////////////////////////////////////////////////////////////
+void drawRPMIndicator(float x, float y, float width, float height, Color fg, Color bg, float rpm) {
+	float bgpadding = 0.01f;
+	
+	// background
+	GRAPHICS::DRAW_RECT(x, y, width+bgpadding, height+bgpadding, bg.R, bg.G, bg.B, bg.A);
+
+
+	// rpm thingy
+	GRAPHICS::DRAW_RECT(x-width*0.5+rpm*width*0.5, y, width*rpm, height, fg.R, fg.G, fg.B, fg.A);
+}
 
 void showHUD() {
+	// RPM Indicator!
+	if (settings.RPMIndicator) {
+		Color background = {
+			settings.RPMIndicatorBackgroundR,
+			settings.RPMIndicatorBackgroundG,
+			settings.RPMIndicatorBackgroundB,
+			settings.RPMIndicatorBackgroundA
+		};
+
+		Color foreground = {
+			settings.RPMIndicatorForegroundR,
+			settings.RPMIndicatorForegroundG,
+			settings.RPMIndicatorForegroundB,
+			settings.RPMIndicatorForegroundA
+		};
+
+		Color redline = {
+			settings.RPMIndicatorRedlineR,
+			settings.RPMIndicatorRedlineG,
+			settings.RPMIndicatorRedlineB,
+			settings.RPMIndicatorRedlineA
+		};
+
+		Color rpmcolor = foreground;
+		if (vehData.Rpm > settings.RPMIndicatorRedline)
+			rpmcolor = redline;
+
+		drawRPMIndicator(
+			settings.RPMIndicatorXpos, 
+			settings.RPMIndicatorYpos, 
+			settings.RPMIndicatorSize*0.25f, 
+			settings.RPMIndicatorSize*0.05f, 
+			rpmcolor, 
+			background,
+			vehData.Rpm
+		);
+	}
+
 	// Shift mode indicator
 	char * shiftModeText;
 	switch (settings.ShiftMode) {
