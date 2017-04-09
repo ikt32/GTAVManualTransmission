@@ -206,39 +206,8 @@ void update() {
 		cycleShiftMode();
 	}
 
-	if (settings.UITips) {
-		if (vehData.SimulatedNeutral) {
-			showText(settings.UITips_X,
-			         settings.UITips_Y,
-			         settings.UITips_Size,
-			         "N");
-		}
-		else if (vehData.CurrGear == 0 && !settings.UITips_OnlyNeutral) {
-			showText(settings.UITips_X,
-					 settings.UITips_Y,
-					 settings.UITips_Size,
-					 "R");
-		}
-		else if (!settings.UITips_OnlyNeutral) {
-			if (vehData.CurrGear != vehData.TopGear) {
-				showText(settings.UITips_X,
-						 settings.UITips_Y,
-						 settings.UITips_Size,
-						 CharAdapter(std::to_string(vehData.CurrGear).c_str()));
-			} else {
-				Color c;
-				c.R = settings.UITips_TopGearC_R;
-				c.G = settings.UITips_TopGearC_G;
-				c.B = settings.UITips_TopGearC_B;
-				c.A = 255;
-				showText(settings.UITips_X,
-						 settings.UITips_Y,
-						 settings.UITips_Size,
-						 CharAdapter(std::to_string(vehData.CurrGear).c_str()),
-						 c);
-			}
-			
-		}
+	if (settings.HUD) {
+		showHUD();
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -261,7 +230,7 @@ void update() {
 		if (!controls.BrakeVal 
 			&& vehData.Speed < 2.0f &&
 			VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle))	{
-			float clutchNeutral = vehData.SimulatedNeutral ? 1.0 : controls.ClutchVal;
+			float clutchNeutral = vehData.SimulatedNeutral ? 1.0f : controls.ClutchVal;
 			if (vehData.Pitch < 0 || controls.ClutchVal) {
 				ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
 					vehicle, 1, 0.0f, -1 * (vehData.Pitch / 150.0f) * 1.1f * clutchNeutral, 0.0f, true, true, true, true);
@@ -345,6 +314,46 @@ void update() {
 ///////////////////////////////////////////////////////////////////////////////
 //                           Helper functions/tools
 ///////////////////////////////////////////////////////////////////////////////
+
+void showHUD() {
+	// Shift mode indicator
+	char * shiftModeText;
+	switch (settings.ShiftMode) {
+	case Sequential: shiftModeText = "S";
+		break;
+	case HPattern: shiftModeText = "H";
+		break;
+	case Automatic: shiftModeText = "A";
+		break;
+	}
+	showText(settings.ShiftModeXpos, settings.ShiftModeYpos, settings.ShiftModeSize, shiftModeText);
+
+
+	// Gear number indication
+	if (vehData.SimulatedNeutral) {
+		showText(settings.GearXpos, settings.GearYpos, settings.GearSize, "N");
+	}
+	else if (vehData.CurrGear == 0) {
+		showText(settings.GearXpos, settings.GearYpos, settings.GearSize, "R");
+	}
+	else {
+		char * gear = CharAdapter(std::to_string(vehData.CurrGear).c_str());
+		Color c;
+		if (vehData.CurrGear == vehData.TopGear) {
+			c.R = settings.GearTopColorR;
+			c.G = settings.GearTopColorG;
+			c.B = settings.GearTopColorB;
+			c.A = 255;
+		}
+		else {
+			c.R = 255;
+			c.G = 255;
+			c.B = 255;
+			c.A = 255;
+		}
+		showText(settings.GearXpos, settings.GearYpos, settings.GearSize, gear, c);
+	}
+}
 
 void showDebugInfo() {
 	std::stringstream ssRPM;

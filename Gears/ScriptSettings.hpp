@@ -1,11 +1,12 @@
 #pragma once
 #include <Windows.h>
-#define CORRECTVGENERAL 420
-#define CORRECTVWHEEL 420
+#define CORRECTVGENERAL "420R"
+#define CORRECTVWHEEL	"420"
 #include <string>
 #include <vector>
 #include "Util/Logger.hpp"
 #include <algorithm>
+#include "Util/simpleini/SimpleIni.h"
 
 class Logger;
 class ScriptControls;
@@ -43,14 +44,18 @@ public:
 	bool AutoLookBack = false;
 	bool ThrottleStart = false;
 
-	bool UITips = true;
-	bool UITips_OnlyNeutral = false;
-	float UITips_X = 0.95f;
-	float UITips_Y = 0.95f;
-	float UITips_Size = 1.0f;
-	int UITips_TopGearC_R = 255;
-	int UITips_TopGearC_G = 255;
-	int UITips_TopGearC_B = 255;
+	bool HUD = true;
+	float GearXpos = 0.95f;
+	float GearYpos = 0.95f;
+	float GearSize = 1.0f;
+	int GearTopColorR = 255;
+	int GearTopColorG = 255;
+	int GearTopColorB = 255;
+
+	float ShiftModeXpos = 0.925f;
+	float ShiftModeYpos = 0.95f;
+	float ShiftModeSize = 1.0f;
+
 	
 	bool CrossScript = false;
 
@@ -97,8 +102,8 @@ public:
 	void SteeringSaveButton(const std::string &confTag, ptrdiff_t index, int button);
 	void SteeringSaveHShifter(const std::string &confTag, ptrdiff_t index, int button[]);
 private:
-	int settings_general_version = 0;
-	int settings_wheel_version = 0;
+	std::string settings_general_version = "000";
+	std::string settings_wheel_version = "000";
 	Logger logger;
 	void parseSettingsWheel(ScriptControls *scriptControl);
 

@@ -44,6 +44,7 @@ enum eRadioStations {
 //                           Helper functions/tools
 ///////////////////////////////////////////////////////////////////////////////
 
+void showHUD();
 void showDebugInfo();
 void crossScriptComms();
 

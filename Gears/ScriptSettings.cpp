@@ -5,13 +5,6 @@
 #include "Util/simpleini/SimpleIni.h"
 #include "Input/ScriptControls.hpp"
 
-// TO/DO This Device<->GUID->Control thing is very broken pls fix
-// Update: Things should be good now.
-
-//ScriptSettings::ScriptSettings(): nDevices(0) {
-//	// Defaults
-//}
-
 ScriptSettings::ScriptSettings(const std::string &general,
 	                           const std::string &wheel,
 	                           Logger &logger) : logger(logger),
@@ -79,16 +72,21 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	AutoLookBack = settingsGeneral.GetBoolValue("OPTIONS", "AutoLookBack", false);
 	ThrottleStart = settingsGeneral.GetBoolValue("OPTIONS", "ThrottleStart", false);
 
-	UITips = settingsGeneral.GetBoolValue("OPTIONS", "UITips", true);
-	UITips_OnlyNeutral = settingsGeneral.GetBoolValue("OPTIONS", "UITips_OnlyNeutral", false);
-	UITips_X = settingsGeneral.GetDoubleValue("OPTIONS", "UITips_X", 95.0) / 100.0f;
-	UITips_Y = settingsGeneral.GetDoubleValue("OPTIONS", "UITips_Y", 95.0) / 100.0f;
-	UITips_Size = settingsGeneral.GetDoubleValue("OPTIONS", "UITips_Size", 15.0) / 100.0f;
-	UITips_TopGearC_R = settingsGeneral.GetLongValue("OPTIONS", "UITips_TopGearC_R", 255);
-	UITips_TopGearC_G = settingsGeneral.GetLongValue("OPTIONS", "UITips_TopGearC_G", 255);
-	UITips_TopGearC_B = settingsGeneral.GetLongValue("OPTIONS", "UITips_TopGearC_B", 255);
-
 	CrossScript = settingsGeneral.GetBoolValue("OPTIONS", "CrossScript", false);
+
+	// [HUD]
+	HUD = settingsGeneral.GetBoolValue			("HUD", "EnableHUD", true);
+	GearXpos = settingsGeneral.GetDoubleValue	("HUD", "GearXpos", 0.95);
+	GearYpos = settingsGeneral.GetDoubleValue	("HUD", "GearYpos", 0.95);
+	GearSize = settingsGeneral.GetDoubleValue	("HUD", "GearSize", 0.15);
+	GearTopColorR = settingsGeneral.GetLongValue("HUD", "GearTopColorR", 255);
+	GearTopColorG = settingsGeneral.GetLongValue("HUD", "GearTopColorG", 0);
+	GearTopColorB = settingsGeneral.GetLongValue("HUD", "GearTopColorB", 0);
+
+	ShiftModeXpos = settingsGeneral.GetDoubleValue("HUD", "ShiftModeXpos", 0.925);
+	ShiftModeYpos = settingsGeneral.GetDoubleValue("HUD", "ShiftModeYpos", 0.90);
+	ShiftModeSize = settingsGeneral.GetDoubleValue("HUD", "ShiftModeSize", 0.15);
+
 
 	// [CONTROLLER]
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Toggle)] = settingsGeneral.GetValue("CONTROLLER", "Toggle", "DpadRight");
