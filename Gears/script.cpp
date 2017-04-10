@@ -403,17 +403,25 @@ void showHUD() {
 			settings.RPMIndicatorForegroundA
 		};
 
-		Color redline = {
-			settings.RPMIndicatorRedlineR,
-			settings.RPMIndicatorRedlineG,
-			settings.RPMIndicatorRedlineB,
-			settings.RPMIndicatorRedlineA
-		};
-
 		Color rpmcolor = foreground;
-		if (vehData.Rpm > settings.RPMIndicatorRedline)
+		if (vehData.Rpm > settings.RPMIndicatorRedline) {
+			Color redline = {
+				settings.RPMIndicatorRedlineR,
+				settings.RPMIndicatorRedlineG,
+				settings.RPMIndicatorRedlineB,
+				settings.RPMIndicatorRedlineA
+			};
 			rpmcolor = redline;
-
+		}
+		if (vehData.CurrGear < vehData.NextGear || vehData.TruckShiftUp) {
+			Color rpmlimiter = {
+				settings.RPMIndicatorRevlimitR,
+				settings.RPMIndicatorRevlimitG,
+				settings.RPMIndicatorRevlimitB,
+				settings.RPMIndicatorRevlimitA
+			};
+			rpmcolor = rpmlimiter;
+		}
 		drawRPMIndicator(
 			settings.RPMIndicatorXpos,
 			settings.RPMIndicatorYpos,

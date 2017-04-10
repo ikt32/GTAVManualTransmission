@@ -120,6 +120,11 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	RPMIndicatorRedlineB = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineB", 0);
 	RPMIndicatorRedlineA = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineA", 255);
 
+	RPMIndicatorRevlimitR = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitR", 255);
+	RPMIndicatorRevlimitG = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitG", 0);
+	RPMIndicatorRevlimitB = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitB", 0);
+	RPMIndicatorRevlimitA = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitA", 255);
+
 	// [CONTROLLER]
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Toggle)] = settingsGeneral.GetValue("CONTROLLER", "Toggle", "DpadRight");
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ToggleH)] = settingsGeneral.GetValue("CONTROLLER", "ToggleShift", "B");

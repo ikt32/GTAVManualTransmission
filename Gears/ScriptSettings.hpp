@@ -84,6 +84,10 @@ public:
 	int RPMIndicatorRedlineG;
 	int RPMIndicatorRedlineB;
 	int RPMIndicatorRedlineA;
+	int RPMIndicatorRevlimitR;
+	int RPMIndicatorRevlimitG;
+	int RPMIndicatorRevlimitB;
+	int RPMIndicatorRevlimitA;
 
 	// [CONTROLLER]
 	bool ToggleEngine = false; // false makes it just turn ON the engine
