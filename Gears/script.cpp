@@ -228,11 +228,11 @@ void update() {
 			&& vehData.Speed < 2.0f &&
 			VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle))	{
 			float clutchNeutral = vehData.SimulatedNeutral ? 1.0f : controls.ClutchVal;
-			if (vehData.Pitch < 0 || controls.ClutchVal) {
+			if (vehData.Pitch < 0 || clutchNeutral) {
 				ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
 					vehicle, 1, 0.0f, -1 * (vehData.Pitch / 150.0f) * 1.1f * clutchNeutral, 0.0f, true, true, true, true);
 			}
-			if (vehData.Pitch > 10.0f || controls.ClutchVal)
+			if (vehData.Pitch > 10.0f || clutchNeutral)
 				ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
 					vehicle, 1, 0.0f, -1 * (vehData.Pitch / 90.0f) * 0.35f * clutchNeutral, 0.0f, true, true, true, true);
 		}
