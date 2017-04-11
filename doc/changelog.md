@@ -1,9 +1,14 @@
 # Changelog
 
 ## 4.2.0 - beta 3 / RC
-No configuration changes
+Configuration changes:
+* Separate [HUD] section for HUD stuff
 
 Changes:
+* Add HUD elements. You can move these around freely or disable them.
+    * Shift mode indicator (H/S/A)
+    * RPM indicator with redline options
+    * Dashboard-data speedometer (kph, mph, m/s)
 * Rename DIUtil to WheelConfigurator
 * Adjust engine braking to be more reliable
 * Adjust hill start effect so it's not affected by throttle position
@@ -12,6 +17,7 @@ Changes:
 * Fix steering corrections patching for FiveM
 * Ignore CrossScript for FiveM
 * Minor internal code optimizations
+* Version strings for 1.0.1032.1
 
 ## 4.2.0 - beta 2
 No configuration changes
