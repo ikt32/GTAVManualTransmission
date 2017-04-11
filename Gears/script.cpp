@@ -1018,8 +1018,13 @@ void handleRPM() {
 	*/
 	if (vehData.CurrGear > 1) {
 		// When pressing clutch and throttle, handle clutch and RPM
-		if (controls.ClutchVal > 0.4f && vehData.ControlAccelerate > 0.05f &&
-		                                 !vehData.SimulatedNeutral) {
+		if (controls.ClutchVal > 0.4f && 
+			vehData.ControlAccelerate > 0.05f &&
+		    !vehData.SimulatedNeutral && 
+			// The next statement is a workaround for rolling back + brake + gear > 1 because it shouldn't rev then.
+			// Also because we're checking on the game Control accel value and not the pedal position
+			// TODO: Might wanna re-write with control.AccelVal instead of vehData.ControlAccelerate?
+			!(vehData.Velocity < 0.0 && controls.BrakeVal > 0.1f && vehData.ControlAccelerate > 0.05f)) {
 			fakeRev();
 			ext.SetThrottle(vehicle, vehData.ControlAccelerate);
 			float tempVal = (1.0f - controls.ClutchVal) * 0.4f + 0.6f;
@@ -1114,10 +1119,8 @@ void functionRealReverse() {
 			ext.SetBrakeP(vehicle, 1.0f);
 		}
 		// RT behavior when rolling back: Burnout
-		if (vehData.CurrGear == 1 &&
-			controls.ThrottleVal > 0.5f && vehData.Velocity < -1.0f) {
+		if (controls.ThrottleVal > 0.5f && vehData.Velocity < -1.0f) {
 			//showText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Rollback");
-
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, controls.ThrottleVal);
 			if (controls.BrakeVal < 0.1f) {
 				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
