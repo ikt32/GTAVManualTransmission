@@ -74,7 +74,12 @@ void update() {
 
 	if (prevVehicle != vehicle) {
 		ext.ClearAddress();
-		ext.GetAddress(vehicle);
+		auto addr = ext.GetAddress(vehicle);
+		if (settings.LogCar) {
+			std::stringstream hexaddr;
+			hexaddr << std::hex << static_cast<void*>(addr);
+			logger.Write("DEBUG: New vehicle address: " + hexaddr.str());
+		}
 		if (vehData.NoClutch) {
 			vehData.SimulatedNeutral = false;
 		}
@@ -100,7 +105,7 @@ void update() {
 
 	controls.UpdateValues(controls.PrevInput, ignoreClutch, false);
 
-	if (settings.Debug) {
+	if (settings.DisplayInfo) {
 		showDebugInfo();
 	}
 
@@ -1584,7 +1589,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	}
 	controls.WheelDI.SetConstantForce(controls.SteerGUID, totalForce);
 
-	if (settings.Debug) {
+	if (settings.DisplayInfo) {
 		std::stringstream SteerRaw;
 		SteerRaw << "SteerRaw: " << controls.SteerVal;
 		showText(0.85, 0.175, 0.4, SteerRaw.str().c_str());

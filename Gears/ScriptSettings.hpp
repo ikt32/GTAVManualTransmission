@@ -93,7 +93,8 @@ public:
 	bool ToggleEngine = false; // false makes it just turn ON the engine
 
 	// [DEBUG]
-	bool Debug = false;
+	bool DisplayInfo = false;
+	bool LogCar = false;
 
 	std::vector<GUID> reggdGuids;
 

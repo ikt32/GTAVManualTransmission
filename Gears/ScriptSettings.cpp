@@ -170,7 +170,8 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 
 
 	// [DEBUG]
-	Debug = settingsGeneral.GetBoolValue("DEBUG", "Info", false);
+	DisplayInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayInfo", false);
+	LogCar = settingsGeneral.GetBoolValue("DEBUG", "LogCar", false);
 
 	// [FILEVERSION]
 	settings_general_version = settingsGeneral.GetValue("FILEVERSION", "VERSION", "000");
