@@ -1,11 +1,8 @@
 #pragma once
 #include <Windows.h>
 
-#include <string>
 #include <vector>
 #include "Util/Logger.hpp"
-#include <algorithm>
-#include "Util/simpleini/SimpleIni.h"
 
 class Logger;
 class ScriptControls;
@@ -62,32 +59,32 @@ public:
 	float ShiftModeSize = 1.0f;
 
 	std::string Speedo;
-	float SpeedoSize;
-	float SpeedoYpos;
-	float SpeedoXpos;
+	float SpeedoSize = 1.5f;
+	float SpeedoYpos = 0.85f;
+	float SpeedoXpos = 0.85f;
 
-	bool RPMIndicator;
-	float RPMIndicatorXpos;
-	float RPMIndicatorYpos;
-	float RPMIndicatorSize;
-	float RPMIndicatorRedline;
+	bool RPMIndicator = true;
+	float RPMIndicatorXpos = 0.9125f;
+	float RPMIndicatorYpos = 0.965f;
+	float RPMIndicatorSize = 0.5f;
+	float RPMIndicatorRedline = 0.875f;
 
-	int RPMIndicatorBackgroundR;
-	int RPMIndicatorBackgroundG;
-	int RPMIndicatorBackgroundB;
-	int RPMIndicatorBackgroundA;
-	int RPMIndicatorForegroundR;
-	int RPMIndicatorForegroundG;
-	int RPMIndicatorForegroundB;
-	int RPMIndicatorForegroundA;
-	int RPMIndicatorRedlineR;
-	int RPMIndicatorRedlineG;
-	int RPMIndicatorRedlineB;
-	int RPMIndicatorRedlineA;
-	int RPMIndicatorRevlimitR;
-	int RPMIndicatorRevlimitG;
-	int RPMIndicatorRevlimitB;
-	int RPMIndicatorRevlimitA;
+	int RPMIndicatorBackgroundR = 0;
+	int RPMIndicatorBackgroundG = 0;
+	int RPMIndicatorBackgroundB = 64;
+	int RPMIndicatorBackgroundA = 128;
+	int RPMIndicatorForegroundR = 255;
+	int RPMIndicatorForegroundG = 255;
+	int RPMIndicatorForegroundB = 255;
+	int RPMIndicatorForegroundA = 255;
+	int RPMIndicatorRedlineR = 255;
+	int RPMIndicatorRedlineG = 128;
+	int RPMIndicatorRedlineB = 128;
+	int RPMIndicatorRedlineA = 255;
+	int RPMIndicatorRevlimitR = 255;
+	int RPMIndicatorRevlimitG = 0;
+	int RPMIndicatorRevlimitB = 0;
+	int RPMIndicatorRevlimitA = 255;
 
 	// [CONTROLLER]
 	bool ToggleEngine = false; // false makes it just turn ON the engine

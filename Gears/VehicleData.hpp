@@ -75,7 +75,7 @@ public:
 	float SteeringAngle = 0.0f;
 	Vector3 RotationVelocity = {};
 	std::vector<float> WheelCompressions = {};
-	Vector3 V3Velocities;
+	Vector3 V3Velocities = {};
 	Vector3 getAccelerationVectors(Vector3 velocities);
 
 	// Should be called after getAccelerationVectors has been called in a loop
@@ -96,7 +96,7 @@ public:
 
 	bool TruckShiftUp = false;
 
-	int RadioStationIndex;
+	int RadioStationIndex = 0;
 private:
 	std::array<char *, 20> badModelNames = {
 		"BENSON",

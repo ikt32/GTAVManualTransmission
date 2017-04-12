@@ -204,7 +204,7 @@ namespace MemoryPatcher {
 		// C7 43 40 CD CC CC 3D is what we're looking for, the second occurrence, at 
 		// 7FF6555FE34A or GTA5.exe+ECE34A in build 617.
 
-		uintptr_t address = NULL;
+		uintptr_t address;
 		if (clutchLowTemp != NULL)
 			address = clutchLowTemp;
 		else
@@ -229,7 +229,7 @@ namespace MemoryPatcher {
 		// 66 89 13 <- Looking for this
 		// 89 73 5C <- Next instruction
 		// EB 0A    <- Next next instruction
-		uintptr_t address = NULL;
+		uintptr_t address;
 		if (gear7A0Temp != 0)
 			address = gear7A0Temp;
 		else 
@@ -275,7 +275,7 @@ namespace MemoryPatcher {
 		// F3 0F10 25 92309400  
 		// F3 0F10 1D 6A309400  
 
-		uintptr_t address = NULL;
+		uintptr_t address;
 		if (SteeringTemp != NULL) {
 			address = SteeringTemp;
 

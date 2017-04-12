@@ -1,7 +1,7 @@
 #include "../../../ScriptHookV_SDK/inc/natives.h"
 #include "Util.hpp"
 
-void showText(float x, float y, float scale, const char* text, int font, Color rgba) {
+void showText(float x, float y, float scale, const char* text, int font, const Color &rgba) {
 	UI::SET_TEXT_FONT(font);
 	UI::SET_TEXT_SCALE(scale, scale);
 	UI::SET_TEXT_COLOUR(rgba.R, rgba.G, rgba.B, rgba.A);
@@ -20,7 +20,7 @@ void showText(float x, float y, float scale, const char* text) {
 	showText(x, y, scale, text, 0, {255, 255, 255, 255});
 }
 
-void showText(float x, float y, float scale, const char* text, Color rgba) {
+void showText(float x, float y, float scale, const char* text, const Color &rgba) {
 	showText(x, y, scale, text, 0, rgba);
 }
 

@@ -104,7 +104,7 @@ void setCursorPosition(int x, int y)
 {
 	static const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	std::cout.flush();
-	COORD coord = { (SHORT)x, (SHORT)y };
+	COORD coord = { static_cast<SHORT>(x), static_cast<SHORT>(y) };
 	SetConsoleCursorPosition(hOut, coord);
 }
 
@@ -170,7 +170,7 @@ void playWheelEffects(float effSteer) {
 	auto steerAxis = controls.WheelDI.StringToAxis(controls.WheelAxes[static_cast<int>(controls.SteerAxisType)]);
 	auto steerSpeed = controls.WheelDI.GetAxisSpeed(steerAxis, controls.SteerGUID) / 20;
 
-	totalForce += (int)(damperForce * 0.1f * steerSpeed);
+	totalForce += static_cast<int>(damperForce * 0.1f * steerSpeed);
 
 	if (effSteer > 1.0f) {
 		totalForce = static_cast<int>((effSteer - 1.0f) * 100000) + totalForce;
@@ -451,8 +451,6 @@ void configDynamicButtons(char c) {
 	std::string confTag = std::get<2>(buttonInfo);
 	int buttonsActive = 0;
 
-	std::string devName;
-
 	// Check whether any buttons had been pressed already
 	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
 
@@ -504,7 +502,7 @@ void configDynamicButtons(char c) {
 
 		for (auto guid : controls.WheelDI.GetGuids()) {
 			std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
-			devName = std::string(wDevName.begin(), wDevName.end()).c_str();
+			std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
 			for (int i = 0; i < 255; i++) {
 				if (controls.WheelDI.IsButtonPressed(i, guid)) {
 					printf("%d @ %s", i, devName.c_str());
@@ -783,8 +781,7 @@ int main()
 		controls.GetLastInputDevice(ScriptControls::InputDevices::Wheel);
 		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, justPeeking);
 
-		float steerMult;
-		steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
+		float steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
 		float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 		
 		GetConsoleScreenBufferInfo(hConsole, &csbi);

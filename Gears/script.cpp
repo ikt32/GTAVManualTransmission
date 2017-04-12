@@ -905,7 +905,7 @@ void functionClutchCatch() {
 		if (settings.ShiftMode == Automatic && controls.BrakeVal > 0.1f) {
 			return;
 		}
-
+		// todo - clutchval changes acceleration factor/speed factor
 		// Forward
 		if (vehData.CurrGear > 0 && vehData.Velocity < vehData.CurrGear * 2.2f &&
 		    controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
@@ -975,13 +975,11 @@ void functionEngBrake() {
 void fakeRev() {
 	float timeStep = SYSTEM::TIMESTEP();
 	float accelRatio = 2 * timeStep;
-	float rpmVal;
 	float rpmValTemp = (vehData.PrevRpm > vehData.Rpm ? (vehData.PrevRpm - vehData.Rpm) : 0.0f);
 	if (vehData.CurrGear == 1) {
 		rpmValTemp *= 2.0f;
 	}
-	rpmVal =
-		vehData.Rpm + // Base value
+	float rpmVal = vehData.Rpm + // Base value
 		rpmValTemp + // Keep it constant
 		vehData.ControlAccelerate * accelRatio; // Addition value, depends on delta T
 
@@ -1446,8 +1444,7 @@ void doWheelSteeringPlane() {
 
 	//////////////////////////////////////////////////////////////////////////////
 
-	float antiDeadzoned;
-	antiDeadzoned = effSteer;
+	float antiDeadzoned = effSteer;
 	if (effSteer < -0.02) {
 		antiDeadzoned = effSteer - 0.20f;
 	}

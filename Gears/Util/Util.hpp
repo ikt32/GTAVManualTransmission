@@ -125,8 +125,8 @@ struct Color {
 
 // Natives called
 void showText(float x, float y, float scale, const char* text);
-void showText(float x, float y, float scale, const char* text, Color rgba);
-void showText(float x, float y, float scale, const char* text, int font, Color rgba);
+void showText(float x, float y, float scale, const char* text, const Color &rgba);
+void showText(float x, float y, float scale, const char* text, int font, const Color &rgba);
 void showNotification(const char* message, int *prevNotification);
 
 //http://stackoverflow.com/questions/36789380/how-to-store-a-const-char-to-a-char
