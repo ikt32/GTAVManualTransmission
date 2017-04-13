@@ -13,7 +13,6 @@ ScriptControls::ScriptControls(Logger &logger): WheelDI(logger),
 ScriptControls::~ScriptControls() { }
 
 void ScriptControls::InitWheel() {
-	
 	if (!WheelDI.InitWheel()) {
 		// Initialization failed somehow, so we skip
 		return;
@@ -28,6 +27,7 @@ void ScriptControls::InitWheel() {
 		WheelDI.NoFeedback = false;
 		WheelDI.UpdateCenterSteering(steerGUID, ffAxis);
 	}
+	wheelInitialized = true;
 }
 
 void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, bool justPeekingWheelKb) {
@@ -36,8 +36,15 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 		controller.UpdateButtonChangeStates();
 	}
 
-	WheelDI.UpdateState();
-	WheelDI.UpdateButtonChangeStates();
+	if (!WheelDI.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
+		wheelInitialized = false;
+	}
+
+	if (wheelInitialized) {
+		WheelDI.UpdateState();
+		WheelDI.UpdateButtonChangeStates();
+	}
+
 	CheckCustomButtons(justPeekingWheelKb);
 
 	// Update ThrottleVal, BrakeVal and ClutchVal ranging from 0.0f (no touch) to 1.0f (full press)
@@ -68,83 +75,26 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 			
 			// You're outta luck if you have a single-axis 3-pedal freak combo or something
 			if (WheelAxes[static_cast<int>(WheelAxisType::Throttle)] == WheelAxes[static_cast<int>(WheelAxisType::Brake)]) {
-				int pivot;
-				if (ThrottleUp == BrakeUp) {
-					pivot = BrakeUp;
-				} else if (ThrottleDown == BrakeUp) {
-					pivot = BrakeUp;
-				} else if (ThrottleUp == BrakeDown) {
-					pivot = BrakeDown;
-				} else if (ThrottleDown == BrakeDown) {
-					pivot = BrakeDown;
-				} else {
-					// something to notify the user the should fix their thing
+				if (!resolveCombinedPedals(RawT))
 					return;
-				}
-
-				// there has to be a better way
-				if (pivot == BrakeUp) {
-					if (BrakeDown > pivot) { // TMIN = BMIN
-						// 0 TMAX < TMIN/PIVOT/BMIN < BMAX 65535
-						if (RawT < pivot) { // Throttle
-							ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleDown) / static_cast<float>(pivot);
-							BrakeVal = 0;
-						} else { // Brake
-							ThrottleVal = 0;
-							BrakeVal = static_cast<float>(RawT - BrakeUp) / static_cast<float>(pivot);
-						}
-					} // Only this has been verified
-					else { // TMAX = BMIN
-						// 0 BMAX < BMIN/PIVOT/TMAX < TMIN 65535
-						if (RawT > pivot) { // Throttle
-							ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleDown) / static_cast<float>(pivot);
-							BrakeVal = 0;
-						}
-						else { // Brake
-							ThrottleVal = 0;
-							BrakeVal = 1.0f - static_cast<float>(RawT - BrakeDown) / static_cast<float>(pivot);
-						}
-					}
-				}
-				if (pivot == BrakeDown) {
-					if (BrakeUp > pivot) { //TMIN = BMAX
-						// TMAX X < TMIN/PIVOT/BMAX < BMIN 65535
-						if (RawT < pivot) { // Throttle
-							ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleDown) / static_cast<float>(pivot);
-							BrakeVal = 0;
-						}
-						else { // Brake
-							ThrottleVal = 0;
-							BrakeVal = 1.0f - static_cast<float>(RawT - BrakeDown) / static_cast<float>(pivot);
-						}
-					}
-					else { // TMAX = BMAX
-						// 0 BMIN < BMAX/PIVOT/TMAX < TMIN 65535
-						if (RawT > pivot) { // Throttle
-							ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleDown) / static_cast<float>(pivot);
-							BrakeVal = 0;
-						}
-						else { // Brake
-							ThrottleVal = 0;
-							BrakeVal = static_cast<float>(RawT - BrakeUp) / static_cast<float>(pivot);
-						}
-					}
-				}
-				ClutchVal = 0.0f + 1.0f / (ClutchDown - ClutchUp)*(static_cast<float>(RawC) - ClutchUp);
-			} // End single-axis mumbo jumbo
+			}
  			else {
 				ThrottleVal = 0.0f + 1.0f / (ThrottleDown - ThrottleUp)*(static_cast<float>(RawT) - ThrottleUp);
 				BrakeVal = 0.0f + 1.0f / (BrakeDown - BrakeUp)*(static_cast<float>(RawB) - BrakeUp);
-				ClutchVal = 0.0f + 1.0f/(ClutchDown - ClutchUp)*(static_cast<float>(RawC) - ClutchUp);
 			}
+
 			if (WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]) == WheelDirectInput::UNKNOWN_AXIS) {
 				ClutchVal = 0.0f;
+			} else {
+				ClutchVal = 0.0f + 1.0f / (ClutchDown - ClutchUp)*(static_cast<float>(RawC) - ClutchUp);
 			}
-			HandbrakeVal = 0.0f + 1.0f / (HandbrakeUp - HandbrakeDown)*(static_cast<float>(RawH) - HandbrakeDown);
 
 			if (WheelDI.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Handbrake)]) == WheelDirectInput::UNKNOWN_AXIS) {
 				HandbrakeVal = 0.0f;
+			} else {
+				HandbrakeVal = 0.0f + 1.0f / (HandbrakeUp - HandbrakeDown)*(static_cast<float>(RawH) - HandbrakeDown);
 			}
+
 			SteerVal = 0.0f + 1.0f / (SteerRight - SteerLeft)*(static_cast<float>(RawS) - SteerLeft);
 
 			if (RawH == -1) { HandbrakeVal = 0.0f; }
@@ -159,7 +109,6 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 			if (ThrottleVal < 0.0f) { ThrottleVal = 0.0f; }
 			if (BrakeVal < 0.0f) { BrakeVal = 0.0f; }
 			if (ClutchVal < 0.0f) { ClutchVal = 0.0f; }
-
 
 			break;
 		}
@@ -345,6 +294,78 @@ void ScriptControls::CheckCustomButtons(bool justPeeking) {
 			}
 		}
 	}
+}
+
+// Fills ThrottleVal and BrakeVal when pedals are combined
+bool ScriptControls::resolveCombinedPedals(int RawT) {
+	int pivot;
+	if (ThrottleUp == BrakeUp) {
+		pivot = BrakeUp;
+	}
+	else if (ThrottleDown == BrakeUp) {
+		pivot = BrakeUp;
+	}
+	else if (ThrottleUp == BrakeDown) {
+		pivot = BrakeDown;
+	}
+	else if (ThrottleDown == BrakeDown) {
+		pivot = BrakeDown;
+	}
+	else {
+		// something to notify the user the should fix their thing
+		return false;
+	}
+
+	// there has to be a better way
+	if (pivot == BrakeUp) {
+		if (BrakeDown > pivot) { // TMIN = BMIN
+								 // 0 TMAX < TMIN/PIVOT/BMIN < BMAX 65535
+			if (RawT < pivot) { // Throttle
+				ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleDown) / static_cast<float>(pivot);
+				BrakeVal = 0;
+			}
+			else { // Brake
+				ThrottleVal = 0;
+				BrakeVal = static_cast<float>(RawT - BrakeUp) / static_cast<float>(pivot);
+			}
+		} // Only this has been verified
+		else { // TMAX = BMIN
+			   // 0 BMAX < BMIN/PIVOT/TMAX < TMIN 65535
+			if (RawT > pivot) { // Throttle
+				ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleDown) / static_cast<float>(pivot);
+				BrakeVal = 0;
+			}
+			else { // Brake
+				ThrottleVal = 0;
+				BrakeVal = 1.0f - static_cast<float>(RawT - BrakeDown) / static_cast<float>(pivot);
+			}
+		}
+	}
+	if (pivot == BrakeDown) {
+		if (BrakeUp > pivot) { //TMIN = BMAX
+							   // TMAX X < TMIN/PIVOT/BMAX < BMIN 65535
+			if (RawT < pivot) { // Throttle
+				ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleDown) / static_cast<float>(pivot);
+				BrakeVal = 0;
+			}
+			else { // Brake
+				ThrottleVal = 0;
+				BrakeVal = 1.0f - static_cast<float>(RawT - BrakeDown) / static_cast<float>(pivot);
+			}
+		}
+		else { // TMAX = BMAX
+			   // 0 BMIN < BMAX/PIVOT/TMAX < TMIN 65535
+			if (RawT > pivot) { // Throttle
+				ThrottleVal = 1.0f - static_cast<float>(RawT - ThrottleDown) / static_cast<float>(pivot);
+				BrakeVal = 0;
+			}
+			else { // Brake
+				ThrottleVal = 0;
+				BrakeVal = static_cast<float>(RawT - BrakeUp) / static_cast<float>(pivot);
+			}
+		}
+	}
+	return true;
 }
 
 // GUID stuff...?

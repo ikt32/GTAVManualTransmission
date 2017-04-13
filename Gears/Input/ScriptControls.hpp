@@ -151,18 +151,21 @@ public:
 	WheelAxisType SteerAxisType;
 
 private:
+	bool resolveCombinedPedals(int RawT);
+	bool IsKeyPressed(int key);
+	bool IsKeyJustPressed(int key, KeyboardControlType control);
+
 	long long pressTime = 0;
 	long long releaseTime = 0;
 
 	XboxController controller;
 	WORD buttonState;
 
-	bool IsKeyPressed(int key);
-	bool IsKeyJustPressed(int key, KeyboardControlType control);
-
+	
 	bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	Logger logger;
+	bool wheelInitialized = false;
 };
 
 // GUID stuff

@@ -82,7 +82,12 @@ public:
 	float GetAxisSpeed(DIAxis axis, GUID device);
 	std::vector<GUID> GetGuids();
 	void PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine);
+	bool IsInitialized();
 private:
+	bool CreateConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis);
+	
+	bool isInitialized = false;
+
 	Logger logger;
 	DiJoyStick djs;
 
@@ -90,7 +95,6 @@ private:
 	LPDIRECTINPUT lpDi = nullptr;
 	LPDIRECTINPUTEFFECT pCFEffect;
 	LPDIRECTINPUTEFFECT pFREffect;
-	bool CreateConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis);
 	std::array<__int64, MAX_RGBBUTTONS> rgbPressTime;
 	std::array<__int64, MAX_RGBBUTTONS> rgbReleaseTime;
 	std::array<bool, MAX_RGBBUTTONS> rgbButtonCurr;

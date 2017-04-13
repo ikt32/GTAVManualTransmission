@@ -544,7 +544,7 @@ void crossScriptComms() {
 //                           Mod functions: Mod control
 ///////////////////////////////////////////////////////////////////////////////
 
-void	reInit() {
+void reInit() {
 	settings.Read(&controls);
 	logger.Write("Settings read");
 	vehData.LockGears = 0x00010001;
