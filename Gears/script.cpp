@@ -596,7 +596,7 @@ void reset() {
 	if (MemoryPatcher::SteeringPatched) {
 		MemoryPatcher::RestoreSteeringCorrection();
 	}
-	if (controls.WheelControl.IsConnected(controls.SteerGUID)) {
+	if (controls.WheelControl.IsConnected(controls.SteerGUID) && settings.FFEnable) {
 		controls.WheelControl.SetConstantForce(controls.SteerGUID, 0);
 	}
 }
