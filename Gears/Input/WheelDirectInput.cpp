@@ -9,40 +9,45 @@
 
 // TODO Look into crashes
 
-WheelDirectInput::WheelDirectInput(Logger &logAlt) : nEntry(0),
-                                                    logger(logAlt),
+WheelDirectInput::WheelDirectInput(Logger &logAlt) : logger(logAlt),
                                                     pCFEffect{nullptr},
-                                                    pFREffect{nullptr} { }
-
-WheelDirectInput::~WheelDirectInput() {
-
-}
-
-bool WheelDirectInput::InitWheel() {
-	logger.Write("WHEEL: Init steering wheel"); 
-	isInitialized = false;
-	// Register with the DirectInput subsystem and get a pointer
-	// to a IDirectInput interface we can use.
+                                                    pFREffect{nullptr} {
+	// Just set up to ensure djs can always be used.
 	if (FAILED(DirectInput8Create(GetModuleHandle(nullptr),
 		DIRECTINPUT_VERSION,
 		IID_IDirectInput8,
 		reinterpret_cast<void**>(&lpDi),
 		nullptr))) {
-		logger.Write("WHEEL: DirectInput create failed");
-		return false;
+		return;
+	}
+	djs.enumerate(lpDi);
+}
+
+WheelDirectInput::~WheelDirectInput() { }
+
+bool WheelDirectInput::InitWheel() {
+	logger.Write("WHEEL: Initializing steering wheel"); 
+	if (lpDi == nullptr) {
+		if (FAILED(DirectInput8Create(GetModuleHandle(nullptr),
+			DIRECTINPUT_VERSION,
+			IID_IDirectInput8,
+			reinterpret_cast<void**>(&lpDi),
+			nullptr))) {
+			logger.Write("WHEEL: DirectInput create failed again");
+			return false;
+		}
 	}
 
 	djs.enumerate(lpDi);
-	nEntry = djs.getEntryCount();
-	logger.Write("WHEEL: Found " + std::to_string(nEntry) + " device(s)");
+	logger.Write("WHEEL: Found " + std::to_string(djs.getEntryCount()) + " device(s)");
 
-	if (nEntry < 1) {
+	if (djs.getEntryCount() < 1) {
 		logger.Write("WHEEL: No wheel detected");
 		return false;
 	}
 
 	foundGuids.clear();
-	for (int i = 0; i < nEntry; i++) {
+	for (int i = 0; i < djs.getEntryCount(); i++) {
 		auto device = djs.getEntry(i);
 		std::wstring wDevName = device->diDeviceInstance.tszInstanceName;
 		logger.Write("WHEEL: Device: " + std::string(wDevName.begin(), wDevName.end()));
@@ -55,18 +60,11 @@ bool WheelDirectInput::InitWheel() {
 		foundGuids.push_back(guid);
 	}
 
-	djs.update();
-	isInitialized = true;
 	logger.Write("WHEEL: Init steering wheel success");
 	return true;
 }
 
 bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
-	if (!isInitialized) {
-		logger.Write("WHEEL: Not initialized before InitFFB");
-		return false;
-	}
-
 	logger.Write("WHEEL: Init FFB device");
 	auto e = FindEntryFromGUID(guid);
 	
@@ -93,22 +91,18 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
 		return false;
 	}
 	logger.Write("WHEEL: Init FFB effect on axis " + DIAxisHelper[ffAxis]);
-	if (!CreateConstantForceEffect(e, ffAxis)) {
+	if (!createConstantForceEffect(e, ffAxis)) {
 		logger.Write("WHEEL: Init FFB effect failed");
-		NoFeedback = true;
 	} else {
 		logger.Write("WHEEL: Init FFB success");
+		hasForceFeedback = true;
 	}
 	return true;
 }
 
 void WheelDirectInput::UpdateCenterSteering(GUID guid, DIAxis steerAxis) {
-	if (!isInitialized) {
-		return;
-	}
-
-	UpdateState(); // TODO: I don't understand
-	UpdateState(); // Why do I need to call this twice?
+	djs.update(); // TODO: Figure out why this needs to be called TWICE
+	djs.update(); // Otherwise the wheel keeps turning/value is not updated?
 	prevTime = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 	prevPosition = GetAxisValue(steerAxis, guid);
 }																																						
@@ -117,16 +111,12 @@ void WheelDirectInput::UpdateCenterSteering(GUID guid, DIAxis steerAxis) {
  * Return NULL when device isn't found
  */
 const DiJoyStick::Entry *WheelDirectInput::FindEntryFromGUID(GUID guid) {
-	if (!isInitialized) {
-		return nullptr;
-	}
-
-	if (nEntry > 0) {
+	if (djs.getEntryCount() > 0) {
 		if (guid == GUID_NULL) {
 			return nullptr;
 		}
 
-		for (int i = 0; i < nEntry; i++) {
+		for (int i = 0; i < djs.getEntryCount(); i++) {
 			auto tempEntry = djs.getEntry(i);
 			if (guid == tempEntry->diDeviceInstance.guidInstance) {
 				return tempEntry;
@@ -136,17 +126,11 @@ const DiJoyStick::Entry *WheelDirectInput::FindEntryFromGUID(GUID guid) {
 	return nullptr;
 }
 
-void WheelDirectInput::UpdateState() {
-	if (!isInitialized) {
-		return;
-	}
+void WheelDirectInput::Update() {
 	djs.update();
 }
 
 bool WheelDirectInput::IsConnected(GUID device) {
-	if (!isInitialized) {
-		return false;
-	}
 	auto e = FindEntryFromGUID(device);
 	if (!e) {
 		return false;
@@ -159,9 +143,6 @@ bool WheelDirectInput::IsConnected(GUID device) {
 // If it matches the cardinal stuff the button is a POV hat thing
 
 bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
-	if (!isInitialized) {
-		return false;
-	}
 	auto e = FindEntryFromGUID(device);
 
 	if (!e) {
@@ -197,9 +178,6 @@ bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
 }
 
 bool WheelDirectInput::IsButtonJustPressed(int buttonType, GUID device) {
-	if (!isInitialized) {
-		return false;
-	}
 	if (buttonType > 127) { // POV
 		povButtonCurr[buttonType] = IsButtonPressed(buttonType,device);
 
@@ -219,9 +197,6 @@ bool WheelDirectInput::IsButtonJustPressed(int buttonType, GUID device) {
 }
 
 bool WheelDirectInput::IsButtonJustReleased(int buttonType, GUID device) {
-	if (!isInitialized) {
-		return false;
-	}
 	if (buttonType > 127) { // POV
 		povButtonCurr[buttonType] = IsButtonPressed(buttonType,device);
 
@@ -241,9 +216,6 @@ bool WheelDirectInput::IsButtonJustReleased(int buttonType, GUID device) {
 }
 
 bool WheelDirectInput::WasButtonHeldForMs(int buttonType, GUID device, int millis) {
-	if (!isInitialized) {
-		return false;
-	}
 	if (buttonType > 127) { // POV
 		if (IsButtonJustPressed(buttonType,device)) {
 			povPressTime[buttonType] = milliseconds_now();
@@ -275,9 +247,6 @@ bool WheelDirectInput::WasButtonHeldForMs(int buttonType, GUID device, int milli
 }
 
 void WheelDirectInput::UpdateButtonChangeStates() {
-	if (!isInitialized) {
-		return;
-	}
 	for (int i = 0; i < MAX_RGBBUTTONS; i++) {
 		rgbButtonPrev[i] = rgbButtonCurr[i];
 	}
@@ -286,10 +255,7 @@ void WheelDirectInput::UpdateButtonChangeStates() {
 	}
 }
 
-bool WheelDirectInput::CreateConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis) {
-	if (!isInitialized) {
-		return false;
-	}
+bool WheelDirectInput::createConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis) {
 	if (!e)
 		return false;
 
@@ -340,11 +306,8 @@ bool WheelDirectInput::CreateConstantForceEffect(const DiJoyStick::Entry *e, DIA
 }
 
 void WheelDirectInput::SetConstantForce(GUID device, int force) {
-	if (!isInitialized) {
-		return;
-	}
 	auto e = FindEntryFromGUID(device);
-	if (!e || !pCFEffect || NoFeedback)
+	if (!e || !pCFEffect || !hasForceFeedback)
 		return;
 
 	LONG rglDirection[1] = {0};
@@ -390,7 +353,7 @@ WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString)
 
 // -1 means device not accessible
 int WheelDirectInput::GetAxisValue(DIAxis axis, GUID device) {
-	if (!IsConnected(device) || !isInitialized) {
+	if (!IsConnected(device)) {
 		return -1;
 	}
 	auto e = FindEntryFromGUID(device);
@@ -411,9 +374,6 @@ int WheelDirectInput::GetAxisValue(DIAxis axis, GUID device) {
 
 // Returns in units/s
 float WheelDirectInput::GetAxisSpeed(DIAxis axis, GUID device) {
-	if (!isInitialized) {
-		return -1;
-	}
 	auto time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 	auto position = GetAxisValue(axis , device);
 	auto result = (position - prevPosition) / ((time - prevTime) / 1e9f);
@@ -438,9 +398,6 @@ std::vector<GUID> WheelDirectInput::GetGuids() {
 
 // Only confirmed to work on my own G27
 void WheelDirectInput::PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine) {
-	if (!isInitialized) {
-		return;
-	}
 	auto e = FindEntryFromGUID(guid);
 
 	if (!e)
@@ -484,10 +441,6 @@ void WheelDirectInput::PlayLedsDInput(GUID guid, const FLOAT currentRPM, const F
 	//HRESULT hr;
 	//hr = e->diDevice->Escape(&data_);
 	e->diDevice->Escape(&data_);
-}
-
-bool WheelDirectInput::IsInitialized() {
-	return isInitialized;
 }
 
 void WheelDirectInput::formatError(HRESULT hr, std::string &hrStr) {

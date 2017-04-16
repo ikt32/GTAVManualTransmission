@@ -141,7 +141,7 @@ public:
 	void CheckGUIDs(const std::vector<_GUID> &guids);
 	bool ButtonIn(ControllerControlType control);
 
-	WheelDirectInput WheelDI;
+	WheelDirectInput WheelControl;
 
 	void SetXboxTrigger(int value);
 	InputDevices PrevInput;
@@ -165,7 +165,6 @@ private:
 	bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	Logger logger;
-	bool wheelInitialized = false;
 };
 
 // GUID stuff

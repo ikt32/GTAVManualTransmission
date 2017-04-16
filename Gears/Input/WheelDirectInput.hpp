@@ -39,9 +39,8 @@ public:
 		"rglSlider1",
 		"UNKNOWN_AXIS"
 	};
-	bool NoFeedback = false;
-	int nEntry = 0;
-
+	//bool NoFeedback = false;
+	
 	enum POV {
 		N = 3600,
 		NE = 4500,
@@ -57,14 +56,15 @@ public:
 
 	WheelDirectInput(Logger &logAlt);
 	~WheelDirectInput();
+
 	bool InitWheel();
-	void formatError(HRESULT hr, std::string &hrStr);
+
 	bool InitFFB(GUID guid, DIAxis ffAxis);
 	void UpdateCenterSteering(GUID guid, DIAxis steerAxis);
 	const DiJoyStick::Entry *FindEntryFromGUID(GUID guid);
 
 	// Should be called every update()
-	void UpdateState();
+	void Update();
 
 	bool IsConnected(GUID device);
 	bool IsButtonPressed(int btn, GUID device);
@@ -76,22 +76,19 @@ public:
 	void SetConstantForce(GUID device, int force);
 
 	DIAxis StringToAxis(std::string& axisString);
-	//DIJOYSTATE2 JoyStates;
 
 	int GetAxisValue(DIAxis axis, GUID device);
 	float GetAxisSpeed(DIAxis axis, GUID device);
 	std::vector<GUID> GetGuids();
 	void PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine);
-	bool IsInitialized();
+
 private:
-	bool CreateConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis);
-	
-	bool isInitialized = false;
-
 	Logger logger;
+
+	bool createConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis);
+	void formatError(HRESULT hr, std::string &hrStr);
+
 	DiJoyStick djs;
-
-
 	LPDIRECTINPUT lpDi = nullptr;
 	LPDIRECTINPUTEFFECT pCFEffect;
 	LPDIRECTINPUTEFFECT pFREffect;
@@ -111,4 +108,5 @@ private:
 	std::array<float, SAMPLES> samples = {};
 	int averageIndex = 0;
 	std::vector<GUID> foundGuids;
+	bool hasForceFeedback = false;
 };

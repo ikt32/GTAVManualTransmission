@@ -133,12 +133,11 @@ void init() {
 
 	controls.InitWheel();
 	controls.CheckGUIDs(settings.reggdGuids);
-	controls.SteerAxisType = ScriptControls::WheelAxisType::Steer;
 	controls.SteerGUID = controls.WheelAxesGUIDs[static_cast<int>(controls.SteerAxisType)];
 	
 	int totalWidth = 0;
-	for (auto guid : controls.WheelDI.GetGuids()) {
-		//std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
+	for (auto guid : controls.WheelControl.GetGuids()) {
+		//std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
 		totalWidth += devWidth;//static_cast<int>(wDevName.length()) + 4;
 	}
 	
@@ -155,7 +154,7 @@ void init() {
  */
 void playWheelEffects(float effSteer) {
 	if (settings.LogiLEDs) {
-		controls.WheelDI.PlayLedsDInput(controls.SteerGUID, controls.ThrottleVal, 0.5f, 0.95f);
+		controls.WheelControl.PlayLedsDInput(controls.SteerGUID, controls.ThrottleVal, 0.5f, 0.95f);
 	}
 
 	auto totalForce = static_cast<int>(controls.ThrottleVal * 20000.0f * 2.0f * (controls.SteerVal - 0.5f));
@@ -167,8 +166,8 @@ void playWheelEffects(float effSteer) {
 		damperForce = settings.DamperMin;
 	}
 	// steerSpeed is to dampen the steering wheel
-	auto steerAxis = controls.WheelDI.StringToAxis(controls.WheelAxes[static_cast<int>(controls.SteerAxisType)]);
-	auto steerSpeed = controls.WheelDI.GetAxisSpeed(steerAxis, controls.SteerGUID) / 20;
+	auto steerAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(controls.SteerAxisType)]);
+	auto steerSpeed = controls.WheelControl.GetAxisSpeed(steerAxis, controls.SteerGUID) / 20;
 
 	totalForce += static_cast<int>(damperForce * 0.1f * steerSpeed);
 
@@ -184,18 +183,18 @@ void playWheelEffects(float effSteer) {
 			totalForce = -10000;
 		}
 	}
-	controls.WheelDI.SetConstantForce(controls.SteerGUID, totalForce);
+	controls.WheelControl.SetConstantForce(controls.SteerGUID, totalForce);
 }
 
 /*
  * Fun starts here!
  */
 bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> startStates, std::tuple<GUID, std::string> &selectedDevice, int hyst, bool &positive, int &startValue_) {
-	for (auto guid : controls.WheelDI.GetGuids()) {
+	for (auto guid : controls.WheelControl.GetGuids()) {
 		for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
 			for (auto startState : startStates) {
-				std::string axisName = controls.WheelDI.DIAxisHelper[i];
-				int axisValue = controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid);
+				std::string axisName = controls.WheelControl.DIAxisHelper[i];
+				int axisValue = controls.WheelControl.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid);
 				int startValue = std::get<2>(startState);
 				if (std::get<0>(startState) == guid &&
 					std::get<1>(startState) == axisName) {
@@ -218,7 +217,7 @@ bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> sta
 }
 
 void saveAxis(const std::string &gameAxis, const std::string &confTag, std::tuple<GUID, std::string> selectedDevice, int min, int max) {
-	std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
+	std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
 	std::string devName = std::string(wDevName.begin(), wDevName.end());
 	auto index = settings.SteeringAppendDevice(std::get<0>(selectedDevice), devName);
 	settings.SteeringSaveAxis(confTag, index, std::get<1>(selectedDevice), min, max);
@@ -283,10 +282,10 @@ void configDynamicAxes(char c) {
 	
 	// Save current state
 	std::vector<std::tuple<GUID, std::string, int>> startStates;
-	for (auto guid : controls.WheelDI.GetGuids()) {
+	for (auto guid : controls.WheelControl.GetGuids()) {
 		for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
-			std::string axisName = controls.WheelDI.DIAxisHelper[i];
-			int axisValue = controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid);
+			std::string axisName = controls.WheelControl.DIAxisHelper[i];
+			int axisValue = controls.WheelControl.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid);
 			startStates.push_back(std::tuple<GUID, std::string, int>(guid, axisName, axisValue));
 		}
 	}
@@ -359,8 +358,8 @@ void configDynamicAxes(char c) {
 		return;
 	}
 
-	int prevAxisValue = controls.WheelDI.GetAxisValue(controls.WheelDI.StringToAxis(std::get<1>(selectedDevice)), std::get<0>(selectedDevice));
-	std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
+	int prevAxisValue = controls.WheelControl.GetAxisValue(controls.WheelControl.StringToAxis(std::get<1>(selectedDevice)), std::get<0>(selectedDevice));
+	std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
 	std::string selectedDevName = std::string(wDevName.begin(), wDevName.end()).c_str();
 	std::string selectedAxis = std::get<1>(selectedDevice);
 	GUID selectedGUID = std::get<0>(selectedDevice);
@@ -384,7 +383,7 @@ void configDynamicAxes(char c) {
 		}
 		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
 		
-		int axisValue = controls.WheelDI.GetAxisValue(controls.WheelDI.StringToAxis(selectedAxis), selectedGUID);
+		int axisValue = controls.WheelControl.GetAxisValue(controls.WheelControl.StringToAxis(selectedAxis), selectedGUID);
 
 		if (positive && axisValue < prevAxisValue) {
 			endValue = prevAxisValue;
@@ -454,14 +453,14 @@ void configDynamicButtons(char c) {
 	// Check whether any buttons had been pressed already
 	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
 
-	for (auto guid : controls.WheelDI.GetGuids()) {
+	for (auto guid : controls.WheelControl.GetGuids()) {
 		for (int i = 0; i < 255; i++) {
-			if (controls.WheelDI.IsButtonPressed(i, guid)) {
+			if (controls.WheelControl.IsButtonPressed(i, guid)) {
 				buttonsActive++;
 			}
 		}
 		for (auto d : directions) {
-			if (controls.WheelDI.IsButtonPressed(d, guid)) {
+			if (controls.WheelControl.IsButtonPressed(d, guid)) {
 				buttonsActive++;
 			}
 		}
@@ -500,11 +499,11 @@ void configDynamicButtons(char c) {
 		setCursorPosition(0, 0);
 		printf("Button for %s: ", gameButton.c_str());
 
-		for (auto guid : controls.WheelDI.GetGuids()) {
-			std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
+		for (auto guid : controls.WheelControl.GetGuids()) {
+			std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
 			std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
 			for (int i = 0; i < 255; i++) {
-				if (controls.WheelDI.IsButtonPressed(i, guid)) {
+				if (controls.WheelControl.IsButtonPressed(i, guid)) {
 					printf("%d @ %s", i, devName.c_str());
 					saveButton(i, confTag, guid, devName);
 					blankLines(csbi.srWindow.Bottom - 5, 6);
@@ -520,7 +519,7 @@ void configDynamicButtons(char c) {
 			//POV hat shit
 			std::string directionsStr = "?";
 			for (auto d : directions) {
-				if (controls.WheelDI.IsButtonPressed(d, guid)) {
+				if (controls.WheelControl.IsButtonPressed(d, guid)) {
 					if (d == WheelDirectInput::N) directionsStr = "N ";
 					if (d == WheelDirectInput::NE) directionsStr = "NE";
 					if (d == WheelDirectInput::E) directionsStr = " E";
@@ -610,11 +609,12 @@ void configHShift(char c) {
 				return;
 			}
 			if (progress == 0) { // Device selection
-				for (int i = 0; i < controls.WheelDI.nEntry; i++) {
+
+				for (int i = 0; i < controls.WheelControl.GetGuids().size(); i++) {
 					if (c == i + '0') {
 						devEntry = i;
 						int devNumber = 0;
-						for (auto guid : controls.WheelDI.GetGuids()) {
+						for (auto guid : controls.WheelControl.GetGuids()) {
 							if (devNumber == devEntry) {
 								devGUID = guid;
 							}
@@ -656,8 +656,8 @@ void configHShift(char c) {
 			case 0: { // Device selection
 				setCursorPosition(0, 0);
 				int devNumber = 0;
-				for (auto guid : controls.WheelDI.GetGuids()) {
-					wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
+				for (auto guid : controls.WheelControl.GetGuids()) {
+					wDevName = controls.WheelControl.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
 					devName = std::string(wDevName.begin(), wDevName.end()).c_str();
 					std::cout << devNumber << ": " << devName << "\n";
 					devNumber++;
@@ -678,7 +678,7 @@ void configHShift(char c) {
 				printf("Select for gear %d:", progress);
 				setCursorPosition(0, 1);
 				for (int i = 0; i < 255; i++) {
-					if (controls.WheelDI.IsButtonPressed(i, devGUID)) {
+					if (controls.WheelControl.IsButtonPressed(i, devGUID)) {
 						devName = std::string(wDevName.begin(), wDevName.end()).c_str();
 						printf("%d @ %s", i, devName.c_str());
 						buttonsActive++;
@@ -699,7 +699,7 @@ void configHShift(char c) {
 				printf("Select for reverse gear");
 				setCursorPosition(0, 1);
 				for (int i = 0; i < 255; i++) {
-					if (controls.WheelDI.IsButtonPressed(i, devGUID)) {
+					if (controls.WheelControl.IsButtonPressed(i, devGUID)) {
 						devName = std::string(wDevName.begin(), wDevName.end()).c_str();
 						printf("%d @ %s", i, devName.c_str());
 						buttonsActive++;
@@ -788,8 +788,8 @@ int main()
 
 		int guidIt = 0;
 		int pRowMax = 0;
-		for (auto guid : controls.WheelDI.GetGuids()) {
-			if (!controls.WheelDI.FindEntryFromGUID(guid)) {
+		for (auto guid : controls.WheelControl.GetGuids()) {
+			if (!controls.WheelControl.FindEntryFromGUID(guid)) {
 				init();
 				break;
 			}
@@ -798,7 +798,7 @@ int main()
 			int xCursorPos = devWidth * guidIt;
 			setCursorPosition(xCursorPos, pRow);
 			pRow++;
-			std::wstring wDevName = controls.WheelDI.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
+			std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
 			std::string devName = std::string(wDevName.begin(), wDevName.end());
 			if (devName.length() > devWidth) {
 				devName.replace(devWidth - 4, 3, "...");
@@ -813,8 +813,8 @@ int main()
 				blankBlock(xCursorPos, pRow, 1, devWidth);
 				setCursorPosition(xCursorPos, pRow);
 				printf("    %s: %d",
-					   controls.WheelDI.DIAxisHelper[i].c_str(),
-					   controls.WheelDI.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid));
+					   controls.WheelControl.DIAxisHelper[i].c_str(),
+					   controls.WheelControl.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid));
 				pRow++;
 			}
 
@@ -825,7 +825,7 @@ int main()
 			blankBlock(xCursorPos, pRow, 1, devWidth);
 			setCursorPosition(xCursorPos, pRow);
 			for (int i = 0; i < 255; i++) {
-				if (controls.WheelDI.IsButtonPressed(i, guid)) {
+				if (controls.WheelControl.IsButtonPressed(i, guid)) {
 					std::cout << i << " ";
 				}
 			}
@@ -850,7 +850,7 @@ int main()
 				if (d == WheelDirectInput::SW) directionsStr = "SW";
 				if (d == WheelDirectInput::W ) directionsStr = " W";
 				if (d == WheelDirectInput::NW) directionsStr = "NW";
-				if (controls.WheelDI.IsButtonPressed(d, guid)) {
+				if (controls.WheelControl.IsButtonPressed(d, guid)) {
 					printf("%05d (%s)", d, directionsStr.c_str());
 				}
 			}
@@ -903,7 +903,7 @@ int main()
 		if (controls.ButtonIn(ScriptControls::WheelControlType::Toggle)) std::cout << "ToggleMod ";
 		if (controls.ButtonIn(ScriptControls::WheelControlType::ToggleH)) std::cout << "ChangeShiftMode ";
 
-		if (!controls.WheelDI.NoFeedback && controls.WheelDI.IsConnected(controls.SteerGUID))
+		if (controls.WheelControl.IsConnected(controls.SteerGUID))
 			playWheelEffects(effSteer);
 		
 		setCursorPosition(0, csbi.srWindow.Bottom - 9);

@@ -130,7 +130,7 @@ void update() {
 		updateLastInputDevice();
 
 		if (settings.AltControls &&
-			controls.WheelDI.IsConnected(controls.SteerGUID) &&
+			controls.WheelControl.IsConnected(controls.SteerGUID) &&
 			controls.PrevInput == ScriptControls::Wheel) {
 			if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
 				controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
@@ -167,7 +167,7 @@ void update() {
 
 	if (!settings.EnableManual &&
 		settings.WheelWithoutManual &&
-		controls.WheelDI.IsConnected(controls.SteerGUID)) {
+		controls.WheelControl.IsConnected(controls.SteerGUID)) {
 
 		updateLastInputDevice();
 		handleVehicleButtons();
@@ -194,7 +194,7 @@ void update() {
 	updateLastInputDevice();
 	handleVehicleButtons();
 
-	if (controls.WheelDI.IsConnected(controls.SteerGUID)) {
+	if (controls.WheelControl.IsConnected(controls.SteerGUID)) {
 		doWheelSteering();
 		bool airborne = !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) &&
 			ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f;
@@ -321,7 +321,6 @@ void drawRPMIndicator(float x, float y, float width, float height, Color fg, Col
 	
 	// background
 	GRAPHICS::DRAW_RECT(x, y, width+bgpadding, height+bgpadding, bg.R, bg.G, bg.B, bg.A);
-
 
 	// rpm thingy
 	GRAPHICS::DRAW_RECT(x-width*0.5f+rpm*width*0.5f, y, width*rpm, height, fg.R, fg.G, fg.B, fg.A);
@@ -499,9 +498,40 @@ void showDebugInfo() {
 
 	if (settings.WheelEnabled) {
 		std::stringstream dinputDisplay;
-		dinputDisplay << "Wheel Avail: " << controls.WheelDI.IsConnected(controls.SteerGUID);
+		dinputDisplay << "Wheel Avail: " << controls.WheelControl.IsConnected(controls.SteerGUID);
 		showText(0.85, 0.150, 0.4, dinputDisplay.str().c_str());
 	}
+}
+
+void showDebugInfoWheel(ScriptSettings &settings, float effSteer, int damperForce, float steerSpeed, double GForce, float oversteer, float understeer) {
+	std::stringstream SteerRaw;
+	SteerRaw << "SteerRaw: " << controls.SteerVal;
+	showText(0.85, 0.175, 0.4, SteerRaw.str().c_str());
+
+	std::stringstream SteerNorm;
+	SteerNorm << "SteerNorm: " << effSteer;
+	showText(0.85, 0.200, 0.4, SteerNorm.str().c_str());
+
+	std::stringstream steerDisplay;
+	steerDisplay << "SteerSpeed: " << steerSpeed;
+	showText(0.85, 0.225, 0.4, steerDisplay.str().c_str());
+
+	std::stringstream GForceDisplay;
+	GForceDisplay << "GForceFinal: " <<
+		std::setprecision(5) << (-GForce * 5000 * settings.FFPhysics * settings.FFGlobalMult);
+	showText(0.85, 0.250, 0.4, GForceDisplay.str().c_str());
+
+	std::stringstream damperF;
+	damperF << "DampForce: " << steerSpeed * damperForce * 0.1;
+	showText(0.85, 0.300, 0.4, damperF.str().c_str());
+
+	std::stringstream ssUnderSteer;
+	ssUnderSteer << "Understeer: " << understeer;
+	showText(0.85, 0.325, 0.4, ssUnderSteer.str().c_str());
+
+	std::stringstream ssOverSteer;
+	ssOverSteer << "Oversteer: " << oversteer;
+	showText(0.85, 0.350, 0.4, ssOverSteer.str().c_str());
 }
 
 // To expose some variables to other scripts
@@ -553,7 +583,6 @@ void reInit() {
 		controls.InitWheel();
 		controls.CheckGUIDs(settings.reggdGuids);
 	}
-	controls.SteerAxisType = ScriptControls::WheelAxisType::Steer;
 	controls.SteerGUID = controls.WheelAxesGUIDs[static_cast<int>(controls.SteerAxisType)];
 
 	logger.Write("Initialization finished");
@@ -567,8 +596,8 @@ void reset() {
 	if (MemoryPatcher::SteeringPatched) {
 		MemoryPatcher::RestoreSteeringCorrection();
 	}
-	if (controls.WheelDI.IsConnected(controls.SteerGUID)) {
-		controls.WheelDI.SetConstantForce(controls.SteerGUID, 0);
+	if (controls.WheelControl.IsConnected(controls.SteerGUID)) {
+		controls.WheelControl.SetConstantForce(controls.SteerGUID, 0);
 	}
 }
 
@@ -613,8 +642,8 @@ void updateLastInputDevice() {
 				break;
 		}
 		if (controls.PrevInput != ScriptControls::Wheel && settings.LogiLEDs) {
-			for (GUID guid : controls.WheelDI.GetGuids()) {
-				controls.WheelDI.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
+			for (GUID guid : controls.WheelControl.GetGuids()) {
+				controls.WheelControl.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
 			}
 		}
 	}
@@ -1256,8 +1285,7 @@ void handleVehicleButtons() {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 	}
 
-	if (!controls.WheelDI.IsConnected(controls.SteerGUID) ||
-		controls.WheelDI.NoFeedback ||
+	if (!controls.WheelControl.IsConnected(controls.SteerGUID) ||
 		controls.PrevInput != ScriptControls::Wheel) {
 		return;
 	}
@@ -1455,17 +1483,16 @@ void doWheelSteeringPlane() {
 }
 
 void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airborne, bool ignoreSpeed) {
-	auto steerAxis = controls.WheelDI.StringToAxis(controls.WheelAxes[static_cast<int>(controls.SteerAxisType)]);
+	auto steerAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(controls.SteerAxisType)]);
 
-	if (!controls.WheelDI.IsConnected(controls.SteerGUID) ||
-		controls.WheelDI.NoFeedback ||
+	if (!controls.WheelControl.IsConnected(controls.SteerGUID) ||
 		controls.PrevInput != ScriptControls::Wheel ||
 		!settings.FFEnable) {
 		return;
 	}
 
 	if (settings.LogiLEDs) {
-		controls.WheelDI.PlayLedsDInput(controls.SteerGUID, vehData.Rpm, 0.45, 0.95);
+		controls.WheelControl.PlayLedsDInput(controls.SteerGUID, vehData.Rpm, 0.45, 0.95);
 	}
 
 	Vector3 accelVals = vehData.getAccelerationVectors(vehData.V3Velocities);
@@ -1494,7 +1521,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	}
 
 	// steerSpeed is to dampen the steering wheel
-	auto steerSpeed = controls.WheelDI.GetAxisSpeed(steerAxis, controls.SteerGUID) / 20;
+	auto steerSpeed = controls.WheelControl.GetAxisSpeed(steerAxis, controls.SteerGUID) / 20;
 
 	/*                    a                                        v^2
 	 * Because G Force = ---- and a = v * omega, verified with a = ---   using a speedo and 
@@ -1587,37 +1614,10 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 			totalForce = -10000;
 		}
 	}
-	controls.WheelDI.SetConstantForce(controls.SteerGUID, totalForce);
+	controls.WheelControl.SetConstantForce(controls.SteerGUID, totalForce);
 
 	if (settings.DisplayInfo) {
-		std::stringstream SteerRaw;
-		SteerRaw << "SteerRaw: " << controls.SteerVal;
-		showText(0.85, 0.175, 0.4, SteerRaw.str().c_str());
-
-		std::stringstream SteerNorm;
-		SteerNorm << "SteerNorm: " << effSteer;
-		showText(0.85, 0.200, 0.4, SteerNorm.str().c_str());
-
-		std::stringstream steerDisplay;
-		steerDisplay << "SteerSpeed: " << steerSpeed;
-		showText(0.85, 0.225, 0.4, steerDisplay.str().c_str());
-		
-		std::stringstream GForceDisplay;
-		GForceDisplay << "GForceFinal: " <<
-			std::setprecision(5) << (-GForce * 5000 * settings.FFPhysics * settings.FFGlobalMult);
-		showText(0.85, 0.250, 0.4, GForceDisplay.str().c_str());
-
-		std::stringstream damperF;
-		damperF << "DampForce: " << steerSpeed * damperForce * 0.1;
-		showText(0.85, 0.300, 0.4, damperF.str().c_str());
-		
-		std::stringstream ssUnderSteer;
-		ssUnderSteer << "Understeer: " << understeer;
-		showText(0.85, 0.325, 0.4, ssUnderSteer.str().c_str());
-
-		std::stringstream ssOverSteer;
-		ssOverSteer << "Oversteer: " << oversteer;
-		showText(0.85, 0.350, 0.4, ssOverSteer.str().c_str());
+		showDebugInfoWheel(settings, effSteer, damperForce, steerSpeed, GForce, oversteer, understeer);
 	}
 }
 
