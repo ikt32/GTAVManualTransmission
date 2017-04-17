@@ -44,6 +44,7 @@ natively! A few features:
 - [Requirements](#requirements)
 - [Installation](#installation)
     - [Additional steps for wheel users](#additional-steps-for-wheel-users)
+- [FiveM installation](#fivem-installation)
 - [Updating](#updating)
 - [Recommended mods](#recommended-mods)
 - [Basic usage and controls](#basic-usage-and-controls)
@@ -93,6 +94,11 @@ When using `WheelConfigurator`, reloading will re-load the config file and check
 When reloading the mod by toggling it off and on, the settings are read again
 and the steering wheel (if connected) is reset again. You can use this to fine-
 tune your settings and change things on-the-fly, without restarting the game.
+
+# FiveM installation
+1. Create a plugins folder in FiveM Application Data 
+2. Gears.asi and the ManualTransmission folder in there.
+
 
 # Updating
 Replace `Gears.asi` and the folder `ManualTransmission` in your GTA V folder.
