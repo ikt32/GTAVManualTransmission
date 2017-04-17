@@ -12,7 +12,7 @@ ScriptControls::ScriptControls(Logger &logger): WheelControl(logger),
 
 ScriptControls::~ScriptControls() { }
 
-void ScriptControls::InitWheel() {
+void ScriptControls::InitWheel(bool initffb) {
 	if (!WheelControl.InitWheel()) {
 		// Initialization failed somehow, so we skip
 		return;
@@ -21,7 +21,8 @@ void ScriptControls::InitWheel() {
 	auto steerGUID = WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)];
 	auto steerAxis = WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)]);
 	auto ffAxis = WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]);
-	if (WheelControl.InitFFB(steerGUID, steerAxis)) {
+	
+	if (initffb && WheelControl.InitFFB(steerGUID, steerAxis)) {
 		WheelControl.UpdateCenterSteering(steerGUID, ffAxis);
 	}
 }

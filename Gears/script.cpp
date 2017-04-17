@@ -580,7 +580,7 @@ void reInit() {
 	vehData.LockGears = 0x00010001;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
 	if (settings.WheelEnabled) {
-		controls.InitWheel();
+		controls.InitWheel(settings.FFEnable);
 		controls.CheckGUIDs(settings.reggdGuids);
 	}
 	controls.SteerGUID = controls.WheelAxesGUIDs[static_cast<int>(controls.SteerAxisType)];
@@ -596,7 +596,7 @@ void reset() {
 	if (MemoryPatcher::SteeringPatched) {
 		MemoryPatcher::RestoreSteeringCorrection();
 	}
-	if (controls.WheelControl.IsConnected(controls.SteerGUID) && settings.FFEnable) {
+	if (settings.FFEnable && controls.WheelControl.IsConnected(controls.SteerGUID)) {
 		controls.WheelControl.SetConstantForce(controls.SteerGUID, 0);
 	}
 }

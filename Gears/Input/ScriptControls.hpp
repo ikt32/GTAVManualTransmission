@@ -87,7 +87,7 @@ public:
 
 	ScriptControls(Logger &logger);
 	~ScriptControls();
-	void InitWheel();
+	void InitWheel(bool initffb);
 
 	InputDevices GetLastInputDevice(InputDevices previous);
 	void UpdateValues(InputDevices prevInput, bool ignoreClutch, bool justPeekingWheelKb);
