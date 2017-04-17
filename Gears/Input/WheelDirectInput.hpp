@@ -83,7 +83,7 @@ public:
 	void PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine);
 
 private:
-	Logger logger;
+	Logger &logger;
 
 	bool createConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis);
 	void formatError(HRESULT hr, std::string &hrStr);

@@ -132,7 +132,7 @@ public:
 private:
 	std::string settings_general_version = "000";
 	std::string settings_wheel_version = "000";
-	Logger logger;
+	Logger &logger;
 	void parseSettingsWheel(ScriptControls *scriptControl);
 
 	// Just looks up which GUID corresponds with what number and returns the GUID.

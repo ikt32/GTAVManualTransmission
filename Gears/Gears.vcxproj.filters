@@ -35,6 +35,7 @@
     <ClCompile Include="Util\Util.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="General.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -88,6 +89,7 @@
     <ClInclude Include="Util\simpleini\SimpleIni.h">
       <Filter>Util\simpleini</Filter>
     </ClInclude>
+    <ClInclude Include="General.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

@@ -7,6 +7,7 @@
 #include "../Gears/ScriptSettings.hpp"
 #include "../Gears/Input/ScriptControls.hpp"
 #include <thread>
+#include "../Gears/General.h"
 
 #define ESC 0x1B
 #define TAB 0x09
@@ -20,9 +21,11 @@ RECT r;
 HWND consoleWindow;
 CONSOLE_SCREEN_BUFFER_INFO csbi;
 
-Logger logger("./DIUtil.log");
 ScriptControls controls(logger);
-ScriptSettings settings("./settings_general.ini", "./settings_wheel.ini", logger);
+
+std::string settingsGeneralFile = Util::GetRunningExecutableFolder() + "\\settings_general.ini";
+std::string settingsWheelFile = Util::GetRunningExecutableFolder() + "\\settings_wheel.ini";
+ScriptSettings settings(settingsGeneralFile, settingsWheelFile,	logger);
 
 std::array<int, 8> directions = {
 	WheelDirectInput::POV::N,
@@ -739,8 +742,9 @@ void configHShift(char c) {
 }
 
 
-int main()
-{
+int main() {
+	std::string logFile = Util::GetRunningExecutableFolder() + "\\" + Util::GetRunningExecutableNameWithoutExtension() + ".log";;
+	logger.SetFile(logFile);
 	int axisTextHeight = 0;
 	int buttonTextHeight = 0;
 

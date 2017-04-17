@@ -1,18 +1,16 @@
 #pragma once
 #include <string>
 
-/*
- * Due to how I use the logger in Gears, this little thing should only be used
- * when in project Gears in the Memory classes, main.cpp, and script.cpp.
- */
-#define GEARSLOGPATH "./Gears.log"
-
 class Logger {
 public:
-	Logger(const std::string &fileName);
+	Logger();
 	void Clear() const;
 	void Write(const std::string& text) const;
+	void SetFile(const std::string &fileName);
 
 private:
-	std::string file;
+	std::string file = "";
+	std::string bakFile = "./GearsERR.log";
 };
+
+extern Logger logger;

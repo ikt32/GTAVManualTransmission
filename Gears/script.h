@@ -6,8 +6,6 @@ http://dev-c.com
 
 #pragma once
 
-//#include "../../ScriptHookV_SDK/inc/types.h"
-
 #ifndef DIRECTINPUT_VERSION
 #define DIRECTINPUT_VERSION 0x0800
 #endif

@@ -164,7 +164,7 @@ private:
 	
 	bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
-	Logger logger;
+	Logger &logger;
 };
 
 // GUID stuff

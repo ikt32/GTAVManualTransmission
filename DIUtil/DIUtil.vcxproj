@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\Gears\General.h" />
     <ClInclude Include="..\Gears\Input\DiJoyStick.h" />
     <ClInclude Include="..\Gears\Input\keyboard.h" />
     <ClInclude Include="..\Gears\Input\ScriptControls.hpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="..\Gears\Util\TimeHelper.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Gears\General.cpp" />
     <ClCompile Include="..\Gears\Input\keyboard.cpp" />
     <ClCompile Include="..\Gears\Input\ScriptControls.cpp" />
     <ClCompile Include="..\Gears\Input\WheelDirectInput.cpp" />

@@ -11,9 +11,15 @@ http://dev-c.com
 #include "Util/Logger.hpp"
 #include "Util/Util.hpp"
 #include "Memory/MemoryPatcher.hpp"
+#include "General.h"
+
+
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
-	Logger logger(GEARSLOGPATH);
+	std::string logFile = Util::GetModuleFolder(hInstance) + "\\" +
+		Util::GetModuleNameWithoutExtension(hInstance) + ".log";
+	logger.SetFile(logFile);
+
 	// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 	switch (reason) {
 		case DLL_PROCESS_ATTACH: {

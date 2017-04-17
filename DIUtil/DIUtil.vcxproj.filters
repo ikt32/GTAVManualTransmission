@@ -34,6 +34,9 @@
     <ClInclude Include="..\Gears\Input\WheelDirectInput.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\Gears\General.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Gears\Input\XboxController.cpp">
@@ -59,5 +62,6 @@
     </ClCompile>
     <ClCompile Include="graveyard.cpp" />
     <ClCompile Include="DIUtil.cpp" />
+    <ClCompile Include="..\Gears\General.cpp" />
   </ItemGroup>
 </Project>

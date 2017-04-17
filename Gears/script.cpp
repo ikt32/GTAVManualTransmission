@@ -18,11 +18,13 @@
 #include "Memory/MemoryPatcher.hpp"
 #include "Util/Logger.hpp"
 #include "Util/Util.hpp"
+#include "General.h"
 
-Logger logger(GEARSLOGPATH);
 ScriptControls controls(logger);
-ScriptSettings settings("./ManualTransmission/settings_general.ini", 
-	"./ManualTransmission/settings_wheel.ini", logger);
+std::string myDir = "\\ManualTransmission";
+std::string settingsGeneralFile =	Util::GetModuleFolder(Util::GetOurModuleHandle()) + myDir + "\\settings_general.ini";
+std::string settingsWheelFile =		Util::GetModuleFolder(Util::GetOurModuleHandle()) + myDir + "\\settings_wheel.ini";
+ScriptSettings settings(settingsGeneralFile, settingsWheelFile, logger);
 
 Player player;
 Ped playerPed;

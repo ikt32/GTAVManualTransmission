@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.2.0 - beta 3 / RC
+## 4.2.0 - Release
 Configuration changes:
 * Separate [HUD] section for HUD stuff
   * settings_general.ini: VERSION is 420R now

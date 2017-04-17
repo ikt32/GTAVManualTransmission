@@ -46,13 +46,11 @@ namespace MemoryPatcher {
 	int gearTries = 0;
 	int steerTries = 0;
 
-
 	bool PatchInstructions() {
 		if (gearTries > maxTries) {
 			return false;
 		}
 
-		Logger logger(GEARSLOGPATH);
 		logger.Write("GEARBOX: Patching");
 
 		if (TotalToPatch == TotalPatched) {
@@ -102,7 +100,6 @@ namespace MemoryPatcher {
 	}
 
 	bool RestoreInstructions() {
-		Logger logger(GEARSLOGPATH);
 		logger.Write("GEARBOX: Restoring instructions");
 
 		if (TotalPatched == 0) {
@@ -142,7 +139,6 @@ namespace MemoryPatcher {
 			return false;
 		}
 
-		Logger logger(GEARSLOGPATH);
 		logger.Write("STEERING: Patching");
 
 		if (SteeringPatched) {
@@ -177,7 +173,6 @@ namespace MemoryPatcher {
 	}
 
 	bool RestoreSteeringCorrection() {
-		Logger logger(GEARSLOGPATH);
 		logger.Write("STEERING: Restoring instructions");
 
 		if (!SteeringPatched) {
