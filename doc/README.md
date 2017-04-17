@@ -52,6 +52,7 @@ natively! A few features:
 - [Configuration](#configuration)
     - [`settings_general.ini`](#settings_generalini)
     - [`[OPTIONS]`](#options)
+    - [`[HUD]`](#hud)
     - [`[CONTROLLER]`](#controller)
     - [`[KEYBOARD]`](#keyboard)
     - [`[DEBUG]`](#debug)
@@ -83,11 +84,11 @@ natively! A few features:
 
 ## Additional steps for wheel users
 3.	Remove or disable any XInput or DirectInput DLL files for your wheel for GTA V
-4.	Launch `DIUtil.exe` in the `ManualTransmission` folder
+4.	Launch `WheelConfigurator.exe` in the `ManualTransmission` folder
 5.	Press the keys mentioned onscreen to configure the axles, buttons and shifter
 6.	Configure the rest of `ManualTransmission/settings_wheel.ini` for Force Feedback etc
 
-When using DIUtil, reloading will re-load the config file and check for device changes.
+When using `WheelConfigurator`, reloading will re-load the config file and check for device changes.
 
 When reloading the mod by toggling it off and on, the settings are read again
 and the steering wheel (if connected) is reset again. You can use this to fine-
@@ -122,11 +123,11 @@ updated, using this is fine. Before this happens, remove it if it crashes your
 game. It was needed to cancel the automatic countersteer and steering reduction
 at speed, but this is included in this mod starting with version 4.2.0.
 
-<sub>As of 11 March 2017, it hasn't been updated for v1.0.944.2</sub>
+<sub>As of 17 April 2017, it hasn't been updated for v1.0.944.2</sub>
 </sub>
 
 # Basic usage and controls
-It's useful to know how to drive stick shift. Alternatively you can also turn
+It's useful to know how to drive stick. Alternatively you can also turn
 off features like stalling, clutch grabbing, or just using sequential or
 automatic mode.
 
@@ -337,28 +338,23 @@ the engine.
 * `0`: Can only start engine with button
 * `1`: Can start engine with button and clutch + throttle
 
-### `UITips` : `0` or `1`
-This is a simple gear display, which might be of help to determine if you’re
-in Neutral or not. It also indicates if the gear you're in is the top gear with
-the specified color.
-
-* `0`: No indicator
-* `1`: Indicator active
-
-* `UITips_X`: `0` is left, `100` is right.
-* `UITips_Y`: `0` is top, `100` is bottom.
-* `UITips_Size`: Any numerical value.
-* `UITips_OnlyNeutral`: `0`: always show. `1`: Show only when in neutral
-* `UITips_TopGearC_R`: `0` to `255`: Red
-* `UITips_TopGearC_G`: `0` to `255`: Green
-* `UITips_TopGearC_B`: `0` to `255`: Blue
-
 ### `CrossScript` : `0` or `1`
 Turn this off to disable communication (shift indicators and neutral gear) to
-other mods. This functionality is automatically disabled when running FiveM. Any executable with version 1.0.505.2!
+other mods. This functionality is automatically disabled when running FiveM or any executable with version 1.0.505.2!
 
 * `0`: No mod info available for other mods
 * `1`: Mod info available for other mods
+
+## `[HUD]`
+Some info you can enable or disable at will. It's pretty self-explanatory. If some element is unwanted, it can be shifted off-screen by making the X and/or Y value 1.00 or more.
+
+* Gear: Current gear
+* GearTopColor: Color for when the top gear is reached
+* ShiftMode: Displays gearbox mode
+* Speedo: Custom speedometer matching the needle on the dashboard
+* RPM Indicator: Linear indicator. Colors can be adjusted
+* Redline: When the bar should turn another color
+* Revlimit: Absolute rev limit color. (yeah these two are different)
 
 ## `[CONTROLLER]`
 The controller can only be used for a sequential gearbox or automatic gearbox.
@@ -442,9 +438,13 @@ reversing with the throttle to work.
 
 ## `[DEBUG]`
 
-### `Info` : `0` or `1`
+### `DisplayInfo` : `0` or `1`
 * `0`: No debug info onscreen
-* `1`: Debug info onscreen with input metrics and other data.
+* `1`: Debug info onscreen with transmission info, input info and force feedback info
+
+### `LogCar` : `0` or `1`
+* `0`: No car address logged
+* `1`: Car address is logged to Gears.log when changing cars. Just something for me to debug things.
 
 ## `settings_wheel.ini`
 This file contains all settings for the wheel controls. I recommend using
