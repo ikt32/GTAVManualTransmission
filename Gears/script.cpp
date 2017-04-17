@@ -21,8 +21,8 @@
 #include "General.h"
 
 ScriptControls controls;
-std::string settingsGeneralFile =	Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_general.ini";
-std::string settingsWheelFile =		Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_wheel.ini";
+std::string settingsGeneralFile;// = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_general.ini";
+std::string settingsWheelFile;// = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_wheel.ini";
 ScriptSettings settings(settingsGeneralFile, settingsWheelFile);
 
 Player player;
@@ -1644,6 +1644,9 @@ void functionAutoGear1() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void main() {
+	settingsGeneralFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_general.ini";
+	settingsWheelFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_wheel.ini";
+	settings.SetFiles(settingsGeneralFile, settingsWheelFile);
 	reInit();
 	while (true) {
 		update();

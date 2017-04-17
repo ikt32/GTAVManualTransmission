@@ -13,6 +13,7 @@ const std::string CORRECTVWHEEL		= "420";
 class ScriptSettings {
 public:
 	ScriptSettings(const std::string &general, const std::string &wheel);
+	void SetFiles(const std::string &general, const std::string &wheel);
 	void parseSettingsGeneral(ScriptControls *scriptControl);
 	void Read(ScriptControls* scriptControl);
 	void Save() const;

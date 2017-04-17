@@ -13,6 +13,11 @@ ScriptSettings::ScriptSettings(const std::string &general,
 
 }
 
+void ScriptSettings::SetFiles(const std::string &general, const std::string &wheel) {
+	settingsGeneralFile = general;
+	settingsWheelFile = wheel;
+}
+
 
 void ScriptSettings::Read(ScriptControls* scriptControl) {
 	parseSettingsGeneral(scriptControl);
