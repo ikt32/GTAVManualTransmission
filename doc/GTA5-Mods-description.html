@@ -53,15 +53,31 @@ With manual transmission enabled, you'll want to be able to properly control you
 Put Gears.asi and the folder ManualTransmission in your GTA V folder (overwrite when asked)
 Read <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md>the README</a> and configure ManualTransmission/settings_general.ini to your preferences
 <b>Wheel installation</b>
-Wheel users should refer to the readme on GitHub for instructions.
+After doing the above, run DIUtil.exe and follow the onscreen instructions
+Wheel users should refer to the readme on GitHub for further options.
 
 <b>Requirements</b>
 GTA V
 <a href=http://www.dev-c.com/gtav/scripthookv/>ScriptHookV</a>
 
+<b>Troubleshooting</b>
+Have you tried turning it off and on?
+If you can't figure things out after having done what's in the readme, I'll need the following to help you.
+* Gears.log
+* ManualTransmission/settings_general.ini
+* ManualTransmission/settings_wheel.ini
+* What kind of inputs (wheel/controller/keyboard) you're using
+* What you already tried to do
+You can use <a href=www.pastebin.com>pastebin</a> to post the files.
+
+<b>Known bugs and problems</b>
+- Crashes with a G920 and ScriptHookVDotNet v2
+
 <b>Controls</b>
 <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md>README</a>
 Alternatively, check settings_general.ini for controls.
+
+<a href=https://gist.github.com/E66666666/16a6bd095f41355de0d4ccf9e6a52ffe>My G27 settings.</a> You need to replace the GUID with your GUID (or use the tool to assign any control after removing the two GUID lines)
 
 <b>Recommended mods</b>
 <a href=https://www.gta5-mods.com/scripts/speedometer-improvedalexbladeversion>Speedometer by LeFix</a>
@@ -88,39 +104,52 @@ Latest builds: <a href=https://ci.appveyor.com/project/E66666666/gtavmanualtrans
 
 <b>Changelog</b>
 
+## <b>4.2.0 - beta 2</b>
+No configuration changes
 
-<b>4.2.0</b>
+Changes:
+* Fix messed up clutch for single-axis throttle/brake settings
+* Fix lag when patching fails: Limit patching attempts
+* Update strings for game version 1.0.1011.1
+* Fix vehicle moving before clutch catch point if throttle is pressed
+
+Wheel changes:
+* Fix crash when FFB applied on a null device after re-initialization
+* Cleaner DirectInput Force Feedback code
+* Cleaner wheel compression retrieval method for FFB detail
+* Improve radio changing
+* Add hold radio buttons to turn radio off
+
+DIUtil changes:
+* Fix a crash when refreshing after removing all devices
+* Add dynamic device & axis detection
+* Add dynamic device & button detection
+* Add current function display for buttons
+* Add wheel->keyboard input blocking option
+
+## <b>4.2.0 - beta 1</b>
 Big changes to configuration!
 
-<ul>
-	<li> Structural changes:
-		<ul>
-			<li>Add a rudimentary configuration tool               </li>
-			<li>Restructured settings to ManualTransmission folder </li>
-			<li>Separated wheel settings and normal settings       </li>
-			<li>Show warning for incorrect .ini versions           </li>
-		</ul>
-	</li>
-	<li> Wheel changes:
-		<ul>
-			<li>Add support for multiple DirectInput devices   </li>
-			<li>Add countersteering and reduction patch        </li>
-			<li>Add axis support for handbrake                 </li>
-			<li>Add back G27/G29 LEDs                          </li>
-			<li>Add option for global FF multiplier            </li>
-			<li>Rework Force Feedback completely               </li>
-			<li>Tweaks to soft lock                            </li>
-			<li>Add 7th gear support for H-shifter             </li>
-			<li>Disable controller rumble while wheel is active</li>
-		</ul>
-	</li>
-	<li>Changes:
-		<ul>
-			<li>Add option to turn on/off throttle+clutch engine starting</li>
-			<li>Add option for clutch shifting in sequential             </li>
-			<li>Only stall if all wheels are on the ground               </li>
-			<li>Remove 8th gear for numpad                               </li>
-			<li>General bug fixes                                        </li>
-		</ul>
-	</li>
-</ul>
+Structural changes:
+* Add a rudimentary configuration tool
+* Restructured settings to ManualTransmission folder
+* Separated wheel settings and normal settings
+* Show warning for incorrect .ini versions
+
+Wheel changes:
+* Add support for multiple DirectInput devices
+* Add countersteering and reduction patch
+* Add axis support for handbrake
+* Add back G27/G29 LEDs
+* Add option for global FF multiplier
+* Rework Force Feedback completely
+* Tweaks to soft lock
+* Add 7th gear support for H-shifter
+* Disable controller rumble while wheel is active
+
+Changes:
+* Add option to turn on/off throttle+clutch engine starting
+* Add option for clutch shifting in sequential
+* Only stall if all wheels are on the ground
+* Remove 8th gear for numpad
+* General bug fixes
