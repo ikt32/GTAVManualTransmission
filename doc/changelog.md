@@ -6,21 +6,26 @@ Configuration changes:
   * settings_general.ini: VERSION is 420R now
 
 Wheel changes:
-* Various DirectInput safety thingies
+* Always initialize DirectInput, just to be safe
 
 Changes:
-* Add HUD elements. You can move these around freely or disable them.
+* Add HUD elements. You can move these around freely or disable them
     * Shift mode indicator (H/S/A)
     * RPM indicator with redline options
     * Dashboard-data speedometer (kph, mph, m/s)
 * Rename DIUtil to WheelConfigurator
-* Adjust engine braking to be more reliable
-* Adjust hill start effect so it's not affected by throttle position
-* Fix a few reversing brake/throttle swap issues so it's more consistent now
-* Fix a few instances where the engine is wrongfully revved
+* Gears.log is made in the ManualTransmission directory now.
+
+FiveM support:
 * Fix getWheelCompressions for FiveM
 * Fix steering corrections patching for FiveM
 * Ignore CrossScript for FiveM
+
+Fixes 'n stuff:
+* Adjust engine braking to be more reliable
+* Adjust hill start effect so it's not affected by throttle position
+* Fix a few instances where the brake/throttle are swapped while reversing
+* Fix a few instances where the engine is wrongfully revved while braking
 * Minor code optimizations
 * Version strings for 1.0.1032.1
 

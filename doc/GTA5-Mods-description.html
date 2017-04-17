@@ -5,86 +5,71 @@ It’s highly recommended to play with this mod using a controller or a wheel.
 
 <b>Steering Wheel Support for GTA V</b>
 With manual transmission enabled, you'll want to be able to properly control your vehicle. By default, GTA V doesn't support steering wheels. Solutions like X360CE only emulate a controller, and the game will miss definition and force feedback for wheels. For this, a large part of this mod is made to support wheels, natively! A few features:
-
 <ul>
     <li>all DirectInput compatible steering wheels supported (since 4.0)</li>
-    <li>force feedback is fully supported                               </li>
-    <li>multiple input devices supported (since 4.2.0)        </li>
-    <li>1:1 mapping of steering wheel to vehicle front wheels </li>
+    <li>force feedback is fully supported</li>
+    <li>multiple input devices supported (since 4.2.0)</li>
+    <li>1:1 mapping of steering wheel to vehicle front wheels</li>
 </ul>
 
 <b>Features:</b>
 <ul>
-	<li>Controller, keyboard and wheel input support</li>
+	<li>Real gears!</li>
+	<li>Dynamic top gear detection</li>
+	<li>Realistic input mapping with working clutch</li>
+	<li>Engine and transmission effects</li>
 	<li>Support for all land-based engine-powered vehicles</li>
 	<li>Fully configurable</li>
-	<li>Common transmission systems:
-		<ul>
-			<li>Sequential gearbox</li>
-			<li>H-pattern gearbox</li>
-			<li>Automatic gearbox</li>
-		</ul>
-	</li>
-	<li>Dynamic top gear detection</li>
-	<li>Reverse with accelerator</li>
-	<li>Engine and transmission mechanics:
-		<ul>
-			<li>Engine braking</li>
-			<li>Engine damage</li>
-			<li>Engine stalling</li>
-			<li>Clutch grabbing</li>
-		</ul>
-	</li>
-	<li>DirectInput Steering Wheel support:
-		<ul>
-			<li>All analog inputs can be assigned</li>
-			<li>All buttons and Dpad can be assigned</li>
-			<li>Multiple devices can be assigned</li>
-			<li>Full Force Feedback supported</li>
-			<li>Understeer and oversteer physics</li>
-			<li>Works even when mod is off</li>
-			<li>Assign wheel buttons to keyboard buttons</li>
-		</ul>
-	</li>
+	<li><a href=https://www.youtube.com/watch?v=r0vxhThdoLo>HUD with speed, RPM and shift mode</a></li>
+	<li>Sequential, automatic and manual gearbox choices</li>
+	<li>Controller, keyboard and wheel input support</li>
 	<li>Seamless input device switching</li>
+	<li>DirectInput Steering Wheel support</li>
+	<li><a href=https://fivem.net/>FiveM support!</a> (client side)</li>
 </ul>
+
+There's much more inside, so take a look!
+
+
+<b>Requirements</b>
+GTA V v1.0.505.2 and up
+<a href=http://www.dev-c.com/gtav/scripthookv/>ScriptHookV</a>
 
 <b>Installation</b>
 Put Gears.asi and the folder ManualTransmission in your GTA V folder (overwrite when asked)
 Read <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md>the README</a> and configure ManualTransmission/settings_general.ini to your preferences
 <b>Wheel installation</b>
-After doing the above, run DIUtil.exe and follow the onscreen instructions
-Wheel users should refer to the readme on GitHub for further options.
+Use WheelConfigurator.exe and follow the onscreen instructions. You should REALLY check out <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md>the README</a>.
+<b>FiveM installation</b>
+Create a <b>plugins</b> folder in <b>FiveM Application Data</b> and put <b>Gears.asi</b> and the <b>ManualTransmission folder</b> in there.
 
-<b>Requirements</b>
-GTA V
-<a href=http://www.dev-c.com/gtav/scripthookv/>ScriptHookV</a>
+<b>Usage</b>
+Refer to the <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md>README</a>. 
+
+<b>Recommended mods</b>
+<a href=https://www.gta5-mods.com/vehicles/realistic-driving-v>Realistic Driving V</a>
+<a href=https://www.gta5-mods.com/scripts/speedometer-improvedalexbladeversion>LeFix Speedometer</a>
+<a href=https://www.gta5-mods.com/scripts/nfsgauge-rpm-gear-speedometer>NFS Gauge</a>
+Custom Steering hasn't been updated for 1.0.944.2, but this mod has steering correction disable patch since 4.2.0.
+
 
 <b>Troubleshooting</b>
-Have you tried turning it off and on?
-If you can't figure things out after having done what's in the readme, I'll need the following to help you.
-* Gears.log
+<i>Have you tried turning it off and on again?</i>
+When asking for help, include the following:
+* ManualTransmission/Gears.log
 * ManualTransmission/settings_general.ini
 * ManualTransmission/settings_wheel.ini
 * What kind of inputs (wheel/controller/keyboard) you're using
 * What you already tried to do
+
 You can use <a href=www.pastebin.com>pastebin</a> to post the files.
 
 <b>Known bugs and problems</b>
-- Crashes with a G920 and ScriptHookVDotNet v2
+- Crashes with a <b>Logitech G920</b> and <b>ScriptHookVDotNet v2</b>. No workaround known.
+- Wheel sticks to one side and/or brake/throttle stuck. Try switching the mod off and on again.
+- Wheel oscillates a lot at high speed. Try decreasing physics force, or increasing damper force. A good handling mod also helps.
 
-<b>Controls</b>
-<a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md>README</a>
-Alternatively, check settings_general.ini for controls.
-
-<a href=https://gist.github.com/E66666666/16a6bd095f41355de0d4ccf9e6a52ffe>My G27 settings.</a> You need to replace the GUID with your GUID (or use the tool to assign any control after removing the two GUID lines)
-
-<b>Recommended mods</b>
-<a href=https://www.gta5-mods.com/scripts/speedometer-improvedalexbladeversion>Speedometer by LeFix</a>
-<a href=https://www.gta5-mods.com/scripts/nfsgauge-rpm-gear-speedometer>NFS Gauge by XMOD</a>
-Custom Steering hasn't been updated for 1.0.944.2, but this mod has steering correction disable patching since 4.2.0.
-
-<b>Big thanks to:</b>
+<b>Sincere thanks to:</b>
 Rockstar Games
 Alexander Blade
 LeFix
@@ -92,17 +77,45 @@ XMOD
 InfamousSabre
 leftas
 kagikn
-Everybody else who helped me
+and everybody else who helped me!
 
 <b>Source code available </b> <a href=https://github.com/E66666666/GTAVManualTransmission>on GitHub</a>
 <b>Full changelog available </b> <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/changelog.md>on GitHub</a>
 
 <b>Alternative downloads</b>
-Past releases: <a href=https://github.com/E66666666/GTAVManualTransmission/releases>GitHub Releases</a>
-Latest builds: <a href=https://ci.appveyor.com/project/E66666666/gtavmanualtransmission/build/artifacts>AppVeyor Artifacts</a> (unstable)
-
+Old releases: <a href=https://github.com/E66666666/GTAVManualTransmission/releases>GitHub Releases</a>
+Latest build: <a href=https://ci.appveyor.com/project/E66666666/gtavmanualtransmission/build/artifacts>AppVeyor Artifacts</a> (unstable)
 
 <b>Changelog</b>
+
+## <b>4.2.0 - Release</b>
+Configuration changes:
+* Separate [HUD] section for HUD stuff
+  * settings_general.ini: VERSION is 420R now
+
+Wheel changes:
+* Always initialize DirectInput, just to be safe
+
+Changes:
+* Add HUD elements. You can move these around freely or disable them
+    * Shift mode indicator (H/S/A)
+    * RPM indicator with redline options
+    * Dashboard-data speedometer (kph, mph, m/s)
+* Rename DIUtil to WheelConfigurator
+* Gears.log is made in the ManualTransmission directory now.
+
+FiveM support:
+* Fix getWheelCompressions for FiveM
+* Fix steering corrections patching for FiveM
+* Ignore CrossScript for FiveM
+
+Fixes 'n stuff:
+* Adjust engine braking to be more reliable
+* Adjust hill start effect so it's not affected by throttle position
+* Fix a few instances where the brake/throttle are swapped while reversing
+* Fix a few instances where the engine is wrongfully revved while braking
+* Minor code optimizations
+* Version strings for 1.0.1032.1
 
 ## <b>4.2.0 - beta 2</b>
 No configuration changes
