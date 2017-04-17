@@ -1647,6 +1647,8 @@ void main() {
 	settingsGeneralFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_general.ini";
 	settingsWheelFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_wheel.ini";
 	settings.SetFiles(settingsGeneralFile, settingsWheelFile);
+	logger.Write("Loading " + settingsGeneralFile);
+	logger.Write("Loading " + settingsWheelFile);
 	reInit();
 	while (true) {
 		update();
