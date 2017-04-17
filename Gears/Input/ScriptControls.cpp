@@ -3,12 +3,11 @@
 #include <Windows.h>
 #include "keyboard.h"
 
-ScriptControls::ScriptControls(Logger &logger): WheelControl(logger),
-                                                PrevInput(Keyboard),
-                                                SteerAxisType(WheelAxisType::Steer),
-                                                controller{1},
-                                                buttonState(0),
-                                                logger(logger) { }
+ScriptControls::ScriptControls(): WheelControl(),
+                                PrevInput(Keyboard),
+                                SteerAxisType(WheelAxisType::Steer),
+                                controller{1},
+                                buttonState(0) { }
 
 ScriptControls::~ScriptControls() { }
 

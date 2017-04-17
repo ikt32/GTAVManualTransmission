@@ -21,11 +21,11 @@ RECT r;
 HWND consoleWindow;
 CONSOLE_SCREEN_BUFFER_INFO csbi;
 
-ScriptControls controls(logger);
+ScriptControls controls;
 
 std::string settingsGeneralFile = Util::GetRunningExecutableFolder() + "\\settings_general.ini";
 std::string settingsWheelFile = Util::GetRunningExecutableFolder() + "\\settings_wheel.ini";
-ScriptSettings settings(settingsGeneralFile, settingsWheelFile,	logger);
+ScriptSettings settings(settingsGeneralFile, settingsWheelFile);
 
 std::array<int, 8> directions = {
 	WheelDirectInput::POV::N,

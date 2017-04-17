@@ -12,7 +12,7 @@ const std::string CORRECTVWHEEL		= "420";
 
 class ScriptSettings {
 public:
-	ScriptSettings(const std::string &general, const std::string &wheel, Logger &logger);
+	ScriptSettings(const std::string &general, const std::string &wheel);
 	void parseSettingsGeneral(ScriptControls *scriptControl);
 	void Read(ScriptControls* scriptControl);
 	void Save() const;
@@ -132,7 +132,6 @@ public:
 private:
 	std::string settings_general_version = "000";
 	std::string settings_wheel_version = "000";
-	Logger &logger;
 	void parseSettingsWheel(ScriptControls *scriptControl);
 
 	// Just looks up which GUID corresponds with what number and returns the GUID.

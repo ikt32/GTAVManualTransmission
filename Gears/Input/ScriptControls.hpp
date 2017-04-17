@@ -85,7 +85,7 @@ public:
 		Wheel = 2
 	};
 
-	ScriptControls(Logger &logger);
+	ScriptControls();
 	~ScriptControls();
 	void InitWheel(bool initffb);
 
@@ -164,7 +164,6 @@ private:
 	
 	bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
-	Logger &logger;
 };
 
 // GUID stuff

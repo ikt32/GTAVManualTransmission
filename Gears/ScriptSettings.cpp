@@ -6,11 +6,10 @@
 #include "Input/ScriptControls.hpp"
 
 ScriptSettings::ScriptSettings(const std::string &general,
-	                           const std::string &wheel,
-	                           Logger &logger) : logger(logger),
-                                                 nDevices(0),
-                                                 settingsGeneralFile(general),
-                                                 settingsWheelFile(wheel) {
+	                           const std::string &wheel) :
+	nDevices(0),
+    settingsGeneralFile(general),
+    settingsWheelFile(wheel) {
 
 }
 

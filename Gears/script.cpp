@@ -20,11 +20,10 @@
 #include "Util/Util.hpp"
 #include "General.h"
 
-ScriptControls controls(logger);
-std::string myDir = "\\ManualTransmission";
-std::string settingsGeneralFile =	Util::GetModuleFolder(Util::GetOurModuleHandle()) + myDir + "\\settings_general.ini";
-std::string settingsWheelFile =		Util::GetModuleFolder(Util::GetOurModuleHandle()) + myDir + "\\settings_wheel.ini";
-ScriptSettings settings(settingsGeneralFile, settingsWheelFile, logger);
+ScriptControls controls;
+std::string settingsGeneralFile =	Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_general.ini";
+std::string settingsWheelFile =		Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_wheel.ini";
+ScriptSettings settings(settingsGeneralFile, settingsWheelFile);
 
 Player player;
 Ped playerPed;

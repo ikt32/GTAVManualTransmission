@@ -9,9 +9,8 @@
 
 // TODO Look into crashes
 
-WheelDirectInput::WheelDirectInput(Logger &logAlt) : logger(logAlt),
-                                                    pCFEffect{nullptr},
-                                                    pFREffect{nullptr} {
+WheelDirectInput::WheelDirectInput() : pCFEffect{nullptr},
+                                       pFREffect{nullptr} {
 	// Just set up to ensure djs can always be used.
 	if (FAILED(DirectInput8Create(GetModuleHandle(nullptr),
 		DIRECTINPUT_VERSION,

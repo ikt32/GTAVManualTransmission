@@ -16,8 +16,8 @@ http://dev-c.com
 
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
-	std::string logFile = Util::GetModuleFolder(hInstance) + "\\" +
-		Util::GetModuleNameWithoutExtension(hInstance) + ".log";
+	std::string logFile = Util::GetModuleFolder(hInstance) + mtDir +
+		"\\" + Util::GetModuleNameWithoutExtension(hInstance) + ".log";
 	logger.SetFile(logFile);
 
 	// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement

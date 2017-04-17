@@ -10,6 +10,9 @@ http://dev-c.com
 #define DIRECTINPUT_VERSION 0x0800
 #endif
 
+#include <string>
+const std::string mtDir = "\\ManualTransmission";
+
 class VehicleData;
 struct Color;
 class ScriptSettings;
