@@ -36,6 +36,12 @@
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="General.cpp" />
+    <ClCompile Include="Menu\MenuClass.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="Menu\controls.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -90,6 +96,12 @@
       <Filter>Util\simpleini</Filter>
     </ClInclude>
     <ClInclude Include="General.h" />
+    <ClInclude Include="Menu\MenuClass.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu\controls.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -106,6 +118,9 @@
     </Filter>
     <Filter Include="Util\simpleini">
       <UniqueIdentifier>{d51e90e7-b382-4e70-afc1-502831bccebd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Menu">
+      <UniqueIdentifier>{d318979d-d544-4b16-9e26-6bec9234be3e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
