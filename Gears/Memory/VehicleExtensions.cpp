@@ -365,13 +365,11 @@ float VehicleExtensions::GetDirtLevel(Vehicle handle) {
 }
 
 float VehicleExtensions::GetDashSpeed(Vehicle handle) {
-	if (gameVersion <= G_VER_1_0_877_1_NOSTEAM) {
-		return 0.0f;
-	}
-
 	auto address = GetAddress(handle);
 
-	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x9F0 : -1);
+	auto offset = (gameVersion > G_VER_1_0_463_1_NOSTEAM ? 0x9A4 : -1);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x9F0 : offset);
+
 	if (offset == -1)
 		return 0.0f;
 
