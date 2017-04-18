@@ -1,47 +1,31 @@
 DIUtil
 ==============================
 
-This DIUtil tool (DirectInputUtil) is to be used (temporarily) for 
-configuration of the main mod. `DIUtil.exe` should be in 
-`<GTA V Dir>\ManualTransmission\` along with `settings_general.ini`
+![WheelConfigurator UI](../doc/WheelConfigurator.png)
+
+This DIUtil tool (DirectInput Utility) is to be used (temporarily) for 
+configuration of the main mod. `WheelConfigurator.exe` should be in 
+`\ManualTransmission\` along with `settings_general.ini`
 and `settings_wheel.ini`.
 
-Usage is two-step. First, just launch `DIUtil.exe`. A console window will show,
-but nothing of value is shown. Just 0-values. Exit, and check `DIUtil.log`. It
-will contain devices it found that can be used. Insert these under 
-`INPUT_DEVICES` in `settings_wheel.ini` for usage, like so
+## Usage
 
-## 1. First run output:
-```
-[02:20:41.855] Manual Transmission v4.2.0 - DirectInput utility
-[02:20:41.860] Initializing steering wheel
-[02:20:41.882] Found 2 device(s)
-[02:20:41.882] Device: Controller (XBOX 360 For Windows)
-[02:20:41.882] GUID:   {0D50F5F0-7C13-11E4-8001-444553540000}
-[02:20:41.882] Device: Logitech G27 Racing Wheel USB
-[02:20:41.882] GUID:   {F69653F0-19B9-11E6-8002-444553540000}
-[02:20:41.892] Initializing force feedback device
-[02:20:41.892] Force feedback device not found
-```
+To use this utility, just run it and follow the onscreen instructions.
+* The top blocks contain your available controllers with their raw values. 
+* The middle block shows the values the game would read if you'd start the game right now.
+* The bottom shows available keys at that moment to press. To configure throttle for example, press "w".
 
-## 2. Add to `settings_wheel.ini`
-```
-[INPUT_DEVICES]
-DEV0 = Logitech G27 Racing Wheel USB
-GUID0 = {F69653F0-19B9-11E6-8002-444553540000}
-```
+The tool automagically detects which axis or button on which device is used for input, so you only need to choose the things you want to assign.
 
-Upon re-running, it will show your last device's info. This can be used to get
-the axis positions and button numbers.
+Specifically for the H-Shifter, you do need to choose your device and you'll need to follow the onscreen instructions (shift into gear X and press Enter, etc).
 
-When adding more devices, repeat these two steps. The last entry in 
-`[INPUT_DEVICES]` is used for display. The `DIUtil.log` also shows if the 
-chosen steering axis has force feedback.
+## `WheelConfigurator.log`
+A log is generated upon running this tool. Right now it's just useful for bug reports.
 
-# Plans
-This is a rather work-intensive way of configuring, so I'm making a GUI at the
-moment but things are not going well.
+## Plans
+So as you might have guessed, this is not a proper GUI! Plans have been dropped for the time being, with focus on making this tool less terrible to use. 
 
-Some Qt, C++/CLI or whatever C++ GUI framework help is very welcome. As for
-now, this should suffice to get things working at all.
+Since a separate executable is less than desirable, I might also start making an in-game menu to configure things, but that'll have no hurry. I'll probably leave this tool as-is whenever that idea becomes reality.
 
+## But I want a GUI!
+Feel free to make one, because I have no idea how to. `¯\_(ツ)_/¯`

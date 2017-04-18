@@ -454,7 +454,9 @@ reversing with the throttle to work.
 
 ## `settings_wheel.ini`
 This file contains all settings for the wheel controls. I recommend using
-__DIUtil.exe__ to configure the axis-inputs and H-shifter.
+__WheelConfigurator.exe__ to configure the axis-inputs and H-shifter.
+
+![WheelConfigurator](WheelConfigurator.png)
 
 DirectInput steering wheels are fully supported! Every axis, button and 8
 directions on the D-pad are supported for inputs. Additionally, steering wheel
@@ -462,7 +464,7 @@ input has been built in even if you don’t want to drive with any gearbox and
 just want the default behavior. __Force Feedback is fully present and active in
 all modes.__
 
-When assigning axes and buttons, __use DIUtil.exe__! This tool will report the
+When assigning axes and buttons, __use the tool__! This tool will report the
 correct values for the .ini.
 
 ## `[OPTIONS]` (Wheel)
@@ -547,7 +549,7 @@ DEV0 = Logitech G27 Racing Wheel USB
 GUID0 = {F69653F0-19B9-11E6-8002-444553540000}
 ```
 
-This is taken from the data DiUtil.exe or Gears.asi generates in `ManualTransmission/DiUtil.log`
+This is taken from the data the tool or Gears.asi generates in `ManualTransmission/WheelConfigurator.log`
 or `Gears.log`. A sample detection entry looks like this:
 
 ```
@@ -555,6 +557,8 @@ or `Gears.log`. A sample detection entry looks like this:
 [23:20:19.989] Device: Logitech G27 Racing Wheel USB
 [23:20:19.989] GUID:   {F69653F0-19B9-11E6-8002-444553540000}
 ```
+
+__You should not need to configure this manually if you used `WheelConfigurator.exe`!__
 
 ## Most controls
 
@@ -581,7 +585,7 @@ The button controls are listed below with how they can be used.
 Every single control can be assigned to any device. 
 
 ## `[STEER]`, `[THROTTLE]`, `[BRAKES]`, `[CLUTCH]` and `[HANDBRAKE_ANALOG]`
-__To properly configure your wheel, use DIUtil.exe!__
+__To properly configure your wheel, use WheelConfigurator.exe!__
 These sections maps your wheel input axes.
 
 ### `DEVICE` : Any
@@ -627,11 +631,6 @@ Soft lock for on bikes.
 
 ### `SteerAngleAlt` : Any less than `SteerAngleMax`
 Soft lock for in planes and boats.
-
-### Existing configurations
-When users submit their configs, I will probably include these with future builds.
-If I ever get around making something UI-like (not that DIUtil abomination), I might
-include some online repo thing. But future plans. Unlikely.
 
 ## `[TO_KEYBOARD]`
 In this section you can assign wheel buttons to keyboard keys. A few examples
