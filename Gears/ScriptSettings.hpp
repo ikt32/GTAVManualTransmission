@@ -62,6 +62,7 @@ public:
 	float ShiftModeYpos = 0.95f;
 	float ShiftModeSize = 1.0f;
 
+	// can be kph, mph, or ms
 	std::string Speedo;
 	float SpeedoSize = 1.5f;
 	float SpeedoYpos = 0.85f;

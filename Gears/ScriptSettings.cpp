@@ -34,12 +34,86 @@ void ScriptSettings::Read(MenuControls* menuControl) {
 }
 
 void ScriptSettings::Save() const {
-	CSimpleIniA ini;
-	ini.SetUnicode();
-	ini.LoadFile(settingsGeneralFile.c_str());
-	ini.SetBoolValue("OPTIONS", "Enable", EnableManual);
-	ini.SetLongValue("OPTIONS", "ShiftMode", ShiftMode);
-	ini.SaveFile(settingsGeneralFile.c_str());
+	CSimpleIniA settingsGeneral;
+	settingsGeneral.SetUnicode();
+	settingsGeneral.LoadFile(settingsGeneralFile.c_str());
+	
+	// [OPTIONS]
+	settingsGeneral.SetBoolValue("OPTIONS", "Enable", EnableManual);
+	settingsGeneral.SetLongValue("OPTIONS", "ShiftMode", ShiftMode);
+
+	settingsGeneral.SetLongValue("OPTIONS", "ShiftMode", ShiftMode);
+	settingsGeneral.SetBoolValue("OPTIONS", "SimpleBike", SimpleBike);
+	settingsGeneral.SetBoolValue("OPTIONS", "EngineDamage", EngDamage);
+	settingsGeneral.SetBoolValue("OPTIONS", "EngineStalling", EngStall);
+	settingsGeneral.SetBoolValue("OPTIONS", "EngineBraking", EngBrake);
+	settingsGeneral.SetBoolValue("OPTIONS", "ClutchCatching", ClutchCatching);
+	settingsGeneral.SetBoolValue("OPTIONS", "ClutchShiftingH", ClutchShiftingH);
+	settingsGeneral.SetBoolValue("OPTIONS", "ClutchShiftingS", ClutchShiftingS);
+	settingsGeneral.SetBoolValue("OPTIONS", "DefaultNeutral", DefaultNeutral);
+
+	//TODO: Something about these factors :$
+	settingsGeneral.SetDoubleValue("OPTIONS", "ClutchCatchpoint", ClutchCatchpoint * 100);
+	settingsGeneral.SetDoubleValue("OPTIONS", "StallingThreshold", StallingThreshold * 100);
+	settingsGeneral.SetDoubleValue("OPTIONS", "RPMDamage", RPMDamage * 100);
+	settingsGeneral.SetDoubleValue("OPTIONS", "MisshiftDamage", MisshiftDamage);
+
+	settingsGeneral.SetBoolValue("OPTIONS", "HillBrakeWorkaround", HillBrakeWorkaround);
+	settingsGeneral.SetBoolValue("OPTIONS", "AutoGear1", AutoGear1);
+	settingsGeneral.SetBoolValue("OPTIONS", "AutoLookBack", AutoLookBack);
+	settingsGeneral.SetBoolValue("OPTIONS", "ThrottleStart", ThrottleStart);
+
+	settingsGeneral.SetBoolValue("OPTIONS", "CrossScript", CrossScript);
+
+	// [HUD]
+	settingsGeneral.SetBoolValue("HUD", "EnableHUD", HUD);
+	settingsGeneral.SetDoubleValue("HUD", "GearXpos", GearXpos);
+	settingsGeneral.SetDoubleValue("HUD", "GearYpos", GearYpos);
+	settingsGeneral.SetDoubleValue("HUD", "GearSize", GearSize);
+	settingsGeneral.SetLongValue("HUD", "GearTopColorR", GearTopColorR);
+	settingsGeneral.SetLongValue("HUD", "GearTopColorG", GearTopColorG);
+	settingsGeneral.SetLongValue("HUD", "GearTopColorB", GearTopColorB);
+
+	settingsGeneral.SetDoubleValue("HUD", "ShiftModeXpos", ShiftModeXpos);
+	settingsGeneral.SetDoubleValue("HUD", "ShiftModeYpos", ShiftModeYpos);
+	settingsGeneral.SetDoubleValue("HUD", "ShiftModeSize", ShiftModeSize);
+
+	settingsGeneral.SetValue("HUD", "Speedo", Speedo.c_str());
+	settingsGeneral.SetDoubleValue("HUD", "SpeedoXpos", SpeedoXpos);
+	settingsGeneral.SetDoubleValue("HUD", "SpeedoYpos", SpeedoYpos);
+	settingsGeneral.SetDoubleValue("HUD", "SpeedoSize", SpeedoSize);
+
+	settingsGeneral.GetBoolValue("HUD", "EnableRPMIndicator", RPMIndicator);
+	settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorXpos", RPMIndicatorXpos);
+	settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorYpos", RPMIndicatorYpos);
+	settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorSize", RPMIndicatorSize);
+	settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorRedline", RPMIndicatorRedline);
+
+	settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundR", RPMIndicatorBackgroundR);
+	settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundG", RPMIndicatorBackgroundG);
+	settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundB", RPMIndicatorBackgroundB);
+	settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundA", RPMIndicatorBackgroundA);
+
+	settingsGeneral.GetLongValue("HUD", "RPMIndicatorForegroundR", RPMIndicatorForegroundR);
+	settingsGeneral.GetLongValue("HUD", "RPMIndicatorForegroundG", RPMIndicatorForegroundG);
+	settingsGeneral.GetLongValue("HUD", "RPMIndicatorForegroundB", RPMIndicatorForegroundB);
+	settingsGeneral.GetLongValue("HUD", "RPMIndicatorForegroundA", RPMIndicatorForegroundA);
+
+	settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineR", RPMIndicatorRedlineR);
+	settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineG", RPMIndicatorRedlineG);
+	settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineB", RPMIndicatorRedlineB);
+	settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineA", RPMIndicatorRedlineA);
+
+	settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitR", RPMIndicatorRevlimitR);
+	settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitG", RPMIndicatorRevlimitG);
+	settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitB", RPMIndicatorRevlimitB);
+	settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitA", RPMIndicatorRevlimitA);
+
+	// [DEBUG]
+	settingsGeneral.GetBoolValue("DEBUG", "DisplayInfo", DisplayInfo);
+	settingsGeneral.GetBoolValue("DEBUG", "LogCar", LogCar);
+
+	settingsGeneral.SaveFile(settingsGeneralFile.c_str());
 }
 
 bool ScriptSettings::IsCorrectVersion() const {
