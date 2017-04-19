@@ -618,7 +618,7 @@ void reset() {
 
 void toggleManual() {
 	settings.EnableManual = !settings.EnableManual;
-	//settings.Save();
+	settings.Save();
 	std::stringstream message;
 	message << "Manual Transmission " <<
 	           (settings.EnableManual ? "Enabled" : "Disabled");
@@ -1666,7 +1666,6 @@ void menuClose() {
 void update_menu() {
 	menu.CheckKeys(&menuControls, std::bind(menuInit), std::bind(menuClose));
 
-	//TODO: prolly save states? :)
 	if (menu.CurrentMenu("mainmenu")) {
 		menu.Title("Manual Transmission");
 		bool tempEnableRead = settings.EnableManual;
@@ -1688,6 +1687,7 @@ void update_menu() {
 		menu.MenuOption("Controls", "controlsmenu");
 		menu.MenuOption("Wheel controls", "wheelmenu");
 		menu.MenuOption("HUD Options", "hudmenu");
+		menu.MenuOption("Menu Options", "menumenu"); 
 		menu.MenuOption("Debug", "debugmenu");
 
 		// wtf
@@ -1731,11 +1731,62 @@ void update_menu() {
 		menu.Option("Not yet implemented :^)");
 	}
 
+	if (menu.CurrentMenu("menumenu")) {
+		menu.Title("Theme Options");
+		//menu.Option("Not yet implemented :^)");
+	
+		menu.MenuOption("Title Text", "settings_theme_titletext");
+		menu.MenuOption("Title Rect", "settings_theme_titlerect");
+		menu.MenuOption("Scroller", "settings_theme_scroller");
+		menu.MenuOption("Options Text", "settings_theme_options");
+		menu.MenuOption("Options Rect", "settings_theme_optionsrect");
+	}
+
+	if (menu.CurrentMenu("settings_theme_titletext")) {
+		menu.Title("Title Text");
+
+		menu.IntOption("Red: ", &menu.titleText.r, 0, 255);
+		menu.IntOption("Green: ", &menu.titleText.g, 0, 255);
+		menu.IntOption("Blue: ", &menu.titleText.b, 0, 255);
+		menu.IntOption("Alpha: ", &menu.titleText.a, 0, 255);
+	}
+	if (menu.CurrentMenu("settings_theme_titlerect")) {
+		menu.Title("Title Rect");
+
+		menu.IntOption("Red: ", &menu.titleRect.r, 0, 255);
+		menu.IntOption("Green: ", &menu.titleRect.g, 0, 255);
+		menu.IntOption("Blue: ", &menu.titleRect.b, 0, 255);
+		menu.IntOption("Alpha: ", &menu.titleRect.a, 0, 255);
+	}
+	if (menu.CurrentMenu("settings_theme_scroller")) {
+		menu.Title("Scroller");
+
+		menu.IntOption("Red: ", &menu.scroller.r, 0, 255);
+		menu.IntOption("Green: ", &menu.scroller.g, 0, 255);
+		menu.IntOption("Blue: ", &menu.scroller.b, 0, 255);
+		menu.IntOption("Alpha: ", &menu.scroller.a, 0, 255);
+	}	
+	if (menu.CurrentMenu("settings_theme_options")) {
+		menu.Title("Options Text");
+		
+		menu.IntOption("Red: ", &menu.options.r, 0, 255);
+		menu.IntOption("Green: ", &menu.options.g, 0, 255);
+		menu.IntOption("Blue: ", &menu.options.b, 0, 255);
+		menu.IntOption("Alpha: ", &menu.options.a, 0, 255);
+	}	
+	if (menu.CurrentMenu("settings_theme_optionsrect")) {
+		menu.Title("Options Rect");
+		
+		menu.IntOption("Red: ", &menu.optionsrect.r, 0, 255);
+		menu.IntOption("Green: ", &menu.optionsrect.g, 0, 255);
+		menu.IntOption("Blue: ", &menu.optionsrect.b, 0, 255);
+		menu.IntOption("Alpha: ", &menu.optionsrect.a, 0, 255);
+	}
+
 	if (menu.CurrentMenu("debugmenu")) {
 		menu.Title("Debug settings");
 		if (menu.BoolOption("Display info", &settings.DisplayInfo)) {}
 		if (menu.BoolOption("Log car address", &settings.LogCar)) {}
-
 	}
 
 
