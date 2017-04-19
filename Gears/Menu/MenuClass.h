@@ -11,12 +11,12 @@ struct rgba {
 	int r, g, b, a;
 };
 
-extern float menux;
-extern rgba titleText;
-extern rgba titleRect;
-extern rgba scroller;
-extern rgba options;
-extern rgba optionsrect;
+//extern float menux;
+//extern rgba titleText;
+//extern rgba titleRect;
+//extern rgba scroller;
+//extern rgba options;
+//extern rgba optionsrect;
 
 class Menu {
 public:
@@ -51,7 +51,6 @@ public:
 	void CheckKeys(MenuControls* controls, std::function<void(void) > onMain, std::function<void(void) > onExit);
 	void CloseMenu();
 
-private:
 	int optionsFont = 6;
 	int titleFont = 7;
 	float menux = 0.2f;
@@ -60,6 +59,16 @@ private:
 	rgba scroller = { 80, 80, 80, 200 };
 	rgba options = { 0, 0, 0, 255 };
 	rgba optionsrect = { 255, 220, 30, 60 };
+
+private:
+	//int optionsFont = 6;
+	//int titleFont = 7;
+	//float menux = 0.2f;
+	//rgba titleText = { 0, 0, 0, 255 };
+	//rgba titleRect = { 255, 200, 0, 255 };
+	//rgba scroller = { 80, 80, 80, 200 };
+	//rgba options = { 0, 0, 0, 255 };
+	//rgba optionsrect = { 255, 220, 30, 60 };
 
 	int optioncount = 0;
 	int currentoption = 0;
