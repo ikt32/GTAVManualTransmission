@@ -631,10 +631,11 @@ void Menu::CheckKeys(MenuControls* controls, std::function<void(void) > onMain, 
 		}
 		if (controls->IsKeyJustPressed(MenuControls::MenuCancel) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendCancel)) {
 			if (menulevel > 0) {
-				backMenu();
 				if (menulevel == 1) {
 					if (onExit) onExit();
 				}
+				backMenu();
+
 			}
 			delay = GetTickCount();
 		}
