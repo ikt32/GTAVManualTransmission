@@ -2,7 +2,7 @@
 
 class Settings;
 
-class Controls
+class MenuControls
 {
 public:
 	friend Settings;
@@ -18,14 +18,13 @@ public:
 		SIZEOF_ControlType
 	};
 
-	Controls();
-	~Controls();
+	MenuControls();
+	~MenuControls();
 	bool IsKeyPressed(int key);
 	bool IsKeyJustPressed(ControlType control);
-	void GetButtonState(bool *a, bool *b, bool *up, bool *down, bool *l, bool *r);
-private:
 	static const int controlSize = SIZEOF_ControlType;
-	int controlKeys[controlSize];
+	int ControlKeys[controlSize];
+private:
 	bool controlCurr[controlSize];
 	bool controlPrev[controlSize];
 };

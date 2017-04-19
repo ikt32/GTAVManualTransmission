@@ -20,9 +20,19 @@
 #include "Util/Util.hpp"
 #include "General.h"
 
+#include "Menu/MenuClass.h"
+#include "menu/Controls.h"
+
+std::string settingsGeneralFile;
+std::string settingsWheelFile;
+std::string menuStyleFile;
+std::string settingsMenuFile;
+
+
+Menu menu;
+MenuControls menuControls;
+
 ScriptControls controls;
-std::string settingsGeneralFile;// = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_general.ini";
-std::string settingsWheelFile;// = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_wheel.ini";
 ScriptSettings settings(settingsGeneralFile, settingsWheelFile);
 
 Player player;
@@ -577,6 +587,10 @@ void crossScriptComms() {
 
 void reInit() {
 	settings.Read(&controls);
+	settings.Read(&menuControls);
+	// nasty but it should work enough...
+	menu.LoadMenuTheme(std::wstring(menuStyleFile.begin(), menuStyleFile.end()).c_str());
+
 	logger.Write("Settings read");
 	vehData.LockGears = 0x00010001;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
@@ -1638,6 +1652,96 @@ void functionAutoGear1() {
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//                             Menu stuff
+///////////////////////////////////////////////////////////////////////////////
+void menuInit() {
+	
+}
+
+void menuClose() {
+	
+}
+
+void update_menu() {
+	menu.CheckKeys(&menuControls, std::bind(menuInit), std::bind(menuClose));
+
+	//TODO: prolly save states? :)
+	if (menu.CurrentMenu("mainmenu")) {
+		menu.Title("Manual Transmission");
+		bool tempEnableRead = settings.EnableManual;
+		if (menu.BoolOption("Enable manual transmission", &tempEnableRead)) { toggleManual(); } 
+		
+		int shiftModeTemp = settings.ShiftMode;
+		std::vector<std::string> gearboxModes = { 
+			"Sequential",
+			"H-pattern",
+			"Automatic"
+		};
+		menu.StringArray("Gearbox", gearboxModes, &shiftModeTemp);
+		if (shiftModeTemp != settings.ShiftMode) {
+			settings.ShiftMode = shiftModeTemp;
+			setShiftMode(shiftModeTemp);
+		}
+
+		menu.MenuOption("Mod options", "optionsmenu");
+		menu.MenuOption("Controls", "controlsmenu");
+		menu.MenuOption("Wheel controls", "wheelmenu");
+		menu.MenuOption("HUD Options", "hudmenu");
+		menu.MenuOption("Debug", "debugmenu");
+
+		// wtf
+		int versionIndex = 0;
+		std::vector<std::string> version = { DISPLAY_VERSION };
+		menu.StringArray("Version", version, &versionIndex);
+	}
+
+	if (menu.CurrentMenu("optionsmenu")) {
+		menu.Title("Mod options");
+		if (menu.BoolOption("Simple Bike", &settings.SimpleBike)) {}
+		if (menu.BoolOption("Engine Damage", &settings.EngDamage)) {}
+		if (menu.BoolOption("Engine Stalling", &settings.EngStall)) {}
+		if (menu.BoolOption("Engine Braking", &settings.EngBrake)) {}
+		if (menu.BoolOption("Clutch Grabbing", &settings.ClutchCatching)) {}
+		if (menu.BoolOption("Clutch Shift (S)", &settings.ClutchShiftingS)) {}
+		if (menu.BoolOption("Clutch Shift (H)", &settings.ClutchShiftingH)) {}
+		if (menu.BoolOption("Default Neutral", &settings.DefaultNeutral)) {}
+		if (menu.FloatOption("Clutch bite point", &settings.ClutchCatchpoint, 0.0f, 1.0f, 0.05f)) {}
+		if (menu.FloatOption("Stalling threshold", &settings.StallingThreshold, 0.0f, 1.0f, 0.05f)) {}
+		if (menu.FloatOption("RPM Damage", &settings.RPMDamage, 0.0f, 10.0f, 0.05f)) {}
+		if (menu.IntOption("Misshift Damage", &settings.MisshiftDamage, 0, 100, 5)) {}
+		if (menu.BoolOption("Hill gravity workaround", &settings.HillBrakeWorkaround)) {}
+		if (menu.BoolOption("Auto gear 1", &settings.AutoGear1)) {}
+		if (menu.BoolOption("Auto look back", &settings.AutoLookBack)) {}
+		if (menu.BoolOption("Clutch + throttle start", &settings.ThrottleStart)) {}
+	}
+
+	if (menu.CurrentMenu("controlsmenu")) {
+		menu.Title("Controls");
+		menu.Option("Not yet implemented :^)");
+	}
+
+	if (menu.CurrentMenu("wheelmenu")) {
+		menu.Title("Wheel controls");
+		menu.Option("Not yet implemented :^)");
+	}
+
+	if (menu.CurrentMenu("hudmenu")) {
+		menu.Title("HUD Options");
+		menu.Option("Not yet implemented :^)");
+	}
+
+	if (menu.CurrentMenu("debugmenu")) {
+		menu.Title("Debug settings");
+		if (menu.BoolOption("Display info", &settings.DisplayInfo)) {}
+		if (menu.BoolOption("Log car address", &settings.LogCar)) {}
+
+	}
+
+
+	menu.EndMenu();
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //                              Script entry
@@ -1646,12 +1750,21 @@ void functionAutoGear1() {
 void main() {
 	settingsGeneralFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_general.ini";
 	settingsWheelFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_wheel.ini";
+	settingsMenuFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_menu.ini";
+	menuStyleFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\MenuStyle.ini";
+	
 	settings.SetFiles(settingsGeneralFile, settingsWheelFile);
+	settings.SetMenuFile(settingsMenuFile);
+
 	logger.Write("Loading " + settingsGeneralFile);
 	logger.Write("Loading " + settingsWheelFile);
+	logger.Write("Loading " + settingsMenuFile);
+	logger.Write("Loading " + menuStyleFile);
+
 	reInit();
 	while (true) {
 		update();
+		update_menu();
 		WAIT(0);
 	}
 }

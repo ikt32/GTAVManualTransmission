@@ -2,22 +2,22 @@
 #include "Input/keyboard.h"
 
 
-Controls::Controls() {
+MenuControls::MenuControls() {
 	std::fill(controlPrev, std::end(controlPrev), false);
 	std::fill(controlCurr, std::end(controlCurr), false);
-	std::fill(controlKeys, std::end(controlKeys), -1);
+	std::fill(ControlKeys, std::end(ControlKeys), -1);
 }
 
-Controls::~Controls() { }
+MenuControls::~MenuControls() { }
 
-bool Controls::IsKeyPressed(int key) {
+bool MenuControls::IsKeyPressed(int key) {
 	if (IsKeyDown(key))
 		return true;
 	return false;
 }
 
-bool Controls::IsKeyJustPressed(ControlType control) {
-	int key = controlKeys[control];
+bool MenuControls::IsKeyJustPressed(ControlType control) {
+	int key = ControlKeys[control];
 	if (IsKeyDown(key))
 		controlCurr[control] = true;
 	else
@@ -31,15 +31,4 @@ bool Controls::IsKeyJustPressed(ControlType control) {
 
 	controlPrev[control] = controlCurr[control];
 	return false;
-}
-
-// alex bruh y
-void Controls::GetButtonState(bool *a, bool *b, bool *up, bool *down, bool *l, bool *r)
-{
-	if (a) *a =			IsKeyJustPressed(MenuSelect);
-	if (b) *b =			IsKeyJustPressed(MenuCancel);
-	if (up) *up =		IsKeyJustPressed(MenuUp);
-	if (down) *down =	IsKeyJustPressed(MenuDown);
-	if (r) *r =			IsKeyJustPressed(MenuRight);
-	if (l) *l =			IsKeyJustPressed(MenuLeft);
 }

@@ -4,6 +4,7 @@
 #include "Input/keyboard.h"
 #include "Util/simpleini/SimpleIni.h"
 #include "Input/ScriptControls.hpp"
+#include "Menu/Controls.h"
 
 ScriptSettings::ScriptSettings(const std::string &general,
 	                           const std::string &wheel) :
@@ -18,10 +19,18 @@ void ScriptSettings::SetFiles(const std::string &general, const std::string &whe
 	settingsWheelFile = wheel;
 }
 
+void ScriptSettings::SetMenuFile(const std::string &menu) {
+	settingsMenuFile = menu;
+}
+
 
 void ScriptSettings::Read(ScriptControls* scriptControl) {
 	parseSettingsGeneral(scriptControl);
 	parseSettingsWheel(scriptControl);
+}
+
+void ScriptSettings::Read(MenuControls* menuControl) {
+	parseSettingsMenu(menuControl);
 }
 
 void ScriptSettings::Save() const {
@@ -182,6 +191,21 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 #pragma warning(pop)
 
 }
+
+void ScriptSettings::parseSettingsMenu(MenuControls *menuControl) {
+	CSimpleIniA menuSettings;
+	menuSettings.SetUnicode();
+	menuSettings.LoadFile(settingsMenuFile.c_str());
+
+	menuControl->ControlKeys[MenuControls::ControlType::MenuKey] = str2key(menuSettings.GetValue("MENU", "MenuKey", "VK_OEM_4"));
+	menuControl->ControlKeys[MenuControls::ControlType::MenuUp] = str2key(menuSettings.GetValue("MENU", "MenuUp", "UP"));
+	menuControl->ControlKeys[MenuControls::ControlType::MenuDown] = str2key(menuSettings.GetValue("MENU", "MenuDown", "DOWN"));
+	menuControl->ControlKeys[MenuControls::ControlType::MenuLeft] = str2key(menuSettings.GetValue("MENU", "MenuLeft", "LEFT"));
+	menuControl->ControlKeys[MenuControls::ControlType::MenuRight] = str2key(menuSettings.GetValue("MENU", "MenuRight", "RIGHT"));
+	menuControl->ControlKeys[MenuControls::ControlType::MenuSelect] = str2key(menuSettings.GetValue("MENU", "MenuSelect", "RETURN"));
+	menuControl->ControlKeys[MenuControls::ControlType::MenuCancel] = str2key(menuSettings.GetValue("MENU", "MenuCancel", "BACKSPACE"));
+}
+
 
 void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 #pragma warning(push)

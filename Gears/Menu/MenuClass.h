@@ -5,7 +5,7 @@
 #include <vector>
 #include <functional>
 
-class Controls;
+class MenuControls;
 
 struct rgba {
 	int r, g, b, a;
@@ -36,6 +36,7 @@ public:
 	bool IntArray(char* option, int display[], int *PlaceHolderInt);
 	bool FloatArray(char* option, float display[], int *PlaceHolderInt);
 	bool CharArray(char* option, char* display[], int *PlaceHolderInt);
+	bool StringArray(char *option, std::vector<std::string> display, int *PlaceHolderInt);
 	void TeleportOption(char* option, float x, float y, float z);
 
 	bool CurrentMenu(char* menuname);
@@ -47,7 +48,7 @@ public:
 	void SaveMenuTheme(LPCWSTR file);
 
 	void EndMenu();
-	void CheckKeys(Controls* controls, std::function<void(void) > onMain, std::function<void(void) > onExit);
+	void CheckKeys(MenuControls* controls, std::function<void(void) > onMain, std::function<void(void) > onExit);
 	void CloseMenu();
 
 private:

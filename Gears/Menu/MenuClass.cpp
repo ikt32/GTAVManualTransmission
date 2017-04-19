@@ -380,11 +380,43 @@ bool Menu::FloatArray(char* option, float display[], int *PlaceHolderInt) {
 	else return false;
 }
 
+// why?!
 bool Menu::CharArray(char* option, char* display[], int *PlaceHolderInt) {
 	Option(option);
 
 	int min = 0;
 	int max = sizeof(display) / sizeof(*display) + 1;
+
+	if (currentoption == optioncount) {
+		if (leftpress) {
+			if (*PlaceHolderInt <= min) *PlaceHolderInt = max;
+			else *PlaceHolderInt -= 1;
+			leftpress = false;
+		}
+		if (*PlaceHolderInt < min) *PlaceHolderInt = max;
+		if (rightpress) {
+			if (*PlaceHolderInt >= max) *PlaceHolderInt = min;
+			else *PlaceHolderInt += 1;
+			rightpress = false;
+		}
+		if (*PlaceHolderInt > max) *PlaceHolderInt = min;
+	}
+	if (currentoption <= 16 && optioncount <= 16)
+		drawText(("<" + (std::string)display[*PlaceHolderInt] + ">").c_str(), optionsFont, menux + 0.068f, (optioncount * 0.035f + 0.125f), 0.5f, 0.5f, options, true);
+	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
+		drawText(("<" + (std::string)display[*PlaceHolderInt] + ">").c_str(), optionsFont, menux + 0.068f, ((optioncount - (currentoption - 16)) * 0.035f + 0.125f), 0.5f, 0.5f, options, true);
+
+	if (optionpress && currentoption == optioncount)
+		return true;
+	else return false;
+}
+
+// :ok_hand:
+bool Menu::StringArray(char* option, std::vector<std::string>display, int *PlaceHolderInt) {
+	Option(option);
+
+	int min = 0;
+	int max = display.size() - 1;
 
 	if (currentoption == optioncount) {
 		if (leftpress) {
@@ -581,12 +613,12 @@ void Menu::EndMenu() {
 	}
 }
 
-void Menu::CheckKeys(Controls* controls, std::function<void(void) > onMain, std::function<void(void) > onExit) {
+void Menu::CheckKeys(MenuControls* controls, std::function<void(void) > onMain, std::function<void(void) > onExit) {
 	optionpress = false;
 	if (GetTickCount() - delay > 120) {
 		//if (getKeyPressed(VK_MULTIPLY) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendLb) &&
 		//	CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendRb)) {
-		if (controls->IsKeyJustPressed(Controls::MenuKey)) {
+		if (controls->IsKeyJustPressed(MenuControls::MenuKey)) {
 			if (menulevel == 0) {
 				changeMenu("mainmenu");
 				if (onMain) onMain();
@@ -597,7 +629,7 @@ void Menu::CheckKeys(Controls* controls, std::function<void(void) > onMain, std:
 			}
 			delay = GetTickCount();
 		}
-		if (controls->IsKeyJustPressed(Controls::MenuCancel) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendCancel)) {
+		if (controls->IsKeyJustPressed(MenuControls::MenuCancel) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendCancel)) {
 			if (menulevel > 0) {
 				backMenu();
 				if (menulevel == 1) {
@@ -606,31 +638,31 @@ void Menu::CheckKeys(Controls* controls, std::function<void(void) > onMain, std:
 			}
 			delay = GetTickCount();
 		}
-		if (controls->IsKeyJustPressed(Controls::MenuSelect) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendAccept)) {
+		if (controls->IsKeyJustPressed(MenuControls::MenuSelect) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendAccept)) {
 			if (menulevel > 0) {
 				menuBeep();
 			}
 			optionpress = true;
 			delay = GetTickCount();
 		}
-		if (controls->IsKeyJustPressed(Controls::MenuDown) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown)) {
+		if (controls->IsKeyJustPressed(MenuControls::MenuDown) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown)) {
 			nextOption();
 			delay = GetTickCount();
 			downpress = true;
 		}
-		if (controls->IsKeyJustPressed(Controls::MenuUp) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp)) {
+		if (controls->IsKeyJustPressed(MenuControls::MenuUp) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp)) {
 			previousOption();
 			delay = GetTickCount();
 			uppress = true;
 		}
-		if (controls->IsKeyJustPressed(Controls::MenuLeft) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft)) {
+		if (controls->IsKeyJustPressed(MenuControls::MenuLeft) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft)) {
 			if (menulevel > 0) {
 				menuBeep();
 			}
 			leftpress = true;
 			delay = GetTickCount();
 		}
-		if (controls->IsKeyJustPressed(Controls::MenuRight) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneRight)) {
+		if (controls->IsKeyJustPressed(MenuControls::MenuRight) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneRight)) {
 			if (menulevel > 0) {
 				menuBeep();
 			}

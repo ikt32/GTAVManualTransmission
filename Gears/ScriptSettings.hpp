@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "Util/Logger.hpp"
+#include "menu/Controls.h"
 
 class Logger;
 class ScriptControls;
@@ -14,14 +15,16 @@ class ScriptSettings {
 public:
 	ScriptSettings(const std::string &general, const std::string &wheel);
 	void SetFiles(const std::string &general, const std::string &wheel);
-	void parseSettingsGeneral(ScriptControls *scriptControl);
+	void SetMenuFile(const std::string & menu);
 	void Read(ScriptControls* scriptControl);
+	void Read(MenuControls *menuControl);
 	void Save() const;
 	bool IsCorrectVersion() const;
 	std::string GetVersionError();
 
 	// Only use this AFTER wheel settings are read.
 	std::vector<GUID> GetGuids();
+
 	// settings_general.ini parts
 	// [OPTIONS]
 	bool EnableManual = true;
@@ -131,9 +134,12 @@ public:
 	void SteeringSaveButton(const std::string &confTag, ptrdiff_t index, int button);
 	void SteeringSaveHShifter(const std::string &confTag, ptrdiff_t index, int button[]);
 private:
+	void parseSettingsGeneral(ScriptControls *scriptControl);
+	void parseSettingsWheel(ScriptControls *scriptControl);
+	void parseSettingsMenu(MenuControls *controls);
+
 	std::string settings_general_version = "000";
 	std::string settings_wheel_version = "000";
-	void parseSettingsWheel(ScriptControls *scriptControl);
 
 	// Just looks up which GUID corresponds with what number and returns the GUID.
 	GUID DeviceIndexToGUID(int device, std::vector<GUID> guids);
@@ -141,4 +147,5 @@ private:
 	int nDevices = 0;
 	std::string settingsGeneralFile;
 	std::string settingsWheelFile;
+	std::string settingsMenuFile;
 };
