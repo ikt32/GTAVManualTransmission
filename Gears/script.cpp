@@ -618,7 +618,7 @@ void reset() {
 
 void toggleManual() {
 	settings.EnableManual = !settings.EnableManual;
-	settings.Save();
+	//settings.Save();
 	std::stringstream message;
 	message << "Manual Transmission " <<
 	           (settings.EnableManual ? "Enabled" : "Disabled");
@@ -646,7 +646,7 @@ void updateLastInputDevice() {
 				if (settings.ShiftMode == HPattern) {
 					showNotification("Switched to controller\nSequential re-initiated", &prevNotification);
 					settings.ShiftMode = Sequential;
-					settings.Save();
+					//settings.Save();
 				}
 				else {
 					showNotification("Switched to controller", &prevNotification);
@@ -712,7 +712,7 @@ void cycleShiftMode() {
 	}
 
 	setShiftMode(settings.ShiftMode);
-	settings.Save();
+	//settings.Save();
 }
 
 void shiftTo(int gear, bool autoClutch) {
@@ -1660,7 +1660,7 @@ void menuInit() {
 }
 
 void menuClose() {
-	
+	settings.Save();
 }
 
 void update_menu() {
