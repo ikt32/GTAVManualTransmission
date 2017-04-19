@@ -83,35 +83,35 @@ void ScriptSettings::Save() const {
 	settingsGeneral.SetDoubleValue("HUD", "SpeedoYpos", SpeedoYpos);
 	settingsGeneral.SetDoubleValue("HUD", "SpeedoSize", SpeedoSize);
 
-	settingsGeneral.GetBoolValue("HUD", "EnableRPMIndicator", RPMIndicator);
-	settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorXpos", RPMIndicatorXpos);
-	settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorYpos", RPMIndicatorYpos);
-	settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorSize", RPMIndicatorSize);
-	settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorRedline", RPMIndicatorRedline);
+	settingsGeneral.SetBoolValue("HUD", "EnableRPMIndicator", RPMIndicator);
+	settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorXpos", RPMIndicatorXpos);
+	settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorYpos", RPMIndicatorYpos);
+	settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorSize", RPMIndicatorSize);
+	settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorRedline", RPMIndicatorRedline);
 
-	settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundR", RPMIndicatorBackgroundR);
-	settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundG", RPMIndicatorBackgroundG);
-	settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundB", RPMIndicatorBackgroundB);
-	settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundA", RPMIndicatorBackgroundA);
+	settingsGeneral.SetLongValue("HUD", "RPMIndicatorBackgroundR", RPMIndicatorBackgroundR);
+	settingsGeneral.SetLongValue("HUD", "RPMIndicatorBackgroundG", RPMIndicatorBackgroundG);
+	settingsGeneral.SetLongValue("HUD", "RPMIndicatorBackgroundB", RPMIndicatorBackgroundB);
+	settingsGeneral.SetLongValue("HUD", "RPMIndicatorBackgroundA", RPMIndicatorBackgroundA);
 
-	settingsGeneral.GetLongValue("HUD", "RPMIndicatorForegroundR", RPMIndicatorForegroundR);
-	settingsGeneral.GetLongValue("HUD", "RPMIndicatorForegroundG", RPMIndicatorForegroundG);
-	settingsGeneral.GetLongValue("HUD", "RPMIndicatorForegroundB", RPMIndicatorForegroundB);
-	settingsGeneral.GetLongValue("HUD", "RPMIndicatorForegroundA", RPMIndicatorForegroundA);
+	settingsGeneral.SetLongValue("HUD", "RPMIndicatorForegroundR", RPMIndicatorForegroundR);
+	settingsGeneral.SetLongValue("HUD", "RPMIndicatorForegroundG", RPMIndicatorForegroundG);
+	settingsGeneral.SetLongValue("HUD", "RPMIndicatorForegroundB", RPMIndicatorForegroundB);
+	settingsGeneral.SetLongValue("HUD", "RPMIndicatorForegroundA", RPMIndicatorForegroundA);
 
-	settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineR", RPMIndicatorRedlineR);
-	settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineG", RPMIndicatorRedlineG);
-	settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineB", RPMIndicatorRedlineB);
-	settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineA", RPMIndicatorRedlineA);
+	settingsGeneral.SetLongValue("HUD", "RPMIndicatorRedlineR", RPMIndicatorRedlineR);
+	settingsGeneral.SetLongValue("HUD", "RPMIndicatorRedlineG", RPMIndicatorRedlineG);
+	settingsGeneral.SetLongValue("HUD", "RPMIndicatorRedlineB", RPMIndicatorRedlineB);
+	settingsGeneral.SetLongValue("HUD", "RPMIndicatorRedlineA", RPMIndicatorRedlineA);
 
-	settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitR", RPMIndicatorRevlimitR);
-	settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitG", RPMIndicatorRevlimitG);
-	settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitB", RPMIndicatorRevlimitB);
-	settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitA", RPMIndicatorRevlimitA);
+	settingsGeneral.SetLongValue("HUD", "RPMIndicatorRevlimitR", RPMIndicatorRevlimitR);
+	settingsGeneral.SetLongValue("HUD", "RPMIndicatorRevlimitG", RPMIndicatorRevlimitG);
+	settingsGeneral.SetLongValue("HUD", "RPMIndicatorRevlimitB", RPMIndicatorRevlimitB);
+	settingsGeneral.SetLongValue("HUD", "RPMIndicatorRevlimitA", RPMIndicatorRevlimitA);
 
 	// [DEBUG]
-	settingsGeneral.GetBoolValue("DEBUG", "DisplayInfo", DisplayInfo);
-	settingsGeneral.GetBoolValue("DEBUG", "LogCar", LogCar);
+	settingsGeneral.SetBoolValue("DEBUG", "DisplayInfo", DisplayInfo);
+	settingsGeneral.SetBoolValue("DEBUG", "LogCar", LogCar);
 
 	settingsGeneral.SaveFile(settingsGeneralFile.c_str());
 }
