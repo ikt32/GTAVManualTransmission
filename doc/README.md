@@ -121,17 +121,6 @@ Mods that counter the power loss when sliding sideways
 * [InversePower](https://www.gta5-mods.com/scripts/inversepower)
 * [Drift Assist](https://www.gta5-mods.com/scripts/drift-assist)
 
-<sub>Outdated:
-* [~~Custom Steering~~](https://www.gta5-mods.com/scripts/custom-steering) 
-
-Custom Steering hasn't been updated for the latest GTA V updates*. Once it gets 
-updated, using this is fine. Before this happens, remove it if it crashes your
-game. It was needed to cancel the automatic countersteer and steering reduction
-at speed, but this is included in this mod starting with version 4.2.0.
-
-<sub>As of 17 April 2017, it hasn't been updated for v1.0.944.2</sub>
-</sub>
-
 # Basic usage and controls
 It's useful to know how to drive stick. Alternatively you can also turn
 off features like stalling, clutch grabbing, or just using sequential or
@@ -142,15 +131,43 @@ WILL need to configure it correctly, otherwise some features will not work.
 The buttons listed below are default controls, but can be changed.
 
 ## Controls
+For both keyboard and controller inputs, refer to `settings_general.ini` for 
+keys. You can also change them to anything you like. Mouse not supported\*
+
+<sub>\* Unless ScriptHookV's Keyboard handler does. Please make an issue,
+pull request or whatever suits you most to inform me :)</sub>
+
 ### Keyboard defaults (US-ANSI)
-* Press `\|` to disable or enable manual transmission.
-* Press `]}` to switch between a sequential gearbox, H-pattern gearbox or the
-automatic gearbox.
+By default, `W` and `S` are assigned to throttle and brake respectively.
+
+* Press `\|` to disable or enable manual transmission
+* Press `]}` to switch between sequential, H-pattern or automatic
+* Press `Z` for Clutch
+* Press `X` for Engine
+
+Sequential and Automatic:
+
+* Press `SHIFT` to shift up
+* Press `CTRL` to shift down
+
+H-shifter mode:
+
+* Press `Numpad 0` for Reverse
+* Press `Numpad 1-7` for H-shifter gears 1-7
+* Press `Numpad 9` for Neutral
+
 
 ### Controller defaults
-* Hold Dpad Right to disable or enable manual transmission.
-* Hold B to switch between a sequential gearbox, H-pattern gearbox or
-the automatic gearbox.
+By default, `RightTrigger` and `LeftTrigger` are assigned to throttle and brake respectively.
+
+* Hold `Dpad Right` to disable or enable manual transmission (disabled at the moment)
+* Hold `B` to switch between sequential, H-pattern or automatic
+* Press `A` to shift up
+* Press `X` to shift down
+* Use `LeftThumbUp` to control the clutch
+* Press `DpadDown` for Engine
+
+
 
 ## Usage
 This mod features dynamic input detection. To switch between inputs, be it wheel,
