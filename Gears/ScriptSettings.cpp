@@ -79,6 +79,7 @@ void ScriptSettings::Save() const {
 	settingsGeneral.SetDoubleValue("HUD", "ShiftModeSize", ShiftModeSize);
 
 	settingsGeneral.SetValue("HUD", "Speedo", Speedo.c_str());
+	settingsGeneral.SetBoolValue("HUD", "SpeedoShowUnit", SpeedoShowUnit);
 	settingsGeneral.SetDoubleValue("HUD", "SpeedoXpos", SpeedoXpos);
 	settingsGeneral.SetDoubleValue("HUD", "SpeedoYpos", SpeedoYpos);
 	settingsGeneral.SetDoubleValue("HUD", "SpeedoSize", SpeedoSize);
@@ -86,7 +87,8 @@ void ScriptSettings::Save() const {
 	settingsGeneral.SetBoolValue("HUD", "EnableRPMIndicator", RPMIndicator);
 	settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorXpos", RPMIndicatorXpos);
 	settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorYpos", RPMIndicatorYpos);
-	settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorSize", RPMIndicatorSize);
+	settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorWidth", RPMIndicatorWidth);
+	settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorHeight", RPMIndicatorHeight);
 	settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorRedline", RPMIndicatorRedline);
 
 	settingsGeneral.SetLongValue("HUD", "RPMIndicatorBackgroundR", RPMIndicatorBackgroundR);
@@ -182,6 +184,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	ShiftModeSize = settingsGeneral.GetDoubleValue("HUD", "ShiftModeSize", 1.50);
 
 	Speedo = settingsGeneral.GetValue("HUD", "Speedo", "kph");
+	SpeedoShowUnit = settingsGeneral.GetBoolValue("HUD", "SpeedoShowUnit", false);
 	SpeedoXpos = settingsGeneral.GetDoubleValue("HUD", "SpeedoXpos", 0.90);
 	SpeedoYpos = settingsGeneral.GetDoubleValue("HUD", "SpeedoYpos", 0.85);
 	SpeedoSize = settingsGeneral.GetDoubleValue("HUD", "SpeedoSize", 1.00);
@@ -189,7 +192,8 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	RPMIndicator = settingsGeneral.GetBoolValue("HUD", "EnableRPMIndicator", true);
 	RPMIndicatorXpos = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorXpos", 0.475);
 	RPMIndicatorYpos = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorYpos", 0.950);
-	RPMIndicatorSize = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorSize", 1.0);
+	RPMIndicatorWidth = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorWidth", 0.0);
+	RPMIndicatorHeight = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorHeight", 0.0);
 	RPMIndicatorRedline = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorRedline", 1.0);
 
 	RPMIndicatorBackgroundR = settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundR", 0);

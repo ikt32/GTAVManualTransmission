@@ -64,6 +64,7 @@ public:
 
 	// can be kph, mph, or ms
 	std::string Speedo;
+	bool SpeedoShowUnit = false;
 	float SpeedoSize = 1.5f;
 	float SpeedoYpos = 0.85f;
 	float SpeedoXpos = 0.85f;
@@ -71,7 +72,8 @@ public:
 	bool RPMIndicator = true;
 	float RPMIndicatorXpos = 0.9125f;
 	float RPMIndicatorYpos = 0.965f;
-	float RPMIndicatorSize = 0.5f;
+	float RPMIndicatorWidth = 0.25f;
+	float RPMIndicatorHeight = 0.05f;
 	float RPMIndicatorRedline = 0.875f;
 
 	int RPMIndicatorBackgroundR = 0;

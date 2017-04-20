@@ -615,7 +615,7 @@ void Menu::EndMenu() {
 
 void Menu::CheckKeys(MenuControls* controls, std::function<void(void) > onMain, std::function<void(void) > onExit) {
 	optionpress = false;
-	if (GetTickCount() - delay > 120) {
+	if (GetTickCount() - delay > 60) {
 		//if (getKeyPressed(VK_MULTIPLY) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendLb) &&
 		//	CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendRb)) {
 		if (controls->IsKeyJustPressed(MenuControls::MenuKey)) {

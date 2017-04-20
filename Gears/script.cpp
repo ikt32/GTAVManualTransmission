@@ -45,6 +45,15 @@ VehicleExtensions ext;
 int prevNotification = 0;
 int prevExtShift = 0;
 
+int speedoIndex;
+//todo: srsly unfuck pls
+std::vector<std::string> speedoTypes = {
+	"off",
+	"kph",
+	"mph",
+	"ms"
+};
+
 enum ShiftModes {
 	Sequential = 0,
 	HPattern = 1,
@@ -328,10 +337,10 @@ void update() {
 //                           Helper functions/tools
 ///////////////////////////////////////////////////////////////////////////////
 void drawRPMIndicator(float x, float y, float width, float height, Color fg, Color bg, float rpm) {
-	float bgpadding = 0.01f;
-	
+	float bgpaddingx = 0.00f;
+	float bgpaddingy = 0.01f;
 	// background
-	GRAPHICS::DRAW_RECT(x, y, width+bgpadding, height+bgpadding, bg.R, bg.G, bg.B, bg.A);
+	GRAPHICS::DRAW_RECT(x, y, width+bgpaddingx, height+bgpaddingy, bg.R, bg.G, bg.B, bg.A);
 
 	// rpm thingy
 	GRAPHICS::DRAW_RECT(x-width*0.5f+rpm*width*0.5f, y, width*rpm, height, fg.R, fg.G, fg.B, fg.A);
@@ -377,7 +386,7 @@ void showHUD() {
 		break;
 	}
 	showText(settings.ShiftModeXpos, settings.ShiftModeYpos, settings.ShiftModeSize, shiftModeText);
-
+	
 	// Speedometer using dashboard speed
 	if (settings.Speedo == "kph" ||
 		settings.Speedo == "mph" ||
@@ -389,16 +398,17 @@ void showHUD() {
 
 		if (settings.Speedo == "kph" ) {
 			speedoFormat << static_cast<int>(std::round(dashms * 3.6f));
-			speedoText = CharAdapter(speedoFormat.str().c_str());
+			if (settings.SpeedoShowUnit) speedoFormat << " km/h";
 		}
 		if (settings.Speedo == "mph" ) {
 			speedoFormat << static_cast<int>(std::round(dashms / 0.44704f));
-			speedoText = CharAdapter(speedoFormat.str().c_str());
+			if (settings.SpeedoShowUnit) speedoFormat << " mph";
 		}
 		if (settings.Speedo == "ms") {
 			speedoFormat << static_cast<int>(std::round(dashms));
-			speedoText = CharAdapter(speedoFormat.str().c_str());
+			if (settings.SpeedoShowUnit) speedoFormat << " m/s";
 		}
+		speedoText = CharAdapter(speedoFormat.str().c_str());
 		showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize, speedoText);
 	}
 
@@ -440,8 +450,8 @@ void showHUD() {
 		drawRPMIndicator(
 			settings.RPMIndicatorXpos,
 			settings.RPMIndicatorYpos,
-			settings.RPMIndicatorSize*0.25f,
-			settings.RPMIndicatorSize*0.05f,
+			settings.RPMIndicatorWidth,
+			settings.RPMIndicatorHeight,
 			rpmcolor,
 			background,
 			vehData.Rpm
@@ -590,6 +600,12 @@ void reInit() {
 	settings.Read(&menuControls);
 	// nasty but it should work enough...
 	menu.LoadMenuTheme(std::wstring(menuStyleFile.begin(), menuStyleFile.end()).c_str());
+
+	// lel we're not gonna exceed max_int anyway
+	speedoIndex = static_cast<int>(std::find(speedoTypes.begin(), speedoTypes.end(), settings.Speedo) - speedoTypes.begin());
+	if (speedoIndex >= speedoTypes.size()) {
+		speedoIndex = 0;
+	}
 
 	logger.Write("Settings read");
 	vehData.LockGears = 0x00010001;
@@ -1666,6 +1682,7 @@ void menuClose() {
 void update_menu() {
 	menu.CheckKeys(&menuControls, std::bind(menuInit), std::bind(menuClose));
 
+	/* Yes hello I am root */
 	if (menu.CurrentMenu("mainmenu")) {
 		menu.Title("Manual Transmission");
 		bool tempEnableRead = settings.EnableManual;
@@ -1696,6 +1713,7 @@ void update_menu() {
 		menu.StringArray("Version", version, &versionIndex);
 	}
 
+	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("optionsmenu")) {
 		menu.Title("Mod options");
 		if (menu.BoolOption("Simple Bike", &settings.SimpleBike)) {}
@@ -1716,25 +1734,101 @@ void update_menu() {
 		if (menu.BoolOption("Clutch + throttle start", &settings.ThrottleStart)) {}
 	}
 
+	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("controlsmenu")) {
 		menu.Title("Controls");
 		menu.Option("Not yet implemented :^)");
 	}
 
+	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("wheelmenu")) {
 		menu.Title("Wheel controls");
 		menu.Option("Not yet implemented :^)");
 	}
 
+	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("hudmenu")) {
 		menu.Title("HUD Options");
-		menu.Option("Not yet implemented :^)");
+
+		menu.BoolOption("Enable", &settings.HUD);
+		menu.MenuOption("Gear and shift mode", "geardisplaymenu");
+		menu.MenuOption("Speedometer", "speedodisplaymenu");
+		menu.MenuOption("RPM Gauge", "rpmdisplaymenu");
+
 	}
 
+	/* Yes hello I am root - 2 */
+	if (menu.CurrentMenu("geardisplaymenu")) {
+		menu.Title("Gear options");
+
+		// prolly gear section
+		menu.FloatOption("Gear X", &settings.GearXpos, 0.0f, 1.0f, 0.005f);
+		menu.FloatOption("Gear Y", &settings.GearYpos, 0.0f, 1.0f, 0.005f);
+		menu.FloatOption("Gear Size", &settings.GearSize, 0.0f, 3.0f, 0.05f);
+		menu.IntOption("Gear Top Color Red", &settings.GearTopColorR, 0, 255);
+		menu.IntOption("Gear Top Color Green", &settings.GearTopColorG, 0, 255);
+		menu.IntOption("Gear Top Color Blue", &settings.GearTopColorB, 0, 255);
+
+		menu.FloatOption("Shift Mode X", &settings.ShiftModeXpos, 0.0f, 1.0f, 0.005f);
+		menu.FloatOption("Shift Mode Y", &settings.ShiftModeYpos, 0.0f, 1.0f, 0.005f);
+		menu.FloatOption("Shift Mode Size", &settings.ShiftModeSize, 0.0f, 3.0f, 0.05f);
+
+	}
+
+	/* Yes hello I am root - 2 */
+	if (menu.CurrentMenu("speedodisplaymenu")) {
+		menu.Title("Speedometer options");
+		// prolly speedo section
+		ptrdiff_t oldPos = std::find(speedoTypes.begin(), speedoTypes.end(), settings.Speedo) - speedoTypes.begin();
+		menu.StringArray("Speedometer", speedoTypes, &speedoIndex);
+		if (speedoIndex != oldPos) {
+			settings.Speedo = speedoTypes.at(speedoIndex);
+		}
+		menu.BoolOption("Show units", &settings.SpeedoShowUnit);
+
+		menu.FloatOption("Speedometer X", &settings.SpeedoXpos, 0.0f, 1.0f, 0.005f);
+		menu.FloatOption("Speedometer Y", &settings.SpeedoYpos, 0.0f, 1.0f, 0.005f);
+		menu.FloatOption("Speedometer Size", &settings.SpeedoSize, 0.0f, 3.0f, 0.05f);
+
+	}
+
+	/* Yes hello I am root - 2 */
+	if (menu.CurrentMenu("rpmdisplaymenu")) {
+		menu.Title("RPM Gauge options");
+		// prolly RPM section
+		menu.BoolOption("RPM Gauge", &settings.RPMIndicator);
+
+		menu.FloatOption("RPM X", &settings.RPMIndicatorXpos, 0.0f, 1.0f, 0.0025f);
+		menu.FloatOption("RPM Y", &settings.RPMIndicatorYpos, 0.0f, 1.0f, 0.0025f);
+		menu.FloatOption("RPM Width", &settings.RPMIndicatorWidth, 0.0f, 1.0f, 0.0025f);
+		menu.FloatOption("RPM Height", &settings.RPMIndicatorHeight, 0.0f, 1.0f, 0.0025f);
+		menu.FloatOption("RPM Redline", &settings.RPMIndicatorRedline, 0.0f, 1.0f, 0.01f);
+
+		menu.IntOption("RPM Background Red	", &settings.RPMIndicatorBackgroundR, 0, 255);
+		menu.IntOption("RPM Background Green", &settings.RPMIndicatorBackgroundG, 0, 255);
+		menu.IntOption("RPM Background Blue	", &settings.RPMIndicatorBackgroundB, 0, 255);
+		menu.IntOption("RPM Background Alpha", &settings.RPMIndicatorBackgroundA, 0, 255);
+																			
+		menu.IntOption("RPM Foreground Red	", &settings.RPMIndicatorForegroundR, 0, 255);
+		menu.IntOption("RPM Foreground Green", &settings.RPMIndicatorForegroundG, 0, 255);
+		menu.IntOption("RPM Foreground Blue	", &settings.RPMIndicatorForegroundB, 0, 255);
+		menu.IntOption("RPM Foreground Alpha", &settings.RPMIndicatorForegroundA, 0, 255);
+
+		menu.IntOption("RPM Redline Red		", &settings.RPMIndicatorRedlineR, 0, 255);
+		menu.IntOption("RPM Redline Green	", &settings.RPMIndicatorRedlineG, 0, 255);
+		menu.IntOption("RPM Redline Blue	", &settings.RPMIndicatorRedlineB, 0, 255);
+		menu.IntOption("RPM Redline Alpha	", &settings.RPMIndicatorRedlineA, 0, 255);
+
+		menu.IntOption("RPM Revlimit Red	", &settings.RPMIndicatorRevlimitR, 0, 255);
+		menu.IntOption("RPM Revlimit Green	", &settings.RPMIndicatorRevlimitG, 0, 255);
+		menu.IntOption("RPM Revlimit Blue	", &settings.RPMIndicatorRevlimitB, 0, 255);
+		menu.IntOption("RPM Revlimit Alpha	", &settings.RPMIndicatorRevlimitA, 0, 255);
+	}
+
+	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("menumenu")) {
 		menu.Title("Theme Options");
-		//menu.Option("Not yet implemented :^)");
-	
+		
 		menu.MenuOption("Title Text", "settings_theme_titletext");
 		menu.MenuOption("Title Rect", "settings_theme_titlerect");
 		menu.MenuOption("Scroller", "settings_theme_scroller");
@@ -1783,6 +1877,7 @@ void update_menu() {
 		menu.IntOption("Alpha: ", &menu.optionsrect.a, 0, 255);
 	}
 
+	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("debugmenu")) {
 		menu.Title("Debug settings");
 		if (menu.BoolOption("Display info", &settings.DisplayInfo)) {}
