@@ -432,10 +432,15 @@ bool Menu::StringArray(char* option, std::vector<std::string>display, int *Place
 		}
 		if (*PlaceHolderInt > max) *PlaceHolderInt = min;
 	}
+	std::string leftArrow = "<";
+	std::string rightArrow = ">";
+	if (max == 0) {
+		leftArrow = rightArrow = "";
+	}
 	if (currentoption <= 16 && optioncount <= 16)
-		drawText(("<" + (std::string)display[*PlaceHolderInt] + ">").c_str(), optionsFont, menux + 0.068f, (optioncount * 0.035f + 0.125f), 0.5f, 0.5f, options, true);
+		drawText((leftArrow + (std::string)display[*PlaceHolderInt] + rightArrow).c_str(), optionsFont, menux + 0.068f, (optioncount * 0.035f + 0.125f), 0.5f, 0.5f, options, true);
 	else if ((optioncount > (currentoption - 16)) && optioncount <= currentoption)
-		drawText(("<" + (std::string)display[*PlaceHolderInt] + ">").c_str(), optionsFont, menux + 0.068f, ((optioncount - (currentoption - 16)) * 0.035f + 0.125f), 0.5f, 0.5f, options, true);
+		drawText((leftArrow + (std::string)display[*PlaceHolderInt] + rightArrow).c_str(), optionsFont, menux + 0.068f, ((optioncount - (currentoption - 16)) * 0.035f + 0.125f), 0.5f, 0.5f, options, true);
 
 	if (optionpress && currentoption == optioncount)
 		return true;
