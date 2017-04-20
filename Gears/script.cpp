@@ -25,7 +25,6 @@
 
 std::string settingsGeneralFile;
 std::string settingsWheelFile;
-std::string menuStyleFile;
 std::string settingsMenuFile;
 
 
@@ -58,6 +57,23 @@ enum ShiftModes {
 	Sequential = 0,
 	HPattern = 1,
 	Automatic = 2
+};
+
+// FontName, fontID
+std::vector<std::string> fonts {
+	{ "Chalet London" },
+	{ "Sign Painter" },
+	{ "Slab Serif" },
+	{ "Chalet Cologne" },
+	{ "Pricedown" },
+};
+
+std::vector<int> fontIDs {
+	0,
+	1,
+	2,
+	4,
+	7
 };
 
 void update() {
@@ -599,7 +615,7 @@ void reInit() {
 	settings.Read(&controls);
 	settings.Read(&menuControls);
 	// nasty but it should work enough...
-	menu.LoadMenuTheme(std::wstring(menuStyleFile.begin(), menuStyleFile.end()).c_str());
+	menu.LoadMenuTheme(std::wstring(settingsMenuFile.begin(), settingsMenuFile.end()).c_str());
 
 	// lel we're not gonna exceed max_int anyway
 	speedoIndex = static_cast<int>(std::find(speedoTypes.begin(), speedoTypes.end(), settings.Speedo) - speedoTypes.begin());
@@ -1677,6 +1693,7 @@ void menuInit() {
 
 void menuClose() {
 	settings.Save();
+	menu.SaveMenuTheme(std::wstring(settingsMenuFile.begin(), settingsMenuFile.end()).c_str());
 }
 
 void update_menu() {
@@ -1707,7 +1724,22 @@ void update_menu() {
 		menu.MenuOption("Menu Options", "menumenu"); 
 		menu.MenuOption("Debug", "debugmenu");
 
-		// wtf
+		int activeIndex = 0;
+		std::string activeInputName;
+		switch (controls.PrevInput) {
+			case ScriptControls::Keyboard:
+				activeInputName = "Keyboard";
+				break;
+			case ScriptControls::Controller:
+				activeInputName = "Controller";
+				break;
+			case ScriptControls::Wheel:
+				activeInputName = "Wheel";
+				break;
+		}
+		std::vector<std::string> active = { activeInputName };
+		menu.StringArray("Active input", active, &activeIndex);
+
 		int versionIndex = 0;
 		std::vector<std::string> version = { DISPLAY_VERSION };
 		menu.StringArray("Version", version, &versionIndex);
@@ -1838,6 +1870,13 @@ void update_menu() {
 
 	if (menu.CurrentMenu("settings_theme_titletext")) {
 		menu.Title("Title Text");
+		
+		int fontIndex = std::find(fontIDs.begin(), fontIDs.end(), menu.titleFont) - fontIDs.begin();
+		int oldIndex = fontIndex;
+		menu.StringArray("Font: ", fonts, &fontIndex);
+		if (fontIndex != oldIndex) {
+			menu.titleFont = fontIDs.at(fontIndex);
+		}
 
 		menu.IntOption("Red: ", &menu.titleText.r, 0, 255);
 		menu.IntOption("Green: ", &menu.titleText.g, 0, 255);
@@ -1862,6 +1901,13 @@ void update_menu() {
 	}	
 	if (menu.CurrentMenu("settings_theme_options")) {
 		menu.Title("Options Text");
+
+		int fontIndex = std::find(fontIDs.begin(), fontIDs.end(), menu.optionsFont) - fontIDs.begin();
+		int oldIndex = fontIndex;
+		menu.StringArray("Font: ", fonts, &fontIndex);
+		if (fontIndex != oldIndex) {
+			menu.optionsFont = fontIDs.at(fontIndex);
+		}
 		
 		menu.IntOption("Red: ", &menu.options.r, 0, 255);
 		menu.IntOption("Green: ", &menu.options.g, 0, 255);
@@ -1897,7 +1943,6 @@ void main() {
 	settingsGeneralFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_general.ini";
 	settingsWheelFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_wheel.ini";
 	settingsMenuFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_menu.ini";
-	menuStyleFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\MenuStyle.ini";
 	
 	settings.SetFiles(settingsGeneralFile, settingsWheelFile);
 	settings.SetMenuFile(settingsMenuFile);
@@ -1905,7 +1950,6 @@ void main() {
 	logger.Write("Loading " + settingsGeneralFile);
 	logger.Write("Loading " + settingsWheelFile);
 	logger.Write("Loading " + settingsMenuFile);
-	logger.Write("Loading " + menuStyleFile);
 
 	reInit();
 	while (true) {
