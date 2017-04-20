@@ -620,7 +620,7 @@ void Menu::EndMenu() {
 
 void Menu::CheckKeys(MenuControls* controls, std::function<void(void) > onMain, std::function<void(void) > onExit) {
 	optionpress = false;
-	if (GetTickCount() - delay > 60) {
+	if (GetTickCount() - delay > menuTime) {
 		//if (getKeyPressed(VK_MULTIPLY) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendLb) &&
 		//	CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendRb)) {
 		if (controls->IsKeyJustPressed(MenuControls::MenuKey)) {
@@ -652,17 +652,20 @@ void Menu::CheckKeys(MenuControls* controls, std::function<void(void) > onMain, 
 			delay = GetTickCount();
 		}
 		if (controls->IsKeyJustPressed(MenuControls::MenuDown) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown)) {
+			if (menulevel > 0) { menuTime = 90; }
 			nextOption();
 			delay = GetTickCount();
 			downpress = true;
 		}
 		if (controls->IsKeyJustPressed(MenuControls::MenuUp) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp)) {
+			if (menulevel > 0) { menuTime = 90; }
 			previousOption();
 			delay = GetTickCount();
 			uppress = true;
 		}
 		if (controls->IsKeyJustPressed(MenuControls::MenuLeft) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft)) {
 			if (menulevel > 0) {
+				menuTime = 60;
 				menuBeep();
 			}
 			leftpress = true;
@@ -670,6 +673,7 @@ void Menu::CheckKeys(MenuControls* controls, std::function<void(void) > onMain, 
 		}
 		if (controls->IsKeyJustPressed(MenuControls::MenuRight) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneRight)) {
 			if (menulevel > 0) {
+				menuTime = 60;
 				menuBeep();
 			}
 			rightpress = true;

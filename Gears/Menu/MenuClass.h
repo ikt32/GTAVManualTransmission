@@ -84,6 +84,7 @@ private:
 	int menulevel = 0;
 	int infocount = 0;
 	int delay = GetTickCount();
+	int menuTime = 60;
 
 	void drawText(const char *text, int font, float x, float y, float scalex, float scaley, rgba rgba, bool center);
 	void drawRect(float x, float y, float width, float height, rgba rgba);
