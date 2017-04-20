@@ -63,7 +63,7 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 	Address = ext.GetAddress(vehicle);
 	CurrGear = ext.GetGearCurr(vehicle);
 	NextGear = ext.GetGearNext(vehicle);
-	Rpm = ext.GetCurrentRPM(vehicle);
+	Rpm = VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) ? ext.GetCurrentRPM(vehicle) : 0.01f;
 	Clutch = ext.GetClutch(vehicle);
 	Throttle = ext.GetThrottle(vehicle);
 	Turbo = ext.GetTurbo(vehicle);
