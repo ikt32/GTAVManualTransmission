@@ -556,7 +556,7 @@ void showDebugInfoWheel(ScriptSettings &settings, float effSteer, int damperForc
 
 	std::stringstream GForceDisplay;
 	GForceDisplay << "GForceFinal: " <<
-		std::setprecision(5) << (-GForce * 5000 * settings.FFPhysics * settings.FFGlobalMult);
+		std::setprecision(5) << (-GForce * 5000 * settings.PhysicsStrength * settings.FFGlobalMult);
 	showText(0.85, 0.250, 0.4, GForceDisplay.str().c_str());
 
 	std::stringstream damperF;
@@ -628,7 +628,7 @@ void reInit() {
 	vehData.LockGears = 0x00010001;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
 	if (settings.EnableWheel) {
-		controls.InitWheel(settings.FFEnable);
+		controls.InitWheel(settings.EnableFFB);
 		controls.CheckGUIDs(settings.reggdGuids);
 	}
 	controls.SteerGUID = controls.WheelAxesGUIDs[static_cast<int>(controls.SteerAxisType)];
@@ -644,7 +644,7 @@ void reset() {
 	if (MemoryPatcher::SteeringPatched) {
 		MemoryPatcher::RestoreSteeringCorrection();
 	}
-	if (settings.FFEnable && controls.WheelControl.IsConnected(controls.SteerGUID)) {
+	if (settings.EnableFFB && controls.WheelControl.IsConnected(controls.SteerGUID)) {
 		controls.WheelControl.SetConstantForce(controls.SteerGUID, 0);
 	}
 }
@@ -1535,7 +1535,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 
 	if (!controls.WheelControl.IsConnected(controls.SteerGUID) ||
 		controls.PrevInput != ScriptControls::Wheel ||
-		!settings.FFEnable) {
+		!settings.EnableFFB) {
 		return;
 	}
 
@@ -1645,9 +1645,9 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	}
 
 	int totalForce = 
-		static_cast<int>(-GForce * 5000 * settings.FFPhysics * settings.FFGlobalMult) + // 2G = max force, Koenigsegg One:1 only does 1.7g!
+		static_cast<int>(-GForce * 5000 * settings.PhysicsStrength * settings.FFGlobalMult) + // 2G = max force, Koenigsegg One:1 only does 1.7g!
+		static_cast<int>(1000.0f * settings.DetailStrength * compSpeedTotal * settings.FFGlobalMult) +
 		static_cast<int>(steerSpeed * damperForce * 0.1) +
-		static_cast<int>(10.0f * settings.DetailStrength * compSpeedTotal * settings.FFGlobalMult) +
 		0;
 
 	// Soft lock
@@ -1694,6 +1694,7 @@ void menuInit() {
 
 void menuClose() {
 	settings.SaveGeneral();
+	settings.SaveWheel();
 	menu.SaveMenuTheme(std::wstring(settingsMenuFile.begin(), settingsMenuFile.end()).c_str());
 }
 
@@ -1720,7 +1721,7 @@ void update_menu() {
 
 		menu.MenuOption("Mod options", "optionsmenu");
 		menu.MenuOption("Controls", "controlsmenu");
-		menu.MenuOption("Wheel controls", "wheelmenu");
+		menu.MenuOption("Wheel Options", "wheelmenu");
 		menu.MenuOption("HUD Options", "hudmenu");
 		menu.MenuOption("Menu Options", "menumenu"); 
 		menu.MenuOption("Debug", "debugmenu");
@@ -1770,7 +1771,7 @@ void update_menu() {
 	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("controlsmenu")) {
 		menu.Title("Controls");
-		menu.Option("Not yet implemented :^)");
+		menu.Option("Not yet implemented");
 	}
 
 	/* Yes hello I am root - 1 */
@@ -1782,6 +1783,7 @@ void update_menu() {
 		if (menu.BoolOption("Patch steering", &settings.PatchSteering)) { settings.SaveWheel(); }
 		if (menu.BoolOption("Patch steering for all inputs", &settings.PatchSteeringAlways)) { settings.SaveWheel(); }
 		if (menu.BoolOption("Logitech LEDs (can crash!)", &settings.LogiLEDs)) { settings.SaveWheel(); }
+		menu.MenuOption("Force feedback", "forcefeedbackmenu");
 
 		std::vector<std::string> info = {
 			"Press RIGHT to clear this axis" ,
@@ -1812,6 +1814,19 @@ void update_menu() {
 			bool result = configAxis("HANDBRAKE_ANALOG");
 			showNotification(result ? "Handbrake axis saved" : "Cancelled handbrake axis calibration", &prevNotification);
 		}
+	}
+
+	/* Yes hello I am root - 2 */
+	if (menu.CurrentMenu("forcefeedbackmenu")) {
+		menu.Title("Force feedback");
+
+		menu.BoolOption("Enable", &settings.EnableFFB);
+		menu.FloatOption("Global multiplier", &settings.FFGlobalMult, 0.0f, 10.0f, 1.0f);
+		menu.IntOption("Damper Max (low speed)", &settings.DamperMax, 0, 200, 1);
+		menu.IntOption("Damper Min (high speed)", &settings.DamperMin, 0, 200, 1);
+		menu.FloatOption("Damper Min speed (m/s)", &settings.TargetSpeed, 0.0f, 40.0f, 0.2f);
+		menu.FloatOption("Physics strength", &settings.PhysicsStrength, 0.0f, 10.0f, 0.1f);
+		menu.FloatOption("Detail strength", &settings.DetailStrength, 0.0f, 10.0f, 0.1f);
 	}
 
 	/* Yes hello I am root - 1 */

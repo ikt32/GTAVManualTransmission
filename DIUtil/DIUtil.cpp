@@ -134,7 +134,7 @@ void init() {
 	settings.Read(&controls);
 	logger.Write("Settings read");
 
-	controls.InitWheel(settings.FFEnable);
+	controls.InitWheel(settings.EnableFFB);
 	controls.CheckGUIDs(settings.reggdGuids);
 	controls.SteerGUID = controls.WheelAxesGUIDs[static_cast<int>(controls.SteerAxisType)];
 	

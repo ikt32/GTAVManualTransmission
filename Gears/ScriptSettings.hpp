@@ -113,12 +113,12 @@ public:
 	bool LogiLEDs = false;
 
 	// [FORCE_FEEDBACK]
-	bool FFEnable = true;
+	bool EnableFFB = true;
 	float FFGlobalMult = 1.0f;
 	int DamperMax = 50;
 	int DamperMin = 10;
-	int TargetSpeed = 10; // TargetSpeed in m/s
-	float FFPhysics = 1.0f;
+	float TargetSpeed = 1.2f; // TargetSpeed in m/s
+	float PhysicsStrength = 1.0f;
 	float DetailStrength = 100.0f;
 
 	// [STEER]
