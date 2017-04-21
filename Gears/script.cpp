@@ -1775,7 +1775,7 @@ void update_menu() {
 	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("wheelmenu")) {
 		menu.Title("Wheel controls");
-		if (menu.BoolOption("Enable wheel", &settings.EnableWheel)) {}
+		if (menu.BoolOption("Enable wheel", &settings.EnableWheel)) { settings.SaveWheel(); }
 		if (menu.BoolOption("Enable wheel without MT", &settings.WheelWithoutManual)) { settings.SaveWheel(); }
 		if (menu.BoolOption("Enable wheel for boats & planes", &settings.AltControls)) { settings.SaveWheel(); }
 		if (menu.BoolOption("Patch steering", &settings.PatchSteering)) { settings.SaveWheel(); }

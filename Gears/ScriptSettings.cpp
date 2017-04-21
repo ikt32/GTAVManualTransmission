@@ -133,7 +133,7 @@ void ScriptSettings::SaveWheel() const {
 	settingWheel.SetBoolValue("OPTIONS", "PatchSteeringAlways", PatchSteeringAlways);
 	settingWheel.SetBoolValue("OPTIONS", "LogitechLEDs", LogiLEDs);
 	
-	settingWheel.SaveFile(settingsGeneralFile.c_str());
+	settingWheel.SaveFile(settingsWheelFile.c_str());
 }
 
 bool ScriptSettings::IsCorrectVersion() const {
