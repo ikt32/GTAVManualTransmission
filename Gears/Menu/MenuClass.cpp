@@ -119,8 +119,8 @@ bool Menu::Option(char* option) {
 
 void Menu::drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLines) {
 	for (int i = 0; i < infoLines; i++) {
-		drawText(extra[i].c_str(), optionsFont, menux + 0.125f, i * 0.035f + 0.125f, 0.5f, 0.5f, options, false);
-		drawRect(										menux + 0.23f,	i * 0.035f + 0.1415f, 0.23f, 0.035f, scroller);
+		drawText(extra[i].c_str(), optionsFont, menux + 0.125f, i * 0.035f + 0.160f, 0.5f, 0.5f, options, false);
+		drawRect(								menux + 0.23f,	i * 0.035f + 0.1765f, 0.23f, 0.035f, optionsrect);
 	}
 }
 
