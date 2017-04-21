@@ -89,7 +89,7 @@ public:
 	~ScriptControls();
 	void InitWheel(bool initffb);
 
-	InputDevices GetLastInputDevice(InputDevices previous);
+	InputDevices GetLastInputDevice(InputDevices previousInput, bool enableWheel = true);
 	void UpdateValues(InputDevices prevInput, bool ignoreClutch, bool justPeekingWheelKb);
 
 	float BrakeVal = 0.0f;

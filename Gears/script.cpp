@@ -165,7 +165,8 @@ void update() {
 
 		updateLastInputDevice();
 
-		if (settings.AltControls &&
+		if (settings.EnableWheel &&
+			settings.AltControls &&
 			controls.WheelControl.IsConnected(controls.SteerGUID) &&
 			controls.PrevInput == ScriptControls::Wheel) {
 			if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
@@ -667,8 +668,8 @@ void toggleManual() {
 }
 
 void updateLastInputDevice() {
-	if (controls.PrevInput != controls.GetLastInputDevice(controls.PrevInput)) {
-		controls.PrevInput = controls.GetLastInputDevice(controls.PrevInput);
+	if (controls.PrevInput != controls.GetLastInputDevice(controls.PrevInput,settings.EnableWheel)) {
+		controls.PrevInput = controls.GetLastInputDevice(controls.PrevInput, settings.EnableWheel);
 		// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 		switch (controls.PrevInput) {
 			case ScriptControls::Keyboard:

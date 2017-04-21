@@ -109,7 +109,7 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 }
 
 // Limitation: Only works for hardcoded input types. Currently throttle.
-ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices previousInput) {
+ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices previousInput, bool enableWheel) {
 	if (IsKeyJustPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)], KeyboardControlType::Throttle) ||
 		IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)])) {
 		return Keyboard;
@@ -118,7 +118,7 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
 		controller.IsButtonPressed(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState)) {
 		return Controller;
 	}
-	if (WheelControl.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
+	if (enableWheel && WheelControl.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
 		// Oh my god I hate single-axis throttle/brake steering wheels
 		// Looking at you DFGT.
 		int RawT = WheelControl.GetAxisValue(WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]), 
