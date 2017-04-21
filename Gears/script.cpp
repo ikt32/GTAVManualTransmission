@@ -1783,9 +1783,12 @@ void update_menu() {
 		if (menu.BoolOption("Patch steering", &settings.PatchSteering)) { settings.SaveWheel(); }
 		if (menu.BoolOption("Patch steering for all inputs", &settings.PatchSteeringAlways)) { settings.SaveWheel(); }
 		if (menu.BoolOption("Logitech LEDs (can crash!)", &settings.LogiLEDs)) { settings.SaveWheel(); }
-		menu.MenuOption("Force feedback", "forcefeedbackmenu");
+		menu.MenuOption("Force feedback options", "forcefeedbackmenu");
 
+		menu.MenuOption("Steering wheel setup", "axesmenu");
 		menu.MenuOption("Steering wheel angles", "anglemenu");
+	}
+
 	if (menu.CurrentMenu("anglemenu")) {
 		menu.Title("Wheel angles");
 
@@ -1795,6 +1798,12 @@ void update_menu() {
 		menu.FloatOption("Boat/Plane soft lock", &settings.SteerAngleAlt, 180.0, 1080.0, 60.0);
 
 	}
+
+	
+	/* Yes hello I am root - 2 */
+	if (menu.CurrentMenu("axesmenu")) {
+		menu.Title("Configure axes");
+		
 		std::vector<std::string> info = {
 			"Press RIGHT to clear this axis" ,
 			"Steer    : " + std::to_string(controls.SteerVal),
@@ -1804,21 +1813,21 @@ void update_menu() {
 			"Handbrake: " + std::to_string(controls.HandbrakeVal),
 		};
 
-		if (menu.OptionPlus("Calibrate steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr) ) {
+		if (menu.OptionPlus("Calibrate steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr)) {
 			bool result = configAxis("STEER");
 			showNotification(result ? "Steering axis saved" : "Cancelled steering axis calibration", &prevNotification);
 		}
-		if (menu.OptionPlus("Calibrate throttle", info, nullptr, std::bind(clearAxis, "THROTTLE"), nullptr) ) {
+		if (menu.OptionPlus("Calibrate throttle", info, nullptr, std::bind(clearAxis, "THROTTLE"), nullptr)) {
 			bool result = configAxis("THROTTLE");
 			showNotification(result ? "Throttle axis saved" : "Cancelled throttle axis calibration", &prevNotification);
 		}
-		if (menu.OptionPlus("Calibrate brake", info, nullptr, std::bind(clearAxis, "BRAKE"), nullptr)	  ) {
+		if (menu.OptionPlus("Calibrate brake", info, nullptr, std::bind(clearAxis, "BRAKE"), nullptr)) {
 			bool result = configAxis("BRAKE");
 			showNotification(result ? "Brake axis saved" : "Cancelled brake axis calibration", &prevNotification);
 		}
-		if (menu.OptionPlus("Calibrate clutch", info, nullptr, std::bind(clearAxis, "CLUTCH"), nullptr)	  ) {
+		if (menu.OptionPlus("Calibrate clutch", info, nullptr, std::bind(clearAxis, "CLUTCH"), nullptr)) {
 			bool result = configAxis("CLUTCH");
-			showNotification(result ? "Clutch axis saved": "Cancelled clutch axis calibration", &prevNotification);
+			showNotification(result ? "Clutch axis saved" : "Cancelled clutch axis calibration", &prevNotification);
 		}
 		if (menu.OptionPlus("Calibrate handbrake", info, nullptr, std::bind(clearAxis, "HANDBRAKE_ANALOG"), nullptr)) {
 			bool result = configAxis("HANDBRAKE_ANALOG");
