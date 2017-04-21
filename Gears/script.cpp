@@ -979,7 +979,7 @@ void functionAShift() { // Automatic
 void functionClutchCatch() {
 	if (controls.ClutchVal < 1.0f - settings.ClutchCatchpoint) {
 		// Automatic cars APPARENTLY need little/no brake pressure to stop
-		if (settings.ShiftMode == Automatic && controls.BrakeVal > 0.1f && vehData.Rpm > 0.3) {
+		if (settings.ShiftMode == Automatic && controls.BrakeVal > 0.1f || vehData.Rpm > 0.3f) {
 			return;
 		}
 		// todo - clutchval changes acceleration factor/speed factor
@@ -987,11 +987,11 @@ void functionClutchCatch() {
 		if (vehData.CurrGear > 0 && vehData.Velocity < vehData.CurrGear * 2.2f &&
 		    controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
 			if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.37f);
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.27f);
 			}
 			else {
 				if (vehData.Rpm < 0.3f) {
-					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.28f);
+					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.27f);
 				} else {
 					ext.SetCurrentRPM(vehicle, 0.28f);
 				}
@@ -1011,6 +1011,7 @@ void functionClutchCatch() {
 			}
 			else if (vehData.Rpm < 0.3f) {
 				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.28f);
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.27f);
 			}
 		}
 	}
