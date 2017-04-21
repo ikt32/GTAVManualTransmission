@@ -1007,10 +1007,9 @@ void functionClutchCatch() {
 				//return;
 			}
 			if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.37f);
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.27f);
 			}
 			else if (vehData.Rpm < 0.3f) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.28f);
 				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.27f);
 			}
 		}
