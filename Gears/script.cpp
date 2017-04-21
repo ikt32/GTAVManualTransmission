@@ -2059,9 +2059,8 @@ bool configAxis(const char *str) {
 
 	if (str == "STEER") {
 		additionalInfo += " Steer right to register axis.";
-	}
-	if (str == "HANDBRAKE_ANALOG") {
-		additionalInfo += " Pull handbrake to register axis.";
+	} else if (str == "HANDBRAKE_ANALOG") {
+		additionalInfo += " Fully pull and set back handbrake to register axis.";
 	} else {
 		additionalInfo += " Fully press and release the " + confTag + " pedal to register axis.";
 	}
