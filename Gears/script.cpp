@@ -1785,6 +1785,16 @@ void update_menu() {
 		if (menu.BoolOption("Logitech LEDs (can crash!)", &settings.LogiLEDs)) { settings.SaveWheel(); }
 		menu.MenuOption("Force feedback", "forcefeedbackmenu");
 
+		menu.MenuOption("Steering wheel angles", "anglemenu");
+	if (menu.CurrentMenu("anglemenu")) {
+		menu.Title("Wheel angles");
+
+		menu.FloatOption("Physical degrees", &settings.SteerAngleMax, 180.0, 1080.0, 60.0);
+		menu.FloatOption("Car soft lock", &settings.SteerAngleCar, 180.0, 1080.0, 60.0);
+		menu.FloatOption("Bike soft lock", &settings.SteerAngleBike, 180.0, 1080.0, 60.0);
+		menu.FloatOption("Boat/Plane soft lock", &settings.SteerAngleAlt, 180.0, 1080.0, 60.0);
+
+	}
 		std::vector<std::string> info = {
 			"Press RIGHT to clear this axis" ,
 			"Steer    : " + std::to_string(controls.SteerVal),
