@@ -2017,10 +2017,10 @@ void clearAxis(std::string axis) {
 }
 
 bool configAxis(const char *str) {
-	std::string escapeKey = "ESCAPE";
+	std::string escapeKey = "BACKSPACE";
 	
 	std::string confTag = str;
-	std::string additionalInfo = "Press ESC to exit.";
+	std::string additionalInfo = "Press Backspace to exit.";
 
 	if (str == "STEER") {
 		additionalInfo += " Steer right to register axis.";
