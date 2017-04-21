@@ -22,11 +22,11 @@
 
 #include "Menu/MenuClass.h"
 #include "menu/Controls.h"
+#include "Input/keyboard.h"
 
 std::string settingsGeneralFile;
 std::string settingsWheelFile;
 std::string settingsMenuFile;
-
 
 Menu menu;
 MenuControls menuControls;
@@ -152,7 +152,7 @@ void update() {
 		red.B = 0;
 		red.A = 255;
 
-		showText(0.05, 0.05, 1.0, CharAdapter(settings.GetVersionError().c_str()), red);
+		showText(0.05, 0.05, 1.0, CharAdapter(settings.GetVersionError().c_str()), 0, red);
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -386,7 +386,7 @@ void showHUD() {
 			c.B = 255;
 			c.A = 255;
 		}
-		showText(settings.GearXpos, settings.GearYpos, settings.GearSize, gear, c);
+		showText(settings.GearXpos, settings.GearYpos, settings.GearSize, gear, 0, c);
 	}
 
 	// Shift mode indicator
@@ -533,7 +533,7 @@ void showDebugInfo() {
 	//showText(0.795, 0.100, 0.4, ssClutchDisable.str().c_str());
 	showText(0.85, 0.125, 0.4, ssHandbrakInput.str().c_str());
 
-	if (settings.WheelEnabled) {
+	if (settings.EnableWheel) {
 		std::stringstream dinputDisplay;
 		dinputDisplay << "Wheel Avail: " << controls.WheelControl.IsConnected(controls.SteerGUID);
 		showText(0.85, 0.150, 0.4, dinputDisplay.str().c_str());
@@ -626,7 +626,7 @@ void reInit() {
 	logger.Write("Settings read");
 	vehData.LockGears = 0x00010001;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
-	if (settings.WheelEnabled) {
+	if (settings.EnableWheel) {
 		controls.InitWheel(settings.FFEnable);
 		controls.CheckGUIDs(settings.reggdGuids);
 	}
@@ -650,7 +650,7 @@ void reset() {
 
 void toggleManual() {
 	settings.EnableManual = !settings.EnableManual;
-	settings.Save();
+	settings.SaveGeneral();
 	std::stringstream message;
 	message << "Manual Transmission " <<
 	           (settings.EnableManual ? "Enabled" : "Disabled");
@@ -1692,7 +1692,7 @@ void menuInit() {
 }
 
 void menuClose() {
-	settings.Save();
+	settings.SaveGeneral();
 	menu.SaveMenuTheme(std::wstring(settingsMenuFile.begin(), settingsMenuFile.end()).c_str());
 }
 
@@ -1775,7 +1775,42 @@ void update_menu() {
 	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("wheelmenu")) {
 		menu.Title("Wheel controls");
-		menu.Option("Not yet implemented :^)");
+		if (menu.BoolOption("Enable wheel", &settings.EnableWheel)) {}
+		if (menu.BoolOption("Enable wheel without MT", &settings.WheelWithoutManual)) { settings.SaveWheel(); }
+		if (menu.BoolOption("Enable wheel for boats & planes", &settings.AltControls)) { settings.SaveWheel(); }
+		if (menu.BoolOption("Patch steering", &settings.PatchSteering)) { settings.SaveWheel(); }
+		if (menu.BoolOption("Patch steering for all inputs", &settings.PatchSteeringAlways)) { settings.SaveWheel(); }
+		if (menu.BoolOption("Logitech LEDs (can crash!)", &settings.LogiLEDs)) { settings.SaveWheel(); }
+
+		std::vector<std::string> info = {
+			"Press RIGHT to clear this axis" ,
+			"Steer    : " + std::to_string(controls.SteerVal),
+			"Throttle : " + std::to_string(controls.ThrottleVal),
+			"Brake    : " + std::to_string(controls.BrakeVal),
+			"Clutch   : " + std::to_string(controls.ClutchVal),
+			"Handbrake: " + std::to_string(controls.HandbrakeVal),
+		};
+
+		if (menu.OptionPlus("Calibrate steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr) ) {
+			bool result = configAxis("STEER");
+			showNotification(result ? "Steering axis saved" : "Cancelled steering axis calibration", &prevNotification);
+		}
+		if (menu.OptionPlus("Calibrate throttle", info, nullptr, std::bind(clearAxis, "THROTTLE"), nullptr) ) {
+			bool result = configAxis("THROTTLE");
+			showNotification(result ? "Throttle axis saved" : "Cancelled throttle axis calibration", &prevNotification);
+		}
+		if (menu.OptionPlus("Calibrate brake", info, nullptr, std::bind(clearAxis, "BRAKE"), nullptr)	  ) {
+			bool result = configAxis("BRAKE");
+			showNotification(result ? "Brake axis saved" : "Cancelled brake axis calibration", &prevNotification);
+		}
+		if (menu.OptionPlus("Calibrate clutch", info, nullptr, std::bind(clearAxis, "CLUTCH"), nullptr)	  ) {
+			bool result = configAxis("CLUTCH");
+			showNotification(result ? "Clutch axis saved": "Cancelled clutch axis calibration", &prevNotification);
+		}
+		if (menu.OptionPlus("Calibrate handbrake", info, nullptr, std::bind(clearAxis, "HANDBRAKE_ANALOG"), nullptr)) {
+			bool result = configAxis("HANDBRAKE_ANALOG");
+			showNotification(result ? "Handbrake axis saved" : "Cancelled handbrake axis calibration", &prevNotification);
+		}
 	}
 
 	/* Yes hello I am root - 1 */
@@ -1932,6 +1967,148 @@ void update_menu() {
 
 
 	menu.EndMenu();
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+//                              Config things
+///////////////////////////////////////////////////////////////////////////////
+bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> startStates, std::tuple<GUID, std::string> &selectedDevice, int hyst, bool &positive, int &startValue_) {
+	for (auto guid : controls.WheelControl.GetGuids()) {
+		for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
+			for (auto startState : startStates) {
+				std::string axisName = controls.WheelControl.DIAxisHelper[i];
+				int axisValue = controls.WheelControl.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid);
+				int startValue = std::get<2>(startState);
+				if (std::get<0>(startState) == guid &&
+					std::get<1>(startState) == axisName) {
+					startValue_ = startValue;
+					if (axisValue > startValue + hyst) { // 0 (min) - 65535 (max)
+						selectedDevice = std::tuple<GUID, std::string>(guid, axisName);
+						positive = true;
+						return true;
+					}
+					if (axisValue < startValue - hyst) { // 65535 (min) - 0 (max)
+						selectedDevice = std::tuple<GUID, std::string>(guid, axisName);
+						positive = false;
+						return true;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+void saveAxis(const std::string &confTag, std::tuple<GUID, std::string> selectedDevice, int min, int max) {
+	std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
+	std::string devName = std::string(wDevName.begin(), wDevName.end());
+	auto index = settings.SteeringAppendDevice(std::get<0>(selectedDevice), devName);
+	settings.SteeringSaveAxis(confTag, index, std::get<1>(selectedDevice), min, max);
+	if (confTag == "STEER") {
+		settings.SteeringSaveFFBAxis(confTag, index, std::get<1>(selectedDevice));
+	}
+	settings.Read(&controls);
+}
+
+void clearAxis(std::string axis) {
+	settings.SteeringSaveAxis(axis, -1, "", 0, 0);
+	settings.Read(&controls);
+}
+
+bool configAxis(const char *str) {
+	std::string escapeKey = "ESCAPE";
+	
+	std::string confTag = str;
+	std::string additionalInfo = "Press ESC to exit.";
+
+	if (str == "STEER") {
+		additionalInfo += " Steer right to register axis.";
+	}
+	if (str == "HANDBRAKE_ANALOG") {
+		additionalInfo += " Pull handbrake to register axis.";
+	} else {
+		additionalInfo += " Fully press and release the " + confTag + " pedal to register axis.";
+	}
+
+	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+	// Save current state
+	std::vector<std::tuple<GUID, std::string, int>> startStates;
+	for (auto guid : controls.WheelControl.GetGuids()) {
+		for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
+			std::string axisName = controls.WheelControl.DIAxisHelper[i];
+			int axisValue = controls.WheelControl.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid);
+			startStates.push_back(std::tuple<GUID, std::string, int>(guid, axisName, axisValue));
+		}
+	}
+
+	std::tuple<GUID, std::string> selectedDevice;
+
+	// Ignore inputs before selection if they moved less than hyst
+	int hyst = 65536 / 8;
+
+	// To track direction of physical <-> digital value.
+	bool positive = true;
+
+	int startValue;
+	int endValue;
+
+	// going down!
+	while (true) {
+		if (IsKeyJustUp(str2key(escapeKey))) {
+			return false;
+		}
+		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+		if (getConfigAxisWithValues(startStates, selectedDevice, hyst, positive, startValue)) {
+			break;
+		}
+		showSubtitle(additionalInfo);
+		WAIT(0);
+	}
+
+	// I'll just assume no manufacturer uses inane non-full range steering wheel values
+	if (confTag == "STEER") {
+		int min = (positive ? 0 : 65535);
+		int max = (positive ? 65535 : 0);
+		saveAxis(confTag, selectedDevice, min, max);
+		return true;
+	}
+
+	int prevAxisValue = controls.WheelControl.GetAxisValue(controls.WheelControl.StringToAxis(std::get<1>(selectedDevice)), std::get<0>(selectedDevice));
+	std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
+	std::string selectedDevName = std::string(wDevName.begin(), wDevName.end()).c_str();
+	std::string selectedAxis = std::get<1>(selectedDevice);
+	GUID selectedGUID = std::get<0>(selectedDevice);
+
+	// and up again!
+	while (true) {
+		if (IsKeyJustUp(str2key(escapeKey))) {
+			return false;
+		}
+		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+
+		int axisValue = controls.WheelControl.GetAxisValue(controls.WheelControl.StringToAxis(selectedAxis), selectedGUID);
+
+		if (positive && axisValue < prevAxisValue) {
+			endValue = prevAxisValue;
+			break;
+		}
+
+		if (!positive && axisValue > prevAxisValue) {
+			endValue = prevAxisValue;
+			break;
+		}
+
+		prevAxisValue = axisValue;
+
+		showSubtitle(additionalInfo);
+		WAIT(0);
+	}
+
+	int min = startValue;
+	int max = endValue;
+	saveAxis(confTag, selectedDevice, min, max);
+	return true;
 }
 
 

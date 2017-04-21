@@ -62,6 +62,8 @@
     </ClCompile>
     <ClCompile Include="graveyard.cpp" />
     <ClCompile Include="DIUtil.cpp" />
-    <ClCompile Include="..\Gears\General.cpp" />
+    <ClCompile Include="..\Gears\General.cpp">
+      <Filter>include</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

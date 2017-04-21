@@ -126,3 +126,9 @@ void functionAutoGear1();
 //                              Script entry
 ///////////////////////////////////////////////////////////////////////////////
 void ScriptMain();
+
+
+
+// Categorize things
+bool configAxis(const char *str);
+void clearAxis(std::string axis);

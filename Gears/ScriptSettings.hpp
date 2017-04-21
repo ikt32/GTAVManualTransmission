@@ -18,7 +18,8 @@ public:
 	void SetMenuFile(const std::string & menu);
 	void Read(ScriptControls* scriptControl);
 	void Read(MenuControls *menuControl);
-	void Save() const;
+	void SaveGeneral() const;
+	void SaveWheel() const;
 	bool IsCorrectVersion() const;
 	std::string GetVersionError();
 
@@ -104,7 +105,7 @@ public:
 
 	// settings_wheel.ini parts
 	// [OPTIONS]
-	bool WheelEnabled = false;
+	bool EnableWheel = false;
 	bool WheelWithoutManual = true;
 	bool AltControls = false;
 	bool PatchSteering = false;
