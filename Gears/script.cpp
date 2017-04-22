@@ -2079,6 +2079,7 @@ void update_menu() {
 		menu.Title("Debug settings");
 		if (menu.BoolOption("Display info", &settings.DisplayInfo)) {}
 		if (menu.BoolOption("Log car address", &settings.LogCar)) {}
+		if (menu.BoolOption("Expose script variables", &settings.CrossScript)) {}
 	}
 
 
