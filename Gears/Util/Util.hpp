@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include "../../ScriptHookV_SDK/inc/types.h"
 
 static std::vector<std::string> GameVersionString = {
 	"VER_1_0_335_2_STEAM", // 00
@@ -149,4 +150,22 @@ public:
 
 private:
 	char* m_s;
+};
+
+//https://github.com/CamxxCore/AirSuperiority
+class GameSound {
+public:
+	GameSound(char *sound, char *soundSet);
+	~GameSound();
+	void Load(char *audioBank);
+	void Play(Entity ent);
+	void Stop();
+
+	bool Active;
+
+private:
+	char *soundSet;
+	char *sound;
+	int soundID;
+	int prevNotification;
 };
