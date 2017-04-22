@@ -1936,10 +1936,10 @@ void update_menu() {
 		menu.Title("Theme Options");
 		
 		menu.MenuOption("Title Text", "settings_theme_titletext");
-		menu.MenuOption("Title Rect", "settings_theme_titlerect");
-		menu.MenuOption("Scroller", "settings_theme_scroller");
+		menu.MenuOption("Title Background", "settings_theme_titlerect");
+		menu.MenuOption("Highlighted", "settings_theme_scroller");
 		menu.MenuOption("Options Text", "settings_theme_options");
-		menu.MenuOption("Options Rect", "settings_theme_optionsrect");
+		menu.MenuOption("Options Background", "settings_theme_optionsrect");
 	}
 
 	if (menu.CurrentMenu("settings_theme_titletext")) {
@@ -1958,7 +1958,7 @@ void update_menu() {
 		menu.IntOption("Alpha: ", &menu.titleText.a, 0, 255);
 	}
 	if (menu.CurrentMenu("settings_theme_titlerect")) {
-		menu.Title("Title Rect");
+		menu.Title("Title Background");
 
 		menu.IntOption("Red: ", &menu.titleRect.r, 0, 255);
 		menu.IntOption("Green: ", &menu.titleRect.g, 0, 255);
@@ -1966,7 +1966,7 @@ void update_menu() {
 		menu.IntOption("Alpha: ", &menu.titleRect.a, 0, 255);
 	}
 	if (menu.CurrentMenu("settings_theme_scroller")) {
-		menu.Title("Scroller");
+		menu.Title("Highlighted");
 
 		menu.IntOption("Red: ", &menu.scroller.r, 0, 255);
 		menu.IntOption("Green: ", &menu.scroller.g, 0, 255);
@@ -1989,7 +1989,7 @@ void update_menu() {
 		menu.IntOption("Alpha: ", &menu.options.a, 0, 255);
 	}	
 	if (menu.CurrentMenu("settings_theme_optionsrect")) {
-		menu.Title("Options Rect");
+		menu.Title("Options Background");
 		
 		menu.IntOption("Red: ", &menu.optionsrect.r, 0, 255);
 		menu.IntOption("Green: ", &menu.optionsrect.g, 0, 255);
