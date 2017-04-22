@@ -94,6 +94,9 @@ std::vector<std::string> buttonConfTags {
 	{ "CHANGE_SHIFTMODE" },
 };
 
+static const int numGears = 8;
+
+
 void update() {
 	///////////////////////////////////////////////////////////////////////////
 	//                     Are we in a supported vehicle?
@@ -1804,7 +1807,24 @@ void update_menu() {
 		menu.MenuOption("Force feedback options", "forcefeedbackmenu");
 		menu.MenuOption("Steering wheel setup", "axesmenu");
 		menu.MenuOption("Steering wheel angles", "anglemenu");
-		menu.MenuOption("Steering wheel buttons","buttonsmenu");
+		menu.MenuOption("Steering wheel buttons", "buttonsmenu");
+		
+		std::vector<std::string> hpatInfo;
+		hpatInfo.push_back("Press RIGHT to clear H-pattern shifter");
+		hpatInfo.push_back("Active gear:");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::HR)) hpatInfo.push_back("Reverse");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H1)) hpatInfo.push_back("Gear 1");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H2)) hpatInfo.push_back("Gear 2");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H3)) hpatInfo.push_back("Gear 3");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H4)) hpatInfo.push_back("Gear 4");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H5)) hpatInfo.push_back("Gear 5");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H6)) hpatInfo.push_back("Gear 6");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H7)) hpatInfo.push_back("Gear 7");
+
+		if (menu.OptionPlus("H-pattern shifter", hpatInfo, nullptr, std::bind(clearHShifter), nullptr)) {
+			bool result = configHPattern();
+			showNotification(result ? "H-pattern shifter saved" : "Cancelled H-pattern shifter setup", &prevNotification);
+		}
 	}
 
 	/* Yes hello I am root - 2 */
@@ -1902,7 +1922,7 @@ void update_menu() {
 		if (controls.ButtonIn(ScriptControls::WheelControlType::ToggleH))	info.push_back("ChangeShiftMode");
 
 		for (auto confTag : buttonConfTags) {
-			if (menu.OptionPlus(CharAdapter(("Calibrate " + confTag).c_str()), info, nullptr, std::bind(clearButton, confTag), nullptr)) {
+			if (menu.OptionPlus(CharAdapter(("Assign " + confTag).c_str()), info, nullptr, std::bind(clearButton, confTag), nullptr)) {
 				bool result = configButton(confTag);
 				showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
 			}
@@ -2115,14 +2135,32 @@ void saveButton(int button, std::string confTag, GUID devGUID) {
 	settings.Read(&controls);
 }
 
+void saveHShifter(std::string confTag, GUID devGUID, std::array<int, numGears> buttonArray, std::string devName) {
+	auto index = settings.SteeringAppendDevice(devGUID, devName);
+	settings.SteeringSaveHShifter(confTag, index, buttonArray.data());
+	settings.Read(&controls);
+}
+
 void clearAxis(std::string axis) {
 	settings.SteeringSaveAxis(axis, -1, "", 0, 0);
 	settings.Read(&controls);
+	showNotification(("Cleared axis " + axis).c_str(), &prevNotification);
 }
 
 void clearButton(std::string button) {
 	settings.SteeringSaveButton(button, -1, -1);
 	settings.Read(&controls);
+	showNotification(("Cleared button " + button).c_str(), &prevNotification);
+}
+
+void clearHShifter() {
+	int empty[numGears] = {};
+	for (int i = 0; i < numGears; i++) {
+		empty[i] = -1;
+	}
+	settings.SteeringSaveHShifter("SHIFTER", -1, empty);
+	settings.Read(&controls);
+	showNotification("Cleared H-pattern shifter", &prevNotification);
 }
 
 bool configAxis(std::string str) {
@@ -2293,6 +2331,104 @@ bool configButton(std::string str) {
 		WAIT(0);
 	}
 }
+
+bool configHPattern() {
+	int buttonsActive = 0;
+
+	std::array<int, 8> directions = {
+		WheelDirectInput::POV::N,
+		WheelDirectInput::POV::NE,
+		WheelDirectInput::POV::E,
+		WheelDirectInput::POV::SE,
+		WheelDirectInput::POV::S,
+		WheelDirectInput::POV::SW,
+		WheelDirectInput::POV::W,
+		WheelDirectInput::POV::NW,
+	};
+
+	std::string escapeKey = "BACKSPACE";
+	std::string skipKey = "RIGHT";
+
+	std::string confTag = "SHIFTER";
+	std::string additionalInfo = "Press Backspace to exit. Press RIGHT to skip gear.";
+	/*additionalInfo += " Press a button to set " + confTag + ".";*/
+
+	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+
+	for (auto guid : controls.WheelControl.GetGuids()) {
+		for (int i = 0; i < 255; i++) {
+			if (controls.WheelControl.IsButtonPressed(i, guid)) {
+				buttonsActive++;
+			}
+		}
+	}
+
+	if (buttonsActive > 0) {
+		showSubtitle("One or more buttons had been pressed on start. Stop pressing and try again.");
+		return false;
+	}
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
+	GUID devGUID = {};
+	std::array<int, numGears> buttonArray; // There are gears 1-7 + R
+	std::fill(buttonArray.begin(), buttonArray.end(), -1);
+	std::string devName;
+
+	int progress = 0;
+
+	while (true) {
+		if (IsKeyJustUp(str2key(escapeKey))) {
+			return false;
+		}
+		if (IsKeyJustUp(str2key(skipKey))) {
+			progress++;
+		}
+
+		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+
+		for (auto guid : controls.WheelControl.GetGuids()) {
+			for (int i = 0; i < 255; i++) {
+				if (controls.WheelControl.IsButtonPressed(i, guid) &&
+					// only find unregistered buttons
+					std::find(std::begin(buttonArray), std::end(buttonArray), i) == std::end(buttonArray)) {
+					// also save device info when just started
+					if (progress == 0) {
+						devGUID = guid;
+						std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
+						devName = std::string(wDevName.begin(), wDevName.end()).c_str();
+						buttonArray[progress] = i;
+						progress++;
+					}
+					// only accept same device onwards
+					else if (guid == devGUID) {
+						buttonArray[progress] = i;
+						progress++;
+					}
+				}
+			}
+		}
+
+
+		if (progress > 7) {
+			break;
+		}
+		std::string gearDisplay;
+		switch (progress) {
+			case 0: gearDisplay = "Reverse"; break;
+			case 1: gearDisplay = "1st gear"; break;
+			case 2: gearDisplay = "2nd gear"; break;
+			case 3: gearDisplay = "3rd gear"; break;
+			case 4: case 5: case 6:
+			case 7: gearDisplay = std::to_string(progress) + "th gear"; break;
+		}
+		showSubtitle("Shift into " + gearDisplay + ". " + additionalInfo);
+		WAIT(0);
+	}
+	//save H-pattern doesn't need its own func because it's called once! :-)
+	saveHShifter(confTag, devGUID, buttonArray, devName);
+	return true;
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
