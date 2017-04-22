@@ -1792,10 +1792,14 @@ void update_menu() {
 	if (menu.CurrentMenu("anglemenu")) {
 		menu.Title("Wheel angles");
 
-		menu.FloatOption("Physical degrees", &settings.SteerAngleMax, 180.0, 1080.0, 60.0);
-		menu.FloatOption("Car soft lock", &settings.SteerAngleCar, 180.0, 1080.0, 60.0);
-		menu.FloatOption("Bike soft lock", &settings.SteerAngleBike, 180.0, 1080.0, 60.0);
-		menu.FloatOption("Boat/Plane soft lock", &settings.SteerAngleAlt, 180.0, 1080.0, 60.0);
+		if (menu.FloatOption("Physical degrees", &settings.SteerAngleMax, 180.0, 1080.0, 60.0)) {
+			if (settings.SteerAngleCar > settings.SteerAngleMax) { settings.SteerAngleCar = settings.SteerAngleMax; }
+			if (settings.SteerAngleBike > settings.SteerAngleMax) { settings.SteerAngleBike = settings.SteerAngleMax; }
+			if (settings.SteerAngleAlt > settings.SteerAngleMax) { settings.SteerAngleAlt = settings.SteerAngleMax; }
+		}
+		menu.FloatOption("Car soft lock", &settings.SteerAngleCar, 180.0, settings.SteerAngleMax, 60.0);
+		menu.FloatOption("Bike soft lock", &settings.SteerAngleBike, 180.0, settings.SteerAngleMax, 60.0);
+		menu.FloatOption("Boat/Plane soft lock", &settings.SteerAngleAlt, 180.0, settings.SteerAngleMax, 60.0);
 
 	}
 
