@@ -76,6 +76,24 @@ std::vector<int> fontIDs {
 	7
 };
 
+std::vector<std::string> buttonConfTags {
+	{ "SHIFT_UP" },
+	{ "SHIFT_DOWN" },
+	{ "ENGINE" },
+	{ "HANDBRAKE" },
+	{ "HORN" },
+	{ "LIGHTS" },
+	{ "LOOK_BACK" },
+	{ "CHANGE_CAMERA" },
+	{ "RADIO_NEXT" },
+	{ "RADIO_PREVIOUS" },
+	{ "INDICATOR_LEFT" },
+	{ "INDICATOR_RIGHT" },
+	{ "INDICATOR_HAZARD" },
+	{ "TOGGLE_MOD" },
+	{ "CHANGE_SHIFTMODE" },
+};
+
 void update() {
 	///////////////////////////////////////////////////////////////////////////
 	//                     Are we in a supported vehicle?
@@ -1784,11 +1802,12 @@ void update_menu() {
 		if (menu.BoolOption("Patch steering for all inputs", &settings.PatchSteeringAlways)) { settings.SaveWheel(); }
 		if (menu.BoolOption("Logitech LEDs (can crash!)", &settings.LogiLEDs)) { settings.SaveWheel(); }
 		menu.MenuOption("Force feedback options", "forcefeedbackmenu");
-
 		menu.MenuOption("Steering wheel setup", "axesmenu");
 		menu.MenuOption("Steering wheel angles", "anglemenu");
+		menu.MenuOption("Steering wheel buttons","buttonsmenu");
 	}
 
+	/* Yes hello I am root - 2 */
 	if (menu.CurrentMenu("anglemenu")) {
 		menu.Title("Wheel angles");
 
@@ -1852,6 +1871,44 @@ void update_menu() {
 		menu.FloatOption("Detail strength", &settings.DetailStrength, 0.0f, 10.0f, 0.1f);
 	}
 
+	/* Yes hello I am root - 2 */
+	if (menu.CurrentMenu("buttonsmenu")) {
+		menu.Title("Configure buttons");
+		std::vector<std::string> info;
+		info.push_back("Press RIGHT to clear this button");
+		info.push_back("Active buttons:");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::HR)) info.push_back("Gear R");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H1)) info.push_back("Gear 1");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H2)) info.push_back("Gear 2");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H3)) info.push_back("Gear 3");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H4)) info.push_back("Gear 4");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H5)) info.push_back("Gear 5");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H6)) info.push_back("Gear 6");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H7)) info.push_back("Gear 7");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftUp))	info.push_back("ShiftUp");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftDown)) info.push_back("ShiftDown");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Engine))	info.push_back("Engine");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Handbrake)) info.push_back("Handbrake");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Horn))		info.push_back("Horn");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Lights))	info.push_back("Lights");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::LookBack))	info.push_back("LookBack");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Camera))	info.push_back("Camera");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::RadioNext)) info.push_back("RadioNext");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::RadioPrev)) info.push_back("RadioPrev");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorLeft))		info.push_back("IndicatorLeft");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorRight))	info.push_back("IndicatorRight");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorHazard))	info.push_back("IndicatorHazard");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Toggle))	info.push_back("ToggleMod");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::ToggleH))	info.push_back("ChangeShiftMode");
+
+		for (auto confTag : buttonConfTags) {
+			if (menu.OptionPlus(CharAdapter(("Calibrate " + confTag).c_str()), info, nullptr, std::bind(clearButton, confTag), nullptr)) {
+				bool result = configButton(confTag);
+				showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+			}
+		}
+	}
+	
 	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("hudmenu")) {
 		menu.Title("HUD Options");
@@ -2050,12 +2107,25 @@ void saveAxis(const std::string &confTag, std::tuple<GUID, std::string> selected
 	settings.Read(&controls);
 }
 
+void saveButton(int button, std::string confTag, GUID devGUID) {
+	std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
+	std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
+	auto index = settings.SteeringAppendDevice(devGUID, devName.c_str());
+	settings.SteeringSaveButton(confTag, index, button);
+	settings.Read(&controls);
+}
+
 void clearAxis(std::string axis) {
 	settings.SteeringSaveAxis(axis, -1, "", 0, 0);
 	settings.Read(&controls);
 }
 
-bool configAxis(const char *str) {
+void clearButton(std::string button) {
+	settings.SteeringSaveButton(button, -1, -1);
+	settings.Read(&controls);
+}
+
+bool configAxis(std::string str) {
 	std::string escapeKey = "BACKSPACE";
 	
 	std::string confTag = str;
@@ -2147,6 +2217,81 @@ bool configAxis(const char *str) {
 	int max = endValue;
 	saveAxis(confTag, selectedDevice, min, max);
 	return true;
+}
+
+bool configButton(std::string str) {
+	int buttonsActive = 0;
+
+	std::array<int, 8> directions = {
+		WheelDirectInput::POV::N,
+		WheelDirectInput::POV::NE,
+		WheelDirectInput::POV::E,
+		WheelDirectInput::POV::SE,
+		WheelDirectInput::POV::S,
+		WheelDirectInput::POV::SW,
+		WheelDirectInput::POV::W,
+		WheelDirectInput::POV::NW,
+	};
+
+	std::string escapeKey = "BACKSPACE";
+
+	std::string confTag = str;
+	std::string additionalInfo = "Press Backspace to exit.";
+	additionalInfo += " Press a button to set " + confTag + ".";
+
+	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+	
+	for (auto guid : controls.WheelControl.GetGuids()) {
+		for (int i = 0; i < 255; i++) {
+			if (controls.WheelControl.IsButtonPressed(i, guid)) {
+				buttonsActive++;
+			}
+		}
+		for (auto d : directions) {
+			if (controls.WheelControl.IsButtonPressed(d, guid)) {
+				buttonsActive++;
+			}
+		}
+	}
+
+	if (buttonsActive > 0) {
+		showSubtitle("One or more buttons had been pressed on start. Stop pressing and try again.");
+		return false;
+	}
+
+	while (true) {
+		if (IsKeyJustUp(str2key(escapeKey))) {
+			return false;
+		}
+		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+
+		for (auto guid : controls.WheelControl.GetGuids()) {
+			for (int i = 0; i < 255; i++) {
+				if (controls.WheelControl.IsButtonPressed(i, guid)) {
+					saveButton(i, confTag, guid);
+					return true;
+				}
+			}
+
+			//POV hat shit
+			std::string directionsStr = "?";
+			for (auto d : directions) {
+				if (controls.WheelControl.IsButtonPressed(d, guid)) {
+					if (d == WheelDirectInput::N) directionsStr = "N ";
+					if (d == WheelDirectInput::NE) directionsStr = "NE";
+					if (d == WheelDirectInput::E) directionsStr = " E";
+					if (d == WheelDirectInput::SE) directionsStr = "SE";
+					if (d == WheelDirectInput::S) directionsStr = "S ";
+					if (d == WheelDirectInput::SW) directionsStr = "SW";
+					if (d == WheelDirectInput::W) directionsStr = " W";
+					if (d == WheelDirectInput::NW) directionsStr = "NW";
+					saveButton(d, confTag, guid);
+					return true;
+				}
+			}
+		}
+		WAIT(0);
+	}
 }
 
 

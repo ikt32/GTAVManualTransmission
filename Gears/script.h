@@ -130,5 +130,7 @@ void ScriptMain();
 
 
 // Categorize things
-bool configAxis(const char *str);
+bool configAxis(std::string str);
 void clearAxis(std::string axis);
+void clearButton(std::string button);
+bool configButton(std::string str);
