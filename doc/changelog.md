@@ -1,5 +1,32 @@
 # Changelog
 
+## 4.3.0
+Configuration changes:
+* Added `settings_menu.ini`
+* `settings_wheel.ini`
+  * `[FORCE_FEEDBACK]` section uses decimal numbers now
+  * Version updated to `430` to reflect this.
+* No `settings_general.ini` changes
+  * Version still `420R`
+* `*.ini` files can now also have `true` or `false` instead of `0` or `1`. Both still work.
+
+Additions:
+* Added a menu. By default accessible with `[{` key.
+  * Pretty much everything in the config files are changeable here, except for keyboard and controller controls.
+* Add gear rattle sound on miss-shift, clear when press clutch (or change gear properly)
+
+FiveM:
+* Fixed speed display for b505
+* Still investigating crashes?
+
+Wheel changes:
+* Input detection uses clutch too, now
+
+Other changes:
+* Make clutch grab self-accelerate a bit more tame, stop revving over 0.3
+* Set engine RPM display to 0 when engine is off.
+
+
 ## 4.2.0 - Release
 Configuration changes:
 * Separate [HUD] section for HUD stuff
