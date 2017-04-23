@@ -376,7 +376,8 @@ void update() {
 	}
 
 	if (gearRattle.Active) {
-		if (controls.ClutchVal > 1.0f - settings.ClutchCatchpoint) {
+		if (controls.ClutchVal > 1.0f - settings.ClutchCatchpoint ||
+			!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
 			gearRattle.Stop();
 		}
 	}
@@ -809,12 +810,9 @@ void functionHShiftTo(int i) {
 			shiftTo(i, false);
 			vehData.SimulatedNeutral = false;
 			gearRattle.Stop();
-			//AUDIO::STOP_SOUND(soundID);
 		}
 		else {
 			gearRattle.Play(vehicle);
-			//soundID = AUDIO::GET_SOUND_ID();
-			//AUDIO::PLAY_SOUND_FROM_ENTITY(soundID, "DAMAGED_TRUCK_IDLE", vehicle, 0, 0, 0);
 			vehData.SimulatedNeutral = true;
 			if (settings.EngDamage &&
 				!vehData.NoClutch) {
@@ -867,16 +865,14 @@ void functionHShiftWheel() {
 		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H5)) ||
 		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H6)) ||
 		controls.ButtonReleased(static_cast<ScriptControls::WheelControlType>(ScriptControls::WheelControlType::H7))
-	) {/*
+	) {
 		if (settings.ClutchShiftingH &&
 			settings.EngDamage &&
 			!vehData.NoClutch) {
 			if (controls.ClutchVal < 1.0 - settings.ClutchCatchpoint) {
-				VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
-					vehicle,
-					VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.MisshiftDamage / 10);
+				gearRattle.Play(vehicle);
 			}
-		}*/
+		}
 		vehData.SimulatedNeutral = !vehData.NoClutch;
 	}
 
