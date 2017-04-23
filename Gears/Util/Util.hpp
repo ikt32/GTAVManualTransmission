@@ -164,8 +164,8 @@ public:
 	bool Active;
 
 private:
-	char *soundSet;
-	char *sound;
-	int soundID;
-	int prevNotification;
+	char *m_soundSet;
+	char *m_sound;
+	int m_soundID;
+	int m_prevNotification;
 };

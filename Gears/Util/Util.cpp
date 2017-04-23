@@ -48,13 +48,14 @@ void showSubtitle(std::string message, int duration) {
 
 GameSound::GameSound(char *sound, char *soundSet) {
 	Active = false;
-	sound = sound;
-	soundSet = soundSet;
-	soundID = -1;
+	m_sound = sound;
+	m_soundSet = soundSet;
+	m_soundID = -1;
 }
 
 GameSound::~GameSound() {
-	AUDIO::RELEASE_SOUND_ID(soundID);
+	AUDIO::STOP_SOUND(m_soundID);
+	AUDIO::RELEASE_SOUND_ID(m_soundID);
 }
 
 void GameSound::Load(char *audioBank) {
@@ -62,13 +63,16 @@ void GameSound::Load(char *audioBank) {
 }
 
 void GameSound::Play(Entity ent) {
-	soundID = AUDIO::GET_SOUND_ID();
-	AUDIO::PLAY_SOUND_FROM_ENTITY(soundID, sound, ent, soundSet, 0, 0);
+	if (Active) return;
+	m_soundID = AUDIO::GET_SOUND_ID();
+	//showNotification(("New soundID: " + std::to_string(m_soundID)).c_str(), nullptr);
+	AUDIO::PLAY_SOUND_FROM_ENTITY(m_soundID, m_sound, ent, m_soundSet, 0, 0);
+	Active = true;
 }
 
 void GameSound::Stop() {
-	if (soundID == -1 || !Active) return;
-	AUDIO::STOP_SOUND(soundID);
+	if (m_soundID == -1 || !Active) return;
+	AUDIO::STOP_SOUND(m_soundID);
 	Active = false;
 }
 
