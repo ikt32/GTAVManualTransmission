@@ -1994,8 +1994,8 @@ void update_menu() {
 			bool result = configAxis("THROTTLE");
 			showNotification(result ? "Throttle axis saved" : "Cancelled throttle axis calibration", &prevNotification);
 		}
-		if (menu.OptionPlus("Calibrate brake", info, nullptr, std::bind(clearAxis, "BRAKE"), nullptr)) {
-			bool result = configAxis("BRAKE");
+		if (menu.OptionPlus("Calibrate brake", info, nullptr, std::bind(clearAxis, "BRAKES"), nullptr)) {
+			bool result = configAxis("BRAKES");
 			showNotification(result ? "Brake axis saved" : "Cancelled brake axis calibration", &prevNotification);
 		}
 		if (menu.OptionPlus("Calibrate clutch", info, nullptr, std::bind(clearAxis, "CLUTCH"), nullptr)) {
