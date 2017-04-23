@@ -354,8 +354,12 @@ void update() {
 
 	// Manual shifting
 	if (settings.ShiftMode == 1) {
-		functionHShiftWheel();
-		functionHShiftKeyboard();
+		if (controls.PrevInput == ScriptControls::Wheel) {
+			functionHShiftWheel();
+		}
+		if (controls.PrevInput == ScriptControls::Keyboard) {
+			functionHShiftKeyboard();
+		}
 	}
 	else if (settings.ShiftMode == 0){
 		functionSShift();
@@ -884,9 +888,9 @@ void functionHShiftWheel() {
 
 void functionSShift() {
 	// Shift up
-	if (controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftUp) ||
-		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftUp) ||
-		controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftUp)) {
+	if (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftUp) ||
+		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftUp) ||
+		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftUp)) {
 		if (vehData.NoClutch) {
 			if (vehData.CurrGear < vehData.TopGear) {
 				shiftTo(vehData.LockGear + 1, true);
@@ -921,9 +925,9 @@ void functionSShift() {
 
 	// Shift down
 
-	if (controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftDown) ||
-		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftDown) ||
-		controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftDown)) {
+	if (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftDown) ||
+		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftDown) ||
+		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftDown)) {
 		if (vehData.NoClutch) {
 			if (vehData.CurrGear > 0) {
 				shiftTo(vehData.LockGear - 1, true);
