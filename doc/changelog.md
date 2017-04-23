@@ -21,11 +21,13 @@ FiveM:
 
 Wheel changes:
 * Input detection uses clutch too, now
+* Rewrite pedal logic :'(. It was NOT fun.
+* Significantly increase wheel resistance when engine is off. This simulates no power steering!
 
 Other changes:
 * Make clutch grab self-accelerate a bit more tame, stop revving over 0.3
 * Set engine RPM display to 0 when engine is off.
-
+* More aggressive custom revving
 
 ## 4.2.0 - Release
 Configuration changes:

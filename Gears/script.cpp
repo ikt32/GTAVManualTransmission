@@ -1093,7 +1093,7 @@ void functionEngBrake() {
 
 void fakeRev() {
 	float timeStep = SYSTEM::TIMESTEP();
-	float accelRatio = 2.5 * timeStep;
+	float accelRatio = 2.5f * timeStep;
 	float rpmValTemp = (vehData.PrevRpm > vehData.Rpm ? (vehData.PrevRpm - vehData.Rpm) : 0.0f);
 	if (vehData.CurrGear == 1) {
 		rpmValTemp *= 2.0f;
@@ -1776,6 +1776,10 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 
 	if (ignoreSpeed) {
 		damperForce = settings.DamperMin;
+	}
+
+	if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
+		damperForce *= 4;
 	}
 
 	if (vehData.Class == VehicleData::VehicleClass::Car || vehData.Class == VehicleData::VehicleClass::Quad) {
