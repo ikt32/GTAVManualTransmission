@@ -309,15 +309,17 @@ void update() {
 	// Reverse behavior
 	// For bikes, do this automatically.
 	if (vehData.Class == VehicleData::VehicleClass::Bike && settings.SimpleBike) {
-		functionAutoReverse();
 		if (controls.PrevInput == ScriptControls::InputDevices::Wheel) {
 			handlePedalsDefault( controls.ThrottleVal, controls.BrakeVal );
+		} else {
+			functionAutoReverse();
 		}
 	}
 	else {
-		functionRealReverse();
 		if (controls.PrevInput == ScriptControls::InputDevices::Wheel) {
 			handlePedalsRealReverse( controls.ThrottleVal, controls.BrakeVal );
+		} else {
+			functionRealReverse();
 		}
 	}
 
@@ -1301,28 +1303,133 @@ void functionRealReverse() {
 // Forward gear: Throttle accelerates, Brake brakes (exclusive)
 // Reverse gear: Throttle reverses, Brake brakes (exclusive)
 void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
+	float speedThreshold = 0.5f;
+	float reverseThreshold = 1.0f;
+
 	if (vehData.CurrGear > 0) {
-		// Throttle Pedal normal
-		if (wheelThrottleVal > 0.01f) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
+		// Going forward
+		if (vehData.Velocity > speedThreshold) {
+			//showText(0.3, 0.0, 1.0, "We are going forward");
+			// Throttle Pedal normal
+			if (wheelThrottleVal > 0.01f) {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
+			}
+			// Brake Pedal normal
+			if (wheelBrakeVal > 0.01f) {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelBrakeVal);
+			}
 		}
-		if (wheelBrakeVal > 0.01f) {
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelBrakeVal);
+
+		// Standing still
+		if (vehData.Velocity < speedThreshold && vehData.Velocity >= -speedThreshold) {
+			//showText(0.3, 0.0, 1.0, "We are stopped");
+
+			if (wheelThrottleVal > 0.01f) {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
+			}
+
+			if (wheelBrakeVal > 0.01f) {
+				ext.SetThrottleP(vehicle, 0.1f);
+				ext.SetBrakeP(vehicle, 1.0f);
+				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+			}
+		}
+
+		// Rolling back
+		if (vehData.Velocity < -speedThreshold) {
+			bool brakelights = false;
+			// Just brake
+			if (wheelThrottleVal <= 0.01f && wheelBrakeVal > 0.01f) {
+				//showText(0.3, 0.0, 1.0, "We should brake");
+				//showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)).c_str());
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelBrakeVal);
+				ext.SetThrottleP(vehicle, 0.1f);
+				ext.SetBrakeP(vehicle, 1.0f);
+				brakelights = true;
+			}
+			
+			if (wheelThrottleVal > 0.01f && controls.ClutchVal < settings.ClutchCatchpoint) {
+				//showText(0.3, 0.0, 1.0, "We should burnout");
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelThrottleVal);
+			}
+
+			if (wheelThrottleVal > 0.01f && controls.ClutchVal > settings.ClutchCatchpoint) {
+				if (wheelBrakeVal > 0.01f) {
+					//showText(0.3, 0.0, 1.0, "We should rev and brake");
+					//showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)).c_str() );
+					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelBrakeVal);
+					ext.SetThrottleP(vehicle, 0.1f);
+					ext.SetBrakeP(vehicle, 1.0f);
+					brakelights = true;
+					fakeRev();
+				}
+				else {
+					//showText(0.3, 0.0, 1.0, "We should rev and do nothing");
+					ext.SetThrottleP(vehicle, wheelThrottleVal); 
+					fakeRev();
+				}
+			}
+			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, brakelights);
 		}
 	}
 
-	// why did this even exist?
-	//if (vehData.CurrGear == 0) {
-	//	// Throttle Pedal Reverse
-	//	if (wheelThrottleVal > 0.01f && wheelThrottleVal > wheelBrakeVal) {
-	//		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelThrottleVal);
-	//	}
-	//	// Brake Pedal Reverse
-	//	if (wheelBrakeVal > 0.01f &&
-	//		vehData.Velocity <= -0.5f) {
-	//		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelBrakeVal);
-	//	}
-	//}
+	if (vehData.CurrGear == 0) {
+		// Enables reverse lights
+		ext.SetThrottleP(vehicle, -0.1f);
+		
+		// We're reversing
+		if (vehData.Velocity < -speedThreshold) {
+			//showText(0.3, 0.0, 1.0, "We are reversing");
+			// Throttle Pedal Reverse
+			if (wheelThrottleVal > 0.01f) {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelThrottleVal);
+			}
+			// Brake Pedal Reverse
+			if (wheelBrakeVal > 0.01f) {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelBrakeVal);
+				ext.SetThrottleP(vehicle, -wheelBrakeVal);
+				ext.SetBrakeP(vehicle, 1.0f);
+			}
+		}
+
+		// Standing still
+		if (vehData.Velocity < speedThreshold && vehData.Velocity >= -speedThreshold) {
+			//showText(0.3, 0.0, 1.0, "We are stopped");
+
+			if (wheelThrottleVal > 0.01f) {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelThrottleVal);
+			}
+
+			if (wheelBrakeVal > 0.01f) {
+				ext.SetThrottleP(vehicle, -wheelBrakeVal);
+				ext.SetBrakeP(vehicle, 1.0f);
+				VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+			}
+		}
+
+		// We're rolling forwards
+		if (vehData.Velocity > speedThreshold) {
+			//showText(0.3, 0.0, 1.0, "We are rolling forwards");
+			bool brakelights = false;
+
+			if (vehData.Velocity > reverseThreshold) {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
+				gearRattle.Play(vehicle);
+				shiftTo(1, false);
+				vehData.SimulatedNeutral = true;
+				if (settings.EngDamage &&
+					!vehData.NoClutch) {
+					VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
+						vehicle,
+						VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.MisshiftDamage * 2);
+				}
+				//showNotification("Woops", nullptr);
+			}
+
+			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, brakelights);
+		}
+	}
 }
 
 // Pedals behave like RT/LT
