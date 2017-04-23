@@ -123,6 +123,8 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
 		// Looking at you DFGT.
 		int RawT = WheelControl.GetAxisValue(WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]), 
 		                                WheelAxesGUIDs[static_cast<int>(WheelAxisType::Throttle)]);
+		auto tempThrottle = 0.0f + 1.0f / (ThrottleDown - ThrottleUp)*(static_cast<float>(RawT) - ThrottleUp);
+
 		if (WheelAxes[static_cast<int>(WheelAxisType::Throttle)] == WheelAxes[static_cast<int>(WheelAxisType::Brake)]) {
 			
 			// get throttle range
@@ -137,7 +139,14 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
 				return Wheel;
 			}
 		}
-		else if (1.0f - static_cast<float>(RawT) / 65535.0f > 0.5f) {
+		else if (tempThrottle > 0.5f) {
+			return Wheel;
+		}
+
+		int RawC = WheelControl.GetAxisValue(WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]),
+											 WheelAxesGUIDs[static_cast<int>(WheelAxisType::Clutch)]);
+		auto tempClutch = 0.0f + 1.0f / (ClutchDown - ClutchUp)*(static_cast<float>(RawC) - ClutchUp);
+		if (tempClutch > 0.5f) {
 			return Wheel;
 		}
 	}
