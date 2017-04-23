@@ -1091,15 +1091,15 @@ void functionEngBrake() {
 
 void fakeRev() {
 	float timeStep = SYSTEM::TIMESTEP();
-	float accelRatio = 2 * timeStep;
+	float accelRatio = 2.5 * timeStep;
 	float rpmValTemp = (vehData.PrevRpm > vehData.Rpm ? (vehData.PrevRpm - vehData.Rpm) : 0.0f);
 	if (vehData.CurrGear == 1) {
 		rpmValTemp *= 2.0f;
 	}
 	float rpmVal = vehData.Rpm + // Base value
 		rpmValTemp + // Keep it constant
-		vehData.ControlAccelerate * accelRatio; // Addition value, depends on delta T
-
+		controls.ThrottleVal * accelRatio; // Addition value, depends on delta T
+	//showText(0.4, 0.4, 2.0, "FakeRev");
 	ext.SetCurrentRPM(vehicle, rpmVal);
 }
 
