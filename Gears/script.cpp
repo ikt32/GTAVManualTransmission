@@ -2769,6 +2769,8 @@ bool configControllerButton(std::string confTag) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void main() {
+	logger.Write("Script started");
+
 	if (!controls.WheelControl.PreInit()) {
 		logger.Write("DirectInput failed to initialize");
 	}

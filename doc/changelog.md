@@ -26,9 +26,10 @@ FiveM:
 * Not sure what happened to the rev limiter :thinking:
 
 Wheel changes:
-* Input detection uses clutch too, now
+* Remove nonsense combined input code. Original code was plenty good to handle combined axes and I'm an idiot for making it complex...
+* Delay DirectInput setup from construction to main\(\)
 * Rewrite ingame pedal logic :'(. It was NOT fun.
-* Remove nonsense combined input code. Original code was plenty good to handle combined axes and I'm an idiot!!!
+* Input detection uses clutch too, now
 * Significantly increase wheel resistance when engine is off. This simulates no power steering!
 
 Other changes:

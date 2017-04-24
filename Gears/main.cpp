@@ -29,7 +29,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 			logger.Clear();
 			logger.Write("GTAVManualTransmission " + std::string(DISPLAY_VERSION));
 			logger.Write("Game version " + eGameVersionToString(getGameVersion()));
-			logger.Write("Script loaded");
+			logger.Write("Script registered");
 			break;
 		}
 		case DLL_PROCESS_DETACH: {
