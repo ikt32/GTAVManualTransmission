@@ -1977,18 +1977,20 @@ void update_menu() {
 	/* Yes hello I am root - 2 */
 	if (menu.CurrentMenu("keyboardmenu")) {
 		menu.Title("Keyboard controls");
-		menu.Option("Press RETURN to configure key");
 
 		std::vector<std::string> keyboardInfo;
 		keyboardInfo.push_back("Press RIGHT to clear key");
-		keyboardInfo.insert(std::end(keyboardInfo), std::begin(keyboardConfTagsDetail), std::end(keyboardConfTagsDetail));
+		keyboardInfo.push_back("Press RETURN to configure key");
+		keyboardInfo.push_back("");
 
+		int it = 0;
 		for (auto confTag : keyboardConfTags) {
+			keyboardInfo.back() = keyboardConfTagsDetail.at(it);
 			if (menu.OptionPlus(CharAdapter(("Assign " + confTag).c_str()), keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag), nullptr)) {
 				bool result = configKeyboardKey(confTag);
-				//showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
 				if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
 			}
+			it++;
 		}
 	}
 
@@ -2671,6 +2673,7 @@ bool configKeyboardKey(std::string confTag) {
 		}
 
 		// Key limits from keyboard.cpp
+		// a-z
 		for (int i = 0x30; i <= 0x39; i++) {
 			if (isMenuControl(i))
 				continue;
@@ -2682,6 +2685,7 @@ bool configKeyboardKey(std::string confTag) {
 			}
 		}
 
+		// A-Z
 		for (int i = 0x41; i <= 0x5A; i++) {
 			if (isMenuControl(i))
 				continue;
