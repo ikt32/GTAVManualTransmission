@@ -99,7 +99,48 @@ std::vector<std::string> buttonConfTags {
 	{ "CHANGE_SHIFTMODE" },
 };
 
-static const int numGears = 8;
+std::vector<std::string> keyboardConfTags{
+	{"Toggle"},
+	{"ToggleH"},
+	{"ShiftUp"},
+	{"ShiftDown"},
+	{"Clutch"},
+	{"Engine"},
+	{"Throttle"},
+	{"Brake"},
+	{"HR"},
+	{"H1"},
+	{"H2"},
+	{"H3"},
+	{"H4"},
+	{"H5"},
+	{"H6"},
+	{"H7"},
+	{"HN"},
+};
+
+std::vector<std::string> keyboardConfTagsDetail{
+	{ "Toggle mod on/off" },
+	{ "Switch shift mode" },
+	{ "Shift up" },
+	{ "Shift down" },
+	{ "Hold for clutch" },
+	{ "Toggle engine on/off" },
+	{ "Key used for throttle" },
+	{ "Key used for brake" },
+	{ "H-pattern gear R press" },
+	{ "H-pattern gear 1 press" },
+	{ "H-pattern gear 2 press" },
+	{ "H-pattern gear 3 press" },
+	{ "H-pattern gear 4 press" },
+	{ "H-pattern gear 5 press" },
+	{ "H-pattern gear 6 press" },
+	{ "H-pattern gear 7 press" },
+	{ "H-pattern Neutral" },
+};
+
+const std::string escapeKey = "BACKSPACE";
+const std::string skipKey = "RIGHT";
 
 
 void update() {
@@ -1922,12 +1963,45 @@ void update_menu() {
 	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("controlsmenu")) {
 		menu.Title("Controls");
+		menu.MenuOption("Controller", "controllermenu");
+		menu.MenuOption("Keyboard", "keyboardmenu");
+		menu.MenuOption("Menu keys", "menukeysmenu");
+	}
+
+	/* Yes hello I am root - 2 */
+	if (menu.CurrentMenu("controllermenu")) {
+		menu.Title("Controller controls");
 		menu.Option("Not yet implemented");
 	}
 
+	/* Yes hello I am root - 2 */
+	if (menu.CurrentMenu("keyboardmenu")) {
+		menu.Title("Keyboard controls");
+		menu.Option("Not yet implemented");
+
+		std::vector<std::string> keyboardInfo;
+		keyboardInfo.push_back("Press RIGHT to clear key");
+		keyboardInfo.insert(std::end(keyboardInfo), std::begin(keyboardConfTagsDetail), std::end(keyboardConfTagsDetail));
+
+		for (auto confTag : keyboardConfTags) {
+			if (menu.OptionPlus(CharAdapter(("Assign " + confTag).c_str()), keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag), nullptr)) {
+				bool result = configKeyboardKey(confTag);
+				showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+			}
+		}
+	}
+
+	/* Yes hello I am root - 2 */
+	if (menu.CurrentMenu("menukeysmenu")) {
+		menu.Title("Menu keys");
+		menu.Option("Not yet implemented");
+	}
+
+
+
 	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("wheelmenu")) {
-		menu.Title("Wheel controls");
+		menu.Title("Wheel options");
 		if (menu.BoolOption("Enable wheel", &settings.EnableWheel)) { settings.SaveWheel(); }
 		if (menu.BoolOption("Enable wheel without MT", &settings.WheelWithoutManual)) { settings.SaveWheel(); }
 		if (menu.BoolOption("Enable wheel for boats & planes", &settings.AltControls)) { settings.SaveWheel(); }
@@ -2266,22 +2340,46 @@ void saveButton(int button, std::string confTag, GUID devGUID) {
 	settings.Read(&controls);
 }
 
+void saveKeyboardKey(std::string confTag, std::string key) {
+	settings.KeyboardSaveKey(confTag, key);
+	settings.Read(&controls);
+	showNotification(("Saved key " + confTag + ": " + key).c_str(), &prevNotification);
+}
+
+void saveControllerButton(std::string confTag, std::string button) {
+	settings.ControllerSaveButton(confTag, button);
+	settings.Read(&controls);
+	showNotification(("Saved button " + confTag + ": " + button).c_str(), &prevNotification);
+}
+
 void saveHShifter(std::string confTag, GUID devGUID, std::array<int, numGears> buttonArray, std::string devName) {
 	auto index = settings.SteeringAppendDevice(devGUID, devName);
 	settings.SteeringSaveHShifter(confTag, index, buttonArray.data());
 	settings.Read(&controls);
 }
 
-void clearAxis(std::string axis) {
-	settings.SteeringSaveAxis(axis, -1, "", 0, 0);
+void clearAxis(std::string confTag) {
+	settings.SteeringSaveAxis(confTag, -1, "", 0, 0);
 	settings.Read(&controls);
-	showNotification(("Cleared axis " + axis).c_str(), &prevNotification);
+	showNotification(("Cleared axis " + confTag).c_str(), &prevNotification);
 }
 
-void clearButton(std::string button) {
-	settings.SteeringSaveButton(button, -1, -1);
+void clearButton(std::string confTag) {
+	settings.SteeringSaveButton(confTag, -1, -1);
 	settings.Read(&controls);
-	showNotification(("Cleared button " + button).c_str(), &prevNotification);
+	showNotification(("Cleared button " + confTag).c_str(), &prevNotification);
+}
+
+void clearKeyboardKey(std::string confTag) {
+	settings.KeyboardSaveKey(confTag, "UNKNOWN");
+	settings.Read(&controls);
+	showNotification(("Cleared key " + confTag).c_str(), &prevNotification);
+}
+
+void clearControllerButton(std::string confTag) {
+	settings.ControllerSaveButton(confTag, "UNKNOWN");
+	settings.Read(&controls);
+	showNotification(("Cleared button " + confTag).c_str(), &prevNotification);
 }
 
 void clearHShifter() {
@@ -2295,7 +2393,6 @@ void clearHShifter() {
 }
 
 bool configAxis(std::string str) {
-	std::string escapeKey = "BACKSPACE";
 	
 	std::string confTag = str;
 	std::string additionalInfo = "Press Backspace to exit.";
@@ -2402,8 +2499,6 @@ bool configButton(std::string str) {
 		WheelDirectInput::POV::NW,
 	};
 
-	std::string escapeKey = "BACKSPACE";
-
 	std::string confTag = str;
 	std::string additionalInfo = "Press Backspace to exit.";
 	additionalInfo += " Press a button to set " + confTag + ".";
@@ -2476,9 +2571,6 @@ bool configHPattern() {
 		WheelDirectInput::POV::W,
 		WheelDirectInput::POV::NW,
 	};
-
-	std::string escapeKey = "BACKSPACE";
-	std::string skipKey = "RIGHT";
 
 	std::string confTag = "SHIFTER";
 	std::string additionalInfo = "Press Backspace to exit. Press RIGHT to skip gear.";
@@ -2560,6 +2652,38 @@ bool configHPattern() {
 	return true;
 }
 
+bool configKeyboardKey(std::string confTag) {
+	std::string additionalInfo = "Press Backspace to exit.";
+
+	while (true) {
+		if (IsKeyJustUp(str2key(escapeKey))) {
+			return false;
+		}
+		auto keymap = createKeyMap();
+		for (auto k : keymap) {
+			if (IsKeyJustUp(k.second)) {
+				saveKeyboardKey(confTag, k.first);
+				return true;
+			}
+		}
+		
+		showSubtitle("Press " + confTag + ". " + additionalInfo);
+		WAIT(0);
+	}
+}
+
+bool configControllerButton(std::string confTag) {
+	std::string additionalInfo = "Press Backspace to exit.";
+
+	while (true) {
+		if (IsKeyJustUp(str2key(escapeKey))) {
+			return false;
+		}
+
+		showSubtitle("Press " + confTag + ". " + additionalInfo);
+		WAIT(0);
+	}
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////

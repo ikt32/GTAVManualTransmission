@@ -133,6 +133,11 @@ void ScriptMain();
 void clearAxis(std::string axis);
 void clearButton(std::string button);
 void clearHShifter();
-bool configAxis(std::string str);
-bool configButton(std::string str);
+void clearKeyboardKey(std::string button);
+void clearControllerButton(std::string button);
+
+bool configAxis(std::string confTag);
+bool configButton(std::string confTag);
 bool configHPattern();
+bool configKeyboardKey(std::string confTag);
+bool configControllerButton(std::string confTag);
