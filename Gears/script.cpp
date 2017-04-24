@@ -1452,15 +1452,17 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 		// We're rolling forwards
 		if (vehData.Velocity > speedThreshold) {
 			//showText(0.3, 0.0, 1.0, "We are rolling forwards");
-			bool brakelights = false;
+			//bool brakelights = false;
 
 			if (vehData.Velocity > reverseThreshold) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
 				gearRattle.Play(vehicle);
 				shiftTo(1, false);
 				vehData.SimulatedNeutral = true;
-				if (settings.EngDamage &&
-					!vehData.NoClutch) {
+				
+				if (controls.ClutchVal > settings.ClutchCatchpoint) {
+					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
+				}
+				if (settings.EngDamage) {
 					VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
 						vehicle,
 						VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.MisshiftDamage * 2);
@@ -1468,7 +1470,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 				//showNotification("Woops", nullptr);
 			}
 
-			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, brakelights);
+			//VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, brakelights);
 		}
 	}
 }
