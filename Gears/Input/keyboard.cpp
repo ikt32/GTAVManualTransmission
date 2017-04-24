@@ -172,15 +172,22 @@ std::map<std::string, int> createKeyMap() {
 	keymap["LAUNCH_APP2"] = VK_LAUNCH_APP2;
 	keymap["PLAY"] = VK_PLAY;
 	keymap["ZOOM"] = VK_ZOOM;
-	keymap["VK_OEM_1"] = VK_OEM_1;		// : ;
-	keymap["VK_OEM_2"] = VK_OEM_2;		// ? /
-	keymap["VK_OEM_3"] = VK_OEM_3;		// ~ `
-	keymap["VK_OEM_4"] = VK_OEM_4;		// { [
-	keymap["VK_OEM_5"] = VK_OEM_5;		// | Backslash
-	keymap["VK_OEM_6"] = VK_OEM_6;		// } ]
-	keymap["VK_OEM_7"] = VK_OEM_7;		// " '
-	keymap["VK_OEM_8"] = VK_OEM_8;		// § !
-	keymap["VK_OEM_102"] = VK_OEM_102;	// > <	
+
+	keymap["VK_OEM_1"]		= VK_OEM_1;			// ';:' for US
+	keymap["VK_OEM_PLUS"] 	= VK_OEM_PLUS;		// '+' any country
+	keymap["VK_OEM_COMMA"]	= VK_OEM_COMMA;		// ',' any country
+	keymap["VK_OEM_MINUS"]	= VK_OEM_MINUS;		// '-' any country
+	keymap["VK_OEM_PERIOD"]	= VK_OEM_PERIOD;  	// '.' any country
+	keymap["VK_OEM_2"]		= VK_OEM_2;			// '/?' for US
+	keymap["VK_OEM_3"]		= VK_OEM_3;			// '`~' for US
+	
+	keymap["VK_OEM_4"]		= VK_OEM_4;			//  '[{' for US
+	keymap["VK_OEM_5"]		= VK_OEM_5;			//  '\|' for US
+	keymap["VK_OEM_6"]		= VK_OEM_6;			//  ']}' for US
+	keymap["VK_OEM_7"]		= VK_OEM_7;			//  ''"' for US
+	keymap["VK_OEM_8"]		= VK_OEM_8;			// § !
+	keymap["VK_OEM_102"]	= VK_OEM_102;		// > <	
+
 	return keymap;
 }
 
