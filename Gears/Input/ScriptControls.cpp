@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include "keyboard.h"
+//#include "keyboard.h"
 
 ScriptControls::ScriptControls(): WheelControl(),
                                 PrevInput(Keyboard),
@@ -151,15 +152,15 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
  */
 
 bool ScriptControls::IsKeyPressed(int key) {
-	//if (GetAsyncKeyState(key) & 0x8000)
-	if (IsKeyDown(key))
-		return true;
+	//if (!IsWindowFocused()) return false;
+	//if (GetAsyncKeyState(key) & 0x8000) return true;
+	if (IsKeyDown(key)) return true;
 	return false;
 }
 
 bool ScriptControls::IsKeyJustPressed(int key, KeyboardControlType control) {
 	//KBControlCurr[static_cast<int>(control)] = (GetAsyncKeyState(key) & 0x8000) != 0;
-	KBControlCurr[static_cast<int>(control)] = IsKeyDown(key);
+	KBControlCurr[static_cast<int>(control)] = IsKeyPressed(key);//IsKeyDown(key);
 	
 	// raising edge
 	if (KBControlCurr[static_cast<int>(control)] && !KBControlPrev[static_cast<int>(control)]) {
