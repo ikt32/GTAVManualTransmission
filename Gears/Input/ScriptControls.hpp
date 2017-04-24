@@ -160,6 +160,31 @@ public:
 		return buttonState;
 	}
 
+	// BLEURGHGHHHGGGKKKKKGGGG
+	// Uh, like, I abstracted the controls to numbers @ read and use those values
+	// but now I want to show them again...
+	int ConfTag2key(std::string confTag) {
+		if (confTag == "Toggle") return KBControl[static_cast<int>(KeyboardControlType::Toggle)];
+		if (confTag == "ToggleH") return KBControl[static_cast<int>(KeyboardControlType::ToggleH)];
+		if (confTag == "ShiftUp") return KBControl[static_cast<int>(KeyboardControlType::ShiftUp)];
+		if (confTag == "ShiftDown") return KBControl[static_cast<int>(KeyboardControlType::ShiftDown)];
+		if (confTag == "Clutch") return KBControl[static_cast<int>(KeyboardControlType::Clutch)];
+		if (confTag == "Engine") return KBControl[static_cast<int>(KeyboardControlType::Engine)];
+		if (confTag == "Throttle") return KBControl[static_cast<int>(KeyboardControlType::Throttle)];
+		if (confTag == "Brake") return KBControl[static_cast<int>(KeyboardControlType::Brake)];
+		if (confTag == "HR") return KBControl[static_cast<int>(KeyboardControlType::HR)];
+		if (confTag == "H1") return KBControl[static_cast<int>(KeyboardControlType::H1)];
+		if (confTag == "H2") return KBControl[static_cast<int>(KeyboardControlType::H2)];
+		if (confTag == "H3") return KBControl[static_cast<int>(KeyboardControlType::H3)];
+		if (confTag == "H4") return KBControl[static_cast<int>(KeyboardControlType::H4)];
+		if (confTag == "H5") return KBControl[static_cast<int>(KeyboardControlType::H5)];
+		if (confTag == "H6") return KBControl[static_cast<int>(KeyboardControlType::H6)];
+		if (confTag == "H7") return KBControl[static_cast<int>(KeyboardControlType::H7)];
+		if (confTag == "HN") return KBControl[static_cast<int>(KeyboardControlType::HN)];
+
+		return -1;
+	}
+
 private:
 	bool resolveCombinedPedals(int RawT);
 	bool IsKeyPressed(int key);

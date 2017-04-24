@@ -81,7 +81,7 @@ std::vector<int> fontIDs {
 	7
 };
 
-std::vector<std::string> buttonConfTags {
+std::vector<std::string> buttonConfTags{
 	{ "SHIFT_UP" },
 	{ "SHIFT_DOWN" },
 	{ "ENGINE" },
@@ -100,23 +100,34 @@ std::vector<std::string> buttonConfTags {
 };
 
 std::vector<std::string> keyboardConfTags{
-	{"Toggle"},
-	{"ToggleH"},
-	{"ShiftUp"},
-	{"ShiftDown"},
-	{"Clutch"},
-	{"Engine"},
-	{"Throttle"},
-	{"Brake"},
-	{"HR"},
-	{"H1"},
-	{"H2"},
-	{"H3"},
-	{"H4"},
-	{"H5"},
-	{"H6"},
-	{"H7"},
-	{"HN"},
+	{ "Toggle" },
+	{ "ToggleH" },
+	{ "ShiftUp" },
+	{ "ShiftDown" },
+	{ "Clutch" },
+	{ "Engine" },
+	{ "Throttle" },
+	{ "Brake" },
+	{ "HR" },
+	{ "H1" },
+	{ "H2" },
+	{ "H3" },
+	{ "H4" },
+	{ "H5" },
+	{ "H6" },
+	{ "H7" },
+	{ "HN" },
+};
+
+std::vector<std::string> controllerConfTags{
+	{ "Toggle" },
+	{ "ToggleShift" },
+	{ "ShiftUp" },
+	{ "ShiftDown" },
+	{ "Clutch" },
+	{ "Engine" },
+	{ "Throttle" },
+	{ "Brake" }
 };
 
 std::vector<std::string> keyboardConfTagsDetail{
@@ -137,17 +148,6 @@ std::vector<std::string> keyboardConfTagsDetail{
 	{ "H-pattern gear 6 press" },
 	{ "H-pattern gear 7 press" },
 	{ "H-pattern Neutral" },
-};
-
-std::vector<std::string> controllerConfTags{
-	{ "Toggle" },
-	{ "ToggleShift" },
-	{ "ShiftUp" },
-	{ "ShiftDown" },
-	{ "Clutch" },
-	{ "Engine" },
-	{ "Throttle" },
-	{ "Brake" }
 };
 
 std::vector<std::string> controllerConfTagDetail{
@@ -2038,12 +2038,14 @@ void update_menu() {
 		int it = 0;
 		for (auto confTag : keyboardConfTags) {
 			keyboardInfo.back() = keyboardConfTagsDetail.at(it);
+			keyboardInfo.push_back("Assigned to " + key2str(controls.ConfTag2key(confTag)));
 			if (menu.OptionPlus(CharAdapter(("Assign " + confTag).c_str()), keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag), nullptr)) {
 				bool result = configKeyboardKey(confTag);
 				if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
 				WAIT(1000);
 			}
 			it++;
+			keyboardInfo.pop_back();
 		}
 	}
 
