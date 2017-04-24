@@ -580,98 +580,79 @@ void showHUD() {
 
 void showDebugInfo() {
 	std::stringstream ssRPM;
-	ssRPM << "RPM: " << std::setprecision(3) << vehData.Rpm;
-	showText(0.01f, 0.300f, 0.4f, ssRPM.str().c_str());
-
 	std::stringstream ssCurrGear;
-	ssCurrGear << "CurrGear: " << vehData.CurrGear;
-	showText(0.01f, 0.325f, 0.4f, ssCurrGear.str().c_str());
-
 	std::stringstream ssNextGear;
-	ssNextGear << "NextGear: " << vehData.NextGear;
-	showText(0.01f, 0.350f, 0.4f, ssNextGear.str().c_str());
-
 	std::stringstream ssClutch;
-	ssClutch << "Clutch: " << std::setprecision(3) << vehData.Clutch;
-	showText(0.01f, 0.375f, 0.4f, ssClutch.str().c_str());
-
 	std::stringstream ssThrottle;
-	ssThrottle << "Throttle: " << std::setprecision(3) << vehData.Throttle;
-	showText(0.01f, 0.400f, 0.4f, ssThrottle.str().c_str());
-
 	std::stringstream ssTurbo;
-	ssTurbo << "Turbo: " << std::setprecision(3) << vehData.Turbo;
-	showText(0.01f, 0.425f, 0.4f, ssTurbo.str().c_str());
-
 	std::stringstream ssAddress;
-	ssAddress << "Address: " << std::hex << reinterpret_cast<uint64_t>(vehData.Address);
-	showText(0.01f, 0.450f, 0.4f, ssAddress.str().c_str());
-
 	std::stringstream ssEnabled;
-	ssEnabled << "Mod " << (settings.EnableManual ? "Enabled" : "Disabled");
-	showText(0.01f, 0.475f, 0.4f, ssEnabled.str().c_str());
 
-	/*std::stringstream ssWheelAddr;
-	ssWheelAddr << "WheelAddress: " << std::hex << ext.GetWheelsPtr(vehicle);
-	showText(0.01f, 0.500, 0.4f, ssWheelAddr.str().c_str());*/
+	ssRPM		<< "RPM:\t\t" << std::setprecision(3) << vehData.Rpm;
+	ssCurrGear	<< "CurrGear:\t" << vehData.CurrGear;
+	ssNextGear	<< "NextGear:\t" << vehData.NextGear;
+	ssClutch	<< "Clutch:\t\t" << std::setprecision(3) << vehData.Clutch;
+	ssThrottle	<< "Throttle:\t" << std::setprecision(3) << vehData.Throttle;
+	ssTurbo		<< "Turbo:\t\t" << std::setprecision(3) << vehData.Turbo;
+	ssAddress	<< "Address:\t" << std::hex << reinterpret_cast<uint64_t>(vehData.Address);
+	ssEnabled	<< "Mod:\t\t" << (settings.EnableManual ? "Enabled" : "Disabled");
+
+	showText(0.01f, 0.300f, 0.4f, ssRPM.str().c_str(),		4);
+	showText(0.01f, 0.325f, 0.4f, ssCurrGear.str().c_str(),	4);
+	showText(0.01f, 0.350f, 0.4f, ssNextGear.str().c_str(),	4);
+	showText(0.01f, 0.375f, 0.4f, ssClutch.str().c_str(),	4);
+	showText(0.01f, 0.400f, 0.4f, ssThrottle.str().c_str(),	4);
+	showText(0.01f, 0.425f, 0.4f, ssTurbo.str().c_str(),	4);
+	showText(0.01f, 0.450f, 0.4f, ssAddress.str().c_str(),	4);
+	showText(0.01f, 0.475f, 0.4f, ssEnabled.str().c_str(),	4);
 
 	std::stringstream ssThrottleInput;
-	ssThrottleInput << "ThrottleVal: " << controls.ThrottleVal;
-
 	std::stringstream ssBrakeInput;
-	ssBrakeInput << "Brake Value: " << controls.BrakeVal;
-
 	std::stringstream ssClutchInput;
-	ssClutchInput << "ClutchValue: " << controls.ClutchVal;
-
-	/*std::stringstream ssClutchDisable;
-	ssClutchDisable << (controls.ClutchDisable ? "Disabled:" : "");*/
-
 	std::stringstream ssHandbrakInput;
-	ssHandbrakInput << "HbrakeVal: " << controls.HandbrakeVal;
 
-	showText(0.85, 0.050, 0.4, ssThrottleInput.str().c_str());
-	showText(0.85, 0.075, 0.4, ssBrakeInput.str().c_str());
-	showText(0.85, 0.100, 0.4, ssClutchInput.str().c_str());
-	//showText(0.795, 0.100, 0.4, ssClutchDisable.str().c_str());
-	showText(0.85, 0.125, 0.4, ssHandbrakInput.str().c_str());
+	ssThrottleInput << "Throttle:\t" << controls.ThrottleVal;
+	ssBrakeInput	<< "Brake:\t\t" << controls.BrakeVal;
+	ssClutchInput	<< "Clutch:\t\t" << controls.ClutchVal;
+	ssHandbrakInput << "Handb:\t\t" << controls.HandbrakeVal;
+
+	showText(0.85, 0.050, 0.4, ssThrottleInput.str().c_str(),	4);
+	showText(0.85, 0.075, 0.4, ssBrakeInput.str().c_str(),		4);
+	showText(0.85, 0.100, 0.4, ssClutchInput.str().c_str(),		4);
+	showText(0.85, 0.125, 0.4, ssHandbrakInput.str().c_str(),	4);
 
 	if (settings.EnableWheel) {
 		std::stringstream dinputDisplay;
-		dinputDisplay << "Wheel Avail: " << controls.WheelControl.IsConnected(controls.SteerGUID);
-		showText(0.85, 0.150, 0.4, dinputDisplay.str().c_str());
+		dinputDisplay << "Wheel" << (controls.WheelControl.IsConnected(controls.SteerGUID) ? "" : " not") << " present";
+		showText(0.85, 0.150, 0.4, dinputDisplay.str().c_str(), 4);
 	}
 }
 
 void showDebugInfoWheel(ScriptSettings &settings, float effSteer, int damperForce, float steerSpeed, double GForce, float oversteer, float understeer) {
 	std::stringstream SteerRaw;
-	SteerRaw << "SteerRaw: " << controls.SteerVal;
-	showText(0.85, 0.175, 0.4, SteerRaw.str().c_str());
-
 	std::stringstream SteerNorm;
-	SteerNorm << "SteerNorm: " << effSteer;
-	showText(0.85, 0.200, 0.4, SteerNorm.str().c_str());
-
 	std::stringstream steerDisplay;
-	steerDisplay << "SteerSpeed: " << steerSpeed;
-	showText(0.85, 0.225, 0.4, steerDisplay.str().c_str());
-
 	std::stringstream GForceDisplay;
-	GForceDisplay << "GForceFinal: " <<
-		std::setprecision(5) << (-GForce * 5000 * settings.PhysicsStrength * settings.FFGlobalMult);
-	showText(0.85, 0.250, 0.4, GForceDisplay.str().c_str());
-
 	std::stringstream damperF;
-	damperF << "DampForce: " << steerSpeed * damperForce * 0.1;
-	showText(0.85, 0.300, 0.4, damperF.str().c_str());
-
 	std::stringstream ssUnderSteer;
-	ssUnderSteer << "Understeer: " << understeer;
-	showText(0.85, 0.325, 0.4, ssUnderSteer.str().c_str());
-
 	std::stringstream ssOverSteer;
-	ssOverSteer << "Oversteer: " << oversteer;
-	showText(0.85, 0.350, 0.4, ssOverSteer.str().c_str());
+	
+	SteerRaw		<< "SteerRaw:\t" << controls.SteerVal;
+	SteerNorm		<< "SteerNorm:\t" << effSteer;
+	steerDisplay	<< "SteerSpeed:\t" << steerSpeed;
+	GForceDisplay	<< "GForceFinal:\t" <<
+		std::setprecision(5) << (-GForce * 5000 * settings.PhysicsStrength * settings.FFGlobalMult);
+	damperF			<< "DampForce:\t" << steerSpeed * damperForce * 0.1;
+	ssUnderSteer	<< "Understeer:\t" << understeer;
+	ssOverSteer		<< "Oversteer:\t" << oversteer;
+
+	showText(0.85, 0.175, 0.4, SteerRaw.str().c_str()		,4);
+	showText(0.85, 0.200, 0.4, SteerNorm.str().c_str()		,4);
+	showText(0.85, 0.225, 0.4, steerDisplay.str().c_str()	,4);
+	showText(0.85, 0.250, 0.4, GForceDisplay.str().c_str()	,4);
+	showText(0.85, 0.275, 0.4, damperF.str().c_str()		,4);
+	showText(0.85, 0.300, 0.4, ssUnderSteer.str().c_str()	,4);
+	showText(0.85, 0.325, 0.4, ssOverSteer.str().c_str()	,4);
 }
 
 // To expose some variables to other scripts
@@ -2108,7 +2089,7 @@ void update_menu() {
 			"Steer    : " + std::to_string(controls.SteerVal),
 			"Throttle : " + std::to_string(controls.ThrottleVal),
 			"Brake    : " + std::to_string(controls.BrakeVal),
-			"Clutch   : " + std::to_string(controls.ClutchVal),
+			"Clutch   : " + std::to_string(controls.ClutchValRaw),
 			"Handbrake: " + std::to_string(controls.HandbrakeVal),
 		};
 
