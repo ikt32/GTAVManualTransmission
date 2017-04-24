@@ -94,8 +94,8 @@ public:
 
 	float BrakeVal = 0.0f;
 	float ThrottleVal = 0.0f;
-	// 1 = Pressed, 0 = Not pressed
-	float ClutchVal = 0.0f;
+	float ClutchVal = 0.0f; 	// 1 = Pressed, 0 = Not pressed
+	float ClutchValRaw = 0.0f;	// For readout purposes. ClutchVal is for gameplay purposes.
 	float SteerVal = 0.5f;
 	float HandbrakeVal = 0.0f;
 

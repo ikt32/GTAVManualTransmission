@@ -72,6 +72,8 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 			} else {
 				ClutchVal = 0.0f + 1.0f / (ClutchDown - ClutchUp)*(static_cast<float>(RawC) - ClutchUp);
 			}
+			ClutchValRaw = 0.0f + 1.0f / (ClutchDown - ClutchUp)*(static_cast<float>(RawC) - ClutchUp);
+
 
 			if (WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Handbrake)]) == WheelDirectInput::UNKNOWN_AXIS) {
 				HandbrakeVal = 0.0f;
@@ -82,17 +84,20 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 			SteerVal = 0.0f + 1.0f / (SteerRight - SteerLeft)*(static_cast<float>(RawS) - SteerLeft);
 
 			if (RawH == -1) { HandbrakeVal = 0.0f; }
-			if (RawC == -1) { ClutchVal = 0.0f; }
+			if (RawC == -1) { ClutchVal = 0.0f; ClutchValRaw = 0.0f; }
 			if (RawT == -1) { ThrottleVal = 0.0f; }
 			if (RawB == -1) { BrakeVal = 0.0f; }
 
 			if (ThrottleVal > 1.0f) { ThrottleVal = 1.0f; }
 			if (BrakeVal > 1.0f) { BrakeVal = 1.0f; }
 			if (ClutchVal > 1.0f) { ClutchVal = 1.0f; }
+			if (ClutchValRaw > 1.0f) { ClutchValRaw = 1.0f; }
+
 
 			if (ThrottleVal < 0.0f) { ThrottleVal = 0.0f; }
 			if (BrakeVal < 0.0f) { BrakeVal = 0.0f; }
 			if (ClutchVal < 0.0f) { ClutchVal = 0.0f; }
+			if (ClutchValRaw < 0.0f) { ClutchValRaw = 0.0f; }
 
 			break;
 		}
