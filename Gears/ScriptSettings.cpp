@@ -587,7 +587,7 @@ ptrdiff_t ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, std::string
 	settingsWheel.SetValue("INPUT_DEVICES", newGUID.c_str(), GUID2String(dev_guid).c_str());
 	int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
 	if (err < 0)
-		logger.Write("Unable to save file");
+		logger.Write("Unable to save to " + settingsWheelFile);
 	return newIndex;
 }
 void ScriptSettings::SteeringSaveAxis(const std::string &confTag, ptrdiff_t index, const std::string & axis, int minVal, int maxVal) {
@@ -600,7 +600,7 @@ void ScriptSettings::SteeringSaveAxis(const std::string &confTag, ptrdiff_t inde
 	settingsWheel.SetValue(confTag.c_str(), "MAX", std::to_string(maxVal).c_str());
 	int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
 	if (err < 0)
-		logger.Write("Unable to save file");
+		logger.Write("Unable to save to " + settingsWheelFile);
 }
 
 void ScriptSettings::SteeringSaveFFBAxis(const std::string & confTag, ptrdiff_t index, const std::string & axis) {
@@ -611,7 +611,7 @@ void ScriptSettings::SteeringSaveFFBAxis(const std::string & confTag, ptrdiff_t 
 	settingsWheel.SetValue(confTag.c_str(), "FFB", axis.c_str());
 	int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
 	if (err < 0)
-		logger.Write("Unable to save file");
+		logger.Write("Unable to save to " + settingsWheelFile);
 }
 
 void ScriptSettings::SteeringSaveButton(const std::string & confTag, ptrdiff_t index, int button) {
@@ -622,7 +622,7 @@ void ScriptSettings::SteeringSaveButton(const std::string & confTag, ptrdiff_t i
 	settingsWheel.SetLongValue(confTag.c_str(), "BUTTON", button);
 	int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
 	if (err < 0)
-		logger.Write("Unable to save file");
+		logger.Write("Unable to save to " + settingsWheelFile);
 }
 
 void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t index, int button[numGears]) {
@@ -640,14 +640,26 @@ void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t
 	settingsWheel.SetLongValue(confTag.c_str(), "GEAR_7", button[7]);
 	int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
 	if (err < 0)
-		logger.Write("Unable to save file");
+		logger.Write("Unable to save to " + settingsWheelFile);
 }
 
 void ScriptSettings::KeyboardSaveKey(const std::string &confTag, const std::string &key) {
-	// TODO: Everything
+	CSimpleIniA settingsGeneral;
+	settingsGeneral.SetUnicode();
+	settingsGeneral.LoadFile(settingsGeneralFile.c_str());
+	settingsGeneral.SetValue("KEYBOARD", confTag.c_str(), key.c_str());
+	int err = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
+	if (err < 0)
+		logger.Write("Unable to save to " + settingsGeneralFile);
 }
 void ScriptSettings::ControllerSaveButton(const std::string &confTag, const std::string &button) {
-	// TODO: Everything
+	CSimpleIniA settingsGeneral;
+	settingsGeneral.SetUnicode();
+	settingsGeneral.LoadFile(settingsGeneralFile.c_str());
+	settingsGeneral.SetValue("CONTROLLER", confTag.c_str(), button.c_str());
+	int err = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
+	if (err < 0)
+		logger.Write("Unable to save to " + settingsGeneralFile);
 }
 
 GUID ScriptSettings::DeviceIndexToGUID(int device, std::vector<GUID> guids) {

@@ -142,7 +142,6 @@ std::vector<std::string> keyboardConfTagsDetail{
 const std::string escapeKey = "BACKSPACE";
 const std::string skipKey = "RIGHT";
 
-
 void update() {
 	///////////////////////////////////////////////////////////////////////////
 	//                     Are we in a supported vehicle?
@@ -1967,7 +1966,6 @@ void update_menu() {
 		menu.Title("Controls");
 		menu.MenuOption("Controller", "controllermenu");
 		menu.MenuOption("Keyboard", "keyboardmenu");
-		menu.MenuOption("Menu keys", "menukeysmenu");
 	}
 
 	/* Yes hello I am root - 2 */
@@ -1979,7 +1977,7 @@ void update_menu() {
 	/* Yes hello I am root - 2 */
 	if (menu.CurrentMenu("keyboardmenu")) {
 		menu.Title("Keyboard controls");
-		menu.Option("Not yet implemented");
+		menu.Option("Press RETURN to configure key");
 
 		std::vector<std::string> keyboardInfo;
 		keyboardInfo.push_back("Press RIGHT to clear key");
@@ -1988,18 +1986,11 @@ void update_menu() {
 		for (auto confTag : keyboardConfTags) {
 			if (menu.OptionPlus(CharAdapter(("Assign " + confTag).c_str()), keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag), nullptr)) {
 				bool result = configKeyboardKey(confTag);
-				showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+				//showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+				if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
 			}
 		}
 	}
-
-	/* Yes hello I am root - 2 */
-	if (menu.CurrentMenu("menukeysmenu")) {
-		menu.Title("Menu keys");
-		menu.Option("Not yet implemented");
-	}
-
-
 
 	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("wheelmenu")) {
@@ -2397,7 +2388,7 @@ void clearHShifter() {
 bool configAxis(std::string str) {
 	
 	std::string confTag = str;
-	std::string additionalInfo = "Press Backspace to exit.";
+	std::string additionalInfo = "Press " + escapeKey + " to exit.";
 
 	if (str == "STEER") {
 		additionalInfo += " Steer right to register axis.";
@@ -2502,7 +2493,7 @@ bool configButton(std::string str) {
 	};
 
 	std::string confTag = str;
-	std::string additionalInfo = "Press Backspace to exit.";
+	std::string additionalInfo = "Press " + escapeKey + " to exit.";
 	additionalInfo += " Press a button to set " + confTag + ".";
 
 	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
@@ -2575,8 +2566,7 @@ bool configHPattern() {
 	};
 
 	std::string confTag = "SHIFTER";
-	std::string additionalInfo = "Press Backspace to exit. Press RIGHT to skip gear.";
-	/*additionalInfo += " Press a button to set " + confTag + ".";*/
+	std::string additionalInfo = "Press " + escapeKey + " to exit. Press " + skipKey + " to skip gear.";
 
 	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
 
@@ -2654,33 +2644,67 @@ bool configHPattern() {
 	return true;
 }
 
-bool configKeyboardKey(std::string confTag) {
-	std::string additionalInfo = "Press Backspace to exit.";
+bool isMenuControl(int control) {
+	if (control == menuControls.ControlKeys[MenuControls::ControlType::MenuKey] ||
+		control == menuControls.ControlKeys[MenuControls::ControlType::MenuSelect] ||
+		control == menuControls.ControlKeys[MenuControls::ControlType::MenuCancel]) {
+		return true;
+	}
 
+	return false;
+}
+
+bool configKeyboardKey(std::string confTag) {
+	std::string additionalInfo = "Press " + escapeKey + " to exit.";
 	while (true) {
 		if (IsKeyJustUp(str2key(escapeKey))) {
 			return false;
 		}
 		auto keymap = createKeyMap();
 		for (auto k : keymap) {
+			if (isMenuControl(k.second))
+				continue;
 			if (IsKeyJustUp(k.second)) {
 				saveKeyboardKey(confTag, k.first);
 				return true;
 			}
 		}
-		
-		showSubtitle("Press " + confTag + ". " + additionalInfo);
+
+		// Key limits from keyboard.cpp
+		for (int i = 0x30; i <= 0x39; i++) {
+			if (isMenuControl(i))
+				continue;
+			if (IsKeyJustUp(i)) {
+				std::string str = "";
+				str = static_cast<char>(i);
+				saveKeyboardKey(confTag, str);
+				return true;
+			}
+		}
+
+		for (int i = 0x41; i <= 0x5A; i++) {
+			if (isMenuControl(i))
+				continue;
+			if (IsKeyJustUp(i)) {
+				std::string str = "";
+				str = static_cast<char>(i);
+				saveKeyboardKey(confTag, str);
+				return true;
+			}
+		}
+
+		showSubtitle("Press " + confTag + ". Menu controls can't be chosen." + additionalInfo);
 		WAIT(0);
 	}
 }
 
 bool configControllerButton(std::string confTag) {
-	std::string additionalInfo = "Press Backspace to exit.";
+	std::string additionalInfo = "Press " + escapeKey + " to exit.";
 
 	while (true) {
-		if (IsKeyJustUp(str2key(escapeKey))) {
+		//if (IsKeyJustUp(str2key(escapeKey))) {
 			return false;
-		}
+		//}
 
 		showSubtitle("Press " + confTag + ". " + additionalInfo);
 		WAIT(0);
