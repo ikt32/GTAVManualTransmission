@@ -625,7 +625,7 @@ void ScriptSettings::SteeringSaveButton(const std::string & confTag, ptrdiff_t i
 		logger.Write("Unable to save file");
 }
 
-void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t index, int button[8]) {
+void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t index, int button[numGears]) {
 	CSimpleIniA settingsWheel;
 	settingsWheel.SetUnicode();
 	settingsWheel.LoadFile(settingsWheelFile.c_str());
@@ -641,6 +641,13 @@ void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t
 	int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
 	if (err < 0)
 		logger.Write("Unable to save file");
+}
+
+void ScriptSettings::KeyboardSaveKey(const std::string &confTag, const std::string &key) {
+	// TODO: Everything
+}
+void ScriptSettings::ControllerSaveButton(const std::string &confTag, const std::string &button) {
+	// TODO: Everything
 }
 
 GUID ScriptSettings::DeviceIndexToGUID(int device, std::vector<GUID> guids) {

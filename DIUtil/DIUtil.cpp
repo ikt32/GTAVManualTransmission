@@ -13,7 +13,6 @@
 #define TAB 0x09
 
 static const int devWidth = 36;
-static const int numGears = 8;
 
 HANDLE hConsole;
 CONSOLE_CURSOR_INFO cursorInfo;
