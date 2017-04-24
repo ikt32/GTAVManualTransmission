@@ -17,6 +17,7 @@ Additions:
   * Change HUD settings
   * Change wheel options, keyboard controls and controller controls
   * Assign controls in-game
+  * Show existing control assignments
 * Add gear rattle sound on miss-shift, clears on clutch press or proper gear change
 
 FiveM:
@@ -31,8 +32,8 @@ Wheel changes:
 * Significantly increase wheel resistance when engine is off. This simulates no power steering!
 
 Other changes:
+* Revert to GetAsyncKeyState() because ScriptHookV's API doesn't do mouse and/or differentiate between left/right shift so that's included now. :joy: :gun:
 * Added normal +/-/,/. to keymap
-  * Please note that left/right shift distinguish and mouse buttons aren't supported still. Nag to Alexander Blade about this.
 * Make clutch grab self-accelerate a bit more tame, stop revving over 0.3
 * Set engine RPM display to 0 when engine is off.
 * More aggressive custom revving
