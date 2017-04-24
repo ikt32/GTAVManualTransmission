@@ -20,6 +20,7 @@ public:
 	void Read(ScriptControls* scriptControl);
 	void Read(MenuControls *menuControl);
 	void SaveGeneral() const;
+	void SaveController(ScriptControls *scriptControl) const;
 	void SaveWheel() const;
 	bool IsCorrectVersion() const;
 	std::string GetVersionError();

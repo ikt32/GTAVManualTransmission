@@ -143,7 +143,8 @@ public:
 
 	WheelDirectInput WheelControl;
 
-	void SetXboxTrigger(int value);
+	void SetXboxTrigger(float value);
+	float GetXboxTrigger();
 	InputDevices PrevInput;
 
 

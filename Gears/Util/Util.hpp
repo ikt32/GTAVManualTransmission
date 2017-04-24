@@ -128,7 +128,7 @@ struct Color {
 
 // Natives called
 void showText(float x, float y, float scale, const char* text, int font = 0, const Color &rgba = { 255, 255, 255, 255 });
-void showNotification(const char* message, int *prevNotification);
+void showNotification(const char* message, int *prevNotification = nullptr);
 void showSubtitle(std::string message, int duration = 2500);
 
 //http://stackoverflow.com/questions/36789380/how-to-store-a-const-char-to-a-char

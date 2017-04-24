@@ -220,8 +220,12 @@ bool ScriptControls::ButtonIn(ControllerControlType control) {
 	return false;
 }
 
-void ScriptControls::SetXboxTrigger(int value) {
-	controller.TriggerValue = static_cast<float>(value) / 100.0f;
+void ScriptControls::SetXboxTrigger(float value) {
+	controller.TriggerValue = value;
+}
+
+float ScriptControls::GetXboxTrigger() {
+	return controller.TriggerValue;
 }
 
 /*

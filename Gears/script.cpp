@@ -139,6 +139,29 @@ std::vector<std::string> keyboardConfTagsDetail{
 	{ "H-pattern Neutral" },
 };
 
+std::vector<std::string> controllerConfTags{
+	{ "Toggle" },
+	{ "ToggleShift" },
+	{ "ShiftUp" },
+	{ "ShiftDown" },
+	{ "Clutch" },
+	{ "Engine" },
+	{ "Throttle" },
+	{ "Brake" }
+};
+
+std::vector<std::string> controllerConfTagDetail{
+	{ "Toggle mod usage: hold" },
+	{ "Toggle shift usage: hold" },
+	{ "Shift up usage: press" },
+	{ "Shift down usage: press" },
+	{ "Clutch usage: axis or button" },
+	{ "Engine usage: press" },
+	{ "Throttle: axis or button" },
+	{ "Brake: axis or button" }
+};
+	
+
 const std::string escapeKey = "BACKSPACE";
 const std::string skipKey = "RIGHT";
 
@@ -1888,6 +1911,7 @@ void menuInit() {
 void menuClose() {
 	settings.SaveGeneral();
 	settings.SaveWheel();
+	settings.SaveController(&controls);
 	menu.SaveMenuTheme(std::wstring(settingsMenuFile.begin(), settingsMenuFile.end()).c_str());
 }
 
@@ -1964,6 +1988,7 @@ void update_menu() {
 	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("controlsmenu")) {
 		menu.Title("Controls");
+		
 		menu.MenuOption("Controller", "controllermenu");
 		menu.MenuOption("Keyboard", "keyboardmenu");
 	}
@@ -1971,7 +1996,34 @@ void update_menu() {
 	/* Yes hello I am root - 2 */
 	if (menu.CurrentMenu("controllermenu")) {
 		menu.Title("Controller controls");
-		menu.Option("Not yet implemented");
+		
+		if (menu.BoolOption("Engine button turns off too", &settings.ToggleEngine)) {}
+		if (menu.IntOption("Long press time (ms)", &controls.CToggleTime, 100, 5000, 100)) {}
+
+		// wtf ikt
+		float currTriggerValue = controls.GetXboxTrigger();
+		float prevTriggerValue = currTriggerValue;
+		if (menu.FloatOption("Trigger value", &currTriggerValue, 0.25, 1.0, 0.05)) {}
+		if (currTriggerValue != prevTriggerValue) {
+			controls.SetXboxTrigger(currTriggerValue);
+		}
+
+		std::vector<std::string> controllerInfo;
+		controllerInfo.push_back("Press RIGHT to clear key");
+		controllerInfo.push_back("Press RETURN to configure button");
+		controllerInfo.push_back("");
+
+		auto it = 0;
+		for (auto confTag : controllerConfTags) {
+			controllerInfo.back() = controllerConfTagDetail.at(it);
+			if (menu.OptionPlus(CharAdapter(("Assign " + confTag).c_str()), controllerInfo, nullptr, std::bind(clearControllerButton, confTag), nullptr)) {
+				bool result = configControllerButton(confTag);
+				//showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+				if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+				WAIT(1000);
+			}
+			it++;
+		}
 	}
 
 	/* Yes hello I am root - 2 */
@@ -1989,6 +2041,7 @@ void update_menu() {
 			if (menu.OptionPlus(CharAdapter(("Assign " + confTag).c_str()), keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag), nullptr)) {
 				bool result = configKeyboardKey(confTag);
 				if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+				WAIT(1000);
 			}
 			it++;
 		}
@@ -2684,7 +2737,6 @@ bool configKeyboardKey(std::string confTag) {
 				return true;
 			}
 		}
-
 		// A-Z
 		for (int i = 0x41; i <= 0x5A; i++) {
 			if (isMenuControl(i))
@@ -2704,12 +2756,23 @@ bool configKeyboardKey(std::string confTag) {
 
 bool configControllerButton(std::string confTag) {
 	std::string additionalInfo = "Press " + escapeKey + " to exit.";
+	XboxController* rawController = controls.GetRawController();
+	if (rawController == nullptr)
+		return false;
 
 	while (true) {
-		//if (IsKeyJustUp(str2key(escapeKey))) {
+		if (IsKeyJustUp(str2key(escapeKey))) {
 			return false;
-		//}
+		}
+		controls.UpdateValues(ScriptControls::InputDevices::Controller, false, true);
 
+		for (std::string buttonHelper : rawController->XboxButtonsHelper) {
+			auto button = rawController->StringToButton(buttonHelper);
+			if (rawController->IsButtonJustPressed(button, controls.GetButtonState())) {
+				saveControllerButton(confTag, buttonHelper);
+				return true;
+			}
+		}
 		showSubtitle("Press " + confTag + ". " + additionalInfo);
 		WAIT(0);
 	}
