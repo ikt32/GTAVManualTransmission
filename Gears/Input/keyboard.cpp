@@ -52,6 +52,22 @@ void ResetKeyState(DWORD key)
 
 DWORD str2key(std::string humanReadableKey)
 {
+	auto keymap = createKeyMap();
+	if (humanReadableKey.length() == 1)
+	{
+		char letter = humanReadableKey.c_str()[0];
+
+		if ((letter >= 0x30 && letter <= 0x39) || (letter >= 0x41 && letter <= 0x5A))
+		{
+			return static_cast<int>(letter);
+		}
+	}
+	
+	//return keymap[humanReadableKey];
+	return GetWithDef(keymap, humanReadableKey, -1);
+}
+
+std::map<std::string, int> createKeyMap() {
 	std::map<std::string, int> keymap;
 
 	keymap["LMB"] = VK_LBUTTON;
@@ -164,20 +180,7 @@ DWORD str2key(std::string humanReadableKey)
 	keymap["VK_OEM_6"] = VK_OEM_6;		// } ]
 	keymap["VK_OEM_7"] = VK_OEM_7;		// " '
 	keymap["VK_OEM_8"] = VK_OEM_8;		// § !
-	keymap["VK_OEM_102"] = VK_OEM_102;	// > <
-
-
-
-	if (humanReadableKey.length() == 1)
-	{
-		char letter = humanReadableKey.c_str()[0];
-
-		if ((letter >= 0x30 && letter <= 0x39) || (letter >= 0x41 && letter <= 0x5A))
-		{
-			return static_cast<int>(letter);
-		}
-	}
-	
-	//return keymap[humanReadableKey];
-	return GetWithDef(keymap, humanReadableKey, -1);
+	keymap["VK_OEM_102"] = VK_OEM_102;	// > <	
+	return keymap;
 }
+

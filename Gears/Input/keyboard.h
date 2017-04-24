@@ -8,6 +8,7 @@
 
 #include <windows.h>
 #include <string>
+#include <map>
 
 // parameters are the same as with aru's ScriptHook for IV
 void OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BOOL isExtended, BOOL isWithAlt, BOOL wasDownBefore, BOOL isUpNow);
@@ -28,3 +29,5 @@ V GetWithDef(const C<K, V, Args...>& m, K const& key, const V & defval)
 		return defval;
 	return it->second;
 }
+
+std::map<std::string, int> createKeyMap();
