@@ -17,15 +17,17 @@ Additions:
   * Change HUD settings
   * Change wheel options, keyboard controls and controller controls
   * Assign controls in-game
-* Add gear rattle sound on miss-shift, clear when press clutch (or change gear properly)
+* Add gear rattle sound on miss-shift, clears on clutch press or proper gear change
 
 FiveM:
 * Fixed speed display for b505
 * Still investigating crashes?
+* Not sure what happened to the rev limiter :thinking:
 
 Wheel changes:
 * Input detection uses clutch too, now
-* Rewrite pedal logic :'(. It was NOT fun.
+* Rewrite ingame pedal logic :'(. It was NOT fun.
+* Remove nonsense combined input code. Original code was plenty good to handle combined axes and I'm an idiot!!!
 * Significantly increase wheel resistance when engine is off. This simulates no power steering!
 
 Other changes:
