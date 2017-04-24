@@ -163,7 +163,7 @@ public:
 	// BLEURGHGHHHGGGKKKKKGGGG
 	// Uh, like, I abstracted the controls to numbers @ read and use those values
 	// but now I want to show them again...
-	int ConfTag2key(std::string confTag) {
+	int ConfTagKB2key(std::string confTag) {
 		if (confTag == "Toggle") return KBControl[static_cast<int>(KeyboardControlType::Toggle)];
 		if (confTag == "ToggleH") return KBControl[static_cast<int>(KeyboardControlType::ToggleH)];
 		if (confTag == "ShiftUp") return KBControl[static_cast<int>(KeyboardControlType::ShiftUp)];
@@ -183,6 +183,20 @@ public:
 		if (confTag == "HN") return KBControl[static_cast<int>(KeyboardControlType::HN)];
 
 		return -1;
+	}
+
+	// Same sentiment applies here
+	std::string ConfTagController2Value(std::string confTag) {
+		if (confTag == "Toggle") return ControlXbox[static_cast<int>(ControllerControlType::Toggle)];
+		if (confTag == "ToggleShift") return ControlXbox[static_cast<int>(ControllerControlType::ToggleH)];
+		if (confTag == "ShiftUp") return ControlXbox[static_cast<int>(ControllerControlType::ShiftUp)];
+		if (confTag == "ShiftDown") return ControlXbox[static_cast<int>(ControllerControlType::ShiftDown)];
+		if (confTag == "Clutch") return ControlXbox[static_cast<int>(ControllerControlType::Clutch)];
+		if (confTag == "Engine") return ControlXbox[static_cast<int>(ControllerControlType::Engine)];
+		if (confTag == "Throttle") return ControlXbox[static_cast<int>(ControllerControlType::Throttle)];
+		if (confTag == "Brake") return ControlXbox[static_cast<int>(ControllerControlType::Brake)];
+
+		return "UNKNOWN";
 	}
 
 private:

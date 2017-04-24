@@ -2016,6 +2016,7 @@ void update_menu() {
 		auto it = 0;
 		for (auto confTag : controllerConfTags) {
 			controllerInfo.back() = controllerConfTagDetail.at(it);
+			controllerInfo.push_back("Assigned to " + controls.ConfTagController2Value(confTag));
 			if (menu.OptionPlus(CharAdapter(("Assign " + confTag).c_str()), controllerInfo, nullptr, std::bind(clearControllerButton, confTag), nullptr)) {
 				bool result = configControllerButton(confTag);
 				//showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
@@ -2023,6 +2024,7 @@ void update_menu() {
 				WAIT(1000);
 			}
 			it++;
+			controllerInfo.pop_back();
 		}
 	}
 
@@ -2038,7 +2040,7 @@ void update_menu() {
 		int it = 0;
 		for (auto confTag : keyboardConfTags) {
 			keyboardInfo.back() = keyboardConfTagsDetail.at(it);
-			keyboardInfo.push_back("Assigned to " + key2str(controls.ConfTag2key(confTag)));
+			keyboardInfo.push_back("Assigned to " + key2str(controls.ConfTagKB2key(confTag)));
 			if (menu.OptionPlus(CharAdapter(("Assign " + confTag).c_str()), keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag), nullptr)) {
 				bool result = configKeyboardKey(confTag);
 				if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
