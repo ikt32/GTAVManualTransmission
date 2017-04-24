@@ -6,13 +6,17 @@ Configuration changes:
 * `settings_wheel.ini`
   * `[FORCE_FEEDBACK]` section uses decimal numbers now
   * Version updated to `430` to reflect this.
-* No `settings_general.ini` changes
-  * Version still `420R`
+* `settings_general.ini`
+  * In `[CONTROLLER]`, `TriggerValue` uses decimal numbers now
+  * Version updated to `430` to reflect this.
 * `*.ini` files can now also have `true` or `false` instead of `0` or `1`. Both still work.
 
 Additions:
-* Added a menu. By default accessible with `[{` key.
-  * Pretty much everything in the config files are changeable here, except for controller controls.
+* Added a menu. By default accessible with `[{` key. Pretty much everything in the config files are changeable here :)
+  * Change mod options
+  * Change HUD settings
+  * Change wheel options, keyboard controls and controller controls
+  * Assign controls in-game
 * Add gear rattle sound on miss-shift, clear when press clutch (or change gear properly)
 
 FiveM:
@@ -25,6 +29,8 @@ Wheel changes:
 * Significantly increase wheel resistance when engine is off. This simulates no power steering!
 
 Other changes:
+* Added normal +/-/,/. to keymap
+  * Please note that left/right shift distinguish and mouse buttons aren't supported still. Nag to Alexander Blade about this.
 * Make clutch grab self-accelerate a bit more tame, stop revving over 0.3
 * Set engine RPM display to 0 when engine is off.
 * More aggressive custom revving
