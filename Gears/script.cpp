@@ -2769,6 +2769,10 @@ bool configControllerButton(std::string confTag) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void main() {
+	if (!controls.WheelControl.PreInit()) {
+		logger.Write("DirectInput failed to initialize");
+	}
+
 	settingsGeneralFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_general.ini";
 	settingsWheelFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_wheel.ini";
 	settingsMenuFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_menu.ini";

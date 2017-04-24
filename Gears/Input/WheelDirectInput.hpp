@@ -56,6 +56,7 @@ public:
 
 	WheelDirectInput();
 	~WheelDirectInput();
+	bool PreInit();
 
 	bool InitWheel();
 

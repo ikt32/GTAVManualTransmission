@@ -12,17 +12,30 @@
 WheelDirectInput::WheelDirectInput() : pCFEffect{nullptr},
                                        pFREffect{nullptr} {
 	// Just set up to ensure djs can always be used.
+	//if (FAILED(DirectInput8Create(GetModuleHandle(nullptr),
+	//	DIRECTINPUT_VERSION,
+	//	IID_IDirectInput8,
+	//	reinterpret_cast<void**>(&lpDi),
+	//	nullptr))) {
+	//	return;
+	//}
+	//djs.enumerate(lpDi);
+}
+
+WheelDirectInput::~WheelDirectInput() { }
+
+bool WheelDirectInput::PreInit() {
+	// Just set up to ensure djs can always be used.
 	if (FAILED(DirectInput8Create(GetModuleHandle(nullptr),
 		DIRECTINPUT_VERSION,
 		IID_IDirectInput8,
 		reinterpret_cast<void**>(&lpDi),
 		nullptr))) {
-		return;
+		return false;
 	}
 	djs.enumerate(lpDi);
+	return true;
 }
-
-WheelDirectInput::~WheelDirectInput() { }
 
 bool WheelDirectInput::InitWheel() {
 	logger.Write("WHEEL: Initializing steering wheel"); 
