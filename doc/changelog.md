@@ -12,7 +12,7 @@ Configuration changes:
 
 Additions:
 * Added a menu. By default accessible with `[{` key.
-  * Pretty much everything in the config files are changeable here, except for keyboard and controller controls.
+  * Pretty much everything in the config files are changeable here, except for controller controls.
 * Add gear rattle sound on miss-shift, clear when press clutch (or change gear properly)
 
 FiveM:
