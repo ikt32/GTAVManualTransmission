@@ -150,6 +150,15 @@ public:
 	GUID SteerGUID;
 	WheelAxisType SteerAxisType;
 
+	// blergh
+	XboxController *GetRawController() {
+		return &controller;
+	}
+	// BLERGH
+	WORD GetButtonState() const {
+		return buttonState;
+	}
+
 private:
 	bool resolveCombinedPedals(int RawT);
 	bool IsKeyPressed(int key);
