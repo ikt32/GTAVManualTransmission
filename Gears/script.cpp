@@ -260,8 +260,8 @@ void update() {
 			controls.PrevInput == ScriptControls::Wheel) {
 			if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
 				controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
-				controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle) ||
-				controls.ButtonJustPressed(ScriptControls::LegacyControlType::Toggle) ) {
+				controls.ButtonHeld(ScriptControls::WheelControlType::Toggle) ||
+				controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::Toggle) ) {
 				reInit();
 			}
 
@@ -289,7 +289,7 @@ void update() {
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle) ||
 		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) || 
-		controls.ButtonHeld(ScriptControls::LegacyControlType::Toggle)) {
+		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonHeld(ScriptControls::LegacyControlType::Toggle)) {
 		toggleManual();
 	}
 
@@ -333,7 +333,7 @@ void update() {
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ToggleH) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::ToggleH) ||
 		controls.ButtonHeld(ScriptControls::ControllerControlType::ToggleH) ||
-		controls.ButtonHeld(ScriptControls::LegacyControlType::ToggleH)) {
+		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonHeld(ScriptControls::LegacyControlType::ToggleH)) {
 		cycleShiftMode();
 	}
 
