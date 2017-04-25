@@ -19,6 +19,7 @@ Additions:
   * Assign controls in-game
   * Show existing control assignments
 * Add gear rattle sound on miss-shift, clears on clutch press or proper gear change
+* Support for non-Xinput controllers again (specify in .ini)
 
 FiveM:
 * Fixed speed display for b505
@@ -38,6 +39,7 @@ Other changes:
 * Make clutch grab self-accelerate a bit more tame, stop revving over 0.3
 * Set engine RPM display to 0 when engine is off.
 * More aggressive custom revving
+* Pretty debug info
 
 ## 4.2.0 - Release
 Configuration changes:

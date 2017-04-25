@@ -99,9 +99,6 @@ public:
 	// [CONTROLLER]
 	bool ToggleEngine = false; // false makes it just turn ON the engine
 
-	// [CONTROLLER_LEGACY]
-	bool UseLegacyController = false;
-
 	// [DEBUG]
 	bool DisplayInfo = false;
 	bool LogCar = false;

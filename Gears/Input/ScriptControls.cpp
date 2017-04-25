@@ -27,7 +27,15 @@ void ScriptControls::InitWheel(bool initffb) {
 }
 
 void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, bool justPeekingWheelKb) {
+#ifdef GAME_BUILD
+	if (UseLegacyController) {
+		lcontroller.UpdateButtonChangeStates();
+	}
+
+	if (!UseLegacyController && controller.IsConnected()) {
+#else
 	if (controller.IsConnected()) {
+#endif
 		buttonState = controller.GetState().Gamepad.wButtons;
 		controller.UpdateButtonChangeStates();
 	}
@@ -43,12 +51,28 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 			ThrottleVal = (IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)]) ? 1.0f : 0.0f);
 			BrakeVal = (IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Brake)]) ? 1.0f : 0.0f);
 			ClutchVal = (IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Clutch)]) ? 1.0f : 0.0f);
+			ClutchValRaw = ClutchVal;
 			break;
 		}			
 		case Controller: {
+#ifdef GAME_BUILD
+			if (UseLegacyController) {
+				ThrottleVal = lcontroller.GetAnalogValue(lcontroller.EControlToButton(LegacyControls[static_cast<int>(LegacyControlType::Throttle)]));
+				BrakeVal = lcontroller.GetAnalogValue(lcontroller.EControlToButton(LegacyControls[static_cast<int>(LegacyControlType::Brake)]));
+				ClutchVal = lcontroller.GetAnalogValue(lcontroller.EControlToButton(LegacyControls[static_cast<int>(LegacyControlType::Clutch)]));
+				ClutchValRaw = ClutchVal;
+			} else {
+				ThrottleVal = controller.GetAnalogValue(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState);
+				BrakeVal = controller.GetAnalogValue(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Brake)]), buttonState);
+				ClutchVal = controller.GetAnalogValue(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Clutch)]), buttonState);
+				ClutchValRaw = ClutchVal;
+			}
+#else
 			ThrottleVal = controller.GetAnalogValue(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState);
 			BrakeVal = controller.GetAnalogValue(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Brake)]), buttonState);
 			ClutchVal = controller.GetAnalogValue(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Clutch)]), buttonState);
+			ClutchValRaw = ClutchVal;
+#endif
 			break;
 		}
 		case Wheel: {
@@ -112,10 +136,21 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
 		IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)])) {
 		return Keyboard;
 	}
-	if (controller.IsButtonJustPressed(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState) ||
-		controller.IsButtonPressed(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState)) {
-		return Controller;
+#ifdef GAME_BUILD
+	if (UseLegacyController) {
+		if (lcontroller.IsButtonJustPressed(lcontroller.EControlToButton(LegacyControls[static_cast<int>(LegacyControlType::Throttle)])) ||
+			lcontroller.IsButtonPressed(lcontroller.EControlToButton(LegacyControls[static_cast<int>(LegacyControlType::Throttle)]))) {
+			return Controller;
+		}
+	} else {
+#endif
+		if (controller.IsButtonJustPressed(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState) ||
+			controller.IsButtonPressed(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState)) {
+			return Controller;
+		}
+#ifdef GAME_BUILD
 	}
+#endif
 	if (enableWheel && WheelControl.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
 		// Oh my god I hate single-axis throttle/brake steering wheels
 		// Looking at you DFGT.
@@ -220,6 +255,9 @@ bool ScriptControls::ButtonIn(ControllerControlType control) {
 
 void ScriptControls::SetXboxTrigger(float value) {
 	controller.TriggerValue = value;
+#ifdef GAME_BUILD
+	lcontroller.TriggerValue = value;
+#endif
 }
 
 float ScriptControls::GetXboxTrigger() {

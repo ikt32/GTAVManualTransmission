@@ -260,7 +260,8 @@ void update() {
 			controls.PrevInput == ScriptControls::Wheel) {
 			if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
 				controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
-				controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle)) {
+				controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle) ||
+				controls.ButtonJustPressed(ScriptControls::LegacyControlType::Toggle) ) {
 				reInit();
 			}
 
@@ -286,8 +287,9 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
-		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
-		controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle)) {
+		controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle) ||
+		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) || 
+		controls.ButtonHeld(ScriptControls::LegacyControlType::Toggle)) {
 		toggleManual();
 	}
 
@@ -329,8 +331,9 @@ void update() {
 	
 
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ToggleH) ||
+		controls.ButtonJustPressed(ScriptControls::WheelControlType::ToggleH) ||
 		controls.ButtonHeld(ScriptControls::ControllerControlType::ToggleH) ||
-		controls.ButtonJustPressed(ScriptControls::WheelControlType::ToggleH)) {
+		controls.ButtonHeld(ScriptControls::LegacyControlType::ToggleH)) {
 		cycleShiftMode();
 	}
 
@@ -931,6 +934,7 @@ void functionHShiftWheel() {
 void functionSShift() {
 	// Shift up
 	if (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftUp) ||
+		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::ShiftUp) ||
 		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftUp) ||
 		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftUp)) {
 		if (vehData.NoClutch) {
@@ -968,6 +972,7 @@ void functionSShift() {
 	// Shift down
 
 	if (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftDown) ||
+		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::ShiftDown) || 
 		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftDown) ||
 		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftDown)) {
 		if (vehData.NoClutch) {
@@ -1005,9 +1010,10 @@ void functionSShift() {
 
 void functionAShift() { // Automatic
 	// Shift up
-	if (controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftUp) ||
-		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftUp) ||
-		controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftUp)) {
+	if (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftUp) ||
+		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::ShiftUp) ||
+		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftUp) ||
+		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftUp)) {
 		// Reverse to Neutral
 		if (vehData.CurrGear == 0 && !vehData.SimulatedNeutral) {
 			shiftTo(1, true);
@@ -1024,9 +1030,10 @@ void functionAShift() { // Automatic
 
 	// Shift down
 
-	if (controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftDown) ||
-		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftDown) ||
-		controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftDown)) {
+	if (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftDown) ||
+		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::ShiftDown) ||
+		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftDown) ||
+		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftDown)) {
 		// 1 to Neutral
 		if (vehData.CurrGear == 1 && !vehData.SimulatedNeutral) {
 			vehData.SimulatedNeutral = true;
@@ -1514,13 +1521,15 @@ void functionAutoReverse() {
 void handleVehicleButtons() {
 	if  (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
 		(controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) ||
-		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
+		 controls.ButtonJustPressed(ScriptControls::LegacyControlType::Engine) || 
+		 controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine) ||
 		settings.ThrottleStart && controls.ThrottleVal > 0.98f && controls.ClutchVal > settings.ClutchCatchpoint)) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 	if  (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
 		((controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) && settings.ToggleEngine) ||
+		 (controls.ButtonJustPressed(ScriptControls::LegacyControlType::Engine) && settings.ToggleEngine) ||
 		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine))) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
@@ -1972,7 +1981,7 @@ void update_menu() {
 		
 		menu.MenuOption("Controller", "controllermenu");
 		menu.MenuOption("Keyboard", "keyboardmenu");
-		menu.BoolOption("Non Xinput controller?", &settings.UseLegacyController);
+		menu.BoolOption("Non Xinput controller?", &controls.UseLegacyController);
 	}
 
 	/* Yes hello I am root - 2 */

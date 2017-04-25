@@ -163,6 +163,7 @@ public:
 	std::array<std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
 #ifdef GAME_BUILD
 	std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> LegacyControls = {};
+	bool UseLegacyController = false;
 #endif
 	std::array<int, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
 	
@@ -224,7 +225,6 @@ public:
 
 		return "UNKNOWN";
 	}
-
 private:
 	long long pressTime = 0;
 	long long releaseTime = 0;

@@ -63,6 +63,7 @@ public:
 		eControl::ControlFrontendSelect		,
 		-1 // UNKNOWN
 	};
+	float TriggerValue;
 
 private:
 	std::array<__int64, SIZEOF_GameButtons> pressTime;
@@ -78,6 +79,7 @@ public:
 	bool IsButtonJustPressed(GameButtons gameButton);
 	bool IsButtonJustReleased(GameButtons gameButton);
 	bool WasButtonHeldForMs(GameButtons gameButton, int milliseconds);
+	void UpdateButtonChangeStates();
 
 	float GetAnalogValue(GameButtons gameButton);
 	GameButtons EControlToButton(int eControlItem);

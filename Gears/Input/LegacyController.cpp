@@ -16,18 +16,29 @@ bool LegacyController::IsButtonPressed(GameButtons gameButton) {
 	if (CONTROLS::IS_CONTROL_PRESSED(0, GameEnums[gameButton])) {
 		return true;
 	}
+	if (CONTROLS::GET_CONTROL_NORMAL(0, GameEnums[gameButton]) > TriggerValue) {
+		return true;
+	}
 	return false;
 }
 
 bool LegacyController::IsButtonJustPressed(GameButtons gameButton) {
-	if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, GameEnums[gameButton]))
+	gameButtonCurr[gameButton] = IsButtonPressed(gameButton);
+
+	// raising edge
+	if (gameButtonCurr[gameButton] && !gameButtonPrev[gameButton]) {
 		return true;
+	}
 	return false;
 }
 
 bool LegacyController::IsButtonJustReleased(GameButtons gameButton) {
-	if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, GameEnums[gameButton]))
+	gameButtonCurr[gameButton] = IsButtonPressed(gameButton);
+
+	// falling edge
+	if (!gameButtonCurr[gameButton] && gameButtonPrev[gameButton]) {
 		return true;
+	}
 	return false;
 }
 
@@ -45,6 +56,12 @@ bool LegacyController::WasButtonHeldForMs(GameButtons gameButton, int millisecon
 		return true;
 	}
 	return false;
+}
+
+void LegacyController::UpdateButtonChangeStates() {
+	for (int i = 0; i < SIZEOF_GameButtons; i++) {
+		gameButtonPrev[i] = gameButtonCurr[i];
+	}
 }
 
 float LegacyController::GetAnalogValue(GameButtons gameButton) {
