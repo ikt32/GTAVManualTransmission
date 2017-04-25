@@ -139,5 +139,5 @@ void clearControllerButton(std::string button);
 bool configAxis(std::string confTag);
 bool configButton(std::string confTag);
 bool configHPattern();
-bool configKeyboardKey(std::string confTag);
-bool configControllerButton(std::string confTag);
+bool configKeyboardKey(const std::string &confTag);
+bool configControllerButton(const std::string &confTag);

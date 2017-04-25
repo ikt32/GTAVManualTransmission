@@ -197,7 +197,7 @@ public:
 	// BLEURGHGHHHGGGKKKKKGGGG
 	// Uh, like, I abstracted the controls to numbers @ read and use those values
 	// but now I want to show them again...
-	int ConfTagKB2key(std::string confTag) {
+	int ConfTagKB2key(const std::string &confTag) {
 		if (confTag == "Toggle") return KBControl[static_cast<int>(KeyboardControlType::Toggle)];
 		if (confTag == "ToggleH") return KBControl[static_cast<int>(KeyboardControlType::ToggleH)];
 		if (confTag == "ShiftUp") return KBControl[static_cast<int>(KeyboardControlType::ShiftUp)];
@@ -220,7 +220,7 @@ public:
 	}
 
 	// Same sentiment applies here
-	std::string ConfTagController2Value(std::string confTag) {
+	std::string ConfTagController2Value(const std::string &confTag) {
 		if (confTag == "Toggle") return ControlXbox[static_cast<int>(ControllerControlType::Toggle)];
 		if (confTag == "ToggleShift") return ControlXbox[static_cast<int>(ControllerControlType::ToggleH)];
 		if (confTag == "ShiftUp") return ControlXbox[static_cast<int>(ControllerControlType::ShiftUp)];

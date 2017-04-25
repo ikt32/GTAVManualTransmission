@@ -300,10 +300,11 @@ bool ScriptControls::ButtonHeld(LegacyControlType control) {
 bool ScriptControls::ButtonIn(LegacyControlType control) {
 	if (!UseLegacyController) return false;
 	auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
-	if (controller.IsButtonPressed(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState))
+	if (lcontroller.IsButtonPressed(gameButton))
 		return true;
 	return false;
 }
+
 #endif
 /*
  * Wheel section

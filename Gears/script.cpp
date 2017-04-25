@@ -518,7 +518,6 @@ void showHUD() {
 	if (settings.Speedo == "kph" ||
 		settings.Speedo == "mph" ||
 		settings.Speedo == "ms") {
-		char * speedoText = "";
 		std::stringstream speedoFormat;
 
 		float dashms = ext.GetDashSpeed(vehicle);
@@ -535,7 +534,7 @@ void showHUD() {
 			speedoFormat << static_cast<int>(std::round(dashms));
 			if (settings.SpeedoShowUnit) speedoFormat << " m/s";
 		}
-		speedoText = CharAdapter(speedoFormat.str().c_str());
+		char *speedoText = CharAdapter(speedoFormat.str().c_str());
 		showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize, speedoText);
 	}
 
@@ -1776,7 +1775,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 		controls.WheelControl.PlayLedsDInput(controls.SteerGUID, vehData.Rpm, 0.45, 0.95);
 	}
 
-	Vector3 accelVals = vehData.getAccelerationVectors(vehData.V3Velocities);
+	vehData.getAccelerationVectors(vehData.V3Velocities);
 	Vector3 accelValsAvg = vehData.getAccelerationVectorsAverage();
 
 	float steerMult;
@@ -2622,17 +2621,8 @@ bool configButton(std::string str) {
 			}
 
 			//POV hat shit
-			std::string directionsStr = "?";
 			for (auto d : directions) {
 				if (controls.WheelControl.IsButtonPressed(d, guid)) {
-					if (d == WheelDirectInput::N) directionsStr = "N ";
-					if (d == WheelDirectInput::NE) directionsStr = "NE";
-					if (d == WheelDirectInput::E) directionsStr = " E";
-					if (d == WheelDirectInput::SE) directionsStr = "SE";
-					if (d == WheelDirectInput::S) directionsStr = "S ";
-					if (d == WheelDirectInput::SW) directionsStr = "SW";
-					if (d == WheelDirectInput::W) directionsStr = " W";
-					if (d == WheelDirectInput::NW) directionsStr = "NW";
 					saveButton(d, confTag, guid);
 					return true;
 				}
@@ -2644,17 +2634,6 @@ bool configButton(std::string str) {
 
 bool configHPattern() {
 	int buttonsActive = 0;
-
-	std::array<int, 8> directions = {
-		WheelDirectInput::POV::N,
-		WheelDirectInput::POV::NE,
-		WheelDirectInput::POV::E,
-		WheelDirectInput::POV::SE,
-		WheelDirectInput::POV::S,
-		WheelDirectInput::POV::SW,
-		WheelDirectInput::POV::W,
-		WheelDirectInput::POV::NW,
-	};
 
 	std::string confTag = "SHIFTER";
 	std::string additionalInfo = "Press " + escapeKey + " to exit. Press " + skipKey + " to skip gear.";
@@ -2726,6 +2705,7 @@ bool configHPattern() {
 			case 3: gearDisplay = "3rd gear"; break;
 			case 4: case 5: case 6:
 			case 7: gearDisplay = std::to_string(progress) + "th gear"; break;
+			default: gearDisplay = "?"; break;
 		}
 		showSubtitle("Shift into " + gearDisplay + ". " + additionalInfo);
 		WAIT(0);
@@ -2745,7 +2725,7 @@ bool isMenuControl(int control) {
 	return false;
 }
 
-bool configKeyboardKey(std::string confTag) {
+bool configKeyboardKey(const std::string &confTag) {
 	std::string additionalInfo = "Press " + escapeKey + " to exit.";
 	while (true) {
 		if (IsKeyJustUp(str2key(escapeKey))) {
@@ -2767,7 +2747,7 @@ bool configKeyboardKey(std::string confTag) {
 			if (isMenuControl(i))
 				continue;
 			if (IsKeyJustUp(i)) {
-				std::string str = "";
+				std::string str;
 				str = static_cast<char>(i);
 				saveKeyboardKey(confTag, str);
 				return true;
@@ -2778,7 +2758,7 @@ bool configKeyboardKey(std::string confTag) {
 			if (isMenuControl(i))
 				continue;
 			if (IsKeyJustUp(i)) {
-				std::string str = "";
+				std::string str;
 				str = static_cast<char>(i);
 				saveKeyboardKey(confTag, str);
 				return true;
@@ -2790,7 +2770,7 @@ bool configKeyboardKey(std::string confTag) {
 	}
 }
 
-bool configControllerButton(std::string confTag) {
+bool configControllerButton(const std::string &confTag) {
 	std::string additionalInfo = "Press " + escapeKey + " to exit.";
 	XboxController* rawController = controls.GetRawController();
 	if (rawController == nullptr)

@@ -137,7 +137,7 @@ void showSubtitle(std::string message, int duration = 2500);
 class CharAdapter
 {
 public:
-	CharAdapter(const char* s) : m_s(::_strdup(s)) { }
+	explicit CharAdapter(const char* s) : m_s(::_strdup(s)) { }
 	CharAdapter(const CharAdapter& other) = delete; // non construction-copyable
 	CharAdapter& operator=(const CharAdapter&) = delete; // non copyable
 	

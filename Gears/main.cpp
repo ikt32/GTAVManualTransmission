@@ -36,6 +36,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 			logger.Write("Init shutdown");
 			bool successI = MemoryPatcher::RestoreInstructions();
 			bool successS = MemoryPatcher::RestoreSteeringCorrection();
+			scriptUnregister(hInstance);
 
 			if (successI && successS) {
 				logger.Write("Shut down script successfully");
@@ -46,7 +47,6 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 				if (!successS)
 					logger.Write("Shut down script with steering not restored");
 			}
-			scriptUnregister(hInstance);
 			//keyboardHandlerUnregister(OnKeyboardMessage);
 			break;
 		}

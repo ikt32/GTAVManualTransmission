@@ -3,9 +3,7 @@
 #include "../Util/TimeHelper.hpp"
 
 
-LegacyController::LegacyController()
-{
-}
+LegacyController::LegacyController(): TriggerValue(0.75f) {}
 
 
 LegacyController::~LegacyController()

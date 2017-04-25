@@ -1,5 +1,6 @@
 /* MenuClass.h */ /* Taken from SudoMod*/
 
+#pragma once
 #include <string>
 #include <windows.h>
 #include <vector>

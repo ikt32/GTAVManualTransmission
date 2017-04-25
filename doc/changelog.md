@@ -5,6 +5,7 @@ Configuration changes:
 * Added `settings_menu.ini`
 * `settings_wheel.ini`
   * `[FORCE_FEEDBACK]` section uses decimal numbers now
+  * `[LOOK_LEFT]` and `[LOOK_RIGHT]` are added
   * Version updated to `430` to reflect this.
 * `settings_general.ini`
   * In `[CONTROLLER]`, `TriggerValue` uses decimal numbers now
@@ -31,6 +32,7 @@ Wheel changes:
 * Delay DirectInput setup from construction to main\(\)
 * Rewrite ingame pedal logic :'(. It was NOT fun.
 * Input detection uses clutch too, now
+* Add look left/right buttons
 * Significantly increase wheel resistance when engine is off. This simulates no power steering!
 
 Other changes:

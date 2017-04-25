@@ -46,7 +46,7 @@ void showSubtitle(std::string message, int duration) {
 	UI::END_TEXT_COMMAND_PRINT(duration, 1);
 }
 
-GameSound::GameSound(char *sound, char *soundSet) {
+GameSound::GameSound(char *sound, char *soundSet): m_prevNotification(0) {
 	Active = false;
 	m_sound = sound;
 	m_soundSet = soundSet;
