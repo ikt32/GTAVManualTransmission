@@ -2,6 +2,9 @@
 
 #include "XboxController.hpp"
 #include "WheelDirectInput.hpp"
+#ifdef GAME_BUILD
+#include "LegacyController.h"
+#endif
 
 class ScriptControls {
 public:
@@ -16,6 +19,20 @@ public:
 		Engine,
 		SIZEOF_ControllerControlType
 	};
+
+#ifdef GAME_BUILD
+	enum class LegacyControlType {
+		ShiftUp,
+		ShiftDown,
+		Clutch,
+		Throttle,
+		Brake,
+		Toggle,
+		ToggleH,
+		Engine,
+		SIZEOF_LegacyControlType
+	};
+#endif
 
 	enum class KeyboardControlType {
 		HR = 0,
@@ -87,68 +104,77 @@ public:
 
 	ScriptControls();
 	~ScriptControls();
+
 	void InitWheel(bool initffb);
-
-	InputDevices GetLastInputDevice(InputDevices previousInput, bool enableWheel = true);
 	void UpdateValues(InputDevices prevInput, bool ignoreClutch, bool justPeekingWheelKb);
+	InputDevices GetLastInputDevice(InputDevices previousInput, bool enableWheel = true);
+	
+	// Add more when desired
+	bool ButtonJustPressed(KeyboardControlType control);
+private:
+	bool IsKeyPressed(int key);
+	bool IsKeyJustPressed(int key, KeyboardControlType control);
 
-	float BrakeVal = 0.0f;
+
+public:
+	bool ButtonJustPressed(ControllerControlType control);
+	bool ButtonReleased(ControllerControlType control);
+	bool ButtonHeld(ControllerControlType control);
+	bool ButtonIn(ControllerControlType control);
+	void SetXboxTrigger(float value);
+	float GetXboxTrigger();
+#ifdef GAME_BUILD
+	bool ButtonJustPressed(LegacyControlType control);
+	bool ButtonReleased(LegacyControlType control);
+	bool ButtonHeld(LegacyControlType control);
+	bool ButtonIn(LegacyControlType control);
+#endif
+	bool ButtonJustPressed(WheelControlType control);
+	bool ButtonReleased(WheelControlType control);
+	bool ButtonHeld(WheelControlType control);
+	bool ButtonIn(WheelControlType control);
+	void CheckCustomButtons(bool justPeeking);
+	void CheckGUIDs(const std::vector<_GUID> &guids);
+
+	InputDevices PrevInput;
+
 	float ThrottleVal = 0.0f;
+	float BrakeVal = 0.0f;
 	float ClutchVal = 0.0f; 	// 1 = Pressed, 0 = Not pressed
 	float ClutchValRaw = 0.0f;	// For readout purposes. ClutchVal is for gameplay purposes.
 	float SteerVal = 0.5f;
 	float HandbrakeVal = 0.0f;
 
+
+	int CToggleTime = 1000;
+	int ThrottleUp = 0;
+	int ThrottleDown = 0;
+	int BrakeUp = 0;
+	int BrakeDown = 0;
+	int ClutchUp = 0;
+	int ClutchDown = 0;
+	int SteerLeft = 0;
+	int SteerRight = 0;
+	int HandbrakeUp = 0;
+	int HandbrakeDown = 0;
+	int WButtonHeld = 1000;
+
 	// Values are filled by ScriptSettings
 	std::array<std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
-	
+#ifdef GAME_BUILD
+	std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> LegacyControls = {};
+#endif
 	std::array<int, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
 	
 	std::array<std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
 	std::array<GUID, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxesGUIDs = {};
-
 	std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
 	std::array<GUID, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButtonGUIDs = {};
-
 	std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
-	GUID WheelToKeyGUID = {};
-	
-	int CToggleTime    = 1000;
-	int ThrottleUp	   = 0;
-	int ThrottleDown	   = 0;
-	int BrakeUp	   = 0;
-	int BrakeDown	   = 0;
-	int ClutchUp	   = 0;
-	int ClutchDown	   = 0;
-	int SteerLeft	   = 0;
-	int SteerRight	   = 0;
-	int HandbrakeUp   = 0;
-	int HandbrakeDown   = 0;
-	//bool ClutchDisable = false;
-	int WButtonHeld = 1000;
-
-	// Add more when desired
-	bool ButtonJustPressed(ControllerControlType control);
-	bool ButtonJustPressed(KeyboardControlType control);
-	bool ButtonJustPressed(WheelControlType control);
-	bool ButtonReleased(ControllerControlType control);
-	bool ButtonReleased(WheelControlType control);
-	bool ButtonHeld(WheelControlType control);
-	// Held for specified milliseconds in .ini
-	bool ButtonHeld(ControllerControlType control);
-	bool ButtonIn(WheelControlType control);
-	void CheckCustomButtons(bool justPeeking);
-	void CheckGUIDs(const std::vector<_GUID> &guids);
-	bool ButtonIn(ControllerControlType control);
-
-	WheelDirectInput WheelControl;
-
-	void SetXboxTrigger(float value);
-	float GetXboxTrigger();
-	InputDevices PrevInput;
-
 
 	GUID SteerGUID;
+	GUID WheelToKeyGUID = {};
+	WheelDirectInput WheelControl;
 	WheelAxisType SteerAxisType;
 
 	// blergh
@@ -200,17 +226,14 @@ public:
 	}
 
 private:
-	bool resolveCombinedPedals(int RawT);
-	bool IsKeyPressed(int key);
-	bool IsKeyJustPressed(int key, KeyboardControlType control);
-
 	long long pressTime = 0;
 	long long releaseTime = 0;
-
+#ifdef GAME_BUILD
+	LegacyController lcontroller;
+#endif
 	XboxController controller;
 	WORD buttonState;
 
-	
 	bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 };

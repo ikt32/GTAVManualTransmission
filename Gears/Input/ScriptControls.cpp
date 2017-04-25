@@ -2,7 +2,6 @@
 
 #include <Windows.h>
 #include "keyboard.h"
-//#include "keyboard.h"
 
 ScriptControls::ScriptControls(): WheelControl(),
                                 PrevInput(Keyboard),
@@ -227,6 +226,37 @@ float ScriptControls::GetXboxTrigger() {
 	return controller.TriggerValue;
 }
 
+/*
+ * Legacy stuff
+ */
+#ifdef GAME_BUILD
+bool ScriptControls::ButtonJustPressed(LegacyControlType control) {
+	auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
+	if (lcontroller.IsButtonJustPressed(gameButton))
+		return true;
+	return false;
+}
+bool ScriptControls::ButtonReleased(LegacyControlType control) {
+	auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
+	if (lcontroller.IsButtonJustReleased(gameButton))
+		return true;
+	return false;
+}
+
+bool ScriptControls::ButtonHeld(LegacyControlType control) {
+	auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
+	if (lcontroller.WasButtonHeldForMs(gameButton, CToggleTime))
+		return true;
+	return false;
+}
+
+bool ScriptControls::ButtonIn(LegacyControlType control) {
+	auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
+	if (controller.IsButtonPressed(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState))
+		return true;
+	return false;
+}
+#endif
 /*
  * Wheel section
  */
