@@ -1520,18 +1520,18 @@ void functionAutoReverse() {
 
 void handleVehicleButtons() {
 	if  (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
-		(controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) ||
-		 controls.ButtonJustPressed(ScriptControls::LegacyControlType::Engine) || 
-		 controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
-		controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine) ||
+		(controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) ||
+		 controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::Engine) ||
+		 controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
+		 controls.PrevInput == ScriptControls::Wheel		&& controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine) ||
 		settings.ThrottleStart && controls.ThrottleVal > 0.98f && controls.ClutchVal > settings.ClutchCatchpoint)) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
 	if  (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
-		((controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) && settings.ToggleEngine) ||
-		 (controls.ButtonJustPressed(ScriptControls::LegacyControlType::Engine) && settings.ToggleEngine) ||
-		controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
-		controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine))) {
+		((controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) && settings.ToggleEngine) ||
+		 (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::Engine) && settings.ToggleEngine) ||
+		 controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
+		 controls.PrevInput == ScriptControls::Wheel		&& controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine))) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 	}
 

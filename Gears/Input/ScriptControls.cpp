@@ -275,12 +275,14 @@ float ScriptControls::GetXboxTrigger() {
  */
 #ifdef GAME_BUILD
 bool ScriptControls::ButtonJustPressed(LegacyControlType control) {
+	if (!UseLegacyController) return false;
 	auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
 	if (lcontroller.IsButtonJustPressed(gameButton))
 		return true;
 	return false;
 }
 bool ScriptControls::ButtonReleased(LegacyControlType control) {
+	if (!UseLegacyController) return false;
 	auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
 	if (lcontroller.IsButtonJustReleased(gameButton))
 		return true;
@@ -288,6 +290,7 @@ bool ScriptControls::ButtonReleased(LegacyControlType control) {
 }
 
 bool ScriptControls::ButtonHeld(LegacyControlType control) {
+	if (!UseLegacyController) return false;
 	auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
 	if (lcontroller.WasButtonHeldForMs(gameButton, CToggleTime))
 		return true;
@@ -295,6 +298,7 @@ bool ScriptControls::ButtonHeld(LegacyControlType control) {
 }
 
 bool ScriptControls::ButtonIn(LegacyControlType control) {
+	if (!UseLegacyController) return false;
 	auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
 	if (controller.IsButtonPressed(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState))
 		return true;
