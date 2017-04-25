@@ -54,7 +54,7 @@ GameSound::GameSound(char *sound, char *soundSet): m_prevNotification(0) {
 }
 
 GameSound::~GameSound() {
-	AUDIO::STOP_SOUND(m_soundID);
+	if (m_soundID == -1 || !Active) return;
 	AUDIO::RELEASE_SOUND_ID(m_soundID);
 }
 
