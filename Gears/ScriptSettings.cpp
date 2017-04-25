@@ -4,11 +4,13 @@
 #ifdef GAME_BUILD
 #include <inc/enums.h>
 #endif
-#include "Input/keyboard.h"
 #include "Util/simpleini/SimpleIni.h"
+#include "Util/Logger.hpp"
+#include "Util/Util.hpp"
+#include "Input/keyboard.h"
 #include "Input/ScriptControls.hpp"
 #include "Menu/Controls.h"
-#include "Util/Util.hpp"
+#include "Menu/MenuClass.h"
 
 ScriptSettings::ScriptSettings(const std::string &general,
 	                           const std::string &wheel) :
@@ -33,8 +35,8 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	parseSettingsWheel(scriptControl);
 }
 
-void ScriptSettings::Read(MenuControls* menuControl) {
-	parseSettingsMenu(menuControl);
+void ScriptSettings::Read(MenuControls* menuControl, Menu *menuOpts) {
+	parseSettingsMenu(menuControl,menuOpts);
 }
 
 void ScriptSettings::SaveGeneral() const {
@@ -170,6 +172,18 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 	settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DetailStrength", DetailStrength);
 
 	settingsWheel.SaveFile(settingsWheelFile.c_str());
+}
+
+void ScriptSettings::SaveMenu(Menu *menuOpts) const {
+	CSimpleIniA settingsMenu;
+	settingsMenu.SetUnicode();
+	settingsMenu.LoadFile(settingsMenuFile.c_str());
+
+	// [MENU]
+	settingsMenu.SetDoubleValue("MENU", "MenuX", menuOpts->menux);
+	settingsMenu.SetDoubleValue("MENU", "MenuY", menuOpts->menuy);
+
+	settingsMenu.SaveFile(settingsMenuFile.c_str());
 }
 
 bool ScriptSettings::IsCorrectVersion() const {
@@ -336,7 +350,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 
 }
 
-void ScriptSettings::parseSettingsMenu(MenuControls *menuControl) {
+void ScriptSettings::parseSettingsMenu(MenuControls *menuControl, Menu *menuOpts) {
 	CSimpleIniA menuSettings;
 	menuSettings.SetUnicode();
 	menuSettings.LoadFile(settingsMenuFile.c_str());
@@ -348,6 +362,12 @@ void ScriptSettings::parseSettingsMenu(MenuControls *menuControl) {
 	menuControl->ControlKeys[MenuControls::ControlType::MenuRight] = str2key(menuSettings.GetValue("MENU", "MenuRight", "RIGHT"));
 	menuControl->ControlKeys[MenuControls::ControlType::MenuSelect] = str2key(menuSettings.GetValue("MENU", "MenuSelect", "RETURN"));
 	menuControl->ControlKeys[MenuControls::ControlType::MenuCancel] = str2key(menuSettings.GetValue("MENU", "MenuCancel", "BACKSPACE"));
+#pragma warning(push)
+#pragma warning(disable: 4244)
+	menuOpts->menux = menuSettings.GetDoubleValue("MENU", "MenuX", 0.2);
+	menuOpts->menuy = menuSettings.GetDoubleValue("MENU", "MenuY", 0.125);
+#pragma warning(pop)
+
 }
 
 

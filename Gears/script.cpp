@@ -700,7 +700,7 @@ void crossScriptComms() {
 
 void reInit() {
 	settings.Read(&controls);
-	settings.Read(&menuControls);
+	settings.Read(&menuControls, &menu);
 	// nasty but it should work enough...
 	menu.LoadMenuTheme(std::wstring(settingsMenuFile.begin(), settingsMenuFile.end()).c_str());
 
@@ -1902,6 +1902,7 @@ void menuClose() {
 	settings.SaveGeneral();
 	settings.SaveWheel(&controls);
 	settings.SaveController(&controls);
+	settings.SaveMenu(&menu);
 	menu.SaveMenuTheme(std::wstring(settingsMenuFile.begin(), settingsMenuFile.end()).c_str());
 }
 
@@ -2269,14 +2270,14 @@ void update_menu() {
 		menu.MenuOption("Highlighted", "settings_theme_scroller");
 		menu.MenuOption("Options Text", "settings_theme_options");
 		menu.MenuOption("Options Background", "settings_theme_optionsrect");
-		menu.FloatOption("Menu X position", &menu.menux, 0.0f, 1.0f, 0.025f);
-		menu.FloatOption("Menu Y position", &menu.menuy, 0.0f, 1.0f, 0.025f);
+		menu.FloatOption("Menu X position", &menu.menux, 0.0f, 1.0f, 0.005f);
+		menu.FloatOption("Menu Y position", &menu.menuy, 0.0f, 1.0f, 0.005f);
 	}
 
 	if (menu.CurrentMenu("settings_theme_titletext")) {
 		menu.Title("Title Text");
 		
-		int fontIndex = std::find(fontIDs.begin(), fontIDs.end(), menu.titleFont) - fontIDs.begin();
+		int fontIndex = static_cast<int>(std::find(fontIDs.begin(), fontIDs.end(), menu.titleFont) - fontIDs.begin());
 		int oldIndex = fontIndex;
 		menu.StringArray("Font: ", fonts, &fontIndex);
 		if (fontIndex != oldIndex) {
@@ -2307,7 +2308,7 @@ void update_menu() {
 	if (menu.CurrentMenu("settings_theme_options")) {
 		menu.Title("Options Text");
 
-		int fontIndex = std::find(fontIDs.begin(), fontIDs.end(), menu.optionsFont) - fontIDs.begin();
+		int fontIndex = static_cast<int>(std::find(fontIDs.begin(), fontIDs.end(), menu.optionsFont) - fontIDs.begin());
 		int oldIndex = fontIndex;
 		menu.StringArray("Font: ", fonts, &fontIndex);
 		if (fontIndex != oldIndex) {

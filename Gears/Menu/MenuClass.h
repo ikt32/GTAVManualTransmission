@@ -54,6 +54,7 @@ public:
 	int optionsFont = 6;
 	int titleFont = 7;
 	float menux = 0.2f;
+	float menuy = 0.125f;
 	rgba titleText = { 0, 0, 0, 255 };
 	rgba titleRect = { 255, 200, 0, 255 };
 	rgba scroller = { 80, 80, 80, 200 };
@@ -83,13 +84,13 @@ private:
 	int lastoption[100];
 	int menulevel = 0;
 	int infocount = 0;
-	int delay = GetTickCount();
+	unsigned int delay = GetTickCount();
 	
-	const int menuTimeSlow = 120;
-	const int menuTimeMedium = 90;
-	const int menuTimeFast = 60;
+	const unsigned int menuTimeSlow = 120;
+	const unsigned int menuTimeMedium = 90;
+	const unsigned int menuTimeFast = 60;
 	
-	int menuTime = menuTimeMedium;
+	unsigned int menuTime = menuTimeMedium;
 
 
 	void drawText(const char *text, int font, float x, float y, float scalex, float scaley, rgba rgba, bool center);

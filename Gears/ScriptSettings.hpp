@@ -2,11 +2,11 @@
 #include <Windows.h>
 
 #include <vector>
-#include "Util/Logger.hpp"
-#include "menu/Controls.h"
 
 class Logger;
 class ScriptControls;
+class Menu;
+class MenuControls;
 
 //const std::string CORRECTVGENERAL	= "430";
 //const std::string CORRECTVWHEEL		= "430";
@@ -18,9 +18,10 @@ public:
 	void SetFiles(const std::string &general, const std::string &wheel);
 	void SetMenuFile(const std::string & menu);
 	void Read(ScriptControls* scriptControl);
-	void Read(MenuControls *menuControl);
+	void Read(MenuControls *menuControl, Menu *menuOpts);
 	void SaveGeneral() const;
 	void SaveController(ScriptControls *scriptControl) const;
+	void SaveMenu(Menu *menuOpts) const;
 	void SaveWheel(ScriptControls *scriptControl) const;
 	bool IsCorrectVersion() const;
 	std::string GetVersionError();
@@ -145,7 +146,7 @@ public:
 private:
 	void parseSettingsGeneral(ScriptControls *scriptControl);
 	void parseSettingsWheel(ScriptControls *scriptControl);
-	void parseSettingsMenu(MenuControls *controls);
+	void parseSettingsMenu(MenuControls *controls, Menu *menuOpts);
 
 	std::string settings_general_version = "000";
 	std::string settings_wheel_version = "000";
