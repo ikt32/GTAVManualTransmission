@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include "inc/enums.h"
 
 class LegacyController
 {
@@ -35,31 +36,31 @@ public:
 	};
 
 	std::array<int, SIZEOF_GameButtons> GameEnums = {
-		ControlFrontendDown		 ,
-		ControlFrontendUp		 ,
-		ControlFrontendLeft		 ,
-		ControlFrontendRight	 ,
-		ControlFrontendRdown	 ,
-		ControlFrontendRup		 ,
-		ControlFrontendRleft	 ,
-		ControlFrontendRright	 ,
-		ControlFrontendAxisX	 ,
-		ControlFrontendAxisY	 ,
-		ControlFrontendRightAxisX,
-		ControlFrontendRightAxisY,
-		ControlFrontendPause	 ,
-		ControlFrontendAccept	 ,
-		ControlFrontendCancel	 ,
-		ControlFrontendX		 ,
-		ControlFrontendY		 ,
-		ControlFrontendLb		 ,
-		ControlFrontendRb		 ,
-		ControlFrontendLt		 ,
-		ControlFrontendRt		 ,
-		ControlFrontendLs		 ,
-		ControlFrontendRs		 ,
-		ControlFrontendDelete	 ,
-		ControlFrontendSelect,
+		eControl::ControlFrontendDown		,
+		eControl::ControlFrontendUp			,
+		eControl::ControlFrontendLeft		,
+		eControl::ControlFrontendRight		,
+		eControl::ControlFrontendRdown		,
+		eControl::ControlFrontendRup		,
+		eControl::ControlFrontendRleft		,
+		eControl::ControlFrontendRright		,
+		eControl::ControlFrontendAxisX		,
+		eControl::ControlFrontendAxisY		,
+		eControl::ControlFrontendRightAxisX	,
+		eControl::ControlFrontendRightAxisY	,
+		eControl::ControlFrontendPause		,
+		eControl::ControlFrontendAccept		,
+		eControl::ControlFrontendCancel		,
+		eControl::ControlFrontendX			,
+		eControl::ControlFrontendY			,
+		eControl::ControlFrontendLb			,
+		eControl::ControlFrontendRb			,
+		eControl::ControlFrontendLt			,
+		eControl::ControlFrontendRt			,
+		eControl::ControlFrontendLs			,
+		eControl::ControlFrontendRs			,
+		eControl::ControlFrontendDelete		,
+		eControl::ControlFrontendSelect		,
 		-1 // UNKNOWN
 	};
 
