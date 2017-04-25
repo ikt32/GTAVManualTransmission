@@ -575,6 +575,18 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 		DeviceIndexToGUID(settingsWheel.GetLongValue("LOOK_BACK", "DEVICE", -1), reggdGuids);
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::LookBack)] =
 		settingsWheel.GetLongValue("LOOK_BACK", "BUTTON", -1);
+	
+	// [LOOK_LEFT]
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::LookLeft)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("LOOK_LEFT", "DEVICE", -1), reggdGuids);
+	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::LookLeft)] =
+		settingsWheel.GetLongValue("LOOK_LEFT", "BUTTON", -1);
+	
+	// [LOOK_RIGHT]
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::LookRight)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("LOOK_RIGHT", "DEVICE", -1), reggdGuids);
+	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::LookRight)] =
+		settingsWheel.GetLongValue("LOOK_RIGHT", "BUTTON", -1);
 
 	// [CHANGE_CAMERA]
 	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::Camera)] =

@@ -51,6 +51,9 @@ int prevExtShift = 0;
 int speedoIndex;
 //todo: srsly unfuck pls
 
+// T_T
+bool lookrightfirst = false;
+
 std::vector<std::string> speedoTypes = {
 	"off",
 	"kph",
@@ -89,6 +92,8 @@ std::vector<std::string> buttonConfTags{
 	{ "HORN" },
 	{ "LIGHTS" },
 	{ "LOOK_BACK" },
+	{ "LOOK_LEFT" },
+	{ "LOOK_RIGHT" },
 	{ "CHANGE_CAMERA" },
 	{ "RADIO_NEXT" },
 	{ "RADIO_PREVIOUS" },
@@ -1555,6 +1560,32 @@ void handleVehicleButtons() {
 	if (controls.ButtonIn(ScriptControls::WheelControlType::LookBack)) {
 		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleLookBehind, 1.0f);
 	}
+	
+	// who was first?
+	if (controls.ButtonIn(ScriptControls::WheelControlType::LookRight) &&
+		controls.ButtonJustPressed(ScriptControls::WheelControlType::LookLeft)) {
+		lookrightfirst = true;
+	}
+
+	if (controls.ButtonIn(ScriptControls::WheelControlType::LookLeft) &&
+		controls.ButtonIn(ScriptControls::WheelControlType::LookRight)) {
+		CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(lookrightfirst ? -180.0f : 180.0f);
+	}
+	else if (controls.ButtonIn(ScriptControls::WheelControlType::LookLeft)) {
+		CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(90);
+	}
+	else if (controls.ButtonIn(ScriptControls::WheelControlType::LookRight)) {
+		CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(-90);
+	}
+	if (controls.ButtonReleased(ScriptControls::WheelControlType::LookLeft) && !(controls.ButtonIn(ScriptControls::WheelControlType::LookRight)) ||
+		controls.ButtonReleased(ScriptControls::WheelControlType::LookRight) && !(controls.ButtonIn(ScriptControls::WheelControlType::LookLeft))) {
+		CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(0);
+	}
+	if (controls.ButtonReleased(ScriptControls::WheelControlType::LookLeft)  ||
+		controls.ButtonReleased(ScriptControls::WheelControlType::LookRight)) {
+		lookrightfirst = false;
+	}
+
 	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::Camera)) {
 		CONTROLS::_SET_CONTROL_NORMAL(0, ControlNextCamera, 1.0f);
 	}
@@ -2165,6 +2196,8 @@ void update_menu() {
 		if (controls.ButtonIn(ScriptControls::WheelControlType::Horn))		info.push_back("Horn");
 		if (controls.ButtonIn(ScriptControls::WheelControlType::Lights))	info.push_back("Lights");
 		if (controls.ButtonIn(ScriptControls::WheelControlType::LookBack))	info.push_back("LookBack");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::LookLeft))	info.push_back("LookLeft");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::LookRight))	info.push_back("LookRight");
 		if (controls.ButtonIn(ScriptControls::WheelControlType::Camera))	info.push_back("Camera");
 		if (controls.ButtonIn(ScriptControls::WheelControlType::RadioNext)) info.push_back("RadioNext");
 		if (controls.ButtonIn(ScriptControls::WheelControlType::RadioPrev)) info.push_back("RadioPrev");

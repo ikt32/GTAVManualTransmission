@@ -77,6 +77,8 @@ public:
 		Horn,
 		Lights,
 		LookBack,
+		LookLeft,
+		LookRight,
 		Camera,
 		RadioPrev,
 		RadioNext,
