@@ -40,7 +40,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;Gears_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GAME_BUILD;WIN32;NDEBUG;_WINDOWS;_USRDLL;Gears_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -66,6 +66,7 @@
     <ClCompile Include="Input\ScriptControls.cpp" />
     <ClCompile Include="Input\WheelDirectInput.cpp" />
     <ClCompile Include="Input\XboxController.cpp" />
+    <ClCompile Include="Input\LegacyController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Memory\MemoryPatcher.cpp" />
     <ClCompile Include="Memory\NativeMemory.cpp" />
@@ -90,6 +91,7 @@
     <ClInclude Include="Input\ScriptControls.hpp" />
     <ClInclude Include="Input\WheelDirectInput.hpp" />
     <ClInclude Include="Input\XboxController.hpp" />
+    <ClInclude Include="Input\LegacyController.h" />
     <ClInclude Include="Memory\MemoryPatcher.hpp" />
     <ClInclude Include="Memory\NativeMemory.hpp" />
     <ClInclude Include="Memory\VehicleExtensions.hpp" />

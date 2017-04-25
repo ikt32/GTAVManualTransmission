@@ -42,6 +42,9 @@
     <ClCompile Include="Menu\controls.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
+    <ClCompile Include="Input\LegacyController.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -101,6 +104,9 @@
     </ClInclude>
     <ClInclude Include="Menu\controls.h">
       <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\LegacyController.h">
+      <Filter>Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
