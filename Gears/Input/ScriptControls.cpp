@@ -122,12 +122,18 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 			if (ClutchVal < 0.0f) { ClutchVal = 0.0f; }
 			if (ClutchValRaw < 0.0f) { ClutchValRaw = 0.0f; }
 
+			if (InvertSteer) { SteerVal = 1.0f - SteerVal; }
+			if (InvertThrottle) { ThrottleVal = 1.0f - ThrottleVal; }
+			if (InvertBrake) { BrakeVal = 1.0f - BrakeVal; }
+			if (InvertClutch) { ClutchVal = 1.0f - ClutchVal; ClutchValRaw = 1.0f - ClutchValRaw; }
+
 			break;
 		}
 		default: break;
 	}
-	if (ignoreClutch)
+	if (ignoreClutch) {
 		ClutchVal = 0.0f;
+	}
 }
 
 // Limitation: Only works for hardcoded input types. Currently throttle.

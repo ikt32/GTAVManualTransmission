@@ -21,7 +21,7 @@ public:
 	void Read(MenuControls *menuControl);
 	void SaveGeneral() const;
 	void SaveController(ScriptControls *scriptControl) const;
-	void SaveWheel() const;
+	void SaveWheel(ScriptControls *scriptControl) const;
 	bool IsCorrectVersion() const;
 	std::string GetVersionError();
 

@@ -160,6 +160,11 @@ public:
 	int WButtonHeld = 1000;
 
 	// Values are filled by ScriptSettings
+	bool InvertSteer = false;
+	bool InvertThrottle = false;
+	bool InvertBrake = false;
+	bool InvertClutch = false;
+	
 	std::array<std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
 #ifdef GAME_BUILD
 	std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> LegacyControls = {};

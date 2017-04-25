@@ -1900,7 +1900,7 @@ void menuInit() {
 
 void menuClose() {
 	settings.SaveGeneral();
-	settings.SaveWheel();
+	settings.SaveWheel(&controls);
 	settings.SaveController(&controls);
 	menu.SaveMenuTheme(std::wstring(settingsMenuFile.begin(), settingsMenuFile.end()).c_str());
 }
@@ -2045,12 +2045,12 @@ void update_menu() {
 	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("wheelmenu")) {
 		menu.Title("Wheel options");
-		if (menu.BoolOption("Enable wheel", &settings.EnableWheel)) { settings.SaveWheel(); }
-		if (menu.BoolOption("Enable wheel without MT", &settings.WheelWithoutManual)) { settings.SaveWheel(); }
-		if (menu.BoolOption("Enable wheel for boats & planes", &settings.AltControls)) { settings.SaveWheel(); }
-		if (menu.BoolOption("Patch steering", &settings.PatchSteering)) { settings.SaveWheel(); }
-		if (menu.BoolOption("Patch steering for all inputs", &settings.PatchSteeringAlways)) { settings.SaveWheel(); }
-		if (menu.BoolOption("Logitech LEDs (can crash!)", &settings.LogiLEDs)) { settings.SaveWheel(); }
+		if (menu.BoolOption("Enable wheel", &settings.EnableWheel)) { settings.SaveWheel(&controls); }
+		if (menu.BoolOption("Enable wheel without MT", &settings.WheelWithoutManual)) { settings.SaveWheel(&controls); }
+		if (menu.BoolOption("Enable wheel for boats & planes", &settings.AltControls)) { settings.SaveWheel(&controls); }
+		if (menu.BoolOption("Patch steering", &settings.PatchSteering)) { settings.SaveWheel(&controls); }
+		if (menu.BoolOption("Patch steering for all inputs", &settings.PatchSteeringAlways)) { settings.SaveWheel(&controls); }
+		if (menu.BoolOption("Logitech LEDs (can crash!)", &settings.LogiLEDs)) { settings.SaveWheel(&controls); }
 		menu.MenuOption("Force feedback options", "forcefeedbackmenu");
 		menu.MenuOption("Steering wheel setup", "axesmenu");
 		menu.MenuOption("Steering wheel angles", "anglemenu");
@@ -2123,6 +2123,11 @@ void update_menu() {
 			bool result = configAxis("HANDBRAKE_ANALOG");
 			showNotification(result ? "Handbrake axis saved" : "Cancelled handbrake axis calibration", &prevNotification);
 		}
+
+		menu.BoolOption("Invert steer", &controls.InvertSteer);
+		menu.BoolOption("Invert throttle", &controls.InvertThrottle);
+		menu.BoolOption("Invert brake", &controls.InvertBrake);
+		menu.BoolOption("Invert clutch", &controls.InvertClutch);
 	}
 
 	/* Yes hello I am root - 2 */
