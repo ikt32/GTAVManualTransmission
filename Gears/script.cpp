@@ -2262,13 +2262,15 @@ void update_menu() {
 
 	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("menumenu")) {
-		menu.Title("Theme Options");
+		menu.Title("Menu Options");
 		
 		menu.MenuOption("Title Text", "settings_theme_titletext");
 		menu.MenuOption("Title Background", "settings_theme_titlerect");
 		menu.MenuOption("Highlighted", "settings_theme_scroller");
 		menu.MenuOption("Options Text", "settings_theme_options");
 		menu.MenuOption("Options Background", "settings_theme_optionsrect");
+		menu.FloatOption("Menu X position", &menu.menux, 0.0f, 1.0f, 0.025f);
+		menu.FloatOption("Menu Y position", &menu.menuy, 0.0f, 1.0f, 0.025f);
 	}
 
 	if (menu.CurrentMenu("settings_theme_titletext")) {
