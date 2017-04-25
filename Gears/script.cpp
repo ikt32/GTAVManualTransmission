@@ -1972,6 +1972,7 @@ void update_menu() {
 		
 		menu.MenuOption("Controller", "controllermenu");
 		menu.MenuOption("Keyboard", "keyboardmenu");
+		menu.BoolOption("Non Xinput controller?", &settings.UseLegacyController);
 	}
 
 	/* Yes hello I am root - 2 */
