@@ -8,8 +8,8 @@
 class Logger;
 class ScriptControls;
 
-const std::string CORRECTVGENERAL	= "420R";
-const std::string CORRECTVWHEEL		= "420";
+//const std::string CORRECTVGENERAL	= "430";
+//const std::string CORRECTVWHEEL		= "430";
 static const int numGears = 8;
 
 class ScriptSettings {

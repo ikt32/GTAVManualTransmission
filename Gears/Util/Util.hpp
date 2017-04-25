@@ -1,6 +1,8 @@
 #pragma once
 
-#define DISPLAY_VERSION "v4.2.0"
+#define DISPLAY_VERSION "v4.3.0"
+#define CORRECTVGENERAL "430"
+#define CORRECTVWHEEL   "430"
 
 #include <string>
 #include <vector>

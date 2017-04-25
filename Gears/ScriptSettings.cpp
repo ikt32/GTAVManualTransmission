@@ -8,6 +8,7 @@
 #include "Util/simpleini/SimpleIni.h"
 #include "Input/ScriptControls.hpp"
 #include "Menu/Controls.h"
+#include "Util/Util.hpp"
 
 ScriptSettings::ScriptSettings(const std::string &general,
 	                           const std::string &wheel) :

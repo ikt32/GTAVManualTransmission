@@ -756,7 +756,7 @@ int main() {
 	GetWindowRect(consoleWindow, &r);
 
 	logger.Clear();
-	logger.Write("Manual Transmission v4.2.0 - DirectInput utility");
+	logger.Write("Manual Transmission v4.3.0 - DirectInput utility");
 
 	init();
 	bool justPeeking = true;
