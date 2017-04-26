@@ -476,29 +476,24 @@ void drawRPMIndicator(float x, float y, float width, float height, Color fg, Col
 void showHUD() {
 
 	// Gear number indication
+	char *gear = CharAdapter(std::to_string(vehData.CurrGear).c_str());
 	if (vehData.SimulatedNeutral) {
-		showText(settings.GearXpos, settings.GearYpos, settings.GearSize, "N");
+		gear = "N";
 	}
 	else if (vehData.CurrGear == 0) {
-		showText(settings.GearXpos, settings.GearYpos, settings.GearSize, "R");
+		gear = "R";
+	}
+	Color c;
+	if (vehData.CurrGear == vehData.TopGear) {
+		c.R = settings.GearTopColorR;
+		c.G = settings.GearTopColorG;
+		c.B = settings.GearTopColorB;
+		c.A = 255;
 	}
 	else {
-		char * gear = CharAdapter(std::to_string(vehData.CurrGear).c_str());
-		Color c;
-		if (vehData.CurrGear == vehData.TopGear) {
-			c.R = settings.GearTopColorR;
-			c.G = settings.GearTopColorG;
-			c.B = settings.GearTopColorB;
-			c.A = 255;
-		}
-		else {
-			c.R = 255;
-			c.G = 255;
-			c.B = 255;
-			c.A = 255;
-		}
-		showText(settings.GearXpos, settings.GearYpos, settings.GearSize, gear, 0, c);
+		c = solidWhite;
 	}
+	showText(settings.GearXpos, settings.GearYpos, settings.GearSize, gear, settings.HUDFont, c, true);
 
 	// Shift mode indicator
 	char * shiftModeText;
@@ -512,9 +507,10 @@ void showHUD() {
 	default: shiftModeText = "";
 		break;
 	}
-	showText(settings.ShiftModeXpos, settings.ShiftModeYpos, settings.ShiftModeSize, shiftModeText);
+	showText(settings.ShiftModeXpos, settings.ShiftModeYpos, settings.ShiftModeSize, shiftModeText, settings.HUDFont, solidWhite, true);
 	
 	// Speedometer using dashboard speed
+	// PROBABLY not going over 999kph (smallest unit)
 	if (settings.Speedo == "kph" ||
 		settings.Speedo == "mph" ||
 		settings.Speedo == "ms") {
@@ -523,19 +519,19 @@ void showHUD() {
 		float dashms = ext.GetDashSpeed(vehicle);
 
 		if (settings.Speedo == "kph" ) {
-			speedoFormat << static_cast<int>(std::round(dashms * 3.6f));
-			if (settings.SpeedoShowUnit) speedoFormat << " km/h";
+			speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(dashms * 3.6f)));
+			if (settings.SpeedoShowUnit) speedoFormat << (settings.HUDFont == 2 ? " kph" : " km/h");
 		}
 		if (settings.Speedo == "mph" ) {
-			speedoFormat << static_cast<int>(std::round(dashms / 0.44704f));
+			speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(dashms / 0.44704f)));
 			if (settings.SpeedoShowUnit) speedoFormat << " mph";
 		}
 		if (settings.Speedo == "ms") {
-			speedoFormat << static_cast<int>(std::round(dashms));
-			if (settings.SpeedoShowUnit) speedoFormat << " m/s";
+			speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(dashms)));
+			if (settings.SpeedoShowUnit) speedoFormat << (settings.HUDFont == 2 ? " mps" : " m/s");;
 		}
 		char *speedoText = CharAdapter(speedoFormat.str().c_str());
-		showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize, speedoText);
+		showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize, speedoText, settings.HUDFont, solidWhite, true);
 	}
 
 	// RPM Indicator!
@@ -2219,6 +2215,13 @@ void update_menu() {
 		menu.Title("HUD Options");
 
 		menu.BoolOption("Enable", &settings.HUD);
+		int fontIndex = static_cast<int>(std::find(fontIDs.begin(), fontIDs.end(), settings.HUDFont) - fontIDs.begin());
+		int oldIndex = fontIndex;
+		menu.StringArray("Font: ", fonts, &fontIndex);
+		if (fontIndex != oldIndex) {
+			settings.HUDFont = fontIDs.at(fontIndex);
+		}
+
 		menu.MenuOption("Gear and shift mode", "geardisplaymenu");
 		menu.MenuOption("Speedometer", "speedodisplaymenu");
 		menu.MenuOption("RPM Gauge", "rpmdisplaymenu");

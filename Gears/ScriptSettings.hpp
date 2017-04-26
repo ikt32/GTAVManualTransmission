@@ -55,6 +55,7 @@ public:
 
 	// [HUD]
 	bool HUD = true;
+	int HUDFont = 0;
 	float GearXpos = 0.95f;
 	float GearYpos = 0.95f;
 	float GearSize = 1.0f;

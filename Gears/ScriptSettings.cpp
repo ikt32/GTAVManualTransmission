@@ -73,6 +73,7 @@ void ScriptSettings::SaveGeneral() const {
 
 	// [HUD]
 	settingsGeneral.SetBoolValue("HUD", "EnableHUD", HUD);
+	settingsGeneral.SetLongValue("HUD", "HUDFont", HUDFont);
 	settingsGeneral.SetDoubleValue("HUD", "GearXpos", GearXpos);
 	settingsGeneral.SetDoubleValue("HUD", "GearYpos", GearYpos);
 	settingsGeneral.SetDoubleValue("HUD", "GearSize", GearSize);
@@ -240,6 +241,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 
 	// [HUD]
 	HUD = settingsGeneral.GetBoolValue			("HUD", "EnableHUD", true);
+	HUDFont = settingsGeneral.GetLongValue		("HUD", "HUDFont", 0);
 	GearXpos = settingsGeneral.GetDoubleValue	("HUD", "GearXpos", 0.95);
 	GearYpos = settingsGeneral.GetDoubleValue	("HUD", "GearYpos", 0.95);
 	GearSize = settingsGeneral.GetDoubleValue	("HUD", "GearSize", 1.50);
