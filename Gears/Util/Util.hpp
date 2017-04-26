@@ -128,8 +128,12 @@ struct Color {
 	int A;
 };
 
+const Color solidWhite = {
+	255, 255, 255, 255
+};
+
 // Natives called
-void showText(float x, float y, float scale, const char* text, int font = 0, const Color &rgba = { 255, 255, 255, 255 });
+void showText(float x, float y, float scale, const char* text, int font = 0, const Color &rgba = solidWhite, bool outline = false);
 void showNotification(const char* message, int *prevNotification = nullptr);
 void showSubtitle(std::string message, int duration = 2500);
 
