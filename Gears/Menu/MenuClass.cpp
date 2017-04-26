@@ -549,14 +549,14 @@ void Menu::EndMenu() {
 			drawRect(menux, (17 * 0.035f + (menuy + 0.0165f)/*0.1415f*/), 0.23f, 0.035f, titleRect);
 
 			if (currentoption == 1) {
-				drawSprite("commonmenu", "arrowright", menux, ((16 + 1) * 0.035f + (menuy + 0.02f)/*0.145f*/), 0.02f, 0.02f, 90, titleText);
+				drawSprite("commonmenu", "arrowright", menux, ((16 + 1) * 0.035f + (menuy + 0.0175f)/*0.145f*/), 0.02f, 0.02f, 90, titleText);
 			}
 			else if (currentoption == optioncount) {
-				drawSprite("commonmenu", "arrowright", menux, ((16 + 1) * 0.035f + (menuy + 0.02f)/*0.145f*/), 0.02f, 0.02f, 270, titleText);
+				drawSprite("commonmenu", "arrowright", menux, ((16 + 1) * 0.035f + (menuy + 0.0175f)/*0.145f*/), 0.02f, 0.02f, 270, titleText);
 			}
 			else {
-				drawSprite("commonmenu", "arrowright", menux, ((16 + 1) * 0.035f + (menuy + 0.015f)/*0.14f*/), 0.02f, 0.02f, 270, titleText);
-				drawSprite("commonmenu", "arrowright", menux, ((16 + 1) * 0.035f + (menuy + 0.025f)/*0.15f*/), 0.02f, 0.02f, 90, titleText);
+				drawSprite("commonmenu", "arrowright", menux, ((16 + 1) * 0.035f + (menuy + 0.0125f)/*0.14f*/), 0.02f, 0.02f, 270, titleText);
+				drawSprite("commonmenu", "arrowright", menux, ((16 + 1) * 0.035f + (menuy + 0.0225f)/*0.15f*/), 0.02f, 0.02f, 90, titleText);
 			}
 		}
 		else
@@ -566,14 +566,14 @@ void Menu::EndMenu() {
 			drawRect(menux, ((optioncount + 1) * 0.035f + (menuy + 0.0165f)/*0.1415f*/), 0.23f, 0.035f, titleRect);
 
 			if (currentoption == 1 && optioncount > 1) {
-				drawSprite("commonmenu", "arrowright", menux, ((optioncount + 1) * 0.035f + (menuy + 0.02f)/*0.145f*/), 0.02f, 0.02f, 90, titleText);
+				drawSprite("commonmenu", "arrowright", menux, ((optioncount + 1) * 0.035f + (menuy + 0.0175f)/*0.145f*/), 0.02f, 0.02f, 90, titleText);
 			}
 			else if (currentoption == optioncount && optioncount > 1) {
-				drawSprite("commonmenu", "arrowright", menux, ((optioncount + 1) * 0.035f + (menuy + 0.02f)/*0.145f*/), 0.02f, 0.02f, 270, titleText);
+				drawSprite("commonmenu", "arrowright", menux, ((optioncount + 1) * 0.035f + (menuy + 0.0175f)/*0.145f*/), 0.02f, 0.02f, 270, titleText);
 			}
 			else if (optioncount > 1) {
-				drawSprite("commonmenu", "arrowright", menux, ((optioncount + 1) * 0.035f + (menuy + 0.015f)/*0.14f*/), 0.02f, 0.02f, 270, titleText);
-				drawSprite("commonmenu", "arrowright", menux, ((optioncount + 1) * 0.035f + (menuy + 0.025f)/*0.15f*/), 0.02f, 0.02f, 90, titleText);
+				drawSprite("commonmenu", "arrowright", menux, ((optioncount + 1) * 0.035f + (menuy + 0.0125f)/*0.14f*/), 0.02f, 0.02f, 270, titleText);
+				drawSprite("commonmenu", "arrowright", menux, ((optioncount + 1) * 0.035f + (menuy + 0.0225f)/*0.15f*/), 0.02f, 0.02f, 90, titleText);
 			}
 		}
 
