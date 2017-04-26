@@ -394,14 +394,14 @@ float WheelDirectInput::GetAxisSpeed(DIAxis axis, GUID device) {
 	prevPosition = position;
 
 	samples[averageIndex] = result;
-	averageIndex = (averageIndex + 1) % (SAMPLES - 1);
+	averageIndex = (averageIndex + 1) % (AVGSAMPLES - 1);
 
 	//return result;
 	auto sum = 0.0f;
-	for (auto i = 0; i < SAMPLES; i++) {
+	for (auto i = 0; i < AVGSAMPLES; i++) {
 		sum += samples[i];
 	}
-	return sum / SAMPLES;
+	return sum / AVGSAMPLES;
 }
 
 std::vector<GUID> WheelDirectInput::GetGuids() {

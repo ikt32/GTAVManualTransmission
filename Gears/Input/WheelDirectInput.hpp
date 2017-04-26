@@ -11,7 +11,7 @@
 #include <vector>
 
 #define MAX_RGBBUTTONS 128
-#define SAMPLES 4
+#define AVGSAMPLES 2
 
 class WheelDirectInput {
 public:
@@ -80,6 +80,7 @@ public:
 
 	int GetAxisValue(DIAxis axis, GUID device);
 	float GetAxisSpeed(DIAxis axis, GUID device);
+
 	std::vector<GUID> GetGuids();
 	void PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine);
 
@@ -104,7 +105,7 @@ private:
 
 	int prevPosition = 0;
 	long long prevTime = 0;
-	std::array<float, SAMPLES> samples = {};
+	std::array<float, AVGSAMPLES> samples = {};
 	int averageIndex = 0;
 	std::vector<GUID> foundGuids;
 	bool hasForceFeedback = false;

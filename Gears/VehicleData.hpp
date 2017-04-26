@@ -12,7 +12,7 @@
 #include "Memory/VehicleExtensions.hpp"
 #include <chrono>
 
-#define SAMPLES 4
+#define SAMPLES 2
 
 
 class VehicleData {

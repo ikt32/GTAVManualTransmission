@@ -1863,10 +1863,6 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 		damperForce = settings.DamperMin;
 	}
 
-	if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
-		damperForce *= 4;
-	}
-
 	if (vehData.Class == VehicleData::VehicleClass::Car || vehData.Class == VehicleData::VehicleClass::Quad) {
 		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true) && VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
 			GForce = GForce * 0.1;
@@ -1878,6 +1874,10 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 			GForce = GForce * 0.1;
 			damperForce = settings.DamperMin;
 		}
+	}
+
+	if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
+		damperForce *= 2;
 	}
 
 	int totalForce = 
