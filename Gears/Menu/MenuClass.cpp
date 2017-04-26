@@ -69,6 +69,10 @@ void Menu::backMenu() {
 
 void Menu::drawText(const char* text, int font, float x, float y, float scalex, float scaley, rgba rgba, bool center) {
 	UI::SET_TEXT_FONT(font);
+	if (font == 0) { // big-ass Chalet London
+		scaley *= 0.75f;
+		y += 0.0025f;
+	}
 	UI::SET_TEXT_SCALE(scalex, scaley);
 	UI::SET_TEXT_COLOUR(rgba.r, rgba.g, rgba.b, rgba.a);
 	UI::SET_TEXT_CENTRE(center);
