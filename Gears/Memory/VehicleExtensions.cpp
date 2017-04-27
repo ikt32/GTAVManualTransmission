@@ -259,12 +259,29 @@ uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {
 	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0xAE0 : offset);
 	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0xB10 : offset);
 
-	// FiveM ?
-	//if (gameVersion == VER_1_0_393_2_NOSTEAM) {
-	//	offset = 0xA90;
-	//}
-
 	return *reinterpret_cast<uint64_t *>(address + offset);
+}
+
+
+float VehicleExtensions::GetVisualHeight(Vehicle handle) {
+	auto wheelPtr = GetWheelsPtr(handle);
+	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? -1 : 0x080);
+	if (offset == -1)
+		return 0.0f;
+
+	return *reinterpret_cast<float *>(wheelPtr + offset);
+}
+
+// 0 is default. Pos is lowered, Neg = change height. Used by LSC. Set once.
+// Physics are NOT affected, including hitbox.
+void VehicleExtensions::SetVisualHeight(Vehicle handle, float height) {
+	auto wheelPtr = GetWheelsPtr(handle);
+	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? -1 : 0x07c);
+
+	if (offset == -1)
+		return;
+
+	*reinterpret_cast<float *>(wheelPtr + offset) = height;
 }
 
 void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) {
