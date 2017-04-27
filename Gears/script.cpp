@@ -1399,7 +1399,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 				brakelights = true;
 			}
 			
-			if (wheelThrottleVal > 0.01f && controls.ClutchVal < settings.ClutchCatchpoint) {
+			if (wheelThrottleVal > 0.01f && controls.ClutchVal < settings.ClutchCatchpoint && !vehData.SimulatedNeutral) {
 				//showText(0.3, 0.0, 1.0, "We should burnout");
 				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
 				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelThrottleVal);
