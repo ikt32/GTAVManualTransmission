@@ -2385,9 +2385,12 @@ void update_menu() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//                              Config things
+//                              Config helpers/util
 ///////////////////////////////////////////////////////////////////////////////
-bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> startStates, std::tuple<GUID, std::string> &selectedDevice, int hyst, bool &positive, int &startValue_) {
+
+// Wheel section
+// Look at that argument list! :D
+bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> startStates, GUID &selectedGUID, std::string &selectedAxis, int hyst, bool &positive, int &startValue_) {
 	for (auto guid : controls.WheelControl.GetGuids()) {
 		for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
 			for (auto startState : startStates) {
@@ -2398,12 +2401,14 @@ bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> sta
 					std::get<1>(startState) == axisName) {
 					startValue_ = startValue;
 					if (axisValue > startValue + hyst) { // 0 (min) - 65535 (max)
-						selectedDevice = std::tuple<GUID, std::string>(guid, axisName);
+						selectedGUID = guid;
+						selectedAxis = axisName;
 						positive = true;
 						return true;
 					}
 					if (axisValue < startValue - hyst) { // 65535 (min) - 0 (max)
-						selectedDevice = std::tuple<GUID, std::string>(guid, axisName);
+						selectedGUID = guid;
+						selectedAxis = axisName;
 						positive = false;
 						return true;
 					}
@@ -2414,18 +2419,18 @@ bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> sta
 	return false;
 }
 
-void saveAxis(const std::string &confTag, std::tuple<GUID, std::string> selectedDevice, int min, int max) {
-	std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
+void saveAxis(const std::string &confTag, GUID devGUID, std::string axis, int min, int max) {
+	std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
 	std::string devName = std::string(wDevName.begin(), wDevName.end());
-	auto index = settings.SteeringAppendDevice(std::get<0>(selectedDevice), devName);
-	settings.SteeringSaveAxis(confTag, index, std::get<1>(selectedDevice), min, max);
+	auto index = settings.SteeringAppendDevice(devGUID, devName);
+	settings.SteeringSaveAxis(confTag, index, axis, min, max);
 	if (confTag == "STEER") {
-		settings.SteeringSaveFFBAxis(confTag, index, std::get<1>(selectedDevice));
+		settings.SteeringSaveFFBAxis(confTag, index, axis);
 	}
 	settings.Read(&controls);
 }
 
-void saveButton(int button, std::string confTag, GUID devGUID) {
+void saveButton(const std::string &confTag, GUID devGUID, int button) {
 	std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
 	std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
 	auto index = settings.SteeringAppendDevice(devGUID, devName.c_str());
@@ -2433,19 +2438,9 @@ void saveButton(int button, std::string confTag, GUID devGUID) {
 	settings.Read(&controls);
 }
 
-void saveKeyboardKey(std::string confTag, std::string key) {
-	settings.KeyboardSaveKey(confTag, key);
-	settings.Read(&controls);
-	showNotification(("Saved key " + confTag + ": " + key).c_str(), &prevNotification);
-}
-
-void saveControllerButton(std::string confTag, std::string button) {
-	settings.ControllerSaveButton(confTag, button);
-	settings.Read(&controls);
-	showNotification(("Saved button " + confTag + ": " + button).c_str(), &prevNotification);
-}
-
-void saveHShifter(std::string confTag, GUID devGUID, std::array<int, numGears> buttonArray, std::string devName) {
+void saveHShifter(const std::string &confTag, GUID devGUID, std::array<int, numGears> buttonArray) {
+	std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
+	std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
 	auto index = settings.SteeringAppendDevice(devGUID, devName);
 	settings.SteeringSaveHShifter(confTag, index, buttonArray.data());
 	settings.Read(&controls);
@@ -2463,6 +2458,29 @@ void clearButton(std::string confTag) {
 	showNotification(("Cleared button " + confTag).c_str(), &prevNotification);
 }
 
+void clearHShifter() {
+	int empty[numGears] = {};
+	for (int i = 0; i < numGears; i++) {
+		empty[i] = -1;
+	}
+	settings.SteeringSaveHShifter("SHIFTER", -1, empty);
+	settings.Read(&controls);
+	showNotification("Cleared H-pattern shifter", &prevNotification);
+}
+
+// Controller and keyboard
+void saveKeyboardKey(std::string confTag, std::string key) {
+	settings.KeyboardSaveKey(confTag, key);
+	settings.Read(&controls);
+	showNotification(("Saved key " + confTag + ": " + key).c_str(), &prevNotification);
+}
+
+void saveControllerButton(std::string confTag, std::string button) {
+	settings.ControllerSaveButton(confTag, button);
+	settings.Read(&controls);
+	showNotification(("Saved button " + confTag + ": " + button).c_str(), &prevNotification);
+}
+
 void clearKeyboardKey(std::string confTag) {
 	settings.KeyboardSaveKey(confTag, "UNKNOWN");
 	settings.Read(&controls);
@@ -2475,16 +2493,10 @@ void clearControllerButton(std::string confTag) {
 	showNotification(("Cleared button " + confTag).c_str(), &prevNotification);
 }
 
-void clearHShifter() {
-	int empty[numGears] = {};
-	for (int i = 0; i < numGears; i++) {
-		empty[i] = -1;
-	}
-	settings.SteeringSaveHShifter("SHIFTER", -1, empty);
-	settings.Read(&controls);
-	showNotification("Cleared H-pattern shifter", &prevNotification);
-}
-
+///////////////////////////////////////////////////////////////////////////////
+//                              Config inputs
+///////////////////////////////////////////////////////////////////////////////
+// Wheel
 bool configAxis(std::string str) {
 	
 	std::string confTag = str;
@@ -2509,14 +2521,14 @@ bool configAxis(std::string str) {
 		}
 	}
 
-	std::tuple<GUID, std::string> selectedDevice;
-
 	// Ignore inputs before selection if they moved less than hyst
 	int hyst = 65536 / 8;
 
 	// To track direction of physical <-> digital value.
 	bool positive = true;
 
+	GUID selectedGUID;
+	std::string selectedAxis;
 	int startValue;
 	int endValue;
 
@@ -2526,7 +2538,7 @@ bool configAxis(std::string str) {
 			return false;
 		}
 		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
-		if (getConfigAxisWithValues(startStates, selectedDevice, hyst, positive, startValue)) {
+		if (getConfigAxisWithValues(startStates, selectedGUID, selectedAxis, hyst, positive, startValue)) {
 			break;
 		}
 		showSubtitle(additionalInfo);
@@ -2537,15 +2549,11 @@ bool configAxis(std::string str) {
 	if (confTag == "STEER") {
 		int min = (positive ? 0 : 65535);
 		int max = (positive ? 65535 : 0);
-		saveAxis(confTag, selectedDevice, min, max);
+		saveAxis(confTag, selectedGUID, selectedAxis, min, max);
 		return true;
 	}
 
-	int prevAxisValue = controls.WheelControl.GetAxisValue(controls.WheelControl.StringToAxis(std::get<1>(selectedDevice)), std::get<0>(selectedDevice));
-	std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
-	std::string selectedDevName = std::string(wDevName.begin(), wDevName.end()).c_str();
-	std::string selectedAxis = std::get<1>(selectedDevice);
-	GUID selectedGUID = std::get<0>(selectedDevice);
+	int prevAxisValue = controls.WheelControl.GetAxisValue(controls.WheelControl.StringToAxis(selectedAxis), selectedGUID);
 
 	// and up again!
 	while (true) {
@@ -2574,7 +2582,7 @@ bool configAxis(std::string str) {
 
 	int min = startValue;
 	int max = endValue;
-	saveAxis(confTag, selectedDevice, min, max);
+	saveAxis(confTag, selectedGUID, selectedAxis, min, max);
 	return true;
 }
 
@@ -2625,7 +2633,7 @@ bool configButton(std::string str) {
 		for (auto guid : controls.WheelControl.GetGuids()) {
 			for (int i = 0; i < 255; i++) {
 				if (controls.WheelControl.IsButtonPressed(i, guid)) {
-					saveButton(i, confTag, guid);
+					saveButton(confTag, guid, i);
 					return true;
 				}
 			}
@@ -2633,7 +2641,7 @@ bool configButton(std::string str) {
 			//POV hat shit
 			for (auto d : directions) {
 				if (controls.WheelControl.IsButtonPressed(d, guid)) {
-					saveButton(d, confTag, guid);
+					saveButton(confTag, guid, d);
 					return true;
 				}
 			}
@@ -2668,7 +2676,6 @@ bool configHPattern() {
 	GUID devGUID = {};
 	std::array<int, numGears> buttonArray; // There are gears 1-7 + R
 	std::fill(buttonArray.begin(), buttonArray.end(), -1);
-	std::string devName;
 
 	int progress = 0;
 
@@ -2684,19 +2691,15 @@ bool configHPattern() {
 
 		for (auto guid : controls.WheelControl.GetGuids()) {
 			for (int i = 0; i < 255; i++) {
-				if (controls.WheelControl.IsButtonPressed(i, guid) &&
-					// only find unregistered buttons
-					std::find(std::begin(buttonArray), std::end(buttonArray), i) == std::end(buttonArray)) {
-					// also save device info when just started
-					if (progress == 0) {
+				// only find unregistered buttons
+				if (controls.WheelControl.IsButtonPressed(i, guid) && 
+					find(begin(buttonArray), end(buttonArray), i) == end(buttonArray)) { 
+					if (progress == 0) { // also save device info when just started
 						devGUID = guid;
-						std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
-						devName = std::string(wDevName.begin(), wDevName.end()).c_str();
 						buttonArray[progress] = i;
 						progress++;
 					}
-					// only accept same device onwards
-					else if (guid == devGUID) {
+					else if (guid == devGUID) { // only accept same device onwards
 						buttonArray[progress] = i;
 						progress++;
 					}
@@ -2721,18 +2724,17 @@ bool configHPattern() {
 		showSubtitle("Shift into " + gearDisplay + ". " + additionalInfo);
 		WAIT(0);
 	}
-	//save H-pattern doesn't need its own func because it's called once! :-)
-	saveHShifter(confTag, devGUID, buttonArray, devName);
+	saveHShifter(confTag, devGUID, buttonArray);
 	return true;
 }
 
+// Keyboard
 bool isMenuControl(int control) {
 	if (control == menuControls.ControlKeys[MenuControls::ControlType::MenuKey] ||
 		control == menuControls.ControlKeys[MenuControls::ControlType::MenuSelect] ||
 		control == menuControls.ControlKeys[MenuControls::ControlType::MenuCancel]) {
 		return true;
 	}
-
 	return false;
 }
 
@@ -2781,6 +2783,7 @@ bool configKeyboardKey(const std::string &confTag) {
 	}
 }
 
+// Controller
 bool configControllerButton(const std::string &confTag) {
 	std::string additionalInfo = "Press " + escapeKey + " to exit.";
 	XboxController* rawController = controls.GetRawController();
