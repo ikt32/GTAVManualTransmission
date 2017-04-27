@@ -2,13 +2,15 @@
 
 Manual Transmission & Steering Wheel Support
 ===========
-Version 4.2.0
+Version 4.3.0
 
 <sub> <sub>
 If you ended up here for version 4.1 to version 4.1.3, use 
 [this](https://github.com/E66666666/GTAVManualTransmission/blob/v4.1.3-b944.2/doc/README.md)
 guide :)
 </sub> </sub>
+
+![Gameplay](Gameplay.jpg)
 
 # Manual Transmission for GTA V
 This mod will enable manual transmission for vehicles, using the games' real
@@ -20,7 +22,7 @@ It’s highly recommended to play with this mod using a controller or a wheel.
 # Steering Wheel Support for GTA V
 With manual transmission enabled, you'll want to be able to properly control
 your vehicle. By default, GTA V doesn't support steering wheels. Solutions like
-X360CE only emulate a controller, and the game will miss definition and force
+x360ce only emulate a controller, and the game will miss definition and force
 feedback for wheels. For this, a large part of this mod is made to support wheels,
 natively! A few features:
 
@@ -50,11 +52,12 @@ natively! A few features:
 - [Basic usage and controls](#basic-usage-and-controls)
     - [Controls](#controls)
     - [Usage](#usage)
-- [Configuration](#configuration)
+- [Configuration files](#configuration-files)
     - [`settings_general.ini`](#settings_generalini)
     - [`[OPTIONS]`](#options)
     - [`[HUD]`](#hud)
     - [`[CONTROLLER]`](#controller)
+    - [`[CONTROLLER_LEGACY]`](#controller_legacy)
     - [`[KEYBOARD]`](#keyboard)
     - [`[DEBUG]`](#debug)
     - [`settings_wheel.ini`](#settings_wheelini)
@@ -81,15 +84,12 @@ natively! A few features:
 
 # Installation
 1.	Put `Gears.asi` and the folder `ManualTransmission` in your GTA V folder (overwrite when asked)
-2.	Read this README and configure `ManualTransmission/settings_general.ini` to your preferences
+2.	Read this README
 
 ## Additional steps for wheel users
 3.	Remove or disable any XInput or DirectInput DLL files for your wheel for GTA V
-4.	Launch `WheelConfigurator.exe` in the `ManualTransmission` folder
-5.	Press the keys mentioned onscreen to configure the axles, buttons and shifter
-6.	Configure the rest of `ManualTransmission/settings_wheel.ini` for Force Feedback etc
-
-When using `WheelConfigurator`, reloading will re-load the config file and check for device changes.
+4.  Configure your wheel in-game with the menu
+5.  Toggle the mod off-on to activate force feedback
 
 When reloading the mod by toggling it off and on, the settings are read again
 and the steering wheel (if connected) is reset again. You can use this to fine-
@@ -97,8 +97,7 @@ tune your settings and change things on-the-fly, without restarting the game.
 
 # FiveM installation
 1. Create a plugins folder in FiveM Application Data 
-2. Gears.asi and the ManualTransmission folder in there.
-
+2. Put `Gears.asi` and the folder `ManualTransmission` in plugins
 
 # Updating
 Replace `Gears.asi` and the folder `ManualTransmission` in your GTA V folder.
@@ -128,14 +127,26 @@ automatic mode.
 
 Read this README to see what the different switches do. You
 WILL need to configure it correctly, otherwise some features will not work.
-The buttons listed below are default controls, but can be changed.
+You can also mess around in the menu, but the intentions of options might not
+be clear.
 
 ## Controls
 For both keyboard and controller inputs, refer to `settings_general.ini` for 
-keys. You can also change them to anything you like. Mouse not supported\*
+keys. Refer to `Keyboard_Keys.txt` for usable keys.
 
-<sub>\* Unless ScriptHookV's Keyboard handler does. Please make an issue,
-pull request or whatever suits you most to inform me :)</sub>
+### Menu
+In `settings_menu.ini`, the keys are stored. Default:
+
+* Press `[{` to access the menu
+* Up/Down/Left/Right arrow keys to navigate
+* `RETURN` to select
+* `BACKSPACE` to go back
+
+Controller __NAVIGATION__ is supported, but not opening the menu. This is
+due to a lack of buttons and combos available.
+
+![Menu setup](MenuMain.jpg)
+
 
 ### Keyboard defaults (US-ANSI)
 By default, `W` and `S` are assigned to throttle and brake respectively.
@@ -147,8 +158,8 @@ By default, `W` and `S` are assigned to throttle and brake respectively.
 
 Sequential and Automatic:
 
-* Press `SHIFT` to shift up
-* Press `CTRL` to shift down
+* Press `LSHIFT` to shift up
+* Press `LCTRL` to shift down
 
 H-shifter mode:
 
@@ -175,7 +186,8 @@ keyboard or controller, you only need to tap the throttle on that device. The mo
 will automatically switch between these inputs.
 
 Specifically for wheel users, you might need to fully depress the throttle
-pedal (once) if the mod keeps swapping away from the keyboard/controller.
+pedal or clutch pedal (once) if the mod keeps swapping away from the
+ keyboard/controller.
 
 ### Driving with Manual Transmission
 To drive forward, ensure that
@@ -206,14 +218,18 @@ details.
 The throttle and the brake work like the accelerator and brake/reverse inputs.
 A clutch pedal won't have any action. The rest of the functions still work.
 
-# Configuration
+# Configuration files
+
+Warning: This section is just for reference! Please use the in-game menu for configuration!
+--------------------
+
 This guide will explain the usage of the ini files and what the options mean. 
 
 Generally, if only `0` or `1` the following holds for that feature:
 * `0`: Disabled
 * `1`: Enabled
 
-Putting `true` or `false` is also okay.
+From version 4.2.0, you will see `true` or `false` in the real .ini.
 
 ## `settings_general.ini`
 This file contains most general settings. Configuring only this is sufficient if
@@ -369,7 +385,7 @@ other mods. This functionality is automatically disabled when running FiveM or a
 * `1`: Mod info available for other mods
 
 ## `[HUD]`
-Some info you can enable or disable at will. It's pretty self-explanatory. If some element is unwanted, it can be shifted off-screen by making the X and/or Y value 1.00 or more.
+Some info you can enable or disable at will. It's pretty self-explanatory.
 
 * Gear: Current gear
 * GearTopColor: Color for when the top gear is reached
@@ -444,6 +460,38 @@ Turn on or off engine.
 You __need__ to correctly set these to get braking and a standstill and
 reversing with the throttle to work.
 
+## `[CONTROLLER_LEGACY]`
+For if you're using a not-Xbox controller. Same stuff applies as in `[CONTROLLER]`.
+
+|Control name				|Xbox equivalent	|Control ID|
+|---------------------------|-------------------|----------|
+|ControlFrontendDown		|Dpad Down			|187       |	
+|ControlFrontendUp			|Dpad Up			|188       |
+|ControlFrontendLeft		|Dpad Left			|189       |
+|ControlFrontendRight		|Dpad Right			|190       |
+|ControlFrontendRdown		|??????????			|191       |
+|ControlFrontendRup			|??????????			|192       |
+|ControlFrontendRleft		|??????????			|193       |
+|ControlFrontendRright		|??????????			|194       |
+|ControlFrontendAxisX		|Left stick X		|195       |
+|ControlFrontendAxisY		|Left stick Y		|196       |
+|ControlFrontendRightAxisX	|Right stick X		|197       |
+|ControlFrontendRightAxisY	|Right stick Y		|198       |
+|ControlFrontendPause		|Start				|199       |
+|ControlFrontendAccept		|A					|201       |
+|ControlFrontendCancel		|B					|202       |
+|ControlFrontendX			|X					|203       |
+|ControlFrontendY			|Y					|204       |
+|ControlFrontendLb			|Left shoulder		|205       |
+|ControlFrontendRb			|Right shoulder		|206       |
+|ControlFrontendLt			|Left trigger		|207       |
+|ControlFrontendRt			|Right trigger		|208       |
+|ControlFrontendLs			|Left stick click	|209       |
+|ControlFrontendRs			|Right stick click	|210       |
+|ControlFrontendDelete		|???????????		|214       |
+|ControlFrontendSelect		|Back				|217       |
+
+
 ## `[KEYBOARD]`
 This section assumes a regular ANSI keyboard with the US/QWERTY layout.
 
@@ -470,10 +518,11 @@ reversing with the throttle to work.
 * `1`: Car address is logged to Gears.log when changing cars. Just something for me to debug things.
 
 ## `settings_wheel.ini`
-This file contains all settings for the wheel controls. I recommend using
-__WheelConfigurator.exe__ to configure the axis-inputs and H-shifter.
+Warning: This section is just for reference! Please use the in-game menu for configuration!
+--------------------
 
-![WheelConfigurator](WheelConfigurator.png)
+This file contains all settings for the wheel controls. I recommend using
+the in-game menu to configure the axis-inputs and H-shifter.
 
 DirectInput steering wheels are fully supported! Every axis, button and 8
 directions on the D-pad are supported for inputs. Additionally, steering wheel
@@ -481,8 +530,10 @@ input has been built in even if you don’t want to drive with any gearbox and
 just want the default behavior. __Force Feedback is fully present and active in
 all modes.__
 
-When assigning axes and buttons, __use the tool__! This tool will report the
-correct values for the .ini.
+When assigning axes and buttons, __DO THIS IN-GAME!__ This mod will resolve the
+correct values. 
+
+![Wheel setup](MenuWheel.jpg)
 
 ## `[OPTIONS]` (Wheel)
 
@@ -575,7 +626,7 @@ or `Gears.log`. A sample detection entry looks like this:
 [23:20:19.989] GUID:   {F69653F0-19B9-11E6-8002-444553540000}
 ```
 
-__You should not need to configure this manually if you used `WheelConfigurator.exe`!__
+__You should not need to configure this manually if you used `WheelConfigurator.exe` or the in-game menu!__
 
 ## Most controls
 
@@ -654,7 +705,7 @@ In this section you can assign wheel buttons to keyboard keys. A few examples
 have been given. The format is `[BUTTON] = [KEY]`. Up to 128 buttons
 are supported. Any keyboard key can be chosen, but Num Lock needs to be OFF for
 keys to be interpreted correctly.
-Use the included __Keys.txt__ for reference!
+Use the included __Keyboard_Keys.txt__ for reference!
 
 Only one device can be used for this feature.
 
@@ -674,13 +725,17 @@ the necessary programs to run GTA V and ScriptHookV supporting that version of
 GTA V.
 
 ## Non-conflicting software
-The mod has been tested with GTA V version 350, 617, 678, 791.2, 877.1 and 944.2 with:
+The mod has been tested with GTA V version 944.2 to 1032.1 with:
 * ScriptHookV
 * ScriptHookVDotNet
 * RAGEPluginHook
 * ENB Series
 * OpenIV
 * FoV 1.33
+
+Limited support for 350, 505.2 (FiveM), 617, 678, 791.2, 877.1. If anything crashes, lemme know.
+
+Full FiveM support is on the way.
 
 ## Conflicting software
 * __x360ce__ will conflict with input detection if throttle, brake or steering clutch
@@ -690,6 +745,7 @@ without overlap is no problem.
 inputs.
 * [__CustomSteering__](https://www.gta5-mods.com/scripts/custom-steering) will
 conflict with steering patching. Remove CustomSteering if `PatchSteering` is enabled.
+* [__ScriptHookVDotNet__](https://github.com/crosire/scripthookvdotnet/releases) might crash the G920. Not sure if there's a workaround. 
 
 ## Steering wheel reports strange values
 Check if your wheel is recognized correctly, a recent Windows 10 update forces
@@ -702,7 +758,7 @@ it's some other unrelated bug :wink:
 ## Steering wheel not detected
 * Try toggling the mod (|\ key)
 * Ensure you have removed xinput dlls from the GTA V directory
-* Check back with DiUtil.exe to see if that thing does see your wheel
+* Check back with `WheelConfigurator.exe` to see if that thing does see your wheel
 
 # Credits
 Massive thanks to these people!
@@ -714,6 +770,7 @@ Massive thanks to these people!
 * leftas
 * kagikn
 * aXurez
+* All others who helped :)
 
 # Source code
 This mod is fully open source. The source code is available at

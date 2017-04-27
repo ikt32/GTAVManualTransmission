@@ -8,12 +8,14 @@ Configuration changes:
   * `[LOOK_LEFT]` and `[LOOK_RIGHT]` are added
   * Version updated to `430` to reflect this.
 * `settings_general.ini`
+  * Added `[CONTROLLER_LEGACY]` for non-Xinput stuff
+  * In `[HUD]`, added `HUDFont`.
   * In `[CONTROLLER]`, `TriggerValue` uses decimal numbers now
   * Version updated to `430` to reflect this.
 * `*.ini` files can now also have `true` or `false` instead of `0` or `1`. Both still work.
 
 Additions:
-* Added a menu. By default accessible with `[{` key. Pretty much everything in the config files are changeable here :)
+* Added a menu. By default accessible with `[{` key. Pretty much everything in the config files is changeable here :)
   * Change mod options
   * Change HUD settings
   * Change wheel options, keyboard controls and controller controls
@@ -34,6 +36,7 @@ Wheel changes:
 * Input detection uses clutch too, now
 * Add look left/right buttons
 * Significantly increase wheel resistance when engine is off. This simulates no power steering!
+* Decrease averaging delay for force feedback, for a faster FFB response
 
 Other changes:
 * Revert to GetAsyncKeyState() because ScriptHookV's API doesn't do mouse and/or differentiate between left/right shift so that's included now. :joy: :gun:
@@ -42,6 +45,7 @@ Other changes:
 * Set engine RPM display to 0 when engine is off.
 * More aggressive custom revving
 * Pretty debug info
+* Pretty HUD font/text
 
 ## 4.2.0 - Release
 Configuration changes:
