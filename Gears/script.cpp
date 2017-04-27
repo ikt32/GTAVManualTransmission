@@ -1405,7 +1405,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelThrottleVal);
 			}
 
-			if (wheelThrottleVal > 0.01f && controls.ClutchVal > settings.ClutchCatchpoint) {
+			if (wheelThrottleVal > 0.01f && (controls.ClutchVal > settings.ClutchCatchpoint || vehData.SimulatedNeutral)) {
 				if (wheelBrakeVal > 0.01f) {
 					//showText(0.3, 0.0, 1.0, "We should rev and brake");
 					//showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)).c_str() );
