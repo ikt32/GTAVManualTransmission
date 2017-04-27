@@ -2631,6 +2631,7 @@ bool configButton(std::string str) {
 				}
 			}
 		}
+		showSubtitle(additionalInfo.c_str());
 		WAIT(0);
 	}
 }
