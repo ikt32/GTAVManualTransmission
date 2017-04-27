@@ -39,7 +39,7 @@ Wheel changes:
 * Decrease averaging delay for force feedback, for a faster FFB response
 
 Other changes:
-* Revert to GetAsyncKeyState() because ScriptHookV's API doesn't do mouse and/or differentiate between left/right shift so that's included now. :joy: :gun:
+* Revert to GetAsyncKeyState() because ScriptHookV's API doesn't do mouse and/or differentiate between left/right shift so that's included now.
 * Added normal +/-/,/. to keymap
 * Make clutch grab self-accelerate a bit more tame, stop revving over 0.3
 * Set engine RPM display to 0 when engine is off.
