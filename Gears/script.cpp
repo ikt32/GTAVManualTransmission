@@ -280,7 +280,7 @@ void update() {
 			// Planes
 			if (vehData.Class == VehicleData::VehicleClass::Plane) {
 				doWheelSteeringPlane();
-				playWheelEffects(settings, vehData, false, true);
+				playWheelEffectsPlane(settings, vehData);
 			}
 			return;
 		}
@@ -1756,6 +1756,62 @@ void doWheelSteeringPlane() {
 		antiDeadzoned = effSteer + 0.20f;
 	}
 	CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyRollLeftRight, antiDeadzoned);
+}
+
+// I have never flown a plane so I have no idea how this should feel
+// Also I don't think planes are flown with a steering wheel but I could be wrong
+void playWheelEffectsPlane(ScriptSettings& settings, VehicleData& vehData) {
+	auto steerAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(controls.SteerAxisType)]);
+
+	if (!controls.WheelControl.IsConnected(controls.SteerGUID) ||
+		controls.PrevInput != ScriptControls::Wheel ||
+		!settings.EnableFFB) {
+		return;
+	}
+
+	vehData.getAccelerationVectors(vehData.V3Velocities);
+	Vector3 accelValsAvg = vehData.getAccelerationVectorsAverage();
+
+	float steerMult = settings.SteerAngleMax / settings.SteerAngleAlt;
+	
+	// Probably 0 when centered so just make a loop around dis
+	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
+
+	int damperForce = settings.DamperMin;
+
+	// steerSpeed is to dampen the steering wheel
+	auto steerSpeed = controls.WheelControl.GetAxisSpeed(steerAxis, controls.SteerGUID) / 20;
+
+	// We're a fucking plane so there are no fake G-Forces
+	// Just forces over the control surfaces so just re-center @ speed?
+	float centerForce = effSteer * vehData.Velocity;
+
+	if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
+		damperForce *= 2;
+	}
+
+	int totalForce =
+		static_cast<int>(centerForce * 100 * settings.PhysicsStrength * settings.FFGlobalMult) + // 2G = max force, Koenigsegg One:1 only does 1.7g!
+		static_cast<int>(steerSpeed * damperForce * 0.1);
+
+	// Soft lock
+	if (effSteer > 1.0f) {
+		totalForce = static_cast<int>((effSteer - 1.0f) * 100000) + totalForce;
+		if (effSteer > 1.1f) {
+			totalForce = 10000;
+		}
+	}
+	else if (effSteer < -1.0f) {
+		totalForce = static_cast<int>((-effSteer - 1.0f) * -100000) + totalForce;
+		if (effSteer < -1.1f) {
+			totalForce = -10000;
+		}
+	}
+	controls.WheelControl.SetConstantForce(controls.SteerGUID, totalForce);
+
+	if (settings.DisplayInfo) {
+		showDebugInfoWheel(settings, effSteer, damperForce, steerSpeed, centerForce, 0.0f, 0.0f);
+	}
 }
 
 void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airborne, bool ignoreSpeed) {

@@ -111,6 +111,7 @@ void handleVehicleButtons();
 void playWheelEffects(ScriptSettings& settings,
 					  VehicleData& vehData,
                       bool airborne, bool ignoreSpeed = false);
+void playWheelEffectsPlane(ScriptSettings& settings, VehicleData& vehData);
 void doWheelSteering();
 void doWheelSteeringBoat();
 void doWheelSteeringPlane();
