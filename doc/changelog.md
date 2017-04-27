@@ -1,5 +1,21 @@
 # Changelog
 
+## 4.3.1
+No configuration changes
+
+Menu changes:
+* Fix subtitles not showing up on wheel button configuration
+* Re-order wheel buttons and show TO_KEYBOARD buttons being pressed
+
+Gameplay changes:
+* Fix brakes being applied when rolling back in neutral
+* Fix gear rattle not playing when popping out of reverse w/o clutch
+* Re-enable persistent shift toggle switch
+* Use normal speed for speedometer if vehicle dashboard speedometer is missing
+
+Wheel changes:
+* Use a separate force feedback calculation for planes
+
 ## 4.3.0
 Configuration changes:
 * Added `settings_menu.ini`
