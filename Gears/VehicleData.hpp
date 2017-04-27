@@ -97,6 +97,8 @@ public:
 	bool TruckShiftUp = false;
 
 	int RadioStationIndex = 0;
+	bool HasSpeedo = false;
+
 private:
 	std::array<char *, 20> badModelNames = {
 		"BENSON",

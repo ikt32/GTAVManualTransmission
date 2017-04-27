@@ -203,6 +203,7 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 
 	if (prevVehicle != vehicle) {
+		vehData.Clear();
 		ext.ClearAddress();
 		auto addr = ext.GetAddress(vehicle);
 		if (settings.LogCar) {
@@ -517,6 +518,12 @@ void showHUD() {
 		std::stringstream speedoFormat;
 
 		float dashms = ext.GetDashSpeed(vehicle);
+		if (!vehData.HasSpeedo && dashms > 0.1f) {
+			vehData.HasSpeedo = true;
+		}
+		if (!vehData.HasSpeedo) {
+			dashms = abs(vehData.Velocity);
+		}
 
 		if (settings.Speedo == "kph" ) {
 			speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(dashms * 3.6f)));
@@ -608,6 +615,7 @@ void showDebugInfo() {
 	showText(0.01f, 0.425f, 0.4f, ssTurbo.str().c_str(),	4);
 	showText(0.01f, 0.450f, 0.4f, ssAddress.str().c_str(),	4);
 	showText(0.01f, 0.475f, 0.4f, ssEnabled.str().c_str(),	4);
+	if (!vehData.HasSpeedo) showText(0.01f, 0.500f, 0.4f, "No speedo btw", 4);
 
 	std::stringstream ssThrottleInput;
 	std::stringstream ssBrakeInput;
