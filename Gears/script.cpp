@@ -85,6 +85,8 @@ std::vector<int> fontIDs {
 };
 
 std::vector<std::string> buttonConfTags{
+	{ "TOGGLE_MOD" },
+	{ "CHANGE_SHIFTMODE" },
 	{ "SHIFT_UP" },
 	{ "SHIFT_DOWN" },
 	{ "ENGINE" },
@@ -100,8 +102,6 @@ std::vector<std::string> buttonConfTags{
 	{ "INDICATOR_LEFT" },
 	{ "INDICATOR_RIGHT" },
 	{ "INDICATOR_HAZARD" },
-	{ "TOGGLE_MOD" },
-	{ "CHANGE_SHIFTMODE" },
 };
 
 std::vector<std::string> keyboardConfTags{
@@ -2201,6 +2201,13 @@ void update_menu() {
 		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorHazard))	info.push_back("IndicatorHazard");
 		if (controls.ButtonIn(ScriptControls::WheelControlType::Toggle))	info.push_back("ToggleMod");
 		if (controls.ButtonIn(ScriptControls::WheelControlType::ToggleH))	info.push_back("ChangeShiftMode");
+		for (int i = 0; i < MAX_RGBBUTTONS; i++) {
+			if (controls.WheelToKey[i] != -1) {
+				if (controls.WheelControl.IsButtonPressed(i, controls.WheelToKeyGUID)) {
+					info.push_back(key2str(controls.WheelToKey[i]));
+				}
+			}
+		}
 
 		for (auto confTag : buttonConfTags) {
 			if (menu.OptionPlus(CharAdapter(("Assign " + confTag).c_str()), info, nullptr, std::bind(clearButton, confTag), nullptr)) {
