@@ -1,0 +1,117 @@
+The keys below are usable for keyboard entries in settings_general.ini
+
+LMB				 
+RMB				 
+CANCEL			
+MMB				 
+BACKSPACE		
+TAB				 
+CLEAR			
+RETURN			
+ALT				 
+PAUSE			
+CAPSLOCK		
+ESCAPE			
+SPACE			
+PAGEUP			
+PAGEDOWN		
+END				 
+HOME			
+LEFT			
+UP				 
+RIGHT			
+DOWN			
+SELECT			
+PRINT			
+EXECUTE			
+PRINTSCREEN		
+INSERT			
+DELETE			
+HELP			
+LWIN			
+RWIN			
+APPS			
+SLEEP			
+NUM0			
+NUM1			
+NUM2			
+NUM3			
+NUM4			
+NUM5			
+NUM6			
+NUM7			
+NUM8			
+NUM9			
+*				 
+PLUS			
+,				 
+MINUS			
+.				 
+/				 
+F1				 
+F2				 
+F3				 
+F4				 
+F5				 
+F6				 
+F7				 
+F8				 
+F9				 
+F10				 
+F11				 
+F12				 
+F13				 
+F14				 
+F15				 
+F16				 
+F17				 
+F18				 
+F19				 
+F20				 
+F21				 
+F22				 
+F23				 
+F24				 
+NUMLOCK			
+SCROLL			
+LSHIFT			
+RSHIFT			
+LCTRL			
+RCTRL			
+LMENU			
+RMENU			
+BROWSER_BACK	
+BROWSER_FORWARD	
+BROWSER_REFRESH	
+BROWSER_STOP	
+BROWSER_SEARCH	
+BROWSER_FAVORITES	
+BROWSER_HOME		
+VOLUME_MUTE			
+VOLUME_DOWN			
+VOLUME_UP			
+MEDIA_NEXT_TRACK	
+MEDIA_PREV_TRACK	
+MEDIA_STOP			
+MEDIA_PLAY_PAUSE	
+LAUNCH_MAIL			
+LAUNCH_MEDIA_SELECT	
+LAUNCH_APP1			
+LAUNCH_APP2			
+PLAY				
+ZOOM				
+
+VK_OEM_PLUS			// '+' any country
+VK_OEM_COMMA		// ',' any country
+VK_OEM_MINUS		// '-' any country
+VK_OEM_PERIOD		// '.' any country
+
+VK_OEM_1			// ';:' for US
+VK_OEM_2			// '/?' for US
+VK_OEM_3			// '`~' for US
+VK_OEM_4			// '[{' for US
+VK_OEM_5			// '\|' for US
+VK_OEM_6			// ']}' for US
+VK_OEM_7			// ''"' for US
+VK_OEM_8			// § !
+VK_OEM_102			// > <	
