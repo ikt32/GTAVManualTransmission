@@ -833,7 +833,7 @@ void cycleShiftMode() {
 	}
 
 	setShiftMode(settings.ShiftMode);
-	//settings.Save();
+	settings.SaveGeneral();
 }
 
 void shiftTo(int gear, bool autoClutch) {
