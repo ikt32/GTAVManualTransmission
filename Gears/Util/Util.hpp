@@ -6,7 +6,7 @@
 
 #include <string>
 #include <vector>
-#include "../../ScriptHookV_SDK/inc/types.h"
+#include "inc/types.h"
 
 static std::vector<std::string> GameVersionString = {
 	"VER_1_0_335_2_STEAM", // 00
