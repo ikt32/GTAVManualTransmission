@@ -61,7 +61,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="General.cpp" />
+    <ClCompile Include="Util\General.cpp" />
     <ClCompile Include="Input\keyboard.cpp" />
     <ClCompile Include="Input\ScriptControls.cpp" />
     <ClCompile Include="Input\WheelDirectInput.cpp" />
@@ -85,7 +85,7 @@
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\main.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h" />
-    <ClInclude Include="General.h" />
+    <ClInclude Include="Util\General.h" />
     <ClInclude Include="Input\DiJoyStick.h" />
     <ClInclude Include="Input\keyboard.h" />
     <ClInclude Include="Input\ScriptControls.hpp" />

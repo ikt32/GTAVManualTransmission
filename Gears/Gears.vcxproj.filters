@@ -35,7 +35,6 @@
     <ClCompile Include="Util\Util.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="General.cpp" />
     <ClCompile Include="Menu\MenuClass.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
@@ -45,6 +44,7 @@
     <ClCompile Include="Input\LegacyController.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="Util\General.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -98,7 +98,6 @@
     <ClInclude Include="Util\simpleini\SimpleIni.h">
       <Filter>Util\simpleini</Filter>
     </ClInclude>
-    <ClInclude Include="General.h" />
     <ClInclude Include="Menu\MenuClass.h">
       <Filter>Menu</Filter>
     </ClInclude>
@@ -108,6 +107,7 @@
     <ClInclude Include="Input\LegacyController.h">
       <Filter>Input</Filter>
     </ClInclude>
+    <ClInclude Include="Util\General.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
