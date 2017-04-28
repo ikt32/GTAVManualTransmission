@@ -477,7 +477,7 @@ void drawRPMIndicator(float x, float y, float width, float height, Color fg, Col
 void showHUD() {
 
 	// Gear number indication
-	char *gear = CharAdapter(std::to_string(vehData.CurrGear).c_str());
+	std::string gear = std::to_string(vehData.CurrGear);
 	if (vehData.SimulatedNeutral) {
 		gear = "N";
 	}
@@ -494,7 +494,7 @@ void showHUD() {
 	else {
 		c = solidWhite;
 	}
-	showText(settings.GearXpos, settings.GearYpos, settings.GearSize, gear, settings.HUDFont, c, true);
+	showText(settings.GearXpos, settings.GearYpos, settings.GearSize, gear.c_str(), settings.HUDFont, c, true);
 
 	// Shift mode indicator
 	char * shiftModeText;
@@ -811,7 +811,7 @@ void setShiftMode(int shiftMode) {
 	if (shiftMode > 2 || shiftMode < 0)
 		return;
 
-	if (settings.ShiftMode == HPattern  && (vehData.Class == VehicleData::VehicleClass::Bike || controls.PrevInput == ScriptControls::Controller)) {
+	if (settings.ShiftMode == HPattern  && controls.PrevInput == ScriptControls::Controller) {
 		settings.ShiftMode = Automatic;
 	}
 
@@ -819,19 +819,14 @@ void setShiftMode(int shiftMode) {
 		vehData.SimulatedNeutral = false;
 	}
 
-	std::stringstream message;
-	std::string mode;
+	std::string mode = "Mode: ";
 	// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 	switch (settings.ShiftMode) {
-		case Sequential: mode = "Sequential";
-			break;
-		case HPattern: mode = "H-Pattern";
-			break;
-		case Automatic: mode = "Automatic";
-			break;
+		case Sequential: mode += "Sequential"; break;
+		case HPattern: mode += "H-Pattern"; break;
+		case Automatic: mode += "Automatic"; break;
 	}
-	message << "Mode: " << mode;
-	showNotification(CharAdapter(message.str().c_str()), &prevNotification);
+	showNotification(CharAdapter(mode.c_str()), &prevNotification);
 }
 
 void cycleShiftMode() {
