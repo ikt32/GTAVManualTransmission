@@ -10,9 +10,8 @@ http://dev-c.com
 #include "Input/keyboard.h"
 #include "Util/Paths.h"
 #include "Util/Logger.hpp"
-#include "Util/Util.hpp"
 #include "Memory/MemoryPatcher.hpp"
-
+#include "Util/Versions.h"
 
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {

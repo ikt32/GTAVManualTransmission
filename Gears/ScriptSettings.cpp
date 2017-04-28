@@ -6,11 +6,11 @@
 #endif
 #include "Util/simpleini/SimpleIni.h"
 #include "Util/Logger.hpp"
-#include "Util/Util.hpp"
 #include "Input/keyboard.h"
 #include "Input/ScriptControls.hpp"
 #include "Menu/Controls.h"
 #include "Menu/MenuClass.h"
+#include "Util/Versions.h"
 
 ScriptSettings::ScriptSettings(const std::string &general,
 	                           const std::string &wheel) :

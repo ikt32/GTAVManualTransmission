@@ -1,7 +1,7 @@
 #include "VehicleExtensions.hpp"
 #include <vector>
 #include "NativeMemory.hpp"
-#include "../Util/Util.hpp"
+#include "Util/Versions.h"
 
 void VehicleExtensions::ClearAddress() {
 	currAddress = nullptr;

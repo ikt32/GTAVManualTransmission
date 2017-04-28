@@ -108,6 +108,7 @@
       <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="Util\Paths.h" />
+    <ClInclude Include="Util\Versions.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

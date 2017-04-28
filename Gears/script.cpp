@@ -23,6 +23,7 @@
 #include "Menu/MenuClass.h"
 #include "menu/Controls.h"
 #include "Input/keyboard.h"
+#include "Util/Versions.h"
 
 GameSound gearRattle("DAMAGED_TRUCK_IDLE", 0);
 
