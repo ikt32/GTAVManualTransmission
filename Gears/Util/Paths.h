@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include <string>
 
-namespace Util {
+namespace Paths {
 	const std::string	GetRunningExecutableFolder();
 	const std::string	GetRunningExecutableName();
 	const std::string	GetRunningExecutableNameWithoutExtension();

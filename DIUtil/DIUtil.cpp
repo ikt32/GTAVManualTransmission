@@ -7,7 +7,7 @@
 #include "../Gears/ScriptSettings.hpp"
 #include "../Gears/Input/ScriptControls.hpp"
 #include <thread>
-#include "../Gears/General.h"
+#include "../Gears/Util/Paths.h"
 
 #define ESC 0x1B
 #define TAB 0x09
@@ -22,8 +22,8 @@ CONSOLE_SCREEN_BUFFER_INFO csbi;
 
 ScriptControls controls;
 
-std::string settingsGeneralFile = Util::GetRunningExecutableFolder() + "\\settings_general.ini";
-std::string settingsWheelFile = Util::GetRunningExecutableFolder() + "\\settings_wheel.ini";
+std::string settingsGeneralFile = Paths::GetRunningExecutableFolder() + "\\settings_general.ini";
+std::string settingsWheelFile = Paths::GetRunningExecutableFolder() + "\\settings_wheel.ini";
 ScriptSettings settings(settingsGeneralFile, settingsWheelFile);
 
 std::array<int, 8> directions = {
@@ -742,7 +742,7 @@ void configHShift(char c) {
 
 
 int main() {
-	std::string logFile = Util::GetRunningExecutableFolder() + "\\" + Util::GetRunningExecutableNameWithoutExtension() + ".log";;
+	std::string logFile = Paths::GetRunningExecutableFolder() + "\\" + Paths::GetRunningExecutableNameWithoutExtension() + ".log";;
 	logger.SetFile(logFile);
 	int axisTextHeight = 0;
 	int buttonTextHeight = 0;

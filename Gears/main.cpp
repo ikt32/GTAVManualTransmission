@@ -8,18 +8,18 @@ http://dev-c.com
 
 #include "script.h"
 #include "Input/keyboard.h"
+#include "Util/Paths.h"
 #include "Util/Logger.hpp"
 #include "Util/Util.hpp"
 #include "Memory/MemoryPatcher.hpp"
-#include "General.h"
 
 
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
-	std::string logFile = Util::GetModuleFolder(hInstance) + mtDir +
-		"\\" + Util::GetModuleNameWithoutExtension(hInstance) + ".log";
+	std::string logFile = Paths::GetModuleFolder(hInstance) + mtDir +
+		"\\" + Paths::GetModuleNameWithoutExtension(hInstance) + ".log";
 	logger.SetFile(logFile);
-	Util::SetOurModuleHandle(hInstance);
+	Paths::SetOurModuleHandle(hInstance);
 
 	// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 	switch (reason) {

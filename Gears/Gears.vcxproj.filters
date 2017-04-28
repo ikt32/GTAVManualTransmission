@@ -44,7 +44,7 @@
     <ClCompile Include="Input\LegacyController.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="Util\General.cpp" />
+    <ClCompile Include="Util\Paths.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -107,7 +107,7 @@
     <ClInclude Include="Input\LegacyController.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="Util\General.h" />
+    <ClInclude Include="Util\Paths.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

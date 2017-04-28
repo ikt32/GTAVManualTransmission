@@ -18,7 +18,7 @@
 #include "Memory/MemoryPatcher.hpp"
 #include "Util/Logger.hpp"
 #include "Util/Util.hpp"
-#include "General.h"
+#include "Util/Paths.h"
 
 #include "Menu/MenuClass.h"
 #include "menu/Controls.h"
@@ -2880,9 +2880,9 @@ void main() {
 		logger.Write("DirectInput failed to initialize");
 	}
 
-	settingsGeneralFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_general.ini";
-	settingsWheelFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_wheel.ini";
-	settingsMenuFile = Util::GetModuleFolder(Util::GetOurModuleHandle()) + mtDir + "\\settings_menu.ini";
+	settingsGeneralFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_general.ini";
+	settingsWheelFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_wheel.ini";
+	settingsMenuFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_menu.ini";
 	
 	settings.SetFiles(settingsGeneralFile, settingsWheelFile);
 	settings.SetMenuFile(settingsMenuFile);
