@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <vector>
 #include <functional>
+#include <array>
 
 class MenuControls;
 
@@ -24,23 +25,23 @@ public:
 	Menu();
 	~Menu();
 
-	void Title(char* title);
-	bool Option(char* option);
+	void Title(std::string  title);
+	bool Option(std::string  option);
 	void drawAdditionalInfoBox(std::vector<std::string> &extra, size_t infoLines);
-	bool OptionPlus(char *option, std::vector<std::string> &extra, bool *highlighted, std::function<void()> onRight, std::function<void()> onLeft);
-	bool MenuOption(char* option, char* menu);
-	bool IntOption(char* option, int *var, int min, int max, int step = 1);
-	bool FloatOption(char* option, float *var, float min, float max, float step = 0.1);
-	bool DoubleOption(char *option, double *var, double min, double max, double step);
-	bool BoolOption(char* option, bool *b00l);
-	bool BoolSpriteOption(char* option, bool b00l, char* category, char* spriteOn, char* spriteOff);
-	bool IntArray(char* option, int display[], int *PlaceHolderInt);
-	bool FloatArray(char* option, float display[], int *PlaceHolderInt);
-	bool CharArray(char* option, char* display[], int *PlaceHolderInt);
-	bool StringArray(char *option, std::vector<std::string> display, int *PlaceHolderInt);
-	void TeleportOption(char* option, float x, float y, float z);
+	bool OptionPlus(std::string option, std::vector<std::string> &extra, bool *highlighted, std::function<void()> onRight, std::function<void()> onLeft);
+	bool MenuOption(std::string  option, std::string  menu);
+	bool IntOption(std::string  option, int *var, int min, int max, int step = 1);
+	bool FloatOption(std::string  option, float *var, float min, float max, float step = 0.1);
+	bool DoubleOption(std::string option, double *var, double min, double max, double step);
+	bool BoolOption(std::string  option, bool *b00l);
+	bool BoolSpriteOption(std::string  option, bool b00l, std::string  category, std::string  spriteOn, std::string  spriteOff);
+	bool IntArray(std::string  option, int display[], int *PlaceHolderInt);
+	bool FloatArray(std::string  option, float display[], int *PlaceHolderInt);
+	bool CharArray(std::string  option, std::string  display[], int *PlaceHolderInt);
+	bool StringArray(std::string option, std::vector<std::string> display, int *PlaceHolderInt);
+	void TeleportOption(std::string  option, float x, float y, float z);
 
-	bool CurrentMenu(char* menuname);
+	bool CurrentMenu(std::string  menuname);
 
 	void IniWriteInt(LPCWSTR file, LPCWSTR section, LPCWSTR key, int value);
 	int IniReadInt(LPCWSTR file, LPCWSTR section, LPCWSTR key);
@@ -80,24 +81,24 @@ private:
 	bool uppress = false;
 	bool downpress = false;
 
-	char* currentmenu[100];
-	char* actualmenu = "";
+	std::array<std::string, 100> currentmenu;
+	std::string actualmenu;
 	int lastoption[100];
 	int menulevel = 0;
 	int infocount = 0;
 	unsigned int delay = GetTickCount();
-	
+
 	const unsigned int menuTimeSlow = 120;
 	const unsigned int menuTimeMedium = 90;
 	const unsigned int menuTimeFast = 60;
-	
+
 	unsigned int menuTime = menuTimeMedium;
 
 
-	void drawText(const char *text, int font, float x, float y, float scalex, float scaley, rgba rgba, bool center);
+	void drawText(const std::string text, int font, float x, float y, float scalex, float scaley, rgba rgba, bool center);
 	void drawRect(float x, float y, float width, float height, rgba rgba);
-	void drawSprite(char* Streamedtexture, char* textureName, float x, float y, float width, float height, float rotation, rgba rgba);
-	void changeMenu(char* menuname);
+	void drawSprite(std::string  Streamedtexture, std::string  textureName, float x, float y, float width, float height, float rotation, rgba rgba);
+	void changeMenu(std::string  menuname);
 	void nextOption();
 	void previousOption();
 	void backMenu();
