@@ -635,7 +635,10 @@ void Menu::CheckKeys(MenuControls* controls, std::function<void(void) > onMain, 
 			}
 			else if (menulevel == 1) {
 				backMenu();
-				if (onExit) onExit();
+				if (onExit) {
+					CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
+					onExit();
+				}
 			}
 			delay = GetTickCount();
 		}
@@ -643,7 +646,10 @@ void Menu::CheckKeys(MenuControls* controls, std::function<void(void) > onMain, 
 			if (menulevel > 0) { menuTime = menuTimeSlow; }
 			if (menulevel > 0) {
 				if (menulevel == 1) {
-					if (onExit) onExit();
+					if (onExit) {
+						CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
+						onExit();
+					}
 				}
 				backMenu();
 
