@@ -265,7 +265,7 @@ uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {
 
 float VehicleExtensions::GetVisualHeight(Vehicle handle) {
 	auto wheelPtr = GetWheelsPtr(handle);
-	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? -1 : 0x080);
+	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x080 : -1);
 	if (offset == -1)
 		return 0.0f;
 
@@ -276,7 +276,7 @@ float VehicleExtensions::GetVisualHeight(Vehicle handle) {
 // Physics are NOT affected, including hitbox.
 void VehicleExtensions::SetVisualHeight(Vehicle handle, float height) {
 	auto wheelPtr = GetWheelsPtr(handle);
-	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? -1 : 0x07c);
+	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x07c : -1);
 
 	if (offset == -1)
 		return;

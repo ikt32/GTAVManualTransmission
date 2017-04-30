@@ -248,7 +248,7 @@ void update() {
 		red.B = 0;
 		red.A = 255;
 
-		showText(0.05, 0.05, 1.0, CharAdapter(settings.GetVersionError().c_str()), 0, red);
+		showText(0.05, 0.05, 1.0, settings.GetVersionError().c_str(), 0, red);
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -538,8 +538,7 @@ void showHUD() {
 			speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(dashms)));
 			if (settings.SpeedoShowUnit) speedoFormat << (settings.HUDFont == 2 ? " mps" : " m/s");;
 		}
-		char *speedoText = CharAdapter(speedoFormat.str().c_str());
-		showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize, speedoText, settings.HUDFont, solidWhite, true);
+		showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize, speedoFormat.str().c_str(), settings.HUDFont, solidWhite, true);
 	}
 
 	// RPM Indicator!
@@ -751,7 +750,7 @@ void toggleManual() {
 	std::stringstream message;
 	message << "Manual Transmission " <<
 	           (settings.EnableManual ? "Enabled" : "Disabled");
-	showNotification(CharAdapter(message.str().c_str()), &prevNotification);
+	showNotification(message.str().c_str(), &prevNotification);
 	logger.Write(message.str());
 	if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
 		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
@@ -827,7 +826,7 @@ void setShiftMode(int shiftMode) {
 		case HPattern: mode += "H-Pattern"; break;
 		case Automatic: mode += "Automatic"; break;
 	}
-	showNotification(CharAdapter(mode.c_str()), &prevNotification);
+	showNotification(mode.c_str(), &prevNotification);
 }
 
 void cycleShiftMode() {
