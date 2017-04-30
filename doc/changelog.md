@@ -13,6 +13,7 @@ Gameplay changes:
 * Re-enable persistent shift toggle switch
 * Use normal speed for speedometer if vehicle dashboard speedometer is missing
 * Fix characters being corrupted for some system configurations
+* Fix cinematic cam disabled after menu close
 
 Wheel changes:
 * Use a separate force feedback calculation for planes
