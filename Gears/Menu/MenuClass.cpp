@@ -580,12 +580,12 @@ void Menu::CheckKeys(MenuControls* controls, std::function<void() > onMain, std:
 	optionpress = false;
 	if (GetTickCount() - delay > menuTime ||
 		controls->IsKeyJustPressed(MenuControls::MenuKey) ||
-		controls->IsKeyJustPressed(MenuControls::MenuSelect) ||
-		controls->IsKeyJustPressed(MenuControls::MenuCancel) ||
-		controls->IsKeyJustPressed(MenuControls::MenuUp) ||
-		controls->IsKeyJustPressed(MenuControls::MenuDown) ||
-		controls->IsKeyJustPressed(MenuControls::MenuLeft) ||
-		controls->IsKeyJustPressed(MenuControls::MenuRight)) {
+		controls->IsKeyJustPressed(MenuControls::MenuSelect) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendAccept) ||
+		controls->IsKeyJustPressed(MenuControls::MenuCancel) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendCancel) ||
+		controls->IsKeyJustPressed(MenuControls::MenuUp) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendUp) ||
+		controls->IsKeyJustPressed(MenuControls::MenuDown) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlFrontendDown) ||
+		controls->IsKeyJustPressed(MenuControls::MenuLeft) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneLeft) ||
+		controls->IsKeyJustPressed(MenuControls::MenuRight) || CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, ControlPhoneRight)) {
 
 		if (controls->IsKeyJustPressed(MenuControls::MenuKey)) {
 			if (menulevel == 0) {
