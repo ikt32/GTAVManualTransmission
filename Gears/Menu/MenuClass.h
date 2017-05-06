@@ -90,5 +90,6 @@ private:
 	void backMenu();
 	void menuBeep();
 	void resetButtonStates();
+	bool useNative = true;
 
 };
