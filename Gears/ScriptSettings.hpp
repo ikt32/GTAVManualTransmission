@@ -5,9 +5,11 @@
 
 class Logger;
 class ScriptControls;
-class Menu;
-class MenuControls;
 
+namespace NativeMenu {
+	class Menu;
+	class MenuControls;
+}
 //const std::string CORRECTVGENERAL	= "430";
 //const std::string CORRECTVWHEEL		= "430";
 static const int numGears = 8;
@@ -18,10 +20,10 @@ public:
 	void SetFiles(const std::string &general, const std::string &wheel);
 	void SetMenuFile(const std::string & menu);
 	void Read(ScriptControls* scriptControl);
-	void Read(MenuControls *menuControl, Menu *menuOpts);
+	void Read(NativeMenu::MenuControls *menuControl, NativeMenu::Menu *menuOpts);
 	void SaveGeneral() const;
 	void SaveController(ScriptControls *scriptControl) const;
-	void SaveMenu(Menu *menuOpts) const;
+	void SaveMenu(NativeMenu::Menu *menuOpts) const;
 	void SaveWheel(ScriptControls *scriptControl) const;
 	bool IsCorrectVersion() const;
 	std::string GetVersionError();
@@ -147,7 +149,7 @@ public:
 private:
 	void parseSettingsGeneral(ScriptControls *scriptControl);
 	void parseSettingsWheel(ScriptControls *scriptControl);
-	void parseSettingsMenu(MenuControls *controls, Menu *menuOpts);
+	void parseSettingsMenu(NativeMenu::MenuControls *controls, NativeMenu::Menu *menuOpts);
 
 	std::string settings_general_version = "000";
 	std::string settings_wheel_version = "000";

@@ -3,13 +3,14 @@
 #include <string>
 #ifdef GAME_BUILD
 #include <inc/enums.h>
+#include "menucontrols.h"
+#include "menu.h"
 #endif
 #include "Util/simpleini/SimpleIni.h"
 #include "Util/Logger.hpp"
 #include "Input/keyboard.h"
 #include "Input/ScriptControls.hpp"
-#include "Menu/Controls.h"
-#include "Menu/MenuClass.h"
+
 #include "Util/Versions.h"
 
 ScriptSettings::ScriptSettings(const std::string &general,
@@ -34,11 +35,11 @@ void ScriptSettings::Read(ScriptControls* scriptControl) {
 	parseSettingsGeneral(scriptControl);
 	parseSettingsWheel(scriptControl);
 }
-
-void ScriptSettings::Read(MenuControls* menuControl, Menu *menuOpts) {
+#ifdef GAME_BUILD
+void ScriptSettings::Read(NativeMenu::MenuControls* menuControl, NativeMenu::Menu *menuOpts) {
 	parseSettingsMenu(menuControl,menuOpts);
 }
-
+#endif
 void ScriptSettings::SaveGeneral() const {
 	CSimpleIniA settingsGeneral;
 	settingsGeneral.SetUnicode();
@@ -174,8 +175,8 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 
 	settingsWheel.SaveFile(settingsWheelFile.c_str());
 }
-
-void ScriptSettings::SaveMenu(Menu *menuOpts) const {
+#ifdef GAME_BUILD
+void ScriptSettings::SaveMenu(NativeMenu::Menu *menuOpts) const {
 	CSimpleIniA settingsMenu;
 	settingsMenu.SetUnicode();
 	settingsMenu.LoadFile(settingsMenuFile.c_str());
@@ -186,6 +187,7 @@ void ScriptSettings::SaveMenu(Menu *menuOpts) const {
 
 	settingsMenu.SaveFile(settingsMenuFile.c_str());
 }
+#endif
 
 bool ScriptSettings::IsCorrectVersion() const {
 	if (settings_general_version != CORRECTVGENERAL || settings_wheel_version != CORRECTVWHEEL)
@@ -351,19 +353,19 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 #pragma warning(pop)
 
 }
-
-void ScriptSettings::parseSettingsMenu(MenuControls *menuControl, Menu *menuOpts) {
+#ifdef GAME_BUILD
+void ScriptSettings::parseSettingsMenu(NativeMenu::MenuControls *menuControl, NativeMenu::Menu *menuOpts) {
 	CSimpleIniA menuSettings;
 	menuSettings.SetUnicode();
 	menuSettings.LoadFile(settingsMenuFile.c_str());
 
-	menuControl->ControlKeys[MenuControls::ControlType::MenuKey] = str2key(menuSettings.GetValue("MENU", "MenuKey", "VK_OEM_4"));
-	menuControl->ControlKeys[MenuControls::ControlType::MenuUp] = str2key(menuSettings.GetValue("MENU", "MenuUp", "UP"));
-	menuControl->ControlKeys[MenuControls::ControlType::MenuDown] = str2key(menuSettings.GetValue("MENU", "MenuDown", "DOWN"));
-	menuControl->ControlKeys[MenuControls::ControlType::MenuLeft] = str2key(menuSettings.GetValue("MENU", "MenuLeft", "LEFT"));
-	menuControl->ControlKeys[MenuControls::ControlType::MenuRight] = str2key(menuSettings.GetValue("MENU", "MenuRight", "RIGHT"));
-	menuControl->ControlKeys[MenuControls::ControlType::MenuSelect] = str2key(menuSettings.GetValue("MENU", "MenuSelect", "RETURN"));
-	menuControl->ControlKeys[MenuControls::ControlType::MenuCancel] = str2key(menuSettings.GetValue("MENU", "MenuCancel", "BACKSPACE"));
+	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuKey] = str2key(menuSettings.GetValue("MENU", "MenuKey", "VK_OEM_4"));
+	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuUp] = str2key(menuSettings.GetValue("MENU", "MenuUp", "UP"));
+	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuDown] = str2key(menuSettings.GetValue("MENU", "MenuDown", "DOWN"));
+	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuLeft] = str2key(menuSettings.GetValue("MENU", "MenuLeft", "LEFT"));
+	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuRight] = str2key(menuSettings.GetValue("MENU", "MenuRight", "RIGHT"));
+	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuSelect] = str2key(menuSettings.GetValue("MENU", "MenuSelect", "RETURN"));
+	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuCancel] = str2key(menuSettings.GetValue("MENU", "MenuCancel", "BACKSPACE"));
 #pragma warning(push)
 #pragma warning(disable: 4244)
 	menuOpts->menux = menuSettings.GetDoubleValue("MENU", "MenuX", 0.2);
@@ -371,7 +373,7 @@ void ScriptSettings::parseSettingsMenu(MenuControls *menuControl, Menu *menuOpts
 #pragma warning(pop)
 
 }
-
+#endif
 
 void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 #pragma warning(push)

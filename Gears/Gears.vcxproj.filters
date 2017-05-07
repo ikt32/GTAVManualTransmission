@@ -35,16 +35,19 @@
     <ClCompile Include="Util\Util.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Menu\MenuClass.cpp">
-      <Filter>Menu</Filter>
-    </ClCompile>
-    <ClCompile Include="Menu\controls.cpp">
-      <Filter>Menu</Filter>
-    </ClCompile>
     <ClCompile Include="Input\LegacyController.cpp">
       <Filter>Input</Filter>
     </ClCompile>
     <ClCompile Include="Util\Paths.cpp" />
+    <ClCompile Include="..\..\GTAVMenuBase\menu.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\GTAVMenuBase\menucontrols.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\GTAVMenuBase\menukeyboard.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -98,17 +101,20 @@
     <ClInclude Include="Util\simpleini\SimpleIni.h">
       <Filter>Util\simpleini</Filter>
     </ClInclude>
-    <ClInclude Include="Menu\MenuClass.h">
-      <Filter>Menu</Filter>
-    </ClInclude>
-    <ClInclude Include="Menu\controls.h">
-      <Filter>Menu</Filter>
-    </ClInclude>
     <ClInclude Include="Input\LegacyController.h">
       <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="Util\Paths.h" />
     <ClInclude Include="Util\Versions.h" />
+    <ClInclude Include="..\..\GTAVMenuBase\menu.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GTAVMenuBase\menucontrols.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GTAVMenuBase\menukeyboard.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

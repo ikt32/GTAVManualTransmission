@@ -34,7 +34,7 @@
     <OutDir>bin\</OutDir>
     <IntDir>obj\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);..\..\ScriptHookV_SDK;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir);..\..\ScriptHookV_SDK;..\..\GTAVMenuBase\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -61,6 +61,9 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\GTAVMenuBase\menu.cpp" />
+    <ClCompile Include="..\..\GTAVMenuBase\menucontrols.cpp" />
+    <ClCompile Include="..\..\GTAVMenuBase\menukeyboard.cpp" />
     <ClCompile Include="Util\Paths.cpp" />
     <ClCompile Include="Input\keyboard.cpp" />
     <ClCompile Include="Input\ScriptControls.cpp" />
@@ -71,8 +74,6 @@
     <ClCompile Include="Memory\MemoryPatcher.cpp" />
     <ClCompile Include="Memory\NativeMemory.cpp" />
     <ClCompile Include="Memory\VehicleExtensions.cpp" />
-    <ClCompile Include="Menu\controls.cpp" />
-    <ClCompile Include="Menu\MenuClass.cpp" />
     <ClCompile Include="script.cpp" />
     <ClCompile Include="ScriptSettings.cpp" />
     <ClCompile Include="Util\Util.cpp" />
@@ -81,6 +82,9 @@
     <ClCompile Include="VehicleData.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\GTAVMenuBase\menu.h" />
+    <ClInclude Include="..\..\GTAVMenuBase\menucontrols.h" />
+    <ClInclude Include="..\..\GTAVMenuBase\menukeyboard.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\enums.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\main.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h" />
@@ -95,8 +99,6 @@
     <ClInclude Include="Memory\MemoryPatcher.hpp" />
     <ClInclude Include="Memory\NativeMemory.hpp" />
     <ClInclude Include="Memory\VehicleExtensions.hpp" />
-    <ClInclude Include="Menu\controls.h" />
-    <ClInclude Include="Menu\MenuClass.h" />
     <ClInclude Include="script.h" />
     <ClInclude Include="ScriptSettings.hpp" />
     <ClInclude Include="Util\Logger.hpp" />

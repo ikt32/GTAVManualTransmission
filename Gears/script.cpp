@@ -20,8 +20,8 @@
 #include "Util/Util.hpp"
 #include "Util/Paths.h"
 
-#include "Menu/MenuClass.h"
-#include "menu/Controls.h"
+#include "menu.h"
+#include "menucontrols.h"
 #include "Input/keyboard.h"
 #include "Util/Versions.h"
 
@@ -33,8 +33,8 @@ std::string settingsGeneralFile;
 std::string settingsWheelFile;
 std::string settingsMenuFile;
 
-Menu menu;
-MenuControls menuControls;
+NativeMenu::Menu menu;
+NativeMenu::MenuControls menuControls;
 
 ScriptControls controls;
 ScriptSettings settings(settingsGeneralFile, settingsWheelFile);
@@ -1819,11 +1819,9 @@ void playWheelEffectsPlane(ScriptSettings& settings, VehicleData& vehData) {
 }
 
 void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airborne, bool ignoreSpeed) {
-	auto steerAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(controls.SteerAxisType)]);
-
-	if (!controls.WheelControl.IsConnected(controls.SteerGUID) ||
+	if (!settings.EnableFFB ||
 		controls.PrevInput != ScriptControls::Wheel ||
-		!settings.EnableFFB) {
+		!controls.WheelControl.IsConnected(controls.SteerGUID)) {
 		return;
 	}
 
@@ -1857,6 +1855,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	}
 
 	// steerSpeed is to dampen the steering wheel
+	auto steerAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(controls.SteerAxisType)]);
 	auto steerSpeed = controls.WheelControl.GetAxisSpeed(steerAxis, controls.SteerGUID) / 20;
 
 	/*                    a                                        v^2
@@ -2790,9 +2789,9 @@ bool configHPattern() {
 
 // Keyboard
 bool isMenuControl(int control) {
-	if (control == menuControls.ControlKeys[MenuControls::ControlType::MenuKey] ||
-		control == menuControls.ControlKeys[MenuControls::ControlType::MenuSelect] ||
-		control == menuControls.ControlKeys[MenuControls::ControlType::MenuCancel]) {
+	if (control == menuControls.ControlKeys[NativeMenu::MenuControls::ControlType::MenuKey] ||
+		control == menuControls.ControlKeys[NativeMenu::MenuControls::ControlType::MenuSelect] ||
+		control == menuControls.ControlKeys[NativeMenu::MenuControls::ControlType::MenuCancel]) {
 		return true;
 	}
 	return false;
