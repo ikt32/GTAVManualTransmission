@@ -34,7 +34,7 @@
     <OutDir>bin\</OutDir>
     <IntDir>obj\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);..\..\ScriptHookV_SDK;..\..\GTAVMenuBase\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)thirdparty\;$(ProjectDir);..\..\ScriptHookV_SDK;..\..\GTAVMenuBase\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -89,6 +89,7 @@
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\main.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h" />
+    <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
     <ClInclude Include="Util\Paths.h" />
     <ClInclude Include="Input\DiJoyStick.h" />
     <ClInclude Include="Input\keyboard.h" />
@@ -102,7 +103,6 @@
     <ClInclude Include="script.h" />
     <ClInclude Include="ScriptSettings.hpp" />
     <ClInclude Include="Util\Logger.hpp" />
-    <ClInclude Include="Util\simpleini\SimpleIni.h" />
     <ClInclude Include="Util\TimeHelper.hpp" />
     <ClInclude Include="Util\Util.hpp" />
     <ClInclude Include="Util\Versions.h" />

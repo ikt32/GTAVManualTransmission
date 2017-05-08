@@ -98,9 +98,6 @@
     <ClInclude Include="Input\ScriptControls.hpp">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="Util\simpleini\SimpleIni.h">
-      <Filter>Util\simpleini</Filter>
-    </ClInclude>
     <ClInclude Include="Input\LegacyController.h">
       <Filter>Input</Filter>
     </ClInclude>
@@ -114,6 +111,9 @@
     </ClInclude>
     <ClInclude Include="..\..\GTAVMenuBase\menukeyboard.h">
       <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h">
+      <Filter>Thirdparty</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -129,11 +129,11 @@
     <Filter Include="Input">
       <UniqueIdentifier>{b0a5ce99-5818-4a5c-8c45-00ae3b8148c4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Util\simpleini">
-      <UniqueIdentifier>{d51e90e7-b382-4e70-afc1-502831bccebd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Menu">
       <UniqueIdentifier>{d318979d-d544-4b16-9e26-6bec9234be3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thirdparty">
+      <UniqueIdentifier>{d0a967a3-e709-4563-beec-8bb1bc9d1711}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -6,7 +6,7 @@
 #include "menucontrols.h"
 #include "menu.h"
 #endif
-#include "Util/simpleini/SimpleIni.h"
+#include "simpleini/SimpleIni.h"
 #include "Util/Logger.hpp"
 #include "Input/keyboard.h"
 #include "Input/ScriptControls.hpp"
