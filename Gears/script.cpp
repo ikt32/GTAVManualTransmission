@@ -2094,7 +2094,7 @@ void update_menu() {
 		for (auto confTag : controllerConfTags) {
 			controllerInfo.back() = controllerConfTagDetail.at(it);
 			controllerInfo.push_back("Assigned to " + controls.ConfTagController2Value(confTag));
-			if (menu.OptionPlus("Assign " + confTag, controllerInfo, nullptr, std::bind(clearControllerButton, confTag), nullptr)) {
+			if (menu.OptionPlus("Assign " + confTag, controllerInfo, nullptr, std::bind(clearControllerButton, confTag), nullptr, "Current setting")) {
 				bool result = configControllerButton(confTag);
 				//showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
 				if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
@@ -2118,7 +2118,7 @@ void update_menu() {
 		for (auto confTag : keyboardConfTags) {
 			keyboardInfo.back() = keyboardConfTagsDetail.at(it);
 			keyboardInfo.push_back("Assigned to " + key2str(controls.ConfTagKB2key(confTag)));
-			if (menu.OptionPlus("Assign " + confTag, keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag), nullptr)) {
+			if (menu.OptionPlus("Assign " + confTag, keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag), nullptr, "Current setting")) {
 				bool result = configKeyboardKey(confTag);
 				if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
 				WAIT(1000);
@@ -2154,7 +2154,7 @@ void update_menu() {
 		if (controls.ButtonIn(ScriptControls::WheelControlType::H6)) hpatInfo.push_back("Gear 6");
 		if (controls.ButtonIn(ScriptControls::WheelControlType::H7)) hpatInfo.push_back("Gear 7");
 
-		if (menu.OptionPlus("H-pattern shifter", hpatInfo, nullptr, std::bind(clearHShifter), nullptr)) {
+		if (menu.OptionPlus("H-pattern shifter", hpatInfo, nullptr, std::bind(clearHShifter), nullptr, "Input values")) {
 			bool result = configHPattern();
 			showNotification(result ? "H-pattern shifter saved" : "Cancelled H-pattern shifter setup", &prevNotification);
 		}
@@ -2189,23 +2189,23 @@ void update_menu() {
 			"Handbrake: " + std::to_string(controls.HandbrakeVal),
 		};
 
-		if (menu.OptionPlus("Calibrate steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr)) {
+		if (menu.OptionPlus("Calibrate steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr, "Input values")) {
 			bool result = configAxis("STEER");
 			showNotification(result ? "Steering axis saved" : "Cancelled steering axis calibration", &prevNotification);
 		}
-		if (menu.OptionPlus("Calibrate throttle", info, nullptr, std::bind(clearAxis, "THROTTLE"), nullptr)) {
+		if (menu.OptionPlus("Calibrate throttle", info, nullptr, std::bind(clearAxis, "THROTTLE"), nullptr, "Input values")) {
 			bool result = configAxis("THROTTLE");
 			showNotification(result ? "Throttle axis saved" : "Cancelled throttle axis calibration", &prevNotification);
 		}
-		if (menu.OptionPlus("Calibrate brake", info, nullptr, std::bind(clearAxis, "BRAKES"), nullptr)) {
+		if (menu.OptionPlus("Calibrate brake", info, nullptr, std::bind(clearAxis, "BRAKES"), nullptr, "Input values")) {
 			bool result = configAxis("BRAKES");
 			showNotification(result ? "Brake axis saved" : "Cancelled brake axis calibration", &prevNotification);
 		}
-		if (menu.OptionPlus("Calibrate clutch", info, nullptr, std::bind(clearAxis, "CLUTCH"), nullptr)) {
+		if (menu.OptionPlus("Calibrate clutch", info, nullptr, std::bind(clearAxis, "CLUTCH"), nullptr, "Input values")) {
 			bool result = configAxis("CLUTCH");
 			showNotification(result ? "Clutch axis saved" : "Cancelled clutch axis calibration", &prevNotification);
 		}
-		if (menu.OptionPlus("Calibrate handbrake", info, nullptr, std::bind(clearAxis, "HANDBRAKE_ANALOG"), nullptr)) {
+		if (menu.OptionPlus("Calibrate handbrake", info, nullptr, std::bind(clearAxis, "HANDBRAKE_ANALOG"), nullptr, "Input values")) {
 			bool result = configAxis("HANDBRAKE_ANALOG");
 			showNotification(result ? "Handbrake axis saved" : "Cancelled handbrake axis calibration", &prevNotification);
 		}
@@ -2269,7 +2269,7 @@ void update_menu() {
 		}
 
 		for (auto confTag : buttonConfTags) {
-			if (menu.OptionPlus("Assign " + confTag, info, nullptr, std::bind(clearButton, confTag), nullptr)) {
+			if (menu.OptionPlus("Assign " + confTag, info, nullptr, std::bind(clearButton, confTag), nullptr, "Current inputs")) {
 				bool result = configButton(confTag);
 				showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
 			}
