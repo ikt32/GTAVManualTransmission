@@ -311,11 +311,39 @@ std::vector<float> VehicleExtensions::GetWheelsCompression(Vehicle handle) {
 	return compressions;
 }
 
+float VehicleExtensions::GetSteeringMultiplier(Vehicle handle) {
+	auto wheelPtr = GetWheelsPtr(handle);
+
+	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x138 : 0x128;
+
+	// first wheel
+	auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * 1);
+	return abs(*reinterpret_cast<float*>(wheelAddr + offset));
+}
+
+template <typename T> int sgn(T val) {
+	return (T(0) < val) - (val < T(0));
+}
+
+void VehicleExtensions::SetSteeringMultiplier(Vehicle handle, float value) {
+	auto wheelPtr = GetWheelsPtr(handle);
+	auto numWheels = GetNumWheels(handle);
+
+	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x138 : 0x128;
+
+	for (int i = 0; i<numWheels; i++) {
+		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
+		int sign = sgn(*reinterpret_cast<float*>(wheelPtr + offset));
+		*reinterpret_cast<float*>(wheelPtr + offset) = value * sign;
+	}
+}
+
 // Steering input angle, steering lock independent
 float VehicleExtensions::GetSteeringInputAngle(Vehicle handle) {
 	auto address = GetAddress(handle);
 
 	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x8A4 : 0x894);
+	offset = (gameVersion > G_VER_1_0_678_1_NOSTEAM ? 0x89C : offset);
 	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x8C4 : offset);
 	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x8EC : offset);
 
@@ -326,6 +354,7 @@ void VehicleExtensions::SetSteeringInputAngle(Vehicle handle, float value) {
 	auto address = GetAddress(handle);
 
 	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x8A4 : 0x894);
+	offset = (gameVersion > G_VER_1_0_678_1_NOSTEAM ? 0x89C : offset);
 	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x8C4 : offset);
 	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x8EC : offset);
 

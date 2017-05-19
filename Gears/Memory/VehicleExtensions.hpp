@@ -41,6 +41,8 @@ public:
 	void SetSteeringInputAngle(Vehicle handle, float value);
 	float GetSteeringAngle(Vehicle handle);
 	void SetSteeringAngle(Vehicle handle, float value);
+	float GetSteeringMultiplier(Vehicle handle);
+	void SetSteeringMultiplier(Vehicle handle, float value);
 	float GetEngineTemp(Vehicle handle);
 	float GetDirtLevel(Vehicle handle);
 	float GetDashSpeed(Vehicle handle);
