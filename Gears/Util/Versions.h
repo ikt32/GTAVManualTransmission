@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-#define DISPLAY_VERSION "v4.3.0"
+#define DISPLAY_VERSION "v4.3.2"
 #define CORRECTVGENERAL "430"
 #define CORRECTVWHEEL   "430"
 
