@@ -35,6 +35,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 			logger.Write("Init shutdown");
 			bool successI = MemoryPatcher::RestoreInstructions();
 			bool successS = MemoryPatcher::RestoreSteeringCorrection();
+			resetSteeringMultiplier();
 			scriptUnregister(hInstance);
 
 			if (successI && successS) {

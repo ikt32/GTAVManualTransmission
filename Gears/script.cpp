@@ -745,6 +745,12 @@ void reset() {
 	}
 }
 
+void resetSteeringMultiplier() {
+	if (ext.GetSteeringMultiplier(vehicle) != 1.0f) {
+		ext.SetSteeringMultiplier(vehicle, 1.0f);
+	}
+}
+
 void toggleManual() {
 	settings.EnableManual = !settings.EnableManual;
 	settings.SaveGeneral();
@@ -796,10 +802,12 @@ void updateLastInputDevice() {
 		if (!MemoryPatcher::SteeringPatched && settings.PatchSteering) {
 			MemoryPatcher::PatchSteeringCorrection();
 		}
+		ext.SetSteeringMultiplier(vehicle, settings.GameSteerMult);
 	} else {
 		if (MemoryPatcher::SteeringPatched && settings.PatchSteering && !settings.PatchSteeringAlways) {
 			MemoryPatcher::RestoreSteeringCorrection();
 		}
+		resetSteeringMultiplier();
 	}
 }
 
@@ -2174,7 +2182,7 @@ void update_menu() {
 		menu.FloatOption("Car soft lock", &settings.SteerAngleCar, 180.0, settings.SteerAngleMax, 60.0);
 		menu.FloatOption("Bike soft lock", &settings.SteerAngleBike, 180.0, settings.SteerAngleMax, 60.0);
 		menu.FloatOption("Boat/Plane soft lock", &settings.SteerAngleAlt, 180.0, settings.SteerAngleMax, 60.0);
-
+		menu.FloatOption("Steering Multiplier", &settings.GameSteerMult, 0.0, 4.0, 0.1);
 	}
 
 	

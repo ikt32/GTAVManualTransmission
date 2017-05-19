@@ -173,6 +173,10 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 	settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "PhysicsStrength", PhysicsStrength);
 	settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DetailStrength", DetailStrength);
 
+	// haha I lied, here's multiplier which is kinda [OPTIONS] anyway
+	// [STEER]
+	settingsWheel.SetDoubleValue("STEER", "GameSteerMult", GameSteerMult);
+
 	settingsWheel.SaveFile(settingsWheelFile.c_str());
 }
 #ifdef GAME_BUILD
@@ -478,6 +482,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	SteerAngleCar = settingsWheel.GetDoubleValue("STEER", "SteerAngleCar", 720.0);
 	SteerAngleBike = settingsWheel.GetDoubleValue("STEER", "SteerAngleBike", 180.0);
 	SteerAngleAlt = settingsWheel.GetDoubleValue("STEER", "SteerAngleAlt", 180.0);
+	GameSteerMult = settingsWheel.GetDoubleValue("STEER", "GameSteerMult", 1.0);
 
 	// [THROTTLE]
 	scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Throttle)] =

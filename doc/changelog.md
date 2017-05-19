@@ -1,5 +1,21 @@
 # Changelog
 
+## 4.3.2
+Configuration changes:
+* Added [CLUTCH_BUTTON] for wheel
+* Added steering multiplier for wheel
+You don't need to replace your existing configs. New values are added when set.
+
+Menu changes:
+* Update menu look and feel
+
+Gameplay changes:
+* Throttle is now considered for engine stalling
+
+Wheel changes:
+* Add support for button-based clutch
+* Add option to change steering multiplier
+
 ## 4.3.1
 No configuration changes
 

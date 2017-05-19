@@ -2,6 +2,7 @@
 #include <Windows.h>
 
 #include <vector>
+#include "simpleini/SimpleIni.h"
 
 class Logger;
 class ScriptControls;
@@ -132,6 +133,7 @@ public:
 	float SteerAngleCar = 720.0f;
 	float SteerAngleBike = 180.0f;
 	float SteerAngleAlt = 180.0f;
+	float GameSteerMult = 1.0f;
 
 	// Methods
 	/*
