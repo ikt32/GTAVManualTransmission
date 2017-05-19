@@ -1113,7 +1113,8 @@ void functionClutchCatch() {
 }
 
 void functionEngStall() {
-	if (controls.ClutchVal < 1.0f - settings.StallingThreshold &&
+	if (controls.ThrottleVal < 1.0f - settings.StallingThreshold &&
+		controls.ClutchVal < 1.0f - settings.StallingThreshold &&
 		vehData.Rpm < 0.21f &&
 		((vehData.Speed < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && vehData.Speed < 1.0f)) &&
 		VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
