@@ -538,6 +538,12 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::HR)] =
 		settingsWheel.GetLongValue("SHIFTER", "GEAR_R", -1);
 
+	// [CLUTCH_BUTTON]
+	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::Clutch)] =
+		DeviceIndexToGUID(settingsWheel.GetLongValue("CLUTCH_BUTTON", "DEVICE", -1), reggdGuids);
+	scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::Clutch)] =
+		settingsWheel.GetLongValue("CLUTCH_BUTTON", "BUTTON", -1);
+
 	// [SHIFT_UP]
 	scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::ShiftUp)] =
 		DeviceIndexToGUID(settingsWheel.GetLongValue("SHIFT_UP", "DEVICE", -1), reggdGuids);

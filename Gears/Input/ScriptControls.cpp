@@ -90,8 +90,14 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 			ThrottleVal = 0.0f + 1.0f / (ThrottleDown - ThrottleUp)*(static_cast<float>(RawT) - ThrottleUp);
 			BrakeVal = 0.0f + 1.0f / (BrakeDown - BrakeUp)*(static_cast<float>(RawB) - BrakeUp);
 
-			if (WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]) == WheelDirectInput::UNKNOWN_AXIS) {
-				ClutchVal = 0.0f;
+			if (WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]) == WheelDirectInput::UNKNOWN_AXIS ||
+				WheelAxesGUIDs[static_cast<int>(WheelAxisType::Clutch)] == GUID()) {
+				// wtf why would u :/
+				if (WheelButton[static_cast<int>(WheelControlType::Clutch)] != -1) {
+					ClutchVal = ButtonIn(WheelControlType::Clutch) ? 1.0f : 0.0f;
+				} else {
+					ClutchVal = 0.0f;
+				}
 			} else {
 				ClutchVal = 0.0f + 1.0f / (ClutchDown - ClutchUp)*(static_cast<float>(RawC) - ClutchUp);
 			}
@@ -107,9 +113,15 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 			SteerVal = 0.0f + 1.0f / (SteerRight - SteerLeft)*(static_cast<float>(RawS) - SteerLeft);
 
 			if (RawH == -1) { HandbrakeVal = 0.0f; }
-			if (RawC == -1) { ClutchVal = 0.0f; ClutchValRaw = 0.0f; }
 			if (RawT == -1) { ThrottleVal = 0.0f; }
 			if (RawB == -1) { BrakeVal = 0.0f; }
+			if (RawC == -1 &&
+				(WheelButton[static_cast<int>(WheelControlType::Clutch)] == -1 ||
+				WheelButtonGUIDs[static_cast<int>(WheelControlType::Clutch)] == GUID())) {
+				ClutchVal = 0.0f; ClutchValRaw = 0.0f;
+			}
+
+			
 
 			if (ThrottleVal > 1.0f) { ThrottleVal = 1.0f; }
 			if (BrakeVal > 1.0f) { BrakeVal = 1.0f; }

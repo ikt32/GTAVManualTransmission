@@ -88,6 +88,7 @@ std::vector<int> fontIDs {
 std::vector<std::string> buttonConfTags{
 	{ "TOGGLE_MOD" },
 	{ "CHANGE_SHIFTMODE" },
+	{ "CLUTCH_BUTTON" },
 	{ "SHIFT_UP" },
 	{ "SHIFT_DOWN" },
 	{ "ENGINE" },
@@ -607,14 +608,14 @@ void showDebugInfo() {
 	ssAddress	<< "Address:\t" << std::hex << reinterpret_cast<uint64_t>(vehData.Address);
 	ssEnabled	<< "Mod:\t\t" << (settings.EnableManual ? "Enabled" : "Disabled");
 
-	showText(0.01f, 0.300f, 0.4f, ssRPM.str().c_str(),		4);
-	showText(0.01f, 0.325f, 0.4f, ssCurrGear.str().c_str(),	4);
-	showText(0.01f, 0.350f, 0.4f, ssNextGear.str().c_str(),	4);
-	showText(0.01f, 0.375f, 0.4f, ssClutch.str().c_str(),	4);
-	showText(0.01f, 0.400f, 0.4f, ssThrottle.str().c_str(),	4);
-	showText(0.01f, 0.425f, 0.4f, ssTurbo.str().c_str(),	4);
-	showText(0.01f, 0.450f, 0.4f, ssAddress.str().c_str(),	4);
-	showText(0.01f, 0.475f, 0.4f, ssEnabled.str().c_str(),	4);
+	showText(0.01f, 0.300f, 0.4f, ssRPM.str().c_str(),		4, solidWhite, true);
+	showText(0.01f, 0.325f, 0.4f, ssCurrGear.str().c_str(),	4, solidWhite, true);
+	showText(0.01f, 0.350f, 0.4f, ssNextGear.str().c_str(),	4, solidWhite, true);
+	showText(0.01f, 0.375f, 0.4f, ssClutch.str().c_str(),	4, solidWhite, true);
+	showText(0.01f, 0.400f, 0.4f, ssThrottle.str().c_str(),	4, solidWhite, true);
+	showText(0.01f, 0.425f, 0.4f, ssTurbo.str().c_str(),	4, solidWhite, true);
+	showText(0.01f, 0.450f, 0.4f, ssAddress.str().c_str(),	4, solidWhite, true);
+	showText(0.01f, 0.475f, 0.4f, ssEnabled.str().c_str(),	4, solidWhite, true);
 	if (!vehData.HasSpeedo) showText(0.01f, 0.500f, 0.4f, "No speedo btw", 4);
 
 	std::stringstream ssThrottleInput;
@@ -627,15 +628,15 @@ void showDebugInfo() {
 	ssClutchInput	<< "Clutch:\t\t" << controls.ClutchVal;
 	ssHandbrakInput << "Handb:\t\t" << controls.HandbrakeVal;
 
-	showText(0.85, 0.050, 0.4, ssThrottleInput.str().c_str(),	4);
-	showText(0.85, 0.075, 0.4, ssBrakeInput.str().c_str(),		4);
-	showText(0.85, 0.100, 0.4, ssClutchInput.str().c_str(),		4);
-	showText(0.85, 0.125, 0.4, ssHandbrakInput.str().c_str(),	4);
+	showText(0.85, 0.050, 0.4, ssThrottleInput.str().c_str(),	4, solidWhite, true);
+	showText(0.85, 0.075, 0.4, ssBrakeInput.str().c_str(),		4, solidWhite, true);
+	showText(0.85, 0.100, 0.4, ssClutchInput.str().c_str(),		4, solidWhite, true);
+	showText(0.85, 0.125, 0.4, ssHandbrakInput.str().c_str(),	4, solidWhite, true);
 
 	if (settings.EnableWheel) {
 		std::stringstream dinputDisplay;
 		dinputDisplay << "Wheel" << (controls.WheelControl.IsConnected(controls.SteerGUID) ? "" : " not") << " present";
-		showText(0.85, 0.150, 0.4, dinputDisplay.str().c_str(), 4);
+		showText(0.85, 0.150, 0.4, dinputDisplay.str().c_str(), 4, solidWhite, true);
 	}
 }
 
@@ -657,13 +658,13 @@ void showDebugInfoWheel(ScriptSettings &settings, float effSteer, int damperForc
 	ssUnderSteer	<< "Understeer:\t" << understeer;
 	ssOverSteer		<< "Oversteer:\t" << oversteer;
 
-	showText(0.85, 0.175, 0.4, SteerRaw.str().c_str()		,4);
-	showText(0.85, 0.200, 0.4, SteerNorm.str().c_str()		,4);
-	showText(0.85, 0.225, 0.4, steerDisplay.str().c_str()	,4);
-	showText(0.85, 0.250, 0.4, GForceDisplay.str().c_str()	,4);
-	showText(0.85, 0.275, 0.4, damperF.str().c_str()		,4);
-	showText(0.85, 0.300, 0.4, ssUnderSteer.str().c_str()	,4);
-	showText(0.85, 0.325, 0.4, ssOverSteer.str().c_str()	,4);
+	showText(0.85, 0.175, 0.4, SteerRaw.str().c_str(),		4, solidWhite, true);
+	showText(0.85, 0.200, 0.4, SteerNorm.str().c_str(),		4, solidWhite, true);
+	showText(0.85, 0.225, 0.4, steerDisplay.str().c_str(),	4, solidWhite, true);
+	showText(0.85, 0.250, 0.4, GForceDisplay.str().c_str(),	4, solidWhite, true);
+	showText(0.85, 0.275, 0.4, damperF.str().c_str(),		4, solidWhite, true);
+	showText(0.85, 0.300, 0.4, ssUnderSteer.str().c_str(),	4, solidWhite, true);
+	showText(0.85, 0.325, 0.4, ssOverSteer.str().c_str(),	4, solidWhite, true);
 }
 
 // To expose some variables to other scripts
@@ -2246,6 +2247,7 @@ void update_menu() {
 		if (controls.ButtonIn(ScriptControls::WheelControlType::H7)) info.push_back("Gear 7");
 		if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftUp))	info.push_back("ShiftUp");
 		if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftDown)) info.push_back("ShiftDown");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Clutch))	info.push_back("ClutchButton");
 		if (controls.ButtonIn(ScriptControls::WheelControlType::Engine))	info.push_back("Engine");
 		if (controls.ButtonIn(ScriptControls::WheelControlType::Handbrake)) info.push_back("Handbrake");
 		if (controls.ButtonIn(ScriptControls::WheelControlType::Horn))		info.push_back("Horn");
