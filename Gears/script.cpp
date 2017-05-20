@@ -28,6 +28,7 @@
 GameSound gearRattle("DAMAGED_TRUCK_IDLE", 0);
 
 int soundID;
+float stallingProbability = 0.0f;
 
 std::string settingsGeneralFile;
 std::string settingsWheelFile;
@@ -1118,15 +1119,33 @@ void functionClutchCatch() {
 }
 
 void functionEngStall() {
-	if (controls.ThrottleVal < 1.0f - settings.StallingThreshold &&
-		controls.ClutchVal < 1.0f - settings.StallingThreshold &&
-		vehData.Rpm < 0.21f &&
-		((vehData.Speed < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && vehData.Speed < 1.0f)) &&
+	float timeStep = SYSTEM::TIMESTEP() * 100.0f;
+
+	float dashms = ext.GetDashSpeed(vehicle);
+	if (!vehData.HasSpeedo && dashms > 0.1f) {
+		vehData.HasSpeedo = true;
+	}
+	if (!vehData.HasSpeedo) {
+		dashms = abs(vehData.Velocity);
+	}
+
+	if (controls.ClutchVal < 1.0f - settings.StallingThreshold &&
+		vehData.Rpm < 0.25f &&
+		((dashms < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && dashms < 1.0f)) &&
 		VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
 		VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
-		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
-		gearRattle.Stop();
+		stallingProbability += (rand() % 1000) / ((7500000.0f * (controls.ThrottleVal+0.001f) * timeStep));
+		if (stallingProbability > 1.0f) {
+			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
+			gearRattle.Stop();
+			stallingProbability = 0.0f;
+			//showNotification("Stalled!");
+		}
+	} else {
+		stallingProbability = 0.0f;
 	}
+	//showText(0.1, 0.1, 1.0, ("Stall prob.:" + std::to_string(stallingProbability)).c_str(), 0, solidWhite, true);
+	//showText(0.1, 0.2, 1.0, ("TS:" + std::to_string(timeStep)).c_str(), 0, solidWhite, true);
 }
 
 void functionEngDamage() {
