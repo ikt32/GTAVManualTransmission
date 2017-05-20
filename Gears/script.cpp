@@ -1084,23 +1084,20 @@ void functionAShift() { // Automatic
 void functionClutchCatch() {
 	if (controls.ClutchVal < 1.0f - settings.ClutchCatchpoint) {
 		// Automatic cars APPARENTLY need little/no brake pressure to stop
-		if (settings.ShiftMode == Automatic && controls.BrakeVal > 0.1f || vehData.Rpm > 0.3f) {
+		if (settings.ShiftMode == Automatic && controls.BrakeVal > 0.1f || vehData.Rpm > 0.25f) {
 			return;
 		}
-		// todo - clutchval changes acceleration factor/speed factor
+
 		// Forward
-		if (vehData.CurrGear > 0 && vehData.Velocity < vehData.CurrGear * 2.2f &&
+		if (vehData.CurrGear > 0 && vehData.Speed < vehData.CurrGear * 2.2f &&
 		    controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
 			if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.27f);
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.45f);
 			}
 			else {
-				if (vehData.Rpm < 0.3f) {
-					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.27f);
-				} else {
-					ext.SetCurrentRPM(vehicle, 0.28f);
-				}
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.27f);
 			}
+			ext.SetCurrentRPM(vehicle, 0.21f);
 		}
 
 		// Reverse
@@ -1108,15 +1105,14 @@ void functionClutchCatch() {
 			controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
 			if (vehData.Velocity < -2.2f) {
 				controls.ClutchVal = 1.0f;
-				//CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.20f);
-				//return;
 			}
 			if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.45f);
+			}
+			else {
 				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.27f);
 			}
-			else if (vehData.Rpm < 0.3f) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.27f);
-			}
+			ext.SetCurrentRPM(vehicle, 0.21f);
 		}
 	}
 }
@@ -2182,7 +2178,7 @@ void update_menu() {
 		menu.FloatOption("Car soft lock", &settings.SteerAngleCar, 180.0, settings.SteerAngleMax, 60.0);
 		menu.FloatOption("Bike soft lock", &settings.SteerAngleBike, 180.0, settings.SteerAngleMax, 60.0);
 		menu.FloatOption("Boat/Plane soft lock", &settings.SteerAngleAlt, 180.0, settings.SteerAngleMax, 60.0);
-		menu.FloatOption("Steering Multiplier", &settings.GameSteerMult, 0.0, 4.0, 0.1);
+		menu.FloatOption("Steering Multiplier", &settings.GameSteerMult, 0.0, 4.0, 0.01);
 	}
 
 	
