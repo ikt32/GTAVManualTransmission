@@ -1235,10 +1235,12 @@ void handleRPM() {
 	else {
 		if (!skip) {
 			finalClutch = 1.0f - controls.ClutchVal;
+			//showText(0.1, 0.1, 0.5, "we have clutch");
 		}
 	}
 	vehData.UpdateRpm();
 	ext.SetClutch(vehicle, finalClutch);
+	//showText(0.1, 0.15, 0.5, ("clutch set: " + std::to_string(finalClutch)).c_str());
 }
 
 void functionTruckLimiting() {
@@ -1425,9 +1427,14 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 					brakelights = true;
 					fakeRev();
 				}
-				else {
+				else if (controls.ClutchVal > 0.9 || vehData.SimulatedNeutral) {
 					//showText(0.3, 0.0, 1.0, "We should rev and do nothing");
 					ext.SetThrottleP(vehicle, wheelThrottleVal); 
+					fakeRev();
+				} else {
+					//showText(0.3, 0.0, 1.0, "We should rev and apply throttle");
+					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
+					ext.SetThrottleP(vehicle, wheelThrottleVal);
 					fakeRev();
 				}
 			}
