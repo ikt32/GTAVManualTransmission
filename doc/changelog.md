@@ -11,6 +11,9 @@ Menu changes:
 
 Gameplay changes:
 * Throttle is now considered for engine stalling
+* Fix throttle only revving but not applying force when rolling back in first gear or higher
+* Make clutch catching stronger again and force idle RPM when it's active.
+* Significantly improve stalling mechanism
 
 Wheel changes:
 * Add support for button-based clutch
