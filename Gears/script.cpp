@@ -1085,7 +1085,8 @@ void functionAShift() { // Automatic
 void functionClutchCatch() {
 	if (controls.ClutchVal < 1.0f - settings.ClutchCatchpoint) {
 		// Automatic cars APPARENTLY need little/no brake pressure to stop
-		if (settings.ShiftMode == Automatic && controls.BrakeVal > 0.1f || vehData.Rpm > 0.25f) {
+		if (settings.ShiftMode == Automatic && controls.BrakeVal > 0.1f || 
+			vehData.Rpm > 0.25f && vehData.Speed >= 2.2f) {
 			return;
 		}
 
