@@ -359,21 +359,25 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 }
 #ifdef GAME_BUILD
 void ScriptSettings::parseSettingsMenu(NativeMenu::MenuControls *menuControl, NativeMenu::Menu *menuOpts) {
-	CSimpleIniA menuSettings;
-	menuSettings.SetUnicode();
-	menuSettings.LoadFile(settingsMenuFile.c_str());
+	CSimpleIniA settingsMenu;
+	settingsMenu.SetUnicode();
+	settingsMenu.LoadFile(settingsMenuFile.c_str());
 
-	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuKey] = str2key(menuSettings.GetValue("MENU", "MenuKey", "VK_OEM_4"));
-	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuUp] = str2key(menuSettings.GetValue("MENU", "MenuUp", "UP"));
-	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuDown] = str2key(menuSettings.GetValue("MENU", "MenuDown", "DOWN"));
-	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuLeft] = str2key(menuSettings.GetValue("MENU", "MenuLeft", "LEFT"));
-	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuRight] = str2key(menuSettings.GetValue("MENU", "MenuRight", "RIGHT"));
-	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuSelect] = str2key(menuSettings.GetValue("MENU", "MenuSelect", "RETURN"));
-	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuCancel] = str2key(menuSettings.GetValue("MENU", "MenuCancel", "BACKSPACE"));
+	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuKey] = str2key(settingsMenu.GetValue("MENU", "MenuKey", "VK_OEM_4"));
+	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuUp] = str2key(settingsMenu.GetValue("MENU", "MenuUp", "UP"));
+	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuDown] = str2key(settingsMenu.GetValue("MENU", "MenuDown", "DOWN"));
+	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuLeft] = str2key(settingsMenu.GetValue("MENU", "MenuLeft", "LEFT"));
+	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuRight] = str2key(settingsMenu.GetValue("MENU", "MenuRight", "RIGHT"));
+	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuSelect] = str2key(settingsMenu.GetValue("MENU", "MenuSelect", "RETURN"));
+	menuControl->ControlKeys[NativeMenu::MenuControls::ControlType::MenuCancel] = str2key(settingsMenu.GetValue("MENU", "MenuCancel", "BACKSPACE"));
+
+	menuControl->ControllerButton1 = settingsMenu.GetLongValue("MENU", "ControllerButton1", -1);
+	menuControl->ControllerButton2 = settingsMenu.GetLongValue("MENU", "ControllerButton2", -1);
+
 #pragma warning(push)
 #pragma warning(disable: 4244)
-	menuOpts->menux = menuSettings.GetDoubleValue("MENU", "MenuX", 0.2);
-	menuOpts->menuy = menuSettings.GetDoubleValue("MENU", "MenuY", 0.125);
+	menuOpts->menux = settingsMenu.GetDoubleValue("MENU", "MenuX", 0.2);
+	menuOpts->menuy = settingsMenu.GetDoubleValue("MENU", "MenuY", 0.125);
 #pragma warning(pop)
 
 }
