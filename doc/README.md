@@ -2,7 +2,7 @@
 
 Manual Transmission & Steering Wheel Support
 ===========
-Version 4.3.0
+Version 4.3.2
 
 <sub> <sub>
 If you ended up here for version 4.1 to version 4.1.3, use 
@@ -67,6 +67,7 @@ natively! A few features:
     - [Most controls](#most-controls)
     - [`[STEER]`, `[THROTTLE]`, `[BRAKES]`, `[CLUTCH]` and `[HANDBRAKE_ANALOG]`](#steer-throttle-brakes-clutch-and-handbrake_analog)
     - [`[TO_KEYBOARD]`](#to_keyboard)
+    - [`settings_menu.ini`](#settings_menuini)
 - [Troubleshooting](#troubleshooting)
     - [Installation dependencies](#installation-dependencies)
     - [Non-conflicting software](#non-conflicting-software)
@@ -102,8 +103,8 @@ tune your settings and change things on-the-fly, without restarting the game.
 # Updating
 Replace `Gears.asi` and the folder `ManualTransmission` in your GTA V folder.
 If the changelog indicated settings version numbers changed, you might want to
-check the options. Otherwise it should be fine to keep `settings_wheel.ini`
-and `settings_general.ini`.
+check the options. Otherwise it should be fine to keep `settings_wheel.ini`,
+ `settings_general.ini` and `settings_menu.ini`.
 
 # Recommended mods
 You might want to install some additional mods to enhance your experience.
@@ -135,18 +136,19 @@ For both keyboard and controller inputs, refer to `settings_general.ini` for
 keys. Refer to `Keyboard_Keys.txt` for usable keys.
 
 ### Menu
-In `settings_menu.ini`, the keys are stored. Default:
+In `settings_menu.ini`, the keys are stored. Default for US layouts:
 
 * Press `[{` to access the menu
 * Up/Down/Left/Right arrow keys to navigate
 * `RETURN` to select
 * `BACKSPACE` to go back
 
-Controller __NAVIGATION__ is supported, but not opening the menu. This is
-due to a lack of buttons and combos available.
+The menu supports controller input fully too, but you'll need to assign
+controller buttons to if if you want to.
 
-![Menu setup](MenuMain.jpg)
+![Menu main](MenuMain0.jpg)
 
+![Menu setup](MenuOptions.jpg)
 
 ### Keyboard defaults (US-ANSI)
 By default, `W` and `S` are assigned to throttle and brake respectively.
@@ -533,7 +535,10 @@ all modes.__
 When assigning axes and buttons, __DO THIS IN-GAME!__ This mod will resolve the
 correct values. 
 
-![Wheel setup](MenuWheel.jpg)
+![Wheel setup](MenuWheel0.jpg)
+
+![Wheel setup](MenuWheel1.jpg)
+
 
 ## `[OPTIONS]` (Wheel)
 
@@ -717,6 +722,10 @@ Examples:
 is installed, it'll lower the car.
 * `16 = LEFT` makes `Button 16` act as the `LEFT` key. If [Windscreen Wipers](https://www.gta5-mods.com/scripts/car-wipers)
 is installed and a compatible car is used, the wipers are turned on.
+
+## `settings_menu.ini`
+
+You can change your menu keys here. Available keys are in Keyboard_Keys.txt. Pay attention to the OEM VK keys as they can differ for your locale.
 
 # Troubleshooting
 ## Installation dependencies
