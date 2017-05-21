@@ -8,6 +8,7 @@ You don't need to replace your existing configs. New values are added when set.
 
 Menu changes:
 * Update menu look and feel
+* Allow to assign controller combo to open menu
 
 Gameplay changes:
 * Throttle is now considered for engine stalling
