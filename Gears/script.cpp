@@ -1134,7 +1134,7 @@ void functionEngStall() {
 		((dashms < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && dashms < 1.0f)) &&
 		VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
 		VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
-		stallingProbability += (rand() % 1000) / ((7500000.0f * (controls.ThrottleVal+0.001f) * timeStep));
+		stallingProbability += (rand() % 1000) / ((5000000.0f * (controls.ThrottleVal+0.001f) * timeStep));
 		if (stallingProbability > 1.0f) {
 			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 			gearRattle.Stop();
