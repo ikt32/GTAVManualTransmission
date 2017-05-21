@@ -2048,7 +2048,7 @@ void update_menu() {
 		menu.MenuOption("Controls", "controlsmenu");
 		menu.MenuOption("Wheel Options", "wheelmenu");
 		menu.MenuOption("HUD Options", "hudmenu");
-		menu.MenuOption("Menu Options", "menumenu"); 
+		//menu.MenuOption("Menu Options", "menumenu"); 
 		menu.MenuOption("Debug", "debugmenu");
 
 		int activeIndex = 0;
