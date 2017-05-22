@@ -64,6 +64,7 @@
     <ClCompile Include="..\..\GTAVMenuBase\menu.cpp" />
     <ClCompile Include="..\..\GTAVMenuBase\menucontrols.cpp" />
     <ClCompile Include="..\..\GTAVMenuBase\menukeyboard.cpp" />
+    <ClCompile Include="ScriptMenu.cpp" />
     <ClCompile Include="Util\Paths.cpp" />
     <ClCompile Include="Input\keyboard.cpp" />
     <ClCompile Include="Input\ScriptControls.cpp" />

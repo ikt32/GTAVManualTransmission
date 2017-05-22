@@ -41,6 +41,12 @@ enum eRadioStations {
 	RadioOff = 255
 };
 
+enum ShiftModes {
+	Sequential = 0,
+	HPattern = 1,
+	Automatic = 2
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 //                           Helper functions/tools
 ///////////////////////////////////////////////////////////////////////////////
@@ -131,7 +137,10 @@ void ScriptMain();
 
 
 
-// Categorize things
+///////////////////////////////////////////////////////////////////////////////
+//                              Menu-related
+///////////////////////////////////////////////////////////////////////////////
+void update_menu();
 void clearAxis(std::string axis);
 void clearButton(std::string button);
 void clearHShifter();
@@ -143,3 +152,4 @@ bool configButton(std::string confTag);
 bool configHPattern();
 bool configKeyboardKey(const std::string &confTag);
 bool configControllerButton(const std::string &confTag);
+
