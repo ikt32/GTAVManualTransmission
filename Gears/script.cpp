@@ -49,10 +49,8 @@ int prevNotification = 0;
 int prevExtShift = 0;
 
 int speedoIndex;
-//todo: srsly unfuck pls
 extern std::vector<std::string> speedoTypes;
 
-// T_T
 bool lookrightfirst = false;
 
 
@@ -72,7 +70,6 @@ void update() {
 	}
 
 	if (!PED::IS_PED_IN_ANY_VEHICLE(playerPed, true)) {
-		reset();
 		return;
 	}
 
@@ -80,7 +77,6 @@ void update() {
 
 	if (!ENTITY::DOES_ENTITY_EXIST(vehicle) ||
 		playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
-		reset();
 		return;
 	}
 
@@ -104,8 +100,8 @@ void update() {
 			vehData.SimulatedNeutral = settings.DefaultNeutral;
 		}
 		shiftTo(1, true);
+		prevVehicle = vehicle;
 	}
-	prevVehicle = vehicle;
 
 	vehData.UpdateValues(ext, vehicle);
 	bool ignoreClutch = false;
