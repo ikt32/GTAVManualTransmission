@@ -216,9 +216,15 @@ void update_menu() {
 		if (menu.BoolOption("Engine Damage", &settings.EngDamage,
 		{ "Damage the engine when over-revving and","when mis-shifting." })) {
 		}
-		if (menu.BoolOption("Engine Stalling", &settings.EngStall)) {}
-		if (menu.BoolOption("Engine Braking", &settings.EngBrake)) {}
-		if (menu.BoolOption("Clutch Bite", &settings.ClutchCatching)) {}
+		if (menu.BoolOption("Engine Stalling", &settings.EngStall,
+		{ "Stall the engine when the wheel speed gets"," too low" })) {
+		}
+		if (menu.BoolOption("Engine Braking", &settings.EngBrake,
+		{ "Help the car braking by slowing down more","at high RPMs" })) {
+		}
+		if (menu.BoolOption("Clutch Bite", &settings.ClutchCatching,
+		{ "Simulate clutch biting action and clutch","interaction at near-stop speeds." })) {
+		}
 		if (menu.BoolOption("Clutch Shift (S)", &settings.ClutchShiftingS,
 		{ "Require holding the clutch to shift", "in sequential mode." })) {
 		}
@@ -228,8 +234,12 @@ void update_menu() {
 		if (menu.BoolOption("Default Neutral", &settings.DefaultNeutral,
 		{ "The car will be in neutral when you get in." })) {
 		}
-		if (menu.MenuOption("Misc. options", "miscoptionsmenu")) {}
-		if (menu.MenuOption("Fine-tuning", "finetuneoptionsmenu")) {}
+		if (menu.MenuOption("Fine-tuning", "finetuneoptionsmenu",
+		{ "Fine-tune the parameters above" })) {
+		}
+		if (menu.MenuOption("Misc. options", "miscoptionsmenu",
+		{ "Options that don't really have to do with","the gearbox simulation." })) {
+		}
 	}
 
 	if (menu.CurrentMenu("miscoptionsmenu")) {
@@ -237,7 +247,8 @@ void update_menu() {
 		if (menu.BoolOption("Simple Bike", &settings.SimpleBike,
 		{ "Disables bike engine stalling and the","clutch bite simulation." })) {
 		}
-		if (menu.BoolOption("Hill gravity workaround", &settings.HillBrakeWorkaround, { "Gives the car a push to overcome","the games' default brakes at a stop." })) {}
+		if (menu.BoolOption("Hill gravity workaround", &settings.HillBrakeWorkaround, 
+		{ "Gives the car a push to overcome","the games' default brakes at a stop." })) {}
 		if (menu.BoolOption("Auto gear 1", &settings.AutoGear1,
 		{ "Automatically switch to first gear","when the car reaches a standstill." })) {
 		}
@@ -262,10 +273,10 @@ void update_menu() {
 	if (menu.CurrentMenu("controlsmenu")) {
 		menu.Title("Controls");
 
-		menu.MenuOption("Controller", "controllermenu");
-		menu.MenuOption("Keyboard", "keyboardmenu");
-		menu.BoolOption("Non Xinput controller?", &controls.UseLegacyController,
-		{ "If you needed to set up your controller in","the pause menu, probably enable this." });
+		menu.MenuOption("Controller", "controllermenu",{"Change controller control assignments."});
+		menu.MenuOption("Keyboard", "keyboardmenu",{"Change keyboard control assignments."});
+		menu.BoolOption("Non-Xinput controller", &controls.UseLegacyController,
+		{ "If you needed to set up your controller in","the pause menu, you should enable this." });
 	}
 
 	/* Yes hello I am root - 2 */
@@ -355,11 +366,15 @@ void update_menu() {
 			settings.SaveWheel(&controls);
 		}
 		if (menu.BoolOption("Logitech LEDs (can crash!)", &settings.LogiLEDs)) { settings.SaveWheel(&controls); }
-		menu.MenuOption("Force feedback options", "forcefeedbackmenu");
-		menu.MenuOption("Steering wheel setup", "axesmenu");
-		menu.MenuOption("Steering wheel angles", "anglemenu");
-		menu.MenuOption("Steering wheel buttons", "buttonsmenu");
-
+		menu.MenuOption("Steering wheel axis setup", "axesmenu", 
+		{ "Configure analog controls, like throttle,","steering and the like." });
+		menu.MenuOption("Steering wheel button setup", "buttonsmenu",
+		{ "Set up your buttons on your steering wheel." });
+		menu.MenuOption("Force feedback options", "forcefeedbackmenu",
+		{ "Fine-tune your force feedback parameters." });
+		menu.MenuOption("Steering wheel angles", "anglemenu",
+		{ "Steering lock options are here." });
+		
 		std::vector<std::string> hpatInfo;
 		hpatInfo.push_back("Press RIGHT to clear H-pattern shifter");
 		hpatInfo.push_back("Active gear:");
@@ -387,9 +402,12 @@ void update_menu() {
 			if (settings.SteerAngleBike > settings.SteerAngleMax) { settings.SteerAngleBike = settings.SteerAngleMax; }
 			if (settings.SteerAngleAlt > settings.SteerAngleMax) { settings.SteerAngleAlt = settings.SteerAngleMax; }
 		}
-		menu.FloatOption("Car soft lock", &settings.SteerAngleCar, 180.0, settings.SteerAngleMax, 60.0);
-		menu.FloatOption("Bike soft lock", &settings.SteerAngleBike, 180.0, settings.SteerAngleMax, 60.0);
-		menu.FloatOption("Boat/Plane soft lock", &settings.SteerAngleAlt, 180.0, settings.SteerAngleMax, 60.0);
+		menu.FloatOption("Car soft lock", &settings.SteerAngleCar, 180.0, settings.SteerAngleMax, 60.0,
+		{"Soft lock for cars, trucks and anything","a kid would call \"car\" (degrees)"});
+		menu.FloatOption("Bike soft lock", &settings.SteerAngleBike, 180.0, settings.SteerAngleMax, 60.0,
+		{ "Soft lock for bikes (degrees)" });
+		menu.FloatOption("Boat/Plane soft lock", &settings.SteerAngleAlt, 180.0, settings.SteerAngleMax, 60.0,
+		{ "Soft lock for boats and planes (in degrees)" });
 		menu.FloatOption("Steering Multiplier", &settings.GameSteerMult, 0.0, 4.0, 0.01, { "Increase steering lock for all cars." });
 	}
 
@@ -446,7 +464,8 @@ void update_menu() {
 		menu.FloatOption("Physics strength", &settings.PhysicsStrength, 0.0f, 10.0f, 0.1f,
 		{ "Force feedback effect strength by ","physics events like cornering and collisions." });
 		menu.FloatOption("Detail strength", &settings.DetailStrength, 0.0f, 10.0f, 0.1f,
-		{ "Force feedback effect strength by ","suspension events like potholes and peds." });
+		{ "Force feedback effect strength by ","suspension events due to road conditions,",
+			"like potholes, speedbumps and peds." });
 	}
 
 	/* Yes hello I am root - 2 */
