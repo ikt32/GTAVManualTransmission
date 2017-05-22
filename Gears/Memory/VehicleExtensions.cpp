@@ -313,12 +313,15 @@ std::vector<float> VehicleExtensions::GetWheelsCompression(Vehicle handle) {
 
 float VehicleExtensions::GetSteeringMultiplier(Vehicle handle) {
 	auto wheelPtr = GetWheelsPtr(handle);
+	auto numWheels = GetNumWheels(handle);
 
 	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x138 : 0x128;
 
-	// first wheel
-	auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * 1);
-	return abs(*reinterpret_cast<float*>(wheelAddr + offset));
+	if (numWheels > 1) {
+		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * 1);
+		return abs(*reinterpret_cast<float*>(wheelAddr + offset));
+	}
+	return 1.0f;
 }
 
 template <typename T> int sgn(T val) {
