@@ -1,5 +1,20 @@
 # Changelog
 
+## 4.3.3
+No config changes
+
+Critical bug fix:
+* Fix crashing when entering anything without wheels
+
+Menu changes:
+* Added details pane for many options!
+
+Gameplay changes:
+* Only reset vehicle stats when entering a new vehicle, not when just stepping out
+
+4.3.3 hotfix:
+* Change how steering multiplier is applied
+
 ## 4.3.2
 Configuration changes:
 * Added [CLUTCH_BUTTON] for wheel
