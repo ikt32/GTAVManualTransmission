@@ -153,3 +153,6 @@ bool configHPattern();
 bool configKeyboardKey(const std::string &confTag);
 bool configControllerButton(const std::string &confTag);
 
+// TODO: Find a less fucky way to do this
+// Update game code from the menu so it doesn't need to know games tuff
+void updateSteeringMultiplier();

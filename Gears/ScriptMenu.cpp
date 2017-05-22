@@ -408,7 +408,10 @@ void update_menu() {
 		{ "Soft lock for bikes (degrees)" });
 		menu.FloatOption("Boat/Plane soft lock", &settings.SteerAngleAlt, 180.0, settings.SteerAngleMax, 60.0,
 		{ "Soft lock for boats and planes (in degrees)" });
-		menu.FloatOption("Steering Multiplier", &settings.GameSteerMult, 0.0, 4.0, 0.01, { "Increase steering lock for all cars." });
+		if (menu.FloatOption("Steering Multiplier", &settings.GameSteerMult, 0.1, 2.0, 0.01, 
+		{ "Increase steering lock for all cars." })) {
+			updateSteeringMultiplier();
+		}
 	}
 
 

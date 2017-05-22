@@ -612,6 +612,7 @@ void reInit() {
 }
 
 void reset() {
+	resetSteeringMultiplier();
 	gearRattle.Stop();
 	prevVehicle = 0;
 	if (MemoryPatcher::TotalPatched == MemoryPatcher::TotalToPatch) {
@@ -676,19 +677,26 @@ void updateLastInputDevice() {
 				controls.WheelControl.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
 			}
 		}
+		if (controls.PrevInput == ScriptControls::Wheel) {
+			if (!MemoryPatcher::SteeringPatched && settings.PatchSteering) {
+				MemoryPatcher::PatchSteeringCorrection();
+			}
+			ext.SetSteeringMultiplier(vehicle, settings.GameSteerMult);
+		}
+		else {
+			if (MemoryPatcher::SteeringPatched && settings.PatchSteering && !settings.PatchSteeringAlways) {
+				MemoryPatcher::RestoreSteeringCorrection();
+			}
+			resetSteeringMultiplier();
+		}
 	}
 	if (controls.PrevInput == ScriptControls::Wheel) {
 		CONTROLS::STOP_PAD_SHAKE(0);
-		if (!MemoryPatcher::SteeringPatched && settings.PatchSteering) {
-			MemoryPatcher::PatchSteeringCorrection();
-		}
-		ext.SetSteeringMultiplier(vehicle, settings.GameSteerMult);
-	} else {
-		if (MemoryPatcher::SteeringPatched && settings.PatchSteering && !settings.PatchSteeringAlways) {
-			MemoryPatcher::RestoreSteeringCorrection();
-		}
-		resetSteeringMultiplier();
 	}
+}
+
+void updateSteeringMultiplier() {
+	ext.SetSteeringMultiplier(vehicle, settings.GameSteerMult);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
