@@ -1772,7 +1772,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	int damperForce = settings.DamperMax - static_cast<int>(vehData.Speed * adjustRatio);
 
 	// Acceleration also affects damper force
-	damperForce -= static_cast<int>(adjustRatio * accelValsAvg.y * std::copysignf(1.0, vehData.Velocity));
+	damperForce -= static_cast<int>(adjustRatio * accelValsAvg.y);
 	
 	if (damperForce < settings.DamperMin) {
 		damperForce = settings.DamperMin;
