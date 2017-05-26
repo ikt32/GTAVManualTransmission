@@ -101,6 +101,7 @@ void update() {
 		}
 		shiftTo(1, true);
 		prevVehicle = vehicle;
+		initSteeringPatches();
 	}
 
 	vehData.UpdateValues(ext, vehicle);
@@ -650,6 +651,26 @@ void toggleManual() {
 	reInit();
 }
 
+void initSteeringPatches() {
+	if (controls.PrevInput != ScriptControls::Wheel && settings.LogiLEDs) {
+		for (GUID guid : controls.WheelControl.GetGuids()) {
+			controls.WheelControl.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
+		}
+	}
+	if (controls.PrevInput == ScriptControls::Wheel) {
+		if (!MemoryPatcher::SteeringPatched && settings.PatchSteering) {
+			MemoryPatcher::PatchSteeringCorrection();
+		}
+		ext.SetSteeringMultiplier(vehicle, settings.GameSteerMult);
+	}
+	else {
+		if (MemoryPatcher::SteeringPatched && settings.PatchSteering && !settings.PatchSteeringAlways) {
+			MemoryPatcher::RestoreSteeringCorrection();
+		}
+		resetSteeringMultiplier();
+	}
+}
+
 void updateLastInputDevice() {
 	if (controls.PrevInput != controls.GetLastInputDevice(controls.PrevInput,settings.EnableWheel)) {
 		controls.PrevInput = controls.GetLastInputDevice(controls.PrevInput, settings.EnableWheel);
@@ -662,7 +683,6 @@ void updateLastInputDevice() {
 				if (settings.ShiftMode == HPattern) {
 					showNotification("Switched to controller\nSequential re-initiated", &prevNotification);
 					settings.ShiftMode = Sequential;
-					//settings.Save();
 				}
 				else {
 					showNotification("Switched to controller", &prevNotification);
@@ -672,23 +692,7 @@ void updateLastInputDevice() {
 				showNotification("Switched to wheel", &prevNotification);
 				break;
 		}
-		if (controls.PrevInput != ScriptControls::Wheel && settings.LogiLEDs) {
-			for (GUID guid : controls.WheelControl.GetGuids()) {
-				controls.WheelControl.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
-			}
-		}
-		if (controls.PrevInput == ScriptControls::Wheel) {
-			if (!MemoryPatcher::SteeringPatched && settings.PatchSteering) {
-				MemoryPatcher::PatchSteeringCorrection();
-			}
-			ext.SetSteeringMultiplier(vehicle, settings.GameSteerMult);
-		}
-		else {
-			if (MemoryPatcher::SteeringPatched && settings.PatchSteering && !settings.PatchSteeringAlways) {
-				MemoryPatcher::RestoreSteeringCorrection();
-			}
-			resetSteeringMultiplier();
-		}
+		initSteeringPatches();
 	}
 	if (controls.PrevInput == ScriptControls::Wheel) {
 		CONTROLS::STOP_PAD_SHAKE(0);
