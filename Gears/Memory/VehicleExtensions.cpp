@@ -311,6 +311,21 @@ std::vector<float> VehicleExtensions::GetWheelsCompression(Vehicle handle) {
 	return compressions;
 }
 
+std::vector<float> VehicleExtensions::GetWheelsSpeed(Vehicle handle) {
+	auto wheelPtr = GetWheelsPtr(handle);
+	auto numWheels = GetNumWheels(handle);
+
+	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x168 : 0x158;
+
+	std::vector<float> speeds;
+
+	for (auto i = 0; i < numWheels; i++) {
+		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
+		speeds.push_back(*reinterpret_cast<float *>(wheelAddr + offset));
+	}
+	return speeds;
+}
+
 float VehicleExtensions::GetSteeringMultiplier(Vehicle handle) {
 	auto wheelPtr = GetWheelsPtr(handle);
 	auto numWheels = GetNumWheels(handle);

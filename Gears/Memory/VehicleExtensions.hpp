@@ -37,6 +37,7 @@ public:
 	void SetVisualHeight(Vehicle handle, float height);
 	void SetWheelsHealth(Vehicle handle, float health);
 	std::vector<float> GetWheelsCompression(Vehicle handle);
+	std::vector<float> GetWheelsSpeed(Vehicle handle);
 	float GetSteeringInputAngle(Vehicle handle);
 	void SetSteeringInputAngle(Vehicle handle, float value);
 	float GetSteeringAngle(Vehicle handle);
