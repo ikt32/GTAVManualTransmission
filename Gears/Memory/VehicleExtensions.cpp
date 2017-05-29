@@ -321,7 +321,7 @@ std::vector<float> VehicleExtensions::GetWheelsSpeed(Vehicle handle) {
 
 	for (auto i = 0; i < numWheels; i++) {
 		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-		speeds.push_back(*reinterpret_cast<float *>(wheelAddr + offset));
+		speeds.push_back(-*reinterpret_cast<float *>(wheelAddr + offset));
 	}
 	return speeds;
 }
