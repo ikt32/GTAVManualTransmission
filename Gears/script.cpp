@@ -984,12 +984,12 @@ void functionClutchCatch() {
 		// Forward
 		if (vehData.CurrGear > 0 && vehData.Speed < vehData.CurrGear * 2.2f &&
 		    controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
-			if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.45f);
-			}
-			else {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.27f);
-			}
+			//if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
+			//	CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.27f);
+			//}
+			//else {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.40f);
+			//}
 			ext.SetCurrentRPM(vehicle, 0.21f);
 		}
 
@@ -999,34 +999,50 @@ void functionClutchCatch() {
 			if (vehData.Velocity < -2.2f) {
 				controls.ClutchVal = 1.0f;
 			}
-			if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.45f);
-			}
-			else {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.27f);
-			}
+			//if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
+			//	CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.27f);
+			//}
+			//else {
+				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.26f);
+			//}
 			ext.SetCurrentRPM(vehicle, 0.21f);
 		}
 	}
 }
 
+float getAverage(std::vector<float> values) {
+	float total = 0.0f;
+	for (auto value : values) {
+		total += value;
+	}
+	return total / values.size();
+}
+
 void functionEngStall() {
 	float timeStep = SYSTEM::TIMESTEP() * 100.0f;
 
-	float dashms = ext.GetDashSpeed(vehicle);
-	if (!vehData.HasSpeedo && dashms > 0.1f) {
+	//float dashms = ext.GetDashSpeed(vehicle);
+	
+	// Since we don't have a convenient way to get the drivetrain [yet]
+	// (I really do not want to look into handling...), we can just use the
+	// average of all wheels for now.
+	// TODO: Get drivetrain from handling data
+	
+	float wheelSpeeds = abs(getAverage(ext.GetWheelsSpeed(vehicle)));
+
+	if (!vehData.HasSpeedo && wheelSpeeds > 0.1f) {
 		vehData.HasSpeedo = true;
 	}
 	if (!vehData.HasSpeedo) {
-		dashms = abs(vehData.Velocity);
+		wheelSpeeds = abs(vehData.Velocity);
 	}
 
 	if (controls.ClutchVal < 1.0f - settings.StallingThreshold &&
 		vehData.Rpm < 0.25f &&
-		((dashms < vehData.CurrGear * 1.4f) || (vehData.CurrGear == 0 && dashms < 1.0f)) &&
+		((wheelSpeeds < vehData.CurrGear * 1.6f) || (vehData.CurrGear == 0 && wheelSpeeds < 1.0f)) &&
 		VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
 		VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
-		stallingProbability += (rand() % 1000) / ((5000000.0f * (controls.ThrottleVal+0.001f) * timeStep));
+		stallingProbability += (rand() % 1000) / ((3300000.0f * (controls.ThrottleVal+0.001f) * timeStep));
 		if (stallingProbability > 1.0f) {
 			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 			gearRattle.Stop();
@@ -1034,9 +1050,14 @@ void functionEngStall() {
 			//showNotification("Stalled!");
 		}
 	} else {
-		stallingProbability = 0.0f;
+		if (stallingProbability > 0.0f) {
+			stallingProbability -= (rand() % 1000) / ((3300000.0f * (controls.ThrottleVal + 0.001f) * timeStep));
+		}
+		else {
+			stallingProbability = 0.0f;
+		}
 	}
-	//showText(0.1, 0.1, 1.0, ("Stall prob.:" + std::to_string(stallingProbability)).c_str(), 0, solidWhite, true);
+	showText(0.1, 0.1, 1.0, ("Stall prob.:" + std::to_string(stallingProbability)).c_str(), 0, solidWhite, true);
 	//showText(0.1, 0.2, 1.0, ("TS:" + std::to_string(timeStep)).c_str(), 0, solidWhite, true);
 }
 
