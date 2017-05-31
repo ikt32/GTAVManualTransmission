@@ -122,6 +122,7 @@ public:
 	bool ButtonJustPressed(ControllerControlType control);
 	bool ButtonReleased(ControllerControlType control);
 	bool ButtonHeld(ControllerControlType control);
+	bool ButtonTapped(ControllerControlType control);
 	bool ButtonIn(ControllerControlType control);
 	void SetXboxTrigger(float value);
 	float GetXboxTrigger();
