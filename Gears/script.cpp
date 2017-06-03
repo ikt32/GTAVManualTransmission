@@ -548,6 +548,23 @@ void showDebugInfoWheel(ScriptSettings &settings, float effSteer, int damperForc
 	showText(0.85, 0.325, 0.4, ssOverSteer.str().c_str(),	4, solidWhite, true);
 }
 
+void showDebugInfo3D(Vector3 location, std::vector<std::string> textLines)
+{
+	float x, y;
+	
+	if (GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(location.x, location.y, location.z, &x, &y)) {
+		int i = 0;
+		for (auto line : textLines) {
+			showText(x, y + 0.0125f * i, 0.2f, line.c_str());
+			i++;
+		}
+		
+		float szX = 0.060f;
+		float szY = 0.0125f * i;
+		GRAPHICS::DRAW_RECT(x + 0.027f, y + (0.0125f * i)/2.0f, szX, szY, 75, 75, 75, 75);
+	}
+}
+
 // To expose some variables to other scripts
 void crossScriptComms() {
 	// FiveM "support": Just don't do anything if that version is detected.
