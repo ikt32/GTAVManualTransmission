@@ -262,6 +262,18 @@ uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {
 	return *reinterpret_cast<uint64_t *>(address + offset);
 }
 
+std::vector<uint64_t> VehicleExtensions::GetWheelPtrs(Vehicle handle) {
+	auto wheelPtr = GetWheelsPtr(handle);  // pointer to wheel pointers
+	auto numWheels = GetNumWheels(handle);
+	std::vector<uint64_t> wheelPtrs;
+	for (auto i = 0; i < numWheels; i++) {
+		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
+		wheelPtrs.push_back(wheelAddr);
+	}
+	return wheelPtrs;
+}
+
+
 
 float VehicleExtensions::GetVisualHeight(Vehicle handle) {
 	auto wheelPtr = GetWheelsPtr(handle);
@@ -294,6 +306,21 @@ void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) {
 		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
 		*reinterpret_cast<float *>(wheelAddr + offset) = health;
 	}
+}
+
+std::vector<float> VehicleExtensions::GetWheelsHealth(Vehicle handle) {
+	auto wheelPtr = GetWheelsPtr(handle);
+	auto numWheels = GetNumWheels(handle);
+
+	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x1E0 : 0x1D0;
+
+	std::vector<float> healths;
+
+	for (auto i = 0; i < numWheels; i++) {
+		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
+		healths.push_back(*reinterpret_cast<float *>(wheelAddr + offset));
+	}
+	return healths;
 }
 
 std::vector<float> VehicleExtensions::GetWheelsCompression(Vehicle handle) {

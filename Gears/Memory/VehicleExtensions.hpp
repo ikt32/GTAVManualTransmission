@@ -33,9 +33,11 @@ public:
 	void SetFuelLevel(Vehicle handle, float value);
 	uint8_t GetNumWheels(Vehicle handle);
 	uint64_t GetWheelsPtr(Vehicle handle);
+	std::vector<uint64_t> GetWheelPtrs(Vehicle handle);
 	float GetVisualHeight(Vehicle handle);
 	void SetVisualHeight(Vehicle handle, float height);
 	void SetWheelsHealth(Vehicle handle, float health);
+	std::vector<float> GetWheelsHealth(Vehicle handle);
 	std::vector<float> GetWheelsCompression(Vehicle handle);
 	std::vector<float> GetWheelsSpeed(Vehicle handle);
 	float GetSteeringInputAngle(Vehicle handle);
