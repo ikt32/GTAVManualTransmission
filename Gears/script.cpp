@@ -26,7 +26,7 @@
 GameSound gearRattle("DAMAGED_TRUCK_IDLE", 0);
 
 int soundID;
-float stallingProbability = 0.0f;
+float stallingProgress = 0.0f;
 
 std::string settingsGeneralFile;
 std::string settingsWheelFile;
@@ -121,6 +121,7 @@ void update() {
 
 	if (settings.DisplayInfo) {
 		showDebugInfo();
+		showWheelInfo();
 	}
 
 	if (!settings.IsCorrectVersion()) {
@@ -991,37 +992,30 @@ void functionAShift() { // Automatic
 ///////////////////////////////////////////////////////////////////////////////
 
 void functionClutchCatch() {
+	float lowSpeed = 2.5f;
+	float idleThrottle = 0.33f;
+
 	if (controls.ClutchVal < 1.0f - settings.ClutchCatchpoint) {
 		// Automatic cars APPARENTLY need little/no brake pressure to stop
 		if (settings.ShiftMode == Automatic && controls.BrakeVal > 0.1f || 
-			vehData.Rpm > 0.25f && vehData.Speed >= 2.2f) {
+			vehData.Rpm > 0.25f && vehData.Speed >= lowSpeed) {
 			return;
 		}
 
 		// Forward
-		if (vehData.CurrGear > 0 && vehData.Speed < vehData.CurrGear * 2.2f &&
+		if (vehData.CurrGear > 0 && vehData.Speed < vehData.CurrGear * lowSpeed &&
 		    controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
-			//if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
-			//	CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.27f);
-			//}
-			//else {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.40f);
-			//}
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, idleThrottle);
 			ext.SetCurrentRPM(vehicle, 0.21f);
 		}
 
 		// Reverse
 		if (vehData.CurrGear == 0 &&
 			controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
-			if (vehData.Velocity < -2.2f) {
+			if (vehData.Velocity < -lowSpeed) {
 				controls.ClutchVal = 1.0f;
 			}
-			//if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
-			//	CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.27f);
-			//}
-			//else {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.26f);
-			//}
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.26f);
 			ext.SetCurrentRPM(vehicle, 0.21f);
 		}
 	}
@@ -1063,46 +1057,40 @@ void showWheelInfo() {
 }
 
 void functionEngStall() {
+	float lowSpeed = 2.4f;
+	float stallingRateDivisor = 3500000.0f; // lower = faster stalling
 	float timeStep = SYSTEM::TIMESTEP() * 100.0f;
-
-	//float dashms = ext.GetDashSpeed(vehicle);
 	
 	// Since we don't have a convenient way to get the drivetrain [yet]
 	// (I really do not want to look into handling...), we can just use the
 	// average of all wheels for now.
 	// TODO: Get drivetrain from handling data
-	
-	float wheelSpeeds = abs(getAverage(ext.GetWheelsSpeed(vehicle)));
 
-	if (!vehData.HasSpeedo && wheelSpeeds > 0.1f) {
-		vehData.HasSpeedo = true;
-	}
-	if (!vehData.HasSpeedo) {
-		wheelSpeeds = abs(vehData.Velocity);
-	}
+	float avgWheelSpeed = abs(getAverage(ext.GetWheelsSpeed(vehicle)));
+	auto wheelSpeeds = ext.GetWheelsSpeed(vehicle);
 
 	if (controls.ClutchVal < 1.0f - settings.StallingThreshold &&
 		vehData.Rpm < 0.25f &&
-		((wheelSpeeds < vehData.CurrGear * 1.6f) || (vehData.CurrGear == 0 && wheelSpeeds < 1.0f)) &&
+		((avgWheelSpeed < vehData.CurrGear * lowSpeed) || (vehData.CurrGear == 0 && avgWheelSpeed < lowSpeed)) &&
 		VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
 		VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
-		stallingProbability += (rand() % 1000) / ((3300000.0f * (controls.ThrottleVal+0.001f) * timeStep));
-		if (stallingProbability > 1.0f) {
+		stallingProgress += (rand() % 1000) / (stallingRateDivisor * (controls.ThrottleVal+0.001f) * timeStep);
+		if (stallingProgress > 1.0f) {
 			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 			gearRattle.Stop();
-			stallingProbability = 0.0f;
-			//showNotification("Stalled!");
-		}
-	} else {
-		if (stallingProbability > 0.0f) {
-			stallingProbability -= (rand() % 1000) / ((3300000.0f * (controls.ThrottleVal + 0.001f) * timeStep));
-		}
-		else {
-			stallingProbability = 0.0f;
+			stallingProgress = 0.0f;
+			//showNotification("Your car has stalled.");
 		}
 	}
-	showText(0.1, 0.1, 1.0, ("Stall prob.:" + std::to_string(stallingProbability)).c_str(), 0, solidWhite, true);
-	//showText(0.1, 0.2, 1.0, ("TS:" + std::to_string(timeStep)).c_str(), 0, solidWhite, true);
+	else {
+		if (stallingProgress > 0.0f) {
+			stallingProgress -= (rand() % 1000) / (stallingRateDivisor * (controls.ThrottleVal + 0.001f) * timeStep);
+		}
+		else {
+			stallingProgress = 0.0f;
+		}
+	}
+	//showText(0.1, 0.1, 1.0, ("Stall progress:" + std::to_string(stallingProgress)).c_str(), 0, solidWhite, true);
 }
 
 void functionEngDamage() {
