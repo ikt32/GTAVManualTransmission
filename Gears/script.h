@@ -54,7 +54,7 @@ enum ShiftModes {
 void showHUD();
 void showDebugInfo();
 void crossScriptComms();
-
+void showWheelInfo();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Mod functions: Mod control

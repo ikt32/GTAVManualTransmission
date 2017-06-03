@@ -1035,6 +1035,33 @@ float getAverage(std::vector<float> values) {
 	return total / values.size();
 }
 
+void showWheelInfo() {
+	auto wheels = ext.GetWheelPtrs(vehicle);
+	auto wheelsSpeed = ext.GetWheelsSpeed(vehicle);
+	auto wheelsCompr = ext.GetWheelsCompression(vehicle);
+	auto wheelsHealt = ext.GetWheelsHealth(vehicle);
+
+	int i = 0;
+	for (auto wheelAddr : wheels) {
+		int offPosX = 0x40;
+		int offPosY = 0x44;
+		int offPosZ = 0x48;
+
+		Vector3 wheelPos;
+		wheelPos.x = *reinterpret_cast<float *>(wheelAddr + offPosX);
+		wheelPos.y = *reinterpret_cast<float *>(wheelAddr + offPosY);
+		wheelPos.z = *reinterpret_cast<float *>(wheelAddr + offPosZ);
+		float wheelSpeed = wheelsSpeed.at(i);
+		float wheelCompr = wheelsCompr.at(i);
+		float wheelHealt = wheelsHealt.at(i);
+		showDebugInfo3D(wheelPos, { 
+			"Speed: " + std::to_string(wheelSpeed),
+			"Comp.: " + std::to_string(wheelCompr),
+			"Healt: " + std::to_string(wheelHealt), });
+		i++;
+	}
+}
+
 void functionEngStall() {
 	float timeStep = SYSTEM::TIMESTEP() * 100.0f;
 
