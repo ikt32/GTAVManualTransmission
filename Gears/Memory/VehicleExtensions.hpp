@@ -34,6 +34,7 @@ public:
 	uint8_t GetNumWheels(Vehicle handle);
 	uint64_t GetWheelsPtr(Vehicle handle);
 	std::vector<uint64_t> GetWheelPtrs(Vehicle handle);
+	std::vector<Vector3> GetWheelContactCoords(Vehicle handle);
 	float GetVisualHeight(Vehicle handle);
 	void SetVisualHeight(Vehicle handle, float height);
 	void SetWheelsHealth(Vehicle handle, float health);

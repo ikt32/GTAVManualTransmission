@@ -273,7 +273,24 @@ std::vector<uint64_t> VehicleExtensions::GetWheelPtrs(Vehicle handle) {
 	return wheelPtrs;
 }
 
+std::vector<Vector3> VehicleExtensions::GetWheelContactCoords(Vehicle handle) {
+	auto wheels = GetWheelPtrs(handle);
+	std::vector<Vector3> positions;
+	int offPosX = 0x40;
+	int offPosY = 0x44;
+	int offPosZ = 0x48;
+	
+	for (auto wheelAddr : wheels) {
+		if (!wheelAddr) continue;
 
+		Vector3 wheelPos;
+		wheelPos.x = *reinterpret_cast<float *>(wheelAddr + offPosX);
+		wheelPos.y = *reinterpret_cast<float *>(wheelAddr + offPosY);
+		wheelPos.z = *reinterpret_cast<float *>(wheelAddr + offPosZ);
+		positions.push_back(wheelPos);
+	}
+	return positions;
+}
 
 float VehicleExtensions::GetVisualHeight(Vehicle handle) {
 	auto wheelPtr = GetWheelsPtr(handle);
