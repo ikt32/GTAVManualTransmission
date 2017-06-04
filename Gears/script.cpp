@@ -1033,29 +1033,19 @@ float getAverage(std::vector<float> values) {
 }
 
 void showWheelInfo() {
-	auto wheels = ext.GetWheelPtrs(vehicle);
+	auto numWheels = ext.GetNumWheels(vehicle);
 	auto wheelsSpeed = ext.GetWheelsSpeed(vehicle);
 	auto wheelsCompr = ext.GetWheelsCompression(vehicle);
 	auto wheelsHealt = ext.GetWheelsHealth(vehicle);
-
-	int i = 0;
-	for (auto wheelAddr : wheels) {
-		int offPosX = 0x40;
-		int offPosY = 0x44;
-		int offPosZ = 0x48;
-
-		Vector3 wheelPos;
-		wheelPos.x = *reinterpret_cast<float *>(wheelAddr + offPosX);
-		wheelPos.y = *reinterpret_cast<float *>(wheelAddr + offPosY);
-		wheelPos.z = *reinterpret_cast<float *>(wheelAddr + offPosZ);
-		float wheelSpeed = wheelsSpeed.at(i);
-		float wheelCompr = wheelsCompr.at(i);
-		float wheelHealt = wheelsHealt.at(i);
-		showDebugInfo3D(wheelPos, { 
+	auto wheelsContactCoords = ext.GetWheelContactCoords(vehicle);
+	for (int i = 0; i < numWheels; i++) {
+		float wheelSpeed = wheelsSpeed[i];
+		float wheelCompr = wheelsCompr[i];
+		float wheelHealt = wheelsHealt[i];
+		showDebugInfo3D(wheelsContactCoords[i], {
 			"Speed: " + std::to_string(wheelSpeed),
-			"Comp.: " + std::to_string(wheelCompr),
-			"Healt: " + std::to_string(wheelHealt), });
-		i++;
+			"Compress: " + std::to_string(wheelCompr),
+			"Health: " + std::to_string(wheelHealt), });
 	}
 }
 
