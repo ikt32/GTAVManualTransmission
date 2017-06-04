@@ -646,6 +646,7 @@ void reset() {
 }
 
 void resetSteeringMultiplier() {
+	if (vehicle == 0) return;
 	if (ext.GetSteeringMultiplier(vehicle) != 1.0f) {
 		ext.SetSteeringMultiplier(vehicle, 1.0f);
 	}
@@ -675,6 +676,7 @@ void initSteeringPatches() {
 			controls.WheelControl.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
 		}
 	}
+	if (vehicle == 0) return;
 	if (controls.PrevInput == ScriptControls::Wheel) {
 		if (!MemoryPatcher::SteeringPatched && settings.PatchSteering) {
 			MemoryPatcher::PatchSteeringCorrection();
@@ -718,6 +720,7 @@ void updateLastInputDevice() {
 }
 
 void updateSteeringMultiplier() {
+	if (vehicle == 0) return;
 	ext.SetSteeringMultiplier(vehicle, settings.GameSteerMult);
 }
 
