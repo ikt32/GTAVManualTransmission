@@ -631,6 +631,7 @@ void reInit() {
 }
 
 void reset() {
+	vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
 	resetSteeringMultiplier();
 	gearRattle.Stop();
 	prevVehicle = 0;
