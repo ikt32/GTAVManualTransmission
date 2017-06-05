@@ -405,8 +405,8 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	scriptControl->InvertClutch =	settingsWheel.GetBoolValue("OPTIONS", "InvertClutch", false);
 
 	// [FORCE_FEEDBACK]
-	EnableFFB = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "FFEnable", true);
-	FFGlobalMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "FFGlobalMult", 1.0);
+	EnableFFB = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Enable", true);
+	FFGlobalMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "GlobalMult", 1.0);
 	DamperMax = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMax", 50);
 	DamperMin = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMin", 20);
 	TargetSpeed = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DamperTargetSpeed", 1.0);
