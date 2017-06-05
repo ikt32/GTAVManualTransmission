@@ -1,5 +1,6 @@
 #define NOMINMAX
 #include "../../../ScriptHookV_SDK/inc/natives.h"
+#include "../../../ScriptHookV_SDK/inc/enums.h"
 #include "Util.hpp"
 #include <algorithm>
 
@@ -73,3 +74,61 @@ void GameSound::Stop() {
 	Active = false;
 }
 
+void DisableActionControlsStart() {
+	CAM::SET_CINEMATIC_BUTTON_ACTIVE(0);
+}
+
+void DisableActionControlsStop() {
+	CAM::SET_CINEMATIC_BUTTON_ACTIVE(1);
+}
+
+void DisableActionControlsTick() {
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlNextCamera, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleCinCam, true);
+
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlPhone, true);
+
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSelectCharacterMichael, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSelectCharacterFranklin, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSelectCharacterTrevor, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSelectCharacterMultiplayer, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlCharacterWheel, true);
+
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackLight, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackHeavy, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMeleeAttackAlternate, true);
+
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMultiplayerInfo, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlMapPointOfInterest, true);
+
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlRadioWheelLeftRight, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleNextRadio, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehiclePrevRadio, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlRadioWheelUpDown, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleNextRadioTrack, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehiclePrevRadioTrack, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleRadioWheel, true);
+
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleDuck, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleSelectNextWeapon, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleSelectPrevWeapon, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleAttack, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleAttack2, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleExit, true);
+
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlContext, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSelectWeapon, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleHeadlight, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleRoof, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleHorn, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleHandbrake, true);
+
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehicleAim, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlVehiclePassengerAim, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlFrontendSocialClub, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlFrontendSocialClubSecondary, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlReplayStartStopRecording, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlInteractionMenu, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlSaveReplayClip, true);
+	CONTROLS::DISABLE_CONTROL_ACTION(2, ControlNextCamera, true);
+}

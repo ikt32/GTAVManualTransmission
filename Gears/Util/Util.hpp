@@ -58,3 +58,7 @@ private:
 	int m_soundID;
 	int m_prevNotification;
 };
+
+void DisableActionControlsStart();
+void DisableActionControlsStop();
+void DisableActionControlsTick();

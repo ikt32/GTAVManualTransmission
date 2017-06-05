@@ -266,7 +266,7 @@ bool ScriptControls::ButtonHeld(ControllerControlType control) {
 XboxController::TapState ScriptControls::ButtonTapped(ControllerControlType control) {
 	if (!controller.IsConnected())
 		return XboxController::TapState::ButtonUp;
-	return (controller.WasButtonTapped(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState, 100));
+	return (controller.WasButtonTapped(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState, 200));
 }
 
 bool ScriptControls::ButtonIn(ControllerControlType control) {

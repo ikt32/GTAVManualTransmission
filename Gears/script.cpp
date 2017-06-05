@@ -859,8 +859,17 @@ void functionHShiftWheel() {
 }
 
 void functionSShift() {
+	// TODO: Properly always block buttons?
+	auto tapStateUp = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftUp);
+	auto tapStateDown = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftDown);
+
+	if (tapStateUp == XboxController::TapState::ButtonDown ||
+		tapStateDown == XboxController::TapState::ButtonDown) {
+		DisableActionControlsTick();
+	}
+
 	// Shift up
-	if (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftUp) ||
+	if (controls.PrevInput == ScriptControls::Controller	&& tapStateUp == XboxController::TapState::Tapped ||
 		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::ShiftUp) ||
 		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftUp) ||
 		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftUp)) {
@@ -898,7 +907,7 @@ void functionSShift() {
 
 	// Shift down
 
-	if (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftDown) ||
+	if (controls.PrevInput == ScriptControls::Controller	&& tapStateDown == XboxController::TapState::Tapped ||
 		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::ShiftDown) || 
 		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftDown) ||
 		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftDown)) {
@@ -936,8 +945,16 @@ void functionSShift() {
 }
 
 void functionAShift() { // Automatic
+	auto tapStateUp = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftUp);
+	auto tapStateDown = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftDown);
+
+	if (tapStateUp == XboxController::TapState::ButtonDown ||
+		tapStateDown == XboxController::TapState::ButtonDown) {
+		DisableActionControlsTick();
+	}
+
 	// Shift up
-	if (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftUp) ||
+	if (controls.PrevInput == ScriptControls::Controller	&& tapStateUp == XboxController::TapState::Tapped ||
 		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::ShiftUp) ||
 		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftUp) ||
 		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftUp)) {
@@ -957,7 +974,7 @@ void functionAShift() { // Automatic
 
 	// Shift down
 
-	if (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftDown) ||
+	if (controls.PrevInput == ScriptControls::Controller	&& tapStateDown == XboxController::TapState::Tapped ||
 		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::ShiftDown) ||
 		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftDown) ||
 		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftDown)) {
