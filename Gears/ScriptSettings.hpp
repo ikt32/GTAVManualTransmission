@@ -2,7 +2,7 @@
 #include <Windows.h>
 
 #include <vector>
-#include "simpleini/SimpleIni.h"
+#include "../thirdparty/simpleini/SimpleIni.h"
 
 class Logger;
 class ScriptControls;

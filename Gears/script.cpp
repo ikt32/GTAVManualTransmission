@@ -310,8 +310,13 @@ void update() {
 		}
 	}
 
+	// enum ShiftModes {
+	// 	Sequential = 0,
+	// 	HPattern = 1,
+	// 	Automatic = 2
+	// };
 	// Manual shifting
-	if (settings.ShiftMode == 1) {
+	if (settings.ShiftMode == HPattern) {
 		if (controls.PrevInput == ScriptControls::Wheel) {
 			functionHShiftWheel();
 		}
@@ -319,7 +324,7 @@ void update() {
 			functionHShiftKeyboard();
 		}
 	}
-	else if (settings.ShiftMode == 0){
+	else if (settings.ShiftMode == Sequential){
 		functionSShift();
 		if (settings.AutoGear1) {
 			functionAutoGear1();
@@ -859,7 +864,7 @@ void functionHShiftWheel() {
 
 void functionSShift() {
 	// Shift up
-	if (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftUp) ||
+	if (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftUp) ||
 		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::ShiftUp) ||
 		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftUp) ||
 		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftUp)) {
@@ -897,7 +902,7 @@ void functionSShift() {
 
 	// Shift down
 
-	if (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::ShiftDown) ||
+	if (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftDown) ||
 		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::ShiftDown) || 
 		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftDown) ||
 		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftDown)) {

@@ -263,6 +263,15 @@ bool ScriptControls::ButtonHeld(ControllerControlType control) {
 	return false;
 }
 
+bool ScriptControls::ButtonTapped(ControllerControlType control) {
+	if (!controller.IsConnected())
+		return false;
+	if (controller.WasButtonHeldForMs(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState, 0) &&
+	   !controller.WasButtonHeldForMs(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState, 100))
+		return true;
+	return false;
+}
+
 bool ScriptControls::ButtonIn(ControllerControlType control) {
 	if (!controller.IsConnected())
 		return false;
