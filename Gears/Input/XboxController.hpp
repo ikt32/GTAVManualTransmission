@@ -5,6 +5,12 @@
 
 class XboxController {
 public:
+	enum class TapState {
+		ButtonUp,
+		ButtonDown,
+		Tapped
+	};
+
 	enum XboxButtons {
 		DpadUp,
 		DpadDown,
@@ -97,6 +103,10 @@ private:
 	int controllerNum;
 	std::array<__int64, SIZEOF_XboxButtons> pressTime;
 	std::array<__int64, SIZEOF_XboxButtons> releaseTime;
+
+	std::array<__int64, SIZEOF_XboxButtons> tapPressTime;
+	std::array<__int64, SIZEOF_XboxButtons> tapReleaseTime;
+
 	float filterDeadzone(XboxButtons buttonType, int input);
 	std::array<bool, SIZEOF_XboxButtons> xboxButtonCurr;
 	std::array<bool, SIZEOF_XboxButtons> xboxButtonPrev;
@@ -111,6 +121,7 @@ public:
 	bool IsButtonJustPressed(XboxButtons buttonType, WORD buttonState);
 	bool IsButtonJustReleased(XboxButtons buttonType, WORD buttonState);
 	bool WasButtonHeldForMs(XboxButtons buttonType, WORD buttonState, int milliseconds);
+	TapState WasButtonTapped(XboxButtons buttonType, WORD buttonState, int milliseconds);
 	void UpdateButtonChangeStates();
 
 

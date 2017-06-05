@@ -96,6 +96,26 @@ bool XboxController::WasButtonHeldForMs(XboxButtons buttonType, WORD buttonState
 	return false;
 }
 
+XboxController::TapState XboxController::WasButtonTapped(XboxButtons buttonType, WORD buttonState, int milliseconds) {
+	if (IsButtonJustPressed(buttonType, buttonState)) {
+		tapPressTime[buttonType] = milliseconds_now();
+	}
+	if (IsButtonJustReleased(buttonType, buttonState)) {
+		tapReleaseTime[buttonType] = milliseconds_now();
+	}
+
+	if ((tapReleaseTime[buttonType] - tapPressTime[buttonType]) > 1 &&
+		(tapReleaseTime[buttonType] - tapPressTime[buttonType]) <= milliseconds) {
+		tapPressTime[buttonType] = 0;
+		tapReleaseTime[buttonType] = 0;
+		return TapState::Tapped;
+	} 
+	if ((milliseconds_now() - tapPressTime[buttonType]) <= milliseconds) {
+		return TapState::ButtonDown;
+	}
+	return TapState::ButtonUp;
+}
+
 void XboxController::UpdateButtonChangeStates() {
 	for (int i = 0; i < SIZEOF_XboxButtons; i++) {
 		xboxButtonPrev[i] = xboxButtonCurr[i];
