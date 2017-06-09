@@ -273,7 +273,7 @@ std::vector<uint64_t> VehicleExtensions::GetWheelPtrs(Vehicle handle) {
 	return wheelPtrs;
 }
 
-std::vector<Vector3> VehicleExtensions::GetWheelContactCoords(Vehicle handle) {
+std::vector<Vector3> VehicleExtensions::GetWheelLastContactCoords(Vehicle handle) {
 	auto wheels = GetWheelPtrs(handle);
 	std::vector<Vector3> positions;
 	int offPosX = 0x40;
@@ -290,6 +290,37 @@ std::vector<Vector3> VehicleExtensions::GetWheelContactCoords(Vehicle handle) {
 		positions.push_back(wheelPos);
 	}
 	return positions;
+}
+
+std::vector<WheelDimensions> VehicleExtensions::GetWheelDimensions(Vehicle handle) {
+	auto wheels = GetWheelPtrs(handle);
+
+	std::vector<WheelDimensions> dimensionsSet;
+	int offTyreRadius = 0x110;
+	int offRimRadius = 0x114;
+	int offTyreWidth = 0x118;
+
+	for (auto wheelAddr : wheels) {
+		if (!wheelAddr) continue;
+
+		WheelDimensions dimensions;
+		dimensions.TyreRadius = *reinterpret_cast<float *>(wheelAddr + offTyreRadius);
+		dimensions.RimRadius = *reinterpret_cast<float *>(wheelAddr + offRimRadius);
+		dimensions.TyreWidth = *reinterpret_cast<float *>(wheelAddr + offTyreWidth);
+		dimensionsSet.push_back(dimensions);
+	}
+	return dimensionsSet;
+}
+
+std::vector<float> VehicleExtensions::GetWheelSpeeds(Vehicle handle) {
+	std::vector<float> wheelSpeeds;
+	int numWheels = GetNumWheels(handle);
+	std::vector<float> rotationSpeed = GetWheelRotationSpeeds(handle);
+	std::vector<WheelDimensions> dimensionsSet = GetWheelDimensions(handle);
+	for (int i = 0; i < numWheels; i++) {
+		wheelSpeeds.push_back(rotationSpeed[i] * dimensionsSet[i].TyreRadius);
+	}
+	return wheelSpeeds;
 }
 
 float VehicleExtensions::GetVisualHeight(Vehicle handle) {
@@ -325,7 +356,7 @@ void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) {
 	}
 }
 
-std::vector<float> VehicleExtensions::GetWheelsHealth(Vehicle handle) {
+std::vector<float> VehicleExtensions::GetWheelHealths(Vehicle handle) {
 	auto wheelPtr = GetWheelsPtr(handle);
 	auto numWheels = GetNumWheels(handle);
 
@@ -340,7 +371,7 @@ std::vector<float> VehicleExtensions::GetWheelsHealth(Vehicle handle) {
 	return healths;
 }
 
-std::vector<float> VehicleExtensions::GetWheelsCompression(Vehicle handle) {
+std::vector<float> VehicleExtensions::GetWheelCompressions(Vehicle handle) {
 	auto wheelPtr = GetWheelsPtr(handle);
 	auto numWheels = GetNumWheels(handle);
 
@@ -355,7 +386,7 @@ std::vector<float> VehicleExtensions::GetWheelsCompression(Vehicle handle) {
 	return compressions;
 }
 
-std::vector<float> VehicleExtensions::GetWheelsSpeed(Vehicle handle) {
+std::vector<float> VehicleExtensions::GetWheelRotationSpeeds(Vehicle handle) {
 	auto wheelPtr = GetWheelsPtr(handle);
 	auto numWheels = GetNumWheels(handle);
 

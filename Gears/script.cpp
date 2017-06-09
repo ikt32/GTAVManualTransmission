@@ -1052,9 +1052,9 @@ float getAverage(std::vector<float> values) {
 
 void showWheelInfo() {
 	auto numWheels = ext.GetNumWheels(vehicle);
-	auto wheelsSpeed = ext.GetWheelsSpeed(vehicle);
-	auto wheelsCompr = ext.GetWheelsCompression(vehicle);
-	auto wheelsHealt = ext.GetWheelsHealth(vehicle);
+	auto wheelsSpeed = ext.GetWheelSpeeds(vehicle);
+	auto wheelsCompr = ext.GetWheelCompressions(vehicle);
+	auto wheelsHealt = ext.GetWheelHealths(vehicle);
 	auto wheelsContactCoords = ext.GetWheelContactCoords(vehicle);
 	for (int i = 0; i < numWheels; i++) {
 		float wheelSpeed = wheelsSpeed[i];
@@ -1077,8 +1077,8 @@ void functionEngStall() {
 	// average of all wheels for now.
 	// TODO: Get drivetrain from handling data
 
-	float avgWheelSpeed = abs(getAverage(ext.GetWheelsSpeed(vehicle)));
-	auto wheelSpeeds = ext.GetWheelsSpeed(vehicle);
+	float avgWheelSpeed = abs(getAverage(ext.GetWheelSpeeds(vehicle)));
+	auto wheelSpeeds = ext.GetWheelSpeeds(vehicle);
 
 	if (controls.ClutchVal < 1.0f - settings.StallingThreshold &&
 		vehData.Rpm < 0.25f &&
