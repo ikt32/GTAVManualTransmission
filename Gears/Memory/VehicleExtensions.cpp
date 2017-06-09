@@ -3,6 +3,11 @@
 #include "NativeMemory.hpp"
 #include "../Util/Versions.h"
 
+template <typename T> int sgn(T val) {
+	return (T(0) < val) - (val < T(0));
+}
+
+
 void VehicleExtensions::ClearAddress() {
 	currAddress = nullptr;
 }
@@ -13,26 +18,6 @@ BYTE *VehicleExtensions::GetAddress(Vehicle handle) {
 		currAddress = reinterpret_cast<BYTE *>(mem.GetAddressOfEntity(handle));
 	}
 	return currAddress;
-}
-
-uint16_t VehicleExtensions::GetGearCurr(Vehicle handle) {
-	auto address = GetAddress(handle);
-
-	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x7A2 : 0x792);
-	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x7C2 : offset);
-	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x7E2 : offset);
-
-	return address == nullptr ? 0 : *reinterpret_cast<const uint16_t *>(address + offset);
-}
-
-uint16_t VehicleExtensions::GetGearNext(Vehicle handle) {
-	auto address = GetAddress(handle);
-
-	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x7A0 : 0x790);
-	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x7C0 : offset);
-	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x7E0 : offset);
-
-	return address == nullptr ? 0 : *reinterpret_cast<const uint16_t *>(address + offset);
 }
 
 uint32_t VehicleExtensions::GetGears(Vehicle handle) {
@@ -55,6 +40,16 @@ void VehicleExtensions::SetGears(Vehicle handle, uint32_t value) {
 	*reinterpret_cast<uint32_t *>(address + offset) = value;
 }
 
+uint16_t VehicleExtensions::GetGearCurr(Vehicle handle) {
+	auto address = GetAddress(handle);
+
+	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x7A2 : 0x792);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x7C2 : offset);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x7E2 : offset);
+
+	return address == nullptr ? 0 : *reinterpret_cast<const uint16_t *>(address + offset);
+}
+
 void VehicleExtensions::SetGearCurr(Vehicle handle, uint16_t value) {
 	auto address = GetAddress(handle);
 
@@ -63,6 +58,16 @@ void VehicleExtensions::SetGearCurr(Vehicle handle, uint16_t value) {
 	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x7E0 : offset);
 
 	*reinterpret_cast<uint32_t *>(address + offset) = value;
+}
+
+uint16_t VehicleExtensions::GetGearNext(Vehicle handle) {
+	auto address = GetAddress(handle);
+
+	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x7A0 : 0x790);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x7C0 : offset);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x7E0 : offset);
+
+	return address == nullptr ? 0 : *reinterpret_cast<const uint16_t *>(address + offset);
 }
 
 void VehicleExtensions::SetGearNext(Vehicle handle, uint16_t value) {
@@ -235,246 +240,6 @@ void VehicleExtensions::SetFuelLevel(Vehicle handle, float value) {
 	*reinterpret_cast<float *>(address + offset) = value;
 }
 
-uint8_t VehicleExtensions::GetNumWheels(Vehicle handle) {
-	auto address = GetAddress(handle);
-
-	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0xAA0 : 0xA80);
-	// FiveM should report 1.0.505.2 now :)
-	offset = (gameVersion > G_VER_1_0_463_1_NOSTEAM ? 0xA90 : offset);
-	offset = (gameVersion > G_VER_1_0_757_4_NOSTEAM ? 0xAB0 : offset);
-	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0xAE0 : offset);
-	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0xB10 : offset);
-	offset += 8;
-	
-	return *reinterpret_cast<int *>(address + offset);
-}
-
-uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {
-	auto address = GetAddress(handle);
-
-	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0xAA0 : 0xA80);
-	// FiveM should report 1.0.505.2 now :)
-	offset = (gameVersion > G_VER_1_0_463_1_NOSTEAM ? 0xA90 : offset); 
-	offset = (gameVersion > G_VER_1_0_757_4_NOSTEAM ? 0xAB0 : offset);
-	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0xAE0 : offset);
-	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0xB10 : offset);
-
-	return *reinterpret_cast<uint64_t *>(address + offset);
-}
-
-std::vector<uint64_t> VehicleExtensions::GetWheelPtrs(Vehicle handle) {
-	auto wheelPtr = GetWheelsPtr(handle);  // pointer to wheel pointers
-	auto numWheels = GetNumWheels(handle);
-	std::vector<uint64_t> wheelPtrs;
-	for (auto i = 0; i < numWheels; i++) {
-		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-		wheelPtrs.push_back(wheelAddr);
-	}
-	return wheelPtrs;
-}
-
-std::vector<Vector3> VehicleExtensions::GetWheelLastContactCoords(Vehicle handle) {
-	auto wheels = GetWheelPtrs(handle);
-	std::vector<Vector3> positions;
-	int offPosX = 0x40;
-	int offPosY = 0x44;
-	int offPosZ = 0x48;
-	
-	for (auto wheelAddr : wheels) {
-		if (!wheelAddr) continue;
-
-		Vector3 wheelPos;
-		wheelPos.x = *reinterpret_cast<float *>(wheelAddr + offPosX);
-		wheelPos.y = *reinterpret_cast<float *>(wheelAddr + offPosY);
-		wheelPos.z = *reinterpret_cast<float *>(wheelAddr + offPosZ);
-		positions.push_back(wheelPos);
-	}
-	return positions;
-}
-
-std::vector<WheelDimensions> VehicleExtensions::GetWheelDimensions(Vehicle handle) {
-	auto wheels = GetWheelPtrs(handle);
-
-	std::vector<WheelDimensions> dimensionsSet;
-	int offTyreRadius = 0x110;
-	int offRimRadius = 0x114;
-	int offTyreWidth = 0x118;
-
-	for (auto wheelAddr : wheels) {
-		if (!wheelAddr) continue;
-
-		WheelDimensions dimensions;
-		dimensions.TyreRadius = *reinterpret_cast<float *>(wheelAddr + offTyreRadius);
-		dimensions.RimRadius = *reinterpret_cast<float *>(wheelAddr + offRimRadius);
-		dimensions.TyreWidth = *reinterpret_cast<float *>(wheelAddr + offTyreWidth);
-		dimensionsSet.push_back(dimensions);
-	}
-	return dimensionsSet;
-}
-
-std::vector<float> VehicleExtensions::GetWheelSpeeds(Vehicle handle) {
-	std::vector<float> wheelSpeeds;
-	int numWheels = GetNumWheels(handle);
-	std::vector<float> rotationSpeed = GetWheelRotationSpeeds(handle);
-	std::vector<WheelDimensions> dimensionsSet = GetWheelDimensions(handle);
-	for (int i = 0; i < numWheels; i++) {
-		wheelSpeeds.push_back(rotationSpeed[i] * dimensionsSet[i].TyreRadius);
-	}
-	return wheelSpeeds;
-}
-
-float VehicleExtensions::GetVisualHeight(Vehicle handle) {
-	auto wheelPtr = GetWheelsPtr(handle);
-	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x080 : -1);
-	if (offset == -1)
-		return 0.0f;
-
-	return *reinterpret_cast<float *>(wheelPtr + offset);
-}
-
-// 0 is default. Pos is lowered, Neg = change height. Used by LSC. Set once.
-// Physics are NOT affected, including hitbox.
-void VehicleExtensions::SetVisualHeight(Vehicle handle, float height) {
-	auto wheelPtr = GetWheelsPtr(handle);
-	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x07c : -1);
-
-	if (offset == -1)
-		return;
-
-	*reinterpret_cast<float *>(wheelPtr + offset) = height;
-}
-
-void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) {
-	auto wheelPtr = GetWheelsPtr(handle);  // pointer to wheel pointers
-	auto numWheels = GetNumWheels(handle);
-
-	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x1E0 : 0x1D0;
-
-	for (auto i = 0; i < numWheels; i++) {
-		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-		*reinterpret_cast<float *>(wheelAddr + offset) = health;
-	}
-}
-
-std::vector<float> VehicleExtensions::GetWheelHealths(Vehicle handle) {
-	auto wheelPtr = GetWheelsPtr(handle);
-	auto numWheels = GetNumWheels(handle);
-
-	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x1E0 : 0x1D0;
-
-	std::vector<float> healths;
-
-	for (auto i = 0; i < numWheels; i++) {
-		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-		healths.push_back(*reinterpret_cast<float *>(wheelAddr + offset));
-	}
-	return healths;
-}
-
-std::vector<float> VehicleExtensions::GetWheelCompressions(Vehicle handle) {
-	auto wheelPtr = GetWheelsPtr(handle);
-	auto numWheels = GetNumWheels(handle);
-
-	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x160 : 0x150;
-
-	std::vector<float> compressions;
-
-	for (auto i = 0; i < numWheels; i++) {
-		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-		compressions.push_back(*reinterpret_cast<float *>(wheelAddr + offset));
-	}
-	return compressions;
-}
-
-std::vector<float> VehicleExtensions::GetWheelRotationSpeeds(Vehicle handle) {
-	auto wheelPtr = GetWheelsPtr(handle);
-	auto numWheels = GetNumWheels(handle);
-
-	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x168 : 0x158;
-
-	std::vector<float> speeds;
-
-	for (auto i = 0; i < numWheels; i++) {
-		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-		speeds.push_back(-*reinterpret_cast<float *>(wheelAddr + offset));
-	}
-	return speeds;
-}
-
-float VehicleExtensions::GetSteeringMultiplier(Vehicle handle) {
-	auto wheelPtr = GetWheelsPtr(handle);
-	auto numWheels = GetNumWheels(handle);
-
-	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x138 : 0x128;
-
-	if (numWheels > 1) {
-		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * 1);
-		return abs(*reinterpret_cast<float*>(wheelAddr + offset));
-	}
-	return 1.0f;
-}
-
-template <typename T> int sgn(T val) {
-	return (T(0) < val) - (val < T(0));
-}
-
-void VehicleExtensions::SetSteeringMultiplier(Vehicle handle, float value) {
-	auto wheelPtr = GetWheelsPtr(handle);
-	auto numWheels = GetNumWheels(handle);
-
-	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x138 : 0x128;
-
-	for (int i = 0; i<numWheels; i++) {
-		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-		int sign = sgn(*reinterpret_cast<float*>(wheelAddr + offset));
-		*reinterpret_cast<float*>(wheelAddr + offset) = value * sign;
-	}
-}
-
-// Steering input angle, steering lock independent
-float VehicleExtensions::GetSteeringInputAngle(Vehicle handle) {
-	auto address = GetAddress(handle);
-
-	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x8A4 : 0x894);
-	offset = (gameVersion > G_VER_1_0_678_1_NOSTEAM ? 0x89C : offset);
-	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x8C4 : offset);
-	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x8EC : offset);
-
-	return *reinterpret_cast<float *>(address + offset);
-}
-
-void VehicleExtensions::SetSteeringInputAngle(Vehicle handle, float value) {
-	auto address = GetAddress(handle);
-
-	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x8A4 : 0x894);
-	offset = (gameVersion > G_VER_1_0_678_1_NOSTEAM ? 0x89C : offset);
-	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x8C4 : offset);
-	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x8EC : offset);
-
-	*reinterpret_cast<float *>(address + offset) = value;
-}
-
-// Wheel angle, steering lock dependent
-float VehicleExtensions::GetSteeringAngle(Vehicle handle) {
-	auto address = GetAddress(handle);
-
-	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x8AC : 0x89C);
-	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x8CC : offset);
-	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x8F4 : offset);
-
-	return *reinterpret_cast<float *>(address + offset);
-}
-
-void VehicleExtensions::SetSteeringAngle(Vehicle handle, float value) {
-	auto address = GetAddress(handle);
-
-	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x8AC : 0x89C);
-	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x8CC : offset);
-	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x8F4 : offset);
-
-	*reinterpret_cast<float *>(address + offset) = value;
-}
-
 float VehicleExtensions::GetEngineTemp(Vehicle handle) {
 	if (gameVersion <= G_VER_1_0_877_1_NOSTEAM) {
 		return 0.0f;
@@ -513,4 +278,236 @@ float VehicleExtensions::GetDashSpeed(Vehicle handle) {
 		return 0.0f;
 
 	return *reinterpret_cast<float *>(address + offset);
+}
+
+float VehicleExtensions::GetSteeringInputAngle(Vehicle handle) {
+	auto address = GetAddress(handle);
+
+	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x8A4 : 0x894);
+	offset = (gameVersion > G_VER_1_0_678_1_NOSTEAM ? 0x89C : offset);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x8C4 : offset);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x8EC : offset);
+
+	return *reinterpret_cast<float *>(address + offset);
+}
+
+void VehicleExtensions::SetSteeringInputAngle(Vehicle handle, float value) {
+	auto address = GetAddress(handle);
+
+	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x8A4 : 0x894);
+	offset = (gameVersion > G_VER_1_0_678_1_NOSTEAM ? 0x89C : offset);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x8C4 : offset);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x8EC : offset);
+
+	*reinterpret_cast<float *>(address + offset) = value;
+}
+
+float VehicleExtensions::GetSteeringAngle(Vehicle handle) {
+	auto address = GetAddress(handle);
+
+	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x8AC : 0x89C);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x8CC : offset);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x8F4 : offset);
+
+	return *reinterpret_cast<float *>(address + offset);
+}
+
+void VehicleExtensions::SetSteeringAngle(Vehicle handle, float value) {
+	auto address = GetAddress(handle);
+
+	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x8AC : 0x89C);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x8CC : offset);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x8F4 : offset);
+
+	*reinterpret_cast<float *>(address + offset) = value;
+}
+
+uint8_t VehicleExtensions::GetNumWheels(Vehicle handle) {
+	auto address = GetAddress(handle);
+
+	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0xAA0 : 0xA80);
+	// FiveM should report 1.0.505.2 now :)
+	offset = (gameVersion > G_VER_1_0_463_1_NOSTEAM ? 0xA90 : offset);
+	offset = (gameVersion > G_VER_1_0_757_4_NOSTEAM ? 0xAB0 : offset);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0xAE0 : offset);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0xB10 : offset);
+	offset += 8;
+	
+	return *reinterpret_cast<int *>(address + offset);
+}
+
+uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {
+	auto address = GetAddress(handle);
+
+	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0xAA0 : 0xA80);
+	// FiveM should report 1.0.505.2 now :)
+	offset = (gameVersion > G_VER_1_0_463_1_NOSTEAM ? 0xA90 : offset); 
+	offset = (gameVersion > G_VER_1_0_757_4_NOSTEAM ? 0xAB0 : offset);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0xAE0 : offset);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0xB10 : offset);
+
+	return *reinterpret_cast<uint64_t *>(address + offset);
+}
+
+std::vector<uint64_t> VehicleExtensions::GetWheelPtrs(Vehicle handle) {
+	auto wheelPtr = GetWheelsPtr(handle);  // pointer to wheel pointers
+	auto numWheels = GetNumWheels(handle);
+	std::vector<uint64_t> wheelPtrs;
+	for (auto i = 0; i < numWheels; i++) {
+		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
+		wheelPtrs.push_back(wheelAddr);
+	}
+	return wheelPtrs;
+}
+
+float VehicleExtensions::GetVisualHeight(Vehicle handle) {
+	auto wheelPtr = GetWheelsPtr(handle);
+	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x080 : -1);
+	if (offset == -1)
+		return 0.0f;
+
+	return *reinterpret_cast<float *>(wheelPtr + offset);
+}
+
+void VehicleExtensions::SetVisualHeight(Vehicle handle, float height) {
+	auto wheelPtr = GetWheelsPtr(handle);
+	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x07c : -1);
+
+	if (offset == -1)
+		return;
+
+	*reinterpret_cast<float *>(wheelPtr + offset) = height;
+}
+
+std::vector<float> VehicleExtensions::GetWheelHealths(Vehicle handle) {
+	auto wheelPtr = GetWheelsPtr(handle);
+	auto numWheels = GetNumWheels(handle);
+
+	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x1E0 : 0x1D0;
+
+	std::vector<float> healths;
+
+	for (auto i = 0; i < numWheels; i++) {
+		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
+		healths.push_back(*reinterpret_cast<float *>(wheelAddr + offset));
+	}
+	return healths;
+}
+
+void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) {
+	auto wheelPtr = GetWheelsPtr(handle);  // pointer to wheel pointers
+	auto numWheels = GetNumWheels(handle);
+
+	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x1E0 : 0x1D0;
+
+	for (auto i = 0; i < numWheels; i++) {
+		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
+		*reinterpret_cast<float *>(wheelAddr + offset) = health;
+	}
+}
+
+float VehicleExtensions::GetSteeringMultiplier(Vehicle handle) {
+	auto wheelPtr = GetWheelsPtr(handle);
+	auto numWheels = GetNumWheels(handle);
+
+	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x138 : 0x128;
+
+	if (numWheels > 1) {
+		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * 1);
+		return abs(*reinterpret_cast<float*>(wheelAddr + offset));
+	}
+	return 1.0f;
+}
+
+void VehicleExtensions::SetSteeringMultiplier(Vehicle handle, float value) {
+	auto wheelPtr = GetWheelsPtr(handle);
+	auto numWheels = GetNumWheels(handle);
+
+	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x138 : 0x128;
+
+	for (int i = 0; i<numWheels; i++) {
+		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
+		int sign = sgn(*reinterpret_cast<float*>(wheelAddr + offset));
+		*reinterpret_cast<float*>(wheelAddr + offset) = value * sign;
+	}
+}
+
+std::vector<Vector3> VehicleExtensions::GetWheelLastContactCoords(Vehicle handle) {
+	auto wheels = GetWheelPtrs(handle);
+	std::vector<Vector3> positions;
+	int offPosX = 0x40;
+	int offPosY = 0x44;
+	int offPosZ = 0x48;
+
+	for (auto wheelAddr : wheels) {
+		if (!wheelAddr) continue;
+
+		Vector3 wheelPos;
+		wheelPos.x = *reinterpret_cast<float *>(wheelAddr + offPosX);
+		wheelPos.y = *reinterpret_cast<float *>(wheelAddr + offPosY);
+		wheelPos.z = *reinterpret_cast<float *>(wheelAddr + offPosZ);
+		positions.push_back(wheelPos);
+	}
+	return positions;
+}
+
+std::vector<float> VehicleExtensions::GetWheelCompressions(Vehicle handle) {
+	auto wheelPtr = GetWheelsPtr(handle);
+	auto numWheels = GetNumWheels(handle);
+
+	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x160 : 0x150;
+
+	std::vector<float> compressions;
+
+	for (auto i = 0; i < numWheels; i++) {
+		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
+		compressions.push_back(*reinterpret_cast<float *>(wheelAddr + offset));
+	}
+	return compressions;
+}
+
+std::vector<WheelDimensions> VehicleExtensions::GetWheelDimensions(Vehicle handle) {
+	auto wheels = GetWheelPtrs(handle);
+
+	std::vector<WheelDimensions> dimensionsSet;
+	int offTyreRadius = 0x110;
+	int offRimRadius = 0x114;
+	int offTyreWidth = 0x118;
+
+	for (auto wheelAddr : wheels) {
+		if (!wheelAddr) continue;
+
+		WheelDimensions dimensions;
+		dimensions.TyreRadius = *reinterpret_cast<float *>(wheelAddr + offTyreRadius);
+		dimensions.RimRadius = *reinterpret_cast<float *>(wheelAddr + offRimRadius);
+		dimensions.TyreWidth = *reinterpret_cast<float *>(wheelAddr + offTyreWidth);
+		dimensionsSet.push_back(dimensions);
+	}
+	return dimensionsSet;
+}
+
+std::vector<float> VehicleExtensions::GetWheelRotationSpeeds(Vehicle handle) {
+	auto wheelPtr = GetWheelsPtr(handle);
+	auto numWheels = GetNumWheels(handle);
+
+	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x168 : 0x158;
+
+	std::vector<float> speeds;
+
+	for (auto i = 0; i < numWheels; i++) {
+		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
+		speeds.push_back(-*reinterpret_cast<float *>(wheelAddr + offset));
+	}
+	return speeds;
+}
+
+std::vector<float> VehicleExtensions::GetTyreSpeeds(Vehicle handle) {
+	std::vector<float> wheelSpeeds;
+	int numWheels = GetNumWheels(handle);
+	std::vector<float> rotationSpeed = GetWheelRotationSpeeds(handle);
+	std::vector<WheelDimensions> dimensionsSet = GetWheelDimensions(handle);
+	for (int i = 0; i < numWheels; i++) {
+		wheelSpeeds.push_back(rotationSpeed[i] * dimensionsSet[i].TyreRadius);
+	}
+	return wheelSpeeds;
 }

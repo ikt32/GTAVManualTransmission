@@ -73,9 +73,11 @@ public:
 	float GetDashSpeed(Vehicle handle);
 	// No set impl.
 
+	// Steering input angle, steering lock independent
 	float GetSteeringInputAngle(Vehicle handle);
 	void SetSteeringInputAngle(Vehicle handle, float value);
 
+	// Wheel angle, steering lock dependent
 	float GetSteeringAngle(Vehicle handle);
 	void SetSteeringAngle(Vehicle handle, float value);
 
@@ -83,30 +85,32 @@ public:
 	uint64_t GetWheelsPtr(Vehicle handle);
 	
 	/*
-	* Suspension info struct
-	*/
+	 * Suspension info struct
+	 */
 	
 	std::vector<uint64_t> GetWheelPtrs(Vehicle handle);
 	
+	// 0 is default. Pos is lowered, Neg = change height. Used by LSC. Set once.
+	// Physics are NOT affected, including hitbox.
 	float GetVisualHeight(Vehicle handle);
 	void SetVisualHeight(Vehicle handle, float height);
 
 	/*
 	 * Wheel struct
-	 */
-	std::vector<float> GetWheelHealths(Vehicle handle);					// 0-1000
-	void SetWheelsHealth(Vehicle handle, float health);					// 0-1000
+	 */	
+	std::vector<float> GetWheelHealths(Vehicle handle);
+	void SetWheelsHealth(Vehicle handle, float health);
 	
 	float GetSteeringMultiplier(Vehicle handle);
 	void SetSteeringMultiplier(Vehicle handle, float value);
 
+	std::vector<Vector3> GetWheelLastContactCoords(Vehicle handle);
 	std::vector<float> GetWheelCompressions(Vehicle handle);
-	// Unit: rad/s
-	std::vector<float> GetWheelRotationSpeeds(Vehicle handle);			
-	std::vector<Vector3> GetWheelLastContactCoords(Vehicle handle);		
-	// Unit: meters, probably.
-	std::vector<WheelDimensions> GetWheelDimensions(Vehicle handle);	
 
+	// Unit: meters, probably.
+	std::vector<WheelDimensions> GetWheelDimensions(Vehicle handle);
+	// Unit: rad/s
+	std::vector<float> GetWheelRotationSpeeds(Vehicle handle);
 	// Unit: m/s, at the tyres. This probably doesn't work well for popped tyres.
 	std::vector<float> GetTyreSpeeds(Vehicle handle);
 
