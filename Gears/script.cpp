@@ -549,20 +549,21 @@ void showDebugInfoWheel(ScriptSettings &settings, float effSteer, int damperForc
 	showText(0.85, 0.325, 0.4, ssOverSteer.str().c_str(),	4, solidWhite, true);
 }
 
-void showDebugInfo3D(Vector3 location, std::vector<std::string> textLines)
-{
+void showDebugInfo3D(Vector3 location, std::vector<std::string> textLines, Color backgroundColor = transparentGray) {
 	float x, y;
+	float height = 0.0125f;
 	
 	if (GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(location.x, location.y, location.z, &x, &y)) {
 		int i = 0;
 		for (auto line : textLines) {
-			showText(x, y + 0.0125f * i, 0.2f, line.c_str());
+			showText(x, y + height * i, 0.2f, line.c_str());
 			i++;
 		}
 		
 		float szX = 0.060f;
-		float szY = 0.0125f * i;
-		GRAPHICS::DRAW_RECT(x + 0.027f, y + (0.0125f * i)/2.0f, szX, szY, 75, 75, 75, 75);
+		float szY = (height * i) + 0.02f;
+		GRAPHICS::DRAW_RECT(x + 0.027f, y + (height * i)/2.0f, szX, szY,
+							backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A);
 	}
 }
 
@@ -1050,20 +1051,42 @@ float getAverage(std::vector<float> values) {
 	return total / values.size();
 }
 
+std::vector<bool> getWheelLockups(Vehicle handle) {
+	std::vector<bool> lockups;
+	float velocity = ENTITY::GET_ENTITY_VELOCITY(vehicle).y;
+	auto wheelsSpeed = ext.GetWheelRotationSpeeds(vehicle);
+	for (auto wheelSpeed : wheelsSpeed) {
+		if (abs(velocity) > 0.01f && wheelSpeed == 0.0f)
+			lockups.push_back(true);
+		else
+			lockups.push_back(false);
+	}
+	return lockups;
+}
+
 void showWheelInfo() {
 	auto numWheels = ext.GetNumWheels(vehicle);
 	auto wheelsSpeed = ext.GetTyreSpeeds(vehicle);
 	auto wheelsCompr = ext.GetWheelCompressions(vehicle);
 	auto wheelsHealt = ext.GetWheelHealths(vehicle);
 	auto wheelsContactCoords = ext.GetWheelLastContactCoords(vehicle);
+	auto wheelsOnGround = ext.GetWheelsOnGround(vehicle);
+	auto wheelCoords = ext.GetWheelCoords(vehicle, ENTITY::GET_ENTITY_COORDS(vehicle, true), ENTITY::GET_ENTITY_ROTATION(vehicle, 0), ENTITY::GET_ENTITY_FORWARD_VECTOR(vehicle));
+	auto wheelLockups = getWheelLockups(vehicle);
+
 	for (int i = 0; i < numWheels; i++) {
 		float wheelSpeed = wheelsSpeed[i];
 		float wheelCompr = wheelsCompr[i];
 		float wheelHealt = wheelsHealt[i];
-		showDebugInfo3D(wheelsContactCoords[i], {
+		Color c = wheelLockups[i] ? solidOrange : transparentGray;
+		c = wheelsOnGround[i] ? c : solidRed;
+		showDebugInfo3D(wheelCoords[i], {
 			"Speed: " + std::to_string(wheelSpeed),
 			"Compress: " + std::to_string(wheelCompr),
-			"Health: " + std::to_string(wheelHealt), });
+			"Health: " + std::to_string(wheelHealt), },
+			c );
+		GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z, 
+							wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z + 1.0f + 2.5f * wheelCompr, 255, 0, 0, 255);
 	}
 }
 
