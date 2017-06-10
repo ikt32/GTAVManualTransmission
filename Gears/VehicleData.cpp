@@ -79,8 +79,12 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 	Pitch = ENTITY::GET_ENTITY_PITCH(vehicle);
 	SteeringAngle = ext.GetSteeringAngle(vehicle);
 	WheelCompressions = ext.GetWheelCompressions(vehicle);
+	DriveBiasFront = ext.GetDriveBiasFront(vehicle);
 	if (prevCompressions.size() != WheelCompressions.size()) {
 		prevCompressions = WheelCompressions;
+	}
+	if (!HasSpeedo && ext.GetDashSpeed(vehicle) > 0.1f) {
+		HasSpeedo = true;
 	}
 
 	ControlAccelerate = (CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate) - 127) / 127.0f;

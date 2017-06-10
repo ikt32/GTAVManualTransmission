@@ -81,6 +81,13 @@ public:
 	float GetSteeringAngle(Vehicle handle);
 	void SetSteeringAngle(Vehicle handle, float value);
 
+	// Handling data related getters
+	uint64_t GetHandlingPtr(Vehicle handle);
+	float GetDriveBiasFront(Vehicle handle);
+	float GetDriveBiasRear(Vehicle handle);
+	float GetPetrolTankVolume(Vehicle handle);
+	float GetOilVolume(Vehicle handle);
+
 	uint8_t GetNumWheels(Vehicle handle);
 	uint64_t GetWheelsPtr(Vehicle handle);
 	

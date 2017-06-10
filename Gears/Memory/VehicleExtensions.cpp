@@ -2,6 +2,7 @@
 #include <vector>
 #include "NativeMemory.hpp"
 #include "../Util/Versions.h"
+#include "HandlingOffsets.hpp"
 
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
@@ -363,6 +364,35 @@ void VehicleExtensions::SetSteeringAngle(Vehicle handle, float value) {
 	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x8F4 : offset);
 
 	*reinterpret_cast<float *>(address + offset) = value;
+}
+
+uint64_t VehicleExtensions::GetHandlingPtr(Vehicle handle) {
+	auto address = GetAddress(handle);
+	
+	int offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x850 : 0x830);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x878 : offset);
+
+	return *reinterpret_cast<uint64_t *>(address + offset);
+}
+
+float VehicleExtensions::GetDriveBiasFront(Vehicle handle) {
+	auto address = GetHandlingPtr(handle);
+	return *reinterpret_cast<float *>(address + hOffsets.fDriveBiasFront);
+}
+
+float VehicleExtensions::GetDriveBiasRear(Vehicle handle) {
+	auto address = GetHandlingPtr(handle);
+	return *reinterpret_cast<float *>(address + hOffsets.fDriveBiasRear);
+}
+
+float VehicleExtensions::GetPetrolTankVolume(Vehicle handle) {
+	auto address = GetHandlingPtr(handle);
+	return *reinterpret_cast<float *>(address + hOffsets.fPetrolTankVolume);
+}
+
+float VehicleExtensions::GetOilVolume(Vehicle handle) {
+	auto address = GetHandlingPtr(handle);
+	return *reinterpret_cast<float *>(address + hOffsets.fOilVolume);
 }
 
 uint8_t VehicleExtensions::GetNumWheels(Vehicle handle) {

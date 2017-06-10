@@ -76,6 +76,7 @@ public:
 	Vector3 RotationVelocity = {};
 	std::vector<float> WheelCompressions = {};
 	Vector3 V3Velocities = {};
+	float DriveBiasFront;
 	Vector3 getAccelerationVectors(Vector3 velocities);
 
 	// Should be called after getAccelerationVectors has been called in a loop
