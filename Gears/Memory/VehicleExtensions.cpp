@@ -16,11 +16,24 @@ Vector3 Cross(Vector3 left, Vector3 right) {
 }
 
 Vector3 operator + (Vector3 left, Vector3 right) {
-	return { left.x + right.x, left.y + right.y, left.z + right.z };
+	return Vector3 { 
+		left.x + right.x,
+		0,
+		left.y + right.y,
+		0,
+		left.z + right.z 
+	};
 }
 
 Vector3 operator * (Vector3 value, float scale) {
-	return { value.x * scale, value.y * scale, value.z * scale };
+	return Vector3{ 
+		value.x * scale, 
+		0, 
+		value.y * scale, 
+		0, 
+		value.z * scale ,
+		0 
+	};
 }
 
 Vector3 operator * (float scale, Vector3 vec) {
@@ -28,12 +41,12 @@ Vector3 operator * (float scale, Vector3 vec) {
 }
 
 Vector3 GetOffsetInWorldCoords(Vector3 base, Vector3 forward, Vector3 rotation, Vector3 offset) {
-	const double deg2rad = 0.01745329251994329576923690768489;
-	double num1 = cos(rotation.y * deg2rad);
-	float x = num1 * cos(-rotation.z  * deg2rad);
-	float y = num1 * sin(rotation.z  * deg2rad);
-	float z = sin(-rotation.y * deg2rad);
-	Vector3 right = { x, y, z };
+	const float deg2rad = 0.01745329251994329576923690768489;
+	float num1 = cosf(rotation.y * deg2rad);
+	float x = num1 * cosf(-rotation.z  * deg2rad);
+	float y = num1 * sinf(rotation.z  * deg2rad);
+	float z = sinf(-rotation.y * deg2rad);
+	Vector3 right = { x, 0, y, 0, z, 0 };
 	Vector3 up = Cross(right, forward);
 	return base + (right * offset.x) + (forward * offset.y) + (up * offset.z);
 }
