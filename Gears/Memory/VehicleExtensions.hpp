@@ -105,9 +105,10 @@ public:
 	void SetSteeringMultiplier(Vehicle handle, float value);
 
 	std::vector<Vector3> GetWheelOffsets(Vehicle handle);
-	std::vector<Vector3> VehicleExtensions::GetWheelCoords(Vehicle handle, Vector3 base, Vector3 rotation, Vector3 direction);
+	std::vector<Vector3> GetWheelCoords(Vehicle handle, Vector3 base, Vector3 rotation, Vector3 direction);
 	std::vector<Vector3> GetWheelLastContactCoords(Vehicle handle);
 	std::vector<float> GetWheelCompressions(Vehicle handle);
+	std::vector<bool> GetWheelsOnGround(Vehicle handle);
 
 	// Unit: meters, probably.
 	std::vector<WheelDimensions> GetWheelDimensions(Vehicle handle);
@@ -122,7 +123,8 @@ private:
 };
 
 // Wheel stuff:
-// 20, 30: offset from body?
+// 20: offset from body?
+// 30: Similar-ish?
 
 // 40, 50: last position on ground?
 // 60 - current position? seems to be 0,0,0 when contact is lost

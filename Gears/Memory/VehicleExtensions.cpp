@@ -547,6 +547,14 @@ std::vector<float> VehicleExtensions::GetWheelCompressions(Vehicle handle) {
 	return compressions;
 }
 
+std::vector<bool> VehicleExtensions::GetWheelsOnGround(Vehicle handle) {
+	std::vector<bool> onGround;
+	for (auto comp : GetWheelCompressions(handle)) {
+		onGround.push_back(comp != 0.0f);
+	}
+	return onGround;
+}
+
 std::vector<WheelDimensions> VehicleExtensions::GetWheelDimensions(Vehicle handle) {
 	auto wheels = GetWheelPtrs(handle);
 
