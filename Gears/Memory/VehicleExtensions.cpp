@@ -7,6 +7,36 @@ template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
 
+Vector3 Cross(Vector3 left, Vector3 right) {
+	Vector3 result;
+	result.x = left.y * right.z - left.z * right.y;
+	result.y = left.z * right.x - left.x * right.z;
+	result.z = left.x * right.y - left.y * right.x;
+	return result;
+}
+
+Vector3 operator + (Vector3 left, Vector3 right) {
+	return { left.x + right.x, left.y + right.y, left.z + right.z };
+}
+
+Vector3 operator * (Vector3 value, float scale) {
+	return { value.x * scale, value.y * scale, value.z * scale };
+}
+
+Vector3 operator * (float scale, Vector3 vec) {
+	return vec * scale;
+}
+
+Vector3 GetOffsetInWorldCoords(Vector3 base, Vector3 forward, Vector3 rotation, Vector3 offset) {
+	const double deg2rad = 0.01745329251994329576923690768489;
+	double num1 = cos(rotation.y * deg2rad);
+	float x = num1 * cos(-rotation.z  * deg2rad);
+	float y = num1 * sin(rotation.z  * deg2rad);
+	float z = sin(-rotation.y * deg2rad);
+	Vector3 right = { x, y, z };
+	Vector3 up = Cross(right, forward);
+	return base + (right * offset.x) + (forward * offset.y) + (up * offset.z);
+}
 
 void VehicleExtensions::ClearAddress() {
 	currAddress = nullptr;
@@ -432,9 +462,47 @@ void VehicleExtensions::SetSteeringMultiplier(Vehicle handle, float value) {
 	}
 }
 
+std::vector<Vector3> VehicleExtensions::GetWheelOffsets(Vehicle handle) {
+	auto wheels = GetWheelPtrs(handle);
+	std::vector<Vector3> positions;
+
+	int offPosX = 0x20;
+	int offPosY = 0x24;
+	int offPosZ = 0x28;
+
+	for (auto wheelAddr : wheels) {
+		if (!wheelAddr) continue;
+
+		Vector3 wheelPos;
+		wheelPos.x = *reinterpret_cast<float *>(wheelAddr + offPosX);
+		wheelPos.y = *reinterpret_cast<float *>(wheelAddr + offPosY);
+		wheelPos.z = *reinterpret_cast<float *>(wheelAddr + offPosZ);
+		positions.push_back(wheelPos);
+	}
+	return positions;
+}
+
+std::vector<Vector3> VehicleExtensions::GetWheelCoords(Vehicle handle, Vector3 base, Vector3 rotation, Vector3 direction) {
+	std::vector<Vector3> worldCoords;
+	std::vector<Vector3> positions = GetWheelOffsets(handle);
+
+	for (Vector3 wheelPos : positions) {
+		Vector3 absPos = GetOffsetInWorldCoords(base, rotation, direction, wheelPos);
+		worldCoords.push_back(absPos);
+	}
+	return worldCoords;
+}
+
 std::vector<Vector3> VehicleExtensions::GetWheelLastContactCoords(Vehicle handle) {
 	auto wheels = GetWheelPtrs(handle);
 	std::vector<Vector3> positions;
+	// 0x40: Last wheel contact coordinates
+	// 0x50: Last wheel contact coordinates but centered on the wheel width
+	// 0x60: Next probable wheel position? Seems to flutter around a lot, while
+	//       position is entirely lost (0.0) when contact is lost. Wheels that
+	//       steer emphasise this further, though acceleration/deceleration
+	//       will also influence it.
+
 	int offPosX = 0x40;
 	int offPosY = 0x44;
 	int offPosZ = 0x48;
