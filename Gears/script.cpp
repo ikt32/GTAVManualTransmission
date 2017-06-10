@@ -472,6 +472,7 @@ void showHUD() {
 }
 
 void showDebugInfo() {
+	std::stringstream ssEnabled;
 	std::stringstream ssRPM;
 	std::stringstream ssCurrGear;
 	std::stringstream ssNextGear;
@@ -479,8 +480,10 @@ void showDebugInfo() {
 	std::stringstream ssThrottle;
 	std::stringstream ssTurbo;
 	std::stringstream ssAddress;
-	std::stringstream ssEnabled;
+	std::stringstream ssDashSpd;
+	std::stringstream ssDbias;
 
+	ssEnabled << "Mod:\t\t" << (settings.EnableManual ? "Enabled" : "Disabled");
 	ssRPM		<< "RPM:\t\t" << std::setprecision(3) << vehData.Rpm;
 	ssCurrGear	<< "CurrGear:\t" << vehData.CurrGear;
 	ssNextGear	<< "NextGear:\t" << vehData.NextGear;
@@ -488,8 +491,10 @@ void showDebugInfo() {
 	ssThrottle	<< "Throttle:\t" << std::setprecision(3) << vehData.Throttle;
 	ssTurbo		<< "Turbo:\t\t" << std::setprecision(3) << vehData.Turbo;
 	ssAddress	<< "Address:\t" << std::hex << reinterpret_cast<uint64_t>(vehData.Address);
-	ssEnabled	<< "Mod:\t\t" << (settings.EnableManual ? "Enabled" : "Disabled");
+	ssDashSpd	<< "Speedo:\t" << (vehData.HasSpeedo ? "Yes" : "No");
+	ssDbias		<< "DBias:\t\t" << std::setprecision(3) << vehData.DriveBiasFront;
 
+	showText(0.01f, 0.275f, 0.4f, ssEnabled.str().c_str(),	4, solidWhite, true);
 	showText(0.01f, 0.300f, 0.4f, ssRPM.str().c_str(),		4, solidWhite, true);
 	showText(0.01f, 0.325f, 0.4f, ssCurrGear.str().c_str(),	4, solidWhite, true);
 	showText(0.01f, 0.350f, 0.4f, ssNextGear.str().c_str(),	4, solidWhite, true);
@@ -497,8 +502,8 @@ void showDebugInfo() {
 	showText(0.01f, 0.400f, 0.4f, ssThrottle.str().c_str(),	4, solidWhite, true);
 	showText(0.01f, 0.425f, 0.4f, ssTurbo.str().c_str(),	4, solidWhite, true);
 	showText(0.01f, 0.450f, 0.4f, ssAddress.str().c_str(),	4, solidWhite, true);
-	showText(0.01f, 0.475f, 0.4f, ssEnabled.str().c_str(),	4, solidWhite, true);
-	if (!vehData.HasSpeedo) showText(0.01f, 0.500f, 0.4f, "No speedo btw", 4);
+	showText(0.01f, 0.475f, 0.4f, ssDashSpd.str().c_str(),	4, solidWhite, true);
+	showText(0.01f, 0.500f, 0.4f, ssDbias.str().c_str(),	4, solidWhite, true);
 
 	std::stringstream ssThrottleInput;
 	std::stringstream ssBrakeInput;
@@ -1101,19 +1106,81 @@ void functionEngStall() {
 	// TODO: Get drivetrain from handling data
 
 	auto wheelSpeeds = ext.GetTyreSpeeds(vehicle);
-	float avgWheelSpeed = abs(getAverage(wheelSpeeds));
+	std::vector<float> wheelsToConsider;
 
-	if (controls.ClutchVal < 1.0f - settings.StallingThreshold &&
+	// TODO: this is ugly and dumb. Fix. 
+
+	//bikes? huh
+	if (ext.GetNumWheels(vehicle) == 2) {
+		// fwd
+		if (vehData.DriveBiasFront == 1.0f) {
+			wheelsToConsider.push_back(wheelSpeeds[0]);
+		}
+		// rwd
+		else if (vehData.DriveBiasFront == 0.0f) {
+			wheelsToConsider.push_back(wheelSpeeds[1]);
+		}
+		// awd
+		else {
+			wheelsToConsider = wheelSpeeds;
+		}
+	}
+	// normal vehicles
+	else if (ext.GetNumWheels(vehicle) == 4) {
+		// fwd
+		if (vehData.DriveBiasFront == 1.0f) {
+			wheelsToConsider.push_back(wheelSpeeds[0]);
+			wheelsToConsider.push_back(wheelSpeeds[1]);
+		}
+		// rwd
+		else if (vehData.DriveBiasFront == 0.0f) {
+			wheelsToConsider.push_back(wheelSpeeds[2]);
+			wheelsToConsider.push_back(wheelSpeeds[3]);
+		}
+		// awd
+		else {
+			wheelsToConsider = wheelSpeeds;
+		}
+	}
+	// offroad? hmmmm
+	else if (ext.GetNumWheels(vehicle) == 6) {
+		// fwd
+		if (vehData.DriveBiasFront == 1.0f) {
+			wheelsToConsider.push_back(wheelSpeeds[0]);
+			wheelsToConsider.push_back(wheelSpeeds[1]);
+		}
+		// rwd
+		else if (vehData.DriveBiasFront == 0.0f) {
+			wheelsToConsider.push_back(wheelSpeeds[2]);
+			wheelsToConsider.push_back(wheelSpeeds[3]);
+			wheelsToConsider.push_back(wheelSpeeds[4]);
+			wheelsToConsider.push_back(wheelSpeeds[5]);
+		}
+		// awd
+		else {
+			wheelsToConsider = wheelSpeeds;
+		}
+	}
+	// trikes 'n stuff, dunno :(
+	else {
+		wheelsToConsider = wheelSpeeds;
+	}
+
+
+
+	float avgWheelSpeed = abs(getAverage(wheelsToConsider));
+	if (vehData.Clutch > 0.2f && // 1.0 = fully engaged, 0.1 = fully disengaged
+		controls.ClutchVal < 1.0f - settings.StallingThreshold &&
 		vehData.Rpm < 0.25f &&
 		((avgWheelSpeed < vehData.CurrGear * lowSpeed) || (vehData.CurrGear == 0 && avgWheelSpeed < lowSpeed)) &&
-		VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
-		VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
+		VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
 		stallingProgress += (rand() % 1000) / (stallingRateDivisor * (controls.ThrottleVal+0.001f) * timeStep);
 		if (stallingProgress > 1.0f) {
 			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 			gearRattle.Stop();
 			stallingProgress = 0.0f;
-			//showNotification("Your car has stalled.");
+			if (settings.DisplayInfo)
+				showNotification("Your car has stalled.");
 		}
 	}
 	else {
