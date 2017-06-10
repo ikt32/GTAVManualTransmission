@@ -1,5 +1,20 @@
 # Changelog
 
+## 4.3.4
+No config changes
+
+Fixes:
+	* Also apply patches when getting into a new car
+	* Fix steering lock not saved
+	* Fix global FFB settings readout typo
+	* 
+
+Improvements:
+	* Use wheel speed data for stalling decision
+	* Use drive bias data for stalling decision
+	* Add fancy debug info about wheels (suspension, speed, locking up)
+	* Use "tap" detection for XInput (need help with blocking default buttons)
+
 ## 4.3.3
 No config changes
 
