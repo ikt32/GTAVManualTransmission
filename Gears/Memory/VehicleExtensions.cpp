@@ -40,15 +40,15 @@ Vector3 operator * (float scale, Vector3 vec) {
 	return vec * scale;
 }
 
-Vector3 GetOffsetInWorldCoords(Vector3 base, Vector3 forward, Vector3 rotation, Vector3 offset) {
-	const float deg2rad = 0.01745329251994329576923690768489;
-	float num1 = cosf(rotation.y * deg2rad);
-	float x = num1 * cosf(-rotation.z  * deg2rad);
-	float y = num1 * sinf(rotation.z  * deg2rad);
-	float z = sinf(-rotation.y * deg2rad);
+Vector3 GetOffsetInWorldCoords(Vector3 position, Vector3 rotation, Vector3 forward, Vector3 offset) {
+	const float deg2Rad = 0.01745329251994329576923690768489;
+	float num1 = cosf(rotation.y * deg2Rad);
+	float x = num1 * cosf(-rotation.z  * deg2Rad);
+	float y = num1 * sinf(rotation.z  * deg2Rad);
+	float z = sinf(-rotation.y * deg2Rad);
 	Vector3 right = { x, 0, y, 0, z, 0 };
 	Vector3 up = Cross(right, forward);
-	return base + (right * offset.x) + (forward * offset.y) + (up * offset.z);
+	return position + (right * offset.x) + (forward * offset.y) + (up * offset.z);
 }
 
 void VehicleExtensions::ClearAddress() {
@@ -495,12 +495,12 @@ std::vector<Vector3> VehicleExtensions::GetWheelOffsets(Vehicle handle) {
 	return positions;
 }
 
-std::vector<Vector3> VehicleExtensions::GetWheelCoords(Vehicle handle, Vector3 base, Vector3 rotation, Vector3 direction) {
+std::vector<Vector3> VehicleExtensions::GetWheelCoords(Vehicle handle, Vector3 position, Vector3 rotation, Vector3 direction) {
 	std::vector<Vector3> worldCoords;
 	std::vector<Vector3> positions = GetWheelOffsets(handle);
 
 	for (Vector3 wheelPos : positions) {
-		Vector3 absPos = GetOffsetInWorldCoords(base, rotation, direction, wheelPos);
+		Vector3 absPos = GetOffsetInWorldCoords(position, rotation, direction, wheelPos);
 		worldCoords.push_back(absPos);
 	}
 	return worldCoords;
