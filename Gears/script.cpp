@@ -87,11 +87,18 @@ void update() {
 	if (prevVehicle != vehicle) {
 		vehData.Clear();
 		ext.ClearAddress();
-		auto addr = ext.GetAddress(vehicle);
 		if (settings.LogCar) {
-			std::stringstream hexaddr;
-			hexaddr << std::hex << static_cast<void*>(addr);
-			logger.Write("DEBUG: New vehicle address: " + hexaddr.str());
+			auto vehicleAddress = ext.GetAddress(vehicle);
+			std::stringstream ssVehicleAddress;
+			ssVehicleAddress << std::hex << static_cast<void*>(vehicleAddress);
+			logger.Write("DEBUG: New vehicle address: " + ssVehicleAddress.str());
+			int i = 0;
+			for (auto address : ext.GetWheelPtrs(vehicle)) {
+				std::stringstream ssWheelAddress;
+				ssWheelAddress << std::hex << address;
+				logger.Write("DEBUG: Wheel " + std::to_string(i) + " address: " + ssWheelAddress.str());
+				i++;
+			}
 		}
 		if (vehData.NoClutch) {
 			vehData.SimulatedNeutral = false;
