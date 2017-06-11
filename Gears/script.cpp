@@ -634,11 +634,7 @@ void reInit() {
 	logger.Write("Settings read");
 	vehData.LockGears = 0x00010001;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
-	if (settings.EnableWheel) {
-		controls.InitWheel(settings.EnableFFB);
-		controls.CheckGUIDs(settings.reggdGuids);
-	}
-	controls.SteerGUID = controls.WheelAxesGUIDs[static_cast<int>(controls.SteerAxisType)];
+	initWheel();
 
 	logger.Write("Initialization finished");
 }
@@ -656,13 +652,6 @@ void reset() {
 	}
 	if (settings.EnableFFB && controls.WheelControl.IsConnected(controls.SteerGUID)) {
 		controls.WheelControl.SetConstantForce(controls.SteerGUID, 0);
-	}
-}
-
-void resetSteeringMultiplier() {
-	if (vehicle == 0) return;
-	if (ext.GetSteeringMultiplier(vehicle) != 1.0f) {
-		ext.SetSteeringMultiplier(vehicle, 1.0f);
 	}
 }
 
@@ -684,6 +673,14 @@ void toggleManual() {
 	reInit();
 }
 
+void initWheel() {
+	if (settings.EnableWheel) {
+		controls.InitWheel(settings.EnableFFB);
+		controls.CheckGUIDs(settings.reggdGuids);
+	}
+	controls.SteerGUID = controls.WheelAxesGUIDs[static_cast<int>(controls.SteerAxisType)];
+}
+
 void initSteeringPatches() {
 	if (controls.PrevInput != ScriptControls::Wheel && settings.LogiLEDs) {
 		for (GUID guid : controls.WheelControl.GetGuids()) {
@@ -702,6 +699,13 @@ void initSteeringPatches() {
 			MemoryPatcher::RestoreSteeringCorrection();
 		}
 		resetSteeringMultiplier();
+	}
+}
+
+void resetSteeringMultiplier() {
+	if (vehicle == 0) return;
+	if (ext.GetSteeringMultiplier(vehicle) != 1.0f) {
+		ext.SetSteeringMultiplier(vehicle, 1.0f);
 	}
 }
 
