@@ -2,7 +2,7 @@
 #include <vector>
 #include "NativeMemory.hpp"
 #include "../Util/Versions.h"
-#include "HandlingOffsets.hpp"
+#include "Offsets.hpp"
 
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));

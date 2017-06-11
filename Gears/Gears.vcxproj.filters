@@ -116,7 +116,7 @@
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h">
       <Filter>Thirdparty</Filter>
     </ClInclude>
-    <ClInclude Include="HandlingOffsets.hpp">
+    <ClInclude Include="Offsets.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
   </ItemGroup>

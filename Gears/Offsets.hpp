@@ -2,28 +2,30 @@
 #include <cstdint>
 #include <windows.h>
 
-struct vecOffset {
+struct vec3Offset {
 	int X;
 	int Y;
 	int Z;
 };
 
-const struct HandlingOffset {
+const struct CVehicleHandlingData {
 	DWORD dwHandlingNameHash = 0x0008;
 	int fMass = 0x000C;
 	int fInitialDragCoeff = 0x0010;
 	// 0x0014
 	// 0x0018
 	// 0x001C
-	vecOffset vecCentreOfMass = {
+	vec3Offset vecCentreOfMass = {
 		0x0020,
 		0x0024,
-		0x0028 };
+		0x0028 
+	};
 	// 0x002C
-	vecOffset vecInertiaMultiplier = {
+	vec3Offset vecInertiaMultiplier = {
 		0x0030,
 		0x0034,
-		0x0038 };
+		0x0038 
+	};
 	// 0x003C
 	int fPercentSubmerged = 0x0040;
 	int fSubmergedRatio = 0x0044;
@@ -85,3 +87,40 @@ const struct HandlingOffset {
 	DWORD dwStrDamageFlags = 0x0124;
 	DWORD dwAIHandlingHash = 0x0134;
 } hOffsets = {};
+
+const struct CWheel {
+	// Wheel stuff:
+	// 20: offset from body?
+	// 30: Similar-ish?
+
+	// 40, 50: last position on ground?
+	// 60 - current position? seems to be 0,0,0 when contact is lost
+
+	// B0 - world velocity
+	// C0 - Same, but flipped?
+
+	// 168 - rotation speed rad/s
+	// 16C - slippage y-dir?
+	// 170 - heating
+
+	// materials.dat related
+	// 190 - surface related: tyre grip
+	// 194 - surface related: wet grip
+	// 198 - surface related: tyre drag
+	// 19C - surface related: top speed mult
+
+
+	// 1C4 - steering angle
+	// 1C8/1D4 - Brake
+	// 1CC/1D8 - Throttle/powered
+	// 1E0 - Cur Health
+	// 1E4 - Max Health
+
+	// 1EC / (flags?) - Powered states
+	// 1F0 - ? bitflags too
+	// 1F4 - Surface flags?
+
+	// ulong offPosX = 0x40;
+	// ulong offPosY = 0x44;
+	// ulong offPosZ = 0x48;
+};
