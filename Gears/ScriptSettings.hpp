@@ -118,6 +118,7 @@ public:
 	bool PatchSteering = false;
 	bool PatchSteeringAlways = false;
 	bool LogiLEDs = false;
+	bool HPatternKeyboard = false;
 
 	// [FORCE_FEEDBACK]
 	bool EnableFFB = true;

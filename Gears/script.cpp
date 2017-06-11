@@ -321,6 +321,7 @@ void update() {
 	if (settings.ShiftMode == 1) {
 		if (controls.PrevInput == ScriptControls::Wheel) {
 			functionHShiftWheel();
+			if (settings.HPatternKeyboard)functionHShiftKeyboard();
 		}
 		if (controls.PrevInput == ScriptControls::Keyboard) {
 			functionHShiftKeyboard();

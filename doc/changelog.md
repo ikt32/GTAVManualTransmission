@@ -1,7 +1,8 @@
 # Changelog
 
 ## 4.3.4
-No config changes
+No incompatible config changes:
+* Added "ALLOW_KEYBOARD" to wheel H-Shifter options
 
 Fixes:  
 * Fix patches not applied when changing cars

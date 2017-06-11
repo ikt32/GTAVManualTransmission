@@ -156,6 +156,7 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 	settingsWheel.SetBoolValue("OPTIONS", "PatchSteering", PatchSteering);
 	settingsWheel.SetBoolValue("OPTIONS", "PatchSteeringAlways", PatchSteeringAlways);
 	settingsWheel.SetBoolValue("OPTIONS", "LogitechLEDs", LogiLEDs);
+	settingsWheel.SetBoolValue("OPTIONS", "HPatternKeyboard", HPatternKeyboard);
 
 	settingsWheel.SetBoolValue("OPTIONS", "InvertSteer", scriptControl->InvertSteer);
 	settingsWheel.SetBoolValue("OPTIONS", "InvertThrottle", scriptControl->InvertThrottle);
@@ -398,6 +399,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	PatchSteering = settingsWheel.GetBoolValue("OPTIONS", "PatchSteering", false);
 	PatchSteeringAlways = settingsWheel.GetBoolValue("OPTIONS", "PatchSteeringAlways", false);
 	LogiLEDs = settingsWheel.GetBoolValue("OPTIONS", "LogitechLEDs", false);
+	HPatternKeyboard = settingsWheel.GetBoolValue("OPTIONS", "HPatternKeyboard", false);
 
 	scriptControl->InvertSteer =	settingsWheel.GetBoolValue("OPTIONS", "InvertSteer", false);
 	scriptControl->InvertThrottle = settingsWheel.GetBoolValue("OPTIONS", "InvertThrottle", false);

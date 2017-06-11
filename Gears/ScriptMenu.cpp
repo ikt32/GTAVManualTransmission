@@ -391,6 +391,9 @@ void update_menu() {
 			bool result = configHPattern();
 			showNotification(result ? "H-pattern shifter saved" : "Cancelled H-pattern shifter setup", &prevNotification);
 		}
+
+		menu.BoolOption("Keyboard H-pattern", &settings.HPatternKeyboard, 
+		{ "This'll allow you to also use the keyboard", "controls for wheel H-shifting. Configure", "controls in the keyboard section." });
 	}
 
 	/* Yes hello I am root - 2 */
