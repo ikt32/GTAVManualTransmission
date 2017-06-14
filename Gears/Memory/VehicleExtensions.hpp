@@ -17,11 +17,11 @@
 #include "../../../ScriptHookV_SDK/inc/types.h"
 #include "../../../ScriptHookV_SDK/inc/nativeCaller.h"
 
-typedef struct {
+struct WheelDimensions {
 	float TyreRadius;
 	float RimRadius;
 	float TyreWidth;
-} WheelDimensions;
+};
 
 class VehicleExtensions {
 public:
