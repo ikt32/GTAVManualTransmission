@@ -7,6 +7,9 @@
  * 
  * Wouldn't work for anything but simple get/setters though, and these
  * stl containers are just too nice.
+ * 
+ * Update 1103.2 - I did not realize manually updating the 
+ * offsets was such a pain in the ass.
  */
 
 #include <vector>
