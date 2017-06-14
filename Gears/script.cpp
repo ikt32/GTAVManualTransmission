@@ -2094,6 +2094,9 @@ void main() {
 	logger.Write("Loading " + settingsWheelFile);
 	logger.Write("Loading " + settingsMenuFile);
 
+	menu.RegisterOnMain(std::bind(menuInit));
+	menu.RegisterOnExit(std::bind(menuClose));
+
 	reInit();
 	while (true) {
 		update();

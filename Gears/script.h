@@ -156,3 +156,6 @@ bool configKeyboardKey(const std::string &confTag);
 bool configControllerButton(const std::string &confTag);
 
 void updateSteeringMultiplier();
+
+void menuInit();
+void menuClose();
