@@ -49,6 +49,9 @@
       <Filter>Menu</Filter>
     </ClCompile>
     <ClCompile Include="ScriptMenu.cpp" />
+    <ClCompile Include="..\..\GTAVMenuBase\menuutils.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -118,6 +121,9 @@
     </ClInclude>
     <ClInclude Include="Offsets.hpp">
       <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GTAVMenuBase\menuutils.h">
+      <Filter>Menu</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
