@@ -88,6 +88,7 @@ const struct CVehicleHandlingData {
 	DWORD dwAIHandlingHash = 0x0134;
 } hOffsets = {};
 
+// 1032
 const struct CWheel {
 	// Wheel stuff:
 	// 20: offset from body?
@@ -124,3 +125,127 @@ const struct CWheel {
 	// ulong offPosY = 0x44;
 	// ulong offPosZ = 0x48;
 };
+
+class CVehicleModelInfoArray {};
+class CNavigation{};
+class CVehicleDrawHandler{};
+class CMatrix{};
+class CAttacker{};
+class CHandlingData{};
+class CPed{};
+
+//1032
+class CVehicle_1032 {
+public:
+	char pad_0x0000[0x20];                                  // 0x0000
+	CVehicleModelInfoArray* VehicleModelInfoArrayContainer; // 0x0020
+	unsigned char typeByte;                                 // 0x0028
+	char pad_0x0029[0x7];                                   // 0x0029
+	CNavigation* CNavigation;                               // 0x0030
+	char pad_0x0038[0x10];                                  // 0x0038
+	CVehicleDrawHandler* CVehicleColorOptions;              // 0x0048
+	char pad_0x0050[0x10];                                  // 0x0050
+	CMatrix N000072BA;                                      // 0x0060
+	char pad_0x00A0[0x20];                                  // 0x00A0
+	DWORD dwBitmapc0;                                       // 0x00C0 1<<17=onfire
+	char pad_0x00C4[0x14];                                  // 0x00C4
+	__int8 N000072C5;                                       // 0x00D8 & 0x02 == 2(not in car), 0 (in car)
+	char pad_0x00D9[0xB0];                                  // 0x00D9
+	unsigned char btGodMode;                                // 0x0189
+	char pad_0x018A[0xF6];                                  // 0x018A
+	float fHealth;                                          // 0x0280
+	char pad_0x0284[0x1C];                                  // 0x0284
+	float fHealthMax;                                       // 0x02A0
+	char pad_0x02A4[0x4];                                   // 0x02A4
+	CAttacker* CAttacker;                                   // 0x02A8
+	char pad_0x02B0[0x68];                                  // 0x02B0
+	__int32 bRocketBoostEnabled;                            // 0x0318
+	float fRocketBoostCharge;                               // 0x031C
+	char pad_0x0320[0x440];                                 // 0x0320
+	Vector3 v3Velocity;                                     // 0x0760
+	float N00002422;                                        // 0x076C
+	float fRotationSpeedRoll;                               // 0x0770
+	float fRotationSpeedPitch;                              // 0x0774
+	float fRotationSpeedYaw;                                // 0x0778
+	float N00006E17;                                        // 0x077C
+	char pad_0x0780[0x30];                                  // 0x0780
+	float fUnknownHealth;                                   // 0x07B0 explodes when damage (not fire) decreases to 0
+	float fFuelTankHealth;                                  // 0x07B4 big bang when reaches -1000
+	float fFuelLevel;                                       // 0x07B8
+	float fFireTimer;                                       // 0x07BC
+	char pad_0x07C0[0x30];                                  // 0x07C0
+	__int8 iGearNext;                                       // 0x07F0
+	char pad_0x07F1[0x1];                                   // 0x07F1
+	__int8 iGearCurrent;                                    // 0x07F2
+	char pad_0x07F3[0x3];                                   // 0x07F3
+	__int8 iGearTopGear;                                    // 0x07F6
+	char pad_0x07F7[0x2D];                                  // 0x07F7
+	float fCurrentRPM;                                      // 0x0824
+	float fCurrentRPM2;                                     // 0x0828
+	char pad_0x082C[0x4];                                   // 0x082C
+	float fClutch;                                          // 0x0830
+	float fThrottle;                                        // 0x0834
+	char pad_0x0838[0x8];                                   // 0x0838
+	__int32 UnknownFC40CBF7B90CA77C;                        // 0x0840 signed
+	char pad_0x0844[0x4];                                   // 0x0844
+	float fTurbo;                                           // 0x0848
+	float fSteeringAngleZERO;                               // 0x084C
+	char pad_0x0850[0x8];                                   // 0x0850
+	float fVehicleCrashDowndown;                            // 0x0858
+	float fHealth2;                                         // 0x085C
+	char pad_0x0860[0x28];                                  // 0x0860
+	CHandlingData* vehicleHandling;                         // 0x0888
+	unsigned char vehicleType;                              // 0x0890 2=car,boat 6=heli,plane (0x04=flying + 0x02=vehicle)
+	unsigned char dw4or5;                                   // 0x0891 always 4 then 5 in plane
+	unsigned char bitmapCarInfo1;                           // 0x0892 3=in, 6=getting in, 2=out, 1=dead car; 2=in heli; 4=props on plane turning. (& 0x02 = drivable)
+	unsigned char bitmapBulletProofTires;                   // 0x0893 wheelsCan'tBreak << 6
+	char pad_0x0894[0x2];                                   // 0x0894
+	unsigned char bitmapUnknown2;                           // 0x0896 << 4 (|= 16) by vehicle_6ebfb22d646ffc18
+	char pad_0x0897[0x3];                                   // 0x0897
+	unsigned char bitmapJumpRelated;                        // 0x089A & 0x10 = something
+	char pad_0x089B[0x1];                                   // 0x089B
+	__int8 bitmapOwnedByPlayer;                             // 0x089C 0x02 = hasBeenOwnedByPlayer
+	char pad_0x089D[0xE];                                   // 0x089D
+	unsigned char bitmapUnknownVehicleType1;                // 0x08AB VEHICLE__CAC66558B944DA67 &= 0xf7; |= 8*(enabled&1)
+	char pad_0x08AC[0x4C];                                  // 0x08AC
+	float N00002483;                                        // 0x08F8
+	float fWheelBias2;                                      // 0x08FC -1.0 to 1.0
+	char pad_0x0900[0x4];                                   // 0x0900
+	float fWheelBias;                                       // 0x0904 -0.65~ to +~0.65
+	char pad_0x0908[0x4];                                   // 0x0908
+	float fThrottlePosition;                                // 0x090C
+	float fBreakPosition;                                   // 0x0910
+	unsigned char bHandbrake;                               // 0x0914
+	char pad_0x0915[0x33];                                  // 0x0915
+	float fDirtLevel;                                       // 0x0948
+	char pad_0x094C[0x70];                                  // 0x094C
+	float fEngineTemp;                                      // 0x09BC
+	char pad_0x09C0[0x34];                                  // 0x09C0
+	DWORD dwCarAlarmLength;                                 // 0x09F4
+	char pad_0x09F8[0x8];                                   // 0x09F8
+	float fDashSpeed;                                       // 0x0A00
+	char pad_0x0A04[0x6];                                   // 0x0A04
+	unsigned char bUsedInB2E0C0D6922D31F2;                  // 0x0A0A
+	char pad_0x0A0B[0x45];                                  // 0x0A0B
+	Vector3 vTravel;                                        // 0x0A50
+	char pad_0x0A5C[0x44];                                  // 0x0A5C
+	float fVelocityX;                                       // 0x0AA0
+	float fVelocityY;                                       // 0x0AA4
+	float fVelocityZ;                                       // 0x0AA8
+	char pad_0x0AAC[0x6C];                                  // 0x0AAC
+	__int32 iVehicleType;                                   // 0x0B18 0=car recently;1=plane, 0d = boat, 8=heli, 0x0e=train, 0x0b=motorbike, <= 0x0a = CAutomobile?
+	char pad_0x0B1C[0x24];                                  // 0x0B1C
+	unsigned char btOpenableDoors;                          // 0x0B40
+	char pad_0x0B41[0x4B];                                  // 0x0B41
+	float fGravity;                                         // 0x0B8C
+	char pad_0x0B90[0x8];                                   // 0x0B90
+	CPed PedsInSeats[15];                                   // 0x0B98
+	char pad_0x0C10[0x798];                                 // 0x0C10
+	unsigned char ReducedGrip;                              // 0x13A8 &=0xBF; |= (reduceGrip & 1) << 6
+	unsigned char CreatesMoneyWhenExploded;                 // 0x13A9 &= 0xFD; |= 2 * enabled
+	char pad_0x13AA[0x3F6];                                 // 0x13AA
+	float fSudoJumpValue;                                   // 0x17A0
+	char pad_0x17A4[0x130];                                 // 0x17A4
+};                                                          // Size=0x18D4
+
+//1103

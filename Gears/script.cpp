@@ -22,6 +22,8 @@
 
 #include "menu.h"
 #include "menucontrols.h"
+#include "Offsets.hpp"
+#include "Memory/NativeMemory.hpp"
 
 GameSound gearRattle("DAMAGED_TRUCK_IDLE", 0);
 
@@ -53,6 +55,7 @@ extern std::vector<std::string> speedoTypes;
 
 bool lookrightfirst = false;
 
+CVehicle_1032 *vehicle_test;
 
 void update() {
 	///////////////////////////////////////////////////////////////////////////
@@ -79,6 +82,9 @@ void update() {
 		playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
 		return;
 	}
+
+	MemoryAccess mem;
+	vehicle_test = reinterpret_cast<CVehicle_1032 *>(mem.GetAddressOfEntity(vehicle));
 
 	///////////////////////////////////////////////////////////////////////////
 	//                           Update stuff
