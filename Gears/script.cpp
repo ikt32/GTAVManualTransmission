@@ -32,8 +32,6 @@ std::string settingsWheelFile;
 std::string settingsMenuFile;
 
 NativeMenu::Menu menu;
-NativeMenu::MenuControls menuControls;
-
 ScriptControls controls;
 ScriptSettings settings(settingsGeneralFile, settingsWheelFile);
 

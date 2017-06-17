@@ -24,7 +24,6 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 	switch (reason) {
 		case DLL_PROCESS_ATTACH: {
 			scriptRegister(hInstance, ScriptMain);
-			//keyboardHandlerRegister(OnKeyboardMessage);
 			logger.Clear();
 			logger.Write("GTAVManualTransmission " + std::string(DISPLAY_VERSION));
 			logger.Write("Game version " + eGameVersionToString(getGameVersion()));
@@ -47,7 +46,6 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 				if (!successS)
 					logger.Write("Shut down script with steering not restored");
 			}
-			//keyboardHandlerUnregister(OnKeyboardMessage);
 			break;
 		}
 	}

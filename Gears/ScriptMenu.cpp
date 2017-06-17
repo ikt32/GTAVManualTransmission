@@ -1,17 +1,14 @@
 #define NOMINMAX
 #include <string>
 
+#include "inc/main.h"
 #include "script.h"
-#include "../../ScriptHookV_SDK/inc/main.h"
+#include "menu.h"
 
 #include "ScriptSettings.hpp"
-
 #include "Input/ScriptControls.hpp"
-#include "Util/Util.hpp"
-
-#include "menu.h"
-//#include "menucontrols.h"
 #include "Input/keyboard.h"
+#include "Util/Util.hpp"
 #include "Util/Versions.h"
 
 extern ScriptSettings settings;
@@ -20,7 +17,6 @@ extern std::string settingsWheelFile;
 extern std::string settingsMenuFile;
 
 extern NativeMenu::Menu menu;
-extern NativeMenu::MenuControls menuControls;
 
 extern ScriptControls controls;
 extern ScriptSettings settings;
@@ -1049,9 +1045,9 @@ bool configHPattern() {
 
 // Keyboard
 bool isMenuControl(int control) {
-	if (control == menuControls.ControlKeys[NativeMenu::MenuControls::ControlType::MenuKey] ||
-		control == menuControls.ControlKeys[NativeMenu::MenuControls::ControlType::MenuSelect] ||
-		control == menuControls.ControlKeys[NativeMenu::MenuControls::ControlType::MenuCancel]) {
+	if (control == menu.GetControls().ControlKeys[NativeMenu::MenuControls::ControlType::MenuKey] ||
+		control == menu.GetControls().ControlKeys[NativeMenu::MenuControls::ControlType::MenuSelect] ||
+		control == menu.GetControls().ControlKeys[NativeMenu::MenuControls::ControlType::MenuCancel]) {
 		return true;
 	}
 	return false;
