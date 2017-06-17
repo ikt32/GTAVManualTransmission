@@ -121,6 +121,7 @@ public:
 	bool IsButtonJustPressed(XboxButtons buttonType, WORD buttonState);
 	bool IsButtonJustReleased(XboxButtons buttonType, WORD buttonState);
 	bool WasButtonHeldForMs(XboxButtons buttonType, WORD buttonState, int milliseconds);
+	bool WasButtonHeldOverMs(XboxButtons xbox_buttons, WORD button_state, int millis);
 	TapState WasButtonTapped(XboxButtons buttonType, WORD buttonState, int milliseconds);
 	void UpdateButtonChangeStates();
 

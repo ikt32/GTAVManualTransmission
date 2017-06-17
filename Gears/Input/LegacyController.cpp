@@ -56,6 +56,19 @@ bool LegacyController::WasButtonHeldForMs(GameButtons gameButton, int millisecon
 	return false;
 }
 
+bool LegacyController::WasButtonHeldOverMs(GameButtons gameButton, int milliseconds) {
+	if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, GameEnums[gameButton])) {
+		pressTime[gameButton] = milliseconds_now();
+	}
+
+	if (CONTROLS::IS_CONTROL_PRESSED(0, GameEnums[gameButton]) &&
+		pressTime[gameButton] != 0 &&
+		(milliseconds_now() - pressTime[gameButton]) >= milliseconds) {
+		return true;
+	}
+	return false;
+}
+
 void LegacyController::UpdateButtonChangeStates() {
 	for (int i = 0; i < SIZEOF_GameButtons; i++) {
 		gameButtonPrev[i] = gameButtonCurr[i];

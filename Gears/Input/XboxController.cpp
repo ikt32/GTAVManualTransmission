@@ -96,6 +96,19 @@ bool XboxController::WasButtonHeldForMs(XboxButtons buttonType, WORD buttonState
 	return false;
 }
 
+bool XboxController::WasButtonHeldOverMs(XboxButtons buttonType, WORD buttonState, int millis) {
+	if (IsButtonJustPressed(buttonType, buttonState)) {
+		pressTime[buttonType] = milliseconds_now();
+	}
+
+	if (IsButtonPressed(buttonType, buttonState) &&
+		pressTime[buttonType] != 0 &&
+		milliseconds_now() - pressTime[buttonType] >= millis) {
+		return true;
+	}
+	return false;
+}
+
 XboxController::TapState XboxController::WasButtonTapped(XboxButtons buttonType, WORD buttonState, int milliseconds) {
 	if (IsButtonJustPressed(buttonType, buttonState)) {
 		tapPressTime[buttonType] = milliseconds_now();

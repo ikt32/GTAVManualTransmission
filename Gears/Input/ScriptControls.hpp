@@ -122,6 +122,7 @@ public:
 	bool ButtonJustPressed(ControllerControlType control);
 	bool ButtonReleased(ControllerControlType control);
 	bool ButtonHeld(ControllerControlType control);
+	bool ButtonHeldOver(ControllerControlType control, int millis);
 	XboxController::TapState ButtonTapped(ControllerControlType control);
 	bool ButtonIn(ControllerControlType control);
 	void SetXboxTrigger(float value);
@@ -130,6 +131,7 @@ public:
 	bool ButtonJustPressed(LegacyControlType control);
 	bool ButtonReleased(LegacyControlType control);
 	bool ButtonHeld(LegacyControlType control);
+	bool ButtonHeldOver(LegacyControlType control, int millis);
 	bool ButtonIn(LegacyControlType control);
 #endif
 	bool ButtonJustPressed(WheelControlType control);

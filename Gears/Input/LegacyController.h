@@ -79,6 +79,7 @@ public:
 	bool IsButtonJustPressed(GameButtons gameButton);
 	bool IsButtonJustReleased(GameButtons gameButton);
 	bool WasButtonHeldForMs(GameButtons gameButton, int milliseconds);
+	bool WasButtonHeldOverMs(GameButtons gameButton, int millis);
 	void UpdateButtonChangeStates();
 
 	float GetAnalogValue(GameButtons gameButton);

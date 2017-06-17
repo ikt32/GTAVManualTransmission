@@ -263,6 +263,14 @@ bool ScriptControls::ButtonHeld(ControllerControlType control) {
 	return false;
 }
 
+bool ScriptControls::ButtonHeldOver(ControllerControlType control, int millis) {
+	if (!controller.IsConnected())
+		return false;
+	if (controller.WasButtonHeldOverMs(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState, millis))
+		return true;
+	return false;
+}
+
 XboxController::TapState ScriptControls::ButtonTapped(ControllerControlType control) {
 	if (!controller.IsConnected())
 		return XboxController::TapState::ButtonUp;
@@ -311,6 +319,14 @@ bool ScriptControls::ButtonHeld(LegacyControlType control) {
 	if (!UseLegacyController) return false;
 	auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
 	if (lcontroller.WasButtonHeldForMs(gameButton, CToggleTime))
+		return true;
+	return false;
+}
+
+bool ScriptControls::ButtonHeldOver(LegacyControlType control, int millis) {
+	if (!UseLegacyController) return false;
+	auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
+	if (lcontroller.WasButtonHeldOverMs(gameButton, millis))
 		return true;
 	return false;
 }
