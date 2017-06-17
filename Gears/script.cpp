@@ -875,11 +875,6 @@ void functionSShift() {
 	auto tapStateUp = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftUp);
 	auto tapStateDown = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftDown);
 
-	if (tapStateUp == XboxController::TapState::ButtonDown ||
-		tapStateDown == XboxController::TapState::ButtonDown) {
-		DisableActionControlsTick();
-	}
-
 	// Shift up
 	if (controls.PrevInput == ScriptControls::Controller	&& tapStateUp == XboxController::TapState::Tapped ||
 		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::ShiftUp) ||
@@ -959,11 +954,6 @@ void functionSShift() {
 void functionAShift() { // Automatic
 	auto tapStateUp = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftUp);
 	auto tapStateDown = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftDown);
-
-	if (tapStateUp == XboxController::TapState::ButtonDown ||
-		tapStateDown == XboxController::TapState::ButtonDown) {
-		DisableActionControlsTick();
-	}
 
 	// Shift up
 	if (controls.PrevInput == ScriptControls::Controller	&& tapStateUp == XboxController::TapState::Tapped ||
@@ -1101,101 +1091,81 @@ void showWheelInfo() {
 	}
 }
 
-void functionEngStall() {
-	float lowSpeed = 2.4f;
-	float stallingRateDivisor = 3500000.0f; // lower = faster stalling
-	float timeStep = SYSTEM::TIMESTEP() * 100.0f;
-	
-	// Since we don't have a convenient way to get the drivetrain [yet]
-	// (I really do not want to look into handling...), we can just use the
-	// average of all wheels for now.
-	// TODO: Get drivetrain from handling data
-
-	auto wheelSpeeds = ext.GetTyreSpeeds(vehicle);
+std::vector<float> findDrivenWheels(std::vector<float> wheelSpeeds) {
 	std::vector<float> wheelsToConsider;
-
-	// TODO: this is ugly and dumb. Fix. 
-
-	//bikes? huh
-	if (ext.GetNumWheels(vehicle) == 2) {
-		// fwd
-		if (vehData.DriveBiasFront == 1.0f) {
-			wheelsToConsider.push_back(wheelSpeeds[0]);
-		}
-		// rwd
-		else if (vehData.DriveBiasFront == 0.0f) {
-			wheelsToConsider.push_back(wheelSpeeds[1]);
-		}
-		// awd
-		else {
-			wheelsToConsider = wheelSpeeds;
-		}
-	}
-	// normal vehicles
-	else if (ext.GetNumWheels(vehicle) == 4) {
-		// fwd
-		if (vehData.DriveBiasFront == 1.0f) {
-			wheelsToConsider.push_back(wheelSpeeds[0]);
-			wheelsToConsider.push_back(wheelSpeeds[1]);
-		}
-		// rwd
-		else if (vehData.DriveBiasFront == 0.0f) {
-			wheelsToConsider.push_back(wheelSpeeds[2]);
-			wheelsToConsider.push_back(wheelSpeeds[3]);
-		}
-		// awd
-		else {
-			wheelsToConsider = wheelSpeeds;
-		}
-	}
-	// offroad? hmmmm
-	else if (ext.GetNumWheels(vehicle) == 6) {
-		// fwd
-		if (vehData.DriveBiasFront == 1.0f) {
-			wheelsToConsider.push_back(wheelSpeeds[0]);
-			wheelsToConsider.push_back(wheelSpeeds[1]);
-		}
-		// rwd
-		else if (vehData.DriveBiasFront == 0.0f) {
-			wheelsToConsider.push_back(wheelSpeeds[2]);
-			wheelsToConsider.push_back(wheelSpeeds[3]);
-			wheelsToConsider.push_back(wheelSpeeds[4]);
-			wheelsToConsider.push_back(wheelSpeeds[5]);
-		}
-		// awd
-		else {
-			wheelsToConsider = wheelSpeeds;
-		}
-	}
-	// trikes 'n stuff, dunno :(
-	else {
+	if (vehData.DriveBiasFront > 0.0f && vehData.DriveBiasFront < 1.0f) {
 		wheelsToConsider = wheelSpeeds;
 	}
+	else {
+		// bikes
+		if (ext.GetNumWheels(vehicle) == 2) {
+			// fwd
+			if (vehData.DriveBiasFront == 1.0f) {
+				wheelsToConsider.push_back(wheelSpeeds[0]);
+			}
+			// rwd
+			else if (vehData.DriveBiasFront == 0.0f) {
+				wheelsToConsider.push_back(wheelSpeeds[1]);
+			}
+		}
+		// normal cars
+		else if (ext.GetNumWheels(vehicle) == 4) {
+			// fwd
+			if (vehData.DriveBiasFront == 1.0f) {
+				wheelsToConsider.push_back(wheelSpeeds[0]);
+				wheelsToConsider.push_back(wheelSpeeds[1]);
+			}
+			// rwd
+			else if (vehData.DriveBiasFront == 0.0f) {
+				wheelsToConsider.push_back(wheelSpeeds[2]);
+				wheelsToConsider.push_back(wheelSpeeds[3]);
+			}
+		}
+		// offroad, trucks
+		else if (ext.GetNumWheels(vehicle) == 6) {
+			// fwd
+			if (vehData.DriveBiasFront == 1.0f) {
+				wheelsToConsider.push_back(wheelSpeeds[0]);
+				wheelsToConsider.push_back(wheelSpeeds[1]);
+			}
+			// rwd
+			else if (vehData.DriveBiasFront == 0.0f) {
+				wheelsToConsider.push_back(wheelSpeeds[2]);
+				wheelsToConsider.push_back(wheelSpeeds[3]);
+				wheelsToConsider.push_back(wheelSpeeds[4]);
+				wheelsToConsider.push_back(wheelSpeeds[5]);
+			}
+		}
+		else {
+			wheelsToConsider = wheelSpeeds;
+		}
+	}
+	return wheelsToConsider;
+}
 
-
-
-	float avgWheelSpeed = abs(getAverage(wheelsToConsider));
+void functionEngStall() {
+	float lowSpeed = 2.4f;
+	float stallingRateDivisor = 3500000.0f;
+	float timeStep = SYSTEM::TIMESTEP() * 100.0f;
+	float avgWheelSpeed = abs(getAverage(findDrivenWheels(ext.GetTyreSpeeds(vehicle))));
 	if (vehData.Clutch > 0.2f && // 1.0 = fully engaged, 0.1 = fully disengaged
 		controls.ClutchVal < 1.0f - settings.StallingThreshold &&
 		vehData.Rpm < 0.25f &&
 		((avgWheelSpeed < vehData.CurrGear * lowSpeed) || (vehData.CurrGear == 0 && avgWheelSpeed < lowSpeed)) &&
 		VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
 		stallingProgress += (rand() % 1000) / (stallingRateDivisor * (controls.ThrottleVal+0.001f) * timeStep);
-		if (stallingProgress > 1.0f) {
-			VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
-			gearRattle.Stop();
-			stallingProgress = 0.0f;
-			if (settings.DisplayInfo)
-				showNotification("Your car has stalled.");
-		}
 	}
 	else {
 		if (stallingProgress > 0.0f) {
 			stallingProgress -= (rand() % 1000) / (stallingRateDivisor * (controls.ThrottleVal + 0.001f) * timeStep);
 		}
-		else {
-			stallingProgress = 0.0f;
-		}
+	}
+	if (stallingProgress > 1.0f) {
+		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
+		gearRattle.Stop();
+		stallingProgress = 0.0f;
+		if (settings.DisplayInfo)
+			showNotification("Your car has stalled.");
 	}
 	//showText(0.1, 0.1, 1.0, ("Stall progress:" + std::to_string(stallingProgress)).c_str(), 0, solidWhite, true);
 }
@@ -1203,8 +1173,8 @@ void functionEngStall() {
 void functionEngDamage() {
 	if (vehData.Rpm > 0.98f &&
 		vehData.ControlAccelerate > 0.99f) {
-		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
-			vehicle, VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (settings.RPMDamage));
+		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, 
+										   VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (settings.RPMDamage));
 	}
 }
 
