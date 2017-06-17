@@ -19,12 +19,10 @@ class ScriptSettings {
 public:
 	ScriptSettings(const std::string &general, const std::string &wheel);
 	void SetFiles(const std::string &general, const std::string &wheel);
-	void SetMenuFile(const std::string & menu);
 	void Read(ScriptControls* scriptControl);
 	void Read(NativeMenu::MenuControls *menuControl, NativeMenu::Menu *menuOpts);
 	void SaveGeneral() const;
 	void SaveController(ScriptControls *scriptControl) const;
-	void SaveMenu(NativeMenu::Menu *menuOpts) const;
 	void SaveWheel(ScriptControls *scriptControl) const;
 	bool IsCorrectVersion() const;
 	std::string GetVersionError();
@@ -152,7 +150,6 @@ public:
 private:
 	void parseSettingsGeneral(ScriptControls *scriptControl);
 	void parseSettingsWheel(ScriptControls *scriptControl);
-	void parseSettingsMenu(NativeMenu::MenuControls *controls, NativeMenu::Menu *menuOpts);
 
 	std::string settings_general_version = "000";
 	std::string settings_wheel_version = "000";

@@ -10,7 +10,7 @@
 #include "Util/Util.hpp"
 
 #include "menu.h"
-#include "menucontrols.h"
+//#include "menucontrols.h"
 #include "Input/keyboard.h"
 #include "Util/Versions.h"
 
@@ -149,8 +149,6 @@ void menuClose() {
 	settings.SaveGeneral();
 	settings.SaveWheel(&controls);
 	settings.SaveController(&controls);
-	settings.SaveMenu(&menu);
-	menu.SaveMenuTheme(std::wstring(settingsMenuFile.begin(), settingsMenuFile.end()).c_str());
 }
 
 void update_menu() {
