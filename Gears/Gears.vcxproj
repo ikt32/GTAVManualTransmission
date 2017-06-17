@@ -48,7 +48,7 @@
     <OutDir>bin\</OutDir>
     <IntDir>obj\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)thirdparty\;$(ProjectDir);..\..\ScriptHookV_SDK;..\..\GTAVMenuBase\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)thirdparty;../thirdparty;$(ProjectDir);..\..\ScriptHookV_SDK;..\..\GTAVMenuBase;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.asi</TargetExt>
