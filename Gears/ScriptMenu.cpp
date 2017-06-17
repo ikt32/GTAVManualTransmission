@@ -10,6 +10,7 @@
 #include "Input/keyboard.h"
 #include "Util/Util.hpp"
 #include "Util/Versions.h"
+#include "inc/natives.h"
 
 extern ScriptSettings settings;
 extern std::string settingsGeneralFile;
@@ -788,8 +789,8 @@ void saveKeyboardKey(std::string confTag, std::string key) {
 	showNotification(("Saved key " + confTag + ": " + key).c_str(), &prevNotification);
 }
 
-void saveControllerButton(std::string confTag, std::string button) {
-	settings.ControllerSaveButton(confTag, button);
+void saveControllerButton(std::string confTag, std::string button, int btnToBlock) {
+	settings.ControllerSaveButton(confTag, button, btnToBlock);
 	settings.Read(&controls);
 	showNotification(("Saved button " + confTag + ": " + button).c_str(), &prevNotification);
 }
@@ -801,7 +802,7 @@ void clearKeyboardKey(std::string confTag) {
 }
 
 void clearControllerButton(std::string confTag) {
-	settings.ControllerSaveButton(confTag, "UNKNOWN");
+	settings.ControllerSaveButton(confTag, "UNKNOWN", -1);
 	settings.Read(&controls);
 	showNotification(("Cleared button " + confTag).c_str(), &prevNotification);
 }
@@ -1098,23 +1099,43 @@ bool configKeyboardKey(const std::string &confTag) {
 	}
 }
 
+std::vector<eControl> controlsToBeBlocked = {
+	ControlVehicleAim,
+	ControlVehicleAttack,
+	ControlVehicleDuck,
+	ControlVehicleHandbrake,
+	ControlVehicleSelectNextWeapon,
+};
+
 // Controller
+int lastVehicleButtonPressed() {
+	for (auto control : controlsToBeBlocked) {
+		if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, control))
+			return control;
+	}
+	return -1;
+}
+
 bool configControllerButton(const std::string &confTag) {
 	std::string additionalInfo = "Press " + escapeKey + " to exit.";
 	XboxController* rawController = controls.GetRawController();
 	if (rawController == nullptr)
 		return false;
 
+	int buttonToBlock = -1;
+
 	while (true) {
 		if (IsKeyJustUp(str2key(escapeKey))) {
 			return false;
 		}
 		controls.UpdateValues(ScriptControls::InputDevices::Controller, false, true);
-
+		if (buttonToBlock == -1) {
+			buttonToBlock = lastVehicleButtonPressed();
+		}
 		for (std::string buttonHelper : rawController->XboxButtonsHelper) {
 			auto button = rawController->StringToButton(buttonHelper);
 			if (rawController->IsButtonJustPressed(button, controls.GetButtonState())) {
-				saveControllerButton(confTag, buttonHelper);
+				saveControllerButton(confTag, buttonHelper, buttonToBlock);
 				return true;
 			}
 		}

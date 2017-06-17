@@ -171,6 +171,8 @@ public:
 	bool InvertClutch = false;
 	
 	std::array<std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
+	std::array<int, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXboxBlocks = {};
+
 #ifdef GAME_BUILD
 	std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> LegacyControls = {};
 	bool UseLegacyController = false;

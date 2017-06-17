@@ -145,7 +145,7 @@ public:
 	void SteeringSaveButton(const std::string &confTag, ptrdiff_t index, int button);
 	void SteeringSaveHShifter(const std::string &confTag, ptrdiff_t index, int button[numGears]);
 	void KeyboardSaveKey(const std::string &confTag, const std::string &key);
-	void ControllerSaveButton(const std::string &confTag, const std::string &button);
+	void ControllerSaveButton(const std::string &confTag, const std::string &button, int btnToBlock);
 
 private:
 	void parseSettingsGeneral(ScriptControls *scriptControl);

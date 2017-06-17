@@ -288,6 +288,9 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Throttle)] = settingsGeneral.GetValue("CONTROLLER", "Throttle", "RightTrigger");
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Brake)] = settingsGeneral.GetValue("CONTROLLER", "Brake", "LeftTrigger");
 
+	scriptControl->ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)] = settingsGeneral.GetLongValue("CONTROLLER", "ShiftUpBlocks", -1);
+	scriptControl->ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)] = settingsGeneral.GetLongValue("CONTROLLER", "ShiftDownBlocks", -1);
+
 #ifdef GAME_BUILD
 	// [CONTROLLER_LEGACY]
 	scriptControl->LegacyControls[static_cast<int>(ScriptControls::LegacyControlType::Toggle)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Toggle", ControlFrontendRight);
@@ -699,11 +702,13 @@ void ScriptSettings::KeyboardSaveKey(const std::string &confTag, const std::stri
 	if (err < 0)
 		logger.Write("Unable to save to " + settingsGeneralFile);
 }
-void ScriptSettings::ControllerSaveButton(const std::string &confTag, const std::string &button) {
+void ScriptSettings::ControllerSaveButton(const std::string &confTag, const std::string &button, int btnToBlock) {
 	CSimpleIniA settingsGeneral;
 	settingsGeneral.SetUnicode();
 	settingsGeneral.LoadFile(settingsGeneralFile.c_str());
 	settingsGeneral.SetValue("CONTROLLER", confTag.c_str(), button.c_str());
+	settingsGeneral.SetLongValue("CONTROLLER", (confTag + "Blocks").c_str(), btnToBlock);
+
 	int err = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
 	if (err < 0)
 		logger.Write("Unable to save to " + settingsGeneralFile);

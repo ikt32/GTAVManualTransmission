@@ -1577,6 +1577,27 @@ void functionAutoReverse() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void handleVehicleButtons() {
+	// Limited button blocking
+	if (settings.EnableManual && controls.PrevInput == ScriptControls::Controller &&
+		!(settings.ShiftMode == Automatic && vehData.CurrGear > 1)) {
+
+		for (int i = 0; i < static_cast<int>(ScriptControls::ControllerControlType::SIZEOF_ControllerControlType); i++) {
+			if (controls.ControlXboxBlocks[i] == -1) continue;
+			// todo: only work for shift up/down atm
+			if (i != (int)ScriptControls::ControllerControlType::ShiftUp && i != (int)ScriptControls::ControllerControlType::ShiftDown) continue;
+
+			if (controls.ButtonHeldOver(static_cast<ScriptControls::ControllerControlType>(i), 200)) {
+				// todo: Neither of these two should be needed but I can't get tap-controls to activate. (switch wpn)
+				CONTROLS::ENABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], true);
+				CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 1.0f);
+			}
+			else {
+				CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], true);
+			}
+		}
+	}
+
+
 	if  (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
 		(controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) ||
 		 controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::Engine) ||

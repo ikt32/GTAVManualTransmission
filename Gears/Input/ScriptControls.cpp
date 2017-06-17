@@ -3,11 +3,13 @@
 #include <Windows.h>
 #include "keyboard.h"
 
-ScriptControls::ScriptControls(): WheelControl(),
-                                PrevInput(Keyboard),
+ScriptControls::ScriptControls(): PrevInput(Keyboard),
+                                WheelControl(),
                                 SteerAxisType(WheelAxisType::Steer),
                                 controller{1},
-                                buttonState(0) { }
+                                buttonState(0) {
+	std::fill(ControlXboxBlocks.begin(), ControlXboxBlocks.end(), -1);
+}
 
 ScriptControls::~ScriptControls() { }
 
