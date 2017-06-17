@@ -21,7 +21,6 @@
 #include "Util/Paths.h"
 
 #include "menu.h"
-#include "menucontrols.h"
 
 GameSound gearRattle("DAMAGED_TRUCK_IDLE", 0);
 
@@ -52,7 +51,6 @@ int speedoIndex;
 extern std::vector<std::string> speedoTypes;
 
 bool lookrightfirst = false;
-
 
 void update() {
 	///////////////////////////////////////////////////////////////////////////
@@ -622,9 +620,7 @@ void crossScriptComms() {
 
 void reInit() {
 	settings.Read(&controls);
-	settings.Read(&menuControls, &menu);
-	// nasty but it should work enough...
-	menu.LoadMenuTheme(std::wstring(settingsMenuFile.begin(), settingsMenuFile.end()).c_str());
+	menu.ReadSettings();
 
 	// lel we're not gonna exceed max_int anyway
 	speedoIndex = static_cast<int>(std::find(speedoTypes.begin(), speedoTypes.end(), settings.Speedo) - speedoTypes.begin());
@@ -2082,11 +2078,14 @@ void main() {
 	settingsMenuFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_menu.ini";
 	
 	settings.SetFiles(settingsGeneralFile, settingsWheelFile);
-	settings.SetMenuFile(settingsMenuFile);
 
 	logger.Write("Loading " + settingsGeneralFile);
 	logger.Write("Loading " + settingsWheelFile);
 	logger.Write("Loading " + settingsMenuFile);
+
+	menu.RegisterOnMain(std::bind(menuInit));
+	menu.RegisterOnExit(std::bind(menuClose));
+	menu.SetFiles(settingsMenuFile);
 
 	reInit();
 	while (true) {

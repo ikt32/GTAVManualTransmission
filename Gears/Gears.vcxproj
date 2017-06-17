@@ -109,6 +109,8 @@
     <ClCompile Include="..\..\GTAVMenuBase\menu.cpp" />
     <ClCompile Include="..\..\GTAVMenuBase\menucontrols.cpp" />
     <ClCompile Include="..\..\GTAVMenuBase\menukeyboard.cpp" />
+    <ClCompile Include="..\..\GTAVMenuBase\menusettings.cpp" />
+    <ClCompile Include="..\..\GTAVMenuBase\menuutils.cpp" />
     <ClCompile Include="ScriptMenu.cpp" />
     <ClCompile Include="Util\Paths.cpp" />
     <ClCompile Include="Input\keyboard.cpp" />
@@ -131,6 +133,8 @@
     <ClInclude Include="..\..\GTAVMenuBase\menu.h" />
     <ClInclude Include="..\..\GTAVMenuBase\menucontrols.h" />
     <ClInclude Include="..\..\GTAVMenuBase\menukeyboard.h" />
+    <ClInclude Include="..\..\GTAVMenuBase\menusettings.h" />
+    <ClInclude Include="..\..\GTAVMenuBase\menuutils.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\enums.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\main.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h" />
