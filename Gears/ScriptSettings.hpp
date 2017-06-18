@@ -7,12 +7,6 @@
 class Logger;
 class ScriptControls;
 
-namespace NativeMenu {
-	class Menu;
-	class MenuControls;
-}
-//const std::string CORRECTVGENERAL	= "430";
-//const std::string CORRECTVWHEEL		= "430";
 static const int numGears = 8;
 
 class ScriptSettings {
@@ -20,7 +14,6 @@ public:
 	ScriptSettings(const std::string &general, const std::string &wheel);
 	void SetFiles(const std::string &general, const std::string &wheel);
 	void Read(ScriptControls* scriptControl);
-	void Read(NativeMenu::MenuControls *menuControl, NativeMenu::Menu *menuOpts);
 	void SaveGeneral() const;
 	void SaveController(ScriptControls *scriptControl) const;
 	void SaveWheel(ScriptControls *scriptControl) const;
