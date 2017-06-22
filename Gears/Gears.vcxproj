@@ -140,7 +140,7 @@
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h" />
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
-    <ClInclude Include="Offsets.hpp" />
+    <ClInclude Include="Memory\Offsets.hpp" />
     <ClInclude Include="Util\Paths.h" />
     <ClInclude Include="Input\DiJoyStick.h" />
     <ClInclude Include="Input\keyboard.h" />

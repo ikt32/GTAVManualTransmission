@@ -122,14 +122,14 @@
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h">
       <Filter>Thirdparty</Filter>
     </ClInclude>
-    <ClInclude Include="Offsets.hpp">
-      <Filter>Memory</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\GTAVMenuBase\menuutils.h">
       <Filter>Menu</Filter>
     </ClInclude>
     <ClInclude Include="..\..\GTAVMenuBase\menusettings.h">
       <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\Offsets.hpp">
+      <Filter>Memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -4,7 +4,11 @@
 No incompatible config changes:
 * Added "ALLOW_KEYBOARD" to wheel H-Shifter options
 
+Menu config changes:
+* Changed MenuY position to visually match original position
+
 Fixes:  
+* Update b1103 offsets
 * Fix patches not applied when changing cars
 * Fix steering lock not saved
 * Fix global FFB settings readout typo
@@ -16,6 +20,7 @@ Improvements:
 * Add fancy debug info about wheels (suspension, speed, locking up)
 * Use "tap" detection for XInput (need help with blocking default buttons)
 * Add wheel address logging
+* Update menu usage
 
 ## 4.3.3
 No config changes
