@@ -122,7 +122,7 @@ void ScriptSettings::SaveController(ScriptControls *scriptControl) const {
 	settingsGeneral.SetBoolValue("CONTROLLER", "ToggleEngine", ToggleEngine);
 	settingsGeneral.SetLongValue("CONTROLLER", "ToggleTime", scriptControl->CToggleTime); 
 	settingsGeneral.SetDoubleValue("CONTROLLER", "TriggerValue", scriptControl->GetXboxTrigger());
-
+	settingsGeneral.SetBoolValue("CONTROLLER", "BlockCarControls", BlockCarControls);
 #ifdef GAME_BUILD
 	settingsGeneral.SetBoolValue("CONTROLLER_LEGACY", "Enable", scriptControl->UseLegacyController);
 #endif
@@ -271,6 +271,8 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	// [CONTROLLER]
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Toggle)] = settingsGeneral.GetValue("CONTROLLER", "Toggle", "DpadRight");
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ToggleH)] = settingsGeneral.GetValue("CONTROLLER", "ToggleShift", "B");
+	BlockCarControls = settingsGeneral.GetBoolValue("CONTROLLER", "BlockCarControls", false);
+
 	scriptControl->CToggleTime = settingsGeneral.GetLongValue("CONTROLLER", "ToggleTime", 500);
 
 	double tval = settingsGeneral.GetDoubleValue("CONTROLLER", "TriggerValue", 0.75);

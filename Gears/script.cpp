@@ -1578,7 +1578,7 @@ void functionAutoReverse() {
 
 void handleVehicleButtons() {
 	// Limited button blocking
-	if (settings.EnableManual && controls.PrevInput == ScriptControls::Controller &&
+	if (settings.BlockCarControls && settings.EnableManual && controls.PrevInput == ScriptControls::Controller &&
 		!(settings.ShiftMode == Automatic && vehData.CurrGear > 1)) {
 
 		for (int i = 0; i < static_cast<int>(ScriptControls::ControllerControlType::SIZEOF_ControllerControlType); i++) {
@@ -1587,15 +1587,25 @@ void handleVehicleButtons() {
 			if (i != (int)ScriptControls::ControllerControlType::ShiftUp && i != (int)ScriptControls::ControllerControlType::ShiftDown) continue;
 
 			if (controls.ButtonHeldOver(static_cast<ScriptControls::ControllerControlType>(i), 200)) {
-				// todo: Neither of these two should be needed but I can't get tap-controls to activate. (switch wpn)
-				CONTROLS::ENABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], true);
-				CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 1.0f);
+				// todo: Neither of these two should be needed but I can't get tap-controls to activate. (switch weapon)
+				//CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], false);
+				//CONTROLS::ENABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], true);
+				//CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 1.0f);
 			}
 			else {
 				CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], true);
 			}
+
+			if (controls.ButtonReleasedAfter(static_cast<ScriptControls::ControllerControlType>(i), 200)) {
+				CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], false);
+				CONTROLS::ENABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], true);
+				CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 1.0f);
+				showSubtitle("Fuck.");
+			}
 		}
 	}
+
+
 
 
 	if  (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&

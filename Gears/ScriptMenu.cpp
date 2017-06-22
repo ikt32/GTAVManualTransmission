@@ -272,6 +272,8 @@ void update_menu() {
 		menu.MenuOption("Keyboard", "keyboardmenu",{"Change keyboard control assignments."});
 		menu.BoolOption("Non-Xinput controller", controls.UseLegacyController,
 		{ "If you needed to set up your controller in","the pause menu, you should enable this." });
+		menu.BoolOption("Block car controls", settings.BlockCarControls, { "Blocks car action controls like ducking, switching guns, handbrake, aim."
+						"Holding activates the original button again. Experimental! Only works for XInput." } );
 	}
 
 	/* Yes hello I am root - 2 */

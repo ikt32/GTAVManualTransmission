@@ -257,6 +257,14 @@ bool ScriptControls::ButtonReleased(ControllerControlType control) {
 	return false;
 }
 
+bool ScriptControls::ButtonReleasedAfter(ControllerControlType control, int time) {
+	if (!controller.IsConnected())
+		return false;
+	if (controller.WasButtonHeldForMs(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState, time))
+		return true;
+	return false;
+}
+
 bool ScriptControls::ButtonHeld(ControllerControlType control) {
 	if (!controller.IsConnected())
 		return false;

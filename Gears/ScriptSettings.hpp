@@ -126,6 +126,7 @@ public:
 	float SteerAngleBike = 180.0f;
 	float SteerAngleAlt = 180.0f;
 	float GameSteerMult = 1.0f;
+	bool BlockCarControls = false;
 
 	// Methods
 	/*

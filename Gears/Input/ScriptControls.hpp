@@ -121,6 +121,7 @@ private:
 public:
 	bool ButtonJustPressed(ControllerControlType control);
 	bool ButtonReleased(ControllerControlType control);
+	bool ButtonReleasedAfter(ControllerControlType control, int time);
 	bool ButtonHeld(ControllerControlType control);
 	bool ButtonHeldOver(ControllerControlType control, int millis);
 	XboxController::TapState ButtonTapped(ControllerControlType control);
