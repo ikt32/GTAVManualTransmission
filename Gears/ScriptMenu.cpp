@@ -153,7 +153,7 @@ void update_menu() {
 
 	/* Yes hello I am root */
 	if (menu.CurrentMenu("mainmenu")) {
-		menu.Title("Manual Transmission");
+		menu.Title("Manual Transmission", 0.90f);
 		bool tempEnableRead = settings.EnableManual;
 
 		if (menu.BoolOption("Enable manual transmission", tempEnableRead,
@@ -273,7 +273,7 @@ void update_menu() {
 		menu.BoolOption("Non-Xinput controller", controls.UseLegacyController,
 		{ "If you needed to set up your controller in","the pause menu, you should enable this." });
 		menu.BoolOption("Block car controls", settings.BlockCarControls, { "Blocks car action controls like ducking, switching guns, handbrake, aim."
-						"Holding activates the original button again. Experimental! Only works for XInput." } );
+						" Holding activates the original button again. Experimental! Only works for XInput." } );
 	}
 
 	/* Yes hello I am root - 2 */
