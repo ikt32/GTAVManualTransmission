@@ -58,8 +58,7 @@ void VehicleExtensions::ClearAddress() {
 
 BYTE *VehicleExtensions::GetAddress(Vehicle handle) {
 	if (currAddress == nullptr) {
-		MemoryAccess mem;
-		currAddress = reinterpret_cast<BYTE *>(mem.GetAddressOfEntity(handle));
+		currAddress = reinterpret_cast<BYTE *>(mem::GetAddressOfEntity(handle));
 	}
 	return currAddress;
 }

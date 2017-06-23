@@ -23,8 +23,6 @@ namespace MemoryPatcher {
 	uintptr_t PatchSteering();
 	void RestoreSteering(uintptr_t address, byte *origInstr, int origInstrSz);
 
-	MemoryAccess mem;
-
 	int TotalToPatch = 2;
 	int TotalPatched = 0;
 
@@ -203,7 +201,7 @@ namespace MemoryPatcher {
 		if (clutchLowTemp != NULL)
 			address = clutchLowTemp;
 		else
-			address = mem.FindPattern("\xC7\x43\x40\xCD\xCC\xCC\x3D\x66\x44\x89\x43\x04", "xxxxxxxxxxxx");
+			address = mem::FindPattern("\xC7\x43\x40\xCD\xCC\xCC\x3D\x66\x44\x89\x43\x04", "xxxxxxxxxxxx");
 
 		if (address) {
 			memset(reinterpret_cast<void *>(address), 0x90, 7);
@@ -226,7 +224,7 @@ namespace MemoryPatcher {
 		if (gear7A0Temp != 0)
 			address = gear7A0Temp;
 		else 
-			address = mem.FindPattern("\x66\x89\x13\x89\x73\x5C", "xxxxxx");
+			address = mem::FindPattern("\x66\x89\x13\x89\x73\x5C", "xxxxxx");
 
 		if (address) {
 			memset(reinterpret_cast<void *>(address), 0x90, 3);
@@ -272,7 +270,7 @@ namespace MemoryPatcher {
 
 		}
 		else {
-			address = mem.FindPattern(
+			address = mem::FindPattern(
 				"\x0F\x84\xD0\x01\x00\x00" // <- This one
 				"\x0F\x28\x4B\x70"
 				"\xF3\x0F\x10\x25\x00\x00\x00\x00"

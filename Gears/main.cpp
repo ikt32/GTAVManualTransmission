@@ -12,9 +12,11 @@ http://dev-c.com
 #include "Util/Logger.hpp"
 #include "Memory/MemoryPatcher.hpp"
 #include "Util/Versions.h"
+#include "Memory/NativeMemory.hpp"
 
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
+	mem::init();
 	std::string logFile = Paths::GetModuleFolder(hInstance) + mtDir +
 		"\\" + Paths::GetModuleNameWithoutExtension(hInstance) + ".log";
 	logger.SetFile(logFile);
