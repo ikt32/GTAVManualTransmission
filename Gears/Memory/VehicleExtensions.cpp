@@ -309,7 +309,8 @@ void VehicleExtensions::SetFuelLevel(Vehicle handle, float value) {
 float VehicleExtensions::GetEngineTemp(Vehicle handle) {
 	auto address = GetAddress(handle);
 
-	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x9AC : -1);
+	auto offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x984 : -1);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x9AC : offset);
 	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x9BC : offset);
 
 	if (offset < 0)
@@ -321,7 +322,8 @@ float VehicleExtensions::GetEngineTemp(Vehicle handle) {
 float VehicleExtensions::GetDirtLevel(Vehicle handle) {
 	auto address = GetAddress(handle);
 
-	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x938 : -1);
+	auto offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x910 : -1);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x938 : offset);
 	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x948 : offset);
 
 	if (offset < 0)
@@ -334,6 +336,7 @@ float VehicleExtensions::GetDashSpeed(Vehicle handle) {
 	auto address = GetAddress(handle);
 
 	auto offset = (gameVersion > G_VER_1_0_463_1_NOSTEAM ? 0x9A4 : -1);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x9C8 : offset);
 	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x9F0 : offset);
 	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0xA00 : offset);
 
@@ -462,7 +465,9 @@ std::vector<uint64_t> VehicleExtensions::GetWheelPtrs(Vehicle handle) {
 
 float VehicleExtensions::GetVisualHeight(Vehicle handle) {
 	auto wheelPtr = GetWheelsPtr(handle);
+
 	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x080 : -1);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x080 : offset);
 	if (offset == -1)
 		return 0.0f;
 
@@ -471,7 +476,8 @@ float VehicleExtensions::GetVisualHeight(Vehicle handle) {
 
 void VehicleExtensions::SetVisualHeight(Vehicle handle, float height) {
 	auto wheelPtr = GetWheelsPtr(handle);
-	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x07c : -1);
+	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x07C : -1);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x07C : -1);
 
 	if (offset == -1)
 		return;
