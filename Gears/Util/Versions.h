@@ -119,7 +119,7 @@ enum G_GameVersion : int {
 };
 
 static std::string eGameVersionToString(int version) {
-	if (version > GameVersionString.size() - 1) {
+	if (version > GameVersionString.size() - 1 || version < 0) {
 		return std::to_string(version);
 	}
 	return GameVersionString[version];
