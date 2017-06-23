@@ -52,6 +52,10 @@ Vector3 GetOffsetInWorldCoords(Vector3 position, Vector3 rotation, Vector3 forwa
 	return position + (right * offset.x) + (forward * offset.y) + (up * offset.z);
 }
 
+VehicleExtensions::VehicleExtensions() {
+	mem::init();
+}
+
 void VehicleExtensions::ClearAddress() {
 	currAddress = nullptr;
 }

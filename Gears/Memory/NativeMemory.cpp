@@ -5,13 +5,14 @@
 
 namespace mem {
 
-	uint64_t(*GetAddressOfEntity)(int entity);
+	uint64_t(*GetAddressOfEntity)(int entity) = nullptr;
 
 	void init() {
-		uintptr_t GetAddressOfEntityAddress = FindPattern("\x83\xF9\xFF\x74\x31\x4C\x8B\x0D\x00\x00\x00\x00\x44\x8B\xC1\x49\x8B\x41\x08",
-														  "xxxxxxxx????xxxxxxx");
-		GetAddressOfEntity = reinterpret_cast<uint64_t(*)(int)>(GetAddressOfEntityAddress);
-
+		if (GetAddressOfEntity == nullptr) {
+			uintptr_t GetAddressOfEntityAddress = FindPattern("\x83\xF9\xFF\x74\x31\x4C\x8B\x0D\x00\x00\x00\x00\x44\x8B\xC1\x49\x8B\x41\x08",
+															  "xxxxxxxx????xxxxxxx");
+			GetAddressOfEntity = reinterpret_cast<uint64_t(*)(int)>(GetAddressOfEntityAddress);
+		}
 	}
 
 	uintptr_t FindPattern(const char* pattern, const char* mask) {

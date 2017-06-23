@@ -25,6 +25,7 @@ struct WheelDimensions {
 
 class VehicleExtensions {
 public:
+	VehicleExtensions();
 	void ClearAddress();
 	BYTE *GetAddress(Vehicle handle);
 
