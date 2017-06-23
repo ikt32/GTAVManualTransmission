@@ -61,6 +61,7 @@ void ScriptSettings::SaveGeneral() const {
 
 	// [HUD]
 	settingsGeneral.SetBoolValue("HUD", "EnableHUD", HUD);
+	settingsGeneral.SetBoolValue("HUD", "AlwaysHUD", AlwaysHUD);
 	settingsGeneral.SetLongValue("HUD", "HUDFont", HUDFont);
 	settingsGeneral.SetDoubleValue("HUD", "GearXpos", GearXpos);
 	settingsGeneral.SetDoubleValue("HUD", "GearYpos", GearYpos);
@@ -108,6 +109,7 @@ void ScriptSettings::SaveGeneral() const {
 
 	// [DEBUG]
 	settingsGeneral.SetBoolValue("DEBUG", "DisplayInfo", DisplayInfo);
+	settingsGeneral.SetBoolValue("DEBUG", "DisplayWheelInfo", DisplayWheelInfo);
 	settingsGeneral.SetBoolValue("DEBUG", "LogCar", LogCar);
 
 	settingsGeneral.SaveFile(settingsGeneralFile.c_str());
@@ -223,6 +225,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 
 	// [HUD]
 	HUD = settingsGeneral.GetBoolValue			("HUD", "EnableHUD", true);
+	AlwaysHUD = settingsGeneral.GetBoolValue("HUD", "AlwaysHUD", false);
 	HUDFont = settingsGeneral.GetLongValue		("HUD", "HUDFont", 0);
 	GearXpos = settingsGeneral.GetDoubleValue	("HUD", "GearXpos", 0.95);
 	GearYpos = settingsGeneral.GetDoubleValue	("HUD", "GearYpos", 0.95);
@@ -331,6 +334,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 
 	// [DEBUG]
 	DisplayInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayInfo", false);
+	DisplayWheelInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayWheelInfo", false);
 	LogCar = settingsGeneral.GetBoolValue("DEBUG", "LogCar", false);
 
 	// [FILEVERSION]

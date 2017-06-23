@@ -124,7 +124,13 @@ void update() {
 
 	if (settings.DisplayInfo) {
 		showDebugInfo();
+	}
+	if (settings.DisplayWheelInfo) {
 		showWheelInfo();
+	}
+	if (settings.HUD &&
+		(settings.EnableManual || settings.AlwaysHUD)) {
+		showHUD();
 	}
 
 	if (!settings.IsCorrectVersion()) {
@@ -228,10 +234,6 @@ void update() {
 		controls.ButtonHeld(ScriptControls::ControllerControlType::ToggleH) ||
 		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonHeld(ScriptControls::LegacyControlType::ToggleH)) {
 		cycleShiftMode();
-	}
-
-	if (settings.HUD) {
-		showHUD();
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -366,7 +368,7 @@ void showHUD() {
 
 	// Gear number indication
 	std::string gear = std::to_string(vehData.CurrGear);
-	if (vehData.SimulatedNeutral) {
+	if (vehData.SimulatedNeutral && settings.EnableManual) {
 		gear = "N";
 	}
 	else if (vehData.CurrGear == 0) {
@@ -396,6 +398,8 @@ void showHUD() {
 	default: shiftModeText = "";
 		break;
 	}
+	if (!settings.EnableManual)
+		shiftModeText = "A";
 	showText(settings.ShiftModeXpos, settings.ShiftModeYpos, settings.ShiftModeSize, shiftModeText, settings.HUDFont, solidWhite, true);
 	
 	// Speedometer using dashboard speed

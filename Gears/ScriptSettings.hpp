@@ -49,6 +49,7 @@ public:
 
 	// [HUD]
 	bool HUD = true;
+	bool AlwaysHUD = false;
 	int HUDFont = 0;
 	float GearXpos = 0.95f;
 	float GearYpos = 0.95f;
@@ -127,6 +128,7 @@ public:
 	float SteerAngleAlt = 180.0f;
 	float GameSteerMult = 1.0f;
 	bool BlockCarControls = false;
+	bool DisplayWheelInfo = false;
 
 	// Methods
 	/*

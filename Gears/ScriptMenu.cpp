@@ -529,6 +529,7 @@ void update_menu() {
 		menu.Title("HUD Options");
 
 		menu.BoolOption("Enable", settings.HUD);
+		menu.BoolOption("Always enable", settings.AlwaysHUD, { "Display HUD even if manual transmission is off." });
 		int fontIndex = static_cast<int>(std::find(fontIDs.begin(), fontIDs.end(), settings.HUDFont) - fontIDs.begin());
 		int oldIndex = fontIndex;
 		menu.StringArray("Font: ", fonts, fontIndex);
@@ -684,7 +685,10 @@ void update_menu() {
 	if (menu.CurrentMenu("debugmenu")) {
 		menu.Title("Debug settings");
 		if (menu.BoolOption("Display info", settings.DisplayInfo,
-		{ "Show all technical info of the gearbox,","inputs and wheel FFB calculations." })) {
+		{ "Show all detailed technical info of the gearbox and inputs calculations." })) {
+		}
+		if (menu.BoolOption("Display wheel info", settings.DisplayWheelInfo,
+		{ "Show per-wheel debug info with off-ground detection, lockup detection and suspension info." })) {
 		}
 		if (menu.BoolOption("Log car address", settings.LogCar,
 		{ "Prints the current vehicle address","to Gears.log." })) {
