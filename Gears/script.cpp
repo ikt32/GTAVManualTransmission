@@ -38,7 +38,7 @@ ScriptSettings settings(settingsGeneralFile, settingsWheelFile);
 Player player;
 Ped playerPed;
 Vehicle vehicle;
-Vehicle prevVehicle;
+Vehicle lastVehicle;
 VehicleData vehData;
 VehicleExtensions ext;
 
@@ -49,6 +49,15 @@ int speedoIndex;
 extern std::vector<std::string> speedoTypes;
 
 bool lookrightfirst = false;
+
+std::string prettyNameFromHash(Hash hash) {
+	char *name = VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(hash);
+	std::string displayName = UI::_GET_LABEL_TEXT(name);
+	if (displayName == "NULL") {
+		displayName = name;
+	}
+	return displayName;
+}
 
 void update() {
 	///////////////////////////////////////////////////////////////////////////
@@ -61,18 +70,12 @@ void update() {
 		!PLAYER::IS_PLAYER_CONTROL_ON(player) ||
 		ENTITY::IS_ENTITY_DEAD(playerPed) ||
 		PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE)) {
-		reset();
-		return;
-	}
-
-	if (!PED::IS_PED_IN_ANY_VEHICLE(playerPed, true)) {
 		return;
 	}
 
 	vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
 
-	if (!ENTITY::DOES_ENTITY_EXIST(vehicle) ||
-		playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
+	if (playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
 		return;
 	}
 
@@ -80,10 +83,9 @@ void update() {
 	//                           Update stuff
 	///////////////////////////////////////////////////////////////////////////
 
-	if (prevVehicle != vehicle) {
-		vehData.Clear();
-		ext.ClearAddress();
+	if (vehicle != lastVehicle && vehicle != 0) {
 		if (settings.LogCar) {
+			logger.Write("DEBUG: Switched vehicle: " + prettyNameFromHash(ENTITY::GET_ENTITY_MODEL(vehicle)));
 			auto vehicleAddress = ext.GetAddress(vehicle);
 			std::stringstream ssVehicleAddress;
 			ssVehicleAddress << std::hex << static_cast<void*>(vehicleAddress);
@@ -96,6 +98,7 @@ void update() {
 				i++;
 			}
 		}
+		vehData.Clear();
 		if (vehData.NoClutch) {
 			vehData.SimulatedNeutral = false;
 		}
@@ -103,8 +106,12 @@ void update() {
 			vehData.SimulatedNeutral = settings.DefaultNeutral;
 		}
 		shiftTo(1, true);
-		prevVehicle = vehicle;
 		initSteeringPatches();
+		lastVehicle = vehicle;
+	}
+
+	if (vehicle == 0) {
+		return;
 	}
 
 	vehData.UpdateValues(ext, vehicle);
@@ -624,7 +631,6 @@ void reInit() {
 	settings.Read(&controls);
 	menu.ReadSettings();
 
-	// lel we're not gonna exceed max_int anyway
 	speedoIndex = static_cast<int>(std::find(speedoTypes.begin(), speedoTypes.end(), settings.Speedo) - speedoTypes.begin());
 	if (speedoIndex >= speedoTypes.size()) {
 		speedoIndex = 0;
@@ -639,10 +645,8 @@ void reInit() {
 }
 
 void reset() {
-	vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
 	resetSteeringMultiplier();
 	gearRattle.Stop();
-	prevVehicle = 0;
 	if (MemoryPatcher::TotalPatched == MemoryPatcher::TotalToPatch) {
 		MemoryPatcher::RestoreInstructions();
 	}
@@ -652,6 +656,7 @@ void reset() {
 	if (settings.EnableFFB && controls.WheelControl.IsConnected(controls.SteerGUID)) {
 		controls.WheelControl.SetConstantForce(controls.SteerGUID, 0);
 	}
+	lastVehicle = vehicle = 0;
 }
 
 void toggleManual() {
@@ -702,9 +707,15 @@ void initSteeringPatches() {
 }
 
 void resetSteeringMultiplier() {
-	if (vehicle == 0) return;
-	if (ext.GetSteeringMultiplier(vehicle) != 1.0f) {
-		ext.SetSteeringMultiplier(vehicle, 1.0f);
+	if (vehicle != 0) {
+		if (ext.GetSteeringMultiplier(vehicle) != 1.0f) {
+			ext.SetSteeringMultiplier(vehicle, 1.0f);
+		}
+	}
+	if (lastVehicle != 0) {
+		if (ext.GetSteeringMultiplier(lastVehicle) != 1.0f) {
+			ext.SetSteeringMultiplier(lastVehicle, 1.0f);
+		}
 	}
 }
 
@@ -1604,7 +1615,6 @@ void handleVehicleButtons() {
 				CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], false);
 				CONTROLS::ENABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], true);
 				CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 1.0f);
-				showSubtitle("Fuck.");
 			}
 		}
 	}

@@ -26,7 +26,6 @@ struct WheelDimensions {
 class VehicleExtensions {
 public:
 	VehicleExtensions();
-	void ClearAddress();
 	BYTE *GetAddress(Vehicle handle);
 
 	/*
@@ -129,6 +128,5 @@ public:
 	std::vector<float> GetTyreSpeeds(Vehicle handle);
 
 private:
-	BYTE* currAddress = nullptr;
 	eGameVersion gameVersion = getGameVersion();
 };

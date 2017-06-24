@@ -56,15 +56,8 @@ VehicleExtensions::VehicleExtensions() {
 	mem::init();
 }
 
-void VehicleExtensions::ClearAddress() {
-	currAddress = nullptr;
-}
-
 BYTE *VehicleExtensions::GetAddress(Vehicle handle) {
-	if (currAddress == nullptr) {
-		currAddress = reinterpret_cast<BYTE *>(mem::GetAddressOfEntity(handle));
-	}
-	return currAddress;
+	return reinterpret_cast<BYTE *>(mem::GetAddressOfEntity(handle));
 }
 
 uint32_t VehicleExtensions::GetGears(Vehicle handle) {

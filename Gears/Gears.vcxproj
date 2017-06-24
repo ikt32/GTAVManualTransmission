@@ -55,7 +55,7 @@
     <OutDir>bin\dbg\</OutDir>
     <IntDir>obj\dbg\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)thirdparty\;$(ProjectDir);..\..\ScriptHookV_SDK;..\..\GTAVMenuBase\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)thirdparty;../thirdparty;$(ProjectDir);..\..\ScriptHookV_SDK;..\..\GTAVMenuBase;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
