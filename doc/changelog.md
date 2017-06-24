@@ -1,5 +1,18 @@
 # Changelog
 
+## 4.3.6
+No incompatible config changes:
+* Add `AlwaysHUD` to `[HUD]`
+* Add `DisplayWheelInfo` to `[DEBUG]`
+* `AlwaysHUD` allows using the mod's HUD/speedo even when the manual transmission part itself is off
+* `DisplayWheelInfo` is decoupled from `ShowInfo` and can be shown on its own to prevent UI clutter
+
+## 4.3.5
+No incompatible config changes
+* Add support for b877
+* Fix menu title sizing
+* Fix wrong version number being displayed
+
 ## 4.3.4
 No incompatible config changes:
 * Added "ALLOW_KEYBOARD" to wheel H-Shifter options
