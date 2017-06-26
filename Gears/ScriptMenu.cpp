@@ -357,10 +357,12 @@ void update_menu() {
 		if (menu.BoolOption("Patch steering", settings.PatchSteering,
 		{ "Patches steering reduction and ", "automatic countersteer for direct control." })) {
 			settings.SaveWheel(&controls);
+			initSteeringPatches();
 		}
 		if (menu.BoolOption("Patch steering for all inputs", settings.PatchSteeringAlways,
 		{ "Also patch this for keyboard and controller." })) {
 			settings.SaveWheel(&controls);
+			initSteeringPatches();
 		}
 		if (menu.BoolOption("Logitech LEDs (can crash!)", settings.LogiLEDs)) { settings.SaveWheel(&controls); }
 		menu.MenuOption("Steering wheel axis setup", "axesmenu", 

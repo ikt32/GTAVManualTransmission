@@ -687,7 +687,7 @@ void initSteeringPatches() {
 			controls.WheelControl.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
 		}
 	}
-	if (vehicle == 0) return;
+	if (vehicle == 0 || ext.GetAddress(vehicle) == nullptr) return;
 	if (controls.PrevInput == ScriptControls::Wheel) {
 		if (!MemoryPatcher::SteeringPatched && settings.PatchSteering) {
 			MemoryPatcher::PatchSteeringCorrection();
