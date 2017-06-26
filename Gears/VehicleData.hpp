@@ -39,7 +39,6 @@ public:
 	VehicleClass Class = VehicleClass::Car;
 	bool NoClutch = false;
 	bool IsTruck = false;
-	BYTE *Address = nullptr;
 	float Rpm = 0.0f;
 
 	// 1 = Not pressed, 0 = Fully pressed

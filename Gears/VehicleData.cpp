@@ -10,7 +10,6 @@ VehicleData::VehicleData() {
 void VehicleData::Clear() {
 	Class = VehicleClass::Car;
 	IsTruck = false;
-	Address = nullptr;
 	Rpm = 0.0f;
 	Clutch = 1.0f;
 	Throttle = 0.0f;
@@ -61,7 +60,6 @@ bool VehicleData::noClutch(char* name) {
 void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 	Hash model = ENTITY::GET_ENTITY_MODEL(vehicle);
 
-	Address = ext.GetAddress(vehicle);
 	CurrGear = ext.GetGearCurr(vehicle);
 	NextGear = ext.GetGearNext(vehicle);
 	Rpm = VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) ? ext.GetCurrentRPM(vehicle) : 0.01f;

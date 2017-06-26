@@ -75,7 +75,7 @@ void update() {
 
 	vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
 
-	if (playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
+	if (vehicle == 0 || playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
 		return;
 	}
 
@@ -83,7 +83,7 @@ void update() {
 	//                           Update stuff
 	///////////////////////////////////////////////////////////////////////////
 
-	if (vehicle != lastVehicle && vehicle != 0) {
+	if (vehicle != lastVehicle) {
 		if (settings.LogCar) {
 			logger.Write("DEBUG: Switched vehicle: " + prettyNameFromHash(ENTITY::GET_ENTITY_MODEL(vehicle)));
 			auto vehicleAddress = ext.GetAddress(vehicle);
@@ -108,10 +108,6 @@ void update() {
 		shiftTo(1, true);
 		initSteeringPatches();
 		lastVehicle = vehicle;
-	}
-
-	if (vehicle == 0) {
-		return;
 	}
 
 	vehData.UpdateValues(ext, vehicle);
@@ -505,7 +501,7 @@ void showDebugInfo() {
 	ssClutch	<< "Clutch:\t\t" << std::setprecision(3) << vehData.Clutch;
 	ssThrottle	<< "Throttle:\t" << std::setprecision(3) << vehData.Throttle;
 	ssTurbo		<< "Turbo:\t\t" << std::setprecision(3) << vehData.Turbo;
-	ssAddress	<< "Address:\t" << std::hex << reinterpret_cast<uint64_t>(vehData.Address);
+	ssAddress	<< "Address:\t" << std::hex << reinterpret_cast<uint64_t>(ext.GetAddress(vehicle));
 	ssDashSpd	<< "Speedo:\t" << (vehData.HasSpeedo ? "Yes" : "No");
 	ssDbias		<< "DBias:\t\t" << std::setprecision(3) << vehData.DriveBiasFront;
 
@@ -707,12 +703,12 @@ void initSteeringPatches() {
 }
 
 void resetSteeringMultiplier() {
-	if (vehicle != 0) {
+	if (vehicle != 0 && ext.GetAddress(vehicle) != nullptr) {
 		if (ext.GetSteeringMultiplier(vehicle) != 1.0f) {
 			ext.SetSteeringMultiplier(vehicle, 1.0f);
 		}
 	}
-	if (lastVehicle != 0) {
+	if (lastVehicle != 0 && ext.GetAddress(lastVehicle) != nullptr) {
 		if (ext.GetSteeringMultiplier(lastVehicle) != 1.0f) {
 			ext.SetSteeringMultiplier(lastVehicle, 1.0f);
 		}
