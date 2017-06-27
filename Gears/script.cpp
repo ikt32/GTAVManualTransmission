@@ -50,14 +50,7 @@ extern std::vector<std::string> speedoTypes;
 
 bool lookrightfirst = false;
 
-std::string prettyNameFromHash(Hash hash) {
-	char *name = VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(hash);
-	std::string displayName = UI::_GET_LABEL_TEXT(name);
-	if (displayName == "NULL") {
-		displayName = name;
-	}
-	return displayName;
-}
+
 
 void update() {
 	///////////////////////////////////////////////////////////////////////////
@@ -75,7 +68,7 @@ void update() {
 
 	vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
 
-	if (vehicle == 0 || ext.GetAddress(vehicle) == nullptr || playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
+	if (vehicle == 0 || playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
 		return;
 	}
 
@@ -85,7 +78,7 @@ void update() {
 
 	if (vehicle != lastVehicle) {
 		if (settings.LogCar) {
-			logger.Write("DEBUG: Switched vehicle: " + prettyNameFromHash(ENTITY::GET_ENTITY_MODEL(vehicle)));
+			logger.Write("DEBUG: Switched vehicle: " + PrettyNameFromHash(ENTITY::GET_ENTITY_MODEL(vehicle)));
 			auto vehicleAddress = ext.GetAddress(vehicle);
 			std::stringstream ssVehicleAddress;
 			ssVehicleAddress << std::hex << static_cast<void*>(vehicleAddress);
@@ -193,6 +186,7 @@ void update() {
 		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) || 
 		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonHeld(ScriptControls::LegacyControlType::Toggle)) {
 		toggleManual();
+		return;
 	}
 
 	if (!settings.EnableManual &&
@@ -702,20 +696,15 @@ void initSteeringPatches() {
 }
 
 void applySteeringMultiplier() {
-	if (vehicle != 0 && ext.GetAddress(vehicle) != nullptr) {
+	if (vehicle != 0) {
 		ext.SetSteeringMultiplier(vehicle, settings.GameSteerMult);
 	}
 }
 
 void resetSteeringMultiplier() {
-	if (vehicle != 0 && ext.GetAddress(vehicle) != nullptr) {
+	if (vehicle != 0) {
 		if (ext.GetSteeringMultiplier(vehicle) != 1.0f) {
 			ext.SetSteeringMultiplier(vehicle, 1.0f);
-		}
-	}
-	if (lastVehicle != 0 && ext.GetAddress(lastVehicle) != nullptr) {
-		if (ext.GetSteeringMultiplier(lastVehicle) != 1.0f) {
-			ext.SetSteeringMultiplier(lastVehicle, 1.0f);
 		}
 	}
 }
@@ -749,7 +738,6 @@ void updateLastInputDevice() {
 }
 
 void updateSteeringMultiplier() {
-	if (vehicle == 0) return;
 	ext.SetSteeringMultiplier(vehicle, settings.GameSteerMult);
 }
 
@@ -1803,8 +1791,7 @@ void doWheelSteering() {
 		}
 
 		float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
-		if (ext.GetAddress(vehicle) != nullptr)
-			ext.SetSteeringInputAngle(vehicle, -effSteer);
+		ext.SetSteeringInputAngle(vehicle, -effSteer);
 		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, effSteer);
 	}
 }
@@ -1813,8 +1800,7 @@ void doWheelSteeringBoat() {
 	float steerMult = settings.SteerAngleMax / settings.SteerAngleAlt;
 	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 
-	if (ext.GetAddress(vehicle) != nullptr)
-		ext.SetSteeringInputAngle(vehicle, -effSteer);
+	ext.SetSteeringInputAngle(vehicle, -effSteer);
 	CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, effSteer);
 }
 

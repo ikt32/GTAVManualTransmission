@@ -77,3 +77,5 @@ private:
 void DisableActionControlsStart();
 void DisableActionControlsStop();
 void DisableActionControlsTick();
+
+std::string PrettyNameFromHash(Hash hash);
