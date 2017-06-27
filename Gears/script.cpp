@@ -75,7 +75,7 @@ void update() {
 
 	vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
 
-	if (vehicle == 0 || playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
+	if (vehicle == 0 || ext.GetAddress(vehicle) == nullptr || playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
 		return;
 	}
 
@@ -687,18 +687,23 @@ void initSteeringPatches() {
 			controls.WheelControl.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
 		}
 	}
-	if (vehicle == 0 || ext.GetAddress(vehicle) == nullptr) return;
-	if (controls.PrevInput == ScriptControls::Wheel) {
+	if (controls.PrevInput == ScriptControls::Wheel || settings.PatchSteeringAlways) {
 		if (!MemoryPatcher::SteeringPatched && settings.PatchSteering) {
 			MemoryPatcher::PatchSteeringCorrection();
 		}
-		ext.SetSteeringMultiplier(vehicle, settings.GameSteerMult);
+		applySteeringMultiplier();
 	}
 	else {
 		if (MemoryPatcher::SteeringPatched && settings.PatchSteering && !settings.PatchSteeringAlways) {
 			MemoryPatcher::RestoreSteeringCorrection();
 		}
 		resetSteeringMultiplier();
+	}
+}
+
+void applySteeringMultiplier() {
+	if (vehicle != 0 && ext.GetAddress(vehicle) != nullptr) {
+		ext.SetSteeringMultiplier(vehicle, settings.GameSteerMult);
 	}
 }
 
@@ -1798,8 +1803,8 @@ void doWheelSteering() {
 		}
 
 		float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
-
-		ext.SetSteeringInputAngle(vehicle, -effSteer);
+		if (ext.GetAddress(vehicle) != nullptr)
+			ext.SetSteeringInputAngle(vehicle, -effSteer);
 		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, effSteer);
 	}
 }
@@ -1808,7 +1813,8 @@ void doWheelSteeringBoat() {
 	float steerMult = settings.SteerAngleMax / settings.SteerAngleAlt;
 	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 
-	ext.SetSteeringInputAngle(vehicle, -effSteer);
+	if (ext.GetAddress(vehicle) != nullptr)
+		ext.SetSteeringInputAngle(vehicle, -effSteer);
 	CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, effSteer);
 }
 

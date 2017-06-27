@@ -62,6 +62,7 @@ void showWheelInfo();
 
 void reInit();
 void reset();
+void applySteeringMultiplier();
 void resetSteeringMultiplier();
 void toggleManual();
 void initWheel();
