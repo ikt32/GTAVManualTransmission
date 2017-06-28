@@ -7,6 +7,9 @@ No incompatible config changes:
 * `AlwaysHUD` allows using the mod's HUD/speedo even when the manual transmission part itself is off
 * `DisplayWheelInfo` is decoupled from `ShowInfo` and can be shown on its own to prevent UI clutter
 
+Fixes:
+* Fix crash on exit/enter/switch vehicle and enable/disable mod
+
 ## 4.3.5
 No incompatible config changes
 * Add support for b877
