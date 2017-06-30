@@ -1463,7 +1463,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 			if (wheelThrottleVal > 0.01f && controls.ClutchVal < settings.ClutchCatchpoint && !vehData.SimulatedNeutral) {
 				//showText(0.3, 0.0, 1.0, "We should burnout");
 				SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, controls.ADZThrottle);
-				SetControlADZ(ControlVehicleBrake, wheelBrakeVal, controls.ADZBrake);
+				SetControlADZ(ControlVehicleBrake, wheelThrottleVal, controls.ADZThrottle);
 			}
 
 			if (wheelThrottleVal > 0.01f && (controls.ClutchVal > settings.ClutchCatchpoint || vehData.SimulatedNeutral)) {
