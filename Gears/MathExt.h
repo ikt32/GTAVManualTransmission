@@ -5,6 +5,8 @@ template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
 
+float lerp(float a, float b, float f);
+
 Vector3 Cross(Vector3 left, Vector3 right);
 
 Vector3 operator + (Vector3 left, Vector3 right);

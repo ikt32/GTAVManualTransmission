@@ -455,6 +455,8 @@ void update_menu() {
 			showNotification(result ? "Handbrake axis saved" : "Cancelled handbrake axis calibration", &prevNotification);
 			if (result) initWheel();
 		}
+		menu.FloatOption("Throttle anti-deadzone",	controls.ADZThrottle, 0.0f, 1.0f, 0.01f, { "GTA V ignores 25% input for throttle by default." });
+		menu.FloatOption("Brake anti-deadzone",		controls.ADZBrake, 0.0f, 1.0f, 0.01f, { "GTA V ignores 25% input for brake by default." });
 
 		menu.BoolOption("Invert steer", controls.InvertSteer);
 		menu.BoolOption("Invert throttle", controls.InvertThrottle);

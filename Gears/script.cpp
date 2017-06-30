@@ -517,7 +517,7 @@ void showDebugInfo() {
 
 	ssThrottleInput << "Throttle:\t" << controls.ThrottleVal;
 	ssBrakeInput	<< "Brake:\t\t" << controls.BrakeVal;
-	ssClutchInput	<< "Clutch:\t\t" << controls.ClutchVal;
+	ssClutchInput	<< "Clutch:\t\t" << controls.ClutchValRaw;
 	ssHandbrakInput << "Handb:\t\t" << controls.HandbrakeVal;
 
 	showText(0.85, 0.050, 0.4, ssThrottleInput.str().c_str(),	4, solidWhite, true);
@@ -1318,14 +1318,19 @@ void functionTruckLimiting() {
 //                   Mod functions: Reverse/Pedal handling
 ///////////////////////////////////////////////////////////////////////////////
 
+// Anti-Deadzone
+void SetControlADZ(eControl control, float value, float adz) {
+	CONTROLS::_SET_CONTROL_NORMAL(0, control, adz+((1.0f-adz)*value));
+}
+
 void functionRealReverse() {
 	// Forward gear
 	// Desired: Only brake
 	if (vehData.CurrGear > 0) {
 		// LT behavior when stopped: Just brake
 		if (controls.BrakeVal > 0.01f && controls.ThrottleVal < controls.BrakeVal &&
-		    vehData.Velocity < 0.5f && vehData.Velocity >= -0.5f) { // < 0.5 so reverse never triggers
-			//showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Stop");
+			vehData.Velocity < 0.5f && vehData.Velocity >= -0.5f) { // < 0.5 so reverse never triggers
+																	//showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Stop");
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
 			ext.SetThrottleP(vehicle, 0.1f);
 			ext.SetBrakeP(vehicle, 1.0f);
@@ -1333,7 +1338,7 @@ void functionRealReverse() {
 		}
 		// LT behavior when rolling back: Brake
 		if (controls.BrakeVal > 0.01f && controls.ThrottleVal < controls.BrakeVal &&
-		    vehData.Velocity < -0.5f) {
+			vehData.Velocity < -0.5f) {
 			//showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Rollback");
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
@@ -1361,7 +1366,7 @@ void functionRealReverse() {
 		if (controls.ThrottleVal > 0.01f && controls.ThrottleVal > controls.BrakeVal) {
 			throttleAndSomeBrake++;
 			//showText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Active Reverse");
-			
+
 			CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, controls.ThrottleVal);
 		}
@@ -1397,7 +1402,7 @@ void functionRealReverse() {
 
 		// LT behavior when still
 		if (controls.BrakeVal > 0.01f && controls.ThrottleVal <= controls.BrakeVal &&
-		    vehData.Velocity > -0.5f && vehData.Velocity <= 0.1f) {
+			vehData.Velocity > -0.5f && vehData.Velocity <= 0.1f) {
 			//showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Stopped");
 
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
@@ -1419,11 +1424,11 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 			//showText(0.3, 0.0, 1.0, "We are going forward");
 			// Throttle Pedal normal
 			if (wheelThrottleVal > 0.01f) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
+				SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, controls.ADZThrottle);
 			}
 			// Brake Pedal normal
 			if (wheelBrakeVal > 0.01f) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelBrakeVal);
+				SetControlADZ(ControlVehicleBrake, wheelBrakeVal, controls.ADZBrake);
 			}
 		}
 
@@ -1432,7 +1437,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 			//showText(0.3, 0.0, 1.0, "We are stopped");
 
 			if (wheelThrottleVal > 0.01f) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
+				SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, controls.ADZThrottle);
 			}
 
 			if (wheelBrakeVal > 0.01f) {
@@ -1449,7 +1454,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 			if (wheelThrottleVal <= 0.01f && wheelBrakeVal > 0.01f) {
 				//showText(0.3, 0.0, 1.0, "We should brake");
 				//showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)).c_str());
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelBrakeVal);
+				SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, controls.ADZBrake);
 				ext.SetThrottleP(vehicle, 0.1f);
 				ext.SetBrakeP(vehicle, 1.0f);
 				brakelights = true;
@@ -1457,15 +1462,15 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 			
 			if (wheelThrottleVal > 0.01f && controls.ClutchVal < settings.ClutchCatchpoint && !vehData.SimulatedNeutral) {
 				//showText(0.3, 0.0, 1.0, "We should burnout");
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelThrottleVal);
+				SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, controls.ADZThrottle);
+				SetControlADZ(ControlVehicleBrake, wheelBrakeVal, controls.ADZBrake);
 			}
 
 			if (wheelThrottleVal > 0.01f && (controls.ClutchVal > settings.ClutchCatchpoint || vehData.SimulatedNeutral)) {
 				if (wheelBrakeVal > 0.01f) {
 					//showText(0.3, 0.0, 1.0, "We should rev and brake");
 					//showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)).c_str() );
-					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelBrakeVal);
+					SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, controls.ADZBrake);
 					ext.SetThrottleP(vehicle, 0.1f);
 					ext.SetBrakeP(vehicle, 1.0f);
 					brakelights = true;
@@ -1477,7 +1482,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 					fakeRev();
 				} else {
 					//showText(0.3, 0.0, 1.0, "We should rev and apply throttle");
-					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
+					SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, controls.ADZThrottle);
 					ext.SetThrottleP(vehicle, wheelThrottleVal);
 					fakeRev();
 				}
@@ -1495,11 +1500,11 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 			//showText(0.3, 0.0, 1.0, "We are reversing");
 			// Throttle Pedal Reverse
 			if (wheelThrottleVal > 0.01f) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelThrottleVal);
+				SetControlADZ(ControlVehicleBrake, wheelThrottleVal, controls.ADZThrottle);
 			}
 			// Brake Pedal Reverse
 			if (wheelBrakeVal > 0.01f) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelBrakeVal);
+				SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, controls.ADZBrake);
 				ext.SetThrottleP(vehicle, -wheelBrakeVal);
 				ext.SetBrakeP(vehicle, 1.0f);
 			}
@@ -1510,7 +1515,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 			//showText(0.3, 0.0, 1.0, "We are stopped");
 
 			if (wheelThrottleVal > 0.01f) {
-				CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelThrottleVal);
+				SetControlADZ(ControlVehicleBrake, wheelThrottleVal, controls.ADZThrottle);
 			}
 
 			if (wheelBrakeVal > 0.01f) {
@@ -1549,10 +1554,10 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 // Pedals behave like RT/LT
 void handlePedalsDefault(float wheelThrottleVal, float wheelBrakeVal) {
 	if (wheelThrottleVal > 0.01f) {
-		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, wheelThrottleVal);
+		SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, controls.ADZThrottle);
 	}
 	if (wheelBrakeVal > 0.01f) {
-		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, wheelBrakeVal);
+		SetControlADZ(ControlVehicleBrake, wheelBrakeVal, controls.ADZBrake);
 	}
 }
 

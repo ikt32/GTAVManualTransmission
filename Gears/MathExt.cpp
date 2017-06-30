@@ -2,7 +2,9 @@
 #include <math.h>
 #include <inc/types.h>
 
-
+float lerp(float a, float b, float f) {
+	return a + f * (b - a);
+}
 
 Vector3 Cross(Vector3 left, Vector3 right) {
 	Vector3 result;

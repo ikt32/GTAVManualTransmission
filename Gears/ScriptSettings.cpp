@@ -151,7 +151,9 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 	settingsWheel.SetBoolValue("OPTIONS", "InvertThrottle", scriptControl->InvertThrottle);
 	settingsWheel.SetBoolValue("OPTIONS", "InvertBrake", scriptControl->InvertBrake);
 	settingsWheel.SetBoolValue("OPTIONS", "InvertClutch", scriptControl->InvertClutch);
-	
+	settingsWheel.SetDoubleValue("OPTIONS", "AntiDeadzoneThrottle", scriptControl->ADZThrottle);
+	settingsWheel.SetDoubleValue("OPTIONS", "AntiDeadzoneBrake", scriptControl->ADZBrake);
+
 	// [FORCE_FEEDBACK]
 	settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Enable", EnableFFB);
 	settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "GlobalMult", FFGlobalMult);
@@ -363,6 +365,9 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	scriptControl->InvertThrottle = settingsWheel.GetBoolValue("OPTIONS", "InvertThrottle", false);
 	scriptControl->InvertBrake =	settingsWheel.GetBoolValue("OPTIONS", "InvertBrake", false);
 	scriptControl->InvertClutch =	settingsWheel.GetBoolValue("OPTIONS", "InvertClutch", false);
+
+	scriptControl->ADZThrottle = settingsWheel.GetDoubleValue("OPTIONS", "AntiDeadzoneThrottle", 0.25);
+	scriptControl->ADZBrake = settingsWheel.GetDoubleValue("OPTIONS", "AntiDeadzoneBrake", 0.25);
 
 	// [FORCE_FEEDBACK]
 	EnableFFB = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Enable", true);
