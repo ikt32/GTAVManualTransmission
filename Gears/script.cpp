@@ -560,21 +560,20 @@ void showDebugInfoWheel(ScriptSettings &settings, float effSteer, int damperForc
 }
 
 void showDebugInfo3D(Vector3 location, std::vector<std::string> textLines, Color backgroundColor = transparentGray) {
-	float x, y;
 	float height = 0.0125f;
 	
-	if (GRAPHICS::GET_SCREEN_COORD_FROM_WORLD_COORD(location.x, location.y, location.z, &x, &y)) {
-		int i = 0;
-		for (auto line : textLines) {
-			showText(x, y + height * i, 0.2f, line.c_str());
-			i++;
-		}
-		
-		float szX = 0.060f;
-		float szY = (height * i) + 0.02f;
-		GRAPHICS::DRAW_RECT(x + 0.027f, y + (height * i)/2.0f, szX, szY,
-							backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A);
+	GRAPHICS::SET_DRAW_ORIGIN(location.x, location.y, location.z, 0);
+	int i = 0;
+	for (auto line : textLines) {
+		showText(0, 0 + height * i, 0.2f, line.c_str());
+		i++;
 	}
+		
+	float szX = 0.060f;
+	float szY = (height * i) + 0.02f;
+	GRAPHICS::DRAW_RECT(0.027f, (height * i)/2.0f, szX, szY,
+						backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A);
+	GRAPHICS::CLEAR_DRAW_ORIGIN();
 }
 
 // To expose some variables to other scripts
