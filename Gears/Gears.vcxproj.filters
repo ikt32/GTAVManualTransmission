@@ -55,6 +55,7 @@
     <ClCompile Include="..\..\GTAVMenuBase\menusettings.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
+    <ClCompile Include="MathExt.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -131,6 +132,7 @@
     <ClInclude Include="Memory\Offsets.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="MathExt.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
