@@ -578,8 +578,14 @@ void showDebugInfo3D(Vector3 location, std::vector<std::string> textLines, Color
 
 // To expose some variables to other scripts
 void crossScriptComms() {
-	// FiveM "support": Just don't do anything if that version is detected.
-	if (getGameVersion() == VER_1_0_505_2_NOSTEAM) return;
+	
+	// FiveM "support"
+	if (!DECORATOR::DECOR_EXIST_ON(vehicle, "doe_elk") ||
+		!DECORATOR::DECOR_EXIST_ON(vehicle, "hunt_score") ||
+		!DECORATOR::DECOR_EXIST_ON(vehicle, "hunt_weapon") ||
+		!DECORATOR::DECOR_EXIST_ON(vehicle, "hunt_chal_weapon")) {
+		return;
+	}
 
 	// Current gear
 	DECORATOR::DECOR_SET_INT(vehicle, "doe_elk", vehData.CurrGear);
@@ -2070,6 +2076,19 @@ void functionAutoGear1() {
 ///////////////////////////////////////////////////////////////////////////////
 //                              Script entry
 ///////////////////////////////////////////////////////////////////////////////
+
+// @Unknown Modder
+//BYTE* g_bIsDecorRegisterLockedPtr = nullptr;
+//void setupGlobals() {
+//	auto addr = mem::FindPattern("\x40\x53\x48\x83\xEC\x20\x80\x3D\x00\x00\x00\x00\x00\x8B\xDA\x75\x29",
+//								 "xxxxxxxx????xxxxx");
+//
+//	if (addr) {
+//		g_bIsDecorRegisterLockedPtr = (BYTE*)(addr + *(int*)(addr + 8) + 13);
+//	}
+//
+//	*g_bIsDecorRegisterLockedPtr = 0;
+//}
 
 void main() {
 	logger.Write("Script started");
