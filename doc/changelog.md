@@ -1,5 +1,18 @@
 # Changelog
 
+## 4.3.7
+No incompatible config changes. Just additions.
+
+Additions:
+* Add throttle, brake anti-deadzone 
+* Add steering wheel and pedal input HUD
+* Separate stalling for H-patt. shift and seq. shift
+
+Fixes:
+* Draw wheel debug info boxes with less jerkiness
+* Check if decorators exist before using them (prevent FiveM crash)
+
+
 ## 4.3.6
 No incompatible config changes:
 * Add `AlwaysHUD` to `[HUD]`
