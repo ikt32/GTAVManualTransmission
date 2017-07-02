@@ -107,6 +107,18 @@ void ScriptSettings::SaveGeneral() const {
 	settingsGeneral.SetLongValue("HUD", "RPMIndicatorRevlimitB", RPMIndicatorRevlimitB);
 	settingsGeneral.SetLongValue("HUD", "RPMIndicatorRevlimitA", RPMIndicatorRevlimitA);
 
+	settingsGeneral.SetBoolValue("HUD", "SteeringWheelInfo", SteeringWheelInfo);
+	settingsGeneral.SetDoubleValue("HUD", "SteeringWheelTextureX", SteeringWheelTextureX);
+	settingsGeneral.SetDoubleValue("HUD", "SteeringWheelTextureY", SteeringWheelTextureY);
+	settingsGeneral.SetDoubleValue("HUD", "SteeringWheelTextureSz", SteeringWheelTextureSz);
+	settingsGeneral.SetDoubleValue("HUD", "PedalInfoX", PedalInfoX);
+	settingsGeneral.SetDoubleValue("HUD", "PedalInfoY", PedalInfoY);
+	settingsGeneral.SetDoubleValue("HUD", "PedalInfoH"	   , PedalInfoH);
+	settingsGeneral.SetDoubleValue("HUD", "PedalInfoW"	   , PedalInfoW);
+	settingsGeneral.SetDoubleValue("HUD", "PedalInfoPadX"  , PedalInfoPadX);
+	settingsGeneral.SetDoubleValue("HUD", "PedalInfoPadY"  , PedalInfoPadY);
+
+
 	// [DEBUG]
 	settingsGeneral.SetBoolValue("DEBUG", "DisplayInfo", DisplayInfo);
 	settingsGeneral.SetBoolValue("DEBUG", "DisplayWheelInfo", DisplayWheelInfo);
@@ -272,6 +284,17 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	RPMIndicatorRevlimitG = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitG", 0);
 	RPMIndicatorRevlimitB = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitB", 0);
 	RPMIndicatorRevlimitA = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitA", 255);
+
+	SteeringWheelInfo	  = settingsGeneral.GetBoolValue("HUD", "SteeringWheelInfo", false);
+	SteeringWheelTextureX = settingsGeneral.GetDoubleValue("HUD", "SteeringWheelTextureX", 0.1);
+	SteeringWheelTextureY = settingsGeneral.GetDoubleValue("HUD", "SteeringWheelTextureY", 0.9);
+	SteeringWheelTextureSz= settingsGeneral.GetDoubleValue("HUD", "SteeringWheelTextureSz", 0.08);
+	PedalInfoX			  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoX", 0.15);
+	PedalInfoY			  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoY", 0.90);
+	PedalInfoH			  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoH", 0.15);
+	PedalInfoW			  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoH", 0.03);
+	PedalInfoPadX		  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoH", 0.01);
+	PedalInfoPadY		  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoH", 0.01);
 
 	// [CONTROLLER]
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Toggle)] = settingsGeneral.GetValue("CONTROLLER", "Toggle", "DpadRight");

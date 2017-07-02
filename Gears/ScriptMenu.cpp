@@ -544,7 +544,7 @@ void update_menu() {
 		menu.MenuOption("Gear and shift mode", "geardisplaymenu");
 		menu.MenuOption("Speedometer", "speedodisplaymenu");
 		menu.MenuOption("RPM Gauge", "rpmdisplaymenu");
-
+		menu.MenuOption("Wheel & Pedal Info", "wheelinfomenu");
 	}
 
 	/* Yes hello I am root - 2 */
@@ -615,91 +615,32 @@ void update_menu() {
 		menu.IntOption("RPM Revlimit Alpha	", settings.RPMIndicatorRevlimitA, 0, 255);
 	}
 
-	/* Yes hello I am root - 1 */
-	/*
-	if (menu.CurrentMenu("menumenu")) {
-		menu.Title("Menu Options");
+	if (menu.CurrentMenu("wheelinfomenu")) {
+		menu.Title("Wheel & Pedal info");
+		
+		menu.BoolOption("Display steering wheel info", settings.SteeringWheelInfo, { "Show input info graphically." });
+		menu.FloatOption("Wheel image X", settings.SteeringWheelTextureX, 0.0f, 1.0f, 0.01f);
+		menu.FloatOption("Wheel image Y", settings.SteeringWheelTextureY, 0.0f, 1.0f, 0.01f);
+		menu.FloatOption("Wheel image size", settings.SteeringWheelTextureSz, 0.0f, 1.0f, 0.01f);
+		menu.FloatOption("Pedals X", settings.PedalInfoX, 0.0f, 1.0f, 0.01f);
+		menu.FloatOption("Pedals Y", settings.PedalInfoY, 0.0f, 1.0f, 0.01f);
+		menu.FloatOption("Pedals Height", settings.PedalInfoH	, 0.0f, 1.0f, 0.01f);
+		menu.FloatOption("Pedals Width", settings.PedalInfoW	, 0.0f, 1.0f, 0.01f);
+		menu.FloatOption("Pedals Pad X", settings.PedalInfoPadX, 0.0f, 1.0f, 0.01f);
+		menu.FloatOption("Pedals Pad Y", settings.PedalInfoPadY, 0.0f, 1.0f, 0.01f);
 
-		menu.MenuOption("Title Text", "settings_theme_titletext");
-		menu.MenuOption("Title Background", "settings_theme_titlerect");
-		menu.MenuOption("Highlighted", "settings_theme_scroller");
-		menu.MenuOption("Options Text", "settings_theme_options");
-		menu.MenuOption("Options Background", "settings_theme_optionsrect");
-		menu.FloatOption("Menu X position", &menu.menux, 0.0f, 1.0f, 0.005f);
-		menu.FloatOption("Menu Y position", &menu.menuy, 0.0f, 1.0f, 0.005f);
 	}
-
-	if (menu.CurrentMenu("settings_theme_titletext")) {
-		menu.Title("Title Text");
-
-		int fontIndex = static_cast<int>(std::find(fontIDs.begin(), fontIDs.end(), menu.titleFont) - fontIDs.begin());
-		int oldIndex = fontIndex;
-		menu.StringArray("Font: ", fonts, &fontIndex);
-		if (fontIndex != oldIndex) {
-			menu.titleFont = fontIDs.at(fontIndex);
-		}
-
-		menu.IntOption("Red: ", &menu.titleText.r, 0, 255);
-		menu.IntOption("Green: ", &menu.titleText.g, 0, 255);
-		menu.IntOption("Blue: ", &menu.titleText.b, 0, 255);
-		menu.IntOption("Alpha: ", &menu.titleText.a, 0, 255);
-	}
-	if (menu.CurrentMenu("settings_theme_titlerect")) {
-		menu.Title("Title Background");
-
-		menu.IntOption("Red: ", &menu.titleRect.r, 0, 255);
-		menu.IntOption("Green: ", &menu.titleRect.g, 0, 255);
-		menu.IntOption("Blue: ", &menu.titleRect.b, 0, 255);
-		menu.IntOption("Alpha: ", &menu.titleRect.a, 0, 255);
-	}
-	if (menu.CurrentMenu("settings_theme_scroller")) {
-		menu.Title("Highlighted");
-
-		menu.IntOption("Red: ", &menu.scroller.r, 0, 255);
-		menu.IntOption("Green: ", &menu.scroller.g, 0, 255);
-		menu.IntOption("Blue: ", &menu.scroller.b, 0, 255);
-		menu.IntOption("Alpha: ", &menu.scroller.a, 0, 255);
-	}
-	if (menu.CurrentMenu("settings_theme_options")) {
-		menu.Title("Options Text");
-
-		int fontIndex = static_cast<int>(std::find(fontIDs.begin(), fontIDs.end(), menu.optionsFont) - fontIDs.begin());
-		int oldIndex = fontIndex;
-		menu.StringArray("Font: ", fonts, &fontIndex);
-		if (fontIndex != oldIndex) {
-			menu.optionsFont = fontIDs.at(fontIndex);
-		}
-
-		menu.IntOption("Red: ", &menu.options.r, 0, 255);
-		menu.IntOption("Green: ", &menu.options.g, 0, 255);
-		menu.IntOption("Blue: ", &menu.options.b, 0, 255);
-		menu.IntOption("Alpha: ", &menu.options.a, 0, 255);
-	}
-	if (menu.CurrentMenu("settings_theme_optionsrect")) {
-		menu.Title("Options Background");
-
-		menu.IntOption("Red: ", &menu.optionsrect.r, 0, 255);
-		menu.IntOption("Green: ", &menu.optionsrect.g, 0, 255);
-		menu.IntOption("Blue: ", &menu.optionsrect.b, 0, 255);
-		menu.IntOption("Alpha: ", &menu.optionsrect.a, 0, 255);
-	}
-	*/
-
 	/* Yes hello I am root - 1 */
 	if (menu.CurrentMenu("debugmenu")) {
 		menu.Title("Debug settings");
 		if (menu.BoolOption("Display info", settings.DisplayInfo,
-		{ "Show all detailed technical info of the gearbox and inputs calculations." })) {
-		}
-		if (menu.BoolOption("Display wheel info", settings.DisplayWheelInfo,
-		{ "Show per-wheel debug info with off-ground detection, lockup detection and suspension info." })) {
-		}
+		{ "Show all detailed technical info of the gearbox and inputs calculations." })) { }
+		if (menu.BoolOption("Display car wheel info", settings.DisplayWheelInfo,
+		{ "Show per-wheel debug info with off-ground detection, lockup detection and suspension info." })) { }
 		if (menu.BoolOption("Log car address", settings.LogCar,
-		{ "Prints the current vehicle address","to Gears.log." })) {
-		}
+		{ "Prints the current vehicle address","to Gears.log." })) { }
 		if (menu.BoolOption("Expose script variables", settings.CrossScript,
-		{ "Shares data like gear, shifting","indicator and Neutral with other mods." })) {
-		}
+		{ "Shares data like gear, shifting","indicator and Neutral with other mods." })) { }
 	}
 
 

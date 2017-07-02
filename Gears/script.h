@@ -55,6 +55,7 @@ void showHUD();
 void showDebugInfo();
 void crossScriptComms();
 void showWheelInfo();
+void drawSteeringWheelInfo();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Mod functions: Mod control

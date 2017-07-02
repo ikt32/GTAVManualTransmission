@@ -93,12 +93,24 @@ public:
 	int RPMIndicatorRevlimitB = 0;
 	int RPMIndicatorRevlimitA = 255;
 
+	bool SteeringWheelInfo = false;
+	float SteeringWheelTextureX;
+	float SteeringWheelTextureY;
+	float SteeringWheelTextureSz;
+	float PedalInfoX;
+	float PedalInfoY;
+	float PedalInfoH;
+	float PedalInfoW;
+	float PedalInfoPadX;
+	float PedalInfoPadY;
+
 	// [CONTROLLER]
 	bool ToggleEngine = false; // false makes it just turn ON the engine
 
 	// [DEBUG]
 	bool DisplayInfo = false;
 	bool LogCar = false;
+	bool DisplayWheelInfo = false;
 
 	std::vector<GUID> reggdGuids;
 
@@ -111,6 +123,7 @@ public:
 	bool PatchSteeringAlways = false;
 	bool LogiLEDs = false;
 	bool HPatternKeyboard = false;
+	bool BlockCarControls = false;
 
 	// [FORCE_FEEDBACK]
 	bool EnableFFB = true;
@@ -127,8 +140,6 @@ public:
 	float SteerAngleBike = 180.0f;
 	float SteerAngleAlt = 180.0f;
 	float GameSteerMult = 1.0f;
-	bool BlockCarControls = false;
-	bool DisplayWheelInfo = false;
 
 	// Methods
 	/*

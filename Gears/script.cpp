@@ -22,8 +22,10 @@
 
 #include "menu.h"
 
-GameSound gearRattle("DAMAGED_TRUCK_IDLE", 0);
+std::string textureWheelFile;
+int textureWheelId;
 
+GameSound gearRattle("DAMAGED_TRUCK_IDLE", 0);
 int soundID;
 float stallingProgress = 0.0f;
 
@@ -127,6 +129,9 @@ void update() {
 	if (settings.HUD &&
 		(settings.EnableManual || settings.AlwaysHUD)) {
 		showHUD();
+	}
+	if (settings.SteeringWheelInfo) {
+		drawSteeringWheelInfo();
 	}
 
 	if (!settings.IsCorrectVersion()) {
@@ -574,6 +579,26 @@ void showDebugInfo3D(Vector3 location, std::vector<std::string> textLines, Color
 	GRAPHICS::DRAW_RECT(0.027f, (height * i)/2.0f, szX, szY,
 						backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A);
 	GRAPHICS::CLEAR_DRAW_ORIGIN();
+}
+
+void drawSteeringWheelInfo() {
+	// Steering Wheel
+	float rotation = settings.SteerAngleMax * (controls.SteerVal - 0.5f);
+	drawTexture(textureWheelId, 0, -9998, 100, 
+				settings.SteeringWheelTextureSz, settings.SteeringWheelTextureSz, 
+				0.5f, 0.5f, // center of texture
+				settings.SteeringWheelTextureX, settings.SteeringWheelTextureY,
+				rotation/360.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
+
+	// Pedals
+	float barWidth = settings.PedalInfoW/3.0f;
+
+	float barYBase = (settings.PedalInfoY + settings.PedalInfoH * 0.5f);
+
+	GRAPHICS::DRAW_RECT(settings.PedalInfoX , settings.PedalInfoY, 3.0f * barWidth + settings.PedalInfoPadX, settings.PedalInfoH + settings.PedalInfoPadY, 0, 0, 0, 92);
+	GRAPHICS::DRAW_RECT(settings.PedalInfoX - 1.0f*barWidth, barYBase - controls.ThrottleVal*settings.PedalInfoH*0.5f, barWidth, controls.ThrottleVal*settings.PedalInfoH, 0, 255, 0, 255);
+	GRAPHICS::DRAW_RECT(settings.PedalInfoX + 0.0f*barWidth, barYBase - controls.BrakeVal*settings.PedalInfoH*0.5f, barWidth, controls.BrakeVal*settings.PedalInfoH, 255, 0, 0, 255);
+	GRAPHICS::DRAW_RECT(settings.PedalInfoX + 1.0f*barWidth, barYBase - controls.ClutchValRaw*settings.PedalInfoH*0.5f, barWidth, controls.ClutchVal*settings.PedalInfoH, 0, 0, 255, 255);
 }
 
 // To expose some variables to other scripts
@@ -2100,7 +2125,9 @@ void main() {
 	settingsGeneralFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_general.ini";
 	settingsWheelFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_wheel.ini";
 	settingsMenuFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_menu.ini";
-	
+	textureWheelFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\texture_wheel.png";
+	textureWheelId = createTexture(textureWheelFile.c_str());
+
 	settings.SetFiles(settingsGeneralFile, settingsWheelFile);
 
 	logger.Write("Loading " + settingsGeneralFile);
