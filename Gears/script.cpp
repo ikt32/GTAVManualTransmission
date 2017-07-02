@@ -306,9 +306,11 @@ void update() {
 		!(settings.SimpleBike && vehData.Class == VehicleData::VehicleClass::Bike) && 
 		!vehData.NoClutch) {
 		// Stalling
-		if (settings.EngStall && settings.ShiftMode != Automatic) {
+		if (settings.EngStall && settings.ShiftMode == HPattern ||
+			settings.EngStallS && settings.ShiftMode == Sequential) {
 			functionEngStall();
 		}
+
 
 		// Simulate "catch point"
 		// When the clutch "grabs" and the car starts moving without input

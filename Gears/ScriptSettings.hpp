@@ -30,6 +30,7 @@ public:
 	bool SimpleBike = false;
 	bool EngDamage = false;
 	bool EngStall = false;
+	bool EngStallS = false;
 	bool EngBrake = false;
 	bool ClutchCatching = false;
 	bool ClutchShiftingH = false;

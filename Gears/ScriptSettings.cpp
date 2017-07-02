@@ -219,6 +219,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	SimpleBike = settingsGeneral.GetBoolValue("OPTIONS", "SimpleBike", false);
 	EngDamage = settingsGeneral.GetBoolValue("OPTIONS", "EngineDamage", false);
 	EngStall = settingsGeneral.GetBoolValue("OPTIONS", "EngineStalling", false);
+	EngStallS = settingsGeneral.GetBoolValue("OPTIONS", "EngineStallingS", false);
 	EngBrake = settingsGeneral.GetBoolValue("OPTIONS", "EngineBraking", false);
 	ClutchCatching = settingsGeneral.GetBoolValue("OPTIONS", "ClutchCatching", false);
 	ClutchShiftingH = settingsGeneral.GetBoolValue("OPTIONS", "ClutchShiftingH", false);
@@ -292,9 +293,9 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	PedalInfoX			  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoX", 0.15);
 	PedalInfoY			  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoY", 0.90);
 	PedalInfoH			  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoH", 0.15);
-	PedalInfoW			  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoH", 0.03);
-	PedalInfoPadX		  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoH", 0.01);
-	PedalInfoPadY		  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoH", 0.01);
+	PedalInfoW			  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoW", 0.03);
+	PedalInfoPadX		  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoPadX", 0.01);
+	PedalInfoPadY		  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoPadY", 0.01);
 
 	// [CONTROLLER]
 	scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Toggle)] = settingsGeneral.GetValue("CONTROLLER", "Toggle", "DpadRight");

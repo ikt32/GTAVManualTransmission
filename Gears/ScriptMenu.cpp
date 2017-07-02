@@ -209,10 +209,13 @@ void update_menu() {
 	if (menu.CurrentMenu("optionsmenu")) {
 		menu.Title("Mod options");
 		if (menu.BoolOption("Engine Damage", settings.EngDamage,
-		{ "Damage the engine when over-revving and","when mis-shifting." })) {
+		{ "Damage the engine when over-revving and when mis-shifting." })) {
 		}
-		if (menu.BoolOption("Engine Stalling", settings.EngStall,
-		{ "Stall the engine when the wheel speed gets"," too low" })) {
+		if (menu.BoolOption("Engine Stalling (H)", settings.EngStall,
+		{ "Stall the engine when the wheel speed gets too low. Applies to H-pattern shift mode." })) {
+		}
+		if (menu.BoolOption("Engine Stalling (S)", settings.EngStallS,
+		{ "Stall the engine when the wheel speed gets too low. Allies to sequential shift mode." })) {
 		}
 		if (menu.BoolOption("Engine Braking", settings.EngBrake,
 		{ "Help the car braking by slowing down more","at high RPMs" })) {
