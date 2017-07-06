@@ -1,7 +1,9 @@
 # Changelog
 
 ## 4.3.7
-No incompatible config changes. Just additions.
+Config changes:
+* Menu offsets changed again (sorry!) for different resolutions and safe space support!
+* For the rest of the files, no incompatible changes. Just additions.
 
 Additions:
 * Add throttle, brake anti-deadzone 

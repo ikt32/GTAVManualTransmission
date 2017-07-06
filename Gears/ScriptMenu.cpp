@@ -24,6 +24,7 @@ extern ScriptSettings settings;
 
 extern int prevNotification;
 extern int speedoIndex;
+extern int textureWheelId;
 
 const std::string escapeKey = "BACKSPACE";
 const std::string skipKey = "RIGHT";
@@ -547,6 +548,13 @@ void update_menu() {
 		menu.MenuOption("Gear and shift mode", "geardisplaymenu");
 		menu.MenuOption("Speedometer", "speedodisplaymenu");
 		menu.MenuOption("RPM Gauge", "rpmdisplaymenu");
+
+		std::vector<std::string> wheelTexturePresent = {};
+
+		if (textureWheelId == -1) {
+			wheelTexturePresent.push_back("Wheel texture not found!");
+		}
+
 		menu.MenuOption("Wheel & Pedal Info", "wheelinfomenu");
 	}
 

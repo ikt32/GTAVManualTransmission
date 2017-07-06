@@ -79,3 +79,5 @@ void DisableActionControlsStop();
 void DisableActionControlsTick();
 
 std::string PrettyNameFromHash(Hash hash);
+
+bool FileExists(const std::string& name);

@@ -3,7 +3,7 @@
 #include "NativeMemory.hpp"
 #include "Util/Versions.h"
 #include "Offsets.hpp"
-#include "MathExt.h"
+#include "Util/MathExt.h"
 
 VehicleExtensions::VehicleExtensions() {
 	mem::init();

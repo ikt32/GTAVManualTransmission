@@ -130,7 +130,7 @@ void update() {
 		(settings.EnableManual || settings.AlwaysHUD)) {
 		showHUD();
 	}
-	if (settings.SteeringWheelInfo) {
+	if (settings.SteeringWheelInfo && textureWheelId != -1) {
 		drawSteeringWheelInfo();
 	}
 
@@ -2128,7 +2128,15 @@ void main() {
 	settingsWheelFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_wheel.ini";
 	settingsMenuFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_menu.ini";
 	textureWheelFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\texture_wheel.png";
-	textureWheelId = createTexture(textureWheelFile.c_str());
+
+	if (FileExists(textureWheelFile)) {
+		textureWheelId = createTexture(textureWheelFile.c_str());
+	}
+	else {
+		logger.Write("ERROR: " + textureWheelFile + " does not exist.");
+		textureWheelId = -1;
+	}
+
 
 	settings.SetFiles(settingsGeneralFile, settingsWheelFile);
 

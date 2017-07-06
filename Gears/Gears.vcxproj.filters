@@ -38,7 +38,6 @@
     <ClCompile Include="Input\LegacyController.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="Util\Paths.cpp" />
     <ClCompile Include="..\..\GTAVMenuBase\menu.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
@@ -55,7 +54,12 @@
     <ClCompile Include="..\..\GTAVMenuBase\menusettings.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
-    <ClCompile Include="MathExt.cpp" />
+    <ClCompile Include="Util\Paths.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\MathExt.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -109,7 +113,6 @@
     <ClInclude Include="Input\LegacyController.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="Util\Paths.h" />
     <ClInclude Include="Util\Versions.h" />
     <ClInclude Include="..\..\GTAVMenuBase\menu.h">
       <Filter>Menu</Filter>
@@ -132,7 +135,12 @@
     <ClInclude Include="Memory\Offsets.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
-    <ClInclude Include="MathExt.h" />
+    <ClInclude Include="Util\Paths.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\MathExt.h">
+      <Filter>Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
