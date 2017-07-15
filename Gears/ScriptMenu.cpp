@@ -814,8 +814,7 @@ void clearAxis(std::string confTag) {
 
 void clearWheelToKey() {
 	GAMEPLAY::DISPLAY_ONSCREEN_KEYBOARD(1, "VEUI_ENTER_TEXT", "", "", "", "", "", 30);
-	while (GAMEPLAY::UPDATE_ONSCREEN_KEYBOARD() == 0)
-	{
+	while (GAMEPLAY::UPDATE_ONSCREEN_KEYBOARD() == 0) {
 		CONTROLS::DISABLE_ALL_CONTROL_ACTIONS(0);
 		WAIT(0);
 	}
@@ -1234,34 +1233,25 @@ bool configKeyboardKey(const std::string &confTag) {
 		}
 		auto keymap = createKeyMap();
 		for (auto k : keymap) {
-			if (isMenuControl(k.second))
+			if (isMenuControl(k.second)) {
+				showNotification("Can't use menu controls!", &prevNotification);
 				continue;
+			}
 			if (IsKeyJustUp(k.second)) {
 				saveKeyboardKey(confTag, k.first);
 				return true;
 			}
 		}
-
-		// Key limits from keyboard.cpp
-		// a-z
-		for (int i = 0x30; i <= 0x39; i++) {
-			if (isMenuControl(i))
+		for (char letter = 0x30; letter <= 0x5A; letter++) {
+			if (letter > 0x39 && letter < 0x41)
 				continue;
-			if (IsKeyJustUp(i)) {
-				std::string str;
-				str = static_cast<char>(i);
-				saveKeyboardKey(confTag, str);
-				return true;
+			std::string letter_ = std::string(1, letter);
+			if (isMenuControl(str2key(letter_))) {
+				showNotification("Can't use menu controls!", &prevNotification);
+				continue;
 			}
-		}
-		// A-Z
-		for (int i = 0x41; i <= 0x5A; i++) {
-			if (isMenuControl(i))
-				continue;
-			if (IsKeyJustUp(i)) {
-				std::string str;
-				str = static_cast<char>(i);
-				saveKeyboardKey(confTag, str);
+			if (IsKeyJustUp(str2key(letter_))) {
+				saveKeyboardKey(confTag, letter_);
 				return true;
 			}
 		}
