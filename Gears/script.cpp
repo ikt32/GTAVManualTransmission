@@ -130,7 +130,7 @@ void update() {
 		(settings.EnableManual || settings.AlwaysHUD)) {
 		showHUD();
 	}
-	if (settings.SteeringWheelInfo && textureWheelId != -1) {
+	if (settings.EnableWheel && settings.SteeringWheelInfo && textureWheelId != -1) {
 		drawSteeringWheelInfo();
 	}
 
@@ -147,15 +147,14 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 	//                            Alt vehicle controls
 	///////////////////////////////////////////////////////////////////////////
-	if (vehData.Class != VehicleData::VehicleClass::Car &&
+	if (settings.EnableWheel &&
+		vehData.Class != VehicleData::VehicleClass::Car &&
 		vehData.Class != VehicleData::VehicleClass::Bike &&
 		vehData.Class != VehicleData::VehicleClass::Quad) {
-		// Alt Support
 
 		updateLastInputDevice();
 
-		if (settings.EnableWheel &&
-			settings.AltControls &&
+		if (settings.AltControls &&
 			controls.WheelControl.IsConnected(controls.SteerGUID) &&
 			controls.PrevInput == ScriptControls::Wheel) {
 			if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
@@ -195,7 +194,7 @@ void update() {
 	}
 
 	if (!settings.EnableManual &&
-		settings.WheelWithoutManual &&
+		settings.EnableWheel && settings.WheelWithoutManual &&
 		controls.WheelControl.IsConnected(controls.SteerGUID)) {
 
 		updateLastInputDevice();
@@ -223,7 +222,7 @@ void update() {
 	updateLastInputDevice();
 	handleVehicleButtons();
 
-	if (controls.WheelControl.IsConnected(controls.SteerGUID)) {
+	if (settings.EnableWheel && controls.WheelControl.IsConnected(controls.SteerGUID)) {
 		doWheelSteering();
 		bool airborne = !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) &&
 			ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f;
