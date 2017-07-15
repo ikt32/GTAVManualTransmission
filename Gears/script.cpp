@@ -585,6 +585,8 @@ void showDebugInfo3D(Vector3 location, std::vector<std::string> textLines, Color
 void drawSteeringWheelInfo() {
 	// Steering Wheel
 	float rotation = settings.SteerAngleMax * (controls.SteerVal - 0.5f);
+	if (controls.PrevInput != ScriptControls::Wheel) rotation = 90.0f * CONTROLS::GET_CONTROL_NORMAL(0, ControlVehicleMoveLeftRight);
+
 	drawTexture(textureWheelId, 0, -9998, 100, 
 				settings.SteeringWheelTextureSz, settings.SteeringWheelTextureSz, 
 				0.5f, 0.5f, // center of texture
