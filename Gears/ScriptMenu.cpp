@@ -322,10 +322,11 @@ void update_menu() {
 			controllerInfo.back() = controllerConfTagDetail.at(it);
 			controllerInfo.push_back("Assigned to " + controls.ConfTagController2Value(confTag));
 			if (menu.OptionPlus("Assign " + confTag, controllerInfo, std::bind(clearControllerButton, confTag), nullptr, "Current setting")) {
+				WAIT(500);
 				bool result = configControllerButton(confTag);
 				//showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
 				if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
-				WAIT(1000);
+				WAIT(500);
 			}
 			it++;
 			controllerInfo.pop_back();
@@ -347,9 +348,10 @@ void update_menu() {
 			keyboardInfo.back() = keyboardConfTagsDetail.at(it);
 			keyboardInfo.push_back("Assigned to " + key2str(controls.ConfTagKB2key(confTag)));
 			if (menu.OptionPlus("Assign " + confTag, keyboardInfo, std::bind(clearKeyboardKey, confTag), nullptr, "Current setting")) {
+				WAIT(500);
 				bool result = configKeyboardKey(confTag);
 				if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
-				WAIT(1000);
+				WAIT(500);
 			}
 			it++;
 			keyboardInfo.pop_back();
