@@ -9,8 +9,10 @@ Additions:
 * Add throttle and brake anti-deadzone 
 * Add steering wheel and pedal input HUD
 * Separate stalling for H-patt. shift and seq. shift
+	* Seq. clutch catch behaves like auto now, regarding brakes
 
 Fixes:
+* Properly disable steering wheel
 * Draw wheel debug info boxes with less jerkiness
 * Check if decorators exist before using them (prevent FiveM crash)
 
