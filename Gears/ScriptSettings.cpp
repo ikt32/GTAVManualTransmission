@@ -732,6 +732,28 @@ void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t
 		logger.Write("Unable to save to " + settingsWheelFile);
 }
 
+void ScriptSettings::SteeringAddWheelToKey(const std::string &confTag, ptrdiff_t index, int button, const std::string &keyName) {
+	CSimpleIniA settingsWheel;
+	settingsWheel.SetUnicode();
+	settingsWheel.LoadFile(settingsWheelFile.c_str());
+	settingsWheel.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
+	settingsWheel.SetValue(confTag.c_str(), std::to_string(button).c_str(), keyName.c_str());
+	int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
+	if (err < 0)
+		logger.Write("Unable to save to " + settingsWheelFile);
+}
+
+bool ScriptSettings::SteeringClearWheelToKey(int button) {
+	CSimpleIniA settingsWheel;
+	settingsWheel.SetUnicode();
+	settingsWheel.LoadFile(settingsWheelFile.c_str());
+	bool result = settingsWheel.Delete("TO_KEYBOARD", std::to_string(button).c_str(), true);
+	int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
+	if (err < 0)
+		logger.Write("Unable to save to " + settingsWheelFile);
+	return result;
+}
+
 void ScriptSettings::KeyboardSaveKey(const std::string &confTag, const std::string &key) {
 	CSimpleIniA settingsGeneral;
 	settingsGeneral.SetUnicode();
@@ -761,4 +783,15 @@ GUID ScriptSettings::DeviceIndexToGUID(int device, std::vector<GUID> guids) {
 		return{};
 	}
 	return guids[device];
+}
+
+int ScriptSettings::GUIDToDeviceIndex(GUID guidToFind) {
+	int i = 0;
+	for (auto guid : reggdGuids) {
+		if (guid == guidToFind) {
+			return i;
+		}
+		i++;
+	}
+	return -1;
 }

@@ -537,48 +537,63 @@ void update_menu() {
 		menu.Title("Configure buttons");
 		menu.Subtitle("Button setup and review");
 
-		std::vector<std::string> info;
-		info.push_back("Press RIGHT to clear this button");
-		info.push_back("Active buttons:");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::HR)) info.push_back("Gear R");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H1)) info.push_back("Gear 1");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H2)) info.push_back("Gear 2");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H3)) info.push_back("Gear 3");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H4)) info.push_back("Gear 4");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H5)) info.push_back("Gear 5");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H6)) info.push_back("Gear 6");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H7)) info.push_back("Gear 7");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftUp))	info.push_back("ShiftUp");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftDown)) info.push_back("ShiftDown");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::Clutch))	info.push_back("ClutchButton");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::Engine))	info.push_back("Engine");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::Handbrake)) info.push_back("Handbrake");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::Horn))		info.push_back("Horn");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::Lights))	info.push_back("Lights");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::LookBack))	info.push_back("LookBack");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::LookLeft))	info.push_back("LookLeft");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::LookRight))	info.push_back("LookRight");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::Camera))	info.push_back("Camera");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::RadioNext)) info.push_back("RadioNext");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::RadioPrev)) info.push_back("RadioPrev");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorLeft))		info.push_back("IndicatorLeft");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorRight))	info.push_back("IndicatorRight");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorHazard))	info.push_back("IndicatorHazard");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::Toggle))	info.push_back("ToggleMod");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::ToggleH))	info.push_back("ChangeShiftMode");
+		std::vector<std::string> wheelToKeyInfo;
+		wheelToKeyInfo.push_back("Active wheel-to-key options:");
+		wheelToKeyInfo.push_back("Press RIGHT to clear a button");
+		wheelToKeyInfo.push_back("Device: " + settings.GUIDToDeviceIndex(controls.WheelToKeyGUID));
 		for (int i = 0; i < MAX_RGBBUTTONS; i++) {
 			if (controls.WheelToKey[i] != -1) {
+				wheelToKeyInfo.push_back(std::to_string(i) + " = " + key2str(controls.WheelToKey[i]));
 				if (controls.WheelControl.IsButtonPressed(i, controls.WheelToKeyGUID)) {
-					info.push_back(key2str(controls.WheelToKey[i]));
+					wheelToKeyInfo.back() += " (Pressed)";
 				}
 			}
 		}
 
+		if (menu.OptionPlus("Set up WheelToKey", wheelToKeyInfo, clearWheelToKey, nullptr, "Info", 
+		{ "Set up wheel buttons that press a keyboard key. Only one device can be used for this." })) {
+			bool result = configWheelToKey();
+			showNotification(result ? "Entry added" : "Cancelled entry addition", &prevNotification);
+		}
+
+		std::vector<std::string> buttonInfo;
+		buttonInfo.push_back("Press RIGHT to clear this button");
+		buttonInfo.push_back("Active buttons:");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::HR)) buttonInfo.push_back("Gear R");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H1)) buttonInfo.push_back("Gear 1");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H2)) buttonInfo.push_back("Gear 2");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H3)) buttonInfo.push_back("Gear 3");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H4)) buttonInfo.push_back("Gear 4");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H5)) buttonInfo.push_back("Gear 5");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H6)) buttonInfo.push_back("Gear 6");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::H7)) buttonInfo.push_back("Gear 7");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftUp))	buttonInfo.push_back("ShiftUp");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftDown)) buttonInfo.push_back("ShiftDown");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Clutch))	buttonInfo.push_back("ClutchButton");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Engine))	buttonInfo.push_back("Engine");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Handbrake)) buttonInfo.push_back("Handbrake");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Horn))		buttonInfo.push_back("Horn");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Lights))	buttonInfo.push_back("Lights");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::LookBack))	buttonInfo.push_back("LookBack");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::LookLeft))	buttonInfo.push_back("LookLeft");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::LookRight))	buttonInfo.push_back("LookRight");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Camera))	buttonInfo.push_back("Camera");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::RadioNext)) buttonInfo.push_back("RadioNext");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::RadioPrev)) buttonInfo.push_back("RadioPrev");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorLeft))		buttonInfo.push_back("IndicatorLeft");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorRight))	buttonInfo.push_back("IndicatorRight");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorHazard))	buttonInfo.push_back("IndicatorHazard");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::Toggle))	buttonInfo.push_back("ToggleMod");
+		if (controls.ButtonIn(ScriptControls::WheelControlType::ToggleH))	buttonInfo.push_back("ChangeShiftMode");
+		if (buttonInfo.size() == 2) buttonInfo.push_back("None");
+
 		for (auto confTag : buttonConfTags) {
-			if (menu.OptionPlus("Assign " + confTag, info, std::bind(clearButton, confTag), nullptr, "Current inputs")) {
+			buttonInfo.push_back("Assigned to " + std::to_string(controls.ConfTagWheel2Value(confTag)));
+			if (menu.OptionPlus("Assign " + confTag, buttonInfo, std::bind(clearButton, confTag), nullptr, "Current inputs")) {
 				bool result = configButton(confTag);
 				showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
 			}
+			buttonInfo.pop_back();
 		}
 	}
 
@@ -774,6 +789,14 @@ void saveButton(const std::string &confTag, GUID devGUID, int button) {
 	settings.Read(&controls);
 }
 
+void addWheelToKey(const std::string &confTag, GUID devGUID, int button, std::string keyName) {
+	std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
+	std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
+	auto index = settings.SteeringAppendDevice(devGUID, devName.c_str());
+	settings.SteeringAddWheelToKey(confTag, index, button, keyName);
+	settings.Read(&controls);
+}
+
 void saveHShifter(const std::string &confTag, GUID devGUID, std::array<int, numGears> buttonArray) {
 	std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
 	std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
@@ -787,6 +810,31 @@ void clearAxis(std::string confTag) {
 	settings.Read(&controls);
 	showNotification(("Cleared axis " + confTag).c_str(), &prevNotification);
 	initWheel();
+}
+
+void clearWheelToKey() {
+	GAMEPLAY::DISPLAY_ONSCREEN_KEYBOARD(1, "VEUI_ENTER_TEXT", "", "", "", "", "", 30);
+	while (GAMEPLAY::UPDATE_ONSCREEN_KEYBOARD() == 0)
+	{
+		CONTROLS::DISABLE_ALL_CONTROL_ACTIONS(0);
+		WAIT(0);
+	}
+	if (!GAMEPLAY::GET_ONSCREEN_KEYBOARD_RESULT()) return;
+	std::string result = GAMEPLAY::GET_ONSCREEN_KEYBOARD_RESULT();
+
+	int button;
+	if (str2int(button, result.c_str(), 10) != STR2INT_SUCCESS) {
+		showNotification("Invalid input: " + result + " is not a valid number!", &prevNotification);
+		return;
+	}
+	bool found = settings.SteeringClearWheelToKey(button);
+	if (found) {
+		showNotification("Removed button " + result, &prevNotification);
+		settings.Read(&controls);
+	}
+	else {
+		showNotification("Button " + result + " not found.", &prevNotification);
+	}
 }
 
 void clearButton(std::string confTag) {
@@ -923,6 +971,107 @@ bool configAxis(std::string str) {
 	int max = endValue;
 	saveAxis(confTag, selectedGUID, selectedAxis, min, max);
 	return true;
+}
+
+bool configWheelToKey() {
+	int buttonsActive = 0;
+
+	std::array<int, 8> directions = {
+		WheelDirectInput::POV::N,
+		WheelDirectInput::POV::NE,
+		WheelDirectInput::POV::E,
+		WheelDirectInput::POV::SE,
+		WheelDirectInput::POV::S,
+		WheelDirectInput::POV::SW,
+		WheelDirectInput::POV::W,
+		WheelDirectInput::POV::NW,
+	};
+
+	std::string additionalInfo = "Press a button to configure. Press " + escapeKey + " to exit.";
+
+	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+
+	for (auto guid : controls.WheelControl.GetGuids()) {
+		for (int i = 0; i < 255; i++) {
+			if (controls.WheelControl.IsButtonPressed(i, guid)) {
+				buttonsActive++;
+			}
+		}
+		for (auto d : directions) {
+			if (controls.WheelControl.IsButtonPressed(d, guid)) {
+				buttonsActive++;
+			}
+		}
+	}
+
+	if (buttonsActive > 0) {
+		showSubtitle("One or more buttons had been pressed on start. Stop pressing and try again.");
+		return false;
+	}
+
+	/*
+	 * 0: Wait for button select
+	 * 1: Wait for keyboard key select
+	 * 2: Done!
+	 */
+	int progress = 0;
+	GUID selectedGuid;
+	int button = -1;
+	std::string keyName;
+	auto keyMap = createKeyMap();
+
+	while (true) {
+		if (IsKeyJustUp(str2key(escapeKey))) {
+			return false;
+		}
+		controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+
+		if (progress == 0) {
+			for (auto guid : controls.WheelControl.GetGuids()) {
+				for (int i = 0; i < 255; i++) {
+					if (controls.WheelControl.IsButtonPressed(i, guid)) {
+						selectedGuid = guid;
+						button = i;
+						progress++;
+					}
+				}
+				//POV hat
+				for (auto d : directions) {
+					if (controls.WheelControl.IsButtonPressed(d, guid)) {
+						selectedGuid = guid;
+						button = d;
+						progress++;
+					}
+				}
+			}
+			if (progress == 1) {
+				additionalInfo = "Press a keyboard key to configure. Press " + escapeKey + " to exit.";
+			}
+		}
+		if (progress == 1) {
+			for (auto key : keyMap) {
+				if (key.first != "ESC" && IsKeyJustUp(key.second)) {
+					keyName = key.first;
+					progress++;
+				}
+			}
+			for (char letter = 0x30; letter <= 0x5A; letter++) {
+				if (letter > 0x39 && letter < 0x41)
+					continue;
+				std::string letter_ = std::string(1, letter);
+				if (IsKeyJustUp(str2key(letter_))) {
+					keyName = letter_;
+					progress++;
+				}
+			}
+		}
+		if (progress >=2 ) {
+			addWheelToKey("TO_KEYBOARD", selectedGuid, button, keyName);
+			return true;
+		}
+		showSubtitle(additionalInfo.c_str());
+		WAIT(0);
+	}
 }
 
 bool configButton(std::string str) {

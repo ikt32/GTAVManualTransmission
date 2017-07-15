@@ -147,11 +147,13 @@ void ScriptMain();
 void update_menu();
 void clearAxis(std::string axis);
 void clearButton(std::string button);
+void clearWheelToKey();
 void clearHShifter();
 void clearKeyboardKey(std::string button);
 void clearControllerButton(std::string button);
 
 bool configAxis(std::string confTag);
+bool configWheelToKey();
 bool configButton(std::string confTag);
 bool configHPattern();
 bool configKeyboardKey(const std::string &confTag);

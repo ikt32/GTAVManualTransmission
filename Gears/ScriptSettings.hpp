@@ -148,12 +148,16 @@ public:
 	 *  otherwise appends GUID and returns new device index
 	 */
 	ptrdiff_t SteeringAppendDevice(const GUID & dev_guid, std::string dev_name);
+	int GUIDToDeviceIndex(GUID guid);
+
 	void SteeringSaveAxis(const std::string &confTag, ptrdiff_t index, const std::string &axis, int minVal, int maxVal);
 	void SteeringSaveFFBAxis(const std::string &confTag, ptrdiff_t index, const std::string &axis);
 	void SteeringSaveButton(const std::string &confTag, ptrdiff_t index, int button);
 	void SteeringSaveHShifter(const std::string &confTag, ptrdiff_t index, int button[numGears]);
 	void KeyboardSaveKey(const std::string &confTag, const std::string &key);
 	void ControllerSaveButton(const std::string &confTag, const std::string &button, int btnToBlock);
+	void SteeringAddWheelToKey(const std::string & cs, ptrdiff_t index, int button, const std::string & key_name);
+	bool SteeringClearWheelToKey(int button);
 
 private:
 	void parseSettingsGeneral(ScriptControls *scriptControl);

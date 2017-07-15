@@ -241,6 +241,32 @@ public:
 
 		return "UNKNOWN";
 	}
+
+	// Oh ikt, what the HELL are ya doing?
+	int ConfTagWheel2Value(const std::string &confTag) {
+		if (confTag == "TOGGLE_MOD"			) return WheelButton[static_cast<int>(WheelControlType::Toggle)];
+		if (confTag == "CHANGE_SHIFTMODE"	) return WheelButton[static_cast<int>(WheelControlType::ToggleH)];
+		if (confTag == "CLUTCH_BUTTON"		) return WheelButton[static_cast<int>(WheelControlType::Clutch)];
+		if (confTag == "SHIFT_UP"			) return WheelButton[static_cast<int>(WheelControlType::ShiftUp)];
+		if (confTag == "SHIFT_DOWN"			) return WheelButton[static_cast<int>(WheelControlType::ShiftDown)];
+		if (confTag == "ENGINE"				) return WheelButton[static_cast<int>(WheelControlType::Engine)];
+		if (confTag == "HANDBRAKE"			) return WheelButton[static_cast<int>(WheelControlType::Handbrake)];
+		if (confTag == "HORN"				) return WheelButton[static_cast<int>(WheelControlType::Horn)];
+		if (confTag == "LIGHTS"				) return WheelButton[static_cast<int>(WheelControlType::Lights)];
+		if (confTag == "LOOK_BACK"			) return WheelButton[static_cast<int>(WheelControlType::LookBack)];
+		if (confTag == "LOOK_LEFT"			) return WheelButton[static_cast<int>(WheelControlType::LookLeft)];
+		if (confTag == "LOOK_RIGHT"			) return WheelButton[static_cast<int>(WheelControlType::LookRight)];
+		if (confTag == "CHANGE_CAMERA"		) return WheelButton[static_cast<int>(WheelControlType::Camera)];
+		if (confTag == "RADIO_NEXT"			) return WheelButton[static_cast<int>(WheelControlType::RadioNext)];
+		if (confTag == "RADIO_PREVIOUS"		) return WheelButton[static_cast<int>(WheelControlType::RadioPrev)];
+		if (confTag == "INDICATOR_LEFT"		) return WheelButton[static_cast<int>(WheelControlType::IndicatorLeft)];
+		if (confTag == "INDICATOR_RIGHT"	) return WheelButton[static_cast<int>(WheelControlType::IndicatorRight)];
+		if (confTag == "INDICATOR_HAZARD"	) return WheelButton[static_cast<int>(WheelControlType::IndicatorHazard)];
+
+		return -1;
+	}
+
+
 private:
 	long long pressTime = 0;
 	long long releaseTime = 0;

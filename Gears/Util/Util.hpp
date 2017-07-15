@@ -32,6 +32,7 @@ const Color transparentGray = { 75, 75, 75, 75 };
 // Natives called
 void showText(float x, float y, float scale, std::string text, int font = 0, const Color &rgba = solidWhite, bool outline = false);
 void showText(float x, float y, float scale, const char* text, int font = 0, const Color &rgba = solidWhite, bool outline = false);
+void showNotification(std::string message, int *prevNotification = nullptr);
 void showNotification(const char* message, int *prevNotification = nullptr);
 void showSubtitle(std::string message, int duration = 2500);
 
@@ -81,3 +82,7 @@ void DisableActionControlsTick();
 std::string PrettyNameFromHash(Hash hash);
 
 bool FileExists(const std::string& name);
+
+enum STR2INT_ERROR { STR2INT_SUCCESS, STR2INT_OVERFLOW, STR2INT_UNDERFLOW, STR2INT_INCONVERTIBLE };
+
+STR2INT_ERROR str2int(int &i, char const *s, int base = 0);

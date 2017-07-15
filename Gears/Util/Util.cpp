@@ -20,6 +20,10 @@ void showText(float x, float y, float scale, const char* text, int font, const C
 	UI::END_TEXT_COMMAND_DISPLAY_TEXT(x, y);
 }
 
+void showNotification(std::string message, int *prevNotification) {
+	showNotification(message.c_str(), prevNotification);
+}
+
 void showNotification(const char* message, int *prevNotification) {
 	if (prevNotification != nullptr && *prevNotification != 0) {
 		UI::_REMOVE_NOTIFICATION(*prevNotification);
@@ -149,4 +153,22 @@ std::string PrettyNameFromHash(Hash hash) {
 bool FileExists(const std::string& name) {
 	struct stat buffer;
 	return (stat(name.c_str(), &buffer) == 0);
+}
+
+STR2INT_ERROR str2int(int &i, char const *s, int base) {
+	char *end;
+	long  l;
+	errno = 0;
+	l = strtol(s, &end, base);
+	if ((errno == ERANGE && l == LONG_MAX) || l > INT_MAX) {
+		return STR2INT_OVERFLOW;
+	}
+	if ((errno == ERANGE && l == LONG_MIN) || l < INT_MIN) {
+		return STR2INT_UNDERFLOW;
+	}
+	if (*s == '\0' || *end != '\0') {
+		return STR2INT_INCONVERTIBLE;
+	}
+	i = l;
+	return STR2INT_SUCCESS;
 }
