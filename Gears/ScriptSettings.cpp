@@ -164,8 +164,6 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 	settingsWheel.SetBoolValue("OPTIONS", "InvertThrottle", scriptControl->InvertThrottle);
 	settingsWheel.SetBoolValue("OPTIONS", "InvertBrake", scriptControl->InvertBrake);
 	settingsWheel.SetBoolValue("OPTIONS", "InvertClutch", scriptControl->InvertClutch);
-	settingsWheel.SetDoubleValue("OPTIONS", "AntiDeadzoneThrottle", scriptControl->ADZThrottle);
-	settingsWheel.SetDoubleValue("OPTIONS", "AntiDeadzoneBrake", scriptControl->ADZBrake);
 
 	// [FORCE_FEEDBACK]
 	settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Enable", EnableFFB);
@@ -182,6 +180,12 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 	settingsWheel.SetDoubleValue("STEER", "SteerAngleBike",SteerAngleBike);
 	settingsWheel.SetDoubleValue("STEER", "SteerAngleAlt", SteerAngleAlt );
 	settingsWheel.SetDoubleValue("STEER", "GameSteerMult", GameSteerMult );
+
+	// [THROTTLE]
+	settingsWheel.SetDoubleValue("THROTTLE", "ANTIDEADZONE", scriptControl->ADZThrottle);
+
+	// [BRAKES]
+	settingsWheel.SetDoubleValue("BRAKES", "ANTIDEADZONE", scriptControl->ADZBrake);
 
 	settingsWheel.SaveFile(settingsWheelFile.c_str());
 }
