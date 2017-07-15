@@ -40,6 +40,7 @@ void ScriptSettings::SaveGeneral() const {
 	settingsGeneral.SetBoolValue("OPTIONS", "SimpleBike", SimpleBike);
 	settingsGeneral.SetBoolValue("OPTIONS", "EngineDamage", EngDamage);
 	settingsGeneral.SetBoolValue("OPTIONS", "EngineStalling", EngStall);
+	settingsGeneral.SetBoolValue("OPTIONS", "EngineStallingS", EngStallS);
 	settingsGeneral.SetBoolValue("OPTIONS", "EngineBraking", EngBrake);
 	settingsGeneral.SetBoolValue("OPTIONS", "ClutchCatching", ClutchCatching);
 	settingsGeneral.SetBoolValue("OPTIONS", "ClutchShiftingH", ClutchShiftingH);
@@ -390,9 +391,6 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	scriptControl->InvertBrake =	settingsWheel.GetBoolValue("OPTIONS", "InvertBrake", false);
 	scriptControl->InvertClutch =	settingsWheel.GetBoolValue("OPTIONS", "InvertClutch", false);
 
-	scriptControl->ADZThrottle = settingsWheel.GetDoubleValue("OPTIONS", "AntiDeadzoneThrottle", 0.25);
-	scriptControl->ADZBrake = settingsWheel.GetDoubleValue("OPTIONS", "AntiDeadzoneBrake", 0.25);
-
 	// [FORCE_FEEDBACK]
 	EnableFFB = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Enable", true);
 	FFGlobalMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "GlobalMult", 1.0);
@@ -485,6 +483,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 		settingsWheel.GetValue("THROTTLE", "AXLE", "");
 	scriptControl->ThrottleUp = settingsWheel.GetLongValue("THROTTLE", "MIN", -1);
 	scriptControl->ThrottleDown = settingsWheel.GetLongValue("THROTTLE", "MAX", -1);
+	scriptControl->ADZThrottle = settingsWheel.GetDoubleValue("THROTTLE", "ANTIDEADZONE", 0.25);
 
 	// [BRAKES]
 	scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Brake)] =
@@ -493,6 +492,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 		settingsWheel.GetValue("BRAKES", "AXLE", "");
 	scriptControl->BrakeUp = settingsWheel.GetLongValue("BRAKES", "MIN", -1);
 	scriptControl->BrakeDown = settingsWheel.GetLongValue("BRAKES", "MAX", -1);
+	scriptControl->ADZBrake = settingsWheel.GetDoubleValue("BRAKES", "ANTIDEADZONE", 0.25);
 
 	// [CLUTCH]
 	scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] =

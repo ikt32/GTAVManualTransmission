@@ -2,11 +2,11 @@
 
 ## 4.3.7
 Config changes:
-* Menu offsets changed again (sorry!) for different resolutions and safe space support!
+* Menu position changed again (sorry!) for different resolutions and safe space support!
 * For the rest of the files, no incompatible changes. Just additions.
 
 Additions:
-* Add throttle, brake anti-deadzone 
+* Add throttle and brake anti-deadzone 
 * Add steering wheel and pedal input HUD
 * Separate stalling for H-patt. shift and seq. shift
 
