@@ -49,9 +49,9 @@ uint16_t VehicleExtensions::GetGearCurr(Vehicle handle) {
 void VehicleExtensions::SetGearCurr(Vehicle handle, uint16_t value) {
 	auto address = GetAddress(handle);
 
-	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x7A0 : 0x790);
-	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x7C0 : offset);
-	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x7E0 : offset);
+	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x7A2 : 0x792);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x7C2 : offset);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x7E2 : offset);
 	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x7F2 : offset);
 
 	*reinterpret_cast<uint32_t *>(address + offset) = value;
@@ -71,10 +71,10 @@ uint16_t VehicleExtensions::GetGearNext(Vehicle handle) {
 void VehicleExtensions::SetGearNext(Vehicle handle, uint16_t value) {
 	auto address = GetAddress(handle);
 
-	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x7A2 : 0x792);
-	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x7C2 : offset);
-	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x7E2 : offset);
-	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x7F2 : offset);
+	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x7A0 : 0x790);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x7C0 : offset);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x7E0 : offset);
+	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x7F0 : offset);
 
 	*reinterpret_cast<uint32_t *>(address + offset) = value;
 }
