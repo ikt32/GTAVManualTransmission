@@ -54,7 +54,7 @@ void VehicleExtensions::SetGearCurr(Vehicle handle, uint16_t value) {
 	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x7E2 : offset);
 	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x7F2 : offset);
 
-	*reinterpret_cast<uint32_t *>(address + offset) = value;
+	*reinterpret_cast<uint16_t *>(address + offset) = value;
 }
 
 uint16_t VehicleExtensions::GetGearNext(Vehicle handle) {
@@ -76,7 +76,7 @@ void VehicleExtensions::SetGearNext(Vehicle handle, uint16_t value) {
 	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x7E0 : offset);
 	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x7F0 : offset);
 
-	*reinterpret_cast<uint32_t *>(address + offset) = value;
+	*reinterpret_cast<uint16_t *>(address + offset) = value;
 }
 
 uint32_t VehicleExtensions::GetTopGear(Vehicle handle) {
