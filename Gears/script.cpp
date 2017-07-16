@@ -1255,8 +1255,12 @@ void handleRPM() {
 
 	if (vehData.CurrGear > 0 &&
 		(vehData.CurrGear < vehData.NextGear && vehData.Speed > 2.0f)) {
-		ext.SetThrottle(vehicle, 1.0f);
+		//ext.SetClutch(vehicle, 1.0f);
+		//ext.SetThrottle(vehicle, 1.0f);
 		fakeRev();
+		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
+		// TODO: Remove this in release
+		showText(0.4, 0.1, 1.0, "REV LIM");
 	}
 
 	// Emulate previous "shift down wanted" behavior.
