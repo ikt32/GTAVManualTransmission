@@ -1245,7 +1245,7 @@ void fakeRev() {
 }
 
 void handleRPM() {
-	float neutralClutchVal = -1.0f;
+	float neutralClutchVal = -5.0f;
 	float finalClutch = 0.0f;
 	bool skip = false;
 
