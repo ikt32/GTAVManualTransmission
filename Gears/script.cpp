@@ -1246,6 +1246,7 @@ void fakeRev() {
 }
 
 void handleRPM() {
+	float neutralClutchVal = -1.0f;
 	float finalClutch = 0.0f;
 	bool skip = false;
 
@@ -1286,7 +1287,7 @@ void handleRPM() {
 			ext.SetThrottle(vehicle, vehData.ControlAccelerate);
 			float tempVal = (1.0f - controls.ClutchVal) * 0.4f + 0.6f;
 			if (controls.ClutchVal > 0.95) {
-				tempVal = -0.5f;
+				tempVal = neutralClutchVal;
 			}
 			finalClutch = tempVal;
 			skip = true;
@@ -1309,7 +1310,7 @@ void handleRPM() {
 			+Tuning the transmission messes this up, so just use -0.5f.
 			+Still messes up the T20 @ Max Transmission upgrade.
 		*/
-		finalClutch = -0.5f;
+		finalClutch = neutralClutchVal;
 	}
 	else {
 		if (!skip) {
