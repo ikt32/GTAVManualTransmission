@@ -79,7 +79,7 @@ void VehicleExtensions::SetGearNext(Vehicle handle, uint16_t value) {
 	*reinterpret_cast<uint16_t *>(address + offset) = value;
 }
 
-uint32_t VehicleExtensions::GetTopGear(Vehicle handle) {
+unsigned char VehicleExtensions::GetTopGear(Vehicle handle) {
 	auto address = GetAddress(handle);
 
 	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x7A6 : 0x796);
