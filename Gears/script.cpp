@@ -205,8 +205,6 @@ void update() {
 			ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f;
 		playWheelEffects(settings, vehData, airborne);
 	}	
-
-	vehData.LockGear = (0xFFFF0000 & vehData.LockGears) >> 16;
 	
 	if (settings.CrossScript) {
 		crossScriptComms();
@@ -351,7 +349,8 @@ void update() {
 
 	// Finally, update memory each loop
 	handleRPM();
-	ext.SetGears(vehicle, vehData.LockGears);
+	ext.SetGearCurr(vehicle, vehData.LockGear);
+	ext.SetGearNext(vehicle, vehData.LockGear);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -660,7 +659,7 @@ void reInit() {
 	}
 
 	logger.Write("Settings read");
-	vehData.LockGears = 0x00010001;
+	vehData.LockGear = 1;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
 	initWheel();
 
@@ -816,7 +815,7 @@ void shiftTo(int gear, bool autoClutch) {
 		controls.ClutchVal = 1.0f;
 		ext.SetThrottle(vehicle, 0.0f);
 	}
-	vehData.LockGears = gear | (gear << 16);
+	vehData.LockGear = gear;
 	vehData.LockTruck = false;
 	vehData.PrevGear = vehData.CurrGear;
 	if (vehData.IsTruck && vehData.Rpm < 0.9) {
@@ -1603,7 +1602,7 @@ void functionAutoReverse() {
 		!CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) &&
 	    vehData.Velocity > -1.0f &&
 	    vehData.CurrGear == 0) {
-		vehData.LockGears = 0x00010001;
+		vehData.LockGear = 1;
 	}
 
 	// Reverse
@@ -1612,7 +1611,7 @@ void functionAutoReverse() {
 	    vehData.Velocity < 1.0f &&
 	    vehData.CurrGear > 0) {
 		vehData.SimulatedNeutral = false;
-		vehData.LockGears = 0x00000000;
+		vehData.LockGear = 0;
 	}
 }
 
@@ -2099,7 +2098,7 @@ void functionAutoLookback() {
 
 void functionAutoGear1() {
 	if (vehData.Throttle < 0.1f && vehData.Speed < 0.1f && vehData.CurrGear > 1) {
-		vehData.LockGears = 0x00010001;
+		vehData.LockGear = 1;
 	}
 }
 

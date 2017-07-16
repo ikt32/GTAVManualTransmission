@@ -20,7 +20,6 @@ void VehicleData::Clear() {
 	LockGear = 1;
 	CurrGear = 1;
 	NextGear = 1;
-	LockGears = 0x00010001;
 	PrevGear = 1;
 	LockSpeed = 0.0f;
 	LockTruck = false;

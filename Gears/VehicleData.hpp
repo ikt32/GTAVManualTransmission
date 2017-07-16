@@ -58,7 +58,6 @@ public:
 	uint8_t LockGear = 0;
 	uint32_t CurrGear = 0;
 	uint32_t NextGear = 0;
-	uint32_t LockGears = 0x00010001;
 	uint8_t PrevGear = 0;
 	float LockSpeed = 0;
 	bool LockTruck = false;
