@@ -17,19 +17,26 @@ namespace MemoryPatcher {
 	uintptr_t PatchGear7A0();
 	void RestoreGear7A0(uintptr_t address);
 
+	// Clutch disengage @ High speed rev limiting
+	uintptr_t PatchClutchRevLimit();
+	void RestoreClutchRevLimit(uintptr_t address);
+
 	// Does the same as Custom Steering by InfamousSabre
 	// Kept for emergency/backup purposes in the case InfamousSabre
 	// stops support earlier than I do. (not trying to compete here!)
 	uintptr_t PatchSteering();
 	void RestoreSteering(uintptr_t address, byte *origInstr, int origInstrSz);
 
-	int TotalToPatch = 2;
+	int NumGearboxPatches = 2;
 	int TotalPatched = 0;
 
 	bool SteeringPatched = false;
 
 	uintptr_t clutchLowAddr = NULL;
 	uintptr_t clutchLowTemp = NULL;
+
+	uintptr_t clutchRevLimitAddr = NULL;
+	uintptr_t clutchRevLimitTemp = NULL;
 
 	uintptr_t gear7A0Addr = NULL;
 	uintptr_t gear7A0Temp = NULL;
@@ -51,7 +58,7 @@ namespace MemoryPatcher {
 
 		logger.Write("GEARBOX: Patching");
 
-		if (TotalToPatch == TotalPatched) {
+		if (NumGearboxPatches == TotalPatched) {
 			logger.Write("GEARBOX: Already patched");
 			return true;
 		}
@@ -69,6 +76,19 @@ namespace MemoryPatcher {
 			logger.Write("GEARBOX: clutchLow patch failed");
 		}
 
+		//clutchRevLimitTemp = PatchClutchRevLimit();
+
+		//if (clutchRevLimitTemp) {
+		//	clutchRevLimitAddr = clutchRevLimitTemp;
+		//	TotalPatched++;
+		//	std::stringstream hexaddr;
+		//	hexaddr << std::hex << clutchRevLimitAddr;
+		//	logger.Write("GEARBOX: Patched clutchRevLimit @ " + hexaddr.str());
+		//}
+		//else {
+		//	logger.Write("GEARBOX: clutchRevLimit patch failed");
+		//}
+
 		gear7A0Temp = PatchGear7A0();
 
 		if (gear7A0Temp) {
@@ -82,7 +102,7 @@ namespace MemoryPatcher {
 			logger.Write("GEARBOX: gear7A0 patch failed");
 		}
 
-		if (TotalPatched == TotalToPatch) {
+		if (TotalPatched == NumGearboxPatches) {
 			logger.Write("GEARBOX: Patch success");
 			gearTries = 0;
 			return true;
@@ -113,6 +133,15 @@ namespace MemoryPatcher {
 		else {
 			logger.Write("GEARBOX: clutchLow not restored");
 		}
+
+		//if (clutchRevLimitAddr) {
+		//	RestoreClutchRevLimit(clutchRevLimitAddr);
+		//	clutchRevLimitAddr = 0;
+		//	TotalPatched--;
+		//}
+		//else {
+		//	logger.Write("GEARBOX: clutchRevLimit not restored");
+		//}
 
 		if (gear7A0Addr) {
 			RestoreGear7A0(gear7A0Addr);
@@ -211,6 +240,35 @@ namespace MemoryPatcher {
 
 	void RestoreClutchLow(uintptr_t address) {
 		byte instrArr[7] = {0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D};
+		if (address) {
+			memcpy(reinterpret_cast<void*>(address), instrArr, 7);
+		}
+	}
+
+	uintptr_t PatchClutchRevLimit() {
+		// Tested on build 1103
+
+		uintptr_t address;
+		if (clutchRevLimitTemp != NULL)
+			address = clutchRevLimitTemp;
+		else
+			address = mem::FindPattern("\xC7\x43\x40\xCD\xCC\xCC\x3D"
+									   "\x44\x89\x7B\x60"
+									   "\x89\x73\x5C"
+									   "\x66\x89\x13", 
+									   "xxxxxxx"
+									   "xxxx"
+									   "xxx"
+									   "xxx");
+
+		if (address) {
+			memset(reinterpret_cast<void *>(address), 0x90, 7);
+		}
+		return address;
+	}
+
+	void RestoreClutchRevLimit(uintptr_t address) {
+		byte instrArr[7] = { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D };
 		if (address) {
 			memcpy(reinterpret_cast<void*>(address), instrArr, 7);
 		}

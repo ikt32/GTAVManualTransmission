@@ -11,7 +11,7 @@ namespace MemoryPatcher {
 	 * "total" refers to the "package" of patches needed to get the gearbox
 	 * and clutch stuff working.
 	 */
-	extern int TotalToPatch;
+	extern int NumGearboxPatches;
 	extern int TotalPatched;
 
 	/*

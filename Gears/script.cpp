@@ -240,7 +240,7 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 	//                            Patching
 	///////////////////////////////////////////////////////////////////////////
-	if (MemoryPatcher::TotalPatched != MemoryPatcher::TotalToPatch && settings.EnableManual) {
+	if (MemoryPatcher::TotalPatched != MemoryPatcher::NumGearboxPatches && settings.EnableManual) {
 		MemoryPatcher::PatchInstructions();
 	}
 
@@ -670,7 +670,7 @@ void reInit() {
 void reset() {
 	resetSteeringMultiplier();
 	gearRattle.Stop();
-	if (MemoryPatcher::TotalPatched == MemoryPatcher::TotalToPatch) {
+	if (MemoryPatcher::TotalPatched == MemoryPatcher::NumGearboxPatches) {
 		MemoryPatcher::RestoreInstructions();
 	}
 	if (MemoryPatcher::SteeringPatched) {
