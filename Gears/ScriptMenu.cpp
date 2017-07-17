@@ -180,8 +180,8 @@ void update_menu() {
 		}
 
 		menu.MenuOption("Mod options", "optionsmenu", { "You can tweak and fine-tune gearbox simulation here." });
-		menu.MenuOption("Controls", "controlsmenu", { "Configure the keyboard and controller inputs." });
-		menu.MenuOption("Wheel Options", "wheelmenu", { "Set up your steering wheel." });
+		menu.MenuOption("Keyboard/Controller", "controlsmenu", { "Configure the keyboard and controller inputs." });
+		menu.MenuOption("Steering Wheel", "wheelmenu", { "Set up your steering wheel." });
 		menu.MenuOption("HUD Options", "hudmenu", { "Toggle and move HUD elements. Choose between imperial or metric speeds." });
 		menu.MenuOption("Debug", "debugmenu", { "Show technical details and options." });
 
@@ -726,9 +726,9 @@ void update_menu() {
 		menu.BoolOption("Display car wheel info", settings.DisplayWheelInfo, 
 		{ "Show per-wheel debug info with off-ground detection, lockup detection and suspension info." });
 		menu.BoolOption("Log car address", settings.LogCar, 
-		{ "Prints the current vehicle address","to Gears.log." });
+		{ "Prints the current vehicle address to Gears.log." });
 		menu.BoolOption("Expose script variables", settings.CrossScript, 
-		{ "Shares data like gear, shifting","indicator and Neutral with other mods." });
+		{ "Shares data like gear, shifting indicator and Neutral with other mods." });
 	}
 
 	menu.EndMenu();
