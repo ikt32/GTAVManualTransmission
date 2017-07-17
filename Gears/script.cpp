@@ -584,7 +584,7 @@ void showDebugInfo3D(Vector3 location, std::vector<std::string> textLines, Color
 void drawSteeringWheelInfo() {
 	// Steering Wheel
 	float rotation = settings.SteerAngleMax * (controls.SteerVal - 0.5f);
-	if (controls.PrevInput != ScriptControls::Wheel) rotation = 90.0f * CONTROLS::GET_CONTROL_NORMAL(0, ControlVehicleMoveLeftRight);
+	if (controls.PrevInput != ScriptControls::Wheel) rotation = 90.0f * -ext.GetSteeringInputAngle(vehicle);
 
 	drawTexture(textureWheelId, 0, -9998, 100, 
 				settings.SteeringWheelTextureSz, settings.SteeringWheelTextureSz, 
@@ -605,7 +605,7 @@ void drawSteeringWheelInfo() {
 
 // To expose some variables to other scripts
 void crossScriptComms() {
-	
+	// TODO: Doesn't work lmao
 	// FiveM "support"
 	if (!DECORATOR::DECOR_EXIST_ON(vehicle, "doe_elk") ||
 		!DECORATOR::DECOR_EXIST_ON(vehicle, "hunt_score") ||
