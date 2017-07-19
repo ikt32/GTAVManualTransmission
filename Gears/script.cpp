@@ -813,7 +813,8 @@ void cycleShiftMode() {
 void shiftTo(int gear, bool autoClutch) {
 	if (autoClutch) {
 		controls.ClutchVal = 1.0f;
-		ext.SetThrottle(vehicle, 0.0f);
+		//ext.SetThrottle(vehicle, 0.0f);
+		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
 	}
 	vehData.LockGear = gear;
 	vehData.LockTruck = false;
@@ -1255,19 +1256,20 @@ void handleRPM() {
 
 	if (vehData.CurrGear > 0 &&
 		(vehData.CurrGear < vehData.NextGear && vehData.Speed > 2.0f)) {
-		//ext.SetClutch(vehicle, 1.0f);
-		//ext.SetThrottle(vehicle, 1.0f);
+		ext.SetThrottle(vehicle, 1.0f);
 		fakeRev();
 		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
-		// TODO: Remove this in release
-		showText(0.4, 0.1, 1.0, "REV LIM");
+		float counterForce = 0.25f*-(static_cast<float>(vehData.TopGear) - static_cast<float>(vehData.CurrGear))/static_cast<float>(vehData.TopGear);
+		ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, counterForce, 0.0f, true, true, true, true);
+		//showText(0.4, 0.1, 1.0, "REV LIM");
+		//showText(0.4, 0.15, 1.0, "CF: " + std::to_string(counterForce));
 	}
 
 	// Emulate previous "shift down wanted" behavior.
-	if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
+	//if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
 		// Don't artificially lower this any more
 		//VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, vehData.Rpm * 2.5f);
-	}
+	//}
 
 	/*
 		Game doesn't rev on disengaged clutch in any gear but 1
