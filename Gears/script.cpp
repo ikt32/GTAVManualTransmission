@@ -21,6 +21,7 @@
 #include "Util/Paths.h"
 
 #include "menu.h"
+#include "Memory/NativeMemory.hpp"
 
 std::string textureWheelFile;
 int textureWheelId;
@@ -605,15 +606,6 @@ void drawSteeringWheelInfo() {
 
 // To expose some variables to other scripts
 void crossScriptComms() {
-	// TODO: Doesn't work lmao
-	// FiveM "support"
-	if (!DECORATOR::DECOR_EXIST_ON(vehicle, "doe_elk") ||
-		!DECORATOR::DECOR_EXIST_ON(vehicle, "hunt_score") ||
-		!DECORATOR::DECOR_EXIST_ON(vehicle, "hunt_weapon") ||
-		!DECORATOR::DECOR_EXIST_ON(vehicle, "hunt_chal_weapon")) {
-		return;
-	}
-
 	// Current gear
 	DECORATOR::DECOR_SET_INT(vehicle, "doe_elk", vehData.CurrGear);
 
@@ -2112,21 +2104,55 @@ void functionAutoGear1() {
 //                              Script entry
 ///////////////////////////////////////////////////////////////////////////////
 
+enum eDecorType
+{
+	DECOR_TYPE_FLOAT = 1,
+	DECOR_TYPE_BOOL,
+	DECOR_TYPE_INT,
+	DECOR_TYPE_UNK,
+	DECOR_TYPE_TIME
+};
+
 // @Unknown Modder
-//BYTE* g_bIsDecorRegisterLockedPtr = nullptr;
-//void setupGlobals() {
-//	auto addr = mem::FindPattern("\x40\x53\x48\x83\xEC\x20\x80\x3D\x00\x00\x00\x00\x00\x8B\xDA\x75\x29",
-//								 "xxxxxxxx????xxxxx");
-//
-//	if (addr) {
-//		g_bIsDecorRegisterLockedPtr = (BYTE*)(addr + *(int*)(addr + 8) + 13);
-//	}
-//
-//	*g_bIsDecorRegisterLockedPtr = 0;
-//}
+BYTE* g_bIsDecorRegisterLockedPtr = nullptr;
+bool setupGlobals() {
+	auto addr = mem::FindPattern("\x40\x53\x48\x83\xEC\x20\x80\x3D\x00\x00\x00\x00\x00\x8B\xDA\x75\x29",
+								 "xxxxxxxx????xxxxx");
+	if (!addr)
+		return false;
+
+	g_bIsDecorRegisterLockedPtr = (BYTE*)(addr + *(int*)(addr + 8) + 13);
+	*g_bIsDecorRegisterLockedPtr = 0;
+
+	// Consider changing this to proper names of our own.
+	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("doe_elk", DECOR_TYPE_INT)) {
+		DECORATOR::DECOR_REGISTER("doe_elk", DECOR_TYPE_INT);
+		logger.Write("DECOR: Registered \"doe_elk\" as DECOR_TYPE_INT");
+	}
+	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("hunt_score", DECOR_TYPE_INT)) {
+		DECORATOR::DECOR_REGISTER("hunt_score", DECOR_TYPE_INT);
+		logger.Write("DECOR: Registered \"hunt_score\" as DECOR_TYPE_INT");
+	}
+	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("hunt_weapon", DECOR_TYPE_INT)) {
+		DECORATOR::DECOR_REGISTER("hunt_weapon", DECOR_TYPE_INT);
+		logger.Write("DECOR: Registered \"hunt_weapon\" as DECOR_TYPE_INT");
+	}
+	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("hunt_chal_weapon", DECOR_TYPE_INT)) {
+		DECORATOR::DECOR_REGISTER("hunt_chal_weapon", DECOR_TYPE_INT);
+		logger.Write("DECOR: Registered \"hunt_chal_weapon\" as DECOR_TYPE_INT");
+	}
+
+	*g_bIsDecorRegisterLockedPtr = 1;
+	return true;
+}
 
 void main() {
 	logger.Write("Script started");
+
+	logger.Write("Setting up globals");
+	if (!setupGlobals()) {
+		logger.Write("Global setup failed!");
+	}
 
 	if (!controls.WheelControl.PreInit()) {
 		logger.Write("DirectInput failed to initialize");
