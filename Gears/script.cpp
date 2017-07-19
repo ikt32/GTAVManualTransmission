@@ -209,6 +209,7 @@ void update() {
 	
 	if (settings.CrossScript) {
 		crossScriptComms();
+		crossScriptUpdated();
 	}
 
 	if (!settings.EnableManual) {
@@ -602,6 +603,40 @@ void drawSteeringWheelInfo() {
 	GRAPHICS::DRAW_RECT(settings.PedalInfoX - 1.0f*barWidth, barYBase - controls.ThrottleVal*settings.PedalInfoH*0.5f, barWidth, controls.ThrottleVal*settings.PedalInfoH, 0, 255, 0, 255);
 	GRAPHICS::DRAW_RECT(settings.PedalInfoX + 0.0f*barWidth, barYBase - controls.BrakeVal*settings.PedalInfoH*0.5f, barWidth, controls.BrakeVal*settings.PedalInfoH, 255, 0, 0, 255);
 	GRAPHICS::DRAW_RECT(settings.PedalInfoX + 1.0f*barWidth, barYBase - controls.ClutchValRaw*settings.PedalInfoH*0.5f, barWidth, controls.ClutchVal*settings.PedalInfoH, 0, 0, 255, 255);
+}
+
+void crossScriptUpdated() {
+	// Current gear
+	DECORATOR::DECOR_SET_INT(vehicle, "mt_gear", vehData.CurrGear);
+
+	// Shift indicator: 0 = nothing, 1 = Shift up, 2 = Shift down
+	if (vehData.CurrGear < vehData.NextGear || vehData.TruckShiftUp) {
+		DECORATOR::DECOR_SET_INT(vehicle, "mt_shift_indicator", 1);
+	}
+	else if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
+		DECORATOR::DECOR_SET_INT(vehicle, "mt_shift_indicator", 2);
+	}
+	else if (vehData.CurrGear == vehData.NextGear) {
+		DECORATOR::DECOR_SET_INT(vehicle, "mt_shift_indicator", 0);
+	}
+
+	// Simulated Neutral
+	if (vehData.SimulatedNeutral && settings.EnableManual) {
+		DECORATOR::DECOR_SET_INT(vehicle, "mt_neutral", 1);
+	}
+	else {
+		DECORATOR::DECOR_SET_INT(vehicle, "mt_neutral", 0);
+	}
+
+	// External shifting
+	int currExtShift = DECORATOR::DECOR_GET_INT(vehicle, "mt_set_shiftmode");
+	if (prevExtShift != currExtShift && currExtShift > 0) {
+		// 1 Seq, 2 H, 3 Auto
+		setShiftMode(currExtShift - 1);
+	}
+	prevExtShift = currExtShift;
+
+	DECORATOR::DECOR_SET_INT(vehicle, "mt_get_shiftmode", settings.ShiftMode + 1);
 }
 
 // To expose some variables to other scripts
@@ -2124,7 +2159,7 @@ bool setupGlobals() {
 	g_bIsDecorRegisterLockedPtr = (BYTE*)(addr + *(int*)(addr + 8) + 13);
 	*g_bIsDecorRegisterLockedPtr = 0;
 
-	// Consider changing this to proper names of our own.
+	// Legacy support until I get LeFix / XMOD to update
 	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("doe_elk", DECOR_TYPE_INT)) {
 		DECORATOR::DECOR_REGISTER("doe_elk", DECOR_TYPE_INT);
 		logger.Write("DECOR: Registered \"doe_elk\" as DECOR_TYPE_INT");
@@ -2141,6 +2176,29 @@ bool setupGlobals() {
 		DECORATOR::DECOR_REGISTER("hunt_chal_weapon", DECOR_TYPE_INT);
 		logger.Write("DECOR: Registered \"hunt_chal_weapon\" as DECOR_TYPE_INT");
 	}
+
+	// New decorators! :)
+	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("mt_gear", DECOR_TYPE_INT)) {
+		DECORATOR::DECOR_REGISTER("mt_gear", DECOR_TYPE_INT);
+		logger.Write("DECOR: Registered \"mt_gear\" as DECOR_TYPE_INT");
+	}
+	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("mt_shift_indicator", DECOR_TYPE_INT)) {
+		DECORATOR::DECOR_REGISTER("mt_shift_indicator", DECOR_TYPE_INT);
+		logger.Write("DECOR: Registered \"mt_shift_indicator\" as DECOR_TYPE_INT");
+	}
+	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("mt_neutral", DECOR_TYPE_INT)) {
+		DECORATOR::DECOR_REGISTER("mt_neutral", DECOR_TYPE_INT);
+		logger.Write("DECOR: Registered \"mt_neutral\" as DECOR_TYPE_INT");
+	}
+	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("mt_set_shiftmode", DECOR_TYPE_INT)) {
+		DECORATOR::DECOR_REGISTER("mt_set_shiftmode", DECOR_TYPE_INT);
+		logger.Write("DECOR: Registered \"mt_set_shiftmode\" as DECOR_TYPE_INT");
+	}
+	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("mt_get_shiftmode", DECOR_TYPE_INT)) {
+		DECORATOR::DECOR_REGISTER("mt_get_shiftmode", DECOR_TYPE_INT);
+		logger.Write("DECOR: Registered \"mt_get_shiftmode\" as DECOR_TYPE_INT");
+	}
+
 
 	*g_bIsDecorRegisterLockedPtr = 1;
 	return true;
@@ -2170,7 +2228,6 @@ void main() {
 		logger.Write("ERROR: " + textureWheelFile + " does not exist.");
 		textureWheelId = -1;
 	}
-
 
 	settings.SetFiles(settingsGeneralFile, settingsWheelFile);
 

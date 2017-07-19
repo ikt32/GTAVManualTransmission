@@ -1,5 +1,18 @@
 # Changelog
 
+## 4.3.8
+Config changes:
+* None afaik
+
+Other changes:
+* Re-do rev limiter
+* Fix clutch engaging when revving some modded cars
+* Use values from game controls for steering wheel rotation picture
+* Register decorators to prevent crashes  (Thanks to Unknown Modder!)
+
+Decorator changes:
+* Change decorator names to be mod-specific
+
 ## 4.3.7
 Config changes:
 * Menu position changed again (sorry!) for different resolutions and safe space support!

@@ -33,33 +33,41 @@ Clone this repository to the same folder ScriptHookV_SDK was extracted so you ha
 Clone my [GTAVMenuBase](https://github.com/E66666666/GTAVMenuBase) to the same folder you're gonna clone this to.
 
 ## Mod support
+**NOTE: Starting with version v4.3.8, new decorators should be used. The old ones
+will be removed with the next minor version number bump!**
+
 You can read decorators to get some info about this mod.
 
-Example: ```DECORATOR::DECOR_GET_INT(vehicle, "hunt_score");``` gets the current shift up/down status. Currently this mod exposes 2 variables which can be used in other scripts.
+Example: ```DECORATOR::DECOR_GET_INT(vehicle, "mt_shift_indicator");``` gets the current shift up/down status. Currently this mod exposes 2 variables which can be used in other scripts.
 
-Current gear: `doe_elk`
+Current gear: `mt_gear`
 * `0`: Reverse
 * `1 through 7`: Matching gear
 
-Speedometers shift up/down indicator: `hunt_score`
+Speedometers shift up/down indicator: `mt_shift_indicator`
 * `0` - Nothing
 * `1` - Shift up
 * `2` - Shift down
 
-Speedometers Neutral gear:
-* `hunt_weapon`: `0` - Not in neutral
-* `hunt_weapon`: `1` - In neutral
+Speedometers Neutral gear: `mt_neutral`
+* `0` - In gear
+* `1` - Neutral
 
 Please note that the neutral gear is fake - it's achieved by having the clutch disengaged fully.
 
-Since version `4.0.2` it's possible to set shifting mode externally.
-
-* `hunt_chal_weapon`: `0` - No change
-* `hunt_chal_weapon`: `1` - Sequential
-* `hunt_chal_weapon`: `2` - H-pattern
-* `hunt_chal_weapon`: `3` - Automatic
+Set shift mode: `mt_set_shiftmode`
+* `0` - No change
+* `1` - Sequential
+* `2` - H-pattern
+* `3` - Automatic
 
 ### FiveM Update
-From version 4.2.0 beta 3 onwards, FiveM is supported! An [update](https://forum.fivem.net/t/fivem-update-march-19th-2017/8703) fixed some issues
-this mod had with FiveM. On top of that, beta 3 has more robust patching for GTA V's 
-stability control.
+From version 4.2.0 beta 3 onwards, FiveM is sort of supported! 
+An [update](https://forum.fivem.net/t/fivem-update-march-19th-2017/8703) fixed 
+some issues this mod had with FiveM. On top of that, beta 3 has more robust 
+patching for GTA V's stability control.
+
+#### FiveM 1.0.1103.2
+FiveM updated to a recent GTA V build, so the problems that arised from using
+an old version are considered gone. From version v4.3.8 onwards, the decor
+setting should also work.
