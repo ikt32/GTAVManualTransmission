@@ -1,3 +1,12 @@
+/*
+ * "Legacy" is a bad name, initially chosen because native controls were
+ * replaced with Xinput. Turns out it's still desired, so it's back.
+ * This class just mirrors XboxController except it uses natives.
+ * 
+ * No plans to make a DirectInput controller thing though as I 
+ * already have the wheel thing.
+ */
+
 #pragma once
 #include <array>
 #include "inc/enums.h"
@@ -5,6 +14,12 @@
 class LegacyController
 {
 public:
+	enum class TapState {
+		ButtonUp,
+		ButtonDown,
+		Tapped
+	};
+
 	enum GameButtons {
 		ControlFrontendDown		 ,
 		ControlFrontendUp		 ,
@@ -68,6 +83,8 @@ public:
 private:
 	std::array<__int64, SIZEOF_GameButtons> pressTime;
 	std::array<__int64, SIZEOF_GameButtons> releaseTime;
+	std::array<__int64, SIZEOF_GameButtons> tapPressTime;
+	std::array<__int64, SIZEOF_GameButtons> tapReleaseTime;
 	std::array<bool, SIZEOF_GameButtons> gameButtonCurr;
 	std::array<bool, SIZEOF_GameButtons> gameButtonPrev;
 
@@ -80,6 +97,7 @@ public:
 	bool IsButtonJustReleased(GameButtons gameButton);
 	bool WasButtonHeldForMs(GameButtons gameButton, int milliseconds);
 	bool WasButtonHeldOverMs(GameButtons gameButton, int millis);
+	TapState WasButtonTapped(GameButtons buttonType, int milliseconds);
 	void UpdateButtonChangeStates();
 
 	float GetAnalogValue(GameButtons gameButton);

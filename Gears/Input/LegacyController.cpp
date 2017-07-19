@@ -69,6 +69,26 @@ bool LegacyController::WasButtonHeldOverMs(GameButtons gameButton, int milliseco
 	return false;
 }
 
+LegacyController::TapState LegacyController::WasButtonTapped(GameButtons buttonType, int milliseconds) {
+	if (IsButtonJustPressed(buttonType)) {
+		tapPressTime[buttonType] = milliseconds_now();
+	}
+	if (IsButtonJustReleased(buttonType)) {
+		tapReleaseTime[buttonType] = milliseconds_now();
+	}
+
+	if ((tapReleaseTime[buttonType] - tapPressTime[buttonType]) > 1 &&
+		(tapReleaseTime[buttonType] - tapPressTime[buttonType]) <= milliseconds) {
+		tapPressTime[buttonType] = 0;
+		tapReleaseTime[buttonType] = 0;
+		return TapState::Tapped;
+	}
+	if ((milliseconds_now() - tapPressTime[buttonType]) <= milliseconds) {
+		return TapState::ButtonDown;
+	}
+	return TapState::ButtonUp;
+}
+
 void LegacyController::UpdateButtonChangeStates() {
 	for (int i = 0; i < SIZEOF_GameButtons; i++) {
 		gameButtonPrev[i] = gameButtonCurr[i];

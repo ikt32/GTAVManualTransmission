@@ -163,6 +163,7 @@ public:
 	bool ButtonHeld(LegacyControlType control);
 	bool ButtonHeldOver(LegacyControlType control, int millis);
 	bool ButtonIn(LegacyControlType control);
+	LegacyController::TapState ButtonTapped(LegacyControlType control);
 #endif
 	bool ButtonJustPressed(WheelControlType control);
 	bool ButtonReleased(WheelControlType control);

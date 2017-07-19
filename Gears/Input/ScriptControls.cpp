@@ -349,6 +349,12 @@ bool ScriptControls::ButtonIn(LegacyControlType control) {
 	return false;
 }
 
+LegacyController::TapState ScriptControls::ButtonTapped(LegacyControlType control) {
+	if (!UseLegacyController) return LegacyController::TapState::ButtonUp;
+	auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
+	return lcontroller.WasButtonTapped(gameButton, 200);
+}
+
 #endif
 /*
  * Wheel section
