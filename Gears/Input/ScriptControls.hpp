@@ -2,6 +2,7 @@
 
 #include "XboxController.hpp"
 #include "WheelDirectInput.hpp"
+#include <map>
 #ifdef GAME_BUILD
 #include "LegacyController.h"
 #endif
@@ -102,6 +103,34 @@ public:
 		Keyboard = 0,
 		Controller = 1,
 		Wheel = 2
+	};
+
+	const std::vector<std::pair<std::string, int>> LegacyControlsMap = {
+		{ "ControlFrontendDown",			187 },
+		{ "ControlFrontendUp",			188 },
+		{ "ControlFrontendLeft",			189 },
+		{ "ControlFrontendRight",		190 },
+		{ "ControlFrontendRdown",		191 },
+		{ "ControlFrontendRup",			192 },
+		{ "ControlFrontendRleft",		193 },
+		{ "ControlFrontendRright",		194 },
+		{ "ControlFrontendAxisX",		195 },
+		{ "ControlFrontendAxisY",		196 },
+		{ "ControlFrontendRightAxisX",	197 },
+		{ "ControlFrontendRightAxisY",	198 },
+		{ "ControlFrontendPause",		199 },
+		{ "ControlFrontendAccept",		201 },
+		{ "ControlFrontendCancel",		202 },
+		{ "ControlFrontendX",			203 },
+		{ "ControlFrontendY",			204 },
+		{ "ControlFrontendLb",			205 },
+		{ "ControlFrontendRb",			206 },
+		{ "ControlFrontendLt",			207 },
+		{ "ControlFrontendRt",			208 },
+		{ "ControlFrontendLs",			209 },
+		{ "ControlFrontendRs",			210 },
+		{ "ControlFrontendDelete",		214 },
+		{ "ControlFrontendSelect",		217 },
 	};
 
 	ScriptControls();
@@ -242,6 +271,28 @@ public:
 		return "UNKNOWN";
 	}
 
+	int ConfTagLController2Value(const std::string &confTag) {
+		if (confTag == "Toggle")		return LegacyControls[static_cast<int>(LegacyControlType::Toggle)];
+		if (confTag == "ToggleShift")	return LegacyControls[static_cast<int>(LegacyControlType::ToggleH)];
+		if (confTag == "ShiftUp")		return LegacyControls[static_cast<int>(LegacyControlType::ShiftUp)];
+		if (confTag == "ShiftDown")		return LegacyControls[static_cast<int>(LegacyControlType::ShiftDown)];
+		if (confTag == "Clutch")		return LegacyControls[static_cast<int>(LegacyControlType::Clutch)];
+		if (confTag == "Engine")		return LegacyControls[static_cast<int>(LegacyControlType::Engine)];
+		if (confTag == "Throttle")		return LegacyControls[static_cast<int>(LegacyControlType::Throttle)];
+		if (confTag == "Brake")			return LegacyControls[static_cast<int>(LegacyControlType::Brake)];
+
+		return -1;
+	}
+
+	std::string NativeControl2Text(int nativeControl) const {
+		for (auto mapItem : LegacyControlsMap) {
+			if (mapItem.second == nativeControl) {
+				return mapItem.first;
+			}
+		}
+		return std::to_string(nativeControl);
+	}
+
 	// Oh ikt, what the HELL are ya doing?
 	int ConfTagWheel2Value(const std::string &confTag) {
 		if (confTag == "TOGGLE_MOD"			) return WheelButton[static_cast<int>(WheelControlType::Toggle)];
@@ -278,6 +329,7 @@ private:
 
 	bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
+
 };
 
 // GUID stuff

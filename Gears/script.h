@@ -152,6 +152,7 @@ void clearWheelToKey();
 void clearHShifter();
 void clearKeyboardKey(std::string button);
 void clearControllerButton(std::string button);
+void clearLControllerButton(std::string button);
 
 bool configAxis(std::string confTag);
 bool configWheelToKey();
@@ -159,6 +160,7 @@ bool configButton(std::string confTag);
 bool configHPattern();
 bool configKeyboardKey(const std::string &confTag);
 bool configControllerButton(const std::string &confTag);
+bool configLControllerButton(const std::string &confTag);
 
 void updateSteeringMultiplier();
 

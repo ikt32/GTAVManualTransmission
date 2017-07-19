@@ -156,6 +156,7 @@ public:
 	void SteeringSaveHShifter(const std::string &confTag, ptrdiff_t index, int button[numGears]);
 	void KeyboardSaveKey(const std::string &confTag, const std::string &key);
 	void ControllerSaveButton(const std::string &confTag, const std::string &button, int btnToBlock);
+	void LControllerSaveButton(const std::string & confTag, int button, int btnToBlock);
 	void SteeringAddWheelToKey(const std::string & cs, ptrdiff_t index, int button, const std::string & key_name);
 	bool SteeringClearWheelToKey(int button);
 

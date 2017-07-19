@@ -282,9 +282,39 @@ void update_menu() {
 		{"Change keyboard control assignments."});
 		
 		menu.BoolOption("Non-Xinput controller", controls.UseLegacyController,
-		{ "If you needed to set up your controller in the pause menu, you should enable this. For now you'll need to configure"
-		" these controls manually in settings_general.ini."});
+		{ "If you needed to set up your controller in the pause menu, you should enable this." });
 		
+		menu.MenuOption("Non-Xinput controller", "legacycontrollermenu",
+		{ "Set up the non-Xinput controller with native controls" });
+
+	}
+
+	/* Yes hello I am root - 2 */
+	if (menu.CurrentMenu("legacycontrollermenu")) {
+		menu.Title("Non-Xinput controls");
+		menu.Subtitle("Non-Xinput options");
+
+		std::vector<std::string> controllerInfo;
+		controllerInfo.push_back("Press RIGHT to clear key");
+		controllerInfo.push_back("Press RETURN to configure button");
+		controllerInfo.push_back("");
+
+		auto it = 0;
+		for (auto confTag : controllerConfTags) {
+			controllerInfo.back() = controllerConfTagDetail.at(it);
+			controllerInfo.push_back("Assigned to " + controls.NativeControl2Text(controls.ConfTagLController2Value(confTag)) + 
+									 " (" + std::to_string(controls.ConfTagLController2Value(confTag)) + ")");
+
+			if (menu.OptionPlus("Assign " + confTag, controllerInfo, std::bind(clearLControllerButton, confTag), nullptr, "Current setting")) {
+				WAIT(500);
+				bool result = configLControllerButton(confTag);
+				//showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+				if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+				WAIT(500);
+			}
+			it++;
+			controllerInfo.pop_back();
+		}
 	}
 
 	/* Yes hello I am root - 2 */
@@ -865,6 +895,12 @@ void saveControllerButton(std::string confTag, std::string button, int btnToBloc
 	showNotification(("Saved button " + confTag + ": " + button).c_str(), &prevNotification);
 }
 
+void saveLControllerButton(std::string confTag, int button, int btnToBlock) {
+	settings.LControllerSaveButton(confTag, button, btnToBlock);
+	settings.Read(&controls);
+	showNotification(("Saved button " + confTag + ": " + std::to_string(button)).c_str(), &prevNotification);
+}
+
 void clearKeyboardKey(std::string confTag) {
 	settings.KeyboardSaveKey(confTag, "UNKNOWN");
 	settings.Read(&controls);
@@ -873,6 +909,12 @@ void clearKeyboardKey(std::string confTag) {
 
 void clearControllerButton(std::string confTag) {
 	settings.ControllerSaveButton(confTag, "UNKNOWN", -1);
+	settings.Read(&controls);
+	showNotification(("Cleared button " + confTag).c_str(), &prevNotification);
+}
+
+void clearLControllerButton(std::string confTag) {
+	settings.LControllerSaveButton(confTag, -1, -1);
 	settings.Read(&controls);
 	showNotification(("Cleared button " + confTag).c_str(), &prevNotification);
 }
@@ -1263,9 +1305,9 @@ bool configKeyboardKey(const std::string &confTag) {
 
 std::vector<eControl> controlsToBeBlocked = {
 	ControlVehicleAim,
+	ControlVehicleHandbrake,
 	ControlVehicleAttack,
 	ControlVehicleDuck,
-	ControlVehicleHandbrake,
 	ControlVehicleSelectNextWeapon,
 };
 
@@ -1301,6 +1343,32 @@ bool configControllerButton(const std::string &confTag) {
 				return true;
 			}
 		}
+		showSubtitle("Press " + confTag + ". " + additionalInfo);
+		WAIT(0);
+	}
+}
+
+bool configLControllerButton(const std::string &confTag) {
+	std::string additionalInfo = "Press " + escapeKey + " to exit.";
+
+	int buttonToBlock = -1;
+
+	while (true) {
+		if (IsKeyJustUp(str2key(escapeKey))) {
+			return false;
+		}
+		controls.UpdateValues(ScriptControls::InputDevices::Controller, false, true);
+		if (buttonToBlock == -1) {
+			buttonToBlock = lastVehicleButtonPressed();
+		}
+
+		for (auto mapItem : controls.LegacyControlsMap) {
+			if (CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, mapItem.second)) {
+				saveLControllerButton(confTag, mapItem.second, buttonToBlock);
+				return true;
+			}
+		}
+
 		showSubtitle("Press " + confTag + ". " + additionalInfo);
 		WAIT(0);
 	}

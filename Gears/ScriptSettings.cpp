@@ -775,6 +775,18 @@ void ScriptSettings::ControllerSaveButton(const std::string &confTag, const std:
 		logger.Write("Unable to save to " + settingsGeneralFile);
 }
 
+void ScriptSettings::LControllerSaveButton(const std::string &confTag, int button, int btnToBlock) {
+	CSimpleIniA settingsGeneral;
+	settingsGeneral.SetUnicode();
+	settingsGeneral.LoadFile(settingsGeneralFile.c_str());
+	settingsGeneral.SetLongValue("CONTROLLER_LEGACY", confTag.c_str(), button);
+	settingsGeneral.SetLongValue("CONTROLLER_LEGACY", (confTag + "Blocks").c_str(), btnToBlock);
+
+	int err = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
+	if (err < 0)
+		logger.Write("Unable to save to " + settingsGeneralFile);
+}
+
 GUID ScriptSettings::DeviceIndexToGUID(int device, std::vector<GUID> guids) {
 	if (device < 0) {
 		return{};
