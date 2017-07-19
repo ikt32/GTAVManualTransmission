@@ -2,13 +2,14 @@
 
 ## 4.3.8
 Config changes:
-* None afaik
+* Everything should be still compatible but I did clean up things here and there.
 
 Other changes:
-* Re-do rev limiter
-* Fix clutch engaging when revving some modded cars
+* Implement custom rev limiter
+* Fix cars moving in neutral by throttle. (clutch values)
 * Use values from game controls for steering wheel rotation picture
 * Register decorators to prevent crashes  (Thanks to Unknown Modder!)
+* Fix other scripts not being informed of these things (Neutral gear in speedos, etc)
 
 Decorator changes:
 * Change decorator names to be mod-specific

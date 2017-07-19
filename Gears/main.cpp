@@ -29,6 +29,10 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 			logger.Clear();
 			logger.Write("GTAVManualTransmission " + std::string(DISPLAY_VERSION));
 			logger.Write("Game version " + eGameVersionToString(getGameVersion()));
+			if (getGameVersion() < G_VER_1_0_877_1_STEAM) {
+				logger.Write("WARNING: Unsupported game version! Update your game.";
+			}
+
 			logger.Write("Script registered");
 			break;
 		}
