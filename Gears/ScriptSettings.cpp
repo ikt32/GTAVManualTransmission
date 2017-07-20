@@ -329,6 +329,8 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 
 #ifdef GAME_BUILD
 	// [CONTROLLER_LEGACY]
+	scriptControl->UseLegacyController = settingsGeneral.GetBoolValue("CONTROLLER_LEGACY", "Enable", false);
+
 	scriptControl->LegacyControls[static_cast<int>(ScriptControls::LegacyControlType::Toggle)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Toggle", ControlFrontendRight);
 	scriptControl->LegacyControls[static_cast<int>(ScriptControls::LegacyControlType::ToggleH)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ToggleH", ControlFrontendCancel);
 	scriptControl->LegacyControls[static_cast<int>(ScriptControls::LegacyControlType::ShiftUp)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftUp", ControlFrontendAccept);
@@ -337,7 +339,9 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	scriptControl->LegacyControls[static_cast<int>(ScriptControls::LegacyControlType::Engine)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Engine", ControlFrontendDown);
 	scriptControl->LegacyControls[static_cast<int>(ScriptControls::LegacyControlType::Throttle)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Throttle", ControlFrontendLt);
 	scriptControl->LegacyControls[static_cast<int>(ScriptControls::LegacyControlType::Brake)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Brake", ControlFrontendRt);
-	scriptControl->UseLegacyController = settingsGeneral.GetBoolValue("CONTROLLER_LEGACY", "Enable", false);
+
+	scriptControl->ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftUp)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftUpBlocks", -1);
+	scriptControl->ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftDown)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftDownBlocks", -1);
 #endif
 
 	// [KEYBOARD]

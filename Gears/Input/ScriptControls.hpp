@@ -164,6 +164,7 @@ public:
 	bool ButtonHeldOver(LegacyControlType control, int millis);
 	bool ButtonIn(LegacyControlType control);
 	LegacyController::TapState ButtonTapped(LegacyControlType control);
+	bool ButtonReleasedAfter(LegacyControlType control, int time);
 #endif
 	bool ButtonJustPressed(WheelControlType control);
 	bool ButtonReleased(WheelControlType control);
@@ -208,8 +209,9 @@ public:
 	std::array<int, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXboxBlocks = {};
 
 #ifdef GAME_BUILD
-	std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> LegacyControls = {};
 	bool UseLegacyController = false;
+	std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> LegacyControls = {};
+	std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> ControlNativeBlocks = {};
 #endif
 	std::array<int, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
 	

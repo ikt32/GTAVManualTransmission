@@ -936,12 +936,17 @@ void functionHShiftWheel() {
 
 void functionSShift() {
 	// TODO: Properly always block buttons?
-	auto tapStateUp = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftUp);
-	auto tapStateDown = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftDown);
+	auto xcTapStateUp = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftUp);
+	auto xcTapStateDn = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftDown);
+
+	auto ncTapStateUp = controls.ButtonTapped(ScriptControls::LegacyControlType::ShiftUp);
+	auto ncTapStateDn = controls.ButtonTapped(ScriptControls::LegacyControlType::ShiftDown);
+
+
 
 	// Shift up
-	if (controls.PrevInput == ScriptControls::Controller	&& tapStateUp == XboxController::TapState::Tapped ||
-		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::ShiftUp) ||
+	if (controls.PrevInput == ScriptControls::Controller	&& xcTapStateUp == XboxController::TapState::Tapped ||
+		controls.PrevInput == ScriptControls::Controller	&& ncTapStateUp == LegacyController::TapState::Tapped ||
 		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftUp) ||
 		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftUp)) {
 		if (vehData.NoClutch) {
@@ -978,8 +983,8 @@ void functionSShift() {
 
 	// Shift down
 
-	if (controls.PrevInput == ScriptControls::Controller	&& tapStateDown == XboxController::TapState::Tapped ||
-		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::ShiftDown) || 
+	if (controls.PrevInput == ScriptControls::Controller	&& xcTapStateDn == XboxController::TapState::Tapped ||
+		controls.PrevInput == ScriptControls::Controller	&& ncTapStateDn == LegacyController::TapState::Tapped ||
 		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftDown) ||
 		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftDown)) {
 		if (vehData.NoClutch) {
@@ -1016,12 +1021,15 @@ void functionSShift() {
 }
 
 void functionAShift() { // Automatic
-	auto tapStateUp = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftUp);
-	auto tapStateDown = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftDown);
+	auto xcTapStateUp = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftUp);
+	auto xcTapStateDn = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftDown);
+
+	auto ncTapStateUp = controls.ButtonTapped(ScriptControls::LegacyControlType::ShiftUp);
+	auto ncTapStateDn = controls.ButtonTapped(ScriptControls::LegacyControlType::ShiftDown);
 
 	// Shift up
-	if (controls.PrevInput == ScriptControls::Controller	&& tapStateUp == XboxController::TapState::Tapped ||
-		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::ShiftUp) ||
+	if (controls.PrevInput == ScriptControls::Controller	&& xcTapStateUp == XboxController::TapState::Tapped ||
+		controls.PrevInput == ScriptControls::Controller	&& ncTapStateUp == LegacyController::TapState::Tapped ||
 		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftUp) ||
 		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftUp)) {
 		// Reverse to Neutral
@@ -1040,8 +1048,8 @@ void functionAShift() { // Automatic
 
 	// Shift down
 
-	if (controls.PrevInput == ScriptControls::Controller	&& tapStateDown == XboxController::TapState::Tapped ||
-		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::ShiftDown) ||
+	if (controls.PrevInput == ScriptControls::Controller	&& xcTapStateDn == XboxController::TapState::Tapped ||
+		controls.PrevInput == ScriptControls::Controller	&& ncTapStateDn == LegacyController::TapState::Tapped ||
 		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftDown) ||
 		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::ShiftDown)) {
 		// 1 to Neutral
@@ -1657,31 +1665,45 @@ void handleVehicleButtons() {
 	if (settings.BlockCarControls && settings.EnableManual && controls.PrevInput == ScriptControls::Controller &&
 		!(settings.ShiftMode == Automatic && vehData.CurrGear > 1)) {
 
-		for (int i = 0; i < static_cast<int>(ScriptControls::ControllerControlType::SIZEOF_ControllerControlType); i++) {
-			if (controls.ControlXboxBlocks[i] == -1) continue;
-			// todo: only work for shift up/down atm
-			if (i != (int)ScriptControls::ControllerControlType::ShiftUp && i != (int)ScriptControls::ControllerControlType::ShiftDown) continue;
+		if (controls.UseLegacyController) {
+			for (int i = 0; i < static_cast<int>(ScriptControls::LegacyControlType::SIZEOF_LegacyControlType); i++) {
+				if (controls.ControlNativeBlocks[i] == -1) continue;
+				if (i != (int)ScriptControls::LegacyControlType::ShiftUp && i != (int)ScriptControls::LegacyControlType::ShiftDown) continue;
 
-			if (controls.ButtonHeldOver(static_cast<ScriptControls::ControllerControlType>(i), 200)) {
-				// todo: Neither of these two should be needed but I can't get tap-controls to activate. (switch weapon)
-				//CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], false);
-				//CONTROLS::ENABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], true);
-				//CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 1.0f);
-			}
-			else {
-				CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], true);
-			}
+				if (controls.ButtonHeldOver(static_cast<ScriptControls::LegacyControlType>(i), 200)) {
+					// todo: tap. (switch weapon)
+				}
+				else {
+					CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlNativeBlocks[i], true);
+				}
 
-			if (controls.ButtonReleasedAfter(static_cast<ScriptControls::ControllerControlType>(i), 200)) {
-				CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], false);
-				CONTROLS::ENABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], true);
-				CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 1.0f);
+				if (controls.ButtonReleasedAfter(static_cast<ScriptControls::LegacyControlType>(i), 200)) {
+					CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlNativeBlocks[i], false);
+					CONTROLS::ENABLE_CONTROL_ACTION(0, controls.ControlNativeBlocks[i], true);
+					CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlNativeBlocks[i], 1.0f);
+				}
+			}
+		}
+		else {
+			for (int i = 0; i < static_cast<int>(ScriptControls::ControllerControlType::SIZEOF_ControllerControlType); i++) {
+				if (controls.ControlXboxBlocks[i] == -1) continue;
+				if (i != (int)ScriptControls::ControllerControlType::ShiftUp && i != (int)ScriptControls::ControllerControlType::ShiftDown) continue;
+
+				if (controls.ButtonHeldOver(static_cast<ScriptControls::ControllerControlType>(i), 200)) {
+					// todo: tap. (switch weapon)
+				}
+				else {
+					CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], true);
+				}
+
+				if (controls.ButtonReleasedAfter(static_cast<ScriptControls::ControllerControlType>(i), 200)) {
+					CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], false);
+					CONTROLS::ENABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], true);
+					CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 1.0f);
+				}
 			}
 		}
 	}
-
-
-
 
 	if  (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
 		(controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) ||

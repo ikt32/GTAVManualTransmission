@@ -355,6 +355,14 @@ LegacyController::TapState ScriptControls::ButtonTapped(LegacyControlType contro
 	return lcontroller.WasButtonTapped(gameButton, 200);
 }
 
+bool ScriptControls::ButtonReleasedAfter(LegacyControlType control, int time) {
+	if (!UseLegacyController) return false;
+	auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
+	if (lcontroller.WasButtonHeldForMs(gameButton, time))
+		return true;
+	return false;
+}
+
 #endif
 /*
  * Wheel section
