@@ -245,9 +245,6 @@ void update() {
 		MemoryPatcher::PatchInstructions();
 	}
 
-	if (!MemoryPatcher::SteeringPatched && settings.PatchSteering && settings.PatchSteeringAlways) {
-		MemoryPatcher::PatchSteeringCorrection();
-	}
 	///////////////////////////////////////////////////////////////////////////
 	// Actual mod operations
 	///////////////////////////////////////////////////////////////////////////
@@ -753,8 +750,8 @@ void initSteeringPatches() {
 		}
 		resetSteeringMultiplier();
 	}
-	if (controls.PrevInput == ScriptControls::Wheel) {
-		if (!MemoryPatcher::SteerControlPatched && settings.PatchSteeringControl) {
+	if (controls.PrevInput == ScriptControls::Wheel && vehData.Class == VehicleData::VehicleClass::Car && settings.PatchSteeringControl) {
+		if (!MemoryPatcher::SteerControlPatched) {
 			MemoryPatcher::PatchSteeringControl();
 		}
 	}
@@ -1682,15 +1679,14 @@ void handleVehicleButtons() {
 				if (i != (int)ScriptControls::LegacyControlType::ShiftUp && i != (int)ScriptControls::LegacyControlType::ShiftDown) continue;
 
 				if (controls.ButtonHeldOver(static_cast<ScriptControls::LegacyControlType>(i), 200)) {
-					// todo: tap. (switch weapon)
+					CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlNativeBlocks[i], 1.0f);
 				}
 				else {
 					CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlNativeBlocks[i], true);
 				}
 
 				if (controls.ButtonReleasedAfter(static_cast<ScriptControls::LegacyControlType>(i), 200)) {
-					CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlNativeBlocks[i], false);
-					CONTROLS::ENABLE_CONTROL_ACTION(0, controls.ControlNativeBlocks[i], true);
+					CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlNativeBlocks[i], 0.0f);
 					CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlNativeBlocks[i], 1.0f);
 				}
 			}
@@ -1701,16 +1697,15 @@ void handleVehicleButtons() {
 				if (i != (int)ScriptControls::ControllerControlType::ShiftUp && i != (int)ScriptControls::ControllerControlType::ShiftDown) continue;
 
 				if (controls.ButtonHeldOver(static_cast<ScriptControls::ControllerControlType>(i), 200)) {
-					// todo: tap. (switch weapon)
+					CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 1.0f);
 				}
 				else {
 					CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], true);
 				}
 
 				if (controls.ButtonReleasedAfter(static_cast<ScriptControls::ControllerControlType>(i), 200)) {
-					CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], false);
-					CONTROLS::ENABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], true);
-					CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 1.0f);
+					CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlNativeBlocks[i], 0.0f);
+					CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlNativeBlocks[i], 1.0f);
 				}
 			}
 		}
@@ -1896,11 +1891,15 @@ void doWheelSteering() {
 		}
 
 		float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
-		ext.SetSteeringInputAngle(vehicle, -effSteer);
-		//CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, effSteer);
-		//SetControlADZ(ControlVehicleMoveLeftRight, effSteer, controls.ADZSteer);
-		//CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleMoveLeftRight, sgn(effSteer) * controls.ADZSteer + ((1.0f - controls.ADZSteer)*effSteer));
-
+		// Both paths should have no deadzone and no twitch.
+		if (settings.PatchSteeringControl) {
+			// Fast/instant.
+			ext.SetSteeringInputAngle(vehicle, -effSteer);
+		}
+		else {
+			// Slower but relyable.
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleMoveLeftRight, sgn(effSteer) * controls.ADZSteer + ((1.0f - controls.ADZSteer)*effSteer));
+		}
 	}
 }
 

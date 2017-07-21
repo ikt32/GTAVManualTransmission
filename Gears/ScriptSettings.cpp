@@ -391,9 +391,9 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	EnableWheel = settingsWheel.GetBoolValue("OPTIONS", "EnableWheel", false);
 	WheelWithoutManual = settingsWheel.GetBoolValue("OPTIONS", "WheelWithoutManual", true);
 	AltControls = settingsWheel.GetBoolValue("OPTIONS", "WheelBoatPlanes", false);
-	PatchSteering = settingsWheel.GetBoolValue("OPTIONS", "PatchSteering", false);
+	PatchSteering = settingsWheel.GetBoolValue("OPTIONS", "PatchSteering", true);
 	PatchSteeringAlways = settingsWheel.GetBoolValue("OPTIONS", "PatchSteeringAlways", false);
-	PatchSteeringControl = settingsWheel.GetBoolValue("OPTIONS", "PatchSteeringControl", false);
+	PatchSteeringControl = settingsWheel.GetBoolValue("OPTIONS", "PatchSteeringControl", true);
 	LogiLEDs = settingsWheel.GetBoolValue("OPTIONS", "LogitechLEDs", false);
 	HPatternKeyboard = settingsWheel.GetBoolValue("OPTIONS", "HPatternKeyboard", false);
 

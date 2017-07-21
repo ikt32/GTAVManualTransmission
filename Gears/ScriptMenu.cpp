@@ -423,8 +423,8 @@ void update_menu() {
 		if (menu.BoolOption("Disable non-wheel steering", settings.PatchSteeringControl,
 		{ "Disable keyboard and controller inputs for steering. Fixes the jerky animation." })) {
 			settings.SaveWheel(&controls);
+			initSteeringPatches();
 		}
-
 
 		if (menu.BoolOption("Logitech RPM LEDs", settings.LogiLEDs, 
 		{ "Show the RPM LEDs on Logitech steering wheels. If the wheel doesn't have compatible RPM LEDs, this might crash." } )) {
@@ -531,8 +531,12 @@ void update_menu() {
 			showNotification(result ? "Handbrake axis saved" : "Cancelled handbrake axis calibration", &prevNotification);
 			if (result) initWheel();
 		}
-		menu.FloatOption("Steering anti-deadzone", controls.ADZSteer, 0.0f, 1.0f, 0.01f,
-		{ "GTA V ignores 25% input for analog controls by default." });
+
+		if (!settings.PatchSteeringControl) {
+			menu.FloatOption("Steering anti-deadzone", controls.ADZSteer, 0.0f, 1.0f, 0.01f,
+			{ "GTA V ignores 25% input for analog controls by default." });
+		}
+
 		menu.FloatOption("Throttle anti-deadzone",	controls.ADZThrottle, 0.0f, 1.0f, 0.01f, 
 		{ "GTA V ignores 25% input for analog controls by default." });
 		menu.FloatOption("Brake anti-deadzone",		controls.ADZBrake, 0.0f, 1.0f, 0.01f,
