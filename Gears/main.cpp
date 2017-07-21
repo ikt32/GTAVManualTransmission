@@ -40,17 +40,20 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 			logger.Write("Init shutdown");
 			bool successI = MemoryPatcher::RestoreInstructions();
 			bool successS = MemoryPatcher::RestoreSteeringCorrection();
+			bool successSC= MemoryPatcher::RestoreSteeringControl();
 			resetSteeringMultiplier();
 			scriptUnregister(hInstance);
 
-			if (successI && successS) {
+			if (successI && successS && successSC) {
 				logger.Write("Shut down script successfully");
 			}
 			else {
 				if (!successI)
-					logger.Write("Shut down script with instructions not restored");
+					logger.Write("WARNING: Shut down script with instructions not restored");
 				if (!successS)
-					logger.Write("Shut down script with steering not restored");
+					logger.Write("WARNING: Shut down script with steer correction not restored");
+				if (!successSC)
+					logger.Write("WARNING: Shut down script with steer control not restored");
 			}
 			break;
 		}

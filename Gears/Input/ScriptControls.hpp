@@ -204,7 +204,8 @@ public:
 
 	float ADZThrottle = 0.25f;
 	float ADZBrake = 0.25f;
-	
+	float ADZSteer = 0.25f;
+
 	std::array<std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
 	std::array<int, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXboxBlocks = {};
 

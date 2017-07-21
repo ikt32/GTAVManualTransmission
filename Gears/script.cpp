@@ -22,6 +22,7 @@
 
 #include "menu.h"
 #include "Memory/NativeMemory.hpp"
+#include "Util/MathExt.h"
 
 std::string textureWheelFile;
 int textureWheelId;
@@ -751,6 +752,16 @@ void initSteeringPatches() {
 			MemoryPatcher::RestoreSteeringCorrection();
 		}
 		resetSteeringMultiplier();
+	}
+	if (controls.PrevInput == ScriptControls::Wheel) {
+		if (!MemoryPatcher::SteerControlPatched && settings.PatchSteeringControl) {
+			MemoryPatcher::PatchSteeringControl();
+		}
+	}
+	else {
+		if (MemoryPatcher::SteerControlPatched) {
+			MemoryPatcher::RestoreSteeringControl();
+		}
 	}
 }
 
@@ -1886,7 +1897,10 @@ void doWheelSteering() {
 
 		float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 		ext.SetSteeringInputAngle(vehicle, -effSteer);
-		CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, effSteer);
+		//CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, effSteer);
+		//SetControlADZ(ControlVehicleMoveLeftRight, effSteer, controls.ADZSteer);
+		//CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleMoveLeftRight, sgn(effSteer) * controls.ADZSteer + ((1.0f - controls.ADZSteer)*effSteer));
+
 	}
 }
 

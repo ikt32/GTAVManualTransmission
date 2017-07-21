@@ -157,6 +157,7 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 	settingsWheel.SetBoolValue("OPTIONS", "WheelBoatPlanes", AltControls);
 	settingsWheel.SetBoolValue("OPTIONS", "PatchSteering", PatchSteering);
 	settingsWheel.SetBoolValue("OPTIONS", "PatchSteeringAlways", PatchSteeringAlways);
+	settingsWheel.SetBoolValue("OPTIONS", "PatchSteeringControl", PatchSteeringControl);
 	settingsWheel.SetBoolValue("OPTIONS", "LogitechLEDs", LogiLEDs);
 	settingsWheel.SetBoolValue("OPTIONS", "HPatternKeyboard", HPatternKeyboard);
 
@@ -175,6 +176,7 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 	settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DetailStrength", DetailStrength);
 
 	// [STEER]
+	settingsWheel.SetDoubleValue("STEER", "ANTIDEADZONE", scriptControl->ADZSteer);
 	settingsWheel.SetDoubleValue("STEER", "SteerAngleMax", SteerAngleMax );
 	settingsWheel.SetDoubleValue("STEER", "SteerAngleCar", SteerAngleCar );
 	settingsWheel.SetDoubleValue("STEER", "SteerAngleBike",SteerAngleBike);
@@ -391,6 +393,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	AltControls = settingsWheel.GetBoolValue("OPTIONS", "WheelBoatPlanes", false);
 	PatchSteering = settingsWheel.GetBoolValue("OPTIONS", "PatchSteering", false);
 	PatchSteeringAlways = settingsWheel.GetBoolValue("OPTIONS", "PatchSteeringAlways", false);
+	PatchSteeringControl = settingsWheel.GetBoolValue("OPTIONS", "PatchSteeringControl", false);
 	LogiLEDs = settingsWheel.GetBoolValue("OPTIONS", "LogitechLEDs", false);
 	HPatternKeyboard = settingsWheel.GetBoolValue("OPTIONS", "HPatternKeyboard", false);
 
@@ -478,6 +481,9 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 		settingsWheel.GetValue("STEER", "FFB", "");
 	scriptControl->SteerLeft = settingsWheel.GetLongValue("STEER", "MIN", -1);
 	scriptControl->SteerRight = settingsWheel.GetLongValue("STEER", "MAX", -1);
+
+	scriptControl->ADZSteer = settingsWheel.GetDoubleValue("STEER", "ANTIDEADZONE", 0.25);
+
 	SteerAngleMax = settingsWheel.GetDoubleValue("STEER", "SteerAngleMax", 900.0);
 	SteerAngleCar = settingsWheel.GetDoubleValue("STEER", "SteerAngleCar", 720.0);
 	SteerAngleBike = settingsWheel.GetDoubleValue("STEER", "SteerAngleBike", 180.0);

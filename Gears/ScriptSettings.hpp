@@ -122,6 +122,7 @@ public:
 	bool AltControls = false;
 	bool PatchSteering = false;
 	bool PatchSteeringAlways = false;
+	bool PatchSteeringControl = false;
 	bool LogiLEDs = false;
 	bool HPatternKeyboard = false;
 	bool BlockCarControls = false;

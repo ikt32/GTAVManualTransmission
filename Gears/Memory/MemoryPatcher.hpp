@@ -7,6 +7,9 @@ namespace MemoryPatcher {
 	bool PatchSteeringCorrection();
 	bool RestoreSteeringCorrection();
 
+	bool PatchSteeringControl();
+	bool RestoreSteeringControl();
+
 	/*
 	 * "total" refers to the "package" of patches needed to get the gearbox
 	 * and clutch stuff working.
@@ -18,4 +21,6 @@ namespace MemoryPatcher {
 	 * That means SteeringPatched is just for the steering part.
 	 */
 	extern bool SteeringPatched;
+	extern bool SteerControlPatched;
+
 };

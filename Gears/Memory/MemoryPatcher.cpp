@@ -24,13 +24,18 @@ namespace MemoryPatcher {
 	// Does the same as Custom Steering by InfamousSabre
 	// Kept for emergency/backup purposes in the case InfamousSabre
 	// stops support earlier than I do. (not trying to compete here!)
-	uintptr_t PatchSteering();
-	void RestoreSteering(uintptr_t address, byte *origInstr, int origInstrSz);
+	uintptr_t ApplySteeringCorrectionPatch();
+	void RevertSteeringCorrectionPatch(uintptr_t address, byte *origInstr, int origInstrSz);
+
+	// Disable (normal) user input while wheel steering is active.
+	uintptr_t ApplySteerControlPatch();
+	void RevertSteerControlPatch(uintptr_t address, byte *origInstr, int origInstrSz);
 
 	int NumGearboxPatches = 3;
 	int TotalPatched = 0;
 
 	bool SteeringPatched = false;
+	bool SteerControlPatched = false;
 
 	uintptr_t clutchLowAddr = NULL;
 	uintptr_t clutchLowTemp = NULL;
@@ -44,12 +49,16 @@ namespace MemoryPatcher {
 	uintptr_t SteeringAddr = NULL;
 	uintptr_t SteeringTemp = NULL;
 
+	uintptr_t SteerControlAddr = NULL;
+	uintptr_t SteerControlTemp = NULL;
+
 	byte origSteerInstr[6] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 	byte origSteerInstrDest[4] = {0x00, 0x00, 0x00, 0x00};
 
 	const int maxTries = 4;
 	int gearTries = 0;
 	int steerTries = 0;
+	int steerControlTries = 0;
 
 	bool PatchInstructions() {
 		if (gearTries > maxTries) {
@@ -173,7 +182,7 @@ namespace MemoryPatcher {
 			return true;
 		}
 
-		SteeringTemp = PatchSteering();
+		SteeringTemp = ApplySteeringCorrectionPatch();
 
 		if (SteeringTemp) {
 			SteeringAddr = SteeringTemp;
@@ -183,7 +192,7 @@ namespace MemoryPatcher {
 			std::stringstream instructs;
 			for (int i = 0; i < sizeof(origSteerInstr) / sizeof(byte); ++i)
 				instructs << std::hex << std::setfill('0') << std::setw(2) << (int)origSteerInstr[i] << " ";
-			logger.Write("STEERING: Steering @ " + hexaddr.str());
+			logger.Write("STEERING: Steering Correction @ " + hexaddr.str());
 			logger.Write("STEERING: Patch success, orig: " + instructs.str());
 			steerTries = 0;
 			return true;
@@ -208,7 +217,7 @@ namespace MemoryPatcher {
 		}
 
 		if (SteeringAddr) {
-			RestoreSteering(SteeringAddr,origSteerInstr, sizeof(origSteerInstr) / sizeof(byte));
+			RevertSteeringCorrectionPatch(SteeringAddr,origSteerInstr, sizeof(origSteerInstr) / sizeof(byte));
 			SteeringAddr = 0;
 			SteeringPatched = false;
 			logger.Write("STEERING: Restore success");
@@ -217,6 +226,62 @@ namespace MemoryPatcher {
 		}
 
 		logger.Write("STEERING: Restore failed");
+		return false;
+	}
+
+	bool PatchSteeringControl() {
+		if (steerControlTries > maxTries) {
+			return false;
+		}
+
+		logger.Write("STEERING CONTROL: Patching");
+
+		if (SteerControlPatched) {
+			logger.Write("STEERING CONTROL: Already patched");
+			return true;
+		}
+
+		SteerControlTemp = ApplySteerControlPatch();
+
+		if (SteerControlTemp) {
+			SteerControlAddr = SteerControlTemp;
+			SteerControlPatched = true;
+			std::stringstream hexaddr;
+			hexaddr << std::hex << SteerControlAddr;
+			logger.Write("STEERING CONTROL: Steering Control @ " + hexaddr.str());
+			steerControlTries = 0;
+			return true;
+		}
+
+		logger.Write("STEERING CONTROL: Patch failed");
+		steerControlTries++;
+
+		if (steerControlTries > maxTries) {
+			logger.Write("STEERING CONTROL: Patch attempt limit exceeded");
+			logger.Write("STEERING CONTROL: Patching disabled");
+		}
+		return false;
+	}
+
+	bool RestoreSteeringControl() {
+		logger.Write("STEERING CONTROL: Restoring instructions");
+
+		if (!SteerControlPatched) {
+			logger.Write("STEERING CONTROL: Already restored/intact");
+			return true;
+		}
+
+		if (SteerControlAddr) {
+			byte origInstr[8] = { 0xF3, 0x0F, 0x11, 0x8B, 0xFC, 0x08, 0x00, 0x00 };
+			RevertSteerControlPatch(SteerControlAddr, origInstr, sizeof(origInstr) / sizeof(byte));
+			SteerControlAddr = 0;
+			SteerControlPatched = false;
+			logger.Write("STEERING CONTROL: Restore success");
+			steerControlTries = 0;
+			return true;
+		}
+
+		logger.Write("STEERING CONTROL: Restore failed");
 		return false;
 	}
 
@@ -297,7 +362,7 @@ namespace MemoryPatcher {
 		}
 	}
 
-	uintptr_t PatchSteering() {
+	uintptr_t ApplySteeringCorrectionPatch() {
 		// GTA V (b791.2 to b1011.1)
 		// F3 44 0F10 15 03319400
 		// 45 84 ED				// test		r13l,r13l
@@ -357,7 +422,34 @@ namespace MemoryPatcher {
 		return 0;
 	}
 
-	void RestoreSteering(uintptr_t address, byte *origInstr, int origInstrSz) {
+	void RevertSteeringCorrectionPatch(uintptr_t address, byte *origInstr, int origInstrSz) {
+		if (address) {
+			memcpy((void*)address, origInstr, origInstrSz);
+		}
+	}
+
+	uintptr_t ApplySteerControlPatch() {
+		// b1032.2
+		uintptr_t address;
+		if (SteerControlTemp != NULL)
+			address = SteerControlTemp;
+		else
+			address = mem::FindPattern("\xF3\x0F\x11\x8B\xFC\x08\x00\x00"
+									   "\xF3\x0F\x10\x83\x00\x09\x00\x00"
+									   "\xF3\x0F\x58\x83\xFC\x08\x00\x00"
+									   "\x41\x0F\x2F\xC3",
+									   "xxxx??xx"
+									   "xxxx??xx"
+									   "xxxx??xx"
+									   "xxxx");
+
+		if (address) {
+			memset(reinterpret_cast<void *>(address), 0x90, 8);
+		}
+		return address;
+	}
+
+	void RevertSteerControlPatch(uintptr_t address, byte *origInstr, int origInstrSz) {
 		if (address) {
 			memcpy((void*)address, origInstr, origInstrSz);
 		}
