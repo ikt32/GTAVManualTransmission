@@ -53,7 +53,9 @@ namespace MemoryPatcher {
 	uintptr_t SteerControlTemp = NULL;
 
 	byte origSteerInstr[6] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-	byte origSteerInstrDest[4] = {0x00, 0x00, 0x00, 0x00};
+	byte origSteerInstrDest[4] = { 0x00, 0x00, 0x00, 0x00 };
+
+	byte origSteerControlInstr[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	const int maxTries = 4;
 	int gearTries = 0;
@@ -247,9 +249,14 @@ namespace MemoryPatcher {
 			SteerControlAddr = SteerControlTemp;
 			SteerControlPatched = true;
 			std::stringstream hexaddr;
+			std::stringstream instructs;
 			hexaddr << std::hex << SteerControlAddr;
+			for (int i = 0; i < sizeof(origSteerControlInstr) / sizeof(byte); ++i)
+				instructs << std::hex << std::setfill('0') << std::setw(2) << (int)origSteerControlInstr[i] << " ";
 			logger.Write("STEERING CONTROL: Steering Control @ " + hexaddr.str());
+			logger.Write("STEERING CONTROL: Patch success, orig: " + instructs.str());
 			steerControlTries = 0;
+
 			return true;
 		}
 
@@ -272,8 +279,8 @@ namespace MemoryPatcher {
 		}
 
 		if (SteerControlAddr) {
-			byte origInstr[8] = { 0xF3, 0x0F, 0x11, 0x8B, 0xFC, 0x08, 0x00, 0x00 };
-			RevertSteerControlPatch(SteerControlAddr, origInstr, sizeof(origInstr) / sizeof(byte));
+			//byte origInstr[8] = { 0xF3, 0x0F, 0x11, 0x8B, 0xFC, 0x08, 0x00, 0x00 };
+			RevertSteerControlPatch(SteerControlAddr, origSteerControlInstr, sizeof(origSteerControlInstr) / sizeof(byte));
 			SteerControlAddr = 0;
 			SteerControlPatched = false;
 			logger.Write("STEERING CONTROL: Restore success");
@@ -444,6 +451,7 @@ namespace MemoryPatcher {
 									   "xxxx");
 
 		if (address) {
+			memcpy(origSteerControlInstr, (void*)address, 8);
 			memset(reinterpret_cast<void *>(address), 0x90, 8);
 		}
 		return address;
