@@ -96,6 +96,8 @@ void update() {
 			}
 		}
 		vehData.Clear();
+		vehData.UpdateValues(ext, vehicle);
+
 		if (vehData.NoClutch) {
 			vehData.SimulatedNeutral = false;
 		}
@@ -1404,7 +1406,7 @@ void functionTruckLimiting() {
 
 // Anti-Deadzone
 void SetControlADZ(eControl control, float value, float adz) {
-	CONTROLS::_SET_CONTROL_NORMAL(0, control, adz+((1.0f-adz)*value));
+	CONTROLS::_SET_CONTROL_NORMAL(0, control, sgn(value)*adz+(1.0f-adz)*value);
 }
 
 void functionRealReverse() {
@@ -1880,35 +1882,39 @@ void handleVehicleButtons() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void doWheelSteering() {
-	if (controls.PrevInput == ScriptControls::InputDevices::Wheel) {
-		float steerMult;
-		if (vehData.Class == VehicleData::VehicleClass::Bike || vehData.Class == VehicleData::VehicleClass::Quad)
-			steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
-		else if (vehData.Class == VehicleData::VehicleClass::Car)
-			steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
-		else {
-			steerMult = settings.SteerAngleMax / settings.SteerAngleAlt;
-		}
+	if (controls.PrevInput != ScriptControls::Wheel)
+		return;
 
-		float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
-		// Both paths should have no deadzone and no twitch.
-		if (settings.PatchSteeringControl) {
-			// Fast/instant.
-			ext.SetSteeringInputAngle(vehicle, -effSteer);
-		}
-		else {
-			// Slower but relyable.
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleMoveLeftRight, sgn(effSteer) * controls.ADZSteer + ((1.0f - controls.ADZSteer)*effSteer));
-		}
+	float steerMult;
+	if (vehData.Class == VehicleData::VehicleClass::Bike || vehData.Class == VehicleData::VehicleClass::Quad)
+		steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
+	else if (vehData.Class == VehicleData::VehicleClass::Car)
+		steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
+	else {
+		steerMult = settings.SteerAngleMax / settings.SteerAngleAlt;
+	}
+
+	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
+
+	/*
+	 * Patched steering is direct without any processing, and super direct.
+	 * _SET_CONTROL_NORMAL is with game processing and could have a bit of delay
+	 * Both should work without any deadzone, with a note that the second one
+	 * does need a specified anti-deadzone (recommended: 24-25%)
+	 * 
+	 */
+	if (vehData.Class == VehicleData::VehicleClass::Car && settings.PatchSteeringControl) {
+		ext.SetSteeringInputAngle(vehicle, -effSteer);
+	}
+	else {
+		SetControlADZ(ControlVehicleMoveLeftRight, effSteer, controls.ADZSteer);
 	}
 }
 
 void doWheelSteeringBoat() {
 	float steerMult = settings.SteerAngleMax / settings.SteerAngleAlt;
 	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
-
-	ext.SetSteeringInputAngle(vehicle, -effSteer);
-	CONTROLS::_SET_CONTROL_NORMAL(27, ControlVehicleMoveLeftRight, effSteer);
+	SetControlADZ(ControlVehicleMoveLeftRight, effSteer, controls.ADZSteer);
 }
 
 void doWheelSteeringPlane() {

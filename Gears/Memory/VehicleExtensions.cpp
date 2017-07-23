@@ -612,3 +612,26 @@ std::vector<float> VehicleExtensions::GetTyreSpeeds(Vehicle handle) {
 	}
 	return wheelSpeeds;
 }
+
+// 0x784 to 0x814 are gear ratios!
+// 0x7f8 - Reverse
+// 0x7fc - 1
+// 0x800 - 2
+// 0x804 - 3
+// 0x808 - 4
+// 0x80c - 5
+// 0x810 - 6
+// 0x814 - 7
+
+// 0x818: fDriveForce
+// Affected by engine upgrade
+// 
+
+// 0x81C: fDriveMaxFlatVel (m/s)
+// Affected by no tuning options
+// Doesn't influence anything?
+
+// 0x820: first gear top speed
+// Closest to km/h but off by 4kph? (val: 20, max @ 24 when doing a burnout)
+// Matches "upshift" moment speed
+// Unrelated to top speed seemingly

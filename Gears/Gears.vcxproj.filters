@@ -113,7 +113,6 @@
     <ClInclude Include="Input\LegacyController.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="Util\Versions.h" />
     <ClInclude Include="..\..\GTAVMenuBase\menu.h">
       <Filter>Menu</Filter>
     </ClInclude>
@@ -139,6 +138,9 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="Util\MathExt.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Versions.h">
       <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
