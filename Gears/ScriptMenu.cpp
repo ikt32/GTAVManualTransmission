@@ -771,8 +771,8 @@ void update_menu() {
 		{ "Show all detailed technical info of the gearbox and inputs calculations." });
 		menu.BoolOption("Display car wheel info", settings.DisplayWheelInfo, 
 		{ "Show per-wheel debug info with off-ground detection, lockup detection and suspension info." });
-		menu.BoolOption("Log car address", settings.LogCar, 
-		{ "Prints the current vehicle address to Gears.log." });
+		//menu.BoolOption("Log car address", settings.LogCar, 
+		//{ "Prints the current vehicle address to Gears.log." });
 		menu.BoolOption("Expose script variables", settings.CrossScript, 
 		{ "Shares data like gear, shifting indicator and Neutral with other mods." });
 	}

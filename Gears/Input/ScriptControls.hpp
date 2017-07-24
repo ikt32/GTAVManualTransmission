@@ -1,8 +1,8 @@
 #pragma once
+#include <string>
 
 #include "XboxController.hpp"
 #include "WheelDirectInput.hpp"
-#include <map>
 #include "GenDInput.h"
 #include "LegacyController.h"
 

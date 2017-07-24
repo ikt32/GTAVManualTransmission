@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include "keyboard.h"
+#include "Util/Logger.hpp"
 
 ScriptControls::ScriptControls(): PrevInput(Keyboard),
                                 WheelControl(),

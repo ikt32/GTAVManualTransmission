@@ -119,7 +119,7 @@ void ScriptSettings::SaveGeneral() const {
 	// [DEBUG]
 	settingsGeneral.SetBoolValue("DEBUG", "DisplayInfo", DisplayInfo);
 	settingsGeneral.SetBoolValue("DEBUG", "DisplayWheelInfo", DisplayWheelInfo);
-	settingsGeneral.SetBoolValue("DEBUG", "LogCar", LogCar);
+	//settingsGeneral.SetBoolValue("DEBUG", "LogCar", LogCar);
 
 	settingsGeneral.SaveFile(settingsGeneralFile.c_str());
 }
@@ -372,7 +372,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	// [DEBUG]
 	DisplayInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayInfo", false);
 	DisplayWheelInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayWheelInfo", false);
-	LogCar = settingsGeneral.GetBoolValue("DEBUG", "LogCar", false);
+	//LogCar = settingsGeneral.GetBoolValue("DEBUG", "LogCar", false);
 
 	// [FILEVERSION]
 	settings_general_version = settingsGeneral.GetValue("FILEVERSION", "VERSION", "000");

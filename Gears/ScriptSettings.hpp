@@ -111,7 +111,7 @@ public:
 
 	// [DEBUG]
 	bool DisplayInfo = false;
-	bool LogCar = false;
+	//bool LogCar = false;
 	bool DisplayWheelInfo = false;
 
 	std::vector<GUID> reggdGuids;

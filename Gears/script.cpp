@@ -78,24 +78,10 @@ void update() {
 	}
 
 	///////////////////////////////////////////////////////////////////////////
-	//                           Update stuff
+	//                       Update vehicle and inputs
 	///////////////////////////////////////////////////////////////////////////
 
 	if (vehicle != lastVehicle) {
-		if (settings.LogCar) {
-			logger.Write("DEBUG: Switched vehicle: " + PrettyNameFromHash(ENTITY::GET_ENTITY_MODEL(vehicle)));
-			auto vehicleAddress = ext.GetAddress(vehicle);
-			std::stringstream ssVehicleAddress;
-			ssVehicleAddress << std::hex << static_cast<void*>(vehicleAddress);
-			logger.Write("DEBUG: New vehicle address: " + ssVehicleAddress.str());
-			int i = 0;
-			for (auto address : ext.GetWheelPtrs(vehicle)) {
-				std::stringstream ssWheelAddress;
-				ssWheelAddress << std::hex << address;
-				logger.Write("DEBUG: Wheel " + std::to_string(i) + " address: " + ssWheelAddress.str());
-				i++;
-			}
-		}
 		vehData.Clear();
 		vehData.UpdateValues(ext, vehicle);
 
