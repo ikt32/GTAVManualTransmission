@@ -835,7 +835,6 @@ void cycleShiftMode() {
 void shiftTo(int gear, bool autoClutch) {
 	if (autoClutch) {
 		controls.ClutchVal = 1.0f;
-		//ext.SetThrottle(vehicle, 0.0f);
 		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
 	}
 	vehData.LockGear = gear;

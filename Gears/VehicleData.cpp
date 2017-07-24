@@ -72,7 +72,6 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 	RotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(vehicle);
 	Class = findClass(model);
 	IsTruck = isBadTruck(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
-	NoClutch = noClutch(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
 	Pitch = ENTITY::GET_ENTITY_PITCH(vehicle);
 	SteeringAngle = ext.GetSteeringAngle(vehicle);
 	WheelCompressions = ext.GetWheelCompressions(vehicle);
@@ -83,6 +82,8 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 	if (!HasSpeedo && ext.GetDashSpeed(vehicle) > 0.1f) {
 		HasSpeedo = true;
 	}
+
+	NoClutch = noClutch(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model)) || TopGear == 1;
 
 	ControlAccelerate = (CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate) - 127) / 127.0f;
 }
