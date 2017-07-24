@@ -194,21 +194,21 @@ void ScriptSettings::SaveStick(ScriptControls *scriptControl) const {
 	settingsStick.SaveFile(settingsStickFile.c_str());
 }
 
-bool ScriptSettings::IsCorrectVersion() const {
-	if (settings_general_version != CORRECTVGENERAL || settings_wheel_version != CORRECTVWHEEL)
-		return false;
-	return true;
-}
-
-std::string ScriptSettings::GetVersionError() {
-	if (settings_general_version != CORRECTVGENERAL && settings_wheel_version != CORRECTVWHEEL)
-		return std::string("Wrong settings_general.ini version\nWrong settings_wheel.ini version");
-	if (settings_general_version != CORRECTVGENERAL)
-		return std::string("Wrong settings_general.ini version");
-	if (settings_wheel_version != CORRECTVWHEEL)
-		return std::string("Wrong settings_wheel.ini version");
-	return "";
-}
+//bool ScriptSettings::IsCorrectVersion() const {
+//	if (settings_general_version != CORRECTVGENERAL || settings_wheel_version != CORRECTVWHEEL)
+//		return false;
+//	return true;
+//}
+//
+//std::string ScriptSettings::GetVersionError() {
+//	if (settings_general_version != CORRECTVGENERAL && settings_wheel_version != CORRECTVWHEEL)
+//		return std::string("Wrong settings_general.ini version\nWrong settings_wheel.ini version");
+//	if (settings_general_version != CORRECTVGENERAL)
+//		return std::string("Wrong settings_general.ini version");
+//	if (settings_wheel_version != CORRECTVWHEEL)
+//		return std::string("Wrong settings_wheel.ini version");
+//	return "";
+//}
 
 std::vector<GUID> ScriptSettings::GetGuids() {
 	return reggdGuids;
@@ -375,7 +375,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	//LogCar = settingsGeneral.GetBoolValue("DEBUG", "LogCar", false);
 
 	// [FILEVERSION]
-	settings_general_version = settingsGeneral.GetValue("FILEVERSION", "VERSION", "000");
+	//settings_general_version = settingsGeneral.GetValue("FILEVERSION", "VERSION", "000");
 #pragma warning(pop)
 
 }
@@ -662,7 +662,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	}
 
 	// [FILEVERSION]
-	settings_wheel_version = settingsWheel.GetValue("FILEVERSION", "VERSION", "000");
+	//settings_wheel_version = settingsWheel.GetValue("FILEVERSION", "VERSION", "000");
 #pragma warning(pop)
 
 }

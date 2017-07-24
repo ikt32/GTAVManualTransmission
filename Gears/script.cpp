@@ -112,6 +112,9 @@ void update() {
 	updateLastInputDevice();
 	controls.UpdateValues(controls.PrevInput, ignoreClutch, false);
 
+	///////////////////////////////////////////////////////////////////////////
+	//                                   HUD
+	///////////////////////////////////////////////////////////////////////////
 	if (settings.DisplayInfo) {
 		showDebugInfo();
 	}
@@ -126,15 +129,14 @@ void update() {
 		drawSteeringWheelInfo();
 	}
 
-	if (!settings.IsCorrectVersion()) {
-		Color red;
-		red.R = 255;
-		red.G = 0;
-		red.B = 0;
-		red.A = 255;
-
-		showText(0.05, 0.05, 1.0, settings.GetVersionError().c_str(), 0, red);
-	}
+	//if (!settings.IsCorrectVersion()) {
+	//	Color red;
+	//	red.R = 255;
+	//	red.G = 0;
+	//	red.B = 0;
+	//	red.A = 255;
+	//	showText(0.05, 0.05, 1.0, settings.GetVersionError().c_str(), 0, red);
+	//}
 
 
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
