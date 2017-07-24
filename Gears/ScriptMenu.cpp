@@ -175,7 +175,7 @@ void update_menu() {
 		{ "Choose your gearbox! Options are Sequential, H-pattern and Automatic." });
 		
 		if (shiftModeTemp != settings.ShiftMode) {
-			settings.ShiftMode = shiftModeTemp;
+			settings.ShiftMode = (ShiftModes)shiftModeTemp;
 			setShiftMode(shiftModeTemp);
 		}
 

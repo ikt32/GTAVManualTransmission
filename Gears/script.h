@@ -41,12 +41,6 @@ enum eRadioStations {
 	RadioOff = 255
 };
 
-enum ShiftModes {
-	Sequential = 0,
-	HPattern = 1,
-	Automatic = 2
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 //                           Helper functions/tools
 ///////////////////////////////////////////////////////////////////////////////
@@ -134,6 +128,7 @@ void doStickControlAir();
 
 void functionAutoLookback();
 void functionAutoGear1();
+void functionHillGravity();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                              Script entry

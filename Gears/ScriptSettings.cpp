@@ -224,7 +224,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	settingsGeneral.GetBoolValue("OPTIONS", "Enable", true);
 	// [OPTIONS]
 	EnableManual = settingsGeneral.GetBoolValue("OPTIONS", "Enable", true);
-	ShiftMode = settingsGeneral.GetLongValue("OPTIONS", "ShiftMode", 0);
+	ShiftMode = (ShiftModes)settingsGeneral.GetLongValue("OPTIONS", "ShiftMode", 0);
 	SimpleBike = settingsGeneral.GetBoolValue("OPTIONS", "SimpleBike", false);
 	EngDamage = settingsGeneral.GetBoolValue("OPTIONS", "EngineDamage", false);
 	EngStall = settingsGeneral.GetBoolValue("OPTIONS", "EngineStalling", false);

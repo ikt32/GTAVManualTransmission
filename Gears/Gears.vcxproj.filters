@@ -63,6 +63,7 @@
     <ClCompile Include="Input\GenDInput.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="ShiftModes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -149,6 +150,7 @@
     <ClInclude Include="Input\GenDInput.h">
       <Filter>Input</Filter>
     </ClInclude>
+    <ClInclude Include="ShiftModes.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

@@ -23,6 +23,7 @@
 #include "menu.h"
 #include "Memory/NativeMemory.hpp"
 #include "Util/MathExt.h"
+#include "ShiftModes.h"
 
 std::string textureWheelFile;
 int textureWheelId;
@@ -54,8 +55,6 @@ int speedoIndex;
 extern std::vector<std::string> speedoTypes;
 
 bool lookrightfirst = false;
-
-
 
 void update() {
 	///////////////////////////////////////////////////////////////////////////
@@ -104,13 +103,14 @@ void update() {
 	if (vehData.Class == VehicleData::VehicleClass::Bike && settings.SimpleBike) {
 		ignoreClutch = true;
 	}
-	// Clutch pedal serves as rudder control
-	if (vehData.Class == VehicleData::VehicleClass::Plane) {
-		ignoreClutch = false;
-	}
 
 	updateLastInputDevice();
 	controls.UpdateValues(controls.PrevInput, ignoreClutch, false);
+
+	if (settings.CrossScript) {
+		crossScriptComms();
+		crossScriptUpdated();
+	}
 
 	///////////////////////////////////////////////////////////////////////////
 	//                                   HUD
@@ -129,16 +129,6 @@ void update() {
 		drawSteeringWheelInfo();
 	}
 
-	//if (!settings.IsCorrectVersion()) {
-	//	Color red;
-	//	red.R = 255;
-	//	red.G = 0;
-	//	red.B = 0;
-	//	red.A = 255;
-	//	showText(0.05, 0.05, 1.0, settings.GetVersionError().c_str(), 0, red);
-	//}
-
-
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
 		controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle) ||
 		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
@@ -151,28 +141,21 @@ void update() {
 	//                            Alt vehicle controls
 	///////////////////////////////////////////////////////////////////////////
 
-	if (settings.EnableWheel && //settings.WheelForBoat &&
-		vehData.Class == VehicleData::VehicleClass::Boat) {
+	if (settings.EnableWheel && controls.PrevInput == ScriptControls::Wheel) {
 
-
-		if (controls.PrevInput == ScriptControls::Wheel) {			
+		if (vehData.Class == VehicleData::VehicleClass::Boat) {
 			handleVehicleButtons();
 			handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
 			doWheelSteering();
 			playWheelEffects(settings, vehData, false, true);
+			return;
 		}
-		return;
-	}
 
-	if (settings.EnableWheel && //settings.WheelForBoat &&
-		(vehData.Class == VehicleData::VehicleClass::Plane || vehData.Class == VehicleData::VehicleClass::Heli )) {
+		if (vehData.Class == VehicleData::VehicleClass::Plane)
+			return;
 
-
-		//if (controls.PrevInput == ScriptControls::Stick) {
-		//	doStickControlAir();
-		//	playFFBAir(settings, vehData);
-		//}
-		return;
+		if (vehData.Class == VehicleData::VehicleClass::Heli)
+			return;
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -190,19 +173,18 @@ void update() {
 			ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f;
 		playWheelEffects(settings, vehData, airborne);
 	}	
-	
-	if (settings.CrossScript) {
-		crossScriptComms();
-		crossScriptUpdated();
-	}
 
+	///////////////////////////////////////////////////////////////////////////
+	//          Active whenever Manual is enabled from here
+	///////////////////////////////////////////////////////////////////////////
 	if (!settings.EnableManual) {
 		return;
 	}
-	///////////////////////////////////////////////////////////////////////////
-	//          Active whenever Manual is enabled from here
-	//						UI stuff and whatever
-	///////////////////////////////////////////////////////////////////////////
+
+	if (MemoryPatcher::TotalPatched != MemoryPatcher::NumGearboxPatches) {
+		MemoryPatcher::PatchInstructions();
+	}
+	
 	handleVehicleButtons();
 
 	if (settings.EnableWheel && controls.WheelControl.IsConnected(controls.SteerGUID)) {
@@ -221,32 +203,8 @@ void update() {
 	}
 
 	///////////////////////////////////////////////////////////////////////////
-	//                            Patching
+	//                            Actual mod operations
 	///////////////////////////////////////////////////////////////////////////
-	if (MemoryPatcher::TotalPatched != MemoryPatcher::NumGearboxPatches && settings.EnableManual) {
-		MemoryPatcher::PatchInstructions();
-	}
-
-	///////////////////////////////////////////////////////////////////////////
-	// Actual mod operations
-	///////////////////////////////////////////////////////////////////////////
-	
-	// Hill-start effect, gravity and stuff
-	// Courtesy of XMOD
-	if (settings.HillBrakeWorkaround) {
-		if (!controls.BrakeVal 
-			&& vehData.Speed < 2.0f &&
-			VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle))	{
-			float clutchNeutral = vehData.SimulatedNeutral ? 1.0f : controls.ClutchVal;
-			if (vehData.Pitch < 0 || clutchNeutral) {
-				ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
-					vehicle, 1, 0.0f, -1 * (vehData.Pitch / 150.0f) * 1.1f * clutchNeutral, 0.0f, true, true, true, true);
-			}
-			if (vehData.Pitch > 10.0f || clutchNeutral)
-				ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
-					vehicle, 1, 0.0f, -1 * (vehData.Pitch / 90.0f) * 0.35f * clutchNeutral, 0.0f, true, true, true, true);
-		}
-	}
 
 	// Reverse behavior
 	// For bikes, do this automatically.
@@ -299,6 +257,15 @@ void update() {
 	}
 
 	// Manual shifting
+	switch(settings.ShiftMode) {
+		case Sequential:
+			break;
+		case HPattern:
+			break;
+		case Automatic:
+			break;
+	}
+
 	if (settings.ShiftMode == 1) {
 		if (controls.PrevInput == ScriptControls::Wheel) {
 			functionHShiftWheel();
@@ -320,6 +287,10 @@ void update() {
 
 	if (settings.AutoLookBack) {
 		functionAutoLookback();
+	}
+
+	if (settings.HillBrakeWorkaround) {
+		functionHillGravity();
 	}
 
 	if (gearRattle.Active) {
@@ -616,7 +587,7 @@ void crossScriptUpdated() {
 	}
 	prevExtShift = currExtShift;
 
-	DECORATOR::DECOR_SET_INT(vehicle, "mt_get_shiftmode", settings.ShiftMode + 1);
+	DECORATOR::DECOR_SET_INT(vehicle, "mt_get_shiftmode", static_cast<int>(settings.ShiftMode) + 1);
 }
 
 // To expose some variables to other scripts
@@ -823,9 +794,9 @@ void setShiftMode(int shiftMode) {
 }
 
 void cycleShiftMode() {
-	settings.ShiftMode++;
-	if (settings.ShiftMode > 2) {
-		settings.ShiftMode = 0;
+	++settings.ShiftMode;
+	if (settings.ShiftMode >= SIZEOF_ShiftModes) {
+		settings.ShiftMode = (ShiftModes)0;
 	}
 
 	setShiftMode(settings.ShiftMode);
@@ -2065,6 +2036,21 @@ void functionAutoLookback() {
 void functionAutoGear1() {
 	if (vehData.Throttle < 0.1f && vehData.Speed < 0.1f && vehData.CurrGear > 1) {
 		vehData.LockGear = 1;
+	}
+}
+
+void functionHillGravity() {
+	if (!controls.BrakeVal
+		&& vehData.Speed < 2.0f &&
+		VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
+		float clutchNeutral = vehData.SimulatedNeutral ? 1.0f : controls.ClutchVal;
+		if (vehData.Pitch < 0 || clutchNeutral) {
+			ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
+				vehicle, 1, 0.0f, -1 * (vehData.Pitch / 150.0f) * 1.1f * clutchNeutral, 0.0f, true, true, true, true);
+		}
+		if (vehData.Pitch > 10.0f || clutchNeutral)
+			ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
+			vehicle, 1, 0.0f, -1 * (vehData.Pitch / 90.0f) * 0.35f * clutchNeutral, 0.0f, true, true, true, true);
 	}
 }
 

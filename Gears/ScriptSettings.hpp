@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "simpleini/SimpleIni.h"
+#include "ShiftModes.h"
 
 class Logger;
 class ScriptControls;
@@ -27,7 +28,7 @@ public:
 	// settings_general.ini parts
 	// [OPTIONS]
 	bool EnableManual = true;
-	int ShiftMode = 0; 	// 0 Seq, 1 H, 2 Auto
+	ShiftModes ShiftMode = Sequential; 	// 0 Seq, 1 H, 2 Auto
 	bool SimpleBike = false;
 	bool EngDamage = false;
 	bool EngStall = false;
