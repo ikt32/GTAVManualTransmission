@@ -3,9 +3,8 @@
 #include "XboxController.hpp"
 #include "WheelDirectInput.hpp"
 #include <map>
-#ifdef GAME_BUILD
+#include "GenDInput.h"
 #include "LegacyController.h"
-#endif
 
 class ScriptControls {
 public:
@@ -21,7 +20,6 @@ public:
 		SIZEOF_ControllerControlType
 	};
 
-#ifdef GAME_BUILD
 	enum class LegacyControlType {
 		ShiftUp,
 		ShiftDown,
@@ -33,7 +31,6 @@ public:
 		Engine,
 		SIZEOF_LegacyControlType
 	};
-#endif
 
 	enum class KeyboardControlType {
 		HR = 0,
@@ -99,16 +96,27 @@ public:
 		SIZEOF_WheelAxisType
 	};
 
+	enum class StickAxisType {
+		Throttle,
+		Brake,
+		Pitch,
+		Roll,
+		RudderL,
+		RudderR,
+		SIZEOF_StickAxisType
+	};
+
 	enum InputDevices {
 		Keyboard = 0,
 		Controller = 1,
-		Wheel = 2
+		Wheel = 2,
+//		Stick = 3,
 	};
 
 	const std::vector<std::pair<std::string, int>> LegacyControlsMap = {
-		{ "ControlFrontendDown",			187 },
+		{ "ControlFrontendDown",		187 },
 		{ "ControlFrontendUp",			188 },
-		{ "ControlFrontendLeft",			189 },
+		{ "ControlFrontendLeft",		189 },
 		{ "ControlFrontendRight",		190 },
 		{ "ControlFrontendRdown",		191 },
 		{ "ControlFrontendRup",			192 },
@@ -157,7 +165,7 @@ public:
 	bool ButtonIn(ControllerControlType control);
 	void SetXboxTrigger(float value);
 	float GetXboxTrigger();
-#ifdef GAME_BUILD
+
 	bool ButtonJustPressed(LegacyControlType control);
 	bool ButtonReleased(LegacyControlType control);
 	bool ButtonHeld(LegacyControlType control);
@@ -165,7 +173,7 @@ public:
 	bool ButtonIn(LegacyControlType control);
 	LegacyController::TapState ButtonTapped(LegacyControlType control);
 	bool ButtonReleasedAfter(LegacyControlType control, int time);
-#endif
+
 	bool ButtonJustPressed(WheelControlType control);
 	bool ButtonReleased(WheelControlType control);
 	bool ButtonHeld(WheelControlType control);
@@ -182,7 +190,6 @@ public:
 	float SteerVal = 0.5f;
 	float HandbrakeVal = 0.0f;
 
-
 	int CToggleTime = 1000;
 	int ThrottleUp = 0;
 	int ThrottleDown = 0;
@@ -196,7 +203,6 @@ public:
 	int HandbrakeDown = 0;
 	int WButtonHeld = 1000;
 
-	// Values are filled by ScriptSettings
 	bool InvertSteer = false;
 	bool InvertThrottle = false;
 	bool InvertBrake = false;
@@ -206,26 +212,52 @@ public:
 	float ADZBrake = 0.25f;
 	float ADZSteer = 0.25f;
 
+	float PlaneThrottle;
+	float PlaneBrake;
+	float PlanePitch;
+	float PlaneRoll;
+	float PlaneRudderL;
+	float PlaneRudderR;
+
+	int PlaneThrottleMin;
+	int PlaneThrottleMax;
+	int PlaneBrakeMin;
+	int PlaneBrakeMax;
+	int PlanePitchMin;
+	int PlanePitchMax;
+	int PlaneRollMin;
+	int PlaneRollMax;
+	int PlaneRudderLMin;
+	int PlaneRudderLMax;
+	int PlaneRudderRMin;
+	int PlaneRudderRMax;
+
+
 	std::array<std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
 	std::array<int, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXboxBlocks = {};
 
-#ifdef GAME_BUILD
 	bool UseLegacyController = false;
 	std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> LegacyControls = {};
 	std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> ControlNativeBlocks = {};
-#endif
+
 	std::array<int, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
 	
 	std::array<std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
 	std::array<GUID, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxesGUIDs = {};
 	std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
 	std::array<GUID, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButtonGUIDs = {};
-	std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
+	std::array<int, WheelDirectInput::MAX_RGBBUTTONS> WheelToKey = {};
 
 	GUID SteerGUID;
 	GUID WheelToKeyGUID = {};
 	WheelDirectInput WheelControl;
 	WheelAxisType SteerAxisType;
+
+	std::array<std::string, static_cast<int>(StickAxisType::SIZEOF_StickAxisType)> StickAxes = {};
+	std::array<GUID, static_cast<int>(StickAxisType::SIZEOF_StickAxisType)> StickAxesGUIDs = {};
+	std::array<int, static_cast<int>(StickAxisType::SIZEOF_StickAxisType)> StickButton = {};
+	std::array<GUID, static_cast<int>(StickAxisType::SIZEOF_StickAxisType)> StickButtonGUIDs = {};
+	//GenDInput StickControl;
 
 	// blergh
 	XboxController *GetRawController() {
@@ -325,9 +357,7 @@ public:
 private:
 	long long pressTime = 0;
 	long long releaseTime = 0;
-#ifdef GAME_BUILD
 	LegacyController lcontroller;
-#endif
 	XboxController controller;
 	WORD buttonState;
 

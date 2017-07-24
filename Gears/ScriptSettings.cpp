@@ -9,22 +9,18 @@
 
 #include "Util/Versions.h"
 
-ScriptSettings::ScriptSettings(const std::string &general,
-	                           const std::string &wheel) :
-	nDevices(0),
-    settingsGeneralFile(general),
-    settingsWheelFile(wheel) {
+ScriptSettings::ScriptSettings() { }
 
-}
-
-void ScriptSettings::SetFiles(const std::string &general, const std::string &wheel) {
+void ScriptSettings::SetFiles(const std::string &general, const std::string &wheel, const std::string &stick) {
 	settingsGeneralFile = general;
 	settingsWheelFile = wheel;
+	settingsStickFile = stick;
 }
 
 void ScriptSettings::Read(ScriptControls* scriptControl) {
 	parseSettingsGeneral(scriptControl);
 	parseSettingsWheel(scriptControl);
+	parseSettingsStick(scriptControl);
 }
 
 void ScriptSettings::SaveGeneral() const {
@@ -138,9 +134,7 @@ void ScriptSettings::SaveController(ScriptControls *scriptControl) const {
 	settingsGeneral.SetLongValue("CONTROLLER", "ToggleTime", scriptControl->CToggleTime); 
 	settingsGeneral.SetDoubleValue("CONTROLLER", "TriggerValue", scriptControl->GetXboxTrigger());
 	settingsGeneral.SetBoolValue("CONTROLLER", "BlockCarControls", BlockCarControls);
-#ifdef GAME_BUILD
 	settingsGeneral.SetBoolValue("CONTROLLER_LEGACY", "Enable", scriptControl->UseLegacyController);
-#endif
 
 	settingsGeneral.SaveFile(settingsGeneralFile.c_str());
 }
@@ -154,7 +148,7 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 	// [OPTIONS]
 	settingsWheel.SetBoolValue("OPTIONS", "EnableWheel", EnableWheel);
 	settingsWheel.SetBoolValue("OPTIONS", "WheelWithoutManual", WheelWithoutManual);
-	settingsWheel.SetBoolValue("OPTIONS", "WheelBoatPlanes", AltControls);
+//	settingsWheel.SetBoolValue("OPTIONS", "WheelBoatPlanes", WheelForBoat);
 	settingsWheel.SetBoolValue("OPTIONS", "PatchSteering", PatchSteering);
 	settingsWheel.SetBoolValue("OPTIONS", "PatchSteeringAlways", PatchSteeringAlways);
 	settingsWheel.SetBoolValue("OPTIONS", "PatchSteeringControl", PatchSteeringControl);
@@ -180,7 +174,7 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 	settingsWheel.SetDoubleValue("STEER", "SteerAngleMax", SteerAngleMax );
 	settingsWheel.SetDoubleValue("STEER", "SteerAngleCar", SteerAngleCar );
 	settingsWheel.SetDoubleValue("STEER", "SteerAngleBike",SteerAngleBike);
-	settingsWheel.SetDoubleValue("STEER", "SteerAngleAlt", SteerAngleAlt );
+	settingsWheel.SetDoubleValue("STEER", "SteerAngleBoat", SteerAngleBoat);
 	settingsWheel.SetDoubleValue("STEER", "GameSteerMult", GameSteerMult );
 
 	// [THROTTLE]
@@ -190,6 +184,14 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 	settingsWheel.SetDoubleValue("BRAKES", "ANTIDEADZONE", scriptControl->ADZBrake);
 
 	settingsWheel.SaveFile(settingsWheelFile.c_str());
+}
+
+void ScriptSettings::SaveStick(ScriptControls *scriptControl) const {
+	CSimpleIniA settingsStick;
+	settingsStick.SetUnicode();
+	settingsStick.LoadFile(settingsStickFile.c_str());
+
+	settingsStick.SaveFile(settingsStickFile.c_str());
 }
 
 bool ScriptSettings::IsCorrectVersion() const {
@@ -329,7 +331,6 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	scriptControl->ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)] = settingsGeneral.GetLongValue("CONTROLLER", "ShiftUpBlocks", -1);
 	scriptControl->ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)] = settingsGeneral.GetLongValue("CONTROLLER", "ShiftDownBlocks", -1);
 
-#ifdef GAME_BUILD
 	// [CONTROLLER_LEGACY]
 	scriptControl->UseLegacyController = settingsGeneral.GetBoolValue("CONTROLLER_LEGACY", "Enable", false);
 
@@ -344,7 +345,6 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 
 	scriptControl->ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftUp)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftUpBlocks", -1);
 	scriptControl->ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftDown)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftDownBlocks", -1);
-#endif
 
 	// [KEYBOARD]
 	scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Toggle)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Toggle", "VK_OEM_5"));
@@ -390,7 +390,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	// [OPTIONS]
 	EnableWheel = settingsWheel.GetBoolValue("OPTIONS", "EnableWheel", false);
 	WheelWithoutManual = settingsWheel.GetBoolValue("OPTIONS", "WheelWithoutManual", true);
-	AltControls = settingsWheel.GetBoolValue("OPTIONS", "WheelBoatPlanes", false);
+//	WheelForBoat = settingsWheel.GetBoolValue("OPTIONS", "WheelForBoat", false);
 	PatchSteering = settingsWheel.GetBoolValue("OPTIONS", "PatchSteering", true);
 	PatchSteeringAlways = settingsWheel.GetBoolValue("OPTIONS", "PatchSteeringAlways", false);
 	PatchSteeringControl = settingsWheel.GetBoolValue("OPTIONS", "PatchSteeringControl", true);
@@ -487,7 +487,8 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	SteerAngleMax = settingsWheel.GetDoubleValue("STEER", "SteerAngleMax", 900.0);
 	SteerAngleCar = settingsWheel.GetDoubleValue("STEER", "SteerAngleCar", 720.0);
 	SteerAngleBike = settingsWheel.GetDoubleValue("STEER", "SteerAngleBike", 180.0);
-	SteerAngleAlt = settingsWheel.GetDoubleValue("STEER", "SteerAngleAlt", 180.0);
+	SteerAngleBoat = settingsWheel.GetDoubleValue("STEER", "SteerAngleBoat", 360.0);
+
 	GameSteerMult = settingsWheel.GetDoubleValue("STEER", "GameSteerMult", 1.0);
 
 	// [THROTTLE]
@@ -650,7 +651,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	// [TO_KEYBOARD]
 	scriptControl->WheelToKeyGUID = 
 		DeviceIndexToGUID(settingsWheel.GetLongValue("TO_KEYBOARD", "DEVICE", -1), reggdGuids);
-	for (int i = 0; i < MAX_RGBBUTTONS; i++) { // Ouch
+	for (int i = 0; i < WheelDirectInput::MAX_RGBBUTTONS; i++) { // Ouch
 		std::string entryString = settingsWheel.GetValue("TO_KEYBOARD", std::to_string(i).c_str(), "UNKNOWN");
 		if (std::string(entryString).compare("UNKNOWN") == 0) {
 			scriptControl->WheelToKey[i] = -1;
@@ -664,6 +665,61 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	settings_wheel_version = settingsWheel.GetValue("FILEVERSION", "VERSION", "000");
 #pragma warning(pop)
 
+}
+
+// We dump the controls in another file, but still combine total information (GUIDs/indexes)
+void ScriptSettings::parseSettingsStick(ScriptControls *scriptControl) {
+	CSimpleIniA settingsStick;
+	settingsStick.SetUnicode();
+	settingsStick.LoadFile(settingsStickFile.c_str());
+
+	// [THROTTLE]
+	scriptControl->StickAxesGUIDs[static_cast<int>(ScriptControls::StickAxisType::Throttle)] =
+		DeviceIndexToGUID(settingsStick.GetLongValue("THROTTLE", "DEVICE", -1), reggdGuids);
+	scriptControl->StickAxes[static_cast<int>(ScriptControls::StickAxisType::Throttle)] =
+		settingsStick.GetValue("THROTTLE", "AXLE", "");
+	scriptControl->PlaneThrottleMin = settingsStick.GetLongValue("THROTTLE", "MIN", -1);
+	scriptControl->PlaneThrottleMax = settingsStick.GetLongValue("THROTTLE", "MAX", -1);
+
+	// [BRAKE]
+	scriptControl->StickAxesGUIDs[static_cast<int>(ScriptControls::StickAxisType::Brake)] =
+		DeviceIndexToGUID(settingsStick.GetLongValue("BRAKE", "DEVICE", -1), reggdGuids);
+	scriptControl->StickAxes[static_cast<int>(ScriptControls::StickAxisType::Brake)] =
+		settingsStick.GetValue("BRAKE", "AXLE", "");
+	scriptControl->PlaneBrakeMin = settingsStick.GetLongValue("BRAKE", "MIN", -1);
+	scriptControl->PlaneBrakeMin = settingsStick.GetLongValue("BRAKE", "MAX", -1);
+
+	// [PITCH]
+	scriptControl->StickAxesGUIDs[static_cast<int>(ScriptControls::StickAxisType::Pitch)] =
+		DeviceIndexToGUID(settingsStick.GetLongValue("PITCH", "DEVICE", -1), reggdGuids);
+	scriptControl->StickAxes[static_cast<int>(ScriptControls::StickAxisType::Pitch)] =
+		settingsStick.GetValue("PITCH", "AXLE", "");
+	scriptControl->PlanePitchMin = settingsStick.GetLongValue("PITCH", "MIN", -1);
+	scriptControl->PlanePitchMin = settingsStick.GetLongValue("PITCH", "MAX", -1);
+
+	// [ROLL]
+	scriptControl->StickAxesGUIDs[static_cast<int>(ScriptControls::StickAxisType::Roll)] =
+		DeviceIndexToGUID(settingsStick.GetLongValue("ROLL", "DEVICE", -1), reggdGuids);
+	scriptControl->StickAxes[static_cast<int>(ScriptControls::StickAxisType::Roll)] =
+		settingsStick.GetValue("ROLL", "AXLE", "");
+	scriptControl->PlaneRollMin = settingsStick.GetLongValue("ROLL", "MIN", -1);
+	scriptControl->PlaneRollMin = settingsStick.GetLongValue("ROLL", "MAX", -1);
+
+	// [RUDDER_L]
+	scriptControl->StickAxesGUIDs[static_cast<int>(ScriptControls::StickAxisType::RudderL)] =
+		DeviceIndexToGUID(settingsStick.GetLongValue("RUDDER_L", "DEVICE", -1), reggdGuids);
+	scriptControl->StickAxes[static_cast<int>(ScriptControls::StickAxisType::RudderL)] =
+		settingsStick.GetValue("RUDDER_L", "AXLE", "");
+	scriptControl->PlaneRudderLMin = settingsStick.GetLongValue("RUDDER_L", "MIN", -1);
+	scriptControl->PlaneRudderLMin = settingsStick.GetLongValue("RUDDER_L", "MAX", -1);
+
+	// [RUDDER_R]
+	scriptControl->StickAxesGUIDs[static_cast<int>(ScriptControls::StickAxisType::RudderR)] =
+		DeviceIndexToGUID(settingsStick.GetLongValue("RUDDER_R", "DEVICE", -1), reggdGuids);
+	scriptControl->StickAxes[static_cast<int>(ScriptControls::StickAxisType::RudderR)] =
+		settingsStick.GetValue("RUDDER_R", "AXLE", "");
+	scriptControl->PlaneRudderRMin = settingsStick.GetLongValue("RUDDER_R", "MIN", -1);
+	scriptControl->PlaneRudderRMin = settingsStick.GetLongValue("RUDDER_R", "MAX", -1);
 }
 
 ptrdiff_t ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, std::string dev_name) {
@@ -762,6 +818,19 @@ bool ScriptSettings::SteeringClearWheelToKey(int button) {
 	if (err < 0)
 		logger.Write("Unable to save to " + settingsWheelFile);
 	return result;
+}
+
+void ScriptSettings::StickSaveAxis(const std::string &confTag, ptrdiff_t index, const std::string &axis, int minVal, int maxVal) {
+	CSimpleIniA settingsStick;
+	settingsStick.SetUnicode();
+	settingsStick.LoadFile(settingsStickFile.c_str());
+	settingsStick.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
+	settingsStick.SetValue(confTag.c_str(), "AXLE", axis.c_str());
+	settingsStick.SetValue(confTag.c_str(), "MIN", std::to_string(minVal).c_str());
+	settingsStick.SetValue(confTag.c_str(), "MAX", std::to_string(maxVal).c_str());
+	int err = settingsStick.SaveFile(settingsStickFile.c_str());
+	if (err < 0)
+		logger.Write("Unable to save to " + settingsStickFile);
 }
 
 void ScriptSettings::KeyboardSaveKey(const std::string &confTag, const std::string &key) {

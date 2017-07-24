@@ -1,19 +1,29 @@
-/*
- * Massive thanks to t-mat on GitHub for having a simple C++ DInput
- * application! https://gist.github.com/t-mat/1391291
- */
-
 #pragma once
-
 #include <array>
 #include <vector>
 #include "DiJoyStick.h"
 
-class WheelDirectInput {
+/*
+ * Okay, so you're probably looking at this class and are trying to figure out
+ * why the hell I copy-pasted 98% of the WheelDirectInput stuff. I'm not a 
+ * smart person, so I put a bit too much wheel stuff into the initialization
+ * of the WheelDirectInput class. This class COULD be seen as a more generic
+ * version, so in some far future when I care enough (never) both these
+ * classes could be "merged".
+ * 
+ * I really don't like this, but oh well :/
+ */
+
+class Axis {
+
+};
+
+class GenDInput {
 public:
 	static const int MAX_RGBBUTTONS = 128;
 	static const int AVGSAMPLES = 2;
-	
+	static const int numAxes = 9;
+
 	enum DIAxis {
 		lX,
 		lY,
@@ -38,7 +48,7 @@ public:
 		"rglSlider1",
 		"UNKNOWN_AXIS"
 	};
-	
+
 	enum POV {
 		N = 3600,
 		NE = 4500,
@@ -52,44 +62,34 @@ public:
 		SIZEOF_POV
 	};
 
-	WheelDirectInput();
-	~WheelDirectInput();
+	GenDInput();
+	~GenDInput();
+
 	bool PreInit();
 
-	bool InitWheel();
+	bool InitDevice();
 
-	bool InitFFB(GUID guid, DIAxis ffAxis);
-	void UpdateCenterSteering(GUID guid, DIAxis steerAxis);
 	const DiJoyStick::Entry *FindEntryFromGUID(GUID guid);
 
-	// Should be called every update()
 	void Update();
 
 	bool IsConnected(GUID device);
-	bool IsButtonPressed(int btn, GUID device);
-	bool IsButtonJustPressed(int btn, GUID device);
-	bool IsButtonJustReleased(int btn, GUID device);
-	bool WasButtonHeldForMs(int btn, GUID device, int millis);
+	bool IsButtonPressed(GUID device, int button);
+	bool IsButtonJustPressed(GUID device, int button);
+	bool IsButtonJustReleased(GUID device, int button);
+	bool WasButtonHeldForMs(GUID device, int button, int millis);
 	void UpdateButtonChangeStates();
-
-	void SetConstantForce(GUID device, int force);
 
 	DIAxis StringToAxis(std::string& axisString);
 
-	int GetAxisValue(DIAxis axis, GUID device);
-	float GetAxisSpeed(DIAxis axis, GUID device);
+	int GetAxisValue(GUID device, DIAxis axis);
+	float GetAxisSpeed(GUID device, DIAxis axis);
 
-	std::vector<GUID> GetGuids();
-	void PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine);
+	std::vector<GUID> GetGUIDs();
 
 private:
-	bool createConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis);
-	void formatError(HRESULT hr, std::string &hrStr);
-
 	DiJoyStick djs;
 	LPDIRECTINPUT lpDi = nullptr;
-	LPDIRECTINPUTEFFECT pCFEffect;
-	LPDIRECTINPUTEFFECT pFREffect;
 	std::array<__int64, MAX_RGBBUTTONS> rgbPressTime;
 	std::array<__int64, MAX_RGBBUTTONS> rgbReleaseTime;
 	std::array<bool, MAX_RGBBUTTONS> rgbButtonCurr;
@@ -101,10 +101,7 @@ private:
 	std::array<bool, SIZEOF_POV> povButtonCurr;
 	std::array<bool, SIZEOF_POV> povButtonPrev;
 
-	int prevPosition = 0;
-	long long prevTime = 0;
 	std::array<float, AVGSAMPLES> samples = {};
-	int averageIndex = 0;
 	std::vector<GUID> foundGuids;
-	bool hasForceFeedback = false;
+
 };

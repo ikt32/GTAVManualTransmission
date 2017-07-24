@@ -184,6 +184,7 @@ void update_menu() {
 		menu.MenuOption("Steering Wheel", "wheelmenu", { "Set up your steering wheel." });
 		menu.MenuOption("HUD Options", "hudmenu", { "Toggle and move HUD elements. Choose between imperial or metric speeds." });
 		menu.MenuOption("Debug", "debugmenu", { "Show technical details and options." });
+		//menu.MenuOption("Plane!", "planemenu");
 
 		int activeIndex = 0;
 		std::string activeInputName;
@@ -197,6 +198,9 @@ void update_menu() {
 			case ScriptControls::Wheel:
 				activeInputName = "Wheel";
 				break;
+			//case ScriptControls::Stick:
+			//	activeInputName = "Stick";
+			//	break;
 		}
 		std::vector<std::string> active = { activeInputName };
 		menu.StringArray("Active input", active, activeIndex, { "Active input is automatically detected and can't be changed." });
@@ -403,10 +407,10 @@ void update_menu() {
 			settings.SaveWheel(&controls);
 		}
 		
-		if (menu.BoolOption("Enable wheel for boats & planes", settings.AltControls,
-		{ "Enable wheel input for boats and planes.","Experimental and hard-coded for now." })) {
-			settings.SaveWheel(&controls);
-		}
+		//if (menu.BoolOption("Enable wheel for boats & planes", settings.WheelForBoat,
+		//{ "Enable wheel input for boats and planes.","Experimental and hard-coded for now." })) {
+		//	settings.SaveWheel(&controls);
+		//}
 		
 		if (menu.BoolOption("Patch steering", settings.PatchSteering,
 		{ "Patches steering reduction and automatic countersteer for more direct control." })) {
@@ -474,7 +478,7 @@ void update_menu() {
 		{ "How many degrees your wheel physically can turn. Should match driver settings." })) {
 			if (settings.SteerAngleCar > settings.SteerAngleMax) { settings.SteerAngleCar = settings.SteerAngleMax; }
 			if (settings.SteerAngleBike > settings.SteerAngleMax) { settings.SteerAngleBike = settings.SteerAngleMax; }
-			if (settings.SteerAngleAlt > settings.SteerAngleMax) { settings.SteerAngleAlt = settings.SteerAngleMax; }
+			if (settings.SteerAngleBoat > settings.SteerAngleMax) { settings.SteerAngleBoat = settings.SteerAngleMax; }
 		}
 		menu.FloatOption("Car soft lock", settings.SteerAngleCar, 180.0, settings.SteerAngleMax, 60.0,
 		{ "Soft lock for cars and trucks. (degrees)" });
@@ -482,8 +486,8 @@ void update_menu() {
 		menu.FloatOption("Bike soft lock", settings.SteerAngleBike, 180.0, settings.SteerAngleMax, 60.0,
 		{ "Soft lock for bikes and quads. (degrees)" });
 
-		menu.FloatOption("Boat/Plane soft lock", settings.SteerAngleAlt, 180.0, settings.SteerAngleMax, 60.0,
-		{ "Soft lock for boats and planes. (degrees)" });
+		menu.FloatOption("Boat soft lock", settings.SteerAngleBoat, 180.0, settings.SteerAngleMax, 60.0,
+		{ "Soft lock for boats. (degrees)" });
 		
 		if (menu.FloatOption("Steering Multiplier", settings.GameSteerMult, 0.1, 2.0, 0.01, 
 		{ "Increase steering lock for all cars." })) {
@@ -583,7 +587,7 @@ void update_menu() {
 		wheelToKeyInfo.push_back("Active wheel-to-key options:");
 		wheelToKeyInfo.push_back("Press RIGHT to clear a button");
 		wheelToKeyInfo.push_back("Device: " + settings.GUIDToDeviceIndex(controls.WheelToKeyGUID));
-		for (int i = 0; i < MAX_RGBBUTTONS; i++) {
+		for (int i = 0; i < WheelDirectInput::MAX_RGBBUTTONS; i++) {
 			if (controls.WheelToKey[i] != -1) {
 				wheelToKeyInfo.push_back(std::to_string(i) + " = " + key2str(controls.WheelToKey[i]));
 				if (controls.WheelControl.IsButtonPressed(i, controls.WheelToKeyGUID)) {
@@ -773,6 +777,52 @@ void update_menu() {
 		{ "Shares data like gear, shifting indicator and Neutral with other mods." });
 	}
 
+	/*if (menu.CurrentMenu("planemenu")) {
+		menu.Title("Plane!");
+		menu.Subtitle("Setup");
+
+		std::vector<std::string> info = {
+			"Press RIGHT to clear this axis" ,
+			"Throttle\t: " + std::to_string(controls.PlaneThrottle),
+			"Brake\t: " + std::to_string(controls.PlaneBrake),
+			"Pitch\t: " + std::to_string(controls.PlanePitch),
+			"Roll\t\t: " + std::to_string(controls.PlaneRoll),
+			"Rudder L\t: " + std::to_string(controls.PlaneRudderL),
+			"Rudder R\t: " + std::to_string(controls.PlaneRudderR),
+		};
+
+		if (menu.OptionPlus("Calibrate throttle", info, std::bind(clearAxis, "THROTTLE"), nullptr, "Input values")) {
+			bool result = configStickAxis("THROTTLE");
+			showNotification(result ? "axis saved" : "Cancelled axis calibration", &prevNotification);
+			if (result) initWheel();
+		}
+		if (menu.OptionPlus("Calibrate brake", info, std::bind(clearAxis, "BRAKE"), nullptr, "Input values")) {
+			bool result = configStickAxis("BRAKE");
+			showNotification(result ? "axis saved" : "Cancelled axis calibration", &prevNotification);
+			if (result) initWheel();
+		}
+		if (menu.OptionPlus("Calibrate pitch", info, std::bind(clearAxis, "PITCH"), nullptr, "Input values")) {
+			bool result = configStickAxis("PITCH");
+			showNotification(result ? "axis saved" : "Cancelled axis calibration", &prevNotification);
+			if (result) initWheel();
+		}
+		if (menu.OptionPlus("Calibrate roll", info, std::bind(clearAxis, "ROLL"), nullptr, "Input values")) {
+			bool result = configStickAxis("ROLL");
+			showNotification(result ? "axis saved" : "Cancelled axis calibration", &prevNotification);
+			if (result) initWheel();
+		}
+		if (menu.OptionPlus("Calibrate rudder L", info, std::bind(clearAxis, "RUDDER_L"), nullptr, "Input values")) {
+			bool result = configStickAxis("RUDDER_L");
+			showNotification(result ? "axis saved" : "Cancelled axis calibration", &prevNotification);
+			if (result) initWheel();
+		}
+		if (menu.OptionPlus("Calibrate rudder R", info, std::bind(clearAxis, "RUDDER_R"), nullptr, "Input values")) {
+			bool result = configStickAxis("RUDDER_R");
+			showNotification(result ? "axis saved" : "Cancelled axis calibration", &prevNotification);
+			if (result) initWheel();
+		}
+	}*/
+
 	menu.EndMenu();
 }
 
@@ -893,6 +943,44 @@ void clearHShifter() {
 	settings.Read(&controls);
 	showNotification("Cleared H-pattern shifter", &prevNotification);
 }
+
+// stick
+//bool getConfigAxisStickWithValues(std::vector<std::tuple<GUID, std::string, int>> startStates, GUID &selectedGUID, std::string &selectedAxis, int hyst, bool &positive, int &startValue_) {
+//	for (auto guid : controls.StickControl.GetGUIDs()) {
+//		for (int i = 0; i < GenDInput::SIZEOF_DIAxis - 1; i++) {
+//			for (auto startState : startStates) {
+//				std::string axisName = controls.StickControl.DIAxisHelper[i];
+//				int axisValue = controls.StickControl.GetAxisValue(guid, static_cast<GenDInput::DIAxis>(i));
+//				int startValue = std::get<2>(startState);
+//				if (std::get<0>(startState) == guid &&
+//					std::get<1>(startState) == axisName) {
+//					startValue_ = startValue;
+//					if (axisValue > startValue + hyst) { // 0 (min) - 65535 (max)
+//						selectedGUID = guid;
+//						selectedAxis = axisName;
+//						positive = true;
+//						return true;
+//					}
+//					if (axisValue < startValue - hyst) { // 65535 (min) - 0 (max)
+//						selectedGUID = guid;
+//						selectedAxis = axisName;
+//						positive = false;
+//						return true;
+//					}
+//				}
+//			}
+//		}
+//	}
+//	return false;
+//}
+//
+//void saveStickAxis(const std::string &confTag, GUID devGUID, std::string axis, int min, int max) {
+//	std::wstring wDevName = controls.StickControl.FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
+//	std::string devName = std::string(wDevName.begin(), wDevName.end());
+//	auto index = settings.SteeringAppendDevice(devGUID, devName);
+//	settings.StickSaveAxis(confTag, index, axis, min, max);
+//	settings.Read(&controls);
+//}
 
 // Controller and keyboard
 void saveKeyboardKey(std::string confTag, std::string key) {
@@ -1385,3 +1473,80 @@ bool configLControllerButton(const std::string &confTag) {
 		WAIT(0);
 	}
 }
+
+/*
+bool configStickAxis(std::string str) {
+
+	std::string confTag = str;
+	std::string additionalInfo = "Press " + escapeKey + " to exit.";
+
+	additionalInfo += " Fully press and release the " + confTag + " to register axis.";
+
+	controls.UpdateValues(ScriptControls::InputDevices::Stick, false, true);
+	// Save current state
+	std::vector<std::tuple<GUID, std::string, int>> startStates;
+	for (auto guid : controls.StickControl.GetGUIDs()) {
+		for (int i = 0; i < GenDInput::SIZEOF_DIAxis - 1; i++) {
+			std::string axisName = controls.StickControl.DIAxisHelper[i];
+			int axisValue = controls.StickControl.GetAxisValue(guid, static_cast<GenDInput::DIAxis>(i));
+			startStates.push_back(std::tuple<GUID, std::string, int>(guid, axisName, axisValue));
+		}
+	}
+
+	// Ignore inputs before selection if they moved less than hyst
+	int hyst = 65536 / 8;
+
+	// To track direction of physical <-> digital value.
+	bool positive = true;
+
+	GUID selectedGUID;
+	std::string selectedAxis;
+	int startValue;
+	int endValue;
+
+	// going down!
+	while (true) {
+		if (IsKeyJustUp(str2key(escapeKey))) {
+			return false;
+		}
+		controls.UpdateValues(ScriptControls::InputDevices::Stick, false, true);
+		if (getConfigAxisStickWithValues(startStates, selectedGUID, selectedAxis, hyst, positive, startValue)) {
+			break;
+		}
+		showSubtitle(additionalInfo);
+		WAIT(0);
+	}
+
+	int prevAxisValue = controls.StickControl.GetAxisValue(selectedGUID, controls.StickControl.StringToAxis(selectedAxis));
+
+	// and up again!
+	while (true) {
+		if (IsKeyJustUp(str2key(escapeKey))) {
+			return false;
+		}
+		controls.UpdateValues(ScriptControls::InputDevices::Stick, false, true);
+
+		int axisValue = controls.StickControl.GetAxisValue(selectedGUID, controls.StickControl.StringToAxis(selectedAxis));
+
+		if (positive && axisValue < prevAxisValue) {
+			endValue = prevAxisValue;
+			break;
+		}
+
+		if (!positive && axisValue > prevAxisValue) {
+			endValue = prevAxisValue;
+			break;
+		}
+
+		prevAxisValue = axisValue;
+
+		showSubtitle(additionalInfo);
+		WAIT(0);
+	}
+
+	int min = startValue;
+	int max = endValue;
+	saveStickAxis(confTag, selectedGUID, selectedAxis, min, max);
+	return true;
+}
+*/

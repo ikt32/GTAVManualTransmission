@@ -28,22 +28,24 @@ void ScriptControls::InitWheel(bool initffb) {
 	}
 }
 
+float mapToFloat(int A, int B, float C, float D, int val) {
+	return ((float)val - (float)A) / ((float)B - (float)A) * (D - C) + C;
+}
+
 void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, bool justPeekingWheelKb) {
-#ifdef GAME_BUILD
 	if (UseLegacyController) {
 		lcontroller.UpdateButtonChangeStates();
 	}
 
 	if (!UseLegacyController && controller.IsConnected()) {
-#else
-	if (controller.IsConnected()) {
-#endif
 		buttonState = controller.GetState().Gamepad.wButtons;
 		controller.UpdateButtonChangeStates();
 	}
 
 	WheelControl.Update();
 	WheelControl.UpdateButtonChangeStates();
+
+//	StickControl.Update();
 
 	CheckCustomButtons(justPeekingWheelKb);
 
@@ -57,7 +59,6 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 			break;
 		}			
 		case Controller: {
-#ifdef GAME_BUILD
 			if (UseLegacyController) {
 				ThrottleVal = lcontroller.GetAnalogValue(lcontroller.EControlToButton(LegacyControls[static_cast<int>(LegacyControlType::Throttle)]));
 				BrakeVal = lcontroller.GetAnalogValue(lcontroller.EControlToButton(LegacyControls[static_cast<int>(LegacyControlType::Brake)]));
@@ -69,12 +70,6 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 				ClutchVal = controller.GetAnalogValue(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Clutch)]), buttonState);
 				ClutchValRaw = ClutchVal;
 			}
-#else
-			ThrottleVal = controller.GetAnalogValue(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState);
-			BrakeVal = controller.GetAnalogValue(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Brake)]), buttonState);
-			ClutchVal = controller.GetAnalogValue(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Clutch)]), buttonState);
-			ClutchValRaw = ClutchVal;
-#endif
 			break;
 		}
 		case Wheel: {
@@ -130,7 +125,6 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 			if (ClutchVal > 1.0f) { ClutchVal = 1.0f; }
 			if (ClutchValRaw > 1.0f) { ClutchValRaw = 1.0f; }
 
-
 			if (ThrottleVal < 0.0f) { ThrottleVal = 0.0f; }
 			if (BrakeVal < 0.0f) { BrakeVal = 0.0f; }
 			if (ClutchVal < 0.0f) { ClutchVal = 0.0f; }
@@ -143,6 +137,43 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 
 			break;
 		}
+		//case Stick: {
+		//	int rawThrottle = StickControl.GetAxisValue(StickAxesGUIDs[static_cast<int>(StickAxisType::Throttle)],
+		//												StickControl.StringToAxis(StickAxes[static_cast<int>(StickAxisType::Throttle)]));
+		//	int rawBrake = StickControl.GetAxisValue(StickAxesGUIDs[static_cast<int>(StickAxisType::Brake)],
+		//											 StickControl.StringToAxis(StickAxes[static_cast<int>(StickAxisType::Brake)]));
+		//	int rawPitch = StickControl.GetAxisValue(StickAxesGUIDs[static_cast<int>(StickAxisType::Pitch)],
+		//											 StickControl.StringToAxis(StickAxes[static_cast<int>(StickAxisType::Pitch)]));
+		//	int rawRoll = StickControl.GetAxisValue(StickAxesGUIDs[static_cast<int>(StickAxisType::Roll)],
+		//											StickControl.StringToAxis(StickAxes[static_cast<int>(StickAxisType::Roll)]));
+		//	int rawRudderR = StickControl.GetAxisValue(StickAxesGUIDs[static_cast<int>(StickAxisType::RudderR)],
+		//											   StickControl.StringToAxis(StickAxes[static_cast<int>(StickAxisType::RudderR)]));
+		//	int rawRudderL = StickControl.GetAxisValue(StickAxesGUIDs[static_cast<int>(StickAxisType::RudderL)],
+		//											   StickControl.StringToAxis(StickAxes[static_cast<int>(StickAxisType::RudderL)]));
+		//	PlaneThrottle = mapToFloat(PlaneThrottleMin, PlaneThrottleMax, 0.0f, 1.0f, rawThrottle);
+		//	PlaneBrake =	mapToFloat(PlaneBrakeMin, PlaneBrakeMax, 0.0f, 1.0f, rawBrake);
+		//	PlanePitch =	mapToFloat(PlanePitchMin, PlanePitchMax, 0.0f, 1.0f, rawPitch);
+		//	PlaneRoll =		mapToFloat(PlaneRollMin, PlaneRollMax, 0.0f, 1.0f, rawRoll);
+		//	PlaneRudderR =	mapToFloat(PlaneRudderRMin, PlaneRudderRMax, 0.0f, 1.0f, rawRudderR);
+		//	PlaneRudderL =	mapToFloat(PlaneRudderLMin, PlaneRudderLMax, 0.0f, 1.0f, rawRudderL);
+
+
+		//	if (PlaneThrottle > 1.0f) { PlaneThrottle = 1.0f; }
+		//	if (PlaneBrake > 1.0f) { PlaneBrake = 1.0f; }
+		//	if (PlanePitch > 1.0f) { PlanePitch = 1.0f; }
+		//	if (PlaneRoll > 1.0f) { PlaneRoll = 1.0f; }
+		//	if (PlaneRudderR > 1.0f) { PlaneRudderR = 1.0f; }
+		//	if (PlaneRudderL > 1.0f) { PlaneRudderL = 1.0f; }
+
+		//	if (PlaneThrottle < 1.0f) { PlaneThrottle = 0.0f; }
+		//	if (PlaneBrake	  < 1.0f) { PlaneBrake    = 0.0f; }
+		//	if (PlanePitch    < 1.0f) { PlanePitch    = 0.0f; }
+		//	if (PlaneRoll     < 1.0f) { PlaneRoll     = 0.0f; }
+		//	if (PlaneRudderR  < 1.0f) { PlaneRudderR  = 0.0f; }
+		//	if (PlaneRudderL  < 1.0f) { PlaneRudderL  = 0.0f; }
+
+		//	break;
+		//}
 		default: break;
 	}
 	if (ignoreClutch) {
@@ -156,39 +187,34 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
 		IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)])) {
 		return Keyboard;
 	}
-#ifdef GAME_BUILD
 	if (UseLegacyController) {
 		if (lcontroller.IsButtonJustPressed(lcontroller.EControlToButton(LegacyControls[static_cast<int>(LegacyControlType::Throttle)])) ||
 			lcontroller.IsButtonPressed(lcontroller.EControlToButton(LegacyControls[static_cast<int>(LegacyControlType::Throttle)]))) {
 			return Controller;
 		}
 	} else {
-#endif
 		if (controller.IsButtonJustPressed(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState) ||
 			controller.IsButtonPressed(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState)) {
 			return Controller;
 		}
-#ifdef GAME_BUILD
 	}
-#endif
 	if (enableWheel && WheelControl.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
-		// Oh my god I hate single-axis throttle/brake steering wheels
-		// Looking at you DFGT.
-		int RawT = WheelControl.GetAxisValue(WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]), 
-		                                WheelAxesGUIDs[static_cast<int>(WheelAxisType::Throttle)]);
-		auto tempThrottle = 0.0f + 1.0f / (ThrottleDown - ThrottleUp)*(static_cast<float>(RawT) - ThrottleUp);
+		auto throttleAxis = WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]);
+		auto throttleGUID = WheelAxesGUIDs[static_cast<int>(WheelAxisType::Throttle)];
+		int rawThrottle = WheelControl.GetAxisValue(throttleAxis, throttleGUID);
+		auto tempThrottle = 0.0f + 1.0f / (ThrottleDown - ThrottleUp)*(static_cast<float>(rawThrottle) - ThrottleUp);
 
 		if (WheelAxes[static_cast<int>(WheelAxisType::Throttle)] == WheelAxes[static_cast<int>(WheelAxisType::Brake)]) {
 			
 			// get throttle range
 			if (ThrottleDown > ThrottleUp &&
-				RawT < ThrottleDown &&
-				RawT > ThrottleUp + (ThrottleDown - ThrottleUp)*0.5) {
+				rawThrottle < ThrottleDown &&
+				rawThrottle > ThrottleUp + (ThrottleDown - ThrottleUp)*0.5) {
 				return Wheel;
 			}
 			if (ThrottleDown < ThrottleUp && // Which twisted mind came up with this
-				RawT > ThrottleDown &&
-				RawT < ThrottleUp - (ThrottleUp - ThrottleDown)*0.5) {
+				rawThrottle > ThrottleDown &&
+				rawThrottle < ThrottleUp - (ThrottleUp - ThrottleDown)*0.5) {
 				return Wheel;
 			}
 		}
@@ -202,7 +228,20 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
 		if (tempClutch > 0.5f) {
 			return Wheel;
 		}
+		if (ButtonIn(WheelControlType::Clutch) || ButtonIn(WheelControlType::Throttle)) {
+			return Wheel;
+		}
 	}
+	//if (enableWheel && StickControl.IsConnected(StickAxesGUIDs[static_cast<int>(StickAxisType::Roll)])) {
+	//	auto throttleAxis = StickControl.StringToAxis(StickAxes[static_cast<int>(StickAxisType::Throttle)]);
+	//	auto throttleGUID = StickAxesGUIDs[static_cast<int>(StickAxisType::Throttle)];
+	//	int rawThrottle = StickControl.GetAxisValue(throttleGUID, throttleAxis);
+	//	auto tempThrottle = 0.0f + 1.0f / (PlaneThrottleMax - PlaneThrottleMin)*(static_cast<float>(rawThrottle) - PlaneThrottleMin);
+	//	if (tempThrottle > 0.5f) {
+	//		return Stick;
+	//	}
+	//}
+
 	return previousInput;
 }
 
@@ -297,9 +336,7 @@ bool ScriptControls::ButtonIn(ControllerControlType control) {
 
 void ScriptControls::SetXboxTrigger(float value) {
 	controller.TriggerValue = value;
-#ifdef GAME_BUILD
 	lcontroller.TriggerValue = value;
-#endif
 }
 
 float ScriptControls::GetXboxTrigger() {
@@ -309,7 +346,6 @@ float ScriptControls::GetXboxTrigger() {
 /*
  * Legacy stuff
  */
-#ifdef GAME_BUILD
 bool ScriptControls::ButtonJustPressed(LegacyControlType control) {
 	if (!UseLegacyController) return false;
 	auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
@@ -363,7 +399,6 @@ bool ScriptControls::ButtonReleasedAfter(LegacyControlType control, int time) {
 	return false;
 }
 
-#endif
 /*
  * Wheel section
  */
@@ -415,7 +450,7 @@ void ScriptControls::CheckCustomButtons(bool justPeeking) {
 	if (justPeeking) { // we do not want to send keyboard codes if we just test the device
 		return;
 	}
-	for (int i = 0; i < MAX_RGBBUTTONS; i++) {
+	for (int i = 0; i < WheelDirectInput::MAX_RGBBUTTONS; i++) {
 		if (WheelToKey[i] != -1) {
 			INPUT input;
 			input.type = INPUT_KEYBOARD;

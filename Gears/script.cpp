@@ -33,11 +33,12 @@ float stallingProgress = 0.0f;
 
 std::string settingsGeneralFile;
 std::string settingsWheelFile;
+std::string settingsStickFile;
 std::string settingsMenuFile;
 
 NativeMenu::Menu menu;
 ScriptControls controls;
-ScriptSettings settings(settingsGeneralFile, settingsWheelFile);
+ScriptSettings settings;
 
 Player player;
 Ped playerPed;
@@ -122,6 +123,7 @@ void update() {
 		ignoreClutch = false;
 	}
 
+	updateLastInputDevice();
 	controls.UpdateValues(controls.PrevInput, ignoreClutch, false);
 
 	if (settings.DisplayInfo) {
@@ -148,40 +150,40 @@ void update() {
 		showText(0.05, 0.05, 1.0, settings.GetVersionError().c_str(), 0, red);
 	}
 
+
+	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
+		controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle) ||
+		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
+		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonHeld(ScriptControls::LegacyControlType::Toggle)) {
+		toggleManual();
+		return;
+	}
+
 	///////////////////////////////////////////////////////////////////////////
 	//                            Alt vehicle controls
 	///////////////////////////////////////////////////////////////////////////
-	if (settings.EnableWheel &&
-		vehData.Class != VehicleData::VehicleClass::Car &&
-		vehData.Class != VehicleData::VehicleClass::Bike &&
-		vehData.Class != VehicleData::VehicleClass::Quad) {
 
-		updateLastInputDevice();
+	if (settings.EnableWheel && //settings.WheelForBoat &&
+		vehData.Class == VehicleData::VehicleClass::Boat) {
 
-		if (settings.AltControls &&
-			controls.WheelControl.IsConnected(controls.SteerGUID) &&
-			controls.PrevInput == ScriptControls::Wheel) {
-			if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
-				controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
-				controls.ButtonHeld(ScriptControls::WheelControlType::Toggle) ||
-				controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::Toggle) ) {
-				reInit();
-			}
 
-			if (vehData.Class == VehicleData::VehicleClass::Boat) {
-				handleVehicleButtons();
-				handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
-				doWheelSteeringBoat();
-				playWheelEffects(settings, vehData, false, true);
-			}
-
-			// Planes
-			if (vehData.Class == VehicleData::VehicleClass::Plane) {
-				doWheelSteeringPlane();
-				playWheelEffectsPlane(settings, vehData);
-			}
-			return;
+		if (controls.PrevInput == ScriptControls::Wheel) {			
+			handleVehicleButtons();
+			handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
+			doWheelSteering();
+			playWheelEffects(settings, vehData, false, true);
 		}
+		return;
+	}
+
+	if (settings.EnableWheel && //settings.WheelForBoat &&
+		(vehData.Class == VehicleData::VehicleClass::Plane || vehData.Class == VehicleData::VehicleClass::Heli )) {
+
+
+		//if (controls.PrevInput == ScriptControls::Stick) {
+		//	doStickControlAir();
+		//	playFFBAir(settings, vehData);
+		//}
 		return;
 	}
 	
@@ -189,19 +191,10 @@ void update() {
 	//                          Ground vehicle controls
 	///////////////////////////////////////////////////////////////////////////
 
-	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
-		controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle) ||
-		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) || 
-		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonHeld(ScriptControls::LegacyControlType::Toggle)) {
-		toggleManual();
-		return;
-	}
-
 	if (!settings.EnableManual &&
 		settings.EnableWheel && settings.WheelWithoutManual &&
 		controls.WheelControl.IsConnected(controls.SteerGUID)) {
 
-		updateLastInputDevice();
 		handleVehicleButtons();
 		handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
 		doWheelSteering();
@@ -222,7 +215,6 @@ void update() {
 	//          Active whenever Manual is enabled from here
 	//						UI stuff and whatever
 	///////////////////////////////////////////////////////////////////////////
-	updateLastInputDevice();
 	handleVehicleButtons();
 
 	if (settings.EnableWheel && controls.WheelControl.IsConnected(controls.SteerGUID)) {
@@ -729,6 +721,7 @@ void toggleManual() {
 void initWheel() {
 	if (settings.EnableWheel) {
 		controls.InitWheel(settings.EnableFFB);
+//		controls.StickControl.InitDevice();
 		controls.CheckGUIDs(settings.reggdGuids);
 	}
 	controls.SteerGUID = controls.WheelAxesGUIDs[static_cast<int>(controls.SteerAxisType)];
@@ -798,6 +791,10 @@ void updateLastInputDevice() {
 			case ScriptControls::Wheel:
 				showNotification("Switched to wheel", &prevNotification);
 				break;
+			//case ScriptControls::Stick: 
+			//	showNotification("Switched to stick", &prevNotification);
+			//	break;
+			default: break;
 		}
 		initSteeringPatches();
 	}
@@ -1891,7 +1888,7 @@ void doWheelSteering() {
 	else if (vehData.Class == VehicleData::VehicleClass::Car)
 		steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
 	else {
-		steerMult = settings.SteerAngleMax / settings.SteerAngleAlt;
+		steerMult = settings.SteerAngleMax / settings.SteerAngleBoat;
 	}
 
 	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
@@ -1911,111 +1908,19 @@ void doWheelSteering() {
 	}
 }
 
-void doWheelSteeringBoat() {
-	float steerMult = settings.SteerAngleMax / settings.SteerAngleAlt;
-	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
-	SetControlADZ(ControlVehicleMoveLeftRight, effSteer, controls.ADZSteer);
+void doStickControlAir() {
+	SetControlADZ(ControlVehicleFlyThrottleUp, controls.PlaneThrottle, 0.25f);
+	SetControlADZ(ControlVehicleFlyPitchUpDown, controls.PlanePitch, 0.25f);
+	SetControlADZ(ControlVehicleFlyRollLeftRight, controls.PlaneRoll, 0.25f);
+	SetControlADZ(ControlVehicleFlyYawLeft, controls.PlaneRudderL, 0.25f);
+	SetControlADZ(ControlVehicleFlyYawRight, controls.PlaneRudderR, 0.25f);
 }
 
-void doWheelSteeringPlane() {
-
-	if (controls.ButtonIn(ScriptControls::WheelControlType::H1))
-		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleUp, 0.33f);
-
-	if (controls.ButtonIn(ScriptControls::WheelControlType::H3))
-		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleUp, 0.66f);
-
-	if (controls.ButtonIn(ScriptControls::WheelControlType::H5))
-		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleUp, 1.0f);
-
-	if (controls.ButtonIn(ScriptControls::WheelControlType::H2))
-		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleDown, 0.33f);
-
-	if (controls.ButtonIn(ScriptControls::WheelControlType::H4))
-		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleDown, 0.66f);
-
-	if (controls.ButtonIn(ScriptControls::WheelControlType::H6))
-		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyThrottleDown, 1.0f);
-
-	float steerMult = settings.SteerAngleMax / settings.SteerAngleAlt;
-	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
-
-
-	if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftUp))
-		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyPitchUpDown, 1.0f);
-
-	if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftDown))
-		CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyPitchUpDown, -1.0f);
-
-	CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyYawLeft, controls.ClutchVal);
-	CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyYawRight, controls.ThrottleVal);
-
-	//////////////////////////////////////////////////////////////////////////////
-
-	float antiDeadzoned = effSteer;
-	if (effSteer < -0.02) {
-		antiDeadzoned = effSteer - 0.20f;
-	}
-	if (effSteer > 0.02) {
-		antiDeadzoned = effSteer + 0.20f;
-	}
-	CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleFlyRollLeftRight, antiDeadzoned);
-}
-
-// I have never flown a plane so I have no idea how this should feel
-// Also I don't think planes are flown with a steering wheel but I could be wrong
-void playWheelEffectsPlane(ScriptSettings& settings, VehicleData& vehData) {
-	auto steerAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(controls.SteerAxisType)]);
-
-	if (!controls.WheelControl.IsConnected(controls.SteerGUID) ||
-		controls.PrevInput != ScriptControls::Wheel ||
-		!settings.EnableFFB) {
+void playFFBAir(ScriptSettings& settings, VehicleData& vehData) {
+	if (!settings.EnableFFB) {
 		return;
 	}
-
-	vehData.getAccelerationVectors(vehData.V3Velocities);
-	Vector3 accelValsAvg = vehData.getAccelerationVectorsAverage();
-
-	float steerMult = settings.SteerAngleMax / settings.SteerAngleAlt;
-	
-	// Probably 0 when centered so just make a loop around dis
-	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
-
-	int damperForce = settings.DamperMin;
-
-	// steerSpeed is to dampen the steering wheel
-	auto steerSpeed = controls.WheelControl.GetAxisSpeed(steerAxis, controls.SteerGUID) / 20;
-
-	// We're a fucking plane so there are no fake G-Forces
-	// Just forces over the control surfaces so just re-center @ speed?
-	float centerForce = effSteer * vehData.Velocity;
-
-	if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
-		damperForce *= 2;
-	}
-
-	int totalForce =
-		static_cast<int>(centerForce * 100 * settings.PhysicsStrength * settings.FFGlobalMult) + // 2G = max force, Koenigsegg One:1 only does 1.7g!
-		static_cast<int>(steerSpeed * damperForce * 0.1);
-
-	// Soft lock
-	if (effSteer > 1.0f) {
-		totalForce = static_cast<int>((effSteer - 1.0f) * 100000) + totalForce;
-		if (effSteer > 1.1f) {
-			totalForce = 10000;
-		}
-	}
-	else if (effSteer < -1.0f) {
-		totalForce = static_cast<int>((-effSteer - 1.0f) * -100000) + totalForce;
-		if (effSteer < -1.1f) {
-			totalForce = -10000;
-		}
-	}
-	controls.WheelControl.SetConstantForce(controls.SteerGUID, totalForce);
-
-	if (settings.DisplayInfo) {
-		showDebugInfoWheel(settings, effSteer, damperForce, steerSpeed, centerForce, 0.0f, 0.0f);
-	}
+	// Stick ffb?
 }
 
 void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airborne, bool ignoreSpeed) {
@@ -2038,7 +1943,7 @@ void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airbo
 	else if (vehData.Class == VehicleData::VehicleClass::Car)
 		steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
 	else {
-		steerMult = settings.SteerAngleMax / settings.SteerAngleAlt;
+		steerMult = settings.SteerAngleMax / settings.SteerAngleBoat;
 	}
 	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 	
@@ -2254,11 +2159,17 @@ void main() {
 	}
 
 	if (!controls.WheelControl.PreInit()) {
-		logger.Write("DirectInput failed to initialize");
+		logger.Write("WHEEL: DirectInput failed to initialize");
 	}
+
+	//if (!controls.StickControl.PreInit()) {
+	//	logger.Write("STICK: DirectInput failed to initialize");
+	//}
+
 
 	settingsGeneralFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_general.ini";
 	settingsWheelFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_wheel.ini";
+	settingsStickFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_stick.ini";
 	settingsMenuFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_menu.ini";
 	textureWheelFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\texture_wheel.png";
 
@@ -2270,7 +2181,7 @@ void main() {
 		textureWheelId = -1;
 	}
 
-	settings.SetFiles(settingsGeneralFile, settingsWheelFile);
+	settings.SetFiles(settingsGeneralFile, settingsWheelFile, settingsStickFile);
 
 	logger.Write("Loading " + settingsGeneralFile);
 	logger.Write("Loading " + settingsWheelFile);

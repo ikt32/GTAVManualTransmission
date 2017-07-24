@@ -123,10 +123,10 @@ void handleVehicleButtons();
 void playWheelEffects(ScriptSettings& settings,
 					  VehicleData& vehData,
                       bool airborne, bool ignoreSpeed = false);
-void playWheelEffectsPlane(ScriptSettings& settings, VehicleData& vehData);
+void playFFBAir(ScriptSettings& settings, VehicleData& vehData);
 void doWheelSteering();
-void doWheelSteeringBoat();
-void doWheelSteeringPlane();
+//void doWheelSteeringBoat();
+void doStickControlAir();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                             Misc features
@@ -161,6 +161,7 @@ bool configHPattern();
 bool configKeyboardKey(const std::string &confTag);
 bool configControllerButton(const std::string &confTag);
 bool configLControllerButton(const std::string &confTag);
+bool configStickAxis(std::string confTag);
 
 void updateSteeringMultiplier();
 

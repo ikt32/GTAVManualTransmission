@@ -1,26 +1,18 @@
 #include "WheelDirectInput.hpp"
-#include "../Util/TimeHelper.hpp"
-#include "../Util/Logger.hpp"
-#include <sstream>
 
 #include <winerror.h>
+
+#include <sstream>
 #include <chrono>
 #include <vector>
 
-// TODO Look into crashes
+#include "../Util/TimeHelper.hpp"
+#include "../Util/Logger.hpp"
+
+// TODO: Get Logitech to get back at me for the G920 issue/crash
 
 WheelDirectInput::WheelDirectInput() : pCFEffect{nullptr},
-                                       pFREffect{nullptr} {
-	// Just set up to ensure djs can always be used.
-	//if (FAILED(DirectInput8Create(GetModuleHandle(nullptr),
-	//	DIRECTINPUT_VERSION,
-	//	IID_IDirectInput8,
-	//	reinterpret_cast<void**>(&lpDi),
-	//	nullptr))) {
-	//	return;
-	//}
-	//djs.enumerate(lpDi);
-}
+                                       pFREffect{nullptr} { }
 
 WheelDirectInput::~WheelDirectInput() { }
 
