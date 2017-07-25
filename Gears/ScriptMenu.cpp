@@ -500,7 +500,7 @@ void update_menu() {
 	if (menu.CurrentMenu("axesmenu")) {
 		menu.Title("Configure axes");
 		menu.Subtitle("Setup steering and pedals");
-
+		controls.UpdateValues(ScriptControls::Wheel, false, true);
 		std::vector<std::string> info = {
 			"Press RIGHT to clear this axis" ,
 			"Steer    : " + std::to_string(controls.SteerVal),
