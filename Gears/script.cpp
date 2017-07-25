@@ -258,31 +258,28 @@ void update() {
 
 	// Manual shifting
 	switch(settings.ShiftMode) {
-		case Sequential:
+		case Sequential: {
+			functionSShift();
+			if (settings.AutoGear1) {
+				functionAutoGear1();
+			}
 			break;
-		case HPattern:
+		}
+		case HPattern: {
+			if (controls.PrevInput == ScriptControls::Wheel) {
+				functionHShiftWheel();
+				if (settings.HPatternKeyboard)functionHShiftKeyboard();
+			}
+			if (controls.PrevInput == ScriptControls::Keyboard) {
+				functionHShiftKeyboard();
+			}
 			break;
-		case Automatic:
+		}
+		case Automatic: {
+			functionAShift();
 			break;
-	}
-
-	if (settings.ShiftMode == 1) {
-		if (controls.PrevInput == ScriptControls::Wheel) {
-			functionHShiftWheel();
-			if (settings.HPatternKeyboard)functionHShiftKeyboard();
 		}
-		if (controls.PrevInput == ScriptControls::Keyboard) {
-			functionHShiftKeyboard();
-		}
-	}
-	else if (settings.ShiftMode == 0){
-		functionSShift();
-		if (settings.AutoGear1) {
-			functionAutoGear1();
-		}
-	}
-	else { // Automatic
-		functionAShift();
+		default: break;
 	}
 
 	if (settings.AutoLookBack) {
@@ -789,6 +786,7 @@ void setShiftMode(int shiftMode) {
 		case Sequential: mode += "Sequential"; break;
 		case HPattern: mode += "H-Pattern"; break;
 		case Automatic: mode += "Automatic"; break;
+		default: break;
 	}
 	showNotification(mode.c_str(), &prevNotification);
 }
