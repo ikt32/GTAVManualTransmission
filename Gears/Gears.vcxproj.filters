@@ -60,9 +60,6 @@
     <ClCompile Include="Util\MathExt.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Input\GenDInput.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
     <ClCompile Include="ShiftModes.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -146,9 +143,6 @@
     </ClInclude>
     <ClInclude Include="Util\Versions.h">
       <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="Input\GenDInput.h">
-      <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="ShiftModes.h" />
   </ItemGroup>

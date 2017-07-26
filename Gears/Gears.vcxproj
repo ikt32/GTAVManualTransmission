@@ -111,7 +111,6 @@
     <ClCompile Include="..\..\GTAVMenuBase\menukeyboard.cpp" />
     <ClCompile Include="..\..\GTAVMenuBase\menusettings.cpp" />
     <ClCompile Include="..\..\GTAVMenuBase\menuutils.cpp" />
-    <ClCompile Include="Input\GenDInput.cpp" />
     <ClCompile Include="ShiftModes.cpp" />
     <ClCompile Include="Util\MathExt.cpp" />
     <ClCompile Include="ScriptMenu.cpp" />
@@ -143,7 +142,6 @@
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h" />
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
-    <ClInclude Include="Input\GenDInput.h" />
     <ClInclude Include="ShiftModes.h" />
     <ClInclude Include="Util\MathExt.h" />
     <ClInclude Include="Memory\Offsets.hpp" />

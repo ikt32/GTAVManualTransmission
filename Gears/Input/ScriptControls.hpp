@@ -3,7 +3,6 @@
 
 #include "XboxController.hpp"
 #include "WheelDirectInput.hpp"
-#include "GenDInput.h"
 #include "LegacyController.h"
 
 class ScriptControls {
