@@ -202,6 +202,7 @@ public:
 	int HandbrakeUp = 0;
 	int HandbrakeDown = 0;
 	int WButtonHeld = 1000;
+	int MaxTapTime = 200;
 
 	bool InvertSteer = false;
 	bool InvertThrottle = false;
@@ -363,7 +364,6 @@ private:
 
 	bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
-
 };
 
 // GUID stuff

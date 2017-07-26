@@ -135,6 +135,7 @@ void ScriptSettings::SaveController(ScriptControls *scriptControl) const {
 	settingsGeneral.SetDoubleValue("CONTROLLER", "TriggerValue", scriptControl->GetXboxTrigger());
 	settingsGeneral.SetBoolValue("CONTROLLER", "BlockCarControls", BlockCarControls);
 	settingsGeneral.SetBoolValue("CONTROLLER_LEGACY", "Enable", scriptControl->UseLegacyController);
+	settingsGeneral.SetLongValue("CONTROLLER", "MaxTapTime", scriptControl->MaxTapTime);
 
 	settingsGeneral.SaveFile(settingsGeneralFile.c_str());
 }
@@ -312,6 +313,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	BlockCarControls = settingsGeneral.GetBoolValue("CONTROLLER", "BlockCarControls", false);
 
 	scriptControl->CToggleTime = settingsGeneral.GetLongValue("CONTROLLER", "ToggleTime", 500);
+	scriptControl->MaxTapTime = settingsGeneral.GetLongValue("CONTROLLER", "MaxTapTime", 200);
 
 	double tval = settingsGeneral.GetDoubleValue("CONTROLLER", "TriggerValue", 0.75);
 	if (tval > 1.0 || tval < 0.1) {

@@ -324,7 +324,7 @@ bool ScriptControls::ButtonHeldOver(ControllerControlType control, int millis) {
 XboxController::TapState ScriptControls::ButtonTapped(ControllerControlType control) {
 	if (!controller.IsConnected())
 		return XboxController::TapState::ButtonUp;
-	return (controller.WasButtonTapped(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState, 200));
+	return (controller.WasButtonTapped(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState, MaxTapTime));
 }
 
 bool ScriptControls::ButtonIn(ControllerControlType control) {
@@ -389,7 +389,7 @@ bool ScriptControls::ButtonIn(LegacyControlType control) {
 LegacyController::TapState ScriptControls::ButtonTapped(LegacyControlType control) {
 	if (!UseLegacyController) return LegacyController::TapState::ButtonUp;
 	auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
-	return lcontroller.WasButtonTapped(gameButton, 200);
+	return lcontroller.WasButtonTapped(gameButton, MaxTapTime);
 }
 
 bool ScriptControls::ButtonReleasedAfter(LegacyControlType control, int time) {

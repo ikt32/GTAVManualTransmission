@@ -335,8 +335,11 @@ void update_menu() {
 		{ "Checked: the engine button turns the engine on AND off.",
 			"Not checked: the button only turns the engine on when it's off." });
 
-		menu.IntOption("Long press time (ms)", controls.CToggleTime, 100, 5000, 100,
+		menu.IntOption("Long press time (ms)", controls.CToggleTime, 100, 5000, 50,
 		{ "Timeout for long press buttons to activate." });
+
+		menu.IntOption("Max tap time (ms)", controls.MaxTapTime, 50, 1000, 10,
+		{ "Buttons pressed and released within this time are regarded as a tap. Shift up, shift down are tap controls." });
 
 		float currTriggerValue = controls.GetXboxTrigger();
 		float prevTriggerValue = currTriggerValue;
