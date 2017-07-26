@@ -13,7 +13,7 @@ class WheelDirectInput {
 public:
 	static const int MAX_RGBBUTTONS = 128;
 	static const int AVGSAMPLES = 2;
-	
+
 	enum DIAxis {
 		lX,
 		lY,
@@ -27,18 +27,6 @@ public:
 		SIZEOF_DIAxis
 	};
 
-	std::array<std::string, SIZEOF_DIAxis> DIAxisHelper{
-		"lX",
-		"lY",
-		"lZ",
-		"lRx",
-		"lRy",
-		"lRz",
-		"rglSlider0",
-		"rglSlider1",
-		"UNKNOWN_AXIS"
-	};
-	
 	enum POV {
 		N = 3600,
 		NE = 4500,
@@ -48,8 +36,18 @@ public:
 		SW = 22500,
 		W = 27000,
 		NW = 31500,
-		UNKNOWN_POV,
-		SIZEOF_POV
+	};
+
+	const std::array<std::string, SIZEOF_DIAxis> DIAxisHelper {
+		"lX",
+		"lY",
+		"lZ",
+		"lRx",
+		"lRy",
+		"lRz",
+		"rglSlider0",
+		"rglSlider1",
+		"UNKNOWN_AXIS"
 	};
 
 	WheelDirectInput();
@@ -86,6 +84,11 @@ private:
 	bool createConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis);
 	void formatError(HRESULT hr, std::string &hrStr);
 
+	static const int POVDIRECTIONS = 8;
+	const std::array<POV, POVDIRECTIONS> POVDirections{
+		N, NE, E, SE, S, SW, W, NW
+	};
+
 	DiJoyStick djs;
 	LPDIRECTINPUT lpDi = nullptr;
 	LPDIRECTINPUTEFFECT pCFEffect;
@@ -96,10 +99,10 @@ private:
 	std::array<bool, MAX_RGBBUTTONS> rgbButtonPrev;
 
 	// hooooo boi a big array I only use 8 values of
-	std::array<__int64, SIZEOF_POV> povPressTime;
-	std::array<__int64, SIZEOF_POV> povReleaseTime;
-	std::array<bool, SIZEOF_POV> povButtonCurr;
-	std::array<bool, SIZEOF_POV> povButtonPrev;
+	std::array<__int64, POVDIRECTIONS> povPressTime;
+	std::array<__int64, POVDIRECTIONS> povReleaseTime;
+	std::array<bool, POVDIRECTIONS> povButtonCurr;
+	std::array<bool, POVDIRECTIONS> povButtonPrev;
 
 	int prevPosition = 0;
 	long long prevTime = 0;

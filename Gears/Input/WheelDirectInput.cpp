@@ -254,8 +254,8 @@ void WheelDirectInput::UpdateButtonChangeStates() {
 	for (int i = 0; i < MAX_RGBBUTTONS; i++) {
 		rgbButtonPrev[i] = rgbButtonCurr[i];
 	}
-	for (int i = 0; i < SIZEOF_POV; i++) {
-		povButtonPrev[i] = povButtonCurr[i];
+	for (auto pov : POVDirections) {
+		povButtonPrev[pov] = povButtonCurr[pov];
 	}
 }
 
