@@ -11,6 +11,7 @@
 #include "Util/Util.hpp"
 #include "Util/Versions.h"
 #include "inc/natives.h"
+#include "menukeyboard.h"
 
 extern ScriptSettings settings;
 extern std::string settingsGeneralFile;
@@ -1159,7 +1160,6 @@ bool configWheelToKey() {
 	GUID selectedGuid;
 	int button = -1;
 	std::string keyName;
-	auto keyMap = createKeyMap();
 
 	while (true) {
 		if (IsKeyJustUp(str2key(escapeKey))) {
@@ -1190,7 +1190,7 @@ bool configWheelToKey() {
 			}
 		}
 		if (progress == 1) {
-			for (auto key : keyMap) {
+			for (auto key : NativeMenu::KeyMap) {
 				if (key.first != "ESC" && IsKeyJustUp(key.second)) {
 					keyName = key.first;
 					progress++;
@@ -1373,8 +1373,7 @@ bool configKeyboardKey(const std::string &confTag) {
 		if (IsKeyJustUp(str2key(escapeKey))) {
 			return false;
 		}
-		auto keymap = createKeyMap();
-		for (auto k : keymap) {
+		for (auto k : NativeMenu::KeyMap) {
 			if (isMenuControl(k.second)) {
 				showNotification("Can't use menu controls!", &prevNotification);
 				continue;
