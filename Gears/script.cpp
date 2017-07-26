@@ -147,7 +147,7 @@ void update() {
 			handleVehicleButtons();
 			handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
 			doWheelSteering();
-			playWheelEffects(settings, vehData, false, true);
+			playFFBGround(false, true);
 			return;
 		}
 
@@ -171,7 +171,7 @@ void update() {
 		doWheelSteering();
 		bool airborne = !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) &&
 			ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f;
-		playWheelEffects(settings, vehData, airborne);
+		playFFBGround(airborne);
 	}	
 
 	///////////////////////////////////////////////////////////////////////////
@@ -191,7 +191,7 @@ void update() {
 		doWheelSteering();
 		bool airborne = !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) &&
 			ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f;
-		playWheelEffects(settings, vehData, airborne );
+		playFFBGround(airborne);
 	}
 	
 
@@ -248,7 +248,6 @@ void update() {
 			functionEngStall();
 		}
 
-
 		// Simulate "catch point"
 		// When the clutch "grabs" and the car starts moving without input
 		if (settings.ClutchCatching) {
@@ -268,9 +267,9 @@ void update() {
 		case HPattern: {
 			if (controls.PrevInput == ScriptControls::Wheel) {
 				functionHShiftWheel();
-				if (settings.HPatternKeyboard)functionHShiftKeyboard();
 			}
-			if (controls.PrevInput == ScriptControls::Keyboard) {
+			if (controls.PrevInput == ScriptControls::Keyboard ||
+				controls.PrevInput == ScriptControls::Wheel && settings.HPatternKeyboard) {
 				functionHShiftKeyboard();
 			}
 			break;
@@ -336,7 +335,7 @@ void showHUD() {
 	else {
 		c = solidWhite;
 	}
-	showText(settings.GearXpos, settings.GearYpos, settings.GearSize, gear.c_str(), settings.HUDFont, c, true);
+	showText(settings.GearXpos, settings.GearYpos, settings.GearSize, gear, settings.HUDFont, c, true);
 
 	// Shift mode indicator
 	char * shiftModeText;
@@ -381,7 +380,7 @@ void showHUD() {
 			speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(dashms)));
 			if (settings.SpeedoShowUnit) speedoFormat << (settings.HUDFont == 2 ? " mps" : " m/s");;
 		}
-		showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize, speedoFormat.str().c_str(), settings.HUDFont, solidWhite, true);
+		showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize, speedoFormat.str(), settings.HUDFont, solidWhite, true);
 	}
 
 	// RPM Indicator!
@@ -454,16 +453,16 @@ void showDebugInfo() {
 	ssDashSpd	<< "Speedo:\t" << (vehData.HasSpeedo ? "Yes" : "No");
 	ssDbias		<< "DBias:\t\t" << std::setprecision(3) << vehData.DriveBiasFront;
 
-	showText(0.01f, 0.275f, 0.4f, ssEnabled.str().c_str(),	4, solidWhite, true);
-	showText(0.01f, 0.300f, 0.4f, ssRPM.str().c_str(),		4, solidWhite, true);
-	showText(0.01f, 0.325f, 0.4f, ssCurrGear.str().c_str(),	4, solidWhite, true);
-	showText(0.01f, 0.350f, 0.4f, ssNextGear.str().c_str(),	4, solidWhite, true);
-	showText(0.01f, 0.375f, 0.4f, ssClutch.str().c_str(),	4, solidWhite, true);
-	showText(0.01f, 0.400f, 0.4f, ssThrottle.str().c_str(),	4, solidWhite, true);
-	showText(0.01f, 0.425f, 0.4f, ssTurbo.str().c_str(),	4, solidWhite, true);
-	showText(0.01f, 0.450f, 0.4f, ssAddress.str().c_str(),	4, solidWhite, true);
-	showText(0.01f, 0.475f, 0.4f, ssDashSpd.str().c_str(),	4, solidWhite, true);
-	showText(0.01f, 0.500f, 0.4f, ssDbias.str().c_str(),	4, solidWhite, true);
+	showText(0.01f, 0.275f, 0.4f, ssEnabled.str(),	4, solidWhite, true);
+	showText(0.01f, 0.300f, 0.4f, ssRPM.str(),		4, solidWhite, true);
+	showText(0.01f, 0.325f, 0.4f, ssCurrGear.str(),	4, solidWhite, true);
+	showText(0.01f, 0.350f, 0.4f, ssNextGear.str(),	4, solidWhite, true);
+	showText(0.01f, 0.375f, 0.4f, ssClutch.str(),	4, solidWhite, true);
+	showText(0.01f, 0.400f, 0.4f, ssThrottle.str(),	4, solidWhite, true);
+	showText(0.01f, 0.425f, 0.4f, ssTurbo.str(),	4, solidWhite, true);
+	showText(0.01f, 0.450f, 0.4f, ssAddress.str(),	4, solidWhite, true);
+	showText(0.01f, 0.475f, 0.4f, ssDashSpd.str(),	4, solidWhite, true);
+	showText(0.01f, 0.500f, 0.4f, ssDbias.str(),	4, solidWhite, true);
 
 	std::stringstream ssThrottleInput;
 	std::stringstream ssBrakeInput;
@@ -475,15 +474,15 @@ void showDebugInfo() {
 	ssClutchInput	<< "Clutch:\t\t" << controls.ClutchValRaw;
 	ssHandbrakInput << "Handb:\t\t" << controls.HandbrakeVal;
 
-	showText(0.85, 0.050, 0.4, ssThrottleInput.str().c_str(),	4, solidWhite, true);
-	showText(0.85, 0.075, 0.4, ssBrakeInput.str().c_str(),		4, solidWhite, true);
-	showText(0.85, 0.100, 0.4, ssClutchInput.str().c_str(),		4, solidWhite, true);
-	showText(0.85, 0.125, 0.4, ssHandbrakInput.str().c_str(),	4, solidWhite, true);
+	showText(0.85, 0.050, 0.4, ssThrottleInput.str(),	4, solidWhite, true);
+	showText(0.85, 0.075, 0.4, ssBrakeInput.str(),		4, solidWhite, true);
+	showText(0.85, 0.100, 0.4, ssClutchInput.str(),		4, solidWhite, true);
+	showText(0.85, 0.125, 0.4, ssHandbrakInput.str(),	4, solidWhite, true);
 
 	if (settings.EnableWheel) {
 		std::stringstream dinputDisplay;
 		dinputDisplay << "Wheel" << (controls.WheelControl.IsConnected(controls.SteerGUID) ? "" : " not") << " present";
-		showText(0.85, 0.150, 0.4, dinputDisplay.str().c_str(), 4, solidWhite, true);
+		showText(0.85, 0.150, 0.4, dinputDisplay.str(), 4, solidWhite, true);
 	}
 }
 
@@ -505,30 +504,13 @@ void showDebugInfoWheel(ScriptSettings &settings, float effSteer, int damperForc
 	ssUnderSteer	<< "Understeer:\t" << understeer;
 	ssOverSteer		<< "Oversteer:\t" << oversteer;
 
-	showText(0.85, 0.175, 0.4, SteerRaw.str().c_str(),		4, solidWhite, true);
-	showText(0.85, 0.200, 0.4, SteerNorm.str().c_str(),		4, solidWhite, true);
-	showText(0.85, 0.225, 0.4, steerDisplay.str().c_str(),	4, solidWhite, true);
-	showText(0.85, 0.250, 0.4, GForceDisplay.str().c_str(),	4, solidWhite, true);
-	showText(0.85, 0.275, 0.4, damperF.str().c_str(),		4, solidWhite, true);
-	showText(0.85, 0.300, 0.4, ssUnderSteer.str().c_str(),	4, solidWhite, true);
-	showText(0.85, 0.325, 0.4, ssOverSteer.str().c_str(),	4, solidWhite, true);
-}
-
-void showDebugInfo3D(Vector3 location, std::vector<std::string> textLines, Color backgroundColor = transparentGray) {
-	float height = 0.0125f;
-	
-	GRAPHICS::SET_DRAW_ORIGIN(location.x, location.y, location.z, 0);
-	int i = 0;
-	for (auto line : textLines) {
-		showText(0, 0 + height * i, 0.2f, line.c_str());
-		i++;
-	}
-		
-	float szX = 0.060f;
-	float szY = (height * i) + 0.02f;
-	GRAPHICS::DRAW_RECT(0.027f, (height * i)/2.0f, szX, szY,
-						backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A);
-	GRAPHICS::CLEAR_DRAW_ORIGIN();
+	showText(0.85, 0.175, 0.4, SteerRaw.str(),		4, solidWhite, true);
+	showText(0.85, 0.200, 0.4, SteerNorm.str(),		4, solidWhite, true);
+	showText(0.85, 0.225, 0.4, steerDisplay.str(),	4, solidWhite, true);
+	showText(0.85, 0.250, 0.4, GForceDisplay.str(),	4, solidWhite, true);
+	showText(0.85, 0.275, 0.4, damperF.str(),		4, solidWhite, true);
+	showText(0.85, 0.300, 0.4, ssUnderSteer.str(),	4, solidWhite, true);
+	showText(0.85, 0.325, 0.4, ssOverSteer.str(),	4, solidWhite, true);
 }
 
 void drawSteeringWheelInfo() {
@@ -587,7 +569,7 @@ void crossScriptUpdated() {
 	DECORATOR::DECOR_SET_INT(vehicle, "mt_get_shiftmode", static_cast<int>(settings.ShiftMode) + 1);
 }
 
-// To expose some variables to other scripts
+// TODO: Phase out
 void crossScriptComms() {
 	// Current gear
 	DECORATOR::DECOR_SET_INT(vehicle, "doe_elk", vehData.CurrGear);
@@ -624,7 +606,7 @@ void crossScriptComms() {
 //                           Mod functions: Mod control
 ///////////////////////////////////////////////////////////////////////////////
 
-void reInit() {
+void initialize() {
 	settings.Read(&controls);
 	menu.ReadSettings();
 
@@ -650,9 +632,7 @@ void reset() {
 	if (MemoryPatcher::SteeringPatched) {
 		MemoryPatcher::RestoreSteeringCorrection();
 	}
-	if (settings.EnableFFB && controls.WheelControl.IsConnected(controls.SteerGUID)) {
-		controls.WheelControl.SetConstantForce(controls.SteerGUID, 0);
-	}
+	controls.StopForceFeedback();
 	lastVehicle = vehicle = 0;
 }
 
@@ -662,7 +642,7 @@ void toggleManual() {
 	std::stringstream message;
 	message << "Manual Transmission " <<
 	           (settings.EnableManual ? "Enabled" : "Disabled");
-	showNotification(message.str().c_str(), &prevNotification);
+	showNotification(message.str(), &prevNotification);
 	logger.Write(message.str());
 	if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
 		VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
@@ -671,7 +651,7 @@ void toggleManual() {
 	if (!settings.EnableManual) {
 		reset();
 	}
-	reInit();
+	initialize();
 }
 
 void initWheel() {
@@ -730,7 +710,6 @@ void resetSteeringMultiplier() {
 void updateLastInputDevice() {
 	if (controls.PrevInput != controls.GetLastInputDevice(controls.PrevInput,settings.EnableWheel)) {
 		controls.PrevInput = controls.GetLastInputDevice(controls.PrevInput, settings.EnableWheel);
-		// ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
 		switch (controls.PrevInput) {
 			case ScriptControls::Keyboard:
 				showNotification("Switched to keyboard/mouse", &prevNotification);
@@ -788,7 +767,7 @@ void setShiftMode(int shiftMode) {
 		case Automatic: mode += "Automatic"; break;
 		default: break;
 	}
-	showNotification(mode.c_str(), &prevNotification);
+	showNotification(mode, &prevNotification);
 }
 
 void cycleShiftMode() {
@@ -1203,7 +1182,7 @@ void functionEngStall() {
 		if (settings.DisplayInfo)
 			showNotification("Your car has stalled.");
 	}
-	//showText(0.1, 0.1, 1.0, ("Stall progress:" + std::to_string(stallingProgress)).c_str(), 0, solidWhite, true);
+	//showText(0.1, 0.1, 1.0, ("Stall progress:" + std::to_string(stallingProgress)), 0, solidWhite, true);
 }
 
 void functionEngDamage() {
@@ -1233,12 +1212,12 @@ void fakeRev() {
 	float timeStep = SYSTEM::TIMESTEP();
 	float accelRatio = 2.5f * timeStep;
 	float rpmValTemp = (vehData.PrevRpm > vehData.Rpm ? (vehData.PrevRpm - vehData.Rpm) : 0.0f);
-	if (vehData.CurrGear == 1) {
+	if (vehData.CurrGear == 1) {			// For some reason, first gear revs slower
 		rpmValTemp *= 2.0f;
 	}
-	float rpmVal = vehData.Rpm + // Base value
-		rpmValTemp + // Keep it constant
-		controls.ThrottleVal * accelRatio; // Addition value, depends on delta T
+	float rpmVal = vehData.Rpm +			// Base value
+		rpmValTemp +						// Keep it constant
+		controls.ThrottleVal * accelRatio;	// Addition value, depends on delta T
 	//showText(0.4, 0.4, 2.0, "FakeRev");
 	ext.SetCurrentRPM(vehicle, rpmVal);
 }
@@ -1323,9 +1302,13 @@ void handleRPM() {
 	}
 	vehData.UpdateRpm();
 	ext.SetClutch(vehicle, finalClutch);
-	//showText(0.1, 0.15, 0.5, ("clutch set: " + std::to_string(finalClutch)).c_str());
+	//showText(0.1, 0.15, 0.5, ("clutch set: " + std::to_string(finalClutch)));
 }
 
+/*
+ * Truck gearbox code doesn't stop accelerating, so this speed limiter
+ * is needed to stop acceleration once upshift point is reached.
+ */
 void functionTruckLimiting() {
 	// Save speed @ shift
 	if (vehData.CurrGear < vehData.NextGear) {
@@ -1357,7 +1340,7 @@ void functionTruckLimiting() {
 //                   Mod functions: Reverse/Pedal handling
 ///////////////////////////////////////////////////////////////////////////////
 
-// Anti-Deadzone
+// Anti-Deadzone.
 void SetControlADZ(eControl control, float value, float adz) {
 	CONTROLS::_SET_CONTROL_NORMAL(0, control, sgn(value)*adz+(1.0f-adz)*value);
 }
@@ -1492,7 +1475,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 			// Just brake
 			if (wheelThrottleVal <= 0.01f && wheelBrakeVal > 0.01f) {
 				//showText(0.3, 0.0, 1.0, "We should brake");
-				//showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)).c_str());
+				//showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)));
 				SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, controls.ADZBrake);
 				ext.SetThrottleP(vehicle, 0.1f);
 				ext.SetBrakeP(vehicle, 1.0f);
@@ -1508,7 +1491,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 			if (wheelThrottleVal > 0.01f && (controls.ClutchVal > settings.ClutchCatchpoint || vehData.SimulatedNeutral)) {
 				if (wheelBrakeVal > 0.01f) {
 					//showText(0.3, 0.0, 1.0, "We should rev and brake");
-					//showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)).c_str() );
+					//showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)) );
 					SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, controls.ADZBrake);
 					ext.SetThrottleP(vehicle, 0.1f);
 					ext.SetBrakeP(vehicle, 1.0f);
@@ -1622,9 +1605,9 @@ void functionAutoReverse() {
 ///////////////////////////////////////////////////////////////////////////////
 //                       Mod functions: Buttons
 ///////////////////////////////////////////////////////////////////////////////
-
-void handleVehicleButtons() {
-	// Limited button blocking
+// Blocks some vehicle controls on tapping, tries to activate them when holding.
+// TODO: Some original "tap" controls don't work.
+void blockButtons() {
 	if (settings.BlockCarControls && settings.EnableManual && controls.PrevInput == ScriptControls::Controller &&
 		!(settings.ShiftMode == Automatic && vehData.CurrGear > 1)) {
 
@@ -1659,28 +1642,35 @@ void handleVehicleButtons() {
 				}
 
 				if (controls.ButtonReleasedAfter(static_cast<ScriptControls::ControllerControlType>(i), 200)) {
-					CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlNativeBlocks[i], 0.0f);
-					CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlNativeBlocks[i], 1.0f);
+					CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 0.0f);
+					CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 1.0f);
 				}
 			}
 		}
 	}
+}
 
-	if  (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
+void startStopEngine() {
+	if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
 		(controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) ||
-		 controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::Engine) ||
-		 controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
-		 controls.PrevInput == ScriptControls::Wheel		&& controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine) ||
-		settings.ThrottleStart && controls.ThrottleVal > 0.98f && controls.ClutchVal > settings.ClutchCatchpoint)) {
+		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::Engine) ||
+		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
+		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine) ||
+		settings.ThrottleStart && controls.ThrottleVal > 0.75f && (controls.ClutchVal > settings.ClutchCatchpoint || vehData.SimulatedNeutral))) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
 	}
-	if  (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
+	if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
 		((controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) && settings.ToggleEngine) ||
-		 (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::Engine) && settings.ToggleEngine) ||
-		 controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
-		 controls.PrevInput == ScriptControls::Wheel		&& controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine))) {
+		(controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::Engine) && settings.ToggleEngine) ||
+		controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
+		controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine))) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 	}
+}
+
+void handleVehicleButtons() {
+	blockButtons();
+	startStopEngine();
 
 	if (!controls.WheelControl.IsConnected(controls.SteerGUID) ||
 		controls.PrevInput != ScriptControls::Wheel) {
@@ -1756,7 +1746,6 @@ void handleVehicleButtons() {
 		AUDIO::_0xDD6BCF9E94425DF9(); // Prev radio station
 	}
 
-
 	if (controls.ButtonJustPressed(ScriptControls::WheelControlType::IndicatorLeft)) {
 		if (!vehData.BlinkerLeft) {
 			vehData.BlinkerTicks = 1;
@@ -1794,15 +1783,14 @@ void handleVehicleButtons() {
 		}
 	}
 
-	float centerPos = 0.5f;//static_cast<float>(controls.SteerLeft + controls.SteerRight) / 2;
-	float wheelCenterDeviation = controls.SteerVal - centerPos;
+	float wheelCenterDeviation = ( controls.SteerVal - 0.5f) / 0.5f;
 
-	if (vehData.BlinkerTicks == 1 && abs(wheelCenterDeviation/ centerPos) > 0.2f)
+	if (vehData.BlinkerTicks == 1 && abs(wheelCenterDeviation) > 0.2f)
 	{
 		vehData.BlinkerTicks = 2;
 	}
 
-	if (vehData.BlinkerTicks == 2 && abs(wheelCenterDeviation / centerPos) < 0.1f)
+	if (vehData.BlinkerTicks == 2 && abs(wheelCenterDeviation) < 0.1f)
 	{
 		vehData.BlinkerTicks = 0;
 		VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
@@ -1872,14 +1860,14 @@ void doStickControlAir() {
 	SetControlADZ(ControlVehicleFlyYawRight, controls.PlaneRudderR, 0.25f);
 }
 
-void playFFBAir(ScriptSettings& settings, VehicleData& vehData) {
+void playFFBAir() {
 	if (!settings.EnableFFB) {
 		return;
 	}
 	// Stick ffb?
 }
 
-void playWheelEffects(ScriptSettings& settings, VehicleData& vehData, bool airborne, bool ignoreSpeed) {
+void playFFBGround(bool airborne, bool ignoreSpeed) {
 	if (!settings.EnableFFB ||
 		controls.PrevInput != ScriptControls::Wheel ||
 		!controls.WheelControl.IsConnected(controls.SteerGUID)) {
@@ -2137,12 +2125,12 @@ void main() {
 	//	logger.Write("STICK: DirectInput failed to initialize");
 	//}
 
-
-	settingsGeneralFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_general.ini";
-	settingsWheelFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_wheel.ini";
-	settingsStickFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_stick.ini";
-	settingsMenuFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\settings_menu.ini";
-	textureWheelFile = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir + "\\texture_wheel.png";
+	std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir;
+	settingsGeneralFile = absoluteModPath + "\\settings_general.ini";
+	settingsWheelFile = absoluteModPath + "\\settings_wheel.ini";
+	settingsStickFile = absoluteModPath + "\\settings_stick.ini";
+	settingsMenuFile = absoluteModPath + "\\settings_menu.ini";
+	textureWheelFile = absoluteModPath + "\\texture_wheel.png";
 
 	if (FileExists(textureWheelFile)) {
 		textureWheelId = createTexture(textureWheelFile.c_str());
@@ -2154,15 +2142,15 @@ void main() {
 
 	settings.SetFiles(settingsGeneralFile, settingsWheelFile, settingsStickFile);
 
-	logger.Write("Loading " + settingsGeneralFile);
-	logger.Write("Loading " + settingsWheelFile);
-	logger.Write("Loading " + settingsMenuFile);
+	//logger.Write("Loading " + settingsGeneralFile);
+	//logger.Write("Loading " + settingsWheelFile);
+	//logger.Write("Loading " + settingsMenuFile);
 
 	menu.RegisterOnMain(std::bind(menuInit));
 	menu.RegisterOnExit(std::bind(menuClose));
 	menu.SetFiles(settingsMenuFile);
 
-	reInit();
+	initialize();
 	while (true) {
 		update();
 		update_menu();

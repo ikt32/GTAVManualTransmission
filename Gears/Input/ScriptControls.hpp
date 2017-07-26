@@ -147,15 +147,13 @@ public:
 	void InitWheel(bool initffb);
 	void UpdateValues(InputDevices prevInput, bool ignoreClutch, bool justPeekingWheelKb);
 	InputDevices GetLastInputDevice(InputDevices previousInput, bool enableWheel = true);
-	
-	// Add more when desired
+
+	// Keyboard controls	
 	bool ButtonJustPressed(KeyboardControlType control);
-private:
 	bool IsKeyPressed(int key);
 	bool IsKeyJustPressed(int key, KeyboardControlType control);
 
-
-public:
+	// Controller controls
 	bool ButtonJustPressed(ControllerControlType control);
 	bool ButtonReleased(ControllerControlType control);
 	bool ButtonReleasedAfter(ControllerControlType control, int time);
@@ -174,11 +172,14 @@ public:
 	LegacyController::TapState ButtonTapped(LegacyControlType control);
 	bool ButtonReleasedAfter(LegacyControlType control, int time);
 
+	// Wheel controls
 	bool ButtonJustPressed(WheelControlType control);
 	bool ButtonReleased(WheelControlType control);
 	bool ButtonHeld(WheelControlType control);
 	bool ButtonIn(WheelControlType control);
 	void CheckCustomButtons(bool justPeeking);
+	void StopForceFeedback();
+
 	void CheckGUIDs(const std::vector<_GUID> &guids);
 
 	InputDevices PrevInput;

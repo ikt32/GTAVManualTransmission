@@ -56,7 +56,7 @@ void drawSteeringWheelInfo();
 //                           Mod functions: Mod control
 ///////////////////////////////////////////////////////////////////////////////
 
-void reInit();
+void initialize();
 void reset();
 void applySteeringMultiplier();
 void resetSteeringMultiplier();
@@ -114,12 +114,9 @@ void handleVehicleButtons();
 //                    Wheel input and force feedback
 ///////////////////////////////////////////////////////////////////////////////
 
-void playWheelEffects(ScriptSettings& settings,
-					  VehicleData& vehData,
-                      bool airborne, bool ignoreSpeed = false);
-void playFFBAir(ScriptSettings& settings, VehicleData& vehData);
+void playFFBGround(bool airborne, bool ignoreSpeed = false);
+void playFFBAir();
 void doWheelSteering();
-//void doWheelSteeringBoat();
 void doStickControlAir();
 
 ///////////////////////////////////////////////////////////////////////////////
