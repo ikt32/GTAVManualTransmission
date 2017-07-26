@@ -2002,7 +2002,8 @@ void playFFBGround(bool airborne, bool ignoreSpeed) {
 			totalForce = -10000;
 		}
 	}
-	controls.WheelControl.SetConstantForce(controls.SteerGUID, totalForce);
+	auto ffAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::ForceFeedback)]);
+	controls.WheelControl.SetConstantForce(controls.SteerGUID, ffAxis, totalForce);
 
 	if (settings.DisplayInfo) {
 		showDebugInfoWheel(settings, effSteer, damperForce, steerSpeed, GForce, oversteer, understeer);

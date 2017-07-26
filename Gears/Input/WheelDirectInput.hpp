@@ -8,6 +8,12 @@
 #include <array>
 #include <vector>
 #include "DiJoyStick.h"
+#include <unordered_map>
+
+// https://stackoverflow.com/questions/24113864/what-is-the-right-way-to-use-a-guid-as-the-key-in-stdhash-map
+namespace std {
+	template<> struct hash<GUID> : public std::_Bitwise_hash<GUID> { };
+}
 
 class WheelDirectInput {
 public:
@@ -70,7 +76,7 @@ public:
 	bool WasButtonHeldForMs(int btn, GUID device, int millis);
 	void UpdateButtonChangeStates();
 
-	void SetConstantForce(GUID device, int force);
+	void SetConstantForce(GUID device, DIAxis ffAxis, int force);
 
 	DIAxis StringToAxis(std::string& axisString);
 
@@ -81,6 +87,7 @@ public:
 	void PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine);
 
 private:
+	void updateAxisSpeed();
 	bool createConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis);
 	void formatError(HRESULT hr, std::string &hrStr);
 
@@ -88,26 +95,25 @@ private:
 	const std::array<POV, POVDIRECTIONS> POVDirections{
 		N, NE, E, SE, S, SW, W, NW
 	};
+	std::vector<GUID> foundGuids;
 
 	DiJoyStick djs;
 	LPDIRECTINPUT lpDi = nullptr;
 	LPDIRECTINPUTEFFECT pCFEffect;
 	LPDIRECTINPUTEFFECT pFREffect;
-	std::array<__int64, MAX_RGBBUTTONS> rgbPressTime;
-	std::array<__int64, MAX_RGBBUTTONS> rgbReleaseTime;
-	std::array<bool, MAX_RGBBUTTONS> rgbButtonCurr;
-	std::array<bool, MAX_RGBBUTTONS> rgbButtonPrev;
+	std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbPressTime;
+	std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbReleaseTime;
+	std::unordered_map<GUID, std::array<bool, MAX_RGBBUTTONS>>	rgbButtonCurr;
+	std::unordered_map<GUID, std::array<bool, MAX_RGBBUTTONS>>	rgbButtonPrev;
+	std::unordered_map<GUID, std::array<__int64, POVDIRECTIONS>>	povPressTime;
+	std::unordered_map<GUID, std::array<__int64, POVDIRECTIONS>>	povReleaseTime;
+	std::unordered_map<GUID, std::array<bool, POVDIRECTIONS>>		povButtonCurr;
+	std::unordered_map<GUID, std::array<bool, POVDIRECTIONS>>		povButtonPrev;
 
-	// hooooo boi a big array I only use 8 values of
-	std::array<__int64, POVDIRECTIONS> povPressTime;
-	std::array<__int64, POVDIRECTIONS> povReleaseTime;
-	std::array<bool, POVDIRECTIONS> povButtonCurr;
-	std::array<bool, POVDIRECTIONS> povButtonPrev;
+	std::unordered_map<GUID, std::array<int, SIZEOF_DIAxis>> prevPosition;
+	std::unordered_map<GUID, std::array<__int64, SIZEOF_DIAxis>> prevTime;
+	std::unordered_map<GUID, std::array<std::array<float, AVGSAMPLES>, SIZEOF_DIAxis>> samples;
 
-	int prevPosition = 0;
-	long long prevTime = 0;
-	std::array<float, AVGSAMPLES> samples = {};
-	int averageIndex = 0;
-	std::vector<GUID> foundGuids;
-	bool hasForceFeedback = false;
+	std::unordered_map<GUID, std::array<int, SIZEOF_DIAxis>> averageIndex;
+	std::unordered_map<GUID, std::array<bool, SIZEOF_DIAxis>> hasForceFeedback;
 };

@@ -473,7 +473,8 @@ void ScriptControls::CheckCustomButtons(bool justPeeking) {
 
 void ScriptControls::StopForceFeedback() {
 	if (WheelControl.IsConnected(SteerGUID)) {
-		WheelControl.SetConstantForce(SteerGUID, 0);
+		auto axis = WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)]);
+		WheelControl.SetConstantForce(SteerGUID, axis, 0);
 	}
 }
 
