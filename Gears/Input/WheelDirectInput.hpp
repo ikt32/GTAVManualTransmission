@@ -42,6 +42,7 @@ public:
 		SW = 22500,
 		W = 27000,
 		NW = 31500,
+		SIZEOF_POV,
 	};
 
 	const std::array<std::string, SIZEOF_DIAxis> DIAxisHelper {
@@ -99,21 +100,21 @@ private:
 
 	DiJoyStick djs;
 	LPDIRECTINPUT lpDi = nullptr;
-	LPDIRECTINPUTEFFECT pCFEffect;
-	LPDIRECTINPUTEFFECT pFREffect;
-	std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbPressTime;
-	std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbReleaseTime;
-	std::unordered_map<GUID, std::array<bool, MAX_RGBBUTTONS>>	rgbButtonCurr;
-	std::unordered_map<GUID, std::array<bool, MAX_RGBBUTTONS>>	rgbButtonPrev;
-	std::unordered_map<GUID, std::array<__int64, POVDIRECTIONS>>	povPressTime;
-	std::unordered_map<GUID, std::array<__int64, POVDIRECTIONS>>	povReleaseTime;
-	std::unordered_map<GUID, std::array<bool, POVDIRECTIONS>>		povButtonCurr;
-	std::unordered_map<GUID, std::array<bool, POVDIRECTIONS>>		povButtonPrev;
+	LPDIRECTINPUTEFFECT pCFEffect = nullptr;
+	LPDIRECTINPUTEFFECT pFREffect = nullptr;
+	std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbPressTime{};
+	std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbReleaseTime{};
+	std::unordered_map<GUID, std::array<bool, MAX_RGBBUTTONS>>	rgbButtonCurr{};
+	std::unordered_map<GUID, std::array<bool, MAX_RGBBUTTONS>>	rgbButtonPrev{};
+	std::unordered_map<GUID, std::array<__int64, SIZEOF_POV>>	povPressTime{};
+	std::unordered_map<GUID, std::array<__int64, SIZEOF_POV>>	povReleaseTime{};
+	std::unordered_map<GUID, std::array<bool, SIZEOF_POV>>		povButtonCurr{};
+	std::unordered_map<GUID, std::array<bool, SIZEOF_POV>>		povButtonPrev{};
 
-	std::unordered_map<GUID, std::array<int, SIZEOF_DIAxis>> prevPosition;
-	std::unordered_map<GUID, std::array<__int64, SIZEOF_DIAxis>> prevTime;
-	std::unordered_map<GUID, std::array<std::array<float, AVGSAMPLES>, SIZEOF_DIAxis>> samples;
+	std::unordered_map<GUID, std::array<int, SIZEOF_DIAxis>> prevPosition{};
+	std::unordered_map<GUID, std::array<__int64, SIZEOF_DIAxis>> prevTime{};
+	std::unordered_map<GUID, std::array<std::array<float, AVGSAMPLES>, SIZEOF_DIAxis>> samples{};
 
-	std::unordered_map<GUID, std::array<int, SIZEOF_DIAxis>> averageIndex;
-	std::unordered_map<GUID, std::array<bool, SIZEOF_DIAxis>> hasForceFeedback;
+	std::unordered_map<GUID, std::array<int, SIZEOF_DIAxis>> averageIndex{};
+	std::unordered_map<GUID, std::array<bool, SIZEOF_DIAxis>> hasForceFeedback{};
 };

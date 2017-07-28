@@ -76,10 +76,10 @@ bool WheelDirectInput::InitWheel() {
 		rgbReleaseTime.insert(	std::pair<GUID, std::array<__int64, MAX_RGBBUTTONS>>(guid, {}));
 		rgbButtonCurr.insert(	std::pair<GUID, std::array<bool,	MAX_RGBBUTTONS>>(guid, {}));
 		rgbButtonPrev.insert(	std::pair<GUID, std::array<bool,	MAX_RGBBUTTONS>>(guid, {}));
-		povPressTime.insert(	std::pair<GUID, std::array<__int64, POVDIRECTIONS>>(guid, {}));
-		povReleaseTime.insert(	std::pair<GUID, std::array<__int64, POVDIRECTIONS>>(guid, {}));
-		povButtonCurr.insert(	std::pair<GUID, std::array<bool,	POVDIRECTIONS>>(guid, {}));
-		povButtonPrev.insert(	std::pair<GUID, std::array<bool,	POVDIRECTIONS>>(guid, {}));
+		povPressTime.insert(	std::pair<GUID, std::array<__int64, SIZEOF_POV>>(guid, {}));
+		povReleaseTime.insert(	std::pair<GUID, std::array<__int64, SIZEOF_POV>>(guid, {}));
+		povButtonCurr.insert(	std::pair<GUID, std::array<bool, SIZEOF_POV>>(guid, {}));
+		povButtonPrev.insert(	std::pair<GUID, std::array<bool, SIZEOF_POV>>(guid, {}));
 	}
 
 	logger.Write("WHEEL: Init steering wheel success");
@@ -161,18 +161,9 @@ bool WheelDirectInput::IsConnected(GUID device) {
 	return true;
 }
 
-// Mental note: buttonType in these args means physical button number
-// like how they are in DirectInput.
-// If it matches the cardinal stuff the button is a POV hat thing
-
 bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
 	auto e = FindEntryFromGUID(device);
-
 	if (!e) {
-		/*wchar_t szGuidW[40] = { 0 };
-		StringFromGUID2(device, szGuidW, 40);
-		std::wstring wGuid = szGuidW;
-		log.Write("DBG: Button " + std::to_string(buttonType) + " with GUID " + std::string(wGuid.begin(), wGuid.end()));*/
 		return false;
 	}
 
@@ -270,7 +261,7 @@ bool WheelDirectInput::WasButtonHeldForMs(int buttonType, GUID device, int milli
 }
 
 void WheelDirectInput::UpdateButtonChangeStates() {
-	for (auto device : GetGuids()) {
+	for (auto device : foundGuids) {
 		for (int i = 0; i < MAX_RGBBUTTONS; i++) {
 			rgbButtonPrev[device][i] = rgbButtonCurr[device][i];
 		}
@@ -398,7 +389,7 @@ int WheelDirectInput::GetAxisValue(DIAxis axis, GUID device) {
 }
 
 void WheelDirectInput::updateAxisSpeed() {
-	for (GUID device : GetGuids()) {
+	for (GUID device : foundGuids) {
 		for (int i = 0; i < SIZEOF_DIAxis; i++) {
 			DIAxis axis = static_cast<DIAxis>(i);
 
