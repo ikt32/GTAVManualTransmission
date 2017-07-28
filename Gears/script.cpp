@@ -56,6 +56,22 @@ extern std::vector<std::string> speedoTypes;
 
 bool lookrightfirst = false;
 
+void initVehicle() {
+	reset();
+	//vehData.Clear();
+	vehData = VehicleData();
+	vehData.UpdateValues(ext, vehicle);
+
+	if (vehData.NoClutch) {
+		vehData.SimulatedNeutral = false;
+	}
+	else {
+		vehData.SimulatedNeutral = settings.DefaultNeutral;
+	}
+	shiftTo(1, true);
+	initSteeringPatches();
+}
+
 void update() {
 	///////////////////////////////////////////////////////////////////////////
 	//                     Are we in a supported vehicle?
@@ -72,7 +88,8 @@ void update() {
 
 	vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
 
-	if (vehicle == 0 || playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
+	if (!vehicle || !ENTITY::DOES_ENTITY_EXIST(vehicle) || 
+		playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
 		return;
 	}
 
@@ -81,26 +98,14 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 
 	if (vehicle != lastVehicle) {
-		vehData.Clear();
-		vehData.UpdateValues(ext, vehicle);
-
-		if (vehData.NoClutch) {
-			vehData.SimulatedNeutral = false;
-		}
-		else {
-			vehData.SimulatedNeutral = settings.DefaultNeutral;
-		}
-		shiftTo(1, true);
-		initSteeringPatches();
-		lastVehicle = vehicle;
+		initVehicle();
 	}
+	lastVehicle = vehicle;
 
 	vehData.UpdateValues(ext, vehicle);
 	bool ignoreClutch = false;
-	if (settings.ShiftMode == Automatic) {
-		ignoreClutch = true;
-	}
-	if (vehData.Class == VehicleData::VehicleClass::Bike && settings.SimpleBike) {
+	if (settings.ShiftMode == Automatic ||
+		vehData.Class == VehicleData::VehicleClass::Bike && settings.SimpleBike) {
 		ignoreClutch = true;
 	}
 
@@ -633,7 +638,7 @@ void reset() {
 		MemoryPatcher::RestoreSteeringCorrection();
 	}
 	controls.StopForceFeedback();
-	lastVehicle = vehicle = 0;
+	//lastVehicle = vehicle = 0;
 }
 
 void toggleManual() {
