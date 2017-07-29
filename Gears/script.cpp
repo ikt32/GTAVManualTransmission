@@ -1313,6 +1313,7 @@ void handleRPM() {
 /*
  * Truck gearbox code doesn't stop accelerating, so this speed limiter
  * is needed to stop acceleration once upshift point is reached.
+ * TODO: Fix speed limiter. Use the same as the other limiter?
  */
 void functionTruckLimiting() {
 	// Save speed @ shift
