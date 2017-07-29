@@ -91,6 +91,7 @@ private:
 	void updateAxisSpeed();
 	bool createConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis);
 	void formatError(HRESULT hr, std::string &hrStr);
+	int povDirectionToIndex(int povDirection);
 
 	static const int POVDIRECTIONS = 8;
 	const std::array<POV, POVDIRECTIONS> POVDirections{
@@ -106,10 +107,10 @@ private:
 	std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbReleaseTime{};
 	std::unordered_map<GUID, std::array<bool, MAX_RGBBUTTONS>>	rgbButtonCurr{};
 	std::unordered_map<GUID, std::array<bool, MAX_RGBBUTTONS>>	rgbButtonPrev{};
-	std::unordered_map<GUID, std::array<__int64, SIZEOF_POV>>	povPressTime{};
-	std::unordered_map<GUID, std::array<__int64, SIZEOF_POV>>	povReleaseTime{};
-	std::unordered_map<GUID, std::array<bool, SIZEOF_POV>>		povButtonCurr{};
-	std::unordered_map<GUID, std::array<bool, SIZEOF_POV>>		povButtonPrev{};
+	std::unordered_map<GUID, std::array<__int64, POVDIRECTIONS>>	povPressTime{};
+	std::unordered_map<GUID, std::array<__int64, POVDIRECTIONS>>	povReleaseTime{};
+	std::unordered_map<GUID, std::array<bool, POVDIRECTIONS>>		povButtonCurr{};
+	std::unordered_map<GUID, std::array<bool, POVDIRECTIONS>>		povButtonPrev{};
 
 	std::unordered_map<GUID, std::array<int, SIZEOF_DIAxis>> prevPosition{};
 	std::unordered_map<GUID, std::array<__int64, SIZEOF_DIAxis>> prevTime{};

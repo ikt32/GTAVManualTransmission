@@ -76,10 +76,10 @@ bool WheelDirectInput::InitWheel() {
 		rgbReleaseTime.insert(	std::pair<GUID, std::array<__int64, MAX_RGBBUTTONS>>(guid, {}));
 		rgbButtonCurr.insert(	std::pair<GUID, std::array<bool,	MAX_RGBBUTTONS>>(guid, {}));
 		rgbButtonPrev.insert(	std::pair<GUID, std::array<bool,	MAX_RGBBUTTONS>>(guid, {}));
-		povPressTime.insert(	std::pair<GUID, std::array<__int64, SIZEOF_POV>>(guid, {}));
-		povReleaseTime.insert(	std::pair<GUID, std::array<__int64, SIZEOF_POV>>(guid, {}));
-		povButtonCurr.insert(	std::pair<GUID, std::array<bool, SIZEOF_POV>>(guid, {}));
-		povButtonPrev.insert(	std::pair<GUID, std::array<bool, SIZEOF_POV>>(guid, {}));
+		povPressTime.insert(	std::pair<GUID, std::array<__int64, POVDIRECTIONS>>(guid, {}));
+		povReleaseTime.insert(	std::pair<GUID, std::array<__int64, POVDIRECTIONS>>(guid, {}));
+		povButtonCurr.insert(	std::pair<GUID, std::array<bool, POVDIRECTIONS>>(guid, {}));
+		povButtonPrev.insert(	std::pair<GUID, std::array<bool, POVDIRECTIONS>>(guid, {}));
 	}
 
 	logger.Write("WHEEL: Init steering wheel success");
@@ -193,10 +193,10 @@ bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
 
 bool WheelDirectInput::IsButtonJustPressed(int buttonType, GUID device) {
 	if (buttonType > 127) { // POV
-		povButtonCurr[device][buttonType] = IsButtonPressed(buttonType,device);
+		povButtonCurr[device][povDirectionToIndex(buttonType)] = IsButtonPressed(buttonType,device);
 
 		// raising edge
-		if (povButtonCurr[device][buttonType] && !povButtonPrev[device][buttonType]) {
+		if (povButtonCurr[device][povDirectionToIndex(buttonType)] && !povButtonPrev[device][povDirectionToIndex(buttonType)]) {
 			return true;
 		}
 		return false;
@@ -212,10 +212,10 @@ bool WheelDirectInput::IsButtonJustPressed(int buttonType, GUID device) {
 
 bool WheelDirectInput::IsButtonJustReleased(int buttonType, GUID device) {
 	if (buttonType > 127) { // POV
-		povButtonCurr[device][buttonType] = IsButtonPressed(buttonType,device);
+		povButtonCurr[device][povDirectionToIndex(buttonType)] = IsButtonPressed(buttonType,device);
 
 		// falling edge
-		if (!povButtonCurr[device][buttonType] && povButtonPrev[device][buttonType]) {
+		if (!povButtonCurr[device][povDirectionToIndex(buttonType)] && povButtonPrev[device][povDirectionToIndex(buttonType)]) {
 			return true;
 		}
 		return false;
@@ -232,15 +232,15 @@ bool WheelDirectInput::IsButtonJustReleased(int buttonType, GUID device) {
 bool WheelDirectInput::WasButtonHeldForMs(int buttonType, GUID device, int millis) {
 	if (buttonType > 127) { // POV
 		if (IsButtonJustPressed(buttonType,device)) {
-			povPressTime[device][buttonType] = milliseconds_now();
+			povPressTime[device][povDirectionToIndex(buttonType)] = milliseconds_now();
 		}
 		if (IsButtonJustReleased(buttonType,device)) {
-			povReleaseTime[device][buttonType] = milliseconds_now();
+			povReleaseTime[device][povDirectionToIndex(buttonType)] = milliseconds_now();
 		}
 
-		if ((povReleaseTime[device][buttonType] - povPressTime[device][buttonType]) >= millis) {
-			povPressTime[device][buttonType] = 0;
-			povReleaseTime[device][buttonType] = 0;
+		if ((povReleaseTime[device][povDirectionToIndex(buttonType)] - povPressTime[device][povDirectionToIndex(buttonType)]) >= millis) {
+			povPressTime[device][povDirectionToIndex(buttonType)] = 0;
+			povReleaseTime[device][povDirectionToIndex(buttonType)] = 0;
 			return true;
 		}
 		return false;
@@ -266,7 +266,7 @@ void WheelDirectInput::UpdateButtonChangeStates() {
 			rgbButtonPrev[device][i] = rgbButtonCurr[device][i];
 		}
 		for (auto pov : POVDirections) {
-			povButtonPrev[device][pov] = povButtonCurr[device][pov];
+			povButtonPrev[device][povDirectionToIndex(pov)] = povButtonCurr[device][povDirectionToIndex(pov)];
 		}
 	}
 }
@@ -505,5 +505,20 @@ void WheelDirectInput::formatError(HRESULT hr, std::string &hrStr) {
 			break;
 		default: hrStr = "UNKNOWN";
 			break;
+	}
+}
+
+int WheelDirectInput::povDirectionToIndex(int povDirection) {
+	switch (povDirection) {
+		case N:		return 0;
+		case NE:	return 1;
+		case E:		return 2;
+		case SE:	return 3;
+		case S:		return 4;
+		case SW:	return 5;
+		case W:		return 6;
+		case NW:	return 7;
+		default:
+			return -1;
 	}
 }
