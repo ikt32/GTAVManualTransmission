@@ -310,7 +310,7 @@ void update_menu() {
 			controllerInfo.push_back("Assigned to " + controls.NativeControl2Text(controls.ConfTagLController2Value(confTag)) + 
 									 " (" + std::to_string(controls.ConfTagLController2Value(confTag)) + ")");
 
-			if (menu.OptionPlus("Assign " + confTag, controllerInfo, std::bind(clearLControllerButton, confTag), nullptr, "Current setting")) {
+			if (menu.OptionPlus("Assign " + confTag, controllerInfo, nullptr, std::bind(clearLControllerButton, confTag), nullptr, "Current setting")) {
 				WAIT(500);
 				bool result = configLControllerButton(confTag);
 				//showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
@@ -359,7 +359,7 @@ void update_menu() {
 		for (auto confTag : controllerConfTags) {
 			controllerInfo.back() = controllerConfTagDetail.at(it);
 			controllerInfo.push_back("Assigned to " + controls.ConfTagController2Value(confTag));
-			if (menu.OptionPlus("Assign " + confTag, controllerInfo, std::bind(clearControllerButton, confTag), nullptr, "Current setting")) {
+			if (menu.OptionPlus("Assign " + confTag, controllerInfo, nullptr, std::bind(clearControllerButton, confTag), nullptr, "Current setting")) {
 				WAIT(500);
 				bool result = configControllerButton(confTag);
 				//showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
@@ -385,7 +385,7 @@ void update_menu() {
 		for (auto confTag : keyboardConfTags) {
 			keyboardInfo.back() = keyboardConfTagsDetail.at(it);
 			keyboardInfo.push_back("Assigned to " + key2str(controls.ConfTagKB2key(confTag)));
-			if (menu.OptionPlus("Assign " + confTag, keyboardInfo, std::bind(clearKeyboardKey, confTag), nullptr, "Current setting")) {
+			if (menu.OptionPlus("Assign " + confTag, keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag), nullptr, "Current setting")) {
 				WAIT(500);
 				bool result = configKeyboardKey(confTag);
 				if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
@@ -463,7 +463,7 @@ void update_menu() {
 		if (controls.ButtonIn(ScriptControls::WheelControlType::H6)) hpatInfo.push_back("Gear 6");
 		if (controls.ButtonIn(ScriptControls::WheelControlType::H7)) hpatInfo.push_back("Gear 7");
 
-		if (menu.OptionPlus("H-pattern shifter setup", hpatInfo, std::bind(clearHShifter), nullptr, "Input values", 
+		if (menu.OptionPlus("H-pattern shifter setup", hpatInfo, nullptr, std::bind(clearHShifter), nullptr, "Input values",
 		{ "Select this option to start H-pattern shifter setup. Follow the on-screen instructions." })) {
 			bool result = configHPattern();
 			showNotification(result ? "H-pattern shifter saved" : "Cancelled H-pattern shifter setup", &prevNotification);
@@ -514,27 +514,27 @@ void update_menu() {
 			"Handbrake: " + std::to_string(controls.HandbrakeVal),
 		};
 
-		if (menu.OptionPlus("Calibrate steering", info, std::bind(clearAxis, "STEER"), nullptr, "Input values")) {
+		if (menu.OptionPlus("Calibrate steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr, "Input values")) {
 			bool result = configAxis("STEER");
 			showNotification(result ? "Steering axis saved" : "Cancelled steering axis calibration", &prevNotification);
 			if (result) initWheel();
 		}
-		if (menu.OptionPlus("Calibrate throttle", info, std::bind(clearAxis, "THROTTLE"), nullptr, "Input values")) {
+		if (menu.OptionPlus("Calibrate throttle", info, nullptr, std::bind(clearAxis, "THROTTLE"), nullptr, "Input values")) {
 			bool result = configAxis("THROTTLE");
 			showNotification(result ? "Throttle axis saved" : "Cancelled throttle axis calibration", &prevNotification);
 			if (result) initWheel();
 		}
-		if (menu.OptionPlus("Calibrate brake", info, std::bind(clearAxis, "BRAKES"), nullptr, "Input values")) {
+		if (menu.OptionPlus("Calibrate brake", info, nullptr, std::bind(clearAxis, "BRAKES"), nullptr, "Input values")) {
 			bool result = configAxis("BRAKES");
 			showNotification(result ? "Brake axis saved" : "Cancelled brake axis calibration", &prevNotification);
 			if (result) initWheel();
 		}
-		if (menu.OptionPlus("Calibrate clutch", info, std::bind(clearAxis, "CLUTCH"), nullptr, "Input values")) {
+		if (menu.OptionPlus("Calibrate clutch", info, nullptr, std::bind(clearAxis, "CLUTCH"), nullptr, "Input values")) {
 			bool result = configAxis("CLUTCH");
 			showNotification(result ? "Clutch axis saved" : "Cancelled clutch axis calibration", &prevNotification);
 			if (result) initWheel();
 		}
-		if (menu.OptionPlus("Calibrate handbrake", info, std::bind(clearAxis, "HANDBRAKE_ANALOG"), nullptr, "Input values")) {
+		if (menu.OptionPlus("Calibrate handbrake", info, nullptr, std::bind(clearAxis, "HANDBRAKE_ANALOG"), nullptr, "Input values")) {
 			bool result = configAxis("HANDBRAKE_ANALOG");
 			showNotification(result ? "Handbrake axis saved" : "Cancelled handbrake axis calibration", &prevNotification);
 			if (result) initWheel();
@@ -600,7 +600,7 @@ void update_menu() {
 			}
 		}
 
-		if (menu.OptionPlus("Set up WheelToKey", wheelToKeyInfo, clearWheelToKey, nullptr, "Info", 
+		if (menu.OptionPlus("Set up WheelToKey", wheelToKeyInfo, nullptr, clearWheelToKey, nullptr, "Info",
 		{ "Set up wheel buttons that press a keyboard key. Only one device can be used for this." })) {
 			bool result = configWheelToKey();
 			showNotification(result ? "Entry added" : "Cancelled entry addition", &prevNotification);
@@ -639,7 +639,7 @@ void update_menu() {
 
 		for (auto confTag : buttonConfTags) {
 			buttonInfo.push_back("Assigned to " + std::to_string(controls.ConfTagWheel2Value(confTag)));
-			if (menu.OptionPlus("Assign " + confTag, buttonInfo, std::bind(clearButton, confTag), nullptr, "Current inputs")) {
+			if (menu.OptionPlus("Assign " + confTag, buttonInfo, nullptr, std::bind(clearButton, confTag), nullptr, "Current inputs")) {
 				bool result = configButton(confTag);
 				showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
 			}
@@ -1213,7 +1213,7 @@ bool configWheelToKey() {
 			addWheelToKey("TO_KEYBOARD", selectedGuid, button, keyName);
 			return true;
 		}
-		showSubtitle(additionalInfo.c_str());
+		showSubtitle(additionalInfo);
 		WAIT(0);
 	}
 }
@@ -1278,7 +1278,7 @@ bool configButton(std::string str) {
 				}
 			}
 		}
-		showSubtitle(additionalInfo.c_str());
+		showSubtitle(additionalInfo);
 		WAIT(0);
 	}
 }
