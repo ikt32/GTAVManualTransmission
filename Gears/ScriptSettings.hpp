@@ -97,15 +97,15 @@ public:
 	int RPMIndicatorRevlimitA = 255;
 
 	bool SteeringWheelInfo = false;
-	float SteeringWheelTextureX;
-	float SteeringWheelTextureY;
-	float SteeringWheelTextureSz;
-	float PedalInfoX;
-	float PedalInfoY;
-	float PedalInfoH;
-	float PedalInfoW;
-	float PedalInfoPadX;
-	float PedalInfoPadY;
+	float SteeringWheelTextureX	 = 0.0f;
+	float SteeringWheelTextureY	 = 0.0f;
+	float SteeringWheelTextureSz = 0.0f;
+	float PedalInfoX			 = 0.0f;
+	float PedalInfoY			 = 0.0f;
+	float PedalInfoH			 = 0.0f;
+	float PedalInfoW			 = 0.0f;
+	float PedalInfoPadX			 = 0.0f;
+	float PedalInfoPadY			 = 0.0f;
 
 	// [CONTROLLER]
 	bool ToggleEngine = false; // false makes it just turn ON the engine

@@ -213,26 +213,25 @@ public:
 	float ADZBrake = 0.25f;
 	float ADZSteer = 0.25f;
 
-	float PlaneThrottle;
-	float PlaneBrake;
-	float PlanePitch;
-	float PlaneRoll;
-	float PlaneRudderL;
-	float PlaneRudderR;
+	float PlaneThrottle		= 0.0f;
+	float PlaneBrake		= 0.0f;
+	float PlanePitch		= 0.0f;
+	float PlaneRoll			= 0.0f;
+	float PlaneRudderL		= 0.0f;
+	float PlaneRudderR		= 0.0f;
 
-	int PlaneThrottleMin;
-	int PlaneThrottleMax;
-	int PlaneBrakeMin;
-	int PlaneBrakeMax;
-	int PlanePitchMin;
-	int PlanePitchMax;
-	int PlaneRollMin;
-	int PlaneRollMax;
-	int PlaneRudderLMin;
-	int PlaneRudderLMax;
-	int PlaneRudderRMin;
-	int PlaneRudderRMax;
-
+	int PlaneThrottleMin	= 0;
+	int PlaneThrottleMax	= 0;
+	int PlaneBrakeMin		= 0;
+	int PlaneBrakeMax		= 0;
+	int PlanePitchMin		= 0;
+	int PlanePitchMax		= 0;
+	int PlaneRollMin		= 0;
+	int PlaneRollMax		= 0;
+	int PlaneRudderLMin		= 0;
+	int PlaneRudderLMax		= 0;
+	int PlaneRudderRMin		= 0;
+	int PlaneRudderRMax		= 0;
 
 	std::array<std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
 	std::array<int, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXboxBlocks = {};
