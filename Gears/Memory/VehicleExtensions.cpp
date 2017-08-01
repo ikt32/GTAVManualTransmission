@@ -258,11 +258,11 @@ void VehicleExtensions::SetFuelLevel(Vehicle handle, float value) {
 float VehicleExtensions::GetEngineTemp(Vehicle handle) {
 	auto address = GetAddress(handle);
 
-	auto offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x984 : -1);
+	auto offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x984: 0);
 	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x9AC : offset);
 	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x9BC : offset);
 
-	if (offset < 0)
+	if (offset == 0)
 		return 0.0f;
 
 	return *reinterpret_cast<float *>(address + offset);
@@ -271,11 +271,11 @@ float VehicleExtensions::GetEngineTemp(Vehicle handle) {
 float VehicleExtensions::GetDirtLevel(Vehicle handle) {
 	auto address = GetAddress(handle);
 
-	auto offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x910 : -1);
+	auto offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x910: 0);
 	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x938 : offset);
 	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x948 : offset);
 
-	if (offset < 0)
+	if (offset == 0)
 		return 0.0f;
 
 	return *reinterpret_cast<float *>(address + offset);
@@ -284,12 +284,12 @@ float VehicleExtensions::GetDirtLevel(Vehicle handle) {
 float VehicleExtensions::GetDashSpeed(Vehicle handle) {
 	auto address = GetAddress(handle);
 
-	auto offset = (gameVersion > G_VER_1_0_463_1_NOSTEAM ? 0x9A4 : -1);
+	auto offset = (gameVersion > G_VER_1_0_463_1_NOSTEAM ? 0x9A4: 0);
 	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x9C8 : offset);
 	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x9F0 : offset);
 	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0xA00 : offset);
 
-	if (offset < 0)
+	if (offset == 0)
 		return 0.0f;
 
 	return *reinterpret_cast<float *>(address + offset);
@@ -344,7 +344,8 @@ void VehicleExtensions::SetSteeringAngle(Vehicle handle, float value) {
 uint64_t VehicleExtensions::GetHandlingPtr(Vehicle handle) {
 	auto address = GetAddress(handle);
 	
-	int offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x850 : 0x830);
+	auto offset = gameVersion > G_VER_1_0_757_4_NOSTEAM ? 0x830 : 0;
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x850 : offset);
 	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x878 : offset);
 	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x888 : offset);
 
@@ -353,21 +354,25 @@ uint64_t VehicleExtensions::GetHandlingPtr(Vehicle handle) {
 
 float VehicleExtensions::GetDriveBiasFront(Vehicle handle) {
 	auto address = GetHandlingPtr(handle);
+	if (address == 0) return 0.0f;
 	return *reinterpret_cast<float *>(address + hOffsets.fDriveBiasFront);
 }
 
 float VehicleExtensions::GetDriveBiasRear(Vehicle handle) {
 	auto address = GetHandlingPtr(handle);
+	if (address == 0) return 0.0f;
 	return *reinterpret_cast<float *>(address + hOffsets.fDriveBiasRear);
 }
 
 float VehicleExtensions::GetPetrolTankVolume(Vehicle handle) {
 	auto address = GetHandlingPtr(handle);
+	if (address == 0) return 0.0f;
 	return *reinterpret_cast<float *>(address + hOffsets.fPetrolTankVolume);
 }
 
 float VehicleExtensions::GetOilVolume(Vehicle handle) {
 	auto address = GetHandlingPtr(handle);
+	if (address == 0) return 0.0f;
 	return *reinterpret_cast<float *>(address + hOffsets.fOilVolume);
 }
 
@@ -375,7 +380,7 @@ uint8_t VehicleExtensions::GetNumWheels(Vehicle handle) {
 	auto address = GetAddress(handle);
 
 	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0xAA0 : 0xA80);
-	// FiveM should report 1.0.505.2 now :)
+	
 	offset = (gameVersion > G_VER_1_0_463_1_NOSTEAM ? 0xA90 : offset);
 	offset = (gameVersion > G_VER_1_0_757_4_NOSTEAM ? 0xAB0 : offset);
 	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0xAE0 : offset);
@@ -391,7 +396,7 @@ uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {
 	auto address = GetAddress(handle);
 
 	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0xAA0 : 0xA80);
-	// FiveM should report 1.0.505.2 now :)
+	
 	offset = (gameVersion > G_VER_1_0_463_1_NOSTEAM ? 0xA90 : offset); 
 	offset = (gameVersion > G_VER_1_0_757_4_NOSTEAM ? 0xAB0 : offset);
 	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0xAE0 : offset);
@@ -415,9 +420,8 @@ std::vector<uint64_t> VehicleExtensions::GetWheelPtrs(Vehicle handle) {
 float VehicleExtensions::GetVisualHeight(Vehicle handle) {
 	auto wheelPtr = GetWheelsPtr(handle);
 
-	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x080 : -1);
-	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x080 : offset);
-	if (offset == -1)
+	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x080 : 0);
+	if (offset == 0)
 		return 0.0f;
 
 	return *reinterpret_cast<float *>(wheelPtr + offset);
@@ -425,10 +429,9 @@ float VehicleExtensions::GetVisualHeight(Vehicle handle) {
 
 void VehicleExtensions::SetVisualHeight(Vehicle handle, float height) {
 	auto wheelPtr = GetWheelsPtr(handle);
-	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x07C : -1);
-	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x07C : -1);
+	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x07C : 0);
 
-	if (offset == -1)
+	if (offset == 0)
 		return;
 
 	*reinterpret_cast<float *>(wheelPtr + offset) = height;
