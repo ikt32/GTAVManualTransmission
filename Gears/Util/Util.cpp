@@ -4,7 +4,7 @@
 #include "Util.hpp"
 #include <algorithm>
 
-float getStringWidth(std::string text, float scale, int font) {
+float getStringWidth(const std::string &text, float scale, int font) {
 	UI::_SET_TEXT_ENTRY_FOR_WIDTH("STRING");
 	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(text));
 	UI::SET_TEXT_FONT(font);
@@ -12,11 +12,7 @@ float getStringWidth(std::string text, float scale, int font) {
 	return UI::_GET_TEXT_SCREEN_WIDTH(true);
 }
 
-void showText(float x, float y, float scale, std::string text, int font, const Color &rgba, bool outline) {
-	showText(x, y, scale, text.c_str(), font, rgba, outline);
-}
-
-void showText(float x, float y, float scale, const char* text, int font, const Color &rgba, bool outline) {
+void showText(float x, float y, float scale, const std::string &text, int font, const Color &rgba, bool outline) {
 	UI::SET_TEXT_FONT(font);
 	UI::SET_TEXT_SCALE(scale, scale);
 	UI::SET_TEXT_COLOUR(rgba.R, rgba.G, rgba.B, rgba.A);
@@ -50,11 +46,7 @@ void showDebugInfo3D(Vector3 location, std::vector<std::string> textLines, Color
 	GRAPHICS::CLEAR_DRAW_ORIGIN();
 }
 
-void showNotification(std::string message, int *prevNotification) {
-	showNotification(message.c_str(), prevNotification);
-}
-
-void showNotification(const char* message, int *prevNotification) {
+void showNotification(const std::string &message, int *prevNotification) {
 	if (prevNotification != nullptr && *prevNotification != 0) {
 		UI::_REMOVE_NOTIFICATION(*prevNotification);
 	}
@@ -68,14 +60,14 @@ void showNotification(const char* message, int *prevNotification) {
 	}
 }
 
-void showSubtitle(std::string message, int duration) {
+void showSubtitle(const std::string &message, int duration) {
 	UI::BEGIN_TEXT_COMMAND_PRINT("CELL_EMAIL_BCON");
 
 	const int maxStringLength = 99;
 
 	for (int i = 0; i < message.size(); i += maxStringLength) {
 		int npos = std::min(maxStringLength, static_cast<int>(message.size()) - i);
-		UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(message.substr(i, npos).c_str()));
+		UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(message.substr(i, npos)));
 	}
 
 	UI::END_TEXT_COMMAND_PRINT(duration, 1);
