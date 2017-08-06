@@ -477,20 +477,19 @@ void update_menu() {
 	if (menu.CurrentMenu("anglemenu")) {
 		menu.Title("Wheel angles");
 		menu.Subtitle("Soft lock & angle setup");
-
-		if (menu.FloatOption("Physical degrees", settings.SteerAngleMax, 180.0, 1080.0, 60.0, 
+		if (menu.FloatOption("Physical degrees", settings.SteerAngleMax, minLock, 1080.0, 30.0,
 		{ "How many degrees your wheel physically can turn. Should match driver settings." })) {
 			if (settings.SteerAngleCar > settings.SteerAngleMax) { settings.SteerAngleCar = settings.SteerAngleMax; }
 			if (settings.SteerAngleBike > settings.SteerAngleMax) { settings.SteerAngleBike = settings.SteerAngleMax; }
 			if (settings.SteerAngleBoat > settings.SteerAngleMax) { settings.SteerAngleBoat = settings.SteerAngleMax; }
 		}
-		menu.FloatOption("Car soft lock", settings.SteerAngleCar, 180.0, settings.SteerAngleMax, 60.0,
+		menu.FloatOption("Car soft lock", settings.SteerAngleCar, minLock, settings.SteerAngleMax, 30.0,
 		{ "Soft lock for cars and trucks. (degrees)" });
 
-		menu.FloatOption("Bike soft lock", settings.SteerAngleBike, 180.0, settings.SteerAngleMax, 60.0,
+		menu.FloatOption("Bike soft lock", settings.SteerAngleBike, minLock, settings.SteerAngleMax, 30.0,
 		{ "Soft lock for bikes and quads. (degrees)" });
 
-		menu.FloatOption("Boat soft lock", settings.SteerAngleBoat, 180.0, settings.SteerAngleMax, 60.0,
+		menu.FloatOption("Boat soft lock", settings.SteerAngleBoat, minLock, settings.SteerAngleMax, 30.0,
 		{ "Soft lock for boats. (degrees)" });
 		
 		if (menu.FloatOption("Steering Multiplier", settings.GameSteerMult, 0.1, 2.0, 0.01, 
