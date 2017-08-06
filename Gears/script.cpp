@@ -1558,18 +1558,24 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 			//showText(0.3, 0.0, 1.0, "We are rolling forwards");
 			//bool brakelights = false;
 
-			if (vehData.Velocity > reverseThreshold) {
+			if (vehData.Velocity > reverseThreshold * 1.0f) {
 				gearRattle.Play(vehicle);
-				shiftTo(1, false);
-				vehData.SimulatedNeutral = true;
+				//shiftTo(1, false);
+				//vehData.SimulatedNeutral = true;
 				
-				if (controls.ClutchVal > settings.ClutchCatchpoint) {
+				if (controls.ClutchVal < settings.ClutchCatchpoint) {
 					CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
 				}
 				if (settings.EngDamage) {
 					VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
 						vehicle,
-						VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.MisshiftDamage * 2);
+						VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.RPMDamage * 2);
+				}
+				// Brake Pedal Reverse
+				if (wheelBrakeVal > 0.01f) {
+					SetControlADZ(ControlVehicleBrake, wheelBrakeVal, controls.ADZBrake);
+					ext.SetThrottleP(vehicle, -wheelBrakeVal);
+					ext.SetBrakeP(vehicle, 1.0f);
 				}
 				//showNotification("Woops", nullptr);
 			}
