@@ -477,6 +477,7 @@ void update_menu() {
 	if (menu.CurrentMenu("anglemenu")) {
 		menu.Title("Wheel angles");
 		menu.Subtitle("Soft lock & angle setup");
+		float minLock = 180.0f;
 		if (menu.FloatOption("Physical degrees", settings.SteerAngleMax, minLock, 1080.0, 30.0,
 		{ "How many degrees your wheel physically can turn. Should match driver settings." })) {
 			if (settings.SteerAngleCar > settings.SteerAngleMax) { settings.SteerAngleCar = settings.SteerAngleMax; }
