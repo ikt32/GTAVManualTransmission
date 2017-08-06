@@ -657,6 +657,7 @@ void toggleManual() {
 		reset();
 	}
 	initialize();
+	initSteeringPatches();
 }
 
 void initWheel() {
