@@ -206,7 +206,6 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
 		auto tempThrottle = 0.0f + 1.0f / (ThrottleDown - ThrottleUp)*(static_cast<float>(rawThrottle) - ThrottleUp);
 
 		if (WheelAxes[static_cast<int>(WheelAxisType::Throttle)] == WheelAxes[static_cast<int>(WheelAxisType::Brake)]) {
-			
 			// get throttle range
 			if (ThrottleDown > ThrottleUp &&
 				rawThrottle < ThrottleDown &&
@@ -223,11 +222,14 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
 			return Wheel;
 		}
 
-		int RawC = WheelControl.GetAxisValue(WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]),
-											 WheelAxesGUIDs[static_cast<int>(WheelAxisType::Clutch)]);
-		auto tempClutch = 0.0f + 1.0f / (ClutchDown - ClutchUp)*(static_cast<float>(RawC) - ClutchUp);
-		if (tempClutch > 0.5f) {
-			return Wheel;
+		auto clutchGUID = WheelAxesGUIDs[static_cast<int>(WheelAxisType::Clutch)];
+		if (WheelControl.IsConnected(clutchGUID)) {
+			auto clutchAxis = WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]);
+			int rawClutch = WheelControl.GetAxisValue(clutchAxis, clutchGUID);
+			auto tempClutch = 0.0f + 1.0f / (ClutchDown - ClutchUp)*(static_cast<float>(rawClutch) - ClutchUp);
+			if (tempClutch > 0.5f) {
+				return Wheel;
+			}
 		}
 		if (ButtonIn(WheelControlType::Clutch) || ButtonIn(WheelControlType::Throttle)) {
 			return Wheel;
