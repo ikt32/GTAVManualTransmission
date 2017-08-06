@@ -6,7 +6,7 @@
 
 float getStringWidth(const std::string &text, float scale, int font) {
 	UI::_SET_TEXT_ENTRY_FOR_WIDTH("STRING");
-	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(text));
+	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char*)text.c_str());
 	UI::SET_TEXT_FONT(font);
 	UI::SET_TEXT_SCALE(scale, scale);
 	return UI::_GET_TEXT_SCREEN_WIDTH(true);
@@ -20,7 +20,7 @@ void showText(float x, float y, float scale, const std::string &text, int font, 
 	UI::SET_TEXT_CENTRE(0);
 	if (outline) UI::SET_TEXT_OUTLINE();
 	UI::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
-	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(text));
+	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char*)text.c_str());
 	UI::END_TEXT_COMMAND_DISPLAY_TEXT(x, y);
 }
 
@@ -52,7 +52,7 @@ void showNotification(const std::string &message, int *prevNotification) {
 	}
 	UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
 
-	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(message));
+	UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char*)message.c_str());
 	
 	int id = UI::_DRAW_NOTIFICATION(false, false);
 	if (prevNotification != nullptr) {
@@ -67,7 +67,7 @@ void showSubtitle(const std::string &message, int duration) {
 
 	for (int i = 0; i < message.size(); i += maxStringLength) {
 		int npos = std::min(maxStringLength, static_cast<int>(message.size()) - i);
-		UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(CharAdapter(message.substr(i, npos)));
+		UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char*)message.substr(i, npos).c_str());
 	}
 
 	UI::END_TEXT_COMMAND_PRINT(duration, 1);
