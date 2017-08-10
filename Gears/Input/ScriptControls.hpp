@@ -1,11 +1,9 @@
 #pragma once
+#include <string>
 
 #include "XboxController.hpp"
 #include "WheelDirectInput.hpp"
-#include <map>
-#ifdef GAME_BUILD
 #include "LegacyController.h"
-#endif
 
 class ScriptControls {
 public:
@@ -21,7 +19,6 @@ public:
 		SIZEOF_ControllerControlType
 	};
 
-#ifdef GAME_BUILD
 	enum class LegacyControlType {
 		ShiftUp,
 		ShiftDown,
@@ -33,7 +30,6 @@ public:
 		Engine,
 		SIZEOF_LegacyControlType
 	};
-#endif
 
 	enum class KeyboardControlType {
 		HR = 0,
@@ -99,16 +95,27 @@ public:
 		SIZEOF_WheelAxisType
 	};
 
+	enum class StickAxisType {
+		Throttle,
+		Brake,
+		Pitch,
+		Roll,
+		RudderL,
+		RudderR,
+		SIZEOF_StickAxisType
+	};
+
 	enum InputDevices {
 		Keyboard = 0,
 		Controller = 1,
-		Wheel = 2
+		Wheel = 2,
+//		Stick = 3,
 	};
 
 	const std::vector<std::pair<std::string, int>> LegacyControlsMap = {
-		{ "ControlFrontendDown",			187 },
+		{ "ControlFrontendDown",		187 },
 		{ "ControlFrontendUp",			188 },
-		{ "ControlFrontendLeft",			189 },
+		{ "ControlFrontendLeft",		189 },
 		{ "ControlFrontendRight",		190 },
 		{ "ControlFrontendRdown",		191 },
 		{ "ControlFrontendRup",			192 },
@@ -139,15 +146,13 @@ public:
 	void InitWheel(bool initffb);
 	void UpdateValues(InputDevices prevInput, bool ignoreClutch, bool justPeekingWheelKb);
 	InputDevices GetLastInputDevice(InputDevices previousInput, bool enableWheel = true);
-	
-	// Add more when desired
+
+	// Keyboard controls	
 	bool ButtonJustPressed(KeyboardControlType control);
-private:
 	bool IsKeyPressed(int key);
 	bool IsKeyJustPressed(int key, KeyboardControlType control);
 
-
-public:
+	// Controller controls
 	bool ButtonJustPressed(ControllerControlType control);
 	bool ButtonReleased(ControllerControlType control);
 	bool ButtonReleasedAfter(ControllerControlType control, int time);
@@ -157,7 +162,7 @@ public:
 	bool ButtonIn(ControllerControlType control);
 	void SetXboxTrigger(float value);
 	float GetXboxTrigger();
-#ifdef GAME_BUILD
+
 	bool ButtonJustPressed(LegacyControlType control);
 	bool ButtonReleased(LegacyControlType control);
 	bool ButtonHeld(LegacyControlType control);
@@ -165,12 +170,15 @@ public:
 	bool ButtonIn(LegacyControlType control);
 	LegacyController::TapState ButtonTapped(LegacyControlType control);
 	bool ButtonReleasedAfter(LegacyControlType control, int time);
-#endif
+
+	// Wheel controls
 	bool ButtonJustPressed(WheelControlType control);
 	bool ButtonReleased(WheelControlType control);
 	bool ButtonHeld(WheelControlType control);
 	bool ButtonIn(WheelControlType control);
 	void CheckCustomButtons(bool justPeeking);
+	void StopForceFeedback();
+
 	void CheckGUIDs(const std::vector<_GUID> &guids);
 
 	InputDevices PrevInput;
@@ -181,7 +189,6 @@ public:
 	float ClutchValRaw = 0.0f;	// For readout purposes. ClutchVal is for gameplay purposes.
 	float SteerVal = 0.5f;
 	float HandbrakeVal = 0.0f;
-
 
 	int CToggleTime = 1000;
 	int ThrottleUp = 0;
@@ -195,8 +202,8 @@ public:
 	int HandbrakeUp = 0;
 	int HandbrakeDown = 0;
 	int WButtonHeld = 1000;
+	int MaxTapTime = 200;
 
-	// Values are filled by ScriptSettings
 	bool InvertSteer = false;
 	bool InvertThrottle = false;
 	bool InvertBrake = false;
@@ -206,26 +213,51 @@ public:
 	float ADZBrake = 0.25f;
 	float ADZSteer = 0.25f;
 
+	float PlaneThrottle		= 0.0f;
+	float PlaneBrake		= 0.0f;
+	float PlanePitch		= 0.0f;
+	float PlaneRoll			= 0.0f;
+	float PlaneRudderL		= 0.0f;
+	float PlaneRudderR		= 0.0f;
+
+	int PlaneThrottleMin	= 0;
+	int PlaneThrottleMax	= 0;
+	int PlaneBrakeMin		= 0;
+	int PlaneBrakeMax		= 0;
+	int PlanePitchMin		= 0;
+	int PlanePitchMax		= 0;
+	int PlaneRollMin		= 0;
+	int PlaneRollMax		= 0;
+	int PlaneRudderLMin		= 0;
+	int PlaneRudderLMax		= 0;
+	int PlaneRudderRMin		= 0;
+	int PlaneRudderRMax		= 0;
+
 	std::array<std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
 	std::array<int, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXboxBlocks = {};
 
-#ifdef GAME_BUILD
 	bool UseLegacyController = false;
 	std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> LegacyControls = {};
 	std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> ControlNativeBlocks = {};
-#endif
+
 	std::array<int, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
 	
 	std::array<std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
 	std::array<GUID, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxesGUIDs = {};
 	std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
 	std::array<GUID, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButtonGUIDs = {};
-	std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
+	std::array<int, WheelDirectInput::MAX_RGBBUTTONS> WheelToKey = {};
 
 	GUID SteerGUID;
 	GUID WheelToKeyGUID = {};
 	WheelDirectInput WheelControl;
 	WheelAxisType SteerAxisType;
+
+	std::array<std::string, static_cast<int>(StickAxisType::SIZEOF_StickAxisType)> StickAxes = {};
+	std::array<GUID, static_cast<int>(StickAxisType::SIZEOF_StickAxisType)> StickAxesGUIDs = {};
+	std::array<int, static_cast<int>(StickAxisType::SIZEOF_StickAxisType)> StickButton = {};
+	std::array<GUID, static_cast<int>(StickAxisType::SIZEOF_StickAxisType)> StickButtonGUIDs = {};
+	//GenDInput StickControl;
 
 	// blergh
 	XboxController *GetRawController() {
@@ -325,15 +357,12 @@ public:
 private:
 	long long pressTime = 0;
 	long long releaseTime = 0;
-#ifdef GAME_BUILD
 	LegacyController lcontroller;
-#endif
 	XboxController controller;
 	WORD buttonState;
 
 	bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 	bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
-
 };
 
 // GUID stuff

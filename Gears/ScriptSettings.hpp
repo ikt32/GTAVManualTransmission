@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "simpleini/SimpleIni.h"
+#include "ShiftModes.h"
 
 class Logger;
 class ScriptControls;
@@ -11,14 +12,15 @@ static const int numGears = 8;
 
 class ScriptSettings {
 public:
-	ScriptSettings(const std::string &general, const std::string &wheel);
-	void SetFiles(const std::string &general, const std::string &wheel);
+	ScriptSettings();
+	void SetFiles(const std::string &general, const std::string &wheel, const std::string &stick);
 	void Read(ScriptControls* scriptControl);
 	void SaveGeneral() const;
 	void SaveController(ScriptControls *scriptControl) const;
 	void SaveWheel(ScriptControls *scriptControl) const;
-	bool IsCorrectVersion() const;
-	std::string GetVersionError();
+	void SaveStick(ScriptControls *scriptControl) const;
+	//bool IsCorrectVersion() const;
+	//std::string GetVersionError();
 
 	// Only use this AFTER wheel settings are read.
 	std::vector<GUID> GetGuids();
@@ -26,7 +28,7 @@ public:
 	// settings_general.ini parts
 	// [OPTIONS]
 	bool EnableManual = true;
-	int ShiftMode = 0; 	// 0 Seq, 1 H, 2 Auto
+	ShiftModes ShiftMode = Sequential; 	// 0 Seq, 1 H, 2 Auto
 	bool SimpleBike = false;
 	bool EngDamage = false;
 	bool EngStall = false;
@@ -95,22 +97,22 @@ public:
 	int RPMIndicatorRevlimitA = 255;
 
 	bool SteeringWheelInfo = false;
-	float SteeringWheelTextureX;
-	float SteeringWheelTextureY;
-	float SteeringWheelTextureSz;
-	float PedalInfoX;
-	float PedalInfoY;
-	float PedalInfoH;
-	float PedalInfoW;
-	float PedalInfoPadX;
-	float PedalInfoPadY;
+	float SteeringWheelTextureX	 = 0.0f;
+	float SteeringWheelTextureY	 = 0.0f;
+	float SteeringWheelTextureSz = 0.0f;
+	float PedalInfoX			 = 0.0f;
+	float PedalInfoY			 = 0.0f;
+	float PedalInfoH			 = 0.0f;
+	float PedalInfoW			 = 0.0f;
+	float PedalInfoPadX			 = 0.0f;
+	float PedalInfoPadY			 = 0.0f;
 
 	// [CONTROLLER]
 	bool ToggleEngine = false; // false makes it just turn ON the engine
 
 	// [DEBUG]
 	bool DisplayInfo = false;
-	bool LogCar = false;
+	//bool LogCar = false;
 	bool DisplayWheelInfo = false;
 
 	std::vector<GUID> reggdGuids;
@@ -119,7 +121,6 @@ public:
 	// [OPTIONS]
 	bool EnableWheel = false;
 	bool WheelWithoutManual = true;
-	bool AltControls = false;
 	bool PatchSteering = false;
 	bool PatchSteeringAlways = false;
 	bool PatchSteeringControl = false;
@@ -140,7 +141,7 @@ public:
 	float SteerAngleMax = 900.0f;
 	float SteerAngleCar = 720.0f;
 	float SteerAngleBike = 180.0f;
-	float SteerAngleAlt = 180.0f;
+	float SteerAngleBoat = 360.0f;
 	float GameSteerMult = 1.0f;
 
 	// Methods
@@ -161,12 +162,15 @@ public:
 	void SteeringAddWheelToKey(const std::string & cs, ptrdiff_t index, int button, const std::string & key_name);
 	bool SteeringClearWheelToKey(int button);
 
+	void StickSaveAxis(const std::string &confTag, ptrdiff_t index, const std::string &axis, int minVal, int maxVal);
+
 private:
 	void parseSettingsGeneral(ScriptControls *scriptControl);
 	void parseSettingsWheel(ScriptControls *scriptControl);
+	void parseSettingsStick(ScriptControls *scriptControl);
 
-	std::string settings_general_version = "000";
-	std::string settings_wheel_version = "000";
+	//std::string settings_general_version = "000";
+	//std::string settings_wheel_version = "000";
 
 	// Just looks up which GUID corresponds with what number and returns the GUID.
 	GUID DeviceIndexToGUID(int device, std::vector<GUID> guids);
@@ -174,5 +178,6 @@ private:
 	int nDevices = 0;
 	std::string settingsGeneralFile;
 	std::string settingsWheelFile;
+	std::string settingsStickFile;
 	std::string settingsMenuFile;
 };

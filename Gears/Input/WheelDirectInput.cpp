@@ -1,26 +1,18 @@
 #include "WheelDirectInput.hpp"
-#include "../Util/TimeHelper.hpp"
-#include "../Util/Logger.hpp"
-#include <sstream>
 
 #include <winerror.h>
+
+#include <sstream>
 #include <chrono>
 #include <vector>
 
-// TODO Look into crashes
+#include "../Util/TimeHelper.hpp"
+#include "../Util/Logger.hpp"
+
+// TODO: Get Logitech to get back at me for the G920 issue/crash
 
 WheelDirectInput::WheelDirectInput() : pCFEffect{nullptr},
-                                       pFREffect{nullptr} {
-	// Just set up to ensure djs can always be used.
-	//if (FAILED(DirectInput8Create(GetModuleHandle(nullptr),
-	//	DIRECTINPUT_VERSION,
-	//	IID_IDirectInput8,
-	//	reinterpret_cast<void**>(&lpDi),
-	//	nullptr))) {
-	//	return;
-	//}
-	//djs.enumerate(lpDi);
-}
+                                       pFREffect{nullptr} { }
 
 WheelDirectInput::~WheelDirectInput() { }
 
@@ -58,6 +50,15 @@ bool WheelDirectInput::InitWheel() {
 		return false;
 	}
 
+	rgbPressTime.clear();
+	rgbReleaseTime.clear();
+	rgbButtonCurr.clear();
+	rgbButtonPrev.clear();
+	povPressTime.clear();
+	povReleaseTime.clear();
+	povButtonCurr.clear();
+	povButtonPrev.clear();
+
 	foundGuids.clear();
 	for (int i = 0; i < djs.getEntryCount(); i++) {
 		auto device = djs.getEntry(i);
@@ -70,6 +71,15 @@ bool WheelDirectInput::InitWheel() {
 		std::wstring wGuid = szGuidW;//std::wstring(szGuidW);
 		logger.Write("WHEEL: GUID:   " + std::string(wGuid.begin(), wGuid.end()));
 		foundGuids.push_back(guid);
+
+		rgbPressTime.insert(	std::pair<GUID, std::array<__int64, MAX_RGBBUTTONS>>(guid, {}));
+		rgbReleaseTime.insert(	std::pair<GUID, std::array<__int64, MAX_RGBBUTTONS>>(guid, {}));
+		rgbButtonCurr.insert(	std::pair<GUID, std::array<bool,	MAX_RGBBUTTONS>>(guid, {}));
+		rgbButtonPrev.insert(	std::pair<GUID, std::array<bool,	MAX_RGBBUTTONS>>(guid, {}));
+		povPressTime.insert(	std::pair<GUID, std::array<__int64, POVDIRECTIONS>>(guid, {}));
+		povReleaseTime.insert(	std::pair<GUID, std::array<__int64, POVDIRECTIONS>>(guid, {}));
+		povButtonCurr.insert(	std::pair<GUID, std::array<bool, POVDIRECTIONS>>(guid, {}));
+		povButtonPrev.insert(	std::pair<GUID, std::array<bool, POVDIRECTIONS>>(guid, {}));
 	}
 
 	logger.Write("WHEEL: Init steering wheel success");
@@ -107,7 +117,7 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
 		logger.Write("WHEEL: Init FFB effect failed");
 	} else {
 		logger.Write("WHEEL: Init FFB success");
-		hasForceFeedback = true;
+		hasForceFeedback[guid][ffAxis] = true;
 	}
 	return true;
 }
@@ -115,8 +125,8 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
 void WheelDirectInput::UpdateCenterSteering(GUID guid, DIAxis steerAxis) {
 	djs.update(); // TODO: Figure out why this needs to be called TWICE
 	djs.update(); // Otherwise the wheel keeps turning/value is not updated?
-	prevTime = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
-	prevPosition = GetAxisValue(steerAxis, guid);
+	prevTime[guid][steerAxis] = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
+	prevPosition[guid][steerAxis] = GetAxisValue(steerAxis, guid);
 }																																						
 
 /*
@@ -140,6 +150,7 @@ const DiJoyStick::Entry *WheelDirectInput::FindEntryFromGUID(GUID guid) {
 
 void WheelDirectInput::Update() {
 	djs.update();
+	updateAxisSpeed();
 }
 
 bool WheelDirectInput::IsConnected(GUID device) {
@@ -150,18 +161,9 @@ bool WheelDirectInput::IsConnected(GUID device) {
 	return true;
 }
 
-// Mental note: buttonType in these args means physical button number
-// like how they are in DirectInput.
-// If it matches the cardinal stuff the button is a POV hat thing
-
 bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
 	auto e = FindEntryFromGUID(device);
-
 	if (!e) {
-		/*wchar_t szGuidW[40] = { 0 };
-		StringFromGUID2(device, szGuidW, 40);
-		std::wstring wGuid = szGuidW;
-		log.Write("DBG: Button " + std::to_string(buttonType) + " with GUID " + std::string(wGuid.begin(), wGuid.end()));*/
 		return false;
 	}
 
@@ -191,18 +193,18 @@ bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
 
 bool WheelDirectInput::IsButtonJustPressed(int buttonType, GUID device) {
 	if (buttonType > 127) { // POV
-		povButtonCurr[buttonType] = IsButtonPressed(buttonType,device);
+		povButtonCurr[device][povDirectionToIndex(buttonType)] = IsButtonPressed(buttonType,device);
 
 		// raising edge
-		if (povButtonCurr[buttonType] && !povButtonPrev[buttonType]) {
+		if (povButtonCurr[device][povDirectionToIndex(buttonType)] && !povButtonPrev[device][povDirectionToIndex(buttonType)]) {
 			return true;
 		}
 		return false;
 	}
-	rgbButtonCurr[buttonType] = IsButtonPressed(buttonType,device);
+	rgbButtonCurr[device][buttonType] = IsButtonPressed(buttonType,device);
 
 	// raising edge
-	if (rgbButtonCurr[buttonType] && !rgbButtonPrev[buttonType]) {
+	if (rgbButtonCurr[device][buttonType] && !rgbButtonPrev[device][buttonType]) {
 		return true;
 	}
 	return false;
@@ -210,18 +212,18 @@ bool WheelDirectInput::IsButtonJustPressed(int buttonType, GUID device) {
 
 bool WheelDirectInput::IsButtonJustReleased(int buttonType, GUID device) {
 	if (buttonType > 127) { // POV
-		povButtonCurr[buttonType] = IsButtonPressed(buttonType,device);
+		povButtonCurr[device][povDirectionToIndex(buttonType)] = IsButtonPressed(buttonType,device);
 
 		// falling edge
-		if (!povButtonCurr[buttonType] && povButtonPrev[buttonType]) {
+		if (!povButtonCurr[device][povDirectionToIndex(buttonType)] && povButtonPrev[device][povDirectionToIndex(buttonType)]) {
 			return true;
 		}
 		return false;
 	}
-	rgbButtonCurr[buttonType] = IsButtonPressed(buttonType,device);
+	rgbButtonCurr[device][buttonType] = IsButtonPressed(buttonType,device);
 
 	// falling edge
-	if (!rgbButtonCurr[buttonType] && rgbButtonPrev[buttonType]) {
+	if (!rgbButtonCurr[device][buttonType] && rgbButtonPrev[device][buttonType]) {
 		return true;
 	}
 	return false;
@@ -230,40 +232,42 @@ bool WheelDirectInput::IsButtonJustReleased(int buttonType, GUID device) {
 bool WheelDirectInput::WasButtonHeldForMs(int buttonType, GUID device, int millis) {
 	if (buttonType > 127) { // POV
 		if (IsButtonJustPressed(buttonType,device)) {
-			povPressTime[buttonType] = milliseconds_now();
+			povPressTime[device][povDirectionToIndex(buttonType)] = milliseconds_now();
 		}
 		if (IsButtonJustReleased(buttonType,device)) {
-			povReleaseTime[buttonType] = milliseconds_now();
+			povReleaseTime[device][povDirectionToIndex(buttonType)] = milliseconds_now();
 		}
 
-		if ((povReleaseTime[buttonType] - povPressTime[buttonType]) >= millis) {
-			povPressTime[buttonType] = 0;
-			povReleaseTime[buttonType] = 0;
+		if ((povReleaseTime[device][povDirectionToIndex(buttonType)] - povPressTime[device][povDirectionToIndex(buttonType)]) >= millis) {
+			povPressTime[device][povDirectionToIndex(buttonType)] = 0;
+			povReleaseTime[device][povDirectionToIndex(buttonType)] = 0;
 			return true;
 		}
 		return false;
 	}
 	if (IsButtonJustPressed(buttonType,device)) {
-		rgbPressTime[buttonType] = milliseconds_now();
+		rgbPressTime[device][buttonType] = milliseconds_now();
 	}
 	if (IsButtonJustReleased(buttonType,device)) {
-		rgbReleaseTime[buttonType] = milliseconds_now();
+		rgbReleaseTime[device][buttonType] = milliseconds_now();
 	}
 
-	if ((rgbReleaseTime[buttonType] - rgbPressTime[buttonType]) >= millis) {
-		rgbPressTime[buttonType] = 0;
-		rgbReleaseTime[buttonType] = 0;
+	if ((rgbReleaseTime[device][buttonType] - rgbPressTime[device][buttonType]) >= millis) {
+		rgbPressTime[device][buttonType] = 0;
+		rgbReleaseTime[device][buttonType] = 0;
 		return true;
 	}
 	return false;
 }
 
 void WheelDirectInput::UpdateButtonChangeStates() {
-	for (int i = 0; i < MAX_RGBBUTTONS; i++) {
-		rgbButtonPrev[i] = rgbButtonCurr[i];
-	}
-	for (int i = 0; i < SIZEOF_POV; i++) {
-		povButtonPrev[i] = povButtonCurr[i];
+	for (auto device : foundGuids) {
+		for (int i = 0; i < MAX_RGBBUTTONS; i++) {
+			rgbButtonPrev[device][i] = rgbButtonCurr[device][i];
+		}
+		for (auto pov : POVDirections) {
+			povButtonPrev[device][povDirectionToIndex(pov)] = povButtonCurr[device][povDirectionToIndex(pov)];
+		}
 	}
 }
 
@@ -317,9 +321,9 @@ bool WheelDirectInput::createConstantForceEffect(const DiJoyStick::Entry *e, DIA
 	return true;
 }
 
-void WheelDirectInput::SetConstantForce(GUID device, int force) {
+void WheelDirectInput::SetConstantForce(GUID device, WheelDirectInput::DIAxis ffAxis, int force) {
 	auto e = FindEntryFromGUID(device);
-	if (!e || !pCFEffect || !hasForceFeedback)
+	if (!e || !pCFEffect || !hasForceFeedback[device][ffAxis])
 		return;
 
 	LONG rglDirection[1] = {0};
@@ -384,22 +388,48 @@ int WheelDirectInput::GetAxisValue(DIAxis axis, GUID device) {
 	}
 }
 
+void WheelDirectInput::updateAxisSpeed() {
+	for (GUID device : foundGuids) {
+		for (int i = 0; i < SIZEOF_DIAxis; i++) {
+			DIAxis axis = static_cast<DIAxis>(i);
+
+			auto time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
+			auto position = GetAxisValue(axis, device);
+			auto result = (position - prevPosition[device][i]) / ((time - prevTime[device][i]) / 1e9f);
+
+			prevTime[device][i] = time;
+			prevPosition[device][i] = position;
+
+			samples[device][i][averageIndex[device][i]] = result;
+			averageIndex[device][i] = (averageIndex[device][i] + 1) % (AVGSAMPLES - 1);
+
+			//return result;
+			//auto sum = 0.0f;
+			//for (auto j = 0; j < AVGSAMPLES; j++) {
+			//	sum += samples[device][i][j];
+			//}
+			//return sum / AVGSAMPLES;
+
+		}
+	}
+}
+
 // Returns in units/s
 float WheelDirectInput::GetAxisSpeed(DIAxis axis, GUID device) {
-	auto time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
-	auto position = GetAxisValue(axis , device);
-	auto result = (position - prevPosition) / ((time - prevTime) / 1e9f);
+	//auto time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
+	//auto position = GetAxisValue(axis , device);
+	//auto result = (position - prevPosition) / ((time - prevTime) / 1e9f);
 
-	prevTime = time;
-	prevPosition = position;
+	//prevTime = time;
+	//prevPosition = position;
 
-	samples[averageIndex] = result;
-	averageIndex = (averageIndex + 1) % (AVGSAMPLES - 1);
+	//samples[averageIndex] = result;
+	//averageIndex = (averageIndex + 1) % (AVGSAMPLES - 1);
 
 	//return result;
 	auto sum = 0.0f;
 	for (auto i = 0; i < AVGSAMPLES; i++) {
-		sum += samples[i];
+		sum += samples[device][axis][i];
 	}
 	return sum / AVGSAMPLES;
 }
@@ -475,5 +505,20 @@ void WheelDirectInput::formatError(HRESULT hr, std::string &hrStr) {
 			break;
 		default: hrStr = "UNKNOWN";
 			break;
+	}
+}
+
+int WheelDirectInput::povDirectionToIndex(int povDirection) {
+	switch (povDirection) {
+		case N:		return 0;
+		case NE:	return 1;
+		case E:		return 2;
+		case SE:	return 3;
+		case S:		return 4;
+		case SW:	return 5;
+		case W:		return 6;
+		case NW:	return 7;
+		default:
+			return -1;
 	}
 }

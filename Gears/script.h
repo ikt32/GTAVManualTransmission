@@ -41,12 +41,6 @@ enum eRadioStations {
 	RadioOff = 255
 };
 
-enum ShiftModes {
-	Sequential = 0,
-	HPattern = 1,
-	Automatic = 2
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 //                           Helper functions/tools
 ///////////////////////////////////////////////////////////////////////////////
@@ -62,7 +56,7 @@ void drawSteeringWheelInfo();
 //                           Mod functions: Mod control
 ///////////////////////////////////////////////////////////////////////////////
 
-void reInit();
+void initialize();
 void reset();
 void applySteeringMultiplier();
 void resetSteeringMultiplier();
@@ -120,13 +114,10 @@ void handleVehicleButtons();
 //                    Wheel input and force feedback
 ///////////////////////////////////////////////////////////////////////////////
 
-void playWheelEffects(ScriptSettings& settings,
-					  VehicleData& vehData,
-                      bool airborne, bool ignoreSpeed = false);
-void playWheelEffectsPlane(ScriptSettings& settings, VehicleData& vehData);
+void playFFBGround(bool airborne, bool ignoreSpeed = false);
+void playFFBAir();
 void doWheelSteering();
-void doWheelSteeringBoat();
-void doWheelSteeringPlane();
+void doStickControlAir();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                             Misc features
@@ -134,6 +125,7 @@ void doWheelSteeringPlane();
 
 void functionAutoLookback();
 void functionAutoGear1();
+void functionHillGravity();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                              Script entry
@@ -161,6 +153,7 @@ bool configHPattern();
 bool configKeyboardKey(const std::string &confTag);
 bool configControllerButton(const std::string &confTag);
 bool configLControllerButton(const std::string &confTag);
+bool configStickAxis(std::string confTag);
 
 void updateSteeringMultiplier();
 
