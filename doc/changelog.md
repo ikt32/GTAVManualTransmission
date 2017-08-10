@@ -7,10 +7,14 @@ Config changes:
 Other changes:
 * Implement custom rev limiter
 * Fix cars moving in neutral by throttle (clutch values)
+* Fix other scripts not being informed of these things (Neutral gear in speedos, etc)
+* Fix car wheel steering jitteryness. Includes two codepaths, one using natives (slower, but reliable/fallback) and one just setting the value directly in memory after some patches.
+* Fix reverse gear not locking up things
+* Fix clutch being detected when not assigned
 * Use values from game controls for steering wheel rotation picture
 * Register decorators to prevent crashes  (Thanks to Unknown Modder!)
-* Fix other scripts not being informed of these things (Neutral gear in speedos, etc)
-* Fix car wheel steering jitteryness. Includes two codepaths, one using natives (slower, but relyable/fallback) and one just setting the value directly in memory after some patches.
+* A bunch of refactoring
+
 
 Decorator changes:
 * Change decorator names to be mod-specific
