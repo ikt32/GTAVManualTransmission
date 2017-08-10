@@ -127,6 +127,16 @@ public:
 	// Unit: m/s, at the tyres. This probably doesn't work well for popped tyres.
 	std::vector<float> GetTyreSpeeds(Vehicle handle);
 
+	// How much smoke and skidmarks the wheels/tires are generating.
+	std::vector<float> GetWheelSkidSmokeEffect(Vehicle handle);
+	void SetWheelSkidSmokeEffect(Vehicle handle, uint8_t index, float speed);
+
+	// Strangely, braking/pulling the handbrake just adds to this value.
+	// This behavior is visible when the instruction decreasing this is patched away.
+	// Needs patching of the instruction manipulating this field for applied values
+	// to stick properly.
+	void SetWheelBrakePressure(Vehicle handle, uint8_t index, float value);
+
 private:
 	eGameVersion gameVersion = getGameVersion();
 };

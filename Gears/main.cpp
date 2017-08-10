@@ -41,6 +41,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 			bool successI = MemoryPatcher::RestoreInstructions();
 			bool successS = MemoryPatcher::RestoreSteeringCorrection();
 			bool successSC= MemoryPatcher::RestoreSteeringControl();
+			bool successB = MemoryPatcher::RestoreBrakeDecrement();
 			resetSteeringMultiplier();
 			scriptUnregister(hInstance);
 
@@ -54,6 +55,8 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 					logger.Write("WARNING: Shut down script with steer correction not restored");
 				if (!successSC)
 					logger.Write("WARNING: Shut down script with steer control not restored");
+				if (!successB)
+					logger.Write("WARNING: Shut down script with brake decrement not restored");
 			}
 			break;
 		}

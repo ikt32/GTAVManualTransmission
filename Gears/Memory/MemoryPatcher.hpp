@@ -1,26 +1,30 @@
 #pragma once
 
 namespace MemoryPatcher {
-	bool PatchInstructions();
-	bool RestoreInstructions();
+bool PatchInstructions();
+bool RestoreInstructions();
 
-	bool PatchSteeringCorrection();
-	bool RestoreSteeringCorrection();
+bool PatchSteeringCorrection();
+bool RestoreSteeringCorrection();
 
-	bool PatchSteeringControl();
-	bool RestoreSteeringControl();
+bool PatchSteeringControl();
+bool RestoreSteeringControl();
 
-	/*
-	 * "total" refers to the "package" of patches needed to get the gearbox
-	 * and clutch stuff working.
-	 */
-	extern int NumGearboxPatches;
-	extern int TotalPatched;
+bool PatchBrakeDecrement();
+bool RestoreBrakeDecrement();
 
-	/*
-	 * That means SteeringPatched is just for the steering part.
-	 */
-	extern bool SteeringPatched;
-	extern bool SteerControlPatched;
 
-};
+/*
+	* "total" refers to the "package" of patches needed to get the gearbox
+	* and clutch stuff working.
+	*/
+extern int NumGearboxPatches;
+extern int TotalPatched;
+
+/*
+	* That means SteeringPatched is just for the steering part.
+	*/
+extern bool SteeringPatched;
+extern bool SteerControlPatched;
+extern bool BrakeDecrementPatched;
+}

@@ -616,6 +616,41 @@ std::vector<float> VehicleExtensions::GetTyreSpeeds(Vehicle handle) {
 	return wheelSpeeds;
 }
 
+void VehicleExtensions::SetWheelSkidSmokeEffect(Vehicle handle, uint8_t index, float value) {
+	if (index > GetNumWheels(handle)) {
+		return;
+	}
+	auto wheelPtr = GetWheelsPtr(handle);
+	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x1B0 : 0x1A0;
+	auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
+	*reinterpret_cast<float *>(wheelAddr + offset) = value;
+}
+
+std::vector<float> VehicleExtensions::GetWheelSkidSmokeEffect(Vehicle handle) {
+	std::vector<float> values;
+	
+	auto wheelPtr = GetWheelsPtr(handle);
+	auto numWheels = GetNumWheels(handle);
+	
+	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x1B0 : 0x1A0;
+
+	for (auto i = 0; i < numWheels; i++) {
+		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
+		values.push_back(-*reinterpret_cast<float *>(wheelAddr + offset));
+	}
+	return values;
+}
+
+void VehicleExtensions::SetWheelBrakePressure(Vehicle handle, uint8_t index, float value) {
+	if (index > GetNumWheels(handle)) {
+		return;
+	}
+	auto wheelPtr = GetWheelsPtr(handle);
+	auto offset = gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x1C8 : 0x1B8;
+	auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
+	*reinterpret_cast<float *>(wheelAddr + offset) = value;
+}
+
 // 0x784 to 0x814 are gear ratios!
 // 0x7f8 - Reverse
 // 0x7fc - 1

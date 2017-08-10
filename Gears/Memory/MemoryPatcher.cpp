@@ -8,458 +8,558 @@
 
 namespace MemoryPatcher {
 
-	// Clutch disengage @ Low Speed High Gear, low RPM
-	uintptr_t PatchClutchLow();
-	void RestoreClutchLow(uintptr_t address);
+// Clutch disengage @ Low Speed High Gear, low RPM
+uintptr_t PatchClutchLow();
+void RestoreClutchLow(uintptr_t address);
 
-	// Individually: Disable "shifting down" wanted
-	// 7A0 is NextGear, or what it appears like in my mod.
-	uintptr_t PatchGear7A0();
-	void RestoreGear7A0(uintptr_t address);
+// Individually: Disable "shifting down" wanted
+// 7A0 is NextGear, or what it appears like in my mod.
+uintptr_t PatchGear7A0();
+void RestoreGear7A0(uintptr_t address);
 
-	// Clutch disengage @ High speed rev limiting
-	uintptr_t PatchClutchRevLimit();
-	void RestoreClutchRevLimit(uintptr_t address);
+// Clutch disengage @ High speed rev limiting
+uintptr_t PatchClutchRevLimit();
+void RestoreClutchRevLimit(uintptr_t address);
 
-	// Does the same as Custom Steering by InfamousSabre
-	// Kept for emergency/backup purposes in the case InfamousSabre
-	// stops support earlier than I do. (not trying to compete here!)
-	uintptr_t ApplySteeringCorrectionPatch();
-	void RevertSteeringCorrectionPatch(uintptr_t address, byte *origInstr, int origInstrSz);
+// Does the same as Custom Steering by InfamousSabre
+// Kept for emergency/backup purposes in the case InfamousSabre
+// stops support earlier than I do. (not trying to compete here!)
+uintptr_t ApplySteeringCorrectionPatch();
+void RevertSteeringCorrectionPatch(uintptr_t address, byte *origInstr, int origInstrSz);
 
-	// Disable (normal) user input while wheel steering is active.
-	uintptr_t ApplySteerControlPatch();
-	void RevertSteerControlPatch(uintptr_t address, byte *origInstr, int origInstrSz);
+// Disable (normal) user input while wheel steering is active.
+uintptr_t ApplySteerControlPatch();
+void RevertSteerControlPatch(uintptr_t address, byte *origInstr, int origInstrSz);
 
-	int NumGearboxPatches = 3;
-	int TotalPatched = 0;
+// When disabled, brake pressure doesn't decrease.
+uintptr_t ApplyBrakePatch();
+void RevertBrakePatch(uintptr_t address, byte *origInstr, int origInstrSz);
 
-	bool SteeringPatched = false;
-	bool SteerControlPatched = false;
+int NumGearboxPatches = 3;
+int TotalPatched = 0;
 
-	uintptr_t clutchLowAddr = NULL;
-	uintptr_t clutchLowTemp = NULL;
+bool SteeringPatched = false;
+bool SteerControlPatched = false;
+bool BrakeDecrementPatched = false;
 
-	uintptr_t clutchRevLimitAddr = NULL;
-	uintptr_t clutchRevLimitTemp = NULL;
+uintptr_t clutchLowAddr = NULL;
+uintptr_t clutchLowTemp = NULL;
 
-	uintptr_t gear7A0Addr = NULL;
-	uintptr_t gear7A0Temp = NULL;
+uintptr_t clutchRevLimitAddr = NULL;
+uintptr_t clutchRevLimitTemp = NULL;
 
-	uintptr_t SteeringAddr = NULL;
-	uintptr_t SteeringTemp = NULL;
+uintptr_t gear7A0Addr = NULL;
+uintptr_t gear7A0Temp = NULL;
 
-	uintptr_t SteerControlAddr = NULL;
-	uintptr_t SteerControlTemp = NULL;
+uintptr_t steeringAddr = NULL;
+uintptr_t steeringTemp = NULL;
 
-	byte origSteerInstr[6] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-	byte origSteerInstrDest[4] = { 0x00, 0x00, 0x00, 0x00 };
+uintptr_t steerControlAddr = NULL;
+uintptr_t steerControlTemp = NULL;
 
-	byte origSteerControlInstr[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+uintptr_t brakeAddr = NULL;
+uintptr_t brakeTemp = NULL;
 
-	const int maxTries = 4;
-	int gearTries = 0;
-	int steerTries = 0;
-	int steerControlTries = 0;
+byte origSteerInstr[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+byte origSteerInstrDest[4] = {0x00, 0x00, 0x00, 0x00};
 
-	bool PatchInstructions() {
-		if (gearTries > maxTries) {
-			return false;
-		}
+byte origSteerControlInstr[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+byte origBrakeInstr[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-		logger.Write("GEARBOX: Patching");
+const int maxAttempts = 4;
+int gearAttempts = 0;
+int steerAttempts = 0;
+int steerControlAttempts = 0;
+int brakeAttempts = 0;
 
-		if (NumGearboxPatches == TotalPatched) {
-			logger.Write("GEARBOX: Already patched");
-			return true;
-		}
-
-		clutchLowTemp = PatchClutchLow();
-
-		if (clutchLowTemp) {
-			clutchLowAddr = clutchLowTemp;
-			TotalPatched++;
-			std::stringstream hexaddr;
-			hexaddr << std::hex << clutchLowAddr;
-			logger.Write("GEARBOX: Patched clutchLow @ " + hexaddr.str());
-		}
-		else {
-			logger.Write("GEARBOX: clutchLow patch failed");
-		}
-
-		clutchRevLimitTemp = PatchClutchRevLimit();
-
-		if (clutchRevLimitTemp) {
-			clutchRevLimitAddr = clutchRevLimitTemp;
-			TotalPatched++;
-			std::stringstream hexaddr;
-			hexaddr << std::hex << clutchRevLimitAddr;
-			logger.Write("GEARBOX: Patched clutchRevLimit @ " + hexaddr.str());
-		}
-		else {
-			logger.Write("GEARBOX: clutchRevLimit patch failed");
-		}
-
-		gear7A0Temp = PatchGear7A0();
-
-		if (gear7A0Temp) {
-			gear7A0Addr = gear7A0Temp;
-			TotalPatched++;
-			std::stringstream hexaddr;
-			hexaddr << std::hex << gear7A0Addr;
-			logger.Write("GEARBOX: Patched gear7A0  @ " + hexaddr.str());
-		}
-		else {
-			logger.Write("GEARBOX: gear7A0 patch failed");
-		}
-
-		if (TotalPatched == NumGearboxPatches) {
-			logger.Write("GEARBOX: Patch success");
-			gearTries = 0;
-			return true;
-		}
-		logger.Write("GEARBOX: Patching failed");
-		gearTries++;
-
-		if (gearTries > maxTries) {
-			logger.Write("GEARBOX: Patch attempt limit exceeded");
-			logger.Write("GEARBOX: Patching disabled");
-		}
+bool PatchInstructions() {
+	if (gearAttempts > maxAttempts) {
 		return false;
 	}
 
-	bool RestoreInstructions() {
-		logger.Write("GEARBOX: Restoring instructions");
+	logger.Write("GEARBOX: Patching");
 
-		if (TotalPatched == 0) {
-			logger.Write("GEARBOX: Already restored/intact");
-			return true;
-		}
+	if (NumGearboxPatches == TotalPatched) {
+		logger.Write("GEARBOX: Already patched");
+		return true;
+	}
 
-		if (clutchLowAddr) {
-			RestoreClutchLow(clutchLowAddr);
-			clutchLowAddr = 0;
-			TotalPatched--;
-		}
-		else {
-			logger.Write("GEARBOX: clutchLow not restored");
-		}
+	clutchLowTemp = PatchClutchLow();
 
-		if (clutchRevLimitAddr) {
-			RestoreClutchRevLimit(clutchRevLimitAddr);
-			clutchRevLimitAddr = 0;
-			TotalPatched--;
-		}
-		else {
-			logger.Write("GEARBOX: clutchRevLimit not restored");
-		}
+	if (clutchLowTemp) {
+		clutchLowAddr = clutchLowTemp;
+		TotalPatched++;
+		std::stringstream hexaddr;
+		hexaddr << std::hex << clutchLowAddr;
+		logger.Write("GEARBOX: Patched clutchLow @ " + hexaddr.str());
+	}
+	else {
+		logger.Write("GEARBOX: clutchLow patch failed");
+	}
 
-		if (gear7A0Addr) {
-			RestoreGear7A0(gear7A0Addr);
-			gear7A0Addr = 0;
-			TotalPatched--;
-		}
-		else {
-			logger.Write("GEARBOX: gear@7A0 not restored");
-		}
+	clutchRevLimitTemp = PatchClutchRevLimit();
 
-		if (TotalPatched == 0) {
-			logger.Write("GEARBOX: Restore success");
-			gearTries = 0;
-			return true;
-		}
-		logger.Write("GEARBOX: Restore failed");
+	if (clutchRevLimitTemp) {
+		clutchRevLimitAddr = clutchRevLimitTemp;
+		TotalPatched++;
+		std::stringstream hexaddr;
+		hexaddr << std::hex << clutchRevLimitAddr;
+		logger.Write("GEARBOX: Patched clutchRevLimit @ " + hexaddr.str());
+	}
+	else {
+		logger.Write("GEARBOX: clutchRevLimit patch failed");
+	}
+
+	gear7A0Temp = PatchGear7A0();
+
+	if (gear7A0Temp) {
+		gear7A0Addr = gear7A0Temp;
+		TotalPatched++;
+		std::stringstream hexaddr;
+		hexaddr << std::hex << gear7A0Addr;
+		logger.Write("GEARBOX: Patched gear7A0  @ " + hexaddr.str());
+	}
+	else {
+		logger.Write("GEARBOX: gear7A0 patch failed");
+	}
+
+	if (TotalPatched == NumGearboxPatches) {
+		logger.Write("GEARBOX: Patch success");
+		gearAttempts = 0;
+		return true;
+	}
+	logger.Write("GEARBOX: Patching failed");
+	gearAttempts++;
+
+	if (gearAttempts > maxAttempts) {
+		logger.Write("GEARBOX: Patch attempt limit exceeded");
+		logger.Write("GEARBOX: Patching disabled");
+	}
+	return false;
+}
+
+bool RestoreInstructions() {
+	logger.Write("GEARBOX: Restoring instructions");
+
+	if (TotalPatched == 0) {
+		logger.Write("GEARBOX: Already restored/intact");
+		return true;
+	}
+
+	if (clutchLowAddr) {
+		RestoreClutchLow(clutchLowAddr);
+		clutchLowAddr = 0;
+		TotalPatched--;
+	}
+	else {
+		logger.Write("GEARBOX: clutchLow not restored");
+	}
+
+	if (clutchRevLimitAddr) {
+		RestoreClutchRevLimit(clutchRevLimitAddr);
+		clutchRevLimitAddr = 0;
+		TotalPatched--;
+	}
+	else {
+		logger.Write("GEARBOX: clutchRevLimit not restored");
+	}
+
+	if (gear7A0Addr) {
+		RestoreGear7A0(gear7A0Addr);
+		gear7A0Addr = 0;
+		TotalPatched--;
+	}
+	else {
+		logger.Write("GEARBOX: gear@7A0 not restored");
+	}
+
+	if (TotalPatched == 0) {
+		logger.Write("GEARBOX: Restore success");
+		gearAttempts = 0;
+		return true;
+	}
+	logger.Write("GEARBOX: Restore failed");
+	return false;
+}
+
+bool PatchSteeringCorrection() {
+	if (steerAttempts > maxAttempts) {
 		return false;
 	}
 
-	bool PatchSteeringCorrection() {
-		if (steerTries > maxTries) {
-			return false;
-		}
+	logger.Write("STEERING: Patching");
 
-		logger.Write("STEERING: Patching");
+	if (SteeringPatched) {
+		logger.Write("STEERING: Already patched");
+		return true;
+	}
 
-		if (SteeringPatched) {
-			logger.Write("STEERING: Already patched");
-			return true;
-		}
+	steeringTemp = ApplySteeringCorrectionPatch();
 
-		SteeringTemp = ApplySteeringCorrectionPatch();
+	if (steeringTemp) {
+		steeringAddr = steeringTemp;
+		SteeringPatched = true;
+		std::stringstream hexaddr;
+		hexaddr << std::hex << steeringAddr;
+		std::stringstream instructs;
+		for (int i = 0; i < sizeof(origSteerInstr) / sizeof(byte); ++i)
+			instructs << std::hex << std::setfill('0') << std::setw(2) << (int)origSteerInstr[i] << " ";
+		logger.Write("STEERING: Steering Correction @ " + hexaddr.str());
+		logger.Write("STEERING: Patch success, orig: " + instructs.str());
+		steerAttempts = 0;
+		return true;
+	}
 
-		if (SteeringTemp) {
-			SteeringAddr = SteeringTemp;
-			SteeringPatched = true;
-			std::stringstream hexaddr;
-			hexaddr << std::hex << SteeringAddr;
-			std::stringstream instructs;
-			for (int i = 0; i < sizeof(origSteerInstr) / sizeof(byte); ++i)
-				instructs << std::hex << std::setfill('0') << std::setw(2) << (int)origSteerInstr[i] << " ";
-			logger.Write("STEERING: Steering Correction @ " + hexaddr.str());
-			logger.Write("STEERING: Patch success, orig: " + instructs.str());
-			steerTries = 0;
-			return true;
-		}
+	logger.Write("STEERING: Patch failed");
+	steerAttempts++;
 
-		logger.Write("STEERING: Patch failed");
-		steerTries++;
+	if (steerAttempts > maxAttempts) {
+		logger.Write("STEERING: Patch attempt limit exceeded");
+		logger.Write("STEERING: Patching disabled");
+	}
+	return false;
+}
 
-		if (steerTries > maxTries) {
-			logger.Write("STEERING: Patch attempt limit exceeded");
-			logger.Write("STEERING: Patching disabled");
-		}
+bool RestoreSteeringCorrection() {
+	logger.Write("STEERING: Restoring instructions");
+
+	if (!SteeringPatched) {
+		logger.Write("STEERING: Already restored/intact");
+		return true;
+	}
+
+	if (steeringAddr) {
+		RevertSteeringCorrectionPatch(steeringAddr, origSteerInstr, sizeof(origSteerInstr) / sizeof(byte));
+		steeringAddr = 0;
+		SteeringPatched = false;
+		logger.Write("STEERING: Restore success");
+		steerAttempts = 0;
+		return true;
+	}
+
+	logger.Write("STEERING: Restore failed");
+	return false;
+}
+
+bool PatchSteeringControl() {
+	if (steerControlAttempts > maxAttempts) {
 		return false;
 	}
 
-	bool RestoreSteeringCorrection() {
-		logger.Write("STEERING: Restoring instructions");
+	logger.Write("STEERING CONTROL: Patching");
 
-		if (!SteeringPatched) {
-			logger.Write("STEERING: Already restored/intact");
-			return true;
-		}
+	if (SteerControlPatched) {
+		logger.Write("STEERING CONTROL: Already patched");
+		return true;
+	}
 
-		if (SteeringAddr) {
-			RevertSteeringCorrectionPatch(SteeringAddr,origSteerInstr, sizeof(origSteerInstr) / sizeof(byte));
-			SteeringAddr = 0;
-			SteeringPatched = false;
-			logger.Write("STEERING: Restore success");
-			steerTries = 0;
-			return true;
-		}
+	steerControlTemp = ApplySteerControlPatch();
 
-		logger.Write("STEERING: Restore failed");
+	if (steerControlTemp) {
+		steerControlAddr = steerControlTemp;
+		SteerControlPatched = true;
+		std::stringstream hexaddr;
+		std::stringstream instructs;
+		hexaddr << std::hex << steerControlAddr;
+		for (int i = 0; i < sizeof(origSteerControlInstr) / sizeof(byte); ++i)
+			instructs << std::hex << std::setfill('0') << std::setw(2) << (int)origSteerControlInstr[i] << " ";
+		logger.Write("STEERING CONTROL: Steering Control @ " + hexaddr.str());
+		logger.Write("STEERING CONTROL: Patch success, orig: " + instructs.str());
+		steerControlAttempts = 0;
+
+		return true;
+	}
+
+	logger.Write("STEERING CONTROL: Patch failed");
+	steerControlAttempts++;
+
+	if (steerControlAttempts > maxAttempts) {
+		logger.Write("STEERING CONTROL: Patch attempt limit exceeded");
+		logger.Write("STEERING CONTROL: Patching disabled");
+	}
+	return false;
+}
+
+bool RestoreSteeringControl() {
+	logger.Write("STEERING CONTROL: Restoring instructions");
+
+	if (!SteerControlPatched) {
+		logger.Write("STEERING CONTROL: Already restored/intact");
+		return true;
+	}
+
+	if (steerControlAddr) {
+		//byte origInstr[8] = { 0xF3, 0x0F, 0x11, 0x8B, 0xFC, 0x08, 0x00, 0x00 };
+		RevertSteerControlPatch(steerControlAddr, origSteerControlInstr, sizeof(origSteerControlInstr) / sizeof(byte));
+		steerControlAddr = 0;
+		SteerControlPatched = false;
+		logger.Write("STEERING CONTROL: Restore success");
+		steerControlAttempts = 0;
+		return true;
+	}
+
+	logger.Write("STEERING CONTROL: Restore failed");
+	return false;
+}
+
+bool PatchBrakeDecrement() {
+	if (brakeAttempts > maxAttempts) {
 		return false;
 	}
 
-	bool PatchSteeringControl() {
-		if (steerControlTries > maxTries) {
-			return false;
-		}
+	//logger.Write("BRAKE PRESSURE: Patching");
 
-		logger.Write("STEERING CONTROL: Patching");
-
-		if (SteerControlPatched) {
-			logger.Write("STEERING CONTROL: Already patched");
-			return true;
-		}
-
-		SteerControlTemp = ApplySteerControlPatch();
-
-		if (SteerControlTemp) {
-			SteerControlAddr = SteerControlTemp;
-			SteerControlPatched = true;
-			std::stringstream hexaddr;
-			std::stringstream instructs;
-			hexaddr << std::hex << SteerControlAddr;
-			for (int i = 0; i < sizeof(origSteerControlInstr) / sizeof(byte); ++i)
-				instructs << std::hex << std::setfill('0') << std::setw(2) << (int)origSteerControlInstr[i] << " ";
-			logger.Write("STEERING CONTROL: Steering Control @ " + hexaddr.str());
-			logger.Write("STEERING CONTROL: Patch success, orig: " + instructs.str());
-			steerControlTries = 0;
-
-			return true;
-		}
-
-		logger.Write("STEERING CONTROL: Patch failed");
-		steerControlTries++;
-
-		if (steerControlTries > maxTries) {
-			logger.Write("STEERING CONTROL: Patch attempt limit exceeded");
-			logger.Write("STEERING CONTROL: Patching disabled");
-		}
-		return false;
+	if (BrakeDecrementPatched) {
+		//logger.Write("BRAKE PRESSURE: Already patched");
+		return true;
 	}
 
-	bool RestoreSteeringControl() {
-		logger.Write("STEERING CONTROL: Restoring instructions");
+	brakeTemp = ApplyBrakePatch();
 
-		if (!SteerControlPatched) {
-			logger.Write("STEERING CONTROL: Already restored/intact");
-			return true;
-		}
+	if (brakeTemp) {
+		brakeAddr = brakeTemp;
+		BrakeDecrementPatched = true;
+		std::stringstream hexaddr;
+		std::stringstream instructs;
+		hexaddr << std::hex << brakeAddr;
+		for (int i = 0; i < sizeof(origBrakeInstr) / sizeof(byte); ++i)
+			instructs << std::hex << std::setfill('0') << std::setw(2) << (int)origBrakeInstr[i] << " ";
+		//logger.Write("BRAKE PRESSURE: BRAKE PRESSURE @ " + hexaddr.str());
+		//logger.Write("BRAKE PRESSURE: Patch success, orig: " + instructs.str());
+		brakeAttempts = 0;
 
-		if (SteerControlAddr) {
-			//byte origInstr[8] = { 0xF3, 0x0F, 0x11, 0x8B, 0xFC, 0x08, 0x00, 0x00 };
-			RevertSteerControlPatch(SteerControlAddr, origSteerControlInstr, sizeof(origSteerControlInstr) / sizeof(byte));
-			SteerControlAddr = 0;
-			SteerControlPatched = false;
-			logger.Write("STEERING CONTROL: Restore success");
-			steerControlTries = 0;
-			return true;
-		}
-
-		logger.Write("STEERING CONTROL: Restore failed");
-		return false;
+		return true;
 	}
 
-	uintptr_t PatchClutchLow() {
-		// Tested on build 350 and build 617
-		// We're only interested in the first 7 bytes but we need the correct one
-		// C7 43 40 CD CC CC 3D is what we're looking for, the second occurrence, at 
-		// 7FF6555FE34A or GTA5.exe+ECE34A in build 617.
+	logger.Write("BRAKE PRESSURE: Patch failed");
+	brakeAttempts++;
 
-		uintptr_t address;
-		if (clutchLowTemp != NULL)
-			address = clutchLowTemp;
-		else
-			address = mem::FindPattern("\xC7\x43\x40\xCD\xCC\xCC\x3D\x66\x44\x89\x43\x04", "xxxxxxxxxxxx");
+	if (brakeAttempts > maxAttempts) {
+		logger.Write("BRAKE PRESSURE: Patch attempt limit exceeded");
+		logger.Write("BRAKE PRESSURE: Patching disabled");
+	}
+	return false;
+}
+bool RestoreBrakeDecrement() {
+	//logger.Write("BRAKE PRESSURE: Restoring instructions");
 
-		if (address) {
-			memset(reinterpret_cast<void *>(address), 0x90, 7);
-		}
+	if (!BrakeDecrementPatched) {
+		//logger.Write("BRAKE PRESSURE: Already restored/intact");
+		return true;
+	}
+
+	if (brakeAddr) {
+		RevertBrakePatch(brakeAddr, origBrakeInstr, sizeof(origBrakeInstr) / sizeof(byte));
+		brakeAddr = 0;
+		BrakeDecrementPatched = false;
+		//logger.Write("BRAKE PRESSURE: Restore success");
+		brakeAttempts = 0;
+		return true;
+	}
+
+	logger.Write("BRAKE PRESSURE: Restore failed");
+	return false;
+}
+
+uintptr_t PatchClutchLow() {
+	// Tested on build 350 and build 617
+	// We're only interested in the first 7 bytes but we need the correct one
+	// C7 43 40 CD CC CC 3D is what we're looking for, the second occurrence, at 
+	// 7FF6555FE34A or GTA5.exe+ECE34A in build 617.
+
+	uintptr_t address;
+	if (clutchLowTemp != NULL)
+		address = clutchLowTemp;
+	else
+		address = mem::FindPattern("\xC7\x43\x40\xCD\xCC\xCC\x3D\x66\x44\x89\x43\x04", "xxxxxxxxxxxx");
+
+	if (address) {
+		memset(reinterpret_cast<void *>(address), 0x90, 7);
+	}
+	return address;
+}
+
+void RestoreClutchLow(uintptr_t address) {
+	byte instrArr[7] = {0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D};
+	if (address) {
+		memcpy(reinterpret_cast<void*>(address), instrArr, 7);
+	}
+}
+
+uintptr_t PatchClutchRevLimit() {
+	// Tested on build 1103
+
+	uintptr_t address;
+	if (clutchRevLimitTemp != NULL)
+		address = clutchRevLimitTemp;
+	else
+		address = mem::FindPattern("\xC7\x43\x40\xCD\xCC\xCC\x3D"
+		                           "\x44\x89\x7B\x60"
+		                           "\x89\x73\x5C"
+		                           "\x66\x89\x13",
+		                           "xxxxxxx"
+		                           "xxxx"
+		                           "xxx"
+		                           "xxx");
+
+	if (address) {
+		memset(reinterpret_cast<void *>(address), 0x90, 7);
+	}
+	return address;
+}
+
+void RestoreClutchRevLimit(uintptr_t address) {
+	byte instrArr[7] = {0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D};
+	if (address) {
+		memcpy(reinterpret_cast<void*>(address), instrArr, 7);
+	}
+}
+
+uintptr_t PatchGear7A0() {
+	// 66 89 13 <- Looking for this
+	// 89 73 5C <- Next instruction
+	// EB 0A    <- Next next instruction
+	uintptr_t address;
+	if (gear7A0Temp != 0)
+		address = gear7A0Temp;
+	else
+		address = mem::FindPattern("\x66\x89\x13\x89\x73\x5C", "xxxxxx");
+
+	if (address) {
+		memset(reinterpret_cast<void *>(address), 0x90, 3);
+	}
+	return address;
+}
+
+void RestoreGear7A0(uintptr_t address) {
+	byte instrArr[3] = {0x66, 0x89, 0x13};
+	if (address) {
+		memcpy(reinterpret_cast<void*>(address), instrArr, 3);
+	}
+}
+
+uintptr_t ApplySteeringCorrectionPatch() {
+	// GTA V (b791.2 to b1011.1)
+	// F3 44 0F10 15 03319400
+	// 45 84 ED				// test		r13l,r13l
+	// 0F84 C8010000		// je		GTA5.exe+EXE53E
+	// 0F28 4B 70 (Next)	// movaps	xmm1,[rbx+70]
+	// F3 0F10 25 06F09300
+	// F3 0F10 1D 3ED39F00
+
+	// in 791.2, 877.1 and 944.2
+	// 0F 84 D0010000 = JE	<address>
+	// becomes
+	// E9 D1 01000090 = JMP	<address> NOP
+
+	// InfamousSabre
+	// "\x0F\x84\x00\x00\x00\x00\x0F\x28\x4B\x70\xF3\x0F\x10\x25\x00\x00\x00\x00\xF3\x0F\x10\x1D\x00\x00\x00\x00" is what I scan for.
+
+	// FiveM (b505.2)
+	// F3 44 0F10 15 03319400
+	// 45 84 ED             
+	// 0F84 D0010000        // <- This one
+	// 0F28 4B 70           
+	// F3 0F10 25 92309400  
+	// F3 0F10 1D 6A309400  
+
+	uintptr_t address;
+	if (steeringTemp != NULL) {
+		address = steeringTemp;
+
+	}
+	else {
+		address = mem::FindPattern(
+			"\x0F\x84\xD0\x01\x00\x00" // <- This one
+			"\x0F\x28\x4B\x70"
+			"\xF3\x0F\x10\x25\x00\x00\x00\x00"
+			"\xF3\x0F\x10\x1D\x00\x00\x00\x00"
+			"\x0F\x28\xC1"
+			"\x0F\x28\xD1",
+			"xx????" // <- This one
+			"xx??"
+			"xxxx????"
+			"xxxx????"
+			"xx?"
+			"xx?");
+	}
+
+	if (address) {
+		byte instrArr[6] = {0xE9, 0xD1, 0x01, 0x00, 0x00, 0x90}; // make preliminary instruction: JMP to <adrr>
+
+		memcpy(origSteerInstr, (void*)address, 6); // save whole orig instruction
+		memcpy(origSteerInstrDest, (void*)(address + 2), 4); // save the address it writes to
+		origSteerInstrDest[0] += 1; // Increment first address by 1
+		memcpy(instrArr + 1, origSteerInstrDest, 4); // use saved address in new instruction
+		memcpy((void*)address, instrArr, 6); // patch with new fixed instruction
+
 		return address;
 	}
+	return 0;
+}
 
-	void RestoreClutchLow(uintptr_t address) {
-		byte instrArr[7] = {0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D};
-		if (address) {
-			memcpy(reinterpret_cast<void*>(address), instrArr, 7);
-		}
+void RevertSteeringCorrectionPatch(uintptr_t address, byte *origInstr, int origInstrSz) {
+	if (address) {
+		memcpy((void*)address, origInstr, origInstrSz);
 	}
+}
 
-	uintptr_t PatchClutchRevLimit() {
-		// Tested on build 1103
+uintptr_t ApplySteerControlPatch() {
+	// b1032.2
+	uintptr_t address;
+	if (steerControlTemp != NULL)
+		address = steerControlTemp;
+	else
+		address = mem::FindPattern("\xF3\x0F\x11\x8B\xFC\x08\x00\x00"
+		                           "\xF3\x0F\x10\x83\x00\x09\x00\x00"
+		                           "\xF3\x0F\x58\x83\xFC\x08\x00\x00"
+		                           "\x41\x0F\x2F\xC3",
+		                           "xxxx??xx"
+		                           "xxxx??xx"
+		                           "xxxx??xx"
+		                           "xxxx");
 
-		uintptr_t address;
-		if (clutchRevLimitTemp != NULL)
-			address = clutchRevLimitTemp;
-		else
-			address = mem::FindPattern("\xC7\x43\x40\xCD\xCC\xCC\x3D"
-									   "\x44\x89\x7B\x60"
-									   "\x89\x73\x5C"
-									   "\x66\x89\x13", 
-									   "xxxxxxx"
-									   "xxxx"
-									   "xxx"
-									   "xxx");
-
-		if (address) {
-			memset(reinterpret_cast<void *>(address), 0x90, 7);
-		}
-		return address;
+	if (address) {
+		memcpy(origSteerControlInstr, (void*)address, 8);
+		memset(reinterpret_cast<void *>(address), 0x90, 8);
 	}
+	return address;
+}
 
-	void RestoreClutchRevLimit(uintptr_t address) {
-		byte instrArr[7] = { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D };
-		if (address) {
-			memcpy(reinterpret_cast<void*>(address), instrArr, 7);
-		}
+void RevertSteerControlPatch(uintptr_t address, byte *origInstr, int origInstrSz) {
+	if (address) {
+		memcpy((void*)address, origInstr, origInstrSz);
 	}
+}
 
-	uintptr_t PatchGear7A0() {
-		// 66 89 13 <- Looking for this
-		// 89 73 5C <- Next instruction
-		// EB 0A    <- Next next instruction
-		uintptr_t address;
-		if (gear7A0Temp != 0)
-			address = gear7A0Temp;
-		else 
-			address = mem::FindPattern("\x66\x89\x13\x89\x73\x5C", "xxxxxx");
+uintptr_t ApplyBrakePatch() {
+	// b1032.2
+	uintptr_t address;
+	if (brakeTemp != NULL)
+		address = brakeTemp;
+	else
+		address = mem::FindPattern(
+			"\xF3\x0F\x11\x81\xC8\x01\x00\x00"
+			"\xC3"
+			"\xCC"
+			"\xEA\x0F\x44\x8B\xCA\x83\xFA"
+			"\x0B\x75\x61",
+			"xxxx??xx"
+			"x"
+			"x"
+			"x??????"
+			"xxx");
 
-		if (address) {
-			memset(reinterpret_cast<void *>(address), 0x90, 3);
-		}
-		return address;
+	if (address) {
+		memcpy(origBrakeInstr, (void*)address, 8);
+		memset(reinterpret_cast<void *>(address), 0x90, 8);
 	}
+	return address;
+}
 
-	void RestoreGear7A0(uintptr_t address) {
-		byte instrArr[3] = {0x66, 0x89, 0x13};
-		if (address) {
-			memcpy(reinterpret_cast<void*>(address), instrArr, 3);
-		}
+void RevertBrakePatch(uintptr_t address, byte *origInstr, int origInstrSz) {
+	if (address) {
+		memcpy((void*)address, origInstr, origInstrSz);
 	}
-
-	uintptr_t ApplySteeringCorrectionPatch() {
-		// GTA V (b791.2 to b1011.1)
-		// F3 44 0F10 15 03319400
-		// 45 84 ED				// test		r13l,r13l
-		// 0F84 C8010000		// je		GTA5.exe+EXE53E
-		// 0F28 4B 70 (Next)	// movaps	xmm1,[rbx+70]
-		// F3 0F10 25 06F09300
-		// F3 0F10 1D 3ED39F00
-		
-		// in 791.2, 877.1 and 944.2
-		// 0F 84 D0010000 = JE	<address>
-		// becomes
-		// E9 D1 01000090 = JMP	<address> NOP
-
-		// InfamousSabre
-		// "\x0F\x84\x00\x00\x00\x00\x0F\x28\x4B\x70\xF3\x0F\x10\x25\x00\x00\x00\x00\xF3\x0F\x10\x1D\x00\x00\x00\x00" is what I scan for.
-
-		// FiveM (b505.2)
-		// F3 44 0F10 15 03319400
-		// 45 84 ED             
-		// 0F84 D0010000        // <- This one
-		// 0F28 4B 70           
-		// F3 0F10 25 92309400  
-		// F3 0F10 1D 6A309400  
-
-		uintptr_t address;
-		if (SteeringTemp != NULL) {
-			address = SteeringTemp;
-
-		}
-		else {
-			address = mem::FindPattern(
-				"\x0F\x84\xD0\x01\x00\x00" // <- This one
-				"\x0F\x28\x4B\x70"
-				"\xF3\x0F\x10\x25\x00\x00\x00\x00"
-				"\xF3\x0F\x10\x1D\x00\x00\x00\x00"
-				"\x0F\x28\xC1"
-				"\x0F\x28\xD1",
-				"xx????" // <- This one
-				"xx??"
-				"xxxx????"
-				"xxxx????"
-				"xx?"
-				"xx?");
-		}
-
-		if (address) {
-			byte instrArr[6] = { 0xE9, 0xD1, 0x01, 0x00, 0x00, 0x90 };	// make preliminary instruction: JMP to <adrr>
-
-			memcpy(origSteerInstr, (void*)address, 6);					// save whole orig instruction
-			memcpy(origSteerInstrDest, (void*)(address + 2), 4);		// save the address it writes to
-			origSteerInstrDest[0] += 1;									// Increment first address by 1
-			memcpy(instrArr + 1, origSteerInstrDest, 4);				// use saved address in new instruction
-			memcpy((void*)address, instrArr, 6);						// patch with new fixed instruction
-
-			return address;
-		}
-		return 0;
-	}
-
-	void RevertSteeringCorrectionPatch(uintptr_t address, byte *origInstr, int origInstrSz) {
-		if (address) {
-			memcpy((void*)address, origInstr, origInstrSz);
-		}
-	}
-
-	uintptr_t ApplySteerControlPatch() {
-		// b1032.2
-		uintptr_t address;
-		if (SteerControlTemp != NULL)
-			address = SteerControlTemp;
-		else
-			address = mem::FindPattern("\xF3\x0F\x11\x8B\xFC\x08\x00\x00"
-									   "\xF3\x0F\x10\x83\x00\x09\x00\x00"
-									   "\xF3\x0F\x58\x83\xFC\x08\x00\x00"
-									   "\x41\x0F\x2F\xC3",
-									   "xxxx??xx"
-									   "xxxx??xx"
-									   "xxxx??xx"
-									   "xxxx");
-
-		if (address) {
-			memcpy(origSteerControlInstr, (void*)address, 8);
-			memset(reinterpret_cast<void *>(address), 0x90, 8);
-		}
-		return address;
-	}
-
-	void RevertSteerControlPatch(uintptr_t address, byte *origInstr, int origInstrSz) {
-		if (address) {
-			memcpy((void*)address, origInstr, origInstrSz);
-		}
-	}
+}
 }
