@@ -137,6 +137,16 @@ public:
 	// to stick properly.
 	void SetWheelBrakePressure(Vehicle handle, uint8_t index, float value);
 
+	// Divide GetDriveMaxFlatVel by the values in this thing to get the top
+	// speed for the gear.
+	std::vector<float> GetGearRatios(Vehicle handle);
+
+	float GetDriveForce(Vehicle handle);
+
+	float GetInitialDriveMaxFlatVel(Vehicle handle);
+
+	float GetDriveMaxFlatVel(Vehicle handle);
+
 private:
 	eGameVersion gameVersion = getGameVersion();
 };

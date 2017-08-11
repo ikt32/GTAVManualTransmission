@@ -651,7 +651,53 @@ void VehicleExtensions::SetWheelBrakePressure(Vehicle handle, uint8_t index, flo
 	*reinterpret_cast<float *>(wheelAddr + offset) = value;
 }
 
-// 0x784 to 0x814 are gear ratios!
+std::vector<float> VehicleExtensions::GetGearRatios(Vehicle handle) {
+	auto address = GetAddress(handle);
+	auto offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x7f8 : 0);
+
+	std::vector<float> ratios;
+	if (offset == 0)
+		return ratios;
+	for (int gearOffset = 0; gearOffset <= 7; gearOffset++) {
+		ratios.push_back(*reinterpret_cast<float *>(address + offset + gearOffset * sizeof(float)));
+	}
+	return ratios;
+}
+
+float VehicleExtensions::GetDriveForce(Vehicle handle) {
+	auto address = GetAddress(handle);
+
+	auto offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x820 : 0);
+
+	if (offset == 0)
+		return 0.0f;
+
+	return *reinterpret_cast<float *>(address + offset);
+}
+
+float VehicleExtensions::GetInitialDriveMaxFlatVel(Vehicle handle) {
+	auto address = GetAddress(handle);
+
+	auto offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x81C : 0);
+
+	if (offset == 0)
+		return 0.0f;
+
+	return *reinterpret_cast<float *>(address + offset);
+}
+
+float VehicleExtensions::GetDriveMaxFlatVel(Vehicle handle) {
+	auto address = GetAddress(handle);
+
+	auto offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x820 : 0);
+
+	if (offset == 0)
+		return 0.0f;
+
+	return *reinterpret_cast<float *>(address + offset);
+}
+
+// 0x7f8 to 0x814 are gear ratios!
 // 0x7f8 - Reverse
 // 0x7fc - 1
 // 0x800 - 2
@@ -665,11 +711,17 @@ void VehicleExtensions::SetWheelBrakePressure(Vehicle handle, uint8_t index, flo
 // Affected by engine upgrade
 // 
 
-// 0x81C: fDriveMaxFlatVel (m/s)
+// 0x81C: fInitialDriveMaxFlatVel (m/s)
 // Affected by no tuning options
 // Doesn't influence anything?
 
 // 0x820: first gear top speed
 // Closest to km/h but off by 4kph? (val: 20, max @ 24 when doing a burnout)
 // Matches "upshift" moment speed
-// Unrelated to top speed seemingly
+// Changing this reflects on vehicle top speeds
+// Corresponds to upshift speed (in m/s) to final gear?
+// FIGURED IT OUT :D
+// Is actually uh final drive speed
+// or whatever car people call it
+// anyway this thing divided by gear ratio == BAM max speed for that gear
+// i am genius (jk)
