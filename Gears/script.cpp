@@ -233,7 +233,6 @@ void update() {
 		functionTruckLimiting();
 	}
 
-	// Since we know prevGear and the speed for that, let's simulate "engine" braking.
 	if (settings.EngBrake) {
 		functionEngBrake();
 	}
@@ -242,6 +241,7 @@ void update() {
 	if (settings.EngDamage &&
 		!vehData.NoClutch) {
 		functionEngDamage();
+		functionEngLock();
 	}
 
 	if (!vehData.SimulatedNeutral && 
@@ -637,6 +637,9 @@ void reset() {
 	if (MemoryPatcher::SteeringPatched) {
 		MemoryPatcher::RestoreSteeringCorrection();
 	}
+	if (MemoryPatcher::BrakeDecrementPatched) {
+		MemoryPatcher::RestoreBrakeDecrement();
+	}
 	controls.StopForceFeedback();
 	//lastVehicle = vehicle = 0;
 }
@@ -793,15 +796,16 @@ void shiftTo(int gear, bool autoClutch) {
 	}
 	vehData.LockGear = gear;
 	vehData.LockTruck = false;
-	vehData.PrevGear = vehData.CurrGear;
 	if (vehData.IsTruck && vehData.Rpm < 0.9) {
 		return;
 	}
 	// for engine braking, but we're not doing anything if that isn't enabled
 	// Only increase the limiter speed
-	if (vehData.Velocity > vehData.LockSpeeds[vehData.CurrGear]) {
-		vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
-	}
+	//if (vehData.Velocity > vehData.LockSpeeds[vehData.CurrGear] &&
+	//	gear > vehData.PrevGear) {
+	//	vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
+	//}
+	vehData.PrevGear = vehData.CurrGear;
 }
 void functionHShiftTo(int i) {
 	if (settings.ClutchShiftingH && !vehData.NoClutch) {
@@ -1112,7 +1116,7 @@ void showWheelInfo() {
 	}
 }
 
-std::vector<float> findDrivenWheels(std::vector<float> wheelSpeeds) {
+std::vector<float> getDrivenWheelsSpeeds(std::vector<float> wheelSpeeds) {
 	std::vector<float> wheelsToConsider;
 	if (vehData.DriveBiasFront > 0.0f && vehData.DriveBiasFront < 1.0f) {
 		wheelsToConsider = wheelSpeeds;
@@ -1168,7 +1172,7 @@ void functionEngStall() {
 	float lowSpeed = 2.4f;
 	float stallingRateDivisor = 3500000.0f;
 	float timeStep = SYSTEM::TIMESTEP() * 100.0f;
-	float avgWheelSpeed = abs(getAverage(findDrivenWheels(ext.GetTyreSpeeds(vehicle))));
+	float avgWheelSpeed = abs(getAverage(getDrivenWheelsSpeeds(ext.GetTyreSpeeds(vehicle))));
 	if (vehData.Clutch > 0.2f && // 1.0 = fully engaged, 0.1 = fully disengaged
 		controls.ClutchVal < 1.0f - settings.StallingThreshold &&
 		vehData.Rpm < 0.25f &&
@@ -1189,6 +1193,8 @@ void functionEngStall() {
 			showNotification("Your car has stalled.");
 	}
 	//showText(0.1, 0.1, 1.0, ("Stall progress:" + std::to_string(stallingProgress)), 0, solidWhite, true);
+	// todo: add engine startup when wheels roll + clutch
+	// not sure if this is already in the game in some sorts
 }
 
 void functionEngDamage() {
@@ -1199,14 +1205,122 @@ void functionEngDamage() {
 	}
 }
 
+// im solving the worng problem here help
+std::vector<bool> getDrivenWheels() {
+	int numWheels = ext.GetNumWheels(vehicle);
+	std::vector<bool> wheelsToConsider;
+	if (vehData.DriveBiasFront > 0.0f && vehData.DriveBiasFront < 1.0f) {
+		for (int i = 0; i < numWheels; i++)
+			wheelsToConsider.push_back(true);
+	}
+	else {
+		// bikes
+		if (numWheels == 2) {
+			// fwd
+			if (vehData.DriveBiasFront == 1.0f) {
+				wheelsToConsider.push_back(true);
+				wheelsToConsider.push_back(false);
+			}
+			// rwd
+			else if (vehData.DriveBiasFront == 0.0f) {
+				wheelsToConsider.push_back(false);
+				wheelsToConsider.push_back(true);
+			}
+		}
+		// normal cars
+		else if (numWheels == 4) {
+			// fwd
+			if (vehData.DriveBiasFront == 1.0f) {
+				wheelsToConsider.push_back(true);
+				wheelsToConsider.push_back(true);
+				wheelsToConsider.push_back(false);
+				wheelsToConsider.push_back(false);
+			}
+			// rwd
+			else if (vehData.DriveBiasFront == 0.0f) {
+				wheelsToConsider.push_back(false);
+				wheelsToConsider.push_back(false);
+				wheelsToConsider.push_back(true);
+				wheelsToConsider.push_back(true);
+			}
+		}
+		// offroad, trucks
+		else if (numWheels == 6) {
+			// fwd
+			if (vehData.DriveBiasFront == 1.0f) {
+				wheelsToConsider.push_back(true);
+				wheelsToConsider.push_back(true);
+				wheelsToConsider.push_back(false);
+				wheelsToConsider.push_back(false);
+				wheelsToConsider.push_back(false);
+				wheelsToConsider.push_back(false);
+			}
+			// rwd
+			else if (vehData.DriveBiasFront == 0.0f) {
+				wheelsToConsider.push_back(false);
+				wheelsToConsider.push_back(false);
+				wheelsToConsider.push_back(true);
+				wheelsToConsider.push_back(true);
+				wheelsToConsider.push_back(true);
+				wheelsToConsider.push_back(true);
+			}
+		}
+		else {
+			for (int i = 0; i < numWheels; i++)
+				wheelsToConsider.push_back(true);
+		}
+	}
+	return wheelsToConsider;
+}
+
+void functionEngLock() {
+	// ok so this took me way too much time
+	// I finally found the gearing ratio stuff, which along with DriveMaxFlatVel (?)
+	// can be used to figure out the max speed for that gear.
+	// Beware though as this might be different for trucks. Haven't checked it yet!
+	auto currGear = ext.GetGearCurr(vehicle);
+	float speed = ext.GetDashSpeed(vehicle);
+	auto ratios = ext.GetGearRatios(vehicle);
+	float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
+	float maxSpeed = DriveMaxFlatVel / ratios[currGear];
+
+	// Wheels are "locking up" due to bad downshifts
+	if (vehData.CurrGear != 0 && vehData.CurrGear != vehData.TopGear &&
+		speed > maxSpeed) {
+
+		if (!MemoryPatcher::BrakeDecrementPatched) {
+			MemoryPatcher::PatchBrakeDecrement();
+		}
+		float inputMultiplier = (1.0f - controls.ClutchVal);
+		float lockingForce = 5.0f * inputMultiplier;
+		auto wheelsToLock = getDrivenWheels();
+		for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
+			if (i >= wheelsToLock.size() || wheelsToLock[i])
+				ext.SetWheelBrakePressure(vehicle, i, lockingForce);
+		}
+		fakeRev();
+		showText(0.5, 0.45, 0.5, "Eng block @ " + std::to_string(static_cast<int>(inputMultiplier * 100.0f)) + "%");
+		showText(0.5, 0.50, 0.5, "Eng block @ " + std::to_string(lockingForce));
+	}
+	else {
+		if (MemoryPatcher::BrakeDecrementPatched) {
+			MemoryPatcher::RestoreBrakeDecrement();
+		}
+	}
+}
+
 void functionEngBrake() {
-	// Braking
-	if (vehData.LockSpeeds[vehData.CurrGear] > 1.0f &&
-		vehData.CurrGear != 0 && vehData.CurrGear != vehData.TopGear &&
-		vehData.Velocity > vehData.LockSpeeds[vehData.CurrGear]+2.0f &&
-		vehData.Rpm >= 1.00) {
-		float brakeForce = -0.20f * (1.0f - controls.ClutchVal);
+	// When you let go of the throttle at high RPMs
+	const float activeBrakeThreshold = 0.65f;
+	if (vehData.Rpm >= activeBrakeThreshold && vehData.Velocity > 5.0f) {
+		float throttleMultiplier = 1.0f - controls.ThrottleVal;
+		float clutchMultiplier = 1.0f - controls.ClutchVal;
+		float inputMultiplier = throttleMultiplier * clutchMultiplier;
+		float rpmMultiplier = (vehData.Rpm - activeBrakeThreshold)/(1.0f-activeBrakeThreshold);
+		float brakeForce = -0.07f * inputMultiplier * rpmMultiplier;
 		ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, brakeForce, 0.0f, true, true, true, true);
+		showText(0.5, 0.55, 0.5, "Eng brake @ " + std::to_string(static_cast<int>(inputMultiplier * 100.0f)) + "%" );
+		showText(0.5, 0.60, 0.5, "Eng brake @ " + std::to_string(brakeForce));
 	}
 }
 

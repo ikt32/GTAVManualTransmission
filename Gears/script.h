@@ -86,6 +86,7 @@ void functionClutchCatch();
 void functionEngStall();
 void functionEngDamage();
 void functionEngBrake();
+void functionEngLock();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                       Mod functions: Gearbox control
