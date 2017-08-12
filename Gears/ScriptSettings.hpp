@@ -34,6 +34,7 @@ public:
 	bool EngStall = false;
 	bool EngStallS = false;
 	bool EngBrake = false;
+	bool EngLock = false;
 	bool ClutchCatching = false;
 	bool ClutchShiftingH = false;
 	bool ClutchShiftingS = false;
@@ -143,6 +144,9 @@ public:
 	float SteerAngleBike = 180.0f;
 	float SteerAngleBoat = 360.0f;
 	float GameSteerMult = 1.0f;
+
+	float EngBrakePower;
+	float EngBrakeThreshold;
 
 	// Methods
 	/*

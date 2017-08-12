@@ -230,6 +230,9 @@ void update_menu() {
 		menu.BoolOption("Engine Braking", settings.EngBrake,
 		{ "Help the car braking by slowing down more at high RPMs" });
 
+		menu.BoolOption("Gear/RPM Lockup", settings.EngLock,
+		{ "Simulate wheel lock-up when mis-shifting to a too low gear for the RPM range." });
+
 		menu.BoolOption("Clutch Bite", settings.ClutchCatching,
 		{ "Simulate clutch biting action and clutch interaction at near-stop speeds." });
 
@@ -273,6 +276,8 @@ void update_menu() {
 		menu.FloatOption("Stalling threshold", settings.StallingThreshold, 0.0f, 1.0f, 0.05f);
 		menu.FloatOption("RPM Damage", settings.RPMDamage, 0.0f, 10.0f, 0.05f);
 		menu.IntOption("Misshift Damage", settings.MisshiftDamage, 0, 100, 5);
+		menu.FloatOption("Engine braking threshold", settings.EngBrakeThreshold, 0.0f, 1.0f, 0.05f);
+		menu.FloatOption("Engine braking power", settings.EngBrakePower, 0.0f, 2.0f, 0.05f);
 	}
 
 	/* Yes hello I am root - 1 */
@@ -410,11 +415,6 @@ void update_menu() {
 		{ "Enable your wheel even when the Manual Transmission part of this mod is off." })) {
 			settings.SaveWheel(&controls);
 		}
-		
-		//if (menu.BoolOption("Enable wheel for boats & planes", settings.WheelForBoat,
-		//{ "Enable wheel input for boats and planes.","Experimental and hard-coded for now." })) {
-		//	settings.SaveWheel(&controls);
-		//}
 		
 		if (menu.BoolOption("Patch steering", settings.PatchSteering,
 		{ "Patches steering reduction and automatic countersteer for more direct control." })) {

@@ -241,6 +241,9 @@ void update() {
 	if (settings.EngDamage &&
 		!vehData.NoClutch) {
 		functionEngDamage();
+	}
+
+	if (settings.EngLock) {
 		functionEngLock();
 	}
 
@@ -1286,7 +1289,7 @@ void functionEngLock() {
 
 	// Wheels are locking up due to bad downshifts
 	if (vehData.CurrGear != 0 && vehData.CurrGear != vehData.TopGear &&
-		!vehData.SimulatedNeutral && speed > maxSpeed) {
+		!vehData.SimulatedNeutral && speed > maxSpeed + 2.0f) {
 
 		if (!MemoryPatcher::BrakeDecrementPatched) {
 			MemoryPatcher::PatchBrakeDecrement();
@@ -1322,19 +1325,17 @@ void functionEngLock() {
 
 void functionEngBrake() {
 	// When you let go of the throttle at high RPMs
-	const float activeBrakeThreshold = 0.65f;
+	float activeBrakeThreshold = settings.EngBrakeThreshold;
 	if (vehData.Rpm >= activeBrakeThreshold && vehData.Velocity > 5.0f) {
 		float throttleMultiplier = 1.0f - controls.ThrottleVal;
 		float clutchMultiplier = 1.0f - controls.ClutchVal;
 		float inputMultiplier = throttleMultiplier * clutchMultiplier;
-		float rpmMultiplier = (vehData.Rpm - activeBrakeThreshold)/(1.0f-activeBrakeThreshold);
-		//float brakeForce = -0.07f * inputMultiplier * rpmMultiplier;
-		float brakePressure = 0.33f * inputMultiplier * rpmMultiplier;
 		if (inputMultiplier > 0.0f) {
 			if (!MemoryPatcher::BrakeDecrementPatched) {
 				MemoryPatcher::PatchBrakeDecrement();
 			}
-			//ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, brakeForce, 0.0f, true, true, true, true);
+			float rpmMultiplier = (vehData.Rpm - activeBrakeThreshold) / (1.0f - activeBrakeThreshold);
+			float brakePressure = settings.EngBrakePower * inputMultiplier * rpmMultiplier;
 			auto wheelsToBrake = getDrivenWheels();
 			for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
 				if (i >= wheelsToBrake.size() || wheelsToBrake[i]) {
@@ -1343,8 +1344,7 @@ void functionEngBrake() {
 			}
 			if (settings.DisplayInfo) {
 				showText(0.5, 0.55, 0.5, "Eng brake @ " + std::to_string(static_cast<int>(inputMultiplier * 100.0f)) + "%");
-				//showText(0.5, 0.60, 0.5, "Eng brake @ " + std::to_string(brakeForce));
-				showText(0.5, 0.60, 0.5, "Eng brake @ " + std::to_string(brakePressure));
+				showText(0.5, 0.60, 0.5, "Pressure: " + std::to_string(brakePressure));
 			}
 		}
 		

@@ -1,8 +1,17 @@
 #pragma once
 #include <inc/types.h>
+#include <vector>
 
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
+}
+
+template<typename T, typename A>
+T avg(std::vector<T, A> const& vec) {
+	T average{};
+	for (auto elem : vec)
+		average += elem;
+	return average / sizeof(vec);
 }
 
 float lerp(float a, float b, float f);
