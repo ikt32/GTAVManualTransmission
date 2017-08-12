@@ -1284,28 +1284,39 @@ void functionEngLock() {
 	float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
 	float maxSpeed = DriveMaxFlatVel / ratios[currGear];
 
-	// Wheels are "locking up" due to bad downshifts
+	// Wheels are locking up due to bad downshifts
 	if (vehData.CurrGear != 0 && vehData.CurrGear != vehData.TopGear &&
-		speed > maxSpeed) {
+		!vehData.SimulatedNeutral && speed > maxSpeed) {
 
 		if (!MemoryPatcher::BrakeDecrementPatched) {
 			MemoryPatcher::PatchBrakeDecrement();
 		}
 		float inputMultiplier = (1.0f - controls.ClutchVal);
-		float lockingForce = 5.0f * inputMultiplier;
+		float lockingForce = 60.0f * inputMultiplier;
 		auto wheelsToLock = getDrivenWheels();
 		for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
-			if (i >= wheelsToLock.size() || wheelsToLock[i])
+			if (i >= wheelsToLock.size() || wheelsToLock[i]) {
 				ext.SetWheelBrakePressure(vehicle, i, lockingForce);
+				ext.SetWheelSkidSmokeEffect(vehicle, i, lockingForce);
+			}
 		}
-		fakeRev();
-		showText(0.5, 0.45, 0.5, "Eng block @ " + std::to_string(static_cast<int>(inputMultiplier * 100.0f)) + "%");
-		showText(0.5, 0.50, 0.5, "Eng block @ " + std::to_string(lockingForce));
+		fakeRev(true, 1.0f);
+		gearRattle.Play(vehicle);
+		if (settings.EngDamage) {
+			VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
+				vehicle,
+				VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.EngDamage);
+		}
+		if (settings.DisplayInfo) {
+			showText(0.5, 0.45, 0.5, "Eng block @ " + std::to_string(static_cast<int>(inputMultiplier * 100.0f)) + "%");
+			showText(0.5, 0.50, 0.5, "Eng block @ " + std::to_string(lockingForce));
+		}
 	}
 	else {
 		if (MemoryPatcher::BrakeDecrementPatched) {
 			MemoryPatcher::RestoreBrakeDecrement();
 		}
+		gearRattle.Stop();
 	}
 }
 
@@ -1319,8 +1330,10 @@ void functionEngBrake() {
 		float rpmMultiplier = (vehData.Rpm - activeBrakeThreshold)/(1.0f-activeBrakeThreshold);
 		float brakeForce = -0.07f * inputMultiplier * rpmMultiplier;
 		ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, brakeForce, 0.0f, true, true, true, true);
-		showText(0.5, 0.55, 0.5, "Eng brake @ " + std::to_string(static_cast<int>(inputMultiplier * 100.0f)) + "%" );
-		showText(0.5, 0.60, 0.5, "Eng brake @ " + std::to_string(brakeForce));
+		if (settings.DisplayInfo) {
+			showText(0.5, 0.55, 0.5, "Eng brake @ " + std::to_string(static_cast<int>(inputMultiplier * 100.0f)) + "%");
+			showText(0.5, 0.60, 0.5, "Eng brake @ " + std::to_string(brakeForce));
+		}
 	}
 }
 
@@ -1328,16 +1341,17 @@ void functionEngBrake() {
 //                       Mod functions: Gearbox control
 ///////////////////////////////////////////////////////////////////////////////
 
-void fakeRev() {
+void fakeRev(bool customThrottle, float customThrottleVal) {
+	float throttleVal = customThrottle ? customThrottleVal : controls.ThrottleVal;
 	float timeStep = SYSTEM::TIMESTEP();
 	float accelRatio = 2.5f * timeStep;
-	float rpmValTemp = (vehData.PrevRpm > vehData.Rpm ? (vehData.PrevRpm - vehData.Rpm) : 0.0f);
+	float rpmValTemp = vehData.PrevRpm > vehData.Rpm ? vehData.PrevRpm - vehData.Rpm : 0.0f;
 	if (vehData.CurrGear == 1) {			// For some reason, first gear revs slower
 		rpmValTemp *= 2.0f;
 	}
 	float rpmVal = vehData.Rpm +			// Base value
 		rpmValTemp +						// Keep it constant
-		controls.ThrottleVal * accelRatio;	// Addition value, depends on delta T
+		throttleVal * accelRatio;	// Addition value, depends on delta T
 	//showText(0.4, 0.4, 2.0, "FakeRev");
 	ext.SetCurrentRPM(vehicle, rpmVal);
 }
@@ -1350,11 +1364,12 @@ void handleRPM() {
 	// Game wants to shift up. Triggered at high RPM, high speed.
 	// Desired result: high RPM, same gear, no more accelerating
 	// Result:	Is as desired. Speed may drop a bit because of game clutch.
-
+	// Update 2017-08-12: We know the gear speeds now, consider patching
+	// shiftUp completely?
 	if (vehData.CurrGear > 0 &&
 		(vehData.CurrGear < vehData.NextGear && vehData.Speed > 2.0f)) {
 		ext.SetThrottle(vehicle, 1.0f);
-		fakeRev();
+		fakeRev(false, 0);
 		CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
 		float counterForce = 0.25f*-(static_cast<float>(vehData.TopGear) - static_cast<float>(vehData.CurrGear))/static_cast<float>(vehData.TopGear);
 		ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, counterForce, 0.0f, true, true, true, true);
@@ -1385,7 +1400,7 @@ void handleRPM() {
 			// Also because we're checking on the game Control accel value and not the pedal position
 			// TODO: Might wanna re-write with control.AccelVal instead of vehData.ControlAccelerate?
 			!(vehData.Velocity < 0.0 && controls.BrakeVal > 0.1f && vehData.ControlAccelerate > 0.05f)) {
-			fakeRev();
+			fakeRev(false, 0);
 			ext.SetThrottle(vehicle, vehData.ControlAccelerate);
 			float tempVal = (1.0f - controls.ClutchVal) * 0.4f + 0.6f;
 			if (controls.ClutchVal > 0.95) {
@@ -1396,7 +1411,7 @@ void handleRPM() {
 		}
 		// Don't care about clutch slippage, just handle RPM now
 		if (vehData.SimulatedNeutral) {
-			fakeRev();
+			fakeRev(false, 0);
 			ext.SetThrottle(vehicle, 1.0f); // For a fuller sound
 		}
 	}
@@ -1528,7 +1543,7 @@ void functionRealReverse() {
 
 			CONTROLS::ENABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, controls.BrakeVal);
-			fakeRev();
+			fakeRev(false, 0);
 		}
 
 		// LT behavior when forward
@@ -1617,17 +1632,17 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 					ext.SetThrottleP(vehicle, 0.1f);
 					ext.SetBrakeP(vehicle, 1.0f);
 					brakelights = true;
-					fakeRev();
+					fakeRev(false, 0);
 				}
 				else if (controls.ClutchVal > 0.9 || vehData.SimulatedNeutral) {
 					//showText(0.3, 0.0, 1.0, "We should rev and do nothing");
 					ext.SetThrottleP(vehicle, wheelThrottleVal); 
-					fakeRev();
+					fakeRev(false, 0);
 				} else {
 					//showText(0.3, 0.0, 1.0, "We should rev and apply throttle");
 					SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, controls.ADZThrottle);
 					ext.SetThrottleP(vehicle, wheelThrottleVal);
-					fakeRev();
+					fakeRev(false, 0);
 				}
 			}
 			VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, brakelights);
