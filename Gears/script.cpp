@@ -1029,12 +1029,26 @@ void functionAShift() { // Automatic
 	}
 
 	// Shift down
-	if ((vehData.CurrGear > 1 && vehData.Rpm < 0.4f) ||
-		(vehData.CurrGear > 1 && vehData.Rpm < 0.5f) && vehData.Throttle > 0.95f) {
-		shiftTo(vehData.CurrGear - 1, true);
-		vehData.NextGear = vehData.CurrGear - 1;
-		vehData.SimulatedNeutral = false;
+	if (vehData.CurrGear > 1) {
+		auto ratios = ext.GetGearRatios(vehicle);
+		float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
+		float prevGearRedline = DriveMaxFlatVel / ratios[vehData.CurrGear - 1];
+		float velDiff = prevGearRedline - ext.GetDashSpeed(vehicle);
+		if (velDiff > + 3.0f + 6.0f*(1.0f - controls.ThrottleVal)) {
+			shiftTo(vehData.CurrGear - 1, true);
+			vehData.NextGear = vehData.CurrGear - 1;
+			vehData.SimulatedNeutral = false;
+		}
 	}
+	
+
+	//// Shift down
+	//if ((vehData.CurrGear > 1 && vehData.Rpm < 0.4f) ||
+	//	(vehData.CurrGear > 1 && vehData.Rpm < 0.5f) && vehData.Throttle > 0.95f) {
+	//	shiftTo(vehData.CurrGear - 1, true);
+	//	vehData.NextGear = vehData.CurrGear - 1;
+	//	vehData.SimulatedNeutral = false;
+	//}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
