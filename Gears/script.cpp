@@ -1291,19 +1291,22 @@ std::vector<bool> getDrivenWheels() {
 }
 
 void functionEngLock() {
+
 	// ok so this took me way too much time
 	// I finally found the gearing ratio stuff, which along with DriveMaxFlatVel (?)
 	// can be used to figure out the max speed for that gear.
 	// Beware though as this might be different for trucks. Haven't checked it yet!
-	auto currGear = ext.GetGearCurr(vehicle);
 	float speed = ext.GetDashSpeed(vehicle);
 	auto ratios = ext.GetGearRatios(vehicle);
 	float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
-	float maxSpeed = DriveMaxFlatVel / ratios[currGear];
+	float maxSpeed = DriveMaxFlatVel / ratios[vehData.CurrGear];
 
 	// Wheels are locking up due to bad downshifts
 	if (vehData.CurrGear != 0 && vehData.CurrGear != vehData.TopGear &&
 		!vehData.SimulatedNeutral && speed > maxSpeed + 2.0f) {
+		if (vehData.IsTruck && vehData.CurrGear == 1 &&
+			speed < vehData.LockSpeed + 5.0f)
+			return;
 
 		if (!MemoryPatcher::BrakeDecrementPatched) {
 			MemoryPatcher::PatchBrakeDecrement();
