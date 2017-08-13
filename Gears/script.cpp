@@ -1057,7 +1057,7 @@ void functionAShift() { // Automatic
 
 void functionClutchCatch() {
 	float lowSpeed = 2.5f;
-	float idleThrottle = 0.33f;
+	float idleThrottle = 0.45f;
 
 	if (controls.ClutchVal < 1.0f - settings.ClutchCatchpoint) {
 		// Automatic cars APPARENTLY need little/no brake pressure to stop
@@ -1072,6 +1072,8 @@ void functionClutchCatch() {
 		    controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
 			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, idleThrottle);
 			ext.SetCurrentRPM(vehicle, 0.21f);
+			ext.SetThrottle(vehicle, 0.0f);
+
 		}
 
 		// Reverse
@@ -1080,8 +1082,9 @@ void functionClutchCatch() {
 			if (vehData.Velocity < -lowSpeed) {
 				controls.ClutchVal = 1.0f;
 			}
-			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, 0.26f);
+			CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, idleThrottle);
 			ext.SetCurrentRPM(vehicle, 0.21f);
+			ext.SetThrottle(vehicle, 0.0f);
 		}
 	}
 }
@@ -1305,7 +1308,7 @@ void functionEngLock() {
 	if (vehData.CurrGear != 0 && vehData.CurrGear != vehData.TopGear &&
 		!vehData.SimulatedNeutral && speed > maxSpeed + 2.0f) {
 		if (vehData.IsTruck && vehData.CurrGear == 1 &&
-			speed < vehData.LockSpeed + 5.0f)
+			speed < vehData.LockSpeed + 10.0f)
 			return;
 
 		if (!MemoryPatcher::BrakeDecrementPatched) {
