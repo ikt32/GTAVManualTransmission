@@ -131,7 +131,8 @@ void update() {
 		(settings.EnableManual || settings.AlwaysHUD)) {
 		showHUD();
 	}
-	if (settings.EnableWheel && settings.SteeringWheelInfo && textureWheelId != -1) {
+	if ((controls.PrevInput == ScriptControls::Wheel || settings.AlwaysSteeringWheelInfo) && 
+		settings.SteeringWheelInfo && textureWheelId != -1) {
 		drawSteeringWheelInfo();
 	}
 
@@ -233,25 +234,6 @@ void update() {
 	if (vehData.IsTruck) {
 		functionTruckLimiting();
 	}
-
-	if (settings.DisplayInfo) {
-		auto ratios = ext.GetGearRatios(vehicle);
-		float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
-		int i = 0;
-		showText(0.25f, 0.05f, 0.5f, "Expected");
-		for (auto ratio : ratios) {
-		float maxSpeed = DriveMaxFlatVel / ratio;
-		showText(0.25f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(maxSpeed));
-		i++;
-		}
-
-		i = 0;
-		showText(0.40f, 0.05f, 0.5f, "Actual");
-		for (auto speed : upshiftSpeeds) {
-		showText(0.40f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
-		i++;
-		}
-	}
 	
 	if (settings.EngBrake) {
 		functionEngBrake();
@@ -331,7 +313,7 @@ void update() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//                           Helper functions/tools
+//                           Display elements
 ///////////////////////////////////////////////////////////////////////////////
 void drawRPMIndicator(float x, float y, float width, float height, Color fg, Color bg, float rpm) {
 	float bgpaddingx = 0.00f;
@@ -343,10 +325,98 @@ void drawRPMIndicator(float x, float y, float width, float height, Color fg, Col
 	GRAPHICS::DRAW_RECT(x-width*0.5f+rpm*width*0.5f, y, width*rpm, height, fg.R, fg.G, fg.B, fg.A);
 }
 
-// todo: make more things toggle-able
-void showHUD() {
+void drawRPMIndicator() {
+	Color background = {
+		settings.RPMIndicatorBackgroundR,
+		settings.RPMIndicatorBackgroundG,
+		settings.RPMIndicatorBackgroundB,
+		settings.RPMIndicatorBackgroundA
+	};
 
-	// Gear number indication
+	Color foreground = {
+		settings.RPMIndicatorForegroundR,
+		settings.RPMIndicatorForegroundG,
+		settings.RPMIndicatorForegroundB,
+		settings.RPMIndicatorForegroundA
+	};
+
+	Color rpmcolor = foreground;
+	if (vehData.Rpm > settings.RPMIndicatorRedline) {
+		Color redline = {
+			settings.RPMIndicatorRedlineR,
+			settings.RPMIndicatorRedlineG,
+			settings.RPMIndicatorRedlineB,
+			settings.RPMIndicatorRedlineA
+		};
+		rpmcolor = redline;
+	}
+	if (vehData.CurrGear < vehData.NextGear || vehData.TruckShiftUp) {
+		Color rpmlimiter = {
+			settings.RPMIndicatorRevlimitR,
+			settings.RPMIndicatorRevlimitG,
+			settings.RPMIndicatorRevlimitB,
+			settings.RPMIndicatorRevlimitA
+		};
+		rpmcolor = rpmlimiter;
+	}
+	drawRPMIndicator(
+		settings.RPMIndicatorXpos,
+		settings.RPMIndicatorYpos,
+		settings.RPMIndicatorWidth,
+		settings.RPMIndicatorHeight,
+		rpmcolor,
+		background,
+		vehData.Rpm
+	);
+}
+
+void drawSpeedoMeter() {
+	std::stringstream speedoFormat;
+
+	float dashms = ext.GetDashSpeed(vehicle);
+	if (!vehData.HasSpeedo && dashms > 0.1f) {
+		vehData.HasSpeedo = true;
+	}
+	if (!vehData.HasSpeedo) {
+		dashms = abs(vehData.Velocity);
+	}
+
+	if (settings.Speedo == "kph" ) {
+		speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(dashms * 3.6f)));
+		if (settings.SpeedoShowUnit) speedoFormat << (settings.HUDFont == 2 ? " kph" : " km/h");
+	}
+	if (settings.Speedo == "mph" ) {
+		speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(dashms / 0.44704f)));
+		if (settings.SpeedoShowUnit) speedoFormat << " mph";
+	}
+	if (settings.Speedo == "ms") {
+		speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(dashms)));
+		if (settings.SpeedoShowUnit) speedoFormat << (settings.HUDFont == 2 ? " mps" : " m/s");;
+	}
+	showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize, speedoFormat.str(), settings.HUDFont, solidWhite, true);
+}
+
+void drawShiftModeIndicator() {
+	std::string shiftModeText;
+	auto color = solidWhite;
+	switch (settings.ShiftMode) {
+		case Sequential: shiftModeText = "S";
+			break;
+		case HPattern: shiftModeText = "H";
+			break;
+		case Automatic: shiftModeText = "A";
+			break;
+		default: shiftModeText = "";
+			break;
+	}
+	if (!settings.EnableManual) {
+		shiftModeText = "A";
+		color = { 0, 126, 232, 255 };
+	}
+	showText(settings.ShiftModeXpos, settings.ShiftModeYpos, settings.ShiftModeSize, shiftModeText, settings.HUDFont, color, true);
+}
+
+void drawGearIndicator() {
 	std::string gear = std::to_string(vehData.CurrGear);
 	if (vehData.SimulatedNeutral && settings.EnableManual) {
 		gear = "N";
@@ -365,97 +435,22 @@ void showHUD() {
 		c = solidWhite;
 	}
 	showText(settings.GearXpos, settings.GearYpos, settings.GearSize, gear, settings.HUDFont, c, true);
+}
 
-	// Shift mode indicator
-	char * shiftModeText;
-	switch (settings.ShiftMode) {
-	case Sequential: shiftModeText = "S";
-		break;
-	case HPattern: shiftModeText = "H";
-		break;
-	case Automatic: shiftModeText = "A";
-		break;
-	default: shiftModeText = "";
-		break;
+void showHUD() {
+	if (settings.GearIndicator) {
+		drawGearIndicator();
 	}
-	if (!settings.EnableManual)
-		shiftModeText = "A";
-	showText(settings.ShiftModeXpos, settings.ShiftModeYpos, settings.ShiftModeSize, shiftModeText, settings.HUDFont, solidWhite, true);
-	
-	// Speedometer using dashboard speed
-	// PROBABLY not going over 999kph (smallest unit)
+	if (settings.ShiftModeIndicator) {
+		drawShiftModeIndicator();
+	}
 	if (settings.Speedo == "kph" ||
 		settings.Speedo == "mph" ||
 		settings.Speedo == "ms") {
-		std::stringstream speedoFormat;
-
-		float dashms = ext.GetDashSpeed(vehicle);
-		if (!vehData.HasSpeedo && dashms > 0.1f) {
-			vehData.HasSpeedo = true;
-		}
-		if (!vehData.HasSpeedo) {
-			dashms = abs(vehData.Velocity);
-		}
-
-		if (settings.Speedo == "kph" ) {
-			speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(dashms * 3.6f)));
-			if (settings.SpeedoShowUnit) speedoFormat << (settings.HUDFont == 2 ? " kph" : " km/h");
-		}
-		if (settings.Speedo == "mph" ) {
-			speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(dashms / 0.44704f)));
-			if (settings.SpeedoShowUnit) speedoFormat << " mph";
-		}
-		if (settings.Speedo == "ms") {
-			speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(dashms)));
-			if (settings.SpeedoShowUnit) speedoFormat << (settings.HUDFont == 2 ? " mps" : " m/s");;
-		}
-		showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize, speedoFormat.str(), settings.HUDFont, solidWhite, true);
+		drawSpeedoMeter();
 	}
-
-	// RPM Indicator!
 	if (settings.RPMIndicator) {
-		Color background = {
-			settings.RPMIndicatorBackgroundR,
-			settings.RPMIndicatorBackgroundG,
-			settings.RPMIndicatorBackgroundB,
-			settings.RPMIndicatorBackgroundA
-		};
-
-		Color foreground = {
-			settings.RPMIndicatorForegroundR,
-			settings.RPMIndicatorForegroundG,
-			settings.RPMIndicatorForegroundB,
-			settings.RPMIndicatorForegroundA
-		};
-
-		Color rpmcolor = foreground;
-		if (vehData.Rpm > settings.RPMIndicatorRedline) {
-			Color redline = {
-				settings.RPMIndicatorRedlineR,
-				settings.RPMIndicatorRedlineG,
-				settings.RPMIndicatorRedlineB,
-				settings.RPMIndicatorRedlineA
-			};
-			rpmcolor = redline;
-		}
-		if (vehData.CurrGear < vehData.NextGear || vehData.TruckShiftUp) {
-			Color rpmlimiter = {
-				settings.RPMIndicatorRevlimitR,
-				settings.RPMIndicatorRevlimitG,
-				settings.RPMIndicatorRevlimitB,
-				settings.RPMIndicatorRevlimitA
-			};
-			rpmcolor = rpmlimiter;
-		}
-		drawRPMIndicator(
-			settings.RPMIndicatorXpos,
-			settings.RPMIndicatorYpos,
-			settings.RPMIndicatorWidth,
-			settings.RPMIndicatorHeight,
-			rpmcolor,
-			background,
-			vehData.Rpm
-		);
+		drawRPMIndicator();
 	}
 }
 
@@ -513,6 +508,25 @@ void showDebugInfo() {
 		dinputDisplay << "Wheel" << (controls.WheelControl.IsConnected(controls.SteerGUID) ? "" : " not") << " present";
 		showText(0.85, 0.150, 0.4, dinputDisplay.str(), 4, solidWhite, true);
 	}
+
+	if (settings.EnableManual && settings.DisplayGearingInfo) {
+		auto ratios = ext.GetGearRatios(vehicle);
+		float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
+		int i = 0;
+		showText(0.25f, 0.05f, 0.5f, "Expected");
+		for (auto ratio : ratios) {
+			float maxSpeed = DriveMaxFlatVel / ratio;
+			showText(0.25f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(maxSpeed));
+			i++;
+		}
+
+		i = 0;
+		showText(0.40f, 0.05f, 0.5f, "Actual");
+		for (auto speed : upshiftSpeeds) {
+			showText(0.40f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
+			i++;
+		}
+	}
 }
 
 void showDebugInfoWheel(ScriptSettings &settings, float effSteer, int damperForce, float steerSpeed, double GForce, float oversteer, float understeer) {
@@ -564,6 +578,9 @@ void drawSteeringWheelInfo() {
 	GRAPHICS::DRAW_RECT(settings.PedalInfoX + 1.0f*barWidth, barYBase - controls.ClutchValRaw*settings.PedalInfoH*0.5f, barWidth, controls.ClutchVal*settings.PedalInfoH, 0, 0, 255, 255);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//                            Helper things
+///////////////////////////////////////////////////////////////////////////////
 void crossScriptUpdated() {
 	// Current gear
 	DECORATOR::DECOR_SET_INT(vehicle, "mt_gear", vehData.CurrGear);

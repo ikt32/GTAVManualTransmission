@@ -40,6 +40,8 @@ public:
 	bool ClutchShiftingS = false;
 	bool DefaultNeutral = false;
 
+	float EngBrakePower;
+	float EngBrakeThreshold;
 	float ClutchCatchpoint = 0.15f;
 	float StallingThreshold = 0.75f;
 	float RPMDamage = 1.5f;
@@ -55,6 +57,8 @@ public:
 	bool HUD = true;
 	bool AlwaysHUD = false;
 	int HUDFont = 0;
+
+	bool GearIndicator;
 	float GearXpos = 0.95f;
 	float GearYpos = 0.95f;
 	float GearSize = 1.0f;
@@ -62,6 +66,7 @@ public:
 	int GearTopColorG = 255;
 	int GearTopColorB = 255;
 
+	bool ShiftModeIndicator;
 	float ShiftModeXpos = 0.925f;
 	float ShiftModeYpos = 0.95f;
 	float ShiftModeSize = 1.0f;
@@ -97,6 +102,7 @@ public:
 	int RPMIndicatorRevlimitB = 0;
 	int RPMIndicatorRevlimitA = 255;
 
+	bool AlwaysSteeringWheelInfo = false;
 	bool SteeringWheelInfo = false;
 	float SteeringWheelTextureX	 = 0.0f;
 	float SteeringWheelTextureY	 = 0.0f;
@@ -109,11 +115,11 @@ public:
 	float PedalInfoPadY			 = 0.0f;
 
 	// [CONTROLLER]
-	bool ToggleEngine = false; // false makes it just turn ON the engine
+	bool ToggleEngine = false;
 
 	// [DEBUG]
 	bool DisplayInfo = false;
-	//bool LogCar = false;
+	bool DisplayGearingInfo;
 	bool DisplayWheelInfo = false;
 
 	std::vector<GUID> reggdGuids;
@@ -145,8 +151,7 @@ public:
 	float SteerAngleBoat = 360.0f;
 	float GameSteerMult = 1.0f;
 
-	float EngBrakePower;
-	float EngBrakeThreshold;
+
 
 	// Methods
 	/*

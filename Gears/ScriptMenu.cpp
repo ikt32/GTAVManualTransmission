@@ -683,7 +683,7 @@ void update_menu() {
 		menu.Title("Gear options");
 		menu.Subtitle("");
 
-		// prolly gear section
+		menu.BoolOption("Gear", settings.GearIndicator);
 		menu.FloatOption("Gear X", settings.GearXpos, 0.0f, 1.0f, 0.005f);
 		menu.FloatOption("Gear Y", settings.GearYpos, 0.0f, 1.0f, 0.005f);
 		menu.FloatOption("Gear Size", settings.GearSize, 0.0f, 3.0f, 0.05f);
@@ -691,10 +691,10 @@ void update_menu() {
 		menu.IntOption("Gear Top Color Green", settings.GearTopColorG, 0, 255);
 		menu.IntOption("Gear Top Color Blue", settings.GearTopColorB, 0, 255);
 
+		menu.BoolOption("Shift Mode", settings.ShiftModeIndicator);
 		menu.FloatOption("Shift Mode X", settings.ShiftModeXpos, 0.0f, 1.0f, 0.005f);
 		menu.FloatOption("Shift Mode Y", settings.ShiftModeYpos, 0.0f, 1.0f, 0.005f);
 		menu.FloatOption("Shift Mode Size", settings.ShiftModeSize, 0.0f, 3.0f, 0.05f);
-
 	}
 
 	/* Yes hello I am root - 2 */
@@ -712,7 +712,6 @@ void update_menu() {
 		menu.FloatOption("Speedometer X", settings.SpeedoXpos, 0.0f, 1.0f, 0.005f);
 		menu.FloatOption("Speedometer Y", settings.SpeedoYpos, 0.0f, 1.0f, 0.005f);
 		menu.FloatOption("Speedometer Size", settings.SpeedoSize, 0.0f, 3.0f, 0.05f);
-
 	}
 
 	/* Yes hello I am root - 2 */
@@ -750,10 +749,11 @@ void update_menu() {
 	}
 
 	if (menu.CurrentMenu("wheelinfomenu")) {
-		menu.Title("Wheel & Pedal info");
+		menu.Title("Wheel & Pedal Info");
 		menu.Subtitle("");
 
 		menu.BoolOption("Display steering wheel info", settings.SteeringWheelInfo, { "Show input info graphically." });
+		menu.BoolOption("Always display info", settings.AlwaysSteeringWheelInfo, { "Display the info even without a steering wheel." });
 		menu.FloatOption("Wheel image X", settings.SteeringWheelTextureX, 0.0f, 1.0f, 0.01f);
 		menu.FloatOption("Wheel image Y", settings.SteeringWheelTextureY, 0.0f, 1.0f, 0.01f);
 		menu.FloatOption("Wheel image size", settings.SteeringWheelTextureSz, 0.0f, 1.0f, 0.01f);
@@ -763,7 +763,6 @@ void update_menu() {
 		menu.FloatOption("Pedals Width", settings.PedalInfoW	, 0.0f, 1.0f, 0.01f);
 		menu.FloatOption("Pedals Pad X", settings.PedalInfoPadX, 0.0f, 1.0f, 0.01f);
 		menu.FloatOption("Pedals Pad Y", settings.PedalInfoPadY, 0.0f, 1.0f, 0.01f);
-
 	}
 
 	/* Yes hello I am root - 1 */
@@ -775,10 +774,10 @@ void update_menu() {
 		{ "Show all detailed technical info of the gearbox and inputs calculations." });
 		menu.BoolOption("Display car wheel info", settings.DisplayWheelInfo, 
 		{ "Show per-wheel debug info with off-ground detection, lockup detection and suspension info." });
-		//menu.BoolOption("Log car address", settings.LogCar, 
-		//{ "Prints the current vehicle address to Gears.log." });
+		menu.BoolOption("Display gearing info", settings.DisplayGearingInfo, 
+		{ "Show gear ratios and shift points from auto mode." });
 		menu.BoolOption("Expose script variables", settings.CrossScript, 
-		{ "Shares data like gear, shifting indicator and Neutral with other mods." });
+		{ "Shares data like gear, shifting indicator and Neutral with other mods. Check GitHub for the supported types." });
 	}
 
 	/*if (menu.CurrentMenu("planemenu")) {

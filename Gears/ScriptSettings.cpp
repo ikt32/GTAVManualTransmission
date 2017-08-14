@@ -62,6 +62,7 @@ void ScriptSettings::SaveGeneral() const {
 	settingsGeneral.SetBoolValue("HUD", "EnableHUD", HUD);
 	settingsGeneral.SetBoolValue("HUD", "AlwaysHUD", AlwaysHUD);
 	settingsGeneral.SetLongValue("HUD", "HUDFont", HUDFont);
+	settingsGeneral.SetBoolValue("HUD", "GearIndicator", GearIndicator);
 	settingsGeneral.SetDoubleValue("HUD", "GearXpos", GearXpos);
 	settingsGeneral.SetDoubleValue("HUD", "GearYpos", GearYpos);
 	settingsGeneral.SetDoubleValue("HUD", "GearSize", GearSize);
@@ -69,6 +70,7 @@ void ScriptSettings::SaveGeneral() const {
 	settingsGeneral.SetLongValue("HUD", "GearTopColorG", GearTopColorG);
 	settingsGeneral.SetLongValue("HUD", "GearTopColorB", GearTopColorB);
 
+	settingsGeneral.SetBoolValue("HUD", "ShiftModeIndicator", ShiftModeIndicator);
 	settingsGeneral.SetDoubleValue("HUD", "ShiftModeXpos", ShiftModeXpos);
 	settingsGeneral.SetDoubleValue("HUD", "ShiftModeYpos", ShiftModeYpos);
 	settingsGeneral.SetDoubleValue("HUD", "ShiftModeSize", ShiftModeSize);
@@ -107,6 +109,7 @@ void ScriptSettings::SaveGeneral() const {
 	settingsGeneral.SetLongValue("HUD", "RPMIndicatorRevlimitA", RPMIndicatorRevlimitA);
 
 	settingsGeneral.SetBoolValue("HUD", "SteeringWheelInfo", SteeringWheelInfo);
+	settingsGeneral.SetBoolValue("HUD", "AlwaysSteeringWheelInfo", AlwaysSteeringWheelInfo);
 	settingsGeneral.SetDoubleValue("HUD", "SteeringWheelTextureX", SteeringWheelTextureX);
 	settingsGeneral.SetDoubleValue("HUD", "SteeringWheelTextureY", SteeringWheelTextureY);
 	settingsGeneral.SetDoubleValue("HUD", "SteeringWheelTextureSz", SteeringWheelTextureSz);
@@ -121,7 +124,7 @@ void ScriptSettings::SaveGeneral() const {
 	// [DEBUG]
 	settingsGeneral.SetBoolValue("DEBUG", "DisplayInfo", DisplayInfo);
 	settingsGeneral.SetBoolValue("DEBUG", "DisplayWheelInfo", DisplayWheelInfo);
-	//settingsGeneral.SetBoolValue("DEBUG", "LogCar", LogCar);
+	settingsGeneral.SetBoolValue("DEBUG", "DisplayGearingInfo", DisplayGearingInfo);
 
 	settingsGeneral.SaveFile(settingsGeneralFile.c_str());
 }
@@ -197,22 +200,6 @@ void ScriptSettings::SaveStick(ScriptControls *scriptControl) const {
 	settingsStick.SaveFile(settingsStickFile.c_str());
 }
 
-//bool ScriptSettings::IsCorrectVersion() const {
-//	if (settings_general_version != CORRECTVGENERAL || settings_wheel_version != CORRECTVWHEEL)
-//		return false;
-//	return true;
-//}
-//
-//std::string ScriptSettings::GetVersionError() {
-//	if (settings_general_version != CORRECTVGENERAL && settings_wheel_version != CORRECTVWHEEL)
-//		return std::string("Wrong settings_general.ini version\nWrong settings_wheel.ini version");
-//	if (settings_general_version != CORRECTVGENERAL)
-//		return std::string("Wrong settings_general.ini version");
-//	if (settings_wheel_version != CORRECTVWHEEL)
-//		return std::string("Wrong settings_wheel.ini version");
-//	return "";
-//}
-
 std::vector<GUID> ScriptSettings::GetGuids() {
 	return reggdGuids;
 }
@@ -257,6 +244,8 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	HUD = settingsGeneral.GetBoolValue			("HUD", "EnableHUD", true);
 	AlwaysHUD = settingsGeneral.GetBoolValue("HUD", "AlwaysHUD", false);
 	HUDFont = settingsGeneral.GetLongValue		("HUD", "HUDFont", 0);
+
+	GearIndicator = settingsGeneral.GetBoolValue("HUD", "GearIndicator", true);
 	GearXpos = settingsGeneral.GetDoubleValue	("HUD", "GearXpos", 0.95);
 	GearYpos = settingsGeneral.GetDoubleValue	("HUD", "GearYpos", 0.95);
 	GearSize = settingsGeneral.GetDoubleValue	("HUD", "GearSize", 1.50);
@@ -264,6 +253,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	GearTopColorG = settingsGeneral.GetLongValue("HUD", "GearTopColorG", 0);
 	GearTopColorB = settingsGeneral.GetLongValue("HUD", "GearTopColorB", 0);
 
+	ShiftModeIndicator = settingsGeneral.GetBoolValue("HUD", "ShiftModeIndicator", true);
 	ShiftModeXpos = settingsGeneral.GetDoubleValue("HUD", "ShiftModeXpos", 0.925);
 	ShiftModeYpos = settingsGeneral.GetDoubleValue("HUD", "ShiftModeYpos", 0.90);
 	ShiftModeSize = settingsGeneral.GetDoubleValue("HUD", "ShiftModeSize", 1.50);
@@ -302,6 +292,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	RPMIndicatorRevlimitA = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitA", 255);
 
 	SteeringWheelInfo	  = settingsGeneral.GetBoolValue("HUD", "SteeringWheelInfo", false);
+	AlwaysSteeringWheelInfo = settingsGeneral.GetBoolValue("HUD", "AlwaysSteeringWheelInfo", true);;
 	SteeringWheelTextureX = settingsGeneral.GetDoubleValue("HUD", "SteeringWheelTextureX", 0.1);
 	SteeringWheelTextureY = settingsGeneral.GetDoubleValue("HUD", "SteeringWheelTextureY", 0.9);
 	SteeringWheelTextureSz= settingsGeneral.GetDoubleValue("HUD", "SteeringWheelTextureSz", 0.08);
@@ -379,10 +370,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	// [DEBUG]
 	DisplayInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayInfo", false);
 	DisplayWheelInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayWheelInfo", false);
-	//LogCar = settingsGeneral.GetBoolValue("DEBUG", "LogCar", false);
-
-	// [FILEVERSION]
-	//settings_general_version = settingsGeneral.GetValue("FILEVERSION", "VERSION", "000");
+	DisplayGearingInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayGearingInfo", false);
 #pragma warning(pop)
 
 }
