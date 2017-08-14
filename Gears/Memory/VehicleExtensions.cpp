@@ -653,11 +653,13 @@ void VehicleExtensions::SetWheelBrakePressure(Vehicle handle, uint8_t index, flo
 
 std::vector<float> VehicleExtensions::GetGearRatios(Vehicle handle) {
 	auto address = GetAddress(handle);
-	auto offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x7f8 : 0);
+
+	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x7A8 : 0x798);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x7C8 : offset);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x7E8 : offset);
+	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x7F8 : offset);
 
 	std::vector<float> ratios;
-	if (offset == 0)
-		return ratios;
 	for (int gearOffset = 0; gearOffset <= 7; gearOffset++) {
 		ratios.push_back(*reinterpret_cast<float *>(address + offset + gearOffset * sizeof(float)));
 	}
@@ -667,10 +669,10 @@ std::vector<float> VehicleExtensions::GetGearRatios(Vehicle handle) {
 float VehicleExtensions::GetDriveForce(Vehicle handle) {
 	auto address = GetAddress(handle);
 
-	auto offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x820 : 0);
-
-	if (offset == 0)
-		return 0.0f;
+	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x7C8 : 0x7B8);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x7E8 : offset);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x808 : offset);
+	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x818 : offset);
 
 	return *reinterpret_cast<float *>(address + offset);
 }
@@ -678,10 +680,10 @@ float VehicleExtensions::GetDriveForce(Vehicle handle) {
 float VehicleExtensions::GetInitialDriveMaxFlatVel(Vehicle handle) {
 	auto address = GetAddress(handle);
 
-	auto offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x81C : 0);
-
-	if (offset == 0)
-		return 0.0f;
+	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x7CC : 0x7BC);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x7EC : offset);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x80C : offset);
+	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x81C : offset);
 
 	return *reinterpret_cast<float *>(address + offset);
 }
@@ -689,10 +691,10 @@ float VehicleExtensions::GetInitialDriveMaxFlatVel(Vehicle handle) {
 float VehicleExtensions::GetDriveMaxFlatVel(Vehicle handle) {
 	auto address = GetAddress(handle);
 
-	auto offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x820 : 0);
-
-	if (offset == 0)
-		return 0.0f;
+	auto offset = (gameVersion > G_VER_1_0_350_2_NOSTEAM ? 0x7D0 : 0x7C0);
+	offset = (gameVersion > G_VER_1_0_791_2_NOSTEAM ? 0x7F0 : offset);
+	offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x810 : offset);
+	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x820 : offset);
 
 	return *reinterpret_cast<float *>(address + offset);
 }
