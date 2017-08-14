@@ -1,7 +1,6 @@
 #include "../../ScriptHookV_SDK/inc/natives.h"
 
 #include "VehicleData.hpp"
-#include "../../ScriptHookV_SDK/inc/enums.h"
 
 VehicleData::VehicleData() {
 	zeroSamples();
@@ -46,14 +45,6 @@ bool VehicleData::isBadTruck(char* name) {
 	return false;
 }
 
-bool VehicleData::noClutch(char* name) {
-	for (int i = 0; i < noClutchModelNames.size(); i++) {
-		if (strcmp(name, noClutchModelNames[i]) == 0)
-			return true;
-	}
-	return false;
-}
-
 // Updates values from memory and natives
 void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 	Hash model = ENTITY::GET_ENTITY_MODEL(vehicle);
@@ -82,15 +73,13 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 		HasSpeedo = true;
 	}
 
-	NoClutch = noClutch(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model)) || TopGear == 1;
-
-	ControlAccelerate = (CONTROLS::GET_CONTROL_VALUE(0, ControlVehicleAccelerate) - 127) / 127.0f;
+	NoClutch = TopGear == 1;
 }
 
 VehicleData::VehicleClass VehicleData::findClass(Hash model) {
 	if (VEHICLE::IS_THIS_MODEL_A_CAR(model))
 		return VehicleClass::Car;
-	if (VEHICLE::IS_THIS_MODEL_A_BICYCLE(model))	// >bicycle is a bike. wth R*?
+	if (VEHICLE::IS_THIS_MODEL_A_BICYCLE(model))
 		return VehicleClass::Bicycle;
 	if (VEHICLE::IS_THIS_MODEL_A_BIKE(model))
 		return VehicleClass::Bike;

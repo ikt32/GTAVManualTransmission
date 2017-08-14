@@ -75,10 +75,6 @@ public:
 	// Should be called after getAccelerationVectors has been called in a loop
 	Vector3 getAccelerationVectorsAverage() const;
 
-	// Moved out of ScriptControls to make it standalone
-	// Perceived accelerator value, float
-	float ControlAccelerate = 0.0f;
-
 	// TODO: make these private or something idk
 
 	float PrevRpm = 0.0f;
@@ -118,17 +114,6 @@ private:
 	};
 	bool isBadTruck(char* name);
 	VehicleClass findClass(Hash model);
-
-	std::array<char *, 7> noClutchModelNames = {
-		"SURGE",
-		"VOLTIC",
-		"KHAMEL",
-		"CADDY",
-		"AIRTUG",
-		"RHINO",
-		"BULLDOZE"
-	};
-	bool noClutch(char* name);
 
 	Vector3 prevVelocities = {};
 	std::vector<float> prevCompressions = {};

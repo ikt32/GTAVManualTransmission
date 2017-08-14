@@ -24,6 +24,7 @@
 #include "Memory/NativeMemory.hpp"
 #include "Util/MathExt.h"
 #include "ShiftModes.h"
+std::array<float, 8> upshiftSpeeds{};
 
 std::string textureWheelFile;
 int textureWheelId;
@@ -58,7 +59,7 @@ bool lookrightfirst = false;
 
 void initVehicle() {
 	reset();
-	//vehData.Clear();
+	std::fill(upshiftSpeeds.begin(), upshiftSpeeds.end(), 0.0f);
 	vehData = VehicleData();
 	vehData.UpdateValues(ext, vehicle);
 
@@ -233,6 +234,25 @@ void update() {
 		functionTruckLimiting();
 	}
 
+	if (settings.DisplayInfo) {
+		auto ratios = ext.GetGearRatios(vehicle);
+		float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
+		int i = 0;
+		showText(0.25f, 0.05f, 0.5f, "Expected");
+		for (auto ratio : ratios) {
+		float maxSpeed = DriveMaxFlatVel / ratio;
+		showText(0.25f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(maxSpeed));
+		i++;
+		}
+
+		i = 0;
+		showText(0.40f, 0.05f, 0.5f, "Actual");
+		for (auto speed : upshiftSpeeds) {
+		showText(0.40f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
+		i++;
+		}
+	}
+	
 	if (settings.EngBrake) {
 		functionEngBrake();
 	}
@@ -323,6 +343,7 @@ void drawRPMIndicator(float x, float y, float width, float height, Color fg, Col
 	GRAPHICS::DRAW_RECT(x-width*0.5f+rpm*width*0.5f, y, width*rpm, height, fg.R, fg.G, fg.B, fg.A);
 }
 
+// todo: make more things toggle-able
 void showHUD() {
 
 	// Gear number indication
@@ -802,12 +823,6 @@ void shiftTo(int gear, bool autoClutch) {
 	if (vehData.IsTruck && vehData.Rpm < 0.9) {
 		return;
 	}
-	// for engine braking, but we're not doing anything if that isn't enabled
-	// Only increase the limiter speed
-	//if (vehData.Velocity > vehData.LockSpeeds[vehData.CurrGear] &&
-	//	gear > vehData.PrevGear) {
-	//	vehData.LockSpeeds[vehData.CurrGear] = vehData.Velocity;
-	//}
 	vehData.PrevGear = vehData.CurrGear;
 }
 void functionHShiftTo(int i) {
@@ -1024,6 +1039,9 @@ void functionAShift() { // Automatic
 	// Shift up
 	if (vehData.CurrGear > 0 &&
 		(vehData.CurrGear < vehData.NextGear && vehData.Speed > 2.0f)) {
+		if (ext.GetDashSpeed(vehicle) > upshiftSpeeds[vehData.CurrGear])
+			upshiftSpeeds[vehData.CurrGear] = ext.GetDashSpeed(vehicle);
+
 		shiftTo(vehData.CurrGear + 1, true);
 		vehData.SimulatedNeutral = false;
 	}
@@ -1034,21 +1052,12 @@ void functionAShift() { // Automatic
 		float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
 		float prevGearRedline = DriveMaxFlatVel / ratios[vehData.CurrGear - 1];
 		float velDiff = prevGearRedline - ext.GetDashSpeed(vehicle);
-		if (velDiff > + 3.0f + 6.0f*(1.0f - controls.ThrottleVal)) {
+		if (velDiff > + 8.0f + 7.0f*(0.5f - controls.ThrottleVal)) {
 			shiftTo(vehData.CurrGear - 1, true);
 			vehData.NextGear = vehData.CurrGear - 1;
 			vehData.SimulatedNeutral = false;
 		}
 	}
-	
-
-	//// Shift down
-	//if ((vehData.CurrGear > 1 && vehData.Rpm < 0.4f) ||
-	//	(vehData.CurrGear > 1 && vehData.Rpm < 0.5f) && vehData.Throttle > 0.95f) {
-	//	shiftTo(vehData.CurrGear - 1, true);
-	//	vehData.NextGear = vehData.CurrGear - 1;
-	//	vehData.SimulatedNeutral = false;
-	//}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1060,8 +1069,6 @@ void functionClutchCatch() {
 	float idleThrottle = 0.45f;
 
 	if (controls.ClutchVal < 1.0f - settings.ClutchCatchpoint) {
-		// Automatic cars APPARENTLY need little/no brake pressure to stop
-		// Also apply this for sequential + grab. Simulates tiptronic (???) transmissions.
 		if (settings.ShiftMode != HPattern && controls.BrakeVal > 0.1f || 
 			vehData.Rpm > 0.25f && vehData.Speed >= lowSpeed) {
 			return;
@@ -1087,14 +1094,6 @@ void functionClutchCatch() {
 			ext.SetThrottle(vehicle, 0.0f);
 		}
 	}
-}
-
-float getAverage(std::vector<float> values) {
-	float total = 0.0f;
-	for (auto value : values) {
-		total += value;
-	}
-	return total / values.size();
 }
 
 std::vector<bool> getWheelLockups(Vehicle handle) {
@@ -1192,7 +1191,7 @@ void functionEngStall() {
 	float lowSpeed = 2.4f;
 	float stallingRateDivisor = 3500000.0f;
 	float timeStep = SYSTEM::TIMESTEP() * 100.0f;
-	float avgWheelSpeed = abs(getAverage(getDrivenWheelsSpeeds(ext.GetTyreSpeeds(vehicle))));
+	float avgWheelSpeed = abs(avg(getDrivenWheelsSpeeds(ext.GetTyreSpeeds(vehicle))));
 	if (vehData.Clutch > 0.2f && // 1.0 = fully engaged, 0.1 = fully disengaged
 		controls.ClutchVal < 1.0f - settings.StallingThreshold &&
 		vehData.Rpm < 0.25f &&
@@ -1219,7 +1218,7 @@ void functionEngStall() {
 
 void functionEngDamage() {
 	if (vehData.Rpm > 0.98f &&
-		vehData.ControlAccelerate > 0.99f) {
+		controls.ThrottleVal > 0.98f) {
 		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, 
 										   VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (settings.RPMDamage));
 	}
@@ -1306,10 +1305,14 @@ void functionEngLock() {
 
 	// Wheels are locking up due to bad downshifts
 	if (vehData.CurrGear != 0 && vehData.CurrGear != vehData.TopGear &&
-		!vehData.SimulatedNeutral && speed > maxSpeed + 2.0f) {
+		!vehData.SimulatedNeutral && speed > maxSpeed + 3.334f) {
 		if (vehData.IsTruck && vehData.CurrGear == 1 &&
-			speed < vehData.LockSpeed + 10.0f)
+			speed < maxSpeed + 12.0f)
 			return;
+		if (vehData.IsTruck && vehData.CurrGear == 2 &&
+			speed < maxSpeed + 6.0f)
+			return;
+
 
 		if (!MemoryPatcher::BrakeDecrementPatched) {
 			MemoryPatcher::PatchBrakeDecrement();
@@ -1433,14 +1436,14 @@ void handleRPM() {
 	if (vehData.CurrGear > 1) {
 		// When pressing clutch and throttle, handle clutch and RPM
 		if (controls.ClutchVal > 0.4f && 
-			vehData.ControlAccelerate > 0.05f &&
+			controls.ThrottleVal > 0.05f &&
 		    !vehData.SimulatedNeutral && 
 			// The next statement is a workaround for rolling back + brake + gear > 1 because it shouldn't rev then.
 			// Also because we're checking on the game Control accel value and not the pedal position
 			// TODO: Might wanna re-write with control.AccelVal instead of vehData.ControlAccelerate?
-			!(vehData.Velocity < 0.0 && controls.BrakeVal > 0.1f && vehData.ControlAccelerate > 0.05f)) {
+			!(vehData.Velocity < 0.0 && controls.BrakeVal > 0.1f && controls.ThrottleVal > 0.05f)) {
 			fakeRev(false, 0);
-			ext.SetThrottle(vehicle, vehData.ControlAccelerate);
+			ext.SetThrottle(vehicle, controls.ThrottleVal);
 			float tempVal = (1.0f - controls.ClutchVal) * 0.4f + 0.6f;
 			if (controls.ClutchVal > 0.95) {
 				tempVal = neutralClutchVal;
