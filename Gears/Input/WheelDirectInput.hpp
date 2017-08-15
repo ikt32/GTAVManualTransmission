@@ -12,7 +12,14 @@
 
 // https://stackoverflow.com/questions/24113864/what-is-the-right-way-to-use-a-guid-as-the-key-in-stdhash-map
 namespace std {
-	template<> struct hash<GUID> : public std::_Bitwise_hash<GUID> { };
+	template<> struct hash<GUID>
+	{
+		size_t operator()(const GUID& guid) const noexcept {
+			const std::uint64_t* p = reinterpret_cast<const std::uint64_t*>(&guid);
+			std::hash<std::uint64_t> hash;
+			return hash(p[0]) ^ hash(p[1]);
+		}
+	};
 }
 
 class WheelDirectInput {

@@ -353,7 +353,6 @@ public:
 		return -1;
 	}
 
-
 private:
 	long long pressTime = 0;
 	long long releaseTime = 0;
