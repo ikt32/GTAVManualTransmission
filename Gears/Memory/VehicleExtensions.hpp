@@ -31,6 +31,12 @@ public:
 	/*
 	 * Vehicle struct
 	 */
+	bool GetRocketBoostActive(Vehicle handle);
+	void SetRocketBoostActive(Vehicle handle, bool val);
+
+	float GetRocketBoostCharge(Vehicle handle);
+	void SetRocketBoostCharge(Vehicle handle, float value);
+
 	uint32_t GetGears(Vehicle handle);
 	void SetGears(Vehicle handle, uint32_t value);
 

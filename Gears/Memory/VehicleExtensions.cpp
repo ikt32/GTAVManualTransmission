@@ -13,6 +13,46 @@ BYTE *VehicleExtensions::GetAddress(Vehicle handle) {
 	return reinterpret_cast<BYTE *>(mem::GetAddressOfEntity(handle));
 }
 
+bool VehicleExtensions::GetRocketBoostActive(Vehicle handle) {
+	auto address = GetAddress(handle);
+	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x318 : 0);
+	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x318 : offset);
+
+	if (offset == 0) return false;
+
+	return *reinterpret_cast<bool *>(address + offset);
+}
+
+void VehicleExtensions::SetRocketBoostActive(Vehicle handle, bool val) {
+	auto address = GetAddress(handle);
+	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x318 : 0);
+	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x318 : offset);
+
+	if (offset == 0) return;
+
+	*reinterpret_cast<bool *>(address + offset) = val;
+}
+
+float VehicleExtensions::GetRocketBoostCharge(Vehicle handle) {
+	auto address = GetAddress(handle);
+	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x31C : 0);
+	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x31C : offset);
+
+	if (offset == 0) return false;
+
+	return *reinterpret_cast<float *> (address + offset);
+}
+
+void VehicleExtensions::SetRocketBoostCharge(Vehicle handle, float value) {
+	auto address = GetAddress(handle);
+	auto offset = (gameVersion > G_VER_1_0_877_1_NOSTEAM ? 0x31C : 0);
+	offset = (gameVersion > G_VER_1_0_1032_1_NOSTEAM ? 0x31C : offset);
+
+	if (offset == 0) return;
+
+	*reinterpret_cast<float *>(address + offset) = value;
+}
+
 uint32_t VehicleExtensions::GetGears(Vehicle handle) {
 	auto address = GetAddress(handle);
 
