@@ -137,6 +137,32 @@ std::vector<std::string> speedoTypes = {
 	"ms"
 };
 
+std::vector<int> blockableControls = {
+	-1,
+	ControlVehicleAim,
+	ControlVehicleHandbrake,
+	ControlVehicleAttack,
+	ControlVehicleDuck,
+	ControlVehicleSelectNextWeapon,
+};
+
+std::vector<std::string> blockableControlsHelp = {
+	"None",
+	"Aim",
+	"Handbrake",
+	"Attack",
+	"Duck",
+	"NextWeapon",
+};
+
+int getBlockableControlIndex(int control) {
+	for (int i = 0; i < blockableControls.size(); i++) {
+		if (control == blockableControls[i])
+			return i;
+	}
+	return 0;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //                             Menu stuff
 ///////////////////////////////////////////////////////////////////////////////
@@ -156,7 +182,7 @@ void update_menu() {
 	/* Yes hello I am root */
 	if (menu.CurrentMenu("mainmenu")) {
 		menu.Title("Manual Transmission", 0.90f);
-		menu.Subtitle(DISPLAY_VERSION, false);
+		menu.Subtitle(std::string("~b~") + DISPLAY_VERSION);
 
 		bool tempEnableRead = settings.EnableManual;
 
@@ -304,6 +330,22 @@ void update_menu() {
 		menu.Title("Non-Xinput controls");
 		menu.Subtitle("Non-Xinput options");
 
+		int oldIndexUp = getBlockableControlIndex(controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftUp)]);
+		int newIndexUp = oldIndexUp;
+		if (menu.StringArray("Shift Up blocks", blockableControlsHelp, newIndexUp)) {
+			if (newIndexUp != oldIndexUp) {
+				controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftUp)] = blockableControls[newIndexUp];
+			}
+		}
+
+		int oldIndexDown = getBlockableControlIndex(controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftDown)]);
+		int newIndexDown = oldIndexDown;
+		if (menu.StringArray("Shift Down blocks", blockableControlsHelp, newIndexDown)) {
+			if (newIndexDown != oldIndexDown) {
+				controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftDown)] = blockableControls[newIndexDown];
+			}
+		}
+
 		std::vector<std::string> controllerInfo;
 		controllerInfo.push_back("Press RIGHT to clear key");
 		controllerInfo.push_back("Press RETURN to configure button");
@@ -334,7 +376,7 @@ void update_menu() {
 
 		menu.BoolOption("Block car controls", settings.BlockCarControls,
 		{ "Blocks car action controls like ducking, switching guns, handbrake, aim. Holding activates the original button again.",
-						"Experimental! Only works for XInput." });
+						"Experimental!" });
 
 		menu.BoolOption("Engine button toggles", settings.ToggleEngine, 
 		{ "Checked: the engine button turns the engine on AND off.",
@@ -353,6 +395,22 @@ void update_menu() {
 
 		if (currTriggerValue != prevTriggerValue) {
 			controls.SetXboxTrigger(currTriggerValue);
+		}
+
+		int oldIndexUp = getBlockableControlIndex(controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)]);
+		int newIndexUp = oldIndexUp;
+		if (menu.StringArray("Shift Up blocks", blockableControlsHelp, newIndexUp)) {
+			if (newIndexUp != oldIndexUp) {
+				controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)] = blockableControls[newIndexUp];
+			}
+		}
+		
+		int oldIndexDown = getBlockableControlIndex(controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)]);
+		int newIndexDown = oldIndexDown;
+		if (menu.StringArray("Shift Down blocks", blockableControlsHelp, newIndexDown)) {
+			if (newIndexDown != oldIndexDown) {
+				controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)] = blockableControls[newIndexDown];
+			}
 		}
 
 		std::vector<std::string> controllerInfo;
@@ -374,6 +432,8 @@ void update_menu() {
 			it++;
 			controllerInfo.pop_back();
 		}
+
+
 	}
 
 	/* Yes hello I am root - 2 */
@@ -992,14 +1052,14 @@ void saveKeyboardKey(std::string confTag, std::string key) {
 	showNotification(("Saved key " + confTag + ": " + key).c_str(), &prevNotification);
 }
 
-void saveControllerButton(std::string confTag, std::string button, int btnToBlock) {
-	settings.ControllerSaveButton(confTag, button, btnToBlock);
+void saveControllerButton(std::string confTag, std::string button) {
+	settings.ControllerSaveButton(confTag, button);
 	settings.Read(&controls);
 	showNotification(("Saved button " + confTag + ": " + button).c_str(), &prevNotification);
 }
 
-void saveLControllerButton(std::string confTag, int button, int btnToBlock) {
-	settings.LControllerSaveButton(confTag, button, btnToBlock);
+void saveLControllerButton(std::string confTag, int button) {
+	settings.LControllerSaveButton(confTag, button);
 	settings.Read(&controls);
 	showNotification(("Saved button " + confTag + ": " + std::to_string(button)).c_str(), &prevNotification);
 }
@@ -1011,13 +1071,13 @@ void clearKeyboardKey(std::string confTag) {
 }
 
 void clearControllerButton(std::string confTag) {
-	settings.ControllerSaveButton(confTag, "UNKNOWN", -1);
+	settings.ControllerSaveButton(confTag, "UNKNOWN");
 	settings.Read(&controls);
 	showNotification(("Cleared button " + confTag).c_str(), &prevNotification);
 }
 
 void clearLControllerButton(std::string confTag) {
-	settings.LControllerSaveButton(confTag, -1, -1);
+	settings.LControllerSaveButton(confTag, -1);
 	settings.Read(&controls);
 	showNotification(("Cleared button " + confTag).c_str(), &prevNotification);
 }
@@ -1404,43 +1464,24 @@ bool configKeyboardKey(const std::string &confTag) {
 	}
 }
 
-std::vector<eControl> controlsToBeBlocked = {
-	ControlVehicleAim,
-	ControlVehicleHandbrake,
-	ControlVehicleAttack,
-	ControlVehicleDuck,
-	ControlVehicleSelectNextWeapon,
-};
+
 
 // Controller
-int lastVehicleButtonPressed() {
-	for (auto control : controlsToBeBlocked) {
-		if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, control))
-			return control;
-	}
-	return -1;
-}
-
 bool configControllerButton(const std::string &confTag) {
 	std::string additionalInfo = "Press " + escapeKey + " to exit.";
 	XboxController* rawController = controls.GetRawController();
 	if (rawController == nullptr)
 		return false;
 
-	int buttonToBlock = -1;
-
 	while (true) {
 		if (IsKeyJustUp(str2key(escapeKey))) {
 			return false;
 		}
 		controls.UpdateValues(ScriptControls::InputDevices::Controller, false, true);
-		if (buttonToBlock == -1) {
-			buttonToBlock = lastVehicleButtonPressed();
-		}
 		for (std::string buttonHelper : rawController->XboxButtonsHelper) {
 			auto button = rawController->StringToButton(buttonHelper);
 			if (rawController->IsButtonJustPressed(button, controls.GetButtonState())) {
-				saveControllerButton(confTag, buttonHelper, buttonToBlock);
+				saveControllerButton(confTag, buttonHelper);
 				return true;
 			}
 		}
@@ -1452,20 +1493,15 @@ bool configControllerButton(const std::string &confTag) {
 bool configLControllerButton(const std::string &confTag) {
 	std::string additionalInfo = "Press " + escapeKey + " to exit.";
 
-	int buttonToBlock = -1;
-
 	while (true) {
 		if (IsKeyJustUp(str2key(escapeKey))) {
 			return false;
 		}
 		controls.UpdateValues(ScriptControls::InputDevices::Controller, false, true);
-		if (buttonToBlock == -1) {
-			buttonToBlock = lastVehicleButtonPressed();
-		}
-
+		
 		for (auto mapItem : controls.LegacyControlsMap) {
 			if (CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, mapItem.second)) {
-				saveLControllerButton(confTag, mapItem.second, buttonToBlock);
+				saveLControllerButton(confTag, mapItem.second);
 				return true;
 			}
 		}

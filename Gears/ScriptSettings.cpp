@@ -139,8 +139,15 @@ void ScriptSettings::SaveController(ScriptControls *scriptControl) const {
 	settingsGeneral.SetLongValue("CONTROLLER", "ToggleTime", scriptControl->CToggleTime); 
 	settingsGeneral.SetDoubleValue("CONTROLLER", "TriggerValue", scriptControl->GetXboxTrigger());
 	settingsGeneral.SetBoolValue("CONTROLLER", "BlockCarControls", BlockCarControls);
-	settingsGeneral.SetBoolValue("CONTROLLER_LEGACY", "Enable", scriptControl->UseLegacyController);
 	settingsGeneral.SetLongValue("CONTROLLER", "MaxTapTime", scriptControl->MaxTapTime);
+	
+	settingsGeneral.SetLongValue("CONTROLLER", "ShiftUpBlocks", scriptControl->ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)]);
+	settingsGeneral.SetLongValue("CONTROLLER", "ShiftDownBlocks", scriptControl->ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)]);
+
+	// [CONTROLLER_LEGACY]
+	settingsGeneral.SetBoolValue("CONTROLLER_LEGACY", "Enable", scriptControl->UseLegacyController);
+	settingsGeneral.SetLongValue("CONTROLLER_LEGACY", "ShiftUpBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftUp)]);
+	settingsGeneral.SetLongValue("CONTROLLER_LEGACY", "ShiftDownBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftDown)]);
 
 	settingsGeneral.SaveFile(settingsGeneralFile.c_str());
 }
@@ -837,24 +844,24 @@ void ScriptSettings::KeyboardSaveKey(const std::string &confTag, const std::stri
 	if (err < 0)
 		logger.Write("Unable to save to " + settingsGeneralFile);
 }
-void ScriptSettings::ControllerSaveButton(const std::string &confTag, const std::string &button, int btnToBlock) {
+void ScriptSettings::ControllerSaveButton(const std::string &confTag, const std::string &button) {
 	CSimpleIniA settingsGeneral;
 	settingsGeneral.SetUnicode();
 	settingsGeneral.LoadFile(settingsGeneralFile.c_str());
 	settingsGeneral.SetValue("CONTROLLER", confTag.c_str(), button.c_str());
-	settingsGeneral.SetLongValue("CONTROLLER", (confTag + "Blocks").c_str(), btnToBlock);
+	//settingsGeneral.SetLongValue("CONTROLLER", (confTag + "Blocks").c_str(), btnToBlock);
 
 	int err = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
 	if (err < 0)
 		logger.Write("Unable to save to " + settingsGeneralFile);
 }
 
-void ScriptSettings::LControllerSaveButton(const std::string &confTag, int button, int btnToBlock) {
+void ScriptSettings::LControllerSaveButton(const std::string &confTag, int button) {
 	CSimpleIniA settingsGeneral;
 	settingsGeneral.SetUnicode();
 	settingsGeneral.LoadFile(settingsGeneralFile.c_str());
 	settingsGeneral.SetLongValue("CONTROLLER_LEGACY", confTag.c_str(), button);
-	settingsGeneral.SetLongValue("CONTROLLER_LEGACY", (confTag + "Blocks").c_str(), btnToBlock);
+	//settingsGeneral.SetLongValue("CONTROLLER_LEGACY", (confTag + "Blocks").c_str(), btnToBlock);
 
 	int err = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
 	if (err < 0)
