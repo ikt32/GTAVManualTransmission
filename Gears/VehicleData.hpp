@@ -75,8 +75,6 @@ public:
 	// Should be called after getAccelerationVectors has been called in a loop
 	Vector3 getAccelerationVectorsAverage() const;
 
-	// TODO: make these private or something idk
-
 	float PrevRpm = 0.0f;
 
 	bool BlinkerLeft = false;

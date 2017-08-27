@@ -122,18 +122,19 @@ void update() {
 	//                                   HUD
 	///////////////////////////////////////////////////////////////////////////
 	if (settings.DisplayInfo) {
-		showDebugInfo();
+		drawDebugInfo();
 	}
 	if (settings.DisplayWheelInfo) {
-		showWheelInfo();
+		drawVehicleWheelInfo();
 	}
 	if (settings.HUD &&
 		(settings.EnableManual || settings.AlwaysHUD)) {
-		showHUD();
+		drawHUD();
 	}
-	if ((controls.PrevInput == ScriptControls::Wheel || settings.AlwaysSteeringWheelInfo) && 
+	if (settings.HUD &&
+		(controls.PrevInput == ScriptControls::Wheel || settings.AlwaysSteeringWheelInfo) &&
 		settings.SteeringWheelInfo && textureWheelId != -1) {
-		drawSteeringWheelInfo();
+		drawInputWheelInfo();
 	}
 
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
@@ -370,9 +371,20 @@ void drawRPMIndicator() {
 	);
 }
 
-void drawSpeedoMeter() {
+std::string formatSpeedo(std::string units, float speed, bool showUnit, int hudFont) {
 	std::stringstream speedoFormat;
+	if (units == "kph") speed = speed * 3.6f;
+	if (units == "mph") speed = speed / 0.44704f;
 
+	speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(speed)));
+	if (hudFont != 2 && units == "kph") units = "km/h";
+	if (hudFont != 2 && units == "ms") units = "m/s";
+	if (showUnit) speedoFormat << " " << units;
+
+	return speedoFormat.str();
+}
+
+void drawSpeedoMeter() {
 	float dashms = ext.GetDashSpeed(vehicle);
 	if (!vehData.HasSpeedo && dashms > 0.1f) {
 		vehData.HasSpeedo = true;
@@ -381,19 +393,9 @@ void drawSpeedoMeter() {
 		dashms = abs(vehData.Velocity);
 	}
 
-	if (settings.Speedo == "kph" ) {
-		speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(dashms * 3.6f)));
-		if (settings.SpeedoShowUnit) speedoFormat << (settings.HUDFont == 2 ? " kph" : " km/h");
-	}
-	if (settings.Speedo == "mph" ) {
-		speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(dashms / 0.44704f)));
-		if (settings.SpeedoShowUnit) speedoFormat << " mph";
-	}
-	if (settings.Speedo == "ms") {
-		speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(dashms)));
-		if (settings.SpeedoShowUnit) speedoFormat << (settings.HUDFont == 2 ? " mps" : " m/s");;
-	}
-	showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize, speedoFormat.str(), settings.HUDFont, solidWhite, true);
+	showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize, 
+		formatSpeedo(settings.Speedo, dashms, settings.SpeedoShowUnit, settings.HUDFont),
+		settings.HUDFont, solidWhite, true);
 }
 
 void drawShiftModeIndicator() {
@@ -437,7 +439,7 @@ void drawGearIndicator() {
 	showText(settings.GearXpos, settings.GearYpos, settings.GearSize, gear, settings.HUDFont, c, true);
 }
 
-void showHUD() {
+void drawHUD() {
 	if (settings.GearIndicator) {
 		drawGearIndicator();
 	}
@@ -454,7 +456,7 @@ void showHUD() {
 	}
 }
 
-void showDebugInfo() {
+void drawDebugInfo() {
 	std::stringstream ssEnabled;
 	std::stringstream ssRPM;
 	std::stringstream ssCurrGear;
@@ -556,7 +558,7 @@ void showDebugInfoWheel(ScriptSettings &settings, float effSteer, int damperForc
 	showText(0.85, 0.325, 0.4, ssOverSteer.str(),	4, solidWhite, true);
 }
 
-void drawSteeringWheelInfo() {
+void drawInputWheelInfo() {
 	// Steering Wheel
 	float rotation = settings.SteerAngleMax * (controls.SteerVal - 0.5f);
 	if (controls.PrevInput != ScriptControls::Wheel) rotation = 90.0f * -ext.GetSteeringInputAngle(vehicle);
@@ -655,18 +657,16 @@ void crossScriptComms() {
 void initialize() {
 	settings.Read(&controls);
 	menu.ReadSettings();
+	logger.Write("Settings read");
 
 	speedoIndex = static_cast<int>(std::find(speedoTypes.begin(), speedoTypes.end(), settings.Speedo) - speedoTypes.begin());
 	if (speedoIndex >= speedoTypes.size()) {
 		speedoIndex = 0;
 	}
 
-	logger.Write("Settings read");
 	vehData.LockGear = 1;
 	vehData.SimulatedNeutral = settings.DefaultNeutral;
 	initWheel();
-
-	logger.Write("Initialization finished");
 }
 
 void reset() {
@@ -922,14 +922,11 @@ void functionHShiftWheel() {
 }
 
 void functionSShift() {
-	// TODO: Properly always block buttons?
 	auto xcTapStateUp = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftUp);
 	auto xcTapStateDn = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftDown);
 
 	auto ncTapStateUp = controls.ButtonTapped(ScriptControls::LegacyControlType::ShiftUp);
 	auto ncTapStateDn = controls.ButtonTapped(ScriptControls::LegacyControlType::ShiftDown);
-
-
 
 	// Shift up
 	if (controls.PrevInput == ScriptControls::Controller	&& xcTapStateUp == XboxController::TapState::Tapped ||
@@ -1126,7 +1123,7 @@ std::vector<bool> getWheelLockups(Vehicle handle) {
 	return lockups;
 }
 
-void showWheelInfo() {
+void drawVehicleWheelInfo() {
 	auto numWheels = ext.GetNumWheels(vehicle);
 	auto wheelsSpeed = ext.GetTyreSpeeds(vehicle);
 	auto wheelsCompr = ext.GetWheelCompressions(vehicle);
@@ -2255,6 +2252,22 @@ enum eDecorType
 	DECOR_TYPE_TIME
 };
 
+void registerDecorator(const char *thing, eDecorType type) {
+	std::string strType = "?????";
+	switch (type) {
+	case DECOR_TYPE_FLOAT: strType = "float"; break;
+	case DECOR_TYPE_BOOL: strType = "bool"; break;
+	case DECOR_TYPE_INT: strType = "int"; break;
+	case DECOR_TYPE_UNK: strType = "unknown"; break;
+	case DECOR_TYPE_TIME: strType = "time"; break;
+	}
+
+	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE((char*)thing, type)) {
+		DECORATOR::DECOR_REGISTER((char*)thing, type);
+		logger.Write("DECOR: Registered \"" + std::string(thing) + "\" as " + strType);
+	}
+}
+
 // @Unknown Modder
 BYTE* g_bIsDecorRegisterLockedPtr = nullptr;
 bool setupGlobals() {
@@ -2267,45 +2280,17 @@ bool setupGlobals() {
 	*g_bIsDecorRegisterLockedPtr = 0;
 
 	// Legacy support until I get LeFix / XMOD to update
-	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("doe_elk", DECOR_TYPE_INT)) {
-		DECORATOR::DECOR_REGISTER("doe_elk", DECOR_TYPE_INT);
-		logger.Write("DECOR: Registered \"doe_elk\" as DECOR_TYPE_INT");
-	}
-	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("hunt_score", DECOR_TYPE_INT)) {
-		DECORATOR::DECOR_REGISTER("hunt_score", DECOR_TYPE_INT);
-		logger.Write("DECOR: Registered \"hunt_score\" as DECOR_TYPE_INT");
-	}
-	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("hunt_weapon", DECOR_TYPE_INT)) {
-		DECORATOR::DECOR_REGISTER("hunt_weapon", DECOR_TYPE_INT);
-		logger.Write("DECOR: Registered \"hunt_weapon\" as DECOR_TYPE_INT");
-	}
-	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("hunt_chal_weapon", DECOR_TYPE_INT)) {
-		DECORATOR::DECOR_REGISTER("hunt_chal_weapon", DECOR_TYPE_INT);
-		logger.Write("DECOR: Registered \"hunt_chal_weapon\" as DECOR_TYPE_INT");
-	}
+	registerDecorator("doe_elk", DECOR_TYPE_INT);
+	registerDecorator("hunt_score", DECOR_TYPE_INT);
+	registerDecorator("hunt_weapon", DECOR_TYPE_INT);
+	registerDecorator("hunt_chal_weapon", DECOR_TYPE_INT);
 
 	// New decorators! :)
-	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("mt_gear", DECOR_TYPE_INT)) {
-		DECORATOR::DECOR_REGISTER("mt_gear", DECOR_TYPE_INT);
-		logger.Write("DECOR: Registered \"mt_gear\" as DECOR_TYPE_INT");
-	}
-	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("mt_shift_indicator", DECOR_TYPE_INT)) {
-		DECORATOR::DECOR_REGISTER("mt_shift_indicator", DECOR_TYPE_INT);
-		logger.Write("DECOR: Registered \"mt_shift_indicator\" as DECOR_TYPE_INT");
-	}
-	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("mt_neutral", DECOR_TYPE_INT)) {
-		DECORATOR::DECOR_REGISTER("mt_neutral", DECOR_TYPE_INT);
-		logger.Write("DECOR: Registered \"mt_neutral\" as DECOR_TYPE_INT");
-	}
-	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("mt_set_shiftmode", DECOR_TYPE_INT)) {
-		DECORATOR::DECOR_REGISTER("mt_set_shiftmode", DECOR_TYPE_INT);
-		logger.Write("DECOR: Registered \"mt_set_shiftmode\" as DECOR_TYPE_INT");
-	}
-	if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE("mt_get_shiftmode", DECOR_TYPE_INT)) {
-		DECORATOR::DECOR_REGISTER("mt_get_shiftmode", DECOR_TYPE_INT);
-		logger.Write("DECOR: Registered \"mt_get_shiftmode\" as DECOR_TYPE_INT");
-	}
-
+	registerDecorator("mt_gear", DECOR_TYPE_INT);
+	registerDecorator("mt_shift_indicator", DECOR_TYPE_INT);
+	registerDecorator("mt_neutral", DECOR_TYPE_INT);
+	registerDecorator("mt_set_shiftmode", DECOR_TYPE_INT);
+	registerDecorator("mt_get_shiftmode", DECOR_TYPE_INT);
 
 	*g_bIsDecorRegisterLockedPtr = 1;
 	return true;
@@ -2344,15 +2329,14 @@ void main() {
 
 	settings.SetFiles(settingsGeneralFile, settingsWheelFile, settingsStickFile);
 
-	//logger.Write("Loading " + settingsGeneralFile);
-	//logger.Write("Loading " + settingsWheelFile);
-	//logger.Write("Loading " + settingsMenuFile);
 
 	menu.RegisterOnMain(std::bind(menuInit));
 	menu.RegisterOnExit(std::bind(menuClose));
 	menu.SetFiles(settingsMenuFile);
 
 	initialize();
+	logger.Write("Initialization finished");
+
 	while (true) {
 		update();
 		update_menu();

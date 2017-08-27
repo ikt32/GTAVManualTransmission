@@ -45,12 +45,12 @@ enum eRadioStations {
 //                           Helper functions/tools
 ///////////////////////////////////////////////////////////////////////////////
 
-void showHUD();
-void showDebugInfo();
+void drawHUD();
+void drawDebugInfo();
 void crossScriptComms();
 void crossScriptUpdated();
-void showWheelInfo();
-void drawSteeringWheelInfo();
+void drawVehicleWheelInfo();
+void drawInputWheelInfo();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Mod functions: Mod control

@@ -7,6 +7,7 @@ Config changes:
 Other changes:
 * Add wheels locking up due to mis-shifts and going faster than the gear supports
 * Add options to show/hide individual HUD elements
+* Add option to manually assign action blocking
 * Re-write engine braking to work with a specified rev range, clutch+throttle dependent
 * Re-write automatic gearbox downshift, now should shift down with higher revs depending on throttle input
 * Implement custom rev limiter
@@ -18,10 +19,11 @@ Other changes:
 * Use values from game controls for steering wheel rotation picture
 * Shift mode indicator is now blue when manual transmission isn't active
 * Register decorators to prevent crashes  (Thanks to Unknown Modder!)
+* Register new decorators, check GitHub for details
 * A bunch of refactoring and cleanup
 
 Decorator changes:
-* Change decorator names to be mod-specific
+* Change decorator names to be mod-specific. Check GitHub!
 
 ## 4.3.7
 Config changes:
