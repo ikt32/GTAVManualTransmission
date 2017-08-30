@@ -148,7 +148,7 @@ float VehicleExtensions::GetCurrentRPM(Vehicle handle) {
 	offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x7F4 : offset;
 	offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x814 : offset;
 	offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x824 : offset;
-	offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x884 : offset;
+	offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x844 : offset;
 
 	return address == nullptr ? 0.0f : *reinterpret_cast<const float *>(address + offset);
 }
@@ -160,7 +160,7 @@ void VehicleExtensions::SetCurrentRPM(Vehicle handle, float value) {
 	offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x7F4 : offset;
 	offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x814 : offset;
 	offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x824 : offset;
-	offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x884 : offset;
+	offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x844 : offset;
 
 	*reinterpret_cast<float *>(address + offset) = value;
 }
@@ -356,7 +356,7 @@ float VehicleExtensions::GetDashSpeed(Vehicle handle) {
 	offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x9C8 : offset;
 	offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x9F0 : offset;
 	offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0xA00 : offset;
-	offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0xA20 : offset;
+	offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0xA10 : offset;
 
 	if (offset == 0)
 		return 0.0f;
