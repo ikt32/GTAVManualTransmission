@@ -63,7 +63,7 @@ tweakable in-game, so you'll find your sweet spot in no time.
 <!-- /TOC -->
 
 # Requirements
-* [Grand Theft Auto V](http://store.steampowered.com/app/271590/Grand_Theft_Auto_V/) 1.0.877.1 to 1.0.1103.2
+* [Grand Theft Auto V](http://store.steampowered.com/app/271590/Grand_Theft_Auto_V/) 1.0.877.1 to 1.0.1180.2
 * [ScriptHookV](http://www.dev-c.com/gtav/scripthookv/)
 
 # Installation and usage
@@ -726,7 +726,7 @@ listed in the (legacy) Controller section.
 
 # Troubleshooting
 ## Compatibility
-The mod has been tested with GTA V version v1.0.877.1 to v1.0.1103.2 with:
+The mod has been tested with GTA V version v1.0.877.1 to v1.0.1180.2 with:
 * ScriptHookV
 * ScriptHookVDotNet
 * RAGEPluginHook

@@ -4,6 +4,9 @@
 Config changes:
 * Everything should be still compatible but I did clean up things here and there.
 
+Updates:
+* Support for v1.0.1180.2 (Smuggler's Run)
+
 Other changes:
 * Add wheels locking up due to mis-shifts and going faster than the gear supports
 * Add options to show/hide individual HUD elements
