@@ -460,7 +460,7 @@ uint8_t VehicleExtensions::GetNumWheels(Vehicle handle) {
 	offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0xAE0 : offset;
 	offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0xB10 : offset;
 	offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0xB20 : offset;
-	offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0xB50 : offset;
+	offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0xB40 : offset;
 
 	offset += 8;
 	
@@ -477,7 +477,7 @@ uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {
 	offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0xAE0 : offset;
 	offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0xB10 : offset;
 	offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0xB20 : offset;
-	offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0xB50 : offset;
+	offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0xB40 : offset;
 
 	return *reinterpret_cast<uint64_t *>(address + offset);
 }
@@ -797,13 +797,5 @@ float VehicleExtensions::GetDriveMaxFlatVel(Vehicle handle) {
 // Affected by no tuning options
 // Doesn't influence anything?
 
-// 0x820: first gear top speed
-// Closest to km/h but off by 4kph? (val: 20, max @ 24 when doing a burnout)
-// Matches "upshift" moment speed
-// Changing this reflects on vehicle top speeds
-// Corresponds to upshift speed (in m/s) to final gear?
-// FIGURED IT OUT :D
-// Is actually uh final drive speed
-// or whatever car people call it
-// anyway this thing divided by gear ratio == BAM max speed for that gear
-// i am genius (jk)
+// 0x820: final drive speed
+// divide this by gear ratio and there's the top speed for the gear
