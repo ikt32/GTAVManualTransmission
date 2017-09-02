@@ -539,16 +539,17 @@ uintptr_t ApplyBrakePatch() {
 		address = brakeTemp;
 	else
 		address = mem::FindPattern(
-			"\xF3\x0F\x11\x81\xC8\x01\x00\x00"
+			"\xEB\x05"
+			"\xF3\x0F\x10\x40\x78"
+			"\xF3\x0F\x59\xC4"
+			"\xF3\x0F\x11\x81\xC8\x01\x00\x00" // this
 			"\xC3"
-			"\xCC"
-			"\xEA\x0F\x44\x8B\xCA\x83\xFA"
-			"\x0B\x75\x61",
+			,
+			"xx"
+			"xxxx?"
+			"xxxx"
 			"xxxx??xx"
-			"x"
-			"x"
-			"x??????"
-			"xxx");
+			"x") + 11;
 
 	if (address) {
 		memcpy(origBrakeInstr, (void*)address, 8);
