@@ -39,9 +39,9 @@ float VehicleExtensions::GetRocketBoostCharge(Vehicle handle) {
 	auto address = GetAddress(handle);
 	auto offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x31C : 0;
 	offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x31C : offset;
-	// Same in 1180
+	offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x320 : offset;
 
-	if (offset == 0) return false;
+	if (offset == 0) return 0.0f;
 
 	return *reinterpret_cast<float *> (address + offset);
 }
@@ -50,7 +50,7 @@ void VehicleExtensions::SetRocketBoostCharge(Vehicle handle, float value) {
 	auto address = GetAddress(handle);
 	auto offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x31C : 0;
 	offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x31C : offset;
-	// Same in 1180
+	offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x320 : offset;
 
 	if (offset == 0) return;
 
