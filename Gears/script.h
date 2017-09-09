@@ -87,6 +87,7 @@ void functionEngStall();
 void functionEngDamage();
 void functionEngBrake();
 void functionEngLock();
+void manageBrakePatch();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                       Mod functions: Gearbox control

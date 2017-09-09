@@ -58,6 +58,9 @@ extern std::vector<std::string> speedoTypes;
 
 bool lookrightfirst = false;
 
+bool engBrakeActive = false;
+bool engLockActive = false;
+
 void initVehicle() {
 	reset();
 	std::fill(upshiftSpeeds.begin(), upshiftSpeeds.end(), 0.0f);
@@ -240,6 +243,9 @@ void update() {
 	if (settings.EngBrake) {
 		functionEngBrake();
 	}
+	else {
+		engBrakeActive = false;
+	}
 
 	// Engine damage: RPM Damage
 	if (settings.EngDamage &&
@@ -250,6 +256,11 @@ void update() {
 	if (settings.EngLock) {
 		functionEngLock();
 	}
+	else {
+		engLockActive = false;
+	}
+
+	manageBrakePatch();
 
 	if (!vehData.SimulatedNeutral && 
 		!(settings.SimpleBike && vehData.Class == VehicleData::VehicleClass::Bike) && 
@@ -1328,10 +1339,10 @@ void functionEngLock() {
 			speed < maxSpeed + 6.0f)
 			return;
 
-
-		if (!MemoryPatcher::BrakeDecrementPatched) {
-			MemoryPatcher::PatchBrakeDecrement();
-		}
+		engLockActive = true;
+		//if (!MemoryPatcher::BrakeDecrementPatched) {
+		//	MemoryPatcher::PatchBrakeDecrement();
+		//}
 		float inputMultiplier = (1.0f - controls.ClutchVal);
 		float lockingForce = 60.0f * inputMultiplier;
 		auto wheelsToLock = getDrivenWheels();
@@ -1363,9 +1374,11 @@ void functionEngLock() {
 		}
 	}
 	else {
+		engLockActive = false;
+		/*
 		if (MemoryPatcher::BrakeDecrementPatched) {
 			MemoryPatcher::RestoreBrakeDecrement();
-		}
+		}*/
 		gearRattle.Stop();
 	}
 }
@@ -1382,9 +1395,10 @@ void functionEngBrake() {
 		float clutchMultiplier = 1.0f - controls.ClutchVal;
 		float inputMultiplier = throttleMultiplier * clutchMultiplier;
 		if (inputMultiplier > 0.0f) {
-			if (!MemoryPatcher::BrakeDecrementPatched) {
-				MemoryPatcher::PatchBrakeDecrement();
-			}
+			engBrakeActive = true;
+			//if (!MemoryPatcher::BrakeDecrementPatched) {
+			//	MemoryPatcher::PatchBrakeDecrement();
+			//}
 			float rpmMultiplier = (vehData.Rpm - activeBrakeThreshold) / (1.0f - activeBrakeThreshold);
 			float engBrakeForce = settings.EngBrakePower * handlingBrakeForce * inputMultiplier * rpmMultiplier;
 			auto wheelsToBrake = getDrivenWheels();
@@ -1403,6 +1417,20 @@ void functionEngBrake() {
 			}
 		}
 		
+	}
+	else {
+		engBrakeActive = false;
+		//if (MemoryPatcher::BrakeDecrementPatched) {
+		//	MemoryPatcher::RestoreBrakeDecrement();
+		//}
+	}
+}
+
+void manageBrakePatch() {
+	if (engBrakeActive || engLockActive) {
+		if (!MemoryPatcher::BrakeDecrementPatched) {
+			MemoryPatcher::PatchBrakeDecrement();
+		}
 	}
 	else {
 		if (MemoryPatcher::BrakeDecrementPatched) {
