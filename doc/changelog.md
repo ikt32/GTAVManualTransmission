@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.3.9
+Thanks for your bug reports!
+Config changes: Nope
+
+Fixes:
+* Fix brake non-responsive while engine braking
+* Fix engine locking and engine braking conflict
+
 ## 4.3.8
 Config changes:
 * Everything should be still compatible but I did clean up things here and there.
