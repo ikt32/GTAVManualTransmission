@@ -1386,7 +1386,7 @@ void functionEngBrake() {
 				MemoryPatcher::PatchBrakeDecrement();
 			}
 			float rpmMultiplier = (vehData.Rpm - activeBrakeThreshold) / (1.0f - activeBrakeThreshold);
-			float engBrakeForce = /*settings.EngBrakePower*/ handlingBrakeForce * inputMultiplier * rpmMultiplier;
+			float engBrakeForce = settings.EngBrakePower * handlingBrakeForce * inputMultiplier * rpmMultiplier;
 			auto wheelsToBrake = getDrivenWheels();
 			for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
 				if (i >= wheelsToBrake.size() || wheelsToBrake[i]) {

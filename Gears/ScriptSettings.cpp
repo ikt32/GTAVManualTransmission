@@ -237,7 +237,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	StallingThreshold = settingsGeneral.GetDoubleValue("OPTIONS", "StallingThreshold", 75.0) / 100.0f;
 	RPMDamage = settingsGeneral.GetDoubleValue("OPTIONS", "RPMDamage", 15.0) / 100.0f;
 	MisshiftDamage = settingsGeneral.GetDoubleValue("OPTIONS", "MisshiftDamage", 10.0);
-	EngBrakePower = settingsGeneral.GetDoubleValue("OPTIONS", "EngBrakePower", 0.33);
+	EngBrakePower = settingsGeneral.GetDoubleValue("OPTIONS", "EngBrakePower", 1.0);
 	EngBrakeThreshold = settingsGeneral.GetDoubleValue("OPTIONS", "EngBrakeThreshold", 0.75);
 
 	HillBrakeWorkaround = settingsGeneral.GetBoolValue("OPTIONS", "HillBrakeWorkaround", false);

@@ -302,8 +302,8 @@ void update_menu() {
 		menu.FloatOption("Stalling threshold", settings.StallingThreshold, 0.0f, 1.0f, 0.05f);
 		menu.FloatOption("RPM Damage", settings.RPMDamage, 0.0f, 10.0f, 0.05f);
 		menu.IntOption("Misshift Damage", settings.MisshiftDamage, 0, 100, 5);
-		menu.FloatOption("Engine braking threshold", settings.EngBrakeThreshold, 0.0f, 1.0f, 0.05f);
-		menu.FloatOption("Engine braking power", settings.EngBrakePower, 0.0f, 2.0f, 0.05f);
+		menu.FloatOption("Engine braking threshold", settings.EngBrakeThreshold, 0.0f, 1.0f, 0.05f, { "RPM where engine braking starts working" });
+		menu.FloatOption("Engine braking power", settings.EngBrakePower, 0.0f, 5.0f, 0.05f, { "How much wheel brake is applied" });
 	}
 
 	/* Yes hello I am root - 1 */
