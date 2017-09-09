@@ -1335,10 +1335,15 @@ void functionEngLock() {
 		float inputMultiplier = (1.0f - controls.ClutchVal);
 		float lockingForce = 60.0f * inputMultiplier;
 		auto wheelsToLock = getDrivenWheels();
+
+		//auto wheelPtrs = ext.GetWheelPtrs(vehicle);
+
 		for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
 			if (i >= wheelsToLock.size() || wheelsToLock[i]) {
 				ext.SetWheelBrakePressure(vehicle, i, lockingForce);
 				ext.SetWheelSkidSmokeEffect(vehicle, i, lockingForce);
+				//unsigned *wheelflags = ((unsigned*)(wheelPtrs[i] + 0x1ec));
+				//(*wheelflags)&=0xFFFF3FFF;
 			}
 			else {
 				float inpBrakeForce = *reinterpret_cast<float *>(ext.GetHandlingPtr(vehicle) + hOffsets.fBrakeForce) * controls.BrakeVal;

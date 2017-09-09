@@ -799,3 +799,10 @@ float VehicleExtensions::GetDriveMaxFlatVel(Vehicle handle) {
 
 // 0x820: final drive speed
 // divide this by gear ratio and there's the top speed for the gear
+
+// b1180
+// 0x838 - power? Drive Force?
+// 0x9E4 - has spoiler? (2nd bit)
+// Couldn't find anything torque-related
+
+// wheel+0x1ec - power/brake flags? abs turned off for e-brake with [wheel+0x1ec] & 0xFFFF3FFF
