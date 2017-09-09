@@ -24,6 +24,7 @@
 #include "Memory/NativeMemory.hpp"
 #include "Util/MathExt.h"
 #include "ShiftModes.h"
+#include "Memory/Offsets.hpp"
 std::array<float, 8> upshiftSpeeds{};
 
 std::string textureWheelFile;
@@ -1339,6 +1340,10 @@ void functionEngLock() {
 				ext.SetWheelBrakePressure(vehicle, i, lockingForce);
 				ext.SetWheelSkidSmokeEffect(vehicle, i, lockingForce);
 			}
+			else {
+				float inpBrakeForce = *reinterpret_cast<float *>(ext.GetHandlingPtr(vehicle) + hOffsets.fBrakeForce) * controls.BrakeVal;
+				ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
+			}
 		}
 		fakeRev(true, 1.0f);
 		gearRattle.Play(vehicle);
@@ -1363,7 +1368,11 @@ void functionEngLock() {
 void functionEngBrake() {
 	// When you let go of the throttle at high RPMs
 	float activeBrakeThreshold = settings.EngBrakeThreshold;
-	if (vehData.Rpm >= activeBrakeThreshold && vehData.Velocity > 5.0f) {
+
+	if (vehData.Rpm >= activeBrakeThreshold && vehData.Velocity > 5.0f && !vehData.SimulatedNeutral) {
+		float handlingBrakeForce = *reinterpret_cast<float *>(ext.GetHandlingPtr(vehicle) + hOffsets.fBrakeForce);
+		float inpBrakeForce = handlingBrakeForce * controls.BrakeVal;
+
 		float throttleMultiplier = 1.0f - controls.ThrottleVal;
 		float clutchMultiplier = 1.0f - controls.ClutchVal;
 		float inputMultiplier = throttleMultiplier * clutchMultiplier;
@@ -1372,16 +1381,20 @@ void functionEngBrake() {
 				MemoryPatcher::PatchBrakeDecrement();
 			}
 			float rpmMultiplier = (vehData.Rpm - activeBrakeThreshold) / (1.0f - activeBrakeThreshold);
-			float brakePressure = settings.EngBrakePower * inputMultiplier * rpmMultiplier;
+			float engBrakeForce = /*settings.EngBrakePower*/ handlingBrakeForce * inputMultiplier * rpmMultiplier;
 			auto wheelsToBrake = getDrivenWheels();
 			for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
 				if (i >= wheelsToBrake.size() || wheelsToBrake[i]) {
-					ext.SetWheelBrakePressure(vehicle, i, brakePressure);
+					ext.SetWheelBrakePressure(vehicle, i, engBrakeForce + inpBrakeForce);
+				}
+				else {
+					ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
 				}
 			}
 			if (settings.DisplayInfo) {
 				showText(0.5, 0.55, 0.5, "Eng brake @ " + std::to_string(static_cast<int>(inputMultiplier * 100.0f)) + "%");
-				showText(0.5, 0.60, 0.5, "Pressure: " + std::to_string(brakePressure));
+				showText(0.5, 0.60, 0.5, "Pressure: " + std::to_string(engBrakeForce));
+				showText(0.5, 0.65, 0.5, "Brk. Inp: " + std::to_string(inpBrakeForce));
 			}
 		}
 		
