@@ -1,0 +1,56 @@
+[CONTROLLER]
+The following controls can be assigned:
+	* DpadUp
+	* DpadDown
+	* DpadLeft
+	* DpadRight
+	* Start
+	* Back
+	* LeftThumb
+	* RightThumb
+	* LeftShoulder
+	* RightShoulder
+	* A
+	* B
+	* X
+	* Y
+	* LeftTrigger
+	* RightTrigger
+	* LeftThumbLeft
+	* LeftThumbRight
+	* RightThumbLeft
+	* RightThumbRight
+	* LeftThumbUp
+	* LeftThumbDown
+	* RightThumbUp
+	* RightThumbDown
+
+[CONTROLLER_LEGACY]
+Usable inputs. USE THE NUMBERS
+Turn off a control by putting -1 there
+Control name                Xbox equivalent		Control ID
+ControlFrontendDown         Dpad Down			187			
+ControlFrontendUp           Dpad Up				188
+ControlFrontendLeft         Dpad Left			189
+ControlFrontendRight        Dpad Right			190
+ControlFrontendRdown        ??????????			191
+ControlFrontendRup          ??????????			192
+ControlFrontendRleft        ??????????			193
+ControlFrontendRright       ??????????			194
+ControlFrontendAxisX        Left stick X		195
+ControlFrontendAxisY        Left stick Y		196
+ControlFrontendRightAxisX   Right stick X		197
+ControlFrontendRightAxisY   Right stick Y		198
+ControlFrontendPause		Start				199
+ControlFrontendAccept		A					201
+ControlFrontendCancel		B					202
+ControlFrontendX			X					203
+ControlFrontendY			Y					204
+ControlFrontendLb			Left shoulder		205
+ControlFrontendRb			Right shoulder		206
+ControlFrontendLt			Left trigger		207
+ControlFrontendRt			Right trigger		208
+ControlFrontendLs			Left stick click	209
+ControlFrontendRs			Right stick click	210
+ControlFrontendDelete		???????????			214
+ControlFrontendSelect		Back				217

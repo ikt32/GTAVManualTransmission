@@ -467,7 +467,8 @@ void update_menu() {
 		menu.Subtitle("Steering wheel options");
 
 		if (menu.BoolOption("Enable wheel", settings.EnableWheel,
-		{ "Enable usage of a steering wheel." })) {
+		{ "Enable usage of a steering wheel. This needs to be enabled before configuring the axes! "
+			"After enabling, re-initialize the mod by toggling it." })) {
 			settings.SaveWheel(&controls);
 		}
 
@@ -500,7 +501,9 @@ void update_menu() {
 		}
 
 		menu.MenuOption("Steering wheel axis setup", "axesmenu", 
-		{ "Configure analog controls, like throttle, steering and the like." });
+		{ "Configure analog controls, like throttle, steering and the like.",
+		"\"Enable  wheel\" needs to be enabled before configuring the axes! "
+			"After enabling, re-initialize the mod by toggling it."});
 
 		menu.MenuOption("Steering wheel button setup", "buttonsmenu",
 		{ "Set up your buttons on your steering wheel." });
@@ -744,6 +747,8 @@ void update_menu() {
 		menu.Subtitle("");
 
 		menu.BoolOption("Gear", settings.GearIndicator);
+		menu.BoolOption("Shift Mode", settings.ShiftModeIndicator);
+
 		menu.FloatOption("Gear X", settings.GearXpos, 0.0f, 1.0f, 0.005f);
 		menu.FloatOption("Gear Y", settings.GearYpos, 0.0f, 1.0f, 0.005f);
 		menu.FloatOption("Gear Size", settings.GearSize, 0.0f, 3.0f, 0.05f);
@@ -751,7 +756,6 @@ void update_menu() {
 		menu.IntOption("Gear Top Color Green", settings.GearTopColorG, 0, 255);
 		menu.IntOption("Gear Top Color Blue", settings.GearTopColorB, 0, 255);
 
-		menu.BoolOption("Shift Mode", settings.ShiftModeIndicator);
 		menu.FloatOption("Shift Mode X", settings.ShiftModeXpos, 0.0f, 1.0f, 0.005f);
 		menu.FloatOption("Shift Mode Y", settings.ShiftModeYpos, 0.0f, 1.0f, 0.005f);
 		menu.FloatOption("Shift Mode Size", settings.ShiftModeSize, 0.0f, 3.0f, 0.05f);

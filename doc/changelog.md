@@ -2,7 +2,7 @@
 
 ## 4.3.9
 Thanks for your bug reports!
-Config changes: Nope
+Config changes: Updated defaults. No need to replace your config: it's just a more comprehensive start for new users/setups.
 
 Fixes:
 * Fix brake non-responsive while engine braking

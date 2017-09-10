@@ -27,7 +27,7 @@ public:
 
 	// settings_general.ini parts
 	// [OPTIONS]
-	bool EnableManual = true;
+	bool EnableManual = false;
 	ShiftModes ShiftMode = Sequential; 	// 0 Seq, 1 H, 2 Auto
 	bool SimpleBike = false;
 	bool EngDamage = false;
@@ -40,8 +40,8 @@ public:
 	bool ClutchShiftingS = false;
 	bool DefaultNeutral = false;
 
-	float EngBrakePower;
-	float EngBrakeThreshold;
+	float EngBrakePower = 0.0f;
+	float EngBrakeThreshold = 0.75f;
 	float ClutchCatchpoint = 0.15f;
 	float StallingThreshold = 0.75f;
 	float RPMDamage = 1.5f;
@@ -58,7 +58,7 @@ public:
 	bool AlwaysHUD = false;
 	int HUDFont = 0;
 
-	bool GearIndicator;
+	bool GearIndicator = true;
 	float GearXpos = 0.95f;
 	float GearYpos = 0.95f;
 	float GearSize = 1.0f;
@@ -66,13 +66,13 @@ public:
 	int GearTopColorG = 255;
 	int GearTopColorB = 255;
 
-	bool ShiftModeIndicator;
+	bool ShiftModeIndicator = true;
 	float ShiftModeXpos = 0.925f;
 	float ShiftModeYpos = 0.95f;
 	float ShiftModeSize = 1.0f;
 
 	// can be kph, mph, or ms
-	std::string Speedo;
+	std::string Speedo = "kph";
 	bool SpeedoShowUnit = false;
 	float SpeedoSize = 1.5f;
 	float SpeedoYpos = 0.85f;
@@ -119,7 +119,7 @@ public:
 
 	// [DEBUG]
 	bool DisplayInfo = false;
-	bool DisplayGearingInfo;
+	bool DisplayGearingInfo = false;
 	bool DisplayWheelInfo = false;
 
 	std::vector<GUID> reggdGuids;
