@@ -7,8 +7,6 @@
 #include "Input/keyboard.h"
 #include "Input/ScriptControls.hpp"
 
-#include "Util/Versions.h"
-
 ScriptSettings::ScriptSettings() { }
 
 void ScriptSettings::SetFiles(const std::string &general, const std::string &wheel, const std::string &stick) {
