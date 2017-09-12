@@ -11,7 +11,7 @@ http://dev-c.com
 #include "Util/Paths.h"
 #include "Util/Logger.hpp"
 #include "Memory/MemoryPatcher.hpp"
-#include "Util/Versions.h"
+#include "Memory/Versions.h"
 #include "Memory/NativeMemory.hpp"
 
 

@@ -141,6 +141,7 @@
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h" />
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
+    <ClInclude Include="Memory\Versions.h" />
     <ClInclude Include="ShiftModes.h" />
     <ClInclude Include="Util\MathExt.h" />
     <ClInclude Include="Memory\Offsets.hpp" />
@@ -159,7 +160,6 @@
     <ClInclude Include="Util\Logger.hpp" />
     <ClInclude Include="Util\TimeHelper.hpp" />
     <ClInclude Include="Util\Util.hpp" />
-    <ClInclude Include="Util\Versions.h" />
     <ClInclude Include="VehicleData.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

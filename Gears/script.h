@@ -6,6 +6,8 @@ http://dev-c.com
 
 #pragma once
 
+#define DISPLAY_VERSION "v4.3.8"
+
 #ifndef DIRECTINPUT_VERSION
 #define DIRECTINPUT_VERSION 0x0800
 #endif

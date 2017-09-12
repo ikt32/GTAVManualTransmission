@@ -141,10 +141,10 @@
     <ClInclude Include="Util\MathExt.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="Util\Versions.h">
-      <Filter>Util</Filter>
-    </ClInclude>
     <ClInclude Include="ShiftModes.h" />
+    <ClInclude Include="Memory\Versions.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
