@@ -1078,7 +1078,12 @@ void functionAShift() { // Automatic
 		float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
 		float prevGearRedline = DriveMaxFlatVel / ratios[vehData.CurrGear - 1];
 		float velDiff = prevGearRedline - ext.GetDashSpeed(vehicle);
-		if (velDiff > + 8.0f + 7.0f*(0.5f - controls.ThrottleVal)) {
+		float gear2Offset = 0.0f;
+		float abnormality = (DriveMaxFlatVel / ratios[1] + DriveMaxFlatVel / ratios[0]);
+		if (vehData.CurrGear == 2 && abnormality > 1.0f) {
+			gear2Offset = 1 / ratios[1] * abnormality;//0.2f * (DriveMaxFlatVel / ratios[2] - DriveMaxFlatVel / ratios[1]);
+		}
+		if (velDiff > gear2Offset + 8.0f + 7.0f*(0.5f - controls.ThrottleVal)) {
 			shiftTo(vehData.CurrGear - 1, true);
 			vehData.NextGear = vehData.CurrGear - 1;
 			vehData.SimulatedNeutral = false;

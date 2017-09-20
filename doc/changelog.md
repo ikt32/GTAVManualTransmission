@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.3.10
+No config changes
+
+Changes:
+* Fix engine sound muted on clutch press
+* Tweak first gear up/downshift parameters
+
 ## 4.3.9
 Thanks for your bug reports!
 Config changes: Updated defaults. No need to replace your config: it's just a more comprehensive start for new users/setups.
