@@ -1459,9 +1459,8 @@ void fakeRev(bool customThrottle, float customThrottleVal) {
 }
 
 void handleRPM() {
-	float neutralClutchVal = -5.0f;
 	float finalClutch = 0.0f;
-	bool skip = false;
+	//bool skip = false;
 
 	// Game wants to shift up. Triggered at high RPM, high speed.
 	// Desired result: high RPM, same gear, no more accelerating
@@ -1478,12 +1477,6 @@ void handleRPM() {
 		//showText(0.4, 0.1, 1.0, "REV LIM");
 		//showText(0.4, 0.15, 1.0, "CF: " + std::to_string(counterForce));
 	}
-
-	// Emulate previous "shift down wanted" behavior.
-	//if (vehData.CurrGear > 1 && vehData.Rpm < 0.4f) {
-		// Don't artificially lower this any more
-		//VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(vehicle, vehData.Rpm * 2.5f);
-	//}
 
 	/*
 		Game doesn't rev on disengaged clutch in any gear but 1
@@ -1504,39 +1497,25 @@ void handleRPM() {
 			!(vehData.Velocity < 0.0 && controls.BrakeVal > 0.1f && controls.ThrottleVal > 0.05f)) {
 			fakeRev(false, 0);
 			ext.SetThrottle(vehicle, controls.ThrottleVal);
-			float tempVal = (1.0f - controls.ClutchVal) * 0.4f + 0.6f;
-			if (controls.ClutchVal > 0.95) {
-				tempVal = neutralClutchVal;
-			}
-			finalClutch = tempVal;
-			skip = true;
 		}
 		// Don't care about clutch slippage, just handle RPM now
 		if (vehData.SimulatedNeutral) {
 			fakeRev(false, 0);
-			ext.SetThrottle(vehicle, 1.0f); // For a fuller sound
+			ext.SetThrottle(vehicle, controls.ThrottleVal);
 		}
 	}
 
-	// Set the clutch depending on neutral status
-	if (vehData.SimulatedNeutral || controls.ClutchVal > 1.0 - settings.ClutchCatchpoint) {
-		/*
-			To prevent a the clutch not being registered as fully pressed
-			by the game. Negative values seem to work, but this amount
-			differs from vehicle to vehicle, so it is at -0.1f to cover
-			every case. Stronger negative values don't seem problematic.
-			+Supercars seem to have a higher offset. -0.2f now,
-			+Tuning the transmission messes this up, so just use -0.5f.
-			+Still messes up the T20 @ Max Transmission upgrade.
-		*/
-		finalClutch = neutralClutchVal;
-	}
-	else {
-		if (!skip) {
-			finalClutch = 1.0f - controls.ClutchVal;
-			//showText(0.1, 0.1, 0.5, "we have clutch");
+	finalClutch = 1.0f - controls.ClutchVal;
+
+	if (vehData.SimulatedNeutral || controls.ClutchVal >= 1.0f) {
+		if (vehData.Speed < 1.0f) {
+			finalClutch = -5.0f;
+		}
+		else {
+			finalClutch = -0.5f;
 		}
 	}
+
 	vehData.UpdateRpm();
 	ext.SetClutch(vehicle, finalClutch);
 	//showText(0.1, 0.15, 0.5, ("clutch set: " + std::to_string(finalClutch)));
