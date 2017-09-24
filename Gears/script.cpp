@@ -540,6 +540,13 @@ void drawDebugInfo() {
 			showText(0.40f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
 			i++;
 		}
+
+		i = 0;
+		showText(0.10f, 0.05f, 0.5f, "Ratios");
+		for (auto ratio : ratios) {
+			showText(0.10f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(ratio));
+			i++;
+		}
 	}
 }
 
@@ -1076,17 +1083,23 @@ void functionAShift() { // Automatic
 	if (vehData.CurrGear > 1) {
 		auto ratios = ext.GetGearRatios(vehicle);
 		float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
-		float prevGearRedline = DriveMaxFlatVel / ratios[vehData.CurrGear - 1];
-		float velDiff = prevGearRedline - ext.GetDashSpeed(vehicle);
-		float gear2Offset = 0.0f;
-		float abnormality = (DriveMaxFlatVel / ratios[1] + DriveMaxFlatVel / ratios[0]);
-		if (vehData.CurrGear == 2 && abnormality > 1.0f) {
-			gear2Offset = 1 / ratios[1] * abnormality;//0.2f * (DriveMaxFlatVel / ratios[2] - DriveMaxFlatVel / ratios[1]);
+		if (vehData.CurrGear == 2) {
+			float topspeedG1 = 0.5f * DriveMaxFlatVel / ratios[1];
+			float speedOffset = 0.66f * topspeedG1 * (0.5f - controls.ThrottleVal);
+			if (ext.GetDashSpeed(vehicle) < topspeedG1 - speedOffset) {
+				shiftTo(vehData.CurrGear - 1, true);
+				vehData.NextGear = vehData.CurrGear - 1;
+				vehData.SimulatedNeutral = false;
+			}
 		}
-		if (velDiff > gear2Offset + 8.0f + 7.0f*(0.5f - controls.ThrottleVal)) {
-			shiftTo(vehData.CurrGear - 1, true);
-			vehData.NextGear = vehData.CurrGear - 1;
-			vehData.SimulatedNeutral = false;
+		else {
+			float prevGearRedline = DriveMaxFlatVel / ratios[vehData.CurrGear - 1];
+			float velDiff = prevGearRedline - ext.GetDashSpeed(vehicle);
+			if (velDiff > 8.0f + 7.0f*(0.5f - controls.ThrottleVal)) {
+				shiftTo(vehData.CurrGear - 1, true);
+				vehData.NextGear = vehData.CurrGear - 1;
+				vehData.SimulatedNeutral = false;
+			}
 		}
 	}
 }
