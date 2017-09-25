@@ -526,8 +526,17 @@ void drawDebugInfo() {
 	if (settings.EnableManual && settings.DisplayGearingInfo) {
 		auto ratios = ext.GetGearRatios(vehicle);
 		float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
+		float InitialDriveMaxFlatVel = ext.GetInitialDriveMaxFlatVel(vehicle);
+
 		int i = 0;
-		showText(0.25f, 0.05f, 0.5f, "Expected");
+		showText(0.10f, 0.05f, 0.35f, "Ratios");
+		for (auto ratio : ratios) {
+			showText(0.10f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(ratio));
+			i++;
+		}
+		
+		i = 0;
+		showText(0.25f, 0.05f, 0.35f, "Expected (DriveMaxFlatVel)");
 		for (auto ratio : ratios) {
 			float maxSpeed = DriveMaxFlatVel / ratio;
 			showText(0.25f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(maxSpeed));
@@ -535,18 +544,21 @@ void drawDebugInfo() {
 		}
 
 		i = 0;
-		showText(0.40f, 0.05f, 0.5f, "Actual");
-		for (auto speed : upshiftSpeeds) {
-			showText(0.40f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
+		showText(0.40f, 0.05f, 0.35f, "Expected (InitialDriveMaxFlatVel)");
+		for (auto ratio : ratios) {
+			float maxSpeed = InitialDriveMaxFlatVel / ratio;
+			showText(0.40f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(maxSpeed));
 			i++;
 		}
 
 		i = 0;
-		showText(0.10f, 0.05f, 0.5f, "Ratios");
-		for (auto ratio : ratios) {
-			showText(0.10f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(ratio));
+		showText(0.55f, 0.05f, 0.35f, "Actual");
+		for (auto speed : upshiftSpeeds) {
+			showText(0.55f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
 			i++;
 		}
+
+		
 	}
 }
 
@@ -1069,11 +1081,19 @@ void functionAShift() { // Automatic
 		}
 	}
 
+	float dashms = ext.GetDashSpeed(vehicle);
+	if (!vehData.HasSpeedo && dashms > 0.1f) {
+		vehData.HasSpeedo = true;
+	}
+	if (!vehData.HasSpeedo) {
+		dashms = abs(vehData.Velocity);
+	}
+
 	// Shift up
 	if (vehData.CurrGear > 0 &&
 		(vehData.CurrGear < vehData.NextGear && vehData.Speed > 2.0f)) {
-		if (ext.GetDashSpeed(vehicle) > upshiftSpeeds[vehData.CurrGear])
-			upshiftSpeeds[vehData.CurrGear] = ext.GetDashSpeed(vehicle);
+		if (dashms > upshiftSpeeds[vehData.CurrGear])
+			upshiftSpeeds[vehData.CurrGear] = dashms;
 
 		shiftTo(vehData.CurrGear + 1, true);
 		vehData.SimulatedNeutral = false;
@@ -1082,19 +1102,19 @@ void functionAShift() { // Automatic
 	// Shift down
 	if (vehData.CurrGear > 1) {
 		auto ratios = ext.GetGearRatios(vehicle);
-		float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
 		if (vehData.CurrGear == 2) {
-			float topspeedG1 = 0.5f * DriveMaxFlatVel / ratios[1];
-			float speedOffset = 0.66f * topspeedG1 * (0.5f - controls.ThrottleVal);
-			if (ext.GetDashSpeed(vehicle) < topspeedG1 - speedOffset) {
-				shiftTo(vehData.CurrGear - 1, true);
-				vehData.NextGear = vehData.CurrGear - 1;
+			float shiftSpeedG1 = ext.GetInitialDriveMaxFlatVel(vehicle) / ratios[1];
+			float speedOffset = 0.25f * shiftSpeedG1 * (1.0f - controls.ThrottleVal);
+			float downshiftSpeed = shiftSpeedG1 - 0.25f * shiftSpeedG1 - speedOffset;
+			if (dashms < downshiftSpeed) {
+				shiftTo(1, true);
+				vehData.NextGear = 1;
 				vehData.SimulatedNeutral = false;
 			}
 		}
 		else {
-			float prevGearRedline = DriveMaxFlatVel / ratios[vehData.CurrGear - 1];
-			float velDiff = prevGearRedline - ext.GetDashSpeed(vehicle);
+			float prevGearRedline = ext.GetDriveMaxFlatVel(vehicle) / ratios[vehData.CurrGear - 1];
+			float velDiff = prevGearRedline - dashms;
 			if (velDiff > 8.0f + 7.0f*(0.5f - controls.ThrottleVal)) {
 				shiftTo(vehData.CurrGear - 1, true);
 				vehData.NextGear = vehData.CurrGear - 1;
@@ -1342,7 +1362,16 @@ void functionEngLock() {
 	// I finally found the gearing ratio stuff, which along with DriveMaxFlatVel (?)
 	// can be used to figure out the max speed for that gear.
 	// Beware though as this might be different for trucks. Haven't checked it yet!
-	float speed = ext.GetDashSpeed(vehicle);
+
+	float dashms = ext.GetDashSpeed(vehicle);
+	if (!vehData.HasSpeedo && dashms > 0.1f) {
+		vehData.HasSpeedo = true;
+	}
+	if (!vehData.HasSpeedo) {
+		dashms = abs(vehData.Velocity);
+	}
+
+	float speed = dashms;
 	auto ratios = ext.GetGearRatios(vehicle);
 	float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
 	float maxSpeed = DriveMaxFlatVel / ratios[vehData.CurrGear];
