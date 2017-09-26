@@ -27,6 +27,8 @@ public:
 	static const int MAX_RGBBUTTONS = 128;
 	static const int AVGSAMPLES = 2;
 
+	static const int POVDIRECTIONS = 8;
+
 	enum DIAxis {
 		lX,
 		lY,
@@ -50,6 +52,10 @@ public:
 		W = 27000,
 		NW = 31500,
 		SIZEOF_POV,
+	};
+
+	const std::array<POV, POVDIRECTIONS> POVDirections{
+		N, NE, E, SE, S, SW, W, NW
 	};
 
 	const std::array<std::string, SIZEOF_DIAxis> DIAxisHelper {
@@ -100,10 +106,6 @@ private:
 	void formatError(HRESULT hr, std::string &hrStr);
 	int povDirectionToIndex(int povDirection);
 
-	static const int POVDIRECTIONS = 8;
-	const std::array<POV, POVDIRECTIONS> POVDirections{
-		N, NE, E, SE, S, SW, W, NW
-	};
 	std::vector<GUID> foundGuids;
 
 	DiJoyStick djs;
