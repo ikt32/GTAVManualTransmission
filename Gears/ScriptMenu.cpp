@@ -503,9 +503,6 @@ void update_menu() {
 		{ "Configure analog controls, like throttle, steering and the like.",
 		"\"Enable  wheel\" needs to be enabled before configuring the axes! "
 			"After enabling, re-initialize the mod by toggling it."});
-
-		menu.MenuOption("Steering wheel button setup", "buttonsmenu",
-		{ "Set up your buttons on your steering wheel." });
 		
 		menu.MenuOption("Force feedback options", "forcefeedbackmenu",
 		{ "Fine-tune your force feedback parameters." });
@@ -513,6 +510,9 @@ void update_menu() {
 		menu.MenuOption("Steering wheel angles", "anglemenu",
 		{ "Set up soft lock options here." });
 		
+		menu.MenuOption("Steering wheel button setup", "buttonsmenu",
+		{ "Set up your buttons on your steering wheel." });
+
 		std::vector<std::string> hpatInfo;
 		hpatInfo.push_back("Press RIGHT to clear H-pattern shifter");
 		hpatInfo.push_back("Active gear:");
@@ -1181,40 +1181,9 @@ bool configAxis(std::string str) {
 }
 
 bool configWheelToKey() {
-	int buttonsActive = 0;
-
-	std::array<int, 8> directions = {
-		WheelDirectInput::POV::N,
-		WheelDirectInput::POV::NE,
-		WheelDirectInput::POV::E,
-		WheelDirectInput::POV::SE,
-		WheelDirectInput::POV::S,
-		WheelDirectInput::POV::SW,
-		WheelDirectInput::POV::W,
-		WheelDirectInput::POV::NW,
-	};
-
 	std::string additionalInfo = "Press a button to configure. Press " + escapeKey + " to exit.";
 
 	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
-
-	for (auto guid : controls.WheelControl.GetGuids()) {
-		for (int i = 0; i < 255; i++) {
-			if (controls.WheelControl.IsButtonPressed(i, guid)) {
-				buttonsActive++;
-			}
-		}
-		for (auto d : directions) {
-			if (controls.WheelControl.IsButtonPressed(d, guid)) {
-				buttonsActive++;
-			}
-		}
-	}
-
-	if (buttonsActive > 0) {
-		showSubtitle("One or more buttons had been pressed on start. Stop pressing and try again.");
-		return false;
-	}
 
 	/*
 	 * 0: Wait for button select
@@ -1235,15 +1204,15 @@ bool configWheelToKey() {
 		if (progress == 0) {
 			for (auto guid : controls.WheelControl.GetGuids()) {
 				for (int i = 0; i < 255; i++) {
-					if (controls.WheelControl.IsButtonPressed(i, guid)) {
+					if (controls.WheelControl.IsButtonJustReleased(i, guid)) {
 						selectedGuid = guid;
 						button = i;
 						progress++;
 					}
 				}
 				//POV hat
-				for (auto d : directions) {
-					if (controls.WheelControl.IsButtonPressed(d, guid)) {
+				for (auto d : controls.WheelControl.POVDirections) {
+					if (controls.WheelControl.IsButtonJustReleased(d, guid)) {
 						selectedGuid = guid;
 						button = d;
 						progress++;
@@ -1281,42 +1250,11 @@ bool configWheelToKey() {
 }
 
 bool configButton(std::string str) {
-	int buttonsActive = 0;
-
-	std::array<int, 8> directions = {
-		WheelDirectInput::POV::N,
-		WheelDirectInput::POV::NE,
-		WheelDirectInput::POV::E,
-		WheelDirectInput::POV::SE,
-		WheelDirectInput::POV::S,
-		WheelDirectInput::POV::SW,
-		WheelDirectInput::POV::W,
-		WheelDirectInput::POV::NW,
-	};
-
 	std::string confTag = str;
 	std::string additionalInfo = "Press " + escapeKey + " to exit.";
 	additionalInfo += " Press a button to set " + confTag + ".";
 
 	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
-
-	for (auto guid : controls.WheelControl.GetGuids()) {
-		for (int i = 0; i < 255; i++) {
-			if (controls.WheelControl.IsButtonPressed(i, guid)) {
-				buttonsActive++;
-			}
-		}
-		for (auto d : directions) {
-			if (controls.WheelControl.IsButtonPressed(d, guid)) {
-				buttonsActive++;
-			}
-		}
-	}
-
-	if (buttonsActive > 0) {
-		showSubtitle("One or more buttons had been pressed on start. Stop pressing and try again.");
-		return false;
-	}
 
 	while (true) {
 		if (IsKeyJustUp(str2key(escapeKey))) {
@@ -1326,15 +1264,14 @@ bool configButton(std::string str) {
 
 		for (auto guid : controls.WheelControl.GetGuids()) {
 			for (int i = 0; i < 255; i++) {
-				if (controls.WheelControl.IsButtonPressed(i, guid)) {
+				if (controls.WheelControl.IsButtonJustReleased(i, guid)) {
 					saveButton(confTag, guid, i);
 					return true;
 				}
 			}
 
-			//POV hat shit
-			for (auto d : directions) {
-				if (controls.WheelControl.IsButtonPressed(d, guid)) {
+			for (auto d : controls.WheelControl.POVDirections) {
+				if (controls.WheelControl.IsButtonJustReleased(d, guid)) {
 					saveButton(confTag, guid, d);
 					return true;
 				}
@@ -1346,26 +1283,10 @@ bool configButton(std::string str) {
 }
 
 bool configHPattern() {
-	int buttonsActive = 0;
-
 	std::string confTag = "SHIFTER";
 	std::string additionalInfo = "Press " + escapeKey + " to exit. Press " + skipKey + " to skip gear.";
 
 	controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
-
-	for (auto guid : controls.WheelControl.GetGuids()) {
-		for (int i = 0; i < 255; i++) {
-			if (controls.WheelControl.IsButtonPressed(i, guid)) {
-				buttonsActive++;
-			}
-		}
-	}
-
-	if (buttonsActive > 0) {
-		showSubtitle("One or more buttons had been pressed on start. Stop pressing and try again.");
-		return false;
-	}
-	////////////////////////////////////////////////////////////////////////////////////////////////
 
 	GUID devGUID = {};
 	std::array<int, numGears> buttonArray; // There are gears 1-7 + R
@@ -1386,7 +1307,7 @@ bool configHPattern() {
 		for (auto guid : controls.WheelControl.GetGuids()) {
 			for (int i = 0; i < 255; i++) {
 				// only find unregistered buttons
-				if (controls.WheelControl.IsButtonPressed(i, guid) &&
+				if (controls.WheelControl.IsButtonJustPressed(i, guid) &&
 					find(begin(buttonArray), end(buttonArray), i) == end(buttonArray)) {
 					if (progress == 0) { // also save device info when just started
 						devGUID = guid;
