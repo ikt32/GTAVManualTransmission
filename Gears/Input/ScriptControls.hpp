@@ -174,7 +174,7 @@ public:
 	// Wheel controls
 	bool ButtonJustPressed(WheelControlType control);
 	bool ButtonReleased(WheelControlType control);
-	bool ButtonHeld(WheelControlType control);
+	bool ButtonHeld(WheelControlType control, int delay);
 	bool ButtonIn(WheelControlType control);
 	void CheckCustomButtons(bool justPeeking);
 	void StopForceFeedback();
@@ -201,7 +201,6 @@ public:
 	int SteerRight = 0;
 	int HandbrakeUp = 0;
 	int HandbrakeDown = 0;
-	int WButtonHeld = 1000;
 	int MaxTapTime = 200;
 
 	bool InvertSteer = false;

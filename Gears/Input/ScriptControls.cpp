@@ -426,12 +426,12 @@ bool ScriptControls::ButtonReleased(WheelControlType control) {
 	return false;
 }
 
-bool ScriptControls::ButtonHeld(WheelControlType control) {
+bool ScriptControls::ButtonHeld(WheelControlType control, int delay) {
 	if (!WheelControl.IsConnected(WheelButtonGUIDs[static_cast<int>(control)]) ||
 		WheelButton[static_cast<int>(control)] == -1) {
 		return false;
 	}
-	if (WheelControl.WasButtonHeldForMs(WheelButton[static_cast<int>(control)], WheelButtonGUIDs[static_cast<int>(control)], WButtonHeld))
+	if (WheelControl.WasButtonHeldForMs(WheelButton[static_cast<int>(control)], WheelButtonGUIDs[static_cast<int>(control)], delay))
 		return true;
 	return false;
 }

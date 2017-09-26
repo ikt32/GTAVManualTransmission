@@ -142,7 +142,7 @@ void update() {
 	}
 
 	if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
-		controls.ButtonJustPressed(ScriptControls::WheelControlType::Toggle) ||
+		controls.ButtonHeld(ScriptControls::WheelControlType::Toggle, 500) ||
 		controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
 		controls.PrevInput == ScriptControls::Controller	&& controls.ButtonHeld(ScriptControls::LegacyControlType::Toggle)) {
 		toggleManual();
@@ -1991,8 +1991,8 @@ void handleVehicleButtons() {
 	}
 
 
-	if (controls.ButtonHeld(ScriptControls::WheelControlType::RadioPrev) ||
-		controls.ButtonHeld(ScriptControls::WheelControlType::RadioNext)) {
+	if (controls.ButtonHeld(ScriptControls::WheelControlType::RadioPrev, 1000) ||
+		controls.ButtonHeld(ScriptControls::WheelControlType::RadioNext, 1000)) {
 		if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() != RadioOff) {
 			vehData.RadioStationIndex = AUDIO::GET_PLAYER_RADIO_STATION_INDEX();
 		}
