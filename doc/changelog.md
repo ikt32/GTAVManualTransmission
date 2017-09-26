@@ -5,7 +5,10 @@ No config changes
 
 Changes:
 * Fix engine sound muted on clutch press
-* Tweak first gear up/downshift parameters
+* Fix models without dashboard shifting problems
+* Fix models without dashboard engine lock problems
+* Improve steering wheel setup
+* Change steering wheel's toggle mod button to a "button held" instead of "button pressed" for more consistent mod toggling
 
 ## 4.3.9
 Thanks for your bug reports!
