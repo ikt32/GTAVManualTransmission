@@ -466,9 +466,10 @@ void update_menu() {
 		menu.Subtitle("Steering wheel options");
 
 		if (menu.BoolOption("Enable wheel", settings.EnableWheel,
-		{ "Enable usage of a steering wheel. This needs to be enabled before configuring the axes! "
-			"After enabling, re-initialize the mod by toggling it." })) {
+		{ "Enable usage of a steering wheel." })) {
 			settings.SaveWheel(&controls);
+			settings.Read(&controls);
+			initWheel();
 		}
 
 		if (menu.BoolOption("Enable wheel always", settings.WheelWithoutManual,
@@ -500,9 +501,7 @@ void update_menu() {
 		}
 
 		menu.MenuOption("Steering wheel axis setup", "axesmenu", 
-		{ "Configure analog controls, like throttle, steering and the like.",
-		"\"Enable  wheel\" needs to be enabled before configuring the axes! "
-			"After enabling, re-initialize the mod by toggling it."});
+		{ "Configure analog controls, like throttle, steering and the like." });
 		
 		menu.MenuOption("Force feedback options", "forcefeedbackmenu",
 		{ "Fine-tune your force feedback parameters." });

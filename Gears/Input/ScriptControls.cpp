@@ -14,7 +14,7 @@ ScriptControls::ScriptControls(): PrevInput(Keyboard),
 
 ScriptControls::~ScriptControls() { }
 
-void ScriptControls::InitWheel(bool initffb) {
+void ScriptControls::InitWheel() {
 	if (!WheelControl.InitWheel()) {
 		// Initialization failed somehow, so we skip
 		return;
@@ -24,7 +24,7 @@ void ScriptControls::InitWheel(bool initffb) {
 	auto steerAxis = WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)]);
 	auto ffAxis = WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]);
 	
-	if (initffb && WheelControl.InitFFB(steerGUID, steerAxis)) {
+	if (WheelControl.InitFFB(steerGUID, steerAxis)) {
 		WheelControl.UpdateCenterSteering(steerGUID, ffAxis);
 	}
 }

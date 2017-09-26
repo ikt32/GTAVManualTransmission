@@ -143,7 +143,7 @@ public:
 	ScriptControls();
 	~ScriptControls();
 
-	void InitWheel(bool initffb);
+	void InitWheel();
 	void UpdateValues(InputDevices prevInput, bool ignoreClutch, bool justPeekingWheelKb);
 	InputDevices GetLastInputDevice(InputDevices previousInput, bool enableWheel = true);
 

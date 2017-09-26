@@ -736,11 +736,9 @@ void toggleManual() {
 }
 
 void initWheel() {
-	if (settings.EnableWheel) {
-		controls.InitWheel(settings.EnableFFB);
-//		controls.StickControl.InitDevice();
-		controls.CheckGUIDs(settings.reggdGuids);
-	}
+	controls.InitWheel();
+	// controls.StickControl.InitDevice();
+	controls.CheckGUIDs(settings.reggdGuids);
 	controls.SteerGUID = controls.WheelAxesGUIDs[static_cast<int>(controls.SteerAxisType)];
 }
 
