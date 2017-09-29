@@ -88,6 +88,7 @@ void update() {
 		!PLAYER::IS_PLAYER_CONTROL_ON(player) ||
 		ENTITY::IS_ENTITY_DEAD(playerPed) ||
 		PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE)) {
+		stopForceFeedback();
 		return;
 	}
 
@@ -95,6 +96,7 @@ void update() {
 
 	if (!vehicle || !ENTITY::DOES_ENTITY_EXIST(vehicle) || 
 		playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
+		stopForceFeedback();
 		return;
 	}
 
@@ -742,12 +744,14 @@ void initWheel() {
 	controls.SteerGUID = controls.WheelAxesGUIDs[static_cast<int>(controls.SteerAxisType)];
 }
 
-void initSteeringPatches() {
-	if (controls.PrevInput != ScriptControls::Wheel && settings.LogiLEDs) {
-		for (GUID guid : controls.WheelControl.GetGuids()) {
-			controls.WheelControl.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
-		}
+void stopForceFeedback() {
+	for (GUID guid : controls.WheelControl.GetGuids()) {
+		controls.WheelControl.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
 	}
+	controls.WheelControl.StopConstantForce();
+}
+
+void initSteeringPatches() {
 	if (controls.PrevInput == ScriptControls::Wheel || settings.PatchSteeringAlways) {
 		if (!MemoryPatcher::SteeringPatched && settings.PatchSteering) {
 			MemoryPatcher::PatchSteeringCorrection();
@@ -814,6 +818,9 @@ void updateLastInputDevice() {
 	}
 	if (controls.PrevInput == ScriptControls::Wheel) {
 		CONTROLS::STOP_PAD_SHAKE(0);
+	}
+	else {
+		stopForceFeedback();
 	}
 }
 

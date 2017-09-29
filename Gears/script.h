@@ -64,6 +64,7 @@ void applySteeringMultiplier();
 void resetSteeringMultiplier();
 void toggleManual();
 void initWheel();
+void stopForceFeedback();
 void initSteeringPatches();
 void updateLastInputDevice();
 

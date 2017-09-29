@@ -9,12 +9,22 @@
 #include "../Util/TimeHelper.hpp"
 #include "../Util/Logger.hpp"
 
-// TODO: Get Logitech to get back at me for the G920 issue/crash
+#define SAFE_RELEASE(p) { if(p) { (p)->Release(); (p)=nullptr; } }
 
 WheelDirectInput::WheelDirectInput() : pCFEffect{nullptr},
                                        pFREffect{nullptr} { }
 
-WheelDirectInput::~WheelDirectInput() { }
+WheelDirectInput::~WheelDirectInput() {
+	for (int i = 0; i < djs.getEntryCount(); i++) {
+		auto device = djs.getEntry(i);
+		if (device)
+			device->diDevice->Unacquire();
+	}
+	
+	SAFE_RELEASE(pCFEffect);
+	SAFE_RELEASE(pFREffect);
+	SAFE_RELEASE(lpDi);
+}
 
 bool WheelDirectInput::PreInit() {
 	// Just set up to ensure djs can always be used.
@@ -286,15 +296,12 @@ bool WheelDirectInput::createConstantForceEffect(const DiJoyStick::Entry *e, DIA
 	else if (ffAxis == lRz) { axis = DIJOFS_RZ; }
 	else { return false; }
 
+	// TODO: Make joystickable
 	// I'm focusing on steering wheels, so you get one axis.
 	DWORD rgdwAxes[1] = { axis };
 	LONG rglDirection[1] = { 0 };
 	DICONSTANTFORCE cf = { 0 };
 
-	/* 
-	 * I don't know why we need to init DIEFFECT if we're using a new DIEFFECT
-	 * afterwards anyway.
-	 */
 	DIEFFECT diEffect;
 	ZeroMemory(&diEffect, sizeof(diEffect));
 	diEffect.dwSize = sizeof(DIEFFECT);
@@ -322,6 +329,9 @@ bool WheelDirectInput::createConstantForceEffect(const DiJoyStick::Entry *e, DIA
 }
 
 void WheelDirectInput::SetConstantForce(GUID device, WheelDirectInput::DIAxis ffAxis, int force) {
+	// As per Microsoft's DirectInput example:
+	// Modifying an effect is basically the same as creating a new one, except
+	// you need only specify the parameters you are modifying
 	auto e = FindEntryFromGUID(device);
 	if (!e || !pCFEffect || !hasForceFeedback[device][ffAxis])
 		return;
@@ -345,17 +355,10 @@ void WheelDirectInput::SetConstantForce(GUID device, WheelDirectInput::DIAxis ff
 	// This should also automagically play.
 	pCFEffect->SetParameters(&diEffect, 
 		DIEP_DIRECTION |  DIEP_TYPESPECIFICPARAMS | DIEP_START);
+}
 
-	// When window focus is lost this should reacquire stuff I guess
-	/*if (FAILED(e->diDevice->Poll())) {
-		HRESULT hr = e->diDevice->Acquire();
-		while (hr == DIERR_INPUTLOST) {
-			hr = e->diDevice->Acquire();
-		}
-		pCFEffect->Start(1, 0);
-	}*/
-	/*e->diDevice->Acquire();
-	pCFEffect->Start(1, 0);*/
+void WheelDirectInput::StopConstantForce() {
+	pCFEffect->Stop();
 }
 
 WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString) {
@@ -402,31 +405,12 @@ void WheelDirectInput::updateAxisSpeed() {
 
 			samples[device][i][averageIndex[device][i]] = result;
 			averageIndex[device][i] = (averageIndex[device][i] + 1) % (AVGSAMPLES - 1);
-
-			//return result;
-			//auto sum = 0.0f;
-			//for (auto j = 0; j < AVGSAMPLES; j++) {
-			//	sum += samples[device][i][j];
-			//}
-			//return sum / AVGSAMPLES;
-
 		}
 	}
 }
 
 // Returns in units/s
 float WheelDirectInput::GetAxisSpeed(DIAxis axis, GUID device) {
-	//auto time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
-	//auto position = GetAxisValue(axis , device);
-	//auto result = (position - prevPosition) / ((time - prevTime) / 1e9f);
-
-	//prevTime = time;
-	//prevPosition = position;
-
-	//samples[averageIndex] = result;
-	//averageIndex = (averageIndex + 1) % (AVGSAMPLES - 1);
-
-	//return result;
 	auto sum = 0.0f;
 	for (auto i = 0; i < AVGSAMPLES; i++) {
 		sum += samples[device][axis][i];

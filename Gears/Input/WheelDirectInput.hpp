@@ -91,6 +91,7 @@ public:
 	void UpdateButtonChangeStates();
 
 	void SetConstantForce(GUID device, DIAxis ffAxis, int force);
+	void StopConstantForce();
 
 	DIAxis StringToAxis(std::string& axisString);
 
