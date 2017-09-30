@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.3.11
+No config changes
+
+Changes:  
+* Fix wheel ffb not resetting after exiting car while effect is active
+
 ## 4.3.10
 No config changes
 
