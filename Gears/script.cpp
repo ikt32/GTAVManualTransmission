@@ -748,7 +748,9 @@ void stopForceFeedback() {
 	for (GUID guid : controls.WheelControl.GetGuids()) {
 		controls.WheelControl.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
 	}
-	controls.WheelControl.StopConstantForce();
+	if (controls.WheelControl.IsConnected(controls.SteerGUID)) {
+		controls.WheelControl.StopConstantForce();
+	}
 }
 
 void initSteeringPatches() {
