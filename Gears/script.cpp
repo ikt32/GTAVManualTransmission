@@ -489,7 +489,7 @@ void drawDebugInfo() {
 	ssClutch	<< "Clutch:\t\t" << std::setprecision(3) << vehData.Clutch;
 	ssThrottle	<< "Throttle:\t" << std::setprecision(3) << vehData.Throttle;
 	ssTurbo		<< "Turbo:\t\t" << std::setprecision(3) << vehData.Turbo;
-	ssAddress	<< "Address:\t" << std::hex << reinterpret_cast<uint64_t>(ext.GetAddress(vehicle));
+	ssAddress	<< "Address:\t0x" << std::hex << reinterpret_cast<uint64_t>(ext.GetAddress(vehicle));
 	ssDashSpd	<< "Speedo:\t" << (vehData.HasSpeedo ? "Yes" : "No");
 	ssDbias		<< "DBias:\t\t" << std::setprecision(3) << vehData.DriveBiasFront;
 

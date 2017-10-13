@@ -6,6 +6,10 @@
 
 Logger::Logger() {}
 
+void Logger::SetFile(const std::string &fileName) {
+	file = fileName;
+}
+
 void Logger::Clear() const {
 	std::ofstream logFile;
 	logFile.open(file, std::ofstream::out | std::ofstream::trunc);
@@ -24,8 +28,17 @@ void Logger::Write(const std::string& text) const {
 		text << "\n";
 }
 
-void Logger::SetFile(const std::string &fileName) {
-	file = fileName;
+int Logger::Writef(char *fmt, ...) {
+	const int size = 1024;
+	char buff[size];
+	int result;
+	va_list args;
+	va_start(args, fmt);
+	result = vsnprintf(buff, size, fmt, args);
+	va_end(args);
+
+	Write(buff);
+	return result;
 }
 
 // Everything's gonna use this instance.

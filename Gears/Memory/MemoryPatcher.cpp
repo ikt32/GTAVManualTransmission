@@ -1,7 +1,6 @@
 #include "MemoryPatcher.hpp"
 
 #include <iomanip>
-#include <sstream>
 #include <Windows.h>
 #include "../Util/Logger.hpp"
 #include "NativeMemory.hpp"
@@ -89,9 +88,7 @@ bool PatchInstructions() {
 	if (clutchLowTemp) {
 		clutchLowAddr = clutchLowTemp;
 		TotalPatched++;
-		std::stringstream hexaddr;
-		hexaddr << std::hex << clutchLowAddr;
-		logger.Write("GEARBOX: Patched clutchLow @ " + hexaddr.str());
+		logger.Writef("GEARBOX: Patched clutchLow @ 0x%p", clutchLowAddr);
 	}
 	else {
 		logger.Write("GEARBOX: clutchLow patch failed");
@@ -102,9 +99,7 @@ bool PatchInstructions() {
 	if (clutchRevLimitTemp) {
 		clutchRevLimitAddr = clutchRevLimitTemp;
 		TotalPatched++;
-		std::stringstream hexaddr;
-		hexaddr << std::hex << clutchRevLimitAddr;
-		logger.Write("GEARBOX: Patched clutchRevLimit @ " + hexaddr.str());
+		logger.Writef("GEARBOX: Patched clutchRevLimit @ 0x%p", clutchRevLimitAddr);
 	}
 	else {
 		logger.Write("GEARBOX: clutchRevLimit patch failed");
@@ -115,9 +110,7 @@ bool PatchInstructions() {
 	if (gear7A0Temp) {
 		gear7A0Addr = gear7A0Temp;
 		TotalPatched++;
-		std::stringstream hexaddr;
-		hexaddr << std::hex << gear7A0Addr;
-		logger.Write("GEARBOX: Patched gear7A0  @ " + hexaddr.str());
+		logger.Writef("GEARBOX: Patched gear7A0  @ 0x%p", gear7A0Addr);
 	}
 	else {
 		logger.Write("GEARBOX: gear7A0 patch failed");
@@ -182,6 +175,16 @@ bool RestoreInstructions() {
 	return false;
 }
 
+std::string formatByteArray(byte *byteArray, size_t length) {
+	std::string instructionBytes;
+	for (int i = 0; i < length; ++i) {
+		char buff[4];
+		snprintf(buff, 4, "%02X ", byteArray[i]);
+		instructionBytes += buff;
+	}
+	return instructionBytes;
+}
+
 bool PatchSteeringCorrection() {
 	if (steerAttempts > maxAttempts) {
 		return false;
@@ -199,13 +202,11 @@ bool PatchSteeringCorrection() {
 	if (steeringTemp) {
 		steeringAddr = steeringTemp;
 		SteeringPatched = true;
-		std::stringstream hexaddr;
-		hexaddr << std::hex << steeringAddr;
-		std::stringstream instructs;
-		for (int i = 0; i < sizeof(origSteerInstr) / sizeof(byte); ++i)
-			instructs << std::hex << std::setfill('0') << std::setw(2) << (int)origSteerInstr[i] << " ";
-		logger.Write("STEERING: Steering Correction @ " + hexaddr.str());
-		logger.Write("STEERING: Patch success, orig: " + instructs.str());
+
+		std::string instructionBytes = formatByteArray(origSteerInstr, sizeof(origSteerInstr) / sizeof(byte));
+
+		logger.Writef("STEERING: Steering Correction @ 0x%p", steeringAddr);
+		logger.Write("STEERING: Patch success, original: " + instructionBytes);
 		steerAttempts = 0;
 		return true;
 	}
@@ -258,13 +259,11 @@ bool PatchSteeringControl() {
 	if (steerControlTemp) {
 		steerControlAddr = steerControlTemp;
 		SteerControlPatched = true;
-		std::stringstream hexaddr;
-		std::stringstream instructs;
-		hexaddr << std::hex << steerControlAddr;
-		for (int i = 0; i < sizeof(origSteerControlInstr) / sizeof(byte); ++i)
-			instructs << std::hex << std::setfill('0') << std::setw(2) << (int)origSteerControlInstr[i] << " ";
-		logger.Write("STEERING CONTROL: Steering Control @ " + hexaddr.str());
-		logger.Write("STEERING CONTROL: Patch success, orig: " + instructs.str());
+
+		std::string instructionBytes = formatByteArray(origSteerControlInstr, sizeof(origSteerControlInstr) / sizeof(byte));
+		
+		logger.Writef("STEERING CONTROL: Steering Control @ 0x%p", steerControlAddr);
+		logger.Write("STEERING CONTROL: Patch success, original : " + instructionBytes);
 		steerControlAttempts = 0;
 
 		return true;
@@ -319,13 +318,11 @@ bool PatchBrakeDecrement() {
 	if (brakeTemp) {
 		brakeAddr = brakeTemp;
 		BrakeDecrementPatched = true;
-		std::stringstream hexaddr;
-		std::stringstream instructs;
-		hexaddr << std::hex << brakeAddr;
-		for (int i = 0; i < sizeof(origBrakeInstr) / sizeof(byte); ++i)
-			instructs << std::hex << std::setfill('0') << std::setw(2) << (int)origBrakeInstr[i] << " ";
-		//logger.Write("BRAKE PRESSURE: BRAKE PRESSURE @ " + hexaddr.str());
-		//logger.Write("BRAKE PRESSURE: Patch success, orig: " + instructs.str());
+
+		//std::string instructionBytes = formatByteArray(origBrakeInstr, sizeof(origBrakeInstr) / sizeof(byte));
+
+		//logger.Writef("BRAKE PRESSURE: BRAKE PRESSURE @ 0x%p", brakeAddr);
+		//logger.Write("BRAKE PRESSURE: Patch success, original : " + instructionBytes);
 		brakeAttempts = 0;
 
 		return true;
