@@ -1259,22 +1259,20 @@ std::vector<float> getDrivenWheelsSpeeds(std::vector<float> wheelSpeeds) {
 }
 
 void functionEngStall() {
-	float lowSpeed = 2.4f;
 	float stallingRateDivisor = 3500000.0f;
 	float timeStep = SYSTEM::TIMESTEP() * 100.0f;
 	float avgWheelSpeed = abs(avg(getDrivenWheelsSpeeds(ext.GetTyreSpeeds(vehicle))));
-	if (vehData.Clutch > 0.2f && // 1.0 = fully engaged, 0.1 = fully disengaged
-		controls.ClutchVal < 1.0f - settings.StallingThreshold &&
-		vehData.Rpm < 0.25f &&
-		((avgWheelSpeed < vehData.CurrGear * lowSpeed) || (vehData.CurrGear == 0 && avgWheelSpeed < lowSpeed)) &&
+	float stallSpeed = 0.16f * abs(ext.GetDriveMaxFlatVel(vehicle)/ext.GetGearRatios(vehicle)[vehData.CurrGear]);
+	if (controls.ClutchVal < 1.0f - settings.StallingThreshold &&
+		vehData.Rpm < 0.2125f &&
+		avgWheelSpeed < stallSpeed &&
 		VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
 		stallingProgress += (rand() % 1000) / (stallingRateDivisor * (controls.ThrottleVal+0.001f) * timeStep);
 	}
-	else {
-		if (stallingProgress > 0.0f) {
-			stallingProgress -= (rand() % 1000) / (stallingRateDivisor * (controls.ThrottleVal + 0.001f) * timeStep);
-		}
+	else if (stallingProgress > 0.0f) {
+		stallingProgress -= (rand() % 1000) / (stallingRateDivisor * (controls.ThrottleVal + 0.001f) * timeStep);
 	}
+
 	if (stallingProgress > 1.0f) {
 		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
 		gearRattle.Stop();
@@ -1282,9 +1280,9 @@ void functionEngStall() {
 		if (settings.DisplayInfo)
 			showNotification("Your car has stalled.");
 	}
-	//showText(0.1, 0.1, 1.0, ("Stall progress:" + std::to_string(stallingProgress)), 0, solidWhite, true);
-	// todo: add engine startup when wheels roll + clutch
-	// not sure if this is already in the game in some sorts
+	//showText(0.1, 0.1, 1.0, "Stall progress: " + std::to_string(stallingProgress));
+	//showText(0.1, 0.2, 1.0, "Stall speed: " + std::to_string(stallSpeed));
+	//showText(0.1, 0.3, 1.0, "Actual speed: " + std::to_string(avgWheelSpeed));
 }
 
 void functionEngDamage() {

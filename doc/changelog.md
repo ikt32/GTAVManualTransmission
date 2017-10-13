@@ -5,6 +5,7 @@ No config changes
 
 Changes:  
 * Fix wheel ffb not resetting after exiting car while effect is active
+* Fix engine stalling parameters
 
 ## 4.3.10
 No config changes
