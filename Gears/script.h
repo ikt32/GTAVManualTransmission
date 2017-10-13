@@ -13,6 +13,7 @@ http://dev-c.com
 #endif
 
 #include <string>
+#include <vector>
 const std::string mtDir = "\\ManualTransmission";
 
 class VehicleData;
@@ -164,3 +165,8 @@ void updateSteeringMultiplier();
 
 void menuInit();
 void menuClose();
+
+///////////////////////////////////////////////////////////////////////////////
+//                        Script-specific utils
+///////////////////////////////////////////////////////////////////////////////
+std::vector<float> getDrivenWheelsSpeeds(std::vector<float> wheelSpeeds);

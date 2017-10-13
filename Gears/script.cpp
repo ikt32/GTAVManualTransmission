@@ -1088,19 +1088,13 @@ void functionAShift() { // Automatic
 		}
 	}
 
-	float dashms = ext.GetDashSpeed(vehicle);
-	if (!vehData.HasSpeedo && dashms > 0.1f) {
-		vehData.HasSpeedo = true;
-	}
-	if (!vehData.HasSpeedo) {
-		dashms = abs(vehData.Velocity);
-	}
+	float currSpeed = avg(getDrivenWheelsSpeeds(ext.GetTyreSpeeds(vehicle)));
 
 	// Shift up
 	if (vehData.CurrGear > 0 &&
 		(vehData.CurrGear < vehData.NextGear && vehData.Speed > 2.0f)) {
-		if (dashms > upshiftSpeeds[vehData.CurrGear])
-			upshiftSpeeds[vehData.CurrGear] = dashms;
+		if (currSpeed > upshiftSpeeds[vehData.CurrGear])
+			upshiftSpeeds[vehData.CurrGear] = currSpeed;
 
 		shiftTo(vehData.CurrGear + 1, true);
 		vehData.SimulatedNeutral = false;
@@ -1113,7 +1107,7 @@ void functionAShift() { // Automatic
 			float shiftSpeedG1 = ext.GetInitialDriveMaxFlatVel(vehicle) / ratios[1];
 			float speedOffset = 0.25f * shiftSpeedG1 * (1.0f - controls.ThrottleVal);
 			float downshiftSpeed = shiftSpeedG1 - 0.25f * shiftSpeedG1 - speedOffset;
-			if (dashms < downshiftSpeed) {
+			if (currSpeed < downshiftSpeed) {
 				shiftTo(1, true);
 				vehData.NextGear = 1;
 				vehData.SimulatedNeutral = false;
@@ -1121,7 +1115,7 @@ void functionAShift() { // Automatic
 		}
 		else {
 			float prevGearRedline = ext.GetDriveMaxFlatVel(vehicle) / ratios[vehData.CurrGear - 1];
-			float velDiff = prevGearRedline - dashms;
+			float velDiff = prevGearRedline - currSpeed;
 			if (velDiff > 8.0f + 7.0f*(0.5f - controls.ThrottleVal)) {
 				shiftTo(vehData.CurrGear - 1, true);
 				vehData.NextGear = vehData.CurrGear - 1;
@@ -1263,6 +1257,7 @@ void functionEngStall() {
 	float timeStep = SYSTEM::TIMESTEP() * 100.0f;
 	float avgWheelSpeed = abs(avg(getDrivenWheelsSpeeds(ext.GetTyreSpeeds(vehicle))));
 	float stallSpeed = 0.16f * abs(ext.GetDriveMaxFlatVel(vehicle)/ext.GetGearRatios(vehicle)[vehData.CurrGear]);
+
 	if (controls.ClutchVal < 1.0f - settings.StallingThreshold &&
 		vehData.Rpm < 0.2125f &&
 		avgWheelSpeed < stallSpeed &&
@@ -1283,6 +1278,13 @@ void functionEngStall() {
 	//showText(0.1, 0.1, 1.0, "Stall progress: " + std::to_string(stallingProgress));
 	//showText(0.1, 0.2, 1.0, "Stall speed: " + std::to_string(stallSpeed));
 	//showText(0.1, 0.3, 1.0, "Actual speed: " + std::to_string(avgWheelSpeed));
+
+	// Simulate push-start
+	// We'll just assume the ignition thing is in the "on" position.
+	if (avgWheelSpeed > stallSpeed && !VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
+		controls.ClutchVal < 1.0f - settings.StallingThreshold) {
+		VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, true, true);
+	}
 }
 
 void functionEngDamage() {
@@ -1368,6 +1370,10 @@ void functionEngLock() {
 	// can be used to figure out the max speed for that gear.
 	// Beware though as this might be different for trucks. Haven't checked it yet!
 
+
+	//float dashms = avg(getDrivenWheelsSpeeds(ext.GetTyreSpeeds(vehicle)));
+	// We'll be using the speeds the vehicle travels at (if the wheels didn't stop),
+	// so dashms is more suitable than driven wheels speed
 	float dashms = ext.GetDashSpeed(vehicle);
 	if (!vehData.HasSpeedo && dashms > 0.1f) {
 		vehData.HasSpeedo = true;
@@ -1375,6 +1381,7 @@ void functionEngLock() {
 	if (!vehData.HasSpeedo) {
 		dashms = abs(vehData.Velocity);
 	}
+
 
 	float speed = dashms;
 	auto ratios = ext.GetGearRatios(vehicle);
@@ -1418,7 +1425,7 @@ void functionEngLock() {
 		if (settings.EngDamage) {
 			VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
 				vehicle,
-				VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.EngDamage);
+				VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.MisshiftDamage);
 		}
 		if (settings.DisplayInfo) {
 			showText(0.5, 0.45, 0.5, "Eng block @ " + std::to_string(static_cast<int>(inputMultiplier * 100.0f)) + "%");
