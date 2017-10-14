@@ -61,7 +61,7 @@ void drawInputWheelInfo();
 
 void initialize();
 void reset();
-void applySteeringMultiplier();
+void applySteeringMultiplier(float multiplier);
 void resetSteeringMultiplier();
 void toggleManual();
 void initWheel();

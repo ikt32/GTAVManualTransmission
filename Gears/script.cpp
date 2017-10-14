@@ -124,6 +124,8 @@ void update() {
 		crossScriptUpdated();
 	}
 
+	updateSteeringMultiplier();
+
 	///////////////////////////////////////////////////////////////////////////
 	//                                   HUD
 	///////////////////////////////////////////////////////////////////////////
@@ -758,7 +760,7 @@ void initSteeringPatches() {
 		if (!MemoryPatcher::SteeringPatched && settings.PatchSteering) {
 			MemoryPatcher::PatchSteeringCorrection();
 		}
-		applySteeringMultiplier();
+		//applySteeringMultiplier();
 	}
 	else {
 		if (MemoryPatcher::SteeringPatched && settings.PatchSteering && !settings.PatchSteeringAlways) {
@@ -778,10 +780,36 @@ void initSteeringPatches() {
 	}
 }
 
-void applySteeringMultiplier() {
+void applySteeringMultiplier(float multiplier) {
 	if (vehicle != 0) {
-		ext.SetSteeringMultiplier(vehicle, settings.GameSteerMult);
+		ext.SetSteeringMultiplier(vehicle, multiplier);
 	}
+}
+
+void updateSteeringMultiplier() {
+	if (!MemoryPatcher::SteeringPatched)
+		return;
+
+	float mult = 1;
+
+	Vector3 vel = ENTITY::GET_ENTITY_VELOCITY(vehicle);
+	Vector3 pos = ENTITY::GET_ENTITY_COORDS(vehicle, 1);
+	Vector3 motion = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, pos.x + vel.x, pos.y + vel.y, pos.z + vel.z);
+
+	if (motion.y > 3) {
+		mult = (0.15 + (pow((1 / 1.13), (abs(motion.y) - 7.2))));
+		if (mult != 0) { mult = floorf(mult * 1000) / 1000; }
+		if (mult > 1) { mult = 1; }
+	}
+
+	if (controls.PrevInput == ScriptControls::Wheel) {
+		mult = (1 + (mult - 1) * settings.SteeringReductionWheel) * settings.GameSteerMultWheel;
+	}
+	else {
+		mult = (1 + (mult - 1) * settings.SteeringReductionOther) * settings.GameSteerMultOther;
+	}
+
+	applySteeringMultiplier(mult);
 }
 
 void resetSteeringMultiplier() {
@@ -826,9 +854,9 @@ void updateLastInputDevice() {
 	}
 }
 
-void updateSteeringMultiplier() {
-	ext.SetSteeringMultiplier(vehicle, settings.GameSteerMult);
-}
+//void updateSteeringMultiplier() {
+//	ext.SetSteeringMultiplier(vehicle, settings.GameSteerMultWheel);
+//}
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Mod functions: Shifting

@@ -171,6 +171,12 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 	settingsWheel.SetBoolValue("OPTIONS", "InvertBrake", scriptControl->InvertBrake);
 	settingsWheel.SetBoolValue("OPTIONS", "InvertClutch", scriptControl->InvertClutch);
 
+	settingsWheel.SetDoubleValue("OPTIONS", "SteeringReductionWheel", SteeringReductionWheel);
+	settingsWheel.SetDoubleValue("OPTIONS", "GameSteerMultWheel", GameSteerMultWheel);
+	
+	settingsWheel.SetDoubleValue("OPTIONS", "SteeringReductionOther", SteeringReductionOther);
+	settingsWheel.SetDoubleValue("OPTIONS", "GameSteerMultOther", GameSteerMultOther);
+
 	// [FORCE_FEEDBACK]
 	settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Enable", EnableFFB);
 	settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "GlobalMult", FFGlobalMult);
@@ -186,7 +192,6 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 	settingsWheel.SetDoubleValue("STEER", "SteerAngleCar", SteerAngleCar );
 	settingsWheel.SetDoubleValue("STEER", "SteerAngleBike",SteerAngleBike);
 	settingsWheel.SetDoubleValue("STEER", "SteerAngleBoat", SteerAngleBoat);
-	settingsWheel.SetDoubleValue("STEER", "GameSteerMult", GameSteerMult );
 
 	// [THROTTLE]
 	settingsWheel.SetDoubleValue("THROTTLE", "ANTIDEADZONE", scriptControl->ADZThrottle);
@@ -397,6 +402,12 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	LogiLEDs = settingsWheel.GetBoolValue("OPTIONS", "LogitechLEDs", false);
 	HPatternKeyboard = settingsWheel.GetBoolValue("OPTIONS", "HPatternKeyboard", false);
 
+	SteeringReductionWheel = settingsWheel.GetDoubleValue("OPTIONS", "SteeringReductionWheel", 0.0);
+	GameSteerMultWheel = settingsWheel.GetDoubleValue("OPTIONS", "GameSteerMultWheel", 1.0);
+
+	SteeringReductionOther = settingsWheel.GetDoubleValue("OPTIONS", "SteeringReductionOther", 0.0);
+	GameSteerMultWheel = settingsWheel.GetDoubleValue("OPTIONS", "GameSteerMultOther", 1.0);
+
 	scriptControl->InvertSteer =	settingsWheel.GetBoolValue("OPTIONS", "InvertSteer", false);
 	scriptControl->InvertThrottle = settingsWheel.GetBoolValue("OPTIONS", "InvertThrottle", false);
 	scriptControl->InvertBrake =	settingsWheel.GetBoolValue("OPTIONS", "InvertBrake", false);
@@ -481,8 +492,6 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	SteerAngleCar = settingsWheel.GetDoubleValue("STEER", "SteerAngleCar", 720.0);
 	SteerAngleBike = settingsWheel.GetDoubleValue("STEER", "SteerAngleBike", 180.0);
 	SteerAngleBoat = settingsWheel.GetDoubleValue("STEER", "SteerAngleBoat", 360.0);
-
-	GameSteerMult = settingsWheel.GetDoubleValue("STEER", "GameSteerMult", 1.0);
 
 	// [THROTTLE]
 	scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Throttle)] =

@@ -115,6 +115,7 @@ public:
 	float PedalInfoPadY			 = 0.0f;
 
 	// [CONTROLLER]
+	bool BlockCarControls = false;
 	bool ToggleEngine = false;
 
 	// [DEBUG]
@@ -133,7 +134,9 @@ public:
 	bool PatchSteeringControl = false;
 	bool LogiLEDs = false;
 	bool HPatternKeyboard = false;
-	bool BlockCarControls = false;
+	float SteeringReductionWheel = 0.0f;
+	float SteeringReductionOther = 0.0f;
+
 
 	// [FORCE_FEEDBACK]
 	bool EnableFFB = true;
@@ -149,9 +152,8 @@ public:
 	float SteerAngleCar = 720.0f;
 	float SteerAngleBike = 180.0f;
 	float SteerAngleBoat = 360.0f;
-	float GameSteerMult = 1.0f;
-
-
+	float GameSteerMultWheel = 1.0f;
+	float GameSteerMultOther = 1.0f;
 
 	// Methods
 	/*
