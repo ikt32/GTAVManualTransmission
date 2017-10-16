@@ -406,7 +406,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	GameSteerMultWheel = settingsWheel.GetDoubleValue("OPTIONS", "GameSteerMultWheel", 1.0);
 
 	SteeringReductionOther = settingsWheel.GetDoubleValue("OPTIONS", "SteeringReductionOther", 0.0);
-	GameSteerMultWheel = settingsWheel.GetDoubleValue("OPTIONS", "GameSteerMultOther", 1.0);
+	GameSteerMultOther = settingsWheel.GetDoubleValue("OPTIONS", "GameSteerMultOther", 1.0);
 
 	scriptControl->InvertSteer =	settingsWheel.GetBoolValue("OPTIONS", "InvertSteer", false);
 	scriptControl->InvertThrottle = settingsWheel.GetBoolValue("OPTIONS", "InvertThrottle", false);
