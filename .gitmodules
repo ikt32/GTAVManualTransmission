@@ -1,0 +1,3 @@
+[submodule "thirdparty/MiniPID"]
+	path = thirdparty/MiniPID
+	url = https://github.com/tekdemo/MiniPID
