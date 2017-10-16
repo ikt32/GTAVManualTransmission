@@ -175,6 +175,8 @@ void menuClose() {
 	settings.SaveController(&controls);
 }
 
+extern int useNew;
+
 void update_menu() {
 	menu.CheckKeys();
 
@@ -182,6 +184,8 @@ void update_menu() {
 	if (menu.CurrentMenu("mainmenu")) {
 		menu.Title("Manual Transmission", 0.90f);
 		menu.Subtitle(std::string("~b~") + DISPLAY_VERSION);
+
+		menu.IntOption("New ffb", useNew, 0, 2, 1);
 
 		bool tempEnableRead = settings.EnableManual;
 

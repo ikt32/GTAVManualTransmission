@@ -25,6 +25,7 @@
 #include "Util/MathExt.h"
 #include "ShiftModes.h"
 #include "Memory/Offsets.hpp"
+#include "MiniPID/MiniPID.h"
 std::array<float, 8> upshiftSpeeds{};
 
 std::string textureWheelFile;
@@ -60,6 +61,10 @@ bool lookrightfirst = false;
 
 bool engBrakeActive = false;
 bool engLockActive = false;
+
+int useNew = 1;
+
+MiniPID pid(1.0, 0.0, 0.0);
 
 void initVehicle() {
 	reset();
@@ -2250,7 +2255,7 @@ void playFFBGround(bool airborne, bool ignoreSpeed) {
 	// end understeer detect
 
 	// On understeering conditions, lower "grippy" feel
-	GForce = std::min(1.0f, std::max(0.0f, 1.0f - understeer + oversteer)) * GForce;
+	// GForce = std::min(1.0f, std::max(0.0f, 1.0f - understeer + oversteer)) * GForce;
 
 	// Simulate caster instability
 	//if (vehData.Velocity < -0.1f) {
@@ -2269,7 +2274,7 @@ void playFFBGround(bool airborne, bool ignoreSpeed) {
 
 	// Cancel all effects except dampening
 	if (airborne) {
-		GForce = 0.0;
+		//GForce = 0.0;
 		damperForce = settings.DamperMin;
 	}
 
@@ -2279,13 +2284,13 @@ void playFFBGround(bool airborne, bool ignoreSpeed) {
 
 	if (vehData.Class == VehicleData::VehicleClass::Car || vehData.Class == VehicleData::VehicleClass::Quad) {
 		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true) && VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
-			GForce = GForce * 0.1;
+			//GForce = GForce * 0.1;
 			damperForce = settings.DamperMin;
 		}
 	}
 	if (vehData.Class == VehicleData::VehicleClass::Bike) {
 		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
-			GForce = GForce * 0.1;
+			//GForce = GForce * 0.1;
 			damperForce = settings.DamperMin;
 		}
 	}
@@ -2294,10 +2299,42 @@ void playFFBGround(bool airborne, bool ignoreSpeed) {
 		damperForce *= 2;
 	}
 
-	int totalForce = 
-		static_cast<int>(-GForce * 5000 * settings.PhysicsStrength * settings.FFGlobalMult) + // 2G = max force, Koenigsegg One:1 only does 1.7g!
-		static_cast<int>(1000.0f * settings.DetailStrength * compSpeedTotal * settings.FFGlobalMult) +
-		static_cast<int>(steerSpeed * damperForce * 0.1) +
+	Vector3 vel = ENTITY::GET_ENTITY_VELOCITY(vehicle);
+	Vector3 pos = ENTITY::GET_ENTITY_COORDS(vehicle, 1);
+	Vector3 travel = vel + pos;
+	GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, travel.x, travel.y, travel.z, 0, 255, 0, 255);
+
+	float currentSteeringAngle = ext.GetSteeringAngle(vehicle)*ext.GetSteeringMultiplier(vehicle);
+	Vector3 steeringVector = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, vehData.Speed*-sin(currentSteeringAngle), vehData.Speed*cos(currentSteeringAngle), 0.0f);
+	GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, steeringVector.x, steeringVector.y, steeringVector.z, 255, 0, 255, 255);
+	Vector3 relSteer = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, steeringVector.x, steeringVector.y, steeringVector.z);
+	Vector3 relTarget = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, travel.x, travel.y, travel.z);
+	float setp = relTarget.x;
+	showDebugInfo3D(steeringVector, { "* Steering",  std::to_string(relSteer.x) });
+	showDebugInfo3D(travel, { "* Target", std::to_string(relTarget.x) });
+
+	double error = pid.getOutput(relSteer.x, setp);
+	
+	showText(0.1, 0.2, 1.0, "RelSteer:\t" + std::to_string(relSteer.x));
+	showText(0.1, 0.3, 1.0, "SetPoint:\t" + std::to_string(relTarget.x));
+	showText(0.1, 0.4, 1.0, "Error:\t" + std::to_string(error));
+	
+	int bigForce;
+	if (useNew == 0) {
+		bigForce = static_cast<int>(5000 * -GForce);
+	}
+	else if (useNew == 1) {
+		bigForce = static_cast<int>(5000 * -error);
+	}
+	else {
+		bigForce = 0;
+	}
+
+	showText(0.1, 0.5, 1.0, "FFBAmp: " + std::to_string(bigForce));
+
+	int totalForce = bigForce +
+		//static_cast<int>(1000.0f * settings.DetailStrength * compSpeedTotal * settings.FFGlobalMult) +
+		//static_cast<int>(steerSpeed * damperForce * 0.1) +
 		0;
 
 	// Soft lock

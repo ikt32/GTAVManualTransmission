@@ -61,6 +61,9 @@
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="ShiftModes.cpp" />
+    <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp">
+      <Filter>Thirdparty</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -144,6 +147,9 @@
     <ClInclude Include="ShiftModes.h" />
     <ClInclude Include="Memory\Versions.h">
       <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\MiniPID\MiniPID.h">
+      <Filter>Thirdparty</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
