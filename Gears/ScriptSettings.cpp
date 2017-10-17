@@ -183,9 +183,7 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 	settingsWheel.SetLongValue("FORCE_FEEDBACK", "DamperMax", DamperMax);
 	settingsWheel.SetLongValue("FORCE_FEEDBACK", "DamperMin", DamperMin);
 	settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DamperTargetSpeed", TargetSpeed);
-	settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "PhysicsStrength", PhysicsStrength);
 	settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DetailStrength", DetailStrength);
-	settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "FFBAmpMultOld", FFBAmpMultOld);
 	settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "FFBAmpMultNew", FFBAmpMultNew);
 
 	// [STEER]
@@ -421,9 +419,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	DamperMax = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMax", 67);
 	DamperMin = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMin", 12);
 	TargetSpeed = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DamperTargetSpeed", 1.2);
-	PhysicsStrength = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "PhysicsStrength", 1.7);
 	DetailStrength = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DetailStrength", 1.6);
-	FFBAmpMultOld = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "FFBAmpMultOld", 1.0);
 	FFBAmpMultNew = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "FFBAmpMultNew", 1.0);
 
 

@@ -643,6 +643,9 @@ void update_menu() {
 
 		menu.FloatOption("Global multiplier", settings.FFGlobalMult, 0.0f, 10.0f, 1.0f);
 		
+		menu.FloatOption("Self aligning force", settings.FFBAmpMultNew, 0.1f, 2.0f, 0.05f,
+		{ "Force feedback strength for steering." });
+
 		menu.IntOption("Damper Max (low speed)", settings.DamperMax, 0, 200, 1, 
 		{ "Wheel friction at low speed." });
 		
@@ -651,12 +654,6 @@ void update_menu() {
 		
 		menu.FloatOption("Damper end speed", settings.TargetSpeed, 0.0f, 40.0f, 0.2f,
 		{ "Speed at which the damper strength should be minimal.", "In m/s." });
-		
-		menu.FloatOption("Physics strength", settings.PhysicsStrength, 0.0f, 10.0f, 0.1f,
-		{ "Force feedback effect strength by physics events like cornering and collisions." });
-
-		// TODO: Things
-		menu.FloatOption("New ffb gain mult", settings.FFBAmpMultNew, 0.1f, 2.0f, 0.05f);
 		
 		menu.FloatOption("Detail strength", settings.DetailStrength, 0.0f, 10.0f, 0.1f,
 		{ "Force feedback effect strength by suspension events due to finer road details." });
