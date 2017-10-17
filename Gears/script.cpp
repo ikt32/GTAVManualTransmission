@@ -2154,8 +2154,6 @@ void playFFBAir() {
 }
 
 int calculateDamper() {
-	// TODO: Jam getAccelVectors calc inside update and just return... things
-	Vector3 accel = vehData.getAccelerationVectors(vehData.V3Velocities);
 	Vector3 accelValsAvg = vehData.getAccelerationVectorsAverage();
 	
 	// targetSpeed is the speed at which the damperForce is at minimum
@@ -2174,7 +2172,7 @@ int calculateDamper() {
 	auto steerAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(controls.SteerAxisType)]);
 	auto steerSpeed = controls.WheelControl.GetAxisSpeed(steerAxis, controls.SteerGUID) / 20;
 
-	damperForce = steerSpeed * damperForce * 0.1;
+	damperForce = (int)(steerSpeed * damperForce * 0.1);
 	return damperForce;
 }
 
@@ -2260,24 +2258,24 @@ void playFFBGround(bool airborne) {
 	float understeer = sgn(travelRelative.x - steeringAngleRelX) * (turnRelativeNormX - steeringAngleRelX);
 	if (steeringAngleRelX > turnRelativeNormX && turnRelativeNormX > travelRelative.x ||
 		steeringAngleRelX < turnRelativeNormX && turnRelativeNormX < travelRelative.x) {
-		satForce = satForce / std::max(1.0f, understeer + 1.0f);
+		satForce = (int)((float)satForce / std::max(1.0f, understeer + 1.0f));
 		under_ = true;
 	}
 
 	if (airborne) {
-		satForce = 0.0;
+		satForce = 0;
 		damperForce = settings.DamperMin;
 	}
 
 	if (vehData.Class == VehicleData::VehicleClass::Car || vehData.Class == VehicleData::VehicleClass::Quad) {
 		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true) && VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
-			satForce = satForce * 0.1;
+			satForce = satForce / 10;
 			damperForce = settings.DamperMin;
 		}
 	}
 	else if (vehData.Class == VehicleData::VehicleClass::Bike) {
 		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
-			satForce = satForce * 0.1;
+			satForce = satForce / 10;
 			damperForce = settings.DamperMin;
 		}
 	}
