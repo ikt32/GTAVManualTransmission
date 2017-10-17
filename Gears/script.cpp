@@ -802,7 +802,7 @@ void updateSteeringMultiplier() {
 	Vector3 motion = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, pos.x + vel.x, pos.y + vel.y, pos.z + vel.z);
 
 	if (motion.y > 3) {
-		mult = (0.15 + (pow((1 / 1.13), (abs(motion.y) - 7.2))));
+		mult = (0.15f + (powf((1.0f / 1.13f), (abs(motion.y) - 7.2f))));
 		if (mult != 0) { mult = floorf(mult * 1000) / 1000; }
 		if (mult > 1) { mult = 1; }
 	}
@@ -2304,11 +2304,19 @@ void playFFBGround(bool airborne, bool ignoreSpeed) {
 	Vector3 travel = vel + pos;
 	GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, travel.x, travel.y, travel.z, 0, 255, 0, 255);
 
+	Vector3 directionVector = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, vehData.Speed*-sin(vehData.RotationVelocity.z), vehData.Speed*cos(vehData.RotationVelocity.z), 0.0f);
+	Vector3 directionVecRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, directionVector.x, directionVector.y, directionVector.z);
+	Vector3 relTarget = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, travel.x, travel.y, travel.z);
+	Vector3 directionVecNormalized = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, (relTarget.x + directionVecRel.x) / 2.0f, (relTarget.y + directionVecRel.y) / 2.0f, 0.0f);
+	GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, directionVecNormalized.x, directionVecNormalized.y, directionVecNormalized.z, 255, 0, 0, 255);
+
 	float currentSteeringAngle = ext.GetSteeringAngle(vehicle)*ext.GetSteeringMultiplier(vehicle);
 	Vector3 steeringVector = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, vehData.Speed*-sin(currentSteeringAngle), vehData.Speed*cos(currentSteeringAngle), 0.0f);
 	GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, steeringVector.x, steeringVector.y, steeringVector.z, 255, 0, 255, 255);
+	
+	bool under = false;
+	
 	Vector3 relSteer = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, steeringVector.x, steeringVector.y, steeringVector.z);
-	Vector3 relTarget = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, travel.x, travel.y, travel.z);
 	float setp = relTarget.x;
 
 	double error = pid.getOutput(relSteer.x, setp);
@@ -2336,6 +2344,7 @@ void playFFBGround(bool airborne, bool ignoreSpeed) {
 	}
 
 	showText(0.1, 0.20, 0.5, std::string(red ? "~r~" : "~w~") + "FFBAmp:\t" + std::to_string(bigForce) + "~w~");
+	
 	red = false;
 	int totalForce = bigForce +
 		static_cast<int>(1000.0f * settings.DetailStrength * compSpeedTotal * settings.FFGlobalMult) +
@@ -2349,7 +2358,11 @@ void playFFBGround(bool airborne, bool ignoreSpeed) {
 		red = true;
 	}
 
-	showText(0.1, 0.25, .5, std::string(red ? "~r~" : "~w~") + "FFBFin:\t" + std::to_string(totalForce) + "~w~");
+	showText(0.1, 0.25, 0.5, std::string(red ? "~r~" : "~w~") + "FFBFin:\t" + std::to_string(totalForce) + "~w~");
+
+	float understeer_ = sgn(relTarget.x - vehData.Speed*-sin(currentSteeringAngle)) * (((relTarget.x + directionVecRel.x) / 2.0f) - (vehData.Speed*-sin(currentSteeringAngle)));
+	if (understeer_ > 0.0f) under = true;
+	showText(0.1, 0.30, 0.5, std::string(under ? "~b~" : "~w~") + "Under:\t" + std::to_string(understeer_) + "~w~");
 
 	// Soft lock
 	if (effSteer > 1.0f) {
