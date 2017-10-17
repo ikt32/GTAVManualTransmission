@@ -146,6 +146,8 @@ public:
 	float TargetSpeed = 1.2f; // TargetSpeed in m/s
 	float PhysicsStrength = 1.0f;
 	float DetailStrength = 100.0f;
+	float FFBAmpMultNew = 1.0f;
+	float FFBAmpMultOld = 1.0f;
 
 	// [STEER]
 	float SteerAngleMax = 900.0f;

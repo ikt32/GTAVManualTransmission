@@ -2193,7 +2193,7 @@ void playFFBGround(bool airborne, bool ignoreSpeed) {
 		controls.WheelControl.PlayLedsDInput(controls.SteerGUID, vehData.Rpm, 0.45, 0.95);
 	}
 
-	vehData.getAccelerationVectors(vehData.V3Velocities);
+	Vector3 accel = vehData.getAccelerationVectors(vehData.V3Velocities);
 	Vector3 accelValsAvg = vehData.getAccelerationVectorsAverage();
 
 	float steerMult;
@@ -2310,32 +2310,46 @@ void playFFBGround(bool airborne, bool ignoreSpeed) {
 	Vector3 relSteer = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, steeringVector.x, steeringVector.y, steeringVector.z);
 	Vector3 relTarget = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, travel.x, travel.y, travel.z);
 	float setp = relTarget.x;
-	showDebugInfo3D(steeringVector, { "* Steering",  std::to_string(relSteer.x) });
-	showDebugInfo3D(travel, { "* Target", std::to_string(relTarget.x) });
 
 	double error = pid.getOutput(relSteer.x, setp);
 	
-	showText(0.1, 0.2, 1.0, "RelSteer:\t" + std::to_string(relSteer.x));
-	showText(0.1, 0.3, 1.0, "SetPoint:\t" + std::to_string(relTarget.x));
-	showText(0.1, 0.4, 1.0, "Error:\t" + std::to_string(error));
+	showText(0.1, 0.05, 0.5, "RelSteer:\t" + std::to_string(relSteer.x));
+	showText(0.1, 0.10, 0.5, "SetPoint:\t" + std::to_string(relTarget.x));
+	showText(0.1, 0.15, 0.5, "Error:\t" + std::to_string(error));
 	
 	int bigForce;
 	if (useNew == 0) {
-		bigForce = static_cast<int>(5000 * -GForce);
+		bigForce = static_cast<int>(settings.FFBAmpMultOld * 5000 * -GForce);
 	}
 	else if (useNew == 1) {
-		bigForce = static_cast<int>(5000 * -error);
+		bigForce = static_cast<int>(settings.FFBAmpMultNew * 2500 * -error);
 	}
 	else {
 		bigForce = 0;
 	}
+	bool red = false;
+	if (bigForce > 10000) {
+		red = true;
+	}
+	if (bigForce < -10000) {
+		red = true;
+	}
 
-	showText(0.1, 0.5, 1.0, "FFBAmp: " + std::to_string(bigForce));
-
+	showText(0.1, 0.20, 0.5, std::string(red ? "~r~" : "~w~") + "FFBAmp:\t" + std::to_string(bigForce) + "~w~");
+	red = false;
 	int totalForce = bigForce +
-		//static_cast<int>(1000.0f * settings.DetailStrength * compSpeedTotal * settings.FFGlobalMult) +
-		//static_cast<int>(steerSpeed * damperForce * 0.1) +
+		static_cast<int>(1000.0f * settings.DetailStrength * compSpeedTotal * settings.FFGlobalMult) +
+		static_cast<int>(steerSpeed * damperForce * 0.1) +
 		0;
+
+	if (totalForce > 10000) {
+		red = true;
+	}
+	if (totalForce < -10000) {
+		red = true;
+	}
+
+	showText(0.1, 0.25, .5, std::string(red ? "~r~" : "~w~") + "FFBFin:\t" + std::to_string(totalForce) + "~w~");
 
 	// Soft lock
 	if (effSteer > 1.0f) {

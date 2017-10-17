@@ -185,7 +185,12 @@ void update_menu() {
 		menu.Title("Manual Transmission", 0.90f);
 		menu.Subtitle(std::string("~b~") + DISPLAY_VERSION);
 
-		menu.IntOption("New ffb", useNew, 0, 2, 1);
+		menu.IntOption("New ffb", useNew, 0, 2, 1, 
+		{"0: Old","1: New", "2: Off"});
+
+		menu.FloatOption("Old ffb gain mult", settings.FFBAmpMultOld , 0.1f, 2.0f, 0.05f);
+		menu.FloatOption("New ffb gain mult", settings.FFBAmpMultNew, 0.1f, 2.0f, 0.05f);
+
 
 		bool tempEnableRead = settings.EnableManual;
 
