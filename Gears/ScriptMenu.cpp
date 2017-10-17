@@ -175,8 +175,6 @@ void menuClose() {
 	settings.SaveController(&controls);
 }
 
-extern int useNew;
-
 void update_menu() {
 	menu.CheckKeys();
 
@@ -184,13 +182,6 @@ void update_menu() {
 	if (menu.CurrentMenu("mainmenu")) {
 		menu.Title("Manual Transmission", 0.90f);
 		menu.Subtitle(std::string("~b~") + DISPLAY_VERSION);
-
-		menu.IntOption("New ffb", useNew, 0, 2, 1, 
-		{"0: Old","1: New", "2: Off"});
-
-		menu.FloatOption("Old ffb gain mult", settings.FFBAmpMultOld , 0.1f, 2.0f, 0.05f);
-		menu.FloatOption("New ffb gain mult", settings.FFBAmpMultNew, 0.1f, 2.0f, 0.05f);
-
 
 		bool tempEnableRead = settings.EnableManual;
 
@@ -663,6 +654,9 @@ void update_menu() {
 		
 		menu.FloatOption("Physics strength", settings.PhysicsStrength, 0.0f, 10.0f, 0.1f,
 		{ "Force feedback effect strength by physics events like cornering and collisions." });
+
+		// TODO: Things
+		menu.FloatOption("New ffb gain mult", settings.FFBAmpMultNew, 0.1f, 2.0f, 0.05f);
 		
 		menu.FloatOption("Detail strength", settings.DetailStrength, 0.0f, 10.0f, 0.1f,
 		{ "Force feedback effect strength by suspension events due to finer road details." });

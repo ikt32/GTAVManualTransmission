@@ -62,8 +62,6 @@ bool lookrightfirst = false;
 bool engBrakeActive = false;
 bool engLockActive = false;
 
-int useNew = 1;
-
 MiniPID pid(1.0, 0.0, 0.0);
 
 void initVehicle() {
@@ -168,7 +166,7 @@ void update() {
 			handleVehicleButtons();
 			handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
 			doWheelSteering();
-			playFFBGround(false, true);
+			playFFBGround(false);
 			return;
 		}
 
@@ -416,7 +414,7 @@ void drawSpeedoMeter() {
 
 	showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize, 
 		formatSpeedo(settings.Speedo, dashms, settings.SpeedoShowUnit, settings.HUDFont),
-		settings.HUDFont, solidWhite, true);
+		settings.HUDFont);
 }
 
 void drawShiftModeIndicator() {
@@ -500,16 +498,16 @@ void drawDebugInfo() {
 	ssDashSpd	<< "Speedo:\t" << (vehData.HasSpeedo ? "Yes" : "No");
 	ssDbias		<< "DBias:\t\t" << std::setprecision(3) << vehData.DriveBiasFront;
 
-	showText(0.01f, 0.275f, 0.4f, ssEnabled.str(),	4, solidWhite, true);
-	showText(0.01f, 0.300f, 0.4f, ssRPM.str(),		4, solidWhite, true);
-	showText(0.01f, 0.325f, 0.4f, ssCurrGear.str(),	4, solidWhite, true);
-	showText(0.01f, 0.350f, 0.4f, ssNextGear.str(),	4, solidWhite, true);
-	showText(0.01f, 0.375f, 0.4f, ssClutch.str(),	4, solidWhite, true);
-	showText(0.01f, 0.400f, 0.4f, ssThrottle.str(),	4, solidWhite, true);
-	showText(0.01f, 0.425f, 0.4f, ssTurbo.str(),	4, solidWhite, true);
-	showText(0.01f, 0.450f, 0.4f, ssAddress.str(),	4, solidWhite, true);
-	showText(0.01f, 0.475f, 0.4f, ssDashSpd.str(),	4, solidWhite, true);
-	showText(0.01f, 0.500f, 0.4f, ssDbias.str(),	4, solidWhite, true);
+	showText(0.01f, 0.275f, 0.4f, ssEnabled.str(),	4);
+	showText(0.01f, 0.300f, 0.4f, ssRPM.str(),		4);
+	showText(0.01f, 0.325f, 0.4f, ssCurrGear.str(),	4);
+	showText(0.01f, 0.350f, 0.4f, ssNextGear.str(),	4);
+	showText(0.01f, 0.375f, 0.4f, ssClutch.str(),	4);
+	showText(0.01f, 0.400f, 0.4f, ssThrottle.str(),	4);
+	showText(0.01f, 0.425f, 0.4f, ssTurbo.str(),	4);
+	showText(0.01f, 0.450f, 0.4f, ssAddress.str(),	4);
+	showText(0.01f, 0.475f, 0.4f, ssDashSpd.str(),	4);
+	showText(0.01f, 0.500f, 0.4f, ssDbias.str(),	4);
 
 	std::stringstream ssThrottleInput;
 	std::stringstream ssBrakeInput;
@@ -521,15 +519,15 @@ void drawDebugInfo() {
 	ssClutchInput	<< "Clutch:\t\t" << controls.ClutchValRaw;
 	ssHandbrakInput << "Handb:\t\t" << controls.HandbrakeVal;
 
-	showText(0.85, 0.050, 0.4, ssThrottleInput.str(),	4, solidWhite, true);
-	showText(0.85, 0.075, 0.4, ssBrakeInput.str(),		4, solidWhite, true);
-	showText(0.85, 0.100, 0.4, ssClutchInput.str(),		4, solidWhite, true);
-	showText(0.85, 0.125, 0.4, ssHandbrakInput.str(),	4, solidWhite, true);
+	showText(0.85, 0.050, 0.4, ssThrottleInput.str(),	4);
+	showText(0.85, 0.075, 0.4, ssBrakeInput.str(),		4);
+	showText(0.85, 0.100, 0.4, ssClutchInput.str(),		4);
+	showText(0.85, 0.125, 0.4, ssHandbrakInput.str(),	4);
 
 	if (settings.EnableWheel) {
 		std::stringstream dinputDisplay;
 		dinputDisplay << "Wheel" << (controls.WheelControl.IsConnected(controls.SteerGUID) ? "" : " not") << " present";
-		showText(0.85, 0.150, 0.4, dinputDisplay.str(), 4, solidWhite, true);
+		showText(0.85, 0.150, 0.4, dinputDisplay.str(), 4);
 	}
 
 	if (settings.EnableManual && settings.DisplayGearingInfo) {
@@ -569,33 +567,6 @@ void drawDebugInfo() {
 
 		
 	}
-}
-
-void showDebugInfoWheel(ScriptSettings &settings, float effSteer, int damperForce, float steerSpeed, double GForce, float oversteer, float understeer) {
-	std::stringstream SteerRaw;
-	std::stringstream SteerNorm;
-	std::stringstream steerDisplay;
-	std::stringstream GForceDisplay;
-	std::stringstream damperF;
-	std::stringstream ssUnderSteer;
-	std::stringstream ssOverSteer;
-	
-	SteerRaw		<< "SteerRaw:\t" << controls.SteerVal;
-	SteerNorm		<< "SteerNorm:\t" << effSteer;
-	steerDisplay	<< "SteerSpeed:\t" << steerSpeed;
-	GForceDisplay	<< "GForceFinal:\t" <<
-		std::setprecision(5) << (-GForce * 5000 * settings.PhysicsStrength * settings.FFGlobalMult);
-	damperF			<< "DampForce:\t" << steerSpeed * damperForce * 0.1;
-	ssUnderSteer	<< "Understeer:\t" << understeer;
-	ssOverSteer		<< "Oversteer:\t" << oversteer;
-
-	showText(0.85, 0.175, 0.4, SteerRaw.str(),		4, solidWhite, true);
-	showText(0.85, 0.200, 0.4, SteerNorm.str(),		4, solidWhite, true);
-	showText(0.85, 0.225, 0.4, steerDisplay.str(),	4, solidWhite, true);
-	showText(0.85, 0.250, 0.4, GForceDisplay.str(),	4, solidWhite, true);
-	showText(0.85, 0.275, 0.4, damperF.str(),		4, solidWhite, true);
-	showText(0.85, 0.300, 0.4, ssUnderSteer.str(),	4, solidWhite, true);
-	showText(0.85, 0.325, 0.4, ssOverSteer.str(),	4, solidWhite, true);
 }
 
 void drawInputWheelInfo() {
@@ -2182,29 +2153,10 @@ void playFFBAir() {
 	// Stick ffb?
 }
 
-void playFFBGround(bool airborne, bool ignoreSpeed) {
-	if (!settings.EnableFFB ||
-		controls.PrevInput != ScriptControls::Wheel ||
-		!controls.WheelControl.IsConnected(controls.SteerGUID)) {
-		return;
-	}
-
-	if (settings.LogiLEDs) {
-		controls.WheelControl.PlayLedsDInput(controls.SteerGUID, vehData.Rpm, 0.45, 0.95);
-	}
-
+int calculateDamper() {
+	// TODO: Jam getAccelVectors calc inside update and just return... things
 	Vector3 accel = vehData.getAccelerationVectors(vehData.V3Velocities);
 	Vector3 accelValsAvg = vehData.getAccelerationVectorsAverage();
-
-	float steerMult;
-	if (vehData.Class == VehicleData::VehicleClass::Bike || vehData.Class == VehicleData::VehicleClass::Quad)
-		steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
-	else if (vehData.Class == VehicleData::VehicleClass::Car)
-		steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
-	else {
-		steerMult = settings.SteerAngleMax / settings.SteerAngleBoat;
-	}
-	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 	
 	// targetSpeed is the speed at which the damperForce is at minimum
 	// damperForce is maximum at speed 0 and decreases with speed increase
@@ -2222,41 +2174,11 @@ void playFFBGround(bool airborne, bool ignoreSpeed) {
 	auto steerAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(controls.SteerAxisType)]);
 	auto steerSpeed = controls.WheelControl.GetAxisSpeed(steerAxis, controls.SteerGUID) / 20;
 
-	/*                    a                                        v^2
-	 * Because G Force = ---- and a = v * omega, verified with a = ---   using a speedo and 
-	 *                   9.81                                       r    r = ypg205t16a length
-	 * No need to crappily emulate centering any more.
-	 * Do: Find something for self-aligning torque
-	 */
-	double GForce = (vehData.RotationVelocity.z * vehData.Velocity) / 9.81f;
+	damperForce = steerSpeed * damperForce * 0.1;
+	return damperForce;
+}
 
-	// Oversteer  - when rear  wheels are outside the turning radius
-	// Understeer - when front wheels are more angled than turning radius
-	// Neutral    - both front rear   are tracking true
-
-	// start oversteer detect
-	float oversteer = 0.0f;
-	
-	float angle = acos(vehData.Velocity / vehData.Speed)* 180.0f / 3.14159265f;
-	if (isnan(angle))
-		angle = 0.0;
-
-	if (angle > 10 && vehData.Velocity > 1.0f) {
-		oversteer = std::min(1.0f, angle/90.0f);
-	}
-	// end oversteer detect
-
-	// begin understeer detect
-	float understeer = 0.0f;
-	if (abs(vehData.SteeringAngle*std::sqrt(vehData.Velocity)) > abs(vehData.RotationVelocity.z) &&
-		vehData.Velocity > 0.1f) {
-		understeer = std::min(1.0f, abs(vehData.SteeringAngle*sqrt(vehData.Velocity) - vehData.RotationVelocity.z));
-	}
-	// end understeer detect
-
-	// On understeering conditions, lower "grippy" feel
-	GForce = std::min(1.0f, std::max(0.0f, 1.0f - understeer + oversteer)) * GForce;
-
+int calculateDetail() {
 	// Detail feel / suspension compression based
 	float compSpeedTotal = 0.0f;
 	auto compSpeed = vehData.GetWheelCompressionSpeeds();
@@ -2267,109 +2189,20 @@ void playFFBGround(bool airborne, bool ignoreSpeed) {
 		compSpeedTotal = -compSpeed[0] + compSpeed[1];
 	}
 
-	// Cancel all effects except dampening
-	if (airborne) {
-		//GForce = 0.0;
-		damperForce = settings.DamperMin;
-	}
+	return static_cast<int>(1000.0f * settings.DetailStrength * compSpeedTotal * settings.FFGlobalMult);
+}
 
-	if (ignoreSpeed) {
-		damperForce = settings.DamperMin;
-	}
-
-	if (vehData.Class == VehicleData::VehicleClass::Car || vehData.Class == VehicleData::VehicleClass::Quad) {
-		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true) && VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
-			//GForce = GForce * 0.1;
-			damperForce = settings.DamperMin;
-		}
-	}
-	if (vehData.Class == VehicleData::VehicleClass::Bike) {
-		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
-			//GForce = GForce * 0.1;
-			damperForce = settings.DamperMin;
-		}
-	}
-
-	if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
-		damperForce *= 2;
-	}
-
-	Vector3 vel = ENTITY::GET_ENTITY_VELOCITY(vehicle);
-	Vector3 pos = ENTITY::GET_ENTITY_COORDS(vehicle, 1);
-	Vector3 travel = vel + pos;
-	GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, travel.x, travel.y, travel.z, 0, 255, 0, 255);
-
-	Vector3 directionVector = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, vehData.Speed*-sin(vehData.RotationVelocity.z), vehData.Speed*cos(vehData.RotationVelocity.z), 0.0f);
-	Vector3 directionVecRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, directionVector.x, directionVector.y, directionVector.z);
-	Vector3 relTarget = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, travel.x, travel.y, travel.z);
-	float directionNormalizedX = (relTarget.x + directionVecRel.x) / 2.0f;
-	float directionNormalizedY = (relTarget.y + directionVecRel.y) / 2.0f;
-	Vector3 directionVecNormalizedWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, directionNormalizedX, directionNormalizedY, 0.0f);
-	GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, directionVecNormalizedWorld.x, directionVecNormalizedWorld.y, directionVecNormalizedWorld.z, 255, 0, 0, 255);
-
-	float currentSteeringAngle = ext.GetSteeringAngle(vehicle)*ext.GetSteeringMultiplier(vehicle);
-	float steeringAnglePointX = vehData.Speed*-sin(currentSteeringAngle);
-	float steeringAnglePointY = vehData.Speed*cos(currentSteeringAngle);
-	Vector3 steeringVector = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, steeringAnglePointX, steeringAnglePointY, 0.0f);
-	GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, steeringVector.x, steeringVector.y, steeringVector.z, 255, 0, 255, 255);
-	
-	bool under = false;
-	
-	Vector3 relSteer = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, steeringVector.x, steeringVector.y, steeringVector.z);
-	float setp = relTarget.x;
-
-	double error = pid.getOutput(relSteer.x, setp);
-	
-	showText(0.1, 0.05, 0.5, "RelSteer:\t" + std::to_string(relSteer.x));
-	showText(0.1, 0.10, 0.5, "SetPoint:\t" + std::to_string(relTarget.x));
-	showText(0.1, 0.15, 0.5, "Error:\t" + std::to_string(error));
-	
-	int bigForce;
-	if (useNew == 0) {
-		bigForce = static_cast<int>(settings.FFBAmpMultOld * 5000 * -GForce);
-	}
-	else if (useNew == 1) {
-		bigForce = static_cast<int>(settings.FFBAmpMultNew * 2500 * -error);
-	}
+void calculateSoftLock(int &totalForce) {
+	float steerMult;
+	if (vehData.Class == VehicleData::VehicleClass::Bike || vehData.Class == VehicleData::VehicleClass::Quad)
+		steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
+	else if (vehData.Class == VehicleData::VehicleClass::Car)
+		steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
 	else {
-		bigForce = 0;
+		steerMult = settings.SteerAngleMax / settings.SteerAngleBoat;
 	}
-	bool clip = false;
-	if (bigForce > 10000) {
-		clip = true;
-	}
-	if (bigForce < -10000) {
-		clip = true;
-	}
+	float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 
-	showText(0.1, 0.20, 0.5, std::string(clip ? "~r~" : "~w~") + "FFBAmp:\t" + std::to_string(bigForce) + "~w~");
-	
-
-	float understeer_ = sgn(relTarget.x - steeringAnglePointX) * (directionNormalizedX - steeringAnglePointX);
-	if (steeringAnglePointX > directionNormalizedX && directionNormalizedX > relTarget.x ||
-		steeringAnglePointX < directionNormalizedX && directionNormalizedX < relTarget.x) {
-		under = true;
-		bigForce = bigForce / std::max(1.0f, understeer_ + 1.0f);
-	}
-
-	clip = false;
-	int totalForce = bigForce +
-		static_cast<int>(1000.0f * settings.DetailStrength * compSpeedTotal * settings.FFGlobalMult) +
-		static_cast<int>(steerSpeed * damperForce * 0.1) +
-		0;
-
-
-	if (totalForce > 10000) {
-		clip = true;
-	}
-	if (totalForce < -10000) {
-		clip = true;
-	}
-
-	showText(0.1, 0.25, 0.5, std::string(under ? "~b~" : "~w~") + "Under:\t" + std::to_string(understeer_) + "~w~");
-	showText(0.1, 0.30, 0.5, std::string(clip ? "~r~" : "~w~") + "FFBFin:\t" + std::to_string(totalForce) + "~w~");
-
-	// Soft lock
 	if (effSteer > 1.0f) {
 		totalForce = static_cast<int>((effSteer - 1.0f) * 100000) + totalForce;
 		if (effSteer > 1.1f) {
@@ -2381,11 +2214,101 @@ void playFFBGround(bool airborne, bool ignoreSpeed) {
 			totalForce = -10000;
 		}
 	}
+}
+
+void playFFBGround(bool airborne) {
+	if (!settings.EnableFFB ||
+		controls.PrevInput != ScriptControls::Wheel ||
+		!controls.WheelControl.IsConnected(controls.SteerGUID)) {
+		return;
+	}
+
+	if (settings.LogiLEDs) {
+		controls.WheelControl.PlayLedsDInput(controls.SteerGUID, vehData.Rpm, 0.45, 0.95);
+	}
+
+	int damperForce = calculateDamper();
+	int detailForce = calculateDetail();
+
+	// the big steering forces thing!
+	Vector3 velocityWorld = ENTITY::GET_ENTITY_VELOCITY(vehicle);
+	Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(vehicle, 1);
+	Vector3 travelWorld = velocityWorld + positionWorld;
+	Vector3 travelRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, travelWorld.x, travelWorld.y, travelWorld.z);
+
+	Vector3 turnWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, vehData.Speed*-sin(vehData.RotationVelocity.z), vehData.Speed*cos(vehData.RotationVelocity.z), 0.0f);
+	Vector3 turnRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, turnWorld.x, turnWorld.y, turnWorld.z);
+	float turnRelativeNormX = (travelRelative.x + turnRelative.x) / 2.0f;
+	float turnRelativeNormY = (travelRelative.y + turnRelative.y) / 2.0f;
+
+	float steeringAngle = ext.GetSteeringAngle(vehicle)*ext.GetSteeringMultiplier(vehicle);
+	float steeringAngleRelX = vehData.Speed*-sin(steeringAngle);
+	float steeringAngleRelY = vehData.Speed*cos(steeringAngle);
+	Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, steeringAngleRelX, steeringAngleRelY, 0.0f);
+	Vector3 steeringRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, steeringWorld.x, steeringWorld.y, steeringWorld.z);
+
+	float setpoint = travelRelative.x;
+	
+	// This can be tuned but it feels pretty nice right now with Kp = 1.0, Ki, Kd = 0.0.
+	double error = pid.getOutput(steeringRelative.x, setpoint);
+	
+	// Despite being scientifically inaccurate, "self-aligning torque" is the best description.
+	int satForce = static_cast<int>(settings.FFBAmpMultNew * 2500 * -error);
+
+	// "Reduction" effects - those that affect already calculated things
+	bool under_ = false;
+	float understeer = sgn(travelRelative.x - steeringAngleRelX) * (turnRelativeNormX - steeringAngleRelX);
+	if (steeringAngleRelX > turnRelativeNormX && turnRelativeNormX > travelRelative.x ||
+		steeringAngleRelX < turnRelativeNormX && turnRelativeNormX < travelRelative.x) {
+		satForce = satForce / std::max(1.0f, understeer + 1.0f);
+		under_ = true;
+	}
+
+	if (airborne) {
+		satForce = 0.0;
+		damperForce = settings.DamperMin;
+	}
+
+	if (vehData.Class == VehicleData::VehicleClass::Car || vehData.Class == VehicleData::VehicleClass::Quad) {
+		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true) && VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
+			satForce = satForce * 0.1;
+			damperForce = settings.DamperMin;
+		}
+	}
+	else if (vehData.Class == VehicleData::VehicleClass::Bike) {
+		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
+			satForce = satForce * 0.1;
+			damperForce = settings.DamperMin;
+		}
+	}
+
+	if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
+		damperForce *= 2;
+	}
+
+	int totalForce = 
+		satForce +
+		detailForce +
+		damperForce;
+
+	// Soft lock
+	calculateSoftLock(totalForce);
+
 	auto ffAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::ForceFeedback)]);
 	controls.WheelControl.SetConstantForce(controls.SteerGUID, ffAxis, totalForce);
 
 	if (settings.DisplayInfo) {
-		showDebugInfoWheel(settings, effSteer, damperForce, steerSpeed, GForce, oversteer, understeer);
+		Vector3 turnWorldNorm = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, turnRelativeNormX, turnRelativeNormY, 0.0f);
+		GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, travelWorld.x, travelWorld.y, travelWorld.z, 0, 255, 0, 255);
+		GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, turnWorldNorm.x, turnWorldNorm.y, turnWorldNorm.z, 255, 0, 0, 255);
+		GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, steeringWorld.x, steeringWorld.y, steeringWorld.z, 255, 0, 255, 255);
+
+		showText(0.85, 0.175, 0.4, "RelSteer:\t" + std::to_string(steeringRelative.x), 4);
+		showText(0.85, 0.200, 0.4, "SetPoint:\t" + std::to_string(travelRelative.x), 4);
+		showText(0.85, 0.225, 0.4, "Error:\t\t" + std::to_string(error), 4);
+		showText(0.85, 0.250, 0.4, std::string(abs(satForce) > 10000 ? "~r~" : "~w~") + "FFBAmp:\t" + std::to_string(satForce) + "~w~", 4);
+		showText(0.85, 0.275, 0.4, std::string(under_ ? "~b~" : "~w~") + "Under:\t\t" + std::to_string(understeer) + "~w~", 4);
+		showText(0.85, 0.300, 0.4, std::string(abs(totalForce) > 10000 ? "~r~" : "~w~") + "FFBFin:\t\t" + std::to_string(totalForce) + "~w~", 4);
 	}
 }
 

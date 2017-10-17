@@ -120,7 +120,7 @@ void handleVehicleButtons();
 //                    Wheel input and force feedback
 ///////////////////////////////////////////////////////////////////////////////
 
-void playFFBGround(bool airborne, bool ignoreSpeed = false);
+void playFFBGround(bool airborne);
 void playFFBAir();
 void doWheelSteering();
 void doStickControlAir();
