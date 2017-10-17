@@ -2255,12 +2255,7 @@ void playFFBGround(bool airborne, bool ignoreSpeed) {
 	// end understeer detect
 
 	// On understeering conditions, lower "grippy" feel
-	// GForce = std::min(1.0f, std::max(0.0f, 1.0f - understeer + oversteer)) * GForce;
-
-	// Simulate caster instability
-	//if (vehData.Velocity < -0.1f) {
-	//	GForce = -GForce;
-	//}
+	GForce = std::min(1.0f, std::max(0.0f, 1.0f - understeer + oversteer)) * GForce;
 
 	// Detail feel / suspension compression based
 	float compSpeedTotal = 0.0f;
@@ -2307,11 +2302,15 @@ void playFFBGround(bool airborne, bool ignoreSpeed) {
 	Vector3 directionVector = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, vehData.Speed*-sin(vehData.RotationVelocity.z), vehData.Speed*cos(vehData.RotationVelocity.z), 0.0f);
 	Vector3 directionVecRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, directionVector.x, directionVector.y, directionVector.z);
 	Vector3 relTarget = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, travel.x, travel.y, travel.z);
-	Vector3 directionVecNormalized = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, (relTarget.x + directionVecRel.x) / 2.0f, (relTarget.y + directionVecRel.y) / 2.0f, 0.0f);
-	GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, directionVecNormalized.x, directionVecNormalized.y, directionVecNormalized.z, 255, 0, 0, 255);
+	float directionNormalizedX = (relTarget.x + directionVecRel.x) / 2.0f;
+	float directionNormalizedY = (relTarget.y + directionVecRel.y) / 2.0f;
+	Vector3 directionVecNormalizedWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, directionNormalizedX, directionNormalizedY, 0.0f);
+	GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, directionVecNormalizedWorld.x, directionVecNormalizedWorld.y, directionVecNormalizedWorld.z, 255, 0, 0, 255);
 
 	float currentSteeringAngle = ext.GetSteeringAngle(vehicle)*ext.GetSteeringMultiplier(vehicle);
-	Vector3 steeringVector = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, vehData.Speed*-sin(currentSteeringAngle), vehData.Speed*cos(currentSteeringAngle), 0.0f);
+	float steeringAnglePointX = vehData.Speed*-sin(currentSteeringAngle);
+	float steeringAnglePointY = vehData.Speed*cos(currentSteeringAngle);
+	Vector3 steeringVector = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, steeringAnglePointX, steeringAnglePointY, 0.0f);
 	GRAPHICS::DRAW_LINE(pos.x, pos.y, pos.z, steeringVector.x, steeringVector.y, steeringVector.z, 255, 0, 255, 255);
 	
 	bool under = false;
@@ -2335,34 +2334,40 @@ void playFFBGround(bool airborne, bool ignoreSpeed) {
 	else {
 		bigForce = 0;
 	}
-	bool red = false;
+	bool clip = false;
 	if (bigForce > 10000) {
-		red = true;
+		clip = true;
 	}
 	if (bigForce < -10000) {
-		red = true;
+		clip = true;
 	}
 
-	showText(0.1, 0.20, 0.5, std::string(red ? "~r~" : "~w~") + "FFBAmp:\t" + std::to_string(bigForce) + "~w~");
+	showText(0.1, 0.20, 0.5, std::string(clip ? "~r~" : "~w~") + "FFBAmp:\t" + std::to_string(bigForce) + "~w~");
 	
-	red = false;
+
+	float understeer_ = sgn(relTarget.x - steeringAnglePointX) * (directionNormalizedX - steeringAnglePointX);
+	if (steeringAnglePointX > directionNormalizedX && directionNormalizedX > relTarget.x ||
+		steeringAnglePointX < directionNormalizedX && directionNormalizedX < relTarget.x) {
+		under = true;
+		bigForce = bigForce / std::max(1.0f, understeer_ + 1.0f);
+	}
+
+	clip = false;
 	int totalForce = bigForce +
 		static_cast<int>(1000.0f * settings.DetailStrength * compSpeedTotal * settings.FFGlobalMult) +
 		static_cast<int>(steerSpeed * damperForce * 0.1) +
 		0;
 
+
 	if (totalForce > 10000) {
-		red = true;
+		clip = true;
 	}
 	if (totalForce < -10000) {
-		red = true;
+		clip = true;
 	}
 
-	showText(0.1, 0.25, 0.5, std::string(red ? "~r~" : "~w~") + "FFBFin:\t" + std::to_string(totalForce) + "~w~");
-
-	float understeer_ = sgn(relTarget.x - vehData.Speed*-sin(currentSteeringAngle)) * (((relTarget.x + directionVecRel.x) / 2.0f) - (vehData.Speed*-sin(currentSteeringAngle)));
-	if (understeer_ > 0.0f) under = true;
-	showText(0.1, 0.30, 0.5, std::string(under ? "~b~" : "~w~") + "Under:\t" + std::to_string(understeer_) + "~w~");
+	showText(0.1, 0.25, 0.5, std::string(under ? "~b~" : "~w~") + "Under:\t" + std::to_string(understeer_) + "~w~");
+	showText(0.1, 0.30, 0.5, std::string(clip ? "~r~" : "~w~") + "FFBFin:\t" + std::to_string(totalForce) + "~w~");
 
 	// Soft lock
 	if (effSteer > 1.0f) {
