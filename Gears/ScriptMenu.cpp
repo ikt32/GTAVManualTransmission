@@ -322,6 +322,24 @@ void update_menu() {
 		menu.MenuOption("Non-Xinput controller", "legacycontrollermenu",
 		{ "Set up the non-Xinput controller with native controls" });
 
+		if (menu.BoolOption("Patch steering for all inputs", settings.PatchSteeringAlways,
+		{ "Also patch steering reduction and automatic countersteer for keyboard and controller inputs.",
+		  "Only active if this patch is also enabled for steering wheels.",
+		  "PatchSteering (Wheel) is "+ std::string(settings.PatchSteering ? "enabled." : "disabled.")})) {
+			settings.SaveWheel(&controls);
+			initSteeringPatches();
+		}
+
+		if (menu.FloatOption("Steering reduction (kb/controller)", settings.SteeringReductionOther, 0.0f, 1.0f, 0.01f,
+		{ "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
+			settings.SaveWheel(&controls);
+		}
+
+		if (menu.FloatOption("Steering multiplier (kb/controller)", settings.GameSteerMultOther, 0.1f, 2.0f, 0.01f,
+		{ "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
+			settings.SaveWheel(&controls);
+		}
+
 	}
 
 	/* Yes hello I am root - 2 */
@@ -491,22 +509,6 @@ void update_menu() {
 		if (menu.FloatOption("Steering multiplier (wheel)", settings.GameSteerMultWheel, 0.1f, 2.0f, 0.01f,
 		{ "Increase steering lock for all cars." })) {
 			updateSteeringMultiplier();
-		}
-		
-		if (menu.BoolOption("Patch steering for all inputs", settings.PatchSteeringAlways,
-		{ "Also patch steering reduction and automatic countersteer for keyboard and controller inputs." })) {
-			settings.SaveWheel(&controls);
-			initSteeringPatches();
-		}
-
-		if (menu.FloatOption("Steering reduction (kb/controller)", settings.SteeringReductionOther, 0.0f, 1.0f, 0.01f,
-		{ "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
-			settings.SaveWheel(&controls);
-		}
-
-		if (menu.FloatOption("Steering multiplier (kb/controller)", settings.GameSteerMultOther, 0.1f, 2.0f, 0.01f,
-		{ "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
-			settings.SaveWheel(&controls);
 		}
 
 		if (menu.BoolOption("Disable non-wheel steering", settings.PatchSteeringControl,
