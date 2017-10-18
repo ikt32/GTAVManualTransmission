@@ -175,739 +175,729 @@ void menuClose() {
 	settings.SaveController(&controls);
 }
 
-void update_menu() {
-	menu.CheckKeys();
+void update_mainmenu() {
+	menu.Title("Manual Transmission", 0.90f);
+	menu.Subtitle(std::string("~b~") + DISPLAY_VERSION);
 
-	/* Yes hello I am root */
-	if (menu.CurrentMenu("mainmenu")) {
-		menu.Title("Manual Transmission", 0.90f);
-		menu.Subtitle(std::string("~b~") + DISPLAY_VERSION);
+	bool tempEnableRead = settings.EnableManual;
 
-		bool tempEnableRead = settings.EnableManual;
+	if (menu.BoolOption("Enable manual transmission", tempEnableRead,
+	                    { "Enable or disable the entire mod." })) {
+		toggleManual();
+	}
 
-		if (menu.BoolOption("Enable manual transmission", tempEnableRead,
-		{ "Enable or disable the entire mod." })) {
-			toggleManual();
-		}
+	int shiftModeTemp = settings.ShiftMode;
+	std::vector<std::string> gearboxModes = {
+		"Sequential",
+		"H-pattern",
+		"Automatic"
+	};
 
-		int shiftModeTemp = settings.ShiftMode;
-		std::vector<std::string> gearboxModes = {
-			"Sequential",
-			"H-pattern",
-			"Automatic"
-		};
-
-		menu.StringArray("Gearbox", gearboxModes, shiftModeTemp, 
-		{ "Choose your gearbox! Options are Sequential, H-pattern and Automatic." });
+	menu.StringArray("Gearbox", gearboxModes, shiftModeTemp, 
+	                 { "Choose your gearbox! Options are Sequential, H-pattern and Automatic." });
 		
-		if (shiftModeTemp != settings.ShiftMode) {
-			settings.ShiftMode = (ShiftModes)shiftModeTemp;
-			setShiftMode(shiftModeTemp);
-		}
+	if (shiftModeTemp != settings.ShiftMode) {
+		settings.ShiftMode = (ShiftModes)shiftModeTemp;
+		setShiftMode(shiftModeTemp);
+	}
 
-		menu.MenuOption("Mod options", "optionsmenu", { "You can tweak and fine-tune gearbox simulation here." });
-		menu.MenuOption("Keyboard/Controller", "controlsmenu", { "Configure the keyboard and controller inputs." });
-		menu.MenuOption("Steering Wheel", "wheelmenu", { "Set up your steering wheel." });
-		menu.MenuOption("HUD Options", "hudmenu", { "Toggle and move HUD elements. Choose between imperial or metric speeds." });
-		menu.MenuOption("Debug", "debugmenu", { "Show technical details and options." });
-		//menu.MenuOption("Plane!", "planemenu");
+	menu.MenuOption("Mod options", "optionsmenu", { "You can tweak and fine-tune gearbox simulation here." });
+	menu.MenuOption("Keyboard/Controller", "controlsmenu", { "Configure the keyboard and controller inputs." });
+	menu.MenuOption("Steering Wheel", "wheelmenu", { "Set up your steering wheel." });
+	menu.MenuOption("HUD Options", "hudmenu", { "Toggle and move HUD elements. Choose between imperial or metric speeds." });
+	menu.MenuOption("Debug", "debugmenu", { "Show technical details and options." });
+	//menu.MenuOption("Plane!", "planemenu");
 
-		int activeIndex = 0;
-		std::string activeInputName;
-		switch (controls.PrevInput) {
-			case ScriptControls::Keyboard:
-				activeInputName = "Keyboard";
-				break;
-			case ScriptControls::Controller:
-				activeInputName = "Controller";
-				break;
-			case ScriptControls::Wheel:
-				activeInputName = "Wheel";
-				break;
+	int activeIndex = 0;
+	std::string activeInputName;
+	switch (controls.PrevInput) {
+		case ScriptControls::Keyboard:
+			activeInputName = "Keyboard";
+			break;
+		case ScriptControls::Controller:
+			activeInputName = "Controller";
+			break;
+		case ScriptControls::Wheel:
+			activeInputName = "Wheel";
+			break;
 			//case ScriptControls::Stick:
 			//	activeInputName = "Stick";
 			//	break;
-		}
-		std::vector<std::string> active = { activeInputName };
-		menu.StringArray("Active input", active, activeIndex, { "Active input is automatically detected and can't be changed." });
 	}
+	std::vector<std::string> active = { activeInputName };
+	menu.StringArray("Active input", active, activeIndex, { "Active input is automatically detected and can't be changed." });
+}
 
-	/* Yes hello I am root - 1 */
-	if (menu.CurrentMenu("optionsmenu")) {
-		menu.Title("Mod options");
-		menu.Subtitle("Gearbox simulation options");
+void update_optionsmenu() {
+	menu.Title("Mod options");
+	menu.Subtitle("Gearbox simulation options");
 
-		menu.BoolOption("Engine Damage", settings.EngDamage,
-		{ "Damage the engine when over-revving and when mis-shifting." });
+	menu.BoolOption("Engine Damage", settings.EngDamage,
+	                { "Damage the engine when over-revving and when mis-shifting." });
 
-		menu.BoolOption("Engine Stalling (H)", settings.EngStall,
-		{ "Stall the engine when the wheel speed gets too low. Applies to H-pattern shift mode." });
+	menu.BoolOption("Engine Stalling (H)", settings.EngStall,
+	                { "Stall the engine when the wheel speed gets too low. Applies to H-pattern shift mode." });
 
-		menu.BoolOption("Engine Stalling (S)", settings.EngStallS,
-		{ "Stall the engine when the wheel speed gets too low. Applies to sequential shift mode." });
+	menu.BoolOption("Engine Stalling (S)", settings.EngStallS,
+	                { "Stall the engine when the wheel speed gets too low. Applies to sequential shift mode." });
 
-		menu.BoolOption("Clutch Shift (H)", settings.ClutchShiftingH,
-		{ "Require holding the clutch to shift in H-pattern shift mode." });
+	menu.BoolOption("Clutch Shift (H)", settings.ClutchShiftingH,
+	                { "Require holding the clutch to shift in H-pattern shift mode." });
 
-		menu.BoolOption("Clutch Shift (S)", settings.ClutchShiftingS,
-		{ "Require holding the clutch to shift in sequential mode." });
+	menu.BoolOption("Clutch Shift (S)", settings.ClutchShiftingS,
+	                { "Require holding the clutch to shift in sequential mode." });
 
-		menu.BoolOption("Engine Braking", settings.EngBrake,
-		{ "Help the car braking by slowing down more at high RPMs" });
+	menu.BoolOption("Engine Braking", settings.EngBrake,
+	                { "Help the car braking by slowing down more at high RPMs" });
 
-		menu.BoolOption("Gear/RPM Lockup", settings.EngLock,
-		{ "Simulate wheel lock-up when mis-shifting to a too low gear for the RPM range." });
+	menu.BoolOption("Gear/RPM Lockup", settings.EngLock,
+	                { "Simulate wheel lock-up when mis-shifting to a too low gear for the RPM range." });
 
-		menu.BoolOption("Clutch Bite", settings.ClutchCatching,
-		{ "Simulate clutch biting action and clutch interaction at near-stop speeds." });
+	menu.BoolOption("Clutch Bite", settings.ClutchCatching,
+	                { "Simulate clutch biting action and clutch interaction at near-stop speeds." });
 
-		menu.BoolOption("Default Neutral gear", settings.DefaultNeutral,
-		{ "The car will be in neutral when you get in." });
+	menu.BoolOption("Default Neutral gear", settings.DefaultNeutral,
+	                { "The car will be in neutral when you get in." });
 
-		menu.MenuOption("Finetuning", "finetuneoptionsmenu",
-		{ "Fine-tune the parameters above" });
+	menu.MenuOption("Finetuning", "finetuneoptionsmenu",
+	                { "Fine-tune the parameters above" });
 
-		menu.MenuOption("Misc. options", "miscoptionsmenu",
-		{ "Options that don't have to do with the gearbox simulation, but mainly are helpers." });
-	}
+	menu.MenuOption("Misc. options", "miscoptionsmenu",
+	                { "Options that don't have to do with the gearbox simulation, but mainly are helpers." });
+}
 
-	/* Yes hello I am root - 2 */
-	if (menu.CurrentMenu("miscoptionsmenu")) {
-		menu.Title("Misc. options");
-		menu.Subtitle("Small helping functions");
+void update_miscoptionsmenu() {
+	menu.Title("Misc. options");
+	menu.Subtitle("Small helping functions");
 
-		menu.BoolOption("Simple Bike", settings.SimpleBike, 
-		{ "Disables bike engine stalling and the clutch bite simulation." });
+	menu.BoolOption("Simple Bike", settings.SimpleBike, 
+	                { "Disables bike engine stalling and the clutch bite simulation." });
 
-		menu.BoolOption("Hill gravity workaround", settings.HillBrakeWorkaround, 
-		{ "Gives the car a push to overcome the games' default brakes at a stop." });
+	menu.BoolOption("Hill gravity workaround", settings.HillBrakeWorkaround, 
+	                { "Gives the car a push to overcome the games' default brakes at a stop." });
 
-		menu.BoolOption("Auto gear 1", settings.AutoGear1, 
-		{ "Automatically switch to first gear when the car reaches a standstill." });
+	menu.BoolOption("Auto gear 1", settings.AutoGear1, 
+	                { "Automatically switch to first gear when the car reaches a standstill." });
 
-		menu.BoolOption("Auto look back", settings.AutoLookBack, 
-		{ "Automatically look back whenever in reverse gear." });
+	menu.BoolOption("Auto look back", settings.AutoLookBack, 
+	                { "Automatically look back whenever in reverse gear." });
 
-		menu.BoolOption("Clutch + throttle start", settings.ThrottleStart, 
-		{ "Allow to start the engine by pressing clutch and throttle, like in DiRT Rally." });
-	}
+	menu.BoolOption("Clutch + throttle start", settings.ThrottleStart, 
+	                { "Allow to start the engine by pressing clutch and throttle, like in DiRT Rally." });
+}
 
-	/* Yes hello I am root - 2 */
-	if (menu.CurrentMenu("finetuneoptionsmenu")) {
-		menu.Title("Fine-tuning");
-		menu.Subtitle("Gearbox fine-tuning options");
+void update_finetuneoptionsmenu() {
+	menu.Title("Fine-tuning");
+	menu.Subtitle("Gearbox fine-tuning options");
 
-		menu.FloatOption("Clutch bite point", settings.ClutchCatchpoint, 0.0f, 1.0f, 0.05f);
-		menu.FloatOption("Stalling threshold", settings.StallingThreshold, 0.0f, 1.0f, 0.05f);
-		menu.FloatOption("RPM Damage", settings.RPMDamage, 0.0f, 10.0f, 0.05f);
-		menu.IntOption("Misshift Damage", settings.MisshiftDamage, 0, 100, 5);
-		menu.FloatOption("Engine braking threshold", settings.EngBrakeThreshold, 0.0f, 1.0f, 0.05f, { "RPM where engine braking starts working" });
-		menu.FloatOption("Engine braking power", settings.EngBrakePower, 0.0f, 5.0f, 0.05f, { "How much wheel brake is applied" });
-	}
+	menu.FloatOption("Clutch bite point", settings.ClutchCatchpoint, 0.0f, 1.0f, 0.05f);
+	menu.FloatOption("Stalling threshold", settings.StallingThreshold, 0.0f, 1.0f, 0.05f);
+	menu.FloatOption("RPM Damage", settings.RPMDamage, 0.0f, 10.0f, 0.05f);
+	menu.IntOption("Misshift Damage", settings.MisshiftDamage, 0, 100, 5);
+	menu.FloatOption("Engine braking threshold", settings.EngBrakeThreshold, 0.0f, 1.0f, 0.05f, { "RPM where engine braking starts working" });
+	menu.FloatOption("Engine braking power", settings.EngBrakePower, 0.0f, 5.0f, 0.05f, { "How much wheel brake is applied" });
+}
 
-	/* Yes hello I am root - 1 */
-	if (menu.CurrentMenu("controlsmenu")) {
-		menu.Title("Controls");
-		menu.Subtitle("Controls options");
+void update_controlsmenu() {
+	menu.Title("Controls");
+	menu.Subtitle("Controls options");
 
-		menu.MenuOption("Controller", "controllermenu",
-		{"Change controller control assignments."});
+	menu.MenuOption("Controller", "controllermenu",
+	                {"Change controller control assignments."});
 		
-		menu.MenuOption("Keyboard", "keyboardmenu",
-		{"Change keyboard control assignments."});
+	menu.MenuOption("Keyboard", "keyboardmenu",
+	                {"Change keyboard control assignments."});
 		
-		menu.BoolOption("Non-Xinput controller", controls.UseLegacyController,
-		{ "If you needed to set up your controller in the pause menu, you should enable this." });
+	menu.BoolOption("Non-Xinput controller", controls.UseLegacyController,
+	                { "If you needed to set up your controller in the pause menu, you should enable this." });
 		
-		menu.MenuOption("Non-Xinput controller", "legacycontrollermenu",
-		{ "Set up the non-Xinput controller with native controls" });
+	menu.MenuOption("Non-Xinput controller", "legacycontrollermenu",
+	                { "Set up the non-Xinput controller with native controls" });
 
-		if (menu.BoolOption("Patch steering for all inputs", settings.PatchSteeringAlways,
-		{ "Also patch steering reduction and automatic countersteer for keyboard and controller inputs.",
-		  "Only active if this patch is also enabled for steering wheels.",
-		  "PatchSteering (Wheel) is "+ std::string(settings.PatchSteering ? "enabled." : "disabled.")})) {
-			settings.SaveWheel(&controls);
-			initSteeringPatches();
-		}
-
-		if (menu.FloatOption("Steering reduction (kb/controller)", settings.SteeringReductionOther, 0.0f, 1.0f, 0.01f,
-		{ "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
-			settings.SaveWheel(&controls);
-		}
-
-		if (menu.FloatOption("Steering multiplier (kb/controller)", settings.GameSteerMultOther, 0.1f, 2.0f, 0.01f,
-		{ "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
-			settings.SaveWheel(&controls);
-		}
-
+	if (menu.BoolOption("Patch steering for all inputs", settings.PatchSteeringAlways,
+	                    { "Also patch steering reduction and automatic countersteer for keyboard and controller inputs.",
+		                    "Only active if this patch is also enabled for steering wheels.",
+		                    "PatchSteering (Wheel) is "+ std::string(settings.PatchSteering ? "enabled." : "disabled.")})) {
+		settings.SaveWheel(&controls);
+		initSteeringPatches();
 	}
 
-	/* Yes hello I am root - 2 */
-	if (menu.CurrentMenu("legacycontrollermenu")) {
-		menu.Title("Non-Xinput controls");
-		menu.Subtitle("Non-Xinput options");
+	if (menu.FloatOption("Steering reduction (kb/controller)", settings.SteeringReductionOther, 0.0f, 1.0f, 0.01f,
+	                     { "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
+		settings.SaveWheel(&controls);
+	}
 
-		int oldIndexUp = getBlockableControlIndex(controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftUp)]);
-		int newIndexUp = oldIndexUp;
-		if (menu.StringArray("Shift Up blocks", blockableControlsHelp, newIndexUp)) {
-			if (newIndexUp != oldIndexUp) {
-				controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftUp)] = blockableControls[newIndexUp];
+	if (menu.FloatOption("Steering multiplier (kb/controller)", settings.GameSteerMultOther, 0.1f, 2.0f, 0.01f,
+	                     { "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
+		settings.SaveWheel(&controls);
+	}
+}
+
+void update_legacycontrollermenu() {
+	menu.Title("Non-Xinput controls");
+	menu.Subtitle("Non-Xinput options");
+
+	int oldIndexUp = getBlockableControlIndex(controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftUp)]);
+	int newIndexUp = oldIndexUp;
+	if (menu.StringArray("Shift Up blocks", blockableControlsHelp, newIndexUp)) {
+		if (newIndexUp != oldIndexUp) {
+			controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftUp)] = blockableControls[newIndexUp];
+		}
+	}
+
+	int oldIndexDown = getBlockableControlIndex(controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftDown)]);
+	int newIndexDown = oldIndexDown;
+	if (menu.StringArray("Shift Down blocks", blockableControlsHelp, newIndexDown)) {
+		if (newIndexDown != oldIndexDown) {
+			controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftDown)] = blockableControls[newIndexDown];
+		}
+	}
+
+	std::vector<std::string> controllerInfo;
+	controllerInfo.push_back("Press RIGHT to clear key");
+	controllerInfo.push_back("Press RETURN to configure button");
+	controllerInfo.push_back("");
+
+	auto it = 0;
+	for (auto confTag : controllerConfTags) {
+		controllerInfo.back() = controllerConfTagDetail.at(it);
+		controllerInfo.push_back("Assigned to " + controls.NativeControl2Text(controls.ConfTagLController2Value(confTag)) + 
+			" (" + std::to_string(controls.ConfTagLController2Value(confTag)) + ")");
+
+		if (menu.OptionPlus("Assign " + confTag, controllerInfo, nullptr, std::bind(clearLControllerButton, confTag), nullptr, "Current setting")) {
+			WAIT(500);
+			bool result = configLControllerButton(confTag);
+			//showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+			if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+			WAIT(500);
+		}
+		it++;
+		controllerInfo.pop_back();
+	}
+}
+
+void update_controllermenu() {
+	menu.Title("Controller controls");
+	menu.Subtitle("Controller options");
+
+	menu.BoolOption("Block car controls", settings.BlockCarControls,
+	                { "Blocks car action controls like ducking, switching guns, handbrake, aim. Holding activates the original button again.",
+		                "Experimental!" });
+
+	menu.BoolOption("Engine button toggles", settings.ToggleEngine, 
+	                { "Checked: the engine button turns the engine on AND off.",
+		                "Not checked: the button only turns the engine on when it's off." });
+
+	menu.IntOption("Long press time (ms)", controls.CToggleTime, 100, 5000, 50,
+	               { "Timeout for long press buttons to activate." });
+
+	menu.IntOption("Max tap time (ms)", controls.MaxTapTime, 50, 1000, 10,
+	               { "Buttons pressed and released within this time are regarded as a tap. Shift up, shift down are tap controls." });
+
+	float currTriggerValue = controls.GetXboxTrigger();
+	float prevTriggerValue = currTriggerValue;
+	menu.FloatOption("Trigger value", currTriggerValue, 0.25, 1.0, 0.05,
+	                 { "Threshold for an analog input to be detected as button press." });
+
+	if (currTriggerValue != prevTriggerValue) {
+		controls.SetXboxTrigger(currTriggerValue);
+	}
+
+	int oldIndexUp = getBlockableControlIndex(controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)]);
+	int newIndexUp = oldIndexUp;
+	if (menu.StringArray("Shift Up blocks", blockableControlsHelp, newIndexUp)) {
+		if (newIndexUp != oldIndexUp) {
+			controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)] = blockableControls[newIndexUp];
+		}
+	}
+		
+	int oldIndexDown = getBlockableControlIndex(controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)]);
+	int newIndexDown = oldIndexDown;
+	if (menu.StringArray("Shift Down blocks", blockableControlsHelp, newIndexDown)) {
+		if (newIndexDown != oldIndexDown) {
+			controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)] = blockableControls[newIndexDown];
+		}
+	}
+
+	std::vector<std::string> controllerInfo;
+	controllerInfo.push_back("Press RIGHT to clear key");
+	controllerInfo.push_back("Press RETURN to configure button");
+	controllerInfo.push_back("");
+
+	auto it = 0;
+	for (auto confTag : controllerConfTags) {
+		controllerInfo.back() = controllerConfTagDetail.at(it);
+		controllerInfo.push_back("Assigned to " + controls.ConfTagController2Value(confTag));
+		if (menu.OptionPlus("Assign " + confTag, controllerInfo, nullptr, std::bind(clearControllerButton, confTag), nullptr, "Current setting")) {
+			WAIT(500);
+			bool result = configControllerButton(confTag);
+			//showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+			if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+			WAIT(500);
+		}
+		it++;
+		controllerInfo.pop_back();
+	}
+}
+
+void update_keyboardmenu() {
+	menu.Title("Keyboard controls");
+	menu.Subtitle("Keyboard assignments");
+
+	std::vector<std::string> keyboardInfo;
+	keyboardInfo.push_back("Press RIGHT to clear key");
+	keyboardInfo.push_back("Press RETURN to configure key");
+	keyboardInfo.push_back("");
+
+	int it = 0;
+	for (auto confTag : keyboardConfTags) {
+		keyboardInfo.back() = keyboardConfTagsDetail.at(it);
+		keyboardInfo.push_back("Assigned to " + key2str(controls.ConfTagKB2key(confTag)));
+		if (menu.OptionPlus("Assign " + confTag, keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag), nullptr, "Current setting")) {
+			WAIT(500);
+			bool result = configKeyboardKey(confTag);
+			if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+			WAIT(500);
+		}
+		it++;
+		keyboardInfo.pop_back();
+	}
+}
+
+void update_wheelmenu() {
+	menu.Title("Steering wheel");
+	menu.Subtitle("Steering wheel options");
+
+	if (menu.BoolOption("Enable wheel", settings.EnableWheel,
+	                    { "Enable usage of a steering wheel." })) {
+		settings.SaveWheel(&controls);
+		settings.Read(&controls);
+		initWheel();
+	}
+
+	if (menu.BoolOption("Enable wheel always", settings.WheelWithoutManual,
+	                    { "Enable your wheel even when the Manual Transmission part of this mod is off." })) {
+		settings.SaveWheel(&controls);
+	}
+		
+	if (menu.BoolOption("Patch steering", settings.PatchSteering,
+	                    { "Patches steering reduction and automatic countersteer for more direct control." })) {
+		settings.SaveWheel(&controls);
+		initSteeringPatches();
+	}
+
+	if (menu.FloatOption("Steering reduction (wheel)", settings.SteeringReductionWheel, 0.0f, 1.0f, 0.01f, 
+	                     { "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
+		settings.SaveWheel(&controls);
+	}
+
+	if (menu.FloatOption("Steering multiplier (wheel)", settings.GameSteerMultWheel, 0.1f, 2.0f, 0.01f,
+	                     { "Increase steering lock for all cars." })) {
+		updateSteeringMultiplier();
+	}
+
+	if (menu.BoolOption("Disable non-wheel steering", settings.PatchSteeringControl,
+	                    { "Disable keyboard and controller inputs for steering. Fixes the jerky animation." })) {
+		settings.SaveWheel(&controls);
+		initSteeringPatches();
+	}
+
+	if (menu.BoolOption("Logitech RPM LEDs", settings.LogiLEDs, 
+	                    { "Show the RPM LEDs on Logitech steering wheels. If the wheel doesn't have compatible RPM LEDs, this might crash." } )) {
+		settings.SaveWheel(&controls);
+	}
+
+	menu.MenuOption("Steering wheel axis setup", "axesmenu", 
+	                { "Configure analog controls, like throttle, steering and the like." });
+		
+	menu.MenuOption("Force feedback options", "forcefeedbackmenu",
+	                { "Fine-tune your force feedback parameters." });
+		
+	menu.MenuOption("Steering wheel angles", "anglemenu",
+	                { "Set up soft lock options here." });
+		
+	menu.MenuOption("Steering wheel button setup", "buttonsmenu",
+	                { "Set up your buttons on your steering wheel." });
+
+	std::vector<std::string> hpatInfo;
+	hpatInfo.push_back("Press RIGHT to clear H-pattern shifter");
+	hpatInfo.push_back("Active gear:");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::HR)) hpatInfo.push_back("Reverse");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H1)) hpatInfo.push_back("Gear 1");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H2)) hpatInfo.push_back("Gear 2");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H3)) hpatInfo.push_back("Gear 3");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H4)) hpatInfo.push_back("Gear 4");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H5)) hpatInfo.push_back("Gear 5");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H6)) hpatInfo.push_back("Gear 6");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H7)) hpatInfo.push_back("Gear 7");
+
+	if (menu.OptionPlus("H-pattern shifter setup", hpatInfo, nullptr, std::bind(clearHShifter), nullptr, "Input values",
+	                    { "Select this option to start H-pattern shifter setup. Follow the on-screen instructions." })) {
+		bool result = configHPattern();
+		showNotification(result ? "H-pattern shifter saved" : "Cancelled H-pattern shifter setup", &prevNotification);
+	}
+
+	menu.BoolOption("Keyboard H-pattern", settings.HPatternKeyboard, 
+	                { "This will allow you to also use the keyboard controls for wheel H-pattern shifting. Configure these controls in the keyboard section." });
+}
+
+void update_anglemenu() {
+	menu.Title("Wheel angles");
+	menu.Subtitle("Soft lock & angle setup");
+	float minLock = 180.0f;
+	if (menu.FloatOption("Physical degrees", settings.SteerAngleMax, minLock, 1080.0, 30.0,
+	                     { "How many degrees your wheel physically can turn. Should match driver settings." })) {
+		if (settings.SteerAngleCar > settings.SteerAngleMax) { settings.SteerAngleCar = settings.SteerAngleMax; }
+		if (settings.SteerAngleBike > settings.SteerAngleMax) { settings.SteerAngleBike = settings.SteerAngleMax; }
+		if (settings.SteerAngleBoat > settings.SteerAngleMax) { settings.SteerAngleBoat = settings.SteerAngleMax; }
+	}
+	menu.FloatOption("Car soft lock", settings.SteerAngleCar, minLock, settings.SteerAngleMax, 30.0,
+	                 { "Soft lock for cars and trucks. (degrees)" });
+
+	menu.FloatOption("Bike soft lock", settings.SteerAngleBike, minLock, settings.SteerAngleMax, 30.0,
+	                 { "Soft lock for bikes and quads. (degrees)" });
+
+	menu.FloatOption("Boat soft lock", settings.SteerAngleBoat, minLock, settings.SteerAngleMax, 30.0,
+	                 { "Soft lock for boats. (degrees)" });
+}
+
+void update_axesmenu() {
+	menu.Title("Configure axes");
+	menu.Subtitle("Setup steering and pedals");
+	controls.UpdateValues(ScriptControls::Wheel, false, true);
+	std::vector<std::string> info = {
+		"Press RIGHT to clear this axis" ,
+		"Steer    : " + std::to_string(controls.SteerVal),
+		"Throttle : " + std::to_string(controls.ThrottleVal),
+		"Brake    : " + std::to_string(controls.BrakeVal),
+		"Clutch   : " + std::to_string(controls.ClutchValRaw),
+		"Handbrake: " + std::to_string(controls.HandbrakeVal),
+	};
+
+	if (menu.OptionPlus("Calibrate steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr, "Input values")) {
+		bool result = configAxis("STEER");
+		showNotification(result ? "Steering axis saved" : "Cancelled steering axis calibration", &prevNotification);
+		if (result) initWheel();
+	}
+	if (menu.OptionPlus("Calibrate throttle", info, nullptr, std::bind(clearAxis, "THROTTLE"), nullptr, "Input values")) {
+		bool result = configAxis("THROTTLE");
+		showNotification(result ? "Throttle axis saved" : "Cancelled throttle axis calibration", &prevNotification);
+		if (result) initWheel();
+	}
+	if (menu.OptionPlus("Calibrate brake", info, nullptr, std::bind(clearAxis, "BRAKES"), nullptr, "Input values")) {
+		bool result = configAxis("BRAKES");
+		showNotification(result ? "Brake axis saved" : "Cancelled brake axis calibration", &prevNotification);
+		if (result) initWheel();
+	}
+	if (menu.OptionPlus("Calibrate clutch", info, nullptr, std::bind(clearAxis, "CLUTCH"), nullptr, "Input values")) {
+		bool result = configAxis("CLUTCH");
+		showNotification(result ? "Clutch axis saved" : "Cancelled clutch axis calibration", &prevNotification);
+		if (result) initWheel();
+	}
+	if (menu.OptionPlus("Calibrate handbrake", info, nullptr, std::bind(clearAxis, "HANDBRAKE_ANALOG"), nullptr, "Input values")) {
+		bool result = configAxis("HANDBRAKE_ANALOG");
+		showNotification(result ? "Handbrake axis saved" : "Cancelled handbrake axis calibration", &prevNotification);
+		if (result) initWheel();
+	}
+
+	if (!settings.PatchSteeringControl) {
+		menu.FloatOption("Steering anti-deadzone", controls.ADZSteer, 0.0f, 1.0f, 0.01f,
+		                 { "GTA V ignores 25% input for analog controls by default." });
+	}
+
+	menu.FloatOption("Throttle anti-deadzone",	controls.ADZThrottle, 0.0f, 1.0f, 0.01f, 
+	                 { "GTA V ignores 25% input for analog controls by default." });
+	menu.FloatOption("Brake anti-deadzone",		controls.ADZBrake, 0.0f, 1.0f, 0.01f,
+	                 { "GTA V ignores 25% input for analog controls by default." });
+
+	menu.BoolOption("Invert steer", controls.InvertSteer);
+	menu.BoolOption("Invert throttle", controls.InvertThrottle);
+	menu.BoolOption("Invert brake", controls.InvertBrake);
+	menu.BoolOption("Invert clutch", controls.InvertClutch);
+}
+
+void update_forcefeedbackmenu() {
+	menu.Title("Force feedback");
+	menu.Subtitle("Force feedback setup");
+
+	menu.BoolOption("Enable", settings.EnableFFB, 
+	                { "Enable or disable force feedback entirely." });
+
+	menu.FloatOption("Global multiplier", settings.FFGlobalMult, 0.0f, 10.0f, 1.0f);
+		
+	menu.FloatOption("Self aligning force", settings.FFBAmpMultNew, 0.1f, 2.0f, 0.05f,
+	                 { "Force feedback strength for steering." });
+
+	menu.IntOption("Damper Max (low speed)", settings.DamperMax, 0, 200, 1, 
+	               { "Wheel friction at low speed." });
+		
+	menu.IntOption("Damper Min (high speed)", settings.DamperMin, 0, 200, 1,
+	               { "Wheel friction at high speed." });
+		
+	menu.FloatOption("Damper end speed", settings.TargetSpeed, 0.0f, 40.0f, 0.2f,
+	                 { "Speed at which the damper strength should be minimal.", "In m/s." });
+		
+	menu.FloatOption("Detail strength", settings.DetailStrength, 0.0f, 10.0f, 0.1f,
+	                 { "Force feedback effect strength by suspension events due to finer road details." });
+}
+
+void update_buttonsmenu() {
+	menu.Title("Configure buttons");
+	menu.Subtitle("Button setup and review");
+
+	std::vector<std::string> wheelToKeyInfo;
+	wheelToKeyInfo.push_back("Active wheel-to-key options:");
+	wheelToKeyInfo.push_back("Press RIGHT to clear a button");
+	wheelToKeyInfo.push_back("Device: " + settings.GUIDToDeviceIndex(controls.WheelToKeyGUID));
+	for (int i = 0; i < WheelDirectInput::MAX_RGBBUTTONS; i++) {
+		if (controls.WheelToKey[i] != -1) {
+			wheelToKeyInfo.push_back(std::to_string(i) + " = " + key2str(controls.WheelToKey[i]));
+			if (controls.WheelControl.IsButtonPressed(i, controls.WheelToKeyGUID)) {
+				wheelToKeyInfo.back() += " (Pressed)";
 			}
 		}
-
-		int oldIndexDown = getBlockableControlIndex(controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftDown)]);
-		int newIndexDown = oldIndexDown;
-		if (menu.StringArray("Shift Down blocks", blockableControlsHelp, newIndexDown)) {
-			if (newIndexDown != oldIndexDown) {
-				controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftDown)] = blockableControls[newIndexDown];
-			}
-		}
-
-		std::vector<std::string> controllerInfo;
-		controllerInfo.push_back("Press RIGHT to clear key");
-		controllerInfo.push_back("Press RETURN to configure button");
-		controllerInfo.push_back("");
-
-		auto it = 0;
-		for (auto confTag : controllerConfTags) {
-			controllerInfo.back() = controllerConfTagDetail.at(it);
-			controllerInfo.push_back("Assigned to " + controls.NativeControl2Text(controls.ConfTagLController2Value(confTag)) + 
-									 " (" + std::to_string(controls.ConfTagLController2Value(confTag)) + ")");
-
-			if (menu.OptionPlus("Assign " + confTag, controllerInfo, nullptr, std::bind(clearLControllerButton, confTag), nullptr, "Current setting")) {
-				WAIT(500);
-				bool result = configLControllerButton(confTag);
-				//showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
-				if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
-				WAIT(500);
-			}
-			it++;
-			controllerInfo.pop_back();
-		}
 	}
 
-	/* Yes hello I am root - 2 */
-	if (menu.CurrentMenu("controllermenu")) {
-		menu.Title("Controller controls");
-		menu.Subtitle("Controller options");
-
-		menu.BoolOption("Block car controls", settings.BlockCarControls,
-		{ "Blocks car action controls like ducking, switching guns, handbrake, aim. Holding activates the original button again.",
-						"Experimental!" });
-
-		menu.BoolOption("Engine button toggles", settings.ToggleEngine, 
-		{ "Checked: the engine button turns the engine on AND off.",
-			"Not checked: the button only turns the engine on when it's off." });
-
-		menu.IntOption("Long press time (ms)", controls.CToggleTime, 100, 5000, 50,
-		{ "Timeout for long press buttons to activate." });
-
-		menu.IntOption("Max tap time (ms)", controls.MaxTapTime, 50, 1000, 10,
-		{ "Buttons pressed and released within this time are regarded as a tap. Shift up, shift down are tap controls." });
-
-		float currTriggerValue = controls.GetXboxTrigger();
-		float prevTriggerValue = currTriggerValue;
-		menu.FloatOption("Trigger value", currTriggerValue, 0.25, 1.0, 0.05,
-		{ "Threshold for an analog input to be detected as button press." });
-
-		if (currTriggerValue != prevTriggerValue) {
-			controls.SetXboxTrigger(currTriggerValue);
-		}
-
-		int oldIndexUp = getBlockableControlIndex(controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)]);
-		int newIndexUp = oldIndexUp;
-		if (menu.StringArray("Shift Up blocks", blockableControlsHelp, newIndexUp)) {
-			if (newIndexUp != oldIndexUp) {
-				controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)] = blockableControls[newIndexUp];
-			}
-		}
-		
-		int oldIndexDown = getBlockableControlIndex(controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)]);
-		int newIndexDown = oldIndexDown;
-		if (menu.StringArray("Shift Down blocks", blockableControlsHelp, newIndexDown)) {
-			if (newIndexDown != oldIndexDown) {
-				controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)] = blockableControls[newIndexDown];
-			}
-		}
-
-		std::vector<std::string> controllerInfo;
-		controllerInfo.push_back("Press RIGHT to clear key");
-		controllerInfo.push_back("Press RETURN to configure button");
-		controllerInfo.push_back("");
-
-		auto it = 0;
-		for (auto confTag : controllerConfTags) {
-			controllerInfo.back() = controllerConfTagDetail.at(it);
-			controllerInfo.push_back("Assigned to " + controls.ConfTagController2Value(confTag));
-			if (menu.OptionPlus("Assign " + confTag, controllerInfo, nullptr, std::bind(clearControllerButton, confTag), nullptr, "Current setting")) {
-				WAIT(500);
-				bool result = configControllerButton(confTag);
-				//showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
-				if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
-				WAIT(500);
-			}
-			it++;
-			controllerInfo.pop_back();
-		}
-
-
+	if (menu.OptionPlus("Set up WheelToKey", wheelToKeyInfo, nullptr, clearWheelToKey, nullptr, "Info",
+	                    { "Set up wheel buttons that press a keyboard key. Only one device can be used for this." })) {
+		bool result = configWheelToKey();
+		showNotification(result ? "Entry added" : "Cancelled entry addition", &prevNotification);
 	}
 
-	/* Yes hello I am root - 2 */
-	if (menu.CurrentMenu("keyboardmenu")) {
-		menu.Title("Keyboard controls");
-		menu.Subtitle("Keyboard assignments");
+	std::vector<std::string> buttonInfo;
+	buttonInfo.push_back("Press RIGHT to clear this button");
+	buttonInfo.push_back("Active buttons:");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::HR)) buttonInfo.push_back("Gear R");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H1)) buttonInfo.push_back("Gear 1");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H2)) buttonInfo.push_back("Gear 2");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H3)) buttonInfo.push_back("Gear 3");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H4)) buttonInfo.push_back("Gear 4");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H5)) buttonInfo.push_back("Gear 5");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H6)) buttonInfo.push_back("Gear 6");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::H7)) buttonInfo.push_back("Gear 7");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftUp))	buttonInfo.push_back("ShiftUp");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftDown)) buttonInfo.push_back("ShiftDown");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::Clutch))	buttonInfo.push_back("ClutchButton");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::Engine))	buttonInfo.push_back("Engine");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::Handbrake)) buttonInfo.push_back("Handbrake");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::Horn))		buttonInfo.push_back("Horn");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::Lights))	buttonInfo.push_back("Lights");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::LookBack))	buttonInfo.push_back("LookBack");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::LookLeft))	buttonInfo.push_back("LookLeft");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::LookRight))	buttonInfo.push_back("LookRight");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::Camera))	buttonInfo.push_back("Camera");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::RadioNext)) buttonInfo.push_back("RadioNext");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::RadioPrev)) buttonInfo.push_back("RadioPrev");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorLeft))		buttonInfo.push_back("IndicatorLeft");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorRight))	buttonInfo.push_back("IndicatorRight");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorHazard))	buttonInfo.push_back("IndicatorHazard");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::Toggle))	buttonInfo.push_back("ToggleMod");
+	if (controls.ButtonIn(ScriptControls::WheelControlType::ToggleH))	buttonInfo.push_back("ChangeShiftMode");
+	if (buttonInfo.size() == 2) buttonInfo.push_back("None");
 
-		std::vector<std::string> keyboardInfo;
-		keyboardInfo.push_back("Press RIGHT to clear key");
-		keyboardInfo.push_back("Press RETURN to configure key");
-		keyboardInfo.push_back("");
-
-		int it = 0;
-		for (auto confTag : keyboardConfTags) {
-			keyboardInfo.back() = keyboardConfTagsDetail.at(it);
-			keyboardInfo.push_back("Assigned to " + key2str(controls.ConfTagKB2key(confTag)));
-			if (menu.OptionPlus("Assign " + confTag, keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag), nullptr, "Current setting")) {
-				WAIT(500);
-				bool result = configKeyboardKey(confTag);
-				if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
-				WAIT(500);
-			}
-			it++;
-			keyboardInfo.pop_back();
+	for (auto confTag : buttonConfTags) {
+		buttonInfo.push_back("Assigned to " + std::to_string(controls.ConfTagWheel2Value(confTag)));
+		if (menu.OptionPlus("Assign " + confTag, buttonInfo, nullptr, std::bind(clearButton, confTag), nullptr, "Current inputs")) {
+			bool result = configButton(confTag);
+			showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
 		}
+		buttonInfo.pop_back();
+	}
+}
+
+void update_hudmenu() {
+	menu.Title("HUD Options");
+	menu.Subtitle("");
+
+	menu.BoolOption("Enable", settings.HUD,
+	                { "Display HUD elements." });
+
+	menu.BoolOption("Always enable", settings.AlwaysHUD,
+	                { "Display HUD even if manual transmission is off." });
+
+	int fontIndex = static_cast<int>(std::find(fontIDs.begin(), fontIDs.end(), settings.HUDFont) - fontIDs.begin());
+	int oldIndex = fontIndex;
+	menu.StringArray("Font: ", fonts, fontIndex, { "Select the font for speed, gearbox mode, current gear." });
+	if (fontIndex != oldIndex) {
+		settings.HUDFont = fontIDs.at(fontIndex);
 	}
 
-	/* Yes hello I am root - 1 */
-	if (menu.CurrentMenu("wheelmenu")) {
-		menu.Title("Steering wheel");
-		menu.Subtitle("Steering wheel options");
+	menu.MenuOption("Gear and shift mode", "geardisplaymenu");
+	menu.MenuOption("Speedometer", "speedodisplaymenu");
+	menu.MenuOption("RPM Gauge", "rpmdisplaymenu");
 
-		if (menu.BoolOption("Enable wheel", settings.EnableWheel,
-		{ "Enable usage of a steering wheel." })) {
-			settings.SaveWheel(&controls);
-			settings.Read(&controls);
-			initWheel();
-		}
+	std::vector<std::string> wheelTexturePresent = {};
 
-		if (menu.BoolOption("Enable wheel always", settings.WheelWithoutManual,
-		{ "Enable your wheel even when the Manual Transmission part of this mod is off." })) {
-			settings.SaveWheel(&controls);
-		}
-		
-		if (menu.BoolOption("Patch steering", settings.PatchSteering,
-		{ "Patches steering reduction and automatic countersteer for more direct control." })) {
-			settings.SaveWheel(&controls);
-			initSteeringPatches();
-		}
-
-		if (menu.FloatOption("Steering reduction (wheel)", settings.SteeringReductionWheel, 0.0f, 1.0f, 0.01f, 
-		{ "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
-			settings.SaveWheel(&controls);
-		}
-
-		if (menu.FloatOption("Steering multiplier (wheel)", settings.GameSteerMultWheel, 0.1f, 2.0f, 0.01f,
-		{ "Increase steering lock for all cars." })) {
-			updateSteeringMultiplier();
-		}
-
-		if (menu.BoolOption("Disable non-wheel steering", settings.PatchSteeringControl,
-		{ "Disable keyboard and controller inputs for steering. Fixes the jerky animation." })) {
-			settings.SaveWheel(&controls);
-			initSteeringPatches();
-		}
-
-		if (menu.BoolOption("Logitech RPM LEDs", settings.LogiLEDs, 
-		{ "Show the RPM LEDs on Logitech steering wheels. If the wheel doesn't have compatible RPM LEDs, this might crash." } )) {
-			settings.SaveWheel(&controls);
-		}
-
-		menu.MenuOption("Steering wheel axis setup", "axesmenu", 
-		{ "Configure analog controls, like throttle, steering and the like." });
-		
-		menu.MenuOption("Force feedback options", "forcefeedbackmenu",
-		{ "Fine-tune your force feedback parameters." });
-		
-		menu.MenuOption("Steering wheel angles", "anglemenu",
-		{ "Set up soft lock options here." });
-		
-		menu.MenuOption("Steering wheel button setup", "buttonsmenu",
-		{ "Set up your buttons on your steering wheel." });
-
-		std::vector<std::string> hpatInfo;
-		hpatInfo.push_back("Press RIGHT to clear H-pattern shifter");
-		hpatInfo.push_back("Active gear:");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::HR)) hpatInfo.push_back("Reverse");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H1)) hpatInfo.push_back("Gear 1");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H2)) hpatInfo.push_back("Gear 2");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H3)) hpatInfo.push_back("Gear 3");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H4)) hpatInfo.push_back("Gear 4");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H5)) hpatInfo.push_back("Gear 5");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H6)) hpatInfo.push_back("Gear 6");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H7)) hpatInfo.push_back("Gear 7");
-
-		if (menu.OptionPlus("H-pattern shifter setup", hpatInfo, nullptr, std::bind(clearHShifter), nullptr, "Input values",
-		{ "Select this option to start H-pattern shifter setup. Follow the on-screen instructions." })) {
-			bool result = configHPattern();
-			showNotification(result ? "H-pattern shifter saved" : "Cancelled H-pattern shifter setup", &prevNotification);
-		}
-
-		menu.BoolOption("Keyboard H-pattern", settings.HPatternKeyboard, 
-		{ "This will allow you to also use the keyboard controls for wheel H-pattern shifting. Configure these controls in the keyboard section." });
+	if (textureWheelId == -1) {
+		wheelTexturePresent.push_back("Wheel texture not found!");
 	}
 
-	/* Yes hello I am root - 2 */
-	if (menu.CurrentMenu("anglemenu")) {
-		menu.Title("Wheel angles");
-		menu.Subtitle("Soft lock & angle setup");
-		float minLock = 180.0f;
-		if (menu.FloatOption("Physical degrees", settings.SteerAngleMax, minLock, 1080.0, 30.0,
-		{ "How many degrees your wheel physically can turn. Should match driver settings." })) {
-			if (settings.SteerAngleCar > settings.SteerAngleMax) { settings.SteerAngleCar = settings.SteerAngleMax; }
-			if (settings.SteerAngleBike > settings.SteerAngleMax) { settings.SteerAngleBike = settings.SteerAngleMax; }
-			if (settings.SteerAngleBoat > settings.SteerAngleMax) { settings.SteerAngleBoat = settings.SteerAngleMax; }
-		}
-		menu.FloatOption("Car soft lock", settings.SteerAngleCar, minLock, settings.SteerAngleMax, 30.0,
-		{ "Soft lock for cars and trucks. (degrees)" });
+	menu.MenuOption("Wheel & Pedal Info", "wheelinfomenu");
+}
 
-		menu.FloatOption("Bike soft lock", settings.SteerAngleBike, minLock, settings.SteerAngleMax, 30.0,
-		{ "Soft lock for bikes and quads. (degrees)" });
+void update_geardisplaymenu() {
+	menu.Title("Gear options");
+	menu.Subtitle("");
 
-		menu.FloatOption("Boat soft lock", settings.SteerAngleBoat, minLock, settings.SteerAngleMax, 30.0,
-		{ "Soft lock for boats. (degrees)" });
-		
+	menu.BoolOption("Gear", settings.GearIndicator);
+	menu.BoolOption("Shift Mode", settings.ShiftModeIndicator);
+
+	menu.FloatOption("Gear X", settings.GearXpos, 0.0f, 1.0f, 0.005f);
+	menu.FloatOption("Gear Y", settings.GearYpos, 0.0f, 1.0f, 0.005f);
+	menu.FloatOption("Gear Size", settings.GearSize, 0.0f, 3.0f, 0.05f);
+	menu.IntOption("Gear Top Color Red", settings.GearTopColorR, 0, 255);
+	menu.IntOption("Gear Top Color Green", settings.GearTopColorG, 0, 255);
+	menu.IntOption("Gear Top Color Blue", settings.GearTopColorB, 0, 255);
+
+	menu.FloatOption("Shift Mode X", settings.ShiftModeXpos, 0.0f, 1.0f, 0.005f);
+	menu.FloatOption("Shift Mode Y", settings.ShiftModeYpos, 0.0f, 1.0f, 0.005f);
+	menu.FloatOption("Shift Mode Size", settings.ShiftModeSize, 0.0f, 3.0f, 0.05f);
+}
+
+void update_speedodisplaymenu() {
+	menu.Title("Speedometer options");
+	menu.Subtitle("");
+
+	ptrdiff_t oldPos = std::find(speedoTypes.begin(), speedoTypes.end(), settings.Speedo) - speedoTypes.begin();
+	menu.StringArray("Speedometer", speedoTypes, speedoIndex);
+	if (speedoIndex != oldPos) {
+		settings.Speedo = speedoTypes.at(speedoIndex);
 	}
+	menu.BoolOption("Show units", settings.SpeedoShowUnit);
+
+	menu.FloatOption("Speedometer X", settings.SpeedoXpos, 0.0f, 1.0f, 0.005f);
+	menu.FloatOption("Speedometer Y", settings.SpeedoYpos, 0.0f, 1.0f, 0.005f);
+	menu.FloatOption("Speedometer Size", settings.SpeedoSize, 0.0f, 3.0f, 0.05f);
+}
+
+void update_rpmdisplaymenu() {
+	menu.Title("RPM Gauge options");
+	menu.Subtitle("");
+
+	menu.BoolOption("RPM Gauge", settings.RPMIndicator);
+	menu.FloatOption("RPM Redline", settings.RPMIndicatorRedline, 0.0f, 1.0f, 0.01f);
+
+	menu.FloatOption("RPM X", settings.RPMIndicatorXpos, 0.0f, 1.0f, 0.0025f);
+	menu.FloatOption("RPM Y", settings.RPMIndicatorYpos, 0.0f, 1.0f, 0.0025f);
+	menu.FloatOption("RPM Width", settings.RPMIndicatorWidth, 0.0f, 1.0f, 0.0025f);
+	menu.FloatOption("RPM Height", settings.RPMIndicatorHeight, 0.0f, 1.0f, 0.0025f);
+
+	menu.IntOption("RPM Background Red	", settings.RPMIndicatorBackgroundR, 0, 255);
+	menu.IntOption("RPM Background Green", settings.RPMIndicatorBackgroundG, 0, 255);
+	menu.IntOption("RPM Background Blue	", settings.RPMIndicatorBackgroundB, 0, 255);
+	menu.IntOption("RPM Background Alpha", settings.RPMIndicatorBackgroundA, 0, 255);
+
+	menu.IntOption("RPM Foreground Red	", settings.RPMIndicatorForegroundR, 0, 255);
+	menu.IntOption("RPM Foreground Green", settings.RPMIndicatorForegroundG, 0, 255);
+	menu.IntOption("RPM Foreground Blue	", settings.RPMIndicatorForegroundB, 0, 255);
+	menu.IntOption("RPM Foreground Alpha", settings.RPMIndicatorForegroundA, 0, 255);
+
+	menu.IntOption("RPM Redline Red		", settings.RPMIndicatorRedlineR, 0, 255);
+	menu.IntOption("RPM Redline Green	", settings.RPMIndicatorRedlineG, 0, 255);
+	menu.IntOption("RPM Redline Blue	", settings.RPMIndicatorRedlineB, 0, 255);
+	menu.IntOption("RPM Redline Alpha	", settings.RPMIndicatorRedlineA, 0, 255);
+
+	menu.IntOption("RPM Revlimit Red	", settings.RPMIndicatorRevlimitR, 0, 255);
+	menu.IntOption("RPM Revlimit Green	", settings.RPMIndicatorRevlimitG, 0, 255);
+	menu.IntOption("RPM Revlimit Blue	", settings.RPMIndicatorRevlimitB, 0, 255);
+	menu.IntOption("RPM Revlimit Alpha	", settings.RPMIndicatorRevlimitA, 0, 255);
+}
+
+void update_wheelinfomenu() {
+	menu.Title("Wheel & Pedal Info");
+	menu.Subtitle("");
+
+	menu.BoolOption("Display steering wheel info", settings.SteeringWheelInfo, { "Show input info graphically." });
+	menu.BoolOption("Always display info", settings.AlwaysSteeringWheelInfo, { "Display the info even without a steering wheel." });
+	menu.FloatOption("Wheel image X", settings.SteeringWheelTextureX, 0.0f, 1.0f, 0.01f);
+	menu.FloatOption("Wheel image Y", settings.SteeringWheelTextureY, 0.0f, 1.0f, 0.01f);
+	menu.FloatOption("Wheel image size", settings.SteeringWheelTextureSz, 0.0f, 1.0f, 0.01f);
+	menu.FloatOption("Pedals X", settings.PedalInfoX, 0.0f, 1.0f, 0.01f);
+	menu.FloatOption("Pedals Y", settings.PedalInfoY, 0.0f, 1.0f, 0.01f);
+	menu.FloatOption("Pedals Height", settings.PedalInfoH	, 0.0f, 1.0f, 0.01f);
+	menu.FloatOption("Pedals Width", settings.PedalInfoW	, 0.0f, 1.0f, 0.01f);
+	menu.FloatOption("Pedals Pad X", settings.PedalInfoPadX, 0.0f, 1.0f, 0.01f);
+	menu.FloatOption("Pedals Pad Y", settings.PedalInfoPadY, 0.0f, 1.0f, 0.01f);
+}
+
+void update_debugmenu() {
+	menu.Title("Debug settings");
+	menu.Subtitle("Extra mod info");
+
+	menu.BoolOption("Display info", settings.DisplayInfo, 
+	                { "Show all detailed technical info of the gearbox and inputs calculations." });
+	menu.BoolOption("Display car wheel info", settings.DisplayWheelInfo, 
+	                { "Show per-wheel debug info with off-ground detection, lockup detection and suspension info." });
+	menu.BoolOption("Display gearing info", settings.DisplayGearingInfo,
+	                { "Show gear ratios and shift points from auto mode." });
+	menu.BoolOption("Display force feedback lines", settings.DisplayFFBInfo,
+	                { "Show lines detailing force feedback direction and force.",
+		                "Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction"});
+	menu.BoolOption("Expose script variables", settings.CrossScript, 
+	                { "Shares data like gear, shifting indicator and Neutral with other mods. Check GitHub for the supported types." });
+}
 
 
-	/* Yes hello I am root - 2 */
-	if (menu.CurrentMenu("axesmenu")) {
-		menu.Title("Configure axes");
-		menu.Subtitle("Setup steering and pedals");
-		controls.UpdateValues(ScriptControls::Wheel, false, true);
-		std::vector<std::string> info = {
-			"Press RIGHT to clear this axis" ,
-			"Steer    : " + std::to_string(controls.SteerVal),
-			"Throttle : " + std::to_string(controls.ThrottleVal),
-			"Brake    : " + std::to_string(controls.BrakeVal),
-			"Clutch   : " + std::to_string(controls.ClutchValRaw),
-			"Handbrake: " + std::to_string(controls.HandbrakeVal),
-		};
+// These tabs look fine in Visual Studio with Tab = 4 spaces
+void update_menu() {
+	menu.CheckKeys();
 
-		if (menu.OptionPlus("Calibrate steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr, "Input values")) {
-			bool result = configAxis("STEER");
-			showNotification(result ? "Steering axis saved" : "Cancelled steering axis calibration", &prevNotification);
-			if (result) initWheel();
-		}
-		if (menu.OptionPlus("Calibrate throttle", info, nullptr, std::bind(clearAxis, "THROTTLE"), nullptr, "Input values")) {
-			bool result = configAxis("THROTTLE");
-			showNotification(result ? "Throttle axis saved" : "Cancelled throttle axis calibration", &prevNotification);
-			if (result) initWheel();
-		}
-		if (menu.OptionPlus("Calibrate brake", info, nullptr, std::bind(clearAxis, "BRAKES"), nullptr, "Input values")) {
-			bool result = configAxis("BRAKES");
-			showNotification(result ? "Brake axis saved" : "Cancelled brake axis calibration", &prevNotification);
-			if (result) initWheel();
-		}
-		if (menu.OptionPlus("Calibrate clutch", info, nullptr, std::bind(clearAxis, "CLUTCH"), nullptr, "Input values")) {
-			bool result = configAxis("CLUTCH");
-			showNotification(result ? "Clutch axis saved" : "Cancelled clutch axis calibration", &prevNotification);
-			if (result) initWheel();
-		}
-		if (menu.OptionPlus("Calibrate handbrake", info, nullptr, std::bind(clearAxis, "HANDBRAKE_ANALOG"), nullptr, "Input values")) {
-			bool result = configAxis("HANDBRAKE_ANALOG");
-			showNotification(result ? "Handbrake axis saved" : "Cancelled handbrake axis calibration", &prevNotification);
-			if (result) initWheel();
-		}
+	/* mainmenu */
+	if (menu.CurrentMenu("mainmenu")) { 			update_mainmenu(); 				}
 
-		if (!settings.PatchSteeringControl) {
-			menu.FloatOption("Steering anti-deadzone", controls.ADZSteer, 0.0f, 1.0f, 0.01f,
-			{ "GTA V ignores 25% input for analog controls by default." });
-		}
+	/* mainmenu -> optionsmenu */
+	if (menu.CurrentMenu("optionsmenu")) { 			update_optionsmenu(); 			}
 
-		menu.FloatOption("Throttle anti-deadzone",	controls.ADZThrottle, 0.0f, 1.0f, 0.01f, 
-		{ "GTA V ignores 25% input for analog controls by default." });
-		menu.FloatOption("Brake anti-deadzone",		controls.ADZBrake, 0.0f, 1.0f, 0.01f,
-		{ "GTA V ignores 25% input for analog controls by default." });
+	/* mainmenu -> optionsmenu -> miscoptionsmenu */
+	if (menu.CurrentMenu("miscoptionsmenu")) { 		update_miscoptionsmenu(); 		}
 
-		menu.BoolOption("Invert steer", controls.InvertSteer);
-		menu.BoolOption("Invert throttle", controls.InvertThrottle);
-		menu.BoolOption("Invert brake", controls.InvertBrake);
-		menu.BoolOption("Invert clutch", controls.InvertClutch);
-	}
+	/* mainmenu -> optionsmenu -> finetuneoptionsmenu */
+	if (menu.CurrentMenu("finetuneoptionsmenu")) { 	update_finetuneoptionsmenu(); 	}
 
-	/* Yes hello I am root - 2 */
-	if (menu.CurrentMenu("forcefeedbackmenu")) {
-		menu.Title("Force feedback");
-		menu.Subtitle("Force feedback setup");
+	/* mainmenu -> controlsmenu */
+	if (menu.CurrentMenu("controlsmenu")) { 		update_controlsmenu(); 			}
 
-		menu.BoolOption("Enable", settings.EnableFFB, 
-		{ "Enable or disable force feedback entirely." });
+	/* mainmenu -> controlsmenu -> legacycontrollermenu */
+	if (menu.CurrentMenu("legacycontrollermenu")) {	update_legacycontrollermenu(); 	}
 
-		menu.FloatOption("Global multiplier", settings.FFGlobalMult, 0.0f, 10.0f, 1.0f);
-		
-		menu.FloatOption("Self aligning force", settings.FFBAmpMultNew, 0.1f, 2.0f, 0.05f,
-		{ "Force feedback strength for steering." });
+	/* mainmenu -> controlsmenu -> controllermenu */
+	if (menu.CurrentMenu("controllermenu")) { 		update_controllermenu(); 		}
 
-		menu.IntOption("Damper Max (low speed)", settings.DamperMax, 0, 200, 1, 
-		{ "Wheel friction at low speed." });
-		
-		menu.IntOption("Damper Min (high speed)", settings.DamperMin, 0, 200, 1,
-		{ "Wheel friction at high speed." });
-		
-		menu.FloatOption("Damper end speed", settings.TargetSpeed, 0.0f, 40.0f, 0.2f,
-		{ "Speed at which the damper strength should be minimal.", "In m/s." });
-		
-		menu.FloatOption("Detail strength", settings.DetailStrength, 0.0f, 10.0f, 0.1f,
-		{ "Force feedback effect strength by suspension events due to finer road details." });
-	}
+	/* mainmenu -> controlsmenu -> keyboardmenu */
+	if (menu.CurrentMenu("keyboardmenu")) { 		update_keyboardmenu();			}
 
-	/* Yes hello I am root - 2 */
-	if (menu.CurrentMenu("buttonsmenu")) {
-		menu.Title("Configure buttons");
-		menu.Subtitle("Button setup and review");
+	/* mainmenu -> wheelmenu */
+	if (menu.CurrentMenu("wheelmenu")) { 			update_wheelmenu(); 			}
 
-		std::vector<std::string> wheelToKeyInfo;
-		wheelToKeyInfo.push_back("Active wheel-to-key options:");
-		wheelToKeyInfo.push_back("Press RIGHT to clear a button");
-		wheelToKeyInfo.push_back("Device: " + settings.GUIDToDeviceIndex(controls.WheelToKeyGUID));
-		for (int i = 0; i < WheelDirectInput::MAX_RGBBUTTONS; i++) {
-			if (controls.WheelToKey[i] != -1) {
-				wheelToKeyInfo.push_back(std::to_string(i) + " = " + key2str(controls.WheelToKey[i]));
-				if (controls.WheelControl.IsButtonPressed(i, controls.WheelToKeyGUID)) {
-					wheelToKeyInfo.back() += " (Pressed)";
-				}
-			}
-		}
+	/* mainmenu -> wheelmenu -> anglemenu */
+	if (menu.CurrentMenu("anglemenu")) { 			update_anglemenu(); 			}
 
-		if (menu.OptionPlus("Set up WheelToKey", wheelToKeyInfo, nullptr, clearWheelToKey, nullptr, "Info",
-		{ "Set up wheel buttons that press a keyboard key. Only one device can be used for this." })) {
-			bool result = configWheelToKey();
-			showNotification(result ? "Entry added" : "Cancelled entry addition", &prevNotification);
-		}
+	/* mainmenu -> wheelmenu -> axesmenu */
+	if (menu.CurrentMenu("axesmenu")) { 			update_axesmenu(); 				}
 
-		std::vector<std::string> buttonInfo;
-		buttonInfo.push_back("Press RIGHT to clear this button");
-		buttonInfo.push_back("Active buttons:");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::HR)) buttonInfo.push_back("Gear R");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H1)) buttonInfo.push_back("Gear 1");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H2)) buttonInfo.push_back("Gear 2");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H3)) buttonInfo.push_back("Gear 3");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H4)) buttonInfo.push_back("Gear 4");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H5)) buttonInfo.push_back("Gear 5");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H6)) buttonInfo.push_back("Gear 6");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::H7)) buttonInfo.push_back("Gear 7");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftUp))	buttonInfo.push_back("ShiftUp");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::ShiftDown)) buttonInfo.push_back("ShiftDown");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::Clutch))	buttonInfo.push_back("ClutchButton");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::Engine))	buttonInfo.push_back("Engine");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::Handbrake)) buttonInfo.push_back("Handbrake");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::Horn))		buttonInfo.push_back("Horn");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::Lights))	buttonInfo.push_back("Lights");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::LookBack))	buttonInfo.push_back("LookBack");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::LookLeft))	buttonInfo.push_back("LookLeft");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::LookRight))	buttonInfo.push_back("LookRight");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::Camera))	buttonInfo.push_back("Camera");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::RadioNext)) buttonInfo.push_back("RadioNext");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::RadioPrev)) buttonInfo.push_back("RadioPrev");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorLeft))		buttonInfo.push_back("IndicatorLeft");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorRight))	buttonInfo.push_back("IndicatorRight");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::IndicatorHazard))	buttonInfo.push_back("IndicatorHazard");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::Toggle))	buttonInfo.push_back("ToggleMod");
-		if (controls.ButtonIn(ScriptControls::WheelControlType::ToggleH))	buttonInfo.push_back("ChangeShiftMode");
-		if (buttonInfo.size() == 2) buttonInfo.push_back("None");
+	/* mainmenu -> wheelmenu -> forcefeedbackmenu */
+	if (menu.CurrentMenu("forcefeedbackmenu")) { 	update_forcefeedbackmenu(); 	}
 
-		for (auto confTag : buttonConfTags) {
-			buttonInfo.push_back("Assigned to " + std::to_string(controls.ConfTagWheel2Value(confTag)));
-			if (menu.OptionPlus("Assign " + confTag, buttonInfo, nullptr, std::bind(clearButton, confTag), nullptr, "Current inputs")) {
-				bool result = configButton(confTag);
-				showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
-			}
-			buttonInfo.pop_back();
-		}
-	}
+	/* mainmenu -> wheelmenu -> buttonsmenu */
+	if (menu.CurrentMenu("buttonsmenu")) { 			update_buttonsmenu(); 			}
 
-	/* Yes hello I am root - 1 */
-	if (menu.CurrentMenu("hudmenu")) {
-		menu.Title("HUD Options");
-		menu.Subtitle("");
+	/* mainmenu -> hudmenu */
+	if (menu.CurrentMenu("hudmenu")) { 				update_hudmenu(); 				}
 
-		menu.BoolOption("Enable", settings.HUD,
-		{ "Display HUD elements." });
+	/* mainmenu -> hudmenu -> geardisplaymenu*/
+	if (menu.CurrentMenu("geardisplaymenu")) { 		update_geardisplaymenu(); 		}
 
-		menu.BoolOption("Always enable", settings.AlwaysHUD,
-		{ "Display HUD even if manual transmission is off." });
+	/* mainmenu -> hudmenu -> speedodisplaymenu*/
+	if (menu.CurrentMenu("speedodisplaymenu")) { 	update_speedodisplaymenu(); 	}
 
-		int fontIndex = static_cast<int>(std::find(fontIDs.begin(), fontIDs.end(), settings.HUDFont) - fontIDs.begin());
-		int oldIndex = fontIndex;
-		menu.StringArray("Font: ", fonts, fontIndex, { "Select the font for speed, gearbox mode, current gear." });
-		if (fontIndex != oldIndex) {
-			settings.HUDFont = fontIDs.at(fontIndex);
-		}
+	/* mainmenu -> hudmenu -> rpmdisplaymenu*/
+	if (menu.CurrentMenu("rpmdisplaymenu")) { 		update_rpmdisplaymenu(); 		}
 
-		menu.MenuOption("Gear and shift mode", "geardisplaymenu");
-		menu.MenuOption("Speedometer", "speedodisplaymenu");
-		menu.MenuOption("RPM Gauge", "rpmdisplaymenu");
+	/* mainmenu -> hudmenu -> wheelinfomenu*/
+	if (menu.CurrentMenu("wheelinfomenu")) { 		update_wheelinfomenu(); 		}
 
-		std::vector<std::string> wheelTexturePresent = {};
-
-		if (textureWheelId == -1) {
-			wheelTexturePresent.push_back("Wheel texture not found!");
-		}
-
-		menu.MenuOption("Wheel & Pedal Info", "wheelinfomenu");
-	}
-
-	/* Yes hello I am root - 2 */
-	if (menu.CurrentMenu("geardisplaymenu")) {
-		menu.Title("Gear options");
-		menu.Subtitle("");
-
-		menu.BoolOption("Gear", settings.GearIndicator);
-		menu.BoolOption("Shift Mode", settings.ShiftModeIndicator);
-
-		menu.FloatOption("Gear X", settings.GearXpos, 0.0f, 1.0f, 0.005f);
-		menu.FloatOption("Gear Y", settings.GearYpos, 0.0f, 1.0f, 0.005f);
-		menu.FloatOption("Gear Size", settings.GearSize, 0.0f, 3.0f, 0.05f);
-		menu.IntOption("Gear Top Color Red", settings.GearTopColorR, 0, 255);
-		menu.IntOption("Gear Top Color Green", settings.GearTopColorG, 0, 255);
-		menu.IntOption("Gear Top Color Blue", settings.GearTopColorB, 0, 255);
-
-		menu.FloatOption("Shift Mode X", settings.ShiftModeXpos, 0.0f, 1.0f, 0.005f);
-		menu.FloatOption("Shift Mode Y", settings.ShiftModeYpos, 0.0f, 1.0f, 0.005f);
-		menu.FloatOption("Shift Mode Size", settings.ShiftModeSize, 0.0f, 3.0f, 0.05f);
-	}
-
-	/* Yes hello I am root - 2 */
-	if (menu.CurrentMenu("speedodisplaymenu")) {
-		menu.Title("Speedometer options");
-		menu.Subtitle("");
-
-		ptrdiff_t oldPos = std::find(speedoTypes.begin(), speedoTypes.end(), settings.Speedo) - speedoTypes.begin();
-		menu.StringArray("Speedometer", speedoTypes, speedoIndex);
-		if (speedoIndex != oldPos) {
-			settings.Speedo = speedoTypes.at(speedoIndex);
-		}
-		menu.BoolOption("Show units", settings.SpeedoShowUnit);
-
-		menu.FloatOption("Speedometer X", settings.SpeedoXpos, 0.0f, 1.0f, 0.005f);
-		menu.FloatOption("Speedometer Y", settings.SpeedoYpos, 0.0f, 1.0f, 0.005f);
-		menu.FloatOption("Speedometer Size", settings.SpeedoSize, 0.0f, 3.0f, 0.05f);
-	}
-
-	/* Yes hello I am root - 2 */
-	if (menu.CurrentMenu("rpmdisplaymenu")) {
-		menu.Title("RPM Gauge options");
-		menu.Subtitle("");
-
-		menu.BoolOption("RPM Gauge", settings.RPMIndicator);
-		menu.FloatOption("RPM Redline", settings.RPMIndicatorRedline, 0.0f, 1.0f, 0.01f);
-
-		menu.FloatOption("RPM X", settings.RPMIndicatorXpos, 0.0f, 1.0f, 0.0025f);
-		menu.FloatOption("RPM Y", settings.RPMIndicatorYpos, 0.0f, 1.0f, 0.0025f);
-		menu.FloatOption("RPM Width", settings.RPMIndicatorWidth, 0.0f, 1.0f, 0.0025f);
-		menu.FloatOption("RPM Height", settings.RPMIndicatorHeight, 0.0f, 1.0f, 0.0025f);
-
-		menu.IntOption("RPM Background Red	", settings.RPMIndicatorBackgroundR, 0, 255);
-		menu.IntOption("RPM Background Green", settings.RPMIndicatorBackgroundG, 0, 255);
-		menu.IntOption("RPM Background Blue	", settings.RPMIndicatorBackgroundB, 0, 255);
-		menu.IntOption("RPM Background Alpha", settings.RPMIndicatorBackgroundA, 0, 255);
-
-		menu.IntOption("RPM Foreground Red	", settings.RPMIndicatorForegroundR, 0, 255);
-		menu.IntOption("RPM Foreground Green", settings.RPMIndicatorForegroundG, 0, 255);
-		menu.IntOption("RPM Foreground Blue	", settings.RPMIndicatorForegroundB, 0, 255);
-		menu.IntOption("RPM Foreground Alpha", settings.RPMIndicatorForegroundA, 0, 255);
-
-		menu.IntOption("RPM Redline Red		", settings.RPMIndicatorRedlineR, 0, 255);
-		menu.IntOption("RPM Redline Green	", settings.RPMIndicatorRedlineG, 0, 255);
-		menu.IntOption("RPM Redline Blue	", settings.RPMIndicatorRedlineB, 0, 255);
-		menu.IntOption("RPM Redline Alpha	", settings.RPMIndicatorRedlineA, 0, 255);
-
-		menu.IntOption("RPM Revlimit Red	", settings.RPMIndicatorRevlimitR, 0, 255);
-		menu.IntOption("RPM Revlimit Green	", settings.RPMIndicatorRevlimitG, 0, 255);
-		menu.IntOption("RPM Revlimit Blue	", settings.RPMIndicatorRevlimitB, 0, 255);
-		menu.IntOption("RPM Revlimit Alpha	", settings.RPMIndicatorRevlimitA, 0, 255);
-	}
-
-	if (menu.CurrentMenu("wheelinfomenu")) {
-		menu.Title("Wheel & Pedal Info");
-		menu.Subtitle("");
-
-		menu.BoolOption("Display steering wheel info", settings.SteeringWheelInfo, { "Show input info graphically." });
-		menu.BoolOption("Always display info", settings.AlwaysSteeringWheelInfo, { "Display the info even without a steering wheel." });
-		menu.FloatOption("Wheel image X", settings.SteeringWheelTextureX, 0.0f, 1.0f, 0.01f);
-		menu.FloatOption("Wheel image Y", settings.SteeringWheelTextureY, 0.0f, 1.0f, 0.01f);
-		menu.FloatOption("Wheel image size", settings.SteeringWheelTextureSz, 0.0f, 1.0f, 0.01f);
-		menu.FloatOption("Pedals X", settings.PedalInfoX, 0.0f, 1.0f, 0.01f);
-		menu.FloatOption("Pedals Y", settings.PedalInfoY, 0.0f, 1.0f, 0.01f);
-		menu.FloatOption("Pedals Height", settings.PedalInfoH	, 0.0f, 1.0f, 0.01f);
-		menu.FloatOption("Pedals Width", settings.PedalInfoW	, 0.0f, 1.0f, 0.01f);
-		menu.FloatOption("Pedals Pad X", settings.PedalInfoPadX, 0.0f, 1.0f, 0.01f);
-		menu.FloatOption("Pedals Pad Y", settings.PedalInfoPadY, 0.0f, 1.0f, 0.01f);
-	}
-
-	/* Yes hello I am root - 1 */
-	if (menu.CurrentMenu("debugmenu")) {
-		menu.Title("Debug settings");
-		menu.Subtitle("Extra mod info");
-
-		menu.BoolOption("Display info", settings.DisplayInfo, 
-		{ "Show all detailed technical info of the gearbox and inputs calculations." });
-		menu.BoolOption("Display car wheel info", settings.DisplayWheelInfo, 
-		{ "Show per-wheel debug info with off-ground detection, lockup detection and suspension info." });
-		menu.BoolOption("Display gearing info", settings.DisplayGearingInfo,
-		{ "Show gear ratios and shift points from auto mode." });
-		menu.BoolOption("Display force feedback lines", settings.DisplayFFBInfo,
-		{ "Show lines detailing force feedback direction and force.",
-		"Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction"});
-		menu.BoolOption("Expose script variables", settings.CrossScript, 
-		{ "Shares data like gear, shifting indicator and Neutral with other mods. Check GitHub for the supported types." });
-	}
-
-	/*if (menu.CurrentMenu("planemenu")) {
-		menu.Title("Plane!");
-		menu.Subtitle("Setup");
-
-		std::vector<std::string> info = {
-			"Press RIGHT to clear this axis" ,
-			"Throttle\t: " + std::to_string(controls.PlaneThrottle),
-			"Brake\t: " + std::to_string(controls.PlaneBrake),
-			"Pitch\t: " + std::to_string(controls.PlanePitch),
-			"Roll\t\t: " + std::to_string(controls.PlaneRoll),
-			"Rudder L\t: " + std::to_string(controls.PlaneRudderL),
-			"Rudder R\t: " + std::to_string(controls.PlaneRudderR),
-		};
-
-		if (menu.OptionPlus("Calibrate throttle", info, std::bind(clearAxis, "THROTTLE"), nullptr, "Input values")) {
-			bool result = configStickAxis("THROTTLE");
-			showNotification(result ? "axis saved" : "Cancelled axis calibration", &prevNotification);
-			if (result) initWheel();
-		}
-		if (menu.OptionPlus("Calibrate brake", info, std::bind(clearAxis, "BRAKE"), nullptr, "Input values")) {
-			bool result = configStickAxis("BRAKE");
-			showNotification(result ? "axis saved" : "Cancelled axis calibration", &prevNotification);
-			if (result) initWheel();
-		}
-		if (menu.OptionPlus("Calibrate pitch", info, std::bind(clearAxis, "PITCH"), nullptr, "Input values")) {
-			bool result = configStickAxis("PITCH");
-			showNotification(result ? "axis saved" : "Cancelled axis calibration", &prevNotification);
-			if (result) initWheel();
-		}
-		if (menu.OptionPlus("Calibrate roll", info, std::bind(clearAxis, "ROLL"), nullptr, "Input values")) {
-			bool result = configStickAxis("ROLL");
-			showNotification(result ? "axis saved" : "Cancelled axis calibration", &prevNotification);
-			if (result) initWheel();
-		}
-		if (menu.OptionPlus("Calibrate rudder L", info, std::bind(clearAxis, "RUDDER_L"), nullptr, "Input values")) {
-			bool result = configStickAxis("RUDDER_L");
-			showNotification(result ? "axis saved" : "Cancelled axis calibration", &prevNotification);
-			if (result) initWheel();
-		}
-		if (menu.OptionPlus("Calibrate rudder R", info, std::bind(clearAxis, "RUDDER_R"), nullptr, "Input values")) {
-			bool result = configStickAxis("RUDDER_R");
-			showNotification(result ? "axis saved" : "Cancelled axis calibration", &prevNotification);
-			if (result) initWheel();
-		}
-	}*/
+	/* mainmenu -> debugmenu */
+	if (menu.CurrentMenu("debugmenu")) { 			update_debugmenu(); 			}
 
 	menu.EndMenu();
 }
