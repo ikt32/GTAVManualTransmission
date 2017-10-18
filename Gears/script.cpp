@@ -196,6 +196,12 @@ void update() {
 	///////////////////////////////////////////////////////////////////////////
 	//          Active whenever Manual is enabled from here
 	///////////////////////////////////////////////////////////////////////////
+	if (vehData.Class == VehicleData::VehicleClass::Plane)
+		return;
+
+	if (vehData.Class == VehicleData::VehicleClass::Heli)
+		return;
+
 	if (!settings.EnableManual) {
 		return;
 	}
@@ -543,7 +549,7 @@ void drawDebugInfo() {
 		}
 		
 		i = 0;
-		showText(0.25f, 0.05f, 0.35f, "Expected (DriveMaxFlatVel)");
+		showText(0.25f, 0.05f, 0.35f, "DriveMaxFlatVel");
 		for (auto ratio : ratios) {
 			float maxSpeed = DriveMaxFlatVel / ratio;
 			showText(0.25f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(maxSpeed));
@@ -551,7 +557,7 @@ void drawDebugInfo() {
 		}
 
 		i = 0;
-		showText(0.40f, 0.05f, 0.35f, "Expected (InitialDriveMaxFlatVel)");
+		showText(0.40f, 0.05f, 0.35f, "InitialDriveMaxFlatVel");
 		for (auto ratio : ratios) {
 			float maxSpeed = InitialDriveMaxFlatVel / ratio;
 			showText(0.40f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(maxSpeed));
@@ -1292,7 +1298,13 @@ void functionEngStall() {
 }
 
 void functionEngDamage() {
-	if (vehData.Rpm > 0.98f &&
+	if (settings.ShiftMode == Automatic ||
+		vehData.TopGear == 1) {
+		return;
+	}
+
+	if (vehData.CurrGear != vehData.TopGear &&
+		vehData.Rpm > 0.98f &&
 		controls.ThrottleVal > 0.98f) {
 		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, 
 										   VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (settings.RPMDamage));
@@ -1368,7 +1380,14 @@ std::vector<bool> getDrivenWheels() {
 }
 
 void functionEngLock() {
-
+	if (settings.ShiftMode == Automatic ||
+		vehData.TopGear == 1 || 
+		vehData.IsTruck ||
+		vehData.CurrGear == 0 ||
+		vehData.CurrGear == vehData.TopGear ||
+		vehData.SimulatedNeutral) {
+		return;
+	}
 	// ok so this took me way too much time
 	// I finally found the gearing ratio stuff, which along with DriveMaxFlatVel (?)
 	// can be used to figure out the max speed for that gear.
@@ -1386,38 +1405,22 @@ void functionEngLock() {
 		dashms = abs(vehData.Velocity);
 	}
 
-
 	float speed = dashms;
 	auto ratios = ext.GetGearRatios(vehicle);
 	float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
 	float maxSpeed = DriveMaxFlatVel / ratios[vehData.CurrGear];
 
 	// Wheels are locking up due to bad downshifts
-	if (vehData.CurrGear != 0 && vehData.CurrGear != vehData.TopGear &&
-		!vehData.SimulatedNeutral && speed > maxSpeed + 3.334f) {
-		if (vehData.IsTruck && vehData.CurrGear == 1 &&
-			speed < maxSpeed + 12.0f)
-			return;
-		if (vehData.IsTruck && vehData.CurrGear == 2 &&
-			speed < maxSpeed + 6.0f)
-			return;
-
+	if (speed > maxSpeed + 3.334f) {
 		engLockActive = true;
-		//if (!MemoryPatcher::BrakeDecrementPatched) {
-		//	MemoryPatcher::PatchBrakeDecrement();
-		//}
 		float inputMultiplier = (1.0f - controls.ClutchVal);
 		float lockingForce = 60.0f * inputMultiplier;
 		auto wheelsToLock = getDrivenWheels();
-
-		//auto wheelPtrs = ext.GetWheelPtrs(vehicle);
 
 		for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
 			if (i >= wheelsToLock.size() || wheelsToLock[i]) {
 				ext.SetWheelBrakePressure(vehicle, i, lockingForce);
 				ext.SetWheelSkidSmokeEffect(vehicle, i, lockingForce);
-				//unsigned *wheelflags = ((unsigned*)(wheelPtrs[i] + 0x1ec));
-				//(*wheelflags)&=0xFFFF3FFF;
 			}
 			else {
 				float inpBrakeForce = *reinterpret_cast<float *>(ext.GetHandlingPtr(vehicle) + hOffsets.fBrakeForce) * controls.BrakeVal;
@@ -1438,10 +1441,6 @@ void functionEngLock() {
 	}
 	else {
 		engLockActive = false;
-		/*
-		if (MemoryPatcher::BrakeDecrementPatched) {
-			MemoryPatcher::RestoreBrakeDecrement();
-		}*/
 		gearRattle.Stop();
 	}
 }
@@ -1459,9 +1458,6 @@ void functionEngBrake() {
 		float inputMultiplier = throttleMultiplier * clutchMultiplier;
 		if (inputMultiplier > 0.0f) {
 			engBrakeActive = true;
-			//if (!MemoryPatcher::BrakeDecrementPatched) {
-			//	MemoryPatcher::PatchBrakeDecrement();
-			//}
 			float rpmMultiplier = (vehData.Rpm - activeBrakeThreshold) / (1.0f - activeBrakeThreshold);
 			float engBrakeForce = settings.EngBrakePower * handlingBrakeForce * inputMultiplier * rpmMultiplier;
 			auto wheelsToBrake = getDrivenWheels();
@@ -1483,9 +1479,6 @@ void functionEngBrake() {
 	}
 	else {
 		engBrakeActive = false;
-		//if (MemoryPatcher::BrakeDecrementPatched) {
-		//	MemoryPatcher::RestoreBrakeDecrement();
-		//}
 	}
 }
 
@@ -2304,8 +2297,8 @@ void playFFBGround(bool airborne) {
 		showText(0.85, 0.175, 0.4, "RelSteer:\t" + std::to_string(steeringRelative.x), 4);
 		showText(0.85, 0.200, 0.4, "SetPoint:\t" + std::to_string(travelRelative.x), 4);
 		showText(0.85, 0.225, 0.4, "Error:\t\t" + std::to_string(error), 4);
-		showText(0.85, 0.250, 0.4, std::string(abs(satForce) > 10000 ? "~r~" : "~w~") + "FFBAmp:\t" + std::to_string(satForce) + "~w~", 4);
-		showText(0.85, 0.275, 0.4, std::string(under_ ? "~b~" : "~w~") + "Under:\t\t" + std::to_string(understeer) + "~w~", 4);
+		showText(0.85, 0.250, 0.4, std::string(under_ ? "~b~" : "~w~") + "Under:\t\t" + std::to_string(understeer) + "~w~", 4);
+		showText(0.85, 0.275, 0.4, std::string(abs(satForce) > 10000 ? "~r~" : "~w~") + "FFBSat:\t\t" + std::to_string(satForce) + "~w~", 4);
 		showText(0.85, 0.300, 0.4, std::string(abs(totalForce) > 10000 ? "~r~" : "~w~") + "FFBFin:\t\t" + std::to_string(totalForce) + "~w~", 4);
 	}
 }
@@ -2344,15 +2337,6 @@ void functionHillGravity() {
 ///////////////////////////////////////////////////////////////////////////////
 //                              Script entry
 ///////////////////////////////////////////////////////////////////////////////
-
-enum eDecorType
-{
-	DECOR_TYPE_FLOAT = 1,
-	DECOR_TYPE_BOOL,
-	DECOR_TYPE_INT,
-	DECOR_TYPE_UNK,
-	DECOR_TYPE_TIME
-};
 
 void registerDecorator(const char *thing, eDecorType type) {
 	std::string strType = "?????";

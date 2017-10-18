@@ -44,6 +44,14 @@ enum eRadioStations {
 	RadioOff = 255
 };
 
+enum eDecorType {
+	DECOR_TYPE_FLOAT = 1,
+	DECOR_TYPE_BOOL,
+	DECOR_TYPE_INT,
+	DECOR_TYPE_UNK,
+	DECOR_TYPE_TIME
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 //                           Helper functions/tools
 ///////////////////////////////////////////////////////////////////////////////
