@@ -166,7 +166,7 @@ void update() {
 			handleVehicleButtons();
 			handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
 			doWheelSteering();
-			playFFBGround(false);
+			playFFBGround();
 			return;
 		}
 
@@ -188,9 +188,7 @@ void update() {
 		handleVehicleButtons();
 		handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
 		doWheelSteering();
-		bool airborne = !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) &&
-			ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f;
-		playFFBGround(airborne);
+		playFFBGround();
 	}	
 
 	///////////////////////////////////////////////////////////////////////////
@@ -214,9 +212,7 @@ void update() {
 
 	if (settings.EnableWheel && controls.WheelControl.IsConnected(controls.SteerGUID)) {
 		doWheelSteering();
-		bool airborne = !VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) &&
-			ENTITY::GET_ENTITY_HEIGHT_ABOVE_GROUND(vehicle) > 1.25f;
-		playFFBGround(airborne);
+		playFFBGround();
 	}
 	
 
@@ -2146,7 +2142,7 @@ void playFFBAir() {
 	// Stick ffb?
 }
 
-int calculateDamper() {
+int calculateDamper(float wheelsOffGroundRatio) {
 	Vector3 accelValsAvg = vehData.getAccelerationVectorsAverage();
 	
 	// targetSpeed is the speed at which the damperForce is at minimum
@@ -2156,9 +2152,28 @@ int calculateDamper() {
 
 	// Acceleration also affects damper force
 	damperForce -= static_cast<int>(adjustRatio * accelValsAvg.y);
+
+	// And wheels not touching the ground!
+	if (wheelsOffGroundRatio > 0.0f) {
+		damperForce = settings.DamperMin + (int)(((float)damperForce - (float)settings.DamperMin) * (1.0f - wheelsOffGroundRatio));
+	}
 	
 	if (damperForce < settings.DamperMin) {
 		damperForce = settings.DamperMin;
+	}
+
+	if (vehData.Class == VehicleData::VehicleClass::Car || vehData.Class == VehicleData::VehicleClass::Quad) {
+		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true) && VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
+			damperForce = settings.DamperMin;
+		}
+		else if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true) || VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
+			damperForce = settings.DamperMin + (int)(((float)damperForce - (float)settings.DamperMin) * 0.5f);
+		}
+	}
+	else if (vehData.Class == VehicleData::VehicleClass::Bike) {
+		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
+			damperForce = settings.DamperMin;
+		}
 	}
 
 	// steerSpeed is to dampen the steering wheel
@@ -2207,7 +2222,7 @@ void calculateSoftLock(int &totalForce) {
 	}
 }
 
-void playFFBGround(bool airborne) {
+void playFFBGround() {
 	if (!settings.EnableFFB ||
 		controls.PrevInput != ScriptControls::Wheel ||
 		!controls.WheelControl.IsConnected(controls.SteerGUID)) {
@@ -2218,7 +2233,30 @@ void playFFBGround(bool airborne) {
 		controls.WheelControl.PlayLedsDInput(controls.SteerGUID, vehData.Rpm, 0.45, 0.95);
 	}
 
-	int damperForce = calculateDamper();
+	auto suspensionStates = ext.GetWheelsOnGround(vehicle);
+	auto angles = ext.GetWheelSteeringAngles(vehicle);
+
+	// These are discrete numbers, but division is needed so floats!
+	float steeredWheels = 0.0f;
+	float steeredWheelsFree = 0.0f;
+
+	for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
+		if (angles[i] != 0.0f) {
+			steeredWheels += 1.0f;
+			if (suspensionStates[i] == false) {
+				steeredWheelsFree += 1.0f;
+			}
+		}
+	}
+	float wheelsOffGroundRatio;
+	if (steeredWheels == 0.0f) {
+		wheelsOffGroundRatio = -1.0f;
+	}
+	else {
+		wheelsOffGroundRatio = steeredWheelsFree / steeredWheels;
+	}
+
+	int damperForce = calculateDamper(wheelsOffGroundRatio);
 	int detailForce = calculateDetail();
 
 	// the big steering forces thing!
@@ -2231,6 +2269,7 @@ void playFFBGround(bool airborne) {
 	Vector3 turnRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, turnWorld.x, turnWorld.y, turnWorld.z);
 	float turnRelativeNormX = (travelRelative.x + turnRelative.x) / 2.0f;
 	float turnRelativeNormY = (travelRelative.y + turnRelative.y) / 2.0f;
+	Vector3 turnWorldNorm = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, turnRelativeNormX, turnRelativeNormY, 0.0f);
 
 	float steeringAngle = ext.GetSteeringAngle(vehicle)*ext.GetSteeringMultiplier(vehicle);
 	float steeringAngleRelX = vehData.Speed*-sin(steeringAngle);
@@ -2255,21 +2294,21 @@ void playFFBGround(bool airborne) {
 		under_ = true;
 	}
 
-	if (airborne) {
-		satForce = 0;
-		damperForce = settings.DamperMin;
+	if (wheelsOffGroundRatio > 0.0f) {
+		satForce = (int)((float)satForce * (1.0f - wheelsOffGroundRatio));
 	}
 
 	if (vehData.Class == VehicleData::VehicleClass::Car || vehData.Class == VehicleData::VehicleClass::Quad) {
 		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true) && VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
 			satForce = satForce / 10;
-			damperForce = settings.DamperMin;
+		}
+		else if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true) || VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
+			damperForce = satForce / 5;
 		}
 	}
 	else if (vehData.Class == VehicleData::VehicleClass::Bike) {
 		if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
 			satForce = satForce / 10;
-			damperForce = settings.DamperMin;
 		}
 	}
 
@@ -2288,12 +2327,12 @@ void playFFBGround(bool airborne) {
 	auto ffAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::ForceFeedback)]);
 	controls.WheelControl.SetConstantForce(controls.SteerGUID, ffAxis, totalForce);
 
-	if (settings.DisplayInfo) {
-		Vector3 turnWorldNorm = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, turnRelativeNormX, turnRelativeNormY, 0.0f);
+	if (settings.DisplayFFBInfo) {
 		GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, travelWorld.x, travelWorld.y, travelWorld.z, 0, 255, 0, 255);
 		GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, turnWorldNorm.x, turnWorldNorm.y, turnWorldNorm.z, 255, 0, 0, 255);
 		GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, steeringWorld.x, steeringWorld.y, steeringWorld.z, 255, 0, 255, 255);
-
+	}
+	if (settings.DisplayInfo) {
 		showText(0.85, 0.175, 0.4, "RelSteer:\t" + std::to_string(steeringRelative.x), 4);
 		showText(0.85, 0.200, 0.4, "SetPoint:\t" + std::to_string(travelRelative.x), 4);
 		showText(0.85, 0.225, 0.4, "Error:\t\t" + std::to_string(error), 4);

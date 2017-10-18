@@ -122,6 +122,7 @@ void ScriptSettings::SaveGeneral() const {
 	// [DEBUG]
 	settingsGeneral.SetBoolValue("DEBUG", "DisplayInfo", DisplayInfo);
 	settingsGeneral.SetBoolValue("DEBUG", "DisplayWheelInfo", DisplayWheelInfo);
+	settingsGeneral.SetBoolValue("DEBUG", "DisplayFFBInfo", DisplayFFBInfo);
 	settingsGeneral.SetBoolValue("DEBUG", "DisplayGearingInfo", DisplayGearingInfo);
 
 	settingsGeneral.SaveFile(settingsGeneralFile.c_str());
@@ -381,6 +382,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	DisplayInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayInfo", false);
 	DisplayWheelInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayWheelInfo", false);
 	DisplayGearingInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayGearingInfo", false);
+	DisplayFFBInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayFFBInfo", false); 
 #pragma warning(pop)
 
 }

@@ -122,6 +122,7 @@ public:
 	bool DisplayInfo = false;
 	bool DisplayGearingInfo = false;
 	bool DisplayWheelInfo = false;
+	bool DisplayFFBInfo = false;
 
 	std::vector<GUID> reggdGuids;
 

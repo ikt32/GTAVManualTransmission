@@ -852,8 +852,11 @@ void update_menu() {
 		{ "Show all detailed technical info of the gearbox and inputs calculations." });
 		menu.BoolOption("Display car wheel info", settings.DisplayWheelInfo, 
 		{ "Show per-wheel debug info with off-ground detection, lockup detection and suspension info." });
-		menu.BoolOption("Display gearing info", settings.DisplayGearingInfo, 
+		menu.BoolOption("Display gearing info", settings.DisplayGearingInfo,
 		{ "Show gear ratios and shift points from auto mode." });
+		menu.BoolOption("Display force feedback lines", settings.DisplayFFBInfo,
+		{ "Show lines detailing force feedback direction and force.",
+		"Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction"});
 		menu.BoolOption("Expose script variables", settings.CrossScript, 
 		{ "Shares data like gear, shifting indicator and Neutral with other mods. Check GitHub for the supported types." });
 	}
