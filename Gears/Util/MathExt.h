@@ -23,3 +23,10 @@ Vector3 operator * (Vector3 value, float scale);
 Vector3 operator * (float scale, Vector3 vec);
 Vector3 GetOffsetInWorldCoords(Vector3 position, Vector3 rotation, Vector3 forward, Vector3 offset);
 
+inline float rad2deg(float rad) {
+	return (rad*(180.0f / 3.14159265358979323846264338327950288f));
+}
+
+inline float deg2rad(float deg) {
+	return (deg*3.14159265358979323846264338327950288f / 180.0f);
+}

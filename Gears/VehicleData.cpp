@@ -23,9 +23,9 @@ void VehicleData::Clear() {
 	LockSpeed = 0.0f;
 	LockTruck = false;
 	SimulatedNeutral = false;
-	prevVelocities.x = 0;
-	prevVelocities.y = 0;
-	prevVelocities.z = 0;
+	SpeedVectorPrev.x = 0;
+	SpeedVectorPrev.y = 0;
+	SpeedVectorPrev.z = 0;
 	WheelCompressions.clear();
 	prevCompressions.clear();
 	HasSpeedo = false;
@@ -34,6 +34,29 @@ void VehicleData::Clear() {
 
 void VehicleData::UpdateRpm() {
 	PrevRpm = Rpm;
+
+}
+
+void VehicleData::updateAcceleration() {
+	long long time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
+
+	Vector3 result;
+	result.x = (SpeedVector.x - SpeedVectorPrev.x) / ((time - prevAccelTime) / 1e9f);
+	result.y = (SpeedVector.y - SpeedVectorPrev.y) / ((time - prevAccelTime) / 1e9f);
+	result.z = (SpeedVector.z - SpeedVectorPrev.z) / ((time - prevAccelTime) / 1e9f);
+	result._paddingx = 0;
+	result._paddingy = 0;
+	result._paddingz = 0;
+
+	prevAccelTime = time;
+	SpeedVectorPrev = SpeedVector;
+
+	acceleration = result;
+}
+
+void VehicleData::updateAverageAcceleration() {
+	accelerationSamples[averageAccelIndex] = acceleration;
+	averageAccelIndex = (averageAccelIndex + 1) % (SAMPLES - 1);
 
 }
 
@@ -57,8 +80,8 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 	Turbo = ext.GetTurbo(vehicle);
 	TopGear = ext.GetTopGear(vehicle);
 	Speed = ENTITY::GET_ENTITY_SPEED(vehicle);
-	V3Velocities = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
-	Velocity = V3Velocities.y;
+	SpeedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
+	Velocity = SpeedVector.y;
 	RotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(vehicle);
 	Class = findClass(model);
 	IsTruck = isBadTruck(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
@@ -74,6 +97,9 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 	}
 
 	NoClutch = TopGear == 1;
+
+	updateAcceleration();
+	updateAverageAcceleration();
 }
 
 VehicleData::VehicleClass VehicleData::findClass(Hash model) {
@@ -110,35 +136,17 @@ std::vector<float> VehicleData::GetWheelCompressionSpeeds() {
 	return result;
 }
 
-
-// Takes velocities in m/s, returns acceleration vectors in m/s^2
-Vector3 VehicleData::getAccelerationVectors(Vector3 velocities) {
-	long long time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
-
-	Vector3 result;
-	result.x = (velocities.x - prevVelocities.x) / ((time - prevAccelTime) / 1e9f);
-	result.y = (velocities.y - prevVelocities.y) / ((time - prevAccelTime) / 1e9f);
-	result.z = (velocities.z - prevVelocities.z) / ((time - prevAccelTime) / 1e9f);
-	result._paddingx = 0;
-	result._paddingy = 0;
-	result._paddingz = 0;
-
-	prevAccelTime = time;
-	prevVelocities = velocities;
-
-	accelSamples[averageAccelIndex] = result;
-	averageAccelIndex = (averageAccelIndex + 1) % (SAMPLES - 1);
-
-	return result;
+Vector3 VehicleData::getAccelerationVectors() {
+	return acceleration;
 }
 
 Vector3 VehicleData::getAccelerationVectorsAverage() const {
 	Vector3 result = {};
 
 	for (int i = 0; i < SAMPLES; i++) {
-		result.x += accelSamples[i].x;
-		result.y += accelSamples[i].y;
-		result.z += accelSamples[i].z;
+		result.x += accelerationSamples[i].x;
+		result.y += accelerationSamples[i].y;
+		result.z += accelerationSamples[i].z;
 	}
 
 	result.x = result.x / SAMPLES;
@@ -150,8 +158,8 @@ Vector3 VehicleData::getAccelerationVectorsAverage() const {
 
 void VehicleData::zeroSamples() {
 	for (int i = 0; i < SAMPLES; i++) {
-		accelSamples[i].x = 0.0f;
-		accelSamples[i].y = 0.0f;
-		accelSamples[i].z = 0.0f;
+		accelerationSamples[i].x = 0.0f;
+		accelerationSamples[i].y = 0.0f;
+		accelerationSamples[i].z = 0.0f;
 	}
 }

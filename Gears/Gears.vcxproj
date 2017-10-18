@@ -110,6 +110,7 @@
     <ClCompile Include="..\..\GTAVMenuBase\menukeyboard.cpp" />
     <ClCompile Include="..\..\GTAVMenuBase\menusettings.cpp" />
     <ClCompile Include="..\..\GTAVMenuBase\menuutils.cpp" />
+    <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp" />
     <ClCompile Include="ShiftModes.cpp" />
     <ClCompile Include="Util\MathExt.cpp" />
     <ClCompile Include="ScriptMenu.cpp" />
@@ -140,6 +141,7 @@
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\main.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h" />
+    <ClInclude Include="..\thirdparty\MiniPID\MiniPID.h" />
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
     <ClInclude Include="Memory\Versions.h" />
     <ClInclude Include="ShiftModes.h" />

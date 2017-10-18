@@ -12,7 +12,7 @@
 #include "Memory/VehicleExtensions.hpp"
 #include <chrono>
 
-#define SAMPLES 2
+#define SAMPLES 6
 
 
 class VehicleData {
@@ -32,6 +32,8 @@ public:
 		Unknown
 	};
 
+	void updateAcceleration();
+	void updateAverageAcceleration();
 	void UpdateValues(VehicleExtensions& ext, Vehicle vehicle);
 	std::vector<float> GetWheelCompressionSpeeds();
 	//bool IsBike = false;
@@ -68,9 +70,9 @@ public:
 	float SteeringAngle = 0.0f;
 	Vector3 RotationVelocity = {};
 	std::vector<float> WheelCompressions = {};
-	Vector3 V3Velocities = {};
+	Vector3 SpeedVector = {};
 	float DriveBiasFront = 0.0f;
-	Vector3 getAccelerationVectors(Vector3 velocities);
+	Vector3 getAccelerationVectors();
 
 	// Should be called after getAccelerationVectors has been called in a loop
 	Vector3 getAccelerationVectorsAverage() const;
@@ -113,13 +115,14 @@ private:
 	bool isBadTruck(char* name);
 	VehicleClass findClass(Hash model);
 
-	Vector3 prevVelocities = {};
+	Vector3 SpeedVectorPrev = {};
 	std::vector<float> prevCompressions = {};
 
 	long long prevAccelTime = 0;
 	long long prevCompressTime = 0;
 
-	std::array<Vector3, SAMPLES> accelSamples = {};
+	Vector3 acceleration;
+	std::array<Vector3, SAMPLES> accelerationSamples = {};
 	int averageAccelIndex = 0;
 	void zeroSamples();
 };

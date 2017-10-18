@@ -6,7 +6,7 @@ http://dev-c.com
 
 #pragma once
 
-#define DISPLAY_VERSION "v4.3.11"
+#define DISPLAY_VERSION "v4.4.0"
 
 #ifndef DIRECTINPUT_VERSION
 #define DIRECTINPUT_VERSION 0x0800
@@ -42,6 +42,14 @@ enum eRadioStations {
 	SelfRadio,
 	BlaineCountyRadio,
 	RadioOff = 255
+};
+
+enum eDecorType {
+	DECOR_TYPE_FLOAT = 1,
+	DECOR_TYPE_BOOL,
+	DECOR_TYPE_INT,
+	DECOR_TYPE_UNK,
+	DECOR_TYPE_TIME
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -120,7 +128,7 @@ void handleVehicleButtons();
 //                    Wheel input and force feedback
 ///////////////////////////////////////////////////////////////////////////////
 
-void playFFBGround(bool airborne, bool ignoreSpeed = false);
+void playFFBGround();
 void playFFBAir();
 void doWheelSteering();
 void doStickControlAir();

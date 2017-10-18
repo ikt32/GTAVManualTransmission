@@ -322,6 +322,24 @@ void update_menu() {
 		menu.MenuOption("Non-Xinput controller", "legacycontrollermenu",
 		{ "Set up the non-Xinput controller with native controls" });
 
+		if (menu.BoolOption("Patch steering for all inputs", settings.PatchSteeringAlways,
+		{ "Also patch steering reduction and automatic countersteer for keyboard and controller inputs.",
+		  "Only active if this patch is also enabled for steering wheels.",
+		  "PatchSteering (Wheel) is "+ std::string(settings.PatchSteering ? "enabled." : "disabled.")})) {
+			settings.SaveWheel(&controls);
+			initSteeringPatches();
+		}
+
+		if (menu.FloatOption("Steering reduction (kb/controller)", settings.SteeringReductionOther, 0.0f, 1.0f, 0.01f,
+		{ "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
+			settings.SaveWheel(&controls);
+		}
+
+		if (menu.FloatOption("Steering multiplier (kb/controller)", settings.GameSteerMultOther, 0.1f, 2.0f, 0.01f,
+		{ "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
+			settings.SaveWheel(&controls);
+		}
+
 	}
 
 	/* Yes hello I am root - 2 */
@@ -492,22 +510,6 @@ void update_menu() {
 		{ "Increase steering lock for all cars." })) {
 			updateSteeringMultiplier();
 		}
-		
-		if (menu.BoolOption("Patch steering for all inputs", settings.PatchSteeringAlways,
-		{ "Also patch steering reduction and automatic countersteer for keyboard and controller inputs." })) {
-			settings.SaveWheel(&controls);
-			initSteeringPatches();
-		}
-
-		if (menu.FloatOption("Steering reduction (kb/controller)", settings.SteeringReductionOther, 0.0f, 1.0f, 0.01f,
-		{ "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
-			settings.SaveWheel(&controls);
-		}
-
-		if (menu.FloatOption("Steering multiplier (kb/controller)", settings.GameSteerMultOther, 0.1f, 2.0f, 0.01f,
-		{ "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
-			settings.SaveWheel(&controls);
-		}
 
 		if (menu.BoolOption("Disable non-wheel steering", settings.PatchSteeringControl,
 		{ "Disable keyboard and controller inputs for steering. Fixes the jerky animation." })) {
@@ -643,6 +645,9 @@ void update_menu() {
 
 		menu.FloatOption("Global multiplier", settings.FFGlobalMult, 0.0f, 10.0f, 1.0f);
 		
+		menu.FloatOption("Self aligning force", settings.FFBAmpMultNew, 0.1f, 2.0f, 0.05f,
+		{ "Force feedback strength for steering." });
+
 		menu.IntOption("Damper Max (low speed)", settings.DamperMax, 0, 200, 1, 
 		{ "Wheel friction at low speed." });
 		
@@ -651,9 +656,6 @@ void update_menu() {
 		
 		menu.FloatOption("Damper end speed", settings.TargetSpeed, 0.0f, 40.0f, 0.2f,
 		{ "Speed at which the damper strength should be minimal.", "In m/s." });
-		
-		menu.FloatOption("Physics strength", settings.PhysicsStrength, 0.0f, 10.0f, 0.1f,
-		{ "Force feedback effect strength by physics events like cornering and collisions." });
 		
 		menu.FloatOption("Detail strength", settings.DetailStrength, 0.0f, 10.0f, 0.1f,
 		{ "Force feedback effect strength by suspension events due to finer road details." });
@@ -852,8 +854,11 @@ void update_menu() {
 		{ "Show all detailed technical info of the gearbox and inputs calculations." });
 		menu.BoolOption("Display car wheel info", settings.DisplayWheelInfo, 
 		{ "Show per-wheel debug info with off-ground detection, lockup detection and suspension info." });
-		menu.BoolOption("Display gearing info", settings.DisplayGearingInfo, 
+		menu.BoolOption("Display gearing info", settings.DisplayGearingInfo,
 		{ "Show gear ratios and shift points from auto mode." });
+		menu.BoolOption("Display force feedback lines", settings.DisplayFFBInfo,
+		{ "Show lines detailing force feedback direction and force.",
+		"Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction"});
 		menu.BoolOption("Expose script variables", settings.CrossScript, 
 		{ "Shares data like gear, shifting indicator and Neutral with other mods. Check GitHub for the supported types." });
 	}

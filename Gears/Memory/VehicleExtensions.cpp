@@ -638,6 +638,21 @@ std::vector<float> VehicleExtensions::GetWheelCompressions(Vehicle handle) {
 	return compressions;
 }
 
+std::vector<float> VehicleExtensions::GetWheelSteeringAngles(Vehicle handle) {
+	auto wheelPtr = GetWheelsPtr(handle);
+	auto numWheels = GetNumWheels(handle);
+
+	auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1C4 : 0x1B4;
+
+	std::vector<float> angles;
+
+	for (auto i = 0; i < numWheels; i++) {
+		auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
+		angles.push_back(*reinterpret_cast<float *>(wheelAddr + offset));
+	}
+	return angles;
+}
+
 std::vector<bool> VehicleExtensions::GetWheelsOnGround(Vehicle handle) {
 	std::vector<bool> onGround;
 	for (auto comp : GetWheelCompressions(handle)) {

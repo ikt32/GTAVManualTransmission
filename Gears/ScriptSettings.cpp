@@ -122,6 +122,7 @@ void ScriptSettings::SaveGeneral() const {
 	// [DEBUG]
 	settingsGeneral.SetBoolValue("DEBUG", "DisplayInfo", DisplayInfo);
 	settingsGeneral.SetBoolValue("DEBUG", "DisplayWheelInfo", DisplayWheelInfo);
+	settingsGeneral.SetBoolValue("DEBUG", "DisplayFFBInfo", DisplayFFBInfo);
 	settingsGeneral.SetBoolValue("DEBUG", "DisplayGearingInfo", DisplayGearingInfo);
 
 	settingsGeneral.SaveFile(settingsGeneralFile.c_str());
@@ -183,8 +184,8 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 	settingsWheel.SetLongValue("FORCE_FEEDBACK", "DamperMax", DamperMax);
 	settingsWheel.SetLongValue("FORCE_FEEDBACK", "DamperMin", DamperMin);
 	settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DamperTargetSpeed", TargetSpeed);
-	settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "PhysicsStrength", PhysicsStrength);
 	settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DetailStrength", DetailStrength);
+	settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "FFBAmpMultNew", FFBAmpMultNew);
 
 	// [STEER]
 	settingsWheel.SetDoubleValue("STEER", "ANTIDEADZONE", scriptControl->ADZSteer);
@@ -381,6 +382,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 	DisplayInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayInfo", false);
 	DisplayWheelInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayWheelInfo", false);
 	DisplayGearingInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayGearingInfo", false);
+	DisplayFFBInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayFFBInfo", false); 
 #pragma warning(pop)
 
 }
@@ -406,7 +408,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	GameSteerMultWheel = settingsWheel.GetDoubleValue("OPTIONS", "GameSteerMultWheel", 1.0);
 
 	SteeringReductionOther = settingsWheel.GetDoubleValue("OPTIONS", "SteeringReductionOther", 0.0);
-	GameSteerMultWheel = settingsWheel.GetDoubleValue("OPTIONS", "GameSteerMultOther", 1.0);
+	GameSteerMultOther = settingsWheel.GetDoubleValue("OPTIONS", "GameSteerMultOther", 1.0);
 
 	scriptControl->InvertSteer =	settingsWheel.GetBoolValue("OPTIONS", "InvertSteer", false);
 	scriptControl->InvertThrottle = settingsWheel.GetBoolValue("OPTIONS", "InvertThrottle", false);
@@ -419,8 +421,9 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 	DamperMax = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMax", 67);
 	DamperMin = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMin", 12);
 	TargetSpeed = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DamperTargetSpeed", 1.2);
-	PhysicsStrength = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "PhysicsStrength", 1.7);
 	DetailStrength = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DetailStrength", 1.6);
+	FFBAmpMultNew = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "FFBAmpMultNew", 1.0);
+
 
 	// [INPUT_DEVICES]
 	int it = 0;
