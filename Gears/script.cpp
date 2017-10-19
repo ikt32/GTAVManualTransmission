@@ -734,7 +734,8 @@ void stopForceFeedback() {
 
 void initSteeringPatches() {
     if (settings.PatchSteering &&
-        (controls.PrevInput == ScriptControls::Wheel || settings.PatchSteeringAlways)) {
+        (controls.PrevInput == ScriptControls::Wheel || settings.PatchSteeringAlways) &&
+        vehData.Class == VehicleData::VehicleClass::Car) {
         if (!MemoryPatcher::SteerCorrectPatched)
             MemoryPatcher::PatchSteeringCorrection();
     }
@@ -2263,7 +2264,23 @@ void playFFBGround() {
     float turnRelativeNormY = (travelRelative.y + turnRelative.y) / 2.0f;
     Vector3 turnWorldNorm = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, turnRelativeNormX, turnRelativeNormY, 0.0f);
 
-    float steeringAngle = ext.GetSteeringAngle(vehicle)*ext.GetSteeringMultiplier(vehicle);
+    float steeringAngle;
+    if (vehData.Class == VehicleData::VehicleClass::Boat) {
+        steeringAngle = vehData.RotationVelocity.z;
+    }
+    else if (vehData.Class == VehicleData::VehicleClass::Car || steeredWheels == 0.0f) {
+        steeringAngle = ext.GetSteeringAngle(vehicle)*ext.GetSteeringMultiplier(vehicle);
+    }
+    else {
+        float allAngles = 0.0f;
+        for (auto angle : angles) {
+            if (angle != 0.0f) {
+                allAngles += angle;
+            }
+        }
+        steeringAngle = allAngles / steeredWheels;
+    }
+    
     float steeringAngleRelX = vehData.Speed*-sin(steeringAngle);
     float steeringAngleRelY = vehData.Speed*cos(steeringAngle);
     Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, steeringAngleRelX, steeringAngleRelY, 0.0f);
@@ -2280,8 +2297,9 @@ void playFFBGround() {
     // "Reduction" effects - those that affect already calculated things
     bool under_ = false;
     float understeer = sgn(travelRelative.x - steeringAngleRelX) * (turnRelativeNormX - steeringAngleRelX);
-    if (steeringAngleRelX > turnRelativeNormX && turnRelativeNormX > travelRelative.x ||
-        steeringAngleRelX < turnRelativeNormX && turnRelativeNormX < travelRelative.x) {
+    if (vehData.Class == VehicleData::VehicleClass::Car &&
+        (steeringAngleRelX > turnRelativeNormX && turnRelativeNormX > travelRelative.x ||
+        steeringAngleRelX < turnRelativeNormX && turnRelativeNormX < travelRelative.x)) {
         satForce = (int)((float)satForce / std::max(1.0f, understeer + 1.0f));
         under_ = true;
     }
