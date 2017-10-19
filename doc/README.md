@@ -2,7 +2,7 @@
 
 Manual Transmission & Steering Wheel Support
 ===========
-Version 4.3.8
+Version 4.4.0
 
 ![Gameplay](Gameplay.jpg)
 
@@ -75,16 +75,17 @@ Remove or disable any XInput or DirectInput input hook configurations for
 your wheel for GTA V (x360ce, for example)
 
 Use the menu hotkey (`[{`) to open the menu. Configure your preferences and 
-options in the menu. __Wheel users__ should configure their wheel before
-playing!
+options in the menu. __Wheel users must do this!__
 
 ## FiveM installation
 1. Create a plugins folder in FiveM Application Data 
 2. Put `Gears.asi` and the folder `ManualTransmission` in plugins
 
+No official support for FiveM is given beyond this package. If you'd like to give conversion to server or FiveM itself a try, I'll try helping where I can.
+
 # Updating
 Replace `Gears.asi` and the folder `ManualTransmission` in your GTA V folder.
-If the changelog indicated settings version numbers changed, you might want to
+If the changelog indicated settings changed, you might want to
 check the options. Otherwise it should be fine to keep `settings_wheel.ini`,
  `settings_general.ini` and `settings_menu.ini`.
 
@@ -94,6 +95,7 @@ You might want to install some additional mods to enhance your experience.
 Any speedometer supporting RPM/Gear reading from memory
 * [NFS Speedo](https://www.gta5-mods.com/scripts/nfsgauge-rpm-gear-speedometer)
 * [LeFix Speedometer](https://www.gta5-mods.com/scripts/speedometer-improvedalexbladeversion)
+* [NFSU Speedometer](https://www.gta5-mods.com/scripts/need-for-speed-underground-speedometer)
 
 Any handling mod that aims to improve handling accuracy
 * [Realistic Driving V](https://www.gta5-mods.com/vehicles/realistic-driving-v)
@@ -112,7 +114,7 @@ In `settings_menu.ini`, the keys are stored. Default for US layouts:
 * `BACKSPACE` to go back
 
 The menu supports controller input fully too, but you'll need to assign
-controller buttons to if if you want to.
+controller buttons to open the menu.
 
 ![Menu main](MenuMain0.jpg)
 
@@ -406,7 +408,7 @@ Hold this button to toggle between Automatic and Sequential Transmission
 How long it takes for a button hold to register. Example, `ToggleTime = 500`
 means you need to hold it half a second to trigger.
 
-#### `TriggerValue` : `0` to `100`
+#### `TriggerValue` : `0.0` to `1.0`
 How many % the analog axis needs to be pressed in or pushed to, to register as
 a button press.
 
@@ -428,10 +430,10 @@ You __need__ to correctly set these to get braking and a standstill and
 reversing with the throttle to work.
 
 #### `ShiftUpBlocks` : Any `eControl`
-eControl that is blocked unless Shift Up is held.
+Control that is blocked when shifting, and active when Shift Up is held.
 
 #### `ShiftDownBlocks` : Any `eControl`
-eControl that is blocked unless Shift Down is held.
+Control that is blocked when shifting, and active when Shift Down is held.
 
 #### `BlockCarControls` : `true` or `false`
 * `false`: Don't block specified controls
@@ -491,14 +493,18 @@ reversing with the throttle to work.
 * `false`: No debug info onscreen
 * `true`: Debug info onscreen with transmission info, input info and force feedback info
 
-#### `LogCar` : `true` or `false`
-* `false`: No car address logged
-* `true`: Car address is logged to Gears.log when changing cars. 
-Just something for me to debug things.
-
 ### `DisplayWheelInfo` : `true` or `false`
 * `false`: No debug info onscreen
 * `true`: Vehicle wheel info onscreen
+
+### `DisplayGearingInfo` : `true` or `false`
+* `false`: No debug info onscreen
+* `true`: Vehicle gear info onscreen while manual transmission active
+
+### `DisplayFFBInfo` : `true` or `false`
+* `false`: No info onscreen
+* `true`: Force feedback forces and direction are drawn onscreen.
+
 
 
 ## `settings_wheel.ini`
@@ -506,7 +512,7 @@ Just something for me to debug things.
 This file contains all settings for the wheel controls. I recommend using
 the in-game menu to configure the axis-inputs and H-shifter.
 
-When assigning axes and buttons, __DO THIS IN-GAME!__ This mod will resolve the
+When assigning axes and buttons, __DO THIS IN-GAME!__ The script will resolve the
 correct values. 
 
 ![Wheel setup](MenuWheel0.jpg)
@@ -522,25 +528,6 @@ use your racing wheel with GTA V and this mod.
 
 #### `WheelWithoutManual` : `true` or `false`
 Enable usage of a wheel without using Manual Transmission features.
-
-#### `WheelBoatPlanes` : `true` or `false`
-__EXPERIMENTAL__
-Support for wheel input for boats and airplanes. Control boats like how you
- control cars. For plane, the layout is a bit different and requires a H-pattern
- shifter.
-| Control | Effect |
-|---------|--------|
-| Throttle | Yaw right |
-| Clutch | Yaw left |
-| Wheel | Roll left / right |
-| Shift up paddle | Pitch up |
-| Shift down paddle | Pitch down |
-| Gear 1| 33% power |
-| Gear 3| 66% power |
-| Gear 5| 100% power |
-| Gear 2| 33% brake / reverse |
-| Gear 4| 66% brake / reverse |
-| Gear 6| 100% brake / reverse |
 
 #### `PatchSteering` : `true` or `false`
 Patch steering correction. Credits to InfamousSabre's original
@@ -574,13 +561,32 @@ Inverts the direction of the brake.
 #### `InvertClutch` : `true` or `false`
 Inverts the direction of the clutch.
 
+#### `SteeringReductionWheel` : `0.0` to `1.0`
+Reduce steering at speed. Applies to wheels.
+
+#### `GameSteerMultWheel` : `0.1` to `2.0`
+Increase steering and steering lock. Applies to wheels.
+
+#### `SteeringReductionOther` : `0.0` to `1.0`
+Reduce steering at speed. Applies to keyboard, controller.
+
+#### `GameSteerMultOther` : `0.1` to `2.0`
+Increase steering and steering lock. Applies to keyboard, controller.
+
+
+
 ### `[FORCE_FEEDBACK]`
 #### `Enable` : `true` or `false`
 Disable or enable force feedback.
 
-#### `GlobalMult` : Any
-Multiplier in percentage of how strong all forces are.
-This feature is available from 4.2.0 on.
+#### `SATAmpMult` : `0` to any
+Force feedback strength for steering. Increase for weak wheels, decrease 
+for strong/fast wheels. Putting this too high clips force feedback. Too low 
+and the car doesn't feel responsive.
+
+#### `DetailMult` : `0` to any
+How strong the feedback is from suspension compression. Think for terrain
+details like road texture, potholes, manhole covers, sidewalk curbs etc.
 
 #### `DamperMax` : `0` to `100`
 Controls the friction feel when the vehicle is at a stop. A higher
@@ -590,17 +596,9 @@ value means more friction. Keep this higher than __DamperMin__.
 Controls the friction feel when the vehicle is moving. A higher
 value means more friction. Keep this lower than __DamperMax__.
 
-#### `DamperTargetSpeed` : `0` to any (in m/s)
+#### `DamperMinSpeed` : `0` to any (in m/s)
 Sets the speed at which the damper effect is minimal. This is in
 meters per second!
-
-#### `PhysicsStrength` : Any
-How much physics affect your steering wheel and pulls it left or right. A higher 
-value means a stronger force feedback.
-
-#### `DetailStrength` : `0` to any
-How strong the feedback is from suspension compression. Think for terrain
-details like road texture, potholes, manhole covers, sidewalk curbs etc.
 
 ### `[INPUT_DEVICES]`
 A list of registered devices and their names.
@@ -697,6 +695,11 @@ Soft lock for on bikes.
 #### `SteerAngleAlt` : Any less than `SteerAngleMax`
 Soft lock for in planes and boats.
 
+
+#### `ANTIDEADZONE` : 
+Anti-deadzone for throttle and brake, so throttle and brake are direct.
+`[STEER]` also has this entry but it's only active if steering control isn't patched.
+
 ### `[TO_KEYBOARD]`
 In this section you can assign wheel buttons to keyboard keys. A few examples
 have been given. The format is `[BUTTON] = [KEY]`. Up to 128 buttons
@@ -752,8 +755,7 @@ crashes the G920. No workaround known, aside from disabling ScriptHookVDotNet.
 Check if your wheel is recognized correctly, a recent Windows 10 update forces
 new Logitech software which will mess up older Logitech steering wheels.
 
-Before using this mod it's highly recommended to test your wheel with other games
-first. I'm not an AAA-dev, so it's better to rule out bugs I can't fix :p
+Before using this mod, you should test test your wheel with other games first.
 
 ### Steering wheel not detected
 * Try toggling the mod (|\ key)
