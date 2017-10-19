@@ -1,7 +1,7 @@
 /*
-* Massive thanks to t-mat on GitHub for having a simple C++ DInput
-* application! https://gist.github.com/t-mat/1391291
-*/
+ * Massive thanks to t-mat on GitHub for having a simple C++ DInput
+ * application! https://gist.github.com/t-mat/1391291
+ */
 
 #pragma once
 #define DIRECTINPUT_VERSION 0x0800
@@ -44,7 +44,7 @@ public:
     // dwDevType = DI8DEVTYPE_DRIVING
     void enumerate(
         LPDIRECTINPUT di,
-        DWORD dwDevType = DI8DEVCLASS_GAMECTRL, //catch-all
+        DWORD dwDevType = DI8DEVCLASS_GAMECTRL,
         LPCDIDATAFORMAT lpdf = &c_dfDIJoystick2,
         DWORD dwFlags = DIEDFL_ATTACHEDONLY,
         int maxEntry = 16) {

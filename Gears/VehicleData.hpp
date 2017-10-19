@@ -1,7 +1,3 @@
-/*
- * What a mess. 
- */
-
 #pragma once
 
 #include "../../ScriptHookV_SDK/inc/types.h"
@@ -36,7 +32,6 @@ public:
     void updateAverageAcceleration();
     void UpdateValues(VehicleExtensions& ext, Vehicle vehicle);
     std::vector<float> GetWheelCompressionSpeeds();
-    //bool IsBike = false;
 
     VehicleClass Class = VehicleClass::Car;
     bool NoClutch = false;
@@ -73,8 +68,6 @@ public:
     Vector3 SpeedVector = {};
     float DriveBiasFront = 0.0f;
     Vector3 getAccelerationVectors();
-
-    // Should be called after getAccelerationVectors has been called in a loop
     Vector3 getAccelerationVectorsAverage() const;
 
     float PrevRpm = 0.0f;

@@ -217,7 +217,7 @@ std::vector<GUID> ScriptSettings::GetGuids() {
 
 void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 #pragma warning(push)
-#pragma warning(disable: 4244) // Make everything doubles later...
+#pragma warning(disable: 4244)
     CSimpleIniA settingsGeneral;
     settingsGeneral.SetUnicode();
     settingsGeneral.LoadFile(settingsGeneralFile.c_str());
@@ -389,7 +389,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 
 void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 #pragma warning(push)
-#pragma warning(disable: 4244) // Make everything doubles later...
+#pragma warning(disable: 4244)
     CSimpleIniA settingsWheel;
     settingsWheel.SetUnicode();
     settingsWheel.LoadFile(settingsWheelFile.c_str());
@@ -665,9 +665,6 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
             scriptControl->WheelToKey[i] = str2key(entryString);
         }
     }
-
-    // [FILEVERSION]
-    //settings_wheel_version = settingsWheel.GetValue("FILEVERSION", "VERSION", "000");
 #pragma warning(pop)
 
 }
@@ -852,7 +849,6 @@ void ScriptSettings::ControllerSaveButton(const std::string &confTag, const std:
     settingsGeneral.SetUnicode();
     settingsGeneral.LoadFile(settingsGeneralFile.c_str());
     settingsGeneral.SetValue("CONTROLLER", confTag.c_str(), button.c_str());
-    //settingsGeneral.SetLongValue("CONTROLLER", (confTag + "Blocks").c_str(), btnToBlock);
 
     int err = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
     if (err < 0)
@@ -864,7 +860,6 @@ void ScriptSettings::LControllerSaveButton(const std::string &confTag, int butto
     settingsGeneral.SetUnicode();
     settingsGeneral.LoadFile(settingsGeneralFile.c_str());
     settingsGeneral.SetLongValue("CONTROLLER_LEGACY", confTag.c_str(), button);
-    //settingsGeneral.SetLongValue("CONTROLLER_LEGACY", (confTag + "Blocks").c_str(), btnToBlock);
 
     int err = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
     if (err < 0)

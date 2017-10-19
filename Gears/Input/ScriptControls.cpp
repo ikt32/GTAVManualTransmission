@@ -138,43 +138,6 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 
             break;
         }
-        //case Stick: {
-        //	int rawThrottle = StickControl.GetAxisValue(StickAxesGUIDs[static_cast<int>(StickAxisType::Throttle)],
-        //												StickControl.StringToAxis(StickAxes[static_cast<int>(StickAxisType::Throttle)]));
-        //	int rawBrake = StickControl.GetAxisValue(StickAxesGUIDs[static_cast<int>(StickAxisType::Brake)],
-        //											 StickControl.StringToAxis(StickAxes[static_cast<int>(StickAxisType::Brake)]));
-        //	int rawPitch = StickControl.GetAxisValue(StickAxesGUIDs[static_cast<int>(StickAxisType::Pitch)],
-        //											 StickControl.StringToAxis(StickAxes[static_cast<int>(StickAxisType::Pitch)]));
-        //	int rawRoll = StickControl.GetAxisValue(StickAxesGUIDs[static_cast<int>(StickAxisType::Roll)],
-        //											StickControl.StringToAxis(StickAxes[static_cast<int>(StickAxisType::Roll)]));
-        //	int rawRudderR = StickControl.GetAxisValue(StickAxesGUIDs[static_cast<int>(StickAxisType::RudderR)],
-        //											   StickControl.StringToAxis(StickAxes[static_cast<int>(StickAxisType::RudderR)]));
-        //	int rawRudderL = StickControl.GetAxisValue(StickAxesGUIDs[static_cast<int>(StickAxisType::RudderL)],
-        //											   StickControl.StringToAxis(StickAxes[static_cast<int>(StickAxisType::RudderL)]));
-        //	PlaneThrottle = mapToFloat(PlaneThrottleMin, PlaneThrottleMax, 0.0f, 1.0f, rawThrottle);
-        //	PlaneBrake =	mapToFloat(PlaneBrakeMin, PlaneBrakeMax, 0.0f, 1.0f, rawBrake);
-        //	PlanePitch =	mapToFloat(PlanePitchMin, PlanePitchMax, 0.0f, 1.0f, rawPitch);
-        //	PlaneRoll =		mapToFloat(PlaneRollMin, PlaneRollMax, 0.0f, 1.0f, rawRoll);
-        //	PlaneRudderR =	mapToFloat(PlaneRudderRMin, PlaneRudderRMax, 0.0f, 1.0f, rawRudderR);
-        //	PlaneRudderL =	mapToFloat(PlaneRudderLMin, PlaneRudderLMax, 0.0f, 1.0f, rawRudderL);
-
-
-        //	if (PlaneThrottle > 1.0f) { PlaneThrottle = 1.0f; }
-        //	if (PlaneBrake > 1.0f) { PlaneBrake = 1.0f; }
-        //	if (PlanePitch > 1.0f) { PlanePitch = 1.0f; }
-        //	if (PlaneRoll > 1.0f) { PlaneRoll = 1.0f; }
-        //	if (PlaneRudderR > 1.0f) { PlaneRudderR = 1.0f; }
-        //	if (PlaneRudderL > 1.0f) { PlaneRudderL = 1.0f; }
-
-        //	if (PlaneThrottle < 1.0f) { PlaneThrottle = 0.0f; }
-        //	if (PlaneBrake	  < 1.0f) { PlaneBrake    = 0.0f; }
-        //	if (PlanePitch    < 1.0f) { PlanePitch    = 0.0f; }
-        //	if (PlaneRoll     < 1.0f) { PlaneRoll     = 0.0f; }
-        //	if (PlaneRudderR  < 1.0f) { PlaneRudderR  = 0.0f; }
-        //	if (PlaneRudderL  < 1.0f) { PlaneRudderL  = 0.0f; }
-
-        //	break;
-        //}
         default: break;
     }
     if (ignoreClutch) {
@@ -235,15 +198,6 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
             return Wheel;
         }
     }
-    //if (enableWheel && StickControl.IsConnected(StickAxesGUIDs[static_cast<int>(StickAxisType::Roll)])) {
-    //	auto throttleAxis = StickControl.StringToAxis(StickAxes[static_cast<int>(StickAxisType::Throttle)]);
-    //	auto throttleGUID = StickAxesGUIDs[static_cast<int>(StickAxisType::Throttle)];
-    //	int rawThrottle = StickControl.GetAxisValue(throttleGUID, throttleAxis);
-    //	auto tempThrottle = 0.0f + 1.0f / (PlaneThrottleMax - PlaneThrottleMin)*(static_cast<float>(rawThrottle) - PlaneThrottleMin);
-    //	if (tempThrottle > 0.5f) {
-    //		return Stick;
-    //	}
-    //}
 
     return previousInput;
 }
@@ -502,22 +456,18 @@ bool operator < (const GUID &guid1, const GUID &guid2) {
 std::string GUID2String(GUID guid) {
     wchar_t szGuidW[40] = { 0 };
     StringFromGUID2(guid, szGuidW, 40);
-    std::wstring wGuid = szGuidW;//std::wstring(szGuidW);
+    std::wstring wGuid = szGuidW;
     return(std::string(wGuid.begin(), wGuid.end()));
 }
 
 void ScriptControls::CheckGUIDs(const std::vector<_GUID> & guids) {
     auto foundGuids = WheelControl.GetGuids();
-    auto reggdGuids = guids;//settings.GetGuids();
+    auto reggdGuids = guids;
     // We're only checking for devices that should be used but aren't found
     std::sort(foundGuids.begin(), foundGuids.end());
     std::sort(reggdGuids.begin(), reggdGuids.end());
     std::vector<GUID> missingReg;
     std::vector<GUID> missingFnd;
-
-    // Mental note since I'm dumb:
-    // The difference of two sets is formed by the elements that are present in
-    // the first set, but not in the second one.
 
     // Registered but not enumerated
     std::set_difference(

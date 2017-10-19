@@ -422,7 +422,6 @@ std::vector<GUID> WheelDirectInput::GetGuids() {
     return foundGuids;
 }
 
-// Only confirmed to work on my own G27
 void WheelDirectInput::PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine) {
     auto e = FindEntryFromGUID(guid);
 
@@ -464,8 +463,6 @@ void WheelDirectInput::PlayLedsDInput(GUID guid, const FLOAT currentRPM, const F
     data_.lpvInBuffer = &wheelData_;
     data_.cbInBuffer = sizeof(wheelData_);
 
-    //HRESULT hr;
-    //hr = e->diDevice->Escape(&data_);
     e->diDevice->Escape(&data_);
 }
 

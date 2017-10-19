@@ -1,17 +1,5 @@
 #pragma once
 
-/*
- * Probably consider ReSharper-ing all of these so I can just
- * have a bunch of pointers to classes depending on version, instead of
- * resolving versions like this right now.
- * 
- * Wouldn't work for anything but simple get/setters though, and these
- * stl containers are just too nice.
- * 
- * Update 1103.2 - I did not realize manually updating the 
- * offsets was such a pain in the ass.
- */
-
 #include <vector>
 #include <cstdint>
 #include "../../../ScriptHookV_SDK/inc/types.h"

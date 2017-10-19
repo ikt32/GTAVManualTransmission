@@ -343,7 +343,7 @@ void drawRPMIndicator(float x, float y, float width, float height, Color fg, Col
     // background
     GRAPHICS::DRAW_RECT(x, y, width+bgpaddingx, height+bgpaddingy, bg.R, bg.G, bg.B, bg.A);
 
-    // rpm thingy
+    // rpm bar
     GRAPHICS::DRAW_RECT(x-width*0.5f+rpm*width*0.5f, y, width*rpm, height, fg.R, fg.G, fg.B, fg.A);
 }
 
@@ -688,14 +688,13 @@ void reset() {
     if (MemoryPatcher::TotalPatched == MemoryPatcher::NumGearboxPatches) {
         MemoryPatcher::RestoreInstructions();
     }
-    if (MemoryPatcher::SteeringPatched) {
+    if (MemoryPatcher::SteerCorrectPatched) {
         MemoryPatcher::RestoreSteeringCorrection();
     }
     if (MemoryPatcher::BrakeDecrementPatched) {
         MemoryPatcher::RestoreBrakeDecrement();
     }
     controls.StopForceFeedback();
-    //lastVehicle = vehicle = 0;
 }
 
 void toggleManual() {
@@ -736,11 +735,11 @@ void stopForceFeedback() {
 void initSteeringPatches() {
     if (settings.PatchSteering &&
         (controls.PrevInput == ScriptControls::Wheel || settings.PatchSteeringAlways)) {
-        if (!MemoryPatcher::SteeringPatched)
+        if (!MemoryPatcher::SteerCorrectPatched)
             MemoryPatcher::PatchSteeringCorrection();
     }
     else {
-        if (MemoryPatcher::SteeringPatched)
+        if (MemoryPatcher::SteerCorrectPatched)
             MemoryPatcher::RestoreSteeringCorrection();
         resetSteeringMultiplier();
     }
@@ -764,7 +763,7 @@ void applySteeringMultiplier(float multiplier) {
 }
 
 void updateSteeringMultiplier() {
-    if (!MemoryPatcher::SteeringPatched)
+    if (!MemoryPatcher::SteerCorrectPatched)
         return;
 
     float mult = 1;
@@ -830,10 +829,6 @@ void updateLastInputDevice() {
         stopForceFeedback();
     }
 }
-
-//void updateSteeringMultiplier() {
-//	ext.SetSteeringMultiplier(vehicle, settings.GameSteerMultWheel);
-//}
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Mod functions: Shifting

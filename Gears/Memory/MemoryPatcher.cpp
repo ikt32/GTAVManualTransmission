@@ -37,7 +37,7 @@ void RevertBrakePatch(uintptr_t address, byte *origInstr, int origInstrSz);
 int NumGearboxPatches = 3;
 int TotalPatched = 0;
 
-bool SteeringPatched = false;
+bool SteerCorrectPatched = false;
 bool SteerControlPatched = false;
 bool BrakeDecrementPatched = false;
 
@@ -192,7 +192,7 @@ bool PatchSteeringCorrection() {
 
     logger.Write("STEERING: Patching");
 
-    if (SteeringPatched) {
+    if (SteerCorrectPatched) {
         logger.Write("STEERING: Already patched");
         return true;
     }
@@ -201,7 +201,7 @@ bool PatchSteeringCorrection() {
 
     if (steeringTemp) {
         steeringAddr = steeringTemp;
-        SteeringPatched = true;
+        SteerCorrectPatched = true;
 
         std::string instructionBytes = formatByteArray(origSteerInstr, sizeof(origSteerInstr) / sizeof(byte));
 
@@ -224,7 +224,7 @@ bool PatchSteeringCorrection() {
 bool RestoreSteeringCorrection() {
     logger.Write("STEERING: Restoring instructions");
 
-    if (!SteeringPatched) {
+    if (!SteerCorrectPatched) {
         logger.Write("STEERING: Already restored/intact");
         return true;
     }
@@ -232,7 +232,7 @@ bool RestoreSteeringCorrection() {
     if (steeringAddr) {
         RevertSteeringCorrectionPatch(steeringAddr, origSteerInstr, sizeof(origSteerInstr) / sizeof(byte));
         steeringAddr = 0;
-        SteeringPatched = false;
+        SteerCorrectPatched = false;
         logger.Write("STEERING: Restore success");
         steerAttempts = 0;
         return true;

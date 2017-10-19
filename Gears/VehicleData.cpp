@@ -121,7 +121,6 @@ VehicleData::VehicleClass VehicleData::findClass(Hash model) {
     return VehicleClass::Unknown;
 }
 
-// Only does this for the first two wheels because I'm lazy, damn it
 std::vector<float> VehicleData::GetWheelCompressionSpeeds() {
     long long time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 

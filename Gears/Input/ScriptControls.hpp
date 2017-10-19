@@ -258,18 +258,15 @@ public:
     std::array<GUID, static_cast<int>(StickAxisType::SIZEOF_StickAxisType)> StickButtonGUIDs = {};
     //GenDInput StickControl;
 
-    // blergh
+
     XboxController *GetRawController() {
         return &controller;
     }
-    // BLERGH
+
     WORD GetButtonState() const {
         return buttonState;
     }
 
-    // BLEURGHGHHHGGGKKKKKGGGG
-    // Uh, like, I abstracted the controls to numbers @ read and use those values
-    // but now I want to show them again...
     int ConfTagKB2key(const std::string &confTag) {
         if (confTag == "Toggle") return KBControl[static_cast<int>(KeyboardControlType::Toggle)];
         if (confTag == "ToggleH") return KBControl[static_cast<int>(KeyboardControlType::ToggleH)];
@@ -292,7 +289,6 @@ public:
         return -1;
     }
 
-    // Same sentiment applies here
     std::string ConfTagController2Value(const std::string &confTag) {
         if (confTag == "Toggle") return ControlXbox[static_cast<int>(ControllerControlType::Toggle)];
         if (confTag == "ToggleShift") return ControlXbox[static_cast<int>(ControllerControlType::ToggleH)];
@@ -328,7 +324,6 @@ public:
         return std::to_string(nativeControl);
     }
 
-    // Oh ikt, what the HELL are ya doing?
     int ConfTagWheel2Value(const std::string &confTag) {
         if (confTag == "TOGGLE_MOD"			) return WheelButton[static_cast<int>(WheelControlType::Toggle)];
         if (confTag == "CHANGE_SHIFTMODE"	) return WheelButton[static_cast<int>(WheelControlType::ToggleH)];
@@ -363,6 +358,6 @@ private:
     bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
 };
 
-// GUID stuff
+// GUID utils
 bool operator < (const GUID &guid1, const GUID &guid2);
 std::string GUID2String(GUID guid);

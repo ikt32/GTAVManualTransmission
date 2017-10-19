@@ -19,8 +19,6 @@ public:
     void SaveController(ScriptControls *scriptControl) const;
     void SaveWheel(ScriptControls *scriptControl) const;
     void SaveStick(ScriptControls *scriptControl) const;
-    //bool IsCorrectVersion() const;
-    //std::string GetVersionError();
 
     // Only use this AFTER wheel settings are read.
     std::vector<GUID> GetGuids();
@@ -180,9 +178,6 @@ private:
     void parseSettingsGeneral(ScriptControls *scriptControl);
     void parseSettingsWheel(ScriptControls *scriptControl);
     void parseSettingsStick(ScriptControls *scriptControl);
-
-    //std::string settings_general_version = "000";
-    //std::string settings_wheel_version = "000";
 
     // Just looks up which GUID corresponds with what number and returns the GUID.
     GUID DeviceIndexToGUID(int device, std::vector<GUID> guids);

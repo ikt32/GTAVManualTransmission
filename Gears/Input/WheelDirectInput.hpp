@@ -1,8 +1,3 @@
-/*
- * Massive thanks to t-mat on GitHub for having a simple C++ DInput
- * application! https://gist.github.com/t-mat/1391291
- */
-
 #pragma once
 
 #include <array>

@@ -139,19 +139,19 @@ const std::unordered_map<std::string, int> keyMap = {
     { "LAUNCH_APP2" , VK_LAUNCH_APP2 },
     { "PLAY" , VK_PLAY },
     { "ZOOM" , VK_ZOOM },
-    { "VK_OEM_1" , VK_OEM_1 },			// ';:' for US
+    { "VK_OEM_1" , VK_OEM_1 },			    // ';:'     for US
     { "VK_OEM_PLUS" , VK_OEM_PLUS },		// '+' any country
-    { "VK_OEM_COMMA" , VK_OEM_COMMA },	// ',' any country
-    { "VK_OEM_MINUS" , VK_OEM_MINUS },	// '-' any country
-    { "VK_OEM_PERIOD" , VK_OEM_PERIOD }, // '.' any country
-    { "VK_OEM_2" , VK_OEM_2 },			// '/?' for US
-    { "VK_OEM_3" , VK_OEM_3 },			// '`~' for US
-    { "VK_OEM_4" , VK_OEM_4 },			// '{' for US
-    { "VK_OEM_5" , VK_OEM_5 },			// '\|' for US
-    { "VK_OEM_6" , VK_OEM_6 },			// '}' for US
-    { "VK_OEM_7" , VK_OEM_7 },			// ''"' for US
-    { "VK_OEM_8" , VK_OEM_8 },			// § !
-    { "VK_OEM_102" , VK_OEM_102 },		// > <	
+    { "VK_OEM_COMMA" , VK_OEM_COMMA },	    // ',' any country
+    { "VK_OEM_MINUS" , VK_OEM_MINUS },	    // '-' any country
+    { "VK_OEM_PERIOD" , VK_OEM_PERIOD },    // '.' any country
+    { "VK_OEM_2" , VK_OEM_2 },			    // '/?'     for US
+    { "VK_OEM_3" , VK_OEM_3 },			    // '`~'     for US
+    { "VK_OEM_4" , VK_OEM_4 },			    // '{'      for US
+    { "VK_OEM_5" , VK_OEM_5 },			    // '\|'     for US
+    { "VK_OEM_6" , VK_OEM_6 },			    // '}'      for US
+    { "VK_OEM_7" , VK_OEM_7 },			    // ''"'     for US
+    { "VK_OEM_8" , VK_OEM_8 },			    // § !
+    { "VK_OEM_102" , VK_OEM_102 },		    // > <	
 };
 
 

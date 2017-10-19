@@ -92,7 +92,6 @@ void GameSound::Load(char *audioBank) {
 void GameSound::Play(Entity ent) {
     if (Active) return;
     m_soundID = AUDIO::GET_SOUND_ID();
-    //showNotification(("New soundID: " + std::to_string(m_soundID)).c_str(), nullptr);
     AUDIO::PLAY_SOUND_FROM_ENTITY(m_soundID, m_sound, ent, m_soundSet, 0, 0);
     Active = true;
 }
