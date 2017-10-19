@@ -180,12 +180,11 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 
     // [FORCE_FEEDBACK]
     settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Enable", EnableFFB);
-    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "GlobalMult", FFGlobalMult);
+    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", SATAmpMult);
+    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DetailMult", DetailMult);
     settingsWheel.SetLongValue("FORCE_FEEDBACK", "DamperMax", DamperMax);
     settingsWheel.SetLongValue("FORCE_FEEDBACK", "DamperMin", DamperMin);
-    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DamperTargetSpeed", TargetSpeed);
-    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DetailStrength", DetailStrength);
-    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "FFBAmpMultNew", FFBAmpMultNew);
+    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DamperMinSpeed", DamperMinSpeed);
 
     // [STEER]
     settingsWheel.SetDoubleValue("STEER", "ANTIDEADZONE", scriptControl->ADZSteer);
@@ -222,7 +221,6 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
     settingsGeneral.SetUnicode();
     settingsGeneral.LoadFile(settingsGeneralFile.c_str());
 
-    settingsGeneral.GetBoolValue("OPTIONS", "Enable", true);
     // [OPTIONS]
     EnableManual = settingsGeneral.GetBoolValue("OPTIONS", "Enable", true);
     ShiftMode = (ShiftModes)settingsGeneral.GetLongValue("OPTIONS", "ShiftMode", 0);
@@ -417,12 +415,12 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 
     // [FORCE_FEEDBACK]
     EnableFFB = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Enable", true);
-    FFGlobalMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "GlobalMult", 1.0);
+    SATAmpMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", 1.0);
+    DetailMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DetailMult", 1.6);
+
     DamperMax = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMax", 67);
     DamperMin = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMin", 12);
-    TargetSpeed = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DamperTargetSpeed", 1.2);
-    DetailStrength = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DetailStrength", 1.6);
-    FFBAmpMultNew = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "FFBAmpMultNew", 1.0);
+    DamperMinSpeed = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DamperTargetSpeed", 1.2);
 
 
     // [INPUT_DEVICES]

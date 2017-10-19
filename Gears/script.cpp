@@ -2139,7 +2139,7 @@ int calculateDamper(float wheelsOffGroundRatio) {
     
     // targetSpeed is the speed at which the damperForce is at minimum
     // damperForce is maximum at speed 0 and decreases with speed increase
-    float adjustRatio = static_cast<float>(settings.DamperMax) / static_cast<float>(settings.TargetSpeed);
+    float adjustRatio = static_cast<float>(settings.DamperMax) / static_cast<float>(settings.DamperMinSpeed);
     int damperForce = settings.DamperMax - static_cast<int>(vehData.Speed * adjustRatio);
 
     // Acceleration also affects damper force
@@ -2187,7 +2187,7 @@ int calculateDetail() {
         compSpeedTotal = -compSpeed[0] + compSpeed[1];
     }
 
-    return static_cast<int>(1000.0f * settings.DetailStrength * compSpeedTotal * settings.FFGlobalMult);
+    return static_cast<int>(1000.0f * settings.DetailMult * compSpeedTotal);
 }
 
 void calculateSoftLock(int &totalForce) {
@@ -2275,7 +2275,7 @@ void playFFBGround() {
     double error = pid.getOutput(steeringRelative.x, setpoint);
     
     // Despite being scientifically inaccurate, "self-aligning torque" is the best description.
-    int satForce = static_cast<int>(settings.FFBAmpMultNew * 2500 * -error);
+    int satForce = static_cast<int>(settings.SATAmpMult * 2500 * -error);
 
     // "Reduction" effects - those that affect already calculated things
     bool under_ = false;

@@ -25,8 +25,8 @@ The following controls can be assigned:
 	* RightThumbUp
 	* RightThumbDown
 
-[CONTROLLER_LEGACY]
-Usable inputs. USE THE NUMBERS
+[CONTROLLER_LEGACY] and [MENU]
+Usable inputs. USE THE CONTROL ID
 Turn off a control by putting -1 there
 Control name                Xbox equivalent		Control ID
 ControlFrontendDown         Dpad Down			187			

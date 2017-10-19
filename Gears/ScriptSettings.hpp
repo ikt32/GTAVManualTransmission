@@ -139,12 +139,11 @@ public:
 
     // [FORCE_FEEDBACK]
     bool EnableFFB = true;
-    float FFGlobalMult = 1.0f;
+    float SATAmpMult = 1.0f;
     int DamperMax = 50;
     int DamperMin = 10;
-    float TargetSpeed = 1.2f; // TargetSpeed in m/s
-    float DetailStrength = 100.0f;
-    float FFBAmpMultNew = 1.0f;
+    float DamperMinSpeed = 1.2f; // TargetSpeed in m/s
+    float DetailMult = 100.0f;
 
     // [STEER]
     float SteerAngleMax = 900.0f;

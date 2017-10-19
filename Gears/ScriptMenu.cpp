@@ -248,7 +248,7 @@ void update_optionsmenu() {
                     { "Require holding the clutch to shift in sequential mode." });
 
     menu.BoolOption("Engine Braking", settings.EngBrake,
-                    { "Help the car braking by slowing down more at high RPMs" });
+                    { "Help the car braking by slowing down more at high RPMs." });
 
     menu.BoolOption("Gear/RPM Lockup", settings.EngLock,
                     { "Simulate wheel lock-up when mis-shifting to a too low gear for the RPM range." });
@@ -260,7 +260,7 @@ void update_optionsmenu() {
                     { "The car will be in neutral when you get in." });
 
     menu.MenuOption("Finetuning", "finetuneoptionsmenu",
-                    { "Fine-tune the parameters above" });
+                    { "Fine-tune the parameters above." });
 
     menu.MenuOption("Misc. options", "miscoptionsmenu",
                     { "Options that don't have to do with the gearbox simulation, but mainly are helpers." });
@@ -290,12 +290,18 @@ void update_finetuneoptionsmenu() {
     menu.Title("Fine-tuning");
     menu.Subtitle("Gearbox fine-tuning options");
 
-    menu.FloatOption("Clutch bite point", settings.ClutchCatchpoint, 0.0f, 1.0f, 0.05f);
-    menu.FloatOption("Stalling threshold", settings.StallingThreshold, 0.0f, 1.0f, 0.05f);
-    menu.FloatOption("RPM Damage", settings.RPMDamage, 0.0f, 10.0f, 0.05f);
-    menu.IntOption("Misshift Damage", settings.MisshiftDamage, 0, 100, 5);
-    menu.FloatOption("Engine braking threshold", settings.EngBrakeThreshold, 0.0f, 1.0f, 0.05f, { "RPM where engine braking starts working" });
-    menu.FloatOption("Engine braking power", settings.EngBrakePower, 0.0f, 5.0f, 0.05f, { "How much wheel brake is applied" });
+    menu.FloatOption("Clutch bite point", settings.ClutchCatchpoint, 0.0f, 1.0f, 0.05f, 
+                     { "How far the clutch has to be lifted to start biting. This value should be lower than \"Stalling threshold\"."});
+    menu.FloatOption("Stalling threshold", settings.StallingThreshold, 0.0f, 1.0f, 0.05f, 
+                     { "How far the clutch has to be lifted to start stalling. This value should be higher than \"Clutch bite point\"."});
+    menu.FloatOption("RPM Damage", settings.RPMDamage, 0.0f, 10.0f, 0.05f,
+                     { "Damage from redlining too long." });
+    menu.IntOption("Misshift Damage", settings.MisshiftDamage, 0, 100, 5, 
+                   { "Damage from being over the rev range." });
+    menu.FloatOption("Engine braking threshold", settings.EngBrakeThreshold, 0.0f, 1.0f, 0.05f, 
+                     { "RPM where engine braking starts being effective." });
+    menu.FloatOption("Engine braking power", settings.EngBrakePower, 0.0f, 5.0f, 0.05f, 
+                     { "Decrease this value if your wheels lock up when engine braking." });
 }
 
 void update_controlsmenu() {
@@ -312,7 +318,7 @@ void update_controlsmenu() {
                     { "If you needed to set up your controller in the pause menu, you should enable this." });
         
     menu.MenuOption("Non-Xinput controller", "legacycontrollermenu",
-                    { "Set up the non-Xinput controller with native controls" });
+                    { "Set up the non-Xinput controller with native controls." });
 
     if (menu.BoolOption("Patch steering for all inputs", settings.PatchSteeringAlways,
                         { "Also patch steering reduction and automatic countersteer for keyboard and controller inputs.",
@@ -323,12 +329,12 @@ void update_controlsmenu() {
     }
 
     if (menu.FloatOption("Steering reduction (kb/controller)", settings.SteeringReductionOther, 0.0f, 1.0f, 0.01f,
-                         { "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
+                         { "Reduce steering input at higher speeds.","From InfamousSabre's Custom Steering." })) {
         settings.SaveWheel(&controls);
     }
 
     if (menu.FloatOption("Steering multiplier (kb/controller)", settings.GameSteerMultOther, 0.1f, 2.0f, 0.01f,
-                         { "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
+                         { "Increase/decrease steering lock.","From InfamousSabre's Custom Steering." })) {
         settings.SaveWheel(&controls);
     }
 }
@@ -380,10 +386,6 @@ void update_controllermenu() {
     menu.Title("Controller controls");
     menu.Subtitle("Controller options");
 
-    menu.BoolOption("Block car controls", settings.BlockCarControls,
-                    { "Blocks car action controls like ducking, switching guns, handbrake, aim. Holding activates the original button again.",
-                        "Experimental!" });
-
     menu.BoolOption("Engine button toggles", settings.ToggleEngine, 
                     { "Checked: the engine button turns the engine on AND off.",
                         "Not checked: the button only turns the engine on when it's off." });
@@ -403,20 +405,18 @@ void update_controllermenu() {
         controls.SetXboxTrigger(currTriggerValue);
     }
 
+    menu.BoolOption("Block car controls", settings.BlockCarControls,
+                    { "Blocks car action controls. Holding activates the original button again.",
+                        "Experimental!" });
+
     int oldIndexUp = getBlockableControlIndex(controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)]);
-    int newIndexUp = oldIndexUp;
-    if (menu.StringArray("Shift Up blocks", blockableControlsHelp, newIndexUp)) {
-        if (newIndexUp != oldIndexUp) {
-            controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)] = blockableControls[newIndexUp];
-        }
+    if (menu.StringArray("Shift Up blocks", blockableControlsHelp, oldIndexUp)) {
+        controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)] = blockableControls[oldIndexUp];
     }
         
     int oldIndexDown = getBlockableControlIndex(controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)]);
-    int newIndexDown = oldIndexDown;
-    if (menu.StringArray("Shift Down blocks", blockableControlsHelp, newIndexDown)) {
-        if (newIndexDown != oldIndexDown) {
-            controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)] = blockableControls[newIndexDown];
-        }
+    if (menu.StringArray("Shift Down blocks", blockableControlsHelp, oldIndexDown)) {
+        controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)] = blockableControls[oldIndexDown];
     }
 
     std::vector<std::string> controllerInfo;
@@ -487,17 +487,17 @@ void update_wheelmenu() {
     }
 
     if (menu.FloatOption("Steering reduction (wheel)", settings.SteeringReductionWheel, 0.0f, 1.0f, 0.01f, 
-                         { "Reduce steering input at higher speeds. Based off InfamousSabre's Custom Steering" })) {
+                         { "Reduce steering input at higher speeds. Best to leave it at 0 for steering wheels." })) {
         settings.SaveWheel(&controls);
     }
 
     if (menu.FloatOption("Steering multiplier (wheel)", settings.GameSteerMultWheel, 0.1f, 2.0f, 0.01f,
-                         { "Increase steering lock for all cars." })) {
+                         { "Increase steering lock for all cars. You might want to increase it for faster steering and more steering lock." })) {
         updateSteeringMultiplier();
     }
 
     if (menu.BoolOption("Disable non-wheel steering", settings.PatchSteeringControl,
-                        { "Disable keyboard and controller inputs for steering. Fixes the jerky animation." })) {
+                        { "Disable keyboard and controller inputs for steering. This fixes the jerky animation." })) {
         settings.SaveWheel(&controls);
         initSteeringPatches();
     }
@@ -508,7 +508,7 @@ void update_wheelmenu() {
     }
 
     menu.MenuOption("Steering wheel axis setup", "axesmenu", 
-                    { "Configure analog controls, like throttle, steering and the like." });
+                    { "Configure the analog controls." });
         
     menu.MenuOption("Force feedback options", "forcefeedbackmenu",
                     { "Fine-tune your force feedback parameters." });
@@ -538,7 +538,7 @@ void update_wheelmenu() {
     }
 
     menu.BoolOption("Keyboard H-pattern", settings.HPatternKeyboard, 
-                    { "This will allow you to also use the keyboard controls for wheel H-pattern shifting. Configure these controls in the keyboard section." });
+                    { "This allows you to use the keyboard for H-pattern shifting. Configure the controls in the keyboard section." });
 }
 
 void update_anglemenu() {
@@ -546,7 +546,7 @@ void update_anglemenu() {
     menu.Subtitle("Soft lock & angle setup");
     float minLock = 180.0f;
     if (menu.FloatOption("Physical degrees", settings.SteerAngleMax, minLock, 1080.0, 30.0,
-                         { "How many degrees your wheel physically can turn. Should match driver settings." })) {
+                         { "How many degrees your wheel can physically turn." })) {
         if (settings.SteerAngleCar > settings.SteerAngleMax) { settings.SteerAngleCar = settings.SteerAngleMax; }
         if (settings.SteerAngleBike > settings.SteerAngleMax) { settings.SteerAngleBike = settings.SteerAngleMax; }
         if (settings.SteerAngleBoat > settings.SteerAngleMax) { settings.SteerAngleBoat = settings.SteerAngleMax; }
@@ -623,22 +623,21 @@ void update_forcefeedbackmenu() {
     menu.BoolOption("Enable", settings.EnableFFB, 
                     { "Enable or disable force feedback entirely." });
 
-    menu.FloatOption("Global multiplier", settings.FFGlobalMult, 0.0f, 10.0f, 1.0f);
-        
-    menu.FloatOption("Self aligning force", settings.FFBAmpMultNew, 0.1f, 2.0f, 0.05f,
-                     { "Force feedback strength for steering." });
+    menu.FloatOption("Self aligning torque multiplier", settings.SATAmpMult, 0.1f, 5.0f, 0.05f,
+                     { "Force feedback strength for steering. Increase for weak wheels, decrease for strong/fast wheels.",
+                     "Putting this too high clips force feedback. Too low and the car doesn't feel responsive."});
 
-    menu.IntOption("Damper Max (low speed)", settings.DamperMax, 0, 200, 1, 
+    menu.FloatOption("Detail effect multiplier", settings.DetailMult, 0.0f, 10.0f, 0.1f,
+                     { "Force feedback effects caused by the suspension." });
+
+    menu.IntOption("Damper max (low speed)", settings.DamperMax, 0, 200, 1, 
                    { "Wheel friction at low speed." });
         
-    menu.IntOption("Damper Min (high speed)", settings.DamperMin, 0, 200, 1,
+    menu.IntOption("Damper min (high speed)", settings.DamperMin, 0, 200, 1,
                    { "Wheel friction at high speed." });
         
-    menu.FloatOption("Damper end speed", settings.TargetSpeed, 0.0f, 40.0f, 0.2f,
-                     { "Speed at which the damper strength should be minimal.", "In m/s." });
-        
-    menu.FloatOption("Detail strength", settings.DetailStrength, 0.0f, 10.0f, 0.1f,
-                     { "Force feedback effect strength by suspension events due to finer road details." });
+    menu.FloatOption("Damper min speed", settings.DamperMinSpeed, 0.0f, 40.0f, 0.2f,
+                     { "Speed where the damper strength should be minimal.", "In m/s." });
 }
 
 void update_buttonsmenu() {
@@ -716,9 +715,7 @@ void update_hudmenu() {
                     { "Display HUD even if manual transmission is off." });
 
     int fontIndex = static_cast<int>(std::find(fontIDs.begin(), fontIDs.end(), settings.HUDFont) - fontIDs.begin());
-    int oldIndex = fontIndex;
-    menu.StringArray("Font: ", fonts, fontIndex, { "Select the font for speed, gearbox mode, current gear." });
-    if (fontIndex != oldIndex) {
+    if (menu.StringArray("Font: ", fonts, fontIndex, { "Select the font for speed, gearbox mode, current gear." })) {
         settings.HUDFont = fontIDs.at(fontIndex);
     }
 
@@ -833,7 +830,7 @@ void update_debugmenu() {
     menu.BoolOption("Display force feedback lines", settings.DisplayFFBInfo,
                     { "Show lines detailing force feedback direction and force.",
                         "Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction"});
-    menu.BoolOption("Expose script variables", settings.CrossScript, 
+    menu.BoolOption("Share script data", settings.CrossScript, 
                     { "Shares data like gear, shifting indicator and Neutral with other mods. Check GitHub for the supported types." });
 }
 
