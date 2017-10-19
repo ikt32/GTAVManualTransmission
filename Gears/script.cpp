@@ -1089,7 +1089,7 @@ void functionAShift() { // Automatic
         }
     }
 
-    float currSpeed = avg(getDrivenWheelsSpeeds(ext.GetTyreSpeeds(vehicle)));
+    float currSpeed = vehData.Speed;
 
     // Shift up
     if (vehData.CurrGear > 0 &&
