@@ -1,9 +1,3 @@
-/*
-		THIS FILE IS A PART OF GTA V SCRIPT HOOK SDK
-					http://dev-c.com
-				(C) Alexander Blade 2015
-*/
-
 #pragma once
 
 #include <windows.h>
@@ -23,8 +17,8 @@ std::string key2str(DWORD key);
 template <template<class, class, class...> class C, typename K, typename V, typename... Args>
 V GetWithDef(const C<K, V, Args...>& m, K const& key, const V & defval)
 {
-	typename C<K, V, Args...>::const_iterator it = m.find(key);
-	if (it == m.end())
-		return defval;
-	return it->second;
+    typename C<K, V, Args...>::const_iterator it = m.find(key);
+    if (it == m.end())
+        return defval;
+    return it->second;
 }

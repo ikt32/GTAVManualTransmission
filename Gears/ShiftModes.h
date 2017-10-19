@@ -1,10 +1,10 @@
 #pragma once
 
 enum ShiftModes {
-	Sequential,
-	HPattern,
-	Automatic,
-	SIZEOF_ShiftModes
+    Sequential,
+    HPattern,
+    Automatic,
+    SIZEOF_ShiftModes
 };
 
 ShiftModes& operator++(ShiftModes &mode);

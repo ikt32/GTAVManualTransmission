@@ -5,10 +5,10 @@
 #include "inc/types.h"
 
 struct Color {
-	int R;
-	int G;
-	int B;
-	int A;
+    int R;
+    int G;
+    int B;
+    int A;
 };
 
 const Color solidWhite = { 255,	255, 255, 255 };
@@ -38,19 +38,19 @@ void showSubtitle(const std::string &message, int duration = 2500);
 //https://github.com/CamxxCore/AirSuperiority
 class GameSound {
 public:
-	GameSound(char *sound, char *soundSet);
-	~GameSound();
-	void Load(char *audioBank);
-	void Play(Entity ent);
-	void Stop();
+    GameSound(char *sound, char *soundSet);
+    ~GameSound();
+    void Load(char *audioBank);
+    void Play(Entity ent);
+    void Stop();
 
-	bool Active;
+    bool Active;
 
 private:
-	char *m_soundSet;
-	char *m_sound;
-	int m_soundID;
-	int m_prevNotification;
+    char *m_soundSet;
+    char *m_sound;
+    int m_soundID;
+    int m_prevNotification;
 };
 
 void DisableActionControlsStart();
