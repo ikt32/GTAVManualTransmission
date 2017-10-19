@@ -734,27 +734,26 @@ void stopForceFeedback() {
 }
 
 void initSteeringPatches() {
-	if (controls.PrevInput == ScriptControls::Wheel || settings.PatchSteeringAlways) {
-		if (!MemoryPatcher::SteeringPatched && settings.PatchSteering) {
+	if (settings.PatchSteering &&
+		(controls.PrevInput == ScriptControls::Wheel || settings.PatchSteeringAlways)) {
+		if (!MemoryPatcher::SteeringPatched)
 			MemoryPatcher::PatchSteeringCorrection();
-		}
-		//applySteeringMultiplier();
 	}
 	else {
-		if (MemoryPatcher::SteeringPatched && settings.PatchSteering && !settings.PatchSteeringAlways) {
+		if (MemoryPatcher::SteeringPatched)
 			MemoryPatcher::RestoreSteeringCorrection();
-		}
 		resetSteeringMultiplier();
 	}
-	if (controls.PrevInput == ScriptControls::Wheel && vehData.Class == VehicleData::VehicleClass::Car && settings.PatchSteeringControl) {
-		if (!MemoryPatcher::SteerControlPatched) {
+
+	if (settings.PatchSteeringControl &&
+		controls.PrevInput == ScriptControls::Wheel &&
+		vehData.Class == VehicleData::VehicleClass::Car) {
+		if (!MemoryPatcher::SteerControlPatched)
 			MemoryPatcher::PatchSteeringControl();
-		}
 	}
 	else {
-		if (MemoryPatcher::SteerControlPatched) {
+		if (MemoryPatcher::SteerControlPatched)
 			MemoryPatcher::RestoreSteeringControl();
-		}
 	}
 }
 
@@ -1545,7 +1544,6 @@ void handleRPM() {
 		    !vehData.SimulatedNeutral && 
 			// The next statement is a workaround for rolling back + brake + gear > 1 because it shouldn't rev then.
 			// Also because we're checking on the game Control accel value and not the pedal position
-			// TODO: Might wanna re-write with control.AccelVal instead of vehData.ControlAccelerate?
 			!(vehData.Velocity < 0.0 && controls.BrakeVal > 0.1f && controls.ThrottleVal > 0.05f)) {
 			fakeRev(false, 0);
 			ext.SetThrottle(vehicle, controls.ThrottleVal);
@@ -1576,7 +1574,6 @@ void handleRPM() {
 /*
  * Truck gearbox code doesn't stop accelerating, so this speed limiter
  * is needed to stop acceleration once upshift point is reached.
- * TODO: Fix speed limiter. Use the same as the other limiter?
  */
 void functionTruckLimiting() {
 	// Save speed @ shift
