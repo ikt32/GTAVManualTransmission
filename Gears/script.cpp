@@ -1374,37 +1374,39 @@ void functionEngLock() {
     if (settings.ShiftMode == Automatic ||
         vehData.TopGear == 1 || 
         vehData.IsTruck ||
-        vehData.CurrGear == 0 ||
         vehData.CurrGear == vehData.TopGear ||
         vehData.SimulatedNeutral) {
+        engLockActive = false;
+        gearRattle.Stop();
         return;
     }
-    // ok so this took me way too much time
-    // I finally found the gearing ratio stuff, which along with DriveMaxFlatVel (?)
-    // can be used to figure out the max speed for that gear.
-    // Beware though as this might be different for trucks. Haven't checked it yet!
+    const float reverseThreshold = 2.0f;
 
-
-    //float dashms = avg(getDrivenWheelsSpeeds(ext.GetTyreSpeeds(vehicle)));
-    // We'll be using the speeds the vehicle travels at (if the wheels didn't stop),
-    // so dashms is more suitable than driven wheels speed
-    float dashms = ext.GetDashSpeed(vehicle);
-    if (!vehData.HasSpeedo && dashms > 0.1f) {
-        vehData.HasSpeedo = true;
-    }
-    if (!vehData.HasSpeedo) {
-        dashms = abs(vehData.Velocity);
-    }
+    float dashms = abs(vehData.Velocity);
 
     float speed = dashms;
     auto ratios = ext.GetGearRatios(vehicle);
     float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
     float maxSpeed = DriveMaxFlatVel / ratios[vehData.CurrGear];
 
-    // Wheels are locking up due to bad downshifts
-    if (speed > maxSpeed + 3.334f) {
+    float inputMultiplier = (1.0f - controls.ClutchVal);
+
+    bool wrongDirection = false;
+    if (vehData.CurrGear == 0 && VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
+        if (vehData.Velocity > reverseThreshold) {
+            wrongDirection = true;
+        }
+    }
+    else {
+        if (vehData.Velocity < -reverseThreshold) {
+            wrongDirection = true;
+        }
+    }
+
+    // Wheels are locking up due to bad (down)shifts
+    if ((speed > abs(maxSpeed) + 3.334f || wrongDirection) && inputMultiplier > settings.ClutchCatchpoint) {
         engLockActive = true;
-        float inputMultiplier = (1.0f - controls.ClutchVal);
+
         float lockingForce = 60.0f * inputMultiplier;
         auto wheelsToLock = getDrivenWheels();
 
@@ -1420,10 +1422,17 @@ void functionEngLock() {
         }
         fakeRev(true, 1.0f);
         gearRattle.Play(vehicle);
+        float oldEngineHealth = VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle);
+        float damageToApply = settings.MisshiftDamage * inputMultiplier;
         if (settings.EngDamage) {
-            VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
-                vehicle,
-                VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.MisshiftDamage);
+            if (oldEngineHealth >= damageToApply) {
+                VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
+                    vehicle,
+                    oldEngineHealth - damageToApply);
+            }
+            else {
+                VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
+            }
         }
         if (settings.DisplayInfo) {
             showText(0.5, 0.45, 0.5, "Eng block @ " + std::to_string(static_cast<int>(inputMultiplier * 100.0f)) + "%");
@@ -1700,7 +1709,7 @@ void functionRealReverse() {
 // Reverse gear: Throttle reverses, Brake brakes (exclusive)
 void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
     float speedThreshold = 0.5f;
-    float reverseThreshold = 1.0f;
+    const float reverseThreshold = 2.0f;
 
     if (vehData.CurrGear > 0) {
         // Going forward
@@ -1814,7 +1823,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
             //showText(0.3, 0.0, 1.0, "We are rolling forwards");
             //bool brakelights = false;
 
-            if (vehData.Velocity > reverseThreshold * 1.0f) {
+            if (vehData.Velocity > reverseThreshold) {
                 gearRattle.Play(vehicle);
                 //shiftTo(1, false);
                 //vehData.SimulatedNeutral = true;
