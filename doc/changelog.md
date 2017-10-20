@@ -1,13 +1,18 @@
 # Changelog
 
-## 4.3.11
-No config changes
+## 4.4.0
+Config changes:
+Change force feedback related options.
 
 Changes:  
-* Fix wheel ffb not resetting after exiting car while effect is active
-* Fix engine stalling parameters
-* Fix engine over-rev from miss-shift damage (it's much higher now)
+* Revamp force feedback, it's much more accurate now!
 * Add engine restart if stalling is active (push start "sim")
+* Add "Custom Steering" for keyboard/controller too
+* Fix wheel ffb not resetting after exiting car while effect is active
+* Fix engine over-rev from miss-shift damage (it completely trashes your engine now)
+* Fix downshift in auto gearbox when engine braking
+* Fix clutch catch restarting engine
+* Fix engine stalling parameters
 
 ## 4.3.10
 No config changes
