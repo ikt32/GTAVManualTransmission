@@ -282,7 +282,7 @@ void update() {
 
         // Simulate "catch point"
         // When the clutch "grabs" and the car starts moving without input
-        if (settings.ClutchCatching) {
+        if (settings.ClutchCatching && VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
             functionClutchCatch();
         }
     }
@@ -1270,7 +1270,9 @@ void functionEngStall() {
     }
 
     if (stallingProgress > 1.0f) {
-        VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
+        if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
+            VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
+        }
         gearRattle.Stop();
         stallingProgress = 0.0f;
         if (settings.DisplayInfo)
@@ -1435,8 +1437,8 @@ void functionEngLock() {
             }
         }
         if (settings.DisplayInfo) {
-            showText(0.5, 0.45, 0.5, "Eng block @ " + std::to_string(static_cast<int>(inputMultiplier * 100.0f)) + "%");
-            showText(0.5, 0.50, 0.5, "Eng block @ " + std::to_string(lockingForce));
+            showText(0.5, 0.80, 0.25, "Eng block @ " + std::to_string(static_cast<int>(inputMultiplier * 100.0f)) + "%");
+            showText(0.5, 0.85, 0.25, "Eng block @ " + std::to_string(lockingForce));
         }
     }
     else {
