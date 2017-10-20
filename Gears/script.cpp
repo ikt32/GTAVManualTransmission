@@ -1392,15 +1392,16 @@ void functionEngLock() {
     float maxSpeed = DriveMaxFlatVel / ratios[vehData.CurrGear];
 
     float inputMultiplier = (1.0f - controls.ClutchVal);
+    auto wheelsSpeed = avg(getDrivenWheelsSpeeds(ext.GetTyreSpeeds(vehicle)));
 
     bool wrongDirection = false;
     if (vehData.CurrGear == 0 && VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
-        if (vehData.Velocity > reverseThreshold) {
+        if (vehData.Velocity > reverseThreshold && wheelsSpeed > reverseThreshold) {
             wrongDirection = true;
         }
     }
     else {
-        if (vehData.Velocity < -reverseThreshold) {
+        if (vehData.Velocity < -reverseThreshold && wheelsSpeed < -reverseThreshold) {
             wrongDirection = true;
         }
     }
@@ -1408,7 +1409,6 @@ void functionEngLock() {
     // Wheels are locking up due to bad (down)shifts
     if ((speed > abs(maxSpeed) + 3.334f || wrongDirection) && inputMultiplier > settings.ClutchCatchpoint) {
         engLockActive = true;
-
         float lockingForce = 60.0f * inputMultiplier;
         auto wheelsToLock = getDrivenWheels();
 
@@ -1826,17 +1826,8 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
             //bool brakelights = false;
 
             if (vehData.Velocity > reverseThreshold) {
-                gearRattle.Play(vehicle);
-                //shiftTo(1, false);
-                //vehData.SimulatedNeutral = true;
-                
                 if (controls.ClutchVal < settings.ClutchCatchpoint) {
                     CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
-                }
-                if (settings.EngDamage) {
-                    VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
-                        vehicle,
-                        VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.RPMDamage * 2);
                 }
                 // Brake Pedal Reverse
                 if (wheelBrakeVal > 0.01f) {
@@ -1844,7 +1835,6 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
                     ext.SetThrottleP(vehicle, -wheelBrakeVal);
                     ext.SetBrakeP(vehicle, 1.0f);
                 }
-                //showNotification("Woops", nullptr);
             }
 
             //VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, brakelights);
