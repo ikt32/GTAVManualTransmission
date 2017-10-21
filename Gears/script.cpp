@@ -67,7 +67,7 @@ MiniPID pid(1.0, 0.0, 0.0);
 void initVehicle() {
     reset();
     std::fill(upshiftSpeeds.begin(), upshiftSpeeds.end(), 0.0f);
-    vehData = VehicleData();
+    vehData.Clear();// = VehicleData();
     vehData.UpdateValues(ext, vehicle);
 
     if (vehData.NoClutch) {
@@ -724,10 +724,10 @@ void initWheel() {
 }
 
 void stopForceFeedback() {
-    for (GUID guid : controls.WheelControl.GetGuids()) {
-        controls.WheelControl.PlayLedsDInput(guid, 0.0, 0.5, 1.0);
-    }
     if (controls.WheelControl.IsConnected(controls.SteerGUID)) {
+        if (settings.LogiLEDs) {
+            controls.WheelControl.PlayLedsDInput(controls.SteerGUID, 0.0, 0.5, 1.0);
+        }
         controls.WheelControl.StopConstantForce();
     }
 }
