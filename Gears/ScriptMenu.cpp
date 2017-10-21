@@ -344,19 +344,18 @@ void update_legacycontrollermenu() {
     menu.Subtitle("Non-Xinput options");
 
     int oldIndexUp = getBlockableControlIndex(controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftUp)]);
-    int newIndexUp = oldIndexUp;
-    if (menu.StringArray("Shift Up blocks", blockableControlsHelp, newIndexUp)) {
-        if (newIndexUp != oldIndexUp) {
-            controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftUp)] = blockableControls[newIndexUp];
-        }
+    if (menu.StringArray("Shift Up blocks", blockableControlsHelp, oldIndexUp)) {
+        controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftUp)] = blockableControls[oldIndexUp];
     }
 
     int oldIndexDown = getBlockableControlIndex(controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftDown)]);
-    int newIndexDown = oldIndexDown;
-    if (menu.StringArray("Shift Down blocks", blockableControlsHelp, newIndexDown)) {
-        if (newIndexDown != oldIndexDown) {
-            controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftDown)] = blockableControls[newIndexDown];
-        }
+    if (menu.StringArray("Shift Down blocks", blockableControlsHelp, oldIndexDown)) {
+        controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftDown)] = blockableControls[oldIndexDown];
+    }
+
+    int oldIndexClutch = getBlockableControlIndex(controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::Clutch)]);
+    if (menu.StringArray("Clutch blocks", blockableControlsHelp, oldIndexClutch)) {
+        controls.ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::Clutch)] = blockableControls[oldIndexClutch];
     }
 
     std::vector<std::string> controllerInfo;
@@ -417,6 +416,11 @@ void update_controllermenu() {
     int oldIndexDown = getBlockableControlIndex(controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)]);
     if (menu.StringArray("Shift Down blocks", blockableControlsHelp, oldIndexDown)) {
         controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)] = blockableControls[oldIndexDown];
+    }
+
+    int oldIndexClutch = getBlockableControlIndex(controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::Clutch)]);
+    if (menu.StringArray("Clutch blocks", blockableControlsHelp, oldIndexClutch)) {
+        controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::Clutch)] = blockableControls[oldIndexClutch];
     }
 
     std::vector<std::string> controllerInfo;

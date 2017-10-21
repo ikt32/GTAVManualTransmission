@@ -1883,7 +1883,8 @@ void blockButtons() {
         if (controls.UseLegacyController) {
             for (int i = 0; i < static_cast<int>(ScriptControls::LegacyControlType::SIZEOF_LegacyControlType); i++) {
                 if (controls.ControlNativeBlocks[i] == -1) continue;
-                if (i != (int)ScriptControls::LegacyControlType::ShiftUp && i != (int)ScriptControls::LegacyControlType::ShiftDown) continue;
+                if (i != (int)ScriptControls::LegacyControlType::ShiftUp && 
+                    i != (int)ScriptControls::LegacyControlType::ShiftDown) continue;
 
                 if (controls.ButtonHeldOver(static_cast<ScriptControls::LegacyControlType>(i), 200)) {
                     CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlNativeBlocks[i], 1.0f);
@@ -1897,11 +1898,15 @@ void blockButtons() {
                     CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlNativeBlocks[i], 1.0f);
                 }
             }
+            if (controls.ControlNativeBlocks[(int)ScriptControls::LegacyControlType::Clutch] != -1) {
+                CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlNativeBlocks[(int)ScriptControls::LegacyControlType::Clutch], true);
+            }
         }
         else {
             for (int i = 0; i < static_cast<int>(ScriptControls::ControllerControlType::SIZEOF_ControllerControlType); i++) {
                 if (controls.ControlXboxBlocks[i] == -1) continue;
-                if (i != (int)ScriptControls::ControllerControlType::ShiftUp && i != (int)ScriptControls::ControllerControlType::ShiftDown) continue;
+                if (i != (int)ScriptControls::ControllerControlType::ShiftUp && 
+                    i != (int)ScriptControls::ControllerControlType::ShiftDown) continue;
 
                 if (controls.ButtonHeldOver(static_cast<ScriptControls::ControllerControlType>(i), 200)) {
                     CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 1.0f);
@@ -1914,6 +1919,9 @@ void blockButtons() {
                     CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 0.0f);
                     CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 1.0f);
                 }
+            }
+            if (controls.ControlXboxBlocks[(int)ScriptControls::ControllerControlType::Clutch] != -1) {
+                CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[(int)ScriptControls::ControllerControlType::Clutch], true);
             }
         }
     }
