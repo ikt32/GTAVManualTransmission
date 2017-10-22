@@ -84,6 +84,7 @@ public:
     float GetDriveBiasRear(Vehicle handle);
     float GetPetrolTankVolume(Vehicle handle);
     float GetOilVolume(Vehicle handle);
+    Hash GetAIHandling(Vehicle handle);
 
     uint8_t GetNumWheels(Vehicle handle);
     uint64_t GetWheelsPtr(Vehicle handle);

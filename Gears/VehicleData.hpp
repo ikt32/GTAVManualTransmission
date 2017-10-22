@@ -10,13 +10,8 @@
 
 #define SAMPLES 6
 
-
 class VehicleData {
 public:
-    VehicleData();
-    void Clear();
-    void UpdateRpm(); // call end of script loop only once
-
     enum class VehicleClass {
         Car,
         Bike,
@@ -28,55 +23,35 @@ public:
         Unknown
     };
 
-    void updateAcceleration();
-    void updateAverageAcceleration();
+    VehicleData();
     void UpdateValues(VehicleExtensions& ext, Vehicle vehicle);
+
     std::vector<float> GetWheelCompressionSpeeds();
+    Vector3 GetRelativeAcceleration();                  // dV/dT
+    Vector3 GetRelativeAccelerationAverage() const;     // Moving average
 
     VehicleClass Class = VehicleClass::Car;
     bool NoClutch = false;
     bool IsTruck = false;
-    float Rpm = 0.0f;
 
-    // 1 = Not pressed, 0 = Fully pressed
-    float Clutch = 0.0f;
+    float RPM = 0.0f;
     
-    float Throttle = 0.0f;
-    float Turbo = 0.0f;
+    uint8_t LockGear = 1;
+    uint16_t PrevGear = 1;
+    float LockSpeed = 0.0f;
+    bool FakeNeutral = false;
 
-    // Absolute speed, in m/s
-    float Speed = 0.0f;
-
-    // Directional speed, in m/s
-    float Velocity = 0.0f;
-
-
-    uint8_t TopGear = 0;
-    uint8_t LockGear = 0;
-    uint32_t CurrGear = 0;
-    uint32_t NextGear = 0;
-    uint8_t PrevGear = 0;
-    float LockSpeed = 0;
-    bool LockTruck = false;
-    bool SimulatedNeutral = false;
-    float Pitch = 0;
-
-    // In radians
-    float SteeringAngle = 0.0f;
-    Vector3 RotationVelocity = {};
     std::vector<float> WheelCompressions = {};
     Vector3 SpeedVector = {};
-    float DriveBiasFront = 0.0f;
-    Vector3 getAccelerationVectors();
-    Vector3 getAccelerationVectorsAverage() const;
 
-    float PrevRpm = 0.0f;
+    float PrevRPM = 0.0f;
 
     bool BlinkerLeft = false;
     bool BlinkerRight = false;
     bool BlinkerHazard = false;
     int BlinkerTicks = 0;
 
+    bool TruckLockSpeed = false;
     bool TruckShiftUp = false;
 
     int RadioStationIndex = 0;
@@ -105,8 +80,12 @@ private:
         "SCRAP",
         "UTILTRUC"
     };
+
     bool isBadTruck(char* name);
     VehicleClass findClass(Hash model);
+
+    void updateAcceleration();
+    void updateAverageAcceleration();
 
     Vector3 SpeedVectorPrev = {};
     std::vector<float> prevCompressions = {};
@@ -117,5 +96,4 @@ private:
     Vector3 acceleration;
     std::array<Vector3, SAMPLES> accelerationSamples = {};
     int averageAccelIndex = 0;
-    void zeroSamples();
 };

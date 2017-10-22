@@ -2,39 +2,41 @@
 
 #include "VehicleData.hpp"
 
-VehicleData::VehicleData() {
-    zeroSamples();
+VehicleData::VehicleData() { }
+
+void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
+    Class = findClass(ENTITY::GET_ENTITY_MODEL(vehicle));
+    IsTruck = isBadTruck(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicle)));
+
+    PrevRPM = RPM;
+    RPM = VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) ? ext.GetCurrentRPM(vehicle) : 0.01f;
+    SpeedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
+    WheelCompressions = ext.GetWheelCompressions(vehicle);
+    if (prevCompressions.size() != WheelCompressions.size()) {
+        prevCompressions = WheelCompressions;
+    }
+    if (!HasSpeedo && ext.GetDashSpeed(vehicle) > 0.0f) {
+        HasSpeedo = true;
+    }
+
+    NoClutch = ext.GetTopGear(vehicle) == 1;
+
+    updateAcceleration();
+    updateAverageAcceleration();
 }
 
-void VehicleData::Clear() {
-    Class = VehicleClass::Car;
-    IsTruck = false;
-    Rpm = 0.0f;
-    Clutch = 1.0f;
-    Throttle = 0.0f;
-    Turbo = 0.0f;
-    Speed = 0.0f;
-    Velocity = 0.0f;
-    TopGear = 1;
-    LockGear = 1;
-    CurrGear = 1;
-    NextGear = 1;
-    PrevGear = 1;
-    LockSpeed = 0.0f;
-    LockTruck = false;
-    SimulatedNeutral = false;
-    SpeedVectorPrev.x = 0;
-    SpeedVectorPrev.y = 0;
-    SpeedVectorPrev.z = 0;
-    WheelCompressions.clear();
-    prevCompressions.clear();
-    HasSpeedo = false;
-    zeroSamples();
-}
+std::vector<float> VehicleData::GetWheelCompressionSpeeds() {
+    long long time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 
-void VehicleData::UpdateRpm() {
-    PrevRpm = Rpm;
+    std::vector<float> result;
+    for (int i = 0; i < WheelCompressions.size(); i++) {
+        result.push_back((WheelCompressions[i] - prevCompressions[i]) / ((time - prevCompressTime) / 1e9f));
+    }
 
+    prevCompressTime = time;
+    prevCompressions = WheelCompressions;
+
+    return result;
 }
 
 void VehicleData::updateAcceleration() {
@@ -68,39 +70,6 @@ bool VehicleData::isBadTruck(char* name) {
     return false;
 }
 
-// Updates values from memory and natives
-void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
-    Hash model = ENTITY::GET_ENTITY_MODEL(vehicle);
-
-    CurrGear = ext.GetGearCurr(vehicle);
-    NextGear = ext.GetGearNext(vehicle);
-    Rpm = VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) ? ext.GetCurrentRPM(vehicle) : 0.01f;
-    Clutch = ext.GetClutch(vehicle);
-    Throttle = ext.GetThrottle(vehicle);
-    Turbo = ext.GetTurbo(vehicle);
-    TopGear = ext.GetTopGear(vehicle);
-    Speed = ENTITY::GET_ENTITY_SPEED(vehicle);
-    SpeedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
-    Velocity = SpeedVector.y;
-    RotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(vehicle);
-    Class = findClass(model);
-    IsTruck = isBadTruck(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(model));
-    Pitch = ENTITY::GET_ENTITY_PITCH(vehicle);
-    SteeringAngle = ext.GetSteeringAngle(vehicle);
-    WheelCompressions = ext.GetWheelCompressions(vehicle);
-    DriveBiasFront = ext.GetDriveBiasFront(vehicle);
-    if (prevCompressions.size() != WheelCompressions.size()) {
-        prevCompressions = WheelCompressions;
-    }
-    if (!HasSpeedo && ext.GetDashSpeed(vehicle) > 0.1f) {
-        HasSpeedo = true;
-    }
-
-    NoClutch = TopGear == 1;
-
-    updateAcceleration();
-    updateAverageAcceleration();
-}
 
 VehicleData::VehicleClass VehicleData::findClass(Hash model) {
     if (VEHICLE::IS_THIS_MODEL_A_CAR(model))
@@ -121,25 +90,11 @@ VehicleData::VehicleClass VehicleData::findClass(Hash model) {
     return VehicleClass::Unknown;
 }
 
-std::vector<float> VehicleData::GetWheelCompressionSpeeds() {
-    long long time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
-
-    std::vector<float> result;
-    for (int i = 0; i < WheelCompressions.size(); i++) {
-        result.push_back((WheelCompressions[i] - prevCompressions[i]) / ((time - prevCompressTime) / 1e9f));
-    }
-    
-    prevCompressTime = time;
-    prevCompressions = WheelCompressions;
-
-    return result;
-}
-
-Vector3 VehicleData::getAccelerationVectors() {
+Vector3 VehicleData::GetRelativeAcceleration() {
     return acceleration;
 }
 
-Vector3 VehicleData::getAccelerationVectorsAverage() const {
+Vector3 VehicleData::GetRelativeAccelerationAverage() const {
     Vector3 result = {};
 
     for (int i = 0; i < SAMPLES; i++) {
@@ -154,11 +109,3 @@ Vector3 VehicleData::getAccelerationVectorsAverage() const {
     return result;
 }
 
-
-void VehicleData::zeroSamples() {
-    for (int i = 0; i < SAMPLES; i++) {
-        accelerationSamples[i].x = 0.0f;
-        accelerationSamples[i].y = 0.0f;
-        accelerationSamples[i].z = 0.0f;
-    }
-}

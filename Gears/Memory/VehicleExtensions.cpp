@@ -450,6 +450,15 @@ float VehicleExtensions::GetOilVolume(Vehicle handle) {
     return *reinterpret_cast<float *>(address + hOffsets.fOilVolume);
 }
 
+Hash VehicleExtensions::GetAIHandling(Vehicle handle) {
+    auto address = GetHandlingPtr(handle);
+    if (address == 0) return 0;
+    auto offset = 0;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x13C : 0;
+    if (offset == 0) return 0;
+    return *reinterpret_cast<Hash *>(address + offset);
+}
+
 uint8_t VehicleExtensions::GetNumWheels(Vehicle handle) {
     auto address = GetAddress(handle);
 
