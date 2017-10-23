@@ -25,50 +25,38 @@ public:
     float GetRocketBoostCharge(Vehicle handle);
     void SetRocketBoostCharge(Vehicle handle, float value);
 
-    uint32_t GetGears(Vehicle handle);
-    void SetGears(Vehicle handle, uint32_t value);
+    float GetFuelLevel(Vehicle handle);
+    void SetFuelLevel(Vehicle handle, float value);
+
+    uint16_t GetGearNext(Vehicle handle);
+    void SetGearNext(Vehicle handle, uint16_t value);
 
     uint16_t GetGearCurr(Vehicle handle);
     void SetGearCurr(Vehicle handle, uint16_t value);
-    
-    uint16_t GetGearNext(Vehicle handle);
-    void SetGearNext(Vehicle handle, uint16_t value);
 
     unsigned char GetTopGear(Vehicle handle);
     // SetTopGear not logical
     
+    // Divide GetDriveMaxFlatVel by the values in this thing to get the top
+    // speed for the gear.
+    std::vector<float> GetGearRatios(Vehicle handle);
+    float GetDriveForce(Vehicle handle);
+    float GetInitialDriveMaxFlatVel(Vehicle handle);
+    float GetDriveMaxFlatVel(Vehicle handle);
+
     float GetCurrentRPM(Vehicle handle);
     void SetCurrentRPM(Vehicle handle, float value);
     
     float GetClutch(Vehicle handle);
     void SetClutch(Vehicle handle, float value);
     
-    float GetTurbo(Vehicle handle);
-    void SetTurbo(Vehicle handle, float value);
-    
     float GetThrottle(Vehicle handle);
     void SetThrottle(Vehicle handle, float value);
-    
-    float GetThrottleP(Vehicle handle);
-    void SetThrottleP(Vehicle handle, float value);
-    
-    float GetBrakeP(Vehicle handle);
-    void SetBrakeP(Vehicle handle, float value);
-    
-    bool GetHandbrake(Vehicle handle);
-    // SetHandbrake not implemented
-    
-    float GetFuelLevel(Vehicle handle);
-    void SetFuelLevel(Vehicle handle, float value);
 
-    float GetEngineTemp(Vehicle handle);
-    // No set impl.
+    float GetTurbo(Vehicle handle);
+    void SetTurbo(Vehicle handle, float value);
 
-    float GetDirtLevel(Vehicle handle);
-    // No set impl.
-
-    float GetDashSpeed(Vehicle handle);
-    // No set impl.
+    uint64_t GetHandlingPtr(Vehicle handle);
 
     // Steering input angle, steering lock independent
     float GetSteeringInputAngle(Vehicle handle);
@@ -77,18 +65,37 @@ public:
     // Wheel angle, steering lock dependent
     float GetSteeringAngle(Vehicle handle);
     void SetSteeringAngle(Vehicle handle, float value);
+   
+    float GetThrottleP(Vehicle handle);
+    void SetThrottleP(Vehicle handle, float value);
+    
+    float GetBrakeP(Vehicle handle);
+    void SetBrakeP(Vehicle handle, float value);
+    
+    bool GetHandbrake(Vehicle handle);
+    // SetHandbrake not implemented
 
-    // Handling data related getters
-    uint64_t GetHandlingPtr(Vehicle handle);
+    float GetDirtLevel(Vehicle handle);
+    // No set impl.
+
+    float GetEngineTemp(Vehicle handle);
+    // No set impl.
+
+    float GetDashSpeed(Vehicle handle);
+    // No set impl.
+
+    uint64_t GetWheelsPtr(Vehicle handle);
+    uint8_t GetNumWheels(Vehicle handle);
+
+    /*
+     * Handling data related getters
+     */
     float GetDriveBiasFront(Vehicle handle);
     float GetDriveBiasRear(Vehicle handle);
     float GetPetrolTankVolume(Vehicle handle);
     float GetOilVolume(Vehicle handle);
     Hash GetAIHandling(Vehicle handle);
 
-    uint8_t GetNumWheels(Vehicle handle);
-    uint64_t GetWheelsPtr(Vehicle handle);
-    
     /*
      * Suspension info struct
      */
@@ -133,16 +140,9 @@ public:
     // to stick properly.
     void SetWheelBrakePressure(Vehicle handle, uint8_t index, float value);
 
-    // Divide GetDriveMaxFlatVel by the values in this thing to get the top
-    // speed for the gear.
-    std::vector<float> GetGearRatios(Vehicle handle);
 
-    float GetDriveForce(Vehicle handle);
-
-    float GetInitialDriveMaxFlatVel(Vehicle handle);
-
-    float GetDriveMaxFlatVel(Vehicle handle);
 
 private:
     eGameVersion gameVersion = getGameVersion();
+
 };

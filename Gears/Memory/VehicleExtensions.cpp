@@ -57,52 +57,28 @@ void VehicleExtensions::SetRocketBoostCharge(Vehicle handle, float value) {
     *reinterpret_cast<float *>(address + offset) = value;
 }
 
-uint32_t VehicleExtensions::GetGears(Vehicle handle) {
+float VehicleExtensions::GetFuelLevel(Vehicle handle) {
     auto address = GetAddress(handle);
 
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7A0 : 0x790;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x7C0 : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x7E0 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x7F0 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x810 : offset;
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x768 : 0x758;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x788 : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x7A8 : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x7B8 : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x7C8 : offset;
 
-    return address == nullptr ? 0 : *reinterpret_cast<const uint32_t *>(address + offset);
+    return *reinterpret_cast<float *>(address + offset);
 }
 
-void VehicleExtensions::SetGears(Vehicle handle, uint32_t value) {
+void VehicleExtensions::SetFuelLevel(Vehicle handle, float value) {
     auto address = GetAddress(handle);
 
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7A0 : 0x790;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x7C0 : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x7E0 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x7F0 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x810 : offset;
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x768 : 0x758;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x788 : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x7A8 : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x7B8 : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x7C8 : offset;
 
-    *reinterpret_cast<uint32_t *>(address + offset) = value;
-}
-
-uint16_t VehicleExtensions::GetGearCurr(Vehicle handle) {
-    auto address = GetAddress(handle);
-
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7A2 : 0x792;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x7C2 : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x7E2 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x7F2 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x812 : offset;
-
-    return address == nullptr ? 0 : *reinterpret_cast<const uint16_t *>(address + offset);
-}
-
-void VehicleExtensions::SetGearCurr(Vehicle handle, uint16_t value) {
-    auto address = GetAddress(handle);
-
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7A2 : 0x792;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x7C2 : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x7E2 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x7F2 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x812 : offset;
-
-    *reinterpret_cast<uint16_t *>(address + offset) = value;
+    *reinterpret_cast<float *>(address + offset) = value;
 }
 
 uint16_t VehicleExtensions::GetGearNext(Vehicle handle) {
@@ -129,6 +105,30 @@ void VehicleExtensions::SetGearNext(Vehicle handle, uint16_t value) {
     *reinterpret_cast<uint16_t *>(address + offset) = value;
 }
 
+uint16_t VehicleExtensions::GetGearCurr(Vehicle handle) {
+    auto address = GetAddress(handle);
+
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7A2 : 0x792;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x7C2 : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x7E2 : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x7F2 : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x812 : offset;
+
+    return address == nullptr ? 0 : *reinterpret_cast<const uint16_t *>(address + offset);
+}
+
+void VehicleExtensions::SetGearCurr(Vehicle handle, uint16_t value) {
+    auto address = GetAddress(handle);
+
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7A2 : 0x792;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x7C2 : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x7E2 : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x7F2 : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x812 : offset;
+
+    *reinterpret_cast<uint16_t *>(address + offset) = value;
+}
+
 unsigned char VehicleExtensions::GetTopGear(Vehicle handle) {
     auto address = GetAddress(handle);
 
@@ -139,6 +139,58 @@ unsigned char VehicleExtensions::GetTopGear(Vehicle handle) {
     offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x816 : offset;
 
     return address == nullptr ? 0 : *reinterpret_cast<const unsigned char *>(address + offset);
+}
+
+std::vector<float> VehicleExtensions::GetGearRatios(Vehicle handle) {
+    auto address = GetAddress(handle);
+
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7A8 : 0x798;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x7C8 : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x7E8 : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x7F8 : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x818 : offset;
+
+    std::vector<float> ratios;
+    for (int gearOffset = 0; gearOffset <= 7; gearOffset++) {
+        ratios.push_back(*reinterpret_cast<float *>(address + offset + gearOffset * sizeof(float)));
+    }
+    return ratios;
+}
+
+float VehicleExtensions::GetDriveForce(Vehicle handle) {
+    auto address = GetAddress(handle);
+
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7C8 : 0x7B8;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x7E8 : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x808 : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x818 : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x838 : offset;
+
+    return *reinterpret_cast<float *>(address + offset);
+}
+
+float VehicleExtensions::GetInitialDriveMaxFlatVel(Vehicle handle) {
+    auto address = GetAddress(handle);
+
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7CC : 0x7BC;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x7EC : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x80C : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x81C : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x83C : offset;
+
+    return *reinterpret_cast<float *>(address + offset);
+}
+
+float VehicleExtensions::GetDriveMaxFlatVel(Vehicle handle) {
+    auto address = GetAddress(handle);
+
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7D0 : 0x7C0;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x7F0 : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x810 : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x820 : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x840 : offset;
+
+    return *reinterpret_cast<float *>(address + offset);
 }
 
 float VehicleExtensions::GetCurrentRPM(Vehicle handle) {
@@ -189,6 +241,30 @@ void VehicleExtensions::SetClutch(Vehicle handle, float value) {
     *reinterpret_cast<float *>(address + offset) = value;
 }
 
+float VehicleExtensions::GetThrottle(Vehicle handle) {
+    auto address = GetAddress(handle);
+
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7E4 : 0x7D4;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x804 : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x824 : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x834 : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x854 : offset;
+
+    return *reinterpret_cast<float *>(address + offset);
+}
+
+void VehicleExtensions::SetThrottle(Vehicle handle, float value) {
+    auto address = GetAddress(handle);
+
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7E4 : 0x7D4;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x804 : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x824 : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x834 : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x854 : offset;
+
+    *reinterpret_cast<float *>(address + offset) = value;
+}
+
 float VehicleExtensions::GetTurbo(Vehicle handle) {
     auto address = GetAddress(handle);
 
@@ -213,26 +289,64 @@ void VehicleExtensions::SetTurbo(Vehicle handle, float value) {
     *reinterpret_cast<float *>(address + offset) = value;
 }
 
-float VehicleExtensions::GetThrottle(Vehicle handle) {
+uint64_t VehicleExtensions::GetHandlingPtr(Vehicle handle) {
     auto address = GetAddress(handle);
 
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7E4 : 0x7D4;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x804 : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x824 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x834 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x854 : offset;
+    auto offset = gameVersion >= G_VER_1_0_791_2_STEAM ? 0x830 : 0;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x850 : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x878 : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x888 : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x8A8 : offset;
+
+    return *reinterpret_cast<uint64_t *>(address + offset);
+}
+
+float VehicleExtensions::GetSteeringInputAngle(Vehicle handle) {
+    auto address = GetAddress(handle);
+
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x8A4 : 0x894;
+    offset = gameVersion >= G_VER_1_0_757_2_STEAM ? 0x89C : offset;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x8C4 : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x8EC : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x8FC : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x91C : offset;
 
     return *reinterpret_cast<float *>(address + offset);
 }
 
-void VehicleExtensions::SetThrottle(Vehicle handle, float value) {
+void VehicleExtensions::SetSteeringInputAngle(Vehicle handle, float value) {
     auto address = GetAddress(handle);
 
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7E4 : 0x7D4;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x804 : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x824 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x834 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x854 : offset;
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x8A4 : 0x894;
+    offset = gameVersion >= G_VER_1_0_757_2_STEAM ? 0x89C : offset;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x8C4 : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x8EC : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x8FC : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x91C : offset;
+
+    *reinterpret_cast<float *>(address + offset) = value;
+}
+
+float VehicleExtensions::GetSteeringAngle(Vehicle handle) {
+    auto address = GetAddress(handle);
+
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x8AC : 0x89C;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x8CC : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x8F4 : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x904 : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x924 : offset;
+
+    return *reinterpret_cast<float *>(address + offset);
+}
+
+void VehicleExtensions::SetSteeringAngle(Vehicle handle, float value) {
+    auto address = GetAddress(handle);
+
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x8AC : 0x89C;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x8CC : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x8F4 : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x904 : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x924 : offset;
 
     *reinterpret_cast<float *>(address + offset) = value;
 }
@@ -297,28 +411,18 @@ bool VehicleExtensions::GetHandbrake(Vehicle handle) {
     return *reinterpret_cast<bool *>(address + offset);
 }
 
-float VehicleExtensions::GetFuelLevel(Vehicle handle) {
+float VehicleExtensions::GetDirtLevel(Vehicle handle) {
     auto address = GetAddress(handle);
 
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x768 : 0x758;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x788 : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x7A8 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x7B8 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x7C8 : offset;
+    auto offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x910 : 0;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x938 : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x948 : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x968 : offset;
+
+    if (offset == 0)
+        return 0.0f;
 
     return *reinterpret_cast<float *>(address + offset);
-}
-
-void VehicleExtensions::SetFuelLevel(Vehicle handle, float value) {
-    auto address = GetAddress(handle);
-
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x768 : 0x758;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x788 : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x7A8 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x7B8 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x7C8 : offset;
-
-    *reinterpret_cast<float *>(address + offset) = value;
 }
 
 float VehicleExtensions::GetEngineTemp(Vehicle handle) {
@@ -328,20 +432,6 @@ float VehicleExtensions::GetEngineTemp(Vehicle handle) {
     offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x9AC : offset;
     offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x9BC : offset;
     offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x9DC : offset;
-
-    if (offset == 0)
-        return 0.0f;
-
-    return *reinterpret_cast<float *>(address + offset);
-}
-
-float VehicleExtensions::GetDirtLevel(Vehicle handle) {
-    auto address = GetAddress(handle);
-
-    auto offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x910: 0;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x938 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x948 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x968 : offset;
 
     if (offset == 0)
         return 0.0f;
@@ -364,66 +454,36 @@ float VehicleExtensions::GetDashSpeed(Vehicle handle) {
     return *reinterpret_cast<float *>(address + offset);
 }
 
-float VehicleExtensions::GetSteeringInputAngle(Vehicle handle) {
+uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {
     auto address = GetAddress(handle);
 
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x8A4 : 0x894;
-    offset = gameVersion >= G_VER_1_0_757_2_STEAM ? 0x89C : offset;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x8C4 : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x8EC : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x8FC : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x91C : offset;
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0xAA0 : 0xA80;
 
-    return *reinterpret_cast<float *>(address + offset);
-}
-
-void VehicleExtensions::SetSteeringInputAngle(Vehicle handle, float value) {
-    auto address = GetAddress(handle);
-
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x8A4 : 0x894;
-    offset = gameVersion >= G_VER_1_0_757_2_STEAM ? 0x89C : offset;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x8C4 : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x8EC : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x8FC : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x91C : offset;
-
-    *reinterpret_cast<float *>(address + offset) = value;
-}
-
-float VehicleExtensions::GetSteeringAngle(Vehicle handle) {
-    auto address = GetAddress(handle);
-
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x8AC : 0x89C;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x8CC : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x8F4 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x904 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x924 : offset;
-
-    return *reinterpret_cast<float *>(address + offset);
-}
-
-void VehicleExtensions::SetSteeringAngle(Vehicle handle, float value) {
-    auto address = GetAddress(handle);
-
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x8AC : 0x89C;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x8CC : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x8F4 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x904 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x924 : offset;
-
-    *reinterpret_cast<float *>(address + offset) = value;
-}
-
-uint64_t VehicleExtensions::GetHandlingPtr(Vehicle handle) {
-    auto address = GetAddress(handle);
-    
-    auto offset = gameVersion >= G_VER_1_0_791_2_STEAM ? 0x830 : 0;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x850 : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x878 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x888 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x8A8 : offset;
+    offset = gameVersion >= G_VER_1_0_505_2_STEAM ? 0xA90 : offset;
+    offset = gameVersion >= G_VER_1_0_791_2_STEAM ? 0xAB0 : offset;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0xAE0 : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0xB10 : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0xB20 : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0xB40 : offset;
 
     return *reinterpret_cast<uint64_t *>(address + offset);
+}
+
+uint8_t VehicleExtensions::GetNumWheels(Vehicle handle) {
+    auto address = GetAddress(handle);
+
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0xAA0 : 0xA80;
+
+    offset = gameVersion >= G_VER_1_0_505_2_STEAM ? 0xA90 : offset;
+    offset = gameVersion >= G_VER_1_0_791_2_STEAM ? 0xAB0 : offset;
+    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0xAE0 : offset;
+    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0xB10 : offset;
+    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0xB20 : offset;
+    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0xB40 : offset;
+
+    offset += 8;
+
+    return *reinterpret_cast<int *>(address + offset);
 }
 
 float VehicleExtensions::GetDriveBiasFront(Vehicle handle) {
@@ -457,38 +517,6 @@ Hash VehicleExtensions::GetAIHandling(Vehicle handle) {
     offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x13C : 0;
     if (offset == 0) return 0;
     return *reinterpret_cast<Hash *>(address + offset);
-}
-
-uint8_t VehicleExtensions::GetNumWheels(Vehicle handle) {
-    auto address = GetAddress(handle);
-
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0xAA0 : 0xA80;
-    
-    offset = gameVersion >= G_VER_1_0_505_2_STEAM ? 0xA90 : offset;
-    offset = gameVersion >= G_VER_1_0_791_2_STEAM ? 0xAB0 : offset;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0xAE0 : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0xB10 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0xB20 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0xB40 : offset;
-
-    offset += 8;
-    
-    return *reinterpret_cast<int *>(address + offset);
-}
-
-uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {
-    auto address = GetAddress(handle);
-
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0xAA0 : 0xA80;
-    
-    offset = gameVersion >= G_VER_1_0_505_2_STEAM ? 0xA90 : offset; 
-    offset = gameVersion >= G_VER_1_0_791_2_STEAM ? 0xAB0 : offset;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0xAE0 : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0xB10 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0xB20 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0xB40 : offset;
-
-    return *reinterpret_cast<uint64_t *>(address + offset);
 }
 
 std::vector<uint64_t> VehicleExtensions::GetWheelPtrs(Vehicle handle) {
@@ -749,58 +777,6 @@ void VehicleExtensions::SetWheelBrakePressure(Vehicle handle, uint8_t index, flo
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1C8 : 0x1B8;
     auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
     *reinterpret_cast<float *>(wheelAddr + offset) = value;
-}
-
-std::vector<float> VehicleExtensions::GetGearRatios(Vehicle handle) {
-    auto address = GetAddress(handle);
-
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7A8 : 0x798;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x7C8 : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x7E8 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x7F8 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x818 : offset;
-
-    std::vector<float> ratios;
-    for (int gearOffset = 0; gearOffset <= 7; gearOffset++) {
-        ratios.push_back(*reinterpret_cast<float *>(address + offset + gearOffset * sizeof(float)));
-    }
-    return ratios;
-}
-
-float VehicleExtensions::GetDriveForce(Vehicle handle) {
-    auto address = GetAddress(handle);
-
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7C8 : 0x7B8;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x7E8 : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x808 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x818 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x838 : offset;
-
-    return *reinterpret_cast<float *>(address + offset);
-}
-
-float VehicleExtensions::GetInitialDriveMaxFlatVel(Vehicle handle) {
-    auto address = GetAddress(handle);
-
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7CC : 0x7BC;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x7EC : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x80C : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x81C : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x83C : offset;
-
-    return *reinterpret_cast<float *>(address + offset);
-}
-
-float VehicleExtensions::GetDriveMaxFlatVel(Vehicle handle) {
-    auto address = GetAddress(handle);
-
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x7D0 : 0x7C0;
-    offset = gameVersion >= G_VER_1_0_877_1_STEAM ? 0x7F0 : offset;
-    offset = gameVersion >= G_VER_1_0_944_2_STEAM ? 0x810 : offset;
-    offset = gameVersion >= G_VER_1_0_1103_2_STEAM ? 0x820 : offset;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x840 : offset;
-
-    return *reinterpret_cast<float *>(address + offset);
 }
 
 // These apply to b1103
