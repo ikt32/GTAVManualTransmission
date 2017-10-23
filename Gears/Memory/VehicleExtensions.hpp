@@ -143,6 +143,35 @@ public:
 
 
 private:
-    eGameVersion gameVersion = getGameVersion();
+    const eGameVersion gameVersion = getGameVersion();
+    void initOffsets();
+    /*int findOffset(const std::map<int, int, std::greater<int>> &offsets);
+    int findOffset(const char* pattern, const char*  mask, int offset);*/
+
+    int rocketBoostActiveOffset = 0;
+    int rocketBoostChargeOffset = 0;
+    int fuelLevelOffset = 0;
+    int gearNextOffset = 0;
+    int gearCurrOffset = 0;
+    int topGearOffset = 0;
+    int gearRatiosOffset = 0;
+    int driveForceOffset = 0;
+    int initialDriveMaxFlatVelOffset = 0;
+    int driveMaxFlatVelOffset = 0;
+    int currentRPMOffset = 0;
+    int clutchOffset = 0;
+    int throttleOffset = 0;
+    int turboOffset = 0;
+    int handlingPtrOffset = 0;
+    int steeringAngleInputOffset = 0;
+    int steeringAngleOffset = 0;
+    int throttlePOffset = 0;
+    int brakePOffset = 0;
+    int handbrakeOffset = 0;
+    int dirtLevelOffset = 0;
+    int engineTempOffset = 0;
+    int dashSpeedOffset = 0;
+    int wheelsPtrOffset = 0;
+    int numWheelsOffset = 0;
 
 };
