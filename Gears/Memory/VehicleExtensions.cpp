@@ -13,8 +13,9 @@ int findOffset(const std::map<int, int, std::greater<int>> &offsets) {
     return offsets.lower_bound(g_gameVersion)->second;
 }
 
-int findOffset(const char*  pattern, const char*  mask, int offset) {
-    return *(int*)(mem::FindPattern(pattern, mask) + offset);
+template <typename T>
+T findOffset(const char* pattern, const char* mask, int offset) {
+    return *(T*)(mem::FindPattern(pattern, mask) + offset);
 }
 
 VehicleExtensions::VehicleExtensions() {
@@ -29,7 +30,7 @@ void VehicleExtensions::initOffsets() {
         { G_VER_1_0_1103_2_STEAM, 0x318 }    // Same in 1180
     };
     rocketBoostActiveOffset =
-        findOffset("\x3A\x91\x00\x00\x00\x00\x74\x00\x84\xD2", "xx????x?xx", 2);
+        findOffset<int>("\x3A\x91\x00\x00\x00\x00\x74\x00\x84\xD2", "xx????x?xx", 2);
 
     const std::map<int, int, std::greater<int>> rocketBoostChargeOffsets{
         { G_VER_1_0_335_2_STEAM, 0 },
@@ -160,7 +161,7 @@ void VehicleExtensions::initOffsets() {
     turboOffset = findOffset(turboOffsets);
 
     handlingPtrOffset = 
-        findOffset("\x3C\x03\x0F\x85\x00\x00\x00\x00\x48\x8B\x41\x20\x48\x8B\x88", "xxxx????xxxxxxx", 0x16);
+        findOffset<int>("\x3C\x03\x0F\x85\x00\x00\x00\x00\x48\x8B\x41\x20\x48\x8B\x88", "xxxx????xxxxxxx", 0x16);
 
     const std::map<int, int, std::greater<int>> steeringAngleInputOffsets{
         { G_VER_1_0_335_2_STEAM, 0x894 },
