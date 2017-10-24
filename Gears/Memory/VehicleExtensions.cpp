@@ -14,20 +14,12 @@ int findOffset(const std::map<int, int, std::greater<int>> &offsets) {
 }
 
 int findOffset(const char*  pattern, const char*  mask, int offset) {
-    return (int)mem::FindPattern(pattern, mask) + offset;
+    return *(int*)(mem::FindPattern(pattern, mask) + offset);
 }
 
 VehicleExtensions::VehicleExtensions() {
     mem::init();
 }
-
-//int VehicleExtensions::findOffset(const std::map<int, int, std::greater<int>> &offsets) {
-//    return offsets.lower_bound(gameVersion)->second;
-//}
-
-//int VehicleExtensions::findOffset(const char*  pattern, const char*  mask, int offset) {
-//    return (int)mem::FindPattern(pattern, mask) + offset;
-//}
 
 void VehicleExtensions::initOffsets() {
 

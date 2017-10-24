@@ -140,11 +140,11 @@ public:
     // to stick properly.
     void SetWheelBrakePressure(Vehicle handle, uint8_t index, float value);
 
+    void initOffsets();
 
 
 private:
     const eGameVersion gameVersion = getGameVersion();
-    void initOffsets();
     /*int findOffset(const std::map<int, int, std::greater<int>> &offsets);
     int findOffset(const char* pattern, const char*  mask, int offset);*/
 

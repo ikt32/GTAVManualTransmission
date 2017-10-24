@@ -2442,6 +2442,8 @@ bool setupGlobals() {
 void main() {
     logger.Write("Script started");
 
+    ext.initOffsets();
+
     logger.Write("Setting up globals");
     if (!setupGlobals()) {
         logger.Write("Global setup failed!");
