@@ -15,7 +15,9 @@ int findOffset(const std::map<int, int, std::greater<int>> &offsets) {
 
 template <typename T>
 T findOffset(const char* pattern, const char* mask, int offset) {
-    return *(T*)(mem::FindPattern(pattern, mask) + offset);
+    uintptr_t addr = mem::FindPattern(pattern, mask);
+    if (addr == 0) return 0;
+    return *(T*)(addr + offset);
 }
 
 VehicleExtensions::VehicleExtensions() {
@@ -23,13 +25,7 @@ VehicleExtensions::VehicleExtensions() {
 }
 
 void VehicleExtensions::initOffsets() {
-
-    const std::map<int, int, std::greater<int>> rocketBoostActiveOffsets{
-        { G_VER_1_0_335_2_STEAM, 0 },
-        { G_VER_1_0_944_2_STEAM, 0x318 },
-        { G_VER_1_0_1103_2_STEAM, 0x318 }    // Same in 1180
-    };
-    rocketBoostActiveOffset =
+    rocketBoostActiveOffset = 
         findOffset<int>("\x3A\x91\x00\x00\x00\x00\x74\x00\x84\xD2", "xx????x?xx", 2);
 
     const std::map<int, int, std::greater<int>> rocketBoostChargeOffsets{
@@ -38,7 +34,7 @@ void VehicleExtensions::initOffsets() {
         { G_VER_1_0_1103_2_STEAM, 0x31C },
         { G_VER_1_0_1180_2_STEAM, 0x320 }
     };
-    rocketBoostChargeOffset = ::findOffset(rocketBoostChargeOffsets);
+    rocketBoostChargeOffset = findOffset(rocketBoostChargeOffsets);
 
     const std::map<int, int, std::greater<int>> fuelLevelOffsets{
         { G_VER_1_0_335_2_STEAM, 0x758 },

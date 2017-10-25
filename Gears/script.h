@@ -1,6 +1,6 @@
 #pragma once
 
-#define DISPLAY_VERSION "v4.4.0"
+#define DISPLAY_VERSION "v4.4.1"
 
 #ifndef DIRECTINPUT_VERSION
 #define DIRECTINPUT_VERSION 0x0800
