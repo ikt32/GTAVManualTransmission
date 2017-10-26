@@ -358,7 +358,8 @@ void WheelDirectInput::SetConstantForce(GUID device, WheelDirectInput::DIAxis ff
 }
 
 void WheelDirectInput::StopConstantForce() {
-    pCFEffect->Stop();
+    if (pCFEffect != nullptr)
+        pCFEffect->Stop();
 }
 
 WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString) {
