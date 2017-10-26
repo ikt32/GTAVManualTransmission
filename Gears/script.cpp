@@ -1,4 +1,9 @@
 #define NOMINMAX
+
+#ifdef _DEBUG
+#include "Dump.h"
+#endif
+
 #include <string>
 #include <sstream>
 #include <iomanip>
@@ -26,6 +31,7 @@
 #include "ShiftModes.h"
 #include "Memory/Offsets.hpp"
 #include "MiniPID/MiniPID.h"
+
 std::array<float, 8> upshiftSpeeds{};
 
 std::string textureWheelFile;
@@ -719,6 +725,7 @@ void initWheel() {
     // controls.StickControl.InitDevice();
     controls.CheckGUIDs(settings.reggdGuids);
     controls.SteerGUID = controls.WheelAxesGUIDs[static_cast<int>(controls.SteerAxisType)];
+    logger.Write("WHEEL: Steering wheel initialization finished");
 }
 
 void stopForceFeedback() {
@@ -2439,6 +2446,35 @@ bool setupGlobals() {
     return true;
 }
 
+bool isPlayerInVehicle() {
+    player = PLAYER::PLAYER_ID();
+    playerPed = PLAYER::PLAYER_PED_ID();
+
+    if (!ENTITY::DOES_ENTITY_EXIST(playerPed) ||
+        !PLAYER::IS_PLAYER_CONTROL_ON(player) ||
+        ENTITY::IS_ENTITY_DEAD(playerPed) ||
+        PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE)) {
+        return false;
+    }
+
+    vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
+
+    if (!vehicle || !ENTITY::DOES_ENTITY_EXIST(vehicle) ||
+        playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
+        return false;
+    }
+    return true;
+}
+
+std::string getInputDevice() {
+    switch (controls.PrevInput) {
+        case ScriptControls::Keyboard: return "Keyboard";
+        case ScriptControls::Controller: return "Controller";
+        case ScriptControls::Wheel: return "Wheel";
+        default: return "None???";
+    }
+}
+
 void main() {
     logger.Write("Script started");
 
@@ -2480,12 +2516,46 @@ void main() {
     menu.SetFiles(settingsMenuFile);
 
     initialize();
-    logger.Write("Initialization finished");
+    logger.Write("START: Initialization finished");
+    logger.Write("START: Starting with MT:  " + std::string(settings.EnableManual ? "ON" : "OFF"));
+    logger.Write("START: Player in vehicle: " + std::string(isPlayerInVehicle() ? "Yes" : "No"));
+    logger.Write("START: Active control:    " + getInputDevice());
 
     while (true) {
+#ifdef _DEBUG
+        __try {
+            update();
+            update_menu();
+            WAIT(0);
+        }
+        __except (DumpStackTrace(GetExceptionInformation())) {
+            showNotification("~r~Manual Transmission~w~~n~Script crashed! Check Gears.log");
+            logger.Write("CRASH: Init shutdown");
+            bool successI = MemoryPatcher::RestoreInstructions();
+            bool successS = MemoryPatcher::RestoreSteeringCorrection();
+            bool successSC = MemoryPatcher::RestoreSteeringControl();
+            bool successB = MemoryPatcher::RestoreBrakeDecrement();
+            resetSteeringMultiplier();
+            if (successI && successS && successSC) {
+                logger.Write("CRASH: Shut down script cleanly");
+            }
+            else {
+                if (!successI)
+                    logger.Write("WARNING: Shut down script with instructions not restored");
+                if (!successS)
+                    logger.Write("WARNING: Shut down script with steer correction not restored");
+                if (!successSC)
+                    logger.Write("WARNING: Shut down script with steer control not restored");
+                if (!successB)
+                    logger.Write("WARNING: Shut down script with brake decrement not restored");
+            }
+            return;
+        }
+#else
         update();
         update_menu();
         WAIT(0);
+#endif
     }
 }
 

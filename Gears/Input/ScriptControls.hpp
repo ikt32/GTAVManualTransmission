@@ -181,7 +181,7 @@ public:
 
     void CheckGUIDs(const std::vector<_GUID> &guids);
 
-    InputDevices PrevInput;
+    InputDevices PrevInput = Controller;
 
     float ThrottleVal = 0.0f;
     float BrakeVal = 0.0f;

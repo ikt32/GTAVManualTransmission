@@ -40,7 +40,7 @@ bool WheelDirectInput::PreInit() {
 }
 
 bool WheelDirectInput::InitWheel() {
-    logger.Write("WHEEL: Initializing steering wheel"); 
+    logger.Write("WHEEL: Initializing input devices"); 
     if (lpDi == nullptr) {
         if (FAILED(DirectInput8Create(GetModuleHandle(nullptr),
             DIRECTINPUT_VERSION,
@@ -56,7 +56,7 @@ bool WheelDirectInput::InitWheel() {
     logger.Write("WHEEL: Found " + std::to_string(djs.getEntryCount()) + " device(s)");
 
     if (djs.getEntryCount() < 1) {
-        logger.Write("WHEEL: No wheel detected");
+        logger.Write("WHEEL: No devices detected");
         return false;
     }
 
@@ -91,13 +91,13 @@ bool WheelDirectInput::InitWheel() {
         povButtonCurr.insert(	std::pair<GUID, std::array<bool, POVDIRECTIONS>>(guid, {}));
         povButtonPrev.insert(	std::pair<GUID, std::array<bool, POVDIRECTIONS>>(guid, {}));
     }
-
-    logger.Write("WHEEL: Init steering wheel success");
+    logger.Write("WHEEL: Devices initialized");
     return true;
 }
 
 bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
     logger.Write("WHEEL: Init FFB device");
+
     auto e = FindEntryFromGUID(guid);
     
     if (!e) {
@@ -126,7 +126,7 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
     if (!createConstantForceEffect(e, ffAxis)) {
         logger.Write("WHEEL: Init FFB effect failed");
     } else {
-        logger.Write("WHEEL: Init FFB success");
+        logger.Write("WHEEL: Init FFB effect success");
         hasForceFeedback[guid][ffAxis] = true;
     }
     return true;
