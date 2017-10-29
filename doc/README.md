@@ -648,7 +648,7 @@ The button controls are listed below with how they can be used.
 Every single control can be assigned to any device. 
 
 ### `[STEER]`, `[THROTTLE]`, `[BRAKES]`, `[CLUTCH]` and `[HANDBRAKE_ANALOG]`
-__To properly configure your wheel, use WheelConfigurator.exe!__
+__To properly configure your wheel, use the in-game menu!__
 These sections maps your wheel input axes.
 
 #### `DEVICE` : Any

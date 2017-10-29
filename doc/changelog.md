@@ -1,4 +1,12 @@
 # Changelog
+## 4.4.1
+Config changes:
+No incompatible changes. Changed defaults to personal preference force feedback.
+
+Changes:
+* Add option to block button for controller clutch
+* Fix crash for wheels without force feedback
+* General optimizations
 
 ## 4.4.0
 Config changes:

@@ -24,31 +24,42 @@ With manual transmission enabled, you'll want to be able to properly control you
 	<li>Controller, keyboard and wheel input support</li>
 	<li>Seamless input device switching</li>
 	<li>DirectInput Steering Wheel support</li>
-	<li><a href=https://fivem.net/>FiveM support! (client side)</a></li>
 </ul>
 There's much more inside, so take a look!
 
 <b>Requirements</b>
-GTA V v1.0.505.2 and up
+GTA V v1.0.877.1 to 1.0.1180.2
 <a href=http://www.dev-c.com/gtav/scripthookv/>ScriptHookV</a>
 
 <b>Installation</b>
 Put Gears.asi and the folder ManualTransmission in your GTA V folder (overwrite when asked)
-Read <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md>the README</a> and configure ManualTransmission/settings_general.ini to your preferences
+Read <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md>the README</a> and configure the mod to your preferences with the in-game menu.
+
+<b>Updating</b>
+Put Gears.asi in your GTA V folder. You can keep old settings, new options are simply added.
+
 <b>Wheel installation</b>
-Use WheelConfigurator.exe and follow the onscreen instructions. You should REALLY check out <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md>the README</a>.
+Use the <b><i>in-game menu</i></b>. You might want to keep <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md>the README</a> as reference.
+
 <b>FiveM installation</b>
 Create a <b>plugins</b> folder in <b>FiveM Application Data</b> and put <b>Gears.asi</b> and the <b>ManualTransmission folder</b> in there.
 
 <b>Usage</b>
-Refer to the <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md>README</a>. 
+Refer to the <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md>README</a>. The menu contains plenty of descriptions too.
+
+<b>Keys</b>
+Open menu:
+[{ on US layout
+Ü on DE layout
+Å on Nordic layout
+It's to the right of "P" in general on QWERTY layouts.
+
+Refer to  the <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md>readme</a> for other default keys. 
 
 <b>Recommended mods</b>
 <a href=https://www.gta5-mods.com/vehicles/realistic-driving-v>Realistic Driving V</a>
 <a href=https://www.gta5-mods.com/scripts/speedometer-improvedalexbladeversion>LeFix Speedometer</a>
 <a href=https://www.gta5-mods.com/scripts/nfsgauge-rpm-gear-speedometer>NFS Gauge</a>
-Custom Steering hasn't been updated for 1.0.944.2, but this mod has steering correction disable patch since 4.2.0.
-
 
 <b>Troubleshooting</b>
 <i>Have you tried turning it off and on again?</i>
@@ -60,11 +71,11 @@ When asking for help, include the following:
 * What you already tried to do
 
 You can use <a href=www.pastebin.com>pastebin</a> to post the files.
+<b>If you don't include at least the mod version and game version, I'm just straight out gonna ignore you.</b>
 
 <b>Known bugs and problems</b>
-- Crashes with a <b>Logitech G920</b> and <b>ScriptHookVDotNet v2</b>. No workaround known.
+- Crashes with a <b>Logitech G920</b> and <b>ScriptHookVDotNet v2</b>. No workaround known. PLEASE CONFIRM IF IT WORKS WITH v4.3.0+!
 - Wheel sticks to one side and/or brake/throttle stuck. Try switching the mod off and on again.
-- Wheel oscillates a lot at high speed. Try decreasing physics force, or increasing damper force. A good handling mod also helps.
 
 <b>Sincere thanks to:</b>
 Rockstar Games
@@ -77,6 +88,7 @@ kagikn
 and everybody else who helped me!
 
 <b>Source code available </b> <a href=https://github.com/E66666666/GTAVManualTransmission>on GitHub</a>
+You can also contribute my messaging me offsets for older versions, for more support :)
 <b>Full changelog available </b> <a href=https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/changelog.md>on GitHub</a>
 
 <b>Alternative downloads</b>
@@ -84,87 +96,4 @@ Old releases: <a href=https://github.com/E66666666/GTAVManualTransmission/releas
 Latest build: <a href=https://ci.appveyor.com/project/E66666666/gtavmanualtransmission/build/artifacts>AppVeyor Artifacts</a> (unstable)
 
 <b>Changelog</b>
-
-<b>No version change (still 4.2.0)</b>
-Hotfix: Fix directory lookup for FiveM.
-
-## <b>4.2.0 - Release</b>
-Configuration changes:
-* Separate [HUD] section for HUD stuff
-  * settings_general.ini: VERSION is 420R now
-
-Wheel changes:
-* Always initialize DirectInput, just to be safe
-
-Changes:
-* Add HUD elements. You can move these around freely or disable them
-    * Shift mode indicator (H/S/A)
-    * RPM indicator with redline options
-    * Dashboard-data speedometer (kph, mph, m/s)
-* Rename DIUtil to WheelConfigurator
-* Gears.log is made in the ManualTransmission directory now.
-
-FiveM support:
-* Fix getWheelCompressions for FiveM
-* Fix steering corrections patching for FiveM
-* Ignore CrossScript for FiveM
-
-Fixes 'n stuff:
-* Adjust engine braking to be more reliable
-* Adjust hill start effect so it's not affected by throttle position
-* Fix a few instances where the brake/throttle are swapped while reversing
-* Fix a few instances where the engine is wrongfully revved while braking
-* Minor code optimizations
-* Version strings for 1.0.1032.1
-
-## <b>4.2.0 - beta 2</b>
-No configuration changes
-
-Changes:
-* Fix messed up clutch for single-axis throttle/brake settings
-* Fix lag when patching fails: Limit patching attempts
-* Update strings for game version 1.0.1011.1
-* Fix vehicle moving before clutch catch point if throttle is pressed
-
-Wheel changes:
-* Fix crash when FFB applied on a null device after re-initialization
-* Cleaner DirectInput Force Feedback code
-* Cleaner wheel compression retrieval method for FFB detail
-* Improve radio changing
-* Add hold radio buttons to turn radio off
-
-DIUtil changes:
-* Fix a crash when refreshing after removing all devices
-* Add dynamic device & axis detection
-* Add dynamic device & button detection
-* Add current function display for buttons
-* Add wheel->keyboard input blocking option
-
-## <b>4.2.0 - beta 1</b>
-Big changes to configuration!
-
-Structural changes:
-* Add a rudimentary configuration tool
-* Restructured settings to ManualTransmission folder
-* Separated wheel settings and normal settings
-* Show warning for incorrect .ini versions
-
-Wheel changes:
-* Add support for multiple DirectInput devices
-* Add countersteering and reduction patch
-* Add axis support for handbrake
-* Add back G27/G29 LEDs
-* Add option for global FF multiplier
-* Rework Force Feedback completely
-* Tweaks to soft lock
-* Add 7th gear support for H-shifter
-* Disable controller rumble while wheel is active
-
-Changes:
-* Add option to turn on/off throttle+clutch engine starting
-* Add option for clutch shifting in sequential
-* Only stall if all wheels are on the ground
-* Remove 8th gear for numpad
-* General bug fixes
-
-<a href=https://forum.fivem.net/t/release-manual-transmission-steering-wheel-support-client/13769><b>View topic on FiveM.net Forums »</b></a>
+-

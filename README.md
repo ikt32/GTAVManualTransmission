@@ -4,9 +4,7 @@ GTA V Manual Transmission
 =========================
 [![Build status](https://ci.appveyor.com/api/projects/status/gy6yh17lp5l1k48d?svg=true)](https://ci.appveyor.com/project/E66666666/gtavmanualtransmission) [![GitHub total downloads](https://img.shields.io/github/downloads/E66666666/GTAVManualTransmission/total.svg)](https://github.com/E66666666/GTAVManualTransmission/releases)
 
-[![forthebadge](http://forthebadge.com/images/badges/60-percent-of-the-time-works-every-time.svg)](http://forthebadge.com)
-
-This is an ASI script allowing for manual control over the ingame gearbox. As a secondary function, this mod has full racing wheel support. Supported features are steering, the throttle, brake and throttle pedals, sequential shifting and using the H-shifter.
+This is an ASI script allowing for manual control over the ingame gearbox. As a secondary function, this mod has full racing wheel support. Supported features are steering, the throttle, brake and throttle pedals, sequential shifting and using the H-shifter. An automatic gearbox has been re-implemented.
 
 Discuss the mod over at [GTAForums.com](http://gtaforums.com/topic/840830-manual-transmission/) or [GTA5-Mods.com](https://forums.gta5-mods.com/topic/1840/script-wip-manual-transmission-steering-wheel-support-4-0).
 
@@ -34,9 +32,7 @@ Clone this repository to the same folder ScriptHookV_SDK was extracted so you ha
 
 Clone my [GTAVMenuBase](https://github.com/E66666666/GTAVMenuBase) to the same folder you're gonna clone this to.
 
-## Mod support
-**NOTE: Starting with version v4.3.8, new decorators should be used. The old ones
-will be removed with the next minor version number bump!**
+## Mod support  
 
 You can read decorators to get some info about this mod.
 
@@ -62,14 +58,3 @@ Set shift mode: `mt_set_shiftmode`
 * `1` - Sequential
 * `2` - H-pattern
 * `3` - Automatic
-
-### FiveM Update
-From version 4.2.0 beta 3 onwards, FiveM is sort of supported! 
-An [update](https://forum.fivem.net/t/fivem-update-march-19th-2017/8703) fixed 
-some issues this mod had with FiveM. On top of that, beta 3 has more robust 
-patching for GTA V's stability control.
-
-#### FiveM 1.0.1103.2
-FiveM updated to a recent GTA V build, so the problems that arised from using
-an old version are considered gone. From version v4.3.8 onwards, the decor
-setting should also work.
