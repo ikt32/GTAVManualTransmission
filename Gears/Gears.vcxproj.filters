@@ -64,6 +64,7 @@
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp">
       <Filter>Thirdparty</Filter>
     </ClCompile>
+    <ClCompile Include="ScriptHUD.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />

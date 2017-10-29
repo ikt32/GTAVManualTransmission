@@ -32,7 +32,17 @@
 #include "Memory/Offsets.hpp"
 #include "MiniPID/MiniPID.h"
 
-std::array<float, 8> upshiftSpeeds{};
+const char* decorCurrentGear = "mt_gear";
+const char* decorShiftNotice = "mt_shift_indicator";
+const char* decorFakeNeutral = "mt_neutral";
+const char* decorSetShiftMode = "mt_set_shiftmode";
+const char* decorGetShiftMode = "mt_get_shiftmode";
+
+const char* decorCurrentGear_old = "doe_elk";
+const char* decorShiftNotice_old = "hunt_score";
+const char* decorFakeNeutral_old = "hunt_weapon";
+
+std::array<float, NUM_GEARS> upshiftSpeeds{};
 
 std::string textureWheelFile;
 int textureWheelId;
@@ -69,22 +79,6 @@ bool engBrakeActive = false;
 bool engLockActive = false;
 
 MiniPID pid(1.0, 0.0, 0.0);
-
-void initVehicle() {
-    reset();
-    std::fill(upshiftSpeeds.begin(), upshiftSpeeds.end(), 0.0f);
-    vehData = VehicleData();
-    vehData.UpdateValues(ext, vehicle);
-
-    if (vehData.NoClutch) {
-        vehData.FakeNeutral = false;
-    }
-    else {
-        vehData.FakeNeutral = settings.DefaultNeutral;
-    }
-    shiftTo(1, true);
-    initSteeringPatches();
-}
 
 void update() {
     ///////////////////////////////////////////////////////////////////////////
@@ -342,334 +336,86 @@ void update() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//                           Display elements
-///////////////////////////////////////////////////////////////////////////////
-void drawRPMIndicator(float x, float y, float width, float height, Color fg, Color bg, float rpm) {
-    float bgpaddingx = 0.00f;
-    float bgpaddingy = 0.01f;
-    // background
-    GRAPHICS::DRAW_RECT(x, y, width+bgpaddingx, height+bgpaddingy, bg.R, bg.G, bg.B, bg.A);
-
-    // rpm bar
-    GRAPHICS::DRAW_RECT(x-width*0.5f+rpm*width*0.5f, y, width*rpm, height, fg.R, fg.G, fg.B, fg.A);
-}
-
-void drawRPMIndicator() {
-    Color background = {
-        settings.RPMIndicatorBackgroundR,
-        settings.RPMIndicatorBackgroundG,
-        settings.RPMIndicatorBackgroundB,
-        settings.RPMIndicatorBackgroundA
-    };
-
-    Color foreground = {
-        settings.RPMIndicatorForegroundR,
-        settings.RPMIndicatorForegroundG,
-        settings.RPMIndicatorForegroundB,
-        settings.RPMIndicatorForegroundA
-    };
-
-    Color rpmcolor = foreground;
-    if (vehData.RPM > settings.RPMIndicatorRedline) {
-        Color redline = {
-            settings.RPMIndicatorRedlineR,
-            settings.RPMIndicatorRedlineG,
-            settings.RPMIndicatorRedlineB,
-            settings.RPMIndicatorRedlineA
-        };
-        rpmcolor = redline;
-    }
-    if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle) || vehData.TruckShiftUp) {
-        Color rpmlimiter = {
-            settings.RPMIndicatorRevlimitR,
-            settings.RPMIndicatorRevlimitG,
-            settings.RPMIndicatorRevlimitB,
-            settings.RPMIndicatorRevlimitA
-        };
-        rpmcolor = rpmlimiter;
-    }
-    drawRPMIndicator(
-        settings.RPMIndicatorXpos,
-        settings.RPMIndicatorYpos,
-        settings.RPMIndicatorWidth,
-        settings.RPMIndicatorHeight,
-        rpmcolor,
-        background,
-        vehData.RPM
-    );
-}
-
-std::string formatSpeedo(std::string units, float speed, bool showUnit, int hudFont) {
-    std::stringstream speedoFormat;
-    if (units == "kph") speed = speed * 3.6f;
-    if (units == "mph") speed = speed / 0.44704f;
-
-    speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(speed)));
-    if (hudFont != 2 && units == "kph") units = "km/h";
-    if (hudFont != 2 && units == "ms") units = "m/s";
-    if (showUnit) speedoFormat << " " << units;
-
-    return speedoFormat.str();
-}
-
-void drawSpeedoMeter() {
-    float dashms = vehData.HasSpeedo ? ext.GetDashSpeed(vehicle) : abs(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y);
-
-    showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize, 
-        formatSpeedo(settings.Speedo, dashms, settings.SpeedoShowUnit, settings.HUDFont),
-        settings.HUDFont);
-}
-
-void drawShiftModeIndicator() {
-    std::string shiftModeText;
-    auto color = solidWhite;
-    switch (settings.ShiftMode) {
-        case Sequential: shiftModeText = "S";
-            break;
-        case HPattern: shiftModeText = "H";
-            break;
-        case Automatic: shiftModeText = "A";
-            break;
-        default: shiftModeText = "";
-            break;
-    }
-    if (!settings.EnableManual) {
-        shiftModeText = "A";
-        color = { 0, 126, 232, 255 };
-    }
-    showText(settings.ShiftModeXpos, settings.ShiftModeYpos, settings.ShiftModeSize, shiftModeText, settings.HUDFont, color, true);
-}
-
-void drawGearIndicator() {
-    std::string gear = std::to_string(ext.GetGearCurr(vehicle));
-    if (vehData.FakeNeutral && settings.EnableManual) {
-        gear = "N";
-    }
-    else if (ext.GetGearCurr(vehicle) == 0) {
-        gear = "R";
-    }
-    Color c;
-    if (ext.GetGearCurr(vehicle) == ext.GetTopGear(vehicle)) {
-        c.R = settings.GearTopColorR;
-        c.G = settings.GearTopColorG;
-        c.B = settings.GearTopColorB;
-        c.A = 255;
-    }
-    else {
-        c = solidWhite;
-    }
-    showText(settings.GearXpos, settings.GearYpos, settings.GearSize, gear, settings.HUDFont, c, true);
-}
-
-void drawHUD() {
-    if (settings.GearIndicator) {
-        drawGearIndicator();
-    }
-    if (settings.ShiftModeIndicator) {
-        drawShiftModeIndicator();
-    }
-    if (settings.Speedo == "kph" ||
-        settings.Speedo == "mph" ||
-        settings.Speedo == "ms") {
-        drawSpeedoMeter();
-    }
-    if (settings.RPMIndicator) {
-        drawRPMIndicator();
-    }
-}
-
-void drawDebugInfo() {
-    std::stringstream ssEnabled;
-    std::stringstream ssRPM;
-    std::stringstream ssCurrGear;
-    std::stringstream ssNextGear;
-    std::stringstream ssClutch;
-    std::stringstream ssThrottle;
-    std::stringstream ssTurbo;
-    std::stringstream ssAddress;
-    std::stringstream ssDashSpd;
-    std::stringstream ssDbias;
-
-    ssEnabled << "Mod:\t\t" << (settings.EnableManual ? "Enabled" : "Disabled");
-    ssRPM		<< "RPM:\t\t" << std::setprecision(3) << vehData.RPM;
-    ssCurrGear	<< "CurrGear:\t" << ext.GetGearCurr(vehicle);
-    ssNextGear	<< "NextGear:\t" << ext.GetGearNext(vehicle);
-    ssClutch	<< "Clutch:\t\t" << std::setprecision(3) << ext.GetClutch(vehicle);
-    ssThrottle	<< "Throttle:\t" << std::setprecision(3) << ext.GetThrottle(vehicle);
-    ssTurbo		<< "Turbo:\t\t" << std::setprecision(3) << ext.GetTurbo(vehicle);
-    ssAddress	<< "Address:\t0x" << std::hex << reinterpret_cast<uint64_t>(ext.GetAddress(vehicle));
-    ssDashSpd	<< "Speedo:\t" << (vehData.HasSpeedo ? "Yes" : "No");
-    ssDbias		<< "DBias:\t\t" << std::setprecision(3) << ext.GetDriveBiasFront(vehicle);
-
-    showText(0.01f, 0.275f, 0.4f, ssEnabled.str(),	4);
-    showText(0.01f, 0.300f, 0.4f, ssRPM.str(),		4);
-    showText(0.01f, 0.325f, 0.4f, ssCurrGear.str(),	4);
-    showText(0.01f, 0.350f, 0.4f, ssNextGear.str(),	4);
-    showText(0.01f, 0.375f, 0.4f, ssClutch.str(),	4);
-    showText(0.01f, 0.400f, 0.4f, ssThrottle.str(),	4);
-    showText(0.01f, 0.425f, 0.4f, ssTurbo.str(),	4);
-    showText(0.01f, 0.450f, 0.4f, ssAddress.str(),	4);
-    showText(0.01f, 0.475f, 0.4f, ssDashSpd.str(),	4);
-    showText(0.01f, 0.500f, 0.4f, ssDbias.str(),	4);
-
-    std::stringstream ssThrottleInput;
-    std::stringstream ssBrakeInput;
-    std::stringstream ssClutchInput;
-    std::stringstream ssHandbrakInput;
-
-    ssThrottleInput << "Throttle:\t" << controls.ThrottleVal;
-    ssBrakeInput	<< "Brake:\t\t" << controls.BrakeVal;
-    ssClutchInput	<< "Clutch:\t\t" << controls.ClutchValRaw;
-    ssHandbrakInput << "Handb:\t\t" << controls.HandbrakeVal;
-
-    showText(0.85, 0.050, 0.4, ssThrottleInput.str(),	4);
-    showText(0.85, 0.075, 0.4, ssBrakeInput.str(),		4);
-    showText(0.85, 0.100, 0.4, ssClutchInput.str(),		4);
-    showText(0.85, 0.125, 0.4, ssHandbrakInput.str(),	4);
-
-    if (settings.EnableWheel) {
-        std::stringstream dinputDisplay;
-        dinputDisplay << "Wheel" << (controls.WheelControl.IsConnected(controls.SteerGUID) ? "" : " not") << " present";
-        showText(0.85, 0.150, 0.4, dinputDisplay.str(), 4);
-    }
-
-    if (settings.EnableManual && settings.DisplayGearingInfo) {
-        auto ratios = ext.GetGearRatios(vehicle);
-        float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
-        float InitialDriveMaxFlatVel = ext.GetInitialDriveMaxFlatVel(vehicle);
-
-        int i = 0;
-        showText(0.10f, 0.05f, 0.35f, "Ratios");
-        for (auto ratio : ratios) {
-            showText(0.10f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(ratio));
-            i++;
-        }
-        
-        i = 0;
-        showText(0.25f, 0.05f, 0.35f, "DriveMaxFlatVel");
-        for (auto ratio : ratios) {
-            float maxSpeed = DriveMaxFlatVel / ratio;
-            showText(0.25f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(maxSpeed));
-            i++;
-        }
-
-        i = 0;
-        showText(0.40f, 0.05f, 0.35f, "InitialDriveMaxFlatVel");
-        for (auto ratio : ratios) {
-            float maxSpeed = InitialDriveMaxFlatVel / ratio;
-            showText(0.40f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(maxSpeed));
-            i++;
-        }
-
-        i = 0;
-        showText(0.55f, 0.05f, 0.35f, "Actual");
-        for (auto speed : upshiftSpeeds) {
-            showText(0.55f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
-            i++;
-        }
-
-        if (upshiftSpeeds[1] > DriveMaxFlatVel / ratios[1] + 0.25 * DriveMaxFlatVel / ratios[1]) {
-            showText(0.2, 0.1, 0.5, "Probably a truck...");
-        }
-        
-    }
-}
-
-void drawInputWheelInfo() {
-    // Steering Wheel
-    float rotation = settings.SteerAngleMax * (controls.SteerVal - 0.5f);
-    if (controls.PrevInput != ScriptControls::Wheel) rotation = 90.0f * -ext.GetSteeringInputAngle(vehicle);
-
-    drawTexture(textureWheelId, 0, -9998, 100, 
-                settings.SteeringWheelTextureSz, settings.SteeringWheelTextureSz, 
-                0.5f, 0.5f, // center of texture
-                settings.SteeringWheelTextureX, settings.SteeringWheelTextureY,
-                rotation/360.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
-
-    // Pedals
-    float barWidth = settings.PedalInfoW/3.0f;
-
-    float barYBase = (settings.PedalInfoY + settings.PedalInfoH * 0.5f);
-
-    GRAPHICS::DRAW_RECT(settings.PedalInfoX , settings.PedalInfoY, 3.0f * barWidth + settings.PedalInfoPadX, settings.PedalInfoH + settings.PedalInfoPadY, 0, 0, 0, 92);
-    GRAPHICS::DRAW_RECT(settings.PedalInfoX - 1.0f*barWidth, barYBase - controls.ThrottleVal*settings.PedalInfoH*0.5f, barWidth, controls.ThrottleVal*settings.PedalInfoH, 0, 255, 0, 255);
-    GRAPHICS::DRAW_RECT(settings.PedalInfoX + 0.0f*barWidth, barYBase - controls.BrakeVal*settings.PedalInfoH*0.5f, barWidth, controls.BrakeVal*settings.PedalInfoH, 255, 0, 0, 255);
-    GRAPHICS::DRAW_RECT(settings.PedalInfoX + 1.0f*barWidth, barYBase - controls.ClutchValRaw*settings.PedalInfoH*0.5f, barWidth, controls.ClutchVal*settings.PedalInfoH, 0, 0, 255, 255);
-}
-
-///////////////////////////////////////////////////////////////////////////////
 //                            Helper things
 ///////////////////////////////////////////////////////////////////////////////
 void crossScriptUpdated() {
     // Current gear
-    DECORATOR::DECOR_SET_INT(vehicle, "mt_gear", ext.GetGearCurr(vehicle));
+    DECORATOR::DECOR_SET_INT(vehicle, (char *)decorCurrentGear, ext.GetGearCurr(vehicle));
 
     // Shift indicator: 0 = nothing, 1 = Shift up, 2 = Shift down
     if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle) || vehData.TruckShiftUp) {
-        DECORATOR::DECOR_SET_INT(vehicle, "mt_shift_indicator", 1);
+        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice, 1);
     }
     else if (ext.GetGearCurr(vehicle) > 1 && vehData.RPM < 0.4f) {
-        DECORATOR::DECOR_SET_INT(vehicle, "mt_shift_indicator", 2);
+        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice, 2);
     }
     else if (ext.GetGearCurr(vehicle) == ext.GetGearNext(vehicle)) {
-        DECORATOR::DECOR_SET_INT(vehicle, "mt_shift_indicator", 0);
+        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice, 0);
     }
 
     // Simulated Neutral
     if (vehData.FakeNeutral && settings.EnableManual) {
-        DECORATOR::DECOR_SET_INT(vehicle, "mt_neutral", 1);
+        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorFakeNeutral, 1);
     }
     else {
-        DECORATOR::DECOR_SET_INT(vehicle, "mt_neutral", 0);
+        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorFakeNeutral, 0);
     }
 
     // External shifting
-    int currExtShift = DECORATOR::DECOR_GET_INT(vehicle, "mt_set_shiftmode");
+    int currExtShift = DECORATOR::DECOR_GET_INT(vehicle, (char *)decorSetShiftMode);
     if (prevExtShift != currExtShift && currExtShift > 0) {
         // 1 Seq, 2 H, 3 Auto
         setShiftMode(currExtShift - 1);
     }
     prevExtShift = currExtShift;
 
-    DECORATOR::DECOR_SET_INT(vehicle, "mt_get_shiftmode", static_cast<int>(settings.ShiftMode) + 1);
+    DECORATOR::DECOR_SET_INT(vehicle, (char *)decorGetShiftMode, static_cast<int>(settings.ShiftMode) + 1);
 }
 
 // TODO: Phase out
 void crossScriptComms() {
     // Current gear
-    DECORATOR::DECOR_SET_INT(vehicle, "doe_elk", ext.GetGearCurr(vehicle));
+    DECORATOR::DECOR_SET_INT(vehicle, (char *)decorCurrentGear_old, ext.GetGearCurr(vehicle));
 
     // Shift indicator: 0 = nothing, 1 = Shift up, 2 = Shift down
     if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle) || vehData.TruckShiftUp) {
-        DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 1);
+        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice_old, 1);
     }
     else if (ext.GetGearCurr(vehicle) > 1 && vehData.RPM < 0.4f) {
-        DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 2);
+        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice_old, 2);
     }
     else if (ext.GetGearCurr(vehicle) == ext.GetGearNext(vehicle)) {
-        DECORATOR::DECOR_SET_INT(vehicle, "hunt_score", 0);
+        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice_old, 0);
     }
 
     // Simulated Neutral
     if (vehData.FakeNeutral && settings.EnableManual) {
-        DECORATOR::DECOR_SET_INT(vehicle, "hunt_weapon", 1);
+        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorFakeNeutral_old, 1);
     }
     else {
-        DECORATOR::DECOR_SET_INT(vehicle, "hunt_weapon", 0);
+        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorFakeNeutral_old, 0);
     }
-
-    // External shifting
-    int currExtShift = DECORATOR::DECOR_GET_INT(vehicle, "hunt_chal_weapon");
-    if (prevExtShift != currExtShift && currExtShift > 0) {
-        // 1 Seq, 2 H, 3 Auto
-        setShiftMode(currExtShift - 1);
-    }
-    prevExtShift = currExtShift;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Mod functions: Mod control
 ///////////////////////////////////////////////////////////////////////////////
+
+void initVehicle() {
+    reset();
+    std::fill(upshiftSpeeds.begin(), upshiftSpeeds.end(), 0.0f);
+    vehData = VehicleData();
+    vehData.UpdateValues(ext, vehicle);
+
+    if (vehData.NoClutch) {
+        vehData.FakeNeutral = false;
+    }
+    else {
+        vehData.FakeNeutral = settings.DefaultNeutral;
+    }
+    shiftTo(1, true);
+    initSteeringPatches();
+}
 
 void initialize() {
     settings.Read(&controls);
@@ -912,8 +658,7 @@ void functionHShiftTo(int i) {
 }
 
 void functionHShiftKeyboard() {
-    // highest vehicle gear is 7th
-    int clamp = 7;
+    int clamp = MAX_GEAR;
     if (ext.GetTopGear(vehicle) <= clamp) {
         clamp = ext.GetTopGear(vehicle);
     }
@@ -929,8 +674,7 @@ void functionHShiftKeyboard() {
 }
 
 void functionHShiftWheel() {
-    // highest vehicle gear is 7th
-    int clamp = 7;
+    int clamp = MAX_GEAR;
     if (ext.GetTopGear(vehicle) <= clamp) {
         clamp = ext.GetTopGear(vehicle);
     }
@@ -2414,7 +2158,7 @@ void registerDecorator(const char *thing, eDecorType type) {
 
     if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE((char*)thing, type)) {
         DECORATOR::DECOR_REGISTER((char*)thing, type);
-        logger.Write("DECOR: Registered \"" + std::string(thing) + "\" as " + strType);
+        logger.Writef("DECOR: Registered \"%s\" as %s", thing, strType.c_str());
     }
 }
 
@@ -2429,18 +2173,17 @@ bool setupGlobals() {
     g_bIsDecorRegisterLockedPtr = (BYTE*)(addr + *(int*)(addr + 8) + 13);
     *g_bIsDecorRegisterLockedPtr = 0;
 
-    // Legacy support until I get LeFix / XMOD to update
-    registerDecorator("doe_elk", DECOR_TYPE_INT);
-    registerDecorator("hunt_score", DECOR_TYPE_INT);
-    registerDecorator("hunt_weapon", DECOR_TYPE_INT);
-    registerDecorator("hunt_chal_weapon", DECOR_TYPE_INT);
+    // Legacy support until I get LeFix to update
+    registerDecorator(decorCurrentGear_old, DECOR_TYPE_INT);
+    registerDecorator(decorShiftNotice_old, DECOR_TYPE_INT);
+    registerDecorator(decorFakeNeutral_old, DECOR_TYPE_INT);
 
     // New decorators! :)
-    registerDecorator("mt_gear", DECOR_TYPE_INT);
-    registerDecorator("mt_shift_indicator", DECOR_TYPE_INT);
-    registerDecorator("mt_neutral", DECOR_TYPE_INT);
-    registerDecorator("mt_set_shiftmode", DECOR_TYPE_INT);
-    registerDecorator("mt_get_shiftmode", DECOR_TYPE_INT);
+    registerDecorator(decorCurrentGear, DECOR_TYPE_INT);
+    registerDecorator(decorShiftNotice, DECOR_TYPE_INT);
+    registerDecorator(decorFakeNeutral, DECOR_TYPE_INT);
+    registerDecorator(decorSetShiftMode, DECOR_TYPE_INT);
+    registerDecorator(decorGetShiftMode, DECOR_TYPE_INT);
 
     *g_bIsDecorRegisterLockedPtr = 1;
     return true;
@@ -2471,7 +2214,7 @@ std::string getInputDevice() {
         case ScriptControls::Keyboard: return "Keyboard";
         case ScriptControls::Controller: return "Controller";
         case ScriptControls::Wheel: return "Wheel";
-        default: return "None???";
+        default: return "Unknown";
     }
 }
 
@@ -2518,8 +2261,6 @@ void main() {
     initialize();
     logger.Write("START: Initialization finished");
     logger.Write("START: Starting with MT:  " + std::string(settings.EnableManual ? "ON" : "OFF"));
-    logger.Write("START: Player in vehicle: " + std::string(isPlayerInVehicle() ? "Yes" : "No"));
-    logger.Write("START: Active control:    " + getInputDevice());
 
     while (true) {
 #ifdef _DEBUG
@@ -2536,7 +2277,7 @@ void main() {
             bool successSC = MemoryPatcher::RestoreSteeringControl();
             bool successB = MemoryPatcher::RestoreBrakeDecrement();
             resetSteeringMultiplier();
-            if (successI && successS && successSC) {
+            if (successI && successS && successSC && successB) {
                 logger.Write("CRASH: Shut down script cleanly");
             }
             else {

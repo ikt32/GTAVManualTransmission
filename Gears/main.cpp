@@ -39,7 +39,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             resetSteeringMultiplier();
             scriptUnregister(hInstance);
 
-            if (successI && successS && successSC) {
+            if (successI && successS && successSC && successB) {
                 logger.Write("Shut down script successfully");
             }
             else {

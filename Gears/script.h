@@ -1,6 +1,8 @@
 #pragma once
 
 #define DISPLAY_VERSION "v4.4.1"
+#define NUM_GEARS 8
+#define MAX_GEAR 7
 
 #ifndef DIRECTINPUT_VERSION
 #define DIRECTINPUT_VERSION 0x0800
@@ -61,6 +63,7 @@ void drawInputWheelInfo();
 //                           Mod functions: Mod control
 ///////////////////////////////////////////////////////////////////////////////
 
+void initVehicle();
 void initialize();
 void reset();
 void applySteeringMultiplier(float multiplier);
