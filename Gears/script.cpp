@@ -709,12 +709,23 @@ void functionHShiftWheel() {
     }
 }
 
+bool isUIActive() {
+    if (PED::IS_PED_RUNNING_MOBILE_PHONE_TASK(playerPed) || menu.IsThisOpen())
+        return true;
+    return false;
+}
+
 void functionSShift() {
     auto xcTapStateUp = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftUp);
     auto xcTapStateDn = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftDown);
 
     auto ncTapStateUp = controls.ButtonTapped(ScriptControls::LegacyControlType::ShiftUp);
     auto ncTapStateDn = controls.ButtonTapped(ScriptControls::LegacyControlType::ShiftDown);
+
+    if (settings.IgnoreShiftsUI && isUIActive()) {
+        xcTapStateUp = xcTapStateDn = XboxController::TapState::ButtonUp;
+        ncTapStateUp = ncTapStateDn = LegacyController::TapState::ButtonUp;
+    }
 
     // Shift up
     if (controls.PrevInput == ScriptControls::Controller	&& xcTapStateUp == XboxController::TapState::Tapped ||
@@ -798,6 +809,11 @@ void functionAShift() { // Automatic
 
     auto ncTapStateUp = controls.ButtonTapped(ScriptControls::LegacyControlType::ShiftUp);
     auto ncTapStateDn = controls.ButtonTapped(ScriptControls::LegacyControlType::ShiftDown);
+
+    if (settings.IgnoreShiftsUI && isUIActive()) {
+        xcTapStateUp = xcTapStateDn = XboxController::TapState::ButtonUp;
+        ncTapStateUp = ncTapStateDn = LegacyController::TapState::ButtonUp;
+    }
 
     // Shift up
     if (controls.PrevInput == ScriptControls::Controller	&& xcTapStateUp == XboxController::TapState::Tapped ||

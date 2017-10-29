@@ -408,6 +408,9 @@ void update_controllermenu() {
                     { "Blocks car action controls. Holding activates the original button again.",
                         "Experimental!" });
 
+    menu.BoolOption("Ignore shifts in UI", settings.IgnoreShiftsUI,
+    { "Ignore shift up/shift down while using the phone or when the menu is open" });
+
     int oldIndexUp = getBlockableControlIndex(controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)]);
     if (menu.StringArray("Shift Up blocks", blockableControlsHelp, oldIndexUp)) {
         controls.ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)] = blockableControls[oldIndexUp];

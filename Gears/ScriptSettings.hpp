@@ -113,8 +113,9 @@ public:
     float PedalInfoPadY			 = 0.0f;
 
     // [CONTROLLER]
-    bool BlockCarControls = false;
     bool ToggleEngine = false;
+    bool BlockCarControls = false;
+    bool IgnoreShiftsUI = false;
 
     // [DEBUG]
     bool DisplayInfo = false;
