@@ -427,7 +427,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 
     DamperMax = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMax", 67);
     DamperMin = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMin", 12);
-    DamperMinSpeed = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DamperTargetSpeed", 1.2);
+    DamperMinSpeed = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DamperMinSpeed", 1.2);
 
 
     // [INPUT_DEVICES]

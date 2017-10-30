@@ -119,7 +119,7 @@ const struct CWheel {
 
     // 1EC / (flags?) - Powered states
     // 1F0 - ? bitflags too
-    // 1F4 - Surface flags?
+    // 1F2 - Surface ID (1 byte)
 
     // ulong offPosX = 0x40;
     // ulong offPosY = 0x44;

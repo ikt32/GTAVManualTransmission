@@ -5,6 +5,7 @@ No incompatible changes. Changed defaults to personal preference force feedback.
 
 Changes:
 * Add option to block button for controller clutch
+* Add option to ignore shifts when in menus using the controller
 * Fix crash for wheels without force feedback
 * General optimizations
 
