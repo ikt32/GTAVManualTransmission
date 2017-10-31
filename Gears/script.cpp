@@ -5,7 +5,6 @@
 #endif
 
 #include <string>
-#include <sstream>
 #include <iomanip>
 #include <algorithm>
 
@@ -931,45 +930,6 @@ void functionClutchCatch() {
             ext.SetCurrentRPM(vehicle, 0.21f);
             ext.SetThrottle(vehicle, 0.0f);
         }
-    }
-}
-
-std::vector<bool> getWheelLockups(Vehicle handle) {
-    std::vector<bool> lockups;
-    float velocity = ENTITY::GET_ENTITY_VELOCITY(vehicle).y;
-    auto wheelsSpeed = ext.GetWheelRotationSpeeds(vehicle);
-    for (auto wheelSpeed : wheelsSpeed) {
-        if (abs(velocity) > 0.01f && wheelSpeed == 0.0f)
-            lockups.push_back(true);
-        else
-            lockups.push_back(false);
-    }
-    return lockups;
-}
-
-void drawVehicleWheelInfo() {
-    auto numWheels = ext.GetNumWheels(vehicle);
-    auto wheelsSpeed = ext.GetTyreSpeeds(vehicle);
-    auto wheelsCompr = ext.GetWheelCompressions(vehicle);
-    auto wheelsHealt = ext.GetWheelHealths(vehicle);
-    auto wheelsContactCoords = ext.GetWheelLastContactCoords(vehicle);
-    auto wheelsOnGround = ext.GetWheelsOnGround(vehicle);
-    auto wheelCoords = ext.GetWheelCoords(vehicle, ENTITY::GET_ENTITY_COORDS(vehicle, true), ENTITY::GET_ENTITY_ROTATION(vehicle, 0), ENTITY::GET_ENTITY_FORWARD_VECTOR(vehicle));
-    auto wheelLockups = getWheelLockups(vehicle);
-
-    for (int i = 0; i < numWheels; i++) {
-        float wheelSpeed = wheelsSpeed[i];
-        float wheelCompr = wheelsCompr[i];
-        float wheelHealt = wheelsHealt[i];
-        Color c = wheelLockups[i] ? solidOrange : transparentGray;
-        c = wheelsOnGround[i] ? c : solidRed;
-        showDebugInfo3D(wheelCoords[i], {
-            "Speed: " + std::to_string(wheelSpeed),
-            "Compress: " + std::to_string(wheelCompr),
-            "Health: " + std::to_string(wheelHealt), },
-            c );
-        GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z, 
-                            wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z + 1.0f + 2.5f * wheelCompr, 255, 0, 0, 255);
     }
 }
 
