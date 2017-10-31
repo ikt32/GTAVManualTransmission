@@ -443,7 +443,7 @@ void reset() {
     if (MemoryPatcher::BrakeDecrementPatched) {
         MemoryPatcher::RestoreBrakeDecrement();
     }
-    controls.StopForceFeedback();
+    stopForceFeedback();
 }
 
 void toggleManual() {
@@ -551,9 +551,7 @@ void updateSteeringMultiplier() {
 
 void resetSteeringMultiplier() {
     if (vehicle != 0) {
-        if (ext.GetSteeringMultiplier(vehicle) != 1.0f) {
-            ext.SetSteeringMultiplier(vehicle, 1.0f);
-        }
+        ext.SetSteeringMultiplier(vehicle, 1.0f);
     }
 }
 

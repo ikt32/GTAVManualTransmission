@@ -37,6 +37,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             bool successSC= MemoryPatcher::RestoreSteeringControl();
             bool successB = MemoryPatcher::RestoreBrakeDecrement();
             resetSteeringMultiplier();
+            stopForceFeedback();
             scriptUnregister(hInstance);
 
             if (successI && successS && successSC && successB) {

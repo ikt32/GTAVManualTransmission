@@ -177,7 +177,6 @@ public:
     bool ButtonHeld(WheelControlType control, int delay);
     bool ButtonIn(WheelControlType control);
     void CheckCustomButtons(bool justPeeking);
-    void StopForceFeedback();
 
     void CheckGUIDs(const std::vector<_GUID> &guids);
 

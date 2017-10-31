@@ -427,13 +427,6 @@ void ScriptControls::CheckCustomButtons(bool justPeeking) {
     }
 }
 
-void ScriptControls::StopForceFeedback() {
-    if (WheelControl.IsConnected(SteerGUID)) {
-        auto axis = WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)]);
-        WheelControl.SetConstantForce(SteerGUID, axis, 0);
-    }
-}
-
 // GUID stuff...?
 bool operator < (const GUID &guid1, const GUID &guid2) {
     if (guid1.Data1 != guid2.Data1) {
