@@ -54,7 +54,6 @@ enum eDecorType {
 
 void drawHUD();
 void drawDebugInfo();
-void crossScriptComms();
 void crossScriptUpdated();
 void drawVehicleWheelInfo();
 void drawInputWheelInfo();

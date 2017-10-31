@@ -37,10 +37,6 @@ const char* decorFakeNeutral = "mt_neutral";
 const char* decorSetShiftMode = "mt_set_shiftmode";
 const char* decorGetShiftMode = "mt_get_shiftmode";
 
-const char* decorCurrentGear_old = "doe_elk";
-const char* decorShiftNotice_old = "hunt_score";
-const char* decorFakeNeutral_old = "hunt_weapon";
-
 std::array<float, NUM_GEARS> upshiftSpeeds{};
 
 std::string textureWheelFile;
@@ -123,7 +119,6 @@ void update() {
     controls.UpdateValues(controls.PrevInput, ignoreClutch, false);
 
     if (settings.CrossScript) {
-        crossScriptComms();
         crossScriptUpdated();
     }
 
@@ -369,31 +364,6 @@ void crossScriptUpdated() {
     prevExtShift = currExtShift;
 
     DECORATOR::DECOR_SET_INT(vehicle, (char *)decorGetShiftMode, static_cast<int>(settings.ShiftMode) + 1);
-}
-
-// TODO: Phase out
-void crossScriptComms() {
-    // Current gear
-    DECORATOR::DECOR_SET_INT(vehicle, (char *)decorCurrentGear_old, ext.GetGearCurr(vehicle));
-
-    // Shift indicator: 0 = nothing, 1 = Shift up, 2 = Shift down
-    if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle) || vehData.TruckShiftUp) {
-        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice_old, 1);
-    }
-    else if (ext.GetGearCurr(vehicle) > 1 && vehData.RPM < 0.4f) {
-        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice_old, 2);
-    }
-    else if (ext.GetGearCurr(vehicle) == ext.GetGearNext(vehicle)) {
-        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice_old, 0);
-    }
-
-    // Simulated Neutral
-    if (vehData.FakeNeutral && settings.EnableManual) {
-        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorFakeNeutral_old, 1);
-    }
-    else {
-        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorFakeNeutral_old, 0);
-    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2152,11 +2122,6 @@ bool setupGlobals() {
 
     g_bIsDecorRegisterLockedPtr = (BYTE*)(addr + *(int*)(addr + 8) + 13);
     *g_bIsDecorRegisterLockedPtr = 0;
-
-    // Legacy support until I get LeFix to update
-    registerDecorator(decorCurrentGear_old, DECOR_TYPE_INT);
-    registerDecorator(decorShiftNotice_old, DECOR_TYPE_INT);
-    registerDecorator(decorFakeNeutral_old, DECOR_TYPE_INT);
 
     // New decorators! :)
     registerDecorator(decorCurrentGear, DECOR_TYPE_INT);
