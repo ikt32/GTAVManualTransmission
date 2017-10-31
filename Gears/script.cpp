@@ -449,11 +449,14 @@ void reset() {
 void toggleManual() {
     settings.EnableManual = !settings.EnableManual;
     settings.SaveGeneral();
-    std::stringstream message;
-    message << "Manual Transmission " <<
-               (settings.EnableManual ? "Enabled" : "Disabled");
-    showNotification(message.str(), &prevNotification);
-    logger.Write(message.str());
+    std::string message = "~b~Manual Transmission~w~~n~";
+    if (settings.EnableManual) {
+        message += "Enabled";
+    }
+    else {
+        message += "Disabled";
+    }
+    showNotification(message, &prevNotification);
     if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
         VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
         VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
@@ -557,27 +560,25 @@ void resetSteeringMultiplier() {
 void updateLastInputDevice() {
     if (controls.PrevInput != controls.GetLastInputDevice(controls.PrevInput,settings.EnableWheel)) {
         controls.PrevInput = controls.GetLastInputDevice(controls.PrevInput, settings.EnableWheel);
+        std::string message = "~b~Manual Transmission~w~~n~Input: ";
         switch (controls.PrevInput) {
             case ScriptControls::Keyboard:
-                showNotification("Switched to keyboard/mouse", &prevNotification);
+                message += "Keyboard";
                 break;
-            case ScriptControls::Controller: // Controller
+            case ScriptControls::Controller:
+                message += "Controller";
                 if (settings.ShiftMode == HPattern) {
-                    showNotification("Switched to controller\nSequential re-initiated", &prevNotification);
+                    message += "~n~Mode: Sequential";
                     settings.ShiftMode = Sequential;
-                }
-                else {
-                    showNotification("Switched to controller", &prevNotification);
                 }
                 break;
             case ScriptControls::Wheel:
-                showNotification("Switched to wheel", &prevNotification);
+                message += "Steering wheel";
                 break;
-            //case ScriptControls::Stick: 
-            //	showNotification("Switched to stick", &prevNotification);
-            //	break;
             default: break;
         }
+        showNotification(message, &prevNotification);
+
         initSteeringPatches();
     }
     if (controls.PrevInput == ScriptControls::Wheel) {
@@ -605,7 +606,7 @@ void setShiftMode(int shiftMode) {
         vehData.FakeNeutral = false;
     }
 
-    std::string mode = "Mode: ";
+    std::string mode = "~b~Manual Transmission~w~~n~Mode: ";
     // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
     switch (settings.ShiftMode) {
         case Sequential: mode += "Sequential"; break;
@@ -1007,8 +1008,6 @@ void functionEngStall() {
         }
         gearRattle.Stop();
         stallingProgress = 0.0f;
-        if (settings.DisplayInfo)
-            showNotification("Your car has stalled.");
     }
     //showText(0.1, 0.1, 1.0, "Stall progress: " + std::to_string(stallingProgress));
     //showText(0.1, 0.2, 1.0, "Stall speed: " + std::to_string(stallSpeed));
@@ -2253,7 +2252,7 @@ void main() {
             WAIT(0);
         }
         __except (DumpStackTrace(GetExceptionInformation())) {
-            showNotification("~r~Manual Transmission~w~~n~Script crashed! Check Gears.log");
+            showNotification("~b~Manual Transmission~w~~n~Script crashed! Check Gears.log");
             logger.Write("CRASH: Init shutdown");
             bool successI = MemoryPatcher::RestoreInstructions();
             bool successS = MemoryPatcher::RestoreSteeringCorrection();
