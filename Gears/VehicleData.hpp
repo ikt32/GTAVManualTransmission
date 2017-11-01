@@ -70,6 +70,9 @@ public:
     int RadioStationIndex = 0;
     bool HasSpeedo = false;
 
+    float StallProgress = 0.0f;
+    bool EngBrakeActive = false;
+    bool EngLockActive = false;
 private:
     std::array<char *, 20> badModelNames = {
         "BENSON",

@@ -44,7 +44,6 @@ int textureWheelId;
 
 GameSound gearRattle("DAMAGED_TRUCK_IDLE", 0);
 int soundID;
-float stallingProgress = 0.0f;
 
 std::string settingsGeneralFile;
 std::string settingsWheelFile;
@@ -69,9 +68,6 @@ int speedoIndex;
 extern std::vector<std::string> speedoTypes;
 
 bool lookrightfirst = false;
-
-bool engBrakeActive = false;
-bool engLockActive = false;
 
 MiniPID pid(1.0, 0.0, 0.0);
 
@@ -251,7 +247,7 @@ void update() {
         functionEngBrake();
     }
     else {
-        engBrakeActive = false;
+        vehData.EngBrakeActive = false;
     }
 
     // Engine damage: RPM Damage
@@ -264,7 +260,7 @@ void update() {
         functionEngLock();
     }
     else {
-        engLockActive = false;
+        vehData.EngLockActive = false;
     }
 
     manageBrakePatch();
@@ -967,18 +963,18 @@ void functionEngStall() {
         vehData.RPM < 0.2125f &&
         avgWheelSpeed < stallSpeed &&
         VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
-        stallingProgress += (rand() % 1000) / (stallingRateDivisor * (controls.ThrottleVal+0.001f) * timeStep);
+        vehData.StallProgress += (rand() % 1000) / (stallingRateDivisor * (controls.ThrottleVal+0.001f) * timeStep);
     }
-    else if (stallingProgress > 0.0f) {
-        stallingProgress -= (rand() % 1000) / (stallingRateDivisor * (controls.ThrottleVal + 0.001f) * timeStep);
+    else if (vehData.StallProgress > 0.0f) {
+        vehData.StallProgress -= (rand() % 1000) / (stallingRateDivisor * (controls.ThrottleVal + 0.001f) * timeStep);
     }
 
-    if (stallingProgress > 1.0f) {
+    if (vehData.StallProgress > 1.0f) {
         if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
             VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
         }
         gearRattle.Stop();
-        stallingProgress = 0.0f;
+        vehData.StallProgress = 0.0f;
     }
     //showText(0.1, 0.1, 1.0, "Stall progress: " + std::to_string(stallingProgress));
     //showText(0.1, 0.2, 1.0, "Stall speed: " + std::to_string(stallSpeed));
@@ -1080,7 +1076,7 @@ void functionEngLock() {
         vehData.IsTruck ||
         ext.GetGearCurr(vehicle) == ext.GetTopGear(vehicle) ||
         vehData.FakeNeutral) {
-        engLockActive = false;
+        vehData.EngLockActive = false;
         gearRattle.Stop();
         return;
     }
@@ -1110,7 +1106,7 @@ void functionEngLock() {
 
     // Wheels are locking up due to bad (down)shifts
     if ((speed > abs(maxSpeed) + 3.334f || wrongDirection) && inputMultiplier > settings.ClutchCatchpoint) {
-        engLockActive = true;
+        vehData.EngLockActive = true;
         float lockingForce = 60.0f * inputMultiplier;
         auto wheelsToLock = getDrivenWheels();
 
@@ -1144,7 +1140,7 @@ void functionEngLock() {
         }
     }
     else {
-        engLockActive = false;
+        vehData.EngLockActive = false;
         gearRattle.Stop();
     }
 }
@@ -1161,7 +1157,7 @@ void functionEngBrake() {
         float clutchMultiplier = 1.0f - controls.ClutchVal;
         float inputMultiplier = throttleMultiplier * clutchMultiplier;
         if (inputMultiplier > 0.0f) {
-            engBrakeActive = true;
+            vehData.EngBrakeActive = true;
             float rpmMultiplier = (vehData.RPM - activeBrakeThreshold) / (1.0f - activeBrakeThreshold);
             float engBrakeForce = settings.EngBrakePower * handlingBrakeForce * inputMultiplier * rpmMultiplier;
             auto wheelsToBrake = getDrivenWheels();
@@ -1182,12 +1178,12 @@ void functionEngBrake() {
         
     }
     else {
-        engBrakeActive = false;
+        vehData.EngBrakeActive = false;
     }
 }
 
 void manageBrakePatch() {
-    if (engBrakeActive || engLockActive) {
+    if (vehData.EngBrakeActive || vehData.EngLockActive) {
         if (!MemoryPatcher::BrakeDecrementPatched) {
             MemoryPatcher::PatchBrakeDecrement();
         }
