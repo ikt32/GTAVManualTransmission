@@ -147,6 +147,7 @@
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
     <ClInclude Include="Dump.h" />
     <ClInclude Include="Memory\Versions.h" />
+    <ClInclude Include="newNatives.h" />
     <ClInclude Include="ShiftModes.h" />
     <ClInclude Include="Util\MathExt.h" />
     <ClInclude Include="Memory\Offsets.hpp" />

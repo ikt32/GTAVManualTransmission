@@ -111,6 +111,10 @@ void VehicleExtensions::initOffsets() {
     dashSpeedOffset = addr == 0 ? 0 : *(int*)(addr + 4);
     logger.Writef("Dashboard Speed Offset: 0x%X", dashSpeedOffset);
 
+    addr = mem::FindPattern("\x8B\x83\x38\x0B\x00\x00\x83\xE8\x08\x83\xF8\x02", "xx????xx?xxx");
+    modelTypeOffset = addr == 0 ? 0 : *(int*)(addr + 2);
+    logger.Writef("Model Type Offset: 0x%X", modelTypeOffset);
+
     addr = mem::FindPattern("\x3B\xB7\x48\x0B\x00\x00\x7D\x0D", "xx????xx");
     wheelsPtrOffset = addr == 0 ? 0 : *(int*)(addr + 2) - 8;
     logger.Writef("Wheels Pointer Offset: 0x%X", wheelsPtrOffset);
@@ -324,6 +328,12 @@ float VehicleExtensions::GetDashSpeed(Vehicle handle) {
     if (dashSpeedOffset == 0) return 0;
     auto address = GetAddress(handle);
     return *reinterpret_cast<float *>(address + dashSpeedOffset);
+}
+
+int VehicleExtensions::GetModelType(Vehicle handle) {
+    if (modelTypeOffset == 0) return 0;
+    auto address = GetAddress(handle);
+    return *reinterpret_cast<int *>(address + modelTypeOffset);
 }
 
 uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {

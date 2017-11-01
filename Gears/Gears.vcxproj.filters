@@ -153,6 +153,7 @@
       <Filter>Thirdparty</Filter>
     </ClInclude>
     <ClInclude Include="Dump.h" />
+    <ClInclude Include="newNatives.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

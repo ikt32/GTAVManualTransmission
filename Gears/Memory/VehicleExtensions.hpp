@@ -84,6 +84,8 @@ public:
     float GetDashSpeed(Vehicle handle);
     // No set impl.
 
+    int GetModelType(Vehicle handle);
+
     uint64_t GetWheelsPtr(Vehicle handle);
     uint8_t GetNumWheels(Vehicle handle);
 
@@ -145,8 +147,6 @@ public:
 
 private:
     const eGameVersion gameVersion = getGameVersion();
-    /*int findOffset(const std::map<int, int, std::greater<int>> &offsets);
-    int findOffset(const char* pattern, const char*  mask, int offset);*/
 
     int rocketBoostActiveOffset = 0;
     int rocketBoostChargeOffset = 0;
@@ -173,5 +173,6 @@ private:
     int dashSpeedOffset = 0;
     int wheelsPtrOffset = 0;
     int numWheelsOffset = 0;
-
+    // 0 = car, 1 = plane, 2 = trailer, 3 = quad, 6 = amphibious car, 7 = amphibious quad, 8 = heli, 11 = motorcycle, 12 = bicycle, 14 = train, 
+    int modelTypeOffset = 0; 
 };
