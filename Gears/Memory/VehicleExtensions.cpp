@@ -6,6 +6,7 @@
 #include "../Util/MathExt.h"
 #include <functional>
 #include <map>
+#include "Util/Logger.hpp"
 
 const eGameVersion g_gameVersion = getGameVersion();
 
@@ -13,202 +14,84 @@ int findOffset(const std::map<int, int, std::greater<int>> &offsets) {
     return offsets.lower_bound(g_gameVersion)->second;
 }
 
-template <typename T>
-T findOffset(const char* pattern, const char* mask, int offset) {
-    uintptr_t addr = mem::FindPattern(pattern, mask);
-    if (addr == 0) return 0;
-    return *(T*)(addr + offset);
-}
-
 VehicleExtensions::VehicleExtensions() {
     mem::init();
 }
 
+// Offsets done by me might need revision
 void VehicleExtensions::initOffsets() {
-    rocketBoostActiveOffset = 
-        findOffset<int>("\x3A\x91\x00\x00\x00\x00\x74\x00\x84\xD2", "xx????x?xx", 2);
+    uintptr_t addr = mem::FindPattern("\x3A\x91\x00\x00\x00\x00\x74\x00\x84\xD2", "xx????x?xx");
+    rocketBoostActiveOffset = *(int*)(addr + 2);
+    logger.Writef("Rocket Boost Active Offset: 0x%X", rocketBoostActiveOffset);
 
-    const std::map<int, int, std::greater<int>> rocketBoostChargeOffsets{
-        { G_VER_1_0_335_2_STEAM, 0 },
-        { G_VER_1_0_944_2_STEAM, 0x31C },
-        { G_VER_1_0_1103_2_STEAM, 0x31C },
-        { G_VER_1_0_1180_2_STEAM, 0x320 }
-    };
-    rocketBoostChargeOffset = findOffset(rocketBoostChargeOffsets);
+    addr = mem::FindPattern("\x48\x8B\x47\x00\xF3\x44\x0F\x10\x9F\x00\x00\x00\x00", "xxx?xxxxx????");
+    rocketBoostChargeOffset = *(int*)(addr + 9);
+    logger.Writef("Rocket Boost Charge Offset: 0x%X", rocketBoostChargeOffset);
 
-    const std::map<int, int, std::greater<int>> fuelLevelOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x758 },
-        { G_VER_1_0_372_2_STEAM, 0x768 },
-        { G_VER_1_0_877_1_STEAM, 0x788 },
-        { G_VER_1_0_944_2_STEAM, 0x7A8 },
-        { G_VER_1_0_1103_2_STEAM, 0x7B8 },
-        { G_VER_1_0_1180_2_STEAM, 0x7C8 }
-    };
-    fuelLevelOffset = findOffset(fuelLevelOffsets);
+    addr = mem::FindPattern("\x74\x26\x0F\x57\xC9", "xxxxx");
+    fuelLevelOffset = *(int*)(addr + 8);
+    logger.Writef("Fuel Level Offset: 0x%X", fuelLevelOffset);
 
-    const std::map<int, int, std::greater<int>> gearNextOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x790 },
-        { G_VER_1_0_372_2_STEAM, 0x7A0 },
-        { G_VER_1_0_877_1_STEAM, 0x7C0 },
-        { G_VER_1_0_944_2_STEAM, 0x7E0 },
-        { G_VER_1_0_1103_2_STEAM, 0x7F0 },
-        { G_VER_1_0_1180_2_STEAM, 0x810 }
-    };
-    gearNextOffset = findOffset(gearNextOffsets);
+    addr = mem::FindPattern("\x48\x8D\x8F\x00\x00\x00\x00\x4C\x8B\xC3\xF3\x0F\x11\x7C\x24",
+        "xxx????xxxxxxxx");
+    nextGearOffset = *(int*)(addr + 3);
+    logger.Writef("Next Gear Offset: 0x%X", nextGearOffset);
 
-    const std::map<int, int, std::greater<int>> gearCurrOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x792 },
-        { G_VER_1_0_372_2_STEAM, 0x7A2 },
-        { G_VER_1_0_877_1_STEAM, 0x7C2 },
-        { G_VER_1_0_944_2_STEAM, 0x7E2 },
-        { G_VER_1_0_1103_2_STEAM, 0x7F2 },
-        { G_VER_1_0_1180_2_STEAM, 0x812 }
-    };
-    gearCurrOffset = findOffset(gearCurrOffsets);;
+    currentGearOffset = *(int*)(addr + 3) + 2;
+    logger.Writef("Current Gear Offset: 0x%X", currentGearOffset);
 
-    const std::map<int, int, std::greater<int>> topGearOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x796 },
-        { G_VER_1_0_372_2_STEAM, 0x7A6 },
-        { G_VER_1_0_877_1_STEAM, 0x7C6 },
-        { G_VER_1_0_944_2_STEAM, 0x7E6 },
-        { G_VER_1_0_1103_2_STEAM, 0x7F6 },
-        { G_VER_1_0_1180_2_STEAM, 0x816 }
-    };
-    topGearOffset = findOffset(topGearOffsets);
+    topGearOffset = *(int*)(addr + 3) + 6;
+    logger.Writef("Top Gear Offset: 0x%X", topGearOffset);
 
-    const std::map<int, int, std::greater<int>> gearRatiosOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x798 },
-        { G_VER_1_0_372_2_STEAM, 0x7A8 },
-        { G_VER_1_0_877_1_STEAM, 0x7C8 },
-        { G_VER_1_0_944_2_STEAM, 0x7E8 },
-        { G_VER_1_0_1103_2_STEAM, 0x7F8 },
-        { G_VER_1_0_1180_2_STEAM, 0x818 }
-    };
-    gearRatiosOffset = findOffset(gearRatiosOffsets);
+    gearRatiosOffset = *(int*)(addr + 3) + 8;
+    logger.Writef("Gear Ratios Offset: 0x%X", gearRatiosOffset);
 
-    const std::map<int, int, std::greater<int>> driveForceOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x7B8 },
-        { G_VER_1_0_372_2_STEAM, 0x7C8 },
-        { G_VER_1_0_877_1_STEAM, 0x7E8 },
-        { G_VER_1_0_944_2_STEAM, 0x808 },
-        { G_VER_1_0_1103_2_STEAM, 0x818 },
-        { G_VER_1_0_1180_2_STEAM, 0x838 }
-    };
-    driveForceOffset = findOffset(driveForceOffsets);
+    driveForceOffset = *(int*)(addr + 3) + 0x28;
+    logger.Writef("Drive Force Offset: 0x%X", driveForceOffset);
 
-    const std::map<int, int, std::greater<int>> initialDriveMaxFlatVelocityOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x7BC },
-        { G_VER_1_0_372_2_STEAM, 0x7CC },
-        { G_VER_1_0_877_1_STEAM, 0x7EC },
-        { G_VER_1_0_944_2_STEAM, 0x80C },
-        { G_VER_1_0_1103_2_STEAM, 0x81C },
-        { G_VER_1_0_1180_2_STEAM, 0x83C }
-    };
-    initialDriveMaxFlatVelOffset = findOffset(initialDriveMaxFlatVelocityOffsets);
+    initialDriveMaxFlatVelOffset = *(int*)(addr + 3) + 0x2C;
+    logger.Writef("Initial Drive Max Flat Velocity Offset: 0x%X", initialDriveMaxFlatVelOffset);
 
-    const std::map<int, int, std::greater<int>> driveMaxFlatVelocityOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x7C0 },
-        { G_VER_1_0_372_2_STEAM, 0x7D0 },
-        { G_VER_1_0_877_1_STEAM, 0x7F0 },
-        { G_VER_1_0_944_2_STEAM, 0x810 },
-        { G_VER_1_0_1103_2_STEAM, 0x820 },
-        { G_VER_1_0_1180_2_STEAM, 0x840 }
-    };
-    driveMaxFlatVelOffset = findOffset(driveMaxFlatVelocityOffsets);
+    driveMaxFlatVelOffset = *(int*)(addr + 3) + 0x30;
+    logger.Writef("Drive Max Flat Velocity Offset: 0x%X", driveMaxFlatVelOffset);
 
-    const std::map<int, int, std::greater<int>> currentRPMOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x7C4 },
-        { G_VER_1_0_372_2_STEAM, 0x7D4 },
-        { G_VER_1_0_877_1_STEAM, 0x7F4 },
-        { G_VER_1_0_944_2_STEAM, 0x814 },
-        { G_VER_1_0_1103_2_STEAM, 0x824 },
-        { G_VER_1_0_1180_2_STEAM, 0x844 }
-    };
-    currentRPMOffset = findOffset(currentRPMOffsets);
+    addr = mem::FindPattern("\xF3\x44\x0F\x10\x93\x00\x00\x00\x00\xF3\x0F\x10\x0D",
+        "xxxxx????xxxx");
+    currentRPMOffset = *(int*)(addr + 5);
+    logger.Writef("RPM Offset: 0x%X", currentRPMOffset);
 
-    const std::map<int, int, std::greater<int>> clutchOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x7D0 },
-        { G_VER_1_0_372_2_STEAM, 0x7E0 },
-        { G_VER_1_0_877_1_STEAM, 0x800 },
-        { G_VER_1_0_944_2_STEAM, 0x820 },
-        { G_VER_1_0_1103_2_STEAM, 0x830 },
-        { G_VER_1_0_1180_2_STEAM, 0x850 }
-    };
-    clutchOffset = findOffset(clutchOffsets);
+    clutchOffset = *(int*)(addr + 5) + 0xC;
+    logger.Writef("Clutch Offset: 0x%X", clutchOffset);
 
-    const std::map<int, int, std::greater<int>> throttleOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x7D4 },
-        { G_VER_1_0_372_2_STEAM, 0x7E4 },
-        { G_VER_1_0_877_1_STEAM, 0x804 },
-        { G_VER_1_0_944_2_STEAM, 0x824 },
-        { G_VER_1_0_1103_2_STEAM, 0x834 },
-        { G_VER_1_0_1180_2_STEAM, 0x854 }
-    };
-    throttleOffset = findOffset(throttleOffsets);
+    throttleOffset = *(int*)(addr + 5) + 0x10;
+    logger.Writef("Throttle Offset: 0x%X", throttleOffset);
 
-    const std::map<int, int, std::greater<int>> turboOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x7D8 },
-        { G_VER_1_0_372_2_STEAM, 0x7F8 },
-        { G_VER_1_0_877_1_STEAM, 0x818 },
-        { G_VER_1_0_944_2_STEAM, 0x838 },
-        { G_VER_1_0_1103_2_STEAM, 0x848 },
-        { G_VER_1_0_1180_2_STEAM, 0x868 }
-    };
-    turboOffset = findOffset(turboOffsets);
+    addr = mem::FindPattern("\xF3\x0F\x10\x8F\x68\x08\x00\x00\x88\x4D\x8C\x0F\x2F\xCF", 
+                            "xxxx????xxx???");
+    turboOffset = *(int*)(addr + 4);
+    logger.Writef("Turbo Offset: 0x%X", turboOffset);
 
-    handlingPtrOffset = 
-        findOffset<int>("\x3C\x03\x0F\x85\x00\x00\x00\x00\x48\x8B\x41\x20\x48\x8B\x88", "xxxx????xxxxxxx", 0x16);
+    addr = mem::FindPattern("\x3C\x03\x0F\x85\x00\x00\x00\x00\x48\x8B\x41\x20\x48\x8B\x88",
+        "xxxx????xxxxxxx");
+    handlingOffset = *(int*)(addr + 0x16);
+    logger.Writef("Handling Offset: 0x%X", handlingOffset);
 
-    const std::map<int, int, std::greater<int>> steeringAngleInputOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x894 },
-        { G_VER_1_0_372_2_STEAM, 0x8A4 },
-        { G_VER_1_0_757_2_STEAM, 0x89C },
-        { G_VER_1_0_877_1_STEAM, 0x8C4 },
-        { G_VER_1_0_944_2_STEAM, 0x8EC },
-        { G_VER_1_0_1103_2_STEAM, 0x8FC },
-        { G_VER_1_0_1180_2_STEAM, 0x91C }
-    };
-    steeringAngleInputOffset = findOffset(steeringAngleInputOffsets);
+    addr = mem::FindPattern("\x74\x0A\xF3\x0F\x11\xB3\x1C\x09\x00\x00\xEB\x25", "xxxxxx????xx");
+    steeringAngleInputOffset = *(int*)(addr + 6);
+    logger.Writef("Steering Input Offset: 0x%X", steeringAngleInputOffset);
 
-    const std::map<int, int, std::greater<int>> steeringAngleOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x89C },
-        { G_VER_1_0_372_2_STEAM, 0x8AC },
-        { G_VER_1_0_877_1_STEAM, 0x8CC },
-        { G_VER_1_0_944_2_STEAM, 0x8F4 },
-        { G_VER_1_0_1103_2_STEAM, 0x904 },
-        { G_VER_1_0_1180_2_STEAM, 0x924 }
-    };
-    steeringAngleOffset = findOffset(steeringAngleOffsets);
+    steeringAngleOffset = *(int*)(addr + 6) + 8;
+    logger.Writef("Steering Angle Offset: 0x%X", steeringAngleOffset);
 
-    const std::map<int, int, std::greater<int>> throttlePOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x8A4 },
-        { G_VER_1_0_372_2_STEAM, 0x8B4 },
-        { G_VER_1_0_877_1_STEAM, 0x8D4 },
-        { G_VER_1_0_944_2_STEAM, 0x8FC },
-        { G_VER_1_0_1103_2_STEAM, 0x90C },
-        { G_VER_1_0_1180_2_STEAM, 0x92C }
-    };
-    throttlePOffset = findOffset(throttlePOffsets);
+    throttlePOffset = *(int*)(addr + 6) + 0x10;
+    logger.Writef("ThrottleP Offset: 0x%X", throttlePOffset);
 
-    const std::map<int, int, std::greater<int>> brakePOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x8A8 },
-        { G_VER_1_0_372_2_STEAM, 0x8B8 },
-        { G_VER_1_0_877_1_STEAM, 0x8D8 },
-        { G_VER_1_0_944_2_STEAM, 0x900 },
-        { G_VER_1_0_1103_2_STEAM, 0x910 },
-        { G_VER_1_0_1180_2_STEAM, 0x930 }
-    };
-    brakePOffset = findOffset(brakePOffsets);
+    brakePOffset = *(int*)(addr + 6) + 0x14;
+    logger.Writef("BrakeP Offset: 0x%X", brakePOffset);
 
-    const std::map<int, int, std::greater<int>> handbrakeOffsets{
-        { G_VER_1_0_335_2_STEAM, 0x8AC },
-        { G_VER_1_0_372_2_STEAM, 0x8BC },
-        { G_VER_1_0_877_1_STEAM, 0x8DC },
-        { G_VER_1_0_944_2_STEAM, 0x904 },
-        { G_VER_1_0_1103_2_STEAM, 0x914 },
-        { G_VER_1_0_1180_2_STEAM, 0x934 }
-    };
-    handbrakeOffset = findOffset(handbrakeOffsets);
+    addr = mem::FindPattern("\x44\x8A\xAA\x00\x00\x00\x00\x0F\x2F\xFB", "xxx????xxx");
+    handbrakeOffset = *(int*)(addr + 3);
+    logger.Writef("Handbrake Offset: 0x%X", handbrakeOffset);
 
     const std::map<int, int, std::greater<int>> dirtLevelOffsets{
         { G_VER_1_0_335_2_STEAM, 0 },
@@ -218,6 +101,7 @@ void VehicleExtensions::initOffsets() {
         { G_VER_1_0_1180_2_STEAM, 0x968 }
     };
     dirtLevelOffset = findOffset(dirtLevelOffsets);
+    logger.Writef("Dirt Level Offset: 0x%X", dirtLevelOffset);
 
     const std::map<int, int, std::greater<int>> engineTempOffsets{
         { G_VER_1_0_335_2_STEAM, 0 },
@@ -227,6 +111,7 @@ void VehicleExtensions::initOffsets() {
         { G_VER_1_0_1180_2_STEAM, 0x9DC }
     };
     engineTempOffset = findOffset(engineTempOffsets);
+    logger.Writef("Engine Temperature Offset: 0x%X", engineTempOffset);
 
     const std::map<int, int, std::greater<int>> dashSpeedOffsets{
         { G_VER_1_0_335_2_STEAM, 0 },
@@ -237,6 +122,7 @@ void VehicleExtensions::initOffsets() {
         { G_VER_1_0_1180_2_STEAM, 0xA10 }
     };
     dashSpeedOffset = findOffset(dashSpeedOffsets);
+    logger.Writef("Dashboard Speed Offset: 0x%X", dashSpeedOffset);
 
     const std::map<int, int, std::greater<int>> wheelsPtrOffsets{
         { G_VER_1_0_335_2_STEAM, 0xA80 },
@@ -248,8 +134,10 @@ void VehicleExtensions::initOffsets() {
         { G_VER_1_0_1180_2_STEAM, 0xB40 }
     };
     wheelsPtrOffset = findOffset(wheelsPtrOffsets);
+    logger.Writef("Wheels Pointer Offset: 0x%X", wheelsPtrOffset);
 
     numWheelsOffset = wheelsPtrOffset == 0 ? 0 : wheelsPtrOffset + 8;
+    logger.Writef("Wheel Count Offset: 0x%X", numWheelsOffset);
 }
 
 BYTE *VehicleExtensions::GetAddress(Vehicle handle) {
@@ -287,23 +175,23 @@ void VehicleExtensions::SetFuelLevel(Vehicle handle, float value) {
 }
 
 uint16_t VehicleExtensions::GetGearNext(Vehicle handle) {
-    if (gearNextOffset == 0) return 0;
-    return *reinterpret_cast<const uint16_t *>(GetAddress(handle) + gearNextOffset);
+    if (nextGearOffset == 0) return 0;
+    return *reinterpret_cast<const uint16_t *>(GetAddress(handle) + nextGearOffset);
 }
 
 void VehicleExtensions::SetGearNext(Vehicle handle, uint16_t value) {
-    if (gearNextOffset == 0) return;
-    *reinterpret_cast<uint16_t *>(GetAddress(handle) + gearNextOffset) = value;
+    if (nextGearOffset == 0) return;
+    *reinterpret_cast<uint16_t *>(GetAddress(handle) + nextGearOffset) = value;
 }
 
 uint16_t VehicleExtensions::GetGearCurr(Vehicle handle) {
-    if (gearCurrOffset == 0) return 0;
-    return *reinterpret_cast<const uint16_t *>(GetAddress(handle) + gearCurrOffset);
+    if (currentGearOffset == 0) return 0;
+    return *reinterpret_cast<const uint16_t *>(GetAddress(handle) + currentGearOffset);
 }
 
 void VehicleExtensions::SetGearCurr(Vehicle handle, uint16_t value) {
-    if (gearCurrOffset == 0) return;
-    *reinterpret_cast<uint16_t *>(GetAddress(handle) + gearCurrOffset) = value;
+    if (currentGearOffset == 0) return;
+    *reinterpret_cast<uint16_t *>(GetAddress(handle) + currentGearOffset) = value;
 }
 
 unsigned char VehicleExtensions::GetTopGear(Vehicle handle) {
@@ -382,9 +270,9 @@ void VehicleExtensions::SetTurbo(Vehicle handle, float value) {
 }
 
 uint64_t VehicleExtensions::GetHandlingPtr(Vehicle handle) {
-    if (handlingPtrOffset == 0) return 0;
+    if (handlingOffset == 0) return 0;
     auto address = GetAddress(handle);
-    return *reinterpret_cast<uint64_t *>(address + handlingPtrOffset);
+    return *reinterpret_cast<uint64_t *>(address + handlingOffset);
 }
 
 float VehicleExtensions::GetSteeringInputAngle(Vehicle handle) {

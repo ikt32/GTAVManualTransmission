@@ -151,8 +151,8 @@ private:
     int rocketBoostActiveOffset = 0;
     int rocketBoostChargeOffset = 0;
     int fuelLevelOffset = 0;
-    int gearNextOffset = 0;
-    int gearCurrOffset = 0;
+    int nextGearOffset = 0;
+    int currentGearOffset = 0;
     int topGearOffset = 0;
     int gearRatiosOffset = 0;
     int driveForceOffset = 0;
@@ -162,7 +162,7 @@ private:
     int clutchOffset = 0;
     int throttleOffset = 0;
     int turboOffset = 0;
-    int handlingPtrOffset = 0;
+    int handlingOffset = 0;
     int steeringAngleInputOffset = 0;
     int steeringAngleOffset = 0;
     int throttlePOffset = 0;
