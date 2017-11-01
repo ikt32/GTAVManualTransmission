@@ -18,7 +18,10 @@ VehicleExtensions::VehicleExtensions() {
     mem::init();
 }
 
-// Offsets done by me might need revision
+/*
+ * Offsets/patterns done by me might need revision, but they've been checked 
+ * against b1180.2 and b877.1 and are okay.
+ */
 void VehicleExtensions::initOffsets() {
     uintptr_t addr = mem::FindPattern("\x3A\x91\x00\x00\x00\x00\x74\x00\x84\xD2", "xx????x?xx");
     rocketBoostActiveOffset = addr == 0 ? 0 : *(int*)(addr + 2);
@@ -33,7 +36,7 @@ void VehicleExtensions::initOffsets() {
     logger.Writef("Fuel Level Offset: 0x%X", fuelLevelOffset);
 
     addr = mem::FindPattern("\x48\x8D\x8F\x00\x00\x00\x00\x4C\x8B\xC3\xF3\x0F\x11\x7C\x24",
-        "xxx????xxxxxxxx");
+                            "xxx????xxxxxxxx");
     nextGearOffset = addr == 0 ? 0 : *(int*)(addr + 3);
     logger.Writef("Next Gear Offset: 0x%X", nextGearOffset);
 
@@ -56,7 +59,7 @@ void VehicleExtensions::initOffsets() {
     logger.Writef("Drive Max Flat Velocity Offset: 0x%X", driveMaxFlatVelOffset);
 
     addr = mem::FindPattern("\xF3\x44\x0F\x10\x93\x00\x00\x00\x00\xF3\x0F\x10\x0D",
-        "xxxxx????xxxx");
+                            "xxxxx????xxxx");
     currentRPMOffset = addr == 0 ? 0 : *(int*)(addr + 5);
     logger.Writef("RPM Offset: 0x%X", currentRPMOffset);
 
@@ -72,7 +75,7 @@ void VehicleExtensions::initOffsets() {
     logger.Writef("Turbo Offset: 0x%X", turboOffset);
 
     addr = mem::FindPattern("\x3C\x03\x0F\x85\x00\x00\x00\x00\x48\x8B\x41\x20\x48\x8B\x88",
-        "xxxx????xxxxxxx");
+                            "xxxx????xxxxxxx");
     handlingOffset = addr == 0 ? 0 : *(int*)(addr + 0x16);
     logger.Writef("Handling Offset: 0x%X", handlingOffset);
 
@@ -93,50 +96,26 @@ void VehicleExtensions::initOffsets() {
     handbrakeOffset = addr == 0 ? 0 : *(int*)(addr + 3);
     logger.Writef("Handbrake Offset: 0x%X", handbrakeOffset);
 
-    const std::map<int, int, std::greater<int>> dirtLevelOffsets{
-        { G_VER_1_0_335_2_STEAM, 0 },
-        { G_VER_1_0_877_1_STEAM, 0x910 },
-        { G_VER_1_0_944_2_STEAM, 0x938 },
-        { G_VER_1_0_1103_2_STEAM, 0x948 },
-        { G_VER_1_0_1180_2_STEAM, 0x968 }
-    };
-    dirtLevelOffset = findOffset(dirtLevelOffsets);
+    addr = mem::FindPattern("\x0F\x29\x7C\x24\x30\x0F\x85\xE3\x00\x00\x00\xF3\x0F\x10\xB9\x68\x09\x00\x00", 
+                            "xx???xx????xxxx????");
+    dirtLevelOffset = addr == 0 ? 0 : *(int*)(addr + 0xF);
     logger.Writef("Dirt Level Offset: 0x%X", dirtLevelOffset);
 
-    const std::map<int, int, std::greater<int>> engineTempOffsets{
-        { G_VER_1_0_335_2_STEAM, 0 },
-        { G_VER_1_0_877_1_STEAM, 0x984 },
-        { G_VER_1_0_944_2_STEAM, 0x9AC },
-        { G_VER_1_0_1103_2_STEAM, 0x9BC },
-        { G_VER_1_0_1180_2_STEAM, 0x9DC }
-    };
-    engineTempOffset = findOffset(engineTempOffsets);
+    addr = mem::FindPattern("\xF3\x0F\x11\x9B\xDC\x09\x00\x00\x0F\x84\xB1\x00\x00\x00",
+                            "xxxx????xxx???");
+    engineTempOffset = addr == 0 ? 0 : *(int*)(addr + 4);
     logger.Writef("Engine Temperature Offset: 0x%X", engineTempOffset);
 
-    const std::map<int, int, std::greater<int>> dashSpeedOffsets{
-        { G_VER_1_0_335_2_STEAM, 0 },
-        { G_VER_1_0_372_2_STEAM, 0x9A4 },
-        { G_VER_1_0_877_1_STEAM, 0x9C8 },
-        { G_VER_1_0_944_2_STEAM, 0x9F0 },
-        { G_VER_1_0_1103_2_STEAM, 0xA00 },
-        { G_VER_1_0_1180_2_STEAM, 0xA10 }
-    };
-    dashSpeedOffset = findOffset(dashSpeedOffsets);
+    addr = mem::FindPattern("\xF3\x0F\x10\x8F\x10\x0A\x00\x00\xF3\x0F\x59\x05\x5E\x30\x8D\x00", 
+                            "xxxx????xxxx????");
+    dashSpeedOffset = addr == 0 ? 0 : *(int*)(addr + 4);
     logger.Writef("Dashboard Speed Offset: 0x%X", dashSpeedOffset);
 
-    const std::map<int, int, std::greater<int>> wheelsPtrOffsets{
-        { G_VER_1_0_335_2_STEAM, 0xA80 },
-        { G_VER_1_0_372_2_STEAM, 0xAA0 },
-        { G_VER_1_0_791_2_STEAM, 0xAB0 },
-        { G_VER_1_0_877_1_STEAM, 0xAE0 },
-        { G_VER_1_0_944_2_STEAM, 0xB10 },
-        { G_VER_1_0_1103_2_STEAM, 0xB20 },
-        { G_VER_1_0_1180_2_STEAM, 0xB40 }
-    };
-    wheelsPtrOffset = findOffset(wheelsPtrOffsets);
+    addr = mem::FindPattern("\x3B\xB7\x48\x0B\x00\x00\x7D\x0D", "xx????xx");
+    wheelsPtrOffset = addr == 0 ? 0 : *(int*)(addr + 2) - 8;
     logger.Writef("Wheels Pointer Offset: 0x%X", wheelsPtrOffset);
 
-    numWheelsOffset = wheelsPtrOffset == 0 ? 0 : wheelsPtrOffset + 8;
+    numWheelsOffset = addr == 0 ? 0 : *(int*)(addr + 2);
     logger.Writef("Wheel Count Offset: 0x%X", numWheelsOffset);
 }
 
