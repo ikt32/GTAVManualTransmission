@@ -10,19 +10,29 @@
 
 #define SAMPLES 6
 
+enum class VehicleClass {
+    Car,
+    Bike,
+    Bicycle,
+    Boat,
+    Plane,
+    Heli,
+    Quad,
+    Train,
+    Unknown
+};
+
+enum class VehicleDomain {
+    Road,
+    Air,
+    Bicycle,
+    Water,
+    Rail,
+    Unknown
+};
+
 class VehicleData {
 public:
-    enum class VehicleClass {
-        Car,
-        Bike,
-        Bicycle,
-        Boat,
-        Plane,
-        Heli,
-        Quad,
-        Unknown
-    };
-
     VehicleData();
     void UpdateValues(VehicleExtensions& ext, Vehicle vehicle);
 
@@ -30,7 +40,10 @@ public:
     Vector3 GetRelativeAcceleration();                  // dV/dT
     Vector3 GetRelativeAccelerationAverage() const;     // Moving average
 
-    VehicleClass Class = VehicleClass::Car;
+    VehicleClass Class = VehicleClass::Unknown;
+    VehicleDomain Domain = VehicleDomain::Unknown;
+    bool Amphibious = false;
+
     bool NoClutch = false;
     bool IsTruck = false;
 
@@ -83,6 +96,8 @@ private:
 
     bool isBadTruck(char* name);
     VehicleClass findClass(Hash model);
+    VehicleDomain findDomain(VehicleClass vehicleClass);
+    bool isAmphibious(VehicleExtensions &ext, Vehicle vehicle);
 
     void updateAcceleration();
     void updateAverageAcceleration();

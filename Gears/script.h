@@ -126,6 +126,7 @@ void handleVehicleButtons();
 
 void playFFBGround();
 void playFFBAir();
+void playFFBWater();
 void doWheelSteering();
 void doStickControlAir();
 

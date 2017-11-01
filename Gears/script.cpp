@@ -111,7 +111,7 @@ void update() {
 
     bool ignoreClutch = false;
     if (settings.ShiftMode == Automatic ||
-        vehData.Class == VehicleData::VehicleClass::Bike && settings.SimpleBike) {
+        vehData.Class == VehicleClass::Bike && settings.SimpleBike) {
         ignoreClutch = true;
     }
 
@@ -133,11 +133,12 @@ void update() {
     if (settings.DisplayWheelInfo) {
         drawVehicleWheelInfo();
     }
-    if (settings.HUD &&
+    if (settings.HUD && vehData.Domain == VehicleDomain::Road &&
         (settings.EnableManual || settings.AlwaysHUD)) {
         drawHUD();
     }
     if (settings.HUD &&
+        (vehData.Domain == VehicleDomain::Road || vehData.Domain == VehicleDomain::Water) &&
         (controls.PrevInput == ScriptControls::Wheel || settings.AlwaysSteeringWheelInfo) &&
         settings.SteeringWheelInfo && textureWheelId != -1) {
         drawInputWheelInfo();
@@ -157,19 +158,14 @@ void update() {
 
     if (settings.EnableWheel && controls.PrevInput == ScriptControls::Wheel) {
 
-        if (vehData.Class == VehicleData::VehicleClass::Boat) {
+        if (vehData.Domain == VehicleDomain::Water) {
             handleVehicleButtons();
             handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
             doWheelSteering();
-            playFFBGround();
+            playFFBWater();
             return;
         }
 
-        if (vehData.Class == VehicleData::VehicleClass::Plane)
-            return;
-
-        if (vehData.Class == VehicleData::VehicleClass::Heli)
-            return;
     }
     
     ///////////////////////////////////////////////////////////////////////////
@@ -183,16 +179,18 @@ void update() {
         handleVehicleButtons();
         handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
         doWheelSteering();
-        playFFBGround();
+        if (vehData.Amphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle) > 0.10f) {
+            playFFBWater();
+        }
+        else {
+            playFFBGround();
+        }
     }	
 
     ///////////////////////////////////////////////////////////////////////////
     //          Active whenever Manual is enabled from here
     ///////////////////////////////////////////////////////////////////////////
-    if (vehData.Class == VehicleData::VehicleClass::Plane)
-        return;
-
-    if (vehData.Class == VehicleData::VehicleClass::Heli)
+    if (vehData.Domain != VehicleDomain::Road)
         return;
 
     if (!settings.EnableManual) {
@@ -207,7 +205,12 @@ void update() {
 
     if (settings.EnableWheel && controls.WheelControl.IsConnected(controls.SteerGUID)) {
         doWheelSteering();
-        playFFBGround();
+        if (vehData.Amphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle) > 0.10f) {
+            playFFBWater();
+        }
+        else {
+            playFFBGround();
+        }
     }
     
 
@@ -224,7 +227,7 @@ void update() {
 
     // Reverse behavior
     // For bikes, do this automatically.
-    if (vehData.Class == VehicleData::VehicleClass::Bike && settings.SimpleBike) {
+    if (vehData.Class == VehicleClass::Bike && settings.SimpleBike) {
         if (controls.PrevInput == ScriptControls::InputDevices::Wheel) {
             handlePedalsDefault( controls.ThrottleVal, controls.BrakeVal );
         } else {
@@ -267,7 +270,7 @@ void update() {
     manageBrakePatch();
 
     if (!vehData.FakeNeutral && 
-        !(settings.SimpleBike && vehData.Class == VehicleData::VehicleClass::Bike) && 
+        !(settings.SimpleBike && vehData.Class == VehicleClass::Bike) && 
         !vehData.NoClutch) {
         // Stalling
         if (settings.EngStall && settings.ShiftMode == HPattern ||
@@ -458,7 +461,7 @@ void stopForceFeedback() {
 void initSteeringPatches() {
     if (settings.PatchSteering &&
         (controls.PrevInput == ScriptControls::Wheel || settings.PatchSteeringAlways) &&
-        vehData.Class == VehicleData::VehicleClass::Car) {
+        vehData.Class == VehicleClass::Car) {
         if (!MemoryPatcher::SteerCorrectPatched)
             MemoryPatcher::PatchSteeringCorrection();
     }
@@ -470,7 +473,7 @@ void initSteeringPatches() {
 
     if (settings.PatchSteeringControl &&
         controls.PrevInput == ScriptControls::Wheel &&
-        vehData.Class == VehicleData::VehicleClass::Car) {
+        vehData.Class == VehicleClass::Car) {
         if (!MemoryPatcher::SteerControlPatched)
             MemoryPatcher::PatchSteeringControl();
     }
@@ -1801,9 +1804,9 @@ void doWheelSteering() {
         return;
 
     float steerMult;
-    if (vehData.Class == VehicleData::VehicleClass::Bike || vehData.Class == VehicleData::VehicleClass::Quad)
+    if (vehData.Class == VehicleClass::Bike || vehData.Class == VehicleClass::Quad)
         steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
-    else if (vehData.Class == VehicleData::VehicleClass::Car)
+    else if (vehData.Class == VehicleClass::Car)
         steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
     else {
         steerMult = settings.SteerAngleMax / settings.SteerAngleBoat;
@@ -1818,7 +1821,7 @@ void doWheelSteering() {
      * does need a specified anti-deadzone (recommended: 24-25%)
      * 
      */
-    if (vehData.Class == VehicleData::VehicleClass::Car && settings.PatchSteeringControl) {
+    if (vehData.Class == VehicleClass::Car && settings.PatchSteeringControl) {
         ext.SetSteeringInputAngle(vehicle, -effSteer);
     }
     else {
@@ -1861,7 +1864,7 @@ int calculateDamper(float wheelsOffGroundRatio) {
         damperForce = settings.DamperMin;
     }
 
-    if (vehData.Class == VehicleData::VehicleClass::Car || vehData.Class == VehicleData::VehicleClass::Quad) {
+    if (vehData.Class == VehicleClass::Car || vehData.Class == VehicleClass::Quad) {
         if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true) && VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
             damperForce = settings.DamperMin;
         }
@@ -1869,7 +1872,7 @@ int calculateDamper(float wheelsOffGroundRatio) {
             damperForce = settings.DamperMin + (int)(((float)damperForce - (float)settings.DamperMin) * 0.5f);
         }
     }
-    else if (vehData.Class == VehicleData::VehicleClass::Bike) {
+    else if (vehData.Class == VehicleClass::Bike) {
         if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
             damperForce = settings.DamperMin;
         }
@@ -1899,9 +1902,9 @@ int calculateDetail() {
 
 void calculateSoftLock(int &totalForce) {
     float steerMult;
-    if (vehData.Class == VehicleData::VehicleClass::Bike || vehData.Class == VehicleData::VehicleClass::Quad)
+    if (vehData.Class == VehicleClass::Bike || vehData.Class == VehicleClass::Quad)
         steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
-    else if (vehData.Class == VehicleData::VehicleClass::Car)
+    else if (vehData.Class == VehicleClass::Car)
         steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
     else {
         steerMult = settings.SteerAngleMax / settings.SteerAngleBoat;
@@ -1972,10 +1975,7 @@ void playFFBGround() {
     Vector3 turnWorldNorm = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, turnRelativeNormX, turnRelativeNormY, 0.0f);
 
     float steeringAngle;
-    if (vehData.Class == VehicleData::VehicleClass::Boat) {
-        steeringAngle = rotationVelocity.z;
-    }
-    else if (vehData.Class == VehicleData::VehicleClass::Car || steeredWheels == 0.0f) {
+    if (vehData.Class == VehicleClass::Car || steeredWheels == 0.0f) {
         steeringAngle = ext.GetSteeringAngle(vehicle)*ext.GetSteeringMultiplier(vehicle);
     }
     else {
@@ -2004,7 +2004,7 @@ void playFFBGround() {
     // "Reduction" effects - those that affect already calculated things
     bool under_ = false;
     float understeer = sgn(travelRelative.x - steeringAngleRelX) * (turnRelativeNormX - steeringAngleRelX);
-    if (vehData.Class == VehicleData::VehicleClass::Car &&
+    if (vehData.Class == VehicleClass::Car &&
         (steeringAngleRelX > turnRelativeNormX && turnRelativeNormX > travelRelative.x ||
         steeringAngleRelX < turnRelativeNormX && turnRelativeNormX < travelRelative.x)) {
         satForce = (int)((float)satForce / std::max(1.0f, understeer + 1.0f));
@@ -2015,7 +2015,7 @@ void playFFBGround() {
         satForce = (int)((float)satForce * (1.0f - wheelsOffGroundRatio));
     }
 
-    if (vehData.Class == VehicleData::VehicleClass::Car || vehData.Class == VehicleData::VehicleClass::Quad) {
+    if (vehData.Class == VehicleClass::Car || vehData.Class == VehicleClass::Quad) {
         if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true) && VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
             satForce = satForce / 10;
         }
@@ -2023,7 +2023,7 @@ void playFFBGround() {
             damperForce = satForce / 5;
         }
     }
-    else if (vehData.Class == VehicleData::VehicleClass::Bike) {
+    else if (vehData.Class == VehicleClass::Bike) {
         if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
             satForce = satForce / 10;
         }
@@ -2054,6 +2054,84 @@ void playFFBGround() {
         showText(0.85, 0.200, 0.4, "SetPoint:\t" + std::to_string(travelRelative.x), 4);
         showText(0.85, 0.225, 0.4, "Error:\t\t" + std::to_string(error), 4);
         showText(0.85, 0.250, 0.4, std::string(under_ ? "~b~" : "~w~") + "Under:\t\t" + std::to_string(understeer) + "~w~", 4);
+        showText(0.85, 0.275, 0.4, std::string(abs(satForce) > 10000 ? "~r~" : "~w~") + "FFBSat:\t\t" + std::to_string(satForce) + "~w~", 4);
+        showText(0.85, 0.300, 0.4, std::string(abs(totalForce) > 10000 ? "~r~" : "~w~") + "FFBFin:\t\t" + std::to_string(totalForce) + "~w~", 4);
+    }
+}
+
+void playFFBWater() {
+    if (!settings.EnableFFB ||
+        controls.PrevInput != ScriptControls::Wheel ||
+        !controls.WheelControl.IsConnected(controls.SteerGUID)) {
+        return;
+    }
+
+    if (settings.LogiLEDs) {
+        controls.WheelControl.PlayLedsDInput(controls.SteerGUID, vehData.RPM, 0.45, 0.95);
+    }
+
+    auto suspensionStates = ext.GetWheelsOnGround(vehicle);
+    auto angles = ext.GetWheelSteeringAngles(vehicle);
+
+    bool isInWater = ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle) > 0.10f;
+    int damperForce = calculateDamper(isInWater ? 0.25f : 1.0f);
+    int detailForce = calculateDetail();
+
+    Vector3 velocityWorld = ENTITY::GET_ENTITY_VELOCITY(vehicle);
+    Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(vehicle, 1);
+    Vector3 travelWorld = velocityWorld + positionWorld;
+    Vector3 travelRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, travelWorld.x, travelWorld.y, travelWorld.z);
+
+    Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(vehicle);
+    Vector3 turnWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, ENTITY::GET_ENTITY_SPEED(vehicle)*-sin(rotationVelocity.z), ENTITY::GET_ENTITY_SPEED(vehicle)*cos(rotationVelocity.z), 0.0f);
+    Vector3 turnRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, turnWorld.x, turnWorld.y, turnWorld.z);
+    float turnRelativeNormX = (travelRelative.x + turnRelative.x) / 2.0f;
+    float turnRelativeNormY = (travelRelative.y + turnRelative.y) / 2.0f;
+    Vector3 turnWorldNorm = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, turnRelativeNormX, turnRelativeNormY, 0.0f);
+
+    float steeringAngle = rotationVelocity.z;
+    float steeringAngleRelX = ENTITY::GET_ENTITY_SPEED(vehicle)*-sin(steeringAngle);
+    float steeringAngleRelY = ENTITY::GET_ENTITY_SPEED(vehicle)*cos(steeringAngle);
+    Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, steeringAngleRelX, steeringAngleRelY, 0.0f);
+    Vector3 steeringRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, steeringWorld.x, steeringWorld.y, steeringWorld.z);
+
+    float setpoint = travelRelative.x;
+
+    // This can be tuned but it feels pretty nice right now with Kp = 1.0, Ki, Kd = 0.0.
+    double error = pid.getOutput(steeringRelative.x, setpoint);
+
+    // Despite being scientifically inaccurate, "self-aligning torque" is the best description.
+    int satForce = static_cast<int>(settings.SATAmpMult * 1250 * -error);
+
+    // "Reduction" effects - those that affect already calculated things
+    if (!isInWater) {
+        satForce = 0;
+    }
+
+    if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
+        damperForce *= 2;
+    }
+
+    int totalForce =
+        satForce +
+        detailForce +
+        damperForce;
+
+    // Soft lock
+    calculateSoftLock(totalForce);
+
+    auto ffAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::ForceFeedback)]);
+    controls.WheelControl.SetConstantForce(controls.SteerGUID, ffAxis, totalForce);
+
+    if (settings.DisplayFFBInfo) {
+        GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, travelWorld.x, travelWorld.y, travelWorld.z, 0, 255, 0, 255);
+        GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, turnWorldNorm.x, turnWorldNorm.y, turnWorldNorm.z, 255, 0, 0, 255);
+        GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, steeringWorld.x, steeringWorld.y, steeringWorld.z, 255, 0, 255, 255);
+    }
+    if (settings.DisplayInfo) {
+        showText(0.85, 0.175, 0.4, "RelSteer:\t" + std::to_string(steeringRelative.x), 4);
+        showText(0.85, 0.200, 0.4, "SetPoint:\t" + std::to_string(travelRelative.x), 4);
+        showText(0.85, 0.225, 0.4, "Error:\t\t" + std::to_string(error), 4);
         showText(0.85, 0.275, 0.4, std::string(abs(satForce) > 10000 ? "~r~" : "~w~") + "FFBSat:\t\t" + std::to_string(satForce) + "~w~", 4);
         showText(0.85, 0.300, 0.4, std::string(abs(totalForce) > 10000 ? "~r~" : "~w~") + "FFBFin:\t\t" + std::to_string(totalForce) + "~w~", 4);
     }

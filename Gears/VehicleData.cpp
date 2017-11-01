@@ -6,6 +6,9 @@ VehicleData::VehicleData() { }
 
 void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
     Class = findClass(ENTITY::GET_ENTITY_MODEL(vehicle));
+    Domain = findDomain(Class);
+    Amphibious = isAmphibious(ext, vehicle);
+
     IsTruck = isBadTruck(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicle)));
 
     PrevRPM = RPM;
@@ -71,23 +74,32 @@ bool VehicleData::isBadTruck(char* name) {
 }
 
 
-VehicleData::VehicleClass VehicleData::findClass(Hash model) {
-    if (VEHICLE::IS_THIS_MODEL_A_CAR(model))
-        return VehicleClass::Car;
-    if (VEHICLE::IS_THIS_MODEL_A_BICYCLE(model))
-        return VehicleClass::Bicycle;
-    if (VEHICLE::IS_THIS_MODEL_A_BIKE(model))
-        return VehicleClass::Bike;
-    if (VEHICLE::IS_THIS_MODEL_A_BOAT(model))
-        return VehicleClass::Boat;
-    if (VEHICLE::IS_THIS_MODEL_A_PLANE(model))
-        return VehicleClass::Plane;
-    if (VEHICLE::IS_THIS_MODEL_A_HELI(model))
-        return VehicleClass::Heli;
-    if (VEHICLE::IS_THIS_MODEL_A_QUADBIKE(model))
-        return VehicleClass::Quad;
-
+VehicleClass VehicleData::findClass(Hash model) {
+    if (VEHICLE::IS_THIS_MODEL_A_CAR(model))        return VehicleClass::Car;
+    if (VEHICLE::IS_THIS_MODEL_A_BICYCLE(model))    return VehicleClass::Bicycle;
+    if (VEHICLE::IS_THIS_MODEL_A_BIKE(model))       return VehicleClass::Bike;
+    if (VEHICLE::IS_THIS_MODEL_A_BOAT(model))       return VehicleClass::Boat;
+    if (VEHICLE::IS_THIS_MODEL_A_PLANE(model))      return VehicleClass::Plane;
+    if (VEHICLE::IS_THIS_MODEL_A_HELI(model))       return VehicleClass::Heli;
+    if (VEHICLE::IS_THIS_MODEL_A_QUADBIKE(model))   return VehicleClass::Quad;
     return VehicleClass::Unknown;
+}
+
+VehicleDomain VehicleData::findDomain(VehicleClass vehicleClass) {
+    switch(vehicleClass) {
+        case VehicleClass::Bicycle: return VehicleDomain::Bicycle;
+        case VehicleClass::Boat:    return VehicleDomain::Water;
+        case VehicleClass:: Heli:
+        case VehicleClass::Plane:   return VehicleDomain::Air;
+        case VehicleClass::Train:   return VehicleDomain::Rail;
+        case VehicleClass::Unknown: return VehicleDomain::Unknown;
+        default: return VehicleDomain::Road;
+    }
+}
+
+bool VehicleData::isAmphibious(VehicleExtensions &ext, Vehicle vehicle) {
+    auto type = ext.GetModelType(vehicle);
+    return (type == 6 || type == 7);
 }
 
 Vector3 VehicleData::GetRelativeAcceleration() {
