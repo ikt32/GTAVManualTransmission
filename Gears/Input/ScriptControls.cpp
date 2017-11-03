@@ -29,10 +29,6 @@ void ScriptControls::InitWheel() {
     }
 }
 
-float mapToFloat(int A, int B, float C, float D, int val) {
-    return ((float)val - (float)A) / ((float)B - (float)A) * (D - C) + C;
-}
-
 void ScriptControls::updateKeyboard() {
     ThrottleVal = (IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)]) ? 1.0f : 0.0f);
     BrakeVal = (IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Brake)]) ? 1.0f : 0.0f);
