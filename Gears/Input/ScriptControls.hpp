@@ -144,6 +144,9 @@ public:
     ~ScriptControls();
 
     void InitWheel();
+    void updateKeyboard();
+    void updateController();
+    void updateWheel();
     void UpdateValues(InputDevices prevInput, bool ignoreClutch, bool justPeekingWheelKb);
     InputDevices GetLastInputDevice(InputDevices previousInput, bool enableWheel = true);
 
@@ -187,19 +190,20 @@ public:
     float ClutchVal = 0.0f; 	// 1 = Pressed, 0 = Not pressed
     float ClutchValRaw = 0.0f;	// For readout purposes. ClutchVal is for gameplay purposes.
     float SteerVal = 0.5f;
+    float SteerValRaw = 0.0f;   // For readout purposes. SteerVal is used for gameplay.
     float HandbrakeVal = 0.0f;
 
     int CToggleTime = 1000;
-    int ThrottleUp = 0;
-    int ThrottleDown = 0;
-    int BrakeUp = 0;
-    int BrakeDown = 0;
-    int ClutchUp = 0;
-    int ClutchDown = 0;
-    int SteerLeft = 0;
-    int SteerRight = 0;
-    int HandbrakeUp = 0;
-    int HandbrakeDown = 0;
+    int ThrottleMin = 0;
+    int ThrottleMax = 0;
+    int BrakeMin = 0;
+    int BrakeMax = 0;
+    int ClutchMin = 0;
+    int ClutchMax = 0;
+    int SteerMin = 0;
+    int SteerMax = 0;
+    int HandbrakeMax = 0;
+    int HandbrakeMin = 0;
     int MaxTapTime = 200;
 
     bool InvertSteer = false;
@@ -210,6 +214,8 @@ public:
     float ADZThrottle = 0.25f;
     float ADZBrake = 0.25f;
     float ADZSteer = 0.25f;
+    float DZSteer = 0.0f;
+    float DZSteerOffset = 0.0f;
 
     float PlaneThrottle		= 0.0f;
     float PlaneBrake		= 0.0f;

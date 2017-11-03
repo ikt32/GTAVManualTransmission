@@ -581,31 +581,37 @@ void update_axesmenu() {
         "Handbrake: " + std::to_string(controls.HandbrakeVal),
     };
 
-    if (menu.OptionPlus("Calibrate steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr, "Input values")) {
+    if (menu.OptionPlus("Configure steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr, "Input values")) {
         bool result = configAxis("STEER");
-        showNotification(result ? "Steering axis saved" : "Cancelled steering axis calibration", &prevNotification);
+        showNotification(result ? "Steering axis saved" : "Cancelled steering axis configuration", &prevNotification);
         if (result) initWheel();
     }
-    if (menu.OptionPlus("Calibrate throttle", info, nullptr, std::bind(clearAxis, "THROTTLE"), nullptr, "Input values")) {
+    if (menu.OptionPlus("Configure throttle", info, nullptr, std::bind(clearAxis, "THROTTLE"), nullptr, "Input values")) {
         bool result = configAxis("THROTTLE");
-        showNotification(result ? "Throttle axis saved" : "Cancelled throttle axis calibration", &prevNotification);
+        showNotification(result ? "Throttle axis saved" : "Cancelled throttle axis configuration", &prevNotification);
         if (result) initWheel();
     }
-    if (menu.OptionPlus("Calibrate brake", info, nullptr, std::bind(clearAxis, "BRAKES"), nullptr, "Input values")) {
+    if (menu.OptionPlus("Configure brake", info, nullptr, std::bind(clearAxis, "BRAKES"), nullptr, "Input values")) {
         bool result = configAxis("BRAKES");
-        showNotification(result ? "Brake axis saved" : "Cancelled brake axis calibration", &prevNotification);
+        showNotification(result ? "Brake axis saved" : "Cancelled brake axis configuration", &prevNotification);
         if (result) initWheel();
     }
-    if (menu.OptionPlus("Calibrate clutch", info, nullptr, std::bind(clearAxis, "CLUTCH"), nullptr, "Input values")) {
+    if (menu.OptionPlus("Configure clutch", info, nullptr, std::bind(clearAxis, "CLUTCH"), nullptr, "Input values")) {
         bool result = configAxis("CLUTCH");
-        showNotification(result ? "Clutch axis saved" : "Cancelled clutch axis calibration", &prevNotification);
+        showNotification(result ? "Clutch axis saved" : "Cancelled clutch axis configuration", &prevNotification);
         if (result) initWheel();
     }
-    if (menu.OptionPlus("Calibrate handbrake", info, nullptr, std::bind(clearAxis, "HANDBRAKE_ANALOG"), nullptr, "Input values")) {
+    if (menu.OptionPlus("Configure handbrake", info, nullptr, std::bind(clearAxis, "HANDBRAKE_ANALOG"), nullptr, "Input values")) {
         bool result = configAxis("HANDBRAKE_ANALOG");
-        showNotification(result ? "Handbrake axis saved" : "Cancelled handbrake axis calibration", &prevNotification);
+        showNotification(result ? "Handbrake axis saved" : "Cancelled handbrake axis configuration", &prevNotification);
         if (result) initWheel();
     }
+
+    menu.FloatOption("Steering deadzone", controls.DZSteer, 0.0f, 0.5f, 0.01f, 
+                     { "Deadzone size, from the center of the wheel." });
+
+    menu.FloatOption("Steering deadzone offset", controls.DZSteerOffset, -0.5f, 0.5f, 0.01f,
+                     { "Put the deadzone with an offset from the center." });
 
     if (!settings.PatchSteeringControl) {
         menu.FloatOption("Steering anti-deadzone", controls.ADZSteer, 0.0f, 1.0f, 0.01f,

@@ -491,8 +491,8 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
         settingsWheel.GetValue("STEER", "AXLE", "");
     scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::ForceFeedback)] =
         settingsWheel.GetValue("STEER", "FFB", "");
-    scriptControl->SteerLeft = settingsWheel.GetLongValue("STEER", "MIN", -1);
-    scriptControl->SteerRight = settingsWheel.GetLongValue("STEER", "MAX", -1);
+    scriptControl->SteerMin = settingsWheel.GetLongValue("STEER", "MIN", -1);
+    scriptControl->SteerMax = settingsWheel.GetLongValue("STEER", "MAX", -1);
 
     scriptControl->ADZSteer = settingsWheel.GetDoubleValue("STEER", "ANTIDEADZONE", 0.25);
 
@@ -506,8 +506,8 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
         DeviceIndexToGUID(settingsWheel.GetLongValue("THROTTLE", "DEVICE", -1), reggdGuids);
     scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Throttle)] =
         settingsWheel.GetValue("THROTTLE", "AXLE", "");
-    scriptControl->ThrottleUp = settingsWheel.GetLongValue("THROTTLE", "MIN", -1);
-    scriptControl->ThrottleDown = settingsWheel.GetLongValue("THROTTLE", "MAX", -1);
+    scriptControl->ThrottleMin = settingsWheel.GetLongValue("THROTTLE", "MIN", -1);
+    scriptControl->ThrottleMax = settingsWheel.GetLongValue("THROTTLE", "MAX", -1);
     scriptControl->ADZThrottle = settingsWheel.GetDoubleValue("THROTTLE", "ANTIDEADZONE", 0.25);
 
     // [BRAKES]
@@ -515,8 +515,8 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
         DeviceIndexToGUID(settingsWheel.GetLongValue("BRAKES", "DEVICE", -1), reggdGuids);
     scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Brake)] =
         settingsWheel.GetValue("BRAKES", "AXLE", "");
-    scriptControl->BrakeUp = settingsWheel.GetLongValue("BRAKES", "MIN", -1);
-    scriptControl->BrakeDown = settingsWheel.GetLongValue("BRAKES", "MAX", -1);
+    scriptControl->BrakeMin = settingsWheel.GetLongValue("BRAKES", "MIN", -1);
+    scriptControl->BrakeMax = settingsWheel.GetLongValue("BRAKES", "MAX", -1);
     scriptControl->ADZBrake = settingsWheel.GetDoubleValue("BRAKES", "ANTIDEADZONE", 0.25);
 
     // [CLUTCH]
@@ -524,16 +524,16 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
         DeviceIndexToGUID(settingsWheel.GetLongValue("CLUTCH", "DEVICE", -1), reggdGuids);
     scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] =
         settingsWheel.GetValue("CLUTCH", "AXLE", "");
-    scriptControl->ClutchUp = settingsWheel.GetLongValue("CLUTCH", "MIN", -1);
-    scriptControl->ClutchDown = settingsWheel.GetLongValue("CLUTCH", "MAX", -1);
+    scriptControl->ClutchMin = settingsWheel.GetLongValue("CLUTCH", "MIN", -1);
+    scriptControl->ClutchMax = settingsWheel.GetLongValue("CLUTCH", "MAX", -1);
 
     // [HANDBRAKE_ANALOG]
     scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Handbrake)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "DEVICE", -1), reggdGuids);
     scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Handbrake)] =
         settingsWheel.GetValue("HANDBRAKE_ANALOG", "AXLE", "");
-    scriptControl->HandbrakeDown = settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "MIN", -1);
-    scriptControl->HandbrakeUp = settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "MAX", -1);
+    scriptControl->HandbrakeMin = settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "MIN", -1);
+    scriptControl->HandbrakeMax = settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "MAX", -1);
 
     // [SHIFTER]
     scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::H1)] =
