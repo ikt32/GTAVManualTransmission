@@ -179,7 +179,7 @@ public:
     bool ButtonReleased(WheelControlType control);
     bool ButtonHeld(WheelControlType control, int delay);
     bool ButtonIn(WheelControlType control);
-    void CheckCustomButtons(bool justPeeking);
+    void CheckCustomButtons();
 
     void CheckGUIDs(const std::vector<_GUID> &guids);
 
@@ -250,7 +250,7 @@ public:
     std::array<GUID, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxesGUIDs = {};
     std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
     std::array<GUID, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButtonGUIDs = {};
-    std::array<int, WheelDirectInput::MAX_RGBBUTTONS> WheelToKey = {};
+    std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
 
     GUID SteerGUID;
     GUID WheelToKeyGUID = {};

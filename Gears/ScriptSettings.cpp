@@ -661,7 +661,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
     // [TO_KEYBOARD]
     scriptControl->WheelToKeyGUID = 
         DeviceIndexToGUID(settingsWheel.GetLongValue("TO_KEYBOARD", "DEVICE", -1), reggdGuids);
-    for (int i = 0; i < WheelDirectInput::MAX_RGBBUTTONS; i++) { // Ouch
+    for (int i = 0; i < MAX_RGBBUTTONS; i++) {
         std::string entryString = settingsWheel.GetValue("TO_KEYBOARD", std::to_string(i).c_str(), "UNKNOWN");
         if (std::string(entryString).compare("UNKNOWN") == 0) {
             scriptControl->WheelToKey[i] = -1;
@@ -787,7 +787,7 @@ void ScriptSettings::SteeringSaveButton(const std::string & confTag, ptrdiff_t i
         logger.Write("Unable to save to " + settingsWheelFile);
 }
 
-void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t index, int button[numGears]) {
+void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t index, int button[NUMGEARS]) {
     CSimpleIniA settingsWheel;
     settingsWheel.SetUnicode();
     settingsWheel.LoadFile(settingsWheelFile.c_str());

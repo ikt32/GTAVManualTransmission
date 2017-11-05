@@ -177,7 +177,7 @@ bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
         return false;
     }
 
-    if (buttonType > 127) {
+    if (buttonType > MAX_RGBBUTTONS) {
         switch (buttonType) {
             case N:
                 if (e->joystate.rgdwPOV[0] == 0) {
@@ -202,11 +202,13 @@ bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
 }
 
 bool WheelDirectInput::IsButtonJustPressed(int buttonType, GUID device) {
-    if (buttonType > 127) { // POV
-        povButtonCurr[device][povDirectionToIndex(buttonType)] = IsButtonPressed(buttonType,device);
+    if (buttonType > MAX_RGBBUTTONS) { // POV
+        int povIndex = povDirectionToIndex(buttonType);
+        if (povIndex == -1) return false;
+        povButtonCurr[device][povIndex] = IsButtonPressed(buttonType,device);
 
         // raising edge
-        if (povButtonCurr[device][povDirectionToIndex(buttonType)] && !povButtonPrev[device][povDirectionToIndex(buttonType)]) {
+        if (povButtonCurr[device][povIndex] && !povButtonPrev[device][povIndex]) {
             return true;
         }
         return false;
@@ -221,11 +223,13 @@ bool WheelDirectInput::IsButtonJustPressed(int buttonType, GUID device) {
 }
 
 bool WheelDirectInput::IsButtonJustReleased(int buttonType, GUID device) {
-    if (buttonType > 127) { // POV
-        povButtonCurr[device][povDirectionToIndex(buttonType)] = IsButtonPressed(buttonType,device);
+    if (buttonType > MAX_RGBBUTTONS) { // POV
+        int povIndex = povDirectionToIndex(buttonType);
+        if (povIndex == -1) return false;
+        povButtonCurr[device][povIndex] = IsButtonPressed(buttonType,device);
 
         // falling edge
-        if (!povButtonCurr[device][povDirectionToIndex(buttonType)] && povButtonPrev[device][povDirectionToIndex(buttonType)]) {
+        if (!povButtonCurr[device][povIndex] && povButtonPrev[device][povIndex]) {
             return true;
         }
         return false;
@@ -240,17 +244,19 @@ bool WheelDirectInput::IsButtonJustReleased(int buttonType, GUID device) {
 }
 
 bool WheelDirectInput::WasButtonHeldForMs(int buttonType, GUID device, int millis) {
-    if (buttonType > 127) { // POV
+    if (buttonType >= MAX_RGBBUTTONS) { // POV
+        int povIndex = povDirectionToIndex(buttonType);
+        if (povIndex == -1) return false;
         if (IsButtonJustPressed(buttonType,device)) {
-            povPressTime[device][povDirectionToIndex(buttonType)] = milliseconds_now();
+            povPressTime[device][povIndex] = milliseconds_now();
         }
         if (IsButtonJustReleased(buttonType,device)) {
-            povReleaseTime[device][povDirectionToIndex(buttonType)] = milliseconds_now();
+            povReleaseTime[device][povIndex] = milliseconds_now();
         }
 
-        if ((povReleaseTime[device][povDirectionToIndex(buttonType)] - povPressTime[device][povDirectionToIndex(buttonType)]) >= millis) {
-            povPressTime[device][povDirectionToIndex(buttonType)] = 0;
-            povReleaseTime[device][povDirectionToIndex(buttonType)] = 0;
+        if ((povReleaseTime[device][povIndex] - povPressTime[device][povIndex]) >= millis) {
+            povPressTime[device][povIndex] = 0;
+            povReleaseTime[device][povIndex] = 0;
             return true;
         }
         return false;
@@ -276,7 +282,9 @@ void WheelDirectInput::UpdateButtonChangeStates() {
             rgbButtonPrev[device][i] = rgbButtonCurr[device][i];
         }
         for (auto pov : POVDirections) {
-            povButtonPrev[device][povDirectionToIndex(pov)] = povButtonCurr[device][povDirectionToIndex(pov)];
+            int povIndex = povDirectionToIndex(pov);
+            if (povIndex == -1) continue;
+            povButtonPrev[device][povIndex] = povButtonCurr[device][povIndex];
         }
     }
 }

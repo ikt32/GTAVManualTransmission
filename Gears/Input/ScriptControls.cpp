@@ -145,7 +145,8 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 
     //StickControl.Update();
 
-    CheckCustomButtons(justPeekingWheelKb);
+    if (!justPeekingWheelKb)   
+        CheckCustomButtons();
 
     // Update ThrottleVal, BrakeVal and ClutchVal ranging from 0.0f (no touch) to 1.0f (full press)
     switch (prevInput) {
@@ -423,14 +424,11 @@ bool ScriptControls::ButtonIn(WheelControlType control) {
     return false;
 }
 
-void ScriptControls::CheckCustomButtons(bool justPeeking) {
+void ScriptControls::CheckCustomButtons() {
     if (!WheelControl.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
         return;
     }
-    if (justPeeking) { // we do not want to send keyboard codes if we just test the device
-        return;
-    }
-    for (int i = 0; i < WheelDirectInput::MAX_RGBBUTTONS; i++) {
+    for (int i = 0; i < MAX_RGBBUTTONS; i++) {
         if (WheelToKey[i] != -1) {
             INPUT input;
             input.type = INPUT_KEYBOARD;

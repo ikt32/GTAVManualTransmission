@@ -17,13 +17,12 @@ namespace std {
     };
 }
 
+const int MAX_RGBBUTTONS = 128;
+const int AVGSAMPLES = 2;
+const int POVDIRECTIONS = 8;
+
 class WheelDirectInput {
 public:
-    static const int MAX_RGBBUTTONS = 128;
-    static const int AVGSAMPLES = 2;
-
-    static const int POVDIRECTIONS = 8;
-
     enum DIAxis {
         lX,
         lY,

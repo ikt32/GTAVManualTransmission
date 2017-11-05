@@ -661,7 +661,7 @@ void update_buttonsmenu() {
     wheelToKeyInfo.push_back("Active wheel-to-key options:");
     wheelToKeyInfo.push_back("Press RIGHT to clear a button");
     wheelToKeyInfo.push_back("Device: " + settings.GUIDToDeviceIndex(controls.WheelToKeyGUID));
-    for (int i = 0; i < WheelDirectInput::MAX_RGBBUTTONS; i++) {
+    for (int i = 0; i < MAX_RGBBUTTONS; i++) {
         if (controls.WheelToKey[i] != -1) {
             wheelToKeyInfo.push_back(std::to_string(i) + " = " + key2str(controls.WheelToKey[i]));
             if (controls.WheelControl.IsButtonPressed(i, controls.WheelToKeyGUID)) {
@@ -975,7 +975,7 @@ void addWheelToKey(const std::string &confTag, GUID devGUID, int button, std::st
     settings.Read(&controls);
 }
 
-void saveHShifter(const std::string &confTag, GUID devGUID, std::array<int, numGears> buttonArray) {
+void saveHShifter(const std::string &confTag, GUID devGUID, std::array<int, NUMGEARS> buttonArray) {
     std::wstring wDevName = controls.WheelControl.FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
     auto index = settings.SteeringAppendDevice(devGUID, devName);
@@ -1021,8 +1021,8 @@ void clearButton(std::string confTag) {
 }
 
 void clearHShifter() {
-    int empty[numGears] = {};
-    for (int i = 0; i < numGears; i++) {
+    int empty[NUMGEARS] = {};
+    for (int i = 0; i < NUMGEARS; i++) {
         empty[i] = -1;
     }
     settings.SteeringSaveHShifter("SHIFTER", -1, empty);
@@ -1309,7 +1309,7 @@ bool configHPattern() {
     controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
 
     GUID devGUID = {};
-    std::array<int, numGears> buttonArray; // There are gears 1-7 + R
+    std::array<int, NUMGEARS> buttonArray; // There are gears 1-7 + R
     std::fill(buttonArray.begin(), buttonArray.end(), -1);
 
     int progress = 0;
@@ -1325,7 +1325,7 @@ bool configHPattern() {
         controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
 
         for (auto guid : controls.WheelControl.GetGuids()) {
-            for (int i = 0; i < 255; i++) {
+            for (int i = 0; i < MAX_RGBBUTTONS; i++) {
                 // only find unregistered buttons
                 if (controls.WheelControl.IsButtonJustPressed(i, guid) &&
                     find(begin(buttonArray), end(buttonArray), i) == end(buttonArray)) {
