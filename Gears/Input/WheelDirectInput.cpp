@@ -11,6 +11,23 @@
 
 #define SAFE_RELEASE(p) { if(p) { (p)->Release(); (p)=nullptr; } }
 
+std::string formatError(HRESULT hr) {
+    switch (hr) {
+    case DI_OK:                     return "DI_OK";
+    case DIERR_INVALIDPARAM:        return "DIERR_INVALIDPARAM";
+    case DIERR_NOTINITIALIZED:      return "DIERR_NOTINITIALIZED";
+    case DIERR_ALREADYINITIALIZED:  return "DIERR_ALREADYINITIALIZED";
+    case DIERR_INPUTLOST:           return "DIERR_INPUTLOST";
+    case DIERR_ACQUIRED:            return "DIERR_ACQUIRED";
+    case DIERR_NOTACQUIRED:         return "DIERR_NOTACQUIRED";
+    case E_HANDLE:                  return "E_HANDLE";
+    case DIERR_DEVICEFULL:          return "DIERR_DEVICEFULL";
+    case DIERR_DEVICENOTREG:        return "DIERR_DEVICENOTREG";
+    default:                        return "UNKNOWN";
+    }
+}
+
+
 WheelDirectInput::WheelDirectInput() : pCFEffect{nullptr},
                                        pFREffect{nullptr} { }
 
@@ -106,8 +123,7 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
     if (FAILED(hr = e->diDevice->SetCooperativeLevel(GetForegroundWindow(),
                                                      DISCL_EXCLUSIVE | 
                                                      DISCL_FOREGROUND))) {
-        std::string hrStr;
-        formatError(hr, hrStr);
+        std::string hrStr = formatError(hr);
         logger.Write(ERROR, "WHEEL: Acquire FFB device error");
         logger.Write(ERROR, "WHEEL: HRESULT = " + hrStr);
         std::stringstream ss;
@@ -286,8 +302,24 @@ void WheelDirectInput::UpdateButtonChangeStates() {
 }
 
 int filterException(int code, PEXCEPTION_POINTERS ex) {
-    logger.Writef(ERROR, "Caught exception %d", code);
+    logger.Writef(FATAL, "Caught exception %d", code);
+    logger.Writef(FATAL, "\tException address 0x%X", ex->ExceptionRecord->ExceptionAddress);
     return EXCEPTION_EXECUTE_HANDLER;
+}
+
+void logCreateEffectException(const DiJoyStick::Entry *e) {
+    logger.Write(FATAL, "CreateEffect caused an exception!");
+    GUID guid = e->diDeviceInstance.guidInstance;
+    wchar_t szGuidW[40] = { 0 };
+    StringFromGUID2(guid, szGuidW, 40);
+    char szGuid[40] = { 0 };
+    size_t   i;  
+    wcstombs_s(&i, szGuid, szGuidW, 40);
+    logger.Writef(FATAL, "\tGUID: %s", szGuid);
+}
+
+void logCreateEffectError(HRESULT hr) {
+    logger.Write(ERROR, "CreateEffect failed: " + formatError(hr));
 }
 
 bool WheelDirectInput::createConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis) {
@@ -333,10 +365,12 @@ bool WheelDirectInput::createConstantForceEffect(const DiJoyStick::Entry *e, DIA
         hr = e->diDevice->CreateEffect(GUID_ConstantForce, &diEffect, &pCFEffect, nullptr);
     }
     __except (filterException(GetExceptionCode(), GetExceptionInformation())) {
+        logCreateEffectException(e);
         return false;
     }
     
     if (FAILED(hr) || !pCFEffect) {
+        logCreateEffectError(hr);
         return false;
     }
 
@@ -374,7 +408,7 @@ void WheelDirectInput::SetConstantForce(GUID device, WheelDirectInput::DIAxis ff
             DIEP_DIRECTION | DIEP_TYPESPECIFICPARAMS | DIEP_START);
     }
     __except(0) {
-
+        // handle silently to not spam the log
     }
 
 }
@@ -493,29 +527,6 @@ void WheelDirectInput::PlayLedsDInput(GUID guid, const FLOAT currentRPM, const F
     data_.cbInBuffer = sizeof(wheelData_);
 
     e->diDevice->Escape(&data_);
-}
-
-void WheelDirectInput::formatError(HRESULT hr, std::string &hrStr) {
-    switch (hr) {
-        case DI_OK: hrStr = "DI_OK";
-            break;
-        case DIERR_INVALIDPARAM: hrStr = "DIERR_INVALIDPARAM";
-            break;
-        case DIERR_NOTINITIALIZED: hrStr = "DIERR_NOTINITIALIZED";
-            break;
-        case DIERR_ALREADYINITIALIZED: hrStr = "DIERR_ALREADYINITIALIZED";
-            break;
-        case DIERR_INPUTLOST: hrStr = "DIERR_INPUTLOST";
-            break;
-        case DIERR_ACQUIRED: hrStr = "DIERR_ACQUIRED";
-            break;
-        case DIERR_NOTACQUIRED: hrStr = "DIERR_NOTACQUIRED";
-            break;
-        case E_HANDLE: hrStr = "E_HANDLE";
-            break;
-        default: hrStr = "UNKNOWN";
-            break;
-    }
 }
 
 int WheelDirectInput::povDirectionToIndex(int povDirection) {

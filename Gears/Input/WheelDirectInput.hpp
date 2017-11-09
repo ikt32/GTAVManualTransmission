@@ -98,7 +98,6 @@ public:
 private:
     void updateAxisSpeed();
     bool createConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis);
-    void formatError(HRESULT hr, std::string &hrStr);
     int povDirectionToIndex(int povDirection);
 
     std::vector<GUID> foundGuids;
