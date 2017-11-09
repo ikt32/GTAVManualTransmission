@@ -4,15 +4,22 @@
 #include <Windows.h>
 #include <fstream>
 
-Logger::Logger() {}
+Logger::Logger() {
+#ifdef _DEBUG
+    minLevel = DEBUG;
+#endif
+}
 
 void Logger::SetFile(const std::string &fileName) {
     file = fileName;
 }
 
 void Logger::SetMinLevel(LogLevel level) {
-    if (minLevel == DEBUG) return;
+#ifdef _DEBUG
+    minLevel = DEBUG;
+#else
     minLevel = level;
+#endif
 }
 
 void Logger::Clear() {
