@@ -152,8 +152,10 @@
     <ClInclude Include="..\thirdparty\MiniPID\MiniPID.h">
       <Filter>Thirdparty</Filter>
     </ClInclude>
-    <ClInclude Include="Dump.h" />
     <ClInclude Include="newNatives.h" />
+    <ClInclude Include="Dump.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -173,6 +175,9 @@
     </Filter>
     <Filter Include="Thirdparty">
       <UniqueIdentifier>{d0a967a3-e709-4563-beec-8bb1bc9d1711}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{928e77b9-6e75-4aa8-85f8-f3cac0985cca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

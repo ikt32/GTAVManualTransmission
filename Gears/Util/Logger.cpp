@@ -1,6 +1,5 @@
 #include "Logger.hpp"
 
-#include <fstream>
 #include <iomanip>
 #include <Windows.h>
 
@@ -10,14 +9,13 @@ void Logger::SetFile(const std::string &fileName) {
     file = fileName;
 }
 
-void Logger::Clear() const {
-    std::ofstream logFile;
+void Logger::Clear() {
     logFile.open(file, std::ofstream::out | std::ofstream::trunc);
     logFile.close();
 }
 
-void Logger::Write(const std::string& text) const {
-    std::ofstream logFile(file, std::ios_base::out | std::ios_base::app);
+void Logger::Write(const std::string& text) {
+    logFile.open(file, std::ios_base::out | std::ios_base::app);
     SYSTEMTIME currTimeLog;
     GetLocalTime(&currTimeLog);
     logFile << "[" <<

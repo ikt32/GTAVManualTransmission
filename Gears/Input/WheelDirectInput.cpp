@@ -27,6 +27,7 @@ WheelDirectInput::~WheelDirectInput() {
 }
 
 bool WheelDirectInput::PreInit() {
+    //logger.Write("WHEEL: Preparing DiJoystick");
     // Just set up to ensure djs can always be used.
     if (FAILED(DirectInput8Create(GetModuleHandle(nullptr),
         DIRECTINPUT_VERSION,
@@ -41,18 +42,13 @@ bool WheelDirectInput::PreInit() {
 
 bool WheelDirectInput::InitWheel() {
     logger.Write("WHEEL: Initializing input devices"); 
-    if (lpDi == nullptr) {
-        if (FAILED(DirectInput8Create(GetModuleHandle(nullptr),
-            DIRECTINPUT_VERSION,
-            IID_IDirectInput8,
-            reinterpret_cast<void**>(&lpDi),
-            nullptr))) {
-            logger.Write("WHEEL: DirectInput create failed again");
-            return false;
-        }
+
+    logger.Write("WHEEL: Setting up DirectInput interface");
+    if (!PreInit()) {
+        logger.Write("WHEEL: Failed setting up DirectInput interface");
+        return false;
     }
 
-    djs.enumerate(lpDi);
     logger.Write("WHEEL: Found " + std::to_string(djs.getEntryCount()) + " device(s)");
 
     if (djs.getEntryCount() < 1) {
@@ -327,6 +323,7 @@ bool WheelDirectInput::createConstantForceEffect(const DiJoyStick::Entry *e, DIA
     diEffect.lpvTypeSpecificParams = &cf;
     diEffect.dwStartDelay = 0;
 
+    // Call to this crashes? (G920 + SHVDN)
     hr = e->diDevice->CreateEffect(GUID_ConstantForce, &diEffect, &pCFEffect, nullptr);
     
     if (FAILED(hr) || !pCFEffect) {

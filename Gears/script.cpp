@@ -45,6 +45,7 @@ int textureWheelId;
 GameSound gearRattle("DAMAGED_TRUCK_IDLE", 0);
 int soundID;
 
+std::string absoluteModPath;
 std::string settingsGeneralFile;
 std::string settingsWheelFile;
 std::string settingsStickFile;
@@ -2218,6 +2219,104 @@ std::string getInputDevice() {
     }
 }
 
+/*
+ * 0: __try __except
+ * 1: try catch
+ */
+void cleanup(int type) {
+    showNotification("~b~Manual Transmission~w~~n~Script crashed! Check Gears.log");
+    logger.Writef("CRASH: Init shutdown: %s", type == 0 ? "__except" : "catch");
+    bool successI = MemoryPatcher::RestoreInstructions();
+    bool successS = MemoryPatcher::RestoreSteeringCorrection();
+    bool successSC = MemoryPatcher::RestoreSteeringControl();
+    bool successB = MemoryPatcher::RestoreBrakeDecrement();
+    resetSteeringMultiplier();
+    if (successI && successS && successSC && successB) {
+        logger.Write("CRASH: Shut down script cleanly");
+    }
+    else {
+        if (!successI)
+            logger.Write("WARNING: Shut down script with instructions not restored");
+        if (!successS)
+            logger.Write("WARNING: Shut down script with steer correction not restored");
+        if (!successSC)
+            logger.Write("WARNING: Shut down script with steer control not restored");
+        if (!successB)
+            logger.Write("WARNING: Shut down script with brake decrement not restored");
+    }
+}
+
+#ifdef _DEBUG
+//https://blogs.msdn.microsoft.com/zhanli/2010/06/25/structured-exception-handling-seh-and-c-exception-handling/
+//https://msdn.microsoft.com/en-us/library/5z4bw5h5.aspx
+void trans_func(unsigned int, EXCEPTION_POINTERS*);
+
+class SE_Exception {
+private:
+    unsigned int nSE;
+public:
+    SE_Exception() {}
+    SE_Exception(unsigned int n) : nSE(n) {}
+    ~SE_Exception() {}
+    unsigned int getSeNumber() { return nSE; }
+};
+
+void trans_func(unsigned int u, EXCEPTION_POINTERS* pExp) {
+    logger.Write("Translator function");
+    DumpStackTrace(pExp);
+    throw SE_Exception();
+}
+
+bool cppMain() {
+    try {
+        update();
+        update_menu();
+        WAIT(0);
+    }
+    catch (const std::exception &e) {
+        logger.Writef("std::exception: %s", e.what());
+        cleanup(1);
+        return true;
+    }
+    catch (const int ex) {
+        logger.Writef("int exception: %d", ex);
+        cleanup(1);
+        return true;
+    }
+    catch (const long ex) {
+        logger.Writef("long exception: %d", ex);
+        cleanup(1);
+        return true;
+    }
+    catch (const char * ex) {
+        logger.Writef("string exception: %d", ex);
+        cleanup(1);
+        return true;
+    }
+    catch (const char ex) {
+        logger.Writef("char exception: %c", ex);
+        cleanup(1);
+        return true;
+    }
+    catch(...) {
+        auto currExp = std::current_exception();
+        cleanup(1);
+        return true;
+    }
+    return false;
+}
+
+bool cMain() {
+    __try {
+        return cppMain();
+    }
+    __except (DumpStackTrace(GetExceptionInformation())) {
+        cleanup(0);
+        return true;
+    }
+}
+#endif
+
 void main() {
     logger.Write("Script started");
 
@@ -2236,7 +2335,7 @@ void main() {
     //	logger.Write("STICK: DirectInput failed to initialize");
     //}
 
-    std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir;
+    absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir;
     settingsGeneralFile = absoluteModPath + "\\settings_general.ini";
     settingsWheelFile = absoluteModPath + "\\settings_wheel.ini";
     settingsStickFile = absoluteModPath + "\\settings_stick.ini";
@@ -2260,38 +2359,11 @@ void main() {
 
     initialize();
     logger.Write("START: Initialization finished");
-    logger.Write("START: Starting with MT:  " + std::string(settings.EnableManual ? "ON" : "OFF"));
+    logger.Writef("START: Starting with MT:  ", settings.EnableManual ? "ON" : "OFF");
 
     while (true) {
 #ifdef _DEBUG
-        __try {
-            update();
-            update_menu();
-            WAIT(0);
-        }
-        __except (DumpStackTrace(GetExceptionInformation())) {
-            showNotification("~b~Manual Transmission~w~~n~Script crashed! Check Gears.log");
-            logger.Write("CRASH: Init shutdown");
-            bool successI = MemoryPatcher::RestoreInstructions();
-            bool successS = MemoryPatcher::RestoreSteeringCorrection();
-            bool successSC = MemoryPatcher::RestoreSteeringControl();
-            bool successB = MemoryPatcher::RestoreBrakeDecrement();
-            resetSteeringMultiplier();
-            if (successI && successS && successSC && successB) {
-                logger.Write("CRASH: Shut down script cleanly");
-            }
-            else {
-                if (!successI)
-                    logger.Write("WARNING: Shut down script with instructions not restored");
-                if (!successS)
-                    logger.Write("WARNING: Shut down script with steer correction not restored");
-                if (!successSC)
-                    logger.Write("WARNING: Shut down script with steer control not restored");
-                if (!successB)
-                    logger.Write("WARNING: Shut down script with brake decrement not restored");
-            }
-            return;
-        }
+        if (cMain()) return;
 #else
         update();
         update_menu();
@@ -2301,6 +2373,9 @@ void main() {
 }
 
 void ScriptMain() {
+#ifdef _DEBUG
+    _set_se_translator(trans_func);
+#endif
     srand(GetTickCount());
     main();
 }

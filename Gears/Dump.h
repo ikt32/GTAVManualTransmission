@@ -106,7 +106,7 @@ DWORD DumpStackTrace(EXCEPTION_POINTERS *ep)
     // Load the symbols:
     // WARNING: You'll need to replace <pdb-search-path> with either NULL
     // or some folder where your clients will be able to find the .pdb file.
-    if (!SymInitialize(process, "./", false))
+    if (!SymInitialize(process, NULL, false))
         throw(std::logic_error("Unable to initialize symbol handler"));
     DWORD symOptions = SymGetOptions();
     symOptions |= SYMOPT_LOAD_LINES | SYMOPT_UNDNAME;
