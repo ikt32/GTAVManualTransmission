@@ -4,6 +4,7 @@
 #include <vector>
 #include "simpleini/SimpleIni.h"
 #include "ShiftModes.h"
+#include "Util/Logger.hpp"
 
 class Logger;
 class ScriptControls;
@@ -122,6 +123,7 @@ public:
     bool DisplayGearingInfo = false;
     bool DisplayWheelInfo = false;
     bool DisplayFFBInfo = false;
+    int LogLevel = INFO;
 
     std::vector<GUID> reggdGuids;
 

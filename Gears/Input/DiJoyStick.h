@@ -104,15 +104,18 @@ protected:
 
             LPDIRECTINPUTDEVICE8 did = nullptr;
 
-            if (SUCCEEDED(di->CreateDevice(lpddi->guidInstance, reinterpret_cast<LPDIRECTINPUTDEVICE*>(&did), nullptr))) {
-                if (SUCCEEDED(did->SetDataFormat(lpdf))) {
-                    // Second call to this crashes? (G920 + SHVDN)
-                    if (SUCCEEDED(did->GetCapabilities(&e.diDevCaps))) {
-                        e.diDevice = did;
-                        entry[nEntry++] = e;
-                    }
-                }
+            if (FAILED(di->CreateDevice(lpddi->guidInstance, reinterpret_cast<LPDIRECTINPUTDEVICE*>(&did), nullptr))) {
+                return DIENUM_CONTINUE;
             }
+            if (FAILED(did->SetDataFormat(lpdf))) {
+                return DIENUM_CONTINUE;
+            }
+            // Second call to this crashes? (G920 + SHVDN)
+            //if (FAILED(did->GetCapabilities(&e.diDevCaps))) {
+            //    return DIENUM_CONTINUE;
+            //}
+            e.diDevice = did;
+            entry[nEntry++] = e;
         }
         return DIENUM_CONTINUE;
     }

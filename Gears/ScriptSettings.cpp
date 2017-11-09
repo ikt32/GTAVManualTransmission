@@ -7,6 +7,9 @@
 #include "Input/keyboard.h"
 #include "Input/ScriptControls.hpp"
 
+#pragma warning(push)
+#pragma warning(disable: 4244)
+
 ScriptSettings::ScriptSettings() { }
 
 void ScriptSettings::SetFiles(const std::string &general, const std::string &wheel, const std::string &stick) {
@@ -219,8 +222,6 @@ std::vector<GUID> ScriptSettings::GetGuids() {
 }
 
 void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
-#pragma warning(push)
-#pragma warning(disable: 4244)
     CSimpleIniA settingsGeneral;
     settingsGeneral.SetUnicode();
     settingsGeneral.LoadFile(settingsGeneralFile.c_str());
@@ -388,13 +389,11 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
     DisplayWheelInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayWheelInfo", false);
     DisplayGearingInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayGearingInfo", false);
     DisplayFFBInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayFFBInfo", false); 
-#pragma warning(pop)
+    LogLevel = settingsGeneral.GetLongValue("DEBUG", "LogLevel", INFO);
 
 }
 
 void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
-#pragma warning(push)
-#pragma warning(disable: 4244)
     CSimpleIniA settingsWheel;
     settingsWheel.SetUnicode();
     settingsWheel.LoadFile(settingsWheelFile.c_str());
@@ -464,7 +463,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
                     errStr = "Something went terribly wrong.";
                     break;
             }
-            logger.Write("CLSIDFromString error: " + errStr);
+            logger.Write(DEBUG, "CLSIDFromString error: " + errStr);
         }
         reggdGuids.push_back(guid);		
         it++;
@@ -670,7 +669,6 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
             scriptControl->WheelToKey[i] = str2key(entryString);
         }
     }
-#pragma warning(pop)
 
 }
 
@@ -749,7 +747,7 @@ ptrdiff_t ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, std::string
     settingsWheel.SetValue("INPUT_DEVICES", newGUID.c_str(), GUID2String(dev_guid).c_str());
     int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
     if (err < 0)
-        logger.Write("Unable to save to " + settingsWheelFile);
+        logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
     return newIndex;
 }
 void ScriptSettings::SteeringSaveAxis(const std::string &confTag, ptrdiff_t index, const std::string & axis, int minVal, int maxVal) {
@@ -762,7 +760,7 @@ void ScriptSettings::SteeringSaveAxis(const std::string &confTag, ptrdiff_t inde
     settingsWheel.SetValue(confTag.c_str(), "MAX", std::to_string(maxVal).c_str());
     int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
     if (err < 0)
-        logger.Write("Unable to save to " + settingsWheelFile);
+        logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
 }
 
 void ScriptSettings::SteeringSaveFFBAxis(const std::string & confTag, ptrdiff_t index, const std::string & axis) {
@@ -773,7 +771,7 @@ void ScriptSettings::SteeringSaveFFBAxis(const std::string & confTag, ptrdiff_t 
     settingsWheel.SetValue(confTag.c_str(), "FFB", axis.c_str());
     int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
     if (err < 0)
-        logger.Write("Unable to save to " + settingsWheelFile);
+        logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
 }
 
 void ScriptSettings::SteeringSaveButton(const std::string & confTag, ptrdiff_t index, int button) {
@@ -784,7 +782,7 @@ void ScriptSettings::SteeringSaveButton(const std::string & confTag, ptrdiff_t i
     settingsWheel.SetLongValue(confTag.c_str(), "BUTTON", button);
     int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
     if (err < 0)
-        logger.Write("Unable to save to " + settingsWheelFile);
+        logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
 }
 
 void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t index, int button[NUMGEARS]) {
@@ -802,7 +800,7 @@ void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t
     settingsWheel.SetLongValue(confTag.c_str(), "GEAR_7", button[7]);
     int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
     if (err < 0)
-        logger.Write("Unable to save to " + settingsWheelFile);
+        logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
 }
 
 void ScriptSettings::SteeringAddWheelToKey(const std::string &confTag, ptrdiff_t index, int button, const std::string &keyName) {
@@ -813,7 +811,7 @@ void ScriptSettings::SteeringAddWheelToKey(const std::string &confTag, ptrdiff_t
     settingsWheel.SetValue(confTag.c_str(), std::to_string(button).c_str(), keyName.c_str());
     int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
     if (err < 0)
-        logger.Write("Unable to save to " + settingsWheelFile);
+        logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
 }
 
 bool ScriptSettings::SteeringClearWheelToKey(int button) {
@@ -823,7 +821,7 @@ bool ScriptSettings::SteeringClearWheelToKey(int button) {
     bool result = settingsWheel.Delete("TO_KEYBOARD", std::to_string(button).c_str(), true);
     int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
     if (err < 0)
-        logger.Write("Unable to save to " + settingsWheelFile);
+        logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
     return result;
 }
 
@@ -837,7 +835,7 @@ void ScriptSettings::StickSaveAxis(const std::string &confTag, ptrdiff_t index, 
     settingsStick.SetValue(confTag.c_str(), "MAX", std::to_string(maxVal).c_str());
     int err = settingsStick.SaveFile(settingsStickFile.c_str());
     if (err < 0)
-        logger.Write("Unable to save to " + settingsStickFile);
+        logger.Write(ERROR, "Unable to save to " + settingsStickFile);
 }
 
 void ScriptSettings::KeyboardSaveKey(const std::string &confTag, const std::string &key) {
@@ -847,7 +845,7 @@ void ScriptSettings::KeyboardSaveKey(const std::string &confTag, const std::stri
     settingsGeneral.SetValue("KEYBOARD", confTag.c_str(), key.c_str());
     int err = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
     if (err < 0)
-        logger.Write("Unable to save to " + settingsGeneralFile);
+        logger.Write(ERROR, "Unable to save to " + settingsGeneralFile);
 }
 void ScriptSettings::ControllerSaveButton(const std::string &confTag, const std::string &button) {
     CSimpleIniA settingsGeneral;
@@ -857,7 +855,7 @@ void ScriptSettings::ControllerSaveButton(const std::string &confTag, const std:
 
     int err = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
     if (err < 0)
-        logger.Write("Unable to save to " + settingsGeneralFile);
+        logger.Write(ERROR, "Unable to save to " + settingsGeneralFile);
 }
 
 void ScriptSettings::LControllerSaveButton(const std::string &confTag, int button) {
@@ -868,7 +866,7 @@ void ScriptSettings::LControllerSaveButton(const std::string &confTag, int butto
 
     int err = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
     if (err < 0)
-        logger.Write("Unable to save to " + settingsGeneralFile);
+        logger.Write(ERROR, "Unable to save to " + settingsGeneralFile);
 }
 
 GUID ScriptSettings::DeviceIndexToGUID(int device, std::vector<GUID> guids) {
@@ -891,3 +889,5 @@ int ScriptSettings::GUIDToDeviceIndex(GUID guidToFind) {
     }
     return -1;
 }
+
+#pragma warning(pop)

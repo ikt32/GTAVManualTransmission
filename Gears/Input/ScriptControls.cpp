@@ -489,9 +489,9 @@ void ScriptControls::CheckGUIDs(const std::vector<_GUID> & guids) {
         foundGuids.begin(), foundGuids.end(), std::back_inserter(missingReg));
 
     if (missingReg.size() > 0) {
-        logger.Write("WHEEL: Used in .ini, unavailable: ");
+        logger.Write(WARN, "WHEEL: Used in .ini, unavailable: ");
         for (auto g : missingReg) {
-            logger.Write(std::string("    ") + GUID2String(g));
+            logger.Write(WARN, std::string("    ") + GUID2String(g));
         }
     }
 
@@ -501,9 +501,9 @@ void ScriptControls::CheckGUIDs(const std::vector<_GUID> & guids) {
         reggdGuids.begin(), reggdGuids.end(), std::back_inserter(missingFnd));
 
     if (missingFnd.size() > 0) {
-        logger.Write("WHEEL: Not set up in .ini: ");
+        logger.Write(INFO, "WHEEL: Not set up in .ini: ");
         for (auto g : missingFnd) {
-            logger.Write(std::string("    ") + GUID2String(g));
+            logger.Write(INFO, std::string("    ") + GUID2String(g));
         }
     }
 }

@@ -389,7 +389,8 @@ void initVehicle() {
 void initialize() {
     settings.Read(&controls);
     menu.ReadSettings();
-    logger.Write("Settings read");
+    logger.SetMinLevel((LogLevel)settings.LogLevel);
+    logger.Write(INFO, "Settings read");
 
     speedoIndex = static_cast<int>(std::find(speedoTypes.begin(), speedoTypes.end(), settings.Speedo) - speedoTypes.begin());
     if (speedoIndex >= speedoTypes.size()) {
@@ -443,7 +444,7 @@ void initWheel() {
     // controls.StickControl.InitDevice();
     controls.CheckGUIDs(settings.reggdGuids);
     controls.SteerGUID = controls.WheelAxesGUIDs[static_cast<int>(controls.SteerAxisType)];
-    logger.Write("WHEEL: Steering wheel initialization finished");
+    logger.Write(INFO, "WHEEL: Steering wheel initialization finished");
 }
 
 void stopForceFeedback() {
@@ -2164,7 +2165,7 @@ void registerDecorator(const char *thing, eDecorType type) {
 
     if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE((char*)thing, type)) {
         DECORATOR::DECOR_REGISTER((char*)thing, type);
-        logger.Writef("DECOR: Registered \"%s\" as %s", thing, strType.c_str());
+        logger.Writef(DEBUG, "DECOR: Registered \"%s\" as %s", thing, strType.c_str());
     }
 }
 
@@ -2225,24 +2226,24 @@ std::string getInputDevice() {
  */
 void cleanup(int type) {
     showNotification("~b~Manual Transmission~w~~n~Script crashed! Check Gears.log");
-    logger.Writef("CRASH: Init shutdown: %s", type == 0 ? "__except" : "catch");
+    logger.Writef(FATAL, "CRASH: Init shutdown: %s", type == 0 ? "__except" : "catch");
     bool successI = MemoryPatcher::RestoreInstructions();
     bool successS = MemoryPatcher::RestoreSteeringCorrection();
     bool successSC = MemoryPatcher::RestoreSteeringControl();
     bool successB = MemoryPatcher::RestoreBrakeDecrement();
     resetSteeringMultiplier();
     if (successI && successS && successSC && successB) {
-        logger.Write("CRASH: Shut down script cleanly");
+        logger.Write(FATAL, "CRASH: Shut down script cleanly");
     }
     else {
         if (!successI)
-            logger.Write("WARNING: Shut down script with instructions not restored");
+            logger.Write(WARN, "Shut down script with instructions not restored");
         if (!successS)
-            logger.Write("WARNING: Shut down script with steer correction not restored");
+            logger.Write(WARN, "Shut down script with steer correction not restored");
         if (!successSC)
-            logger.Write("WARNING: Shut down script with steer control not restored");
+            logger.Write(WARN, "Shut down script with steer control not restored");
         if (!successB)
-            logger.Write("WARNING: Shut down script with brake decrement not restored");
+            logger.Write(WARN, "Shut down script with brake decrement not restored");
     }
 }
 
@@ -2262,7 +2263,7 @@ public:
 };
 
 void trans_func(unsigned int u, EXCEPTION_POINTERS* pExp) {
-    logger.Write("Translator function");
+    logger.Write(FATAL, "Translator function");
     DumpStackTrace(pExp);
     throw SE_Exception();
 }
@@ -2274,27 +2275,27 @@ bool cppMain() {
         WAIT(0);
     }
     catch (const std::exception &e) {
-        logger.Writef("std::exception: %s", e.what());
+        logger.Writef(FATAL, "std::exception: %s", e.what());
         cleanup(1);
         return true;
     }
     catch (const int ex) {
-        logger.Writef("int exception: %d", ex);
+        logger.Writef(FATAL, "int exception: %d", ex);
         cleanup(1);
         return true;
     }
     catch (const long ex) {
-        logger.Writef("long exception: %d", ex);
+        logger.Writef(FATAL, "long exception: %d", ex);
         cleanup(1);
         return true;
     }
     catch (const char * ex) {
-        logger.Writef("string exception: %d", ex);
+        logger.Writef(FATAL, "string exception: %d", ex);
         cleanup(1);
         return true;
     }
     catch (const char ex) {
-        logger.Writef("char exception: %c", ex);
+        logger.Writef(FATAL, "char exception: %c", ex);
         cleanup(1);
         return true;
     }
@@ -2318,17 +2319,17 @@ bool cMain() {
 #endif
 
 void main() {
-    logger.Write("Script started");
+    logger.Write(INFO, "Script started");
 
     ext.initOffsets();
 
-    logger.Write("Setting up globals");
+    logger.Write(INFO, "Setting up globals");
     if (!setupGlobals()) {
-        logger.Write("Global setup failed!");
+        logger.Write(ERROR, "Global setup failed!");
     }
 
     if (!controls.WheelControl.PreInit()) {
-        logger.Write("WHEEL: DirectInput failed to initialize");
+        logger.Write(ERROR, "WHEEL: DirectInput failed to initialize");
     }
 
     //if (!controls.StickControl.PreInit()) {
@@ -2346,7 +2347,7 @@ void main() {
         textureWheelId = createTexture(textureWheelFile.c_str());
     }
     else {
-        logger.Write("ERROR: " + textureWheelFile + " does not exist.");
+        logger.Write(ERROR, textureWheelFile + " does not exist.");
         textureWheelId = -1;
     }
 
@@ -2358,8 +2359,8 @@ void main() {
     menu.SetFiles(settingsMenuFile);
 
     initialize();
-    logger.Write("START: Initialization finished");
-    logger.Writef("START: Starting with MT:  ", settings.EnableManual ? "ON" : "OFF");
+    logger.Write(INFO, "START: Initialization finished");
+    logger.Writef(DEBUG, "START: Starting with MT:  ", settings.EnableManual ? "ON" : "OFF");
 
     while (true) {
 #ifdef _DEBUG

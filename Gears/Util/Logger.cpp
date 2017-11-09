@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <Windows.h>
+#include <fstream>
 
 Logger::Logger() {}
 
@@ -9,13 +10,18 @@ void Logger::SetFile(const std::string &fileName) {
     file = fileName;
 }
 
-void Logger::Clear() {
-    logFile.open(file, std::ofstream::out | std::ofstream::trunc);
-    logFile.close();
+void Logger::SetMinLevel(LogLevel level) {
+    if (minLevel == DEBUG) return;
+    minLevel = level;
 }
 
-void Logger::Write(const std::string& text) {
-    logFile.open(file, std::ios_base::out | std::ios_base::app);
+void Logger::Clear() {
+    std::ofstream logFile(file, std::ofstream::out | std::ofstream::trunc);
+}
+
+void Logger::Write(LogLevel level, const std::string& text) {
+    if (level < minLevel) return;
+    std::ofstream logFile(file, std::ios_base::out | std::ios_base::app);
     SYSTEMTIME currTimeLog;
     GetLocalTime(&currTimeLog);
     logFile << "[" <<
@@ -23,20 +29,22 @@ void Logger::Write(const std::string& text) {
         std::setw(2) << std::setfill('0') << currTimeLog.wMinute << ":" <<
         std::setw(2) << std::setfill('0') << currTimeLog.wSecond << "." <<
         std::setw(3) << std::setfill('0') << currTimeLog.wMilliseconds << "] " <<
+        "[ " << levelText(level) << " ] " <<
         text << "\n";
 }
 
-int Logger::Writef(char *fmt, ...) {
+void Logger::Writef(LogLevel level, char *fmt, ...) {
     const int size = 1024;
     char buff[size];
-    int result;
     va_list args;
     va_start(args, fmt);
-    result = vsnprintf(buff, size, fmt, args);
+    vsnprintf(buff, size, fmt, args);
     va_end(args);
+    Write(level, buff);
+}
 
-    Write(buff);
-    return result;
+std::string Logger::levelText(LogLevel level) {
+    return levelStrings[level];
 }
 
 // Everything's gonna use this instance.

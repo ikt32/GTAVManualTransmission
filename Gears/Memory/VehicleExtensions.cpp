@@ -25,102 +25,102 @@ VehicleExtensions::VehicleExtensions() {
 void VehicleExtensions::initOffsets() {
     uintptr_t addr = mem::FindPattern("\x3A\x91\x00\x00\x00\x00\x74\x00\x84\xD2", "xx????x?xx");
     rocketBoostActiveOffset = addr == 0 ? 0 : *(int*)(addr + 2);
-    logger.Writef("Rocket Boost Active Offset: 0x%X", rocketBoostActiveOffset);
+    logger.Writef(DEBUG, "Rocket Boost Active Offset: 0x%X", rocketBoostActiveOffset);
 
     addr = mem::FindPattern("\x48\x8B\x47\x00\xF3\x44\x0F\x10\x9F\x00\x00\x00\x00", "xxx?xxxxx????");
     rocketBoostChargeOffset = addr == 0 ? 0 : *(int*)(addr + 9);
-    logger.Writef("Rocket Boost Charge Offset: 0x%X", rocketBoostChargeOffset);
+    logger.Writef(DEBUG, "Rocket Boost Charge Offset: 0x%X", rocketBoostChargeOffset);
 
     addr = mem::FindPattern("\x74\x26\x0F\x57\xC9", "xxxxx");
     fuelLevelOffset = addr == 0 ? 0 : *(int*)(addr + 8);
-    logger.Writef("Fuel Level Offset: 0x%X", fuelLevelOffset);
+    logger.Writef(DEBUG, "Fuel Level Offset: 0x%X", fuelLevelOffset);
 
     addr = mem::FindPattern("\x48\x8D\x8F\x00\x00\x00\x00\x4C\x8B\xC3\xF3\x0F\x11\x7C\x24",
                             "xxx????xxxxxxxx");
     nextGearOffset = addr == 0 ? 0 : *(int*)(addr + 3);
-    logger.Writef("Next Gear Offset: 0x%X", nextGearOffset);
+    logger.Writef(DEBUG, "Next Gear Offset: 0x%X", nextGearOffset);
 
     currentGearOffset = addr == 0 ? 0 : *(int*)(addr + 3) + 2;
-    logger.Writef("Current Gear Offset: 0x%X", currentGearOffset);
+    logger.Writef(DEBUG, "Current Gear Offset: 0x%X", currentGearOffset);
 
     topGearOffset = addr == 0 ? 0 : *(int*)(addr + 3) + 6;
-    logger.Writef("Top Gear Offset: 0x%X", topGearOffset);
+    logger.Writef(DEBUG, "Top Gear Offset: 0x%X", topGearOffset);
 
     gearRatiosOffset = addr == 0 ? 0 : *(int*)(addr + 3) + 8;
-    logger.Writef("Gear Ratios Offset: 0x%X", gearRatiosOffset);
+    logger.Writef(DEBUG, "Gear Ratios Offset: 0x%X", gearRatiosOffset);
 
     driveForceOffset = addr == 0 ? 0 : *(int*)(addr + 3) + 0x28;
-    logger.Writef("Drive Force Offset: 0x%X", driveForceOffset);
+    logger.Writef(DEBUG, "Drive Force Offset: 0x%X", driveForceOffset);
 
     initialDriveMaxFlatVelOffset = addr == 0 ? 0 : *(int*)(addr + 3) + 0x2C;
-    logger.Writef("Initial Drive Max Flat Velocity Offset: 0x%X", initialDriveMaxFlatVelOffset);
+    logger.Writef(DEBUG, "Initial Drive Max Flat Velocity Offset: 0x%X", initialDriveMaxFlatVelOffset);
 
     driveMaxFlatVelOffset = addr == 0 ? 0 : *(int*)(addr + 3) + 0x30;
-    logger.Writef("Drive Max Flat Velocity Offset: 0x%X", driveMaxFlatVelOffset);
+    logger.Writef(DEBUG, "Drive Max Flat Velocity Offset: 0x%X", driveMaxFlatVelOffset);
 
     addr = mem::FindPattern("\xF3\x44\x0F\x10\x93\x00\x00\x00\x00\xF3\x0F\x10\x0D",
                             "xxxxx????xxxx");
     currentRPMOffset = addr == 0 ? 0 : *(int*)(addr + 5);
-    logger.Writef("RPM Offset: 0x%X", currentRPMOffset);
+    logger.Writef(DEBUG, "RPM Offset: 0x%X", currentRPMOffset);
 
     clutchOffset = addr == 0 ? 0 : *(int*)(addr + 5) + 0xC;
-    logger.Writef("Clutch Offset: 0x%X", clutchOffset);
+    logger.Writef(DEBUG, "Clutch Offset: 0x%X", clutchOffset);
 
     throttleOffset = addr == 0 ? 0 : *(int*)(addr + 5) + 0x10;
-    logger.Writef("Throttle Offset: 0x%X", throttleOffset);
+    logger.Writef(DEBUG, "Throttle Offset: 0x%X", throttleOffset);
 
     addr = mem::FindPattern("\xF3\x0F\x10\x8F\x68\x08\x00\x00\x88\x4D\x8C\x0F\x2F\xCF", 
                             "xxxx????xxx???");
     turboOffset = addr == 0 ? 0 : *(int*)(addr + 4);
-    logger.Writef("Turbo Offset: 0x%X", turboOffset);
+    logger.Writef(DEBUG, "Turbo Offset: 0x%X", turboOffset);
 
     addr = mem::FindPattern("\x3C\x03\x0F\x85\x00\x00\x00\x00\x48\x8B\x41\x20\x48\x8B\x88",
                             "xxxx????xxxxxxx");
     handlingOffset = addr == 0 ? 0 : *(int*)(addr + 0x16);
-    logger.Writef("Handling Offset: 0x%X", handlingOffset);
+    logger.Writef(DEBUG, "Handling Offset: 0x%X", handlingOffset);
 
     addr = mem::FindPattern("\x74\x0A\xF3\x0F\x11\xB3\x1C\x09\x00\x00\xEB\x25", "xxxxxx????xx");
     steeringAngleInputOffset = addr == 0 ? 0 : *(int*)(addr + 6);
-    logger.Writef("Steering Input Offset: 0x%X", steeringAngleInputOffset);
+    logger.Writef(DEBUG, "Steering Input Offset: 0x%X", steeringAngleInputOffset);
 
     steeringAngleOffset = addr == 0 ? 0 : *(int*)(addr + 6) + 8;
-    logger.Writef("Steering Angle Offset: 0x%X", steeringAngleOffset);
+    logger.Writef(DEBUG, "Steering Angle Offset: 0x%X", steeringAngleOffset);
 
     throttlePOffset = addr == 0 ? 0 : *(int*)(addr + 6) + 0x10;
-    logger.Writef("ThrottleP Offset: 0x%X", throttlePOffset);
+    logger.Writef(DEBUG, "ThrottleP Offset: 0x%X", throttlePOffset);
 
     brakePOffset = addr == 0 ? 0 : *(int*)(addr + 6) + 0x14;
-    logger.Writef("BrakeP Offset: 0x%X", brakePOffset);
+    logger.Writef(DEBUG, "BrakeP Offset: 0x%X", brakePOffset);
 
     addr = mem::FindPattern("\x44\x8A\xAA\x00\x00\x00\x00\x0F\x2F\xFB", "xxx????xxx");
     handbrakeOffset = addr == 0 ? 0 : *(int*)(addr + 3);
-    logger.Writef("Handbrake Offset: 0x%X", handbrakeOffset);
+    logger.Writef(DEBUG, "Handbrake Offset: 0x%X", handbrakeOffset);
 
     addr = mem::FindPattern("\x0F\x29\x7C\x24\x30\x0F\x85\xE3\x00\x00\x00\xF3\x0F\x10\xB9\x68\x09\x00\x00", 
                             "xx???xx????xxxx????");
     dirtLevelOffset = addr == 0 ? 0 : *(int*)(addr + 0xF);
-    logger.Writef("Dirt Level Offset: 0x%X", dirtLevelOffset);
+    logger.Writef(DEBUG, "Dirt Level Offset: 0x%X", dirtLevelOffset);
 
     addr = mem::FindPattern("\xF3\x0F\x11\x9B\xDC\x09\x00\x00\x0F\x84\xB1\x00\x00\x00",
                             "xxxx????xxx???");
     engineTempOffset = addr == 0 ? 0 : *(int*)(addr + 4);
-    logger.Writef("Engine Temperature Offset: 0x%X", engineTempOffset);
+    logger.Writef(DEBUG, "Engine Temperature Offset: 0x%X", engineTempOffset);
 
     addr = mem::FindPattern("\xF3\x0F\x10\x8F\x10\x0A\x00\x00\xF3\x0F\x59\x05\x5E\x30\x8D\x00", 
                             "xxxx????xxxx????");
     dashSpeedOffset = addr == 0 ? 0 : *(int*)(addr + 4);
-    logger.Writef("Dashboard Speed Offset: 0x%X", dashSpeedOffset);
+    logger.Writef(DEBUG, "Dashboard Speed Offset: 0x%X", dashSpeedOffset);
 
     addr = mem::FindPattern("\x8B\x83\x38\x0B\x00\x00\x83\xE8\x08\x83\xF8\x02", "xx????xx?xxx");
     modelTypeOffset = addr == 0 ? 0 : *(int*)(addr + 2);
-    logger.Writef("Model Type Offset: 0x%X", modelTypeOffset);
+    logger.Writef(DEBUG, "Model Type Offset: 0x%X", modelTypeOffset);
 
     addr = mem::FindPattern("\x3B\xB7\x48\x0B\x00\x00\x7D\x0D", "xx????xx");
     wheelsPtrOffset = addr == 0 ? 0 : *(int*)(addr + 2) - 8;
-    logger.Writef("Wheels Pointer Offset: 0x%X", wheelsPtrOffset);
+    logger.Writef(DEBUG, "Wheels Pointer Offset: 0x%X", wheelsPtrOffset);
 
     numWheelsOffset = addr == 0 ? 0 : *(int*)(addr + 2);
-    logger.Writef("Wheel Count Offset: 0x%X", numWheelsOffset);
+    logger.Writef(DEBUG, "Wheel Count Offset: 0x%X", numWheelsOffset);
 }
 
 BYTE *VehicleExtensions::GetAddress(Vehicle handle) {

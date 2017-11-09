@@ -41,18 +41,18 @@ bool WheelDirectInput::PreInit() {
 }
 
 bool WheelDirectInput::InitWheel() {
-    logger.Write("WHEEL: Initializing input devices"); 
+    logger.Write(INFO, "WHEEL: Initializing input devices"); 
 
-    logger.Write("WHEEL: Setting up DirectInput interface");
+    logger.Write(INFO, "WHEEL: Setting up DirectInput interface");
     if (!PreInit()) {
-        logger.Write("WHEEL: Failed setting up DirectInput interface");
+        logger.Write(ERROR, "WHEEL: Failed setting up DirectInput interface");
         return false;
     }
 
-    logger.Write("WHEEL: Found " + std::to_string(djs.getEntryCount()) + " device(s)");
+    logger.Write(INFO, "WHEEL: Found " + std::to_string(djs.getEntryCount()) + " device(s)");
 
     if (djs.getEntryCount() < 1) {
-        logger.Write("WHEEL: No devices detected");
+        logger.Write(INFO, "WHEEL: No devices detected");
         return false;
     }
 
@@ -69,13 +69,13 @@ bool WheelDirectInput::InitWheel() {
     for (int i = 0; i < djs.getEntryCount(); i++) {
         auto device = djs.getEntry(i);
         std::wstring wDevName = device->diDeviceInstance.tszInstanceName;
-        logger.Write("WHEEL: Device: " + std::string(wDevName.begin(), wDevName.end()));
+        logger.Write(INFO, "WHEEL: Device: " + std::string(wDevName.begin(), wDevName.end()));
 
         GUID guid = device->diDeviceInstance.guidInstance;
         wchar_t szGuidW[40] = { 0 };
         StringFromGUID2(guid, szGuidW, 40);
         std::wstring wGuid = szGuidW;//std::wstring(szGuidW);
-        logger.Write("WHEEL: GUID:   " + std::string(wGuid.begin(), wGuid.end()));
+        logger.Write(INFO, "WHEEL: GUID:   " + std::string(wGuid.begin(), wGuid.end()));
         foundGuids.push_back(guid);
 
         rgbPressTime.insert(	std::pair<GUID, std::array<__int64, MAX_RGBBUTTONS>>(guid, {}));
@@ -87,17 +87,17 @@ bool WheelDirectInput::InitWheel() {
         povButtonCurr.insert(	std::pair<GUID, std::array<bool, POVDIRECTIONS>>(guid, {}));
         povButtonPrev.insert(	std::pair<GUID, std::array<bool, POVDIRECTIONS>>(guid, {}));
     }
-    logger.Write("WHEEL: Devices initialized");
+    logger.Write(INFO, "WHEEL: Devices initialized");
     return true;
 }
 
 bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
-    logger.Write("WHEEL: Init FFB device");
+    logger.Write(INFO, "WHEEL: Init FFB device");
 
     auto e = FindEntryFromGUID(guid);
     
     if (!e) {
-        logger.Write("WHEEL: FFB device not found");
+        logger.Write(WARN, "WHEEL: FFB device not found");
         return false;
     }
 
@@ -108,21 +108,21 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
                                                      DISCL_FOREGROUND))) {
         std::string hrStr;
         formatError(hr, hrStr);
-        logger.Write("WHEEL: Acquire FFB device error");
-        logger.Write("WHEEL: HRESULT = " + hrStr);
+        logger.Write(ERROR, "WHEEL: Acquire FFB device error");
+        logger.Write(ERROR, "WHEEL: HRESULT = " + hrStr);
         std::stringstream ss;
         ss << std::hex << hr;
-        logger.Write("WHEEL: ERRCODE = " + ss.str());
+        logger.Write(ERROR, "WHEEL: ERRCODE = " + ss.str());
         ss.str(std::string());
         ss << std::hex << GetForegroundWindow();
-        logger.Write("WHEEL: HWND =    " + ss.str());
+        logger.Write(ERROR, "WHEEL: HWND =    " + ss.str());
         return false;
     }
-    logger.Write("WHEEL: Init FFB effect on axis " + DIAxisHelper[ffAxis]);
+    logger.Write(INFO, "WHEEL: Init FFB effect on axis " + DIAxisHelper[ffAxis]);
     if (!createConstantForceEffect(e, ffAxis)) {
-        logger.Write("WHEEL: Init FFB effect failed");
+        logger.Write(ERROR, "WHEEL: Init FFB effect failed");
     } else {
-        logger.Write("WHEEL: Init FFB effect success");
+        logger.Write(INFO, "WHEEL: Init FFB effect success");
         hasForceFeedback[guid][ffAxis] = true;
     }
     return true;
@@ -285,6 +285,11 @@ void WheelDirectInput::UpdateButtonChangeStates() {
     }
 }
 
+int filterException(int code, PEXCEPTION_POINTERS ex) {
+    logger.Writef(ERROR, "Caught exception %d", code);
+    return EXCEPTION_EXECUTE_HANDLER;
+}
+
 bool WheelDirectInput::createConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis) {
     if (!e)
         return false;
@@ -324,7 +329,12 @@ bool WheelDirectInput::createConstantForceEffect(const DiJoyStick::Entry *e, DIA
     diEffect.dwStartDelay = 0;
 
     // Call to this crashes? (G920 + SHVDN)
-    hr = e->diDevice->CreateEffect(GUID_ConstantForce, &diEffect, &pCFEffect, nullptr);
+    __try {
+        hr = e->diDevice->CreateEffect(GUID_ConstantForce, &diEffect, &pCFEffect, nullptr);
+    }
+    __except (filterException(GetExceptionCode(), GetExceptionInformation())) {
+        return false;
+    }
     
     if (FAILED(hr) || !pCFEffect) {
         return false;
@@ -358,13 +368,26 @@ void WheelDirectInput::SetConstantForce(GUID device, WheelDirectInput::DIAxis ff
     diEffect.dwStartDelay = 0;
     
     // This should also automagically play.
-    pCFEffect->SetParameters(&diEffect, 
-        DIEP_DIRECTION |  DIEP_TYPESPECIFICPARAMS | DIEP_START);
+    // Might also crash (G920)
+    __try {
+        pCFEffect->SetParameters(&diEffect,
+            DIEP_DIRECTION | DIEP_TYPESPECIFICPARAMS | DIEP_START);
+    }
+    __except(0) {
+
+    }
+
 }
 
 void WheelDirectInput::StopConstantForce() {
-    if (pCFEffect != nullptr)
-        pCFEffect->Stop();
+    if (pCFEffect != nullptr) {
+        __try {
+            pCFEffect->Stop();
+        }
+        __finally {
+            
+        }
+    }
 }
 
 WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString) {

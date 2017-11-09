@@ -14,6 +14,11 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
     std::string logFile = Paths::GetModuleFolder(hInstance) + mtDir +
         "\\" + Paths::GetModuleNameWithoutExtension(hInstance) + ".log";
     logger.SetFile(logFile);
+#ifdef _DEBUG
+    logger.SetMinLevel(DEBUG);
+#else
+    logger.SetMinLevel(INFO);
+#endif
     Paths::SetOurModuleHandle(hInstance);
 
     // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
@@ -21,17 +26,17 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
         case DLL_PROCESS_ATTACH: {
             scriptRegister(hInstance, ScriptMain);
             logger.Clear();
-            logger.Writef("GTAVManualTransmission %s (build %s)", DISPLAY_VERSION, __DATE__);
-            logger.Write("Game version " + eGameVersionToString(getGameVersion()));
+            logger.Writef(INFO, "GTAVManualTransmission %s (build %s)", DISPLAY_VERSION, __DATE__);
+            logger.Write(INFO, "Game version " + eGameVersionToString(getGameVersion()));
             if (getGameVersion() < G_VER_1_0_877_1_STEAM) {
-                logger.Write("WARNING: Unsupported game version! Update your game.");
+                logger.Write(WARN, "Unsupported game version! Update your game.");
             }
 
-            logger.Write("Script registered");
+            logger.Write(INFO, "Script registered");
             break;
         }
         case DLL_PROCESS_DETACH: {
-            logger.Write("Init shutdown");
+            logger.Write(INFO, "Init shutdown");
             bool successI = MemoryPatcher::RestoreInstructions();
             bool successS = MemoryPatcher::RestoreSteeringCorrection();
             bool successSC= MemoryPatcher::RestoreSteeringControl();
@@ -41,17 +46,17 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             scriptUnregister(hInstance);
 
             if (successI && successS && successSC && successB) {
-                logger.Write("Shut down script successfully");
+                logger.Write(INFO, "Shut down script successfully");
             }
             else {
                 if (!successI)
-                    logger.Write("WARNING: Shut down script with instructions not restored");
+                    logger.Write(WARN, "Shut down script with instructions not restored");
                 if (!successS)
-                    logger.Write("WARNING: Shut down script with steer correction not restored");
+                    logger.Write(WARN, "Shut down script with steer correction not restored");
                 if (!successSC)
-                    logger.Write("WARNING: Shut down script with steer control not restored");
+                    logger.Write(WARN, "Shut down script with steer control not restored");
                 if (!successB)
-                    logger.Write("WARNING: Shut down script with brake decrement not restored");
+                    logger.Write(WARN, "Shut down script with brake decrement not restored");
             }
             break;
         }
