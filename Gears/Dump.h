@@ -170,7 +170,7 @@ DWORD DumpStackTrace(EXCEPTION_POINTERS *ep)
     SymCleanup(process);
 
     // Display the string:
-    logger.Writef("Stack Trace: Program has crashed. Report error to:\n"
+    logger.Write("Stack Trace: Program has crashed. Report error to:\n"
         "ikt on GTA5-Mods.com\n\n%s", builder.str().c_str());
     return EXCEPTION_EXECUTE_HANDLER;
 }

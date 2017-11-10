@@ -26,7 +26,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
         case DLL_PROCESS_ATTACH: {
             scriptRegister(hInstance, ScriptMain);
             logger.Clear();
-            logger.Writef(INFO, "GTAVManualTransmission %s (build %s)", DISPLAY_VERSION, __DATE__);
+            logger.Write(INFO, "GTAVManualTransmission %s (build %s)", DISPLAY_VERSION, __DATE__);
             logger.Write(INFO, "Game version " + eGameVersionToString(getGameVersion()));
             if (getGameVersion() < G_VER_1_0_877_1_STEAM) {
                 logger.Write(WARN, "Unsupported game version! Update your game.");

@@ -88,7 +88,7 @@ bool PatchInstructions() {
     if (clutchLowTemp) {
         clutchLowAddr = clutchLowTemp;
         TotalPatched++;
-        logger.Writef(DEBUG, "GEARBOX: Patched clutchLow @ 0x%p", clutchLowAddr);
+        logger.Write(DEBUG, "GEARBOX: Patched clutchLow @ 0x%p", clutchLowAddr);
     }
     else {
         logger.Write(ERROR, "GEARBOX: clutchLow patch failed");
@@ -99,7 +99,7 @@ bool PatchInstructions() {
     if (clutchRevLimitTemp) {
         clutchRevLimitAddr = clutchRevLimitTemp;
         TotalPatched++;
-        logger.Writef(DEBUG, "GEARBOX: Patched clutchRevLimit @ 0x%p", clutchRevLimitAddr);
+        logger.Write(DEBUG, "GEARBOX: Patched clutchRevLimit @ 0x%p", clutchRevLimitAddr);
     }
     else {
         logger.Write(ERROR, "GEARBOX: clutchRevLimit patch failed");
@@ -110,7 +110,7 @@ bool PatchInstructions() {
     if (gear7A0Temp) {
         gear7A0Addr = gear7A0Temp;
         TotalPatched++;
-        logger.Writef(DEBUG, "GEARBOX: Patched gear7A0  @ 0x%p", gear7A0Addr);
+        logger.Write(DEBUG, "GEARBOX: Patched gear7A0  @ 0x%p", gear7A0Addr);
     }
     else {
         logger.Write(ERROR, "GEARBOX: gear7A0 patch failed");
@@ -205,7 +205,7 @@ bool PatchSteeringCorrection() {
 
         std::string instructionBytes = formatByteArray(origSteerInstr, sizeof(origSteerInstr) / sizeof(byte));
 
-        logger.Writef(DEBUG, "STEERING: Steering Correction @ 0x%p", steeringAddr);
+        logger.Write(DEBUG, "STEERING: Steering Correction @ 0x%p", steeringAddr);
         logger.Write(DEBUG, "STEERING: Patch success, original: " + instructionBytes);
         steerAttempts = 0;
         return true;
@@ -262,7 +262,7 @@ bool PatchSteeringControl() {
 
         std::string instructionBytes = formatByteArray(origSteerControlInstr, sizeof(origSteerControlInstr) / sizeof(byte));
         
-        logger.Writef(DEBUG, "STEERING CONTROL: Steering Control @ 0x%p", steerControlAddr);
+        logger.Write(DEBUG, "STEERING CONTROL: Steering Control @ 0x%p", steerControlAddr);
         logger.Write(DEBUG, "STEERING CONTROL: Patch success, original : " + instructionBytes);
         steerControlAttempts = 0;
 
@@ -321,7 +321,7 @@ bool PatchBrakeDecrement() {
 
         //std::string instructionBytes = formatByteArray(origBrakeInstr, sizeof(origBrakeInstr) / sizeof(byte));
 
-        //logger.Writef("BRAKE PRESSURE: BRAKE PRESSURE @ 0x%p", brakeAddr);
+        //logger.Write("BRAKE PRESSURE: BRAKE PRESSURE @ 0x%p", brakeAddr);
         //logger.Write("BRAKE PRESSURE: Patch success, original : " + instructionBytes);
         brakeAttempts = 0;
 

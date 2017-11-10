@@ -40,14 +40,14 @@ void Logger::Write(LogLevel level, const std::string& text) {
         text << "\n";
 }
 
-void Logger::Writef(LogLevel level, char *fmt, ...) {
+void Logger::Write(LogLevel level, const char *fmt, ...) {
     const int size = 1024;
     char buff[size];
     va_list args;
     va_start(args, fmt);
     vsnprintf(buff, size, fmt, args);
     va_end(args);
-    Write(level, buff);
+    Write(level, std::string(buff));
 }
 
 std::string Logger::levelText(LogLevel level) {

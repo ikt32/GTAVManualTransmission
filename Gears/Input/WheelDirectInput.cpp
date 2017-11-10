@@ -302,8 +302,8 @@ void WheelDirectInput::UpdateButtonChangeStates() {
 }
 
 int filterException(int code, PEXCEPTION_POINTERS ex) {
-    logger.Writef(FATAL, "Caught exception %d", code);
-    logger.Writef(FATAL, "\tException address 0x%X", ex->ExceptionRecord->ExceptionAddress);
+    logger.Write(FATAL, "Caught exception %d", code);
+    logger.Write(FATAL, "\tException address 0x%X", ex->ExceptionRecord->ExceptionAddress);
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
@@ -315,7 +315,7 @@ void logCreateEffectException(const DiJoyStick::Entry *e) {
     char szGuid[40] = { 0 };
     size_t   i;  
     wcstombs_s(&i, szGuid, szGuidW, 40);
-    logger.Writef(FATAL, "\tGUID: %s", szGuid);
+    logger.Write(FATAL, "\tGUID: %s", szGuid);
 }
 
 void logCreateEffectError(HRESULT hr) {

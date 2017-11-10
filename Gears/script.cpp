@@ -2165,7 +2165,7 @@ void registerDecorator(const char *thing, eDecorType type) {
 
     if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE((char*)thing, type)) {
         DECORATOR::DECOR_REGISTER((char*)thing, type);
-        logger.Writef(DEBUG, "DECOR: Registered \"%s\" as %s", thing, strType.c_str());
+        logger.Write(DEBUG, "DECOR: Registered \"%s\" as %s", thing, strType.c_str());
     }
 }
 
@@ -2226,7 +2226,7 @@ std::string getInputDevice() {
  */
 void cleanup(int type) {
     showNotification("~b~Manual Transmission~w~~n~Script crashed! Check Gears.log");
-    logger.Writef(FATAL, "CRASH: Init shutdown: %s", type == 0 ? "__except" : "catch");
+    logger.Write(FATAL, "CRASH: Init shutdown: %s", type == 0 ? "__except" : "catch");
     bool successI = MemoryPatcher::RestoreInstructions();
     bool successS = MemoryPatcher::RestoreSteeringCorrection();
     bool successSC = MemoryPatcher::RestoreSteeringControl();
@@ -2275,27 +2275,27 @@ bool cppMain() {
         WAIT(0);
     }
     catch (const std::exception &e) {
-        logger.Writef(FATAL, "std::exception: %s", e.what());
+        logger.Write(FATAL, "std::exception: %s", e.what());
         cleanup(1);
         return true;
     }
     catch (const int ex) {
-        logger.Writef(FATAL, "int exception: %d", ex);
+        logger.Write(FATAL, "int exception: %d", ex);
         cleanup(1);
         return true;
     }
     catch (const long ex) {
-        logger.Writef(FATAL, "long exception: %d", ex);
+        logger.Write(FATAL, "long exception: %d", ex);
         cleanup(1);
         return true;
     }
     catch (const char * ex) {
-        logger.Writef(FATAL, "string exception: %d", ex);
+        logger.Write(FATAL, "string exception: %d", ex);
         cleanup(1);
         return true;
     }
     catch (const char ex) {
-        logger.Writef(FATAL, "char exception: %c", ex);
+        logger.Write(FATAL, "char exception: %c", ex);
         cleanup(1);
         return true;
     }
@@ -2360,7 +2360,7 @@ void main() {
 
     initialize();
     logger.Write(INFO, "START: Initialization finished");
-    logger.Writef(DEBUG, "START: Starting with MT:  ", settings.EnableManual ? "ON" : "OFF");
+    logger.Write(DEBUG, "START: Starting with MT:  ", settings.EnableManual ? "ON" : "OFF");
 
     while (true) {
 #ifdef _DEBUG

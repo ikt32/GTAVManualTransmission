@@ -18,7 +18,7 @@ public:
     void SetMinLevel(LogLevel level);
     void Clear();
     void Write(LogLevel level, const std::string& text);
-    void Writef(LogLevel level, char *fmt, ...);
+    void Write(LogLevel level, const char *fmt, ...);
 
 private:
     std::string file = "";
