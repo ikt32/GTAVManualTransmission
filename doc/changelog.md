@@ -1,16 +1,20 @@
 # Changelog
 ## 4.4.1
 Config changes:
-No incompatible changes. Changed defaults to personal preference force feedback.
+No incompatible changes.
 
 Changes:
 * Add option to block button for controller clutch
-* Add option to ignore shifts when in menus when using a controller
+* Add option to ignore shifts in menus (controller)
 * Add option for deadzone with steering wheels
 * Add Manual Transmission title above notifications
+* Add warning to configure driving devices
 * Improve boat and amphibious force feedback
+* Scale ffb effects to steering wheel degrees
 * Fix crash for steering wheels without force feedback
+* Fix crash on setting up wheel buttons
 * Remove support for non-custom decorators
+* Small improvements here and there
 
 ## 4.4.0
 Config changes:
