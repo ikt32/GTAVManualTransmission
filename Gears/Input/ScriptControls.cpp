@@ -491,7 +491,7 @@ void ScriptControls::CheckGUIDs(const std::vector<_GUID> & guids) {
     if (missingReg.size() > 0) {
         logger.Write(WARN, "WHEEL: Used in .ini, unavailable: ");
         for (auto g : missingReg) {
-            logger.Write(WARN, std::string("    ") + GUID2String(g));
+            logger.Write(WARN, "WHEEL: GUID:   %s", GUID2String(g).c_str());
         }
     }
 
@@ -500,10 +500,16 @@ void ScriptControls::CheckGUIDs(const std::vector<_GUID> & guids) {
         foundGuids.begin(), foundGuids.end(),
         reggdGuids.begin(), reggdGuids.end(), std::back_inserter(missingFnd));
 
+    FreeDevices.clear();
+
     if (missingFnd.size() > 0) {
         logger.Write(INFO, "WHEEL: Not set up in .ini: ");
         for (auto g : missingFnd) {
-            logger.Write(INFO, std::string("    ") + GUID2String(g));
+            std::wstring wDevName = WheelControl.FindEntryFromGUID(g)->diDeviceInstance.tszInstanceName;
+            std::string devName = std::string(wDevName.begin(), wDevName.end());
+            logger.Write(INFO, "WHEEL: Device: %s", devName.c_str());
+            logger.Write(INFO, "WHEEL: GUID:   %s", GUID2String(g).c_str());
+            FreeDevices.push_back(Device(devName, g));
         }
     }
 }

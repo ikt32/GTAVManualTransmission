@@ -5,6 +5,12 @@
 #include "WheelDirectInput.hpp"
 #include "LegacyController.h"
 
+struct Device {
+    Device(std::string name, GUID guid) : name(name), guid(guid) {}
+    std::string name;
+    GUID guid;
+};
+
 class ScriptControls {
 public:
     enum class ControllerControlType {
@@ -263,6 +269,7 @@ public:
     std::array<GUID, static_cast<int>(StickAxisType::SIZEOF_StickAxisType)> StickButtonGUIDs = {};
     //GenDInput StickControl;
 
+    std::vector<Device> FreeDevices{};
 
     XboxController *GetRawController() {
         return &controller;

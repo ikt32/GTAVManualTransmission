@@ -179,6 +179,16 @@ void update_mainmenu() {
     menu.Title("Manual Transmission", 0.90f);
     menu.Subtitle(std::string("~b~") + DISPLAY_VERSION);
 
+    for(auto device : controls.FreeDevices) {
+        if (menu.Option(device.name, NativeMenu::solidRed, 
+            { "This device wasn't set up yet. Apply this option to discard the message.", 
+              "Full name: " + device.name })) {
+            settings.SteeringAppendDevice(device.guid, device.name);
+            settings.Read(&controls);
+            controls.CheckGUIDs(settings.reggdGuids);
+        }
+    }
+
     bool tempEnableRead = settings.EnableManual;
 
     if (menu.BoolOption("Enable manual transmission", tempEnableRead,
