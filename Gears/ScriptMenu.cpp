@@ -647,6 +647,9 @@ void update_forcefeedbackmenu() {
     menu.BoolOption("Enable", settings.EnableFFB, 
                     { "Enable or disable force feedback entirely." });
 
+    menu.BoolOption("Scale forces", settings.ScaleFFB, 
+                    { "Scale forces to degree of rotation." });
+
     menu.FloatOption("Self aligning torque multiplier", settings.SATAmpMult, 0.1f, 5.0f, 0.05f,
                      { "Force feedback strength for steering. Increase for weak wheels, decrease for strong/fast wheels.",
                      "Putting this too high clips force feedback. Too low and the car doesn't feel responsive."});

@@ -187,6 +187,7 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 
     // [FORCE_FEEDBACK]
     settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Enable", EnableFFB);
+    settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Scale", ScaleFFB);
     settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", SATAmpMult);
     settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DetailMult", DetailMult);
     settingsWheel.SetLongValue("FORCE_FEEDBACK", "DamperMax", DamperMax);
@@ -421,6 +422,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
 
     // [FORCE_FEEDBACK]
     EnableFFB = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Enable", true);
+    ScaleFFB = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Scale", true);
     SATAmpMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", 1.0);
     DetailMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DetailMult", 1.6);
 

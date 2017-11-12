@@ -1974,12 +1974,32 @@ int calculateSat(int defaultGain, float steeringAngle, bool isCar) {
     return satForce;
 }
 
+float getSteeringLock() {
+    switch (vehData.Class) {
+        case VehicleClass::Bike:
+        case VehicleClass::Quad:
+        case VehicleClass::Bicycle:
+            return settings.SteerAngleBike;
+        case VehicleClass::Car:
+            return settings.SteerAngleCar;
+        case VehicleClass::Boat:
+            return settings.SteerAngleBoat;
+        case VehicleClass::Plane:
+        case VehicleClass::Heli:
+        case VehicleClass::Train:
+        case VehicleClass::Unknown:
+        default: return settings.SteerAngleCar;
+    }
+}
+
 void playFFBGround() {
     if (!settings.EnableFFB ||
         controls.PrevInput != ScriptControls::Wheel ||
         !controls.WheelControl.IsConnected(controls.SteerGUID)) {
         return;
     }
+
+    float rotationScale = settings.ScaleFFB ? getSteeringLock()/900.0f : 1.0f;
 
     if (settings.LogiLEDs) {
         controls.WheelControl.PlayLedsDInput(controls.SteerGUID, vehData.RPM, 0.45, 0.95);
@@ -2056,6 +2076,8 @@ void playFFBGround() {
         detailForce +
         damperForce;
 
+    totalForce = (int)((float)totalForce * rotationScale);
+
     // Soft lock
     calculateSoftLock(totalForce);
 
@@ -2075,6 +2097,8 @@ void playFFBWater() {
         !controls.WheelControl.IsConnected(controls.SteerGUID)) {
         return;
     }
+
+    float rotationScale = settings.ScaleFFB ? getSteeringLock() / 900.0f : 1.0f;
 
     if (settings.LogiLEDs) {
         controls.WheelControl.PlayLedsDInput(controls.SteerGUID, vehData.RPM, 0.45, 0.95);
@@ -2101,6 +2125,8 @@ void playFFBWater() {
         satForce +
         detailForce +
         damperForce;
+
+    totalForce = (int)((float)totalForce * rotationScale);
 
     // Soft lock
     calculateSoftLock(totalForce);

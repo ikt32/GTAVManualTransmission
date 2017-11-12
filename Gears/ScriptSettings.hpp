@@ -142,6 +142,7 @@ public:
 
     // [FORCE_FEEDBACK]
     bool EnableFFB = true;
+    bool ScaleFFB = true;
     float SATAmpMult = 1.0f;
     int DamperMax = 50;
     int DamperMin = 10;
