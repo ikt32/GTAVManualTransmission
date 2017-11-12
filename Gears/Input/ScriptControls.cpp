@@ -474,6 +474,17 @@ std::string GUID2String(GUID guid) {
     return(std::string(wGuid.begin(), wGuid.end()));
 }
 
+bool isSupportedDrivingDevice(DWORD dwDevType) {
+    switch (GET_DIDEVICE_TYPE(dwDevType)) {
+        case DI8DEVTYPE_DRIVING:        // Wheels
+        case DI8DEVTYPE_SUPPLEMENTAL:   // Pedal sets, shifters, etc
+        case DI8DEVTYPE_FLIGHT:         // Yay HOTAS
+            return true;
+        default:
+            return false;
+    }
+}
+
 void ScriptControls::CheckGUIDs(const std::vector<_GUID> & guids) {
     auto foundGuids = WheelControl.GetGuids();
     auto reggdGuids = guids;
@@ -505,11 +516,15 @@ void ScriptControls::CheckGUIDs(const std::vector<_GUID> & guids) {
     if (missingFnd.size() > 0) {
         logger.Write(INFO, "WHEEL: Not set up in .ini: ");
         for (auto g : missingFnd) {
-            std::wstring wDevName = WheelControl.FindEntryFromGUID(g)->diDeviceInstance.tszInstanceName;
-            std::string devName = std::string(wDevName.begin(), wDevName.end());
+            auto entry = WheelControl.FindEntryFromGUID(g);
+            if (entry == nullptr) continue;
+            std::wstring wDevName = entry->diDeviceInstance.tszInstanceName;
+            auto devName = std::string(wDevName.begin(), wDevName.end());
             logger.Write(INFO, "WHEEL: Device: %s", devName.c_str());
             logger.Write(INFO, "WHEEL: GUID:   %s", GUID2String(g).c_str());
-            FreeDevices.push_back(Device(devName, g));
+            if (isSupportedDrivingDevice(entry->diDeviceInstance.dwDevType)) {
+                FreeDevices.push_back(Device(devName, g));
+            }
         }
     }
 }

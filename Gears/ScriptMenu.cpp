@@ -181,7 +181,8 @@ void update_mainmenu() {
 
     for(auto device : controls.FreeDevices) {
         if (menu.Option(device.name, NativeMenu::solidRed, 
-            { "This device wasn't set up yet. Apply this option to discard the message.", 
+            { "~r~<b>THIS DEVICE HASN'T BEEN SET UP YET!</b>~w~",
+              "Set it up or apply this option to discard the message.", 
               "Full name: " + device.name })) {
             settings.SteeringAppendDevice(device.guid, device.name);
             settings.Read(&controls);
