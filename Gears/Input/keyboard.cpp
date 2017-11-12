@@ -195,9 +195,7 @@ DWORD str2key(std::string humanReadableKey) {
 std::string key2str(DWORD key) {
     if (key == -1) return "UNKNOWN";
     if ((key >= 0x30 && key <= 0x39) || (key >= 0x41 && key <= 0x5A)) {
-        std::string letter;
-        letter = (char)key;
-        return std::string(letter);
+        return std::string(1, static_cast<char>(key));
     }
     for (auto k : keyMap) {
         if (k.second == key) return k.first;

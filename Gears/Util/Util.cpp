@@ -177,9 +177,8 @@ bool FileExists(const std::string& name) {
 
 STR2INT_ERROR str2int(int &i, char const *s, int base) {
     char *end;
-    long  l;
     errno = 0;
-    l = strtol(s, &end, base);
+    long l = strtol(s, &end, base);
     if ((errno == ERANGE && l == LONG_MAX) || l > INT_MAX) {
         return STR2INT_OVERFLOW;
     }

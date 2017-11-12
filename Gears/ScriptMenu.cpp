@@ -1211,7 +1211,7 @@ bool configWheelToKey() {
      * 2: Done!
      */
     int progress = 0;
-    GUID selectedGuid;
+    GUID selectedGuid{};
     int button = -1;
     std::string keyName;
 

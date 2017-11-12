@@ -7,7 +7,7 @@ float lerp(float a, float b, float f) {
 }
 
 Vector3 Cross(Vector3 left, Vector3 right) {
-    Vector3 result;
+    Vector3 result{};
     result.x = left.y * right.z - left.z * right.y;
     result.y = left.z * right.x - left.x * right.z;
     result.z = left.x * right.y - left.y * right.x;

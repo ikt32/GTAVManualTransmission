@@ -42,7 +42,7 @@ std::array<float, NUM_GEARS> upshiftSpeeds{};
 std::string textureWheelFile;
 int textureWheelId;
 
-GameSound gearRattle("DAMAGED_TRUCK_IDLE", 0);
+GameSound gearRattle("DAMAGED_TRUCK_IDLE", nullptr);
 int soundID;
 
 std::string absoluteModPath;
@@ -1217,7 +1217,6 @@ void fakeRev(bool customThrottle, float customThrottleVal) {
 }
 
 void handleRPM() {
-    float finalClutch = 0.0f;
     //bool skip = false;
 
     // Game wants to shift up. Triggered at high RPM, high speed.
@@ -1262,7 +1261,7 @@ void handleRPM() {
         }
     }
 
-    finalClutch = 1.0f - controls.ClutchVal;
+    float finalClutch = 1.0f - controls.ClutchVal;
 
     if (vehData.FakeNeutral || controls.ClutchVal >= 1.0f) {
         if (ENTITY::GET_ENTITY_SPEED(vehicle) < 1.0f) {

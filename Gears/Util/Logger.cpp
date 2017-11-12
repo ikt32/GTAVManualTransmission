@@ -36,7 +36,7 @@ void Logger::Write(LogLevel level, const std::string& text) {
         std::setw(2) << std::setfill('0') << currTimeLog.wMinute << ":" <<
         std::setw(2) << std::setfill('0') << currTimeLog.wSecond << "." <<
         std::setw(3) << std::setfill('0') << currTimeLog.wMilliseconds << "] " <<
-        "[ " << levelText(level) << " ] " <<
+        "[" << levelText(level) << "] " <<
         text << "\n";
 }
 

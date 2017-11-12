@@ -307,7 +307,7 @@ void VehicleExtensions::SetBrakeP(Vehicle handle, float value) {
 }
 
 bool VehicleExtensions::GetHandbrake(Vehicle handle) {
-    if (handbrakeOffset == 0) return 0;
+    if (handbrakeOffset == 0) return false;
     auto address = GetAddress(handle);
     return *reinterpret_cast<bool *>(address + handbrakeOffset);
 }
@@ -375,8 +375,7 @@ float VehicleExtensions::GetOilVolume(Vehicle handle) {
 Hash VehicleExtensions::GetAIHandling(Vehicle handle) {
     auto address = GetHandlingPtr(handle);
     if (address == 0) return 0;
-    auto offset = 0;
-    offset = gameVersion >= G_VER_1_0_1180_2_STEAM ? 0x13C : 0;
+    auto offset = 0x13C;
     if (offset == 0) return 0;
     return *reinterpret_cast<Hash *>(address + offset);
 }
