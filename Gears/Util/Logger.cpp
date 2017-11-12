@@ -22,11 +22,11 @@ void Logger::SetMinLevel(LogLevel level) {
 #endif
 }
 
-void Logger::Clear() {
+void Logger::Clear() const {
     std::ofstream logFile(file, std::ofstream::out | std::ofstream::trunc);
 }
 
-void Logger::Write(LogLevel level, const std::string& text) {
+void Logger::Write(LogLevel level, const std::string& text) const {
     if (level < minLevel) return;
     std::ofstream logFile(file, std::ios_base::out | std::ios_base::app);
     SYSTEMTIME currTimeLog;
@@ -40,7 +40,8 @@ void Logger::Write(LogLevel level, const std::string& text) {
         text << "\n";
 }
 
-void Logger::Write(LogLevel level, const char *fmt, ...) {
+void Logger::Write(LogLevel level, const char *fmt, ...) const {
+    if (level < minLevel) return;
     const int size = 1024;
     char buff[size];
     va_list args;
@@ -50,7 +51,7 @@ void Logger::Write(LogLevel level, const char *fmt, ...) {
     Write(level, std::string(buff));
 }
 
-std::string Logger::levelText(LogLevel level) {
+std::string Logger::levelText(LogLevel level) const {
     return levelStrings[level];
 }
 

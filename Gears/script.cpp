@@ -2219,6 +2219,7 @@ std::string getInputDevice() {
     }
 }
 
+#ifdef _DEBUG
 /*
  * 0: __try __except
  * 1: try catch
@@ -2246,7 +2247,6 @@ void cleanup(int type) {
     }
 }
 
-#ifdef _DEBUG
 //https://blogs.msdn.microsoft.com/zhanli/2010/06/25/structured-exception-handling-seh-and-c-exception-handling/
 //https://msdn.microsoft.com/en-us/library/5z4bw5h5.aspx
 void trans_func(unsigned int, EXCEPTION_POINTERS*);

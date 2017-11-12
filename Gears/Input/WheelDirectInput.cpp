@@ -403,24 +403,16 @@ void WheelDirectInput::SetConstantForce(GUID device, WheelDirectInput::DIAxis ff
     
     // This should also automagically play.
     // Might also crash (G920)
-    __try {
-        pCFEffect->SetParameters(&diEffect,
-            DIEP_DIRECTION | DIEP_TYPESPECIFICPARAMS | DIEP_START);
-    }
-    __except(0) {
-        // handle silently to not spam the log
-    }
+    // pCFEffect should be NULL and the function should've exited early
+    // if pCFEffect was NULL anyway.
 
+    pCFEffect->SetParameters(&diEffect,
+        DIEP_DIRECTION | DIEP_TYPESPECIFICPARAMS | DIEP_START);
 }
 
 void WheelDirectInput::StopConstantForce() {
     if (pCFEffect != nullptr) {
-        __try {
-            pCFEffect->Stop();
-        }
-        __finally {
-            
-        }
+        pCFEffect->Stop();
     }
 }
 

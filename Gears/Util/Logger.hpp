@@ -16,18 +16,18 @@ public:
     Logger();
     void SetFile(const std::string &fileName);
     void SetMinLevel(LogLevel level);
-    void Clear();
-    void Write(LogLevel level, const std::string& text);
-    void Write(LogLevel level, const char *fmt, ...);
+    void Clear() const;
+    void Write(LogLevel level, const std::string& text) const;
+    void Write(LogLevel level, const char *fmt, ...) const;
 
 private:
     std::string file = "";
-    std::string levelText(LogLevel level);
+    std::string levelText(LogLevel level) const;
     LogLevel minLevel = INFO;
     const std::vector<std::string> levelStrings{
         "DEBUG", 
-        "INFO ",
-        "WARN ",
+        " INFO",
+        " WARN",
         "ERROR",
         "FATAL",
     };
