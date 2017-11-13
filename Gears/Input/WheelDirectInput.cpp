@@ -189,7 +189,7 @@ bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
         return false;
     }
 
-    if (buttonType > MAX_RGBBUTTONS) {
+    if (buttonType >= MAX_RGBBUTTONS) {
         switch (buttonType) {
             case N:
                 if (e->joystate.rgdwPOV[0] == 0) {
@@ -214,7 +214,7 @@ bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
 }
 
 bool WheelDirectInput::IsButtonJustPressed(int buttonType, GUID device) {
-    if (buttonType > MAX_RGBBUTTONS) { // POV
+    if (buttonType >= MAX_RGBBUTTONS) { // POV
         int povIndex = povDirectionToIndex(buttonType);
         if (povIndex == -1) return false;
         povButtonCurr[device][povIndex] = IsButtonPressed(buttonType,device);
@@ -235,7 +235,7 @@ bool WheelDirectInput::IsButtonJustPressed(int buttonType, GUID device) {
 }
 
 bool WheelDirectInput::IsButtonJustReleased(int buttonType, GUID device) {
-    if (buttonType > MAX_RGBBUTTONS) { // POV
+    if (buttonType >= MAX_RGBBUTTONS) { // POV
         int povIndex = povDirectionToIndex(buttonType);
         if (povIndex == -1) return false;
         povButtonCurr[device][povIndex] = IsButtonPressed(buttonType,device);

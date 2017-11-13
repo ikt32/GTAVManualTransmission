@@ -100,25 +100,25 @@ private:
     bool createConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis);
     int povDirectionToIndex(int povDirection);
 
-    std::vector<GUID> foundGuids;
+    std::vector<GUID> foundGuids { GUID_NULL };
 
     DiJoyStick djs;
     LPDIRECTINPUT lpDi = nullptr;
     LPDIRECTINPUTEFFECT pCFEffect = nullptr;
     LPDIRECTINPUTEFFECT pFREffect = nullptr;
-    std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbPressTime{};
-    std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbReleaseTime{};
-    std::unordered_map<GUID, std::array<bool, MAX_RGBBUTTONS>>	rgbButtonCurr{};
-    std::unordered_map<GUID, std::array<bool, MAX_RGBBUTTONS>>	rgbButtonPrev{};
-    std::unordered_map<GUID, std::array<__int64, POVDIRECTIONS>>	povPressTime{};
-    std::unordered_map<GUID, std::array<__int64, POVDIRECTIONS>>	povReleaseTime{};
-    std::unordered_map<GUID, std::array<bool, POVDIRECTIONS>>		povButtonCurr{};
-    std::unordered_map<GUID, std::array<bool, POVDIRECTIONS>>		povButtonPrev{};
+    std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbPressTime   { 0 };
+    std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbReleaseTime { 0 };
+    std::unordered_map<GUID, std::array<bool, MAX_RGBBUTTONS>>	rgbButtonCurr { 0 };
+    std::unordered_map<GUID, std::array<bool, MAX_RGBBUTTONS>>	rgbButtonPrev { 0 };
+    std::unordered_map<GUID, std::array<__int64, POVDIRECTIONS>>	povPressTime   { 0 };
+    std::unordered_map<GUID, std::array<__int64, POVDIRECTIONS>>	povReleaseTime { 0 };
+    std::unordered_map<GUID, std::array<bool, POVDIRECTIONS>>		povButtonCurr { 0 };
+    std::unordered_map<GUID, std::array<bool, POVDIRECTIONS>>		povButtonPrev { 0 };
 
-    std::unordered_map<GUID, std::array<int, SIZEOF_DIAxis>> prevPosition{};
-    std::unordered_map<GUID, std::array<__int64, SIZEOF_DIAxis>> prevTime{};
-    std::unordered_map<GUID, std::array<std::array<float, AVGSAMPLES>, SIZEOF_DIAxis>> samples{};
+    std::unordered_map<GUID, std::array<int, SIZEOF_DIAxis>> prevPosition { 0 };
+    std::unordered_map<GUID, std::array<__int64, SIZEOF_DIAxis>> prevTime { 0 };
+    std::unordered_map<GUID, std::array<std::array<float, AVGSAMPLES>, SIZEOF_DIAxis>> samples { 0 };
 
-    std::unordered_map<GUID, std::array<int, SIZEOF_DIAxis>> averageIndex{};
-    std::unordered_map<GUID, std::array<bool, SIZEOF_DIAxis>> hasForceFeedback{};
+    std::unordered_map<GUID, std::array<int, SIZEOF_DIAxis>> averageIndex { 0 };
+    std::unordered_map<GUID, std::array<bool, SIZEOF_DIAxis>> hasForceFeedback { false };
 };

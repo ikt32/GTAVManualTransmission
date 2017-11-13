@@ -1237,7 +1237,7 @@ bool configWheelToKey() {
 
         if (progress == 0) {
             for (auto guid : controls.WheelControl.GetGuids()) {
-                for (int i = 0; i < 255; i++) {
+                for (int i = 0; i < MAX_RGBBUTTONS; i++) {
                     if (controls.WheelControl.IsButtonJustReleased(i, guid)) {
                         selectedGuid = guid;
                         button = i;
@@ -1297,7 +1297,7 @@ bool configButton(std::string str) {
         controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
 
         for (auto guid : controls.WheelControl.GetGuids()) {
-            for (int i = 0; i < 255; i++) {
+            for (int i = 0; i < MAX_RGBBUTTONS; i++) {
                 if (controls.WheelControl.IsButtonJustReleased(i, guid)) {
                     saveButton(confTag, guid, i);
                     return true;
