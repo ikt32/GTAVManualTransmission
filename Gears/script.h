@@ -1,6 +1,6 @@
 #pragma once
 
-#define DISPLAY_VERSION "v4.4.2"
+#define DISPLAY_VERSION "v4.4.3"
 #define NUM_GEARS 8
 #define MAX_GEAR 7
 
@@ -141,6 +141,7 @@ void functionHillGravity();
 ///////////////////////////////////////////////////////////////////////////////
 //                              Script entry
 ///////////////////////////////////////////////////////////////////////////////
+void readSettings();
 void ScriptMain();
 
 

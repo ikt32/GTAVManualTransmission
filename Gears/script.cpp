@@ -387,10 +387,7 @@ void initVehicle() {
 }
 
 void initialize() {
-    settings.Read(&controls);
-    menu.ReadSettings();
-    logger.SetMinLevel((LogLevel)settings.LogLevel);
-    logger.Write(INFO, "Settings read");
+    readSettings();
 
     speedoIndex = static_cast<int>(std::find(speedoTypes.begin(), speedoTypes.end(), settings.Speedo) - speedoTypes.begin());
     if (speedoIndex >= speedoTypes.size()) {
@@ -2344,8 +2341,27 @@ bool cMain() {
 }
 #endif
 
+void readSettings() {
+    settings.Read(&controls);
+    menu.ReadSettings();
+    logger.SetMinLevel((LogLevel)settings.LogLevel);
+    logger.Write(INFO, "Settings read");
+}
+
 void main() {
     logger.Write(INFO, "Script started");
+    absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir;
+    settingsGeneralFile = absoluteModPath + "\\settings_general.ini";
+    settingsWheelFile = absoluteModPath + "\\settings_wheel.ini";
+    settingsStickFile = absoluteModPath + "\\settings_stick.ini";
+    settingsMenuFile = absoluteModPath + "\\settings_menu.ini";
+    textureWheelFile = absoluteModPath + "\\texture_wheel.png";
+
+    settings.SetFiles(settingsGeneralFile, settingsWheelFile, settingsStickFile);
+    menu.RegisterOnMain(std::bind(menuInit));
+    menu.RegisterOnExit(std::bind(menuClose));
+    menu.SetFiles(settingsMenuFile);
+    initialize();
 
     ext.initOffsets();
 
@@ -2362,13 +2378,6 @@ void main() {
     //	logger.Write("STICK: DirectInput failed to initialize");
     //}
 
-    absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir;
-    settingsGeneralFile = absoluteModPath + "\\settings_general.ini";
-    settingsWheelFile = absoluteModPath + "\\settings_wheel.ini";
-    settingsStickFile = absoluteModPath + "\\settings_stick.ini";
-    settingsMenuFile = absoluteModPath + "\\settings_menu.ini";
-    textureWheelFile = absoluteModPath + "\\texture_wheel.png";
-
     if (FileExists(textureWheelFile)) {
         textureWheelId = createTexture(textureWheelFile.c_str());
     }
@@ -2377,16 +2386,8 @@ void main() {
         textureWheelId = -1;
     }
 
-    settings.SetFiles(settingsGeneralFile, settingsWheelFile, settingsStickFile);
-
-
-    menu.RegisterOnMain(std::bind(menuInit));
-    menu.RegisterOnExit(std::bind(menuClose));
-    menu.SetFiles(settingsMenuFile);
-
-    initialize();
     logger.Write(INFO, "START: Initialization finished");
-    logger.Write(DEBUG, "START: Starting with MT:  ", settings.EnableManual ? "ON" : "OFF");
+    logger.Write(DEBUG, "START: Starting with MT:  %s", settings.EnableManual ? "ON" : "OFF");
 
     while (true) {
 #ifdef _DEBUG
