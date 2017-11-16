@@ -85,7 +85,8 @@ public:
     void UpdateButtonChangeStates();
 
     void SetConstantForce(GUID device, DIAxis ffAxis, int force);
-    void StopConstantForce();
+    void SetDamper(GUID device, DIAxis ffAxis, int force);
+    void StopEffects();
 
     DIAxis StringToAxis(std::string& axisString);
 
@@ -97,15 +98,21 @@ public:
 
 private:
     void updateAxisSpeed();
-    bool createConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis);
+    void createConstantForceEffect(DWORD axis, int numAxes, DIEFFECT &diEffect);
+    void createDamperEffect(DWORD axis, int numAxes, DIEFFECT &diEffect);
+    bool createEffects(GUID device, DIAxis ffAxis);
     int povDirectionToIndex(int povDirection);
 
     std::vector<GUID> foundGuids { GUID_NULL };
 
     DiJoyStick djs;
     LPDIRECTINPUT lpDi = nullptr;
-    LPDIRECTINPUTEFFECT pCFEffect = nullptr;
-    LPDIRECTINPUTEFFECT pFREffect = nullptr;
+    LPDIRECTINPUTEFFECT m_cfEffect = nullptr;
+    LPDIRECTINPUTEFFECT m_dEffect = nullptr;
+    DICONSTANTFORCE m_constantForceParams;
+    DICONDITION m_damperParams;
+
+
     std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbPressTime   { 0 };
     std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbReleaseTime { 0 };
     std::unordered_map<GUID, std::array<bool, MAX_RGBBUTTONS>>	rgbButtonCurr { 0 };

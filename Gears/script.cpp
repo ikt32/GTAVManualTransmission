@@ -452,7 +452,7 @@ void stopForceFeedback() {
         if (settings.LogiLEDs) {
             controls.WheelControl.PlayLedsDInput(controls.SteerGUID, 0.0, 0.5, 1.0);
         }
-        controls.WheelControl.StopConstantForce();
+        controls.WheelControl.StopEffects();
     }
 }
 
@@ -1876,10 +1876,10 @@ int calculateDamper(float wheelsOffGroundRatio) {
     }
 
     // steerSpeed is to dampen the steering wheel
-    auto steerAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(controls.SteerAxisType)]);
-    auto steerSpeed = controls.WheelControl.GetAxisSpeed(steerAxis, controls.SteerGUID) / 20;
+    //auto steerAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(controls.SteerAxisType)]);
+    //auto steerSpeed = controls.WheelControl.GetAxisSpeed(steerAxis, controls.SteerGUID) / 20;
 
-    damperForce = (int)(steerSpeed * damperForce * 0.1);
+    //damperForce = (int)(steerSpeed * damperForce * 0.1);
     return damperForce;
 }
 
@@ -2043,7 +2043,7 @@ void playFFBGround() {
     }
 
 
-    int damperForce = calculateDamper(wheelsOffGroundRatio);
+    int damperForce = 50*calculateDamper(wheelsOffGroundRatio);
     int detailForce = calculateDetail();
     int satForce = calculateSat(2500, steeringAngle, vehData.Class == VehicleClass::Car);
 
@@ -2071,10 +2071,10 @@ void playFFBGround() {
         damperForce *= 2;
     }
 
-    int totalForce = 
+    int totalForce =
         satForce +
-        detailForce +
-        damperForce;
+        detailForce;
+    //+    damperForce;
 
     totalForce = (int)((float)totalForce * rotationScale);
 
@@ -2083,7 +2083,8 @@ void playFFBGround() {
 
     auto ffAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::ForceFeedback)]);
     controls.WheelControl.SetConstantForce(controls.SteerGUID, ffAxis, totalForce);
-
+    controls.WheelControl.SetDamper(controls.SteerGUID, ffAxis, abs(damperForce));
+    showText(0.5, 0.05, 0.5, std::to_string(damperForce).c_str());
     
     if (settings.DisplayInfo) {
         showText(0.85, 0.275, 0.4, std::string(abs(satForce) > 10000 ? "~r~" : "~w~") + "FFBSat:\t\t" + std::to_string(satForce) + "~w~", 4);
@@ -2123,8 +2124,8 @@ void playFFBWater() {
 
     int totalForce =
         satForce +
-        detailForce +
-        damperForce;
+        detailForce;// +
+        //damperForce;
 
     totalForce = (int)((float)totalForce * rotationScale);
 
@@ -2133,7 +2134,7 @@ void playFFBWater() {
 
     auto ffAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::ForceFeedback)]);
     controls.WheelControl.SetConstantForce(controls.SteerGUID, ffAxis, totalForce);
-
+    //controls.WheelControl.SetDamper(controls.SteerGUID, ffAxis, 0);
 
     if (settings.DisplayInfo) {
         showText(0.85, 0.275, 0.4, std::string(abs(satForce) > 10000 ? "~r~" : "~w~") + "FFBSat:\t\t" + std::to_string(satForce) + "~w~", 4);

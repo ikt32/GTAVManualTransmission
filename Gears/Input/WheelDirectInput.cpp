@@ -28,8 +28,7 @@ std::string formatError(HRESULT hr) {
 }
 
 
-WheelDirectInput::WheelDirectInput() : pCFEffect{nullptr},
-                                       pFREffect{nullptr} { }
+WheelDirectInput::WheelDirectInput() { }
 
 WheelDirectInput::~WheelDirectInput() {
     for (int i = 0; i < djs.getEntryCount(); i++) {
@@ -38,8 +37,8 @@ WheelDirectInput::~WheelDirectInput() {
             device->diDevice->Unacquire();
     }
     
-    SAFE_RELEASE(pCFEffect);
-    SAFE_RELEASE(pFREffect);
+    SAFE_RELEASE(m_cfEffect);
+    SAFE_RELEASE(m_dEffect);
     SAFE_RELEASE(lpDi);
 }
 
@@ -135,7 +134,7 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
         return false;
     }
     logger.Write(INFO, "WHEEL: Init FFB effect on axis " + DIAxisHelper[ffAxis]);
-    if (!createConstantForceEffect(e, ffAxis)) {
+    if (!createEffects(guid, ffAxis)) {
         logger.Write(ERROR, "WHEEL: Init FFB effect failed");
     } else {
         logger.Write(INFO, "WHEEL: Init FFB effect success");
@@ -318,11 +317,67 @@ void logCreateEffectException(const DiJoyStick::Entry *e) {
     logger.Write(FATAL, "\tGUID: %s", szGuid);
 }
 
-void logCreateEffectError(HRESULT hr) {
-    logger.Write(ERROR, "CreateEffect failed: " + formatError(hr));
+void logCreateEffectError(HRESULT hr, const char *which) {
+    logger.Write(ERROR, "CreateEffect failed: %s (%s)", formatError(hr).c_str(), which);
 }
 
-bool WheelDirectInput::createConstantForceEffect(const DiJoyStick::Entry *e, DIAxis ffAxis) {
+void WheelDirectInput::createConstantForceEffect(DWORD axis, int numAxes, DIEFFECT &diEffect) {
+    DWORD rgdwAxes[1] = { axis };
+    LONG rglDirection[1] = { 0 };
+    m_constantForceParams.lMagnitude = 0;
+
+    ZeroMemory(&diEffect, sizeof(diEffect));
+    diEffect.dwSize = sizeof(DIEFFECT);
+    diEffect.rgdwAxes = rgdwAxes;
+    diEffect.rglDirection = rglDirection;
+    diEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
+    diEffect.dwDuration = INFINITE;
+    diEffect.dwSamplePeriod = 0;
+    diEffect.dwGain = DI_FFNOMINALMAX;
+    diEffect.dwTriggerButton = DIEB_NOTRIGGER;
+    diEffect.dwTriggerRepeatInterval = 0;
+
+    diEffect.cAxes = numAxes;
+    diEffect.lpEnvelope = nullptr;
+    diEffect.cbTypeSpecificParams = diEffect.cAxes * sizeof(DICONSTANTFORCE);
+    diEffect.lpvTypeSpecificParams = &m_constantForceParams;
+    diEffect.dwStartDelay = 0;
+}
+
+void WheelDirectInput::createDamperEffect(DWORD axis, int numAxes, DIEFFECT &diEffect) {
+    DWORD rgdwAxes[1] = { axis };
+    LONG rglDirection[1] = { 1 };
+
+    m_damperParams.lDeadBand = 0;
+    m_damperParams.lOffset = 0;
+    m_damperParams.lPositiveCoefficient = 0;
+    m_damperParams.lNegativeCoefficient = 0;
+    m_damperParams.dwPositiveSaturation = DI_FFNOMINALMAX;
+    m_damperParams.dwNegativeSaturation = DI_FFNOMINALMAX;
+
+    ZeroMemory(&diEffect, sizeof(diEffect));
+    diEffect.dwSize = sizeof(DIEFFECT);
+    diEffect.rgdwAxes = rgdwAxes;
+    diEffect.rglDirection = rglDirection;
+    diEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
+    diEffect.dwDuration = INFINITE;
+    diEffect.dwSamplePeriod = 0;
+    diEffect.dwGain = DI_FFNOMINALMAX;
+    diEffect.dwTriggerButton = DIEB_NOTRIGGER;
+    diEffect.dwTriggerRepeatInterval = 0;
+
+    diEffect.cAxes = numAxes;
+    diEffect.dwStartDelay = 0;
+    diEffect.lpEnvelope = nullptr;
+    diEffect.cbTypeSpecificParams = diEffect.cAxes * sizeof(DICONDITION);
+    diEffect.lpvTypeSpecificParams = &m_damperParams;
+}
+
+bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
+    const int numEffects = 2;
+    int createdEffects = 0;
+    auto e = FindEntryFromGUID(device);
+    
     if (!e)
         return false;
 
@@ -339,80 +394,102 @@ bool WheelDirectInput::createConstantForceEffect(const DiJoyStick::Entry *e, DIA
 
     // TODO: Make joystickable
     // I'm focusing on steering wheels, so you get one axis.
-    DWORD rgdwAxes[1] = { axis };
-    LONG rglDirection[1] = { 0 };
-    DICONSTANTFORCE cf = { 0 };
-
-    DIEFFECT diEffect;
-    ZeroMemory(&diEffect, sizeof(diEffect));
-    diEffect.dwSize = sizeof(DIEFFECT);
-    diEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
-    diEffect.dwDuration = INFINITE;
-    diEffect.dwSamplePeriod = 0;
-    diEffect.dwGain = DI_FFNOMINALMAX;
-    diEffect.dwTriggerButton = DIEB_NOTRIGGER;
-    diEffect.dwTriggerRepeatInterval = 0;
-    diEffect.cAxes = 1;
-    diEffect.rgdwAxes = rgdwAxes;
-    diEffect.rglDirection = rglDirection;
-    diEffect.lpEnvelope = nullptr;
-    diEffect.cbTypeSpecificParams = sizeof(DICONSTANTFORCE);
-    diEffect.lpvTypeSpecificParams = &cf;
-    diEffect.dwStartDelay = 0;
+    int numAxes = 1;
+    DIEFFECT cfEffect;
+    createConstantForceEffect(axis, numAxes, cfEffect);
+    DIEFFECT damperEffect;
+    createDamperEffect(axis, numAxes, damperEffect);
 
     // Call to this crashes? (G920 + SHVDN)
     __try {
-        hr = e->diDevice->CreateEffect(GUID_ConstantForce, &diEffect, &pCFEffect, nullptr);
+        hr = e->diDevice->CreateEffect(GUID_ConstantForce, &cfEffect, &m_cfEffect, nullptr);
+        if (FAILED(hr) || !m_cfEffect) {
+            logCreateEffectError(hr, "constant force");
+        }
+        else {
+            createdEffects++;
+        }
+        hr = e->diDevice->CreateEffect(GUID_Damper, &damperEffect, &m_dEffect, nullptr);
+        if (FAILED(hr) || !m_dEffect) {
+            logCreateEffectError(hr, "damper");
+        }
+        else {
+            createdEffects++;
+        }
+
     }
     __except (filterException(GetExceptionCode(), GetExceptionInformation())) {
         logCreateEffectException(e);
         return false;
     }
     
-    if (FAILED(hr) || !pCFEffect) {
-        logCreateEffectError(hr);
-        return false;
-    }
+    if (createdEffects == 0) return false;
 
     return true;
 }
 
-void WheelDirectInput::SetConstantForce(GUID device, WheelDirectInput::DIAxis ffAxis, int force) {
+void WheelDirectInput::SetConstantForce(GUID device, DIAxis ffAxis, int force) {
     // As per Microsoft's DirectInput example:
     // Modifying an effect is basically the same as creating a new one, except
     // you need only specify the parameters you are modifying
     auto e = FindEntryFromGUID(device);
-    if (!e || !pCFEffect || !hasForceFeedback[device][ffAxis])
+    if (!e || !m_cfEffect || !hasForceFeedback[device][ffAxis])
         return;
 
-    LONG rglDirection[1] = {0};
+    LONG rglDirection[1] = { 0 };
 
-    DICONSTANTFORCE cf;
-    cf.lMagnitude = force;
+    m_constantForceParams.lMagnitude = force;
 
-    DIEFFECT diEffect;
-    ZeroMemory(&diEffect, sizeof(diEffect));
-    diEffect.dwSize = sizeof(DIEFFECT);
-    diEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
-    diEffect.cAxes = 1;
-    diEffect.rglDirection = rglDirection;
-    diEffect.lpEnvelope = nullptr;
-    diEffect.cbTypeSpecificParams = sizeof(DICONSTANTFORCE);
-    diEffect.lpvTypeSpecificParams = &cf;
-    diEffect.dwStartDelay = 0;
-    
-    // This should also automagically play.
-    // Might also crash (G920)
-    // pCFEffect should be NULL and the function should've exited early
-    // if pCFEffect was NULL anyway.
+    DIEFFECT effect;
+    ZeroMemory(&effect, sizeof(effect));
+    effect.dwSize = sizeof(DIEFFECT);
+    effect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
+    effect.cAxes = 1;
+    effect.rglDirection = rglDirection;
+    effect.lpEnvelope = nullptr;
+    effect.cbTypeSpecificParams = effect.cAxes * sizeof(DICONSTANTFORCE);
+    effect.lpvTypeSpecificParams = &m_constantForceParams;
+    effect.dwStartDelay = 0;
 
-    pCFEffect->SetParameters(&diEffect,
+    e->diDevice->Acquire();
+    m_cfEffect->SetParameters(&effect,
         DIEP_DIRECTION | DIEP_TYPESPECIFICPARAMS | DIEP_START);
+    m_dEffect->Start(1, 0);
 }
 
-void WheelDirectInput::StopConstantForce() {
-    if (pCFEffect != nullptr) {
-        pCFEffect->Stop();
+void WheelDirectInput::SetDamper(GUID device, DIAxis ffAxis, int force) {
+    auto e = FindEntryFromGUID(device);
+    if (!e || !m_dEffect || !hasForceFeedback[device][ffAxis])
+        return;
+
+    LONG rglDirection[1] = { 1 };
+
+    m_damperParams.lPositiveCoefficient = force;
+    m_damperParams.lNegativeCoefficient = force;
+
+    DIEFFECT effect;
+    ZeroMemory(&effect, sizeof(effect));
+    effect.dwSize = sizeof(DIEFFECT);
+    effect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
+    effect.cAxes = 1;
+    effect.rglDirection = rglDirection;
+    effect.lpEnvelope = nullptr;
+    effect.cbTypeSpecificParams = effect.cAxes * sizeof(DICONDITION);
+    effect.lpvTypeSpecificParams = &m_damperParams;
+    effect.dwStartDelay = 0;
+
+    e->diDevice->Acquire();
+    m_dEffect->SetParameters(&effect,
+        DIEP_DIRECTION | DIEP_TYPESPECIFICPARAMS | DIEP_START);
+    m_dEffect->Start(1, 0);
+}
+
+void WheelDirectInput::StopEffects() {
+    if (m_cfEffect != nullptr) {
+        m_cfEffect->Stop();
+    }
+    if (m_dEffect != nullptr) {
+        m_dEffect->Stop();
     }
 }
 
@@ -477,29 +554,26 @@ std::vector<GUID> WheelDirectInput::GetGuids() {
     return foundGuids;
 }
 
+CONST DWORD ESCAPE_COMMAND_LEDS = 0;
+CONST DWORD LEDS_VERSION_NUMBER = 0x00000001;
+
+struct LedsRpmData {
+    FLOAT currentRPM;
+    FLOAT rpmFirstLedTurnsOn;
+    FLOAT rpmRedLine;
+};
+
+struct WheelData {
+    DWORD size;
+    DWORD versionNbr;
+    LedsRpmData rpmData;
+};
+
 void WheelDirectInput::PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine) {
     auto e = FindEntryFromGUID(guid);
 
     if (!e)
         return;
-
-    CONST DWORD ESCAPE_COMMAND_LEDS = 0;
-    CONST DWORD LEDS_VERSION_NUMBER = 0x00000001;
-
-    struct LedsRpmData
-    {
-        FLOAT currentRPM;
-        FLOAT rpmFirstLedTurnsOn;
-        FLOAT rpmRedLine;
-    };
-
-    struct WheelData
-    {
-        DWORD size;
-        DWORD versionNbr;
-        LedsRpmData rpmData;
-    };
-
     
     WheelData wheelData_;
     ZeroMemory(&wheelData_, sizeof(wheelData_));
