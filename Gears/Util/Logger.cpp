@@ -5,9 +5,6 @@
 #include <fstream>
 
 Logger::Logger() {
-#ifdef _DEBUG
-    minLevel = DEBUG;
-#endif
 }
 
 void Logger::SetFile(const std::string &fileName) {
@@ -15,11 +12,7 @@ void Logger::SetFile(const std::string &fileName) {
 }
 
 void Logger::SetMinLevel(LogLevel level) {
-#ifdef _DEBUG
-    minLevel = DEBUG;
-#else
     minLevel = level;
-#endif
 }
 
 void Logger::Clear() const {
@@ -27,7 +20,9 @@ void Logger::Clear() const {
 }
 
 void Logger::Write(LogLevel level, const std::string& text) const {
+#ifndef _DEBUG
     if (level < minLevel) return;
+#endif
     std::ofstream logFile(file, std::ios_base::out | std::ios_base::app);
     SYSTEMTIME currTimeLog;
     GetLocalTime(&currTimeLog);
@@ -41,7 +36,6 @@ void Logger::Write(LogLevel level, const std::string& text) const {
 }
 
 void Logger::Write(LogLevel level, const char *fmt, ...) const {
-    if (level < minLevel) return;
     const int size = 1024;
     char buff[size];
     va_list args;

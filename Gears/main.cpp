@@ -6,19 +6,12 @@
 #include "Util/Logger.hpp"
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/Versions.h"
-#include "Memory/NativeMemory.hpp"
 
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
-    mem::init();
     std::string logFile = Paths::GetModuleFolder(hInstance) + mtDir +
         "\\" + Paths::GetModuleNameWithoutExtension(hInstance) + ".log";
     logger.SetFile(logFile);
-#ifdef _DEBUG
-    logger.SetMinLevel(DEBUG);
-#else
-    logger.SetMinLevel(INFO);
-#endif
     Paths::SetOurModuleHandle(hInstance);
 
     // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement

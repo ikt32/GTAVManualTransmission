@@ -16,15 +16,14 @@ int findOffset(const std::map<int, int, std::greater<int>> &offsets) {
     return offsets.lower_bound(g_gameVersion)->second;
 }
 
-VehicleExtensions::VehicleExtensions() {
-    mem::init();
-}
+VehicleExtensions::VehicleExtensions() { }
 
 /*
  * Offsets/patterns done by me might need revision, but they've been checked 
  * against b1180.2 and b877.1 and are okay.
  */
 void VehicleExtensions::initOffsets() {
+    mem::init();
     uintptr_t addr = mem::FindPattern("\x3A\x91\x00\x00\x00\x00\x74\x00\x84\xD2", "xx????x?xx");
     rocketBoostActiveOffset = addr == 0 ? 0 : *(int*)(addr + 2);
     logger.Write(rocketBoostActiveOffset == 0 ? WARN : DEBUG, "Rocket Boost Active Offset: 0x%X", rocketBoostActiveOffset);

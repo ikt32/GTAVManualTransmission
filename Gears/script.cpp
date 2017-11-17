@@ -388,14 +388,6 @@ void initVehicle() {
 
 void initialize() {
     readSettings();
-
-    speedoIndex = static_cast<int>(std::find(speedoTypes.begin(), speedoTypes.end(), settings.Speedo) - speedoTypes.begin());
-    if (speedoIndex >= speedoTypes.size()) {
-        speedoIndex = 0;
-    }
-
-    vehData.LockGear = 1;
-    vehData.FakeNeutral = settings.DefaultNeutral;
     initWheel();
 }
 
@@ -2343,8 +2335,15 @@ bool cMain() {
 
 void readSettings() {
     settings.Read(&controls);
-    menu.ReadSettings();
+    if (settings.LogLevel > 4) settings.LogLevel = 1;
     logger.SetMinLevel((LogLevel)settings.LogLevel);
+
+    speedoIndex = static_cast<int>(std::find(speedoTypes.begin(), speedoTypes.end(), settings.Speedo) - speedoTypes.begin());
+    if (speedoIndex >= speedoTypes.size()) {
+        speedoIndex = 0;
+    }
+    vehData.FakeNeutral = settings.DefaultNeutral;
+    menu.ReadSettings();
     logger.Write(INFO, "Settings read");
 }
 
@@ -2361,8 +2360,7 @@ void main() {
     menu.RegisterOnMain(std::bind(menuInit));
     menu.RegisterOnExit(std::bind(menuClose));
     menu.SetFiles(settingsMenuFile);
-    initialize();
-
+    readSettings();
     ext.initOffsets();
 
     logger.Write(INFO, "Setting up globals");
@@ -2373,6 +2371,7 @@ void main() {
     if (!controls.WheelControl.PreInit()) {
         logger.Write(ERROR, "WHEEL: DirectInput failed to initialize");
     }
+    initWheel();
 
     //if (!controls.StickControl.PreInit()) {
     //	logger.Write("STICK: DirectInput failed to initialize");
@@ -2386,8 +2385,8 @@ void main() {
         textureWheelId = -1;
     }
 
-    logger.Write(INFO, "START: Initialization finished");
     logger.Write(DEBUG, "START: Starting with MT:  %s", settings.EnableManual ? "ON" : "OFF");
+    logger.Write(INFO, "START: Initialization finished");
 
     while (true) {
 #ifdef _DEBUG
