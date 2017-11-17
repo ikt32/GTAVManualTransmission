@@ -31,6 +31,8 @@
 #include "Memory/Offsets.hpp"
 #include "MiniPID/MiniPID.h"
 
+const std::string mtPrefix = "~b~Manual Transmission~w~~n~";
+
 const char* decorCurrentGear = "mt_gear";
 const char* decorShiftNotice = "mt_shift_indicator";
 const char* decorFakeNeutral = "mt_neutral";
@@ -409,7 +411,7 @@ void reset() {
 void toggleManual() {
     settings.EnableManual = !settings.EnableManual;
     settings.SaveGeneral();
-    std::string message = "~b~Manual Transmission~w~~n~";
+    std::string message = mtPrefix;
     if (settings.EnableManual) {
         message += "Enabled";
     }
@@ -518,7 +520,7 @@ void resetSteeringMultiplier() {
 void updateLastInputDevice() {
     if (controls.PrevInput != controls.GetLastInputDevice(controls.PrevInput,settings.EnableWheel)) {
         controls.PrevInput = controls.GetLastInputDevice(controls.PrevInput, settings.EnableWheel);
-        std::string message = "~b~Manual Transmission~w~~n~Input: ";
+        std::string message = mtPrefix + "Input: ";
         switch (controls.PrevInput) {
             case ScriptControls::Keyboard:
                 message += "Keyboard";
@@ -564,7 +566,7 @@ void setShiftMode(int shiftMode) {
         vehData.FakeNeutral = false;
     }
 
-    std::string mode = "~b~Manual Transmission~w~~n~Mode: ";
+    std::string mode = mtPrefix + "Mode: ";
     // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
     switch (settings.ShiftMode) {
         case Sequential: mode += "Sequential"; break;
@@ -2189,10 +2191,15 @@ BYTE* g_bIsDecorRegisterLockedPtr = nullptr;
 bool setupGlobals() {
     auto addr = mem::FindPattern("\x40\x53\x48\x83\xEC\x20\x80\x3D\x00\x00\x00\x00\x00\x8B\xDA\x75\x29",
                                  "xxxxxxxx????xxxxx");
-    if (!addr)
+    if (!addr) {
+        logger.Write(ERROR, "Couldn't find pattern for bIsDecorRegisterLockedPtr");
         return false;
+    }
 
     g_bIsDecorRegisterLockedPtr = (BYTE*)(addr + *(int*)(addr + 8) + 13);
+
+    logger.Write(DEBUG, "bIsDecorRegisterLockedPtr @ 0x%p", g_bIsDecorRegisterLockedPtr);
+
     *g_bIsDecorRegisterLockedPtr = 0;
 
     // New decorators! :)
@@ -2241,7 +2248,7 @@ std::string getInputDevice() {
  * 1: try catch
  */
 void cleanup(int type) {
-    showNotification("~b~Manual Transmission~w~~n~Script crashed! Check Gears.log");
+    showNotification(mtPrefix + "Script crashed! Check Gears.log");
     logger.Write(FATAL, "CRASH: Init shutdown: %s", type == 0 ? "__except" : "catch");
     bool successI = MemoryPatcher::RestoreInstructions();
     bool successS = MemoryPatcher::RestoreSteeringCorrection();
