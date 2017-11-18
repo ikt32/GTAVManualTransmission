@@ -30,3 +30,8 @@ inline float rad2deg(float rad) {
 inline float deg2rad(float deg) {
     return (deg*3.14159265358979323846264338327950288f / 180.0f);
 }
+
+template <typename T>
+T map(T x, T in_min, T in_max, T out_min, T out_max) {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}

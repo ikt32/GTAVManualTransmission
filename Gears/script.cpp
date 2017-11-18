@@ -1832,46 +1832,51 @@ void playFFBAir() {
     // Stick ffb?
 }
 
-int calculateDamper(float wheelsOffGroundRatio) {
+int calculateDamper(float gain, float wheelsOffGroundRatio) {
     Vector3 accelValsAvg = vehData.GetRelativeAccelerationAverage();
     
-    // targetSpeed is the speed at which the damperForce is at minimum
-    // damperForce is maximum at speed 0 and decreases with speed increase
-    float adjustRatio = static_cast<float>(settings.DamperMax) / static_cast<float>(settings.DamperMinSpeed);
-    int damperForce = settings.DamperMax - static_cast<int>(ENTITY::GET_ENTITY_SPEED(vehicle) * adjustRatio);
+    // Just to use floats everywhere here
+    float damperMax = static_cast<float>(settings.DamperMax);
+    float damperMin = static_cast<float>(settings.DamperMin);
+    float damperMinSpeed = static_cast<float>(settings.DamperMinSpeed);
 
-    // Acceleration also affects damper force
-    damperForce -= static_cast<int>(adjustRatio * accelValsAvg.y);
+    float absVehicleSpeed = abs(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y);
+    float damperFactorSpeed = map(absVehicleSpeed, 0.0f, damperMinSpeed, damperMax, damperMin);
+    damperFactorSpeed = fmaxf(damperFactorSpeed, damperMin);
+    // already clamped on the upper bound by abs(vel) in map()
 
-    // And wheels not touching the ground!
-    if (wheelsOffGroundRatio > 0.0f) {
-        damperForce = settings.DamperMin + (int)(((float)damperForce - (float)settings.DamperMin) * (1.0f - wheelsOffGroundRatio));
-    }
+    // 2G of deceleration causes addition of damperMin. Heavier feeling steer when braking!
+    float damperFactorAccel = map(-accelValsAvg.y / 9.81f, -2.0f, 2.0f, -damperMin, damperMin);
+    damperFactorAccel = fmaxf(damperFactorAccel, -damperMin);
+    damperFactorAccel = fminf(damperFactorAccel, damperMin);
+
+    float damperForce = damperFactorSpeed + damperFactorAccel;
+
+    damperForce = damperForce * (1.0f - wheelsOffGroundRatio);
     
-    if (damperForce < settings.DamperMin) {
-        damperForce = settings.DamperMin;
-    }
-
     if (vehData.Class == VehicleClass::Car || vehData.Class == VehicleClass::Quad) {
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true) && VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
-            damperForce = settings.DamperMin;
+        if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
+            damperForce /= 2.0f;
         }
-        else if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true) || VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
-            damperForce = settings.DamperMin + (int)(((float)damperForce - (float)settings.DamperMin) * 0.5f);
+        if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
+            damperForce /= 2.0f;
         }
     }
     else if (vehData.Class == VehicleClass::Bike) {
         if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
-            damperForce = settings.DamperMin;
+            damperForce /= 4.0f;
         }
     }
 
-    // steerSpeed is to dampen the steering wheel
-    //auto steerAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(controls.SteerAxisType)]);
-    //auto steerSpeed = controls.WheelControl.GetAxisSpeed(steerAxis, controls.SteerGUID) / 20;
+    if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
+        damperForce *= 2.0f;
+    }
 
-    //damperForce = (int)(steerSpeed * damperForce * 0.1);
-    return damperForce;
+    // clamp
+    damperForce = fmaxf(damperForce, damperMin / 4.0f);
+    damperForce = fminf(damperForce, damperMax * 2.0f);
+
+    return static_cast<int>(damperForce);
 }
 
 int calculateDetail() {
@@ -1888,7 +1893,7 @@ int calculateDetail() {
     return static_cast<int>(1000.0f * settings.DetailMult * compSpeedTotal);
 }
 
-void calculateSoftLock(int &totalForce) {
+int calculateSoftLock(int totalForce) {
     float steerMult;
     if (vehData.Class == VehicleClass::Bike || vehData.Class == VehicleClass::Quad)
         steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
@@ -1910,10 +1915,11 @@ void calculateSoftLock(int &totalForce) {
             totalForce = -10000;
         }
     }
+    return totalForce;
 }
 
 // Despite being scientifically inaccurate, "self-aligning torque" is the best description.
-int calculateSat(int defaultGain, float steeringAngle, bool isCar) {
+int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRatio, bool isCar) {
     Vector3 velocityWorld = ENTITY::GET_ENTITY_VELOCITY(vehicle);
     Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(vehicle, 1);
     Vector3 travelWorld = velocityWorld + positionWorld;
@@ -1947,6 +1953,22 @@ int calculateSat(int defaultGain, float steeringAngle, bool isCar) {
             steeringAngleRelX < turnRelativeNormX && turnRelativeNormX < travelRelative.x) {
             satForce = (int)((float)satForce / std::max(1.0f, understeer + 1.0f));
             understeering = true;
+        }
+    }
+
+    satForce = (int)((float)satForce * (1.0f - wheelsOffGroundRatio));
+
+    if (vehData.Class == VehicleClass::Car || vehData.Class == VehicleClass::Quad) {
+        if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
+            satForce = satForce / 4;
+        }
+        if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
+            satForce = satForce / 4;
+        }
+    }
+    else if (vehData.Class == VehicleClass::Bike) {
+        if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
+            satForce = satForce / 10;
         }
     }
 
@@ -2011,11 +2033,8 @@ void playFFBGround() {
             }
         }
     }
-    float wheelsOffGroundRatio;
-    if (steeredWheels == 0.0f) {
-        wheelsOffGroundRatio = -1.0f;
-    }
-    else {
+    float wheelsOffGroundRatio = 0.0f;
+    if (steeredWheels != 0.0f) {
         wheelsOffGroundRatio = steeredWheelsFree / steeredWheels;
     }
 
@@ -2033,53 +2052,27 @@ void playFFBGround() {
         steeringAngle = allAngles / steeredWheels;
     }
 
-
-    int damperForce = 50*calculateDamper(wheelsOffGroundRatio);
+    int damperForce = calculateDamper(50.0f, wheelsOffGroundRatio);
     int detailForce = calculateDetail();
-    int satForce = calculateSat(2500, steeringAngle, vehData.Class == VehicleClass::Car);
-
-    if (wheelsOffGroundRatio > 0.0f) {
-        satForce = (int)((float)satForce * (1.0f - wheelsOffGroundRatio));
-    }
-
-    if (vehData.Class == VehicleClass::Car || vehData.Class == VehicleClass::Quad) {
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
-            satForce = satForce / 4;
-            damperForce = damperForce / 2;
-        }
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 1, true)) {
-            satForce = satForce / 4;
-            damperForce = damperForce / 2;
-        }
-    }
-    else if (vehData.Class == VehicleClass::Bike) {
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
-            satForce = satForce / 10;
-        }
-    }
-
-    if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
-        damperForce *= 2;
-    }
+    int satForce = calculateSat(2500, steeringAngle, wheelsOffGroundRatio, vehData.Class == VehicleClass::Car);
 
     int totalForce =
         satForce +
         detailForce;
-    //+    damperForce;
 
     totalForce = (int)((float)totalForce * rotationScale);
 
-    // Soft lock
-    calculateSoftLock(totalForce);
+    totalForce = calculateSoftLock(totalForce);
 
     auto ffAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::ForceFeedback)]);
     controls.WheelControl.SetConstantForce(controls.SteerGUID, ffAxis, totalForce);
-    controls.WheelControl.SetDamper(controls.SteerGUID, ffAxis, abs(damperForce));
-    showText(0.5, 0.05, 0.5, std::to_string(damperForce).c_str());
+    controls.WheelControl.SetDamper(controls.SteerGUID, ffAxis, damperForce);
+    
     
     if (settings.DisplayInfo) {
         showText(0.85, 0.275, 0.4, std::string(abs(satForce) > 10000 ? "~r~" : "~w~") + "FFBSat:\t\t" + std::to_string(satForce) + "~w~", 4);
         showText(0.85, 0.300, 0.4, std::string(abs(totalForce) > 10000 ? "~r~" : "~w~") + "FFBFin:\t\t" + std::to_string(totalForce) + "~w~", 4);
+        showText(0.5, 0.05, 0.5, std::string("Damper: ") + std::to_string(damperForce).c_str());
     }
 }
 
@@ -2100,17 +2093,13 @@ void playFFBWater() {
     auto angles = ext.GetWheelSteeringAngles(vehicle);
 
     bool isInWater = ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle) > 0.10f;
-    int damperForce = calculateDamper(isInWater ? 0.25f : 1.0f);
+    int damperForce = calculateDamper(50.0f, isInWater ? 0.25f : 1.0f);
     int detailForce = calculateDetail();
-    int satForce = calculateSat(750, ENTITY::GET_ENTITY_ROTATION_VELOCITY(vehicle).z, false);
+    int satForce = calculateSat(750, ENTITY::GET_ENTITY_ROTATION_VELOCITY(vehicle).z, 1.0f, false);
 
     // "Reduction" effects - those that affect already calculated things
     if (!isInWater) {
         satForce = 0;
-    }
-
-    if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
-        damperForce *= 2;
     }
 
     int totalForce =
@@ -2121,11 +2110,11 @@ void playFFBWater() {
     totalForce = (int)((float)totalForce * rotationScale);
 
     // Soft lock
-    calculateSoftLock(totalForce);
+    totalForce = calculateSoftLock(totalForce);
 
     auto ffAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::ForceFeedback)]);
     controls.WheelControl.SetConstantForce(controls.SteerGUID, ffAxis, totalForce);
-    //controls.WheelControl.SetDamper(controls.SteerGUID, ffAxis, 0);
+    controls.WheelControl.SetDamper(controls.SteerGUID, ffAxis, damperForce);
 
     if (settings.DisplayInfo) {
         showText(0.85, 0.275, 0.4, std::string(abs(satForce) > 10000 ? "~r~" : "~w~") + "FFBSat:\t\t" + std::to_string(satForce) + "~w~", 4);

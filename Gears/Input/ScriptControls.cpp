@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include "keyboard.h"
 #include "Util/Logger.hpp"
+#include "Util/MathExt.h"
 
 ScriptControls::ScriptControls(): PrevInput(Keyboard),
                                 WheelControl(),
@@ -48,10 +49,6 @@ void ScriptControls::updateController() {
         ClutchVal = controller.GetAnalogValue(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Clutch)]), buttonState);
         ClutchValRaw = ClutchVal;
     }
-}
-
-float map(float x, float in_min, float in_max, float out_min, float out_max) {
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 void ScriptControls::updateWheel() {
