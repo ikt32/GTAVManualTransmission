@@ -136,10 +136,11 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
     logger.Write(INFO, "WHEEL: Init FFB effect on axis " + DIAxisHelper[ffAxis]);
     if (!createEffects(guid, ffAxis)) {
         logger.Write(ERROR, "WHEEL: Init FFB effect failed");
-    } else {
-        logger.Write(INFO, "WHEEL: Init FFB effect success");
-        hasForceFeedback[guid][ffAxis] = true;
-    }
+        hasForceFeedback[guid][ffAxis] = false;
+        return false;
+    } 
+    logger.Write(INFO, "WHEEL: Init FFB effect success");
+    hasForceFeedback[guid][ffAxis] = true;
     return true;
 }
 
@@ -301,8 +302,8 @@ void WheelDirectInput::UpdateButtonChangeStates() {
 }
 
 int filterException(int code, PEXCEPTION_POINTERS ex) {
-    logger.Write(FATAL, "Caught exception %d", code);
-    logger.Write(FATAL, "\tException address 0x%X", ex->ExceptionRecord->ExceptionAddress);
+    logger.Write(FATAL, "Caught exception 0x%X", code);
+    logger.Write(FATAL, "\tException address 0x%p", ex->ExceptionRecord->ExceptionAddress);
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
