@@ -30,10 +30,12 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
         }
         case DLL_PROCESS_DETACH: {
             logger.Write(INFO, "Init shutdown");
-            bool successI = MemoryPatcher::RestoreInstructions();
-            bool successS = MemoryPatcher::RestoreSteeringCorrection();
-            bool successSC= MemoryPatcher::RestoreSteeringControl();
-            bool successB = MemoryPatcher::RestoreBrakeDecrement();
+            bool successI  = MemoryPatcher::RestoreInstructions();
+            bool successS  = MemoryPatcher::RestoreSteeringCorrection();
+            bool successSC = MemoryPatcher::RestoreSteeringControl();
+            bool successB  = MemoryPatcher::RestoreBrakeDecrement();
+            bool successSU = MemoryPatcher::RestoreShiftUp();
+
             resetSteeringMultiplier();
             stopForceFeedback();
             scriptUnregister(hInstance);
@@ -43,13 +45,15 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             }
             else {
                 if (!successI)
-                    logger.Write(WARN, "Shut down script with instructions not restored");
+                    logger.Write(WARN, "PATCH: (Shutdown) instructions not restored");
                 if (!successS)
-                    logger.Write(WARN, "Shut down script with steer correction not restored");
+                    logger.Write(WARN, "PATCH: (Shutdown) steer correction not restored");
                 if (!successSC)
-                    logger.Write(WARN, "Shut down script with steer control not restored");
+                    logger.Write(WARN, "PATCH: (Shutdown) steer control not restored");
                 if (!successB)
-                    logger.Write(WARN, "Shut down script with brake decrement not restored");
+                    logger.Write(WARN, "PATCH: (Shutdown) brake decrement not restored");
+                if (!successSU)
+                    logger.Write(WARN, "PATCH: (Shutdown) Shift Up not restored");
             }
             break;
         }

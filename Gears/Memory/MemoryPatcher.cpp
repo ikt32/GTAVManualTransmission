@@ -389,24 +389,26 @@ bool PatchShiftUp() {
         }
         return false;
     }
-
     shiftUpAddr = shiftUpTemp;
     ShiftUpPatched = true;
-
     shiftUpAttempts = 0;
+
+    logger.Write(DEBUG, "PATCH: Shift Up @ 0x%p", shiftUpAddr);
+    logger.Write(DEBUG, "PATCH: Shift Up Patch success");
     return true;
 }
 bool RestoreShiftUp() {
-    if (!BrakeDecrementPatched) {
+    if (!ShiftUpPatched) {
         return true;
     }
 
     if (!shiftUpAddr) {
-        logger.Write(ERROR, "BRAKE PRESSURE: Restore failed");
+        logger.Write(ERROR, "PATCH: Shift Up Restore failed");
         return false;
     }
 
     RevertShiftUpPatch(shiftUpAddr);
+    logger.Write(DEBUG, "PATCH: Shift Up Revert success");
     shiftUpAddr = 0;
     ShiftUpPatched = false;
     shiftUpAttempts = 0;

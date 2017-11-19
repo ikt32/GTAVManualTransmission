@@ -241,6 +241,18 @@ void update() {
         }
     }
 
+    // Only bikes that are bike-like
+    if (vehData.Class == VehicleClass::Bike && ext.GetNumWheels(vehicle) == 2) {
+        if (!MemoryPatcher::ShiftUpPatched)
+            MemoryPatcher::PatchShiftUp();
+        functionBikeLimiting();
+    }
+    else {
+        if (MemoryPatcher::ShiftUpPatched) {
+            MemoryPatcher::RestoreShiftUp();
+        }
+    }
+
     // Limit truck speed per gear upon game wanting to shift, but we block it.
     if (vehData.IsTruck) {
         functionTruckLimiting();
@@ -404,6 +416,9 @@ void reset() {
     }
     if (MemoryPatcher::BrakeDecrementPatched) {
         MemoryPatcher::RestoreBrakeDecrement();
+    }
+    if (MemoryPatcher::ShiftUpPatched) {
+        MemoryPatcher::RestoreShiftUp();
     }
     stopForceFeedback();
 }
@@ -902,14 +917,7 @@ std::vector<float> getDrivenWheelsSpeeds(std::vector<float> wheelSpeeds) {
     else {
         // bikes
         if (ext.GetNumWheels(vehicle) == 2) {
-            // fwd
-            if (ext.GetDriveBiasFront(vehicle) == 1.0f) {
-                wheelsToConsider.push_back(wheelSpeeds[0]);
-            }
-            // rwd
-            else if (ext.GetDriveBiasFront(vehicle) == 0.0f) {
-                wheelsToConsider.push_back(wheelSpeeds[1]);
-            }
+            wheelsToConsider.push_back(wheelSpeeds[0]);
         }
         // normal cars
         else if (ext.GetNumWheels(vehicle) == 4) {
@@ -1006,16 +1014,9 @@ std::vector<bool> getDrivenWheels() {
     else {
         // bikes
         if (numWheels == 2) {
-            // fwd
-            if (ext.GetDriveBiasFront(vehicle) == 1.0f) {
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(false);
-            }
-            // rwd
-            else if (ext.GetDriveBiasFront(vehicle) == 0.0f) {
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(true);
-            }
+            // Front id = 1, rear id = 0...
+            wheelsToConsider.push_back(true);
+            wheelsToConsider.push_back(false);
         }
         // normal cars
         else if (numWheels == 4) {
@@ -1098,7 +1099,7 @@ void functionEngLock() {
     }
 
     // Wheels are locking up due to bad (down)shifts
-    if ((speed > abs(maxSpeed) + 3.334f || wrongDirection) && inputMultiplier > settings.ClutchCatchpoint) {
+    if ((speed > abs(maxSpeed * 1.15f) + 3.334f || wrongDirection) && inputMultiplier > settings.ClutchCatchpoint) {
         vehData.EngLockActive = true;
         float lockingForce = 60.0f * inputMultiplier;
         auto wheelsToLock = getDrivenWheels();
@@ -1216,7 +1217,7 @@ void handleRPM() {
     // Update 2017-08-12: We know the gear speeds now, consider patching
     // shiftUp completely?
     if (ext.GetGearCurr(vehicle) > 0 &&
-        (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle) && ENTITY::GET_ENTITY_SPEED(vehicle) > 2.0f)) {
+        ((ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle) && ENTITY::GET_ENTITY_SPEED(vehicle) > 2.0f) || vehData.TruckShiftUp)) {
         ext.SetThrottle(vehicle, 1.0f);
         fakeRev(false, 0);
         CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
@@ -1290,6 +1291,28 @@ void functionTruckLimiting() {
     if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > vehData.LockSpeed && vehData.TruckLockSpeed ||
         ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > vehData.LockSpeed && vehData.PrevGear > ext.GetGearCurr(vehicle)) {
         controls.ClutchVal = 1.0f;
+        vehData.TruckShiftUp = true;
+    }
+    else {
+        vehData.TruckShiftUp = false;
+    }
+}
+
+/*
+ * Bikes are pesky and don't seem to get limited like cars, so
+ * do this myself...
+ * TODO: Do this for everything actually!
+ */
+void functionBikeLimiting() {
+    if (ext.GetGearCurr(vehicle) == ext.GetTopGear(vehicle))
+        return;
+
+    auto ratios = ext.GetGearRatios(vehicle);
+    float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
+    float maxSpeed = DriveMaxFlatVel / ratios[ext.GetGearCurr(vehicle)];
+
+    if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > maxSpeed) {
+        // Abuse TruckShiftUp to indicate shifting wants
         vehData.TruckShiftUp = true;
     }
     else {

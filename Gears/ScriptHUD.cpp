@@ -312,6 +312,7 @@ void drawVehicleWheelInfo() {
         Color c = wheelLockups[i] ? solidOrange : transparentGray;
         c = wheelsOnGround[i] ? c : solidRed;
         showDebugInfo3D(wheelCoords[i], {
+            "idx: " + std::to_string(i),
             "Speed: " + std::to_string(wheelSpeed),
             "Compress: " + std::to_string(wheelCompr),
             "Health: " + std::to_string(wheelHealt), },
