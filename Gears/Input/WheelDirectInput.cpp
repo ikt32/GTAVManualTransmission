@@ -390,8 +390,9 @@ void WheelDirectInput::createCollisionEffect(DWORD axis, int numAxes, DIEFFECT &
 /*
  * Deal with stl stuff in __try
  */
+std::string currentEffectAttempt = "";
 void logCreateEffectException(const DiJoyStick::Entry *e) {
-    logger.Write(FATAL, "CreateEffect caused an exception!");
+    logger.Write(FATAL, "CreateEffect (%s) caused an exception!", currentEffectAttempt.c_str());
     GUID guid = e->diDeviceInstance.guidInstance;
     wchar_t szGuidW[40] = { 0 };
     StringFromGUID2(guid, szGuidW, 40);
@@ -441,6 +442,7 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
 
     // Call to this crashes? (G920 + SHVDN)
     __try {
+        currentEffectAttempt = "constant force";
         hr = e->diDevice->CreateEffect(GUID_ConstantForce, &cfEffect, &m_cfEffect, nullptr);
         if (FAILED(hr) || !m_cfEffect) {
             logCreateEffectError(hr, "constant force");
@@ -448,6 +450,8 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
         else {
             createdEffects++;
         }
+
+        currentEffectAttempt = "damper";
         hr = e->diDevice->CreateEffect(GUID_Damper, &damperEffect, &m_dEffect, nullptr);
         if (FAILED(hr) || !m_dEffect) {
             logCreateEffectError(hr, "damper");
@@ -455,6 +459,8 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
         else {
             createdEffects++;
         }
+
+        currentEffectAttempt = "collision";
         hr = e->diDevice->CreateEffect(GUID_Square, &collisionEffect, &m_colEffect, nullptr);
         if (FAILED(hr) || !m_colEffect) {
             logCreateEffectError(hr, "collision");
@@ -463,9 +469,11 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
             createdEffects++;
         }
 
+        currentEffectAttempt = "";
     }
     __except (filterException(GetExceptionCode(), GetExceptionInformation())) {
         logCreateEffectException(e);
+        currentEffectAttempt = "";
         return false;
     }
     

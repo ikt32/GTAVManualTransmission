@@ -2069,7 +2069,6 @@ void playFFBGround() {
     float gforce = abs(vehData.GetRelativeAccelerationAverage().y) / 9.81f;
     const float minGforce = 5.0f;
     const float maxGforce = 50.0f;
-    // 10 g's
     if (gforce > minGforce) {
         float res = map(gforce, minGforce, maxGforce, 500.0f, 10000.0f) * settings.CollisionMult;
         controls.WheelControl.SetCollision(controls.SteerGUID, ffAxis, (int)res);
