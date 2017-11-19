@@ -13,8 +13,13 @@ void RestoreClutchLow(uintptr_t address);
 
 // Individually: Disable "shifting down" wanted
 // 7A0 is NextGear, or what it appears like in my mod.
-uintptr_t PatchGear7A0();
-void RestoreGear7A0(uintptr_t address);
+uintptr_t PatchShiftDown();
+void RestoreShiftDown(uintptr_t address);
+
+// Only do this for bikes for now
+// We need to limit speed ourselves in the loop
+uintptr_t ApplyShiftUpPatch();
+void RevertShiftUpPatch(uintptr_t address);
 
 // Clutch disengage @ High speed rev limiting
 uintptr_t PatchClutchRevLimit();
@@ -40,6 +45,7 @@ int TotalPatched = 0;
 bool SteerCorrectPatched = false;
 bool SteerControlPatched = false;
 bool BrakeDecrementPatched = false;
+bool ShiftUpPatched = false;
 
 uintptr_t clutchLowAddr = NULL;
 uintptr_t clutchLowTemp = NULL;
@@ -47,8 +53,11 @@ uintptr_t clutchLowTemp = NULL;
 uintptr_t clutchRevLimitAddr = NULL;
 uintptr_t clutchRevLimitTemp = NULL;
 
-uintptr_t gear7A0Addr = NULL;
-uintptr_t gear7A0Temp = NULL;
+uintptr_t shiftDownAddr = NULL;
+uintptr_t shiftDownTemp = NULL;
+
+uintptr_t shiftUpAddr = NULL;
+uintptr_t shiftUpTemp = NULL;
 
 uintptr_t steeringAddr = NULL;
 uintptr_t steeringTemp = NULL;
@@ -70,6 +79,7 @@ int gearAttempts = 0;
 int steerAttempts = 0;
 int steerControlAttempts = 0;
 int brakeAttempts = 0;
+int shiftUpAttempts = 0;
 
 bool PatchInstructions() {
     if (gearAttempts > maxAttempts) {
@@ -105,15 +115,15 @@ bool PatchInstructions() {
         logger.Write(ERROR, "GEARBOX: clutchRevLimit patch failed");
     }
 
-    gear7A0Temp = PatchGear7A0();
+    shiftDownTemp = PatchShiftDown();
 
-    if (gear7A0Temp) {
-        gear7A0Addr = gear7A0Temp;
+    if (shiftDownTemp) {
+        shiftDownAddr = shiftDownTemp;
         TotalPatched++;
-        logger.Write(DEBUG, "GEARBOX: Patched gear7A0  @ 0x%p", gear7A0Addr);
+        logger.Write(DEBUG, "GEARBOX: Patched shiftDown  @ 0x%p", shiftDownAddr);
     }
     else {
-        logger.Write(ERROR, "GEARBOX: gear7A0 patch failed");
+        logger.Write(ERROR, "GEARBOX: shiftDown patch failed");
     }
 
     if (TotalPatched == NumGearboxPatches) {
@@ -157,13 +167,13 @@ bool RestoreInstructions() {
         logger.Write(DEBUG, "GEARBOX: clutchRevLimit not restored");
     }
 
-    if (gear7A0Addr) {
-        RestoreGear7A0(gear7A0Addr);
-        gear7A0Addr = 0;
+    if (shiftDownAddr) {
+        RestoreShiftDown(shiftDownAddr);
+        shiftDownAddr = 0;
         TotalPatched--;
     }
     else {
-        logger.Write(DEBUG, "GEARBOX: gear@7A0 not restored");
+        logger.Write(DEBUG, "GEARBOX: shiftDown not restored");
     }
 
     if (TotalPatched == 0) {
@@ -358,6 +368,51 @@ bool RestoreBrakeDecrement() {
     return false;
 }
 
+bool PatchShiftUp() {
+    if (shiftUpAttempts > maxAttempts) {
+        return false;
+    }
+
+    if (ShiftUpPatched) {
+        return true;
+    }
+
+    shiftUpTemp = ApplyShiftUpPatch();
+
+    if (!shiftUpTemp) {
+        logger.Write(ERROR, "PATCH: Shift Up Patch failed");
+        shiftUpAttempts++;
+
+        if (shiftUpAttempts > maxAttempts) {
+            logger.Write(ERROR, "PATCH: Shift Up Patch attempt limit exceeded");
+            logger.Write(ERROR, "PATCH: Shift Up Patching disabled");
+        }
+        return false;
+    }
+
+    shiftUpAddr = shiftUpTemp;
+    ShiftUpPatched = true;
+
+    shiftUpAttempts = 0;
+    return true;
+}
+bool RestoreShiftUp() {
+    if (!BrakeDecrementPatched) {
+        return true;
+    }
+
+    if (!shiftUpAddr) {
+        logger.Write(ERROR, "BRAKE PRESSURE: Restore failed");
+        return false;
+    }
+
+    RevertShiftUpPatch(shiftUpAddr);
+    shiftUpAddr = 0;
+    ShiftUpPatched = false;
+    shiftUpAttempts = 0;
+    return true;
+}
+
 uintptr_t PatchClutchLow() {
     // Tested on build 350 and build 617
     // We're only interested in the first 7 bytes but we need the correct one
@@ -412,13 +467,13 @@ void RestoreClutchRevLimit(uintptr_t address) {
     }
 }
 
-uintptr_t PatchGear7A0() {
+uintptr_t PatchShiftDown() {
     // 66 89 13 <- Looking for this
     // 89 73 5C <- Next instruction
     // EB 0A    <- Next next instruction
     uintptr_t address;
-    if (gear7A0Temp != 0)
-        address = gear7A0Temp;
+    if (shiftDownTemp != 0)
+        address = shiftDownTemp;
     else
         address = mem::FindPattern("\x66\x89\x13\x89\x73\x5C", "xxxxxx");
 
@@ -428,8 +483,29 @@ uintptr_t PatchGear7A0() {
     return address;
 }
 
-void RestoreGear7A0(uintptr_t address) {
+void RestoreShiftDown(uintptr_t address) {
     byte instrArr[3] = {0x66, 0x89, 0x13};
+    if (address) {
+        memcpy(reinterpret_cast<void*>(address), instrArr, 3);
+    }
+}
+
+uintptr_t ApplyShiftUpPatch() {
+    // 66 89 13 <- Looking for this
+    uintptr_t address;
+    if (shiftUpTemp != 0)
+        address = shiftUpTemp;
+    else
+        address = mem::FindPattern("\x66\x89\x13\xB8\x05\x00\x00\x00\x66\x89\x43\04", "xxxx????xxx?");
+
+    if (address) {
+        memset(reinterpret_cast<void *>(address), 0x90, 3);
+    }
+    return address;
+}
+
+void RevertShiftUpPatch(uintptr_t address) {
+    byte instrArr[3] = { 0x66, 0x89, 0x13 };
     if (address) {
         memcpy(reinterpret_cast<void*>(address), instrArr, 3);
     }
