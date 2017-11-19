@@ -2058,18 +2058,13 @@ void playFFBGround() {
     int detailForce = calculateDetail();
     int satForce = calculateSat(2500, steeringAngle, wheelsOffGroundRatio, vehData.Class == VehicleClass::Car);
 
-    int totalForce =
-        satForce +
-        detailForce;
-
+    int totalForce = satForce + detailForce;
     totalForce = (int)((float)totalForce * rotationScale);
-
     totalForce = calculateSoftLock(totalForce);
 
     auto ffAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::ForceFeedback)]);
     controls.WheelControl.SetConstantForce(controls.SteerGUID, ffAxis, totalForce);
     controls.WheelControl.SetDamper(controls.SteerGUID, ffAxis, damperForce);
-    
     
     if (settings.DisplayInfo) {
         showText(0.85, 0.275, 0.4, std::string(abs(satForce) > 10000 ? "~r~" : "~w~") + "FFBSat:\t\t" + std::to_string(satForce) + "~w~", 4);
@@ -2099,19 +2094,12 @@ void playFFBWater() {
     int detailForce = calculateDetail();
     int satForce = calculateSat(750, ENTITY::GET_ENTITY_ROTATION_VELOCITY(vehicle).z, 1.0f, false);
 
-    // "Reduction" effects - those that affect already calculated things
     if (!isInWater) {
         satForce = 0;
     }
 
-    int totalForce =
-        satForce +
-        detailForce;// +
-        //damperForce;
-
+    int totalForce = satForce + detailForce;
     totalForce = (int)((float)totalForce * rotationScale);
-
-    // Soft lock
     totalForce = calculateSoftLock(totalForce);
 
     auto ffAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::ForceFeedback)]);
