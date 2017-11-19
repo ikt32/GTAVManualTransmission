@@ -1876,6 +1876,8 @@ int calculateDamper(float gain, float wheelsOffGroundRatio) {
     damperForce = fmaxf(damperForce, damperMin / 4.0f);
     damperForce = fminf(damperForce, damperMax * 2.0f);
 
+    damperForce *= gain;
+
     return static_cast<int>(damperForce);
 }
 
