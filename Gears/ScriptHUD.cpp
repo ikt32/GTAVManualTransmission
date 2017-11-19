@@ -64,15 +64,15 @@ void drawRPMIndicator() {
         };
         rpmcolor = redline;
     }
-    if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle) || vehData.TruckShiftUp) {
-        Color rpmlimiter = {
-            settings.RPMIndicatorRevlimitR,
-            settings.RPMIndicatorRevlimitG,
-            settings.RPMIndicatorRevlimitB,
-            settings.RPMIndicatorRevlimitA
-        };
-        rpmcolor = rpmlimiter;
-    }
+    //if (vehData.TruckShiftUp) {
+    //    Color rpmlimiter = {
+    //        settings.RPMIndicatorRevlimitR,
+    //        settings.RPMIndicatorRevlimitG,
+    //        settings.RPMIndicatorRevlimitB,
+    //        settings.RPMIndicatorRevlimitA
+    //    };
+    //    rpmcolor = rpmlimiter;
+    //}
     drawRPMIndicator(
         settings.RPMIndicatorXpos,
         settings.RPMIndicatorYpos,

@@ -74,6 +74,8 @@ bool lookrightfirst = false;
 
 MiniPID pid(1.0, 0.0, 0.0);
 
+bool hitLimiter = false;
+
 void update() {
     ///////////////////////////////////////////////////////////////////////////
     //                     Are we in a supported vehicle?
@@ -242,21 +244,21 @@ void update() {
     }
 
     // Only bikes that are bike-like
-    if (vehData.Class == VehicleClass::Bike && ext.GetNumWheels(vehicle) == 2) {
+    //if (vehData.Class == VehicleClass::Bike && ext.GetNumWheels(vehicle) == 2) {
         if (!MemoryPatcher::ShiftUpPatched)
             MemoryPatcher::PatchShiftUp();
         functionBikeLimiting();
-    }
-    else {
-        if (MemoryPatcher::ShiftUpPatched) {
-            MemoryPatcher::RestoreShiftUp();
-        }
-    }
+    //}
+    //else {
+    //    if (MemoryPatcher::ShiftUpPatched) {
+    //        MemoryPatcher::RestoreShiftUp();
+    //    }
+    //}
 
     // Limit truck speed per gear upon game wanting to shift, but we block it.
-    if (vehData.IsTruck) {
-        functionTruckLimiting();
-    }
+    //if (vehData.IsTruck) {
+    //    functionTruckLimiting();
+    //}
     
     if (settings.EngBrake) {
         functionEngBrake();
@@ -351,7 +353,7 @@ void crossScriptUpdated() {
     DECORATOR::DECOR_SET_INT(vehicle, (char *)decorCurrentGear, ext.GetGearCurr(vehicle));
 
     // Shift indicator: 0 = nothing, 1 = Shift up, 2 = Shift down
-    if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle) || vehData.TruckShiftUp) {
+    if (hitLimiter) {
         DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice, 1);
     }
     else if (ext.GetGearCurr(vehicle) > 1 && vehData.RPM < 0.4f) {
@@ -836,11 +838,17 @@ void functionAShift() { // Automatic
         }
     }
     
-    float currSpeed = ENTITY::GET_ENTITY_SPEED(vehicle);
+    float currSpeed = vehData.SpeedVector.y;
 
+    bool timetoshiftup = false;
+    auto ratios = ext.GetGearRatios(vehicle);
+    float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
+    float maxSpeed = DriveMaxFlatVel / ratios[ext.GetGearCurr(vehicle)];
+    float shiftSpeed = maxSpeed - 0.33*maxSpeed*(1.0f - controls.ThrottleVal);
+    timetoshiftup = currSpeed > shiftSpeed;
     // Shift up
-    if (ext.GetGearCurr(vehicle) > 0 &&
-        (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle) && ENTITY::GET_ENTITY_SPEED(vehicle) > 2.0f)) {
+    if (ext.GetGearCurr(vehicle) > 0 && ext.GetGearCurr(vehicle) < ext.GetTopGear(vehicle) &&
+        (timetoshiftup && currSpeed > 2.0f)) {
         if (currSpeed > upshiftSpeeds[ext.GetGearCurr(vehicle)])
             upshiftSpeeds[ext.GetGearCurr(vehicle)] = currSpeed;
 
@@ -1217,7 +1225,7 @@ void handleRPM() {
     // Update 2017-08-12: We know the gear speeds now, consider patching
     // shiftUp completely?
     if (ext.GetGearCurr(vehicle) > 0 &&
-        ((ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle) && ENTITY::GET_ENTITY_SPEED(vehicle) > 2.0f) || vehData.TruckShiftUp)) {
+        ((hitLimiter && ENTITY::GET_ENTITY_SPEED(vehicle) > 2.0f))) {
         ext.SetThrottle(vehicle, 1.0f);
         fakeRev(false, 0);
         CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
@@ -1271,32 +1279,32 @@ void handleRPM() {
  * Truck gearbox code doesn't stop accelerating, so this speed limiter
  * is needed to stop acceleration once upshift point is reached.
  */
-void functionTruckLimiting() {
-    // Save speed @ shift
-    if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle)) {
-        if (vehData.PrevGear <= ext.GetGearCurr(vehicle) ||
-            ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y <= vehData.LockSpeed ||
-            vehData.LockSpeed < 0.01f) {
-            vehData.LockSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
-        }
-    }
-
-    // Update speed
-    if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle)) {
-        vehData.LockSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
-        vehData.TruckLockSpeed = true;
-    }
-
-    // Limit
-    if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > vehData.LockSpeed && vehData.TruckLockSpeed ||
-        ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > vehData.LockSpeed && vehData.PrevGear > ext.GetGearCurr(vehicle)) {
-        controls.ClutchVal = 1.0f;
-        vehData.TruckShiftUp = true;
-    }
-    else {
-        vehData.TruckShiftUp = false;
-    }
-}
+//void functionTruckLimiting() {
+//    // Save speed @ shift
+//    if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle)) {
+//        if (vehData.PrevGear <= ext.GetGearCurr(vehicle) ||
+//            ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y <= vehData.LockSpeed ||
+//            vehData.LockSpeed < 0.01f) {
+//            vehData.LockSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
+//        }
+//    }
+//
+//    // Update speed
+//    if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle)) {
+//        vehData.LockSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
+//        vehData.TruckLockSpeed = true;
+//    }
+//
+//    // Limit
+//    if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > vehData.LockSpeed && vehData.TruckLockSpeed ||
+//        ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > vehData.LockSpeed && vehData.PrevGear > ext.GetGearCurr(vehicle)) {
+//        controls.ClutchVal = 1.0f;
+//        vehData.TruckShiftUp = true;
+//    }
+//    else {
+//        vehData.TruckShiftUp = false;
+//    }
+//}
 
 /*
  * Bikes are pesky and don't seem to get limited like cars, so
@@ -1304,8 +1312,10 @@ void functionTruckLimiting() {
  * TODO: Do this for everything actually!
  */
 void functionBikeLimiting() {
-    if (ext.GetGearCurr(vehicle) == ext.GetTopGear(vehicle))
+    if (ext.GetGearCurr(vehicle) == ext.GetTopGear(vehicle) || ext.GetGearCurr(vehicle) == 0) {
+        hitLimiter = false;
         return;
+    }
 
     auto ratios = ext.GetGearRatios(vehicle);
     float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
@@ -1313,10 +1323,10 @@ void functionBikeLimiting() {
 
     if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > maxSpeed) {
         // Abuse TruckShiftUp to indicate shifting wants
-        vehData.TruckShiftUp = true;
+        hitLimiter = true;
     }
     else {
-        vehData.TruckShiftUp = false;
+        hitLimiter = false;
     }
 }
 

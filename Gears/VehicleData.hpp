@@ -65,7 +65,7 @@ public:
     int BlinkerTicks = 0;
 
     bool TruckLockSpeed = false;
-    bool TruckShiftUp = false;
+    //bool TruckShiftUp = false;
 
     int RadioStationIndex = 0;
     bool HasSpeedo = false;
