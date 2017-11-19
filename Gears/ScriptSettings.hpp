@@ -147,7 +147,8 @@ public:
     int DamperMax = 50;
     int DamperMin = 10;
     float DamperMinSpeed = 1.2f; // TargetSpeed in m/s
-    float DetailMult = 100.0f;
+    float DetailMult = 2.5f;
+    float CollisionMult = 1.0f;
 
     // [STEER]
     float SteerAngleMax = 900.0f;

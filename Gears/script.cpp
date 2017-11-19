@@ -2065,6 +2065,20 @@ void playFFBGround() {
     auto ffAxis = controls.WheelControl.StringToAxis(controls.WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::ForceFeedback)]);
     controls.WheelControl.SetConstantForce(controls.SteerGUID, ffAxis, totalForce);
     controls.WheelControl.SetDamper(controls.SteerGUID, ffAxis, damperForce);
+
+    float gforce = abs(vehData.GetRelativeAccelerationAverage().y) / 9.81f;
+    const float minGforce = 5.0f;
+    const float maxGforce = 50.0f;
+    // 10 g's
+    if (gforce > minGforce) {
+        float res = map(gforce, minGforce, maxGforce, 500.0f, 10000.0f) * settings.CollisionMult;
+        controls.WheelControl.SetCollision(controls.SteerGUID, ffAxis, (int)res);
+        if (settings.DisplayInfo) {
+            std::string info = "Collision @ ~r~" + std::to_string(gforce) + "G~w~~n~";
+            std::string info2 = "FFB: " + std::to_string((int)res);
+            showNotification(mtPrefix + info + info2, &prevNotification);
+        }
+    }
     
     if (settings.DisplayInfo) {
         showText(0.85, 0.275, 0.4, std::string(abs(satForce) > 10000 ? "~r~" : "~w~") + "FFBSat:\t\t" + std::to_string(satForce) + "~w~", 4);

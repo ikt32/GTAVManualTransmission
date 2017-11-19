@@ -657,6 +657,9 @@ void update_forcefeedbackmenu() {
     menu.FloatOption("Detail effect multiplier", settings.DetailMult, 0.0f, 10.0f, 0.1f,
                      { "Force feedback effects caused by the suspension." });
 
+    menu.FloatOption("Collision effect multiplier", settings.CollisionMult, 0.0f, 5.0f, 0.1f,
+                     { "Force feedback effect caused by frontal/rear collisions." });
+
     menu.IntOption("Damper max (low speed)", settings.DamperMax, 0, 200, 1, 
                    { "Wheel friction at low speed." });
         

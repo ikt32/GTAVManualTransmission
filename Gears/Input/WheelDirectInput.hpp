@@ -86,6 +86,7 @@ public:
 
     void SetConstantForce(GUID device, DIAxis ffAxis, int force);
     void SetDamper(GUID device, DIAxis ffAxis, int force);
+    void SetCollision(GUID device, DIAxis ffAxis, int force);
     void StopEffects();
 
     DIAxis StringToAxis(std::string& axisString);
@@ -100,6 +101,7 @@ private:
     void updateAxisSpeed();
     void createConstantForceEffect(DWORD axis, int numAxes, DIEFFECT &diEffect);
     void createDamperEffect(DWORD axis, int numAxes, DIEFFECT &diEffect);
+    void createCollisionEffect(DWORD axis, int numAxes, DIEFFECT &diEffect);
     bool createEffects(GUID device, DIAxis ffAxis);
     int povDirectionToIndex(int povDirection);
 
@@ -107,11 +109,16 @@ private:
 
     DiJoyStick djs;
     LPDIRECTINPUT lpDi = nullptr;
+
+    // TODO: Group these effects in classes?
     LPDIRECTINPUTEFFECT m_cfEffect = nullptr;
-    LPDIRECTINPUTEFFECT m_dEffect = nullptr;
     DICONSTANTFORCE m_constantForceParams;
+
+    LPDIRECTINPUTEFFECT m_dEffect = nullptr;
     DICONDITION m_damperParams;
 
+    LPDIRECTINPUTEFFECT m_colEffect = nullptr;
+    DIPERIODIC m_collisionParams;
 
     std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbPressTime   { 0 };
     std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbReleaseTime { 0 };

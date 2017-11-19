@@ -190,6 +190,7 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
     settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Scale", ScaleFFB);
     settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", SATAmpMult);
     settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DetailMult", DetailMult);
+    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "CollisionMult", CollisionMult);
     settingsWheel.SetLongValue("FORCE_FEEDBACK", "DamperMax", DamperMax);
     settingsWheel.SetLongValue("FORCE_FEEDBACK", "DamperMin", DamperMin);
     settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DamperMinSpeed", DamperMinSpeed);
@@ -424,7 +425,8 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
     EnableFFB = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Enable", true);
     ScaleFFB = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Scale", true);
     SATAmpMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", 1.0);
-    DetailMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DetailMult", 1.6);
+    DetailMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DetailMult", 2.5);
+    CollisionMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "CollisionMult", 1.0);
 
     DamperMax = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMax", 67);
     DamperMin = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMin", 12);
