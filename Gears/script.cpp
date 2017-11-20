@@ -40,6 +40,7 @@ const char* decorSetShiftMode = "mt_set_shiftmode";
 const char* decorGetShiftMode = "mt_get_shiftmode";
 
 std::array<float, NUM_GEARS> upshiftSpeeds{};
+std::array<float, NUM_GEARS> upshiftSpeeds2{};
 
 std::string textureWheelFile;
 int textureWheelId;
@@ -389,6 +390,7 @@ void crossScriptUpdated() {
 void initVehicle() {
     reset();
     std::fill(upshiftSpeeds.begin(), upshiftSpeeds.end(), 0.0f);
+    std::fill(upshiftSpeeds2.begin(), upshiftSpeeds2.end(), 0.0f);
     vehData = VehicleData();
     vehData.UpdateValues(ext, vehicle);
 
@@ -787,7 +789,7 @@ void functionSShift() {
     }
 }
 
-void functionAShift() { // Automatic
+bool subAShiftManual() {
     auto xcTapStateUp = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftUp);
     auto xcTapStateDn = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftDown);
 
@@ -808,18 +810,17 @@ void functionAShift() { // Automatic
         if (ext.GetGearCurr(vehicle) == 0 && !vehData.FakeNeutral) {
             shiftTo(1, true);
             vehData.FakeNeutral = true;
-            return;
+            return true;
         }
 
         // Neutral to 1
         if (ext.GetGearCurr(vehicle) == 1 && vehData.FakeNeutral) {
             vehData.FakeNeutral = false;
-            return;
+            return true;
         }
     }
 
     // Shift down
-
     if (controls.PrevInput == ScriptControls::Controller	&& xcTapStateDn == XboxController::TapState::Tapped ||
         controls.PrevInput == ScriptControls::Controller	&& ncTapStateDn == LegacyController::TapState::Tapped ||
         controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ShiftDown) ||
@@ -827,56 +828,73 @@ void functionAShift() { // Automatic
         // 1 to Neutral
         if (ext.GetGearCurr(vehicle) == 1 && !vehData.FakeNeutral) {
             vehData.FakeNeutral = true;
-            return;
+            return true;
         }
 
         // Neutral to R
         if (ext.GetGearCurr(vehicle) == 1 && vehData.FakeNeutral) {
             shiftTo(0, true);
             vehData.FakeNeutral = false;
-            return;
+            return true;
         }
     }
+    return false;
+}
+
+void functionAShift() { 
+    // Manual part
+    if (subAShiftManual()) return;
     
     float currSpeed = vehData.SpeedVector.y;
-
-    bool timetoshiftup = false;
     auto ratios = ext.GetGearRatios(vehicle);
     float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
-    float maxSpeed = DriveMaxFlatVel / ratios[ext.GetGearCurr(vehicle)];
-    float shiftSpeed = maxSpeed - 0.33*maxSpeed*(1.0f - controls.ThrottleVal);
-    timetoshiftup = currSpeed > shiftSpeed;
-    // Shift up
-    if (ext.GetGearCurr(vehicle) > 0 && ext.GetGearCurr(vehicle) < ext.GetTopGear(vehicle) &&
-        (timetoshiftup && currSpeed > 2.0f)) {
-        if (currSpeed > upshiftSpeeds[ext.GetGearCurr(vehicle)])
-            upshiftSpeeds[ext.GetGearCurr(vehicle)] = currSpeed;
+    float InitialDriveMaxFlatVel = ext.GetInitialDriveMaxFlatVel(vehicle);
+    int currGear = ext.GetGearCurr(vehicle);
+    float acceleration = vehData.GetRelativeAccelerationAverage().y;
 
-        shiftTo(ext.GetGearCurr(vehicle) + 1, true);
-        vehData.FakeNeutral = false;
+    // Shift up.
+    if (currGear > 0 && currGear < ext.GetTopGear(vehicle)) {
+        float minSpeedUpShiftWindow = InitialDriveMaxFlatVel / ratios[currGear];
+        float maxSpeedUpShiftWindow = DriveMaxFlatVel / ratios[currGear];
+        float upshiftSpeed = map(controls.ThrottleVal, 0.0f, 1.0f, minSpeedUpShiftWindow, maxSpeedUpShiftWindow);
+        //upshiftSpeed = upshiftSpeed - (acceleration - controls.ThrottleVal*)
+        float accelDeficit = ratios[currGear] * controls.ThrottleVal * controls.ThrottleVal * VEHICLE::GET_VEHICLE_ACCELERATION(vehicle) - acceleration / 9.81f;
+        showText(0.65, 0.35, 0.5, "Accel: " + std::to_string(acceleration/9.81f));
+        showText(0.65, 0.40, 0.5, "Expec: " + std::to_string(ratios[currGear] * controls.ThrottleVal * VEHICLE::GET_VEHICLE_ACCELERATION(vehicle)));
+        showText(0.65, 0.45, 0.5, "Defic: " + std::to_string(accelDeficit));
+
+        if (currSpeed > minSpeedUpShiftWindow && accelDeficit > acceleration / 9.81f) {
+            shiftTo(ext.GetGearCurr(vehicle) + 1, true);
+            vehData.FakeNeutral = false;
+            upshiftSpeeds2[currGear] = currSpeed;
+        }
     }
 
-    // Shift down
-    if (ext.GetGearCurr(vehicle) > 1) {
-        auto ratios = ext.GetGearRatios(vehicle);
-        if (ext.GetGearCurr(vehicle) == 2) {
-            float shiftSpeedG1 = ext.GetInitialDriveMaxFlatVel(vehicle) / ratios[1];
+    // Shift down. Can shift to first.
+    if (currGear > 1) {
+        if (currGear == 2) {
+            float shiftSpeedG1 = InitialDriveMaxFlatVel / ratios[1];
             float speedOffset = 0.25f * shiftSpeedG1 * (1.0f - controls.ThrottleVal);
             float downshiftSpeed = shiftSpeedG1 - 0.25f * shiftSpeedG1 - speedOffset;
             if (currSpeed < downshiftSpeed) {
                 shiftTo(1, true);
-                //ext.GetGearNext(vehicle) = 1;
                 vehData.FakeNeutral = false;
             }
         }
         else {
-            float prevGearRedline = ext.GetDriveMaxFlatVel(vehicle) / ratios[ext.GetGearCurr(vehicle) - 1];
-            float velDiff = prevGearRedline - currSpeed;
-            if (velDiff > 8.0f + 7.0f*(0.5f - controls.ThrottleVal)) {
-                shiftTo(ext.GetGearCurr(vehicle) - 1, true);
-                //ext.GetGearNext(vehicle) = ext.GetGearCurr(vehicle) - 1;
+            float prevGearTopSpeed = DriveMaxFlatVel / ratios[currGear - 1];
+            float prevGearMinSpeed = InitialDriveMaxFlatVel / ratios[currGear - 1];
+            float velDiff1 = prevGearTopSpeed - currSpeed;
+            float velDiff2 = prevGearMinSpeed - currSpeed;
+            if (velDiff2 > 8.0f + 7.0f*(0.5f - controls.ThrottleVal)) {
+                shiftTo(currGear - 1, true);
                 vehData.FakeNeutral = false;
             }
+            //float velDiff = prevGearTopSpeed - currSpeed;
+            //if (velDiff > 8.0f + 7.0f*(0.5f - controls.ThrottleVal)) {
+            //    shiftTo(currGear - 1, true);
+            //    vehData.FakeNeutral = false;
+            //}
         }
     }
 }

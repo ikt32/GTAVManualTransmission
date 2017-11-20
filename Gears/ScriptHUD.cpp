@@ -25,6 +25,7 @@ extern VehicleData vehData;
 extern VehicleExtensions ext;
 extern Vehicle vehicle;
 extern std::array<float, NUM_GEARS> upshiftSpeeds;
+extern std::array<float, NUM_GEARS> upshiftSpeeds2;
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Display elements
@@ -218,7 +219,12 @@ void drawDebugInfo() {
         showText(0.85, 0.150, 0.4, dinputDisplay.str(), 4);
     }
 
-    if (settings.EnableManual && settings.DisplayGearingInfo) {
+    if (settings.DisplayGearingInfo) {
+        if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle) &&
+            vehData.SpeedVector.y > upshiftSpeeds[ext.GetGearCurr(vehicle)]) {
+            upshiftSpeeds[ext.GetGearCurr(vehicle)] = vehData.SpeedVector.y;
+        }
+
         auto ratios = ext.GetGearRatios(vehicle);
         float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
         float InitialDriveMaxFlatVel = ext.GetInitialDriveMaxFlatVel(vehicle);
@@ -247,16 +253,22 @@ void drawDebugInfo() {
         }
 
         i = 0;
-        showText(0.55f, 0.05f, 0.35f, "Actual");
+        showText(0.55f, 0.05f, 0.35f, "Actual (Game)");
         for (auto speed : upshiftSpeeds) {
             showText(0.55f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
             i++;
         }
 
-        if (upshiftSpeeds[1] > DriveMaxFlatVel / ratios[1] + 0.25 * DriveMaxFlatVel / ratios[1]) {
-            showText(0.2, 0.1, 0.5, "Probably a truck...");
+        i = 0;
+        showText(0.70f, 0.05f, 0.35f, "Actual (Mod)");
+        for (auto speed : upshiftSpeeds2) {
+            showText(0.70f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
+            i++;
         }
 
+        if (upshiftSpeeds[1] > (DriveMaxFlatVel / ratios[1]) * 1.25f) {
+            showText(0.2, 0.1, 0.5, "Probably a truck...");
+        }
     }
 }
 
