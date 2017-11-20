@@ -237,17 +237,17 @@ void drawDebugInfo() {
         }
 
         i = 0;
-        showText(0.25f, 0.05f, 0.35f, "DriveMaxFlatVel");
+        showText(0.25f, 0.05f, 0.35f, "InitialDriveMaxFlatVel");
         for (auto ratio : ratios) {
-            float maxSpeed = DriveMaxFlatVel / ratio;
+            float maxSpeed = InitialDriveMaxFlatVel / ratio;
             showText(0.25f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(maxSpeed));
             i++;
         }
 
         i = 0;
-        showText(0.40f, 0.05f, 0.35f, "InitialDriveMaxFlatVel");
+        showText(0.40f, 0.05f, 0.35f, "DriveMaxFlatVel");
         for (auto ratio : ratios) {
-            float maxSpeed = InitialDriveMaxFlatVel / ratio;
+            float maxSpeed = DriveMaxFlatVel / ratio;
             showText(0.40f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(maxSpeed));
             i++;
         }

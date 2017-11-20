@@ -840,7 +840,9 @@ bool subAShiftManual() {
     }
     return false;
 }
-
+bool ignoreACC = false;
+float prevAcc;
+DWORD prevTime;
 void functionAShift() { 
     // Manual part
     if (subAShiftManual()) return;
@@ -850,24 +852,54 @@ void functionAShift() {
     float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
     float InitialDriveMaxFlatVel = ext.GetInitialDriveMaxFlatVel(vehicle);
     int currGear = ext.GetGearCurr(vehicle);
-    float acceleration = vehData.GetRelativeAccelerationAverage().y;
-
+    float acceleration = vehData.GetRelativeAccelerationAverage().y / 9.81f;
+    /*auto tFileN = logger.GetFile();
+    logger.SetFile("./Fuck3.csv");
+    logger.Write(DEBUG, "%f,%f,%f,%d", vehData.RPM, currSpeed, acceleration, currGear);
+    logger.SetFile(tFileN);*/
     // Shift up.
     if (currGear > 0 && currGear < ext.GetTopGear(vehicle)) {
         float minSpeedUpShiftWindow = InitialDriveMaxFlatVel / ratios[currGear];
         float maxSpeedUpShiftWindow = DriveMaxFlatVel / ratios[currGear];
-        float upshiftSpeed = map(controls.ThrottleVal, 0.0f, 1.0f, minSpeedUpShiftWindow, maxSpeedUpShiftWindow);
-        //upshiftSpeed = upshiftSpeed - (acceleration - controls.ThrottleVal*)
-        float accelDeficit = ratios[currGear] * controls.ThrottleVal * controls.ThrottleVal * VEHICLE::GET_VEHICLE_ACCELERATION(vehicle) - acceleration / 9.81f;
-        showText(0.65, 0.35, 0.5, "Accel: " + std::to_string(acceleration/9.81f));
-        showText(0.65, 0.40, 0.5, "Expec: " + std::to_string(ratios[currGear] * controls.ThrottleVal * VEHICLE::GET_VEHICLE_ACCELERATION(vehicle)));
-        showText(0.65, 0.45, 0.5, "Defic: " + std::to_string(accelDeficit));
+        float midSpeedUpShiftWindow = (minSpeedUpShiftWindow + maxSpeedUpShiftWindow) / 2.0f;
+        float UpShiftWindow = maxSpeedUpShiftWindow - minSpeedUpShiftWindow;
+        
 
-        if (currSpeed > minSpeedUpShiftWindow && accelDeficit > acceleration / 9.81f) {
+        float upshiftSpeed = map(pow(controls.ThrottleVal, 6.0f), 0.0f, 1.0f, minSpeedUpShiftWindow, maxSpeedUpShiftWindow);
+        float accelExpect = pow(controls.ThrottleVal, 2.0f) * ratios[currGear] * VEHICLE::GET_VEHICLE_ACCELERATION(vehicle);
+        float accelDeficit = accelExpect - acceleration;
+        bool shouldShiftUpSPD = currSpeed > upshiftSpeed;
+        bool shouldShiftUpACC = accelExpect > 2.0f * acceleration && !ignoreACC;
+
+        showText(0.65, 0.35, 0.5, "Accel: " + std::to_string(acceleration));
+        showText(0.65, 0.40, 0.5, "Expec: " + std::to_string(accelExpect));
+        showText(0.65, 0.45, 0.5, "Defic: " + std::to_string(accelDeficit));
+        showText(0.65, 0.50, 0.5, "tDelt: " + std::to_string(upshiftSpeed));
+        if (shouldShiftUpSPD) showText(0.65, 0.55, 0.5, "SPD");
+        if (shouldShiftUpACC) showText(0.70, 0.55, 0.5, "ACC");
+        float upratething = 1.0f / *(float*)(ext.GetHandlingPtr(vehicle) + 0x0058);
+        //showText(0.5, 0.5, 1.0, std::to_string(upratething));
+
+        if (currSpeed > minSpeedUpShiftWindow && (shouldShiftUpSPD || shouldShiftUpACC)) {
+            ignoreACC = true;
+            prevTime = GetTickCount();
+
+            if (shouldShiftUpSPD) logger.Write(DEBUG, "Shifted to %d by %s", currGear + 1, "SPD");
+            if (shouldShiftUpACC) logger.Write(DEBUG, "Shifted to %d by %s", currGear + 1, "ACC");
+
             shiftTo(ext.GetGearCurr(vehicle) + 1, true);
             vehData.FakeNeutral = false;
             upshiftSpeeds2[currGear] = currSpeed;
         }
+        if (ignoreACC) {
+            showText(0.65, 0.55, 0.5, "DIS ACC");
+            if (prevAcc < acceleration && GetTickCount() > prevTime + (int)(upratething*1000.0f)) {
+                prevTime = GetTickCount();
+                ignoreACC = false;
+            }
+        }
+        prevAcc = acceleration;
+
     }
 
     // Shift down. Can shift to first.
