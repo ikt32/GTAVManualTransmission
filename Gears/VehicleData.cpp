@@ -9,8 +9,6 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
     Domain = findDomain(Class);
     Amphibious = isAmphibious(ext, vehicle);
 
-    IsTruck = isBadTruck(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicle)));
-
     PrevRPM = RPM;
     RPM = VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) ? ext.GetCurrentRPM(vehicle) : 0.01f;
     SpeedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
@@ -64,15 +62,6 @@ void VehicleData::updateAverageAcceleration() {
     averageAccelIndex = (averageAccelIndex + 1) % (SAMPLES - 1);
 
 }
-
-bool VehicleData::isBadTruck(char* name) {
-    for (int i = 0; i < badModelNames.size(); i++) {
-        if (strcmp(name, badModelNames[i]) == 0)
-            return true;
-    }
-    return false;
-}
-
 
 VehicleClass VehicleData::findClass(Hash model) {
     if (VEHICLE::IS_THIS_MODEL_A_CAR(model))        return VehicleClass::Car;

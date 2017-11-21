@@ -103,8 +103,8 @@ void manageBrakePatch();
 
 void fakeRev(bool customThrottle = false, float customThrottleVal = 0.0f);
 void handleRPM();
-void functionTruckLimiting();
-void functionBikeLimiting();
+//void functionTruckLimiting();
+void functionLimiter();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                   Mod functions: Reverse/Pedal handling
