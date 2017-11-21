@@ -56,7 +56,7 @@ void drawRPMIndicator() {
     };
 
     Color rpmcolor = foreground;
-    if (vehData.RPM > settings.RPMIndicatorRedline) {
+    if (fabs(vehData.SpeedVector.y) > fabs(ext.GetInitialDriveMaxFlatVel(vehicle) / ext.GetGearRatios(vehicle)[ext.GetGearCurr(vehicle)])) {
         Color redline = {
             settings.RPMIndicatorRedlineR,
             settings.RPMIndicatorRedlineG,
@@ -65,15 +65,15 @@ void drawRPMIndicator() {
         };
         rpmcolor = redline;
     }
-    //if (vehData.TruckShiftUp) {
-    //    Color rpmlimiter = {
-    //        settings.RPMIndicatorRevlimitR,
-    //        settings.RPMIndicatorRevlimitG,
-    //        settings.RPMIndicatorRevlimitB,
-    //        settings.RPMIndicatorRevlimitA
-    //    };
-    //    rpmcolor = rpmlimiter;
-    //}
+    if (fabs(vehData.SpeedVector.y) > fabs(ext.GetInitialDriveMaxFlatVel(vehicle) / ext.GetGearRatios(vehicle)[ext.GetGearCurr(vehicle)])) {
+        Color rpmlimiter = {
+            settings.RPMIndicatorRevlimitR,
+            settings.RPMIndicatorRevlimitG,
+            settings.RPMIndicatorRevlimitB,
+            settings.RPMIndicatorRevlimitA
+        };
+        rpmcolor = rpmlimiter;
+    }
     drawRPMIndicator(
         settings.RPMIndicatorXpos,
         settings.RPMIndicatorYpos,
@@ -264,10 +264,6 @@ void drawDebugInfo() {
         for (auto speed : upshiftSpeeds2) {
             showText(0.70f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
             i++;
-        }
-
-        if (upshiftSpeeds[1] > (DriveMaxFlatVel / ratios[1]) * 1.25f) {
-            showText(0.2, 0.1, 0.5, "Probably a truck...");
         }
     }
 }

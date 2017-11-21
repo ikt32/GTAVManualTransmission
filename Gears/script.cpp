@@ -75,6 +75,11 @@ bool lookrightfirst = false;
 
 MiniPID pid(1.0, 0.0, 0.0);
 
+/*
+* Do something with them globals
+*/
+bool ignoreAccelerationUpshiftTrigger = false;
+DWORD prevUpshiftTime;
 bool hitLimiter = false;
 
 void update() {
@@ -202,6 +207,9 @@ void update() {
     if (MemoryPatcher::TotalPatched != MemoryPatcher::NumGearboxPatches) {
         MemoryPatcher::PatchInstructions();
     }
+    if (!MemoryPatcher::ShiftUpPatched) {
+        MemoryPatcher::PatchShiftUp();
+    }
     
     handleVehicleButtons();
 
@@ -244,23 +252,8 @@ void update() {
         }
     }
 
-    // Only bikes that are bike-like
-    //if (vehData.Class == VehicleClass::Bike && ext.GetNumWheels(vehicle) == 2) {
-        if (!MemoryPatcher::ShiftUpPatched)
-            MemoryPatcher::PatchShiftUp();
-        functionBikeLimiting();
-    //}
-    //else {
-    //    if (MemoryPatcher::ShiftUpPatched) {
-    //        MemoryPatcher::RestoreShiftUp();
-    //    }
-    //}
+    functionLimiter();
 
-    // Limit truck speed per gear upon game wanting to shift, but we block it.
-    //if (vehData.IsTruck) {
-    //    functionTruckLimiting();
-    //}
-    
     if (settings.EngBrake) {
         functionEngBrake();
     }
@@ -612,10 +605,6 @@ void shiftTo(int gear, bool autoClutch) {
         CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
     }
     vehData.LockGear = gear;
-    vehData.TruckLockSpeed = false;
-    if (vehData.IsTruck && vehData.RPM < 0.9) {
-        return;
-    }
     vehData.PrevGear = ext.GetGearCurr(vehicle);
 }
 void functionHShiftTo(int i) {
@@ -789,6 +778,9 @@ void functionSShift() {
     }
 }
 
+/*
+ * Manual part of the automatic transmission (R<->N<->D)
+ */
 bool subAShiftManual() {
     auto xcTapStateUp = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftUp);
     auto xcTapStateDn = controls.ButtonTapped(ScriptControls::ControllerControlType::ShiftDown);
@@ -840,9 +832,7 @@ bool subAShiftManual() {
     }
     return false;
 }
-bool ignoreACC = false;
-float prevAcc;
-DWORD prevTime;
+
 void functionAShift() { 
     // Manual part
     if (subAShiftManual()) return;
@@ -852,81 +842,46 @@ void functionAShift() {
     float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
     float InitialDriveMaxFlatVel = ext.GetInitialDriveMaxFlatVel(vehicle);
     int currGear = ext.GetGearCurr(vehicle);
-    float acceleration = vehData.GetRelativeAccelerationAverage().y / 9.81f;
-    /*auto tFileN = logger.GetFile();
-    logger.SetFile("./Fuck3.csv");
-    logger.Write(DEBUG, "%f,%f,%f,%d", vehData.RPM, currSpeed, acceleration, currGear);
-    logger.SetFile(tFileN);*/
+    float acceleration = vehData.GetRelativeAcceleration().y / 9.81f;
+
+    float minSpeedUpShiftWindow = InitialDriveMaxFlatVel / ratios[currGear];
+    float maxSpeedUpShiftWindow = DriveMaxFlatVel / ratios[currGear];
+    float upshiftSpeed = map(pow(controls.ThrottleVal, 6.0f), 0.0f, 1.0f, minSpeedUpShiftWindow, maxSpeedUpShiftWindow);
+
     // Shift up.
     if (currGear > 0 && currGear < ext.GetTopGear(vehicle)) {
-        float minSpeedUpShiftWindow = InitialDriveMaxFlatVel / ratios[currGear];
-        float maxSpeedUpShiftWindow = DriveMaxFlatVel / ratios[currGear];
-        float midSpeedUpShiftWindow = (minSpeedUpShiftWindow + maxSpeedUpShiftWindow) / 2.0f;
-        float UpShiftWindow = maxSpeedUpShiftWindow - minSpeedUpShiftWindow;
-        
-
-        float upshiftSpeed = map(pow(controls.ThrottleVal, 6.0f), 0.0f, 1.0f, minSpeedUpShiftWindow, maxSpeedUpShiftWindow);
         float accelExpect = pow(controls.ThrottleVal, 2.0f) * ratios[currGear] * VEHICLE::GET_VEHICLE_ACCELERATION(vehicle);
-        float accelDeficit = accelExpect - acceleration;
         bool shouldShiftUpSPD = currSpeed > upshiftSpeed;
-        bool shouldShiftUpACC = accelExpect > 2.0f * acceleration && !ignoreACC;
-
-        showText(0.65, 0.35, 0.5, "Accel: " + std::to_string(acceleration));
-        showText(0.65, 0.40, 0.5, "Expec: " + std::to_string(accelExpect));
-        showText(0.65, 0.45, 0.5, "Defic: " + std::to_string(accelDeficit));
-        showText(0.65, 0.50, 0.5, "tDelt: " + std::to_string(upshiftSpeed));
-        if (shouldShiftUpSPD) showText(0.65, 0.55, 0.5, "SPD");
-        if (shouldShiftUpACC) showText(0.70, 0.55, 0.5, "ACC");
-        float upratething = 1.0f / *(float*)(ext.GetHandlingPtr(vehicle) + 0x0058);
-        //showText(0.5, 0.5, 1.0, std::to_string(upratething));
+        bool shouldShiftUpACC = accelExpect > 2.0f * acceleration && !ignoreAccelerationUpshiftTrigger;
+        float upshiftTimeout = 1.0f / *(float*)(ext.GetHandlingPtr(vehicle) + hOffsets.fClutchChangeRateScaleUpShift);
 
         if (currSpeed > minSpeedUpShiftWindow && (shouldShiftUpSPD || shouldShiftUpACC)) {
-            ignoreACC = true;
-            prevTime = GetTickCount();
-
-            if (shouldShiftUpSPD) logger.Write(DEBUG, "Shifted to %d by %s", currGear + 1, "SPD");
-            if (shouldShiftUpACC) logger.Write(DEBUG, "Shifted to %d by %s", currGear + 1, "ACC");
-
+            ignoreAccelerationUpshiftTrigger = true;
+            prevUpshiftTime = GetTickCount();
             shiftTo(ext.GetGearCurr(vehicle) + 1, true);
             vehData.FakeNeutral = false;
             upshiftSpeeds2[currGear] = currSpeed;
         }
-        if (ignoreACC) {
-            showText(0.65, 0.55, 0.5, "DIS ACC");
-            if (prevAcc < acceleration && GetTickCount() > prevTime + (int)(upratething*1000.0f)) {
-                prevTime = GetTickCount();
-                ignoreACC = false;
+
+        if (ignoreAccelerationUpshiftTrigger) {
+            if (ignoreAccelerationUpshiftTrigger && GetTickCount() > prevUpshiftTime + (int)(upshiftTimeout*1000.0f)) {
+                ignoreAccelerationUpshiftTrigger = false;
             }
         }
-        prevAcc = acceleration;
-
     }
 
-    // Shift down. Can shift to first.
+    // Shift down
     if (currGear > 1) {
-        if (currGear == 2) {
-            float shiftSpeedG1 = InitialDriveMaxFlatVel / ratios[1];
-            float speedOffset = 0.25f * shiftSpeedG1 * (1.0f - controls.ThrottleVal);
-            float downshiftSpeed = shiftSpeedG1 - 0.25f * shiftSpeedG1 - speedOffset;
-            if (currSpeed < downshiftSpeed) {
-                shiftTo(1, true);
-                vehData.FakeNeutral = false;
-            }
-        }
-        else {
-            float prevGearTopSpeed = DriveMaxFlatVel / ratios[currGear - 1];
-            float prevGearMinSpeed = InitialDriveMaxFlatVel / ratios[currGear - 1];
-            float velDiff1 = prevGearTopSpeed - currSpeed;
-            float velDiff2 = prevGearMinSpeed - currSpeed;
-            if (velDiff2 > 8.0f + 7.0f*(0.5f - controls.ThrottleVal)) {
-                shiftTo(currGear - 1, true);
-                vehData.FakeNeutral = false;
-            }
-            //float velDiff = prevGearTopSpeed - currSpeed;
-            //if (velDiff > 8.0f + 7.0f*(0.5f - controls.ThrottleVal)) {
-            //    shiftTo(currGear - 1, true);
-            //    vehData.FakeNeutral = false;
-            //}
+        float prevGearTopSpeed = DriveMaxFlatVel / ratios[currGear - 1];
+        float prevGearMinSpeed = InitialDriveMaxFlatVel / ratios[currGear - 1];
+        float highEndShiftSpeed = fminf(minSpeedUpShiftWindow, prevGearTopSpeed);
+
+        float prevGearDelta = prevGearTopSpeed - prevGearMinSpeed;
+        float downshiftSpeed = map(controls.ThrottleVal, 0.0f, 1.0f, prevGearMinSpeed, highEndShiftSpeed);
+
+        if (currSpeed < downshiftSpeed - prevGearDelta) {
+            shiftTo(currGear - 1, true);
+            vehData.FakeNeutral = false;
         }
     }
 }
@@ -1125,7 +1080,6 @@ std::vector<bool> getDrivenWheels() {
 void functionEngLock() {
     if (settings.ShiftMode == Automatic ||
         ext.GetTopGear(vehicle) == 1 || 
-        vehData.IsTruck ||
         ext.GetGearCurr(vehicle) == ext.GetTopGear(vehicle) ||
         vehData.FakeNeutral) {
         vehData.EngLockActive = false;
@@ -1275,7 +1229,7 @@ void handleRPM() {
     // Update 2017-08-12: We know the gear speeds now, consider patching
     // shiftUp completely?
     if (ext.GetGearCurr(vehicle) > 0 &&
-        ((hitLimiter && ENTITY::GET_ENTITY_SPEED(vehicle) > 2.0f))) {
+        (hitLimiter && ENTITY::GET_ENTITY_SPEED(vehicle) > 2.0f)) {
         ext.SetThrottle(vehicle, 1.0f);
         fakeRev(false, 0);
         CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
@@ -1326,42 +1280,9 @@ void handleRPM() {
 }
 
 /*
- * Truck gearbox code doesn't stop accelerating, so this speed limiter
- * is needed to stop acceleration once upshift point is reached.
+ * Custom limiter thing
  */
-//void functionTruckLimiting() {
-//    // Save speed @ shift
-//    if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle)) {
-//        if (vehData.PrevGear <= ext.GetGearCurr(vehicle) ||
-//            ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y <= vehData.LockSpeed ||
-//            vehData.LockSpeed < 0.01f) {
-//            vehData.LockSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
-//        }
-//    }
-//
-//    // Update speed
-//    if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle)) {
-//        vehData.LockSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
-//        vehData.TruckLockSpeed = true;
-//    }
-//
-//    // Limit
-//    if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > vehData.LockSpeed && vehData.TruckLockSpeed ||
-//        ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > vehData.LockSpeed && vehData.PrevGear > ext.GetGearCurr(vehicle)) {
-//        controls.ClutchVal = 1.0f;
-//        vehData.TruckShiftUp = true;
-//    }
-//    else {
-//        vehData.TruckShiftUp = false;
-//    }
-//}
-
-/*
- * Bikes are pesky and don't seem to get limited like cars, so
- * do this myself...
- * TODO: Do this for everything actually!
- */
-void functionBikeLimiting() {
+void functionLimiter() {
     if (ext.GetGearCurr(vehicle) == ext.GetTopGear(vehicle) || ext.GetGearCurr(vehicle) == 0) {
         hitLimiter = false;
         return;
@@ -1372,7 +1293,6 @@ void functionBikeLimiting() {
     float maxSpeed = DriveMaxFlatVel / ratios[ext.GetGearCurr(vehicle)];
 
     if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > maxSpeed) {
-        // Abuse TruckShiftUp to indicate shifting wants
         hitLimiter = true;
     }
     else {

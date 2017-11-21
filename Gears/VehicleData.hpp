@@ -45,7 +45,7 @@ public:
     bool Amphibious = false;
 
     bool NoClutch = false;
-    bool IsTruck = false;
+    //bool IsTruck = false;
 
     float RPM = 0.0f;
     
@@ -64,9 +64,6 @@ public:
     bool BlinkerHazard = false;
     int BlinkerTicks = 0;
 
-    bool TruckLockSpeed = false;
-    //bool TruckShiftUp = false;
-
     int RadioStationIndex = 0;
     bool HasSpeedo = false;
 
@@ -74,30 +71,6 @@ public:
     bool EngBrakeActive = false;
     bool EngLockActive = false;
 private:
-    std::array<char *, 20> badModelNames = {
-        "BENSON",
-        "BIFF",
-        "HAULER",
-        "PACKER",
-        "PHANTOM",
-        "POUNDER",
-        "FIRETRUK",
-        "DUMP",
-        "FLATBED",
-        "MIXER",
-        "MIXER2",
-        "RUBBLE",
-        "TIPTRUCK",
-        "TIPTRUCK2",
-        "BARRACKS",
-        "BARRACKS2",
-        "BARRACKS3",
-        "RIPLEY",
-        "SCRAP",
-        "UTILTRUC"
-    };
-
-    bool isBadTruck(char* name);
     VehicleClass findClass(Hash model);
     VehicleDomain findDomain(VehicleClass vehicleClass);
     bool isAmphibious(VehicleExtensions &ext, Vehicle vehicle);
