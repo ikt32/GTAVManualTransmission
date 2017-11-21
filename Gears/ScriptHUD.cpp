@@ -8,6 +8,7 @@
 #include <sstream>
 #include "Memory/VehicleExtensions.hpp"
 #include "VehicleData.hpp"
+#include "Util/MathExt.h"
 
 extern ScriptSettings settings;
 extern std::string settingsGeneralFile;
@@ -56,7 +57,7 @@ void drawRPMIndicator() {
     };
 
     Color rpmcolor = foreground;
-    if (fabs(vehData.SpeedVector.y) > fabs(ext.GetInitialDriveMaxFlatVel(vehicle) / ext.GetGearRatios(vehicle)[ext.GetGearCurr(vehicle)])) {
+    if (vehData.RPM > settings.RPMIndicatorRedline) {
         Color redline = {
             settings.RPMIndicatorRedlineR,
             settings.RPMIndicatorRedlineG,
@@ -65,7 +66,10 @@ void drawRPMIndicator() {
         };
         rpmcolor = redline;
     }
-    if (fabs(vehData.SpeedVector.y) > fabs(ext.GetInitialDriveMaxFlatVel(vehicle) / ext.GetGearRatios(vehicle)[ext.GetGearCurr(vehicle)])) {
+    float ratio = ext.GetGearRatios(vehicle)[ext.GetGearCurr(vehicle)];
+    float minUpshift = ext.GetInitialDriveMaxFlatVel(vehicle);
+    float maxUpshift = ext.GetDriveMaxFlatVel(vehicle);
+    if (vehData.RPM > map(minUpshift / ratio, 0.0f, maxUpshift / ratio, 0.0f, 1.0f)) {
         Color rpmlimiter = {
             settings.RPMIndicatorRevlimitR,
             settings.RPMIndicatorRevlimitG,
