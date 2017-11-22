@@ -25,8 +25,8 @@ extern int textureWheelId;
 extern VehicleData vehData;
 extern VehicleExtensions ext;
 extern Vehicle vehicle;
-extern std::array<float, NUM_GEARS> upshiftSpeeds;
-extern std::array<float, NUM_GEARS> upshiftSpeeds2;
+extern std::array<float, NUM_GEARS> upshiftSpeedsGame;
+extern std::array<float, NUM_GEARS> upshiftSpeedsMod;
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Display elements
@@ -224,9 +224,8 @@ void drawDebugInfo() {
     }
 
     if (settings.DisplayGearingInfo) {
-        if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle) &&
-            vehData.SpeedVector.y > upshiftSpeeds[ext.GetGearCurr(vehicle)]) {
-            upshiftSpeeds[ext.GetGearCurr(vehicle)] = vehData.SpeedVector.y;
+        if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle)) {
+            upshiftSpeedsGame[ext.GetGearCurr(vehicle)] = vehData.SpeedVector.y;
         }
 
         auto ratios = ext.GetGearRatios(vehicle);
@@ -258,14 +257,14 @@ void drawDebugInfo() {
 
         i = 0;
         showText(0.55f, 0.05f, 0.35f, "Actual (Game)");
-        for (auto speed : upshiftSpeeds) {
+        for (auto speed : upshiftSpeedsGame) {
             showText(0.55f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
             i++;
         }
 
         i = 0;
         showText(0.70f, 0.05f, 0.35f, "Actual (Mod)");
-        for (auto speed : upshiftSpeeds2) {
+        for (auto speed : upshiftSpeedsMod) {
             showText(0.70f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
             i++;
         }
@@ -324,10 +323,10 @@ void drawVehicleWheelInfo() {
         Color c = wheelLockups[i] ? solidOrange : transparentGray;
         c = wheelsOnGround[i] ? c : solidRed;
         showDebugInfo3D(wheelCoords[i], {
-            "idx: " + std::to_string(i),
-            "Speed: " + std::to_string(wheelSpeed),
-            "Compress: " + std::to_string(wheelCompr),
-            "Health: " + std::to_string(wheelHealt), },
+            "Index: \t" + std::to_string(i),
+            "Speed: \t" + std::to_string(wheelSpeed),
+            "Compr: \t" + std::to_string(wheelCompr),
+            "Health: \t" + std::to_string(wheelHealt), },
             c);
         GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
             wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z + 1.0f + 2.5f * wheelCompr, 255, 0, 0, 255);

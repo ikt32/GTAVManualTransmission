@@ -39,8 +39,8 @@ const char* decorFakeNeutral = "mt_neutral";
 const char* decorSetShiftMode = "mt_set_shiftmode";
 const char* decorGetShiftMode = "mt_get_shiftmode";
 
-std::array<float, NUM_GEARS> upshiftSpeeds{};
-std::array<float, NUM_GEARS> upshiftSpeeds2{};
+std::array<float, NUM_GEARS> upshiftSpeedsGame{};
+std::array<float, NUM_GEARS> upshiftSpeedsMod{};
 
 std::string textureWheelFile;
 int textureWheelId;
@@ -382,8 +382,8 @@ void crossScriptUpdated() {
 
 void initVehicle() {
     reset();
-    std::fill(upshiftSpeeds.begin(), upshiftSpeeds.end(), 0.0f);
-    std::fill(upshiftSpeeds2.begin(), upshiftSpeeds2.end(), 0.0f);
+    std::fill(upshiftSpeedsGame.begin(), upshiftSpeedsGame.end(), 0.0f);
+    std::fill(upshiftSpeedsMod.begin(), upshiftSpeedsMod.end(), 0.0f);
     vehData = VehicleData();
     vehData.UpdateValues(ext, vehicle);
 
@@ -860,7 +860,7 @@ void functionAShift() {
             prevUpshiftTime = GetTickCount();
             shiftTo(ext.GetGearCurr(vehicle) + 1, true);
             vehData.FakeNeutral = false;
-            upshiftSpeeds2[currGear] = currSpeed;
+            upshiftSpeedsMod[currGear] = currSpeed;
         }
 
         if (ignoreAccelerationUpshiftTrigger) {
