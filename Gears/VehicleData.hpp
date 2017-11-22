@@ -44,20 +44,20 @@ public:
     VehicleDomain Domain = VehicleDomain::Unknown;
     bool Amphibious = false;
 
-    bool NoClutch = false;
-    //bool IsTruck = false;
-
+    float PrevRPM = 0.0f;
     float RPM = 0.0f;
-    
     uint8_t LockGear = 1;
     uint16_t PrevGear = 1;
     float LockSpeed = 0.0f;
+
+    bool NoClutch = false;
     bool FakeNeutral = false;
+    bool HitLimiter = false;
+    DWORD PrevUpshiftTime = 0;
+    bool IgnoreAccelerationUpshiftTrigger = false;
 
-    std::vector<float> WheelCompressions = {};
-    Vector3 SpeedVector = {};
-
-    float PrevRPM = 0.0f;
+    std::vector<float> WheelCompressions{};
+    Vector3 SpeedVector{};
 
     bool BlinkerLeft = false;
     bool BlinkerRight = false;
@@ -74,17 +74,15 @@ private:
     VehicleClass findClass(Hash model);
     VehicleDomain findDomain(VehicleClass vehicleClass);
     bool isAmphibious(VehicleExtensions &ext, Vehicle vehicle);
-
     void updateAcceleration();
-    void updateAverageAcceleration();
 
-    Vector3 SpeedVectorPrev = {};
-    std::vector<float> prevCompressions = {};
+    Vector3 prevSpeedVector{};
+    std::vector<float> prevCompressions{};
 
     long long prevAccelTime = 0;
     long long prevCompressTime = 0;
 
-    Vector3 acceleration;
-    std::array<Vector3, SAMPLES> accelerationSamples = {};
+    Vector3 acceleration{};
+    std::array<Vector3, SAMPLES> accelerationSamples{};
     int averageAccelIndex = 0;
 };

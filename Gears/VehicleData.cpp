@@ -23,7 +23,6 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
     NoClutch = ext.GetTopGear(vehicle) == 1;
 
     updateAcceleration();
-    updateAverageAcceleration();
 }
 
 std::vector<float> VehicleData::GetWheelCompressionSpeeds() {
@@ -44,23 +43,20 @@ void VehicleData::updateAcceleration() {
     long long time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
 
     Vector3 result;
-    result.x = (SpeedVector.x - SpeedVectorPrev.x) / ((time - prevAccelTime) / 1e9f);
-    result.y = (SpeedVector.y - SpeedVectorPrev.y) / ((time - prevAccelTime) / 1e9f);
-    result.z = (SpeedVector.z - SpeedVectorPrev.z) / ((time - prevAccelTime) / 1e9f);
+    result.x = (SpeedVector.x - prevSpeedVector.x) / ((time - prevAccelTime) / 1e9f);
+    result.y = (SpeedVector.y - prevSpeedVector.y) / ((time - prevAccelTime) / 1e9f);
+    result.z = (SpeedVector.z - prevSpeedVector.z) / ((time - prevAccelTime) / 1e9f);
     result._paddingx = 0;
     result._paddingy = 0;
     result._paddingz = 0;
 
     prevAccelTime = time;
-    SpeedVectorPrev = SpeedVector;
+    prevSpeedVector = SpeedVector;
 
     acceleration = result;
-}
 
-void VehicleData::updateAverageAcceleration() {
     accelerationSamples[averageAccelIndex] = acceleration;
     averageAccelIndex = (averageAccelIndex + 1) % (SAMPLES - 1);
-
 }
 
 VehicleClass VehicleData::findClass(Hash model) {

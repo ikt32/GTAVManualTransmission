@@ -75,13 +75,6 @@ bool lookrightfirst = false;
 
 MiniPID pid(1.0, 0.0, 0.0);
 
-/*
- * Do something with them globals
- */
-bool ignoreAccelerationUpshiftTrigger = false;
-DWORD prevUpshiftTime;
-bool hitLimiter = false;
-
 void update() {
     ///////////////////////////////////////////////////////////////////////////
     //                     Are we in a supported vehicle?
@@ -347,7 +340,7 @@ void crossScriptUpdated() {
     DECORATOR::DECOR_SET_INT(vehicle, (char *)decorCurrentGear, ext.GetGearCurr(vehicle));
 
     // Shift indicator: 0 = nothing, 1 = Shift up, 2 = Shift down
-    if (hitLimiter) {
+    if (vehData.HitLimiter) {
         DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice, 1);
     }
     else if (ext.GetGearCurr(vehicle) > 1 && vehData.RPM < 0.4f) {
@@ -863,20 +856,20 @@ void functionAShift() {
     // Shift up.
     if (currGear < ext.GetTopGear(vehicle)) {
         bool shouldShiftUpSPD = currSpeed > upshiftSpeed;
-        bool shouldShiftUpACC = accelExpect > 2.0f * acceleration && !ignoreAccelerationUpshiftTrigger;
+        bool shouldShiftUpACC = accelExpect > 2.0f * acceleration && !vehData.IgnoreAccelerationUpshiftTrigger;
 
         if (currSpeed > minSpeedUpShiftWindow && (shouldShiftUpSPD || shouldShiftUpACC)) {
-            ignoreAccelerationUpshiftTrigger = true;
-            prevUpshiftTime = GetTickCount();
+            vehData.IgnoreAccelerationUpshiftTrigger = true;
+            vehData.PrevUpshiftTime = GetTickCount();
             shiftTo(ext.GetGearCurr(vehicle) + 1, true);
             vehData.FakeNeutral = false;
             upshiftSpeedsMod[currGear] = currSpeed;
         }
 
-        if (ignoreAccelerationUpshiftTrigger) {
+        if (vehData.IgnoreAccelerationUpshiftTrigger) {
             float upshiftTimeout = 1.0f / *(float*)(ext.GetHandlingPtr(vehicle) + hOffsets.fClutchChangeRateScaleUpShift);
-            if (ignoreAccelerationUpshiftTrigger && GetTickCount() > prevUpshiftTime + (int)(upshiftTimeout*1000.0f)) {
-                ignoreAccelerationUpshiftTrigger = false;
+            if (vehData.IgnoreAccelerationUpshiftTrigger && GetTickCount() > vehData.PrevUpshiftTime + (int)(upshiftTimeout*1000.0f)) {
+                vehData.IgnoreAccelerationUpshiftTrigger = false;
             }
         }
     }
@@ -1244,7 +1237,7 @@ void handleRPM() {
     // Update 2017-08-12: We know the gear speeds now, consider patching
     // shiftUp completely?
     if (ext.GetGearCurr(vehicle) > 0 &&
-        (hitLimiter && ENTITY::GET_ENTITY_SPEED(vehicle) > 2.0f)) {
+        (vehData.HitLimiter && ENTITY::GET_ENTITY_SPEED(vehicle) > 2.0f)) {
         ext.SetThrottle(vehicle, 1.0f);
         fakeRev(false, 0);
         CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
@@ -1299,7 +1292,7 @@ void handleRPM() {
  */
 void functionLimiter() {
     if (ext.GetGearCurr(vehicle) == ext.GetTopGear(vehicle) || ext.GetGearCurr(vehicle) == 0) {
-        hitLimiter = false;
+        vehData.HitLimiter = false;
         return;
     }
 
@@ -1308,10 +1301,10 @@ void functionLimiter() {
     float maxSpeed = DriveMaxFlatVel / ratios[ext.GetGearCurr(vehicle)];
 
     if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > maxSpeed) {
-        hitLimiter = true;
+        vehData.HitLimiter = true;
     }
     else {
-        hitLimiter = false;
+        vehData.HitLimiter = false;
     }
 }
 
