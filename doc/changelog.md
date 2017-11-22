@@ -1,4 +1,22 @@
 # Changelog
+## 4.5.0
+Config changes:
+No
+
+Changes:
+* Improve redline detection and consistency across vehicles
+* Re-write auto gearbox to accomodate new redline detection
+* Fix bikes shifting up without input
+* Fix big trucks being weird in general
+
+Wheel changes:
+* Add frontal collission force feedback
+* Implement proper smooth damper
+* Fix camera pitch change on looking sideways
+
+## 4.4.2
+* Fix a button assignment issue
+
 ## 4.4.1
 Config changes:
 No incompatible changes.

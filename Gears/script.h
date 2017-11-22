@@ -1,6 +1,6 @@
 #pragma once
 
-#define DISPLAY_VERSION "v4.4.3"
+#define DISPLAY_VERSION "v4.5.0"
 #define NUM_GEARS 8
 #define MAX_GEAR 7
 
