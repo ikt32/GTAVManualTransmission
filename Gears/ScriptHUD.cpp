@@ -9,7 +9,9 @@
 #include "Memory/VehicleExtensions.hpp"
 #include "VehicleData.hpp"
 #include "Util/MathExt.h"
+#include "menu.h"
 
+extern NativeMenu::Menu menu;
 extern ScriptSettings settings;
 extern std::string settingsGeneralFile;
 extern std::string settingsWheelFile;
@@ -180,27 +182,30 @@ void drawDebugInfo() {
     std::stringstream ssDashSpd;
     std::stringstream ssDbias;
 
-    ssEnabled << "Mod:\t\t" << (settings.EnableManual ? "Enabled" : "Disabled");
-    ssRPM << "RPM:\t\t" << std::setprecision(3) << vehData.RPM;
-    ssCurrGear << "CurrGear:\t" << ext.GetGearCurr(vehicle);
-    ssNextGear << "NextGear:\t" << ext.GetGearNext(vehicle);
-    ssClutch << "Clutch:\t\t" << std::setprecision(3) << ext.GetClutch(vehicle);
-    ssThrottle << "Throttle:\t" << std::setprecision(3) << ext.GetThrottle(vehicle);
-    ssTurbo << "Turbo:\t\t" << std::setprecision(3) << ext.GetTurbo(vehicle);
-    ssAddress << "Address:\t0x" << std::hex << reinterpret_cast<uint64_t>(ext.GetAddress(vehicle));
-    ssDashSpd << "Speedo:\t" << (vehData.HasSpeedo ? "Yes" : "No");
-    ssDbias << "DBias:\t\t" << std::setprecision(3) << ext.GetDriveBiasFront(vehicle);
+    ssEnabled   << "Mod Enabled:\t\t"   << (settings.EnableManual ? "Yes" : "No");
+    ssRPM       << "RPM:\t\t\t"         << std::setprecision(3) << vehData.RPM;
+    ssCurrGear  << "Current Gear:\t\t"  << ext.GetGearCurr(vehicle);
+    ssNextGear  << "Next Gear:\t\t"     << ext.GetGearNext(vehicle);
+    ssClutch    << "Clutch:\t\t\t"      << std::setprecision(3) << ext.GetClutch(vehicle);
+    ssThrottle  << "Throttle:\t\t\t"    << std::setprecision(3) << ext.GetThrottle(vehicle);
+    ssTurbo     << "Turbo:\t\t\t"       << std::setprecision(3) << ext.GetTurbo(vehicle);
+    ssAddress   << "Veh Address:\t\t0x" << std::hex << reinterpret_cast<uint64_t>(ext.GetAddress(vehicle));
+    ssDashSpd   << "Speedo Present:\t"  << (vehData.HasSpeedo ? "Yes" : "No");
+    ssDbias     << "Drive Bias:\t\t"    << std::setprecision(3) << ext.GetDriveBiasFront(vehicle);
 
-    showText(0.01f, 0.275f, 0.4f, ssEnabled.str(), 4);
-    showText(0.01f, 0.300f, 0.4f, ssRPM.str(), 4);
-    showText(0.01f, 0.325f, 0.4f, ssCurrGear.str(), 4);
-    showText(0.01f, 0.350f, 0.4f, ssNextGear.str(), 4);
-    showText(0.01f, 0.375f, 0.4f, ssClutch.str(), 4);
-    showText(0.01f, 0.400f, 0.4f, ssThrottle.str(), 4);
-    showText(0.01f, 0.425f, 0.4f, ssTurbo.str(), 4);
-    showText(0.01f, 0.450f, 0.4f, ssAddress.str(), 4);
-    showText(0.01f, 0.475f, 0.4f, ssDashSpd.str(), 4);
-    showText(0.01f, 0.500f, 0.4f, ssDbias.str(), 4);
+    if (!menu.IsThisOpen()) {
+        showText(0.01, 0.275, 0.3, ssEnabled.str());
+        showText(0.01, 0.300, 0.3, ssRPM.str());
+        showText(0.01, 0.325, 0.3, ssCurrGear.str());
+        showText(0.01, 0.350, 0.3, ssNextGear.str());
+        showText(0.01, 0.375, 0.3, ssClutch.str());
+        showText(0.01, 0.400, 0.3, ssThrottle.str());
+        showText(0.01, 0.425, 0.3, ssTurbo.str());
+        showText(0.01, 0.450, 0.3, ssAddress.str());
+        showText(0.01, 0.475, 0.3, ssDashSpd.str());
+        showText(0.01, 0.500, 0.3, ssDbias.str());
+    }
+
 
     std::stringstream ssThrottleInput;
     std::stringstream ssBrakeInput;

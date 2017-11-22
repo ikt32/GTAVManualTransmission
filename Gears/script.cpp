@@ -76,8 +76,8 @@ bool lookrightfirst = false;
 MiniPID pid(1.0, 0.0, 0.0);
 
 /*
-* Do something with them globals
-*/
+ * Do something with them globals
+ */
 bool ignoreAccelerationUpshiftTrigger = false;
 DWORD prevUpshiftTime;
 bool hitLimiter = false;
@@ -837,23 +837,33 @@ void functionAShift() {
     // Manual part
     if (subAShiftManual()) return;
     
+    int currGear = ext.GetGearCurr(vehicle);
+    if (currGear == 0) return;
+
     float currSpeed = vehData.SpeedVector.y;
     auto ratios = ext.GetGearRatios(vehicle);
     float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
     float InitialDriveMaxFlatVel = ext.GetInitialDriveMaxFlatVel(vehicle);
-    int currGear = ext.GetGearCurr(vehicle);
-    float acceleration = vehData.GetRelativeAcceleration().y / 9.81f;
 
-    float minSpeedUpShiftWindow = InitialDriveMaxFlatVel / ratios[currGear];
     float maxSpeedUpShiftWindow = DriveMaxFlatVel / ratios[currGear];
-    float upshiftSpeed = map(pow(controls.ThrottleVal, 6.0f), 0.0f, 1.0f, minSpeedUpShiftWindow, maxSpeedUpShiftWindow);
+    float minSpeedUpShiftWindow = InitialDriveMaxFlatVel / ratios[currGear];
+    float currGearDelta = maxSpeedUpShiftWindow - minSpeedUpShiftWindow;
+
+    float prevGearTopSpeed = DriveMaxFlatVel / ratios[currGear - 1];
+    float prevGearMinSpeed = InitialDriveMaxFlatVel / ratios[currGear - 1];
+    float highEndShiftSpeed = fminf(minSpeedUpShiftWindow, prevGearTopSpeed);
+    float prevGearDelta = prevGearTopSpeed - prevGearMinSpeed;
+
+    float upshiftSpeed   = map(pow(controls.ThrottleVal, 6.0f), 0.0f, 1.0f, minSpeedUpShiftWindow, maxSpeedUpShiftWindow);
+    float downshiftSpeed = map(pow(controls.ThrottleVal, 6.0f), 0.0f, 1.0f, prevGearMinSpeed,      highEndShiftSpeed);
+
+    float acceleration = vehData.GetRelativeAcceleration().y / 9.81f;
+    float accelExpect = pow(controls.ThrottleVal, 2.0f) * ratios[currGear] * VEHICLE::GET_VEHICLE_ACCELERATION(vehicle);
 
     // Shift up.
-    if (currGear > 0 && currGear < ext.GetTopGear(vehicle)) {
-        float accelExpect = pow(controls.ThrottleVal, 2.0f) * ratios[currGear] * VEHICLE::GET_VEHICLE_ACCELERATION(vehicle);
+    if (currGear < ext.GetTopGear(vehicle)) {
         bool shouldShiftUpSPD = currSpeed > upshiftSpeed;
         bool shouldShiftUpACC = accelExpect > 2.0f * acceleration && !ignoreAccelerationUpshiftTrigger;
-        float upshiftTimeout = 1.0f / *(float*)(ext.GetHandlingPtr(vehicle) + hOffsets.fClutchChangeRateScaleUpShift);
 
         if (currSpeed > minSpeedUpShiftWindow && (shouldShiftUpSPD || shouldShiftUpACC)) {
             ignoreAccelerationUpshiftTrigger = true;
@@ -864,6 +874,7 @@ void functionAShift() {
         }
 
         if (ignoreAccelerationUpshiftTrigger) {
+            float upshiftTimeout = 1.0f / *(float*)(ext.GetHandlingPtr(vehicle) + hOffsets.fClutchChangeRateScaleUpShift);
             if (ignoreAccelerationUpshiftTrigger && GetTickCount() > prevUpshiftTime + (int)(upshiftTimeout*1000.0f)) {
                 ignoreAccelerationUpshiftTrigger = false;
             }
@@ -872,17 +883,21 @@ void functionAShift() {
 
     // Shift down
     if (currGear > 1) {
-        float prevGearTopSpeed = DriveMaxFlatVel / ratios[currGear - 1];
-        float prevGearMinSpeed = InitialDriveMaxFlatVel / ratios[currGear - 1];
-        float highEndShiftSpeed = fminf(minSpeedUpShiftWindow, prevGearTopSpeed);
-
-        float prevGearDelta = prevGearTopSpeed - prevGearMinSpeed;
-        float downshiftSpeed = map(controls.ThrottleVal, 0.0f, 1.0f, prevGearMinSpeed, highEndShiftSpeed);
-
         if (currSpeed < downshiftSpeed - prevGearDelta) {
             shiftTo(currGear - 1, true);
             vehData.FakeNeutral = false;
         }
+    }
+
+    if (settings.DisplayInfo && !menu.IsThisOpen()) {
+        showText(0.01, 0.525, 0.3, "CurrentSpeed: \t" + std::to_string(currSpeed));
+        showText(0.01, 0.550, 0.3, "UpshiftSpeed: \t" + std::to_string(upshiftSpeed));
+        showText(0.01, 0.575, 0.3, "DnshiftSpeed: \t" + std::to_string(downshiftSpeed - prevGearDelta));
+        showText(0.01, 0.600, 0.3, "PrevGearDelta: \t" + std::to_string(prevGearDelta));
+        showText(0.01, 0.625, 0.3, "CurrGearDelta: \t" + std::to_string(currGearDelta));
+        showText(0.01, 0.650, 0.3, "Accel(Expect): \t" + std::to_string(accelExpect));
+        showText(0.01, 0.675, 0.3, "2 * Accel(Real): \t" + std::to_string(2.0f * acceleration));
+
     }
 }
 
