@@ -71,8 +71,6 @@ int prevExtShift = 0;
 int speedoIndex;
 extern std::vector<std::string> speedoTypes;
 
-bool lookrightfirst = false;
-
 MiniPID pid(1.0, 0.0, 0.0);
 
 void update() {
@@ -1672,17 +1670,19 @@ void handleVehicleButtons() {
     // who was first?
     if (controls.ButtonIn(ScriptControls::WheelControlType::LookRight) &&
         controls.ButtonJustPressed(ScriptControls::WheelControlType::LookLeft)) {
-        lookrightfirst = true;
+        vehData.LookBackRShoulder = true;
     }
 
     if (controls.ButtonIn(ScriptControls::WheelControlType::LookLeft) &&
         controls.ButtonIn(ScriptControls::WheelControlType::LookRight)) {
-        CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(lookrightfirst ? -180.0f : 180.0f);
+        CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(vehData.LookBackRShoulder ? -180.0f : 180.0f);
     }
     else if (controls.ButtonIn(ScriptControls::WheelControlType::LookLeft)) {
-        CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(90);
+        CAM::SET_GAMEPLAY_CAM_RELATIVE_PITCH(0.0f, 1.0f);
+        CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(90.0f);
     }
     else if (controls.ButtonIn(ScriptControls::WheelControlType::LookRight)) {
+        CAM::SET_GAMEPLAY_CAM_RELATIVE_PITCH(0.0f, 1.0f);
         CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(-90);
     }
     if (controls.ButtonReleased(ScriptControls::WheelControlType::LookLeft) && !(controls.ButtonIn(ScriptControls::WheelControlType::LookRight)) ||
@@ -1691,7 +1691,7 @@ void handleVehicleButtons() {
     }
     if (controls.ButtonReleased(ScriptControls::WheelControlType::LookLeft)  ||
         controls.ButtonReleased(ScriptControls::WheelControlType::LookRight)) {
-        lookrightfirst = false;
+        vehData.LookBackRShoulder = false;
     }
 
     if (controls.ButtonJustPressed(ScriptControls::WheelControlType::Camera)) {

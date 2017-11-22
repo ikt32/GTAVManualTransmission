@@ -64,6 +64,8 @@ public:
     bool BlinkerHazard = false;
     int BlinkerTicks = 0;
 
+    bool LookBackRShoulder = false;
+
     int RadioStationIndex = 0;
     bool HasSpeedo = false;
 
