@@ -168,58 +168,72 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 
 // Limitation: Only works for hardcoded input types. Currently throttle.
 ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices previousInput, bool enableWheel) {
-    if (IsKeyJustPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)], KeyboardControlType::Throttle) ||
-        IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)])) {
+    auto kbThrottleIdx = static_cast<int>(KeyboardControlType::Throttle);
+    auto kbBrakeIdx = static_cast<int>(KeyboardControlType::Brake);
+    if (IsKeyJustPressed(KBControl[kbThrottleIdx], KeyboardControlType::Throttle) ||
+        IsKeyPressed(KBControl[kbThrottleIdx]) ||
+        IsKeyJustPressed(KBControl[kbBrakeIdx], KeyboardControlType::Brake) ||
+        IsKeyPressed(KBControl[kbBrakeIdx])) {
         return Keyboard;
     }
+
     if (UseLegacyController) {
-        if (lcontroller.IsButtonJustPressed(lcontroller.EControlToButton(LegacyControls[static_cast<int>(LegacyControlType::Throttle)])) ||
-            lcontroller.IsButtonPressed(lcontroller.EControlToButton(LegacyControls[static_cast<int>(LegacyControlType::Throttle)]))) {
+        auto lcThrottleIdx = static_cast<int>(LegacyControlType::Throttle);
+        auto lcThrottleBtn = lcontroller.EControlToButton(LegacyControls[lcThrottleIdx]);
+        auto lcBrakeIdx = static_cast<int>(LegacyControlType::Brake);
+        auto lcBrakeBtn = lcontroller.EControlToButton(LegacyControls[lcBrakeIdx]);
+        if (lcontroller.IsButtonJustPressed(lcThrottleBtn) ||
+            lcontroller.IsButtonPressed(lcThrottleBtn) ||
+            lcontroller.IsButtonJustPressed(lcBrakeBtn) ||
+            lcontroller.IsButtonPressed(lcBrakeBtn)) {
             return Controller;
         }
-    } else {
-        if (controller.IsButtonJustPressed(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState) ||
-            controller.IsButtonPressed(controller.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]), buttonState)) {
+    } 
+    else {
+        auto cThrottleIdx = static_cast<int>(ControllerControlType::Throttle);
+        auto cThrottleBtn = controller.StringToButton(ControlXbox[cThrottleIdx]);
+        auto cBrakeIdx = static_cast<int>(ControllerControlType::Brake);
+        auto cBrakeBtn = controller.StringToButton(ControlXbox[cBrakeIdx]);
+        if (controller.IsButtonJustPressed(cThrottleBtn, buttonState) ||
+            controller.IsButtonPressed(cThrottleBtn, buttonState) ||
+            controller.IsButtonJustPressed(cBrakeBtn, buttonState) ||
+            controller.IsButtonPressed(cBrakeBtn, buttonState)) {
             return Controller;
         }
     }
     if (enableWheel && WheelControl.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
         auto throttleAxis = WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]);
         auto throttleGUID = WheelAxesGUIDs[static_cast<int>(WheelAxisType::Throttle)];
-        int rawThrottle = WheelControl.GetAxisValue(throttleAxis, throttleGUID);
-        auto tempThrottle = 0.0f + 1.0f / (ThrottleMax - ThrottleMin)*(static_cast<float>(rawThrottle) - ThrottleMin);
-
-        if (WheelAxes[static_cast<int>(WheelAxisType::Throttle)] == WheelAxes[static_cast<int>(WheelAxisType::Brake)]) {
-            // get throttle range
-            if (ThrottleMax > ThrottleMin &&
-                rawThrottle < ThrottleMax &&
-                rawThrottle > ThrottleMin + (ThrottleMax - ThrottleMin)*0.5) {
-                return Wheel;
-            }
-            if (ThrottleMax < ThrottleMin && // Which twisted mind came up with this
-                rawThrottle > ThrottleMax &&
-                rawThrottle < ThrottleMin - (ThrottleMin - ThrottleMax)*0.5) {
-                return Wheel;
-            }
+        int raw_t = WheelControl.GetAxisValue(throttleAxis, throttleGUID);
+        auto tempThrottle = map((float)raw_t, (float)ThrottleMin, (float)ThrottleMax, 0.0f, 1.0f);
+        if (raw_t == -1) {
+            tempThrottle = 0.0f;
         }
-        else if (tempThrottle > 0.5f) {
+        if (InvertThrottle) {
+            tempThrottle = 1.0f - tempThrottle;
+        }
+        if (tempThrottle > 0.5f) {
             return Wheel;
         }
 
         auto clutchGUID = WheelAxesGUIDs[static_cast<int>(WheelAxisType::Clutch)];
-        if (WheelControl.IsConnected(clutchGUID)) {
-            auto clutchAxis = WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]);
-            int rawClutch = WheelControl.GetAxisValue(clutchAxis, clutchGUID);
-            auto tempClutch = 0.0f + 1.0f / (ClutchMax - ClutchMin)*(static_cast<float>(rawClutch) - ClutchMin);
-            if (tempClutch > 0.5f) {
-                return Wheel;
-            }
+        auto clutchAxis = WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]);
+        int raw_c = WheelControl.GetAxisValue(clutchAxis, clutchGUID);
+        auto tempClutch = map((float)raw_c, (float)ClutchMin, (float)ClutchMax, 0.0f, 1.0f);
+        if (raw_c == -1) {
+            tempClutch = 0.0f;
         }
+        if (InvertClutch) {
+            tempClutch = 1.0f - tempClutch;
+        }
+        if (tempClutch > 0.5f) {
+            return Wheel;
+        }
+
         if (ButtonIn(WheelControlType::Clutch) || ButtonIn(WheelControlType::Throttle)) {
             return Wheel;
         }
     }
-
     return previousInput;
 }
 
