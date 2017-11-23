@@ -56,7 +56,7 @@ void VehicleData::updateAcceleration() {
     acceleration = result;
 
     accelerationSamples[averageAccelIndex] = acceleration;
-    averageAccelIndex = (averageAccelIndex + 1) % (SAMPLES - 1);
+    averageAccelIndex = (averageAccelIndex + 1) % SAMPLES;
 }
 
 VehicleClass VehicleData::findClass(Hash model) {
