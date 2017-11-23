@@ -589,10 +589,6 @@ void decGamma(float min, float step) {
     settings.BrakeGamma -= step;
 }
 
-int movAvgIndex = 0;
-const int windowSize = 10;
-float movAvgVals[windowSize];
-
 std::vector<std::string> showGammaCurve() {
 
     std::string larr = "< ";
@@ -639,15 +635,7 @@ std::vector<std::string> showGammaCurve() {
                             255, 255, 255, 255);
     }
 
-    movAvgVals[movAvgIndex] = controls.BrakeVal;
-    float avgd = 0.0f;
-    for (float val : movAvgVals) {
-        avgd += val;
-    }
-    avgd /= windowSize;
-    movAvgIndex = (movAvgIndex + 1) % windowSize;
-
-    std::pair<float, float> currentPoint = { avgd, pow(avgd, settings.BrakeGamma) };
+    std::pair<float, float> currentPoint = { controls.BrakeValAvg, pow(controls.BrakeValAvg, settings.BrakeGamma) };
     float pointX = rectX - 0.5f*rectW + currentPoint.first * rectW;
     float pointY = rectY + 0.5f*rectH - currentPoint.second * rectH;
     GRAPHICS::DRAW_RECT(pointX, pointY, 

@@ -5,6 +5,8 @@
 #include "WheelDirectInput.hpp"
 #include "LegacyController.h"
 
+const int AVERAGEWINDOW = 10;
+
 struct Device {
     Device(std::string name, GUID guid) : name(name), guid(guid) {}
     std::string name;
@@ -193,6 +195,7 @@ public:
 
     float ThrottleVal = 0.0f;
     float BrakeVal = 0.0f;
+    float BrakeValAvg = 0.0f;   // Used for gamma curve display. Not as jittery.
     float ClutchVal = 0.0f; 	// 1 = Pressed, 0 = Not pressed
     float ClutchValRaw = 0.0f;	// For readout purposes. ClutchVal is for gameplay purposes.
     float SteerVal = 0.5f;
@@ -368,6 +371,9 @@ private:
 
     bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
     bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
+
+    int movAvgIndex = 0;
+    float averageBrakeVals[AVERAGEWINDOW];
 };
 
 // GUID utils

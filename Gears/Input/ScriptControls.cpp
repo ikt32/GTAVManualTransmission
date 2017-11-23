@@ -164,6 +164,14 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
     if (ignoreClutch) {
         ClutchVal = 0.0f;
     }
+
+    averageBrakeVals[movAvgIndex] = BrakeVal;
+    BrakeValAvg = 0.0f;
+    for (float val : averageBrakeVals) {
+        BrakeValAvg += val;
+    }
+    BrakeValAvg /= AVERAGEWINDOW;
+    movAvgIndex = (movAvgIndex + 1) % AVERAGEWINDOW;
 }
 
 // Limitation: Only works for hardcoded input types. Currently throttle.
