@@ -11,7 +11,8 @@ Changes:
 
 Wheel changes:
 * Add frontal collission force feedback
-* Implement proper smooth damper
+* Add proper damper effect
+* Add brake gamma curve option
 * Fix camera pitch change on looking sideways
 
 ## 4.4.2

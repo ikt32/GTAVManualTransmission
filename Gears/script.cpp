@@ -1407,6 +1407,9 @@ void functionRealReverse() {
 // Forward gear: Throttle accelerates, Brake brakes (exclusive)
 // Reverse gear: Throttle reverses, Brake brakes (exclusive)
 void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
+    wheelThrottleVal = pow(wheelThrottleVal, settings.ThrottleGamma);
+    wheelBrakeVal = pow(wheelBrakeVal, settings.BrakeGamma);
+
     float speedThreshold = 0.5f;
     const float reverseThreshold = 2.0f;
 
@@ -1541,6 +1544,8 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
 
 // Pedals behave like RT/LT
 void handlePedalsDefault(float wheelThrottleVal, float wheelBrakeVal) {
+    wheelThrottleVal = pow(wheelThrottleVal, settings.ThrottleGamma);
+    wheelBrakeVal = pow(wheelBrakeVal, settings.BrakeGamma);
     if (wheelThrottleVal > 0.01f) {
         SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, controls.ADZThrottle);
     }

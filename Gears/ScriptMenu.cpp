@@ -579,6 +579,84 @@ void update_anglemenu() {
                      { "Soft lock for boats. (degrees)" });
 }
 
+void incGamma(float max, float step) {
+    if (settings.BrakeGamma + step > max) return;
+    settings.BrakeGamma += step;
+}
+
+void decGamma(float min, float step) {
+    if (settings.BrakeGamma - step < min) return;
+    settings.BrakeGamma -= step;
+}
+
+int movAvgIndex = 0;
+const int windowSize = 10;
+float movAvgVals[windowSize];
+
+std::vector<std::string> showGammaCurve() {
+
+    std::string larr = "< ";
+    std::string rarr = " >";
+    if (settings.BrakeGamma >= 5.0f - 0.01f) rarr = "";
+    if (settings.BrakeGamma <= 0.1f + 0.01f) larr = "";
+
+    char buf[100];
+    _snprintf_s(buf, sizeof(buf), "%.*f", 2, settings.BrakeGamma);
+    std::string printVar = buf;
+
+    std::vector<std::string> info {
+        "Brake gamma:",
+        larr + printVar + rarr
+    };
+
+    const int max_samples = 100;
+    std::vector<std::pair<float, float>> points;
+    for (int i = 0; i < max_samples; i++) {
+        float x = (float)i / (float)max_samples;
+        float y = pow(x, settings.BrakeGamma);
+        points.push_back({ x, y });
+    }
+
+    float rectX = 0.5f;
+    float rectY = 0.5f;
+    float rectW = 0.40f / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+    float rectH = 0.40f;
+    float blockW = rectW / max_samples;//0.001f * (16.0f / 9.0f) / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+    float blockH = blockW * GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+
+    GRAPHICS::DRAW_RECT(rectX, rectY, 
+                        rectW + 3.0f*blockW, rectH + 3.0f*blockH,
+                        255, 255, 255, 191);
+    GRAPHICS::DRAW_RECT(rectX, rectY, 
+                        rectW + blockW / 2.0f, rectH + blockH / 2.0f, 
+                        0, 0, 0, 239);
+
+    for (auto point : points) {
+        float pointX = rectX - 0.5f*rectW + point.first *rectW;
+        float pointY = rectY + 0.5f*rectH - point.second *rectH;
+        GRAPHICS::DRAW_RECT(pointX, pointY, 
+                            blockW, blockH, 
+                            255, 255, 255, 255);
+    }
+
+    movAvgVals[movAvgIndex] = controls.BrakeVal;
+    float avgd = 0.0f;
+    for (float val : movAvgVals) {
+        avgd += val;
+    }
+    avgd /= windowSize;
+    movAvgIndex = (movAvgIndex + 1) % windowSize;
+
+    std::pair<float, float> currentPoint = { avgd, pow(avgd, settings.BrakeGamma) };
+    float pointX = rectX - 0.5f*rectW + currentPoint.first * rectW;
+    float pointY = rectY + 0.5f*rectH - currentPoint.second * rectH;
+    GRAPHICS::DRAW_RECT(pointX, pointY, 
+                        3.0f*blockW, 3.0f*blockH, 
+                        255, 0, 0, 255);
+    
+    return info;
+}
+ 
 void update_axesmenu() {
     menu.Title("Configure axes");
     menu.Subtitle("Setup steering and pedals");
@@ -631,8 +709,18 @@ void update_axesmenu() {
 
     menu.FloatOption("Throttle anti-deadzone",	controls.ADZThrottle, 0.0f, 1.0f, 0.01f, 
                      { "GTA V ignores 25% input for analog controls by default." });
+
     menu.FloatOption("Brake anti-deadzone",		controls.ADZBrake, 0.0f, 1.0f, 0.01f,
                      { "GTA V ignores 25% input for analog controls by default." });
+
+    bool showGamma = false;
+    std::vector<std::string> extras = {};
+    menu.OptionPlus("Brake gamma", extras, &showGamma, std::bind(incGamma, 5.0f, 0.01f), std::bind(decGamma, 0.1f, 0.01f), "Brake gamma", 
+                    { "Linearity of the brake pedal. Values over 1.0 feel more real if you have progressive springs." });
+    if (showGamma) {
+        extras = showGammaCurve();
+        menu.OptionPlusPlus(extras, "Brake gamma");
+    }
 
     menu.BoolOption("Invert steer", controls.InvertSteer);
     menu.BoolOption("Invert throttle", controls.InvertThrottle);

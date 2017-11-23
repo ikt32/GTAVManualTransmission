@@ -139,7 +139,6 @@ public:
     float SteeringReductionWheel = 0.0f;
     float SteeringReductionOther = 0.0f;
 
-
     // [FORCE_FEEDBACK]
     bool EnableFFB = true;
     bool ScaleFFB = true;
@@ -157,6 +156,12 @@ public:
     float SteerAngleBoat = 360.0f;
     float GameSteerMultWheel = 1.0f;
     float GameSteerMultOther = 1.0f;
+
+    // [THROTTLE]
+    float ThrottleGamma = 1.0f;
+
+    // [BRAKE]
+    float BrakeGamma = 1.0f;
 
     // Methods
     /*

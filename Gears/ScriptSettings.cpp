@@ -204,9 +204,11 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
 
     // [THROTTLE]
     settingsWheel.SetDoubleValue("THROTTLE", "ANTIDEADZONE", scriptControl->ADZThrottle);
+    settingsWheel.SetDoubleValue("THROTTLE", "GAMMA", ThrottleGamma);
 
     // [BRAKES]
     settingsWheel.SetDoubleValue("BRAKES", "ANTIDEADZONE", scriptControl->ADZBrake);
+    settingsWheel.SetDoubleValue("BRAKES", "GAMMA", BrakeGamma);
 
     settingsWheel.SaveFile(settingsWheelFile.c_str());
 }
@@ -512,6 +514,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
     scriptControl->ThrottleMin = settingsWheel.GetLongValue("THROTTLE", "MIN", -1);
     scriptControl->ThrottleMax = settingsWheel.GetLongValue("THROTTLE", "MAX", -1);
     scriptControl->ADZThrottle = settingsWheel.GetDoubleValue("THROTTLE", "ANTIDEADZONE", 0.25);
+    ThrottleGamma = settingsWheel.GetDoubleValue("THROTTLE", "GAMMA", 1.0);
 
     // [BRAKES]
     scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Brake)] =
@@ -521,6 +524,7 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
     scriptControl->BrakeMin = settingsWheel.GetLongValue("BRAKES", "MIN", -1);
     scriptControl->BrakeMax = settingsWheel.GetLongValue("BRAKES", "MAX", -1);
     scriptControl->ADZBrake = settingsWheel.GetDoubleValue("BRAKES", "ANTIDEADZONE", 0.25);
+    BrakeGamma = settingsWheel.GetDoubleValue("BRAKES", "GAMMA", 1.0);
 
     // [CLUTCH]
     scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] =
