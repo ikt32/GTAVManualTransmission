@@ -561,12 +561,14 @@ void setShiftMode(int shiftMode) {
     if (shiftMode > 2 || shiftMode < 0)
         return;
 
-    if (settings.ShiftMode == HPattern  && controls.PrevInput == ScriptControls::Controller) {
-        settings.ShiftMode = Automatic;
+    if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
+        if ((settings.ShiftMode == Automatic || settings.ShiftMode == Sequential) && ext.GetGearCurr(vehicle) > 1) {
+            vehData.FakeNeutral = false;
+        }
     }
 
-    if ((settings.ShiftMode == Automatic || settings.ShiftMode == Sequential) && ext.GetGearCurr(vehicle) > 1) {
-        vehData.FakeNeutral = false;
+    if (settings.ShiftMode == HPattern  && controls.PrevInput == ScriptControls::Controller) {
+        settings.ShiftMode = Automatic;
     }
 
     std::string mode = mtPrefix + "Mode: ";
