@@ -111,58 +111,22 @@ void update_npc() {
         return;
     }
 
-    if (settings.ShowNPCInfo && false) {
-        auto vehPos = ENTITY::GET_ENTITY_COORDS(vehicle, true);
-        float searchdist = 100.0f;
-        Vector3 vehDir = ENTITY::GET_ENTITY_FORWARD_VECTOR(vehicle);
-        Vector3 vehFor = vehPos + (vehDir * searchdist);
-        GRAPHICS::DRAW_LINE(vehPos.x, vehPos.y, vehPos.z, vehFor.x, vehFor.y, vehFor.z, 255, 255, 255, 255);
-
-        auto raycast = WORLDPROBE::_START_SHAPE_TEST_RAY(vehPos.x, vehPos.y, vehPos.z, vehFor.x, vehFor.y, vehFor.z, 2, vehicle, 7);
-        BOOL hit;
-        Vector3 hitCoords;
-        Vector3 hitNormal;
-        Entity hitEntity;
-        WORLDPROBE::GET_SHAPE_TEST_RESULT(raycast, &hit, &hitCoords, &hitNormal, &hitEntity);
-
-        if (hit && ENTITY::DOES_ENTITY_EXIST(hitEntity) && ENTITY::IS_ENTITY_A_VEHICLE(hitEntity)) {
-            auto plate = VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(hitEntity);
-            showDebugInfo3D(hitCoords, {
-                UI::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(hitEntity))),
-                plate,
-                "Throttle: " + std::to_string(ext.GetThrottleP(hitEntity)),
-                "Brake: " + std::to_string(ext.GetBrakeP(hitEntity)),
-                "Steer:" + std::to_string(ext.GetSteeringAngle(hitEntity)),
-                "RPM: " + std::to_string(ext.GetCurrentRPM(hitEntity)),
-                "Curr Gear: " + std::to_string(ext.GetGearCurr(hitEntity)),
-                "Next Gear: " + std::to_string(ext.GetGearNext(hitEntity)),
-                "Top Gear: " + std::to_string(ext.GetTopGear(hitEntity))
-            });
-        }
-    }
-
     if (settings.ShowNPCInfo) {
         auto vehPos = ENTITY::GET_ENTITY_COORDS(vehicle, true);
         float searchdist = 50.0f;
-        Vector3 vehDir = ENTITY::GET_ENTITY_FORWARD_VECTOR(vehicle);
-        Vector3 vehFor = vehPos + (vehDir * searchdist);
-
         const int ARR_SIZE = 1024;
         Vehicle vehicles[ARR_SIZE];
         int count = worldGetAllVehicles(vehicles, ARR_SIZE);
         for (int i = 0; i < count; i++) {
             if (vehicles[i] == vehicle) continue;
-            
             Vector3 targetPos = ENTITY::GET_ENTITY_COORDS(vehicles[i], true);
-
-            Vector3 direction = targetPos - vehPos;
-            direction = Normalize(direction);
-            float vehDirection = atan2(direction.y, direction.x) * (180.0f / 3.14159);
+            Vector3 direction = Normalize(targetPos - vehPos);
+            float vehDirection = atan2(direction.y, direction.x) * (180.0f / 3.14159f);
             float myHeading = ENTITY::GET_ENTITY_HEADING(vehicle) + 90.0f;
 
             bool close = areTheseClose(vehDirection, myHeading, 15.0f);
-            float centerCloseness = howClose(vehDirection, myHeading, 15.0f);
             if (close) {
+                float centerCloseness = howClose(vehDirection, myHeading, 15.0f);
                 float dist = Distance(vehPos, targetPos);
                 if (dist < searchdist) {
                     float meCloseness = pow(2.0f * (searchdist - dist) / searchdist, 2.0f);
@@ -185,10 +149,8 @@ void update_npc() {
                     }, bgColor, fgColor);
                 }
             }
-            
         }
     }
-
 
     if (settings.EnableManual && mtActive) {
         const int ARR_SIZE = 1024;
