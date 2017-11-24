@@ -384,7 +384,9 @@ void initVehicle() {
     else {
         vehData.FakeNeutral = settings.DefaultNeutral;
     }
-    shiftTo(1, true);
+    shiftTo(1, false);
+    ext.SetGearCurr(vehicle, 1);
+    ext.SetGearNext(vehicle, 1);
     initSteeringPatches();
 }
 
@@ -703,6 +705,7 @@ void functionSShift() {
             if (ext.GetGearCurr(vehicle) < ext.GetTopGear(vehicle)) {
                 shiftTo(vehData.LockGear + 1, true);
             }
+            vehData.FakeNeutral = false;
             return;
         }
 
@@ -728,6 +731,8 @@ void functionSShift() {
         // 1 to X
         if (ext.GetGearCurr(vehicle) < ext.GetTopGear(vehicle)) {
             shiftTo(vehData.LockGear + 1, true);
+            vehData.FakeNeutral = false;
+            return;
         }
     }
 
@@ -740,6 +745,7 @@ void functionSShift() {
         if (vehData.NoClutch) {
             if (ext.GetGearCurr(vehicle) > 0) {
                 shiftTo(vehData.LockGear - 1, true);
+                vehData.FakeNeutral = false;
             }
             return;
         }
@@ -766,7 +772,9 @@ void functionSShift() {
         // X to 1
         if (ext.GetGearCurr(vehicle) > 1) {
             shiftTo(vehData.LockGear - 1, true);
+            vehData.FakeNeutral = false;
         }
+        return;
     }
 }
 
