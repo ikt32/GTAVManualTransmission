@@ -598,7 +598,6 @@ void shiftTo(int gear, bool autoClutch) {
         CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
     }
     vehData.LockGear = gear;
-    vehData.PrevGear = ext.GetGearCurr(vehicle);
 }
 void functionHShiftTo(int i) {
     if (settings.ClutchShiftingH && !vehData.NoClutch) {

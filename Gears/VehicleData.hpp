@@ -47,7 +47,6 @@ public:
     float PrevRPM = 0.0f;
     float RPM = 0.0f;
     uint8_t LockGear = 1;
-    uint16_t PrevGear = 1;
     float LockSpeed = 0.0f;
 
     bool NoClutch = false;
