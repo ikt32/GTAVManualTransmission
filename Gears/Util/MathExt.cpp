@@ -6,6 +6,15 @@ float lerp(float a, float b, float f) {
     return a + f * (b - a);
 }
 
+float Length(Vector3 vec) {
+    return sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+}
+
+float Distance(Vector3 vec1, Vector3 vec2) {
+    Vector3 distance = vec1 - vec2;
+    return Length(distance);
+}
+
 Vector3 Cross(Vector3 left, Vector3 right) {
     Vector3 result{};
     result.x = left.y * right.z - left.z * right.y;
@@ -24,6 +33,17 @@ Vector3 operator + (Vector3 left, Vector3 right) {
     };
 }
 
+Vector3 operator - (Vector3 left, Vector3 right) {
+    return Vector3{
+        left.x - right.x,
+        0,
+        left.y - right.y,
+        0,
+        left.z - right.z
+    };
+}
+
+
 Vector3 operator * (Vector3 value, float scale) {
     return Vector3{
         value.x * scale,
@@ -37,6 +57,19 @@ Vector3 operator * (Vector3 value, float scale) {
 
 Vector3 operator * (float scale, Vector3 vec) {
     return vec * scale;
+}
+
+Vector3 Normalize(Vector3 vec) {
+    Vector3 vector = {};
+    float length = Length(vec);
+
+    if (length != 0.0f) {
+        vector.x = vec.x / length;
+        vector.y = vec.y / length;
+        vector.z = vec.z / length;
+    }
+
+    return vector;
 }
 
 Vector3 GetOffsetInWorldCoords(Vector3 position, Vector3 rotation, Vector3 forward, Vector3 offset) {

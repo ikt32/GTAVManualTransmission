@@ -24,7 +24,7 @@ void showText(float x, float y, float scale, const std::string &text, int font, 
     UI::END_TEXT_COMMAND_DISPLAY_TEXT(x, y);
 }
 
-void showDebugInfo3D(Vector3 location, std::vector<std::string> textLines, Color backgroundColor) {
+void showDebugInfo3D(Vector3 location, std::vector<std::string> textLines, Color backgroundColor, Color fontColor) {
     float height = 0.0125f;
 
     GRAPHICS::SET_DRAW_ORIGIN(location.x, location.y, location.z, 0);
@@ -32,7 +32,7 @@ void showDebugInfo3D(Vector3 location, std::vector<std::string> textLines, Color
 
     float szX = 0.060f;
     for (auto line : textLines) {
-        showText(0, 0 + height * i, 0.2f, line.c_str());
+        showText(0, 0 + height * i, 0.2f, line.c_str(), 0, fontColor, true);
         float currWidth = getStringWidth(line, 0.2f, 0);
         if (currWidth > szX) {
             szX = currWidth;
