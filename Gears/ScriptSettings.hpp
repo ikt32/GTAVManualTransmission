@@ -124,6 +124,7 @@ public:
     bool DisplayWheelInfo = false;
     bool DisplayFFBInfo = false;
     int LogLevel = INFO;
+    bool ShowNPCInfo = false;
 
     std::vector<GUID> reggdGuids;
 
