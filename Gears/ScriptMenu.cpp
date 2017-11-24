@@ -936,8 +936,6 @@ void update_debugmenu() {
     menu.BoolOption("Display force feedback lines", settings.DisplayFFBInfo,
                     { "Show lines detailing force feedback direction and force.",
                         "Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction"});
-    menu.BoolOption("Share script data", settings.CrossScript, 
-                    { "Shares data like gear, shifting indicator and Neutral with other mods. Check GitHub for the supported types." });
 }
 
 
