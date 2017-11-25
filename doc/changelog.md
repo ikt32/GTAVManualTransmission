@@ -1,13 +1,16 @@
 # Changelog
 ## 4.5.0
 Config changes:
-No
+None to worry about
 
 Changes:
 * Improve redline detection and consistency across vehicles
 * Re-write auto gearbox to accomodate new redline detection
+* Fix NPC gearboxes not shifting properly
 * Fix bikes shifting up without input
 * Fix big trucks being weird in general
+* Allow brake to switch input modes too
+* Some bug fixes
 
 Wheel changes:
 * Add frontal collission force feedback
