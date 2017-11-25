@@ -85,7 +85,7 @@ float getAngleBetween(float h1, float h2, float separation) {
 
 void showNPCInfo(Vehicle vehicles[1024], int count) {
     showText(0.9, 0.5, 0.4, "NPC Vehs: " + std::to_string(count));
-    bool lookBack = (bool)CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleLookBehind);
+    bool lookBack = CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleLookBehind) == TRUE;
     auto vehPos = ENTITY::GET_ENTITY_COORDS(vehicle, true);
     float searchdist = 50.0f;
     float searchfov = 15.0f;
@@ -1011,7 +1011,7 @@ void functionAShift() {
     // Shift up.
     if (currGear < ext.GetTopGear(vehicle)) {
         bool shouldShiftUpSPD = currSpeed > upshiftSpeed;
-        bool shouldShiftUpACC = accelExpect > 2.0f * acceleration && !vehData.IgnoreAccelerationUpshiftTrigger;
+        bool shouldShiftUpACC = acceleration < 0.33f * accelExpect && !vehData.IgnoreAccelerationUpshiftTrigger;
 
         if (currSpeed > minSpeedUpShiftWindow && (shouldShiftUpSPD || shouldShiftUpACC)) {
             vehData.IgnoreAccelerationUpshiftTrigger = true;
@@ -1044,7 +1044,7 @@ void functionAShift() {
         showText(0.01, 0.600, 0.3, "PrevGearDelta: \t" + std::to_string(prevGearDelta));
         showText(0.01, 0.625, 0.3, "CurrGearDelta: \t" + std::to_string(currGearDelta));
         showText(0.01, 0.650, 0.3, "Accel(Expect): \t" + std::to_string(accelExpect));
-        showText(0.01, 0.675, 0.3, "2 * Accel(Real): \t" + std::to_string(2.0f * acceleration));
+        showText(0.01, 0.675, 0.3, "Accel(Actual): \t\t" + std::to_string(acceleration));
 
     }
 }
