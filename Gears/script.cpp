@@ -2187,7 +2187,10 @@ void playFFBGround() {
         return;
     }
 
-    float rotationScale = settings.ScaleFFB ? getSteeringLock()/900.0f : 1.0f;
+    float rotationScale = 1.0f;
+    if (settings.ScaleFFB) {
+        rotationScale = getSteeringLock() / settings.SteerAngleMax * 0.66f + 0.34f;
+    }
 
     if (settings.LogiLEDs) {
         controls.WheelControl.PlayLedsDInput(controls.SteerGUID, vehData.RPM, 0.45, 0.95);
@@ -2231,7 +2234,7 @@ void playFFBGround() {
     int satForce = calculateSat(2500, steeringAngle, wheelsOffGroundRatio, vehData.Class == VehicleClass::Car);
     int damperForce = calculateDamper(50.0f, wheelsOffGroundRatio);
 
-    // Decrease damper if sat rises, so sat is more responsive
+    // Decrease damper if sat rises, so constantForce doesn't fight against damper
     float damperMult = 1.0f - std::min(fabs((float)satForce), 10000.0f) / 10000.0f;
     damperForce = (int)(damperMult * (float)damperForce);
 
@@ -2270,7 +2273,10 @@ void playFFBWater() {
         return;
     }
 
-    float rotationScale = settings.ScaleFFB ? getSteeringLock() / 900.0f : 1.0f;
+    float rotationScale = 1.0f;
+    if (settings.ScaleFFB) {
+        rotationScale = getSteeringLock() / settings.SteerAngleMax * 0.66f + 0.34f;
+    }
 
     if (settings.LogiLEDs) {
         controls.WheelControl.PlayLedsDInput(controls.SteerGUID, vehData.RPM, 0.45, 0.95);
