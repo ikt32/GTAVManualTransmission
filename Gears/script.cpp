@@ -74,24 +74,121 @@ extern std::vector<std::string> speedoTypes;
 MiniPID pid(1.0, 0.0, 0.0);
 DWORD	vehUpdateTime;
 
-bool areTheseClose(float h1, float h2, float separation) {
-    auto diff = fabs(h1 - h2);
-    if (diff < separation)
-        return true;
-    if (fabs(diff - 360.0f) < separation)
-        return true;
-
-    return false;
-}
-
-float howClose(float h1, float h2, float separation) {
+float getAngleBetween(float h1, float h2, float separation) {
     auto diff = fabs(h1 - h2);
     if (diff < separation)
         return (separation - diff) / separation;
     if (fabs(diff - 360.0f) < separation)
         return (separation - fabs(diff - 360.0f)) / separation;
+    return separation;
+}
 
-    return 0.0f;
+void showNPCInfo(Vehicle vehicles[1024], int count) {
+    showText(0.9, 0.5, 0.4, "NPC Vehs: " + std::to_string(count));
+    bool lookBack = (bool)CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleLookBehind);
+    auto vehPos = ENTITY::GET_ENTITY_COORDS(vehicle, true);
+    float searchdist = 50.0f;
+    float searchfov = 15.0f;
+    for (int i = 0; i < count; i++) {
+        if (vehicles[i] == vehicle) continue;
+        Vector3 targetPos = ENTITY::GET_ENTITY_COORDS(vehicles[i], true);
+        Vector3 direction = Normalize(targetPos - vehPos);
+        float vehDirection = atan2(direction.y, direction.x) * (180.0f / 3.14159f);
+        float myHeading = ENTITY::GET_ENTITY_HEADING(vehicle) + 90.0f;
+        if (lookBack) myHeading += 180.0f;
+        float latDist = getAngleBetween(vehDirection, myHeading, searchfov);
+        if (latDist < searchfov) {
+            float dist = Distance(vehPos, targetPos);
+            if (dist < searchdist) {
+                float meCloseness = pow(2.0f * (searchdist - dist) / searchdist, 2.0f);
+                int drawAlpha = std::min((int)(255 * latDist * meCloseness), 255);
+                Color bgColor = transparentGray;
+                Color fgColor = solidWhite;
+                if (drawAlpha < bgColor.A) bgColor.A = drawAlpha;
+                if (drawAlpha < fgColor.A) fgColor.A = drawAlpha;
+                auto plate = VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(vehicles[i]);
+
+                Color thColor = fgColor;
+                float throttle = ext.GetThrottleP(vehicles[i]);
+
+                if (throttle >= 0.0f) {
+                    thColor.R = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
+                    thColor.B = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
+                }
+                else {
+                    thColor.B = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
+                    thColor.G = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
+                }
+
+                Color brColor = fgColor;
+                float brake = ext.GetBrakeP(vehicles[i]);
+
+                brColor.B = (int)map(brake, 0.0f, 1.0f, 255.0f, 0.0f);
+                brColor.G = (int)map(brake, 0.0f, 1.0f, 255.0f, 0.0f);
+
+                Color rpmColor = fgColor;
+                float rpm = ext.GetCurrentRPM(vehicles[i]);
+                rpmColor.G = (int)map(rpm, 0.0f, 1.0f, 255.0f, 165.0f);
+                rpmColor.B = (int)map(rpm, 0.0f, 1.0f, 255.0f, 0.0f);
+
+
+                showDebugInfo3DColors(targetPos, 
+                    { { UI::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicles[i]))), fgColor },
+                      { plate, fgColor },
+                      { "Throttle: " + std::to_string(throttle), thColor },
+                      { "Brake: " + std::to_string(brake), brColor },
+                      { "Steer:" + std::to_string(ext.GetSteeringAngle(vehicles[i])), fgColor },
+                      { "RPM: " + std::to_string(rpm), rpmColor },
+                      { "Gear: " + std::to_string(ext.GetGearCurr(vehicles[i])), fgColor },
+                      { "Top Gear: " + std::to_string(ext.GetTopGear(vehicles[i])), fgColor }, }, 
+                    bgColor);
+            }
+        }
+    }
+}
+
+void updateNPCVehicles(Vehicle vehicles[1024], int count) {
+    if (vehUpdateTime + 200 < GetTickCount()) {
+        vehUpdateTime = GetTickCount();
+        for (int i = 0; i < count; i++) {
+            if (vehicles[i] == vehicle) continue;
+            if (ext.GetTopGear(vehicles[i]) == 1) continue;
+
+            int currGear = ext.GetGearCurr(vehicles[i]);
+            if (currGear == 0) continue;
+
+            // common
+            float currSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicles[i], true).y;
+            auto ratios = ext.GetGearRatios(vehicles[i]);
+            float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicles[i]);
+            float InitialDriveMaxFlatVel = ext.GetInitialDriveMaxFlatVel(vehicles[i]);
+
+            // Shift up
+            float maxSpeedUpShiftWindow = DriveMaxFlatVel / ratios[currGear];
+            float minSpeedUpShiftWindow = InitialDriveMaxFlatVel / ratios[currGear];
+            float upshiftSpeed = map(ext.GetThrottleP(vehicles[i]), 0.0f, 1.0f, minSpeedUpShiftWindow, maxSpeedUpShiftWindow);
+
+            if (currGear < ext.GetTopGear(vehicles[i])) {
+                if (currSpeed > upshiftSpeed) {
+                    ext.SetGearNext(vehicles[i], ext.GetGearCurr(vehicles[i]) + 1);
+                    continue;
+                }
+            }
+
+            // Shift down
+            float prevGearTopSpeed = DriveMaxFlatVel / ratios[currGear - 1];
+            float prevGearMinSpeed = InitialDriveMaxFlatVel / ratios[currGear - 1];
+            float highEndShiftSpeed = fminf(minSpeedUpShiftWindow, prevGearTopSpeed);
+            float prevGearDelta = prevGearTopSpeed - prevGearMinSpeed;
+            float downshiftSpeed = map(ext.GetThrottleP(vehicles[i]), 0.0f, 1.0f, prevGearMinSpeed, highEndShiftSpeed);
+
+            if (currGear > 1) {
+                if (currSpeed < downshiftSpeed - prevGearDelta) {
+                    ext.SetGearNext(vehicles[i], ext.GetGearCurr(vehicles[i]) - 1);
+                }
+            }
+        }
+    }
 }
 
 void update_npc() {
@@ -115,105 +212,11 @@ void update_npc() {
     int count = worldGetAllVehicles(vehicles, ARR_SIZE);
 
     if (settings.ShowNPCInfo) {
-        bool lookBack = CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleLookBehind);
-        auto vehPos = ENTITY::GET_ENTITY_COORDS(vehicle, true);
-        float searchdist = 50.0f;
-        for (int i = 0; i < count; i++) {
-            if (vehicles[i] == vehicle) continue;
-            Vector3 targetPos = ENTITY::GET_ENTITY_COORDS(vehicles[i], true);
-            Vector3 direction = Normalize(targetPos - vehPos);
-            float vehDirection = atan2(direction.y, direction.x) * (180.0f / 3.14159f);
-            float myHeading = ENTITY::GET_ENTITY_HEADING(vehicle) + 90.0f;
-            if (lookBack) myHeading += 180.0f;
-            bool close = areTheseClose(vehDirection, myHeading, 15.0f);
-            if (close) {
-                float centerCloseness = howClose(vehDirection, myHeading, 15.0f);
-                float dist = Distance(vehPos, targetPos);
-                if (dist < searchdist) {
-                    float meCloseness = pow(2.0f * (searchdist - dist) / searchdist, 2.0f);
-                    int drawAlpha = std::min((int)(255 * centerCloseness * meCloseness), 255);
-                    Color bgColor = transparentGray;
-                    Color fgColor = solidWhite;
-                    if (drawAlpha < bgColor.A) bgColor.A = drawAlpha;
-                    if (drawAlpha < fgColor.A) fgColor.A = drawAlpha;
-                    auto plate = VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(vehicles[i]);
-
-                    Color thColor = fgColor;
-                    float throttle = ext.GetThrottleP(vehicles[i]);
-
-                    if (throttle >= 0.0f) {
-                        thColor.R = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
-                        thColor.B = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
-                    }
-                    else {
-                        thColor.B = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
-                        thColor.G = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
-                    }
-
-                    Color brColor = fgColor;
-                    float brake = ext.GetBrakeP(vehicles[i]);
-
-                    brColor.B = (int)map(brake, 0.0f, 1.0f, 255.0f, 0.0f);
-                    brColor.G = (int)map(brake, 0.0f, 1.0f, 255.0f, 0.0f);
-
-                    showDebugInfo3DColors(targetPos, {
-                        { UI::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicles[i]))), fgColor },
-                        { plate, fgColor },
-                        { "Throttle: " + std::to_string(throttle), thColor },
-                        { "Brake: " + std::to_string(brake), brColor },
-                        { "Steer:" + std::to_string(ext.GetSteeringAngle(vehicles[i])), fgColor },
-                        { "RPM: " + std::to_string(ext.GetCurrentRPM(vehicles[i])), fgColor },
-                        { "Curr Gear: " + std::to_string(ext.GetGearCurr(vehicles[i])), fgColor },
-                        { "Next Gear: " + std::to_string(ext.GetGearNext(vehicles[i])), fgColor },
-                        { "Top Gear: " + std::to_string(ext.GetTopGear(vehicles[i])), fgColor },
-                    }, bgColor);
-                }
-            }
-        }
+        showNPCInfo(vehicles, count);
     }
 
     if (settings.EnableManual && mtActive) {
-        if (vehUpdateTime + 200 < GetTickCount()) {
-            vehUpdateTime = GetTickCount();
-            for (int i = 0; i < count; i++) {
-                if (vehicles[i] == vehicle) continue;
-                if (ext.GetTopGear(vehicles[i]) == 1) continue;
-
-                int currGear = ext.GetGearCurr(vehicles[i]);
-                if (currGear == 0) continue;
-
-                // common
-                float currSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicles[i], true).y;
-                auto ratios = ext.GetGearRatios(vehicles[i]);
-                float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicles[i]);
-                float InitialDriveMaxFlatVel = ext.GetInitialDriveMaxFlatVel(vehicles[i]);
-
-                // Shift up
-                float maxSpeedUpShiftWindow = DriveMaxFlatVel / ratios[currGear];
-                float minSpeedUpShiftWindow = InitialDriveMaxFlatVel / ratios[currGear];
-                float upshiftSpeed = map(ext.GetThrottleP(vehicles[i]), 0.0f, 1.0f, minSpeedUpShiftWindow, maxSpeedUpShiftWindow);
-
-                if (currGear < ext.GetTopGear(vehicles[i])) {
-                    if (currSpeed > upshiftSpeed) {
-                        ext.SetGearNext(vehicles[i], ext.GetGearCurr(vehicles[i]) + 1);
-                        continue;
-                    }
-                }
-
-                // Shift down
-                float prevGearTopSpeed = DriveMaxFlatVel / ratios[currGear - 1];
-                float prevGearMinSpeed = InitialDriveMaxFlatVel / ratios[currGear - 1];
-                float highEndShiftSpeed = fminf(minSpeedUpShiftWindow, prevGearTopSpeed);
-                float prevGearDelta = prevGearTopSpeed - prevGearMinSpeed;
-                float downshiftSpeed = map(ext.GetThrottleP(vehicles[i]), 0.0f, 1.0f, prevGearMinSpeed, highEndShiftSpeed);
-
-                if (currGear > 1) {
-                    if (currSpeed < downshiftSpeed - prevGearDelta) {
-                        ext.SetGearNext(vehicles[i], ext.GetGearCurr(vehicles[i]) - 1);
-                    }
-                }
-            }
-        }
+        updateNPCVehicles(vehicles, count);
     }
 }
 

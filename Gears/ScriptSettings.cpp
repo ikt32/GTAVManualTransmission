@@ -127,6 +127,7 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetBoolValue("DEBUG", "DisplayWheelInfo", DisplayWheelInfo);
     settingsGeneral.SetBoolValue("DEBUG", "DisplayFFBInfo", DisplayFFBInfo);
     settingsGeneral.SetBoolValue("DEBUG", "DisplayGearingInfo", DisplayGearingInfo);
+    settingsGeneral.SetBoolValue("DEBUG", "DisplayNPCInfo", ShowNPCInfo);
 
     settingsGeneral.SaveFile(settingsGeneralFile.c_str());
 }
@@ -392,7 +393,8 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
     DisplayInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayInfo", false);
     DisplayWheelInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayWheelInfo", false);
     DisplayGearingInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayGearingInfo", false);
-    DisplayFFBInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayFFBInfo", false); 
+    DisplayFFBInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayFFBInfo", false);
+    ShowNPCInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayNPCInfo", false);
     LogLevel = settingsGeneral.GetLongValue("DEBUG", "LogLevel", INFO);
 
 }
