@@ -936,7 +936,8 @@ void update_debugmenu() {
     menu.BoolOption("Display force feedback lines", settings.DisplayFFBInfo,
                     { "Show lines detailing force feedback direction and force.",
                         "Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction"});
-    menu.BoolOption("Show NPC info", settings.ShowNPCInfo);
+    menu.BoolOption("Show NPC info", settings.ShowNPCInfo,
+                    { "Show vehicle info of NPC vehicles near you." });
 }
 
 

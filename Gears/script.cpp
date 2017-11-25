@@ -74,8 +74,7 @@ extern std::vector<std::string> speedoTypes;
 MiniPID pid(1.0, 0.0, 0.0);
 DWORD	vehUpdateTime;
 
-bool areTheseClose(float h1, float h2, float separation)
-{
+bool areTheseClose(float h1, float h2, float separation) {
     auto diff = fabs(h1 - h2);
     if (diff < separation)
         return true;
@@ -85,8 +84,7 @@ bool areTheseClose(float h1, float h2, float separation)
     return false;
 }
 
-float howClose(float h1, float h2, float separation)
-{
+float howClose(float h1, float h2, float separation) {
     auto diff = fabs(h1 - h2);
     if (diff < separation)
         return (separation - diff) / separation;
@@ -98,7 +96,6 @@ float howClose(float h1, float h2, float separation)
 
 void update_npc() {
     bool mtActive = MemoryPatcher::ShiftUpPatched;
-
     if (!ENTITY::DOES_ENTITY_EXIST(playerPed) ||
         !PLAYER::IS_PLAYER_CONTROL_ON(player) ||
         ENTITY::IS_ENTITY_DEAD(playerPed) ||
@@ -111,19 +108,23 @@ void update_npc() {
         return;
     }
 
+    if (!settings.ShowNPCInfo && !(settings.EnableManual && mtActive)) return;
+
+    const int ARR_SIZE = 1024;
+    Vehicle vehicles[ARR_SIZE];
+    int count = worldGetAllVehicles(vehicles, ARR_SIZE);
+
     if (settings.ShowNPCInfo) {
+        bool lookBack = CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleLookBehind);
         auto vehPos = ENTITY::GET_ENTITY_COORDS(vehicle, true);
         float searchdist = 50.0f;
-        const int ARR_SIZE = 1024;
-        Vehicle vehicles[ARR_SIZE];
-        int count = worldGetAllVehicles(vehicles, ARR_SIZE);
         for (int i = 0; i < count; i++) {
             if (vehicles[i] == vehicle) continue;
             Vector3 targetPos = ENTITY::GET_ENTITY_COORDS(vehicles[i], true);
             Vector3 direction = Normalize(targetPos - vehPos);
             float vehDirection = atan2(direction.y, direction.x) * (180.0f / 3.14159f);
             float myHeading = ENTITY::GET_ENTITY_HEADING(vehicle) + 90.0f;
-
+            if (lookBack) myHeading += 180.0f;
             bool close = areTheseClose(vehDirection, myHeading, 15.0f);
             if (close) {
                 float centerCloseness = howClose(vehDirection, myHeading, 15.0f);
@@ -136,26 +137,42 @@ void update_npc() {
                     if (drawAlpha < bgColor.A) bgColor.A = drawAlpha;
                     if (drawAlpha < fgColor.A) fgColor.A = drawAlpha;
                     auto plate = VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(vehicles[i]);
-                    showDebugInfo3D(targetPos, {
-                        UI::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicles[i]))),
-                        plate,
-                        "Throttle: " + std::to_string(ext.GetThrottleP(vehicles[i])),
-                        "Brake: " + std::to_string(ext.GetBrakeP(vehicles[i])),
-                        "Steer:" + std::to_string(ext.GetSteeringAngle(vehicles[i])),
-                        "RPM: " + std::to_string(ext.GetCurrentRPM(vehicles[i])),
-                        "Curr Gear: " + std::to_string(ext.GetGearCurr(vehicles[i])),
-                        "Next Gear: " + std::to_string(ext.GetGearNext(vehicles[i])),
-                        "Top Gear: " + std::to_string(ext.GetTopGear(vehicles[i]))
-                    }, bgColor, fgColor);
+
+                    Color thColor = fgColor;
+                    float throttle = ext.GetThrottleP(vehicles[i]);
+
+                    if (throttle >= 0.0f) {
+                        thColor.R = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
+                        thColor.B = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
+                    }
+                    else {
+                        thColor.B = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
+                        thColor.G = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
+                    }
+
+                    Color brColor = fgColor;
+                    float brake = ext.GetBrakeP(vehicles[i]);
+
+                    brColor.B = (int)map(brake, 0.0f, 1.0f, 255.0f, 0.0f);
+                    brColor.G = (int)map(brake, 0.0f, 1.0f, 255.0f, 0.0f);
+
+                    showDebugInfo3DColors(targetPos, {
+                        { UI::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicles[i]))), fgColor },
+                        { plate, fgColor },
+                        { "Throttle: " + std::to_string(throttle), thColor },
+                        { "Brake: " + std::to_string(brake), brColor },
+                        { "Steer:" + std::to_string(ext.GetSteeringAngle(vehicles[i])), fgColor },
+                        { "RPM: " + std::to_string(ext.GetCurrentRPM(vehicles[i])), fgColor },
+                        { "Curr Gear: " + std::to_string(ext.GetGearCurr(vehicles[i])), fgColor },
+                        { "Next Gear: " + std::to_string(ext.GetGearNext(vehicles[i])), fgColor },
+                        { "Top Gear: " + std::to_string(ext.GetTopGear(vehicles[i])), fgColor },
+                    }, bgColor);
                 }
             }
         }
     }
 
     if (settings.EnableManual && mtActive) {
-        const int ARR_SIZE = 1024;
-        Vehicle vehicles[ARR_SIZE];
-        int count = worldGetAllVehicles(vehicles, ARR_SIZE);
         if (vehUpdateTime + 200 < GetTickCount()) {
             vehUpdateTime = GetTickCount();
             for (int i = 0; i < count; i++) {
@@ -551,6 +568,7 @@ void toggleManual() {
         message += "Disabled";
     }
     showNotification(message, &prevNotification);
+
     if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
         VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
         VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);

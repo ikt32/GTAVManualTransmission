@@ -46,6 +46,28 @@ void showDebugInfo3D(Vector3 location, std::vector<std::string> textLines, Color
     GRAPHICS::CLEAR_DRAW_ORIGIN();
 }
 
+void showDebugInfo3DColors(Vector3 location, std::vector<std::pair<std::string, Color>> textLines, Color backgroundColor) {
+    float height = 0.0125f;
+
+    GRAPHICS::SET_DRAW_ORIGIN(location.x, location.y, location.z, 0);
+    int i = 0;
+
+    float szX = 0.060f;
+    for (auto line : textLines) {
+        showText(0, 0 + height * i, 0.2f, line.first.c_str(), 0, line.second, true);
+        float currWidth = getStringWidth(line.first, 0.2f, 0);
+        if (currWidth > szX) {
+            szX = currWidth;
+        }
+        i++;
+    }
+
+    float szY = (height * i) + 0.02f;
+    GRAPHICS::DRAW_RECT(0.027f, (height * i) / 2.0f, szX, szY,
+        backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A);
+    GRAPHICS::CLEAR_DRAW_ORIGIN();
+}
+
 void showNotification(const std::string &message, int *prevNotification) {
     if (prevNotification != nullptr && *prevNotification != 0) {
         UI::_REMOVE_NOTIFICATION(*prevNotification);
