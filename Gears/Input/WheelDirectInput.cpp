@@ -508,7 +508,7 @@ void WheelDirectInput::SetConstantForce(GUID device, DIAxis ffAxis, int force) {
     e->diDevice->Acquire();
     m_cfEffect->SetParameters(&effect,
         DIEP_DIRECTION | DIEP_TYPESPECIFICPARAMS | DIEP_START);
-    m_dEffect->Start(1, 0);
+    m_cfEffect->Start(1, 0);
 }
 
 void WheelDirectInput::SetDamper(GUID device, DIAxis ffAxis, int force) {
