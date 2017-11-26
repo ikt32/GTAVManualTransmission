@@ -333,7 +333,7 @@ void WheelDirectInput::createConstantForceEffect(DWORD axis, int numAxes, DIEFFE
 
 void WheelDirectInput::createDamperEffect(DWORD axis, int numAxes, DIEFFECT &diEffect) {
     DWORD rgdwAxes[1] = { axis };
-    LONG rglDirection[1] = { 1 };
+    LONG rglDirection[1] = { 0 };
 
     m_damperParams.lDeadBand = 0;
     m_damperParams.lOffset = 0;
@@ -342,10 +342,8 @@ void WheelDirectInput::createDamperEffect(DWORD axis, int numAxes, DIEFFECT &diE
     m_damperParams.dwPositiveSaturation = DI_FFNOMINALMAX;
     m_damperParams.dwNegativeSaturation = DI_FFNOMINALMAX;
 
-    ZeroMemory(&diEffect, sizeof(diEffect));
+    ZeroMemory(&diEffect, sizeof(DIEFFECT));
     diEffect.dwSize = sizeof(DIEFFECT);
-    diEffect.rgdwAxes = rgdwAxes;
-    diEffect.rglDirection = rglDirection;
     diEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
     diEffect.dwDuration = INFINITE;
     diEffect.dwSamplePeriod = 0;
@@ -354,15 +352,16 @@ void WheelDirectInput::createDamperEffect(DWORD axis, int numAxes, DIEFFECT &diE
     diEffect.dwTriggerRepeatInterval = 0;
 
     diEffect.cAxes = numAxes;
-    diEffect.dwStartDelay = 0;
+    diEffect.rgdwAxes = rgdwAxes;
+    diEffect.rglDirection = rglDirection;
     diEffect.lpEnvelope = nullptr;
-    diEffect.cbTypeSpecificParams = diEffect.cAxes * sizeof(DICONDITION);
+    diEffect.cbTypeSpecificParams = sizeof(DICONDITION);
     diEffect.lpvTypeSpecificParams = &m_damperParams;
 }
 
 void WheelDirectInput::createCollisionEffect(DWORD axis, int numAxes, DIEFFECT &diEffect) {
     DWORD rgdwAxes[1] = { axis };
-    LONG rglDirection[1] = { 1 };
+    LONG rglDirection[1] = { 0 };
 
     m_collisionParams.dwMagnitude = 0;
     m_collisionParams.dwPeriod = static_cast<DWORD>(0.100 * DI_SECONDS);
@@ -430,7 +429,7 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
 
     // TODO: Make joystickable
     // I'm focusing on steering wheels, so you get one axis.
-    int numAxes = 1;
+    const int numAxes = 1;
     DIEFFECT cfEffect;
     createConstantForceEffect(axis, numAxes, cfEffect);
 
@@ -516,19 +515,19 @@ void WheelDirectInput::SetDamper(GUID device, DIAxis ffAxis, int force) {
     if (!e || !m_dEffect || !hasForceFeedback[device][ffAxis])
         return;
 
-    LONG rglDirection[1] = { 1 };
+    LONG rglDirection[1] = { 0 };
 
     m_damperParams.lPositiveCoefficient = force;
     m_damperParams.lNegativeCoefficient = force;
 
     DIEFFECT effect;
-    ZeroMemory(&effect, sizeof(effect));
+    ZeroMemory(&effect, sizeof(DIEFFECT));
     effect.dwSize = sizeof(DIEFFECT);
     effect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
     effect.cAxes = 1;
     effect.rglDirection = rglDirection;
     effect.lpEnvelope = nullptr;
-    effect.cbTypeSpecificParams = effect.cAxes * sizeof(DICONDITION);
+    effect.cbTypeSpecificParams = sizeof(DICONDITION);
     effect.lpvTypeSpecificParams = &m_damperParams;
     effect.dwStartDelay = 0;
 
