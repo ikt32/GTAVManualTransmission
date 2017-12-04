@@ -166,7 +166,7 @@ int getBlockableControlIndex(int control) {
 //                             Menu stuff
 ///////////////////////////////////////////////////////////////////////////////
 void menuInit() {
-
+    menu.ReadSettings();
 }
 
 void menuClose() {
