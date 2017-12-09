@@ -1,3 +1,6 @@
 [submodule "thirdparty/MiniPID"]
 	path = thirdparty/MiniPID
 	url = https://github.com/tekdemo/MiniPID
+[submodule "thirdparty/simpleini"]
+	path = thirdparty/simpleini
+	url = https://github.com/brofield/simpleini
