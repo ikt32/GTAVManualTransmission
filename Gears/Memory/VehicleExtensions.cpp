@@ -59,9 +59,9 @@ void VehicleExtensions::initOffsets() {
     driveMaxFlatVelOffset = addr == 0 ? 0 : *(int*)(addr + 3) + 0x30;
     logger.Write(driveMaxFlatVelOffset == 0 ? WARN : DEBUG, "Drive Max Flat Velocity Offset: 0x%X", driveMaxFlatVelOffset);
 
-    addr = mem::FindPattern("\xF3\x44\x0F\x10\x93\x00\x00\x00\x00\xF3\x0F\x10\x0D",
-                            "xxxxx????xxxx");
-    currentRPMOffset = addr == 0 ? 0 : *(int*)(addr + 5);
+    addr = mem::FindPattern("\x76\x03\x0F\x28\xF0\xF3\x44\x0F\x10\x93",
+                            "xxxxxxxxxx");
+    currentRPMOffset = addr == 0 ? 0 : *(int*)(addr + 10);
     logger.Write(currentRPMOffset == 0 ? WARN : DEBUG, "RPM Offset: 0x%X", currentRPMOffset);
 
     clutchOffset = addr == 0 ? 0 : *(int*)(addr + 5) + 0xC;
