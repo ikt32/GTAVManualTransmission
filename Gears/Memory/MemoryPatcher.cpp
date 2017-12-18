@@ -1,6 +1,5 @@
 #include "MemoryPatcher.hpp"
 
-#include <iomanip>
 #include <Windows.h>
 #include "../Util/Logger.hpp"
 #include "NativeMemory.hpp"
@@ -541,32 +540,34 @@ uintptr_t ApplySteeringCorrectionPatch() {
     uintptr_t address;
     if (steeringTemp != NULL) {
         address = steeringTemp;
-
     }
     else {
         address = mem::FindPattern(
+            "\x45\x84\xED"
             "\x0F\x84\xD0\x01\x00\x00" // <- This one
             "\x0F\x28\x4B\x70"
             "\xF3\x0F\x10\x25\x00\x00\x00\x00"
             "\xF3\x0F\x10\x1D\x00\x00\x00\x00"
             "\x0F\x28\xC1"
-            "\x0F\x28\xD1",
+            "\x0F\x28\xD1", 
+            "xxx"
             "xx????" // <- This one
-            "xx??"
-            "xxxx????"
-            "xxxx????"
+            "xxx?"
+            "xxx?????"
+            "xxx?????"
             "xx?"
-            "xx?");
+            "xx?") + 3;
     }
 
     if (address) {
-        byte instrArr[6] = {0xE9, 0xD1, 0x01, 0x00, 0x00, 0x90}; // make preliminary instruction: JMP to <adrr>
+        byte instrArr[6] = 
+            {0xE9, 0x00, 0x00, 0x00, 0x00, 0x90};               // make preliminary instruction: JMP to <adrr>
 
-        memcpy(origSteerInstr, (void*)address, 6); // save whole orig instruction
-        memcpy(origSteerInstrDest, (void*)(address + 2), 4); // save the address it writes to
-        origSteerInstrDest[0] += 1; // Increment first address by 1
-        memcpy(instrArr + 1, origSteerInstrDest, 4); // use saved address in new instruction
-        memcpy((void*)address, instrArr, 6); // patch with new fixed instruction
+        memcpy(origSteerInstr, (void*)address, 6);              // save whole orig instruction
+        memcpy(origSteerInstrDest, (void*)(address + 2), 4);    // save the address it writes to
+        origSteerInstrDest[0] += 1;                             // Increment first byte by 1
+        memcpy(instrArr + 1, origSteerInstrDest, 4);            // use saved address in new instruction
+        memcpy((void*)address, instrArr, 6);                    // patch with new fixed instruction
 
         return address;
     }
