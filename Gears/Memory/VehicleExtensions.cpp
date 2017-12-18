@@ -64,10 +64,10 @@ void VehicleExtensions::initOffsets() {
     currentRPMOffset = addr == 0 ? 0 : *(int*)(addr + 10);
     logger.Write(currentRPMOffset == 0 ? WARN : DEBUG, "RPM Offset: 0x%X", currentRPMOffset);
 
-    clutchOffset = addr == 0 ? 0 : *(int*)(addr + 5) + 0xC;
+    clutchOffset = addr == 0 ? 0 : *(int*)(addr + 10) + 0xC;
     logger.Write(clutchOffset == 0 ? WARN : DEBUG, "Clutch Offset: 0x%X", clutchOffset);
 
-    throttleOffset = addr == 0 ? 0 : *(int*)(addr + 5) + 0x10;
+    throttleOffset = addr == 0 ? 0 : *(int*)(addr + 10) + 0x10;
     logger.Write(throttleOffset == 0 ? WARN : DEBUG, "Throttle Offset: 0x%X", throttleOffset);
 
     addr = mem::FindPattern("\xF3\x0F\x10\x8F\x68\x08\x00\x00\x88\x4D\x8C\x0F\x2F\xCF", 
@@ -417,6 +417,7 @@ std::vector<float> VehicleExtensions::GetWheelHealths(Vehicle handle) {
     auto numWheels = GetNumWheels(handle);
 
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1E0 : 0x1D0;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1D8 : offset;
 
     std::vector<float> healths;
 
@@ -432,6 +433,7 @@ void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) {
     auto numWheels = GetNumWheels(handle);
 
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1E0 : 0x1D0;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1D8 : offset;
 
     for (auto i = 0; i < numWheels; i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
@@ -527,6 +529,7 @@ std::vector<float> VehicleExtensions::GetWheelCompressions(Vehicle handle) {
     auto numWheels = GetNumWheels(handle);
 
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x160 : 0x150;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x15C : offset;
 
     std::vector<float> compressions;
 
@@ -542,6 +545,7 @@ std::vector<float> VehicleExtensions::GetWheelSteeringAngles(Vehicle handle) {
     auto numWheels = GetNumWheels(handle);
 
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1C4 : 0x1B4;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1BC : offset;
 
     std::vector<float> angles;
 
@@ -585,6 +589,7 @@ std::vector<float> VehicleExtensions::GetWheelRotationSpeeds(Vehicle handle) {
     auto numWheels = GetNumWheels(handle);
 
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x168 : 0x158;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x164 : offset;
 
     std::vector<float> speeds;
 
@@ -612,6 +617,8 @@ void VehicleExtensions::SetWheelSkidSmokeEffect(Vehicle handle, uint8_t index, f
     }
     auto wheelPtr = GetWheelsPtr(handle);
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1B0 : 0x1A0;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1AC : offset;
+
     auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
     *reinterpret_cast<float *>(wheelAddr + offset) = value;
 }
@@ -623,6 +630,7 @@ std::vector<float> VehicleExtensions::GetWheelSkidSmokeEffect(Vehicle handle) {
     auto numWheels = GetNumWheels(handle);
     
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1B0 : 0x1A0;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1AC : offset;
 
     for (auto i = 0; i < numWheels; i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
@@ -637,6 +645,7 @@ void VehicleExtensions::SetWheelBrakePressure(Vehicle handle, uint8_t index, flo
     }
     auto wheelPtr = GetWheelsPtr(handle);
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1C8 : 0x1B8;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1C0 : offset;
     auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
     *reinterpret_cast<float *>(wheelAddr + offset) = value;
 }
