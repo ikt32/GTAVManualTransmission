@@ -617,7 +617,7 @@ void VehicleExtensions::SetWheelSkidSmokeEffect(Vehicle handle, uint8_t index, f
     }
     auto wheelPtr = GetWheelsPtr(handle);
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1B0 : 0x1A0;
-    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1AC : offset;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1A8 : offset;
 
     auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
     *reinterpret_cast<float *>(wheelAddr + offset) = value;
@@ -630,7 +630,7 @@ std::vector<float> VehicleExtensions::GetWheelSkidSmokeEffect(Vehicle handle) {
     auto numWheels = GetNumWheels(handle);
     
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1B0 : 0x1A0;
-    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1AC : offset;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1A8 : offset;
 
     for (auto i = 0; i < numWheels; i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);

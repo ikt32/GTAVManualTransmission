@@ -315,10 +315,7 @@ bool PatchBrakeDecrement() {
         return false;
     }
 
-    //logger.Write("BRAKE PRESSURE: Patching");
-
     if (BrakeDecrementPatched) {
-        //logger.Write("BRAKE PRESSURE: Already patched");
         return true;
     }
 
@@ -329,8 +326,6 @@ bool PatchBrakeDecrement() {
         BrakeDecrementPatched = true;
 
         //std::string instructionBytes = formatByteArray(origBrakeInstr, sizeof(origBrakeInstr) / sizeof(byte));
-
-        //logger.Write("BRAKE PRESSURE: BRAKE PRESSURE @ 0x%p", brakeAddr);
         //logger.Write("BRAKE PRESSURE: Patch success, original : " + instructionBytes);
         brakeAttempts = 0;
 
@@ -611,22 +606,24 @@ void RevertSteerControlPatch(uintptr_t address, byte *origInstr, int origInstrSz
 uintptr_t ApplyBrakePatch() {
     // b1032.2
     uintptr_t address;
-    if (brakeTemp != NULL)
+    if (brakeTemp != NULL) {
         address = brakeTemp;
-    else
+    }
+    else {
         address = mem::FindPattern(
             "\xEB\x05"
             "\xF3\x0F\x10\x40\x78"
             "\xF3\x0F\x59\xC4"
             "\xF3\x0F\x11\x81\xC8\x01\x00\x00" // this
-            "\xC3"
-            ,
+            "\xC3",
             "xx"
             "xxxx?"
             "xxxx"
             "xxxx??xx"
             "x") + 11;
-
+        logger.Write(DEBUG, "BRAKE PRESSURE: BRAKE PRESSURE @ 0x%p", address);
+    }
+    
     if (address) {
         memcpy(origBrakeInstr, (void*)address, 8);
         memset(reinterpret_cast<void *>(address), 0x90, 8);
