@@ -1,4 +1,10 @@
 # Changelog
+
+## 4.5.1
+* Update for v1.0.1290.1
+* Fix starting of damper effect
+* Fix effect params
+
 ## 4.5.0
 Config changes:
 None to worry about
