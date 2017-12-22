@@ -90,6 +90,7 @@ void showNPCInfo(Vehicle vehicles[1024], int count) {
     float searchdist = 50.0f;
     float searchfov = 15.0f;
     for (int i = 0; i < count; i++) {
+        if (vehicles[i] == 0) continue;
         if (vehicles[i] == vehicle) continue;
         Vector3 targetPos = ENTITY::GET_ENTITY_COORDS(vehicles[i], true);
         Vector3 direction = Normalize(targetPos - vehPos);
@@ -151,7 +152,9 @@ void updateNPCVehicles(Vehicle vehicles[1024], int count) {
     if (vehUpdateTime + 200 < GetTickCount()) {
         vehUpdateTime = GetTickCount();
         for (int i = 0; i < count; i++) {
+            if (vehicles[i] == 0) continue;
             if (vehicles[i] == vehicle) continue;
+            if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicles[i])) continue;
             if (ext.GetTopGear(vehicles[i]) == 1) continue;
 
             int currGear = ext.GetGearCurr(vehicles[i]);
