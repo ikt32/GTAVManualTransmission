@@ -74,6 +74,10 @@ extern std::vector<std::string> speedoTypes;
 MiniPID pid(1.0, 0.0, 0.0);
 DWORD	vehUpdateTime;
 
+const float g_baseStallSpeed = 0.10f;
+const float g_baseCatchMinSpeed = 0.12f;
+const float g_baseCatchMaxSpeed = 0.24f;
+
 float getAngleBetween(float h1, float h2, float separation) {
     auto diff = fabs(h1 - h2);
     if (diff < separation)
@@ -1057,31 +1061,32 @@ void functionAShift() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void functionClutchCatch() {
-    float lowSpeed = 2.5f;
-    float idleThrottle = 0.45f;
+    float lowSpeed = g_baseCatchMinSpeed * (ext.GetDriveMaxFlatVel(vehicle) / ext.GetGearRatios(vehicle)[ext.GetGearCurr(vehicle)]);
+    float mehSpeed = g_baseCatchMaxSpeed * (ext.GetDriveMaxFlatVel(vehicle) / ext.GetGearRatios(vehicle)[ext.GetGearCurr(vehicle)]);
 
-    if (controls.ClutchVal < 1.0f - settings.ClutchCatchpoint) {
+    const float idleThrottle = 0.24f;
+
+    if (controls.ClutchVal < 1.0f - settings.ClutchCatchpoint && 
+        controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
         if (settings.ShiftMode != HPattern && controls.BrakeVal > 0.1f || 
-            vehData.RPM > 0.25f && ENTITY::GET_ENTITY_SPEED(vehicle) >= lowSpeed) {
+            vehData.RPM > 0.25f && vehData.SpeedVector.y >= lowSpeed) {
             return;
         }
 
         // Forward
-        if (ext.GetGearCurr(vehicle) > 0 && ENTITY::GET_ENTITY_SPEED(vehicle) < ext.GetGearCurr(vehicle) * lowSpeed &&
-            controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
-            CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, idleThrottle);
+        if (ext.GetGearCurr(vehicle) > 0 && vehData.SpeedVector.y < mehSpeed) {
+            float throttle = map(vehData.SpeedVector.y, mehSpeed, lowSpeed, 0.0f, idleThrottle);
+            CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, throttle);
             ext.SetCurrentRPM(vehicle, 0.21f);
             ext.SetThrottle(vehicle, 0.0f);
-
         }
 
         // Reverse
-        if (ext.GetGearCurr(vehicle) == 0 &&
-            controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
-            if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < -lowSpeed) {
-                controls.ClutchVal = 1.0f;
-            }
-            CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, idleThrottle);
+        if (ext.GetGearCurr(vehicle) == 0) {
+            float throttle = map(abs(vehData.SpeedVector.y), abs(mehSpeed), abs(lowSpeed), 0.0f, idleThrottle);
+            // due to 0.25f deadzone throttle makes reversing anims stop, so its jerky
+            // TODO: needs a workaround to prevent jerky reversing anims
+            CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, throttle); 
             ext.SetCurrentRPM(vehicle, 0.21f);
             ext.SetThrottle(vehicle, 0.0f);
         }
@@ -1137,7 +1142,7 @@ void functionEngStall() {
     float stallingRateDivisor = 3500000.0f;
     float timeStep = SYSTEM::TIMESTEP() * 100.0f;
     float avgWheelSpeed = abs(avg(getDrivenWheelsSpeeds(ext.GetTyreSpeeds(vehicle))));
-    float stallSpeed = 0.16f * abs(ext.GetDriveMaxFlatVel(vehicle)/ext.GetGearRatios(vehicle)[ext.GetGearCurr(vehicle)]);
+    float stallSpeed = g_baseStallSpeed * abs(ext.GetDriveMaxFlatVel(vehicle)/ext.GetGearRatios(vehicle)[ext.GetGearCurr(vehicle)]);
 
     if (controls.ClutchVal < 1.0f - settings.StallingThreshold &&
         vehData.RPM < 0.2125f &&
