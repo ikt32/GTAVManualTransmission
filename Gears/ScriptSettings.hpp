@@ -117,6 +117,7 @@ public:
     bool ToggleEngine = false;
     bool BlockCarControls = false;
     bool IgnoreShiftsUI = false;
+    bool BlockHShift = true;
 
     // [DEBUG]
     bool DisplayInfo = false;

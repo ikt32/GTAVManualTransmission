@@ -348,6 +348,9 @@ void update_controlsmenu() {
                          { "Increase/decrease steering lock.","From InfamousSabre's Custom Steering." })) {
         settings.SaveWheel(&controls);
     }
+
+    menu.BoolOption("Block H-pattern on controller", settings.BlockHShift, 
+                    { "Block H-pattern mode when using controller input." });
 }
 
 void update_legacycontrollermenu() {

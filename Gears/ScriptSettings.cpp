@@ -143,6 +143,7 @@ void ScriptSettings::SaveController(ScriptControls *scriptControl) const {
     settingsGeneral.SetDoubleValue("CONTROLLER", "TriggerValue", scriptControl->GetXboxTrigger());
     settingsGeneral.SetBoolValue("CONTROLLER", "BlockCarControls", BlockCarControls);
     settingsGeneral.SetBoolValue("CONTROLLER", "IgnoreShiftsUI", IgnoreShiftsUI);
+    settingsGeneral.SetBoolValue("CONTROLLER", "BlockHShift", BlockHShift);
 
     settingsGeneral.SetLongValue("CONTROLLER", "MaxTapTime", scriptControl->MaxTapTime);
     
@@ -327,6 +328,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
     scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ToggleH)] = settingsGeneral.GetValue("CONTROLLER", "ToggleShift", "B");
     BlockCarControls = settingsGeneral.GetBoolValue("CONTROLLER", "BlockCarControls", false);
     IgnoreShiftsUI = settingsGeneral.GetBoolValue("CONTROLLER", "IgnoreShiftsUI", false);
+    BlockHShift = settingsGeneral.GetBoolValue("CONTROLLER", "BlockHShift", true);
 
     scriptControl->CToggleTime = settingsGeneral.GetLongValue("CONTROLLER", "ToggleTime", 300);
     scriptControl->MaxTapTime = settingsGeneral.GetLongValue("CONTROLLER", "MaxTapTime", 200);

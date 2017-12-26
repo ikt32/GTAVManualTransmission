@@ -687,7 +687,7 @@ void updateLastInputDevice() {
                 break;
             case ScriptControls::Controller:
                 message += "Controller";
-                if (settings.ShiftMode == HPattern) {
+                if (settings.ShiftMode == HPattern && settings.BlockHShift) {
                     message += "~n~Mode: Sequential";
                     settings.ShiftMode = Sequential;
                 }
@@ -724,7 +724,7 @@ void setShiftMode(int shiftMode) {
         }
     }
 
-    if (settings.ShiftMode == HPattern  && controls.PrevInput == ScriptControls::Controller) {
+    if (settings.ShiftMode == HPattern && controls.PrevInput == ScriptControls::Controller && settings.BlockHShift) {
         settings.ShiftMode = Automatic;
     }
 
