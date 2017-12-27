@@ -85,10 +85,10 @@ bool PatchInstructions() {
         return false;
     }
 
-    logger.Write(DEBUG, "GEARBOX: Patching");
+    logger.Write(DEBUG, "PATCH: GEARBOX: Patching");
 
     if (NumGearboxPatches == TotalPatched) {
-        logger.Write(DEBUG, "GEARBOX: Already patched");
+        logger.Write(DEBUG, "PATCH: GEARBOX: Already patched");
         return true;
     }
 
@@ -97,10 +97,10 @@ bool PatchInstructions() {
     if (clutchLowTemp) {
         clutchLowAddr = clutchLowTemp;
         TotalPatched++;
-        logger.Write(DEBUG, "GEARBOX: Patched clutchLow @ 0x%p", clutchLowAddr);
+        logger.Write(DEBUG, "PATCH: GEARBOX: Patched clutchLow @ 0x%p", clutchLowAddr);
     }
     else {
-        logger.Write(ERROR, "GEARBOX: clutchLow patch failed");
+        logger.Write(ERROR, "PATCH: GEARBOX: clutchLow patch failed");
     }
 
     clutchRevLimitTemp = PatchClutchRevLimit();
@@ -108,10 +108,10 @@ bool PatchInstructions() {
     if (clutchRevLimitTemp) {
         clutchRevLimitAddr = clutchRevLimitTemp;
         TotalPatched++;
-        logger.Write(DEBUG, "GEARBOX: Patched clutchRevLimit @ 0x%p", clutchRevLimitAddr);
+        logger.Write(DEBUG, "PATCH: GEARBOX: Patched clutchRevLimit @ 0x%p", clutchRevLimitAddr);
     }
     else {
-        logger.Write(ERROR, "GEARBOX: clutchRevLimit patch failed");
+        logger.Write(ERROR, "PATCH: GEARBOX: clutchRevLimit patch failed");
     }
 
     shiftDownTemp = PatchShiftDown();
@@ -119,32 +119,32 @@ bool PatchInstructions() {
     if (shiftDownTemp) {
         shiftDownAddr = shiftDownTemp;
         TotalPatched++;
-        logger.Write(DEBUG, "GEARBOX: Patched shiftDown  @ 0x%p", shiftDownAddr);
+        logger.Write(DEBUG, "PATCH: GEARBOX: Patched shiftDown  @ 0x%p", shiftDownAddr);
     }
     else {
-        logger.Write(ERROR, "GEARBOX: shiftDown patch failed");
+        logger.Write(ERROR, "PATCH: GEARBOX: shiftDown patch failed");
     }
 
     if (TotalPatched == NumGearboxPatches) {
-        logger.Write(DEBUG, "GEARBOX: Patch success");
+        logger.Write(DEBUG, "PATCH: GEARBOX: Patch success");
         gearAttempts = 0;
         return true;
     }
-    logger.Write(ERROR, "GEARBOX: Patching failed");
+    logger.Write(ERROR, "PATCH: GEARBOX: Patching failed");
     gearAttempts++;
 
     if (gearAttempts > maxAttempts) {
-        logger.Write(ERROR, "GEARBOX: Patch attempt limit exceeded");
-        logger.Write(ERROR, "GEARBOX: Patching disabled");
+        logger.Write(ERROR, "PATCH: GEARBOX: Patch attempt limit exceeded");
+        logger.Write(ERROR, "PATCH: GEARBOX: Patching disabled");
     }
     return false;
 }
 
 bool RestoreInstructions() {
-    logger.Write(DEBUG, "GEARBOX: Restoring instructions");
+    logger.Write(DEBUG, "PATCH: GEARBOX: Restoring instructions");
 
     if (TotalPatched == 0) {
-        logger.Write(DEBUG, "GEARBOX: Already restored/intact");
+        logger.Write(DEBUG, "PATCH: GEARBOX: Already restored/intact");
         return true;
     }
 
@@ -154,7 +154,7 @@ bool RestoreInstructions() {
         TotalPatched--;
     }
     else {
-        logger.Write(DEBUG, "GEARBOX: clutchLow not restored");
+        logger.Write(DEBUG, "PATCH: GEARBOX: clutchLow not restored");
     }
 
     if (clutchRevLimitAddr) {
@@ -163,7 +163,7 @@ bool RestoreInstructions() {
         TotalPatched--;
     }
     else {
-        logger.Write(DEBUG, "GEARBOX: clutchRevLimit not restored");
+        logger.Write(DEBUG, "PATCH: GEARBOX: clutchRevLimit not restored");
     }
 
     if (shiftDownAddr) {
@@ -172,15 +172,15 @@ bool RestoreInstructions() {
         TotalPatched--;
     }
     else {
-        logger.Write(DEBUG, "GEARBOX: shiftDown not restored");
+        logger.Write(DEBUG, "PATCH: GEARBOX: shiftDown not restored");
     }
 
     if (TotalPatched == 0) {
-        logger.Write(DEBUG, "GEARBOX: Restore success");
+        logger.Write(DEBUG, "PATCH: GEARBOX: Restore success");
         gearAttempts = 0;
         return true;
     }
-    logger.Write(ERROR, "GEARBOX: Restore failed");
+    logger.Write(ERROR, "PATCH: GEARBOX: Restore failed");
     return false;
 }
 
@@ -199,10 +199,10 @@ bool PatchSteeringCorrection() {
         return false;
     }
 
-    logger.Write(DEBUG, "STEERING: Patching");
+    logger.Write(DEBUG, "PATCH: STEERING: Patching");
 
     if (SteerCorrectPatched) {
-        logger.Write(DEBUG, "STEERING: Already patched");
+        logger.Write(DEBUG, "PATCH: STEERING: Already patched");
         return true;
     }
 
@@ -214,18 +214,18 @@ bool PatchSteeringCorrection() {
 
         std::string instructionBytes = formatByteArray(origSteerInstr, sizeof(origSteerInstr) / sizeof(byte));
 
-        logger.Write(DEBUG, "STEERING: Steering Correction @ 0x%p", steeringAddr);
-        logger.Write(DEBUG, "STEERING: Patch success, original: " + instructionBytes);
+        logger.Write(DEBUG, "PATCH: STEERING: Steering Correction @ 0x%p", steeringAddr);
+        logger.Write(DEBUG, "PATCH: STEERING: Patch success, original: " + instructionBytes);
         steerAttempts = 0;
         return true;
     }
 
-    logger.Write(ERROR, "STEERING: Patch failed");
+    logger.Write(ERROR, "PATCH: STEERING: Patch failed");
     steerAttempts++;
 
     if (steerAttempts > maxAttempts) {
-        logger.Write(ERROR, "STEERING: Patch attempt limit exceeded");
-        logger.Write(ERROR, "STEERING: Patching disabled");
+        logger.Write(ERROR, "PATCH: STEERING: Patch attempt limit exceeded");
+        logger.Write(ERROR, "PATCH: STEERING: Patching disabled");
     }
     return false;
 }
@@ -234,7 +234,7 @@ bool RestoreSteeringCorrection() {
     logger.Write(DEBUG, "STEERING: Restoring instructions");
 
     if (!SteerCorrectPatched) {
-        logger.Write(DEBUG, "STEERING: Already restored/intact");
+        logger.Write(DEBUG, "PATCH: STEERING: Already restored/intact");
         return true;
     }
 
@@ -242,12 +242,12 @@ bool RestoreSteeringCorrection() {
         RevertSteeringCorrectionPatch(steeringAddr, origSteerInstr, sizeof(origSteerInstr) / sizeof(byte));
         steeringAddr = 0;
         SteerCorrectPatched = false;
-        logger.Write(DEBUG, "STEERING: Restore success");
+        logger.Write(DEBUG, "PATCH: STEERING: Restore success");
         steerAttempts = 0;
         return true;
     }
 
-    logger.Write(ERROR, "STEERING: Restore failed");
+    logger.Write(ERROR, "PATCH: STEERING: Restore failed");
     return false;
 }
 
@@ -256,10 +256,10 @@ bool PatchSteeringControl() {
         return false;
     }
 
-    logger.Write(DEBUG, "STEERING CONTROL: Patching");
+    logger.Write(DEBUG, "PATCH: STEERING CONTROL: Patching");
 
     if (SteerControlPatched) {
-        logger.Write(DEBUG, "STEERING CONTROL: Already patched");
+        logger.Write(DEBUG, "PATCH: STEERING CONTROL: Already patched");
         return true;
     }
 
@@ -271,28 +271,28 @@ bool PatchSteeringControl() {
 
         std::string instructionBytes = formatByteArray(origSteerControlInstr, sizeof(origSteerControlInstr) / sizeof(byte));
         
-        logger.Write(DEBUG, "STEERING CONTROL: Steering Control @ 0x%p", steerControlAddr);
-        logger.Write(DEBUG, "STEERING CONTROL: Patch success, original : " + instructionBytes);
+        logger.Write(DEBUG, "PATCH: STEERING CONTROL: Steering Control @ 0x%p", steerControlAddr);
+        logger.Write(DEBUG, "PATCH: STEERING CONTROL: Patch success, original : " + instructionBytes);
         steerControlAttempts = 0;
 
         return true;
     }
 
-    logger.Write(ERROR, "STEERING CONTROL: Patch failed");
+    logger.Write(ERROR, "PATCH: STEERING CONTROL: Patch failed");
     steerControlAttempts++;
 
     if (steerControlAttempts > maxAttempts) {
-        logger.Write(ERROR, "STEERING CONTROL: Patch attempt limit exceeded");
-        logger.Write(ERROR, "STEERING CONTROL: Patching disabled");
+        logger.Write(ERROR, "PATCH: STEERING CONTROL: Patch attempt limit exceeded");
+        logger.Write(ERROR, "PATCH: STEERING CONTROL: Patching disabled");
     }
     return false;
 }
 
 bool RestoreSteeringControl() {
-    logger.Write(DEBUG, "STEERING CONTROL: Restoring instructions");
+    logger.Write(DEBUG, "PATCH: STEERING CONTROL: Restoring instructions");
 
     if (!SteerControlPatched) {
-        logger.Write(DEBUG, "STEERING CONTROL: Already restored/intact");
+        logger.Write(DEBUG, "PATCH: STEERING CONTROL: Already restored/intact");
         return true;
     }
 
@@ -301,12 +301,12 @@ bool RestoreSteeringControl() {
         RevertSteerControlPatch(steerControlAddr, origSteerControlInstr, sizeof(origSteerControlInstr) / sizeof(byte));
         steerControlAddr = 0;
         SteerControlPatched = false;
-        logger.Write(DEBUG, "STEERING CONTROL: Restore success");
+        logger.Write(DEBUG, "PATCH: STEERING CONTROL: Restore success");
         steerControlAttempts = 0;
         return true;
     }
 
-    logger.Write(ERROR, "STEERING CONTROL: Restore failed");
+    logger.Write(ERROR, "PATCH: STEERING CONTROL: Restore failed");
     return false;
 }
 
@@ -332,12 +332,12 @@ bool PatchBrakeDecrement() {
         return true;
     }
 
-    logger.Write(ERROR, "BRAKE PRESSURE: Patch failed");
+    logger.Write(ERROR, "PATCH: Brake pressure Patch failed");
     brakeAttempts++;
 
     if (brakeAttempts > maxAttempts) {
-        logger.Write(ERROR, "BRAKE PRESSURE: Patch attempt limit exceeded");
-        logger.Write(ERROR, "BRAKE PRESSURE: Patching disabled");
+        logger.Write(ERROR, "PATCH: Brake pressure Patch attempt limit exceeded");
+        logger.Write(ERROR, "PATCH: Brake pressure Patching disabled");
     }
     return false;
 }
@@ -358,7 +358,7 @@ bool RestoreBrakeDecrement() {
         return true;
     }
 
-    logger.Write(ERROR, "BRAKE PRESSURE: Restore failed");
+    logger.Write(ERROR, "PATCH: Brake pressure restore failed");
     return false;
 }
 
@@ -538,20 +538,19 @@ uintptr_t ApplySteeringCorrectionPatch() {
     }
     else {
         address = mem::FindPattern(
-            "\x45\x84\xED"
             "\x0F\x84\xD0\x01\x00\x00" // <- This one
             "\x0F\x28\x4B\x70"
             "\xF3\x0F\x10\x25\x00\x00\x00\x00"
             "\xF3\x0F\x10\x1D\x00\x00\x00\x00"
             "\x0F\x28\xC1"
-            "\x0F\x28\xD1", 
-            "xxx"
+            "\x0F\x28\xD1",
             "xx????" // <- This one
             "xxx?"
             "xxx?????"
             "xxx?????"
             "xx?"
-            "xx?") + 3;
+            "xx?");
+        logger.Write(DEBUG, "PATCH: Steering correction patch @ 0x%p", address);
     }
 
     if (address) {
@@ -578,17 +577,21 @@ void RevertSteeringCorrectionPatch(uintptr_t address, byte *origInstr, int origI
 uintptr_t ApplySteerControlPatch() {
     // b1032.2
     uintptr_t address;
-    if (steerControlTemp != NULL)
+    if (steerControlTemp != NULL) {
         address = steerControlTemp;
-    else
+    }
+    else {
         address = mem::FindPattern("\xF3\x0F\x11\x8B\xFC\x08\x00\x00"
-                                   "\xF3\x0F\x10\x83\x00\x09\x00\x00"
-                                   "\xF3\x0F\x58\x83\xFC\x08\x00\x00"
-                                   "\x41\x0F\x2F\xC3",
-                                   "xxxx??xx"
-                                   "xxxx??xx"
-                                   "xxxx??xx"
-                                   "xxxx");
+            "\xF3\x0F\x10\x83\x00\x09\x00\x00"
+            "\xF3\x0F\x58\x83\xFC\x08\x00\x00"
+            "\x41\x0F\x2F\xC3",
+            "xxxx??xx"
+            "xxxx??xx"
+            "xxxx??xx"
+            "xxxx");
+        logger.Write(DEBUG, "PATCH: Steer control patch @ 0x%p", address);
+    }
+
 
     if (address) {
         memcpy(origSteerControlInstr, (void*)address, 8);
@@ -620,8 +623,9 @@ uintptr_t ApplyBrakePatch() {
             "xxxx?"
             "xxxx"
             "xxxx??xx"
-            "x") + 11;
-        logger.Write(DEBUG, "BRAKE PRESSURE: BRAKE PRESSURE @ 0x%p", address);
+            "x");
+        if (address) address += 11;
+        logger.Write(DEBUG, "PATCH: Brake patch @ 0x%p", address);
     }
     
     if (address) {
