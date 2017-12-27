@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.5.2
+* Improve clutch catching
+* Add option to allow H-pattern for controller
+* Fix crash on pre-v1.0.1290.1 (caused by steering patching)
+* Fix crash on invalid pool handles
+
 ## 4.5.1
 * Update for v1.0.1290.1
 * Fix starting of damper effect

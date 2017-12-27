@@ -231,7 +231,7 @@ bool PatchSteeringCorrection() {
 }
 
 bool RestoreSteeringCorrection() {
-    logger.Write(DEBUG, "STEERING: Restoring instructions");
+    logger.Write(DEBUG, "PATCH: STEERING: Restoring instructions");
 
     if (!SteerCorrectPatched) {
         logger.Write(DEBUG, "PATCH: STEERING: Already restored/intact");
