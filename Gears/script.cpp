@@ -689,7 +689,7 @@ void updateLastInputDevice() {
                 message += "Controller";
                 if (settings.ShiftMode == HPattern && settings.BlockHShift) {
                     message += "~n~Mode: Sequential";
-                    settings.ShiftMode = Sequential;
+                    setShiftMode(Sequential);
                 }
                 break;
             case ScriptControls::Wheel:
@@ -718,14 +718,18 @@ void setShiftMode(int shiftMode) {
     if (shiftMode > 2 || shiftMode < 0)
         return;
 
-    if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
-        if ((settings.ShiftMode == Automatic || settings.ShiftMode == Sequential) && ext.GetGearCurr(vehicle) > 1) {
-            vehData.FakeNeutral = false;
-        }
+    if ((shiftMode == Automatic ||
+        shiftMode == Sequential) && ext.GetGearCurr(vehicle) > 1) {
+        vehData.FakeNeutral = false;
     }
 
-    if (settings.ShiftMode == HPattern && controls.PrevInput == ScriptControls::Controller && settings.BlockHShift) {
+    if (shiftMode == HPattern &&
+        controls.PrevInput == ScriptControls::Controller && 
+        settings.BlockHShift) {
         settings.ShiftMode = Automatic;
+    }
+    else {
+        settings.ShiftMode = (ShiftModes)shiftMode;
     }
 
     std::string mode = mtPrefix + "Mode: ";
@@ -740,12 +744,12 @@ void setShiftMode(int shiftMode) {
 }
 
 void cycleShiftMode() {
-    ++settings.ShiftMode;
-    if (settings.ShiftMode >= SIZEOF_ShiftModes) {
-        settings.ShiftMode = (ShiftModes)0;
+    int tempShiftMode = settings.ShiftMode + 1;
+    if (tempShiftMode >= SIZEOF_ShiftModes) {
+        tempShiftMode = (ShiftModes)0;
     }
 
-    setShiftMode(settings.ShiftMode);
+    setShiftMode(tempShiftMode);
     settings.SaveGeneral();
 }
 
