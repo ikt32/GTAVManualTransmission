@@ -8,6 +8,7 @@ This is an ASI script allowing for manual control over the ingame gearbox with v
   * Sequential 
   * H-pattern
   * Custom automatic
+  
 Along with clutch simulation, engine effects and realistic throttle/brake input schemes.
 
 As a secondary function, this mod has full (DirectInput) racing wheel support: 
