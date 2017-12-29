@@ -4,7 +4,25 @@ GTA V Manual Transmission
 =========================
 [![Build status](https://ci.appveyor.com/api/projects/status/gy6yh17lp5l1k48d?svg=true)](https://ci.appveyor.com/project/E66666666/gtavmanualtransmission) [![GitHub total downloads](https://img.shields.io/github/downloads/E66666666/GTAVManualTransmission/total.svg)](https://github.com/E66666666/GTAVManualTransmission/releases)
 
-This is an ASI script allowing for manual control over the ingame gearbox. As a secondary function, this mod has full racing wheel support. Supported features are steering, the throttle, brake and throttle pedals, sequential shifting and using the H-shifter. An automatic gearbox has been re-implemented.
+This is an ASI script allowing for manual control over the ingame gearbox with various control options:
+  * Sequential 
+  * H-pattern
+  * Custom automatic
+Along with clutch simulation, engine effects and realistic throttle/brake input schemes.
+
+As a secondary function, this mod has full (DirectInput) racing wheel support: 
+  * Direct steering
+  * Proper force feedback
+  * Analog throttle, brake and clutch pedals
+  * Sequential shifter and H-pattern shifter support
+  * Many more assignable controls
+  * Multiple devices supported
+  
+Other features:
+  * Seamless switching between keyboard, controller and steering wheel
+  * Extremely customizable experience
+  * User friendly configuration menu
+  * Various HUD elements for vehicle info and input info
 
 Discuss the mod over at [GTAForums.com](http://gtaforums.com/topic/840830-manual-transmission/) or [GTA5-Mods.com](https://forums.gta5-mods.com/topic/1840/script-wip-manual-transmission-steering-wheel-support-4-0).
 
