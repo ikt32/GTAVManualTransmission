@@ -143,6 +143,7 @@ std::vector<int> blockableControls = {
     ControlVehicleAttack,
     ControlVehicleDuck,
     ControlVehicleSelectNextWeapon,
+    ControlVehicleCinCam,
 };
 
 std::vector<std::string> blockableControlsHelp = {
@@ -152,6 +153,7 @@ std::vector<std::string> blockableControlsHelp = {
     "Attack",
     "Duck",
     "NextWeapon",
+    "CinematicCamera",
 };
 
 int getBlockableControlIndex(int control) {
