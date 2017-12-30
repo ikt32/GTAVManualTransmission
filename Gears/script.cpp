@@ -74,7 +74,7 @@ extern std::vector<std::string> speedoTypes;
 MiniPID pid(1.0, 0.0, 0.0);
 DWORD	vehUpdateTime;
 
-const float g_baseStallSpeed = 0.10f;
+const float g_baseStallSpeed = 0.08f;
 const float g_baseCatchMinSpeed = 0.12f;
 const float g_baseCatchMaxSpeed = 0.24f;
 
@@ -1765,8 +1765,7 @@ void blockButtons() {
                 }
 
                 if (controls.ButtonReleasedAfter(static_cast<ScriptControls::LegacyControlType>(i), 200)) {
-                    CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlNativeBlocks[i], 0.0f);
-                    CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlNativeBlocks[i], 1.0f);
+                    // todo
                 }
             }
             if (controls.ControlNativeBlocks[(int)ScriptControls::LegacyControlType::Clutch] != -1) {
@@ -1787,8 +1786,7 @@ void blockButtons() {
                 }
 
                 if (controls.ButtonReleasedAfter(static_cast<ScriptControls::ControllerControlType>(i), 200)) {
-                    CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 0.0f);
-                    CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 1.0f);
+                    // todo
                 }
             }
             if (controls.ControlXboxBlocks[(int)ScriptControls::ControllerControlType::Clutch] != -1) {
