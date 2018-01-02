@@ -1423,7 +1423,7 @@ void handleRPM() {
         //showText(0.4, 0.1, 1.0, "REV LIM");
         //showText(0.4, 0.15, 1.0, "CF: " + std::to_string(counterForce));
     }
-
+    
     /*
         Game doesn't rev on disengaged clutch in any gear but 1
         This workaround tries to emulate this
@@ -1432,7 +1432,10 @@ void handleRPM() {
         Fix: Map 0.0-1.0 to 0.6-1.0 (clutchdata)
         Fix: Map 0.0-1.0 to 1.0-0.6 (control)
     */
+    float finalClutch = 1.0f - controls.ClutchVal;
+    
     if (ext.GetGearCurr(vehicle) > 1) {
+        finalClutch = map(controls.ClutchVal, 0.0f, 1.0f, 1.0f, 0.6f);
         // When pressing clutch and throttle, handle clutch and RPM
         if (controls.ClutchVal > 0.4f && 
             controls.ThrottleVal > 0.05f &&
@@ -1449,8 +1452,6 @@ void handleRPM() {
             ext.SetThrottle(vehicle, controls.ThrottleVal);
         }
     }
-
-    float finalClutch = 1.0f - controls.ClutchVal;
 
     if (vehData.FakeNeutral || controls.ClutchVal >= 1.0f) {
         if (ENTITY::GET_ENTITY_SPEED(vehicle) < 1.0f) {
