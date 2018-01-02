@@ -302,7 +302,7 @@ void update_finetuneoptionsmenu() {
     menu.Title("Fine-tuning");
     menu.Subtitle("Gearbox fine-tuning options");
 
-    menu.FloatOption("Clutch bite point", settings.ClutchCatchpoint, 0.0f, 1.0f, 0.05f, 
+    menu.FloatOption("Clutch bite threshold", settings.ClutchThreshold, 0.0f, 1.0f, 0.05f, 
                      { "How far the clutch has to be lifted to start biting. This value should be lower than \"Stalling threshold\"."});
     menu.FloatOption("Stalling threshold", settings.StallingThreshold, 0.0f, 1.0f, 0.05f, 
                      { "How far the clutch has to be lifted to start stalling. This value should be higher than \"Clutch bite point\"."});

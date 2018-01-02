@@ -45,7 +45,7 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetBoolValue("OPTIONS", "ClutchShiftingS", ClutchShiftingS);
     settingsGeneral.SetBoolValue("OPTIONS", "DefaultNeutral", DefaultNeutral);
 
-    settingsGeneral.SetDoubleValue("OPTIONS", "ClutchCatchpoint", ClutchCatchpoint * 100);
+    settingsGeneral.SetDoubleValue("OPTIONS", "ClutchCatchpoint", ClutchThreshold * 100);
     settingsGeneral.SetDoubleValue("OPTIONS", "StallingThreshold", StallingThreshold * 100);
     settingsGeneral.SetDoubleValue("OPTIONS", "RPMDamage", RPMDamage * 100);
     settingsGeneral.SetDoubleValue("OPTIONS", "MisshiftDamage", MisshiftDamage);
@@ -246,7 +246,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
     ClutchShiftingS = settingsGeneral.GetBoolValue("OPTIONS", "ClutchShiftingS", false);
     DefaultNeutral = settingsGeneral.GetBoolValue("OPTIONS", "DefaultNeutral", true);
 
-    ClutchCatchpoint = settingsGeneral.GetDoubleValue("OPTIONS", "ClutchCatchpoint", 10.0) / 100.0f;
+    ClutchThreshold = settingsGeneral.GetDoubleValue("OPTIONS", "ClutchCatchpoint", 10.0) / 100.0f;
     StallingThreshold = settingsGeneral.GetDoubleValue("OPTIONS", "StallingThreshold", 85.0) / 100.0f;
     RPMDamage = settingsGeneral.GetDoubleValue("OPTIONS", "RPMDamage", 15.0) / 100.0f;
     MisshiftDamage = settingsGeneral.GetDoubleValue("OPTIONS", "MisshiftDamage", 20.0);

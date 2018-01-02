@@ -477,7 +477,7 @@ void update() {
     }
 
     if (gearRattle.Active) {
-        if (controls.ClutchVal > 1.0f - settings.ClutchCatchpoint ||
+        if (controls.ClutchVal > 1.0f - settings.ClutchThreshold ||
             !VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
             gearRattle.Stop();
         }
@@ -767,7 +767,7 @@ void shiftTo(int gear, bool autoClutch) {
 }
 void functionHShiftTo(int i) {
     if (settings.ClutchShiftingH && !vehData.NoClutch) {
-        if (controls.ClutchVal > 1.0f - settings.ClutchCatchpoint) {
+        if (controls.ClutchVal > 1.0f - settings.ClutchThreshold) {
             shiftTo(i, false);
             vehData.FakeNeutral = false;
             gearRattle.Stop();
@@ -829,7 +829,7 @@ void functionHShiftWheel() {
         if (settings.ClutchShiftingH &&
             settings.EngDamage &&
             !vehData.NoClutch) {
-            if (controls.ClutchVal < 1.0 - settings.ClutchCatchpoint) {
+            if (controls.ClutchVal < 1.0 - settings.ClutchThreshold) {
                 gearRattle.Play(vehicle);
             }
         }
@@ -875,7 +875,7 @@ void functionSShift() {
 
         // Shift block /w clutch shifting for seq.
         if (settings.ClutchShiftingS && 
-            controls.ClutchVal < 1.0f - settings.ClutchCatchpoint) {
+            controls.ClutchVal < 1.0f - settings.ClutchThreshold) {
             return;
         }
 
@@ -916,7 +916,7 @@ void functionSShift() {
 
         // Shift block /w clutch shifting for seq.
         if (settings.ClutchShiftingS &&
-            controls.ClutchVal < 1.0f - settings.ClutchCatchpoint) {
+            controls.ClutchVal < 1.0f - settings.ClutchThreshold) {
             return;
         }
 
@@ -1075,7 +1075,7 @@ void functionClutchCatch() {
 
     const float idleThrottle = 0.24f;
 
-    if (controls.ClutchVal < 1.0f - settings.ClutchCatchpoint && 
+    if (controls.ClutchVal < 1.0f - settings.ClutchThreshold && 
         controls.ThrottleVal < 0.25f && controls.BrakeVal < 0.95) {
         if (settings.ShiftMode != HPattern && controls.BrakeVal > 0.1f || 
             vehData.RPM > 0.25f && vehData.SpeedVector.y >= lowSpeed) {
@@ -1148,19 +1148,27 @@ std::vector<float> getDrivenWheelsSpeeds(std::vector<float> wheelSpeeds) {
 }
 
 void functionEngStall() {
-    float stallingRateDivisor = 3500000.0f;
-    float timeStep = SYSTEM::TIMESTEP() * 100.0f;
     float avgWheelSpeed = abs(avg(getDrivenWheelsSpeeds(ext.GetTyreSpeeds(vehicle))));
     float stallSpeed = g_baseStallSpeed * abs(ext.GetDriveMaxFlatVel(vehicle)/ext.GetGearRatios(vehicle)[ext.GetGearCurr(vehicle)]);
+    float stallTime = 0.30f;
 
-    if (controls.ClutchVal < 1.0f - settings.StallingThreshold &&
-        vehData.RPM < 0.2125f &&
+    //showText(0.1, 0.1, 1.0, "Stall progress: " + std::to_string(vehData.StallProgress));
+    //showText(0.1, 0.2, 1.0, "Stall speed: " + std::to_string(stallSpeed));
+    //showText(0.1, 0.3, 1.0, "Actual speed: " + std::to_string(avgWheelSpeed));
+    //showText(0.1, 0.4, 1.0, "Stall thres: " + std::to_string(1.0f - settings.StallingThreshold));
+    //showText(0.1, 0.5, 1.0, "ClutchVal: " + std::to_string(controls.ClutchVal));
+
+    // this thing is big when the clutch isnt pressed
+    float invClutch = 1.0f - controls.ClutchVal;
+
+    if (invClutch > settings.StallingThreshold &&
+        vehData.RPM < 0.25f &&
         avgWheelSpeed < stallSpeed &&
         VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
-        vehData.StallProgress += (rand() % 1000) / (stallingRateDivisor * (controls.ThrottleVal+0.001f) * timeStep);
+        vehData.StallProgress += invClutch * 1.0f/stallTime * GAMEPLAY::GET_FRAME_TIME();
     }
     else if (vehData.StallProgress > 0.0f) {
-        vehData.StallProgress -= (rand() % 1000) / (stallingRateDivisor * (controls.ThrottleVal + 0.001f) * timeStep);
+        vehData.StallProgress -= invClutch * 1.0f/stallTime * GAMEPLAY::GET_FRAME_TIME();
     }
 
     if (vehData.StallProgress > 1.0f) {
@@ -1170,14 +1178,11 @@ void functionEngStall() {
         gearRattle.Stop();
         vehData.StallProgress = 0.0f;
     }
-    //showText(0.1, 0.1, 1.0, "Stall progress: " + std::to_string(stallingProgress));
-    //showText(0.1, 0.2, 1.0, "Stall speed: " + std::to_string(stallSpeed));
-    //showText(0.1, 0.3, 1.0, "Actual speed: " + std::to_string(avgWheelSpeed));
 
     // Simulate push-start
     // We'll just assume the ignition thing is in the "on" position.
     if (avgWheelSpeed > stallSpeed && !VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
-        controls.ClutchVal < 1.0f - settings.StallingThreshold) {
+        invClutch > settings.StallingThreshold) {
         VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, true, true);
     }
 }
@@ -1291,7 +1296,7 @@ void functionEngLock() {
     }
 
     // Wheels are locking up due to bad (down)shifts
-    if ((speed > abs(maxSpeed * 1.15f) + 3.334f || wrongDirection) && inputMultiplier > settings.ClutchCatchpoint) {
+    if ((speed > abs(maxSpeed * 1.15f) + 3.334f || wrongDirection) && inputMultiplier > settings.ClutchThreshold) {
         vehData.EngLockActive = true;
         float lockingForce = 60.0f * inputMultiplier;
         auto wheelsToLock = getDrivenWheels();
@@ -1629,13 +1634,13 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
                 brakelights = true;
             }
             
-            if (wheelThrottleVal > 0.01f && controls.ClutchVal < settings.ClutchCatchpoint && !vehData.FakeNeutral) {
+            if (wheelThrottleVal > 0.01f && controls.ClutchVal < settings.ClutchThreshold && !vehData.FakeNeutral) {
                 //showText(0.3, 0.0, 1.0, "We should burnout");
                 SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, controls.ADZThrottle);
                 SetControlADZ(ControlVehicleBrake, wheelThrottleVal, controls.ADZThrottle);
             }
 
-            if (wheelThrottleVal > 0.01f && (controls.ClutchVal > settings.ClutchCatchpoint || vehData.FakeNeutral)) {
+            if (wheelThrottleVal > 0.01f && (controls.ClutchVal > settings.ClutchThreshold || vehData.FakeNeutral)) {
                 if (wheelBrakeVal > 0.01f) {
                     //showText(0.3, 0.0, 1.0, "We should rev and brake");
                     //showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)) );
@@ -1700,7 +1705,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
             //bool brakelights = false;
 
             if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > reverseThreshold) {
-                if (controls.ClutchVal < settings.ClutchCatchpoint) {
+                if (controls.ClutchVal < settings.ClutchThreshold) {
                     CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
                 }
                 // Brake Pedal Reverse
@@ -1807,7 +1812,7 @@ void startStopEngine() {
         controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::Engine) ||
         controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
         controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine) ||
-        settings.ThrottleStart && controls.ThrottleVal > 0.75f && (controls.ClutchVal > settings.ClutchCatchpoint || vehData.FakeNeutral))) {
+        settings.ThrottleStart && controls.ThrottleVal > 0.75f && (controls.ClutchVal > settings.ClutchThreshold || vehData.FakeNeutral))) {
         VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
     }
     if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&

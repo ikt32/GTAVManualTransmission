@@ -41,7 +41,7 @@ public:
 
     float EngBrakePower = 0.0f;
     float EngBrakeThreshold = 0.75f;
-    float ClutchCatchpoint = 0.15f;
+    float ClutchThreshold = 0.15f;
     float StallingThreshold = 0.75f;
     float RPMDamage = 1.5f;
     int MisshiftDamage = 10;
