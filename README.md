@@ -57,6 +57,8 @@ You can read decorators to get some info about this mod.
 
 Example: ```DECORATOR::DECOR_GET_INT(vehicle, "mt_shift_indicator");``` gets the current shift up/down status. Currently this mod exposes 2 variables which can be used in other scripts.
 
+### Gearbox/Shift mode
+
 Current gear: `mt_gear`
 * `0`: Reverse
 * `1 through 7`: Matching gear
@@ -77,3 +79,19 @@ Set shift mode: `mt_set_shiftmode`
 * `1` - Sequential
 * `2` - H-pattern
 * `3` - Automatic
+
+### Camera (look left/right/back)
+
+These decorators allow custom vehicle camera mods know if user is pressing look-left/right/behind through Manual Transmission's input system (including steering wheel buttons), so they can support this mod easily.
+
+Looking left (bool): `mt_looking_left`
+* `true`  - LookLeft button is pressed
+* `false` - LookLeft button is not pressed
+
+Looking right (bool): `mt_looking_right`
+* `true`  - LookRight button is pressed
+* `false` - LookRight button is not pressed
+
+Looking left (bool): `mt_looking_back`
+* `true`  - LookBack button (or LookLeft + LookRight) is pressed
+* `false` - LookBack button is not pressed
