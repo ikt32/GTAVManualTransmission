@@ -1436,13 +1436,18 @@ void handleRPM() {
     
     if (ext.GetGearCurr(vehicle) > 1) {
         finalClutch = map(controls.ClutchVal, 0.0f, 1.0f, 1.0f, 0.6f);
+
+        // The next statement is a workaround for rolling back + brake + gear > 1 because it shouldn't rev then.
+        // Also because we're checking on the game Control accel value and not the pedal position
+        bool rollingback = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < 0.0 && 
+                           controls.BrakeVal > 0.1f && 
+                           controls.ThrottleVal > 0.05f;
+
         // When pressing clutch and throttle, handle clutch and RPM
         if (controls.ClutchVal > 0.4f && 
             controls.ThrottleVal > 0.05f &&
             !vehData.FakeNeutral && 
-            // The next statement is a workaround for rolling back + brake + gear > 1 because it shouldn't rev then.
-            // Also because we're checking on the game Control accel value and not the pedal position
-            !(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < 0.0 && controls.BrakeVal > 0.1f && controls.ThrottleVal > 0.05f)) {
+            !rollingback) {
             fakeRev(false, 0);
             ext.SetThrottle(vehicle, controls.ThrottleVal);
         }
