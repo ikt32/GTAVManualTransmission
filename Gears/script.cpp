@@ -24,7 +24,7 @@
 #include "Util/Util.hpp"
 #include "Util/Paths.h"
 
-#include "menu.h"
+#include <menu.h>
 #include "Memory/NativeMemory.hpp"
 #include "Util/MathExt.h"
 #include "ShiftModes.h"
@@ -38,6 +38,11 @@ const char* decorShiftNotice = "mt_shift_indicator";
 const char* decorFakeNeutral = "mt_neutral";
 const char* decorSetShiftMode = "mt_set_shiftmode";
 const char* decorGetShiftMode = "mt_get_shiftmode";
+
+// Camera mods interoperability (via decorators)
+const char* decorLookingLeft = "mt_looking_left";
+const char* decorLookingRight = "mt_looking_right";
+const char* decorLookingBack = "mt_looking_back";
 
 std::array<float, NUM_GEARS> upshiftSpeedsGame{};
 std::array<float, NUM_GEARS> upshiftSpeedsMod{};
@@ -1866,6 +1871,19 @@ void handleVehicleButtons() {
         vehData.LookBackRShoulder = false;
     }
 
+	// Set camera related decorators
+	DECORATOR::DECOR_SET_BOOL(vehicle, (char *)decorLookingLeft, controls.ButtonIn(ScriptControls::WheelControlType::LookLeft));
+	DECORATOR::DECOR_SET_BOOL(vehicle, (char *)decorLookingRight, controls.ButtonIn(ScriptControls::WheelControlType::LookRight));
+
+	DECORATOR::DECOR_SET_BOOL(vehicle, (char *)decorLookingBack, 
+		controls.ButtonIn(ScriptControls::WheelControlType::LookBack) || 
+		(
+			controls.ButtonIn(ScriptControls::WheelControlType::LookLeft) 
+			&&
+			controls.ButtonIn(ScriptControls::WheelControlType::LookRight)
+		)
+	); // decorLookingBack = LookBack || (LookLeft && LookRight)
+
     if (controls.ButtonJustPressed(ScriptControls::WheelControlType::Camera)) {
         CONTROLS::_SET_CONTROL_NORMAL(0, ControlNextCamera, 1.0f);
     }
@@ -2393,6 +2411,11 @@ bool setupGlobals() {
     registerDecorator(decorFakeNeutral, DECOR_TYPE_INT);
     registerDecorator(decorSetShiftMode, DECOR_TYPE_INT);
     registerDecorator(decorGetShiftMode, DECOR_TYPE_INT);
+
+	// Camera mods interoperability
+	registerDecorator(decorLookingLeft, DECOR_TYPE_BOOL);
+	registerDecorator(decorLookingRight, DECOR_TYPE_BOOL);
+	registerDecorator(decorLookingBack, DECOR_TYPE_BOOL);
 
     *g_bIsDecorRegisterLockedPtr = 1;
     return true;
