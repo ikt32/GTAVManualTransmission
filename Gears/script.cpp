@@ -24,7 +24,7 @@
 #include "Util/Util.hpp"
 #include "Util/Paths.h"
 
-#include "../GTAVMenuBase/menu.h"
+#include <menu.h>
 #include "Memory/NativeMemory.hpp"
 #include "Util/MathExt.h"
 #include "ShiftModes.h"
