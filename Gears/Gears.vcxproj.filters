@@ -65,6 +65,9 @@
       <Filter>Thirdparty</Filter>
     </ClCompile>
     <ClCompile Include="ScriptHUD.cpp" />
+    <ClCompile Include="Input\DiJoyStick.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />

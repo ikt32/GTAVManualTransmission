@@ -116,6 +116,7 @@
     <ClCompile Include="..\..\GTAVMenuBase\menusettings.cpp" />
     <ClCompile Include="..\..\GTAVMenuBase\menuutils.cpp" />
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp" />
+    <ClCompile Include="Input\DiJoyStick.cpp" />
     <ClCompile Include="ScriptHUD.cpp" />
     <ClCompile Include="ShiftModes.cpp" />
     <ClCompile Include="Util\MathExt.cpp" />
