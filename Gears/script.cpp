@@ -1,9 +1,5 @@
 #define NOMINMAX
 
-#ifdef _DEBUG
-#include "Dump.h"
-#endif
-
 #include <string>
 #include <iomanip>
 #include <algorithm>
@@ -2461,104 +2457,6 @@ std::string getInputDevice() {
     }
 }
 
-#ifdef _DEBUG
-/*
- * 0: __try __except
- * 1: try catch
- */
-void cleanup(int type) {
-    showNotification(mtPrefix + "Script crashed! Check Gears.log");
-    logger.Write(FATAL, "CRASH: Init shutdown: %s", type == 0 ? "__except" : "catch");
-    bool successI = MemoryPatcher::RestoreInstructions();
-    bool successS = MemoryPatcher::RestoreSteeringCorrection();
-    bool successSC = MemoryPatcher::RestoreSteeringControl();
-    bool successB = MemoryPatcher::RestoreBrakeDecrement();
-    resetSteeringMultiplier();
-    if (successI && successS && successSC && successB) {
-        logger.Write(FATAL, "CRASH: Shut down script cleanly");
-    }
-    else {
-        if (!successI)
-            logger.Write(WARN, "Shut down script with instructions not restored");
-        if (!successS)
-            logger.Write(WARN, "Shut down script with steer correction not restored");
-        if (!successSC)
-            logger.Write(WARN, "Shut down script with steer control not restored");
-        if (!successB)
-            logger.Write(WARN, "Shut down script with brake decrement not restored");
-    }
-}
-
-//https://blogs.msdn.microsoft.com/zhanli/2010/06/25/structured-exception-handling-seh-and-c-exception-handling/
-//https://msdn.microsoft.com/en-us/library/5z4bw5h5.aspx
-void trans_func(unsigned int, EXCEPTION_POINTERS*);
-
-class SE_Exception {
-private:
-    unsigned int nSE;
-public:
-    SE_Exception() {}
-    SE_Exception(unsigned int n) : nSE(n) {}
-    ~SE_Exception() {}
-    unsigned int getSeNumber() { return nSE; }
-};
-
-void trans_func(unsigned int u, EXCEPTION_POINTERS* pExp) {
-    logger.Write(FATAL, "Translator function");
-    DumpStackTrace(pExp);
-    throw SE_Exception();
-}
-
-bool cppMain() {
-    try {
-        update();
-        update_menu();
-        WAIT(0);
-    }
-    catch (const std::exception &e) {
-        logger.Write(FATAL, "std::exception: %s", e.what());
-        cleanup(1);
-        return true;
-    }
-    catch (const int ex) {
-        logger.Write(FATAL, "int exception: %d", ex);
-        cleanup(1);
-        return true;
-    }
-    catch (const long ex) {
-        logger.Write(FATAL, "long exception: %d", ex);
-        cleanup(1);
-        return true;
-    }
-    catch (const char * ex) {
-        logger.Write(FATAL, "string exception: %d", ex);
-        cleanup(1);
-        return true;
-    }
-    catch (const char ex) {
-        logger.Write(FATAL, "char exception: %c", ex);
-        cleanup(1);
-        return true;
-    }
-    catch(...) {
-        auto currExp = std::current_exception();
-        cleanup(1);
-        return true;
-    }
-    return false;
-}
-
-bool cMain() {
-    __try {
-        return cppMain();
-    }
-    __except (DumpStackTrace(GetExceptionInformation())) {
-        cleanup(0);
-        return true;
-    }
-}
-#endif
-
 void readSettings() {
     settings.Read(&controls);
     if (settings.LogLevel > 4) settings.LogLevel = 1;
@@ -2615,21 +2513,14 @@ void main() {
     logger.Write(INFO, "START: Initialization finished");
 
     while (true) {
-#ifdef _DEBUG
-        if (cMain()) return;
-#else
         update();
         update_npc();
         update_menu();
         WAIT(0);
-#endif
     }
 }
 
 void ScriptMain() {
-#ifdef _DEBUG
-    _set_se_translator(trans_func);
-#endif
     srand(GetTickCount());
     main();
 }
