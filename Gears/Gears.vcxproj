@@ -118,6 +118,7 @@
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp" />
     <ClCompile Include="Input\DiJoyStick.cpp" />
     <ClCompile Include="ScriptHUD.cpp" />
+    <ClCompile Include="ScriptNPC.cpp" />
     <ClCompile Include="ShiftModes.cpp" />
     <ClCompile Include="Util\MathExt.cpp" />
     <ClCompile Include="ScriptMenu.cpp" />

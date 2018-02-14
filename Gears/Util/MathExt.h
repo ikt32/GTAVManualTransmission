@@ -25,6 +25,7 @@ Vector3 operator * (Vector3 value, float scale);
 Vector3 operator * (float scale, Vector3 vec);
 Vector3 Normalize(Vector3 vec);
 Vector3 GetOffsetInWorldCoords(Vector3 position, Vector3 rotation, Vector3 forward, Vector3 offset);
+float GetAngleBetween(float h1, float h2, float separation);
 
 inline float rad2deg(float rad) {
     return (rad*(180.0f / 3.14159265358979323846264338327950288f));

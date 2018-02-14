@@ -68,6 +68,7 @@
     <ClCompile Include="Input\DiJoyStick.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="ScriptNPC.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />

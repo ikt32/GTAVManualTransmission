@@ -82,3 +82,12 @@ Vector3 GetOffsetInWorldCoords(Vector3 position, Vector3 rotation, Vector3 forwa
     Vector3 up = Cross(right, forward);
     return position + (right * offset.x) + (forward * offset.y) + (up * offset.z);
 }
+
+float GetAngleBetween(float h1, float h2, float separation) {
+    auto diff = fabs(h1 - h2);
+    if (diff < separation)
+        return (separation - diff) / separation;
+    if (fabs(diff - 360.0f) < separation)
+        return (separation - fabs(diff - 360.0f)) / separation;
+    return separation;
+}
