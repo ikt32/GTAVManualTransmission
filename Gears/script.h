@@ -56,7 +56,7 @@ void update_npc();
 
 void drawHUD();
 void drawDebugInfo();
-void crossScriptUpdated();
+void crossScript();
 void drawVehicleWheelInfo();
 void drawInputWheelInfo();
 

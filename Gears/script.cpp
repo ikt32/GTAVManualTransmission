@@ -78,25 +78,22 @@ extern std::vector<std::string> speedoTypes;
 
 MiniPID pid(1.0, 0.0, 0.0);
 
+bool isVehicleAvailable() {
+    return vehicle != 0 && 
+        ENTITY::DOES_ENTITY_EXIST(vehicle) && 
+        playerPed == VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1);
+}
+
 void update_globals() {
     player = PLAYER::PLAYER_ID();
     playerPed = PLAYER::PLAYER_PED_ID();
     vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
 }
 
-void update_mod() {
-    ///////////////////////////////////////////////////////////////////////////
-    //                     Is the player the driver?
-    ///////////////////////////////////////////////////////////////////////////
-    if (!vehicle || !ENTITY::DOES_ENTITY_EXIST(vehicle) || 
-        playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
-        stopForceFeedback();
+void update_vehicle() {
+    if (!isVehicleAvailable()) {
         return;
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    //                       Update vehicle and inputs
-    ///////////////////////////////////////////////////////////////////////////
 
     if (vehicle != lastVehicle) {
         initVehicle();
@@ -104,18 +101,21 @@ void update_mod() {
     lastVehicle = vehicle;
 
     vehData.UpdateValues(ext, vehicle);
+}
 
-    bool ignoreClutch = false;
-    if (settings.ShiftMode == Automatic ||
-        vehData.Class == VehicleClass::Bike && settings.SimpleBike) {
-        ignoreClutch = true;
+void update_inputs() {
+    updateLastInputDevice();
+    controls.UpdateValues(controls.PrevInput, false);
+}
+
+void update_mod() {
+    if (!isVehicleAvailable()) {
+        stopForceFeedback();
+        return;
     }
 
-    updateLastInputDevice();
-    controls.UpdateValues(controls.PrevInput, ignoreClutch, false);
-
     if (settings.CrossScript) {
-        crossScriptUpdated();
+        crossScript();
     }
 
     updateSteeringMultiplier();
@@ -331,7 +331,7 @@ void update_mod() {
 ///////////////////////////////////////////////////////////////////////////////
 //                            Helper things
 ///////////////////////////////////////////////////////////////////////////////
-void crossScriptUpdated() {
+void crossScript() {
     // Current gear
     DECORATOR::DECOR_SET_INT(vehicle, (char *)decorCurrentGear, ext.GetGearCurr(vehicle));
 
@@ -941,6 +941,68 @@ void functionClutchCatch() {
     }
 }
 
+// im solving the worng problem here help
+std::vector<bool> getDrivenWheels() {
+    int numWheels = ext.GetNumWheels(vehicle);
+    std::vector<bool> wheelsToConsider;
+    if (ext.GetDriveBiasFront(vehicle) > 0.0f && ext.GetDriveBiasFront(vehicle) < 1.0f) {
+        for (int i = 0; i < numWheels; i++)
+            wheelsToConsider.push_back(true);
+    }
+    else {
+        // bikes
+        if (numWheels == 2) {
+            // Front id = 1, rear id = 0...
+            wheelsToConsider.push_back(true);
+            wheelsToConsider.push_back(false);
+        }
+        // normal cars
+        else if (numWheels == 4) {
+            // fwd
+            if (ext.GetDriveBiasFront(vehicle) == 1.0f) {
+                wheelsToConsider.push_back(true);
+                wheelsToConsider.push_back(true);
+                wheelsToConsider.push_back(false);
+                wheelsToConsider.push_back(false);
+            }
+            // rwd
+            else if (ext.GetDriveBiasFront(vehicle) == 0.0f) {
+                wheelsToConsider.push_back(false);
+                wheelsToConsider.push_back(false);
+                wheelsToConsider.push_back(true);
+                wheelsToConsider.push_back(true);
+            }
+        }
+        // offroad, trucks
+        else if (numWheels == 6) {
+            // fwd
+            if (ext.GetDriveBiasFront(vehicle) == 1.0f) {
+                wheelsToConsider.push_back(true);
+                wheelsToConsider.push_back(true);
+                wheelsToConsider.push_back(false);
+                wheelsToConsider.push_back(false);
+                wheelsToConsider.push_back(false);
+                wheelsToConsider.push_back(false);
+            }
+            // rwd
+            else if (ext.GetDriveBiasFront(vehicle) == 0.0f) {
+                wheelsToConsider.push_back(false);
+                wheelsToConsider.push_back(false);
+                wheelsToConsider.push_back(true);
+                wheelsToConsider.push_back(true);
+                wheelsToConsider.push_back(true);
+                wheelsToConsider.push_back(true);
+            }
+        }
+        else {
+            for (int i = 0; i < numWheels; i++)
+                wheelsToConsider.push_back(true);
+        }
+    }
+    return wheelsToConsider;
+}
+
+
 std::vector<float> getDrivenWheelsSpeeds(std::vector<float> wheelSpeeds) {
     std::vector<float> wheelsToConsider;
     if (ext.GetDriveBiasFront(vehicle) > 0.0f && ext.GetDriveBiasFront(vehicle) < 1.0f) {
@@ -1038,67 +1100,6 @@ void functionEngDamage() {
         VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, 
                                            VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (settings.RPMDamage));
     }
-}
-
-// im solving the worng problem here help
-std::vector<bool> getDrivenWheels() {
-    int numWheels = ext.GetNumWheels(vehicle);
-    std::vector<bool> wheelsToConsider;
-    if (ext.GetDriveBiasFront(vehicle) > 0.0f && ext.GetDriveBiasFront(vehicle) < 1.0f) {
-        for (int i = 0; i < numWheels; i++)
-            wheelsToConsider.push_back(true);
-    }
-    else {
-        // bikes
-        if (numWheels == 2) {
-            // Front id = 1, rear id = 0...
-            wheelsToConsider.push_back(true);
-            wheelsToConsider.push_back(false);
-        }
-        // normal cars
-        else if (numWheels == 4) {
-            // fwd
-            if (ext.GetDriveBiasFront(vehicle) == 1.0f) {
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-            }
-            // rwd
-            else if (ext.GetDriveBiasFront(vehicle) == 0.0f) {
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-            }
-        }
-        // offroad, trucks
-        else if (numWheels == 6) {
-            // fwd
-            if (ext.GetDriveBiasFront(vehicle) == 1.0f) {
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-            }
-            // rwd
-            else if (ext.GetDriveBiasFront(vehicle) == 0.0f) {
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-            }
-        }
-        else {
-            for (int i = 0; i < numWheels; i++)
-                wheelsToConsider.push_back(true);
-        }
-    }
-    return wheelsToConsider;
 }
 
 void functionEngLock() {
@@ -1245,6 +1246,14 @@ void fakeRev(bool customThrottle, float customThrottleVal) {
 }
 
 void handleRPM() {
+    float clutch = controls.ClutchVal;
+
+    // Ignores clutch 
+    if (settings.ShiftMode == Automatic ||
+        vehData.Class == VehicleClass::Bike && settings.SimpleBike) {
+        clutch = 0.0f;
+    }
+
     //bool skip = false;
 
     // Game wants to shift up. Triggered at high RPM, high speed.
@@ -1271,10 +1280,10 @@ void handleRPM() {
         Fix: Map 0.0-1.0 to 0.6-1.0 (clutchdata)
         Fix: Map 0.0-1.0 to 1.0-0.6 (control)
     */
-    float finalClutch = 1.0f - controls.ClutchVal;
+    float finalClutch = 1.0f - clutch;
     
     if (ext.GetGearCurr(vehicle) > 1) {
-        finalClutch = map(controls.ClutchVal, 0.0f, 1.0f, 1.0f, 0.6f);
+        finalClutch = map(clutch, 0.0f, 1.0f, 1.0f, 0.6f);
 
         // The next statement is a workaround for rolling back + brake + gear > 1 because it shouldn't rev then.
         // Also because we're checking on the game Control accel value and not the pedal position
@@ -1283,7 +1292,7 @@ void handleRPM() {
                            controls.ThrottleVal > 0.05f;
 
         // When pressing clutch and throttle, handle clutch and RPM
-        if (controls.ClutchVal > 0.4f && 
+        if (clutch > 0.4f &&
             controls.ThrottleVal > 0.05f &&
             !vehData.FakeNeutral && 
             !rollingback) {
@@ -1297,7 +1306,7 @@ void handleRPM() {
         }
     }
 
-    if (vehData.FakeNeutral || controls.ClutchVal >= 1.0f) {
+    if (vehData.FakeNeutral || clutch >= 1.0f) {
         if (ENTITY::GET_ENTITY_SPEED(vehicle) < 1.0f) {
             finalClutch = -5.0f;
         }
@@ -1333,6 +1342,8 @@ void functionLimiter() {
 ///////////////////////////////////////////////////////////////////////////////
 //                   Mod functions: Reverse/Pedal handling
 ///////////////////////////////////////////////////////////////////////////////
+
+#pragma region region_wheel
 
 // Anti-Deadzone.
 void SetControlADZ(eControl control, float value, float adz) {
@@ -1838,6 +1849,8 @@ void handleVehicleButtons() {
 //                    Wheel input and force feedback
 ///////////////////////////////////////////////////////////////////////////////
 
+#pragma region region_ffb
+
 void doWheelSteering() {
     if (controls.PrevInput != ScriptControls::Wheel)
         return;
@@ -2186,6 +2199,10 @@ void playFFBWater() {
     }
 }
 
+#pragma endregion region_ffb
+
+#pragma endregion region_wheel
+
 ///////////////////////////////////////////////////////////////////////////////
 //                             Misc features
 ///////////////////////////////////////////////////////////////////////////////
@@ -2271,35 +2288,6 @@ bool setupGlobals() {
     return true;
 }
 
-bool isPlayerInVehicle() {
-    player = PLAYER::PLAYER_ID();
-    playerPed = PLAYER::PLAYER_PED_ID();
-
-    if (!ENTITY::DOES_ENTITY_EXIST(playerPed) ||
-        !PLAYER::IS_PLAYER_CONTROL_ON(player) ||
-        ENTITY::IS_ENTITY_DEAD(playerPed) ||
-        PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE)) {
-        return false;
-    }
-
-    vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
-
-    if (!vehicle || !ENTITY::DOES_ENTITY_EXIST(vehicle) ||
-        playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
-        return false;
-    }
-    return true;
-}
-
-std::string getInputDevice() {
-    switch (controls.PrevInput) {
-        case ScriptControls::Keyboard: return "Keyboard";
-        case ScriptControls::Controller: return "Controller";
-        case ScriptControls::Wheel: return "Wheel";
-        default: return "Unknown";
-    }
-}
-
 void readSettings() {
     settings.Read(&controls);
     if (settings.LogLevel > 4) settings.LogLevel = 1;
@@ -2357,6 +2345,8 @@ void main() {
 
     while (true) {
         update_globals();
+        update_inputs();
+        update_vehicle();
         update_mod();
         update_npc();
         update_menu();

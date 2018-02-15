@@ -652,7 +652,7 @@ std::vector<std::string> showGammaCurve() {
 void update_axesmenu() {
     menu.Title("Configure axes");
     menu.Subtitle("Setup steering and pedals");
-    controls.UpdateValues(ScriptControls::Wheel, false, true);
+    controls.UpdateValues(ScriptControls::Wheel, true);
     std::vector<std::string> info = {
         "Press RIGHT to clear this axis" ,
         "Steer    : " + std::to_string(controls.SteerVal),
@@ -1221,7 +1221,7 @@ bool configAxis(std::string str) {
         additionalInfo += " Fully press and release the " + confTag + " pedal to register axis.";
     }
 
-    controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+    controls.UpdateValues(ScriptControls::InputDevices::Wheel, true);
     // Save current state
     std::vector<std::tuple<GUID, std::string, int>> startStates;
     for (auto guid : controls.WheelControl.GetGuids()) {
@@ -1248,7 +1248,7 @@ bool configAxis(std::string str) {
         if (IsKeyJustUp(str2key(escapeKey))) {
             return false;
         }
-        controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+        controls.UpdateValues(ScriptControls::InputDevices::Wheel, true);
         if (getConfigAxisWithValues(startStates, selectedGUID, selectedAxis, hyst, positive, startValue)) {
             break;
         }
@@ -1271,7 +1271,7 @@ bool configAxis(std::string str) {
         if (IsKeyJustUp(str2key(escapeKey))) {
             return false;
         }
-        controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+        controls.UpdateValues(ScriptControls::InputDevices::Wheel, true);
 
         int axisValue = controls.WheelControl.GetAxisValue(controls.WheelControl.StringToAxis(selectedAxis), selectedGUID);
 
@@ -1300,7 +1300,7 @@ bool configAxis(std::string str) {
 bool configWheelToKey() {
     std::string additionalInfo = "Press a button to configure. Press " + escapeKey + " to exit.";
 
-    controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+    controls.UpdateValues(ScriptControls::InputDevices::Wheel, true);
 
     /*
      * 0: Wait for button select
@@ -1316,7 +1316,7 @@ bool configWheelToKey() {
         if (IsKeyJustUp(str2key(escapeKey))) {
             return false;
         }
-        controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+        controls.UpdateValues(ScriptControls::InputDevices::Wheel, true);
 
         if (progress == 0) {
             for (auto guid : controls.WheelControl.GetGuids()) {
@@ -1371,13 +1371,13 @@ bool configButton(std::string str) {
     std::string additionalInfo = "Press " + escapeKey + " to exit.";
     additionalInfo += " Press a button to set " + confTag + ".";
 
-    controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+    controls.UpdateValues(ScriptControls::InputDevices::Wheel, true);
 
     while (true) {
         if (IsKeyJustUp(str2key(escapeKey))) {
             return false;
         }
-        controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+        controls.UpdateValues(ScriptControls::InputDevices::Wheel, true);
 
         for (auto guid : controls.WheelControl.GetGuids()) {
             for (int i = 0; i < MAX_RGBBUTTONS; i++) {
@@ -1403,7 +1403,7 @@ bool configHPattern() {
     std::string confTag = "SHIFTER";
     std::string additionalInfo = "Press " + escapeKey + " to exit. Press " + skipKey + " to skip gear.";
 
-    controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+    controls.UpdateValues(ScriptControls::InputDevices::Wheel, true);
 
     GUID devGUID = {};
     std::array<int, NUMGEARS> buttonArray; // There are gears 1-7 + R
@@ -1419,7 +1419,7 @@ bool configHPattern() {
             progress++;
         }
 
-        controls.UpdateValues(ScriptControls::InputDevices::Wheel, false, true);
+        controls.UpdateValues(ScriptControls::InputDevices::Wheel, true);
 
         for (auto guid : controls.WheelControl.GetGuids()) {
             for (int i = 0; i < MAX_RGBBUTTONS; i++) {
@@ -1518,7 +1518,7 @@ bool configControllerButton(const std::string &confTag) {
         if (IsKeyJustUp(str2key(escapeKey))) {
             return false;
         }
-        controls.UpdateValues(ScriptControls::InputDevices::Controller, false, true);
+        controls.UpdateValues(ScriptControls::InputDevices::Controller, true);
         for (std::string buttonHelper : rawController->XboxButtonsHelper) {
             auto button = rawController->StringToButton(buttonHelper);
             if (rawController->IsButtonJustPressed(button, controls.GetButtonState())) {
@@ -1538,7 +1538,7 @@ bool configLControllerButton(const std::string &confTag) {
         if (IsKeyJustUp(str2key(escapeKey))) {
             return false;
         }
-        controls.UpdateValues(ScriptControls::InputDevices::Controller, false, true);
+        controls.UpdateValues(ScriptControls::InputDevices::Controller, true);
         
         for (auto mapItem : controls.LegacyControlsMap) {
             if (CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, mapItem.second)) {

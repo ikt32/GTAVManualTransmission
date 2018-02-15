@@ -155,7 +155,7 @@ public:
     void updateKeyboard();
     void updateController();
     void updateWheel();
-    void UpdateValues(InputDevices prevInput, bool ignoreClutch, bool justPeekingWheelKb);
+    void UpdateValues(InputDevices prevInput, bool skipKeyboardInput);
     InputDevices GetLastInputDevice(InputDevices previousInput, bool enableWheel = true);
 
     // Keyboard controls	

@@ -127,7 +127,7 @@ void ScriptControls::updateWheel() {
     if (InvertClutch) { ClutchVal = 1.0f - ClutchVal; ClutchValRaw = 1.0f - ClutchValRaw; }
 }
 
-void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, bool justPeekingWheelKb) {
+void ScriptControls::UpdateValues(InputDevices prevInput, bool skipKeyboardInput) {
     if (UseLegacyController) {
         lcontroller.UpdateButtonChangeStates();
     }
@@ -142,7 +142,7 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
 
     //StickControl.Update();
 
-    if (!justPeekingWheelKb)   
+    if (!skipKeyboardInput)   
         CheckCustomButtons();
 
     // Update ThrottleVal, BrakeVal and ClutchVal ranging from 0.0f (no touch) to 1.0f (full press)
@@ -160,9 +160,6 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool ignoreClutch, boo
             break;
         }
         default: break;
-    }
-    if (ignoreClutch) {
-        ClutchVal = 0.0f;
     }
 
     averageBrakeVals[movAvgIndex] = BrakeVal;
