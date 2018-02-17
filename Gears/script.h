@@ -66,7 +66,7 @@ void drawInputWheelInfo();
 
 void initVehicle();
 void initialize();
-void reset();
+void resetVehicle();
 void applySteeringMultiplier(float multiplier);
 void resetSteeringMultiplier();
 void toggleManual();
@@ -97,7 +97,7 @@ void functionEngStall();
 void functionEngDamage();
 void functionEngBrake();
 void functionEngLock();
-void manageBrakePatch();
+//void manageBrakePatch();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                       Mod functions: Gearbox control

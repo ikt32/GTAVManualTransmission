@@ -92,6 +92,8 @@ void update_globals() {
 
 void update_vehicle() {
     if (!isVehicleAvailable()) {
+        resetVehicle();
+        lastVehicle = vehicle;
         return;
     }
 
@@ -108,21 +110,11 @@ void update_inputs() {
     controls.UpdateValues(controls.PrevInput, false);
 }
 
-void update_mod() {
+void update_hud() {
     if (!isVehicleAvailable()) {
-        stopForceFeedback();
         return;
     }
 
-    if (settings.CrossScript) {
-        crossScript();
-    }
-
-    updateSteeringMultiplier();
-
-    ///////////////////////////////////////////////////////////////////////////
-    //                                   HUD
-    ///////////////////////////////////////////////////////////////////////////
     if (settings.DisplayInfo) {
         drawDebugInfo();
     }
@@ -139,39 +131,38 @@ void update_mod() {
         settings.SteeringWheelInfo && textureWheelId != -1) {
         drawInputWheelInfo();
     }
+}
 
-    if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
-        controls.ButtonHeld(ScriptControls::WheelControlType::Toggle, 500) ||
-        controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
-        controls.PrevInput == ScriptControls::Controller	&& controls.ButtonHeld(ScriptControls::LegacyControlType::Toggle)) {
-        toggleManual();
+void update_alt_water() {
+    handleVehicleButtons();
+    handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
+    doWheelSteering();
+    playFFBWater();
+}
+
+void update_alt_road(const bool enableManual) {
+    if (!controls.WheelControl.IsConnected(controls.SteerGUID))
         return;
-    }
 
-    ///////////////////////////////////////////////////////////////////////////
-    //                            Alt vehicle controls
-    ///////////////////////////////////////////////////////////////////////////
-
-    if (settings.EnableWheel && controls.PrevInput == ScriptControls::Wheel) {
-
-        if (vehData.Domain == VehicleDomain::Water) {
-            handleVehicleButtons();
-            handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
-            doWheelSteering();
+    updateSteeringMultiplier();
+    if (enableManual) {
+        handleVehicleButtons();
+        doWheelSteering();
+        if (vehData.Amphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle) > 0.10f) {
             playFFBWater();
-            return;
         }
-
+        else {
+            playFFBGround();
+        }
+        if (vehData.Class == VehicleClass::Bike && settings.SimpleBike) {
+            handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
+        }
+        else {
+            handlePedalsRealReverse(controls.ThrottleVal, controls.BrakeVal);
+        }
     }
-    
-    ///////////////////////////////////////////////////////////////////////////
-    //                          Ground vehicle controls
-    ///////////////////////////////////////////////////////////////////////////
-
-    if (!settings.EnableManual &&
-        settings.EnableWheel && settings.WheelWithoutManual &&
-        controls.WheelControl.IsConnected(controls.SteerGUID)) {
-
+    // TODO: Remove this option (WheelWithoutManual) in favor of always-on?
+    else if (settings.WheelWithoutManual) {
         handleVehicleButtons();
         handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
         doWheelSteering();
@@ -181,67 +172,82 @@ void update_mod() {
         else {
             playFFBGround();
         }
-    }	
+    }
+}
 
-    ///////////////////////////////////////////////////////////////////////////
-    //          Active whenever Manual is enabled from here
-    ///////////////////////////////////////////////////////////////////////////
-    if (vehData.Domain != VehicleDomain::Road)
-        return;
-
-    if (!settings.EnableManual) {
+// For alternative (wheel, joy) input
+void update_input_controls(const bool enableManual) {
+    if (!settings.EnableWheel || controls.PrevInput != ScriptControls::Wheel) {
         return;
     }
-
-    if (MemoryPatcher::TotalPatched != MemoryPatcher::NumGearboxPatches) {
-        MemoryPatcher::PatchInstructions();
-    }
-    if (!MemoryPatcher::ShiftUpPatched) {
-        MemoryPatcher::PatchShiftUp();
-    }
-    
-    handleVehicleButtons();
-
-    if (settings.EnableWheel && controls.WheelControl.IsConnected(controls.SteerGUID)) {
-        doWheelSteering();
-        if (vehData.Amphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle) > 0.10f) {
-            playFFBWater();
+    // oto/truck
+    // motor
+    // fiets
+    // boot
+    // vliegtuig
+    // helikopter
+    if (isVehicleAvailable()) {
+        switch (vehData.Domain) {
+        case VehicleDomain::Road: {
+            update_alt_road(enableManual);
+            break;
         }
-        else {
-            playFFBGround();
+        case VehicleDomain::Water: {
+            update_alt_water();
+            break;
+        }
+        case VehicleDomain::Air: {
+            break;
+        }
+        case VehicleDomain::Bicycle: {
+            break;
+        }
+        case VehicleDomain::Rail: {
+            break;
+        }
+        case VehicleDomain::Unknown: {
+            break;
+        }
+        default: {
+            ;
+        }
         }
     }
-    
+    // voet
 
-    if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ToggleH) ||
-        controls.ButtonJustPressed(ScriptControls::WheelControlType::ToggleH) ||
-        controls.ButtonHeld(ScriptControls::ControllerControlType::ToggleH) ||
-        controls.PrevInput == ScriptControls::Controller	&& controls.ButtonHeld(ScriptControls::LegacyControlType::ToggleH)) {
-        cycleShiftMode();
+}
+
+// don't write with VehicleExtensions and dont set clutch state
+void update_misc_features() {
+    if (isVehicleAvailable()) {
+        if (settings.CrossScript) {
+            crossScript();
+        }
+
+        if (settings.AutoLookBack) {
+            functionAutoLookback();
+        }
+
+
+    }
+}
+
+// Only when mod is working or writes clutch stuff.
+// Called inside manual transmission part!
+// Mostly optional stuff.
+void update_manual_features() {
+    if (settings.HillBrakeWorkaround) {
+        functionHillGravity();
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    //                            Actual mod operations
-    ///////////////////////////////////////////////////////////////////////////
-
-    // Reverse behavior
-    // For bikes, do this automatically.
-    if (vehData.Class == VehicleClass::Bike && settings.SimpleBike) {
-        if (controls.PrevInput == ScriptControls::InputDevices::Wheel) {
-            handlePedalsDefault( controls.ThrottleVal, controls.BrakeVal );
-        } else {
+    if (controls.PrevInput != ScriptControls::InputDevices::Wheel) {
+        if (vehData.Class == VehicleClass::Bike && settings.SimpleBike) {
             functionAutoReverse();
         }
-    }
-    else {
-        if (controls.PrevInput == ScriptControls::InputDevices::Wheel) {
-            handlePedalsRealReverse( controls.ThrottleVal, controls.BrakeVal );
-        } else {
+        else {
             functionRealReverse();
         }
     }
-
-    functionLimiter();
 
     if (settings.EngBrake) {
         functionEngBrake();
@@ -263,10 +269,8 @@ void update_mod() {
         vehData.EngLockActive = false;
     }
 
-    manageBrakePatch();
-
-    if (!vehData.FakeNeutral && 
-        !(settings.SimpleBike && vehData.Class == VehicleClass::Bike) && 
+    if (!vehData.FakeNeutral &&
+        !(settings.SimpleBike && vehData.Class == VehicleClass::Bike) &&
         !vehData.NoClutch) {
         // Stalling
         if (settings.EngStall && settings.ShiftMode == HPattern ||
@@ -281,7 +285,65 @@ void update_mod() {
         }
     }
 
-    // Manual shifting
+    if (vehData.EngBrakeActive || vehData.EngLockActive) {
+        if (!MemoryPatcher::BrakeDecrementPatched) {
+            MemoryPatcher::PatchBrakeDecrement();
+        }
+    }
+    else {
+        if (MemoryPatcher::BrakeDecrementPatched) {
+            MemoryPatcher::RestoreBrakeDecrement();
+        }
+    }
+
+    if (gearRattle.Active) {
+        if (controls.ClutchVal > 1.0f - settings.ClutchThreshold ||
+            !VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
+            gearRattle.Stop();
+        }
+    }
+}
+
+// Manual Transmission part of the mod
+void update_manual_transmission() {
+    if (!isVehicleAvailable()) {
+        return;
+    }
+
+    //updateSteeringMultiplier();
+
+    if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
+        controls.ButtonHeld(ScriptControls::WheelControlType::Toggle, 500) ||
+        controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
+        controls.PrevInput == ScriptControls::Controller	&& controls.ButtonHeld(ScriptControls::LegacyControlType::Toggle)) {
+        toggleManual();
+        return;
+    }
+
+    if (vehData.Domain != VehicleDomain::Road || !settings.EnableManual)
+        return;
+
+    ///////////////////////////////////////////////////////////////////////////
+    //          Active whenever Manual is enabled from here
+    ///////////////////////////////////////////////////////////////////////////
+
+    if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ToggleH) ||
+        controls.ButtonJustPressed(ScriptControls::WheelControlType::ToggleH) ||
+        controls.ButtonHeld(ScriptControls::ControllerControlType::ToggleH) ||
+        controls.PrevInput == ScriptControls::Controller	&& controls.ButtonHeld(ScriptControls::LegacyControlType::ToggleH)) {
+        cycleShiftMode();
+    }
+
+    if (MemoryPatcher::TotalPatched != MemoryPatcher::NumGearboxPatches) {
+        MemoryPatcher::PatchInstructions();
+    }
+    // TODO: Now why did I do this separate from the PatchInstructions()????
+    if (!MemoryPatcher::ShiftUpPatched) {
+        MemoryPatcher::PatchShiftUp();
+    }
+
+    update_manual_features();
+
     switch(settings.ShiftMode) {
         case Sequential: {
             functionSShift();
@@ -307,20 +369,7 @@ void update_mod() {
         default: break;
     }
 
-    if (settings.AutoLookBack) {
-        functionAutoLookback();
-    }
-
-    if (settings.HillBrakeWorkaround) {
-        functionHillGravity();
-    }
-
-    if (gearRattle.Active) {
-        if (controls.ClutchVal > 1.0f - settings.ClutchThreshold ||
-            !VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
-            gearRattle.Stop();
-        }
-    }
+    functionLimiter();
 
     // Finally, update memory each loop
     handleRPM();
@@ -332,6 +381,9 @@ void update_mod() {
 //                            Helper things
 ///////////////////////////////////////////////////////////////////////////////
 void crossScript() {
+    if (!isVehicleAvailable())
+        return;
+
     // Current gear
     DECORATOR::DECOR_SET_INT(vehicle, (char *)decorCurrentGear, ext.GetGearCurr(vehicle));
 
@@ -370,7 +422,7 @@ void crossScript() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void initVehicle() {
-    reset();
+    resetVehicle();
     std::fill(upshiftSpeedsGame.begin(), upshiftSpeedsGame.end(), 0.0f);
     std::fill(upshiftSpeedsMod.begin(), upshiftSpeedsMod.end(), 0.0f);
     vehData = VehicleData();
@@ -393,7 +445,7 @@ void initialize() {
     initWheel();
 }
 
-void reset() {
+void resetVehicle() {
     resetSteeringMultiplier();
     gearRattle.Stop();
     if (MemoryPatcher::TotalPatched == MemoryPatcher::NumGearboxPatches) {
@@ -428,7 +480,7 @@ void toggleManual() {
         VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
     }
     if (!settings.EnableManual) {
-        reset();
+        resetVehicle();
     }
     initialize();
     initSteeringPatches();
@@ -1213,18 +1265,18 @@ void functionEngBrake() {
     }
 }
 
-void manageBrakePatch() {
-    if (vehData.EngBrakeActive || vehData.EngLockActive) {
-        if (!MemoryPatcher::BrakeDecrementPatched) {
-            MemoryPatcher::PatchBrakeDecrement();
-        }
-    }
-    else {
-        if (MemoryPatcher::BrakeDecrementPatched) {
-            MemoryPatcher::RestoreBrakeDecrement();
-        }
-    }
-}
+//void manageBrakePatch() {
+//    if (vehData.EngBrakeActive || vehData.EngLockActive) {
+//        if (!MemoryPatcher::BrakeDecrementPatched) {
+//            MemoryPatcher::PatchBrakeDecrement();
+//        }
+//    }
+//    else {
+//        if (MemoryPatcher::BrakeDecrementPatched) {
+//            MemoryPatcher::RestoreBrakeDecrement();
+//        }
+//    }
+//}
 
 ///////////////////////////////////////////////////////////////////////////////
 //                       Mod functions: Gearbox control
@@ -2347,7 +2399,10 @@ void main() {
         update_globals();
         update_inputs();
         update_vehicle();
-        update_mod();
+        update_hud();
+        update_input_controls(settings.EnableManual);
+        update_manual_transmission();
+        update_misc_features();
         update_npc();
         update_menu();
         WAIT(0);
