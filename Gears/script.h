@@ -121,7 +121,7 @@ void handlePedalsRealReverse(float logiThrottleVal, float logiBrakeVal);
 //                       Mod functions: Buttons
 ///////////////////////////////////////////////////////////////////////////////
 
-void handleVehicleButtons();
+void checkWheelButtons();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                    Wheel input and force feedback
@@ -180,3 +180,7 @@ void menuClose();
 //                        Script-specific utils
 ///////////////////////////////////////////////////////////////////////////////
 std::vector<float> getDrivenWheelsSpeeds(std::vector<float> wheelSpeeds);
+
+
+void     blockButtons();
+void startStopEngine();

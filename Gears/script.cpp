@@ -146,7 +146,10 @@ void update_hud() {
 }
 
 void update_alt_water() {
-    handleVehicleButtons();
+    if (!controls.WheelControl.IsConnected(controls.SteerGUID))
+        return;
+    
+    checkWheelButtons();
     handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
     doWheelSteering();
     playFFBWater();
@@ -156,9 +159,7 @@ void update_alt_road() {
     if (!controls.WheelControl.IsConnected(controls.SteerGUID))
         return;
 
-    updateSteeringMultiplier();
-    handleVehicleButtons();
-
+    checkWheelButtons();
     if (settings.EnableManual && 
         !(vehData.Class == VehicleClass::Bike && settings.SimpleBike)) {
         handlePedalsRealReverse(controls.ThrottleVal, controls.BrakeVal);
@@ -185,6 +186,10 @@ void update_alt_foot() {
 void update_input_controls() {
     if (!isPlayerAvailable())
         return;
+
+    updateSteeringMultiplier();
+    blockButtons();
+    startStopEngine();
 
     if (!settings.EnableWheel || controls.PrevInput != ScriptControls::Wheel) {
         return;
@@ -1673,50 +1678,52 @@ void functionAutoReverse() {
 // Blocks some vehicle controls on tapping, tries to activate them when holding.
 // TODO: Some original "tap" controls don't work.
 void blockButtons() {
-    if (settings.BlockCarControls && settings.EnableManual && controls.PrevInput == ScriptControls::Controller &&
-        !(settings.ShiftMode == Automatic && ext.GetGearCurr(vehicle) > 1)) {
+    if (!settings.EnableManual || !settings.BlockCarControls ||
+        controls.PrevInput != ScriptControls::Controller ||
+        settings.ShiftMode == Automatic || ext.GetGearCurr(vehicle) == 0) {
+        return;
+    }
 
-        if (controls.UseLegacyController) {
-            for (int i = 0; i < static_cast<int>(ScriptControls::LegacyControlType::SIZEOF_LegacyControlType); i++) {
-                if (controls.ControlNativeBlocks[i] == -1) continue;
-                if (i != (int)ScriptControls::LegacyControlType::ShiftUp && 
-                    i != (int)ScriptControls::LegacyControlType::ShiftDown) continue;
+    if (controls.UseLegacyController) {
+        for (int i = 0; i < static_cast<int>(ScriptControls::LegacyControlType::SIZEOF_LegacyControlType); i++) {
+            if (controls.ControlNativeBlocks[i] == -1) continue;
+            if (i != (int)ScriptControls::LegacyControlType::ShiftUp && 
+                i != (int)ScriptControls::LegacyControlType::ShiftDown) continue;
 
-                if (controls.ButtonHeldOver(static_cast<ScriptControls::LegacyControlType>(i), 200)) {
-                    CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlNativeBlocks[i], 1.0f);
-                }
-                else {
-                    CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlNativeBlocks[i], true);
-                }
-
-                if (controls.ButtonReleasedAfter(static_cast<ScriptControls::LegacyControlType>(i), 200)) {
-                    // todo
-                }
+            if (controls.ButtonHeldOver(static_cast<ScriptControls::LegacyControlType>(i), 200)) {
+                CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlNativeBlocks[i], 1.0f);
             }
-            if (controls.ControlNativeBlocks[(int)ScriptControls::LegacyControlType::Clutch] != -1) {
-                CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlNativeBlocks[(int)ScriptControls::LegacyControlType::Clutch], true);
+            else {
+                CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlNativeBlocks[i], true);
+            }
+
+            if (controls.ButtonReleasedAfter(static_cast<ScriptControls::LegacyControlType>(i), 200)) {
+                // todo
             }
         }
-        else {
-            for (int i = 0; i < static_cast<int>(ScriptControls::ControllerControlType::SIZEOF_ControllerControlType); i++) {
-                if (controls.ControlXboxBlocks[i] == -1) continue;
-                if (i != (int)ScriptControls::ControllerControlType::ShiftUp && 
-                    i != (int)ScriptControls::ControllerControlType::ShiftDown) continue;
+        if (controls.ControlNativeBlocks[(int)ScriptControls::LegacyControlType::Clutch] != -1) {
+            CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlNativeBlocks[(int)ScriptControls::LegacyControlType::Clutch], true);
+        }
+    }
+    else {
+        for (int i = 0; i < static_cast<int>(ScriptControls::ControllerControlType::SIZEOF_ControllerControlType); i++) {
+            if (controls.ControlXboxBlocks[i] == -1) continue;
+            if (i != (int)ScriptControls::ControllerControlType::ShiftUp && 
+                i != (int)ScriptControls::ControllerControlType::ShiftDown) continue;
 
-                if (controls.ButtonHeldOver(static_cast<ScriptControls::ControllerControlType>(i), 200)) {
-                    CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 1.0f);
-                }
-                else {
-                    CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], true);
-                }
+            if (controls.ButtonHeldOver(static_cast<ScriptControls::ControllerControlType>(i), 200)) {
+                CONTROLS::_SET_CONTROL_NORMAL(0, controls.ControlXboxBlocks[i], 1.0f);
+            }
+            else {
+                CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[i], true);
+            }
 
-                if (controls.ButtonReleasedAfter(static_cast<ScriptControls::ControllerControlType>(i), 200)) {
-                    // todo
-                }
+            if (controls.ButtonReleasedAfter(static_cast<ScriptControls::ControllerControlType>(i), 200)) {
+                // todo
             }
-            if (controls.ControlXboxBlocks[(int)ScriptControls::ControllerControlType::Clutch] != -1) {
-                CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[(int)ScriptControls::ControllerControlType::Clutch], true);
-            }
+        }
+        if (controls.ControlXboxBlocks[(int)ScriptControls::ControllerControlType::Clutch] != -1) {
+            CONTROLS::DISABLE_CONTROL_ACTION(0, controls.ControlXboxBlocks[(int)ScriptControls::ControllerControlType::Clutch], true);
         }
     }
 }
@@ -1731,18 +1738,15 @@ void startStopEngine() {
         VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
     }
     if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
-        ((controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) && settings.ToggleEngine) ||
-        (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::Engine) && settings.ToggleEngine) ||
+        (controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::ControllerControlType::Engine) && settings.ToggleEngine ||
+        controls.PrevInput == ScriptControls::Controller	&& controls.ButtonJustPressed(ScriptControls::LegacyControlType::Engine) && settings.ToggleEngine ||
         controls.PrevInput == ScriptControls::Keyboard		&& controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Engine) ||
         controls.PrevInput == ScriptControls::Wheel			&& controls.ButtonJustPressed(ScriptControls::WheelControlType::Engine))) {
         VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
     }
 }
 
-void handleVehicleButtons() {
-    blockButtons();
-    startStopEngine();
-
+void checkWheelButtons() {
     if (!controls.WheelControl.IsConnected(controls.SteerGUID) ||
         controls.PrevInput != ScriptControls::Wheel) {
         return;
