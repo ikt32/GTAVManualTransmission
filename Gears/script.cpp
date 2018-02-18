@@ -78,9 +78,15 @@ extern std::vector<std::string> speedoTypes;
 
 MiniPID pid(1.0, 0.0, 0.0);
 
-// TODO: Player alive and controllable
 bool isPlayerAvailable() {
-    return false;
+    if (!PLAYER::IS_PLAYER_CONTROL_ON(player) || 
+        PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE) || 
+        CUTSCENE::IS_CUTSCENE_PLAYING() ||
+        !ENTITY::DOES_ENTITY_EXIST(playerPed) || 
+        ENTITY::IS_ENTITY_DEAD(playerPed)) {
+        return false;
+    }
+    return true;
 }
 
 bool isVehicleAvailable() {
@@ -117,7 +123,7 @@ void update_inputs() {
 }
 
 void update_hud() {
-    if (!isVehicleAvailable()) {
+    if (!isPlayerAvailable() || !isVehicleAvailable()) {
         return;
     }
 
@@ -177,6 +183,9 @@ void update_alt_foot() {
 // Apply input as controls for selected devices:
 // TODO: Joystick support? More generic support?
 void update_input_controls() {
+    if (!isPlayerAvailable())
+        return;
+
     if (!settings.EnableWheel || controls.PrevInput != ScriptControls::Wheel) {
         return;
     }
@@ -214,6 +223,9 @@ void update_input_controls() {
 
 // don't write with VehicleExtensions and dont set clutch state
 void update_misc_features() {
+    if (!isPlayerAvailable())
+        return;
+
     if (isVehicleAvailable()) {
         if (settings.CrossScript) {
             crossScript();
@@ -301,7 +313,7 @@ void update_manual_features() {
 
 // Manual Transmission part of the mod
 void update_manual_transmission() {
-    if (!isVehicleAvailable()) {
+    if (!isPlayerAvailable() || !isVehicleAvailable()) {
         return;
     }
 
