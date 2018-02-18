@@ -78,25 +78,35 @@ extern std::vector<std::string> speedoTypes;
 
 MiniPID pid(1.0, 0.0, 0.0);
 
+bool isPlayerAvailable() {
+    if (!PLAYER::IS_PLAYER_CONTROL_ON(player) || 
+        PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE) || 
+        CUTSCENE::IS_CUTSCENE_PLAYING() ||
+        !ENTITY::DOES_ENTITY_EXIST(playerPed) || 
+        ENTITY::IS_ENTITY_DEAD(playerPed)) {
+        return false;
+    }
+    return true;
+}
+
+bool isVehicleAvailable() {
+    return vehicle != 0 && 
+        ENTITY::DOES_ENTITY_EXIST(vehicle) && 
+        playerPed == VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1);
+}
+
 void update_globals() {
     player = PLAYER::PLAYER_ID();
     playerPed = PLAYER::PLAYER_PED_ID();
     vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
 }
 
-void update_mod() {
-    ///////////////////////////////////////////////////////////////////////////
-    //                     Is the player the driver?
-    ///////////////////////////////////////////////////////////////////////////
-    if (!vehicle || !ENTITY::DOES_ENTITY_EXIST(vehicle) || 
-        playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
-        stopForceFeedback();
+void update_vehicle() {
+    if (!isVehicleAvailable()) {
+        resetVehicle();
+        lastVehicle = vehicle;
         return;
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    //                       Update vehicle and inputs
-    ///////////////////////////////////////////////////////////////////////////
 
     if (vehicle != lastVehicle) {
         initVehicle();
@@ -104,25 +114,19 @@ void update_mod() {
     lastVehicle = vehicle;
 
     vehData.UpdateValues(ext, vehicle);
+}
 
-    bool ignoreClutch = false;
-    if (settings.ShiftMode == Automatic ||
-        vehData.Class == VehicleClass::Bike && settings.SimpleBike) {
-        ignoreClutch = true;
-    }
-
+// Read inputs
+void update_inputs() {
     updateLastInputDevice();
-    controls.UpdateValues(controls.PrevInput, ignoreClutch, false);
+    controls.UpdateValues(controls.PrevInput, false);
+}
 
-    if (settings.CrossScript) {
-        crossScriptUpdated();
+void update_hud() {
+    if (!isPlayerAvailable() || !isVehicleAvailable()) {
+        return;
     }
 
-    updateSteeringMultiplier();
-
-    ///////////////////////////////////////////////////////////////////////////
-    //                                   HUD
-    ///////////////////////////////////////////////////////////////////////////
     if (settings.DisplayInfo) {
         drawDebugInfo();
     }
@@ -139,109 +143,118 @@ void update_mod() {
         settings.SteeringWheelInfo && textureWheelId != -1) {
         drawInputWheelInfo();
     }
+}
 
-    if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
-        controls.ButtonHeld(ScriptControls::WheelControlType::Toggle, 500) ||
-        controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
-        controls.PrevInput == ScriptControls::Controller	&& controls.ButtonHeld(ScriptControls::LegacyControlType::Toggle)) {
-        toggleManual();
-        return;
-    }
+void update_alt_water() {
+    handleVehicleButtons();
+    handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
+    doWheelSteering();
+    playFFBWater();
+}
 
-    ///////////////////////////////////////////////////////////////////////////
-    //                            Alt vehicle controls
-    ///////////////////////////////////////////////////////////////////////////
-
-    if (settings.EnableWheel && controls.PrevInput == ScriptControls::Wheel) {
-
-        if (vehData.Domain == VehicleDomain::Water) {
-            handleVehicleButtons();
-            handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
-            doWheelSteering();
-            playFFBWater();
-            return;
-        }
-
-    }
-    
-    ///////////////////////////////////////////////////////////////////////////
-    //                          Ground vehicle controls
-    ///////////////////////////////////////////////////////////////////////////
-
-    if (!settings.EnableManual &&
-        settings.EnableWheel && settings.WheelWithoutManual &&
-        controls.WheelControl.IsConnected(controls.SteerGUID)) {
-
-        handleVehicleButtons();
-        handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
-        doWheelSteering();
-        if (vehData.Amphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle) > 0.10f) {
-            playFFBWater();
-        }
-        else {
-            playFFBGround();
-        }
-    }	
-
-    ///////////////////////////////////////////////////////////////////////////
-    //          Active whenever Manual is enabled from here
-    ///////////////////////////////////////////////////////////////////////////
-    if (vehData.Domain != VehicleDomain::Road)
+void update_alt_road() {
+    if (!controls.WheelControl.IsConnected(controls.SteerGUID))
         return;
 
-    if (!settings.EnableManual) {
-        return;
-    }
-
-    if (MemoryPatcher::TotalPatched != MemoryPatcher::NumGearboxPatches) {
-        MemoryPatcher::PatchInstructions();
-    }
-    if (!MemoryPatcher::ShiftUpPatched) {
-        MemoryPatcher::PatchShiftUp();
-    }
-    
+    updateSteeringMultiplier();
     handleVehicleButtons();
 
-    if (settings.EnableWheel && controls.WheelControl.IsConnected(controls.SteerGUID)) {
-        doWheelSteering();
-        if (vehData.Amphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle) > 0.10f) {
-            playFFBWater();
-        }
-        else {
-            playFFBGround();
-        }
-    }
-    
-
-    if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ToggleH) ||
-        controls.ButtonJustPressed(ScriptControls::WheelControlType::ToggleH) ||
-        controls.ButtonHeld(ScriptControls::ControllerControlType::ToggleH) ||
-        controls.PrevInput == ScriptControls::Controller	&& controls.ButtonHeld(ScriptControls::LegacyControlType::ToggleH)) {
-        cycleShiftMode();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    //                            Actual mod operations
-    ///////////////////////////////////////////////////////////////////////////
-
-    // Reverse behavior
-    // For bikes, do this automatically.
-    if (vehData.Class == VehicleClass::Bike && settings.SimpleBike) {
-        if (controls.PrevInput == ScriptControls::InputDevices::Wheel) {
-            handlePedalsDefault( controls.ThrottleVal, controls.BrakeVal );
-        } else {
-            functionAutoReverse();
-        }
+    if (settings.EnableManual && 
+        !(vehData.Class == VehicleClass::Bike && settings.SimpleBike)) {
+        handlePedalsRealReverse(controls.ThrottleVal, controls.BrakeVal);
     }
     else {
-        if (controls.PrevInput == ScriptControls::InputDevices::Wheel) {
-            handlePedalsRealReverse( controls.ThrottleVal, controls.BrakeVal );
-        } else {
+        handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
+    }
+    doWheelSteering();
+    if (vehData.Amphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle) > 0.10f) {
+        playFFBWater();
+    }
+    else {
+        playFFBGround();
+    }
+}
+
+// TODO: Emulate joy input?
+void update_alt_foot() {
+    
+}
+
+// Apply input as controls for selected devices:
+// TODO: Joystick support? More generic support?
+void update_input_controls() {
+    if (!isPlayerAvailable())
+        return;
+
+    if (!settings.EnableWheel || controls.PrevInput != ScriptControls::Wheel) {
+        return;
+    }
+    if (isVehicleAvailable()) {
+        switch (vehData.Domain) {
+        case VehicleDomain::Road: {
+            update_alt_road();
+            break;
+        }
+        case VehicleDomain::Water: {
+            update_alt_water();
+            break;
+        }
+        case VehicleDomain::Air: {
+            break;
+        }
+        case VehicleDomain::Bicycle: {
+            break;
+        }
+        case VehicleDomain::Rail: {
+            break;
+        }
+        case VehicleDomain::Unknown: {
+            break;
+        }
+        default: {
+            ;
+        }
+        }
+    }
+    else if (isPlayerAvailable()) {
+        update_alt_foot();
+    }
+}
+
+// don't write with VehicleExtensions and dont set clutch state
+void update_misc_features() {
+    if (!isPlayerAvailable())
+        return;
+
+    if (isVehicleAvailable()) {
+        if (settings.CrossScript) {
+            crossScript();
+        }
+
+        if (settings.AutoLookBack) {
+            functionAutoLookback();
+        }
+    }
+
+    functionHidePlayerInFPV();
+}
+
+// Only when mod is working or writes clutch stuff.
+// Called inside manual transmission part!
+// Mostly optional stuff.
+void update_manual_features() {
+    if (settings.HillBrakeWorkaround) {
+        functionHillGravity();
+    }
+
+    if (controls.PrevInput != ScriptControls::InputDevices::Wheel) {
+        if (vehData.Class == VehicleClass::Bike && settings.SimpleBike) {
+            functionAutoReverse();
+        }
+        else {
             functionRealReverse();
         }
     }
-
-    functionLimiter();
 
     if (settings.EngBrake) {
         functionEngBrake();
@@ -263,10 +276,8 @@ void update_mod() {
         vehData.EngLockActive = false;
     }
 
-    manageBrakePatch();
-
-    if (!vehData.FakeNeutral && 
-        !(settings.SimpleBike && vehData.Class == VehicleClass::Bike) && 
+    if (!vehData.FakeNeutral &&
+        !(settings.SimpleBike && vehData.Class == VehicleClass::Bike) &&
         !vehData.NoClutch) {
         // Stalling
         if (settings.EngStall && settings.ShiftMode == HPattern ||
@@ -281,7 +292,65 @@ void update_mod() {
         }
     }
 
-    // Manual shifting
+    if (vehData.EngBrakeActive || vehData.EngLockActive) {
+        if (!MemoryPatcher::BrakeDecrementPatched) {
+            MemoryPatcher::PatchBrakeDecrement();
+        }
+    }
+    else {
+        if (MemoryPatcher::BrakeDecrementPatched) {
+            MemoryPatcher::RestoreBrakeDecrement();
+        }
+    }
+
+    if (gearRattle.Active) {
+        if (controls.ClutchVal > 1.0f - settings.ClutchThreshold ||
+            !VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
+            gearRattle.Stop();
+        }
+    }
+}
+
+// Manual Transmission part of the mod
+void update_manual_transmission() {
+    if (!isPlayerAvailable() || !isVehicleAvailable()) {
+        return;
+    }
+
+    //updateSteeringMultiplier();
+
+    if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::Toggle) ||
+        controls.ButtonHeld(ScriptControls::WheelControlType::Toggle, 500) ||
+        controls.ButtonHeld(ScriptControls::ControllerControlType::Toggle) ||
+        controls.PrevInput == ScriptControls::Controller	&& controls.ButtonHeld(ScriptControls::LegacyControlType::Toggle)) {
+        toggleManual();
+        return;
+    }
+
+    if (vehData.Domain != VehicleDomain::Road || !settings.EnableManual)
+        return;
+
+    ///////////////////////////////////////////////////////////////////////////
+    //          Active whenever Manual is enabled from here
+    ///////////////////////////////////////////////////////////////////////////
+
+    if (controls.ButtonJustPressed(ScriptControls::KeyboardControlType::ToggleH) ||
+        controls.ButtonJustPressed(ScriptControls::WheelControlType::ToggleH) ||
+        controls.ButtonHeld(ScriptControls::ControllerControlType::ToggleH) ||
+        controls.PrevInput == ScriptControls::Controller	&& controls.ButtonHeld(ScriptControls::LegacyControlType::ToggleH)) {
+        cycleShiftMode();
+    }
+
+    if (MemoryPatcher::TotalPatched != MemoryPatcher::NumGearboxPatches) {
+        MemoryPatcher::PatchInstructions();
+    }
+    // TODO: Now why did I do this separate from the PatchInstructions()????
+    if (!MemoryPatcher::ShiftUpPatched) {
+        MemoryPatcher::PatchShiftUp();
+    }
+
+    update_manual_features();
+
     switch(settings.ShiftMode) {
         case Sequential: {
             functionSShift();
@@ -307,20 +376,7 @@ void update_mod() {
         default: break;
     }
 
-    if (settings.AutoLookBack) {
-        functionAutoLookback();
-    }
-
-    if (settings.HillBrakeWorkaround) {
-        functionHillGravity();
-    }
-
-    if (gearRattle.Active) {
-        if (controls.ClutchVal > 1.0f - settings.ClutchThreshold ||
-            !VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
-            gearRattle.Stop();
-        }
-    }
+    functionLimiter();
 
     // Finally, update memory each loop
     handleRPM();
@@ -331,7 +387,10 @@ void update_mod() {
 ///////////////////////////////////////////////////////////////////////////////
 //                            Helper things
 ///////////////////////////////////////////////////////////////////////////////
-void crossScriptUpdated() {
+void crossScript() {
+    if (!isVehicleAvailable())
+        return;
+
     // Current gear
     DECORATOR::DECOR_SET_INT(vehicle, (char *)decorCurrentGear, ext.GetGearCurr(vehicle));
 
@@ -370,7 +429,7 @@ void crossScriptUpdated() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void initVehicle() {
-    reset();
+    resetVehicle();
     std::fill(upshiftSpeedsGame.begin(), upshiftSpeedsGame.end(), 0.0f);
     std::fill(upshiftSpeedsMod.begin(), upshiftSpeedsMod.end(), 0.0f);
     vehData = VehicleData();
@@ -393,7 +452,7 @@ void initialize() {
     initWheel();
 }
 
-void reset() {
+void resetVehicle() {
     resetSteeringMultiplier();
     gearRattle.Stop();
     if (MemoryPatcher::TotalPatched == MemoryPatcher::NumGearboxPatches) {
@@ -428,7 +487,7 @@ void toggleManual() {
         VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
     }
     if (!settings.EnableManual) {
-        reset();
+        resetVehicle();
     }
     initialize();
     initSteeringPatches();
@@ -941,6 +1000,68 @@ void functionClutchCatch() {
     }
 }
 
+// im solving the worng problem here help
+std::vector<bool> getDrivenWheels() {
+    int numWheels = ext.GetNumWheels(vehicle);
+    std::vector<bool> wheelsToConsider;
+    if (ext.GetDriveBiasFront(vehicle) > 0.0f && ext.GetDriveBiasFront(vehicle) < 1.0f) {
+        for (int i = 0; i < numWheels; i++)
+            wheelsToConsider.push_back(true);
+    }
+    else {
+        // bikes
+        if (numWheels == 2) {
+            // Front id = 1, rear id = 0...
+            wheelsToConsider.push_back(true);
+            wheelsToConsider.push_back(false);
+        }
+        // normal cars
+        else if (numWheels == 4) {
+            // fwd
+            if (ext.GetDriveBiasFront(vehicle) == 1.0f) {
+                wheelsToConsider.push_back(true);
+                wheelsToConsider.push_back(true);
+                wheelsToConsider.push_back(false);
+                wheelsToConsider.push_back(false);
+            }
+            // rwd
+            else if (ext.GetDriveBiasFront(vehicle) == 0.0f) {
+                wheelsToConsider.push_back(false);
+                wheelsToConsider.push_back(false);
+                wheelsToConsider.push_back(true);
+                wheelsToConsider.push_back(true);
+            }
+        }
+        // offroad, trucks
+        else if (numWheels == 6) {
+            // fwd
+            if (ext.GetDriveBiasFront(vehicle) == 1.0f) {
+                wheelsToConsider.push_back(true);
+                wheelsToConsider.push_back(true);
+                wheelsToConsider.push_back(false);
+                wheelsToConsider.push_back(false);
+                wheelsToConsider.push_back(false);
+                wheelsToConsider.push_back(false);
+            }
+            // rwd
+            else if (ext.GetDriveBiasFront(vehicle) == 0.0f) {
+                wheelsToConsider.push_back(false);
+                wheelsToConsider.push_back(false);
+                wheelsToConsider.push_back(true);
+                wheelsToConsider.push_back(true);
+                wheelsToConsider.push_back(true);
+                wheelsToConsider.push_back(true);
+            }
+        }
+        else {
+            for (int i = 0; i < numWheels; i++)
+                wheelsToConsider.push_back(true);
+        }
+    }
+    return wheelsToConsider;
+}
+
+
 std::vector<float> getDrivenWheelsSpeeds(std::vector<float> wheelSpeeds) {
     std::vector<float> wheelsToConsider;
     if (ext.GetDriveBiasFront(vehicle) > 0.0f && ext.GetDriveBiasFront(vehicle) < 1.0f) {
@@ -1038,67 +1159,6 @@ void functionEngDamage() {
         VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, 
                                            VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (settings.RPMDamage));
     }
-}
-
-// im solving the worng problem here help
-std::vector<bool> getDrivenWheels() {
-    int numWheels = ext.GetNumWheels(vehicle);
-    std::vector<bool> wheelsToConsider;
-    if (ext.GetDriveBiasFront(vehicle) > 0.0f && ext.GetDriveBiasFront(vehicle) < 1.0f) {
-        for (int i = 0; i < numWheels; i++)
-            wheelsToConsider.push_back(true);
-    }
-    else {
-        // bikes
-        if (numWheels == 2) {
-            // Front id = 1, rear id = 0...
-            wheelsToConsider.push_back(true);
-            wheelsToConsider.push_back(false);
-        }
-        // normal cars
-        else if (numWheels == 4) {
-            // fwd
-            if (ext.GetDriveBiasFront(vehicle) == 1.0f) {
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-            }
-            // rwd
-            else if (ext.GetDriveBiasFront(vehicle) == 0.0f) {
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-            }
-        }
-        // offroad, trucks
-        else if (numWheels == 6) {
-            // fwd
-            if (ext.GetDriveBiasFront(vehicle) == 1.0f) {
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-            }
-            // rwd
-            else if (ext.GetDriveBiasFront(vehicle) == 0.0f) {
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-            }
-        }
-        else {
-            for (int i = 0; i < numWheels; i++)
-                wheelsToConsider.push_back(true);
-        }
-    }
-    return wheelsToConsider;
 }
 
 void functionEngLock() {
@@ -1212,18 +1272,18 @@ void functionEngBrake() {
     }
 }
 
-void manageBrakePatch() {
-    if (vehData.EngBrakeActive || vehData.EngLockActive) {
-        if (!MemoryPatcher::BrakeDecrementPatched) {
-            MemoryPatcher::PatchBrakeDecrement();
-        }
-    }
-    else {
-        if (MemoryPatcher::BrakeDecrementPatched) {
-            MemoryPatcher::RestoreBrakeDecrement();
-        }
-    }
-}
+//void manageBrakePatch() {
+//    if (vehData.EngBrakeActive || vehData.EngLockActive) {
+//        if (!MemoryPatcher::BrakeDecrementPatched) {
+//            MemoryPatcher::PatchBrakeDecrement();
+//        }
+//    }
+//    else {
+//        if (MemoryPatcher::BrakeDecrementPatched) {
+//            MemoryPatcher::RestoreBrakeDecrement();
+//        }
+//    }
+//}
 
 ///////////////////////////////////////////////////////////////////////////////
 //                       Mod functions: Gearbox control
@@ -1245,6 +1305,14 @@ void fakeRev(bool customThrottle, float customThrottleVal) {
 }
 
 void handleRPM() {
+    float clutch = controls.ClutchVal;
+
+    // Ignores clutch 
+    if (settings.ShiftMode == Automatic ||
+        vehData.Class == VehicleClass::Bike && settings.SimpleBike) {
+        clutch = 0.0f;
+    }
+
     //bool skip = false;
 
     // Game wants to shift up. Triggered at high RPM, high speed.
@@ -1271,10 +1339,10 @@ void handleRPM() {
         Fix: Map 0.0-1.0 to 0.6-1.0 (clutchdata)
         Fix: Map 0.0-1.0 to 1.0-0.6 (control)
     */
-    float finalClutch = 1.0f - controls.ClutchVal;
+    float finalClutch = 1.0f - clutch;
     
     if (ext.GetGearCurr(vehicle) > 1) {
-        finalClutch = map(controls.ClutchVal, 0.0f, 1.0f, 1.0f, 0.6f);
+        finalClutch = map(clutch, 0.0f, 1.0f, 1.0f, 0.6f);
 
         // The next statement is a workaround for rolling back + brake + gear > 1 because it shouldn't rev then.
         // Also because we're checking on the game Control accel value and not the pedal position
@@ -1283,7 +1351,7 @@ void handleRPM() {
                            controls.ThrottleVal > 0.05f;
 
         // When pressing clutch and throttle, handle clutch and RPM
-        if (controls.ClutchVal > 0.4f && 
+        if (clutch > 0.4f &&
             controls.ThrottleVal > 0.05f &&
             !vehData.FakeNeutral && 
             !rollingback) {
@@ -1297,7 +1365,7 @@ void handleRPM() {
         }
     }
 
-    if (vehData.FakeNeutral || controls.ClutchVal >= 1.0f) {
+    if (vehData.FakeNeutral || clutch >= 1.0f) {
         if (ENTITY::GET_ENTITY_SPEED(vehicle) < 1.0f) {
             finalClutch = -5.0f;
         }
@@ -1333,6 +1401,8 @@ void functionLimiter() {
 ///////////////////////////////////////////////////////////////////////////////
 //                   Mod functions: Reverse/Pedal handling
 ///////////////////////////////////////////////////////////////////////////////
+
+#pragma region region_wheel
 
 // Anti-Deadzone.
 void SetControlADZ(eControl control, float value, float adz) {
@@ -1838,6 +1908,8 @@ void handleVehicleButtons() {
 //                    Wheel input and force feedback
 ///////////////////////////////////////////////////////////////////////////////
 
+#pragma region region_ffb
+
 void doWheelSteering() {
     if (controls.PrevInput != ScriptControls::Wheel)
         return;
@@ -2186,6 +2258,10 @@ void playFFBWater() {
     }
 }
 
+#pragma endregion region_ffb
+
+#pragma endregion region_wheel
+
 ///////////////////////////////////////////////////////////////////////////////
 //                             Misc features
 ///////////////////////////////////////////////////////////////////////////////
@@ -2216,6 +2292,15 @@ void functionHillGravity() {
         if (pitch > 10.0f || clutchNeutral)
             ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
             vehicle, 1, 0.0f, -1 * (pitch / 90.0f) * 0.35f * clutchNeutral, 0.0f, true, true, true, true);
+    }
+}
+
+void functionHidePlayerInFPV() {
+    if (settings.HidePlayerInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4 && isVehicleAvailable()) {
+        ENTITY::SET_ENTITY_VISIBLE(playerPed, false, false);
+    }
+    else {
+        ENTITY::SET_ENTITY_VISIBLE(playerPed, true, false);
     }
 }
 
@@ -2269,35 +2354,6 @@ bool setupGlobals() {
 
     *g_bIsDecorRegisterLockedPtr = 1;
     return true;
-}
-
-bool isPlayerInVehicle() {
-    player = PLAYER::PLAYER_ID();
-    playerPed = PLAYER::PLAYER_PED_ID();
-
-    if (!ENTITY::DOES_ENTITY_EXIST(playerPed) ||
-        !PLAYER::IS_PLAYER_CONTROL_ON(player) ||
-        ENTITY::IS_ENTITY_DEAD(playerPed) ||
-        PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE)) {
-        return false;
-    }
-
-    vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
-
-    if (!vehicle || !ENTITY::DOES_ENTITY_EXIST(vehicle) ||
-        playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
-        return false;
-    }
-    return true;
-}
-
-std::string getInputDevice() {
-    switch (controls.PrevInput) {
-        case ScriptControls::Keyboard: return "Keyboard";
-        case ScriptControls::Controller: return "Controller";
-        case ScriptControls::Wheel: return "Wheel";
-        default: return "Unknown";
-    }
 }
 
 void readSettings() {
@@ -2357,7 +2413,12 @@ void main() {
 
     while (true) {
         update_globals();
-        update_mod();
+        update_inputs();
+        update_vehicle();
+        update_hud();
+        update_input_controls();
+        update_manual_transmission();
+        update_misc_features();
         update_npc();
         update_menu();
         WAIT(0);

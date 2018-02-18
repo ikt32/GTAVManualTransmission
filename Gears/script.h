@@ -56,7 +56,7 @@ void update_npc();
 
 void drawHUD();
 void drawDebugInfo();
-void crossScriptUpdated();
+void crossScript();
 void drawVehicleWheelInfo();
 void drawInputWheelInfo();
 
@@ -66,7 +66,7 @@ void drawInputWheelInfo();
 
 void initVehicle();
 void initialize();
-void reset();
+void resetVehicle();
 void applySteeringMultiplier(float multiplier);
 void resetSteeringMultiplier();
 void toggleManual();
@@ -97,7 +97,7 @@ void functionEngStall();
 void functionEngDamage();
 void functionEngBrake();
 void functionEngLock();
-void manageBrakePatch();
+//void manageBrakePatch();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                       Mod functions: Gearbox control
@@ -140,6 +140,7 @@ void doStickControlAir();
 void functionAutoLookback();
 void functionAutoGear1();
 void functionHillGravity();
+void functionHidePlayerInFPV();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                              Script entry

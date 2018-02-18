@@ -56,6 +56,7 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetBoolValue("OPTIONS", "AutoGear1", AutoGear1);
     settingsGeneral.SetBoolValue("OPTIONS", "AutoLookBack", AutoLookBack);
     settingsGeneral.SetBoolValue("OPTIONS", "ThrottleStart", ThrottleStart);
+    settingsGeneral.SetBoolValue("OPTIONS", "HidePlayerInFPV", HidePlayerInFPV);
 
     settingsGeneral.SetBoolValue("OPTIONS", "CrossScript", CrossScript);
 
@@ -257,6 +258,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
     AutoGear1 = settingsGeneral.GetBoolValue("OPTIONS", "AutoGear1", false);
     AutoLookBack = settingsGeneral.GetBoolValue("OPTIONS", "AutoLookBack", false);
     ThrottleStart = settingsGeneral.GetBoolValue("OPTIONS", "ThrottleStart", true);
+    HidePlayerInFPV = settingsGeneral.GetBoolValue("OPTIONS", "HidePlayerInFPV", false);
 
     CrossScript = settingsGeneral.GetBoolValue("OPTIONS", "CrossScript", true);
 

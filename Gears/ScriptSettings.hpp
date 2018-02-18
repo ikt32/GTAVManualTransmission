@@ -46,10 +46,13 @@ public:
     float RPMDamage = 1.5f;
     int MisshiftDamage = 10;
 
+    // misc stuff
     bool HillBrakeWorkaround = false;
     bool AutoGear1 = false;
     bool AutoLookBack = false;
     bool ThrottleStart = false;
+    bool HidePlayerInFPV = false;
+
     bool CrossScript = false;
 
     // [HUD]

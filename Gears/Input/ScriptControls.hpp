@@ -13,6 +13,9 @@ struct Device {
     GUID guid;
 };
 
+/*
+ * TODO: Only really works for ground domain vehicles
+ */
 class ScriptControls {
 public:
     enum class ControllerControlType {
@@ -155,7 +158,7 @@ public:
     void updateKeyboard();
     void updateController();
     void updateWheel();
-    void UpdateValues(InputDevices prevInput, bool ignoreClutch, bool justPeekingWheelKb);
+    void UpdateValues(InputDevices prevInput, bool skipKeyboardInput);
     InputDevices GetLastInputDevice(InputDevices previousInput, bool enableWheel = true);
 
     // Keyboard controls	
