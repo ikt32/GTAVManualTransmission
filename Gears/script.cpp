@@ -78,6 +78,11 @@ extern std::vector<std::string> speedoTypes;
 
 MiniPID pid(1.0, 0.0, 0.0);
 
+// TODO: Player alive and controllable
+bool isPlayerAvailable() {
+    return false;
+}
+
 bool isVehicleAvailable() {
     return vehicle != 0 && 
         ENTITY::DOES_ENTITY_EXIST(vehicle) && 
@@ -105,6 +110,7 @@ void update_vehicle() {
     vehData.UpdateValues(ext, vehicle);
 }
 
+// Read inputs
 void update_inputs() {
     updateLastInputDevice();
     controls.UpdateValues(controls.PrevInput, false);
@@ -140,56 +146,44 @@ void update_alt_water() {
     playFFBWater();
 }
 
-void update_alt_road(const bool enableManual) {
+void update_alt_road() {
     if (!controls.WheelControl.IsConnected(controls.SteerGUID))
         return;
 
     updateSteeringMultiplier();
-    if (enableManual) {
-        handleVehicleButtons();
-        doWheelSteering();
-        if (vehData.Amphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle) > 0.10f) {
-            playFFBWater();
-        }
-        else {
-            playFFBGround();
-        }
-        if (vehData.Class == VehicleClass::Bike && settings.SimpleBike) {
-            handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
-        }
-        else {
-            handlePedalsRealReverse(controls.ThrottleVal, controls.BrakeVal);
-        }
+    handleVehicleButtons();
+
+    if (settings.EnableManual && 
+        !(vehData.Class == VehicleClass::Bike && settings.SimpleBike)) {
+        handlePedalsRealReverse(controls.ThrottleVal, controls.BrakeVal);
     }
-    // TODO: Remove this option (WheelWithoutManual) in favor of always-on?
-    else if (settings.WheelWithoutManual) {
-        handleVehicleButtons();
+    else {
         handlePedalsDefault(controls.ThrottleVal, controls.BrakeVal);
-        doWheelSteering();
-        if (vehData.Amphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle) > 0.10f) {
-            playFFBWater();
-        }
-        else {
-            playFFBGround();
-        }
+    }
+    doWheelSteering();
+    if (vehData.Amphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle) > 0.10f) {
+        playFFBWater();
+    }
+    else {
+        playFFBGround();
     }
 }
 
-// For alternative (wheel, joy) input
-void update_input_controls(const bool enableManual) {
+// TODO: Emulate joy input?
+void update_alt_foot() {
+    
+}
+
+// Apply input as controls for selected devices:
+// TODO: Joystick support? More generic support?
+void update_input_controls() {
     if (!settings.EnableWheel || controls.PrevInput != ScriptControls::Wheel) {
         return;
     }
-    // oto/truck
-    // motor
-    // fiets
-    // boot
-    // vliegtuig
-    // helikopter
     if (isVehicleAvailable()) {
         switch (vehData.Domain) {
         case VehicleDomain::Road: {
-            update_alt_road(enableManual);
+            update_alt_road();
             break;
         }
         case VehicleDomain::Water: {
@@ -213,8 +207,9 @@ void update_input_controls(const bool enableManual) {
         }
         }
     }
-    // voet
-
+    else if (isPlayerAvailable()) {
+        update_alt_foot();
+    }
 }
 
 // don't write with VehicleExtensions and dont set clutch state
@@ -227,9 +222,9 @@ void update_misc_features() {
         if (settings.AutoLookBack) {
             functionAutoLookback();
         }
-
-
     }
+
+    functionHidePlayerInFPV();
 }
 
 // Only when mod is working or writes clutch stuff.
@@ -2288,6 +2283,15 @@ void functionHillGravity() {
     }
 }
 
+void functionHidePlayerInFPV() {
+    if (settings.HidePlayerInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4 && isVehicleAvailable()) {
+        ENTITY::SET_ENTITY_VISIBLE(playerPed, false, false);
+    }
+    else {
+        ENTITY::SET_ENTITY_VISIBLE(playerPed, true, false);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //                              Script entry
 ///////////////////////////////////////////////////////////////////////////////
@@ -2400,7 +2404,7 @@ void main() {
         update_inputs();
         update_vehicle();
         update_hud();
-        update_input_controls(settings.EnableManual);
+        update_input_controls();
         update_manual_transmission();
         update_misc_features();
         update_npc();

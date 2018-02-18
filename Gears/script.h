@@ -140,6 +140,7 @@ void doStickControlAir();
 void functionAutoLookback();
 void functionAutoGear1();
 void functionHillGravity();
+void functionHidePlayerInFPV();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                              Script entry

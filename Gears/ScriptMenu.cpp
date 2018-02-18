@@ -296,6 +296,11 @@ void update_miscoptionsmenu() {
 
     menu.BoolOption("Clutch + throttle start", settings.ThrottleStart, 
                     { "Allow to start the engine by pressing clutch and throttle, like in DiRT Rally." });
+
+    menu.BoolOption("Hide player in FPV", settings.HidePlayerInFPV, 
+                    { "Hides the player in first person view." });
+
+
 }
 
 void update_finetuneoptionsmenu() {

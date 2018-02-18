@@ -13,6 +13,9 @@ struct Device {
     GUID guid;
 };
 
+/*
+ * TODO: Only really works for ground domain vehicles
+ */
 class ScriptControls {
 public:
     enum class ControllerControlType {
