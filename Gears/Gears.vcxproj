@@ -116,7 +116,7 @@
     <ClCompile Include="..\..\GTAVMenuBase\menusettings.cpp" />
     <ClCompile Include="..\..\GTAVMenuBase\menuutils.cpp" />
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp" />
-    <ClCompile Include="Input\DiJoyStick.cpp" />
+    <ClCompile Include="Input\DIDeviceFactory.cpp" />
     <ClCompile Include="ScriptHUD.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
     <ClCompile Include="ShiftModes.cpp" />
@@ -158,7 +158,7 @@
     <ClInclude Include="Util\MathExt.h" />
     <ClInclude Include="Memory\Offsets.hpp" />
     <ClInclude Include="Util\Paths.h" />
-    <ClInclude Include="Input\DiJoyStick.h" />
+    <ClInclude Include="Input\DIDeviceFactory.h" />
     <ClInclude Include="Input\keyboard.h" />
     <ClInclude Include="Input\ScriptControls.hpp" />
     <ClInclude Include="Input\WheelDirectInput.hpp" />

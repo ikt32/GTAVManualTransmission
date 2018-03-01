@@ -65,10 +65,10 @@
       <Filter>Thirdparty</Filter>
     </ClCompile>
     <ClCompile Include="ScriptHUD.cpp" />
-    <ClCompile Include="Input\DiJoyStick.cpp">
+    <ClCompile Include="ScriptNPC.cpp" />
+    <ClCompile Include="Input\DIDeviceFactory.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="ScriptNPC.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -86,9 +86,6 @@
     </ClInclude>
     <ClInclude Include="ScriptSettings.hpp" />
     <ClInclude Include="VehicleData.hpp" />
-    <ClInclude Include="Input\DiJoyStick.h">
-      <Filter>Input</Filter>
-    </ClInclude>
     <ClInclude Include="Input\keyboard.h">
       <Filter>Input</Filter>
     </ClInclude>
@@ -159,6 +156,9 @@
     <ClInclude Include="newNatives.h" />
     <ClInclude Include="Dump.h">
       <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\DIDeviceFactory.h">
+      <Filter>Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

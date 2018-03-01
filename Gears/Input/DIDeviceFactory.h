@@ -9,32 +9,34 @@
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
-class DiJoyStick {
-public:
-    struct Entry {
-        DIDEVICEINSTANCE diDeviceInstance;
-        DIDEVCAPS diDevCaps;
-        LPDIRECTINPUTDEVICE8 diDevice;
-        DIJOYSTATE2 joystate;
-    };
+struct DIDevice {
+    DIDEVICEINSTANCE diDeviceInstance;
+    DIDEVCAPS diDevCaps;
+    LPDIRECTINPUTDEVICE8 diDevice;
+    DIJOYSTATE2 joystate;
+};
 
-    DiJoyStick();
-    ~DiJoyStick();
-    void clear();
-    void enumerate(LPDIRECTINPUT di,
+
+class DIDeviceFactory {
+public:
+    DIDeviceFactory();
+    ~DIDeviceFactory();
+
+    void Enumerate(LPDIRECTINPUT di,
                    DWORD dwDevType = DI8DEVCLASS_GAMECTRL,
                    LPCDIDATAFORMAT lpdf = &c_dfDIJoystick2,
                    DWORD dwFlags = DIEDFL_ATTACHEDONLY,
                    int maxEntry = 16);
-    int getEntryCount() const;
-    const Entry* getEntry(int index) const;
-    void update() const;
+    int GetEntryCount() const;
+    const DIDevice* GetEntry(int index) const;
+    void Update() const;
 
 protected:
     static BOOL CALLBACK DIEnumDevicesCallback_static(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef);
     BOOL DIEnumDevicesCallback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef);
+    void clear();
 
-    Entry* entry;
+    DIDevice* entry;
     int maxEntry;
     int nEntry;
     LPDIRECTINPUT di;

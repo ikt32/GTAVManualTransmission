@@ -2,7 +2,7 @@
 
 #include <array>
 #include <vector>
-#include "DiJoyStick.h"
+#include "DIDeviceFactory.h"
 #include <unordered_map>
 
 // https://stackoverflow.com/questions/24113864/what-is-the-right-way-to-use-a-guid-as-the-key-in-stdhash-map
@@ -72,7 +72,7 @@ public:
 
     bool InitFFB(GUID guid, DIAxis ffAxis);
     void UpdateCenterSteering(GUID guid, DIAxis steerAxis);
-    const DiJoyStick::Entry *FindEntryFromGUID(GUID guid);
+    const DIDevice *FindEntryFromGUID(GUID guid);
 
     // Should be called every update()
     void Update();
@@ -107,7 +107,7 @@ private:
 
     std::vector<GUID> foundGuids { GUID_NULL };
 
-    DiJoyStick djs;
+    DIDeviceFactory diFactory;
     LPDIRECTINPUT lpDi = nullptr;
 
     // TODO: Group these effects in classes?

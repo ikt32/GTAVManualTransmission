@@ -1,4 +1,4 @@
-#include "DiJoyStick.h"
+#include "DIDeviceFactory.h"
 #include <wbemidl.h>
 #include <oleauto.h>
 #include <wchar.h>
@@ -126,17 +126,17 @@ LCleanup:
 
 
 
-DiJoyStick::DiJoyStick() : entry(nullptr),
+DIDeviceFactory::DIDeviceFactory() : entry(nullptr),
 maxEntry(0),
 nEntry(0),
 di(nullptr),
 lpdf{ nullptr } { }
 
-DiJoyStick::~DiJoyStick() {
+DIDeviceFactory::~DIDeviceFactory() {
     clear();
 }
 
-void DiJoyStick::clear() {
+void DIDeviceFactory::clear() {
     if (entry) {
         delete[] entry;
         entry = nullptr;
@@ -149,10 +149,10 @@ void DiJoyStick::clear() {
 // All on https://msdn.microsoft.com/en-us/library/windows/desktop/microsoft.directx_sdk.reference.dideviceinstance(v=vs.85).aspx
 // dwDevType = DI8DEVTYPE_JOYSTICK
 // dwDevType = DI8DEVTYPE_DRIVING
-void DiJoyStick::enumerate(LPDIRECTINPUT di, DWORD dwDevType, LPCDIDATAFORMAT lpdf, DWORD dwFlags, int maxEntry) {
+void DIDeviceFactory::Enumerate(LPDIRECTINPUT di, DWORD dwDevType, LPCDIDATAFORMAT lpdf, DWORD dwFlags, int maxEntry) {
     clear();
 
-    entry = new Entry[maxEntry];
+    entry = new DIDevice[maxEntry];
     this->di = di;
     this->maxEntry = maxEntry;
     nEntry = 0;
@@ -163,21 +163,21 @@ void DiJoyStick::enumerate(LPDIRECTINPUT di, DWORD dwDevType, LPCDIDATAFORMAT lp
     this->di = nullptr;
 }
 
-int DiJoyStick::getEntryCount() const {
+int DIDeviceFactory::GetEntryCount() const {
     return nEntry;
 }
 
-const DiJoyStick::Entry* DiJoyStick::getEntry(int index) const {
-    const Entry* e = nullptr;
+const DIDevice* DIDeviceFactory::GetEntry(int index) const {
+    const DIDevice* e = nullptr;
     if (index >= 0 && index < nEntry) {
         e = &entry[index];
     }
     return e;
 }
 
-void DiJoyStick::update() const {
+void DIDeviceFactory::Update() const {
     for (int iEntry = 0; iEntry < nEntry; ++iEntry) {
-        Entry& e = entry[iEntry];
+        DIDevice& e = entry[iEntry];
         LPDIRECTINPUTDEVICE8 d = e.diDevice;
 
         if (FAILED(d->Poll())) {
@@ -192,16 +192,16 @@ void DiJoyStick::update() const {
     }
 }
 
-BOOL DiJoyStick::DIEnumDevicesCallback_static(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef) {
-    return reinterpret_cast<DiJoyStick*>(pvRef)->DIEnumDevicesCallback(lpddi, pvRef);
+BOOL DIDeviceFactory::DIEnumDevicesCallback_static(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef) {
+    return reinterpret_cast<DIDeviceFactory*>(pvRef)->DIEnumDevicesCallback(lpddi, pvRef);
 }
 
-BOOL DiJoyStick::DIEnumDevicesCallback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef) {
+BOOL DIDeviceFactory::DIEnumDevicesCallback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef) {
     //if (IsXInputDevice(&lpddi->guidProduct))
     //    return DIENUM_CONTINUE;
 
     if (nEntry < maxEntry) {
-        Entry e = { 0 };
+        DIDevice e = { 0 };
 
         memcpy(&e.diDeviceInstance, lpddi, sizeof(e.diDeviceInstance));
         e.diDevCaps.dwSize = sizeof(e.diDevCaps);

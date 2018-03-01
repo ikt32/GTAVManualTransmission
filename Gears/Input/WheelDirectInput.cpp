@@ -31,8 +31,8 @@ std::string formatError(HRESULT hr) {
 WheelDirectInput::WheelDirectInput() { }
 
 WheelDirectInput::~WheelDirectInput() {
-    for (int i = 0; i < djs.getEntryCount(); i++) {
-        auto device = djs.getEntry(i);
+    for (int i = 0; i < diFactory.GetEntryCount(); i++) {
+        auto device = diFactory.GetEntry(i);
         if (device)
             device->diDevice->Unacquire();
     }
@@ -53,7 +53,7 @@ bool WheelDirectInput::PreInit() {
         nullptr))) {
         return false;
     }
-    djs.enumerate(lpDi);
+    diFactory.Enumerate(lpDi);
     return true;
 }
 
@@ -66,9 +66,9 @@ bool WheelDirectInput::InitWheel() {
         return false;
     }
 
-    logger.Write(INFO, "WHEEL: Found " + std::to_string(djs.getEntryCount()) + " device(s)");
+    logger.Write(INFO, "WHEEL: Found " + std::to_string(diFactory.GetEntryCount()) + " device(s)");
 
-    if (djs.getEntryCount() < 1) {
+    if (diFactory.GetEntryCount() < 1) {
         logger.Write(INFO, "WHEEL: No devices detected");
         return false;
     }
@@ -83,8 +83,8 @@ bool WheelDirectInput::InitWheel() {
     povButtonPrev.clear();
 
     foundGuids.clear();
-    for (int i = 0; i < djs.getEntryCount(); i++) {
-        auto device = djs.getEntry(i);
+    for (int i = 0; i < diFactory.GetEntryCount(); i++) {
+        auto device = diFactory.GetEntry(i);
         std::wstring wDevName = device->diDeviceInstance.tszInstanceName;
         logger.Write(INFO, "WHEEL: Device: " + std::string(wDevName.begin(), wDevName.end()));
 
@@ -146,8 +146,8 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
 }
 
 void WheelDirectInput::UpdateCenterSteering(GUID guid, DIAxis steerAxis) {
-    djs.update(); // TODO: Figure out why this needs to be called TWICE
-    djs.update(); // Otherwise the wheel keeps turning/value is not updated?
+    diFactory.Update(); // TODO: Figure out why this needs to be called TWICE
+    diFactory.Update(); // Otherwise the wheel keeps turning/value is not updated?
     prevTime[guid][steerAxis] = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
     prevPosition[guid][steerAxis] = GetAxisValue(steerAxis, guid);
 }																																						
@@ -155,14 +155,14 @@ void WheelDirectInput::UpdateCenterSteering(GUID guid, DIAxis steerAxis) {
 /*
  * Return NULL when device isn't found
  */
-const DiJoyStick::Entry *WheelDirectInput::FindEntryFromGUID(GUID guid) {
-    if (djs.getEntryCount() > 0) {
+const DIDevice *WheelDirectInput::FindEntryFromGUID(GUID guid) {
+    if (diFactory.GetEntryCount() > 0) {
         if (guid == GUID_NULL) {
             return nullptr;
         }
 
-        for (int i = 0; i < djs.getEntryCount(); i++) {
-            auto tempEntry = djs.getEntry(i);
+        for (int i = 0; i < diFactory.GetEntryCount(); i++) {
+            auto tempEntry = diFactory.GetEntry(i);
             if (guid == tempEntry->diDeviceInstance.guidInstance) {
                 return tempEntry;
             }
@@ -172,7 +172,7 @@ const DiJoyStick::Entry *WheelDirectInput::FindEntryFromGUID(GUID guid) {
 }
 
 void WheelDirectInput::Update() {
-    djs.update();
+    diFactory.Update();
     updateAxisSpeed();
 }
 
@@ -390,7 +390,7 @@ void WheelDirectInput::createCollisionEffect(DWORD axis, int numAxes, DIEFFECT &
  * Deal with stl stuff in __try
  */
 std::string currentEffectAttempt = "";
-void logCreateEffectException(const DiJoyStick::Entry *e) {
+void logCreateEffectException(const DIDevice *e) {
     logger.Write(FATAL, "CreateEffect (%s) caused an exception!", currentEffectAttempt.c_str());
     GUID guid = e->diDeviceInstance.guidInstance;
     wchar_t szGuidW[40] = { 0 };
