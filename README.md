@@ -55,7 +55,7 @@ Clone my [GTAVMenuBase](https://github.com/E66666666/GTAVMenuBase) to the same f
 
 You can read decorators to get some info about this mod.
 
-Example: ```DECORATOR::DECOR_GET_INT(vehicle, "mt_shift_indicator");``` gets the current shift up/down status. Currently this mod exposes 2 variables which can be used in other scripts.
+Example: ```DECORATOR::DECOR_GET_INT(vehicle, "mt_shift_indicator");``` gets the current shift up/down status.
 
 ### Gearbox/Shift mode
 
