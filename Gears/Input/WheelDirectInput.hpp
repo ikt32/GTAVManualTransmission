@@ -66,7 +66,7 @@ public:
 
     WheelDirectInput();
     ~WheelDirectInput();
-    bool PreInit();
+    bool InitDI();
 
     bool InitWheel();
 
@@ -107,7 +107,6 @@ private:
 
     std::vector<GUID> foundGuids { GUID_NULL };
 
-    DIDeviceFactory diFactory;
     LPDIRECTINPUT lpDi = nullptr;
 
     // TODO: Group these effects in classes?

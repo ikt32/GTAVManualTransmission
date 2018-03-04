@@ -7,7 +7,7 @@
 #include "Util/Logger.hpp"
 
 class Logger;
-class ScriptControls;
+class CarControls;
 
 const int NUMGEARS = 8;
 
@@ -15,11 +15,11 @@ class ScriptSettings {
 public:
     ScriptSettings();
     void SetFiles(const std::string &general, const std::string &wheel, const std::string &stick);
-    void Read(ScriptControls* scriptControl);
+    void Read(CarControls* scriptControl);
     void SaveGeneral() const;
-    void SaveController(ScriptControls *scriptControl) const;
-    void SaveWheel(ScriptControls *scriptControl) const;
-    void SaveStick(ScriptControls *scriptControl) const;
+    void SaveController(CarControls *scriptControl) const;
+    void SaveWheel(CarControls *scriptControl) const;
+    void SaveStick(CarControls *scriptControl) const;
 
     // Only use this AFTER wheel settings are read.
     std::vector<GUID> GetGuids();
@@ -186,12 +186,9 @@ public:
     void SteeringAddWheelToKey(const std::string & cs, ptrdiff_t index, int button, const std::string & key_name);
     bool SteeringClearWheelToKey(int button);
 
-    void StickSaveAxis(const std::string &confTag, ptrdiff_t index, const std::string &axis, int minVal, int maxVal);
-
 private:
-    void parseSettingsGeneral(ScriptControls *scriptControl);
-    void parseSettingsWheel(ScriptControls *scriptControl);
-    void parseSettingsStick(ScriptControls *scriptControl);
+    void parseSettingsGeneral(CarControls *scriptControl);
+    void parseSettingsWheel(CarControls *scriptControl);
 
     // Just looks up which GUID corresponds with what number and returns the GUID.
     GUID DeviceIndexToGUID(int device, std::vector<GUID> guids);
@@ -199,6 +196,5 @@ private:
     int nDevices = 0;
     std::string settingsGeneralFile;
     std::string settingsWheelFile;
-    std::string settingsStickFile;
     std::string settingsMenuFile;
 };

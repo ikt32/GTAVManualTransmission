@@ -1,11 +1,11 @@
-#include "ScriptControls.hpp"
+#include "CarControls.hpp"
 
 #include <Windows.h>
 #include "keyboard.h"
 #include "Util/Logger.hpp"
 #include "Util/MathExt.h"
 
-ScriptControls::ScriptControls(): PrevInput(Keyboard),
+CarControls::CarControls(): PrevInput(Keyboard),
                                 WheelControl(),
                                 SteerAxisType(WheelAxisType::Steer),
                                 controller{1},
@@ -13,9 +13,9 @@ ScriptControls::ScriptControls(): PrevInput(Keyboard),
     std::fill(ControlXboxBlocks.begin(), ControlXboxBlocks.end(), -1);
 }
 
-ScriptControls::~ScriptControls() { }
+CarControls::~CarControls() { }
 
-void ScriptControls::InitWheel() {
+void CarControls::InitWheel() {
     if (!WheelControl.InitWheel()) {
         // Initialization failed somehow, so we skip
         return;
@@ -30,14 +30,14 @@ void ScriptControls::InitWheel() {
     }
 }
 
-void ScriptControls::updateKeyboard() {
+void CarControls::updateKeyboard() {
     ThrottleVal = (IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)]) ? 1.0f : 0.0f);
     BrakeVal = (IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Brake)]) ? 1.0f : 0.0f);
     ClutchVal = (IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Clutch)]) ? 1.0f : 0.0f);
     ClutchValRaw = ClutchVal;
 }
 
-void ScriptControls::updateController() {
+void CarControls::updateController() {
     if (UseLegacyController) {
         ThrottleVal = lcontroller.GetAnalogValue(lcontroller.EControlToButton(LegacyControls[static_cast<int>(LegacyControlType::Throttle)]));
         BrakeVal = lcontroller.GetAnalogValue(lcontroller.EControlToButton(LegacyControls[static_cast<int>(LegacyControlType::Brake)]));
@@ -51,7 +51,7 @@ void ScriptControls::updateController() {
     }
 }
 
-void ScriptControls::updateWheel() {
+void CarControls::updateWheel() {
     auto throttleAxis = WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]);
     auto brakeAxis = WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Brake)]);
     auto clutchAxis = WheelControl.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]);
@@ -127,7 +127,7 @@ void ScriptControls::updateWheel() {
     if (InvertClutch) { ClutchVal = 1.0f - ClutchVal; ClutchValRaw = 1.0f - ClutchValRaw; }
 }
 
-void ScriptControls::UpdateValues(InputDevices prevInput, bool skipKeyboardInput) {
+void CarControls::UpdateValues(InputDevices prevInput, bool skipKeyboardInput) {
     if (UseLegacyController) {
         lcontroller.UpdateButtonChangeStates();
     }
@@ -139,8 +139,6 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool skipKeyboardInput
 
     WheelControl.Update();
     WheelControl.UpdateButtonChangeStates();
-
-    //StickControl.Update();
 
     if (!skipKeyboardInput)   
         CheckCustomButtons();
@@ -172,7 +170,7 @@ void ScriptControls::UpdateValues(InputDevices prevInput, bool skipKeyboardInput
 }
 
 // Limitation: Only works for hardcoded input types. Currently throttle.
-ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices previousInput, bool enableWheel) {
+CarControls::InputDevices CarControls::GetLastInputDevice(InputDevices previousInput, bool enableWheel) {
     auto kbThrottleIdx = static_cast<int>(KeyboardControlType::Throttle);
     auto kbBrakeIdx = static_cast<int>(KeyboardControlType::Brake);
     if (IsKeyJustPressed(KBControl[kbThrottleIdx], KeyboardControlType::Throttle) ||
@@ -246,14 +244,14 @@ ScriptControls::InputDevices ScriptControls::GetLastInputDevice(InputDevices pre
  * Keyboard section
  */
 
-bool ScriptControls::IsKeyPressed(int key) {
+bool CarControls::IsKeyPressed(int key) {
     //if (!IsWindowFocused()) return false;
     //if (GetAsyncKeyState(key) & 0x8000) return true;
     if (IsKeyDown(key)) return true;
     return false;
 }
 
-bool ScriptControls::IsKeyJustPressed(int key, KeyboardControlType control) {
+bool CarControls::IsKeyJustPressed(int key, KeyboardControlType control) {
     //KBControlCurr[static_cast<int>(control)] = (GetAsyncKeyState(key) & 0x8000) != 0;
     KBControlCurr[static_cast<int>(control)] = IsKeyPressed(key);//IsKeyDown(key);
     
@@ -267,7 +265,7 @@ bool ScriptControls::IsKeyJustPressed(int key, KeyboardControlType control) {
     return false;
 }
 
-bool ScriptControls::ButtonJustPressed(KeyboardControlType control) {
+bool CarControls::ButtonJustPressed(KeyboardControlType control) {
     if (IsKeyJustPressed(KBControl[static_cast<int>(control)], control))
         return true;
     return false;
@@ -277,7 +275,7 @@ bool ScriptControls::ButtonJustPressed(KeyboardControlType control) {
 * Controller section
 */
 
-bool ScriptControls::ButtonJustPressed(ControllerControlType control) {
+bool CarControls::ButtonJustPressed(ControllerControlType control) {
     if (!controller.IsConnected())
         return false;
     if (controller.IsButtonJustPressed(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState))
@@ -285,7 +283,7 @@ bool ScriptControls::ButtonJustPressed(ControllerControlType control) {
     return false;
 }
 
-bool ScriptControls::ButtonReleased(ControllerControlType control) {
+bool CarControls::ButtonReleased(ControllerControlType control) {
     if (!controller.IsConnected())
         return false;
     if (controller.IsButtonJustReleased(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState))
@@ -293,7 +291,7 @@ bool ScriptControls::ButtonReleased(ControllerControlType control) {
     return false;
 }
 
-bool ScriptControls::ButtonReleasedAfter(ControllerControlType control, int time) {
+bool CarControls::ButtonReleasedAfter(ControllerControlType control, int time) {
     if (!controller.IsConnected())
         return false;
     if (controller.WasButtonHeldForMs(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState, time))
@@ -301,7 +299,7 @@ bool ScriptControls::ButtonReleasedAfter(ControllerControlType control, int time
     return false;
 }
 
-bool ScriptControls::ButtonHeld(ControllerControlType control) {
+bool CarControls::ButtonHeld(ControllerControlType control) {
     if (!controller.IsConnected())
         return false;
     if (controller.WasButtonHeldForMs(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState, CToggleTime))
@@ -309,7 +307,7 @@ bool ScriptControls::ButtonHeld(ControllerControlType control) {
     return false;
 }
 
-bool ScriptControls::ButtonHeldOver(ControllerControlType control, int millis) {
+bool CarControls::ButtonHeldOver(ControllerControlType control, int millis) {
     if (!controller.IsConnected())
         return false;
     if (controller.WasButtonHeldOverMs(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState, millis))
@@ -317,13 +315,13 @@ bool ScriptControls::ButtonHeldOver(ControllerControlType control, int millis) {
     return false;
 }
 
-XboxController::TapState ScriptControls::ButtonTapped(ControllerControlType control) {
+XboxController::TapState CarControls::ButtonTapped(ControllerControlType control) {
     if (!controller.IsConnected())
         return XboxController::TapState::ButtonUp;
     return (controller.WasButtonTapped(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState, MaxTapTime));
 }
 
-bool ScriptControls::ButtonIn(ControllerControlType control) {
+bool CarControls::ButtonIn(ControllerControlType control) {
     if (!controller.IsConnected())
         return false;
     if (controller.IsButtonPressed(controller.StringToButton(ControlXbox[static_cast<int>(control)]), buttonState))
@@ -331,26 +329,26 @@ bool ScriptControls::ButtonIn(ControllerControlType control) {
     return false;
 }
 
-void ScriptControls::SetXboxTrigger(float value) {
+void CarControls::SetXboxTrigger(float value) {
     controller.TriggerValue = value;
     lcontroller.TriggerValue = value;
 }
 
-float ScriptControls::GetXboxTrigger() {
+float CarControls::GetXboxTrigger() {
     return controller.TriggerValue;
 }
 
 /*
  * Legacy stuff
  */
-bool ScriptControls::ButtonJustPressed(LegacyControlType control) {
+bool CarControls::ButtonJustPressed(LegacyControlType control) {
     if (!UseLegacyController) return false;
     auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
     if (lcontroller.IsButtonJustPressed(gameButton))
         return true;
     return false;
 }
-bool ScriptControls::ButtonReleased(LegacyControlType control) {
+bool CarControls::ButtonReleased(LegacyControlType control) {
     if (!UseLegacyController) return false;
     auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
     if (lcontroller.IsButtonJustReleased(gameButton))
@@ -358,7 +356,7 @@ bool ScriptControls::ButtonReleased(LegacyControlType control) {
     return false;
 }
 
-bool ScriptControls::ButtonHeld(LegacyControlType control) {
+bool CarControls::ButtonHeld(LegacyControlType control) {
     if (!UseLegacyController) return false;
     auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
     if (lcontroller.WasButtonHeldForMs(gameButton, CToggleTime))
@@ -366,7 +364,7 @@ bool ScriptControls::ButtonHeld(LegacyControlType control) {
     return false;
 }
 
-bool ScriptControls::ButtonHeldOver(LegacyControlType control, int millis) {
+bool CarControls::ButtonHeldOver(LegacyControlType control, int millis) {
     if (!UseLegacyController) return false;
     auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
     if (lcontroller.WasButtonHeldOverMs(gameButton, millis))
@@ -374,7 +372,7 @@ bool ScriptControls::ButtonHeldOver(LegacyControlType control, int millis) {
     return false;
 }
 
-bool ScriptControls::ButtonIn(LegacyControlType control) {
+bool CarControls::ButtonIn(LegacyControlType control) {
     if (!UseLegacyController) return false;
     auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
     if (lcontroller.IsButtonPressed(gameButton))
@@ -382,13 +380,13 @@ bool ScriptControls::ButtonIn(LegacyControlType control) {
     return false;
 }
 
-LegacyController::TapState ScriptControls::ButtonTapped(LegacyControlType control) {
+LegacyController::TapState CarControls::ButtonTapped(LegacyControlType control) {
     if (!UseLegacyController) return LegacyController::TapState::ButtonUp;
     auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
     return lcontroller.WasButtonTapped(gameButton, MaxTapTime);
 }
 
-bool ScriptControls::ButtonReleasedAfter(LegacyControlType control, int time) {
+bool CarControls::ButtonReleasedAfter(LegacyControlType control, int time) {
     if (!UseLegacyController) return false;
     auto gameButton = lcontroller.EControlToButton(LegacyControls[static_cast<int>(control)]);
     if (lcontroller.WasButtonHeldForMs(gameButton, time))
@@ -400,7 +398,7 @@ bool ScriptControls::ButtonReleasedAfter(LegacyControlType control, int time) {
  * Wheel section
  */
 
-bool ScriptControls::ButtonJustPressed(WheelControlType control) {
+bool CarControls::ButtonJustPressed(WheelControlType control) {
     if (!WheelControl.IsConnected(WheelButtonGUIDs[static_cast<int>(control)]) ||
         WheelButton[static_cast<int>(control)] == -1) {
         return false;
@@ -410,7 +408,7 @@ bool ScriptControls::ButtonJustPressed(WheelControlType control) {
     return false;
 }
 
-bool ScriptControls::ButtonReleased(WheelControlType control) {
+bool CarControls::ButtonReleased(WheelControlType control) {
     if (!WheelControl.IsConnected(WheelButtonGUIDs[static_cast<int>(control)]) ||
         WheelButton[static_cast<int>(control)] == -1) {
         return false;
@@ -420,7 +418,7 @@ bool ScriptControls::ButtonReleased(WheelControlType control) {
     return false;
 }
 
-bool ScriptControls::ButtonHeld(WheelControlType control, int delay) {
+bool CarControls::ButtonHeld(WheelControlType control, int delay) {
     if (!WheelControl.IsConnected(WheelButtonGUIDs[static_cast<int>(control)]) ||
         WheelButton[static_cast<int>(control)] == -1) {
         return false;
@@ -430,7 +428,7 @@ bool ScriptControls::ButtonHeld(WheelControlType control, int delay) {
     return false;
 }
 
-bool ScriptControls::ButtonIn(WheelControlType control) {
+bool CarControls::ButtonIn(WheelControlType control) {
     if (!WheelControl.IsConnected(WheelButtonGUIDs[static_cast<int>(control)]) ||
         WheelButton[static_cast<int>(control)] == -1) {
         return false;
@@ -440,7 +438,7 @@ bool ScriptControls::ButtonIn(WheelControlType control) {
     return false;
 }
 
-void ScriptControls::CheckCustomButtons() {
+void CarControls::CheckCustomButtons() {
     if (!WheelControl.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
         return;
     }
@@ -501,7 +499,7 @@ bool isSupportedDrivingDevice(DWORD dwDevType) {
     }
 }
 
-void ScriptControls::CheckGUIDs(const std::vector<_GUID> & guids) {
+void CarControls::CheckGUIDs(const std::vector<_GUID> & guids) {
     auto foundGuids = WheelControl.GetGuids();
     auto reggdGuids = guids;
     // We're only checking for devices that should be used but aren't found

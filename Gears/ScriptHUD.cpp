@@ -2,7 +2,7 @@
 #include "inc/natives.h"
 
 #include "ScriptSettings.hpp"
-#include "Input/ScriptControls.hpp"
+#include "Input/CarControls.hpp"
 #include "Util/Util.hpp"
 #include <iomanip>
 #include <sstream>
@@ -17,7 +17,7 @@ extern std::string settingsGeneralFile;
 extern std::string settingsWheelFile;
 extern std::string settingsMenuFile;
 
-extern ScriptControls controls;
+extern CarControls carControls;
 extern ScriptSettings settings;
 
 extern int prevNotification;
@@ -212,10 +212,10 @@ void drawDebugInfo() {
     std::stringstream ssClutchInput;
     std::stringstream ssHandbrakInput;
 
-    ssThrottleInput << "Throttle:\t" << controls.ThrottleVal;
-    ssBrakeInput << "Brake:\t\t" << controls.BrakeVal;
-    ssClutchInput << "Clutch:\t\t" << controls.ClutchValRaw;
-    ssHandbrakInput << "Handb:\t\t" << controls.HandbrakeVal;
+    ssThrottleInput << "Throttle:\t" << carControls.ThrottleVal;
+    ssBrakeInput << "Brake:\t\t" << carControls.BrakeVal;
+    ssClutchInput << "Clutch:\t\t" << carControls.ClutchValRaw;
+    ssHandbrakInput << "Handb:\t\t" << carControls.HandbrakeVal;
 
     showText(0.85, 0.050, 0.4, ssThrottleInput.str(), 4);
     showText(0.85, 0.075, 0.4, ssBrakeInput.str(), 4);
@@ -224,7 +224,7 @@ void drawDebugInfo() {
 
     if (settings.EnableWheel) {
         std::stringstream dinputDisplay;
-        dinputDisplay << "Wheel" << (controls.WheelControl.IsConnected(controls.SteerGUID) ? "" : " not") << " present";
+        dinputDisplay << "Wheel" << (carControls.WheelControl.IsConnected(carControls.SteerGUID) ? "" : " not") << " present";
         showText(0.85, 0.150, 0.4, dinputDisplay.str(), 4);
     }
 
@@ -278,8 +278,8 @@ void drawDebugInfo() {
 
 void drawInputWheelInfo() {
     // Steering Wheel
-    float rotation = settings.SteerAngleMax * (controls.SteerVal - 0.5f);
-    if (controls.PrevInput != ScriptControls::Wheel) rotation = 90.0f * -ext.GetSteeringInputAngle(vehicle);
+    float rotation = settings.SteerAngleMax * (carControls.SteerVal - 0.5f);
+    if (carControls.PrevInput != CarControls::Wheel) rotation = 90.0f * -ext.GetSteeringInputAngle(vehicle);
 
     drawTexture(textureWheelId, 0, -9998, 100,
         settings.SteeringWheelTextureSz, settings.SteeringWheelTextureSz,
@@ -293,9 +293,9 @@ void drawInputWheelInfo() {
     float barYBase = (settings.PedalInfoY + settings.PedalInfoH * 0.5f);
 
     GRAPHICS::DRAW_RECT(settings.PedalInfoX, settings.PedalInfoY, 3.0f * barWidth + settings.PedalInfoPadX, settings.PedalInfoH + settings.PedalInfoPadY, 0, 0, 0, 92);
-    GRAPHICS::DRAW_RECT(settings.PedalInfoX - 1.0f*barWidth, barYBase - controls.ThrottleVal*settings.PedalInfoH*0.5f, barWidth, controls.ThrottleVal*settings.PedalInfoH, 0, 255, 0, 255);
-    GRAPHICS::DRAW_RECT(settings.PedalInfoX + 0.0f*barWidth, barYBase - controls.BrakeVal*settings.PedalInfoH*0.5f, barWidth, controls.BrakeVal*settings.PedalInfoH, 255, 0, 0, 255);
-    GRAPHICS::DRAW_RECT(settings.PedalInfoX + 1.0f*barWidth, barYBase - controls.ClutchValRaw*settings.PedalInfoH*0.5f, barWidth, controls.ClutchVal*settings.PedalInfoH, 0, 0, 255, 255);
+    GRAPHICS::DRAW_RECT(settings.PedalInfoX - 1.0f*barWidth, barYBase - carControls.ThrottleVal*settings.PedalInfoH*0.5f, barWidth, carControls.ThrottleVal*settings.PedalInfoH, 0, 255, 0, 255);
+    GRAPHICS::DRAW_RECT(settings.PedalInfoX + 0.0f*barWidth, barYBase - carControls.BrakeVal*settings.PedalInfoH*0.5f, barWidth, carControls.BrakeVal*settings.PedalInfoH, 255, 0, 0, 255);
+    GRAPHICS::DRAW_RECT(settings.PedalInfoX + 1.0f*barWidth, barYBase - carControls.ClutchValRaw*settings.PedalInfoH*0.5f, barWidth, carControls.ClutchVal*settings.PedalInfoH, 0, 0, 255, 255);
 }
 
 std::vector<bool> getWheelLockups(Vehicle handle) {

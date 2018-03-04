@@ -5,7 +5,7 @@
 #include "simpleini/SimpleIni.h"
 #include "Util/Logger.hpp"
 #include "Input/keyboard.h"
-#include "Input/ScriptControls.hpp"
+#include "Input/CarControls.hpp"
 
 #pragma warning(push)
 #pragma warning(disable: 4244)
@@ -15,13 +15,11 @@ ScriptSettings::ScriptSettings() { }
 void ScriptSettings::SetFiles(const std::string &general, const std::string &wheel, const std::string &stick) {
     settingsGeneralFile = general;
     settingsWheelFile = wheel;
-    settingsStickFile = stick;
 }
 
-void ScriptSettings::Read(ScriptControls* scriptControl) {
+void ScriptSettings::Read(CarControls* scriptControl) {
     parseSettingsGeneral(scriptControl);
     parseSettingsWheel(scriptControl);
-    parseSettingsStick(scriptControl);
 }
 
 void ScriptSettings::SaveGeneral() const {
@@ -133,7 +131,7 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SaveFile(settingsGeneralFile.c_str());
 }
 
-void ScriptSettings::SaveController(ScriptControls *scriptControl) const {
+void ScriptSettings::SaveController(CarControls *scriptControl) const {
     CSimpleIniA settingsGeneral;
     settingsGeneral.SetUnicode();
     settingsGeneral.LoadFile(settingsGeneralFile.c_str());
@@ -148,21 +146,21 @@ void ScriptSettings::SaveController(ScriptControls *scriptControl) const {
 
     settingsGeneral.SetLongValue("CONTROLLER", "MaxTapTime", scriptControl->MaxTapTime);
     
-    settingsGeneral.SetLongValue("CONTROLLER", "ShiftUpBlocks", scriptControl->ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)]);
-    settingsGeneral.SetLongValue("CONTROLLER", "ShiftDownBlocks", scriptControl->ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)]);
-    settingsGeneral.SetLongValue("CONTROLLER", "ClutchBlocks", scriptControl->ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::Clutch)]);
+    settingsGeneral.SetLongValue("CONTROLLER", "ShiftUpBlocks", scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)]);
+    settingsGeneral.SetLongValue("CONTROLLER", "ShiftDownBlocks", scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)]);
+    settingsGeneral.SetLongValue("CONTROLLER", "ClutchBlocks", scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)]);
 
     // [CONTROLLER_LEGACY]
     settingsGeneral.SetBoolValue("CONTROLLER_LEGACY", "Enable", scriptControl->UseLegacyController);
-    settingsGeneral.SetLongValue("CONTROLLER_LEGACY", "ShiftUpBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftUp)]);
-    settingsGeneral.SetLongValue("CONTROLLER_LEGACY", "ShiftDownBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftDown)]);
-    settingsGeneral.SetLongValue("CONTROLLER_LEGACY", "ClutchBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::Clutch)]);
+    settingsGeneral.SetLongValue("CONTROLLER_LEGACY", "ShiftUpBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
+    settingsGeneral.SetLongValue("CONTROLLER_LEGACY", "ShiftDownBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
+    settingsGeneral.SetLongValue("CONTROLLER_LEGACY", "ClutchBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
 
     settingsGeneral.SaveFile(settingsGeneralFile.c_str());
 }
 
 // Axis information is saved by its own calibration methods
-void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
+void ScriptSettings::SaveWheel(CarControls *scriptControl) const {
     CSimpleIniA settingsWheel;
     settingsWheel.SetUnicode();
     settingsWheel.LoadFile(settingsWheelFile.c_str());
@@ -216,19 +214,11 @@ void ScriptSettings::SaveWheel(ScriptControls *scriptControl) const {
     settingsWheel.SaveFile(settingsWheelFile.c_str());
 }
 
-void ScriptSettings::SaveStick(ScriptControls *scriptControl) const {
-    CSimpleIniA settingsStick;
-    settingsStick.SetUnicode();
-    settingsStick.LoadFile(settingsStickFile.c_str());
-
-    settingsStick.SaveFile(settingsStickFile.c_str());
-}
-
 std::vector<GUID> ScriptSettings::GetGuids() {
     return reggdGuids;
 }
 
-void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
+void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     CSimpleIniA settingsGeneral;
     settingsGeneral.SetUnicode();
     settingsGeneral.LoadFile(settingsGeneralFile.c_str());
@@ -326,8 +316,8 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
     PedalInfoPadY		  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoPadY", 0.000000);
 
     // [CONTROLLER]
-    scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Toggle)] = settingsGeneral.GetValue("CONTROLLER", "Toggle", "UNKNOWN");
-    scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ToggleH)] = settingsGeneral.GetValue("CONTROLLER", "ToggleShift", "B");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Toggle)] = settingsGeneral.GetValue("CONTROLLER", "Toggle", "UNKNOWN");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ToggleH)] = settingsGeneral.GetValue("CONTROLLER", "ToggleShift", "B");
     BlockCarControls = settingsGeneral.GetBoolValue("CONTROLLER", "BlockCarControls", false);
     IgnoreShiftsUI = settingsGeneral.GetBoolValue("CONTROLLER", "IgnoreShiftsUI", false);
     BlockHShift = settingsGeneral.GetBoolValue("CONTROLLER", "BlockHShift", true);
@@ -343,53 +333,53 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 
     ToggleEngine = settingsGeneral.GetBoolValue("CONTROLLER", "ToggleEngine", false);
 
-    scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)] = settingsGeneral.GetValue("CONTROLLER", "ShiftUp", "A");
-    scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)] = settingsGeneral.GetValue("CONTROLLER", "ShiftDown", "X");
-    scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Clutch)] = settingsGeneral.GetValue("CONTROLLER", "Clutch", "LeftThumbUp");
-    scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Engine)] = settingsGeneral.GetValue("CONTROLLER", "Engine", "DpadDown");
-    scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Throttle)] = settingsGeneral.GetValue("CONTROLLER", "Throttle", "RightTrigger");
-    scriptControl->ControlXbox[static_cast<int>(ScriptControls::ControllerControlType::Brake)] = settingsGeneral.GetValue("CONTROLLER", "Brake", "LeftTrigger");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] = settingsGeneral.GetValue("CONTROLLER", "ShiftUp", "A");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = settingsGeneral.GetValue("CONTROLLER", "ShiftDown", "X");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Clutch)] = settingsGeneral.GetValue("CONTROLLER", "Clutch", "LeftThumbUp");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Engine)] = settingsGeneral.GetValue("CONTROLLER", "Engine", "DpadDown");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Throttle)] = settingsGeneral.GetValue("CONTROLLER", "Throttle", "RightTrigger");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Brake)] = settingsGeneral.GetValue("CONTROLLER", "Brake", "LeftTrigger");
 
-    scriptControl->ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftUp)] = settingsGeneral.GetLongValue("CONTROLLER", "ShiftUpBlocks", -1);
-    scriptControl->ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::ShiftDown)] = settingsGeneral.GetLongValue("CONTROLLER", "ShiftDownBlocks", -1);
-    scriptControl->ControlXboxBlocks[static_cast<int>(ScriptControls::ControllerControlType::Clutch)] = settingsGeneral.GetLongValue("CONTROLLER", "ClutchBlocks", -1);
+    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] = settingsGeneral.GetLongValue("CONTROLLER", "ShiftUpBlocks", -1);
+    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = settingsGeneral.GetLongValue("CONTROLLER", "ShiftDownBlocks", -1);
+    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)] = settingsGeneral.GetLongValue("CONTROLLER", "ClutchBlocks", -1);
 
     // [CONTROLLER_LEGACY]
     scriptControl->UseLegacyController = settingsGeneral.GetBoolValue("CONTROLLER_LEGACY", "Enable", false);
 
-    scriptControl->LegacyControls[static_cast<int>(ScriptControls::LegacyControlType::Toggle)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Toggle", -1);
-    scriptControl->LegacyControls[static_cast<int>(ScriptControls::LegacyControlType::ToggleH)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ToggleH", ControlFrontendCancel);
-    scriptControl->LegacyControls[static_cast<int>(ScriptControls::LegacyControlType::ShiftUp)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftUp", ControlFrontendAccept);
-    scriptControl->LegacyControls[static_cast<int>(ScriptControls::LegacyControlType::ShiftDown)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftDown", ControlFrontendX);
-    scriptControl->LegacyControls[static_cast<int>(ScriptControls::LegacyControlType::Clutch)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Clutch", ControlFrontendAxisY);
-    scriptControl->LegacyControls[static_cast<int>(ScriptControls::LegacyControlType::Engine)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Engine", ControlFrontendDown);
-    scriptControl->LegacyControls[static_cast<int>(ScriptControls::LegacyControlType::Throttle)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Throttle", ControlFrontendLt);
-    scriptControl->LegacyControls[static_cast<int>(ScriptControls::LegacyControlType::Brake)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Brake", ControlFrontendRt);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Toggle)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Toggle", -1);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ToggleH)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ToggleH", ControlFrontendCancel);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftUp", ControlFrontendAccept);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftDown", ControlFrontendX);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Clutch)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Clutch", ControlFrontendAxisY);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Engine)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Engine", ControlFrontendDown);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Throttle)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Throttle", ControlFrontendLt);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Brake)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Brake", ControlFrontendRt);
 
-    scriptControl->ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftUp)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftUpBlocks", -1);
-    scriptControl->ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::ShiftDown)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftDownBlocks", -1);
-    scriptControl->ControlNativeBlocks[static_cast<int>(ScriptControls::LegacyControlType::Clutch)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ClutchBlocks", -1);
+    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftUpBlocks", -1);
+    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftDownBlocks", -1);
+    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ClutchBlocks", -1);
 
     // [KEYBOARD]
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Toggle)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Toggle", "VK_OEM_5"));
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ToggleH)] = str2key(settingsGeneral.GetValue("KEYBOARD", "ToggleH", "VK_OEM_6"));
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ShiftUp)] = str2key(settingsGeneral.GetValue("KEYBOARD", "ShiftUp", "LSHIFT"));
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::ShiftDown)] = str2key(settingsGeneral.GetValue("KEYBOARD", "ShiftDown", "LCTRL"));
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Clutch)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Clutch", "Z"));
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Engine)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Engine", "X"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Toggle)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Toggle", "VK_OEM_5"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleH)] = str2key(settingsGeneral.GetValue("KEYBOARD", "ToggleH", "VK_OEM_6"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftUp)] = str2key(settingsGeneral.GetValue("KEYBOARD", "ShiftUp", "LSHIFT"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftDown)] = str2key(settingsGeneral.GetValue("KEYBOARD", "ShiftDown", "LCTRL"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Clutch)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Clutch", "Z"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Engine)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Engine", "X"));
 
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Throttle)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Throttle", "W"));
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::Brake)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Brake", "S"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Throttle)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Throttle", "W"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Brake)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Brake", "S"));
 
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::HR)] = str2key(settingsGeneral.GetValue("KEYBOARD", "HR", "NUM0"));
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H1)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H1", "NUM1"));
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H2)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H2", "NUM2"));
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H3)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H3", "NUM3"));
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H4)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H4", "NUM4"));
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H5)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H5", "NUM5"));
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H6)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H6", "NUM6"));
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::H7)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H7", "NUM7"));
-    scriptControl->KBControl[static_cast<int>(ScriptControls::KeyboardControlType::HN)] = str2key(settingsGeneral.GetValue("KEYBOARD", "HN", "NUM9"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HR)] = str2key(settingsGeneral.GetValue("KEYBOARD", "HR", "NUM0"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H1)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H1", "NUM1"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H2)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H2", "NUM2"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H3)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H3", "NUM3"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H4)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H4", "NUM4"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H5)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H5", "NUM5"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H6)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H6", "NUM6"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H7", "NUM7"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HN)] = str2key(settingsGeneral.GetValue("KEYBOARD", "HN", "NUM9"));
 
 
 
@@ -403,7 +393,7 @@ void ScriptSettings::parseSettingsGeneral(ScriptControls *scriptControl) {
 
 }
 
-void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
+void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     CSimpleIniA settingsWheel;
     settingsWheel.SetUnicode();
     settingsWheel.LoadFile(settingsWheelFile.c_str());
@@ -483,24 +473,24 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
     nDevices = it;
 
     // [TOGGLE_MOD]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::Toggle)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Toggle)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("TOGGLE_MOD", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::Toggle)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Toggle)] =
         settingsWheel.GetLongValue("TOGGLE_MOD", "BUTTON", -1);
 
     // [CHANGE_SHIFTMODE]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::ToggleH)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::ToggleH)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("CHANGE_SHIFTMODE", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::ToggleH)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ToggleH)] =
         settingsWheel.GetLongValue("CHANGE_SHIFTMODE", "BUTTON", -1);
 
 
     // [STEER]
-    scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Steer)] =
+    scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Steer)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("STEER", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Steer)] =
+    scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Steer)] =
         settingsWheel.GetValue("STEER", "AXLE", "");
-    scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::ForceFeedback)] =
+    scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::ForceFeedback)] =
         settingsWheel.GetValue("STEER", "FFB", "");
     scriptControl->SteerMin = settingsWheel.GetLongValue("STEER", "MIN", -1);
     scriptControl->SteerMax = settingsWheel.GetLongValue("STEER", "MAX", -1);
@@ -513,9 +503,9 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
     SteerAngleBoat = settingsWheel.GetDoubleValue("STEER", "SteerAngleBoat", 360.0);
 
     // [THROTTLE]
-    scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Throttle)] =
+    scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Throttle)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("THROTTLE", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Throttle)] =
+    scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Throttle)] =
         settingsWheel.GetValue("THROTTLE", "AXLE", "");
     scriptControl->ThrottleMin = settingsWheel.GetLongValue("THROTTLE", "MIN", -1);
     scriptControl->ThrottleMax = settingsWheel.GetLongValue("THROTTLE", "MAX", -1);
@@ -523,9 +513,9 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
     ThrottleGamma = settingsWheel.GetDoubleValue("THROTTLE", "GAMMA", 1.0);
 
     // [BRAKES]
-    scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Brake)] =
+    scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Brake)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("BRAKES", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Brake)] =
+    scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Brake)] =
         settingsWheel.GetValue("BRAKES", "AXLE", "");
     scriptControl->BrakeMin = settingsWheel.GetLongValue("BRAKES", "MIN", -1);
     scriptControl->BrakeMax = settingsWheel.GetLongValue("BRAKES", "MAX", -1);
@@ -533,142 +523,142 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
     BrakeGamma = settingsWheel.GetDoubleValue("BRAKES", "GAMMA", 1.0);
 
     // [CLUTCH]
-    scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] =
+    scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Clutch)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("CLUTCH", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Clutch)] =
+    scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Clutch)] =
         settingsWheel.GetValue("CLUTCH", "AXLE", "");
     scriptControl->ClutchMin = settingsWheel.GetLongValue("CLUTCH", "MIN", -1);
     scriptControl->ClutchMax = settingsWheel.GetLongValue("CLUTCH", "MAX", -1);
 
     // [HANDBRAKE_ANALOG]
-    scriptControl->WheelAxesGUIDs[static_cast<int>(ScriptControls::WheelAxisType::Handbrake)] =
+    scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Handbrake)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelAxes[static_cast<int>(ScriptControls::WheelAxisType::Handbrake)] =
+    scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Handbrake)] =
         settingsWheel.GetValue("HANDBRAKE_ANALOG", "AXLE", "");
     scriptControl->HandbrakeMin = settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "MIN", -1);
     scriptControl->HandbrakeMax = settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "MAX", -1);
 
     // [SHIFTER]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::H1)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::H2)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::H3)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::H4)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::H5)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::H6)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::H7)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::HR)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H1)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H2)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H3)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H4)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H5)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H6)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H7)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::HR)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("SHIFTER", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::H1)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H1)] =
         settingsWheel.GetLongValue("SHIFTER", "GEAR_1", -1);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::H2)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H2)] =
         settingsWheel.GetLongValue("SHIFTER", "GEAR_2", -1);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::H3)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H3)] =
         settingsWheel.GetLongValue("SHIFTER", "GEAR_3", -1);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::H4)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H4)] =
         settingsWheel.GetLongValue("SHIFTER", "GEAR_4", -1);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::H5)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H5)] =
         settingsWheel.GetLongValue("SHIFTER", "GEAR_5", -1);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::H6)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H6)] =
         settingsWheel.GetLongValue("SHIFTER", "GEAR_6", -1);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::H7)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H7)] =
         settingsWheel.GetLongValue("SHIFTER", "GEAR_7", -1);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::HR)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::HR)] =
         settingsWheel.GetLongValue("SHIFTER", "GEAR_R", -1);
 
     // [CLUTCH_BUTTON]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::Clutch)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Clutch)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("CLUTCH_BUTTON", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::Clutch)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Clutch)] =
         settingsWheel.GetLongValue("CLUTCH_BUTTON", "BUTTON", -1);
 
     // [SHIFT_UP]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::ShiftUp)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::ShiftUp)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("SHIFT_UP", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::ShiftUp)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ShiftUp)] =
         settingsWheel.GetLongValue("SHIFT_UP", "BUTTON", -1);
 
     // [SHIFT_DOWN]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::ShiftDown)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::ShiftDown)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("SHIFT_DOWN", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::ShiftDown)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ShiftDown)] =
         settingsWheel.GetLongValue("SHIFT_DOWN", "BUTTON", -1);
 
     // [HANDBRAKE]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::Handbrake)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Handbrake)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("HANDBRAKE", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::Handbrake)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Handbrake)] =
         settingsWheel.GetLongValue("HANDBRAKE", "BUTTON", -1);
 
     // [ENGINE]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::Engine)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Engine)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("ENGINE", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::Engine)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Engine)] =
         settingsWheel.GetLongValue("ENGINE", "BUTTON", -1);
 
     // [LIGHTS]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::Lights)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Lights)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("LIGHTS", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::Lights)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Lights)] =
         settingsWheel.GetLongValue("LIGHTS", "BUTTON", -1);
 
     // [HORN]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::Horn)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Horn)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("HORN", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::Horn)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Horn)] =
         settingsWheel.GetLongValue("HORN", "BUTTON", -1);
 
     // [LOOK_BACK]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::LookBack)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::LookBack)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("LOOK_BACK", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::LookBack)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::LookBack)] =
         settingsWheel.GetLongValue("LOOK_BACK", "BUTTON", -1);
     
     // [LOOK_LEFT]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::LookLeft)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::LookLeft)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("LOOK_LEFT", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::LookLeft)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::LookLeft)] =
         settingsWheel.GetLongValue("LOOK_LEFT", "BUTTON", -1);
     
     // [LOOK_RIGHT]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::LookRight)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::LookRight)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("LOOK_RIGHT", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::LookRight)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::LookRight)] =
         settingsWheel.GetLongValue("LOOK_RIGHT", "BUTTON", -1);
 
     // [CHANGE_CAMERA]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::Camera)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Camera)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("CHANGE_CAMERA", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::Camera)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Camera)] =
         settingsWheel.GetLongValue("CHANGE_CAMERA", "BUTTON", -1);
 
     // [RADIO_NEXT]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::RadioNext)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::RadioNext)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("RADIO_NEXT", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::RadioNext)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::RadioNext)] =
         settingsWheel.GetLongValue("RADIO_NEXT", "BUTTON", -1);
 
     // [RADIO_PREVIOUS]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::RadioPrev)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::RadioPrev)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("RADIO_PREVIOUS", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::RadioPrev)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::RadioPrev)] =
         settingsWheel.GetLongValue("RADIO_PREVIOUS", "BUTTON", -1);
 
     // [INDICATOR_LEFT]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::IndicatorLeft)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::IndicatorLeft)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("INDICATOR_LEFT", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::IndicatorLeft)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::IndicatorLeft)] =
         settingsWheel.GetLongValue("INDICATOR_LEFT", "BUTTON", -1);
 
     // [INDICATOR_RIGHT]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::IndicatorRight)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::IndicatorRight)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("INDICATOR_RIGHT", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::IndicatorRight)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::IndicatorRight)] =
         settingsWheel.GetLongValue("INDICATOR_RIGHT", "BUTTON", -1);
 
     // [INDICATOR_HAZARD]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(ScriptControls::WheelControlType::IndicatorHazard)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::IndicatorHazard)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("INDICATOR_HAZARD", "DEVICE", -1), reggdGuids);
-    scriptControl->WheelButton[static_cast<int>(ScriptControls::WheelControlType::IndicatorHazard)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::IndicatorHazard)] =
         settingsWheel.GetLongValue("INDICATOR_HAZARD", "BUTTON", -1);
     
     // [TO_KEYBOARD]
@@ -684,61 +674,6 @@ void ScriptSettings::parseSettingsWheel(ScriptControls *scriptControl) {
         }
     }
 
-}
-
-// We dump the controls in another file, but still combine total information (GUIDs/indexes)
-void ScriptSettings::parseSettingsStick(ScriptControls *scriptControl) {
-    CSimpleIniA settingsStick;
-    settingsStick.SetUnicode();
-    settingsStick.LoadFile(settingsStickFile.c_str());
-
-    // [THROTTLE]
-    scriptControl->StickAxesGUIDs[static_cast<int>(ScriptControls::StickAxisType::Throttle)] =
-        DeviceIndexToGUID(settingsStick.GetLongValue("THROTTLE", "DEVICE", -1), reggdGuids);
-    scriptControl->StickAxes[static_cast<int>(ScriptControls::StickAxisType::Throttle)] =
-        settingsStick.GetValue("THROTTLE", "AXLE", "");
-    scriptControl->PlaneThrottleMin = settingsStick.GetLongValue("THROTTLE", "MIN", -1);
-    scriptControl->PlaneThrottleMax = settingsStick.GetLongValue("THROTTLE", "MAX", -1);
-
-    // [BRAKE]
-    scriptControl->StickAxesGUIDs[static_cast<int>(ScriptControls::StickAxisType::Brake)] =
-        DeviceIndexToGUID(settingsStick.GetLongValue("BRAKE", "DEVICE", -1), reggdGuids);
-    scriptControl->StickAxes[static_cast<int>(ScriptControls::StickAxisType::Brake)] =
-        settingsStick.GetValue("BRAKE", "AXLE", "");
-    scriptControl->PlaneBrakeMin = settingsStick.GetLongValue("BRAKE", "MIN", -1);
-    scriptControl->PlaneBrakeMin = settingsStick.GetLongValue("BRAKE", "MAX", -1);
-
-    // [PITCH]
-    scriptControl->StickAxesGUIDs[static_cast<int>(ScriptControls::StickAxisType::Pitch)] =
-        DeviceIndexToGUID(settingsStick.GetLongValue("PITCH", "DEVICE", -1), reggdGuids);
-    scriptControl->StickAxes[static_cast<int>(ScriptControls::StickAxisType::Pitch)] =
-        settingsStick.GetValue("PITCH", "AXLE", "");
-    scriptControl->PlanePitchMin = settingsStick.GetLongValue("PITCH", "MIN", -1);
-    scriptControl->PlanePitchMin = settingsStick.GetLongValue("PITCH", "MAX", -1);
-
-    // [ROLL]
-    scriptControl->StickAxesGUIDs[static_cast<int>(ScriptControls::StickAxisType::Roll)] =
-        DeviceIndexToGUID(settingsStick.GetLongValue("ROLL", "DEVICE", -1), reggdGuids);
-    scriptControl->StickAxes[static_cast<int>(ScriptControls::StickAxisType::Roll)] =
-        settingsStick.GetValue("ROLL", "AXLE", "");
-    scriptControl->PlaneRollMin = settingsStick.GetLongValue("ROLL", "MIN", -1);
-    scriptControl->PlaneRollMin = settingsStick.GetLongValue("ROLL", "MAX", -1);
-
-    // [RUDDER_L]
-    scriptControl->StickAxesGUIDs[static_cast<int>(ScriptControls::StickAxisType::RudderL)] =
-        DeviceIndexToGUID(settingsStick.GetLongValue("RUDDER_L", "DEVICE", -1), reggdGuids);
-    scriptControl->StickAxes[static_cast<int>(ScriptControls::StickAxisType::RudderL)] =
-        settingsStick.GetValue("RUDDER_L", "AXLE", "");
-    scriptControl->PlaneRudderLMin = settingsStick.GetLongValue("RUDDER_L", "MIN", -1);
-    scriptControl->PlaneRudderLMin = settingsStick.GetLongValue("RUDDER_L", "MAX", -1);
-
-    // [RUDDER_R]
-    scriptControl->StickAxesGUIDs[static_cast<int>(ScriptControls::StickAxisType::RudderR)] =
-        DeviceIndexToGUID(settingsStick.GetLongValue("RUDDER_R", "DEVICE", -1), reggdGuids);
-    scriptControl->StickAxes[static_cast<int>(ScriptControls::StickAxisType::RudderR)] =
-        settingsStick.GetValue("RUDDER_R", "AXLE", "");
-    scriptControl->PlaneRudderRMin = settingsStick.GetLongValue("RUDDER_R", "MIN", -1);
-    scriptControl->PlaneRudderRMin = settingsStick.GetLongValue("RUDDER_R", "MAX", -1);
 }
 
 ptrdiff_t ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, std::string dev_name) {
@@ -837,19 +772,6 @@ bool ScriptSettings::SteeringClearWheelToKey(int button) {
     if (err < 0)
         logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
     return result;
-}
-
-void ScriptSettings::StickSaveAxis(const std::string &confTag, ptrdiff_t index, const std::string &axis, int minVal, int maxVal) {
-    CSimpleIniA settingsStick;
-    settingsStick.SetUnicode();
-    settingsStick.LoadFile(settingsStickFile.c_str());
-    settingsStick.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
-    settingsStick.SetValue(confTag.c_str(), "AXLE", axis.c_str());
-    settingsStick.SetValue(confTag.c_str(), "MIN", std::to_string(minVal).c_str());
-    settingsStick.SetValue(confTag.c_str(), "MAX", std::to_string(maxVal).c_str());
-    int err = settingsStick.SaveFile(settingsStickFile.c_str());
-    if (err < 0)
-        logger.Write(ERROR, "Unable to save to " + settingsStickFile);
 }
 
 void ScriptSettings::KeyboardSaveKey(const std::string &confTag, const std::string &key) {

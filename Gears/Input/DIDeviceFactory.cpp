@@ -124,7 +124,10 @@ LCleanup:
     return bIsXinputDevice;
 }
 
-
+DIDeviceFactory & DIDeviceFactory::Get() {
+    static DIDeviceFactory instance;
+    return instance;
+}
 
 DIDeviceFactory::DIDeviceFactory() : entry(nullptr),
 maxEntry(0),

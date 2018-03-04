@@ -16,11 +16,9 @@ struct DIDevice {
     DIJOYSTATE2 joystate;
 };
 
-
 class DIDeviceFactory {
 public:
-    DIDeviceFactory();
-    ~DIDeviceFactory();
+    static DIDeviceFactory& Get();
 
     void Enumerate(LPDIRECTINPUT di,
                    DWORD dwDevType = DI8DEVCLASS_GAMECTRL,
@@ -32,6 +30,8 @@ public:
     void Update() const;
 
 protected:
+    DIDeviceFactory();
+    ~DIDeviceFactory();
     static BOOL CALLBACK DIEnumDevicesCallback_static(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef);
     BOOL DIEnumDevicesCallback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef);
     void clear();

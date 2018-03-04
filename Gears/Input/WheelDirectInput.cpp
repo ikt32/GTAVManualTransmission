@@ -27,12 +27,11 @@ std::string formatError(HRESULT hr) {
     }
 }
 
-
 WheelDirectInput::WheelDirectInput() { }
 
 WheelDirectInput::~WheelDirectInput() {
-    for (int i = 0; i < diFactory.GetEntryCount(); i++) {
-        auto device = diFactory.GetEntry(i);
+    for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
+        auto device = DIDeviceFactory::Get().GetEntry(i);
         if (device)
             device->diDevice->Unacquire();
     }
@@ -43,32 +42,31 @@ WheelDirectInput::~WheelDirectInput() {
     SAFE_RELEASE(lpDi);
 }
 
-bool WheelDirectInput::PreInit() {
-    //logger.Write("WHEEL: Preparing DiJoystick");
-    // Just set up to ensure djs can always be used.
-    if (FAILED(DirectInput8Create(GetModuleHandle(nullptr),
-        DIRECTINPUT_VERSION,
-        IID_IDirectInput8,
-        reinterpret_cast<void**>(&lpDi),
-        nullptr))) {
+bool WheelDirectInput::InitDI() {
+    HRESULT result = DirectInput8Create(GetModuleHandle(nullptr),
+                                        DIRECTINPUT_VERSION,
+                                        IID_IDirectInput8,
+                                        reinterpret_cast<void**>(&lpDi),
+                                        nullptr);
+
+    if (FAILED(result)) {
+        logger.Write(ERROR, "WHEEL: Failed setting up DirectInput interface");
         return false;
     }
-    diFactory.Enumerate(lpDi);
+    DIDeviceFactory::Get().Enumerate(lpDi);
     return true;
 }
 
 bool WheelDirectInput::InitWheel() {
     logger.Write(INFO, "WHEEL: Initializing input devices"); 
-
     logger.Write(INFO, "WHEEL: Setting up DirectInput interface");
-    if (!PreInit()) {
-        logger.Write(ERROR, "WHEEL: Failed setting up DirectInput interface");
+    if (!InitDI()) {
         return false;
     }
 
-    logger.Write(INFO, "WHEEL: Found " + std::to_string(diFactory.GetEntryCount()) + " device(s)");
+    logger.Write(INFO, "WHEEL: Found " + std::to_string(DIDeviceFactory::Get().GetEntryCount()) + " device(s)");
 
-    if (diFactory.GetEntryCount() < 1) {
+    if (DIDeviceFactory::Get().GetEntryCount() < 1) {
         logger.Write(INFO, "WHEEL: No devices detected");
         return false;
     }
@@ -83,8 +81,8 @@ bool WheelDirectInput::InitWheel() {
     povButtonPrev.clear();
 
     foundGuids.clear();
-    for (int i = 0; i < diFactory.GetEntryCount(); i++) {
-        auto device = diFactory.GetEntry(i);
+    for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
+        auto device = DIDeviceFactory::Get().GetEntry(i);
         std::wstring wDevName = device->diDeviceInstance.tszInstanceName;
         logger.Write(INFO, "WHEEL: Device: " + std::string(wDevName.begin(), wDevName.end()));
 
@@ -146,8 +144,8 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
 }
 
 void WheelDirectInput::UpdateCenterSteering(GUID guid, DIAxis steerAxis) {
-    diFactory.Update(); // TODO: Figure out why this needs to be called TWICE
-    diFactory.Update(); // Otherwise the wheel keeps turning/value is not updated?
+    DIDeviceFactory::Get().Update(); // TODO: Figure out why this needs to be called TWICE
+    DIDeviceFactory::Get().Update(); // Otherwise the wheel keeps turning/value is not updated?
     prevTime[guid][steerAxis] = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
     prevPosition[guid][steerAxis] = GetAxisValue(steerAxis, guid);
 }																																						
@@ -156,13 +154,13 @@ void WheelDirectInput::UpdateCenterSteering(GUID guid, DIAxis steerAxis) {
  * Return NULL when device isn't found
  */
 const DIDevice *WheelDirectInput::FindEntryFromGUID(GUID guid) {
-    if (diFactory.GetEntryCount() > 0) {
+    if (DIDeviceFactory::Get().GetEntryCount() > 0) {
         if (guid == GUID_NULL) {
             return nullptr;
         }
 
-        for (int i = 0; i < diFactory.GetEntryCount(); i++) {
-            auto tempEntry = diFactory.GetEntry(i);
+        for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
+            auto tempEntry = DIDeviceFactory::Get().GetEntry(i);
             if (guid == tempEntry->diDeviceInstance.guidInstance) {
                 return tempEntry;
             }
@@ -172,7 +170,7 @@ const DIDevice *WheelDirectInput::FindEntryFromGUID(GUID guid) {
 }
 
 void WheelDirectInput::Update() {
-    diFactory.Update();
+    DIDeviceFactory::Get().Update();
     updateAxisSpeed();
 }
 

@@ -13,10 +13,7 @@ struct Device {
     GUID guid;
 };
 
-/*
- * TODO: Only really works for ground domain vehicles
- */
-class ScriptControls {
+class CarControls {
 public:
     enum class ControllerControlType {
         ShiftUp,
@@ -106,21 +103,10 @@ public:
         SIZEOF_WheelAxisType
     };
 
-    enum class StickAxisType {
-        Throttle,
-        Brake,
-        Pitch,
-        Roll,
-        RudderL,
-        RudderR,
-        SIZEOF_StickAxisType
-    };
-
     enum InputDevices {
         Keyboard = 0,
         Controller = 1,
-        Wheel = 2,
-//		Stick = 3,
+        Wheel = 2
     };
 
     const std::vector<std::pair<std::string, int>> LegacyControlsMap = {
@@ -151,8 +137,8 @@ public:
         { "ControlFrontendSelect",		217 },
     };
 
-    ScriptControls();
-    ~ScriptControls();
+    CarControls();
+    ~CarControls();
 
     void InitWheel();
     void updateKeyboard();
@@ -229,26 +215,6 @@ public:
     float DZSteer = 0.0f;
     float DZSteerOffset = 0.0f;
 
-    float PlaneThrottle		= 0.0f;
-    float PlaneBrake		= 0.0f;
-    float PlanePitch		= 0.0f;
-    float PlaneRoll			= 0.0f;
-    float PlaneRudderL		= 0.0f;
-    float PlaneRudderR		= 0.0f;
-
-    int PlaneThrottleMin	= 0;
-    int PlaneThrottleMax	= 0;
-    int PlaneBrakeMin		= 0;
-    int PlaneBrakeMax		= 0;
-    int PlanePitchMin		= 0;
-    int PlanePitchMax		= 0;
-    int PlaneRollMin		= 0;
-    int PlaneRollMax		= 0;
-    int PlaneRudderLMin		= 0;
-    int PlaneRudderLMax		= 0;
-    int PlaneRudderRMin		= 0;
-    int PlaneRudderRMax		= 0;
-
     std::array<std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
     std::array<int, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXboxBlocks = {};
 
@@ -268,12 +234,6 @@ public:
     GUID WheelToKeyGUID = {};
     WheelDirectInput WheelControl;
     WheelAxisType SteerAxisType;
-
-    std::array<std::string, static_cast<int>(StickAxisType::SIZEOF_StickAxisType)> StickAxes = {};
-    std::array<GUID, static_cast<int>(StickAxisType::SIZEOF_StickAxisType)> StickAxesGUIDs = {};
-    std::array<int, static_cast<int>(StickAxisType::SIZEOF_StickAxisType)> StickButton = {};
-    std::array<GUID, static_cast<int>(StickAxisType::SIZEOF_StickAxisType)> StickButtonGUIDs = {};
-    //GenDInput StickControl;
 
     std::vector<Device> FreeDevices{};
 
