@@ -130,7 +130,7 @@ public:
     int LogLevel = INFO;
     bool ShowNPCInfo = false;
 
-    std::vector<GUID> reggdGuids;
+    std::vector<GUID> RegisteredGUIDs;
 
     // settings_wheel.ini parts
     // [OPTIONS]

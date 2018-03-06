@@ -145,20 +145,14 @@ void update_hud() {
     }
 }
 
-void update_alt_water() {
-    if (!carControls.WheelControl.IsConnected(carControls.SteerGUID))
-        return;
-    
+void wheelControlWater() {
     checkWheelButtons();
     handlePedalsDefault(carControls.ThrottleVal, carControls.BrakeVal);
     doWheelSteering();
     playFFBWater();
 }
 
-void update_alt_road() {
-    if (!carControls.WheelControl.IsConnected(carControls.SteerGUID))
-        return;
-
+void wheelControlRoad() {
     checkWheelButtons();
     if (settings.EnableManual && 
         !(vehData.Class == VehicleClass::Bike && settings.SimpleBike)) {
@@ -188,15 +182,19 @@ void update_input_controls() {
     if (!settings.EnableWheel || carControls.PrevInput != CarControls::Wheel) {
         return;
     }
+
+    if (!carControls.WheelAvailable())
+        return;
+
     if (isVehicleAvailable()) {
         switch (vehData.Domain) {
         case VehicleDomain::Road: {
-            update_alt_road();
+            wheelControlRoad();
             break;
         }
         case VehicleDomain::Water: {
             // TODO: Option to disable for water
-            update_alt_water();
+            wheelControlWater();
             break;
         }
         case VehicleDomain::Air: {
@@ -493,18 +491,13 @@ void toggleManual() {
 
 void initWheel() {
     carControls.InitWheel();
-    carControls.CheckGUIDs(settings.reggdGuids);
+    carControls.CheckGUIDs(settings.RegisteredGUIDs);
     carControls.SteerGUID = carControls.WheelAxesGUIDs[static_cast<int>(carControls.SteerAxisType)];
     logger.Write(INFO, "WHEEL: Steering wheel initialization finished");
 }
 
 void stopForceFeedback() {
-    if (carControls.WheelControl.IsConnected(carControls.SteerGUID)) {
-        if (settings.LogiLEDs) {
-            carControls.WheelControl.PlayLedsDInput(carControls.SteerGUID, 0.0, 0.5, 1.0);
-        }
-        carControls.WheelControl.StopEffects();
-    }
+    carControls.StopFFB(settings.LogiLEDs);
 }
 
 void initSteeringPatches() {
@@ -1739,8 +1732,7 @@ void startStopEngine() {
 }
 
 void checkWheelButtons() {
-    if (!carControls.WheelControl.IsConnected(carControls.SteerGUID) ||
-        carControls.PrevInput != CarControls::Wheel) {
+    if (carControls.PrevInput != CarControls::Wheel) {
         return;
     }
 
@@ -2113,8 +2105,7 @@ float getSteeringLock() {
 
 void playFFBGround() {
     if (!settings.EnableFFB ||
-        carControls.PrevInput != CarControls::Wheel ||
-        !carControls.WheelControl.IsConnected(carControls.SteerGUID)) {
+        carControls.PrevInput != CarControls::Wheel) {
         return;
     }
 
@@ -2124,7 +2115,7 @@ void playFFBGround() {
     }
 
     if (settings.LogiLEDs) {
-        carControls.WheelControl.PlayLedsDInput(carControls.SteerGUID, vehData.RPM, 0.45, 0.95);
+        carControls.PlayLEDs(vehData.RPM, 0.45f, 0.95f);
     }
 
     auto suspensionStates = ext.GetWheelsOnGround(vehicle);
@@ -2172,24 +2163,24 @@ void playFFBGround() {
     int totalForce = satForce + detailForce;
     totalForce = (int)((float)totalForce * rotationScale);
     totalForce = calculateSoftLock(totalForce);
+    carControls.PlayFFBDynamics(totalForce, damperForce);
 
-    auto ffAxis = carControls.WheelControl.StringToAxis(carControls.WheelAxes[static_cast<int>(CarControls::WheelAxisType::ForceFeedback)]);
-    carControls.WheelControl.SetConstantForce(carControls.SteerGUID, ffAxis, totalForce);
-    carControls.WheelControl.SetDamper(carControls.SteerGUID, ffAxis, damperForce);
-
-    float gforce = abs(vehData.GetRelativeAccelerationAverage().y) / 9.81f;
     const float minGforce = 5.0f;
     const float maxGforce = 50.0f;
-    if (gforce > minGforce) {
-        float res = map(gforce, minGforce, maxGforce, 500.0f, 10000.0f) * settings.CollisionMult;
-        carControls.WheelControl.SetCollision(carControls.SteerGUID, ffAxis, (int)res);
-        if (settings.DisplayInfo) {
-            std::string info = "Collision @ ~r~" + std::to_string(gforce) + "G~w~~n~";
-            std::string info2 = "FFB: " + std::to_string((int)res);
-            showNotification(mtPrefix + info + info2, &prevNotification);
-        }
+    const float minForce = 500.0f;
+    const float maxForce = 10000.0f;
+    float gForce = abs(vehData.GetRelativeAccelerationAverage().y) / 9.81f;
+    bool collision = gForce > minGforce;
+    int res = static_cast<int>(map(gForce, minGforce, maxGforce, minForce, maxForce) * settings.CollisionMult);
+    if (collision) {
+        carControls.PlayFFBCollision(res);
     }
-    
+
+    if (settings.DisplayInfo && collision) {
+        std::string info = "Collision @ ~r~" + std::to_string(gForce) + "G~w~~n~";
+        std::string info2 = "FFB: " + std::to_string(res);
+        showNotification(mtPrefix + info + info2, &prevNotification);
+    }
     if (settings.DisplayInfo) {
         showText(0.85, 0.275, 0.4, std::string(abs(satForce) > 10000 ? "~r~" : "~w~") + "FFBSat:\t\t" + std::to_string(satForce) + "~w~", 4);
         showText(0.85, 0.300, 0.4, std::string(abs(totalForce) > 10000 ? "~r~" : "~w~") + "FFBFin:\t\t" + std::to_string(totalForce) + "~w~", 4);
@@ -2199,8 +2190,7 @@ void playFFBGround() {
 
 void playFFBWater() {
     if (!settings.EnableFFB ||
-        carControls.PrevInput != CarControls::Wheel ||
-        !carControls.WheelControl.IsConnected(carControls.SteerGUID)) {
+        carControls.PrevInput != CarControls::Wheel) {
         return;
     }
 
@@ -2210,7 +2200,7 @@ void playFFBWater() {
     }
 
     if (settings.LogiLEDs) {
-        carControls.WheelControl.PlayLedsDInput(carControls.SteerGUID, vehData.RPM, 0.45, 0.95);
+        carControls.PlayLEDs(vehData.RPM, 0.45f, 0.95f);
     }
 
     auto suspensionStates = ext.GetWheelsOnGround(vehicle);
@@ -2228,10 +2218,7 @@ void playFFBWater() {
     int totalForce = satForce + detailForce;
     totalForce = (int)((float)totalForce * rotationScale);
     totalForce = calculateSoftLock(totalForce);
-
-    auto ffAxis = carControls.WheelControl.StringToAxis(carControls.WheelAxes[static_cast<int>(CarControls::WheelAxisType::ForceFeedback)]);
-    carControls.WheelControl.SetConstantForce(carControls.SteerGUID, ffAxis, totalForce);
-    carControls.WheelControl.SetDamper(carControls.SteerGUID, ffAxis, damperForce);
+    carControls.PlayFFBDynamics(totalForce, damperForce);
 
     if (settings.DisplayInfo) {
         showText(0.85, 0.275, 0.4, std::string(abs(satForce) > 10000 ? "~r~" : "~w~") + "FFBSat:\t\t" + std::to_string(satForce) + "~w~", 4);

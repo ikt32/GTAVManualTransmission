@@ -179,6 +179,12 @@ public:
     void CheckCustomButtons();
 
     void CheckGUIDs(const std::vector<_GUID> &guids);
+    void PlayFFBDynamics(int totalForce, int damperForce);
+    void PlayFFBCollision(int collisionForce);
+    void PlayLEDs(float rpm, float firstLed, float lastLed);
+    void StopFFB(bool turnOffLeds);
+    bool WheelAvailable();
+    WheelDirectInput& GetWheel();
 
     InputDevices PrevInput = Controller;
 
@@ -232,7 +238,6 @@ public:
 
     GUID SteerGUID;
     GUID WheelToKeyGUID = {};
-    WheelDirectInput WheelControl;
     WheelAxisType SteerAxisType;
 
     std::vector<Device> FreeDevices{};
@@ -326,6 +331,7 @@ public:
     }
 
 private:
+    WheelDirectInput mWheelInput;
     long long pressTime = 0;
     long long releaseTime = 0;
     LegacyController lcontroller;

@@ -188,7 +188,7 @@ void update_mainmenu() {
               "Full name: " + device.name })) {
             settings.SteeringAppendDevice(device.guid, device.name);
             settings.Read(&carControls);
-            carControls.CheckGUIDs(settings.reggdGuids);
+            carControls.CheckGUIDs(settings.RegisteredGUIDs);
         }
     }
 
@@ -760,7 +760,7 @@ void update_buttonsmenu() {
     for (int i = 0; i < MAX_RGBBUTTONS; i++) {
         if (carControls.WheelToKey[i] != -1) {
             wheelToKeyInfo.push_back(std::to_string(i) + " = " + key2str(carControls.WheelToKey[i]));
-            if (carControls.WheelControl.IsButtonPressed(i, carControls.WheelToKeyGUID)) {
+            if (carControls.GetWheel().IsButtonPressed(i, carControls.WheelToKeyGUID)) {
                 wheelToKeyInfo.back() += " (Pressed)";
             }
         }
@@ -1016,11 +1016,11 @@ void update_menu() {
 // Wheel section
 // Look at that argument list! :D
 bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> startStates, GUID &selectedGUID, std::string &selectedAxis, int hyst, bool &positive, int &startValue_) {
-    for (auto guid : carControls.WheelControl.GetGuids()) {
+    for (auto guid : carControls.GetWheel().GetGuids()) {
         for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
             for (auto startState : startStates) {
-                std::string axisName = carControls.WheelControl.DIAxisHelper[i];
-                int axisValue = carControls.WheelControl.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid);
+                std::string axisName = carControls.GetWheel().DIAxisHelper[i];
+                int axisValue = carControls.GetWheel().GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid);
                 int startValue = std::get<2>(startState);
                 if (std::get<0>(startState) == guid &&
                     std::get<1>(startState) == axisName) {
@@ -1045,7 +1045,7 @@ bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> sta
 }
 
 void saveAxis(const std::string &confTag, GUID devGUID, std::string axis, int min, int max) {
-    std::wstring wDevName = carControls.WheelControl.FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
+    std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     std::string devName = std::string(wDevName.begin(), wDevName.end());
     auto index = settings.SteeringAppendDevice(devGUID, devName);
     settings.SteeringSaveAxis(confTag, index, axis, min, max);
@@ -1056,7 +1056,7 @@ void saveAxis(const std::string &confTag, GUID devGUID, std::string axis, int mi
 }
 
 void saveButton(const std::string &confTag, GUID devGUID, int button) {
-    std::wstring wDevName = carControls.WheelControl.FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
+    std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
     auto index = settings.SteeringAppendDevice(devGUID, devName.c_str());
     settings.SteeringSaveButton(confTag, index, button);
@@ -1064,7 +1064,7 @@ void saveButton(const std::string &confTag, GUID devGUID, int button) {
 }
 
 void addWheelToKey(const std::string &confTag, GUID devGUID, int button, std::string keyName) {
-    std::wstring wDevName = carControls.WheelControl.FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
+    std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
     auto index = settings.SteeringAppendDevice(devGUID, devName.c_str());
     settings.SteeringAddWheelToKey(confTag, index, button, keyName);
@@ -1072,7 +1072,7 @@ void addWheelToKey(const std::string &confTag, GUID devGUID, int button, std::st
 }
 
 void saveHShifter(const std::string &confTag, GUID devGUID, std::array<int, NUMGEARS> buttonArray) {
-    std::wstring wDevName = carControls.WheelControl.FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
+    std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
     auto index = settings.SteeringAppendDevice(devGUID, devName);
     settings.SteeringSaveHShifter(confTag, index, buttonArray.data());
@@ -1185,10 +1185,10 @@ bool configAxis(std::string str) {
     carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
     // Save current state
     std::vector<std::tuple<GUID, std::string, int>> startStates;
-    for (auto guid : carControls.WheelControl.GetGuids()) {
+    for (auto guid : carControls.GetWheel().GetGuids()) {
         for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
-            std::string axisName = carControls.WheelControl.DIAxisHelper[i];
-            int axisValue = carControls.WheelControl.GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid);
+            std::string axisName = carControls.GetWheel().DIAxisHelper[i];
+            int axisValue = carControls.GetWheel().GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid);
             startStates.push_back(std::tuple<GUID, std::string, int>(guid, axisName, axisValue));
         }
     }
@@ -1225,7 +1225,7 @@ bool configAxis(std::string str) {
         return true;
     }
 
-    int prevAxisValue = carControls.WheelControl.GetAxisValue(carControls.WheelControl.StringToAxis(selectedAxis), selectedGUID);
+    int prevAxisValue = carControls.GetWheel().GetAxisValue(carControls.GetWheel().StringToAxis(selectedAxis), selectedGUID);
 
     // and up again!
     while (true) {
@@ -1234,7 +1234,7 @@ bool configAxis(std::string str) {
         }
         carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
-        int axisValue = carControls.WheelControl.GetAxisValue(carControls.WheelControl.StringToAxis(selectedAxis), selectedGUID);
+        int axisValue = carControls.GetWheel().GetAxisValue(carControls.GetWheel().StringToAxis(selectedAxis), selectedGUID);
 
         if (positive && axisValue < prevAxisValue) {
             endValue = prevAxisValue;
@@ -1280,17 +1280,17 @@ bool configWheelToKey() {
         carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
         if (progress == 0) {
-            for (auto guid : carControls.WheelControl.GetGuids()) {
+            for (auto guid : carControls.GetWheel().GetGuids()) {
                 for (int i = 0; i < MAX_RGBBUTTONS; i++) {
-                    if (carControls.WheelControl.IsButtonJustReleased(i, guid)) {
+                    if (carControls.GetWheel().IsButtonJustReleased(i, guid)) {
                         selectedGuid = guid;
                         button = i;
                         progress++;
                     }
                 }
                 //POV hat
-                for (auto d : carControls.WheelControl.POVDirections) {
-                    if (carControls.WheelControl.IsButtonJustReleased(d, guid)) {
+                for (auto d : carControls.GetWheel().POVDirections) {
+                    if (carControls.GetWheel().IsButtonJustReleased(d, guid)) {
                         selectedGuid = guid;
                         button = d;
                         progress++;
@@ -1340,16 +1340,16 @@ bool configButton(std::string str) {
         }
         carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
-        for (auto guid : carControls.WheelControl.GetGuids()) {
+        for (auto guid : carControls.GetWheel().GetGuids()) {
             for (int i = 0; i < MAX_RGBBUTTONS; i++) {
-                if (carControls.WheelControl.IsButtonJustReleased(i, guid)) {
+                if (carControls.GetWheel().IsButtonJustReleased(i, guid)) {
                     saveButton(confTag, guid, i);
                     return true;
                 }
             }
 
-            for (auto d : carControls.WheelControl.POVDirections) {
-                if (carControls.WheelControl.IsButtonJustReleased(d, guid)) {
+            for (auto d : carControls.GetWheel().POVDirections) {
+                if (carControls.GetWheel().IsButtonJustReleased(d, guid)) {
                     saveButton(confTag, guid, d);
                     return true;
                 }
@@ -1382,10 +1382,10 @@ bool configHPattern() {
 
         carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
-        for (auto guid : carControls.WheelControl.GetGuids()) {
+        for (auto guid : carControls.GetWheel().GetGuids()) {
             for (int i = 0; i < MAX_RGBBUTTONS; i++) {
                 // only find unregistered buttons
-                if (carControls.WheelControl.IsButtonJustPressed(i, guid) &&
+                if (carControls.GetWheel().IsButtonJustPressed(i, guid) &&
                     find(begin(buttonArray), end(buttonArray), i) == end(buttonArray)) {
                     if (progress == 0) { // also save device info when just started
                         devGUID = guid;
@@ -1399,7 +1399,6 @@ bool configHPattern() {
                 }
             }
         }
-
 
         if (progress > 7) {
             break;

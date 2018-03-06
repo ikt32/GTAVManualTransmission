@@ -224,7 +224,7 @@ void drawDebugInfo() {
 
     if (settings.EnableWheel) {
         std::stringstream dinputDisplay;
-        dinputDisplay << "Wheel" << (carControls.WheelControl.IsConnected(carControls.SteerGUID) ? "" : " not") << " present";
+        dinputDisplay << "Wheel" << (carControls.WheelAvailable() ? "" : " not") << " present";
         showText(0.85, 0.150, 0.4, dinputDisplay.str(), 4);
     }
 
