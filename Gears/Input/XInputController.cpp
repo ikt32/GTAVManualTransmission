@@ -1,12 +1,13 @@
-#include "XboxController.hpp"
+#include "XInputController.hpp"
 #include "../Util/TimeHelper.hpp"
 #include <string>
 
-XboxController::XboxController(int playerNumber) {
-    controllerNum = playerNumber - 1;
+XInputController::XInputController(int playerNumber)
+    : buttonState(0)
+    , controllerNum(playerNumber - 1) {
 }
 
-XINPUT_STATE XboxController::GetState() {
+XINPUT_STATE XInputController::GetState() {
     // Zeroise the state
     ZeroMemory(&controllerState, sizeof(XINPUT_STATE));
 
@@ -16,7 +17,7 @@ XINPUT_STATE XboxController::GetState() {
     return controllerState;
 }
 
-bool XboxController::IsConnected() {
+bool XInputController::IsConnected() {
     // Zeroise the state
     ZeroMemory(&controllerState, sizeof(XINPUT_STATE));
 
@@ -29,7 +30,7 @@ bool XboxController::IsConnected() {
     return false;
 }
 
-void XboxController::Vibrate(int leftVal, int rightVal) const {
+void XInputController::Vibrate(int leftVal, int rightVal) const {
     // Create a Vibraton State
     XINPUT_VIBRATION Vibration;
 
@@ -44,7 +45,7 @@ void XboxController::Vibrate(int leftVal, int rightVal) const {
     XInputSetState(controllerNum, &Vibration);
 }
 
-bool XboxController::IsButtonPressed(XboxButtons buttonType, WORD buttonState) {
+bool XInputController::IsButtonPressed(XboxButtons buttonType) {
     if (buttonType == LeftTrigger ||
         buttonType == RightTrigger ||
         buttonType == LeftThumbLeft ||
@@ -55,13 +56,13 @@ bool XboxController::IsButtonPressed(XboxButtons buttonType, WORD buttonState) {
         buttonType == LeftThumbDown ||
         buttonType == RightThumbUp ||
         buttonType == RightThumbDown) {
-        return (GetAnalogValue(buttonType, buttonState) > TriggerValue);
+        return (GetAnalogValue(buttonType) > TriggerValue);
     }
     return (buttonState & XboxButtonMasks[buttonType]) != 0;
 }
 
-bool XboxController::IsButtonJustPressed(XboxButtons buttonType, WORD buttonState) {
-    xboxButtonCurr[buttonType] = IsButtonPressed(buttonType, buttonState);
+bool XInputController::IsButtonJustPressed(XboxButtons buttonType) {
+    xboxButtonCurr[buttonType] = IsButtonPressed(buttonType);
 
     // raising edge
     if (xboxButtonCurr[buttonType] && !xboxButtonPrev[buttonType]) {
@@ -70,8 +71,8 @@ bool XboxController::IsButtonJustPressed(XboxButtons buttonType, WORD buttonStat
     return false;
 }
 
-bool XboxController::IsButtonJustReleased(XboxButtons buttonType, WORD buttonState) {
-    xboxButtonCurr[buttonType] = IsButtonPressed(buttonType, buttonState);
+bool XInputController::IsButtonJustReleased(XboxButtons buttonType) {
+    xboxButtonCurr[buttonType] = IsButtonPressed(buttonType);
 
     // falling edge
     if (!xboxButtonCurr[buttonType] && xboxButtonPrev[buttonType]) {
@@ -80,11 +81,11 @@ bool XboxController::IsButtonJustReleased(XboxButtons buttonType, WORD buttonSta
     return false;
 }
 
-bool XboxController::WasButtonHeldForMs(XboxButtons buttonType, WORD buttonState, int milliseconds) {
-    if (IsButtonJustPressed(buttonType, buttonState)) {
+bool XInputController::WasButtonHeldForMs(XboxButtons buttonType, int milliseconds) {
+    if (IsButtonJustPressed(buttonType)) {
         pressTime[buttonType] = milliseconds_now();
     }
-    if (IsButtonJustReleased(buttonType, buttonState)) {
+    if (IsButtonJustReleased(buttonType)) {
         releaseTime[buttonType] = milliseconds_now();
     }
 
@@ -96,12 +97,12 @@ bool XboxController::WasButtonHeldForMs(XboxButtons buttonType, WORD buttonState
     return false;
 }
 
-bool XboxController::WasButtonHeldOverMs(XboxButtons buttonType, WORD buttonState, int millis) {
-    if (IsButtonJustPressed(buttonType, buttonState)) {
+bool XInputController::WasButtonHeldOverMs(XboxButtons buttonType, int millis) {
+    if (IsButtonJustPressed(buttonType)) {
         pressTime[buttonType] = milliseconds_now();
     }
 
-    if (IsButtonPressed(buttonType, buttonState) &&
+    if (IsButtonPressed(buttonType) &&
         pressTime[buttonType] != 0 &&
         milliseconds_now() - pressTime[buttonType] >= millis) {
         return true;
@@ -109,11 +110,11 @@ bool XboxController::WasButtonHeldOverMs(XboxButtons buttonType, WORD buttonStat
     return false;
 }
 
-XboxController::TapState XboxController::WasButtonTapped(XboxButtons buttonType, WORD buttonState, int milliseconds) {
-    if (IsButtonJustPressed(buttonType, buttonState)) {
+XInputController::TapState XInputController::WasButtonTapped(XboxButtons buttonType, int milliseconds) {
+    if (IsButtonJustPressed(buttonType)) {
         tapPressTime[buttonType] = milliseconds_now();
     }
-    if (IsButtonJustReleased(buttonType, buttonState)) {
+    if (IsButtonJustReleased(buttonType)) {
         tapReleaseTime[buttonType] = milliseconds_now();
     }
 
@@ -129,13 +130,13 @@ XboxController::TapState XboxController::WasButtonTapped(XboxButtons buttonType,
     return TapState::ButtonUp;
 }
 
-void XboxController::UpdateButtonChangeStates() {
+void XInputController::UpdateButtonChangeStates() {
     for (int i = 0; i < SIZEOF_XboxButtons; i++) {
         xboxButtonPrev[i] = xboxButtonCurr[i];
     }
 }
 
-XboxController::XboxButtons XboxController::StringToButton(std::string& buttonString) {
+XInputController::XboxButtons XInputController::StringToButton(std::string& buttonString) {
     for (int i = 0; i < SIZEOF_XboxButtons; i++) {
         if (buttonString == XboxButtonsHelper[i]) {
             return static_cast<XboxButtons>(i);
@@ -144,7 +145,7 @@ XboxController::XboxButtons XboxController::StringToButton(std::string& buttonSt
     return UNKNOWN;
 }
 
-float XboxController::GetAnalogValue(XboxButtons buttonType, WORD buttonState) {
+float XInputController::GetAnalogValue(XboxButtons buttonType) {
     switch (buttonType) {
         case LeftTrigger:		return static_cast<float>(controllerState.Gamepad.bLeftTrigger) / 255;
         case RightTrigger:		return static_cast<float>(controllerState.Gamepad.bRightTrigger) / 255;
@@ -156,11 +157,16 @@ float XboxController::GetAnalogValue(XboxButtons buttonType, WORD buttonState) {
         case LeftThumbDown:		return filterDeadzone(buttonType, controllerState.Gamepad.sThumbLY);
         case RightThumbUp:		return filterDeadzone(buttonType, controllerState.Gamepad.sThumbRY);
         case RightThumbDown:	return filterDeadzone(buttonType, controllerState.Gamepad.sThumbRY);
-        default:				return IsButtonPressed(buttonType, buttonState) ? 1.0f : 0.0f;
+        default:				return IsButtonPressed(buttonType) ? 1.0f : 0.0f;
     }
 }
 
-float XboxController::filterDeadzone(XboxButtons buttonType, int input) {
+void XInputController::Update() {
+    buttonState = GetState().Gamepad.wButtons;
+    UpdateButtonChangeStates();
+}
+
+float XInputController::filterDeadzone(XboxButtons buttonType, int input) {
     int deadzone;
     switch (buttonType) {
         case LeftThumbLeft:

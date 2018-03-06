@@ -8,9 +8,6 @@
     <ClCompile Include="Input\keyboard.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="Input\XboxController.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
     <ClCompile Include="Input\WheelDirectInput.cpp">
       <Filter>Input</Filter>
     </ClCompile>
@@ -69,6 +66,9 @@
     <ClCompile Include="Input\CarControls.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="Input\XInputController.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -87,9 +87,6 @@
     <ClInclude Include="ScriptSettings.hpp" />
     <ClInclude Include="VehicleData.hpp" />
     <ClInclude Include="Input\keyboard.h">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Input\XboxController.hpp">
       <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="Input\WheelDirectInput.hpp">
@@ -158,6 +155,9 @@
       <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="Input\CarControls.hpp">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\XInputController.hpp">
       <Filter>Input</Filter>
     </ClInclude>
   </ItemGroup>

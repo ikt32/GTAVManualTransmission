@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "XboxController.hpp"
+#include "XInputController.hpp"
 #include "WheelDirectInput.hpp"
 #include "LegacyController.h"
 
@@ -158,7 +158,7 @@ public:
     bool ButtonReleasedAfter(ControllerControlType control, int time);
     bool ButtonHeld(ControllerControlType control);
     bool ButtonHeldOver(ControllerControlType control, int millis);
-    XboxController::TapState ButtonTapped(ControllerControlType control);
+    XInputController::TapState ButtonTapped(ControllerControlType control);
     bool ButtonIn(ControllerControlType control);
     void SetXboxTrigger(float value);
     float GetXboxTrigger();
@@ -242,12 +242,9 @@ public:
 
     std::vector<Device> FreeDevices{};
 
-    XboxController *GetRawController() {
-        return &controller;
-    }
-
-    WORD GetButtonState() const {
-        return buttonState;
+    // TODO: Make interface or some other global-ish stuff
+    XInputController *GetRawController() {
+        return &mXInputController;
     }
 
     int ConfTagKB2key(const std::string &confTag) {
@@ -332,11 +329,8 @@ public:
 
 private:
     WheelDirectInput mWheelInput;
-    long long pressTime = 0;
-    long long releaseTime = 0;
-    LegacyController lcontroller;
-    XboxController controller;
-    WORD buttonState;
+    LegacyController mNativeController;
+    XInputController mXInputController;
 
     bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
     bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};

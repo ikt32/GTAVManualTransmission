@@ -744,12 +744,12 @@ void functionSShift() {
     auto ncTapStateDn = carControls.ButtonTapped(CarControls::LegacyControlType::ShiftDown);
 
     if (settings.IgnoreShiftsUI && isUIActive()) {
-        xcTapStateUp = xcTapStateDn = XboxController::TapState::ButtonUp;
+        xcTapStateUp = xcTapStateDn = XInputController::TapState::ButtonUp;
         ncTapStateUp = ncTapStateDn = LegacyController::TapState::ButtonUp;
     }
 
     // Shift up
-    if (carControls.PrevInput == CarControls::Controller	&& xcTapStateUp == XboxController::TapState::Tapped ||
+    if (carControls.PrevInput == CarControls::Controller	&& xcTapStateUp == XInputController::TapState::Tapped ||
         carControls.PrevInput == CarControls::Controller	&& ncTapStateUp == LegacyController::TapState::Tapped ||
         carControls.PrevInput == CarControls::Keyboard		&& carControls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftUp) ||
         carControls.PrevInput == CarControls::Wheel			&& carControls.ButtonJustPressed(CarControls::WheelControlType::ShiftUp)) {
@@ -790,7 +790,7 @@ void functionSShift() {
 
     // Shift down
 
-    if (carControls.PrevInput == CarControls::Controller	&& xcTapStateDn == XboxController::TapState::Tapped ||
+    if (carControls.PrevInput == CarControls::Controller	&& xcTapStateDn == XInputController::TapState::Tapped ||
         carControls.PrevInput == CarControls::Controller	&& ncTapStateDn == LegacyController::TapState::Tapped ||
         carControls.PrevInput == CarControls::Keyboard		&& carControls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftDown) ||
         carControls.PrevInput == CarControls::Wheel			&& carControls.ButtonJustPressed(CarControls::WheelControlType::ShiftDown)) {
@@ -841,12 +841,12 @@ bool subAShiftManual() {
     auto ncTapStateDn = carControls.ButtonTapped(CarControls::LegacyControlType::ShiftDown);
 
     if (settings.IgnoreShiftsUI && isUIActive()) {
-        xcTapStateUp = xcTapStateDn = XboxController::TapState::ButtonUp;
+        xcTapStateUp = xcTapStateDn = XInputController::TapState::ButtonUp;
         ncTapStateUp = ncTapStateDn = LegacyController::TapState::ButtonUp;
     }
 
     // Shift up
-    if (carControls.PrevInput == CarControls::Controller	&& xcTapStateUp == XboxController::TapState::Tapped ||
+    if (carControls.PrevInput == CarControls::Controller	&& xcTapStateUp == XInputController::TapState::Tapped ||
         carControls.PrevInput == CarControls::Controller	&& ncTapStateUp == LegacyController::TapState::Tapped ||
         carControls.PrevInput == CarControls::Keyboard		&& carControls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftUp) ||
         carControls.PrevInput == CarControls::Wheel			&& carControls.ButtonJustPressed(CarControls::WheelControlType::ShiftUp)) {
@@ -865,7 +865,7 @@ bool subAShiftManual() {
     }
 
     // Shift down
-    if (carControls.PrevInput == CarControls::Controller	&& xcTapStateDn == XboxController::TapState::Tapped ||
+    if (carControls.PrevInput == CarControls::Controller	&& xcTapStateDn == XInputController::TapState::Tapped ||
         carControls.PrevInput == CarControls::Controller	&& ncTapStateDn == LegacyController::TapState::Tapped ||
         carControls.PrevInput == CarControls::Keyboard		&& carControls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftDown) ||
         carControls.PrevInput == CarControls::Wheel			&& carControls.ButtonJustPressed(CarControls::WheelControlType::ShiftDown)) {

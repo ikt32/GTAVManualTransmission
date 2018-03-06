@@ -3,7 +3,7 @@
 #include <Xinput.h>
 #include <array>
 
-class XboxController {
+class XInputController {
 public:
     enum class TapState {
         ButtonUp,
@@ -100,6 +100,7 @@ public:
 
 private:
     XINPUT_STATE controllerState;
+    WORD buttonState;
     int controllerNum;
     std::array<__int64, SIZEOF_XboxButtons> pressTime;
     std::array<__int64, SIZEOF_XboxButtons> releaseTime;
@@ -112,22 +113,23 @@ private:
     std::array<bool, SIZEOF_XboxButtons> xboxButtonPrev;
 
 public:
-    explicit XboxController(int playerNumber);
+    explicit XInputController(int playerNumber);
     XINPUT_STATE GetState();
     bool IsConnected();
     void Vibrate(int leftval = 0, int rightval = 0) const;
 
-    bool IsButtonPressed(XboxButtons buttonType, WORD buttonState);
-    bool IsButtonJustPressed(XboxButtons buttonType, WORD buttonState);
-    bool IsButtonJustReleased(XboxButtons buttonType, WORD buttonState);
-    bool WasButtonHeldForMs(XboxButtons buttonType, WORD buttonState, int milliseconds);
-    bool WasButtonHeldOverMs(XboxButtons xbox_buttons, WORD button_state, int millis);
-    TapState WasButtonTapped(XboxButtons buttonType, WORD buttonState, int milliseconds);
+    bool IsButtonPressed(XboxButtons buttonType);
+    bool IsButtonJustPressed(XboxButtons buttonType);
+    bool IsButtonJustReleased(XboxButtons buttonType);
+    bool WasButtonHeldForMs(XboxButtons buttonType, int milliseconds);
+    bool WasButtonHeldOverMs(XboxButtons xbox_buttons, int millis);
+    TapState WasButtonTapped(XboxButtons buttonType, int milliseconds);
     void UpdateButtonChangeStates();
 
 
     XboxButtons StringToButton(std::string& buttonString);
 
     // Returns a 0.0 to 1.0 value for any button
-    float GetAnalogValue(XboxButtons buttonType, WORD buttonState);
+    float GetAnalogValue(XboxButtons buttonType);
+    void Update();
 };

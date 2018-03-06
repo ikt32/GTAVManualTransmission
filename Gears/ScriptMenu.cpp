@@ -1468,7 +1468,7 @@ bool configKeyboardKey(const std::string &confTag) {
 // Controller
 bool configControllerButton(const std::string &confTag) {
     std::string additionalInfo = "Press " + escapeKey + " to exit.";
-    XboxController* rawController = carControls.GetRawController();
+    XInputController* rawController = carControls.GetRawController();
     if (rawController == nullptr)
         return false;
 
@@ -1479,7 +1479,7 @@ bool configControllerButton(const std::string &confTag) {
         carControls.UpdateValues(CarControls::InputDevices::Controller, true);
         for (std::string buttonHelper : rawController->XboxButtonsHelper) {
             auto button = rawController->StringToButton(buttonHelper);
-            if (rawController->IsButtonJustPressed(button, carControls.GetButtonState())) {
+            if (rawController->IsButtonJustPressed(button)) {
                 saveControllerButton(confTag, buttonHelper);
                 return true;
             }
