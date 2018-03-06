@@ -3,7 +3,7 @@
 #include "script.h"
 #include "inc/natives.h"
 
-#include "Input/LegacyController.h"
+#include "Input/NativeController.h"
 #include "Memory/VehicleExtensions.hpp"
 #include "Memory/MemoryPatcher.hpp"
 #include "ScriptSettings.hpp"

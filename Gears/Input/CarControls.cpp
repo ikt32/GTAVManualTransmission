@@ -128,10 +128,9 @@ void CarControls::updateWheel() {
 
 void CarControls::UpdateValues(InputDevices prevInput, bool skipKeyboardInput) {
     if (UseLegacyController) {
-        mNativeController.UpdateButtonChangeStates();
+        mNativeController.Update();
     }
-
-    if (!UseLegacyController && mXInputController.IsConnected()) {
+    else {
         mXInputController.Update();
     }
 
@@ -274,66 +273,52 @@ bool CarControls::ButtonJustPressed(KeyboardControlType control) {
 */
 
 bool CarControls::ButtonJustPressed(ControllerControlType control) {
-    if (!mXInputController.IsConnected())
-        return false;
     if (mXInputController.IsButtonJustPressed(mXInputController.StringToButton(ControlXbox[static_cast<int>(control)])))
         return true;
     return false;
 }
 
 bool CarControls::ButtonReleased(ControllerControlType control) {
-    if (!mXInputController.IsConnected())
-        return false;
     if (mXInputController.IsButtonJustReleased(mXInputController.StringToButton(ControlXbox[static_cast<int>(control)])))
         return true;
     return false;
 }
 
 bool CarControls::ButtonReleasedAfter(ControllerControlType control, int time) {
-    if (!mXInputController.IsConnected())
-        return false;
     if (mXInputController.WasButtonHeldForMs(mXInputController.StringToButton(ControlXbox[static_cast<int>(control)]), time))
         return true;
     return false;
 }
 
 bool CarControls::ButtonHeld(ControllerControlType control) {
-    if (!mXInputController.IsConnected())
-        return false;
     if (mXInputController.WasButtonHeldForMs(mXInputController.StringToButton(ControlXbox[static_cast<int>(control)]), CToggleTime))
         return true;
     return false;
 }
 
 bool CarControls::ButtonHeldOver(ControllerControlType control, int millis) {
-    if (!mXInputController.IsConnected())
-        return false;
     if (mXInputController.WasButtonHeldOverMs(mXInputController.StringToButton(ControlXbox[static_cast<int>(control)]), millis))
         return true;
     return false;
 }
 
 XInputController::TapState CarControls::ButtonTapped(ControllerControlType control) {
-    if (!mXInputController.IsConnected())
-        return XInputController::TapState::ButtonUp;
     return (mXInputController.WasButtonTapped(mXInputController.StringToButton(ControlXbox[static_cast<int>(control)]), MaxTapTime));
 }
 
 bool CarControls::ButtonIn(ControllerControlType control) {
-    if (!mXInputController.IsConnected())
-        return false;
     if (mXInputController.IsButtonPressed(mXInputController.StringToButton(ControlXbox[static_cast<int>(control)])))
         return true;
     return false;
 }
 
-void CarControls::SetXboxTrigger(float value) {
-    mXInputController.TriggerValue = value;
-    mNativeController.TriggerValue = value;
+void CarControls::SetControllerTriggerLevel(float value) {
+    mXInputController.SetTriggerValue(value);
+    mNativeController.SetTriggerValue(value);
 }
 
-float CarControls::GetXboxTrigger() {
-    return mXInputController.TriggerValue;
+float CarControls::GetControllerTrigger() {
+    return mXInputController.GetTriggerValue();
 }
 
 /*
@@ -378,8 +363,8 @@ bool CarControls::ButtonIn(LegacyControlType control) {
     return false;
 }
 
-LegacyController::TapState CarControls::ButtonTapped(LegacyControlType control) {
-    if (!UseLegacyController) return LegacyController::TapState::ButtonUp;
+NativeController::TapState CarControls::ButtonTapped(LegacyControlType control) {
+    if (!UseLegacyController) return NativeController::TapState::ButtonUp;
     auto gameButton = mNativeController.EControlToButton(LegacyControls[static_cast<int>(control)]);
     return mNativeController.WasButtonTapped(gameButton, MaxTapTime);
 }

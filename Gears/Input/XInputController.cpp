@@ -7,7 +7,9 @@ XInputController::XInputController(int playerNumber)
     , controllerNum(playerNumber - 1) {
 }
 
-XINPUT_STATE XInputController::GetState() {
+XInputController::~XInputController() {}
+
+XINPUT_STATE XInputController::getState() {
     // Zeroise the state
     ZeroMemory(&controllerState, sizeof(XINPUT_STATE));
 
@@ -17,12 +19,13 @@ XINPUT_STATE XInputController::GetState() {
     return controllerState;
 }
 
-bool XInputController::IsConnected() {
+bool XInputController::isConnected() {
     // Zeroise the state
     ZeroMemory(&controllerState, sizeof(XINPUT_STATE));
 
     // Get the state
-    DWORD Result = XInputGetState(controllerNum, &controllerState);
+    XINPUT_STATE discard_this;
+    DWORD Result = XInputGetState(controllerNum, &discard_this);
 
     if (Result == ERROR_SUCCESS) {
         return true;
@@ -30,7 +33,8 @@ bool XInputController::IsConnected() {
     return false;
 }
 
-void XInputController::Vibrate(int leftVal, int rightVal) const {
+void XInputController::Vibrate(int leftVal, int rightVal) {
+    if (!isConnected()) return;
     // Create a Vibraton State
     XINPUT_VIBRATION Vibration;
 
@@ -56,12 +60,13 @@ bool XInputController::IsButtonPressed(XboxButtons buttonType) {
         buttonType == LeftThumbDown ||
         buttonType == RightThumbUp ||
         buttonType == RightThumbDown) {
-        return (GetAnalogValue(buttonType) > TriggerValue);
+        return (GetAnalogValue(buttonType) > triggerValue);
     }
     return (buttonState & XboxButtonMasks[buttonType]) != 0;
 }
 
 bool XInputController::IsButtonJustPressed(XboxButtons buttonType) {
+    if (!isConnected()) return false;
     xboxButtonCurr[buttonType] = IsButtonPressed(buttonType);
 
     // raising edge
@@ -72,6 +77,7 @@ bool XInputController::IsButtonJustPressed(XboxButtons buttonType) {
 }
 
 bool XInputController::IsButtonJustReleased(XboxButtons buttonType) {
+    if (!isConnected()) return false;
     xboxButtonCurr[buttonType] = IsButtonPressed(buttonType);
 
     // falling edge
@@ -82,6 +88,7 @@ bool XInputController::IsButtonJustReleased(XboxButtons buttonType) {
 }
 
 bool XInputController::WasButtonHeldForMs(XboxButtons buttonType, int milliseconds) {
+    if (!isConnected()) return false;
     if (IsButtonJustPressed(buttonType)) {
         pressTime[buttonType] = milliseconds_now();
     }
@@ -98,6 +105,7 @@ bool XInputController::WasButtonHeldForMs(XboxButtons buttonType, int millisecon
 }
 
 bool XInputController::WasButtonHeldOverMs(XboxButtons buttonType, int millis) {
+    if (!isConnected()) return false;
     if (IsButtonJustPressed(buttonType)) {
         pressTime[buttonType] = milliseconds_now();
     }
@@ -111,6 +119,7 @@ bool XInputController::WasButtonHeldOverMs(XboxButtons buttonType, int millis) {
 }
 
 XInputController::TapState XInputController::WasButtonTapped(XboxButtons buttonType, int milliseconds) {
+    if (!isConnected()) return TapState::ButtonUp;
     if (IsButtonJustPressed(buttonType)) {
         tapPressTime[buttonType] = milliseconds_now();
     }
@@ -128,12 +137,6 @@ XInputController::TapState XInputController::WasButtonTapped(XboxButtons buttonT
         return TapState::ButtonDown;
     }
     return TapState::ButtonUp;
-}
-
-void XInputController::UpdateButtonChangeStates() {
-    for (int i = 0; i < SIZEOF_XboxButtons; i++) {
-        xboxButtonPrev[i] = xboxButtonCurr[i];
-    }
 }
 
 XInputController::XboxButtons XInputController::StringToButton(std::string& buttonString) {
@@ -162,8 +165,20 @@ float XInputController::GetAnalogValue(XboxButtons buttonType) {
 }
 
 void XInputController::Update() {
-    buttonState = GetState().Gamepad.wButtons;
-    UpdateButtonChangeStates();
+    if (!isConnected()) return;
+
+    buttonState = getState().Gamepad.wButtons;
+    for (int i = 0; i < SIZEOF_XboxButtons; i++) {
+        xboxButtonPrev[i] = xboxButtonCurr[i];
+    }
+}
+
+void XInputController::SetTriggerValue(float value) {
+    triggerValue = value;
+}
+
+float XInputController::GetTriggerValue() {
+    return triggerValue;
 }
 
 float XInputController::filterDeadzone(XboxButtons buttonType, int input) {

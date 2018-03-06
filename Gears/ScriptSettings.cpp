@@ -139,7 +139,7 @@ void ScriptSettings::SaveController(CarControls *scriptControl) const {
     // [CONTROLLER]
     settingsGeneral.SetBoolValue("CONTROLLER", "ToggleEngine", ToggleEngine);
     settingsGeneral.SetLongValue("CONTROLLER", "ToggleTime", scriptControl->CToggleTime); 
-    settingsGeneral.SetDoubleValue("CONTROLLER", "TriggerValue", scriptControl->GetXboxTrigger());
+    settingsGeneral.SetDoubleValue("CONTROLLER", "TriggerValue", scriptControl->GetControllerTrigger());
     settingsGeneral.SetBoolValue("CONTROLLER", "BlockCarControls", BlockCarControls);
     settingsGeneral.SetBoolValue("CONTROLLER", "IgnoreShiftsUI", IgnoreShiftsUI);
     settingsGeneral.SetBoolValue("CONTROLLER", "BlockHShift", BlockHShift);
@@ -329,7 +329,7 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     if (tval > 1.0 || tval < 0.1) {
         tval = 0.85;
     }
-    scriptControl->SetXboxTrigger(tval);
+    scriptControl->SetControllerTriggerLevel(tval);
 
     ToggleEngine = settingsGeneral.GetBoolValue("CONTROLLER", "ToggleEngine", false);
 

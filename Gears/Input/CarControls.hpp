@@ -3,7 +3,7 @@
 
 #include "XInputController.hpp"
 #include "WheelDirectInput.hpp"
-#include "LegacyController.h"
+#include "NativeController.h"
 
 const int AVERAGEWINDOW = 10;
 
@@ -160,15 +160,15 @@ public:
     bool ButtonHeldOver(ControllerControlType control, int millis);
     XInputController::TapState ButtonTapped(ControllerControlType control);
     bool ButtonIn(ControllerControlType control);
-    void SetXboxTrigger(float value);
-    float GetXboxTrigger();
+    void SetControllerTriggerLevel(float value);
+    float GetControllerTrigger();
 
     bool ButtonJustPressed(LegacyControlType control);
     bool ButtonReleased(LegacyControlType control);
     bool ButtonHeld(LegacyControlType control);
     bool ButtonHeldOver(LegacyControlType control, int millis);
     bool ButtonIn(LegacyControlType control);
-    LegacyController::TapState ButtonTapped(LegacyControlType control);
+    NativeController::TapState ButtonTapped(LegacyControlType control);
     bool ButtonReleasedAfter(LegacyControlType control, int time);
 
     // Wheel controls
@@ -329,7 +329,7 @@ public:
 
 private:
     WheelDirectInput mWheelInput;
-    LegacyController mNativeController;
+    NativeController mNativeController;
     XInputController mXInputController;
 
     bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};

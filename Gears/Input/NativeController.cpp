@@ -1,26 +1,26 @@
-#include "LegacyController.h"
+#include "NativeController.h"
 #include "inc/natives.h"
 #include "../Util/TimeHelper.hpp"
 
 
-LegacyController::LegacyController(): TriggerValue(0.75f) {}
+NativeController::NativeController(): triggerValue(0.75f) {}
 
 
-LegacyController::~LegacyController()
+NativeController::~NativeController()
 {
 }
 
-bool LegacyController::IsButtonPressed(GameButtons gameButton) {
+bool NativeController::IsButtonPressed(GameButtons gameButton) {
     if (CONTROLS::IS_CONTROL_PRESSED(0, GameEnums[gameButton])) {
         return true;
     }
-    if (CONTROLS::GET_CONTROL_NORMAL(0, GameEnums[gameButton]) > TriggerValue) {
+    if (CONTROLS::GET_CONTROL_NORMAL(0, GameEnums[gameButton]) > triggerValue) {
         return true;
     }
     return false;
 }
 
-bool LegacyController::IsButtonJustPressed(GameButtons gameButton) {
+bool NativeController::IsButtonJustPressed(GameButtons gameButton) {
     gameButtonCurr[gameButton] = IsButtonPressed(gameButton);
 
     // raising edge
@@ -30,7 +30,7 @@ bool LegacyController::IsButtonJustPressed(GameButtons gameButton) {
     return false;
 }
 
-bool LegacyController::IsButtonJustReleased(GameButtons gameButton) {
+bool NativeController::IsButtonJustReleased(GameButtons gameButton) {
     gameButtonCurr[gameButton] = IsButtonPressed(gameButton);
 
     // falling edge
@@ -40,7 +40,7 @@ bool LegacyController::IsButtonJustReleased(GameButtons gameButton) {
     return false;
 }
 
-bool LegacyController::WasButtonHeldForMs(GameButtons gameButton, int milliseconds) {
+bool NativeController::WasButtonHeldForMs(GameButtons gameButton, int milliseconds) {
     if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, GameEnums[gameButton])) {
         pressTime[gameButton] = milliseconds_now();
     }
@@ -56,7 +56,7 @@ bool LegacyController::WasButtonHeldForMs(GameButtons gameButton, int millisecon
     return false;
 }
 
-bool LegacyController::WasButtonHeldOverMs(GameButtons gameButton, int milliseconds) {
+bool NativeController::WasButtonHeldOverMs(GameButtons gameButton, int milliseconds) {
     if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, GameEnums[gameButton])) {
         pressTime[gameButton] = milliseconds_now();
     }
@@ -69,7 +69,7 @@ bool LegacyController::WasButtonHeldOverMs(GameButtons gameButton, int milliseco
     return false;
 }
 
-LegacyController::TapState LegacyController::WasButtonTapped(GameButtons buttonType, int milliseconds) {
+NativeController::TapState NativeController::WasButtonTapped(GameButtons buttonType, int milliseconds) {
     if (IsButtonJustPressed(buttonType)) {
         tapPressTime[buttonType] = milliseconds_now();
     }
@@ -89,21 +89,25 @@ LegacyController::TapState LegacyController::WasButtonTapped(GameButtons buttonT
     return TapState::ButtonUp;
 }
 
-void LegacyController::UpdateButtonChangeStates() {
+void NativeController::Update() {
     for (int i = 0; i < SIZEOF_GameButtons; i++) {
         gameButtonPrev[i] = gameButtonCurr[i];
     }
 }
 
-float LegacyController::GetAnalogValue(GameButtons gameButton) {
+float NativeController::GetAnalogValue(GameButtons gameButton) {
     return CONTROLS::GET_CONTROL_NORMAL(0, GameEnums[gameButton]);
 }
 
-LegacyController::GameButtons LegacyController::EControlToButton(int eControlItem) {
+NativeController::GameButtons NativeController::EControlToButton(int eControlItem) {
     for (int i = 0; i < SIZEOF_GameButtons; i++) {
         if (eControlItem == GameEnums[i]) {
             return static_cast<GameButtons>(i);
         }
     }
     return UNKNOWN;
+}
+
+void NativeController::SetTriggerValue(float value) {
+    triggerValue = value;
 }

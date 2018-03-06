@@ -11,7 +11,7 @@
 #include <array>
 #include "inc/enums.h"
 
-class LegacyController
+class NativeController
 {
 public:
     enum class TapState {
@@ -78,7 +78,21 @@ public:
         eControl::ControlFrontendSelect		,
         -1 // UNKNOWN
     };
-    float TriggerValue;
+
+    NativeController();
+    ~NativeController();
+
+    bool IsButtonPressed(GameButtons gameButton);
+    bool IsButtonJustPressed(GameButtons gameButton);
+    bool IsButtonJustReleased(GameButtons gameButton);
+    bool WasButtonHeldForMs(GameButtons gameButton, int milliseconds);
+    bool WasButtonHeldOverMs(GameButtons gameButton, int millis);
+    TapState WasButtonTapped(GameButtons gameButton, int milliseconds);
+    void Update();
+
+    float GetAnalogValue(GameButtons gameButton);
+    GameButtons EControlToButton(int eControlItem);
+    void SetTriggerValue(float value);
 
 private:
     std::array<__int64, SIZEOF_GameButtons> pressTime;
@@ -87,21 +101,6 @@ private:
     std::array<__int64, SIZEOF_GameButtons> tapReleaseTime;
     std::array<bool, SIZEOF_GameButtons> gameButtonCurr;
     std::array<bool, SIZEOF_GameButtons> gameButtonPrev;
-
-public:
-    LegacyController();
-    ~LegacyController();
-
-    bool IsButtonPressed(GameButtons gameButton);
-    bool IsButtonJustPressed(GameButtons gameButton);
-    bool IsButtonJustReleased(GameButtons gameButton);
-    bool WasButtonHeldForMs(GameButtons gameButton, int milliseconds);
-    bool WasButtonHeldOverMs(GameButtons gameButton, int millis);
-    TapState WasButtonTapped(GameButtons buttonType, int milliseconds);
-    void UpdateButtonChangeStates();
-
-    float GetAnalogValue(GameButtons gameButton);
-    GameButtons EControlToButton(int eControlItem);
-
+    float triggerValue;
 };
 

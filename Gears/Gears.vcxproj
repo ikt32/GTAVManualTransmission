@@ -127,7 +127,7 @@
     <ClCompile Include="Input\CarControls.cpp" />
     <ClCompile Include="Input\WheelDirectInput.cpp" />
     <ClCompile Include="Input\XInputController.cpp" />
-    <ClCompile Include="Input\LegacyController.cpp" />
+    <ClCompile Include="Input\NativeController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Memory\MemoryPatcher.cpp" />
     <ClCompile Include="Memory\NativeMemory.cpp" />
@@ -163,7 +163,7 @@
     <ClInclude Include="Input\CarControls.hpp" />
     <ClInclude Include="Input\WheelDirectInput.hpp" />
     <ClInclude Include="Input\XInputController.hpp" />
-    <ClInclude Include="Input\LegacyController.h" />
+    <ClInclude Include="Input\NativeController.h" />
     <ClInclude Include="Memory\MemoryPatcher.hpp" />
     <ClInclude Include="Memory\NativeMemory.hpp" />
     <ClInclude Include="Memory\VehicleExtensions.hpp" />

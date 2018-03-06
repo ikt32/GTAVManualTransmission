@@ -29,9 +29,6 @@
     <ClCompile Include="Util\Util.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Input\LegacyController.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\GTAVMenuBase\menu.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
@@ -67,6 +64,9 @@
       <Filter>Input</Filter>
     </ClCompile>
     <ClCompile Include="Input\XInputController.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\NativeController.cpp">
       <Filter>Input</Filter>
     </ClCompile>
   </ItemGroup>
@@ -109,9 +109,6 @@
     </ClInclude>
     <ClInclude Include="Util\TimeHelper.hpp">
       <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="Input\LegacyController.h">
-      <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="..\..\GTAVMenuBase\menu.h">
       <Filter>Menu</Filter>
@@ -158,6 +155,9 @@
       <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="Input\XInputController.hpp">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\NativeController.h">
       <Filter>Input</Filter>
     </ClInclude>
   </ItemGroup>

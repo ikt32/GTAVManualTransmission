@@ -409,13 +409,13 @@ void update_controllermenu() {
     menu.IntOption("Max tap time (ms)", carControls.MaxTapTime, 50, 1000, 10,
                    { "Buttons pressed and released within this time are regarded as a tap. Shift up, shift down are tap controls." });
 
-    float currTriggerValue = carControls.GetXboxTrigger();
+    float currTriggerValue = carControls.GetControllerTrigger();
     float prevTriggerValue = currTriggerValue;
     menu.FloatOption("Trigger value", currTriggerValue, 0.25, 1.0, 0.05,
                      { "Threshold for an analog input to be detected as button press." });
 
     if (currTriggerValue != prevTriggerValue) {
-        carControls.SetXboxTrigger(currTriggerValue);
+        carControls.SetControllerTriggerLevel(currTriggerValue);
     }
 
     menu.BoolOption("Block car controls", settings.BlockCarControls,
