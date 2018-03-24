@@ -175,10 +175,10 @@ void ScriptSettings::SaveWheel(CarControls *scriptControl) const {
     settingsWheel.SetBoolValue("OPTIONS", "LogitechLEDs", LogiLEDs);
     settingsWheel.SetBoolValue("OPTIONS", "HPatternKeyboard", HPatternKeyboard);
 
-    settingsWheel.SetBoolValue("OPTIONS", "InvertSteer", scriptControl->InvertSteer);
-    settingsWheel.SetBoolValue("OPTIONS", "InvertThrottle", scriptControl->InvertThrottle);
-    settingsWheel.SetBoolValue("OPTIONS", "InvertBrake", scriptControl->InvertBrake);
-    settingsWheel.SetBoolValue("OPTIONS", "InvertClutch", scriptControl->InvertClutch);
+    //settingsWheel.SetBoolValue("OPTIONS", "InvertSteer", scriptControl->InvertSteer);
+    //settingsWheel.SetBoolValue("OPTIONS", "InvertThrottle", scriptControl->InvertThrottle);
+    //settingsWheel.SetBoolValue("OPTIONS", "InvertBrake", scriptControl->InvertBrake);
+    //settingsWheel.SetBoolValue("OPTIONS", "InvertClutch", scriptControl->InvertClutch);
 
     settingsWheel.SetDoubleValue("OPTIONS", "SteeringReductionWheel", SteeringReductionWheel);
     settingsWheel.SetDoubleValue("OPTIONS", "GameSteerMultWheel", GameSteerMultWheel);
@@ -414,10 +414,10 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     SteeringReductionOther = settingsWheel.GetDoubleValue("OPTIONS", "SteeringReductionOther", 0.0);
     GameSteerMultOther = settingsWheel.GetDoubleValue("OPTIONS", "GameSteerMultOther", 1.0);
 
-    scriptControl->InvertSteer =	settingsWheel.GetBoolValue("OPTIONS", "InvertSteer", false);
-    scriptControl->InvertThrottle = settingsWheel.GetBoolValue("OPTIONS", "InvertThrottle", false);
-    scriptControl->InvertBrake =	settingsWheel.GetBoolValue("OPTIONS", "InvertBrake", false);
-    scriptControl->InvertClutch =	settingsWheel.GetBoolValue("OPTIONS", "InvertClutch", false);
+    //scriptControl->InvertSteer =	settingsWheel.GetBoolValue("OPTIONS", "InvertSteer", false);
+    //scriptControl->InvertThrottle = settingsWheel.GetBoolValue("OPTIONS", "InvertThrottle", false);
+    //scriptControl->InvertBrake =	settingsWheel.GetBoolValue("OPTIONS", "InvertBrake", false);
+    //scriptControl->InvertClutch =	settingsWheel.GetBoolValue("OPTIONS", "InvertClutch", false);
 
     // [FORCE_FEEDBACK]
     EnableFFB = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Enable", true);
@@ -564,6 +564,18 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
         settingsWheel.GetLongValue("SHIFTER", "GEAR_7", -1);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::HR)] =
         settingsWheel.GetLongValue("SHIFTER", "GEAR_R", -1);
+
+    // [THROTTLE_BUTTON]
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Throttle)] =
+        DeviceIndexToGUID(settingsWheel.GetLongValue("THROTTLE_BUTTON", "DEVICE", -1), RegisteredGUIDs);
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Throttle)] =
+        settingsWheel.GetLongValue("THROTTLE_BUTTON", "BUTTON", -1);
+
+    // [BRAKE_BUTTON]
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Brake)] =
+        DeviceIndexToGUID(settingsWheel.GetLongValue("BRAKE_BUTTON", "DEVICE", -1), RegisteredGUIDs);
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Brake)] =
+        settingsWheel.GetLongValue("BRAKE_BUTTON", "BUTTON", -1);
 
     // [CLUTCH_BUTTON]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Clutch)] =

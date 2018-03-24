@@ -90,6 +90,7 @@ public:
         IndicatorLeft,
         IndicatorRight,
         IndicatorHazard,
+        UNKNOWN,
         SIZEOF_WheelControlType
     };
 
@@ -143,6 +144,8 @@ public:
     void InitWheel();
     void updateKeyboard();
     void updateController();
+    float getInputValue(WheelAxisType axisType, WheelControlType buttonType, float minRaw, float maxRaw);
+    float filterDeadzone(float input, float deadzone, float deadzoneOffset);
     void updateWheel();
     void UpdateValues(InputDevices prevInput, bool skipKeyboardInput);
     InputDevices GetLastInputDevice(InputDevices previousInput, bool enableWheel = true);
@@ -210,10 +213,10 @@ public:
     int HandbrakeMin = 0;
     int MaxTapTime = 200;
 
-    bool InvertSteer = false;
-    bool InvertThrottle = false;
-    bool InvertBrake = false;
-    bool InvertClutch = false;
+    //bool InvertSteer = false;
+    //bool InvertThrottle = false;
+    //bool InvertBrake = false;
+    //bool InvertClutch = false;
 
     float ADZThrottle = 0.25f;
     float ADZBrake = 0.25f;
@@ -307,6 +310,8 @@ public:
     int ConfTagWheel2Value(const std::string &confTag) {
         if (confTag == "TOGGLE_MOD"			) return WheelButton[static_cast<int>(WheelControlType::Toggle)];
         if (confTag == "CHANGE_SHIFTMODE"	) return WheelButton[static_cast<int>(WheelControlType::ToggleH)];
+        if (confTag == "THROTTLE_BUTTON") return WheelButton[static_cast<int>(WheelControlType::Throttle)];
+        if (confTag == "BRAKE_BUTTON") return WheelButton[static_cast<int>(WheelControlType::Brake)];
         if (confTag == "CLUTCH_BUTTON"		) return WheelButton[static_cast<int>(WheelControlType::Clutch)];
         if (confTag == "SHIFT_UP"			) return WheelButton[static_cast<int>(WheelControlType::ShiftUp)];
         if (confTag == "SHIFT_DOWN"			) return WheelButton[static_cast<int>(WheelControlType::ShiftDown)];

@@ -30,9 +30,9 @@ void CarControls::InitWheel() {
 }
 
 void CarControls::updateKeyboard() {
-    ThrottleVal = (IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)]) ? 1.0f : 0.0f);
-    BrakeVal = (IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Brake)]) ? 1.0f : 0.0f);
-    ClutchVal = (IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Clutch)]) ? 1.0f : 0.0f);
+    ThrottleVal = IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)]) ? 1.0f : 0.0f;
+    BrakeVal = IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Brake)]) ? 1.0f : 0.0f;
+    ClutchVal = IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Clutch)]) ? 1.0f : 0.0f;
     ClutchValRaw = ClutchVal;
 }
 
@@ -50,80 +50,52 @@ void CarControls::updateController() {
     }
 }
 
-void CarControls::updateWheel() {
-    auto throttleAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]);
-    auto brakeAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Brake)]);
-    auto clutchAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]);
-    auto steerAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]);
-    auto handbrakeAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Handbrake)]);
+// analog > button
+float CarControls::getInputValue(WheelAxisType axisType, WheelControlType buttonType, float minRaw, float maxRaw) {
+    float inputValue;
+    auto axis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(axisType)]);
+    auto axisGUID = WheelAxesGUIDs[static_cast<int>(axisType)];
 
-    auto throttleGUID = WheelAxesGUIDs[static_cast<int>(WheelAxisType::Throttle)];
-    auto brakeGUID = WheelAxesGUIDs[static_cast<int>(WheelAxisType::Brake)];
-    auto clutchGUID = WheelAxesGUIDs[static_cast<int>(WheelAxisType::Clutch)];
-    auto steerGUID = WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)];
-    auto handbrakeGUID = WheelAxesGUIDs[static_cast<int>(WheelAxisType::Handbrake)];
+    int axisValue = mWheelInput.GetAxisValue(axis, axisGUID);
 
-    int raw_t = mWheelInput.GetAxisValue(throttleAxis, throttleGUID);
-    int raw_b = mWheelInput.GetAxisValue(brakeAxis, brakeGUID);
-    int raw_c = mWheelInput.GetAxisValue(clutchAxis, clutchGUID);
-    int raw_s = mWheelInput.GetAxisValue(steerAxis, steerGUID);
-    int raw_h = mWheelInput.GetAxisValue(handbrakeAxis, handbrakeGUID);
-            
-    ThrottleVal = map((float)raw_t, (float)ThrottleMin, (float)ThrottleMax, 0.0f, 1.0f);
-    BrakeVal = map((float)raw_b, (float)BrakeMin, (float)BrakeMax, 0.0f, 1.0f);
-            
-    SteerValRaw = map((float)raw_s, (float)SteerMin, (float)SteerMax, 0.0f, 1.0f);
-    if (DZSteer > 0.005f) {
-        float center = 0.5f + DZSteerOffset;
-        float minLimit = center - DZSteer;
-        float maxLimit = center + DZSteer;
-        if (SteerValRaw < minLimit) {
-            SteerVal = map(SteerValRaw, 0.0f, minLimit, 0.0f, 0.5f);
+    if (axisValue != -1) {
+        inputValue = map(static_cast<float>(axisValue), minRaw, maxRaw, 0.0f, 1.0f);
+    }
+    else {
+        inputValue = ButtonIn(buttonType) ? 1.0f : 0.0f;
+    }
+    return inputValue;
+}
+
+float CarControls::filterDeadzone(float input, float deadzone, float deadzoneOffset) {
+    float filtered;
+    if (deadzone > 0.005f) {
+        float center = 0.5f + deadzoneOffset;
+        float minLimit = center - deadzone;
+        float maxLimit = center + deadzone;
+        if (input < minLimit) {
+            filtered = map(input, 0.0f, minLimit, 0.0f, 0.5f);
         }
-        else if (SteerValRaw > maxLimit) {
-            SteerVal = map(SteerValRaw, maxLimit, 1.0f, 0.5f, 1.0f);
+        else if (input > maxLimit) {
+            filtered = map(input, maxLimit, 1.0f, 0.5f, 1.0f);
         }
         else {
-            SteerVal = 0.5f;
+            filtered = 0.5f;
         }
     }
     else {
-        SteerVal = SteerValRaw;
+        filtered = input;
     }
+    return filtered;
+}
 
-    ClutchValRaw = map((float)raw_c, (float)ClutchMin, (float)ClutchMax, 0.0f, 1.0f);
-    if (mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]) == WheelDirectInput::UNKNOWN_AXIS ||
-        WheelAxesGUIDs[static_cast<int>(WheelAxisType::Clutch)] == GUID()) {
-        // wtf why would u :/
-        if (WheelButton[static_cast<int>(WheelControlType::Clutch)] != -1) {
-            ClutchVal = ButtonIn(WheelControlType::Clutch) ? 1.0f : 0.0f;
-        } else {
-            ClutchVal = 0.0f;
-        }
-    } else {
-        ClutchVal = ClutchValRaw;
-    }
-
-    if (mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Handbrake)]) == WheelDirectInput::UNKNOWN_AXIS) {
-        HandbrakeVal = 0.0f;
-    } else {
-        HandbrakeVal = map((float)raw_h, (float)HandbrakeMin, (float)HandbrakeMax, 0.0f, 1.0f);
-    }
-
-
-    if (raw_h == -1) { HandbrakeVal = 0.0f; }
-    if (raw_t == -1) { ThrottleVal = 0.0f; }
-    if (raw_b == -1) { BrakeVal = 0.0f; }
-    if (raw_c == -1 &&
-        (WheelButton[static_cast<int>(WheelControlType::Clutch)] == -1 ||
-            WheelButtonGUIDs[static_cast<int>(WheelControlType::Clutch)] == GUID())) {
-        ClutchVal = 0.0f; ClutchValRaw = 0.0f;
-    }
-
-    if (InvertSteer) { SteerVal = 1.0f - SteerVal; SteerValRaw = 1.0f - SteerValRaw; }
-    if (InvertThrottle) { ThrottleVal = 1.0f - ThrottleVal; }
-    if (InvertBrake) { BrakeVal = 1.0f - BrakeVal; }
-    if (InvertClutch) { ClutchVal = 1.0f - ClutchVal; ClutchValRaw = 1.0f - ClutchValRaw; }
+void CarControls::updateWheel() {
+    ThrottleVal = getInputValue(WheelAxisType::Throttle, WheelControlType::Throttle, static_cast<float>(ThrottleMin), static_cast<float>(ThrottleMax));
+    BrakeVal = getInputValue(WheelAxisType::Brake, WheelControlType::Brake, static_cast<float>(BrakeMin), static_cast<float>(BrakeMax));
+    ClutchVal = getInputValue(WheelAxisType::Clutch, WheelControlType::Clutch, static_cast<float>(ClutchMin), static_cast<float>(ClutchMax));
+    HandbrakeVal = getInputValue(WheelAxisType::Handbrake, WheelControlType::Handbrake, static_cast<float>(HandbrakeMin), static_cast<float>(HandbrakeMax));
+    SteerValRaw = getInputValue(WheelAxisType::Steer, WheelControlType::UNKNOWN, static_cast<float>(SteerMin), static_cast<float>(SteerMax));
+    SteerVal = filterDeadzone(SteerValRaw, DZSteer, DZSteerOffset);
 }
 
 void CarControls::UpdateValues(InputDevices prevInput, bool skipKeyboardInput) {
@@ -209,9 +181,9 @@ CarControls::InputDevices CarControls::GetLastInputDevice(InputDevices previousI
         if (raw_t == -1) {
             tempThrottle = 0.0f;
         }
-        if (InvertThrottle) {
-            tempThrottle = 1.0f - tempThrottle;
-        }
+        //if (InvertThrottle) {
+        //    tempThrottle = 1.0f - tempThrottle;
+        //}
         if (tempThrottle > 0.5f) {
             return Wheel;
         }
@@ -223,9 +195,9 @@ CarControls::InputDevices CarControls::GetLastInputDevice(InputDevices previousI
         if (raw_c == -1) {
             tempClutch = 0.0f;
         }
-        if (InvertClutch) {
-            tempClutch = 1.0f - tempClutch;
-        }
+        //if (InvertClutch) {
+        //    tempClutch = 1.0f - tempClutch;
+        //}
         if (tempClutch > 0.5f) {
             return Wheel;
         }

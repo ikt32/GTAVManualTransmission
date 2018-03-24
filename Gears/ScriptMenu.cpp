@@ -49,6 +49,8 @@ std::vector<int> fontIDs{
 std::vector<std::string> buttonConfTags{
     { "TOGGLE_MOD" },
     { "CHANGE_SHIFTMODE" },
+    { "THROTTLE_BUTTON" },
+    { "BRAKE_BUTTON" },
     { "CLUTCH_BUTTON" },
     { "SHIFT_UP" },
     { "SHIFT_DOWN" },
@@ -713,10 +715,10 @@ void update_axesmenu() {
         menu.OptionPlusPlus(extras, "Brake gamma");
     }
 
-    menu.BoolOption("Invert steer", carControls.InvertSteer);
-    menu.BoolOption("Invert throttle", carControls.InvertThrottle);
-    menu.BoolOption("Invert brake", carControls.InvertBrake);
-    menu.BoolOption("Invert clutch", carControls.InvertClutch);
+    //menu.BoolOption("Invert steer", carControls.InvertSteer);
+    //menu.BoolOption("Invert throttle", carControls.InvertThrottle);
+    //menu.BoolOption("Invert brake", carControls.InvertBrake);
+    //menu.BoolOption("Invert clutch", carControls.InvertClutch);
 }
 
 void update_forcefeedbackmenu() {
