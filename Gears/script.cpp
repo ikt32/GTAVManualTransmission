@@ -110,6 +110,7 @@ void update_vehicle() {
 
     if (vehicle != lastVehicle) {
         initVehicle();
+        initSteeringPatches();
     }
     lastVehicle = vehicle;
 
