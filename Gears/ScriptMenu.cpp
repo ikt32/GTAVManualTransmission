@@ -659,7 +659,7 @@ void update_axesmenu() {
         "Steer    : " + std::to_string(carControls.SteerVal),
         "Throttle : " + std::to_string(carControls.ThrottleVal),
         "Brake    : " + std::to_string(carControls.BrakeVal),
-        "Clutch   : " + std::to_string(carControls.ClutchValRaw),
+        "Clutch   : " + std::to_string(carControls.ClutchVal),
         "Handbrake: " + std::to_string(carControls.HandbrakeVal),
     };
 

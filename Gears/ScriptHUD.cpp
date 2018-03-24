@@ -214,7 +214,7 @@ void drawDebugInfo() {
 
     ssThrottleInput << "Throttle:\t" << carControls.ThrottleVal;
     ssBrakeInput << "Brake:\t\t" << carControls.BrakeVal;
-    ssClutchInput << "Clutch:\t\t" << carControls.ClutchValRaw;
+    ssClutchInput << "Clutch:\t\t" << carControls.ClutchVal;
     ssHandbrakInput << "Handb:\t\t" << carControls.HandbrakeVal;
 
     showText(0.85, 0.050, 0.4, ssThrottleInput.str(), 4);
@@ -295,7 +295,7 @@ void drawInputWheelInfo() {
     GRAPHICS::DRAW_RECT(settings.PedalInfoX, settings.PedalInfoY, 3.0f * barWidth + settings.PedalInfoPadX, settings.PedalInfoH + settings.PedalInfoPadY, 0, 0, 0, 92);
     GRAPHICS::DRAW_RECT(settings.PedalInfoX - 1.0f*barWidth, barYBase - carControls.ThrottleVal*settings.PedalInfoH*0.5f, barWidth, carControls.ThrottleVal*settings.PedalInfoH, 0, 255, 0, 255);
     GRAPHICS::DRAW_RECT(settings.PedalInfoX + 0.0f*barWidth, barYBase - carControls.BrakeVal*settings.PedalInfoH*0.5f, barWidth, carControls.BrakeVal*settings.PedalInfoH, 255, 0, 0, 255);
-    GRAPHICS::DRAW_RECT(settings.PedalInfoX + 1.0f*barWidth, barYBase - carControls.ClutchValRaw*settings.PedalInfoH*0.5f, barWidth, carControls.ClutchVal*settings.PedalInfoH, 0, 0, 255, 255);
+    GRAPHICS::DRAW_RECT(settings.PedalInfoX + 1.0f*barWidth, barYBase - carControls.ClutchVal*settings.PedalInfoH*0.5f, barWidth, carControls.ClutchVal*settings.PedalInfoH, 0, 0, 255, 255);
 }
 
 std::vector<bool> getWheelLockups(Vehicle handle) {

@@ -195,7 +195,6 @@ public:
     float BrakeVal = 0.0f;
     float BrakeValAvg = 0.0f;   // Used for gamma curve display. Not as jittery.
     float ClutchVal = 0.0f; 	// 1 = Pressed, 0 = Not pressed
-    float ClutchValRaw = 0.0f;	// For readout purposes. ClutchVal is for gameplay purposes.
     float SteerVal = 0.5f;
     float SteerValRaw = 0.0f;   // For readout purposes. SteerVal is used for gameplay.
     float HandbrakeVal = 0.0f;
