@@ -10,6 +10,9 @@
 
 #include <string>
 #include <vector>
+
+#include <inc/types.h>
+
 const std::string mtDir = "\\ManualTransmission";
 
 class VehicleData;
@@ -128,10 +131,8 @@ void checkWheelButtons();
 ///////////////////////////////////////////////////////////////////////////////
 
 void playFFBGround();
-void playFFBAir();
 void playFFBWater();
 void doWheelSteering();
-void doStickControlAir();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                             Misc features
@@ -169,7 +170,6 @@ bool configHPattern();
 bool configKeyboardKey(const std::string &confTag);
 bool configControllerButton(const std::string &confTag);
 bool configLControllerButton(const std::string &confTag);
-bool configStickAxis(std::string confTag);
 
 void updateSteeringMultiplier();
 
@@ -184,3 +184,6 @@ std::vector<float> getDrivenWheelsSpeeds(std::vector<float> wheelSpeeds);
 
 void     blockButtons();
 void startStopEngine();
+
+void drawSteeringLines(float steeringAngle);
+float getSteeringAngle(Vehicle v);

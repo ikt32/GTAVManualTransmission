@@ -143,6 +143,11 @@ void update_hud() {
         settings.SteeringWheelInfo && textureWheelId != -1) {
         drawInputWheelInfo();
     }
+
+    if (settings.DisplayFFBInfo) {
+        float angle = getSteeringAngle(vehicle);
+        drawSteeringLines(angle);
+    }
 }
 
 void wheelControlWater() {
@@ -2027,8 +2032,8 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     Vector3 turnWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, ENTITY::GET_ENTITY_SPEED(vehicle)*-sin(rotationVelocity.z), ENTITY::GET_ENTITY_SPEED(vehicle)*cos(rotationVelocity.z), 0.0f);
     Vector3 turnRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, turnWorld.x, turnWorld.y, turnWorld.z);
     float turnRelativeNormX = (travelRelative.x + turnRelative.x) / 2.0f;
-    float turnRelativeNormY = (travelRelative.y + turnRelative.y) / 2.0f;
-    Vector3 turnWorldNorm = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, turnRelativeNormX, turnRelativeNormY, 0.0f);
+    //float turnRelativeNormY = (travelRelative.y + turnRelative.y) / 2.0f;
+    //Vector3 turnWorldNorm = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, turnRelativeNormX, turnRelativeNormY, 0.0f);
 
     float steeringAngleRelX = ENTITY::GET_ENTITY_SPEED(vehicle)*-sin(steeringAngle);
     float steeringAngleRelY = ENTITY::GET_ENTITY_SPEED(vehicle)*cos(steeringAngle);
@@ -2070,11 +2075,11 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
         }
     }
 
-    if (settings.DisplayFFBInfo) {
-        GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, travelWorld.x, travelWorld.y, travelWorld.z, 0, 255, 0, 255);
-        GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, turnWorldNorm.x, turnWorldNorm.y, turnWorldNorm.z, 255, 0, 0, 255);
-        GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, steeringWorld.x, steeringWorld.y, steeringWorld.z, 255, 0, 255, 255);
-    }
+    //if (settings.DisplayFFBInfo) {
+    //    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, travelWorld.x, travelWorld.y, travelWorld.z, 0, 255, 0, 255);
+    //    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, turnWorldNorm.x, turnWorldNorm.y, turnWorldNorm.z, 255, 0, 0, 255);
+    //    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, steeringWorld.x, steeringWorld.y, steeringWorld.z, 255, 0, 255, 255);
+    //}
     if (settings.DisplayInfo) {
         showText(0.85, 0.175, 0.4, "RelSteer:\t" + std::to_string(steeringRelative.x), 4);
         showText(0.85, 0.200, 0.4, "SetPoint:\t" + std::to_string(travelRelative.x), 4);
@@ -2083,6 +2088,74 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     }
 
     return satForce;
+}
+
+// Despite being scientifically inaccurate, "self-aligning torque" is the best description.
+void drawSteeringLines(float steeringAngle) {
+    Vector3 velocityWorld = ENTITY::GET_ENTITY_VELOCITY(vehicle);
+    Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(vehicle, 1);
+    Vector3 travelWorld = velocityWorld + positionWorld;
+    Vector3 travelRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, travelWorld.x, travelWorld.y, travelWorld.z);
+
+    Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(vehicle);
+    Vector3 turnWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, ENTITY::GET_ENTITY_SPEED(vehicle)*-sin(rotationVelocity.z), ENTITY::GET_ENTITY_SPEED(vehicle)*cos(rotationVelocity.z), 0.0f);
+    Vector3 turnRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, turnWorld.x, turnWorld.y, turnWorld.z);
+    float turnRelativeNormX = (travelRelative.x + turnRelative.x) / 2.0f;
+    float turnRelativeNormY = (travelRelative.y + turnRelative.y) / 2.0f;
+    Vector3 turnWorldNorm = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, turnRelativeNormX, turnRelativeNormY, 0.0f);
+
+    float steeringAngleRelX = ENTITY::GET_ENTITY_SPEED(vehicle)*-sin(steeringAngle);
+    float steeringAngleRelY = ENTITY::GET_ENTITY_SPEED(vehicle)*cos(steeringAngle);
+    Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, steeringAngleRelX, steeringAngleRelY, 0.0f);
+
+    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, travelWorld.x, travelWorld.y, travelWorld.z, 0, 255, 0, 255);
+    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, turnWorldNorm.x, turnWorldNorm.y, turnWorldNorm.z, 255, 0, 0, 255);
+    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, steeringWorld.x, steeringWorld.y, steeringWorld.z, 255, 0, 255, 255);
+}
+
+float getSteeringAngle(Vehicle v) {
+    auto angles = ext.GetWheelSteeringAngles(v);
+    float wheelsSteered = 0.0f;
+    float avgAngle = 0.0f;
+
+    for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
+        if (i < 3 && angles[i] != 0.0f) {
+            wheelsSteered += 1.0f;
+            avgAngle += angles[i];
+        }
+    }
+
+    if (wheelsSteered > 0.5f && wheelsSteered < 2.5f) { // bikes, cars, quads
+        avgAngle /= wheelsSteered;
+    }
+    else {
+        avgAngle = ext.GetSteeringAngle(vehicle)*ext.GetSteeringMultiplier(vehicle); // tank, forklift
+    }
+    return avgAngle;
+}
+
+
+
+float getFloatingSteeredWheelsRatio(Vehicle v) {
+    auto suspensionStates = ext.GetWheelsOnGround(vehicle);
+    auto angles = ext.GetWheelSteeringAngles(vehicle);
+
+    float wheelsOffGroundRatio = 0.0f;
+    float wheelsInAir = 0.0f;
+    float wheelsSteered = 0.0f;
+
+    for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
+        if (angles[i] != 0.0f) {
+            wheelsSteered += 1.0f;
+            if (suspensionStates[i] == false) {
+                wheelsInAir += 1.0f;
+            }
+        }
+    }
+    if (wheelsSteered != 0.0f) {
+        wheelsOffGroundRatio = wheelsInAir / wheelsSteered;
+    }
+    return wheelsOffGroundRatio;
 }
 
 float getSteeringLock() {
@@ -2118,42 +2191,11 @@ void playFFBGround() {
         carControls.PlayLEDs(vehData.RPM, 0.45f, 0.95f);
     }
 
-    auto suspensionStates = ext.GetWheelsOnGround(vehicle);
-    auto angles = ext.GetWheelSteeringAngles(vehicle);
-
-    // These are discrete numbers, but division is needed so floats!
-    float steeredWheels = 0.0f;
-    float steeredWheelsFree = 0.0f;
-
-    for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
-        if (angles[i] != 0.0f) {
-            steeredWheels += 1.0f;
-            if (suspensionStates[i] == false) {
-                steeredWheelsFree += 1.0f;
-            }
-        }
-    }
-    float wheelsOffGroundRatio = 0.0f;
-    if (steeredWheels != 0.0f) {
-        wheelsOffGroundRatio = steeredWheelsFree / steeredWheels;
-    }
-
-    float steeringAngle;
-    if (vehData.Class == VehicleClass::Car || steeredWheels == 0.0f) {
-        steeringAngle = ext.GetSteeringAngle(vehicle)*ext.GetSteeringMultiplier(vehicle);
-    }
-    else {
-        float allAngles = 0.0f;
-        for (auto angle : angles) {
-            if (angle != 0.0f) {
-                allAngles += angle;
-            }
-        }
-        steeringAngle = allAngles / steeredWheels;
-    }
+    float avgAngle = getSteeringAngle(vehicle);
+    float wheelsOffGroundRatio = getFloatingSteeredWheelsRatio(vehicle);
 
     int detailForce = calculateDetail();
-    int satForce = calculateSat(2500, steeringAngle, wheelsOffGroundRatio, vehData.Class == VehicleClass::Car);
+    int satForce = calculateSat(2500, avgAngle, wheelsOffGroundRatio, vehData.Class == VehicleClass::Car);
     int damperForce = calculateDamper(50.0f, wheelsOffGroundRatio);
 
     // Decrease damper if sat rises, so constantForce doesn't fight against damper
