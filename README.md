@@ -74,6 +74,7 @@ Speedometers Neutral gear: `mt_neutral`
 
 Please note that the neutral gear is fake - it's achieved by having the clutch disengaged fully.
 
+Get shift mode: `mt_get_shiftmode`
 Set shift mode: `mt_set_shiftmode`
 * `0` - No change
 * `1` - Sequential
