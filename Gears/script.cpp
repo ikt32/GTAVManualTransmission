@@ -1673,8 +1673,10 @@ void functionAutoReverse() {
 // TODO: Some original "tap" controls don't work.
 void blockButtons() {
     if (!settings.EnableManual || !settings.BlockCarControls ||
-        carControls.PrevInput != CarControls::Controller ||
-        settings.ShiftMode == Automatic || ext.GetGearCurr(vehicle) == 0) {
+        carControls.PrevInput != CarControls::Controller || !isVehicleAvailable()) {
+        return;
+    }
+    if (!(settings.ShiftMode == Automatic && ext.GetGearCurr(vehicle) < 2)) {
         return;
     }
 
