@@ -151,3 +151,10 @@ void update_npc() {
         updateNPCVehicles(vehicles, count);
     }
 }
+
+void NPCMain() {
+    while (true) {
+        update_npc();
+        WAIT(0);
+    }
+}

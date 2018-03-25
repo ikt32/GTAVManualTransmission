@@ -18,6 +18,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
     switch (reason) {
         case DLL_PROCESS_ATTACH: {
             scriptRegister(hInstance, ScriptMain);
+            scriptRegisterAdditionalThread(hInstance, NPCMain);
             logger.Clear();
             logger.Write(INFO, "GTAVManualTransmission %s (build %s)", DISPLAY_VERSION, __DATE__);
             logger.Write(INFO, "Game version " + eGameVersionToString(getGameVersion()));

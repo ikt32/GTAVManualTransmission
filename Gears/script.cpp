@@ -2432,7 +2432,7 @@ void main() {
         update_input_controls();
         update_manual_transmission();
         update_misc_features();
-        update_npc();
+        //update_npc();
         update_menu();
         WAIT(0);
     }
