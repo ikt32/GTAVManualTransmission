@@ -596,7 +596,10 @@ void updateLastInputDevice() {
                 break;
             default: break;
         }
-        showNotification(message, &prevNotification);
+        // Suppress notification when not in car
+        if (isVehicleAvailable()) {
+            showNotification(message, &prevNotification);
+        }
 
         initSteeringPatches();
     }
