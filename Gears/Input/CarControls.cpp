@@ -171,35 +171,13 @@ CarControls::InputDevices CarControls::GetLastInputDevice(InputDevices previousI
         }
     }
     if (enableWheel && mWheelInput.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
-        auto throttleAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Throttle)]);
-        auto throttleGUID = WheelAxesGUIDs[static_cast<int>(WheelAxisType::Throttle)];
-        int raw_t = mWheelInput.GetAxisValue(throttleAxis, throttleGUID);
-        auto tempThrottle = map((float)raw_t, (float)ThrottleMin, (float)ThrottleMax, 0.0f, 1.0f);
-        if (raw_t == -1) {
-            tempThrottle = 0.0f;
-        }
-        //if (InvertThrottle) {
-        //    tempThrottle = 1.0f - tempThrottle;
-        //}
-        if (tempThrottle > 0.5f) {
-            return Wheel;
-        }
+        float throttleVal = getInputValue(WheelAxisType::Throttle, WheelControlType::Throttle, ThrottleMin, ThrottleMax);
+        float brakeVal = getInputValue(WheelAxisType::Brake, WheelControlType::Brake, BrakeMin, BrakeMax);
+        float clutchVal = getInputValue(WheelAxisType::Clutch, WheelControlType::Clutch, ClutchMin, ClutchMax);
 
-        auto clutchGUID = WheelAxesGUIDs[static_cast<int>(WheelAxisType::Clutch)];
-        auto clutchAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Clutch)]);
-        int raw_c = mWheelInput.GetAxisValue(clutchAxis, clutchGUID);
-        auto tempClutch = map((float)raw_c, (float)ClutchMin, (float)ClutchMax, 0.0f, 1.0f);
-        if (raw_c == -1) {
-            tempClutch = 0.0f;
-        }
-        //if (InvertClutch) {
-        //    tempClutch = 1.0f - tempClutch;
-        //}
-        if (tempClutch > 0.5f) {
-            return Wheel;
-        }
-
-        if (ButtonIn(WheelControlType::Clutch) || ButtonIn(WheelControlType::Throttle)) {
+        if (throttleVal > 0.5f ||
+            brakeVal > 0.5f ||
+            clutchVal > 0.5f) {
             return Wheel;
         }
     }
