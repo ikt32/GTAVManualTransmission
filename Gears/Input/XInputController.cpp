@@ -21,10 +21,10 @@ XINPUT_STATE XInputController::getState() {
 
 bool XInputController::isConnected() {
     // Zeroise the state
-    ZeroMemory(&controllerState, sizeof(XINPUT_STATE));
+    XINPUT_STATE discard_this;
+    ZeroMemory(&discard_this, sizeof(XINPUT_STATE));
 
     // Get the state
-    XINPUT_STATE discard_this;
     DWORD Result = XInputGetState(controllerNum, &discard_this);
 
     if (Result == ERROR_SUCCESS) {
