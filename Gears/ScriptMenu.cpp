@@ -731,14 +731,14 @@ void update_forcefeedbackmenu() {
     menu.BoolOption("Scale forces", settings.ScaleFFB, 
                     { "Scale forces to degree of rotation." });
 
-    menu.FloatOption("Self aligning torque multiplier", settings.SATAmpMult, 0.1f, 5.0f, 0.05f,
+    menu.FloatOption("Self aligning torque multiplier", settings.SATAmpMult, 0.1f, 10.0f, 0.05f,
                      { "Force feedback strength for steering. Increase for weak wheels, decrease for strong/fast wheels.",
                      "Putting this too high clips force feedback. Too low and the car doesn't feel responsive."});
 
     menu.FloatOption("Detail effect multiplier", settings.DetailMult, 0.0f, 10.0f, 0.1f,
                      { "Force feedback effects caused by the suspension." });
 
-    menu.FloatOption("Collision effect multiplier", settings.CollisionMult, 0.0f, 5.0f, 0.1f,
+    menu.FloatOption("Collision effect multiplier", settings.CollisionMult, 0.0f, 10.0f, 0.1f,
                      { "Force feedback effect caused by frontal/rear collisions." });
 
     menu.IntOption("Damper max (low speed)", settings.DamperMax, 0, 200, 1, 
@@ -746,7 +746,7 @@ void update_forcefeedbackmenu() {
         
     menu.IntOption("Damper min (high speed)", settings.DamperMin, 0, 200, 1,
                    { "Wheel friction at high speed." });
-        
+    
     menu.FloatOption("Damper min speed", settings.DamperMinSpeed, 0.0f, 40.0f, 0.2f,
                      { "Speed where the damper strength should be minimal.", "In m/s." });
 }
