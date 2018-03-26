@@ -120,7 +120,7 @@ private:
     std::array<__int64, SIZEOF_XboxButtons> tapReleaseTime;
     std::array<bool, SIZEOF_XboxButtons> xboxButtonCurr;
     std::array<bool, SIZEOF_XboxButtons> xboxButtonPrev;
-    float triggerValue;
+    float triggerValue = 0.75f;
 
     XINPUT_STATE controllerState;
     WORD buttonState;

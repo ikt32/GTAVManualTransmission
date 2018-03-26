@@ -407,7 +407,6 @@ void logCreateEffectError(HRESULT hr, const char *which) {
 }
 
 bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
-    const int numEffects = 3;
     int createdEffects = 0;
     auto e = FindEntryFromGUID(device);
     

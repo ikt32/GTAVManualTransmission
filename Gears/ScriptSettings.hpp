@@ -19,7 +19,6 @@ public:
     void SaveGeneral() const;
     void SaveController(CarControls *scriptControl) const;
     void SaveWheel(CarControls *scriptControl) const;
-    void SaveStick(CarControls *scriptControl) const;
 
     // Only use this AFTER wheel settings are read.
     std::vector<GUID> GetGuids();

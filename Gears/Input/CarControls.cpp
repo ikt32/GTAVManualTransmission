@@ -6,8 +6,8 @@
 #include "Util/MathExt.h"
 
 CarControls::CarControls(): PrevInput(Keyboard),
-                                mWheelInput(),
                                 SteerAxisType(WheelAxisType::Steer),
+                                mWheelInput(),
                                 mXInputController{1} {
     std::fill(ControlXboxBlocks.begin(), ControlXboxBlocks.end(), -1);
 }
@@ -171,9 +171,9 @@ CarControls::InputDevices CarControls::GetLastInputDevice(InputDevices previousI
         }
     }
     if (enableWheel && mWheelInput.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
-        float throttleVal = getInputValue(WheelAxisType::Throttle, WheelControlType::Throttle, ThrottleMin, ThrottleMax);
-        float brakeVal = getInputValue(WheelAxisType::Brake, WheelControlType::Brake, BrakeMin, BrakeMax);
-        float clutchVal = getInputValue(WheelAxisType::Clutch, WheelControlType::Clutch, ClutchMin, ClutchMax);
+        float throttleVal = getInputValue(WheelAxisType::Throttle, WheelControlType::Throttle, static_cast<float>(ThrottleMin), static_cast<float>(ThrottleMax));
+        float brakeVal = getInputValue(WheelAxisType::Brake, WheelControlType::Brake, static_cast<float>(BrakeMin), static_cast<float>(BrakeMax));
+        float clutchVal = getInputValue(WheelAxisType::Clutch, WheelControlType::Clutch, static_cast<float>(ClutchMin), static_cast<float>(ClutchMax));
 
         if (throttleVal > 0.5f ||
             brakeVal > 0.5f ||
