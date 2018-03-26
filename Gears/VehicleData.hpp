@@ -1,12 +1,13 @@
 #pragma once
 
-#include "../../ScriptHookV_SDK/inc/types.h"
+#include <inc/types.h>
 
-#include <Windows.h>
+//#include <Windows.h>
 #include <array>
 #include <vector>
-#include "Memory/VehicleExtensions.hpp"
 #include <chrono>
+#include "script.h"
+#include "Memory/VehicleExtensions.hpp"
 
 #define SAMPLES 6
 
@@ -55,7 +56,7 @@ public:
     DWORD PrevUpshiftTime = 0;
     bool IgnoreAccelerationUpshiftTrigger = false;
 
-    std::vector<float> WheelCompressions{};
+    std::vector<float> WheelCompressions = { };
     Vector3 SpeedVector{};
 
     bool BlinkerLeft = false;
@@ -71,6 +72,9 @@ public:
     float StallProgress = 0.0f;
     bool EngBrakeActive = false;
     bool EngLockActive = false;
+
+    std::array<float, NUM_GEARS> UpshiftSpeedsGame = { };
+    std::array<float, NUM_GEARS> UpshiftSpeedsMod = { };
 private:
     VehicleClass findClass(Hash model);
     VehicleDomain findDomain(VehicleClass vehicleClass);

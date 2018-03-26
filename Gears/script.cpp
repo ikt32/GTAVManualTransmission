@@ -44,9 +44,6 @@ const float g_baseStallSpeed = 0.08f;
 const float g_baseCatchMinSpeed = 0.12f;
 const float g_baseCatchMaxSpeed = 0.24f;
 
-std::array<float, NUM_GEARS> upshiftSpeedsGame{};
-std::array<float, NUM_GEARS> upshiftSpeedsMod{};
-
 std::string textureWheelFile;
 int textureWheelId;
 
@@ -103,18 +100,16 @@ void update_globals() {
 
 void update_vehicle() {
     if (!isVehicleAvailable()) {
-        resetVehicle();
+        clearVehicleData();
         lastVehicle = vehicle;
-        return;
     }
-
-    if (vehicle != lastVehicle) {
-        initVehicle();
-        initSteeringPatches();
+    else {
+        if (vehicle != lastVehicle) {
+            clearVehicleData();
+        }
+        vehData.UpdateValues(ext, vehicle);
     }
     lastVehicle = vehicle;
-
-    vehData.UpdateValues(ext, vehicle);
 }
 
 // Read inputs
@@ -181,7 +176,6 @@ void update_input_controls() {
     if (!isPlayerAvailable())
         return;
 
-    updateSteeringMultiplier();
     blockButtons();
     startStopEngine();
 
@@ -346,7 +340,6 @@ void update_manual_transmission() {
     if (MemoryPatcher::TotalPatched != MemoryPatcher::NumGearboxPatches) {
         MemoryPatcher::PatchInstructions();
     }
-    // TODO: Now why did I do this separate from the PatchInstructions()????
     if (!MemoryPatcher::ShiftUpPatched) {
         MemoryPatcher::PatchShiftUp();
     }
@@ -430,35 +423,24 @@ void crossScript() {
 //                           Mod functions: Mod control
 ///////////////////////////////////////////////////////////////////////////////
 
-void initVehicle() {
-    resetVehicle();
-    std::fill(upshiftSpeedsGame.begin(), upshiftSpeedsGame.end(), 0.0f);
-    std::fill(upshiftSpeedsMod.begin(), upshiftSpeedsMod.end(), 0.0f);
+void clearVehicleData() {
     vehData = VehicleData();
-    vehData.UpdateValues(ext, vehicle);
-
     if (vehData.NoClutch) {
         vehData.FakeNeutral = false;
     }
     else {
         vehData.FakeNeutral = settings.DefaultNeutral;
     }
-    shiftTo(1, false);
-    ext.SetGearCurr(vehicle, 1);
-    ext.SetGearNext(vehicle, 1);
-    initSteeringPatches();
-}
-
-void initialize() {
-    readSettings();
-    initWheel();
-}
-
-void resetVehicle() {
-    resetSteeringMultiplier();
     gearRattle.Stop();
+}
+
+void clearPatches() {
+    resetSteeringMultiplier();
     if (MemoryPatcher::TotalPatched == MemoryPatcher::NumGearboxPatches) {
         MemoryPatcher::RestoreInstructions();
+    }
+    if (MemoryPatcher::SteerControlPatched) {
+        MemoryPatcher::RestoreSteeringControl();
     }
     if (MemoryPatcher::SteerCorrectPatched) {
         MemoryPatcher::RestoreSteeringCorrection();
@@ -469,7 +451,6 @@ void resetVehicle() {
     if (MemoryPatcher::ShiftUpPatched) {
         MemoryPatcher::RestoreShiftUp();
     }
-    stopForceFeedback();
 }
 
 void toggleManual() {
@@ -483,16 +464,10 @@ void toggleManual() {
         message += "Disabled";
     }
     showNotification(message, &prevNotification);
-
-    if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
-        VEHICLE::SET_VEHICLE_HANDBRAKE(vehicle, false);
-        VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
-    }
-    if (!settings.EnableManual) {
-        resetVehicle();
-    }
-    initialize();
-    initSteeringPatches();
+    clearVehicleData();
+    readSettings();
+    initWheel();
+    clearPatches();
 }
 
 void initWheel() {
@@ -506,22 +481,20 @@ void stopForceFeedback() {
     carControls.StopFFB(settings.LogiLEDs);
 }
 
-void initSteeringPatches() {
-    if (settings.PatchSteering &&
-        (carControls.PrevInput == CarControls::Wheel || settings.PatchSteeringAlways) &&
-        vehData.Class == VehicleClass::Car) {
+void update_steeringpatches() {
+    bool isCar = vehData.Class == VehicleClass::Car;
+    bool useWheel = carControls.PrevInput == CarControls::Wheel;
+    if (isCar && settings.PatchSteering &&
+        (useWheel || settings.PatchSteeringAlways)) {
         if (!MemoryPatcher::SteerCorrectPatched)
             MemoryPatcher::PatchSteeringCorrection();
     }
     else {
         if (MemoryPatcher::SteerCorrectPatched)
             MemoryPatcher::RestoreSteeringCorrection();
-        resetSteeringMultiplier();
     }
 
-    if (settings.PatchSteeringControl &&
-        carControls.PrevInput == CarControls::Wheel &&
-        vehData.Class == VehicleClass::Car) {
+    if (isCar && useWheel && settings.PatchSteeringControl) {
         if (!MemoryPatcher::SteerControlPatched)
             MemoryPatcher::PatchSteeringControl();
     }
@@ -529,11 +502,8 @@ void initSteeringPatches() {
         if (MemoryPatcher::SteerControlPatched)
             MemoryPatcher::RestoreSteeringControl();
     }
-}
-
-void applySteeringMultiplier(float multiplier) {
-    if (vehicle != 0) {
-        ext.SetSteeringMultiplier(vehicle, multiplier);
+    if (isVehicleAvailable()) {
+        updateSteeringMultiplier();
     }
 }
 
@@ -566,8 +536,7 @@ void updateSteeringMultiplier() {
     else {
         mult = mult * settings.GameSteerMultOther;
     }
-
-    applySteeringMultiplier(mult);
+    ext.SetSteeringMultiplier(vehicle, mult);
 }
 
 void resetSteeringMultiplier() {
@@ -600,8 +569,6 @@ void updateLastInputDevice() {
         if (isVehicleAvailable()) {
             showNotification(message, &prevNotification);
         }
-
-        initSteeringPatches();
     }
     if (carControls.PrevInput == CarControls::Wheel) {
         CONTROLS::STOP_PAD_SHAKE(0);
@@ -931,7 +898,7 @@ void functionAShift() {
             vehData.PrevUpshiftTime = GetTickCount();
             shiftTo(ext.GetGearCurr(vehicle) + 1, true);
             vehData.FakeNeutral = false;
-            upshiftSpeedsMod[currGear] = currSpeed;
+            vehData.UpshiftSpeedsMod[currGear] = currSpeed;
         }
 
         if (vehData.IgnoreAccelerationUpshiftTrigger) {
@@ -1270,19 +1237,6 @@ void functionEngBrake() {
         vehData.EngBrakeActive = false;
     }
 }
-
-//void manageBrakePatch() {
-//    if (vehData.EngBrakeActive || vehData.EngLockActive) {
-//        if (!MemoryPatcher::BrakeDecrementPatched) {
-//            MemoryPatcher::PatchBrakeDecrement();
-//        }
-//    }
-//    else {
-//        if (MemoryPatcher::BrakeDecrementPatched) {
-//            MemoryPatcher::RestoreBrakeDecrement();
-//        }
-//    }
-//}
 
 ///////////////////////////////////////////////////////////////////////////////
 //                       Mod functions: Gearbox control
@@ -1676,7 +1630,7 @@ void blockButtons() {
         carControls.PrevInput != CarControls::Controller || !isVehicleAvailable()) {
         return;
     }
-    if (!(settings.ShiftMode == Automatic && ext.GetGearCurr(vehicle) < 2)) {
+    if (settings.ShiftMode == Automatic && ext.GetGearCurr(vehicle) > 1) {
         return;
     }
 
@@ -2426,13 +2380,13 @@ void main() {
 
     while (true) {
         update_globals();
-        update_inputs();
         update_vehicle();
+        update_inputs();
+        update_steeringpatches();
         update_hud();
         update_input_controls();
         update_manual_transmission();
         update_misc_features();
-        //update_npc();
         update_menu();
         WAIT(0);
     }

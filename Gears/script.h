@@ -67,15 +67,11 @@ void drawInputWheelInfo();
 //                           Mod functions: Mod control
 ///////////////////////////////////////////////////////////////////////////////
 
-void initVehicle();
-void initialize();
-void resetVehicle();
-void applySteeringMultiplier(float multiplier);
+void clearVehicleData();
 void resetSteeringMultiplier();
 void toggleManual();
 void initWheel();
 void stopForceFeedback();
-void initSteeringPatches();
 void updateLastInputDevice();
 
 ///////////////////////////////////////////////////////////////////////////////

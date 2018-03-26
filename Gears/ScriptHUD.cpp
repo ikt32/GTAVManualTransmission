@@ -27,8 +27,6 @@ extern int textureWheelId;
 extern VehicleData vehData;
 extern VehicleExtensions ext;
 extern Vehicle vehicle;
-extern std::array<float, NUM_GEARS> upshiftSpeedsGame;
-extern std::array<float, NUM_GEARS> upshiftSpeedsMod;
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Display elements
@@ -230,7 +228,7 @@ void drawDebugInfo() {
 
     if (settings.DisplayGearingInfo) {
         if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle)) {
-            upshiftSpeedsGame[ext.GetGearCurr(vehicle)] = vehData.SpeedVector.y;
+            vehData.UpshiftSpeedsGame[ext.GetGearCurr(vehicle)] = vehData.SpeedVector.y;
         }
 
         auto ratios = ext.GetGearRatios(vehicle);
@@ -262,14 +260,14 @@ void drawDebugInfo() {
 
         i = 0;
         showText(0.55f, 0.05f, 0.35f, "Actual (Game)");
-        for (auto speed : upshiftSpeedsGame) {
+        for (const auto& speed : vehData.UpshiftSpeedsGame) {
             showText(0.55f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
             i++;
         }
 
         i = 0;
         showText(0.70f, 0.05f, 0.35f, "Actual (Mod)");
-        for (auto speed : upshiftSpeedsMod) {
+        for (const auto& speed : vehData.UpshiftSpeedsMod) {
             showText(0.70f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
             i++;
         }

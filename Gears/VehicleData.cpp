@@ -1,4 +1,4 @@
-#include "../../ScriptHookV_SDK/inc/natives.h"
+#include <inc/natives.h>
 
 #include "VehicleData.hpp"
 

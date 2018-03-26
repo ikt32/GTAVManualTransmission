@@ -338,7 +338,6 @@ void update_controlsmenu() {
                             "Only active if this patch is also enabled for steering wheels.",
                             "PatchSteering (Wheel) is "+ std::string(settings.PatchSteering ? "enabled." : "disabled.")})) {
         settings.SaveWheel(&carControls);
-        initSteeringPatches();
     }
 
     if (menu.FloatOption("Steering reduction (kb/controller)", settings.SteeringReductionOther, 0.0f, 1.0f, 0.01f,
@@ -506,7 +505,6 @@ void update_wheelmenu() {
     if (menu.BoolOption("Patch steering", settings.PatchSteering,
                         { "Patches steering reduction and automatic countersteer for more direct control." })) {
         settings.SaveWheel(&carControls);
-        initSteeringPatches();
     }
 
     if (menu.FloatOption("Steering reduction (wheel)", settings.SteeringReductionWheel, 0.0f, 1.0f, 0.01f, 
@@ -516,13 +514,11 @@ void update_wheelmenu() {
 
     if (menu.FloatOption("Steering multiplier (wheel)", settings.GameSteerMultWheel, 0.1f, 2.0f, 0.01f,
                          { "Increase steering lock for all cars. You might want to increase it for faster steering and more steering lock." })) {
-        updateSteeringMultiplier();
     }
 
     if (menu.BoolOption("Disable non-wheel steering", settings.PatchSteeringControl,
                         { "Disable keyboard and controller inputs for steering. This fixes the jerky animation." })) {
         settings.SaveWheel(&carControls);
-        initSteeringPatches();
     }
 
     if (menu.BoolOption("Logitech RPM LEDs", settings.LogiLEDs, 
