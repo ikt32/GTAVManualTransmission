@@ -130,7 +130,7 @@ void updateNPCVehicles(Vehicle vehicles[1024], int count) {
 }
 
 void update_npc() {
-    bool mtActive = MemoryPatcher::ShiftUpPatched;
+    bool mtActive = MemoryPatcher::NumGearboxPatches != 0;
 
     if (!vehicle || !ENTITY::DOES_ENTITY_EXIST(vehicle) ||
         playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {

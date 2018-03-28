@@ -5,8 +5,8 @@ namespace MemoryPatcher {
  * Patch clutch and gearbox behavior so they can be script-controlled
  * Changes multiple things.
  */
-bool PatchInstructions();
-bool RestoreInstructions();
+bool ApplyGearboxPatches();
+bool RevertGearboxPatches();
 
 /*
  * Remove steering correction and steering scaling at speed
@@ -27,12 +27,6 @@ bool PatchBrakeDecrement();
 bool RestoreBrakeDecrement();
 
 /*
- * Remove "shift up" trigger
- */
-bool PatchShiftUp();
-bool RestoreShiftUp();
-
-/*
  * "total" refers to the "package" of patches needed to get the gearbox
  * and clutch stuff working.
  */
@@ -42,5 +36,4 @@ extern int TotalPatched;
 extern bool SteerCorrectPatched;
 extern bool SteerControlPatched;
 extern bool BrakeDecrementPatched;
-extern bool ShiftUpPatched;
 }

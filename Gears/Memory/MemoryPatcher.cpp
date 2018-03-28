@@ -1,11 +1,10 @@
 #include "MemoryPatcher.hpp"
 
-#include <Windows.h>
-#include "../Util/Logger.hpp"
 #include "NativeMemory.hpp"
+#include "Util/Logger.hpp"
+#include "Util/Util.hpp"
 
 namespace MemoryPatcher {
-
 // Clutch disengage @ Low Speed High Gear, low RPM
 uintptr_t ApplyClutchLowPatch();
 void RevertClutchLowPatch(uintptr_t address);
@@ -38,13 +37,12 @@ void RevertSteerControlPatch(uintptr_t address, byte *origInstr, int origInstrSz
 uintptr_t ApplyBrakePatch();
 void RevertBrakePatch(uintptr_t address, byte *origInstr, int origInstrSz);
 
-int NumGearboxPatches = 3;
+int NumGearboxPatches = 4;
 int TotalPatched = 0;
 
 bool SteerCorrectPatched = false;
 bool SteerControlPatched = false;
 bool BrakeDecrementPatched = false;
-bool ShiftUpPatched = false;
 
 uintptr_t clutchLowAddr = NULL;
 uintptr_t clutchLowTemp = NULL;
@@ -74,14 +72,13 @@ byte origSteerControlInstr[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 byte origBrakeInstr[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 const int maxAttempts = 4;
-int gearAttempts = 0;
+int gearboxAttempts = 0;
 int steerAttempts = 0;
 int steerControlAttempts = 0;
 int brakeAttempts = 0;
-int shiftUpAttempts = 0;
 
-bool PatchInstructions() {
-    if (gearAttempts > maxAttempts) {
+bool ApplyGearboxPatches() {
+    if (gearboxAttempts > maxAttempts) {
         return false;
     }
 
@@ -93,7 +90,6 @@ bool PatchInstructions() {
     }
 
     clutchLowTemp = ApplyClutchLowPatch();
-
     if (clutchLowTemp) {
         clutchLowAddr = clutchLowTemp;
         TotalPatched++;
@@ -104,7 +100,6 @@ bool PatchInstructions() {
     }
 
     clutchRevLimitTemp = ApplyClutchRevLimitPatch();
-
     if (clutchRevLimitTemp) {
         clutchRevLimitAddr = clutchRevLimitTemp;
         TotalPatched++;
@@ -115,7 +110,6 @@ bool PatchInstructions() {
     }
 
     shiftDownTemp = ApplyShiftDownPatch();
-
     if (shiftDownTemp) {
         shiftDownAddr = shiftDownTemp;
         TotalPatched++;
@@ -125,22 +119,32 @@ bool PatchInstructions() {
         logger.Write(ERROR, "PATCH: GEARBOX: shiftDown patch failed");
     }
 
+    shiftUpTemp = ApplyShiftUpPatch();
+    if (shiftUpTemp) {
+        shiftUpAddr = shiftUpTemp;
+        TotalPatched++;
+        logger.Write(DEBUG, "PATCH: GEARBOX: Patched shiftUp  @ 0x%p", shiftUpAddr);
+    }
+    else {
+        logger.Write(ERROR, "PATCH: GEARBOX: shiftUp patch failed");
+    }
+
     if (TotalPatched == NumGearboxPatches) {
         logger.Write(DEBUG, "PATCH: GEARBOX: Patch success");
-        gearAttempts = 0;
+        gearboxAttempts = 0;
         return true;
     }
     logger.Write(ERROR, "PATCH: GEARBOX: Patching failed");
-    gearAttempts++;
+    gearboxAttempts++;
 
-    if (gearAttempts > maxAttempts) {
+    if (gearboxAttempts > maxAttempts) {
         logger.Write(ERROR, "PATCH: GEARBOX: Patch attempt limit exceeded");
         logger.Write(ERROR, "PATCH: GEARBOX: Patching disabled");
     }
     return false;
 }
 
-bool RestoreInstructions() {
+bool RevertGearboxPatches() {
     logger.Write(DEBUG, "PATCH: GEARBOX: Restoring instructions");
 
     if (TotalPatched == 0) {
@@ -175,23 +179,22 @@ bool RestoreInstructions() {
         logger.Write(DEBUG, "PATCH: GEARBOX: shiftDown not restored");
     }
 
+    if (shiftUpAddr) {
+        RevertShiftUpPatch(shiftUpAddr);
+        shiftUpAddr = 0;
+        TotalPatched--;
+    }
+    else {
+        logger.Write(ERROR, "PATCH: GEARBOX: shiftUp not restored");
+    }
+
     if (TotalPatched == 0) {
         logger.Write(DEBUG, "PATCH: GEARBOX: Restore success");
-        gearAttempts = 0;
+        gearboxAttempts = 0;
         return true;
     }
     logger.Write(ERROR, "PATCH: GEARBOX: Restore failed");
     return false;
-}
-
-std::string formatByteArray(byte *byteArray, size_t length) {
-    std::string instructionBytes;
-    for (int i = 0; i < length; ++i) {
-        char buff[4];
-        snprintf(buff, 4, "%02X ", byteArray[i]);
-        instructionBytes += buff;
-    }
-    return instructionBytes;
 }
 
 bool PatchSteeringCorrection() {
@@ -212,7 +215,7 @@ bool PatchSteeringCorrection() {
         steeringAddr = steeringTemp;
         SteerCorrectPatched = true;
 
-        std::string instructionBytes = formatByteArray(origSteerInstr, sizeof(origSteerInstr) / sizeof(byte));
+        std::string instructionBytes = ByteArrayToString(origSteerInstr, sizeof(origSteerInstr) / sizeof(byte));
 
         logger.Write(DEBUG, "PATCH: STEERING: Steering Correction @ 0x%p", steeringAddr);
         logger.Write(DEBUG, "PATCH: STEERING: Patch success, original: " + instructionBytes);
@@ -269,7 +272,7 @@ bool PatchSteeringControl() {
         steerControlAddr = steerControlTemp;
         SteerControlPatched = true;
 
-        std::string instructionBytes = formatByteArray(origSteerControlInstr, sizeof(origSteerControlInstr) / sizeof(byte));
+        std::string instructionBytes = ByteArrayToString(origSteerControlInstr, sizeof(origSteerControlInstr) / sizeof(byte));
         
         logger.Write(DEBUG, "PATCH: STEERING CONTROL: Steering Control @ 0x%p", steerControlAddr);
         logger.Write(DEBUG, "PATCH: STEERING CONTROL: Patch success, original : " + instructionBytes);
@@ -341,6 +344,7 @@ bool PatchBrakeDecrement() {
     }
     return false;
 }
+
 bool RestoreBrakeDecrement() {
     //logger.Write("BRAKE PRESSURE: Restoring instructions");
 
@@ -360,53 +364,6 @@ bool RestoreBrakeDecrement() {
 
     logger.Write(ERROR, "PATCH: Brake pressure restore failed");
     return false;
-}
-
-bool PatchShiftUp() {
-    if (shiftUpAttempts > maxAttempts) {
-        return false;
-    }
-
-    if (ShiftUpPatched) {
-        return true;
-    }
-
-    shiftUpTemp = ApplyShiftUpPatch();
-
-    if (!shiftUpTemp) {
-        logger.Write(ERROR, "PATCH: Shift Up Patch failed");
-        shiftUpAttempts++;
-
-        if (shiftUpAttempts > maxAttempts) {
-            logger.Write(ERROR, "PATCH: Shift Up Patch attempt limit exceeded");
-            logger.Write(ERROR, "PATCH: Shift Up Patching disabled");
-        }
-        return false;
-    }
-    shiftUpAddr = shiftUpTemp;
-    ShiftUpPatched = true;
-    shiftUpAttempts = 0;
-
-    logger.Write(DEBUG, "PATCH: Shift Up @ 0x%p", shiftUpAddr);
-    logger.Write(DEBUG, "PATCH: Shift Up Patch success");
-    return true;
-}
-bool RestoreShiftUp() {
-    if (!ShiftUpPatched) {
-        return true;
-    }
-
-    if (!shiftUpAddr) {
-        logger.Write(ERROR, "PATCH: Shift Up Restore failed");
-        return false;
-    }
-
-    RevertShiftUpPatch(shiftUpAddr);
-    logger.Write(DEBUG, "PATCH: Shift Up Revert success");
-    shiftUpAddr = 0;
-    ShiftUpPatched = false;
-    shiftUpAttempts = 0;
-    return true;
 }
 
 uintptr_t ApplyClutchLowPatch() {

@@ -213,3 +213,13 @@ STR2INT_ERROR str2int(int &i, char const *s, int base) {
     i = l;
     return STR2INT_SUCCESS;
 }
+
+std::string ByteArrayToString(byte *byteArray, size_t length) {
+    std::string instructionBytes;
+    for (int i = 0; i < length; ++i) {
+        char buff[4];
+        snprintf(buff, 4, "%02X ", byteArray[i]);
+        instructionBytes += buff;
+    }
+    return instructionBytes;
+}

@@ -338,10 +338,7 @@ void update_manual_transmission() {
     }
 
     if (MemoryPatcher::TotalPatched != MemoryPatcher::NumGearboxPatches) {
-        MemoryPatcher::PatchInstructions();
-    }
-    if (!MemoryPatcher::ShiftUpPatched) {
-        MemoryPatcher::PatchShiftUp();
+        MemoryPatcher::ApplyGearboxPatches();
     }
 
     update_manual_features();
@@ -436,8 +433,8 @@ void clearVehicleData() {
 
 void clearPatches() {
     resetSteeringMultiplier();
-    if (MemoryPatcher::TotalPatched == MemoryPatcher::NumGearboxPatches) {
-        MemoryPatcher::RestoreInstructions();
+    if (MemoryPatcher::TotalPatched != 0) {
+        MemoryPatcher::RevertGearboxPatches();
     }
     if (MemoryPatcher::SteerControlPatched) {
         MemoryPatcher::RestoreSteeringControl();
@@ -447,9 +444,6 @@ void clearPatches() {
     }
     if (MemoryPatcher::BrakeDecrementPatched) {
         MemoryPatcher::RestoreBrakeDecrement();
-    }
-    if (MemoryPatcher::ShiftUpPatched) {
-        MemoryPatcher::RestoreShiftUp();
     }
 }
 
