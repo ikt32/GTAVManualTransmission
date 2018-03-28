@@ -93,7 +93,7 @@ void VehicleExtensions::initOffsets() {
     brakePOffset = addr == 0 ? 0 : *(int*)(addr + 6) + 0x14;
     logger.Write(brakePOffset == 0 ? WARN : DEBUG, "BrakeP Offset: 0x%X", brakePOffset);
 
-    addr = mem::FindPattern("\x44\x8A\xAA\x00\x00\x00\x00\x0F\x2F\xFB", "xxx????xxx");
+    addr = mem::FindPattern("\x44\x88\xA3\x00\x00\x00\x00\x45\x8A\xF4", "xxx????xxx");
     handbrakeOffset = addr == 0 ? 0 : *(int*)(addr + 3);
     logger.Write(handbrakeOffset == 0 ? WARN : DEBUG, "Handbrake Offset: 0x%X", handbrakeOffset);
 
