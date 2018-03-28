@@ -412,12 +412,14 @@ void VehicleExtensions::SetVisualHeight(Vehicle handle, float height) {
     *reinterpret_cast<float *>(wheelPtr + offset) = height;
 }
 
+// TODO: Pattern
 std::vector<float> VehicleExtensions::GetWheelHealths(Vehicle handle) {
     auto wheelPtr = GetWheelsPtr(handle);
     auto numWheels = GetNumWheels(handle);
 
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1E0 : 0x1D0;
     offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1D8 : offset;
+    offset = gameVersion >= G_VER_1_0_1365_1_STEAM ? 0x1E0 : offset;
 
     std::vector<float> healths;
 
@@ -434,6 +436,7 @@ void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) {
 
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1E0 : 0x1D0;
     offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1D8 : offset;
+    offset = gameVersion >= G_VER_1_0_1365_1_STEAM ? 0x1E0 : offset;
 
     for (auto i = 0; i < numWheels; i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
@@ -446,6 +449,7 @@ float VehicleExtensions::GetSteeringMultiplier(Vehicle handle) {
     auto numWheels = GetNumWheels(handle);
 
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x138 : 0x128;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x140 : offset;
 
     if (numWheels > 1) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * 1);
@@ -459,6 +463,7 @@ void VehicleExtensions::SetSteeringMultiplier(Vehicle handle, float value) {
     auto numWheels = GetNumWheels(handle);
 
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x138 : 0x128;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x140 : offset;
 
     for (int i = 0; i<numWheels; i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
@@ -530,6 +535,7 @@ std::vector<float> VehicleExtensions::GetWheelCompressions(Vehicle handle) {
 
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x160 : 0x150;
     offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x15C : offset;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x160 : offset;
 
     std::vector<float> compressions;
 
@@ -546,6 +552,7 @@ std::vector<float> VehicleExtensions::GetWheelSteeringAngles(Vehicle handle) {
 
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1C4 : 0x1B4;
     offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1BC : offset;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1C4 : offset;
 
     std::vector<float> angles;
 
@@ -590,6 +597,7 @@ std::vector<float> VehicleExtensions::GetWheelRotationSpeeds(Vehicle handle) {
 
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x168 : 0x158;
     offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x164 : offset;
+    offset = gameVersion >= G_VER_1_0_1365_1_STEAM ? 0x16C : offset;
 
     std::vector<float> speeds;
 
@@ -618,6 +626,7 @@ void VehicleExtensions::SetWheelSkidSmokeEffect(Vehicle handle, uint8_t index, f
     auto wheelPtr = GetWheelsPtr(handle);
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1B0 : 0x1A0;
     offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1A8 : offset;
+    offset = gameVersion >= G_VER_1_0_1365_1_STEAM ? 0x1B0 : offset;
 
     auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
     *reinterpret_cast<float *>(wheelAddr + offset) = value;
@@ -631,6 +640,7 @@ std::vector<float> VehicleExtensions::GetWheelSkidSmokeEffect(Vehicle handle) {
     
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1B0 : 0x1A0;
     offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1A8 : offset;
+    offset = gameVersion >= G_VER_1_0_1365_1_STEAM ? 0x1B0 : offset;
 
     for (auto i = 0; i < numWheels; i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
@@ -646,6 +656,8 @@ void VehicleExtensions::SetWheelBrakePressure(Vehicle handle, uint8_t index, flo
     auto wheelPtr = GetWheelsPtr(handle);
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1C8 : 0x1B8;
     offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1C0 : offset;
+    offset = gameVersion >= G_VER_1_0_1365_1_STEAM ? 0x1C8 : offset;
+
     auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
     *reinterpret_cast<float *>(wheelAddr + offset) = value;
 }
