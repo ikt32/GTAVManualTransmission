@@ -7,13 +7,13 @@
 namespace MemoryPatcher {
 
 // Clutch disengage @ Low Speed High Gear, low RPM
-uintptr_t PatchClutchLow();
-void RestoreClutchLow(uintptr_t address);
+uintptr_t ApplyClutchLowPatch();
+void RevertClutchLowPatch(uintptr_t address);
 
 // Individually: Disable "shifting down" wanted
 // 7A0 is NextGear, or what it appears like in my mod.
-uintptr_t PatchShiftDown();
-void RestoreShiftDown(uintptr_t address);
+uintptr_t ApplyShiftDownPatch();
+void RevertShiftDownPatch(uintptr_t address);
 
 // Only do this for bikes for now
 // We need to limit speed ourselves in the loop
@@ -21,8 +21,8 @@ uintptr_t ApplyShiftUpPatch();
 void RevertShiftUpPatch(uintptr_t address);
 
 // Clutch disengage @ High speed rev limiting
-uintptr_t PatchClutchRevLimit();
-void RestoreClutchRevLimit(uintptr_t address);
+uintptr_t ApplyClutchRevLimitPatch();
+void RevertClutchRevLimitPatch(uintptr_t address);
 
 // Does the same as Custom Steering by InfamousSabre
 // Kept for emergency/backup purposes in the case InfamousSabre
@@ -92,7 +92,7 @@ bool PatchInstructions() {
         return true;
     }
 
-    clutchLowTemp = PatchClutchLow();
+    clutchLowTemp = ApplyClutchLowPatch();
 
     if (clutchLowTemp) {
         clutchLowAddr = clutchLowTemp;
@@ -103,7 +103,7 @@ bool PatchInstructions() {
         logger.Write(ERROR, "PATCH: GEARBOX: clutchLow patch failed");
     }
 
-    clutchRevLimitTemp = PatchClutchRevLimit();
+    clutchRevLimitTemp = ApplyClutchRevLimitPatch();
 
     if (clutchRevLimitTemp) {
         clutchRevLimitAddr = clutchRevLimitTemp;
@@ -114,7 +114,7 @@ bool PatchInstructions() {
         logger.Write(ERROR, "PATCH: GEARBOX: clutchRevLimit patch failed");
     }
 
-    shiftDownTemp = PatchShiftDown();
+    shiftDownTemp = ApplyShiftDownPatch();
 
     if (shiftDownTemp) {
         shiftDownAddr = shiftDownTemp;
@@ -149,7 +149,7 @@ bool RestoreInstructions() {
     }
 
     if (clutchLowAddr) {
-        RestoreClutchLow(clutchLowAddr);
+        RevertClutchLowPatch(clutchLowAddr);
         clutchLowAddr = 0;
         TotalPatched--;
     }
@@ -158,7 +158,7 @@ bool RestoreInstructions() {
     }
 
     if (clutchRevLimitAddr) {
-        RestoreClutchRevLimit(clutchRevLimitAddr);
+        RevertClutchRevLimitPatch(clutchRevLimitAddr);
         clutchRevLimitAddr = 0;
         TotalPatched--;
     }
@@ -167,7 +167,7 @@ bool RestoreInstructions() {
     }
 
     if (shiftDownAddr) {
-        RestoreShiftDown(shiftDownAddr);
+        RevertShiftDownPatch(shiftDownAddr);
         shiftDownAddr = 0;
         TotalPatched--;
     }
@@ -409,7 +409,7 @@ bool RestoreShiftUp() {
     return true;
 }
 
-uintptr_t PatchClutchLow() {
+uintptr_t ApplyClutchLowPatch() {
     // Tested on build 350 and build 617
     // We're only interested in the first 7 bytes but we need the correct one
     // C7 43 40 CD CC CC 3D is what we're looking for, the second occurrence, at 
@@ -427,14 +427,14 @@ uintptr_t PatchClutchLow() {
     return address;
 }
 
-void RestoreClutchLow(uintptr_t address) {
+void RevertClutchLowPatch(uintptr_t address) {
     byte instrArr[7] = {0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D};
     if (address) {
         memcpy(reinterpret_cast<void*>(address), instrArr, 7);
     }
 }
 
-uintptr_t PatchClutchRevLimit() {
+uintptr_t ApplyClutchRevLimitPatch() {
     // Tested on build 1103
 
     uintptr_t address;
@@ -456,14 +456,14 @@ uintptr_t PatchClutchRevLimit() {
     return address;
 }
 
-void RestoreClutchRevLimit(uintptr_t address) {
+void RevertClutchRevLimitPatch(uintptr_t address) {
     byte instrArr[7] = {0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D};
     if (address) {
         memcpy(reinterpret_cast<void*>(address), instrArr, 7);
     }
 }
 
-uintptr_t PatchShiftDown() {
+uintptr_t ApplyShiftDownPatch() {
     // 66 89 13 <- Looking for this
     // 89 73 5C <- Next instruction
     // EB 0A    <- Next next instruction
@@ -479,7 +479,7 @@ uintptr_t PatchShiftDown() {
     return address;
 }
 
-void RestoreShiftDown(uintptr_t address) {
+void RevertShiftDownPatch(uintptr_t address) {
     byte instrArr[3] = {0x66, 0x89, 0x13};
     if (address) {
         memcpy(reinterpret_cast<void*>(address), instrArr, 3);

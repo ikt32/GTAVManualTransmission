@@ -32,10 +32,10 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
         case DLL_PROCESS_DETACH: {
             logger.Write(INFO, "Init shutdown");
             bool successI  = MemoryPatcher::RestoreInstructions();
+            bool successSU = MemoryPatcher::RestoreShiftUp();
             bool successS  = MemoryPatcher::RestoreSteeringCorrection();
             bool successSC = MemoryPatcher::RestoreSteeringControl();
             bool successB  = MemoryPatcher::RestoreBrakeDecrement();
-            bool successSU = MemoryPatcher::RestoreShiftUp();
 
             resetSteeringMultiplier();
             stopForceFeedback();
