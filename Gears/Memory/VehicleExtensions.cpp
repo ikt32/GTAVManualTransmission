@@ -449,7 +449,7 @@ float VehicleExtensions::GetSteeringMultiplier(Vehicle handle) {
     auto numWheels = GetNumWheels(handle);
 
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x138 : 0x128;
-    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x140 : offset;
+    offset = gameVersion >= G_VER_1_0_1365_1_STEAM ? 0x140 : offset;
 
     if (numWheels > 1) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * 1);
@@ -463,7 +463,7 @@ void VehicleExtensions::SetSteeringMultiplier(Vehicle handle, float value) {
     auto numWheels = GetNumWheels(handle);
 
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x138 : 0x128;
-    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x140 : offset;
+    offset = gameVersion >= G_VER_1_0_1365_1_STEAM ? 0x140 : offset;
 
     for (int i = 0; i<numWheels; i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
@@ -535,7 +535,7 @@ std::vector<float> VehicleExtensions::GetWheelCompressions(Vehicle handle) {
 
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x160 : 0x150;
     offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x15C : offset;
-    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x160 : offset;
+    offset = gameVersion >= G_VER_1_0_1365_1_STEAM ? 0x160 : offset;
 
     std::vector<float> compressions;
 
@@ -552,7 +552,7 @@ std::vector<float> VehicleExtensions::GetWheelSteeringAngles(Vehicle handle) {
 
     auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1C4 : 0x1B4;
     offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1BC : offset;
-    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1C4 : offset;
+    offset = gameVersion >= G_VER_1_0_1365_1_STEAM ? 0x1C4 : offset;
 
     std::vector<float> angles;
 
