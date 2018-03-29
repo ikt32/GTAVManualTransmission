@@ -141,6 +141,7 @@ public:
     // Needs patching of the instruction manipulating this field for applied values
     // to stick properly.
     void SetWheelBrakePressure(Vehicle handle, uint8_t index, float value);
+    std::vector<uint32_t> GetVehicleFlags(Vehicle handle);
 
     void initOffsets();
 
@@ -175,4 +176,6 @@ private:
     int numWheelsOffset = 0;
     // 0 = car, 1 = plane, 2 = trailer, 3 = quad, 6 = amphibious car, 7 = amphibious quad, 8 = heli, 11 = motorcycle, 12 = bicycle, 14 = train, 
     int modelTypeOffset = 0; 
+    const int vehicleModelInfoOffset = 0x020;
+    int vehicleFlagsOffset = 0;
 };

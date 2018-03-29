@@ -122,6 +122,10 @@ void VehicleExtensions::initOffsets() {
 
     numWheelsOffset = addr == 0 ? 0 : *(int*)(addr + 2);
     logger.Write(numWheelsOffset == 0 ? WARN : DEBUG, "Wheel Count Offset: 0x%X", numWheelsOffset);
+
+    addr = mem::FindPattern("\x48\x85\xC0\x74\x3C\x8B\x80\x00\x00\x00\x00\xC1\xE8\x0F", "xxxxxxx????xxx");
+    vehicleFlagsOffset = addr == 0 ? 0 : *(int*)(addr + 7);
+    logger.Write(vehicleFlagsOffset == 0 ? WARN : DEBUG, "VehicleFlags Offset: 0x%X", vehicleFlagsOffset);
 }
 
 BYTE *VehicleExtensions::GetAddress(Vehicle handle) {
@@ -661,6 +665,22 @@ void VehicleExtensions::SetWheelBrakePressure(Vehicle handle, uint8_t index, flo
     auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
     *reinterpret_cast<float *>(wheelAddr + offset) = value;
 }
+
+std::vector<uint32_t> VehicleExtensions::GetVehicleFlags(Vehicle handle) {
+    auto address = GetAddress(handle);
+
+    if (!address)
+        return std::vector<uint32_t>();
+
+    std::vector<uint32_t> offs(6);
+
+    auto pCVehicleModelInfo = *(uint64_t*)(address + vehicleModelInfoOffset);
+    for (uint8_t i = 0; i < 6; i++) {
+        offs[i] = *(uint32_t*)(pCVehicleModelInfo + vehicleFlagsOffset + sizeof(uint32_t) * i);
+    }
+    return offs;
+}
+
 
 // These apply to b1103
 // 0x7f8 to 0x814 are gear ratios!

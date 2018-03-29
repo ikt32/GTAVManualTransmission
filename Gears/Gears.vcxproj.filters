@@ -160,6 +160,9 @@
     <ClInclude Include="Input\NativeController.h">
       <Filter>Input</Filter>
     </ClInclude>
+    <ClInclude Include="Memory\VehicleFlags.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

@@ -152,6 +152,7 @@
     <ClInclude Include="..\thirdparty\MiniPID\MiniPID.h" />
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
     <ClInclude Include="Dump.h" />
+    <ClInclude Include="Memory\VehicleFlags.h" />
     <ClInclude Include="Memory\Versions.h" />
     <ClInclude Include="newNatives.h" />
     <ClInclude Include="ShiftModes.h" />
