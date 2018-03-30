@@ -1,6 +1,7 @@
 #include <inc/natives.h>
 
 #include "VehicleData.hpp"
+#include "Memory/VehicleFlags.h"
 
 VehicleData::VehicleData() { }
 
@@ -20,7 +21,7 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
         HasSpeedo = true;
     }
 
-    NoClutch = ext.GetTopGear(vehicle) == 1;
+    NoClutch = ext.GetTopGear(vehicle) == 1 || ext.GetVehicleFlags(vehicle)[1] & eVehicleFlag2::FLAG_IS_ELECTRIC;
 
     updateAcceleration();
 }

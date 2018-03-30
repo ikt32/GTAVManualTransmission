@@ -127,7 +127,8 @@ void VehicleExtensions::initOffsets() {
     vehicleFlagsOffset = addr == 0 ? 0 : *(int*)(addr + 7);
     logger.Write(vehicleFlagsOffset == 0 ? WARN : DEBUG, "Vehicle Flags Offset: 0x%X", vehicleFlagsOffset);
 
-    addr = mem::FindPattern("\x0F\xBA\xAB\xEC\x01\x00\x00\x09\x0F\x2F\xB3\x40\x01\x00\x00\x48\x8B\x83\x20\x01\x00\x00", "xx?????xxx???xxxx?????");
+    addr = mem::FindPattern("\x0F\xBA\xAB\xEC\x01\x00\x00\x09\x0F\x2F\xB3\x40\x01\x00\x00\x48\x8B\x83\x20\x01\x00\x00", 
+                            "xx?????xxx???xxxx?????");
     steeringMultOffset = addr == 0 ? 0 : *(int*)(addr + 11);
     logger.Write(vehicleFlagsOffset == 0 ? WARN : DEBUG, "Steering Multiplier Offset: 0x%X", steeringMultOffset);
 }

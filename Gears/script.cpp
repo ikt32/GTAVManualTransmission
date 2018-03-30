@@ -26,6 +26,7 @@
 #include "ShiftModes.h"
 #include "Memory/Offsets.hpp"
 #include "MiniPID/MiniPID.h"
+#include "Memory/VehicleFlags.h"
 
 const std::string mtPrefix = "~b~Manual Transmission~w~~n~";
 
@@ -1109,6 +1110,7 @@ void functionEngStall() {
 
 void functionEngDamage() {
     if (settings.ShiftMode == Automatic ||
+        ext.GetVehicleFlags(vehicle)[1] & eVehicleFlag2::FLAG_IS_ELECTRIC || 
         ext.GetTopGear(vehicle) == 1) {
         return;
     }
@@ -1123,6 +1125,7 @@ void functionEngDamage() {
 
 void functionEngLock() {
     if (settings.ShiftMode == Automatic ||
+        ext.GetVehicleFlags(vehicle)[1] & eVehicleFlag2::FLAG_IS_ELECTRIC ||
         ext.GetTopGear(vehicle) == 1 || 
         ext.GetGearCurr(vehicle) == ext.GetTopGear(vehicle) ||
         vehData.FakeNeutral) {
