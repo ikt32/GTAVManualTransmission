@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.6.0
+* Add support for b1365
+* Add support for [Custom Camera V Plus](https://www.gta5-mods.com/scripts/custom-camera-v-plus) via decorators
+* Add cinematic cam to blockable controls
+* Add player hiding in FPV option
+* Add throttle and brake button inputs for steering wheel
+* Tweak stalling parameters
+* Bug fixes and general improvements
+
+## 4.5.3
+* Fix external shiftmode setter.
+
 ## 4.5.2
 * Improve clutch catching
 * Add option to allow H-pattern for controller
