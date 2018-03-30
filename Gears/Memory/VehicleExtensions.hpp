@@ -178,4 +178,6 @@ private:
     int modelTypeOffset = 0; 
     const int vehicleModelInfoOffset = 0x020;
     int vehicleFlagsOffset = 0;
+
+    int steeringMultOffset = 0;
 };

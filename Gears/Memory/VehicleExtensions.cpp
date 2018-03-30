@@ -125,7 +125,11 @@ void VehicleExtensions::initOffsets() {
 
     addr = mem::FindPattern("\x48\x85\xC0\x74\x3C\x8B\x80\x00\x00\x00\x00\xC1\xE8\x0F", "xxxxxxx????xxx");
     vehicleFlagsOffset = addr == 0 ? 0 : *(int*)(addr + 7);
-    logger.Write(vehicleFlagsOffset == 0 ? WARN : DEBUG, "VehicleFlags Offset: 0x%X", vehicleFlagsOffset);
+    logger.Write(vehicleFlagsOffset == 0 ? WARN : DEBUG, "Vehicle Flags Offset: 0x%X", vehicleFlagsOffset);
+
+    addr = mem::FindPattern("\x0F\xBA\xAB\xEC\x01\x00\x00\x09\x0F\x2F\xB3\x40\x01\x00\x00\x48\x8B\x83\x20\x01\x00\x00", "xx?????xxx???xxxx?????");
+    steeringMultOffset = addr == 0 ? 0 : *(int*)(addr + 11);
+    logger.Write(vehicleFlagsOffset == 0 ? WARN : DEBUG, "Steering Multiplier Offset: 0x%X", steeringMultOffset);
 }
 
 BYTE *VehicleExtensions::GetAddress(Vehicle handle) {
@@ -452,12 +456,9 @@ float VehicleExtensions::GetSteeringMultiplier(Vehicle handle) {
     auto wheelPtr = GetWheelsPtr(handle);
     auto numWheels = GetNumWheels(handle);
 
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x138 : 0x128;
-    offset = gameVersion >= G_VER_1_0_1365_1_STEAM ? 0x140 : offset;
-
     if (numWheels > 1) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * 1);
-        return abs(*reinterpret_cast<float*>(wheelAddr + offset));
+        return abs(*reinterpret_cast<float*>(wheelAddr + steeringMultOffset));
     }
     return 1.0f;
 }
@@ -466,13 +467,10 @@ void VehicleExtensions::SetSteeringMultiplier(Vehicle handle, float value) {
     auto wheelPtr = GetWheelsPtr(handle);
     auto numWheels = GetNumWheels(handle);
 
-    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x138 : 0x128;
-    offset = gameVersion >= G_VER_1_0_1365_1_STEAM ? 0x140 : offset;
-
     for (int i = 0; i<numWheels; i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-        int sign = sgn(*reinterpret_cast<float*>(wheelAddr + offset));
-        *reinterpret_cast<float*>(wheelAddr + offset) = value * sign;
+        int sign = sgn(*reinterpret_cast<float*>(wheelAddr + steeringMultOffset));
+        *reinterpret_cast<float*>(wheelAddr + steeringMultOffset) = value * sign;
     }
 }
 

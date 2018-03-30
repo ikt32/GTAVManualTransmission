@@ -17,6 +17,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
     // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
     switch (reason) {
         case DLL_PROCESS_ATTACH: {
+            MemoryPatcher::SetPatterns(getGameVersion());
             scriptRegister(hInstance, ScriptMain);
             scriptRegisterAdditionalThread(hInstance, NPCMain);
             logger.Clear();
@@ -25,7 +26,6 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             if (getGameVersion() < G_VER_1_0_877_1_STEAM) {
                 logger.Write(WARN, "Unsupported game version! Update your game.");
             }
-
             logger.Write(INFO, "Script registered");
             break;
         }

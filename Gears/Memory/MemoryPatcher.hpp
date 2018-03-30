@@ -1,6 +1,8 @@
 #pragma once
 
 namespace MemoryPatcher {
+void SetPatterns(int version);
+
 /*
  * Patch clutch and gearbox behavior so they can be script-controlled
  * Changes multiple things.
