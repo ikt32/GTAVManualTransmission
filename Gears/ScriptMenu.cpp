@@ -169,14 +169,18 @@ int getBlockableControlIndex(int control) {
 ///////////////////////////////////////////////////////////////////////////////
 //                             Menu stuff
 ///////////////////////////////////////////////////////////////////////////////
-void menuInit() {
+void onMenuInit() {
     menu.ReadSettings();
 }
 
-void menuClose() {
+void saveChanges() {
     settings.SaveGeneral();
-    settings.SaveWheel(&carControls);
     settings.SaveController(&carControls);
+    settings.SaveWheel(&carControls);
+}
+
+void onMenuClose() {
+    saveChanges();
 }
 
 void update_mainmenu() {
@@ -188,6 +192,7 @@ void update_mainmenu() {
             { "~r~<b>THIS DEVICE HASN'T BEEN SET UP YET!</b>~w~",
               "Set it up or apply this option to discard the message.", 
               "Full name: " + device.name })) {
+            saveChanges();
             settings.SteeringAppendDevice(device.guid, device.name);
             settings.Read(&carControls);
             carControls.CheckGUIDs(settings.RegisteredGUIDs);
@@ -492,7 +497,7 @@ void update_wheelmenu() {
 
     if (menu.BoolOption("Enable wheel", settings.EnableWheel,
                         { "Enable usage of a steering wheel." })) {
-        settings.SaveWheel(&carControls);
+        saveChanges();
         settings.Read(&carControls);
         initWheel();
     }
@@ -1043,6 +1048,7 @@ bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> sta
 }
 
 void saveAxis(const std::string &confTag, GUID devGUID, std::string axis, int min, int max) {
+    saveChanges();
     std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     std::string devName = std::string(wDevName.begin(), wDevName.end());
     auto index = settings.SteeringAppendDevice(devGUID, devName);
@@ -1054,6 +1060,7 @@ void saveAxis(const std::string &confTag, GUID devGUID, std::string axis, int mi
 }
 
 void saveButton(const std::string &confTag, GUID devGUID, int button) {
+    saveChanges();
     std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
     auto index = settings.SteeringAppendDevice(devGUID, devName.c_str());
@@ -1062,6 +1069,7 @@ void saveButton(const std::string &confTag, GUID devGUID, int button) {
 }
 
 void addWheelToKey(const std::string &confTag, GUID devGUID, int button, std::string keyName) {
+    saveChanges();
     std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
     auto index = settings.SteeringAppendDevice(devGUID, devName.c_str());
@@ -1070,6 +1078,7 @@ void addWheelToKey(const std::string &confTag, GUID devGUID, int button, std::st
 }
 
 void saveHShifter(const std::string &confTag, GUID devGUID, std::array<int, NUMGEARS> buttonArray) {
+    saveChanges();
     std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
     auto index = settings.SteeringAppendDevice(devGUID, devName);
@@ -1078,6 +1087,7 @@ void saveHShifter(const std::string &confTag, GUID devGUID, std::array<int, NUMG
 }
 
 void clearAxis(std::string confTag) {
+    saveChanges();
     settings.SteeringSaveAxis(confTag, -1, "", 0, 0);
     settings.Read(&carControls);
     showNotification(("Cleared axis " + confTag).c_str(), &prevNotification);
@@ -1100,6 +1110,7 @@ void clearWheelToKey() {
     }
     bool found = settings.SteeringClearWheelToKey(button);
     if (found) {
+        saveChanges();
         showNotification("Removed button " + result, &prevNotification);
         settings.Read(&carControls);
     }
@@ -1109,12 +1120,14 @@ void clearWheelToKey() {
 }
 
 void clearButton(std::string confTag) {
+    saveChanges();
     settings.SteeringSaveButton(confTag, -1, -1);
     settings.Read(&carControls);
     showNotification(("Cleared button " + confTag).c_str(), &prevNotification);
 }
 
 void clearHShifter() {
+    saveChanges();
     int empty[NUMGEARS] = {};
     for (int i = 0; i < NUMGEARS; i++) {
         empty[i] = -1;
@@ -1126,36 +1139,42 @@ void clearHShifter() {
 
 // Controller and keyboard
 void saveKeyboardKey(std::string confTag, std::string key) {
+    saveChanges();
     settings.KeyboardSaveKey(confTag, key);
     settings.Read(&carControls);
     showNotification(("Saved key " + confTag + ": " + key).c_str(), &prevNotification);
 }
 
 void saveControllerButton(std::string confTag, std::string button) {
+    saveChanges();
     settings.ControllerSaveButton(confTag, button);
     settings.Read(&carControls);
     showNotification(("Saved button " + confTag + ": " + button).c_str(), &prevNotification);
 }
 
 void saveLControllerButton(std::string confTag, int button) {
+    saveChanges();
     settings.LControllerSaveButton(confTag, button);
     settings.Read(&carControls);
     showNotification(("Saved button " + confTag + ": " + std::to_string(button)).c_str(), &prevNotification);
 }
 
 void clearKeyboardKey(std::string confTag) {
+    saveChanges();
     settings.KeyboardSaveKey(confTag, "UNKNOWN");
     settings.Read(&carControls);
     showNotification(("Cleared key " + confTag).c_str(), &prevNotification);
 }
 
 void clearControllerButton(std::string confTag) {
+    saveChanges();
     settings.ControllerSaveButton(confTag, "UNKNOWN");
     settings.Read(&carControls);
     showNotification(("Cleared button " + confTag).c_str(), &prevNotification);
 }
 
 void clearLControllerButton(std::string confTag) {
+    saveChanges();
     settings.LControllerSaveButton(confTag, -1);
     settings.Read(&carControls);
     showNotification(("Cleared button " + confTag).c_str(), &prevNotification);

@@ -456,9 +456,6 @@ void RevertClutchRevLimitPatch(uintptr_t address) {
 }
 
 uintptr_t ApplyShiftDownPatch() {
-    // 66 89 13 <- Looking for this
-    // 89 73 5C <- Next instruction
-    // EB 0A    <- Next next instruction
     uintptr_t address;
     if (shiftDownTemp != 0)
         address = shiftDownTemp;
@@ -478,7 +475,6 @@ void RevertShiftDownPatch(uintptr_t address) {
 }
 
 uintptr_t ApplyShiftUpPatch() {
-    // 66 89 13 <- Looking for this
     uintptr_t address;
     if (shiftUpTemp != 0)
         address = shiftUpTemp;

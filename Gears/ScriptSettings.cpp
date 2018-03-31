@@ -12,7 +12,7 @@
 
 ScriptSettings::ScriptSettings() { }
 
-void ScriptSettings::SetFiles(const std::string &general, const std::string &wheel, const std::string &stick) {
+void ScriptSettings::SetFiles(const std::string &general, const std::string &wheel) {
     settingsGeneralFile = general;
     settingsWheelFile = wheel;
 }

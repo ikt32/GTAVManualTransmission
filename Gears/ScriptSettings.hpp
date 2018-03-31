@@ -14,7 +14,7 @@ const int NUMGEARS = 8;
 class ScriptSettings {
 public:
     ScriptSettings();
-    void SetFiles(const std::string &general, const std::string &wheel, const std::string &stick);
+    void SetFiles(const std::string &general, const std::string &wheel);
     void Read(CarControls* scriptControl);
     void SaveGeneral() const;
     void SaveController(CarControls *scriptControl) const;
