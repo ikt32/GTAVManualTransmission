@@ -111,7 +111,7 @@ Refer to `settings_menu.ini` for keys.
 Opening the menu:
 * Press `[{` to access the menu or
 * Enter the `mtmenu` cheat or
-* Press `RB` + `A` on your controller.
+* Press `RB` + `B` on your controller.
 
 ![Menu main](Menu-Main.png) ![Menu setup](Menu-Options.png)
 
