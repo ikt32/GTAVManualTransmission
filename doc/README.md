@@ -2,7 +2,7 @@
 
 Manual Transmission & Steering Wheel Support
 ===========
-Version 4.4.0
+Version 4.6.0
 
 ![Gameplay](Gameplay.jpg)
 
@@ -15,7 +15,7 @@ It’s highly recommended to play with this mod using a controller or a wheel.
 
 # Steering Wheel Support for GTA V
 Enjoy the open world of Grand Theft Auto V with your steering wheel! Force
-feedback is enabled, so you can feel how each vehicle is different, and of
+feedback is supported, so you can feel how each vehicle is different, and of
 course how the various roads and surfaces feel.
 
 Support is enabled in two varieties - with the game's automatic transmission
@@ -25,7 +25,7 @@ tweakable in-game, so you'll find your sweet spot in no time.
 * all DirectInput compatible steering wheels supported (since 4.0)
 * multiple input devices supported (since 4.2.0)
 * force feedback is fully supported
-* 1:1 mapping of steering wheel to vehicle front wheels
+* direct mapping of steering wheel to vehicle wheels
 
 # Downloads
 * [GTA5-Mods.com](https://www.gta5-mods.com/scripts/manual-transmission-ikt)
@@ -48,7 +48,7 @@ tweakable in-game, so you'll find your sweet spot in no time.
     - [Keyboard defaults (US-ANSI)](#keyboard-defaults-us-ansi)
     - [Controller defaults](#controller-defaults)
     - [Wheel defaults](#wheel-defaults)
-    - [Usage](#usage)
+    - [Controls priority](#controls-priority)
 - [Driving with Manual Transmission](#driving-with-manual-transmission)
 - [Configuration files](#configuration-files)
     - [`settings_general.ini`](#settings_generalini)
@@ -63,19 +63,19 @@ tweakable in-game, so you'll find your sweet spot in no time.
 <!-- /TOC -->
 
 # Requirements
-* [Grand Theft Auto V](http://store.steampowered.com/app/271590/Grand_Theft_Auto_V/) 1.0.877.1 to 1.0.1180.2
+* [Grand Theft Auto V](http://store.steampowered.com/app/271590/Grand_Theft_Auto_V/) 1.0.877.1 to 1.0.1365.1
 * [ScriptHookV](http://www.dev-c.com/gtav/scripthookv/)
 
 # Installation and usage
 Put `Gears.asi` and the folder `ManualTransmission` in your GTA V folder
- (overwrite when asked)
+ (overwrite when asked).
 
 __Additional steps for wheel users__  
 Remove or disable any XInput or DirectInput input hook configurations for 
 your wheel for GTA V (x360ce, for example)
 
 Use the menu hotkey (`[{`) to open the menu. Configure your preferences and 
-options in the menu. __Wheel users must do this!__
+options in the menu. __Mandatory for wheel users!__
 
 ## FiveM installation
 1. Create a plugins folder in FiveM Application Data 
@@ -106,19 +106,14 @@ Mods that counter the power loss when sliding sideways
 * [Drift Assist](https://www.gta5-mods.com/scripts/drift-assist)
 
 # Controls
-In `settings_menu.ini`, the keys are stored. Default for US layouts:
+Refer to `settings_menu.ini` for keys.
 
-* Press `[{` to access the menu
-* Up/Down/Left/Right arrow keys to navigate
-* `RETURN` to select
-* `BACKSPACE` to go back
+Opening the menu:
+* Press `[{` to access the menu or
+* Enter the `mtmenu` cheat or
+* Press `RB` + `A` on your controller.
 
-The menu supports controller input fully too, but you'll need to assign
-controller buttons to open the menu.
-
-![Menu main](MenuMain0.jpg)
-
-![Menu setup](MenuOptions.jpg)
+![Menu main](Menu-Main.png) ![Menu setup](Menu-Options.png)
 
 ## Keyboard defaults (US-ANSI)
 By default, `W` and `S` are assigned to throttle and brake respectively.
@@ -153,7 +148,11 @@ By default, `RightTrigger` and `LeftTrigger` are assigned to throttle and brake 
 ## Wheel defaults
 There are no defaults. You need to use the menu to assign your controls.
 
-## Usage
+![Wheel setup](Menu-Wheel0.png)
+
+![Wheel setup](Menu-Wheel1.png)
+
+## Controls priority
 The mod picks up the last control and is only active for that set of controls.
 To switch between inputs (keyboard, controller or wheel), you only need to tap
  the throttle on that device. The mod automagically switches between these inputs.
@@ -355,6 +354,8 @@ other mods.
 ### `[HUD]`
 Some info you can enable or disable at will. It's pretty self-explanatory.
 
+![Pic HUD](Menu-HUD.png)
+
 * Gear: Current gear
 * GearTopColor: Color for when the top gear is reached
 * ShiftMode: Displays gearbox mode
@@ -515,10 +516,11 @@ the in-game menu to configure the axis-inputs and H-shifter.
 When assigning axes and buttons, __DO THIS IN-GAME!__ The script will resolve the
 correct values. 
 
-![Wheel setup](MenuWheel0.jpg)
+![Wheel setup](Menu-Wheel0.png)
 
-![Wheel setup](MenuWheel1.jpg)
+![Wheel setup](Menu-Wheel1.png)
 
+![Wheel setup](Menu-Wheel2.png)
 
 ### `[OPTIONS]` (Wheel)
 
