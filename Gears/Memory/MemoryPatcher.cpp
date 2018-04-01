@@ -96,23 +96,20 @@ PatternInfo brake;
 
 void SetPatterns(int version) {
     if (version < G_GameVersion::G_VER_1_0_1365_1_STEAM) {
-        shiftUp = PatternInfo("\x66\x89\x13\xB8\x05\x00\x00\x00\x66\x89\x43\04", 
-            "xxxx????xxx?", { 0x66, 0x89, 0x13 });
+        shiftUp = PatternInfo("\x66\x89\x13\xB8\x05\x00\x00\x00", 
+            "xxxxxxxx", { 0x66, 0x89, 0x13 });
         shiftDown = PatternInfo("\x66\x89\x13\x89\x73\x5C", 
             "xxxxxx", { 0x66, 0x89, 0x13 });
-        // Brake: "\xF3\x0F\x11\x81\xC8\x01\x00\x00"
-        brake = PatternInfo("\xEB\x05\xF3\x0F\x10\x40\x78\xF3\x0F\x59\xC4\xF3\x0F\x11\x81\xC8\x01\x00\x00\xC3",
-            "xxxxxx?xxxxxxxx??xxx", { }, 11);
+        brake = PatternInfo("\xEB\x05\xF3\x0F\x10\x40\x78\xF3\x0F\x59\xC4\xF3",
+            "xxxxxx?xxxxx", { }, 11);
     }
     else {
         shiftUp = PatternInfo("\x66\x89\x0B\x8D\x46\x04\x66\x89\x43\04",
             "xx?xx?xxx?", { 0x66, 0x89, 0x0B });
         shiftDown = PatternInfo("\x66\x89\x13\x44\x89\x73\x5c",
             "xxxxxxx", { 0x66, 0x89, 0x13 });
-        auto patt = "\xEB\x05\xF3\x0F\x10\x40\x78\xF3\x41\x0F\x59\xC0\xF3";
-        auto mask = "xxxxx??x?x?xx";
-        brake = PatternInfo(patt,
-            mask, { }, 12);
+        brake = PatternInfo("\xEB\x05\xF3\x0F\x10\x40\x78\xF3\x41\x0F\x59\xC0\xF3",
+            "xxxxx??x?x?xx", {}, 12);
     }
 }
 
