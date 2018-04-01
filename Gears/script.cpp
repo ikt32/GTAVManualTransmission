@@ -1223,9 +1223,9 @@ void functionEngBrake() {
                 }
             }
             if (settings.DisplayInfo) {
-                showText(0.5, 0.55, 0.5, "Eng brake @ " + std::to_string(static_cast<int>(inputMultiplier * 100.0f)) + "%");
-                showText(0.5, 0.60, 0.5, "Pressure: " + std::to_string(engBrakeForce));
-                showText(0.5, 0.65, 0.5, "Brk. Inp: " + std::to_string(inpBrakeForce));
+                showText(0.85, 0.500, 0.4, "EngBrake:\t\t " + std::to_string(static_cast<int>(inputMultiplier * 100.0f)) + "%", 4);
+                showText(0.85, 0.525, 0.4, "Pressure:\t\t " + std::to_string(engBrakeForce), 4);
+                showText(0.85, 0.550, 0.4, "BrkInput:\t\t " + std::to_string(inpBrakeForce), 4);
             }
         }
         
@@ -2032,11 +2032,6 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
         }
     }
 
-    //if (settings.DisplayFFBInfo) {
-    //    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, travelWorld.x, travelWorld.y, travelWorld.z, 0, 255, 0, 255);
-    //    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, turnWorldNorm.x, turnWorldNorm.y, turnWorldNorm.z, 255, 0, 0, 255);
-    //    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, steeringWorld.x, steeringWorld.y, steeringWorld.z, 255, 0, 255, 255);
-    //}
     if (settings.DisplayInfo) {
         showText(0.85, 0.175, 0.4, "RelSteer:\t" + std::to_string(steeringRelative.x), 4);
         showText(0.85, 0.200, 0.4, "SetPoint:\t" + std::to_string(travelRelative.x), 4);
@@ -2183,7 +2178,7 @@ void playFFBGround() {
     if (settings.DisplayInfo) {
         showText(0.85, 0.275, 0.4, std::string(abs(satForce) > 10000 ? "~r~" : "~w~") + "FFBSat:\t\t" + std::to_string(satForce) + "~w~", 4);
         showText(0.85, 0.300, 0.4, std::string(abs(totalForce) > 10000 ? "~r~" : "~w~") + "FFBFin:\t\t" + std::to_string(totalForce) + "~w~", 4);
-        showText(0.5, 0.05, 0.5, std::string("Damper: ") + std::to_string(damperForce).c_str());
+        showText(0.85, 0.325, 0.4, std::string("Damper:\t") + std::to_string(damperForce).c_str(), 4);
     }
 }
 
