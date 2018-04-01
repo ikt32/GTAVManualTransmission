@@ -502,13 +502,14 @@ void update_wheelmenu() {
         initWheel();
     }
 
-    if (menu.BoolOption("Enable wheel always", settings.WheelWithoutManual,
+    if (menu.BoolOption("Always enable wheel", settings.WheelWithoutManual,
                         { "Enable your wheel even when the Manual Transmission part of this mod is off." })) {
         settings.SaveWheel(&carControls);
     }
-        
+
     if (menu.BoolOption("Patch steering", settings.PatchSteering,
-                        { "Patches steering reduction and automatic countersteer for more direct control." })) {
+                        { "Patches steering reduction and automatic countersteer for more direct control.",
+                          "Recommended to keep this on." })) {
         settings.SaveWheel(&carControls);
     }
 
@@ -522,7 +523,8 @@ void update_wheelmenu() {
     }
 
     if (menu.BoolOption("Disable non-wheel steering", settings.PatchSteeringControl,
-                        { "Disable keyboard and controller inputs for steering. This fixes the jerky animation." })) {
+                        { "Disable keyboard and controller inputs for steering. This fixes the jerky animation.",
+                          "Recommended to keep this on." })) {
         settings.SaveWheel(&carControls);
     }
 
@@ -531,17 +533,17 @@ void update_wheelmenu() {
         settings.SaveWheel(&carControls);
     }
 
-    menu.MenuOption("Steering wheel axis setup", "axesmenu", 
-                    { "Configure the analog controls." });
-        
+    menu.MenuOption("Analog input setup", "axesmenu", 
+                    { "Configure the analog inputs." });
+    
+    menu.MenuOption("Button input setup", "buttonsmenu",
+                    { "Set up your buttons on your steering wheel." });
+    
     menu.MenuOption("Force feedback options", "forcefeedbackmenu",
                     { "Fine-tune your force feedback parameters." });
         
-    menu.MenuOption("Steering wheel angles", "anglemenu",
+    menu.MenuOption("Soft lock options", "anglemenu",
                     { "Set up soft lock options here." });
-        
-    menu.MenuOption("Steering wheel button setup", "buttonsmenu",
-                    { "Set up your buttons on your steering wheel." });
 
     std::vector<std::string> hpatInfo;
     hpatInfo.push_back("Press RIGHT to clear H-pattern shifter");
@@ -566,7 +568,7 @@ void update_wheelmenu() {
 }
 
 void update_anglemenu() {
-    menu.Title("Wheel angles");
+    menu.Title("Soft lock");
     menu.Subtitle("Soft lock & angle setup");
     float minLock = 180.0f;
     if (menu.FloatOption("Physical degrees", settings.SteerAngleMax, minLock, 1080.0, 30.0,
