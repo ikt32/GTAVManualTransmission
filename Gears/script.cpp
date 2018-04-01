@@ -2011,7 +2011,7 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
         understeer = sgn(travelRelative.x - steeringAngleRelX) * (turnRelativeNormX - steeringAngleRelX);
         if (steeringAngleRelX > turnRelativeNormX && turnRelativeNormX > travelRelative.x ||
             steeringAngleRelX < turnRelativeNormX && turnRelativeNormX < travelRelative.x) {
-            satForce = (int)((float)satForce / std::max(1.0f, understeer + 1.0f));
+            satForce = (int)((float)satForce / std::max(1.0f, 3.3f * understeer + 1.0f));
             understeering = true;
         }
     }
