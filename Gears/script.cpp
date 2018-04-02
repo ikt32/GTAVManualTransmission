@@ -294,6 +294,14 @@ void update_manual_features() {
             MemoryPatcher::PatchBrakeDecrement();
         }
     }
+    else if (vehData.InduceBurnout) {
+        if (!MemoryPatcher::BrakeDecrementPatched) {
+            MemoryPatcher::PatchBrakeDecrement();
+        }
+        for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
+            ext.SetWheelBrakePressure(vehicle, i, 0.0f);
+        }
+    }
     else {
         if (MemoryPatcher::BrakeDecrementPatched) {
             MemoryPatcher::RestoreBrakeDecrement();
@@ -1390,6 +1398,10 @@ void functionRealReverse() {
             if (carControls.BrakeVal < 0.1f) {
                 VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
             }
+            vehData.InduceBurnout = true;
+        }
+        else {
+            vehData.InduceBurnout = false;
         }
     }
     // Reverse gear
@@ -1503,6 +1515,10 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
                 //showText(0.3, 0.0, 1.0, "We should burnout");
                 SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
                 SetControlADZ(ControlVehicleBrake, wheelThrottleVal, carControls.ADZThrottle);
+                vehData.InduceBurnout = true;
+            }
+            else {
+                vehData.InduceBurnout = false;
             }
 
             if (wheelThrottleVal > 0.01f && (carControls.ClutchVal > settings.ClutchThreshold || vehData.FakeNeutral)) {

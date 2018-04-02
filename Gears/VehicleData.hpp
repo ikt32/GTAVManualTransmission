@@ -75,6 +75,7 @@ public:
 
     std::array<float, NUM_GEARS> UpshiftSpeedsGame = { };
     std::array<float, NUM_GEARS> UpshiftSpeedsMod = { };
+    bool InduceBurnout = false;
 private:
     VehicleClass findClass(Hash model);
     VehicleDomain findDomain(VehicleClass vehicleClass);
