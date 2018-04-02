@@ -318,18 +318,20 @@ void drawVehicleWheelInfo() {
     auto wheelsOnGround = ext.GetWheelsOnGround(vehicle);
     auto wheelCoords = ext.GetWheelCoords(vehicle, ENTITY::GET_ENTITY_COORDS(vehicle, true), ENTITY::GET_ENTITY_ROTATION(vehicle, 0), ENTITY::GET_ENTITY_FORWARD_VECTOR(vehicle));
     auto wheelLockups = getWheelLockups(vehicle);
-
+    auto wheelsBrake = ext.GetWheelBrakePressure(vehicle);
     for (int i = 0; i < numWheels; i++) {
         float wheelSpeed = wheelsSpeed[i];
         float wheelCompr = wheelsCompr[i];
         float wheelHealt = wheelsHealt[i];
+        float wheelBrake = wheelsBrake[i];
         Color c = wheelLockups[i] ? solidOrange : transparentGray;
         c = wheelsOnGround[i] ? c : solidRed;
         showDebugInfo3D(wheelCoords[i], {
             "Index: \t" + std::to_string(i),
             "Speed: \t" + std::to_string(wheelSpeed),
             "Compr: \t" + std::to_string(wheelCompr),
-            "Health: \t" + std::to_string(wheelHealt), },
+            "Health: \t" + std::to_string(wheelHealt),
+            "Brake: \t " + std::to_string(wheelBrake)},
             c);
         GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
             wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z + 1.0f + 2.5f * wheelCompr, 255, 0, 0, 255);

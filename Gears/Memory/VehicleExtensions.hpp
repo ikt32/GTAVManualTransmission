@@ -140,6 +140,7 @@ public:
     // This behavior is visible when the instruction decreasing this is patched away.
     // Needs patching of the instruction manipulating this field for applied values
     // to stick properly.
+    std::vector<float> GetWheelBrakePressure(Vehicle handle);
     void SetWheelBrakePressure(Vehicle handle, uint8_t index, float value);
     std::vector<uint32_t> GetVehicleFlags(Vehicle handle);
 
