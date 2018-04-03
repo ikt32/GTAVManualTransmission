@@ -841,6 +841,13 @@ bool subAShiftManual() {
             vehData.FakeNeutral = false;
             return true;
         }
+
+        // Invalid + N to 1
+        if (ext.GetGearCurr(vehicle) == 0 && vehData.FakeNeutral) {
+            shiftTo(1, true);
+            vehData.FakeNeutral = false;
+            return true;
+        }
     }
 
     // Shift down
@@ -856,6 +863,13 @@ bool subAShiftManual() {
 
         // Neutral to R
         if (ext.GetGearCurr(vehicle) == 1 && vehData.FakeNeutral) {
+            shiftTo(0, true);
+            vehData.FakeNeutral = false;
+            return true;
+        }
+
+        // Invalid + N to R
+        if (ext.GetGearCurr(vehicle) == 0 && vehData.FakeNeutral) {
             shiftTo(0, true);
             vehData.FakeNeutral = false;
             return true;
