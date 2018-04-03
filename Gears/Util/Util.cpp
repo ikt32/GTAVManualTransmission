@@ -223,3 +223,20 @@ std::string ByteArrayToString(byte *byteArray, size_t length) {
     }
     return instructionBytes;
 }
+
+bool isPlayerAvailable(Player player, Ped playerPed) {
+    if (!PLAYER::IS_PLAYER_CONTROL_ON(player) ||
+        PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE) ||
+        CUTSCENE::IS_CUTSCENE_PLAYING() ||
+        !ENTITY::DOES_ENTITY_EXIST(playerPed) ||
+        ENTITY::IS_ENTITY_DEAD(playerPed)) {
+        return false;
+    }
+    return true;
+}
+
+bool isVehicleAvailable(Vehicle vehicle, Ped playerPed) {
+    return vehicle != 0 &&
+        ENTITY::DOES_ENTITY_EXIST(vehicle) &&
+        playerPed == VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1);
+}

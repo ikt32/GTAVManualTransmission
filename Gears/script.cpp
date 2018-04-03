@@ -76,39 +76,24 @@ extern std::vector<std::string> speedoTypes;
 
 MiniPID pid(1.0, 0.0, 0.0);
 
-bool isPlayerAvailable() {
-    if (!PLAYER::IS_PLAYER_CONTROL_ON(player) || 
-        PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE) || 
-        CUTSCENE::IS_CUTSCENE_PLAYING() ||
-        !ENTITY::DOES_ENTITY_EXIST(playerPed) || 
-        ENTITY::IS_ENTITY_DEAD(playerPed)) {
-        return false;
-    }
-    return true;
-}
-
-bool isVehicleAvailable() {
-    return vehicle != 0 && 
-        ENTITY::DOES_ENTITY_EXIST(vehicle) && 
-        playerPed == VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1);
-}
-
-void update_globals() {
+void update_player() {
     player = PLAYER::PLAYER_ID();
     playerPed = PLAYER::PLAYER_PED_ID();
-    vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
 }
 
 void update_vehicle() {
-    if (!isVehicleAvailable()) {
-        clearVehicleData();
-        lastVehicle = vehicle;
-    }
-    else {
-        if (vehicle != lastVehicle) {
-            clearVehicleData();
-        }
+    vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
+    if (isVehicleAvailable(vehicle, playerPed)) {
         vehData.UpdateValues(ext, vehicle);
+    }
+    if (vehicle != lastVehicle) {
+        gearRattle.Stop();
+        if (vehData.NoClutch) {
+            vehData.FakeNeutral = false;
+        }
+        else {
+            vehData.FakeNeutral = settings.DefaultNeutral;
+        }
     }
     lastVehicle = vehicle;
 }
@@ -120,7 +105,7 @@ void update_inputs() {
 }
 
 void update_hud() {
-    if (!isPlayerAvailable() || !isVehicleAvailable()) {
+    if (!isPlayerAvailable(player, playerPed) || !isVehicleAvailable(vehicle, playerPed)) {
         return;
     }
 
@@ -174,7 +159,7 @@ void wheelControlRoad() {
 
 // Apply input as controls for selected devices
 void update_input_controls() {
-    if (!isPlayerAvailable())
+    if (!isPlayerAvailable(player, playerPed))
         return;
 
     blockButtons();
@@ -187,7 +172,7 @@ void update_input_controls() {
     if (!carControls.WheelAvailable())
         return;
 
-    if (isVehicleAvailable()) {
+    if (isVehicleAvailable(vehicle, playerPed)) {
         switch (vehData.Domain) {
         case VehicleDomain::Road: {
             wheelControlRoad();
@@ -220,10 +205,10 @@ void update_input_controls() {
 
 // don't write with VehicleExtensions and dont set clutch state
 void update_misc_features() {
-    if (!isPlayerAvailable())
+    if (!isPlayerAvailable(player, playerPed))
         return;
 
-    if (isVehicleAvailable()) {
+    if (isVehicleAvailable(vehicle, playerPed)) {
         if (settings.CrossScript) {
             crossScript();
         }
@@ -318,7 +303,7 @@ void update_manual_features() {
 
 // Manual Transmission part of the mod
 void update_manual_transmission() {
-    if (!isPlayerAvailable() || !isVehicleAvailable()) {
+    if (!isPlayerAvailable(player, playerPed) || !isVehicleAvailable(vehicle, playerPed)) {
         return;
     }
 
@@ -389,7 +374,7 @@ void update_manual_transmission() {
 //                            Helper things
 ///////////////////////////////////////////////////////////////////////////////
 void crossScript() {
-    if (!isVehicleAvailable())
+    if (!isVehicleAvailable(vehicle, playerPed))
         return;
 
     // Current gear
@@ -429,17 +414,6 @@ void crossScript() {
 //                           Mod functions: Mod control
 ///////////////////////////////////////////////////////////////////////////////
 
-void clearVehicleData() {
-    vehData = VehicleData();
-    if (vehData.NoClutch) {
-        vehData.FakeNeutral = false;
-    }
-    else {
-        vehData.FakeNeutral = settings.DefaultNeutral;
-    }
-    gearRattle.Stop();
-}
-
 void clearPatches() {
     resetSteeringMultiplier();
     if (MemoryPatcher::TotalPatched != 0) {
@@ -467,7 +441,7 @@ void toggleManual() {
         message += "Disabled";
     }
     showNotification(message, &prevNotification);
-    clearVehicleData();
+    gearRattle.Stop();
     readSettings();
     initWheel();
     clearPatches();
@@ -505,7 +479,7 @@ void update_steeringpatches() {
         if (MemoryPatcher::SteerControlPatched)
             MemoryPatcher::RestoreSteeringControl();
     }
-    if (isVehicleAvailable()) {
+    if (isVehicleAvailable(vehicle, playerPed)) {
         updateSteeringMultiplier();
     }
 }
@@ -569,7 +543,7 @@ void updateLastInputDevice() {
             default: break;
         }
         // Suppress notification when not in car
-        if (isVehicleAvailable()) {
+        if (isVehicleAvailable(vehicle, playerPed)) {
             showNotification(message, &prevNotification);
         }
     }
@@ -1654,7 +1628,7 @@ void functionAutoReverse() {
 // TODO: Some original "tap" controls don't work.
 void blockButtons() {
     if (!settings.EnableManual || !settings.BlockCarControls ||
-        carControls.PrevInput != CarControls::Controller || !isVehicleAvailable()) {
+        carControls.PrevInput != CarControls::Controller || !isVehicleAvailable(vehicle, playerPed)) {
         return;
     }
     if (settings.ShiftMode == Automatic && ext.GetGearCurr(vehicle) > 1) {
@@ -2288,7 +2262,7 @@ void functionHillGravity() {
 }
 
 void functionHidePlayerInFPV() {
-    if (settings.HidePlayerInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4 && isVehicleAvailable()) {
+    if (settings.HidePlayerInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4 && isVehicleAvailable(vehicle, playerPed)) {
         ENTITY::SET_ENTITY_VISIBLE(playerPed, false, false);
     }
     else {
@@ -2385,10 +2359,6 @@ void main() {
 
     initWheel();
 
-    //if (!controls.StickControl.PreInit()) {
-    //	logger.Write("STICK: DirectInput failed to initialize");
-    //}
-
     if (FileExists(textureWheelFile)) {
         textureWheelId = createTexture(textureWheelFile.c_str());
     }
@@ -2401,7 +2371,7 @@ void main() {
     logger.Write(INFO, "START: Initialization finished");
 
     while (true) {
-        update_globals();
+        update_player();
         update_vehicle();
         update_inputs();
         update_steeringpatches();

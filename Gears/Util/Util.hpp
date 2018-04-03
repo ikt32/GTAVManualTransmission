@@ -67,3 +67,7 @@ enum STR2INT_ERROR { STR2INT_SUCCESS, STR2INT_OVERFLOW, STR2INT_UNDERFLOW, STR2I
 STR2INT_ERROR str2int(int &i, char const *s, int base = 0);
 
 std::string ByteArrayToString(byte *byteArray, size_t length);
+
+bool isPlayerAvailable(Player player, Ped playerPed);
+
+bool isVehicleAvailable(Vehicle vehicle, Ped playerPed);
