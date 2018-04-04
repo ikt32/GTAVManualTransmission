@@ -564,10 +564,8 @@ void setShiftMode(int shiftMode) {
     if (shiftMode > 2 || shiftMode < 0)
         return;
 
-    if ((shiftMode == Automatic ||
-        shiftMode == Sequential) && ext.GetGearCurr(vehicle) > 1) {
+    if (isVehicleAvailable(vehicle, playerPed) && shiftMode != HPattern && ext.GetGearCurr(vehicle) > 1)
         vehData.FakeNeutral = false;
-    }
 
     if (shiftMode == HPattern &&
         carControls.PrevInput == CarControls::Controller && 
