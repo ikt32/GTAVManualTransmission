@@ -168,7 +168,6 @@ void ScriptSettings::SaveWheel(CarControls *scriptControl) const {
     // [OPTIONS]
     settingsWheel.SetBoolValue("OPTIONS", "EnableWheel", EnableWheel);
     settingsWheel.SetBoolValue("OPTIONS", "WheelWithoutManual", WheelWithoutManual);
-//	settingsWheel.SetBoolValue("OPTIONS", "WheelBoatPlanes", WheelForBoat);
     settingsWheel.SetBoolValue("OPTIONS", "PatchSteering", PatchSteering);
     settingsWheel.SetBoolValue("OPTIONS", "PatchSteeringAlways", PatchSteeringAlways);
     settingsWheel.SetBoolValue("OPTIONS", "PatchSteeringControl", PatchSteeringControl);
@@ -185,6 +184,7 @@ void ScriptSettings::SaveWheel(CarControls *scriptControl) const {
     
     settingsWheel.SetDoubleValue("OPTIONS", "SteeringReductionOther", SteeringReductionOther);
     settingsWheel.SetDoubleValue("OPTIONS", "GameSteerMultOther", GameSteerMultOther);
+    settingsWheel.SetBoolValue("OPTIONS", "UseShifterForAuto", UseShifterForAuto);
 
     // [FORCE_FEEDBACK]
     settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Enable", EnableFFB);
@@ -413,6 +413,7 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 
     SteeringReductionOther = settingsWheel.GetDoubleValue("OPTIONS", "SteeringReductionOther", 0.0);
     GameSteerMultOther = settingsWheel.GetDoubleValue("OPTIONS", "GameSteerMultOther", 1.0);
+    UseShifterForAuto = settingsWheel.GetBoolValue("OPTIONS", "UseShifterForAuto", false);
 
     //scriptControl->InvertSteer =	settingsWheel.GetBoolValue("OPTIONS", "InvertSteer", false);
     //scriptControl->InvertThrottle = settingsWheel.GetBoolValue("OPTIONS", "InvertThrottle", false);
@@ -673,6 +674,18 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::IndicatorHazard)] =
         settingsWheel.GetLongValue("INDICATOR_HAZARD", "BUTTON", -1);
     
+    // [AUTO_R]
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::AR)] =
+        DeviceIndexToGUID(settingsWheel.GetLongValue("AUTO_R", "DEVICE", -1), RegisteredGUIDs);
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::AR)] =
+        settingsWheel.GetLongValue("AUTO_R", "BUTTON", -1);
+
+    // [AUTO_D]
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::AD)] =
+        DeviceIndexToGUID(settingsWheel.GetLongValue("AUTO_D", "DEVICE", -1), RegisteredGUIDs);
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::AD)] =
+        settingsWheel.GetLongValue("AUTO_D", "BUTTON", -1);
+
     // [TO_KEYBOARD]
     scriptControl->WheelToKeyGUID = 
         DeviceIndexToGUID(settingsWheel.GetLongValue("TO_KEYBOARD", "DEVICE", -1), RegisteredGUIDs);

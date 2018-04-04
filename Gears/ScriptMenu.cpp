@@ -563,8 +563,24 @@ void update_wheelmenu() {
         showNotification(result ? "H-pattern shifter saved" : "Cancelled H-pattern shifter setup", &prevNotification);
     }
 
+    std::vector<std::string> hAutoInfo;
+    hAutoInfo.push_back("Press RIGHT to clear H-pattern auto");
+    hpatInfo.push_back("Active gear:");
+    if (carControls.ButtonIn(CarControls::WheelControlType::AR)) hAutoInfo.push_back("Reverse");
+    else if (carControls.ButtonIn(CarControls::WheelControlType::AD)) hAutoInfo.push_back("Drive");
+    else hAutoInfo.push_back("Neutral");
+
+    if (menu.OptionPlus("H-pattern shifter setup (auto)", hAutoInfo, nullptr, std::bind(clearASelect), nullptr, "Input values",
+    { "Select this option to start H-pattern shifter (auto) setup. Follow the on-screen instructions." })) {
+        bool result = configASelect();
+        showNotification(result ? "H-pattern shifter (auto) saved" : "Cancelled H-pattern shifter (auto) setup", &prevNotification);
+    }
+
     menu.BoolOption("Keyboard H-pattern", settings.HPatternKeyboard, 
                     { "This allows you to use the keyboard for H-pattern shifting. Configure the controls in the keyboard section." });
+
+    menu.BoolOption("Use shifter for automatic", settings.UseShifterForAuto, 
+                    { "Use the H-pattern shifter to select the Drive/Reverse gears." });
 }
 
 void update_anglemenu() {
@@ -788,6 +804,8 @@ void update_buttonsmenu() {
     if (carControls.ButtonIn(CarControls::WheelControlType::H5)) buttonInfo.push_back("Gear 5");
     if (carControls.ButtonIn(CarControls::WheelControlType::H6)) buttonInfo.push_back("Gear 6");
     if (carControls.ButtonIn(CarControls::WheelControlType::H7)) buttonInfo.push_back("Gear 7");
+    if (carControls.ButtonIn(CarControls::WheelControlType::AR)) buttonInfo.push_back("Auto R");
+    if (carControls.ButtonIn(CarControls::WheelControlType::AD)) buttonInfo.push_back("Auto 1");
     if (carControls.ButtonIn(CarControls::WheelControlType::ShiftUp))	buttonInfo.push_back("ShiftUp");
     if (carControls.ButtonIn(CarControls::WheelControlType::ShiftDown)) buttonInfo.push_back("ShiftDown");
     if (carControls.ButtonIn(CarControls::WheelControlType::Clutch))	buttonInfo.push_back("ClutchButton");
@@ -1139,6 +1157,14 @@ void clearHShifter() {
     showNotification("Cleared H-pattern shifter", &prevNotification);
 }
 
+void clearASelect() {
+    saveChanges();
+    settings.SteeringSaveButton("AUTO_R", -1, -1);
+    settings.SteeringSaveButton("AUTO_D", -1, -1);
+    settings.Read(&carControls);
+    showNotification("Cleared H-pattern shifter (auto)", &prevNotification);
+}
+
 // Controller and keyboard
 void saveKeyboardKey(std::string confTag, std::string key) {
     saveChanges();
@@ -1383,11 +1409,9 @@ bool configHPattern() {
     std::string confTag = "SHIFTER";
     std::string additionalInfo = "Press " + escapeKey + " to exit. Press " + skipKey + " to skip gear.";
 
-    carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
-
     GUID devGUID = {};
     std::array<int, NUMGEARS> buttonArray; // There are gears 1-7 + R
-    std::fill(buttonArray.begin(), buttonArray.end(), -1);
+    fill(buttonArray.begin(), buttonArray.end(), -1);
 
     int progress = 0;
 
@@ -1419,7 +1443,7 @@ bool configHPattern() {
             }
         }
 
-        if (progress > 7) {
+        if (progress > NUMGEARS-1) {
             break;
         }
         std::string gearDisplay;
@@ -1436,6 +1460,54 @@ bool configHPattern() {
         WAIT(0);
     }
     saveHShifter(confTag, devGUID, buttonArray);
+    return true;
+}
+
+// I hate myself.
+// TODO: Fix strings
+bool configASelect() {
+    std::string additionalInfo = "Press " + escapeKey + " to exit.";
+    GUID devGUID = {};
+    std::array<int, 2> buttonArray{ -1, -1 };
+    int progress = 0;
+
+    while (true) {
+        if (IsKeyJustUp(str2key(escapeKey))) {
+            return false;
+        }
+
+        carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
+
+        for (auto guid : carControls.GetWheel().GetGuids()) {
+            for (int i = 0; i < MAX_RGBBUTTONS; i++) {
+                // only find unregistered buttons
+                if (carControls.GetWheel().IsButtonJustPressed(i, guid) &&
+                    find(begin(buttonArray), end(buttonArray), i) == end(buttonArray)) {
+                    if (progress == 0) { // also save device info when just started
+                        devGUID = guid;
+                        saveButton("AUTO_R", devGUID, i);
+                        progress++;
+                    }
+                    else if (guid == devGUID) { // only accept same device onwards
+                        saveButton("AUTO_D", devGUID, i);
+                        progress++;
+                    }
+                }
+            }
+        }
+
+        if (progress > 1) {
+            break;
+        }
+        std::string gearDisplay;
+        switch (progress) {
+        case 0: gearDisplay = "Reverse"; break;
+        case 1: gearDisplay = "Drive"; break;
+        default: gearDisplay = "?"; break;
+        }
+        showSubtitle("Shift into " + gearDisplay + ". " + additionalInfo);
+        WAIT(0);
+    }
     return true;
 }
 

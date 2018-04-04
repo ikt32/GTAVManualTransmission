@@ -45,6 +45,8 @@ public:
     float RPMDamage = 1.5f;
     int MisshiftDamage = 10;
 
+    bool UseShifterForAuto = false;
+
     // misc stuff
     bool HillBrakeWorkaround = false;
     bool AutoGear1 = false;

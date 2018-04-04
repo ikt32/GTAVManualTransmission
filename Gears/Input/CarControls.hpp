@@ -90,6 +90,8 @@ public:
         IndicatorLeft,
         IndicatorRight,
         IndicatorHazard,
+        AR,
+        AD,
         UNKNOWN,
         SIZEOF_WheelControlType
     };

@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.6.1
+* Add H-pattern shifter assignments for automatic gearbox drive/neutral selection
+* Fix shift up patch for pre-b1365
+* Fix a crash when getting out of a car when using a wheel and then using a controller
+* Fix an issue where assigning a button resets current menu session changes
+* Fix an issue where the auto gearbox can't shift out of neutral
+* Make understeer more noticeable
+
 ## 4.6.0
 * Add support for b1365
 * Add support for [Custom Camera V Plus](https://www.gta5-mods.com/scripts/custom-camera-v-plus) via decorators

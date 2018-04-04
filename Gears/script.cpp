@@ -783,7 +783,7 @@ void functionSShift() {
 /*
  * Manual part of the automatic transmission (R<->N<->D)
  */
-bool subAShiftManual() {
+bool subAutoShiftSequential() {
     auto xcTapStateUp = carControls.ButtonTapped(CarControls::ControllerControlType::ShiftUp);
     auto xcTapStateDn = carControls.ButtonTapped(CarControls::ControllerControlType::ShiftDown);
 
@@ -849,9 +849,44 @@ bool subAShiftManual() {
     return false;
 }
 
+/*
+ * Manual part of the automatic transmission (Direct selection)
+ */
+bool subAutoShiftSelect() {
+    if (carControls.ButtonJustPressed(CarControls::WheelControlType::AR)) {
+        if (vehData.SpeedVector.y < 5.0f) {
+            shiftTo(0, true);
+            vehData.FakeNeutral = false;
+        }
+        return true;
+    }
+    if (carControls.ButtonJustPressed(CarControls::WheelControlType::AD)) {
+        shiftTo(1, true);
+        vehData.FakeNeutral = false;
+        return true;
+    }
+    if (carControls.ButtonReleased(CarControls::WheelControlType::AR)) {
+        shiftTo(1, true);
+        vehData.FakeNeutral = true;
+        return true;
+    }
+    if (carControls.ButtonReleased(CarControls::WheelControlType::AD)) {
+        vehData.FakeNeutral = true;
+        return true;
+    }
+    return false;
+}
+
 void functionAShift() { 
     // Manual part
-    if (subAShiftManual()) return;
+    if (carControls.PrevInput == CarControls::Wheel && settings.UseShifterForAuto) {
+        if (subAutoShiftSelect()) 
+            return;
+    }
+    else {
+        if (subAutoShiftSequential()) 
+            return;
+    }
     
     int currGear = ext.GetGearCurr(vehicle);
     if (currGear == 0) return;
@@ -1528,6 +1563,9 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
                 }
             }
             VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, brakelights);
+        }
+        else {
+            vehData.InduceBurnout = false;
         }
     }
 
