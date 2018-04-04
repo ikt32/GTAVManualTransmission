@@ -655,16 +655,15 @@ void functionHShiftWheel() {
             functionHShiftTo(i);
         }
     }
-    // Bleh
-    if (carControls.ButtonReleased(static_cast<CarControls::WheelControlType>(CarControls::WheelControlType::H1)) ||
-        carControls.ButtonReleased(static_cast<CarControls::WheelControlType>(CarControls::WheelControlType::H2)) ||
-        carControls.ButtonReleased(static_cast<CarControls::WheelControlType>(CarControls::WheelControlType::H3)) ||
-        carControls.ButtonReleased(static_cast<CarControls::WheelControlType>(CarControls::WheelControlType::H4)) ||
-        carControls.ButtonReleased(static_cast<CarControls::WheelControlType>(CarControls::WheelControlType::H5)) ||
-        carControls.ButtonReleased(static_cast<CarControls::WheelControlType>(CarControls::WheelControlType::H6)) ||
-        carControls.ButtonReleased(static_cast<CarControls::WheelControlType>(CarControls::WheelControlType::H7)) ||
-        carControls.ButtonReleased(static_cast<CarControls::WheelControlType>(CarControls::WheelControlType::HR))
-    ) {
+
+    if (carControls.ButtonReleased(CarControls::WheelControlType::H1) ||
+        carControls.ButtonReleased(CarControls::WheelControlType::H2) ||
+        carControls.ButtonReleased(CarControls::WheelControlType::H3) ||
+        carControls.ButtonReleased(CarControls::WheelControlType::H4) ||
+        carControls.ButtonReleased(CarControls::WheelControlType::H5) ||
+        carControls.ButtonReleased(CarControls::WheelControlType::H6) ||
+        carControls.ButtonReleased(CarControls::WheelControlType::H7) ||
+        carControls.ButtonReleased(CarControls::WheelControlType::HR)) {
         if (settings.ClutchShiftingH &&
             settings.EngDamage &&
             !vehData.NoClutch) {
@@ -675,7 +674,7 @@ void functionHShiftWheel() {
         vehData.FakeNeutral = !vehData.NoClutch;
     }
 
-    if (carControls.ButtonReleased(static_cast<CarControls::WheelControlType>(CarControls::WheelControlType::HR))) {
+    if (carControls.ButtonReleased(CarControls::WheelControlType::HR)) {
         shiftTo(1, true);
         vehData.FakeNeutral = !vehData.NoClutch;
     }
