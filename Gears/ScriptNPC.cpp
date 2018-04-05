@@ -1,5 +1,3 @@
-#define NOMINMAX
-
 #include "script.h"
 #include <inc/natives.h>
 

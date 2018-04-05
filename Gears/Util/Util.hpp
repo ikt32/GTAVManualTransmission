@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <inc/types.h>
 
 enum STR2INT_ERROR {
     STR2INT_SUCCESS, 
@@ -13,4 +12,4 @@ enum STR2INT_ERROR {
 
 STR2INT_ERROR str2int(int &i, char const *s, int base = 0);
 
-std::string ByteArrayToString(byte *byteArray, size_t length);
+std::string ByteArrayToString(uint8_t *byteArray, size_t length);

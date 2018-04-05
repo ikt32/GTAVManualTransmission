@@ -18,7 +18,7 @@ STR2INT_ERROR str2int(int &i, char const *s, int base) {
     return STR2INT_SUCCESS;
 }
 
-std::string ByteArrayToString(byte *byteArray, size_t length) {
+std::string ByteArrayToString(uint8_t *byteArray, size_t length) {
     std::string instructionBytes;
     for (int i = 0; i < length; ++i) {
         char buff[4];

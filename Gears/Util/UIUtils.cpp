@@ -1,5 +1,3 @@
-#define NOMINMAX
-
 #include "UIUtils.h"
 #include <inc/natives.h>
 #include <algorithm>

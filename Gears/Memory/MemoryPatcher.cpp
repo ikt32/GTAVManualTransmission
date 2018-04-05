@@ -28,15 +28,15 @@ void RevertClutchRevLimitPatch(uintptr_t address);
 // Kept for emergency/backup purposes in the case InfamousSabre
 // stops support earlier than I do. (not trying to compete here!)
 uintptr_t ApplySteeringCorrectionPatch();
-void RevertSteeringCorrectionPatch(uintptr_t address, byte *origInstr, int origInstrSz);
+void RevertSteeringCorrectionPatch(uintptr_t address, uint8_t *origInstr, int origInstrSz);
 
 // Disable (normal) user input while wheel steering is active.
 uintptr_t ApplySteerControlPatch();
-void RevertSteerControlPatch(uintptr_t address, byte *origInstr, int origInstrSz);
+void RevertSteerControlPatch(uintptr_t address, uint8_t *origInstr, int origInstrSz);
 
 // When disabled, brake pressure doesn't decrease.
 uintptr_t ApplyBrakePatch();
-void RevertBrakePatch(uintptr_t address, byte *origInstr, int origInstrSz);
+void RevertBrakePatch(uintptr_t address, uint8_t *origInstr, int origInstrSz);
 
 int NumGearboxPatches = 4;
 int TotalPatched = 0;
@@ -66,11 +66,11 @@ uintptr_t steerControlTemp = NULL;
 uintptr_t brakeAddr = NULL;
 uintptr_t brakeTemp = NULL;
 
-byte origSteerInstr[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-byte origSteerInstrDest[4] = {0x00, 0x00, 0x00, 0x00};
+uint8_t origSteerInstr[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+uint8_t origSteerInstrDest[4] = {0x00, 0x00, 0x00, 0x00};
 
-byte origSteerControlInstr[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-byte origBrakeInstr[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+uint8_t origSteerControlInstr[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+uint8_t origBrakeInstr[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 const int maxAttempts = 4;
 int gearboxAttempts = 0;
@@ -80,13 +80,13 @@ int brakeAttempts = 0;
 
 struct PatternInfo {
     PatternInfo(){}
-    PatternInfo(std::string pattern, std::string mask, std::vector<byte> data)
+    PatternInfo(std::string pattern, std::string mask, std::vector<uint8_t> data)
         : Pattern(pattern), Mask(mask), Data(data) { }
-    PatternInfo(std::string pattern, std::string mask, std::vector<byte> data, uint32_t offset)
+    PatternInfo(std::string pattern, std::string mask, std::vector<uint8_t> data, uint32_t offset)
         : Pattern(pattern), Mask(mask), Data(data), Offset(offset) { }
     std::string Pattern;
     std::string Mask;
-    std::vector<byte> Data;
+    std::vector<uint8_t> Data;
     uint32_t Offset = 0;
 };
 
@@ -251,7 +251,7 @@ bool PatchSteeringCorrection() {
         steeringAddr = steeringTemp;
         SteerCorrectPatched = true;
 
-        std::string instructionBytes = ByteArrayToString(origSteerInstr, sizeof(origSteerInstr) / sizeof(byte));
+        std::string instructionBytes = ByteArrayToString(origSteerInstr, sizeof(origSteerInstr) / sizeof(uint8_t));
 
         logger.Write(DEBUG, "PATCH: STEERING: Steering Correction @ 0x%p", steeringAddr);
         logger.Write(DEBUG, "PATCH: STEERING: Patch success, original: " + instructionBytes);
@@ -278,7 +278,7 @@ bool RestoreSteeringCorrection() {
     }
 
     if (steeringAddr) {
-        RevertSteeringCorrectionPatch(steeringAddr, origSteerInstr, sizeof(origSteerInstr) / sizeof(byte));
+        RevertSteeringCorrectionPatch(steeringAddr, origSteerInstr, sizeof(origSteerInstr) / sizeof(uint8_t));
         steeringAddr = 0;
         SteerCorrectPatched = false;
         logger.Write(DEBUG, "PATCH: STEERING: Restore success");
@@ -308,7 +308,7 @@ bool PatchSteeringControl() {
         steerControlAddr = steerControlTemp;
         SteerControlPatched = true;
 
-        std::string instructionBytes = ByteArrayToString(origSteerControlInstr, sizeof(origSteerControlInstr) / sizeof(byte));
+        std::string instructionBytes = ByteArrayToString(origSteerControlInstr, sizeof(origSteerControlInstr) / sizeof(uint8_t));
         
         logger.Write(DEBUG, "PATCH: STEERING CONTROL: Steering Control @ 0x%p", steerControlAddr);
         logger.Write(DEBUG, "PATCH: STEERING CONTROL: Patch success, original : " + instructionBytes);
@@ -337,7 +337,7 @@ bool RestoreSteeringControl() {
 
     if (steerControlAddr) {
         //byte origInstr[8] = { 0xF3, 0x0F, 0x11, 0x8B, 0xFC, 0x08, 0x00, 0x00 };
-        RevertSteerControlPatch(steerControlAddr, origSteerControlInstr, sizeof(origSteerControlInstr) / sizeof(byte));
+        RevertSteerControlPatch(steerControlAddr, origSteerControlInstr, sizeof(origSteerControlInstr) / sizeof(uint8_t));
         steerControlAddr = 0;
         SteerControlPatched = false;
         logger.Write(DEBUG, "PATCH: STEERING CONTROL: Restore success");
@@ -390,7 +390,7 @@ bool RestoreBrakeDecrement() {
     }
 
     if (brakeAddr) {
-        RevertBrakePatch(brakeAddr, origBrakeInstr, sizeof(origBrakeInstr) / sizeof(byte));
+        RevertBrakePatch(brakeAddr, origBrakeInstr, sizeof(origBrakeInstr) / sizeof(uint8_t));
         brakeAddr = 0;
         BrakeDecrementPatched = false;
         //logger.Write("BRAKE PRESSURE: Restore success");
@@ -421,7 +421,7 @@ uintptr_t ApplyClutchLowPatch() {
 }
 
 void RevertClutchLowPatch(uintptr_t address) {
-    byte instrArr[7] = {0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D};
+    uint8_t instrArr[7] = {0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D};
     if (address) {
         memcpy(reinterpret_cast<void*>(address), instrArr, 7);
     }
@@ -446,7 +446,7 @@ uintptr_t ApplyClutchRevLimitPatch() {
 }
 
 void RevertClutchRevLimitPatch(uintptr_t address) {
-    byte instrArr[7] = {0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D};
+    uint8_t instrArr[7] = {0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D};
     if (address) {
         memcpy(reinterpret_cast<void*>(address), instrArr, 7);
     }
@@ -537,7 +537,7 @@ uintptr_t ApplySteeringCorrectionPatch() {
     }
 
     if (address) {
-        byte instrArr[6] = 
+        uint8_t instrArr[6] =
             {0xE9, 0x00, 0x00, 0x00, 0x00, 0x90};               // make preliminary instruction: JMP to <adrr>
 
         memcpy(origSteerInstr, (void*)address, 6);              // save whole orig instruction
@@ -551,7 +551,7 @@ uintptr_t ApplySteeringCorrectionPatch() {
     return 0;
 }
 
-void RevertSteeringCorrectionPatch(uintptr_t address, byte *origInstr, int origInstrSz) {
+void RevertSteeringCorrectionPatch(uintptr_t address, uint8_t *origInstr, int origInstrSz) {
     if (address) {
         memcpy((void*)address, origInstr, origInstrSz);
     }
@@ -583,7 +583,7 @@ uintptr_t ApplySteerControlPatch() {
     return address;
 }
 
-void RevertSteerControlPatch(uintptr_t address, byte *origInstr, int origInstrSz) {
+void RevertSteerControlPatch(uintptr_t address, uint8_t *origInstr, int origInstrSz) {
     if (address) {
         memcpy((void*)address, origInstr, origInstrSz);
     }
@@ -608,7 +608,7 @@ uintptr_t ApplyBrakePatch() {
     return address;
 }
 
-void RevertBrakePatch(uintptr_t address, byte *origInstr, int origInstrSz) {
+void RevertBrakePatch(uintptr_t address, uint8_t *origInstr, int origInstrSz) {
     if (address) {
         memcpy((void*)address, origInstr, origInstrSz);
     }

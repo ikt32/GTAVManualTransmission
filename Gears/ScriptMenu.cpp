@@ -1,4 +1,3 @@
-#define NOMINMAX
 #include "script.h"
 
 #include <string>
