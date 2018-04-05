@@ -284,7 +284,7 @@ void update_manual_features() {
             MemoryPatcher::PatchBrakeDecrement();
         }
         for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
-            ext.SetWheelBrakePressure(vehicle, i, 0.0f);
+            ext.SetWheelBrakePressure(vehicle, i, carControls.BrakeVal);
         }
     }
     else {
@@ -1535,6 +1535,8 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
                 //showText(0.3, 0.0, 1.0, "We should burnout");
                 SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
                 SetControlADZ(ControlVehicleBrake, wheelThrottleVal, carControls.ADZThrottle);
+                ext.SetThrottle(vehicle, 1.0f);
+                ext.SetThrottleP(vehicle, 1.0f);
                 vehData.InduceBurnout = true;
             }
             else {
