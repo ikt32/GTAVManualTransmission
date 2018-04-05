@@ -69,6 +69,9 @@
     <ClCompile Include="Input\NativeController.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="Util\GameSound.cpp" />
+    <ClCompile Include="Util\UIUtils.cpp" />
+    <ClCompile Include="Util\Files.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -163,6 +166,12 @@
     <ClInclude Include="Memory\VehicleFlags.h">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="Constants.h" />
+    <ClInclude Include="Util\GameSound.h" />
+    <ClInclude Include="Util\Color.h" />
+    <ClInclude Include="Util\UIUtils.h" />
+    <ClInclude Include="Util\Files.h" />
+    <ClInclude Include="Util\MiscEnums.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

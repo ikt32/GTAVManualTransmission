@@ -1,55 +1,8 @@
 #pragma once
-
-#define DISPLAY_VERSION "v4.6.1"
-#define NUM_GEARS 8
-#define MAX_GEAR 7
-
-#ifndef DIRECTINPUT_VERSION
-#define DIRECTINPUT_VERSION 0x0800
-#endif
-
 #include <string>
 #include <vector>
 
 #include <inc/types.h>
-
-const std::string mtDir = "\\ManualTransmission";
-
-class VehicleData;
-struct Color;
-class ScriptSettings;
-
-//http://pastebin.com/Kj9t38KF
-enum eRadioStations {
-    LosSantosRockRadio,
-    NonStopPopFM,
-    RadioLosSantos,
-    ChannelX,
-    WestCoastTalkRadio,
-    RebelRadio,
-    SoulwaxFM,
-    EastLosFM,
-    WestCoastClassics,
-    BlueArk,
-    WorldideFM,
-    FlyLoFM,
-    TheLowdown,
-    TheLab,
-    RadioMirrorPark,
-    Space1032,
-    VinewoodBlvdRadio,
-    SelfRadio,
-    BlaineCountyRadio,
-    RadioOff = 255
-};
-
-enum eDecorType {
-    DECOR_TYPE_FLOAT = 1,
-    DECOR_TYPE_BOOL,
-    DECOR_TYPE_INT,
-    DECOR_TYPE_UNK,
-    DECOR_TYPE_TIME
-};
 
 void update_npc();
 
@@ -184,3 +137,7 @@ void startStopEngine();
 
 void drawSteeringLines(float steeringAngle);
 float getSteeringAngle(Vehicle v);
+
+bool isPlayerAvailable(Player player, Ped playerPed);
+
+bool isVehicleAvailable(Vehicle vehicle, Ped playerPed);

@@ -1,16 +1,20 @@
 #define NOMINMAX
+#include "script.h"
+
 #include <string>
 
-#include "inc/main.h"
-#include "script.h"
-#include "menu.h"
+#include <inc/main.h>
+#include <inc/natives.h>
+
+#include <menu.h>
+#include <menukeyboard.h>
 
 #include "ScriptSettings.hpp"
 #include "Input/CarControls.hpp"
 #include "Input/keyboard.h"
+#include "Util/UIUtils.h"
 #include "Util/Util.hpp"
-#include "inc/natives.h"
-#include "menukeyboard.h"
+#include "Constants.h"
 
 extern ScriptSettings settings;
 extern std::string settingsGeneralFile;

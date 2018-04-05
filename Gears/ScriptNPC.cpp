@@ -1,14 +1,16 @@
 #define NOMINMAX
 
 #include "script.h"
-#include "inc/natives.h"
+#include <inc/natives.h>
 
 #include "Input/NativeController.h"
 #include "Memory/VehicleExtensions.hpp"
 #include "Memory/MemoryPatcher.hpp"
 #include "ScriptSettings.hpp"
+
 #include "Util/MathExt.h"
 #include "Util/Util.hpp"
+#include "Util/UIUtils.h"
 
 extern ScriptSettings settings;
 
