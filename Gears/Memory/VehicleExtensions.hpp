@@ -136,12 +136,21 @@ public:
     std::vector<float> GetWheelSkidSmokeEffect(Vehicle handle);
     void SetWheelSkidSmokeEffect(Vehicle handle, uint8_t index, float speed);
 
+    // Needs patching the decreasing thing
+    std::vector<float> GetWheelPower(Vehicle handle);
+    void SetWheelPower(Vehicle handle, uint8_t index, float value);
+
     // Strangely, braking/pulling the handbrake just adds to this value.
     // This behavior is visible when the instruction decreasing this is patched away.
     // Needs patching of the instruction manipulating this field for applied values
     // to stick properly.
     std::vector<float> GetWheelBrakePressure(Vehicle handle);
     void SetWheelBrakePressure(Vehicle handle, uint8_t index, float value);
+
+
+    bool IsWheelPowered(Vehicle handle, uint8_t index);
+    std::vector<uint16_t> GetWheelFlags(Vehicle handle);
+
     std::vector<uint32_t> GetVehicleFlags(Vehicle handle);
 
     void initOffsets();

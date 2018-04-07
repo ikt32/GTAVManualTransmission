@@ -29,6 +29,12 @@ bool PatchBrakeDecrement();
 bool RestoreBrakeDecrement();
 
 /*
+* Remove brake pressure drop, more script control over brakes
+*/
+bool PatchThrottleDecrement();
+bool RestoreThrottleDecrement();
+
+/*
  * "total" refers to the "package" of patches needed to get the gearbox
  * and clutch stuff working.
  */
@@ -38,4 +44,5 @@ extern int TotalPatched;
 extern bool SteerCorrectPatched;
 extern bool SteerControlPatched;
 extern bool BrakeDecrementPatched;
+extern bool ThrottleDecrementPatched;
 }

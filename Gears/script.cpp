@@ -302,13 +302,23 @@ void update_manual_features() {
         if (!MemoryPatcher::BrakeDecrementPatched) {
             MemoryPatcher::PatchBrakeDecrement();
         }
+        if (!MemoryPatcher::ThrottleDecrementPatched) {
+            MemoryPatcher::PatchThrottleDecrement();
+        }
         for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
             ext.SetWheelBrakePressure(vehicle, i, 0.0f);
+            if (ext.IsWheelPowered(vehicle, i))
+                ext.SetWheelPower(vehicle, i, 2.0f * ext.GetDriveForce(vehicle));
         }
+        fakeRev();
+        vehData.InduceBurnout = false;
     }
     else {
         if (MemoryPatcher::BrakeDecrementPatched) {
             MemoryPatcher::RestoreBrakeDecrement();
+        }
+        if (MemoryPatcher::ThrottleDecrementPatched) {
+            MemoryPatcher::RestoreThrottleDecrement();
         }
     }
 
@@ -1008,111 +1018,23 @@ void functionClutchCatch() {
     }
 }
 
-// im solving the worng problem here help
 std::vector<bool> getDrivenWheels() {
     int numWheels = ext.GetNumWheels(vehicle);
     std::vector<bool> wheelsToConsider;
-    if (ext.GetDriveBiasFront(vehicle) > 0.0f && ext.GetDriveBiasFront(vehicle) < 1.0f) {
-        for (int i = 0; i < numWheels; i++)
-            wheelsToConsider.push_back(true);
-    }
-    else {
-        // bikes
-        if (numWheels == 2) {
-            // Front id = 1, rear id = 0...
-            wheelsToConsider.push_back(true);
-            wheelsToConsider.push_back(false);
-        }
-        // normal cars
-        else if (numWheels == 4) {
-            // fwd
-            if (ext.GetDriveBiasFront(vehicle) == 1.0f) {
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-            }
-            // rwd
-            else if (ext.GetDriveBiasFront(vehicle) == 0.0f) {
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-            }
-        }
-        // offroad, trucks
-        else if (numWheels == 6) {
-            // fwd
-            if (ext.GetDriveBiasFront(vehicle) == 1.0f) {
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-            }
-            // rwd
-            else if (ext.GetDriveBiasFront(vehicle) == 0.0f) {
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(false);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-                wheelsToConsider.push_back(true);
-            }
-        }
-        else {
-            for (int i = 0; i < numWheels; i++)
-                wheelsToConsider.push_back(true);
-        }
-    }
+    for (int i = 0; i < numWheels; i++)
+        wheelsToConsider.push_back(ext.IsWheelPowered(vehicle, i));
+
     return wheelsToConsider;
 }
 
-
 std::vector<float> getDrivenWheelsSpeeds(std::vector<float> wheelSpeeds) {
-    std::vector<float> wheelsToConsider;
-    if (ext.GetDriveBiasFront(vehicle) > 0.0f && ext.GetDriveBiasFront(vehicle) < 1.0f) {
-        wheelsToConsider = wheelSpeeds;
+    std::vector<float> speeds;
+    std::vector<bool> drivenWheels = getDrivenWheels();
+    for (uint8_t i = 0; i < wheelSpeeds.size(); ++i) {
+        if (drivenWheels[i])
+            speeds.push_back(wheelSpeeds[i]);
     }
-    else {
-        // bikes
-        if (ext.GetNumWheels(vehicle) == 2) {
-            wheelsToConsider.push_back(wheelSpeeds[0]);
-        }
-        // normal cars
-        else if (ext.GetNumWheels(vehicle) == 4) {
-            // fwd
-            if (ext.GetDriveBiasFront(vehicle) == 1.0f) {
-                wheelsToConsider.push_back(wheelSpeeds[0]);
-                wheelsToConsider.push_back(wheelSpeeds[1]);
-            }
-            // rwd
-            else if (ext.GetDriveBiasFront(vehicle) == 0.0f) {
-                wheelsToConsider.push_back(wheelSpeeds[2]);
-                wheelsToConsider.push_back(wheelSpeeds[3]);
-            }
-        }
-        // offroad, trucks
-        else if (ext.GetNumWheels(vehicle) == 6) {
-            // fwd
-            if (ext.GetDriveBiasFront(vehicle) == 1.0f) {
-                wheelsToConsider.push_back(wheelSpeeds[0]);
-                wheelsToConsider.push_back(wheelSpeeds[1]);
-            }
-            // rwd
-            else if (ext.GetDriveBiasFront(vehicle) == 0.0f) {
-                wheelsToConsider.push_back(wheelSpeeds[2]);
-                wheelsToConsider.push_back(wheelSpeeds[3]);
-                wheelsToConsider.push_back(wheelSpeeds[4]);
-                wheelsToConsider.push_back(wheelSpeeds[5]);
-            }
-        }
-        else {
-            wheelsToConsider = wheelSpeeds;
-        }
-    }
-    return wheelsToConsider;
+    return speeds;
 }
 
 void functionEngStall() {
@@ -1431,16 +1353,13 @@ void functionRealReverse() {
             ext.SetBrakeP(vehicle, 1.0f);
         }
         // RT behavior when rolling back: Burnout
-        if (carControls.ThrottleVal > 0.5f && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < -1.0f) {
+        if (!vehData.FakeNeutral && carControls.ThrottleVal > 0.5f && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < -1.0f) {
             //showText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Rollback");
-            CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, carControls.ThrottleVal);
+            //CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, carControls.ThrottleVal);
             if (carControls.BrakeVal < 0.1f) {
                 VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
             }
             vehData.InduceBurnout = true;
-        }
-        else {
-            vehData.InduceBurnout = false;
         }
     }
     // Reverse gear
@@ -1550,14 +1469,13 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
                 brakelights = true;
             }
             
-            if (wheelThrottleVal > 0.01f && carControls.ClutchVal < settings.ClutchThreshold && !vehData.FakeNeutral) {
+            if (!vehData.FakeNeutral && wheelThrottleVal > 0.01f && carControls.ClutchVal < settings.ClutchThreshold && !vehData.FakeNeutral) {
                 //showText(0.3, 0.0, 1.0, "We should burnout");
-                SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
-                SetControlADZ(ControlVehicleBrake, wheelThrottleVal, carControls.ADZThrottle);
+                //SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
+                //SetControlADZ(ControlVehicleBrake, wheelThrottleVal, carControls.ADZThrottle);
+                ext.SetThrottle(vehicle, 1.0f);
+                ext.SetThrottleP(vehicle, 1.0f);
                 vehData.InduceBurnout = true;
-            }
-            else {
-                vehData.InduceBurnout = false;
             }
 
             if (wheelThrottleVal > 0.01f && (carControls.ClutchVal > settings.ClutchThreshold || vehData.FakeNeutral)) {
@@ -1582,9 +1500,6 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
                 }
             }
             VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, brakelights);
-        }
-        else {
-            vehData.InduceBurnout = false;
         }
     }
 
