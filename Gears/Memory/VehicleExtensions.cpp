@@ -652,6 +652,34 @@ std::vector<float> VehicleExtensions::GetWheelSkidSmokeEffect(Vehicle handle) {
     return values;
 }
 
+std::vector<float> VehicleExtensions::GetWheelPower(Vehicle handle) {
+    const auto numWheels = GetNumWheels(handle);
+    std::vector<float> values(numWheels);
+    auto wheelPtr = GetWheelsPtr(handle);
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1CC : 0x1BC;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1C4 : offset;
+    offset = gameVersion >= G_VER_1_0_1365_1_STEAM ? 0x1CC : offset;
+
+    for (auto i = 0; i < numWheels; ++i) {
+        auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
+        values[i] = *reinterpret_cast<float *>(wheelAddr + offset);
+    }
+    return values;
+}
+
+void VehicleExtensions::SetWheelPower(Vehicle handle, uint8_t index, float value) {
+    if (index > GetNumWheels(handle)) {
+        return;
+    }
+    auto wheelPtr = GetWheelsPtr(handle);
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1CC : 0x1BC;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1C4 : offset;
+    offset = gameVersion >= G_VER_1_0_1365_1_STEAM ? 0x1CC : offset;
+
+    auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
+    *reinterpret_cast<float *>(wheelAddr + offset) = value;
+}
+
 std::vector<float> VehicleExtensions::GetWheelBrakePressure(Vehicle handle) {
     const auto numWheels = GetNumWheels(handle);
     std::vector<float> values(numWheels);
@@ -678,6 +706,18 @@ void VehicleExtensions::SetWheelBrakePressure(Vehicle handle, uint8_t index, flo
 
     auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
     *reinterpret_cast<float *>(wheelAddr + offset) = value;
+}
+
+bool VehicleExtensions::IsWheelPowered(Vehicle handle, uint8_t index) {
+    if (index > GetNumWheels(handle)) {
+        return false;
+    }
+
+    auto offset = 0x1F0;
+    auto wheelPtr = GetWheelsPtr(handle);
+    auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
+    auto wheelFlags = *reinterpret_cast<uint32_t *>(wheelAddr + offset);
+    return wheelFlags & 0x10;
 }
 
 std::vector<uint32_t> VehicleExtensions::GetVehicleFlags(Vehicle handle) {
