@@ -74,12 +74,12 @@ uintptr_t brakeTemp = NULL;
 uintptr_t throttleAddr = NULL;
 uintptr_t throttleTemp = NULL;
 
-byte origSteerInstr[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-byte origSteerInstrDest[4] = {0x00, 0x00, 0x00, 0x00};
+uint8_t origSteerInstr[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+uint8_t origSteerInstrDest[4] = {0x00, 0x00, 0x00, 0x00};
 
-byte origSteerControlInstr[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-byte origBrakeInstr[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-byte origThrottleInstr[7] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+uint8_t origSteerControlInstr[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+uint8_t origBrakeInstr[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+uint8_t origThrottleInstr[7] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 const int maxAttempts = 4;
 int gearboxAttempts = 0;
@@ -448,7 +448,7 @@ bool RestoreThrottleDecrement() {
     }
 
     if (throttleAddr) {
-        RevertThrottlePatch(throttleAddr, origThrottleInstr, sizeof(origThrottleInstr) / sizeof(byte));
+        RevertThrottlePatch(throttleAddr, origThrottleInstr, sizeof(origThrottleInstr) / sizeof(uint8_t));
         throttleAddr = 0;
         ThrottleDecrementPatched = false;
         throttleAttempts = 0;
