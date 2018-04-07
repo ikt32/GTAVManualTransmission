@@ -720,6 +720,18 @@ bool VehicleExtensions::IsWheelPowered(Vehicle handle, uint8_t index) {
     return wheelFlags & 0x10;
 }
 
+std::vector<uint16_t> VehicleExtensions::GetWheelFlags(Vehicle handle) {
+    const auto numWheels = GetNumWheels(handle);
+    std::vector<uint16_t> flags(numWheels);
+    auto wheelPtr = GetWheelsPtr(handle);
+    auto offset = 0x1F0;
+    for (auto i = 0; i < numWheels; ++i) {
+        auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
+        flags[i] = *reinterpret_cast<uint16_t *>(wheelAddr + offset);
+    }
+    return flags;
+}
+
 std::vector<uint32_t> VehicleExtensions::GetVehicleFlags(Vehicle handle) {
     auto address = GetAddress(handle);
 

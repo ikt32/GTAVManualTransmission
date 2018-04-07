@@ -149,7 +149,8 @@ public:
 
 
     bool IsWheelPowered(Vehicle handle, uint8_t index);
-    
+    std::vector<uint16_t> GetWheelFlags(Vehicle handle);
+
     std::vector<uint32_t> GetVehicleFlags(Vehicle handle);
 
     void initOffsets();
