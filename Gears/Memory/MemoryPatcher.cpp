@@ -38,12 +38,17 @@ void RevertSteerControlPatch(uintptr_t address, byte *origInstr, int origInstrSz
 uintptr_t ApplyBrakePatch();
 void RevertBrakePatch(uintptr_t address, byte *origInstr, int origInstrSz);
 
+// When disabled, throttle doesn't decrease.
+uintptr_t ApplyThrottlePatch();
+void RevertThrottlePatch(uintptr_t address, uint8_t *origInstr, int origInstrSz);
+
 int NumGearboxPatches = 4;
 int TotalPatched = 0;
 
 bool SteerCorrectPatched = false;
 bool SteerControlPatched = false;
 bool BrakeDecrementPatched = false;
+bool ThrottleDecrementPatched = false;
 
 uintptr_t clutchLowAddr = NULL;
 uintptr_t clutchLowTemp = NULL;
@@ -66,17 +71,22 @@ uintptr_t steerControlTemp = NULL;
 uintptr_t brakeAddr = NULL;
 uintptr_t brakeTemp = NULL;
 
+uintptr_t throttleAddr = NULL;
+uintptr_t throttleTemp = NULL;
+
 byte origSteerInstr[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 byte origSteerInstrDest[4] = {0x00, 0x00, 0x00, 0x00};
 
 byte origSteerControlInstr[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 byte origBrakeInstr[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+byte origThrottleInstr[7] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 const int maxAttempts = 4;
 int gearboxAttempts = 0;
 int steerAttempts = 0;
 int steerControlAttempts = 0;
 int brakeAttempts = 0;
+int throttleAttempts = 0;
 
 struct PatternInfo {
     PatternInfo(){}
@@ -93,6 +103,7 @@ struct PatternInfo {
 PatternInfo shiftUp;
 PatternInfo shiftDown;
 PatternInfo brake;
+PatternInfo throttle;
 
 void SetPatterns(int version) {
     if (version < G_GameVersion::G_VER_1_0_1365_1_STEAM) {
@@ -110,6 +121,7 @@ void SetPatterns(int version) {
             "xxxxxxx", { 0x66, 0x89, 0x13 });
         brake = PatternInfo("\xEB\x05\xF3\x0F\x10\x40\x78\xF3\x41\x0F\x59\xC0\xF3",
             "xxxxx??x?x?xx", {}, 12);
+        throttle = PatternInfo("\x83\xA1\x00\x00\x00\x00\x00\x0F\x28\xC3\x89", "xx?????xxxx", { });
     }
 }
 
@@ -402,6 +414,52 @@ bool RestoreBrakeDecrement() {
     return false;
 }
 
+bool PatchThrottleDecrement() {
+    if (throttleAttempts > maxAttempts) {
+        return false;
+    }
+
+    if (ThrottleDecrementPatched) {
+        return true;
+    }
+
+    throttleTemp = ApplyThrottlePatch();
+
+    if (throttleTemp) {
+        throttleAddr = throttleTemp;
+        ThrottleDecrementPatched = true;
+        throttleAttempts = 0;
+        return true;
+    }
+
+    logger.Write(ERROR, "PATCH: Throttle pressure Patch failed");
+    throttleAttempts++;
+
+    if (throttleAttempts > maxAttempts) {
+        logger.Write(ERROR, "PATCH: Throttle pressure Patch attempt limit exceeded");
+        logger.Write(ERROR, "PATCH: Throttle pressure Patching disabled");
+    }
+    return false;
+}
+
+bool RestoreThrottleDecrement() {
+    if (!ThrottleDecrementPatched) {
+        return true;
+    }
+
+    if (throttleAddr) {
+        RevertThrottlePatch(throttleAddr, origThrottleInstr, sizeof(origThrottleInstr) / sizeof(byte));
+        throttleAddr = 0;
+        ThrottleDecrementPatched = false;
+        throttleAttempts = 0;
+        return true;
+    }
+
+    logger.Write(ERROR, "PATCH: Throttle pressure restore failed");
+    return false;
+}
+
+
 uintptr_t ApplyClutchLowPatch() {
     // Tested on build 350 and build 617
     // We're only interested in the first 7 bytes but we need the correct one
@@ -613,4 +671,30 @@ void RevertBrakePatch(uintptr_t address, byte *origInstr, int origInstrSz) {
         memcpy((void*)address, origInstr, origInstrSz);
     }
 }
+
+uintptr_t ApplyThrottlePatch() {
+    // b1290
+    uintptr_t address;
+    if (throttleTemp != NULL) {
+        address = throttleTemp;
+    }
+    else {
+        address = mem::FindPattern("\x83\xA1\x00\x00\x00\x00\x00\x0F\x28\xC3\x89", "xx?????xxxx");
+        if (address) address += throttle.Offset;
+        logger.Write(DEBUG, "PATCH: Throttle patch @ 0x%p", address);
+    }
+
+    if (address) {
+        memcpy(origThrottleInstr, (void*)address, 7);
+        memset(reinterpret_cast<void *>(address), 0x90, 7);
+    }
+    return address;
+}
+
+void RevertThrottlePatch(uintptr_t address, uint8_t *origInstr, int origInstrSz) {
+    if (address) {
+        memcpy((void*)address, origInstr, origInstrSz);
+    }
+}
+
 }

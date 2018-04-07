@@ -31,27 +31,29 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
         }
         case DLL_PROCESS_DETACH: {
             logger.Write(INFO, "Init shutdown");
-            bool successI  = MemoryPatcher::RevertGearboxPatches();
-            bool successS  = MemoryPatcher::RestoreSteeringCorrection();
-            bool successSC = MemoryPatcher::RestoreSteeringControl();
-            bool successB  = MemoryPatcher::RestoreBrakeDecrement();
+            const uint8_t expected = 5;
+            uint8_t actual = 0;
+
+            if (MemoryPatcher::RevertGearboxPatches()) 
+                actual++;
+            if (MemoryPatcher::RestoreSteeringCorrection())
+                actual++;
+            if (MemoryPatcher::RestoreSteeringControl()) 
+                actual++;
+            if (MemoryPatcher::RestoreBrakeDecrement())
+                actual++;
+            if (MemoryPatcher::RestoreThrottleDecrement())
+                actual++;
 
             resetSteeringMultiplier();
             stopForceFeedback();
             scriptUnregister(hInstance);
 
-            if (successI && successS && successSC && successB) {
-                logger.Write(INFO, "Shut down script successfully");
+            if (actual == expected) {
+                logger.Write(INFO, "PATCH: Script shut down cleanly.");
             }
             else {
-                if (!successI)
-                    logger.Write(WARN, "PATCH: (Shutdown) instructions not restored");
-                if (!successS)
-                    logger.Write(WARN, "PATCH: (Shutdown) steer correction not restored");
-                if (!successSC)
-                    logger.Write(WARN, "PATCH: (Shutdown) steer control not restored");
-                if (!successB)
-                    logger.Write(WARN, "PATCH: (Shutdown) brake decrement not restored");
+                logger.Write(ERROR, "PATCH: Script shut down with unrestored patches!");
             }
             break;
         }

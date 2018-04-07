@@ -283,13 +283,23 @@ void update_manual_features() {
         if (!MemoryPatcher::BrakeDecrementPatched) {
             MemoryPatcher::PatchBrakeDecrement();
         }
-        for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
-            ext.SetWheelBrakePressure(vehicle, i, carControls.BrakeVal);
+        if (!MemoryPatcher::ThrottleDecrementPatched) {
+            MemoryPatcher::PatchThrottleDecrement();
         }
+        for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
+            ext.SetWheelBrakePressure(vehicle, i, 0.0f);
+            if (ext.IsWheelPowered(vehicle, i))
+                ext.SetWheelPower(vehicle, i, 2.0f * ext.GetDriveForce(vehicle));
+        }
+        fakeRev();
+        vehData.InduceBurnout = false;
     }
     else {
         if (MemoryPatcher::BrakeDecrementPatched) {
             MemoryPatcher::RestoreBrakeDecrement();
+        }
+        if (MemoryPatcher::ThrottleDecrementPatched) {
+            MemoryPatcher::RestoreThrottleDecrement();
         }
     }
 
@@ -1324,16 +1334,13 @@ void functionRealReverse() {
             ext.SetBrakeP(vehicle, 1.0f);
         }
         // RT behavior when rolling back: Burnout
-        if (carControls.ThrottleVal > 0.5f && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < -1.0f) {
+        if (!vehData.FakeNeutral && carControls.ThrottleVal > 0.5f && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < -1.0f) {
             //showText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Rollback");
-            CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, carControls.ThrottleVal);
+            //CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, carControls.ThrottleVal);
             if (carControls.BrakeVal < 0.1f) {
                 VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
             }
             vehData.InduceBurnout = true;
-        }
-        else {
-            vehData.InduceBurnout = false;
         }
     }
     // Reverse gear
@@ -1443,16 +1450,13 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
                 brakelights = true;
             }
             
-            if (wheelThrottleVal > 0.01f && carControls.ClutchVal < settings.ClutchThreshold && !vehData.FakeNeutral) {
+            if (!vehData.FakeNeutral && wheelThrottleVal > 0.01f && carControls.ClutchVal < settings.ClutchThreshold && !vehData.FakeNeutral) {
                 //showText(0.3, 0.0, 1.0, "We should burnout");
-                SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
-                SetControlADZ(ControlVehicleBrake, wheelThrottleVal, carControls.ADZThrottle);
+                //SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
+                //SetControlADZ(ControlVehicleBrake, wheelThrottleVal, carControls.ADZThrottle);
                 ext.SetThrottle(vehicle, 1.0f);
                 ext.SetThrottleP(vehicle, 1.0f);
                 vehData.InduceBurnout = true;
-            }
-            else {
-                vehData.InduceBurnout = false;
             }
 
             if (wheelThrottleVal > 0.01f && (carControls.ClutchVal > settings.ClutchThreshold || vehData.FakeNeutral)) {
@@ -1477,9 +1481,6 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
                 }
             }
             VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, brakelights);
-        }
-        else {
-            vehData.InduceBurnout = false;
         }
     }
 
