@@ -63,7 +63,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
       <AdditionalIncludeDirectories>..\..\ScriptHookV_SDK;..\..\GTAVMenuBase;$(ProjectDir);$(SolutionDir)thirdparty</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NOGDI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -91,7 +91,7 @@
       <AdditionalIncludeDirectories>..\..\ScriptHookV_SDK;..\..\GTAVMenuBase;$(ProjectDir);$(SolutionDir)thirdparty</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <ExceptionHandling>Async</ExceptionHandling>
-      <PreprocessorDefinitions>NOGDI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -120,6 +120,8 @@
     <ClCompile Include="ScriptHUD.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
     <ClCompile Include="ShiftModes.cpp" />
+    <ClCompile Include="Util\Files.cpp" />
+    <ClCompile Include="Util\GameSound.cpp" />
     <ClCompile Include="Util\MathExt.cpp" />
     <ClCompile Include="ScriptMenu.cpp" />
     <ClCompile Include="Util\Paths.cpp" />
@@ -134,6 +136,7 @@
     <ClCompile Include="Memory\VehicleExtensions.cpp" />
     <ClCompile Include="script.cpp" />
     <ClCompile Include="ScriptSettings.cpp" />
+    <ClCompile Include="Util\UIUtils.cpp" />
     <ClCompile Include="Util\Util.cpp" />
     <ClCompile Include="Util\TimeHelper.cpp" />
     <ClCompile Include="Util\Logger.cpp" />
@@ -151,13 +154,17 @@
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h" />
     <ClInclude Include="..\thirdparty\MiniPID\MiniPID.h" />
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
-    <ClInclude Include="Dump.h" />
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="Memory\VehicleFlags.h" />
     <ClInclude Include="Memory\Versions.h" />
     <ClInclude Include="newNatives.h" />
     <ClInclude Include="ShiftModes.h" />
+    <ClInclude Include="Util\Color.h" />
+    <ClInclude Include="Util\Files.h" />
+    <ClInclude Include="Util\GameSound.h" />
     <ClInclude Include="Util\MathExt.h" />
     <ClInclude Include="Memory\Offsets.hpp" />
+    <ClInclude Include="Util\MiscEnums.h" />
     <ClInclude Include="Util\Paths.h" />
     <ClInclude Include="Input\DIDeviceFactory.h" />
     <ClInclude Include="Input\keyboard.h" />
@@ -172,6 +179,7 @@
     <ClInclude Include="ScriptSettings.hpp" />
     <ClInclude Include="Util\Logger.hpp" />
     <ClInclude Include="Util\TimeHelper.hpp" />
+    <ClInclude Include="Util\UIUtils.h" />
     <ClInclude Include="Util\Util.hpp" />
     <ClInclude Include="VehicleData.hpp" />
   </ItemGroup>

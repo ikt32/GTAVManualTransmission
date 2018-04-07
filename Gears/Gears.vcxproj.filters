@@ -69,6 +69,15 @@
     <ClCompile Include="Input\NativeController.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="Util\UIUtils.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Files.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\GameSound.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -145,9 +154,6 @@
       <Filter>Thirdparty</Filter>
     </ClInclude>
     <ClInclude Include="newNatives.h" />
-    <ClInclude Include="Dump.h">
-      <Filter>Debug</Filter>
-    </ClInclude>
     <ClInclude Include="Input\DIDeviceFactory.h">
       <Filter>Input</Filter>
     </ClInclude>
@@ -162,6 +168,22 @@
     </ClInclude>
     <ClInclude Include="Memory\VehicleFlags.h">
       <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Constants.h" />
+    <ClInclude Include="Util\UIUtils.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Color.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Files.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\GameSound.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\MiscEnums.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -182,9 +204,6 @@
     </Filter>
     <Filter Include="Thirdparty">
       <UniqueIdentifier>{d0a967a3-e709-4563-beec-8bb1bc9d1711}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Debug">
-      <UniqueIdentifier>{928e77b9-6e75-4aa8-85f8-f3cac0985cca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

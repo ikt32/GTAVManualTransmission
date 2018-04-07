@@ -1,15 +1,20 @@
 #include "script.h"
-#include "inc/natives.h"
 
-#include "ScriptSettings.hpp"
-#include "Input/CarControls.hpp"
-#include "Util/Util.hpp"
 #include <iomanip>
 #include <sstream>
+
+#include <inc/natives.h>
+
+#include <menu.h>
+
 #include "Memory/VehicleExtensions.hpp"
-#include "VehicleData.hpp"
+
 #include "Util/MathExt.h"
-#include "menu.h"
+#include "Util/UIUtils.h"
+
+#include "Input/CarControls.hpp"
+#include "VehicleData.hpp"
+#include "ScriptSettings.hpp"
 
 extern NativeMenu::Menu menu;
 extern ScriptSettings settings;

@@ -3,14 +3,14 @@
 #include <string>
 
 namespace Paths {
-    const std::string	GetRunningExecutableFolder();
-    const std::string	GetRunningExecutableName();
-    const std::string	GetRunningExecutableNameWithoutExtension();
+std::string	GetRunningExecutableFolder();
+std::string	GetRunningExecutableName();
+std::string	GetRunningExecutableNameWithoutExtension();
 
-    const std::string	GetModuleFolder(const HMODULE module);
-    const std::string	GetModuleName(const HMODULE module);
-    const std::string	GetModuleNameWithoutExtension(const HMODULE module);
+std::string	GetModuleFolder(const HMODULE module);
+std::string	GetModuleName(const HMODULE module);
+std::string	GetModuleNameWithoutExtension(const HMODULE module);
 
     void				SetOurModuleHandle(const HMODULE module);
-    const HMODULE		GetOurModuleHandle();
+HMODULE		GetOurModuleHandle();
 }

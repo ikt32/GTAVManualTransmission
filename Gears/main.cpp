@@ -6,6 +6,7 @@
 #include "Util/Logger.hpp"
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/Versions.h"
+#include "Constants.h"
 
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {

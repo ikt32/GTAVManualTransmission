@@ -1,7 +1,6 @@
-#define NOMINMAX
+#include "script.h"
 
 #include <string>
-#include <iomanip>
 #include <algorithm>
 
 #include "../../ScriptHookV_SDK/inc/natives.h"
@@ -9,24 +8,27 @@
 #include "../../ScriptHookV_SDK/inc/main.h"
 #include "../../ScriptHookV_SDK/inc/types.h"
 
-#include "script.h"
+#include <menu.h>
+#include <MiniPID/MiniPID.h>
 
 #include "ScriptSettings.hpp"
 #include "VehicleData.hpp"
+#include "ShiftModes.h"
+
+#include "Memory/MemoryPatcher.hpp"
+#include "Memory/NativeMemory.hpp"
+#include "Memory/Offsets.hpp"
+#include "Memory/VehicleFlags.h"
 
 #include "Input/CarControls.hpp"
-#include "Memory/MemoryPatcher.hpp"
-#include "Util/Logger.hpp"
-#include "Util/Util.hpp"
-#include "Util/Paths.h"
 
-#include <menu.h>
-#include "Memory/NativeMemory.hpp"
+#include "Util/Logger.hpp"
+#include "Util/Paths.h"
 #include "Util/MathExt.h"
-#include "ShiftModes.h"
-#include "Memory/Offsets.hpp"
-#include "MiniPID/MiniPID.h"
-#include "Memory/VehicleFlags.h"
+#include "Util/GameSound.h"
+#include "Util/Files.h"
+#include "Util/UIUtils.h"
+#include "Util/MiscEnums.h"
 
 const std::string mtPrefix = "~b~Manual Transmission~w~~n~";
 
@@ -75,6 +77,23 @@ int speedoIndex;
 extern std::vector<std::string> speedoTypes;
 
 MiniPID pid(1.0, 0.0, 0.0);
+
+bool isPlayerAvailable(Player player, Ped playerPed) {
+    if (!PLAYER::IS_PLAYER_CONTROL_ON(player) ||
+        PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE) ||
+        CUTSCENE::IS_CUTSCENE_PLAYING() ||
+        !ENTITY::DOES_ENTITY_EXIST(playerPed) ||
+        ENTITY::IS_ENTITY_DEAD(playerPed)) {
+        return false;
+    }
+    return true;
+}
+
+bool isVehicleAvailable(Vehicle vehicle, Ped playerPed) {
+    return vehicle != 0 &&
+        ENTITY::DOES_ENTITY_EXIST(vehicle) &&
+        playerPed == VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1);
+}
 
 void update_player() {
     player = PLAYER::PLAYER_ID();
