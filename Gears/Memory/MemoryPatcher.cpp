@@ -90,12 +90,12 @@ int throttleAttempts = 0;
 
 struct PatternInfo {
     PatternInfo(){}
-    PatternInfo(std::string pattern, std::string mask, std::vector<uint8_t> data)
+    PatternInfo(char* pattern, char* mask, std::vector<uint8_t> data)
         : Pattern(pattern), Mask(mask), Data(data) { }
-    PatternInfo(std::string pattern, std::string mask, std::vector<uint8_t> data, uint32_t offset)
+    PatternInfo(char* pattern, char* mask, std::vector<uint8_t> data, uint32_t offset)
         : Pattern(pattern), Mask(mask), Data(data), Offset(offset) { }
-    std::string Pattern;
-    std::string Mask;
+    char* Pattern;
+    char* Mask;
     std::vector<uint8_t> Data;
     uint32_t Offset = 0;
 };
@@ -107,21 +107,16 @@ PatternInfo throttle;
 
 void SetPatterns(int version) {
     if (version < G_GameVersion::G_VER_1_0_1365_1_STEAM) {
-        shiftUp = PatternInfo("\x66\x89\x13\xB8\x05\x00\x00\x00", 
-            "xxxxxxxx", { 0x66, 0x89, 0x13 });
-        shiftDown = PatternInfo("\x66\x89\x13\x89\x73\x5C", 
-            "xxxxxx", { 0x66, 0x89, 0x13 });
-        brake = PatternInfo("\xEB\x05\xF3\x0F\x10\x40\x78\xF3\x0F\x59\xC4\xF3",
-            "xxxxxx?xxxxx", { }, 11);
+        shiftUp = PatternInfo("\x66\x89\x13\xB8\x05\x00\x00\x00", "xxxxxxxx", { 0x66, 0x89, 0x13 });
+        shiftDown = PatternInfo("\x66\x89\x13\x89\x73\x5C", "xxxxxx", { 0x66, 0x89, 0x13 });
+        brake = PatternInfo("\xEB\x05\xF3\x0F\x10\x40\x78\xF3\x0F\x59\xC4\xF3", "xxxxxx?xxxxx", { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, 11);
+        throttle = PatternInfo("\x0F\x28\xC3\x44\x89\x89\xC4\x01\x00\x00\x89\x81\xD0\x01\x00\x00", "xx?xxx??xxxx??xx", { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, 3);
     }
     else {
-        shiftUp = PatternInfo("\x66\x89\x0B\x8D\x46\x04\x66\x89\x43\04",
-            "xx?xx?xxx?", { 0x66, 0x89, 0x0B });
-        shiftDown = PatternInfo("\x66\x89\x13\x44\x89\x73\x5c",
-            "xxxxxxx", { 0x66, 0x89, 0x13 });
-        brake = PatternInfo("\xEB\x05\xF3\x0F\x10\x40\x78\xF3\x41\x0F\x59\xC0\xF3",
-            "xxxxx??x?x?xx", {}, 12);
-        throttle = PatternInfo("\x83\xA1\x00\x00\x00\x00\x00\x0F\x28\xC3\x89", "xx?????xxxx", { });
+        shiftUp = PatternInfo("\x66\x89\x0B\x8D\x46\x04\x66\x89\x43\04", "xx?xx?xxx?", { 0x66, 0x89, 0x0B });
+        shiftDown = PatternInfo("\x66\x89\x13\x44\x89\x73\x5c", "xxxxxxx", { 0x66, 0x89, 0x13 });
+        brake = PatternInfo("\xEB\x05\xF3\x0F\x10\x40\x78\xF3\x41\x0F\x59\xC0\xF3", "xxxxx??x?x?xx", { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, 12);
+        throttle = PatternInfo("\x83\xA1\x00\x00\x00\x00\x00\x0F\x28\xC3\x89", "xx?????xxxx", { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
     }
 }
 
@@ -515,7 +510,7 @@ uintptr_t ApplyShiftDownPatch() {
     if (shiftDownTemp != 0)
         address = shiftDownTemp;
     else
-        address = mem::FindPattern(shiftDown.Pattern.c_str(), shiftDown.Mask.c_str());
+        address = mem::FindPattern(shiftDown.Pattern, shiftDown.Mask);
 
     if (address) {
         memset(reinterpret_cast<void *>(address), 0x90, shiftDown.Data.size());
@@ -534,7 +529,7 @@ uintptr_t ApplyShiftUpPatch() {
     if (shiftUpTemp != 0)
         address = shiftUpTemp;
     else
-        address = mem::FindPattern(shiftUp.Pattern.c_str(), shiftUp.Mask.c_str());
+        address = mem::FindPattern(shiftUp.Pattern, shiftUp.Mask);
 
     if (address) {
         memset(reinterpret_cast<void *>(address), 0x90, shiftUp.Data.size());
@@ -654,14 +649,14 @@ uintptr_t ApplyBrakePatch() {
         address = brakeTemp;
     }
     else {
-        address = mem::FindPattern(brake.Pattern.c_str(), brake.Mask.c_str());
+        address = mem::FindPattern(brake.Pattern, brake.Mask);
         if (address) address += brake.Offset;
         logger.Write(DEBUG, "PATCH: Brake patch @ 0x%p", address);
     }
     
     if (address) {
-        memcpy(origBrakeInstr, (void*)address, 8);
-        memset(reinterpret_cast<void *>(address), 0x90, 8);
+        memcpy(origBrakeInstr, (void*)address, brake.Data.size());
+        memset(reinterpret_cast<void *>(address), 0x90, brake.Data.size());
     }
     return address;
 }
@@ -679,14 +674,14 @@ uintptr_t ApplyThrottlePatch() {
         address = throttleTemp;
     }
     else {
-        address = mem::FindPattern("\x83\xA1\x00\x00\x00\x00\x00\x0F\x28\xC3\x89", "xx?????xxxx");
+        address = mem::FindPattern(throttle.Pattern, throttle.Mask);
         if (address) address += throttle.Offset;
         logger.Write(DEBUG, "PATCH: Throttle patch @ 0x%p", address);
     }
 
     if (address) {
-        memcpy(origThrottleInstr, (void*)address, 7);
-        memset(reinterpret_cast<void *>(address), 0x90, 7);
+        memcpy(origThrottleInstr, (void*)address, throttle.Data.size());
+        memset(reinterpret_cast<void *>(address), 0x90, throttle.Data.size());
     }
     return address;
 }

@@ -713,7 +713,10 @@ bool VehicleExtensions::IsWheelPowered(Vehicle handle, uint8_t index) {
         return false;
     }
 
-    auto offset = 0x1F0;
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1F0 : 0x1E0;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1E8 : offset;
+    offset = gameVersion >= G_VER_1_0_1365_1_STEAM ? 0x1F0 : offset;
+
     auto wheelPtr = GetWheelsPtr(handle);
     auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
     auto wheelFlags = *reinterpret_cast<uint32_t *>(wheelAddr + offset);
@@ -724,7 +727,11 @@ std::vector<uint16_t> VehicleExtensions::GetWheelFlags(Vehicle handle) {
     const auto numWheels = GetNumWheels(handle);
     std::vector<uint16_t> flags(numWheels);
     auto wheelPtr = GetWheelsPtr(handle);
-    auto offset = 0x1F0;
+    
+    auto offset = gameVersion >= G_VER_1_0_372_2_STEAM ? 0x1F0 : 0x1E0;
+    offset = gameVersion >= G_VER_1_0_1290_1_STEAM ? 0x1E8 : offset;
+    offset = gameVersion >= G_VER_1_0_1365_1_STEAM ? 0x1F0 : offset;
+    
     for (auto i = 0; i < numWheels; ++i) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
         flags[i] = *reinterpret_cast<uint16_t *>(wheelAddr + offset);

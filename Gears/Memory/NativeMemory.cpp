@@ -39,17 +39,14 @@ namespace mem {
 
         for (const char* retAddress = start_offset; retAddress < start_offset + size; retAddress++) {
             if (*retAddress == pattern[pos] || mask[pos] == '?') {
-                if (mask[pos + 1] == '\0') {
+                if (mask[pos + 1] == '\0')
                     return (reinterpret_cast<uintptr_t>(retAddress) - searchLen);
-                }
-
                 pos++;
             }
             else {
                 pos = 0;
             }
         }
-
         return 0;
     }
 }

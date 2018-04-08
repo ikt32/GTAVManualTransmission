@@ -2,11 +2,12 @@
 
 ## 4.6.1
 * Add H-pattern shifter assignments for automatic gearbox drive/neutral selection
+* Change understeer force feedback impact
+* Change how a burnout-while-reversing works in realistic pedals mode
 * Fix shift up patch for pre-b1365
 * Fix a crash when getting out of a car when using a wheel and then using a controller
 * Fix an issue where assigning a button resets current menu session changes
 * Fix an issue where the auto gearbox can't shift out of neutral
-* Make understeer more noticeable
 
 ## 4.6.0
 * Add support for b1365
