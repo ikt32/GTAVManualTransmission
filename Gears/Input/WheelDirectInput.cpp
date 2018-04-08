@@ -2,7 +2,6 @@
 
 #include <winerror.h>
 
-#include <sstream>
 #include <chrono>
 #include <vector>
 
@@ -124,12 +123,8 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
         std::string hrStr = formatError(hr);
         logger.Write(ERROR, "WHEEL: Acquire FFB device error");
         logger.Write(ERROR, "WHEEL: HRESULT = " + hrStr);
-        std::stringstream ss;
-        ss << std::hex << hr;
-        logger.Write(ERROR, "WHEEL: ERRCODE = " + ss.str());
-        ss.str(std::string());
-        ss << std::hex << GetForegroundWindow();
-        logger.Write(ERROR, "WHEEL: HWND =    " + ss.str());
+        logger.Write(ERROR, "WHEEL: ERRCODE = %X", hr);
+        logger.Write(ERROR, "WHEEL: HWND =    %X", GetForegroundWindow());
         return false;
     }
     logger.Write(INFO, "WHEEL: Init FFB effect on axis " + DIAxisHelper[ffAxis]);
