@@ -185,6 +185,9 @@
     <ClInclude Include="Util\MiscEnums.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="Util\StringFormat.h">
+      <Filter>Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

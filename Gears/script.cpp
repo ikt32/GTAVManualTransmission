@@ -29,6 +29,7 @@
 #include "Util/Files.h"
 #include "Util/UIUtils.h"
 #include "Util/MiscEnums.h"
+#include "Util/StringFormat.h"
 
 const std::string mtPrefix = "~b~Manual Transmission~w~~n~";
 
@@ -970,14 +971,13 @@ void functionAShift() {
     }
 
     if (settings.DisplayInfo && !menu.IsThisOpen()) {
-        showText(0.01, 0.525, 0.3, "CurrentSpeed: \t" + std::to_string(currSpeed));
-        showText(0.01, 0.550, 0.3, "UpshiftSpeed: \t" + std::to_string(upshiftSpeed));
-        showText(0.01, 0.575, 0.3, "DnshiftSpeed: \t" + std::to_string(downshiftSpeed - prevGearDelta));
-        showText(0.01, 0.600, 0.3, "PrevGearDelta: \t" + std::to_string(prevGearDelta));
-        showText(0.01, 0.625, 0.3, "CurrGearDelta: \t" + std::to_string(currGearDelta));
-        showText(0.01, 0.650, 0.3, "Accel(Expect): \t" + std::to_string(accelExpect));
-        showText(0.01, 0.675, 0.3, "Accel(Actual): \t\t" + std::to_string(acceleration));
-
+        showText(0.01, 0.525, 0.3, fmt("CurrentSpeed: \t%.3f"   , currSpeed));
+        showText(0.01, 0.550, 0.3, fmt("UpshiftSpeed: \t%.3f"   , upshiftSpeed));
+        showText(0.01, 0.575, 0.3, fmt("DnshiftSpeed: \t%.3f"   , downshiftSpeed - prevGearDelta));
+        showText(0.01, 0.600, 0.3, fmt("PrevGearDelta: \t%.3f"  , prevGearDelta));
+        showText(0.01, 0.625, 0.3, fmt("CurrGearDelta: \t%.3f"  , currGearDelta));
+        showText(0.01, 0.650, 0.3, fmt("Accel(Expect): \t%.3f"  , accelExpect));
+        showText(0.01, 0.675, 0.3, fmt("Accel(Actual): \t\t%.3f", acceleration));
     }
 }
 

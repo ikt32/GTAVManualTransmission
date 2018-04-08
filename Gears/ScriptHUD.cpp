@@ -1,8 +1,5 @@
 #include "script.h"
 
-#include <iomanip>
-#include <sstream>
-
 #include <inc/natives.h>
 
 #include <menu.h>
@@ -15,6 +12,7 @@
 #include "Input/CarControls.hpp"
 #include "VehicleData.hpp"
 #include "ScriptSettings.hpp"
+#include "Util/StringFormat.h"
 
 extern NativeMenu::Menu menu;
 extern ScriptSettings settings;
@@ -95,16 +93,24 @@ void drawRPMIndicator() {
 }
 
 std::string formatSpeedo(std::string units, float speed, bool showUnit, int hudFont) {
-    std::stringstream speedoFormat;
-    if (units == "kph") speed = speed * 3.6f;
-    if (units == "mph") speed = speed / 0.44704f;
+    if (units == "kph") 
+        speed = speed * 3.6f;
 
-    speedoFormat << std::setfill('0') << std::setw(3) << std::to_string(static_cast<int>(std::round(speed)));
-    if (hudFont != 2 && units == "kph") units = "km/h";
-    if (hudFont != 2 && units == "ms") units = "m/s";
-    if (showUnit) speedoFormat << " " << units;
+    if (units == "mph") 
+        speed = speed / 0.44704f;
 
-    return speedoFormat.str();
+    if (hudFont != 2 && units == "kph") 
+        units = "km/h";
+
+    if (hudFont != 2 && units == "ms") 
+        units = "m/s";
+
+    auto str = fmt("%03d", static_cast<int>(speed));
+
+    if (showUnit) 
+        str + " " + units;
+
+    return str;
 }
 
 void drawSpeedoMeter() {
@@ -174,62 +180,27 @@ void drawHUD() {
 }
 
 void drawDebugInfo() {
-    std::stringstream ssEnabled;
-    std::stringstream ssRPM;
-    std::stringstream ssCurrGear;
-    std::stringstream ssNextGear;
-    std::stringstream ssClutch;
-    std::stringstream ssThrottle;
-    std::stringstream ssTurbo;
-    std::stringstream ssAddress;
-    std::stringstream ssDashSpd;
-    std::stringstream ssDbias;
-
-    ssEnabled   << "Mod Enabled:\t\t"   << (settings.EnableManual ? "Yes" : "No");
-    ssRPM       << "RPM:\t\t\t"         << std::setprecision(3) << vehData.RPM;
-    ssCurrGear  << "Current Gear:\t\t"  << ext.GetGearCurr(vehicle);
-    ssNextGear  << "Next Gear:\t\t"     << ext.GetGearNext(vehicle);
-    ssClutch    << "Clutch:\t\t\t"      << std::setprecision(3) << ext.GetClutch(vehicle);
-    ssThrottle  << "Throttle:\t\t\t"    << std::setprecision(3) << ext.GetThrottle(vehicle);
-    ssTurbo     << "Turbo:\t\t\t"       << std::setprecision(3) << ext.GetTurbo(vehicle);
-    ssAddress   << "Veh Address:\t\t0x" << std::hex << reinterpret_cast<uint64_t>(ext.GetAddress(vehicle));
-    ssDashSpd   << "Speedo Present:\t"  << (vehData.HasSpeedo ? "Yes" : "No");
-    ssDbias     << "Drive Bias:\t\t"    << std::setprecision(3) << ext.GetDriveBiasFront(vehicle);
-
     if (!menu.IsThisOpen()) {
-        showText(0.01, 0.275, 0.3, ssEnabled.str());
-        showText(0.01, 0.300, 0.3, ssRPM.str());
-        showText(0.01, 0.325, 0.3, ssCurrGear.str());
-        showText(0.01, 0.350, 0.3, ssNextGear.str());
-        showText(0.01, 0.375, 0.3, ssClutch.str());
-        showText(0.01, 0.400, 0.3, ssThrottle.str());
-        showText(0.01, 0.425, 0.3, ssTurbo.str());
-        showText(0.01, 0.450, 0.3, ssAddress.str());
-        showText(0.01, 0.475, 0.3, ssDashSpd.str());
-        showText(0.01, 0.500, 0.3, ssDbias.str());
+        showText(0.01, 0.275, 0.3, fmt("Mod Enabled:\t\t%s" , settings.EnableManual ? "Yes" : "No"));
+        showText(0.01, 0.300, 0.3, fmt("RPM:\t\t\t%.3f", vehData.RPM));
+        showText(0.01, 0.325, 0.3, fmt("Current Gear:\t\t%d", ext.GetGearCurr(vehicle)));
+        showText(0.01, 0.350, 0.3, fmt("Next Gear:\t\t%d", ext.GetGearNext(vehicle)));
+        showText(0.01, 0.375, 0.3, fmt("Clutch:\t\t\t%.3f", ext.GetClutch(vehicle)));
+        showText(0.01, 0.400, 0.3, fmt("Throttle:\t\t\t%.3f", ext.GetThrottle(vehicle)));
+        showText(0.01, 0.425, 0.3, fmt("Turbo:\t\t\t%.3f", ext.GetTurbo(vehicle)));
+        showText(0.01, 0.450, 0.3, fmt("VehAddress:\t\t0x%X", reinterpret_cast<uint64_t>(ext.GetAddress(vehicle))));
+        showText(0.01, 0.475, 0.3, fmt("Speedo Present:\t%s", vehData.HasSpeedo ? "Yes" : "No"));
+        showText(0.01, 0.500, 0.3, fmt("Drive Bias:\t\t%.3f", ext.GetDriveBiasFront(vehicle)));
     }
 
+    showText(0.85, 0.050, 0.4, fmt("Throttle:\t%.3f", carControls.ThrottleVal) , 4);
+    showText(0.85, 0.075, 0.4, fmt("Brake:\t\t%.3f" , carControls.BrakeVal)    , 4);
+    showText(0.85, 0.100, 0.4, fmt("Clutch:\t\t%.3f", carControls.ClutchVal)   , 4);
+    showText(0.85, 0.125, 0.4, fmt("Handb:\t\t%.3f" , carControls.HandbrakeVal), 4);
 
-    std::stringstream ssThrottleInput;
-    std::stringstream ssBrakeInput;
-    std::stringstream ssClutchInput;
-    std::stringstream ssHandbrakInput;
-
-    ssThrottleInput << "Throttle:\t" << carControls.ThrottleVal;
-    ssBrakeInput << "Brake:\t\t" << carControls.BrakeVal;
-    ssClutchInput << "Clutch:\t\t" << carControls.ClutchVal;
-    ssHandbrakInput << "Handb:\t\t" << carControls.HandbrakeVal;
-
-    showText(0.85, 0.050, 0.4, ssThrottleInput.str(), 4);
-    showText(0.85, 0.075, 0.4, ssBrakeInput.str(), 4);
-    showText(0.85, 0.100, 0.4, ssClutchInput.str(), 4);
-    showText(0.85, 0.125, 0.4, ssHandbrakInput.str(), 4);
-
-    if (settings.EnableWheel) {
-        std::stringstream dinputDisplay;
-        dinputDisplay << "Wheel" << (carControls.WheelAvailable() ? "" : " not") << " present";
-        showText(0.85, 0.150, 0.4, dinputDisplay.str(), 4);
-    }
+    if (settings.EnableWheel)
+        showText(0.85, 0.150, 0.4, fmt("Wheel %s present", carControls.WheelAvailable() ? "" : " not"), 4);
+    
 
     if (settings.DisplayGearingInfo) {
         if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle)) {
@@ -326,22 +297,17 @@ void drawVehicleWheelInfo() {
     auto wheelsPower = ext.GetWheelPower(vehicle);
     auto wheelsBrake = ext.GetWheelBrakePressure(vehicle);
     for (int i = 0; i < numWheels; i++) {
-        float wheelSpeed = wheelsSpeed[i];
         float wheelCompr = wheelsCompr[i];
-        float wheelHealt = wheelsHealt[i];
-        float wheelPower = wheelsPower[i];
-        float wheelBrake = wheelsBrake[i];
         Color c = wheelLockups[i] ? solidOrange : transparentGray;
         c = wheelsOnGround[i] ? c : solidRed;
         showDebugInfo3D(wheelCoords[i], {
-            "Index: \t" + std::to_string(i),
-            "Power: \t" + std::string(ext.IsWheelPowered(vehicle, i) ? "Yes" : "No"),
-            "Speed: \t" + std::to_string(wheelSpeed),
-            "Compr: \t" + std::to_string(wheelCompr),
-            "Health: \t" + std::to_string(wheelHealt),
-            "Power: \t" + std::to_string(wheelPower),
-            "Brake: \t " + std::to_string(wheelBrake)},
-            c);
+            fmt("Index: \t%d", i),
+            fmt("Power: \t%s", ext.IsWheelPowered(vehicle, i) ? "Yes" : "No"),
+            fmt("Speed: \t%.3f", wheelsSpeed[i]),
+            fmt("Compr: \t%.3f", wheelCompr),
+            fmt("Health: \t%.3f", wheelsHealt[i]),
+            fmt("Power: \t%.3f", wheelsPower[i]),
+            fmt("Brake: \t%.3f",wheelsBrake[i])}, c);
         GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
             wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z + 1.0f + 2.5f * wheelCompr, 255, 0, 0, 255);
     }

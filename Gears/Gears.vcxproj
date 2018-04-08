@@ -178,6 +178,7 @@
     <ClInclude Include="script.h" />
     <ClInclude Include="ScriptSettings.hpp" />
     <ClInclude Include="Util\Logger.hpp" />
+    <ClInclude Include="Util\StringFormat.h" />
     <ClInclude Include="Util\TimeHelper.hpp" />
     <ClInclude Include="Util\UIUtils.h" />
     <ClInclude Include="Util\Util.hpp" />
