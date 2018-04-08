@@ -78,6 +78,9 @@
     <ClCompile Include="Util\GameSound.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="Util\StringFormat.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />

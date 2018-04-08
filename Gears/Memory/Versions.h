@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <map>
 
 static std::vector<std::string> GameVersionString = {
     "VER_1_0_335_2_STEAM",      // 00
@@ -130,6 +131,30 @@ enum G_GameVersion : int {
 
     G_VER_1_0_1365_1_STEAM,     // 40
     G_VER_1_0_1365_1_NOSTEAM,   // 41
+};
+
+static std::map<uint32_t, uint8_t> ExeVersionMap {
+    { 335, G_VER_1_0_335_2_STEAM },
+    { 350, G_VER_1_0_350_1_STEAM },  
+    { 372, G_VER_1_0_372_2_STEAM },  
+    { 393, G_VER_1_0_393_2_STEAM },  
+    { 393, G_VER_1_0_393_4_STEAM },  
+    { 463, G_VER_1_0_463_1_STEAM },  
+    { 505, G_VER_1_0_505_2_STEAM },  
+    { 573, G_VER_1_0_573_1_STEAM },  
+    { 617, G_VER_1_0_617_1_STEAM },  
+    { 678, G_VER_1_0_678_1_STEAM },  
+    { 757, G_VER_1_0_757_2_STEAM },  
+    { 757, G_VER_1_0_757_4_STEAM },  
+    { 791, G_VER_1_0_791_2_STEAM },  
+    { 877, G_VER_1_0_877_1_STEAM },  
+    { 944, G_VER_1_0_944_2_STEAM },  
+    { 1011, G_VER_1_0_1011_1_STEAM }, 
+    { 1032, G_VER_1_0_1032_1_STEAM }, 
+    { 1103, G_VER_1_0_1103_2_STEAM }, 
+    { 1180, G_VER_1_0_1180_2_STEAM }, 
+    { 1290, G_VER_1_0_1290_1_STEAM }, 
+    { 1365, G_VER_1_0_1365_1_STEAM }, 
 };
 
 static std::string eGameVersionToString(int version) {

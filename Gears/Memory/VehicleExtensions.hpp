@@ -14,6 +14,7 @@ struct WheelDimensions {
 class VehicleExtensions {
 public:
     VehicleExtensions();
+    static void ChangeVersion(int version);
     BYTE *GetAddress(Vehicle handle);
 
     /*
@@ -157,8 +158,6 @@ public:
 
 
 private:
-    const eGameVersion gameVersion = getGameVersion();
-
     int rocketBoostActiveOffset = 0;
     int rocketBoostChargeOffset = 0;
     int fuelLevelOffset = 0;

@@ -36,3 +36,5 @@ template<typename ... Args>
 std::string fmt(std::string fmt, Args&& ... args) {
     return stringFormatInternal(fmt, convert(std::forward<Args>(args))...);
 }
+
+bool strfind(const std::string & strHaystack, const std::string & strNeedle);
