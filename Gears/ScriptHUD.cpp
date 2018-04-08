@@ -105,10 +105,10 @@ std::string formatSpeedo(std::string units, float speed, bool showUnit, int hudF
     if (hudFont != 2 && units == "ms") 
         units = "m/s";
 
-    auto str = fmt("%03d", static_cast<int>(speed));
+    std::string str = fmt("%03d", static_cast<int>(speed));
 
     if (showUnit) 
-        str + " " + units;
+        str = fmt("%s %s", str, units);
 
     return str;
 }
