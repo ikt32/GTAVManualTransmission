@@ -307,9 +307,17 @@ void update_manual_features() {
             MemoryPatcher::PatchThrottleDecrement();
         }
         for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
-            ext.SetWheelBrakePressure(vehicle, i, 0.0f);
-            if (ext.IsWheelPowered(vehicle, i))
+            if (ext.IsWheelPowered(vehicle, i)) {
+                ext.SetWheelBrakePressure(vehicle, i, 0.0f);
                 ext.SetWheelPower(vehicle, i, 2.0f * ext.GetDriveForce(vehicle));
+            }
+            else {
+                float handlingBrakeForce = *reinterpret_cast<float *>(ext.GetHandlingPtr(vehicle) + hOffsets.fBrakeForce);
+                float inpBrakeForce = handlingBrakeForce * carControls.BrakeVal;
+                ext.SetWheelPower(vehicle, i, 0.0f);
+                ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
+            }
+
         }
         fakeRev();
         vehData.InduceBurnout = false;
