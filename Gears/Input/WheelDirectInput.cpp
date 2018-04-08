@@ -7,6 +7,7 @@
 
 #include "../Util/TimeHelper.hpp"
 #include "../Util/Logger.hpp"
+#include "Util/StringFormat.h"
 
 #define SAFE_RELEASE(p) { if(p) { (p)->Release(); (p)=nullptr; } }
 
@@ -63,7 +64,7 @@ bool WheelDirectInput::InitWheel() {
         return false;
     }
 
-    logger.Write(INFO, "WHEEL: Found " + std::to_string(DIDeviceFactory::Get().GetEntryCount()) + " device(s)");
+    logger.Write(INFO, fmt("WHEEL: Found %d device(s)", DIDeviceFactory::Get().GetEntryCount()));
 
     if (DIDeviceFactory::Get().GetEntryCount() < 1) {
         logger.Write(INFO, "WHEEL: No devices detected");

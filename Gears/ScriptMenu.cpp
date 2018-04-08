@@ -14,6 +14,7 @@
 #include "Util/UIUtils.h"
 #include "Util/Util.hpp"
 #include "Constants.h"
+#include "Util/StringFormat.h"
 
 extern ScriptSettings settings;
 extern std::string settingsGeneralFile;
@@ -389,14 +390,13 @@ void update_legacycontrollermenu() {
     auto it = 0;
     for (auto confTag : controllerConfTags) {
         controllerInfo.back() = controllerConfTagDetail.at(it);
-        controllerInfo.push_back("Assigned to " + carControls.NativeControl2Text(carControls.ConfTagLController2Value(confTag)) + 
-            " (" + std::to_string(carControls.ConfTagLController2Value(confTag)) + ")");
+        int nativeControl = carControls.ConfTagLController2Value(confTag);
+        controllerInfo.push_back(fmt("Assigned to %s (%d)", carControls.NativeControl2Text(nativeControl), nativeControl));
 
         if (menu.OptionPlus("Assign " + confTag, controllerInfo, nullptr, std::bind(clearLControllerButton, confTag), nullptr, "Current setting")) {
             WAIT(500);
             bool result = configLControllerButton(confTag);
-            //showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
-            if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+            if (!result) showNotification("Cancelled " + confTag + " assignment", &prevNotification);
             WAIT(500);
         }
         it++;
@@ -461,8 +461,7 @@ void update_controllermenu() {
         if (menu.OptionPlus("Assign " + confTag, controllerInfo, nullptr, std::bind(clearControllerButton, confTag), nullptr, "Current setting")) {
             WAIT(500);
             bool result = configControllerButton(confTag);
-            //showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
-            if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+            if (!result) showNotification("Cancelled " + confTag + " assignment", &prevNotification);
             WAIT(500);
         }
         it++;
@@ -486,7 +485,7 @@ void update_keyboardmenu() {
         if (menu.OptionPlus("Assign " + confTag, keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag), nullptr, "Current setting")) {
             WAIT(500);
             bool result = configKeyboardKey(confTag);
-            if (!result) showNotification(("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+            if (!result) showNotification("Cancelled " + confTag + " assignment", &prevNotification);
             WAIT(500);
         }
         it++;
@@ -678,11 +677,11 @@ void update_axesmenu() {
     carControls.UpdateValues(CarControls::Wheel, true);
     std::vector<std::string> info = {
         "Press RIGHT to clear this axis" ,
-        "Steer    : " + std::to_string(carControls.SteerVal),
-        "Throttle : " + std::to_string(carControls.ThrottleVal),
-        "Brake    : " + std::to_string(carControls.BrakeVal),
-        "Clutch   : " + std::to_string(carControls.ClutchVal),
-        "Handbrake: " + std::to_string(carControls.HandbrakeVal),
+        fmt("Steer:\t\t%.3f"  , carControls.SteerVal),
+        fmt("Throttle:\t\t%.3f" , carControls.ThrottleVal),
+        fmt("Brake:\t\t%.3f"  , carControls.BrakeVal),
+        fmt("Clutch:\t\t%.3f" , carControls.ClutchVal),
+        fmt("Handbrake:\t%.3f", carControls.HandbrakeVal),
     };
 
     if (menu.OptionPlus("Configure steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr, "Input values")) {
@@ -783,7 +782,7 @@ void update_buttonsmenu() {
     wheelToKeyInfo.push_back("Device: " + settings.GUIDToDeviceIndex(carControls.WheelToKeyGUID));
     for (int i = 0; i < MAX_RGBBUTTONS; i++) {
         if (carControls.WheelToKey[i] != -1) {
-            wheelToKeyInfo.push_back(std::to_string(i) + " = " + key2str(carControls.WheelToKey[i]));
+            wheelToKeyInfo.push_back(fmt("%d = %s", i, key2str(carControls.WheelToKey[i])));
             if (carControls.GetWheel().IsButtonPressed(i, carControls.WheelToKeyGUID)) {
                 wheelToKeyInfo.back() += " (Pressed)";
             }
@@ -830,10 +829,10 @@ void update_buttonsmenu() {
     if (buttonInfo.size() == 2) buttonInfo.push_back("None");
 
     for (auto confTag : buttonConfTags) {
-        buttonInfo.push_back("Assigned to " + std::to_string(carControls.ConfTagWheel2Value(confTag)));
+        buttonInfo.push_back(fmt("Assigned to %d", carControls.ConfTagWheel2Value(confTag)));
         if (menu.OptionPlus("Assign " + confTag, buttonInfo, nullptr, std::bind(clearButton, confTag), nullptr, "Current inputs")) {
             bool result = configButton(confTag);
-            showNotification(result ? (confTag + " saved").c_str() : ("Cancelled " + confTag + " assignment").c_str(), &prevNotification);
+            showNotification(result ? confTag + " saved" : "Cancelled " + confTag + " assignment", &prevNotification);
         }
         buttonInfo.pop_back();
     }
@@ -1085,8 +1084,8 @@ void saveAxis(const std::string &confTag, GUID devGUID, std::string axis, int mi
 void saveButton(const std::string &confTag, GUID devGUID, int button) {
     saveChanges();
     std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
-    std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
-    auto index = settings.SteeringAppendDevice(devGUID, devName.c_str());
+    std::string devName = std::string(wDevName.begin(), wDevName.end());
+    auto index = settings.SteeringAppendDevice(devGUID, devName);
     settings.SteeringSaveButton(confTag, index, button);
     settings.Read(&carControls);
 }
@@ -1094,8 +1093,8 @@ void saveButton(const std::string &confTag, GUID devGUID, int button) {
 void addWheelToKey(const std::string &confTag, GUID devGUID, int button, std::string keyName) {
     saveChanges();
     std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
-    std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
-    auto index = settings.SteeringAppendDevice(devGUID, devName.c_str());
+    std::string devName = std::string(wDevName.begin(), wDevName.end());
+    auto index = settings.SteeringAppendDevice(devGUID, devName);
     settings.SteeringAddWheelToKey(confTag, index, button, keyName);
     settings.Read(&carControls);
 }
@@ -1103,7 +1102,7 @@ void addWheelToKey(const std::string &confTag, GUID devGUID, int button, std::st
 void saveHShifter(const std::string &confTag, GUID devGUID, std::array<int, NUMGEARS> buttonArray) {
     saveChanges();
     std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
-    std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
+    std::string devName = std::string(wDevName.begin(), wDevName.end());
     auto index = settings.SteeringAppendDevice(devGUID, devName);
     settings.SteeringSaveHShifter(confTag, index, buttonArray.data());
     settings.Read(&carControls);
@@ -1113,7 +1112,7 @@ void clearAxis(std::string confTag) {
     saveChanges();
     settings.SteeringSaveAxis(confTag, -1, "", 0, 0);
     settings.Read(&carControls);
-    showNotification(("Cleared axis " + confTag).c_str(), &prevNotification);
+    showNotification("Cleared axis " + confTag, &prevNotification);
     initWheel();
 }
 
@@ -1146,7 +1145,7 @@ void clearButton(std::string confTag) {
     saveChanges();
     settings.SteeringSaveButton(confTag, -1, -1);
     settings.Read(&carControls);
-    showNotification(("Cleared button " + confTag).c_str(), &prevNotification);
+    showNotification("Cleared button " + confTag, &prevNotification);
 }
 
 void clearHShifter() {
@@ -1173,42 +1172,42 @@ void saveKeyboardKey(std::string confTag, std::string key) {
     saveChanges();
     settings.KeyboardSaveKey(confTag, key);
     settings.Read(&carControls);
-    showNotification(("Saved key " + confTag + ": " + key).c_str(), &prevNotification);
+    showNotification("Saved key " + confTag + ": " + key, &prevNotification);
 }
 
 void saveControllerButton(std::string confTag, std::string button) {
     saveChanges();
     settings.ControllerSaveButton(confTag, button);
     settings.Read(&carControls);
-    showNotification(("Saved button " + confTag + ": " + button).c_str(), &prevNotification);
+    showNotification("Saved button " + confTag + ": " + button, &prevNotification);
 }
 
 void saveLControllerButton(std::string confTag, int button) {
     saveChanges();
     settings.LControllerSaveButton(confTag, button);
     settings.Read(&carControls);
-    showNotification(("Saved button " + confTag + ": " + std::to_string(button)).c_str(), &prevNotification);
+    showNotification(fmt("Saved button %s: %d", confTag, button), &prevNotification);
 }
 
 void clearKeyboardKey(std::string confTag) {
     saveChanges();
     settings.KeyboardSaveKey(confTag, "UNKNOWN");
     settings.Read(&carControls);
-    showNotification(("Cleared key " + confTag).c_str(), &prevNotification);
+    showNotification("Cleared key " + confTag, &prevNotification);
 }
 
 void clearControllerButton(std::string confTag) {
     saveChanges();
     settings.ControllerSaveButton(confTag, "UNKNOWN");
     settings.Read(&carControls);
-    showNotification(("Cleared button " + confTag).c_str(), &prevNotification);
+    showNotification("Cleared button " + confTag, &prevNotification);
 }
 
 void clearLControllerButton(std::string confTag) {
     saveChanges();
     settings.LControllerSaveButton(confTag, -1);
     settings.Read(&carControls);
-    showNotification(("Cleared button " + confTag).c_str(), &prevNotification);
+    showNotification("Cleared button " + confTag, &prevNotification);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

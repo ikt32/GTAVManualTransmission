@@ -1157,8 +1157,8 @@ void functionEngLock() {
             }
         }
         if (settings.DisplayInfo) {
-            showText(0.5, 0.80, 0.25, "Eng block @ " + std::to_string(static_cast<int>(inputMultiplier * 100.0f)) + "%");
-            showText(0.5, 0.85, 0.25, "Eng block @ " + std::to_string(lockingForce));
+            showText(0.5, 0.80, 0.25, fmt("Eng block: %.3f", inputMultiplier));
+            showText(0.5, 0.85, 0.25, fmt("Eng block force: %.3f", lockingForce));
         }
     }
     else {
@@ -1192,9 +1192,9 @@ void functionEngBrake() {
                 }
             }
             if (settings.DisplayInfo) {
-                showText(0.85, 0.500, 0.4, "EngBrake:\t\t " + std::to_string(static_cast<int>(inputMultiplier * 100.0f)) + "%", 4);
-                showText(0.85, 0.525, 0.4, "Pressure:\t\t " + std::to_string(engBrakeForce), 4);
-                showText(0.85, 0.550, 0.4, "BrkInput:\t\t " + std::to_string(inpBrakeForce), 4);
+                showText(0.85, 0.500, 0.4, fmt("EngBrake:\t\t%.3f", inputMultiplier), 4);
+                showText(0.85, 0.525, 0.4, fmt("Pressure:\t\t%.3f", engBrakeForce), 4);
+                showText(0.85, 0.550, 0.4, fmt("BrkInput:\t\t%.3f", inpBrakeForce), 4);
             }
         }
         
@@ -2006,10 +2006,10 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     }
 
     if (settings.DisplayInfo) {
-        showText(0.85, 0.175, 0.4, "RelSteer:\t" + std::to_string(steeringRelative.x), 4);
-        showText(0.85, 0.200, 0.4, "SetPoint:\t" + std::to_string(travelRelative.x), 4);
-        showText(0.85, 0.225, 0.4, "Error:\t\t" + std::to_string(error), 4);
-        showText(0.85, 0.250, 0.4, std::string(understeering ? "~b~" : "~w~") + "Under:\t\t" + std::to_string(understeer) + "~w~", 4);
+        showText(0.85, 0.175, 0.4, fmt("RelSteer:\t%.3f", steeringRelative.x), 4);
+        showText(0.85, 0.200, 0.4, fmt("SetPoint:\t%.3f", travelRelative.x), 4);
+        showText(0.85, 0.225, 0.4, fmt("Error:\t\t%.3f" , error), 4);
+        showText(0.85, 0.250, 0.4, fmt("%sUnder:\t\t%.3f~w~", understeering ? "~b~" : "~w~", understeer), 4);
     }
 
     return satForce;
@@ -2144,14 +2144,13 @@ void playFFBGround() {
     }
 
     if (settings.DisplayInfo && collision) {
-        std::string info = "Collision @ ~r~" + std::to_string(gForce) + "G~w~~n~";
-        std::string info2 = "FFB: " + std::to_string(res);
-        showNotification(mtPrefix + info + info2, &prevNotification);
+        showNotification(fmt("%sCollision @ ~r~%.3fG~w~~n~"
+                             "FFB: %d",mtPrefix, gForce, res), &prevNotification);
     }
     if (settings.DisplayInfo) {
-        showText(0.85, 0.275, 0.4, std::string(abs(satForce) > 10000 ? "~r~" : "~w~") + "FFBSat:\t\t" + std::to_string(satForce) + "~w~", 4);
-        showText(0.85, 0.300, 0.4, std::string(abs(totalForce) > 10000 ? "~r~" : "~w~") + "FFBFin:\t\t" + std::to_string(totalForce) + "~w~", 4);
-        showText(0.85, 0.325, 0.4, std::string("Damper:\t") + std::to_string(damperForce).c_str(), 4);
+        showText(0.85, 0.275, 0.4, fmt("%sFFBSat:\t\t%d~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
+        showText(0.85, 0.300, 0.4, fmt("%sFFBFin:\t\t%d~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
+        showText(0.85, 0.325, 0.4, fmt("Damper:\t%d", damperForce), 4);
     }
 }
 
@@ -2188,8 +2187,9 @@ void playFFBWater() {
     carControls.PlayFFBDynamics(totalForce, damperForce);
 
     if (settings.DisplayInfo) {
-        showText(0.85, 0.275, 0.4, std::string(abs(satForce) > 10000 ? "~r~" : "~w~") + "FFBSat:\t\t" + std::to_string(satForce) + "~w~", 4);
-        showText(0.85, 0.300, 0.4, std::string(abs(totalForce) > 10000 ? "~r~" : "~w~") + "FFBFin:\t\t" + std::to_string(totalForce) + "~w~", 4);
+        showText(0.85, 0.275, 0.4, fmt("%sFFBSat:\t\t%d~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
+        showText(0.85, 0.300, 0.4, fmt("%sFFBFin:\t\t%d~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
+        showText(0.85, 0.325, 0.4, fmt("Damper:\t%d", damperForce), 4);
     }
 }
 
