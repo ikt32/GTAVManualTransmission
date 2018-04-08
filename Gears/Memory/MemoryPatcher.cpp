@@ -106,13 +106,12 @@ PatternInfo brake;
 PatternInfo throttle;
 
 void SetPatterns(int version) {
-    if (version < G_GameVersion::G_VER_1_0_1365_1_STEAM) {
-        shiftUp = PatternInfo("\x66\x89\x13\xB8\x05\x00\x00\x00", "xxxxxxxx", { 0x66, 0x89, 0x13 });
-        shiftDown = PatternInfo("\x66\x89\x13\x89\x73\x5C", "xxxxxx", { 0x66, 0x89, 0x13 });
-        brake = PatternInfo("\xEB\x05\xF3\x0F\x10\x40\x78\xF3\x0F\x59\xC4\xF3", "xxxxxx?xxxxx", { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, 11);
-        throttle = PatternInfo("\x0F\x28\xC3\x44\x89\x89\xC4\x01\x00\x00\x89\x81\xD0\x01\x00\x00", "xx?xxx??xxxx??xx", { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, 3);
-    }
-    else {
+    // Valid for >= G_VER_1_0_877_1_STEAM, but only worry about pre-877 if I get reports
+    shiftUp = PatternInfo("\x66\x89\x13\xB8\x05\x00\x00\x00", "xxxxxxxx", { 0x66, 0x89, 0x13 });
+    shiftDown = PatternInfo("\x66\x89\x13\x89\x73\x5C", "xxxxxx", { 0x66, 0x89, 0x13 });
+    brake = PatternInfo("\xEB\x05\xF3\x0F\x10\x40\x78\xF3\x0F\x59\xC4\xF3", "xxxxxx?xxxxx", { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, 11);
+    throttle = PatternInfo("\x0F\x28\xC3\x44\x89\x89\xC4\x01\x00\x00\x89\x81\xD0\x01\x00\x00", "xx?xxx??xxxx??xx", { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, 3);
+    if (version >= G_VER_1_0_1365_1_STEAM) {
         shiftUp = PatternInfo("\x66\x89\x0B\x8D\x46\x04\x66\x89\x43\04", "xx?xx?xxx?", { 0x66, 0x89, 0x0B });
         shiftDown = PatternInfo("\x66\x89\x13\x44\x89\x73\x5c", "xxxxxxx", { 0x66, 0x89, 0x13 });
         brake = PatternInfo("\xEB\x05\xF3\x0F\x10\x40\x78\xF3\x41\x0F\x59\xC0\xF3", "xxxxx??x?x?xx", { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, 12);
