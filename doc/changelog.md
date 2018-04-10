@@ -2,6 +2,7 @@
 
 ## 4.6.1
 * Add H-pattern shifter assignments for automatic gearbox drive/neutral selection
+* Add a workaround for FiveM version mismatch issues
 * Change understeer force feedback impact
 * Change how a burnout-while-reversing works in realistic pedals mode
 * Fix shift up patch for pre-b1365
