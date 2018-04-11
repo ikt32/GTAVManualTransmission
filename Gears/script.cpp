@@ -119,10 +119,11 @@ void update_vehicle() {
         gearStates = VehicleGearboxStates();
         wheelPatchStates = WheelPatchStates();
         gearRattle.Stop();
-
+    }
+    if (vehicle != lastVehicle && isVehicleAvailable(vehicle, playerPed)) {
         if (ext.GetTopGear(vehicle) == 1 || ext.GetVehicleFlags(vehicle)[1] & eVehicleFlag2::FLAG_IS_ELECTRIC)
             gearStates.FakeNeutral = false;
-        else 
+        else
             gearStates.FakeNeutral = settings.DefaultNeutral;
     }
     if (isVehicleAvailable(vehicle, playerPed)) {
