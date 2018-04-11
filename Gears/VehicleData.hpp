@@ -38,57 +38,69 @@ public:
     void UpdateValues(VehicleExtensions& ext, Vehicle vehicle);
 
     std::vector<float> GetWheelCompressionSpeeds();
-    Vector3 GetRelativeAcceleration();                  // dV/dT
-    Vector3 GetRelativeAccelerationAverage() const;     // Moving average
+    Vector3 GetRelativeAcceleration();            // dV/dT
+    Vector3 GetRelativeAccelerationAverage();     // Moving average
 
+    // Static-ish vehicle info stuff
     VehicleClass Class = VehicleClass::Unknown;
     VehicleDomain Domain = VehicleDomain::Unknown;
     bool Amphibious = false;
+    bool HasSpeedo = false;
+    bool NoClutch = false;
 
+    // Continuously updated
+
+    // Gearbox stuff
     float PrevRPM = 0.0f;
     float RPM = 0.0f;
     uint8_t LockGear = 1;
-    float LockSpeed = 0.0f;
 
-    bool NoClutch = false;
     bool FakeNeutral = false;
     bool HitLimiter = false;
+
+    std::array<float, NUM_GEARS> UpshiftSpeedsGame = {};
+    std::array<float, NUM_GEARS> UpshiftSpeedsMod = {};
+
+    // Auto gearbox stuff need to find a better solution/workaround
     DWORD PrevUpshiftTime = 0;
     bool IgnoreAccelerationUpshiftTrigger = false;
 
-    std::vector<float> WheelCompressions = { };
-    Vector3 SpeedVector{};
-
-    bool BlinkerLeft = false;
-    bool BlinkerRight = false;
-    bool BlinkerHazard = false;
-    int BlinkerTicks = 0;
-
-    bool LookBackRShoulder = false;
-
-    int RadioStationIndex = 0;
-    bool HasSpeedo = false;
-
-    float StallProgress = 0.0f;
+    // Brake stuff
     bool EngBrakeActive = false;
     bool EngLockActive = false;
-
-    std::array<float, NUM_GEARS> UpshiftSpeedsGame = { };
-    std::array<float, NUM_GEARS> UpshiftSpeedsMod = { };
     bool InduceBurnout = false;
 private:
     VehicleClass findClass(Hash model);
     VehicleDomain findDomain(VehicleClass vehicleClass);
     bool isAmphibious(VehicleExtensions &ext, Vehicle vehicle);
-    void updateAcceleration();
+    void updateAverages(long long thisTick);
 
-    Vector3 prevSpeedVector{};
-    std::vector<float> prevCompressions{};
+    long long prevTick = 0;
 
-    long long prevAccelTime = 0;
-    long long prevCompressTime = 0;
-
-    Vector3 acceleration{};
+    Vector3 speedVector = {};
+    Vector3 prevSpeedVector = {};
+    Vector3 acceleration = {};
     std::array<Vector3, SAMPLES> accelerationSamples{};
     int averageAccelIndex = 0;
+
+    // Misc stuff
+    std::vector<float> wheelCompressions = {};
+    std::vector<float> prevCompressions = {};
+    std::vector<float> compressionSpeeds = {};
+
+};
+
+// Standalone <<<thing>>>
+struct VehiclePeripherals {
+    // "Peripherals"
+    bool BlinkerLeft = false;
+    bool BlinkerRight = false;
+    bool BlinkerHazard = false;
+    int BlinkerTicks = 0;
+    bool LookBackRShoulder = false;
+    int RadioStationIndex = 0;
+
+    // Gearbox stuff
+    float StallProgress = 0.0f;
+
 };

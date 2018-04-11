@@ -204,7 +204,7 @@ void drawDebugInfo() {
 
     if (settings.DisplayGearingInfo) {
         if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle)) {
-            vehData.UpshiftSpeedsGame[ext.GetGearCurr(vehicle)] = vehData.SpeedVector.y;
+            vehData.UpshiftSpeedsGame[ext.GetGearCurr(vehicle)] = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
         }
 
         auto ratios = ext.GetGearRatios(vehicle);

@@ -6,16 +6,18 @@
 VehicleData::VehicleData() { }
 
 void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
+    auto thisTick = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
     Class = findClass(ENTITY::GET_ENTITY_MODEL(vehicle));
     Domain = findDomain(Class);
     Amphibious = isAmphibious(ext, vehicle);
 
     PrevRPM = RPM;
     RPM = VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) ? ext.GetCurrentRPM(vehicle) : 0.01f;
-    SpeedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
-    WheelCompressions = ext.GetWheelCompressions(vehicle);
-    if (prevCompressions.size() != WheelCompressions.size()) {
-        prevCompressions = WheelCompressions;
+    speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
+    wheelCompressions = ext.GetWheelCompressions(vehicle);
+    if (prevCompressions.size() != wheelCompressions.size()) {
+        prevCompressions = wheelCompressions;
+        compressionSpeeds = std::vector<float>(wheelCompressions.size());
     }
     if (!HasSpeedo && ext.GetDashSpeed(vehicle) > 0.0f) {
         HasSpeedo = true;
@@ -23,41 +25,48 @@ void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
 
     NoClutch = ext.GetTopGear(vehicle) == 1 || ext.GetVehicleFlags(vehicle)[1] & eVehicleFlag2::FLAG_IS_ELECTRIC;
 
-    updateAcceleration();
+    updateAverages(thisTick);
+    prevTick = thisTick;
 }
 
-std::vector<float> VehicleData::GetWheelCompressionSpeeds() {
-    long long time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
+Vector3 VehicleData::GetRelativeAcceleration() {
+    return acceleration;
+}
 
-    std::vector<float> result;
-    for (int i = 0; i < WheelCompressions.size(); i++) {
-        result.push_back((WheelCompressions[i] - prevCompressions[i]) / ((time - prevCompressTime) / 1e9f));
+Vector3 VehicleData::GetRelativeAccelerationAverage() {
+    Vector3 result = {};
+
+    for (int i = 0; i < SAMPLES; i++) {
+        result.x += accelerationSamples[i].x;
+        result.y += accelerationSamples[i].y;
+        result.z += accelerationSamples[i].z;
     }
 
-    prevCompressTime = time;
-    prevCompressions = WheelCompressions;
-
+    result.x = result.x / SAMPLES;
+    result.y = result.y / SAMPLES;
+    result.z = result.z / SAMPLES;
     return result;
 }
 
-void VehicleData::updateAcceleration() {
-    long long time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
+std::vector<float> VehicleData::GetWheelCompressionSpeeds() {
+    return compressionSpeeds;
+}
 
-    Vector3 result;
-    result.x = (SpeedVector.x - prevSpeedVector.x) / ((time - prevAccelTime) / 1e9f);
-    result.y = (SpeedVector.y - prevSpeedVector.y) / ((time - prevAccelTime) / 1e9f);
-    result.z = (SpeedVector.z - prevSpeedVector.z) / ((time - prevAccelTime) / 1e9f);
-    result._paddingx = 0;
-    result._paddingy = 0;
-    result._paddingz = 0;
+void VehicleData::updateAverages(long long thisTick) {
+    acceleration.x = (speedVector.x - prevSpeedVector.x) / ((thisTick - prevTick) / 1e9f);
+    acceleration.y = (speedVector.y - prevSpeedVector.y) / ((thisTick - prevTick) / 1e9f);
+    acceleration.z = (speedVector.z - prevSpeedVector.z) / ((thisTick - prevTick) / 1e9f);
 
-    prevAccelTime = time;
-    prevSpeedVector = SpeedVector;
-
-    acceleration = result;
+    prevSpeedVector = speedVector;
 
     accelerationSamples[averageAccelIndex] = acceleration;
     averageAccelIndex = (averageAccelIndex + 1) % SAMPLES;
+
+    std::vector<float> result;
+    for (int i = 0; i < wheelCompressions.size(); i++) {
+        compressionSpeeds[i] = (wheelCompressions[i] - prevCompressions[i]) / ((thisTick - prevTick) / 1e9f);
+    }
+    prevCompressions = wheelCompressions;
 }
 
 VehicleClass VehicleData::findClass(Hash model) {
@@ -87,23 +96,3 @@ bool VehicleData::isAmphibious(VehicleExtensions &ext, Vehicle vehicle) {
     auto type = ext.GetModelType(vehicle);
     return (type == 6 || type == 7);
 }
-
-Vector3 VehicleData::GetRelativeAcceleration() {
-    return acceleration;
-}
-
-Vector3 VehicleData::GetRelativeAccelerationAverage() const {
-    Vector3 result = {};
-
-    for (int i = 0; i < SAMPLES; i++) {
-        result.x += accelerationSamples[i].x;
-        result.y += accelerationSamples[i].y;
-        result.z += accelerationSamples[i].z;
-    }
-
-    result.x = result.x / SAMPLES;
-    result.y = result.y / SAMPLES;
-    result.z = result.z / SAMPLES;
-    return result;
-}
-

@@ -69,6 +69,7 @@ Ped playerPed;
 Vehicle vehicle;
 Vehicle lastVehicle;
 VehicleData vehData;
+VehiclePeripherals vehData2;
 VehicleExtensions ext;
 
 int prevNotification = 0;
@@ -103,17 +104,18 @@ void update_player() {
 
 void update_vehicle() {
     vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
-    if (isVehicleAvailable(vehicle, playerPed)) {
-        vehData.UpdateValues(ext, vehicle);
-    }
+    // Reset vehicle stats on vehicle change (or leave)
     if (vehicle != lastVehicle) {
         gearRattle.Stop();
-        if (vehData.NoClutch) {
+        vehData = VehicleData();
+        vehData2 = VehiclePeripherals();
+        if (ext.GetTopGear(vehicle) == 1 || ext.GetVehicleFlags(vehicle)[1] & eVehicleFlag2::FLAG_IS_ELECTRIC)
             vehData.FakeNeutral = false;
-        }
-        else {
+        else 
             vehData.FakeNeutral = settings.DefaultNeutral;
-        }
+    }
+    if (isVehicleAvailable(vehicle, playerPed)) {
+        vehData.UpdateValues(ext, vehicle);
     }
     lastVehicle = vehicle;
 }
@@ -892,7 +894,7 @@ bool subAutoShiftSequential() {
  */
 bool subAutoShiftSelect() {
     if (carControls.ButtonJustPressed(CarControls::WheelControlType::AR)) {
-        if (vehData.SpeedVector.y < 5.0f) {
+        if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < 5.0f) {
             shiftTo(0, true);
             vehData.FakeNeutral = false;
         }
@@ -929,7 +931,7 @@ void functionAShift() {
     int currGear = ext.GetGearCurr(vehicle);
     if (currGear == 0) return;
 
-    float currSpeed = vehData.SpeedVector.y;
+    float currSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
     auto ratios = ext.GetGearRatios(vehicle);
     float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
     float InitialDriveMaxFlatVel = ext.GetInitialDriveMaxFlatVel(vehicle);
@@ -1002,13 +1004,13 @@ void functionClutchCatch() {
     if (carControls.ClutchVal < 1.0f - settings.ClutchThreshold && 
         carControls.ThrottleVal < 0.25f && carControls.BrakeVal < 0.95) {
         if (settings.ShiftMode != HPattern && carControls.BrakeVal > 0.1f || 
-            vehData.RPM > 0.25f && vehData.SpeedVector.y >= lowSpeed) {
+            vehData.RPM > 0.25f && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y >= lowSpeed) {
             return;
         }
 
         // Forward
-        if (ext.GetGearCurr(vehicle) > 0 && vehData.SpeedVector.y < mehSpeed) {
-            float throttle = map(vehData.SpeedVector.y, mehSpeed, lowSpeed, 0.0f, idleThrottle);
+        if (ext.GetGearCurr(vehicle) > 0 && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < mehSpeed) {
+            float throttle = map(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y, mehSpeed, lowSpeed, 0.0f, idleThrottle);
             CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, throttle);
             ext.SetCurrentRPM(vehicle, 0.21f);
             ext.SetThrottle(vehicle, 0.0f);
@@ -1016,7 +1018,7 @@ void functionClutchCatch() {
 
         // Reverse
         if (ext.GetGearCurr(vehicle) == 0) {
-            float throttle = map(abs(vehData.SpeedVector.y), abs(mehSpeed), abs(lowSpeed), 0.0f, idleThrottle);
+            float throttle = map(abs(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y), abs(mehSpeed), abs(lowSpeed), 0.0f, idleThrottle);
             // due to 0.25f deadzone throttle makes reversing anims stop, so its jerky
             // TODO: needs a workaround to prevent jerky reversing anims
             CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, throttle); 
@@ -1063,18 +1065,18 @@ void functionEngStall() {
         vehData.RPM < 0.25f &&
         avgWheelSpeed < stallSpeed &&
         VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
-        vehData.StallProgress += invClutch * 1.0f/stallTime * GAMEPLAY::GET_FRAME_TIME();
+        vehData2.StallProgress += invClutch * 1.0f/stallTime * GAMEPLAY::GET_FRAME_TIME();
     }
-    else if (vehData.StallProgress > 0.0f) {
-        vehData.StallProgress -= invClutch * 1.0f/stallTime * GAMEPLAY::GET_FRAME_TIME();
+    else if (vehData2.StallProgress > 0.0f) {
+        vehData2.StallProgress -= invClutch * 1.0f/stallTime * GAMEPLAY::GET_FRAME_TIME();
     }
 
-    if (vehData.StallProgress > 1.0f) {
+    if (vehData2.StallProgress > 1.0f) {
         if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
             VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
         }
         gearRattle.Stop();
-        vehData.StallProgress = 0.0f;
+        vehData2.StallProgress = 0.0f;
     }
 
     // Simulate push-start
@@ -1698,12 +1700,12 @@ void checkWheelButtons() {
     // who was first?
     if (carControls.ButtonIn(CarControls::WheelControlType::LookRight) &&
         carControls.ButtonJustPressed(CarControls::WheelControlType::LookLeft)) {
-        vehData.LookBackRShoulder = true;
+        vehData2.LookBackRShoulder = true;
     }
 
     if (carControls.ButtonIn(CarControls::WheelControlType::LookLeft) &&
         carControls.ButtonIn(CarControls::WheelControlType::LookRight)) {
-        CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(vehData.LookBackRShoulder ? -180.0f : 180.0f);
+        CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(vehData2.LookBackRShoulder ? -180.0f : 180.0f);
     }
     else if (carControls.ButtonIn(CarControls::WheelControlType::LookLeft)) {
         CAM::SET_GAMEPLAY_CAM_RELATIVE_PITCH(0.0f, 1.0f);
@@ -1719,7 +1721,7 @@ void checkWheelButtons() {
     }
     if (carControls.ButtonReleased(CarControls::WheelControlType::LookLeft)  ||
         carControls.ButtonReleased(CarControls::WheelControlType::LookRight)) {
-        vehData.LookBackRShoulder = false;
+        vehData2.LookBackRShoulder = false;
     }
 
 	// Set camera related decorators
@@ -1743,94 +1745,94 @@ void checkWheelButtons() {
     if (carControls.ButtonHeld(CarControls::WheelControlType::RadioPrev, 1000) ||
         carControls.ButtonHeld(CarControls::WheelControlType::RadioNext, 1000)) {
         if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() != RadioOff) {
-            vehData.RadioStationIndex = AUDIO::GET_PLAYER_RADIO_STATION_INDEX();
+            vehData2.RadioStationIndex = AUDIO::GET_PLAYER_RADIO_STATION_INDEX();
         }
         AUDIO::SET_VEH_RADIO_STATION(vehicle, "OFF");
         return;
     }
     if (carControls.ButtonReleased(CarControls::WheelControlType::RadioNext)) {
         if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() == RadioOff) {
-            AUDIO::SET_RADIO_TO_STATION_INDEX(vehData.RadioStationIndex);
+            AUDIO::SET_RADIO_TO_STATION_INDEX(vehData2.RadioStationIndex);
             return;
         }
         AUDIO::_0xFF266D1D0EB1195D(); // Next radio station
     }
     if (carControls.ButtonReleased(CarControls::WheelControlType::RadioPrev)) {
         if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() == RadioOff) {
-            AUDIO::SET_RADIO_TO_STATION_INDEX(vehData.RadioStationIndex);
+            AUDIO::SET_RADIO_TO_STATION_INDEX(vehData2.RadioStationIndex);
             return;
         }
         AUDIO::_0xDD6BCF9E94425DF9(); // Prev radio station
     }
 
     if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorLeft)) {
-        if (!vehData.BlinkerLeft) {
-            vehData.BlinkerTicks = 1;
+        if (!vehData2.BlinkerLeft) {
+            vehData2.BlinkerTicks = 1;
             VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false); // L
             VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true); // R
-            vehData.BlinkerLeft = true;
-            vehData.BlinkerRight = false;
-            vehData.BlinkerHazard = false;
+            vehData2.BlinkerLeft = true;
+            vehData2.BlinkerRight = false;
+            vehData2.BlinkerHazard = false;
         }
         else {
-            vehData.BlinkerTicks = 0;
+            vehData2.BlinkerTicks = 0;
             VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
             VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-            vehData.BlinkerLeft = false;
-            vehData.BlinkerRight = false;
-            vehData.BlinkerHazard = false;
+            vehData2.BlinkerLeft = false;
+            vehData2.BlinkerRight = false;
+            vehData2.BlinkerHazard = false;
         }
     }
     if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorRight)) {
-        if (!vehData.BlinkerRight) {
-            vehData.BlinkerTicks = 1;
+        if (!vehData2.BlinkerRight) {
+            vehData2.BlinkerTicks = 1;
             VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true); // L
             VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false); // R
-            vehData.BlinkerLeft = false;
-            vehData.BlinkerRight = true;
-            vehData.BlinkerHazard = false;
+            vehData2.BlinkerLeft = false;
+            vehData2.BlinkerRight = true;
+            vehData2.BlinkerHazard = false;
         }
         else {
-            vehData.BlinkerTicks = 0;
+            vehData2.BlinkerTicks = 0;
             VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
             VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-            vehData.BlinkerLeft = false;
-            vehData.BlinkerRight = false;
-            vehData.BlinkerHazard = false;
+            vehData2.BlinkerLeft = false;
+            vehData2.BlinkerRight = false;
+            vehData2.BlinkerHazard = false;
         }
     }
 
     float wheelCenterDeviation = ( carControls.SteerVal - 0.5f) / 0.5f;
 
-    if (vehData.BlinkerTicks == 1 && abs(wheelCenterDeviation) > 0.2f)
+    if (vehData2.BlinkerTicks == 1 && abs(wheelCenterDeviation) > 0.2f)
     {
-        vehData.BlinkerTicks = 2;
+        vehData2.BlinkerTicks = 2;
     }
 
-    if (vehData.BlinkerTicks == 2 && abs(wheelCenterDeviation) < 0.1f)
+    if (vehData2.BlinkerTicks == 2 && abs(wheelCenterDeviation) < 0.1f)
     {
-        vehData.BlinkerTicks = 0;
+        vehData2.BlinkerTicks = 0;
         VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
         VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-        vehData.BlinkerLeft = false;
-        vehData.BlinkerRight = false;
-        vehData.BlinkerHazard = false;
+        vehData2.BlinkerLeft = false;
+        vehData2.BlinkerRight = false;
+        vehData2.BlinkerHazard = false;
     }
 
     if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorHazard)) {
-        if (!vehData.BlinkerHazard) {
+        if (!vehData2.BlinkerHazard) {
             VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true); // L
             VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true); // R
-            vehData.BlinkerLeft = false;
-            vehData.BlinkerRight = false;
-            vehData.BlinkerHazard = true;
+            vehData2.BlinkerLeft = false;
+            vehData2.BlinkerRight = false;
+            vehData2.BlinkerHazard = true;
         }
         else {
             VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
             VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-            vehData.BlinkerLeft = false;
-            vehData.BlinkerRight = false;
-            vehData.BlinkerHazard = false;
+            vehData2.BlinkerLeft = false;
+            vehData2.BlinkerRight = false;
+            vehData2.BlinkerHazard = false;
         }
     }
 }
