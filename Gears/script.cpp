@@ -1676,23 +1676,95 @@ void startStopEngine() {
     }
 }
 
-void checkWheelButtons() {
-    if (carControls.PrevInput != CarControls::Wheel) {
-        return;
+void resetIndicators() {
+    VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
+    VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
+    vehData2.BlinkerLeft = false;
+    vehData2.BlinkerRight = false;
+    vehData2.BlinkerHazard = false;
+}
+
+void checkIndicatorActions() {
+    if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorLeft)) {
+        if (!vehData2.BlinkerLeft) {
+            vehData2.BlinkerTicks = 1;
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false); // L
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true); // R
+            vehData2.BlinkerLeft = true;
+            vehData2.BlinkerRight = false;
+            vehData2.BlinkerHazard = false;
+        }
+        else {
+            vehData2.BlinkerTicks = 0;
+            resetIndicators();
+        }
+    }
+    if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorRight)) {
+        if (!vehData2.BlinkerRight) {
+            vehData2.BlinkerTicks = 1;
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true); // L
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false); // R
+            vehData2.BlinkerLeft = false;
+            vehData2.BlinkerRight = true;
+            vehData2.BlinkerHazard = false;
+        }
+        else {
+            vehData2.BlinkerTicks = 0;
+            resetIndicators();
+        }
     }
 
-    if (carControls.HandbrakeVal > 0.1f) {
-        CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, carControls.HandbrakeVal);
+    float wheelCenterDeviation = (carControls.SteerVal - 0.5f) / 0.5f;
+
+    if (vehData2.BlinkerTicks == 1 && abs(wheelCenterDeviation) > 0.2f) {
+        vehData2.BlinkerTicks = 2;
     }
-    if (carControls.ButtonIn(CarControls::WheelControlType::Handbrake)) {
-        CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
+
+    if (vehData2.BlinkerTicks == 2 && abs(wheelCenterDeviation) < 0.1f) {
+        vehData2.BlinkerTicks = 0;
+        resetIndicators();
     }
-    if (carControls.ButtonIn(CarControls::WheelControlType::Horn)) {
-        CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHorn, 1.0f);
+
+    if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorHazard)) {
+        if (!vehData2.BlinkerHazard) {
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true); // L
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true); // R
+            vehData2.BlinkerLeft = false;
+            vehData2.BlinkerRight = false;
+            vehData2.BlinkerHazard = true;
+        }
+        else {
+            resetIndicators();
+        }
     }
-    if (carControls.ButtonJustPressed(CarControls::WheelControlType::Lights)) {
-        CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHeadlight, 1.0f);
+}
+
+void checkRadioButtons() {
+    if (carControls.ButtonHeld(CarControls::WheelControlType::RadioPrev, 1000) ||
+        carControls.ButtonHeld(CarControls::WheelControlType::RadioNext, 1000)) {
+        if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() != RadioOff) {
+            vehData2.RadioStationIndex = AUDIO::GET_PLAYER_RADIO_STATION_INDEX();
+        }
+        AUDIO::SET_VEH_RADIO_STATION(vehicle, "OFF");
+        return;
     }
+    if (carControls.ButtonReleased(CarControls::WheelControlType::RadioNext)) {
+        if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() == RadioOff) {
+            AUDIO::SET_RADIO_TO_STATION_INDEX(vehData2.RadioStationIndex);
+            return;
+        }
+        AUDIO::_0xFF266D1D0EB1195D(); // Next radio station
+    }
+    if (carControls.ButtonReleased(CarControls::WheelControlType::RadioPrev)) {
+        if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() == RadioOff) {
+            AUDIO::SET_RADIO_TO_STATION_INDEX(vehData2.RadioStationIndex);
+            return;
+        }
+        AUDIO::_0xDD6BCF9E94425DF9(); // Prev radio station
+    }
+}
+
+void checkCameraButtons() {
     if (carControls.ButtonIn(CarControls::WheelControlType::LookBack)) {
         CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleLookBehind, 1.0f);
     }
@@ -1724,117 +1796,48 @@ void checkWheelButtons() {
         vehData2.LookBackRShoulder = false;
     }
 
-	// Set camera related decorators
-	DECORATOR::DECOR_SET_BOOL(vehicle, (char *)decorLookingLeft, carControls.ButtonIn(CarControls::WheelControlType::LookLeft));
-	DECORATOR::DECOR_SET_BOOL(vehicle, (char *)decorLookingRight, carControls.ButtonIn(CarControls::WheelControlType::LookRight));
+    // Set camera related decorators
+    DECORATOR::DECOR_SET_BOOL(vehicle, (char *)decorLookingLeft, carControls.ButtonIn(CarControls::WheelControlType::LookLeft));
+    DECORATOR::DECOR_SET_BOOL(vehicle, (char *)decorLookingRight, carControls.ButtonIn(CarControls::WheelControlType::LookRight));
 
-	DECORATOR::DECOR_SET_BOOL(vehicle, (char *)decorLookingBack, 
-		carControls.ButtonIn(CarControls::WheelControlType::LookBack) || 
-		(
-			carControls.ButtonIn(CarControls::WheelControlType::LookLeft) 
-			&&
-			carControls.ButtonIn(CarControls::WheelControlType::LookRight)
-		)
-	); // decorLookingBack = LookBack || (LookLeft && LookRight)
+    DECORATOR::DECOR_SET_BOOL(vehicle, (char *)decorLookingBack, 
+                              carControls.ButtonIn(CarControls::WheelControlType::LookBack) || 
+                              (
+                                  carControls.ButtonIn(CarControls::WheelControlType::LookLeft) 
+                                  &&
+                                  carControls.ButtonIn(CarControls::WheelControlType::LookRight)
+                              )
+    ); // decorLookingBack = LookBack || (LookLeft && LookRight)
 
     if (carControls.ButtonJustPressed(CarControls::WheelControlType::Camera)) {
         CONTROLS::_SET_CONTROL_NORMAL(0, ControlNextCamera, 1.0f);
     }
+}
 
+void checkVehicleInputButtons() {
+    if (carControls.HandbrakeVal > 0.1f) {
+        CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, carControls.HandbrakeVal);
+    }
+    if (carControls.ButtonIn(CarControls::WheelControlType::Handbrake)) {
+        CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
+    }
+    if (carControls.ButtonIn(CarControls::WheelControlType::Horn)) {
+        CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHorn, 1.0f);
+    }
+    if (carControls.ButtonJustPressed(CarControls::WheelControlType::Lights)) {
+        CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHeadlight, 1.0f);
+    }
+}
 
-    if (carControls.ButtonHeld(CarControls::WheelControlType::RadioPrev, 1000) ||
-        carControls.ButtonHeld(CarControls::WheelControlType::RadioNext, 1000)) {
-        if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() != RadioOff) {
-            vehData2.RadioStationIndex = AUDIO::GET_PLAYER_RADIO_STATION_INDEX();
-        }
-        AUDIO::SET_VEH_RADIO_STATION(vehicle, "OFF");
+void checkWheelButtons() {
+    if (carControls.PrevInput != CarControls::Wheel) {
         return;
     }
-    if (carControls.ButtonReleased(CarControls::WheelControlType::RadioNext)) {
-        if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() == RadioOff) {
-            AUDIO::SET_RADIO_TO_STATION_INDEX(vehData2.RadioStationIndex);
-            return;
-        }
-        AUDIO::_0xFF266D1D0EB1195D(); // Next radio station
-    }
-    if (carControls.ButtonReleased(CarControls::WheelControlType::RadioPrev)) {
-        if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() == RadioOff) {
-            AUDIO::SET_RADIO_TO_STATION_INDEX(vehData2.RadioStationIndex);
-            return;
-        }
-        AUDIO::_0xDD6BCF9E94425DF9(); // Prev radio station
-    }
 
-    if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorLeft)) {
-        if (!vehData2.BlinkerLeft) {
-            vehData2.BlinkerTicks = 1;
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false); // L
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true); // R
-            vehData2.BlinkerLeft = true;
-            vehData2.BlinkerRight = false;
-            vehData2.BlinkerHazard = false;
-        }
-        else {
-            vehData2.BlinkerTicks = 0;
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-            vehData2.BlinkerLeft = false;
-            vehData2.BlinkerRight = false;
-            vehData2.BlinkerHazard = false;
-        }
-    }
-    if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorRight)) {
-        if (!vehData2.BlinkerRight) {
-            vehData2.BlinkerTicks = 1;
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true); // L
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false); // R
-            vehData2.BlinkerLeft = false;
-            vehData2.BlinkerRight = true;
-            vehData2.BlinkerHazard = false;
-        }
-        else {
-            vehData2.BlinkerTicks = 0;
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-            vehData2.BlinkerLeft = false;
-            vehData2.BlinkerRight = false;
-            vehData2.BlinkerHazard = false;
-        }
-    }
-
-    float wheelCenterDeviation = ( carControls.SteerVal - 0.5f) / 0.5f;
-
-    if (vehData2.BlinkerTicks == 1 && abs(wheelCenterDeviation) > 0.2f)
-    {
-        vehData2.BlinkerTicks = 2;
-    }
-
-    if (vehData2.BlinkerTicks == 2 && abs(wheelCenterDeviation) < 0.1f)
-    {
-        vehData2.BlinkerTicks = 0;
-        VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
-        VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-        vehData2.BlinkerLeft = false;
-        vehData2.BlinkerRight = false;
-        vehData2.BlinkerHazard = false;
-    }
-
-    if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorHazard)) {
-        if (!vehData2.BlinkerHazard) {
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true); // L
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true); // R
-            vehData2.BlinkerLeft = false;
-            vehData2.BlinkerRight = false;
-            vehData2.BlinkerHazard = true;
-        }
-        else {
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-            vehData2.BlinkerLeft = false;
-            vehData2.BlinkerRight = false;
-            vehData2.BlinkerHazard = false;
-        }
-    }
+    checkVehicleInputButtons();
+    checkCameraButtons();
+    checkRadioButtons();
+    checkIndicatorActions();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
