@@ -3,37 +3,44 @@
 #include "VehicleData.hpp"
 #include "Memory/VehicleFlags.h"
 
-VehicleData::VehicleData() { }
+VehicleInfo::VehicleInfo() { }
 
-void VehicleData::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
-    auto thisTick = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
+void VehicleInfo::UpdateValues(VehicleExtensions &ext, Vehicle vehicle) {
     Class = findClass(ENTITY::GET_ENTITY_MODEL(vehicle));
     Domain = findDomain(Class);
-    Amphibious = isAmphibious(ext, vehicle);
+    IsAmphibious = isAmphibious(ext, vehicle);
 
-    PrevRPM = RPM;
-    RPM = VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) ? ext.GetCurrentRPM(vehicle) : 0.01f;
+    if (!HasSpeedo && ext.GetDashSpeed(vehicle) > 0.0f) {
+        HasSpeedo = true;
+    }
+
+    if (ext.GetTopGear(vehicle) == 1 || ext.GetVehicleFlags(vehicle)[1] & eVehicleFlag2::FLAG_IS_ELECTRIC)
+        HasClutch = false;
+    else
+        HasClutch = true;
+}
+
+VehicleDerivatives::VehicleDerivatives() { }
+
+void VehicleDerivatives::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
+    auto thisTick = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
+
     speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
     wheelCompressions = ext.GetWheelCompressions(vehicle);
     if (prevCompressions.size() != wheelCompressions.size()) {
         prevCompressions = wheelCompressions;
         compressionSpeeds = std::vector<float>(wheelCompressions.size());
     }
-    if (!HasSpeedo && ext.GetDashSpeed(vehicle) > 0.0f) {
-        HasSpeedo = true;
-    }
-
-    NoClutch = ext.GetTopGear(vehicle) == 1 || ext.GetVehicleFlags(vehicle)[1] & eVehicleFlag2::FLAG_IS_ELECTRIC;
 
     updateAverages(thisTick);
     prevTick = thisTick;
 }
 
-Vector3 VehicleData::GetRelativeAcceleration() {
+Vector3 VehicleDerivatives::GetRelativeAcceleration() {
     return acceleration;
 }
 
-Vector3 VehicleData::GetRelativeAccelerationAverage() {
+Vector3 VehicleDerivatives::GetRelativeAccelerationAverage() {
     Vector3 result = {};
 
     for (int i = 0; i < SAMPLES; i++) {
@@ -48,11 +55,11 @@ Vector3 VehicleData::GetRelativeAccelerationAverage() {
     return result;
 }
 
-std::vector<float> VehicleData::GetWheelCompressionSpeeds() {
+std::vector<float> VehicleDerivatives::GetWheelCompressionSpeeds() {
     return compressionSpeeds;
 }
 
-void VehicleData::updateAverages(long long thisTick) {
+void VehicleDerivatives::updateAverages(long long thisTick) {
     acceleration.x = (speedVector.x - prevSpeedVector.x) / ((thisTick - prevTick) / 1e9f);
     acceleration.y = (speedVector.y - prevSpeedVector.y) / ((thisTick - prevTick) / 1e9f);
     acceleration.z = (speedVector.z - prevSpeedVector.z) / ((thisTick - prevTick) / 1e9f);
@@ -69,7 +76,7 @@ void VehicleData::updateAverages(long long thisTick) {
     prevCompressions = wheelCompressions;
 }
 
-VehicleClass VehicleData::findClass(Hash model) {
+VehicleClass VehicleInfo::findClass(Hash model) {
     if (VEHICLE::IS_THIS_MODEL_A_CAR(model))        return VehicleClass::Car;
     if (VEHICLE::IS_THIS_MODEL_A_BICYCLE(model))    return VehicleClass::Bicycle;
     if (VEHICLE::IS_THIS_MODEL_A_BIKE(model))       return VehicleClass::Bike;
@@ -80,7 +87,7 @@ VehicleClass VehicleData::findClass(Hash model) {
     return VehicleClass::Unknown;
 }
 
-VehicleDomain VehicleData::findDomain(VehicleClass vehicleClass) {
+VehicleDomain VehicleInfo::findDomain(VehicleClass vehicleClass) {
     switch(vehicleClass) {
         case VehicleClass::Bicycle: return VehicleDomain::Bicycle;
         case VehicleClass::Boat:    return VehicleDomain::Water;
@@ -92,7 +99,18 @@ VehicleDomain VehicleData::findDomain(VehicleClass vehicleClass) {
     }
 }
 
-bool VehicleData::isAmphibious(VehicleExtensions &ext, Vehicle vehicle) {
+bool VehicleInfo::isAmphibious(VehicleExtensions &ext, Vehicle vehicle) {
     auto type = ext.GetModelType(vehicle);
     return (type == 6 || type == 7);
+}
+
+EngineValues::EngineValues() {}
+
+void EngineValues::Update(VehicleExtensions &ext, Vehicle vehicle) {
+    PrevRPM = RPM;
+
+    if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle))
+        RPM = ext.GetCurrentRPM(vehicle);
+    else
+        RPM = 0.01f;
 }

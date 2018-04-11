@@ -27,7 +27,13 @@ extern int prevNotification;
 extern int speedoIndex;
 extern int textureWheelId;
 
-extern VehicleData vehData;
+extern VehicleInfo vehInfo;
+extern EngineValues engVal;
+extern VehicleDerivatives vehDerivs;
+extern VehicleMiscStates miscStates;
+extern VehicleGearboxStates gearStates;
+extern WheelPatchStates wheelPatchStates;
+
 extern VehicleExtensions ext;
 extern Vehicle vehicle;
 
@@ -60,7 +66,7 @@ void drawRPMIndicator() {
     };
 
     Color rpmcolor = foreground;
-    if (vehData.RPM > settings.RPMIndicatorRedline) {
+    if (engVal.RPM > settings.RPMIndicatorRedline) {
         Color redline = {
             settings.RPMIndicatorRedlineR,
             settings.RPMIndicatorRedlineG,
@@ -72,7 +78,7 @@ void drawRPMIndicator() {
     float ratio = ext.GetGearRatios(vehicle)[ext.GetGearCurr(vehicle)];
     float minUpshift = ext.GetInitialDriveMaxFlatVel(vehicle);
     float maxUpshift = ext.GetDriveMaxFlatVel(vehicle);
-    if (vehData.RPM > map(minUpshift / ratio, 0.0f, maxUpshift / ratio, 0.0f, 1.0f)) {
+    if (engVal.RPM > map(minUpshift / ratio, 0.0f, maxUpshift / ratio, 0.0f, 1.0f)) {
         Color rpmlimiter = {
             settings.RPMIndicatorRevlimitR,
             settings.RPMIndicatorRevlimitG,
@@ -88,7 +94,7 @@ void drawRPMIndicator() {
         settings.RPMIndicatorHeight,
         rpmcolor,
         background,
-        vehData.RPM
+        engVal.RPM
     );
 }
 
@@ -114,7 +120,7 @@ std::string formatSpeedo(std::string units, float speed, bool showUnit, int hudF
 }
 
 void drawSpeedoMeter() {
-    float dashms = vehData.HasSpeedo ? ext.GetDashSpeed(vehicle) : abs(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y);
+    float dashms = vehInfo.HasSpeedo ? ext.GetDashSpeed(vehicle) : abs(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y);
 
     showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize,
         formatSpeedo(settings.Speedo, dashms, settings.SpeedoShowUnit, settings.HUDFont),
@@ -143,7 +149,7 @@ void drawShiftModeIndicator() {
 
 void drawGearIndicator() {
     std::string gear = std::to_string(ext.GetGearCurr(vehicle));
-    if (vehData.FakeNeutral && settings.EnableManual) {
+    if (gearStates.FakeNeutral && settings.EnableManual) {
         gear = "N";
     }
     else if (ext.GetGearCurr(vehicle) == 0) {
@@ -182,14 +188,14 @@ void drawHUD() {
 void drawDebugInfo() {
     if (!menu.IsThisOpen()) {
         showText(0.01, 0.275, 0.3, fmt("Mod Enabled:\t\t%s" , settings.EnableManual ? "Yes" : "No"));
-        showText(0.01, 0.300, 0.3, fmt("RPM:\t\t\t%.3f", vehData.RPM));
+        showText(0.01, 0.300, 0.3, fmt("RPM:\t\t\t%.3f", engVal.RPM));
         showText(0.01, 0.325, 0.3, fmt("Current Gear:\t\t%d", ext.GetGearCurr(vehicle)));
         showText(0.01, 0.350, 0.3, fmt("Next Gear:\t\t%d", ext.GetGearNext(vehicle)));
         showText(0.01, 0.375, 0.3, fmt("Clutch:\t\t\t%.3f", ext.GetClutch(vehicle)));
         showText(0.01, 0.400, 0.3, fmt("Throttle:\t\t\t%.3f", ext.GetThrottle(vehicle)));
         showText(0.01, 0.425, 0.3, fmt("Turbo:\t\t\t%.3f", ext.GetTurbo(vehicle)));
         showText(0.01, 0.450, 0.3, fmt("VehAddress:\t\t0x%X", reinterpret_cast<uint64_t>(ext.GetAddress(vehicle))));
-        showText(0.01, 0.475, 0.3, fmt("Speedo Present:\t%s", vehData.HasSpeedo ? "Yes" : "No"));
+        showText(0.01, 0.475, 0.3, fmt("Speedo Present:\t%s", vehInfo.HasSpeedo ? "Yes" : "No"));
         showText(0.01, 0.500, 0.3, fmt("Drive Bias:\t\t%.3f", ext.GetDriveBiasFront(vehicle)));
     }
 
@@ -204,7 +210,7 @@ void drawDebugInfo() {
 
     if (settings.DisplayGearingInfo) {
         if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle)) {
-            vehData.UpshiftSpeedsGame[ext.GetGearCurr(vehicle)] = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
+            gearStates.UpshiftSpeedsGame[ext.GetGearCurr(vehicle)] = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
         }
 
         auto ratios = ext.GetGearRatios(vehicle);
@@ -236,14 +242,14 @@ void drawDebugInfo() {
 
         i = 0;
         showText(0.55f, 0.05f, 0.35f, "Actual (Game)");
-        for (const auto& speed : vehData.UpshiftSpeedsGame) {
+        for (const auto& speed : gearStates.UpshiftSpeedsGame) {
             showText(0.55f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
             i++;
         }
 
         i = 0;
         showText(0.70f, 0.05f, 0.35f, "Actual (Mod)");
-        for (const auto& speed : vehData.UpshiftSpeedsMod) {
+        for (const auto& speed : gearStates.UpshiftSpeedsMod) {
             showText(0.70f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
             i++;
         }
