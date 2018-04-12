@@ -130,7 +130,6 @@ void update_vehicle() {
         vehDerivs.UpdateValues(ext, vehicle);
         vehInfo.UpdateValues(ext, vehicle);
         engVal.Update(ext, vehicle);
-        vehDerivs.UpdateValues(ext, vehicle);
     }
     lastVehicle = vehicle;
 }
@@ -1941,7 +1940,7 @@ int calculateDetail() {
     auto compSpeed = vehDerivs.GetWheelCompressionSpeeds();
 
     // More than 2 wheels! Trikes should be ok, etc.
-    if (ext.GetNumWheels(vehicle) > 2) {
+    if (compSpeed.size() > 2) {
         // left should pull left, right should pull right
         compSpeedTotal = -compSpeed[0] + compSpeed[1];
     }

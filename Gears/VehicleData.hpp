@@ -72,7 +72,7 @@ public:
     Vector3 GetRelativeAccelerationAverage();     // Moving average
 
 private:
-    void updateAverages(long long thisTick);
+    void updateDeltas(long long thisTick);
 
     long long prevTick = 0;
 

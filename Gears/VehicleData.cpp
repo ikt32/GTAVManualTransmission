@@ -28,11 +28,13 @@ void VehicleDerivatives::UpdateValues(VehicleExtensions& ext, Vehicle vehicle) {
     speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
     wheelCompressions = ext.GetWheelCompressions(vehicle);
     if (prevCompressions.size() != wheelCompressions.size()) {
-        prevCompressions = wheelCompressions;
-        compressionSpeeds = std::vector<float>(wheelCompressions.size());
+        prevCompressions.resize(wheelCompressions.size());
+        compressionSpeeds.resize(wheelCompressions.size());
     }
 
-    updateAverages(thisTick);
+    updateDeltas(thisTick);
+    prevCompressions = wheelCompressions;
+    prevSpeedVector = speedVector;
     prevTick = thisTick;
 }
 
@@ -59,21 +61,18 @@ std::vector<float> VehicleDerivatives::GetWheelCompressionSpeeds() {
     return compressionSpeeds;
 }
 
-void VehicleDerivatives::updateAverages(long long thisTick) {
-    acceleration.x = (speedVector.x - prevSpeedVector.x) / ((thisTick - prevTick) / 1e9f);
-    acceleration.y = (speedVector.y - prevSpeedVector.y) / ((thisTick - prevTick) / 1e9f);
-    acceleration.z = (speedVector.z - prevSpeedVector.z) / ((thisTick - prevTick) / 1e9f);
-
-    prevSpeedVector = speedVector;
+void VehicleDerivatives::updateDeltas(long long thisTick) {
+    const float ns = 1e9f;
+    acceleration.x = (speedVector.x - prevSpeedVector.x) / ((thisTick - prevTick) / ns);
+    acceleration.y = (speedVector.y - prevSpeedVector.y) / ((thisTick - prevTick) / ns);
+    acceleration.z = (speedVector.z - prevSpeedVector.z) / ((thisTick - prevTick) / ns);
 
     accelerationSamples[averageAccelIndex] = acceleration;
     averageAccelIndex = (averageAccelIndex + 1) % SAMPLES;
 
-    std::vector<float> result;
-    for (int i = 0; i < wheelCompressions.size(); i++) {
-        compressionSpeeds[i] = (wheelCompressions[i] - prevCompressions[i]) / ((thisTick - prevTick) / 1e9f);
+    for (int i = 0; i < wheelCompressions.size(); ++i) {
+        compressionSpeeds[i] = (wheelCompressions[i] - prevCompressions[i]) / ((thisTick - prevTick) / ns);
     }
-    prevCompressions = wheelCompressions;
 }
 
 VehicleClass VehicleInfo::findClass(Hash model) {
