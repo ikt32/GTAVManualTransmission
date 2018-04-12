@@ -2173,7 +2173,7 @@ void playFFBGround() {
         showText(0.85, 0.275, 0.4, fmt("%sFFBSat:\t\t%d~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
         showText(0.85, 0.300, 0.4, fmt("%sFFBFin:\t\t%d~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
         showText(0.85, 0.325, 0.4, fmt("Damper:\t\t%d", damperForce), 4);
-        showText(0.85, 0.325, 0.4, fmt("Detail:\t\t%d", detailForce), 4);
+        showText(0.85, 0.350, 0.4, fmt("Detail:\t\t%d", detailForce), 4);
     }
 }
 
