@@ -1099,7 +1099,7 @@ void addWheelToKey(const std::string &confTag, GUID devGUID, int button, std::st
     settings.Read(&carControls);
 }
 
-void saveHShifter(const std::string &confTag, GUID devGUID, std::array<int, NUMGEARS> buttonArray) {
+void saveHShifter(const std::string &confTag, GUID devGUID, std::array<int, NUM_GEARS> buttonArray) {
     saveChanges();
     std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     std::string devName = std::string(wDevName.begin(), wDevName.end());
@@ -1150,8 +1150,8 @@ void clearButton(std::string confTag) {
 
 void clearHShifter() {
     saveChanges();
-    int empty[NUMGEARS] = {};
-    for (int i = 0; i < NUMGEARS; i++) {
+    int empty[NUM_GEARS] = {};
+    for (int i = 0; i < NUM_GEARS; i++) {
         empty[i] = -1;
     }
     settings.SteeringSaveHShifter("SHIFTER", -1, empty);
@@ -1412,7 +1412,7 @@ bool configHPattern() {
     std::string additionalInfo = "Press " + escapeKey + " to exit. Press " + skipKey + " to skip gear.";
 
     GUID devGUID = {};
-    std::array<int, NUMGEARS> buttonArray; // There are gears 1-7 + R
+    std::array<int, NUM_GEARS> buttonArray; // There are gears 1-7 + R
     fill(buttonArray.begin(), buttonArray.end(), -1);
 
     int progress = 0;
@@ -1445,7 +1445,7 @@ bool configHPattern() {
             }
         }
 
-        if (progress > NUMGEARS-1) {
+        if (progress > NUM_GEARS-1) {
             break;
         }
         std::string gearDisplay;

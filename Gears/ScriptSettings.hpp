@@ -9,8 +9,6 @@
 class Logger;
 class CarControls;
 
-const int NUMGEARS = 8;
-
 class ScriptSettings {
 public:
     ScriptSettings();
@@ -180,7 +178,7 @@ public:
     void SteeringSaveAxis(const std::string &confTag, ptrdiff_t index, const std::string &axis, int minVal, int maxVal);
     void SteeringSaveFFBAxis(const std::string &confTag, ptrdiff_t index, const std::string &axis);
     void SteeringSaveButton(const std::string &confTag, ptrdiff_t index, int button);
-    void SteeringSaveHShifter(const std::string &confTag, ptrdiff_t index, int button[NUMGEARS]);
+    void SteeringSaveHShifter(const std::string &confTag, ptrdiff_t index, int *button);
     void KeyboardSaveKey(const std::string &confTag, const std::string &key);
     void ControllerSaveButton(const std::string &confTag, const std::string &button);
     void LControllerSaveButton(const std::string & confTag, int button);

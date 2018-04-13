@@ -759,7 +759,7 @@ void ScriptSettings::SteeringSaveButton(const std::string & confTag, ptrdiff_t i
         logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
 }
 
-void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t index, int button[NUMGEARS]) {
+void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t index, int *button) {
     CSimpleIniA settingsWheel;
     settingsWheel.SetUnicode();
     settingsWheel.LoadFile(settingsWheelFile.c_str());
