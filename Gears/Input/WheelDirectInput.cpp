@@ -685,3 +685,39 @@ int WheelDirectInput::povDirectionToIndex(int povDirection) {
             return -1;
     }
 }
+
+bool operator < (const GUID &guid1, const GUID &guid2) {
+    if (guid1.Data1 != guid2.Data1) {
+        return guid1.Data1 < guid2.Data1;
+    }
+    if (guid1.Data2 != guid2.Data2) {
+        return guid1.Data2 < guid2.Data2;
+    }
+    if (guid1.Data3 != guid2.Data3) {
+        return guid1.Data3 < guid2.Data3;
+    }
+    for (int i = 0; i<8; i++) {
+        if (guid1.Data4[i] != guid2.Data4[i]) {
+            return guid1.Data4[i] < guid2.Data4[i];
+        }
+    }
+    return false;
+}
+
+std::string GUID2String(GUID guid) {
+    wchar_t szGuidW[40] = { 0 };
+    StringFromGUID2(guid, szGuidW, 40);
+    std::wstring wGuid = szGuidW;
+    return(std::string(wGuid.begin(), wGuid.end()));
+}
+
+bool isSupportedDrivingDevice(DWORD dwDevType) {
+    switch (GET_DIDEVICE_TYPE(dwDevType)) {
+        case DI8DEVTYPE_DRIVING: // Wheels
+        case DI8DEVTYPE_SUPPLEMENTAL: // Pedal sets, shifters, etc
+        case DI8DEVTYPE_FLIGHT: // Yay HOTAS
+            return true;
+        default:
+            return false;
+    }
+}

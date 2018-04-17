@@ -135,3 +135,9 @@ private:
     std::unordered_map<GUID, std::array<int, SIZEOF_DIAxis>> averageIndex { 0 };
     std::unordered_map<GUID, std::array<bool, SIZEOF_DIAxis>> hasForceFeedback { false };
 };
+
+// GUID utils
+bool operator < (const GUID &guid1, const GUID &guid2);
+std::string GUID2String(GUID guid);
+bool isSupportedDrivingDevice(DWORD dwDevType);
+
