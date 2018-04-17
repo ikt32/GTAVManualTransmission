@@ -32,8 +32,15 @@ WheelDirectInput::WheelDirectInput() { }
 WheelDirectInput::~WheelDirectInput() {
     for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
         auto device = DIDeviceFactory::Get().GetEntry(i);
-        if (device)
-            device->diDevice->Unacquire();
+        if (device) {
+            HRESULT hr = device->diDevice->Unacquire();
+            if (FAILED(hr)) {
+                logger.Write(ERROR, "WHEEL: Failed unacquiring device: %s", 
+                    formatError(hr).c_str());
+                logger.Write(FATAL, "\tGUID: %s", 
+                    GUID2String(device->diDeviceInstance.guidInstance).c_str());
+            }
+        }
     }
     
     SAFE_RELEASE(m_cfEffect);
@@ -84,13 +91,10 @@ bool WheelDirectInput::InitWheel() {
     for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
         auto device = DIDeviceFactory::Get().GetEntry(i);
         std::wstring wDevName = device->diDeviceInstance.tszInstanceName;
-        logger.Write(INFO, "WHEEL: Device: " + std::string(wDevName.begin(), wDevName.end()));
-
         GUID guid = device->diDeviceInstance.guidInstance;
-        wchar_t szGuidW[40] = { 0 };
-        StringFromGUID2(guid, szGuidW, 40);
-        std::wstring wGuid = szGuidW;//std::wstring(szGuidW);
-        logger.Write(INFO, "WHEEL: GUID:   " + std::string(wGuid.begin(), wGuid.end()));
+        
+        logger.Write(INFO, "WHEEL: Device: " + std::string(wDevName.begin(), wDevName.end()));
+        logger.Write(INFO, "WHEEL: GUID:   %s", GUID2String(guid));
         foundGuids.push_back(guid);
 
         rgbPressTime.insert(	std::pair<GUID, std::array<__int64, MAX_RGBBUTTONS>>(guid, {}));
@@ -386,13 +390,7 @@ void WheelDirectInput::createCollisionEffect(DWORD axis, int numAxes, DIEFFECT &
 std::string currentEffectAttempt = "";
 void logCreateEffectException(const DIDevice *e) {
     logger.Write(FATAL, "CreateEffect (%s) caused an exception!", currentEffectAttempt.c_str());
-    GUID guid = e->diDeviceInstance.guidInstance;
-    wchar_t szGuidW[40] = { 0 };
-    StringFromGUID2(guid, szGuidW, 40);
-    char szGuid[40] = { 0 };
-    size_t   i;
-    wcstombs_s(&i, szGuid, szGuidW, 40);
-    logger.Write(FATAL, "\tGUID: %s", szGuid);
+    logger.Write(FATAL, "\tGUID: %s", GUID2String(e->diDeviceInstance.guidInstance).c_str());
 }
 
 /*
