@@ -1261,7 +1261,7 @@ void handleRPM() {
     if (ext.GetGearCurr(vehicle) > 0 &&
         (gearStates.HitLimiter && ENTITY::GET_ENTITY_SPEED(vehicle) > 2.0f)) {
         ext.SetThrottle(vehicle, 1.0f);
-        fakeRev(false, 0);
+        fakeRev(false, 1.0f);
         CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
         float counterForce = 0.25f*-(static_cast<float>(ext.GetTopGear(vehicle)) - static_cast<float>(ext.GetGearCurr(vehicle)))/static_cast<float>(ext.GetTopGear(vehicle));
         ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, counterForce, 0.0f, true, true, true, true);
@@ -1319,7 +1319,8 @@ void handleRPM() {
  * Custom limiter thing
  */
 void functionLimiter() {
-    if (ext.GetGearCurr(vehicle) == ext.GetTopGear(vehicle) || ext.GetGearCurr(vehicle) == 0) {
+    if (!settings.HardLimiter && 
+        (ext.GetGearCurr(vehicle) == ext.GetTopGear(vehicle) || ext.GetGearCurr(vehicle) == 0)) {
         gearStates.HitLimiter = false;
         return;
     }
@@ -1328,7 +1329,7 @@ void functionLimiter() {
     float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
     float maxSpeed = DriveMaxFlatVel / ratios[ext.GetGearCurr(vehicle)];
 
-    if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > maxSpeed) {
+    if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > maxSpeed && ext.GetCurrentRPM(vehicle) >= 1.0f) {
         gearStates.HitLimiter = true;
     }
     else {

@@ -194,7 +194,8 @@ void update_mainmenu() {
     for(auto device : carControls.FreeDevices) {
         if (menu.Option(device.name, NativeMenu::solidRed, 
             { "~r~<b>THIS DEVICE HASN'T BEEN SET UP YET!</b>~w~",
-              "Set it up or apply this option to discard the message.", 
+              "Set it up in the wheel menu!",
+              "Pressing Select discards this message/option."
               "Full name: " + device.name })) {
             saveChanges();
             settings.SteeringAppendDevice(device.guid, device.name);
@@ -286,8 +287,10 @@ void update_optionsmenu() {
 }
 
 void update_miscoptionsmenu() {
-    menu.Title("Misc. options");
-    menu.Subtitle("Small helping functions");
+    menu.Title("Miscellaneous");
+    menu.Subtitle("Miscellaneous options");
+    menu.BoolOption("Hard rev limiter", settings.HardLimiter, 
+                    { "Enforce rev limiter for reverse and top speed. No more infinite speed!" });
 
     menu.BoolOption("Simple Bike", settings.SimpleBike, 
                     { "Disables bike engine stalling and the clutch bite simulation." });

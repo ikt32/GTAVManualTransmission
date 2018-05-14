@@ -5,6 +5,7 @@
 #include "simpleini/SimpleIni.h"
 #include "ShiftModes.h"
 #include "Util/Logger.hpp"
+#include "Memory/VehicleExtensions.hpp"
 
 class Logger;
 class CarControls;
@@ -42,6 +43,7 @@ public:
     float StallingThreshold = 0.75f;
     float RPMDamage = 1.5f;
     int MisshiftDamage = 10;
+    bool HardLimiter = false;
 
     bool UseShifterForAuto = false;
 

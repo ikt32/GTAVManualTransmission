@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.6.2
+* Add a hard rev limiter
+* Fix speedometer not showing up properly
+* Bug fixes and general improvements
+
 ## 4.6.1
 * Add H-pattern shifter assignments for automatic gearbox drive/neutral selection
 * Add a workaround for FiveM version mismatch issues
