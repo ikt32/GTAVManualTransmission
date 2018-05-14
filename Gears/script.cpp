@@ -249,7 +249,7 @@ void update_misc_features() {
             crossScript();
         }
 
-        if (settings.AutoLookBack) {
+        if (settings.AutoLookBack && vehInfo.Class != VehicleClass::Heli) {
             functionAutoLookback();
         }
     }
@@ -2226,7 +2226,7 @@ void playFFBWater() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void functionAutoLookback() {
-    if (ext.GetGearCurr(vehicle) == 0) {
+    if (ext.GetTopGear(vehicle) > 0 && ext.GetGearCurr(vehicle) == 0) {
         CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleLookBehind, 1.0f);
     }
 }
