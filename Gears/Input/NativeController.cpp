@@ -1,6 +1,6 @@
 #include "NativeController.h"
-#include "inc/natives.h"
-#include "../Util/TimeHelper.hpp"
+#include <inc/natives.h>
+#include "Util/TimeHelper.hpp"
 
 
 NativeController::NativeController(): triggerValue(0.75f) {}

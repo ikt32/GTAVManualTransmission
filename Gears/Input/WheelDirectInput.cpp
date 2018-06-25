@@ -5,8 +5,8 @@
 #include <chrono>
 #include <vector>
 
-#include "../Util/TimeHelper.hpp"
-#include "../Util/Logger.hpp"
+#include "Util/TimeHelper.hpp"
+#include "Util/Logger.hpp"
 #include "Util/StringFormat.h"
 
 #define SAFE_RELEASE(p) { if(p) { (p)->Release(); (p)=nullptr; } }

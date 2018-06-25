@@ -1,15 +1,6 @@
-/*
- * "Legacy" is a bad name, initially chosen because native controls were
- * replaced with Xinput. Turns out it's still desired, so it's back.
- * This class just mirrors XboxController except it uses natives.
- * 
- * No plans to make a DirectInput controller thing though as I 
- * already have the wheel thing.
- */
-
 #pragma once
 #include <array>
-#include "inc/enums.h"
+#include <inc/enums.h>
 
 class NativeController
 {

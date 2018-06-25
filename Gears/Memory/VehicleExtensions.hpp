@@ -2,8 +2,8 @@
 
 #include <vector>
 #include <cstdint>
-#include "../../../ScriptHookV_SDK/inc/types.h"
-#include "../../../ScriptHookV_SDK/inc/nativeCaller.h"
+#include <inc/types.h>
+#include <inc/nativeCaller.h>
 
 struct WheelDimensions {
     float TyreRadius;
