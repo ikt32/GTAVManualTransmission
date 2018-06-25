@@ -69,15 +69,15 @@ void showNPCInfo(Vehicle vehicles[1024], int count) {
 
 
                 showDebugInfo3DColors(targetPos,
-                { { UI::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicles[i]))), fgColor },
-                { plate, fgColor },
-                { "Throttle: " + std::to_string(throttle), thColor },
-                { "Brake: " + std::to_string(brake), brColor },
-                { "Steer:" + std::to_string(ext.GetSteeringAngle(vehicles[i])), fgColor },
-                { "RPM: " + std::to_string(rpm), rpmColor },
-                { "Gear: " + std::to_string(ext.GetGearCurr(vehicles[i])), fgColor },
-                { "Top Gear: " + std::to_string(ext.GetTopGear(vehicles[i])), fgColor }, },
-                    bgColor);
+                                      { { UI::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicles[i]))), fgColor },
+                                          { plate, fgColor },
+                                          { "Throttle: " + std::to_string(throttle), thColor },
+                                          { "Brake: " + std::to_string(brake), brColor },
+                                          { "Steer:" + std::to_string(ext.GetSteeringAngle(vehicles[i])), fgColor },
+                                          { "RPM: " + std::to_string(rpm), rpmColor },
+                                          { "Gear: " + std::to_string(ext.GetGearCurr(vehicles[i])), fgColor },
+                                          { "Top Gear: " + std::to_string(ext.GetTopGear(vehicles[i])), fgColor }, },
+                                      bgColor);
             }
         }
     }

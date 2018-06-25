@@ -108,7 +108,7 @@ public:
     void Update();
 
     float GetAnalogValue(XboxButtons buttonType);
-    XboxButtons StringToButton(std::string& buttonString);
+    XboxButtons StringToButton(const std::string &buttonString);
     void SetTriggerValue(float value);
     float GetTriggerValue();
     void Vibrate(int leftval = 0, int rightval = 0);

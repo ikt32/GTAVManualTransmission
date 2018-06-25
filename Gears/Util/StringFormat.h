@@ -33,7 +33,7 @@ std::string stringFormatInternal(const std::string& format, Args&& ... args)
 }
 
 template<typename ... Args>
-std::string fmt(std::string fmt, Args&& ... args) {
+std::string fmt(const std::string& fmt, Args&& ... args) {
     return stringFormatInternal(fmt, convert(std::forward<Args>(args))...);
 }
 

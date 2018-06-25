@@ -139,7 +139,7 @@ XInputController::TapState XInputController::WasButtonTapped(XboxButtons buttonT
     return TapState::ButtonUp;
 }
 
-XInputController::XboxButtons XInputController::StringToButton(std::string& buttonString) {
+XInputController::XboxButtons XInputController::StringToButton(const std::string &buttonString) {
     for (int i = 0; i < SIZEOF_XboxButtons; i++) {
         if (buttonString == XboxButtonsHelper[i]) {
             return static_cast<XboxButtons>(i);
