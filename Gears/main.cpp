@@ -1,26 +1,20 @@
-#include "../../ScriptHookV_SDK/inc/main.h"
+#include <inc/main.h>
+
+#include <filesystem>
 
 #include "script.h"
-#include "Input/keyboard.h"
-#include "Util/Paths.h"
-#include "Util/Logger.hpp"
-#include "Memory/MemoryPatcher.hpp"
-#include "Memory/Versions.h"
+
 #include "Constants.h"
-#include "Util/StringFormat.h"
-#include <filesystem>
+#include "Memory/MemoryPatcher.hpp"
 #include "Memory/VehicleExtensions.hpp"
+#include "Memory/Versions.h"
+#include "Util/Logger.hpp"
+#include "Util/Paths.h"
+#include "Util/StringFormat.h"
 
 #pragma comment(lib,"Version.lib")
 
 namespace fs = std::experimental::filesystem;
-std::vector<std::string> scanFolder(std::string path) {
-    std::vector<std::string> files;
-    for (auto &file : fs::directory_iterator(path)) {
-        std::string fileName = fs::path(file).string();
-        
-    }
-}
 
 int getExeVersion(std::string newestExe) {
     DWORD  verHandle = 0;
@@ -89,8 +83,13 @@ int getExeInfo() {
 }
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
-    std::string logFile = Paths::GetModuleFolder(hInstance) + mtDir +
-        "\\" + Paths::GetModuleNameWithoutExtension(hInstance) + ".log";
+    const std::string modPath = Paths::GetModuleFolder(hInstance) + mtDir;
+    const std::string logFile = modPath + "\\" + Paths::GetModuleNameWithoutExtension(hInstance) + ".log";
+
+    if (!fs::is_directory(modPath) || !fs::exists(modPath)) {
+        fs::create_directory(modPath);
+    }
+
     logger.SetFile(logFile);
     Paths::SetOurModuleHandle(hInstance);
 
