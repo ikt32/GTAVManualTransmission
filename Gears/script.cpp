@@ -2339,8 +2339,8 @@ void main() {
     textureWheelFile = absoluteModPath + "\\texture_wheel.png";
 
     settings.SetFiles(settingsGeneralFile, settingsWheelFile);
-    menu.RegisterOnMain(std::bind(onMenuInit));
-    menu.RegisterOnExit(std::bind(onMenuClose));
+    menu.RegisterOnMain([] { onMenuInit(); });
+    menu.RegisterOnExit([] { onMenuClose(); });
     menu.SetFiles(settingsMenuFile);
     readSettings();
     ext.initOffsets();

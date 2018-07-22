@@ -276,6 +276,9 @@ void update_optionsmenu() {
     menu.BoolOption("Clutch Bite", settings.ClutchCatching,
                     { "Simulate clutch biting action and clutch interaction at near-stop speeds." });
 
+    menu.BoolOption("Hard rev limiter", settings.HardLimiter, 
+                    { "Enforce rev limiter for reverse and top speed. No more infinite speed!" });
+
     menu.BoolOption("Default Neutral gear", settings.DefaultNeutral,
                     { "The car will be in neutral when you get in." });
 
@@ -289,8 +292,6 @@ void update_optionsmenu() {
 void update_miscoptionsmenu() {
     menu.Title("Miscellaneous");
     menu.Subtitle("Miscellaneous options");
-    menu.BoolOption("Hard rev limiter", settings.HardLimiter, 
-                    { "Enforce rev limiter for reverse and top speed. No more infinite speed!" });
 
     menu.BoolOption("Simple Bike", settings.SimpleBike, 
                     { "Disables bike engine stalling and the clutch bite simulation." });
