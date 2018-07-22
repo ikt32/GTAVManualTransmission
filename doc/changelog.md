@@ -2,8 +2,11 @@
 
 ## 4.6.2
 * Add a hard rev limiter
-* Fix speedometer not showing up properly
-* Bug fixes and general improvements
+* The settings directory is now created if the user forgot to install it
+* Fix a bug where the speedometer would not show up properly
+* Fix a bug where some vehicles are stuck when the automatic look back option is enabled
+* Fix a few bugs related to keeping vehicle state
+* Other bug fixes and general improvements
 
 ## 4.6.1
 * Add H-pattern shifter assignments for automatic gearbox drive/neutral selection
