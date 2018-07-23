@@ -191,19 +191,6 @@ void update_mainmenu() {
     menu.Title("Manual Transmission", 0.90f);
     menu.Subtitle(std::string("~b~") + DISPLAY_VERSION);
 
-    for(auto device : carControls.FreeDevices) {
-        if (menu.Option(device.name, NativeMenu::solidRed, 
-            { "~r~<b>THIS DEVICE HASN'T BEEN SET UP YET!</b>~w~",
-              "Set it up in the wheel menu!",
-              "Pressing Select discards this message/option."
-              "Full name: " + device.name })) {
-            saveChanges();
-            settings.SteeringAppendDevice(device.guid, device.name);
-            settings.Read(&carControls);
-            carControls.CheckGUIDs(settings.RegisteredGUIDs);
-        }
-    }
-
     bool tempEnableRead = settings.EnableManual;
 
     if (menu.BoolOption("Enable manual transmission", tempEnableRead,
@@ -246,6 +233,19 @@ void update_mainmenu() {
     }
     std::vector<std::string> active = { activeInputName };
     menu.StringArray("Active input", active, activeIndex, { "Active input is automatically detected and can't be changed." });
+
+    for (auto device : carControls.FreeDevices) {
+        if (menu.Option(device.name, NativeMenu::solidRed,
+            { "~r~<b>THIS DEVICE HASN'T BEEN SET UP YET!</b>~w~",
+            "Set it up in the wheel menu!",
+            "Pressing Select discards this message/option."
+            "Full name: " + device.name })) {
+            saveChanges();
+            settings.SteeringAppendDevice(device.guid, device.name);
+            settings.Read(&carControls);
+            carControls.CheckGUIDs(settings.RegisteredGUIDs);
+        }
+    }
 }
 
 void update_optionsmenu() {
