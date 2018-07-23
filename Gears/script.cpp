@@ -433,7 +433,7 @@ void crossScript() {
     DECORATOR::DECOR_SET_INT(vehicle, (char *)decorCurrentGear, ext.GetGearCurr(vehicle));
 
     // Shift indicator: 0 = nothing, 1 = Shift up, 2 = Shift down
-    if (gearStates.HitLimiter) {
+    if (gearStates.HitRPMSpeedLimiter || gearStates.HitRPMLimiter) {
         DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice, 1);
     }
     else if (ext.GetGearCurr(vehicle) > 1 && engVal.RPM < 0.4f) {
@@ -1259,14 +1259,18 @@ void handleRPM() {
     // Update 2017-08-12: We know the gear speeds now, consider patching
     // shiftUp completely?
     if (ext.GetGearCurr(vehicle) > 0 &&
-        (gearStates.HitLimiter && ENTITY::GET_ENTITY_SPEED(vehicle) > 2.0f)) {
+        (gearStates.HitRPMSpeedLimiter && ENTITY::GET_ENTITY_SPEED(vehicle) > 2.0f)) {
         ext.SetThrottle(vehicle, 1.0f);
         fakeRev(false, 1.0f);
         CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
         float counterForce = 0.25f*-(static_cast<float>(ext.GetTopGear(vehicle)) - static_cast<float>(ext.GetGearCurr(vehicle)))/static_cast<float>(ext.GetTopGear(vehicle));
         ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, counterForce, 0.0f, true, true, true, true);
-        //showText(0.4, 0.1, 1.0, "REV LIM");
+        //showText(0.4, 0.1, 1.0, "REV LIM SPD");
         //showText(0.4, 0.15, 1.0, "CF: " + std::to_string(counterForce));
+    }
+    if (gearStates.HitRPMLimiter) {
+        ext.SetCurrentRPM(vehicle, 1.0f);
+        //showText(0.4, 0.1, 1.0, "REV LIM RPM");
     }
     
     /*
@@ -1319,9 +1323,11 @@ void handleRPM() {
  * Custom limiter thing
  */
 void functionLimiter() {
+    gearStates.HitRPMLimiter = ext.GetCurrentRPM(vehicle) > 1.0f;
+
     if (!settings.HardLimiter && 
         (ext.GetGearCurr(vehicle) == ext.GetTopGear(vehicle) || ext.GetGearCurr(vehicle) == 0)) {
-        gearStates.HitLimiter = false;
+        gearStates.HitRPMSpeedLimiter = false;
         return;
     }
 
@@ -1330,10 +1336,10 @@ void functionLimiter() {
     float maxSpeed = DriveMaxFlatVel / ratios[ext.GetGearCurr(vehicle)];
 
     if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > maxSpeed && ext.GetCurrentRPM(vehicle) >= 1.0f) {
-        gearStates.HitLimiter = true;
+        gearStates.HitRPMSpeedLimiter = true;
     }
     else {
-        gearStates.HitLimiter = false;
+        gearStates.HitRPMSpeedLimiter = false;
     }
 }
 
