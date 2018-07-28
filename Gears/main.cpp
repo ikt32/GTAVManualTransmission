@@ -16,6 +16,18 @@
 
 namespace fs = std::experimental::filesystem;
 
+template < typename K, typename V >
+V findNextLowest(const std::map<K, V>& map, K key) {
+    V lowestMatch{};
+    for (auto it = map.rbegin(); it != map.rend(); ++it) {
+        if (it->first <= key) {
+            lowestMatch = it->second;
+            return lowestMatch;
+        }
+    }
+    return lowestMatch;
+}
+
 int getExeVersion(std::string newestExe) {
     DWORD  verHandle = 0;
     UINT   size = 0;
@@ -102,7 +114,8 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             if (scriptingVersion < G_VER_1_0_877_1_STEAM) {
                 logger.Write(WARN, "Unsupported game version! Update your game.");
             }
-            int actualVersion = ExeVersionMap.lower_bound(getExeInfo())->second;
+            //int actualVersion = ExeVersionMap.lower_bound(getExeInfo())->second;
+            auto actualVersion = findNextLowest(ExeVersionMap, getExeInfo());
             if (scriptingVersion % 2) {
                 scriptingVersion--;
             }
