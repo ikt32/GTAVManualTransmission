@@ -94,7 +94,7 @@ bool WheelDirectInput::InitWheel() {
         GUID guid = device->diDeviceInstance.guidInstance;
         
         logger.Write(INFO, "WHEEL: Device: " + std::string(wDevName.begin(), wDevName.end()));
-        logger.Write(INFO, "WHEEL: GUID:   %s", GUID2String(guid));
+        logger.Write(INFO, "WHEEL: GUID:   %s", GUID2String(guid).c_str());
         foundGuids.push_back(guid);
 
         rgbPressTime.insert(	std::pair<GUID, std::array<__int64, MAX_RGBBUTTONS>>(guid, {}));

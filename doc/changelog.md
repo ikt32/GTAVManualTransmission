@@ -7,6 +7,7 @@
 * Fix a bug where some vehicles are stuck when the automatic look back option is enabled
 * Fix a few bugs related to keeping vehicle state
 * Other bug fixes and general improvements
+* Update for b1493. Additionally it should be a tiny bit more future-proof.
 
 ## 4.6.1
 * Add H-pattern shifter assignments for automatic gearbox drive/neutral selection
