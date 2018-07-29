@@ -189,4 +189,15 @@ private:
     int vehicleFlagsOffset = 0;
 
     int steeringMultOffset = 0;
+
+    // Wheel stuff
+    int wheelHealthOffset = 0;
+    int wheelSuspensionCompressionOffset = 0;
+    int wheelSteeringAngleOffset = 0;
+    int wheelAngularVelocityOffset = 0;
+    int wheelSmokeOffset = 0;
+    int wheelPowerOffset = 0;
+    int wheelBrakeOffset = 0;
+    int wheelFlagsOffset = 0;
+
 };
