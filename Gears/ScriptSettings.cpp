@@ -350,7 +350,7 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     scriptControl->UseLegacyController = settingsGeneral.GetBoolValue("CONTROLLER_LEGACY", "Enable", false);
 
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Toggle)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Toggle", -1);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ToggleH)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ToggleH", ControlFrontendCancel);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ToggleH)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ToggleShift", ControlFrontendCancel);
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftUp", ControlFrontendAccept);
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftDown", ControlFrontendX);
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Clutch)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Clutch", ControlFrontendAxisY);
