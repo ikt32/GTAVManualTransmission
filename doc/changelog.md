@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.6.4
+* Fix a bug where the menu gets messed up after 10 options scrolling.
+* Fix a bug where the non-Xinput controller settings loads the wrong setting for shifting mode.
+
+## 4.6.3
+* Fix a few missing vehicle offset searches.
+
 ## 4.6.2
 * Add a hard rev limiter
 * The settings directory is now created if the user forgot to install it
