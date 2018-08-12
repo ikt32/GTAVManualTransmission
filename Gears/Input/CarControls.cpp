@@ -61,6 +61,7 @@ float CarControls::getInputValue(WheelAxisType axisType, WheelControlType button
     else {
         inputValue = ButtonIn(buttonType) ? 1.0f : 0.0f;
     }
+    inputValue = std::clamp(inputValue, 0.0f, 1.0f);
     return inputValue;
 }
 
