@@ -3,11 +3,17 @@
 #include <string>
 
 XInputController::XInputController(int playerNumber)
-    : buttonState(0)
-    , controllerNum(playerNumber - 1) {
-}
+    : pressTime()
+    , releaseTime()
+    , tapPressTime()
+    , tapReleaseTime()
+    , xboxButtonCurr()
+    , xboxButtonPrev()
+    , controllerState()
+    , buttonState(0)
+    , controllerNum(playerNumber - 1) {}
 
-XInputController::~XInputController() {}
+XInputController::~XInputController() = default;
 
 XINPUT_STATE XInputController::getState() {
     // Zeroise the state
@@ -27,10 +33,7 @@ bool XInputController::isConnected() {
     // Get the state
     DWORD Result = XInputGetState(controllerNum, &discard_this);
 
-    if (Result == ERROR_SUCCESS) {
-        return true;
-    }
-    return false;
+    return Result == ERROR_SUCCESS;
 }
 
 void XInputController::Vibrate(int leftVal, int rightVal) {
@@ -70,10 +73,7 @@ bool XInputController::IsButtonJustPressed(XboxButtons buttonType) {
     xboxButtonCurr[buttonType] = IsButtonPressed(buttonType);
 
     // raising edge
-    if (xboxButtonCurr[buttonType] && !xboxButtonPrev[buttonType]) {
-        return true;
-    }
-    return false;
+    return xboxButtonCurr[buttonType] && !xboxButtonPrev[buttonType];
 }
 
 bool XInputController::IsButtonJustReleased(XboxButtons buttonType) {
@@ -81,10 +81,7 @@ bool XInputController::IsButtonJustReleased(XboxButtons buttonType) {
     xboxButtonCurr[buttonType] = IsButtonPressed(buttonType);
 
     // falling edge
-    if (!xboxButtonCurr[buttonType] && xboxButtonPrev[buttonType]) {
-        return true;
-    }
-    return false;
+    return !xboxButtonCurr[buttonType] && xboxButtonPrev[buttonType];
 }
 
 bool XInputController::WasButtonHeldForMs(XboxButtons buttonType, int milliseconds) {
@@ -110,12 +107,8 @@ bool XInputController::WasButtonHeldOverMs(XboxButtons buttonType, int millis) {
         pressTime[buttonType] = milliseconds_now();
     }
 
-    if (IsButtonPressed(buttonType) &&
-        pressTime[buttonType] != 0 &&
-        milliseconds_now() - pressTime[buttonType] >= millis) {
-        return true;
-    }
-    return false;
+    return IsButtonPressed(buttonType) && pressTime[buttonType] != 0 && milliseconds_now() - pressTime[buttonType] >=
+        millis;
 }
 
 XInputController::TapState XInputController::WasButtonTapped(XboxButtons buttonType, int milliseconds) {

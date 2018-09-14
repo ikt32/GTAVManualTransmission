@@ -160,16 +160,12 @@ bool IsWindowFocused() {
     DWORD foregroundProcId;
     GetWindowThreadProcessId(foregroundHwnd, &foregroundProcId);
     auto currentProcId = GetCurrentProcessId();
-    if (foregroundProcId == currentProcId) {
-        return true;
-    }
-    return false;
+    return foregroundProcId == currentProcId;
 }
 
 bool IsKeyDown(DWORD key) {
     if (!IsWindowFocused()) return false;
-    if (GetAsyncKeyState(key) & 0x8000) return true;
-    return false;
+    return (GetAsyncKeyState(key) & 0x8000) != 0;
 }
 
 bool IsKeyJustUp(DWORD key, bool exclusive) {

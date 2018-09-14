@@ -176,10 +176,7 @@ void WheelDirectInput::Update() {
 
 bool WheelDirectInput::IsConnected(GUID device) {
     auto e = FindEntryFromGUID(device);
-    if (!e) {
-        return false;
-    }
-    return true;
+    return e != nullptr;
 }
 
 bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
@@ -207,9 +204,7 @@ bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
                 return false;
         }
     }
-    if (e->joystate.rgbButtons[buttonType])
-        return true;
-    return false;
+    return e->joystate.rgbButtons[buttonType] != 0;
 }
 
 bool WheelDirectInput::IsButtonJustPressed(int buttonType, GUID device) {
@@ -219,18 +214,12 @@ bool WheelDirectInput::IsButtonJustPressed(int buttonType, GUID device) {
         povButtonCurr[device][povIndex] = IsButtonPressed(buttonType,device);
 
         // raising edge
-        if (povButtonCurr[device][povIndex] && !povButtonPrev[device][povIndex]) {
-            return true;
-        }
-        return false;
+        return povButtonCurr[device][povIndex] && !povButtonPrev[device][povIndex];
     }
     rgbButtonCurr[device][buttonType] = IsButtonPressed(buttonType,device);
 
     // raising edge
-    if (rgbButtonCurr[device][buttonType] && !rgbButtonPrev[device][buttonType]) {
-        return true;
-    }
-    return false;
+    return rgbButtonCurr[device][buttonType] && !rgbButtonPrev[device][buttonType];
 }
 
 bool WheelDirectInput::IsButtonJustReleased(int buttonType, GUID device) {
@@ -240,18 +229,12 @@ bool WheelDirectInput::IsButtonJustReleased(int buttonType, GUID device) {
         povButtonCurr[device][povIndex] = IsButtonPressed(buttonType,device);
 
         // falling edge
-        if (!povButtonCurr[device][povIndex] && povButtonPrev[device][povIndex]) {
-            return true;
-        }
-        return false;
+        return !povButtonCurr[device][povIndex] && povButtonPrev[device][povIndex];
     }
     rgbButtonCurr[device][buttonType] = IsButtonPressed(buttonType,device);
 
     // falling edge
-    if (!rgbButtonCurr[device][buttonType] && rgbButtonPrev[device][buttonType]) {
-        return true;
-    }
-    return false;
+    return !rgbButtonCurr[device][buttonType] && rgbButtonPrev[device][buttonType];
 }
 
 bool WheelDirectInput::WasButtonHeldForMs(int buttonType, GUID device, int millis) {
@@ -466,10 +449,8 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
         currentEffectAttempt = "";
         return false;
     }
-    
-    if (createdEffects == 0) return false;
 
-    return true;
+    return createdEffects != 0;
 }
 
 void WheelDirectInput::SetConstantForce(GUID device, DIAxis ffAxis, int force) {
