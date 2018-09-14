@@ -130,14 +130,8 @@ void updateNPCVehicles(Vehicle vehicles[1024], int count) {
 }
 
 void update_npc() {
-    bool mtActive = MemoryPatcher::NumGearboxPatches != 0;
-
-    if (!vehicle || !ENTITY::DOES_ENTITY_EXIST(vehicle) ||
-        playerPed != VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1)) {
-        return;
-    }
-
-    if (!settings.ShowNPCInfo && !(settings.EnableManual && mtActive)) return;
+    bool mtActive = MemoryPatcher::TotalPatched > 0;
+    if (!settings.ShowNPCInfo && !mtActive) return;
 
     const int ARR_SIZE = 1024;
     Vehicle vehicles[ARR_SIZE];
@@ -147,7 +141,7 @@ void update_npc() {
         showNPCInfo(vehicles, count);
     }
 
-    if (settings.EnableManual && mtActive) {
+    if (mtActive) {
         updateNPCVehicles(vehicles, count);
     }
 }
