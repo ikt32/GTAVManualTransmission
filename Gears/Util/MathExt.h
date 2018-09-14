@@ -2,6 +2,9 @@
 #include <inc/types.h>
 #include <vector>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
@@ -27,12 +30,14 @@ Vector3 Normalize(Vector3 vec);
 Vector3 GetOffsetInWorldCoords(Vector3 position, Vector3 rotation, Vector3 forward, Vector3 offset);
 float GetAngleBetween(float h1, float h2, float separation);
 
-inline float rad2deg(float rad) {
-    return (rad*(180.0f / 3.14159265358979323846264338327950288f));
+template <typename T, typename = typename std::enable_if<std::is_floating_point<T>::value, T>::type>
+T rad2deg(T rad) {
+    return static_cast<T>(static_cast<double>(rad) * (180.0 / M_PI));
 }
 
-inline float deg2rad(float deg) {
-    return (deg*3.14159265358979323846264338327950288f / 180.0f);
+template <typename T, typename = typename std::enable_if<std::is_floating_point<T>::value, T>::type>
+T deg2rad(T deg) {
+    return static_cast<T>(static_cast<double>(deg) * M_PI / 180.0);
 }
 
 template <typename T>
