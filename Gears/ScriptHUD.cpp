@@ -278,18 +278,7 @@ void drawInputWheelInfo() {
     GRAPHICS::DRAW_RECT(settings.PedalInfoX + 1.0f*barWidth, barYBase - carControls.ClutchVal*settings.PedalInfoH*0.5f, barWidth, carControls.ClutchVal*settings.PedalInfoH, 0, 0, 255, 255);
 }
 
-std::vector<bool> getWheelLockups(Vehicle handle) {
-    std::vector<bool> lockups;
-    float velocity = ENTITY::GET_ENTITY_VELOCITY(vehicle).y;
-    auto wheelsSpeed = ext.GetWheelRotationSpeeds(vehicle);
-    for (auto wheelSpeed : wheelsSpeed) {
-        if (abs(velocity) > 0.01f && wheelSpeed == 0.0f)
-            lockups.push_back(true);
-        else
-            lockups.push_back(false);
-    }
-    return lockups;
-}
+std::vector<bool> getWheelLockups(Vehicle handle);
 
 void drawVehicleWheelInfo() {
     auto numWheels = ext.GetNumWheels(vehicle);

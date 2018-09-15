@@ -85,6 +85,18 @@ int speedoIndex;
 extern std::vector<std::string> speedoTypes;
 
 MiniPID pid(1.0, 0.0, 0.0);
+std::vector<bool> getWheelLockups(Vehicle handle) {
+    std::vector<bool> lockups;
+    float velocity = ENTITY::GET_ENTITY_VELOCITY(handle).y;
+    auto wheelsSpeed = ext.GetWheelRotationSpeeds(handle);
+    for (auto wheelSpeed : wheelsSpeed) {
+        if (abs(velocity) > 0.01f && wheelSpeed == 0.0f)
+            lockups.push_back(true);
+        else
+            lockups.push_back(false);
+    }
+    return lockups;
+}
 
 bool isPlayerAvailable(Player player, Ped playerPed) {
     if (!PLAYER::IS_PLAYER_CONTROL_ON(player) ||
