@@ -1001,12 +1001,17 @@ void functionAShift() {
     float acceleration = vehDerivs.GetRelativeAcceleration().y / 9.81f;
     float accelExpect = pow(carControls.ThrottleVal, 2.0f) * ratios[currGear] * VEHICLE::GET_VEHICLE_ACCELERATION(vehicle);
 
+    float throttle = abs(ext.GetThrottle(vehicle));
+    float RPM = ext.GetCurrentRPM(vehicle);
+    float engineLoad = throttle / RPM;
+    bool shouldShiftUpLoad = throttle == 1.0f && engineLoad < 1.10f;
+
     // Shift up.
     if (currGear < ext.GetTopGear(vehicle)) {
         bool shouldShiftUpSPD = currSpeed > upshiftSpeed;
         bool shouldShiftUpACC = acceleration < 0.33f * accelExpect && !gearStates.IgnoreAccelerationUpshiftTrigger;
 
-        if (currSpeed > minSpeedUpShiftWindow && (shouldShiftUpSPD || shouldShiftUpACC)) {
+        if (currSpeed > minSpeedUpShiftWindow && (shouldShiftUpSPD || shouldShiftUpLoad/*|| shouldShiftUpACC*/)) {
             gearStates.IgnoreAccelerationUpshiftTrigger = true;
             gearStates.PrevUpshiftTime = GetTickCount();
             shiftTo(ext.GetGearCurr(vehicle) + 1, true);
@@ -1024,7 +1029,7 @@ void functionAShift() {
 
     // Shift down
     if (currGear > 1) {
-        if (currSpeed < downshiftSpeed - prevGearDelta) {
+        if (currSpeed < downshiftSpeed - prevGearDelta && !shouldShiftUpLoad) {
             shiftTo(currGear - 1, true);
             gearStates.FakeNeutral = false;
         }
@@ -1036,8 +1041,8 @@ void functionAShift() {
         showText(0.01, 0.575, 0.3, fmt("DnshiftSpeed: \t%.3f"   , downshiftSpeed - prevGearDelta));
         showText(0.01, 0.600, 0.3, fmt("PrevGearDelta: \t%.3f"  , prevGearDelta));
         showText(0.01, 0.625, 0.3, fmt("CurrGearDelta: \t%.3f"  , currGearDelta));
-        showText(0.01, 0.650, 0.3, fmt("Accel(Expect): \t%.3f"  , accelExpect));
-        showText(0.01, 0.675, 0.3, fmt("Accel(Actual): \t\t%.3f", acceleration));
+        //showText(0.01, 0.650, 0.3, fmt("Accel(Expect): \t%.3f"  , accelExpect));
+        //showText(0.01, 0.675, 0.3, fmt("Accel(Actual): \t\t%.3f", acceleration));
     }
 }
 
