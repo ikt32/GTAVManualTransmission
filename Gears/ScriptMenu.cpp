@@ -32,7 +32,7 @@ extern int textureWheelId;
 
 const std::string escapeKey = "BACKSPACE";
 const std::string skipKey = "RIGHT";
-
+extern bool g_CustomABS;
 // FontName, fontID
 std::vector<std::string> fonts{
     { "Chalet London" },
@@ -197,7 +197,7 @@ void update_mainmenu() {
                         { "Enable or disable the entire mod." })) {
         toggleManual();
     }
-
+    //menu.BoolOption("Enable ABS", g_CustomABS);
     int shiftModeTemp = settings.ShiftMode;
     std::vector<std::string> gearboxModes = {
         "Sequential",

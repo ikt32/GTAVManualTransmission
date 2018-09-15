@@ -85,6 +85,8 @@ int speedoIndex;
 extern std::vector<std::string> speedoTypes;
 
 MiniPID pid(1.0, 0.0, 0.0);
+bool g_CustomABS;
+
 std::vector<bool> getWheelLockups(Vehicle handle) {
     std::vector<bool> lockups;
     float velocity = ENTITY::GET_ENTITY_VELOCITY(handle).y;
@@ -96,6 +98,68 @@ std::vector<bool> getWheelLockups(Vehicle handle) {
             lockups.push_back(false);
     }
     return lockups;
+}
+
+
+void handleBrakePatch() {
+    bool lockedUp = false;
+    bool ebrk = ext.GetHandbrake(vehicle);
+    bool brn = VEHICLE::IS_VEHICLE_IN_BURNOUT(vehicle);
+    auto lockUps = getWheelLockups(vehicle);
+    auto susps = ext.GetWheelCompressions(vehicle);
+    for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
+        if (lockUps[i] && susps[i] > 0.0f)
+            lockedUp = true;
+    }
+    if (ebrk || brn)
+        lockedUp = false;
+    if (g_CustomABS && lockedUp) {
+        if (!MemoryPatcher::BrakeDecrementPatched) {
+            MemoryPatcher::PatchBrakeDecrement();
+        }
+        for (int i = 0; i < lockUps.size(); i++) {
+            ext.SetWheelBrakePressure(vehicle, i, ext.GetWheelBrakePressure(vehicle)[i] * 0.9f);
+        }
+        showText(0.45, 0.75, 1.0, "~r~ABS");
+    }
+    else {
+        if (wheelPatchStates.EngBrakeActive || wheelPatchStates.EngLockActive) {
+            if (!MemoryPatcher::BrakeDecrementPatched) {
+                MemoryPatcher::PatchBrakeDecrement();
+            }
+        }
+        else if (wheelPatchStates.InduceBurnout) {
+            if (!MemoryPatcher::BrakeDecrementPatched) {
+                MemoryPatcher::PatchBrakeDecrement();
+            }
+            if (!MemoryPatcher::ThrottleDecrementPatched) {
+                MemoryPatcher::PatchThrottleDecrement();
+            }
+            for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
+                if (ext.IsWheelPowered(vehicle, i)) {
+                    ext.SetWheelBrakePressure(vehicle, i, 0.0f);
+                    ext.SetWheelPower(vehicle, i, 2.0f * ext.GetDriveForce(vehicle));
+                }
+                else {
+                    float handlingBrakeForce = *reinterpret_cast<float *>(ext.GetHandlingPtr(vehicle) + hOffsets.fBrakeForce);
+                    float inpBrakeForce = handlingBrakeForce * carControls.BrakeVal;
+                    ext.SetWheelPower(vehicle, i, 0.0f);
+                    ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
+                }
+
+            }
+            fakeRev();
+            wheelPatchStates.InduceBurnout = false;
+        }
+        else {
+            if (MemoryPatcher::BrakeDecrementPatched) {
+                MemoryPatcher::RestoreBrakeDecrement();
+            }
+            if (MemoryPatcher::ThrottleDecrementPatched) {
+                MemoryPatcher::RestoreThrottleDecrement();
+            }
+        }
+    }
 }
 
 bool isPlayerAvailable(Player player, Ped playerPed) {
@@ -320,42 +384,7 @@ void update_manual_features() {
         }
     }
 
-    if (wheelPatchStates.EngBrakeActive || wheelPatchStates.EngLockActive) {
-        if (!MemoryPatcher::BrakeDecrementPatched) {
-            MemoryPatcher::PatchBrakeDecrement();
-        }
-    }
-    else if (wheelPatchStates.InduceBurnout) {
-        if (!MemoryPatcher::BrakeDecrementPatched) {
-            MemoryPatcher::PatchBrakeDecrement();
-        }
-        if (!MemoryPatcher::ThrottleDecrementPatched) {
-            MemoryPatcher::PatchThrottleDecrement();
-        }
-        for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
-            if (ext.IsWheelPowered(vehicle, i)) {
-                ext.SetWheelBrakePressure(vehicle, i, 0.0f);
-                ext.SetWheelPower(vehicle, i, 2.0f * ext.GetDriveForce(vehicle));
-            }
-            else {
-                float handlingBrakeForce = *reinterpret_cast<float *>(ext.GetHandlingPtr(vehicle) + hOffsets.fBrakeForce);
-                float inpBrakeForce = handlingBrakeForce * carControls.BrakeVal;
-                ext.SetWheelPower(vehicle, i, 0.0f);
-                ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
-            }
-
-        }
-        fakeRev();
-        wheelPatchStates.InduceBurnout = false;
-    }
-    else {
-        if (MemoryPatcher::BrakeDecrementPatched) {
-            MemoryPatcher::RestoreBrakeDecrement();
-        }
-        if (MemoryPatcher::ThrottleDecrementPatched) {
-            MemoryPatcher::RestoreThrottleDecrement();
-        }
-    }
+    handleBrakePatch();
 
     if (gearRattle.Active) {
         if (carControls.ClutchVal > 1.0f - settings.ClutchThreshold ||
