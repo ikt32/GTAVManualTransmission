@@ -1955,7 +1955,7 @@ int calculateDetail() {
     return static_cast<int>(1000.0f * settings.DetailMult * compSpeedTotal);
 }
 
-int calculateSoftLock(int totalForce) {
+void calculateSoftLock(int &totalForce) {
     float steerMult;
     if (vehInfo.Class == VehicleClass::Bike || vehInfo.Class == VehicleClass::Quad)
         steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
@@ -1965,19 +1965,11 @@ int calculateSoftLock(int totalForce) {
         steerMult = settings.SteerAngleMax / settings.SteerAngleBoat;
     }
     float effSteer = steerMult * 2.0f * (carControls.SteerVal - 0.5f);
-
     if (effSteer > 1.0f) {
-        totalForce = static_cast<int>((effSteer - 1.0f) * 100000) + totalForce;
-        if (effSteer > 1.1f) {
-            totalForce = 10000;
-        }
+        totalForce = (int)map(effSteer, 1.0f, steerMult, (float)totalForce, 40000.0f);
     } else if (effSteer < -1.0f) {
-        totalForce = static_cast<int>((-effSteer - 1.0f) * -100000) + totalForce;
-        if (effSteer < -1.1f) {
-            totalForce = -10000;
-        }
+        totalForce = (int)map(effSteer, -1.0f, -steerMult, (float)totalForce, -40000.0f);
     }
-    return totalForce;
 }
 
 // Despite being scientifically inaccurate, "self-aligning torque" is the best description.
@@ -2158,7 +2150,7 @@ void playFFBGround() {
 
     int totalForce = satForce + detailForce;
     totalForce = (int)((float)totalForce * rotationScale);
-    totalForce = calculateSoftLock(totalForce);
+    calculateSoftLock(totalForce);
     carControls.PlayFFBDynamics(totalForce, damperForce);
 
     const float minGforce = 5.0f;
@@ -2213,7 +2205,7 @@ void playFFBWater() {
 
     int totalForce = satForce + detailForce;
     totalForce = (int)((float)totalForce * rotationScale);
-    totalForce = calculateSoftLock(totalForce);
+    calculateSoftLock(totalForce);
     carControls.PlayFFBDynamics(totalForce, damperForce);
 
     if (settings.DisplayInfo) {
