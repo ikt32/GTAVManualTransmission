@@ -693,7 +693,7 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
         DeviceIndexToGUID(settingsWheel.GetLongValue("TO_KEYBOARD", "DEVICE", -1), RegisteredGUIDs);
     for (int i = 0; i < MAX_RGBBUTTONS; i++) {
         std::string entryString = settingsWheel.GetValue("TO_KEYBOARD", std::to_string(i).c_str(), "UNKNOWN");
-        if (std::string(entryString).compare("UNKNOWN") == 0) {
+        if (entryString == "UNKNOWN") {
             scriptControl->WheelToKey[i] = -1;
         }
         else {
