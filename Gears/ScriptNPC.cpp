@@ -88,7 +88,7 @@ void updateNPCVehicles(Vehicle vehicles[1024], int count) {
         npcVehicleUpdateTime = GetTickCount();
         for (int i = 0; i < count; i++) {
             if (vehicles[i] == 0) continue;
-            if (vehicles[i] == vehicle) continue;
+            if (vehicles[i] == vehicle && VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1) == playerPed) continue;
             if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicles[i])) continue;
             if (ext.GetTopGear(vehicles[i]) == 1) continue;
 
