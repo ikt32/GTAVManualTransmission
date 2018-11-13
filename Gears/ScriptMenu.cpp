@@ -236,9 +236,10 @@ void update_mainmenu() {
 
     for (auto device : carControls.FreeDevices) {
         if (menu.Option(device.name, NativeMenu::solidRed,
-            { "~r~<b>THIS DEVICE HASN'T BEEN SET UP YET!</b>~w~",
-            "Set it up in the wheel menu!",
-            "Pressing Select discards this message/option."
+            { "~r~<b>This device needs to be configured!</b>~w~",
+            "Please assign axes and buttons in the ~r~<b>Steering Wheel</b>~w~ menu"
+                " under ~r~<b>Analog Input Setup</b>~w~ and ~r~<b>Button Input Setup</b>~w~ before using this device.",
+            "Pressing Select discards this warning.", 
             "Full name: " + device.name })) {
             saveChanges();
             settings.SteeringAppendDevice(device.guid, device.name);
