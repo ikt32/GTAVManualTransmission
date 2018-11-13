@@ -30,3 +30,4 @@ packages.config
 
 # Temp
 Server/
+*.TMP
