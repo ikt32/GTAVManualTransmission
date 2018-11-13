@@ -733,7 +733,7 @@ void configHShift(char c) {
 
 
 int main() {
-	std::string logFile = Paths::GetRunningExecutableFolder() + "\\" + Paths::GetRunningExecutableNameWithoutExtension() + ".log";;
+	std::string logFile = Paths::GetRunningExecutableFolder() + "\\" + Paths::GetRunningExecutableNameWithoutExtension() + ".log";
 	logger.SetFile(logFile);
 	int axisTextHeight = 0;
 	int buttonTextHeight = 0;
@@ -747,7 +747,7 @@ int main() {
 	GetWindowRect(consoleWindow, &r);
 
 	logger.Clear();
-	logger.Write(INFO, "Manual Transmission v4.3.0 - DirectInput utility");
+	logger.Write(INFO, "Manual Transmission %s - Wheel setup tool", DISPLAY_VERSION);
 
 	init();
 	bool justPeeking = true;
