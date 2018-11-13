@@ -1,9 +1,9 @@
 #include "MemoryPatcher.hpp"
 
 #include "NativeMemory.hpp"
-#include "Util/Logger.hpp"
-#include "Util/Util.hpp"
 #include "Versions.h"
+#include "../Util/Logger.hpp"
+#include "../Util/Util.hpp"
 
 namespace MemoryPatcher {
 // Clutch disengage @ Low Speed High Gear, low RPM

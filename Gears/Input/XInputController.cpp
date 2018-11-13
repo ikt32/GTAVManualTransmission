@@ -1,5 +1,5 @@
 #include "XInputController.hpp"
-#include "Util/TimeHelper.hpp"
+#include "../Util/TimeHelper.hpp"
 #include <string>
 
 XInputController::XInputController(int playerNumber)

@@ -2,8 +2,8 @@
 
 #include <Windows.h>
 #include "keyboard.h"
-#include "Util/Logger.hpp"
-#include "Util/MathExt.h"
+#include "../Util/Logger.hpp"
+#include "../Util/MathExt.h"
 
 CarControls::CarControls(): PrevInput(Keyboard)
                           , SteerGUID()

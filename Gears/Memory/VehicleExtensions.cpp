@@ -7,8 +7,8 @@
 #include "NativeMemory.hpp"
 #include "Versions.h"
 #include "Offsets.hpp"
-#include "Util/MathExt.h"
-#include "Util/Logger.hpp"
+#include "../Util/MathExt.h"
+#include "../Util/Logger.hpp"
 
 eGameVersion g_gameVersion = getGameVersion();
 

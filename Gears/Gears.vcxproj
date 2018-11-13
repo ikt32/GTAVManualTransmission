@@ -62,7 +62,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>..\..\ScriptHookV_SDK;..\..\GTAVMenuBase;$(ProjectDir);$(SolutionDir)thirdparty</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\ScriptHookV_SDK;..\..\GTAVMenuBase;$(SolutionDir)thirdparty</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>

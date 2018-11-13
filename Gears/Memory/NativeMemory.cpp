@@ -2,7 +2,7 @@
 
 #include <Windows.h>
 #include <Psapi.h>
-#include "Util/Logger.hpp"
+#include "../Util/Logger.hpp"
 
 namespace mem {
 
