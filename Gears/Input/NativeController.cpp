@@ -2,7 +2,6 @@
 #include <inc/natives.h>
 #include "../Util/TimeHelper.hpp"
 
-
 NativeController::NativeController(): pressTime()
                                     , releaseTime()
                                     , tapPressTime()
@@ -13,6 +12,7 @@ NativeController::NativeController(): pressTime()
 
 NativeController::~NativeController() = default;
 
+#ifndef NO_NATIVES
 bool NativeController::IsButtonPressed(GameButtons gameButton) {
     if (CONTROLS::IS_CONTROL_PRESSED(0, GameEnums[gameButton])) {
         return true;
@@ -104,3 +104,47 @@ NativeController::GameButtons NativeController::EControlToButton(int eControlIte
 void NativeController::SetTriggerValue(float value) {
     triggerValue = value;
 }
+#else
+
+// Stubs
+bool NativeController::IsButtonPressed(GameButtons gameButton) {
+    return false;
+}
+
+bool NativeController::IsButtonJustPressed(GameButtons gameButton) {
+    return false;
+}
+
+bool NativeController::IsButtonJustReleased(GameButtons gameButton) {
+    return false;
+}
+
+bool NativeController::WasButtonHeldForMs(GameButtons gameButton, int milliseconds) {
+    return false;
+}
+
+bool NativeController::WasButtonHeldOverMs(GameButtons gameButton, int milliseconds) {
+    return false;
+}
+
+NativeController::TapState NativeController::WasButtonTapped(GameButtons gameButton, int milliseconds) {
+    return TapState::ButtonUp;
+}
+
+void NativeController::Update() {
+
+}
+
+float NativeController::GetAnalogValue(GameButtons gameButton) {
+    return false;
+}
+
+NativeController::GameButtons NativeController::EControlToButton(int eControlItem) {
+    return UNKNOWN;
+}
+
+void NativeController::SetTriggerValue(float value) {
+    triggerValue = value;
+}
+
+#endif
