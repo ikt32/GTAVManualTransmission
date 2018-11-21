@@ -73,66 +73,41 @@ std::vector<std::string> buttonConfTags{
     { "INDICATOR_HAZARD" },
 };
 
-std::vector<std::string> keyboardConfTags{
-    { "Toggle" },
-    { "ToggleH" },
-    { "ShiftUp" },
-    { "ShiftDown" },
-    { "Clutch" },
-    { "Engine" },
-    { "Throttle" },
-    { "Brake" },
-    { "HR" },
-    { "H1" },
-    { "H2" },
-    { "H3" },
-    { "H4" },
-    { "H5" },
-    { "H6" },
-    { "H7" },
-    { "HN" },
+struct STagInfo {
+    std::string Tag;
+    std::string Info;
 };
 
-std::vector<std::string> controllerConfTags{
-    { "Toggle" },
-    { "ToggleShift" },
-    { "ShiftUp" },
-    { "ShiftDown" },
-    { "Clutch" },
-    { "Engine" },
-    { "Throttle" },
-    { "Brake" }
+const std::vector<STagInfo> keyboardConfTags = {
+    { "Toggle"   , "Toggle mod on/off"      },
+    { "ToggleH"  , "Switch shift mode"      },
+    { "ShiftUp"  , "Shift up"               },
+    { "ShiftDown", "Shift down"             },
+    { "Clutch"   , "Hold for clutch"        },
+    { "Engine"   , "Toggle engine on/off"   },
+    { "Throttle" , "Key used for throttle"  },
+    { "Brake"    , "Key used for brake"     },
+    { "HR"       , "H-pattern gear R press" },
+    { "H1"       , "H-pattern gear 1 press" },
+    { "H2"       , "H-pattern gear 2 press" },
+    { "H3"       , "H-pattern gear 3 press" },
+    { "H4"       , "H-pattern gear 4 press" },
+    { "H5"       , "H-pattern gear 5 press" },
+    { "H6"       , "H-pattern gear 6 press" },
+    { "H7"       , "H-pattern gear 7 press" },
+    { "HN"       , "H-pattern Neutral"      },
 };
 
-std::vector<std::string> keyboardConfTagsDetail{
-    { "Toggle mod on/off" },
-    { "Switch shift mode" },
-    { "Shift up" },
-    { "Shift down" },
-    { "Hold for clutch" },
-    { "Toggle engine on/off" },
-    { "Key used for throttle" },
-    { "Key used for brake" },
-    { "H-pattern gear R press" },
-    { "H-pattern gear 1 press" },
-    { "H-pattern gear 2 press" },
-    { "H-pattern gear 3 press" },
-    { "H-pattern gear 4 press" },
-    { "H-pattern gear 5 press" },
-    { "H-pattern gear 6 press" },
-    { "H-pattern gear 7 press" },
-    { "H-pattern Neutral" },
-};
 
-std::vector<std::string> controllerConfTagDetail{
-    { "Toggle mod usage: hold" },
-    { "Toggle shift usage: hold" },
-    { "Shift up usage: press" },
-    { "Shift down usage: press" },
-    { "Clutch usage: axis or button" },
-    { "Engine usage: press" },
-    { "Throttle: axis or button" },
-    { "Brake: axis or button" }
+const std::vector<STagInfo> controllerConfTags = {
+    { "Toggle"     , "Toggle mod usage: hold"      },
+    { "ToggleShift", "Toggle shift usage: hold"    },
+    { "ShiftUp"    , "Shift up usage: press"       },
+    { "ShiftDown"  , "Shift down usage: press"     },
+    { "Clutch"     , "Clutch usage: axis or button"},
+    { "Engine"     , "Engine usage: press"         },
+    { "Throttle"   , "Throttle: axis or button"    },
+    { "Brake"      , "Brake: axis or button"       }
 };
 
 std::vector<std::string> speedoTypes = {
@@ -393,15 +368,15 @@ void update_legacycontrollermenu() {
     controllerInfo.push_back("");
 
     auto it = 0;
-    for (auto confTag : controllerConfTags) {
-        controllerInfo.back() = controllerConfTagDetail.at(it);
-        int nativeControl = carControls.ConfTagLController2Value(confTag);
+    for (const auto& confTag : controllerConfTags) {
+        controllerInfo.back() = confTag.Info;
+        int nativeControl = carControls.ConfTagLController2Value(confTag.Tag);
         controllerInfo.push_back(fmt("Assigned to %s (%d)", carControls.NativeControl2Text(nativeControl), nativeControl));
 
-        if (menu.OptionPlus("Assign " + confTag, controllerInfo, nullptr, std::bind(clearLControllerButton, confTag), nullptr, "Current setting")) {
+        if (menu.OptionPlus("Assign " + confTag.Tag, controllerInfo, nullptr, std::bind(clearLControllerButton, confTag.Tag), nullptr, "Current setting")) {
             WAIT(500);
-            bool result = configLControllerButton(confTag);
-            if (!result) showNotification("Cancelled " + confTag + " assignment", &prevNotification);
+            bool result = configLControllerButton(confTag.Tag);
+            if (!result) showNotification("Cancelled " + confTag.Tag + " assignment", &prevNotification);
             WAIT(500);
         }
         it++;
@@ -460,13 +435,13 @@ void update_controllermenu() {
     controllerInfo.push_back("");
 
     auto it = 0;
-    for (auto confTag : controllerConfTags) {
-        controllerInfo.back() = controllerConfTagDetail.at(it);
-        controllerInfo.push_back("Assigned to " + carControls.ConfTagController2Value(confTag));
-        if (menu.OptionPlus("Assign " + confTag, controllerInfo, nullptr, std::bind(clearControllerButton, confTag), nullptr, "Current setting")) {
+    for (const auto& confTag : controllerConfTags) {
+        controllerInfo.back() = confTag.Info;
+        controllerInfo.push_back("Assigned to " + carControls.ConfTagController2Value(confTag.Tag));
+        if (menu.OptionPlus("Assign " + confTag.Tag, controllerInfo, nullptr, std::bind(clearControllerButton, confTag.Tag), nullptr, "Current setting")) {
             WAIT(500);
-            bool result = configControllerButton(confTag);
-            if (!result) showNotification("Cancelled " + confTag + " assignment", &prevNotification);
+            bool result = configControllerButton(confTag.Tag);
+            if (!result) showNotification("Cancelled " + confTag.Tag + " assignment", &prevNotification);
             WAIT(500);
         }
         it++;
@@ -484,13 +459,13 @@ void update_keyboardmenu() {
     keyboardInfo.push_back("");
 
     int it = 0;
-    for (auto confTag : keyboardConfTags) {
-        keyboardInfo.back() = keyboardConfTagsDetail.at(it);
-        keyboardInfo.push_back("Assigned to " + key2str(carControls.ConfTagKB2key(confTag)));
-        if (menu.OptionPlus("Assign " + confTag, keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag), nullptr, "Current setting")) {
+    for (const auto& confTag : keyboardConfTags) {
+        keyboardInfo.back() = confTag.Info;
+        keyboardInfo.push_back("Assigned to " + key2str(carControls.ConfTagKB2key(confTag.Tag)));
+        if (menu.OptionPlus("Assign " + confTag.Tag, keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag.Tag), nullptr, "Current setting")) {
             WAIT(500);
-            bool result = configKeyboardKey(confTag);
-            if (!result) showNotification("Cancelled " + confTag + " assignment", &prevNotification);
+            bool result = configKeyboardKey(confTag.Tag);
+            if (!result) showNotification("Cancelled " + confTag.Tag + " assignment", &prevNotification);
             WAIT(500);
         }
         it++;
