@@ -25,17 +25,6 @@ std::string settingsGeneralFile = Paths::GetRunningExecutableFolder() + "\\setti
 std::string settingsWheelFile = Paths::GetRunningExecutableFolder() + "\\settings_wheel.ini";
 ScriptSettings settings;
 
-std::array<int, 8> directions = {
-	WheelDirectInput::POV::N,
-	WheelDirectInput::POV::NE,
-	WheelDirectInput::POV::E,
-	WheelDirectInput::POV::SE,
-	WheelDirectInput::POV::S,
-	WheelDirectInput::POV::SW,
-	WheelDirectInput::POV::W,
-	WheelDirectInput::POV::NW,
-};
-
 // acceptedKeys, gameButton, confTag
 std::vector<std::tuple<char, std::string, std::string>> buttonInfos = {
 	std::make_tuple('=', "shift up",          "SHIFT_UP"),
@@ -452,7 +441,7 @@ void configDynamicButtons(char c) {
 				buttonsActive++;
 			}
 		}
-		for (auto d : directions) {
+		for (auto d : controls.GetWheel().POVDirections) {
 			if (controls.GetWheel().IsButtonPressed(d, guid)) {
 				buttonsActive++;
 			}
@@ -511,7 +500,7 @@ void configDynamicButtons(char c) {
 
 			//POV hat shit
 			std::string directionsStr = "?";
-			for (auto d : directions) {
+			for (auto d : controls.GetWheel().POVDirections) {
 				if (controls.GetWheel().IsButtonPressed(d, guid)) {
 					if (d == WheelDirectInput::N) directionsStr = "N ";
 					if (d == WheelDirectInput::NE) directionsStr = "NE";
@@ -835,7 +824,7 @@ int main() {
 			std::string directionsStr;
 			blankBlock(xCursorPos, pRow, 1, devWidth);
 			setCursorPosition(xCursorPos, pRow);
-			for (auto d : directions) {
+			for (auto d : controls.GetWheel().POVDirections) {
 				if (d == WheelDirectInput::N ) directionsStr = "N ";
 				if (d == WheelDirectInput::NE) directionsStr = "NE";
 				if (d == WheelDirectInput::E ) directionsStr = " E";
