@@ -585,29 +585,27 @@ void update_anglemenu() {
                      { "Soft lock for boats. (degrees)" });
 }
 
-void incGamma(float max, float step) {
-    if (settings.BrakeGamma + step > max) return;
-    settings.BrakeGamma += step;
+void incGamma(float& gamma, float max, float step) {
+    if (gamma + step > max) return;
+    gamma += step;
 }
 
-void decGamma(float min, float step) {
-    if (settings.BrakeGamma - step < min) return;
-    settings.BrakeGamma -= step;
+void decGamma(float& gamma, float min, float step) {
+    if (gamma - step < min) return;
+    gamma -= step;
 }
 
-std::vector<std::string> showGammaCurve() {
+std::vector<std::string> showGammaCurve(std::string axis, const float input, const float gamma) {
 
     std::string larr = "< ";
     std::string rarr = " >";
-    if (settings.BrakeGamma >= 5.0f - 0.01f) rarr = "";
-    if (settings.BrakeGamma <= 0.1f + 0.01f) larr = "";
+    if (gamma >= 5.0f - 0.01f) rarr = "";
+    if (gamma <= 0.1f + 0.01f) larr = "";
 
-    char buf[100];
-    _snprintf_s(buf, sizeof(buf), "%.*f", 2, settings.BrakeGamma);
-    std::string printVar = buf;
-
+    std::string printVar = fmt("%.*f", 2, gamma);
+    
     std::vector<std::string> info {
-        "Brake gamma:",
+        axis + " gamma:",
         larr + printVar + rarr
     };
 
@@ -615,7 +613,7 @@ std::vector<std::string> showGammaCurve() {
     std::vector<std::pair<float, float>> points;
     for (int i = 0; i < max_samples; i++) {
         float x = (float)i / (float)max_samples;
-        float y = pow(x, settings.BrakeGamma);
+        float y = pow(x, gamma);
         points.push_back({ x, y });
     }
 
@@ -641,7 +639,7 @@ std::vector<std::string> showGammaCurve() {
                             255, 255, 255, 255);
     }
 
-    std::pair<float, float> currentPoint = { carControls.BrakeValAvg, pow(carControls.BrakeValAvg, settings.BrakeGamma) };
+    std::pair<float, float> currentPoint = { input, pow(input, gamma) };
     float pointX = rectX - 0.5f*rectW + currentPoint.first * rectW;
     float pointY = rectY + 0.5f*rectH - currentPoint.second * rectH;
     GRAPHICS::DRAW_RECT(pointX, pointY, 
@@ -707,12 +705,29 @@ void update_axesmenu() {
     menu.FloatOption("Brake anti-deadzone",		carControls.ADZBrake, 0.0f, 1.0f, 0.01f,
                      { "GTA V ignores 25% input for analog controls by default." });
 
-    bool showGamma = false;
+    bool showBrakeGammaBox = false;
     std::vector<std::string> extras = {};
-    menu.OptionPlus("Brake gamma", extras, &showGamma, std::bind(incGamma, 5.0f, 0.01f), std::bind(decGamma, 0.1f, 0.01f), "Brake gamma", 
+    menu.OptionPlus("Brake gamma", extras, &showBrakeGammaBox,
+                    [=] { return incGamma(settings.BrakeGamma, 5.0f, 0.01f); },
+                    [=] { return decGamma(settings.BrakeGamma, 0.1f, 0.01f); },
+                    "Brake gamma",
                     { "Linearity of the brake pedal. Values over 1.0 feel more real if you have progressive springs." });
-    if (showGamma) {
-        extras = showGammaCurve();
+
+    if (showBrakeGammaBox) {
+        extras = showGammaCurve("Brake", carControls.BrakeValAvg, settings.BrakeGamma);
+        menu.OptionPlusPlus(extras, "Brake gamma");
+    }
+
+    bool showThrottleGammaBox = false;
+    extras = {};
+    menu.OptionPlus("Throttle gamma", extras, &showThrottleGammaBox,
+        [=] { return incGamma(settings.ThrottleGamma, 5.0f, 0.01f); },
+        [=] { return decGamma(settings.ThrottleGamma, 0.1f, 0.01f); },
+        "Throttle gamma",
+        { "Linearity of the throttle pedal." });
+
+    if (showThrottleGammaBox) {
+        extras = showGammaCurve("Brake", carControls.ThrottleVal, settings.ThrottleGamma);
         menu.OptionPlusPlus(extras, "Brake gamma");
     }
 
