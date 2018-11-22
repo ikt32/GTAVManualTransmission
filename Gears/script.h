@@ -103,18 +103,18 @@ void NPCMain();
 //                              Menu-related
 ///////////////////////////////////////////////////////////////////////////////
 void update_menu();
-void clearAxis(std::string axis);
-void clearButton(std::string button);
+void clearAxis(const std::string& axis);
+void clearButton(const std::string& button);
 void clearWheelToKey();
 void clearHShifter();
 void clearASelect();
-void clearKeyboardKey(std::string button);
-void clearControllerButton(std::string button);
-void clearLControllerButton(std::string button);
+void clearKeyboardKey(const std::string& button);
+void clearControllerButton(const std::string& button);
+void clearLControllerButton(const std::string& button);
 
-bool configAxis(std::string confTag);
+bool configAxis(const std::string& confTag);
 bool configWheelToKey();
-bool configButton(std::string confTag);
+bool configButton(const std::string& confTag);
 bool configHPattern();
 bool configASelect();
 bool configKeyboardKey(const std::string &confTag);
