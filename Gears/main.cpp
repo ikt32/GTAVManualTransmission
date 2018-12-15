@@ -1,6 +1,7 @@
 #include <inc/main.h>
 
 #include <filesystem>
+#include <Psapi.h>
 
 #include "script.h"
 
@@ -22,18 +23,43 @@ V findNextLowest(const std::map<K, V>& map, K key) {
         if (it->first <= key)
             return it->second;
     }
-    return V{};
+    return map.begin()->second;
 }
 
-int getExeVersion(std::string newestExe) {
+bool isModulePresent(const std::string& name, std::string& modulePath) {
+    bool found = false;
+    
+    HMODULE hMods[1024];
+    DWORD cbNeeded;
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
+        PROCESS_VM_READ,
+        FALSE, GetCurrentProcessId());
+
+    if (EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded)) {
+        for (unsigned int i = 0; i < cbNeeded / sizeof(HMODULE); ++i) {
+            CHAR szModName[MAX_PATH];
+            if (GetModuleFileNameExA(hProcess, hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR))) {
+                if (strfind(szModName, name)) {
+                    found = true;
+                    modulePath = szModName;
+                    break;
+                }
+            }
+        }
+    }
+    CloseHandle(hProcess);
+    return found;
+}
+
+int getExeVersion(std::string exe) {
     DWORD  verHandle = 0;
     UINT   size = 0;
     LPBYTE lpBuffer = NULL;
-    DWORD  verSize = GetFileVersionInfoSizeA(newestExe.c_str(), &verHandle);
+    DWORD  verSize = GetFileVersionInfoSizeA(exe.c_str(), &verHandle);
     if (verSize != 0) {
-        LPSTR verData = new char[verSize];
-        if (GetFileVersionInfoA(newestExe.c_str(), verHandle, verSize, verData)) {
-            if (VerQueryValueA(verData, "\\", (VOID FAR* FAR*)&lpBuffer, &size)) {
+        std::vector<char> verData(verSize);
+        if (GetFileVersionInfoA(exe.c_str(), verHandle, verSize, verData.data())) {
+            if (VerQueryValueA(verData.data(), "\\", (VOID FAR* FAR*)&lpBuffer, &size)) {
                 if (size) {
                     VS_FIXEDFILEINFO *verInfo = (VS_FIXEDFILEINFO *)lpBuffer;
                     if (verInfo->dwSignature == VS_FFI_SIGNATURE) {
@@ -51,44 +77,35 @@ int getExeVersion(std::string newestExe) {
                 }
             }
         }
-        delete[] verData;
     }
+    logger.Write(ERROR, "File version detection failed");
     return -1;
 }
 
 int getExeInfo() {
-    char filename[MAX_PATH];
-    DWORD size = GetModuleFileNameA(NULL, filename, MAX_PATH);
-    if (size) {
-        logger.Write(INFO, "Executable: %s", filename);
-        if (strfind(filename,"fivem")) {
-            auto folder = std::string(filename).substr(0, std::string(filename).find_last_of("\\"));
-            auto cacheFolder = folder + "\\FiveM.app\\cache\\game";
-            std::string newestExe;
-            fs::directory_entry newestExeEntry;
-            for (auto &file : fs::directory_iterator(cacheFolder)) {
-                if (strfind(fs::path(file).string(), "GTA5.exe")) {
-                    if (newestExe == "" || last_write_time(newestExeEntry) < last_write_time(file)) {
-                        newestExe = fs::path(file).string();
-                        newestExeEntry = file;
-                    }
+    std::string currExe = Paths::GetRunningExecutablePath();
+    logger.Write(INFO, "Running executable: %s", currExe.c_str());
+    std::string citizenDir;
+    bool fiveM = isModulePresent("CitizenGame.dll", citizenDir);
+
+    if (fiveM) {
+        logger.Write(INFO, "FiveM detected");
+        auto FiveMApp = std::string(citizenDir).substr(0, std::string(citizenDir).find_last_of('\\'));
+        logger.Write(INFO, "FiveM.app dir: %s", FiveMApp.c_str());
+        auto cacheFolder = FiveMApp + "\\cache\\game";
+        std::string newestExe;
+        fs::directory_entry newestExeEntry;
+        for (auto &file : fs::directory_iterator(cacheFolder)) {
+            if (strfind(fs::path(file).string(), "GTA5.exe")) {
+                if (newestExe.empty() || last_write_time(newestExeEntry) < last_write_time(file)) {
+                    newestExe = fs::path(file).string();
+                    newestExeEntry = file;
                 }
             }
-            if (newestExe != "") {
-                return getExeVersion(newestExe);
-            }
         }
-        else if (strfind(filename, "gta5.exe")){
-            return getExeVersion(filename);
-        }
-        else {
-            logger.Write(WARN, "Unknown game executable!");
-        }
+        currExe = newestExe;
     }
-    else {
-        logger.Write(WARN, "Unknown game executable!");
-    }
-    return -1;
+    return getExeVersion(currExe);
 }
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
@@ -111,13 +128,24 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             if (scriptingVersion < G_VER_1_0_877_1_STEAM) {
                 logger.Write(WARN, "Unsupported game version! Update your game.");
             }
-            //int actualVersion = ExeVersionMap.lower_bound(getExeInfo())->second;
-            auto actualVersion = findNextLowest(ExeVersionMap, getExeInfo());
+
+            int exeVersion = getExeInfo();
+            int actualVersion = findNextLowest(ExeVersionMap, exeVersion);
             if (scriptingVersion % 2) {
                 scriptingVersion--;
             }
-            if (actualVersion != scriptingVersion && actualVersion != -1) {
-                logger.Write(WARN, "Version mismatch! Using %s for script!", eGameVersionToString(actualVersion).c_str());
+            if (actualVersion != scriptingVersion) {
+                logger.Write(WARN, "Version mismatch!");
+                logger.Write(WARN, "    Detected: %s", eGameVersionToString(actualVersion).c_str());
+                logger.Write(WARN, "    Reported: %s", eGameVersionToString(scriptingVersion).c_str());
+                if (actualVersion == -1) {
+                    logger.Write(WARN, "Version detection failed");
+                    logger.Write(WARN, "    Using reported version (%s)", eGameVersionToString(scriptingVersion).c_str());
+                    actualVersion = scriptingVersion;
+                }
+                else {
+                    logger.Write(WARN, "Using detected version (%s)", eGameVersionToString(actualVersion).c_str());
+                }
                 MemoryPatcher::SetPatterns(actualVersion);
                 VehicleExtensions::ChangeVersion(actualVersion);
             }

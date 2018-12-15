@@ -2,6 +2,12 @@
 
 static HMODULE ourModule;
 
+std::string Paths::GetRunningExecutablePath() {
+    char fileName[MAX_PATH];
+    GetModuleFileNameA(nullptr, fileName, MAX_PATH);
+    return fileName;
+}
+
 std::string Paths::GetRunningExecutableFolder() {
     char fileName[MAX_PATH];
     GetModuleFileNameA(nullptr, fileName, MAX_PATH);

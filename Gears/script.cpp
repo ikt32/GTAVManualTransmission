@@ -771,9 +771,7 @@ void functionHShiftWheel() {
 }
 
 bool isUIActive() {
-    if (PED::IS_PED_RUNNING_MOBILE_PHONE_TASK(playerPed) || menu.IsThisOpen())
-        return true;
-    return false;
+    return PED::IS_PED_RUNNING_MOBILE_PHONE_TASK(playerPed) || menu.IsThisOpen();
 }
 
 void functionSShift() {
