@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <map>
 
 static std::vector<std::string> GameVersionString = {
     "VER_1_0_335_2_STEAM",      // 00
@@ -69,6 +68,12 @@ static std::vector<std::string> GameVersionString = {
 
     "VER_1_0_1493_0_STEAM",     // 42
     "VER_1_0_1493_0_NOSTEAM",   // 43
+
+    "VER_1_0_1493_1_STEAM",     // 44
+    "VER_1_0_1493_1_NOSTEAM",   // 45
+    
+    "VER_1_0_1604_0_STEAM",     // 46
+    "VER_1_0_1604_0_NOSTEAM",   // 47
 };
 
 enum G_GameVersion : int {
@@ -137,9 +142,15 @@ enum G_GameVersion : int {
 
     G_VER_1_0_1493_0_STEAM,     // 42
     G_VER_1_0_1493_0_NOSTEAM,   // 43
+
+    G_VER_1_0_1493_1_STEAM,     // 44
+    G_VER_1_0_1493_1_NOSTEAM,   // 45
+
+    G_VER_1_0_1604_0_STEAM,     // 46
+    G_VER_1_0_1604_0_NOSTEAM,   // 47
 };
 
-static std::map<int, int> ExeVersionMap {
+static std::vector<std::pair<int, int>> ExeVersionMap = {
     {   0,                    -1 },
     { 335, G_VER_1_0_335_2_STEAM },
     { 350, G_VER_1_0_350_1_STEAM },  
@@ -163,6 +174,8 @@ static std::map<int, int> ExeVersionMap {
     { 1290, G_VER_1_0_1290_1_STEAM }, 
     { 1365, G_VER_1_0_1365_1_STEAM }, 
     { 1493, G_VER_1_0_1493_0_STEAM },
+    { 1493, G_VER_1_0_1493_1_STEAM },
+    { 1604, G_VER_1_0_1604_0_STEAM },
 };
 
 static std::string eGameVersionToString(int version) {
@@ -170,4 +183,13 @@ static std::string eGameVersionToString(int version) {
         return std::to_string(version);
     }
     return GameVersionString[version];
+}
+
+template < typename K, typename V >
+V findNextLowest(const std::vector<std::pair<K, V>>& map, K key) {
+    for (auto it = map.rbegin(); it != map.rend(); ++it) {
+        if (it->first <= key)
+            return it->second;
+    }
+    return map.begin()->second;
 }

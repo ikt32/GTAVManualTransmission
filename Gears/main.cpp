@@ -15,16 +15,7 @@
 
 #pragma comment(lib,"Version.lib")
 
-namespace fs = std::experimental::filesystem;
-
-template < typename K, typename V >
-V findNextLowest(const std::map<K, V>& map, K key) {
-    for (auto it = map.rbegin(); it != map.rend(); ++it) {
-        if (it->first <= key)
-            return it->second;
-    }
-    return map.begin()->second;
-}
+namespace fs = std::filesystem;
 
 bool isModulePresent(const std::string& name, std::string& modulePath) {
     bool found = false;
