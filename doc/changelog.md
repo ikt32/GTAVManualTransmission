@@ -1,8 +1,12 @@
 # Changelog
 
 ## 4.6.4
+* Improve soft lock transition
+* Improve version detection
+* Fix FiveM compatibility
 * Fix a bug where the menu gets messed up after 10 options scrolling.
 * Fix a bug where the non-Xinput controller settings loads the wrong setting for shifting mode.
+* Fix AI not shifting properly when shifting is patched
 
 ## 4.6.3
 * Fix a few missing vehicle offset searches.
