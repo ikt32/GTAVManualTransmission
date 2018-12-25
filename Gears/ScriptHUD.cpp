@@ -37,6 +37,9 @@ extern WheelPatchStates wheelPatchStates;
 extern VehicleExtensions ext;
 extern Vehicle vehicle;
 
+std::vector<bool> getWheelLockups(Vehicle handle);
+
+
 ///////////////////////////////////////////////////////////////////////////////
 //                           Display elements
 ///////////////////////////////////////////////////////////////////////////////
@@ -277,8 +280,6 @@ void drawInputWheelInfo() {
     GRAPHICS::DRAW_RECT(settings.PedalInfoX + 0.0f*barWidth, barYBase - carControls.BrakeVal*settings.PedalInfoH*0.5f, barWidth, carControls.BrakeVal*settings.PedalInfoH, 255, 0, 0, 255);
     GRAPHICS::DRAW_RECT(settings.PedalInfoX + 1.0f*barWidth, barYBase - carControls.ClutchVal*settings.PedalInfoH*0.5f, barWidth, carControls.ClutchVal*settings.PedalInfoH, 0, 0, 255, 255);
 }
-
-std::vector<bool> getWheelLockups(Vehicle handle);
 
 void drawVehicleWheelInfo() {
     auto numWheels = ext.GetNumWheels(vehicle);

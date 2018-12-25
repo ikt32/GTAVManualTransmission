@@ -242,9 +242,9 @@ unsigned char VehicleExtensions::GetTopGear(Vehicle handle) {
 
 std::vector<float> VehicleExtensions::GetGearRatios(Vehicle handle) {
     auto address = GetAddress(handle);
-    std::vector<float> ratios;
+    std::vector<float> ratios(8);
     for (int gearOffset = 0; gearOffset <= 7; gearOffset++) {
-        ratios.push_back(*reinterpret_cast<float *>(address + gearRatiosOffset + gearOffset * sizeof(float)));
+        ratios[gearOffset] = *reinterpret_cast<float *>(address + gearRatiosOffset + gearOffset * sizeof(float));
     }
     return ratios;
 }
@@ -441,10 +441,10 @@ Hash VehicleExtensions::GetAIHandling(Vehicle handle) {
 std::vector<uint64_t> VehicleExtensions::GetWheelPtrs(Vehicle handle) {
     auto wheelPtr = GetWheelsPtr(handle);  // pointer to wheel pointers
     auto numWheels = GetNumWheels(handle);
-    std::vector<uint64_t> wheelPtrs;
+    std::vector<uint64_t> wheelPtrs(numWheels);
     for (auto i = 0; i < numWheels; i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-        wheelPtrs.push_back(wheelAddr);
+        wheelPtrs[i] = wheelAddr;
     }
     return wheelPtrs;
 }
@@ -479,7 +479,7 @@ std::vector<float> VehicleExtensions::GetWheelHealths(Vehicle handle) {
 
     for (auto i = 0; i < numWheels; i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-        healths.push_back(*reinterpret_cast<float *>(wheelAddr + wheelHealthOffset));
+        healths[i] = *reinterpret_cast<float *>(wheelAddr + wheelHealthOffset);
     }
     return healths;
 }
@@ -648,12 +648,13 @@ std::vector<float> VehicleExtensions::GetWheelRotationSpeeds(Vehicle handle) {
 }
 
 std::vector<float> VehicleExtensions::GetTyreSpeeds(Vehicle handle) {
-    std::vector<float> wheelSpeeds;
     int numWheels = GetNumWheels(handle);
     std::vector<float> rotationSpeed = GetWheelRotationSpeeds(handle);
     std::vector<WheelDimensions> dimensionsSet = GetWheelDimensions(handle);
+    std::vector<float> wheelSpeeds(numWheels);
+
     for (int i = 0; i < numWheels; i++) {
-        wheelSpeeds.push_back(rotationSpeed[i] * dimensionsSet[i].TyreRadius);
+        wheelSpeeds[i] = rotationSpeed[i] * dimensionsSet[i].TyreRadius;
     }
     return wheelSpeeds;
 }
@@ -683,11 +684,12 @@ std::vector<float> VehicleExtensions::GetWheelSkidSmokeEffect(Vehicle handle) {
 }
 
 std::vector<float> VehicleExtensions::GetWheelPower(Vehicle handle) {
-    const auto numWheels = GetNumWheels(handle);
-    std::vector<float> values(numWheels);
+    auto numWheels = GetNumWheels(handle);
     auto wheelPtr = GetWheelsPtr(handle);
 
-    if (wheelPowerOffset) return values;
+    std::vector<float> values(numWheels);
+
+    if (wheelPowerOffset == 0) return values;
 
     for (auto i = 0; i < numWheels; ++i) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
