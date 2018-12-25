@@ -526,14 +526,13 @@ std::vector<Vector3> VehicleExtensions::GetWheelOffsets(Vehicle handle) {
     int offPosY = 0x24;
     int offPosZ = 0x28;
 
+    positions.reserve(wheels.size());
     for (auto wheelAddr : wheels) {
-        if (!wheelAddr) continue;
-
-        Vector3 wheelPos;
-        wheelPos.x = *reinterpret_cast<float *>(wheelAddr + offPosX);
-        wheelPos.y = *reinterpret_cast<float *>(wheelAddr + offPosY);
-        wheelPos.z = *reinterpret_cast<float *>(wheelAddr + offPosZ);
-        positions.push_back(wheelPos);
+        positions.emplace_back(Vector3 {
+            *reinterpret_cast<float *>(wheelAddr + offPosX), 0,
+            *reinterpret_cast<float *>(wheelAddr + offPosY), 0,
+            *reinterpret_cast<float *>(wheelAddr + offPosZ), 0,
+        });
     }
     return positions;
 }
@@ -542,9 +541,9 @@ std::vector<Vector3> VehicleExtensions::GetWheelCoords(Vehicle handle, Vector3 p
     std::vector<Vector3> worldCoords;
     std::vector<Vector3> positions = GetWheelOffsets(handle);
 
+    worldCoords.reserve(positions.size());
     for (Vector3 wheelPos : positions) {
-        Vector3 absPos = GetOffsetInWorldCoords(position, rotation, direction, wheelPos);
-        worldCoords.push_back(absPos);
+        worldCoords.emplace_back(GetOffsetInWorldCoords(position, rotation, direction, wheelPos));
     }
     return worldCoords;
 }
@@ -563,14 +562,13 @@ std::vector<Vector3> VehicleExtensions::GetWheelLastContactCoords(Vehicle handle
     int offPosY = 0x44;
     int offPosZ = 0x48;
 
+    positions.reserve(wheels.size());
     for (auto wheelAddr : wheels) {
-        if (!wheelAddr) continue;
-
-        Vector3 wheelPos;
-        wheelPos.x = *reinterpret_cast<float *>(wheelAddr + offPosX);
-        wheelPos.y = *reinterpret_cast<float *>(wheelAddr + offPosY);
-        wheelPos.z = *reinterpret_cast<float *>(wheelAddr + offPosZ);
-        positions.push_back(wheelPos);
+        positions.emplace_back(Vector3{
+            *reinterpret_cast<float *>(wheelAddr + offPosX), 0,
+            *reinterpret_cast<float *>(wheelAddr + offPosY), 0,
+            *reinterpret_cast<float *>(wheelAddr + offPosZ), 0,
+            });
     }
     return positions;
 }
@@ -606,8 +604,10 @@ std::vector<float> VehicleExtensions::GetWheelSteeringAngles(Vehicle handle) {
 }
 
 std::vector<bool> VehicleExtensions::GetWheelsOnGround(Vehicle handle) {
+    auto compressions = GetWheelCompressions(handle);
     std::vector<bool> onGround;
-    for (auto comp : GetWheelCompressions(handle)) {
+    onGround.reserve(compressions.size());
+    for (auto comp : compressions) {
         onGround.push_back(comp != 0.0f);
     }
     return onGround;
