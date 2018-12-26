@@ -87,7 +87,10 @@ void SetPatterns(int version) {
             { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D });
         clutchRevLimit = PatternInfo("\xC7\x43\x40\xCD\xCC\xCC\x3D\x44\x89\x6B\x6C\x44\x89\x73\x68", "xx?xxxxxx??xx??",
             { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D });
-        // TODO: steeringAssist
+        steeringAssist = PatternInfo("\x45\x84\xED\x0F\x84\xD0\x01\x00\x00\x0F\x28\x4B\x70"
+            "\xF3\x0F\x10\x25\x00\x00\x00\x00\xF3\x0F\x10\x1D\x00\x00\x00\x00\x0F\x28\xC1\x0F\x28\xD1", 
+            "xxxxx????xx??xxx?????xxx?????xx?xx?",
+            { 0xE9, 0x00, 0x00, 0x00, 0x00, 0x90 }, 3);
     }
 }
 
@@ -229,4 +232,9 @@ bool RestoreThrottle() {
 // "\x0F\x84\x00\x00\x00\x00\x0F\x28\x4B\x70\xF3\x0F\x10\x25\x00\x00\x00\x00\xF3\x0F\x10\x1D\x00\x00\x00\x00" is what I scan for.
 
 // GTA V (b1604.0)
-// ???
+// 45 84 ED 
+// 0F 84 D8 01 00 00 
+// 0F 28 4F 60 
+// F3 0F 10 1D A1 20 91 00 
+// F3 0F 10 15 99 48 9D 00
+
