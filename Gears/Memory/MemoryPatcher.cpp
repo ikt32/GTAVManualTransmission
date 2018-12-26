@@ -81,14 +81,13 @@ void SetPatterns(int version) {
             { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
     }
     if (version >= G_VER_1_0_1604_0_STEAM) {
-        //shiftUp
-        //shiftDown
-        //brake
-        //throttle
-        //clutchLow
-        //clutchRevLimit
-        //steeringCorrection
-        //steeringControl
+        shiftDown = PatternInfo("\x66\x89\x13\x44\x89\x73\x68\xeb\x0a", "xxxxxx?xx",
+            { 0x66, 0x89, 0x13 });
+        clutchLow = PatternInfo("\xC7\x43\x40\xCD\xCC\xCC\x3D\x66\x44\x89\x43\x04", "xx?xxxxxxxxx",
+            { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D });
+        clutchRevLimit = PatternInfo("\xC7\x43\x40\xCD\xCC\xCC\x3D\x44\x89\x6B\x6C\x44\x89\x73\x68", "xx?xxxxxx??xx??",
+            { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D });
+        // TODO: steeringAssist
     }
 }
 
