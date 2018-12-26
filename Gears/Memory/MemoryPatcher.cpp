@@ -1,17 +1,14 @@
 #include "MemoryPatcher.hpp"
-#include <utility>
 
-#include "NativeMemory.hpp"
 #include "Versions.h"
 #include "../Util/Logger.hpp"
-#include "../Util/Util.hpp"
 
 #include "PatternInfo.h"
 #include "Patcher.h"
 
 namespace MemoryPatcher {
-int NumGearboxPatches = 4;
-int TotalPatched = 0;
+const int NumGearboxPatches = 4;
+int NumGearboxPatched = 0;
 
 const int maxAttempts = 4;
 int gearboxAttempts = 0;
@@ -43,8 +40,8 @@ PatternInfo brake;
 Patcher BrakePatcher("[Misc] Brake", brake);
 
 // Disables countersteer/steering assist
-PatternInfo steeringCorrection;
-PatcherJmp SteeringAssistPatcher("[Steer] Steering assist", steeringCorrection, true);
+PatternInfo steeringAssist;
+PatcherJmp SteeringAssistPatcher("[Steer] Steering assist", steeringAssist, true);
 
 // Disables user steering input for total script control
 PatternInfo steeringControl;
@@ -66,7 +63,7 @@ void SetPatterns(int version) {
         { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D });
     clutchRevLimit = PatternInfo("\xC7\x43\x40\xCD\xCC\xCC\x3D\x44\x89\x7B\x60", "xxxxxxxxx?x", 
         { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D });
-    steeringCorrection = PatternInfo("\x0F\x84\xD0\x01\x00\x00" "\x0F\x28\x4B\x70" "\xF3\x0F\x10\x25\x00\x00\x00\x00" "\xF3\x0F\x10\x1D\x00\x00\x00\x00" "\x0F\x28\xC1" "\x0F\x28\xD1",
+    steeringAssist = PatternInfo("\x0F\x84\xD0\x01\x00\x00" "\x0F\x28\x4B\x70" "\xF3\x0F\x10\x25\x00\x00\x00\x00" "\xF3\x0F\x10\x1D\x00\x00\x00\x00" "\x0F\x28\xC1" "\x0F\x28\xD1",
         "xx????" "xxx?" "xxx?????" "xxx?????" "xx?" "xx?", 
         { 0xE9, 0x00, 0x00, 0x00, 0x00, 0x90 });
     steeringControl = PatternInfo("\xF3\x0F\x11\x8B\xFC\x08\x00\x00" "\xF3\x0F\x10\x83\x00\x09\x00\x00" "\xF3\x0F\x58\x83\xFC\x08\x00\x00" "\x41\x0F\x2F\xC3",
@@ -100,82 +97,82 @@ bool ApplyGearboxPatches() {
         return false;
     }
 
-    logger.Write(DEBUG, "PATCH: GEARBOX: Patching");
+    logger.Write(DEBUG, "PATCH: [Gears] Patching");
 
-    if (NumGearboxPatches == TotalPatched) {
-        logger.Write(DEBUG, "PATCH: GEARBOX: Already patched");
+    if (NumGearboxPatches == NumGearboxPatched) {
+        logger.Write(DEBUG, "PATCH: [Gears] Already patched");
         return true;
     }
 
     if (ClutchLowRPMPatcher.Patch()) {
-        TotalPatched++;
+        NumGearboxPatched++;
     }
 
     if (ClutchRevLimPatcher.Patch()) {
-        TotalPatched++;
+        NumGearboxPatched++;
     }
 
     if (ShiftDownPatcher.Patch()) {
-        TotalPatched++;
+        NumGearboxPatched++;
     }
 
     if (ShiftUpPatcher.Patch()) {
-        TotalPatched++;
+        NumGearboxPatched++;
     }
 
-    if (TotalPatched == NumGearboxPatches) {
-        logger.Write(DEBUG, "PATCH: GEARBOX: Patch success");
+    if (NumGearboxPatched == NumGearboxPatches) {
+        logger.Write(DEBUG, "PATCH: [Gears] Patch success");
         gearboxAttempts = 0;
         return true;
     }
-    logger.Write(ERROR, "PATCH: GEARBOX: Patching failed");
+    logger.Write(ERROR, "PATCH: [Gears] Patching failed");
     gearboxAttempts++;
 
     if (gearboxAttempts > maxAttempts) {
-        logger.Write(ERROR, "PATCH: GEARBOX: Patch attempt limit exceeded");
-        logger.Write(ERROR, "PATCH: GEARBOX: Patching disabled");
+        logger.Write(ERROR, "PATCH: [Gears] Patch attempt limit exceeded");
+        logger.Write(ERROR, "PATCH: [Gears] Patching disabled");
     }
     return false;
 }
 
 bool RevertGearboxPatches() {
-    logger.Write(DEBUG, "PATCH: GEARBOX: Restoring instructions");
+    logger.Write(DEBUG, "PATCH: [Gears] Restoring instructions");
 
-    if (TotalPatched == 0) {
-        logger.Write(DEBUG, "PATCH: GEARBOX: Already restored/intact");
+    if (NumGearboxPatched == 0) {
+        logger.Write(DEBUG, "PATCH: [Gears] Already restored/intact");
         return true;
     }
 
     if (ClutchLowRPMPatcher.Restore()) {
-        TotalPatched--;
+        NumGearboxPatched--;
     }
 
     if (ClutchRevLimPatcher.Restore()) {
-        TotalPatched--;
+        NumGearboxPatched--;
     }
 
     if (ShiftDownPatcher.Restore()) {
-        TotalPatched--;
+        NumGearboxPatched--;
     }
 
     if (ShiftUpPatcher.Restore()) {
-        TotalPatched--;
+        NumGearboxPatched--;
     }
 
-    if (TotalPatched == 0) {
-        logger.Write(DEBUG, "PATCH: GEARBOX: Restore success");
+    if (NumGearboxPatched == 0) {
+        logger.Write(DEBUG, "PATCH: [Gears] Restore success");
         gearboxAttempts = 0;
         return true;
     }
-    logger.Write(ERROR, "PATCH: GEARBOX: Restore failed");
+    logger.Write(ERROR, "PATCH: [Gears] Restore failed");
     return false;
 }
 
-bool PatchSteeringCorrection() {
+bool PatchSteeringAssist() {
     return SteeringAssistPatcher.Patch();
 }
 
-bool RestoreSteeringCorrection() {
+bool RestoreSteeringAssist() {
     return SteeringAssistPatcher.Restore();
 }
 
@@ -187,19 +184,19 @@ bool RestoreSteeringControl() {
     return SteeringControlPatcher.Restore();
 }
 
-bool PatchBrakeDecrement() {
+bool PatchBrake() {
     return BrakePatcher.Patch();
 }
 
-bool RestoreBrakeDecrement() {
+bool RestoreBrake() {
     return BrakePatcher.Restore();
 }
 
-bool PatchThrottleDecrement() {
+bool PatchThrottle() {
     return ThrottlePatcher.Patch();
 }
 
-bool RestoreThrottleDecrement() {
+bool RestoreThrottle() {
     return ThrottlePatcher.Restore();
 }
 }

@@ -130,7 +130,7 @@ void updateNPCVehicles(Vehicle vehicles[1024], int count) {
 }
 
 void update_npc() {
-    bool mtActive = MemoryPatcher::TotalPatched > 0;
+    bool mtActive = MemoryPatcher::NumGearboxPatched > 0;
     if (!settings.ShowNPCInfo && !mtActive) return;
 
     const int ARR_SIZE = 1024;

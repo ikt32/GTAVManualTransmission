@@ -157,13 +157,13 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 
             if (MemoryPatcher::RevertGearboxPatches()) 
                 actual++;
-            if (MemoryPatcher::RestoreSteeringCorrection())
+            if (MemoryPatcher::RestoreSteeringAssist())
                 actual++;
             if (MemoryPatcher::RestoreSteeringControl()) 
                 actual++;
-            if (MemoryPatcher::RestoreBrakeDecrement())
+            if (MemoryPatcher::RestoreBrake())
                 actual++;
-            if (MemoryPatcher::RestoreThrottleDecrement())
+            if (MemoryPatcher::RestoreThrottle())
                 actual++;
 
             resetSteeringMultiplier();

@@ -115,7 +115,7 @@ void handleBrakePatch() {
         lockedUp = false;
     if (g_CustomABS && lockedUp) {
         if (!MemoryPatcher::BrakePatcher.Patched()) {
-            MemoryPatcher::PatchBrakeDecrement();
+            MemoryPatcher::PatchBrake();
         }
         for (int i = 0; i < lockUps.size(); i++) {
             ext.SetWheelBrakePressure(vehicle, i, ext.GetWheelBrakePressure(vehicle)[i] * 0.9f);
@@ -125,15 +125,15 @@ void handleBrakePatch() {
     else {
         if (wheelPatchStates.EngBrakeActive || wheelPatchStates.EngLockActive) {
             if (!MemoryPatcher::BrakePatcher.Patched()) {
-                MemoryPatcher::PatchBrakeDecrement();
+                MemoryPatcher::PatchBrake();
             }
         }
         else if (wheelPatchStates.InduceBurnout) {
             if (!MemoryPatcher::BrakePatcher.Patched()) {
-                MemoryPatcher::PatchBrakeDecrement();
+                MemoryPatcher::PatchBrake();
             }
             if (!MemoryPatcher::ThrottlePatcher.Patched()) {
-                MemoryPatcher::PatchThrottleDecrement();
+                MemoryPatcher::PatchThrottle();
             }
             for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
                 if (ext.IsWheelPowered(vehicle, i)) {
@@ -153,10 +153,10 @@ void handleBrakePatch() {
         }
         else {
             if (MemoryPatcher::BrakePatcher.Patched()) {
-                MemoryPatcher::RestoreBrakeDecrement();
+                MemoryPatcher::RestoreBrake();
             }
             if (MemoryPatcher::ThrottlePatcher.Patched()) {
-                MemoryPatcher::RestoreThrottleDecrement();
+                MemoryPatcher::RestoreThrottle();
             }
         }
     }
@@ -424,7 +424,7 @@ void update_manual_transmission() {
         cycleShiftMode();
     }
 
-    if (MemoryPatcher::TotalPatched != MemoryPatcher::NumGearboxPatches) {
+    if (MemoryPatcher::NumGearboxPatched != MemoryPatcher::NumGearboxPatches) {
         MemoryPatcher::ApplyGearboxPatches();
     }
 
@@ -509,17 +509,17 @@ void crossScript() {
 
 void clearPatches() {
     resetSteeringMultiplier();
-    if (MemoryPatcher::TotalPatched != 0) {
+    if (MemoryPatcher::NumGearboxPatched != 0) {
         MemoryPatcher::RevertGearboxPatches();
     }
     if (MemoryPatcher::SteeringControlPatcher.Patched()) {
         MemoryPatcher::RestoreSteeringControl();
     }
     if (MemoryPatcher::SteeringAssistPatcher.Patched()) {
-        MemoryPatcher::RestoreSteeringCorrection();
+        MemoryPatcher::RestoreSteeringAssist();
     }
     if (MemoryPatcher::BrakePatcher.Patched()) {
-        MemoryPatcher::RestoreBrakeDecrement();
+        MemoryPatcher::RestoreBrake();
     }
 }
 
@@ -557,11 +557,11 @@ void update_steeringpatches() {
     if (isCar && settings.PatchSteering &&
         (useWheel || settings.PatchSteeringAlways)) {
         if (!MemoryPatcher::SteeringAssistPatcher.Patched())
-            MemoryPatcher::PatchSteeringCorrection();
+            MemoryPatcher::PatchSteeringAssist();
     }
     else {
         if (MemoryPatcher::SteeringAssistPatcher.Patched())
-            MemoryPatcher::RestoreSteeringCorrection();
+            MemoryPatcher::RestoreSteeringAssist();
     }
 
     if (isCar && useWheel && settings.PatchSteeringControl) {

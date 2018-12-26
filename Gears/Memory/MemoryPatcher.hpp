@@ -14,8 +14,8 @@ bool RevertGearboxPatches();
 /*
  * Remove steering correction and steering scaling at speed
  */
-bool PatchSteeringCorrection();
-bool RestoreSteeringCorrection();
+bool PatchSteeringAssist();
+bool RestoreSteeringAssist();
 
 /*
  * Disable keyboard and controller from steer input, only wheel control
@@ -26,21 +26,17 @@ bool RestoreSteeringControl();
 /*
  * Remove brake pressure drop, more script control over brakes
  */
-bool PatchBrakeDecrement();
-bool RestoreBrakeDecrement();
+bool PatchBrake();
+bool RestoreBrake();
 
 /*
 * Remove brake pressure drop, more script control over brakes
 */
-bool PatchThrottleDecrement();
-bool RestoreThrottleDecrement();
+bool PatchThrottle();
+bool RestoreThrottle();
 
-/*
- * "total" refers to the "package" of patches needed to get the gearbox
- * and clutch stuff working.
- */
-extern int NumGearboxPatches;
-extern int TotalPatched;
+extern const int NumGearboxPatches;
+extern int NumGearboxPatched;
 
 extern Patcher ThrottlePatcher;
 extern Patcher BrakePatcher;
