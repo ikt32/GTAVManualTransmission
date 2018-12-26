@@ -92,6 +92,17 @@ void SetPatterns(int version) {
     }
 }
 
+void Test() {
+    ShiftUpPatcher.Test();
+    ShiftDownPatcher.Test();
+    ClutchLowRPMPatcher.Test();
+    ClutchRevLimPatcher.Test();
+    ThrottlePatcher.Test();
+    BrakePatcher.Test();
+    SteeringAssistPatcher.Test();
+    SteeringControlPatcher.Test();
+}
+
 bool ApplyGearboxPatches() {
     if (gearboxAttempts > maxAttempts) {
         return false;

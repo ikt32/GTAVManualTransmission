@@ -2386,6 +2386,7 @@ void main() {
     menu.SetFiles(settingsMenuFile);
     readSettings();
     ext.initOffsets();
+    MemoryPatcher::Test();
 
     logger.Write(INFO, "Setting up globals");
     if (!setupGlobals()) {

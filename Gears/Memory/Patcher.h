@@ -88,6 +88,16 @@ public:
         return false;
     }
 
+    uintptr_t Test() const {
+        auto addr = mem::FindPattern(mPattern.Pattern, mPattern.Mask);
+        if (addr)
+            logger.Write(DEBUG, "PATCH: Test: [%s] found at 0x%p", mName.c_str(), addr);
+        else
+            logger.Write(ERROR, "PATCH: Test: [%s] not found", mName.c_str());
+
+        return addr;
+    }
+
     bool Patched() const {
         return mPatched;
     }

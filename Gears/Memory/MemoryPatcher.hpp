@@ -3,6 +3,7 @@
 
 namespace MemoryPatcher {
 void SetPatterns(int version);
+void Test();
 
 /*
  * Patch clutch and gearbox behavior so they can be script-controlled
