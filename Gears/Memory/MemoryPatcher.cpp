@@ -15,37 +15,37 @@ int gearboxAttempts = 0;
 
 // When disabled, shift-up doesn't trigger.
 PatternInfo shiftUp;
-Patcher ShiftUpPatcher("[Gears] Shift Up", shiftUp, true);
+Patcher ShiftUpPatcher("Gears: Shift Up", shiftUp, true);
 
 // When disabled, shift-down doesn't trigger.
 PatternInfo shiftDown;
-Patcher ShiftDownPatcher("[Gears] Shift Down", shiftDown, true);
+Patcher ShiftDownPatcher("Gears: Shift Down", shiftDown, true);
 
 // When disabled, clutch doesn't disengage on low RPMs
 // (in the RPM region where shift-down would've been triggered)
 PatternInfo clutchLow;
-Patcher ClutchLowRPMPatcher("[Gears] Clutch Low RPM", clutchLow, true);
+Patcher ClutchLowRPMPatcher("Gears: Clutch Low RPM", clutchLow, true);
 
 // When disabled, clutch doesn't disengage on redline 
 // (in the RPM region where shift-up would've been triggered)
 PatternInfo clutchRevLimit;
-Patcher ClutchRevLimPatcher("[Gears] Clutch Rev lim", clutchRevLimit, true);
+Patcher ClutchRevLimPatcher("Gears: Clutch Rev lim", clutchRevLimit, true);
 
 // When disabled, throttle doesn't decrease.
 PatternInfo throttle;
-Patcher ThrottlePatcher("[Misc] Throttle", throttle);
+Patcher ThrottlePatcher("Misc: Throttle", throttle);
 
 // When disabled, brake pressure doesn't decrease.
 PatternInfo brake;
-Patcher BrakePatcher("[Misc] Brake", brake);
+Patcher BrakePatcher("Misc: Brake", brake);
 
 // Disables countersteer/steering assist
 PatternInfo steeringAssist;
-PatcherJmp SteeringAssistPatcher("[Steer] Steering assist", steeringAssist, true);
+PatcherJmp SteeringAssistPatcher("Steer: Steering assist", steeringAssist, true);
 
 // Disables user steering input for total script control
 PatternInfo steeringControl;
-Patcher SteeringControlPatcher("[Steer] Steering input", steeringControl, true);
+Patcher SteeringControlPatcher("Steer: Steering input", steeringControl, true);
 
 void SetPatterns(int version) {
     // Valid for 877 to 1290
@@ -110,10 +110,10 @@ bool ApplyGearboxPatches() {
         return false;
     }
 
-    logger.Write(DEBUG, "PATCH: [Gears] Patching");
+    logger.Write(DEBUG, "[Patch] [Gears] Patching");
 
     if (NumGearboxPatches == NumGearboxPatched) {
-        logger.Write(DEBUG, "PATCH: [Gears] Already patched");
+        logger.Write(DEBUG, "[Patch] [Gears] Already patched");
         return true;
     }
 
@@ -134,25 +134,25 @@ bool ApplyGearboxPatches() {
     }
 
     if (NumGearboxPatched == NumGearboxPatches) {
-        logger.Write(DEBUG, "PATCH: [Gears] Patch success");
+        logger.Write(DEBUG, "[Patch] [Gears] Patch success");
         gearboxAttempts = 0;
         return true;
     }
-    logger.Write(ERROR, "PATCH: [Gears] Patching failed");
+    logger.Write(ERROR, "[Patch] [Gears] Patching failed");
     gearboxAttempts++;
 
     if (gearboxAttempts > maxAttempts) {
-        logger.Write(ERROR, "PATCH: [Gears] Patch attempt limit exceeded");
-        logger.Write(ERROR, "PATCH: [Gears] Patching disabled");
+        logger.Write(ERROR, "[Patch] [Gears] Patch attempt limit exceeded");
+        logger.Write(ERROR, "[Patch] [Gears] Patching disabled");
     }
     return false;
 }
 
 bool RevertGearboxPatches() {
-    logger.Write(DEBUG, "PATCH: [Gears] Restoring instructions");
+    logger.Write(DEBUG, "[Patch] [Gears] Restoring instructions");
 
     if (NumGearboxPatched == 0) {
-        logger.Write(DEBUG, "PATCH: [Gears] Already restored/intact");
+        logger.Write(DEBUG, "[Patch] [Gears] Already restored/intact");
         return true;
     }
 
@@ -173,11 +173,11 @@ bool RevertGearboxPatches() {
     }
 
     if (NumGearboxPatched == 0) {
-        logger.Write(DEBUG, "PATCH: [Gears] Restore success");
+        logger.Write(DEBUG, "[Patch] [Gears] Restore success");
         gearboxAttempts = 0;
         return true;
     }
-    logger.Write(ERROR, "PATCH: [Gears] Restore failed");
+    logger.Write(ERROR, "[Patch] [Gears] Restore failed");
     return false;
 }
 

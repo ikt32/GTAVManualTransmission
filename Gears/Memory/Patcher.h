@@ -7,7 +7,7 @@
 #include "../Util/Util.hpp"
 
 namespace MemoryPatcher {
-// simple NOP patcher?
+// simple NOP patcher
 class Patcher {
 public:
     Patcher(std::string name, PatternInfo& pattern, bool verbose)
@@ -30,10 +30,8 @@ public:
             return false;
         }
 
-        if (mVerbose) logger.Write(DEBUG, "PATCH: [%s] Patching", mName.c_str());
-
         if (mPatched) {
-            if (mVerbose) logger.Write(DEBUG, "PATCH: [%s] Already patched", mName.c_str());
+            if (mVerbose) logger.Write(DEBUG, "[Patch] [%s] Already patched", mName.c_str());
             return true;
         }
 
@@ -46,29 +44,28 @@ public:
 
             if (mVerbose) {
                 std::string bytes = ByteArrayToString(mPattern.Data.data(), mPattern.Data.size());
-                logger.Write(DEBUG, "PATCH: [%s] Found at @ 0x%p", mName.c_str(), mAddress);
-                logger.Write(DEBUG, "PATCH: [%s] Patch success, original code: %s", mName.c_str(), bytes.c_str());
+                logger.Write(DEBUG, "[Patch] [%s] Patch success, original code: %s", mName.c_str(), bytes.c_str());
             }
             return true;
         }
 
-        logger.Write(ERROR, "PATCH: [%s] Patch failed", mName.c_str());
+        logger.Write(ERROR, "[Patch] [%s] Patch failed", mName.c_str());
         mAttempts++;
 
         if (mAttempts > mMaxAttempts) {
-            logger.Write(ERROR, "PATCH: [%s] Patch attempt limit exceeded", mName.c_str());
-            logger.Write(ERROR, "PATCH: [%s] Patching disabled", mName.c_str());
+            logger.Write(ERROR, "[Patch] [%s] Patch attempt limit exceeded", mName.c_str());
+            logger.Write(ERROR, "[Patch] [%s] Patching disabled", mName.c_str());
         }
         return false;
     }
 
     virtual bool Restore() {
         if (mVerbose)
-            logger.Write(DEBUG, "PATCH: [%s] Restoring instructions", mName.c_str());
+            logger.Write(DEBUG, "[Patch] [%s] Restoring instructions", mName.c_str());
 
         if (!mPatched) {
             if (mVerbose)
-                logger.Write(DEBUG, "PATCH: [%s] Already restored/intact", mName.c_str());
+                logger.Write(DEBUG, "[Patch] [%s] Already restored/intact", mName.c_str());
             return true;
         }
 
@@ -79,21 +76,21 @@ public:
             mAttempts = 0;
 
             if (mVerbose) {
-                logger.Write(DEBUG, "PATCH: [%s] Restore success", mName.c_str());
+                logger.Write(DEBUG, "[Patch] [%s] Restore success", mName.c_str());
             }
             return true;
         }
 
-        logger.Write(ERROR, "PATCH: [%s] restore failed", mName.c_str());
+        logger.Write(ERROR, "[Patch] [%s] restore failed", mName.c_str());
         return false;
     }
 
     uintptr_t Test() const {
         auto addr = mem::FindPattern(mPattern.Pattern, mPattern.Mask);
         if (addr)
-            logger.Write(DEBUG, "PATCH: Test: [%s] found at 0x%p", mName.c_str(), addr);
+            logger.Write(DEBUG, "[Patch] Test: [%s] found at 0x%p", mName.c_str(), addr);
         else
-            logger.Write(ERROR, "PATCH: Test: [%s] not found", mName.c_str());
+            logger.Write(ERROR, "[Patch] Test: [%s] not found", mName.c_str());
 
         return addr;
     }
@@ -120,8 +117,13 @@ protected:
         }
         else {
             address = mem::FindPattern(mPattern.Pattern, mPattern.Mask);
-            if (address) address += mPattern.Offset;
-            logger.Write(DEBUG, "PATCH: [%s] Patched @ 0x%p", mName.c_str(), address);
+            if (address) {
+                address += mPattern.Offset;
+                logger.Write(DEBUG, "[Patch] [%s] found at 0x%p", mName.c_str(), address);
+            }
+            else {
+                logger.Write(ERROR, "[Patch] [%s] not found", mName.c_str());
+            }
         }
 
         if (address) {
@@ -149,8 +151,13 @@ protected:
         }
         else {
             address = mem::FindPattern(mPattern.Pattern, mPattern.Mask);
-            if (address) address += mPattern.Offset;
-            logger.Write(DEBUG, "PATCH: [%s] Patched @ 0x%p", mName.c_str(), address);
+            if (address) {
+                address += mPattern.Offset;
+                logger.Write(DEBUG, "[Patch] [%s] found at 0x%p", mName.c_str(), address);
+            }
+            else {
+                logger.Write(ERROR, "[Patch] [%s] not found", mName.c_str());
+            }
         }
 
         if (address) {
