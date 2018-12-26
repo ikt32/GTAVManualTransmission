@@ -42,9 +42,8 @@ bool RestoreThrottleDecrement();
 extern int NumGearboxPatches;
 extern int TotalPatched;
 
-extern bool SteerCorrectPatched;
-extern bool SteerControlPatched;
-extern bool ThrottleDecrementPatched;
-
+extern Patcher ThrottlePatcher;
 extern Patcher BrakePatcher;
+extern PatcherJmp SteeringAssistPatcher;
+extern Patcher SteeringControlPatcher;
 }

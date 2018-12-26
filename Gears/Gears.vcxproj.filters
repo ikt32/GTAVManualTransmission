@@ -194,7 +194,9 @@
     <ClInclude Include="Memory\PatternInfo.h">
       <Filter>Memory\Patching</Filter>
     </ClInclude>
-    <ClInclude Include="Memory\Patcher.h" />
+    <ClInclude Include="Memory\Patcher.h">
+      <Filter>Memory\Patching</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

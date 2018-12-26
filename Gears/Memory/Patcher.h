@@ -121,4 +121,42 @@ protected:
         return address;
     }
 };
+
+// TODO: Can probably be removed when mPattern.Data makes more sense later?
+class PatcherJmp : public Patcher {
+public:
+    PatcherJmp(const std::string& name, PatternInfo& pattern, bool verbose)
+        : Patcher(name, pattern, verbose) {}
+
+    PatcherJmp(const std::string& name, PatternInfo& pattern)
+        : Patcher(name, pattern) {}
+
+protected:
+    uintptr_t Apply() override {
+        uintptr_t address;
+        if (mTemp != NULL) {
+            address = mTemp;
+        }
+        else {
+            address = mem::FindPattern(mPattern.Pattern, mPattern.Mask);
+            if (address) address += mPattern.Offset;
+            logger.Write(DEBUG, "PATCH: [%s] Patched @ 0x%p", mName.c_str(), address);
+        }
+
+        if (address) {
+            uint8_t instrArr[6] =
+            { 0xE9, 0x00, 0x00, 0x00, 0x00, 0x90 };               // make preliminary instruction: JMP to <adrr>
+            uint8_t origSteerInstrDest[4] = { 0x00, 0x00, 0x00, 0x00 };
+
+            memcpy(mPattern.Data.data(), (void*)address, 6); // save whole orig instruction
+            memcpy(origSteerInstrDest, (void*)(address + 2), 4);    // save the address it writes to
+            origSteerInstrDest[0] += 1;                             // Increment first byte by 1
+            memcpy(instrArr + 1, origSteerInstrDest, 4);            // use saved address in new instruction
+            memcpy((void*)address, instrArr, 6);                    // patch with new fixed instruction
+
+            return address;
+        }
+        return 0;
+    }
+};
 }

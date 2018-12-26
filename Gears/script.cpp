@@ -132,7 +132,7 @@ void handleBrakePatch() {
             if (!MemoryPatcher::BrakePatcher.Patched()) {
                 MemoryPatcher::PatchBrakeDecrement();
             }
-            if (!MemoryPatcher::ThrottleDecrementPatched) {
+            if (!MemoryPatcher::ThrottlePatcher.Patched()) {
                 MemoryPatcher::PatchThrottleDecrement();
             }
             for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
@@ -155,7 +155,7 @@ void handleBrakePatch() {
             if (MemoryPatcher::BrakePatcher.Patched()) {
                 MemoryPatcher::RestoreBrakeDecrement();
             }
-            if (MemoryPatcher::ThrottleDecrementPatched) {
+            if (MemoryPatcher::ThrottlePatcher.Patched()) {
                 MemoryPatcher::RestoreThrottleDecrement();
             }
         }
@@ -512,10 +512,10 @@ void clearPatches() {
     if (MemoryPatcher::TotalPatched != 0) {
         MemoryPatcher::RevertGearboxPatches();
     }
-    if (MemoryPatcher::SteerControlPatched) {
+    if (MemoryPatcher::SteeringControlPatcher.Patched()) {
         MemoryPatcher::RestoreSteeringControl();
     }
-    if (MemoryPatcher::SteerCorrectPatched) {
+    if (MemoryPatcher::SteeringAssistPatcher.Patched()) {
         MemoryPatcher::RestoreSteeringCorrection();
     }
     if (MemoryPatcher::BrakePatcher.Patched()) {
@@ -556,20 +556,20 @@ void update_steeringpatches() {
     bool useWheel = carControls.PrevInput == CarControls::Wheel;
     if (isCar && settings.PatchSteering &&
         (useWheel || settings.PatchSteeringAlways)) {
-        if (!MemoryPatcher::SteerCorrectPatched)
+        if (!MemoryPatcher::SteeringAssistPatcher.Patched())
             MemoryPatcher::PatchSteeringCorrection();
     }
     else {
-        if (MemoryPatcher::SteerCorrectPatched)
+        if (MemoryPatcher::SteeringAssistPatcher.Patched())
             MemoryPatcher::RestoreSteeringCorrection();
     }
 
     if (isCar && useWheel && settings.PatchSteeringControl) {
-        if (!MemoryPatcher::SteerControlPatched)
+        if (!MemoryPatcher::SteeringControlPatcher.Patched())
             MemoryPatcher::PatchSteeringControl();
     }
     else {
-        if (MemoryPatcher::SteerControlPatched)
+        if (MemoryPatcher::SteeringControlPatcher.Patched())
             MemoryPatcher::RestoreSteeringControl();
     }
     if (isVehicleAvailable(vehicle, playerPed)) {
@@ -581,7 +581,7 @@ void update_steeringpatches() {
 void updateSteeringMultiplier() {
     float mult = 1;
 
-    if (MemoryPatcher::SteerCorrectPatched) {
+    if (MemoryPatcher::SteeringAssistPatcher.Patched()) {
         Vector3 vel = ENTITY::GET_ENTITY_VELOCITY(vehicle);
         Vector3 pos = ENTITY::GET_ENTITY_COORDS(vehicle, 1);
         Vector3 motion = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, pos.x + vel.x, pos.y + vel.y, pos.z + vel.z);
