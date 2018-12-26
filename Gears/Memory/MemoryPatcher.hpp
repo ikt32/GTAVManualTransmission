@@ -1,4 +1,5 @@
 #pragma once
+#include "Patcher.h"
 
 namespace MemoryPatcher {
 void SetPatterns(int version);
@@ -43,6 +44,7 @@ extern int TotalPatched;
 
 extern bool SteerCorrectPatched;
 extern bool SteerControlPatched;
-extern bool BrakeDecrementPatched;
 extern bool ThrottleDecrementPatched;
+
+extern Patcher BrakePatcher;
 }

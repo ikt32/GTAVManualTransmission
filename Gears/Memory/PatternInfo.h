@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-
+namespace MemoryPatcher {
 struct PatternInfo {
     PatternInfo() : Pattern(nullptr), Mask(nullptr) {}
 
@@ -13,3 +13,4 @@ struct PatternInfo {
     std::vector<uint8_t> Data;
     uint32_t Offset = 0;
 };
+}

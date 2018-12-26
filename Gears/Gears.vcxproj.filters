@@ -191,6 +191,10 @@
     <ClInclude Include="Util\StringFormat.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="Memory\PatternInfo.h">
+      <Filter>Memory\Patching</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\Patcher.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -210,6 +214,9 @@
     </Filter>
     <Filter Include="Thirdparty">
       <UniqueIdentifier>{d0a967a3-e709-4563-beec-8bb1bc9d1711}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory\Patching">
+      <UniqueIdentifier>{a0e6c9f3-7e78-430a-abb7-39e38e87d266}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

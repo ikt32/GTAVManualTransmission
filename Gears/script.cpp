@@ -114,7 +114,7 @@ void handleBrakePatch() {
     if (ebrk || brn)
         lockedUp = false;
     if (g_CustomABS && lockedUp) {
-        if (!MemoryPatcher::BrakeDecrementPatched) {
+        if (!MemoryPatcher::BrakePatcher.Patched()) {
             MemoryPatcher::PatchBrakeDecrement();
         }
         for (int i = 0; i < lockUps.size(); i++) {
@@ -124,12 +124,12 @@ void handleBrakePatch() {
     }
     else {
         if (wheelPatchStates.EngBrakeActive || wheelPatchStates.EngLockActive) {
-            if (!MemoryPatcher::BrakeDecrementPatched) {
+            if (!MemoryPatcher::BrakePatcher.Patched()) {
                 MemoryPatcher::PatchBrakeDecrement();
             }
         }
         else if (wheelPatchStates.InduceBurnout) {
-            if (!MemoryPatcher::BrakeDecrementPatched) {
+            if (!MemoryPatcher::BrakePatcher.Patched()) {
                 MemoryPatcher::PatchBrakeDecrement();
             }
             if (!MemoryPatcher::ThrottleDecrementPatched) {
@@ -152,7 +152,7 @@ void handleBrakePatch() {
             wheelPatchStates.InduceBurnout = false;
         }
         else {
-            if (MemoryPatcher::BrakeDecrementPatched) {
+            if (MemoryPatcher::BrakePatcher.Patched()) {
                 MemoryPatcher::RestoreBrakeDecrement();
             }
             if (MemoryPatcher::ThrottleDecrementPatched) {
@@ -518,7 +518,7 @@ void clearPatches() {
     if (MemoryPatcher::SteerCorrectPatched) {
         MemoryPatcher::RestoreSteeringCorrection();
     }
-    if (MemoryPatcher::BrakeDecrementPatched) {
+    if (MemoryPatcher::BrakePatcher.Patched()) {
         MemoryPatcher::RestoreBrakeDecrement();
     }
 }

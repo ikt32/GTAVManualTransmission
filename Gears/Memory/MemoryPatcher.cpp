@@ -7,6 +7,7 @@
 #include "../Util/Util.hpp"
 
 #include "PatternInfo.h"
+#include "Patcher.h"
 
 namespace MemoryPatcher {
 // Clutch disengage @ Low Speed High Gear, low RPM
@@ -16,10 +17,6 @@ void RevertClutchLowPatch(uintptr_t address);
 // Disable "shifting down" wanted
 uintptr_t ApplyShiftDownPatch();
 void RevertShiftDownPatch(uintptr_t address);
-
-// Disable "shifting up" wanted
-uintptr_t ApplyShiftUpPatch();
-void RevertShiftUpPatch(uintptr_t address);
 
 // Clutch disengage @ High speed rev limiting
 uintptr_t ApplyClutchRevLimitPatch();
@@ -31,9 +28,6 @@ uintptr_t ApplySteeringCorrectionPatch();
 // Disable (normal) user input while wheel steering is active.
 uintptr_t ApplySteerControlPatch();
 
-// When disabled, brake pressure doesn't decrease.
-uintptr_t ApplyBrakePatch();
-
 // When disabled, throttle doesn't decrease.
 uintptr_t ApplyThrottlePatch();
 
@@ -42,7 +36,6 @@ int TotalPatched = 0;
 
 bool SteerCorrectPatched = false;
 bool SteerControlPatched = false;
-bool BrakeDecrementPatched = false;
 bool ThrottleDecrementPatched = false;
 
 uintptr_t clutchLowAddr = NULL;
@@ -54,17 +47,11 @@ uintptr_t clutchRevLimitTemp = NULL;
 uintptr_t shiftDownAddr = NULL;
 uintptr_t shiftDownTemp = NULL;
 
-uintptr_t shiftUpAddr = NULL;
-uintptr_t shiftUpTemp = NULL;
-
 uintptr_t steeringAddr = NULL;
 uintptr_t steeringTemp = NULL;
 
 uintptr_t steerControlAddr = NULL;
 uintptr_t steerControlTemp = NULL;
-
-uintptr_t brakeAddr = NULL;
-uintptr_t brakeTemp = NULL;
 
 uintptr_t throttleAddr = NULL;
 uintptr_t throttleTemp = NULL;
@@ -73,18 +60,23 @@ const int maxAttempts = 4;
 int gearboxAttempts = 0;
 int steerAttempts = 0;
 int steerControlAttempts = 0;
-int brakeAttempts = 0;
 int throttleAttempts = 0;
 
+// When disabled, shift-up doesn't trigger.
 PatternInfo shiftUp;
+Patcher ShiftUpPatcher("Shift Up", shiftUp, true);
+
 PatternInfo shiftDown;
-PatternInfo brake;
 PatternInfo throttle;
 
 PatternInfo clutchLow;
 PatternInfo clutchRevLimit;
 PatternInfo steeringCorrection;
 PatternInfo steeringControl;
+
+// When disabled, brake pressure doesn't decrease.
+PatternInfo brake;
+Patcher BrakePatcher("Brake", brake);
 
 void SetPatterns(int version) {
     // Valid for 877 to 1290
@@ -173,14 +165,8 @@ bool ApplyGearboxPatches() {
         logger.Write(ERROR, "PATCH: GEARBOX: shiftDown patch failed");
     }
 
-    shiftUpTemp = ApplyShiftUpPatch();
-    if (shiftUpTemp) {
-        shiftUpAddr = shiftUpTemp;
+    if (ShiftUpPatcher.Patch()) {
         TotalPatched++;
-        logger.Write(DEBUG, "PATCH: GEARBOX: Patched shiftUp  @ 0x%p", shiftUpAddr);
-    }
-    else {
-        logger.Write(ERROR, "PATCH: GEARBOX: shiftUp patch failed");
     }
 
     if (TotalPatched == NumGearboxPatches) {
@@ -233,13 +219,8 @@ bool RevertGearboxPatches() {
         logger.Write(DEBUG, "PATCH: GEARBOX: shiftDown not restored");
     }
 
-    if (shiftUpAddr) {
-        RevertShiftUpPatch(shiftUpAddr);
-        shiftUpAddr = 0;
+    if (ShiftUpPatcher.Restore()) {
         TotalPatched--;
-    }
-    else {
-        logger.Write(ERROR, "PATCH: GEARBOX: shiftUp not restored");
     }
 
     if (TotalPatched == 0) {
@@ -354,7 +335,6 @@ bool RestoreSteeringControl() {
     }
 
     if (steerControlAddr) {
-        //byte origInstr[8] = { 0xF3, 0x0F, 0x11, 0x8B, 0xFC, 0x08, 0x00, 0x00 };
         memcpy((void*)steerControlAddr, steeringControl.Data.data(), steeringControl.Data.size());
         steerControlAddr = 0;
         SteerControlPatched = false;
@@ -368,56 +348,11 @@ bool RestoreSteeringControl() {
 }
 
 bool PatchBrakeDecrement() {
-    if (brakeAttempts > maxAttempts) {
-        return false;
-    }
-
-    if (BrakeDecrementPatched) {
-        return true;
-    }
-
-    brakeTemp = ApplyBrakePatch();
-
-    if (brakeTemp) {
-        brakeAddr = brakeTemp;
-        BrakeDecrementPatched = true;
-
-        //std::string instructionBytes = formatByteArray(origBrakeInstr, sizeof(origBrakeInstr) / sizeof(byte));
-        //logger.Write("BRAKE PRESSURE: Patch success, original : " + instructionBytes);
-        brakeAttempts = 0;
-
-        return true;
-    }
-
-    logger.Write(ERROR, "PATCH: Brake pressure Patch failed");
-    brakeAttempts++;
-
-    if (brakeAttempts > maxAttempts) {
-        logger.Write(ERROR, "PATCH: Brake pressure Patch attempt limit exceeded");
-        logger.Write(ERROR, "PATCH: Brake pressure Patching disabled");
-    }
-    return false;
+    return BrakePatcher.Patch();
 }
 
 bool RestoreBrakeDecrement() {
-    //logger.Write("BRAKE PRESSURE: Restoring instructions");
-
-    if (!BrakeDecrementPatched) {
-        //logger.Write("BRAKE PRESSURE: Already restored/intact");
-        return true;
-    }
-
-    if (brakeAddr) {
-        memcpy((void*)brakeAddr, brake.Data.data(), brake.Data.size());
-        brakeAddr = 0;
-        BrakeDecrementPatched = false;
-        //logger.Write("BRAKE PRESSURE: Restore success");
-        brakeAttempts = 0;
-        return true;
-    }
-
-    logger.Write(ERROR, "PATCH: Brake pressure restore failed");
-    return false;
+    return BrakePatcher.Restore();
 }
 
 bool PatchThrottleDecrement() {
@@ -523,27 +458,8 @@ void RevertShiftDownPatch(uintptr_t address) {
     }
 }
 
-uintptr_t ApplyShiftUpPatch() {
-    uintptr_t address;
-    if (shiftUpTemp != 0)
-        address = shiftUpTemp;
-    else
-        address = mem::FindPattern(shiftUp.Pattern, shiftUp.Mask);
-
-    if (address) {
-        memset(reinterpret_cast<void *>(address), 0x90, shiftUp.Data.size());
-    }
-    return address;
-}
-
-void RevertShiftUpPatch(uintptr_t address) {
-    if (address) {
-        memcpy(reinterpret_cast<void*>(address), shiftUp.Data.data(), shiftUp.Data.size());
-    }
-}
-
 uintptr_t ApplySteeringCorrectionPatch() {
-    // GTA V (b791.2 to b1011.1)
+    // GTA V (b791.2 to b1493.1)
     // F3 44 0F10 15 03319400
     // 45 84 ED				// test		r13l,r13l
     // 0F84 C8010000		// je		GTA5.exe+EXE53E
@@ -559,13 +475,9 @@ uintptr_t ApplySteeringCorrectionPatch() {
     // InfamousSabre
     // "\x0F\x84\x00\x00\x00\x00\x0F\x28\x4B\x70\xF3\x0F\x10\x25\x00\x00\x00\x00\xF3\x0F\x10\x1D\x00\x00\x00\x00" is what I scan for.
 
-    // FiveM (b505.2)
-    // F3 44 0F10 15 03319400
-    // 45 84 ED             
-    // 0F84 D0010000        // <- This one
-    // 0F28 4B 70           
-    // F3 0F10 25 92309400  
-    // F3 0F10 1D 6A309400  
+    // GTA V (b1604.0)
+    // ???
+
 
     uintptr_t address;
     if (steeringTemp != NULL) {
@@ -593,7 +505,6 @@ uintptr_t ApplySteeringCorrectionPatch() {
 }
 
 uintptr_t ApplySteerControlPatch() {
-    // b1032.2
     uintptr_t address;
     if (steerControlTemp != NULL) {
         address = steerControlTemp;
@@ -611,27 +522,7 @@ uintptr_t ApplySteerControlPatch() {
     return address;
 }
 
-uintptr_t ApplyBrakePatch() {
-    // b1032.2
-    uintptr_t address;
-    if (brakeTemp != NULL) {
-        address = brakeTemp;
-    }
-    else {
-        address = mem::FindPattern(brake.Pattern, brake.Mask);
-        if (address) address += brake.Offset;
-        logger.Write(DEBUG, "PATCH: Brake patch @ 0x%p", address);
-    }
-    
-    if (address) {
-        memcpy(brake.Data.data(), (void*)address, brake.Data.size());
-        memset(reinterpret_cast<void *>(address), 0x90, brake.Data.size());
-    }
-    return address;
-}
-
 uintptr_t ApplyThrottlePatch() {
-    // b1290
     uintptr_t address;
     if (throttleTemp != NULL) {
         address = throttleTemp;
