@@ -10,18 +10,6 @@
 #include "Patcher.h"
 
 namespace MemoryPatcher {
-// Clutch disengage @ Low Speed High Gear, low RPM
-uintptr_t ApplyClutchLowPatch();
-void RevertClutchLowPatch(uintptr_t address);
-
-// Disable "shifting down" wanted
-uintptr_t ApplyShiftDownPatch();
-void RevertShiftDownPatch(uintptr_t address);
-
-// Clutch disengage @ High speed rev limiting
-uintptr_t ApplyClutchRevLimitPatch();
-void RevertClutchRevLimitPatch(uintptr_t address);
-
 // Does the same as Custom Steering by InfamousSabre
 uintptr_t ApplySteeringCorrectionPatch();
 
@@ -37,15 +25,6 @@ int TotalPatched = 0;
 bool SteerCorrectPatched = false;
 bool SteerControlPatched = false;
 bool ThrottleDecrementPatched = false;
-
-uintptr_t clutchLowAddr = NULL;
-uintptr_t clutchLowTemp = NULL;
-
-uintptr_t clutchRevLimitAddr = NULL;
-uintptr_t clutchRevLimitTemp = NULL;
-
-uintptr_t shiftDownAddr = NULL;
-uintptr_t shiftDownTemp = NULL;
 
 uintptr_t steeringAddr = NULL;
 uintptr_t steeringTemp = NULL;
@@ -64,19 +43,31 @@ int throttleAttempts = 0;
 
 // When disabled, shift-up doesn't trigger.
 PatternInfo shiftUp;
-Patcher ShiftUpPatcher("Shift Up", shiftUp, true);
+Patcher ShiftUpPatcher("[Gears] Shift Up", shiftUp, true);
 
+// When disabled, shift-down doesn't trigger.
 PatternInfo shiftDown;
-PatternInfo throttle;
+Patcher ShiftDownPatcher("[Gears] Shift Down", shiftDown, true);
 
+// When disabled, clutch doesn't disengage on low RPMs
+// (in the RPM region where shift-down would've been triggered)
 PatternInfo clutchLow;
+Patcher ClutchLowRPMPatcher("[Gears] Clutch Low RPM", clutchLow, true);
+
+// When disabled, clutch doesn't disengage on redline 
+// (in the RPM region where shift-up would've been triggered)
 PatternInfo clutchRevLimit;
+Patcher ClutchRevLimPatcher("[Gears] Clutch Rev lim", clutchRevLimit, true);
+
 PatternInfo steeringCorrection;
 PatternInfo steeringControl;
 
+PatternInfo throttle;
+Patcher ThrottlePatcher("[Misc] Throttle", throttle);
+
 // When disabled, brake pressure doesn't decrease.
 PatternInfo brake;
-Patcher BrakePatcher("Brake", brake);
+Patcher BrakePatcher("[Misc] Brake", brake);
 
 void SetPatterns(int version) {
     // Valid for 877 to 1290
@@ -135,34 +126,16 @@ bool ApplyGearboxPatches() {
         return true;
     }
 
-    clutchLowTemp = ApplyClutchLowPatch();
-    if (clutchLowTemp) {
-        clutchLowAddr = clutchLowTemp;
+    if (ClutchLowRPMPatcher.Patch()) {
         TotalPatched++;
-        logger.Write(DEBUG, "PATCH: GEARBOX: Patched clutchLow @ 0x%p", clutchLowAddr);
-    }
-    else {
-        logger.Write(ERROR, "PATCH: GEARBOX: clutchLow patch failed");
     }
 
-    clutchRevLimitTemp = ApplyClutchRevLimitPatch();
-    if (clutchRevLimitTemp) {
-        clutchRevLimitAddr = clutchRevLimitTemp;
+    if (ClutchRevLimPatcher.Patch()) {
         TotalPatched++;
-        logger.Write(DEBUG, "PATCH: GEARBOX: Patched clutchRevLimit @ 0x%p", clutchRevLimitAddr);
-    }
-    else {
-        logger.Write(ERROR, "PATCH: GEARBOX: clutchRevLimit patch failed");
     }
 
-    shiftDownTemp = ApplyShiftDownPatch();
-    if (shiftDownTemp) {
-        shiftDownAddr = shiftDownTemp;
+    if (ShiftDownPatcher.Patch()) {
         TotalPatched++;
-        logger.Write(DEBUG, "PATCH: GEARBOX: Patched shiftDown  @ 0x%p", shiftDownAddr);
-    }
-    else {
-        logger.Write(ERROR, "PATCH: GEARBOX: shiftDown patch failed");
     }
 
     if (ShiftUpPatcher.Patch()) {
@@ -192,31 +165,16 @@ bool RevertGearboxPatches() {
         return true;
     }
 
-    if (clutchLowAddr) {
-        RevertClutchLowPatch(clutchLowAddr);
-        clutchLowAddr = 0;
+    if (ClutchLowRPMPatcher.Restore()) {
         TotalPatched--;
-    }
-    else {
-        logger.Write(DEBUG, "PATCH: GEARBOX: clutchLow not restored");
     }
 
-    if (clutchRevLimitAddr) {
-        RevertClutchRevLimitPatch(clutchRevLimitAddr);
-        clutchRevLimitAddr = 0;
+    if (ClutchRevLimPatcher.Restore()) {
         TotalPatched--;
-    }
-    else {
-        logger.Write(DEBUG, "PATCH: GEARBOX: clutchRevLimit not restored");
     }
 
-    if (shiftDownAddr) {
-        RevertShiftDownPatch(shiftDownAddr);
-        shiftDownAddr = 0;
+    if (ShiftDownPatcher.Restore()) {
         TotalPatched--;
-    }
-    else {
-        logger.Write(DEBUG, "PATCH: GEARBOX: shiftDown not restored");
     }
 
     if (ShiftUpPatcher.Restore()) {
@@ -398,64 +356,6 @@ bool RestoreThrottleDecrement() {
 
     logger.Write(ERROR, "PATCH: Throttle pressure restore failed");
     return false;
-}
-
-
-uintptr_t ApplyClutchLowPatch() {
-    uintptr_t address;
-    if (clutchLowTemp != NULL)
-        address = clutchLowTemp;
-    else
-        address = mem::FindPattern(clutchLow.Pattern, clutchLow.Mask);
-
-    if (address) {
-        memset(reinterpret_cast<void *>(address), 0x90, clutchLow.Data.size());
-    }
-    return address;
-}
-
-void RevertClutchLowPatch(uintptr_t address) {
-    if (address) {
-        memcpy(reinterpret_cast<void*>(address), clutchLow.Data.data(), clutchLow.Data.size());
-    }
-}
-
-uintptr_t ApplyClutchRevLimitPatch() {
-    uintptr_t address;
-    if (clutchRevLimitTemp != NULL)
-        address = clutchRevLimitTemp;
-    else
-        address = mem::FindPattern(clutchRevLimit.Pattern, clutchRevLimit.Mask);
-
-    if (address) {
-        memset(reinterpret_cast<void *>(address), 0x90, clutchRevLimit.Data.size());
-    }
-    return address;
-}
-
-void RevertClutchRevLimitPatch(uintptr_t address) {
-    if (address) {
-        memcpy(reinterpret_cast<void*>(address), clutchRevLimit.Data.data(), clutchRevLimit.Data.size());
-    }
-}
-
-uintptr_t ApplyShiftDownPatch() {
-    uintptr_t address;
-    if (shiftDownTemp != 0)
-        address = shiftDownTemp;
-    else
-        address = mem::FindPattern(shiftDown.Pattern, shiftDown.Mask);
-
-    if (address) {
-        memset(reinterpret_cast<void *>(address), 0x90, shiftDown.Data.size());
-    }
-    return address;
-}
-
-void RevertShiftDownPatch(uintptr_t address) {
-    if (address) {
-        memcpy(reinterpret_cast<void*>(address), shiftDown.Data.data(), shiftDown.Data.size());
-    }
 }
 
 uintptr_t ApplySteeringCorrectionPatch() {
