@@ -1,4 +1,5 @@
 #include "MemoryPatcher.hpp"
+#include <utility>
 
 #include "NativeMemory.hpp"
 #include "Versions.h"
@@ -28,19 +29,19 @@ void RevertClutchRevLimitPatch(uintptr_t address);
 // Kept for emergency/backup purposes in the case InfamousSabre
 // stops support earlier than I do. (not trying to compete here!)
 uintptr_t ApplySteeringCorrectionPatch();
-void RevertSteeringCorrectionPatch(uintptr_t address, uint8_t *origInstr, int origInstrSz);
+void RevertSteeringCorrectionPatch(uintptr_t address, uint8_t *origInstr, size_t origInstrSz);
 
 // Disable (normal) user input while wheel steering is active.
 uintptr_t ApplySteerControlPatch();
-void RevertSteerControlPatch(uintptr_t address, uint8_t *origInstr, int origInstrSz);
+void RevertSteerControlPatch(uintptr_t address, uint8_t *origInstr, size_t origInstrSz);
 
 // When disabled, brake pressure doesn't decrease.
 uintptr_t ApplyBrakePatch();
-void RevertBrakePatch(uintptr_t address, uint8_t *origInstr, int origInstrSz);
+void RevertBrakePatch(uintptr_t address, uint8_t *origInstr, size_t origInstrSz);
 
 // When disabled, throttle doesn't decrease.
 uintptr_t ApplyThrottlePatch();
-void RevertThrottlePatch(uintptr_t address, uint8_t *origInstr, int origInstrSz);
+void RevertThrottlePatch(uintptr_t address, uint8_t *origInstr, size_t origInstrSz);
 
 int NumGearboxPatches = 4;
 int TotalPatched = 0;
@@ -74,13 +75,6 @@ uintptr_t brakeTemp = NULL;
 uintptr_t throttleAddr = NULL;
 uintptr_t throttleTemp = NULL;
 
-uint8_t origSteerInstr[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-uint8_t origSteerInstrDest[4] = {0x00, 0x00, 0x00, 0x00};
-
-uint8_t origSteerControlInstr[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-uint8_t origBrakeInstr[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-uint8_t origThrottleInstr[7] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-
 const int maxAttempts = 4;
 int gearboxAttempts = 0;
 int steerAttempts = 0;
@@ -89,13 +83,14 @@ int brakeAttempts = 0;
 int throttleAttempts = 0;
 
 struct PatternInfo {
-    PatternInfo(){}
-    PatternInfo(char* pattern, char* mask, std::vector<uint8_t> data)
-        : Pattern(pattern), Mask(mask), Data(data) { }
-    PatternInfo(char* pattern, char* mask, std::vector<uint8_t> data, uint32_t offset)
-        : Pattern(pattern), Mask(mask), Data(data), Offset(offset) { }
-    char* Pattern;
-    char* Mask;
+    PatternInfo() : Pattern(nullptr), Mask(nullptr) {}
+
+    PatternInfo(const char* pattern, const char* mask, std::vector<uint8_t> data)
+        : Pattern(pattern), Mask(mask), Data(std::move(data)) { }
+    PatternInfo(const char* pattern, const char* mask, std::vector<uint8_t> data, uint32_t offset)
+        : Pattern(pattern), Mask(mask), Data(std::move(data)), Offset(offset) { }
+    const char* Pattern;
+    const char* Mask;
     std::vector<uint8_t> Data;
     uint32_t Offset = 0;
 };
@@ -105,17 +100,53 @@ PatternInfo shiftDown;
 PatternInfo brake;
 PatternInfo throttle;
 
+PatternInfo clutchLow;
+PatternInfo clutchRevLimit;
+PatternInfo steeringCorrection;
+PatternInfo steeringControl;
+
 void SetPatterns(int version) {
-    // Valid for >= G_VER_1_0_877_1_STEAM, but only worry about pre-877 if I get reports
-    shiftUp = PatternInfo("\x66\x89\x13\xB8\x05\x00\x00\x00", "xxxxxxxx", { 0x66, 0x89, 0x13 });
-    shiftDown = PatternInfo("\x66\x89\x13\x89\x73\x5C", "xxxxxx", { 0x66, 0x89, 0x13 });
-    brake = PatternInfo("\xEB\x05\xF3\x0F\x10\x40\x78\xF3\x0F\x59\xC4\xF3", "xxxxxx?xxxxx", { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, 11);
-    throttle = PatternInfo("\x0F\x28\xC3\x44\x89\x89\xC4\x01\x00\x00\x89\x81\xD0\x01\x00\x00", "xx?xxx??xxxx??xx", { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, 3);
+    // Valid for 877 to 1290
+    shiftUp = PatternInfo("\x66\x89\x13\xB8\x05\x00\x00\x00", "xxxxxxxx", 
+        { 0x66, 0x89, 0x13 });
+    shiftDown = PatternInfo("\x66\x89\x13\x89\x73\x5C", "xxxxxx", 
+        { 0x66, 0x89, 0x13 });
+    brake = PatternInfo("\xEB\x05\xF3\x0F\x10\x40\x78\xF3\x0F\x59\xC4\xF3", "xxxxxx?xxxxx", 
+        { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, 11);
+    throttle = PatternInfo("\x0F\x28\xC3\x44\x89\x89\xC4\x01\x00\x00\x89\x81\xD0\x01\x00\x00", "xx?xxx??xxxx??xx", 
+        { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, 3);
+
+    // Valid for 877 to 1493
+    clutchLow = PatternInfo("\xC7\x43\x40\xCD\xCC\xCC\x3D\x66\x44\x89\x43\x04", "xxxxxxxxxxxx", 
+        { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D });
+    clutchRevLimit = PatternInfo("\xC7\x43\x40\xCD\xCC\xCC\x3D\x44\x89\x7B\x60", "xxxxxxxxx?x", 
+        { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D });
+    steeringCorrection = PatternInfo("\x0F\x84\xD0\x01\x00\x00" "\x0F\x28\x4B\x70" "\xF3\x0F\x10\x25\x00\x00\x00\x00" "\xF3\x0F\x10\x1D\x00\x00\x00\x00" "\x0F\x28\xC1" "\x0F\x28\xD1",
+        "xx????" "xxx?" "xxx?????" "xxx?????" "xx?" "xx?", 
+        { 0xE9, 0x00, 0x00, 0x00, 0x00, 0x90 });
+    steeringControl = PatternInfo("\xF3\x0F\x11\x8B\xFC\x08\x00\x00" "\xF3\x0F\x10\x83\x00\x09\x00\x00" "\xF3\x0F\x58\x83\xFC\x08\x00\x00" "\x41\x0F\x2F\xC3",
+        "xxxx??xx" "xxxx??xx" "xxxx??xx" "xxxx", 
+        { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
+
     if (version >= G_VER_1_0_1365_1_STEAM) {
-        shiftUp = PatternInfo("\x66\x89\x0B\x8D\x46\x04\x66\x89\x43\04", "xx?xx?xxx?", { 0x66, 0x89, 0x0B });
-        shiftDown = PatternInfo("\x66\x89\x13\x44\x89\x73\x5c", "xxxxxxx", { 0x66, 0x89, 0x13 });
-        brake = PatternInfo("\xEB\x05\xF3\x0F\x10\x40\x78\xF3\x41\x0F\x59\xC0\xF3", "xxxxx??x?x?xx", { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, 12);
-        throttle = PatternInfo("\x83\xA1\x00\x00\x00\x00\x00\x0F\x28\xC3\x89", "xx?????xxxx", { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+        shiftUp = PatternInfo("\x66\x89\x0B\x8D\x46\x04\x66\x89\x43\04", "xx?xx?xxx?", 
+            { 0x66, 0x89, 0x0B });
+        shiftDown = PatternInfo("\x66\x89\x13\x44\x89\x73\x5c", "xxxxxxx", 
+            { 0x66, 0x89, 0x13 });
+        brake = PatternInfo("\xEB\x05\xF3\x0F\x10\x40\x78\xF3\x41\x0F\x59\xC0\xF3", "xxxxx??x?x?xx", 
+            { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, 12);
+        throttle = PatternInfo("\x83\xA1\x00\x00\x00\x00\x00\x0F\x28\xC3\x89", "xx?????xxxx", 
+            { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 });
+    }
+    if (version >= G_VER_1_0_1604_0_STEAM) {
+        //shiftUp
+        //shiftDown
+        //brake
+        //throttle
+        //clutchLow
+        //clutchRevLimit
+        //steeringCorrection
+        //steeringControl
     }
 }
 
@@ -257,7 +288,7 @@ bool PatchSteeringCorrection() {
         steeringAddr = steeringTemp;
         SteerCorrectPatched = true;
 
-        std::string instructionBytes = ByteArrayToString(origSteerInstr, sizeof(origSteerInstr) / sizeof(uint8_t));
+        std::string instructionBytes = ByteArrayToString(steeringCorrection.Data.data(), steeringCorrection.Data.size());
 
         logger.Write(DEBUG, "PATCH: STEERING: Steering Correction @ 0x%p", steeringAddr);
         logger.Write(DEBUG, "PATCH: STEERING: Patch success, original: " + instructionBytes);
@@ -284,7 +315,7 @@ bool RestoreSteeringCorrection() {
     }
 
     if (steeringAddr) {
-        RevertSteeringCorrectionPatch(steeringAddr, origSteerInstr, sizeof(origSteerInstr) / sizeof(uint8_t));
+        memcpy((void*)steeringAddr, steeringCorrection.Data.data(), steeringCorrection.Data.size());
         steeringAddr = 0;
         SteerCorrectPatched = false;
         logger.Write(DEBUG, "PATCH: STEERING: Restore success");
@@ -314,7 +345,7 @@ bool PatchSteeringControl() {
         steerControlAddr = steerControlTemp;
         SteerControlPatched = true;
 
-        std::string instructionBytes = ByteArrayToString(origSteerControlInstr, sizeof(origSteerControlInstr) / sizeof(uint8_t));
+        std::string instructionBytes = ByteArrayToString(steeringControl.Data.data(), steeringControl.Data.size());
         
         logger.Write(DEBUG, "PATCH: STEERING CONTROL: Steering Control @ 0x%p", steerControlAddr);
         logger.Write(DEBUG, "PATCH: STEERING CONTROL: Patch success, original : " + instructionBytes);
@@ -343,7 +374,7 @@ bool RestoreSteeringControl() {
 
     if (steerControlAddr) {
         //byte origInstr[8] = { 0xF3, 0x0F, 0x11, 0x8B, 0xFC, 0x08, 0x00, 0x00 };
-        RevertSteerControlPatch(steerControlAddr, origSteerControlInstr, sizeof(origSteerControlInstr) / sizeof(uint8_t));
+        memcpy((void*)steerControlAddr, steeringControl.Data.data(), steeringControl.Data.size());
         steerControlAddr = 0;
         SteerControlPatched = false;
         logger.Write(DEBUG, "PATCH: STEERING CONTROL: Restore success");
@@ -396,7 +427,7 @@ bool RestoreBrakeDecrement() {
     }
 
     if (brakeAddr) {
-        RevertBrakePatch(brakeAddr, origBrakeInstr, sizeof(origBrakeInstr) / sizeof(uint8_t));
+        memcpy((void*)brakeAddr, brake.Data.data(), brake.Data.size());
         brakeAddr = 0;
         BrakeDecrementPatched = false;
         //logger.Write("BRAKE PRESSURE: Restore success");
@@ -442,7 +473,7 @@ bool RestoreThrottleDecrement() {
     }
 
     if (throttleAddr) {
-        RevertThrottlePatch(throttleAddr, origThrottleInstr, sizeof(origThrottleInstr) / sizeof(uint8_t));
+        memcpy((void*)throttleAddr, throttle.Data.data(), throttle.Data.size());
         throttleAddr = 0;
         ThrottleDecrementPatched = false;
         throttleAttempts = 0;
@@ -455,52 +486,40 @@ bool RestoreThrottleDecrement() {
 
 
 uintptr_t ApplyClutchLowPatch() {
-    // Tested on build 350 and build 617
-    // We're only interested in the first 7 bytes but we need the correct one
-    // C7 43 40 CD CC CC 3D is what we're looking for, the second occurrence, at 
-    // 7FF6555FE34A or GTA5.exe+ECE34A in build 617.
-
     uintptr_t address;
     if (clutchLowTemp != NULL)
         address = clutchLowTemp;
     else
-        address = mem::FindPattern("\xC7\x43\x40\xCD\xCC\xCC\x3D\x66\x44\x89\x43\x04", "xxxxxxxxxxxx");
+        address = mem::FindPattern(clutchLow.Pattern, clutchLow.Mask);
 
     if (address) {
-        memset(reinterpret_cast<void *>(address), 0x90, 7);
+        memset(reinterpret_cast<void *>(address), 0x90, clutchLow.Data.size());
     }
     return address;
 }
 
 void RevertClutchLowPatch(uintptr_t address) {
-    uint8_t instrArr[7] = {0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D};
     if (address) {
-        memcpy(reinterpret_cast<void*>(address), instrArr, 7);
+        memcpy(reinterpret_cast<void*>(address), clutchLow.Data.data(), clutchLow.Data.size());
     }
 }
 
 uintptr_t ApplyClutchRevLimitPatch() {
-    // Tested on build 1103
-
     uintptr_t address;
     if (clutchRevLimitTemp != NULL)
         address = clutchRevLimitTemp;
     else
-        address = mem::FindPattern("\xC7\x43\x40\xCD\xCC\xCC\x3D"
-                                   "\x44\x89\x7B\x60",
-                                   "xxxxxxx"
-                                   "xx?x");
+        address = mem::FindPattern(clutchRevLimit.Pattern, clutchRevLimit.Mask);
 
     if (address) {
-        memset(reinterpret_cast<void *>(address), 0x90, 7);
+        memset(reinterpret_cast<void *>(address), 0x90, clutchRevLimit.Data.size());
     }
     return address;
 }
 
 void RevertClutchRevLimitPatch(uintptr_t address) {
-    uint8_t instrArr[7] = {0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D};
     if (address) {
-        memcpy(reinterpret_cast<void*>(address), instrArr, 7);
+        memcpy(reinterpret_cast<void*>(address), clutchRevLimit.Data.data(), clutchRevLimit.Data.size());
     }
 }
 
@@ -572,27 +591,16 @@ uintptr_t ApplySteeringCorrectionPatch() {
         address = steeringTemp;
     }
     else {
-        address = mem::FindPattern(
-            "\x0F\x84\xD0\x01\x00\x00" // <- This one
-            "\x0F\x28\x4B\x70"
-            "\xF3\x0F\x10\x25\x00\x00\x00\x00"
-            "\xF3\x0F\x10\x1D\x00\x00\x00\x00"
-            "\x0F\x28\xC1"
-            "\x0F\x28\xD1",
-            "xx????" // <- This one
-            "xxx?"
-            "xxx?????"
-            "xxx?????"
-            "xx?"
-            "xx?");
+        address = mem::FindPattern(steeringCorrection.Pattern, steeringCorrection.Mask);
         logger.Write(DEBUG, "PATCH: Steering correction patch @ 0x%p", address);
     }
 
     if (address) {
         uint8_t instrArr[6] =
             {0xE9, 0x00, 0x00, 0x00, 0x00, 0x90};               // make preliminary instruction: JMP to <adrr>
+        uint8_t origSteerInstrDest[4] = {0x00, 0x00, 0x00, 0x00};
 
-        memcpy(origSteerInstr, (void*)address, 6);              // save whole orig instruction
+        memcpy(steeringCorrection.Data.data(), (void*)address, 6); // save whole orig instruction
         memcpy(origSteerInstrDest, (void*)(address + 2), 4);    // save the address it writes to
         origSteerInstrDest[0] += 1;                             // Increment first byte by 1
         memcpy(instrArr + 1, origSteerInstrDest, 4);            // use saved address in new instruction
@@ -603,12 +611,6 @@ uintptr_t ApplySteeringCorrectionPatch() {
     return 0;
 }
 
-void RevertSteeringCorrectionPatch(uintptr_t address, uint8_t *origInstr, int origInstrSz) {
-    if (address) {
-        memcpy((void*)address, origInstr, origInstrSz);
-    }
-}
-
 uintptr_t ApplySteerControlPatch() {
     // b1032.2
     uintptr_t address;
@@ -616,29 +618,16 @@ uintptr_t ApplySteerControlPatch() {
         address = steerControlTemp;
     }
     else {
-        address = mem::FindPattern("\xF3\x0F\x11\x8B\xFC\x08\x00\x00"
-            "\xF3\x0F\x10\x83\x00\x09\x00\x00"
-            "\xF3\x0F\x58\x83\xFC\x08\x00\x00"
-            "\x41\x0F\x2F\xC3",
-            "xxxx??xx"
-            "xxxx??xx"
-            "xxxx??xx"
-            "xxxx");
+        address = mem::FindPattern(steeringControl.Pattern, steeringControl.Mask);
         logger.Write(DEBUG, "PATCH: Steer control patch @ 0x%p", address);
     }
 
 
     if (address) {
-        memcpy(origSteerControlInstr, (void*)address, 8);
+        memcpy(steeringControl.Data.data(), (void*)address, 8);
         memset(reinterpret_cast<void *>(address), 0x90, 8);
     }
     return address;
-}
-
-void RevertSteerControlPatch(uintptr_t address, uint8_t *origInstr, int origInstrSz) {
-    if (address) {
-        memcpy((void*)address, origInstr, origInstrSz);
-    }
 }
 
 uintptr_t ApplyBrakePatch() {
@@ -654,16 +643,10 @@ uintptr_t ApplyBrakePatch() {
     }
     
     if (address) {
-        memcpy(origBrakeInstr, (void*)address, brake.Data.size());
+        memcpy(brake.Data.data(), (void*)address, brake.Data.size());
         memset(reinterpret_cast<void *>(address), 0x90, brake.Data.size());
     }
     return address;
-}
-
-void RevertBrakePatch(uintptr_t address, uint8_t *origInstr, int origInstrSz) {
-    if (address) {
-        memcpy((void*)address, origInstr, origInstrSz);
-    }
 }
 
 uintptr_t ApplyThrottlePatch() {
@@ -679,16 +662,10 @@ uintptr_t ApplyThrottlePatch() {
     }
 
     if (address) {
-        memcpy(origThrottleInstr, (void*)address, throttle.Data.size());
+        memcpy(throttle.Data.data(), (void*)address, throttle.Data.size());
         memset(reinterpret_cast<void *>(address), 0x90, throttle.Data.size());
     }
     return address;
-}
-
-void RevertThrottlePatch(uintptr_t address, uint8_t *origInstr, int origInstrSz) {
-    if (address) {
-        memcpy((void*)address, origInstr, origInstrSz);
-    }
 }
 
 }
