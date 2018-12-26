@@ -6,18 +6,18 @@
 #include "../Util/Logger.hpp"
 #include "../Util/Util.hpp"
 
+#include "PatternInfo.h"
+
 namespace MemoryPatcher {
 // Clutch disengage @ Low Speed High Gear, low RPM
 uintptr_t ApplyClutchLowPatch();
 void RevertClutchLowPatch(uintptr_t address);
 
-// Individually: Disable "shifting down" wanted
-// 7A0 is NextGear, or what it appears like in my mod.
+// Disable "shifting down" wanted
 uintptr_t ApplyShiftDownPatch();
 void RevertShiftDownPatch(uintptr_t address);
 
-// Only do this for bikes for now
-// We need to limit speed ourselves in the loop
+// Disable "shifting up" wanted
 uintptr_t ApplyShiftUpPatch();
 void RevertShiftUpPatch(uintptr_t address);
 
@@ -26,22 +26,16 @@ uintptr_t ApplyClutchRevLimitPatch();
 void RevertClutchRevLimitPatch(uintptr_t address);
 
 // Does the same as Custom Steering by InfamousSabre
-// Kept for emergency/backup purposes in the case InfamousSabre
-// stops support earlier than I do. (not trying to compete here!)
 uintptr_t ApplySteeringCorrectionPatch();
-void RevertSteeringCorrectionPatch(uintptr_t address, uint8_t *origInstr, size_t origInstrSz);
 
 // Disable (normal) user input while wheel steering is active.
 uintptr_t ApplySteerControlPatch();
-void RevertSteerControlPatch(uintptr_t address, uint8_t *origInstr, size_t origInstrSz);
 
 // When disabled, brake pressure doesn't decrease.
 uintptr_t ApplyBrakePatch();
-void RevertBrakePatch(uintptr_t address, uint8_t *origInstr, size_t origInstrSz);
 
 // When disabled, throttle doesn't decrease.
 uintptr_t ApplyThrottlePatch();
-void RevertThrottlePatch(uintptr_t address, uint8_t *origInstr, size_t origInstrSz);
 
 int NumGearboxPatches = 4;
 int TotalPatched = 0;
@@ -81,19 +75,6 @@ int steerAttempts = 0;
 int steerControlAttempts = 0;
 int brakeAttempts = 0;
 int throttleAttempts = 0;
-
-struct PatternInfo {
-    PatternInfo() : Pattern(nullptr), Mask(nullptr) {}
-
-    PatternInfo(const char* pattern, const char* mask, std::vector<uint8_t> data)
-        : Pattern(pattern), Mask(mask), Data(std::move(data)) { }
-    PatternInfo(const char* pattern, const char* mask, std::vector<uint8_t> data, uint32_t offset)
-        : Pattern(pattern), Mask(mask), Data(std::move(data)), Offset(offset) { }
-    const char* Pattern;
-    const char* Mask;
-    std::vector<uint8_t> Data;
-    uint32_t Offset = 0;
-};
 
 PatternInfo shiftUp;
 PatternInfo shiftDown;
