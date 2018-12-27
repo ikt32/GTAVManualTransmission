@@ -25,6 +25,8 @@ std::string settingsGeneralFile = Paths::GetRunningExecutableFolder() + "\\setti
 std::string settingsWheelFile = Paths::GetRunningExecutableFolder() + "\\settings_wheel.ini";
 ScriptSettings settings;
 
+uint8_t g_numGears = 9;
+
 // acceptedKeys, gameButton, confTag
 std::vector<std::tuple<char, std::string, std::string>> buttonInfos = {
 	std::make_tuple('=', "shift up",          "SHIFT_UP"),
@@ -564,7 +566,7 @@ void configHShift(char c) {
 
 	int buttonsActive = 0;
 	GUID devGUID = {};
-	std::array<int, NUM_GEARS> buttonArray; // There are gears 1-7 + R
+    std::vector<int> buttonArray(g_numGears);
 	std::fill(buttonArray.begin(), buttonArray.end(), -1);
 	std::string devName;
 	std::wstring wDevName;
@@ -580,8 +582,8 @@ void configHShift(char c) {
 				return;
 			}
 			if (c == TAB) {
-				int empty[NUM_GEARS] = {};
-				settings.SteeringSaveHShifter(confTag, -1, empty);
+                std::vector<int> empty(g_numGears);
+                settings.SteeringSaveHShifter(confTag, -1, empty);
 				cls();
 				setCursorPosition(0, csbi.srWindow.Bottom);
 				printf("Cleared H-shifter settings");
@@ -607,7 +609,7 @@ void configHShift(char c) {
 				}
 				continue;
 			}
-			if (progress >= 1 && progress <= NUM_GEARS) { // Gear config (8 is for reverse)
+			if (progress >= 1 && progress <= g_numGears) { // Gear config (8 is for reverse)
 				// Gear reverse goes in [0] btw way
 				if (c == 0x0D) { // RETURN
 					if (buttonsActive > 1) {
@@ -699,7 +701,7 @@ void configHShift(char c) {
 			break;
 			default: { // save all the shit
 				auto index = settings.SteeringAppendDevice(devGUID, devName);
-				settings.SteeringSaveHShifter(confTag, index, buttonArray.data());
+				settings.SteeringSaveHShifter(confTag, index, buttonArray);
 				cls();
 				setCursorPosition(0, csbi.srWindow.Bottom);
 				printf("Saved changes");

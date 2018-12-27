@@ -10,6 +10,8 @@
 #include "../Util/MathExt.h"
 #include "../Util/Logger.hpp"
 
+extern uint8_t g_numGears;
+
 eGameVersion g_gameVersion = getGameVersion();
 
 int findOffset(const std::map<int, int, std::greater<int>> &offsets) {
@@ -242,8 +244,8 @@ unsigned char VehicleExtensions::GetTopGear(Vehicle handle) {
 
 std::vector<float> VehicleExtensions::GetGearRatios(Vehicle handle) {
     auto address = GetAddress(handle);
-    std::vector<float> ratios(8);
-    for (int gearOffset = 0; gearOffset <= 7; gearOffset++) {
+    std::vector<float> ratios(g_numGears);
+    for (int gearOffset = 0; gearOffset < g_numGears; gearOffset++) {
         ratios[gearOffset] = *reinterpret_cast<float *>(address + gearRatiosOffset + gearOffset * sizeof(float));
     }
     return ratios;

@@ -31,6 +31,9 @@
 #include "Util/MiscEnums.h"
 #include "Util/StringFormat.h"
 
+// <= b1493: 8, >= b1604: 9
+uint8_t g_numGears = 8;
+
 const std::string mtPrefix = "~b~Manual Transmission~w~~n~";
 
 const char* decorCurrentGear = "mt_gear";
@@ -73,7 +76,7 @@ VehicleInfo vehInfo;
 EngineValues engVal;
 VehicleDerivatives vehDerivs;
 VehicleMiscStates miscStates;
-VehicleGearboxStates gearStates;
+VehicleGearboxStates gearStates(g_numGears);
 WheelPatchStates wheelPatchStates;
 
 VehicleExtensions ext;
@@ -192,7 +195,7 @@ void update_vehicle() {
         engVal = EngineValues();
         vehDerivs = VehicleDerivatives();
         miscStates = VehicleMiscStates();
-        gearStates = VehicleGearboxStates();
+        gearStates = VehicleGearboxStates(g_numGears);
         wheelPatchStates = WheelPatchStates();
         gearRattle.Stop();
     }
@@ -722,7 +725,7 @@ void functionHShiftTo(int i) {
 }
 
 void functionHShiftKeyboard() {
-    int clamp = MAX_GEAR;
+    int clamp = g_numGears - 1;
     if (ext.GetTopGear(vehicle) <= clamp) {
         clamp = ext.GetTopGear(vehicle);
     }
@@ -737,7 +740,7 @@ void functionHShiftKeyboard() {
 }
 
 void functionHShiftWheel() {
-    int clamp = MAX_GEAR;
+    int clamp = g_numGears - 1;
     if (ext.GetTopGear(vehicle) <= clamp) {
         clamp = ext.GetTopGear(vehicle);
     }
@@ -754,6 +757,7 @@ void functionHShiftWheel() {
         carControls.ButtonReleased(CarControls::WheelControlType::H5) ||
         carControls.ButtonReleased(CarControls::WheelControlType::H6) ||
         carControls.ButtonReleased(CarControls::WheelControlType::H7) ||
+        carControls.ButtonReleased(CarControls::WheelControlType::H8) ||
         carControls.ButtonReleased(CarControls::WheelControlType::HR)) {
         if (settings.ClutchShiftingH &&
             settings.EngDamage && vehInfo.HasClutch) {

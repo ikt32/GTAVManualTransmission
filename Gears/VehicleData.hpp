@@ -109,6 +109,11 @@ struct VehicleMiscStates {
 };
 
 struct VehicleGearboxStates {
+    VehicleGearboxStates(uint8_t numGears) {
+        UpshiftSpeedsGame.resize(numGears);
+        UpshiftSpeedsMod.resize(numGears);
+    }
+
     // Gearbox stuff
     float StallProgress = 0.0f;
     uint8_t LockGear = 1;
@@ -117,8 +122,8 @@ struct VehicleGearboxStates {
     bool HitRPMSpeedLimiter = false; // Limit speed at top RPM
     bool HitRPMLimiter = false; // Limit RPM so it doesn't >1.0f
 
-    std::array<float, NUM_GEARS> UpshiftSpeedsGame = {};
-    std::array<float, NUM_GEARS> UpshiftSpeedsMod = {};
+    std::vector<float> UpshiftSpeedsGame;
+    std::vector<float> UpshiftSpeedsMod;
 
     // Auto gearbox stuff need to find a better solution/workaround
     DWORD PrevUpshiftTime = 0;

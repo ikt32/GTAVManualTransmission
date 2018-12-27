@@ -6,6 +6,7 @@
 #include "Util/Logger.hpp"
 #include "Input/keyboard.h"
 #include "Input/CarControls.hpp"
+#include "Util/StringFormat.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4244)
@@ -381,6 +382,7 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H5)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H5", "NUM5"));
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H6)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H6", "NUM6"));
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H7", "NUM7"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H8", "NUM8"));
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HN)] = str2key(settingsGeneral.GetValue("KEYBOARD", "HN", "NUM9"));
 
 
@@ -549,8 +551,10 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H5)] =
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H6)] =
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H7)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H8)] =
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::HR)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("SHIFTER", "DEVICE", -1), RegisteredGUIDs);
+
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H1)] =
         settingsWheel.GetLongValue("SHIFTER", "GEAR_1", -1);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H2)] =
@@ -565,6 +569,8 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
         settingsWheel.GetLongValue("SHIFTER", "GEAR_6", -1);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H7)] =
         settingsWheel.GetLongValue("SHIFTER", "GEAR_7", -1);
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H8)] =
+        settingsWheel.GetLongValue("SHIFTER", "GEAR_8", -1);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::HR)] =
         settingsWheel.GetLongValue("SHIFTER", "GEAR_R", -1);
 
@@ -761,19 +767,17 @@ void ScriptSettings::SteeringSaveButton(const std::string & confTag, ptrdiff_t i
         logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
 }
 
-void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t index, int *button) {
+void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t index, const std::vector<int>& button) {
     CSimpleIniA settingsWheel;
     settingsWheel.SetUnicode();
     settingsWheel.LoadFile(settingsWheelFile.c_str());
     settingsWheel.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
+
     settingsWheel.SetLongValue(confTag.c_str(), "GEAR_R", button[0]);
-    settingsWheel.SetLongValue(confTag.c_str(), "GEAR_1", button[1]);
-    settingsWheel.SetLongValue(confTag.c_str(), "GEAR_2", button[2]);
-    settingsWheel.SetLongValue(confTag.c_str(), "GEAR_3", button[3]);
-    settingsWheel.SetLongValue(confTag.c_str(), "GEAR_4", button[4]);
-    settingsWheel.SetLongValue(confTag.c_str(), "GEAR_5", button[5]);
-    settingsWheel.SetLongValue(confTag.c_str(), "GEAR_6", button[6]);
-    settingsWheel.SetLongValue(confTag.c_str(), "GEAR_7", button[7]);
+    for (uint8_t i = 1; i < button.size(); ++i) {
+        settingsWheel.SetLongValue(confTag.c_str(), fmt("GEAR_%d", i).c_str(), button[i]);
+    }
+
     int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
     if (err < 0)
         logger.Write(ERROR, "Unable to save to " + settingsWheelFile);

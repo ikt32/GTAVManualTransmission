@@ -48,6 +48,7 @@ public:
         H5,
         H6,
         H7,
+        H8,
         HN,
         ShiftUp,
         ShiftDown,
@@ -69,6 +70,7 @@ public:
         H5,
         H6,
         H7,
+        H8,
         HN,
         ShiftUp,
         ShiftDown,
@@ -268,6 +270,7 @@ public:
         if (confTag == "H5") return KBControl[static_cast<int>(KeyboardControlType::H5)];
         if (confTag == "H6") return KBControl[static_cast<int>(KeyboardControlType::H6)];
         if (confTag == "H7") return KBControl[static_cast<int>(KeyboardControlType::H7)];
+        if (confTag == "H8") return KBControl[static_cast<int>(KeyboardControlType::H8)];
         if (confTag == "HN") return KBControl[static_cast<int>(KeyboardControlType::HN)];
 
         return -1;

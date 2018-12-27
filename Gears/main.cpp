@@ -143,6 +143,10 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             else {                
                 MemoryPatcher::SetPatterns(scriptingVersion);
             }
+
+            if (actualVersion >= G_VER_1_0_1604_0_STEAM) {
+                g_numGears = 9;
+            }
             
             scriptRegister(hInstance, ScriptMain);
             scriptRegisterAdditionalThread(hInstance, NPCMain);

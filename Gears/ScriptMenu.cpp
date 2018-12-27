@@ -94,6 +94,7 @@ const std::vector<STagInfo> keyboardConfTags = {
     { "H5"       , "H-pattern gear 5 press" },
     { "H6"       , "H-pattern gear 6 press" },
     { "H7"       , "H-pattern gear 7 press" },
+    { "H8"       , "H-pattern gear 8 press" },
     { "HN"       , "H-pattern Neutral"      },
 };
 
@@ -540,6 +541,7 @@ void update_wheelmenu() {
     if (carControls.ButtonIn(CarControls::WheelControlType::H5)) hpatInfo.emplace_back("Gear 5");
     if (carControls.ButtonIn(CarControls::WheelControlType::H6)) hpatInfo.emplace_back("Gear 6");
     if (carControls.ButtonIn(CarControls::WheelControlType::H7)) hpatInfo.emplace_back("Gear 7");
+    if (carControls.ButtonIn(CarControls::WheelControlType::H8)) hpatInfo.emplace_back("Gear 8");
 
     if (menu.OptionPlus("H-pattern shifter setup", hpatInfo, nullptr, std::bind(clearHShifter), nullptr, "Input values",
         { "Select this option to start H-pattern shifter setup. Follow the on-screen instructions." })) {
@@ -806,6 +808,7 @@ void update_buttonsmenu() {
     if (carControls.ButtonIn(CarControls::WheelControlType::H5)) buttonInfo.push_back("Gear 5");
     if (carControls.ButtonIn(CarControls::WheelControlType::H6)) buttonInfo.push_back("Gear 6");
     if (carControls.ButtonIn(CarControls::WheelControlType::H7)) buttonInfo.push_back("Gear 7");
+    if (carControls.ButtonIn(CarControls::WheelControlType::H8)) buttonInfo.push_back("Gear 8");
     if (carControls.ButtonIn(CarControls::WheelControlType::AR)) buttonInfo.push_back("Auto R");
     if (carControls.ButtonIn(CarControls::WheelControlType::AD)) buttonInfo.push_back("Auto 1");
     if (carControls.ButtonIn(CarControls::WheelControlType::ShiftUp))   buttonInfo.push_back("ShiftUp");
@@ -1097,12 +1100,12 @@ void addWheelToKey(const std::string &confTag, GUID devGUID, int button, const s
     settings.Read(&carControls);
 }
 
-void saveHShifter(const std::string &confTag, GUID devGUID, std::array<int, NUM_GEARS> buttonArray) {
+void saveHShifter(const std::string &confTag, GUID devGUID, const std::vector<int>& buttonArray) {
     saveChanges();
     std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     std::string devName = std::string(wDevName.begin(), wDevName.end());
     auto index = settings.SteeringAppendDevice(devGUID, devName);
-    settings.SteeringSaveHShifter(confTag, index, buttonArray.data());
+    settings.SteeringSaveHShifter(confTag, index, buttonArray);
     settings.Read(&carControls);
 }
 
@@ -1148,10 +1151,9 @@ void clearButton(const std::string& confTag) {
 
 void clearHShifter() {
     saveChanges();
-    int empty[NUM_GEARS] = {};
-    for (int& i : empty) {
-        i = -1;
-    }
+    std::vector<int> empty(g_numGears);
+    std::fill(empty.begin(), empty.end(), -1);
+
     settings.SteeringSaveHShifter("SHIFTER", -1, empty);
     settings.Read(&carControls);
     showNotification("Cleared H-pattern shifter", &prevNotification);
@@ -1407,8 +1409,8 @@ bool configHPattern() {
     std::string additionalInfo = "Press " + escapeKey + " to exit. Press " + skipKey + " to skip gear.";
 
     GUID devGUID = {};
-    std::array<int, NUM_GEARS> buttonArray{}; // There are gears 1-7 + R
-    fill(buttonArray.begin(), buttonArray.end(), -1);
+    std::vector<int> buttonArray(g_numGears);
+    std::fill(buttonArray.begin(), buttonArray.end(), -1);
 
     int progress = 0;
 
@@ -1440,7 +1442,7 @@ bool configHPattern() {
             }
         }
 
-        if (progress > NUM_GEARS - 1) {
+        if (progress > g_numGears - 1) {
             break;
         }
         std::string gearDisplay;
