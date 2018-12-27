@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.6.5
+* Update for v1.0.1604.0 (Arena War)
+* Add support for 8th gear (added in Arena War)
+* Other bug fixes and general improvements
+
 ## 4.6.4
 * Improve soft lock transition
 * Improve version detection
