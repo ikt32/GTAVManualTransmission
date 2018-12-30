@@ -145,7 +145,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             }
 
             if (actualVersion >= G_VER_1_0_1604_0_STEAM) {
-                g_numGears = 9;
+                g_numGears = 11;
             }
             
             scriptRegister(hInstance, ScriptMain);
