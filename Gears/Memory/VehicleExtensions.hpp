@@ -35,15 +35,23 @@ public:
     uint16_t GetGearCurr(Vehicle handle);
     void SetGearCurr(Vehicle handle, uint16_t value);
 
-    unsigned char GetTopGear(Vehicle handle);
-    // SetTopGear not logical
-    
+    uint8_t GetTopGear(Vehicle handle);
+    void SetTopGear(Vehicle handle, uint8_t value);
+
     // Divide GetDriveMaxFlatVel by the values in this thing to get the top
     // speed for the gear.
+    float* GetGearRatioPtr(Vehicle handle, uint8_t gear);
     std::vector<float> GetGearRatios(Vehicle handle);
+    void SetGearRatios(Vehicle handle, const std::vector<float>& values);
+
     float GetDriveForce(Vehicle handle);
+    void SetDriveForce(Vehicle handle, float value);
+
     float GetInitialDriveMaxFlatVel(Vehicle handle);
+    void SetInitialDriveMaxFlatVel(Vehicle handle, float value);
+
     float GetDriveMaxFlatVel(Vehicle handle);
+    void SetDriveMaxFlatVel(Vehicle handle, float value);
 
     float GetCurrentRPM(Vehicle handle);
     void SetCurrentRPM(Vehicle handle, float value);

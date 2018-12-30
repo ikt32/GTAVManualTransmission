@@ -237,18 +237,38 @@ void VehicleExtensions::SetGearCurr(Vehicle handle, uint16_t value) {
     *reinterpret_cast<uint16_t *>(GetAddress(handle) + currentGearOffset) = value;
 }
 
-unsigned char VehicleExtensions::GetTopGear(Vehicle handle) {
+uint8_t VehicleExtensions::GetTopGear(Vehicle handle) {
     if (topGearOffset == 0) return 0;
-    return *reinterpret_cast<const unsigned char *>(GetAddress(handle) + topGearOffset);
+    return *reinterpret_cast<uint8_t *>(GetAddress(handle) + topGearOffset);
+}
+
+void VehicleExtensions::SetTopGear(Vehicle handle, uint8_t value) {
+    if (topGearOffset == 0) return;
+    *reinterpret_cast<uint8_t *>(GetAddress(handle) + topGearOffset) = value;
+}
+
+float* VehicleExtensions::GetGearRatioPtr(Vehicle handle, uint8_t gear) {
+    if (gearRatiosOffset == 0) return nullptr;
+    return reinterpret_cast<float*>(
+        GetAddress(handle) + gearRatiosOffset + gear * sizeof(float));
 }
 
 std::vector<float> VehicleExtensions::GetGearRatios(Vehicle handle) {
+    if (gearRatiosOffset == 0) return {};
     auto address = GetAddress(handle);
     std::vector<float> ratios(g_numGears);
-    for (int gearOffset = 0; gearOffset < g_numGears; gearOffset++) {
-        ratios[gearOffset] = *reinterpret_cast<float *>(address + gearRatiosOffset + gearOffset * sizeof(float));
+    for (int gear = 0; gear < g_numGears; ++gear) {
+        ratios[gear] = *reinterpret_cast<float *>(address + gearRatiosOffset + gear * sizeof(float));
     }
     return ratios;
+}
+
+void VehicleExtensions::SetGearRatios(Vehicle handle, const std::vector<float>& values) {
+    if (gearRatiosOffset == 0) return;
+    auto address = GetAddress(handle);
+    for (uint8_t gear = 0; gear <= values.size(); ++gear) {
+        *reinterpret_cast<float *>(address + gearRatiosOffset + gear * sizeof(float)) = values[gear];
+    }
 }
 
 float VehicleExtensions::GetDriveForce(Vehicle handle) {
@@ -256,14 +276,29 @@ float VehicleExtensions::GetDriveForce(Vehicle handle) {
     return *reinterpret_cast<float *>(GetAddress(handle) + driveForceOffset);
 }
 
+void VehicleExtensions::SetDriveForce(Vehicle handle, float value) {
+    if (driveForceOffset == 0) return;
+    *reinterpret_cast<float *>(GetAddress(handle) + driveForceOffset) = value;
+}
+
 float VehicleExtensions::GetInitialDriveMaxFlatVel(Vehicle handle) {
     if (initialDriveMaxFlatVelOffset == 0) return 0.0f;
     return *reinterpret_cast<float *>(GetAddress(handle) + initialDriveMaxFlatVelOffset);
 }
 
+void VehicleExtensions::SetInitialDriveMaxFlatVel(Vehicle handle, float value) {
+    if (initialDriveMaxFlatVelOffset == 0) return;
+    *reinterpret_cast<float *>(GetAddress(handle) + initialDriveMaxFlatVelOffset) = value;
+}
+
 float VehicleExtensions::GetDriveMaxFlatVel(Vehicle handle) {
     if (driveMaxFlatVelOffset == 0) return 0.0f;
     return *reinterpret_cast<float *>(GetAddress(handle) + driveMaxFlatVelOffset);
+}
+
+void VehicleExtensions::SetDriveMaxFlatVel(Vehicle handle, float value) {
+    if (driveMaxFlatVelOffset == 0) return;
+    *reinterpret_cast<float *>(GetAddress(handle) + driveMaxFlatVelOffset) = value;
 }
 
 float VehicleExtensions::GetCurrentRPM(Vehicle handle) {
