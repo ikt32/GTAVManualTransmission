@@ -383,6 +383,8 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H6)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H6", "NUM6"));
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H7", "NUM7"));
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H8", "NUM8"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H9", "none"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H10", "none"));
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HN)] = str2key(settingsGeneral.GetValue("KEYBOARD", "HN", "NUM9"));
 
 
@@ -552,6 +554,8 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H6)] =
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H7)] =
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H8)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H9)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H10)] =
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::HR)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("SHIFTER", "DEVICE", -1), RegisteredGUIDs);
 
@@ -571,6 +575,10 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
         settingsWheel.GetLongValue("SHIFTER", "GEAR_7", -1);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H8)] =
         settingsWheel.GetLongValue("SHIFTER", "GEAR_8", -1);
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H9)] =
+        settingsWheel.GetLongValue("SHIFTER", "GEAR_9", -1);
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H10)] =
+        settingsWheel.GetLongValue("SHIFTER", "GEAR_10", -1); 
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::HR)] =
         settingsWheel.GetLongValue("SHIFTER", "GEAR_R", -1);
 

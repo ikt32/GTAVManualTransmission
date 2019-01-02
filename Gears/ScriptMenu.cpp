@@ -95,6 +95,8 @@ const std::vector<STagInfo> keyboardConfTags = {
     { "H6"       , "H-pattern gear 6 press" },
     { "H7"       , "H-pattern gear 7 press" },
     { "H8"       , "H-pattern gear 8 press" },
+    { "H9"       , "H-pattern gear 9 press" },
+    { "H10"      , "H-pattern gear 10 press"},
     { "HN"       , "H-pattern Neutral"      },
 };
 
@@ -534,14 +536,11 @@ void update_wheelmenu() {
         "Active gear:"
     };
     if (carControls.ButtonIn(CarControls::WheelControlType::HR)) hpatInfo.emplace_back("Reverse");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H1)) hpatInfo.emplace_back("Gear 1");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H2)) hpatInfo.emplace_back("Gear 2");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H3)) hpatInfo.emplace_back("Gear 3");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H4)) hpatInfo.emplace_back("Gear 4");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H5)) hpatInfo.emplace_back("Gear 5");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H6)) hpatInfo.emplace_back("Gear 6");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H7)) hpatInfo.emplace_back("Gear 7");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H8)) hpatInfo.emplace_back("Gear 8");
+    for (uint8_t gear = 1; gear < g_numGears; ++gear) {
+        // H1 == 1
+        if (carControls.ButtonIn(static_cast<CarControls::WheelControlType>(gear))) 
+            hpatInfo.emplace_back(fmt("Gear %d", gear));
+    }
 
     if (menu.OptionPlus("H-pattern shifter setup", hpatInfo, nullptr, std::bind(clearHShifter), nullptr, "Input values",
         { "Select this option to start H-pattern shifter setup. Follow the on-screen instructions." })) {
@@ -809,6 +808,8 @@ void update_buttonsmenu() {
     if (carControls.ButtonIn(CarControls::WheelControlType::H6)) buttonInfo.push_back("Gear 6");
     if (carControls.ButtonIn(CarControls::WheelControlType::H7)) buttonInfo.push_back("Gear 7");
     if (carControls.ButtonIn(CarControls::WheelControlType::H8)) buttonInfo.push_back("Gear 8");
+    if (carControls.ButtonIn(CarControls::WheelControlType::H9)) buttonInfo.push_back("Gear 9");
+    if (carControls.ButtonIn(CarControls::WheelControlType::H10)) buttonInfo.push_back("Gear 10");
     if (carControls.ButtonIn(CarControls::WheelControlType::AR)) buttonInfo.push_back("Auto R");
     if (carControls.ButtonIn(CarControls::WheelControlType::AD)) buttonInfo.push_back("Auto 1");
     if (carControls.ButtonIn(CarControls::WheelControlType::ShiftUp))   buttonInfo.push_back("ShiftUp");

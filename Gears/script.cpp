@@ -736,6 +736,16 @@ void functionHShiftKeyboard() {
     }
 }
 
+bool isHShifterJustNeutral() {
+    auto minGear = CarControls::WheelControlType::HR;
+    auto topGear = CarControls::WheelControlType::H10;
+    for (auto gear = static_cast<uint32_t>(minGear); gear <= static_cast<uint32_t>(topGear); ++gear) {
+        if (carControls.ButtonReleased(static_cast<CarControls::WheelControlType>(gear)))
+            return true;
+    }
+    return false;
+}
+
 void functionHShiftWheel() {
     int clamp = g_numGears - 1;
     if (ext.GetTopGear(vehicle) <= clamp) {
@@ -747,15 +757,7 @@ void functionHShiftWheel() {
         }
     }
 
-    if (carControls.ButtonReleased(CarControls::WheelControlType::H1) ||
-        carControls.ButtonReleased(CarControls::WheelControlType::H2) ||
-        carControls.ButtonReleased(CarControls::WheelControlType::H3) ||
-        carControls.ButtonReleased(CarControls::WheelControlType::H4) ||
-        carControls.ButtonReleased(CarControls::WheelControlType::H5) ||
-        carControls.ButtonReleased(CarControls::WheelControlType::H6) ||
-        carControls.ButtonReleased(CarControls::WheelControlType::H7) ||
-        carControls.ButtonReleased(CarControls::WheelControlType::H8) ||
-        carControls.ButtonReleased(CarControls::WheelControlType::HR)) {
+    if (isHShifterJustNeutral()) {
         if (settings.ClutchShiftingH &&
             settings.EngDamage && vehInfo.HasClutch) {
             if (carControls.ClutchVal < 1.0 - settings.ClutchThreshold) {

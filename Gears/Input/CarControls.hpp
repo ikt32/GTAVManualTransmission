@@ -39,16 +39,18 @@ public:
         SIZEOF_LegacyControlType
     };
 
-    enum class KeyboardControlType {
+    enum class KeyboardControlType : uint32_t {
         HR = 0,
-        H1,
-        H2,
-        H3,
-        H4,
-        H5,
-        H6,
-        H7,
-        H8,
+        H1 = 1,
+        H2 = 2,
+        H3 = 3,
+        H4 = 4,
+        H5 = 5,
+        H6 = 6,
+        H7 = 7,
+        H8 = 8,
+        H9 = 9,
+        H10 = 10,
         HN,
         ShiftUp,
         ShiftDown,
@@ -61,16 +63,18 @@ public:
         SIZEOF_KeyboardControlType
     };
 
-    enum class WheelControlType {
+    enum class WheelControlType : uint32_t {
         HR = 0,
-        H1,
-        H2,
-        H3,
-        H4,
-        H5,
-        H6,
-        H7,
-        H8,
+        H1 = 1,
+        H2 = 2,
+        H3 = 3,
+        H4 = 4,
+        H5 = 5,
+        H6 = 6,
+        H7 = 7,
+        H8 = 8,
+        H9 = 9,
+        H10 = 10,
         HN,
         ShiftUp,
         ShiftDown,
@@ -271,6 +275,8 @@ public:
         if (confTag == "H6") return KBControl[static_cast<int>(KeyboardControlType::H6)];
         if (confTag == "H7") return KBControl[static_cast<int>(KeyboardControlType::H7)];
         if (confTag == "H8") return KBControl[static_cast<int>(KeyboardControlType::H8)];
+        if (confTag == "H9") return KBControl[static_cast<int>(KeyboardControlType::H9)];
+        if (confTag == "H10") return KBControl[static_cast<int>(KeyboardControlType::H10)];
         if (confTag == "HN") return KBControl[static_cast<int>(KeyboardControlType::HN)];
 
         return -1;
