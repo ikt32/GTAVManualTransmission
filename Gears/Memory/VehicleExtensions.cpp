@@ -10,7 +10,9 @@
 #include "../Util/MathExt.h"
 #include "../Util/Logger.hpp"
 
-extern uint8_t g_numGears;
+// <= b1493: 8  (Top gear = 7)
+// >= b1604: 11 (Top gear = 10)
+uint8_t g_numGears = 8;
 
 eGameVersion g_gameVersion = getGameVersion();
 
@@ -20,10 +22,16 @@ int findOffset(const std::map<int, int, std::greater<int>> &offsets) {
 
 VehicleExtensions::VehicleExtensions() {
     g_gameVersion = getGameVersion();
+    if (g_gameVersion >= G_VER_1_0_1604_0_STEAM) {
+        g_numGears = 11;
+    }
 }
 
 void VehicleExtensions::ChangeVersion(int version) {
     g_gameVersion = static_cast<eGameVersion>(version);
+    if (g_gameVersion >= G_VER_1_0_1604_0_STEAM) {
+        g_numGears = 11;
+    }
 }
 
 /*

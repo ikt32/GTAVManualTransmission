@@ -5,6 +5,8 @@
 #include <inc/types.h>
 #include <inc/nativeCaller.h>
 
+extern uint8_t g_numGears;
+
 struct WheelDimensions {
     float TyreRadius;
     float RimRadius;

@@ -31,9 +31,6 @@
 #include "Util/MiscEnums.h"
 #include "Util/StringFormat.h"
 
-// <= b1493: 8, >= b1604: 9
-uint8_t g_numGears = 8;
-
 const std::string mtPrefix = "~b~Manual Transmission~w~~n~";
 
 const char* decorCurrentGear = "mt_gear";

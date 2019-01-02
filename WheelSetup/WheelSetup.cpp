@@ -25,7 +25,7 @@ std::string settingsGeneralFile = Paths::GetRunningExecutableFolder() + "\\setti
 std::string settingsWheelFile = Paths::GetRunningExecutableFolder() + "\\settings_wheel.ini";
 ScriptSettings settings;
 
-uint8_t g_numGears = 9;
+uint8_t g_numGears = 11;
 
 // acceptedKeys, gameButton, confTag
 std::vector<std::tuple<char, std::string, std::string>> buttonInfos = {
