@@ -31,7 +31,7 @@ extern int textureWheelId;
 
 const std::string escapeKey = "BACKSPACE";
 const std::string skipKey = "RIGHT";
-extern bool g_CustomABS;
+
 // FontName, fontID
 std::vector<std::string> fonts{
     { "Chalet London" },
@@ -174,7 +174,7 @@ void update_mainmenu() {
         { "Enable or disable the entire mod." })) {
         toggleManual();
     }
-    //menu.BoolOption("Enable ABS", g_CustomABS);
+
     int shiftModeTemp = settings.ShiftMode;
     std::vector<std::string> gearboxModes = {
         "Sequential",
@@ -970,6 +970,8 @@ void update_debugmenu() {
             "Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction" });
     menu.BoolOption("Show NPC info", settings.ShowNPCInfo,
         { "Show vehicle info of NPC vehicles near you." });
+    menu.BoolOption("Enable ABS", settings.CustomABS,
+        { "Experimental script-driven ABS."});
 }
 
 void update_menu() {

@@ -44,6 +44,7 @@ public:
     float RPMDamage = 1.5f;
     int MisshiftDamage = 10;
     bool HardLimiter = false;
+    bool CustomABS = false;
 
     bool UseShifterForAuto = false;
 

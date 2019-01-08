@@ -107,20 +107,22 @@ void handleBrakePatch() {
     bool brn = VEHICLE::IS_VEHICLE_IN_BURNOUT(vehicle);
     auto lockUps = getWheelLockups(vehicle);
     auto susps = ext.GetWheelCompressions(vehicle);
+    auto brakePressures = ext.GetWheelBrakePressure(vehicle);
     for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
-        if (lockUps[i] && susps[i] > 0.0f)
+        if (lockUps[i] && susps[i] > 0.0f && brakePressures[i] > 0.0f)
             lockedUp = true;
     }
     if (ebrk || brn)
         lockedUp = false;
-    if (g_CustomABS && lockedUp) {
+    if (settings.CustomABS && lockedUp) {
         if (!MemoryPatcher::BrakePatcher.Patched()) {
             MemoryPatcher::PatchBrake();
         }
-        for (int i = 0; i < lockUps.size(); i++) {
+        for (size_t i = 0; i < lockUps.size(); i++) {
             ext.SetWheelBrakePressure(vehicle, i, ext.GetWheelBrakePressure(vehicle)[i] * 0.9f);
         }
-        showText(0.45, 0.75, 1.0, "~r~ABS");
+        if (settings.DisplayInfo)
+            showText(0.45, 0.75, 1.0, "~r~(ABS)");
     }
     else {
         if (wheelPatchStates.EngBrakeActive || wheelPatchStates.EngLockActive) {
