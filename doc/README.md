@@ -2,7 +2,7 @@
 
 # Manual Transmission and Steering Wheel Support for GTA V
 
-Version 4.6.5
+Version 4.6.6
 
 ![Gameplay](Gameplay.jpg)
 
@@ -61,6 +61,7 @@ customizable to fit your wheel and personal preferences.
     * [`settings_menu.ini`](#settings_menuini)
   * [Troubleshooting](#troubleshooting)
     * [Compatibility](#compatibility)
+    * [Known generic issues](#known-generic-issues)
     * [Steering wheel issues](#steering-wheel-issues)
   * [Credits](#credits)
   * [Source code](#source-code)
@@ -389,6 +390,31 @@ other mods.
 * `false`: No mod info available for other mods
 * `true`: Mod info available for other mods
 
+##### `HidePlayerInFPV` : `true` or `false`
+
+Turn this on to hide the player in first person camera.
+
+* `false`: Do not hide player in first person camera
+* `true`: Hide player in first person camera
+
+##### `HardLimiter` : `true` or `false`
+
+Turn this on to limit speed when max RPM is reached.
+
+* `false`: Do not limit speed when max RPM is reached
+* `true`: Speed is limited when max RPM is reached
+
+This is especially noticeable when in top gear, and the car still has power
+to accelerate even though the RPM needle is pinned. Speed is limited by cutting
+throttle, just like a normal rev limiter would do.
+
+##### `CustomABS` : `true` or `false`
+
+Turn this on to enable experimental ABS.
+
+Works for vehicles with both real ABS and no ABS. It stops braking a wheel when
+a lock-up is detected, allowing for slightly more control under max braking.
+
 #### `[HUD]`
 
 Some info you can enable or disable at will. It's pretty self-explanatory.
@@ -556,20 +582,37 @@ reversing with the throttle to work.
 * `false`: No debug info onscreen
 * `true`: Debug info onscreen with transmission info, input info and force feedback info
 
-#### `DisplayWheelInfo` : `true` or `false`
+##### `DisplayWheelInfo` : `true` or `false`
 
 * `false`: No debug info onscreen
 * `true`: Vehicle wheel info onscreen
 
-#### `DisplayGearingInfo` : `true` or `false`
+##### `DisplayGearingInfo` : `true` or `false`
 
 * `false`: No debug info onscreen
 * `true`: Vehicle gear info onscreen while manual transmission active
 
-#### `DisplayFFBInfo` : `true` or `false`
+##### `DisplayFFBInfo` : `true` or `false`
 
 * `false`: No info onscreen
-* `true`: Force feedback forces and direction are drawn onscreen.
+* `true`: Force feedback forces and direction are drawn onscreen
+
+#### `[UPDATE]`
+
+An update checking mechanism is built in since v4.6.6. This checks GitHub for
+new releases and alerts the user. Internet access is needed.
+
+##### `EnableUpdate` : `true` or `false`
+
+* `false`: Don't check for updates on startup
+* `true`: Check for update on startup
+
+##### `IgnoredVersion` : `string`
+
+Ignore update notifications for a specific version, e.g. your current version is
+v4.6.6 and v4.6.7 only contains FiveM fixes, which you don't use anyway. In that
+case, fill in `v4.6.7` here. This value is also automatically set via the menu
+when the option is chosen.
 
 ### `settings_wheel.ini`
 
@@ -834,16 +877,18 @@ The mod has been tested with GTA V version v1.0.877.1 to v1.0.1604.0 with:
 * RAGEPluginHook
 * OpenIV
 
-#### Incompatible software
+### Known generic issues
 
-* __x360ce__ will conflict with input detection if throttle, brake or steering clutch are mapped, but the mod should still register your wheel. Assigning inputs without overlap is no problem.
+* __x360ce__ will conflict with input detection if throttle, brake, clutch or steering axes are mapped in x360ce. Assigning inputs without overlap is no problem.
 * [__Strapped__](https://www.gta5-mods.com/scripts/pull-out-strap) will conflict with inputs.
 * [__CustomSteering__](https://www.gta5-mods.com/scripts/custom-steering) will conflict with steering patching. Remove CustomSteering if `PatchSteering` is enabled.
-* [__ScriptHookVDotNet__](https://github.com/crosire/scripthookvdotnet/releases)  crashes the G920. No workaround known, aside from disabling ScriptHookVDotNet.
-
-#### Incompatible hardware
-
-* [__ScriptHookVDotNet__](https://github.com/crosire/scripthookvdotnet/releases)  crashes the G920. No workaround known, aside from disabling ScriptHookVDotNet.
+* [__ScriptHookVDotNet__](https://github.com/crosire/scripthookvdotnet/releases) crashes the Logitech G920.
+  * Workaround: Disable ScriptHookVDotNet.
+  * Workaround: Launch the game with RAGEPluginHook. \[Found by BULLFAYCE\]
+* Steering wheel sticks to full left/full throttle.
+  * Workaround: Re-toggle the script, prevent alt-tabbing while not paused.
+* Wheel not detected at all when using Steam.
+  * Fix: Uncheck `Generic Gamepad Configuration Support` in Steam Big Picture settings, Controller settings. \[Found by Kaerali\]
 
 ### Steering wheel issues
 
@@ -851,8 +896,6 @@ The mod has been tested with GTA V version v1.0.877.1 to v1.0.1604.0 with:
 
 Check if your wheel is recognized correctly, a recent Windows 10 update forces
 new Logitech software which will mess up older Logitech steering wheels.
-
-Before using this mod, you should test test your wheel with other games first.
 
 #### Steering wheel not detected
 
