@@ -105,7 +105,7 @@ private:
     bool createEffects(GUID device, DIAxis ffAxis);
     int povDirectionToIndex(int povDirection);
 
-    std::vector<GUID> foundGuids { GUID_NULL };
+    std::vector<GUID> foundGuids {};
 
     LPDIRECTINPUT lpDi = nullptr;
 
