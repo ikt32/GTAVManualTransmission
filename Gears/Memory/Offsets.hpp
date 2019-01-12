@@ -77,14 +77,15 @@ const struct CVehicleHandlingData {
     int fEngineDamageMult = 0x00FC;
     int fPetrolTankVolume = 0x0100;
     int fOilVolume = 0x0104;
-    // 0x0108
+    // 0x0108                           // 0.5f?
     int fSeatOffsetDistX = 0x010C;
     int fSeatOffsetDistY = 0x0110;
     int fSeatOffsetDistZ = 0x0114;
-    int nMonetaryValue = 0x0118;
-    DWORD dwStrModelFlags = 0x011C;
-    DWORD dwStrHandlingFlags = 0x0120;
-    DWORD dwStrDamageFlags = 0x0124;
+    int nMonetaryValue = 0x0118;        // 0x118 in 1604
+    
+    DWORD dwStrModelFlags = 0x011C;     // 0x124 in 1604
+    DWORD dwStrHandlingFlags = 0x0120;  // 0x128 in 1604
+    DWORD dwStrDamageFlags = 0x0124;    // 0x12C in 1604
     DWORD dwAIHandlingHash = 0x0134;
 } hOffsets = {};
 
