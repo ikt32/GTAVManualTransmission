@@ -59,11 +59,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
       <AdditionalIncludeDirectories>..\..\ScriptHookV_SDK;..\..\GTAVMenuBase;$(SolutionDir)thirdparty</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -120,6 +119,7 @@
     <ClCompile Include="ScriptHUD.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
     <ClCompile Include="ShiftModes.cpp" />
+    <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="Util\Files.cpp" />
     <ClCompile Include="Util\GameSound.cpp" />
     <ClCompile Include="Util\MathExt.cpp" />
@@ -153,6 +153,15 @@
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\main.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h" />
     <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h" />
+    <ClInclude Include="..\thirdparty\curl\curl.h" />
+    <ClInclude Include="..\thirdparty\curl\curlver.h" />
+    <ClInclude Include="..\thirdparty\curl\easy.h" />
+    <ClInclude Include="..\thirdparty\curl\mprintf.h" />
+    <ClInclude Include="..\thirdparty\curl\multi.h" />
+    <ClInclude Include="..\thirdparty\curl\stdcheaders.h" />
+    <ClInclude Include="..\thirdparty\curl\system.h" />
+    <ClInclude Include="..\thirdparty\curl\typecheck-gcc.h" />
+    <ClInclude Include="..\thirdparty\curl\urlapi.h" />
     <ClInclude Include="..\thirdparty\MiniPID\MiniPID.h" />
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
     <ClInclude Include="Constants.h" />
@@ -162,6 +171,7 @@
     <ClInclude Include="Memory\Versions.h" />
     <ClInclude Include="newNatives.h" />
     <ClInclude Include="ShiftModes.h" />
+    <ClInclude Include="UpdateChecker.h" />
     <ClInclude Include="Util\Color.h" />
     <ClInclude Include="Util\Files.h" />
     <ClInclude Include="Util\GameSound.h" />
@@ -186,6 +196,9 @@
     <ClInclude Include="Util\UIUtils.h" />
     <ClInclude Include="Util\Util.hpp" />
     <ClInclude Include="VehicleData.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\thirdparty\curl\libcurl.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

@@ -30,6 +30,10 @@
 #include "Util/UIUtils.h"
 #include "Util/MiscEnums.h"
 #include "Util/StringFormat.h"
+#include "UpdateChecker.h"
+
+ReleaseInfo g_releaseInfo;
+bool g_notifyUpdate;
 
 const std::string mtPrefix = "~b~Manual Transmission~w~~n~";
 
@@ -2390,6 +2394,15 @@ void main() {
     menu.RegisterOnExit([] { onMenuClose(); });
     menu.SetFiles(settingsMenuFile);
     readSettings();
+
+    if (settings.EnableUpdate) {
+        bool newAvailable = CheckUpdate(g_releaseInfo);
+
+        if (newAvailable && settings.IgnoredVersion != g_releaseInfo.Version) {
+            g_notifyUpdate = true;
+        }
+    }
+
     ext.initOffsets();
     MemoryPatcher::Test();
 

@@ -123,6 +123,12 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetDoubleValue("HUD", "PedalInfoPadX"  , PedalInfoPadX);
     settingsGeneral.SetDoubleValue("HUD", "PedalInfoPadY"  , PedalInfoPadY);
 
+    // [UPDATE]
+    settingsGeneral.SetBoolValue("UPDATE", "EnableUpdate", EnableUpdate);
+    if (!IgnoredVersion.empty())
+        settingsGeneral.SetValue("UPDATE", "IgnoredVersion", IgnoredVersion.c_str());
+    else
+        settingsGeneral.SetValue("UPDATE", "IgnoredVersion", "v0.0.0");
 
     // [DEBUG]
     settingsGeneral.SetBoolValue("DEBUG", "DisplayInfo", DisplayInfo);
@@ -389,7 +395,9 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H10", "none"));
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HN)] = str2key(settingsGeneral.GetValue("KEYBOARD", "HN", "NUM9"));
 
-
+    // [UPDATE]
+    EnableUpdate = settingsGeneral.GetBoolValue("UPDATE", "EnableUpdate", true);
+    IgnoredVersion = settingsGeneral.GetValue("UPDATE", "IgnoredVersion", "v0.0.0");
 
     // [DEBUG]
     DisplayInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayInfo", false);

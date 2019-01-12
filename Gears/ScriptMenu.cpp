@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include <shellapi.h>
+
 #include <inc/main.h>
 #include <inc/natives.h>
 
@@ -15,6 +17,10 @@
 #include "Util/Util.hpp"
 #include "Constants.h"
 #include "Util/StringFormat.h"
+#include "UpdateChecker.h"
+
+extern bool g_notifyUpdate;
+extern ReleaseInfo g_releaseInfo;
 
 extern std::string settingsGeneralFile;
 extern std::string settingsWheelFile;
@@ -31,6 +37,8 @@ extern int textureWheelId;
 
 const std::string escapeKey = "BACKSPACE";
 const std::string skipKey = "RIGHT";
+
+const std::string modUrl = "https://www.gta5-mods.com/scripts/manual-transmission-ikt";
 
 // FontName, fontID
 std::vector<std::string> fonts{
@@ -168,8 +176,34 @@ void update_mainmenu() {
     menu.Title("Manual Transmission", 0.90f);
     menu.Subtitle(std::string("~b~") + DISPLAY_VERSION);
 
-    bool tempEnableRead = settings.EnableManual;
+    if (g_notifyUpdate) {
+        std::vector<std::string> bodyLines = 
+            NativeMenu::split(g_releaseInfo.Body, '\n');
 
+        std::vector<std::string> extra = {
+            fmt("New version: %s", g_releaseInfo.Version.c_str()),
+            fmt("Release date: %s", g_releaseInfo.TimestampPublished.c_str()),
+            "Changelog:"
+        };
+
+        for (auto line : bodyLines) {
+            extra.push_back(line);
+        }
+
+        if (menu.OptionPlus("New update available!", extra, nullptr, [] {
+            settings.IgnoredVersion = g_releaseInfo.Version;
+            g_notifyUpdate = false;
+            saveChanges();
+        }, nullptr, "Update info",
+            { "Press accept to check GTA5-Mods.com.",
+                "Press right to ignore current update." })) {
+            WAIT(20);
+            CONTROLS::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
+            ShellExecuteA(0, 0, modUrl.c_str(), 0, 0, SW_SHOW);
+        }
+    }
+
+    bool tempEnableRead = settings.EnableManual;
     if (menu.BoolOption("Enable manual transmission", tempEnableRead,
         { "Enable or disable the entire mod." })) {
         toggleManual();
@@ -972,6 +1006,22 @@ void update_debugmenu() {
         { "Show vehicle info of NPC vehicles near you." });
     menu.BoolOption("Enable ABS", settings.CustomABS,
         { "Experimental script-driven ABS."});
+    menu.BoolOption("Enable update check", settings.EnableUpdate,
+        { "Check for mod updates."});
+
+    if (menu.Option("Check for updates", { "Manually check for updates. "
+        "Re-enables update checking and clears ignored update." })) {
+        settings.EnableUpdate = true;
+        settings.IgnoredVersion = "v0.0.0";
+        if (CheckUpdate(g_releaseInfo)) {
+            g_notifyUpdate = true;
+            showNotification(fmt("Manual Transmission: Update available, new version: %s.", 
+                g_releaseInfo.Version));
+        }
+        else {
+            showNotification("Manual Transmission: No update available.");
+        }
+    }
 }
 
 void update_menu() {

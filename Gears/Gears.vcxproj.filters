@@ -81,6 +81,9 @@
     <ClCompile Include="Util\StringFormat.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="UpdateChecker.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -197,6 +200,36 @@
     <ClInclude Include="Memory\Patcher.h">
       <Filter>Memory\Patching</Filter>
     </ClInclude>
+    <ClInclude Include="UpdateChecker.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\curl\curl.h">
+      <Filter>Thirdparty\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\curl\curlver.h">
+      <Filter>Thirdparty\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\curl\easy.h">
+      <Filter>Thirdparty\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\curl\mprintf.h">
+      <Filter>Thirdparty\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\curl\multi.h">
+      <Filter>Thirdparty\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\curl\stdcheaders.h">
+      <Filter>Thirdparty\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\curl\system.h">
+      <Filter>Thirdparty\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\curl\typecheck-gcc.h">
+      <Filter>Thirdparty\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\curl\urlapi.h">
+      <Filter>Thirdparty\curl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -220,5 +253,13 @@
     <Filter Include="Memory\Patching">
       <UniqueIdentifier>{a0e6c9f3-7e78-430a-abb7-39e38e87d266}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Thirdparty\curl">
+      <UniqueIdentifier>{86991d65-e172-479c-8c09-1e4747551205}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\thirdparty\curl\libcurl.lib">
+      <Filter>Thirdparty\curl</Filter>
+    </Library>
   </ItemGroup>
 </Project>

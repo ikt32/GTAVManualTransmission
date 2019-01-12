@@ -124,6 +124,10 @@ public:
     bool IgnoreShiftsUI = false;
     bool BlockHShift = true;
 
+    // [UPDATE]
+    bool EnableUpdate = true;
+    std::string IgnoredVersion = "";
+
     // [DEBUG]
     bool DisplayInfo = false;
     bool DisplayGearingInfo = false;
