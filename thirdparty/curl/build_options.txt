@@ -1,0 +1,5 @@
+curl 7.63.0
+Windows\VC15
+SDK: 10.0.17134.0
+LIB Release - DLL Windows SSPI - DLL WinIDN
+64-bit
