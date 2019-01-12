@@ -1745,41 +1745,49 @@ void startStopEngine() {
     }
 }
 
-void resetIndicators() {
-    VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false);
-    VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false);
-    miscStates.BlinkerLeft = false;
-    miscStates.BlinkerRight = false;
-    miscStates.BlinkerHazard = false;
+// Set state, and activate them if hazards are off.
+void setBlinkers(bool left, bool right) {
+    miscStates.BlinkerLeft = left;
+    miscStates.BlinkerRight = right;
+
+    if (!miscStates.BlinkerHazard) {
+        VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, right);
+        VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, left);
+    }
 }
 
 void checkIndicatorActions() {
+    if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorHazard)) {
+        if (!miscStates.BlinkerHazard) {
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true);
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true);
+            miscStates.BlinkerHazard = true;
+        }
+        else {
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, miscStates.BlinkerRight);
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, miscStates.BlinkerLeft);
+            miscStates.BlinkerHazard = false;
+        }
+    }
+
     if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorLeft)) {
         if (!miscStates.BlinkerLeft) {
             miscStates.BlinkerTicks = 1;
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, false); // L
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true); // R
-            miscStates.BlinkerLeft = true;
-            miscStates.BlinkerRight = false;
-            miscStates.BlinkerHazard = false;
+            setBlinkers(true, false);
         }
         else {
             miscStates.BlinkerTicks = 0;
-            resetIndicators();
+            setBlinkers(false, false);
         }
     }
     if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorRight)) {
         if (!miscStates.BlinkerRight) {
             miscStates.BlinkerTicks = 1;
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true); // L
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, false); // R
-            miscStates.BlinkerLeft = false;
-            miscStates.BlinkerRight = true;
-            miscStates.BlinkerHazard = false;
+            setBlinkers(false, true);
         }
         else {
             miscStates.BlinkerTicks = 0;
-            resetIndicators();
+            setBlinkers(false, false);
         }
     }
 
@@ -1791,20 +1799,7 @@ void checkIndicatorActions() {
 
     if (miscStates.BlinkerTicks == 2 && abs(wheelCenterDeviation) < 0.1f) {
         miscStates.BlinkerTicks = 0;
-        resetIndicators();
-    }
-
-    if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorHazard)) {
-        if (!miscStates.BlinkerHazard) {
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true); // L
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true); // R
-            miscStates.BlinkerLeft = false;
-            miscStates.BlinkerRight = false;
-            miscStates.BlinkerHazard = true;
-        }
-        else {
-            resetIndicators();
-        }
+        setBlinkers(false, false);
     }
 }
 
