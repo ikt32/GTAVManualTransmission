@@ -274,7 +274,7 @@ std::vector<float> VehicleExtensions::GetGearRatios(Vehicle handle) {
 void VehicleExtensions::SetGearRatios(Vehicle handle, const std::vector<float>& values) {
     if (gearRatiosOffset == 0) return;
     auto address = GetAddress(handle);
-    for (uint8_t gear = 0; gear <= values.size(); ++gear) {
+    for (uint8_t gear = 0; gear < values.size(); ++gear) {
         *reinterpret_cast<float *>(address + gearRatiosOffset + gear * sizeof(float)) = values[gear];
     }
 }
