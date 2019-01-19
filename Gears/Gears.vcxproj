@@ -119,6 +119,7 @@
     <ClCompile Include="..\..\GTAVMenuBase\menuutils.cpp" />
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp" />
     <ClCompile Include="Input\DIDeviceFactory.cpp" />
+    <ClCompile Include="ManualTransmission.cpp" />
     <ClCompile Include="ScriptHUD.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
     <ClCompile Include="ShiftModes.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="..\thirdparty\MiniPID\MiniPID.h" />
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="ManualTransmission.h" />
     <ClInclude Include="Memory\Patcher.h" />
     <ClInclude Include="Memory\PatternInfo.h" />
     <ClInclude Include="Memory\VehicleFlags.h" />

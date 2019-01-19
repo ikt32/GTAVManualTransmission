@@ -22,6 +22,8 @@ DWORD   raycastUpdateTime = 0;
 
 std::set<Vehicle> raycastVehicles;
 
+std::vector<Vehicle> ignoredVehicles;
+
 void showNPCInfo(Vehicle npcVehicle, bool allowOccupied) {
     bool lookBack = CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleLookBehind) == TRUE;
     auto vehPos = ENTITY::GET_ENTITY_COORDS(vehicle, true);
@@ -138,6 +140,7 @@ void showNPCsInfo(Vehicle vehicles[1024], int count) {
 
 void updateNPCVehicle(Vehicle npcVehicle) {
     if (npcVehicle == 0 || !ENTITY::DOES_ENTITY_EXIST(npcVehicle)) return;
+    if (std::find(ignoredVehicles.begin(), ignoredVehicles.end(), vehicle) != ignoredVehicles.end()) return;
     if (npcVehicle == vehicle && VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1) == playerPed) return;
 
     if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(npcVehicle)) return;

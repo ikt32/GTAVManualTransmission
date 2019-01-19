@@ -84,6 +84,9 @@
     <ClCompile Include="UpdateChecker.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="ManualTransmission.cpp">
+      <Filter>API</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -230,6 +233,9 @@
     <ClInclude Include="..\thirdparty\curl\urlapi.h">
       <Filter>Thirdparty\curl</Filter>
     </ClInclude>
+    <ClInclude Include="ManualTransmission.h">
+      <Filter>API</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -255,6 +261,9 @@
     </Filter>
     <Filter Include="Thirdparty\curl">
       <UniqueIdentifier>{86991d65-e172-479c-8c09-1e4747551205}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API">
+      <UniqueIdentifier>{05abafde-5223-4634-93cd-877f6570d6a7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
