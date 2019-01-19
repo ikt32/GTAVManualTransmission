@@ -27,7 +27,10 @@ std::string formatError(HRESULT hr) {
     }
 }
 
-WheelDirectInput::WheelDirectInput() { }
+WheelDirectInput::WheelDirectInput()
+    : m_constantForceParams()
+    , m_damperParams()
+    , m_collisionParams() { }
 
 WheelDirectInput::~WheelDirectInput() {
     for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
@@ -35,9 +38,9 @@ WheelDirectInput::~WheelDirectInput() {
         if (device) {
             HRESULT hr = device->diDevice->Unacquire();
             if (FAILED(hr)) {
-                logger.Write(ERROR, "WHEEL: Failed unacquiring device: %s", 
+                logger.Write(ERROR, "[Wheel] Failed unacquiring device: %s", 
                     formatError(hr).c_str());
-                logger.Write(FATAL, "\tGUID: %s", 
+                logger.Write(ERROR, "[Wheel]     GUID: %s",
                     GUID2String(device->diDeviceInstance.guidInstance).c_str());
             }
         }
@@ -57,7 +60,7 @@ bool WheelDirectInput::InitDI() {
                                         nullptr);
 
     if (FAILED(result)) {
-        logger.Write(ERROR, "WHEEL: Failed setting up DirectInput interface");
+        logger.Write(ERROR, "[Wheel] Failed setting up DirectInput interface");
         return false;
     }
     DIDeviceFactory::Get().Enumerate(lpDi);
@@ -65,16 +68,16 @@ bool WheelDirectInput::InitDI() {
 }
 
 bool WheelDirectInput::InitWheel() {
-    logger.Write(INFO, "WHEEL: Initializing input devices"); 
-    logger.Write(INFO, "WHEEL: Setting up DirectInput interface");
+    logger.Write(INFO, "[Wheel] Initializing input devices"); 
+    logger.Write(INFO, "[Wheel] Setting up DirectInput interface");
     if (!InitDI()) {
         return false;
     }
 
-    logger.Write(INFO, fmt("WHEEL: Found %d device(s)", DIDeviceFactory::Get().GetEntryCount()));
+    logger.Write(INFO, fmt("[Wheel] Found %d device(s)", DIDeviceFactory::Get().GetEntryCount()));
 
     if (DIDeviceFactory::Get().GetEntryCount() < 1) {
-        logger.Write(INFO, "WHEEL: No devices detected");
+        logger.Write(INFO, "[Wheel] No devices detected");
         return false;
     }
 
@@ -93,8 +96,8 @@ bool WheelDirectInput::InitWheel() {
         std::wstring wDevName = device->diDeviceInstance.tszInstanceName;
         GUID guid = device->diDeviceInstance.guidInstance;
         
-        logger.Write(INFO, "WHEEL: Device: " + std::string(wDevName.begin(), wDevName.end()));
-        logger.Write(INFO, "WHEEL: GUID:   %s", GUID2String(guid).c_str());
+        logger.Write(INFO, "[Wheel]     Name:   %s", std::string(wDevName.begin(), wDevName.end()).c_str());
+        logger.Write(INFO, "[Wheel]     GUID:   %s", GUID2String(guid).c_str());
         foundGuids.push_back(guid);
 
         rgbPressTime.insert(	std::pair<GUID, std::array<__int64, MAX_RGBBUTTONS>>(guid, {}));
@@ -106,17 +109,17 @@ bool WheelDirectInput::InitWheel() {
         povButtonCurr.insert(	std::pair<GUID, std::array<bool, POVDIRECTIONS>>(guid, {}));
         povButtonPrev.insert(	std::pair<GUID, std::array<bool, POVDIRECTIONS>>(guid, {}));
     }
-    logger.Write(INFO, "WHEEL: Devices initialized");
+    logger.Write(INFO, "[Wheel] Devices initialized");
     return true;
 }
 
 bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
-    logger.Write(INFO, "WHEEL: Init FFB device");
+    logger.Write(INFO, "[Wheel] Initializing force feedback");
 
     auto e = FindEntryFromGUID(guid);
     
     if (!e) {
-        logger.Write(WARN, "WHEEL: FFB device not found");
+        logger.Write(WARN, "[Wheel] FFB device not found");
         return false;
     }
 
@@ -125,20 +128,19 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
     if (FAILED(hr = e->diDevice->SetCooperativeLevel(GetForegroundWindow(),
                                                      DISCL_EXCLUSIVE | 
                                                      DISCL_FOREGROUND))) {
-        std::string hrStr = formatError(hr);
-        logger.Write(ERROR, "WHEEL: Acquire FFB device error");
-        logger.Write(ERROR, "WHEEL: HRESULT = " + hrStr);
-        logger.Write(ERROR, "WHEEL: ERRCODE = %X", hr);
-        logger.Write(ERROR, "WHEEL: HWND =    %X", GetForegroundWindow());
+        logger.Write(ERROR, "[Wheel] Acquire FFB device error");
+        logger.Write(ERROR, "[Wheel]     HRESULT = %s", formatError(hr).c_str());
+        logger.Write(ERROR, "[Wheel]     ERRCODE = %X", hr);
+        logger.Write(ERROR, "[Wheel]     HWND =    %X", GetForegroundWindow());
         return false;
     }
-    logger.Write(INFO, "WHEEL: Init FFB effect on axis " + DIAxisHelper[ffAxis]);
+    logger.Write(INFO, "[Wheel] Initializing FFB effects (axis: %s)", DIAxisHelper[ffAxis].c_str());
     if (!createEffects(guid, ffAxis)) {
-        logger.Write(ERROR, "WHEEL: Init FFB effect failed");
+        logger.Write(ERROR, "[Wheel] Init FFB effect failed, disabling force feedback");
         hasForceFeedback[guid][ffAxis] = false;
         return false;
     } 
-    logger.Write(INFO, "WHEEL: Init FFB effect success");
+    logger.Write(INFO, "[Wheel] Inititalizing force feedback success");
     hasForceFeedback[guid][ffAxis] = true;
     return true;
 }
@@ -284,8 +286,8 @@ void WheelDirectInput::UpdateButtonChangeStates() {
 }
 
 int filterException(int code, PEXCEPTION_POINTERS ex) {
-    logger.Write(FATAL, "Caught exception 0x%X", code);
-    logger.Write(FATAL, "\tException address 0x%p", ex->ExceptionRecord->ExceptionAddress);
+    logger.Write(FATAL, "[Wheel] Caught exception 0x%X", code);
+    logger.Write(FATAL, "[Wheel]     Exception address 0x%p", ex->ExceptionRecord->ExceptionAddress);
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
@@ -372,15 +374,15 @@ void WheelDirectInput::createCollisionEffect(DWORD axis, int numAxes, DIEFFECT &
  */
 std::string currentEffectAttempt = "";
 void logCreateEffectException(const DIDevice *e) {
-    logger.Write(FATAL, "CreateEffect (%s) caused an exception!", currentEffectAttempt.c_str());
-    logger.Write(FATAL, "\tGUID: %s", GUID2String(e->diDeviceInstance.guidInstance).c_str());
+    logger.Write(FATAL, "[Wheel] CreateEffect (%s) caused an exception!", currentEffectAttempt.c_str());
+    logger.Write(FATAL, "[Wheel]     GUID: %s", GUID2String(e->diDeviceInstance.guidInstance).c_str());
 }
 
 /*
  * Deal with stl stuff in __try
  */
 void logCreateEffectError(HRESULT hr, const char *which) {
-    logger.Write(ERROR, "CreateEffect failed: %s (%s)", formatError(hr).c_str(), which);
+    logger.Write(ERROR, "[Wheel] CreateEffect [] failed: [0x%08X] %s (%s)", hr, formatError(hr).c_str(), which);
 }
 
 bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {

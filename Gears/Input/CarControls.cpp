@@ -380,9 +380,9 @@ void CarControls::CheckGUIDs(const std::vector<_GUID> & guids) {
         foundGuids.begin(), foundGuids.end(), std::back_inserter(missingReg));
 
     if (!missingReg.empty()) {
-        logger.Write(WARN, "WHEEL: Used in .ini, unavailable: ");
+        logger.Write(WARN, "[Wheel] Used in .ini, unavailable: ");
         for (auto g : missingReg) {
-            logger.Write(WARN, "WHEEL: GUID:   %s", GUID2String(g).c_str());
+            logger.Write(WARN, "[Wheel] GUID:   %s", GUID2String(g).c_str());
         }
     }
 
@@ -394,14 +394,14 @@ void CarControls::CheckGUIDs(const std::vector<_GUID> & guids) {
     FreeDevices.clear();
 
     if (!missingFnd.empty()) {
-        logger.Write(INFO, "WHEEL: Not set up in .ini: ");
+        logger.Write(INFO, "[Wheel] Not set up in .ini: ");
         for (auto g : missingFnd) {
             auto entry = mWheelInput.FindEntryFromGUID(g);
             if (entry == nullptr) continue;
             std::wstring wDevName = entry->diDeviceInstance.tszInstanceName;
             auto devName = std::string(wDevName.begin(), wDevName.end());
-            logger.Write(INFO, "WHEEL: Device: %s", devName.c_str());
-            logger.Write(INFO, "WHEEL: GUID:   %s", GUID2String(g).c_str());
+            logger.Write(INFO, "[Wheel] Device: %s", devName.c_str());
+            logger.Write(INFO, "[Wheel] GUID:   %s", GUID2String(g).c_str());
             if (isSupportedDrivingDevice(entry->diDeviceInstance.dwDevType)) {
                 FreeDevices.push_back(Device(devName, g));
             }
