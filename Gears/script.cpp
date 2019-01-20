@@ -412,7 +412,7 @@ void update_manual_transmission() {
         carControls.ButtonHeld(CarControls::WheelControlType::Toggle, 500) ||
         carControls.ButtonHeld(CarControls::ControllerControlType::Toggle) ||
         carControls.PrevInput == CarControls::Controller	&& carControls.ButtonHeld(CarControls::LegacyControlType::Toggle)) {
-        toggleManual();
+        toggleManual(!settings.EnableManual);
         return;
     }
 
@@ -529,8 +529,11 @@ void clearPatches() {
     }
 }
 
-void toggleManual() {
-    settings.EnableManual = !settings.EnableManual;
+void toggleManual(bool enable) {
+    // Don't need to do anything
+    if (settings.EnableManual == enable)
+        return;
+    settings.EnableManual = enable;
     settings.SaveGeneral();
     std::string message = mtPrefix;
     if (settings.EnableManual) {

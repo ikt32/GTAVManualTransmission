@@ -205,8 +205,8 @@ void update_mainmenu() {
 
     bool tempEnableRead = settings.EnableManual;
     if (menu.BoolOption("Enable manual transmission", tempEnableRead,
-        { "Enable or disable the entire mod." })) {
-        toggleManual();
+        { "Enable or disable the manual transmission. Steering wheel stays active." })) {
+        toggleManual(!settings.EnableManual);
     }
 
     int shiftModeTemp = settings.ShiftMode;

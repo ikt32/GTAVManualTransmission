@@ -16,7 +16,7 @@ bool MT_IsActive() {
 }
 
 void MT_SetActive(bool active) {
-    // TODO?
+    toggleManual(active);
 }
 
 void MT_AddIgnoreVehicle(int vehicle) {

@@ -21,7 +21,7 @@ void drawInputWheelInfo();
 ///////////////////////////////////////////////////////////////////////////////
 
 void resetSteeringMultiplier();
-void toggleManual();
+void toggleManual(bool enable);
 void initWheel();
 void stopForceFeedback();
 void updateLastInputDevice();
