@@ -3,9 +3,10 @@
 #include <inc/types.h>
 #include "Memory/MemoryPatcher.hpp"
 #include "Constants.h"
+#include "script.h"
 
 extern std::vector<Vehicle> ignoredVehicles;
-
+extern Vehicle vehicle;
 const char* MT_GetVersion() {
     return DISPLAY_VERSION;
 }
@@ -36,5 +37,13 @@ void MT_ClearIgnoredVehicles() {
 }
 
 unsigned MT_NumIgnoredVehicles() {
-    return ignoredVehicles.size();
+    return static_cast<unsigned>(ignoredVehicles.size());
+}
+
+const int* MT_GetIgnoredVehicles() {
+    return ignoredVehicles.data();
+}
+
+int MT_GetManagedVehicle() {
+    return vehicle;
 }
