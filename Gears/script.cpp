@@ -122,7 +122,7 @@ void handleBrakePatch() {
         if (!MemoryPatcher::BrakePatcher.Patched()) {
             MemoryPatcher::PatchBrake();
         }
-        for (size_t i = 0; i < lockUps.size(); i++) {
+        for (uint8_t i = 0; i < lockUps.size(); i++) {
             ext.SetWheelBrakePressure(vehicle, i, ext.GetWheelBrakePressure(vehicle)[i] * 0.9f);
         }
         if (settings.DisplayInfo)
@@ -2402,7 +2402,10 @@ void main() {
     }
 
     ext.initOffsets();
-    MemoryPatcher::Test();
+    if (!MemoryPatcher::Test()) {
+        logger.Write(ERROR, "Patchability test failed!");
+        MemoryPatcher::Error = true;
+    }
 
     logger.Write(INFO, "Setting up globals");
     if (!setupGlobals()) {

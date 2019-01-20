@@ -13,6 +13,8 @@ int NumGearboxPatched = 0;
 const int maxAttempts = 4;
 int gearboxAttempts = 0;
 
+bool Error = false;
+
 // When disabled, shift-up doesn't trigger.
 PatternInfo shiftUp;
 Patcher ShiftUpPatcher("Gears: Shift Up", shiftUp, true);
@@ -94,15 +96,17 @@ void SetPatterns(int version) {
     }
 }
 
-void Test() {
-    ShiftUpPatcher.Test();
-    ShiftDownPatcher.Test();
-    ClutchLowRPMPatcher.Test();
-    ClutchRevLimPatcher.Test();
-    ThrottlePatcher.Test();
-    BrakePatcher.Test();
-    SteeringAssistPatcher.Test();
-    SteeringControlPatcher.Test();
+bool Test() {
+    bool success = true;
+    success &= 0 != ShiftUpPatcher.Test();
+    success &= 0 != ShiftDownPatcher.Test();
+    success &= 0 != ClutchLowRPMPatcher.Test();
+    success &= 0 != ClutchRevLimPatcher.Test();
+    success &= 0 != ThrottlePatcher.Test();
+    success &= 0 != BrakePatcher.Test();
+    success &= 0 != SteeringAssistPatcher.Test();
+    success &= 0 != SteeringControlPatcher.Test();
+    return success;
 }
 
 bool ApplyGearboxPatches() {

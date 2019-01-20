@@ -18,6 +18,7 @@
 #include "Constants.h"
 #include "Util/StringFormat.h"
 #include "UpdateChecker.h"
+#include "Memory/MemoryPatcher.hpp"
 
 extern bool g_notifyUpdate;
 extern ReleaseInfo g_releaseInfo;
@@ -175,6 +176,13 @@ void onMenuClose() {
 void update_mainmenu() {
     menu.Title("Manual Transmission", 0.90f);
     menu.Subtitle(std::string("~b~") + DISPLAY_VERSION);
+
+    if (MemoryPatcher::Error) {
+        menu.Option("Patch test error", NativeMenu::solidRed, 
+            { "One or more components can't be patched. Mod behavior is uncertain."
+              "Usually caused by a game update or using an incompatible version.", 
+              "Check Gears.log for more details." });
+    }
 
     if (g_notifyUpdate) {
         std::vector<std::string> bodyLines = 

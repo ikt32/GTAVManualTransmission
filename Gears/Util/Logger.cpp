@@ -4,8 +4,7 @@
 #include <Windows.h>
 #include <fstream>
 
-Logger::Logger() {
-}
+Logger::Logger() = default;
 
 void Logger::SetFile(const std::string &fileName) {
     file = fileName;

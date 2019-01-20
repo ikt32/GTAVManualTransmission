@@ -3,7 +3,7 @@
 
 namespace MemoryPatcher {
 void SetPatterns(int version);
-void Test();
+bool Test();
 
 /*
  * Patch clutch and gearbox behavior so they can be script-controlled
@@ -35,6 +35,8 @@ bool RestoreBrake();
 */
 bool PatchThrottle();
 bool RestoreThrottle();
+
+extern bool Error;
 
 extern const int NumGearboxPatches;
 extern int NumGearboxPatched;

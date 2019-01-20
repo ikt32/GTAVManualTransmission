@@ -67,7 +67,6 @@ void VehicleExtensions::initOffsets() {
     logger.Write(gearRatiosOffset == 0 ? WARN : DEBUG, "Gear Ratios Offset: 0x%X", gearRatiosOffset);
 
     if (g_gameVersion >= G_VER_1_0_1604_0_STEAM) {
-        //driveForceOffset = addr == 0 ? 0 : *(int*)(addr + 3) + 0x2C;
         addr = mem::FindPattern("\xF3\x0F\x10\x8F\xA4\x08\x00\x00\xF3\x0F\x5E\xF0\x41\x0F\x2F\xCA", "xxxx????xxx?xxx?");
         driveForceOffset = addr == 0 ? 0 : *(int*)(addr + 4);
     }
