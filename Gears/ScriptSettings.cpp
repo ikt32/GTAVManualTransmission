@@ -207,6 +207,8 @@ void ScriptSettings::SaveWheel(CarControls *scriptControl) const {
 
     // [STEER]
     settingsWheel.SetDoubleValue("STEER", "ANTIDEADZONE", scriptControl->ADZSteer);
+    settingsWheel.SetDoubleValue("STEER", "DEADZONE", scriptControl->DZSteer);
+    settingsWheel.SetDoubleValue("STEER", "DEADZONEOFFSET", scriptControl->DZSteerOffset);
     settingsWheel.SetDoubleValue("STEER", "SteerAngleMax", SteerAngleMax );
     settingsWheel.SetDoubleValue("STEER", "SteerAngleCar", SteerAngleCar );
     settingsWheel.SetDoubleValue("STEER", "SteerAngleBike",SteerAngleBike);
@@ -513,6 +515,8 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     scriptControl->SteerMax = settingsWheel.GetLongValue("STEER", "MAX", -1);
 
     scriptControl->ADZSteer = settingsWheel.GetDoubleValue("STEER", "ANTIDEADZONE", 0.25);
+    scriptControl->DZSteer = settingsWheel.GetDoubleValue("STEER", "DEADZONE", 0.0);
+    scriptControl->DZSteerOffset = settingsWheel.GetDoubleValue("STEER", "DEADZONEOFFSET", 0.0);
 
     SteerAngleMax = settingsWheel.GetDoubleValue("STEER", "SteerAngleMax", 900.0);
     SteerAngleCar = settingsWheel.GetDoubleValue("STEER", "SteerAngleCar", 720.0);
