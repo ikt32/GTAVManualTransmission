@@ -1852,11 +1852,11 @@ void checkCameraButtons() {
     }
     else if (carControls.ButtonIn(CarControls::WheelControlType::LookRight)) {
         CAM::SET_GAMEPLAY_CAM_RELATIVE_PITCH(0.0f, 1.0f);
-        CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(-90);
+        CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(-90.0f);
     }
-    if (carControls.ButtonReleased(CarControls::WheelControlType::LookLeft) && !(carControls.ButtonIn(CarControls::WheelControlType::LookRight)) ||
-        carControls.ButtonReleased(CarControls::WheelControlType::LookRight) && !(carControls.ButtonIn(CarControls::WheelControlType::LookLeft))) {
-        CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(0);
+    if (carControls.ButtonReleased(CarControls::WheelControlType::LookLeft) && !carControls.ButtonIn(CarControls::WheelControlType::LookRight) ||
+        carControls.ButtonReleased(CarControls::WheelControlType::LookRight) && !carControls.ButtonIn(CarControls::WheelControlType::LookLeft)) {
+        CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(0.0f);
     }
     if (carControls.ButtonReleased(CarControls::WheelControlType::LookLeft)  ||
         carControls.ButtonReleased(CarControls::WheelControlType::LookRight)) {
