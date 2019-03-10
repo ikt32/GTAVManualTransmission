@@ -319,6 +319,9 @@ void update_input_controls() {
         default: { }
         }
     }
+    else {
+        stopForceFeedback();
+    }
 }
 
 // don't write with VehicleExtensions and dont set clutch state
