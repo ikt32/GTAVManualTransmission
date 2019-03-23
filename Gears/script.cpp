@@ -2349,7 +2349,13 @@ bool setupGlobals() {
 
     logger.Write(DEBUG, "bIsDecorRegisterLockedPtr @ 0x%p", g_bIsDecorRegisterLockedPtr);
 
-    *g_bIsDecorRegisterLockedPtr = 0;
+    bool scriptDidUnlock = false;
+
+    // only unlock if not unlocked yet
+    if (*g_bIsDecorRegisterLockedPtr == 1) {
+        *g_bIsDecorRegisterLockedPtr = 0;
+        scriptDidUnlock = true;
+    }
 
     // New decorators! :)
     registerDecorator(decorCurrentGear, DECOR_TYPE_INT);
@@ -2363,7 +2369,10 @@ bool setupGlobals() {
 	registerDecorator(decorLookingRight, DECOR_TYPE_BOOL);
 	registerDecorator(decorLookingBack, DECOR_TYPE_BOOL);
 
-    *g_bIsDecorRegisterLockedPtr = 1;
+    // only re-lock if it was locked before
+    if (scriptDidUnlock) {
+        *g_bIsDecorRegisterLockedPtr = 1;
+    }
     return true;
 }
 
