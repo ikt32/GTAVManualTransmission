@@ -6,6 +6,7 @@
 * Add update checker, allows to be turned off or to ignore an update
 * Fix an issue where hazard lights cancelled when turning, like normal signal lights
 * Fix an issue where turning lights would override hazard lights
+* Fix an issue where script re-locks `DECOR_REGISTER` if something else unlocked it
 
 ## 4.6.5
 * Update for v1.0.1604.0 (Arena War)
