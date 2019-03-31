@@ -31,6 +31,7 @@
 #include "Util/MiscEnums.h"
 #include "Util/StringFormat.h"
 #include "UpdateChecker.h"
+#include "Constants.h"
 
 ReleaseInfo g_releaseInfo;
 bool g_notifyUpdate;
@@ -48,6 +49,7 @@ const char* decorLookingLeft = "mt_looking_left";
 const char* decorLookingRight = "mt_looking_right";
 const char* decorLookingBack = "mt_looking_back";
 
+// TODO: Should be in the settings
 const float g_baseStallSpeed = 0.08f;
 const float g_baseCatchMinSpeed = 0.12f;
 const float g_baseCatchMaxSpeed = 0.24f;
@@ -55,8 +57,8 @@ const float g_baseCatchMaxSpeed = 0.24f;
 std::string textureWheelFile;
 int textureWheelId;
 
+// TODO: I think this broke some time ago?
 GameSound gearRattle("DAMAGED_TRUCK_IDLE", nullptr);
-int soundID;
 
 std::string absoluteModPath;
 std::string settingsGeneralFile;
@@ -73,14 +75,13 @@ Ped playerPed;
 Vehicle vehicle;
 Vehicle lastVehicle;
 
-VehicleInfo vehInfo;
-EngineValues engVal;
-VehicleDerivatives vehDerivs;
-VehicleMiscStates miscStates;
+//VehicleInfo vehInfo;
+VehiclePeripherals peripherals;
 VehicleGearboxStates gearStates(g_numGears);
 WheelPatchStates wheelPatchStates;
 
 VehicleExtensions ext;
+VehicleData vehData(ext);
 
 int prevNotification = 0;
 int prevExtShift = 0;
@@ -91,28 +92,14 @@ extern std::vector<std::string> speedoTypes;
 MiniPID pid(1.0, 0.0, 0.0);
 bool g_CustomABS;
 
-std::vector<bool> getWheelLockups(Vehicle handle) {
-    std::vector<bool> lockups;
-    float velocity = ENTITY::GET_ENTITY_VELOCITY(handle).y;
-    auto wheelsSpeed = ext.GetWheelRotationSpeeds(handle);
-    for (auto wheelSpeed : wheelsSpeed) {
-        if (abs(velocity) > 0.01f && wheelSpeed == 0.0f)
-            lockups.push_back(true);
-        else
-            lockups.push_back(false);
-    }
-    return lockups;
-}
-
-
 void handleBrakePatch() {
     bool lockedUp = false;
-    bool ebrk = ext.GetHandbrake(vehicle);
+    bool ebrk = vehData.mHandbrake;
     bool brn = VEHICLE::IS_VEHICLE_IN_BURNOUT(vehicle);
-    auto lockUps = getWheelLockups(vehicle);
-    auto susps = ext.GetWheelCompressions(vehicle);
+    auto lockUps = vehData.mWheelsLockedUp;
+    auto susps = vehData.mSuspensionTravel;
     auto brakePressures = ext.GetWheelBrakePressure(vehicle);
-    for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
+    for (int i = 0; i < vehData.mWheelCount; i++) {
         if (lockUps[i] && susps[i] > 0.0f && brakePressures[i] > 0.0f)
             lockedUp = true;
     }
@@ -141,13 +128,13 @@ void handleBrakePatch() {
             if (!MemoryPatcher::ThrottlePatcher.Patched()) {
                 MemoryPatcher::PatchThrottle();
             }
-            for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
+            for (int i = 0; i < vehData.mWheelCount; i++) {
                 if (ext.IsWheelPowered(vehicle, i)) {
                     ext.SetWheelBrakePressure(vehicle, i, 0.0f);
                     ext.SetWheelPower(vehicle, i, 2.0f * ext.GetDriveForce(vehicle));
                 }
                 else {
-                    float handlingBrakeForce = *reinterpret_cast<float *>(ext.GetHandlingPtr(vehicle) + hOffsets.fBrakeForce);
+                    float handlingBrakeForce = *reinterpret_cast<float *>(vehData.mHandlingPtr + hOffsets.fBrakeForce);
                     float inpBrakeForce = handlingBrakeForce * carControls.BrakeVal;
                     ext.SetWheelPower(vehicle, i, 0.0f);
                     ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
@@ -194,25 +181,22 @@ void update_vehicle() {
     vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
     // Reset vehicle stats on vehicle change (or leave)
     if (vehicle != lastVehicle) {
-        vehInfo = VehicleInfo();
-        engVal = EngineValues();
-        vehDerivs = VehicleDerivatives();
-        miscStates = VehicleMiscStates();
+        peripherals = VehiclePeripherals();
         gearStates = VehicleGearboxStates(g_numGears);
         wheelPatchStates = WheelPatchStates();
+        vehData.SetVehicle(vehicle); // assign new vehicle;
         gearRattle.Stop();
     }
+    if (isVehicleAvailable(vehicle, playerPed)) {
+        vehData.Update(); // Update before doing anything else
+    }
     if (vehicle != lastVehicle && isVehicleAvailable(vehicle, playerPed)) {
-        if (ext.GetTopGear(vehicle) == 1 || ext.GetVehicleFlags(vehicle)[1] & eVehicleFlag2::FLAG_IS_ELECTRIC)
+        if (vehData.mGearTop == 1 || vehData.mFlags[1] & FLAG_IS_ELECTRIC)
             gearStates.FakeNeutral = false;
         else
             gearStates.FakeNeutral = settings.DefaultNeutral;
     }
-    if (isVehicleAvailable(vehicle, playerPed)) {
-        vehDerivs.UpdateValues(ext, vehicle);
-        vehInfo.UpdateValues(ext, vehicle);
-        engVal.Update(ext, vehicle);
-    }
+
     lastVehicle = vehicle;
 }
 
@@ -233,12 +217,12 @@ void update_hud() {
     if (settings.DisplayWheelInfo) {
         drawVehicleWheelInfo();
     }
-    if (settings.HUD && vehInfo.Domain == VehicleDomain::Road &&
+    if (settings.HUD && vehData.mDomain == VehicleDomain::Road &&
         (settings.EnableManual || settings.AlwaysHUD)) {
         drawHUD();
     }
     if (settings.HUD &&
-        (vehInfo.Domain == VehicleDomain::Road || vehInfo.Domain == VehicleDomain::Water) &&
+        (vehData.mDomain == VehicleDomain::Road || vehData.mDomain == VehicleDomain::Water) &&
         (carControls.PrevInput == CarControls::Wheel || settings.AlwaysSteeringWheelInfo) &&
         settings.SteeringWheelInfo && textureWheelId != -1) {
         drawInputWheelInfo();
@@ -260,14 +244,14 @@ void wheelControlWater() {
 void wheelControlRoad() {
     checkWheelButtons();
     if (settings.EnableManual && 
-        !(vehInfo.Class == VehicleClass::Bike && settings.SimpleBike)) {
+        !(vehData.mClass == VehicleClass::Bike && settings.SimpleBike)) {
         handlePedalsRealReverse(carControls.ThrottleVal, carControls.BrakeVal);
     }
     else {
         handlePedalsDefault(carControls.ThrottleVal, carControls.BrakeVal);
     }
     doWheelSteering();
-    if (vehInfo.IsAmphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle) > 0.10f) {
+    if (vehData.mIsAmphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle) > 0.10f) {
         playFFBWater();
     }
     else {
@@ -291,7 +275,7 @@ void update_input_controls() {
         return;
 
     if (isVehicleAvailable(vehicle, playerPed)) {
-        switch (vehInfo.Domain) {
+        switch (vehData.mDomain) {
         case VehicleDomain::Road: {
             wheelControlRoad();
             break;
@@ -334,7 +318,7 @@ void update_misc_features() {
             crossScript();
         }
 
-        if (settings.AutoLookBack && vehInfo.Class != VehicleClass::Heli) {
+        if (settings.AutoLookBack && vehData.mClass != VehicleClass::Heli) {
             functionAutoLookback();
         }
     }
@@ -351,7 +335,7 @@ void update_manual_features() {
     }
 
     if (carControls.PrevInput != CarControls::InputDevices::Wheel) {
-        if (vehInfo.Class == VehicleClass::Bike && settings.SimpleBike) {
+        if (vehData.mClass == VehicleClass::Bike && settings.SimpleBike) {
             functionAutoReverse();
         }
         else {
@@ -367,7 +351,7 @@ void update_manual_features() {
     }
 
     // Engine damage: RPM Damage
-    if (settings.EngDamage && vehInfo.HasClutch) {
+    if (settings.EngDamage && vehData.mHasClutch) {
         functionEngDamage();
     }
 
@@ -379,7 +363,7 @@ void update_manual_features() {
     }
 
     if (!gearStates.FakeNeutral &&
-        !(settings.SimpleBike && vehInfo.Class == VehicleClass::Bike) && vehInfo.HasClutch) {
+        !(settings.SimpleBike && vehData.mClass == VehicleClass::Bike) && vehData.mHasClutch) {
         // Stalling
         if (settings.EngStall && settings.ShiftMode == HPattern ||
             settings.EngStallS && settings.ShiftMode == Sequential) {
@@ -419,7 +403,7 @@ void update_manual_transmission() {
         return;
     }
 
-    if (vehInfo.Domain != VehicleDomain::Road || !settings.EnableManual)
+    if (vehData.mDomain != VehicleDomain::Road || !settings.EnableManual)
         return;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -436,7 +420,6 @@ void update_manual_transmission() {
     if (MemoryPatcher::NumGearboxPatched != MemoryPatcher::NumGearboxPatches) {
         MemoryPatcher::ApplyGearboxPatches();
     }
-
     update_manual_features();
 
     switch(settings.ShiftMode) {
@@ -480,16 +463,16 @@ void crossScript() {
         return;
 
     // Current gear
-    DECORATOR::DECOR_SET_INT(vehicle, (char *)decorCurrentGear, ext.GetGearCurr(vehicle));
+    DECORATOR::DECOR_SET_INT(vehicle, (char *)decorCurrentGear, vehData.mGearCurr);
 
     // Shift indicator: 0 = nothing, 1 = Shift up, 2 = Shift down
     if (gearStates.HitRPMSpeedLimiter || gearStates.HitRPMLimiter) {
         DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice, 1);
     }
-    else if (ext.GetGearCurr(vehicle) > 1 && engVal.RPM < 0.4f) {
+    else if (vehData.mGearCurr > 1 && vehData.mRPM < 0.4f) {
         DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice, 2);
     }
-    else if (ext.GetGearCurr(vehicle) == ext.GetGearNext(vehicle)) {
+    else if (vehData.mGearCurr == vehData.mGearNext) {
         DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice, 0);
     }
 
@@ -564,7 +547,7 @@ void stopForceFeedback() {
 }
 
 void update_steeringpatches() {
-    bool isCar = vehInfo.Class == VehicleClass::Car;
+    bool isCar = vehData.mClass == VehicleClass::Car;
     bool useWheel = carControls.PrevInput == CarControls::Wheel;
     if (isCar && settings.PatchSteering &&
         (useWheel || settings.PatchSteeringAlways)) {
@@ -669,7 +652,7 @@ void setShiftMode(int shiftMode) {
     if (shiftMode > 2 || shiftMode < 0)
         return;
 
-    if (isVehicleAvailable(vehicle, playerPed) && shiftMode != HPattern && ext.GetGearCurr(vehicle) > 1)
+    if (isVehicleAvailable(vehicle, playerPed) && shiftMode != HPattern && vehData.mGearCurr > 1)
         gearStates.FakeNeutral = false;
 
     if (shiftMode == HPattern &&
@@ -710,7 +693,7 @@ void shiftTo(int gear, bool autoClutch) {
     gearStates.LockGear = gear;
 }
 void functionHShiftTo(int i) {
-    if (settings.ClutchShiftingH && vehInfo.HasClutch) {
+    if (settings.ClutchShiftingH && vehData.mHasClutch) {
         if (carControls.ClutchVal > 1.0f - settings.ClutchThreshold) {
             shiftTo(i, false);
             gearStates.FakeNeutral = false;
@@ -719,7 +702,7 @@ void functionHShiftTo(int i) {
         else {
             gearRattle.Play(vehicle);
             gearStates.FakeNeutral = true;
-            if (settings.EngDamage && vehInfo.HasClutch) {
+            if (settings.EngDamage && vehData.mHasClutch) {
                 VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
                     vehicle,
                     VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.MisshiftDamage);
@@ -735,15 +718,15 @@ void functionHShiftTo(int i) {
 
 void functionHShiftKeyboard() {
     int clamp = g_numGears - 1;
-    if (ext.GetTopGear(vehicle) <= clamp) {
-        clamp = ext.GetTopGear(vehicle);
+    if (vehData.mGearTop <= clamp) {
+        clamp = vehData.mGearTop;
     }
     for (uint8_t i = 0; i <= clamp; i++) {
         if (carControls.ButtonJustPressed(static_cast<CarControls::KeyboardControlType>(i))) {
             functionHShiftTo(i);
         }
     }
-    if (carControls.ButtonJustPressed(CarControls::KeyboardControlType::HN) && vehInfo.HasClutch) {
+    if (carControls.ButtonJustPressed(CarControls::KeyboardControlType::HN) && vehData.mHasClutch) {
         gearStates.FakeNeutral = !gearStates.FakeNeutral;
     }
 }
@@ -760,8 +743,8 @@ bool isHShifterJustNeutral() {
 
 void functionHShiftWheel() {
     int clamp = g_numGears - 1;
-    if (ext.GetTopGear(vehicle) <= clamp) {
-        clamp = ext.GetTopGear(vehicle);
+    if (vehData.mGearTop <= clamp) {
+        clamp = vehData.mGearTop;
     }
     for (uint8_t i = 0; i <= clamp; i++) {
         if (carControls.ButtonJustPressed(static_cast<CarControls::WheelControlType>(i))) {
@@ -771,17 +754,17 @@ void functionHShiftWheel() {
 
     if (isHShifterJustNeutral()) {
         if (settings.ClutchShiftingH &&
-            settings.EngDamage && vehInfo.HasClutch) {
+            settings.EngDamage && vehData.mHasClutch) {
             if (carControls.ClutchVal < 1.0 - settings.ClutchThreshold) {
                 gearRattle.Play(vehicle);
             }
         }
-        gearStates.FakeNeutral = vehInfo.HasClutch;
+        gearStates.FakeNeutral = vehData.mHasClutch;
     }
 
     if (carControls.ButtonReleased(CarControls::WheelControlType::HR)) {
         shiftTo(1, true);
-        gearStates.FakeNeutral = vehInfo.HasClutch;
+        gearStates.FakeNeutral = vehData.mHasClutch;
     }
 }
 
@@ -806,8 +789,8 @@ void functionSShift() {
         carControls.PrevInput == CarControls::Controller	&& ncTapStateUp == NativeController::TapState::Tapped ||
         carControls.PrevInput == CarControls::Keyboard		&& carControls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftUp) ||
         carControls.PrevInput == CarControls::Wheel			&& carControls.ButtonJustPressed(CarControls::WheelControlType::ShiftUp)) {
-        if (!vehInfo.HasClutch) {
-            if (ext.GetGearCurr(vehicle) < ext.GetTopGear(vehicle)) {
+        if (!vehData.mHasClutch) {
+            if (vehData.mGearCurr < vehData.mGearTop) {
                 shiftTo(gearStates.LockGear + 1, true);
             }
             gearStates.FakeNeutral = false;
@@ -821,20 +804,20 @@ void functionSShift() {
         }
 
         // Reverse to Neutral
-        if (ext.GetGearCurr(vehicle) == 0 && !gearStates.FakeNeutral) {
+        if (vehData.mGearCurr == 0 && !gearStates.FakeNeutral) {
             shiftTo(1, true);
             gearStates.FakeNeutral = true;
             return;
         }
 
         // Neutral to 1
-        if (ext.GetGearCurr(vehicle) == 1 && gearStates.FakeNeutral) {
+        if (vehData.mGearCurr == 1 && gearStates.FakeNeutral) {
             gearStates.FakeNeutral = false;
             return;
         }
 
         // 1 to X
-        if (ext.GetGearCurr(vehicle) < ext.GetTopGear(vehicle)) {
+        if (vehData.mGearCurr < vehData.mGearTop) {
             shiftTo(gearStates.LockGear + 1, true);
             gearStates.FakeNeutral = false;
             return;
@@ -847,8 +830,8 @@ void functionSShift() {
         carControls.PrevInput == CarControls::Controller	&& ncTapStateDn == NativeController::TapState::Tapped ||
         carControls.PrevInput == CarControls::Keyboard		&& carControls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftDown) ||
         carControls.PrevInput == CarControls::Wheel			&& carControls.ButtonJustPressed(CarControls::WheelControlType::ShiftDown)) {
-        if (!vehInfo.HasClutch) {
-            if (ext.GetGearCurr(vehicle) > 0) {
+        if (!vehData.mHasClutch) {
+            if (vehData.mGearCurr > 0) {
                 shiftTo(gearStates.LockGear - 1, true);
                 gearStates.FakeNeutral = false;
             }
@@ -862,20 +845,20 @@ void functionSShift() {
         }
 
         // 1 to Neutral
-        if (ext.GetGearCurr(vehicle) == 1 && !gearStates.FakeNeutral) {
+        if (vehData.mGearCurr == 1 && !gearStates.FakeNeutral) {
             gearStates.FakeNeutral = true;
             return;
         }
 
         // Neutral to R
-        if (ext.GetGearCurr(vehicle) == 1 && gearStates.FakeNeutral) {
+        if (vehData.mGearCurr == 1 && gearStates.FakeNeutral) {
             shiftTo(0, true);
             gearStates.FakeNeutral = false;
             return;
         }
 
         // X to 1
-        if (ext.GetGearCurr(vehicle) > 1) {
+        if (vehData.mGearCurr > 1) {
             shiftTo(gearStates.LockGear - 1, true);
             gearStates.FakeNeutral = false;
         }
@@ -904,20 +887,20 @@ bool subAutoShiftSequential() {
         carControls.PrevInput == CarControls::Keyboard		&& carControls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftUp) ||
         carControls.PrevInput == CarControls::Wheel			&& carControls.ButtonJustPressed(CarControls::WheelControlType::ShiftUp)) {
         // Reverse to Neutral
-        if (ext.GetGearCurr(vehicle) == 0 && !gearStates.FakeNeutral) {
+        if (vehData.mGearCurr == 0 && !gearStates.FakeNeutral) {
             shiftTo(1, true);
             gearStates.FakeNeutral = true;
             return true;
         }
 
         // Neutral to 1
-        if (ext.GetGearCurr(vehicle) == 1 && gearStates.FakeNeutral) {
+        if (vehData.mGearCurr == 1 && gearStates.FakeNeutral) {
             gearStates.FakeNeutral = false;
             return true;
         }
 
         // Invalid + N to 1
-        if (ext.GetGearCurr(vehicle) == 0 && gearStates.FakeNeutral) {
+        if (vehData.mGearCurr == 0 && gearStates.FakeNeutral) {
             shiftTo(1, true);
             gearStates.FakeNeutral = false;
             return true;
@@ -930,20 +913,20 @@ bool subAutoShiftSequential() {
         carControls.PrevInput == CarControls::Keyboard		&& carControls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftDown) ||
         carControls.PrevInput == CarControls::Wheel			&& carControls.ButtonJustPressed(CarControls::WheelControlType::ShiftDown)) {
         // 1 to Neutral
-        if (ext.GetGearCurr(vehicle) == 1 && !gearStates.FakeNeutral) {
+        if (vehData.mGearCurr == 1 && !gearStates.FakeNeutral) {
             gearStates.FakeNeutral = true;
             return true;
         }
 
         // Neutral to R
-        if (ext.GetGearCurr(vehicle) == 1 && gearStates.FakeNeutral) {
+        if (vehData.mGearCurr == 1 && gearStates.FakeNeutral) {
             shiftTo(0, true);
             gearStates.FakeNeutral = false;
             return true;
         }
 
         // Invalid + N to R
-        if (ext.GetGearCurr(vehicle) == 0 && gearStates.FakeNeutral) {
+        if (vehData.mGearCurr == 0 && gearStates.FakeNeutral) {
             shiftTo(0, true);
             gearStates.FakeNeutral = false;
             return true;
@@ -991,13 +974,13 @@ void functionAShift() {
             return;
     }
     
-    int currGear = ext.GetGearCurr(vehicle);
+    int currGear = vehData.mGearCurr;
     if (currGear == 0) return;
 
     float currSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
-    auto ratios = ext.GetGearRatios(vehicle);
-    float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
-    float InitialDriveMaxFlatVel = ext.GetInitialDriveMaxFlatVel(vehicle);
+    auto ratios = vehData.mGearRatios;
+    float DriveMaxFlatVel = vehData.mDriveMaxFlatVel;
+    float InitialDriveMaxFlatVel = vehData.mInitialDriveMaxFlatVel;
 
     float maxSpeedUpShiftWindow = DriveMaxFlatVel / ratios[currGear];
     float minSpeedUpShiftWindow = InitialDriveMaxFlatVel / ratios[currGear];
@@ -1011,29 +994,29 @@ void functionAShift() {
     float upshiftSpeed   = map(pow(carControls.ThrottleVal, 6.0f), 0.0f, 1.0f, minSpeedUpShiftWindow, maxSpeedUpShiftWindow);
     float downshiftSpeed = map(pow(carControls.ThrottleVal, 6.0f), 0.0f, 1.0f, prevGearMinSpeed,      highEndShiftSpeed);
 
-    float acceleration = vehDerivs.GetRelativeAcceleration().y / 9.81f;
+    float acceleration = vehData.mAcceleration.y / 9.81f;
     float accelExpect = pow(carControls.ThrottleVal, 2.0f) * ratios[currGear] * VEHICLE::GET_VEHICLE_ACCELERATION(vehicle);
 
-    float throttle = abs(ext.GetThrottle(vehicle));
-    float RPM = ext.GetCurrentRPM(vehicle);
+    float throttle = abs(vehData.mThrottle);
+    float RPM = vehData.mRPM;
     float engineLoad = throttle / RPM;
     bool shouldShiftUpLoad = throttle == 1.0f && engineLoad < 1.10f;
 
     // Shift up.
-    if (currGear < ext.GetTopGear(vehicle)) {
+    if (currGear < vehData.mGearTop) {
         bool shouldShiftUpSPD = currSpeed > upshiftSpeed;
         bool shouldShiftUpACC = acceleration < 0.33f * accelExpect && !gearStates.IgnoreAccelerationUpshiftTrigger;
 
         if (currSpeed > minSpeedUpShiftWindow && (shouldShiftUpSPD || shouldShiftUpLoad/*|| shouldShiftUpACC*/)) {
             gearStates.IgnoreAccelerationUpshiftTrigger = true;
             gearStates.PrevUpshiftTime = GetTickCount();
-            shiftTo(ext.GetGearCurr(vehicle) + 1, true);
+            shiftTo(vehData.mGearCurr + 1, true);
             gearStates.FakeNeutral = false;
             gearStates.UpshiftSpeedsMod[currGear] = currSpeed;
         }
 
         if (gearStates.IgnoreAccelerationUpshiftTrigger) {
-            float upshiftTimeout = 1.0f / *(float*)(ext.GetHandlingPtr(vehicle) + hOffsets.fClutchChangeRateScaleUpShift);
+            float upshiftTimeout = 1.0f / *(float*)(vehData.mHandlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
             if (gearStates.IgnoreAccelerationUpshiftTrigger && GetTickCount() > gearStates.PrevUpshiftTime + (int)(upshiftTimeout*1000.0f)) {
                 gearStates.IgnoreAccelerationUpshiftTrigger = false;
             }
@@ -1064,20 +1047,20 @@ void functionAShift() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void functionClutchCatch() {
-    float lowSpeed = g_baseCatchMinSpeed * (ext.GetDriveMaxFlatVel(vehicle) / ext.GetGearRatios(vehicle)[ext.GetGearCurr(vehicle)]);
-    float mehSpeed = g_baseCatchMaxSpeed * (ext.GetDriveMaxFlatVel(vehicle) / ext.GetGearRatios(vehicle)[ext.GetGearCurr(vehicle)]);
+    float lowSpeed = g_baseCatchMinSpeed * (vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr]);
+    float mehSpeed = g_baseCatchMaxSpeed * (vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr]);
 
     const float idleThrottle = 0.24f;
 
     if (carControls.ClutchVal < 1.0f - settings.ClutchThreshold && 
         carControls.ThrottleVal < 0.25f && carControls.BrakeVal < 0.95) {
         if (settings.ShiftMode != HPattern && carControls.BrakeVal > 0.1f || 
-            engVal.RPM > 0.25f && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y >= lowSpeed) {
+            vehData.mRPM > 0.25f && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y >= lowSpeed) {
             return;
         }
 
         // Forward
-        if (ext.GetGearCurr(vehicle) > 0 && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < mehSpeed) {
+        if (vehData.mGearCurr > 0 && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < mehSpeed) {
             float throttle = map(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y, mehSpeed, lowSpeed, 0.0f, idleThrottle);
             CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, throttle);
             ext.SetCurrentRPM(vehicle, 0.21f);
@@ -1085,7 +1068,7 @@ void functionClutchCatch() {
         }
 
         // Reverse
-        if (ext.GetGearCurr(vehicle) == 0) {
+        if (vehData.mGearCurr == 0) {
             float throttle = map(abs(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y), abs(mehSpeed), abs(lowSpeed), 0.0f, idleThrottle);
             // due to 0.25f deadzone throttle makes reversing anims stop, so its jerky
             // TODO: needs a workaround to prevent jerky reversing anims
@@ -1096,28 +1079,9 @@ void functionClutchCatch() {
     }
 }
 
-std::vector<bool> getDrivenWheels() {
-    int numWheels = ext.GetNumWheels(vehicle);
-    std::vector<bool> wheelsToConsider;
-    for (int i = 0; i < numWheels; i++)
-        wheelsToConsider.push_back(ext.IsWheelPowered(vehicle, i));
-
-    return wheelsToConsider;
-}
-
-std::vector<float> getDrivenWheelsSpeeds(std::vector<float> wheelSpeeds) {
-    std::vector<float> speeds;
-    std::vector<bool> drivenWheels = getDrivenWheels();
-    for (uint8_t i = 0; i < wheelSpeeds.size(); ++i) {
-        if (drivenWheels[i])
-            speeds.push_back(wheelSpeeds[i]);
-    }
-    return speeds;
-}
-
 void functionEngStall() {
-    float avgWheelSpeed = abs(avg(getDrivenWheelsSpeeds(ext.GetTyreSpeeds(vehicle))));
-    float stallSpeed = g_baseStallSpeed * abs(ext.GetDriveMaxFlatVel(vehicle)/ext.GetGearRatios(vehicle)[ext.GetGearCurr(vehicle)]);
+    float avgWheelSpeed = abs(vehData.mWheelAverageDrivenTyreSpeed);
+    float stallSpeed = g_baseStallSpeed * abs(vehData.mDriveMaxFlatVel/vehData.mGearRatios[vehData.mGearCurr]);
     float stallTime = 0.30f;
 
     //showText(0.1, 0.1, 1.0, "Stall progress: " + std::to_string(vehData.StallProgress));
@@ -1130,7 +1094,7 @@ void functionEngStall() {
     float invClutch = 1.0f - carControls.ClutchVal;
 
     if (invClutch > settings.StallingThreshold &&
-        engVal.RPM < 0.25f &&
+        vehData.mRPM < 0.25f &&
         avgWheelSpeed < stallSpeed &&
         VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
         gearStates.StallProgress += invClutch * 1.0f/stallTime * GAMEPLAY::GET_FRAME_TIME();
@@ -1157,13 +1121,13 @@ void functionEngStall() {
 
 void functionEngDamage() {
     if (settings.ShiftMode == Automatic ||
-        ext.GetVehicleFlags(vehicle)[1] & eVehicleFlag2::FLAG_IS_ELECTRIC || 
-        ext.GetTopGear(vehicle) == 1) {
+        vehData.mFlags[1] & eVehicleFlag2::FLAG_IS_ELECTRIC || 
+        vehData.mGearTop == 1) {
         return;
     }
 
-    if (ext.GetGearCurr(vehicle) != ext.GetTopGear(vehicle) &&
-        engVal.RPM > 0.98f &&
+    if (vehData.mGearCurr != vehData.mGearTop &&
+        vehData.mRPM > 0.98f &&
         carControls.ThrottleVal > 0.98f) {
         VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, 
                                            VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (settings.RPMDamage));
@@ -1172,9 +1136,9 @@ void functionEngDamage() {
 
 void functionEngLock() {
     if (settings.ShiftMode == Automatic ||
-        ext.GetVehicleFlags(vehicle)[1] & eVehicleFlag2::FLAG_IS_ELECTRIC ||
-        ext.GetTopGear(vehicle) == 1 || 
-        ext.GetGearCurr(vehicle) == ext.GetTopGear(vehicle) ||
+        vehData.mFlags[1] & eVehicleFlag2::FLAG_IS_ELECTRIC ||
+        vehData.mGearTop == 1 || 
+        vehData.mGearCurr == vehData.mGearTop ||
         gearStates.FakeNeutral) {
         wheelPatchStates.EngLockActive = false;
         gearRattle.Stop();
@@ -1185,15 +1149,15 @@ void functionEngLock() {
     float dashms = abs(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y);
 
     float speed = dashms;
-    auto ratios = ext.GetGearRatios(vehicle);
-    float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
-    float maxSpeed = DriveMaxFlatVel / ratios[ext.GetGearCurr(vehicle)];
+    auto ratios = vehData.mGearRatios;
+    float DriveMaxFlatVel = vehData.mDriveMaxFlatVel;
+    float maxSpeed = DriveMaxFlatVel / ratios[vehData.mGearCurr];
 
     float inputMultiplier = (1.0f - carControls.ClutchVal);
-    auto wheelsSpeed = avg(getDrivenWheelsSpeeds(ext.GetTyreSpeeds(vehicle)));
+    auto wheelsSpeed = vehData.mWheelAverageDrivenTyreSpeed;
 
     bool wrongDirection = false;
-    if (ext.GetGearCurr(vehicle) == 0 && VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
+    if (vehData.mGearCurr == 0 && VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
         if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > reverseThreshold && wheelsSpeed > reverseThreshold) {
             wrongDirection = true;
         }
@@ -1208,15 +1172,15 @@ void functionEngLock() {
     if ((speed > abs(maxSpeed * 1.15f) + 3.334f || wrongDirection) && inputMultiplier > settings.ClutchThreshold) {
         wheelPatchStates.EngLockActive = true;
         float lockingForce = 60.0f * inputMultiplier;
-        auto wheelsToLock = getDrivenWheels();
+        auto wheelsToLock = vehData.mWheelsDriven;//getDrivenWheels();
 
-        for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
+        for (int i = 0; i < vehData.mWheelCount; i++) {
             if (i >= wheelsToLock.size() || wheelsToLock[i]) {
                 ext.SetWheelBrakePressure(vehicle, i, lockingForce);
                 ext.SetWheelSkidSmokeEffect(vehicle, i, lockingForce);
             }
             else {
-                float inpBrakeForce = *reinterpret_cast<float *>(ext.GetHandlingPtr(vehicle) + hOffsets.fBrakeForce) * carControls.BrakeVal;
+                float inpBrakeForce = *reinterpret_cast<float *>(vehData.mHandlingPtr + hOffsets.fBrakeForce) * carControls.BrakeVal;
                 ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
             }
         }
@@ -1249,8 +1213,8 @@ void functionEngBrake() {
     // When you let go of the throttle at high RPMs
     float activeBrakeThreshold = settings.EngBrakeThreshold;
 
-    if (engVal.RPM >= activeBrakeThreshold && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > 5.0f && !gearStates.FakeNeutral) {
-        float handlingBrakeForce = *reinterpret_cast<float *>(ext.GetHandlingPtr(vehicle) + hOffsets.fBrakeForce);
+    if (vehData.mRPM >= activeBrakeThreshold && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > 5.0f && !gearStates.FakeNeutral) {
+        float handlingBrakeForce = *reinterpret_cast<float *>(vehData.mHandlingPtr + hOffsets.fBrakeForce);
         float inpBrakeForce = handlingBrakeForce * carControls.BrakeVal;
 
         float throttleMultiplier = 1.0f - carControls.ThrottleVal;
@@ -1258,10 +1222,10 @@ void functionEngBrake() {
         float inputMultiplier = throttleMultiplier * clutchMultiplier;
         if (inputMultiplier > 0.0f) {
             wheelPatchStates.EngBrakeActive = true;
-            float rpmMultiplier = (engVal.RPM - activeBrakeThreshold) / (1.0f - activeBrakeThreshold);
+            float rpmMultiplier = (vehData.mRPM - activeBrakeThreshold) / (1.0f - activeBrakeThreshold);
             float engBrakeForce = settings.EngBrakePower * handlingBrakeForce * inputMultiplier * rpmMultiplier;
-            auto wheelsToBrake = getDrivenWheels();
-            for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
+            auto wheelsToBrake = vehData.mWheelsDriven;// getDrivenWheels();
+            for (int i = 0; i < vehData.mWheelCount; i++) {
                 if (i >= wheelsToBrake.size() || wheelsToBrake[i]) {
                     ext.SetWheelBrakePressure(vehicle, i, engBrakeForce + inpBrakeForce);
                 }
@@ -1286,15 +1250,16 @@ void functionEngBrake() {
 //                       Mod functions: Gearbox control
 ///////////////////////////////////////////////////////////////////////////////
 
+// TODO: Change ratios for additional param RPM rise speed
 void fakeRev(bool customThrottle, float customThrottleVal) {
     float throttleVal = customThrottle ? customThrottleVal : carControls.ThrottleVal;
     float timeStep = SYSTEM::TIMESTEP();
     float accelRatio = 2.5f * timeStep;
-    float rpmValTemp = engVal.PrevRPM > engVal.RPM ? engVal.PrevRPM - engVal.RPM : 0.0f;
-    if (ext.GetGearCurr(vehicle) == 1) {			// For some reason, first gear revs slower
+    float rpmValTemp = vehData.mRPMPrev > vehData.mRPM ? vehData.mRPMPrev - vehData.mRPM : 0.0f;
+    if (vehData.mGearCurr == 1) {			// For some reason, first gear revs slower
         rpmValTemp *= 2.0f;
     }
-    float rpmVal = engVal.RPM +			// Base value
+    float rpmVal = vehData.mRPM +			// Base value
         rpmValTemp +						// Keep it constant
         throttleVal * accelRatio;	// Addition value, depends on delta T
     //showText(0.4, 0.4, 2.0, "FakeRev");
@@ -1306,7 +1271,7 @@ void handleRPM() {
 
     // Ignores clutch 
     if (settings.ShiftMode == Automatic ||
-        vehInfo.Class == VehicleClass::Bike && settings.SimpleBike) {
+        vehData.mClass == VehicleClass::Bike && settings.SimpleBike) {
         clutch = 0.0f;
     }
 
@@ -1317,12 +1282,12 @@ void handleRPM() {
     // Result:	Is as desired. Speed may drop a bit because of game clutch.
     // Update 2017-08-12: We know the gear speeds now, consider patching
     // shiftUp completely?
-    if (ext.GetGearCurr(vehicle) > 0 &&
+    if (vehData.mGearCurr > 0 &&
         (gearStates.HitRPMSpeedLimiter && ENTITY::GET_ENTITY_SPEED(vehicle) > 2.0f)) {
         ext.SetThrottle(vehicle, 1.0f);
         fakeRev(false, 1.0f);
         CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
-        float counterForce = 0.25f*-(static_cast<float>(ext.GetTopGear(vehicle)) - static_cast<float>(ext.GetGearCurr(vehicle)))/static_cast<float>(ext.GetTopGear(vehicle));
+        float counterForce = 0.25f*-(static_cast<float>(vehData.mGearTop) - static_cast<float>(vehData.mGearCurr))/static_cast<float>(vehData.mGearTop);
         ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, counterForce, 0.0f, true, true, true, true);
         //showText(0.4, 0.1, 1.0, "REV LIM SPD");
         //showText(0.4, 0.15, 1.0, "CF: " + std::to_string(counterForce));
@@ -1335,14 +1300,14 @@ void handleRPM() {
     /*
         Game doesn't rev on disengaged clutch in any gear but 1
         This workaround tries to emulate this
-        Default: ext.GetClutch(vehicle) >= 0.6: Normal
-        Default: ext.GetClutch(vehicle) < 0.6: Nothing happens
+        Default: vehData.mClutch >= 0.6: Normal
+        Default: vehData.mClutch < 0.6: Nothing happens
         Fix: Map 0.0-1.0 to 0.6-1.0 (clutchdata)
         Fix: Map 0.0-1.0 to 1.0-0.6 (control)
     */
     float finalClutch = 1.0f - clutch;
     
-    if (ext.GetGearCurr(vehicle) > 1) {
+    if (vehData.mGearCurr > 1) {
         finalClutch = map(clutch, 0.0f, 1.0f, 1.0f, 0.6f);
 
         // The next statement is a workaround for rolling back + brake + gear > 1 because it shouldn't rev then.
@@ -1382,19 +1347,19 @@ void handleRPM() {
  * Custom limiter thing
  */
 void functionLimiter() {
-    gearStates.HitRPMLimiter = ext.GetCurrentRPM(vehicle) > 1.0f;
+    gearStates.HitRPMLimiter = vehData.mRPM > 1.0f;
 
     if (!settings.HardLimiter && 
-        (ext.GetGearCurr(vehicle) == ext.GetTopGear(vehicle) || ext.GetGearCurr(vehicle) == 0)) {
+        (vehData.mGearCurr == vehData.mGearTop || vehData.mGearCurr == 0)) {
         gearStates.HitRPMSpeedLimiter = false;
         return;
     }
 
-    auto ratios = ext.GetGearRatios(vehicle);
-    float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
-    float maxSpeed = DriveMaxFlatVel / ratios[ext.GetGearCurr(vehicle)];
+    auto ratios = vehData.mGearRatios;
+    float DriveMaxFlatVel = vehData.mDriveMaxFlatVel;
+    float maxSpeed = DriveMaxFlatVel / ratios[vehData.mGearCurr];
 
-    if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > maxSpeed && ext.GetCurrentRPM(vehicle) >= 1.0f) {
+    if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > maxSpeed && vehData.mRPM >= 1.0f) {
         gearStates.HitRPMSpeedLimiter = true;
     }
     else {
@@ -1416,7 +1381,7 @@ void SetControlADZ(eControl control, float value, float adz) {
 void functionRealReverse() {
     // Forward gear
     // Desired: Only brake
-    if (ext.GetGearCurr(vehicle) > 0) {
+    if (vehData.mGearCurr > 0) {
         // LT behavior when stopped: Just brake
         if (carControls.BrakeVal > 0.01f && carControls.ThrottleVal < carControls.BrakeVal &&
             ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < 0.5f && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y >= -0.5f) { // < 0.5 so reverse never triggers
@@ -1449,7 +1414,7 @@ void functionRealReverse() {
     }
     // Reverse gear
     // Desired: RT reverses, LT brakes
-    if (ext.GetGearCurr(vehicle) == 0) {
+    if (vehData.mGearCurr == 0) {
         // Enables reverse lights
         ext.SetThrottleP(vehicle, -0.1f);
         // RT behavior
@@ -1512,7 +1477,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
     float speedThreshold = 0.5f;
     const float reverseThreshold = 2.0f;
 
-    if (ext.GetGearCurr(vehicle) > 0) {
+    if (vehData.mGearCurr > 0) {
         // Going forward
         if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > speedThreshold) {
             //showText(0.3, 0.0, 1.0, "We are going forward");
@@ -1588,7 +1553,7 @@ void handlePedalsRealReverse(float wheelThrottleVal, float wheelBrakeVal) {
         }
     }
 
-    if (ext.GetGearCurr(vehicle) == 0) {
+    if (vehData.mGearCurr == 0) {
         // Enables reverse lights
         ext.SetThrottleP(vehicle, -0.1f);
         
@@ -1661,7 +1626,7 @@ void functionAutoReverse() {
     if (CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && 
         !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) &&
         ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > -1.0f &&
-        ext.GetGearCurr(vehicle) == 0) {
+        vehData.mGearCurr == 0) {
         gearStates.LockGear = 1;
     }
 
@@ -1669,7 +1634,7 @@ void functionAutoReverse() {
     if (CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && 
         !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) &&
         ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < 1.0f &&
-        ext.GetGearCurr(vehicle) > 0) {
+        vehData.mGearCurr > 0) {
         gearStates.FakeNeutral = false;
         gearStates.LockGear = 0;
     }
@@ -1685,7 +1650,7 @@ void blockButtons() {
         carControls.PrevInput != CarControls::Controller || !isVehicleAvailable(vehicle, playerPed)) {
         return;
     }
-    if (settings.ShiftMode == Automatic && ext.GetGearCurr(vehicle) > 1) {
+    if (settings.ShiftMode == Automatic && vehData.mGearCurr > 1) {
         return;
     }
 
@@ -1753,10 +1718,10 @@ void startStopEngine() {
 
 // Set state, and activate them if hazards are off.
 void setBlinkers(bool left, bool right) {
-    miscStates.BlinkerLeft = left;
-    miscStates.BlinkerRight = right;
+    peripherals.BlinkerLeft = left;
+    peripherals.BlinkerRight = right;
 
-    if (!miscStates.BlinkerHazard) {
+    if (!peripherals.BlinkerHazard) {
         VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, right);
         VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, left);
     }
@@ -1764,47 +1729,47 @@ void setBlinkers(bool left, bool right) {
 
 void checkIndicatorActions() {
     if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorHazard)) {
-        if (!miscStates.BlinkerHazard) {
+        if (!peripherals.BlinkerHazard) {
             VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, true);
             VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, true);
-            miscStates.BlinkerHazard = true;
+            peripherals.BlinkerHazard = true;
         }
         else {
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, miscStates.BlinkerRight);
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, miscStates.BlinkerLeft);
-            miscStates.BlinkerHazard = false;
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 0, peripherals.BlinkerRight);
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(vehicle, 1, peripherals.BlinkerLeft);
+            peripherals.BlinkerHazard = false;
         }
     }
 
     if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorLeft)) {
-        if (!miscStates.BlinkerLeft) {
-            miscStates.BlinkerTicks = 1;
+        if (!peripherals.BlinkerLeft) {
+            peripherals.BlinkerTicks = 1;
             setBlinkers(true, false);
         }
         else {
-            miscStates.BlinkerTicks = 0;
+            peripherals.BlinkerTicks = 0;
             setBlinkers(false, false);
         }
     }
     if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorRight)) {
-        if (!miscStates.BlinkerRight) {
-            miscStates.BlinkerTicks = 1;
+        if (!peripherals.BlinkerRight) {
+            peripherals.BlinkerTicks = 1;
             setBlinkers(false, true);
         }
         else {
-            miscStates.BlinkerTicks = 0;
+            peripherals.BlinkerTicks = 0;
             setBlinkers(false, false);
         }
     }
 
     float wheelCenterDeviation = (carControls.SteerVal - 0.5f) / 0.5f;
 
-    if (miscStates.BlinkerTicks == 1 && abs(wheelCenterDeviation) > 0.2f) {
-        miscStates.BlinkerTicks = 2;
+    if (peripherals.BlinkerTicks == 1 && abs(wheelCenterDeviation) > 0.2f) {
+        peripherals.BlinkerTicks = 2;
     }
 
-    if (miscStates.BlinkerTicks == 2 && abs(wheelCenterDeviation) < 0.1f) {
-        miscStates.BlinkerTicks = 0;
+    if (peripherals.BlinkerTicks == 2 && abs(wheelCenterDeviation) < 0.1f) {
+        peripherals.BlinkerTicks = 0;
         setBlinkers(false, false);
     }
 }
@@ -1813,21 +1778,21 @@ void checkRadioButtons() {
     if (carControls.ButtonHeld(CarControls::WheelControlType::RadioPrev, 1000) ||
         carControls.ButtonHeld(CarControls::WheelControlType::RadioNext, 1000)) {
         if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() != RadioOff) {
-            miscStates.RadioStationIndex = AUDIO::GET_PLAYER_RADIO_STATION_INDEX();
+            peripherals.RadioStationIndex = AUDIO::GET_PLAYER_RADIO_STATION_INDEX();
         }
         AUDIO::SET_VEH_RADIO_STATION(vehicle, "OFF");
         return;
     }
     if (carControls.ButtonReleased(CarControls::WheelControlType::RadioNext)) {
         if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() == RadioOff) {
-            AUDIO::SET_RADIO_TO_STATION_INDEX(miscStates.RadioStationIndex);
+            AUDIO::SET_RADIO_TO_STATION_INDEX(peripherals.RadioStationIndex);
             return;
         }
         AUDIO::_0xFF266D1D0EB1195D(); // Next radio station
     }
     if (carControls.ButtonReleased(CarControls::WheelControlType::RadioPrev)) {
         if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() == RadioOff) {
-            AUDIO::SET_RADIO_TO_STATION_INDEX(miscStates.RadioStationIndex);
+            AUDIO::SET_RADIO_TO_STATION_INDEX(peripherals.RadioStationIndex);
             return;
         }
         AUDIO::_0xDD6BCF9E94425DF9(); // Prev radio station
@@ -1842,12 +1807,12 @@ void checkCameraButtons() {
     // who was first?
     if (carControls.ButtonIn(CarControls::WheelControlType::LookRight) &&
         carControls.ButtonJustPressed(CarControls::WheelControlType::LookLeft)) {
-        miscStates.LookBackRShoulder = true;
+        peripherals.LookBackRShoulder = true;
     }
 
     if (carControls.ButtonIn(CarControls::WheelControlType::LookLeft) &&
         carControls.ButtonIn(CarControls::WheelControlType::LookRight)) {
-        CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(miscStates.LookBackRShoulder ? -180.0f : 180.0f);
+        CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(peripherals.LookBackRShoulder ? -180.0f : 180.0f);
     }
     else if (carControls.ButtonIn(CarControls::WheelControlType::LookLeft)) {
         CAM::SET_GAMEPLAY_CAM_RELATIVE_PITCH(0.0f, 1.0f);
@@ -1863,7 +1828,7 @@ void checkCameraButtons() {
     }
     if (carControls.ButtonReleased(CarControls::WheelControlType::LookLeft)  ||
         carControls.ButtonReleased(CarControls::WheelControlType::LookRight)) {
-        miscStates.LookBackRShoulder = false;
+        peripherals.LookBackRShoulder = false;
     }
 
     // Set camera related decorators
@@ -1921,9 +1886,9 @@ void doWheelSteering() {
         return;
 
     float steerMult;
-    if (vehInfo.Class == VehicleClass::Bike || vehInfo.Class == VehicleClass::Quad)
+    if (vehData.mClass == VehicleClass::Bike || vehData.mClass == VehicleClass::Quad)
         steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
-    else if (vehInfo.Class == VehicleClass::Car)
+    else if (vehData.mClass == VehicleClass::Car)
         steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
     else {
         steerMult = settings.SteerAngleMax / settings.SteerAngleBoat;
@@ -1938,7 +1903,7 @@ void doWheelSteering() {
      * does need a specified anti-deadzone (recommended: 24-25%)
      * 
      */
-    if (vehInfo.Class == VehicleClass::Car && settings.PatchSteeringControl) {
+    if (vehData.mClass == VehicleClass::Car && settings.PatchSteeringControl) {
         ext.SetSteeringInputAngle(vehicle, -effSteer);
     }
     else {
@@ -1947,7 +1912,7 @@ void doWheelSteering() {
 }
 
 int calculateDamper(float gain, float wheelsOffGroundRatio) {
-    Vector3 accelValsAvg = vehDerivs.GetRelativeAccelerationAverage();
+    Vector3 accelValsAvg = vehData.mAcceleration; //TODO: Avg/dampen later
     
     // Just to use floats everywhere here
     float damperMax = static_cast<float>(settings.DamperMax);
@@ -1968,7 +1933,7 @@ int calculateDamper(float gain, float wheelsOffGroundRatio) {
 
     damperForce = damperForce * (1.0f - wheelsOffGroundRatio);
     
-    if (vehInfo.Class == VehicleClass::Car || vehInfo.Class == VehicleClass::Quad) {
+    if (vehData.mClass == VehicleClass::Car || vehData.mClass == VehicleClass::Quad) {
         if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
             damperForce /= 2.0f;
         }
@@ -1976,7 +1941,7 @@ int calculateDamper(float gain, float wheelsOffGroundRatio) {
             damperForce /= 2.0f;
         }
     }
-    else if (vehInfo.Class == VehicleClass::Bike) {
+    else if (vehData.mClass == VehicleClass::Bike) {
         if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
             damperForce /= 4.0f;
         }
@@ -1998,7 +1963,7 @@ int calculateDamper(float gain, float wheelsOffGroundRatio) {
 int calculateDetail() {
     // Detail feel / suspension compression based
     float compSpeedTotal = 0.0f;
-    auto compSpeed = vehDerivs.GetWheelCompressionSpeeds();
+    auto compSpeed = vehData.mSuspensionTravelSpeeds;
 
     // More than 2 wheels! Trikes should be ok, etc.
     if (compSpeed.size() > 2) {
@@ -2011,9 +1976,9 @@ int calculateDetail() {
 
 void calculateSoftLock(int &totalForce) {
     float steerMult;
-    if (vehInfo.Class == VehicleClass::Bike || vehInfo.Class == VehicleClass::Quad)
+    if (vehData.mClass == VehicleClass::Bike || vehData.mClass == VehicleClass::Quad)
         steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
-    else if (vehInfo.Class == VehicleClass::Car)
+    else if (vehData.mClass == VehicleClass::Car)
         steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
     else {
         steerMult = settings.SteerAngleMax / settings.SteerAngleBoat;
@@ -2066,7 +2031,7 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
 
     satForce = (int)((float)satForce * (1.0f - wheelsOffGroundRatio));
 
-    if (vehInfo.Class == VehicleClass::Car || vehInfo.Class == VehicleClass::Quad) {
+    if (vehData.mClass == VehicleClass::Car || vehData.mClass == VehicleClass::Quad) {
         if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
             satForce = satForce / 4;
         }
@@ -2074,7 +2039,7 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
             satForce = satForce / 4;
         }
     }
-    else if (vehInfo.Class == VehicleClass::Bike) {
+    else if (vehData.mClass == VehicleClass::Bike) {
         if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
             satForce = satForce / 10;
         }
@@ -2114,11 +2079,11 @@ void drawSteeringLines(float steeringAngle) {
 }
 
 float getSteeringAngle(Vehicle v) {
-    auto angles = ext.GetWheelSteeringAngles(v);
+    auto angles = vehData.mWheelSteeringAngles;
     float wheelsSteered = 0.0f;
     float avgAngle = 0.0f;
 
-    for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
+    for (int i = 0; i < vehData.mWheelCount; i++) {
         if (i < 3 && angles[i] != 0.0f) {
             wheelsSteered += 1.0f;
             avgAngle += angles[i];
@@ -2129,7 +2094,7 @@ float getSteeringAngle(Vehicle v) {
         avgAngle /= wheelsSteered;
     }
     else {
-        avgAngle = ext.GetSteeringAngle(vehicle)*ext.GetSteeringMultiplier(vehicle); // tank, forklift
+        avgAngle = vehData.mSteeringAngle * vehData.mSteeringMult; // tank, forklift
     }
     return avgAngle;
 }
@@ -2137,14 +2102,14 @@ float getSteeringAngle(Vehicle v) {
 
 
 float getFloatingSteeredWheelsRatio(Vehicle v) {
-    auto suspensionStates = ext.GetWheelsOnGround(vehicle);
-    auto angles = ext.GetWheelSteeringAngles(vehicle);
+    auto suspensionStates = vehData.mWheelsOnGround;
+    auto angles = vehData.mWheelSteeringAngles;
 
     float wheelsOffGroundRatio = 0.0f;
     float wheelsInAir = 0.0f;
     float wheelsSteered = 0.0f;
 
-    for (int i = 0; i < ext.GetNumWheels(vehicle); i++) {
+    for (int i = 0; i < vehData.mWheelCount; i++) {
         if (angles[i] != 0.0f) {
             wheelsSteered += 1.0f;
             if (suspensionStates[i] == false) {
@@ -2159,7 +2124,7 @@ float getFloatingSteeredWheelsRatio(Vehicle v) {
 }
 
 float getSteeringLock() {
-    switch (vehInfo.Class) {
+    switch (vehData.mClass) {
         case VehicleClass::Bike:
         case VehicleClass::Quad:
         case VehicleClass::Bicycle:
@@ -2188,14 +2153,14 @@ void playFFBGround() {
     }
 
     if (settings.LogiLEDs) {
-        carControls.PlayLEDs(engVal.RPM, 0.45f, 0.95f);
+        carControls.PlayLEDs(vehData.mRPM, 0.45f, 0.95f);
     }
 
     float avgAngle = getSteeringAngle(vehicle);
     float wheelsOffGroundRatio = getFloatingSteeredWheelsRatio(vehicle);
 
     int detailForce = calculateDetail();
-    int satForce = calculateSat(2500, avgAngle, wheelsOffGroundRatio, vehInfo.Class == VehicleClass::Car);
+    int satForce = calculateSat(2500, avgAngle, wheelsOffGroundRatio, vehData.mClass == VehicleClass::Car);
     int damperForce = calculateDamper(50.0f, wheelsOffGroundRatio);
 
     // Decrease damper if sat rises, so constantForce doesn't fight against damper
@@ -2211,7 +2176,7 @@ void playFFBGround() {
     const float maxGforce = 50.0f;
     const float minForce = 500.0f;
     const float maxForce = 10000.0f;
-    float gForce = abs(vehDerivs.GetRelativeAccelerationAverage().y) / 9.81f;
+    float gForce = abs(vehData.mAcceleration.y) / 9.81f; // TODO: Average/dampen later
     bool collision = gForce > minGforce;
     int res = static_cast<int>(map(gForce, minGforce, maxGforce, minForce, maxForce) * settings.CollisionMult);
     if (collision) {
@@ -2242,11 +2207,11 @@ void playFFBWater() {
     }
 
     if (settings.LogiLEDs) {
-        carControls.PlayLEDs(engVal.RPM, 0.45f, 0.95f);
+        carControls.PlayLEDs(vehData.mRPM, 0.45f, 0.95f);
     }
 
-    auto suspensionStates = ext.GetWheelsOnGround(vehicle);
-    auto angles = ext.GetWheelSteeringAngles(vehicle);
+    auto suspensionStates = vehData.mWheelsOnGround;
+    auto angles = vehData.mWheelSteeringAngles;
 
     bool isInWater = ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle) > 0.10f;
     int damperForce = calculateDamper(50.0f, isInWater ? 0.25f : 1.0f);
@@ -2278,13 +2243,13 @@ void playFFBWater() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void functionAutoLookback() {
-    if (ext.GetTopGear(vehicle) > 0 && ext.GetGearCurr(vehicle) == 0) {
+    if (vehData.mGearTop > 0 && vehData.mGearCurr == 0) {
         CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleLookBehind, 1.0f);
     }
 }
 
 void functionAutoGear1() {
-    if (ext.GetThrottle(vehicle) < 0.1f && ENTITY::GET_ENTITY_SPEED(vehicle) < 0.1f && ext.GetGearCurr(vehicle) > 1) {
+    if (vehData.mThrottle < 0.1f && ENTITY::GET_ENTITY_SPEED(vehicle) < 0.1f && vehData.mGearCurr > 1) {
         gearStates.LockGear = 1;
     }
 }

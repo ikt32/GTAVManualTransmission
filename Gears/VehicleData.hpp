@@ -2,14 +2,9 @@
 
 #include <inc/types.h>
 
-//#include <Windows.h>
-#include <array>
 #include <vector>
 #include <chrono>
-#include "Constants.h"
 #include "Memory/VehicleExtensions.hpp"
-
-#define SAMPLES 6
 
 enum class VehicleClass {
     Car,
@@ -32,73 +27,7 @@ enum class VehicleDomain {
     Unknown
 };
 
-/*
- * For the more static stuff that only changes once per vehicle spawn
- *   * Vehicle type
- *   * Stuff that's updated once more is known but stays the same
- * Can use VehicleExtensions
- */
-class VehicleInfo {
-public:
-    VehicleInfo();
-    void UpdateValues(VehicleExtensions& ext, Vehicle vehicle);
-
-    // Static-ish vehicle info stuff
-    VehicleClass Class = VehicleClass::Unknown;
-    VehicleDomain Domain = VehicleDomain::Unknown;
-    bool IsAmphibious = false;
-    bool HasSpeedo = false;
-    bool HasClutch = false;
-
-private:
-    VehicleClass findClass(Hash model);
-    VehicleDomain findDomain(VehicleClass vehicleClass);
-    bool isAmphibious(VehicleExtensions &ext, Vehicle vehicle);
-};
-
-/*
- * For continuously updated non-gearbox related stuff like derivative values:
- *   * Speeds of components (suspension compression)
- *   * Acceleration
- * Can use VehicleExtensions
- */ 
-class VehicleDerivatives {
-public:
-    VehicleDerivatives();
-    void UpdateValues(VehicleExtensions& ext, Vehicle vehicle);
-
-    std::vector<float> GetWheelCompressionSpeeds();
-    Vector3 GetRelativeAcceleration();            // dV/dT
-    Vector3 GetRelativeAccelerationAverage();     // Moving average
-
-private:
-    void updateDeltas(long long thisTick);
-
-    long long prevTick = 0;
-
-    Vector3 speedVector = {};
-    Vector3 prevSpeedVector = {};
-    Vector3 acceleration = {};
-    std::array<Vector3, SAMPLES> accelerationSamples{};
-    int averageAccelIndex = 0;
-
-    // Misc stuff
-    std::vector<float> wheelCompressions = {};
-    std::vector<float> prevCompressions = {};
-    std::vector<float> compressionSpeeds = {};
-};
-
-class EngineValues {
-public:
-    EngineValues();
-    void Update(VehicleExtensions& ext, Vehicle vehicle);
-
-    float PrevRPM = 0.0f;
-    float RPM = 0.0f;
-};
-
-// Standalone <<<thing>>>
-struct VehicleMiscStates {
+struct VehiclePeripherals {
     // "Peripherals"
     bool BlinkerLeft = false;
     bool BlinkerRight = false;
@@ -135,4 +64,87 @@ struct WheelPatchStates {
     bool EngBrakeActive = false;
     bool EngLockActive = false;
     bool InduceBurnout = false;
+};
+
+
+// Contains all data of a vehicle, gets updated on tick.
+// Prefer to use this class over reading ext and calculating stuff
+// all the damn time.
+class VehicleData {
+public:
+    VehicleData(VehicleExtensions& ext);
+
+    void SetVehicle(Vehicle v);
+    void Update();
+
+    // These should be read-only, but I cba to write getters for all of these.    
+    // Vehicle this data is valid for
+    Vehicle mVehicle;
+    VehicleExtensions& mExt;
+    uint64_t mHandlingPtr;
+
+    Vector3 mVelocity;
+    Vector3 mAcceleration;
+
+    float mRPM;
+    float mRPMPrev;
+    float mClutch;
+    float mThrottle;
+    float mTurbo;
+    bool mHandbrake;
+
+    float mSteeringInput; // -1.0f to 1.0f
+    float mSteeringAngle; // in radians
+    float mSteeringMult;
+
+    uint8_t mGearCurr;
+    uint8_t mGearNext;
+    uint8_t mGearTop;
+    std::vector<float> mGearRatios;
+
+    float mDriveMaxFlatVel;
+    float mInitialDriveMaxFlatVel;
+
+    uint8_t mWheelCount;
+    std::vector<bool> mWheelsDriven;
+    std::vector<float> mWheelTyreSpeeds;
+    float mWheelAverageDrivenTyreSpeed;
+
+    std::vector<bool> mWheelsLockedUp;
+    std::vector<bool> mWheelsOnGround;
+    std::vector<float> mWheelSteeringAngles;
+
+    std::vector<float> mSuspensionTravel;
+    std::vector<float> mSuspensionTravelSpeeds;
+
+    std::vector<float> mBrakePressures;
+
+    // Workaround
+    bool mHasSpeedo;
+
+    // Note: Size == 6
+    std::vector<uint32_t> mFlags;
+    bool mHasClutch;
+    bool mIsElectric;
+    bool mIsCVT;
+
+    //VehicleInfo mInfo;
+
+    // Non-changing for instance
+    VehicleClass mClass;
+    VehicleDomain mDomain;
+    bool mIsAmphibious;
+
+private:
+    std::vector<bool> getDrivenWheels();
+    float getAverageDrivenWheelTyreSpeeds();
+    std::vector<bool> getWheelsLockedUp();
+    std::vector<float> getSuspensionTravelSpeeds();
+    Vector3 getAcceleration();
+
+    VehicleClass findClass(Hash model);
+    VehicleDomain findDomain(VehicleClass vehicleClass);
+
+    std::vector<float> mPrevSuspensionTravel;
+    Vector3 mPrevVelocity;
 };

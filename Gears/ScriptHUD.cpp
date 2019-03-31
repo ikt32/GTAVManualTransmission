@@ -21,24 +21,18 @@ extern std::string settingsWheelFile;
 extern std::string settingsMenuFile;
 
 extern CarControls carControls;
-extern ScriptSettings settings;
 
 extern int prevNotification;
 extern int speedoIndex;
 extern int textureWheelId;
 
-extern VehicleInfo vehInfo;
-extern EngineValues engVal;
-extern VehicleDerivatives vehDerivs;
-extern VehicleMiscStates miscStates;
+extern VehiclePeripherals peripherals;
 extern VehicleGearboxStates gearStates;
 extern WheelPatchStates wheelPatchStates;
 
 extern VehicleExtensions ext;
 extern Vehicle vehicle;
-
-std::vector<bool> getWheelLockups(Vehicle handle);
-
+extern VehicleData vehData;
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Display elements
@@ -69,7 +63,7 @@ void drawRPMIndicator() {
     };
 
     Color rpmcolor = foreground;
-    if (engVal.RPM > settings.RPMIndicatorRedline) {
+    if (vehData.mRPM > settings.RPMIndicatorRedline) {
         Color redline = {
             settings.RPMIndicatorRedlineR,
             settings.RPMIndicatorRedlineG,
@@ -81,7 +75,7 @@ void drawRPMIndicator() {
     float ratio = ext.GetGearRatios(vehicle)[ext.GetGearCurr(vehicle)];
     float minUpshift = ext.GetInitialDriveMaxFlatVel(vehicle);
     float maxUpshift = ext.GetDriveMaxFlatVel(vehicle);
-    if (engVal.RPM > map(minUpshift / ratio, 0.0f, maxUpshift / ratio, 0.0f, 1.0f)) {
+    if (vehData.mRPM > map(minUpshift / ratio, 0.0f, maxUpshift / ratio, 0.0f, 1.0f)) {
         Color rpmlimiter = {
             settings.RPMIndicatorRevlimitR,
             settings.RPMIndicatorRevlimitG,
@@ -97,7 +91,7 @@ void drawRPMIndicator() {
         settings.RPMIndicatorHeight,
         rpmcolor,
         background,
-        engVal.RPM
+        vehData.mRPM
     );
 }
 
@@ -123,7 +117,7 @@ std::string formatSpeedo(std::string units, float speed, bool showUnit, int hudF
 }
 
 void drawSpeedoMeter() {
-    float dashms = vehInfo.HasSpeedo ? ext.GetDashSpeed(vehicle) : abs(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y);
+    float dashms = vehData.mHasSpeedo ? ext.GetDashSpeed(vehicle) : abs(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y);
 
     showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize,
         formatSpeedo(settings.Speedo, dashms, settings.SpeedoShowUnit, settings.HUDFont),
@@ -191,14 +185,14 @@ void drawHUD() {
 void drawDebugInfo() {
     if (!menu.IsThisOpen()) {
         showText(0.01, 0.275, 0.3, fmt("Mod Enabled:\t\t%s" , settings.EnableManual ? "Yes" : "No"));
-        showText(0.01, 0.300, 0.3, fmt("RPM:\t\t\t%.3f", engVal.RPM));
+        showText(0.01, 0.300, 0.3, fmt("RPM:\t\t\t%.3f", vehData.mRPM));
         showText(0.01, 0.325, 0.3, fmt("Current Gear:\t\t%d", ext.GetGearCurr(vehicle)));
         showText(0.01, 0.350, 0.3, fmt("Next Gear:\t\t%d", ext.GetGearNext(vehicle)));
         showText(0.01, 0.375, 0.3, fmt("Clutch:\t\t\t%.3f", ext.GetClutch(vehicle)));
         showText(0.01, 0.400, 0.3, fmt("Throttle:\t\t\t%.3f", ext.GetThrottle(vehicle)));
         showText(0.01, 0.425, 0.3, fmt("Turbo:\t\t\t%.3f", ext.GetTurbo(vehicle)));
         showText(0.01, 0.450, 0.3, fmt("VehAddress:\t\t0x%X", reinterpret_cast<uint64_t>(ext.GetAddress(vehicle))));
-        showText(0.01, 0.475, 0.3, fmt("Speedo Present:\t%s", vehInfo.HasSpeedo ? "Yes" : "No"));
+        showText(0.01, 0.475, 0.3, fmt("Speedo Present:\t%s", vehData.mHasSpeedo ? "Yes" : "No"));
         showText(0.01, 0.500, 0.3, fmt("Drive Bias:\t\t%.3f", ext.GetDriveBiasFront(vehicle)));
     }
 
@@ -289,7 +283,7 @@ void drawVehicleWheelInfo() {
     auto wheelsContactCoords = ext.GetWheelLastContactCoords(vehicle);
     auto wheelsOnGround = ext.GetWheelsOnGround(vehicle);
     auto wheelCoords = ext.GetWheelCoords(vehicle, ENTITY::GET_ENTITY_COORDS(vehicle, true), ENTITY::GET_ENTITY_ROTATION(vehicle, 0), ENTITY::GET_ENTITY_FORWARD_VECTOR(vehicle));
-    auto wheelLockups = getWheelLockups(vehicle);
+    auto wheelLockups = vehData.mWheelsLockedUp;
     auto wheelsPower = ext.GetWheelPower(vehicle);
     auto wheelsBrake = ext.GetWheelBrakePressure(vehicle);
     for (int i = 0; i < numWheels; i++) {
