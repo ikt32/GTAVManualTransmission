@@ -26,6 +26,31 @@ MT_API bool         MT_IsActive();
  */
 MT_API void         MT_SetActive(bool active);
 
+/**
+ * \brief           Get if the gear is in neutral. Neutral is specific to this
+ *                  mod, so it can't be read from the game itself.
+ * \return          True if in neutral gear.
+ */
+MT_API bool         MT_NeutralGear();
+
+/**
+ * \brief           Get current shifting mode.
+ *                  1: Sequential
+ *                  2: H-Pattern
+ *                  3: Automatic
+ * \return          Shifting mode.
+ */
+MT_API int          MT_GetShiftMode();
+
+/**
+ * \brief           Set the shifting mode.
+ *                  1: Sequential
+ *                  2: H-Pattern
+ *                  3: Automatic
+ * \param [in] mode Desired mode.
+ */
+MT_API void         MT_SetShiftMode(int mode);
+
 /*
  * AI shifting override
  */
@@ -66,3 +91,25 @@ MT_API const int*   MT_GetIgnoredVehicles();
  * \return          Handle to the Vehicle entity the player is using.
  */
 MT_API int          MT_GetManagedVehicle();
+
+/*
+ * Basic steering wheel input info.
+ */
+
+/**
+ * \brief           Gets whether "look left" is pressed on the steering wheel
+ * \return          True for pressed, false for not.
+ */
+MT_API bool MT_LookingLeft();
+
+/**
+ * \brief           Gets whether "look right" is pressed on the steering wheel
+ * \return          True for pressed, false for not.
+ */
+MT_API bool MT_LookingRight();
+
+/**
+ * \brief           Gets whether "look back" is pressed on the steering wheel
+ * \return          True for pressed, false for not.
+ */
+MT_API bool MT_LookingBack();
