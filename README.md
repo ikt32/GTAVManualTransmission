@@ -51,48 +51,20 @@ Clone this repository to the same folder ScriptHookV_SDK was extracted so you ha
 
 Clone my [GTAVMenuBase](https://github.com/E66666666/GTAVMenuBase) to the same folder you're gonna clone this to.
 
-## Mod support  
+## Scripting API  
 
-You can read decorators to get some info about this mod.
+Decorators are now deprecated and will be removed in the first release after v4.6.6.
 
-Example: ```DECORATOR::DECOR_GET_INT(vehicle, "mt_shift_indicator");``` gets the current shift up/down status.
+Check [ManualTransmission.h](https://github.com/E66666666/GTAVManualTransmission/blob/master/Gears/ManualTransmission.h) for available API functions.
 
-### Gearbox/Shift mode
+A C# example on how to use it can be found in [this gist](https://gist.github.com/E66666666/d11cdbd9800ad73efeff612374349347).
 
-Current gear: `mt_gear`
-* `0`: Reverse
-* `1 through 7`: Matching gear
+## Bug reporting and support
 
-Speedometers shift up/down indicator: `mt_shift_indicator`
-* `0` - Nothing
-* `1` - Shift up
-* `2` - Shift down
+Bugs can be reported in the following channels:
 
-Speedometers Neutral gear: `mt_neutral`
-* `0` - In gear
-* `1` - Neutral
+* [Discord server](https://discord.gg/gHee23U)
+* [5mods comments](https://www.gta5-mods.com/scripts/manual-transmission-ikt#comments_tab)
+* [GitHub issues](https://github.com/E66666666/GTAVManualTransmission/issues/new)
 
-Please note that the neutral gear is fake - it's achieved by having the clutch disengaged fully.
-
-Get shift mode: `mt_get_shiftmode`
-Set shift mode: `mt_set_shiftmode`
-* `0` - No change
-* `1` - Sequential
-* `2` - H-pattern
-* `3` - Automatic
-
-### Camera (look left/right/back)
-
-These decorators allow custom vehicle camera mods know if user is pressing look-left/right/behind through Manual Transmission's input system (including steering wheel buttons), so they can support this mod easily.
-
-Looking left (bool): `mt_looking_left`
-* `true`  - LookLeft button is pressed
-* `false` - LookLeft button is not pressed
-
-Looking right (bool): `mt_looking_right`
-* `true`  - LookRight button is pressed
-* `false` - LookRight button is not pressed
-
-Looking left (bool): `mt_looking_back`
-* `true`  - LookBack button (or LookLeft + LookRight) is pressed
-* `false` - LookBack button is not pressed
+Please always include `Gears.log`. If additional hardware, like a steering wheel is involved, also include those details in the report.
