@@ -27,6 +27,14 @@ enum class VehicleDomain {
     Unknown
 };
 
+enum class ABSType {
+    ABS_NONE,
+    ABS_STD,
+    ABS_OPTION,
+    ABS_ALT_STD,
+    ABS_ALT_OPTION,
+};
+
 struct VehiclePeripherals {
     // "Peripherals"
     bool BlinkerLeft = false;
@@ -124,9 +132,15 @@ public:
 
     // Note: Size == 6
     std::vector<uint32_t> mFlags;
-    bool mHasClutch;
+
+    uint32_t mHandlingFlags;
+    uint32_t mModelFlags;
+    
     bool mIsElectric;
     bool mIsCVT;
+    bool mHasClutch;
+    bool mHasABS;
+    ABSType mABSType;
 
     //VehicleInfo mInfo;
 
@@ -144,6 +158,7 @@ private:
 
     VehicleClass findClass(Hash model);
     VehicleDomain findDomain(VehicleClass vehicleClass);
+    ABSType getABSType(uint32_t handlingFlags);
 
     std::vector<float> mPrevSuspensionTravel;
     Vector3 mPrevVelocity;

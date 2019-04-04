@@ -5,8 +5,19 @@
 #include "script.h"
 
 VehicleData::VehicleData(VehicleExtensions& ext)
-    : mExt(ext) {
-}
+    : mVehicle(0), mExt(ext), mHandlingPtr(0)
+    , mVelocity(), mAcceleration(), mRPM(0), mRPMPrev(0)
+    , mClutch(0), mThrottle(0), mTurbo(0), mHandbrake(false)
+    , mSteeringInput(0), mSteeringAngle(0), mSteeringMult(0)
+    , mGearCurr(0), mGearNext(0), mGearTop(0)
+    , mDriveMaxFlatVel(0), mInitialDriveMaxFlatVel(0)
+    , mWheelCount(0), mWheelAverageDrivenTyreSpeed(0)
+    , mHasSpeedo(false)
+    , mHandlingFlags(0), mModelFlags(0)
+    , mIsElectric(false), mIsCVT(false), mHasClutch(false)
+    , mHasABS(false), mABSType()
+    , mClass(), mDomain(), mIsAmphibious(false)
+    , mPrevVelocity() {}
 
 void VehicleData::SetVehicle(Vehicle v) {
     mVehicle = v;
@@ -17,12 +28,25 @@ void VehicleData::SetVehicle(Vehicle v) {
         mDomain = findDomain(mClass);
         auto type = mExt.GetModelType(mVehicle);
         mIsAmphibious = (type == 6 || type == 7);
+        mHasSpeedo = false;
 
         // initialize prev's init state
         mVelocity = ENTITY::GET_ENTITY_SPEED_VECTOR(mVehicle, true);
         mRPM = VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(mVehicle) ?
             mExt.GetCurrentRPM(mVehicle) : 0.01f;
         mSuspensionTravel = mExt.GetWheelCompressions(mVehicle);
+
+        mFlags = mExt.GetVehicleFlags(mVehicle);
+        //TODO: Make proper version map for these
+        mModelFlags = *reinterpret_cast<uint32_t *>(mHandlingPtr + 0x124);
+        mHandlingFlags = *reinterpret_cast<uint32_t *>(mHandlingPtr + 0x128);
+
+        mIsElectric = mFlags[1] & eVehicleFlag2::FLAG_IS_ELECTRIC;
+        mIsCVT = mHandlingFlags & 0x00001000;
+        mHasClutch = mIsElectric || mIsCVT;
+
+        mHasABS = getABSType(mModelFlags) != ABSType::ABS_NONE;
+        mABSType = getABSType(mModelFlags);
 
         Update();
     }
@@ -66,13 +90,6 @@ void VehicleData::Update() {
 
     mSuspensionTravel = mExt.GetWheelCompressions(mVehicle);
     mBrakePressures = mExt.GetWheelBrakePressure(mVehicle);
-
-    // TODO: Parse Flags
-    mFlags = mExt.GetVehicleFlags(mVehicle);
-
-    mIsElectric = mFlags[1] & eVehicleFlag2::FLAG_IS_ELECTRIC;
-    mIsCVT = mGearTop == 1; //TODO: Extract from handling flags
-    mHasClutch = mIsElectric || mIsCVT;
 
     if (!mHasSpeedo && mExt.GetDashSpeed(mVehicle) > 0.0f) {
         mHasSpeedo = true;
@@ -160,4 +177,17 @@ VehicleDomain VehicleData::findDomain(VehicleClass vehicleClass) {
     case VehicleClass::Unknown: return VehicleDomain::Unknown;
     default: return VehicleDomain::Road;
     }
+}
+
+ABSType VehicleData::getABSType(uint32_t handlingFlags) {
+    if (handlingFlags & 0x10)
+        return ABSType::ABS_STD;
+    if (handlingFlags & 0x20)
+        return ABSType::ABS_OPTION;
+    if (handlingFlags & 0x40)
+        return ABSType::ABS_ALT_STD;
+    if (handlingFlags & 0x80)
+        return ABSType::ABS_ALT_OPTION;
+
+    return ABSType::ABS_NONE;
 }
