@@ -231,11 +231,18 @@ void update_mainmenu() {
         setShiftMode(shiftModeTemp);
     }
 
-    menu.MenuOption("Mod options", "optionsmenu", { "You can tweak and fine-tune gearbox simulation here." });
-    menu.MenuOption("Keyboard/Controller", "controlsmenu", { "Configure the keyboard and controller inputs." });
-    menu.MenuOption("Steering Wheel", "wheelmenu", { "Set up your steering wheel." });
-    menu.MenuOption("HUD Options", "hudmenu", { "Toggle and move HUD elements. Choose between imperial or metric speeds." });
-    menu.MenuOption("Debug", "debugmenu", { "Show technical details and options." });
+    menu.MenuOption("Mod options", "optionsmenu", 
+        { "You can tweak and fine-tune gearbox simulation here." });
+    menu.MenuOption("Keyboard/Controller", "controlsmenu", 
+        { "Configure the keyboard and controller inputs." });
+    menu.MenuOption("Steering Wheel", "wheelmenu", 
+        { "Set up your steering wheel." });
+    menu.MenuOption("HUD Options", "hudmenu", 
+        { "Toggle and move HUD elements. Choose between imperial or metric speeds." });
+    menu.MenuOption("Driving assists", "miscassistmenu",
+        { "Assist to make driving a bit easier." });
+    menu.MenuOption("Debug options", "debugmenu", 
+        { "Show technical details and options." });
 
     int activeIndex = 0;
     std::string activeInputName;
@@ -303,32 +310,6 @@ void update_optionsmenu() {
 
     menu.MenuOption("Finetuning", "finetuneoptionsmenu",
         { "Fine-tune the parameters above." });
-
-    menu.MenuOption("Misc. options", "miscoptionsmenu",
-        { "Options that don't have to do with the gearbox simulation, but mainly are helpers." });
-}
-
-void update_miscoptionsmenu() {
-    menu.Title("Miscellaneous");
-    menu.Subtitle("Miscellaneous options");
-
-    menu.BoolOption("Simple Bike", settings.SimpleBike,
-        { "Disables bike engine stalling and the clutch bite simulation." });
-
-    menu.BoolOption("Hill gravity workaround", settings.HillBrakeWorkaround,
-        { "Gives the car a push to overcome the games' default brakes at a stop." });
-
-    menu.BoolOption("Auto gear 1", settings.AutoGear1,
-        { "Automatically switch to first gear when the car reaches a standstill." });
-
-    menu.BoolOption("Auto look back", settings.AutoLookBack,
-        { "Automatically look back whenever in reverse gear." });
-
-    menu.BoolOption("Clutch + throttle start", settings.ThrottleStart,
-        { "Allow to start the engine by pressing clutch and throttle, like in DiRT Rally." });
-
-    menu.BoolOption("Hide player in FPV", settings.HidePlayerInFPV,
-        { "Hides the player in first person view." });
 }
 
 void update_finetuneoptionsmenu() {
@@ -997,6 +978,34 @@ void update_wheelinfomenu() {
     menu.FloatOption("Pedals Pad Y", settings.PedalInfoPadY, 0.0f, 1.0f, 0.01f);
 }
 
+void update_miscassistmenu() {
+    menu.Title("Drving assists");
+    menu.Subtitle("Assists to make driving easier");
+
+    menu.BoolOption("Enable ABS", settings.CustomABS,
+        { "Experimental script-driven ABS." });
+    menu.BoolOption("Only enable ABS if not present", settings.ABSFilter,
+        { "Only enables script-driven ABS on vehicles without the ABS flag." });
+
+    menu.BoolOption("Simple Bike", settings.SimpleBike,
+        { "Disables bike engine stalling and the clutch bite simulation." });
+
+    menu.BoolOption("Hill gravity workaround", settings.HillBrakeWorkaround,
+        { "Gives the car a push to overcome the games' default brakes at a stop." });
+
+    menu.BoolOption("Auto gear 1", settings.AutoGear1,
+        { "Automatically switch to first gear when the car reaches a standstill." });
+
+    menu.BoolOption("Auto look back", settings.AutoLookBack,
+        { "Automatically look back whenever in reverse gear." });
+
+    menu.BoolOption("Clutch + throttle start", settings.ThrottleStart,
+        { "Allow to start the engine by pressing clutch and throttle." });
+
+    menu.BoolOption("Hide player in FPV", settings.HidePlayerInFPV,
+        { "Hides the player in first person view." });
+}
+
 void update_debugmenu() {
     menu.Title("Debug settings");
     menu.Subtitle("Extra mod info");
@@ -1012,8 +1021,6 @@ void update_debugmenu() {
             "Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction" });
     menu.BoolOption("Show NPC info", settings.ShowNPCInfo,
         { "Show vehicle info of NPC vehicles near you." });
-    menu.BoolOption("Enable ABS", settings.CustomABS,
-        { "Experimental script-driven ABS."});
     menu.BoolOption("Enable update check", settings.EnableUpdate,
         { "Check for mod updates."});
 
@@ -1040,9 +1047,6 @@ void update_menu() {
 
     /* mainmenu -> optionsmenu */
     if (menu.CurrentMenu("optionsmenu")) { update_optionsmenu(); }
-
-    /* mainmenu -> optionsmenu -> miscoptionsmenu */
-    if (menu.CurrentMenu("miscoptionsmenu")) { update_miscoptionsmenu(); }
 
     /* mainmenu -> optionsmenu -> finetuneoptionsmenu */
     if (menu.CurrentMenu("finetuneoptionsmenu")) { update_finetuneoptionsmenu(); }
@@ -1088,6 +1092,9 @@ void update_menu() {
 
     /* mainmenu -> hudmenu -> wheelinfomenu*/
     if (menu.CurrentMenu("wheelinfomenu")) { update_wheelinfomenu(); }
+
+    /* mainmenu -> miscassistmenu */
+    if (menu.CurrentMenu("miscassistmenu")) { update_miscassistmenu(); }
 
     /* mainmenu -> debugmenu */
     if (menu.CurrentMenu("debugmenu")) { update_debugmenu(); }

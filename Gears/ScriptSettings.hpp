@@ -45,6 +45,7 @@ public:
     int MisshiftDamage = 10;
     bool HardLimiter = false;
     bool CustomABS = false;
+    bool ABSFilter = false;
 
     bool UseShifterForAuto = false;
 

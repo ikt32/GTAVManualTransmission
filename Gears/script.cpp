@@ -90,8 +90,8 @@ int speedoIndex;
 extern std::vector<std::string> speedoTypes;
 
 MiniPID pid(1.0, 0.0, 0.0);
-bool g_CustomABS;
 
+//TODO: Reorganize/move?
 void handleBrakePatch() {
     bool lockedUp = false;
     bool ebrk = vehData.mHandbrake;
@@ -105,7 +105,9 @@ void handleBrakePatch() {
     }
     if (ebrk || brn)
         lockedUp = false;
-    if (settings.CustomABS && lockedUp) {
+    bool absNativePresent = vehData.mHasABS && settings.ABSFilter;
+
+    if (settings.CustomABS && lockedUp && !absNativePresent) {
         if (!MemoryPatcher::BrakePatcher.Patched()) {
             MemoryPatcher::PatchBrake();
         }

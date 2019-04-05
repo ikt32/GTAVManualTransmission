@@ -4,9 +4,14 @@
 * Add support for 10th gear
 * Add experimental scripted ABS
 * Add update checker, allows to be turned off or to ignore an update
+* Add C-style exported functions, replaces decorators and adds AI blacklisting
+* Add a workaround for FiveM other players vehicles not shifting
+* Fix an issue where steering deadzone is not saved properly
+* Fix an issue where force feedback continues playing when ejected from a car
 * Fix an issue where hazard lights cancelled when turning, like normal signal lights
 * Fix an issue where turning lights would override hazard lights
 * Fix an issue where script re-locks `DECOR_REGISTER` if something else unlocked it
+* General code improvements
 
 ## 4.6.5
 * Update for v1.0.1604.0 (Arena War)
