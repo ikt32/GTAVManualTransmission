@@ -148,34 +148,56 @@ enum G_GameVersion : int {
 
     G_VER_1_0_1604_0_STEAM,     // 46
     G_VER_1_0_1604_0_NOSTEAM,   // 47
+
+    G_VER_1_0_1604_1_STEAM,     // 48
+    G_VER_1_0_1604_1_NOSTEAM,   // 49
 };
 
-static std::vector<std::pair<int, int>> ExeVersionMap = {
-    {   0,                    -1 },
-    { 335, G_VER_1_0_335_2_STEAM },
-    { 350, G_VER_1_0_350_1_STEAM },  
-    { 372, G_VER_1_0_372_2_STEAM },  
-    { 393, G_VER_1_0_393_2_STEAM },  
-    { 393, G_VER_1_0_393_4_STEAM },  
-    { 463, G_VER_1_0_463_1_STEAM },  
-    { 505, G_VER_1_0_505_2_STEAM },  
-    { 573, G_VER_1_0_573_1_STEAM },  
-    { 617, G_VER_1_0_617_1_STEAM },  
-    { 678, G_VER_1_0_678_1_STEAM },  
-    { 757, G_VER_1_0_757_2_STEAM },  
-    { 757, G_VER_1_0_757_4_STEAM },  
-    { 791, G_VER_1_0_791_2_STEAM },  
-    { 877, G_VER_1_0_877_1_STEAM },  
-    { 944, G_VER_1_0_944_2_STEAM },  
-    { 1011, G_VER_1_0_1011_1_STEAM }, 
-    { 1032, G_VER_1_0_1032_1_STEAM }, 
-    { 1103, G_VER_1_0_1103_2_STEAM }, 
-    { 1180, G_VER_1_0_1180_2_STEAM }, 
-    { 1290, G_VER_1_0_1290_1_STEAM }, 
-    { 1365, G_VER_1_0_1365_1_STEAM }, 
-    { 1493, G_VER_1_0_1493_0_STEAM },
-    { 1493, G_VER_1_0_1493_1_STEAM },
-    { 1604, G_VER_1_0_1604_0_STEAM },
+struct SVersion {
+    int Minor;
+    int Build;
+};
+
+inline bool operator==(const SVersion& a, const SVersion& b) {
+    return a.Minor == b.Minor && a.Build == b.Build;
+}
+
+inline bool operator<=(const SVersion& a, const SVersion& b) {
+    if (a.Minor <= b.Minor)
+        return true;
+    if (a.Minor == b.Minor)
+        if (a.Build <= b.Build)
+            return true;
+    return false;
+}
+
+static std::vector<std::pair<SVersion, int>> ExeVersionMap = {
+    { {   0, 0 },                      -1 },
+    { { 335, 2 },   G_VER_1_0_335_2_STEAM },
+    { { 350, 1 },   G_VER_1_0_350_1_STEAM },  
+    { { 372, 2 },   G_VER_1_0_372_2_STEAM },  
+    { { 393, 2 },   G_VER_1_0_393_2_STEAM },  
+    { { 393, 4 },   G_VER_1_0_393_4_STEAM },  
+    { { 463, 1 },   G_VER_1_0_463_1_STEAM },  
+    { { 505, 2 },   G_VER_1_0_505_2_STEAM },  
+    { { 573, 1 },   G_VER_1_0_573_1_STEAM },  
+    { { 617, 1 },   G_VER_1_0_617_1_STEAM },  
+    { { 678, 1 },   G_VER_1_0_678_1_STEAM },  
+    { { 757, 2 },   G_VER_1_0_757_2_STEAM },  
+    { { 757, 4 },   G_VER_1_0_757_4_STEAM },  
+    { { 791, 2 },   G_VER_1_0_791_2_STEAM },  
+    { { 877, 1 },   G_VER_1_0_877_1_STEAM },  
+    { { 944, 2 },   G_VER_1_0_944_2_STEAM },  
+    { { 1011, 1 },  G_VER_1_0_1011_1_STEAM }, 
+    { { 1032, 1 },  G_VER_1_0_1032_1_STEAM }, 
+    { { 1103, 2 },  G_VER_1_0_1103_2_STEAM }, 
+    { { 1180, 2 },  G_VER_1_0_1180_2_STEAM }, 
+    { { 1290, 1 },  G_VER_1_0_1290_1_STEAM }, 
+    { { 1365, 1 },  G_VER_1_0_1365_1_STEAM }, 
+    { { 1493, 0 },  G_VER_1_0_1493_0_STEAM },
+    { { 1493, 1 },  G_VER_1_0_1493_1_STEAM },
+    { { 1604, 0 },  G_VER_1_0_1604_0_STEAM },
+    { { 1604, 1 },  G_VER_1_0_1604_1_STEAM },
 };
 
 static std::string eGameVersionToString(int version) {
@@ -186,7 +208,7 @@ static std::string eGameVersionToString(int version) {
 }
 
 template < typename K, typename V >
-V findNextLowest(const std::vector<std::pair<K, V>>& map, K key) {
+V findNextLowest(const std::vector<std::pair<K, V>>& map, const K& key) {
     for (auto it = map.rbegin(); it != map.rend(); ++it) {
         if (it->first <= key)
             return it->second;

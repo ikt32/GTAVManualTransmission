@@ -42,7 +42,7 @@ bool isModulePresent(const std::string& name, std::string& modulePath) {
     return found;
 }
 
-int getExeVersion(std::string exe) {
+SVersion getExeVersion(const std::string& exe) {
     DWORD  verHandle = 0;
     UINT   size = 0;
     LPBYTE lpBuffer = NULL;
@@ -58,22 +58,23 @@ int getExeVersion(std::string exe) {
                         // DWORD is always 32 bits, so first two revision numbers
                         // come from dwFileVersionMS, last two come from dwFileVersionLS
                         logger.Write(INFO, "File Version: %d.%d.%d.%d",
-                                     (verInfo->dwFileVersionMS >> 16) & 0xffff,
-                                     (verInfo->dwFileVersionMS >> 0) & 0xffff,
-                                     (verInfo->dwFileVersionLS >> 16) & 0xffff,
-                                     (verInfo->dwFileVersionLS >> 0) & 0xffff
+                                     verInfo->dwFileVersionMS >> 16 & 0xffff,
+                                     verInfo->dwFileVersionMS >>  0 & 0xffff,
+                                     verInfo->dwFileVersionLS >> 16 & 0xffff,
+                                     verInfo->dwFileVersionLS >>  0 & 0xffff
                         );
-                        return (verInfo->dwFileVersionLS >> 16) & 0xffff;
+                        return { verInfo->dwFileVersionLS >> 16 & 0xffff,
+                                 verInfo->dwFileVersionLS >>  0 & 0xffff };
                     }
                 }
             }
         }
     }
     logger.Write(ERROR, "File version detection failed");
-    return -1;
+    return { 0, 0 };
 }
 
-int getExeInfo() {
+SVersion getExeInfo() {
     std::string currExe = Paths::GetRunningExecutablePath();
     logger.Write(INFO, "Running executable: %s", currExe.c_str());
     std::string citizenDir;
@@ -120,7 +121,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
                 logger.Write(WARN, "Unsupported game version! Update your game.");
             }
 
-            int exeVersion = getExeInfo();
+            SVersion exeVersion = getExeInfo();
             int actualVersion = findNextLowest(ExeVersionMap, exeVersion);
             if (scriptingVersion % 2) {
                 scriptingVersion--;
