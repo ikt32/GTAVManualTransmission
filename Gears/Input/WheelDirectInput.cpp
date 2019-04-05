@@ -9,6 +9,10 @@
 #include "../Util/Logger.hpp"
 #include "../Util/StringFormat.h"
 
+#ifdef _DEBUG
+#include "../Dump.h"
+#endif
+
 #define SAFE_RELEASE(p) { if(p) { (p)->Release(); (p)=nullptr; } }
 
 std::string formatError(HRESULT hr) {
@@ -288,6 +292,9 @@ void WheelDirectInput::UpdateButtonChangeStates() {
 int filterException(int code, PEXCEPTION_POINTERS ex) {
     logger.Write(FATAL, "[Wheel] Caught exception 0x%X", code);
     logger.Write(FATAL, "[Wheel]     Exception address 0x%p", ex->ExceptionRecord->ExceptionAddress);
+#ifdef _DEBUG
+    DumpStackTrace(ex);
+#endif
     return EXCEPTION_EXECUTE_HANDLER;
 }
 

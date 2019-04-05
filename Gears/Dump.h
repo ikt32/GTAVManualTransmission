@@ -154,7 +154,7 @@ DWORD DumpStackTrace(EXCEPTION_POINTERS *ep)
                 break;
             if (fnName == "RaiseException") {
                 // This is what we get when compiled in Release mode:
-                logger.Write("Crash: Your program has crashed.\n\n");
+                logger.Write(FATAL, "[Stack] Couldn't dump, built in Release mode");
                 return EXCEPTION_EXECUTE_HANDLER;
             }
         }
@@ -170,8 +170,8 @@ DWORD DumpStackTrace(EXCEPTION_POINTERS *ep)
     SymCleanup(process);
 
     // Display the string:
-    logger.Write("Stack Trace: Program has crashed. Report error to:\n"
-        "ikt on GTA5-Mods.com\n\n%s", builder.str().c_str());
+    logger.Write(FATAL, "[Stack] Program has crashed. Stack trace:\n\n%s",
+        builder.str().c_str());
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
