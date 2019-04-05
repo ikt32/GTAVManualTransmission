@@ -74,6 +74,9 @@ static std::vector<std::string> GameVersionString = {
     
     "VER_1_0_1604_0_STEAM",     // 46
     "VER_1_0_1604_0_NOSTEAM",   // 47
+
+    "VER_1_0_1604_1_STEAM",     // 48
+    "VER_1_0_1604_1_NOSTEAM",   // 49
 };
 
 enum G_GameVersion : int {
@@ -163,7 +166,7 @@ inline bool operator==(const SVersion& a, const SVersion& b) {
 }
 
 inline bool operator<=(const SVersion& a, const SVersion& b) {
-    if (a.Minor <= b.Minor)
+    if (a.Minor <= b.Minor && a.Build <= b.Build)
         return true;
     if (a.Minor == b.Minor)
         if (a.Build <= b.Build)
