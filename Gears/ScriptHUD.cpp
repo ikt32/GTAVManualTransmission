@@ -184,16 +184,16 @@ void drawHUD() {
 
 void drawDebugInfo() {
     if (!menu.IsThisOpen()) {
-        showText(0.01, 0.275, 0.3, fmt("Mod Enabled:\t\t%s" , settings.EnableManual ? "Yes" : "No"));
+        showText(0.01, 0.250, 0.3, fmt("Address:\t\t\t0x%X", reinterpret_cast<uint64_t>(ext.GetAddress(vehicle))));
+        showText(0.01, 0.275, 0.3, fmt("Mod Enabled:\t\t%d" , settings.EnableManual));
         showText(0.01, 0.300, 0.3, fmt("RPM:\t\t\t%.3f", vehData.mRPM));
         showText(0.01, 0.325, 0.3, fmt("Current Gear:\t\t%d", ext.GetGearCurr(vehicle)));
         showText(0.01, 0.350, 0.3, fmt("Next Gear:\t\t%d", ext.GetGearNext(vehicle)));
-        showText(0.01, 0.375, 0.3, fmt("Clutch:\t\t\t%.3f", ext.GetClutch(vehicle)));
-        showText(0.01, 0.400, 0.3, fmt("Throttle:\t\t\t%.3f", ext.GetThrottle(vehicle)));
-        showText(0.01, 0.425, 0.3, fmt("Turbo:\t\t\t%.3f", ext.GetTurbo(vehicle)));
-        showText(0.01, 0.450, 0.3, fmt("VehAddress:\t\t0x%X", reinterpret_cast<uint64_t>(ext.GetAddress(vehicle))));
-        showText(0.01, 0.475, 0.3, fmt("Speedo Present:\t%s", vehData.mHasSpeedo ? "Yes" : "No"));
-        showText(0.01, 0.500, 0.3, fmt("Drive Bias:\t\t%.3f", ext.GetDriveBiasFront(vehicle)));
+        showText(0.01, 0.375, 0.3, fmt("Clutch:\t\t\t%.2f", ext.GetClutch(vehicle)));
+        showText(0.01, 0.400, 0.3, fmt("Throttle:\t\t\t%.2f", ext.GetThrottle(vehicle)));
+        showText(0.01, 0.425, 0.3, fmt("Turbo:\t\t\t%.2f", ext.GetTurbo(vehicle)));
+        showText(0.01, 0.450, 0.3, fmt("Speedo Present:\t%d", vehData.mHasSpeedo));
+        showText(0.01, 0.475, 0.3, fmt("Clutch Present:\t%d", vehData.mHasClutch));
     }
 
     showText(0.85, 0.050, 0.4, fmt("Throttle:\t%.3f", carControls.ThrottleVal) , 4);

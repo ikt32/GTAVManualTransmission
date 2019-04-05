@@ -43,7 +43,7 @@ void VehicleData::SetVehicle(Vehicle v) {
 
         mIsElectric = mFlags[1] & eVehicleFlag2::FLAG_IS_ELECTRIC;
         mIsCVT = mHandlingFlags & 0x00001000;
-        mHasClutch = mIsElectric || mIsCVT;
+        mHasClutch = !mIsElectric && !mIsCVT;
 
         mHasABS = getABSType(mModelFlags) != ABSType::ABS_NONE;
         mABSType = getABSType(mModelFlags);
