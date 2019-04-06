@@ -8,6 +8,12 @@
 #include "Input/CarControls.hpp"
 #include "Util/StringFormat.h"
 
+#define CHECK_LOG_SI_ERROR(result, operation) \
+    if (result < 0) { \
+        logger.Write(ERROR, "[Settings] %s Failed to %s, SI_Error [%d]", \
+        __FUNCTION__, operation, result); \
+    }
+
 #pragma warning(push)
 #pragma warning(disable: 4244)
 
@@ -26,8 +32,9 @@ void ScriptSettings::Read(CarControls* scriptControl) {
 void ScriptSettings::SaveGeneral() const {
     CSimpleIniA settingsGeneral;
     settingsGeneral.SetUnicode();
-    settingsGeneral.LoadFile(settingsGeneralFile.c_str());
-    
+    SI_Error result = settingsGeneral.LoadFile(settingsGeneralFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "load");
+
     // [OPTIONS]
     settingsGeneral.SetBoolValue("OPTIONS", "Enable", EnableManual);
     settingsGeneral.SetLongValue("OPTIONS", "ShiftMode", ShiftMode);
@@ -138,14 +145,16 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetBoolValue("DEBUG", "DisplayGearingInfo", DisplayGearingInfo);
     settingsGeneral.SetBoolValue("DEBUG", "DisplayNPCInfo", ShowNPCInfo);
 
-    settingsGeneral.SaveFile(settingsGeneralFile.c_str());
+    result = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "save");
 }
 
 void ScriptSettings::SaveController(CarControls *scriptControl) const {
     CSimpleIniA settingsGeneral;
     settingsGeneral.SetUnicode();
-    settingsGeneral.LoadFile(settingsGeneralFile.c_str());
-    
+    SI_Error result = settingsGeneral.LoadFile(settingsGeneralFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "load");
+
     // [CONTROLLER]
     settingsGeneral.SetBoolValue("CONTROLLER", "ToggleEngine", ToggleEngine);
     settingsGeneral.SetLongValue("CONTROLLER", "ToggleTime", scriptControl->CToggleTime); 
@@ -166,14 +175,16 @@ void ScriptSettings::SaveController(CarControls *scriptControl) const {
     settingsGeneral.SetLongValue("CONTROLLER_LEGACY", "ShiftDownBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
     settingsGeneral.SetLongValue("CONTROLLER_LEGACY", "ClutchBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
 
-    settingsGeneral.SaveFile(settingsGeneralFile.c_str());
+    result = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "save");
 }
 
 // Axis information is saved by its own calibration methods
 void ScriptSettings::SaveWheel(CarControls *scriptControl) const {
     CSimpleIniA settingsWheel;
     settingsWheel.SetUnicode();
-    settingsWheel.LoadFile(settingsWheelFile.c_str());
+    SI_Error result = settingsWheel.LoadFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "load");
 
     // [OPTIONS]
     settingsWheel.SetBoolValue("OPTIONS", "EnableWheel", EnableWheel);
@@ -223,7 +234,8 @@ void ScriptSettings::SaveWheel(CarControls *scriptControl) const {
     settingsWheel.SetDoubleValue("BRAKES", "ANTIDEADZONE", scriptControl->ADZBrake);
     settingsWheel.SetDoubleValue("BRAKES", "GAMMA", BrakeGamma);
 
-    settingsWheel.SaveFile(settingsWheelFile.c_str());
+    result = settingsWheel.SaveFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "save");
 }
 
 std::vector<GUID> ScriptSettings::GetGuids() {
@@ -233,7 +245,8 @@ std::vector<GUID> ScriptSettings::GetGuids() {
 void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     CSimpleIniA settingsGeneral;
     settingsGeneral.SetUnicode();
-    settingsGeneral.LoadFile(settingsGeneralFile.c_str());
+    SI_Error result = settingsGeneral.LoadFile(settingsGeneralFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "load");
 
     // [OPTIONS]
     EnableManual = settingsGeneral.GetBoolValue("OPTIONS", "Enable", true);
@@ -416,7 +429,8 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
 void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     CSimpleIniA settingsWheel;
     settingsWheel.SetUnicode();
-    settingsWheel.LoadFile(settingsWheelFile.c_str());
+    SI_Error result = settingsWheel.LoadFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "load");
 
     // [OPTIONS]
     EnableWheel = settingsWheel.GetBoolValue("OPTIONS", "EnableWheel", true);
@@ -748,53 +762,59 @@ ptrdiff_t ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, std::string
 
     CSimpleIniA settingsWheel;
     settingsWheel.SetUnicode();
-    settingsWheel.LoadFile(settingsWheelFile.c_str());
+    SI_Error result = settingsWheel.LoadFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "load");
+
     settingsWheel.SetValue("INPUT_DEVICES", newDEV.c_str(), dev_name.c_str());
     settingsWheel.SetValue("INPUT_DEVICES", newGUID.c_str(), GUID2String(dev_guid).c_str());
-    int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
-    if (err < 0)
-        logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
+    result = settingsWheel.SaveFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "save");
     return newIndex;
 }
 void ScriptSettings::SteeringSaveAxis(const std::string &confTag, ptrdiff_t index, const std::string & axis, int minVal, int maxVal) {
     CSimpleIniA settingsWheel;
     settingsWheel.SetUnicode();
-    settingsWheel.LoadFile(settingsWheelFile.c_str());
+    SI_Error result = settingsWheel.LoadFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "load");
+
     settingsWheel.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
     settingsWheel.SetValue(confTag.c_str(), "AXLE", axis.c_str());
     settingsWheel.SetValue(confTag.c_str(), "MIN", std::to_string(minVal).c_str());
     settingsWheel.SetValue(confTag.c_str(), "MAX", std::to_string(maxVal).c_str());
-    int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
-    if (err < 0)
-        logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
+    result = settingsWheel.SaveFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "save");
 }
 
 void ScriptSettings::SteeringSaveFFBAxis(const std::string & confTag, ptrdiff_t index, const std::string & axis) {
     CSimpleIniA settingsWheel;
     settingsWheel.SetUnicode();
-    settingsWheel.LoadFile(settingsWheelFile.c_str());
+    SI_Error result = settingsWheel.LoadFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "load");
+
     settingsWheel.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
     settingsWheel.SetValue(confTag.c_str(), "FFB", axis.c_str());
-    int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
-    if (err < 0)
-        logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
+    result = settingsWheel.SaveFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "save");
 }
 
 void ScriptSettings::SteeringSaveButton(const std::string & confTag, ptrdiff_t index, int button) {
     CSimpleIniA settingsWheel;
     settingsWheel.SetUnicode();
-    settingsWheel.LoadFile(settingsWheelFile.c_str());
+    SI_Error result = settingsWheel.LoadFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "load");
+
     settingsWheel.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
     settingsWheel.SetLongValue(confTag.c_str(), "BUTTON", button);
-    int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
-    if (err < 0)
-        logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
+    result = settingsWheel.SaveFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "save");
 }
 
 void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t index, const std::vector<int>& button) {
     CSimpleIniA settingsWheel;
     settingsWheel.SetUnicode();
-    settingsWheel.LoadFile(settingsWheelFile.c_str());
+    SI_Error result = settingsWheel.LoadFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "load");
+
     settingsWheel.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
 
     settingsWheel.SetLongValue(confTag.c_str(), "GEAR_R", button[0]);
@@ -802,62 +822,66 @@ void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t
         settingsWheel.SetLongValue(confTag.c_str(), fmt("GEAR_%d", i).c_str(), button[i]);
     }
 
-    int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
-    if (err < 0)
-        logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
+    result = settingsWheel.SaveFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "save");
 }
 
 void ScriptSettings::SteeringAddWheelToKey(const std::string &confTag, ptrdiff_t index, int button, const std::string &keyName) {
     CSimpleIniA settingsWheel;
     settingsWheel.SetUnicode();
-    settingsWheel.LoadFile(settingsWheelFile.c_str());
+    SI_Error result = settingsWheel.LoadFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "load");
+
     settingsWheel.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
     settingsWheel.SetValue(confTag.c_str(), std::to_string(button).c_str(), keyName.c_str());
-    int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
-    if (err < 0)
-        logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
+    result = settingsWheel.SaveFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "save");
 }
 
 bool ScriptSettings::SteeringClearWheelToKey(int button) {
     CSimpleIniA settingsWheel;
     settingsWheel.SetUnicode();
-    settingsWheel.LoadFile(settingsWheelFile.c_str());
-    bool result = settingsWheel.Delete("TO_KEYBOARD", std::to_string(button).c_str(), true);
-    int err = settingsWheel.SaveFile(settingsWheelFile.c_str());
-    if (err < 0)
-        logger.Write(ERROR, "Unable to save to " + settingsWheelFile);
-    return result;
+    SI_Error result = settingsWheel.LoadFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "load");
+
+    bool deleted = settingsWheel.Delete("TO_KEYBOARD", std::to_string(button).c_str(), true);
+    result = settingsWheel.SaveFile(settingsWheelFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "save");
+    return deleted;
 }
 
 void ScriptSettings::KeyboardSaveKey(const std::string &confTag, const std::string &key) {
     CSimpleIniA settingsGeneral;
     settingsGeneral.SetUnicode();
-    settingsGeneral.LoadFile(settingsGeneralFile.c_str());
+    SI_Error result = settingsGeneral.LoadFile(settingsGeneralFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "load");
+
     settingsGeneral.SetValue("KEYBOARD", confTag.c_str(), key.c_str());
-    int err = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
-    if (err < 0)
-        logger.Write(ERROR, "Unable to save to " + settingsGeneralFile);
+    result = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "save");
 }
 void ScriptSettings::ControllerSaveButton(const std::string &confTag, const std::string &button) {
     CSimpleIniA settingsGeneral;
     settingsGeneral.SetUnicode();
-    settingsGeneral.LoadFile(settingsGeneralFile.c_str());
+    SI_Error result = settingsGeneral.LoadFile(settingsGeneralFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "load");
+
     settingsGeneral.SetValue("CONTROLLER", confTag.c_str(), button.c_str());
 
-    int err = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
-    if (err < 0)
-        logger.Write(ERROR, "Unable to save to " + settingsGeneralFile);
+    result = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "save");
 }
 
 void ScriptSettings::LControllerSaveButton(const std::string &confTag, int button) {
     CSimpleIniA settingsGeneral;
     settingsGeneral.SetUnicode();
-    settingsGeneral.LoadFile(settingsGeneralFile.c_str());
+    SI_Error result = settingsGeneral.LoadFile(settingsGeneralFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "load");
+
     settingsGeneral.SetLongValue("CONTROLLER_LEGACY", confTag.c_str(), button);
 
-    int err = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
-    if (err < 0)
-        logger.Write(ERROR, "Unable to save to " + settingsGeneralFile);
+    result = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
+    CHECK_LOG_SI_ERROR(result, "save");
 }
 
 GUID ScriptSettings::DeviceIndexToGUID(int device, std::vector<GUID> guids) {
