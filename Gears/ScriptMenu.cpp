@@ -23,17 +23,11 @@
 extern bool g_notifyUpdate;
 extern ReleaseInfo g_releaseInfo;
 
-extern std::string settingsGeneralFile;
-extern std::string settingsWheelFile;
-extern std::string settingsMenuFile;
-
 extern NativeMenu::Menu menu;
-
 extern CarControls carControls;
 extern ScriptSettings settings;
 
 extern int prevNotification;
-extern int speedoIndex;
 extern int textureWheelId;
 
 const std::string escapeKey = "BACKSPACE";
@@ -121,7 +115,7 @@ const std::vector<STagInfo> controllerConfTags = {
     { "Brake"      , "Brake: axis or button"       }
 };
 
-std::vector<std::string> speedoTypes = {
+const std::vector<std::string> speedoTypes = {
     "off",
     "kph",
     "mph",
@@ -917,9 +911,10 @@ void update_speedodisplaymenu() {
     menu.Subtitle("");
 
     ptrdiff_t oldPos = std::find(speedoTypes.begin(), speedoTypes.end(), settings.Speedo) - speedoTypes.begin();
-    menu.StringArray("Speedometer", speedoTypes, speedoIndex);
-    if (speedoIndex != oldPos) {
-        settings.Speedo = speedoTypes.at(speedoIndex);
+    int newPos = static_cast<int>(oldPos);
+    menu.StringArray("Speedometer", speedoTypes, newPos);
+    if (newPos != oldPos) {
+        settings.Speedo = speedoTypes.at(newPos);
     }
     menu.BoolOption("Show units", settings.SpeedoShowUnit);
 

@@ -16,20 +16,10 @@
 
 extern NativeMenu::Menu menu;
 extern ScriptSettings settings;
-extern std::string settingsGeneralFile;
-extern std::string settingsWheelFile;
-extern std::string settingsMenuFile;
-
 extern CarControls carControls;
-
-extern int prevNotification;
-extern int speedoIndex;
 extern int textureWheelId;
 
-extern VehiclePeripherals peripherals;
 extern VehicleGearboxStates gearStates;
-extern WheelPatchStates wheelPatchStates;
-
 extern VehicleExtensions ext;
 extern Vehicle vehicle;
 extern VehicleData vehData;

@@ -86,8 +86,8 @@ VehicleData vehData(ext);
 int prevNotification = 0;
 int prevExtShift = 0;
 
-int speedoIndex;
-extern std::vector<std::string> speedoTypes;
+//int speedoIndex;
+//extern std::vector<std::string> speedoTypes;
 
 MiniPID pid(1.0, 0.0, 0.0);
 
@@ -2304,7 +2304,6 @@ void registerDecorator(const char *thing, eDecorType type) {
 }
 
 // @Unknown Modder
-BYTE* g_bIsDecorRegisterLockedPtr = nullptr;
 bool setupGlobals() {
     auto addr = mem::FindPattern("\x40\x53\x48\x83\xEC\x20\x80\x3D\x00\x00\x00\x00\x00\x8B\xDA\x75\x29",
                                  "xxxxxxxx????xxxxx");
@@ -2313,7 +2312,8 @@ bool setupGlobals() {
         return false;
     }
 
-    g_bIsDecorRegisterLockedPtr = (BYTE*)(addr + *(int*)(addr + 8) + 13);
+    BYTE* g_bIsDecorRegisterLockedPtr = 
+        reinterpret_cast<BYTE*>(addr + *reinterpret_cast<int*>(addr + 8) + 13);
 
     logger.Write(DEBUG, "bIsDecorRegisterLockedPtr @ 0x%p", g_bIsDecorRegisterLockedPtr);
 
@@ -2347,12 +2347,8 @@ bool setupGlobals() {
 void readSettings() {
     settings.Read(&carControls);
     if (settings.LogLevel > 4) settings.LogLevel = 1;
-    logger.SetMinLevel((LogLevel)settings.LogLevel);
+    logger.SetMinLevel(static_cast<LogLevel>(settings.LogLevel));
 
-    speedoIndex = static_cast<int>(std::find(speedoTypes.begin(), speedoTypes.end(), settings.Speedo) - speedoTypes.begin());
-    if (speedoIndex >= speedoTypes.size()) {
-        speedoIndex = 0;
-    }
     gearStates.FakeNeutral = settings.DefaultNeutral;
     menu.ReadSettings();
     logger.Write(INFO, "Settings read");
