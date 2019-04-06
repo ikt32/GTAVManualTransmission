@@ -192,8 +192,12 @@ void drawDebugInfo() {
         showText(0.01, 0.375, 0.3, fmt("Clutch:\t\t\t%.2f", ext.GetClutch(vehicle)));
         showText(0.01, 0.400, 0.3, fmt("Throttle:\t\t\t%.2f", ext.GetThrottle(vehicle)));
         showText(0.01, 0.425, 0.3, fmt("Turbo:\t\t\t%.2f", ext.GetTurbo(vehicle)));
-        showText(0.01, 0.450, 0.3, fmt("Speedo Present:\t%d", vehData.mHasSpeedo));
-        showText(0.01, 0.475, 0.3, fmt("Clutch Present:\t%d", vehData.mHasClutch));
+        showText(0.01, 0.450, 0.3, fmt("%sSpeedo", vehData.mHasSpeedo ? "~g~" : "~r~"));
+        showText(0.01, 0.475, 0.3, fmt("%sE %sCVT -> %sClutch",
+            vehData.mIsElectric ? "~g~" : "~r~", vehData.mIsCVT ? "~g~" : "~r~",
+            vehData.mHasClutch ? "~g~" : "~r~"));
+        showText(0.01, 0.500, 0.3, fmt("%sABS",
+            vehData.mHasABS ? "~g~" : "~r~"));
     }
 
     showText(0.85, 0.050, 0.4, fmt("Throttle:\t%.3f", carControls.ThrottleVal) , 4);
@@ -287,18 +291,17 @@ void drawVehicleWheelInfo() {
     auto wheelsPower = ext.GetWheelPower(vehicle);
     auto wheelsBrake = ext.GetWheelBrakePressure(vehicle);
     for (int i = 0; i < numWheels; i++) {
-        float wheelCompr = wheelsCompr[i];
         Color c = wheelLockups[i] ? solidOrange : transparentGray;
         c = wheelsOnGround[i] ? c : solidRed;
         showDebugInfo3D(wheelCoords[i], {
             fmt("Index: \t%d", i),
-            fmt("Power: \t%s", ext.IsWheelPowered(vehicle, i) ? "Yes" : "No"),
+            fmt("%sPowered", ext.IsWheelPowered(vehicle, i) ? "~g~" : "~r~"),
             fmt("Speed: \t%.3f", wheelsSpeed[i]),
-            fmt("Compr: \t%.3f", wheelCompr),
+            fmt("Compr: \t%.3f", wheelsCompr[i]),
             fmt("Health: \t%.3f", wheelsHealt[i]),
             fmt("Power: \t%.3f", wheelsPower[i]),
             fmt("Brake: \t%.3f",wheelsBrake[i])}, c);
         GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
-            wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z + 1.0f + 2.5f * wheelCompr, 255, 0, 0, 255);
+            wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z + 1.0f + 2.5f * wheelsCompr[i], 255, 0, 0, 255);
     }
 }
