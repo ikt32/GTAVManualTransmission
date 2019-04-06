@@ -145,6 +145,36 @@ void handleBrakePatch() {
     }
 }
 
+/*
+ * TODO: Some ideas to require rev matching for smooth driving...
+ */
+
+void checkRevMatch() {
+    float expectedSpeed = vehData.mRPM * (vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr]);
+    float actualSpeed = vehData.mWheelAverageDrivenTyreSpeed;
+    float speedDelta = expectedSpeed - actualSpeed;
+    
+    if (speedDelta > 0.0f) {
+        // Engine is faster than wheels, wheelspin should occur
+        if (vehData.mClutch == 1.0f) {
+            // TODO: Implement
+        }
+        else {
+            // TODO: Clutch heating?
+        }
+    }
+
+    // Engine is slower than wheels, slowdown/blocking should occur
+    if (speedDelta < 0.0f) {
+        if (vehData.mClutch == 1.0f) {
+            // TODO: Implement
+        }
+        else {
+            // TODO: Clutch heating? Engine brake?
+        }
+    }
+}
+
 bool isPlayerAvailable(Player player, Ped playerPed) {
     if (!PLAYER::IS_PLAYER_CONTROL_ON(player) ||
         PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE) ||
@@ -351,6 +381,8 @@ void update_manual_features() {
     else {
         wheelPatchStates.EngLockActive = false;
     }
+
+    // TODO: engLock change to checkRevMatch?
 
     if (!gearStates.FakeNeutral &&
         !(settings.SimpleBike && vehData.mClass == VehicleClass::Bike) && vehData.mHasClutch) {
