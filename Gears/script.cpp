@@ -54,17 +54,10 @@ const float g_baseStallSpeed = 0.08f;
 const float g_baseCatchMinSpeed = 0.12f;
 const float g_baseCatchMaxSpeed = 0.24f;
 
-std::string textureWheelFile;
 int textureWheelId;
 
 // TODO: I think this broke some time ago?
 GameSound gearRattle("DAMAGED_TRUCK_IDLE", nullptr);
-
-std::string absoluteModPath;
-std::string settingsGeneralFile;
-std::string settingsWheelFile;
-std::string settingsStickFile;
-std::string settingsMenuFile;
 
 NativeMenu::Menu menu;
 CarControls carControls;
@@ -75,7 +68,6 @@ Ped playerPed;
 Vehicle vehicle;
 Vehicle lastVehicle;
 
-//VehicleInfo vehInfo;
 VehiclePeripherals peripherals;
 VehicleGearboxStates gearStates(g_numGears);
 WheelPatchStates wheelPatchStates;
@@ -84,10 +76,6 @@ VehicleExtensions ext;
 VehicleData vehData(ext);
 
 int prevNotification = 0;
-int prevExtShift = 0;
-
-//int speedoIndex;
-//extern std::vector<std::string> speedoTypes;
 
 MiniPID pid(1.0, 0.0, 0.0);
 
@@ -489,11 +477,10 @@ void crossScript() {
 
     // External shifting
     int currExtShift = DECORATOR::DECOR_GET_INT(vehicle, (char *)decorSetShiftMode);
-    if (prevExtShift != currExtShift && currExtShift > 0) {
+    if (settings.ShiftMode + 1 != currExtShift && currExtShift > 0) {
         // 1 Seq, 2 H, 3 Auto
         setShiftMode(currExtShift - 1);
     }
-    prevExtShift = currExtShift;
 
     DECORATOR::DECOR_SET_INT(vehicle, (char *)decorGetShiftMode, static_cast<int>(settings.ShiftMode) + 1);
 }
@@ -2356,12 +2343,12 @@ void readSettings() {
 
 void main() {
     logger.Write(INFO, "Script started");
-    absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir;
-    settingsGeneralFile = absoluteModPath + "\\settings_general.ini";
-    settingsWheelFile = absoluteModPath + "\\settings_wheel.ini";
-    settingsStickFile = absoluteModPath + "\\settings_stick.ini";
-    settingsMenuFile = absoluteModPath + "\\settings_menu.ini";
-    textureWheelFile = absoluteModPath + "\\texture_wheel.png";
+    std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir;
+    std::string settingsGeneralFile = absoluteModPath + "\\settings_general.ini";
+    std::string settingsWheelFile = absoluteModPath + "\\settings_wheel.ini";
+    std::string settingsStickFile = absoluteModPath + "\\settings_stick.ini";
+    std::string settingsMenuFile = absoluteModPath + "\\settings_menu.ini";
+    std::string textureWheelFile = absoluteModPath + "\\texture_wheel.png";
 
     settings.SetFiles(settingsGeneralFile, settingsWheelFile);
     menu.RegisterOnMain([] { onMenuInit(); });
