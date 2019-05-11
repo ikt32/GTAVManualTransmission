@@ -49,11 +49,6 @@ const char* decorLookingLeft = "mt_looking_left";
 const char* decorLookingRight = "mt_looking_right";
 const char* decorLookingBack = "mt_looking_back";
 
-// TODO: Should be in the settings
-const float g_baseStallSpeed = 0.08f;
-const float g_baseCatchMinSpeed = 0.12f;
-const float g_baseCatchMaxSpeed = 0.24f;
-
 int textureWheelId;
 
 // TODO: I think this broke some time ago?
@@ -1096,27 +1091,33 @@ void functionClutchCatch() {
 }
 
 void functionEngStall() {
-    float avgWheelSpeed = abs(vehData.mWheelAverageDrivenTyreSpeed);
-    float stallSpeed = g_baseStallSpeed * abs(vehData.mDriveMaxFlatVel/vehData.mGearRatios[vehData.mGearCurr]);
-    float stallTime = 0.30f;
+    const float stallRate = GAMEPLAY::GET_FRAME_TIME() * 3.33f;
 
-    //showText(0.1, 0.1, 1.0, "Stall progress: " + std::to_string(vehData.StallProgress));
-    //showText(0.1, 0.2, 1.0, "Stall speed: " + std::to_string(stallSpeed));
-    //showText(0.1, 0.3, 1.0, "Actual speed: " + std::to_string(avgWheelSpeed));
-    //showText(0.1, 0.4, 1.0, "Stall thres: " + std::to_string(1.0f - settings.StallingThreshold));
-    //showText(0.1, 0.5, 1.0, "ClutchVal: " + std::to_string(controls.ClutchVal));
+    float minSpeed = settings.StallingRPM * abs(vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr]);
+    float actualSpeed = vehData.mWheelAverageDrivenTyreSpeed;
+
+    // Closer to idle speed = less buildup for stalling
+    float speedDiffRatio = map(abs(minSpeed) - abs(actualSpeed), 0.0f, abs(minSpeed), 0.0f, 1.0f);
+    speedDiffRatio = std::clamp(speedDiffRatio, 0.0f, 1.0f);
+    if (speedDiffRatio < 0.45f)
+        speedDiffRatio = 0.0f; //ignore if we're close-ish to idle
+    
+    bool clutchEngaged = carControls.ClutchVal < 1.0f - settings.ClutchThreshold;
+    bool stallEngaged = carControls.ClutchVal < 1.0f - settings.StallingThreshold;
 
     // this thing is big when the clutch isnt pressed
     float invClutch = 1.0f - carControls.ClutchVal;
 
-    if (invClutch > settings.StallingThreshold &&
-        vehData.mRPM < 0.25f &&
-        avgWheelSpeed < stallSpeed &&
+    if (stallEngaged &&
+        vehData.mRPM < 0.25f && //engine actually has to idle
+        abs(actualSpeed) < abs(minSpeed) &&
         VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
-        gearStates.StallProgress += invClutch * 1.0f/stallTime * GAMEPLAY::GET_FRAME_TIME();
+        float change = invClutch * speedDiffRatio * stallRate;
+        gearStates.StallProgress += change;
     }
     else if (gearStates.StallProgress > 0.0f) {
-        gearStates.StallProgress -= invClutch * 1.0f/stallTime * GAMEPLAY::GET_FRAME_TIME();
+        float change = stallRate; // "subtract" quickly
+        gearStates.StallProgress -= change;
     }
 
     if (gearStates.StallProgress > 1.0f) {
@@ -1129,10 +1130,15 @@ void functionEngStall() {
 
     // Simulate push-start
     // We'll just assume the ignition thing is in the "on" position.
-    if (avgWheelSpeed > stallSpeed && !VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
-        invClutch > settings.StallingThreshold) {
+    if (actualSpeed > minSpeed && !VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
+        stallEngaged) {
         VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, true, true);
     }
+
+    //showText(0.1, 0.00, 0.4, fmt("Stall progress: %.02f", gearStates.StallProgress));
+    //showText(0.1, 0.02, 0.4, fmt("Clutch: %d", clutchEngaged));
+    //showText(0.1, 0.04, 0.4, fmt("Stall?: %d", stallEngaged));
+    //showText(0.1, 0.06, 0.4, fmt("SpeedDiffRatio: %.02f", speedDiffRatio));
 }
 
 void functionEngDamage() {

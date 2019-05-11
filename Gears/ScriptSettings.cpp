@@ -51,9 +51,10 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetBoolValue("OPTIONS", "ClutchShiftingS", ClutchShiftingS);
     settingsGeneral.SetBoolValue("OPTIONS", "DefaultNeutral", DefaultNeutral);
 
-    settingsGeneral.SetDoubleValue("OPTIONS", "ClutchCatchpoint", ClutchThreshold * 100);
-    settingsGeneral.SetDoubleValue("OPTIONS", "StallingThreshold", StallingThreshold * 100);
-    settingsGeneral.SetDoubleValue("OPTIONS", "RPMDamage", RPMDamage * 100);
+    settingsGeneral.SetDoubleValue("OPTIONS", "ClutchCatchpoint", ClutchThreshold * 100.0);
+    settingsGeneral.SetDoubleValue("OPTIONS", "StallingThreshold", StallingThreshold * 100.0);
+    settingsGeneral.SetDoubleValue("OPTIONS", "StallingRPM", StallingRPM);
+    settingsGeneral.SetDoubleValue("OPTIONS", "RPMDamage", RPMDamage * 100.0);
     settingsGeneral.SetDoubleValue("OPTIONS", "MisshiftDamage", MisshiftDamage);
     settingsGeneral.SetDoubleValue("OPTIONS", "EngBrakePower", EngBrakePower);
     settingsGeneral.SetDoubleValue("OPTIONS", "EngBrakeThreshold", EngBrakeThreshold);
@@ -264,6 +265,7 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
 
     ClutchThreshold = settingsGeneral.GetDoubleValue("OPTIONS", "ClutchCatchpoint", 10.0) / 100.0f;
     StallingThreshold = settingsGeneral.GetDoubleValue("OPTIONS", "StallingThreshold", 85.0) / 100.0f;
+    StallingRPM = settingsGeneral.GetDoubleValue("OPTIONS", "StallingRPM", 0.1);
     RPMDamage = settingsGeneral.GetDoubleValue("OPTIONS", "RPMDamage", 15.0) / 100.0f;
     MisshiftDamage = settingsGeneral.GetDoubleValue("OPTIONS", "MisshiftDamage", 20.0);
     EngBrakePower = settingsGeneral.GetDoubleValue("OPTIONS", "EngBrakePower", 1.0);

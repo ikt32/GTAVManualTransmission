@@ -314,6 +314,10 @@ void update_finetuneoptionsmenu() {
         { "How far the clutch has to be lifted to start biting. This value should be lower than \"Stalling threshold\"." });
     menu.FloatOption("Stalling threshold", settings.StallingThreshold, 0.0f, 1.0f, 0.05f,
         { "How far the clutch has to be lifted to start stalling. This value should be higher than \"Clutch bite point\"." });
+    menu.FloatOption("Stalling RPM", settings.StallingRPM, 0.0f, 0.2f, 0.01f,
+    	{ "Consider stalling when the expected RPM drops below this number.",
+    	  "The range is 0.0 to 0.2. The engine idles at 0.2, so 0.1 is a decent value." });
+
     menu.FloatOption("RPM Damage", settings.RPMDamage, 0.0f, 10.0f, 0.05f,
         { "Damage from redlining too long." });
     menu.IntOption("Misshift Damage", settings.MisshiftDamage, 0, 100, 5,
