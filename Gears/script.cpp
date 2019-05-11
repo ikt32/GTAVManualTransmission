@@ -79,6 +79,8 @@ int prevNotification = 0;
 
 MiniPID pid(1.0, 0.0, 0.0);
 
+void SetControlADZ(eControl control, float value, float adz);
+
 //TODO: Reorganize/move?
 void handleBrakePatch() {
     bool lockedUp = false;
@@ -1069,35 +1071,27 @@ void functionAShift() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void functionClutchCatch() {
-    float lowSpeed = g_baseCatchMinSpeed * (vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr]);
-    float mehSpeed = g_baseCatchMaxSpeed * (vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr]);
+    const float idleThrottle = 0.24f; // TODO -> Settings?
 
-    const float idleThrottle = 0.24f;
+    float clutchRatio = map(carControls.ClutchVal, settings.ClutchThreshold, 1.0f, 1.0f, 0.0f);
+    clutchRatio = std::clamp(clutchRatio, 0.0f, 1.0f);
 
-    if (carControls.ClutchVal < 1.0f - settings.ClutchThreshold && 
-        carControls.ThrottleVal < 0.25f && carControls.BrakeVal < 0.95) {
-        if (settings.ShiftMode != HPattern && carControls.BrakeVal > 0.1f || 
-            vehData.mRPM > 0.25f && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y >= lowSpeed) {
-            return;
-        }
+    bool clutchEngaged = carControls.ClutchVal < 1.0f - settings.ClutchThreshold;
+    float minSpeed = 0.2f * (vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr]);
+    float expectedSpeed = vehData.mRPM * (vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr]) * clutchRatio;
+    float actualSpeed = vehData.mWheelAverageDrivenTyreSpeed;
+    if (abs(actualSpeed) < abs(minSpeed) &&
+    	clutchEngaged) {
+        float throttle = map(abs(actualSpeed), 0.0f, abs(expectedSpeed), idleThrottle, 0.0f);
+    	throttle = std::clamp(throttle, 0.0f, idleThrottle);
 
-        // Forward
-        if (vehData.mGearCurr > 0 && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < mehSpeed) {
-            float throttle = map(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y, mehSpeed, lowSpeed, 0.0f, idleThrottle);
-            CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, throttle);
-            ext.SetCurrentRPM(vehicle, 0.21f);
-            ext.SetThrottle(vehicle, 0.0f);
-        }
-
-        // Reverse
-        if (vehData.mGearCurr == 0) {
-            float throttle = map(abs(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y), abs(mehSpeed), abs(lowSpeed), 0.0f, idleThrottle);
-            // due to 0.25f deadzone throttle makes reversing anims stop, so its jerky
-            // TODO: needs a workaround to prevent jerky reversing anims
-            CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, throttle); 
-            ext.SetCurrentRPM(vehicle, 0.21f);
-            ext.SetThrottle(vehicle, 0.0f);
-        }
+    	bool userThrottle = abs(carControls.ThrottleVal) > idleThrottle || abs(carControls.BrakeVal) > idleThrottle;
+    	if (!userThrottle) {
+    		if (vehData.mGearCurr > 0)
+    			SetControlADZ(ControlVehicleAccelerate, throttle, 0.25f);
+    		else
+    			SetControlADZ(ControlVehicleBrake, throttle, 0.25f);
+    	}
     }
 }
 
