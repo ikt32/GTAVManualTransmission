@@ -2351,10 +2351,10 @@ bool setupGlobals() {
     registerDecorator(decorSetShiftMode, DECOR_TYPE_INT);
     registerDecorator(decorGetShiftMode, DECOR_TYPE_INT);
 
-	// Camera mods interoperability
-	registerDecorator(decorLookingLeft, DECOR_TYPE_BOOL);
-	registerDecorator(decorLookingRight, DECOR_TYPE_BOOL);
-	registerDecorator(decorLookingBack, DECOR_TYPE_BOOL);
+    // Camera mods interoperability
+    registerDecorator(decorLookingLeft, DECOR_TYPE_BOOL);
+    registerDecorator(decorLookingRight, DECOR_TYPE_BOOL);
+    registerDecorator(decorLookingBack, DECOR_TYPE_BOOL);
 
     // only re-lock if it was locked before
     if (scriptDidUnlock) {
