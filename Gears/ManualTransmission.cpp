@@ -12,6 +12,7 @@ extern ScriptSettings settings;
 extern CarControls carControls;
 extern Vehicle vehicle;
 extern VehicleGearboxStates gearStates;
+extern VehicleData vehData;
 extern std::vector<Vehicle> ignoredVehicles;
 
 const char* MT_GetVersion() {
@@ -37,6 +38,19 @@ int MT_GetShiftMode() {
 void MT_SetShiftMode(int mode) {
     if (mode == 1 || mode == 2 || mode == 3)
         setShiftMode(mode - 1);
+}
+
+int MT_GetShiftIndicator() {
+    if (gearStates.HitRPMSpeedLimiter || gearStates.HitRPMLimiter) {
+        return 1;
+    }
+    else if (vehData.mGearCurr > 1 && vehData.mRPM < 0.4f) {
+        return 2;
+    }
+    else if (vehData.mGearCurr == vehData.mGearNext) {
+        return 0;
+    }
+    return 0;
 }
 
 void MT_AddIgnoreVehicle(int vehicle) {

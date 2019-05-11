@@ -51,6 +51,14 @@ MT_API int          MT_GetShiftMode();
  */
 MT_API void         MT_SetShiftMode(int mode);
 
+/**
+ * \brief           Get whether the user should shift up/down
+ *                  0: No action
+ *                  1: Shift up
+ *                  2: Shift down
+ */
+MT_API int          MT_GetShiftIndicator();
+
 /*
  * AI shifting override
  */
