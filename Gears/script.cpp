@@ -1052,68 +1052,54 @@ void functionAShift() {
     int currGear = vehData.mGearCurr;
     if (currGear == 0) return;
 
+    
+    const float throttleHangRate = 0.33f;   // TODO: To settings
+    const float minRPM = 0.32f;             // TODO: To settings
+
+    if (carControls.ThrottleVal > gearStates.ThrottleHang)
+        gearStates.ThrottleHang = carControls.ThrottleVal;
+    else if (gearStates.ThrottleHang > 0.0f)
+        gearStates.ThrottleHang -= GAMEPLAY::GET_FRAME_TIME() * throttleHangRate;
+
+    if (gearStates.ThrottleHang < 0.0f)
+        gearStates.ThrottleHang = 0.0f;
+
     float currSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
-    auto ratios = vehData.mGearRatios;
-    float DriveMaxFlatVel = vehData.mDriveMaxFlatVel;
-    float InitialDriveMaxFlatVel = vehData.mInitialDriveMaxFlatVel;
 
-    float maxSpeedUpShiftWindow = DriveMaxFlatVel / ratios[currGear];
-    float minSpeedUpShiftWindow = InitialDriveMaxFlatVel / ratios[currGear];
-    float currGearDelta = maxSpeedUpShiftWindow - minSpeedUpShiftWindow;
+    float nextGearMinSpeed;
+    if (currGear < vehData.mGearTop) {
+        nextGearMinSpeed = minRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear + 1];
+    }
+    else {
+        nextGearMinSpeed = minRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear];
+    }
 
-    float prevGearTopSpeed = DriveMaxFlatVel / ratios[currGear - 1];
-    float prevGearMinSpeed = InitialDriveMaxFlatVel / ratios[currGear - 1];
-    float highEndShiftSpeed = fminf(minSpeedUpShiftWindow, prevGearTopSpeed);
-    float prevGearDelta = prevGearTopSpeed - prevGearMinSpeed;
+    float currGearMinSpeed = minRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear];
 
-    float upshiftSpeed   = map(pow(carControls.ThrottleVal, 6.0f), 0.0f, 1.0f, minSpeedUpShiftWindow, maxSpeedUpShiftWindow);
-    float downshiftSpeed = map(pow(carControls.ThrottleVal, 6.0f), 0.0f, 1.0f, prevGearMinSpeed,      highEndShiftSpeed);
+    float currGearTopSpeed = vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear];
+    float prevGearTopSpeed = vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear - 1];
 
-    float acceleration = vehData.mAcceleration.y / 9.81f;
-    float accelExpect = pow(carControls.ThrottleVal, 2.0f) * ratios[currGear] * VEHICLE::GET_VEHICLE_ACCELERATION(vehicle);
-
-    float throttle = abs(vehData.mThrottle);
-    float RPM = vehData.mRPM;
-    float engineLoad = throttle / RPM;
-    bool shouldShiftUpLoad = throttle == 1.0f && engineLoad < 1.10f;
+    float engineLoad = gearStates.ThrottleHang - map(vehData.mRPM, 0.2f, 1.0f, 0.0f, 1.0f);
 
     // Shift up.
     if (currGear < vehData.mGearTop) {
-        bool shouldShiftUpSPD = currSpeed > upshiftSpeed;
-        bool shouldShiftUpACC = acceleration < 0.33f * accelExpect && !gearStates.IgnoreAccelerationUpshiftTrigger;
-
-        if (currSpeed > minSpeedUpShiftWindow && (shouldShiftUpSPD || shouldShiftUpLoad/*|| shouldShiftUpACC*/)) {
-            gearStates.IgnoreAccelerationUpshiftTrigger = true;
-            gearStates.PrevUpshiftTime = GetTickCount();
+        if (engineLoad < 0.05f && currSpeed > nextGearMinSpeed) {
             shiftTo(vehData.mGearCurr + 1, true);
             gearStates.FakeNeutral = false;
             gearStates.UpshiftSpeedsMod[currGear] = currSpeed;
-        }
-
-        if (gearStates.IgnoreAccelerationUpshiftTrigger) {
-            float upshiftTimeout = 1.0f / *(float*)(vehData.mHandlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
-            if (gearStates.IgnoreAccelerationUpshiftTrigger && GetTickCount() > gearStates.PrevUpshiftTime + (int)(upshiftTimeout*1000.0f)) {
-                gearStates.IgnoreAccelerationUpshiftTrigger = false;
-            }
         }
     }
 
     // Shift down
     if (currGear > 1) {
-        if (currSpeed < downshiftSpeed - prevGearDelta && !shouldShiftUpLoad) {
+        if (engineLoad > 0.66f || currSpeed < currGearMinSpeed) {
             shiftTo(currGear - 1, true);
             gearStates.FakeNeutral = false;
         }
     }
 
     if (settings.DisplayInfo && !menu.IsThisOpen()) {
-        showText(0.01, 0.525, 0.3, fmt("CurrentSpeed: \t%.3f"   , currSpeed));
-        showText(0.01, 0.550, 0.3, fmt("UpshiftSpeed: \t%.3f"   , upshiftSpeed));
-        showText(0.01, 0.575, 0.3, fmt("DnshiftSpeed: \t%.3f"   , downshiftSpeed - prevGearDelta));
-        showText(0.01, 0.600, 0.3, fmt("PrevGearDelta: \t%.3f"  , prevGearDelta));
-        showText(0.01, 0.625, 0.3, fmt("CurrGearDelta: \t%.3f"  , currGearDelta));
-        //showText(0.01, 0.650, 0.3, fmt("Accel(Expect): \t%.3f"  , accelExpect));
-        //showText(0.01, 0.675, 0.3, fmt("Accel(Actual): \t\t%.3f", acceleration));
+        showText(0.01, 0.525, 0.3, fmt("Engine load: \t%.3f", engineLoad));
     }
 }
 

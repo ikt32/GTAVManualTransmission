@@ -73,9 +73,8 @@ struct VehicleGearboxStates {
     std::vector<float> UpshiftSpeedsGame;
     std::vector<float> UpshiftSpeedsMod;
 
-    // Auto gearbox stuff need to find a better solution/workaround
-    DWORD PrevUpshiftTime = 0;
-    bool IgnoreAccelerationUpshiftTrigger = false;
+    // Auto gearbox stuff
+    float ThrottleHang; // throttle value for low load upshifting
 };
 
 struct WheelPatchStates {
