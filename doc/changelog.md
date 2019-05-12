@@ -1,11 +1,15 @@
 # Changelog
 
 ## 4.6.6
-* Add support for 10th gear
+
+* Revise automatic transmission shifting behavior
+* Revise clutch creep and stalling behavior
+* Revise sequential/auto shift clutch behavior
 * Add experimental scripted ABS
 * Add update checker, allows to be turned off or to ignore an update
 * Add C-style exported functions, replaces decorators and adds AI blacklisting
-* Add a workaround for FiveM other players vehicles not shifting
+* Fix an issue for FiveM other players where other vehicles are not shifting
+* Fix support for 10th gear
 * Fix an issue where steering deadzone is not saved properly
 * Fix an issue where force feedback continues playing when ejected from a car
 * Fix an issue where hazard lights cancelled when turning, like normal signal lights
