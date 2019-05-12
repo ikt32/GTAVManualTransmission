@@ -45,6 +45,11 @@ struct VehiclePeripherals {
     int RadioStationIndex = 0;
 };
 
+enum class ShiftDirection {
+    Up,
+    Down
+};
+
 struct VehicleGearboxStates {
     VehicleGearboxStates(uint8_t numGears) {
         UpshiftSpeedsGame.resize(numGears);
@@ -54,6 +59,12 @@ struct VehicleGearboxStates {
     // Gearbox stuff
     float StallProgress = 0.0f;
     uint8_t LockGear = 1;
+
+    // Delayed shifting
+    bool Shifting = false; 
+    uint8_t NextGear = 1;
+    float ClutchVal = 0.0f; // Clutch value _while_ Shifting
+    ShiftDirection ShiftDirection = ShiftDirection::Up;
 
     bool FakeNeutral = false;
     bool HitRPMSpeedLimiter = false; // Limit speed at top RPM

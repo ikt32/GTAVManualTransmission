@@ -30,6 +30,7 @@
 #include "Util/UIUtils.h"
 #include "Util/MiscEnums.h"
 #include "Util/StringFormat.h"
+#include "Util/TimeHelper.hpp"
 #include "UpdateChecker.h"
 #include "Constants.h"
 
@@ -75,6 +76,7 @@ int prevNotification = 0;
 MiniPID pid(1.0, 0.0, 0.0);
 
 void SetControlADZ(eControl control, float value, float adz);
+void updateShifting();
 
 //TODO: Reorganize/move?
 void handleBrakePatch() {
@@ -468,6 +470,7 @@ void update_manual_transmission() {
 
     functionLimiter();
 
+    updateShifting();
     // Finally, update memory each loop
     handleRPM();
     ext.SetGearCurr(vehicle, gearStates.LockGear);
@@ -706,10 +709,16 @@ void cycleShiftMode() {
 
 void shiftTo(int gear, bool autoClutch) {
     if (autoClutch) {
-        carControls.ClutchVal = 1.0f;
-        CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
+        if (gearStates.Shifting)
+            return;
+        gearStates.NextGear = gear;
+        gearStates.Shifting = true;
+        gearStates.ClutchVal = 0.0f;
+        gearStates.ShiftDirection = gear > gearStates.LockGear ? ShiftDirection::Up : ShiftDirection::Down;
     }
-    gearStates.LockGear = gear;
+    else {
+        gearStates.LockGear = gear;
+    }
 }
 void functionHShiftTo(int i) {
     if (settings.ClutchShiftingH && vehData.mHasClutch) {
@@ -729,7 +738,7 @@ void functionHShiftTo(int i) {
         }
     }
     else {
-        shiftTo(i, true);
+        shiftTo(i, false);
         gearStates.FakeNeutral = false;
         gearRattle.Stop();
     }
@@ -782,13 +791,60 @@ void functionHShiftWheel() {
     }
 
     if (carControls.ButtonReleased(CarControls::WheelControlType::HR)) {
-        shiftTo(1, true);
+        shiftTo(1, false);
         gearStates.FakeNeutral = vehData.mHasClutch;
     }
 }
 
 bool isUIActive() {
     return PED::IS_PED_RUNNING_MOBILE_PHONE_TASK(playerPed) || menu.IsThisOpen();
+}
+
+/*
+ * Delayed shifting with clutch. Active for automatic and sequential shifts.
+ * Shifting process:
+ * 1. Init shift, next gear set
+ * 2. Clutch disengages
+ * 3. Next gear active
+ * 4. Clutch engages again
+ * 5. Done shifting
+ */
+void updateShifting() {
+    if (!gearStates.Shifting)
+        return;
+
+    auto handlingPtr = ext.GetHandlingPtr(vehicle);
+    // This is x Clutch per second? e.g. changerate 2.5 -> clutch fully (dis)engages in 1/2.5 seconds? or whole thing?
+    float rateUp = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
+    float rateDown = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleDownShift);
+
+    float shiftRate = gearStates.ShiftDirection == ShiftDirection::Up ? rateUp : rateDown;
+    // TODO: To settings.
+    /*
+     * 4.0 gives similar perf as base - probably the whole shift takes 1/rate seconds
+     * with my extra disengage step, the whole thing should take also 1/rate seconds
+     */
+    shiftRate = shiftRate * GAMEPLAY::GET_FRAME_TIME() * 4.0f;
+
+    if (gearStates.NextGear != gearStates.LockGear) {
+        gearStates.ClutchVal += shiftRate;
+    }
+    if (gearStates.ClutchVal >= 1.0f && gearStates.LockGear != gearStates.NextGear) {
+        gearStates.LockGear = gearStates.NextGear;
+        return;
+    }
+    if (gearStates.NextGear == gearStates.LockGear) {
+        gearStates.ClutchVal -= shiftRate;
+    }
+
+    if (gearStates.ClutchVal < 0.0f && gearStates.NextGear == gearStates.LockGear) {
+        gearStates.ClutchVal = 0.0f;
+        gearStates.Shifting = false;
+    }
+
+    showText(0.1, 0.00, 0.4, fmt("Current Rate: %.02f", shiftRate));
+    showText(0.1, 0.02, 0.4, fmt("Upshift Rate: %.02f", rateUp));
+    showText(0.1, 0.04, 0.4, fmt("Downsh. Rate: %.02f", rateDown));
 }
 
 void functionSShift() {
@@ -824,7 +880,7 @@ void functionSShift() {
 
         // Reverse to Neutral
         if (vehData.mGearCurr == 0 && !gearStates.FakeNeutral) {
-            shiftTo(1, true);
+            shiftTo(1, false);
             gearStates.FakeNeutral = true;
             return;
         }
@@ -851,7 +907,7 @@ void functionSShift() {
         carControls.PrevInput == CarControls::Wheel			&& carControls.ButtonJustPressed(CarControls::WheelControlType::ShiftDown)) {
         if (!vehData.mHasClutch) {
             if (vehData.mGearCurr > 0) {
-                shiftTo(gearStates.LockGear - 1, true);
+                shiftTo(gearStates.LockGear - 1, false);
                 gearStates.FakeNeutral = false;
             }
             return;
@@ -871,7 +927,7 @@ void functionSShift() {
 
         // Neutral to R
         if (vehData.mGearCurr == 1 && gearStates.FakeNeutral) {
-            shiftTo(0, true);
+            shiftTo(0, false);
             gearStates.FakeNeutral = false;
             return;
         }
@@ -907,7 +963,7 @@ bool subAutoShiftSequential() {
         carControls.PrevInput == CarControls::Wheel			&& carControls.ButtonJustPressed(CarControls::WheelControlType::ShiftUp)) {
         // Reverse to Neutral
         if (vehData.mGearCurr == 0 && !gearStates.FakeNeutral) {
-            shiftTo(1, true);
+            shiftTo(1, false);
             gearStates.FakeNeutral = true;
             return true;
         }
@@ -920,7 +976,7 @@ bool subAutoShiftSequential() {
 
         // Invalid + N to 1
         if (vehData.mGearCurr == 0 && gearStates.FakeNeutral) {
-            shiftTo(1, true);
+            shiftTo(1, false);
             gearStates.FakeNeutral = false;
             return true;
         }
@@ -939,14 +995,14 @@ bool subAutoShiftSequential() {
 
         // Neutral to R
         if (vehData.mGearCurr == 1 && gearStates.FakeNeutral) {
-            shiftTo(0, true);
+            shiftTo(0, false);
             gearStates.FakeNeutral = false;
             return true;
         }
 
         // Invalid + N to R
         if (vehData.mGearCurr == 0 && gearStates.FakeNeutral) {
-            shiftTo(0, true);
+            shiftTo(0, false);
             gearStates.FakeNeutral = false;
             return true;
         }
@@ -960,18 +1016,18 @@ bool subAutoShiftSequential() {
 bool subAutoShiftSelect() {
     if (carControls.ButtonJustPressed(CarControls::WheelControlType::AR)) {
         if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < 5.0f) {
-            shiftTo(0, true);
+            shiftTo(0, false);
             gearStates.FakeNeutral = false;
         }
         return true;
     }
     if (carControls.ButtonJustPressed(CarControls::WheelControlType::AD)) {
-        shiftTo(1, true);
+        shiftTo(1, false);
         gearStates.FakeNeutral = false;
         return true;
     }
     if (carControls.ButtonReleased(CarControls::WheelControlType::AR)) {
-        shiftTo(1, true);
+        shiftTo(1, false);
         gearStates.FakeNeutral = true;
         return true;
     }
@@ -1070,6 +1126,8 @@ void functionClutchCatch() {
 
     float clutchRatio = map(carControls.ClutchVal, settings.ClutchThreshold, 1.0f, 1.0f, 0.0f);
     clutchRatio = std::clamp(clutchRatio, 0.0f, 1.0f);
+
+    // TODO: Check for settings.ShiftMode == Automatic if anybody complains...
 
     bool clutchEngaged = carControls.ClutchVal < 1.0f - settings.ClutchThreshold;
     float minSpeed = 0.2f * (vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr]);
@@ -1291,10 +1349,25 @@ void fakeRev(bool customThrottle, float customThrottleVal) {
 void handleRPM() {
     float clutch = carControls.ClutchVal;
 
+    if (gearStates.Shifting) {
+        clutch = gearStates.ClutchVal;
+
+        if (gearStates.ShiftDirection == ShiftDirection::Up) {
+            if (settings.ShiftMode == ShiftModes::Automatic || settings.ShiftMode == Sequential) {
+                CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
+            }
+        }
+        else { // blip throttle
+            //CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 1.0f);
+        }
+    }
+
     // Ignores clutch 
-    if (settings.ShiftMode == Automatic ||
-        vehData.mClass == VehicleClass::Bike && settings.SimpleBike) {
-        clutch = 0.0f;
+    if (!gearStates.Shifting) {
+        if (settings.ShiftMode == Automatic ||
+            vehData.mClass == VehicleClass::Bike && settings.SimpleBike) {
+            clutch = 0.0f;
+        }
     }
 
     //bool skip = false;
@@ -1342,7 +1415,8 @@ void handleRPM() {
         if (clutch > 0.4f &&
             carControls.ThrottleVal > 0.05f &&
             !gearStates.FakeNeutral && 
-            !rollingback) {
+            !rollingback &&
+            !gearStates.Shifting) {
             fakeRev(false, 0);
             ext.SetThrottle(vehicle, carControls.ThrottleVal);
         }
