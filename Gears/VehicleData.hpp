@@ -74,7 +74,7 @@ struct VehicleGearboxStates {
     std::vector<float> UpshiftSpeedsMod;
 
     // Auto gearbox stuff
-    float ThrottleHang; // throttle value for low load upshifting
+    float ThrottleHang = 0.0f; // throttle value for low load upshifting
 };
 
 struct WheelPatchStates {

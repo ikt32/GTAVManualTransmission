@@ -1057,7 +1057,7 @@ void functionAShift() {
     if (currGear == 0) return;
 
     
-    const float throttleHangRate = 0.33f;   // TODO: To settings
+    const float throttleHangRate = 0.05f;   // TODO: To settings. Lower = keep in low gear longer // eco - 0.33
     const float minRPM = 0.32f;             // TODO: To settings
 
     if (carControls.ThrottleVal > gearStates.ThrottleHang)
@@ -1068,7 +1068,7 @@ void functionAShift() {
     if (gearStates.ThrottleHang < 0.0f)
         gearStates.ThrottleHang = 0.0f;
 
-    float currSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
+    float currSpeed = vehData.mWheelAverageDrivenTyreSpeed;
 
     float nextGearMinSpeed;
     if (currGear < vehData.mGearTop) {
@@ -1085,9 +1085,16 @@ void functionAShift() {
 
     float engineLoad = gearStates.ThrottleHang - map(vehData.mRPM, 0.2f, 1.0f, 0.0f, 1.0f);
 
+    bool skidding = false;
+    for (auto x : ext.GetWheelSkidSmokeEffect(vehicle)) {
+        if (abs(x) > 3.5f)
+            skidding = true;
+    }
+
+    // TODO: 0.05 and 0.66 -> Settings
     // Shift up.
     if (currGear < vehData.mGearTop) {
-        if (engineLoad < 0.05f && currSpeed > nextGearMinSpeed) {
+        if (engineLoad < 0.05f && currSpeed > nextGearMinSpeed && !skidding) {
             shiftTo(vehData.mGearCurr + 1, true);
             gearStates.FakeNeutral = false;
             gearStates.UpshiftSpeedsMod[currGear] = currSpeed;
