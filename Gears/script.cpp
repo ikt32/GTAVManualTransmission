@@ -471,6 +471,7 @@ void update_manual_transmission() {
     functionLimiter();
 
     updateShifting();
+
     // Finally, update memory each loop
     handleRPM();
     ext.SetGearCurr(vehicle, gearStates.LockGear);
@@ -810,6 +811,13 @@ bool isUIActive() {
  * 5. Done shifting
  */
 void updateShifting() {
+    if (settings.DisplayInfo && !menu.IsThisOpen()) {
+        showText(0.01, 0.550, 0.3, "Shifting: " + std::string(gearStates.Shifting ? "Y" : "N"));
+        showText(0.01, 0.575, 0.3, "Clutch: " + std::to_string(gearStates.ClutchVal));
+        showText(0.01, 0.600, 0.3, "Lock: " + std::to_string(gearStates.LockGear));
+        showText(0.01, 0.625, 0.3, "Next: " + std::to_string(gearStates.NextGear));
+    }
+
     if (!gearStates.Shifting)
         return;
 
@@ -841,10 +849,6 @@ void updateShifting() {
         gearStates.ClutchVal = 0.0f;
         gearStates.Shifting = false;
     }
-
-    showText(0.1, 0.00, 0.4, fmt("Current Rate: %.02f", shiftRate));
-    showText(0.1, 0.02, 0.4, fmt("Upshift Rate: %.02f", rateUp));
-    showText(0.1, 0.04, 0.4, fmt("Downsh. Rate: %.02f", rateDown));
 }
 
 void functionSShift() {
