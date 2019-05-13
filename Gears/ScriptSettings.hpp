@@ -59,6 +59,13 @@ public:
 
     bool CrossScript = false;
 
+    // [AUTO_BOX]
+    float UpshiftLoad = 0.05f;      // Lower = upshift later
+    float DownshiftLoad = 0.66f;    // Higher = downshift later
+    float NextGearMinRPM = 0.32f;   // Don't upshift until next gears' RPM is over this value.
+    float CurrGearMinRPM = 0.27f;   // Downshift when RPM drops below this value.
+    float EcoRate = 0.33f;          // Lower = keep in low gear longer // eco - 0.33
+
     // [HUD]
     bool HUD = true;
     bool AlwaysHUD = false;

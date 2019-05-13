@@ -1054,34 +1054,27 @@ void functionAShift() {
     }
     
     int currGear = vehData.mGearCurr;
-    if (currGear == 0) return;
-
-    
-    const float throttleHangRate = 0.05f;   // TODO: To settings. Lower = keep in low gear longer // eco - 0.33
-    const float minRPM = 0.32f;             // TODO: To settings
+    if (currGear == 0)
+        return;
+    if (gearStates.Shifting)
+        return;
 
     if (carControls.ThrottleVal > gearStates.ThrottleHang)
         gearStates.ThrottleHang = carControls.ThrottleVal;
     else if (gearStates.ThrottleHang > 0.0f)
-        gearStates.ThrottleHang -= GAMEPLAY::GET_FRAME_TIME() * throttleHangRate;
+        gearStates.ThrottleHang -= GAMEPLAY::GET_FRAME_TIME() * settings.EcoRate;
 
     if (gearStates.ThrottleHang < 0.0f)
         gearStates.ThrottleHang = 0.0f;
 
     float currSpeed = vehData.mWheelAverageDrivenTyreSpeed;
 
-    float nextGearMinSpeed;
+    float nextGearMinSpeed = 0.0f; // don't care about top gear
     if (currGear < vehData.mGearTop) {
-        nextGearMinSpeed = minRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear + 1];
-    }
-    else {
-        nextGearMinSpeed = minRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear];
+        nextGearMinSpeed = settings.NextGearMinRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear + 1];
     }
 
-    float currGearMinSpeed = minRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear];
-
-    float currGearTopSpeed = vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear];
-    float prevGearTopSpeed = vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear - 1];
+    float currGearMinSpeed = settings.CurrGearMinRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear];
 
     float engineLoad = gearStates.ThrottleHang - map(vehData.mRPM, 0.2f, 1.0f, 0.0f, 1.0f);
 
@@ -1091,10 +1084,9 @@ void functionAShift() {
             skidding = true;
     }
 
-    // TODO: 0.05 and 0.66 -> Settings
     // Shift up.
     if (currGear < vehData.mGearTop) {
-        if (engineLoad < 0.05f && currSpeed > nextGearMinSpeed && !skidding) {
+        if (engineLoad < settings.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
             shiftTo(vehData.mGearCurr + 1, true);
             gearStates.FakeNeutral = false;
             gearStates.UpshiftSpeedsMod[currGear] = currSpeed;
@@ -1103,7 +1095,7 @@ void functionAShift() {
 
     // Shift down
     if (currGear > 1) {
-        if (engineLoad > 0.66f || currSpeed < currGearMinSpeed) {
+        if (engineLoad > settings.DownshiftLoad || currSpeed < currGearMinSpeed) {
             shiftTo(currGear - 1, true);
             gearStates.FakeNeutral = false;
         }

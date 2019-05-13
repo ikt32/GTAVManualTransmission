@@ -304,6 +304,9 @@ void update_optionsmenu() {
 
     menu.MenuOption("Finetuning", "finetuneoptionsmenu",
         { "Fine-tune the parameters above." });
+
+    menu.MenuOption("Automatic finetuning", "finetuneautooptionsmenu",
+        { "Fine-tune script-provided automatic transmission parameters." });
 }
 
 void update_finetuneoptionsmenu() {
@@ -315,8 +318,8 @@ void update_finetuneoptionsmenu() {
     menu.FloatOption("Stalling threshold", settings.StallingThreshold, 0.0f, 1.0f, 0.05f,
         { "How far the clutch has to be lifted to start stalling. This value should be higher than \"Clutch bite point\"." });
     menu.FloatOption("Stalling RPM", settings.StallingRPM, 0.0f, 0.2f, 0.01f,
-    	{ "Consider stalling when the expected RPM drops below this number.",
-    	  "The range is 0.0 to 0.2. The engine idles at 0.2, so 0.1 is a decent value." });
+        { "Consider stalling when the expected RPM drops below this number.",
+          "The range is 0.0 to 0.2. The engine idles at 0.2, so 0.1 is a decent value." });
 
     menu.FloatOption("RPM Damage", settings.RPMDamage, 0.0f, 10.0f, 0.05f,
         { "Damage from redlining too long." });
@@ -326,6 +329,23 @@ void update_finetuneoptionsmenu() {
         { "RPM where engine braking starts being effective." });
     menu.FloatOption("Engine braking power", settings.EngBrakePower, 0.0f, 5.0f, 0.05f,
         { "Decrease this value if your wheels lock up when engine braking." });
+}
+
+void update_finetuneautooptionsmenu() {
+    menu.Title("Automatic transmission finetuning");
+    menu.Subtitle("Script-driven automatic transmission");
+
+    menu.FloatOption("Upshift engine load", settings.UpshiftLoad, 0.01f, 0.20f, 0.01f,
+        { "Upshift when the engine load drops below this value." });
+    menu.FloatOption("Downshift engine load", settings.DownshiftLoad, 0.50f, 1.00f, 0.01f,
+        { "Downshift when the engine load rises over this value." });
+    menu.FloatOption("Next gear min RPM",    settings.NextGearMinRPM, 0.20f, 0.50f, 0.01f, 
+        { "Don't upshift until next gears' RPM is over this value." });
+    menu.FloatOption("Current gear min RPM", settings.CurrGearMinRPM, 0.20f, 0.50f, 0.01f, 
+        { "Downshift when RPM drops below this value." });
+    menu.FloatOption("Economy rate", settings.EcoRate, 0.01f, 0.50f, 0.01f,
+        { "On releasing throttle, high values cause earlier upshifts.",
+          "Set this low to stay in gear longer when releasing throttle." });
 }
 
 void update_controlsmenu() {
@@ -1049,6 +1069,9 @@ void update_menu() {
 
     /* mainmenu -> optionsmenu -> finetuneoptionsmenu */
     if (menu.CurrentMenu("finetuneoptionsmenu")) { update_finetuneoptionsmenu(); }
+
+    /* mainmenu -> optionsmenu -> finetuneautooptionsmenu */
+    if (menu.CurrentMenu("finetuneautooptionsmenu")) { update_finetuneautooptionsmenu(); }
 
     /* mainmenu -> controlsmenu */
     if (menu.CurrentMenu("controlsmenu")) { update_controlsmenu(); }

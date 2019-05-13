@@ -70,6 +70,13 @@ void ScriptSettings::SaveGeneral() const {
 
     settingsGeneral.SetBoolValue("OPTIONS", "CrossScript", CrossScript);
 
+    // [AUTO_BOX]
+    settingsGeneral.SetDoubleValue("AUTO_BOX", "UpshiftLoad = ", UpshiftLoad);
+    settingsGeneral.SetDoubleValue("AUTO_BOX", "DownshiftLoad ", DownshiftLoad);
+    settingsGeneral.SetDoubleValue("AUTO_BOX", "NextGearMinRPM", NextGearMinRPM);
+    settingsGeneral.SetDoubleValue("AUTO_BOX", "CurrGearMinRPM", CurrGearMinRPM);
+    settingsGeneral.SetDoubleValue("AUTO_BOX", "EcoRate", EcoRate);
+
     // [HUD]
     settingsGeneral.SetBoolValue("HUD", "EnableHUD", HUD);
     settingsGeneral.SetBoolValue("HUD", "AlwaysHUD", AlwaysHUD);
@@ -281,6 +288,13 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     ABSFilter = settingsGeneral.GetBoolValue("OPTIONS", "ABSFilter", false);
 
     CrossScript = settingsGeneral.GetBoolValue("OPTIONS", "CrossScript", true);
+
+    // [AUTO_BOX]
+    UpshiftLoad = settingsGeneral.GetDoubleValue("AUTO_BOX", "UpshiftLoad", 0.05f);
+    DownshiftLoad =  settingsGeneral.GetDoubleValue("AUTO_BOX", "DownshiftLoad", 0.66f);
+    NextGearMinRPM = settingsGeneral.GetDoubleValue("AUTO_BOX", "NextGearMinRPM", 0.32f);
+    CurrGearMinRPM = settingsGeneral.GetDoubleValue("AUTO_BOX", "CurrGearMinRPM", 0.27f);
+    EcoRate = settingsGeneral.GetDoubleValue("AUTO_BOX", "EcoRate", 0.33f);
 
     // [HUD]
     HUD = settingsGeneral.GetBoolValue			("HUD", "EnableHUD", true);
