@@ -31,3 +31,4 @@ packages.config
 # Temp
 Server/
 *.TMP
+doc/changelog.pdf
