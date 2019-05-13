@@ -71,7 +71,7 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetBoolValue("OPTIONS", "CrossScript", CrossScript);
 
     // [AUTO_BOX]
-    settingsGeneral.SetDoubleValue("AUTO_BOX", "UpshiftLoad = ", UpshiftLoad);
+    settingsGeneral.SetDoubleValue("AUTO_BOX", "UpshiftLoad", UpshiftLoad);
     settingsGeneral.SetDoubleValue("AUTO_BOX", "DownshiftLoad ", DownshiftLoad);
     settingsGeneral.SetDoubleValue("AUTO_BOX", "NextGearMinRPM", NextGearMinRPM);
     settingsGeneral.SetDoubleValue("AUTO_BOX", "CurrGearMinRPM", CurrGearMinRPM);
