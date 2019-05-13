@@ -415,6 +415,39 @@ Turn this on to enable experimental ABS.
 Works for vehicles with both real ABS and no ABS. It stops braking a wheel when
 a lock-up is detected, allowing for slightly more control under max braking.
 
+#### `[AUTO_BOX]`
+
+The automatic gearbox this mod provides is fully customizable. Since
+`v4.6.6` the following values are used:
+
+##### `UpshiftLoad` : `0.01` to `0.20` (default 0.05)
+
+The engine load at which the car should shift up. A lower value means it shifts
+up in a higher RPM.
+
+##### `DownshiftLoad` : `0.50` to `1.00` (default 0.55)
+
+The engine load at which the car should shift down. The car downshifts when the
+load is higher than this value.
+
+##### `NextGearMinRPM` : `0.20` to `0.50` (default 0.33)
+
+The car does not shift up until the RPM in the next gear is higher than this
+value.
+
+##### `CurrGearMinRPM` : `0.20` to `0.50` (default 0.27)
+
+The car shifts down when the RPM drops below this value.
+
+##### `EcoRate`: `0.01` to `0.50` (default 0.05)
+
+On releasing or easing off the throttle, this value affects when the car
+shifts up. A lower value shifts up after a longer time than a high value.
+
+Lowering this value makes the car stay in a low gear, in a high RPM longer.
+Set this value low to make it race-like, set this value high to make it
+economical.
+
 #### `[HUD]`
 
 Some info you can enable or disable at will. It's pretty self-explanatory.
