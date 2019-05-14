@@ -1405,7 +1405,7 @@ void handleRPM() {
             carControls.ThrottleVal > 0.05f &&
             !gearStates.FakeNeutral && 
             !rollingback &&
-            !gearStates.Shifting) {
+            (!gearStates.Shifting || carControls.ClutchVal > 0.4f)) {
             fakeRev(false, 0);
             ext.SetThrottle(vehicle, carControls.ThrottleVal);
         }
