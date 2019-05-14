@@ -1331,24 +1331,30 @@ void fakeRev(bool customThrottle, float customThrottleVal) {
     float rpmVal = vehData.mRPM +			// Base value
         rpmValTemp +						// Keep it constant
         throttleVal * accelRatio;	// Addition value, depends on delta T
-    //showText(0.4, 0.4, 2.0, "FakeRev");
+    //showText(0.4, 0.4, 1.0, fmt("FakeRev %d %.02f", customThrottle, rpmVal));
     ext.SetCurrentRPM(vehicle, rpmVal);
 }
 
 void handleRPM() {
     float clutch = carControls.ClutchVal;
 
+    // Shifting is only true in Automatic and Sequential mode
     if (gearStates.Shifting) {
-        clutch = gearStates.ClutchVal;
+        if (gearStates.ClutchVal > clutch)
+            clutch = gearStates.ClutchVal;
 
-        if (gearStates.ShiftDirection == ShiftDirection::Up) {
-            if (settings.ShiftMode == ShiftModes::Automatic || settings.ShiftMode == Sequential) {
+        // Only lift and blip when no clutch used
+        if (carControls.ClutchVal == 0.0f) {
+            if (gearStates.ShiftDirection == ShiftDirection::Up) {
                 CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
             }
+            else {
+                float expectedRPM = vehData.mWheelAverageDrivenTyreSpeed / (vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr - 1]);
+                if (vehData.mRPM < expectedRPM * 0.75f)
+                    CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.66f);
+            }
         }
-        else { // blip throttle
-            //CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 1.0f);
-        }
+
     }
 
     // Ignores clutch 
