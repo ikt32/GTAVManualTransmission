@@ -70,6 +70,9 @@ void ScriptSettings::SaveGeneral() const {
 
     settingsGeneral.SetBoolValue("OPTIONS", "CrossScript", CrossScript);
 
+    // [SHIFT_OPTIONS]
+    settingsGeneral.SetDoubleValue("SHIFT_OPTIONS", "ClutchRateMult", ClutchRateMult);
+
     // [AUTO_BOX]
     settingsGeneral.SetDoubleValue("AUTO_BOX", "UpshiftLoad", UpshiftLoad);
     settingsGeneral.SetDoubleValue("AUTO_BOX", "DownshiftLoad ", DownshiftLoad);
@@ -288,6 +291,9 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     ABSFilter = settingsGeneral.GetBoolValue("OPTIONS", "ABSFilter", false);
 
     CrossScript = settingsGeneral.GetBoolValue("OPTIONS", "CrossScript", true);
+
+    // [SHIFT_OPTIONS]
+    ClutchRateMult = settingsGeneral.GetDoubleValue("SHIFT_OPTIONS", "ClutchRateMult", 1.0f);
 
     // [AUTO_BOX]
     UpshiftLoad = settingsGeneral.GetDoubleValue("AUTO_BOX", "UpshiftLoad", 0.05f);

@@ -305,6 +305,9 @@ void update_optionsmenu() {
     menu.MenuOption("Finetuning", "finetuneoptionsmenu",
         { "Fine-tune the parameters above." });
 
+    menu.MenuOption("Shifting options", "shiftingoptionsmenu",
+        { "Change the shifting behavior for sequential and automatic modes." } );
+
     menu.MenuOption("Automatic finetuning", "finetuneautooptionsmenu",
         { "Fine-tune script-provided automatic transmission parameters." });
 }
@@ -329,6 +332,14 @@ void update_finetuneoptionsmenu() {
         { "RPM where engine braking starts being effective." });
     menu.FloatOption("Engine braking power", settings.EngBrakePower, 0.0f, 5.0f, 0.05f,
         { "Decrease this value if your wheels lock up when engine braking." });
+}
+
+void update_shiftingoptionsmenu() {
+    menu.Title("Shifting options");
+    menu.Subtitle("Auto & sequential shift options");
+
+    menu.FloatOption("Clutch rate multiplier", settings.ClutchRateMult, 0.05f, 20.0f, 0.05f,
+        { "Change how fast clutching is. Below 1 is slower, higher than 1 is faster." });
 }
 
 void update_finetuneautooptionsmenu() {
@@ -1069,6 +1080,9 @@ void update_menu() {
 
     /* mainmenu -> optionsmenu -> finetuneoptionsmenu */
     if (menu.CurrentMenu("finetuneoptionsmenu")) { update_finetuneoptionsmenu(); }
+
+    /* mainmenu -> optionsmenu -> shiftingoptionsmenu */
+    if (menu.CurrentMenu("shiftingoptionsmenu")) { update_shiftingoptionsmenu(); }
 
     /* mainmenu -> optionsmenu -> finetuneautooptionsmenu */
     if (menu.CurrentMenu("finetuneautooptionsmenu")) { update_finetuneautooptionsmenu(); }

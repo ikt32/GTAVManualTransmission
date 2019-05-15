@@ -827,7 +827,8 @@ void updateShifting() {
     float rateDown = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleDownShift);
 
     float shiftRate = gearStates.ShiftDirection == ShiftDirection::Up ? rateUp : rateDown;
-    // TODO: To settings.
+    shiftRate *= settings.ClutchRateMult;
+
     /*
      * 4.0 gives similar perf as base - probably the whole shift takes 1/rate seconds
      * with my extra disengage step, the whole thing should take also 1/rate seconds
