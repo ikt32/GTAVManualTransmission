@@ -338,6 +338,10 @@ void update_shiftingoptionsmenu() {
     menu.Title("Shifting options");
     menu.Subtitle("Auto & sequential shift options");
 
+    menu.BoolOption("Cut throttle on upshift", settings.DownshiftBlip,
+        { "Helps rev matching." });
+    menu.BoolOption("Blip throttle on downshift", settings.UpshiftCut,
+        { "Helps rev matching." });
     menu.FloatOption("Clutch rate multiplier", settings.ClutchRateMult, 0.05f, 20.0f, 0.05f,
         { "Change how fast clutching is. Below 1 is slower, higher than 1 is faster." });
 }

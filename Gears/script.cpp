@@ -1346,10 +1346,11 @@ void handleRPM() {
 
         // Only lift and blip when no clutch used
         if (carControls.ClutchVal == 0.0f) {
-            if (gearStates.ShiftDirection == ShiftDirection::Up) {
+            if (gearStates.ShiftDirection == ShiftDirection::Up &&
+                settings.UpshiftCut) {
                 CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
             }
-            else {
+            else if (settings.DownshiftBlip) {
                 float expectedRPM = vehData.mWheelAverageDrivenTyreSpeed / (vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr - 1]);
                 if (vehData.mRPM < expectedRPM * 0.75f)
                     CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.66f);

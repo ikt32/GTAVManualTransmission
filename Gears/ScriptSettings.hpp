@@ -61,6 +61,9 @@ public:
 
     // [SHIFT_OPTIONS]
     float ClutchRateMult = 1.0f;
+    bool UpshiftCut = true;
+    bool DownshiftBlip = true;
+
     // [AUTO_BOX]
     float UpshiftLoad = 0.05f;      // Lower = upshift later
     float DownshiftLoad = 0.55f;    // Higher = downshift later
