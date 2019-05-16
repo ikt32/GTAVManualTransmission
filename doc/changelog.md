@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.6.7
+
+* Add throttle cut and blip on up and downshifts, both toggleable
+* Add an option to change clutch change rate on shifts
+
 ## 4.6.6
 
 * Revise automatic transmission shifting behavior
