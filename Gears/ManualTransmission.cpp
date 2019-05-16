@@ -7,6 +7,7 @@
 #include "Memory/MemoryPatcher.hpp"
 #include "Input/CarControls.hpp"
 #include "VehicleData.hpp"
+#include "Util/MathExt.h"
 
 extern ScriptSettings settings;
 extern CarControls carControls;
@@ -41,14 +42,23 @@ void MT_SetShiftMode(int mode) {
 }
 
 int MT_GetShiftIndicator() {
-    if (gearStates.HitRPMSpeedLimiter || gearStates.HitRPMLimiter) {
+    float nextGearMinSpeed = 0.0f; // don't care about top gear
+    if (gearStates.LockGear < vehData.mGearTop) {
+        nextGearMinSpeed = settings.NextGearMinRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[gearStates.LockGear + 1];
+    }
+    float engineLoad = carControls.ThrottleVal - map(vehData.mRPM, 0.2f, 1.0f, 0.0f, 1.0f);
+    bool shiftUpLoad = gearStates.LockGear < vehData.mGearTop && 
+        engineLoad < settings.UpshiftLoad && 
+        vehData.mWheelAverageDrivenTyreSpeed > nextGearMinSpeed;
+
+    float currGearMinSpeed = settings.CurrGearMinRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[gearStates.LockGear];
+    bool shiftDownLoad = engineLoad > settings.DownshiftLoad || vehData.mWheelAverageDrivenTyreSpeed < currGearMinSpeed;
+
+    if (gearStates.HitRPMSpeedLimiter || gearStates.HitRPMLimiter || shiftUpLoad) {
         return 1;
     }
-    else if (vehData.mGearCurr > 1 && vehData.mRPM < 0.4f) {
+    if (vehData.mGearCurr > 1 && shiftDownLoad) {
         return 2;
-    }
-    else if (vehData.mGearCurr == vehData.mGearNext) {
-        return 0;
     }
     return 0;
 }
