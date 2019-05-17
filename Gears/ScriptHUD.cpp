@@ -13,6 +13,7 @@
 #include "VehicleData.hpp"
 #include "ScriptSettings.hpp"
 #include "Util/StringFormat.h"
+#include "Memory/Offsets.hpp"
 
 extern NativeMenu::Menu menu;
 extern ScriptSettings settings;
@@ -200,50 +201,29 @@ void drawDebugInfo() {
     
 
     if (settings.DisplayGearingInfo) {
-        if (ext.GetGearCurr(vehicle) < ext.GetGearNext(vehicle)) {
-            gearStates.UpshiftSpeedsGame[ext.GetGearCurr(vehicle)] = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y;
-        }
-
         auto ratios = ext.GetGearRatios(vehicle);
         float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
-        float InitialDriveMaxFlatVel = ext.GetInitialDriveMaxFlatVel(vehicle);
 
         int i = 0;
-        showText(0.10f, 0.05f, 0.35f, "Ratios");
+        showText(0.30f, 0.05f, 0.35f, "Ratios");
         for (auto ratio : ratios) {
-            showText(0.10f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(ratio));
+            showText(0.30f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(ratio));
             i++;
         }
 
         i = 0;
-        showText(0.25f, 0.05f, 0.35f, "InitialDriveMaxFlatVel");
-        for (auto ratio : ratios) {
-            float maxSpeed = InitialDriveMaxFlatVel / ratio;
-            showText(0.25f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(maxSpeed));
-            i++;
-        }
-
-        i = 0;
-        showText(0.40f, 0.05f, 0.35f, "DriveMaxFlatVel");
+        showText(0.45f, 0.05f, 0.35f, "DriveMaxFlatVel");
         for (auto ratio : ratios) {
             float maxSpeed = DriveMaxFlatVel / ratio;
-            showText(0.40f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(maxSpeed));
+            showText(0.45f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(maxSpeed));
             i++;
         }
 
-        i = 0;
-        showText(0.55f, 0.05f, 0.35f, "Actual (Game)");
-        for (const auto& speed : gearStates.UpshiftSpeedsGame) {
-            showText(0.55f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
-            i++;
-        }
-
-        i = 0;
-        showText(0.70f, 0.05f, 0.35f, "Actual (Mod)");
-        for (const auto& speed : gearStates.UpshiftSpeedsMod) {
-            showText(0.70f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(speed));
-            i++;
-        }
+        // This is x Clutch per second? e.g. changerate 2.5 -> clutch fully (dis)engages in 1/2.5 seconds? or whole thing?
+        float rateUp = *reinterpret_cast<float*>(ext.GetHandlingPtr(vehicle) + hOffsets.fClutchChangeRateScaleUpShift);
+        float rateDown = *reinterpret_cast<float*>(ext.GetHandlingPtr(vehicle) + hOffsets.fClutchChangeRateScaleDownShift);
+        showText(0.60f, 0.050f, 0.35f, fmt("ClutchRate Up: %.03f", rateUp));
+        showText(0.60f, 0.075f, 0.35f, fmt("ClutchRate Dn: %.03f", rateDown));
     }
 }
 
