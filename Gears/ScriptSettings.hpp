@@ -5,7 +5,6 @@
 #include "simpleini/SimpleIni.h"
 #include "ShiftModes.h"
 #include "Util/Logger.hpp"
-#include "Memory/VehicleExtensions.hpp"
 
 class Logger;
 class CarControls;

@@ -19,6 +19,7 @@
 #include "Util/StringFormat.h"
 #include "UpdateChecker.h"
 #include "Memory/MemoryPatcher.hpp"
+#include "Memory/VehicleExtensions.hpp"
 
 extern bool g_notifyUpdate;
 extern ReleaseInfo g_releaseInfo;
