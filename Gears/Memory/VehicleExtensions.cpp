@@ -263,8 +263,8 @@ float* VehicleExtensions::GetGearRatioPtr(Vehicle handle, uint8_t gear) {
 std::vector<float> VehicleExtensions::GetGearRatios(Vehicle handle) {
     if (gearRatiosOffset == 0) return {};
     auto address = GetAddress(handle);
-    std::vector<float> ratios(g_numGears);
-    for (int gear = 0; gear < g_numGears; ++gear) {
+    std::vector<float> ratios(GetTopGear(handle) + 1);
+    for (int gear = 0; gear < GetTopGear(handle) + 1; ++gear) {
         ratios[gear] = *reinterpret_cast<float *>(address + gearRatiosOffset + gear * sizeof(float));
     }
     return ratios;
