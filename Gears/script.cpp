@@ -1090,7 +1090,6 @@ void functionAShift() {
         if (engineLoad < settings.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
             shiftTo(vehData.mGearCurr + 1, true);
             gearStates.FakeNeutral = false;
-            gearStates.UpshiftSpeedsMod[currGear] = currSpeed;
         }
     }
 

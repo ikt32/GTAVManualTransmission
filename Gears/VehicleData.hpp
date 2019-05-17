@@ -52,8 +52,6 @@ enum class ShiftDirection {
 
 struct VehicleGearboxStates {
     VehicleGearboxStates(uint8_t numGears) {
-        UpshiftSpeedsGame.resize(numGears);
-        UpshiftSpeedsMod.resize(numGears);
     }
 
     // Gearbox stuff
@@ -69,9 +67,6 @@ struct VehicleGearboxStates {
     bool FakeNeutral = false;
     bool HitRPMSpeedLimiter = false; // Limit speed at top RPM
     bool HitRPMLimiter = false; // Limit RPM so it doesn't >1.0f
-
-    std::vector<float> UpshiftSpeedsGame;
-    std::vector<float> UpshiftSpeedsMod;
 
     // Auto gearbox stuff
     float ThrottleHang = 0.0f; // throttle value for low load upshifting
