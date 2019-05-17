@@ -3,6 +3,8 @@
 #include "VehicleData.hpp"
 #include "Memory/VehicleFlags.h"
 #include "script.h"
+#include "Memory/Offsets.hpp"
+#include "Memory/Versions.h"
 
 VehicleData::VehicleData(VehicleExtensions& ext)
     : mVehicle(0), mExt(ext), mHandlingPtr(0)
@@ -37,9 +39,16 @@ void VehicleData::SetVehicle(Vehicle v) {
         mSuspensionTravel = mExt.GetWheelCompressions(mVehicle);
 
         mFlags = mExt.GetVehicleFlags(mVehicle);
-        //TODO: Make proper version map for these
-        mModelFlags = *reinterpret_cast<uint32_t *>(mHandlingPtr + 0x124);
-        mHandlingFlags = *reinterpret_cast<uint32_t *>(mHandlingPtr + 0x128);
+
+        extern eGameVersion g_gameVersion;
+        if (g_gameVersion >= G_VER_1_0_1604_0_STEAM) {
+            mModelFlags = *reinterpret_cast<uint32_t*>(mHandlingPtr + hOffsets1604.dwStrModelFlags);
+            mHandlingFlags = *reinterpret_cast<uint32_t*>(mHandlingPtr + hOffsets1604.dwStrHandlingFlags);
+        }
+        else {
+            mModelFlags = *reinterpret_cast<uint32_t*>(mHandlingPtr + hOffsets.dwStrModelFlags);
+            mHandlingFlags = *reinterpret_cast<uint32_t*>(mHandlingPtr + hOffsets.dwStrHandlingFlags);
+        }
 
         mIsElectric = mFlags[1] & eVehicleFlag2::FLAG_IS_ELECTRIC;
         mIsCVT = mHandlingFlags & 0x00001000;
