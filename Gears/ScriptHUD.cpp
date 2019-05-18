@@ -219,11 +219,16 @@ void drawDebugInfo() {
             i++;
         }
 
-        // This is x Clutch per second? e.g. changerate 2.5 -> clutch fully (dis)engages in 1/2.5 seconds? or whole thing?
         float rateUp = *reinterpret_cast<float*>(ext.GetHandlingPtr(vehicle) + hOffsets.fClutchChangeRateScaleUpShift);
         float rateDown = *reinterpret_cast<float*>(ext.GetHandlingPtr(vehicle) + hOffsets.fClutchChangeRateScaleDownShift);
+        float upshiftDuration = 1.0f / (rateUp * settings.ClutchRateMult);
+        float downshiftDuration = 1.0f / (rateDown * settings.ClutchRateMult);
+
         showText(0.60f, 0.050f, 0.35f, fmt("ClutchRate Up: %.03f", rateUp));
         showText(0.60f, 0.075f, 0.35f, fmt("ClutchRate Dn: %.03f", rateDown));
+        showText(0.60f, 0.100f, 0.35f, fmt("Duration Up: %.03f", upshiftDuration));
+        showText(0.60f, 0.125f, 0.35f, fmt("Duration Dn: %.03f", downshiftDuration));
+        showText(0.60f, 0.150f, 0.35f, fmt("Shift timeout (dn): %.03f", downshiftDuration * settings.DownshiftTimeoutMult));
     }
 }
 

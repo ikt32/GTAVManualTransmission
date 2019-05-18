@@ -1090,12 +1090,27 @@ void functionAShift() {
         if (engineLoad < settings.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
             shiftTo(vehData.mGearCurr + 1, true);
             gearStates.FakeNeutral = false;
+            gearStates.LastUpshiftTime = GAMEPLAY::GET_GAME_TIMER();
         }
     }
 
+    // Shift down later when ratios are far apart
+    float gearRatioRatio = 1.0f;
+
+    if (vehData.mGearTop > 1) {
+        float baseGearRatio = 1.948768f / 3.333333f;
+        float thisGearRatio = vehData.mGearRatios[2] / vehData.mGearRatios[1];
+        gearRatioRatio = baseGearRatio / thisGearRatio;
+        gearRatioRatio = map(gearRatioRatio, 1.0f, 2.0f, 1.0f, 4.0f);
+    }
+
+    float rateUp = *reinterpret_cast<float*>(vehData.mHandlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
+    float upshiftDuration = 1.0f / (rateUp * settings.ClutchRateMult);
+    bool tpPassed = GAMEPLAY::GET_GAME_TIMER() > gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration);
+
     // Shift down
     if (currGear > 1) {
-        if (engineLoad > settings.DownshiftLoad || currSpeed < currGearMinSpeed) {
+        if (tpPassed && engineLoad > settings.DownshiftLoad * gearRatioRatio || currSpeed < currGearMinSpeed) {
             shiftTo(currGear - 1, true);
             gearStates.FakeNeutral = false;
         }

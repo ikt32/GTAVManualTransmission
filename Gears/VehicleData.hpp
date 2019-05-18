@@ -70,6 +70,7 @@ struct VehicleGearboxStates {
 
     // Auto gearbox stuff
     float ThrottleHang = 0.0f; // throttle value for low load upshifting
+    int LastUpshiftTime = 0;
 };
 
 struct WheelPatchStates {

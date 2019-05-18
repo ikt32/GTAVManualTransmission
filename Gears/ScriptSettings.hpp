@@ -65,10 +65,11 @@ public:
 
     // [AUTO_BOX]
     float UpshiftLoad = 0.05f;      // Lower = upshift later
-    float DownshiftLoad = 0.55f;    // Higher = downshift later
+    float DownshiftLoad = 0.60f;    // Higher = downshift later
     float NextGearMinRPM = 0.33f;   // Don't upshift until next gears' RPM is over this value.
     float CurrGearMinRPM = 0.27f;   // Downshift when RPM drops below this value.
     float EcoRate = 0.05f;          // Lower = keep in low gear longer // eco - 0.33
+    float DownshiftTimeoutMult = 1.0f; // Timeout mult for not downshifting after an upshift
 
     // [HUD]
     bool HUD = true;

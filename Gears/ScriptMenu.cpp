@@ -352,9 +352,15 @@ void update_finetuneautooptionsmenu() {
     menu.Subtitle("Script-driven automatic transmission");
 
     menu.FloatOption("Upshift engine load", settings.UpshiftLoad, 0.01f, 0.20f, 0.01f,
-        { "Upshift when the engine load drops below this value." });
+        { "Upshift when the engine load drops below this value. "
+          "Raise this value if the car can't upshift."});
     menu.FloatOption("Downshift engine load", settings.DownshiftLoad, 0.50f, 1.00f, 0.01f,
-        { "Downshift when the engine load rises over this value." });
+        { "Downshift when the engine load rises over this value. "
+          "Raise this value if the car downshifts right after upshifting." });
+    menu.FloatOption("Downshift timeout multiplier", settings.DownshiftTimeoutMult, 0.05f, 4.00f, 0.05f,
+        { "Don't downshift while car has just shifted up. "
+          "Timeout based on clutch change rate.",
+          "Raise for longer timeout, lower to allow earlier downshifting after an upshift." });
     menu.FloatOption("Next gear min RPM",    settings.NextGearMinRPM, 0.20f, 0.50f, 0.01f, 
         { "Don't upshift until next gears' RPM is over this value." });
     menu.FloatOption("Current gear min RPM", settings.CurrGearMinRPM, 0.20f, 0.50f, 0.01f, 
