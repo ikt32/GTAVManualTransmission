@@ -4,6 +4,10 @@
 
 * Add throttle cut and blip on up and downshifts, both toggleable
 * Add an option to change clutch change rate on shifts
+* Fix some vehicles unable to upshift to 2 properly with the automatic mode
+* Fix vehicle flags offsets for older game versions
+* Improve shift indicators in API
+* Improve debug info
 
 ## 4.6.6
 
