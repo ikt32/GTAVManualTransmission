@@ -51,22 +51,18 @@ enum class ShiftDirection {
 };
 
 struct VehicleGearboxStates {
-    VehicleGearboxStates(uint8_t numGears) {
-    }
-
     // Gearbox stuff
     float StallProgress = 0.0f;
     uint8_t LockGear = 1;
+    bool FakeNeutral = false;
+    bool HitRPMSpeedLimiter = false; // Limit speed at top RPM
+    bool HitRPMLimiter = false; // Limit RPM so it doesn't >1.0f
 
     // Delayed shifting
     bool Shifting = false; 
     uint8_t NextGear = 1;
     float ClutchVal = 0.0f; // Clutch value _while_ Shifting
     ShiftDirection ShiftDirection = ShiftDirection::Up;
-
-    bool FakeNeutral = false;
-    bool HitRPMSpeedLimiter = false; // Limit speed at top RPM
-    bool HitRPMLimiter = false; // Limit RPM so it doesn't >1.0f
 
     // Auto gearbox stuff
     float ThrottleHang = 0.0f; // throttle value for low load upshifting

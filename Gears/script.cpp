@@ -65,7 +65,7 @@ Vehicle vehicle;
 Vehicle lastVehicle;
 
 VehiclePeripherals peripherals;
-VehicleGearboxStates gearStates(g_numGears);
+VehicleGearboxStates gearStates;
 WheelPatchStates wheelPatchStates;
 
 VehicleExtensions ext;
@@ -201,7 +201,7 @@ void update_vehicle() {
     // Reset vehicle stats on vehicle change (or leave)
     if (vehicle != lastVehicle) {
         peripherals = VehiclePeripherals();
-        gearStates = VehicleGearboxStates(g_numGears);
+        gearStates = VehicleGearboxStates();
         wheelPatchStates = WheelPatchStates();
         vehData.SetVehicle(vehicle); // assign new vehicle;
         gearRattle.Stop();
