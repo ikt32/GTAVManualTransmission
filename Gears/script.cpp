@@ -52,9 +52,6 @@ const char* decorLookingBack = "mt_looking_back";
 
 int textureWheelId;
 
-// TODO: I think this broke some time ago?
-GameSound gearRattle("DAMAGED_TRUCK_IDLE", nullptr);
-
 NativeMenu::Menu menu;
 CarControls carControls;
 ScriptSettings settings;
@@ -204,7 +201,6 @@ void update_vehicle() {
         gearStates = VehicleGearboxStates();
         wheelPatchStates = WheelPatchStates();
         vehData.SetVehicle(vehicle); // assign new vehicle;
-        gearRattle.Stop();
     }
     if (isVehicleAvailable(vehicle, playerPed)) {
         vehData.Update(); // Update before doing anything else
@@ -399,13 +395,6 @@ void update_manual_features() {
     }
 
     handleBrakePatch();
-
-    if (gearRattle.Active) {
-        if (carControls.ClutchVal > 1.0f - settings.ClutchThreshold ||
-            !VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
-            gearRattle.Stop();
-        }
-    }
 }
 
 // Manual Transmission part of the mod
@@ -552,7 +541,6 @@ void toggleManual(bool enable) {
         message += "Disabled";
     }
     showNotification(message, &prevNotification);
-    gearRattle.Stop();
     readSettings();
     initWheel();
     clearPatches();
@@ -671,7 +659,6 @@ void updateLastInputDevice() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void setShiftMode(int shiftMode) {
-    gearRattle.Stop();
     if (shiftMode > 2 || shiftMode < 0)
         return;
 
@@ -726,10 +713,8 @@ void functionHShiftTo(int i) {
         if (carControls.ClutchVal > 1.0f - settings.ClutchThreshold) {
             shiftTo(i, false);
             gearStates.FakeNeutral = false;
-            gearRattle.Stop();
         }
         else {
-            gearRattle.Play(vehicle);
             gearStates.FakeNeutral = true;
             if (settings.EngDamage && vehData.mHasClutch) {
                 VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
@@ -741,7 +726,6 @@ void functionHShiftTo(int i) {
     else {
         shiftTo(i, false);
         gearStates.FakeNeutral = false;
-        gearRattle.Stop();
     }
 }
 
@@ -785,7 +769,6 @@ void functionHShiftWheel() {
         if (settings.ClutchShiftingH &&
             settings.EngDamage && vehData.mHasClutch) {
             if (carControls.ClutchVal < 1.0 - settings.ClutchThreshold) {
-                gearRattle.Play(vehicle);
             }
         }
         gearStates.FakeNeutral = vehData.mHasClutch;
@@ -1186,7 +1169,6 @@ void functionEngStall() {
         if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
             VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
         }
-        gearRattle.Stop();
         gearStates.StallProgress = 0.0f;
     }
 
@@ -1225,7 +1207,6 @@ void functionEngLock() {
         vehData.mGearCurr == vehData.mGearTop ||
         gearStates.FakeNeutral) {
         wheelPatchStates.EngLockActive = false;
-        gearRattle.Stop();
         return;
     }
     const float reverseThreshold = 2.0f;
@@ -1269,7 +1250,6 @@ void functionEngLock() {
             }
         }
         fakeRev(true, 1.0f);
-        gearRattle.Play(vehicle);
         float oldEngineHealth = VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle);
         float damageToApply = settings.MisshiftDamage * inputMultiplier;
         if (settings.EngDamage) {
@@ -1289,7 +1269,6 @@ void functionEngLock() {
     }
     else {
         wheelPatchStates.EngLockActive = false;
-        gearRattle.Stop();
     }
 }
 
