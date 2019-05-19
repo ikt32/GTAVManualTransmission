@@ -354,7 +354,7 @@ void update_finetuneautooptionsmenu() {
     menu.FloatOption("Upshift engine load", settings.UpshiftLoad, 0.01f, 0.20f, 0.01f,
         { "Upshift when the engine load drops below this value. "
           "Raise this value if the car can't upshift."});
-    menu.FloatOption("Downshift engine load", settings.DownshiftLoad, 0.50f, 1.00f, 0.01f,
+    menu.FloatOption("Downshift engine load", settings.DownshiftLoad, 0.30f, 1.00f, 0.01f,
         { "Downshift when the engine load rises over this value. "
           "Raise this value if the car downshifts right after upshifting." });
     menu.FloatOption("Downshift timeout multiplier", settings.DownshiftTimeoutMult, 0.05f, 4.00f, 0.05f,
