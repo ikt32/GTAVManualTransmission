@@ -294,8 +294,8 @@ void update_optionsmenu() {
     menu.BoolOption("Gear/RPM Lockup", settings.EngLock,
         { "Simulate wheel lock-up when mis-shifting to a too low gear for the RPM range." });
 
-    menu.BoolOption("Clutch Bite", settings.ClutchCatching,
-        { "Simulate clutch biting action and clutch interaction at near-stop speeds." });
+    menu.BoolOption("Clutch Creep", settings.ClutchCatching,
+        { "Simulate clutch creep when stopped with clutch engaged." });
 
     menu.BoolOption("Hard rev limiter", settings.HardLimiter,
         { "Enforce rev limiter for reverse and top speed. No more infinite speed!" });
