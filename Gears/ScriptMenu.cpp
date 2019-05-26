@@ -1019,6 +1019,19 @@ void update_wheelinfomenu() {
     menu.FloatOption("Pedals Width", settings.PedalInfoW, 0.0f, 1.0f, 0.01f);
     menu.FloatOption("Pedals Pad X", settings.PedalInfoPadX, 0.0f, 1.0f, 0.01f);
     menu.FloatOption("Pedals Pad Y", settings.PedalInfoPadY, 0.0f, 1.0f, 0.01f);
+    menu.IntOption("Pedals Background Alpha", settings.PedalBackgroundA, 0, 255);
+    menu.IntOption("Throttle Bar Red    ", settings.PedalInfoThrottleR, 0, 255);
+    menu.IntOption("Throttle Bar Green  ", settings.PedalInfoThrottleG, 0, 255);
+    menu.IntOption("Throttle Bar Blue   ", settings.PedalInfoThrottleB, 0, 255);
+    menu.IntOption("Throttle Bar Alpha  ", settings.PedalInfoThrottleA, 0, 255);
+    menu.IntOption("Brake Bar Red    ", settings.PedalInfoBrakeR, 0, 255);
+    menu.IntOption("Brake Bar Green  ", settings.PedalInfoBrakeG, 0, 255);
+    menu.IntOption("Brake Bar Blue   ", settings.PedalInfoBrakeB, 0, 255);
+    menu.IntOption("Brake Bar Alpha  ", settings.PedalInfoBrakeA   , 0, 255);
+    menu.IntOption("Clutch Bar Red    ", settings.PedalInfoClutchR, 0, 255);
+    menu.IntOption("Clutch Bar Green  ", settings.PedalInfoClutchG, 0, 255);
+    menu.IntOption("Clutch Bar Blue   ", settings.PedalInfoClutchB, 0, 255);
+    menu.IntOption("Clutch Bar Alpha  ", settings.PedalInfoClutchA  , 0, 255);
 }
 
 void update_miscassistmenu() {

@@ -248,10 +248,17 @@ void drawInputWheelInfo() {
 
     float barYBase = (settings.PedalInfoY + settings.PedalInfoH * 0.5f);
 
-    GRAPHICS::DRAW_RECT(settings.PedalInfoX, settings.PedalInfoY, 3.0f * barWidth + settings.PedalInfoPadX, settings.PedalInfoH + settings.PedalInfoPadY, 0, 0, 0, 92);
-    GRAPHICS::DRAW_RECT(settings.PedalInfoX - 1.0f*barWidth, barYBase - carControls.ThrottleVal*settings.PedalInfoH*0.5f, barWidth, carControls.ThrottleVal*settings.PedalInfoH, 0, 255, 0, 255);
-    GRAPHICS::DRAW_RECT(settings.PedalInfoX + 0.0f*barWidth, barYBase - carControls.BrakeVal*settings.PedalInfoH*0.5f, barWidth, carControls.BrakeVal*settings.PedalInfoH, 255, 0, 0, 255);
-    GRAPHICS::DRAW_RECT(settings.PedalInfoX + 1.0f*barWidth, barYBase - carControls.ClutchVal*settings.PedalInfoH*0.5f, barWidth, carControls.ClutchVal*settings.PedalInfoH, 0, 0, 255, 255);
+    GRAPHICS::DRAW_RECT(settings.PedalInfoX, settings.PedalInfoY, 3.0f * barWidth + settings.PedalInfoPadX, settings.PedalInfoH + settings.PedalInfoPadY, 
+        0, 0, 0, settings.PedalBackgroundA);
+    GRAPHICS::DRAW_RECT(settings.PedalInfoX + 1.0f * barWidth, barYBase - carControls.ThrottleVal * settings.PedalInfoH * 0.5f,
+        barWidth, carControls.ThrottleVal * settings.PedalInfoH, 
+        settings.PedalInfoThrottleR, settings.PedalInfoThrottleG, settings.PedalInfoThrottleB, settings.PedalInfoThrottleA);
+    GRAPHICS::DRAW_RECT(settings.PedalInfoX + 0.0f * barWidth, barYBase - carControls.BrakeVal * settings.PedalInfoH * 0.5f,
+        barWidth, carControls.BrakeVal * settings.PedalInfoH,
+        settings.PedalInfoBrakeR, settings.PedalInfoBrakeG, settings.PedalInfoBrakeB, settings.PedalInfoBrakeA);
+    GRAPHICS::DRAW_RECT(settings.PedalInfoX - 1.0f * barWidth, barYBase - carControls.ClutchVal * settings.PedalInfoH * 0.5f,
+        barWidth, carControls.ClutchVal * settings.PedalInfoH,
+        settings.PedalInfoClutchR, settings.PedalInfoClutchG, settings.PedalInfoClutchB, settings.PedalInfoClutchA);
 }
 
 void drawVehicleWheelInfo() {

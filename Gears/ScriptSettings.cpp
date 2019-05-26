@@ -146,6 +146,23 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetDoubleValue("HUD", "PedalInfoPadX"  , PedalInfoPadX);
     settingsGeneral.SetDoubleValue("HUD", "PedalInfoPadY"  , PedalInfoPadY);
 
+    settingsGeneral.SetLongValue("HUD", "PedalBackgroundA", PedalBackgroundA);
+
+    settingsGeneral.SetLongValue("HUD", "PedalInfoThrottleR", PedalInfoThrottleR);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoThrottleG", PedalInfoThrottleG);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoThrottleB", PedalInfoThrottleB);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoThrottleA", PedalInfoThrottleA);
+
+    settingsGeneral.SetLongValue("HUD", "PedalInfoBrakeR", PedalInfoBrakeR);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoBrakeG", PedalInfoBrakeG);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoBrakeB", PedalInfoBrakeB);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoBrakeA", PedalInfoBrakeA);
+
+    settingsGeneral.SetLongValue("HUD", "PedalInfoClutchR", PedalInfoClutchR);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoClutchG", PedalInfoClutchG);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoClutchB", PedalInfoClutchB);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoClutchA", PedalInfoClutchA);
+
     // [UPDATE]
     settingsGeneral.SetBoolValue("UPDATE", "EnableUpdate", EnableUpdate);
     if (!IgnoredVersion.empty())
@@ -371,6 +388,23 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     PedalInfoW			  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoW", 0.040000);
     PedalInfoPadX		  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoPadX", 0.000000);
     PedalInfoPadY		  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoPadY", 0.000000);
+    
+    PedalBackgroundA = settingsGeneral.GetLongValue("HUD", "PedalBackgroundA", 92);
+
+    PedalInfoThrottleR = settingsGeneral.GetLongValue("HUD", "PedalInfoThrottleR", 0);
+    PedalInfoThrottleG = settingsGeneral.GetLongValue("HUD", "PedalInfoThrottleG", 255);
+    PedalInfoThrottleB = settingsGeneral.GetLongValue("HUD", "PedalInfoThrottleB", 0);
+    PedalInfoThrottleA = settingsGeneral.GetLongValue("HUD", "PedalInfoThrottleA", 255);
+
+    PedalInfoBrakeR = settingsGeneral.GetLongValue("HUD", "PedalInfoBrakeR", 255);
+    PedalInfoBrakeG = settingsGeneral.GetLongValue("HUD", "PedalInfoBrakeG", 0);
+    PedalInfoBrakeB = settingsGeneral.GetLongValue("HUD", "PedalInfoBrakeB", 0);
+    PedalInfoBrakeA = settingsGeneral.GetLongValue("HUD", "PedalInfoBrakeA", 255);
+
+    PedalInfoClutchR = settingsGeneral.GetLongValue("HUD", "PedalInfoClutchR", 0);
+    PedalInfoClutchG = settingsGeneral.GetLongValue("HUD", "PedalInfoClutchG", 0);
+    PedalInfoClutchB = settingsGeneral.GetLongValue("HUD", "PedalInfoClutchB", 255);
+    PedalInfoClutchA = settingsGeneral.GetLongValue("HUD", "PedalInfoClutchA", 255);
 
     // [CONTROLLER]
     scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Toggle)] = settingsGeneral.GetValue("CONTROLLER", "Toggle", "UNKNOWN");

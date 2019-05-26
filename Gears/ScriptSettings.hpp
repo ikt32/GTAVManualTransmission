@@ -131,6 +131,19 @@ public:
     float PedalInfoW			 = 0.0f;
     float PedalInfoPadX			 = 0.0f;
     float PedalInfoPadY			 = 0.0f;
+    int PedalBackgroundA = 92;
+    int PedalInfoThrottleR = 0;
+    int PedalInfoThrottleG = 255;
+    int PedalInfoThrottleB = 0;
+    int PedalInfoThrottleA = 255;
+    int PedalInfoBrakeR = 255;
+    int PedalInfoBrakeG = 0;
+    int PedalInfoBrakeB = 0;
+    int PedalInfoBrakeA = 255;
+    int PedalInfoClutchR = 0;
+    int PedalInfoClutchG = 0;
+    int PedalInfoClutchB = 255;
+    int PedalInfoClutchA = 255;
 
     // [CONTROLLER]
     bool ToggleEngine = false;
