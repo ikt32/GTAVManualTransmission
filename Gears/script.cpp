@@ -1713,7 +1713,7 @@ void functionAutoReverse() {
         !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) &&
         ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > -1.0f &&
         vehData.mGearCurr == 0) {
-        gearStates.LockGear = 1;
+        shiftTo(1, false);
     }
 
     // Reverse
@@ -1722,7 +1722,7 @@ void functionAutoReverse() {
         ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < 1.0f &&
         vehData.mGearCurr > 0) {
         gearStates.FakeNeutral = false;
-        gearStates.LockGear = 0;
+        shiftTo(0, false);
     }
 }
 
@@ -2336,7 +2336,7 @@ void functionAutoLookback() {
 
 void functionAutoGear1() {
     if (vehData.mThrottle < 0.1f && ENTITY::GET_ENTITY_SPEED(vehicle) < 0.1f && vehData.mGearCurr > 1) {
-        gearStates.LockGear = 1;
+        shiftTo(1, false);
     }
 }
 
