@@ -818,6 +818,14 @@ void updateShifting() {
      */
     shiftRate = shiftRate * GAMEPLAY::GET_FRAME_TIME() * 4.0f;
 
+    // Something went wrong, abort and just shift to NextGear.
+    if (gearStates.ClutchVal > 1.5f) {
+        gearStates.ClutchVal = 0.0f;
+        gearStates.Shifting = false;
+        gearStates.LockGear = gearStates.NextGear;
+        return;
+    }
+
     if (gearStates.NextGear != gearStates.LockGear) {
         gearStates.ClutchVal += shiftRate;
     }
