@@ -194,6 +194,7 @@ public:
     float SteerAngleBoat = 360.0f;
     float GameSteerMultWheel = 1.0f;
     float GameSteerMultOther = 1.0f;
+    float SteerGamma = 1.0f;
 
     // [THROTTLE]
     float ThrottleGamma = 1.0f;

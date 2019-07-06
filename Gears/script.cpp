@@ -1988,14 +1988,18 @@ void doWheelSteering() {
         steerMult = settings.SteerAngleMax / settings.SteerAngleBoat;
     }
 
-    float effSteer = steerMult * 2.0f * (carControls.SteerVal - 0.5f);
+    float steerValL = map(carControls.SteerVal, 0.0f, 0.5f, 1.0f, 0.0f);
+    float steerValR = map(carControls.SteerVal, 0.5f, 1.0f, 0.0f, 1.0f);
+    float steerValGammaL = pow(steerValL, settings.SteerGamma);
+    float steerValGammaR = pow(steerValR, settings.SteerGamma);
+    float steerValGamma = carControls.SteerVal < 0.5f ? -steerValGammaL : steerValGammaR;
+    float effSteer = steerMult * steerValGamma;
 
     /*
      * Patched steering is direct without any processing, and super direct.
-     * _SET_CONTROL_NORMAL is with game processing and could have a bit of delay
+     * _SET_CONTROL_NORMAL is with game processing and could have a bit of assist
      * Both should work without any deadzone, with a note that the second one
      * does need a specified anti-deadzone (recommended: 24-25%)
-     * 
      */
     if (vehData.mClass == VehicleClass::Car && settings.PatchSteeringControl) {
         ext.SetSteeringInputAngle(vehicle, -effSteer);

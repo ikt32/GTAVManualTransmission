@@ -20,6 +20,7 @@
 #include "UpdateChecker.h"
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/VehicleExtensions.hpp"
+#include "Util/MathExt.h"
 
 extern bool g_notifyUpdate;
 extern ReleaseInfo g_releaseInfo;
@@ -400,7 +401,7 @@ void update_controlsmenu() {
         settings.SaveWheel(&carControls);
     }
 
-    if (menu.FloatOption("Steering multiplier (kb/controller)", settings.GameSteerMultOther, 0.1f, 2.0f, 0.01f,
+    if (menu.FloatOption("Steering multiplier (kb/controller)", settings.GameSteerMultOther, 0.01f, 2.0f, 0.01f,
         { "Increase/decrease steering lock.","From InfamousSabre's Custom Steering." })) {
         settings.SaveWheel(&carControls);
     }
@@ -796,8 +797,24 @@ void update_axesmenu() {
         { "Linearity of the throttle pedal." });
 
     if (showThrottleGammaBox) {
-        extras = showGammaCurve("Brake", carControls.ThrottleVal, settings.ThrottleGamma);
-        menu.OptionPlusPlus(extras, "Brake gamma");
+        extras = showGammaCurve("Throttle", carControls.ThrottleVal, settings.ThrottleGamma);
+        menu.OptionPlusPlus(extras, "Throttle gamma");
+    }
+
+    bool showSteeringGammaBox = false;
+    extras = {};
+    menu.OptionPlus("Steering gamma", extras, &showSteeringGammaBox,
+        [=] { return incGamma(settings.SteerGamma, 5.0f, 0.01f); },
+        [=] { return decGamma(settings.SteerGamma, 0.1f, 0.01f); },
+        "Steering gamma",
+        { "Linearity of the steering wheel." });
+
+    if (showSteeringGammaBox) {
+        float steerValL = map(carControls.SteerVal, 0.0f, 0.5f, 1.0f, 0.0f);
+        float steerValR = map(carControls.SteerVal, 0.5f, 1.0f, 0.0f, 1.0f);
+        float steerVal = carControls.SteerVal < 0.5f ? steerValL : steerValR;
+        extras = showGammaCurve("Steering", steerVal, settings.SteerGamma);
+        menu.OptionPlusPlus(extras, "Steering gamma");
     }
 
     //menu.BoolOption("Invert steer", carControls.InvertSteer);
