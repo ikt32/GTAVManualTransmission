@@ -84,7 +84,7 @@ public:
     void SetBrakeP(Vehicle handle, float value);
     
     bool GetHandbrake(Vehicle handle);
-    // SetHandbrake not implemented
+    void SetHandbrake(Vehicle handle, bool value);
 
     float GetDirtLevel(Vehicle handle);
     // No set impl.
@@ -107,6 +107,7 @@ public:
     float GetDriveBiasRear(Vehicle handle);
     float GetPetrolTankVolume(Vehicle handle);
     float GetOilVolume(Vehicle handle);
+    float GetMaxSteeringAngle(Vehicle handle);
     Hash GetAIHandling(Vehicle handle);
 
     /*

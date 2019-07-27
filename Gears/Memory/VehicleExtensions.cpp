@@ -419,6 +419,12 @@ bool VehicleExtensions::GetHandbrake(Vehicle handle) {
     return *reinterpret_cast<bool *>(address + handbrakeOffset);
 }
 
+void VehicleExtensions::SetHandbrake(Vehicle handle, bool value) {
+    if (handbrakeOffset == 0) return;
+    auto address = GetAddress(handle);
+    *reinterpret_cast<bool*>(address + handbrakeOffset) = value;
+}
+
 float VehicleExtensions::GetDirtLevel(Vehicle handle) {
     if (dirtLevelOffset == 0) return 0;
     auto address = GetAddress(handle);
@@ -477,6 +483,12 @@ float VehicleExtensions::GetOilVolume(Vehicle handle) {
     auto address = GetHandlingPtr(handle);
     if (address == 0) return 0.0f;
     return *reinterpret_cast<float *>(address + hOffsets.fOilVolume);
+}
+
+float VehicleExtensions::GetMaxSteeringAngle(Vehicle handle) {
+    auto address = GetHandlingPtr(handle);
+    if (address == 0) return 0.0f;
+    return *reinterpret_cast<float*>(address + hOffsets.fSteeringLock);
 }
 
 Hash VehicleExtensions::GetAIHandling(Vehicle handle) {
