@@ -2,10 +2,13 @@
 
 ## 4.6.7
 
+* Update for 1.0.1737.0 (Thank you Sparten for the help!)
 * Add throttle cut and blip on up and downshifts, both toggleable
 * Add an option to change clutch change rate on shifts
+* Add an option to change steering wheel gamma
 * Fix some vehicles unable to upshift to 2 properly with the automatic mode
 * Fix vehicle flags offsets for older game versions
+* Change the order of drawn throttle, brake and clutch axes to match pedal layout
 * Improve shift indicators in API
 * Improve debug info
 
