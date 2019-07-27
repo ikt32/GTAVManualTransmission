@@ -175,7 +175,7 @@ void drawHUD() {
 
 void drawDebugInfo() {
     if (!menu.IsThisOpen()) {
-        showText(0.01, 0.250, 0.3, fmt("Address:\t\t\t0x%X", reinterpret_cast<uint64_t>(ext.GetAddress(vehicle))));
+        showText(0.01, 0.250, 0.3, fmt("Address: 0x%llX", ext.GetAddress(vehicle)));
         showText(0.01, 0.275, 0.3, fmt("Mod Enabled:\t\t%d" , settings.EnableManual));
         showText(0.01, 0.300, 0.3, fmt("RPM:\t\t\t%.3f", vehData.mRPM));
         showText(0.01, 0.325, 0.3, fmt("Current Gear:\t\t%d", ext.GetGearCurr(vehicle)));
