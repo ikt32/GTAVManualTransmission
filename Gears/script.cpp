@@ -276,8 +276,10 @@ void wheelControlRoad() {
 
 // Apply input as controls for selected devices
 void update_input_controls() {
-    if (!isPlayerAvailable(player, playerPed))
+    if (!isPlayerAvailable(player, playerPed)) {
+        stopForceFeedback();
         return;
+    }
 
     blockButtons();
     startStopEngine();
