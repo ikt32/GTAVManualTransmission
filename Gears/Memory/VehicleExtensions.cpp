@@ -176,7 +176,7 @@ void VehicleExtensions::initOffsets() {
     wheelAngularVelocityOffset = addr == 0 ? 0 : (*(int*)(addr + 8)) + 0xc;
     logger.Write(wheelAngularVelocityOffset == 0 ? WARN : DEBUG, "Wheel Angular Velocity Offset: 0x%X", wheelAngularVelocityOffset);
 
-    if (g_gameVersion >= G_VER_1_0_1734_0_STEAM) {
+    if (g_gameVersion >= G_VER_1_0_1737_0_STEAM) {
         addr = mem::FindPattern("\x0F\x2F\x81\xBC\x01\x00\x00" "\x0F\x97\xC0" "\xEB\x00" "\xD1\x00", "xx???xx" "xxx" "x?" "x?");
     }
     else {
