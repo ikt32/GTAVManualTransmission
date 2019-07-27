@@ -8,6 +8,8 @@
 * Add an option to change steering wheel gamma
 * Fix some vehicles unable to upshift to 2 properly with the automatic mode
 * Fix vehicle flags offsets for older game versions
+* Fix an issue where visibility was constantly set, causing an equipped parachute to always appear as deployed
+* Fix an issue where H-pattern shifter setup didn't display text for 8th gear and up
 * Change the order of drawn throttle, brake and clutch axes to match pedal layout
 * Improve shift indicators in API
 * Improve debug info

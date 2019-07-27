@@ -1598,9 +1598,7 @@ bool configHPattern() {
         case 1: gearDisplay = "1st gear"; break;
         case 2: gearDisplay = "2nd gear"; break;
         case 3: gearDisplay = "3rd gear"; break;
-        case 4: case 5: case 6:
-        case 7: gearDisplay = std::to_string(progress) + "th gear"; break;
-        default: gearDisplay = "?"; break;
+        default: gearDisplay = std::to_string(progress) + "th gear"; break;
         }
         showSubtitle("Shift into " + gearDisplay + ". " + additionalInfo);
         WAIT(0);
