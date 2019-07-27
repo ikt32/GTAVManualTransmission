@@ -1742,7 +1742,7 @@ void functionAutoReverse() {
 // Blocks some vehicle controls on tapping, tries to activate them when holding.
 // TODO: Some original "tap" controls don't work.
 void blockButtons() {
-    if (!settings.EnableManual || !settings.BlockCarControls ||
+    if (!settings.EnableManual || !settings.BlockCarControls || vehData.mDomain != VehicleDomain::Road ||
         carControls.PrevInput != CarControls::Controller || !isVehicleAvailable(vehicle, playerPed)) {
         return;
     }
@@ -2372,10 +2372,17 @@ void functionHillGravity() {
 }
 
 void functionHidePlayerInFPV() {
+    bool visible = ENTITY::IS_ENTITY_VISIBLE(playerPed);
+    bool shouldHide = false;
+
     if (settings.HidePlayerInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4 && isVehicleAvailable(vehicle, playerPed)) {
+        shouldHide = true;
+    }
+
+    if (visible && shouldHide) {
         ENTITY::SET_ENTITY_VISIBLE(playerPed, false, false);
     }
-    else {
+    if (!visible && !shouldHide) {
         ENTITY::SET_ENTITY_VISIBLE(playerPed, true, false);
     }
 }
