@@ -121,6 +121,7 @@
     <ClCompile Include="..\..\GTAVMenuBase\menusettings.cpp" />
     <ClCompile Include="..\..\GTAVMenuBase\menuutils.cpp" />
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp" />
+    <ClCompile Include="Compatibility.cpp" />
     <ClCompile Include="Input\DIDeviceFactory.cpp" />
     <ClCompile Include="ManualTransmission.cpp" />
     <ClCompile Include="ScriptHUD.cpp" />
@@ -179,6 +180,7 @@
     <ClInclude Include="Memory\Versions.h" />
     <ClInclude Include="newNatives.h" />
     <ClInclude Include="ShiftModes.h" />
+    <ClInclude Include="Compatibility.h" />
     <ClInclude Include="UpdateChecker.h" />
     <ClInclude Include="Util\Color.h" />
     <ClInclude Include="Util\Files.h" />

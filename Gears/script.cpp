@@ -33,6 +33,7 @@
 #include "Util/TimeHelper.hpp"
 #include "UpdateChecker.h"
 #include "Constants.h"
+#include "Compatibility.h"
 
 ReleaseInfo g_releaseInfo;
 bool g_notifyUpdate;
@@ -783,7 +784,10 @@ void functionHShiftWheel() {
 }
 
 bool isUIActive() {
-    return PED::IS_PED_RUNNING_MOBILE_PHONE_TASK(playerPed) || menu.IsThisOpen();
+    return PED::IS_PED_RUNNING_MOBILE_PHONE_TASK(playerPed) ||
+        menu.IsThisOpen() ||
+        TrainerV::Active && *TrainerV::Active;
+        //CONTROLS::IS_CONTROL_ENABLED(0, eControl::ControlCharacterWheel);
 }
 
 /*
@@ -2491,6 +2495,7 @@ void main() {
     if (!setupGlobals()) {
         logger.Write(ERROR, "Global setup failed!");
     }
+    setupCompatibility();
 
     initWheel();
 

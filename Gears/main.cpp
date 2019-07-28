@@ -12,6 +12,7 @@
 #include "Util/Logger.hpp"
 #include "Util/Paths.h"
 #include "Util/StringFormat.h"
+#include "Compatibility.h"
 
 #pragma comment(lib,"Version.lib")
 
@@ -170,6 +171,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             resetSteeringMultiplier();
             stopForceFeedback();
             scriptUnregister(hInstance);
+            releaseCompatibility();
 
             if (actual == expected) {
                 logger.Write(INFO, "PATCH: Script shut down cleanly");
