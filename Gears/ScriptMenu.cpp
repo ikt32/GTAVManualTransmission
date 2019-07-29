@@ -18,7 +18,6 @@
 #include "Util/UIUtils.h"
 #include "Util/Util.hpp"
 #include "Constants.h"
-#include "Util/StringFormat.h"
 #include "UpdateChecker.h"
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/VehicleExtensions.hpp"
@@ -508,11 +507,11 @@ void update_controllermenu() {
     auto it = 0;
     for (const auto& confTag : controllerConfTags) {
         controllerInfo.back() = confTag.Info;
-        controllerInfo.push_back("Assigned to " + carControls.ConfTagController2Value(confTag.Tag));
-        if (menu.OptionPlus("Assign " + confTag.Tag, controllerInfo, nullptr, std::bind(clearControllerButton, confTag.Tag), nullptr, "Current setting")) {
+        controllerInfo.push_back(fmt::format("Assigned to {}", carControls.ConfTagController2Value(confTag.Tag)));
+        if (menu.OptionPlus(fmt::format("Assign {}", confTag.Tag), controllerInfo, nullptr, std::bind(clearControllerButton, confTag.Tag), nullptr, "Current setting")) {
             WAIT(500);
             bool result = configControllerButton(confTag.Tag);
-            if (!result) showNotification("Cancelled " + confTag.Tag + " assignment", &prevNotification);
+            if (!result) showNotification(fmt::format("Cancelled {} assignment", confTag.Tag), &prevNotification);
             WAIT(500);
         }
         it++;
@@ -533,11 +532,11 @@ void update_keyboardmenu() {
     int it = 0;
     for (const auto& confTag : keyboardConfTags) {
         keyboardInfo.back() = confTag.Info;
-        keyboardInfo.push_back("Assigned to " + key2str(carControls.ConfTagKB2key(confTag.Tag)));
-        if (menu.OptionPlus("Assign " + confTag.Tag, keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag.Tag), nullptr, "Current setting")) {
+        keyboardInfo.push_back(fmt::format("Assigned to {}", key2str(carControls.ConfTagKB2key(confTag.Tag))));
+        if (menu.OptionPlus(fmt::format("Assign {}", confTag.Tag), keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag.Tag), nullptr, "Current setting")) {
             WAIT(500);
             bool result = configKeyboardKey(confTag.Tag);
-            if (!result) showNotification("Cancelled " + confTag.Tag + " assignment", &prevNotification);
+            if (!result) showNotification(fmt::format("Cancelled {} assignment", confTag.Tag), &prevNotification);
             WAIT(500);
         }
         it++;
@@ -1262,7 +1261,7 @@ void clearAxis(const std::string& confTag) {
     saveChanges();
     settings.SteeringSaveAxis(confTag, -1, "", 0, 0);
     settings.Read(&carControls);
-    showNotification("Cleared axis " + confTag, &prevNotification);
+    showNotification(fmt::format("Cleared axis {}", confTag), &prevNotification);
     initWheel();
 }
 
@@ -1277,17 +1276,17 @@ void clearWheelToKey() {
 
     int button;
     if (str2int(button, result.c_str(), 10) != STR2INT_SUCCESS) {
-        showNotification("Invalid input: " + result + " is not a valid number!", &prevNotification);
+        showNotification(fmt::format("Invalid input: {} is not a valid number!", result), &prevNotification);
         return;
     }
     bool found = settings.SteeringClearWheelToKey(button);
     if (found) {
         saveChanges();
-        showNotification("Removed button " + result, &prevNotification);
+        showNotification(fmt::format("Removed button {}", result), &prevNotification);
         settings.Read(&carControls);
     }
     else {
-        showNotification("Button " + result + " not found.", &prevNotification);
+        showNotification(fmt::format("Button {} not found.", result), &prevNotification);
     }
 }
 
@@ -1295,7 +1294,7 @@ void clearButton(const std::string& confTag) {
     saveChanges();
     settings.SteeringSaveButton(confTag, -1, -1);
     settings.Read(&carControls);
-    showNotification("Cleared button " + confTag, &prevNotification);
+    showNotification(fmt::format("Cleared button {}", confTag), &prevNotification);
 }
 
 void clearHShifter() {
@@ -1321,14 +1320,14 @@ void saveKeyboardKey(const std::string& confTag, const std::string& key) {
     saveChanges();
     settings.KeyboardSaveKey(confTag, key);
     settings.Read(&carControls);
-    showNotification("Saved key " + confTag + ": " + key, &prevNotification);
+    showNotification(fmt::format("Saved key {}: {}.", confTag, key), &prevNotification);
 }
 
 void saveControllerButton(const std::string& confTag, const std::string& button) {
     saveChanges();
     settings.ControllerSaveButton(confTag, button);
     settings.Read(&carControls);
-    showNotification("Saved button " + confTag + ": " + button, &prevNotification);
+    showNotification(fmt::format("Saved button {}: {}.", confTag, button), &prevNotification);
 }
 
 void saveLControllerButton(const std::string& confTag, int button) {
@@ -1342,21 +1341,21 @@ void clearKeyboardKey(const std::string& confTag) {
     saveChanges();
     settings.KeyboardSaveKey(confTag, "UNKNOWN");
     settings.Read(&carControls);
-    showNotification("Cleared key " + confTag, &prevNotification);
+    showNotification(fmt::format("Cleared key {}", confTag), &prevNotification);
 }
 
 void clearControllerButton(const std::string& confTag) {
     saveChanges();
     settings.ControllerSaveButton(confTag, "UNKNOWN");
     settings.Read(&carControls);
-    showNotification("Cleared button " + confTag, &prevNotification);
+    showNotification(fmt::format("Cleared button {}", confTag), &prevNotification);
 }
 
 void clearLControllerButton(const std::string& confTag) {
     saveChanges();
     settings.LControllerSaveButton(confTag, -1);
     settings.Read(&carControls);
-    showNotification("Cleared button " + confTag, &prevNotification);
+    showNotification(fmt::format("Cleared button {}", confTag), &prevNotification);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1364,7 +1363,7 @@ void clearLControllerButton(const std::string& confTag) {
 ///////////////////////////////////////////////////////////////////////////////
 // Wheel
 bool configAxis(const std::string& confTag) {
-    std::string additionalInfo = "Press " + escapeKey + " to exit.";
+    std::string additionalInfo = fmt::format("Press {} to exit.", escapeKey);
 
     if (confTag == "STEER") {
         additionalInfo += " Steer right to register axis.";
@@ -1373,7 +1372,7 @@ bool configAxis(const std::string& confTag) {
         additionalInfo += " Fully pull and set back handbrake to register axis.";
     }
     else {
-        additionalInfo += " Fully press and release the " + confTag + " pedal to register axis.";
+        additionalInfo += fmt::format(" Fully press and release the {} pedal to register axis.", confTag);
     }
 
     carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
@@ -1453,7 +1452,7 @@ bool configAxis(const std::string& confTag) {
 }
 
 bool configWheelToKey() {
-    std::string additionalInfo = "Press a button to configure. Press " + escapeKey + " to exit.";
+    std::string additionalInfo = fmt::format("Press a button to configure. Press {} to exit", escapeKey);
 
     carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
@@ -1492,7 +1491,7 @@ bool configWheelToKey() {
                 }
             }
             if (progress == 1) {
-                additionalInfo = "Press a keyboard key to configure. Press " + escapeKey + " to exit.";
+                additionalInfo = fmt::format("Press a keyboard key to configure. Press {} to exit", escapeKey);
             }
         }
         if (progress == 1) {
@@ -1522,8 +1521,7 @@ bool configWheelToKey() {
 }
 
 bool configButton(const std::string& confTag) {
-    std::string additionalInfo = "Press " + escapeKey + " to exit.";
-    additionalInfo += " Press a button to set " + confTag + ".";
+    std::string additionalInfo = fmt::format("Press {} to exit. Press a button to set {}.", escapeKey, confTag);
 
     carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
@@ -1555,7 +1553,7 @@ bool configButton(const std::string& confTag) {
 
 bool configHPattern() {
     std::string confTag = "SHIFTER";
-    std::string additionalInfo = "Press " + escapeKey + " to exit. Press " + skipKey + " to skip gear.";
+    std::string additionalInfo = fmt::format("Press {} to exit. Press {} to skip gear.", escapeKey, skipKey);
 
     GUID devGUID = {};
     std::vector<int> buttonArray(g_numGears);
@@ -1600,9 +1598,9 @@ bool configHPattern() {
         case 1: gearDisplay = "1st gear"; break;
         case 2: gearDisplay = "2nd gear"; break;
         case 3: gearDisplay = "3rd gear"; break;
-        default: gearDisplay = std::to_string(progress) + "th gear"; break;
+        default: gearDisplay = fmt::format("{}th gear", progress); break;
         }
-        showSubtitle("Shift into " + gearDisplay + ". " + additionalInfo);
+        showSubtitle(fmt::format("Shift into {}. {}", gearDisplay, additionalInfo));
         WAIT(0);
     }
     saveHShifter(confTag, devGUID, buttonArray);
@@ -1612,7 +1610,7 @@ bool configHPattern() {
 // I hate myself.
 // TODO: Fix strings
 bool configASelect() {
-    std::string additionalInfo = "Press " + escapeKey + " to exit.";
+    std::string additionalInfo = fmt::format("Press {} to exit", escapeKey);
     GUID devGUID = {};
     std::array<int, 2> buttonArray{ -1, -1 };
     int progress = 0;
@@ -1651,7 +1649,7 @@ bool configASelect() {
         case 1: gearDisplay = "Drive"; break;
         default: gearDisplay = "?"; break;
         }
-        showSubtitle("Shift into " + gearDisplay + ". " + additionalInfo);
+        showSubtitle(fmt::format("Shift into {}. {}", gearDisplay, additionalInfo));
         WAIT(0);
     }
     return true;
@@ -1665,7 +1663,7 @@ bool isMenuControl(int control) {
 }
 
 bool configKeyboardKey(const std::string &confTag) {
-    std::string additionalInfo = "Press " + escapeKey + " to exit.";
+    std::string additionalInfo = fmt::format("Press {} to exit", escapeKey);
     while (true) {
         if (IsKeyJustUp(str2key(escapeKey))) {
             return false;
@@ -1694,14 +1692,14 @@ bool configKeyboardKey(const std::string &confTag) {
             }
         }
 
-        showSubtitle("Press " + confTag + ". Menu controls can't be chosen." + additionalInfo);
+        showSubtitle(fmt::format("Press {}. Menu keys can't be chosen. {}", confTag, additionalInfo));
         WAIT(0);
     }
 }
 
 // Controller
 bool configControllerButton(const std::string &confTag) {
-    std::string additionalInfo = "Press " + escapeKey + " to exit.";
+    std::string additionalInfo = fmt::format("Press {} to exit", escapeKey);
     XInputController* rawController = carControls.GetRawController();
     if (rawController == nullptr)
         return false;
@@ -1718,13 +1716,13 @@ bool configControllerButton(const std::string &confTag) {
                 return true;
             }
         }
-        showSubtitle("Press " + confTag + ". " + additionalInfo);
+        showSubtitle(fmt::format("Press {}. {}", confTag, additionalInfo));
         WAIT(0);
     }
 }
 
 bool configLControllerButton(const std::string &confTag) {
-    std::string additionalInfo = "Press " + escapeKey + " to exit.";
+    std::string additionalInfo = fmt::format("Press {} to exit", escapeKey);
 
     while (true) {
         if (IsKeyJustUp(str2key(escapeKey))) {
@@ -1739,7 +1737,7 @@ bool configLControllerButton(const std::string &confTag) {
             }
         }
 
-        showSubtitle("Press " + confTag + ". " + additionalInfo);
+        showSubtitle(fmt::format("Press {}. {}", confTag, additionalInfo));
         WAIT(0);
     }
 }
