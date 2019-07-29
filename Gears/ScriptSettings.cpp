@@ -463,18 +463,18 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Throttle)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Throttle", "W"));
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Brake)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Brake", "S"));
 
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HR)] = str2key(settingsGeneral.GetValue("KEYBOARD", "HR", "NUM0"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H1)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H1", "NUM1"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H2)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H2", "NUM2"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H3)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H3", "NUM3"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H4)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H4", "NUM4"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H5)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H5", "NUM5"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H6)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H6", "NUM6"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H7", "NUM7"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H8", "NUM8"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H9", "none"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H10", "none"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HN)] = str2key(settingsGeneral.GetValue("KEYBOARD", "HN", "NUM9"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HR)] = str2key(settingsGeneral.GetValue("KEYBOARD", "HR", "UNKNOWN"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H1)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H1", "UNKNOWN"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H2)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H2", "UNKNOWN"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H3)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H3", "UNKNOWN"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H4)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H4", "UNKNOWN"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H5)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H5", "UNKNOWN"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H6)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H6", "UNKNOWN"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H7", "UNKNOWN"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H8)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H8", "UNKNOWN"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H9)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H9", "UNKNOWN"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H10)] = str2key(settingsGeneral.GetValue("KEYBOARD", "H10", "UNKNOWN"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HN)] = str2key(settingsGeneral.GetValue("KEYBOARD", "HN", "UNKNOWN"));
 
     // [UPDATE]
     EnableUpdate = settingsGeneral.GetBoolValue("UPDATE", "EnableUpdate", true);
