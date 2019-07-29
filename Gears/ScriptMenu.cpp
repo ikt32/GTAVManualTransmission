@@ -1669,11 +1669,11 @@ bool configKeyboardKey(const std::string &confTag) {
             return false;
         }
         for (auto k : NativeMenu::KeyMap) {
-            if (isMenuControl(k.second)) {
-                showNotification("Can't use menu controls!", &prevNotification);
-                continue;
-            }
             if (IsKeyJustUp(k.second)) {
+                if (isMenuControl(k.second)) {
+                    showNotification("Can't use menu controls!", &prevNotification);
+                    continue;
+                }
                 saveKeyboardKey(confTag, k.first);
                 return true;
             }
@@ -1682,11 +1682,11 @@ bool configKeyboardKey(const std::string &confTag) {
             if (letter > 0x39 && letter < 0x41)
                 continue;
             std::string letter_ = std::string(1, letter);
-            if (isMenuControl(str2key(letter_))) {
-                showNotification("Can't use menu controls!", &prevNotification);
-                continue;
-            }
             if (IsKeyJustUp(str2key(letter_))) {
+                if (isMenuControl(str2key(letter_))) {
+                    showNotification("Can't use menu controls!", &prevNotification);
+                    continue;
+                }
                 saveKeyboardKey(confTag, letter_);
                 return true;
             }
