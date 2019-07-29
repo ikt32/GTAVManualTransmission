@@ -4,6 +4,8 @@
 
 #include <shellapi.h>
 
+#include <fmt/format.h>
+
 #include <inc/main.h>
 #include <inc/natives.h>
 
@@ -173,7 +175,7 @@ void onMenuClose() {
 
 void update_mainmenu() {
     menu.Title("Manual Transmission", 0.90f);
-    menu.Subtitle(std::string("~b~") + DISPLAY_VERSION);
+    menu.Subtitle(fmt::format("~b~{}", DISPLAY_VERSION));
 
     if (MemoryPatcher::Error) {
         menu.Option("Patch test error", NativeMenu::solidRed, 
@@ -187,12 +189,12 @@ void update_mainmenu() {
             NativeMenu::split(g_releaseInfo.Body, '\n');
 
         std::vector<std::string> extra = {
-            fmt("New version: %s", g_releaseInfo.Version.c_str()),
-            fmt("Release date: %s", g_releaseInfo.TimestampPublished.c_str()),
+            fmt::format("New version: {}", g_releaseInfo.Version.c_str()),
+            fmt::format("Release date: {}", g_releaseInfo.TimestampPublished.c_str()),
             "Changelog:"
         };
 
-        for (auto line : bodyLines) {
+        for (const auto& line : bodyLines) {
             extra.push_back(line);
         }
 
@@ -257,13 +259,13 @@ void update_mainmenu() {
     }
     menu.StringArray("Active input", { activeInputName }, activeIndex, { "Active input is automatically detected and can't be changed." });
 
-    for (auto device : carControls.FreeDevices) {
+    for (const auto& device : carControls.FreeDevices) {
         if (menu.Option(device.name, NativeMenu::solidRed,
             { "~r~<b>This device needs to be configured!</b>~w~",
               "Please assign axes and buttons in ~r~<b>Steering Wheel</b>~w~->"
               "~r~<b>Analog Input Setup</b>~w~, ~r~<b>Button Input Setup</b>~w~ before using this device.",
               "Pressing Select discards this warning.",
-              "Full name: " + device.name })) {
+              fmt::format("Full name: {}", device.name) })) {
             saveChanges();
             settings.SteeringAppendDevice(device.guid, device.name);
             settings.Read(&carControls);
@@ -392,7 +394,7 @@ void update_controlsmenu() {
     if (menu.BoolOption("Patch steering for all inputs", settings.PatchSteeringAlways,
         { "Also patch steering reduction and automatic countersteer for keyboard and controller inputs.",
             "Only active if this patch is also enabled for steering wheels.",
-            "PatchSteering (Wheel) is " + std::string(settings.PatchSteering ? "enabled." : "disabled.") })) {
+            fmt::format("PatchSteering (Wheel) is {}.", settings.PatchSteering ? "enabled" : "disabled") })) {
         settings.SaveWheel(&carControls);
     }
 
@@ -439,12 +441,12 @@ void update_legacycontrollermenu() {
     for (const auto& confTag : controllerConfTags) {
         controllerInfo.back() = confTag.Info;
         int nativeControl = carControls.ConfTagLController2Value(confTag.Tag);
-        controllerInfo.push_back(fmt("Assigned to %s (%d)", carControls.NativeControl2Text(nativeControl), nativeControl));
+        controllerInfo.push_back(fmt::format("Assigned to {} ({})", carControls.NativeControl2Text(nativeControl), nativeControl));
 
-        if (menu.OptionPlus("Assign " + confTag.Tag, controllerInfo, nullptr, std::bind(clearLControllerButton, confTag.Tag), nullptr, "Current setting")) {
+        if (menu.OptionPlus(fmt::format("Assign {}", confTag.Tag), controllerInfo, nullptr, std::bind(clearLControllerButton, confTag.Tag), nullptr, "Current setting")) {
             WAIT(500);
             bool result = configLControllerButton(confTag.Tag);
-            if (!result) showNotification("Cancelled " + confTag.Tag + " assignment", &prevNotification);
+            if (!result) showNotification(fmt::format("Cancelled {} assignment", confTag.Tag), &prevNotification);
             WAIT(500);
         }
         it++;
@@ -605,7 +607,7 @@ void update_wheelmenu() {
     for (uint8_t gear = 1; gear < g_numGears; ++gear) {
         // H1 == 1
         if (carControls.ButtonIn(static_cast<CarControls::WheelControlType>(gear))) 
-            hpatInfo.emplace_back(fmt("Gear %d", gear));
+            hpatInfo.emplace_back(fmt::format("Gear {}", gear));
     }
 
     if (menu.OptionPlus("H-pattern shifter setup", hpatInfo, nullptr, std::bind(clearHShifter), nullptr, "Input values",
@@ -672,11 +674,11 @@ std::vector<std::string> showGammaCurve(const std::string& axis, const float inp
     if (gamma >= 5.0f - 0.01f) rarr = "";
     if (gamma <= 0.1f + 0.01f) larr = "";
 
-    std::string printVar = fmt("%.*f", 2, gamma);
+    std::string printVar = fmt::format("{:.{}f}", gamma, 2);
 
     std::vector<std::string> info{
-        axis + " gamma:",
-        larr + printVar + rarr
+        fmt::format("{} gamma:", axis),
+        fmt::format("{}{}{}", larr, printVar, rarr)
     };
 
     const int max_samples = 100;
@@ -725,11 +727,11 @@ void update_axesmenu() {
     carControls.UpdateValues(CarControls::Wheel, true);
     std::vector<std::string> info = {
         "Press RIGHT to clear this axis" ,
-        fmt("Steer:\t\t%.3f"  , carControls.SteerVal),
-        fmt("Throttle:\t\t%.3f" , carControls.ThrottleVal),
-        fmt("Brake:\t\t%.3f"  , carControls.BrakeVal),
-        fmt("Clutch:\t\t%.3f" , carControls.ClutchVal),
-        fmt("Handbrake:\t%.3f", carControls.HandbrakeVal),
+        fmt::format("Steer:\t\t{:.3f}", carControls.SteerVal),
+        fmt::format("Throttle:\t\t{:.3f}", carControls.ThrottleVal),
+        fmt::format("Brake:\t\t{:.3f}", carControls.BrakeVal),
+        fmt::format("Clutch:\t\t{:.3f}", carControls.ClutchVal),
+        fmt::format("Handbrake:\t{:.3f}", carControls.HandbrakeVal),
     };
 
     if (menu.OptionPlus("Configure steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr, "Input values")) {
@@ -860,14 +862,14 @@ void update_buttonsmenu() {
     std::vector<std::string> wheelToKeyInfo = {
         "Active wheel-to-key options:",
         "Press RIGHT to clear a button",
-        fmt("Device: %d", settings.GUIDToDeviceIndex(carControls.WheelToKeyGUID))
+        fmt::format("Device: {}", settings.GUIDToDeviceIndex(carControls.WheelToKeyGUID))
     };
 
     for (int i = 0; i < MAX_RGBBUTTONS; i++) {
         if (carControls.WheelToKey[i] != -1) {
-            wheelToKeyInfo.push_back(fmt("%d = %s", i, key2str(carControls.WheelToKey[i])));
+            wheelToKeyInfo.push_back(fmt::format("{} = {}", i, key2str(carControls.WheelToKey[i])));
             if (carControls.GetWheel().IsButtonPressed(i, carControls.WheelToKeyGUID)) {
-                wheelToKeyInfo.back() += " (Pressed)";
+                wheelToKeyInfo.back() = fmt::format("{} (Pressed)", wheelToKeyInfo.back());
             }
         }
     }
@@ -915,10 +917,10 @@ void update_buttonsmenu() {
     if (buttonInfo.size() == 2) buttonInfo.push_back("None");
 
     for (auto confTag : buttonConfTags) {
-        buttonInfo.push_back(fmt("Assigned to %d", carControls.ConfTagWheel2Value(confTag)));
-        if (menu.OptionPlus("Assign " + confTag, buttonInfo, nullptr, std::bind(clearButton, confTag), nullptr, "Current inputs")) {
+        buttonInfo.push_back(fmt::format("Assigned to {}", carControls.ConfTagWheel2Value(confTag)));
+        if (menu.OptionPlus(fmt::format("Assign {}", confTag), buttonInfo, nullptr, std::bind(clearButton, confTag), nullptr, "Current inputs")) {
             bool result = configButton(confTag);
-            showNotification(result ? confTag + " saved" : "Cancelled " + confTag + " assignment", &prevNotification);
+            showNotification(fmt::format("[{}] {}", confTag, result ? "saved" : "assignment cancelled."), &prevNotification);
         }
         buttonInfo.pop_back();
     }
@@ -1103,7 +1105,7 @@ void update_debugmenu() {
         settings.IgnoredVersion = "v0.0.0";
         if (CheckUpdate(g_releaseInfo)) {
             g_notifyUpdate = true;
-            showNotification(fmt("Manual Transmission: Update available, new version: %s.", 
+            showNotification(fmt::format("Manual Transmission: Update available, new version: {}.", 
                 g_releaseInfo.Version));
         }
         else {
@@ -1333,7 +1335,7 @@ void saveLControllerButton(const std::string& confTag, int button) {
     saveChanges();
     settings.LControllerSaveButton(confTag, button);
     settings.Read(&carControls);
-    showNotification(fmt("Saved button %s: %d", confTag, button), &prevNotification);
+    showNotification(fmt::format("Saved button {}: {}", confTag, button), &prevNotification);
 }
 
 void clearKeyboardKey(const std::string& confTag) {

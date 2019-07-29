@@ -10,6 +10,7 @@
 
 #include <menu.h>
 #include <MiniPID/MiniPID.h>
+#include <fmt/format.h>
 
 #include "ScriptSettings.hpp"
 #include "VehicleData.hpp"
@@ -1114,7 +1115,7 @@ void functionAShift() {
     }
 
     if (settings.DisplayInfo && !menu.IsThisOpen()) {
-        showText(0.01, 0.525, 0.3, fmt("Engine load: \t%.3f", engineLoad));
+        showText(0.01, 0.525, 0.3, fmt::format("Engine load: \t{:.3f}", engineLoad));
     }
 }
 
@@ -1277,8 +1278,8 @@ void functionEngLock() {
             }
         }
         if (settings.DisplayInfo) {
-            showText(0.5, 0.80, 0.25, fmt("Eng block: %.3f", inputMultiplier));
-            showText(0.5, 0.85, 0.25, fmt("Eng block force: %.3f", lockingForce));
+            showText(0.5, 0.80, 0.25, fmt::format("Eng block: {:.3f}", inputMultiplier));
+            showText(0.5, 0.85, 0.25, fmt::format("Eng block force: {:.3f}", lockingForce));
         }
     }
     else {
@@ -1311,9 +1312,9 @@ void functionEngBrake() {
                 }
             }
             if (settings.DisplayInfo) {
-                showText(0.85, 0.500, 0.4, fmt("EngBrake:\t\t%.3f", inputMultiplier), 4);
-                showText(0.85, 0.525, 0.4, fmt("Pressure:\t\t%.3f", engBrakeForce), 4);
-                showText(0.85, 0.550, 0.4, fmt("BrkInput:\t\t%.3f", inpBrakeForce), 4);
+                showText(0.85, 0.500, 0.4, fmt::format("EngBrake:\t\t{:.3f}", inputMultiplier), 4);
+                showText(0.85, 0.525, 0.4, fmt::format("Pressure:\t\t{:.3f}", engBrakeForce), 4);
+                showText(0.85, 0.550, 0.4, fmt::format("BrkInput:\t\t{:.3f}", inpBrakeForce), 4);
             }
         }
         
@@ -2150,10 +2151,10 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     }
 
     if (settings.DisplayInfo) {
-        showText(0.85, 0.175, 0.4, fmt("RelSteer:\t%.3f", steeringRelative.x), 4);
-        showText(0.85, 0.200, 0.4, fmt("SetPoint:\t%.3f", travelRelative.x), 4);
-        showText(0.85, 0.225, 0.4, fmt("Error:\t\t%.3f" , error), 4);
-        showText(0.85, 0.250, 0.4, fmt("%sUnder:\t\t%.3f~w~", understeering ? "~b~" : "~w~", understeer), 4);
+        showText(0.85, 0.175, 0.4, fmt::format("RelSteer:\t{:.3f}", steeringRelative.x), 4);
+        showText(0.85, 0.200, 0.4, fmt::format("SetPoint:\t{:.3f}", travelRelative.x), 4);
+        showText(0.85, 0.225, 0.4, fmt::format("Error:\t\t{:.3f}" , error), 4);
+        showText(0.85, 0.250, 0.4, fmt::format("{}Under:\t\t{:.3f}~w~", understeering ? "~b~" : "~w~", understeer), 4);
     }
 
     return satForce;
@@ -2288,14 +2289,14 @@ void playFFBGround() {
     }
 
     if (settings.DisplayInfo && collision) {
-        showNotification(fmt("%sCollision @ ~r~%.3fG~w~~n~"
-                             "FFB: %d",mtPrefix, gForce, res), &prevNotification);
+        showNotification(fmt::format("{}Collision @ ~r~{:.3f}G~w~~n~"
+                             "FFB: {}",mtPrefix, gForce, res), &prevNotification);
     }
     if (settings.DisplayInfo) {
-        showText(0.85, 0.275, 0.4, fmt("%sFFBSat:\t\t%d~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
-        showText(0.85, 0.300, 0.4, fmt("%sFFBFin:\t\t%d~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
-        showText(0.85, 0.325, 0.4, fmt("Damper:\t\t%d", damperForce), 4);
-        showText(0.85, 0.350, 0.4, fmt("Detail:\t\t%d", detailForce), 4);
+        showText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
+        showText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
+        showText(0.85, 0.325, 0.4, fmt::format("Damper:\t\t{}", damperForce), 4);
+        showText(0.85, 0.350, 0.4, fmt::format("Detail:\t\t{}", detailForce), 4);
     }
 }
 
@@ -2332,9 +2333,9 @@ void playFFBWater() {
     carControls.PlayFFBDynamics(totalForce, damperForce);
 
     if (settings.DisplayInfo) {
-        showText(0.85, 0.275, 0.4, fmt("%sFFBSat:\t\t%d~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
-        showText(0.85, 0.300, 0.4, fmt("%sFFBFin:\t\t%d~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
-        showText(0.85, 0.325, 0.4, fmt("Damper:\t%d", damperForce), 4);
+        showText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
+        showText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
+        showText(0.85, 0.325, 0.4, fmt::format("Damper:\t{}", damperForce), 4);
     }
 }
 

@@ -1,12 +1,12 @@
 #include "ScriptSettings.hpp"
 
 #include <string>
+#include <fmt/format.h>
+#include <simpleini/SimpleIni.h>
 
-#include "simpleini/SimpleIni.h"
 #include "Util/Logger.hpp"
 #include "Input/keyboard.h"
 #include "Input/CarControls.hpp"
-#include "Util/StringFormat.h"
 
 #define CHECK_LOG_SI_ERROR(result, operation) \
     if (result < 0) { \
@@ -884,7 +884,7 @@ void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t
 
     settingsWheel.SetLongValue(confTag.c_str(), "GEAR_R", button[0]);
     for (uint8_t i = 1; i < button.size(); ++i) {
-        settingsWheel.SetLongValue(confTag.c_str(), fmt("GEAR_%d", i).c_str(), button[i]);
+        settingsWheel.SetLongValue(confTag.c_str(), fmt::format("GEAR_{}", i).c_str(), button[i]);
     }
 
     result = settingsWheel.SaveFile(settingsWheelFile.c_str());

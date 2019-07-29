@@ -14,6 +14,9 @@
     <Filter Include="Gears\Util">
       <UniqueIdentifier>{637838ec-8fc7-4f51-a973-9e057ca0c265}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Lib">
+      <UniqueIdentifier>{5019c68f-bf1b-4d67-a931-5524a6301447}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Gears\Util\TimeHelper.hpp">
@@ -84,6 +87,12 @@
     </ClCompile>
     <ClCompile Include="..\Gears\Input\DIDeviceFactory.cpp">
       <Filter>Gears\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\fmt\src\posix.cc">
+      <Filter>Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\fmt\src\format.cc">
+      <Filter>Lib</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

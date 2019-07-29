@@ -61,7 +61,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>..\..\ScriptHookV_SDK;..\..\GTAVMenuBase;$(SolutionDir)thirdparty</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\ScriptHookV_SDK;..\..\GTAVMenuBase;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\fmt\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>MT_EXPORTS;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -120,6 +120,8 @@
     <ClCompile Include="..\..\GTAVMenuBase\menukeyboard.cpp" />
     <ClCompile Include="..\..\GTAVMenuBase\menusettings.cpp" />
     <ClCompile Include="..\..\GTAVMenuBase\menuutils.cpp" />
+    <ClCompile Include="..\thirdparty\fmt\src\format.cc" />
+    <ClCompile Include="..\thirdparty\fmt\src\posix.cc" />
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp" />
     <ClCompile Include="Compatibility.cpp" />
     <ClCompile Include="Input\DIDeviceFactory.cpp" />

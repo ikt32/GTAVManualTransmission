@@ -1,5 +1,5 @@
 #include "script.h"
-
+#include <fmt/format.h>
 #include <inc/natives.h>
 
 #include <menu.h>
@@ -12,7 +12,6 @@
 #include "Input/CarControls.hpp"
 #include "VehicleData.hpp"
 #include "ScriptSettings.hpp"
-#include "Util/StringFormat.h"
 #include "Memory/Offsets.hpp"
 
 extern NativeMenu::Menu menu;
@@ -99,10 +98,10 @@ std::string formatSpeedo(std::string units, float speed, bool showUnit, int hudF
     if (hudFont != 2 && units == "ms") 
         units = "m/s";
 
-    std::string str = fmt("%03d", static_cast<int>(speed));
+    std::string str = fmt::format("{:03.0f}", speed);
 
     if (showUnit) 
-        str = fmt("%s %s", str, units);
+        str = fmt::format("{} {}", str, units);
 
     return str;
 }
@@ -175,29 +174,29 @@ void drawHUD() {
 
 void drawDebugInfo() {
     if (!menu.IsThisOpen()) {
-        showText(0.01, 0.250, 0.3, fmt("Address: 0x%llX", ext.GetAddress(vehicle)));
-        showText(0.01, 0.275, 0.3, fmt("Mod Enabled:\t\t%d" , settings.EnableManual));
-        showText(0.01, 0.300, 0.3, fmt("RPM:\t\t\t%.3f", vehData.mRPM));
-        showText(0.01, 0.325, 0.3, fmt("Current Gear:\t\t%d", ext.GetGearCurr(vehicle)));
-        showText(0.01, 0.350, 0.3, fmt("Next Gear:\t\t%d", ext.GetGearNext(vehicle)));
-        showText(0.01, 0.375, 0.3, fmt("Clutch:\t\t\t%.2f", ext.GetClutch(vehicle)));
-        showText(0.01, 0.400, 0.3, fmt("Throttle:\t\t\t%.2f", ext.GetThrottle(vehicle)));
-        showText(0.01, 0.425, 0.3, fmt("Turbo:\t\t\t%.2f", ext.GetTurbo(vehicle)));
-        showText(0.01, 0.450, 0.3, fmt("%sSpeedo", vehData.mHasSpeedo ? "~g~" : "~r~"));
-        showText(0.01, 0.475, 0.3, fmt("%sE %sCVT -> %sClutch",
+        showText(0.01, 0.250, 0.3, fmt::format("Address: 0x{:X}", reinterpret_cast<uintptr_t>(ext.GetAddress(vehicle))));
+        showText(0.01, 0.275, 0.3, fmt::format("Mod Enabled:\t\t{}" , settings.EnableManual));
+        showText(0.01, 0.300, 0.3, fmt::format("RPM:\t\t\t{:.3f}", vehData.mRPM));
+        showText(0.01, 0.325, 0.3, fmt::format("Current Gear:\t\t{}", ext.GetGearCurr(vehicle)));
+        showText(0.01, 0.350, 0.3, fmt::format("Next Gear:\t\t{}", ext.GetGearNext(vehicle)));
+        showText(0.01, 0.375, 0.3, fmt::format("Clutch:\t\t\t{:.2f}", ext.GetClutch(vehicle)));
+        showText(0.01, 0.400, 0.3, fmt::format("Throttle:\t\t\t{:.2f}", ext.GetThrottle(vehicle)));
+        showText(0.01, 0.425, 0.3, fmt::format("Turbo:\t\t\t{:.2f}", ext.GetTurbo(vehicle)));
+        showText(0.01, 0.450, 0.3, fmt::format("{}Speedo", vehData.mHasSpeedo ? "~g~" : "~r~"));
+        showText(0.01, 0.475, 0.3, fmt::format("{}E {}CVT -> {}Clutch",
             vehData.mIsElectric ? "~g~" : "~r~", vehData.mIsCVT ? "~g~" : "~r~",
             vehData.mHasClutch ? "~g~" : "~r~"));
-        showText(0.01, 0.500, 0.3, fmt("%sABS",
+        showText(0.01, 0.500, 0.3, fmt::format("{}ABS",
             vehData.mHasABS ? "~g~" : "~r~"));
     }
 
-    showText(0.85, 0.050, 0.4, fmt("Throttle:\t%.3f", carControls.ThrottleVal) , 4);
-    showText(0.85, 0.075, 0.4, fmt("Brake:\t\t%.3f" , carControls.BrakeVal)    , 4);
-    showText(0.85, 0.100, 0.4, fmt("Clutch:\t\t%.3f", carControls.ClutchVal)   , 4);
-    showText(0.85, 0.125, 0.4, fmt("Handb:\t\t%.3f" , carControls.HandbrakeVal), 4);
+    showText(0.85, 0.050, 0.4, fmt::format("Throttle:\t{:.3f}", carControls.ThrottleVal) , 4);
+    showText(0.85, 0.075, 0.4, fmt::format("Brake:\t\t{:.3f}" , carControls.BrakeVal)    , 4);
+    showText(0.85, 0.100, 0.4, fmt::format("Clutch:\t\t{:.3f}", carControls.ClutchVal)   , 4);
+    showText(0.85, 0.125, 0.4, fmt::format("Handb:\t\t{:.3f}" , carControls.HandbrakeVal), 4);
 
     if (settings.EnableWheel)
-        showText(0.85, 0.150, 0.4, fmt("Wheel %s present", carControls.WheelAvailable() ? "" : " not"), 4);
+        showText(0.85, 0.150, 0.4, fmt::format("Wheel {} present", carControls.WheelAvailable() ? "" : " not"), 4);
     
 
     if (settings.DisplayGearingInfo) {
@@ -207,7 +206,7 @@ void drawDebugInfo() {
         int i = 0;
         showText(0.30f, 0.05f, 0.35f, "Ratios");
         for (auto ratio : ratios) {
-            showText(0.30f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(ratio));
+            showText(0.30f, 0.10f + 0.025f * i, 0.35f, fmt::format("G{}: {:.3f}", i, ratio));
             i++;
         }
 
@@ -215,7 +214,7 @@ void drawDebugInfo() {
         showText(0.45f, 0.05f, 0.35f, "DriveMaxFlatVel");
         for (auto ratio : ratios) {
             float maxSpeed = DriveMaxFlatVel / ratio;
-            showText(0.45f, 0.10f + 0.025f * i, 0.35f, "G" + std::to_string(i) + ": " + std::to_string(maxSpeed));
+            showText(0.45f, 0.10f + 0.025f * i, 0.35f, fmt::format("G{}: {:.3f}", i, maxSpeed));
             i++;
         }
 
@@ -224,11 +223,11 @@ void drawDebugInfo() {
         float upshiftDuration = 1.0f / (rateUp * settings.ClutchRateMult);
         float downshiftDuration = 1.0f / (rateDown * settings.ClutchRateMult);
 
-        showText(0.60f, 0.050f, 0.35f, fmt("ClutchRate Up: %.03f", rateUp));
-        showText(0.60f, 0.075f, 0.35f, fmt("ClutchRate Dn: %.03f", rateDown));
-        showText(0.60f, 0.100f, 0.35f, fmt("Duration Up: %.03f", upshiftDuration));
-        showText(0.60f, 0.125f, 0.35f, fmt("Duration Dn: %.03f", downshiftDuration));
-        showText(0.60f, 0.150f, 0.35f, fmt("Shift timeout (dn): %.03f", downshiftDuration * settings.DownshiftTimeoutMult));
+        showText(0.60f, 0.050f, 0.35f, fmt::format("ClutchRate Up: {:.3f}", rateUp));
+        showText(0.60f, 0.075f, 0.35f, fmt::format("ClutchRate Dn: {:.3f}", rateDown));
+        showText(0.60f, 0.100f, 0.35f, fmt::format("Duration Up: {:.3f}", upshiftDuration));
+        showText(0.60f, 0.125f, 0.35f, fmt::format("Duration Dn: {:.3f}", downshiftDuration));
+        showText(0.60f, 0.150f, 0.35f, fmt::format("Shift timeout (dn): {:.3f}", downshiftDuration * settings.DownshiftTimeoutMult));
     }
 }
 
@@ -276,13 +275,13 @@ void drawVehicleWheelInfo() {
         Color c = wheelLockups[i] ? solidOrange : transparentGray;
         c = wheelsOnGround[i] ? c : solidRed;
         showDebugInfo3D(wheelCoords[i], {
-            fmt("Index: \t%d", i),
-            fmt("%sPowered", ext.IsWheelPowered(vehicle, i) ? "~g~" : "~r~"),
-            fmt("Speed: \t%.3f", wheelsSpeed[i]),
-            fmt("Compr: \t%.3f", wheelsCompr[i]),
-            fmt("Health: \t%.3f", wheelsHealt[i]),
-            fmt("Power: \t%.3f", wheelsPower[i]),
-            fmt("Brake: \t%.3f",wheelsBrake[i])}, c);
+            fmt::format("Index: \t{}", i),
+            fmt::format("{}Powered", ext.IsWheelPowered(vehicle, i) ? "~g~" : "~r~"),
+            fmt::format("Speed: \t{:.3f}", wheelsSpeed[i]),
+            fmt::format("Compr: \t{:.3f}", wheelsCompr[i]),
+            fmt::format("Health: \t{:.3f}", wheelsHealt[i]),
+            fmt::format("Power: \t{:.3f}", wheelsPower[i]),
+            fmt::format("Brake: \t{:.3f}",wheelsBrake[i])}, c);
         GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
             wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z + 1.0f + 2.5f * wheelsCompr[i], 255, 0, 0, 255);
     }

@@ -90,6 +90,12 @@
     <ClCompile Include="Compatibility.cpp">
       <Filter>API</Filter>
     </ClCompile>
+    <ClCompile Include="..\thirdparty\fmt\src\posix.cc">
+      <Filter>Thirdparty\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\fmt\src\format.cc">
+      <Filter>Thirdparty\fmt</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -270,6 +276,9 @@
     </Filter>
     <Filter Include="API">
       <UniqueIdentifier>{05abafde-5223-4634-93cd-877f6570d6a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thirdparty\fmt">
+      <UniqueIdentifier>{ed736439-0f02-423b-8962-64053e0896cd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

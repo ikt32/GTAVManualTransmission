@@ -78,7 +78,7 @@ bool WheelDirectInput::InitWheel() {
         return false;
     }
 
-    logger.Write(INFO, fmt("[Wheel] Found %d device(s)", DIDeviceFactory::Get().GetEntryCount()));
+    logger.Write(INFO, "[Wheel] Found %d device(s)", DIDeviceFactory::Get().GetEntryCount());
 
     if (DIDeviceFactory::Get().GetEntryCount() < 1) {
         logger.Write(INFO, "[Wheel] No devices detected");
