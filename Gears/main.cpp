@@ -7,10 +7,10 @@
 
 #include "Compatibility.h"
 #include "Constants.h"
-#include "FileVersion.h"
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/VehicleExtensions.hpp"
 #include "Memory/Versions.h"
+#include "Util/FileVersion.h"
 #include "Util/Logger.hpp"
 #include "Util/Paths.h"
 

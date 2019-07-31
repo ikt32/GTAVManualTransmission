@@ -124,7 +124,6 @@
     <ClCompile Include="..\thirdparty\fmt\src\posix.cc" />
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp" />
     <ClCompile Include="Compatibility.cpp" />
-    <ClCompile Include="FileVersion.cpp" />
     <ClCompile Include="Input\DIDeviceFactory.cpp" />
     <ClCompile Include="ManualTransmission.cpp" />
     <ClCompile Include="ScriptHUD.cpp" />
@@ -132,6 +131,7 @@
     <ClCompile Include="ShiftModes.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="Util\Files.cpp" />
+    <ClCompile Include="Util\FileVersion.cpp" />
     <ClCompile Include="Util\GameSound.cpp" />
     <ClCompile Include="Util\MathExt.cpp" />
     <ClCompile Include="ScriptMenu.cpp" />
@@ -175,7 +175,6 @@
     <ClInclude Include="..\thirdparty\MiniPID\MiniPID.h" />
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
     <ClInclude Include="Constants.h" />
-    <ClInclude Include="FileVersion.h" />
     <ClInclude Include="ManualTransmission.h" />
     <ClInclude Include="Memory\Patcher.h" />
     <ClInclude Include="Memory\PatternInfo.h" />
@@ -187,6 +186,7 @@
     <ClInclude Include="UpdateChecker.h" />
     <ClInclude Include="Util\Color.h" />
     <ClInclude Include="Util\Files.h" />
+    <ClInclude Include="Util\FileVersion.h" />
     <ClInclude Include="Util\GameSound.h" />
     <ClInclude Include="Util\MathExt.h" />
     <ClInclude Include="Memory\Offsets.hpp" />

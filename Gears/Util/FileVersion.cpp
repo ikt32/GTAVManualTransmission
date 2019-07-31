@@ -4,8 +4,8 @@
 #include <Windows.h>
 #include <Psapi.h>
 
-#include "Util/Logger.hpp"
-#include "Util/Paths.h"
+#include "../Util/Logger.hpp"
+#include "../Util/Paths.h"
 
 #pragma comment(lib,"Version.lib")
 

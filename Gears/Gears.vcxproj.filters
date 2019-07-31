@@ -93,7 +93,7 @@
     <ClCompile Include="..\thirdparty\fmt\src\format.cc">
       <Filter>Thirdparty\fmt</Filter>
     </ClCompile>
-    <ClCompile Include="FileVersion.cpp">
+    <ClCompile Include="Util\FileVersion.cpp">
       <Filter>Util</Filter>
     </ClCompile>
   </ItemGroup>
@@ -245,7 +245,7 @@
     <ClInclude Include="Compatibility.h">
       <Filter>API</Filter>
     </ClInclude>
-    <ClInclude Include="FileVersion.h">
+    <ClInclude Include="Util\FileVersion.h">
       <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
