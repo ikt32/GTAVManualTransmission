@@ -7,7 +7,6 @@
 
 #include "../Util/TimeHelper.hpp"
 #include "../Util/Logger.hpp"
-#include "../Util/StringFormat.h"
 
 #ifdef _DEBUG
 #include "../Dump.h"

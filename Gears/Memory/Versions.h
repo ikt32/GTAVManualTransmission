@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "../FileVersion.h"
 
 static std::vector<std::string> GameVersionString = {
     "VER_1_0_335_2_STEAM",      // 00
@@ -167,24 +168,6 @@ enum G_GameVersion : int {
     G_VER_1_0_1737_0_STEAM,     // 50
     G_VER_1_0_1737_0_NOSTEAM,   // 51
 };
-
-struct SVersion {
-    int Minor;
-    int Build;
-};
-
-inline bool operator==(const SVersion& a, const SVersion& b) {
-    return a.Minor == b.Minor && a.Build == b.Build;
-}
-
-inline bool operator<=(const SVersion& a, const SVersion& b) {
-    if (a.Minor <= b.Minor && a.Build <= b.Build)
-        return true;
-    if (a.Minor == b.Minor)
-        if (a.Build <= b.Build)
-            return true;
-    return false;
-}
 
 static std::vector<std::pair<SVersion, int>> ExeVersionMap = {
     { {   0, 0 },                      -1 },

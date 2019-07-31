@@ -30,8 +30,6 @@
 #include "Util/Files.h"
 #include "Util/UIUtils.h"
 #include "Util/MiscEnums.h"
-#include "Util/StringFormat.h"
-#include "Util/TimeHelper.hpp"
 #include "UpdateChecker.h"
 #include "Constants.h"
 #include "Compatibility.h"

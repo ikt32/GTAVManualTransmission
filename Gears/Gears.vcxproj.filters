@@ -78,9 +78,6 @@
     <ClCompile Include="Util\GameSound.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Util\StringFormat.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
     <ClCompile Include="UpdateChecker.cpp">
       <Filter>Util</Filter>
     </ClCompile>
@@ -95,6 +92,9 @@
     </ClCompile>
     <ClCompile Include="..\thirdparty\fmt\src\format.cc">
       <Filter>Thirdparty\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="FileVersion.cpp">
+      <Filter>Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -203,9 +203,6 @@
     <ClInclude Include="Util\MiscEnums.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="Util\StringFormat.h">
-      <Filter>Util</Filter>
-    </ClInclude>
     <ClInclude Include="Memory\PatternInfo.h">
       <Filter>Memory\Patching</Filter>
     </ClInclude>
@@ -247,6 +244,9 @@
     </ClInclude>
     <ClInclude Include="Compatibility.h">
       <Filter>API</Filter>
+    </ClInclude>
+    <ClInclude Include="FileVersion.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

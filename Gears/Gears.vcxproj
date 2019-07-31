@@ -124,6 +124,7 @@
     <ClCompile Include="..\thirdparty\fmt\src\posix.cc" />
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp" />
     <ClCompile Include="Compatibility.cpp" />
+    <ClCompile Include="FileVersion.cpp" />
     <ClCompile Include="Input\DIDeviceFactory.cpp" />
     <ClCompile Include="ManualTransmission.cpp" />
     <ClCompile Include="ScriptHUD.cpp" />
@@ -146,7 +147,6 @@
     <ClCompile Include="Memory\VehicleExtensions.cpp" />
     <ClCompile Include="script.cpp" />
     <ClCompile Include="ScriptSettings.cpp" />
-    <ClCompile Include="Util\StringFormat.cpp" />
     <ClCompile Include="Util\UIUtils.cpp" />
     <ClCompile Include="Util\Util.cpp" />
     <ClCompile Include="Util\TimeHelper.cpp" />
@@ -175,6 +175,7 @@
     <ClInclude Include="..\thirdparty\MiniPID\MiniPID.h" />
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="FileVersion.h" />
     <ClInclude Include="ManualTransmission.h" />
     <ClInclude Include="Memory\Patcher.h" />
     <ClInclude Include="Memory\PatternInfo.h" />
@@ -203,7 +204,6 @@
     <ClInclude Include="script.h" />
     <ClInclude Include="ScriptSettings.hpp" />
     <ClInclude Include="Util\Logger.hpp" />
-    <ClInclude Include="Util\StringFormat.h" />
     <ClInclude Include="Util\TimeHelper.hpp" />
     <ClInclude Include="Util\UIUtils.h" />
     <ClInclude Include="Util\Util.hpp" />
