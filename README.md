@@ -42,7 +42,7 @@ Discuss the mod over at [GTAForums.com](http://gtaforums.com/topic/840830-manual
 
 ### Requirements
 * [ScriptHookV SDK by Alexander Blade](http://www.dev-c.com/gtav/scripthookv/)
-* [DirectX SDK (June 2010)](https://www.microsoft.com/en-us/download/details.aspx?id=6812) for XInput 1.3 and DirectInput
+* Windows SDK 10.0.15063.0 (in Visual Studio Updater) for XInput and DirectInput
 * [GTAVMenuBase](https://github.com/E66666666/GTAVMenuBase)
 
 Download the [ScriptHookV SDK](http://www.dev-c.com/gtav/scripthookv/) and extract its contents to ScriptHookV_SDK.
@@ -53,7 +53,7 @@ Clone my [GTAVMenuBase](https://github.com/E66666666/GTAVMenuBase) to the same f
 
 ## Scripting API  
 
-Decorators are now deprecated and will be removed in the first release after v4.6.6.
+Decorators are now deprecated and will be removed in v4.7.0.
 
 Check [ManualTransmission.h](https://github.com/E66666666/GTAVManualTransmission/blob/master/Gears/ManualTransmission.h) for available API functions.
 

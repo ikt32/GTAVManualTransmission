@@ -7,7 +7,7 @@
 #include "../Util/Logger.hpp"
 #include "../Util/Paths.h"
 
-#pragma comment(lib,"Version.lib")
+#pragma comment(lib, "Version.lib")
 
 namespace fs = std::filesystem;
 

@@ -2,6 +2,8 @@
 #include "../Util/TimeHelper.hpp"
 #include <string>
 
+#pragma comment(lib, "XInput.lib")
+
 XInputController::XInputController(int playerNumber)
     : pressTime()
     , releaseTime()

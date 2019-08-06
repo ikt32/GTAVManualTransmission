@@ -14,8 +14,6 @@
 #include "Util/Logger.hpp"
 #include "Util/Paths.h"
 
-#pragma comment(lib,"Version.lib")
-
 namespace fs = std::filesystem;
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {

@@ -12,6 +12,9 @@
 #include "../Dump.h"
 #endif
 
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "dxguid.lib")
+
 #define SAFE_RELEASE(p) { if(p) { (p)->Release(); (p)=nullptr; } }
 
 std::string formatError(HRESULT hr) {
