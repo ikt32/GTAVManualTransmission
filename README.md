@@ -57,7 +57,10 @@ Decorators are now deprecated and will be removed in v4.7.0.
 
 Check [ManualTransmission.h](https://github.com/E66666666/GTAVManualTransmission/blob/master/Gears/ManualTransmission.h) for available API functions.
 
-A C# example on how to use it can be found in [this gist](https://gist.github.com/E66666666/d11cdbd9800ad73efeff612374349347).
+* [C# Example](https://gist.github.com/E66666666/d11cdbd9800ad73efeff612374349347)
+* [C++ Example](https://gist.github.com/E66666666/59390733b366cad4638901ae5fcfd046)
+
+If you have any questions, don't hesitate to ask me on one of the channels below.
 
 ## Bug reporting and support
 
