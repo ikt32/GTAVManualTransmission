@@ -243,20 +243,31 @@ void update_mainmenu() {
     menu.MenuOption("Debug options", "debugmenu", 
         { "Show technical details and options." });
 
-    int activeIndex = 0;
-    std::string activeInputName;
-    switch (carControls.PrevInput) {
-    case CarControls::Keyboard:
-        activeInputName = "Keyboard";
-        break;
-    case CarControls::Controller:
-        activeInputName = "Controller";
-        break;
-    case CarControls::Wheel:
-        activeInputName = "Wheel";
-        break;
+    if (settings.DisableInputDetect) {
+        int activeIndex = carControls.PrevInput;
+        std::vector<std::string> inputNames {
+            "Keyboard", "Controller", "Wheel"
+        };
+        if (menu.StringArray("Active input", inputNames, activeIndex, { "Active input is set manually." })) {
+            carControls.PrevInput = static_cast<CarControls::InputDevices>(activeIndex);
+        }
     }
-    menu.StringArray("Active input", { activeInputName }, activeIndex, { "Active input is automatically detected and can't be changed." });
+    else {
+        int activeIndex = 0;
+        std::string activeInputName;
+        switch (carControls.PrevInput) {
+        case CarControls::Keyboard:
+            activeInputName = "Keyboard";
+            break;
+        case CarControls::Controller:
+            activeInputName = "Controller";
+            break;
+        case CarControls::Wheel:
+            activeInputName = "Wheel";
+            break;
+        }
+        menu.StringArray("Active input", { activeInputName }, activeIndex, { "Active input is automatically detected and can't be changed." });
+    }
 
     for (const auto& device : carControls.FreeDevices) {
         if (menu.Option(device.name, NativeMenu::solidRed,
