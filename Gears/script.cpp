@@ -624,7 +624,8 @@ void resetSteeringMultiplier() {
 }
 
 void updateLastInputDevice() {
-    if (carControls.PrevInput != carControls.GetLastInputDevice(carControls.PrevInput,settings.EnableWheel)) {
+    if (!settings.DisableInputDetect && 
+        carControls.PrevInput != carControls.GetLastInputDevice(carControls.PrevInput,settings.EnableWheel)) {
         carControls.PrevInput = carControls.GetLastInputDevice(carControls.PrevInput, settings.EnableWheel);
         std::string message = mtPrefix + "Input: ";
         switch (carControls.PrevInput) {

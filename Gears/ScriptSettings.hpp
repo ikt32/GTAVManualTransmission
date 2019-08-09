@@ -162,6 +162,7 @@ public:
     bool DisplayFFBInfo = false;
     int LogLevel = INFO;
     bool ShowNPCInfo = false;
+    bool DisableInputDetect = false;
 
     std::vector<GUID> RegisteredGUIDs;
 

@@ -176,6 +176,7 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetBoolValue("DEBUG", "DisplayFFBInfo", DisplayFFBInfo);
     settingsGeneral.SetBoolValue("DEBUG", "DisplayGearingInfo", DisplayGearingInfo);
     settingsGeneral.SetBoolValue("DEBUG", "DisplayNPCInfo", ShowNPCInfo);
+    settingsGeneral.SetBoolValue("DEBUG", "DisableInputDetect", DisableInputDetect);
 
     result = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
@@ -487,6 +488,7 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     DisplayFFBInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayFFBInfo", false);
     ShowNPCInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayNPCInfo", false);
     LogLevel = settingsGeneral.GetLongValue("DEBUG", "LogLevel", INFO);
+    DisableInputDetect = settingsGeneral.GetBoolValue("DEBUG", "DisableInputDetect", false);
 
 }
 
