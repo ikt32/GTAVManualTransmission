@@ -1330,7 +1330,7 @@ void functionEngBrake() {
 // TODO: Change ratios for additional param RPM rise speed
 void fakeRev(bool customThrottle, float customThrottleVal) {
     float throttleVal = customThrottle ? customThrottleVal : carControls.ThrottleVal;
-    float timeStep = SYSTEM::TIMESTEP();
+    float timeStep = GAMEPLAY::GET_FRAME_TIME();
     float accelRatio = 2.5f * timeStep;
     float rpmValTemp = vehData.mRPMPrev > vehData.mRPM ? vehData.mRPMPrev - vehData.mRPM : 0.0f;
     if (vehData.mGearCurr == 1) {			// For some reason, first gear revs slower
