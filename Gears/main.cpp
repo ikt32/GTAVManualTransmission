@@ -83,17 +83,18 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             if (MemoryPatcher::RestoreThrottle())
                 actual++;
 
-            resetSteeringMultiplier();
-            stopForceFeedback();
-            scriptUnregister(hInstance);
-            releaseCompatibility();
-
             if (actual == expected) {
                 logger.Write(INFO, "PATCH: Script shut down cleanly");
             }
             else {
                 logger.Write(ERROR, "PATCH: Script shut down with unrestored patches!");
             }
+
+            resetSteeringMultiplier();
+            stopForceFeedback();
+            releaseCompatibility();
+
+            scriptUnregister(hInstance);
             break;
         }
         default:
