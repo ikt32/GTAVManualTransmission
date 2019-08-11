@@ -2,6 +2,8 @@
 
 #include <string>
 #include <algorithm>
+#include <thread>
+#include <mutex>
 
 #include <inc/natives.h>
 #include <inc/enums.h>
@@ -35,7 +37,13 @@
 #include "Compatibility.h"
 
 ReleaseInfo g_releaseInfo;
+std::mutex g_releaseInfoMutex;
+
 bool g_notifyUpdate;
+std::mutex g_notifyUpdateMutex;
+
+bool g_checkUpdateDone;
+std::mutex g_checkUpdateDoneMutex;
 
 const std::string mtPrefix = "~b~Manual Transmission~w~~n~";
 
@@ -2462,6 +2470,40 @@ void readSettings() {
     logger.Write(INFO, "Settings read");
 }
 
+void threadCheckUpdate() {
+    std::thread([]() {
+        std::lock_guard releaseInfoLock(g_releaseInfoMutex);
+        std::lock_guard checkUpdateLock(g_checkUpdateDoneMutex);
+        std::lock_guard notifyUpdateLock(g_notifyUpdateMutex);
+
+        bool newAvailable = CheckUpdate(g_releaseInfo);
+
+        if (newAvailable && settings.IgnoredVersion != g_releaseInfo.Version) {
+            g_notifyUpdate = true;
+        }
+        g_checkUpdateDone = true;
+    }).detach();
+}
+
+void update_update_notification() {
+    std::unique_lock releaseInfoLock(g_releaseInfoMutex, std::try_to_lock);
+    std::unique_lock checkUpdateLock(g_checkUpdateDoneMutex, std::try_to_lock);
+    std::unique_lock notifyUpdateLock(g_notifyUpdateMutex, std::try_to_lock);
+
+    if (checkUpdateLock.owns_lock() && releaseInfoLock.owns_lock() && notifyUpdateLock.owns_lock()) {
+        if (g_checkUpdateDone) {
+            g_checkUpdateDone = false;
+            if (g_notifyUpdate) {
+                showNotification(fmt::format("Manual Transmission: Update available, new version: {}.",
+                    g_releaseInfo.Version));
+            }
+            else {
+                showNotification("Manual Transmission: No update available.");
+            }
+        }
+    }
+}
+
 void main() {
     logger.Write(INFO, "Script started");
     std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir;
@@ -2478,11 +2520,7 @@ void main() {
     readSettings();
 
     if (settings.EnableUpdate) {
-        bool newAvailable = CheckUpdate(g_releaseInfo);
-
-        if (newAvailable && settings.IgnoredVersion != g_releaseInfo.Version) {
-            g_notifyUpdate = true;
-        }
+        threadCheckUpdate();
     }
 
     ext.initOffsets();
@@ -2520,6 +2558,7 @@ void main() {
         update_manual_transmission();
         update_misc_features();
         update_menu();
+        update_update_notification();
         WAIT(0);
     }
 }

@@ -1,6 +1,7 @@
 #include "script.h"
 
 #include <string>
+#include <mutex>
 
 #include <shellapi.h>
 
@@ -23,8 +24,14 @@
 #include "Memory/VehicleExtensions.hpp"
 #include "Util/MathExt.h"
 
-extern bool g_notifyUpdate;
 extern ReleaseInfo g_releaseInfo;
+extern std::mutex g_releaseInfoMutex;
+
+extern bool g_notifyUpdate;
+extern std::mutex g_notifyUpdateMutex;
+
+extern bool g_checkUpdateDone;
+extern std::mutex g_checkUpdateDoneMutex;
 
 extern NativeMenu::Menu menu;
 extern CarControls carControls;
@@ -183,30 +190,36 @@ void update_mainmenu() {
               "Check Gears.log for more details." });
     }
 
-    if (g_notifyUpdate) {
-        std::vector<std::string> bodyLines = 
-            NativeMenu::split(g_releaseInfo.Body, '\n');
+    {
+        std::unique_lock releaseInfoLock(g_releaseInfoMutex, std::try_to_lock);
+        std::unique_lock notifyUpdateLock(g_notifyUpdateMutex, std::try_to_lock);
+        if (notifyUpdateLock.owns_lock() && releaseInfoLock.owns_lock()) {
+            if (g_notifyUpdate) {
+                std::vector<std::string> bodyLines =
+                    NativeMenu::split(g_releaseInfo.Body, '\n');
 
-        std::vector<std::string> extra = {
-            fmt::format("New version: {}", g_releaseInfo.Version.c_str()),
-            fmt::format("Release date: {}", g_releaseInfo.TimestampPublished.c_str()),
-            "Changelog:"
-        };
+                std::vector<std::string> extra = {
+                    fmt::format("New version: {}", g_releaseInfo.Version.c_str()),
+                    fmt::format("Release date: {}", g_releaseInfo.TimestampPublished.c_str()),
+                    "Changelog:"
+                };
 
-        for (const auto& line : bodyLines) {
-            extra.push_back(line);
-        }
+                for (const auto& line : bodyLines) {
+                    extra.push_back(line);
+                }
 
-        if (menu.OptionPlus("New update available!", extra, nullptr, [] {
-            settings.IgnoredVersion = g_releaseInfo.Version;
-            g_notifyUpdate = false;
-            saveChanges();
-        }, nullptr, "Update info",
-            { "Press accept to check GTA5-Mods.com.",
-                "Press right to ignore current update." })) {
-            WAIT(20);
-            CONTROLS::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
-            ShellExecuteA(0, 0, modUrl.c_str(), 0, 0, SW_SHOW);
+                if (menu.OptionPlus("New update available!", extra, nullptr, [] {
+                    settings.IgnoredVersion = g_releaseInfo.Version;
+                    g_notifyUpdate = false;
+                    saveChanges();
+                    }, nullptr, "Update info",
+                    { "Press accept to check GTA5-Mods.com.",
+                        "Press right to ignore current update." })) {
+                    WAIT(20);
+                    CONTROLS::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
+                    ShellExecuteA(0, 0, modUrl.c_str(), 0, 0, SW_SHOW);
+                }
+            }
         }
     }
 
@@ -1114,14 +1127,8 @@ void update_debugmenu() {
         "Re-enables update checking and clears ignored update." })) {
         settings.EnableUpdate = true;
         settings.IgnoredVersion = "v0.0.0";
-        if (CheckUpdate(g_releaseInfo)) {
-            g_notifyUpdate = true;
-            showNotification(fmt::format("Manual Transmission: Update available, new version: {}.", 
-                g_releaseInfo.Version));
-        }
-        else {
-            showNotification("Manual Transmission: No update available.");
-        }
+
+        threadCheckUpdate();
     }
 }
 
