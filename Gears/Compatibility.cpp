@@ -35,6 +35,7 @@ void setupCompatibility() {
 
 void releaseCompatibility() {
     if (TrainerVModule && TrainerV::Active) {
-        //FreeLibrary(TrainerVModule);
+        TrainerVModule = nullptr;
+        TrainerV::Active = nullptr;
     }
 }
