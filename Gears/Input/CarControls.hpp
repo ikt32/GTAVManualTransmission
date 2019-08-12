@@ -96,8 +96,10 @@ public:
         IndicatorLeft,
         IndicatorRight,
         IndicatorHazard,
-        AR,
-        AD,
+        APark,
+        AReverse,
+        ANeutral,
+        ADrive,
         UNKNOWN,
         SIZEOF_WheelControlType
     };

@@ -643,9 +643,10 @@ void update_wheelmenu() {
         "Press RIGHT to clear H-pattern auto",
         "Active gear:"
     };
-    if (carControls.ButtonIn(CarControls::WheelControlType::AR))        hAutoInfo.emplace_back("Reverse");
-    else if (carControls.ButtonIn(CarControls::WheelControlType::AD))   hAutoInfo.emplace_back("Drive");
-    else                                                                hAutoInfo.emplace_back("Neutral");
+    if (carControls.ButtonIn(CarControls::WheelControlType::APark)) hAutoInfo.emplace_back("Auto Park");
+    if (carControls.ButtonIn(CarControls::WheelControlType::AReverse)) hAutoInfo.emplace_back("Auto Reverse");
+    if (carControls.ButtonIn(CarControls::WheelControlType::ANeutral)) hAutoInfo.emplace_back("Auto Neutral");
+    if (carControls.ButtonIn(CarControls::WheelControlType::ADrive)) hAutoInfo.emplace_back("Auto Drive");
 
     if (menu.OptionPlus("H-pattern shifter setup (auto)", hAutoInfo, nullptr, [] { clearASelect(); }, nullptr, "Input values",
         { "Select this option to start H-pattern shifter (auto) setup. Follow the on-screen instructions." })) {
@@ -917,8 +918,10 @@ void update_buttonsmenu() {
     if (carControls.ButtonIn(CarControls::WheelControlType::H8)) buttonInfo.push_back("Gear 8");
     if (carControls.ButtonIn(CarControls::WheelControlType::H9)) buttonInfo.push_back("Gear 9");
     if (carControls.ButtonIn(CarControls::WheelControlType::H10)) buttonInfo.push_back("Gear 10");
-    if (carControls.ButtonIn(CarControls::WheelControlType::AR)) buttonInfo.push_back("Auto R");
-    if (carControls.ButtonIn(CarControls::WheelControlType::AD)) buttonInfo.push_back("Auto 1");
+    if (carControls.ButtonIn(CarControls::WheelControlType::APark)) buttonInfo.push_back("Auto Park");
+    if (carControls.ButtonIn(CarControls::WheelControlType::AReverse)) buttonInfo.push_back("Auto Reverse");
+    if (carControls.ButtonIn(CarControls::WheelControlType::ANeutral)) buttonInfo.push_back("Auto Reverse");
+    if (carControls.ButtonIn(CarControls::WheelControlType::ADrive)) buttonInfo.push_back("Auto Drive");
     if (carControls.ButtonIn(CarControls::WheelControlType::ShiftUp))   buttonInfo.push_back("ShiftUp");
     if (carControls.ButtonIn(CarControls::WheelControlType::ShiftDown)) buttonInfo.push_back("ShiftDown");
     if (carControls.ButtonIn(CarControls::WheelControlType::Clutch))    buttonInfo.push_back("ClutchButton");
@@ -1629,9 +1632,9 @@ bool configHPattern() {
 // I hate myself.
 // TODO: Fix strings
 bool configASelect() {
-    std::string additionalInfo = fmt::format("Press {} to exit", escapeKey);
+    std::string additionalInfo = fmt::format("Press {} to exit.", escapeKey);
     GUID devGUID = {};
-    std::array<int, 2> buttonArray{ -1, -1 };
+    std::array<int, 4> buttonArray{ -1, -1, -1, -1 };
     int progress = 0;
 
     while (true) {
@@ -1648,27 +1651,47 @@ bool configASelect() {
                     find(begin(buttonArray), end(buttonArray), i) == end(buttonArray)) {
                     if (progress == 0) { // also save device info when just started
                         devGUID = guid;
-                        saveButton("AUTO_R", devGUID, i);
+                        saveButton("AUTO_P", devGUID, i);
                         progress++;
                     }
                     else if (guid == devGUID) { // only accept same device onwards
-                        saveButton("AUTO_D", devGUID, i);
+                        std::string autoPos;
+                        switch (progress) {
+                        case 0: autoPos = "P"; break;
+                        case 1: autoPos = "R"; break;
+                        case 2: autoPos = "N"; break;
+                        case 3: autoPos = "D"; break;
+                        default: autoPos = "?"; break;
+                        }
+                        saveButton(fmt::format("AUTO_{}", autoPos), devGUID, i);
                         progress++;
                     }
                 }
             }
         }
-
-        if (progress > 1) {
+        if (progress > 3) {
             break;
         }
         std::string gearDisplay;
         switch (progress) {
-        case 0: gearDisplay = "Reverse"; break;
-        case 1: gearDisplay = "Drive"; break;
+        case 0: gearDisplay = "Park"; break;
+        case 1: gearDisplay = "Reverse"; break;
+        case 2: gearDisplay = "Neutral"; break;
+        case 3: gearDisplay = "Drive"; break;
         default: gearDisplay = "?"; break;
         }
-        showSubtitle(fmt::format("Shift into {}. {}", gearDisplay, additionalInfo));
+
+        if (progress == 2) {
+            std::string additionalInfoN = fmt::format("Press {} to skip Neutral assignment. No input becomes Neutral. {}", skipKey, additionalInfo);
+            if (IsKeyJustUp(str2key(skipKey))) {
+                progress++;
+                saveButton("AUTO_N", devGUID, -1);
+            }
+            showSubtitle(fmt::format("Shift into {}. {}", gearDisplay, additionalInfoN));
+        }
+        else {
+            showSubtitle(fmt::format("Shift into {}. {}", gearDisplay, additionalInfo));
+        }
         WAIT(0);
     }
     return true;

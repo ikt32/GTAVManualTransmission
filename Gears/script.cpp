@@ -969,26 +969,47 @@ bool subAutoShiftSequential() {
  * Manual part of the automatic transmission (Direct selection)
  */
 bool subAutoShiftSelect() {
-    if (carControls.ButtonJustPressed(CarControls::WheelControlType::AR)) {
+    if (carControls.ButtonIn(CarControls::WheelControlType::APark)) {
+        if (gearStates.LockGear != 1) {
+            shiftTo(1, false);
+        }
+        gearStates.FakeNeutral = true;
+        CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
+        return true;
+    }
+    if (carControls.ButtonJustPressed(CarControls::WheelControlType::AReverse)) {
         if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < 5.0f) {
             shiftTo(0, false);
             gearStates.FakeNeutral = false;
         }
         return true;
     }
-    if (carControls.ButtonJustPressed(CarControls::WheelControlType::AD)) {
+    if (carControls.ButtonJustPressed(CarControls::WheelControlType::ADrive)) {
         shiftTo(1, false);
         gearStates.FakeNeutral = false;
         return true;
     }
-    if (carControls.ButtonReleased(CarControls::WheelControlType::AR)) {
-        shiftTo(1, false);
-        gearStates.FakeNeutral = true;
-        return true;
+    // Unassigned neutral -> pop into neutral when any gear is released
+    if (carControls.WheelButton[static_cast<int>(CarControls::WheelControlType::ANeutral)] == -1) {
+        if (carControls.ButtonReleased(CarControls::WheelControlType::APark) ||
+            carControls.ButtonReleased(CarControls::WheelControlType::AReverse) ||
+            carControls.ButtonReleased(CarControls::WheelControlType::ADrive)) {
+            if (gearStates.LockGear != 1) {
+                shiftTo(1, false);
+            }
+            gearStates.FakeNeutral = true;
+            return true;
+        }
     }
-    if (carControls.ButtonReleased(CarControls::WheelControlType::AD)) {
-        gearStates.FakeNeutral = true;
-        return true;
+    // Assigned neutral -> handle like any other button.
+    else {
+        if (carControls.ButtonJustPressed(CarControls::WheelControlType::ANeutral)) {
+            if (gearStates.LockGear != 1) {
+                shiftTo(1, false);
+            }
+            gearStates.FakeNeutral = true;
+            return true;
+        }
     }
     return false;
 }

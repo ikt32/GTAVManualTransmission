@@ -136,7 +136,10 @@ void drawShiftModeIndicator() {
 
 void drawGearIndicator() {
     std::string gear = std::to_string(ext.GetGearCurr(vehicle));
-    if (gearStates.FakeNeutral && settings.EnableManual) {
+    if (ext.GetHandbrake(vehicle)) {
+        gear = "P";
+    }
+    else if (gearStates.FakeNeutral && settings.EnableManual) {
         gear = "N";
     }
     else if (ext.GetGearCurr(vehicle) == 0) {

@@ -782,17 +782,29 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
         DeviceIndexToGUID(settingsWheel.GetLongValue("INDICATOR_HAZARD", "DEVICE", -1), RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::IndicatorHazard)] =
         settingsWheel.GetLongValue("INDICATOR_HAZARD", "BUTTON", -1);
-    
+
+    // [AUTO_P]
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::APark)] =
+        DeviceIndexToGUID(settingsWheel.GetLongValue("AUTO_P", "DEVICE", -1), RegisteredGUIDs);
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::APark)] =
+        settingsWheel.GetLongValue("AUTO_P", "BUTTON", -1);
+
     // [AUTO_R]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::AR)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::AReverse)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("AUTO_R", "DEVICE", -1), RegisteredGUIDs);
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::AR)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::AReverse)] =
         settingsWheel.GetLongValue("AUTO_R", "BUTTON", -1);
 
+    // [AUTO_N]
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::ANeutral)] =
+        DeviceIndexToGUID(settingsWheel.GetLongValue("AUTO_N", "DEVICE", -1), RegisteredGUIDs);
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ANeutral)] =
+        settingsWheel.GetLongValue("AUTO_N", "BUTTON", -1);
+
     // [AUTO_D]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::AD)] =
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::ADrive)] =
         DeviceIndexToGUID(settingsWheel.GetLongValue("AUTO_D", "DEVICE", -1), RegisteredGUIDs);
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::AD)] =
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ADrive)] =
         settingsWheel.GetLongValue("AUTO_D", "BUTTON", -1);
 
     // [TO_KEYBOARD]
