@@ -10,7 +10,7 @@ bool IsKeyDown(DWORD key);
 bool IsKeyJustUp(DWORD key, bool exclusive = true);
 
 // https://github.com/elsewhat/gtav-mod-scene-director/commit/14d30944af64418265a34d2fedf4bf4d735be36d
-DWORD str2key(std::string humanReadableKey);
+DWORD str2key(const std::string& humanReadableKey);
 std::string key2str(DWORD key);
 
 // http://stackoverflow.com/questions/2333728/stdmap-default-value

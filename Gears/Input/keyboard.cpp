@@ -178,7 +178,7 @@ bool IsKeyJustUp(DWORD key, bool exclusive) {
     return false;
 }
 
-DWORD str2key(std::string humanReadableKey) {
+DWORD str2key(const std::string& humanReadableKey) {
     if (humanReadableKey.length() == 1) {
         char letter = humanReadableKey.c_str()[0];
         if ((letter >= 0x30 && letter <= 0x39) || (letter >= 0x41 && letter <= 0x5A)) {
@@ -193,7 +193,7 @@ std::string key2str(DWORD key) {
     if ((key >= 0x30 && key <= 0x39) || (key >= 0x41 && key <= 0x5A)) {
         return std::string(1, static_cast<char>(key));
     }
-    for (auto k : keyMap) {
+    for (const auto& k : keyMap) {
         if (k.second == key) return k.first;
     }
     return "UNKNOWN";
