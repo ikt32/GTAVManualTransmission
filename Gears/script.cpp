@@ -47,17 +47,6 @@ std::mutex g_checkUpdateDoneMutex;
 
 const std::string mtPrefix = "~b~Manual Transmission~w~~n~";
 
-const char* decorCurrentGear = "mt_gear";
-const char* decorShiftNotice = "mt_shift_indicator";
-const char* decorFakeNeutral = "mt_neutral";
-const char* decorSetShiftMode = "mt_set_shiftmode";
-const char* decorGetShiftMode = "mt_get_shiftmode";
-
-// Camera mods interoperability (via decorators)
-const char* decorLookingLeft = "mt_looking_left";
-const char* decorLookingRight = "mt_looking_right";
-const char* decorLookingBack = "mt_looking_back";
-
 int textureWheelId;
 
 NativeMenu::Menu menu;
@@ -339,10 +328,6 @@ void update_misc_features() {
         return;
 
     if (isVehicleAvailable(vehicle, playerPed)) {
-        if (settings.CrossScript) {
-            crossScript();
-        }
-
         if (settings.AutoLookBack && vehData.mClass != VehicleClass::Heli) {
             functionAutoLookback();
         }
@@ -475,46 +460,6 @@ void update_manual_transmission() {
     handleRPM();
     ext.SetGearCurr(vehicle, gearStates.LockGear);
     ext.SetGearNext(vehicle, gearStates.LockGear);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-//                            Helper things
-///////////////////////////////////////////////////////////////////////////////
-//TODO: Remove in v4.6.7
-void crossScript() {
-    if (!isVehicleAvailable(vehicle, playerPed))
-        return;
-
-    // Current gear
-    DECORATOR::DECOR_SET_INT(vehicle, (char *)decorCurrentGear, vehData.mGearCurr);
-
-    // Shift indicator: 0 = nothing, 1 = Shift up, 2 = Shift down
-    if (gearStates.HitRPMSpeedLimiter || gearStates.HitRPMLimiter) {
-        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice, 1);
-    }
-    else if (vehData.mGearCurr > 1 && vehData.mRPM < 0.4f) {
-        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice, 2);
-    }
-    else if (vehData.mGearCurr == vehData.mGearNext) {
-        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorShiftNotice, 0);
-    }
-
-    // Simulated Neutral
-    if (gearStates.FakeNeutral && settings.EnableManual) {
-        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorFakeNeutral, 1);
-    }
-    else {
-        DECORATOR::DECOR_SET_INT(vehicle, (char *)decorFakeNeutral, 0);
-    }
-
-    // External shifting
-    int currExtShift = DECORATOR::DECOR_GET_INT(vehicle, (char *)decorSetShiftMode);
-    if (settings.ShiftMode + 1 != currExtShift && currExtShift > 0) {
-        // 1 Seq, 2 H, 3 Auto
-        setShiftMode(currExtShift - 1);
-    }
-
-    DECORATOR::DECOR_SET_INT(vehicle, (char *)decorGetShiftMode, static_cast<int>(settings.ShiftMode) + 1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1939,19 +1884,6 @@ void checkCameraButtons() {
         peripherals.LookBackRShoulder = false;
     }
 
-    // Set camera related decorators
-    DECORATOR::DECOR_SET_BOOL(vehicle, (char *)decorLookingLeft, carControls.ButtonIn(CarControls::WheelControlType::LookLeft));
-    DECORATOR::DECOR_SET_BOOL(vehicle, (char *)decorLookingRight, carControls.ButtonIn(CarControls::WheelControlType::LookRight));
-
-    DECORATOR::DECOR_SET_BOOL(vehicle, (char *)decorLookingBack, 
-                              carControls.ButtonIn(CarControls::WheelControlType::LookBack) || 
-                              (
-                                  carControls.ButtonIn(CarControls::WheelControlType::LookLeft) 
-                                  &&
-                                  carControls.ButtonIn(CarControls::WheelControlType::LookRight)
-                              )
-    ); // decorLookingBack = LookBack || (LookLeft && LookRight)
-
     if (carControls.ButtonJustPressed(CarControls::WheelControlType::Camera)) {
         CONTROLS::_SET_CONTROL_NORMAL(0, ControlNextCamera, 1.0f);
     }
@@ -2441,17 +2373,17 @@ bool setupGlobals() {
         scriptDidUnlock = true;
     }
 
-    // New decorators! :)
-    registerDecorator(decorCurrentGear, DECOR_TYPE_INT);
-    registerDecorator(decorShiftNotice, DECOR_TYPE_INT);
-    registerDecorator(decorFakeNeutral, DECOR_TYPE_INT);
-    registerDecorator(decorSetShiftMode, DECOR_TYPE_INT);
-    registerDecorator(decorGetShiftMode, DECOR_TYPE_INT);
+    //// New decorators! :)
+    //registerDecorator(decorCurrentGear, DECOR_TYPE_INT);
+    //registerDecorator(decorShiftNotice, DECOR_TYPE_INT);
+    //registerDecorator(decorFakeNeutral, DECOR_TYPE_INT);
+    //registerDecorator(decorSetShiftMode, DECOR_TYPE_INT);
+    //registerDecorator(decorGetShiftMode, DECOR_TYPE_INT);
 
-    // Camera mods interoperability
-    registerDecorator(decorLookingLeft, DECOR_TYPE_BOOL);
-    registerDecorator(decorLookingRight, DECOR_TYPE_BOOL);
-    registerDecorator(decorLookingBack, DECOR_TYPE_BOOL);
+    //// Camera mods interoperability
+    //registerDecorator(decorLookingLeft, DECOR_TYPE_BOOL);
+    //registerDecorator(decorLookingRight, DECOR_TYPE_BOOL);
+    //registerDecorator(decorLookingBack, DECOR_TYPE_BOOL);
 
     // only re-lock if it was locked before
     if (scriptDidUnlock) {
@@ -2529,10 +2461,6 @@ void main() {
         MemoryPatcher::Error = true;
     }
 
-    logger.Write(INFO, "Setting up globals");
-    if (!setupGlobals()) {
-        logger.Write(ERROR, "Global setup failed!");
-    }
     setupCompatibility();
 
     initWheel();

@@ -68,8 +68,6 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetBoolValue("OPTIONS", "CustomABS", CustomABS);
     settingsGeneral.SetBoolValue("OPTIONS", "ABSFilter", ABSFilter);
 
-    settingsGeneral.SetBoolValue("OPTIONS", "CrossScript", CrossScript);
-
     // [SHIFT_OPTIONS]
     settingsGeneral.SetBoolValue("SHIFT_OPTIONS", "UpshiftCut", UpshiftCut);
     settingsGeneral.SetBoolValue("SHIFT_OPTIONS", "DownshiftBlip", DownshiftBlip);
@@ -312,8 +310,6 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     HardLimiter = settingsGeneral.GetBoolValue("OPTIONS", "HardLimiter", false);
     CustomABS = settingsGeneral.GetBoolValue("OPTIONS", "CustomABS", false);
     ABSFilter = settingsGeneral.GetBoolValue("OPTIONS", "ABSFilter", false);
-
-    CrossScript = settingsGeneral.GetBoolValue("OPTIONS", "CrossScript", true);
 
     // [SHIFT_OPTIONS]
     UpshiftCut = settingsGeneral.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", true);

@@ -56,8 +56,6 @@ public:
     bool ThrottleStart = false;
     bool HidePlayerInFPV = false;
 
-    bool CrossScript = false;
-
     // [SHIFT_OPTIONS]
     float ClutchRateMult = 1.0f;
     bool UpshiftCut = true;

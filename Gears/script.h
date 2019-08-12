@@ -13,7 +13,6 @@ void update_npc();
 
 void drawHUD();
 void drawDebugInfo();
-void crossScript();
 void drawVehicleWheelInfo();
 void drawInputWheelInfo();
 
