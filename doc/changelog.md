@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.6.8
+
+* Add "Park" and "Neutral" positions for H-shifter automatic gear selection
+* Add support for ignoring Simple Trainer menu inputs when it's open (10.0+)
+* Add an option to use manual input switching (Debug submenu, change in main menu)
+* Fix an issue where assigning keyboard gears for 8, 9 , 10 wrongly assign to 7
+* Fix an issue where keyboard assignment wrongly warns about a menu button being used
+* Fix an issue where the update check freezes the game momentarily (run in another thread)
+* Fix an issue where the update check crashes the game when no network is present
+* Remove usage of decorators for cross-script information
+
 ## 4.6.7
 
 * Update for 1.0.1737.0 (Thank you Sparten for the help!)
