@@ -2450,8 +2450,12 @@ void update_update_notification() {
                 showNotification(fmt::format("Manual Transmission: Update available, new version: {}.",
                     g_releaseInfo.Version));
             }
+            else if (g_releaseInfo.Version.empty()) {
+                showNotification("Manual Transmission: Failed to check for update.");
+            }
             else {
-                showNotification("Manual Transmission: No update available.");
+                showNotification(fmt::format("Manual Transmission: No update available, latest version: {}.",
+                    g_releaseInfo.Version));
             }
         }
     }

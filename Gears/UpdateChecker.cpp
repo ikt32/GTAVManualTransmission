@@ -31,8 +31,7 @@ size_t cbWriter(char *data, size_t size, size_t nmemb, std::string *writerData) 
     return size * nmemb;
 }
 
-bool init(CURL *&curl, std::string& dataBuffer, const RepoInfo& repo) {
-    char errBuff[CURL_ERROR_SIZE];
+bool init(CURL *&curl, std::string& dataBuffer, char* errBuff, const RepoInfo& repo) {
     CURLcode result{};
 
     curl = curl_easy_init();
@@ -84,7 +83,7 @@ ReleaseInfo GetLatestReleaseInfo(const RepoInfo& repoInfo) {
     result = curl_global_init(CURL_GLOBAL_DEFAULT);
     CHECK_CURL_CODE(result, "Failed initializing CURL lib", errBuff, ReleaseInfo());
 
-    if (!init(curl, dataBuffer, repoInfo)) {
+    if (!init(curl, dataBuffer, errBuff, repoInfo)) {
         return ReleaseInfo();
     }
 
