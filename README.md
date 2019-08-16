@@ -42,7 +42,8 @@ Discuss the mod over at [GTAForums.com](http://gtaforums.com/topic/840830-manual
 
 ### Requirements
 * [ScriptHookV SDK by Alexander Blade](http://www.dev-c.com/gtav/scripthookv/)
-* [DirectX SDK (June 2010)](https://www.microsoft.com/en-us/download/details.aspx?id=6812) for XInput 1.3 and DirectInput
+* Windows SDK 10.0.15063.0
+* [DirectX SDK (June 2010)](https://www.microsoft.com/en-us/download/details.aspx?id=6812) for XInput 1.3 ([see doc](doc/notes.md))
 * [GTAVMenuBase](https://github.com/E66666666/GTAVMenuBase)
 
 Download the [ScriptHookV SDK](http://www.dev-c.com/gtav/scripthookv/) and extract its contents to ScriptHookV_SDK.
