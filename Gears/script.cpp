@@ -738,9 +738,7 @@ void functionHShiftWheel() {
 
 bool isUIActive() {
     return PED::IS_PED_RUNNING_MOBILE_PHONE_TASK(playerPed) ||
-        menu.IsThisOpen() ||
-        TrainerV::Active && *TrainerV::Active;
-        //CONTROLS::IS_CONTROL_ENABLED(0, eControl::ControlCharacterWheel);
+        menu.IsThisOpen() || TrainerV::Active();
 }
 
 /*

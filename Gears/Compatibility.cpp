@@ -3,9 +3,7 @@
 #include <Windows.h>
 #include <string>
 
-//bool(*TrainerV::Active)() = nullptr;
-
-bool* TrainerV::Active = nullptr;
+bool* pActive = nullptr;
 
 HMODULE TrainerVModule = nullptr;
 
@@ -29,13 +27,17 @@ void setupCompatibility() {
         logger.Write(INFO, "TrainerV.asi not found");
         return;
     }
-    //bool(*)()
-    TrainerV::Active = CheckAddr<bool*>(TrainerVModule, "?Menu1@@3_NA");
+
+    pActive = CheckAddr<bool*>(TrainerVModule, "?Menu1@@3_NA");
+}
+
+bool TrainerV::Active() {
+    if (pActive)
+        return *pActive;
+    return false;
 }
 
 void releaseCompatibility() {
-    if (TrainerVModule && TrainerV::Active) {
-        TrainerVModule = nullptr;
-        TrainerV::Active = nullptr;
-    }
+    TrainerVModule = nullptr;
+    pActive = nullptr;
 }
