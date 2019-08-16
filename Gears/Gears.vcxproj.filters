@@ -96,6 +96,9 @@
     <ClCompile Include="Util\FileVersion.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\GTAVMenuBase\menumemutils.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -247,6 +250,9 @@
     </ClInclude>
     <ClInclude Include="Util\FileVersion.h">
       <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GTAVMenuBase\menumemutils.hpp">
+      <Filter>Menu</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -2472,6 +2472,7 @@ void main() {
     menu.RegisterOnMain([] { onMenuInit(); });
     menu.RegisterOnExit([] { onMenuClose(); });
     menu.SetFiles(settingsMenuFile);
+    menu.Initialize();
     readSettings();
 
     if (settings.EnableUpdate) {
