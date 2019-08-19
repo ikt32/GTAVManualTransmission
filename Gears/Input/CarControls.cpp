@@ -6,10 +6,7 @@
 #include "../Util/MathExt.h"
 
 CarControls::CarControls(): PrevInput(Keyboard)
-                          , SteerGUID()
-                          , SteerAxisType(WheelAxisType::Steer)
-                          , mXInputController(1)
-                          , averageBrakeVals{0} {
+                          , mXInputController(1) {
     std::fill(ControlXboxBlocks.begin(), ControlXboxBlocks.end(), -1);
 }
 
@@ -127,14 +124,6 @@ void CarControls::UpdateValues(InputDevices prevInput, bool skipKeyboardInput) {
         }
         default: break;
     }
-
-    averageBrakeVals[movAvgIndex] = BrakeVal;
-    BrakeValAvg = 0.0f;
-    for (float val : averageBrakeVals) {
-        BrakeValAvg += val;
-    }
-    BrakeValAvg /= AVERAGEWINDOW;
-    movAvgIndex = (movAvgIndex + 1) % AVERAGEWINDOW;
 }
 
 // Limitation: Only works for hardcoded input types. Currently throttle.
@@ -411,28 +400,28 @@ void CarControls::CheckGUIDs(const std::vector<_GUID> & guids) {
 
 void CarControls::PlayFFBDynamics(int totalForce, int damperForce) {
     auto ffAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)]);
-    mWheelInput.SetConstantForce(SteerGUID, ffAxis, totalForce);
-    mWheelInput.SetDamper(SteerGUID, ffAxis, damperForce);
+    mWheelInput.SetConstantForce(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)], ffAxis, totalForce);
+    mWheelInput.SetDamper(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)], ffAxis, damperForce);
 }
 
 void CarControls::PlayFFBCollision(int collisionForce) {
     auto ffAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)]);
-    mWheelInput.SetCollision(SteerGUID, ffAxis, collisionForce);
+    mWheelInput.SetCollision(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)], ffAxis, collisionForce);
 }
 
 void CarControls::PlayLEDs(float rpm, float firstLed, float lastLed) {
-    mWheelInput.PlayLedsDInput(SteerGUID, rpm, firstLed, lastLed);
+    mWheelInput.PlayLedsDInput(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)], rpm, firstLed, lastLed);
 }
 
 void CarControls::StopFFB(bool turnOffLeds) {
     if (turnOffLeds) {
-        mWheelInput.PlayLedsDInput(SteerGUID, 0.0, 0.5, 1.0);
+        mWheelInput.PlayLedsDInput(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)], 0.0, 0.5, 1.0);
     }
     mWheelInput.StopEffects();
 }
 
 bool CarControls::WheelAvailable() {
-    return mWheelInput.IsConnected(SteerGUID);
+    return mWheelInput.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)]);
 }
 
 WheelDirectInput& CarControls::GetWheel() {

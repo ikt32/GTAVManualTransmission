@@ -5,8 +5,6 @@
 #include "WheelDirectInput.hpp"
 #include "NativeController.h"
 
-const int AVERAGEWINDOW = 10;
-
 struct Device {
     Device(std::string name, GUID guid) : name(name), guid(guid) {}
     std::string name;
@@ -203,7 +201,6 @@ public:
 
     float ThrottleVal = 0.0f;
     float BrakeVal = 0.0f;
-    float BrakeValAvg = 0.0f;   // Used for gamma curve display. Not as jittery.
     float ClutchVal = 0.0f; 	// 1 = Pressed, 0 = Not pressed
     float SteerVal = 0.5f;
     float SteerValRaw = 0.0f;   // For readout purposes. SteerVal is used for gameplay.
@@ -221,11 +218,6 @@ public:
     int HandbrakeMax = 0;
     int HandbrakeMin = 0;
     int MaxTapTime = 200;
-
-    //bool InvertSteer = false;
-    //bool InvertThrottle = false;
-    //bool InvertBrake = false;
-    //bool InvertClutch = false;
 
     float ADZThrottle = 0.25f;
     float ADZBrake = 0.25f;
@@ -248,9 +240,7 @@ public:
     std::array<GUID, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButtonGUIDs = {};
     std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
 
-    GUID SteerGUID;
     GUID WheelToKeyGUID = {};
-    WheelAxisType SteerAxisType;
 
     std::vector<Device> FreeDevices{};
 
@@ -351,7 +341,4 @@ private:
 
     bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
     bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
-
-    int movAvgIndex = 0;
-    float averageBrakeVals[AVERAGEWINDOW];
 };

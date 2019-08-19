@@ -504,7 +504,6 @@ void toggleManual(bool enable) {
 void initWheel() {
     carControls.InitWheel();
     carControls.CheckGUIDs(settings.RegisteredGUIDs);
-    carControls.SteerGUID = carControls.WheelAxesGUIDs[static_cast<int>(carControls.SteerAxisType)];
     logger.Write(INFO, "[Wheel] Steering wheel initialization finished");
 }
 

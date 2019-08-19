@@ -810,7 +810,7 @@ void update_axesmenu() {
         { "Linearity of the brake pedal. Values over 1.0 feel more real if you have progressive springs." });
 
     if (showBrakeGammaBox) {
-        extras = showGammaCurve("Brake", carControls.BrakeValAvg, settings.BrakeGamma);
+        extras = showGammaCurve("Brake", carControls.BrakeVal, settings.BrakeGamma);
         menu.OptionPlusPlus(extras, "Brake gamma");
     }
 
@@ -842,11 +842,6 @@ void update_axesmenu() {
         extras = showGammaCurve("Steering", steerVal, settings.SteerGamma);
         menu.OptionPlusPlus(extras, "Steering gamma");
     }
-
-    //menu.BoolOption("Invert steer", carControls.InvertSteer);
-    //menu.BoolOption("Invert throttle", carControls.InvertThrottle);
-    //menu.BoolOption("Invert brake", carControls.InvertBrake);
-    //menu.BoolOption("Invert clutch", carControls.InvertClutch);
 }
 
 void update_forcefeedbackmenu() {
