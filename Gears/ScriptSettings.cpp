@@ -17,6 +17,14 @@
 #pragma warning(push)
 #pragma warning(disable: 4244)
 
+#ifdef NO_NATIVES
+bool g_DefaultOverride;
+float g_CountersteerMult;
+#else
+extern bool g_DefaultOverride;
+extern float g_CountersteerMult;
+#endif
+
 ScriptSettings::ScriptSettings() { }
 
 void ScriptSettings::SetFiles(const std::string &general, const std::string &wheel) {
@@ -175,6 +183,9 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetBoolValue("DEBUG", "DisplayGearingInfo", DisplayGearingInfo);
     settingsGeneral.SetBoolValue("DEBUG", "DisplayNPCInfo", ShowNPCInfo);
     settingsGeneral.SetBoolValue("DEBUG", "DisableInputDetect", DisableInputDetect);
+
+    settingsGeneral.SetBoolValue("DEBUG", "EnhancedSteering", g_DefaultOverride);
+    settingsGeneral.SetDoubleValue("DEBUG", "CSMult", g_CountersteerMult);
 
     result = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
@@ -485,7 +496,8 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     ShowNPCInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayNPCInfo", false);
     LogLevel = settingsGeneral.GetLongValue("DEBUG", "LogLevel", INFO);
     DisableInputDetect = settingsGeneral.GetBoolValue("DEBUG", "DisableInputDetect", false);
-
+    g_DefaultOverride = settingsGeneral.GetBoolValue("DEBUG", "EnhancedSteering");
+    g_CountersteerMult = settingsGeneral.GetDoubleValue("DEBUG", "CSMult", 1.0f);
 }
 
 void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {

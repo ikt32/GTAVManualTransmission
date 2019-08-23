@@ -179,6 +179,9 @@ void onMenuClose() {
     saveChanges();
 }
 
+extern bool g_DefaultOverride;
+extern float g_CountersteerMult;
+
 void update_mainmenu() {
     menu.Title("Manual Transmission", 0.90f);
     menu.Subtitle(fmt::format("~b~{}", DISPLAY_VERSION));
@@ -1105,6 +1108,14 @@ void update_miscassistmenu() {
 void update_debugmenu() {
     menu.Title("Debug settings");
     menu.Subtitle("Extra mod info");
+
+    menu.BoolOption("Enhanced Steering", g_DefaultOverride, { 
+        "Overrides default steering with custom implementation.", 
+        "- Customizable countersteer multiplier", 
+        "- No magic rotation or air control",
+        "- Applies steering mult and steering reduction",
+        "- Limited to controller/keyboard, since wheel already does this"});
+    menu.FloatOption("Countersteer multiplier", g_CountersteerMult, 0.0f, 2.0f, 0.05f);
 
     menu.BoolOption("Display info", settings.DisplayInfo,
         { "Show all detailed technical info of the gearbox and inputs calculations." });

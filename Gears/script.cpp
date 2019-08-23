@@ -72,6 +72,9 @@ MiniPID pid(1.0, 0.0, 0.0);
 void SetControlADZ(eControl control, float value, float adz);
 void updateShifting();
 
+bool g_DefaultOverride = false;
+float g_CountersteerMult = 1.0f;
+
 //TODO: Reorganize/move?
 void handleBrakePatch() {
     bool lockedUp = false;
@@ -512,6 +515,9 @@ void stopForceFeedback() {
 }
 
 void update_steeringpatches() {
+    if (g_DefaultOverride)
+        return;
+
     bool isCar = vehData.mClass == VehicleClass::Car;
     bool useWheel = carControls.PrevInput == CarControls::Wheel;
     if (isCar && settings.PatchSteering &&
@@ -2458,6 +2464,183 @@ void update_update_notification() {
     }
 }
 
+float Racer_getSteeringAngle(Vehicle v) {
+    float largestAngle = 0.0f;
+    auto angles = ext.GetWheelSteeringAngles(v);
+
+    for (auto angle : angles) {
+        if (abs(angle) > abs(largestAngle)) {
+            largestAngle = angle;
+        }
+    }
+    return largestAngle;
+}
+
+void PlayerRacer_getControllerControls(bool& handbrake, float& throttle, float& brake, float& steer) {
+    XInputController& mXInput = *carControls.GetRawController();
+
+    // Basic input stuff
+    handbrake = mXInput.IsButtonPressed(XInputController::RightShoulder);
+    throttle = mXInput.GetAnalogValue(XInputController::RightTrigger);
+    brake = mXInput.GetAnalogValue(XInputController::LeftTrigger);
+    steer = mXInput.GetAnalogValue(XInputController::LeftThumbLeft);
+    if (steer == 0.0f) steer = -mXInput.GetAnalogValue(XInputController::LeftThumbRight);
+    bool reverseSwitch = mXInput.IsButtonPressed(XInputController::LeftShoulder);
+    if (reverseSwitch)
+        throttle = -mXInput.GetAnalogValue(XInputController::RightTrigger);
+}
+
+void PlayerRacer_getKeyboardControls(bool& handbrake, float& throttle, float& brake, float& steer) {
+    handbrake = GetAsyncKeyState(' ') & 0x8000 ? 1.0f : 0.0f;
+    throttle = GetAsyncKeyState('W') & 0x8000 ? 1.0f : 0.0f;
+    float reverse = GetAsyncKeyState('I') & 0x8000 ? 1.0f : 0.0f;
+    if (reverse > 0.5)
+        throttle = -1.0f;
+
+    brake = GetAsyncKeyState('S') & 0x8000 ? 1.0f : 0.0f;
+    float left = GetAsyncKeyState('A') & 0x8000 ? 1.0f : 0.0f;
+    float right = GetAsyncKeyState('D') & 0x8000 ? 1.0f : 0.0f;
+    steer = left - right;
+}
+
+void PlayerRacer_getControls(bool& handbrake, float& throttle, float& brake, float& steer) {
+    if (carControls.PrevInput == CarControls::InputDevices::Controller) {
+        PlayerRacer_getControllerControls(handbrake, throttle, brake, steer);
+    }
+    else {
+        PlayerRacer_getKeyboardControls(handbrake, throttle, brake, steer);
+    }
+}
+
+float mSteerPrev = 0.0f;
+
+float Racer_calculateReduction() {
+    Vehicle mVehicle = vehicle;
+    float mult = 1;
+    Vector3 vel = ENTITY::GET_ENTITY_VELOCITY(mVehicle);
+    Vector3 pos = ENTITY::GET_ENTITY_COORDS(mVehicle, 1);
+    Vector3 motion = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(mVehicle, pos.x + vel.x, pos.y + vel.y,
+        pos.z + vel.z);
+    if (motion.y > 3) {
+        mult = 0.15f + powf(0.9f, abs(motion.y) - 7.2f);
+        if (mult != 0) { mult = floorf(mult * 1000) / 1000; }
+        if (mult > 1) { mult = 1; }
+    }
+    mult = (1 + (mult - 1) * settings.SteeringReductionOther);
+    return mult;
+}
+
+float Racer_calculateDesiredHeading(float steeringMax, float desiredHeading,
+    float reduction) {
+    float correction = desiredHeading;
+    Vehicle mVehicle = vehicle;
+
+
+    float origTravel = 0.0f;
+    if (abs(ENTITY::GET_ENTITY_SPEED_VECTOR(mVehicle, true).y) > 3.0f) {
+        Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(mVehicle, 1);
+        Vector3 travelWorld = positionWorld + ENTITY::GET_ENTITY_VELOCITY(mVehicle);
+
+        Vector3 target = Normalize(
+            ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(mVehicle, travelWorld.x, travelWorld.y, travelWorld.z));
+        float travelDir = atan2(target.y, target.x) - M_PI / 2.0f;
+        if (travelDir > M_PI / 2.0f) {
+            travelDir -= M_PI;
+        }
+        if (travelDir < -M_PI / 2.0f) {
+            travelDir += M_PI;
+        }
+        travelDir *= sgn(ENTITY::GET_ENTITY_SPEED_VECTOR(mVehicle, true).y);
+        travelDir *= g_CountersteerMult;
+        origTravel = travelDir;
+        travelDir += desiredHeading;
+
+        correction = atan2(sin(travelDir), cos(travelDir));
+    }
+
+    if (settings.DisplayInfo) {
+        showText(0.3f, 0.00f, 0.5f, fmt::format("strr = {}", desiredHeading * steeringMax));
+        showText(0.3f, 0.05f, 0.5f, fmt::format("corr = {}", origTravel));
+    }
+    float finalreduct = map(abs(desiredHeading * steeringMax - origTravel), 0.0f, steeringMax, 1.0f, reduction);
+    finalreduct = map(abs(desiredHeading), 0.0f, 1.0f, 1.0f, finalreduct);
+    correction *= finalreduct;
+
+    if (settings.DisplayInfo) {
+        showText(0.3f, 0.10f, 0.5f, fmt::format("Applying reduction {}", finalreduct));
+    }
+
+    if (correction > steeringMax)
+        correction = steeringMax;
+    if (correction < -steeringMax)
+        correction = -steeringMax;
+
+    return correction;
+}
+
+void PlayerRacer_UpdateControl() {
+    Vehicle mVehicle = vehicle;
+
+    float limitRadians = ext.GetMaxSteeringAngle(mVehicle);
+    float reduction = Racer_calculateReduction();
+
+    bool handbrake = false;
+    float throttle = 0.0f;
+    float brake = 0.0f;
+    float steer = 0.0f;
+
+    PlayerRacer_getControls(handbrake, throttle, brake, steer);
+
+    // Only user input is lerp'd
+    float steerCurr;
+
+    if (steer == 0.0f) {
+        steerCurr = lerp(
+            mSteerPrev,
+            steer,
+            1.0f - pow(0.000001f, GAMEPLAY::GET_FRAME_TIME()));
+    }
+    else {
+        steerCurr = lerp(
+            mSteerPrev,
+            steer,
+            1.0f - pow(0.0001f, GAMEPLAY::GET_FRAME_TIME()));
+    }
+    mSteerPrev = steerCurr;
+
+    float desiredHeading = Racer_calculateDesiredHeading(1.0f, steerCurr, reduction);
+
+    // Disable steering and aircrobatics controls
+    CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
+    CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveUpDown, true);
+
+    // Both need to be set, top one with radian limit
+    ext.SetSteeringAngle(mVehicle, settings.GameSteerMultOther * desiredHeading * limitRadians);
+    ext.SetSteeringInputAngle(mVehicle, settings.GameSteerMultOther * desiredHeading);
+}
+
+void update_yeet() {
+    if (!isVehicleAvailable(vehicle, playerPed))
+        return;
+
+    if (!g_DefaultOverride) {
+        if (MemoryPatcher::SteeringAssistPatcher.Patched())
+            MemoryPatcher::RestoreSteeringAssist();
+
+        if (MemoryPatcher::SteeringControlPatcher.Patched())
+            MemoryPatcher::RestoreSteeringControl();
+        return;
+    }
+
+    if (!MemoryPatcher::SteeringAssistPatcher.Patched())
+        MemoryPatcher::PatchSteeringAssist();
+
+    if (!MemoryPatcher::SteeringControlPatcher.Patched())
+        MemoryPatcher::PatchSteeringControl();
+
+    PlayerRacer_UpdateControl();
+}
+
 void main() {
     logger.Write(INFO, "Script started");
     std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir;
@@ -2510,6 +2693,7 @@ void main() {
         update_misc_features();
         update_menu();
         update_update_notification();
+        update_yeet();
         WAIT(0);
     }
 }
