@@ -5,7 +5,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-template <typename T> int sgn(T val) {
+template <typename T> T sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
 

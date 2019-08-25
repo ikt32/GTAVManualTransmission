@@ -2530,19 +2530,28 @@ float Racer_calculateReduction() {
     return mult;
 }
 
+void drawSphere(Vector3 p, float scale, Color c) {
+    GRAPHICS::DRAW_MARKER(eMarkerType::MarkerTypeDebugSphere,
+        p.x, p.y, p.z,
+        0.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f,
+        scale, scale, scale,
+        c.R, c.G, c.B, c.A,
+        false, false, 2, false, nullptr, nullptr, false);
+}
+
+// Correction = radians!!!
 float Racer_calculateDesiredHeading(float steeringMax, float desiredHeading,
     float reduction) {
+    desiredHeading *= reduction;
     float correction = desiredHeading;
     Vehicle mVehicle = vehicle;
 
 
     float origTravel = 0.0f;
-    if (abs(ENTITY::GET_ENTITY_SPEED_VECTOR(mVehicle, true).y) > 3.0f) {
-        Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(mVehicle, 1);
-        Vector3 travelWorld = positionWorld + ENTITY::GET_ENTITY_VELOCITY(mVehicle);
-
-        Vector3 target = Normalize(
-            ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(mVehicle, travelWorld.x, travelWorld.y, travelWorld.z));
+    Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(mVehicle, true);
+    if (abs(speedVector.y) > 3.0f) {
+        Vector3 target = Normalize(speedVector);
         float travelDir = atan2(target.y, target.x) - M_PI / 2.0f;
         if (travelDir > M_PI / 2.0f) {
             travelDir -= M_PI;
@@ -2550,7 +2559,7 @@ float Racer_calculateDesiredHeading(float steeringMax, float desiredHeading,
         if (travelDir < -M_PI / 2.0f) {
             travelDir += M_PI;
         }
-        travelDir *= sgn(ENTITY::GET_ENTITY_SPEED_VECTOR(mVehicle, true).y);
+        travelDir *= sgn(speedVector.y);
         travelDir *= g_CountersteerMult;
         origTravel = travelDir;
         travelDir += desiredHeading;
@@ -2562,10 +2571,16 @@ float Racer_calculateDesiredHeading(float steeringMax, float desiredHeading,
         showText(0.3f, 0.00f, 0.5f, fmt::format("strr = {}", desiredHeading * steeringMax));
         showText(0.3f, 0.05f, 0.5f, fmt::format("corr = {}", origTravel));
     }
-    float finalreduct = map(abs(desiredHeading * steeringMax - origTravel), 0.0f, steeringMax, 1.0f, reduction);
-    finalreduct = map(abs(desiredHeading), 0.0f, 1.0f, 1.0f, finalreduct);
-    correction *= finalreduct;
 
+    // Always apply max reduction unless... steering in the direction of oversteer correction?
+    float finalreduct = reduction;
+    float absoluteHeadingReq = desiredHeading * ext.GetMaxSteeringAngle(vehicle);
+    //if (sgn(correction) == sgn(absoluteHeadingReq) && abs(correction) > deg2rad(25.0f)) {
+    //    map(abs(desiredHeading * steeringMax - origTravel), 0.0f, steeringMax, 1.0f, reduction);
+    //    finalreduct = map(abs(desiredHeading), 0.0f, 1.0f, 1.0f, finalreduct);
+    //    correction *= finalreduct;
+    //    showText(0.3f, 0.15f, 0.5f, fmt::format("Applying reduction2", finalreduct));
+    //}
     if (settings.DisplayInfo) {
         showText(0.3f, 0.10f, 0.5f, fmt::format("Applying reduction {}", finalreduct));
     }
@@ -2587,48 +2602,74 @@ void PlayerRacer_UpdateControl() {
     bool handbrake = false;
     float throttle = 0.0f;
     float brake = 0.0f;
-    float steer = 0.0f;
+    float steer = 0.0f; //-1 to 1
 
     PlayerRacer_getControls(handbrake, throttle, brake, steer);
 
     // Only user input is lerp'd
     float steerCurr;
 
+    float steerValGammaL = pow(-steer, settings.SteerGamma);
+    float steerValGammaR = pow(steer, settings.SteerGamma);
+    float steerValGamma = steer < 0.0f ? -steerValGammaL : steerValGammaR;
+
     if (steer == 0.0f) {
         steerCurr = lerp(
             mSteerPrev,
-            steer,
+            steerValGamma,
             1.0f - pow(0.000001f, GAMEPLAY::GET_FRAME_TIME()));
     }
     else {
         steerCurr = lerp(
             mSteerPrev,
-            steer,
+            steerValGamma,
             1.0f - pow(0.0001f, GAMEPLAY::GET_FRAME_TIME()));
     }
     mSteerPrev = steerCurr;
 
     float desiredHeading = Racer_calculateDesiredHeading(1.0f, steerCurr, reduction);
 
+    if (vehData.mClass == VehicleClass::Car) {
+        // TODO: Deluxo and more funky cars?
+        if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && (ENTITY::GET_ENTITY_MODEL(vehicle) == GAMEPLAY::GET_HASH_KEY("­TOWTRUCK2") || ENTITY::GET_ENTITY_MODEL(vehicle) == GAMEPLAY::GET_HASH_KEY("­TOWTRUCK"))) {
+            // noop
+        }
+        else {
+            CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveUpDown, true);
+        }
+    }
+    // TODO: Re-enable for airborne && deluxo
     // Disable steering and aircrobatics controls
     CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
-    CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveUpDown, true);
 
     // Both need to be set, top one with radian limit
-    ext.SetSteeringAngle(mVehicle, settings.GameSteerMultOther * desiredHeading * limitRadians);
-    ext.SetSteeringInputAngle(mVehicle, settings.GameSteerMultOther * desiredHeading);
+    ext.SetSteeringAngle(mVehicle, settings.GameSteerMultOther * desiredHeading);
+    ext.SetSteeringInputAngle(mVehicle, settings.GameSteerMultOther * desiredHeading / limitRadians);
 }
 
 void update_yeet() {
     if (!isVehicleAvailable(vehicle, playerPed))
         return;
 
-    if (!g_DefaultOverride) {
-        if (MemoryPatcher::SteeringAssistPatcher.Patched())
-            MemoryPatcher::RestoreSteeringAssist();
+    if (settings.DisplayInfo) {
+        float steeringAngle = Racer_getSteeringAngle(vehicle);
 
-        if (MemoryPatcher::SteeringControlPatcher.Patched())
-            MemoryPatcher::RestoreSteeringControl();
+        Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
+        Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(vehicle, 1);
+        Vector3 travelRelative = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, speedVector.x, speedVector.y, speedVector.z);
+
+        float steeringAngleRelX = ENTITY::GET_ENTITY_SPEED(vehicle) * -sin(steeringAngle);
+        float steeringAngleRelY = ENTITY::GET_ENTITY_SPEED(vehicle) * cos(steeringAngle);
+        Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, steeringAngleRelX, steeringAngleRelY, 0.0f);
+
+        GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, travelRelative.x, travelRelative.y, travelRelative.z, 0, 255, 0, 255);
+        drawSphere(travelRelative, 0.25f, { 0, 255, 0, 255 });
+        GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, steeringWorld.x, steeringWorld.y, steeringWorld.z, 255, 0, 255, 255);
+        drawSphere(steeringWorld, 0.25f, { 255, 0, 255, 255 });
+    }
+
+    if (!g_DefaultOverride) {
+        // Restore should be handled by the normal stuff, eventually this should be merged
         return;
     }
 
