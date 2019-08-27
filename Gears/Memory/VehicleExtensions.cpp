@@ -574,7 +574,7 @@ void VehicleExtensions::SetSteeringMultiplier(Vehicle handle, float value) {
 
     for (int i = 0; i<numWheels; i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-        int sign = sgn(*reinterpret_cast<float*>(wheelAddr + steeringMultOffset));
+        float sign = sgn(*reinterpret_cast<float*>(wheelAddr + steeringMultOffset));
         *reinterpret_cast<float*>(wheelAddr + steeringMultOffset) = value * sign;
     }
 }

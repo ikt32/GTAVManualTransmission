@@ -1078,8 +1078,10 @@ void update_wheelinfomenu() {
 }
 
 void update_miscassistmenu() {
-    menu.Title("Drving assists");
+    menu.Title("Driving assists");
     menu.Subtitle("Assists to make driving easier");
+
+    menu.MenuOption("Steering assists", "steeringassistmenu");
 
     menu.BoolOption("Enable ABS", settings.CustomABS,
         { "Experimental script-driven ABS." });
@@ -1105,17 +1107,21 @@ void update_miscassistmenu() {
         { "Hides the player in first person view." });
 }
 
+void update_steeringassistmenu() {
+    menu.Title("Steering assists");
+    menu.Subtitle("Custom steering assist");
+
+    menu.BoolOption("Enhanced Steering", settings.CustomSteering.Enabled,
+        { "Overrides the default steering assist with a custom implementation. "
+            "Disables acrobatic burnout and airborne controls. "
+            "Limited to controller & keyboard, since wheel is always custom." });
+    menu.FloatOption("Countersteer multiplier", settings.CustomSteering.CountersteerMult, 0.0f, 2.0f, 0.05f);
+    menu.FloatOption("Countersteer limit", settings.CustomSteering.CountersteerLimit, 0.0f, 360.0f, 1.0f); // in degrees
+}
+
 void update_debugmenu() {
     menu.Title("Debug settings");
     menu.Subtitle("Extra mod info");
-
-    menu.BoolOption("Enhanced Steering", g_DefaultOverride, { 
-        "Overrides default steering with custom implementation.", 
-        "- Customizable countersteer multiplier", 
-        "- No magic rotation or air control",
-        "- Applies steering mult and steering reduction",
-        "- Limited to controller/keyboard, since wheel already does this"});
-    menu.FloatOption("Countersteer multiplier", g_CountersteerMult, 0.0f, 2.0f, 0.05f);
 
     menu.BoolOption("Display info", settings.DisplayInfo,
         { "Show all detailed technical info of the gearbox and inputs calculations." });
@@ -1203,6 +1209,9 @@ void update_menu() {
 
     /* mainmenu -> miscassistmenu */
     if (menu.CurrentMenu("miscassistmenu")) { update_miscassistmenu(); }
+
+    /* mainmenu -> miscassistmenu -> steeringassistmenu */
+    if (menu.CurrentMenu("steeringassistmenu")) { update_steeringassistmenu(); }
 
     /* mainmenu -> debugmenu */
     if (menu.CurrentMenu("debugmenu")) { update_debugmenu(); }

@@ -75,6 +75,10 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetBoolValue("OPTIONS", "HardLimiter", HardLimiter);
     settingsGeneral.SetBoolValue("OPTIONS", "CustomABS", CustomABS);
     settingsGeneral.SetBoolValue("OPTIONS", "ABSFilter", ABSFilter);
+    
+    //[CUSTOM_STEERING]
+    settingsGeneral.SetBoolValue("CUSTOM_STEERING", "Enabled", CustomSteering.Enabled);
+    settingsGeneral.SetDoubleValue("CUSTOM_STEERING", "CountersteerMult", CustomSteering.CountersteerMult);
 
     // [SHIFT_OPTIONS]
     settingsGeneral.SetBoolValue("SHIFT_OPTIONS", "UpshiftCut", UpshiftCut);
@@ -183,9 +187,6 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetBoolValue("DEBUG", "DisplayGearingInfo", DisplayGearingInfo);
     settingsGeneral.SetBoolValue("DEBUG", "DisplayNPCInfo", ShowNPCInfo);
     settingsGeneral.SetBoolValue("DEBUG", "DisableInputDetect", DisableInputDetect);
-
-    settingsGeneral.SetBoolValue("DEBUG", "EnhancedSteering", g_DefaultOverride);
-    settingsGeneral.SetDoubleValue("DEBUG", "CSMult", g_CountersteerMult);
 
     result = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
@@ -334,6 +335,10 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     CurrGearMinRPM = settingsGeneral.GetDoubleValue("AUTO_BOX", "CurrGearMinRPM", 0.27f);
     EcoRate = settingsGeneral.GetDoubleValue("AUTO_BOX", "EcoRate", 0.05f);
     DownshiftTimeoutMult = settingsGeneral.GetDoubleValue("AUTO_BOX", "DownshiftTimeoutMult", 1.0f);
+
+    // [CUSTOM_STEERING]
+    CustomSteering.Enabled = settingsGeneral.GetBoolValue("CUSTOM_STEERING", "Enabled", false);
+    CustomSteering.CountersteerMult = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "CountersteerMult", 1.0f);
 
     // [HUD]
     HUD = settingsGeneral.GetBoolValue			("HUD", "EnableHUD", true);
@@ -496,8 +501,6 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     ShowNPCInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayNPCInfo", false);
     LogLevel = settingsGeneral.GetLongValue("DEBUG", "LogLevel", INFO);
     DisableInputDetect = settingsGeneral.GetBoolValue("DEBUG", "DisableInputDetect", false);
-    g_DefaultOverride = settingsGeneral.GetBoolValue("DEBUG", "EnhancedSteering");
-    g_CountersteerMult = settingsGeneral.GetDoubleValue("DEBUG", "CSMult", 1.0f);
 }
 
 void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {

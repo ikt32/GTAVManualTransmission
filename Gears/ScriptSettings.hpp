@@ -2,7 +2,6 @@
 #include <Windows.h>
 
 #include <vector>
-#include "simpleini/SimpleIni.h"
 #include "ShiftModes.h"
 #include "Util/Logger.hpp"
 
@@ -48,6 +47,12 @@ public:
     bool ABSFilter = false;
 
     bool UseShifterForAuto = false;
+
+    struct {
+        bool Enabled;
+        float CountersteerMult;
+        float CountersteerLimit;
+    } CustomSteering;
 
     // misc stuff
     bool HillBrakeWorkaround = false;
