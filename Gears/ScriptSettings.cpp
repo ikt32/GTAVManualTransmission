@@ -79,6 +79,7 @@ void ScriptSettings::SaveGeneral() const {
     //[CUSTOM_STEERING]
     settingsGeneral.SetBoolValue("CUSTOM_STEERING", "Enabled", CustomSteering.Enabled);
     settingsGeneral.SetDoubleValue("CUSTOM_STEERING", "CountersteerMult", CustomSteering.CountersteerMult);
+    settingsGeneral.SetDoubleValue("CUSTOM_STEERING", "CountersteerLimit", CustomSteering.CountersteerLimit);
 
     // [SHIFT_OPTIONS]
     settingsGeneral.SetBoolValue("SHIFT_OPTIONS", "UpshiftCut", UpshiftCut);
@@ -339,6 +340,7 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     // [CUSTOM_STEERING]
     CustomSteering.Enabled = settingsGeneral.GetBoolValue("CUSTOM_STEERING", "Enabled", false);
     CustomSteering.CountersteerMult = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "CountersteerMult", 1.0f);
+    CustomSteering.CountersteerLimit = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "CountersteerLimit", 15.0f);
 
     // [HUD]
     HUD = settingsGeneral.GetBoolValue			("HUD", "EnableHUD", true);
