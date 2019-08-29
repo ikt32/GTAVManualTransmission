@@ -2572,12 +2572,7 @@ float Racer_calculateDesiredHeading(float steeringMax, float desiredHeading,
         correction = travelDir + desiredHeading;
     }
 
-    if (correction > steeringMax)
-        correction = steeringMax;
-    if (correction < -steeringMax)
-        correction = -steeringMax;
-
-    return correction;
+    return std::clamp(correction, -steeringMax, steeringMax);
 }
 
 void PlayerRacer_UpdateControl() {
