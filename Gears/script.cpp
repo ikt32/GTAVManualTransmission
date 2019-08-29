@@ -2548,7 +2548,7 @@ void drawSphere(Vector3 p, float scale, Color c) {
 // Returns in radians
 float Racer_calculateDesiredHeading(float steeringMax, float desiredHeading,
     float reduction) {
-    desiredHeading *= reduction; // TODO: Figure out if this is what R* does or not
+    desiredHeading *= reduction * steeringMax; // TODO: Figure out if this is what R* does or not
     float correction = desiredHeading;
 
     Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
@@ -2610,7 +2610,7 @@ void PlayerRacer_UpdateControl() {
     }
     mSteerPrev = steerCurr;
 
-    float desiredHeading = Racer_calculateDesiredHeading(1.0f, steerCurr, reduction);
+    float desiredHeading = Racer_calculateDesiredHeading(limitRadians, steerCurr, reduction);
 
     if (vehData.mClass == VehicleClass::Car) {
         // TODO: Deluxo and more funky cars?
