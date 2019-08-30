@@ -49,9 +49,11 @@ public:
     bool UseShifterForAuto = false;
 
     struct {
-        bool Enabled;
+        int Mode;
         float CountersteerMult;
         float CountersteerLimit;
+        float SteeringMult;
+        float SteeringReduction;
     } CustomSteering;
 
     // misc stuff
@@ -173,13 +175,8 @@ public:
     // [OPTIONS]
     bool EnableWheel = false;
     bool WheelWithoutManual = true;
-    bool PatchSteering = false;
-    bool PatchSteeringAlways = false;
-    bool PatchSteeringControl = false;
     bool LogiLEDs = false;
     bool HPatternKeyboard = false;
-    float SteeringReductionWheel = 0.0f;
-    float SteeringReductionOther = 0.0f;
 
     // [FORCE_FEEDBACK]
     bool EnableFFB = true;
@@ -197,7 +194,6 @@ public:
     float SteerAngleBike = 180.0f;
     float SteerAngleBoat = 360.0f;
     float GameSteerMultWheel = 1.0f;
-    float GameSteerMultOther = 1.0f;
     float SteerGamma = 1.0f;
 
     // [THROTTLE]

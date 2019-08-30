@@ -511,14 +511,15 @@ void stopForceFeedback() {
     carControls.StopFFB(settings.LogiLEDs);
 }
 
-void update_steeringpatches() {
-    if (settings.CustomSteering.Enabled)
-        return;
+float Racer_getSteeringAngle(Vehicle v);
+void PlayerRacer_UpdateControl();
 
+void update_steering() {
     bool isCar = vehData.mClass == VehicleClass::Car;
     bool useWheel = carControls.PrevInput == CarControls::Wheel;
-    if (isCar && settings.PatchSteering &&
-        (useWheel || settings.PatchSteeringAlways)) {
+    bool customSteering = settings.CustomSteering.Mode > 0;
+
+    if (isCar && (useWheel || customSteering)) {
         if (!MemoryPatcher::SteeringAssistPatcher.Patched())
             MemoryPatcher::PatchSteeringAssist();
     }
@@ -527,7 +528,7 @@ void update_steeringpatches() {
             MemoryPatcher::RestoreSteeringAssist();
     }
 
-    if (isCar && useWheel && settings.PatchSteeringControl) {
+    if (isCar && (useWheel || customSteering)) {
         if (!MemoryPatcher::SteeringControlPatcher.Patched())
             MemoryPatcher::PatchSteeringControl();
     }
@@ -535,40 +536,47 @@ void update_steeringpatches() {
         if (MemoryPatcher::SteeringControlPatcher.Patched())
             MemoryPatcher::RestoreSteeringControl();
     }
+
     if (isVehicleAvailable(vehicle, playerPed)) {
         updateSteeringMultiplier();
     }
+
+    if (customSteering) {
+        PlayerRacer_UpdateControl();
+    }
+
+    if (settings.DisplayInfo) {
+        float steeringAngle = Racer_getSteeringAngle(vehicle);
+
+        Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
+        Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(vehicle, 1);
+        Vector3 travelRelative = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, speedVector.x, speedVector.y, speedVector.z);
+
+        float steeringAngleRelX = ENTITY::GET_ENTITY_SPEED(vehicle) * -sin(steeringAngle);
+        float steeringAngleRelY = ENTITY::GET_ENTITY_SPEED(vehicle) * cos(steeringAngle);
+        Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, steeringAngleRelX, steeringAngleRelY, 0.0f);
+
+        //showText(0.3f, 0.15f, 0.5f, fmt::format("Angle: {}", rad2deg(steeringAngle)));
+
+        GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, travelRelative.x, travelRelative.y, travelRelative.z, 0, 255, 0, 255);
+        drawSphere(travelRelative, 0.25f, { 0, 255, 0, 255 });
+        GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, steeringWorld.x, steeringWorld.y, steeringWorld.z, 255, 0, 255, 255);
+        drawSphere(steeringWorld, 0.25f, { 255, 0, 255, 255 });
+    }
 }
 
-// From CustomSteering
+// From CustomSteering TODO Merge into the new CustomSteering thing
+// calculateReduction
 void updateSteeringMultiplier() {
-    float mult = 1;
-
-    if (MemoryPatcher::SteeringAssistPatcher.Patched()) {
-        Vector3 vel = ENTITY::GET_ENTITY_VELOCITY(vehicle);
-        Vector3 pos = ENTITY::GET_ENTITY_COORDS(vehicle, 1);
-        Vector3 motion = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, pos.x + vel.x, pos.y + vel.y, pos.z + vel.z);
-
-        if (motion.y > 3) {
-            mult = (0.15f + (powf((1.0f / 1.13f), (abs(motion.y) - 7.2f))));
-            if (mult != 0) { mult = floorf(mult * 1000) / 1000; }
-            if (mult > 1) { mult = 1; }
-        }
-
-        if (carControls.PrevInput == CarControls::Wheel) {
-            mult = (1 + (mult - 1) * settings.SteeringReductionWheel);
-        }
-        else {
-            mult = (1 + (mult - 1) * settings.SteeringReductionOther);
-        }
-    }
+    float mult = 1.0f;
 
     if (carControls.PrevInput == CarControls::Wheel) {
         mult = mult * settings.GameSteerMultWheel;
     }
     else {
-        mult = mult * settings.GameSteerMultOther;
+        mult = mult * settings.CustomSteering.SteeringMult;
     }
+    // TODO: Consider not using and moving steering reduction/mult to input side
     ext.SetSteeringMultiplier(vehicle, mult);
 }
 
@@ -1449,7 +1457,7 @@ void functionLimiter() {
 
 // Anti-Deadzone.
 void SetControlADZ(eControl control, float value, float adz) {
-    CONTROLS::_SET_CONTROL_NORMAL(0, control, sgn(value)*adz+(1.0f-adz)*value);
+    CONTROLS::_SET_CONTROL_NORMAL(0, control, sgn(value) * adz + (1.0f - adz) * value);
 }
 
 void functionRealReverse() {
@@ -1968,7 +1976,7 @@ void doWheelSteering() {
      * Both should work without any deadzone, with a note that the second one
      * does need a specified anti-deadzone (recommended: 24-25%)
      */
-    if (vehData.mClass == VehicleClass::Car && settings.PatchSteeringControl) {
+    if (vehData.mClass == VehicleClass::Car) {
         ext.SetSteeringInputAngle(vehicle, -effSteer);
     }
     else {
@@ -2474,49 +2482,9 @@ float Racer_getSteeringAngle(Vehicle v) {
     return largestAngle;
 }
 
-// TODO: Check if native controls can be used (after disable).
-void PlayerRacer_getControllerControls(bool& handbrake, float& throttle, float& brake, float& steer) {
-    XInputController& mXInput = *carControls.GetRawController();
-
-    // Basic input stuff
-    handbrake = mXInput.IsButtonPressed(XInputController::RightShoulder);
-    throttle = mXInput.GetAnalogValue(XInputController::RightTrigger);
-    brake = mXInput.GetAnalogValue(XInputController::LeftTrigger);
-    steer = mXInput.GetAnalogValue(XInputController::LeftThumbLeft);
-    if (steer == 0.0f) steer = -mXInput.GetAnalogValue(XInputController::LeftThumbRight);
-    bool reverseSwitch = mXInput.IsButtonPressed(XInputController::LeftShoulder);
-    if (reverseSwitch)
-        throttle = -mXInput.GetAnalogValue(XInputController::RightTrigger);
-}
-
-// TODO: Check if native controls can be used.
-void PlayerRacer_getKeyboardControls(bool& handbrake, float& throttle, float& brake, float& steer) {
-    handbrake = GetAsyncKeyState(' ') & 0x8000 ? 1.0f : 0.0f;
-    throttle = GetAsyncKeyState('W') & 0x8000 ? 1.0f : 0.0f;
-    float reverse = GetAsyncKeyState('I') & 0x8000 ? 1.0f : 0.0f;
-    if (reverse > 0.5)
-        throttle = -1.0f;
-
-    brake = GetAsyncKeyState('S') & 0x8000 ? 1.0f : 0.0f;
-    float left = GetAsyncKeyState('A') & 0x8000 ? 1.0f : 0.0f;
-    float right = GetAsyncKeyState('D') & 0x8000 ? 1.0f : 0.0f;
-    steer = left - right;
-    //steer = -CONTROLS::GET_DISABLED_CONTROL_NORMAL(1, eControl::ControlMoveLeftRight);
-}
-
-void PlayerRacer_getControls(bool& handbrake, float& throttle, float& brake, float& steer) {
-    if (carControls.PrevInput == CarControls::InputDevices::Controller) {
-        PlayerRacer_getControllerControls(handbrake, throttle, brake, steer);
-    }
-    else {
-        PlayerRacer_getKeyboardControls(handbrake, throttle, brake, steer);
-    }
-}
-
 // TODO: Move to control class or something
 float mSteerPrev = 0.0f;
 
-// TODO: Merge with other reduct class
 float Racer_calculateReduction() {
     Vehicle mVehicle = vehicle;
     float mult = 1;
@@ -2529,26 +2497,15 @@ float Racer_calculateReduction() {
         if (mult != 0) { mult = floorf(mult * 1000) / 1000; }
         if (mult > 1) { mult = 1; }
     }
-    mult = (1 + (mult - 1) * settings.SteeringReductionOther);
+    mult = (1 + (mult - 1) * settings.CustomSteering.SteeringReduction);
     return mult;
-}
-
-// TODO: Move to debug tools
-void drawSphere(Vector3 p, float scale, Color c) {
-    GRAPHICS::DRAW_MARKER(eMarkerType::MarkerTypeDebugSphere,
-        p.x, p.y, p.z,
-        0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f,
-        scale, scale, scale,
-        c.R, c.G, c.B, c.A,
-        false, false, 2, false, nullptr, nullptr, false);
 }
 
 // TODO: Re-use for steering wheel!
 // Returns in radians
-float Racer_calculateDesiredHeading(float steeringMax, float desiredHeading,
-    float reduction) {
-    desiredHeading *= reduction * steeringMax; // TODO: Figure out if this is what R* does or not
+float Racer_calculateDesiredHeading(float steeringMax, float desiredHeading, float reduction) {
+    // Scale input with both reduction and steering limit
+    desiredHeading = desiredHeading * reduction * steeringMax;
     float correction = desiredHeading;
 
     Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
@@ -2563,10 +2520,11 @@ float Racer_calculateDesiredHeading(float steeringMax, float desiredHeading,
         }
         // Correct for reverse
         travelDir *= sgn(speedVector.y);
-        // Custom user multiplier
-        travelDir *= settings.CustomSteering.CountersteerMult;
 
-        // Steering-corrected value
+        // Custom user multiplier. Division by steeringmult needed to neutralize over-correction.
+        travelDir *= settings.CustomSteering.CountersteerMult / settings.CustomSteering.SteeringMult;
+
+        // clamp auto correction to countersteer limit
         travelDir = std::clamp(travelDir, deg2rad(-settings.CustomSteering.CountersteerLimit), deg2rad(settings.CustomSteering.CountersteerLimit));
 
         correction = travelDir + desiredHeading;
@@ -2576,19 +2534,14 @@ float Racer_calculateDesiredHeading(float steeringMax, float desiredHeading,
 }
 
 void PlayerRacer_UpdateControl() {
-    Vehicle mVehicle = vehicle;
+    if (!isVehicleAvailable(vehicle, playerPed))
+        return;
 
-    float limitRadians = ext.GetMaxSteeringAngle(mVehicle);
+    float limitRadians = ext.GetMaxSteeringAngle(vehicle);
     float reduction = Racer_calculateReduction();
 
-    bool handbrake = false;
-    float throttle = 0.0f;
-    float brake = 0.0f;
-    float steer = 0.0f; //-1 to 1
+    float steer = -CONTROLS::GET_DISABLED_CONTROL_NORMAL(1, ControlMoveLeftRight);
 
-    PlayerRacer_getControls(handbrake, throttle, brake, steer);
-
-    // Only user input is lerp'd
     float steerCurr;
 
     float steerValGammaL = pow(-steer, settings.SteerGamma);
@@ -2623,50 +2576,13 @@ void PlayerRacer_UpdateControl() {
     }
     // TODO: Re-enable for airborne && deluxo
     // Disable steering and aircrobatics controls
+
+    // Note: This breaks mouse steering, but is needed to get rid of wonky physics...
     CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
 
     // Both need to be set, top one with radian limit
-    ext.SetSteeringAngle(mVehicle, settings.GameSteerMultOther * desiredHeading);
-    ext.SetSteeringInputAngle(mVehicle, settings.GameSteerMultOther * desiredHeading * (1.0f / limitRadians));
-}
-
-// TODO: Don't yeet.
-void update_yeet() {
-    if (!isVehicleAvailable(vehicle, playerPed))
-        return;
-
-    if (settings.DisplayInfo) {
-        float steeringAngle = Racer_getSteeringAngle(vehicle);
-
-        Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
-        Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(vehicle, 1);
-        Vector3 travelRelative = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, speedVector.x, speedVector.y, speedVector.z);
-
-        float steeringAngleRelX = ENTITY::GET_ENTITY_SPEED(vehicle) * -sin(steeringAngle);
-        float steeringAngleRelY = ENTITY::GET_ENTITY_SPEED(vehicle) * cos(steeringAngle);
-        Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, steeringAngleRelX, steeringAngleRelY, 0.0f);
-
-        // TODO: Hide somewhere nice.
-        showText(0.3f, 0.15f, 0.5f, fmt::format("Angle: {}", rad2deg(steeringAngle)));
-
-        GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, travelRelative.x, travelRelative.y, travelRelative.z, 0, 255, 0, 255);
-        drawSphere(travelRelative, 0.25f, { 0, 255, 0, 255 });
-        GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, steeringWorld.x, steeringWorld.y, steeringWorld.z, 255, 0, 255, 255);
-        drawSphere(steeringWorld, 0.25f, { 255, 0, 255, 255 });
-    }
-
-    if (!settings.CustomSteering.Enabled) {
-        // Restore should be handled by the normal stuff, TODO eventually this should be merged
-        return;
-    }
-
-    if (!MemoryPatcher::SteeringAssistPatcher.Patched())
-        MemoryPatcher::PatchSteeringAssist();
-
-    if (!MemoryPatcher::SteeringControlPatcher.Patched())
-        MemoryPatcher::PatchSteeringControl();
-
-    PlayerRacer_UpdateControl();
+    ext.SetSteeringAngle(vehicle,       desiredHeading);
+    ext.SetSteeringInputAngle(vehicle,  desiredHeading * (1.0f / limitRadians));
 }
 
 void main() {
@@ -2714,14 +2630,13 @@ void main() {
         update_player();
         update_vehicle();
         update_inputs();
-        update_steeringpatches();
+        update_steering();
         update_hud();
         update_input_controls();
         update_manual_transmission();
         update_misc_features();
         update_menu();
         update_update_notification();
-        update_yeet();
         WAIT(0);
     }
 }
