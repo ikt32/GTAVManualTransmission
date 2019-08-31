@@ -217,7 +217,7 @@ public:
     void KeyboardSaveKey(const std::string &confTag, const std::string &key);
     void ControllerSaveButton(const std::string &confTag, const std::string &button);
     void LControllerSaveButton(const std::string & confTag, int button);
-    void SteeringAddWheelToKey(const std::string & cs, ptrdiff_t index, int button, const std::string & key_name);
+    void SteeringAddWheelToKey(const std::string & conftag, ptrdiff_t index, int button, const std::string & keyName);
     bool SteeringClearWheelToKey(int button);
 
 private:
