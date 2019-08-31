@@ -545,7 +545,7 @@ void update_steering() {
         PlayerRacer_UpdateControl();
     }
 
-    if (settings.DisplayInfo) {
+    if (settings.DisplayInfo && isVehicleAvailable(vehicle, playerPed)) {
         float steeringAngle = Racer_getSteeringAngle(vehicle);
 
         Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
