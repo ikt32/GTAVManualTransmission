@@ -2565,20 +2565,29 @@ void PlayerRacer_UpdateControl() {
 
     float desiredHeading = Racer_calculateDesiredHeading(limitRadians, steerCurr, reduction);
 
-    if (vehData.mClass == VehicleClass::Car) {
-        // TODO: Deluxo and more funky cars?
-        if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle) && (ENTITY::GET_ENTITY_MODEL(vehicle) == GAMEPLAY::GET_HASH_KEY("­TOWTRUCK2") || ENTITY::GET_ENTITY_MODEL(vehicle) == GAMEPLAY::GET_HASH_KEY("­TOWTRUCK"))) {
-            // noop
-        }
-        else {
+    switch(ENTITY::GET_ENTITY_MODEL(vehicle)) {
+    case joaat("TOWTRUCK"):
+    case joaat("TOWTRUCK2"):
+        if (!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle))
             CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveUpDown, true);
+        CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
+        break;
+    case joaat("deluxo"):
+    case joaat("stromberg"):
+        if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
+            CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveUpDown, true);
+            CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
         }
+    case joaat("oppressor"):
+    case joaat("oppressor2"):
+        if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle))
+            CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
+        break;
+    default:
+        CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveUpDown, true);
+        CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
+        break;
     }
-    // TODO: Re-enable for airborne && deluxo
-    // Disable steering and aircrobatics controls
-
-    // Note: This breaks mouse steering, but is needed to get rid of wonky physics...
-    CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
 
     // Both need to be set, top one with radian limit
     ext.SetSteeringAngle(vehicle,       desiredHeading);
