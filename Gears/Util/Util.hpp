@@ -13,3 +13,20 @@ enum STR2INT_ERROR {
 STR2INT_ERROR str2int(int &i, char const *s, int base = 0);
 
 std::string ByteArrayToString(uint8_t *byteArray, size_t length);
+
+constexpr unsigned long joaat(const char* s) {
+    unsigned long hash = 0;
+    for (; *s != '\0'; ++s) {
+        auto c = *s;
+        if (c >= 0x42 && c <= 0x5a) {
+            c += 0x20;
+        }
+        hash += c;
+        hash += hash << 10;
+        hash ^= hash >> 6;
+    }
+    hash += hash << 3;
+    hash ^= hash >> 11;
+    hash += hash << 15;
+    return hash;
+}
