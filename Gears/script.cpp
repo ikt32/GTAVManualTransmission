@@ -517,7 +517,7 @@ void PlayerRacer_UpdateControl();
 void update_steering() {
     bool isCar = vehData.mClass == VehicleClass::Car;
     bool useWheel = carControls.PrevInput == CarControls::Wheel;
-    bool customSteering = settings.CustomSteering.Mode > 0;
+    bool customSteering = settings.CustomSteering.Mode > 0 && !useWheel;
 
     if (isCar && (useWheel || customSteering)) {
         if (!MemoryPatcher::SteeringAssistPatcher.Patched())
@@ -545,7 +545,7 @@ void update_steering() {
         PlayerRacer_UpdateControl();
     }
 
-    if (settings.DisplayInfo && isVehicleAvailable(vehicle, playerPed)) {
+    if (settings.DisplayInfo && isVehicleAvailable(vehicle, playerPed) && customSteering) {
         float steeringAngle = Racer_getSteeringAngle(vehicle);
 
         Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
@@ -1977,6 +1977,7 @@ void doWheelSteering() {
      * does need a specified anti-deadzone (recommended: 24-25%)
      */
     if (vehData.mClass == VehicleClass::Car) {
+        ext.SetSteeringAngle(vehicle, -effSteer * ext.GetMaxSteeringAngle(vehicle));
         ext.SetSteeringInputAngle(vehicle, -effSteer);
     }
     else {
