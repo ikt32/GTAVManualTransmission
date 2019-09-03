@@ -2074,38 +2074,40 @@ void calculateSoftLock(int &totalForce, int& damperForce) {
 
 // Despite being scientifically inaccurate, "self-aligning torque" is the best description.
 int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRatio, bool isCar) {
-    pid.setD(ENTITY::GET_ENTITY_SPEED(vehicle) * 0.1f);
+    float speed = ENTITY::GET_ENTITY_SPEED(vehicle);
+    pid.setD(static_cast<double>(speed) * 0.1);
     Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
     Vector3 rotVector = ENTITY::GET_ENTITY_ROTATION_VELOCITY(vehicle);
-    Vector3 expectedVector = Vector3{
-        ENTITY::GET_ENTITY_SPEED(vehicle) * -sin(steeringAngle),
-        0,
-        ENTITY::GET_ENTITY_SPEED(vehicle) * cos(steeringAngle),
-        0,
-        0,
-        0
+    Vector3 rotRelative {
+        speed * -sin(rotVector.z), 0,
+        speed* cos(rotVector.z), 0,
+        0, 0
+    };
+
+    Vector3 expectedVector {
+        speed * -sin(steeringAngle / settings.GameSteerMultWheel), 0,
+        speed* cos(steeringAngle / settings.GameSteerMultWheel), 0,
+        0, 0
     };
     
-    double error = pid.getOutput(expectedVector.x, speedVector.x * 0.5f + rotVector.x * 0.5f);
+    float error = static_cast<float>(pid.getOutput(expectedVector.x, static_cast<double>(speedVector.x) * 0.5));
 
-    int satForce = static_cast<int>(settings.SATAmpMult * defaultGain * -error);
+    int satForce = static_cast<int>(settings.SATAmpMult * static_cast<float>(defaultGain) * -error);
 
     // "Reduction" effects - those that affect already calculated things
     bool understeering = false;
     float understeer = 0.0f;
     if (isCar) {
-        // TODO: New implementation
-        //float turnRelativeNormX = speedVector.x * 0.5f + rotVector.x * 0.5f;
-        //float xxx = ENTITY::GET_ENTITY_SPEED(vehicle) * -sin(steeringAngle);
-        //understeer = sgn(speedVector.x - xxx) * (turnRelativeNormX - xxx);
-        //if (xxx > turnRelativeNormX && turnRelativeNormX > speedVector.x ||
-        //    xxx < turnRelativeNormX && turnRelativeNormX < speedVector.x) {
-        //    satForce = (int)((float)satForce / std::max(1.0f, 3.3f * understeer + 1.0f));
-        //    understeering = true;
-        //}
+        float expTurnX = speedVector.x * 0.5f + rotRelative.x * 0.5f;
+        understeer = sgn(speedVector.x - expectedVector.x) * (expTurnX - expectedVector.x);
+        if (expectedVector.x > expTurnX && expTurnX > speedVector.x ||
+            expectedVector.x < expTurnX && expTurnX < speedVector.x) {
+            satForce = static_cast<int>(static_cast<float>(satForce) / std::max(1.0f, 3.3f * understeer + 1.0f));
+            understeering = true;
+        }
     }
 
-    satForce = (int)((float)satForce * (1.0f - wheelsOffGroundRatio));
+    satForce = static_cast<int>(static_cast<float>(satForce) * (1.0f - wheelsOffGroundRatio));
 
     if (vehData.mClass == VehicleClass::Car || vehData.mClass == VehicleClass::Quad) {
         if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
