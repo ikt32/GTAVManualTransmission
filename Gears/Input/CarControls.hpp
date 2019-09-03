@@ -194,6 +194,7 @@ public:
     void PlayFFBCollision(int collisionForce);
     void PlayLEDs(float rpm, float firstLed, float lastLed);
     void StopFFB(bool turnOffLeds);
+    float GetAxisSpeed(WheelAxisType axis);
     bool WheelAvailable();
     WheelDirectInput& GetWheel();
 

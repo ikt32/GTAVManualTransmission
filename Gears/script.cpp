@@ -2048,7 +2048,7 @@ int calculateDetail() {
     return static_cast<int>(1000.0f * settings.DetailMult * compSpeedTotal);
 }
 
-void calculateSoftLock(int &totalForce) {
+void calculateSoftLock(int &totalForce, int& damperForce) {
     float steerMult;
     if (vehData.mClass == VehicleClass::Bike || vehData.mClass == VehicleClass::Quad)
         steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
@@ -2058,9 +2058,16 @@ void calculateSoftLock(int &totalForce) {
         steerMult = settings.SteerAngleMax / settings.SteerAngleBoat;
     }
     float effSteer = steerMult * 2.0f * (carControls.SteerVal - 0.5f);
+    float steerSpeed = carControls.GetAxisSpeed(CarControls::WheelAxisType::Steer);
     if (effSteer > 1.0f) {
+        if (steerSpeed > 0.1f) {
+            damperForce = (int)map(steerSpeed, 0.1f, 0.4f, (float)damperForce, 40000.0f);
+        }
         totalForce = (int)map(effSteer, 1.0f, steerMult, (float)totalForce, 40000.0f);
     } else if (effSteer < -1.0f) {
+        if (steerSpeed < -0.1f) {
+            damperForce = (int)map(steerSpeed, -0.1f, -0.4f, (float)damperForce, 40000.0f);
+        }
         totalForce = (int)map(effSteer, -1.0f, -steerMult, (float)totalForce, -40000.0f);
     }
 }
@@ -2238,7 +2245,7 @@ void playFFBGround() {
 
     int totalForce = satForce + detailForce;
     totalForce = (int)((float)totalForce * rotationScale);
-    calculateSoftLock(totalForce);
+    calculateSoftLock(totalForce, damperForce);
     carControls.PlayFFBDynamics(std::clamp(totalForce, -10000, 10000), std::clamp(damperForce, -10000, 10000));
 
     const float minGforce = 5.0f;
@@ -2293,7 +2300,7 @@ void playFFBWater() {
 
     int totalForce = satForce + detailForce;
     totalForce = (int)((float)totalForce * rotationScale);
-    calculateSoftLock(totalForce);
+    calculateSoftLock(totalForce, damperForce);
     carControls.PlayFFBDynamics(totalForce, damperForce);
 
     if (settings.DisplayInfo) {

@@ -420,6 +420,11 @@ void CarControls::StopFFB(bool turnOffLeds) {
     mWheelInput.StopEffects();
 }
 
+float CarControls::GetAxisSpeed(WheelAxisType axis) {
+    auto diAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(axis)]);
+    return mWheelInput.GetAxisSpeed(diAxis, WheelAxesGUIDs[static_cast<int>(axis)]);
+}
+
 bool CarControls::WheelAvailable() {
     return mWheelInput.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)]);
 }
