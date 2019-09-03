@@ -2254,7 +2254,7 @@ void playFFBGround() {
     bool collision = gForce > minGforce;
     int res = static_cast<int>(map(gForce, minGforce, maxGforce, minForce, maxForce) * settings.CollisionMult);
     if (collision) {
-        carControls.PlayFFBCollision(res);
+        carControls.PlayFFBCollision(std::clamp(res, -10000, 10000));
     }
 
     if (settings.DisplayInfo && collision) {
