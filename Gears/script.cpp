@@ -2067,27 +2067,19 @@ void calculateSoftLock(int &totalForce) {
 
 // Despite being scientifically inaccurate, "self-aligning torque" is the best description.
 int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRatio, bool isCar) {
-    Vector3 velocityWorld = ENTITY::GET_ENTITY_VELOCITY(vehicle);
-    Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(vehicle, 1);
-    Vector3 travelWorld = velocityWorld + positionWorld;
-    Vector3 travelRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, travelWorld.x, travelWorld.y, travelWorld.z);
-
-    Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(vehicle);
-    Vector3 turnWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, ENTITY::GET_ENTITY_SPEED(vehicle)*-sin(rotationVelocity.z), ENTITY::GET_ENTITY_SPEED(vehicle)*cos(rotationVelocity.z), 0.0f);
-    Vector3 turnRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, turnWorld.x, turnWorld.y, turnWorld.z);
-    float turnRelativeNormX = (travelRelative.x + turnRelative.x) / 2.0f;
-    //float turnRelativeNormY = (travelRelative.y + turnRelative.y) / 2.0f;
-    //Vector3 turnWorldNorm = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, turnRelativeNormX, turnRelativeNormY, 0.0f);
-
-    float steeringAngleRelX = ENTITY::GET_ENTITY_SPEED(vehicle)*-sin(steeringAngle);
-    float steeringAngleRelY = ENTITY::GET_ENTITY_SPEED(vehicle)*cos(steeringAngle);
-    Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, steeringAngleRelX, steeringAngleRelY, 0.0f);
-    Vector3 steeringRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, steeringWorld.x, steeringWorld.y, steeringWorld.z);
-
-    float setpoint = travelRelative.x;
-
-    // This can be tuned but it feels pretty nice right now with Kp = 1.0, Ki, Kd = 0.0.
-    double error = pid.getOutput(steeringRelative.x, setpoint);
+    pid.setD(ENTITY::GET_ENTITY_SPEED(vehicle) * 0.1f);
+    Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
+    Vector3 rotVector = ENTITY::GET_ENTITY_ROTATION_VELOCITY(vehicle);
+    Vector3 expectedVector = Vector3{
+        ENTITY::GET_ENTITY_SPEED(vehicle) * -sin(steeringAngle),
+        0,
+        ENTITY::GET_ENTITY_SPEED(vehicle) * cos(steeringAngle),
+        0,
+        0,
+        0
+    };
+    
+    double error = pid.getOutput(expectedVector.x, speedVector.x * 0.5f + rotVector.x * 0.5f);
 
     int satForce = static_cast<int>(settings.SATAmpMult * defaultGain * -error);
 
@@ -2095,12 +2087,15 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     bool understeering = false;
     float understeer = 0.0f;
     if (isCar) {
-        understeer = sgn(travelRelative.x - steeringAngleRelX) * (turnRelativeNormX - steeringAngleRelX);
-        if (steeringAngleRelX > turnRelativeNormX && turnRelativeNormX > travelRelative.x ||
-            steeringAngleRelX < turnRelativeNormX && turnRelativeNormX < travelRelative.x) {
-            satForce = (int)((float)satForce / std::max(1.0f, 3.3f * understeer + 1.0f));
-            understeering = true;
-        }
+        // TODO: New implementation
+        //float turnRelativeNormX = speedVector.x * 0.5f + rotVector.x * 0.5f;
+        //float xxx = ENTITY::GET_ENTITY_SPEED(vehicle) * -sin(steeringAngle);
+        //understeer = sgn(speedVector.x - xxx) * (turnRelativeNormX - xxx);
+        //if (xxx > turnRelativeNormX && turnRelativeNormX > speedVector.x ||
+        //    xxx < turnRelativeNormX && turnRelativeNormX < speedVector.x) {
+        //    satForce = (int)((float)satForce / std::max(1.0f, 3.3f * understeer + 1.0f));
+        //    understeering = true;
+        //}
     }
 
     satForce = (int)((float)satForce * (1.0f - wheelsOffGroundRatio));
@@ -2120,8 +2115,8 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     }
 
     if (settings.DisplayInfo) {
-        showText(0.85, 0.175, 0.4, fmt::format("RelSteer:\t{:.3f}", steeringRelative.x), 4);
-        showText(0.85, 0.200, 0.4, fmt::format("SetPoint:\t{:.3f}", travelRelative.x), 4);
+        //showText(0.85, 0.175, 0.4, fmt::format("RelSteer:\t{:.3f}", steeringRelative.x), 4);
+        //showText(0.85, 0.200, 0.4, fmt::format("SetPoint:\t{:.3f}", travelRelative.x), 4);
         showText(0.85, 0.225, 0.4, fmt::format("Error:\t\t{:.3f}" , error), 4);
         showText(0.85, 0.250, 0.4, fmt::format("{}Under:\t\t{:.3f}~w~", understeering ? "~b~" : "~w~", understeer), 4);
     }
@@ -2244,7 +2239,7 @@ void playFFBGround() {
     int totalForce = satForce + detailForce;
     totalForce = (int)((float)totalForce * rotationScale);
     calculateSoftLock(totalForce);
-    carControls.PlayFFBDynamics(totalForce, damperForce);
+    carControls.PlayFFBDynamics(std::clamp(totalForce, -10000, 10000), std::clamp(damperForce, -10000, 10000));
 
     const float minGforce = 5.0f;
     const float maxGforce = 50.0f;
