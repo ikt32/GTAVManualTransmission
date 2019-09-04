@@ -10,3 +10,4 @@ void showDebugInfo3D(Vector3 location, const std::vector<std::string> &textLines
 void showDebugInfo3DColors(Vector3 location, const std::vector<std::pair<std::string, Color>> &textLines, Color backgroundColor = transparentGray);
 void showNotification(const std::string &message, int *prevNotification = nullptr);
 void showSubtitle(const std::string &message, int duration = 2500);
+void drawSphere(Vector3 p, float scale, Color c);

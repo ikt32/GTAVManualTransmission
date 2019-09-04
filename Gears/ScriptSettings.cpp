@@ -16,7 +16,6 @@
 
 #pragma warning(push)
 #pragma warning(disable: 4244)
-
 ScriptSettings::ScriptSettings() { }
 
 void ScriptSettings::SetFiles(const std::string &general, const std::string &wheel) {
@@ -67,6 +66,13 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetBoolValue("OPTIONS", "HardLimiter", HardLimiter);
     settingsGeneral.SetBoolValue("OPTIONS", "CustomABS", CustomABS);
     settingsGeneral.SetBoolValue("OPTIONS", "ABSFilter", ABSFilter);
+    
+    //[CUSTOM_STEERING]
+    settingsGeneral.SetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
+    settingsGeneral.SetDoubleValue("CUSTOM_STEERING", "CountersteerMult", CustomSteering.CountersteerMult);
+    settingsGeneral.SetDoubleValue("CUSTOM_STEERING", "CountersteerLimit", CustomSteering.CountersteerLimit);
+    settingsGeneral.SetDoubleValue("CUSTOM_STEERING", "SteeringMult", CustomSteering.SteeringMult);
+    settingsGeneral.SetDoubleValue("CUSTOM_STEERING", "SteeringReduction", CustomSteering.SteeringReduction);
 
     // [SHIFT_OPTIONS]
     settingsGeneral.SetBoolValue("SHIFT_OPTIONS", "UpshiftCut", UpshiftCut);
@@ -220,22 +226,11 @@ void ScriptSettings::SaveWheel(CarControls *scriptControl) const {
     // [OPTIONS]
     settingsWheel.SetBoolValue("OPTIONS", "EnableWheel", EnableWheel);
     settingsWheel.SetBoolValue("OPTIONS", "WheelWithoutManual", WheelWithoutManual);
-    settingsWheel.SetBoolValue("OPTIONS", "PatchSteering", PatchSteering);
-    settingsWheel.SetBoolValue("OPTIONS", "PatchSteeringAlways", PatchSteeringAlways);
-    settingsWheel.SetBoolValue("OPTIONS", "PatchSteeringControl", PatchSteeringControl);
+
     settingsWheel.SetBoolValue("OPTIONS", "LogitechLEDs", LogiLEDs);
     settingsWheel.SetBoolValue("OPTIONS", "HPatternKeyboard", HPatternKeyboard);
 
-    //settingsWheel.SetBoolValue("OPTIONS", "InvertSteer", scriptControl->InvertSteer);
-    //settingsWheel.SetBoolValue("OPTIONS", "InvertThrottle", scriptControl->InvertThrottle);
-    //settingsWheel.SetBoolValue("OPTIONS", "InvertBrake", scriptControl->InvertBrake);
-    //settingsWheel.SetBoolValue("OPTIONS", "InvertClutch", scriptControl->InvertClutch);
-
-    settingsWheel.SetDoubleValue("OPTIONS", "SteeringReductionWheel", SteeringReductionWheel);
     settingsWheel.SetDoubleValue("OPTIONS", "GameSteerMultWheel", GameSteerMultWheel);
-    
-    settingsWheel.SetDoubleValue("OPTIONS", "SteeringReductionOther", SteeringReductionOther);
-    settingsWheel.SetDoubleValue("OPTIONS", "GameSteerMultOther", GameSteerMultOther);
     settingsWheel.SetBoolValue("OPTIONS", "UseShifterForAuto", UseShifterForAuto);
 
     // [FORCE_FEEDBACK]
@@ -323,6 +318,13 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     CurrGearMinRPM = settingsGeneral.GetDoubleValue("AUTO_BOX", "CurrGearMinRPM", 0.27f);
     EcoRate = settingsGeneral.GetDoubleValue("AUTO_BOX", "EcoRate", 0.05f);
     DownshiftTimeoutMult = settingsGeneral.GetDoubleValue("AUTO_BOX", "DownshiftTimeoutMult", 1.0f);
+
+    // [CUSTOM_STEERING]
+    CustomSteering.Mode = settingsGeneral.GetLongValue("CUSTOM_STEERING", "Mode", 0);
+    CustomSteering.CountersteerMult = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "CountersteerMult", 1.0f);
+    CustomSteering.CountersteerLimit = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "CountersteerLimit", 15.0f);
+    CustomSteering.SteeringMult = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "SteeringMult", 1.0f);
+    CustomSteering.SteeringReduction = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "SteeringReduction", 1.0f);
 
     // [HUD]
     HUD = settingsGeneral.GetBoolValue			("HUD", "EnableHUD", true);
@@ -485,7 +487,6 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     ShowNPCInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayNPCInfo", false);
     LogLevel = settingsGeneral.GetLongValue("DEBUG", "LogLevel", INFO);
     DisableInputDetect = settingsGeneral.GetBoolValue("DEBUG", "DisableInputDetect", false);
-
 }
 
 void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
@@ -497,24 +498,12 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     // [OPTIONS]
     EnableWheel = settingsWheel.GetBoolValue("OPTIONS", "EnableWheel", true);
     WheelWithoutManual = settingsWheel.GetBoolValue("OPTIONS", "WheelWithoutManual", true);
-//	WheelForBoat = settingsWheel.GetBoolValue("OPTIONS", "WheelForBoat", false);
-    PatchSteering = settingsWheel.GetBoolValue("OPTIONS", "PatchSteering", true);
-    PatchSteeringAlways = settingsWheel.GetBoolValue("OPTIONS", "PatchSteeringAlways", false);
-    PatchSteeringControl = settingsWheel.GetBoolValue("OPTIONS", "PatchSteeringControl", true);
     LogiLEDs = settingsWheel.GetBoolValue("OPTIONS", "LogitechLEDs", false);
     HPatternKeyboard = settingsWheel.GetBoolValue("OPTIONS", "HPatternKeyboard", false);
 
-    SteeringReductionWheel = settingsWheel.GetDoubleValue("OPTIONS", "SteeringReductionWheel", 0.0);
     GameSteerMultWheel = settingsWheel.GetDoubleValue("OPTIONS", "GameSteerMultWheel", 1.0);
 
-    SteeringReductionOther = settingsWheel.GetDoubleValue("OPTIONS", "SteeringReductionOther", 0.0);
-    GameSteerMultOther = settingsWheel.GetDoubleValue("OPTIONS", "GameSteerMultOther", 1.0);
     UseShifterForAuto = settingsWheel.GetBoolValue("OPTIONS", "UseShifterForAuto", false);
-
-    //scriptControl->InvertSteer =	settingsWheel.GetBoolValue("OPTIONS", "InvertSteer", false);
-    //scriptControl->InvertThrottle = settingsWheel.GetBoolValue("OPTIONS", "InvertThrottle", false);
-    //scriptControl->InvertBrake =	settingsWheel.GetBoolValue("OPTIONS", "InvertBrake", false);
-    //scriptControl->InvertClutch =	settingsWheel.GetBoolValue("OPTIONS", "InvertClutch", false);
 
     // [FORCE_FEEDBACK]
     EnableFFB = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Enable", true);

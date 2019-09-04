@@ -2,7 +2,6 @@
 #include <Windows.h>
 
 #include <vector>
-#include "simpleini/SimpleIni.h"
 #include "ShiftModes.h"
 #include "Util/Logger.hpp"
 
@@ -48,6 +47,14 @@ public:
     bool ABSFilter = false;
 
     bool UseShifterForAuto = false;
+
+    struct {
+        int Mode;
+        float CountersteerMult;
+        float CountersteerLimit;
+        float SteeringMult;
+        float SteeringReduction;
+    } CustomSteering;
 
     // misc stuff
     bool HillBrakeWorkaround = false;
@@ -168,13 +175,8 @@ public:
     // [OPTIONS]
     bool EnableWheel = false;
     bool WheelWithoutManual = true;
-    bool PatchSteering = false;
-    bool PatchSteeringAlways = false;
-    bool PatchSteeringControl = false;
     bool LogiLEDs = false;
     bool HPatternKeyboard = false;
-    float SteeringReductionWheel = 0.0f;
-    float SteeringReductionOther = 0.0f;
 
     // [FORCE_FEEDBACK]
     bool EnableFFB = true;
@@ -192,7 +194,6 @@ public:
     float SteerAngleBike = 180.0f;
     float SteerAngleBoat = 360.0f;
     float GameSteerMultWheel = 1.0f;
-    float GameSteerMultOther = 1.0f;
     float SteerGamma = 1.0f;
 
     // [THROTTLE]
@@ -216,7 +217,7 @@ public:
     void KeyboardSaveKey(const std::string &confTag, const std::string &key);
     void ControllerSaveButton(const std::string &confTag, const std::string &button);
     void LControllerSaveButton(const std::string & confTag, int button);
-    void SteeringAddWheelToKey(const std::string & cs, ptrdiff_t index, int button, const std::string & key_name);
+    void SteeringAddWheelToKey(const std::string & conftag, ptrdiff_t index, int button, const std::string & keyName);
     bool SteeringClearWheelToKey(int button);
 
 private:

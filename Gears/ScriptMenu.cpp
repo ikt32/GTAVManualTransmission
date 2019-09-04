@@ -179,6 +179,9 @@ void onMenuClose() {
     saveChanges();
 }
 
+extern bool g_DefaultOverride;
+extern float g_CountersteerMult;
+
 void update_mainmenu() {
     menu.Title("Manual Transmission", 0.90f);
     menu.Subtitle(fmt::format("~b~{}", DISPLAY_VERSION));
@@ -399,40 +402,61 @@ void update_finetuneautooptionsmenu() {
 }
 
 void update_controlsmenu() {
-    menu.Title("Controls");
-    menu.Subtitle("Controls options");
+    menu.Title("Controller and keyboard options");
+    menu.Subtitle("Options and assignments");
 
-    menu.MenuOption("Controller", "controllermenu",
-        { "Change controller control assignments." });
+    menu.MenuOption("Controller options", "controlleroptionsmenu");
 
-    menu.MenuOption("Keyboard", "keyboardmenu",
-        { "Change keyboard control assignments." });
-
-    menu.BoolOption("Non-Xinput controller", carControls.UseLegacyController,
-        { "If you needed to set up your controller in the pause menu, you should enable this." });
-
-    menu.MenuOption("Non-Xinput controller", "legacycontrollermenu",
-        { "Set up the non-Xinput controller with native controls." });
-
-    if (menu.BoolOption("Patch steering for all inputs", settings.PatchSteeringAlways,
-        { "Also patch steering reduction and automatic countersteer for keyboard and controller inputs.",
-            "Only active if this patch is also enabled for steering wheels.",
-            fmt::format("PatchSteering (Wheel) is {}.", settings.PatchSteering ? "enabled" : "disabled") })) {
-        settings.SaveWheel(&carControls);
+    if (carControls.UseLegacyController) {
+        menu.MenuOption("Native controller bindings", "legacycontrollermenu",
+            { "Set up native controller bindings." });
+    }
+    else {
+        menu.MenuOption("Controller bindings", "controllermenu",
+            { "Change controller control bindings." });
     }
 
-    if (menu.FloatOption("Steering reduction (kb/controller)", settings.SteeringReductionOther, 0.0f, 1.0f, 0.01f,
-        { "Reduce steering input at higher speeds.","From InfamousSabre's Custom Steering." })) {
-        settings.SaveWheel(&carControls);
+    menu.MenuOption("Keyboard bindings", "keyboardmenu",
+        { "Change keyboard control bindings." });
+
+    menu.MenuOption("Steering assists", "steeringassistmenu");
+}
+
+void update_controlleroptionsmenu() {
+    menu.Title("Controller options");
+    menu.Subtitle("Controller options");
+
+    menu.BoolOption("Engine button toggles", settings.ToggleEngine,
+        { "Checked: the engine button turns the engine on AND off.",
+            "Not checked: the button only turns the engine on when it's off." });
+
+    menu.IntOption("Long press time (ms)", carControls.CToggleTime, 100, 5000, 50,
+        { "Timeout for long press buttons to activate." });
+
+    menu.IntOption("Max tap time (ms)", carControls.MaxTapTime, 50, 1000, 10,
+        { "Buttons pressed and released within this time are regarded as a tap. Shift up, shift down are tap controls." });
+
+    float currTriggerValue = carControls.GetControllerTrigger();
+    float prevTriggerValue = currTriggerValue;
+    menu.FloatOption("Trigger value", currTriggerValue, 0.25, 1.0, 0.05,
+        { "Threshold for an analog input to be detected as button press." });
+
+    if (currTriggerValue != prevTriggerValue) {
+        carControls.SetControllerTriggerLevel(currTriggerValue);
     }
 
-    if (menu.FloatOption("Steering multiplier (kb/controller)", settings.GameSteerMultOther, 0.01f, 2.0f, 0.01f,
-        { "Increase/decrease steering lock.","From InfamousSabre's Custom Steering." })) {
-        settings.SaveWheel(&carControls);
-    }
+    menu.BoolOption("Block car controls", settings.BlockCarControls,
+        { "Blocks car action controls. Holding activates the original button again.",
+            "Experimental!" });
 
     menu.BoolOption("Block H-pattern on controller", settings.BlockHShift,
         { "Block H-pattern mode when using controller input." });
+
+    menu.BoolOption("Ignore shifts in UI", settings.IgnoreShiftsUI,
+        { "Ignore shift up/shift down while using the phone or when the menu is open" });
+
+    menu.BoolOption("Native controller input", carControls.UseLegacyController,
+        { "Using a controller not supported by XInput? Enable this option and re-bind your controls." });
 }
 
 void update_legacycontrollermenu() {
@@ -478,34 +502,8 @@ void update_legacycontrollermenu() {
 }
 
 void update_controllermenu() {
-    menu.Title("Controller controls");
-    menu.Subtitle("Controller options");
-
-    menu.BoolOption("Engine button toggles", settings.ToggleEngine,
-        { "Checked: the engine button turns the engine on AND off.",
-            "Not checked: the button only turns the engine on when it's off." });
-
-    menu.IntOption("Long press time (ms)", carControls.CToggleTime, 100, 5000, 50,
-        { "Timeout for long press buttons to activate." });
-
-    menu.IntOption("Max tap time (ms)", carControls.MaxTapTime, 50, 1000, 10,
-        { "Buttons pressed and released within this time are regarded as a tap. Shift up, shift down are tap controls." });
-
-    float currTriggerValue = carControls.GetControllerTrigger();
-    float prevTriggerValue = currTriggerValue;
-    menu.FloatOption("Trigger value", currTriggerValue, 0.25, 1.0, 0.05,
-        { "Threshold for an analog input to be detected as button press." });
-
-    if (currTriggerValue != prevTriggerValue) {
-        carControls.SetControllerTriggerLevel(currTriggerValue);
-    }
-
-    menu.BoolOption("Block car controls", settings.BlockCarControls,
-        { "Blocks car action controls. Holding activates the original button again.",
-            "Experimental!" });
-
-    menu.BoolOption("Ignore shifts in UI", settings.IgnoreShiftsUI,
-        { "Ignore shift up/shift down while using the phone or when the menu is open" });
+    menu.Title("Controller bindings");
+    menu.Subtitle("Controller bindings");
 
     int oldIndexUp = getBlockableControlIndex(carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)]);
     if (menu.StringArray("Shift Up blocks", blockableControlsHelp, oldIndexUp)) {
@@ -544,8 +542,8 @@ void update_controllermenu() {
 }
 
 void update_keyboardmenu() {
-    menu.Title("Keyboard controls");
-    menu.Subtitle("Keyboard assignments");
+    menu.Title("Keyboard bindings");
+    menu.Subtitle("Keyboard bindings");
 
     std::vector<std::string> keyboardInfo = {
         "Press RIGHT to clear key",
@@ -584,25 +582,8 @@ void update_wheelmenu() {
         settings.SaveWheel(&carControls);
     }
 
-    if (menu.BoolOption("Patch steering", settings.PatchSteering,
-        { "Patches steering reduction and automatic countersteer for more direct control.",
-          "Recommended to keep this on." })) {
-        settings.SaveWheel(&carControls);
-    }
-
-    if (menu.FloatOption("Steering reduction (wheel)", settings.SteeringReductionWheel, 0.0f, 1.0f, 0.01f,
-        { "Reduce steering input at higher speeds. Best to leave it at 0 for steering wheels." })) {
-        settings.SaveWheel(&carControls);
-    }
-
     if (menu.FloatOption("Steering multiplier (wheel)", settings.GameSteerMultWheel, 0.1f, 2.0f, 0.01f,
         { "Increase steering lock for all cars. You might want to increase it for faster steering and more steering lock." })) {
-    }
-
-    if (menu.BoolOption("Disable non-wheel steering", settings.PatchSteeringControl,
-        { "Disable keyboard and controller inputs for steering. This fixes the jerky animation.",
-          "Recommended to keep this on." })) {
-        settings.SaveWheel(&carControls);
     }
 
     if (menu.BoolOption("Logitech RPM LEDs", settings.LogiLEDs,
@@ -789,11 +770,6 @@ void update_axesmenu() {
 
     menu.FloatOption("Steering deadzone offset", carControls.DZSteerOffset, -0.5f, 0.5f, 0.01f,
         { "Put the deadzone with an offset from the center." });
-
-    if (!settings.PatchSteeringControl) {
-        menu.FloatOption("Steering anti-deadzone", carControls.ADZSteer, 0.0f, 1.0f, 0.01f,
-            { "GTA V ignores 25% input for analog controls by default." });
-    }
 
     menu.FloatOption("Throttle anti-deadzone", carControls.ADZThrottle, 0.0f, 1.0f, 0.01f,
         { "GTA V ignores 25% input for analog controls by default." });
@@ -1075,7 +1051,7 @@ void update_wheelinfomenu() {
 }
 
 void update_miscassistmenu() {
-    menu.Title("Drving assists");
+    menu.Title("Driving assists");
     menu.Subtitle("Assists to make driving easier");
 
     menu.BoolOption("Enable ABS", settings.CustomABS,
@@ -1100,6 +1076,40 @@ void update_miscassistmenu() {
 
     menu.BoolOption("Hide player in FPV", settings.HidePlayerInFPV,
         { "Hides the player in first person view." });
+}
+
+void update_steeringassistmenu() {
+    menu.Title("Steering assists");
+    menu.Subtitle("Custom steering assist options");
+
+    std::vector<std::string> steeringModeDescription;
+    switch(settings.CustomSteering.Mode) {
+    case 0:
+        steeringModeDescription.emplace_back("Default: Original game steering.");
+        steeringModeDescription.emplace_back("Only applies Steering Multiplier.");
+        break;
+    case 1:
+        steeringModeDescription.emplace_back("Enhanced: Custom countersteer, disabled magic forces.");
+        steeringModeDescription.emplace_back("Applies all settings below.");
+        break;
+    default:
+        steeringModeDescription.emplace_back("Invalid option?");
+    }
+    menu.StringArray("Steering Mode", { "Default", "Enhanced" }, settings.CustomSteering.Mode, steeringModeDescription);
+    menu.FloatOption("Countersteer multiplier", settings.CustomSteering.CountersteerMult, 0.0f, 2.0f, 0.05f,
+        { "How much countersteer should be given." });
+    menu.FloatOption("Countersteer limit", settings.CustomSteering.CountersteerLimit, 0.0f, 360.0f, 1.0f, 
+        { "Maximum angle in degrees for automatic countersteering. Game default is 15 degrees." });
+
+    if (menu.FloatOption("Steering Reduction", settings.CustomSteering.SteeringReduction, 0.0f, 1.0f, 0.01f,
+        { "Reduce steering input at higher speeds.", "From InfamousSabre's Custom Steering." })) {
+        settings.SaveWheel(&carControls);
+    }
+
+    if (menu.FloatOption("Steering Multiplier", settings.CustomSteering.SteeringMult, 0.01f, 2.0f, 0.01f,
+        { "Increase/decrease steering lock.", "From InfamousSabre's Custom Steering." })) {
+        settings.SaveWheel(&carControls);
+    }
 }
 
 void update_debugmenu() {
@@ -1151,10 +1161,13 @@ void update_menu() {
     /* mainmenu -> controlsmenu */
     if (menu.CurrentMenu("controlsmenu")) { update_controlsmenu(); }
 
+    /* mainmenu -> controlsmenu -> controlleroptionsmenu */
+    if (menu.CurrentMenu("controlleroptionsmenu")) { update_controlleroptionsmenu(); }
+
     /* mainmenu -> controlsmenu -> legacycontrollermenu */
     if (menu.CurrentMenu("legacycontrollermenu")) { update_legacycontrollermenu(); }
 
-    /* mainmenu -> controlsmenu -> controllermenu */
+    /* mainmenu -> controlsmenu -> controllerbindingsmenu */
     if (menu.CurrentMenu("controllermenu")) { update_controllermenu(); }
 
     /* mainmenu -> controlsmenu -> keyboardmenu */
@@ -1192,6 +1205,9 @@ void update_menu() {
 
     /* mainmenu -> miscassistmenu */
     if (menu.CurrentMenu("miscassistmenu")) { update_miscassistmenu(); }
+
+    /* mainmenu -> miscassistmenu -> steeringassistmenu */
+    if (menu.CurrentMenu("steeringassistmenu")) { update_steeringassistmenu(); }
 
     /* mainmenu -> debugmenu */
     if (menu.CurrentMenu("debugmenu")) { update_debugmenu(); }

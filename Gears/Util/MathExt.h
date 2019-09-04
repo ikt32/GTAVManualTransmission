@@ -5,8 +5,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-template <typename T> int sgn(T val) {
-    return (T(0) < val) - (val < T(0));
+template <typename T> T sgn(T val) {
+    return static_cast<T>((T{} < val) - (val < T{}));
 }
 
 template<typename T, typename A>

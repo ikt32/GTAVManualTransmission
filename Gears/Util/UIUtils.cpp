@@ -1,5 +1,6 @@
 #include "UIUtils.h"
 #include <inc/natives.h>
+#include <inc/enums.h>
 #include <algorithm>
 
 float getStringWidth(const std::string &text, float scale, int font) {
@@ -91,4 +92,14 @@ void showSubtitle(const std::string &message, int duration) {
     }
 
     UI::END_TEXT_COMMAND_PRINT(duration, 1);
+}
+
+void drawSphere(Vector3 p, float scale, Color c) {
+    GRAPHICS::DRAW_MARKER(eMarkerType::MarkerTypeDebugSphere,
+                          p.x, p.y, p.z,
+                          0.0f, 0.0f, 0.0f,
+                          0.0f, 0.0f, 0.0f,
+                          scale, scale, scale,
+                          c.R, c.G, c.B, c.A,
+                          false, false, 2, false, nullptr, nullptr, false);
 }

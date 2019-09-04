@@ -136,6 +136,6 @@ void startStopEngine();
 void drawSteeringLines(float steeringAngle);
 float getSteeringAngle(Vehicle v);
 
+// TODO: Move to some util class. NativeUtils???
 bool isPlayerAvailable(Player player, Ped playerPed);
-
 bool isVehicleAvailable(Vehicle vehicle, Ped playerPed);

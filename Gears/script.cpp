@@ -35,6 +35,7 @@
 #include "UpdateChecker.h"
 #include "Constants.h"
 #include "Compatibility.h"
+#include "CustomSteering.h"
 
 ReleaseInfo g_releaseInfo;
 std::mutex g_releaseInfoMutex;
@@ -511,11 +512,12 @@ void stopForceFeedback() {
     carControls.StopFFB(settings.LogiLEDs);
 }
 
-void update_steeringpatches() {
+void update_steering() {
     bool isCar = vehData.mClass == VehicleClass::Car;
     bool useWheel = carControls.PrevInput == CarControls::Wheel;
-    if (isCar && settings.PatchSteering &&
-        (useWheel || settings.PatchSteeringAlways)) {
+    bool customSteering = settings.CustomSteering.Mode > 0 && !useWheel;
+
+    if (isCar && (useWheel || customSteering)) {
         if (!MemoryPatcher::SteeringAssistPatcher.Patched())
             MemoryPatcher::PatchSteeringAssist();
     }
@@ -524,7 +526,7 @@ void update_steeringpatches() {
             MemoryPatcher::RestoreSteeringAssist();
     }
 
-    if (isCar && useWheel && settings.PatchSteeringControl) {
+    if (isCar && (useWheel || customSteering)) {
         if (!MemoryPatcher::SteeringControlPatcher.Patched())
             MemoryPatcher::PatchSteeringControl();
     }
@@ -532,40 +534,28 @@ void update_steeringpatches() {
         if (MemoryPatcher::SteeringControlPatcher.Patched())
             MemoryPatcher::RestoreSteeringControl();
     }
+
     if (isVehicleAvailable(vehicle, playerPed)) {
         updateSteeringMultiplier();
     }
+
+    if (customSteering) {
+        CustomSteering::Update();
+    }
 }
 
-// From CustomSteering
+// From CustomSteering TODO Merge into the new CustomSteering thing
+// calculateReduction
 void updateSteeringMultiplier() {
-    float mult = 1;
-
-    if (MemoryPatcher::SteeringAssistPatcher.Patched()) {
-        Vector3 vel = ENTITY::GET_ENTITY_VELOCITY(vehicle);
-        Vector3 pos = ENTITY::GET_ENTITY_COORDS(vehicle, 1);
-        Vector3 motion = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, pos.x + vel.x, pos.y + vel.y, pos.z + vel.z);
-
-        if (motion.y > 3) {
-            mult = (0.15f + (powf((1.0f / 1.13f), (abs(motion.y) - 7.2f))));
-            if (mult != 0) { mult = floorf(mult * 1000) / 1000; }
-            if (mult > 1) { mult = 1; }
-        }
-
-        if (carControls.PrevInput == CarControls::Wheel) {
-            mult = (1 + (mult - 1) * settings.SteeringReductionWheel);
-        }
-        else {
-            mult = (1 + (mult - 1) * settings.SteeringReductionOther);
-        }
-    }
+    float mult = 1.0f;
 
     if (carControls.PrevInput == CarControls::Wheel) {
         mult = mult * settings.GameSteerMultWheel;
     }
     else {
-        mult = mult * settings.GameSteerMultOther;
+        mult = mult * settings.CustomSteering.SteeringMult;
     }
+    // TODO: Consider not using and moving steering reduction/mult to input side
     ext.SetSteeringMultiplier(vehicle, mult);
 }
 
@@ -1446,7 +1436,7 @@ void functionLimiter() {
 
 // Anti-Deadzone.
 void SetControlADZ(eControl control, float value, float adz) {
-    CONTROLS::_SET_CONTROL_NORMAL(0, control, sgn(value)*adz+(1.0f-adz)*value);
+    CONTROLS::_SET_CONTROL_NORMAL(0, control, sgn(value) * adz + (1.0f - adz) * value);
 }
 
 void functionRealReverse() {
@@ -1965,7 +1955,8 @@ void doWheelSteering() {
      * Both should work without any deadzone, with a note that the second one
      * does need a specified anti-deadzone (recommended: 24-25%)
      */
-    if (vehData.mClass == VehicleClass::Car && settings.PatchSteeringControl) {
+    if (vehData.mClass == VehicleClass::Car) {
+        ext.SetSteeringAngle(vehicle, -effSteer * ext.GetMaxSteeringAngle(vehicle));
         ext.SetSteeringInputAngle(vehicle, -effSteer);
     }
     else {
@@ -2036,7 +2027,7 @@ int calculateDetail() {
     return static_cast<int>(1000.0f * settings.DetailMult * compSpeedTotal);
 }
 
-void calculateSoftLock(int &totalForce) {
+void calculateSoftLock(int &totalForce, int& damperForce) {
     float steerMult;
     if (vehData.mClass == VehicleClass::Bike || vehData.mClass == VehicleClass::Quad)
         steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
@@ -2046,52 +2037,56 @@ void calculateSoftLock(int &totalForce) {
         steerMult = settings.SteerAngleMax / settings.SteerAngleBoat;
     }
     float effSteer = steerMult * 2.0f * (carControls.SteerVal - 0.5f);
+    float steerSpeed = carControls.GetAxisSpeed(CarControls::WheelAxisType::Steer);
     if (effSteer > 1.0f) {
+        if (steerSpeed > 0.1f) {
+            damperForce = (int)map(steerSpeed, 0.1f, 0.4f, (float)damperForce, 40000.0f);
+        }
         totalForce = (int)map(effSteer, 1.0f, steerMult, (float)totalForce, 40000.0f);
     } else if (effSteer < -1.0f) {
+        if (steerSpeed < -0.1f) {
+            damperForce = (int)map(steerSpeed, -0.1f, -0.4f, (float)damperForce, 40000.0f);
+        }
         totalForce = (int)map(effSteer, -1.0f, -steerMult, (float)totalForce, -40000.0f);
     }
 }
 
 // Despite being scientifically inaccurate, "self-aligning torque" is the best description.
 int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRatio, bool isCar) {
-    Vector3 velocityWorld = ENTITY::GET_ENTITY_VELOCITY(vehicle);
-    Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(vehicle, 1);
-    Vector3 travelWorld = velocityWorld + positionWorld;
-    Vector3 travelRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, travelWorld.x, travelWorld.y, travelWorld.z);
+    float speed = ENTITY::GET_ENTITY_SPEED(vehicle);
+    pid.setD(static_cast<double>(speed) * 0.1);
+    Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true);
+    Vector3 rotVector = ENTITY::GET_ENTITY_ROTATION_VELOCITY(vehicle);
+    Vector3 rotRelative {
+        speed * -sin(rotVector.z), 0,
+        speed* cos(rotVector.z), 0,
+        0, 0
+    };
 
-    Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(vehicle);
-    Vector3 turnWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, ENTITY::GET_ENTITY_SPEED(vehicle)*-sin(rotationVelocity.z), ENTITY::GET_ENTITY_SPEED(vehicle)*cos(rotationVelocity.z), 0.0f);
-    Vector3 turnRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, turnWorld.x, turnWorld.y, turnWorld.z);
-    float turnRelativeNormX = (travelRelative.x + turnRelative.x) / 2.0f;
-    //float turnRelativeNormY = (travelRelative.y + turnRelative.y) / 2.0f;
-    //Vector3 turnWorldNorm = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, turnRelativeNormX, turnRelativeNormY, 0.0f);
+    Vector3 expectedVector {
+        speed * -sin(steeringAngle / settings.GameSteerMultWheel), 0,
+        speed* cos(steeringAngle / settings.GameSteerMultWheel), 0,
+        0, 0
+    };
+    
+    float error = static_cast<float>(pid.getOutput(expectedVector.x, static_cast<double>(speedVector.x) * 0.5));
 
-    float steeringAngleRelX = ENTITY::GET_ENTITY_SPEED(vehicle)*-sin(steeringAngle);
-    float steeringAngleRelY = ENTITY::GET_ENTITY_SPEED(vehicle)*cos(steeringAngle);
-    Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, steeringAngleRelX, steeringAngleRelY, 0.0f);
-    Vector3 steeringRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(vehicle, steeringWorld.x, steeringWorld.y, steeringWorld.z);
-
-    float setpoint = travelRelative.x;
-
-    // This can be tuned but it feels pretty nice right now with Kp = 1.0, Ki, Kd = 0.0.
-    double error = pid.getOutput(steeringRelative.x, setpoint);
-
-    int satForce = static_cast<int>(settings.SATAmpMult * defaultGain * -error);
+    int satForce = static_cast<int>(settings.SATAmpMult * static_cast<float>(defaultGain) * -error);
 
     // "Reduction" effects - those that affect already calculated things
     bool understeering = false;
     float understeer = 0.0f;
     if (isCar) {
-        understeer = sgn(travelRelative.x - steeringAngleRelX) * (turnRelativeNormX - steeringAngleRelX);
-        if (steeringAngleRelX > turnRelativeNormX && turnRelativeNormX > travelRelative.x ||
-            steeringAngleRelX < turnRelativeNormX && turnRelativeNormX < travelRelative.x) {
-            satForce = (int)((float)satForce / std::max(1.0f, 3.3f * understeer + 1.0f));
+        float expTurnX = speedVector.x * 0.5f + rotRelative.x * 0.5f;
+        understeer = sgn(speedVector.x - expectedVector.x) * (expTurnX - expectedVector.x);
+        if (expectedVector.x > expTurnX && expTurnX > speedVector.x ||
+            expectedVector.x < expTurnX && expTurnX < speedVector.x) {
+            satForce = static_cast<int>(static_cast<float>(satForce) / std::max(1.0f, 3.3f * understeer + 1.0f));
             understeering = true;
         }
     }
 
-    satForce = (int)((float)satForce * (1.0f - wheelsOffGroundRatio));
+    satForce = static_cast<int>(static_cast<float>(satForce) * (1.0f - wheelsOffGroundRatio));
 
     if (vehData.mClass == VehicleClass::Car || vehData.mClass == VehicleClass::Quad) {
         if (VEHICLE::IS_VEHICLE_TYRE_BURST(vehicle, 0, true)) {
@@ -2108,8 +2103,8 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     }
 
     if (settings.DisplayInfo) {
-        showText(0.85, 0.175, 0.4, fmt::format("RelSteer:\t{:.3f}", steeringRelative.x), 4);
-        showText(0.85, 0.200, 0.4, fmt::format("SetPoint:\t{:.3f}", travelRelative.x), 4);
+        //showText(0.85, 0.175, 0.4, fmt::format("RelSteer:\t{:.3f}", steeringRelative.x), 4);
+        //showText(0.85, 0.200, 0.4, fmt::format("SetPoint:\t{:.3f}", travelRelative.x), 4);
         showText(0.85, 0.225, 0.4, fmt::format("Error:\t\t{:.3f}" , error), 4);
         showText(0.85, 0.250, 0.4, fmt::format("{}Under:\t\t{:.3f}~w~", understeering ? "~b~" : "~w~", understeer), 4);
     }
@@ -2231,8 +2226,8 @@ void playFFBGround() {
 
     int totalForce = satForce + detailForce;
     totalForce = (int)((float)totalForce * rotationScale);
-    calculateSoftLock(totalForce);
-    carControls.PlayFFBDynamics(totalForce, damperForce);
+    calculateSoftLock(totalForce, damperForce);
+    carControls.PlayFFBDynamics(std::clamp(totalForce, -10000, 10000), std::clamp(damperForce, -10000, 10000));
 
     const float minGforce = 5.0f;
     const float maxGforce = 50.0f;
@@ -2242,7 +2237,7 @@ void playFFBGround() {
     bool collision = gForce > minGforce;
     int res = static_cast<int>(map(gForce, minGforce, maxGforce, minForce, maxForce) * settings.CollisionMult);
     if (collision) {
-        carControls.PlayFFBCollision(res);
+        carControls.PlayFFBCollision(std::clamp(res, -10000, 10000));
     }
 
     if (settings.DisplayInfo && collision) {
@@ -2286,7 +2281,7 @@ void playFFBWater() {
 
     int totalForce = satForce + detailForce;
     totalForce = (int)((float)totalForce * rotationScale);
-    calculateSoftLock(totalForce);
+    calculateSoftLock(totalForce, damperForce);
     carControls.PlayFFBDynamics(totalForce, damperForce);
 
     if (settings.DisplayInfo) {
@@ -2503,7 +2498,7 @@ void main() {
         update_player();
         update_vehicle();
         update_inputs();
-        update_steeringpatches();
+        update_steering();
         update_hud();
         update_input_controls();
         update_manual_transmission();
