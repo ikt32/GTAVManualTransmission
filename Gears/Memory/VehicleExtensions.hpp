@@ -137,6 +137,8 @@ public:
     std::vector<float> GetWheelSteeringAngles(Vehicle handle);
     std::vector<bool> GetWheelsOnGround(Vehicle handle);
 
+    float GetWheelLargestAngle(Vehicle handle);
+
     // Unit: meters, probably.
     std::vector<WheelDimensions> GetWheelDimensions(Vehicle handle);
     // Unit: rad/s

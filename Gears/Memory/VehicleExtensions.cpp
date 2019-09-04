@@ -674,6 +674,18 @@ std::vector<bool> VehicleExtensions::GetWheelsOnGround(Vehicle handle) {
     return onGround;
 }
 
+float VehicleExtensions::GetWheelLargestAngle(Vehicle handle) {
+    float largestAngle = 0.0f;
+    auto angles = GetWheelSteeringAngles(handle);
+
+    for (auto angle : angles) {
+        if (abs(angle) > abs(largestAngle)) {
+            largestAngle = angle;
+        }
+    }
+    return largestAngle;
+}
+
 std::vector<WheelDimensions> VehicleExtensions::GetWheelDimensions(Vehicle handle) {
     auto wheels = GetWheelPtrs(handle);
 
