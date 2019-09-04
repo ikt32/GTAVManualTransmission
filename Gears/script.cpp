@@ -2348,63 +2348,6 @@ void functionHidePlayerInFPV() {
 //                              Script entry
 ///////////////////////////////////////////////////////////////////////////////
 
-void registerDecorator(const char *thing, eDecorType type) {
-    std::string strType = "?????";
-    switch (type) {
-    case DECOR_TYPE_FLOAT: strType = "float"; break;
-    case DECOR_TYPE_BOOL: strType = "bool"; break;
-    case DECOR_TYPE_INT: strType = "int"; break;
-    case DECOR_TYPE_UNK: strType = "unknown"; break;
-    case DECOR_TYPE_TIME: strType = "time"; break;
-    }
-
-    if (!DECORATOR::DECOR_IS_REGISTERED_AS_TYPE((char*)thing, type)) {
-        DECORATOR::DECOR_REGISTER((char*)thing, type);
-        logger.Write(DEBUG, "DECOR: Registered \"%s\" as %s", thing, strType.c_str());
-    }
-}
-
-// @Unknown Modder
-bool setupGlobals() {
-    auto addr = mem::FindPattern("\x40\x53\x48\x83\xEC\x20\x80\x3D\x00\x00\x00\x00\x00\x8B\xDA\x75\x29",
-                                 "xxxxxxxx????xxxxx");
-    if (!addr) {
-        logger.Write(ERROR, "Couldn't find pattern for bIsDecorRegisterLockedPtr");
-        return false;
-    }
-
-    BYTE* g_bIsDecorRegisterLockedPtr = 
-        reinterpret_cast<BYTE*>(addr + *reinterpret_cast<int*>(addr + 8) + 13);
-
-    logger.Write(DEBUG, "bIsDecorRegisterLockedPtr @ 0x%p", g_bIsDecorRegisterLockedPtr);
-
-    bool scriptDidUnlock = false;
-
-    // only unlock if not unlocked yet
-    if (*g_bIsDecorRegisterLockedPtr == 1) {
-        *g_bIsDecorRegisterLockedPtr = 0;
-        scriptDidUnlock = true;
-    }
-
-    //// New decorators! :)
-    //registerDecorator(decorCurrentGear, DECOR_TYPE_INT);
-    //registerDecorator(decorShiftNotice, DECOR_TYPE_INT);
-    //registerDecorator(decorFakeNeutral, DECOR_TYPE_INT);
-    //registerDecorator(decorSetShiftMode, DECOR_TYPE_INT);
-    //registerDecorator(decorGetShiftMode, DECOR_TYPE_INT);
-
-    //// Camera mods interoperability
-    //registerDecorator(decorLookingLeft, DECOR_TYPE_BOOL);
-    //registerDecorator(decorLookingRight, DECOR_TYPE_BOOL);
-    //registerDecorator(decorLookingBack, DECOR_TYPE_BOOL);
-
-    // only re-lock if it was locked before
-    if (scriptDidUnlock) {
-        *g_bIsDecorRegisterLockedPtr = 1;
-    }
-    return true;
-}
-
 void readSettings() {
     settings.Read(&carControls);
     if (settings.LogLevel > 4) settings.LogLevel = 1;
