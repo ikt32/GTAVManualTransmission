@@ -125,6 +125,7 @@
     <ClCompile Include="..\thirdparty\fmt\src\posix.cc" />
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp" />
     <ClCompile Include="Compatibility.cpp" />
+    <ClCompile Include="CustomSteering.cpp" />
     <ClCompile Include="Input\DIDeviceFactory.cpp" />
     <ClCompile Include="ManualTransmission.cpp" />
     <ClCompile Include="ScriptHUD.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="..\thirdparty\MiniPID\MiniPID.h" />
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="CustomSteering.h" />
     <ClInclude Include="ManualTransmission.h" />
     <ClInclude Include="Memory\Patcher.h" />
     <ClInclude Include="Memory\PatternInfo.h" />

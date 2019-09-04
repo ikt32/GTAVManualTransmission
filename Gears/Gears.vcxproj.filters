@@ -99,6 +99,7 @@
     <ClCompile Include="..\..\GTAVMenuBase\menumemutils.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
+    <ClCompile Include="CustomSteering.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -254,6 +255,7 @@
     <ClInclude Include="..\..\GTAVMenuBase\menumemutils.hpp">
       <Filter>Menu</Filter>
     </ClInclude>
+    <ClInclude Include="CustomSteering.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
