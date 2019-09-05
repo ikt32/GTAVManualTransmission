@@ -1426,7 +1426,7 @@ bool configAxis(const std::string& confTag) {
     }
 
     carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
-    // Save current state TODO
+    // Save current state
     std::vector<std::tuple<GUID, std::string, int>> startStates;
     for (auto guid : carControls.GetWheel().GetGuids()) {
         for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
@@ -1657,8 +1657,6 @@ bool configHPattern() {
     return true;
 }
 
-// I hate myself.
-// TODO: Fix strings
 bool configASelect() {
     std::string additionalInfo = fmt::format("Press {} to exit.", escapeKey);
     GUID devGUID = {};
