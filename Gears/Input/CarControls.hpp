@@ -1,12 +1,14 @@
 #pragma once
 #include <string>
+#include <utility>
 
 #include "XInputController.hpp"
 #include "WheelDirectInput.hpp"
 #include "NativeController.h"
 
 struct Device {
-    Device(std::string name, GUID guid) : name(name), guid(guid) {}
+    Device(std::string name, GUID guid)
+        : name(std::move(name)), guid(guid) {}
     std::string name;
     GUID guid;
 };

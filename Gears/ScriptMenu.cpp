@@ -1252,7 +1252,7 @@ void update_menu() {
 
 // Wheel section
 // Look at that argument list! :D
-bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> startStates, GUID &selectedGUID, std::string &selectedAxis, int hyst, bool &positive, int &startValue_) {
+bool getConfigAxisWithValues(const std::vector<std::tuple<GUID, std::string, int>>& startStates, GUID &selectedGUID, std::string &selectedAxis, int hyst, bool &positive, int &startValue_) {
     for (auto guid : carControls.GetWheel().GetGuids()) {
         for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
             for (auto startState : startStates) {

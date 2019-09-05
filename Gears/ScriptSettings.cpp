@@ -811,7 +811,7 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 
 }
 
-ptrdiff_t ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, std::string dev_name) {
+ptrdiff_t ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, const std::string& dev_name) {
     auto found = find(RegisteredGUIDs.begin(), RegisteredGUIDs.end(), dev_guid);
     if (found != RegisteredGUIDs.end()) {
         // present! Return index

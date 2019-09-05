@@ -21,7 +21,7 @@ public:
         , mTemp(0) { }
 
     Patcher(std::string name, PatternInfo& pattern) 
-        : Patcher(name, pattern, false) { }
+        : Patcher(std::move(name), pattern, false) { }
 
     virtual ~Patcher() = default;
 

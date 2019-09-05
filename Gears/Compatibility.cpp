@@ -8,7 +8,7 @@ bool* pActive = nullptr;
 HMODULE TrainerVModule = nullptr;
 
 template <typename T>
-T CheckAddr(HMODULE lib, std::string funcName)
+T CheckAddr(HMODULE lib, const std::string& funcName)
 {
     FARPROC func = GetProcAddress(lib, funcName.c_str());
     if (!func)
