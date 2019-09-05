@@ -67,72 +67,47 @@ void blockButtons();
 void startStopEngine();
 void functionAutoReverse();
 void functionRealReverse();
+void updateLastInputDevice();
+void updateSteeringMultiplier();
 
-//TODO: Reorganize/move?
-void handleBrakePatch() {
-    bool lockedUp = false;
-    bool ebrk = vehData.mHandbrake;
-    bool brn = VEHICLE::IS_VEHICLE_IN_BURNOUT(vehicle);
-    auto lockUps = vehData.mWheelsLockedUp;
-    auto susps = vehData.mSuspensionTravel;
-    auto brakePressures = ext.GetWheelBrakePressure(vehicle);
-    for (int i = 0; i < vehData.mWheelCount; i++) {
-        if (lockUps[i] && susps[i] > 0.0f && brakePressures[i] > 0.0f)
-            lockedUp = true;
-    }
-    if (ebrk || brn)
-        lockedUp = false;
-    bool absNativePresent = vehData.mHasABS && settings.ABSFilter;
+///////////////////////////////////////////////////////////////////////////////
+//                           Mod functions: Shifting
+///////////////////////////////////////////////////////////////////////////////
 
-    if (settings.CustomABS && lockedUp && !absNativePresent) {
-        if (!MemoryPatcher::BrakePatcher.Patched()) {
-            MemoryPatcher::PatchBrake();
-        }
-        for (uint8_t i = 0; i < lockUps.size(); i++) {
-            ext.SetWheelBrakePressure(vehicle, i, ext.GetWheelBrakePressure(vehicle)[i] * 0.9f);
-        }
-        if (settings.DisplayInfo)
-            showText(0.45, 0.75, 1.0, "~r~(ABS)");
-    }
-    else {
-        if (wheelPatchStates.EngBrakeActive || wheelPatchStates.EngLockActive) {
-            if (!MemoryPatcher::BrakePatcher.Patched()) {
-                MemoryPatcher::PatchBrake();
-            }
-        }
-        else if (wheelPatchStates.InduceBurnout) {
-            if (!MemoryPatcher::BrakePatcher.Patched()) {
-                MemoryPatcher::PatchBrake();
-            }
-            if (!MemoryPatcher::ThrottlePatcher.Patched()) {
-                MemoryPatcher::PatchThrottle();
-            }
-            for (int i = 0; i < vehData.mWheelCount; i++) {
-                if (ext.IsWheelPowered(vehicle, i)) {
-                    ext.SetWheelBrakePressure(vehicle, i, 0.0f);
-                    ext.SetWheelPower(vehicle, i, 2.0f * ext.GetDriveForce(vehicle));
-                }
-                else {
-                    float handlingBrakeForce = *reinterpret_cast<float *>(vehData.mHandlingPtr + hOffsets.fBrakeForce);
-                    float inpBrakeForce = handlingBrakeForce * carControls.BrakeVal;
-                    ext.SetWheelPower(vehicle, i, 0.0f);
-                    ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
-                }
+void cycleShiftMode();
+void shiftTo(int gear, bool autoClutch);
+void functionHShiftTo(int i);
+void functionHShiftKeyboard();
+void functionHShiftWheel();
+void functionSShift();
+void functionAShift();
 
-            }
-            fakeRev();
-            wheelPatchStates.InduceBurnout = false;
-        }
-        else {
-            if (MemoryPatcher::BrakePatcher.Patched()) {
-                MemoryPatcher::RestoreBrake();
-            }
-            if (MemoryPatcher::ThrottlePatcher.Patched()) {
-                MemoryPatcher::RestoreThrottle();
-            }
-        }
-    }
-}
+///////////////////////////////////////////////////////////////////////////////
+//                   Mod functions: Gearbox features
+///////////////////////////////////////////////////////////////////////////////
+
+void functionClutchCatch();
+void functionEngStall();
+void functionEngDamage();
+void functionEngBrake();
+void functionEngLock();
+
+///////////////////////////////////////////////////////////////////////////////
+//                       Mod functions: Gearbox control
+///////////////////////////////////////////////////////////////////////////////
+
+void handleBrakePatch();
+void handleRPM();
+void functionLimiter();
+
+///////////////////////////////////////////////////////////////////////////////
+//                             Misc features
+///////////////////////////////////////////////////////////////////////////////
+
+void functionAutoLookback();
+void functionAutoGear1();
+void functionHillGravity();
+void functionHidePlayerInFPV();
 
 void update_player() {
     player = PLAYER::PLAYER_ID();
@@ -1227,6 +1202,71 @@ void functionEngBrake() {
 ///////////////////////////////////////////////////////////////////////////////
 //                       Mod functions: Gearbox control
 ///////////////////////////////////////////////////////////////////////////////
+
+void handleBrakePatch() {
+    bool lockedUp = false;
+    bool ebrk = vehData.mHandbrake;
+    bool brn = VEHICLE::IS_VEHICLE_IN_BURNOUT(vehicle);
+    auto lockUps = vehData.mWheelsLockedUp;
+    auto susps = vehData.mSuspensionTravel;
+    auto brakePressures = ext.GetWheelBrakePressure(vehicle);
+    for (int i = 0; i < vehData.mWheelCount; i++) {
+        if (lockUps[i] && susps[i] > 0.0f && brakePressures[i] > 0.0f)
+            lockedUp = true;
+    }
+    if (ebrk || brn)
+        lockedUp = false;
+    bool absNativePresent = vehData.mHasABS && settings.ABSFilter;
+
+    if (settings.CustomABS && lockedUp && !absNativePresent) {
+        if (!MemoryPatcher::BrakePatcher.Patched()) {
+            MemoryPatcher::PatchBrake();
+        }
+        for (uint8_t i = 0; i < lockUps.size(); i++) {
+            ext.SetWheelBrakePressure(vehicle, i, ext.GetWheelBrakePressure(vehicle)[i] * 0.9f);
+        }
+        if (settings.DisplayInfo)
+            showText(0.45, 0.75, 1.0, "~r~(ABS)");
+    }
+    else {
+        if (wheelPatchStates.EngBrakeActive || wheelPatchStates.EngLockActive) {
+            if (!MemoryPatcher::BrakePatcher.Patched()) {
+                MemoryPatcher::PatchBrake();
+            }
+        }
+        else if (wheelPatchStates.InduceBurnout) {
+            if (!MemoryPatcher::BrakePatcher.Patched()) {
+                MemoryPatcher::PatchBrake();
+            }
+            if (!MemoryPatcher::ThrottlePatcher.Patched()) {
+                MemoryPatcher::PatchThrottle();
+            }
+            for (int i = 0; i < vehData.mWheelCount; i++) {
+                if (ext.IsWheelPowered(vehicle, i)) {
+                    ext.SetWheelBrakePressure(vehicle, i, 0.0f);
+                    ext.SetWheelPower(vehicle, i, 2.0f * ext.GetDriveForce(vehicle));
+                }
+                else {
+                    float handlingBrakeForce = *reinterpret_cast<float*>(vehData.mHandlingPtr + hOffsets.fBrakeForce);
+                    float inpBrakeForce = handlingBrakeForce * carControls.BrakeVal;
+                    ext.SetWheelPower(vehicle, i, 0.0f);
+                    ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
+                }
+
+            }
+            fakeRev();
+            wheelPatchStates.InduceBurnout = false;
+        }
+        else {
+            if (MemoryPatcher::BrakePatcher.Patched()) {
+                MemoryPatcher::RestoreBrake();
+            }
+            if (MemoryPatcher::ThrottlePatcher.Patched()) {
+                MemoryPatcher::RestoreThrottle();
+            }
+        }
+    }
+}
 
 // TODO: Change ratios for additional param RPM rise speed
 void fakeRev(bool customThrottle, float customThrottleVal) {

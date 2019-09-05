@@ -2,10 +2,7 @@
 #include <string>
 #include <vector>
 
-#include <inc/types.h>
-
 void threadCheckUpdate();
-void update_npc();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Helper functions/tools
@@ -24,49 +21,18 @@ void resetSteeringMultiplier();
 void toggleManual(bool enable);
 void initWheel();
 void stopForceFeedback();
-void updateLastInputDevice();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Mod functions: Shifting
 ///////////////////////////////////////////////////////////////////////////////
 
 void setShiftMode(int shiftMode);
-void cycleShiftMode();
-void shiftTo(int gear, bool autoClutch);
-void functionHShiftTo(int i);
-void functionHShiftKeyboard();
-void functionHShiftWheel();
-void functionSShift();
-void functionAShift();
-
-///////////////////////////////////////////////////////////////////////////////
-//                   Mod functions: Gearbox features
-///////////////////////////////////////////////////////////////////////////////
-
-void functionClutchCatch();
-void functionEngStall();
-void functionEngDamage();
-void functionEngBrake();
-void functionEngLock();
-//void manageBrakePatch();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                       Mod functions: Gearbox control
 ///////////////////////////////////////////////////////////////////////////////
 
 void fakeRev(bool customThrottle = false, float customThrottleVal = 0.0f);
-void handleRPM();
-//void functionTruckLimiting();
-void functionLimiter();
-
-///////////////////////////////////////////////////////////////////////////////
-//                             Misc features
-///////////////////////////////////////////////////////////////////////////////
-
-void functionAutoLookback();
-void functionAutoGear1();
-void functionHillGravity();
-void functionHidePlayerInFPV();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                              Script entry
@@ -80,25 +46,6 @@ void NPCMain();
 //                              Menu-related
 ///////////////////////////////////////////////////////////////////////////////
 void update_menu();
-void clearAxis(const std::string& axis);
-void clearButton(const std::string& button);
-void clearWheelToKey();
-void clearHShifter();
-void clearASelect();
-void clearKeyboardKey(const std::string& button);
-void clearControllerButton(const std::string& button);
-void clearLControllerButton(const std::string& button);
-
-bool configAxis(const std::string& confTag);
-bool configWheelToKey();
-bool configButton(const std::string& confTag);
-bool configHPattern();
-bool configASelect();
-bool configKeyboardKey(const std::string &confTag);
-bool configControllerButton(const std::string &confTag);
-bool configLControllerButton(const std::string &confTag);
-
-void updateSteeringMultiplier();
 
 void onMenuInit();
 void onMenuClose();

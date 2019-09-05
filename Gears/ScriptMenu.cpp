@@ -1,18 +1,5 @@
 #include "script.h"
 
-#include <string>
-#include <mutex>
-
-#include <shellapi.h>
-
-#include <fmt/format.h>
-
-#include <inc/main.h>
-#include <inc/natives.h>
-
-#include <menu.h>
-#include <menukeyboard.h>
-
 #include "ScriptSettings.hpp"
 #include "Input/CarControls.hpp"
 #include "Input/keyboard.h"
@@ -24,6 +11,17 @@
 #include "Memory/VehicleExtensions.hpp"
 #include "Util/MathExt.h"
 #include "ScriptUtils.h"
+
+#include <menu.h>
+#include <menukeyboard.h>
+#include <inc/main.h>
+#include <inc/natives.h>
+
+#include <windows.h>
+#include <shellapi.h>
+#include <fmt/format.h>
+#include <string>
+#include <mutex>
 
 extern ReleaseInfo g_releaseInfo;
 extern std::mutex g_releaseInfoMutex;
@@ -53,6 +51,24 @@ struct SControlText {
     T Control;
     std::string Text;
 };
+
+void clearAxis(const std::string& axis);
+void clearButton(const std::string& button);
+void clearWheelToKey();
+void clearHShifter();
+void clearASelect();
+void clearKeyboardKey(const std::string& button);
+void clearControllerButton(const std::string& button);
+void clearLControllerButton(const std::string& button);
+
+bool configAxis(const std::string& confTag);
+bool configWheelToKey();
+bool configButton(const std::string& confTag);
+bool configHPattern();
+bool configASelect();
+bool configKeyboardKey(const std::string& confTag);
+bool configControllerButton(const std::string& confTag);
+bool configLControllerButton(const std::string& confTag);
 
 namespace {
     const std::string escapeKey = "BACKSPACE";
@@ -204,9 +220,6 @@ void saveChanges() {
 void onMenuClose() {
     saveChanges();
 }
-
-extern bool g_DefaultOverride;
-extern float g_CountersteerMult;
 
 void update_mainmenu() {
     menu.Title("Manual Transmission", 0.90f);
