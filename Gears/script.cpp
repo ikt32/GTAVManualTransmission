@@ -134,36 +134,6 @@ void handleBrakePatch() {
     }
 }
 
-/*
- * TODO: Some ideas to require rev matching for smooth driving...
- */
-
-void checkRevMatch() {
-    float expectedSpeed = vehData.mRPM * (vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr]);
-    float actualSpeed = vehData.mWheelAverageDrivenTyreSpeed;
-    float speedDelta = expectedSpeed - actualSpeed;
-    
-    if (speedDelta > 0.0f) {
-        // Engine is faster than wheels, wheelspin should occur
-        if (vehData.mClutch == 1.0f) {
-            // TODO: Implement
-        }
-        else {
-            // TODO: Clutch heating?
-        }
-    }
-
-    // Engine is slower than wheels, slowdown/blocking should occur
-    if (speedDelta < 0.0f) {
-        if (vehData.mClutch == 1.0f) {
-            // TODO: Implement
-        }
-        else {
-            // TODO: Clutch heating? Engine brake?
-        }
-    }
-}
-
 void update_player() {
     player = PLAYER::PLAYER_ID();
     playerPed = PLAYER::PLAYER_PED_ID();
