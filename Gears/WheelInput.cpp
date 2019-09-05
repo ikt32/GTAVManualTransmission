@@ -42,11 +42,6 @@ namespace WheelInput {
 //                   Mod functions: Reverse/Pedal handling
 ///////////////////////////////////////////////////////////////////////////////
 
-// Anti-Deadzone. TODO: MOVE
-void SetControlADZ(eControl control, float value, float adz) {
-    CONTROLS::_SET_CONTROL_NORMAL(0, control, sgn(value) * adz + (1.0f - adz) * value);
-}
-
 // Forward gear: Throttle accelerates, Brake brakes (exclusive)
 // Reverse gear: Throttle reverses, Brake brakes (exclusive)
 void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
@@ -62,11 +57,11 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             //showText(0.3, 0.0, 1.0, "We are going forward");
             // Throttle Pedal normal
             if (wheelThrottleVal > 0.01f) {
-                SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
+                Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
             }
             // Brake Pedal normal
             if (wheelBrakeVal > 0.01f) {
-                SetControlADZ(ControlVehicleBrake, wheelBrakeVal, carControls.ADZBrake);
+                Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, carControls.ADZBrake);
             }
         }
 
@@ -75,7 +70,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             //showText(0.3, 0.0, 1.0, "We are stopped");
 
             if (wheelThrottleVal > 0.01f) {
-                SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
+                Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
             }
 
             if (wheelBrakeVal > 0.01f) {
@@ -92,7 +87,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             if (wheelThrottleVal <= 0.01f && wheelBrakeVal > 0.01f) {
                 //showText(0.3, 0.0, 1.0, "We should brake");
                 //showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)));
-                SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, carControls.ADZBrake);
+                Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, carControls.ADZBrake);
                 ext.SetThrottleP(vehicle, 0.1f);
                 ext.SetBrakeP(vehicle, 1.0f);
                 brakelights = true;
@@ -111,7 +106,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
                 if (wheelBrakeVal > 0.01f) {
                     //showText(0.3, 0.0, 1.0, "We should rev and brake");
                     //showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)) );
-                    SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, carControls.ADZBrake);
+                    Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, carControls.ADZBrake);
                     ext.SetThrottleP(vehicle, 0.1f);
                     ext.SetBrakeP(vehicle, 1.0f);
                     brakelights = true;
@@ -124,7 +119,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
                 }
                 else {
                     //showText(0.3, 0.0, 1.0, "We should rev and apply throttle");
-                    SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
+                    Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
                     ext.SetThrottleP(vehicle, wheelThrottleVal);
                     fakeRev(false, 0);
                 }
@@ -142,11 +137,11 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             //showText(0.3, 0.0, 1.0, "We are reversing");
             // Throttle Pedal Reverse
             if (wheelThrottleVal > 0.01f) {
-                SetControlADZ(ControlVehicleBrake, wheelThrottleVal, carControls.ADZThrottle);
+                Controls::SetControlADZ(ControlVehicleBrake, wheelThrottleVal, carControls.ADZThrottle);
             }
             // Brake Pedal Reverse
             if (wheelBrakeVal > 0.01f) {
-                SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, carControls.ADZBrake);
+                Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, carControls.ADZBrake);
                 ext.SetThrottleP(vehicle, -wheelBrakeVal);
                 ext.SetBrakeP(vehicle, 1.0f);
             }
@@ -157,7 +152,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             //showText(0.3, 0.0, 1.0, "We are stopped");
 
             if (wheelThrottleVal > 0.01f) {
-                SetControlADZ(ControlVehicleBrake, wheelThrottleVal, carControls.ADZThrottle);
+                Controls::SetControlADZ(ControlVehicleBrake, wheelThrottleVal, carControls.ADZThrottle);
             }
 
             if (wheelBrakeVal > 0.01f) {
@@ -178,7 +173,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
                 }
                 // Brake Pedal Reverse
                 if (wheelBrakeVal > 0.01f) {
-                    SetControlADZ(ControlVehicleBrake, wheelBrakeVal, carControls.ADZBrake);
+                    Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, carControls.ADZBrake);
                     ext.SetThrottleP(vehicle, -wheelBrakeVal);
                     ext.SetBrakeP(vehicle, 1.0f);
                 }
@@ -194,10 +189,10 @@ void WheelInput::HandlePedalsArcade(float wheelThrottleVal, float wheelBrakeVal)
     wheelThrottleVal = pow(wheelThrottleVal, settings.ThrottleGamma);
     wheelBrakeVal = pow(wheelBrakeVal, settings.BrakeGamma);
     if (wheelThrottleVal > 0.01f) {
-        SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
+        Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
     }
     if (wheelBrakeVal > 0.01f) {
-        SetControlADZ(ControlVehicleBrake, wheelBrakeVal, carControls.ADZBrake);
+        Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, carControls.ADZBrake);
     }
 }
 
@@ -387,7 +382,7 @@ void WheelInput::DoSteering() {
         ext.SetSteeringInputAngle(vehicle, -effSteer);
     }
     else {
-        SetControlADZ(ControlVehicleMoveLeftRight, effSteer, carControls.ADZSteer);
+        Controls::SetControlADZ(ControlVehicleMoveLeftRight, effSteer, carControls.ADZSteer);
     }
 }
 

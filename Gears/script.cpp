@@ -62,7 +62,6 @@ WheelPatchStates wheelPatchStates;
 VehicleExtensions ext;
 VehicleData vehData(ext);
 
-void SetControlADZ(eControl control, float value, float adz);
 void updateShifting();
 void blockButtons();
 void startStopEngine();
@@ -1096,9 +1095,9 @@ void functionClutchCatch() {
     	bool userThrottle = abs(carControls.ThrottleVal) > idleThrottle || abs(carControls.BrakeVal) > idleThrottle;
     	if (!userThrottle) {
     		if (vehData.mGearCurr > 0)
-    			SetControlADZ(ControlVehicleAccelerate, throttle, 0.25f);
+                Controls::SetControlADZ(ControlVehicleAccelerate, throttle, 0.25f);
     		else
-    			SetControlADZ(ControlVehicleBrake, throttle, 0.25f);
+                Controls::SetControlADZ(ControlVehicleBrake, throttle, 0.25f);
     	}
     }
 }
