@@ -102,11 +102,3 @@ void updateSteeringMultiplier();
 
 void onMenuInit();
 void onMenuClose();
-
-///////////////////////////////////////////////////////////////////////////////
-//                        Script-specific utils
-///////////////////////////////////////////////////////////////////////////////
-
-// TODO: Move to some util class. NativeUtils???
-bool isPlayerAvailable(Player player, Ped playerPed);
-bool isVehicleAvailable(Vehicle vehicle, Ped playerPed);

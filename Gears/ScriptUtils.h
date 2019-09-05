@@ -1,5 +1,6 @@
 #pragma once
 #include "inc/enums.h"
+#include "inc/types.h"
 #include <string>
 
 /**
@@ -13,4 +14,9 @@ namespace UI {
 
 namespace Controls {
     void SetControlADZ(eControl control, float value, float adz);
+}
+
+namespace Util {
+    bool PlayerAvailable(Player player, Ped playerPed);
+    bool VehicleAvailable(Vehicle vehicle, Ped playerPed);
 }

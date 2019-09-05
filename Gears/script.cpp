@@ -164,23 +164,6 @@ void checkRevMatch() {
     }
 }
 
-bool isPlayerAvailable(Player player, Ped playerPed) {
-    if (!PLAYER::IS_PLAYER_CONTROL_ON(player) ||
-        PLAYER::IS_PLAYER_BEING_ARRESTED(player, TRUE) ||
-        CUTSCENE::IS_CUTSCENE_PLAYING() ||
-        !ENTITY::DOES_ENTITY_EXIST(playerPed) ||
-        ENTITY::IS_ENTITY_DEAD(playerPed)) {
-        return false;
-    }
-    return true;
-}
-
-bool isVehicleAvailable(Vehicle vehicle, Ped playerPed) {
-    return vehicle != 0 &&
-        ENTITY::DOES_ENTITY_EXIST(vehicle) &&
-        playerPed == VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1);
-}
-
 void update_player() {
     player = PLAYER::PLAYER_ID();
     playerPed = PLAYER::PLAYER_PED_ID();
@@ -195,10 +178,10 @@ void update_vehicle() {
         wheelPatchStates = WheelPatchStates();
         vehData.SetVehicle(vehicle); // assign new vehicle;
     }
-    if (isVehicleAvailable(vehicle, playerPed)) {
+    if (Util::VehicleAvailable(vehicle, playerPed)) {
         vehData.Update(); // Update before doing anything else
     }
-    if (vehicle != lastVehicle && isVehicleAvailable(vehicle, playerPed)) {
+    if (vehicle != lastVehicle && Util::VehicleAvailable(vehicle, playerPed)) {
         if (vehData.mGearTop == 1 || vehData.mFlags[1] & FLAG_IS_ELECTRIC)
             gearStates.FakeNeutral = false;
         else
@@ -215,7 +198,7 @@ void update_inputs() {
 }
 
 void update_hud() {
-    if (!isPlayerAvailable(player, playerPed) || !isVehicleAvailable(vehicle, playerPed)) {
+    if (!Util::PlayerAvailable(player, playerPed) || !Util::VehicleAvailable(vehicle, playerPed)) {
         return;
     }
 
@@ -268,7 +251,7 @@ void wheelControlRoad() {
 
 // Apply input as controls for selected devices
 void update_input_controls() {
-    if (!isPlayerAvailable(player, playerPed)) {
+    if (!Util::PlayerAvailable(player, playerPed)) {
         stopForceFeedback();
         return;
     }
@@ -283,7 +266,7 @@ void update_input_controls() {
     if (!carControls.WheelAvailable())
         return;
 
-    if (isVehicleAvailable(vehicle, playerPed)) {
+    if (Util::VehicleAvailable(vehicle, playerPed)) {
         switch (vehData.mDomain) {
         case VehicleDomain::Road: {
             wheelControlRoad();
@@ -319,10 +302,10 @@ void update_input_controls() {
 
 // don't write with VehicleExtensions and dont set clutch state
 void update_misc_features() {
-    if (!isPlayerAvailable(player, playerPed))
+    if (!Util::PlayerAvailable(player, playerPed))
         return;
 
-    if (isVehicleAvailable(vehicle, playerPed)) {
+    if (Util::VehicleAvailable(vehicle, playerPed)) {
         if (settings.AutoLookBack && vehData.mClass != VehicleClass::Heli) {
             functionAutoLookback();
         }
@@ -389,7 +372,7 @@ void update_manual_features() {
 
 // Manual Transmission part of the mod
 void update_manual_transmission() {
-    if (!isPlayerAvailable(player, playerPed) || !isVehicleAvailable(vehicle, playerPed)) {
+    if (!Util::PlayerAvailable(player, playerPed) || !Util::VehicleAvailable(vehicle, playerPed)) {
         return;
     }
 
@@ -527,7 +510,7 @@ void update_steering() {
             MemoryPatcher::RestoreSteeringControl();
     }
 
-    if (isVehicleAvailable(vehicle, playerPed)) {
+    if (Util::VehicleAvailable(vehicle, playerPed)) {
         updateSteeringMultiplier();
     }
 
@@ -579,7 +562,7 @@ void updateLastInputDevice() {
             default: break;
         }
         // Suppress notification when not in car
-        if (isVehicleAvailable(vehicle, playerPed)) {
+        if (Util::VehicleAvailable(vehicle, playerPed)) {
             UI::Notify(message);
         }
     }
@@ -599,7 +582,7 @@ void setShiftMode(int shiftMode) {
     if (shiftMode > 2 || shiftMode < 0)
         return;
 
-    if (isVehicleAvailable(vehicle, playerPed) && shiftMode != HPattern && vehData.mGearCurr > 1)
+    if (Util::VehicleAvailable(vehicle, playerPed) && shiftMode != HPattern && vehData.mGearCurr > 1)
         gearStates.FakeNeutral = false;
 
     if (shiftMode == HPattern &&
@@ -1540,7 +1523,7 @@ void functionAutoReverse() {
 // TODO: Some original "tap" controls don't work.
 void blockButtons() {
     if (!settings.EnableManual || !settings.BlockCarControls || vehData.mDomain != VehicleDomain::Road ||
-        carControls.PrevInput != CarControls::Controller || !isVehicleAvailable(vehicle, playerPed)) {
+        carControls.PrevInput != CarControls::Controller || !Util::VehicleAvailable(vehicle, playerPed)) {
         return;
     }
     if (settings.ShiftMode == Automatic && vehData.mGearCurr > 1) {
@@ -1648,7 +1631,7 @@ void functionHidePlayerInFPV() {
     bool visible = ENTITY::IS_ENTITY_VISIBLE(playerPed);
     bool shouldHide = false;
 
-    if (settings.HidePlayerInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4 && isVehicleAvailable(vehicle, playerPed)) {
+    if (settings.HidePlayerInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4 && Util::VehicleAvailable(vehicle, playerPed)) {
         shouldHide = true;
     }
 
