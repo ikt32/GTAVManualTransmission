@@ -516,7 +516,6 @@ void update_legacycontrollermenu() {
         "",
     };
 
-    auto it = 0;
     for (const auto& confTag : controllerConfTags) {
         controllerInfo.back() = confTag.Info;
         int nativeControl = carControls.ConfTagLController2Value(confTag.Tag);
@@ -529,7 +528,6 @@ void update_legacycontrollermenu() {
                 UI::Notify(fmt::format("Cancelled {} assignment", confTag.Tag));
             WAIT(500);
         }
-        it++;
         controllerInfo.pop_back();
     }
 }
@@ -565,7 +563,6 @@ void update_controllermenu() {
         "",
     };
 
-    auto it = 0;
     for (const auto& confTag : controllerConfTags) {
         controllerInfo.back() = confTag.Info;
         controllerInfo.push_back(fmt::format("Assigned to {}", carControls.ConfTagController2Value(confTag.Tag)));
@@ -576,7 +573,6 @@ void update_controllermenu() {
                 UI::Notify(fmt::format("Cancelled {} assignment", confTag.Tag));
             WAIT(500);
         }
-        it++;
         controllerInfo.pop_back();
     }
 }
@@ -591,7 +587,6 @@ void update_keyboardmenu() {
         "",
     };
 
-    int it = 0;
     for (const auto& confTag : keyboardConfTags) {
         keyboardInfo.back() = confTag.Info;
         keyboardInfo.push_back(fmt::format("Assigned to {}", key2str(carControls.ConfTagKB2key(confTag.Tag))));
@@ -602,7 +597,6 @@ void update_keyboardmenu() {
                 UI::Notify(fmt::format("Cancelled {} assignment", confTag.Tag));
             WAIT(500);
         }
-        it++;
         keyboardInfo.pop_back();
     }
 }
