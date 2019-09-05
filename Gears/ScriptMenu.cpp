@@ -52,14 +52,14 @@ struct SControlText {
     std::string Text;
 };
 
-void clearAxis(const std::string& axis);
-void clearButton(const std::string& button);
+void clearAxis(const std::string& confTag);
+void clearButton(const std::string& confTag);
 void clearWheelToKey();
 void clearHShifter();
 void clearASelect();
-void clearKeyboardKey(const std::string& button);
-void clearControllerButton(const std::string& button);
-void clearLControllerButton(const std::string& button);
+void clearKeyboardKey(const std::string& confTag);
+void clearControllerButton(const std::string& confTag);
+void clearLControllerButton(const std::string& confTag);
 
 bool configAxis(const std::string& confTag);
 bool configWheelToKey();
