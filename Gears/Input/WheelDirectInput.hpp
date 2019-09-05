@@ -78,10 +78,10 @@ public:
     void Update();
 
     bool IsConnected(GUID device);
-    bool IsButtonPressed(int btn, GUID device);
-    bool IsButtonJustPressed(int btn, GUID device);
-    bool IsButtonJustReleased(int btn, GUID device);
-    bool WasButtonHeldForMs(int btn, GUID device, int millis);
+    bool IsButtonPressed(int buttonType, GUID device);
+    bool IsButtonJustPressed(int buttonType, GUID device);
+    bool IsButtonJustReleased(int buttonType, GUID device);
+    bool WasButtonHeldForMs(int buttonType, GUID device, int millis);
     void UpdateButtonChangeStates();
 
     void SetConstantForce(GUID device, DIAxis ffAxis, int force);
@@ -95,7 +95,7 @@ public:
     float GetAxisSpeed(DIAxis axis, GUID device);
 
     std::vector<GUID> GetGuids();
-    void PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine);
+    void PlayLedsDInput(GUID guid, float currentRPM, float rpmFirstLedTurnsOn, float rpmRedLine);
 
 private:
     void updateAxisSpeed();

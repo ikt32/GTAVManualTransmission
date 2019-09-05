@@ -1,13 +1,13 @@
 #include "WheelInput.h"
 
-#include "script.h" // TODO: for isXAvailable...
+#include "script.h"
+#include "ScriptUtils.h"
 #include "ScriptSettings.hpp"
 #include "VehicleData.hpp"
 #include "Input/CarControls.hpp"
 #include "Util/MathExt.h"
 #include "Util/MiscEnums.h"
 #include "Util/UIUtils.h"
-#include "Util/Util.hpp"
 #include "Memory/VehicleExtensions.hpp"
 
 #include "inc/enums.h"
@@ -17,7 +17,6 @@
 #include "MiniPID/MiniPID.h"
 #include "fmt/format.h"
 #include <algorithm>
-#include "ScriptUtils.h"
 
 extern Vehicle vehicle;
 extern Ped playerPed;

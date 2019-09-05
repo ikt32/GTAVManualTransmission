@@ -1,12 +1,11 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
 struct ReleaseInfo {
-    unsigned char MajorVersion;
-    unsigned char MinorVersion;
-    unsigned char PatchVersion;
+    unsigned char MajorVersion{};
+    unsigned char MinorVersion{};
+    unsigned char PatchVersion{};
     std::string Suffix;
 
     std::string Version;

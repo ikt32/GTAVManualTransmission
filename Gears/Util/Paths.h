@@ -8,10 +8,10 @@ std::string	GetRunningExecutableFolder();
 std::string	GetRunningExecutableName();
 std::string	GetRunningExecutableNameWithoutExtension();
 
-std::string	GetModuleFolder(const HMODULE module);
-std::string	GetModuleName(const HMODULE module);
-std::string	GetModuleNameWithoutExtension(const HMODULE module);
+std::string	GetModuleFolder(HMODULE module);
+std::string	GetModuleName(HMODULE module);
+std::string	GetModuleNameWithoutExtension(HMODULE module);
 
-void SetOurModuleHandle(const HMODULE module);
+void SetOurModuleHandle(HMODULE module);
 HMODULE GetOurModuleHandle();
 }

@@ -15,7 +15,7 @@
 
 // Use after error buffer has been set. Returns out of calling func on failure.
 #define CHECK_CURL_CODE(result, msg, errBuff, retValue) \
-    if (result != CURLE_OK) {\
+    if ((result) != CURLE_OK) {\
         logger.Write(ERROR, "[CURL] %s [%d - %s]", msg, result, errBuff);\
         return retValue;\
     }
@@ -32,8 +32,6 @@ size_t cbWriter(char *data, size_t size, size_t nmemb, std::string *writerData) 
 }
 
 bool init(CURL *&curl, std::string& dataBuffer, char* errBuff, const RepoInfo& repo) {
-    CURLcode result{};
-
     curl = curl_easy_init();
 
     if (curl == nullptr) {
@@ -41,7 +39,7 @@ bool init(CURL *&curl, std::string& dataBuffer, char* errBuff, const RepoInfo& r
         return false;
     }
 
-    result = curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errBuff);
+    CURLcode result = curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errBuff);
     if (result != CURLE_OK) {
         logger.Write(ERROR, "[CURL] Failed to set error buffer [%d]", result);
         return false;
@@ -78,9 +76,8 @@ ReleaseInfo GetLatestReleaseInfo(const RepoInfo& repoInfo) {
     std::string dataBuffer;
 
     CURL* curl;
-    CURLcode result{};
 
-    result = curl_global_init(CURL_GLOBAL_DEFAULT);
+    CURLcode result = curl_global_init(CURL_GLOBAL_DEFAULT);
     CHECK_CURL_CODE(result, "Failed initializing CURL lib", errBuff, ReleaseInfo());
 
     if (!init(curl, dataBuffer, errBuff, repoInfo)) {

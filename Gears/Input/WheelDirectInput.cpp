@@ -401,8 +401,6 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
     if (!e)
         return false;
 
-    HRESULT hr;
-
     DWORD axis;
     if		(ffAxis == lX)	{ axis = DIJOFS_X; }
     else if (ffAxis == lY)	{ axis = DIJOFS_Y; }
@@ -427,7 +425,7 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
     // Call to this crashes? (G920 + SHVDN)
     __try {
         currentEffectAttempt = "constant force";
-        hr = e->diDevice->CreateEffect(GUID_ConstantForce, &cfEffect, &m_cfEffect, nullptr);
+        HRESULT hr = e->diDevice->CreateEffect(GUID_ConstantForce, &cfEffect, &m_cfEffect, nullptr);
         if (FAILED(hr) || !m_cfEffect) {
             logCreateEffectError(hr, "constant force");
         }
@@ -635,7 +633,7 @@ struct WheelData {
     LedsRpmData rpmData;
 };
 
-void WheelDirectInput::PlayLedsDInput(GUID guid, const FLOAT currentRPM, const FLOAT rpmFirstLedTurnsOn, const FLOAT rpmRedLine) {
+void WheelDirectInput::PlayLedsDInput(GUID guid, float currentRPM, float rpmFirstLedTurnsOn, float rpmRedLine) {
     auto e = FindEntryFromGUID(guid);
 
     if (!e)

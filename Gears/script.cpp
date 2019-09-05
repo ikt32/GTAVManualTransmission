@@ -531,7 +531,7 @@ void setShiftMode(int shiftMode) {
         settings.ShiftMode = Automatic;
     }
     else {
-        settings.ShiftMode = (ShiftModes)shiftMode;
+        settings.ShiftMode = static_cast<ShiftModes>(shiftMode);
     }
 
     std::string mode = "Mode: ";
@@ -548,7 +548,7 @@ void setShiftMode(int shiftMode) {
 void cycleShiftMode() {
     int tempShiftMode = settings.ShiftMode + 1;
     if (tempShiftMode >= SIZEOF_ShiftModes) {
-        tempShiftMode = (ShiftModes)0;
+        tempShiftMode = static_cast<ShiftModes>(0);
     }
 
     setShiftMode(tempShiftMode);
@@ -1538,8 +1538,8 @@ void blockButtons() {
     if (carControls.UseLegacyController) {
         for (int i = 0; i < static_cast<int>(CarControls::LegacyControlType::SIZEOF_LegacyControlType); i++) {
             if (carControls.ControlNativeBlocks[i] == -1) continue;
-            if (i != (int)CarControls::LegacyControlType::ShiftUp && 
-                i != (int)CarControls::LegacyControlType::ShiftDown) continue;
+            if (i != static_cast<int>(CarControls::LegacyControlType::ShiftUp) && 
+                i != static_cast<int>(CarControls::LegacyControlType::ShiftDown)) continue;
 
             if (carControls.ButtonHeldOver(static_cast<CarControls::LegacyControlType>(i), 200)) {
                 CONTROLS::_SET_CONTROL_NORMAL(0, carControls.ControlNativeBlocks[i], 1.0f);
@@ -1552,15 +1552,15 @@ void blockButtons() {
                 // todo
             }
         }
-        if (carControls.ControlNativeBlocks[(int)CarControls::LegacyControlType::Clutch] != -1) {
-            CONTROLS::DISABLE_CONTROL_ACTION(0, carControls.ControlNativeBlocks[(int)CarControls::LegacyControlType::Clutch], true);
+        if (carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] != -1) {
+            CONTROLS::DISABLE_CONTROL_ACTION(0, carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)], true);
         }
     }
     else {
         for (int i = 0; i < static_cast<int>(CarControls::ControllerControlType::SIZEOF_ControllerControlType); i++) {
             if (carControls.ControlXboxBlocks[i] == -1) continue;
-            if (i != (int)CarControls::ControllerControlType::ShiftUp && 
-                i != (int)CarControls::ControllerControlType::ShiftDown) continue;
+            if (i != static_cast<int>(CarControls::ControllerControlType::ShiftUp) && 
+                i != static_cast<int>(CarControls::ControllerControlType::ShiftDown)) continue;
 
             if (carControls.ButtonHeldOver(static_cast<CarControls::ControllerControlType>(i), 200)) {
                 CONTROLS::_SET_CONTROL_NORMAL(0, carControls.ControlXboxBlocks[i], 1.0f);
@@ -1573,8 +1573,8 @@ void blockButtons() {
                 // todo
             }
         }
-        if (carControls.ControlXboxBlocks[(int)CarControls::ControllerControlType::Clutch] != -1) {
-            CONTROLS::DISABLE_CONTROL_ACTION(0, carControls.ControlXboxBlocks[(int)CarControls::ControllerControlType::Clutch], true);
+        if (carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)] != -1) {
+            CONTROLS::DISABLE_CONTROL_ACTION(0, carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)], true);
         }
     }
 }
@@ -1616,7 +1616,7 @@ void functionAutoGear1() {
 }
 
 void functionHillGravity() {
-    if (!carControls.BrakeVal
+    if (carControls.BrakeVal == 0.0f
         && ENTITY::GET_ENTITY_SPEED(vehicle) < 2.0f &&
         VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
         float pitch = ENTITY::GET_ENTITY_PITCH(vehicle);;
