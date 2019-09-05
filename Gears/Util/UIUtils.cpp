@@ -1,14 +1,18 @@
 #include "UIUtils.h"
-#include <inc/natives.h>
-#include <inc/enums.h>
+
+#include "inc/natives.h"
+#include "inc/enums.h"
+#include "fmt/format.h"
 #include <algorithm>
 
-float getStringWidth(const std::string &text, float scale, int font) {
-    UI::_BEGIN_TEXT_COMMAND_WIDTH("STRING");
-    UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char*)text.c_str());
-    UI::SET_TEXT_FONT(font);
-    UI::SET_TEXT_SCALE(scale, scale);
-    return UI::_END_TEXT_COMMAND_GET_WIDTH(true);
+namespace {
+    float getStringWidth(const std::string& text, float scale, int font) {
+        UI::_BEGIN_TEXT_COMMAND_WIDTH("STRING");
+        UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char*)text.c_str());
+        UI::SET_TEXT_FONT(font);
+        UI::SET_TEXT_SCALE(scale, scale);
+        return UI::_END_TEXT_COMMAND_GET_WIDTH(true);
+    }
 }
 
 void showText(float x, float y, float scale, const std::string &text, int font, const Color &rgba, bool outline) {

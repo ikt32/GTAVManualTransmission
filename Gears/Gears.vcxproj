@@ -130,6 +130,7 @@
     <ClCompile Include="ManualTransmission.cpp" />
     <ClCompile Include="ScriptHUD.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
+    <ClCompile Include="ScriptUtils.cpp" />
     <ClCompile Include="ShiftModes.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="Util\Files.cpp" />
@@ -186,6 +187,7 @@
     <ClInclude Include="Memory\VehicleFlags.h" />
     <ClInclude Include="Memory\Versions.h" />
     <ClInclude Include="newNatives.h" />
+    <ClInclude Include="ScriptUtils.h" />
     <ClInclude Include="ShiftModes.h" />
     <ClInclude Include="Compatibility.h" />
     <ClInclude Include="UpdateChecker.h" />

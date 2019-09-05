@@ -17,6 +17,7 @@
 #include "MiniPID/MiniPID.h"
 #include "fmt/format.h"
 #include <algorithm>
+#include "ScriptUtils.h"
 
 extern Vehicle vehicle;
 extern Ped playerPed;
@@ -28,9 +29,6 @@ extern CarControls carControls;
 extern VehiclePeripherals peripherals;
 extern VehicleGearboxStates gearStates;
 extern WheelPatchStates wheelPatchStates;
-
-extern std::string mtPrefix; // TODO: -> To Constants::NotificationPrefix
-extern int prevNotification; // TODO: -> Include in notify impl or something?
 
 namespace {
     MiniPID pid(1.0, 0.0, 0.0);
@@ -649,8 +647,8 @@ void WheelInput::PlayFFBGround() {
     }
 
     if (settings.DisplayInfo && collision) {
-        showNotification(fmt::format("{}Collision @ ~r~{:.3f}G~w~~n~"
-            "FFB: {}", mtPrefix, gForce, res), &prevNotification);
+        UI::Notify(fmt::format("Collision @ ~r~{:.3f}G~w~~n~"
+            "FFB: {}", gForce, res));
     }
     if (settings.DisplayInfo) {
         showText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);

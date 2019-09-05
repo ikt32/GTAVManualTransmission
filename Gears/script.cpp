@@ -33,6 +33,7 @@
 #include "Compatibility.h"
 #include "CustomSteering.h"
 #include "WheelInput.h"
+#include "ScriptUtils.h"
 
 ReleaseInfo g_releaseInfo;
 std::mutex g_releaseInfoMutex;
@@ -42,8 +43,6 @@ std::mutex g_notifyUpdateMutex;
 
 bool g_checkUpdateDone;
 std::mutex g_checkUpdateDoneMutex;
-
-std::string mtPrefix = "~b~Manual Transmission~w~~n~"; // TODO: -> To Constants::NotificationPrefix
 
 int textureWheelId;
 
@@ -62,8 +61,6 @@ WheelPatchStates wheelPatchStates;
 
 VehicleExtensions ext;
 VehicleData vehData(ext);
-
-int prevNotification = 0;
 
 void SetControlADZ(eControl control, float value, float adz);
 void updateShifting();
@@ -487,14 +484,12 @@ void toggleManual(bool enable) {
         return;
     settings.EnableManual = enable;
     settings.SaveGeneral();
-    std::string message = mtPrefix;
     if (settings.EnableManual) {
-        message += "Enabled";
+        UI::Notify("MT Enabled");
     }
     else {
-        message += "Disabled";
+        UI::Notify("MT Disabled");
     }
-    showNotification(message, &prevNotification);
     readSettings();
     initWheel();
     clearPatches();
@@ -567,7 +562,7 @@ void updateLastInputDevice() {
     if (!settings.DisableInputDetect && 
         carControls.PrevInput != carControls.GetLastInputDevice(carControls.PrevInput,settings.EnableWheel)) {
         carControls.PrevInput = carControls.GetLastInputDevice(carControls.PrevInput, settings.EnableWheel);
-        std::string message = mtPrefix + "Input: ";
+        std::string message = "Input: ";
         switch (carControls.PrevInput) {
             case CarControls::Keyboard:
                 message += "Keyboard";
@@ -586,7 +581,7 @@ void updateLastInputDevice() {
         }
         // Suppress notification when not in car
         if (isVehicleAvailable(vehicle, playerPed)) {
-            showNotification(message, &prevNotification);
+            UI::Notify(message);
         }
     }
     if (carControls.PrevInput == CarControls::Wheel) {
@@ -617,7 +612,7 @@ void setShiftMode(int shiftMode) {
         settings.ShiftMode = (ShiftModes)shiftMode;
     }
 
-    std::string mode = mtPrefix + "Mode: ";
+    std::string mode = "Mode: ";
     // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
     switch (settings.ShiftMode) {
         case Sequential: mode += "Sequential"; break;
@@ -625,7 +620,7 @@ void setShiftMode(int shiftMode) {
         case Automatic: mode += "Automatic"; break;
         default: break;
     }
-    showNotification(mode, &prevNotification);
+    UI::Notify(mode);
 }
 
 void cycleShiftMode() {
@@ -1704,14 +1699,14 @@ void update_update_notification() {
         if (g_checkUpdateDone) {
             g_checkUpdateDone = false;
             if (g_notifyUpdate) {
-                showNotification(fmt::format("Manual Transmission: Update available, new version: {}.",
+                UI::Notify(fmt::format("Manual Transmission: Update available, new version: {}.",
                     g_releaseInfo.Version));
             }
             else if (g_releaseInfo.Version.empty()) {
-                showNotification("Manual Transmission: Failed to check for update.");
+                UI::Notify("Manual Transmission: Failed to check for update.");
             }
             else {
-                showNotification(fmt::format("Manual Transmission: No update available, latest version: {}.",
+                UI::Notify(fmt::format("Manual Transmission: No update available, latest version: {}.",
                     g_releaseInfo.Version));
             }
         }
@@ -1720,7 +1715,7 @@ void update_update_notification() {
 
 void main() {
     logger.Write(INFO, "Script started");
-    std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + mtDir;
+    std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
     std::string settingsGeneralFile = absoluteModPath + "\\settings_general.ini";
     std::string settingsWheelFile = absoluteModPath + "\\settings_wheel.ini";
     std::string settingsStickFile = absoluteModPath + "\\settings_stick.ini";

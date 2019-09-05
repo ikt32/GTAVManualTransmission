@@ -17,7 +17,7 @@ extern VehicleData vehData;
 extern std::vector<Vehicle> ignoredVehicles;
 
 const char* MT_GetVersion() {
-    return DISPLAY_VERSION;
+    return Constants::DisplayVersion;
 }
 
 bool MT_IsActive() {

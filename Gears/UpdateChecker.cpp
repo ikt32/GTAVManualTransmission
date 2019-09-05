@@ -154,7 +154,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 bool CheckUpdate(ReleaseInfo& relInfo) {
     logger.Write(INFO, "Checking for updates");
     std::string url = fmt::format("https://api.github.com/repos/{}/{}/releases/latest", "E66666666", "GTAVManualTransmission");
-    std::string ua = fmt::format("E66666666/MT{}", DISPLAY_VERSION);
+    std::string ua = fmt::format("E66666666/MT{}", Constants::DisplayVersion);
     std::string header = "Accept: application/vnd.github.v3+json";
 
     relInfo = GetLatestReleaseInfo({ url, ua, header });
