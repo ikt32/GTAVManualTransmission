@@ -48,8 +48,9 @@ struct STagInfo {
     std::string Info;
 };
 
-struct SWheelButtonText {
-    CarControls::WheelControlType Control;
+template <typename T>
+struct SControlText {
+    T Control;
     std::string Text;
 };
 
@@ -58,7 +59,7 @@ namespace {
     const std::string skipKey = "RIGHT";
     const std::string modUrl = "https://www.gta5-mods.com/scripts/manual-transmission-ikt";
 
-    const std::vector<SWheelButtonText> wheelMenuButtons{
+    const std::vector<SControlText<CarControls::WheelControlType>> wheelMenuButtons {
         { CarControls::WheelControlType::HR             , "[Gear R]" },
         { CarControls::WheelControlType::H1             , "[Gear 1]" },
         { CarControls::WheelControlType::H2             , "[Gear 2]" },
@@ -93,106 +94,95 @@ namespace {
         { CarControls::WheelControlType::Toggle         , "[ToggleMod]" },
         { CarControls::WheelControlType::ToggleH        , "[ChangeShiftMode]" },
     };
-}
 
-const std::vector<SFont> fonts {
+    const std::vector<SFont> fonts {
     { 0, "Chalet London" },
     { 1, "Sign Painter" },
     { 2, "Slab Serif" },
     { 4, "Chalet Cologne" },
     { 7, "Pricedown" },
-};
+    };
 
-const std::vector<std::string> buttonConfTags {
-    { "TOGGLE_MOD" },
-    { "CHANGE_SHIFTMODE" },
-    { "THROTTLE_BUTTON" },
-    { "BRAKE_BUTTON" },
-    { "CLUTCH_BUTTON" },
-    { "SHIFT_UP" },
-    { "SHIFT_DOWN" },
-    { "ENGINE" },
-    { "HANDBRAKE" },
-    { "HORN" },
-    { "LIGHTS" },
-    { "LOOK_BACK" },
-    { "LOOK_LEFT" },
-    { "LOOK_RIGHT" },
-    { "CHANGE_CAMERA" },
-    { "RADIO_NEXT" },
-    { "RADIO_PREVIOUS" },
-    { "INDICATOR_LEFT" },
-    { "INDICATOR_RIGHT" },
-    { "INDICATOR_HAZARD" },
-};
+    const std::vector<std::string> buttonConfTags {
+        { "TOGGLE_MOD" },
+        { "CHANGE_SHIFTMODE" },
+        { "THROTTLE_BUTTON" },
+        { "BRAKE_BUTTON" },
+        { "CLUTCH_BUTTON" },
+        { "SHIFT_UP" },
+        { "SHIFT_DOWN" },
+        { "ENGINE" },
+        { "HANDBRAKE" },
+        { "HORN" },
+        { "LIGHTS" },
+        { "LOOK_BACK" },
+        { "LOOK_LEFT" },
+        { "LOOK_RIGHT" },
+        { "CHANGE_CAMERA" },
+        { "RADIO_NEXT" },
+        { "RADIO_PREVIOUS" },
+        { "INDICATOR_LEFT" },
+        { "INDICATOR_RIGHT" },
+        { "INDICATOR_HAZARD" },
+    };
 
-const std::vector<STagInfo> keyboardConfTags {
-    { "Toggle"   , "Toggle mod on/off"      },
-    { "ToggleH"  , "Switch shift mode"      },
-    { "ShiftUp"  , "Shift up"               },
-    { "ShiftDown", "Shift down"             },
-    { "Clutch"   , "Hold for clutch"        },
-    { "Engine"   , "Toggle engine on/off"   },
-    { "Throttle" , "Key used for throttle"  },
-    { "Brake"    , "Key used for brake"     },
-    { "HR"       , "H-pattern gear R press" },
-    { "H1"       , "H-pattern gear 1 press" },
-    { "H2"       , "H-pattern gear 2 press" },
-    { "H3"       , "H-pattern gear 3 press" },
-    { "H4"       , "H-pattern gear 4 press" },
-    { "H5"       , "H-pattern gear 5 press" },
-    { "H6"       , "H-pattern gear 6 press" },
-    { "H7"       , "H-pattern gear 7 press" },
-    { "H8"       , "H-pattern gear 8 press" },
-    { "H9"       , "H-pattern gear 9 press" },
-    { "H10"      , "H-pattern gear 10 press"},
-    { "HN"       , "H-pattern Neutral"      },
-};
+    const std::vector<STagInfo> keyboardConfTags {
+        { "Toggle"   , "Toggle mod on/off"      },
+        { "ToggleH"  , "Switch shift mode"      },
+        { "ShiftUp"  , "Shift up"               },
+        { "ShiftDown", "Shift down"             },
+        { "Clutch"   , "Hold for clutch"        },
+        { "Engine"   , "Toggle engine on/off"   },
+        { "Throttle" , "Key used for throttle"  },
+        { "Brake"    , "Key used for brake"     },
+        { "HR"       , "H-pattern gear R press" },
+        { "H1"       , "H-pattern gear 1 press" },
+        { "H2"       , "H-pattern gear 2 press" },
+        { "H3"       , "H-pattern gear 3 press" },
+        { "H4"       , "H-pattern gear 4 press" },
+        { "H5"       , "H-pattern gear 5 press" },
+        { "H6"       , "H-pattern gear 6 press" },
+        { "H7"       , "H-pattern gear 7 press" },
+        { "H8"       , "H-pattern gear 8 press" },
+        { "H9"       , "H-pattern gear 9 press" },
+        { "H10"      , "H-pattern gear 10 press"},
+        { "HN"       , "H-pattern Neutral"      },
+    };
 
 
-const std::vector<STagInfo> controllerConfTags = {
-    { "Toggle"     , "Toggle mod usage: hold"      },
-    { "ToggleShift", "Toggle shift usage: hold"    },
-    { "ShiftUp"    , "Shift up usage: press"       },
-    { "ShiftDown"  , "Shift down usage: press"     },
-    { "Clutch"     , "Clutch usage: axis or button"},
-    { "Engine"     , "Engine usage: press"         },
-    { "Throttle"   , "Throttle: axis or button"    },
-    { "Brake"      , "Brake: axis or button"       }
-};
+    const std::vector<STagInfo> controllerConfTags {
+        { "Toggle"     , "Toggle mod usage: hold"      },
+        { "ToggleShift", "Toggle shift usage: hold"    },
+        { "ShiftUp"    , "Shift up usage: press"       },
+        { "ShiftDown"  , "Shift down usage: press"     },
+        { "Clutch"     , "Clutch usage: axis or button"},
+        { "Engine"     , "Engine usage: press"         },
+        { "Throttle"   , "Throttle: axis or button"    },
+        { "Brake"      , "Brake: axis or button"       }
+    };
 
-const std::vector<std::string> speedoTypes = {
-    "off",
-    "kph",
-    "mph",
-    "ms"
-};
+    const std::vector<std::string> speedoTypes {
+        "off",
+        "kph",
+        "mph",
+        "ms"
+    };
 
-std::vector<int> blockableControls = {
-    -1,
-    ControlVehicleAim,
-    ControlVehicleHandbrake,
-    ControlVehicleAttack,
-    ControlVehicleDuck,
-    ControlVehicleSelectNextWeapon,
-    ControlVehicleCinCam,
-    ControlVehicleExit
-};
-
-std::vector<std::string> blockableControlsHelp = {
-    "None",
-    "Aim",
-    "Handbrake",
-    "Attack",
-    "Duck",
-    "NextWeapon",
-    "Cinematic Cam",
-    "Exit Car"
-};
+    const std::vector<SControlText<int>> blockableControls {
+        { -1,                             "None"},
+        { ControlVehicleAim,              "Aim"},
+        { ControlVehicleHandbrake,        "Handbrake"},
+        { ControlVehicleAttack,           "Attack"},
+        { ControlVehicleDuck,             "Duck"},
+        { ControlVehicleSelectNextWeapon, "NextWeapon"},
+        { ControlVehicleCinCam,           "Cinematic Cam"},
+        { ControlVehicleExit,             "Exit Car"}
+    };
+}
 
 int getBlockableControlIndex(int control) {
     for (size_t i = 0; i < blockableControls.size(); i++) {
-        if (control == blockableControls[i])
+        if (control == blockableControls[i].Control)
             return static_cast<int>(i);
     }
     return 0;
@@ -444,12 +434,12 @@ void update_controlsmenu() {
     menu.MenuOption("Controller options", "controlleroptionsmenu");
 
     if (carControls.UseLegacyController) {
-        menu.MenuOption("Native controller bindings", "legacycontrollermenu",
-            { "Set up native controller bindings." });
+        menu.MenuOption("Controller bindings (Native)", "legacycontrollermenu",
+            { "Set up controller bindings." });
     }
     else {
-        menu.MenuOption("Controller bindings", "controllermenu",
-            { "Change controller control bindings." });
+        menu.MenuOption("Controller bindings (XInput)", "controllermenu",
+            { "Set up controller bindings." });
     }
 
     menu.MenuOption("Keyboard bindings", "keyboardmenu",
@@ -496,22 +486,28 @@ void update_controlleroptionsmenu() {
 }
 
 void update_legacycontrollermenu() {
-    menu.Title("Non-Xinput controls");
-    menu.Subtitle("Non-Xinput options");
+    menu.Title("Controller bindings");
+    menu.Subtitle("Native controls");
+
+    std::vector<std::string> blockableControlsHelp;
+    blockableControlsHelp.reserve(blockableControls.size());
+    for (const auto& control : blockableControls) {
+        blockableControlsHelp.emplace_back(control.Text);
+    }
 
     int oldIndexUp = getBlockableControlIndex(carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
     if (menu.StringArray("Shift Up blocks", blockableControlsHelp, oldIndexUp)) {
-        carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = blockableControls[oldIndexUp];
+        carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = blockableControls[oldIndexUp].Control;
     }
 
     int oldIndexDown = getBlockableControlIndex(carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
     if (menu.StringArray("Shift Down blocks", blockableControlsHelp, oldIndexDown)) {
-        carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = blockableControls[oldIndexDown];
+        carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = blockableControls[oldIndexDown].Control;
     }
 
     int oldIndexClutch = getBlockableControlIndex(carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
     if (menu.StringArray("Clutch blocks", blockableControlsHelp, oldIndexClutch)) {
-        carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] = blockableControls[oldIndexClutch];
+        carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] = blockableControls[oldIndexClutch].Control;
     }
 
     std::vector<std::string> controllerInfo = {
@@ -540,21 +536,27 @@ void update_legacycontrollermenu() {
 
 void update_controllermenu() {
     menu.Title("Controller bindings");
-    menu.Subtitle("Controller bindings");
+    menu.Subtitle("XInput controls");
+
+    std::vector<std::string> blockableControlsHelp;
+    blockableControlsHelp.reserve(blockableControls.size());
+    for (const auto& control : blockableControls) {
+        blockableControlsHelp.emplace_back(control.Text);
+    }
 
     int oldIndexUp = getBlockableControlIndex(carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)]);
     if (menu.StringArray("Shift Up blocks", blockableControlsHelp, oldIndexUp)) {
-        carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] = blockableControls[oldIndexUp];
+        carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] = blockableControls[oldIndexUp].Control;
     }
 
     int oldIndexDown = getBlockableControlIndex(carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)]);
     if (menu.StringArray("Shift Down blocks", blockableControlsHelp, oldIndexDown)) {
-        carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = blockableControls[oldIndexDown];
+        carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = blockableControls[oldIndexDown].Control;
     }
 
     int oldIndexClutch = getBlockableControlIndex(carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)]);
     if (menu.StringArray("Clutch blocks", blockableControlsHelp, oldIndexClutch)) {
-        carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)] = blockableControls[oldIndexClutch];
+        carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)] = blockableControls[oldIndexClutch].Control;
     }
 
     std::vector<std::string> controllerInfo = {
@@ -956,7 +958,7 @@ void update_hudmenu() {
         for (const auto& font : fonts)
             strFonts.push_back(font.Name);
         int fontIndex = static_cast<int>(fontIt - fonts.begin());
-        if (menu.StringArray("Font: ", strFonts, fontIndex, { "Select the font for speed, gearbox mode, current gear." })) {
+        if (menu.StringArray("Font", strFonts, fontIndex, { "Select the font for speed, gearbox mode, current gear." })) {
             settings.HUDFont = fonts.at(fontIndex).ID;
         }
     }
