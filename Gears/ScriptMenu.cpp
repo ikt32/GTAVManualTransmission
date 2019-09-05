@@ -1761,18 +1761,16 @@ bool configKeyboardKey(const std::string &confTag) {
 // Controller
 bool configControllerButton(const std::string &confTag) {
     std::string additionalInfo = fmt::format("Press {} to exit", escapeKey);
-    XInputController* rawController = carControls.GetRawController();
-    if (rawController == nullptr)
-        return false;
+    XInputController controller = carControls.GetController();
 
     while (true) {
         if (IsKeyJustUp(str2key(escapeKey))) {
             return false;
         }
         carControls.UpdateValues(CarControls::InputDevices::Controller, true);
-        for (const std::string& buttonHelper : rawController->XboxButtonsHelper) {
-            auto button = rawController->StringToButton(buttonHelper);
-            if (rawController->IsButtonJustPressed(button)) {
+        for (const std::string& buttonHelper : controller.XboxButtonsHelper) {
+            auto button = controller.StringToButton(buttonHelper);
+            if (controller.IsButtonJustPressed(button)) {
                 saveControllerButton(confTag, buttonHelper);
                 return true;
             }

@@ -245,9 +245,8 @@ public:
 
     std::vector<Device> FreeDevices{};
 
-    // TODO: Make interface or some other global-ish stuff
-    XInputController *GetRawController() {
-        return &mXInputController;
+    XInputController& GetController() {
+        return mXInputController;
     }
 
     int ConfTagKB2key(const std::string &confTag) {
