@@ -38,14 +38,7 @@ extern NativeMenu::Menu menu;
 extern CarControls carControls;
 extern ScriptSettings settings;
 
-namespace {
-    const std::string escapeKey = "BACKSPACE";
-    const std::string skipKey = "RIGHT";
-
-    const std::string modUrl = "https://www.gta5-mods.com/scripts/manual-transmission-ikt";
-}
-
-struct Font {
+struct SFont {
     int ID;
     std::string Name;
 };
@@ -55,7 +48,54 @@ struct STagInfo {
     std::string Info;
 };
 
-const std::vector<Font> fonts {
+struct SWheelButtonText {
+    CarControls::WheelControlType Control;
+    std::string Text;
+};
+
+namespace {
+    const std::string escapeKey = "BACKSPACE";
+    const std::string skipKey = "RIGHT";
+    const std::string modUrl = "https://www.gta5-mods.com/scripts/manual-transmission-ikt";
+
+    const std::vector<SWheelButtonText> wheelMenuButtons{
+        { CarControls::WheelControlType::HR             , "[Gear R]" },
+        { CarControls::WheelControlType::H1             , "[Gear 1]" },
+        { CarControls::WheelControlType::H2             , "[Gear 2]" },
+        { CarControls::WheelControlType::H3             , "[Gear 3]" },
+        { CarControls::WheelControlType::H4             , "[Gear 4]" },
+        { CarControls::WheelControlType::H5             , "[Gear 5]" },
+        { CarControls::WheelControlType::H6             , "[Gear 6]" },
+        { CarControls::WheelControlType::H7             , "[Gear 7]" },
+        { CarControls::WheelControlType::H8             , "[Gear 8]" },
+        { CarControls::WheelControlType::H9             , "[Gear 9]" },
+        { CarControls::WheelControlType::H10            , "[Gear 10]" },
+        { CarControls::WheelControlType::APark          , "[Auto Park]" },
+        { CarControls::WheelControlType::AReverse       , "[Auto Reverse]" },
+        { CarControls::WheelControlType::ANeutral       , "[Auto Reverse]" },
+        { CarControls::WheelControlType::ADrive         , "[Auto Drive]" },
+        { CarControls::WheelControlType::ShiftUp        , "[ShiftUp]" },
+        { CarControls::WheelControlType::ShiftDown      , "[ShiftDown]" },
+        { CarControls::WheelControlType::Clutch         , "[ClutchButton]" },
+        { CarControls::WheelControlType::Engine         , "[Engine]" },
+        { CarControls::WheelControlType::Handbrake      , "[Handbrake]" },
+        { CarControls::WheelControlType::Horn           , "[Horn]" },
+        { CarControls::WheelControlType::Lights         , "[Lights]" },
+        { CarControls::WheelControlType::LookBack       , "[LookBack]" },
+        { CarControls::WheelControlType::LookLeft       , "[LookLeft]" },
+        { CarControls::WheelControlType::LookRight      , "[LookRight]" },
+        { CarControls::WheelControlType::Camera         , "[Camera]" },
+        { CarControls::WheelControlType::RadioNext      , "[RadioNext]" },
+        { CarControls::WheelControlType::RadioPrev      , "[RadioPrev]" },
+        { CarControls::WheelControlType::IndicatorLeft  , "[IndicatorLeft]" },
+        { CarControls::WheelControlType::IndicatorRight , "[IndicatorRight]" },
+        { CarControls::WheelControlType::IndicatorHazard, "[IndicatorHazard]" },
+        { CarControls::WheelControlType::Toggle         , "[ToggleMod]" },
+        { CarControls::WheelControlType::ToggleH        , "[ChangeShiftMode]" },
+    };
+}
+
+const std::vector<SFont> fonts {
     { 0, "Chalet London" },
     { 1, "Sign Painter" },
     { 2, "Slab Serif" },
@@ -880,42 +920,14 @@ void update_buttonsmenu() {
     }
 
     std::vector<std::string> buttonInfo;
-    buttonInfo.push_back("Press RIGHT to clear this button");
-    buttonInfo.push_back("Active buttons:");
-    if (carControls.ButtonIn(CarControls::WheelControlType::HR)) buttonInfo.push_back("Gear R");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H1)) buttonInfo.push_back("Gear 1");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H2)) buttonInfo.push_back("Gear 2");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H3)) buttonInfo.push_back("Gear 3");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H4)) buttonInfo.push_back("Gear 4");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H5)) buttonInfo.push_back("Gear 5");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H6)) buttonInfo.push_back("Gear 6");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H7)) buttonInfo.push_back("Gear 7");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H8)) buttonInfo.push_back("Gear 8");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H9)) buttonInfo.push_back("Gear 9");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H10)) buttonInfo.push_back("Gear 10");
-    if (carControls.ButtonIn(CarControls::WheelControlType::APark)) buttonInfo.push_back("Auto Park");
-    if (carControls.ButtonIn(CarControls::WheelControlType::AReverse)) buttonInfo.push_back("Auto Reverse");
-    if (carControls.ButtonIn(CarControls::WheelControlType::ANeutral)) buttonInfo.push_back("Auto Reverse");
-    if (carControls.ButtonIn(CarControls::WheelControlType::ADrive)) buttonInfo.push_back("Auto Drive");
-    if (carControls.ButtonIn(CarControls::WheelControlType::ShiftUp))   buttonInfo.push_back("ShiftUp");
-    if (carControls.ButtonIn(CarControls::WheelControlType::ShiftDown)) buttonInfo.push_back("ShiftDown");
-    if (carControls.ButtonIn(CarControls::WheelControlType::Clutch))    buttonInfo.push_back("ClutchButton");
-    if (carControls.ButtonIn(CarControls::WheelControlType::Engine))    buttonInfo.push_back("Engine");
-    if (carControls.ButtonIn(CarControls::WheelControlType::Handbrake)) buttonInfo.push_back("Handbrake");
-    if (carControls.ButtonIn(CarControls::WheelControlType::Horn))      buttonInfo.push_back("Horn");
-    if (carControls.ButtonIn(CarControls::WheelControlType::Lights))    buttonInfo.push_back("Lights");
-    if (carControls.ButtonIn(CarControls::WheelControlType::LookBack))  buttonInfo.push_back("LookBack");
-    if (carControls.ButtonIn(CarControls::WheelControlType::LookLeft))  buttonInfo.push_back("LookLeft");
-    if (carControls.ButtonIn(CarControls::WheelControlType::LookRight)) buttonInfo.push_back("LookRight");
-    if (carControls.ButtonIn(CarControls::WheelControlType::Camera))    buttonInfo.push_back("Camera");
-    if (carControls.ButtonIn(CarControls::WheelControlType::RadioNext)) buttonInfo.push_back("RadioNext");
-    if (carControls.ButtonIn(CarControls::WheelControlType::RadioPrev)) buttonInfo.push_back("RadioPrev");
-    if (carControls.ButtonIn(CarControls::WheelControlType::IndicatorLeft))     buttonInfo.push_back("IndicatorLeft");
-    if (carControls.ButtonIn(CarControls::WheelControlType::IndicatorRight))    buttonInfo.push_back("IndicatorRight");
-    if (carControls.ButtonIn(CarControls::WheelControlType::IndicatorHazard))   buttonInfo.push_back("IndicatorHazard");
-    if (carControls.ButtonIn(CarControls::WheelControlType::Toggle))    buttonInfo.push_back("ToggleMod");
-    if (carControls.ButtonIn(CarControls::WheelControlType::ToggleH))   buttonInfo.push_back("ChangeShiftMode");
-    if (buttonInfo.size() == 2) buttonInfo.push_back("None");
+    buttonInfo.emplace_back("Press RIGHT to clear this button");
+    buttonInfo.emplace_back("Active buttons:");
+    for (const auto& wheelButton : wheelMenuButtons) {
+        if (carControls.ButtonIn(wheelButton.Control))
+            buttonInfo.emplace_back(wheelButton.Text);
+    }
+    if (buttonInfo.size() == 2)
+        buttonInfo.emplace_back("None");
 
     for (auto confTag : buttonConfTags) {
         buttonInfo.push_back(fmt::format("Assigned to {}", carControls.ConfTagWheel2Value(confTag)));
@@ -937,7 +949,7 @@ void update_hudmenu() {
     menu.BoolOption("Always enable", settings.AlwaysHUD,
         { "Display HUD even if manual transmission is off." });
 
-    auto fontIt = std::find_if(fonts.begin(), fonts.end(), [](const Font& font) { return font.ID == settings.HUDFont; });
+    auto fontIt = std::find_if(fonts.begin(), fonts.end(), [](const SFont& font) { return font.ID == settings.HUDFont; });
     if (fontIt != fonts.end()) {
         std::vector<std::string> strFonts;
         strFonts.reserve(fonts.size());
