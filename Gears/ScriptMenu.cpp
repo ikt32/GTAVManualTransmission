@@ -38,31 +38,32 @@ extern NativeMenu::Menu menu;
 extern CarControls carControls;
 extern ScriptSettings settings;
 
-extern int textureWheelId;
+namespace {
+    const std::string escapeKey = "BACKSPACE";
+    const std::string skipKey = "RIGHT";
 
-const std::string escapeKey = "BACKSPACE";
-const std::string skipKey = "RIGHT";
+    const std::string modUrl = "https://www.gta5-mods.com/scripts/manual-transmission-ikt";
+}
 
-const std::string modUrl = "https://www.gta5-mods.com/scripts/manual-transmission-ikt";
-
-// FontName, fontID
-std::vector<std::string> fonts{
-    { "Chalet London" },
-    { "Sign Painter" },
-    { "Slab Serif" },
-    { "Chalet Cologne" },
-    { "Pricedown" },
+struct Font {
+    int ID;
+    std::string Name;
 };
 
-std::vector<int> fontIDs{
-    0,
-    1,
-    2,
-    4,
-    7
+struct STagInfo {
+    std::string Tag;
+    std::string Info;
 };
 
-std::vector<std::string> buttonConfTags{
+const std::vector<Font> fonts {
+    { 0, "Chalet London" },
+    { 1, "Sign Painter" },
+    { 2, "Slab Serif" },
+    { 4, "Chalet Cologne" },
+    { 7, "Pricedown" },
+};
+
+const std::vector<std::string> buttonConfTags {
     { "TOGGLE_MOD" },
     { "CHANGE_SHIFTMODE" },
     { "THROTTLE_BUTTON" },
@@ -85,12 +86,7 @@ std::vector<std::string> buttonConfTags{
     { "INDICATOR_HAZARD" },
 };
 
-struct STagInfo {
-    std::string Tag;
-    std::string Info;
-};
-
-const std::vector<STagInfo> keyboardConfTags = {
+const std::vector<STagInfo> keyboardConfTags {
     { "Toggle"   , "Toggle mod on/off"      },
     { "ToggleH"  , "Switch shift mode"      },
     { "ShiftUp"  , "Shift up"               },
@@ -632,8 +628,8 @@ void update_wheelmenu() {
     if (carControls.ButtonIn(CarControls::WheelControlType::ANeutral)) hAutoInfo.emplace_back("Auto Neutral");
     if (carControls.ButtonIn(CarControls::WheelControlType::ADrive)) hAutoInfo.emplace_back("Auto Drive");
 
-    if (menu.OptionPlus("H-pattern shifter setup (auto)", hAutoInfo, nullptr, [] { clearASelect(); }, nullptr, "Input values",
-        { "Select this option to start H-pattern shifter (auto) setup. Follow the on-screen instructions." })) {
+    if (menu.OptionPlus("Shifter setup for automatic", hAutoInfo, nullptr, [] { clearASelect(); }, nullptr, "Input values",
+        { "Set up H-pattern shifter for automatic gearbox. Follow the on-screen instructions." })) {
         bool result = configASelect();
         UI::Notify(result ? "H-pattern shifter (auto) saved" : "Cancelled H-pattern shifter (auto) setup");
     }
@@ -941,20 +937,25 @@ void update_hudmenu() {
     menu.BoolOption("Always enable", settings.AlwaysHUD,
         { "Display HUD even if manual transmission is off." });
 
-    int fontIndex = static_cast<int>(std::find(fontIDs.begin(), fontIDs.end(), settings.HUDFont) - fontIDs.begin());
-    if (menu.StringArray("Font: ", fonts, fontIndex, { "Select the font for speed, gearbox mode, current gear." })) {
-        settings.HUDFont = fontIDs.at(fontIndex);
+    auto fontIt = std::find_if(fonts.begin(), fonts.end(), [](const Font& font) { return font.ID == settings.HUDFont; });
+    if (fontIt != fonts.end()) {
+        std::vector<std::string> strFonts;
+        strFonts.reserve(fonts.size());
+        for (const auto& font : fonts)
+            strFonts.push_back(font.Name);
+        int fontIndex = static_cast<int>(fontIt - fonts.begin());
+        if (menu.StringArray("Font: ", strFonts, fontIndex, { "Select the font for speed, gearbox mode, current gear." })) {
+            settings.HUDFont = fonts.at(fontIndex).ID;
+        }
     }
+    else {
+        menu.Option("Invalid font ID in settings");
+    }
+
 
     menu.MenuOption("Gear and shift mode", "geardisplaymenu");
     menu.MenuOption("Speedometer", "speedodisplaymenu");
     menu.MenuOption("RPM Gauge", "rpmdisplaymenu");
-
-    std::vector<std::string> wheelTexturePresent = {};
-
-    if (textureWheelId == -1) {
-        wheelTexturePresent.emplace_back("Wheel texture not found!");
-    }
 
     menu.MenuOption("Wheel & Pedal Info", "wheelinfomenu");
 }
