@@ -154,6 +154,7 @@
     <ClCompile Include="Util\TimeHelper.cpp" />
     <ClCompile Include="Util\Logger.cpp" />
     <ClCompile Include="VehicleData.cpp" />
+    <ClCompile Include="WheelInput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\GTAVMenuBase\menu.h" />
@@ -212,6 +213,7 @@
     <ClInclude Include="Util\UIUtils.h" />
     <ClInclude Include="Util\Util.hpp" />
     <ClInclude Include="VehicleData.hpp" />
+    <ClInclude Include="WheelInput.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\thirdparty\curl\libcurl.lib" />

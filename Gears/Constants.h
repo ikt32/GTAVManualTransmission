@@ -6,5 +6,7 @@
 #define VERSION_MINOR 6
 #define VERSION_PATCH 8
 
+// TODO: namespace Constants {
 static const char* const DISPLAY_VERSION = "v" STR(VERSION_MAJOR) "."  STR(VERSION_MINOR) "." STR(VERSION_PATCH);
 static const char* const mtDir = "\\ManualTransmission";
+//TODO: const std::string mtPrefix = "~b~Manual Transmission~w~~n~";
