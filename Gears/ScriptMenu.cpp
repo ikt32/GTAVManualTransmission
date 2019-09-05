@@ -96,11 +96,11 @@ namespace {
     };
 
     const std::vector<SFont> fonts {
-    { 0, "Chalet London" },
-    { 1, "Sign Painter" },
-    { 2, "Slab Serif" },
-    { 4, "Chalet Cologne" },
-    { 7, "Pricedown" },
+        { 0, "Chalet London" },
+        { 1, "Sign Painter" },
+        { 2, "Slab Serif" },
+        { 4, "Chalet Cologne" },
+        { 7, "Pricedown" },
     };
 
     const std::vector<std::string> buttonConfTags {
