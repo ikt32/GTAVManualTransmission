@@ -487,18 +487,15 @@ void update_steering() {
     }
 }
 
-// From CustomSteering TODO Merge into the new CustomSteering thing
-// calculateReduction
 void updateSteeringMultiplier() {
-    float mult = 1.0f;
+    float mult;
 
     if (carControls.PrevInput == CarControls::Wheel) {
-        mult = mult * settings.GameSteerMultWheel;
+        mult = settings.GameSteerMultWheel;
     }
     else {
-        mult = mult * settings.CustomSteering.SteeringMult;
+        mult = settings.CustomSteering.SteeringMult;
     }
-    // TODO: Consider not using and moving steering reduction/mult to input side
     ext.SetSteeringMultiplier(vehicle, mult);
 }
 
