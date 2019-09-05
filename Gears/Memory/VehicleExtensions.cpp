@@ -686,6 +686,27 @@ float VehicleExtensions::GetWheelLargestAngle(Vehicle handle) {
     return largestAngle;
 }
 
+float VehicleExtensions::GetWheelAverageAngle(Vehicle handle) {
+    auto angles = GetWheelSteeringAngles(handle);
+    float wheelsSteered = 0.0f;
+    float avgAngle = 0.0f;
+
+    for (int i = 0; i < GetNumWheels(handle); i++) {
+        if (i < 3 && angles[i] != 0.0f) {
+            wheelsSteered += 1.0f;
+            avgAngle += angles[i];
+        }
+    }
+
+    if (wheelsSteered > 0.5f && wheelsSteered < 2.5f) { // bikes, cars, quads
+        avgAngle /= wheelsSteered;
+    }
+    else {
+        avgAngle = GetSteeringAngle(handle) * GetSteeringMultiplier(handle); // tank, forklift
+    }
+    return avgAngle;
+}
+
 std::vector<WheelDimensions> VehicleExtensions::GetWheelDimensions(Vehicle handle) {
     auto wheels = GetWheelPtrs(handle);
 
