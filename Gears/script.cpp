@@ -320,8 +320,6 @@ void update_manual_features() {
         wheelPatchStates.EngLockActive = false;
     }
 
-    // TODO: engLock change to checkRevMatch?
-
     if (!gearStates.FakeNeutral &&
         !(settings.SimpleBike && vehData.mClass == VehicleClass::Bike) && vehData.mHasClutch) {
         // Stalling
