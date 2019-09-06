@@ -1249,37 +1249,7 @@ void update_menu() {
 ///////////////////////////////////////////////////////////////////////////////
 //                              Config helpers/util
 ///////////////////////////////////////////////////////////////////////////////
-
 // Wheel section
-// Look at that argument list! :D
-bool getConfigAxisWithValues(const std::vector<std::tuple<GUID, std::string, int>>& startStates, GUID &selectedGUID, std::string &selectedAxis, int hyst, bool &positive, int &startValue_) {
-    for (auto guid : carControls.GetWheel().GetGuids()) {
-        for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
-            for (auto startState : startStates) {
-                std::string axisName = carControls.GetWheel().DIAxisHelper[i];
-                int axisValue = carControls.GetWheel().GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid);
-                int startValue = std::get<2>(startState);
-                if (std::get<0>(startState) == guid &&
-                    std::get<1>(startState) == axisName) {
-                    startValue_ = startValue;
-                    if (axisValue > startValue + hyst) { // 0 (min) - 65535 (max)
-                        selectedGUID = guid;
-                        selectedAxis = axisName;
-                        positive = true;
-                        return true;
-                    }
-                    if (axisValue < startValue - hyst) { // 65535 (min) - 0 (max)
-                        selectedGUID = guid;
-                        selectedAxis = axisName;
-                        positive = false;
-                        return true;
-                    }
-                }
-            }
-        }
-    }
-    return false;
-}
 
 void saveAxis(const std::string &confTag, GUID devGUID, const std::string& axis, int min, int max) {
     saveChanges();
@@ -1426,8 +1396,15 @@ void clearLControllerButton(const std::string& confTag) {
 ///////////////////////////////////////////////////////////////////////////////
 // Wheel
 bool configAxis(const std::string& confTag) {
-    std::string additionalInfo = fmt::format("Press {} to exit.", escapeKey);
+    struct SAxisState {
+        GUID Guid;
+        WheelDirectInput::DIAxis Axis;
+        int ValueStart;
+        int ValueEnd;
+    };
 
+    std::string additionalInfo = fmt::format("Press {} to exit.", escapeKey);
+    bool confSteer = confTag == "STEER";
     if (confTag == "STEER") {
         additionalInfo += " Steer right to register axis.";
     }
@@ -1440,77 +1417,93 @@ bool configAxis(const std::string& confTag) {
 
     carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
     // Save current state
-    std::vector<std::tuple<GUID, std::string, int>> startStates;
+    std::vector<SAxisState> axisStates;
     for (auto guid : carControls.GetWheel().GetGuids()) {
         for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
-            std::string axisName = carControls.GetWheel().DIAxisHelper[i];
-            int axisValue = carControls.GetWheel().GetAxisValue(static_cast<WheelDirectInput::DIAxis>(i), guid);
-            startStates.emplace_back(guid, axisName, axisValue);
+            auto axis = static_cast<WheelDirectInput::DIAxis>(i);
+            int axisValue = carControls.GetWheel().GetAxisValue(axis, guid);
+            axisStates.push_back({ guid, axis, axisValue, axisValue });
         }
     }
 
     // Ignore inputs before selection if they moved less than hyst
     int hyst = 65536 / 8;
 
-    // To track direction of physical <-> digital value.
-    bool positive = true;
-
-    GUID selectedGUID;
-    std::string selectedAxis;
-    int startValue;
-    int endValue;
-
-    // going down!
-    while (true) {
+    bool found = false;
+    while (!found) {
         if (IsKeyJustUp(str2key(escapeKey))) {
             return false;
         }
         carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
-        if (getConfigAxisWithValues(startStates, selectedGUID, selectedAxis, hyst, positive, startValue)) {
-            break;
+
+        for (auto guid : carControls.GetWheel().GetGuids()) {
+            for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
+                auto axis = static_cast<WheelDirectInput::DIAxis>(i);
+                for (auto& axisState : axisStates) {
+                    if (axisState.Guid != guid)
+                        continue;
+
+                    if (axisState.Axis != axis)
+                        continue;
+
+                    int axisValue = carControls.GetWheel().GetAxisValue(axis, guid);
+
+                    if (axisValue == -1)
+                        continue;
+
+                    // 0 (min) - 65535 (max) -> Positive
+                    if (axisValue > axisState.ValueStart + hyst && axisValue > axisState.ValueEnd) {
+                        axisState.ValueEnd = axisValue;
+                        if (confSteer) // Early return for steering axis.
+                            found = true;
+                    }
+
+                    // 65535 (min) - 0 (max) -> Negative
+                    if (axisValue < axisState.ValueStart - hyst && axisValue < axisState.ValueEnd) {
+                        axisState.ValueEnd = axisValue;
+                        if (confSteer) // Early return for steering axis.
+                            found = true;
+                    }
+
+                    // 0 (min) - 65535 (max) -> Positive
+                    if (axisValue < axisState.ValueEnd - hyst) {
+                        found = true;
+                    }
+
+                    // 65535 (min) - 0 (max) -> Negative
+                    if (axisValue > axisState.ValueEnd + hyst) {
+                        found = true;
+                    }
+                }
+            }
         }
+
         showSubtitle(additionalInfo);
         WAIT(0);
     }
 
-    // I'll just assume no manufacturer uses inane non-full range steering wheel values
-    if (confTag == "STEER") {
-        int min = (positive ? 0 : 65535);
-        int max = (positive ? 65535 : 0);
-        saveAxis(confTag, selectedGUID, selectedAxis, min, max);
+    SAxisState foundAxis{};
+    int maxDiff = 0;
+    for (const auto& axisState : axisStates) {
+        int diff = abs(axisState.ValueStart - axisState.ValueEnd);
+        if (diff > maxDiff) {
+            maxDiff = diff;
+            foundAxis = axisState;
+        }
+    }
+    std::string axisName = carControls.GetWheel().DIAxisHelper[foundAxis.Axis];
+
+    // Use full range instead of registered values, since steering is full range.
+    if (confSteer) {
+        int min = foundAxis.ValueEnd > foundAxis.ValueStart ? 0 : 65535;
+        int max = foundAxis.ValueEnd > foundAxis.ValueStart ? 65535 : 0;
+        saveAxis(confTag, foundAxis.Guid, axisName, min, max);
         return true;
     }
 
-    int prevAxisValue = carControls.GetWheel().GetAxisValue(carControls.GetWheel().StringToAxis(selectedAxis), selectedGUID);
-
-    // and up again!
-    while (true) {
-        if (IsKeyJustUp(str2key(escapeKey))) {
-            return false;
-        }
-        carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
-
-        int axisValue = carControls.GetWheel().GetAxisValue(carControls.GetWheel().StringToAxis(selectedAxis), selectedGUID);
-
-        if (positive && axisValue < prevAxisValue) {
-            endValue = prevAxisValue;
-            break;
-        }
-
-        if (!positive && axisValue > prevAxisValue) {
-            endValue = prevAxisValue;
-            break;
-        }
-
-        prevAxisValue = axisValue;
-
-        showSubtitle(additionalInfo);
-        WAIT(0);
-    }
-
-    int min = startValue;
-    int max = endValue;
-    saveAxis(confTag, selectedGUID, selectedAxis, min, max);
+    int min = foundAxis.ValueStart;
+    int max = foundAxis.ValueEnd;
+    saveAxis(confTag, foundAxis.Guid, axisName, min, max);
     return true;
 }
 
