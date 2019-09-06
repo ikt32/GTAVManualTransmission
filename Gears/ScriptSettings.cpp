@@ -16,7 +16,10 @@
 
 #pragma warning(push)
 #pragma warning(disable: 4244)
-ScriptSettings::ScriptSettings() { }
+ScriptSettings::ScriptSettings()
+    : CustomSteering { 0, 1.0f, 90.0f, 1.0f, 1.0f }
+    , FFB { 10000, 0 }
+{ }
 
 void ScriptSettings::SetFiles(const std::string &general, const std::string &wheel) {
     settingsGeneralFile = general;
@@ -237,6 +240,9 @@ void ScriptSettings::SaveWheel(CarControls *scriptControl) const {
     settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Enable", EnableFFB);
     settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Scale", ScaleFFB);
     settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", SATAmpMult);
+    settingsWheel.SetLongValue("FORCE_FEEDBACK", "SATMax", FFB.SATMax);
+    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "AntiDeadForce", FFB.AntiDeadForce);
+
     settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DetailMult", DetailMult);
     settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "CollisionMult", CollisionMult);
     settingsWheel.SetLongValue("FORCE_FEEDBACK", "DamperMax", DamperMax);
@@ -509,6 +515,9 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     EnableFFB = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Enable", true);
     ScaleFFB = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Scale", true);
     SATAmpMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", 1.0);
+    FFB.SATMax = settingsWheel.GetLongValue("FORCE_FEEDBACK", "SATMax", 10000);
+    FFB.AntiDeadForce = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "AntiDeadForce", 0);
+
     DetailMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DetailMult", 2.5);
     CollisionMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "CollisionMult", 1.0);
 

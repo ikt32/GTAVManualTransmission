@@ -887,6 +887,8 @@ void update_forcefeedbackmenu() {
         { "Force feedback strength for steering. Increase for weak wheels, decrease for strong/fast wheels.",
         "Putting this too high clips force feedback. Too low and the car doesn't feel responsive." });
 
+    menu.IntOption("Self aligning torque limit", settings.FFB.SATMax, 0, 10000, 100);
+
     menu.FloatOption("Detail effect multiplier", settings.DetailMult, 0.0f, 10.0f, 0.1f,
         { "Force feedback effects caused by the suspension." });
 
@@ -901,6 +903,37 @@ void update_forcefeedbackmenu() {
 
     menu.FloatOption("Damper min speed", settings.DamperMinSpeed, 0.0f, 40.0f, 0.2f,
         { "Speed where the damper strength should be minimal.", "In m/s." });
+
+    if (menu.Option("Tune FFB Anti-Deadzone")) {
+        carControls.PlayFFBCollision(0);
+        carControls.PlayFFBDynamics(0, 0);
+        while (true) {
+            if (IsKeyJustUp(str2key(escapeKey))) {
+                break;
+            }
+
+            if (IsKeyJustUp(str2key("LEFT"))) {
+                settings.FFB.AntiDeadForce -= 100;
+                if (settings.FFB.AntiDeadForce < 100) {
+                    settings.FFB.AntiDeadForce = 0;
+                }
+            }
+
+            if (IsKeyJustUp(str2key("RIGHT"))) {
+                settings.FFB.AntiDeadForce += 100;
+                if (settings.FFB.AntiDeadForce > 10000 - 100) {
+                    settings.FFB.AntiDeadForce = 10000;
+                }
+            }
+            carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
+
+            carControls.PlayFFBDynamics(settings.FFB.AntiDeadForce, 0);
+            
+            showSubtitle(fmt::format("Press LEFT and RIGHT to decrease and increase force feedback anti-deadzone. "
+                "Use the highest value before your wheel starts moving. Currently [{}]. Press {} to exit.", settings.FFB.AntiDeadForce, escapeKey));
+            WAIT(0);
+        }
+    }
 }
 
 void update_buttonsmenu() {

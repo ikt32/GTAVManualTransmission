@@ -530,6 +530,13 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
         showText(0.85, 0.225, 0.4, fmt::format("Error:\t\t{:.3f}", error), 4);
         showText(0.85, 0.250, 0.4, fmt::format("{}Under:\t\t{:.3f}~w~", understeering ? "~b~" : "~w~", understeer), 4);
     }
+    if (satForce > 0) {
+        satForce = map(satForce, 0, 10000, settings.FFB.AntiDeadForce, 10000);
+    }
+    if (satForce < 0) {
+        satForce = map(satForce, -10000, 0, -10000, -settings.FFB.AntiDeadForce);
+    }
+    satForce = std::clamp(satForce, -settings.FFB.SATMax, settings.FFB.SATMax);
 
     return satForce;
 }
@@ -645,7 +652,7 @@ void WheelInput::PlayFFBGround() {
             "FFB: {}", gForce, res));
     }
     if (settings.DisplayInfo) {
-        showText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
+        showText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > settings.FFB.SATMax ? "~r~" : "~w~", satForce), 4);
         showText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
         showText(0.85, 0.325, 0.4, fmt::format("Damper:\t\t{}", damperForce), 4);
         showText(0.85, 0.350, 0.4, fmt::format("Detail:\t\t{}", detailForce), 4);

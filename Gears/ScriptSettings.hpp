@@ -51,7 +51,7 @@ public:
     struct {
         int Mode;
         float CountersteerMult;
-        float CountersteerLimit;
+        float CountersteerLimit; // In Degrees
         float SteeringMult;
         float SteeringReduction;
     } CustomSteering;
@@ -187,6 +187,10 @@ public:
     float DamperMinSpeed = 1.2f; // TargetSpeed in m/s
     float DetailMult = 2.5f;
     float CollisionMult = 1.0f;
+    struct {
+        int SATMax;
+        int AntiDeadForce;
+    } FFB;
 
     // [STEER]
     float SteerAngleMax = 900.0f;
