@@ -138,6 +138,7 @@ public:
     std::vector<bool> GetWheelsOnGround(Vehicle handle);
 
     float GetWheelLargestAngle(Vehicle handle);
+    float GetWheelAverageAngle(Vehicle handle);
 
     // Unit: meters, probably.
     std::vector<WheelDimensions> GetWheelDimensions(Vehicle handle);

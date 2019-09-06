@@ -207,7 +207,7 @@ public:
      *  Checks if GUID already exists and returns device index
      *  otherwise appends GUID and returns new device index
      */
-    ptrdiff_t SteeringAppendDevice(const GUID & dev_guid, std::string dev_name);
+    ptrdiff_t SteeringAppendDevice(const GUID & dev_guid, const std::string& dev_name);
     int GUIDToDeviceIndex(GUID guid);
 
     void SteeringSaveAxis(const std::string &confTag, ptrdiff_t index, const std::string &axis, int minVal, int maxVal);

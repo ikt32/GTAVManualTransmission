@@ -100,6 +100,8 @@
       <Filter>Menu</Filter>
     </ClCompile>
     <ClCompile Include="CustomSteering.cpp" />
+    <ClCompile Include="WheelInput.cpp" />
+    <ClCompile Include="ScriptUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -256,6 +258,8 @@
       <Filter>Menu</Filter>
     </ClInclude>
     <ClInclude Include="CustomSteering.h" />
+    <ClInclude Include="WheelInput.h" />
+    <ClInclude Include="ScriptUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

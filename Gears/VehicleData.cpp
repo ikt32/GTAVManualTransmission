@@ -2,7 +2,6 @@
 
 #include "VehicleData.hpp"
 #include "Memory/VehicleFlags.h"
-#include "script.h"
 #include "Memory/Offsets.hpp"
 #include "Memory/Versions.h"
 

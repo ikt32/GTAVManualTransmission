@@ -17,7 +17,7 @@
 namespace fs = std::filesystem;
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
-    const std::string modPath = Paths::GetModuleFolder(hInstance) + mtDir;
+    const std::string modPath = Paths::GetModuleFolder(hInstance) + Constants::ModDir;
     const std::string logFile = modPath + "\\" + Paths::GetModuleNameWithoutExtension(hInstance) + ".log";
 
     if (!fs::is_directory(modPath) || !fs::exists(modPath)) {
@@ -31,7 +31,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
         case DLL_PROCESS_ATTACH: {
             int scriptingVersion = getGameVersion();
             logger.Clear();
-            logger.Write(INFO, "Manual Transmission %s (built %s %s)", DISPLAY_VERSION, __DATE__, __TIME__);
+            logger.Write(INFO, "Manual Transmission %s (built %s %s)", Constants::DisplayVersion, __DATE__, __TIME__);
             logger.Write(INFO, "Game version " + eGameVersionToString(scriptingVersion));
             if (scriptingVersion < G_VER_1_0_877_1_STEAM) {
                 logger.Write(WARN, "Unsupported game version! Update your game.");

@@ -737,7 +737,7 @@ int main() {
 	GetWindowRect(consoleWindow, &r);
 
 	logger.Clear();
-	logger.Write(INFO, "Manual Transmission %s - Wheel setup tool", DISPLAY_VERSION);
+	logger.Write(INFO, "Manual Transmission %s - Wheel setup tool", Constants::DisplayVersion);
 
 	init();
 	bool justPeeking = true;

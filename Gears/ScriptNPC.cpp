@@ -8,7 +8,6 @@
 #include "ScriptSettings.hpp"
 
 #include "Util/MathExt.h"
-#include "Util/Util.hpp"
 #include "Util/UIUtils.h"
 
 extern ScriptSettings settings;
@@ -41,24 +40,24 @@ void showNPCInfo(Vehicle npcVehicle, bool allowOccupied) {
         float throttle = ext.GetThrottleP(npcVehicle);
 
         if (throttle >= 0.0f) {
-            thColor.R = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
-            thColor.B = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
+            thColor.R = static_cast<int>(map(throttle, 0.0f, 1.0f, 255.0f, 0.0f));
+            thColor.B = static_cast<int>(map(throttle, 0.0f, 1.0f, 255.0f, 0.0f));
         }
         else {
-            thColor.B = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
-            thColor.G = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
+            thColor.B = static_cast<int>(map(throttle, 0.0f, 1.0f, 255.0f, 0.0f));
+            thColor.G = static_cast<int>(map(throttle, 0.0f, 1.0f, 255.0f, 0.0f));
         }
 
         Color brColor = fgColor;
         float brake = ext.GetBrakeP(npcVehicle);
 
-        brColor.B = (int)map(brake, 0.0f, 1.0f, 255.0f, 0.0f);
-        brColor.G = (int)map(brake, 0.0f, 1.0f, 255.0f, 0.0f);
+        brColor.B = static_cast<int>(map(brake, 0.0f, 1.0f, 255.0f, 0.0f));
+        brColor.G = static_cast<int>(map(brake, 0.0f, 1.0f, 255.0f, 0.0f));
 
         Color rpmColor = fgColor;
         float rpm = ext.GetCurrentRPM(npcVehicle);
-        rpmColor.G = (int)map(rpm, 0.0f, 1.0f, 255.0f, 165.0f);
-        rpmColor.B = (int)map(rpm, 0.0f, 1.0f, 255.0f, 0.0f);
+        rpmColor.G = static_cast<int>(map(rpm, 0.0f, 1.0f, 255.0f, 165.0f));
+        rpmColor.B = static_cast<int>(map(rpm, 0.0f, 1.0f, 255.0f, 0.0f));
 
 
 
@@ -86,7 +85,7 @@ void showNPCInfo(Vehicle npcVehicle, bool allowOccupied) {
         float dist = Distance(vehPos, targetPos);
         if (dist < searchdist) {
             float meCloseness = pow(2.0f * (searchdist - dist) / searchdist, 2.0f);
-            int drawAlpha = std::min((int)(255 * latDist * meCloseness), 255);
+            int drawAlpha = std::min(static_cast<int>(255 * latDist * meCloseness), 255);
             Color bgColor = transparentGray;
             Color fgColor = solidWhite;
             if (drawAlpha < bgColor.A) bgColor.A = drawAlpha;
@@ -97,24 +96,24 @@ void showNPCInfo(Vehicle npcVehicle, bool allowOccupied) {
             float throttle = ext.GetThrottleP(npcVehicle);
 
             if (throttle >= 0.0f) {
-                thColor.R = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
-                thColor.B = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
+                thColor.R = static_cast<int>(map(throttle, 0.0f, 1.0f, 255.0f, 0.0f));
+                thColor.B = static_cast<int>(map(throttle, 0.0f, 1.0f, 255.0f, 0.0f));
             }
             else {
-                thColor.B = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
-                thColor.G = (int)map(throttle, 0.0f, 1.0f, 255.0f, 0.0f);
+                thColor.B = static_cast<int>(map(throttle, 0.0f, 1.0f, 255.0f, 0.0f));
+                thColor.G = static_cast<int>(map(throttle, 0.0f, 1.0f, 255.0f, 0.0f));
             }
 
             Color brColor = fgColor;
             float brake = ext.GetBrakeP(npcVehicle);
 
-            brColor.B = (int)map(brake, 0.0f, 1.0f, 255.0f, 0.0f);
-            brColor.G = (int)map(brake, 0.0f, 1.0f, 255.0f, 0.0f);
+            brColor.B = static_cast<int>(map(brake, 0.0f, 1.0f, 255.0f, 0.0f));
+            brColor.G = static_cast<int>(map(brake, 0.0f, 1.0f, 255.0f, 0.0f));
 
             Color rpmColor = fgColor;
             float rpm = ext.GetCurrentRPM(npcVehicle);
-            rpmColor.G = (int)map(rpm, 0.0f, 1.0f, 255.0f, 165.0f);
-            rpmColor.B = (int)map(rpm, 0.0f, 1.0f, 255.0f, 0.0f);
+            rpmColor.G = static_cast<int>(map(rpm, 0.0f, 1.0f, 255.0f, 165.0f));
+            rpmColor.B = static_cast<int>(map(rpm, 0.0f, 1.0f, 255.0f, 0.0f));
 
 
             showDebugInfo3DColors(targetPos,

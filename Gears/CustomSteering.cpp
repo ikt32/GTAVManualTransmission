@@ -1,6 +1,6 @@
 #include "CustomSteering.h"
 
-#include "script.h" // TODO: for isXAvailable...
+#include "ScriptUtils.h"
 #include "ScriptSettings.hpp"
 #include "Util/MathExt.h"
 #include "Util/UIUtils.h"
@@ -95,7 +95,7 @@ void CustomSteering::drawDebug() {
 
 // Main custom steering function - called by main loop.
 void CustomSteering::Update() {
-    if (!isVehicleAvailable(vehicle, playerPed))
+    if (!Util::VehicleAvailable(vehicle, playerPed))
         return;
 
     if (settings.DisplayInfo)

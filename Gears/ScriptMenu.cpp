@@ -1,18 +1,5 @@
 #include "script.h"
 
-#include <string>
-#include <mutex>
-
-#include <shellapi.h>
-
-#include <fmt/format.h>
-
-#include <inc/main.h>
-#include <inc/natives.h>
-
-#include <menu.h>
-#include <menukeyboard.h>
-
 #include "ScriptSettings.hpp"
 #include "Input/CarControls.hpp"
 #include "Input/keyboard.h"
@@ -23,6 +10,18 @@
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/VehicleExtensions.hpp"
 #include "Util/MathExt.h"
+#include "ScriptUtils.h"
+
+#include <menu.h>
+#include <menukeyboard.h>
+#include <inc/main.h>
+#include <inc/natives.h>
+
+#include <windows.h>
+#include <shellapi.h>
+#include <fmt/format.h>
+#include <string>
+#include <mutex>
 
 extern ReleaseInfo g_releaseInfo;
 extern std::mutex g_releaseInfoMutex;
@@ -37,52 +36,9 @@ extern NativeMenu::Menu menu;
 extern CarControls carControls;
 extern ScriptSettings settings;
 
-extern int prevNotification;
-extern int textureWheelId;
-
-const std::string escapeKey = "BACKSPACE";
-const std::string skipKey = "RIGHT";
-
-const std::string modUrl = "https://www.gta5-mods.com/scripts/manual-transmission-ikt";
-
-// FontName, fontID
-std::vector<std::string> fonts{
-    { "Chalet London" },
-    { "Sign Painter" },
-    { "Slab Serif" },
-    { "Chalet Cologne" },
-    { "Pricedown" },
-};
-
-std::vector<int> fontIDs{
-    0,
-    1,
-    2,
-    4,
-    7
-};
-
-std::vector<std::string> buttonConfTags{
-    { "TOGGLE_MOD" },
-    { "CHANGE_SHIFTMODE" },
-    { "THROTTLE_BUTTON" },
-    { "BRAKE_BUTTON" },
-    { "CLUTCH_BUTTON" },
-    { "SHIFT_UP" },
-    { "SHIFT_DOWN" },
-    { "ENGINE" },
-    { "HANDBRAKE" },
-    { "HORN" },
-    { "LIGHTS" },
-    { "LOOK_BACK" },
-    { "LOOK_LEFT" },
-    { "LOOK_RIGHT" },
-    { "CHANGE_CAMERA" },
-    { "RADIO_NEXT" },
-    { "RADIO_PREVIOUS" },
-    { "INDICATOR_LEFT" },
-    { "INDICATOR_RIGHT" },
-    { "INDICATOR_HAZARD" },
+struct SFont {
+    int ID;
+    std::string Name;
 };
 
 struct STagInfo {
@@ -90,73 +46,159 @@ struct STagInfo {
     std::string Info;
 };
 
-const std::vector<STagInfo> keyboardConfTags = {
-    { "Toggle"   , "Toggle mod on/off"      },
-    { "ToggleH"  , "Switch shift mode"      },
-    { "ShiftUp"  , "Shift up"               },
-    { "ShiftDown", "Shift down"             },
-    { "Clutch"   , "Hold for clutch"        },
-    { "Engine"   , "Toggle engine on/off"   },
-    { "Throttle" , "Key used for throttle"  },
-    { "Brake"    , "Key used for brake"     },
-    { "HR"       , "H-pattern gear R press" },
-    { "H1"       , "H-pattern gear 1 press" },
-    { "H2"       , "H-pattern gear 2 press" },
-    { "H3"       , "H-pattern gear 3 press" },
-    { "H4"       , "H-pattern gear 4 press" },
-    { "H5"       , "H-pattern gear 5 press" },
-    { "H6"       , "H-pattern gear 6 press" },
-    { "H7"       , "H-pattern gear 7 press" },
-    { "H8"       , "H-pattern gear 8 press" },
-    { "H9"       , "H-pattern gear 9 press" },
-    { "H10"      , "H-pattern gear 10 press"},
-    { "HN"       , "H-pattern Neutral"      },
+template <typename T>
+struct SControlText {
+    T Control;
+    std::string Text;
 };
 
+void clearAxis(const std::string& confTag);
+void clearButton(const std::string& confTag);
+void clearWheelToKey();
+void clearHShifter();
+void clearASelect();
+void clearKeyboardKey(const std::string& confTag);
+void clearControllerButton(const std::string& confTag);
+void clearLControllerButton(const std::string& confTag);
 
-const std::vector<STagInfo> controllerConfTags = {
-    { "Toggle"     , "Toggle mod usage: hold"      },
-    { "ToggleShift", "Toggle shift usage: hold"    },
-    { "ShiftUp"    , "Shift up usage: press"       },
-    { "ShiftDown"  , "Shift down usage: press"     },
-    { "Clutch"     , "Clutch usage: axis or button"},
-    { "Engine"     , "Engine usage: press"         },
-    { "Throttle"   , "Throttle: axis or button"    },
-    { "Brake"      , "Brake: axis or button"       }
-};
+bool configAxis(const std::string& confTag);
+bool configWheelToKey();
+bool configButton(const std::string& confTag);
+bool configHPattern();
+bool configASelect();
+bool configKeyboardKey(const std::string& confTag);
+bool configControllerButton(const std::string& confTag);
+bool configLControllerButton(const std::string& confTag);
 
-const std::vector<std::string> speedoTypes = {
-    "off",
-    "kph",
-    "mph",
-    "ms"
-};
+namespace {
+    const std::string escapeKey = "BACKSPACE";
+    const std::string skipKey = "RIGHT";
+    const std::string modUrl = "https://www.gta5-mods.com/scripts/manual-transmission-ikt";
 
-std::vector<int> blockableControls = {
-    -1,
-    ControlVehicleAim,
-    ControlVehicleHandbrake,
-    ControlVehicleAttack,
-    ControlVehicleDuck,
-    ControlVehicleSelectNextWeapon,
-    ControlVehicleCinCam,
-    ControlVehicleExit
-};
+    const std::vector<SControlText<CarControls::WheelControlType>> wheelMenuButtons {
+        { CarControls::WheelControlType::HR             , "[Gear R]" },
+        { CarControls::WheelControlType::H1             , "[Gear 1]" },
+        { CarControls::WheelControlType::H2             , "[Gear 2]" },
+        { CarControls::WheelControlType::H3             , "[Gear 3]" },
+        { CarControls::WheelControlType::H4             , "[Gear 4]" },
+        { CarControls::WheelControlType::H5             , "[Gear 5]" },
+        { CarControls::WheelControlType::H6             , "[Gear 6]" },
+        { CarControls::WheelControlType::H7             , "[Gear 7]" },
+        { CarControls::WheelControlType::H8             , "[Gear 8]" },
+        { CarControls::WheelControlType::H9             , "[Gear 9]" },
+        { CarControls::WheelControlType::H10            , "[Gear 10]" },
+        { CarControls::WheelControlType::APark          , "[Auto Park]" },
+        { CarControls::WheelControlType::AReverse       , "[Auto Reverse]" },
+        { CarControls::WheelControlType::ANeutral       , "[Auto Reverse]" },
+        { CarControls::WheelControlType::ADrive         , "[Auto Drive]" },
+        { CarControls::WheelControlType::ShiftUp        , "[ShiftUp]" },
+        { CarControls::WheelControlType::ShiftDown      , "[ShiftDown]" },
+        { CarControls::WheelControlType::Clutch         , "[ClutchButton]" },
+        { CarControls::WheelControlType::Engine         , "[Engine]" },
+        { CarControls::WheelControlType::Handbrake      , "[Handbrake]" },
+        { CarControls::WheelControlType::Horn           , "[Horn]" },
+        { CarControls::WheelControlType::Lights         , "[Lights]" },
+        { CarControls::WheelControlType::LookBack       , "[LookBack]" },
+        { CarControls::WheelControlType::LookLeft       , "[LookLeft]" },
+        { CarControls::WheelControlType::LookRight      , "[LookRight]" },
+        { CarControls::WheelControlType::Camera         , "[Camera]" },
+        { CarControls::WheelControlType::RadioNext      , "[RadioNext]" },
+        { CarControls::WheelControlType::RadioPrev      , "[RadioPrev]" },
+        { CarControls::WheelControlType::IndicatorLeft  , "[IndicatorLeft]" },
+        { CarControls::WheelControlType::IndicatorRight , "[IndicatorRight]" },
+        { CarControls::WheelControlType::IndicatorHazard, "[IndicatorHazard]" },
+        { CarControls::WheelControlType::Toggle         , "[ToggleMod]" },
+        { CarControls::WheelControlType::ToggleH        , "[ChangeShiftMode]" },
+    };
 
-std::vector<std::string> blockableControlsHelp = {
-    "None",
-    "Aim",
-    "Handbrake",
-    "Attack",
-    "Duck",
-    "NextWeapon",
-    "Cinematic Cam",
-    "Exit Car"
-};
+    const std::vector<SFont> fonts {
+        { 0, "Chalet London" },
+        { 1, "Sign Painter" },
+        { 2, "Slab Serif" },
+        { 4, "Chalet Cologne" },
+        { 7, "Pricedown" },
+    };
+
+    const std::vector<std::string> buttonConfTags {
+        { "TOGGLE_MOD" },
+        { "CHANGE_SHIFTMODE" },
+        { "THROTTLE_BUTTON" },
+        { "BRAKE_BUTTON" },
+        { "CLUTCH_BUTTON" },
+        { "SHIFT_UP" },
+        { "SHIFT_DOWN" },
+        { "ENGINE" },
+        { "HANDBRAKE" },
+        { "HORN" },
+        { "LIGHTS" },
+        { "LOOK_BACK" },
+        { "LOOK_LEFT" },
+        { "LOOK_RIGHT" },
+        { "CHANGE_CAMERA" },
+        { "RADIO_NEXT" },
+        { "RADIO_PREVIOUS" },
+        { "INDICATOR_LEFT" },
+        { "INDICATOR_RIGHT" },
+        { "INDICATOR_HAZARD" },
+    };
+
+    const std::vector<STagInfo> keyboardConfTags {
+        { "Toggle"   , "Toggle mod on/off"      },
+        { "ToggleH"  , "Switch shift mode"      },
+        { "ShiftUp"  , "Shift up"               },
+        { "ShiftDown", "Shift down"             },
+        { "Clutch"   , "Hold for clutch"        },
+        { "Engine"   , "Toggle engine on/off"   },
+        { "Throttle" , "Key used for throttle"  },
+        { "Brake"    , "Key used for brake"     },
+        { "HR"       , "H-pattern gear R press" },
+        { "H1"       , "H-pattern gear 1 press" },
+        { "H2"       , "H-pattern gear 2 press" },
+        { "H3"       , "H-pattern gear 3 press" },
+        { "H4"       , "H-pattern gear 4 press" },
+        { "H5"       , "H-pattern gear 5 press" },
+        { "H6"       , "H-pattern gear 6 press" },
+        { "H7"       , "H-pattern gear 7 press" },
+        { "H8"       , "H-pattern gear 8 press" },
+        { "H9"       , "H-pattern gear 9 press" },
+        { "H10"      , "H-pattern gear 10 press"},
+        { "HN"       , "H-pattern Neutral"      },
+    };
+
+
+    const std::vector<STagInfo> controllerConfTags {
+        { "Toggle"     , "Toggle mod usage: hold"      },
+        { "ToggleShift", "Toggle shift usage: hold"    },
+        { "ShiftUp"    , "Shift up usage: press"       },
+        { "ShiftDown"  , "Shift down usage: press"     },
+        { "Clutch"     , "Clutch usage: axis or button"},
+        { "Engine"     , "Engine usage: press"         },
+        { "Throttle"   , "Throttle: axis or button"    },
+        { "Brake"      , "Brake: axis or button"       }
+    };
+
+    const std::vector<std::string> speedoTypes {
+        "off",
+        "kph",
+        "mph",
+        "ms"
+    };
+
+    const std::vector<SControlText<int>> blockableControls {
+        { -1,                             "None"},
+        { ControlVehicleAim,              "Aim"},
+        { ControlVehicleHandbrake,        "Handbrake"},
+        { ControlVehicleAttack,           "Attack"},
+        { ControlVehicleDuck,             "Duck"},
+        { ControlVehicleSelectNextWeapon, "NextWeapon"},
+        { ControlVehicleCinCam,           "Cinematic Cam"},
+        { ControlVehicleExit,             "Exit Car"}
+    };
+}
 
 int getBlockableControlIndex(int control) {
     for (size_t i = 0; i < blockableControls.size(); i++) {
-        if (control == blockableControls[i])
+        if (control == blockableControls[i].Control)
             return static_cast<int>(i);
     }
     return 0;
@@ -179,12 +221,9 @@ void onMenuClose() {
     saveChanges();
 }
 
-extern bool g_DefaultOverride;
-extern float g_CountersteerMult;
-
 void update_mainmenu() {
     menu.Title("Manual Transmission", 0.90f);
-    menu.Subtitle(fmt::format("~b~{}", DISPLAY_VERSION));
+    menu.Subtitle(fmt::format("~b~{}", Constants::DisplayVersion));
 
     if (MemoryPatcher::Error) {
         menu.Option("Patch test error", NativeMenu::solidRed, 
@@ -408,12 +447,12 @@ void update_controlsmenu() {
     menu.MenuOption("Controller options", "controlleroptionsmenu");
 
     if (carControls.UseLegacyController) {
-        menu.MenuOption("Native controller bindings", "legacycontrollermenu",
-            { "Set up native controller bindings." });
+        menu.MenuOption("Controller bindings (Native)", "legacycontrollermenu",
+            { "Set up controller bindings." });
     }
     else {
-        menu.MenuOption("Controller bindings", "controllermenu",
-            { "Change controller control bindings." });
+        menu.MenuOption("Controller bindings (XInput)", "controllermenu",
+            { "Set up controller bindings." });
     }
 
     menu.MenuOption("Keyboard bindings", "keyboardmenu",
@@ -460,22 +499,28 @@ void update_controlleroptionsmenu() {
 }
 
 void update_legacycontrollermenu() {
-    menu.Title("Non-Xinput controls");
-    menu.Subtitle("Non-Xinput options");
+    menu.Title("Controller bindings");
+    menu.Subtitle("Native controls");
+
+    std::vector<std::string> blockableControlsHelp;
+    blockableControlsHelp.reserve(blockableControls.size());
+    for (const auto& control : blockableControls) {
+        blockableControlsHelp.emplace_back(control.Text);
+    }
 
     int oldIndexUp = getBlockableControlIndex(carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
     if (menu.StringArray("Shift Up blocks", blockableControlsHelp, oldIndexUp)) {
-        carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = blockableControls[oldIndexUp];
+        carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = blockableControls[oldIndexUp].Control;
     }
 
     int oldIndexDown = getBlockableControlIndex(carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
     if (menu.StringArray("Shift Down blocks", blockableControlsHelp, oldIndexDown)) {
-        carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = blockableControls[oldIndexDown];
+        carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = blockableControls[oldIndexDown].Control;
     }
 
     int oldIndexClutch = getBlockableControlIndex(carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
     if (menu.StringArray("Clutch blocks", blockableControlsHelp, oldIndexClutch)) {
-        carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] = blockableControls[oldIndexClutch];
+        carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] = blockableControls[oldIndexClutch].Control;
     }
 
     std::vector<std::string> controllerInfo = {
@@ -484,7 +529,6 @@ void update_legacycontrollermenu() {
         "",
     };
 
-    auto it = 0;
     for (const auto& confTag : controllerConfTags) {
         controllerInfo.back() = confTag.Info;
         int nativeControl = carControls.ConfTagLController2Value(confTag.Tag);
@@ -493,31 +537,37 @@ void update_legacycontrollermenu() {
         if (menu.OptionPlus(fmt::format("Assign {}", confTag.Tag), controllerInfo, nullptr, std::bind(clearLControllerButton, confTag.Tag), nullptr, "Current setting")) {
             WAIT(500);
             bool result = configLControllerButton(confTag.Tag);
-            if (!result) showNotification(fmt::format("Cancelled {} assignment", confTag.Tag), &prevNotification);
+            if (!result)
+                UI::Notify(fmt::format("Cancelled {} assignment", confTag.Tag));
             WAIT(500);
         }
-        it++;
         controllerInfo.pop_back();
     }
 }
 
 void update_controllermenu() {
     menu.Title("Controller bindings");
-    menu.Subtitle("Controller bindings");
+    menu.Subtitle("XInput controls");
+
+    std::vector<std::string> blockableControlsHelp;
+    blockableControlsHelp.reserve(blockableControls.size());
+    for (const auto& control : blockableControls) {
+        blockableControlsHelp.emplace_back(control.Text);
+    }
 
     int oldIndexUp = getBlockableControlIndex(carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)]);
     if (menu.StringArray("Shift Up blocks", blockableControlsHelp, oldIndexUp)) {
-        carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] = blockableControls[oldIndexUp];
+        carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] = blockableControls[oldIndexUp].Control;
     }
 
     int oldIndexDown = getBlockableControlIndex(carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)]);
     if (menu.StringArray("Shift Down blocks", blockableControlsHelp, oldIndexDown)) {
-        carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = blockableControls[oldIndexDown];
+        carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = blockableControls[oldIndexDown].Control;
     }
 
     int oldIndexClutch = getBlockableControlIndex(carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)]);
     if (menu.StringArray("Clutch blocks", blockableControlsHelp, oldIndexClutch)) {
-        carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)] = blockableControls[oldIndexClutch];
+        carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)] = blockableControls[oldIndexClutch].Control;
     }
 
     std::vector<std::string> controllerInfo = {
@@ -526,17 +576,16 @@ void update_controllermenu() {
         "",
     };
 
-    auto it = 0;
     for (const auto& confTag : controllerConfTags) {
         controllerInfo.back() = confTag.Info;
         controllerInfo.push_back(fmt::format("Assigned to {}", carControls.ConfTagController2Value(confTag.Tag)));
         if (menu.OptionPlus(fmt::format("Assign {}", confTag.Tag), controllerInfo, nullptr, std::bind(clearControllerButton, confTag.Tag), nullptr, "Current setting")) {
             WAIT(500);
             bool result = configControllerButton(confTag.Tag);
-            if (!result) showNotification(fmt::format("Cancelled {} assignment", confTag.Tag), &prevNotification);
+            if (!result)
+                UI::Notify(fmt::format("Cancelled {} assignment", confTag.Tag));
             WAIT(500);
         }
-        it++;
         controllerInfo.pop_back();
     }
 }
@@ -551,17 +600,16 @@ void update_keyboardmenu() {
         "",
     };
 
-    int it = 0;
     for (const auto& confTag : keyboardConfTags) {
         keyboardInfo.back() = confTag.Info;
         keyboardInfo.push_back(fmt::format("Assigned to {}", key2str(carControls.ConfTagKB2key(confTag.Tag))));
         if (menu.OptionPlus(fmt::format("Assign {}", confTag.Tag), keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag.Tag), nullptr, "Current setting")) {
             WAIT(500);
             bool result = configKeyboardKey(confTag.Tag);
-            if (!result) showNotification(fmt::format("Cancelled {} assignment", confTag.Tag), &prevNotification);
+            if (!result)
+                UI::Notify(fmt::format("Cancelled {} assignment", confTag.Tag));
             WAIT(500);
         }
-        it++;
         keyboardInfo.pop_back();
     }
 }
@@ -617,7 +665,7 @@ void update_wheelmenu() {
     if (menu.OptionPlus("H-pattern shifter setup", hpatInfo, nullptr, std::bind(clearHShifter), nullptr, "Input values",
         { "Select this option to start H-pattern shifter setup. Follow the on-screen instructions." })) {
         bool result = configHPattern();
-        showNotification(result ? "H-pattern shifter saved" : "Cancelled H-pattern shifter setup", &prevNotification);
+        UI::Notify(result ? "H-pattern shifter saved" : "Cancelled H-pattern shifter setup");
     }
 
     std::vector<std::string> hAutoInfo = {
@@ -629,10 +677,10 @@ void update_wheelmenu() {
     if (carControls.ButtonIn(CarControls::WheelControlType::ANeutral)) hAutoInfo.emplace_back("Auto Neutral");
     if (carControls.ButtonIn(CarControls::WheelControlType::ADrive)) hAutoInfo.emplace_back("Auto Drive");
 
-    if (menu.OptionPlus("H-pattern shifter setup (auto)", hAutoInfo, nullptr, [] { clearASelect(); }, nullptr, "Input values",
-        { "Select this option to start H-pattern shifter (auto) setup. Follow the on-screen instructions." })) {
+    if (menu.OptionPlus("Shifter setup for automatic", hAutoInfo, nullptr, [] { clearASelect(); }, nullptr, "Input values",
+        { "Set up H-pattern shifter for automatic gearbox. Follow the on-screen instructions." })) {
         bool result = configASelect();
-        showNotification(result ? "H-pattern shifter (auto) saved" : "Cancelled H-pattern shifter (auto) setup", &prevNotification);
+        UI::Notify(result ? "H-pattern shifter (auto) saved" : "Cancelled H-pattern shifter (auto) setup");
     }
 
     menu.BoolOption("Keyboard H-pattern", settings.HPatternKeyboard,
@@ -741,28 +789,33 @@ void update_axesmenu() {
 
     if (menu.OptionPlus("Configure steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr, "Input values")) {
         bool result = configAxis("STEER");
-        showNotification(result ? "Steering axis saved" : "Cancelled steering axis configuration", &prevNotification);
-        if (result) initWheel();
+        UI::Notify(result ? "Steering axis saved" : "Cancelled steering axis configuration");
+        if (result) 
+            initWheel();
     }
     if (menu.OptionPlus("Configure throttle", info, nullptr, std::bind(clearAxis, "THROTTLE"), nullptr, "Input values")) {
         bool result = configAxis("THROTTLE");
-        showNotification(result ? "Throttle axis saved" : "Cancelled throttle axis configuration", &prevNotification);
-        if (result) initWheel();
+        UI::Notify(result ? "Throttle axis saved" : "Cancelled throttle axis configuration");
+        if (result) 
+            initWheel();
     }
     if (menu.OptionPlus("Configure brake", info, nullptr, std::bind(clearAxis, "BRAKES"), nullptr, "Input values")) {
         bool result = configAxis("BRAKES");
-        showNotification(result ? "Brake axis saved" : "Cancelled brake axis configuration", &prevNotification);
-        if (result) initWheel();
+        UI::Notify(result ? "Brake axis saved" : "Cancelled brake axis configuration");
+        if (result) 
+            initWheel();
     }
     if (menu.OptionPlus("Configure clutch", info, nullptr, std::bind(clearAxis, "CLUTCH"), nullptr, "Input values")) {
         bool result = configAxis("CLUTCH");
-        showNotification(result ? "Clutch axis saved" : "Cancelled clutch axis configuration", &prevNotification);
-        if (result) initWheel();
+        UI::Notify(result ? "Clutch axis saved" : "Cancelled clutch axis configuration");
+        if (result) 
+            initWheel();
     }
     if (menu.OptionPlus("Configure handbrake", info, nullptr, std::bind(clearAxis, "HANDBRAKE_ANALOG"), nullptr, "Input values")) {
         bool result = configAxis("HANDBRAKE_ANALOG");
-        showNotification(result ? "Handbrake axis saved" : "Cancelled handbrake axis configuration", &prevNotification);
-        if (result) initWheel();
+        UI::Notify(result ? "Handbrake axis saved" : "Cancelled handbrake axis configuration");
+        if (result) 
+            initWheel();
     }
 
     menu.FloatOption("Steering deadzone", carControls.DZSteer, 0.0f, 0.5f, 0.01f,
@@ -872,52 +925,24 @@ void update_buttonsmenu() {
     if (menu.OptionPlus("Set up WheelToKey", wheelToKeyInfo, nullptr, clearWheelToKey, nullptr, "Info",
         { "Set up wheel buttons that press a keyboard key. Only one device can be used for this." })) {
         bool result = configWheelToKey();
-        showNotification(result ? "Entry added" : "Cancelled entry addition", &prevNotification);
+        UI::Notify(result ? "Entry added" : "Cancelled entry addition");
     }
 
     std::vector<std::string> buttonInfo;
-    buttonInfo.push_back("Press RIGHT to clear this button");
-    buttonInfo.push_back("Active buttons:");
-    if (carControls.ButtonIn(CarControls::WheelControlType::HR)) buttonInfo.push_back("Gear R");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H1)) buttonInfo.push_back("Gear 1");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H2)) buttonInfo.push_back("Gear 2");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H3)) buttonInfo.push_back("Gear 3");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H4)) buttonInfo.push_back("Gear 4");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H5)) buttonInfo.push_back("Gear 5");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H6)) buttonInfo.push_back("Gear 6");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H7)) buttonInfo.push_back("Gear 7");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H8)) buttonInfo.push_back("Gear 8");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H9)) buttonInfo.push_back("Gear 9");
-    if (carControls.ButtonIn(CarControls::WheelControlType::H10)) buttonInfo.push_back("Gear 10");
-    if (carControls.ButtonIn(CarControls::WheelControlType::APark)) buttonInfo.push_back("Auto Park");
-    if (carControls.ButtonIn(CarControls::WheelControlType::AReverse)) buttonInfo.push_back("Auto Reverse");
-    if (carControls.ButtonIn(CarControls::WheelControlType::ANeutral)) buttonInfo.push_back("Auto Reverse");
-    if (carControls.ButtonIn(CarControls::WheelControlType::ADrive)) buttonInfo.push_back("Auto Drive");
-    if (carControls.ButtonIn(CarControls::WheelControlType::ShiftUp))   buttonInfo.push_back("ShiftUp");
-    if (carControls.ButtonIn(CarControls::WheelControlType::ShiftDown)) buttonInfo.push_back("ShiftDown");
-    if (carControls.ButtonIn(CarControls::WheelControlType::Clutch))    buttonInfo.push_back("ClutchButton");
-    if (carControls.ButtonIn(CarControls::WheelControlType::Engine))    buttonInfo.push_back("Engine");
-    if (carControls.ButtonIn(CarControls::WheelControlType::Handbrake)) buttonInfo.push_back("Handbrake");
-    if (carControls.ButtonIn(CarControls::WheelControlType::Horn))      buttonInfo.push_back("Horn");
-    if (carControls.ButtonIn(CarControls::WheelControlType::Lights))    buttonInfo.push_back("Lights");
-    if (carControls.ButtonIn(CarControls::WheelControlType::LookBack))  buttonInfo.push_back("LookBack");
-    if (carControls.ButtonIn(CarControls::WheelControlType::LookLeft))  buttonInfo.push_back("LookLeft");
-    if (carControls.ButtonIn(CarControls::WheelControlType::LookRight)) buttonInfo.push_back("LookRight");
-    if (carControls.ButtonIn(CarControls::WheelControlType::Camera))    buttonInfo.push_back("Camera");
-    if (carControls.ButtonIn(CarControls::WheelControlType::RadioNext)) buttonInfo.push_back("RadioNext");
-    if (carControls.ButtonIn(CarControls::WheelControlType::RadioPrev)) buttonInfo.push_back("RadioPrev");
-    if (carControls.ButtonIn(CarControls::WheelControlType::IndicatorLeft))     buttonInfo.push_back("IndicatorLeft");
-    if (carControls.ButtonIn(CarControls::WheelControlType::IndicatorRight))    buttonInfo.push_back("IndicatorRight");
-    if (carControls.ButtonIn(CarControls::WheelControlType::IndicatorHazard))   buttonInfo.push_back("IndicatorHazard");
-    if (carControls.ButtonIn(CarControls::WheelControlType::Toggle))    buttonInfo.push_back("ToggleMod");
-    if (carControls.ButtonIn(CarControls::WheelControlType::ToggleH))   buttonInfo.push_back("ChangeShiftMode");
-    if (buttonInfo.size() == 2) buttonInfo.push_back("None");
+    buttonInfo.emplace_back("Press RIGHT to clear this button");
+    buttonInfo.emplace_back("Active buttons:");
+    for (const auto& wheelButton : wheelMenuButtons) {
+        if (carControls.ButtonIn(wheelButton.Control))
+            buttonInfo.emplace_back(wheelButton.Text);
+    }
+    if (buttonInfo.size() == 2)
+        buttonInfo.emplace_back("None");
 
     for (auto confTag : buttonConfTags) {
         buttonInfo.push_back(fmt::format("Assigned to {}", carControls.ConfTagWheel2Value(confTag)));
         if (menu.OptionPlus(fmt::format("Assign {}", confTag), buttonInfo, nullptr, std::bind(clearButton, confTag), nullptr, "Current inputs")) {
             bool result = configButton(confTag);
-            showNotification(fmt::format("[{}] {}", confTag, result ? "saved" : "assignment cancelled."), &prevNotification);
+            UI::Notify(fmt::format("[{}] {}", confTag, result ? "saved" : "assignment cancelled."));
         }
         buttonInfo.pop_back();
     }
@@ -933,20 +958,25 @@ void update_hudmenu() {
     menu.BoolOption("Always enable", settings.AlwaysHUD,
         { "Display HUD even if manual transmission is off." });
 
-    int fontIndex = static_cast<int>(std::find(fontIDs.begin(), fontIDs.end(), settings.HUDFont) - fontIDs.begin());
-    if (menu.StringArray("Font: ", fonts, fontIndex, { "Select the font for speed, gearbox mode, current gear." })) {
-        settings.HUDFont = fontIDs.at(fontIndex);
+    auto fontIt = std::find_if(fonts.begin(), fonts.end(), [](const SFont& font) { return font.ID == settings.HUDFont; });
+    if (fontIt != fonts.end()) {
+        std::vector<std::string> strFonts;
+        strFonts.reserve(fonts.size());
+        for (const auto& font : fonts)
+            strFonts.push_back(font.Name);
+        int fontIndex = static_cast<int>(fontIt - fonts.begin());
+        if (menu.StringArray("Font", strFonts, fontIndex, { "Select the font for speed, gearbox mode, current gear." })) {
+            settings.HUDFont = fonts.at(fontIndex).ID;
+        }
     }
+    else {
+        menu.Option("Invalid font ID in settings");
+    }
+
 
     menu.MenuOption("Gear and shift mode", "geardisplaymenu");
     menu.MenuOption("Speedometer", "speedodisplaymenu");
     menu.MenuOption("RPM Gauge", "rpmdisplaymenu");
-
-    std::vector<std::string> wheelTexturePresent = {};
-
-    if (textureWheelId == -1) {
-        wheelTexturePresent.emplace_back("Wheel texture not found!");
-    }
 
     menu.MenuOption("Wheel & Pedal Info", "wheelinfomenu");
 }
@@ -1222,7 +1252,7 @@ void update_menu() {
 
 // Wheel section
 // Look at that argument list! :D
-bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> startStates, GUID &selectedGUID, std::string &selectedAxis, int hyst, bool &positive, int &startValue_) {
+bool getConfigAxisWithValues(const std::vector<std::tuple<GUID, std::string, int>>& startStates, GUID &selectedGUID, std::string &selectedAxis, int hyst, bool &positive, int &startValue_) {
     for (auto guid : carControls.GetWheel().GetGuids()) {
         for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
             for (auto startState : startStates) {
@@ -1294,7 +1324,7 @@ void clearAxis(const std::string& confTag) {
     saveChanges();
     settings.SteeringSaveAxis(confTag, -1, "", 0, 0);
     settings.Read(&carControls);
-    showNotification(fmt::format("Cleared axis {}", confTag), &prevNotification);
+    UI::Notify(fmt::format("Cleared axis {}", confTag));
     initWheel();
 }
 
@@ -1309,17 +1339,17 @@ void clearWheelToKey() {
 
     int button;
     if (str2int(button, result.c_str(), 10) != STR2INT_SUCCESS) {
-        showNotification(fmt::format("Invalid input: {} is not a valid number!", result), &prevNotification);
+        UI::Notify(fmt::format("Invalid input: {} is not a valid number!", result));
         return;
     }
     bool found = settings.SteeringClearWheelToKey(button);
     if (found) {
         saveChanges();
-        showNotification(fmt::format("Removed button {}", result), &prevNotification);
+        UI::Notify(fmt::format("Removed button {}", result));
         settings.Read(&carControls);
     }
     else {
-        showNotification(fmt::format("Button {} not found.", result), &prevNotification);
+        UI::Notify(fmt::format("Button {} not found.", result));
     }
 }
 
@@ -1327,7 +1357,7 @@ void clearButton(const std::string& confTag) {
     saveChanges();
     settings.SteeringSaveButton(confTag, -1, -1);
     settings.Read(&carControls);
-    showNotification(fmt::format("Cleared button {}", confTag), &prevNotification);
+    UI::Notify(fmt::format("Cleared button {}", confTag));
 }
 
 void clearHShifter() {
@@ -1337,7 +1367,7 @@ void clearHShifter() {
 
     settings.SteeringSaveHShifter("SHIFTER", -1, empty);
     settings.Read(&carControls);
-    showNotification("Cleared H-pattern shifter", &prevNotification);
+    UI::Notify("Cleared H-pattern shifter");
 }
 
 void clearASelect() {
@@ -1345,7 +1375,7 @@ void clearASelect() {
     settings.SteeringSaveButton("AUTO_R", -1, -1);
     settings.SteeringSaveButton("AUTO_D", -1, -1);
     settings.Read(&carControls);
-    showNotification("Cleared H-pattern shifter (auto)", &prevNotification);
+    UI::Notify("Cleared H-pattern shifter (auto)");
 }
 
 // Controller and keyboard
@@ -1353,42 +1383,42 @@ void saveKeyboardKey(const std::string& confTag, const std::string& key) {
     saveChanges();
     settings.KeyboardSaveKey(confTag, key);
     settings.Read(&carControls);
-    showNotification(fmt::format("Saved key {}: {}.", confTag, key), &prevNotification);
+    UI::Notify(fmt::format("Saved key {}: {}.", confTag, key));
 }
 
 void saveControllerButton(const std::string& confTag, const std::string& button) {
     saveChanges();
     settings.ControllerSaveButton(confTag, button);
     settings.Read(&carControls);
-    showNotification(fmt::format("Saved button {}: {}.", confTag, button), &prevNotification);
+    UI::Notify(fmt::format("Saved button {}: {}.", confTag, button));
 }
 
 void saveLControllerButton(const std::string& confTag, int button) {
     saveChanges();
     settings.LControllerSaveButton(confTag, button);
     settings.Read(&carControls);
-    showNotification(fmt::format("Saved button {}: {}", confTag, button), &prevNotification);
+    UI::Notify(fmt::format("Saved button {}: {}", confTag, button));
 }
 
 void clearKeyboardKey(const std::string& confTag) {
     saveChanges();
     settings.KeyboardSaveKey(confTag, "UNKNOWN");
     settings.Read(&carControls);
-    showNotification(fmt::format("Cleared key {}", confTag), &prevNotification);
+    UI::Notify(fmt::format("Cleared key {}", confTag));
 }
 
 void clearControllerButton(const std::string& confTag) {
     saveChanges();
     settings.ControllerSaveButton(confTag, "UNKNOWN");
     settings.Read(&carControls);
-    showNotification(fmt::format("Cleared button {}", confTag), &prevNotification);
+    UI::Notify(fmt::format("Cleared button {}", confTag));
 }
 
 void clearLControllerButton(const std::string& confTag) {
     saveChanges();
     settings.LControllerSaveButton(confTag, -1);
     settings.Read(&carControls);
-    showNotification(fmt::format("Cleared button {}", confTag), &prevNotification);
+    UI::Notify(fmt::format("Cleared button {}", confTag));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1409,7 +1439,7 @@ bool configAxis(const std::string& confTag) {
     }
 
     carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
-    // Save current state TODO
+    // Save current state
     std::vector<std::tuple<GUID, std::string, int>> startStates;
     for (auto guid : carControls.GetWheel().GetGuids()) {
         for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
@@ -1640,8 +1670,6 @@ bool configHPattern() {
     return true;
 }
 
-// I hate myself.
-// TODO: Fix strings
 bool configASelect() {
     std::string additionalInfo = fmt::format("Press {} to exit.", escapeKey);
     GUID devGUID = {};
@@ -1724,7 +1752,7 @@ bool configKeyboardKey(const std::string &confTag) {
         for (auto k : NativeMenu::KeyMap) {
             if (IsKeyJustUp(k.second)) {
                 if (isMenuControl(k.second)) {
-                    showNotification("Can't use menu controls!", &prevNotification);
+                    UI::Notify("Can't use menu controls!");
                     continue;
                 }
                 saveKeyboardKey(confTag, k.first);
@@ -1737,7 +1765,7 @@ bool configKeyboardKey(const std::string &confTag) {
             std::string letter_ = std::string(1, letter);
             if (IsKeyJustUp(str2key(letter_))) {
                 if (isMenuControl(str2key(letter_))) {
-                    showNotification("Can't use menu controls!", &prevNotification);
+                    UI::Notify("Can't use menu controls!");
                     continue;
                 }
                 saveKeyboardKey(confTag, letter_);
@@ -1753,18 +1781,16 @@ bool configKeyboardKey(const std::string &confTag) {
 // Controller
 bool configControllerButton(const std::string &confTag) {
     std::string additionalInfo = fmt::format("Press {} to exit", escapeKey);
-    XInputController* rawController = carControls.GetRawController();
-    if (rawController == nullptr)
-        return false;
+    XInputController controller = carControls.GetController();
 
     while (true) {
         if (IsKeyJustUp(str2key(escapeKey))) {
             return false;
         }
         carControls.UpdateValues(CarControls::InputDevices::Controller, true);
-        for (const std::string& buttonHelper : rawController->XboxButtonsHelper) {
-            auto button = rawController->StringToButton(buttonHelper);
-            if (rawController->IsButtonJustPressed(button)) {
+        for (const std::string& buttonHelper : controller.XboxButtonsHelper) {
+            auto button = controller.StringToButton(buttonHelper);
+            if (controller.IsButtonJustPressed(button)) {
                 saveControllerButton(confTag, buttonHelper);
                 return true;
             }
