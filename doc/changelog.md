@@ -1,8 +1,20 @@
 # Changelog
 
-## 4.6.8
+## 4.7.0
 
+New wheel changes:
+
+* Improve force feedback model, eliminated oscillation/fishtailing
+* Add option to limit force feedback power
+* Add anti-deadzone support on force feedback power
+* Add damper effect to soft lock for a harder cutoff
 * Add "Park" and "Neutral" positions for H-shifter automatic gear selection
+* Improve wheel axis mapping, now registers axis after lifting off the control significantly
+* Fix an issue where Logitech LEDs caused force feedback to get stuck to last command
+
+New features:
+
+* Add an enhanced custom steering mode for keyboard and controller
 * Add support for ignoring Simple Trainer menu inputs when it's open (10.0+)
 * Add an option to use manual input switching (Debug submenu, change in main menu)
 * Fix an issue where assigning keyboard gears for 8, 9 , 10 wrongly assign to 7
