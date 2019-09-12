@@ -12,7 +12,8 @@ namespace {
 }
 
 void UI::Notify(const std::string& message) {
-    showNotification(fmt::format("{}\n{}", Constants::NotificationPrefix, message), &notificationHandle);
+    int* notifHandleAddr = &notificationHandle; // prevents optimizing away the pointery thing
+    showNotification(fmt::format("{}\n{}", Constants::NotificationPrefix, message), notifHandleAddr);
 }
 
 void Controls::SetControlADZ(eControl control, float value, float adz) {
