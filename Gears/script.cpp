@@ -1180,10 +1180,10 @@ void functionEngBrake() {
             auto wheelsToBrake = vehData.mWheelsDriven;// getDrivenWheels();
             for (int i = 0; i < vehData.mWheelCount; i++) {
                 if (i >= wheelsToBrake.size() || wheelsToBrake[i]) {
-                    ext.SetWheelBrakePressure(vehicle, i, engBrakeForce + inpBrakeForce);
+                    ext.SetWheelPower(vehicle, i, -engBrakeForce + -inpBrakeForce);
                 }
                 else {
-                    ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
+                    ext.SetWheelPower(vehicle, i, -inpBrakeForce);
                 }
             }
             if (settings.DisplayInfo) {
@@ -1230,8 +1230,8 @@ void handleBrakePatch() {
     }
     else {
         if (wheelPatchStates.EngBrakeActive || wheelPatchStates.EngLockActive) {
-            if (!MemoryPatcher::BrakePatcher.Patched()) {
-                MemoryPatcher::PatchBrake();
+            if (!MemoryPatcher::ThrottlePatcher.Patched()) {
+                MemoryPatcher::PatchThrottle();
             }
         }
         else if (wheelPatchStates.InduceBurnout) {
