@@ -1,6 +1,5 @@
 #include "ManualTransmission.h"
 
-#include <inc/types.h>
 #include "script.h"
 #include "Constants.h"
 #include "ScriptSettings.hpp"
@@ -8,6 +7,9 @@
 #include "Input/CarControls.hpp"
 #include "VehicleData.hpp"
 #include "Util/MathExt.h"
+
+#include "inc/natives.h"
+#include "inc/types.h"
 
 extern ScriptSettings settings;
 extern CarControls carControls;
@@ -42,6 +44,10 @@ void MT_SetShiftMode(int mode) {
 }
 
 int MT_GetShiftIndicator() {
+    if (!ENTITY::DOES_ENTITY_EXIST(vehicle)) {
+        // vehData is not initialized yet, so mGearRatios can not be dereferenced.
+        return 0;
+    }
     float nextGearMinSpeed = 0.0f; // don't care about top gear
     if (gearStates.LockGear < vehData.mGearTop) {
         nextGearMinSpeed = settings.NextGearMinRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[gearStates.LockGear + 1];
