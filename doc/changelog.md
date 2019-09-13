@@ -2,7 +2,7 @@
 
 ## 4.7.0
 
-New wheel changes:
+Wheel changes and fixes:
 
 * Improve force feedback model, eliminated oscillation/fishtailing
 * Add option to limit force feedback power
@@ -12,8 +12,9 @@ New wheel changes:
 * Improve wheel axis mapping, now registers axis after lifting off the control significantly
 * Fix an issue where Logitech LEDs caused force feedback to get stuck to last command
 
-New features:
+Other changes and fixes:
 
+* Change engine braking to set wheel torque instead of using brakes
 * Add an enhanced custom steering mode for keyboard and controller
 * Add support for ignoring Simple Trainer menu inputs when it's open (10.0+)
 * Add an option to use manual input switching (Debug submenu, change in main menu)
@@ -21,6 +22,7 @@ New features:
 * Fix an issue where keyboard assignment wrongly warns about a menu button being used
 * Fix an issue where the update check freezes the game momentarily (run in another thread)
 * Fix an issue where the update check crashes the game when no network is present
+* Fix an issue causing a crash of the calling application when MT_GetShiftIndicator is called without a valid `vehData`.
 * Remove usage of decorators for cross-script information
 
 ## 4.6.7
