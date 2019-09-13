@@ -999,6 +999,7 @@ void functionAShift() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void functionClutchCatch() {
+    // TODO: Make more subtle / use throttle?
     const float idleThrottle = 0.24f; // TODO -> Settings?
 
     float clutchRatio = map(carControls.ClutchVal, settings.ClutchThreshold, 1.0f, 1.0f, 0.0f);
@@ -1131,12 +1132,12 @@ void functionEngLock() {
 
         for (int i = 0; i < vehData.mWheelCount; i++) {
             if (i >= wheelsToLock.size() || wheelsToLock[i]) {
-                ext.SetWheelBrakePressure(vehicle, i, lockingForce);
+                ext.SetWheelPower(vehicle, i, -lockingForce);
                 ext.SetWheelSkidSmokeEffect(vehicle, i, lockingForce);
             }
             else {
                 float inpBrakeForce = *reinterpret_cast<float *>(vehData.mHandlingPtr + hOffsets.fBrakeForce) * carControls.BrakeVal;
-                ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
+                //ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
             }
         }
         fakeRev(true, 1.0f);
@@ -1241,21 +1242,6 @@ void handleBrakePatch() {
             if (!MemoryPatcher::ThrottlePatcher.Patched()) {
                 MemoryPatcher::PatchThrottle();
             }
-            for (int i = 0; i < vehData.mWheelCount; i++) {
-                if (ext.IsWheelPowered(vehicle, i)) {
-                    ext.SetWheelBrakePressure(vehicle, i, 0.0f);
-                    ext.SetWheelPower(vehicle, i, 2.0f * ext.GetDriveForce(vehicle));
-                }
-                else {
-                    float handlingBrakeForce = *reinterpret_cast<float*>(vehData.mHandlingPtr + hOffsets.fBrakeForce);
-                    float inpBrakeForce = handlingBrakeForce * carControls.BrakeVal;
-                    ext.SetWheelPower(vehicle, i, 0.0f);
-                    ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
-                }
-
-            }
-            fakeRev();
-            wheelPatchStates.InduceBurnout = false;
         }
         else {
             if (MemoryPatcher::BrakePatcher.Patched()) {
@@ -1443,7 +1429,25 @@ void functionRealReverse() {
             if (carControls.BrakeVal < 0.1f) {
                 VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
             }
+            for (int i = 0; i < vehData.mWheelCount; i++) {
+                if (ext.IsWheelPowered(vehicle, i)) {
+                    ext.SetWheelBrakePressure(vehicle, i, 0.0f);
+                    ext.SetWheelPower(vehicle, i, 2.0f * ext.GetDriveForce(vehicle));
+                }
+                else {
+                    float handlingBrakeForce = *reinterpret_cast<float*>(vehData.mHandlingPtr + hOffsets.fBrakeForce);
+                    float inpBrakeForce = handlingBrakeForce * carControls.BrakeVal;
+                    ext.SetWheelPower(vehicle, i, 0.0f);
+                    ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
+                }
+            }
+            fakeRev();
+            ext.SetThrottle(vehicle, carControls.ThrottleVal);
+            ext.SetThrottleP(vehicle, carControls.ThrottleVal);
             wheelPatchStates.InduceBurnout = true;
+        }
+        else {
+            wheelPatchStates.InduceBurnout = false;
         }
     }
     // Reverse gear
@@ -1616,6 +1620,7 @@ void functionAutoGear1() {
 }
 
 void functionHillGravity() {
+    // TODO: Needs improvement/proper fix
     if (carControls.BrakeVal == 0.0f
         && ENTITY::GET_ENTITY_SPEED(vehicle) < 2.0f &&
         VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
