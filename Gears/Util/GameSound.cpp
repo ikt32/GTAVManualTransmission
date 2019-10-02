@@ -1,32 +1,36 @@
 #include "GameSound.h"
 #include <inc/natives.h>
+#include <utility>
 
 
-GameSound::GameSound(char *sound, char *soundSet) {
-    Active = false;
-    m_sound = sound;
-    m_soundSet = soundSet;
-    m_soundID = -1;
+GameSound::GameSound(std::string sound, std::string soundSet, std::string audioBank) :
+    mAudioBank(std::move(audioBank)),
+    mSoundSet(std::move(soundSet)),
+    mSound(std::move(sound)),
+    mSoundID(-1) {
 }
 
-GameSound::~GameSound() {
-    if (m_soundID == -1 || !Active) return;
-    AUDIO::RELEASE_SOUND_ID(m_soundID);
-}
+GameSound::~GameSound() = default;
 
-void GameSound::Load(char *audioBank) {
-    AUDIO::REQUEST_SCRIPT_AUDIO_BANK(audioBank, false);
+void GameSound::Release() {
+    if (mSoundID == -1)
+        return;
+    AUDIO::RELEASE_SOUND_ID(mSoundID);
 }
 
 void GameSound::Play(Entity ent) {
-    if (Active) return;
-    m_soundID = AUDIO::GET_SOUND_ID();
-    AUDIO::PLAY_SOUND_FROM_ENTITY(m_soundID, m_sound, ent, m_soundSet, 0, 0);
-    Active = true;
+    if (mSoundID != -1) {
+        Stop();
+    }
+
+    mSoundID = AUDIO::GET_SOUND_ID();
+    AUDIO::PLAY_SOUND_FROM_ENTITY(mSoundID, (char*)mSound.c_str(), ent, (char*)mSoundSet.c_str(), 0, 0);
 }
 
 void GameSound::Stop() {
-    if (m_soundID == -1 || !Active) return;
-    AUDIO::STOP_SOUND(m_soundID);
-    Active = false;
+    if (mSoundID == -1) 
+        return;
+    AUDIO::STOP_SOUND(mSoundID);
+    AUDIO::RELEASE_SOUND_ID(mSoundID);
+    mSoundID = -1;
 }
