@@ -9,6 +9,7 @@
 #include "Util/MiscEnums.h"
 #include "Util/UIUtils.h"
 #include "Memory/VehicleExtensions.hpp"
+#include "Memory/Offsets.hpp"
 
 #include "inc/enums.h"
 #include "inc/natives.h"
@@ -92,12 +93,26 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
                 brakelights = true;
             }
 
-            if (!gearStates.FakeNeutral && wheelThrottleVal > 0.01f && carControls.ClutchVal < settings.ClutchThreshold && !gearStates.FakeNeutral) {
+            if (!gearStates.FakeNeutral && wheelThrottleVal > 0.01f && carControls.ClutchVal < settings.ClutchThreshold) {
                 //showText(0.3, 0.0, 1.0, "We should burnout");
-                //SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
-                //SetControlADZ(ControlVehicleBrake, wheelThrottleVal, carControls.ADZThrottle);
-                ext.SetThrottle(vehicle, 1.0f);
-                ext.SetThrottleP(vehicle, 1.0f);
+                if (carControls.BrakeVal < 0.1f) {
+                    VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
+                }
+                for (int i = 0; i < vehData.mWheelCount; i++) {
+                    if (ext.IsWheelPowered(vehicle, i)) {
+                        ext.SetWheelBrakePressure(vehicle, i, 0.0f);
+                        ext.SetWheelPower(vehicle, i, 2.0f * ext.GetDriveForce(vehicle));
+                    }
+                    else {
+                        float handlingBrakeForce = *reinterpret_cast<float*>(vehData.mHandlingPtr + hOffsets.fBrakeForce);
+                        float inpBrakeForce = handlingBrakeForce * carControls.BrakeVal;
+                        ext.SetWheelPower(vehicle, i, 0.0f);
+                        ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
+                    }
+                }
+                fakeRev();
+                ext.SetThrottle(vehicle, carControls.ThrottleVal);
+                ext.SetThrottleP(vehicle, carControls.ThrottleVal);
                 wheelPatchStates.InduceBurnout = true;
             }
 
@@ -124,6 +139,9 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
                 }
             }
             VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, brakelights);
+        }
+        else {
+            wheelPatchStates.InduceBurnout = false;
         }
     }
 
