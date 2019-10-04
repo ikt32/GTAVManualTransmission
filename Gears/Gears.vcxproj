@@ -132,6 +132,7 @@
     <ClCompile Include="ScriptNPC.cpp" />
     <ClCompile Include="ScriptUtils.cpp" />
     <ClCompile Include="ShiftModes.cpp" />
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="Util\Files.cpp" />
     <ClCompile Include="Util\FileVersion.cpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="CustomSteering.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="ManualTransmission.h" />
     <ClInclude Include="Memory\Patcher.h" />
     <ClInclude Include="Memory\PatternInfo.h" />

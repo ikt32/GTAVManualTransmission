@@ -102,6 +102,9 @@
     <ClCompile Include="CustomSteering.cpp" />
     <ClCompile Include="WheelInput.cpp" />
     <ClCompile Include="ScriptUtils.cpp" />
+    <ClCompile Include="Timer.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -260,6 +263,9 @@
     <ClInclude Include="CustomSteering.h" />
     <ClInclude Include="WheelInput.h" />
     <ClInclude Include="ScriptUtils.h" />
+    <ClInclude Include="Timer.h">
+      <Filter>Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
