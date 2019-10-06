@@ -194,6 +194,10 @@ namespace {
         { ControlVehicleCinCam,           "Cinematic Cam"},
         { ControlVehicleExit,             "Exit Car"}
     };
+
+    const std::vector<std::string> tcsStrings{
+        "Disabled", "Brakes", "Throttle"
+    };
 }
 
 int getBlockableControlIndex(int control) {
@@ -1121,6 +1125,9 @@ void update_miscassistmenu() {
         { "Experimental script-driven ABS." });
     menu.BoolOption("Only enable ABS if not present", settings.ABSFilter,
         { "Only enables script-driven ABS on vehicles without the ABS flag." });
+
+    menu.StringArray("Traction Control mode", tcsStrings, settings.Assists.TractionControl,
+        { "Disabled", "Brakes", "Throttle" });
 
     menu.BoolOption("Simple Bike", settings.SimpleBike,
         { "Disables bike engine stalling and the clutch bite simulation." });

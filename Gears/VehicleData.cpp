@@ -55,7 +55,8 @@ void VehicleData::SetVehicle(Vehicle v) {
 
         mHasABS = getABSType(mModelFlags) != ABSType::ABS_NONE;
         mABSType = getABSType(mModelFlags);
-
+        mWheelsTcs.resize(mExt.GetNumWheels(mVehicle));
+        mWheelsAbs.resize(mExt.GetNumWheels(mVehicle));
         Update();
     }
 }

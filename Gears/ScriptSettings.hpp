@@ -49,6 +49,10 @@ public:
     bool UseShifterForAuto = false;
 
     struct {
+        int TractionControl;
+    } Assists;
+
+    struct {
         int Mode;
         float CountersteerMult;
         float CountersteerLimit; // In Degrees

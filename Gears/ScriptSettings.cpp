@@ -17,7 +17,8 @@
 #pragma warning(push)
 #pragma warning(disable: 4244)
 ScriptSettings::ScriptSettings()
-    : CustomSteering { 0, 1.0f, 90.0f, 1.0f, 1.0f }
+    : Assists { 0 }
+    , CustomSteering { 0, 1.0f, 90.0f, 1.0f, 1.0f }
     , FFB { 10000, 0 }
 { }
 
@@ -69,6 +70,9 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetBoolValue("OPTIONS", "HardLimiter", HardLimiter);
     settingsGeneral.SetBoolValue("OPTIONS", "CustomABS", CustomABS);
     settingsGeneral.SetBoolValue("OPTIONS", "ABSFilter", ABSFilter);
+
+    // [ASSISTS]
+    settingsGeneral.SetLongValue("ASSISTS", "TractionControl", Assists.TractionControl);
     
     //[CUSTOM_STEERING]
     settingsGeneral.SetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
@@ -311,6 +315,9 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     HardLimiter = settingsGeneral.GetBoolValue("OPTIONS", "HardLimiter", false);
     CustomABS = settingsGeneral.GetBoolValue("OPTIONS", "CustomABS", false);
     ABSFilter = settingsGeneral.GetBoolValue("OPTIONS", "ABSFilter", false);
+
+    // [ASSISTS]
+    Assists.TractionControl = settingsGeneral.GetLongValue("ASSISTS", "TractionControl", 0);
 
     // [SHIFT_OPTIONS]
     UpshiftCut = settingsGeneral.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", true);

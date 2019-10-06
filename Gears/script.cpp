@@ -1205,51 +1205,113 @@ void functionEngBrake() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void handleBrakePatch() {
-    bool lockedUp = false;
+    bool useABS = false;
+    bool useTCS = false;
+
     bool ebrk = vehData.mHandbrake;
     bool brn = VEHICLE::IS_VEHICLE_IN_BURNOUT(vehicle);
-    auto lockUps = vehData.mWheelsLockedUp;
     auto susps = vehData.mSuspensionTravel;
-    auto brakePressures = ext.GetWheelBrakePressure(vehicle);
-    for (int i = 0; i < vehData.mWheelCount; i++) {
-        if (lockUps[i] && susps[i] > 0.0f && brakePressures[i] > 0.0f)
-            lockedUp = true;
-    }
-    if (ebrk || brn)
-        lockedUp = false;
-    bool absNativePresent = vehData.mHasABS && settings.ABSFilter;
+    auto lockUps = vehData.mWheelsLockedUp;
+    auto speeds = vehData.mWheelTyreSpeeds;
 
-    if (settings.CustomABS && lockedUp && !absNativePresent) {
+    {
+        bool lockedUp = false;
+        auto brakePressures = ext.GetWheelBrakePressure(vehicle);
+        for (int i = 0; i < vehData.mWheelCount; i++) {
+            if (lockUps[i] && susps[i] > 0.0f && brakePressures[i] > 0.0f)
+                lockedUp = true;
+        }
+        if (ebrk || brn)
+            lockedUp = false;
+        bool absNativePresent = vehData.mHasABS && settings.ABSFilter;
+
+        if (settings.CustomABS && lockedUp && !absNativePresent)
+            useABS = true;
+    }
+    
+    {
+        bool tractionLoss = false;
+        if (settings.Assists.TractionControl != 0) {
+            for (int i = 0; i < vehData.mWheelCount; i++) {
+                if (speeds[i] > vehData.mVelocity.y + 2.5f && susps[i] > 0.0f && vehData.mWheelsDriven[i])
+                    tractionLoss = true;
+            }
+            if (ebrk || brn)
+                tractionLoss = false;
+        }
+
+        if (settings.Assists.TractionControl != 0 && tractionLoss)
+            useTCS = true;
+    }
+
+
+    if (useTCS && settings.Assists.TractionControl == 2) {
+        CONTROLS::DISABLE_CONTROL_ACTION(2, eControl::ControlVehicleAccelerate, true);
+        if (settings.DisplayInfo)
+            showText(0.45, 0.75, 1.0, "~r~(TCS/T)");
+    }
+
+    if (wheelPatchStates.InduceBurnout) {
+        if (!MemoryPatcher::BrakePatcher.Patched()) {
+            MemoryPatcher::PatchBrake();
+        }
+        if (!MemoryPatcher::ThrottlePatcher.Patched()) {
+            MemoryPatcher::PatchThrottle();
+        }
+        if (settings.DisplayInfo)
+            showText(0.45, 0.75, 1.0, "~r~Burnout");
+    }
+    else if (wheelPatchStates.EngBrakeActive || wheelPatchStates.EngLockActive) {
+        if (!MemoryPatcher::ThrottlePatcher.Patched()) {
+            MemoryPatcher::PatchThrottle();
+        }
+        if (settings.DisplayInfo)
+            showText(0.45, 0.75, 1.0, "~r~EngBrake/Lock");
+    }
+    else if (useTCS && settings.Assists.TractionControl == 1) {
+        if (!MemoryPatcher::BrakePatcher.Patched()) {
+            MemoryPatcher::PatchBrake();
+        }
+        auto pows = ext.GetWheelPower(vehicle);
+        for (int i = 0; i < vehData.mWheelCount; i++) {
+            if (speeds[i] > vehData.mVelocity.y + 2.5f && susps[i] > 0.0f && vehData.mWheelsDriven[i] && pows[i] > 0.1f) {
+                ext.SetWheelBrakePressure(vehicle, i, map(speeds[i], vehData.mVelocity.y, vehData.mVelocity.y + 2.5f, 0.0f, 0.5f));
+                vehData.mWheelsTcs[i] = true;
+            }
+            else {
+                ext.SetWheelBrakePressure(vehicle, i, 0.0f);
+                vehData.mWheelsTcs[i] = false;
+            }
+        }
+        if (settings.DisplayInfo)
+            showText(0.45, 0.75, 1.0, "~r~(TCS/B)");
+    }
+    else if (useABS) {
         if (!MemoryPatcher::BrakePatcher.Patched()) {
             MemoryPatcher::PatchBrake();
         }
         for (uint8_t i = 0; i < lockUps.size(); i++) {
             ext.SetWheelBrakePressure(vehicle, i, ext.GetWheelBrakePressure(vehicle)[i] * 0.9f);
+            vehData.mWheelsAbs[i] = true;
         }
         if (settings.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~(ABS)");
     }
     else {
-        if (wheelPatchStates.EngBrakeActive || wheelPatchStates.EngLockActive) {
-            if (!MemoryPatcher::ThrottlePatcher.Patched()) {
-                MemoryPatcher::PatchThrottle();
+        if (MemoryPatcher::BrakePatcher.Patched()) {
+            for (int i = 0; i < vehData.mWheelCount; i++) {
+                if (carControls.BrakeVal == 0.0f) {
+                    ext.SetWheelBrakePressure(vehicle, i, 0.0f);
+                }
             }
+            MemoryPatcher::RestoreBrake();
         }
-        else if (wheelPatchStates.InduceBurnout) {
-            if (!MemoryPatcher::BrakePatcher.Patched()) {
-                MemoryPatcher::PatchBrake();
-            }
-            if (!MemoryPatcher::ThrottlePatcher.Patched()) {
-                MemoryPatcher::PatchThrottle();
-            }
+        if (MemoryPatcher::ThrottlePatcher.Patched()) {
+            MemoryPatcher::RestoreThrottle();
         }
-        else {
-            if (MemoryPatcher::BrakePatcher.Patched()) {
-                MemoryPatcher::RestoreBrake();
-            }
-            if (MemoryPatcher::ThrottlePatcher.Patched()) {
-                MemoryPatcher::RestoreThrottle();
-            }
+        for (int i = 0; i < vehData.mWheelCount; i++) {
+            vehData.mWheelsTcs[i] = false;
+            vehData.mWheelsAbs[i] = false;
         }
     }
 }

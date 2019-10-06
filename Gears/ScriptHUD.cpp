@@ -271,12 +271,22 @@ void drawVehicleWheelInfo() {
     auto wheelsContactCoords = ext.GetWheelLastContactCoords(vehicle);
     auto wheelsOnGround = ext.GetWheelsOnGround(vehicle);
     auto wheelCoords = ext.GetWheelCoords(vehicle, ENTITY::GET_ENTITY_COORDS(vehicle, true), ENTITY::GET_ENTITY_ROTATION(vehicle, 0), ENTITY::GET_ENTITY_FORWARD_VECTOR(vehicle));
-    auto wheelLockups = vehData.mWheelsLockedUp;
     auto wheelsPower = ext.GetWheelPower(vehicle);
     auto wheelsBrake = ext.GetWheelBrakePressure(vehicle);
     for (int i = 0; i < numWheels; i++) {
-        Color c = wheelLockups[i] ? solidOrange : transparentGray;
-        c = wheelsOnGround[i] ? c : solidRed;
+        Color color = transparentGray;
+        if (vehData.mWheelsTcs[i]) {
+            color = Color{ 255, 255, 0, 127 };
+        }
+        if (vehData.mWheelsAbs[i]) {
+            color = Color{ 255, 0, 0, 127 };
+        }
+        if (vehData.mWheelsLockedUp[i]) {
+            color = Color{ 127, 0, 255, 127 };
+        }
+        if (!wheelsOnGround[i]) {
+            color = Color{ 0, 0, 0, 0 };
+        }
         showDebugInfo3D(wheelCoords[i], {
             fmt::format("Index: \t{}", i),
             fmt::format("{}Powered", ext.IsWheelPowered(vehicle, i) ? "~g~" : "~r~"),
@@ -284,7 +294,7 @@ void drawVehicleWheelInfo() {
             fmt::format("Compr: \t{:.3f}", wheelsCompr[i]),
             fmt::format("Health: \t{:.3f}", wheelsHealt[i]),
             fmt::format("Power: \t{:.3f}", wheelsPower[i]),
-            fmt::format("Brake: \t{:.3f}",wheelsBrake[i])}, c);
+            fmt::format("Brake: \t{:.3f}", wheelsBrake[i])}, color);
         GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
             wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z + 1.0f + 2.5f * wheelsCompr[i], 255, 0, 0, 255);
     }

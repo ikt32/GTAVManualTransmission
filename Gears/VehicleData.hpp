@@ -129,6 +129,9 @@ public:
 
     std::vector<float> mBrakePressures;
 
+    // set externally, boo?
+    std::vector<bool> mWheelsTcs;
+    std::vector<bool> mWheelsAbs;
     // Workaround
     bool mHasSpeedo;
 
