@@ -14,7 +14,7 @@ extern ScriptSettings settings;
 
 extern VehicleExtensions ext;
 extern Ped playerPed;
-extern Vehicle vehicle;
+extern Vehicle playerVehicle;
 
 DWORD	npcVehicleUpdateTime = 0;
 DWORD   raycastUpdateTime = 0;
@@ -25,12 +25,12 @@ std::vector<Vehicle> ignoredVehicles;
 
 void showNPCInfo(Vehicle npcVehicle, bool allowOccupied) {
     bool lookBack = CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleLookBehind) == TRUE;
-    auto vehPos = ENTITY::GET_ENTITY_COORDS(vehicle, true);
+    auto vehPos = ENTITY::GET_ENTITY_COORDS(playerVehicle, true);
     float searchdist = 50.0f;
     float searchfov = 15.0f;
     if (npcVehicle == 0) return;
 
-    if (npcVehicle == vehicle && allowOccupied) {
+    if (npcVehicle == playerVehicle && allowOccupied) {
         Vector3 targetPos = ENTITY::GET_ENTITY_COORDS(npcVehicle, true);
         Color bgColor = transparentGray;
         Color fgColor = solidWhite;
@@ -73,12 +73,12 @@ void showNPCInfo(Vehicle npcVehicle, bool allowOccupied) {
             bgColor);
     }
 
-    if (npcVehicle == vehicle) return;
+    if (npcVehicle == playerVehicle) return;
 
     Vector3 targetPos = ENTITY::GET_ENTITY_COORDS(npcVehicle, true);
     Vector3 direction = Normalize(targetPos - vehPos);
     float vehDirection = atan2(direction.y, direction.x) * (180.0f / 3.14159f);
-    float myHeading = ENTITY::GET_ENTITY_HEADING(vehicle) + 90.0f;
+    float myHeading = ENTITY::GET_ENTITY_HEADING(playerVehicle) + 90.0f;
     if (lookBack) myHeading += 180.0f;
     float latDist = GetAngleBetween(vehDirection, myHeading, searchfov);
     if (latDist < searchfov) {
@@ -139,8 +139,8 @@ void showNPCsInfo(Vehicle vehicles[1024], int count) {
 
 void updateNPCVehicle(Vehicle npcVehicle) {
     if (npcVehicle == 0 || !ENTITY::DOES_ENTITY_EXIST(npcVehicle)) return;
-    if (std::find(ignoredVehicles.begin(), ignoredVehicles.end(), vehicle) != ignoredVehicles.end()) return;
-    if (npcVehicle == vehicle && VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1) == playerPed) return;
+    if (std::find(ignoredVehicles.begin(), ignoredVehicles.end(), playerVehicle) != ignoredVehicles.end()) return;
+    if (npcVehicle == playerVehicle && VEHICLE::GET_PED_IN_VEHICLE_SEAT(playerVehicle, -1) == playerPed) return;
 
     if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(npcVehicle)) return;
     if (ext.GetTopGear(npcVehicle) == 1) return;
@@ -189,7 +189,7 @@ std::set<Vehicle> updateRaycastVehicles() {
         auto angle = static_cast<float>(static_cast<double>(i) / static_cast<double>(numCasts) * 2.0 * M_PI);
         auto raycastCoordA = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(playerPed, distMin * cos(angle), distMin * sin(angle), 0.0f);
         auto raycastCoordB = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(playerPed, distMax * cos(angle), distMax * sin(angle), 0.0f);
-        auto ray = WORLDPROBE::_START_SHAPE_TEST_RAY(raycastCoordA.x, raycastCoordA.y, raycastCoordA.z, raycastCoordB.x, raycastCoordB.y, raycastCoordB.z, 10, vehicle, 0);
+        auto ray = WORLDPROBE::_START_SHAPE_TEST_RAY(raycastCoordA.x, raycastCoordA.y, raycastCoordA.z, raycastCoordB.x, raycastCoordB.y, raycastCoordB.z, 10, playerVehicle, 0);
         BOOL hit;
         Vector3 endCoords, surfaceNormal;
         Entity entity;
