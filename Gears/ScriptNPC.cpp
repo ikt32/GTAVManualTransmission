@@ -55,8 +55,6 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
         return;
 
     bool playerPassenger = !IsPedOnSeat(npcVehicle, playerPed, -1) && PED::GET_VEHICLE_PED_IS_IN(playerPed, false) == npcVehicle;
-    if (playerPassenger)
-        showText(0.1f, 0.1f, 0.5f, fmt::format("~r~Ur in a {}", VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(npcVehicle)));
 
     bool lookBack = CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleLookBehind) == TRUE;
     auto vehPos = ENTITY::GET_ENTITY_COORDS(playerVehicle, true);
@@ -72,9 +70,6 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
     if (latDist < searchfov || playerPassenger) {
         float dist = Distance(vehPos, targetPos);
         if (dist < searchdist || playerPassenger) {
-            if (playerPassenger) {
-                showText(0.1f, 0.1f, 0.5f, fmt::format("~g~Ur in a {}", VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(npcVehicle)));
-            }
             float meCloseness = pow(2.0f * (searchdist - dist) / searchdist, 2.0f);
             int drawAlpha = std::min(static_cast<int>(255 * latDist * meCloseness), 255);
             Color bgColor = transparentGray;
