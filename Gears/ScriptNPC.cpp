@@ -24,6 +24,11 @@ DWORD   raycastUpdateTime = 0;
 
 std::vector<Vehicle> ignoredVehicles;
 
+bool IsPedOnSeat(Vehicle vehicle, Ped ped, int seat) {
+    Vehicle pedVehicle = PED::GET_VEHICLE_PED_IS_IN(ped, false);
+    return vehicle == pedVehicle && VEHICLE::GET_PED_IN_VEHICLE_SEAT(pedVehicle, seat) == ped;
+}
+
 class NPCVehicle {
 public:
     NPCVehicle(Vehicle vehicle)
@@ -43,8 +48,16 @@ protected:
 std::vector<NPCVehicle> npcVehicles;
 
 
-void showNPCInfo(NPCVehicle _npcVehicle, bool allowOccupied) {
+void showNPCInfo(NPCVehicle _npcVehicle) {
     Vehicle npcVehicle = _npcVehicle.GetVehicle();
+    if (npcVehicle == 0 ||
+        !ENTITY::DOES_ENTITY_EXIST(npcVehicle))
+        return;
+
+    bool playerPassenger = !IsPedOnSeat(npcVehicle, playerPed, -1) && PED::GET_VEHICLE_PED_IS_IN(playerPed, false) == npcVehicle;
+    if (playerPassenger)
+        showText(0.1f, 0.1f, 0.5f, fmt::format("~r~Ur in a {}", VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(npcVehicle)));
+
     bool lookBack = CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleLookBehind) == TRUE;
     auto vehPos = ENTITY::GET_ENTITY_COORDS(playerVehicle, true);
     float searchdist = 50.0f;
@@ -56,9 +69,12 @@ void showNPCInfo(NPCVehicle _npcVehicle, bool allowOccupied) {
     float myHeading = ENTITY::GET_ENTITY_HEADING(playerVehicle) + 90.0f;
     if (lookBack) myHeading += 180.0f;
     float latDist = GetAngleBetween(vehDirection, myHeading, searchfov);
-    if (latDist < searchfov) {
+    if (latDist < searchfov || playerPassenger) {
         float dist = Distance(vehPos, targetPos);
-        if (dist < searchdist) {
+        if (dist < searchdist || playerPassenger) {
+            if (playerPassenger) {
+                showText(0.1f, 0.1f, 0.5f, fmt::format("~g~Ur in a {}", VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(npcVehicle)));
+            }
             float meCloseness = pow(2.0f * (searchdist - dist) / searchdist, 2.0f);
             int drawAlpha = std::min(static_cast<int>(255 * latDist * meCloseness), 255);
             Color bgColor = transparentGray;
@@ -94,7 +110,8 @@ void showNPCInfo(NPCVehicle _npcVehicle, bool allowOccupied) {
             auto load = gearStates.ThrottleHang - map(ext.GetCurrentRPM(npcVehicle), 0.2f, 1.0f, 0.0f, 1.0f);
 
             showDebugInfo3DColors(targetPos,
-                { //{ UI::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(npcVehicle))), fgColor },
+                {
+                    //{ UI::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(npcVehicle))), fgColor },
                     //{ plate, fgColor },
                     { "Throttle: " + std::to_string(throttle), thColor },
                     { "Brake: " + std::to_string(brake), brColor },
@@ -112,7 +129,9 @@ void showNPCInfo(NPCVehicle _npcVehicle, bool allowOccupied) {
 
 void showNPCsInfo(const std::vector<NPCVehicle>& vehicles) {
     for (const auto& vehicle : vehicles) {
-        showNPCInfo(vehicle, false);
+        if (IsPedOnSeat(vehicle.GetVehicle(), playerPed, -1))
+            continue;
+        showNPCInfo(vehicle);
     }
 }
 
@@ -176,26 +195,27 @@ void updateShifting(Vehicle npcVehicle, VehicleGearboxStates& gearStates) {
 void updateNPCVehicle(NPCVehicle& _npcVehicle) {
     Vehicle npcVehicle = _npcVehicle.GetVehicle();
     auto& gearStates = _npcVehicle.GetGearbox();
-    float throttle = ext.GetThrottleP(npcVehicle);
 
-    if (npcVehicle == 0 || !ENTITY::DOES_ENTITY_EXIST(npcVehicle)) return;
-    if (std::find(ignoredVehicles.begin(), ignoredVehicles.end(), playerVehicle) != ignoredVehicles.end()) return;
-    if (npcVehicle == playerVehicle && VEHICLE::GET_PED_IN_VEHICLE_SEAT(playerVehicle, -1) == playerPed) return;
-
-    if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(npcVehicle)) return;
-    if (ext.GetTopGear(npcVehicle) == 1) return;
-
-    int currGear = ext.GetGearCurr(npcVehicle);
-    if (currGear == 0) 
+    if (npcVehicle == 0 ||
+        !ENTITY::DOES_ENTITY_EXIST(npcVehicle))
         return;
 
     if (gearStates.Shifting)
         return;
 
+    if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(npcVehicle)) 
+        return;
+
     auto topGear = ext.GetTopGear(npcVehicle);
+    auto currGear = ext.GetGearCurr(npcVehicle);
+
+    if (topGear == 1 || currGear == 0)
+        return;
+
+    float throttle = ext.GetThrottleP(npcVehicle);
     auto gearRatios = ext.GetGearRatios(npcVehicle);
-    auto driveMaxFlatVel = ext.GetDriveMaxFlatVel(npcVehicle);
-    auto rpm = ext.GetCurrentRPM(npcVehicle);
+    float driveMaxFlatVel = ext.GetDriveMaxFlatVel(npcVehicle);
+    float rpm = ext.GetCurrentRPM(npcVehicle);
 
     if (throttle > gearStates.ThrottleHang)
         gearStates.ThrottleHang = throttle;
@@ -279,6 +299,15 @@ std::set<Vehicle> updateRaycastVehicles() {
 
 void updateNPCVehicles(std::vector<NPCVehicle>& vehicles) {
     for(auto& vehicle : vehicles) {
+        if (IsPedOnSeat(vehicle.GetVehicle(), playerPed, -1))
+            continue;
+
+        bool ignored = std::find_if(ignoredVehicles.begin(), ignoredVehicles.end(), [&](const auto & ignoredVehicle) {
+            return ignoredVehicle.GetVehicle() == vehicle;
+        }) != ignoredVehicles.end();
+        if (ignored)
+            continue;
+
         updateNPCVehicle(vehicle);
 
         updateShifting(vehicle.GetVehicle(), vehicle.GetGearbox());
@@ -309,7 +338,8 @@ void updateNPCVehicleList(const std::vector<Vehicle>& newVehicles, std::vector<N
 
 void update_npc() {
     bool mtActive = MemoryPatcher::NumGearboxPatched > 0;
-    if (!settings.ShowNPCInfo && !mtActive) return;
+    if (!settings.ShowNPCInfo && !mtActive) 
+        return;
 
     const int ARR_SIZE = 1024;
     std::vector<Vehicle> vehicles(ARR_SIZE);
