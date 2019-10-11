@@ -22,8 +22,6 @@ extern Vehicle playerVehicle;
 DWORD	npcVehicleUpdateTime = 0;
 DWORD   raycastUpdateTime = 0;
 
-std::set<Vehicle> raycastVehicles;
-
 std::vector<Vehicle> ignoredVehicles;
 
 class NPCVehicle {
@@ -289,7 +287,25 @@ void updateNPCVehicles(std::vector<NPCVehicle>& vehicles) {
     }
 }
 
+void updateNPCVehicleList(const std::vector<Vehicle>& newVehicles, std::vector<NPCVehicle>& manVehicles) {
+    // Remove stale vehicles
+    for (auto it = manVehicles.begin(); it != manVehicles.end();) {
+        // vehicle disappeared from list
+        if (std::find(newVehicles.begin(), newVehicles.end(), it->GetVehicle()) == newVehicles.end()) {
+            it = manVehicles.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
 
+    // Add new vehicles
+    for (const auto& vehicle : newVehicles) {
+        if (std::find_if(manVehicles.begin(), manVehicles.end(), [&](const auto & npcVehicle) { return npcVehicle.GetVehicle() == vehicle; }) == manVehicles.end()) {
+            manVehicles.emplace_back(vehicle);
+        }
+    }
+}
 
 void update_npc() {
     bool mtActive = MemoryPatcher::NumGearboxPatched > 0;
@@ -300,23 +316,22 @@ void update_npc() {
     int count = worldGetAllVehicles(vehicles.data(), ARR_SIZE);
     vehicles.resize(count);
 
-    // Remove stale vehicles
-    for(auto it = npcVehicles.begin(); it != npcVehicles.end();) {
-        // vehicle disappeared from list
-        if (std::find(vehicles.begin(), vehicles.end(), it->GetVehicle()) == vehicles.end()) {
-            it = npcVehicles.erase(it);
-        }
-        else {
-            ++it;
+    // ScriptHookV did not return any vehicles, check manually
+    if (count == 0) {
+        if (raycastUpdateTime + 1000 < GetTickCount()) {
+            raycastUpdateTime = GetTickCount();
+            auto raycastVehicles = updateRaycastVehicles();
+            auto raycastVehicles_ = std::vector<Vehicle>(raycastVehicles.begin(), raycastVehicles.end());
+            updateNPCVehicleList(raycastVehicles_, npcVehicles);
+
+            if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(playerVehicle, -1) != playerPed) {
+                npcVehicles.emplace_back(playerVehicle);
+            }
+
         }
     }
-
-    // Add new vehicles
-    for (const auto& vehicle : vehicles) {
-        if (std::find_if(npcVehicles.begin(), npcVehicles.end(), [&](const auto& npcVehicle){ return npcVehicle.GetVehicle() == vehicle; }) == npcVehicles.end()) {
-            if (vehicle == playerVehicle) continue;
-            npcVehicles.emplace_back(vehicle);
-        }
+    else {
+        updateNPCVehicleList(vehicles, npcVehicles);
     }
 
     if (settings.ShowNPCInfo) {
