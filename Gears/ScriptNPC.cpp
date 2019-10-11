@@ -51,53 +51,6 @@ void showNPCInfo(NPCVehicle _npcVehicle, bool allowOccupied) {
     auto vehPos = ENTITY::GET_ENTITY_COORDS(playerVehicle, true);
     float searchdist = 50.0f;
     float searchfov = 15.0f;
-    if (npcVehicle == 0) return;
-
-    if (npcVehicle == playerVehicle && allowOccupied) {
-        Vector3 targetPos = ENTITY::GET_ENTITY_COORDS(npcVehicle, true);
-        Color bgColor = transparentGray;
-        Color fgColor = solidWhite;
-        auto plate = VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(npcVehicle);
-
-        Color thColor = fgColor;
-        float throttle = ext.GetThrottleP(npcVehicle);
-
-        if (throttle >= 0.0f) {
-            thColor.R = static_cast<int>(map(throttle, 0.0f, 1.0f, 255.0f, 0.0f));
-            thColor.B = static_cast<int>(map(throttle, 0.0f, 1.0f, 255.0f, 0.0f));
-        }
-        else {
-            thColor.B = static_cast<int>(map(throttle, 0.0f, 1.0f, 255.0f, 0.0f));
-            thColor.G = static_cast<int>(map(throttle, 0.0f, 1.0f, 255.0f, 0.0f));
-        }
-
-        Color brColor = fgColor;
-        float brake = ext.GetBrakeP(npcVehicle);
-
-        brColor.B = static_cast<int>(map(brake, 0.0f, 1.0f, 255.0f, 0.0f));
-        brColor.G = static_cast<int>(map(brake, 0.0f, 1.0f, 255.0f, 0.0f));
-
-        Color rpmColor = fgColor;
-        float rpm = ext.GetCurrentRPM(npcVehicle);
-        rpmColor.G = static_cast<int>(map(rpm, 0.0f, 1.0f, 255.0f, 165.0f));
-        rpmColor.B = static_cast<int>(map(rpm, 0.0f, 1.0f, 255.0f, 0.0f));
-
-        auto gearStates = _npcVehicle.GetGearbox();
-        auto load = gearStates.ThrottleHang - map(ext.GetCurrentRPM(npcVehicle), 0.2f, 1.0f, 0.0f, 1.0f);
-
-        showDebugInfo3DColors(targetPos,
-            { //{ UI::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(npcVehicle))), fgColor },
-                //{ plate, fgColor },
-                { "Throttle: " + std::to_string(throttle), thColor },
-                { "Brake: " + std::to_string(brake), brColor },
-                { "Steer:" + std::to_string(ext.GetSteeringAngle(npcVehicle)), fgColor },
-                { "RPM: " + std::to_string(rpm), rpmColor },
-                { fmt::format("Gear: {}/{}", ext.GetGearCurr(npcVehicle), ext.GetTopGear(npcVehicle)), fgColor },
-                { fmt::format("Load: {}", load), fgColor }, },
-            bgColor);
-    }
-
-    if (npcVehicle == playerVehicle) return;
 
     Vector3 targetPos = ENTITY::GET_ENTITY_COORDS(npcVehicle, true);
     Vector3 direction = Normalize(targetPos - vehPos);
@@ -154,17 +107,7 @@ void showNPCInfo(NPCVehicle _npcVehicle, bool allowOccupied) {
                     { fmt::format("Shifting: {}", gearStates.Shifting), fgColor },
                     { fmt::format("TH: {}", gearStates.ThrottleHang), fgColor },
                 },
-                    bgColor);
-            //showDebugInfo3DColors(targetPos,
-            //                      { { UI::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(npcVehicle))), fgColor },
-            //                          { plate, fgColor },
-            //                          { "Throttle: " + std::to_string(throttle), thColor },
-            //                          { "Brake: " + std::to_string(brake), brColor },
-            //                          { "Steer:" + std::to_string(ext.GetSteeringAngle(npcVehicle)), fgColor },
-            //                          { "RPM: " + std::to_string(rpm), rpmColor },
-            //                          { "Gear: " + std::to_string(ext.GetGearCurr(npcVehicle)), fgColor },
-            //                          { "Top Gear: " + std::to_string(ext.GetTopGear(npcVehicle)), fgColor }, },
-            //                      bgColor);
+                bgColor);
         }
     }
 }
@@ -281,14 +224,6 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
             skidding = true;
     }
 
-    //auto p = ENTITY::GET_ENTITY_COORDS(npcVehicle, true);
-    //p.z += 2.0f;
-    //showDebugInfo3D(p, {
-    //            {fmt::format("{}EL: {}", engineLoad < settings.UpshiftLoad ? "~g~" : "", engineLoad)},
-    //            {fmt::format("{}SPD: {}/{}", currSpeed > nextGearMinSpeed ? "~g~" : "", currSpeed, nextGearMinSpeed)},
-    //            {fmt::format("{}Skid", skidding ? "~g~" : "")},
-    //    });
-
     // Shift up.
     if (currGear < topGear) {
         if (engineLoad < settings.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
@@ -345,43 +280,13 @@ std::set<Vehicle> updateRaycastVehicles() {
 }
 
 void updateNPCVehicles(std::vector<NPCVehicle>& vehicles) {
-    //if (npcVehicleUpdateTime + 200 < GetTickCount()) {
-    //    npcVehicleUpdateTime = GetTickCount();
-    //    for (int i = 0; i < count; ++i) {
-    //        Vehicle npcVehicle = vehicles[i];
-    //        updateNPCVehicle(npcVehicle);
-    //    }
-    //}
     for(auto& vehicle : vehicles) {
         updateNPCVehicle(vehicle);
 
-        // Shifting is only true in Automatic and Sequential mode
         updateShifting(vehicle.GetVehicle(), vehicle.GetGearbox());
         ext.SetGearCurr(vehicle.GetVehicle(), vehicle.GetGearbox().LockGear);
         ext.SetGearNext(vehicle.GetVehicle(), vehicle.GetGearbox().LockGear);
     }
-
-    // ScriptHookV did not return any vehicles, check manually
-    //if (count == 0) {
-    //    if (raycastUpdateTime + 1000 < GetTickCount()) {
-    //        raycastUpdateTime = GetTickCount();
-    //        raycastVehicles = updateRaycastVehicles();
-    //    }
-
-    //    // yeah this runs every tick
-    //    for (const auto& rcVehicle : raycastVehicles) {
-    //        updateNPCVehicle(rcVehicle);
-    //        if (settings.ShowNPCInfo)
-    //            showNPCInfo(rcVehicle, false);
-    //    }
-
-    //    Vehicle vehicle2 = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
-    //    if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle2, -1) != playerPed) {
-    //        updateNPCVehicle(vehicle2);
-    //        if (settings.ShowNPCInfo)
-    //            showNPCInfo(vehicle2, true);
-    //    }
-    //}
 }
 
 
