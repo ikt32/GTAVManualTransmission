@@ -13,6 +13,7 @@
 #include "Memory/Offsets.hpp"
 
 #include <fmt/format.h>
+#include "ScriptUtils.h"
 
 class NPCVehicle;
 
@@ -42,18 +43,12 @@ protected:
     VehicleGearboxStates mGearbox;
 };
 
-bool IsPedOnSeat(Vehicle vehicle, Ped ped, int seat) {
-    Vehicle pedVehicle = PED::GET_VEHICLE_PED_IS_IN(ped, false);
-    return vehicle == pedVehicle && 
-        VEHICLE::GET_PED_IN_VEHICLE_SEAT(pedVehicle, seat) == ped;
-}
-
 void showNPCInfo(NPCVehicle _npcVehicle) {
     Vehicle npcVehicle = _npcVehicle.GetVehicle();
     if (npcVehicle == 0 || !ENTITY::DOES_ENTITY_EXIST(npcVehicle))
         return;
 
-    bool playerPassenger = !IsPedOnSeat(npcVehicle, playerPed, -1) && 
+    bool playerPassenger = !Util::IsPedOnSeat(npcVehicle, playerPed, -1) && 
         PED::GET_VEHICLE_PED_IS_IN(playerPed, false) == npcVehicle;
 
     bool lookBack = CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleLookBehind) == TRUE;
@@ -124,7 +119,7 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
 
 void showNPCsInfo(const std::vector<NPCVehicle>& vehicles) {
     for (const auto& vehicle : vehicles) {
-        if (IsPedOnSeat(vehicle.GetVehicle(), playerPed, -1))
+        if (Util::IsPedOnSeat(vehicle.GetVehicle(), playerPed, -1))
             continue;
         showNPCInfo(vehicle);
     }
@@ -295,7 +290,7 @@ std::set<Vehicle> updateRaycastVehicles() {
 
 void updateNPCVehicles(std::vector<NPCVehicle>& vehicles) {
     for(auto& vehicle : vehicles) {
-        if (IsPedOnSeat(vehicle.GetVehicle(), playerPed, -1))
+        if (Util::IsPedOnSeat(vehicle.GetVehicle(), playerPed, -1))
             continue;
 
         bool ignored = std::find_if(ignoredVehicles.begin(), ignoredVehicles.end(), [&](const auto & ignoredVehicle) {
