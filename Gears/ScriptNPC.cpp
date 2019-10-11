@@ -13,21 +13,18 @@
 #include "Memory/Offsets.hpp"
 
 #include <fmt/format.h>
-extern ScriptSettings settings;
 
+class NPCVehicle;
+
+extern ScriptSettings settings;
 extern VehicleExtensions ext;
 extern Ped playerPed;
 extern Vehicle playerVehicle;
 
-DWORD	npcVehicleUpdateTime = 0;
-DWORD   raycastUpdateTime = 0;
-
 std::vector<Vehicle> ignoredVehicles;
+std::vector<NPCVehicle> npcVehicles;
 
-bool IsPedOnSeat(Vehicle vehicle, Ped ped, int seat) {
-    Vehicle pedVehicle = PED::GET_VEHICLE_PED_IS_IN(ped, false);
-    return vehicle == pedVehicle && VEHICLE::GET_PED_IN_VEHICLE_SEAT(pedVehicle, seat) == ped;
-}
+DWORD   raycastUpdateTime = 0;
 
 class NPCVehicle {
 public:
@@ -45,16 +42,19 @@ protected:
     VehicleGearboxStates mGearbox;
 };
 
-std::vector<NPCVehicle> npcVehicles;
-
+bool IsPedOnSeat(Vehicle vehicle, Ped ped, int seat) {
+    Vehicle pedVehicle = PED::GET_VEHICLE_PED_IS_IN(ped, false);
+    return vehicle == pedVehicle && 
+        VEHICLE::GET_PED_IN_VEHICLE_SEAT(pedVehicle, seat) == ped;
+}
 
 void showNPCInfo(NPCVehicle _npcVehicle) {
     Vehicle npcVehicle = _npcVehicle.GetVehicle();
-    if (npcVehicle == 0 ||
-        !ENTITY::DOES_ENTITY_EXIST(npcVehicle))
+    if (npcVehicle == 0 || !ENTITY::DOES_ENTITY_EXIST(npcVehicle))
         return;
 
-    bool playerPassenger = !IsPedOnSeat(npcVehicle, playerPed, -1) && PED::GET_VEHICLE_PED_IS_IN(playerPed, false) == npcVehicle;
+    bool playerPassenger = !IsPedOnSeat(npcVehicle, playerPed, -1) && 
+        PED::GET_VEHICLE_PED_IS_IN(playerPed, false) == npcVehicle;
 
     bool lookBack = CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleLookBehind) == TRUE;
     auto vehPos = ENTITY::GET_ENTITY_COORDS(playerVehicle, true);
@@ -215,12 +215,12 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
     if (throttle > gearStates.ThrottleHang)
         gearStates.ThrottleHang = throttle;
     else if (gearStates.ThrottleHang > 0.0f)
-        gearStates.ThrottleHang -= GAMEPLAY::GET_FRAME_TIME() * 0.05f; // 0.50f was ecorate
+        gearStates.ThrottleHang -= GAMEPLAY::GET_FRAME_TIME() * settings.EcoRate;
 
     if (gearStates.ThrottleHang < 0.0f)
         gearStates.ThrottleHang = 0.0f;
 
-    float currSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(npcVehicle, true).y;// ext.GetDashSpeed(npcVehicle);// vehData.mWheelAverageDrivenTyreSpeed;
+    float currSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(npcVehicle, true).y;
 
     float nextGearMinSpeed = 0.0f; // don't care about top gear
     if (currGear < topGear) {
@@ -278,7 +278,8 @@ std::set<Vehicle> updateRaycastVehicles() {
         auto angle = static_cast<float>(static_cast<double>(i) / static_cast<double>(numCasts) * 2.0 * M_PI);
         auto raycastCoordA = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(playerPed, distMin * cos(angle), distMin * sin(angle), 0.0f);
         auto raycastCoordB = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(playerPed, distMax * cos(angle), distMax * sin(angle), 0.0f);
-        auto ray = WORLDPROBE::_START_SHAPE_TEST_RAY(raycastCoordA.x, raycastCoordA.y, raycastCoordA.z, raycastCoordB.x, raycastCoordB.y, raycastCoordB.z, 10, playerVehicle, 0);
+        auto ray = WORLDPROBE::_START_SHAPE_TEST_RAY(
+            raycastCoordA.x, raycastCoordA.y, raycastCoordA.z, raycastCoordB.x, raycastCoordB.y, raycastCoordB.z, 10, playerVehicle, 0);
         BOOL hit;
         Vector3 endCoords, surfaceNormal;
         Entity entity;
@@ -325,7 +326,10 @@ void updateNPCVehicleList(const std::vector<Vehicle>& newVehicles, std::vector<N
 
     // Add new vehicles
     for (const auto& vehicle : newVehicles) {
-        if (std::find_if(manVehicles.begin(), manVehicles.end(), [&](const auto & npcVehicle) { return npcVehicle.GetVehicle() == vehicle; }) == manVehicles.end()) {
+        bool vehicleMissing = std::find_if(manVehicles.begin(), manVehicles.end(), [&](const auto & npcVehicle) {
+            return npcVehicle.GetVehicle() == vehicle;
+        }) == manVehicles.end();
+        if (vehicleMissing) {
             manVehicles.emplace_back(vehicle);
         }
     }
