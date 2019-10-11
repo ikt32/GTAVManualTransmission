@@ -299,7 +299,7 @@ void updateNPCVehicles(std::vector<NPCVehicle>& vehicles) {
             continue;
 
         bool ignored = std::find_if(ignoredVehicles.begin(), ignoredVehicles.end(), [&](const auto & ignoredVehicle) {
-            return ignoredVehicle.GetVehicle() == vehicle;
+            return ignoredVehicle == vehicle.GetVehicle();
         }) != ignoredVehicles.end();
         if (ignored)
             continue;
