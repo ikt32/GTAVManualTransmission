@@ -191,6 +191,15 @@ void drawDebugInfo() {
             vehData.mHasClutch ? "~g~" : "~r~"));
         showText(0.01, 0.500, 0.3, fmt::format("{}ABS",
             vehData.mHasABS ? "~g~" : "~r~"));
+
+        showText(0.01, 0.550, 0.3, fmt::format("{}Shifting", gearStates.Shifting ? "~g~" : "~r~"));
+        showText(0.01, 0.575, 0.3, fmt::format("Clutch: {}" ,gearStates.ClutchVal));
+        showText(0.01, 0.600, 0.3, fmt::format("Lock: {}" ,gearStates.LockGear));
+        showText(0.01, 0.625, 0.3, fmt::format("Next: {}" ,gearStates.NextGear));
+        showText(0.01, 0.650, 0.3, fmt::format("{}Load/upReq: {:.3f}\t/{:.3f}",
+            gearStates.Shifting ? "~c~" : "", gearStates.EngineLoad, gearStates.UpshiftLoad));
+        showText(0.01, 0.675, 0.3, fmt::format("{}Load/dnReq: {:.3f}\t/{:.3f}",
+            gearStates.Shifting ? "~c~" : "", gearStates.EngineLoad, gearStates.DownshiftLoad));
     }
 
     showText(0.85, 0.050, 0.4, fmt::format("Throttle:\t{:.3f}", carControls.ThrottleVal) , 4);

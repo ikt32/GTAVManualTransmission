@@ -655,13 +655,6 @@ bool isUIActive() {
  * 5. Done shifting
  */
 void updateShifting() {
-    if (settings.DisplayInfo && !menu.IsThisOpen()) {
-        showText(0.01, 0.550, 0.3, "Shifting: " + std::string(gearStates.Shifting ? "Y" : "N"));
-        showText(0.01, 0.575, 0.3, "Clutch: " + std::to_string(gearStates.ClutchVal));
-        showText(0.01, 0.600, 0.3, "Lock: " + std::to_string(gearStates.LockGear));
-        showText(0.01, 0.625, 0.3, "Next: " + std::to_string(gearStates.NextGear));
-    }
-
     if (!gearStates.Shifting)
         return;
 
@@ -951,6 +944,8 @@ void functionAShift() {
     float currGearMinSpeed = settings.CurrGearMinRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear];
 
     float engineLoad = gearStates.ThrottleHang - map(vehData.mRPM, 0.2f, 1.0f, 0.0f, 1.0f);
+    gearStates.EngineLoad = engineLoad;
+    gearStates.UpshiftLoad = settings.UpshiftLoad;
 
     bool skidding = false;
     for (auto x : ext.GetWheelSkidSmokeEffect(playerVehicle)) {
@@ -978,6 +973,7 @@ void functionAShift() {
     float rateUp = *reinterpret_cast<float*>(vehData.mHandlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
     float upshiftDuration = 1.0f / (rateUp * settings.ClutchRateMult);
     bool tpPassed = GAMEPLAY::GET_GAME_TIMER() > gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * settings.DownshiftTimeoutMult);
+    gearStates.DownshiftLoad = settings.DownshiftLoad * gearRatioRatio;
 
     // Shift down
     if (currGear > 1) {
@@ -985,10 +981,6 @@ void functionAShift() {
             shiftTo(currGear - 1, true);
             gearStates.FakeNeutral = false;
         }
-    }
-
-    if (settings.DisplayInfo && !menu.IsThisOpen()) {
-        showText(0.01, 0.525, 0.3, fmt::format("Engine load: \t{:.3f}", engineLoad));
     }
 }
 
