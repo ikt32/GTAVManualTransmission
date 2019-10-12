@@ -19,4 +19,5 @@ namespace Controls {
 namespace Util {
     bool PlayerAvailable(Player player, Ped playerPed);
     bool VehicleAvailable(Vehicle vehicle, Ped playerPed);
+    bool IsPedOnSeat(Vehicle vehicle, Ped ped, int seat);
 }

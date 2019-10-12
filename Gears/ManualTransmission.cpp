@@ -13,7 +13,7 @@
 
 extern ScriptSettings settings;
 extern CarControls carControls;
-extern Vehicle vehicle;
+extern Vehicle playerVehicle;
 extern VehicleGearboxStates gearStates;
 extern VehicleData vehData;
 extern std::vector<Vehicle> ignoredVehicles;
@@ -44,7 +44,7 @@ void MT_SetShiftMode(int mode) {
 }
 
 int MT_GetShiftIndicator() {
-    if (!ENTITY::DOES_ENTITY_EXIST(vehicle)) {
+    if (!ENTITY::DOES_ENTITY_EXIST(playerVehicle)) {
         // vehData is not initialized yet, so mGearRatios can not be dereferenced.
         return 0;
     }
@@ -95,7 +95,7 @@ const int* MT_GetIgnoredVehicles() {
 }
 
 int MT_GetManagedVehicle() {
-    return vehicle;
+    return playerVehicle;
 }
 
 bool MT_LookingLeft() {

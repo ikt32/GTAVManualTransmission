@@ -21,7 +21,7 @@ extern int textureWheelId;
 
 extern VehicleGearboxStates gearStates;
 extern VehicleExtensions ext;
-extern Vehicle vehicle;
+extern Vehicle playerVehicle;
 extern VehicleData vehData;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -62,9 +62,9 @@ void drawRPMIndicator() {
         };
         rpmcolor = redline;
     }
-    float ratio = ext.GetGearRatios(vehicle)[ext.GetGearCurr(vehicle)];
-    float minUpshift = ext.GetInitialDriveMaxFlatVel(vehicle);
-    float maxUpshift = ext.GetDriveMaxFlatVel(vehicle);
+    float ratio = ext.GetGearRatios(playerVehicle)[ext.GetGearCurr(playerVehicle)];
+    float minUpshift = ext.GetInitialDriveMaxFlatVel(playerVehicle);
+    float maxUpshift = ext.GetDriveMaxFlatVel(playerVehicle);
     if (vehData.mRPM > map(minUpshift / ratio, 0.0f, maxUpshift / ratio, 0.0f, 1.0f)) {
         Color rpmlimiter = {
             settings.RPMIndicatorRevlimitR,
@@ -107,7 +107,7 @@ std::string formatSpeedo(std::string units, float speed, bool showUnit, int hudF
 }
 
 void drawSpeedoMeter() {
-    float dashms = vehData.mHasSpeedo ? ext.GetDashSpeed(vehicle) : abs(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y);
+    float dashms = vehData.mHasSpeedo ? ext.GetDashSpeed(playerVehicle) : abs(ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y);
 
     showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize,
         formatSpeedo(settings.Speedo, dashms, settings.SpeedoShowUnit, settings.HUDFont),
@@ -135,18 +135,18 @@ void drawShiftModeIndicator() {
 }
 
 void drawGearIndicator() {
-    std::string gear = std::to_string(ext.GetGearCurr(vehicle));
-    if (ext.GetHandbrake(vehicle)) {
+    std::string gear = std::to_string(ext.GetGearCurr(playerVehicle));
+    if (ext.GetHandbrake(playerVehicle)) {
         gear = "P";
     }
     else if (gearStates.FakeNeutral && settings.EnableManual) {
         gear = "N";
     }
-    else if (ext.GetGearCurr(vehicle) == 0) {
+    else if (ext.GetGearCurr(playerVehicle) == 0) {
         gear = "R";
     }
     Color c;
-    if (ext.GetGearCurr(vehicle) == ext.GetTopGear(vehicle)) {
+    if (ext.GetGearCurr(playerVehicle) == ext.GetTopGear(playerVehicle)) {
         c.R = settings.GearTopColorR;
         c.G = settings.GearTopColorG;
         c.B = settings.GearTopColorB;
@@ -177,14 +177,14 @@ void drawHUD() {
 
 void drawDebugInfo() {
     if (!menu.IsThisOpen()) {
-        showText(0.01, 0.250, 0.3, fmt::format("Address: 0x{:X}", reinterpret_cast<uintptr_t>(ext.GetAddress(vehicle))));
+        showText(0.01, 0.250, 0.3, fmt::format("Address: 0x{:X}", reinterpret_cast<uintptr_t>(ext.GetAddress(playerVehicle))));
         showText(0.01, 0.275, 0.3, fmt::format("Mod Enabled:\t\t{}" , settings.EnableManual));
         showText(0.01, 0.300, 0.3, fmt::format("RPM:\t\t\t{:.3f}", vehData.mRPM));
-        showText(0.01, 0.325, 0.3, fmt::format("Current Gear:\t\t{}", ext.GetGearCurr(vehicle)));
-        showText(0.01, 0.350, 0.3, fmt::format("Next Gear:\t\t{}", ext.GetGearNext(vehicle)));
-        showText(0.01, 0.375, 0.3, fmt::format("Clutch:\t\t\t{:.2f}", ext.GetClutch(vehicle)));
-        showText(0.01, 0.400, 0.3, fmt::format("Throttle:\t\t\t{:.2f}", ext.GetThrottle(vehicle)));
-        showText(0.01, 0.425, 0.3, fmt::format("Turbo:\t\t\t{:.2f}", ext.GetTurbo(vehicle)));
+        showText(0.01, 0.325, 0.3, fmt::format("Current Gear:\t\t{}", ext.GetGearCurr(playerVehicle)));
+        showText(0.01, 0.350, 0.3, fmt::format("Next Gear:\t\t{}", ext.GetGearNext(playerVehicle)));
+        showText(0.01, 0.375, 0.3, fmt::format("Clutch:\t\t\t{:.2f}", ext.GetClutch(playerVehicle)));
+        showText(0.01, 0.400, 0.3, fmt::format("Throttle:\t\t\t{:.2f}", ext.GetThrottle(playerVehicle)));
+        showText(0.01, 0.425, 0.3, fmt::format("Turbo:\t\t\t{:.2f}", ext.GetTurbo(playerVehicle)));
         showText(0.01, 0.450, 0.3, fmt::format("{}Speedo", vehData.mHasSpeedo ? "~g~" : "~r~"));
         showText(0.01, 0.475, 0.3, fmt::format("{}E {}CVT -> {}Clutch",
             vehData.mIsElectric ? "~g~" : "~r~", vehData.mIsCVT ? "~g~" : "~r~",
@@ -203,8 +203,8 @@ void drawDebugInfo() {
     
 
     if (settings.DisplayGearingInfo) {
-        auto ratios = ext.GetGearRatios(vehicle);
-        float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(vehicle);
+        auto ratios = ext.GetGearRatios(playerVehicle);
+        float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(playerVehicle);
 
         int i = 0;
         showText(0.30f, 0.05f, 0.35f, "Ratios");
@@ -221,8 +221,8 @@ void drawDebugInfo() {
             i++;
         }
 
-        float rateUp = *reinterpret_cast<float*>(ext.GetHandlingPtr(vehicle) + hOffsets.fClutchChangeRateScaleUpShift);
-        float rateDown = *reinterpret_cast<float*>(ext.GetHandlingPtr(vehicle) + hOffsets.fClutchChangeRateScaleDownShift);
+        float rateUp = *reinterpret_cast<float*>(ext.GetHandlingPtr(playerVehicle) + hOffsets.fClutchChangeRateScaleUpShift);
+        float rateDown = *reinterpret_cast<float*>(ext.GetHandlingPtr(playerVehicle) + hOffsets.fClutchChangeRateScaleDownShift);
         float upshiftDuration = 1.0f / (rateUp * settings.ClutchRateMult);
         float downshiftDuration = 1.0f / (rateDown * settings.ClutchRateMult);
 
@@ -237,7 +237,7 @@ void drawDebugInfo() {
 void drawInputWheelInfo() {
     // Steering Wheel
     float rotation = settings.SteerAngleMax * (carControls.SteerVal - 0.5f);
-    if (carControls.PrevInput != CarControls::Wheel) rotation = 90.0f * -ext.GetSteeringInputAngle(vehicle);
+    if (carControls.PrevInput != CarControls::Wheel) rotation = 90.0f * -ext.GetSteeringInputAngle(playerVehicle);
 
     drawTexture(textureWheelId, 0, -9998, 100,
         settings.SteeringWheelTextureSz, settings.SteeringWheelTextureSz,
@@ -264,15 +264,15 @@ void drawInputWheelInfo() {
 }
 
 void drawVehicleWheelInfo() {
-    auto numWheels = ext.GetNumWheels(vehicle);
-    auto wheelsSpeed = ext.GetTyreSpeeds(vehicle);
-    auto wheelsCompr = ext.GetWheelCompressions(vehicle);
-    auto wheelsHealt = ext.GetWheelHealths(vehicle);
-    auto wheelsContactCoords = ext.GetWheelLastContactCoords(vehicle);
-    auto wheelsOnGround = ext.GetWheelsOnGround(vehicle);
-    auto wheelCoords = ext.GetWheelCoords(vehicle, ENTITY::GET_ENTITY_COORDS(vehicle, true), ENTITY::GET_ENTITY_ROTATION(vehicle, 0), ENTITY::GET_ENTITY_FORWARD_VECTOR(vehicle));
-    auto wheelsPower = ext.GetWheelPower(vehicle);
-    auto wheelsBrake = ext.GetWheelBrakePressure(vehicle);
+    auto numWheels = ext.GetNumWheels(playerVehicle);
+    auto wheelsSpeed = ext.GetTyreSpeeds(playerVehicle);
+    auto wheelsCompr = ext.GetWheelCompressions(playerVehicle);
+    auto wheelsHealt = ext.GetWheelHealths(playerVehicle);
+    auto wheelsContactCoords = ext.GetWheelLastContactCoords(playerVehicle);
+    auto wheelsOnGround = ext.GetWheelsOnGround(playerVehicle);
+    auto wheelCoords = ext.GetWheelCoords(playerVehicle, ENTITY::GET_ENTITY_COORDS(playerVehicle, true), ENTITY::GET_ENTITY_ROTATION(playerVehicle, 0), ENTITY::GET_ENTITY_FORWARD_VECTOR(playerVehicle));
+    auto wheelsPower = ext.GetWheelPower(playerVehicle);
+    auto wheelsBrake = ext.GetWheelBrakePressure(playerVehicle);
     for (int i = 0; i < numWheels; i++) {
         Color color = transparentGray;
         if (vehData.mWheelsTcs[i]) {
@@ -289,7 +289,7 @@ void drawVehicleWheelInfo() {
         }
         showDebugInfo3D(wheelCoords[i], {
             fmt::format("Index: \t{}", i),
-            fmt::format("{}Powered", ext.IsWheelPowered(vehicle, i) ? "~g~" : "~r~"),
+            fmt::format("{}Powered", ext.IsWheelPowered(playerVehicle, i) ? "~g~" : "~r~"),
             fmt::format("Speed: \t{:.3f}", wheelsSpeed[i]),
             fmt::format("Compr: \t{:.3f}", wheelsCompr[i]),
             fmt::format("Health: \t{:.3f}", wheelsHealt[i]),

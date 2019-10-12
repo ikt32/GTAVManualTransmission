@@ -52,7 +52,7 @@ ScriptSettings settings;
 
 Player player;
 Ped playerPed;
-Vehicle vehicle;
+Vehicle playerVehicle;
 Vehicle lastVehicle;
 
 VehiclePeripherals peripherals;
@@ -115,25 +115,25 @@ void update_player() {
 }
 
 void update_vehicle() {
-    vehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
+    playerVehicle = PED::GET_VEHICLE_PED_IS_IN(playerPed, false);
     // Reset vehicle stats on vehicle change (or leave)
-    if (vehicle != lastVehicle) {
+    if (playerVehicle != lastVehicle) {
         peripherals = VehiclePeripherals();
         gearStates = VehicleGearboxStates();
         wheelPatchStates = WheelPatchStates();
-        vehData.SetVehicle(vehicle); // assign new vehicle;
+        vehData.SetVehicle(playerVehicle); // assign new vehicle;
     }
-    if (Util::VehicleAvailable(vehicle, playerPed)) {
+    if (Util::VehicleAvailable(playerVehicle, playerPed)) {
         vehData.Update(); // Update before doing anything else
     }
-    if (vehicle != lastVehicle && Util::VehicleAvailable(vehicle, playerPed)) {
+    if (playerVehicle != lastVehicle && Util::VehicleAvailable(playerVehicle, playerPed)) {
         if (vehData.mGearTop == 1 || vehData.mFlags[1] & FLAG_IS_ELECTRIC)
             gearStates.FakeNeutral = false;
         else
             gearStates.FakeNeutral = settings.DefaultNeutral;
     }
 
-    lastVehicle = vehicle;
+    lastVehicle = playerVehicle;
 }
 
 // Read inputs
@@ -143,7 +143,7 @@ void update_inputs() {
 }
 
 void update_hud() {
-    if (!Util::PlayerAvailable(player, playerPed) || !Util::VehicleAvailable(vehicle, playerPed)) {
+    if (!Util::PlayerAvailable(player, playerPed) || !Util::VehicleAvailable(playerVehicle, playerPed)) {
         return;
     }
 
@@ -186,7 +186,7 @@ void wheelControlRoad() {
         WheelInput::HandlePedalsArcade(carControls.ThrottleVal, carControls.BrakeVal);
     }
     WheelInput::DoSteering();
-    if (vehData.mIsAmphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle) > 0.10f) {
+    if (vehData.mIsAmphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(playerVehicle) > 0.10f) {
         WheelInput::PlayFFBWater();
     }
     else {
@@ -211,7 +211,7 @@ void update_input_controls() {
     if (!carControls.WheelAvailable())
         return;
 
-    if (Util::VehicleAvailable(vehicle, playerPed)) {
+    if (Util::VehicleAvailable(playerVehicle, playerPed)) {
         switch (vehData.mDomain) {
         case VehicleDomain::Road: {
             wheelControlRoad();
@@ -250,7 +250,7 @@ void update_misc_features() {
     if (!Util::PlayerAvailable(player, playerPed))
         return;
 
-    if (Util::VehicleAvailable(vehicle, playerPed)) {
+    if (Util::VehicleAvailable(playerVehicle, playerPed)) {
         if (settings.AutoLookBack && vehData.mClass != VehicleClass::Heli) {
             functionAutoLookback();
         }
@@ -305,7 +305,7 @@ void update_manual_features() {
 
         // Simulate "catch point"
         // When the clutch "grabs" and the car starts moving without input
-        if (settings.ClutchCatching && VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
+        if (settings.ClutchCatching && VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(playerVehicle)) {
             functionClutchCatch();
         }
     }
@@ -315,7 +315,7 @@ void update_manual_features() {
 
 // Manual Transmission part of the mod
 void update_manual_transmission() {
-    if (!Util::PlayerAvailable(player, playerPed) || !Util::VehicleAvailable(vehicle, playerPed)) {
+    if (!Util::PlayerAvailable(player, playerPed) || !Util::VehicleAvailable(playerVehicle, playerPed)) {
         return;
     }
 
@@ -379,8 +379,8 @@ void update_manual_transmission() {
 
     // Finally, update memory each loop
     handleRPM();
-    ext.SetGearCurr(vehicle, gearStates.LockGear);
-    ext.SetGearNext(vehicle, gearStates.LockGear);
+    ext.SetGearCurr(playerVehicle, gearStates.LockGear);
+    ext.SetGearNext(playerVehicle, gearStates.LockGear);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -453,7 +453,7 @@ void update_steering() {
             MemoryPatcher::RestoreSteeringControl();
     }
 
-    if (Util::VehicleAvailable(vehicle, playerPed)) {
+    if (Util::VehicleAvailable(playerVehicle, playerPed)) {
         updateSteeringMultiplier();
     }
 
@@ -471,12 +471,12 @@ void updateSteeringMultiplier() {
     else {
         mult = settings.CustomSteering.SteeringMult;
     }
-    ext.SetSteeringMultiplier(vehicle, mult);
+    ext.SetSteeringMultiplier(playerVehicle, mult);
 }
 
 void resetSteeringMultiplier() {
-    if (vehicle != 0) {
-        ext.SetSteeringMultiplier(vehicle, 1.0f);
+    if (playerVehicle != 0) {
+        ext.SetSteeringMultiplier(playerVehicle, 1.0f);
     }
 }
 
@@ -502,7 +502,7 @@ void updateLastInputDevice() {
             default: break;
         }
         // Suppress notification when not in car
-        if (Util::VehicleAvailable(vehicle, playerPed)) {
+        if (Util::VehicleAvailable(playerVehicle, playerPed)) {
             UI::Notify(message);
         }
     }
@@ -522,7 +522,7 @@ void setShiftMode(int shiftMode) {
     if (shiftMode > 2 || shiftMode < 0)
         return;
 
-    if (Util::VehicleAvailable(vehicle, playerPed) && shiftMode != HPattern && vehData.mGearCurr > 1)
+    if (Util::VehicleAvailable(playerVehicle, playerPed) && shiftMode != HPattern && vehData.mGearCurr > 1)
         gearStates.FakeNeutral = false;
 
     if (shiftMode == HPattern &&
@@ -578,8 +578,8 @@ void functionHShiftTo(int i) {
             gearStates.FakeNeutral = true;
             if (settings.EngDamage && vehData.mHasClutch) {
                 VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
-                    vehicle,
-                    VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - settings.MisshiftDamage);
+                    playerVehicle,
+                    VEHICLE::GET_VEHICLE_ENGINE_HEALTH(playerVehicle) - settings.MisshiftDamage);
             }
         }
     }
@@ -665,7 +665,7 @@ void updateShifting() {
     if (!gearStates.Shifting)
         return;
 
-    auto handlingPtr = ext.GetHandlingPtr(vehicle);
+    auto handlingPtr = ext.GetHandlingPtr(playerVehicle);
     // This is x Clutch per second? e.g. changerate 2.5 -> clutch fully (dis)engages in 1/2.5 seconds? or whole thing?
     float rateUp = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
     float rateDown = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleDownShift);
@@ -880,7 +880,7 @@ bool subAutoShiftSelect() {
         return true;
     }
     if (carControls.ButtonJustPressed(CarControls::WheelControlType::AReverse)) {
-        if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < 5.0f) {
+        if (ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y < 5.0f) {
             shiftTo(0, false);
             gearStates.FakeNeutral = false;
         }
@@ -953,7 +953,7 @@ void functionAShift() {
     float engineLoad = gearStates.ThrottleHang - map(vehData.mRPM, 0.2f, 1.0f, 0.0f, 1.0f);
 
     bool skidding = false;
-    for (auto x : ext.GetWheelSkidSmokeEffect(vehicle)) {
+    for (auto x : ext.GetWheelSkidSmokeEffect(playerVehicle)) {
         if (abs(x) > 3.5f)
             skidding = true;
     }
@@ -1047,7 +1047,7 @@ void functionEngStall() {
     if (stallEngaged &&
         vehData.mRPM < 0.25f && //engine actually has to idle
         abs(actualSpeed) < abs(minSpeed) &&
-        VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
+        VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(playerVehicle)) {
         float change = invClutch * speedDiffRatio * stallRate;
         gearStates.StallProgress += change;
     }
@@ -1057,17 +1057,17 @@ void functionEngStall() {
     }
 
     if (gearStates.StallProgress > 1.0f) {
-        if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
-            VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
+        if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(playerVehicle)) {
+            VEHICLE::SET_VEHICLE_ENGINE_ON(playerVehicle, false, true, true);
         }
         gearStates.StallProgress = 0.0f;
     }
 
     // Simulate push-start
     // We'll just assume the ignition thing is in the "on" position.
-    if (actualSpeed > minSpeed && !VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
+    if (actualSpeed > minSpeed && !VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(playerVehicle) &&
         stallEngaged) {
-        VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, true, true);
+        VEHICLE::SET_VEHICLE_ENGINE_ON(playerVehicle, true, true, true);
     }
 
     //showText(0.1, 0.00, 0.4, fmt("Stall progress: %.02f", gearStates.StallProgress));
@@ -1086,8 +1086,8 @@ void functionEngDamage() {
     if (vehData.mGearCurr != vehData.mGearTop &&
         vehData.mRPM > 0.98f &&
         carControls.ThrottleVal > 0.98f) {
-        VEHICLE::SET_VEHICLE_ENGINE_HEALTH(vehicle, 
-                                           VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle) - (settings.RPMDamage));
+        VEHICLE::SET_VEHICLE_ENGINE_HEALTH(playerVehicle, 
+                                           VEHICLE::GET_VEHICLE_ENGINE_HEALTH(playerVehicle) - (settings.RPMDamage));
     }
 }
 
@@ -1102,7 +1102,7 @@ void functionEngLock() {
     }
     const float reverseThreshold = 2.0f;
 
-    float dashms = abs(ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y);
+    float dashms = abs(ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y);
 
     float speed = dashms;
     auto ratios = vehData.mGearRatios;
@@ -1113,13 +1113,13 @@ void functionEngLock() {
     auto wheelsSpeed = vehData.mWheelAverageDrivenTyreSpeed;
 
     bool wrongDirection = false;
-    if (vehData.mGearCurr == 0 && VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle)) {
-        if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > reverseThreshold && wheelsSpeed > reverseThreshold) {
+    if (vehData.mGearCurr == 0 && VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(playerVehicle)) {
+        if (ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y > reverseThreshold && wheelsSpeed > reverseThreshold) {
             wrongDirection = true;
         }
     }
     else {
-        if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < -reverseThreshold && wheelsSpeed < -reverseThreshold) {
+        if (ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y < -reverseThreshold && wheelsSpeed < -reverseThreshold) {
             wrongDirection = true;
         }
     }
@@ -1132,8 +1132,8 @@ void functionEngLock() {
 
         for (int i = 0; i < vehData.mWheelCount; i++) {
             if (i >= wheelsToLock.size() || wheelsToLock[i]) {
-                ext.SetWheelPower(vehicle, i, -lockingForce);
-                ext.SetWheelSkidSmokeEffect(vehicle, i, lockingForce);
+                ext.SetWheelPower(playerVehicle, i, -lockingForce);
+                ext.SetWheelSkidSmokeEffect(playerVehicle, i, lockingForce);
             }
             else {
                 float inpBrakeForce = *reinterpret_cast<float *>(vehData.mHandlingPtr + hOffsets.fBrakeForce) * carControls.BrakeVal;
@@ -1141,16 +1141,16 @@ void functionEngLock() {
             }
         }
         fakeRev(true, 1.0f);
-        float oldEngineHealth = VEHICLE::GET_VEHICLE_ENGINE_HEALTH(vehicle);
+        float oldEngineHealth = VEHICLE::GET_VEHICLE_ENGINE_HEALTH(playerVehicle);
         float damageToApply = settings.MisshiftDamage * inputMultiplier;
         if (settings.EngDamage) {
             if (oldEngineHealth >= damageToApply) {
                 VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
-                    vehicle,
+                    playerVehicle,
                     oldEngineHealth - damageToApply);
             }
             else {
-                VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
+                VEHICLE::SET_VEHICLE_ENGINE_ON(playerVehicle, false, true, true);
             }
         }
         if (settings.DisplayInfo) {
@@ -1167,7 +1167,7 @@ void functionEngBrake() {
     // When you let go of the throttle at high RPMs
     float activeBrakeThreshold = settings.EngBrakeThreshold;
 
-    if (vehData.mRPM >= activeBrakeThreshold && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > 5.0f && !gearStates.FakeNeutral) {
+    if (vehData.mRPM >= activeBrakeThreshold && ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y > 5.0f && !gearStates.FakeNeutral) {
         float handlingBrakeForce = *reinterpret_cast<float *>(vehData.mHandlingPtr + hOffsets.fBrakeForce);
         float inpBrakeForce = handlingBrakeForce * carControls.BrakeVal;
 
@@ -1181,10 +1181,10 @@ void functionEngBrake() {
             auto wheelsToBrake = vehData.mWheelsDriven;// getDrivenWheels();
             for (int i = 0; i < vehData.mWheelCount; i++) {
                 if (i >= wheelsToBrake.size() || wheelsToBrake[i]) {
-                    ext.SetWheelPower(vehicle, i, -engBrakeForce + -inpBrakeForce);
+                    ext.SetWheelPower(playerVehicle, i, -engBrakeForce + -inpBrakeForce);
                 }
                 else {
-                    ext.SetWheelPower(vehicle, i, -inpBrakeForce);
+                    ext.SetWheelPower(playerVehicle, i, -inpBrakeForce);
                 }
             }
             if (settings.DisplayInfo) {
@@ -1209,14 +1209,14 @@ void handleBrakePatch() {
     bool useTCS = false;
 
     bool ebrk = vehData.mHandbrake;
-    bool brn = VEHICLE::IS_VEHICLE_IN_BURNOUT(vehicle);
+    bool brn = VEHICLE::IS_VEHICLE_IN_BURNOUT(playerVehicle);
     auto susps = vehData.mSuspensionTravel;
     auto lockUps = vehData.mWheelsLockedUp;
     auto speeds = vehData.mWheelTyreSpeeds;
 
     {
         bool lockedUp = false;
-        auto brakePressures = ext.GetWheelBrakePressure(vehicle);
+        auto brakePressures = ext.GetWheelBrakePressure(playerVehicle);
         for (int i = 0; i < vehData.mWheelCount; i++) {
             if (lockUps[i] && susps[i] > 0.0f && brakePressures[i] > 0.0f)
                 lockedUp = true;
@@ -1272,14 +1272,14 @@ void handleBrakePatch() {
         if (!MemoryPatcher::BrakePatcher.Patched()) {
             MemoryPatcher::PatchBrake();
         }
-        auto pows = ext.GetWheelPower(vehicle);
+        auto pows = ext.GetWheelPower(playerVehicle);
         for (int i = 0; i < vehData.mWheelCount; i++) {
             if (speeds[i] > vehData.mVelocity.y + 2.5f && susps[i] > 0.0f && vehData.mWheelsDriven[i] && pows[i] > 0.1f) {
-                ext.SetWheelBrakePressure(vehicle, i, map(speeds[i], vehData.mVelocity.y, vehData.mVelocity.y + 2.5f, 0.0f, 0.5f));
+                ext.SetWheelBrakePressure(playerVehicle, i, map(speeds[i], vehData.mVelocity.y, vehData.mVelocity.y + 2.5f, 0.0f, 0.5f));
                 vehData.mWheelsTcs[i] = true;
             }
             else {
-                ext.SetWheelBrakePressure(vehicle, i, 0.0f);
+                ext.SetWheelBrakePressure(playerVehicle, i, 0.0f);
                 vehData.mWheelsTcs[i] = false;
             }
         }
@@ -1291,7 +1291,7 @@ void handleBrakePatch() {
             MemoryPatcher::PatchBrake();
         }
         for (uint8_t i = 0; i < lockUps.size(); i++) {
-            ext.SetWheelBrakePressure(vehicle, i, ext.GetWheelBrakePressure(vehicle)[i] * 0.9f);
+            ext.SetWheelBrakePressure(playerVehicle, i, ext.GetWheelBrakePressure(playerVehicle)[i] * 0.9f);
             vehData.mWheelsAbs[i] = true;
         }
         if (settings.DisplayInfo)
@@ -1301,7 +1301,7 @@ void handleBrakePatch() {
         if (MemoryPatcher::BrakePatcher.Patched()) {
             for (int i = 0; i < vehData.mWheelCount; i++) {
                 if (carControls.BrakeVal == 0.0f) {
-                    ext.SetWheelBrakePressure(vehicle, i, 0.0f);
+                    ext.SetWheelBrakePressure(playerVehicle, i, 0.0f);
                 }
             }
             MemoryPatcher::RestoreBrake();
@@ -1329,7 +1329,7 @@ void fakeRev(bool customThrottle, float customThrottleVal) {
         rpmValTemp +						// Keep it constant
         throttleVal * accelRatio;	// Addition value, depends on delta T
     //showText(0.4, 0.4, 1.0, fmt("FakeRev %d %.02f", customThrottle, rpmVal));
-    ext.SetCurrentRPM(vehicle, rpmVal);
+    ext.SetCurrentRPM(playerVehicle, rpmVal);
 }
 
 void handleRPM() {
@@ -1371,17 +1371,17 @@ void handleRPM() {
     // Update 2017-08-12: We know the gear speeds now, consider patching
     // shiftUp completely?
     if (vehData.mGearCurr > 0 &&
-        (gearStates.HitRPMSpeedLimiter && ENTITY::GET_ENTITY_SPEED(vehicle) > 2.0f)) {
-        ext.SetThrottle(vehicle, 1.0f);
+        (gearStates.HitRPMSpeedLimiter && ENTITY::GET_ENTITY_SPEED(playerVehicle) > 2.0f)) {
+        ext.SetThrottle(playerVehicle, 1.0f);
         fakeRev(false, 1.0f);
         CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
         float counterForce = 0.25f*-(static_cast<float>(vehData.mGearTop) - static_cast<float>(vehData.mGearCurr))/static_cast<float>(vehData.mGearTop);
-        ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0.0f, counterForce, 0.0f, true, true, true, true);
+        ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(playerVehicle, 1, 0.0f, counterForce, 0.0f, true, true, true, true);
         //showText(0.4, 0.1, 1.0, "REV LIM SPD");
         //showText(0.4, 0.15, 1.0, "CF: " + std::to_string(counterForce));
     }
     if (gearStates.HitRPMLimiter) {
-        ext.SetCurrentRPM(vehicle, 1.0f);
+        ext.SetCurrentRPM(playerVehicle, 1.0f);
         //showText(0.4, 0.1, 1.0, "REV LIM RPM");
     }
     
@@ -1400,7 +1400,7 @@ void handleRPM() {
 
         // The next statement is a workaround for rolling back + brake + gear > 1 because it shouldn't rev then.
         // Also because we're checking on the game Control accel value and not the pedal position
-        bool rollingback = ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < 0.0 && 
+        bool rollingback = ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y < 0.0 && 
                            carControls.BrakeVal > 0.1f && 
                            carControls.ThrottleVal > 0.05f;
 
@@ -1411,17 +1411,17 @@ void handleRPM() {
             !rollingback &&
             (!gearStates.Shifting || carControls.ClutchVal > 0.4f)) {
             fakeRev(false, 0);
-            ext.SetThrottle(vehicle, carControls.ThrottleVal);
+            ext.SetThrottle(playerVehicle, carControls.ThrottleVal);
         }
         // Don't care about clutch slippage, just handle RPM now
         if (gearStates.FakeNeutral) {
             fakeRev(false, 0);
-            ext.SetThrottle(vehicle, carControls.ThrottleVal);
+            ext.SetThrottle(playerVehicle, carControls.ThrottleVal);
         }
     }
 
     if (gearStates.FakeNeutral || clutch >= 1.0f) {
-        if (ENTITY::GET_ENTITY_SPEED(vehicle) < 1.0f) {
+        if (ENTITY::GET_ENTITY_SPEED(playerVehicle) < 1.0f) {
             finalClutch = -5.0f;
         }
         else {
@@ -1429,7 +1429,7 @@ void handleRPM() {
         }
     }
 
-    ext.SetClutch(vehicle, finalClutch);
+    ext.SetClutch(playerVehicle, finalClutch);
 }
 
 /*
@@ -1448,7 +1448,7 @@ void functionLimiter() {
     float DriveMaxFlatVel = vehData.mDriveMaxFlatVel;
     float maxSpeed = DriveMaxFlatVel / ratios[vehData.mGearCurr];
 
-    if (ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > maxSpeed && vehData.mRPM >= 1.0f) {
+    if (ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y > maxSpeed && vehData.mRPM >= 1.0f) {
         gearStates.HitRPMSpeedLimiter = true;
     }
     else {
@@ -1466,46 +1466,46 @@ void functionRealReverse() {
     if (vehData.mGearCurr > 0) {
         // LT behavior when stopped: Just brake
         if (carControls.BrakeVal > 0.01f && carControls.ThrottleVal < carControls.BrakeVal &&
-            ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < 0.5f && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y >= -0.5f) { // < 0.5 so reverse never triggers
+            ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y < 0.5f && ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y >= -0.5f) { // < 0.5 so reverse never triggers
                                                                     //showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Stop");
             CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-            ext.SetThrottleP(vehicle, 0.1f);
-            ext.SetBrakeP(vehicle, 1.0f);
-            VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+            ext.SetThrottleP(playerVehicle, 0.1f);
+            ext.SetBrakeP(playerVehicle, 1.0f);
+            VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(playerVehicle, true);
         }
         // LT behavior when rolling back: Brake
         if (carControls.BrakeVal > 0.01f && carControls.ThrottleVal < carControls.BrakeVal &&
-            ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < -0.5f) {
+            ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y < -0.5f) {
             //showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Rollback");
-            VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+            VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(playerVehicle, true);
             CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
             CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, carControls.BrakeVal);
-            ext.SetThrottle(vehicle, 0.0f);
-            ext.SetThrottleP(vehicle, 0.1f);
-            ext.SetBrakeP(vehicle, 1.0f);
+            ext.SetThrottle(playerVehicle, 0.0f);
+            ext.SetThrottleP(playerVehicle, 0.1f);
+            ext.SetBrakeP(playerVehicle, 1.0f);
         }
         // RT behavior when rolling back: Burnout
-        if (!gearStates.FakeNeutral && carControls.ThrottleVal > 0.5f && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < -1.0f) {
+        if (!gearStates.FakeNeutral && carControls.ThrottleVal > 0.5f && ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y < -1.0f) {
             //showText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Rollback");
             //CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, carControls.ThrottleVal);
             if (carControls.BrakeVal < 0.1f) {
-                VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, false);
+                VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(playerVehicle, false);
             }
             for (int i = 0; i < vehData.mWheelCount; i++) {
-                if (ext.IsWheelPowered(vehicle, i)) {
-                    ext.SetWheelBrakePressure(vehicle, i, 0.0f);
-                    ext.SetWheelPower(vehicle, i, 2.0f * ext.GetDriveForce(vehicle));
+                if (ext.IsWheelPowered(playerVehicle, i)) {
+                    ext.SetWheelBrakePressure(playerVehicle, i, 0.0f);
+                    ext.SetWheelPower(playerVehicle, i, 2.0f * ext.GetDriveForce(playerVehicle));
                 }
                 else {
                     float handlingBrakeForce = *reinterpret_cast<float*>(vehData.mHandlingPtr + hOffsets.fBrakeForce);
                     float inpBrakeForce = handlingBrakeForce * carControls.BrakeVal;
-                    ext.SetWheelPower(vehicle, i, 0.0f);
-                    ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
+                    ext.SetWheelPower(playerVehicle, i, 0.0f);
+                    ext.SetWheelBrakePressure(playerVehicle, i, inpBrakeForce);
                 }
             }
             fakeRev();
-            ext.SetThrottle(vehicle, carControls.ThrottleVal);
-            ext.SetThrottleP(vehicle, carControls.ThrottleVal);
+            ext.SetThrottle(playerVehicle, carControls.ThrottleVal);
+            ext.SetThrottleP(playerVehicle, carControls.ThrottleVal);
             wheelPatchStates.InduceBurnout = true;
         }
         else {
@@ -1516,7 +1516,7 @@ void functionRealReverse() {
     // Desired: RT reverses, LT brakes
     if (vehData.mGearCurr == 0) {
         // Enables reverse lights
-        ext.SetThrottleP(vehicle, -0.1f);
+        ext.SetThrottleP(playerVehicle, -0.1f);
         // RT behavior
         int throttleAndSomeBrake = 0;
         if (carControls.ThrottleVal > 0.01f && carControls.ThrottleVal > carControls.BrakeVal) {
@@ -1528,7 +1528,7 @@ void functionRealReverse() {
         }
         // LT behavior when reversing
         if (carControls.BrakeVal > 0.01f &&
-            ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y <= -0.5f) {
+            ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y <= -0.5f) {
             throttleAndSomeBrake++;
             //showText(0.3, 0.35, 0.5, "functionRealReverse: Brake @ Reverse");
 
@@ -1546,24 +1546,24 @@ void functionRealReverse() {
 
         // LT behavior when forward
         if (carControls.BrakeVal > 0.01f && carControls.ThrottleVal <= carControls.BrakeVal &&
-            ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > 0.1f) {
+            ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y > 0.1f) {
             //showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Rollforwrd");
 
-            VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+            VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(playerVehicle, true);
             CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, carControls.BrakeVal);
 
             //CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-            ext.SetBrakeP(vehicle, 1.0f);
+            ext.SetBrakeP(playerVehicle, 1.0f);
         }
 
         // LT behavior when still
         if (carControls.BrakeVal > 0.01f && carControls.ThrottleVal <= carControls.BrakeVal &&
-            ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > -0.5f && ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y <= 0.1f) {
+            ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y > -0.5f && ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y <= 0.1f) {
             //showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Stopped");
 
-            VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(vehicle, true);
+            VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(playerVehicle, true);
             CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-            ext.SetBrakeP(vehicle, 1.0f);
+            ext.SetBrakeP(playerVehicle, 1.0f);
         }
     }
 }
@@ -1572,7 +1572,7 @@ void functionAutoReverse() {
     // Go forward
     if (CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && 
         !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) &&
-        ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y > -1.0f &&
+        ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y > -1.0f &&
         vehData.mGearCurr == 0) {
         shiftTo(1, false);
     }
@@ -1580,7 +1580,7 @@ void functionAutoReverse() {
     // Reverse
     if (CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && 
         !CONTROLS::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) &&
-        ENTITY::GET_ENTITY_SPEED_VECTOR(vehicle, true).y < 1.0f &&
+        ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y < 1.0f &&
         vehData.mGearCurr > 0) {
         gearStates.FakeNeutral = false;
         shiftTo(0, false);
@@ -1594,7 +1594,7 @@ void functionAutoReverse() {
 // TODO: Some original "tap" controls don't work.
 void blockButtons() {
     if (!settings.EnableManual || !settings.BlockCarControls || vehData.mDomain != VehicleDomain::Road ||
-        carControls.PrevInput != CarControls::Controller || !Util::VehicleAvailable(vehicle, playerPed)) {
+        carControls.PrevInput != CarControls::Controller || !Util::VehicleAvailable(playerVehicle, playerPed)) {
         return;
     }
     if (settings.ShiftMode == Automatic && vehData.mGearCurr > 1) {
@@ -1646,20 +1646,20 @@ void blockButtons() {
 }
 
 void startStopEngine() {
-    if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
+    if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(playerVehicle) &&
         (carControls.PrevInput == CarControls::Controller	&& carControls.ButtonJustPressed(CarControls::ControllerControlType::Engine) ||
         carControls.PrevInput == CarControls::Controller	&& carControls.ButtonJustPressed(CarControls::LegacyControlType::Engine) ||
         carControls.PrevInput == CarControls::Keyboard		&& carControls.ButtonJustPressed(CarControls::KeyboardControlType::Engine) ||
         carControls.PrevInput == CarControls::Wheel			&& carControls.ButtonJustPressed(CarControls::WheelControlType::Engine) ||
         settings.ThrottleStart && carControls.ThrottleVal > 0.75f && (carControls.ClutchVal > settings.ClutchThreshold || gearStates.FakeNeutral))) {
-        VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, true, false, true);
+        VEHICLE::SET_VEHICLE_ENGINE_ON(playerVehicle, true, false, true);
     }
-    if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(vehicle) &&
+    if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(playerVehicle) &&
         (carControls.PrevInput == CarControls::Controller	&& carControls.ButtonJustPressed(CarControls::ControllerControlType::Engine) && settings.ToggleEngine ||
         carControls.PrevInput == CarControls::Controller	&& carControls.ButtonJustPressed(CarControls::LegacyControlType::Engine) && settings.ToggleEngine ||
         carControls.PrevInput == CarControls::Keyboard		&& carControls.ButtonJustPressed(CarControls::KeyboardControlType::Engine) ||
         carControls.PrevInput == CarControls::Wheel			&& carControls.ButtonJustPressed(CarControls::WheelControlType::Engine))) {
-        VEHICLE::SET_VEHICLE_ENGINE_ON(vehicle, false, true, true);
+        VEHICLE::SET_VEHICLE_ENGINE_ON(playerVehicle, false, true, true);
     }
 }
 
@@ -1676,7 +1676,7 @@ void functionAutoLookback() {
 }
 
 void functionAutoGear1() {
-    if (vehData.mThrottle < 0.1f && ENTITY::GET_ENTITY_SPEED(vehicle) < 0.1f && vehData.mGearCurr > 1) {
+    if (vehData.mThrottle < 0.1f && ENTITY::GET_ENTITY_SPEED(playerVehicle) < 0.1f && vehData.mGearCurr > 1) {
         shiftTo(1, false);
     }
 }
@@ -1684,18 +1684,18 @@ void functionAutoGear1() {
 void functionHillGravity() {
     // TODO: Needs improvement/proper fix
     if (carControls.BrakeVal == 0.0f
-        && ENTITY::GET_ENTITY_SPEED(vehicle) < 2.0f &&
-        VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle)) {
-        float pitch = ENTITY::GET_ENTITY_PITCH(vehicle);;
+        && ENTITY::GET_ENTITY_SPEED(playerVehicle) < 2.0f &&
+        VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(playerVehicle)) {
+        float pitch = ENTITY::GET_ENTITY_PITCH(playerVehicle);;
 
         float clutchNeutral = gearStates.FakeNeutral ? 1.0f : carControls.ClutchVal;
         if (pitch < 0 || clutchNeutral) {
             ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
-                vehicle, 1, 0.0f, -1 * (pitch / 150.0f) * 1.1f * clutchNeutral, 0.0f, true, true, true, true);
+                playerVehicle, 1, 0.0f, -1 * (pitch / 150.0f) * 1.1f * clutchNeutral, 0.0f, true, true, true, true);
         }
         if (pitch > 10.0f || clutchNeutral)
             ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
-            vehicle, 1, 0.0f, -1 * (pitch / 90.0f) * 0.35f * clutchNeutral, 0.0f, true, true, true, true);
+            playerVehicle, 1, 0.0f, -1 * (pitch / 90.0f) * 0.35f * clutchNeutral, 0.0f, true, true, true, true);
     }
 }
 
@@ -1703,7 +1703,7 @@ void functionHidePlayerInFPV() {
     bool visible = ENTITY::IS_ENTITY_VISIBLE(playerPed);
     bool shouldHide = false;
 
-    if (settings.HidePlayerInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4 && Util::VehicleAvailable(vehicle, playerPed)) {
+    if (settings.HidePlayerInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4 && Util::VehicleAvailable(playerVehicle, playerPed)) {
         shouldHide = true;
     }
 

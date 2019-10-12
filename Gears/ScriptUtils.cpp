@@ -36,3 +36,9 @@ bool Util::VehicleAvailable(Vehicle vehicle, Ped playerPed) {
         ENTITY::DOES_ENTITY_EXIST(vehicle) &&
         playerPed == VEHICLE::GET_PED_IN_VEHICLE_SEAT(vehicle, -1);
 }
+
+bool Util::IsPedOnSeat(Vehicle vehicle, Ped ped, int seat) {
+    Vehicle pedVehicle = PED::GET_VEHICLE_PED_IS_IN(ped, false);
+    return vehicle == pedVehicle &&
+        VEHICLE::GET_PED_IN_VEHICLE_SEAT(pedVehicle, seat) == ped;
+}
