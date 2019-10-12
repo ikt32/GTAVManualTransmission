@@ -1103,14 +1103,16 @@ void functionEngLock() {
     auto wheelsSpeed = vehData.mWheelAverageDrivenTyreSpeed;
 
     bool wrongDirection = false;
-    if (vehData.mGearCurr == 0 && VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(playerVehicle)) {
-        if (ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y > reverseThreshold && wheelsSpeed > reverseThreshold) {
-            wrongDirection = true;
+    if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(playerVehicle)) {
+        if (vehData.mGearCurr == 0) {
+            if (vehData.mVelocity.y > reverseThreshold && wheelsSpeed > reverseThreshold) {
+                wrongDirection = true;
+            }
         }
-    }
-    else {
-        if (ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y < -reverseThreshold && wheelsSpeed < -reverseThreshold) {
-            wrongDirection = true;
+        else {
+            if (vehData.mVelocity.y < -reverseThreshold && wheelsSpeed < -reverseThreshold) {
+                wrongDirection = true;
+            }
         }
     }
 
@@ -1122,7 +1124,7 @@ void functionEngLock() {
 
         for (int i = 0; i < vehData.mWheelCount; i++) {
             if (i >= wheelsToLock.size() || wheelsToLock[i]) {
-                ext.SetWheelPower(playerVehicle, i, -lockingForce);
+                ext.SetWheelPower(playerVehicle, i, -lockingForce * sgn(vehData.mVelocity.y));
                 ext.SetWheelSkidSmokeEffect(playerVehicle, i, lockingForce);
             }
             else {
@@ -1164,17 +1166,17 @@ void functionEngBrake() {
         float throttleMultiplier = 1.0f - carControls.ThrottleVal;
         float clutchMultiplier = 1.0f - carControls.ClutchVal;
         float inputMultiplier = throttleMultiplier * clutchMultiplier;
-        if (inputMultiplier > 0.0f) {
+        if (inputMultiplier > 0.05f) {
             wheelPatchStates.EngBrakeActive = true;
             float rpmMultiplier = (vehData.mRPM - activeBrakeThreshold) / (1.0f - activeBrakeThreshold);
             float engBrakeForce = settings.EngBrakePower * handlingBrakeForce * inputMultiplier * rpmMultiplier;
             auto wheelsToBrake = vehData.mWheelsDriven;// getDrivenWheels();
             for (int i = 0; i < vehData.mWheelCount; i++) {
                 if (i >= wheelsToBrake.size() || wheelsToBrake[i]) {
-                    ext.SetWheelPower(playerVehicle, i, -engBrakeForce + -inpBrakeForce);
+                    ext.SetWheelPower(playerVehicle, i, (-engBrakeForce + -inpBrakeForce) * sgn(vehData.mVelocity.y));
                 }
                 else {
-                    ext.SetWheelPower(playerVehicle, i, -inpBrakeForce);
+                    ext.SetWheelPower(playerVehicle, i, -inpBrakeForce * sgn(vehData.mVelocity.y));
                 }
             }
             if (settings.DisplayInfo) {
@@ -1251,12 +1253,19 @@ void handleBrakePatch() {
         if (settings.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~Burnout");
     }
-    else if (wheelPatchStates.EngBrakeActive || wheelPatchStates.EngLockActive) {
+    else if (wheelPatchStates.EngBrakeActive) {
         if (!MemoryPatcher::ThrottlePatcher.Patched()) {
             MemoryPatcher::PatchThrottle();
         }
         if (settings.DisplayInfo)
-            showText(0.45, 0.75, 1.0, "~r~EngBrake/Lock");
+            showText(0.45, 0.75, 1.0, "~r~EngBrake");
+    }
+    else if (wheelPatchStates.EngLockActive) {
+        if (!MemoryPatcher::ThrottlePatcher.Patched()) {
+            MemoryPatcher::PatchThrottle();
+        }
+        if (settings.DisplayInfo)
+            showText(0.45, 0.75, 1.0, "~r~EngLock");
     }
     else if (useTCS && settings.Assists.TractionControl == 1) {
         if (!MemoryPatcher::BrakePatcher.Patched()) {
