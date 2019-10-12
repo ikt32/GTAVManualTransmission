@@ -207,7 +207,7 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
     float driveMaxFlatVel = ext.GetDriveMaxFlatVel(npcVehicle);
     float rpm = ext.GetCurrentRPM(npcVehicle);
 
-    if (throttle > gearStates.ThrottleHang)
+    if (throttle >= gearStates.ThrottleHang)
         gearStates.ThrottleHang = throttle;
     else if (gearStates.ThrottleHang > 0.0f)
         gearStates.ThrottleHang -= GAMEPLAY::GET_FRAME_TIME() * settings.EcoRate;
