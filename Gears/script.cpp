@@ -933,7 +933,7 @@ void functionAShift() {
     if (gearStates.Shifting)
         return;
 
-    if (carControls.ThrottleVal > gearStates.ThrottleHang)
+    if (carControls.ThrottleVal >= gearStates.ThrottleHang)
         gearStates.ThrottleHang = carControls.ThrottleVal;
     else if (gearStates.ThrottleHang > 0.0f)
         gearStates.ThrottleHang -= GAMEPLAY::GET_FRAME_TIME() * settings.EcoRate;
@@ -970,11 +970,9 @@ void functionAShift() {
     // Shift down later when ratios are far apart
     float gearRatioRatio = 1.0f;
 
-    if (vehData.mGearTop > 1) {
-        float baseGearRatio = 1.948768f / 3.333333f;
-        float thisGearRatio = vehData.mGearRatios[2] / vehData.mGearRatios[1];
-        gearRatioRatio = baseGearRatio / thisGearRatio;
-        gearRatioRatio = map(gearRatioRatio, 1.0f, 2.0f, 1.0f, 4.0f);
+    if (vehData.mGearTop > 1 && currGear < vehData.mGearTop) {
+        float thisGearRatio = vehData.mGearRatios[currGear] / vehData.mGearRatios[currGear + 1];
+        gearRatioRatio = thisGearRatio;
     }
 
     float rateUp = *reinterpret_cast<float*>(vehData.mHandlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
