@@ -2,27 +2,43 @@
 
 ## 4.7.0
 
-Wheel changes and fixes:
+Warning: Some items in `[OPTION]` are now moved into `[MISC]`. The script will generate missing entries, so no action is needed, but affected settings will be reset to their default values.
 
-* Improve force feedback model, eliminated oscillation/fishtailing
+New Steering Wheel features and improvements:
+
+* Overhaul force feedback model, eliminating oscillation and fishtailing
 * Add option to limit force feedback power
 * Add anti-deadzone support on force feedback power
 * Add damper effect to soft lock for a harder cutoff
 * Add "Park" and "Neutral" positions for H-shifter automatic gear selection
-* Improve wheel axis mapping, now registers axis after lifting off the control significantly
+
+New general features and improvements:
+
+* Add an enhanced custom steering mode for keyboard and controller
+* Add Traction Control as driving assist
+* Upgrade AI shifting logic to player logic, allowing AI to cruise at higher gears and select lower gears on demand more dynamically
+* Fix an issue where a burnout condition is triggered when rolling back in a forward gear despite the clutch being fully held
+* Fix an issue where ABS reduced brakes to all wheels instead of just affected wheels
+* Reorder assist/feature priorities to: Burnout -> Engine lock -> ABS -> Traction Control -> Engine braking.
+
+Wheel fixes:
+
 * Fix an issue where Logitech LEDs caused force feedback to get stuck to last command
+* Fix an issue causing no throttle being applied when rolling back in a forward gear
+* Improve wheel axis mapping, now registers axis after lifting off the control significantly
 
 Other changes and fixes:
 
-* Change engine braking to set wheel torque instead of using brakes
-* Add an enhanced custom steering mode for keyboard and controller
 * Add support for ignoring Simple Trainer menu inputs when it's open (10.0+)
 * Add an option to use manual input switching (Debug submenu, change in main menu)
+* Add an option to disable player hiding, for compatibility with scripts also toggling player visibility
+* Allow NPC debug info to show in the current vehicle, when being a passenger
+* Improve automatic gearbox downshift conditions for gears that are spaced further from each other
 * Fix an issue where assigning keyboard gears for 8, 9 , 10 wrongly assign to 7
 * Fix an issue where keyboard assignment wrongly warns about a menu button being used
 * Fix an issue where the update check freezes the game momentarily (run in another thread)
 * Fix an issue where the update check crashes the game when no network is present
-* Fix an issue causing a crash of the calling application when MT_GetShiftIndicator is called without a valid `vehData`.
+* Fix an issue causing a crash of the calling application when MT_GetShiftIndicator is called without a valid `vehData`
 * Remove usage of decorators for cross-script information
 
 ## 4.6.7
