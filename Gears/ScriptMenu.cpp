@@ -1144,8 +1144,10 @@ void update_miscassistmenu() {
     menu.BoolOption("Clutch + throttle start", settings.ThrottleStart,
         { "Allow to start the engine by pressing clutch and throttle." });
 
-    menu.BoolOption("Hide player in FPV", settings.HidePlayerInFPV,
-        { "Hides the player in first person view." });
+    if (menu.BoolOption("Hide player in FPV", settings.HidePlayerInFPV,
+        { "Hides the player in first person view." })) {
+        functionHidePlayerInFPV(true);
+    }
 }
 
 void update_steeringassistmenu() {
@@ -1198,6 +1200,10 @@ void update_debugmenu() {
     menu.BoolOption("Show NPC info", settings.ShowNPCInfo,
         { "Show vehicle info of NPC vehicles near you." });
     menu.BoolOption("Disable input detection", settings.DisableInputDetect);
+    menu.BoolOption("Disable player hiding", settings.Debug.DisablePlayerHide, 
+        { "Disables toggling player visibility by script.",
+            "Use this when some other script controls visibility." });
+
     menu.BoolOption("Enable update check", settings.EnableUpdate,
         { "Check for mod updates."});
 

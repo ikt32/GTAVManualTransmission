@@ -107,7 +107,6 @@ void functionLimiter();
 void functionAutoLookback();
 void functionAutoGear1();
 void functionHillGravity();
-void functionHidePlayerInFPV();
 
 void update_player() {
     player = PLAYER::PLAYER_ID();
@@ -122,6 +121,7 @@ void update_vehicle() {
         gearStates = VehicleGearboxStates();
         wheelPatchStates = WheelPatchStates();
         vehData.SetVehicle(playerVehicle); // assign new vehicle;
+        functionHidePlayerInFPV(true);
     }
     if (Util::VehicleAvailable(playerVehicle, playerPed)) {
         vehData.Update(); // Update before doing anything else
@@ -256,7 +256,7 @@ void update_misc_features() {
         }
     }
 
-    functionHidePlayerInFPV();
+    functionHidePlayerInFPV(false);
 }
 
 // Only when mod is working or writes clutch stuff.
@@ -1698,7 +1698,28 @@ void functionHillGravity() {
     }
 }
 
-void functionHidePlayerInFPV() {
+int prevCameraMode;
+
+void functionHidePlayerInFPV(bool optionToggled) {
+    bool shouldRun = false;
+
+    int cameraMode = CAM::GET_FOLLOW_PED_CAM_VIEW_MODE();
+    if (prevCameraMode != cameraMode) {
+        shouldRun = true;
+    }
+    prevCameraMode = cameraMode;
+
+    if (optionToggled) {
+        shouldRun = true;
+    }
+
+    if (settings.Debug.DisablePlayerHide) {
+        shouldRun = false;
+    }
+
+    if (!shouldRun)
+        return;
+
     bool visible = ENTITY::IS_ENTITY_VISIBLE(playerPed);
     bool shouldHide = false;
 

@@ -172,6 +172,9 @@ public:
     int LogLevel = INFO;
     bool ShowNPCInfo = false;
     bool DisableInputDetect = false;
+    struct {
+        bool DisablePlayerHide = false;
+    } Debug;
 
     std::vector<GUID> RegisteredGUIDs;
 
