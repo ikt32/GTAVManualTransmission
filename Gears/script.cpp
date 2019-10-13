@@ -1169,14 +1169,14 @@ void functionEngBrake() {
         if (inputMultiplier > 0.05f) {
             wheelPatchStates.EngBrakeActive = true;
             float rpmMultiplier = (vehData.mRPM - activeBrakeThreshold) / (1.0f - activeBrakeThreshold);
-            float engBrakeForce = settings.EngBrakePower * handlingBrakeForce * inputMultiplier * rpmMultiplier;
-            auto wheelsToBrake = vehData.mWheelsDriven;// getDrivenWheels();
+            float engBrakeForce = settings.EngBrakePower * inputMultiplier * rpmMultiplier;
+            auto wheelsToBrake = vehData.mWheelsDriven;
             for (int i = 0; i < vehData.mWheelCount; i++) {
-                if (i >= wheelsToBrake.size() || wheelsToBrake[i]) {
-                    ext.SetWheelPower(playerVehicle, i, (-engBrakeForce + -inpBrakeForce) * sgn(vehData.mVelocity.y));
+                if (wheelsToBrake[i]) {
+                    ext.SetWheelBrakePressure(playerVehicle, i, inpBrakeForce + engBrakeForce);
                 }
                 else {
-                    ext.SetWheelPower(playerVehicle, i, -inpBrakeForce * sgn(vehData.mVelocity.y));
+                    ext.SetWheelBrakePressure(playerVehicle, i, inpBrakeForce);
                 }
             }
             if (settings.DisplayInfo) {
@@ -1185,7 +1185,9 @@ void functionEngBrake() {
                 showText(0.85, 0.550, 0.4, fmt::format("BrkInput:\t\t{:.3f}", inpBrakeForce), 4);
             }
         }
-        
+        else {
+            wheelPatchStates.EngBrakeActive = false;
+        }
     }
     else {
         wheelPatchStates.EngBrakeActive = false;
@@ -1254,8 +1256,8 @@ void handleBrakePatch() {
             showText(0.45, 0.75, 1.0, "~r~Burnout");
     }
     else if (wheelPatchStates.EngBrakeActive) {
-        if (!MemoryPatcher::ThrottlePatcher.Patched()) {
-            MemoryPatcher::PatchThrottle();
+        if (!MemoryPatcher::BrakePatcher.Patched()) {
+            MemoryPatcher::PatchBrake();
         }
         if (settings.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~EngBrake");
