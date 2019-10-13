@@ -1255,19 +1255,24 @@ void handleBrakePatch() {
         if (settings.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~Burnout");
     }
-    else if (wheelPatchStates.EngBrakeActive) {
-        if (!MemoryPatcher::BrakePatcher.Patched()) {
-            MemoryPatcher::PatchBrake();
-        }
-        if (settings.DisplayInfo)
-            showText(0.45, 0.75, 1.0, "~r~EngBrake");
-    }
     else if (wheelPatchStates.EngLockActive) {
         if (!MemoryPatcher::ThrottlePatcher.Patched()) {
             MemoryPatcher::PatchThrottle();
         }
         if (settings.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~EngLock");
+    }
+    else if (useABS) {
+        if (!MemoryPatcher::BrakePatcher.Patched()) {
+            MemoryPatcher::PatchBrake();
+        }
+        for (uint8_t i = 0; i < lockUps.size(); i++) {
+            if (lockUps[i])
+                ext.SetWheelBrakePressure(playerVehicle, i, 0.0f);
+            vehData.mWheelsAbs[i] = true;
+        }
+        if (settings.DisplayInfo)
+            showText(0.45, 0.75, 1.0, "~r~(ABS)");
     }
     else if (useTCS && settings.Assists.TractionControl == 1) {
         if (!MemoryPatcher::BrakePatcher.Patched()) {
@@ -1287,16 +1292,12 @@ void handleBrakePatch() {
         if (settings.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~(TCS/B)");
     }
-    else if (useABS) {
+    else if (wheelPatchStates.EngBrakeActive) {
         if (!MemoryPatcher::BrakePatcher.Patched()) {
             MemoryPatcher::PatchBrake();
         }
-        for (uint8_t i = 0; i < lockUps.size(); i++) {
-            ext.SetWheelBrakePressure(playerVehicle, i, ext.GetWheelBrakePressure(playerVehicle)[i] * 0.9f);
-            vehData.mWheelsAbs[i] = true;
-        }
         if (settings.DisplayInfo)
-            showText(0.45, 0.75, 1.0, "~r~(ABS)");
+            showText(0.45, 0.75, 1.0, "~r~EngBrake");
     }
     else {
         if (MemoryPatcher::BrakePatcher.Patched()) {
