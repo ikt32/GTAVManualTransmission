@@ -1486,7 +1486,8 @@ void functionRealReverse() {
             ext.SetBrakeP(playerVehicle, 1.0f);
         }
         // RT behavior when rolling back: Burnout
-        if (!gearStates.FakeNeutral && carControls.ThrottleVal > 0.5f && ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y < -1.0f) {
+        if (!gearStates.FakeNeutral && carControls.ThrottleVal > 0.5f && carControls.ClutchVal < settings.ClutchThreshold && 
+            ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y < -1.0f ) {
             //showText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Rollback");
             //CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, carControls.ThrottleVal);
             if (carControls.BrakeVal < 0.1f) {
