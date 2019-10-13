@@ -1199,7 +1199,8 @@ void update_debugmenu() {
             "Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction" });
     menu.BoolOption("Show NPC info", settings.ShowNPCInfo,
         { "Show vehicle info of NPC vehicles near you." });
-    menu.BoolOption("Disable input detection", settings.DisableInputDetect);
+    menu.BoolOption("Disable input detection", settings.DisableInputDetect,
+        { "Allows for manual input selection." });
     menu.BoolOption("Disable player hiding", settings.Debug.DisablePlayerHide, 
         { "Disables toggling player visibility by script.",
             "Use this when some other script controls visibility." });
