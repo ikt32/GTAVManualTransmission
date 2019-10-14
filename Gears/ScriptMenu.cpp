@@ -900,6 +900,10 @@ void update_forcefeedbackmenu() {
     menu.IntOption("Detail effect limit", settings.FFB.DetailLim, 0, 20000, 1, 
         { "Clamp effect amplitude to this value. 20000 allows muxing with the main effect." });
 
+    menu.IntOption("Detail effect averaging", settings.FFB.DetailMAW, 1, 100, 1,
+        { "Averages the detail effect to prevent force feedback spikes.",
+        "Recommended to keep as low as possible, as higher values delay more."});
+
     menu.FloatOption("Collision effect multiplier", settings.CollisionMult, 0.0f, 10.0f, 0.1f,
         { "Force feedback effect caused by frontal/rear collisions." });
 

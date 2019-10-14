@@ -171,5 +171,7 @@ private:
     ABSType getABSType(uint32_t handlingFlags);
 
     std::vector<float> mPrevSuspensionTravel;
+    std::vector<std::vector<float>> mSuspensionTravelSpeedsHistory;
+
     Vector3 mPrevVelocity;
 };

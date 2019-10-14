@@ -198,6 +198,7 @@ public:
         int SATMax;
         int AntiDeadForce;
         int DetailLim = 10000;
+        int DetailMAW = 1;
     } FFB;
 
     // [STEER]

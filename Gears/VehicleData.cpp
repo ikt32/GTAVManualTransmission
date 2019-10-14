@@ -4,6 +4,11 @@
 #include "Memory/VehicleFlags.h"
 #include "Memory/Offsets.hpp"
 #include "Memory/Versions.h"
+#include "Util/MathExt.h"
+
+
+#include "ScriptSettings.hpp"
+extern ScriptSettings settings;
 
 VehicleData::VehicleData(VehicleExtensions& ext)
     : mVehicle(0), mExt(ext), mHandlingPtr(0)
@@ -57,6 +62,7 @@ void VehicleData::SetVehicle(Vehicle v) {
         mABSType = getABSType(mModelFlags);
         mWheelsTcs.resize(mExt.GetNumWheels(mVehicle));
         mWheelsAbs.resize(mExt.GetNumWheels(mVehicle));
+        mSuspensionTravelSpeedsHistory.clear();
         Update();
     }
 }
@@ -110,6 +116,24 @@ void VehicleData::Update() {
     mWheelsLockedUp = getWheelsLockedUp();
     mSuspensionTravelSpeeds = getSuspensionTravelSpeeds();
     mAcceleration = getAcceleration();
+
+    mSuspensionTravelSpeedsHistory.push_back(mSuspensionTravelSpeeds);
+    while (mSuspensionTravelSpeedsHistory.size() > settings.FFB.DetailMAW) {
+        mSuspensionTravelSpeedsHistory.erase(mSuspensionTravelSpeedsHistory.begin());
+    }
+
+    std::vector<float> averageSpeeds(mSuspensionTravelSpeedsHistory[0].size());
+    for (size_t i = 0; i < mSuspensionTravelSpeedsHistory.size(); ++i) {
+        auto speeds = mSuspensionTravelSpeedsHistory[i];
+        for (size_t wheelIdx = 0; wheelIdx < speeds.size(); ++wheelIdx) {
+            averageSpeeds[wheelIdx] += speeds[wheelIdx];
+        }
+    }
+    for(size_t i = 0; i < averageSpeeds.size(); ++i) {
+        averageSpeeds[i] /= static_cast<float>(settings.FFB.DetailMAW);
+    }
+
+    mSuspensionTravelSpeeds = averageSpeeds;
 }
 
 std::vector<bool> VehicleData::getDrivenWheels() {
