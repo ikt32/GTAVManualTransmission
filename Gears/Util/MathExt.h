@@ -14,7 +14,7 @@ T avg(std::vector<T, A> const& vec) {
     T average{};
     for (auto elem : vec)
         average += elem;
-    return average / vec.size();
+    return average / static_cast<T>(vec.size());
 }
 
 float lerp(float a, float b, float f);
