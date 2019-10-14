@@ -197,6 +197,7 @@ public:
     struct {
         int SATMax;
         int AntiDeadForce;
+        int DetailLim = 10000;
     } FFB;
 
     // [STEER]

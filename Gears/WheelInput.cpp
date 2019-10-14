@@ -641,7 +641,7 @@ void WheelInput::PlayFFBGround() {
     float avgAngle = ext.GetWheelAverageAngle(playerVehicle);
     float wheelsOffGroundRatio = getFloatingSteeredWheelsRatio(playerVehicle);
 
-    int detailForce = calculateDetail();
+    int detailForce = std::clamp(calculateDetail(), -settings.FFB.DetailLim, settings.FFB.DetailLim);
     int satForce = calculateSat(2500, avgAngle, wheelsOffGroundRatio, vehData.mClass == VehicleClass::Car);
     int damperForce = calculateDamper(50.0f, wheelsOffGroundRatio);
 

@@ -895,6 +895,8 @@ void update_forcefeedbackmenu() {
 
     menu.FloatOption("Detail effect multiplier", settings.DetailMult, 0.0f, 10.0f, 0.1f,
         { "Force feedback effects caused by the suspension." });
+    menu.IntOption("Detail effect limit", settings.FFB.DetailLim, 0, 20000, 1, 
+        { "Clamp effect amplitude to this value. 20000 allows muxing with the main effect." });
 
     menu.FloatOption("Collision effect multiplier", settings.CollisionMult, 0.0f, 10.0f, 0.1f,
         { "Force feedback effect caused by frontal/rear collisions." });
