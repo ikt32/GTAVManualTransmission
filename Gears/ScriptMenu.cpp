@@ -891,10 +891,12 @@ void update_forcefeedbackmenu() {
         { "Force feedback strength for steering. Increase for weak wheels, decrease for strong/fast wheels.",
         "Putting this too high clips force feedback. Too low and the car doesn't feel responsive." });
 
-    menu.IntOption("Self aligning torque limit", settings.FFB.SATMax, 0, 10000, 100);
+    menu.IntOption("Self aligning torque limit", settings.FFB.SATMax, 0, 10000, 100,
+        { "Clamp effect amplitude to this value. 10000 is the technical limit." });
 
     menu.FloatOption("Detail effect multiplier", settings.DetailMult, 0.0f, 10.0f, 0.1f,
-        { "Force feedback effects caused by the suspension." });
+        { "Force feedback effects caused by the suspension. This effect is muxed with the main effect." });
+
     menu.IntOption("Detail effect limit", settings.FFB.DetailLim, 0, 20000, 1, 
         { "Clamp effect amplitude to this value. 20000 allows muxing with the main effect." });
 
