@@ -31,16 +31,16 @@ void MT_SetActive(bool active) {
 }
 
 bool MT_NeutralGear() {
-    return gearStates.FakeNeutral && settings.EnableManual;
+    return gearStates.FakeNeutral && settings.MTOptions.Enable;
 }
 
 int MT_GetShiftMode() {
-    return static_cast<int>(settings.ShiftMode) + 1;
+    return EToInt(settings.MTOptions.ShiftMode) + 1;
 }
 
 void MT_SetShiftMode(int mode) {
     if (mode == 1 || mode == 2 || mode == 3)
-        setShiftMode(mode - 1);
+        setShiftMode(static_cast<EShiftMode>(mode - 1));
 }
 
 int MT_GetShiftIndicator() {
@@ -50,15 +50,15 @@ int MT_GetShiftIndicator() {
     }
     float nextGearMinSpeed = 0.0f; // don't care about top gear
     if (gearStates.LockGear < vehData.mGearTop) {
-        nextGearMinSpeed = settings.NextGearMinRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[gearStates.LockGear + 1];
+        nextGearMinSpeed = settings.AutoParams.NextGearMinRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[gearStates.LockGear + 1];
     }
     float engineLoad = carControls.ThrottleVal - map(vehData.mRPM, 0.2f, 1.0f, 0.0f, 1.0f);
     bool shiftUpLoad = gearStates.LockGear < vehData.mGearTop && 
-        engineLoad < settings.UpshiftLoad && 
+        engineLoad < settings.AutoParams.UpshiftLoad && 
         vehData.mWheelAverageDrivenTyreSpeed > nextGearMinSpeed;
 
-    float currGearMinSpeed = settings.CurrGearMinRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[gearStates.LockGear];
-    bool shiftDownLoad = engineLoad > settings.DownshiftLoad || vehData.mWheelAverageDrivenTyreSpeed < currGearMinSpeed;
+    float currGearMinSpeed = settings.AutoParams.CurrGearMinRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[gearStates.LockGear];
+    bool shiftDownLoad = engineLoad > settings.AutoParams.DownshiftLoad || vehData.mWheelAverageDrivenTyreSpeed < currGearMinSpeed;
 
     if (gearStates.HitRPMSpeedLimiter || gearStates.HitRPMLimiter || shiftUpLoad) {
         return 1;

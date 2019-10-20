@@ -51,7 +51,6 @@
     <ClCompile Include="Util\MathExt.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="ShiftModes.cpp" />
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp">
       <Filter>Thirdparty</Filter>
     </ClCompile>
@@ -173,7 +172,6 @@
     <ClInclude Include="Util\MathExt.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="ShiftModes.h" />
     <ClInclude Include="Memory\Versions.h">
       <Filter>Memory</Filter>
     </ClInclude>

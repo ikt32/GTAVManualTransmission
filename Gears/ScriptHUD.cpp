@@ -39,26 +39,26 @@ void drawRPMIndicator(float x, float y, float width, float height, Color fg, Col
 
 void drawRPMIndicator() {
     Color background = {
-        settings.RPMIndicatorBackgroundR,
-        settings.RPMIndicatorBackgroundG,
-        settings.RPMIndicatorBackgroundB,
-        settings.RPMIndicatorBackgroundA
+        settings.HUD.RPMBar.BgR,
+        settings.HUD.RPMBar.BgG,
+        settings.HUD.RPMBar.BgB,
+        settings.HUD.RPMBar.BgA
     };
 
     Color foreground = {
-        settings.RPMIndicatorForegroundR,
-        settings.RPMIndicatorForegroundG,
-        settings.RPMIndicatorForegroundB,
-        settings.RPMIndicatorForegroundA
+        settings.HUD.RPMBar.FgR,
+        settings.HUD.RPMBar.FgG,
+        settings.HUD.RPMBar.FgB,
+        settings.HUD.RPMBar.FgA
     };
 
     Color rpmcolor = foreground;
-    if (vehData.mRPM > settings.RPMIndicatorRedline) {
+    if (vehData.mRPM > settings.HUD.RPMBar.Redline) {
         Color redline = {
-            settings.RPMIndicatorRedlineR,
-            settings.RPMIndicatorRedlineG,
-            settings.RPMIndicatorRedlineB,
-            settings.RPMIndicatorRedlineA
+            settings.HUD.RPMBar.RedlineR,
+            settings.HUD.RPMBar.RedlineG,
+            settings.HUD.RPMBar.RedlineB,
+            settings.HUD.RPMBar.RedlineA
         };
         rpmcolor = redline;
     }
@@ -67,18 +67,18 @@ void drawRPMIndicator() {
     float maxUpshift = ext.GetDriveMaxFlatVel(playerVehicle);
     if (vehData.mRPM > map(minUpshift / ratio, 0.0f, maxUpshift / ratio, 0.0f, 1.0f)) {
         Color rpmlimiter = {
-            settings.RPMIndicatorRevlimitR,
-            settings.RPMIndicatorRevlimitG,
-            settings.RPMIndicatorRevlimitB,
-            settings.RPMIndicatorRevlimitA
+            settings.HUD.RPMBar.RevLimitR,
+            settings.HUD.RPMBar.RevLimitG,
+            settings.HUD.RPMBar.RevLimitB,
+            settings.HUD.RPMBar.RevLimitA
         };
         rpmcolor = rpmlimiter;
     }
     drawRPMIndicator(
-        settings.RPMIndicatorXpos,
-        settings.RPMIndicatorYpos,
-        settings.RPMIndicatorWidth,
-        settings.RPMIndicatorHeight,
+        settings.HUD.RPMBar.XPos,
+        settings.HUD.RPMBar.YPos,
+        settings.HUD.RPMBar.XSz,
+        settings.HUD.RPMBar.YSz,
         rpmcolor,
         background,
         vehData.mRPM
@@ -109,29 +109,25 @@ std::string formatSpeedo(std::string units, float speed, bool showUnit, int hudF
 void drawSpeedoMeter() {
     float dashms = vehData.mHasSpeedo ? ext.GetDashSpeed(playerVehicle) : abs(ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y);
 
-    showText(settings.SpeedoXpos, settings.SpeedoYpos, settings.SpeedoSize,
-        formatSpeedo(settings.Speedo, dashms, settings.SpeedoShowUnit, settings.HUDFont),
-        settings.HUDFont);
+    showText(settings.HUD.Speedo.XPos, settings.HUD.Speedo.YPos, settings.HUD.Speedo.Size,
+        formatSpeedo(settings.HUD.Speedo.Speedo, dashms, settings.HUD.Speedo.ShowUnit, settings.HUD.HUDFont),
+        settings.HUD.HUDFont);
 }
 
 void drawShiftModeIndicator() {
     std::string shiftModeText;
     auto color = solidWhite;
-    switch (settings.ShiftMode) {
-    case Sequential: shiftModeText = "S";
-        break;
-    case HPattern: shiftModeText = "H";
-        break;
-    case Automatic: shiftModeText = "A";
-        break;
-    default: shiftModeText = "";
-        break;
+    switch (settings.MTOptions.ShiftMode) {
+        case EShiftMode::Sequential:    shiftModeText = "S"; break;
+        case EShiftMode::HPattern:      shiftModeText = "H"; break;
+        case EShiftMode::Automatic:     shiftModeText = "A"; break;
+        default: shiftModeText = ""; break;
     }
-    if (!settings.EnableManual) {
+    if (!settings.MTOptions.Enable) {
         shiftModeText = "A";
         color = { 0, 126, 232, 255 };
     }
-    showText(settings.ShiftModeXpos, settings.ShiftModeYpos, settings.ShiftModeSize, shiftModeText, settings.HUDFont, color, true);
+    showText(settings.HUD.ShiftMode.XPos, settings.HUD.ShiftMode.YPos, settings.HUD.ShiftMode.Size, shiftModeText, settings.HUD.HUDFont, color, true);
 }
 
 void drawGearIndicator() {
@@ -139,7 +135,7 @@ void drawGearIndicator() {
     if (ext.GetHandbrake(playerVehicle)) {
         gear = "P";
     }
-    else if (gearStates.FakeNeutral && settings.EnableManual) {
+    else if (gearStates.FakeNeutral && settings.MTOptions.Enable) {
         gear = "N";
     }
     else if (ext.GetGearCurr(playerVehicle) == 0) {
@@ -147,30 +143,30 @@ void drawGearIndicator() {
     }
     Color c;
     if (ext.GetGearCurr(playerVehicle) == ext.GetTopGear(playerVehicle)) {
-        c.R = settings.GearTopColorR;
-        c.G = settings.GearTopColorG;
-        c.B = settings.GearTopColorB;
+        c.R = settings.HUD.Gear.TopColorR;
+        c.G = settings.HUD.Gear.TopColorG;
+        c.B = settings.HUD.Gear.TopColorB;
         c.A = 255;
     }
     else {
         c = solidWhite;
     }
-    showText(settings.GearXpos, settings.GearYpos, settings.GearSize, gear, settings.HUDFont, c, true);
+    showText(settings.HUD.Gear.XPos, settings.HUD.Gear.YPos, settings.HUD.Gear.Size, gear, settings.HUD.HUDFont, c, true);
 }
 
 void drawHUD() {
-    if (settings.GearIndicator) {
+    if (settings.HUD.Gear.Enable) {
         drawGearIndicator();
     }
-    if (settings.ShiftModeIndicator) {
+    if (settings.HUD.ShiftMode.Enable) {
         drawShiftModeIndicator();
     }
-    if (settings.Speedo == "kph" ||
-        settings.Speedo == "mph" ||
-        settings.Speedo == "ms") {
+    if (settings.HUD.Speedo.Speedo == "kph" ||
+        settings.HUD.Speedo.Speedo == "mph" ||
+        settings.HUD.Speedo.Speedo == "ms") {
         drawSpeedoMeter();
     }
-    if (settings.RPMIndicator) {
+    if (settings.HUD.RPMBar.Enable) {
         drawRPMIndicator();
     }
 }
@@ -178,7 +174,7 @@ void drawHUD() {
 void drawDebugInfo() {
     if (!menu.IsThisOpen()) {
         showText(0.01, 0.250, 0.3, fmt::format("Address: 0x{:X}", reinterpret_cast<uintptr_t>(ext.GetAddress(playerVehicle))));
-        showText(0.01, 0.275, 0.3, fmt::format("Mod Enabled:\t\t{}" , settings.EnableManual));
+        showText(0.01, 0.275, 0.3, fmt::format("Mod Enabled:\t\t{}" , settings.MTOptions.Enable));
         showText(0.01, 0.300, 0.3, fmt::format("RPM:\t\t\t{:.3f}", vehData.mRPM));
         showText(0.01, 0.325, 0.3, fmt::format("Current Gear:\t\t{}", ext.GetGearCurr(playerVehicle)));
         showText(0.01, 0.350, 0.3, fmt::format("Next Gear:\t\t{}", ext.GetGearNext(playerVehicle)));
@@ -207,11 +203,11 @@ void drawDebugInfo() {
     showText(0.85, 0.100, 0.4, fmt::format("Clutch:\t\t{:.3f}", carControls.ClutchVal)   , 4);
     showText(0.85, 0.125, 0.4, fmt::format("Handb:\t\t{:.3f}" , carControls.HandbrakeVal), 4);
 
-    if (settings.EnableWheel)
+    if (settings.Wheel.Options.Enable)
         showText(0.85, 0.150, 0.4, fmt::format("Wheel {} present", carControls.WheelAvailable() ? "" : " not"), 4);
     
 
-    if (settings.DisplayGearingInfo) {
+    if (settings.Debug.DisplayGearingInfo) {
         auto ratios = ext.GetGearRatios(playerVehicle);
         float DriveMaxFlatVel = ext.GetDriveMaxFlatVel(playerVehicle);
 
@@ -232,44 +228,44 @@ void drawDebugInfo() {
 
         float rateUp = *reinterpret_cast<float*>(ext.GetHandlingPtr(playerVehicle) + hOffsets.fClutchChangeRateScaleUpShift);
         float rateDown = *reinterpret_cast<float*>(ext.GetHandlingPtr(playerVehicle) + hOffsets.fClutchChangeRateScaleDownShift);
-        float upshiftDuration = 1.0f / (rateUp * settings.ClutchRateMult);
-        float downshiftDuration = 1.0f / (rateDown * settings.ClutchRateMult);
+        float upshiftDuration = 1.0f / (rateUp * settings.ShiftOptions.ClutchRateMult);
+        float downshiftDuration = 1.0f / (rateDown * settings.ShiftOptions.ClutchRateMult);
 
         showText(0.60f, 0.050f, 0.35f, fmt::format("ClutchRate Up: {:.3f}", rateUp));
         showText(0.60f, 0.075f, 0.35f, fmt::format("ClutchRate Dn: {:.3f}", rateDown));
         showText(0.60f, 0.100f, 0.35f, fmt::format("Duration Up: {:.3f}", upshiftDuration));
         showText(0.60f, 0.125f, 0.35f, fmt::format("Duration Dn: {:.3f}", downshiftDuration));
-        showText(0.60f, 0.150f, 0.35f, fmt::format("Shift timeout (dn): {:.3f}", downshiftDuration * settings.DownshiftTimeoutMult));
+        showText(0.60f, 0.150f, 0.35f, fmt::format("Shift timeout (dn): {:.3f}", downshiftDuration * settings.AutoParams.DownshiftTimeoutMult));
     }
 }
 
 void drawInputWheelInfo() {
     // Steering Wheel
-    float rotation = settings.SteerAngleMax * (carControls.SteerVal - 0.5f);
+    float rotation = settings.Wheel.Steering.AngleMax * (carControls.SteerVal - 0.5f);
     if (carControls.PrevInput != CarControls::Wheel) rotation = 90.0f * -ext.GetSteeringInputAngle(playerVehicle);
 
     drawTexture(textureWheelId, 0, -9998, 100,
-        settings.SteeringWheelTextureSz, settings.SteeringWheelTextureSz,
+        settings.HUD.Wheel.ImgSize, settings.HUD.Wheel.ImgSize,
         0.5f, 0.5f, // center of texture
-        settings.SteeringWheelTextureX, settings.SteeringWheelTextureY,
+        settings.HUD.Wheel.ImgXPos, settings.HUD.Wheel.ImgYPos,
         rotation / 360.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
 
     // Pedals
-    float barWidth = settings.PedalInfoW / 3.0f;
+    float barWidth = settings.HUD.Wheel.PedalXSz / 3.0f;
 
-    float barYBase = (settings.PedalInfoY + settings.PedalInfoH * 0.5f);
+    float barYBase = (settings.HUD.Wheel.PedalYPos + settings.HUD.Wheel.PedalYSz * 0.5f);
 
-    GRAPHICS::DRAW_RECT(settings.PedalInfoX, settings.PedalInfoY, 3.0f * barWidth + settings.PedalInfoPadX, settings.PedalInfoH + settings.PedalInfoPadY, 
-        0, 0, 0, settings.PedalBackgroundA);
-    GRAPHICS::DRAW_RECT(settings.PedalInfoX + 1.0f * barWidth, barYBase - carControls.ThrottleVal * settings.PedalInfoH * 0.5f,
-        barWidth, carControls.ThrottleVal * settings.PedalInfoH, 
-        settings.PedalInfoThrottleR, settings.PedalInfoThrottleG, settings.PedalInfoThrottleB, settings.PedalInfoThrottleA);
-    GRAPHICS::DRAW_RECT(settings.PedalInfoX + 0.0f * barWidth, barYBase - carControls.BrakeVal * settings.PedalInfoH * 0.5f,
-        barWidth, carControls.BrakeVal * settings.PedalInfoH,
-        settings.PedalInfoBrakeR, settings.PedalInfoBrakeG, settings.PedalInfoBrakeB, settings.PedalInfoBrakeA);
-    GRAPHICS::DRAW_RECT(settings.PedalInfoX - 1.0f * barWidth, barYBase - carControls.ClutchVal * settings.PedalInfoH * 0.5f,
-        barWidth, carControls.ClutchVal * settings.PedalInfoH,
-        settings.PedalInfoClutchR, settings.PedalInfoClutchG, settings.PedalInfoClutchB, settings.PedalInfoClutchA);
+    GRAPHICS::DRAW_RECT(settings.HUD.Wheel.PedalXPos, settings.HUD.Wheel.PedalYPos, 3.0f * barWidth + settings.HUD.Wheel.PedalXPad, settings.HUD.Wheel.PedalYSz + settings.HUD.Wheel.PedalYPad, 
+        0, 0, 0, settings.HUD.Wheel.PedalBgA);
+    GRAPHICS::DRAW_RECT(settings.HUD.Wheel.PedalXPos + 1.0f * barWidth, barYBase - carControls.ThrottleVal * settings.HUD.Wheel.PedalYSz * 0.5f,
+        barWidth, carControls.ThrottleVal * settings.HUD.Wheel.PedalYSz, 
+        settings.HUD.Wheel.PedalThrottleR, settings.HUD.Wheel.PedalThrottleG, settings.HUD.Wheel.PedalThrottleB, settings.HUD.Wheel.PedalThrottleA);
+    GRAPHICS::DRAW_RECT(settings.HUD.Wheel.PedalXPos + 0.0f * barWidth, barYBase - carControls.BrakeVal * settings.HUD.Wheel.PedalYSz * 0.5f,
+        barWidth, carControls.BrakeVal * settings.HUD.Wheel.PedalYSz,
+        settings.HUD.Wheel.PedalBrakeR, settings.HUD.Wheel.PedalBrakeG, settings.HUD.Wheel.PedalBrakeB, settings.HUD.Wheel.PedalBrakeA);
+    GRAPHICS::DRAW_RECT(settings.HUD.Wheel.PedalXPos - 1.0f * barWidth, barYBase - carControls.ClutchVal * settings.HUD.Wheel.PedalYSz * 0.5f,
+        barWidth, carControls.ClutchVal * settings.HUD.Wheel.PedalYSz,
+        settings.HUD.Wheel.PedalClutchR, settings.HUD.Wheel.PedalClutchG, settings.HUD.Wheel.PedalClutchB, settings.HUD.Wheel.PedalClutchA);
 }
 
 void drawVehicleWheelInfo() {

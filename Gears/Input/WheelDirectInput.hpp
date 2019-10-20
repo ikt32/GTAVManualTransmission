@@ -1,8 +1,8 @@
 #pragma once
 
+#include "DIDeviceFactory.h"
 #include <array>
 #include <vector>
-#include "DIDeviceFactory.h"
 #include <unordered_map>
 
 // https://stackoverflow.com/questions/24113864/what-is-the-right-way-to-use-a-guid-as-the-key-in-stdhash-map
@@ -136,8 +136,4 @@ private:
     std::unordered_map<GUID, std::array<bool, SIZEOF_DIAxis>> hasForceFeedback { false };
 };
 
-// GUID utils
-bool operator < (const GUID &guid1, const GUID &guid2);
-std::string GUID2String(GUID guid);
 bool isSupportedDrivingDevice(DWORD dwDevType);
-

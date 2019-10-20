@@ -1,14 +1,18 @@
 #include "NativeController.h"
 #include <inc/natives.h>
 #include "../Util/TimeHelper.hpp"
+#include "../ScriptSettings.hpp"
+
+extern ScriptSettings settings;
 
 NativeController::NativeController(): pressTime()
                                     , releaseTime()
                                     , tapPressTime()
                                     , tapReleaseTime()
                                     , gameButtonCurr()
-                                    , gameButtonPrev()
-                                    , triggerValue(0.75f) {}
+                                    , gameButtonPrev() {
+    
+}
 
 NativeController::~NativeController() = default;
 
@@ -17,7 +21,7 @@ bool NativeController::IsButtonPressed(GameButtons gameButton) {
     if (CONTROLS::IS_CONTROL_PRESSED(0, GameEnums[gameButton])) {
         return true;
     }
-    if (CONTROLS::GET_CONTROL_NORMAL(0, GameEnums[gameButton]) > triggerValue) {
+    if (CONTROLS::GET_CONTROL_NORMAL(0, GameEnums[gameButton]) > settings.Controller.TriggerValue) {
         return true;
     }
     return false;
@@ -101,9 +105,6 @@ NativeController::GameButtons NativeController::EControlToButton(int eControlIte
     return UNKNOWN;
 }
 
-void NativeController::SetTriggerValue(float value) {
-    triggerValue = value;
-}
 #else
 
 // Stubs
@@ -141,10 +142,6 @@ float NativeController::GetAnalogValue(GameButtons gameButton) {
 
 NativeController::GameButtons NativeController::EControlToButton(int eControlItem) {
     return UNKNOWN;
-}
-
-void NativeController::SetTriggerValue(float value) {
-    triggerValue = value;
 }
 
 #endif

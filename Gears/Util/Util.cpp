@@ -1,5 +1,4 @@
 #include "Util.hpp"
-#include <inc/natives.h>
 
 STR2INT_ERROR str2int(int &i, char const *s, int base) {
     char *end;
@@ -28,3 +27,20 @@ std::string ByteArrayToString(uint8_t *byteArray, size_t length) {
     return instructionBytes;
 }
 
+std::string GUID2String(GUID guid) {
+    wchar_t szGuidW[40] = {0};
+    StringFromGUID2(guid, szGuidW, 40);
+    std::wstring wGuid = szGuidW;
+    return (std::string(wGuid.begin(), wGuid.end()));
+}
+
+GUID String2GUID(std::string guidStr) {
+    GUID guid;
+    std::wstring clsidStr;
+    clsidStr.assign(guidStr.begin(), guidStr.end());
+    HRESULT hr = CLSIDFromString(clsidStr.c_str(), &guid);
+    if (hr != NOERROR) {
+        return GUID();
+    }
+    return guid;
+}

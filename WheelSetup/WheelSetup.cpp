@@ -48,7 +48,7 @@ std::vector<std::tuple<char, std::string, std::string>> buttonInfos = {
 
 std::vector<std::tuple<char, std::string, std::string>> axisInfos = {
 	std::make_tuple('w', "throttle",          "THROTTLE"),
-	std::make_tuple('s', "brakes",            "BRAKES"),
+	std::make_tuple('s', "brake",             "BRAKE"),
 	std::make_tuple('a', "clutch",            "CLUTCH"),
 	std::make_tuple('d', "steering",          "STEER"),
 	std::make_tuple('f', "handbrake",         "HANDBRAKE_ANALOG"),
@@ -125,7 +125,7 @@ void init() {
 	logger.Write(INFO, "Settings read");
 
 	controls.InitWheel();
-	controls.CheckGUIDs(settings.RegisteredGUIDs);
+	controls.CheckGUIDs(settings.Wheel.InputDevices.RegisteredGUIDs);
 	
 	int totalWidth = 0;
 	for (auto guid : controls.GetWheel().GetGuids()) {
@@ -145,7 +145,7 @@ void init() {
  * Simplified playWheelEffects() from in Gears
  */
 void playWheelEffects(float effSteer) {
-	if (settings.LogiLEDs) {
+	if (settings.Wheel.Options.LogiLEDs) {
 		controls.GetWheel().PlayLedsDInput(controls.WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Steer)], controls.ThrottleVal, 0.5f, 0.95f);
 	}
 
@@ -765,7 +765,7 @@ int main() {
 		controls.GetLastInputDevice(CarControls::InputDevices::Wheel);
 		controls.UpdateValues(CarControls::InputDevices::Wheel, justPeeking);
 
-		float steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
+		float steerMult = settings.Wheel.Steering.AngleMax / settings.Wheel.Steering.AngleCar;
 		float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 		
 		GetConsoleScreenBufferInfo(hConsole, &csbi);

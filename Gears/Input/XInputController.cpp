@@ -1,6 +1,9 @@
 #include "XInputController.hpp"
+#include "../ScriptSettings.hpp"
 #include "../Util/TimeHelper.hpp"
 #include <string>
+
+extern ScriptSettings settings;
 
 XInputController::XInputController(int playerNumber)
     : pressTime()
@@ -63,7 +66,7 @@ bool XInputController::IsButtonPressed(XboxButtons buttonType) {
         buttonType == LeftThumbDown ||
         buttonType == RightThumbUp ||
         buttonType == RightThumbDown) {
-        return (GetAnalogValue(buttonType) > triggerValue);
+        return (GetAnalogValue(buttonType) > settings.Controller.TriggerValue);
     }
     return (buttonState & XboxButtonMasks[buttonType]) != 0;
 }
@@ -164,14 +167,6 @@ void XInputController::Update() {
     for (int i = 0; i < SIZEOF_XboxButtons; i++) {
         xboxButtonPrev[i] = xboxButtonCurr[i];
     }
-}
-
-void XInputController::SetTriggerValue(float value) {
-    triggerValue = value;
-}
-
-float XInputController::GetTriggerValue() {
-    return triggerValue;
 }
 
 float XInputController::filterDeadzone(XboxButtons buttonType, int input) {

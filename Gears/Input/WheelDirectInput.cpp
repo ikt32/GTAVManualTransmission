@@ -7,6 +7,7 @@
 
 #include "../Util/TimeHelper.hpp"
 #include "../Util/Logger.hpp"
+#include "../Util/Util.hpp"
 
 #ifdef _DEBUG
 #include "../Dump.h"
@@ -692,13 +693,6 @@ bool operator < (const GUID &guid1, const GUID &guid2) {
         }
     }
     return false;
-}
-
-std::string GUID2String(GUID guid) {
-    wchar_t szGuidW[40] = { 0 };
-    StringFromGUID2(guid, szGuidW, 40);
-    std::wstring wGuid = szGuidW;
-    return(std::string(wGuid.begin(), wGuid.end()));
 }
 
 bool isSupportedDrivingDevice(DWORD dwDevType) {

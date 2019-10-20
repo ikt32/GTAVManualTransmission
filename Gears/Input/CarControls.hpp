@@ -173,8 +173,6 @@ public:
     bool ButtonHeldOver(ControllerControlType control, int millis);
     XInputController::TapState ButtonTapped(ControllerControlType control);
     bool ButtonIn(ControllerControlType control);
-    void SetControllerTriggerLevel(float value);
-    float GetControllerTrigger();
 
     bool ButtonJustPressed(LegacyControlType control);
     bool ButtonReleased(LegacyControlType control);
@@ -209,29 +207,20 @@ public:
     float SteerValRaw = 0.0f;   // For readout purposes. SteerVal is used for gameplay.
     float HandbrakeVal = 0.0f;
 
-    int CToggleTime = 1000;
-    int ThrottleMin = 0;
-    int ThrottleMax = 0;
-    int BrakeMin = 0;
-    int BrakeMax = 0;
-    int ClutchMin = 0;
-    int ClutchMax = 0;
-    int SteerMin = 0;
-    int SteerMax = 0;
-    int HandbrakeMax = 0;
-    int HandbrakeMin = 0;
-    int MaxTapTime = 200;
-
-    float ADZThrottle = 0.25f;
-    float ADZBrake = 0.25f;
-    float ADZSteer = 0.25f;
-    float DZSteer = 0.0f;
-    float DZSteerOffset = 0.0f;
+    //int ThrottleMin = 0;
+    //int ThrottleMax = 0;
+    //int BrakeMin = 0;
+    //int BrakeMax = 0;
+    //int ClutchMin = 0;
+    //int ClutchMax = 0;
+    //int SteerMin = 0;
+    //int SteerMax = 0;
+    //int HandbrakeMax = 0;
+    //int HandbrakeMin = 0;
 
     std::array<std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
     std::array<int, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXboxBlocks = {};
 
-    bool UseLegacyController = false;
     std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> LegacyControls = {};
     std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> ControlNativeBlocks = {};
 
