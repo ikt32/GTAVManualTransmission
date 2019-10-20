@@ -1164,21 +1164,18 @@ void update_steeringassistmenu() {
     default:
         steeringModeDescription.emplace_back("Invalid option?");
     }
-    menu.StringArray("Steering Mode", { "Default", "Enhanced" }, settings.CustomSteering.Mode, steeringModeDescription);
+    menu.StringArray("Steering Mode", { "Default", "Enhanced" }, settings.CustomSteering.Mode, 
+        steeringModeDescription);
     menu.FloatOption("Countersteer multiplier", settings.CustomSteering.CountersteerMult, 0.0f, 2.0f, 0.05f,
         { "How much countersteer should be given." });
     menu.FloatOption("Countersteer limit", settings.CustomSteering.CountersteerLimit, 0.0f, 360.0f, 1.0f, 
         { "Maximum angle in degrees for automatic countersteering. Game default is 15 degrees." });
-
-    if (menu.FloatOption("Steering Reduction", settings.CustomSteering.SteeringReduction, 0.0f, 1.0f, 0.01f,
-        { "Reduce steering input at higher speeds.", "From InfamousSabre's Custom Steering." })) {
-        settings.SaveWheel(&carControls);
-    }
-
-    if (menu.FloatOption("Steering Multiplier", settings.CustomSteering.SteeringMult, 0.01f, 2.0f, 0.01f,
-        { "Increase/decrease steering lock.", "From InfamousSabre's Custom Steering." })) {
-        settings.SaveWheel(&carControls);
-    }
+    menu.FloatOption("Steering Reduction", settings.CustomSteering.SteeringReduction, 0.0f, 1.0f, 0.01f,
+        { "Reduce steering input at higher speeds.", "From InfamousSabre's Custom Steering." });
+    menu.FloatOption("Steering Multiplier", settings.CustomSteering.SteeringMult, 0.01f, 2.0f, 0.01f,
+        { "Increase/decrease steering lock.", "From InfamousSabre's Custom Steering." });
+    menu.FloatOption("Steering Gamma", settings.CustomSteering.Gamma, 0.01f, 2.0f, 0.01f,
+        { "Change linearity of steering input." });
 }
 
 void update_debugmenu() {
