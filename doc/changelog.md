@@ -2,7 +2,7 @@
 
 ## 4.7.0
 
-Warning: Some items in `[OPTION]` are now moved into `[MISC]`. The script will generate missing entries, so no action is needed, but affected settings will be reset to their default values.
+Warning: Many options are relocated. The script will generate missing entries, so no action is needed, but affected settings will be reset to their default values. However, it's recommended to start with a clean settings file to reduce confusion when manually changing settings.
 
 New Steering Wheel features and improvements:
 
