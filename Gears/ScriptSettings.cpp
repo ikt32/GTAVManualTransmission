@@ -100,9 +100,10 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetDoubleValue("AUTO_PARAMS", "DownshiftTimeoutMult", AutoParams.DownshiftTimeoutMult);
 
     // [HUD]
-    settingsGeneral.SetBoolValue("HUD", "EnableHUD", HUD.HUD);
-    settingsGeneral.SetBoolValue("HUD", "AlwaysHUD", HUD.AlwaysHUD);
-    settingsGeneral.SetLongValue("HUD", "HUDFont", HUD.HUDFont);
+    settingsGeneral.SetBoolValue("HUD", "EnableHUD", HUD.Enable);
+    settingsGeneral.SetBoolValue("HUD", "AlwaysHUD", HUD.Always);
+    settingsGeneral.SetLongValue("HUD", "HUDFont", HUD.Font);
+    settingsGeneral.SetLongValue("HUD", "NotifyLevel", HUD.NotifyLevel);
 
     settingsGeneral.SetBoolValue("HUD", "GearIndicator", HUD.Gear.Enable);
     settingsGeneral.SetDoubleValue("HUD", "GearXpos", HUD.Gear.XPos);
@@ -333,13 +334,13 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     ShiftOptions.DownshiftBlip = settingsGeneral.GetBoolValue("SHIFT_OPTIONS", "DownshiftBlip", ShiftOptions.DownshiftBlip);
     ShiftOptions.ClutchRateMult = settingsGeneral.GetDoubleValue("SHIFT_OPTIONS", "ClutchRateMult", ShiftOptions.ClutchRateMult);
 
-    // [AUTO_PARAMETERS]
-    AutoParams.UpshiftLoad = settingsGeneral.GetDoubleValue("AUTO_PARAMETERS", "UpshiftLoad", AutoParams.UpshiftLoad);
-    AutoParams.DownshiftLoad =  settingsGeneral.GetDoubleValue("AUTO_PARAMETERS", "DownshiftLoad", AutoParams.DownshiftLoad);
-    AutoParams.NextGearMinRPM = settingsGeneral.GetDoubleValue("AUTO_PARAMETERS", "NextGearMinRPM", AutoParams.NextGearMinRPM);
-    AutoParams.CurrGearMinRPM = settingsGeneral.GetDoubleValue("AUTO_PARAMETERS", "CurrGearMinRPM", AutoParams.CurrGearMinRPM);
-    AutoParams.EcoRate = settingsGeneral.GetDoubleValue("AUTO_PARAMETERS", "EcoRate", AutoParams.EcoRate);
-    AutoParams.DownshiftTimeoutMult = settingsGeneral.GetDoubleValue("AUTO_PARAMETERS", "DownshiftTimeoutMult", AutoParams.DownshiftTimeoutMult);
+    // [AUTO_PARAMS]
+    AutoParams.UpshiftLoad = settingsGeneral.GetDoubleValue("AUTO_PARAMS", "UpshiftLoad", AutoParams.UpshiftLoad);
+    AutoParams.DownshiftLoad =  settingsGeneral.GetDoubleValue("AUTO_PARAMS", "DownshiftLoad", AutoParams.DownshiftLoad);
+    AutoParams.NextGearMinRPM = settingsGeneral.GetDoubleValue("AUTO_PARAMS", "NextGearMinRPM", AutoParams.NextGearMinRPM);
+    AutoParams.CurrGearMinRPM = settingsGeneral.GetDoubleValue("AUTO_PARAMS", "CurrGearMinRPM", AutoParams.CurrGearMinRPM);
+    AutoParams.EcoRate = settingsGeneral.GetDoubleValue("AUTO_PARAMS", "EcoRate", AutoParams.EcoRate);
+    AutoParams.DownshiftTimeoutMult = settingsGeneral.GetDoubleValue("AUTO_PARAMS", "DownshiftTimeoutMult", AutoParams.DownshiftTimeoutMult);
 
     // [CUSTOM_STEERING]
     CustomSteering.Mode = settingsGeneral.GetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
@@ -350,9 +351,9 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     CustomSteering.Gamma = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "Gamma", CustomSteering.Gamma);
 
     // [HUD]
-    HUD.HUD = settingsGeneral.GetBoolValue("HUD", "EnableHUD", HUD.HUD);
-    HUD.AlwaysHUD = settingsGeneral.GetBoolValue("HUD", "AlwaysHUD", HUD.AlwaysHUD);
-    HUD.HUDFont = settingsGeneral.GetLongValue("HUD", "HUDFont", HUD.HUDFont);
+    HUD.Enable = settingsGeneral.GetBoolValue("HUD", "EnableHUD", HUD.Enable);
+    HUD.Always = settingsGeneral.GetBoolValue("HUD", "AlwaysHUD", HUD.Always);
+    HUD.Font = settingsGeneral.GetLongValue("HUD", "HUDFont", HUD.Font);
 
     HUD.Gear.Enable = settingsGeneral.GetBoolValue("HUD", "GearIndicator", HUD.Gear.Enable);
     HUD.Gear.XPos = settingsGeneral.GetDoubleValue("HUD", "GearXpos", HUD.Gear.XPos);

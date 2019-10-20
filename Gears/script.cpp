@@ -152,11 +152,11 @@ void update_hud() {
     if (settings.Debug.DisplayWheelInfo) {
         drawVehicleWheelInfo();
     }
-    if (settings.HUD.HUD && vehData.mDomain == VehicleDomain::Road &&
-        (settings.MTOptions.Enable || settings.HUD.AlwaysHUD)) {
+    if (settings.HUD.Enable && vehData.mDomain == VehicleDomain::Road &&
+        (settings.MTOptions.Enable || settings.HUD.Always)) {
         drawHUD();
     }
-    if (settings.HUD.HUD &&
+    if (settings.HUD.Enable &&
         (vehData.mDomain == VehicleDomain::Road || vehData.mDomain == VehicleDomain::Water) &&
         (carControls.PrevInput == CarControls::Wheel || settings.HUD.Wheel.Always) &&
         settings.HUD.Wheel.Enable && textureWheelId != -1) {

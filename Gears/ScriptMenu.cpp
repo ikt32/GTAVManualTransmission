@@ -986,13 +986,13 @@ void update_hudmenu() {
     menu.Title("HUD Options");
     menu.Subtitle("");
 
-    menu.BoolOption("Enable", settings.HUD.HUD,
+    menu.BoolOption("Enable", settings.HUD.Enable,
         { "Display HUD elements." });
 
-    menu.BoolOption("Always enable", settings.HUD.AlwaysHUD,
+    menu.BoolOption("Always enable", settings.HUD.Always,
         { "Display HUD even if manual transmission is off." });
 
-    auto fontIt = std::find_if(fonts.begin(), fonts.end(), [](const SFont& font) { return font.ID == settings.HUD.HUDFont; });
+    auto fontIt = std::find_if(fonts.begin(), fonts.end(), [](const SFont& font) { return font.ID == settings.HUD.Font; });
     if (fontIt != fonts.end()) {
         std::vector<std::string> strFonts;
         strFonts.reserve(fonts.size());
@@ -1000,7 +1000,7 @@ void update_hudmenu() {
             strFonts.push_back(font.Name);
         int fontIndex = static_cast<int>(fontIt - fonts.begin());
         if (menu.StringArray("Font", strFonts, fontIndex, { "Select the font for speed, gearbox mode, current gear." })) {
-            settings.HUD.HUDFont = fonts.at(fontIndex).ID;
+            settings.HUD.Font = fonts.at(fontIndex).ID;
         }
     }
     else {

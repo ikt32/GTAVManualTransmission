@@ -110,8 +110,8 @@ void drawSpeedoMeter() {
     float dashms = vehData.mHasSpeedo ? ext.GetDashSpeed(playerVehicle) : abs(ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y);
 
     showText(settings.HUD.Speedo.XPos, settings.HUD.Speedo.YPos, settings.HUD.Speedo.Size,
-        formatSpeedo(settings.HUD.Speedo.Speedo, dashms, settings.HUD.Speedo.ShowUnit, settings.HUD.HUDFont),
-        settings.HUD.HUDFont);
+        formatSpeedo(settings.HUD.Speedo.Speedo, dashms, settings.HUD.Speedo.ShowUnit, settings.HUD.Font),
+        settings.HUD.Font);
 }
 
 void drawShiftModeIndicator() {
@@ -127,7 +127,7 @@ void drawShiftModeIndicator() {
         shiftModeText = "A";
         color = { 0, 126, 232, 255 };
     }
-    showText(settings.HUD.ShiftMode.XPos, settings.HUD.ShiftMode.YPos, settings.HUD.ShiftMode.Size, shiftModeText, settings.HUD.HUDFont, color, true);
+    showText(settings.HUD.ShiftMode.XPos, settings.HUD.ShiftMode.YPos, settings.HUD.ShiftMode.Size, shiftModeText, settings.HUD.Font, color, true);
 }
 
 void drawGearIndicator() {
@@ -151,7 +151,7 @@ void drawGearIndicator() {
     else {
         c = solidWhite;
     }
-    showText(settings.HUD.Gear.XPos, settings.HUD.Gear.YPos, settings.HUD.Gear.Size, gear, settings.HUD.HUDFont, c, true);
+    showText(settings.HUD.Gear.XPos, settings.HUD.Gear.YPos, settings.HUD.Gear.Size, gear, settings.HUD.Font, c, true);
 }
 
 void drawHUD() {

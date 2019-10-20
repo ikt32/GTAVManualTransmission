@@ -80,7 +80,7 @@ public:
         bool DownshiftBlip = true;
     } ShiftOptions;
 
-    // [AUTO_PARAMETERS]
+    // [AUTO_PARAMS]
     struct {
         // Lower = upshift later
         float UpshiftLoad = 0.05f;
@@ -110,15 +110,15 @@ public:
 
     // [HUD]
     struct {
-        bool HUD = true;
-        bool AlwaysHUD = true;
+        bool Enable = true;
+        bool Always = true;
         // Fonts:
         // 0 - Chalet London
         // 1 - Sign Painter
         // 2 - Slab Serif
         // 4 - Chalet Cologne
         // 7 - Pricedown
-        int HUDFont = 4;
+        int Font = 4;
 
         struct {
             bool Enable = true;
