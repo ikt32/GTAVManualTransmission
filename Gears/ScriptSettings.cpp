@@ -354,6 +354,7 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     HUD.Enable = settingsGeneral.GetBoolValue("HUD", "EnableHUD", HUD.Enable);
     HUD.Always = settingsGeneral.GetBoolValue("HUD", "AlwaysHUD", HUD.Always);
     HUD.Font = settingsGeneral.GetLongValue("HUD", "HUDFont", HUD.Font);
+    HUD.NotifyLevel = settingsGeneral.GetLongValue("HUD", "NotifyLevel", HUD.NotifyLevel);
 
     HUD.Gear.Enable = settingsGeneral.GetBoolValue("HUD", "GearIndicator", HUD.Gear.Enable);
     HUD.Gear.XPos = settingsGeneral.GetDoubleValue("HUD", "GearXpos", HUD.Gear.XPos);

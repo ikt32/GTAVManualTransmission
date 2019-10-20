@@ -120,6 +120,13 @@ public:
         // 7 - Pricedown
         int Font = 4;
 
+        // Levels:
+        // 0 - Debug
+        // 1 - Info
+        // 2 - Error/UI (LogLevel WARN)
+        // 3 - None
+        int NotifyLevel = INFO;
+
         struct {
             bool Enable = true;
             float XPos = 0.9525f;

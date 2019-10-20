@@ -665,10 +665,11 @@ void WheelInput::PlayFFBGround() {
         carControls.PlayFFBCollision(std::clamp(res, -10000, 10000));
     }
 
-    if (settings.Debug.DisplayInfo && collision) {
-        UI::Notify(fmt::format("Collision @ ~r~{:.3f}G~w~~n~"
+    if (collision) {
+        UI::Notify(DEBUG, fmt::format("Collision @ ~r~{:.3f}G~w~~n~"
             "FFB: {}", gForce, res));
     }
+
     if (settings.Debug.DisplayInfo) {
         showText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > settings.Wheel.FFB.SATMax ? "~r~" : "~w~", satForce), 4);
         showText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);

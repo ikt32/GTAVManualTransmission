@@ -409,10 +409,10 @@ void toggleManual(bool enable) {
     settings.MTOptions.Enable = enable;
     settings.SaveGeneral();
     if (settings.MTOptions.Enable) {
-        UI::Notify("MT Enabled");
+        UI::Notify(INFO, "MT Enabled");
     }
     else {
-        UI::Notify("MT Disabled");
+        UI::Notify(INFO, "MT Disabled");
     }
     readSettings();
     initWheel();
@@ -503,7 +503,7 @@ void updateLastInputDevice() {
         }
         // Suppress notification when not in car
         if (Util::VehicleAvailable(playerVehicle, playerPed)) {
-            UI::Notify(message);
+            UI::Notify(INFO, message);
         }
     }
     if (carControls.PrevInput == CarControls::Wheel) {
@@ -539,7 +539,7 @@ void setShiftMode(EShiftMode shiftMode) {
         case EShiftMode::Automatic:     mode += "Automatic";    break;
         default:                                                break;
     }
-    UI::Notify(mode);
+    UI::Notify(INFO, mode);
 }
 
 void cycleShiftMode() {
@@ -1770,15 +1770,15 @@ void update_update_notification() {
         if (g_checkUpdateDone) {
             g_checkUpdateDone = false;
             if (g_notifyUpdate) {
-                UI::Notify(fmt::format("Manual Transmission: Update available, new version: {}.",
-                    g_releaseInfo.Version));
+                UI::Notify(INFO, fmt::format("Manual Transmission: Update available, new version: {}.",
+                                         g_releaseInfo.Version));
             }
             else if (g_releaseInfo.Version.empty()) {
-                UI::Notify("Manual Transmission: Failed to check for update.");
+                UI::Notify(INFO, "Manual Transmission: Failed to check for update.");
             }
             else {
-                UI::Notify(fmt::format("Manual Transmission: No update available, latest version: {}.",
-                    g_releaseInfo.Version));
+                UI::Notify(INFO, fmt::format("Manual Transmission: No update available, latest version: {}.",
+                                         g_releaseInfo.Version));
             }
         }
     }

@@ -198,6 +198,13 @@ namespace {
     const std::vector<std::string> tcsStrings{
         "Disabled", "Brakes", "Throttle"
     };
+
+    const std::vector<std::string> notifyLevelStrings{
+        "Debug",
+        "Info",
+        "UI",
+        "None"
+    };
 }
 
 int getBlockableControlIndex(int control) {
@@ -536,7 +543,7 @@ void update_legacycontrollermenu() {
             WAIT(500);
             bool result = configLControllerButton(confTag.Tag);
             if (!result)
-                UI::Notify(fmt::format("Cancelled {} assignment", confTag.Tag));
+                UI::Notify(WARN, fmt::format("Cancelled {} assignment", confTag.Tag));
             WAIT(500);
         }
         controllerInfo.pop_back();
@@ -581,7 +588,7 @@ void update_controllermenu() {
             WAIT(500);
             bool result = configControllerButton(confTag.Tag);
             if (!result)
-                UI::Notify(fmt::format("Cancelled {} assignment", confTag.Tag));
+                UI::Notify(WARN, fmt::format("Cancelled {} assignment", confTag.Tag));
             WAIT(500);
         }
         controllerInfo.pop_back();
@@ -605,7 +612,7 @@ void update_keyboardmenu() {
             WAIT(500);
             bool result = configKeyboardKey(confTag.Tag);
             if (!result)
-                UI::Notify(fmt::format("Cancelled {} assignment", confTag.Tag));
+                UI::Notify(WARN, fmt::format("Cancelled {} assignment", confTag.Tag));
             WAIT(500);
         }
         keyboardInfo.pop_back();
@@ -658,7 +665,7 @@ void update_wheelmenu() {
     if (menu.OptionPlus("H-pattern shifter setup", hpatInfo, nullptr, std::bind(clearHShifter), nullptr, "Input values",
         { "Select this option to start H-pattern shifter setup. Follow the on-screen instructions." })) {
         bool result = configHPattern();
-        UI::Notify(result ? "H-pattern shifter saved" : "Cancelled H-pattern shifter setup");
+        UI::Notify(WARN, result ? "H-pattern shifter saved" : "Cancelled H-pattern shifter setup");
     }
 
     std::vector<std::string> hAutoInfo = {
@@ -673,7 +680,7 @@ void update_wheelmenu() {
     if (menu.OptionPlus("Shifter setup for automatic", hAutoInfo, nullptr, [] { clearASelect(); }, nullptr, "Input values",
         { "Set up H-pattern shifter for automatic gearbox. Follow the on-screen instructions." })) {
         bool result = configASelect();
-        UI::Notify(result ? "H-pattern shifter (auto) saved" : "Cancelled H-pattern shifter (auto) setup");
+        UI::Notify(WARN, result ? "H-pattern shifter (auto) saved" : "Cancelled H-pattern shifter (auto) setup");
     }
 
     menu.BoolOption("Keyboard H-pattern", settings.Wheel.Options.HPatternKeyboard,
@@ -782,31 +789,31 @@ void update_axesmenu() {
 
     if (menu.OptionPlus("Configure steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr, "Input values")) {
         bool result = configAxis("STEER");
-        UI::Notify(result ? "Steering axis saved" : "Cancelled steering axis configuration");
+        UI::Notify(WARN, result ? "Steering axis saved" : "Cancelled steering axis configuration");
         if (result) 
             initWheel();
     }
     if (menu.OptionPlus("Configure throttle", info, nullptr, std::bind(clearAxis, "THROTTLE"), nullptr, "Input values")) {
         bool result = configAxis("THROTTLE");
-        UI::Notify(result ? "Throttle axis saved" : "Cancelled throttle axis configuration");
+        UI::Notify(WARN, result ? "Throttle axis saved" : "Cancelled throttle axis configuration");
         if (result) 
             initWheel();
     }
     if (menu.OptionPlus("Configure brake", info, nullptr, std::bind(clearAxis, "BRAKE"), nullptr, "Input values")) {
         bool result = configAxis("BRAKE");
-        UI::Notify(result ? "Brake axis saved" : "Cancelled brake axis configuration");
+        UI::Notify(WARN, result ? "Brake axis saved" : "Cancelled brake axis configuration");
         if (result) 
             initWheel();
     }
     if (menu.OptionPlus("Configure clutch", info, nullptr, std::bind(clearAxis, "CLUTCH"), nullptr, "Input values")) {
         bool result = configAxis("CLUTCH");
-        UI::Notify(result ? "Clutch axis saved" : "Cancelled clutch axis configuration");
+        UI::Notify(WARN, result ? "Clutch axis saved" : "Cancelled clutch axis configuration");
         if (result) 
             initWheel();
     }
     if (menu.OptionPlus("Configure handbrake", info, nullptr, std::bind(clearAxis, "HANDBRAKE_ANALOG"), nullptr, "Input values")) {
         bool result = configAxis("HANDBRAKE_ANALOG");
-        UI::Notify(result ? "Handbrake axis saved" : "Cancelled handbrake axis configuration");
+        UI::Notify(WARN, result ? "Handbrake axis saved" : "Cancelled handbrake axis configuration");
         if (result) 
             initWheel();
     }
@@ -959,7 +966,7 @@ void update_buttonsmenu() {
     if (menu.OptionPlus("Set up WheelToKey", wheelToKeyInfo, nullptr, clearWheelToKey, nullptr, "Info",
         { "Set up wheel buttons that press a keyboard key. Only one device can be used for this." })) {
         bool result = configWheelToKey();
-        UI::Notify(result ? "Entry added" : "Cancelled entry addition");
+        UI::Notify(WARN, result ? "Entry added" : "Cancelled entry addition");
     }
 
     std::vector<std::string> buttonInfo;
@@ -976,7 +983,7 @@ void update_buttonsmenu() {
         buttonInfo.push_back(fmt::format("Assigned to {}", carControls.ConfTagWheel2Value(confTag)));
         if (menu.OptionPlus(fmt::format("Assign {}", confTag), buttonInfo, nullptr, std::bind(clearButton, confTag), nullptr, "Current inputs")) {
             bool result = configButton(confTag);
-            UI::Notify(fmt::format("[{}] {}", confTag, result ? "saved" : "assignment cancelled."));
+            UI::Notify(WARN, fmt::format("[{}] {}", confTag, result ? "saved" : "assignment cancelled."));
         }
         buttonInfo.pop_back();
     }
@@ -1007,11 +1014,16 @@ void update_hudmenu() {
         menu.Option("Invalid font ID in settings");
     }
 
+    menu.StringArray("Notification level", notifyLevelStrings, settings.HUD.NotifyLevel,
+        { "What kind of notifications to display.",
+        "Debug: All",
+        "Info: Mode switching",
+        "UI: Menu actions and setup",
+        "None: Hide all notifications" });
 
     menu.MenuOption("Gear and shift mode", "geardisplaymenu");
     menu.MenuOption("Speedometer", "speedodisplaymenu");
     menu.MenuOption("RPM Gauge", "rpmdisplaymenu");
-
     menu.MenuOption("Wheel & Pedal Info", "wheelinfomenu");
 }
 
@@ -1335,7 +1347,7 @@ void clearAxis(const std::string& confTag) {
     saveChanges();
     settings.SteeringSaveAxis(confTag, -1, "", 0, 0);
     settings.Read(&carControls);
-    UI::Notify(fmt::format("Cleared axis {}", confTag));
+    UI::Notify(WARN, fmt::format("Cleared axis {}", confTag));
     initWheel();
 }
 
@@ -1350,17 +1362,17 @@ void clearWheelToKey() {
 
     int button;
     if (str2int(button, result.c_str(), 10) != STR2INT_SUCCESS) {
-        UI::Notify(fmt::format("Invalid input: {} is not a valid number!", result));
+        UI::Notify(WARN, fmt::format("Invalid input: {} is not a valid number!", result));
         return;
     }
     bool found = settings.SteeringClearWheelToKey(button);
     if (found) {
         saveChanges();
-        UI::Notify(fmt::format("Removed button {}", result));
+        UI::Notify(WARN, fmt::format("Removed button {}", result));
         settings.Read(&carControls);
     }
     else {
-        UI::Notify(fmt::format("Button {} not found.", result));
+        UI::Notify(WARN, fmt::format("Button {} not found.", result));
     }
 }
 
@@ -1368,7 +1380,7 @@ void clearButton(const std::string& confTag) {
     saveChanges();
     settings.SteeringSaveButton(confTag, -1, -1);
     settings.Read(&carControls);
-    UI::Notify(fmt::format("Cleared button {}", confTag));
+    UI::Notify(WARN, fmt::format("Cleared button {}", confTag));
 }
 
 void clearHShifter() {
@@ -1378,7 +1390,7 @@ void clearHShifter() {
 
     settings.SteeringSaveHShifter("SHIFTER", -1, empty);
     settings.Read(&carControls);
-    UI::Notify("Cleared H-pattern shifter");
+    UI::Notify(WARN, "Cleared H-pattern shifter");
 }
 
 void clearASelect() {
@@ -1386,7 +1398,7 @@ void clearASelect() {
     settings.SteeringSaveButton("AUTO_R", -1, -1);
     settings.SteeringSaveButton("AUTO_D", -1, -1);
     settings.Read(&carControls);
-    UI::Notify("Cleared H-pattern shifter (auto)");
+    UI::Notify(WARN, "Cleared H-pattern shifter (auto)");
 }
 
 // Controller and keyboard
@@ -1394,42 +1406,42 @@ void saveKeyboardKey(const std::string& confTag, const std::string& key) {
     saveChanges();
     settings.KeyboardSaveKey(confTag, key);
     settings.Read(&carControls);
-    UI::Notify(fmt::format("Saved key {}: {}.", confTag, key));
+    UI::Notify(WARN, fmt::format("Saved key {}: {}.", confTag, key));
 }
 
 void saveControllerButton(const std::string& confTag, const std::string& button) {
     saveChanges();
     settings.ControllerSaveButton(confTag, button);
     settings.Read(&carControls);
-    UI::Notify(fmt::format("Saved button {}: {}.", confTag, button));
+    UI::Notify(WARN, fmt::format("Saved button {}: {}.", confTag, button));
 }
 
 void saveLControllerButton(const std::string& confTag, int button) {
     saveChanges();
     settings.LControllerSaveButton(confTag, button);
     settings.Read(&carControls);
-    UI::Notify(fmt::format("Saved button {}: {}", confTag, button));
+    UI::Notify(WARN, fmt::format("Saved button {}: {}", confTag, button));
 }
 
 void clearKeyboardKey(const std::string& confTag) {
     saveChanges();
     settings.KeyboardSaveKey(confTag, "UNKNOWN");
     settings.Read(&carControls);
-    UI::Notify(fmt::format("Cleared key {}", confTag));
+    UI::Notify(WARN, fmt::format("Cleared key {}", confTag));
 }
 
 void clearControllerButton(const std::string& confTag) {
     saveChanges();
     settings.ControllerSaveButton(confTag, "UNKNOWN");
     settings.Read(&carControls);
-    UI::Notify(fmt::format("Cleared button {}", confTag));
+    UI::Notify(WARN, fmt::format("Cleared button {}", confTag));
 }
 
 void clearLControllerButton(const std::string& confTag) {
     saveChanges();
     settings.LControllerSaveButton(confTag, -1);
     settings.Read(&carControls);
-    UI::Notify(fmt::format("Cleared button {}", confTag));
+    UI::Notify(WARN, fmt::format("Cleared button {}", confTag));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1786,7 +1798,7 @@ bool configKeyboardKey(const std::string &confTag) {
         for (auto k : NativeMenu::KeyMap) {
             if (IsKeyJustUp(k.second)) {
                 if (isMenuControl(k.second)) {
-                    UI::Notify("Can't use menu controls!");
+                    UI::Notify(WARN, "Can't use menu controls!");
                     continue;
                 }
                 saveKeyboardKey(confTag, k.first);
@@ -1799,7 +1811,7 @@ bool configKeyboardKey(const std::string &confTag) {
             std::string letter_ = std::string(1, letter);
             if (IsKeyJustUp(str2key(letter_))) {
                 if (isMenuControl(str2key(letter_))) {
-                    UI::Notify("Can't use menu controls!");
+                    UI::Notify(WARN, "Can't use menu controls!");
                     continue;
                 }
                 saveKeyboardKey(confTag, letter_);
