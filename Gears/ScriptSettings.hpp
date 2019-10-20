@@ -179,9 +179,9 @@ public:
         struct {
             bool Enable = true;
             bool Always = false;
-            float ImgXPos = 0.23f;
-            float ImgYPos = 0.98f;
-            float ImgSize = 0.06f;
+            float ImgXPos = 0.22f;
+            float ImgYPos = 0.80f;
+            float ImgSize = 0.05f;
 
             float PedalXPos = 0.22f;
             float PedalYPos = 0.90f;
