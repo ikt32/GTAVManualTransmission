@@ -239,12 +239,12 @@ void ScriptSettings::SaveWheel(CarControls *scriptControl) const {
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [OPTIONS]
-    settingsWheel.SetBoolValue("OPTIONS", "EnableWheel", Wheel.Options.Enable);
+    settingsWheel.SetBoolValue("MT_OPTIONS", "EnableWheel", Wheel.Options.Enable);
 
-    settingsWheel.SetBoolValue("OPTIONS", "LogitechLEDs", Wheel.Options.LogiLEDs);
-    settingsWheel.SetBoolValue("OPTIONS", "HPatternKeyboard", Wheel.Options.HPatternKeyboard);
+    settingsWheel.SetBoolValue("MT_OPTIONS", "LogitechLEDs", Wheel.Options.LogiLEDs);
+    settingsWheel.SetBoolValue("MT_OPTIONS", "HPatternKeyboard", Wheel.Options.HPatternKeyboard);
 
-    settingsWheel.SetBoolValue("OPTIONS", "UseShifterForAuto", Wheel.Options.UseShifterForAuto);
+    settingsWheel.SetBoolValue("MT_OPTIONS", "UseShifterForAuto", Wheel.Options.UseShifterForAuto);
 
     // [FORCE_FEEDBACK]
     settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
@@ -295,18 +295,18 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [OPTIONS]
-    MTOptions.Enable = settingsGeneral.GetBoolValue("OPTIONS", "Enable", MTOptions.Enable);
+    MTOptions.Enable = settingsGeneral.GetBoolValue("MT_OPTIONS", "Enable", MTOptions.Enable);
     MTOptions.ShiftMode = 
-        static_cast<EShiftMode>(settingsGeneral.GetLongValue("OPTIONS", "ShiftMode", EToInt(MTOptions.ShiftMode)));
-    MTOptions.EngDamage = settingsGeneral.GetBoolValue("OPTIONS", "EngineDamage", MTOptions.EngDamage);
-    MTOptions.EngStallH = settingsGeneral.GetBoolValue("OPTIONS", "EngineStalling", MTOptions.EngStallH);
-    MTOptions.EngStallS = settingsGeneral.GetBoolValue("OPTIONS", "EngineStallingS", MTOptions.EngStallS);
-    MTOptions.EngBrake = settingsGeneral.GetBoolValue("OPTIONS", "EngineBraking", MTOptions.EngBrake);
-    MTOptions.EngLock  = settingsGeneral.GetBoolValue("OPTIONS", "EngineLocking", MTOptions.EngLock);
-    MTOptions.ClutchCreep = settingsGeneral.GetBoolValue("OPTIONS", "ClutchCatching", MTOptions.ClutchCreep);
-    MTOptions.ClutchShiftH = settingsGeneral.GetBoolValue("OPTIONS", "ClutchShiftingH", MTOptions.ClutchShiftH);
-    MTOptions.ClutchShiftS = settingsGeneral.GetBoolValue("OPTIONS", "ClutchShiftingS", MTOptions.ClutchShiftS);
-    MTOptions.HardLimiter = settingsGeneral.GetBoolValue("OPTIONS", "HardLimiter", MTOptions.HardLimiter);
+        static_cast<EShiftMode>(settingsGeneral.GetLongValue("MT_OPTIONS", "ShiftMode", EToInt(MTOptions.ShiftMode)));
+    MTOptions.EngDamage = settingsGeneral.GetBoolValue("MT_OPTIONS", "EngineDamage", MTOptions.EngDamage);
+    MTOptions.EngStallH = settingsGeneral.GetBoolValue("MT_OPTIONS", "EngineStalling", MTOptions.EngStallH);
+    MTOptions.EngStallS = settingsGeneral.GetBoolValue("MT_OPTIONS", "EngineStallingS", MTOptions.EngStallS);
+    MTOptions.EngBrake = settingsGeneral.GetBoolValue("MT_OPTIONS", "EngineBraking", MTOptions.EngBrake);
+    MTOptions.EngLock  = settingsGeneral.GetBoolValue("MT_OPTIONS", "EngineLocking", MTOptions.EngLock);
+    MTOptions.ClutchCreep = settingsGeneral.GetBoolValue("MT_OPTIONS", "ClutchCatching", MTOptions.ClutchCreep);
+    MTOptions.ClutchShiftH = settingsGeneral.GetBoolValue("MT_OPTIONS", "ClutchShiftingH", MTOptions.ClutchShiftH);
+    MTOptions.ClutchShiftS = settingsGeneral.GetBoolValue("MT_OPTIONS", "ClutchShiftingS", MTOptions.ClutchShiftS);
+    MTOptions.HardLimiter = settingsGeneral.GetBoolValue("MT_OPTIONS", "HardLimiter", MTOptions.HardLimiter);
 
     MTParams.ClutchThreshold =      settingsGeneral.GetDoubleValue("MT_PARAMS", "ClutchCatchpoint", MTParams.ClutchThreshold);
     MTParams.StallingThreshold =    settingsGeneral.GetDoubleValue("MT_PARAMS", "StallingThreshold", MTParams.StallingThreshold);
@@ -522,10 +522,10 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [OPTIONS]
-    Wheel.Options.Enable = settingsWheel.GetBoolValue("OPTIONS", "EnableWheel", Wheel.Options.Enable);
-    Wheel.Options.LogiLEDs = settingsWheel.GetBoolValue("OPTIONS", "LogitechLEDs", Wheel.Options.LogiLEDs);
-    Wheel.Options.HPatternKeyboard = settingsWheel.GetBoolValue("OPTIONS", "HPatternKeyboard", Wheel.Options.HPatternKeyboard);
-    Wheel.Options.UseShifterForAuto = settingsWheel.GetBoolValue("OPTIONS", "UseShifterForAuto", Wheel.Options.UseShifterForAuto);
+    Wheel.Options.Enable = settingsWheel.GetBoolValue("MT_OPTIONS", "EnableWheel", Wheel.Options.Enable);
+    Wheel.Options.LogiLEDs = settingsWheel.GetBoolValue("MT_OPTIONS", "LogitechLEDs", Wheel.Options.LogiLEDs);
+    Wheel.Options.HPatternKeyboard = settingsWheel.GetBoolValue("MT_OPTIONS", "HPatternKeyboard", Wheel.Options.HPatternKeyboard);
+    Wheel.Options.UseShifterForAuto = settingsWheel.GetBoolValue("MT_OPTIONS", "UseShifterForAuto", Wheel.Options.UseShifterForAuto);
 
     // [FORCE_FEEDBACK]
     Wheel.FFB.Enable = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
