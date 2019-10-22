@@ -276,16 +276,17 @@ public:
         struct {
             bool Enable = true;
             bool Scale = true;
+            int AntiDeadForce = 0;
             float SATAmpMult = 1.0f;
+            int SATMax = 10000;
+            float SATFactor = 0.66f;
             int DamperMax = 50;
             int DamperMin = 10;
             float DamperMinSpeed = 1.2f; // TargetSpeed in m/s
             float DetailMult = 2.5f;
-            float CollisionMult = 1.0f;
-            int SATMax = 10000;
-            int AntiDeadForce = 0;
             int DetailLim = 20000;
             int DetailMAW = 1;
+            float CollisionMult = 1.0f;
         } FFB;
 
         // [STEER]

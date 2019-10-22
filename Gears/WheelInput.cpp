@@ -508,8 +508,8 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
         speed * cos(steeringAngle / settings.Wheel.Steering.SteerMult), 0,
         0, 0
     };
-
-    float error = static_cast<float>(pid.getOutput(expectedVector.x, static_cast<double>(speedVector.x) * 0.5));
+    
+    float error = static_cast<float>(pid.getOutput(expectedVector.x, static_cast<double>(speedVector.x) * settings.Wheel.FFB.SATFactor));
 
     int satForce = static_cast<int>(settings.Wheel.FFB.SATAmpMult * static_cast<float>(defaultGain) * -error);
 

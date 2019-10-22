@@ -890,6 +890,10 @@ void update_forcefeedbackmenu() {
     menu.IntOption("Self aligning torque limit", settings.Wheel.FFB.SATMax, 0, 10000, 100,
         { "Clamp effect amplitude to this value. 10000 is the technical limit." });
 
+    menu.FloatOption("Self aligning torque factor", settings.Wheel.FFB.SATFactor, 0.0f, 1.0f, 0.01f,
+        { "Reactive force offset/multiplier, when not going straight.",
+          "Depending on wheel strength, a larger value helps reaching countersteer faster or reduce overcorrection."});
+
     menu.FloatOption("Detail effect multiplier", settings.Wheel.FFB.DetailMult, 0.0f, 10.0f, 0.1f,
         { "Force feedback effects caused by the suspension. This effect is muxed with the main effect." });
 
