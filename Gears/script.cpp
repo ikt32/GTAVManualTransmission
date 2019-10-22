@@ -1345,13 +1345,13 @@ void handleRPM() {
                 settings.ShiftOptions.UpshiftCut) {
                 CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
             }
-            else if (settings.ShiftOptions.DownshiftBlip) {
+            if (gearStates.ShiftDirection == ShiftDirection::Down &&
+                settings.ShiftOptions.DownshiftBlip) {
                 float expectedRPM = vehData.mWheelAverageDrivenTyreSpeed / (vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr - 1]);
                 if (vehData.mRPM < expectedRPM * 0.75f)
                     CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.66f);
             }
         }
-
     }
 
     // Ignores clutch 
