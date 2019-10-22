@@ -480,8 +480,13 @@ void resetSteeringMultiplier() {
 }
 
 void updateLastInputDevice() {
-    if (!settings.Debug.DisableInputDetect && 
-        carControls.PrevInput != carControls.GetLastInputDevice(carControls.PrevInput,settings.Wheel.Options.Enable)) {
+    if (settings.Debug.DisableInputDetect)
+        return;
+
+    if (!PED::IS_PED_IN_ANY_VEHICLE(playerPed, true))
+        return;
+
+    if (carControls.PrevInput != carControls.GetLastInputDevice(carControls.PrevInput,settings.Wheel.Options.Enable)) {
         carControls.PrevInput = carControls.GetLastInputDevice(carControls.PrevInput, settings.Wheel.Options.Enable);
         std::string message = "Input: ";
         switch (carControls.PrevInput) {
