@@ -897,7 +897,7 @@ void update_forcefeedbackmenu() {
     menu.FloatOption("Detail effect multiplier", settings.Wheel.FFB.DetailMult, 0.0f, 10.0f, 0.1f,
         { "Force feedback effects caused by the suspension. This effect is muxed with the main effect." });
 
-    menu.IntOption("Detail effect limit", settings.Wheel.FFB.DetailLim, 0, 20000, 1, 
+    menu.IntOption("Detail effect limit", settings.Wheel.FFB.DetailLim, 0, 20000, 100, 
         { "Clamp effect amplitude to this value. 20000 allows muxing with the main effect." });
 
     menu.IntOption("Detail effect averaging", settings.Wheel.FFB.DetailMAW, 1, 100, 1,
