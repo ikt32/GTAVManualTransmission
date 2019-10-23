@@ -249,7 +249,7 @@ void ScriptSettings::SaveWheel(CarControls *scriptControl) const {
     // [FORCE_FEEDBACK]
     settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
     settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Scale", Wheel.FFB.Scale);
-    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
+    settingsWheel.SetLongValue("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
     settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
     settingsWheel.SetLongValue("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
     settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
@@ -529,16 +529,16 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     // [FORCE_FEEDBACK]
     Wheel.FFB.Enable = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
     Wheel.FFB.Scale = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Scale", Wheel.FFB.Scale);
-    Wheel.FFB.AntiDeadForce = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
+    Wheel.FFB.AntiDeadForce = settingsWheel.GetLongValue("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
     Wheel.FFB.SATAmpMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
     Wheel.FFB.SATMax = settingsWheel.GetLongValue("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
     Wheel.FFB.SATFactor = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
-    Wheel.FFB.DamperMax = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DetailMult", Wheel.FFB.DetailMult);
-    Wheel.FFB.DamperMin = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
-    Wheel.FFB.DamperMinSpeed = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
-    Wheel.FFB.DetailMult = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMax", Wheel.FFB.DamperMax);
-    Wheel.FFB.DetailLim = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin);
-    Wheel.FFB.DetailMAW = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
+    Wheel.FFB.DamperMax = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMax", Wheel.FFB.DamperMax);
+    Wheel.FFB.DamperMin = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin); ;
+    Wheel.FFB.DamperMinSpeed = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
+    Wheel.FFB.DetailMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DetailMult", Wheel.FFB.DetailMult);
+    Wheel.FFB.DetailLim = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
+    Wheel.FFB.DetailMAW = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
     Wheel.FFB.CollisionMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
 
     // [INPUT_DEVICES]
