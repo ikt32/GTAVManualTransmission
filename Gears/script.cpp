@@ -565,24 +565,38 @@ void shiftTo(int gear, bool autoClutch) {
         gearStates.LockGear = gear;
     }
 }
+
 void functionHShiftTo(int i) {
-    if (settings.MTOptions.ClutchShiftH && vehData.mHasClutch) {
-        if (carControls.ClutchVal > 1.0f - settings.MTParams.ClutchThreshold) {
-            shiftTo(i, false);
-            gearStates.FakeNeutral = false;
-        }
-        else {
-            gearStates.FakeNeutral = true;
-            if (settings.MTOptions.EngDamage && vehData.mHasClutch) {
-                VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
-                    playerVehicle,
-                    VEHICLE::GET_VEHICLE_ENGINE_HEALTH(playerVehicle) - settings.MTParams.MisshiftDamage);
-            }
-        }
-    }
-    else {
+    bool shiftPass;
+
+    bool checkShift = settings.MTOptions.ClutchShiftH && vehData.mHasClutch;
+
+    // shifting from neutral into gear is OK when rev matched
+    float expectedRPM = vehData.mWheelAverageDrivenTyreSpeed / (vehData.mDriveMaxFlatVel / vehData.mGearRatios[i]);
+    bool rpmInRange = Math::Near(vehData.mRPM, expectedRPM, settings.ShiftOptions.RPMTolerance);
+
+    bool clutchPass = carControls.ClutchVal > 1.0f - settings.MTParams.ClutchThreshold;
+
+    if (!checkShift)
+        shiftPass = true;
+    else if (rpmInRange)
+        shiftPass = true;
+    else if (clutchPass)
+        shiftPass = true;
+    else
+        shiftPass = false;
+
+    if (shiftPass) {
         shiftTo(i, false);
         gearStates.FakeNeutral = false;
+    }
+    else {
+        gearStates.FakeNeutral = true;
+        if (settings.MTOptions.EngDamage && vehData.mHasClutch) {
+            VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
+                playerVehicle,
+                VEHICLE::GET_VEHICLE_ENGINE_HEALTH(playerVehicle) - settings.MTParams.MisshiftDamage);
+        }
     }
 }
 

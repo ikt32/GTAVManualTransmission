@@ -90,6 +90,7 @@ void ScriptSettings::SaveGeneral() const {
     settingsGeneral.SetBoolValue("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
     settingsGeneral.SetBoolValue("SHIFT_OPTIONS", "DownshiftBlip", ShiftOptions.DownshiftBlip);
     settingsGeneral.SetDoubleValue("SHIFT_OPTIONS", "ClutchRateMult", ShiftOptions.ClutchRateMult);
+    settingsGeneral.SetDoubleValue("SHIFT_OPTIONS", "RPMTolerance", ShiftOptions.RPMTolerance);
 
     // [AUTO_PARAMS]
     settingsGeneral.SetDoubleValue("AUTO_PARAMS", "UpshiftLoad", AutoParams.UpshiftLoad);
@@ -332,6 +333,7 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     ShiftOptions.UpshiftCut = settingsGeneral.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
     ShiftOptions.DownshiftBlip = settingsGeneral.GetBoolValue("SHIFT_OPTIONS", "DownshiftBlip", ShiftOptions.DownshiftBlip);
     ShiftOptions.ClutchRateMult = settingsGeneral.GetDoubleValue("SHIFT_OPTIONS", "ClutchRateMult", ShiftOptions.ClutchRateMult);
+    ShiftOptions.ClutchRateMult = settingsGeneral.GetDoubleValue("SHIFT_OPTIONS", "RPMTolerance", ShiftOptions.RPMTolerance);
 
     // [AUTO_PARAMS]
     AutoParams.UpshiftLoad = settingsGeneral.GetDoubleValue("AUTO_PARAMS", "UpshiftLoad", AutoParams.UpshiftLoad);

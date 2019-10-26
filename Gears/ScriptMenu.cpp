@@ -426,6 +426,11 @@ void update_shiftingoptionsmenu() {
         { "Helps rev matching." });
     menu.FloatOption("Clutch rate multiplier", settings.ShiftOptions.ClutchRateMult, 0.05f, 20.0f, 0.05f,
         { "Change how fast clutching is. Below 1 is slower, higher than 1 is faster." });
+    menu.FloatOption("Shifting RPM tolerance", settings.ShiftOptions.RPMTolerance, 0.0f, 1.0f, 0.05f,
+        { "RPM mismatch tolerance on shifts",
+            "Only applies to H-pattern with \"Clutch Shift\" enabled.",
+            fmt::format("Clutch Shift (H) is {}abled.", settings.MTOptions.ClutchShiftH ? "~g~en" : "~r~dis")
+        });
 }
 
 void update_finetuneautooptionsmenu() {

@@ -78,6 +78,7 @@ public:
         float ClutchRateMult = 1.0f;
         bool UpshiftCut = true;
         bool DownshiftBlip = true;
+        float RPMTolerance = 0.2f;
     } ShiftOptions;
 
     // [AUTO_PARAMS]
