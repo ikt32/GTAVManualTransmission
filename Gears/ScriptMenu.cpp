@@ -296,16 +296,18 @@ void update_mainmenu() {
         setShiftMode(static_cast<EShiftMode>(tempShiftMode));
     }
 
-    menu.MenuOption("Mod options", "optionsmenu", 
-        { "You can tweak and fine-tune gearbox simulation here." });
-    menu.MenuOption("Keyboard/Controller", "controlsmenu", 
-        { "Configure the keyboard and controller inputs." });
+    menu.MenuOption("Settings", "settingsmenu", 
+        { "Choose what parts of Manual Transmission are active." });
+    menu.MenuOption("Controller & Keyboard", "controlsmenu", 
+        { "Configure the controller and keyboard." });
     menu.MenuOption("Steering Wheel", "wheelmenu", 
         { "Set up your steering wheel." });
     menu.MenuOption("HUD Options", "hudmenu", 
         { "Toggle and move HUD elements. Choose between imperial or metric speeds." });
-    menu.MenuOption("Driving assists", "miscassistmenu",
-        { "Assist to make driving a bit easier." });
+    menu.MenuOption("Driving assists", "driveassistmenu",
+        { "ABS and TC options." });
+    menu.MenuOption("Gameplay assists", "gameassistmenu",
+        { "Assist to make playing a bit easier." });
     menu.MenuOption("Debug options", "debugmenu", 
         { "Show technical details and options." });
 
@@ -350,10 +352,26 @@ void update_mainmenu() {
     }
 }
 
-void update_optionsmenu() {
-    menu.Title("Mod options");
-    menu.Subtitle("Gearbox simulation options");
+void update_settingsmenu() {
+    menu.Title("Settings");
+    menu.Subtitle("Manual Transmission settings");
 
+    menu.MenuOption("Features", "featuresmenu",
+        { "Turn on or off parts of Manual Transmission." });
+
+    menu.MenuOption("Finetuning", "finetuneoptionsmenu",
+        { "Fine-tune the parameters above." });
+
+    menu.MenuOption("Shifting options", "shiftingoptionsmenu",
+        { "Change the shifting behavior for sequential and automatic modes." } );
+
+    menu.MenuOption("Automatic finetuning", "finetuneautooptionsmenu",
+        { "Fine-tune script-provided automatic transmission parameters." });
+}
+
+void update_featuresmenu() {
+    menu.Title("Features");
+    menu.Subtitle("Manual Transmission parts");
     menu.BoolOption("Engine Damage", settings.MTOptions.EngDamage,
         { "Damage the engine when over-revving and when mis-shifting." });
 
@@ -380,18 +398,6 @@ void update_optionsmenu() {
 
     menu.BoolOption("Hard rev limiter", settings.MTOptions.HardLimiter,
         { "Enforce rev limiter for reverse and top speed. No more infinite speed!" });
-
-    menu.BoolOption("Default Neutral gear", settings.GameAssists.DefaultNeutral,
-        { "The car will be in neutral when you get in." });
-
-    menu.MenuOption("Finetuning", "finetuneoptionsmenu",
-        { "Fine-tune the parameters above." });
-
-    menu.MenuOption("Shifting options", "shiftingoptionsmenu",
-        { "Change the shifting behavior for sequential and automatic modes." } );
-
-    menu.MenuOption("Automatic finetuning", "finetuneautooptionsmenu",
-        { "Fine-tune script-provided automatic transmission parameters." });
 }
 
 void update_finetuneoptionsmenu() {
@@ -418,14 +424,18 @@ void update_finetuneoptionsmenu() {
 
 void update_shiftingoptionsmenu() {
     menu.Title("Shifting options");
-    menu.Subtitle("Auto & sequential shift options");
+    menu.Subtitle("");
 
     menu.BoolOption("Cut throttle on upshift", settings.ShiftOptions.DownshiftBlip,
-        { "Helps rev matching." });
+        { "Helps rev matching.",
+            "Only applies to sequential mode."});
     menu.BoolOption("Blip throttle on downshift", settings.ShiftOptions.UpshiftCut,
-        { "Helps rev matching." });
+        { "Helps rev matching.",
+            "Only applies to sequential mode." });
     menu.FloatOption("Clutch rate multiplier", settings.ShiftOptions.ClutchRateMult, 0.05f, 20.0f, 0.05f,
-        { "Change how fast clutching is. Below 1 is slower, higher than 1 is faster." });
+        { "Change how fast clutching is. Below 1 is slower, higher than 1 is faster.",
+            "Only applies to sequential mode." });
+
     menu.FloatOption("Shifting RPM tolerance", settings.ShiftOptions.RPMTolerance, 0.0f, 1.0f, 0.05f,
         { "RPM mismatch tolerance on shifts",
             "Only applies to H-pattern with \"Clutch Shift\" enabled.",
@@ -457,8 +467,8 @@ void update_finetuneautooptionsmenu() {
 }
 
 void update_controlsmenu() {
-    menu.Title("Controller and keyboard options");
-    menu.Subtitle("Options and assignments");
+    menu.Title("Controls");
+    menu.Subtitle("Controller & Keyboard");
 
     menu.MenuOption("Controller options", "controlleroptionsmenu");
 
@@ -474,7 +484,8 @@ void update_controlsmenu() {
     menu.MenuOption("Keyboard bindings", "keyboardmenu",
         { "Change keyboard control bindings." });
 
-    menu.MenuOption("Steering assists", "steeringassistmenu");
+    menu.MenuOption("Steering assists", "steeringassistmenu",
+        { "Customize steering input for keyboards and controllers." });
 }
 
 void update_controlleroptionsmenu() {
@@ -1135,23 +1146,35 @@ void update_wheelinfomenu() {
     menu.IntOption("Clutch Bar Alpha  ", settings.HUD.Wheel.PedalClutchA  , 0, 255);
 }
 
-void update_miscassistmenu() {
+void update_driveassistmenu() {
     menu.Title("Driving assists");
     menu.Subtitle("Assists to make driving easier");
 
     menu.BoolOption("Enable ABS", settings.DriveAssists.CustomABS,
         { "Experimental script-driven ABS." });
+
     menu.BoolOption("Only enable ABS if not present", settings.DriveAssists.ABSFilter,
         { "Only enables script-driven ABS on vehicles without the ABS flag." });
 
     menu.StringArray("Traction Control mode", tcsStrings, settings.DriveAssists.TCMode,
-        { "Disabled", "Brakes", "Throttle" });
+        { "On traction loss: ",
+            "Disabled: Do nothing",
+            "Brakes: Apply brake per wheel",
+            "Throttle: Cut throttle" });
+}
+
+void update_gameassistmenu() {
+    menu.Title("Gameplay assists");
+    menu.Subtitle("Simplify Manual Transmission");
+
+    menu.BoolOption("Default Neutral gear", settings.GameAssists.DefaultNeutral,
+        { "The car will be in neutral when you get in." });
 
     menu.BoolOption("Simple Bike", settings.GameAssists.SimpleBike,
         { "Disables bike engine stalling and the clutch bite simulation." });
 
     menu.BoolOption("Hill gravity workaround", settings.GameAssists.HillGravity,
-        { "Gives the car a push to overcome the games' default brakes at a stop." });
+        { "Gives the car a push to overcome the games' default brakes when stopped." });
 
     menu.BoolOption("Auto gear 1", settings.GameAssists.AutoGear1,
         { "Automatically switch to first gear when the car reaches a standstill." });
@@ -1238,16 +1261,19 @@ void update_menu() {
     /* mainmenu */
     if (menu.CurrentMenu("mainmenu")) { update_mainmenu(); }
 
-    /* mainmenu -> optionsmenu */
-    if (menu.CurrentMenu("optionsmenu")) { update_optionsmenu(); }
+    /* mainmenu -> settingsmenu */
+    if (menu.CurrentMenu("settingsmenu")) { update_settingsmenu(); }
 
-    /* mainmenu -> optionsmenu -> finetuneoptionsmenu */
+    /* mainmenu -> settingsmenu -> featuresmenu */
+    if (menu.CurrentMenu("featuresmenu")) { update_featuresmenu(); }
+
+    /* mainmenu -> settingsmenu -> finetuneoptionsmenu */
     if (menu.CurrentMenu("finetuneoptionsmenu")) { update_finetuneoptionsmenu(); }
 
-    /* mainmenu -> optionsmenu -> shiftingoptionsmenu */
+    /* mainmenu -> settingsmenu -> shiftingoptionsmenu */
     if (menu.CurrentMenu("shiftingoptionsmenu")) { update_shiftingoptionsmenu(); }
 
-    /* mainmenu -> optionsmenu -> finetuneautooptionsmenu */
+    /* mainmenu -> settingsmenu -> finetuneautooptionsmenu */
     if (menu.CurrentMenu("finetuneautooptionsmenu")) { update_finetuneautooptionsmenu(); }
 
     /* mainmenu -> controlsmenu */
@@ -1264,6 +1290,9 @@ void update_menu() {
 
     /* mainmenu -> controlsmenu -> keyboardmenu */
     if (menu.CurrentMenu("keyboardmenu")) { update_keyboardmenu(); }
+
+    /* mainmenu -> controlsmenu -> steeringassistmenu */
+    if (menu.CurrentMenu("steeringassistmenu")) { update_steeringassistmenu(); }
 
     /* mainmenu -> wheelmenu */
     if (menu.CurrentMenu("wheelmenu")) { update_wheelmenu(); }
@@ -1295,11 +1324,11 @@ void update_menu() {
     /* mainmenu -> hudmenu -> wheelinfomenu*/
     if (menu.CurrentMenu("wheelinfomenu")) { update_wheelinfomenu(); }
 
-    /* mainmenu -> miscassistmenu */
-    if (menu.CurrentMenu("miscassistmenu")) { update_miscassistmenu(); }
+    /* mainmenu -> driveassistmenu */
+    if (menu.CurrentMenu("driveassistmenu")) { update_driveassistmenu(); }
 
-    /* mainmenu -> miscassistmenu -> steeringassistmenu */
-    if (menu.CurrentMenu("steeringassistmenu")) { update_steeringassistmenu(); }
+    /* mainmenu -> gameassistmenu */
+    if (menu.CurrentMenu("gameassistmenu")) { update_gameassistmenu(); }
 
     /* mainmenu -> debugmenu */
     if (menu.CurrentMenu("debugmenu")) { update_debugmenu(); }
