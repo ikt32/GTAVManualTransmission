@@ -1,17 +1,21 @@
 #include "ScriptUtils.h"
 
+#include "ScriptSettings.hpp"
 #include "Constants.h"
 #include "Util/MathExt.h"
 #include "Util/UIUtils.h"
 #include "inc/natives.h"
 #include "fmt/format.h"
 
+extern ScriptSettings settings;
 
 namespace {
     int notificationHandle = 0;
 }
 
-void UI::Notify(const std::string& message) {
+void UI::Notify(int level, const std::string& message) {
+    if (level < settings.HUD.NotifyLevel)
+        return;
     int* notifHandleAddr = &notificationHandle; // prevents optimizing away the pointery thing
     showNotification(fmt::format("{}\n{}", Constants::NotificationPrefix, message), notifHandleAddr);
 }

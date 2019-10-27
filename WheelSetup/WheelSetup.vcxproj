@@ -166,6 +166,7 @@
     <ClInclude Include="..\Gears\Util\Logger.hpp" />
     <ClInclude Include="..\Gears\Util\Paths.h" />
     <ClInclude Include="..\Gears\Util\TimeHelper.hpp" />
+    <ClInclude Include="..\Gears\Util\Util.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Gears\Input\DIDeviceFactory.cpp" />
@@ -178,6 +179,7 @@
     <ClCompile Include="..\Gears\Util\Logger.cpp" />
     <ClCompile Include="..\Gears\Util\Paths.cpp" />
     <ClCompile Include="..\Gears\Util\TimeHelper.cpp" />
+    <ClCompile Include="..\Gears\Util\Util.cpp" />
     <ClCompile Include="..\thirdparty\fmt\src\format.cc" />
     <ClCompile Include="..\thirdparty\fmt\src\posix.cc" />
     <ClCompile Include="WheelSetup.cpp" />

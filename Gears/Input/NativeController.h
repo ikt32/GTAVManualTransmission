@@ -83,7 +83,6 @@ public:
 
     float GetAnalogValue(GameButtons gameButton);
     GameButtons EControlToButton(int eControlItem);
-    void SetTriggerValue(float value);
 
 private:
     std::array<__int64, SIZEOF_GameButtons> pressTime;
@@ -92,6 +91,5 @@ private:
     std::array<__int64, SIZEOF_GameButtons> tapReleaseTime;
     std::array<bool, SIZEOF_GameButtons> gameButtonCurr;
     std::array<bool, SIZEOF_GameButtons> gameButtonPrev;
-    float triggerValue;
 };
 

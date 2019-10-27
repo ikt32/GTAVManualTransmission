@@ -109,8 +109,7 @@ public:
 
     float GetAnalogValue(XboxButtons buttonType);
     XboxButtons StringToButton(const std::string &buttonString);
-    void SetTriggerValue(float value);
-    float GetTriggerValue();
+
     void Vibrate(int leftval = 0, int rightval = 0);
 
 private:
@@ -120,7 +119,6 @@ private:
     std::array<__int64, SIZEOF_XboxButtons> tapReleaseTime;
     std::array<bool, SIZEOF_XboxButtons> xboxButtonCurr;
     std::array<bool, SIZEOF_XboxButtons> xboxButtonPrev;
-    float triggerValue = 0.75f;
 
     XINPUT_STATE controllerState;
     WORD buttonState;

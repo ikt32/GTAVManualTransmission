@@ -15,7 +15,6 @@
 
 #include "ScriptSettings.hpp"
 #include "VehicleData.hpp"
-#include "ShiftModes.h"
 
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/Offsets.hpp"
@@ -130,7 +129,7 @@ void update_vehicle() {
         if (vehData.mGearTop == 1 || vehData.mFlags[1] & FLAG_IS_ELECTRIC)
             gearStates.FakeNeutral = false;
         else
-            gearStates.FakeNeutral = settings.DefaultNeutral;
+            gearStates.FakeNeutral = settings.GameAssists.DefaultNeutral;
     }
 
     lastVehicle = playerVehicle;
@@ -147,24 +146,24 @@ void update_hud() {
         return;
     }
 
-    if (settings.DisplayInfo) {
+    if (settings.Debug.DisplayInfo) {
         drawDebugInfo();
     }
-    if (settings.DisplayWheelInfo) {
+    if (settings.Debug.DisplayWheelInfo) {
         drawVehicleWheelInfo();
     }
-    if (settings.HUD && vehData.mDomain == VehicleDomain::Road &&
-        (settings.EnableManual || settings.AlwaysHUD)) {
+    if (settings.HUD.Enable && vehData.mDomain == VehicleDomain::Road &&
+        (settings.MTOptions.Enable || settings.HUD.Always)) {
         drawHUD();
     }
-    if (settings.HUD &&
+    if (settings.HUD.Enable &&
         (vehData.mDomain == VehicleDomain::Road || vehData.mDomain == VehicleDomain::Water) &&
-        (carControls.PrevInput == CarControls::Wheel || settings.AlwaysSteeringWheelInfo) &&
-        settings.SteeringWheelInfo && textureWheelId != -1) {
+        (carControls.PrevInput == CarControls::Wheel || settings.HUD.Wheel.Always) &&
+        settings.HUD.Wheel.Enable && textureWheelId != -1) {
         drawInputWheelInfo();
     }
 
-    if (settings.DisplayFFBInfo) {
+    if (settings.Debug.DisplayFFBInfo) {
         WheelInput::DrawDebugLines();
     }
 }
@@ -178,8 +177,8 @@ void wheelControlWater() {
 
 void wheelControlRoad() {
     WheelInput::CheckButtons();
-    if (settings.EnableManual && 
-        !(vehData.mClass == VehicleClass::Bike && settings.SimpleBike)) {
+    if (settings.MTOptions.Enable && 
+        !(vehData.mClass == VehicleClass::Bike && settings.GameAssists.SimpleBike)) {
         WheelInput::HandlePedals(carControls.ThrottleVal, carControls.BrakeVal);
     }
     else {
@@ -204,7 +203,7 @@ void update_input_controls() {
     blockButtons();
     startStopEngine();
 
-    if (!settings.EnableWheel || carControls.PrevInput != CarControls::Wheel) {
+    if (!settings.Wheel.Options.Enable || carControls.PrevInput != CarControls::Wheel) {
         return;
     }
 
@@ -251,7 +250,7 @@ void update_misc_features() {
         return;
 
     if (Util::VehicleAvailable(playerVehicle, playerPed)) {
-        if (settings.AutoLookBack && vehData.mClass != VehicleClass::Heli) {
+        if (settings.GameAssists.AutoLookBack && vehData.mClass != VehicleClass::Heli) {
             functionAutoLookback();
         }
     }
@@ -263,12 +262,12 @@ void update_misc_features() {
 // Called inside manual transmission part!
 // Mostly optional stuff.
 void update_manual_features() {
-    if (settings.HillBrakeWorkaround) {
+    if (settings.GameAssists.HillGravity) {
         functionHillGravity();
     }
 
     if (carControls.PrevInput != CarControls::InputDevices::Wheel) {
-        if (vehData.mClass == VehicleClass::Bike && settings.SimpleBike) {
+        if (vehData.mClass == VehicleClass::Bike && settings.GameAssists.SimpleBike) {
             functionAutoReverse();
         }
         else {
@@ -276,7 +275,7 @@ void update_manual_features() {
         }
     }
 
-    if (settings.EngBrake) {
+    if (settings.MTOptions.EngBrake) {
         functionEngBrake();
     }
     else {
@@ -284,11 +283,11 @@ void update_manual_features() {
     }
 
     // Engine damage: RPM Damage
-    if (settings.EngDamage && vehData.mHasClutch) {
+    if (settings.MTOptions.EngDamage && vehData.mHasClutch) {
         functionEngDamage();
     }
 
-    if (settings.EngLock) {
+    if (settings.MTOptions.EngLock) {
         functionEngLock();
     }
     else {
@@ -296,16 +295,16 @@ void update_manual_features() {
     }
 
     if (!gearStates.FakeNeutral &&
-        !(settings.SimpleBike && vehData.mClass == VehicleClass::Bike) && vehData.mHasClutch) {
+        !(settings.GameAssists.SimpleBike && vehData.mClass == VehicleClass::Bike) && vehData.mHasClutch) {
         // Stalling
-        if (settings.EngStall && settings.ShiftMode == HPattern ||
-            settings.EngStallS && settings.ShiftMode == Sequential) {
+        if (settings.MTOptions.EngStallH && settings.MTOptions.ShiftMode == EShiftMode::HPattern ||
+            settings.MTOptions.EngStallS && settings.MTOptions.ShiftMode == EShiftMode::Sequential) {
             functionEngStall();
         }
 
         // Simulate "catch point"
         // When the clutch "grabs" and the car starts moving without input
-        if (settings.ClutchCatching && VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(playerVehicle)) {
+        if (settings.MTOptions.ClutchCreep && VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(playerVehicle)) {
             functionClutchCatch();
         }
     }
@@ -325,11 +324,11 @@ void update_manual_transmission() {
         carControls.ButtonHeld(CarControls::WheelControlType::Toggle, 500) ||
         carControls.ButtonHeld(CarControls::ControllerControlType::Toggle) ||
         carControls.PrevInput == CarControls::Controller	&& carControls.ButtonHeld(CarControls::LegacyControlType::Toggle)) {
-        toggleManual(!settings.EnableManual);
+        toggleManual(!settings.MTOptions.Enable);
         return;
     }
 
-    if (vehData.mDomain != VehicleDomain::Road || !settings.EnableManual)
+    if (vehData.mDomain != VehicleDomain::Road || !settings.MTOptions.Enable)
         return;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -348,25 +347,25 @@ void update_manual_transmission() {
     }
     update_manual_features();
 
-    switch(settings.ShiftMode) {
-        case Sequential: {
+    switch(settings.MTOptions.ShiftMode) {
+        case EShiftMode::Sequential: {
             functionSShift();
-            if (settings.AutoGear1) {
+            if (settings.GameAssists.AutoGear1) {
                 functionAutoGear1();
             }
             break;
         }
-        case HPattern: {
+        case EShiftMode::HPattern: {
             if (carControls.PrevInput == CarControls::Wheel) {
                 functionHShiftWheel();
             }
             if (carControls.PrevInput == CarControls::Keyboard ||
-                carControls.PrevInput == CarControls::Wheel && settings.HPatternKeyboard) {
+                carControls.PrevInput == CarControls::Wheel && settings.Wheel.Options.HPatternKeyboard) {
                 functionHShiftKeyboard();
             }
             break;
         }
-        case Automatic: {
+        case EShiftMode::Automatic: {
             functionAShift();
             break;
         }
@@ -405,15 +404,15 @@ void clearPatches() {
 
 void toggleManual(bool enable) {
     // Don't need to do anything
-    if (settings.EnableManual == enable)
+    if (settings.MTOptions.Enable == enable)
         return;
-    settings.EnableManual = enable;
+    settings.MTOptions.Enable = enable;
     settings.SaveGeneral();
-    if (settings.EnableManual) {
-        UI::Notify("MT Enabled");
+    if (settings.MTOptions.Enable) {
+        UI::Notify(INFO, "MT Enabled");
     }
     else {
-        UI::Notify("MT Disabled");
+        UI::Notify(INFO, "MT Disabled");
     }
     readSettings();
     initWheel();
@@ -422,12 +421,12 @@ void toggleManual(bool enable) {
 
 void initWheel() {
     carControls.InitWheel();
-    carControls.CheckGUIDs(settings.RegisteredGUIDs);
+    carControls.CheckGUIDs(settings.Wheel.InputDevices.RegisteredGUIDs);
     logger.Write(INFO, "[Wheel] Steering wheel initialization finished");
 }
 
 void stopForceFeedback() {
-    carControls.StopFFB(settings.LogiLEDs);
+    carControls.StopFFB(settings.Wheel.Options.LogiLEDs);
 }
 
 void update_steering() {
@@ -466,7 +465,7 @@ void updateSteeringMultiplier() {
     float mult;
 
     if (carControls.PrevInput == CarControls::Wheel) {
-        mult = settings.GameSteerMultWheel;
+        mult = settings.Wheel.Steering.SteerMult;
     }
     else {
         mult = settings.CustomSteering.SteeringMult;
@@ -481,9 +480,14 @@ void resetSteeringMultiplier() {
 }
 
 void updateLastInputDevice() {
-    if (!settings.DisableInputDetect && 
-        carControls.PrevInput != carControls.GetLastInputDevice(carControls.PrevInput,settings.EnableWheel)) {
-        carControls.PrevInput = carControls.GetLastInputDevice(carControls.PrevInput, settings.EnableWheel);
+    if (settings.Debug.DisableInputDetect)
+        return;
+
+    if (!PED::IS_PED_IN_ANY_VEHICLE(playerPed, true))
+        return;
+
+    if (carControls.PrevInput != carControls.GetLastInputDevice(carControls.PrevInput,settings.Wheel.Options.Enable)) {
+        carControls.PrevInput = carControls.GetLastInputDevice(carControls.PrevInput, settings.Wheel.Options.Enable);
         std::string message = "Input: ";
         switch (carControls.PrevInput) {
             case CarControls::Keyboard:
@@ -491,9 +495,10 @@ void updateLastInputDevice() {
                 break;
             case CarControls::Controller:
                 message += "Controller";
-                if (settings.ShiftMode == HPattern && settings.BlockHShift) {
+                if (settings.MTOptions.ShiftMode == EShiftMode::HPattern &&
+                    settings.Controller.BlockHShift) {
                     message += "~n~Mode: Sequential";
-                    setShiftMode(Sequential);
+                    setShiftMode(EShiftMode::Sequential);
                 }
                 break;
             case CarControls::Wheel:
@@ -503,7 +508,7 @@ void updateLastInputDevice() {
         }
         // Suppress notification when not in car
         if (Util::VehicleAvailable(playerVehicle, playerPed)) {
-            UI::Notify(message);
+            UI::Notify(INFO, message);
         }
     }
     if (carControls.PrevInput == CarControls::Wheel) {
@@ -518,40 +523,32 @@ void updateLastInputDevice() {
 //                           Mod functions: Shifting
 ///////////////////////////////////////////////////////////////////////////////
 
-void setShiftMode(int shiftMode) {
-    if (shiftMode > 2 || shiftMode < 0)
-        return;
-
-    if (Util::VehicleAvailable(playerVehicle, playerPed) && shiftMode != HPattern && vehData.mGearCurr > 1)
+void setShiftMode(EShiftMode shiftMode) {
+    if (Util::VehicleAvailable(playerVehicle, playerPed) && shiftMode != EShiftMode::HPattern && vehData.mGearCurr > 1)
         gearStates.FakeNeutral = false;
 
-    if (shiftMode == HPattern &&
+    if (shiftMode == EShiftMode::HPattern &&
         carControls.PrevInput == CarControls::Controller && 
-        settings.BlockHShift) {
-        settings.ShiftMode = Automatic;
+        settings.Controller.BlockHShift) {
+        settings.MTOptions.ShiftMode = EShiftMode::Automatic;
     }
     else {
-        settings.ShiftMode = static_cast<ShiftModes>(shiftMode);
+        settings.MTOptions.ShiftMode = shiftMode;
     }
 
     std::string mode = "Mode: ";
     // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
-    switch (settings.ShiftMode) {
-        case Sequential: mode += "Sequential"; break;
-        case HPattern: mode += "H-Pattern"; break;
-        case Automatic: mode += "Automatic"; break;
-        default: break;
+    switch (settings.MTOptions.ShiftMode) {
+        case EShiftMode::Sequential:    mode += "Sequential";   break;
+        case EShiftMode::HPattern:      mode += "H-Pattern";    break;
+        case EShiftMode::Automatic:     mode += "Automatic";    break;
+        default:                                                break;
     }
-    UI::Notify(mode);
+    UI::Notify(INFO, mode);
 }
 
 void cycleShiftMode() {
-    int tempShiftMode = settings.ShiftMode + 1;
-    if (tempShiftMode >= SIZEOF_ShiftModes) {
-        tempShiftMode = static_cast<ShiftModes>(0);
-    }
-
-    setShiftMode(tempShiftMode);
+    setShiftMode(Next(settings.MTOptions.ShiftMode));
     settings.SaveGeneral();
 }
 
@@ -568,24 +565,38 @@ void shiftTo(int gear, bool autoClutch) {
         gearStates.LockGear = gear;
     }
 }
+
 void functionHShiftTo(int i) {
-    if (settings.ClutchShiftingH && vehData.mHasClutch) {
-        if (carControls.ClutchVal > 1.0f - settings.ClutchThreshold) {
-            shiftTo(i, false);
-            gearStates.FakeNeutral = false;
-        }
-        else {
-            gearStates.FakeNeutral = true;
-            if (settings.EngDamage && vehData.mHasClutch) {
-                VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
-                    playerVehicle,
-                    VEHICLE::GET_VEHICLE_ENGINE_HEALTH(playerVehicle) - settings.MisshiftDamage);
-            }
-        }
-    }
-    else {
+    bool shiftPass;
+
+    bool checkShift = settings.MTOptions.ClutchShiftH && vehData.mHasClutch;
+
+    // shifting from neutral into gear is OK when rev matched
+    float expectedRPM = vehData.mWheelAverageDrivenTyreSpeed / (vehData.mDriveMaxFlatVel / vehData.mGearRatios[i]);
+    bool rpmInRange = Math::Near(vehData.mRPM, expectedRPM, settings.ShiftOptions.RPMTolerance);
+
+    bool clutchPass = carControls.ClutchVal > 1.0f - settings.MTParams.ClutchThreshold;
+
+    if (!checkShift)
+        shiftPass = true;
+    else if (rpmInRange)
+        shiftPass = true;
+    else if (clutchPass)
+        shiftPass = true;
+    else
+        shiftPass = false;
+
+    if (shiftPass) {
         shiftTo(i, false);
         gearStates.FakeNeutral = false;
+    }
+    else {
+        gearStates.FakeNeutral = true;
+        if (settings.MTOptions.EngDamage && vehData.mHasClutch) {
+            VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
+                playerVehicle,
+                VEHICLE::GET_VEHICLE_ENGINE_HEALTH(playerVehicle) - settings.MTParams.MisshiftDamage);
+        }
     }
 }
 
@@ -626,9 +637,9 @@ void functionHShiftWheel() {
     }
 
     if (isHShifterJustNeutral()) {
-        if (settings.ClutchShiftingH &&
-            settings.EngDamage && vehData.mHasClutch) {
-            if (carControls.ClutchVal < 1.0 - settings.ClutchThreshold) {
+        if (settings.MTOptions.ClutchShiftH &&
+            settings.MTOptions.EngDamage && vehData.mHasClutch) {
+            if (carControls.ClutchVal < 1.0 - settings.MTParams.ClutchThreshold) {
             }
         }
         gearStates.FakeNeutral = vehData.mHasClutch;
@@ -664,7 +675,7 @@ void updateShifting() {
     float rateDown = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleDownShift);
 
     float shiftRate = gearStates.ShiftDirection == ShiftDirection::Up ? rateUp : rateDown;
-    shiftRate *= settings.ClutchRateMult;
+    shiftRate *= settings.ShiftOptions.ClutchRateMult;
 
     /*
      * 4.0 gives similar perf as base - probably the whole shift takes 1/rate seconds
@@ -704,7 +715,7 @@ void functionSShift() {
     auto ncTapStateUp = carControls.ButtonTapped(CarControls::LegacyControlType::ShiftUp);
     auto ncTapStateDn = carControls.ButtonTapped(CarControls::LegacyControlType::ShiftDown);
 
-    if (settings.IgnoreShiftsUI && isUIActive()) {
+    if (settings.Controller.IgnoreShiftsUI && isUIActive()) {
         xcTapStateUp = xcTapStateDn = XInputController::TapState::ButtonUp;
         ncTapStateUp = ncTapStateDn = NativeController::TapState::ButtonUp;
     }
@@ -723,8 +734,8 @@ void functionSShift() {
         }
 
         // Shift block /w clutch shifting for seq.
-        if (settings.ClutchShiftingS && 
-            carControls.ClutchVal < 1.0f - settings.ClutchThreshold) {
+        if (settings.MTOptions.ClutchShiftS && 
+            carControls.ClutchVal < 1.0f - settings.MTParams.ClutchThreshold) {
             return;
         }
 
@@ -764,8 +775,8 @@ void functionSShift() {
         }
 
         // Shift block /w clutch shifting for seq.
-        if (settings.ClutchShiftingS &&
-            carControls.ClutchVal < 1.0f - settings.ClutchThreshold) {
+        if (settings.MTOptions.ClutchShiftS &&
+            carControls.ClutchVal < 1.0f - settings.MTParams.ClutchThreshold) {
             return;
         }
 
@@ -801,7 +812,7 @@ bool subAutoShiftSequential() {
     auto ncTapStateUp = carControls.ButtonTapped(CarControls::LegacyControlType::ShiftUp);
     auto ncTapStateDn = carControls.ButtonTapped(CarControls::LegacyControlType::ShiftDown);
 
-    if (settings.IgnoreShiftsUI && isUIActive()) {
+    if (settings.Controller.IgnoreShiftsUI && isUIActive()) {
         xcTapStateUp = xcTapStateDn = XInputController::TapState::ButtonUp;
         ncTapStateUp = ncTapStateDn = NativeController::TapState::ButtonUp;
     }
@@ -911,7 +922,7 @@ bool subAutoShiftSelect() {
 
 void functionAShift() { 
     // Manual part
-    if (carControls.PrevInput == CarControls::Wheel && settings.UseShifterForAuto) {
+    if (carControls.PrevInput == CarControls::Wheel && settings.Wheel.Options.UseShifterForAuto) {
         if (subAutoShiftSelect()) 
             return;
     }
@@ -929,7 +940,7 @@ void functionAShift() {
     if (carControls.ThrottleVal >= gearStates.ThrottleHang)
         gearStates.ThrottleHang = carControls.ThrottleVal;
     else if (gearStates.ThrottleHang > 0.0f)
-        gearStates.ThrottleHang -= GAMEPLAY::GET_FRAME_TIME() * settings.EcoRate;
+        gearStates.ThrottleHang -= GAMEPLAY::GET_FRAME_TIME() * settings.AutoParams.EcoRate;
 
     if (gearStates.ThrottleHang < 0.0f)
         gearStates.ThrottleHang = 0.0f;
@@ -938,14 +949,14 @@ void functionAShift() {
 
     float nextGearMinSpeed = 0.0f; // don't care about top gear
     if (currGear < vehData.mGearTop) {
-        nextGearMinSpeed = settings.NextGearMinRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear + 1];
+        nextGearMinSpeed = settings.AutoParams.NextGearMinRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear + 1];
     }
 
-    float currGearMinSpeed = settings.CurrGearMinRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear];
+    float currGearMinSpeed = settings.AutoParams.CurrGearMinRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[currGear];
 
     float engineLoad = gearStates.ThrottleHang - map(vehData.mRPM, 0.2f, 1.0f, 0.0f, 1.0f);
     gearStates.EngineLoad = engineLoad;
-    gearStates.UpshiftLoad = settings.UpshiftLoad;
+    gearStates.UpshiftLoad = settings.AutoParams.UpshiftLoad;
 
     bool skidding = false;
     for (auto x : ext.GetWheelSkidSmokeEffect(playerVehicle)) {
@@ -955,7 +966,7 @@ void functionAShift() {
 
     // Shift up.
     if (currGear < vehData.mGearTop) {
-        if (engineLoad < settings.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
+        if (engineLoad < settings.AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
             shiftTo(vehData.mGearCurr + 1, true);
             gearStates.FakeNeutral = false;
             gearStates.LastUpshiftTime = GAMEPLAY::GET_GAME_TIMER();
@@ -971,13 +982,13 @@ void functionAShift() {
     }
 
     float rateUp = *reinterpret_cast<float*>(vehData.mHandlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
-    float upshiftDuration = 1.0f / (rateUp * settings.ClutchRateMult);
-    bool tpPassed = GAMEPLAY::GET_GAME_TIMER() > gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * settings.DownshiftTimeoutMult);
-    gearStates.DownshiftLoad = settings.DownshiftLoad * gearRatioRatio;
+    float upshiftDuration = 1.0f / (rateUp * settings.ShiftOptions.ClutchRateMult);
+    bool tpPassed = GAMEPLAY::GET_GAME_TIMER() > gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * settings.AutoParams.DownshiftTimeoutMult);
+    gearStates.DownshiftLoad = settings.AutoParams.DownshiftLoad * gearRatioRatio;
 
     // Shift down
     if (currGear > 1) {
-        if (tpPassed && engineLoad > settings.DownshiftLoad * gearRatioRatio || currSpeed < currGearMinSpeed) {
+        if (tpPassed && engineLoad > settings.AutoParams.DownshiftLoad * gearRatioRatio || currSpeed < currGearMinSpeed) {
             shiftTo(currGear - 1, true);
             gearStates.FakeNeutral = false;
         }
@@ -992,12 +1003,12 @@ void functionClutchCatch() {
     // TODO: Make more subtle / use throttle?
     const float idleThrottle = 0.24f; // TODO -> Settings?
 
-    float clutchRatio = map(carControls.ClutchVal, settings.ClutchThreshold, 1.0f, 1.0f, 0.0f);
+    float clutchRatio = map(carControls.ClutchVal, 1.0f - settings.MTParams.ClutchThreshold, 0.0f, 0.0f, 1.0f);
     clutchRatio = std::clamp(clutchRatio, 0.0f, 1.0f);
 
-    // TODO: Check for settings.ShiftMode == Automatic if anybody complains...
+    // TODO: Check for settings.MTOptions.ShiftMode == Automatic if anybody complains...
 
-    bool clutchEngaged = carControls.ClutchVal < 1.0f - settings.ClutchThreshold;
+    bool clutchEngaged = carControls.ClutchVal < 1.0f - settings.MTParams.ClutchThreshold;
     float minSpeed = 0.2f * (vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr]);
     float expectedSpeed = vehData.mRPM * (vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr]) * clutchRatio;
     float actualSpeed = vehData.mWheelAverageDrivenTyreSpeed;
@@ -1019,7 +1030,7 @@ void functionClutchCatch() {
 void functionEngStall() {
     const float stallRate = GAMEPLAY::GET_FRAME_TIME() * 3.33f;
 
-    float minSpeed = settings.StallingRPM * abs(vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr]);
+    float minSpeed = settings.MTParams.StallingRPM * abs(vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr]);
     float actualSpeed = vehData.mWheelAverageDrivenTyreSpeed;
 
     // Closer to idle speed = less buildup for stalling
@@ -1028,8 +1039,8 @@ void functionEngStall() {
     if (speedDiffRatio < 0.45f)
         speedDiffRatio = 0.0f; //ignore if we're close-ish to idle
     
-    bool clutchEngaged = carControls.ClutchVal < 1.0f - settings.ClutchThreshold;
-    bool stallEngaged = carControls.ClutchVal < 1.0f - settings.StallingThreshold;
+    bool clutchEngaged = carControls.ClutchVal < 1.0f - settings.MTParams.ClutchThreshold;
+    bool stallEngaged = carControls.ClutchVal < 1.0f - settings.MTParams.StallingThreshold;
 
     // this thing is big when the clutch isnt pressed
     float invClutch = 1.0f - carControls.ClutchVal;
@@ -1067,7 +1078,7 @@ void functionEngStall() {
 }
 
 void functionEngDamage() {
-    if (settings.ShiftMode == Automatic ||
+    if (settings.MTOptions.ShiftMode == EShiftMode::Automatic ||
         vehData.mFlags[1] & eVehicleFlag2::FLAG_IS_ELECTRIC || 
         vehData.mGearTop == 1) {
         return;
@@ -1077,12 +1088,12 @@ void functionEngDamage() {
         vehData.mRPM > 0.98f &&
         carControls.ThrottleVal > 0.98f) {
         VEHICLE::SET_VEHICLE_ENGINE_HEALTH(playerVehicle, 
-                                           VEHICLE::GET_VEHICLE_ENGINE_HEALTH(playerVehicle) - (settings.RPMDamage));
+                                           VEHICLE::GET_VEHICLE_ENGINE_HEALTH(playerVehicle) - (settings.MTParams.RPMDamage));
     }
 }
 
 void functionEngLock() {
-    if (settings.ShiftMode == Automatic ||
+    if (settings.MTOptions.ShiftMode == EShiftMode::Automatic ||
         vehData.mFlags[1] & eVehicleFlag2::FLAG_IS_ELECTRIC ||
         vehData.mGearTop == 1 || 
         vehData.mGearCurr == vehData.mGearTop ||
@@ -1117,7 +1128,7 @@ void functionEngLock() {
     }
 
     // Wheels are locking up due to bad (down)shifts
-    if ((speed > abs(maxSpeed * 1.15f) + 3.334f || wrongDirection) && inputMultiplier > settings.ClutchThreshold) {
+    if ((speed > abs(maxSpeed * 1.15f) + 3.334f || wrongDirection) && inputMultiplier > settings.MTParams.ClutchThreshold) {
         wheelPatchStates.EngLockActive = true;
         float lockingForce = 60.0f * inputMultiplier;
         auto wheelsToLock = vehData.mWheelsDriven;//getDrivenWheels();
@@ -1134,8 +1145,8 @@ void functionEngLock() {
         }
         fakeRev(true, 1.0f);
         float oldEngineHealth = VEHICLE::GET_VEHICLE_ENGINE_HEALTH(playerVehicle);
-        float damageToApply = settings.MisshiftDamage * inputMultiplier;
-        if (settings.EngDamage) {
+        float damageToApply = settings.MTParams.MisshiftDamage * inputMultiplier;
+        if (settings.MTOptions.EngDamage) {
             if (oldEngineHealth >= damageToApply) {
                 VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
                     playerVehicle,
@@ -1145,7 +1156,7 @@ void functionEngLock() {
                 VEHICLE::SET_VEHICLE_ENGINE_ON(playerVehicle, false, true, true);
             }
         }
-        if (settings.DisplayInfo) {
+        if (settings.Debug.DisplayInfo) {
             showText(0.5, 0.80, 0.25, fmt::format("Eng block: {:.3f}", inputMultiplier));
             showText(0.5, 0.85, 0.25, fmt::format("Eng block force: {:.3f}", lockingForce));
         }
@@ -1157,7 +1168,7 @@ void functionEngLock() {
 
 void functionEngBrake() {
     // When you let go of the throttle at high RPMs
-    float activeBrakeThreshold = settings.EngBrakeThreshold;
+    float activeBrakeThreshold = settings.MTParams.EngBrakeThreshold;
 
     if (vehData.mRPM >= activeBrakeThreshold && ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y > 5.0f && !gearStates.FakeNeutral) {
         float handlingBrakeForce = *reinterpret_cast<float *>(vehData.mHandlingPtr + hOffsets.fBrakeForce);
@@ -1169,7 +1180,7 @@ void functionEngBrake() {
         if (inputMultiplier > 0.05f) {
             wheelPatchStates.EngBrakeActive = true;
             float rpmMultiplier = (vehData.mRPM - activeBrakeThreshold) / (1.0f - activeBrakeThreshold);
-            float engBrakeForce = settings.EngBrakePower * inputMultiplier * rpmMultiplier;
+            float engBrakeForce = settings.MTParams.EngBrakePower * inputMultiplier * rpmMultiplier;
             auto wheelsToBrake = vehData.mWheelsDriven;
             for (int i = 0; i < vehData.mWheelCount; i++) {
                 if (wheelsToBrake[i]) {
@@ -1179,7 +1190,7 @@ void functionEngBrake() {
                     ext.SetWheelBrakePressure(playerVehicle, i, inpBrakeForce);
                 }
             }
-            if (settings.DisplayInfo) {
+            if (settings.Debug.DisplayInfo) {
                 showText(0.85, 0.500, 0.4, fmt::format("EngBrake:\t\t{:.3f}", inputMultiplier), 4);
                 showText(0.85, 0.525, 0.4, fmt::format("Pressure:\t\t{:.3f}", engBrakeForce), 4);
                 showText(0.85, 0.550, 0.4, fmt::format("BrkInput:\t\t{:.3f}", inpBrakeForce), 4);
@@ -1217,15 +1228,15 @@ void handleBrakePatch() {
         }
         if (ebrk || brn)
             lockedUp = false;
-        bool absNativePresent = vehData.mHasABS && settings.ABSFilter;
+        bool absNativePresent = vehData.mHasABS && settings.DriveAssists.ABSFilter;
 
-        if (settings.CustomABS && lockedUp && !absNativePresent)
+        if (settings.DriveAssists.CustomABS && lockedUp && !absNativePresent)
             useABS = true;
     }
     
     {
         bool tractionLoss = false;
-        if (settings.Assists.TractionControl != 0) {
+        if (settings.DriveAssists.TCMode != 0) {
             for (int i = 0; i < vehData.mWheelCount; i++) {
                 if (speeds[i] > vehData.mVelocity.y + 2.5f && susps[i] > 0.0f && vehData.mWheelsDriven[i])
                     tractionLoss = true;
@@ -1234,14 +1245,14 @@ void handleBrakePatch() {
                 tractionLoss = false;
         }
 
-        if (settings.Assists.TractionControl != 0 && tractionLoss)
+        if (settings.DriveAssists.TCMode != 0 && tractionLoss)
             useTCS = true;
     }
 
 
-    if (useTCS && settings.Assists.TractionControl == 2) {
+    if (useTCS && settings.DriveAssists.TCMode == 2) {
         CONTROLS::DISABLE_CONTROL_ACTION(2, eControl::ControlVehicleAccelerate, true);
-        if (settings.DisplayInfo)
+        if (settings.Debug.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~(TCS/T)");
     }
 
@@ -1252,14 +1263,14 @@ void handleBrakePatch() {
         if (!MemoryPatcher::ThrottlePatcher.Patched()) {
             MemoryPatcher::PatchThrottle();
         }
-        if (settings.DisplayInfo)
+        if (settings.Debug.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~Burnout");
     }
     else if (wheelPatchStates.EngLockActive) {
         if (!MemoryPatcher::ThrottlePatcher.Patched()) {
             MemoryPatcher::PatchThrottle();
         }
-        if (settings.DisplayInfo)
+        if (settings.Debug.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~EngLock");
     }
     else if (useABS) {
@@ -1271,10 +1282,10 @@ void handleBrakePatch() {
                 ext.SetWheelBrakePressure(playerVehicle, i, 0.0f);
             vehData.mWheelsAbs[i] = true;
         }
-        if (settings.DisplayInfo)
+        if (settings.Debug.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~(ABS)");
     }
-    else if (useTCS && settings.Assists.TractionControl == 1) {
+    else if (useTCS && settings.DriveAssists.TCMode == 1) {
         if (!MemoryPatcher::BrakePatcher.Patched()) {
             MemoryPatcher::PatchBrake();
         }
@@ -1289,14 +1300,14 @@ void handleBrakePatch() {
                 vehData.mWheelsTcs[i] = false;
             }
         }
-        if (settings.DisplayInfo)
+        if (settings.Debug.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~(TCS/B)");
     }
     else if (wheelPatchStates.EngBrakeActive) {
         if (!MemoryPatcher::BrakePatcher.Patched()) {
             MemoryPatcher::PatchBrake();
         }
-        if (settings.DisplayInfo)
+        if (settings.Debug.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~EngBrake");
     }
     else {
@@ -1345,22 +1356,22 @@ void handleRPM() {
         // Only lift and blip when no clutch used
         if (carControls.ClutchVal == 0.0f) {
             if (gearStates.ShiftDirection == ShiftDirection::Up &&
-                settings.UpshiftCut) {
+                settings.ShiftOptions.UpshiftCut) {
                 CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
             }
-            else if (settings.DownshiftBlip) {
+            if (gearStates.ShiftDirection == ShiftDirection::Down &&
+                settings.ShiftOptions.DownshiftBlip) {
                 float expectedRPM = vehData.mWheelAverageDrivenTyreSpeed / (vehData.mDriveMaxFlatVel / vehData.mGearRatios[vehData.mGearCurr - 1]);
                 if (vehData.mRPM < expectedRPM * 0.75f)
                     CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.66f);
             }
         }
-
     }
 
     // Ignores clutch 
     if (!gearStates.Shifting) {
-        if (settings.ShiftMode == Automatic ||
-            vehData.mClass == VehicleClass::Bike && settings.SimpleBike) {
+        if (settings.MTOptions.ShiftMode == EShiftMode::Automatic ||
+            vehData.mClass == VehicleClass::Bike && settings.GameAssists.SimpleBike) {
             clutch = 0.0f;
         }
     }
@@ -1440,7 +1451,7 @@ void handleRPM() {
 void functionLimiter() {
     gearStates.HitRPMLimiter = vehData.mRPM > 1.0f;
 
-    if (!settings.HardLimiter && 
+    if (!settings.MTOptions.HardLimiter && 
         (vehData.mGearCurr == vehData.mGearTop || vehData.mGearCurr == 0)) {
         gearStates.HitRPMSpeedLimiter = false;
         return;
@@ -1487,7 +1498,7 @@ void functionRealReverse() {
             ext.SetBrakeP(playerVehicle, 1.0f);
         }
         // RT behavior when rolling back: Burnout
-        if (!gearStates.FakeNeutral && carControls.ThrottleVal > 0.5f && carControls.ClutchVal < settings.ClutchThreshold && 
+        if (!gearStates.FakeNeutral && carControls.ThrottleVal > 0.5f && carControls.ClutchVal < 1.0f - settings.MTParams.ClutchThreshold && 
             ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y < -1.0f ) {
             //showText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Rollback");
             //CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, carControls.ThrottleVal);
@@ -1596,15 +1607,15 @@ void functionAutoReverse() {
 // Blocks some vehicle controls on tapping, tries to activate them when holding.
 // TODO: Some original "tap" controls don't work.
 void blockButtons() {
-    if (!settings.EnableManual || !settings.BlockCarControls || vehData.mDomain != VehicleDomain::Road ||
+    if (!settings.MTOptions.Enable || !settings.Controller.BlockCarControls || vehData.mDomain != VehicleDomain::Road ||
         carControls.PrevInput != CarControls::Controller || !Util::VehicleAvailable(playerVehicle, playerPed)) {
         return;
     }
-    if (settings.ShiftMode == Automatic && vehData.mGearCurr > 1) {
+    if (settings.MTOptions.ShiftMode == EShiftMode::Automatic && vehData.mGearCurr > 1) {
         return;
     }
 
-    if (carControls.UseLegacyController) {
+    if (settings.Controller.Native.Enable) {
         for (int i = 0; i < static_cast<int>(CarControls::LegacyControlType::SIZEOF_LegacyControlType); i++) {
             if (carControls.ControlNativeBlocks[i] == -1) continue;
             if (i != static_cast<int>(CarControls::LegacyControlType::ShiftUp) && 
@@ -1648,18 +1659,19 @@ void blockButtons() {
     }
 }
 
+// TODO: Proper held values from settings or something
 void startStopEngine() {
     if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(playerVehicle) &&
-        (carControls.PrevInput == CarControls::Controller	&& carControls.ButtonJustPressed(CarControls::ControllerControlType::Engine) ||
-        carControls.PrevInput == CarControls::Controller	&& carControls.ButtonJustPressed(CarControls::LegacyControlType::Engine) ||
+        (carControls.PrevInput == CarControls::Controller	&& carControls.ButtonHeldOver(CarControls::ControllerControlType::Engine, 200) ||
+        carControls.PrevInput == CarControls::Controller	&& carControls.ButtonHeldOver(CarControls::LegacyControlType::Engine, 200) ||
         carControls.PrevInput == CarControls::Keyboard		&& carControls.ButtonJustPressed(CarControls::KeyboardControlType::Engine) ||
         carControls.PrevInput == CarControls::Wheel			&& carControls.ButtonJustPressed(CarControls::WheelControlType::Engine) ||
-        settings.ThrottleStart && carControls.ThrottleVal > 0.75f && (carControls.ClutchVal > settings.ClutchThreshold || gearStates.FakeNeutral))) {
+        settings.GameAssists.ThrottleStart && carControls.ThrottleVal > 0.75f && (carControls.ClutchVal > 1.0f - settings.MTParams.ClutchThreshold || gearStates.FakeNeutral))) {
         VEHICLE::SET_VEHICLE_ENGINE_ON(playerVehicle, true, false, true);
     }
     if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(playerVehicle) &&
-        (carControls.PrevInput == CarControls::Controller	&& carControls.ButtonJustPressed(CarControls::ControllerControlType::Engine) && settings.ToggleEngine ||
-        carControls.PrevInput == CarControls::Controller	&& carControls.ButtonJustPressed(CarControls::LegacyControlType::Engine) && settings.ToggleEngine ||
+        (carControls.PrevInput == CarControls::Controller	&& carControls.ButtonHeldOver(CarControls::ControllerControlType::Engine, 200) && settings.Controller.ToggleEngine ||
+        carControls.PrevInput == CarControls::Controller	&& carControls.ButtonHeldOver(CarControls::LegacyControlType::Engine, 200) && settings.Controller.ToggleEngine ||
         carControls.PrevInput == CarControls::Keyboard		&& carControls.ButtonJustPressed(CarControls::KeyboardControlType::Engine) ||
         carControls.PrevInput == CarControls::Wheel			&& carControls.ButtonJustPressed(CarControls::WheelControlType::Engine))) {
         VEHICLE::SET_VEHICLE_ENGINE_ON(playerVehicle, false, true, true);
@@ -1727,7 +1739,7 @@ void functionHidePlayerInFPV(bool optionToggled) {
     bool visible = ENTITY::IS_ENTITY_VISIBLE(playerPed);
     bool shouldHide = false;
 
-    if (settings.HidePlayerInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4 && Util::VehicleAvailable(playerVehicle, playerPed)) {
+    if (settings.GameAssists.HidePlayerInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4 && Util::VehicleAvailable(playerVehicle, playerPed)) {
         shouldHide = true;
     }
 
@@ -1745,10 +1757,10 @@ void functionHidePlayerInFPV(bool optionToggled) {
 
 void readSettings() {
     settings.Read(&carControls);
-    if (settings.LogLevel > 4) settings.LogLevel = 1;
-    logger.SetMinLevel(static_cast<LogLevel>(settings.LogLevel));
+    if (settings.Debug.LogLevel > 4) settings.Debug.LogLevel = 1;
+    logger.SetMinLevel(static_cast<LogLevel>(settings.Debug.LogLevel));
 
-    gearStates.FakeNeutral = settings.DefaultNeutral;
+    gearStates.FakeNeutral = settings.GameAssists.DefaultNeutral;
     menu.ReadSettings();
     logger.Write(INFO, "Settings read");
 }
@@ -1761,7 +1773,7 @@ void threadCheckUpdate() {
 
         bool newAvailable = CheckUpdate(g_releaseInfo);
 
-        if (newAvailable && settings.IgnoredVersion != g_releaseInfo.Version) {
+        if (newAvailable && settings.Update.IgnoredVersion != g_releaseInfo.Version) {
             g_notifyUpdate = true;
         }
         g_checkUpdateDone = true;
@@ -1777,15 +1789,15 @@ void update_update_notification() {
         if (g_checkUpdateDone) {
             g_checkUpdateDone = false;
             if (g_notifyUpdate) {
-                UI::Notify(fmt::format("Manual Transmission: Update available, new version: {}.",
-                    g_releaseInfo.Version));
+                UI::Notify(INFO, fmt::format("Manual Transmission: Update available, new version: {}.",
+                                         g_releaseInfo.Version));
             }
             else if (g_releaseInfo.Version.empty()) {
-                UI::Notify("Manual Transmission: Failed to check for update.");
+                UI::Notify(INFO, "Manual Transmission: Failed to check for update.");
             }
             else {
-                UI::Notify(fmt::format("Manual Transmission: No update available, latest version: {}.",
-                    g_releaseInfo.Version));
+                UI::Notify(INFO, fmt::format("Manual Transmission: No update available, latest version: {}.",
+                                         g_releaseInfo.Version));
             }
         }
     }
@@ -1807,7 +1819,7 @@ void main() {
     menu.Initialize();
     readSettings();
 
-    if (settings.EnableUpdate) {
+    if (settings.Update.EnableUpdate) {
         threadCheckUpdate();
     }
 
@@ -1829,7 +1841,7 @@ void main() {
         textureWheelId = -1;
     }
 
-    logger.Write(DEBUG, "START: Starting with MT:  %s", settings.EnableManual ? "ON" : "OFF");
+    logger.Write(DEBUG, "START: Starting with MT:  %s", settings.MTOptions.Enable ? "ON" : "OFF");
     logger.Write(INFO, "START: Initialization finished");
 
     while (true) {

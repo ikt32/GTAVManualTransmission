@@ -9,7 +9,7 @@
  */
 
 namespace UI {
-    void Notify(const std::string& message);
+    void Notify(int level, const std::string& message);
 }
 
 namespace Controls {

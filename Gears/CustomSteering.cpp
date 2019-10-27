@@ -98,7 +98,7 @@ void CustomSteering::Update() {
     if (!Util::VehicleAvailable(playerVehicle, playerPed))
         return;
 
-    if (settings.DisplayInfo)
+    if (settings.Debug.DisplayInfo)
         drawDebug();
 
     float limitRadians = ext.GetMaxSteeringAngle(playerVehicle);
@@ -108,8 +108,8 @@ void CustomSteering::Update() {
 
     float steerCurr;
 
-    float steerValGammaL = pow(-steer, settings.SteerGamma);
-    float steerValGammaR = pow(steer, settings.SteerGamma);
+    float steerValGammaL = pow(-steer, settings.CustomSteering.Gamma);
+    float steerValGammaR = pow(steer, settings.CustomSteering.Gamma);
     float steerValGamma = steer < 0.0f ? -steerValGammaL : steerValGammaR;
 
     // TODO: Other approach to smoothing input. Config transform speed.

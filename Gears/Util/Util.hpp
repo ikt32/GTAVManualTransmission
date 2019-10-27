@@ -1,5 +1,10 @@
 #pragma once
 
+#ifndef DIRECTINPUT_VERSION
+#define DIRECTINPUT_VERSION 0x0800
+#endif
+#include <dinput.h>
+
 #include <string>
 #include <vector>
 
@@ -30,3 +35,13 @@ constexpr unsigned long joaat(const char* s) {
     hash += hash << 15;
     return hash;
 }
+
+template<typename E>
+constexpr auto EToInt(E e) -> typename std::underlying_type<E>::type {
+    return static_cast<typename std::underlying_type<E>::type>(e);
+}
+
+// GUID utils
+bool operator < (const GUID& guid1, const GUID& guid2);
+std::string GUID2String(GUID guid);
+GUID String2GUID(std::string guidStr);

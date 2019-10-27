@@ -45,8 +45,8 @@ namespace WheelInput {
 // Forward gear: Throttle accelerates, Brake brakes (exclusive)
 // Reverse gear: Throttle reverses, Brake brakes (exclusive)
 void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
-    wheelThrottleVal = pow(wheelThrottleVal, settings.ThrottleGamma);
-    wheelBrakeVal = pow(wheelBrakeVal, settings.BrakeGamma);
+    wheelThrottleVal = pow(wheelThrottleVal, settings.Wheel.Throttle.Gamma);
+    wheelBrakeVal = pow(wheelBrakeVal, settings.Wheel.Brake.Gamma);
 
     float speedThreshold = 0.5f;
     const float reverseThreshold = 2.0f;
@@ -57,11 +57,11 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             //showText(0.3, 0.0, 1.0, "We are going forward");
             // Throttle Pedal normal
             if (wheelThrottleVal > 0.01f) {
-                Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
+                Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, settings.Wheel.Throttle.AntiDeadZone);
             }
             // Brake Pedal normal
             if (wheelBrakeVal > 0.01f) {
-                Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, carControls.ADZBrake);
+                Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, settings.Wheel.Brake.AntiDeadZone);
             }
         }
 
@@ -70,7 +70,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             //showText(0.3, 0.0, 1.0, "We are stopped");
 
             if (wheelThrottleVal > 0.01f) {
-                Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
+                Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, settings.Wheel.Throttle.AntiDeadZone);
             }
 
             if (wheelBrakeVal > 0.01f) {
@@ -87,13 +87,13 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             if (wheelThrottleVal <= 0.01f && wheelBrakeVal > 0.01f) {
                 //showText(0.3, 0.0, 1.0, "We should brake");
                 //showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)));
-                Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, carControls.ADZBrake);
+                Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, settings.Wheel.Brake.AntiDeadZone);
                 ext.SetThrottleP(playerVehicle, 0.1f);
                 ext.SetBrakeP(playerVehicle, 1.0f);
                 brakelights = true;
             }
 
-            if (!gearStates.FakeNeutral && wheelThrottleVal > 0.01f && carControls.ClutchVal < settings.ClutchThreshold) {
+            if (!gearStates.FakeNeutral && wheelThrottleVal > 0.01f && carControls.ClutchVal < 1.0f - settings.MTParams.ClutchThreshold) {
                 //showText(0.3, 0.0, 1.0, "We should burnout");
                 if (carControls.BrakeVal < 0.1f) {
                     VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(playerVehicle, false);
@@ -116,11 +116,11 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
                 wheelPatchStates.InduceBurnout = true;
             }
 
-            if (wheelThrottleVal > 0.01f && (carControls.ClutchVal > settings.ClutchThreshold || gearStates.FakeNeutral)) {
+            if (wheelThrottleVal > 0.01f && (carControls.ClutchVal > 1.0f - settings.MTParams.ClutchThreshold || gearStates.FakeNeutral)) {
                 if (wheelBrakeVal > 0.01f) {
                     //showText(0.3, 0.0, 1.0, "We should rev and brake");
                     //showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)) );
-                    Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, carControls.ADZBrake);
+                    Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, settings.Wheel.Brake.AntiDeadZone);
                     ext.SetThrottleP(playerVehicle, 0.1f);
                     ext.SetBrakeP(playerVehicle, 1.0f);
                     brakelights = true;
@@ -133,7 +133,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
                 }
                 else {
                     //showText(0.3, 0.0, 1.0, "We should rev and apply throttle");
-                    Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
+                    Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, settings.Wheel.Throttle.AntiDeadZone);
                     ext.SetThrottleP(playerVehicle, wheelThrottleVal);
                     fakeRev(false, 0);
                 }
@@ -154,11 +154,11 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             //showText(0.3, 0.0, 1.0, "We are reversing");
             // Throttle Pedal Reverse
             if (wheelThrottleVal > 0.01f) {
-                Controls::SetControlADZ(ControlVehicleBrake, wheelThrottleVal, carControls.ADZThrottle);
+                Controls::SetControlADZ(ControlVehicleBrake, wheelThrottleVal, settings.Wheel.Throttle.AntiDeadZone);
             }
             // Brake Pedal Reverse
             if (wheelBrakeVal > 0.01f) {
-                Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, carControls.ADZBrake);
+                Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, settings.Wheel.Brake.AntiDeadZone);
                 ext.SetThrottleP(playerVehicle, -wheelBrakeVal);
                 ext.SetBrakeP(playerVehicle, 1.0f);
             }
@@ -169,7 +169,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             //showText(0.3, 0.0, 1.0, "We are stopped");
 
             if (wheelThrottleVal > 0.01f) {
-                Controls::SetControlADZ(ControlVehicleBrake, wheelThrottleVal, carControls.ADZThrottle);
+                Controls::SetControlADZ(ControlVehicleBrake, wheelThrottleVal, settings.Wheel.Throttle.AntiDeadZone);
             }
 
             if (wheelBrakeVal > 0.01f) {
@@ -185,12 +185,12 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             //bool brakelights = false;
 
             if (ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y > reverseThreshold) {
-                if (carControls.ClutchVal < settings.ClutchThreshold) {
+                if (carControls.ClutchVal < 1.0f - settings.MTParams.ClutchThreshold) {
                     CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
                 }
                 // Brake Pedal Reverse
                 if (wheelBrakeVal > 0.01f) {
-                    Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, carControls.ADZBrake);
+                    Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, settings.Wheel.Brake.AntiDeadZone);
                     ext.SetThrottleP(playerVehicle, -wheelBrakeVal);
                     ext.SetBrakeP(playerVehicle, 1.0f);
                 }
@@ -203,13 +203,13 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
 
 // Pedals behave like RT/LT
 void WheelInput::HandlePedalsArcade(float wheelThrottleVal, float wheelBrakeVal) {
-    wheelThrottleVal = pow(wheelThrottleVal, settings.ThrottleGamma);
-    wheelBrakeVal = pow(wheelBrakeVal, settings.BrakeGamma);
+    wheelThrottleVal = pow(wheelThrottleVal, settings.Wheel.Throttle.Gamma);
+    wheelBrakeVal = pow(wheelBrakeVal, settings.Wheel.Brake.Gamma);
     if (wheelThrottleVal > 0.01f) {
-        Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, carControls.ADZThrottle);
+        Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, settings.Wheel.Throttle.AntiDeadZone);
     }
     if (wheelBrakeVal > 0.01f) {
-        Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, carControls.ADZBrake);
+        Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, settings.Wheel.Brake.AntiDeadZone);
     }
 }
 
@@ -374,17 +374,17 @@ void WheelInput::DoSteering() {
 
     float steerMult;
     if (vehData.mClass == VehicleClass::Bike || vehData.mClass == VehicleClass::Quad)
-        steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
+        steerMult = settings.Wheel.Steering.AngleMax / settings.Wheel.Steering.AngleBike;
     else if (vehData.mClass == VehicleClass::Car)
-        steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
+        steerMult = settings.Wheel.Steering.AngleMax / settings.Wheel.Steering.AngleCar;
     else {
-        steerMult = settings.SteerAngleMax / settings.SteerAngleBoat;
+        steerMult = settings.Wheel.Steering.AngleMax / settings.Wheel.Steering.AngleBoat;
     }
 
     float steerValL = map(carControls.SteerVal, 0.0f, 0.5f, 1.0f, 0.0f);
     float steerValR = map(carControls.SteerVal, 0.5f, 1.0f, 0.0f, 1.0f);
-    float steerValGammaL = pow(steerValL, settings.SteerGamma);
-    float steerValGammaR = pow(steerValR, settings.SteerGamma);
+    float steerValGammaL = pow(steerValL, settings.Wheel.Steering.Gamma);
+    float steerValGammaR = pow(steerValR, settings.Wheel.Steering.Gamma);
     float steerValGamma = carControls.SteerVal < 0.5f ? -steerValGammaL : steerValGammaR;
     float effSteer = steerMult * steerValGamma;
 
@@ -399,7 +399,7 @@ void WheelInput::DoSteering() {
         ext.SetSteeringInputAngle(playerVehicle, -effSteer);
     }
     else {
-        Controls::SetControlADZ(ControlVehicleMoveLeftRight, effSteer, carControls.ADZSteer);
+        Controls::SetControlADZ(ControlVehicleMoveLeftRight, effSteer, settings.Wheel.Steering.AntiDeadZone);
     }
 }
 
@@ -407,9 +407,9 @@ int calculateDamper(float gain, float wheelsOffGroundRatio) {
     Vector3 accelValsAvg = vehData.mAcceleration; //TODO: Avg/dampen later
 
     // Just to use floats everywhere here
-    float damperMax = static_cast<float>(settings.DamperMax);
-    float damperMin = static_cast<float>(settings.DamperMin);
-    float damperMinSpeed = static_cast<float>(settings.DamperMinSpeed);
+    float damperMax = static_cast<float>(settings.Wheel.FFB.DamperMax);
+    float damperMin = static_cast<float>(settings.Wheel.FFB.DamperMin);
+    float damperMinSpeed = static_cast<float>(settings.Wheel.FFB.DamperMinSpeed);
 
     float absVehicleSpeed = abs(ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y);
     float damperFactorSpeed = map(absVehicleSpeed, 0.0f, damperMinSpeed, damperMax, damperMin);
@@ -463,17 +463,17 @@ int calculateDetail() {
         compSpeedTotal = -compSpeed[0] + compSpeed[1];
     }
 
-    return static_cast<int>(1000.0f * settings.DetailMult * compSpeedTotal);
+    return static_cast<int>(1000.0f * settings.Wheel.FFB.DetailMult * compSpeedTotal);
 }
 
 void calculateSoftLock(int& totalForce, int& damperForce) {
     float steerMult;
     if (vehData.mClass == VehicleClass::Bike || vehData.mClass == VehicleClass::Quad)
-        steerMult = settings.SteerAngleMax / settings.SteerAngleBike;
+        steerMult = settings.Wheel.Steering.AngleMax / settings.Wheel.Steering.AngleBike;
     else if (vehData.mClass == VehicleClass::Car)
-        steerMult = settings.SteerAngleMax / settings.SteerAngleCar;
+        steerMult = settings.Wheel.Steering.AngleMax / settings.Wheel.Steering.AngleCar;
     else {
-        steerMult = settings.SteerAngleMax / settings.SteerAngleBoat;
+        steerMult = settings.Wheel.Steering.AngleMax / settings.Wheel.Steering.AngleBoat;
     }
     float effSteer = steerMult * 2.0f * (carControls.SteerVal - 0.5f);
     float steerSpeed = carControls.GetAxisSpeed(CarControls::WheelAxisType::Steer);
@@ -504,14 +504,14 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     };
 
     Vector3 expectedVector{
-        speed * -sin(steeringAngle / settings.GameSteerMultWheel), 0,
-        speed * cos(steeringAngle / settings.GameSteerMultWheel), 0,
+        speed * -sin(steeringAngle / settings.Wheel.Steering.SteerMult), 0,
+        speed * cos(steeringAngle / settings.Wheel.Steering.SteerMult), 0,
         0, 0
     };
+    
+    float error = static_cast<float>(pid.getOutput(expectedVector.x, static_cast<double>(speedVector.x) * settings.Wheel.FFB.SATFactor));
 
-    float error = static_cast<float>(pid.getOutput(expectedVector.x, static_cast<double>(speedVector.x) * 0.5));
-
-    int satForce = static_cast<int>(settings.SATAmpMult * static_cast<float>(defaultGain) * -error);
+    int satForce = static_cast<int>(settings.Wheel.FFB.SATAmpMult * static_cast<float>(defaultGain) * -error);
 
     // "Reduction" effects - those that affect already calculated things
     bool understeering = false;
@@ -542,19 +542,19 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
         }
     }
 
-    if (settings.DisplayInfo) {
+    if (settings.Debug.DisplayInfo) {
         //showText(0.85, 0.175, 0.4, fmt::format("RelSteer:\t{:.3f}", steeringRelative.x), 4);
         //showText(0.85, 0.200, 0.4, fmt::format("SetPoint:\t{:.3f}", travelRelative.x), 4);
         showText(0.85, 0.225, 0.4, fmt::format("Error:\t\t{:.3f}", error), 4);
         showText(0.85, 0.250, 0.4, fmt::format("{}Under:\t\t{:.3f}~w~", understeering ? "~b~" : "~w~", understeer), 4);
     }
     if (satForce > 0) {
-        satForce = map(satForce, 0, 10000, settings.FFB.AntiDeadForce, 10000);
+        satForce = map(satForce, 0, 10000, settings.Wheel.FFB.AntiDeadForce, 10000);
     }
     if (satForce < 0) {
-        satForce = map(satForce, -10000, 0, -10000, -settings.FFB.AntiDeadForce);
+        satForce = map(satForce, -10000, 0, -10000, -settings.Wheel.FFB.AntiDeadForce);
     }
-    satForce = std::clamp(satForce, -settings.FFB.SATMax, settings.FFB.SATMax);
+    satForce = std::clamp(satForce, -settings.Wheel.FFB.SATMax, settings.Wheel.FFB.SATMax);
 
     return satForce;
 }
@@ -610,38 +610,38 @@ float getSteeringLock() {
     case VehicleClass::Bike:
     case VehicleClass::Quad:
     case VehicleClass::Bicycle:
-        return settings.SteerAngleBike;
+        return settings.Wheel.Steering.AngleBike;
     case VehicleClass::Car:
-        return settings.SteerAngleCar;
+        return settings.Wheel.Steering.AngleCar;
     case VehicleClass::Boat:
-        return settings.SteerAngleBoat;
+        return settings.Wheel.Steering.AngleBoat;
     case VehicleClass::Plane:
     case VehicleClass::Heli:
     case VehicleClass::Train:
     case VehicleClass::Unknown:
-    default: return settings.SteerAngleCar;
+    default: return settings.Wheel.Steering.AngleCar;
     }
 }
 
 void WheelInput::PlayFFBGround() {
-    if (!settings.EnableFFB ||
+    if (!settings.Wheel.FFB.Enable ||
         carControls.PrevInput != CarControls::Wheel) {
         return;
     }
 
     float rotationScale = 1.0f;
-    if (settings.ScaleFFB) {
-        rotationScale = getSteeringLock() / settings.SteerAngleMax * 0.66f + 0.34f;
+    if (settings.Wheel.FFB.Scale) {
+        rotationScale = getSteeringLock() / settings.Wheel.Steering.AngleMax * 0.66f + 0.34f;
     }
 
-    if (settings.LogiLEDs) {
+    if (settings.Wheel.Options.LogiLEDs) {
         carControls.PlayLEDs(vehData.mRPM, 0.45f, 0.95f);
     }
 
     float avgAngle = ext.GetWheelAverageAngle(playerVehicle);
     float wheelsOffGroundRatio = getFloatingSteeredWheelsRatio(playerVehicle);
 
-    int detailForce = std::clamp(calculateDetail(), -settings.FFB.DetailLim, settings.FFB.DetailLim);
+    int detailForce = std::clamp(calculateDetail(), -settings.Wheel.FFB.DetailLim, settings.Wheel.FFB.DetailLim);
     int satForce = calculateSat(2500, avgAngle, wheelsOffGroundRatio, vehData.mClass == VehicleClass::Car);
     int damperForce = calculateDamper(50.0f, wheelsOffGroundRatio);
 
@@ -660,17 +660,18 @@ void WheelInput::PlayFFBGround() {
     const float maxForce = 10000.0f;
     float gForce = abs(vehData.mAcceleration.y) / 9.81f; // TODO: Average/dampen later
     bool collision = gForce > minGforce;
-    int res = static_cast<int>(map(gForce, minGforce, maxGforce, minForce, maxForce) * settings.CollisionMult);
+    int res = static_cast<int>(map(gForce, minGforce, maxGforce, minForce, maxForce) * settings.Wheel.FFB.CollisionMult);
     if (collision) {
         carControls.PlayFFBCollision(std::clamp(res, -10000, 10000));
     }
 
-    if (settings.DisplayInfo && collision) {
-        UI::Notify(fmt::format("Collision @ ~r~{:.3f}G~w~~n~"
+    if (collision) {
+        UI::Notify(DEBUG, fmt::format("Collision @ ~r~{:.3f}G~w~~n~"
             "FFB: {}", gForce, res));
     }
-    if (settings.DisplayInfo) {
-        showText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > settings.FFB.SATMax ? "~r~" : "~w~", satForce), 4);
+
+    if (settings.Debug.DisplayInfo) {
+        showText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > settings.Wheel.FFB.SATMax ? "~r~" : "~w~", satForce), 4);
         showText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
         showText(0.85, 0.325, 0.4, fmt::format("Damper:\t\t{}", damperForce), 4);
         showText(0.85, 0.350, 0.4, fmt::format("Detail:\t\t{}", detailForce), 4);
@@ -678,17 +679,17 @@ void WheelInput::PlayFFBGround() {
 }
 
 void WheelInput::PlayFFBWater() {
-    if (!settings.EnableFFB ||
+    if (!settings.Wheel.FFB.Enable ||
         carControls.PrevInput != CarControls::Wheel) {
         return;
     }
 
     float rotationScale = 1.0f;
-    if (settings.ScaleFFB) {
-        rotationScale = getSteeringLock() / settings.SteerAngleMax * 0.66f + 0.34f;
+    if (settings.Wheel.FFB.Scale) {
+        rotationScale = getSteeringLock() / settings.Wheel.Steering.AngleMax * 0.66f + 0.34f;
     }
 
-    if (settings.LogiLEDs) {
+    if (settings.Wheel.Options.LogiLEDs) {
         carControls.PlayLEDs(vehData.mRPM, 0.45f, 0.95f);
     }
 
@@ -709,7 +710,7 @@ void WheelInput::PlayFFBWater() {
     calculateSoftLock(totalForce, damperForce);
     carControls.PlayFFBDynamics(totalForce, damperForce);
 
-    if (settings.DisplayInfo) {
+    if (settings.Debug.DisplayInfo) {
         showText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
         showText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
         showText(0.85, 0.325, 0.4, fmt::format("Damper:\t{}", damperForce), 4);

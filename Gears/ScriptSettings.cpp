@@ -5,8 +5,11 @@
 #include <simpleini/SimpleIni.h>
 
 #include "Util/Logger.hpp"
+#include "Util/Util.hpp"
 #include "Input/keyboard.h"
 #include "Input/CarControls.hpp"
+
+// TODO: Settings shouldn't *do* anything, other stuff just needs to take stuff from this.
 
 #define CHECK_LOG_SI_ERROR(result, operation) \
     if (result < 0) { \
@@ -14,13 +17,14 @@
         __FUNCTION__, operation, result); \
     }
 
+EShiftMode Next(EShiftMode mode) {
+    return static_cast<EShiftMode>((static_cast<int>(mode) + 1) % 3);
+}
+
+ScriptSettings::ScriptSettings() = default;
+
 #pragma warning(push)
 #pragma warning(disable: 4244)
-ScriptSettings::ScriptSettings()
-    : Assists { 0 }
-    , CustomSteering { 0, 1.0f, 90.0f, 1.0f, 1.0f }
-    , FFB { 10000, 0 }
-{ }
 
 void ScriptSettings::SetFiles(const std::string &general, const std::string &wheel) {
     settingsGeneralFile = general;
@@ -38,156 +42,159 @@ void ScriptSettings::SaveGeneral() const {
     SI_Error result = settingsGeneral.LoadFile(settingsGeneralFile.c_str());
     CHECK_LOG_SI_ERROR(result, "load");
 
-    // [OPTIONS]
-    settingsGeneral.SetBoolValue("OPTIONS", "Enable", EnableManual);
-    settingsGeneral.SetLongValue("OPTIONS", "ShiftMode", ShiftMode);
+    // [MT_OPTIONS]
+    settingsGeneral.SetBoolValue("MT_OPTIONS", "Enable", MTOptions.Enable);
+    settingsGeneral.SetLongValue("MT_OPTIONS", "ShiftMode", EToInt(MTOptions.ShiftMode));
+    settingsGeneral.SetBoolValue("MT_OPTIONS", "EngineDamage", MTOptions.EngDamage);
+    settingsGeneral.SetBoolValue("MT_OPTIONS", "EngineStalling", MTOptions.EngStallH);
+    settingsGeneral.SetBoolValue("MT_OPTIONS", "EngineStallingS", MTOptions.EngStallS);
+    settingsGeneral.SetBoolValue("MT_OPTIONS", "EngineBraking", MTOptions.EngBrake);
+    settingsGeneral.SetBoolValue("MT_OPTIONS", "EngineLocking", MTOptions.EngLock);
+    settingsGeneral.SetBoolValue("MT_OPTIONS", "ClutchCatching", MTOptions.ClutchCreep);
+    settingsGeneral.SetBoolValue("MT_OPTIONS", "ClutchShiftingH", MTOptions.ClutchShiftH);
+    settingsGeneral.SetBoolValue("MT_OPTIONS", "ClutchShiftingS", MTOptions.ClutchShiftS);
+    settingsGeneral.SetBoolValue("MT_OPTIONS", "HardLimiter", MTOptions.HardLimiter);
 
-    settingsGeneral.SetLongValue("OPTIONS", "ShiftMode", ShiftMode);
-    settingsGeneral.SetBoolValue("OPTIONS", "SimpleBike", SimpleBike);
-    settingsGeneral.SetBoolValue("OPTIONS", "EngineDamage", EngDamage);
-    settingsGeneral.SetBoolValue("OPTIONS", "EngineStalling", EngStall);
-    settingsGeneral.SetBoolValue("OPTIONS", "EngineStallingS", EngStallS);
-    settingsGeneral.SetBoolValue("OPTIONS", "EngineBraking", EngBrake);
-    settingsGeneral.SetBoolValue("OPTIONS", "EngineLocking", EngLock);
-    settingsGeneral.SetBoolValue("OPTIONS", "ClutchCatching", ClutchCatching);
-    settingsGeneral.SetBoolValue("OPTIONS", "ClutchShiftingH", ClutchShiftingH);
-    settingsGeneral.SetBoolValue("OPTIONS", "ClutchShiftingS", ClutchShiftingS);
-    settingsGeneral.SetBoolValue("OPTIONS", "DefaultNeutral", DefaultNeutral);
+    // [MT_PARAMS]
+    settingsGeneral.SetDoubleValue("MT_PARAMS", "ClutchCatchpoint", MTParams.ClutchThreshold);
+    settingsGeneral.SetDoubleValue("MT_PARAMS", "StallingThreshold", MTParams.StallingThreshold);
+    settingsGeneral.SetDoubleValue("MT_PARAMS", "StallingRPM", MTParams.StallingRPM);
+    settingsGeneral.SetDoubleValue("MT_PARAMS", "RPMDamage", MTParams.RPMDamage);
+    settingsGeneral.SetDoubleValue("MT_PARAMS", "MisshiftDamage", MTParams.MisshiftDamage);
+    settingsGeneral.SetDoubleValue("MT_PARAMS", "EngBrakePower", MTParams.EngBrakePower);
+    settingsGeneral.SetDoubleValue("MT_PARAMS", "EngBrakeThreshold", MTParams.EngBrakeThreshold);
 
-    settingsGeneral.SetDoubleValue("OPTIONS", "ClutchCatchpoint", ClutchThreshold * 100.0);
-    settingsGeneral.SetDoubleValue("OPTIONS", "StallingThreshold", StallingThreshold * 100.0);
-    settingsGeneral.SetDoubleValue("OPTIONS", "StallingRPM", StallingRPM);
-    settingsGeneral.SetDoubleValue("OPTIONS", "RPMDamage", RPMDamage * 100.0);
-    settingsGeneral.SetDoubleValue("OPTIONS", "MisshiftDamage", MisshiftDamage);
-    settingsGeneral.SetDoubleValue("OPTIONS", "EngBrakePower", EngBrakePower);
-    settingsGeneral.SetDoubleValue("OPTIONS", "EngBrakeThreshold", EngBrakeThreshold);
+    // [GAMEPLAY_ASSISTS]
+    settingsGeneral.SetBoolValue("GAMEPLAY_ASSISTS", "SimpleBike", GameAssists.SimpleBike);
+    settingsGeneral.SetBoolValue("GAMEPLAY_ASSISTS", "HillBrakeWorkaround", GameAssists.HillGravity);
+    settingsGeneral.SetBoolValue("GAMEPLAY_ASSISTS", "AutoGear1", GameAssists.AutoGear1);
+    settingsGeneral.SetBoolValue("GAMEPLAY_ASSISTS", "AutoLookBack", GameAssists.AutoLookBack);
+    settingsGeneral.SetBoolValue("GAMEPLAY_ASSISTS", "ThrottleStart", GameAssists.ThrottleStart);
+    settingsGeneral.SetBoolValue("GAMEPLAY_ASSISTS", "HidePlayerInFPV", GameAssists.HidePlayerInFPV);
+    settingsGeneral.SetBoolValue("GAMEPLAY_ASSISTS", "DefaultNeutral", GameAssists.DefaultNeutral);
 
-    settingsGeneral.SetBoolValue("OPTIONS", "HillBrakeWorkaround", HillBrakeWorkaround);
-    settingsGeneral.SetBoolValue("OPTIONS", "AutoGear1", AutoGear1);
-    settingsGeneral.SetBoolValue("OPTIONS", "AutoLookBack", AutoLookBack);
-    settingsGeneral.SetBoolValue("OPTIONS", "ThrottleStart", ThrottleStart);
-    settingsGeneral.SetBoolValue("OPTIONS", "HidePlayerInFPV", HidePlayerInFPV);
-    settingsGeneral.SetBoolValue("OPTIONS", "HardLimiter", HardLimiter);
-    settingsGeneral.SetBoolValue("OPTIONS", "CustomABS", CustomABS);
-    settingsGeneral.SetBoolValue("OPTIONS", "ABSFilter", ABSFilter);
+    // [DRIVING_ASSISTS]
+    settingsGeneral.SetBoolValue("DRIVING_ASSISTS", "CustomABS", DriveAssists.CustomABS);
+    settingsGeneral.SetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABSFilter);
+    settingsGeneral.SetLongValue("DRIVING_ASSISTS", "TractionControl", DriveAssists.TCMode);
 
-    // [ASSISTS]
-    settingsGeneral.SetLongValue("ASSISTS", "TractionControl", Assists.TractionControl);
-    
     //[CUSTOM_STEERING]
     settingsGeneral.SetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
     settingsGeneral.SetDoubleValue("CUSTOM_STEERING", "CountersteerMult", CustomSteering.CountersteerMult);
     settingsGeneral.SetDoubleValue("CUSTOM_STEERING", "CountersteerLimit", CustomSteering.CountersteerLimit);
     settingsGeneral.SetDoubleValue("CUSTOM_STEERING", "SteeringMult", CustomSteering.SteeringMult);
     settingsGeneral.SetDoubleValue("CUSTOM_STEERING", "SteeringReduction", CustomSteering.SteeringReduction);
+    settingsGeneral.SetDoubleValue("CUSTOM_STEERING", "Gamma", CustomSteering.Gamma);
 
     // [SHIFT_OPTIONS]
-    settingsGeneral.SetBoolValue("SHIFT_OPTIONS", "UpshiftCut", UpshiftCut);
-    settingsGeneral.SetBoolValue("SHIFT_OPTIONS", "DownshiftBlip", DownshiftBlip);
-    settingsGeneral.SetDoubleValue("SHIFT_OPTIONS", "ClutchRateMult", ClutchRateMult);
+    settingsGeneral.SetBoolValue("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
+    settingsGeneral.SetBoolValue("SHIFT_OPTIONS", "DownshiftBlip", ShiftOptions.DownshiftBlip);
+    settingsGeneral.SetDoubleValue("SHIFT_OPTIONS", "ClutchRateMult", ShiftOptions.ClutchRateMult);
+    settingsGeneral.SetDoubleValue("SHIFT_OPTIONS", "RPMTolerance", ShiftOptions.RPMTolerance);
 
-
-    // [AUTO_BOX]
-    settingsGeneral.SetDoubleValue("AUTO_BOX", "UpshiftLoad", UpshiftLoad);
-    settingsGeneral.SetDoubleValue("AUTO_BOX", "DownshiftLoad", DownshiftLoad);
-    settingsGeneral.SetDoubleValue("AUTO_BOX", "NextGearMinRPM", NextGearMinRPM);
-    settingsGeneral.SetDoubleValue("AUTO_BOX", "CurrGearMinRPM", CurrGearMinRPM);
-    settingsGeneral.SetDoubleValue("AUTO_BOX", "EcoRate", EcoRate);
-    settingsGeneral.SetDoubleValue("AUTO_BOX", "DownshiftTimeoutMult", DownshiftTimeoutMult);
+    // [AUTO_PARAMS]
+    settingsGeneral.SetDoubleValue("AUTO_PARAMS", "UpshiftLoad", AutoParams.UpshiftLoad);
+    settingsGeneral.SetDoubleValue("AUTO_PARAMS", "DownshiftLoad", AutoParams.DownshiftLoad);
+    settingsGeneral.SetDoubleValue("AUTO_PARAMS", "NextGearMinRPM", AutoParams.NextGearMinRPM);
+    settingsGeneral.SetDoubleValue("AUTO_PARAMS", "CurrGearMinRPM", AutoParams.CurrGearMinRPM);
+    settingsGeneral.SetDoubleValue("AUTO_PARAMS", "EcoRate", AutoParams.EcoRate);
+    settingsGeneral.SetDoubleValue("AUTO_PARAMS", "DownshiftTimeoutMult", AutoParams.DownshiftTimeoutMult);
 
     // [HUD]
-    settingsGeneral.SetBoolValue("HUD", "EnableHUD", HUD);
-    settingsGeneral.SetBoolValue("HUD", "AlwaysHUD", AlwaysHUD);
-    settingsGeneral.SetLongValue("HUD", "HUDFont", HUDFont);
-    settingsGeneral.SetBoolValue("HUD", "GearIndicator", GearIndicator);
-    settingsGeneral.SetDoubleValue("HUD", "GearXpos", GearXpos);
-    settingsGeneral.SetDoubleValue("HUD", "GearYpos", GearYpos);
-    settingsGeneral.SetDoubleValue("HUD", "GearSize", GearSize);
-    settingsGeneral.SetLongValue("HUD", "GearTopColorR", GearTopColorR);
-    settingsGeneral.SetLongValue("HUD", "GearTopColorG", GearTopColorG);
-    settingsGeneral.SetLongValue("HUD", "GearTopColorB", GearTopColorB);
+    settingsGeneral.SetBoolValue("HUD", "EnableHUD", HUD.Enable);
+    settingsGeneral.SetBoolValue("HUD", "AlwaysHUD", HUD.Always);
+    settingsGeneral.SetLongValue("HUD", "HUDFont", HUD.Font);
+    settingsGeneral.SetLongValue("HUD", "NotifyLevel", HUD.NotifyLevel);
 
-    settingsGeneral.SetBoolValue("HUD", "ShiftModeIndicator", ShiftModeIndicator);
-    settingsGeneral.SetDoubleValue("HUD", "ShiftModeXpos", ShiftModeXpos);
-    settingsGeneral.SetDoubleValue("HUD", "ShiftModeYpos", ShiftModeYpos);
-    settingsGeneral.SetDoubleValue("HUD", "ShiftModeSize", ShiftModeSize);
+    settingsGeneral.SetBoolValue("HUD", "GearIndicator", HUD.Gear.Enable);
+    settingsGeneral.SetDoubleValue("HUD", "GearXpos", HUD.Gear.XPos);
+    settingsGeneral.SetDoubleValue("HUD", "GearYpos", HUD.Gear.YPos);
+    settingsGeneral.SetDoubleValue("HUD", "GearSize", HUD.Gear.Size);
+    settingsGeneral.SetLongValue("HUD", "GearTopColorR", HUD.Gear.TopColorR);
+    settingsGeneral.SetLongValue("HUD", "GearTopColorG", HUD.Gear.TopColorG);
+    settingsGeneral.SetLongValue("HUD", "GearTopColorB", HUD.Gear.TopColorB);
 
-    settingsGeneral.SetValue("HUD", "Speedo", Speedo.c_str());
-    settingsGeneral.SetBoolValue("HUD", "SpeedoShowUnit", SpeedoShowUnit);
-    settingsGeneral.SetDoubleValue("HUD", "SpeedoXpos", SpeedoXpos);
-    settingsGeneral.SetDoubleValue("HUD", "SpeedoYpos", SpeedoYpos);
-    settingsGeneral.SetDoubleValue("HUD", "SpeedoSize", SpeedoSize);
+    settingsGeneral.SetBoolValue("HUD", "ShiftModeIndicator", HUD.ShiftMode.Enable);
+    settingsGeneral.SetDoubleValue("HUD", "ShiftModeXpos", HUD.ShiftMode.XPos);
+    settingsGeneral.SetDoubleValue("HUD", "ShiftModeYpos", HUD.ShiftMode.YPos);
+    settingsGeneral.SetDoubleValue("HUD", "ShiftModeSize", HUD.ShiftMode.Size);
 
-    settingsGeneral.SetBoolValue("HUD", "EnableRPMIndicator", RPMIndicator);
-    settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorXpos", RPMIndicatorXpos);
-    settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorYpos", RPMIndicatorYpos);
-    settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorWidth", RPMIndicatorWidth);
-    settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorHeight", RPMIndicatorHeight);
-    settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorRedline", RPMIndicatorRedline);
+    settingsGeneral.SetValue("HUD", "Speedo", HUD.Speedo.Speedo.c_str());
+    settingsGeneral.SetBoolValue("HUD", "SpeedoShowUnit", HUD.Speedo.ShowUnit);
+    settingsGeneral.SetDoubleValue("HUD", "SpeedoXpos", HUD.Speedo.XPos);
+    settingsGeneral.SetDoubleValue("HUD", "SpeedoYpos", HUD.Speedo.YPos);
+    settingsGeneral.SetDoubleValue("HUD", "SpeedoSize", HUD.Speedo.Size);
 
-    settingsGeneral.SetLongValue("HUD", "RPMIndicatorBackgroundR", RPMIndicatorBackgroundR);
-    settingsGeneral.SetLongValue("HUD", "RPMIndicatorBackgroundG", RPMIndicatorBackgroundG);
-    settingsGeneral.SetLongValue("HUD", "RPMIndicatorBackgroundB", RPMIndicatorBackgroundB);
-    settingsGeneral.SetLongValue("HUD", "RPMIndicatorBackgroundA", RPMIndicatorBackgroundA);
+    settingsGeneral.SetBoolValue("HUD", "EnableRPMIndicator", HUD.RPMBar.Enable);
+    settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorXpos", HUD.RPMBar.XPos);
+    settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorYpos", HUD.RPMBar.YPos);
+    settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorWidth", HUD.RPMBar.XSz);
+    settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorHeight", HUD.RPMBar.YSz);
+    settingsGeneral.SetDoubleValue("HUD", "RPMIndicatorRedline", HUD.RPMBar.Redline);
 
-    settingsGeneral.SetLongValue("HUD", "RPMIndicatorForegroundR", RPMIndicatorForegroundR);
-    settingsGeneral.SetLongValue("HUD", "RPMIndicatorForegroundG", RPMIndicatorForegroundG);
-    settingsGeneral.SetLongValue("HUD", "RPMIndicatorForegroundB", RPMIndicatorForegroundB);
-    settingsGeneral.SetLongValue("HUD", "RPMIndicatorForegroundA", RPMIndicatorForegroundA);
+    settingsGeneral.SetLongValue("HUD", "RPMIndicatorBackgroundR", HUD.RPMBar.BgR);
+    settingsGeneral.SetLongValue("HUD", "RPMIndicatorBackgroundG", HUD.RPMBar.BgG);
+    settingsGeneral.SetLongValue("HUD", "RPMIndicatorBackgroundB", HUD.RPMBar.BgB);
+    settingsGeneral.SetLongValue("HUD", "RPMIndicatorBackgroundA", HUD.RPMBar.BgA);
 
-    settingsGeneral.SetLongValue("HUD", "RPMIndicatorRedlineR", RPMIndicatorRedlineR);
-    settingsGeneral.SetLongValue("HUD", "RPMIndicatorRedlineG", RPMIndicatorRedlineG);
-    settingsGeneral.SetLongValue("HUD", "RPMIndicatorRedlineB", RPMIndicatorRedlineB);
-    settingsGeneral.SetLongValue("HUD", "RPMIndicatorRedlineA", RPMIndicatorRedlineA);
+    settingsGeneral.SetLongValue("HUD", "RPMIndicatorForegroundR", HUD.RPMBar.FgR);
+    settingsGeneral.SetLongValue("HUD", "RPMIndicatorForegroundG", HUD.RPMBar.FgG);
+    settingsGeneral.SetLongValue("HUD", "RPMIndicatorForegroundB", HUD.RPMBar.FgB);
+    settingsGeneral.SetLongValue("HUD", "RPMIndicatorForegroundA", HUD.RPMBar.FgA);
 
-    settingsGeneral.SetLongValue("HUD", "RPMIndicatorRevlimitR", RPMIndicatorRevlimitR);
-    settingsGeneral.SetLongValue("HUD", "RPMIndicatorRevlimitG", RPMIndicatorRevlimitG);
-    settingsGeneral.SetLongValue("HUD", "RPMIndicatorRevlimitB", RPMIndicatorRevlimitB);
-    settingsGeneral.SetLongValue("HUD", "RPMIndicatorRevlimitA", RPMIndicatorRevlimitA);
+    settingsGeneral.SetLongValue("HUD", "RPMIndicatorRedlineR", HUD.RPMBar.RedlineR);
+    settingsGeneral.SetLongValue("HUD", "RPMIndicatorRedlineG", HUD.RPMBar.RedlineG);
+    settingsGeneral.SetLongValue("HUD", "RPMIndicatorRedlineB", HUD.RPMBar.RedlineB);
+    settingsGeneral.SetLongValue("HUD", "RPMIndicatorRedlineA", HUD.RPMBar.RedlineA);
 
-    settingsGeneral.SetBoolValue("HUD", "SteeringWheelInfo", SteeringWheelInfo);
-    settingsGeneral.SetBoolValue("HUD", "AlwaysSteeringWheelInfo", AlwaysSteeringWheelInfo);
-    settingsGeneral.SetDoubleValue("HUD", "SteeringWheelTextureX", SteeringWheelTextureX);
-    settingsGeneral.SetDoubleValue("HUD", "SteeringWheelTextureY", SteeringWheelTextureY);
-    settingsGeneral.SetDoubleValue("HUD", "SteeringWheelTextureSz", SteeringWheelTextureSz);
-    settingsGeneral.SetDoubleValue("HUD", "PedalInfoX", PedalInfoX);
-    settingsGeneral.SetDoubleValue("HUD", "PedalInfoY", PedalInfoY);
-    settingsGeneral.SetDoubleValue("HUD", "PedalInfoH"	   , PedalInfoH);
-    settingsGeneral.SetDoubleValue("HUD", "PedalInfoW"	   , PedalInfoW);
-    settingsGeneral.SetDoubleValue("HUD", "PedalInfoPadX"  , PedalInfoPadX);
-    settingsGeneral.SetDoubleValue("HUD", "PedalInfoPadY"  , PedalInfoPadY);
+    settingsGeneral.SetLongValue("HUD", "RPMIndicatorRevlimitR", HUD.RPMBar.RevLimitR);
+    settingsGeneral.SetLongValue("HUD", "RPMIndicatorRevlimitG", HUD.RPMBar.RevLimitG);
+    settingsGeneral.SetLongValue("HUD", "RPMIndicatorRevlimitB", HUD.RPMBar.RevLimitB);
+    settingsGeneral.SetLongValue("HUD", "RPMIndicatorRevlimitA", HUD.RPMBar.RevLimitA);
 
-    settingsGeneral.SetLongValue("HUD", "PedalBackgroundA", PedalBackgroundA);
+    settingsGeneral.SetBoolValue("HUD", "SteeringWheelInfo", HUD.Wheel.Enable);
+    settingsGeneral.SetBoolValue("HUD", "AlwaysSteeringWheelInfo", HUD.Wheel.Always);
+    settingsGeneral.SetDoubleValue("HUD", "SteeringWheelTextureX", HUD.Wheel.ImgXPos);
+    settingsGeneral.SetDoubleValue("HUD", "SteeringWheelTextureY", HUD.Wheel.ImgYPos);
+    settingsGeneral.SetDoubleValue("HUD", "SteeringWheelTextureSz", HUD.Wheel.ImgSize);
+    settingsGeneral.SetDoubleValue("HUD", "PedalInfoX", HUD.Wheel.PedalXPos);
+    settingsGeneral.SetDoubleValue("HUD", "PedalInfoY", HUD.Wheel.PedalYPos);
+    settingsGeneral.SetDoubleValue("HUD", "PedalInfoH"	   , HUD.Wheel.PedalYSz);
+    settingsGeneral.SetDoubleValue("HUD", "PedalInfoW"	   , HUD.Wheel.PedalXSz);
+    settingsGeneral.SetDoubleValue("HUD", "PedalInfoPadX"  , HUD.Wheel.PedalXPad);
+    settingsGeneral.SetDoubleValue("HUD", "PedalInfoPadY"  , HUD.Wheel.PedalYPad);
 
-    settingsGeneral.SetLongValue("HUD", "PedalInfoThrottleR", PedalInfoThrottleR);
-    settingsGeneral.SetLongValue("HUD", "PedalInfoThrottleG", PedalInfoThrottleG);
-    settingsGeneral.SetLongValue("HUD", "PedalInfoThrottleB", PedalInfoThrottleB);
-    settingsGeneral.SetLongValue("HUD", "PedalInfoThrottleA", PedalInfoThrottleA);
+    settingsGeneral.SetLongValue("HUD", "PedalBackgroundA", HUD.Wheel.PedalBgA);
 
-    settingsGeneral.SetLongValue("HUD", "PedalInfoBrakeR", PedalInfoBrakeR);
-    settingsGeneral.SetLongValue("HUD", "PedalInfoBrakeG", PedalInfoBrakeG);
-    settingsGeneral.SetLongValue("HUD", "PedalInfoBrakeB", PedalInfoBrakeB);
-    settingsGeneral.SetLongValue("HUD", "PedalInfoBrakeA", PedalInfoBrakeA);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoThrottleR", HUD.Wheel.PedalThrottleR);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoThrottleG", HUD.Wheel.PedalThrottleG);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoThrottleB", HUD.Wheel.PedalThrottleB);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoThrottleA", HUD.Wheel.PedalThrottleA);
 
-    settingsGeneral.SetLongValue("HUD", "PedalInfoClutchR", PedalInfoClutchR);
-    settingsGeneral.SetLongValue("HUD", "PedalInfoClutchG", PedalInfoClutchG);
-    settingsGeneral.SetLongValue("HUD", "PedalInfoClutchB", PedalInfoClutchB);
-    settingsGeneral.SetLongValue("HUD", "PedalInfoClutchA", PedalInfoClutchA);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoBrakeR", HUD.Wheel.PedalBrakeR);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoBrakeG", HUD.Wheel.PedalBrakeG);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoBrakeB", HUD.Wheel.PedalBrakeB);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoBrakeA", HUD.Wheel.PedalBrakeA);
+
+    settingsGeneral.SetLongValue("HUD", "PedalInfoClutchR", HUD.Wheel.PedalClutchR);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoClutchG", HUD.Wheel.PedalClutchG);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoClutchB", HUD.Wheel.PedalClutchB);
+    settingsGeneral.SetLongValue("HUD", "PedalInfoClutchA", HUD.Wheel.PedalClutchA);
 
     // [UPDATE]
-    settingsGeneral.SetBoolValue("UPDATE", "EnableUpdate", EnableUpdate);
-    if (!IgnoredVersion.empty())
-        settingsGeneral.SetValue("UPDATE", "IgnoredVersion", IgnoredVersion.c_str());
+    settingsGeneral.SetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);
+    if (!Update.IgnoredVersion.empty())
+        settingsGeneral.SetValue("UPDATE", "IgnoredVersion", Update.IgnoredVersion.c_str());
     else
         settingsGeneral.SetValue("UPDATE", "IgnoredVersion", "v0.0.0");
 
     // [DEBUG]
-    settingsGeneral.SetBoolValue("DEBUG", "DisplayInfo", DisplayInfo);
-    settingsGeneral.SetBoolValue("DEBUG", "DisplayWheelInfo", DisplayWheelInfo);
-    settingsGeneral.SetBoolValue("DEBUG", "DisplayFFBInfo", DisplayFFBInfo);
-    settingsGeneral.SetBoolValue("DEBUG", "DisplayGearingInfo", DisplayGearingInfo);
-    settingsGeneral.SetBoolValue("DEBUG", "DisplayNPCInfo", ShowNPCInfo);
-    settingsGeneral.SetBoolValue("DEBUG", "DisableInputDetect", DisableInputDetect);
+    settingsGeneral.SetBoolValue("DEBUG", "DisplayInfo", Debug.DisplayInfo);
+    settingsGeneral.SetBoolValue("DEBUG", "DisplayWheelInfo", Debug.DisplayWheelInfo);
+    settingsGeneral.SetBoolValue("DEBUG", "DisplayFFBInfo", Debug.DisplayFFBInfo);
+    settingsGeneral.SetBoolValue("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
+    settingsGeneral.SetBoolValue("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
+    settingsGeneral.SetBoolValue("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
     settingsGeneral.SetBoolValue("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
 
     result = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
@@ -201,24 +208,25 @@ void ScriptSettings::SaveController(CarControls *scriptControl) const {
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [CONTROLLER]
-    settingsGeneral.SetBoolValue("CONTROLLER", "ToggleEngine", ToggleEngine);
-    settingsGeneral.SetLongValue("CONTROLLER", "ToggleTime", scriptControl->CToggleTime); 
-    settingsGeneral.SetDoubleValue("CONTROLLER", "TriggerValue", scriptControl->GetControllerTrigger());
-    settingsGeneral.SetBoolValue("CONTROLLER", "BlockCarControls", BlockCarControls);
-    settingsGeneral.SetBoolValue("CONTROLLER", "IgnoreShiftsUI", IgnoreShiftsUI);
-    settingsGeneral.SetBoolValue("CONTROLLER", "BlockHShift", BlockHShift);
+    settingsGeneral.SetLongValue("CONTROLLER", "HoldTimeMs", Controller.HoldTimeMs);
+    settingsGeneral.SetLongValue("CONTROLLER", "MaxTapTimeMs", Controller.MaxTapTimeMs);
+    settingsGeneral.SetDoubleValue("CONTROLLER", "TriggerValue", Controller.TriggerValue);
 
-    settingsGeneral.SetLongValue("CONTROLLER", "MaxTapTime", scriptControl->MaxTapTime);
+    settingsGeneral.SetBoolValue("CONTROLLER", "ToggleEngine", Controller.ToggleEngine);
+    settingsGeneral.SetBoolValue("CONTROLLER", "BlockCarControls", Controller.BlockCarControls);
+    settingsGeneral.SetBoolValue("CONTROLLER", "IgnoreShiftsUI", Controller.IgnoreShiftsUI);
+    settingsGeneral.SetBoolValue("CONTROLLER", "BlockHShift", Controller.BlockHShift);
+
     
-    settingsGeneral.SetLongValue("CONTROLLER", "ShiftUpBlocks", scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)]);
-    settingsGeneral.SetLongValue("CONTROLLER", "ShiftDownBlocks", scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)]);
-    settingsGeneral.SetLongValue("CONTROLLER", "ClutchBlocks", scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)]);
+    settingsGeneral.SetLongValue("CONTROLLER", "ShiftUpBlocks", Controller.ShiftUpBlocks);
+    settingsGeneral.SetLongValue("CONTROLLER", "ShiftDownBlocks", Controller.ShiftDownBlocks);
+    settingsGeneral.SetLongValue("CONTROLLER", "ClutchBlocks", Controller.ClutchBlocks);
 
-    // [CONTROLLER_LEGACY]
-    settingsGeneral.SetBoolValue("CONTROLLER_LEGACY", "Enable", scriptControl->UseLegacyController);
-    settingsGeneral.SetLongValue("CONTROLLER_LEGACY", "ShiftUpBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
-    settingsGeneral.SetLongValue("CONTROLLER_LEGACY", "ShiftDownBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
-    settingsGeneral.SetLongValue("CONTROLLER_LEGACY", "ClutchBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
+    // [CONTROLLER_NATIVE]
+    settingsGeneral.SetBoolValue("CONTROLLER_NATIVE", "Enable", Controller.Native.Enable);
+    settingsGeneral.SetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", Controller.Native.ShiftUpBlocks);
+    settingsGeneral.SetLongValue("CONTROLLER_NATIVE", "ShiftDownBlocks", Controller.Native.ShiftDownBlocks);
+    settingsGeneral.SetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", Controller.Native.ClutchBlocks);
 
     result = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
@@ -232,55 +240,52 @@ void ScriptSettings::SaveWheel(CarControls *scriptControl) const {
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [OPTIONS]
-    settingsWheel.SetBoolValue("OPTIONS", "EnableWheel", EnableWheel);
-    settingsWheel.SetBoolValue("OPTIONS", "WheelWithoutManual", WheelWithoutManual);
+    settingsWheel.SetBoolValue("MT_OPTIONS", "EnableWheel", Wheel.Options.Enable);
 
-    settingsWheel.SetBoolValue("OPTIONS", "LogitechLEDs", LogiLEDs);
-    settingsWheel.SetBoolValue("OPTIONS", "HPatternKeyboard", HPatternKeyboard);
+    settingsWheel.SetBoolValue("MT_OPTIONS", "LogitechLEDs", Wheel.Options.LogiLEDs);
+    settingsWheel.SetBoolValue("MT_OPTIONS", "HPatternKeyboard", Wheel.Options.HPatternKeyboard);
 
-    settingsWheel.SetDoubleValue("OPTIONS", "GameSteerMultWheel", GameSteerMultWheel);
-    settingsWheel.SetBoolValue("OPTIONS", "UseShifterForAuto", UseShifterForAuto);
+    settingsWheel.SetBoolValue("MT_OPTIONS", "UseShifterForAuto", Wheel.Options.UseShifterForAuto);
 
     // [FORCE_FEEDBACK]
-    settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Enable", EnableFFB);
-    settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Scale", ScaleFFB);
-    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", SATAmpMult);
-    settingsWheel.SetLongValue("FORCE_FEEDBACK", "SATMax", FFB.SATMax);
-    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "AntiDeadForce", FFB.AntiDeadForce);
+    settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
+    settingsWheel.SetBoolValue("FORCE_FEEDBACK", "Scale", Wheel.FFB.Scale);
+    settingsWheel.SetLongValue("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
+    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
+    settingsWheel.SetLongValue("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
+    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
+    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DetailMult", Wheel.FFB.DetailMult);
+    settingsWheel.SetLongValue("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
+    settingsWheel.SetLongValue("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
+    settingsWheel.SetLongValue("FORCE_FEEDBACK", "DamperMax", Wheel.FFB.DamperMax);
+    settingsWheel.SetLongValue("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin);
+    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
+    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
 
-    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DetailMult", DetailMult);
-    settingsWheel.SetLongValue("FORCE_FEEDBACK", "DetailLim", FFB.DetailLim);
-    settingsWheel.SetLongValue("FORCE_FEEDBACK", "DetailMaw", FFB.DetailMAW);
-
-    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "CollisionMult", CollisionMult);
-    settingsWheel.SetLongValue("FORCE_FEEDBACK", "DamperMax", DamperMax);
-    settingsWheel.SetLongValue("FORCE_FEEDBACK", "DamperMin", DamperMin);
-    settingsWheel.SetDoubleValue("FORCE_FEEDBACK", "DamperMinSpeed", DamperMinSpeed);
+    // [INPUT_DEVICES]
+    settingsWheel.SetValue("INPUT_DEVICES", nullptr, nullptr);
 
     // [STEER]
-    settingsWheel.SetDoubleValue("STEER", "ANTIDEADZONE", scriptControl->ADZSteer);
-    settingsWheel.SetDoubleValue("STEER", "DEADZONE", scriptControl->DZSteer);
-    settingsWheel.SetDoubleValue("STEER", "DEADZONEOFFSET", scriptControl->DZSteerOffset);
-    settingsWheel.SetDoubleValue("STEER", "SteerAngleMax", SteerAngleMax );
-    settingsWheel.SetDoubleValue("STEER", "SteerAngleCar", SteerAngleCar );
-    settingsWheel.SetDoubleValue("STEER", "SteerAngleBike",SteerAngleBike);
-    settingsWheel.SetDoubleValue("STEER", "SteerAngleBoat", SteerAngleBoat);
-    settingsWheel.SetDoubleValue("STEER", "GAMMA", SteerGamma);
+    settingsWheel.SetDoubleValue("STEER", "ANTIDEADZONE", Wheel.Steering.AntiDeadZone);
+    settingsWheel.SetDoubleValue("STEER", "DEADZONE", Wheel.Steering.DeadZone);
+    settingsWheel.SetDoubleValue("STEER", "DEADZONEOFFSET", Wheel.Steering.DeadZoneOffset);
+    settingsWheel.SetDoubleValue("STEER", "SteerAngleMax", Wheel.Steering.AngleMax);
+    settingsWheel.SetDoubleValue("STEER", "SteerAngleCar", Wheel.Steering.AngleCar);
+    settingsWheel.SetDoubleValue("STEER", "SteerAngleBike",Wheel.Steering.AngleBike);
+    settingsWheel.SetDoubleValue("STEER", "SteerAngleBoat", Wheel.Steering.AngleBoat);
+    settingsWheel.SetDoubleValue("STEER", "GAMMA", Wheel.Steering.Gamma);
+    settingsWheel.SetDoubleValue("STEER", "GameSteerMultWheel", Wheel.Steering.SteerMult);
 
     // [THROTTLE]
-    settingsWheel.SetDoubleValue("THROTTLE", "ANTIDEADZONE", scriptControl->ADZThrottle);
-    settingsWheel.SetDoubleValue("THROTTLE", "GAMMA", ThrottleGamma);
+    settingsWheel.SetDoubleValue("THROTTLE", "GAMMA", Wheel.Throttle.Gamma);
+    settingsWheel.SetDoubleValue("THROTTLE", "ANTIDEADZONE", Wheel.Throttle.AntiDeadZone);
 
-    // [BRAKES]
-    settingsWheel.SetDoubleValue("BRAKES", "ANTIDEADZONE", scriptControl->ADZBrake);
-    settingsWheel.SetDoubleValue("BRAKES", "GAMMA", BrakeGamma);
+    // [BRAKE]
+    settingsWheel.SetDoubleValue("BRAKE", "GAMMA", Wheel.Brake.Gamma);
+    settingsWheel.SetDoubleValue("BRAKE", "ANTIDEADZONE", Wheel.Brake.AntiDeadZone);
 
     result = settingsWheel.SaveFile(settingsWheelFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
-}
-
-std::vector<GUID> ScriptSettings::GetGuids() {
-    return RegisteredGUIDs;
 }
 
 void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
@@ -290,157 +295,161 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [OPTIONS]
-    EnableManual = settingsGeneral.GetBoolValue("OPTIONS", "Enable", true);
-    ShiftMode = (ShiftModes)settingsGeneral.GetLongValue("OPTIONS", "ShiftMode", 0);
-    SimpleBike = settingsGeneral.GetBoolValue("OPTIONS", "SimpleBike", false);
-    EngDamage = settingsGeneral.GetBoolValue("OPTIONS", "EngineDamage", false);
-    EngStall = settingsGeneral.GetBoolValue("OPTIONS", "EngineStalling", true);
-    EngStallS = settingsGeneral.GetBoolValue("OPTIONS", "EngineStallingS", false);
-    EngBrake = settingsGeneral.GetBoolValue("OPTIONS", "EngineBraking", true);
-    EngLock  = settingsGeneral.GetBoolValue("OPTIONS", "EngineLocking", false);
-    ClutchCatching = settingsGeneral.GetBoolValue("OPTIONS", "ClutchCatching", true);
-    ClutchShiftingH = settingsGeneral.GetBoolValue("OPTIONS", "ClutchShiftingH", true);
-    ClutchShiftingS = settingsGeneral.GetBoolValue("OPTIONS", "ClutchShiftingS", false);
-    DefaultNeutral = settingsGeneral.GetBoolValue("OPTIONS", "DefaultNeutral", true);
+    MTOptions.Enable = settingsGeneral.GetBoolValue("MT_OPTIONS", "Enable", MTOptions.Enable);
+    MTOptions.ShiftMode = 
+        static_cast<EShiftMode>(settingsGeneral.GetLongValue("MT_OPTIONS", "ShiftMode", EToInt(MTOptions.ShiftMode)));
+    MTOptions.EngDamage = settingsGeneral.GetBoolValue("MT_OPTIONS", "EngineDamage", MTOptions.EngDamage);
+    MTOptions.EngStallH = settingsGeneral.GetBoolValue("MT_OPTIONS", "EngineStalling", MTOptions.EngStallH);
+    MTOptions.EngStallS = settingsGeneral.GetBoolValue("MT_OPTIONS", "EngineStallingS", MTOptions.EngStallS);
+    MTOptions.EngBrake = settingsGeneral.GetBoolValue("MT_OPTIONS", "EngineBraking", MTOptions.EngBrake);
+    MTOptions.EngLock  = settingsGeneral.GetBoolValue("MT_OPTIONS", "EngineLocking", MTOptions.EngLock);
+    MTOptions.ClutchCreep = settingsGeneral.GetBoolValue("MT_OPTIONS", "ClutchCatching", MTOptions.ClutchCreep);
+    MTOptions.ClutchShiftH = settingsGeneral.GetBoolValue("MT_OPTIONS", "ClutchShiftingH", MTOptions.ClutchShiftH);
+    MTOptions.ClutchShiftS = settingsGeneral.GetBoolValue("MT_OPTIONS", "ClutchShiftingS", MTOptions.ClutchShiftS);
+    MTOptions.HardLimiter = settingsGeneral.GetBoolValue("MT_OPTIONS", "HardLimiter", MTOptions.HardLimiter);
 
-    ClutchThreshold = settingsGeneral.GetDoubleValue("OPTIONS", "ClutchCatchpoint", 10.0) / 100.0f;
-    StallingThreshold = settingsGeneral.GetDoubleValue("OPTIONS", "StallingThreshold", 85.0) / 100.0f;
-    StallingRPM = settingsGeneral.GetDoubleValue("OPTIONS", "StallingRPM", 0.1);
-    RPMDamage = settingsGeneral.GetDoubleValue("OPTIONS", "RPMDamage", 15.0) / 100.0f;
-    MisshiftDamage = settingsGeneral.GetDoubleValue("OPTIONS", "MisshiftDamage", 20.0);
-    EngBrakePower = settingsGeneral.GetDoubleValue("OPTIONS", "EngBrakePower", 1.0);
-    EngBrakeThreshold = settingsGeneral.GetDoubleValue("OPTIONS", "EngBrakeThreshold", 0.75);
+    MTParams.ClutchThreshold =      settingsGeneral.GetDoubleValue("MT_PARAMS", "ClutchCatchpoint", MTParams.ClutchThreshold);
+    MTParams.StallingThreshold =    settingsGeneral.GetDoubleValue("MT_PARAMS", "StallingThreshold", MTParams.StallingThreshold);
+    MTParams.StallingRPM =          settingsGeneral.GetDoubleValue("MT_PARAMS", "StallingRPM", MTParams.StallingRPM);
+    MTParams.RPMDamage =            settingsGeneral.GetDoubleValue("MT_PARAMS", "RPMDamage", MTParams.RPMDamage);
+    MTParams.MisshiftDamage =       settingsGeneral.GetDoubleValue("MT_PARAMS", "MisshiftDamage", MTParams.MisshiftDamage);
+    MTParams.EngBrakePower =        settingsGeneral.GetDoubleValue("MT_PARAMS", "EngBrakePower", MTParams.EngBrakePower);
+    MTParams.EngBrakeThreshold =    settingsGeneral.GetDoubleValue("MT_PARAMS", "EngBrakeThreshold", MTParams.EngBrakeThreshold);
 
-    HillBrakeWorkaround = settingsGeneral.GetBoolValue("OPTIONS", "HillBrakeWorkaround", false);
-    AutoGear1 = settingsGeneral.GetBoolValue("OPTIONS", "AutoGear1", false);
-    AutoLookBack = settingsGeneral.GetBoolValue("OPTIONS", "AutoLookBack", false);
-    ThrottleStart = settingsGeneral.GetBoolValue("OPTIONS", "ThrottleStart", true);
-    HidePlayerInFPV = settingsGeneral.GetBoolValue("OPTIONS", "HidePlayerInFPV", false);
-    HardLimiter = settingsGeneral.GetBoolValue("OPTIONS", "HardLimiter", false);
-    CustomABS = settingsGeneral.GetBoolValue("OPTIONS", "CustomABS", false);
-    ABSFilter = settingsGeneral.GetBoolValue("OPTIONS", "ABSFilter", false);
+    GameAssists.DefaultNeutral =    settingsGeneral.GetBoolValue("GAMEPLAY_ASSISTS", "DefaultNeutral", GameAssists.DefaultNeutral);
+    GameAssists.SimpleBike =        settingsGeneral.GetBoolValue("GAMEPLAY_ASSISTS", "SimpleBike", GameAssists.SimpleBike);
+    GameAssists.HillGravity =       settingsGeneral.GetBoolValue("GAMEPLAY_ASSISTS", "HillBrakeWorkaround", GameAssists.HillGravity);
+    GameAssists.AutoGear1 =         settingsGeneral.GetBoolValue("GAMEPLAY_ASSISTS", "AutoGear1", GameAssists.AutoGear1);
+    GameAssists.AutoLookBack =      settingsGeneral.GetBoolValue("GAMEPLAY_ASSISTS", "AutoLookBack", GameAssists.AutoLookBack);
+    GameAssists.ThrottleStart =     settingsGeneral.GetBoolValue("GAMEPLAY_ASSISTS", "ThrottleStart", GameAssists.ThrottleStart);
+    GameAssists.HidePlayerInFPV =   settingsGeneral.GetBoolValue("GAMEPLAY_ASSISTS", "HidePlayerInFPV", GameAssists.HidePlayerInFPV);
 
-    // [ASSISTS]
-    Assists.TractionControl = settingsGeneral.GetLongValue("ASSISTS", "TractionControl", 0);
+    // [DRIVING_ASSISTS]
+    DriveAssists.CustomABS = settingsGeneral.GetBoolValue("DRIVING_ASSISTS", "CustomABS", DriveAssists.CustomABS);
+    DriveAssists.ABSFilter = settingsGeneral.GetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABSFilter);
+    DriveAssists.TCMode = settingsGeneral.GetLongValue("DRIVING_ASSISTS", "TractionControl", DriveAssists.TCMode);
 
     // [SHIFT_OPTIONS]
-    UpshiftCut = settingsGeneral.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", true);
-    DownshiftBlip = settingsGeneral.GetBoolValue("SHIFT_OPTIONS", "DownshiftBlip", true);
-    ClutchRateMult = settingsGeneral.GetDoubleValue("SHIFT_OPTIONS", "ClutchRateMult", 1.0f);
+    ShiftOptions.UpshiftCut = settingsGeneral.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
+    ShiftOptions.DownshiftBlip = settingsGeneral.GetBoolValue("SHIFT_OPTIONS", "DownshiftBlip", ShiftOptions.DownshiftBlip);
+    ShiftOptions.ClutchRateMult = settingsGeneral.GetDoubleValue("SHIFT_OPTIONS", "ClutchRateMult", ShiftOptions.ClutchRateMult);
+    ShiftOptions.ClutchRateMult = settingsGeneral.GetDoubleValue("SHIFT_OPTIONS", "RPMTolerance", ShiftOptions.RPMTolerance);
 
-    // [AUTO_BOX]
-    UpshiftLoad = settingsGeneral.GetDoubleValue("AUTO_BOX", "UpshiftLoad", 0.05f);
-    DownshiftLoad =  settingsGeneral.GetDoubleValue("AUTO_BOX", "DownshiftLoad", 0.60f);
-    NextGearMinRPM = settingsGeneral.GetDoubleValue("AUTO_BOX", "NextGearMinRPM", 0.33f);
-    CurrGearMinRPM = settingsGeneral.GetDoubleValue("AUTO_BOX", "CurrGearMinRPM", 0.27f);
-    EcoRate = settingsGeneral.GetDoubleValue("AUTO_BOX", "EcoRate", 0.05f);
-    DownshiftTimeoutMult = settingsGeneral.GetDoubleValue("AUTO_BOX", "DownshiftTimeoutMult", 1.0f);
+    // [AUTO_PARAMS]
+    AutoParams.UpshiftLoad = settingsGeneral.GetDoubleValue("AUTO_PARAMS", "UpshiftLoad", AutoParams.UpshiftLoad);
+    AutoParams.DownshiftLoad =  settingsGeneral.GetDoubleValue("AUTO_PARAMS", "DownshiftLoad", AutoParams.DownshiftLoad);
+    AutoParams.NextGearMinRPM = settingsGeneral.GetDoubleValue("AUTO_PARAMS", "NextGearMinRPM", AutoParams.NextGearMinRPM);
+    AutoParams.CurrGearMinRPM = settingsGeneral.GetDoubleValue("AUTO_PARAMS", "CurrGearMinRPM", AutoParams.CurrGearMinRPM);
+    AutoParams.EcoRate = settingsGeneral.GetDoubleValue("AUTO_PARAMS", "EcoRate", AutoParams.EcoRate);
+    AutoParams.DownshiftTimeoutMult = settingsGeneral.GetDoubleValue("AUTO_PARAMS", "DownshiftTimeoutMult", AutoParams.DownshiftTimeoutMult);
 
     // [CUSTOM_STEERING]
-    CustomSteering.Mode = settingsGeneral.GetLongValue("CUSTOM_STEERING", "Mode", 0);
-    CustomSteering.CountersteerMult = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "CountersteerMult", 1.0f);
-    CustomSteering.CountersteerLimit = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "CountersteerLimit", 15.0f);
-    CustomSteering.SteeringMult = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "SteeringMult", 1.0f);
-    CustomSteering.SteeringReduction = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "SteeringReduction", 1.0f);
+    CustomSteering.Mode = settingsGeneral.GetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
+    CustomSteering.CountersteerMult = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "CountersteerMult", CustomSteering.CountersteerMult);
+    CustomSteering.CountersteerLimit = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "CountersteerLimit", CustomSteering.CountersteerLimit);
+    CustomSteering.SteeringMult = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "SteeringMult", CustomSteering.SteeringMult);
+    CustomSteering.SteeringReduction = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "SteeringReduction", CustomSteering.SteeringReduction);
+    CustomSteering.Gamma = settingsGeneral.GetDoubleValue("CUSTOM_STEERING", "Gamma", CustomSteering.Gamma);
 
     // [HUD]
-    HUD = settingsGeneral.GetBoolValue			("HUD", "EnableHUD", true);
-    AlwaysHUD = settingsGeneral.GetBoolValue	("HUD", "AlwaysHUD", false);
-    HUDFont = settingsGeneral.GetLongValue		("HUD", "HUDFont", 4);
+    HUD.Enable = settingsGeneral.GetBoolValue("HUD", "EnableHUD", HUD.Enable);
+    HUD.Always = settingsGeneral.GetBoolValue("HUD", "AlwaysHUD", HUD.Always);
+    HUD.Font = settingsGeneral.GetLongValue("HUD", "HUDFont", HUD.Font);
+    HUD.NotifyLevel = settingsGeneral.GetLongValue("HUD", "NotifyLevel", HUD.NotifyLevel);
 
-    GearIndicator = settingsGeneral.GetBoolValue("HUD", "GearIndicator", true);
-    GearXpos = settingsGeneral.GetDoubleValue	("HUD", "GearXpos", 0.952500);
-    GearYpos = settingsGeneral.GetDoubleValue	("HUD", "GearYpos", 0.885000);
-    GearSize = settingsGeneral.GetDoubleValue	("HUD", "GearSize", 0.700000);
-    GearTopColorR = settingsGeneral.GetLongValue("HUD", "GearTopColorR", 255);
-    GearTopColorG = settingsGeneral.GetLongValue("HUD", "GearTopColorG", 63);
-    GearTopColorB = settingsGeneral.GetLongValue("HUD", "GearTopColorB", 63);
+    HUD.Gear.Enable = settingsGeneral.GetBoolValue("HUD", "GearIndicator", HUD.Gear.Enable);
+    HUD.Gear.XPos = settingsGeneral.GetDoubleValue("HUD", "GearXpos", HUD.Gear.XPos);
+    HUD.Gear.YPos = settingsGeneral.GetDoubleValue("HUD", "GearYpos", HUD.Gear.YPos);
+    HUD.Gear.Size = settingsGeneral.GetDoubleValue("HUD", "GearSize", HUD.Gear.Size);
+    HUD.Gear.TopColorR = settingsGeneral.GetLongValue("HUD", "GearTopColorR", HUD.Gear.TopColorR);
+    HUD.Gear.TopColorG = settingsGeneral.GetLongValue("HUD", "GearTopColorG", HUD.Gear.TopColorG);
+    HUD.Gear.TopColorB = settingsGeneral.GetLongValue("HUD", "GearTopColorB", HUD.Gear.TopColorB);
 
-    ShiftModeIndicator = settingsGeneral.GetBoolValue("HUD", "ShiftModeIndicator", true);
-    ShiftModeXpos = settingsGeneral.GetDoubleValue("HUD", "ShiftModeXpos", 0.935000);
-    ShiftModeYpos = settingsGeneral.GetDoubleValue("HUD", "ShiftModeYpos", 0.885000);
-    ShiftModeSize = settingsGeneral.GetDoubleValue("HUD", "ShiftModeSize", 0.700000);
+    HUD.ShiftMode.Enable = settingsGeneral.GetBoolValue("HUD", "ShiftModeIndicator", true);
+    HUD.ShiftMode.XPos = settingsGeneral.GetDoubleValue("HUD", "ShiftModeXpos", HUD.ShiftMode.XPos);
+    HUD.ShiftMode.YPos = settingsGeneral.GetDoubleValue("HUD", "ShiftModeYpos", HUD.ShiftMode.YPos);
+    HUD.ShiftMode.Size = settingsGeneral.GetDoubleValue("HUD", "ShiftModeSize", HUD.ShiftMode.Size);
 
-    Speedo = settingsGeneral.GetValue("HUD", "Speedo", "kph");
-    SpeedoShowUnit = settingsGeneral.GetBoolValue("HUD", "SpeedoShowUnit", true);
-    SpeedoXpos = settingsGeneral.GetDoubleValue("HUD", "SpeedoXpos", 0.860000);
-    SpeedoYpos = settingsGeneral.GetDoubleValue("HUD", "SpeedoYpos", 0.885000);
-    SpeedoSize = settingsGeneral.GetDoubleValue("HUD", "SpeedoSize", 0.700000);
+    HUD.Speedo.Speedo = settingsGeneral.GetValue("HUD", "Speedo", HUD.Speedo.Speedo.c_str());
+    HUD.Speedo.ShowUnit = settingsGeneral.GetBoolValue("HUD", "SpeedoShowUnit", HUD.Speedo.ShowUnit);
+    HUD.Speedo.XPos = settingsGeneral.GetDoubleValue("HUD", "SpeedoXpos", HUD.Speedo.XPos);
+    HUD.Speedo.YPos = settingsGeneral.GetDoubleValue("HUD", "SpeedoYpos", HUD.Speedo.YPos);
+    HUD.Speedo.Size = settingsGeneral.GetDoubleValue("HUD", "SpeedoSize", HUD.Speedo.Size);
 
-    RPMIndicator = settingsGeneral.GetBoolValue("HUD", "EnableRPMIndicator", true);
-    RPMIndicatorXpos = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorXpos", 0.120001);
-    RPMIndicatorYpos = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorYpos", 0.765000);
-    RPMIndicatorWidth = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorWidth", 0.140000);
-    RPMIndicatorHeight = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorHeight", 0.005000);
-    RPMIndicatorRedline = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorRedline", 0.845000);
+    HUD.RPMBar.Enable = settingsGeneral.GetBoolValue("HUD", "EnableRPMIndicator", HUD.RPMBar.Enable);
+    HUD.RPMBar.XPos = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorXpos", HUD.RPMBar.XPos);
+    HUD.RPMBar.YPos = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorYpos", HUD.RPMBar.YPos);
+    HUD.RPMBar.XSz = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorWidth", HUD.RPMBar.XSz);
+    HUD.RPMBar.YSz = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorHeight", HUD.RPMBar.YSz);
+    HUD.RPMBar.Redline = settingsGeneral.GetDoubleValue("HUD", "RPMIndicatorRedline", HUD.RPMBar.Redline);
 
-    RPMIndicatorBackgroundR = settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundR", 0);
-    RPMIndicatorBackgroundG = settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundG", 0);
-    RPMIndicatorBackgroundB = settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundB", 0);
-    RPMIndicatorBackgroundA = settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundA", 128);
+    HUD.RPMBar.BgR = settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundR", HUD.RPMBar.BgR);
+    HUD.RPMBar.BgG = settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundG", HUD.RPMBar.BgG);
+    HUD.RPMBar.BgB = settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundB", HUD.RPMBar.BgB);
+    HUD.RPMBar.BgA = settingsGeneral.GetLongValue("HUD", "RPMIndicatorBackgroundA", HUD.RPMBar.BgA);
                                     
-    RPMIndicatorForegroundR = settingsGeneral.GetLongValue("HUD", "RPMIndicatorForegroundR", 255);
-    RPMIndicatorForegroundG = settingsGeneral.GetLongValue("HUD", "RPMIndicatorForegroundG", 255);
-    RPMIndicatorForegroundB = settingsGeneral.GetLongValue("HUD", "RPMIndicatorForegroundB", 255);
-    RPMIndicatorForegroundA = settingsGeneral.GetLongValue("HUD", "RPMIndicatorForegroundA", 255);
+    HUD.RPMBar.FgR = settingsGeneral.GetLongValue("HUD", "RPMIndicatorForegroundR", HUD.RPMBar.FgR);
+    HUD.RPMBar.FgG = settingsGeneral.GetLongValue("HUD", "RPMIndicatorForegroundG", HUD.RPMBar.FgG);
+    HUD.RPMBar.FgB = settingsGeneral.GetLongValue("HUD", "RPMIndicatorForegroundB", HUD.RPMBar.FgB);
+    HUD.RPMBar.FgA = settingsGeneral.GetLongValue("HUD", "RPMIndicatorForegroundA", HUD.RPMBar.FgA);
                                     
-    RPMIndicatorRedlineR = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineR", 255);
-    RPMIndicatorRedlineG = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineG", 92);
-    RPMIndicatorRedlineB = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineB", 0);
-    RPMIndicatorRedlineA = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineA", 255);
+    HUD.RPMBar.RedlineR = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineR", HUD.RPMBar.RedlineR);
+    HUD.RPMBar.RedlineG = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineG", HUD.RPMBar.RedlineG);
+    HUD.RPMBar.RedlineB = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineB", HUD.RPMBar.RedlineB);
+    HUD.RPMBar.RedlineA = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRedlineA", HUD.RPMBar.RedlineA);
 
-    RPMIndicatorRevlimitR = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitR", 255);
-    RPMIndicatorRevlimitG = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitG", 0);
-    RPMIndicatorRevlimitB = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitB", 0);
-    RPMIndicatorRevlimitA = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitA", 255);
+    HUD.RPMBar.RevLimitR = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitR", HUD.RPMBar.RevLimitR);
+    HUD.RPMBar.RevLimitG = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitG", HUD.RPMBar.RevLimitG);
+    HUD.RPMBar.RevLimitB = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitB", HUD.RPMBar.RevLimitB);
+    HUD.RPMBar.RevLimitA = settingsGeneral.GetLongValue("HUD", "RPMIndicatorRevlimitA", HUD.RPMBar.RevLimitA);
 
-    SteeringWheelInfo	  = settingsGeneral.GetBoolValue("HUD", "SteeringWheelInfo", true);
-    AlwaysSteeringWheelInfo = settingsGeneral.GetBoolValue("HUD", "AlwaysSteeringWheelInfo", false);
-    SteeringWheelTextureX = settingsGeneral.GetDoubleValue("HUD", "SteeringWheelTextureX", 0.230000);
-    SteeringWheelTextureY = settingsGeneral.GetDoubleValue("HUD", "SteeringWheelTextureY", 0.890000);
-    SteeringWheelTextureSz= settingsGeneral.GetDoubleValue("HUD", "SteeringWheelTextureSz", 0.060000);
-    PedalInfoX			  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoX", 0.290000);
-    PedalInfoY			  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoY", 0.890000);
-    PedalInfoH			  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoH", 0.100000);
-    PedalInfoW			  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoW", 0.040000);
-    PedalInfoPadX		  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoPadX", 0.000000);
-    PedalInfoPadY		  = settingsGeneral.GetDoubleValue("HUD", "PedalInfoPadY", 0.000000);
-    
-    PedalBackgroundA = settingsGeneral.GetLongValue("HUD", "PedalBackgroundA", 92);
+    HUD.Wheel.Enable = settingsGeneral.GetBoolValue("HUD", "SteeringWheelInfo", HUD.Wheel.Enable);
+    HUD.Wheel.Always = settingsGeneral.GetBoolValue("HUD", "AlwaysSteeringWheelInfo", HUD.Wheel.Always);
+    HUD.Wheel.ImgXPos = settingsGeneral.GetDoubleValue("HUD", "SteeringWheelTextureX", HUD.Wheel.ImgXPos);
+    HUD.Wheel.ImgYPos = settingsGeneral.GetDoubleValue("HUD", "SteeringWheelTextureY", HUD.Wheel.ImgYPos);
+    HUD.Wheel.ImgSize = settingsGeneral.GetDoubleValue("HUD", "SteeringWheelTextureSz", HUD.Wheel.ImgSize);
 
-    PedalInfoThrottleR = settingsGeneral.GetLongValue("HUD", "PedalInfoThrottleR", 0);
-    PedalInfoThrottleG = settingsGeneral.GetLongValue("HUD", "PedalInfoThrottleG", 255);
-    PedalInfoThrottleB = settingsGeneral.GetLongValue("HUD", "PedalInfoThrottleB", 0);
-    PedalInfoThrottleA = settingsGeneral.GetLongValue("HUD", "PedalInfoThrottleA", 255);
+    HUD.Wheel.PedalXPos = settingsGeneral.GetDoubleValue("HUD", "PedalInfoX", HUD.Wheel.PedalXPos);
+    HUD.Wheel.PedalYPos = settingsGeneral.GetDoubleValue("HUD", "PedalInfoY", HUD.Wheel.PedalYPos);
+    HUD.Wheel.PedalYSz = settingsGeneral.GetDoubleValue("HUD", "PedalInfoH", HUD.Wheel.PedalYSz);
+    HUD.Wheel.PedalXSz = settingsGeneral.GetDoubleValue("HUD", "PedalInfoW", HUD.Wheel.PedalXSz);
+    HUD.Wheel.PedalXPad = settingsGeneral.GetDoubleValue("HUD", "PedalInfoPadX", HUD.Wheel.PedalXPad);
+    HUD.Wheel.PedalYPad = settingsGeneral.GetDoubleValue("HUD", "PedalInfoPadY", HUD.Wheel.PedalYPad);
+    HUD.Wheel.PedalBgA = settingsGeneral.GetLongValue("HUD", "PedalBackgroundA", HUD.Wheel.PedalBgA);
 
-    PedalInfoBrakeR = settingsGeneral.GetLongValue("HUD", "PedalInfoBrakeR", 255);
-    PedalInfoBrakeG = settingsGeneral.GetLongValue("HUD", "PedalInfoBrakeG", 0);
-    PedalInfoBrakeB = settingsGeneral.GetLongValue("HUD", "PedalInfoBrakeB", 0);
-    PedalInfoBrakeA = settingsGeneral.GetLongValue("HUD", "PedalInfoBrakeA", 255);
+    HUD.Wheel.PedalThrottleR = settingsGeneral.GetLongValue("HUD", "PedalInfoThrottleR", HUD.Wheel.PedalThrottleR);
+    HUD.Wheel.PedalThrottleG = settingsGeneral.GetLongValue("HUD", "PedalInfoThrottleG", HUD.Wheel.PedalThrottleG);
+    HUD.Wheel.PedalThrottleB = settingsGeneral.GetLongValue("HUD", "PedalInfoThrottleB", HUD.Wheel.PedalThrottleB);
+    HUD.Wheel.PedalThrottleA = settingsGeneral.GetLongValue("HUD", "PedalInfoThrottleA", HUD.Wheel.PedalThrottleA);
 
-    PedalInfoClutchR = settingsGeneral.GetLongValue("HUD", "PedalInfoClutchR", 0);
-    PedalInfoClutchG = settingsGeneral.GetLongValue("HUD", "PedalInfoClutchG", 0);
-    PedalInfoClutchB = settingsGeneral.GetLongValue("HUD", "PedalInfoClutchB", 255);
-    PedalInfoClutchA = settingsGeneral.GetLongValue("HUD", "PedalInfoClutchA", 255);
+    HUD.Wheel.PedalBrakeR = settingsGeneral.GetLongValue("HUD", "PedalInfoBrakeR", HUD.Wheel.PedalBrakeR);
+    HUD.Wheel.PedalBrakeG = settingsGeneral.GetLongValue("HUD", "PedalInfoBrakeG", HUD.Wheel.PedalBrakeG);
+    HUD.Wheel.PedalBrakeB = settingsGeneral.GetLongValue("HUD", "PedalInfoBrakeB", HUD.Wheel.PedalBrakeB);
+    HUD.Wheel.PedalBrakeA = settingsGeneral.GetLongValue("HUD", "PedalInfoBrakeA", HUD.Wheel.PedalBrakeA);
+
+    HUD.Wheel.PedalClutchR = settingsGeneral.GetLongValue("HUD", "PedalInfoClutchR", HUD.Wheel.PedalClutchR);
+    HUD.Wheel.PedalClutchG = settingsGeneral.GetLongValue("HUD", "PedalInfoClutchG", HUD.Wheel.PedalClutchG);
+    HUD.Wheel.PedalClutchB = settingsGeneral.GetLongValue("HUD", "PedalInfoClutchB", HUD.Wheel.PedalClutchB);
+    HUD.Wheel.PedalClutchA = settingsGeneral.GetLongValue("HUD", "PedalInfoClutchA", HUD.Wheel.PedalClutchA);
 
     // [CONTROLLER]
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Toggle)] = settingsGeneral.GetValue("CONTROLLER", "Toggle", "UNKNOWN");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ToggleH)] = settingsGeneral.GetValue("CONTROLLER", "ToggleShift", "B");
-    BlockCarControls = settingsGeneral.GetBoolValue("CONTROLLER", "BlockCarControls", false);
-    IgnoreShiftsUI = settingsGeneral.GetBoolValue("CONTROLLER", "IgnoreShiftsUI", false);
-    BlockHShift = settingsGeneral.GetBoolValue("CONTROLLER", "BlockHShift", true);
+    // TODO: Fix this somehow
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Toggle)] =
+        settingsGeneral.GetValue("CONTROLLER", "Toggle", "UNKNOWN");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ToggleH)] = 
+        settingsGeneral.GetValue("CONTROLLER", "ToggleShift", "B");
 
-    scriptControl->CToggleTime = settingsGeneral.GetLongValue("CONTROLLER", "ToggleTime", 300);
-    scriptControl->MaxTapTime = settingsGeneral.GetLongValue("CONTROLLER", "MaxTapTime", 200);
+    Controller.BlockCarControls = settingsGeneral.GetBoolValue("CONTROLLER", "BlockCarControls", Controller.BlockCarControls);
+    Controller.IgnoreShiftsUI = settingsGeneral.GetBoolValue("CONTROLLER", "IgnoreShiftsUI", Controller.IgnoreShiftsUI);
+    Controller.BlockHShift = settingsGeneral.GetBoolValue("CONTROLLER", "BlockHShift", Controller.BlockHShift);
 
-    double tval = settingsGeneral.GetDoubleValue("CONTROLLER", "TriggerValue", 0.85);
-    if (tval > 1.0 || tval < 0.1) {
-        tval = 0.85;
-    }
-    scriptControl->SetControllerTriggerLevel(tval);
+    Controller.HoldTimeMs = settingsGeneral.GetLongValue("CONTROLLER", "ToggleTime", Controller.HoldTimeMs);
+    Controller.MaxTapTimeMs = settingsGeneral.GetLongValue("CONTROLLER", "MaxTapTime", Controller.MaxTapTimeMs);
+    Controller.TriggerValue = settingsGeneral.GetDoubleValue("CONTROLLER", "TriggerValue", Controller.TriggerValue);
+    
+    Controller.ToggleEngine = settingsGeneral.GetBoolValue("CONTROLLER", "ToggleEngine", Controller.ToggleEngine);
 
-    ToggleEngine = settingsGeneral.GetBoolValue("CONTROLLER", "ToggleEngine", false);
-
+    // TODO: Also this
     scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] = settingsGeneral.GetValue("CONTROLLER", "ShiftUp", "A");
     scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = settingsGeneral.GetValue("CONTROLLER", "ShiftDown", "X");
     scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Clutch)] = settingsGeneral.GetValue("CONTROLLER", "Clutch", "LeftThumbUp");
@@ -452,21 +461,21 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = settingsGeneral.GetLongValue("CONTROLLER", "ShiftDownBlocks", -1);
     scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)] = settingsGeneral.GetLongValue("CONTROLLER", "ClutchBlocks", -1);
 
-    // [CONTROLLER_LEGACY]
-    scriptControl->UseLegacyController = settingsGeneral.GetBoolValue("CONTROLLER_LEGACY", "Enable", false);
+    // [CONTROLLER_NATIVE]
+    Controller.Native.Enable = settingsGeneral.GetBoolValue("CONTROLLER_NATIVE", "Enable", Controller.Native.Enable);
 
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Toggle)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Toggle", -1);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ToggleH)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ToggleShift", ControlFrontendCancel);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftUp", ControlFrontendAccept);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftDown", ControlFrontendX);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Clutch)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Clutch", ControlFrontendAxisY);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Engine)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Engine", ControlFrontendDown);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Throttle)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Throttle", ControlFrontendLt);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Brake)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "Brake", ControlFrontendRt);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Toggle)] = settingsGeneral.GetLongValue("CONTROLLER_NATIVE", "Toggle", -1);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ToggleH)] = settingsGeneral.GetLongValue("CONTROLLER_NATIVE", "ToggleShift", ControlFrontendCancel);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = settingsGeneral.GetLongValue("CONTROLLER_NATIVE", "ShiftUp", ControlFrontendAccept);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = settingsGeneral.GetLongValue("CONTROLLER_NATIVE", "ShiftDown", ControlFrontendX);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Clutch)] = settingsGeneral.GetLongValue("CONTROLLER_NATIVE", "Clutch", ControlFrontendAxisY);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Engine)] = settingsGeneral.GetLongValue("CONTROLLER_NATIVE", "Engine", ControlFrontendDown);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Throttle)] = settingsGeneral.GetLongValue("CONTROLLER_NATIVE", "Throttle", ControlFrontendLt);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Brake)] = settingsGeneral.GetLongValue("CONTROLLER_NATIVE", "Brake", ControlFrontendRt);
 
-    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftUpBlocks", -1);
-    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ShiftDownBlocks", -1);
-    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] = settingsGeneral.GetLongValue("CONTROLLER_LEGACY", "ClutchBlocks", -1);
+    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = settingsGeneral.GetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", -1);
+    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = settingsGeneral.GetLongValue("CONTROLLER_NATIVE", "ShiftDownBlocks", -1);
+    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] = settingsGeneral.GetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", -1);
 
     // [KEYBOARD]
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Toggle)] = str2key(settingsGeneral.GetValue("KEYBOARD", "Toggle", "VK_OEM_5"));
@@ -493,18 +502,18 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HN)] = str2key(settingsGeneral.GetValue("KEYBOARD", "HN", "UNKNOWN"));
 
     // [UPDATE]
-    EnableUpdate = settingsGeneral.GetBoolValue("UPDATE", "EnableUpdate", true);
-    IgnoredVersion = settingsGeneral.GetValue("UPDATE", "IgnoredVersion", "v0.0.0");
+    Update.EnableUpdate = settingsGeneral.GetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);
+    Update.IgnoredVersion = settingsGeneral.GetValue("UPDATE", "IgnoredVersion", Update.IgnoredVersion.c_str());
 
     // [DEBUG]
-    DisplayInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayInfo", false);
-    DisplayWheelInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayWheelInfo", false);
-    DisplayGearingInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayGearingInfo", false);
-    DisplayFFBInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayFFBInfo", false);
-    ShowNPCInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayNPCInfo", false);
-    LogLevel = settingsGeneral.GetLongValue("DEBUG", "LogLevel", INFO);
-    DisableInputDetect = settingsGeneral.GetBoolValue("DEBUG", "DisableInputDetect", false);
-    Debug.DisablePlayerHide = settingsGeneral.GetBoolValue("DEBUG", "DisablePlayerHide", false);
+    Debug.LogLevel = settingsGeneral.GetLongValue("DEBUG", "LogLevel", Debug.LogLevel);
+    Debug.DisplayInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayInfo", Debug.DisplayInfo);
+    Debug.DisplayWheelInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayWheelInfo", Debug.DisplayWheelInfo);
+    Debug.DisplayGearingInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
+    Debug.DisplayFFBInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayFFBInfo", Debug.DisplayFFBInfo);
+    Debug.DisplayNPCInfo = settingsGeneral.GetBoolValue("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
+    Debug.DisableInputDetect = settingsGeneral.GetBoolValue("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
+    Debug.DisablePlayerHide = settingsGeneral.GetBoolValue("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
 }
 
 void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
@@ -514,36 +523,29 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [OPTIONS]
-    EnableWheel = settingsWheel.GetBoolValue("OPTIONS", "EnableWheel", true);
-    WheelWithoutManual = settingsWheel.GetBoolValue("OPTIONS", "WheelWithoutManual", true);
-    LogiLEDs = settingsWheel.GetBoolValue("OPTIONS", "LogitechLEDs", false);
-    HPatternKeyboard = settingsWheel.GetBoolValue("OPTIONS", "HPatternKeyboard", false);
-
-    GameSteerMultWheel = settingsWheel.GetDoubleValue("OPTIONS", "GameSteerMultWheel", 1.0);
-
-    UseShifterForAuto = settingsWheel.GetBoolValue("OPTIONS", "UseShifterForAuto", false);
+    Wheel.Options.Enable = settingsWheel.GetBoolValue("MT_OPTIONS", "EnableWheel", Wheel.Options.Enable);
+    Wheel.Options.LogiLEDs = settingsWheel.GetBoolValue("MT_OPTIONS", "LogitechLEDs", Wheel.Options.LogiLEDs);
+    Wheel.Options.HPatternKeyboard = settingsWheel.GetBoolValue("MT_OPTIONS", "HPatternKeyboard", Wheel.Options.HPatternKeyboard);
+    Wheel.Options.UseShifterForAuto = settingsWheel.GetBoolValue("MT_OPTIONS", "UseShifterForAuto", Wheel.Options.UseShifterForAuto);
 
     // [FORCE_FEEDBACK]
-    EnableFFB = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Enable", true);
-    ScaleFFB = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Scale", true);
-    SATAmpMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", 1.0);
-    FFB.SATMax = settingsWheel.GetLongValue("FORCE_FEEDBACK", "SATMax", 10000);
-    FFB.AntiDeadForce = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "AntiDeadForce", 0);
-
-    DetailMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DetailMult", 2.5);
-    FFB.DetailLim = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DetailLim", 20000);
-    FFB.DetailMAW = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DetailMAW", 1);
-
-    CollisionMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "CollisionMult", 1.0);
-
-    DamperMax = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMax", 67);
-    DamperMin = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMin", 12);
-    DamperMinSpeed = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DamperMinSpeed", 1.2);
-
+    Wheel.FFB.Enable = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
+    Wheel.FFB.Scale = settingsWheel.GetBoolValue("FORCE_FEEDBACK", "Scale", Wheel.FFB.Scale);
+    Wheel.FFB.AntiDeadForce = settingsWheel.GetLongValue("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
+    Wheel.FFB.SATAmpMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
+    Wheel.FFB.SATMax = settingsWheel.GetLongValue("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
+    Wheel.FFB.SATFactor = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
+    Wheel.FFB.DamperMax = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMax", Wheel.FFB.DamperMax);
+    Wheel.FFB.DamperMin = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin); ;
+    Wheel.FFB.DamperMinSpeed = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
+    Wheel.FFB.DetailMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "DetailMult", Wheel.FFB.DetailMult);
+    Wheel.FFB.DetailLim = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
+    Wheel.FFB.DetailMAW = settingsWheel.GetLongValue("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
+    Wheel.FFB.CollisionMult = settingsWheel.GetDoubleValue("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
 
     // [INPUT_DEVICES]
     int it = 0;
-    RegisteredGUIDs.clear();
+    Wheel.InputDevices.RegisteredGUIDs.clear();
     while (true) {
         std::string currDevIndex = std::string("DEV") + std::to_string(it);
         std::string currGuidIndex = std::string("GUID") + std::to_string(it);
@@ -555,101 +557,86 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
         if (currGuid == "")
             break;
 
-        std::wstring clsidStr;
-        clsidStr.assign(currGuid.begin(), currGuid.end());
-        GUID guid;
-        HRESULT hr = CLSIDFromString(clsidStr.c_str(), &guid);
-        if (hr != NOERROR) {
-            std::string errStr;
-            switch (hr) {
-                case CO_E_CLASSSTRING:
-                    errStr = "The class string was improperly formatted.";
-                    break;
-                case REGDB_E_CLASSNOTREG:
-                    errStr = "The CLSID corresponding to the class string was not found in the registry.";
-                    break;
-                case REGDB_E_READREGDB:
-                    errStr = "The registry could not be opened for reading.";
-                    break;
-                default:
-                    errStr = "Something went terribly wrong.";
-                    break;
-            }
-            logger.Write(DEBUG, "CLSIDFromString error: " + errStr);
+        GUID guid = String2GUID(currGuid);
+        if (guid != GUID()) {
+            Wheel.InputDevices.RegisteredGUIDs.push_back(guid);
         }
-        RegisteredGUIDs.push_back(guid);		
+        else {
+            logger.Write(ERROR, "Failed to parse GUID. GUID [%s] @ [%s]", currGuid.c_str(), currDevice.c_str());
+        }
         it++;
     }
     nDevices = it;
 
     // [TOGGLE_MOD]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Toggle)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("TOGGLE_MOD", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("TOGGLE_MOD", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Toggle)] =
         settingsWheel.GetLongValue("TOGGLE_MOD", "BUTTON", -1);
 
     // [CHANGE_SHIFTMODE]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::ToggleH)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("CHANGE_SHIFTMODE", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("CHANGE_SHIFTMODE", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ToggleH)] =
         settingsWheel.GetLongValue("CHANGE_SHIFTMODE", "BUTTON", -1);
 
 
     // [STEER]
     scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Steer)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("STEER", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("STEER", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Steer)] =
         settingsWheel.GetValue("STEER", "AXLE", "");
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::ForceFeedback)] =
         settingsWheel.GetValue("STEER", "FFB", "");
-    scriptControl->SteerMin = settingsWheel.GetLongValue("STEER", "MIN", -1);
-    scriptControl->SteerMax = settingsWheel.GetLongValue("STEER", "MAX", -1);
+    Wheel.Steering.Min = settingsWheel.GetLongValue("STEER", "MIN", -1);
+    Wheel.Steering.Max = settingsWheel.GetLongValue("STEER", "MAX", -1);
 
-    scriptControl->ADZSteer = settingsWheel.GetDoubleValue("STEER", "ANTIDEADZONE", 0.25);
-    scriptControl->DZSteer = settingsWheel.GetDoubleValue("STEER", "DEADZONE", 0.0);
-    scriptControl->DZSteerOffset = settingsWheel.GetDoubleValue("STEER", "DEADZONEOFFSET", 0.0);
-    SteerGamma = settingsWheel.GetDoubleValue("STEER", "GAMMA", 1.0);
+    Wheel.Steering.AntiDeadZone = settingsWheel.GetDoubleValue("STEER", "ANTIDEADZONE", Wheel.Steering.AntiDeadZone);
+    Wheel.Steering.DeadZone = settingsWheel.GetDoubleValue("STEER", "DEADZONE", Wheel.Steering.DeadZone);
+    Wheel.Steering.DeadZoneOffset = settingsWheel.GetDoubleValue("STEER", "DEADZONEOFFSET", Wheel.Steering.DeadZoneOffset);
+    Wheel.Steering.Gamma = settingsWheel.GetDoubleValue("STEER", "GAMMA", Wheel.Steering.Gamma);
 
-    SteerAngleMax = settingsWheel.GetDoubleValue("STEER", "SteerAngleMax", 900.0);
-    SteerAngleCar = settingsWheel.GetDoubleValue("STEER", "SteerAngleCar", 720.0);
-    SteerAngleBike = settingsWheel.GetDoubleValue("STEER", "SteerAngleBike", 180.0);
-    SteerAngleBoat = settingsWheel.GetDoubleValue("STEER", "SteerAngleBoat", 360.0);
+    Wheel.Steering.AngleMax = settingsWheel.GetDoubleValue("STEER", "SteerAngleMax", Wheel.Steering.AngleMax);
+    Wheel.Steering.AngleCar = settingsWheel.GetDoubleValue("STEER", "SteerAngleCar", Wheel.Steering.AngleCar);
+    Wheel.Steering.AngleBike = settingsWheel.GetDoubleValue("STEER", "SteerAngleBike", Wheel.Steering.AngleBike);
+    Wheel.Steering.AngleBoat = settingsWheel.GetDoubleValue("STEER", "SteerAngleBoat", Wheel.Steering.AngleBoat);
+    Wheel.Steering.SteerMult = settingsWheel.GetDoubleValue("STEER", "GameSteerMultWheel", Wheel.Steering.SteerMult);
 
     // [THROTTLE]
     scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Throttle)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("THROTTLE", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("THROTTLE", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Throttle)] =
         settingsWheel.GetValue("THROTTLE", "AXLE", "");
-    scriptControl->ThrottleMin = settingsWheel.GetLongValue("THROTTLE", "MIN", -1);
-    scriptControl->ThrottleMax = settingsWheel.GetLongValue("THROTTLE", "MAX", -1);
-    scriptControl->ADZThrottle = settingsWheel.GetDoubleValue("THROTTLE", "ANTIDEADZONE", 0.25);
-    ThrottleGamma = settingsWheel.GetDoubleValue("THROTTLE", "GAMMA", 1.0);
+    Wheel.Throttle.Min = settingsWheel.GetLongValue("THROTTLE", "MIN", -1);
+    Wheel.Throttle.Max = settingsWheel.GetLongValue("THROTTLE", "MAX", -1);
+    Wheel.Throttle.AntiDeadZone = settingsWheel.GetDoubleValue("THROTTLE", "ANTIDEADZONE", 0.25);
+    Wheel.Throttle.Gamma = settingsWheel.GetDoubleValue("THROTTLE", "GAMMA", 1.0);
 
-    // [BRAKES]
+    // [BRAKE]
     scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Brake)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("BRAKES", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("BRAKE", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Brake)] =
-        settingsWheel.GetValue("BRAKES", "AXLE", "");
-    scriptControl->BrakeMin = settingsWheel.GetLongValue("BRAKES", "MIN", -1);
-    scriptControl->BrakeMax = settingsWheel.GetLongValue("BRAKES", "MAX", -1);
-    scriptControl->ADZBrake = settingsWheel.GetDoubleValue("BRAKES", "ANTIDEADZONE", 0.25);
-    BrakeGamma = settingsWheel.GetDoubleValue("BRAKES", "GAMMA", 1.0);
+        settingsWheel.GetValue("BRAKE", "AXLE", "");
+    Wheel.Brake.Min = settingsWheel.GetLongValue("BRAKE", "MIN", -1);
+    Wheel.Brake.Max = settingsWheel.GetLongValue("BRAKE", "MAX", -1);
+    Wheel.Brake.AntiDeadZone = settingsWheel.GetDoubleValue("BRAKE", "ANTIDEADZONE", 0.25);
+    Wheel.Brake.Gamma = settingsWheel.GetDoubleValue("BRAKE", "GAMMA", 1.0);
 
     // [CLUTCH]
     scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Clutch)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("CLUTCH", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("CLUTCH", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Clutch)] =
         settingsWheel.GetValue("CLUTCH", "AXLE", "");
-    scriptControl->ClutchMin = settingsWheel.GetLongValue("CLUTCH", "MIN", -1);
-    scriptControl->ClutchMax = settingsWheel.GetLongValue("CLUTCH", "MAX", -1);
+    Wheel.Clutch.Min = settingsWheel.GetLongValue("CLUTCH", "MIN", -1);
+    Wheel.Clutch.Max = settingsWheel.GetLongValue("CLUTCH", "MAX", -1);
 
     // [HANDBRAKE_ANALOG]
     scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Handbrake)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Handbrake)] =
         settingsWheel.GetValue("HANDBRAKE_ANALOG", "AXLE", "");
-    scriptControl->HandbrakeMin = settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "MIN", -1);
-    scriptControl->HandbrakeMax = settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "MAX", -1);
+    Wheel.HandbrakeA.Min = settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "MIN", -1);
+    Wheel.HandbrakeA.Max = settingsWheel.GetLongValue("HANDBRAKE_ANALOG", "MAX", -1);
 
     // [SHIFTER]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H1)] =
@@ -663,7 +650,7 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H9)] =
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H10)] =
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::HR)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("SHIFTER", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("SHIFTER", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
 
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H1)] =
         settingsWheel.GetLongValue("SHIFTER", "GEAR_1", -1);
@@ -690,139 +677,139 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 
     // [THROTTLE_BUTTON]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Throttle)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("THROTTLE_BUTTON", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("THROTTLE_BUTTON", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Throttle)] =
         settingsWheel.GetLongValue("THROTTLE_BUTTON", "BUTTON", -1);
 
     // [BRAKE_BUTTON]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Brake)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("BRAKE_BUTTON", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("BRAKE_BUTTON", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Brake)] =
         settingsWheel.GetLongValue("BRAKE_BUTTON", "BUTTON", -1);
 
     // [CLUTCH_BUTTON]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Clutch)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("CLUTCH_BUTTON", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("CLUTCH_BUTTON", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Clutch)] =
         settingsWheel.GetLongValue("CLUTCH_BUTTON", "BUTTON", -1);
 
     // [SHIFT_UP]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::ShiftUp)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("SHIFT_UP", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("SHIFT_UP", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ShiftUp)] =
         settingsWheel.GetLongValue("SHIFT_UP", "BUTTON", -1);
 
     // [SHIFT_DOWN]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::ShiftDown)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("SHIFT_DOWN", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("SHIFT_DOWN", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ShiftDown)] =
         settingsWheel.GetLongValue("SHIFT_DOWN", "BUTTON", -1);
 
     // [HANDBRAKE]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Handbrake)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("HANDBRAKE", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("HANDBRAKE", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Handbrake)] =
         settingsWheel.GetLongValue("HANDBRAKE", "BUTTON", -1);
 
     // [ENGINE]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Engine)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("ENGINE", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("ENGINE", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Engine)] =
         settingsWheel.GetLongValue("ENGINE", "BUTTON", -1);
 
     // [LIGHTS]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Lights)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("LIGHTS", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("LIGHTS", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Lights)] =
         settingsWheel.GetLongValue("LIGHTS", "BUTTON", -1);
 
     // [HORN]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Horn)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("HORN", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("HORN", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Horn)] =
         settingsWheel.GetLongValue("HORN", "BUTTON", -1);
 
     // [LOOK_BACK]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::LookBack)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("LOOK_BACK", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("LOOK_BACK", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::LookBack)] =
         settingsWheel.GetLongValue("LOOK_BACK", "BUTTON", -1);
     
     // [LOOK_LEFT]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::LookLeft)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("LOOK_LEFT", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("LOOK_LEFT", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::LookLeft)] =
         settingsWheel.GetLongValue("LOOK_LEFT", "BUTTON", -1);
     
     // [LOOK_RIGHT]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::LookRight)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("LOOK_RIGHT", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("LOOK_RIGHT", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::LookRight)] =
         settingsWheel.GetLongValue("LOOK_RIGHT", "BUTTON", -1);
 
     // [CHANGE_CAMERA]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Camera)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("CHANGE_CAMERA", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("CHANGE_CAMERA", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Camera)] =
         settingsWheel.GetLongValue("CHANGE_CAMERA", "BUTTON", -1);
 
     // [RADIO_NEXT]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::RadioNext)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("RADIO_NEXT", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("RADIO_NEXT", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::RadioNext)] =
         settingsWheel.GetLongValue("RADIO_NEXT", "BUTTON", -1);
 
     // [RADIO_PREVIOUS]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::RadioPrev)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("RADIO_PREVIOUS", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("RADIO_PREVIOUS", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::RadioPrev)] =
         settingsWheel.GetLongValue("RADIO_PREVIOUS", "BUTTON", -1);
 
     // [INDICATOR_LEFT]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::IndicatorLeft)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("INDICATOR_LEFT", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("INDICATOR_LEFT", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::IndicatorLeft)] =
         settingsWheel.GetLongValue("INDICATOR_LEFT", "BUTTON", -1);
 
     // [INDICATOR_RIGHT]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::IndicatorRight)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("INDICATOR_RIGHT", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("INDICATOR_RIGHT", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::IndicatorRight)] =
         settingsWheel.GetLongValue("INDICATOR_RIGHT", "BUTTON", -1);
 
     // [INDICATOR_HAZARD]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::IndicatorHazard)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("INDICATOR_HAZARD", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("INDICATOR_HAZARD", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::IndicatorHazard)] =
         settingsWheel.GetLongValue("INDICATOR_HAZARD", "BUTTON", -1);
 
     // [AUTO_P]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::APark)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("AUTO_P", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("AUTO_P", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::APark)] =
         settingsWheel.GetLongValue("AUTO_P", "BUTTON", -1);
 
     // [AUTO_R]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::AReverse)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("AUTO_R", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("AUTO_R", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::AReverse)] =
         settingsWheel.GetLongValue("AUTO_R", "BUTTON", -1);
 
     // [AUTO_N]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::ANeutral)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("AUTO_N", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("AUTO_N", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ANeutral)] =
         settingsWheel.GetLongValue("AUTO_N", "BUTTON", -1);
 
     // [AUTO_D]
     scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::ADrive)] =
-        DeviceIndexToGUID(settingsWheel.GetLongValue("AUTO_D", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("AUTO_D", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ADrive)] =
         settingsWheel.GetLongValue("AUTO_D", "BUTTON", -1);
 
     // [TO_KEYBOARD]
     scriptControl->WheelToKeyGUID = 
-        DeviceIndexToGUID(settingsWheel.GetLongValue("TO_KEYBOARD", "DEVICE", -1), RegisteredGUIDs);
+        DeviceIndexToGUID(settingsWheel.GetLongValue("TO_KEYBOARD", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     for (int i = 0; i < MAX_RGBBUTTONS; i++) {
         std::string entryString = settingsWheel.GetValue("TO_KEYBOARD", std::to_string(i).c_str(), "UNKNOWN");
         if (entryString == "UNKNOWN") {
@@ -836,14 +823,14 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 }
 
 ptrdiff_t ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, const std::string& dev_name) {
-    auto found = find(RegisteredGUIDs.begin(), RegisteredGUIDs.end(), dev_guid);
-    if (found != RegisteredGUIDs.end()) {
+    auto found = find(Wheel.InputDevices.RegisteredGUIDs.begin(), Wheel.InputDevices.RegisteredGUIDs.end(), dev_guid);
+    if (found != Wheel.InputDevices.RegisteredGUIDs.end()) {
         // present! Return index
         // Dependent on implementation of reading this but it should work(TM). Lotsa assumptions.
-        return distance(RegisteredGUIDs.begin(), found);
+        return distance(Wheel.InputDevices.RegisteredGUIDs.begin(), found);
     }
     // missing! Add & return index afterwards
-    auto newIndex = distance(RegisteredGUIDs.begin(), RegisteredGUIDs.end());
+    auto newIndex = distance(Wheel.InputDevices.RegisteredGUIDs.begin(), Wheel.InputDevices.RegisteredGUIDs.end());
     std::string newDEV = "DEV" + std::to_string(newIndex);
     std::string newGUID = "GUID" + std::to_string(newIndex);
 
@@ -966,7 +953,7 @@ void ScriptSettings::LControllerSaveButton(const std::string &confTag, int butto
     SI_Error result = settingsGeneral.LoadFile(settingsGeneralFile.c_str());
     CHECK_LOG_SI_ERROR(result, "load");
 
-    settingsGeneral.SetLongValue("CONTROLLER_LEGACY", confTag.c_str(), button);
+    settingsGeneral.SetLongValue("CONTROLLER_NATIVE", confTag.c_str(), button);
 
     result = settingsGeneral.SaveFile(settingsGeneralFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
@@ -984,7 +971,7 @@ GUID ScriptSettings::DeviceIndexToGUID(int device, std::vector<GUID> guids) {
 
 int ScriptSettings::GUIDToDeviceIndex(GUID guidToFind) {
     int i = 0;
-    for (auto guid : RegisteredGUIDs) {
+    for (auto guid : Wheel.InputDevices.RegisteredGUIDs) {
         if (guid == guidToFind) {
             return i;
         }

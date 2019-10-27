@@ -131,7 +131,6 @@
     <ClCompile Include="ScriptHUD.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
     <ClCompile Include="ScriptUtils.cpp" />
-    <ClCompile Include="ShiftModes.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="Util\Files.cpp" />
@@ -190,7 +189,6 @@
     <ClInclude Include="Memory\Versions.h" />
     <ClInclude Include="newNatives.h" />
     <ClInclude Include="ScriptUtils.h" />
-    <ClInclude Include="ShiftModes.h" />
     <ClInclude Include="Compatibility.h" />
     <ClInclude Include="UpdateChecker.h" />
     <ClInclude Include="Util\Color.h" />
