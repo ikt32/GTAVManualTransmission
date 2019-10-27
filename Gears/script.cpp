@@ -1003,7 +1003,7 @@ void functionClutchCatch() {
     // TODO: Make more subtle / use throttle?
     const float idleThrottle = 0.24f; // TODO -> Settings?
 
-    float clutchRatio = map(carControls.ClutchVal, settings.MTParams.ClutchThreshold, 1.0f, 1.0f, 0.0f);
+    float clutchRatio = map(carControls.ClutchVal, 1.0f - settings.MTParams.ClutchThreshold, 0.0f, 0.0f, 1.0f);
     clutchRatio = std::clamp(clutchRatio, 0.0f, 1.0f);
 
     // TODO: Check for settings.MTOptions.ShiftMode == Automatic if anybody complains...
@@ -1498,7 +1498,7 @@ void functionRealReverse() {
             ext.SetBrakeP(playerVehicle, 1.0f);
         }
         // RT behavior when rolling back: Burnout
-        if (!gearStates.FakeNeutral && carControls.ThrottleVal > 0.5f && carControls.ClutchVal < settings.MTParams.ClutchThreshold && 
+        if (!gearStates.FakeNeutral && carControls.ThrottleVal > 0.5f && carControls.ClutchVal < 1.0f - settings.MTParams.ClutchThreshold && 
             ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y < -1.0f ) {
             //showText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Rollback");
             //CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, carControls.ThrottleVal);
@@ -1666,7 +1666,7 @@ void startStopEngine() {
         carControls.PrevInput == CarControls::Controller	&& carControls.ButtonHeldOver(CarControls::LegacyControlType::Engine, 200) ||
         carControls.PrevInput == CarControls::Keyboard		&& carControls.ButtonJustPressed(CarControls::KeyboardControlType::Engine) ||
         carControls.PrevInput == CarControls::Wheel			&& carControls.ButtonJustPressed(CarControls::WheelControlType::Engine) ||
-        settings.GameAssists.ThrottleStart && carControls.ThrottleVal > 0.75f && (carControls.ClutchVal > settings.MTParams.ClutchThreshold || gearStates.FakeNeutral))) {
+        settings.GameAssists.ThrottleStart && carControls.ThrottleVal > 0.75f && (carControls.ClutchVal > 1.0f - settings.MTParams.ClutchThreshold || gearStates.FakeNeutral))) {
         VEHICLE::SET_VEHICLE_ENGINE_ON(playerVehicle, true, false, true);
     }
     if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(playerVehicle) &&

@@ -47,7 +47,9 @@ public:
     struct {
         float EngBrakePower = 0.0f;
         float EngBrakeThreshold = 0.75f;
+        // Clutch _lift_ distance
         float ClutchThreshold = 0.15f;
+        // Clutch _lift_ distance
         float StallingThreshold = 0.35f;
         float StallingRPM = 0.1f;
         float RPMDamage = 0.1f;
