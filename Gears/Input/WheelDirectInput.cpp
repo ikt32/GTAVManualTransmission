@@ -43,6 +43,7 @@ WheelDirectInput::~WheelDirectInput() {
     for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
         auto device = DIDeviceFactory::Get().GetEntry(i);
         if (device) {
+            StopEffects();
             HRESULT hr = device->diDevice->Unacquire();
             if (FAILED(hr)) {
                 logger.Write(ERROR, "[Wheel] Failed unacquiring device: %s", 
