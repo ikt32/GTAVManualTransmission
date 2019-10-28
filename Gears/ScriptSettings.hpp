@@ -77,9 +77,9 @@ public:
 
     // [SHIFT_OPTIONS]
     struct {
-        float ClutchRateMult = 1.0f;
         bool UpshiftCut = true;
         bool DownshiftBlip = true;
+        float ClutchRateMult = 1.0f;
         float RPMTolerance = 0.2f;
     } ShiftOptions;
 
