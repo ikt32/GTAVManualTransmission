@@ -3,7 +3,7 @@
 #include "../Util/TimeHelper.hpp"
 #include "../ScriptSettings.hpp"
 
-extern ScriptSettings settings;
+extern ScriptSettings g_settings;
 
 NativeController::NativeController(): pressTime()
                                     , releaseTime()

@@ -11,11 +11,11 @@
 #include "inc/natives.h"
 #include "inc/types.h"
 
-extern ScriptSettings settings;
-extern CarControls carControls;
-extern Vehicle playerVehicle;
-extern VehicleGearboxStates gearStates;
-extern VehicleData vehData;
+extern ScriptSettings g_settings;
+extern CarControls g_controls;
+extern Vehicle g_playerVehicle;
+extern VehicleGearboxStates g_gearStates;
+extern VehicleData g_vehData;
 extern std::vector<Vehicle> ignoredVehicles;
 
 const char* MT_GetVersion() {
@@ -31,11 +31,11 @@ void MT_SetActive(bool active) {
 }
 
 bool MT_NeutralGear() {
-    return gearStates.FakeNeutral && settings.MTOptions.Enable;
+    return g_gearStates.FakeNeutral && g_settings.MTOptions.Enable;
 }
 
 int MT_GetShiftMode() {
-    return EToInt(settings.MTOptions.ShiftMode) + 1;
+    return EToInt(g_settings.MTOptions.ShiftMode) + 1;
 }
 
 void MT_SetShiftMode(int mode) {
@@ -44,26 +44,26 @@ void MT_SetShiftMode(int mode) {
 }
 
 int MT_GetShiftIndicator() {
-    if (!ENTITY::DOES_ENTITY_EXIST(playerVehicle)) {
+    if (!ENTITY::DOES_ENTITY_EXIST(g_playerVehicle)) {
         // vehData is not initialized yet, so mGearRatios can not be dereferenced.
         return 0;
     }
     float nextGearMinSpeed = 0.0f; // don't care about top gear
-    if (gearStates.LockGear < vehData.mGearTop) {
-        nextGearMinSpeed = settings.AutoParams.NextGearMinRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[gearStates.LockGear + 1];
+    if (g_gearStates.LockGear < g_vehData.mGearTop) {
+        nextGearMinSpeed = g_settings.AutoParams.NextGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.LockGear + 1];
     }
-    float engineLoad = carControls.ThrottleVal - map(vehData.mRPM, 0.2f, 1.0f, 0.0f, 1.0f);
-    bool shiftUpLoad = gearStates.LockGear < vehData.mGearTop && 
-        engineLoad < settings.AutoParams.UpshiftLoad && 
-        vehData.mWheelAverageDrivenTyreSpeed > nextGearMinSpeed;
+    float engineLoad = g_controls.ThrottleVal - map(g_vehData.mRPM, 0.2f, 1.0f, 0.0f, 1.0f);
+    bool shiftUpLoad = g_gearStates.LockGear < g_vehData.mGearTop && 
+        engineLoad < g_settings.AutoParams.UpshiftLoad && 
+        g_vehData.mWheelAverageDrivenTyreSpeed > nextGearMinSpeed;
 
-    float currGearMinSpeed = settings.AutoParams.CurrGearMinRPM * vehData.mDriveMaxFlatVel / vehData.mGearRatios[gearStates.LockGear];
-    bool shiftDownLoad = engineLoad > settings.AutoParams.DownshiftLoad || vehData.mWheelAverageDrivenTyreSpeed < currGearMinSpeed;
+    float currGearMinSpeed = g_settings.AutoParams.CurrGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.LockGear];
+    bool shiftDownLoad = engineLoad > g_settings.AutoParams.DownshiftLoad || g_vehData.mWheelAverageDrivenTyreSpeed < currGearMinSpeed;
 
-    if (gearStates.HitRPMSpeedLimiter || gearStates.HitRPMLimiter || shiftUpLoad) {
+    if (g_gearStates.HitRPMSpeedLimiter || g_gearStates.HitRPMLimiter || shiftUpLoad) {
         return 1;
     }
-    if (vehData.mGearCurr > 1 && shiftDownLoad) {
+    if (g_vehData.mGearCurr > 1 && shiftDownLoad) {
         return 2;
     }
     return 0;
@@ -95,20 +95,20 @@ const int* MT_GetIgnoredVehicles() {
 }
 
 int MT_GetManagedVehicle() {
-    return playerVehicle;
+    return g_playerVehicle;
 }
 
 bool MT_LookingLeft() {
-    return carControls.ButtonIn(CarControls::WheelControlType::LookLeft);
+    return g_controls.ButtonIn(CarControls::WheelControlType::LookLeft);
 }
 
 bool MT_LookingRight() {
-    return carControls.ButtonIn(CarControls::WheelControlType::LookRight);
+    return g_controls.ButtonIn(CarControls::WheelControlType::LookRight);
 }
 
 bool MT_LookingBack() {
-    return carControls.ButtonIn(CarControls::WheelControlType::LookBack) ||
+    return g_controls.ButtonIn(CarControls::WheelControlType::LookBack) ||
 
-        carControls.ButtonIn(CarControls::WheelControlType::LookLeft) &&
-        carControls.ButtonIn(CarControls::WheelControlType::LookRight);
+        g_controls.ButtonIn(CarControls::WheelControlType::LookLeft) &&
+        g_controls.ButtonIn(CarControls::WheelControlType::LookRight);
 }

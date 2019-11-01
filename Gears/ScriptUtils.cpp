@@ -7,14 +7,14 @@
 #include "inc/natives.h"
 #include "fmt/format.h"
 
-extern ScriptSettings settings;
+extern ScriptSettings g_settings;
 
 namespace {
     int notificationHandle = 0;
 }
 
 void UI::Notify(int level, const std::string& message) {
-    if (level < settings.HUD.NotifyLevel)
+    if (level < g_settings.HUD.NotifyLevel)
         return;
     int* notifHandleAddr = &notificationHandle; // prevents optimizing away the pointery thing
     showNotification(fmt::format("{}\n{}", Constants::NotificationPrefix, message), notifHandleAddr);

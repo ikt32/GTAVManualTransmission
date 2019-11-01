@@ -19,16 +19,16 @@
 #include "fmt/format.h"
 #include <algorithm>
 
-extern Vehicle playerVehicle;
-extern Ped playerPed;
-extern VehicleExtensions ext;
-extern ScriptSettings settings;
-extern VehicleData vehData;
-extern CarControls carControls;
+extern Vehicle g_playerVehicle;
+extern Ped g_playerPed;
+extern VehicleExtensions g_ext;
+extern ScriptSettings g_settings;
+extern VehicleData g_vehData;
+extern CarControls g_controls;
 
-extern VehiclePeripherals peripherals;
-extern VehicleGearboxStates gearStates;
-extern WheelPatchStates wheelPatchStates;
+extern VehiclePeripherals g_peripherals;
+extern VehicleGearboxStates g_gearStates;
+extern WheelPatchStates g_wheelPatchStates;
 
 namespace {
     MiniPID pid(1.0, 0.0, 0.0);
@@ -45,154 +45,154 @@ namespace WheelInput {
 // Forward gear: Throttle accelerates, Brake brakes (exclusive)
 // Reverse gear: Throttle reverses, Brake brakes (exclusive)
 void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
-    wheelThrottleVal = pow(wheelThrottleVal, settings.Wheel.Throttle.Gamma);
-    wheelBrakeVal = pow(wheelBrakeVal, settings.Wheel.Brake.Gamma);
+    wheelThrottleVal = pow(wheelThrottleVal, g_settings.Wheel.Throttle.Gamma);
+    wheelBrakeVal = pow(wheelBrakeVal, g_settings.Wheel.Brake.Gamma);
 
     float speedThreshold = 0.5f;
     const float reverseThreshold = 2.0f;
 
-    if (vehData.mGearCurr > 0) {
+    if (g_vehData.mGearCurr > 0) {
         // Going forward
-        if (ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y > speedThreshold) {
+        if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y > speedThreshold) {
             //showText(0.3, 0.0, 1.0, "We are going forward");
             // Throttle Pedal normal
             if (wheelThrottleVal > 0.01f) {
-                Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, settings.Wheel.Throttle.AntiDeadZone);
+                Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, g_settings.Wheel.Throttle.AntiDeadZone);
             }
             // Brake Pedal normal
             if (wheelBrakeVal > 0.01f) {
-                Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, settings.Wheel.Brake.AntiDeadZone);
+                Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone);
             }
         }
 
         // Standing still
-        if (ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y < speedThreshold && ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y >= -speedThreshold) {
+        if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y < speedThreshold && ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y >= -speedThreshold) {
             //showText(0.3, 0.0, 1.0, "We are stopped");
 
             if (wheelThrottleVal > 0.01f) {
-                Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, settings.Wheel.Throttle.AntiDeadZone);
+                Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, g_settings.Wheel.Throttle.AntiDeadZone);
             }
 
             if (wheelBrakeVal > 0.01f) {
-                ext.SetThrottleP(playerVehicle, 0.1f);
-                ext.SetBrakeP(playerVehicle, 1.0f);
-                VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(playerVehicle, true);
+                g_ext.SetThrottleP(g_playerVehicle, 0.1f);
+                g_ext.SetBrakeP(g_playerVehicle, 1.0f);
+                VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, true);
             }
         }
 
         // Rolling back
-        if (ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y < -speedThreshold) {
+        if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y < -speedThreshold) {
             bool brakelights = false;
             // Just brake
             if (wheelThrottleVal <= 0.01f && wheelBrakeVal > 0.01f) {
                 //showText(0.3, 0.0, 1.0, "We should brake");
                 //showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)));
-                Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, settings.Wheel.Brake.AntiDeadZone);
-                ext.SetThrottleP(playerVehicle, 0.1f);
-                ext.SetBrakeP(playerVehicle, 1.0f);
+                Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone);
+                g_ext.SetThrottleP(g_playerVehicle, 0.1f);
+                g_ext.SetBrakeP(g_playerVehicle, 1.0f);
                 brakelights = true;
             }
 
-            if (!gearStates.FakeNeutral && wheelThrottleVal > 0.01f && carControls.ClutchVal < 1.0f - settings.MTParams.ClutchThreshold) {
+            if (!g_gearStates.FakeNeutral && wheelThrottleVal > 0.01f && g_controls.ClutchVal < 1.0f - g_settings.MTParams.ClutchThreshold) {
                 //showText(0.3, 0.0, 1.0, "We should burnout");
-                if (carControls.BrakeVal < 0.1f) {
-                    VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(playerVehicle, false);
+                if (g_controls.BrakeVal < 0.1f) {
+                    VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, false);
                 }
-                for (int i = 0; i < vehData.mWheelCount; i++) {
-                    if (ext.IsWheelPowered(playerVehicle, i)) {
-                        ext.SetWheelBrakePressure(playerVehicle, i, 0.0f);
-                        ext.SetWheelPower(playerVehicle, i, 2.0f * ext.GetDriveForce(playerVehicle));
+                for (int i = 0; i < g_vehData.mWheelCount; i++) {
+                    if (g_ext.IsWheelPowered(g_playerVehicle, i)) {
+                        g_ext.SetWheelBrakePressure(g_playerVehicle, i, 0.0f);
+                        g_ext.SetWheelPower(g_playerVehicle, i, 2.0f * g_ext.GetDriveForce(g_playerVehicle));
                     }
                     else {
-                        float handlingBrakeForce = *reinterpret_cast<float*>(vehData.mHandlingPtr + hOffsets.fBrakeForce);
-                        float inpBrakeForce = handlingBrakeForce * carControls.BrakeVal;
-                        ext.SetWheelPower(playerVehicle, i, 0.0f);
-                        ext.SetWheelBrakePressure(playerVehicle, i, inpBrakeForce);
+                        float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
+                        float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
+                        g_ext.SetWheelPower(g_playerVehicle, i, 0.0f);
+                        g_ext.SetWheelBrakePressure(g_playerVehicle, i, inpBrakeForce);
                     }
                 }
                 fakeRev();
-                ext.SetThrottle(playerVehicle, carControls.ThrottleVal);
-                ext.SetThrottleP(playerVehicle, carControls.ThrottleVal);
-                wheelPatchStates.InduceBurnout = true;
+                g_ext.SetThrottle(g_playerVehicle, g_controls.ThrottleVal);
+                g_ext.SetThrottleP(g_playerVehicle, g_controls.ThrottleVal);
+                g_wheelPatchStates.InduceBurnout = true;
             }
 
-            if (wheelThrottleVal > 0.01f && (carControls.ClutchVal > 1.0f - settings.MTParams.ClutchThreshold || gearStates.FakeNeutral)) {
+            if (wheelThrottleVal > 0.01f && (g_controls.ClutchVal > 1.0f - g_settings.MTParams.ClutchThreshold || g_gearStates.FakeNeutral)) {
                 if (wheelBrakeVal > 0.01f) {
                     //showText(0.3, 0.0, 1.0, "We should rev and brake");
                     //showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)) );
-                    Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, settings.Wheel.Brake.AntiDeadZone);
-                    ext.SetThrottleP(playerVehicle, 0.1f);
-                    ext.SetBrakeP(playerVehicle, 1.0f);
+                    Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone);
+                    g_ext.SetThrottleP(g_playerVehicle, 0.1f);
+                    g_ext.SetBrakeP(g_playerVehicle, 1.0f);
                     brakelights = true;
                     fakeRev(false, 0);
                 }
-                else if (carControls.ClutchVal > 0.9 || gearStates.FakeNeutral) {
+                else if (g_controls.ClutchVal > 0.9 || g_gearStates.FakeNeutral) {
                     //showText(0.3, 0.0, 1.0, "We should rev and do nothing");
-                    ext.SetThrottleP(playerVehicle, wheelThrottleVal);
+                    g_ext.SetThrottleP(g_playerVehicle, wheelThrottleVal);
                     fakeRev(false, 0);
                 }
                 else {
                     //showText(0.3, 0.0, 1.0, "We should rev and apply throttle");
-                    Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, settings.Wheel.Throttle.AntiDeadZone);
-                    ext.SetThrottleP(playerVehicle, wheelThrottleVal);
+                    Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, g_settings.Wheel.Throttle.AntiDeadZone);
+                    g_ext.SetThrottleP(g_playerVehicle, wheelThrottleVal);
                     fakeRev(false, 0);
                 }
             }
-            VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(playerVehicle, brakelights);
+            VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, brakelights);
         }
         else {
-            wheelPatchStates.InduceBurnout = false;
+            g_wheelPatchStates.InduceBurnout = false;
         }
     }
 
-    if (vehData.mGearCurr == 0) {
+    if (g_vehData.mGearCurr == 0) {
         // Enables reverse lights
-        ext.SetThrottleP(playerVehicle, -0.1f);
+        g_ext.SetThrottleP(g_playerVehicle, -0.1f);
 
         // We're reversing
-        if (ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y < -speedThreshold) {
+        if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y < -speedThreshold) {
             //showText(0.3, 0.0, 1.0, "We are reversing");
             // Throttle Pedal Reverse
             if (wheelThrottleVal > 0.01f) {
-                Controls::SetControlADZ(ControlVehicleBrake, wheelThrottleVal, settings.Wheel.Throttle.AntiDeadZone);
+                Controls::SetControlADZ(ControlVehicleBrake, wheelThrottleVal, g_settings.Wheel.Throttle.AntiDeadZone);
             }
             // Brake Pedal Reverse
             if (wheelBrakeVal > 0.01f) {
-                Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, settings.Wheel.Brake.AntiDeadZone);
-                ext.SetThrottleP(playerVehicle, -wheelBrakeVal);
-                ext.SetBrakeP(playerVehicle, 1.0f);
+                Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone);
+                g_ext.SetThrottleP(g_playerVehicle, -wheelBrakeVal);
+                g_ext.SetBrakeP(g_playerVehicle, 1.0f);
             }
         }
 
         // Standing still
-        if (ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y < speedThreshold && ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y >= -speedThreshold) {
+        if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y < speedThreshold && ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y >= -speedThreshold) {
             //showText(0.3, 0.0, 1.0, "We are stopped");
 
             if (wheelThrottleVal > 0.01f) {
-                Controls::SetControlADZ(ControlVehicleBrake, wheelThrottleVal, settings.Wheel.Throttle.AntiDeadZone);
+                Controls::SetControlADZ(ControlVehicleBrake, wheelThrottleVal, g_settings.Wheel.Throttle.AntiDeadZone);
             }
 
             if (wheelBrakeVal > 0.01f) {
-                ext.SetThrottleP(playerVehicle, -wheelBrakeVal);
-                ext.SetBrakeP(playerVehicle, 1.0f);
-                VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(playerVehicle, true);
+                g_ext.SetThrottleP(g_playerVehicle, -wheelBrakeVal);
+                g_ext.SetBrakeP(g_playerVehicle, 1.0f);
+                VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, true);
             }
         }
 
         // We're rolling forwards
-        if (ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y > speedThreshold) {
+        if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y > speedThreshold) {
             //showText(0.3, 0.0, 1.0, "We are rolling forwards");
             //bool brakelights = false;
 
-            if (ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y > reverseThreshold) {
-                if (carControls.ClutchVal < 1.0f - settings.MTParams.ClutchThreshold) {
+            if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y > reverseThreshold) {
+                if (g_controls.ClutchVal < 1.0f - g_settings.MTParams.ClutchThreshold) {
                     CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
                 }
                 // Brake Pedal Reverse
                 if (wheelBrakeVal > 0.01f) {
-                    Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, settings.Wheel.Brake.AntiDeadZone);
-                    ext.SetThrottleP(playerVehicle, -wheelBrakeVal);
-                    ext.SetBrakeP(playerVehicle, 1.0f);
+                    Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone);
+                    g_ext.SetThrottleP(g_playerVehicle, -wheelBrakeVal);
+                    g_ext.SetBrakeP(g_playerVehicle, 1.0f);
                 }
             }
 
@@ -203,13 +203,13 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
 
 // Pedals behave like RT/LT
 void WheelInput::HandlePedalsArcade(float wheelThrottleVal, float wheelBrakeVal) {
-    wheelThrottleVal = pow(wheelThrottleVal, settings.Wheel.Throttle.Gamma);
-    wheelBrakeVal = pow(wheelBrakeVal, settings.Wheel.Brake.Gamma);
+    wheelThrottleVal = pow(wheelThrottleVal, g_settings.Wheel.Throttle.Gamma);
+    wheelBrakeVal = pow(wheelBrakeVal, g_settings.Wheel.Brake.Gamma);
     if (wheelThrottleVal > 0.01f) {
-        Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, settings.Wheel.Throttle.AntiDeadZone);
+        Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, g_settings.Wheel.Throttle.AntiDeadZone);
     }
     if (wheelBrakeVal > 0.01f) {
-        Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, settings.Wheel.Brake.AntiDeadZone);
+        Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone);
     }
 }
 
@@ -220,81 +220,81 @@ void WheelInput::HandlePedalsArcade(float wheelThrottleVal, float wheelBrakeVal)
 
 // Set state, and activate them if hazards are off.
 void setBlinkers(bool left, bool right) {
-    peripherals.BlinkerLeft = left;
-    peripherals.BlinkerRight = right;
+    g_peripherals.BlinkerLeft = left;
+    g_peripherals.BlinkerRight = right;
 
-    if (!peripherals.BlinkerHazard) {
-        VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(playerVehicle, 0, right);
-        VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(playerVehicle, 1, left);
+    if (!g_peripherals.BlinkerHazard) {
+        VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, 0, right);
+        VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, 1, left);
     }
 }
 
 void checkIndicatorActions() {
-    if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorHazard)) {
-        if (!peripherals.BlinkerHazard) {
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(playerVehicle, 0, true);
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(playerVehicle, 1, true);
-            peripherals.BlinkerHazard = true;
+    if (g_controls.ButtonJustPressed(CarControls::WheelControlType::IndicatorHazard)) {
+        if (!g_peripherals.BlinkerHazard) {
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, 0, true);
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, 1, true);
+            g_peripherals.BlinkerHazard = true;
         }
         else {
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(playerVehicle, 0, peripherals.BlinkerRight);
-            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(playerVehicle, 1, peripherals.BlinkerLeft);
-            peripherals.BlinkerHazard = false;
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, 0, g_peripherals.BlinkerRight);
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, 1, g_peripherals.BlinkerLeft);
+            g_peripherals.BlinkerHazard = false;
         }
     }
 
-    if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorLeft)) {
-        if (!peripherals.BlinkerLeft) {
-            peripherals.BlinkerTicks = 1;
+    if (g_controls.ButtonJustPressed(CarControls::WheelControlType::IndicatorLeft)) {
+        if (!g_peripherals.BlinkerLeft) {
+            g_peripherals.BlinkerTicks = 1;
             setBlinkers(true, false);
         }
         else {
-            peripherals.BlinkerTicks = 0;
+            g_peripherals.BlinkerTicks = 0;
             setBlinkers(false, false);
         }
     }
-    if (carControls.ButtonJustPressed(CarControls::WheelControlType::IndicatorRight)) {
-        if (!peripherals.BlinkerRight) {
-            peripherals.BlinkerTicks = 1;
+    if (g_controls.ButtonJustPressed(CarControls::WheelControlType::IndicatorRight)) {
+        if (!g_peripherals.BlinkerRight) {
+            g_peripherals.BlinkerTicks = 1;
             setBlinkers(false, true);
         }
         else {
-            peripherals.BlinkerTicks = 0;
+            g_peripherals.BlinkerTicks = 0;
             setBlinkers(false, false);
         }
     }
 
-    float wheelCenterDeviation = (carControls.SteerVal - 0.5f) / 0.5f;
+    float wheelCenterDeviation = (g_controls.SteerVal - 0.5f) / 0.5f;
 
-    if (peripherals.BlinkerTicks == 1 && abs(wheelCenterDeviation) > 0.2f) {
-        peripherals.BlinkerTicks = 2;
+    if (g_peripherals.BlinkerTicks == 1 && abs(wheelCenterDeviation) > 0.2f) {
+        g_peripherals.BlinkerTicks = 2;
     }
 
-    if (peripherals.BlinkerTicks == 2 && abs(wheelCenterDeviation) < 0.1f) {
-        peripherals.BlinkerTicks = 0;
+    if (g_peripherals.BlinkerTicks == 2 && abs(wheelCenterDeviation) < 0.1f) {
+        g_peripherals.BlinkerTicks = 0;
         setBlinkers(false, false);
     }
 }
 
 void checkRadioButtons() {
-    if (carControls.ButtonHeld(CarControls::WheelControlType::RadioPrev, 1000) ||
-        carControls.ButtonHeld(CarControls::WheelControlType::RadioNext, 1000)) {
+    if (g_controls.ButtonHeld(CarControls::WheelControlType::RadioPrev, 1000) ||
+        g_controls.ButtonHeld(CarControls::WheelControlType::RadioNext, 1000)) {
         if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() != RadioOff) {
-            peripherals.RadioStationIndex = AUDIO::GET_PLAYER_RADIO_STATION_INDEX();
+            g_peripherals.RadioStationIndex = AUDIO::GET_PLAYER_RADIO_STATION_INDEX();
         }
-        AUDIO::SET_VEH_RADIO_STATION(playerVehicle, "OFF");
+        AUDIO::SET_VEH_RADIO_STATION(g_playerVehicle, "OFF");
         return;
     }
-    if (carControls.ButtonReleased(CarControls::WheelControlType::RadioNext)) {
+    if (g_controls.ButtonReleased(CarControls::WheelControlType::RadioNext)) {
         if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() == RadioOff) {
-            AUDIO::SET_RADIO_TO_STATION_INDEX(peripherals.RadioStationIndex);
+            AUDIO::SET_RADIO_TO_STATION_INDEX(g_peripherals.RadioStationIndex);
             return;
         }
         AUDIO::_0xFF266D1D0EB1195D(); // Next radio station
     }
-    if (carControls.ButtonReleased(CarControls::WheelControlType::RadioPrev)) {
+    if (g_controls.ButtonReleased(CarControls::WheelControlType::RadioPrev)) {
         if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() == RadioOff) {
-            AUDIO::SET_RADIO_TO_STATION_INDEX(peripherals.RadioStationIndex);
+            AUDIO::SET_RADIO_TO_STATION_INDEX(g_peripherals.RadioStationIndex);
             return;
         }
         AUDIO::_0xDD6BCF9E94425DF9(); // Prev radio station
@@ -302,59 +302,59 @@ void checkRadioButtons() {
 }
 
 void checkCameraButtons() {
-    if (carControls.ButtonIn(CarControls::WheelControlType::LookBack)) {
+    if (g_controls.ButtonIn(CarControls::WheelControlType::LookBack)) {
         CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleLookBehind, 1.0f);
     }
 
     // who was first?
-    if (carControls.ButtonIn(CarControls::WheelControlType::LookRight) &&
-        carControls.ButtonJustPressed(CarControls::WheelControlType::LookLeft)) {
-        peripherals.LookBackRShoulder = true;
+    if (g_controls.ButtonIn(CarControls::WheelControlType::LookRight) &&
+        g_controls.ButtonJustPressed(CarControls::WheelControlType::LookLeft)) {
+        g_peripherals.LookBackRShoulder = true;
     }
 
-    if (carControls.ButtonIn(CarControls::WheelControlType::LookLeft) &&
-        carControls.ButtonIn(CarControls::WheelControlType::LookRight)) {
-        CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(peripherals.LookBackRShoulder ? -180.0f : 180.0f);
+    if (g_controls.ButtonIn(CarControls::WheelControlType::LookLeft) &&
+        g_controls.ButtonIn(CarControls::WheelControlType::LookRight)) {
+        CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(g_peripherals.LookBackRShoulder ? -180.0f : 180.0f);
     }
-    else if (carControls.ButtonIn(CarControls::WheelControlType::LookLeft)) {
+    else if (g_controls.ButtonIn(CarControls::WheelControlType::LookLeft)) {
         CAM::SET_GAMEPLAY_CAM_RELATIVE_PITCH(0.0f, 1.0f);
         CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(90.0f);
     }
-    else if (carControls.ButtonIn(CarControls::WheelControlType::LookRight)) {
+    else if (g_controls.ButtonIn(CarControls::WheelControlType::LookRight)) {
         CAM::SET_GAMEPLAY_CAM_RELATIVE_PITCH(0.0f, 1.0f);
         CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(-90.0f);
     }
-    if (carControls.ButtonReleased(CarControls::WheelControlType::LookLeft) && !carControls.ButtonIn(CarControls::WheelControlType::LookRight) ||
-        carControls.ButtonReleased(CarControls::WheelControlType::LookRight) && !carControls.ButtonIn(CarControls::WheelControlType::LookLeft)) {
+    if (g_controls.ButtonReleased(CarControls::WheelControlType::LookLeft) && !g_controls.ButtonIn(CarControls::WheelControlType::LookRight) ||
+        g_controls.ButtonReleased(CarControls::WheelControlType::LookRight) && !g_controls.ButtonIn(CarControls::WheelControlType::LookLeft)) {
         CAM::SET_GAMEPLAY_CAM_RELATIVE_HEADING(0.0f);
     }
-    if (carControls.ButtonReleased(CarControls::WheelControlType::LookLeft) ||
-        carControls.ButtonReleased(CarControls::WheelControlType::LookRight)) {
-        peripherals.LookBackRShoulder = false;
+    if (g_controls.ButtonReleased(CarControls::WheelControlType::LookLeft) ||
+        g_controls.ButtonReleased(CarControls::WheelControlType::LookRight)) {
+        g_peripherals.LookBackRShoulder = false;
     }
 
-    if (carControls.ButtonJustPressed(CarControls::WheelControlType::Camera)) {
+    if (g_controls.ButtonJustPressed(CarControls::WheelControlType::Camera)) {
         CONTROLS::_SET_CONTROL_NORMAL(0, ControlNextCamera, 1.0f);
     }
 }
 
 void checkVehicleInputButtons() {
-    if (carControls.HandbrakeVal > 0.1f) {
-        CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, carControls.HandbrakeVal);
+    if (g_controls.HandbrakeVal > 0.1f) {
+        CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, g_controls.HandbrakeVal);
     }
-    if (carControls.ButtonIn(CarControls::WheelControlType::Handbrake)) {
+    if (g_controls.ButtonIn(CarControls::WheelControlType::Handbrake)) {
         CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
     }
-    if (carControls.ButtonIn(CarControls::WheelControlType::Horn)) {
+    if (g_controls.ButtonIn(CarControls::WheelControlType::Horn)) {
         CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHorn, 1.0f);
     }
-    if (carControls.ButtonJustPressed(CarControls::WheelControlType::Lights)) {
+    if (g_controls.ButtonJustPressed(CarControls::WheelControlType::Lights)) {
         CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHeadlight, 1.0f);
     }
 }
 
 void WheelInput::CheckButtons() {
-    if (carControls.PrevInput != CarControls::Wheel) {
+    if (g_controls.PrevInput != CarControls::Wheel) {
         return;
     }
 
@@ -369,23 +369,23 @@ void WheelInput::CheckButtons() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void WheelInput::DoSteering() {
-    if (carControls.PrevInput != CarControls::Wheel)
+    if (g_controls.PrevInput != CarControls::Wheel)
         return;
 
     float steerMult;
-    if (vehData.mClass == VehicleClass::Bike || vehData.mClass == VehicleClass::Quad)
-        steerMult = settings.Wheel.Steering.AngleMax / settings.Wheel.Steering.AngleBike;
-    else if (vehData.mClass == VehicleClass::Car)
-        steerMult = settings.Wheel.Steering.AngleMax / settings.Wheel.Steering.AngleCar;
+    if (g_vehData.mClass == VehicleClass::Bike || g_vehData.mClass == VehicleClass::Quad)
+        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleBike;
+    else if (g_vehData.mClass == VehicleClass::Car)
+        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleCar;
     else {
-        steerMult = settings.Wheel.Steering.AngleMax / settings.Wheel.Steering.AngleBoat;
+        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleBoat;
     }
 
-    float steerValL = map(carControls.SteerVal, 0.0f, 0.5f, 1.0f, 0.0f);
-    float steerValR = map(carControls.SteerVal, 0.5f, 1.0f, 0.0f, 1.0f);
-    float steerValGammaL = pow(steerValL, settings.Wheel.Steering.Gamma);
-    float steerValGammaR = pow(steerValR, settings.Wheel.Steering.Gamma);
-    float steerValGamma = carControls.SteerVal < 0.5f ? -steerValGammaL : steerValGammaR;
+    float steerValL = map(g_controls.SteerVal, 0.0f, 0.5f, 1.0f, 0.0f);
+    float steerValR = map(g_controls.SteerVal, 0.5f, 1.0f, 0.0f, 1.0f);
+    float steerValGammaL = pow(steerValL, g_settings.Wheel.Steering.Gamma);
+    float steerValGammaR = pow(steerValR, g_settings.Wheel.Steering.Gamma);
+    float steerValGamma = g_controls.SteerVal < 0.5f ? -steerValGammaL : steerValGammaR;
     float effSteer = steerMult * steerValGamma;
 
     /*
@@ -394,24 +394,24 @@ void WheelInput::DoSteering() {
      * Both should work without any deadzone, with a note that the second one
      * does need a specified anti-deadzone (recommended: 24-25%)
      */
-    if (vehData.mClass == VehicleClass::Car) {
-        ext.SetSteeringAngle(playerVehicle, -effSteer * ext.GetMaxSteeringAngle(playerVehicle));
-        ext.SetSteeringInputAngle(playerVehicle, -effSteer);
+    if (g_vehData.mClass == VehicleClass::Car) {
+        g_ext.SetSteeringAngle(g_playerVehicle, -effSteer * g_ext.GetMaxSteeringAngle(g_playerVehicle));
+        g_ext.SetSteeringInputAngle(g_playerVehicle, -effSteer);
     }
     else {
-        Controls::SetControlADZ(ControlVehicleMoveLeftRight, effSteer, settings.Wheel.Steering.AntiDeadZone);
+        Controls::SetControlADZ(ControlVehicleMoveLeftRight, effSteer, g_settings.Wheel.Steering.AntiDeadZone);
     }
 }
 
 int calculateDamper(float gain, float wheelsOffGroundRatio) {
-    Vector3 accelValsAvg = vehData.mAcceleration; //TODO: Avg/dampen later
+    Vector3 accelValsAvg = g_vehData.mAcceleration; //TODO: Avg/dampen later
 
     // Just to use floats everywhere here
-    float damperMax = static_cast<float>(settings.Wheel.FFB.DamperMax);
-    float damperMin = static_cast<float>(settings.Wheel.FFB.DamperMin);
-    float damperMinSpeed = static_cast<float>(settings.Wheel.FFB.DamperMinSpeed);
+    float damperMax = static_cast<float>(g_settings.Wheel.FFB.DamperMax);
+    float damperMin = static_cast<float>(g_settings.Wheel.FFB.DamperMin);
+    float damperMinSpeed = static_cast<float>(g_settings.Wheel.FFB.DamperMinSpeed);
 
-    float absVehicleSpeed = abs(ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true).y);
+    float absVehicleSpeed = abs(ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y);
     float damperFactorSpeed = map(absVehicleSpeed, 0.0f, damperMinSpeed, damperMax, damperMin);
     damperFactorSpeed = fmaxf(damperFactorSpeed, damperMin);
     // already clamped on the upper bound by abs(vel) in map()
@@ -425,21 +425,21 @@ int calculateDamper(float gain, float wheelsOffGroundRatio) {
 
     damperForce = damperForce * (1.0f - wheelsOffGroundRatio);
 
-    if (vehData.mClass == VehicleClass::Car || vehData.mClass == VehicleClass::Quad) {
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(playerVehicle, 0, true)) {
+    if (g_vehData.mClass == VehicleClass::Car || g_vehData.mClass == VehicleClass::Quad) {
+        if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 0, true)) {
             damperForce /= 2.0f;
         }
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(playerVehicle, 1, true)) {
+        if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 1, true)) {
             damperForce /= 2.0f;
         }
     }
-    else if (vehData.mClass == VehicleClass::Bike) {
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(playerVehicle, 0, true)) {
+    else if (g_vehData.mClass == VehicleClass::Bike) {
+        if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 0, true)) {
             damperForce /= 4.0f;
         }
     }
 
-    if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(playerVehicle)) {
+    if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle)) {
         damperForce *= 2.0f;
     }
 
@@ -455,7 +455,7 @@ int calculateDamper(float gain, float wheelsOffGroundRatio) {
 int calculateDetail() {
     // Detail feel / suspension compression based
     float compSpeedTotal = 0.0f;
-    auto compSpeed = vehData.mSuspensionTravelSpeeds;
+    auto compSpeed = g_vehData.mSuspensionTravelSpeeds;
 
     // More than 2 wheels! Trikes should be ok, etc.
     if (compSpeed.size() > 2) {
@@ -463,20 +463,20 @@ int calculateDetail() {
         compSpeedTotal = -compSpeed[0] + compSpeed[1];
     }
 
-    return static_cast<int>(1000.0f * settings.Wheel.FFB.DetailMult * compSpeedTotal);
+    return static_cast<int>(1000.0f * g_settings.Wheel.FFB.DetailMult * compSpeedTotal);
 }
 
 void calculateSoftLock(int& totalForce, int& damperForce) {
     float steerMult;
-    if (vehData.mClass == VehicleClass::Bike || vehData.mClass == VehicleClass::Quad)
-        steerMult = settings.Wheel.Steering.AngleMax / settings.Wheel.Steering.AngleBike;
-    else if (vehData.mClass == VehicleClass::Car)
-        steerMult = settings.Wheel.Steering.AngleMax / settings.Wheel.Steering.AngleCar;
+    if (g_vehData.mClass == VehicleClass::Bike || g_vehData.mClass == VehicleClass::Quad)
+        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleBike;
+    else if (g_vehData.mClass == VehicleClass::Car)
+        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleCar;
     else {
-        steerMult = settings.Wheel.Steering.AngleMax / settings.Wheel.Steering.AngleBoat;
+        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleBoat;
     }
-    float effSteer = steerMult * 2.0f * (carControls.SteerVal - 0.5f);
-    float steerSpeed = carControls.GetAxisSpeed(CarControls::WheelAxisType::Steer);
+    float effSteer = steerMult * 2.0f * (g_controls.SteerVal - 0.5f);
+    float steerSpeed = g_controls.GetAxisSpeed(CarControls::WheelAxisType::Steer);
     if (effSteer > 1.0f) {
         if (steerSpeed > 0.1f) {
             damperForce = (int)map(steerSpeed, 0.1f, 0.4f, (float)damperForce, 40000.0f);
@@ -493,10 +493,10 @@ void calculateSoftLock(int& totalForce, int& damperForce) {
 
 // Despite being scientifically inaccurate, "self-aligning torque" is the best description.
 int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRatio, bool isCar) {
-    float speed = ENTITY::GET_ENTITY_SPEED(playerVehicle);
+    float speed = ENTITY::GET_ENTITY_SPEED(g_playerVehicle);
     pid.setD(static_cast<double>(speed) * 0.1);
-    Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true);
-    Vector3 rotVector = ENTITY::GET_ENTITY_ROTATION_VELOCITY(playerVehicle);
+    Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
+    Vector3 rotVector = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
     Vector3 rotRelative{
         speed * -sin(rotVector.z), 0,
         speed * cos(rotVector.z), 0,
@@ -504,14 +504,14 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     };
 
     Vector3 expectedVector{
-        speed * -sin(steeringAngle / settings.Wheel.Steering.SteerMult), 0,
-        speed * cos(steeringAngle / settings.Wheel.Steering.SteerMult), 0,
+        speed * -sin(steeringAngle / g_settings.Wheel.Steering.SteerMult), 0,
+        speed * cos(steeringAngle / g_settings.Wheel.Steering.SteerMult), 0,
         0, 0
     };
     
-    float error = static_cast<float>(pid.getOutput(expectedVector.x, static_cast<double>(speedVector.x) * settings.Wheel.FFB.SATFactor));
+    float error = static_cast<float>(pid.getOutput(expectedVector.x, static_cast<double>(speedVector.x) * g_settings.Wheel.FFB.SATFactor));
 
-    int satForce = static_cast<int>(settings.Wheel.FFB.SATAmpMult * static_cast<float>(defaultGain) * -error);
+    int satForce = static_cast<int>(g_settings.Wheel.FFB.SATAmpMult * static_cast<float>(defaultGain) * -error);
 
     // "Reduction" effects - those that affect already calculated things
     bool understeering = false;
@@ -528,55 +528,55 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
 
     satForce = static_cast<int>(static_cast<float>(satForce) * (1.0f - wheelsOffGroundRatio));
 
-    if (vehData.mClass == VehicleClass::Car || vehData.mClass == VehicleClass::Quad) {
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(playerVehicle, 0, true)) {
+    if (g_vehData.mClass == VehicleClass::Car || g_vehData.mClass == VehicleClass::Quad) {
+        if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 0, true)) {
             satForce = satForce / 4;
         }
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(playerVehicle, 1, true)) {
+        if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 1, true)) {
             satForce = satForce / 4;
         }
     }
-    else if (vehData.mClass == VehicleClass::Bike) {
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(playerVehicle, 0, true)) {
+    else if (g_vehData.mClass == VehicleClass::Bike) {
+        if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 0, true)) {
             satForce = satForce / 10;
         }
     }
 
-    if (settings.Debug.DisplayInfo) {
+    if (g_settings.Debug.DisplayInfo) {
         //showText(0.85, 0.175, 0.4, fmt::format("RelSteer:\t{:.3f}", steeringRelative.x), 4);
         //showText(0.85, 0.200, 0.4, fmt::format("SetPoint:\t{:.3f}", travelRelative.x), 4);
         showText(0.85, 0.225, 0.4, fmt::format("Error:\t\t{:.3f}", error), 4);
         showText(0.85, 0.250, 0.4, fmt::format("{}Under:\t\t{:.3f}~w~", understeering ? "~b~" : "~w~", understeer), 4);
     }
     if (satForce > 0) {
-        satForce = map(satForce, 0, 10000, settings.Wheel.FFB.AntiDeadForce, 10000);
+        satForce = map(satForce, 0, 10000, g_settings.Wheel.FFB.AntiDeadForce, 10000);
     }
     if (satForce < 0) {
-        satForce = map(satForce, -10000, 0, -10000, -settings.Wheel.FFB.AntiDeadForce);
+        satForce = map(satForce, -10000, 0, -10000, -g_settings.Wheel.FFB.AntiDeadForce);
     }
-    satForce = std::clamp(satForce, -settings.Wheel.FFB.SATMax, settings.Wheel.FFB.SATMax);
+    satForce = std::clamp(satForce, -g_settings.Wheel.FFB.SATMax, g_settings.Wheel.FFB.SATMax);
 
     return satForce;
 }
 
 // Despite being scientifically inaccurate, "self-aligning torque" is the best description.
 void WheelInput::DrawDebugLines() {
-    float steeringAngle = ext.GetWheelAverageAngle(playerVehicle);
-    Vector3 velocityWorld = ENTITY::GET_ENTITY_VELOCITY(playerVehicle);
-    Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(playerVehicle, 1);
+    float steeringAngle = g_ext.GetWheelAverageAngle(g_playerVehicle);
+    Vector3 velocityWorld = ENTITY::GET_ENTITY_VELOCITY(g_playerVehicle);
+    Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, 1);
     Vector3 travelWorld = velocityWorld + positionWorld;
-    Vector3 travelRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(playerVehicle, travelWorld.x, travelWorld.y, travelWorld.z);
+    Vector3 travelRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(g_playerVehicle, travelWorld.x, travelWorld.y, travelWorld.z);
 
-    Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(playerVehicle);
-    Vector3 turnWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(playerVehicle, ENTITY::GET_ENTITY_SPEED(playerVehicle) * -sin(rotationVelocity.z), ENTITY::GET_ENTITY_SPEED(playerVehicle) * cos(rotationVelocity.z), 0.0f);
-    Vector3 turnRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(playerVehicle, turnWorld.x, turnWorld.y, turnWorld.z);
+    Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
+    Vector3 turnWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, ENTITY::GET_ENTITY_SPEED(g_playerVehicle) * -sin(rotationVelocity.z), ENTITY::GET_ENTITY_SPEED(g_playerVehicle) * cos(rotationVelocity.z), 0.0f);
+    Vector3 turnRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(g_playerVehicle, turnWorld.x, turnWorld.y, turnWorld.z);
     float turnRelativeNormX = (travelRelative.x + turnRelative.x) / 2.0f;
     float turnRelativeNormY = (travelRelative.y + turnRelative.y) / 2.0f;
-    Vector3 turnWorldNorm = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(playerVehicle, turnRelativeNormX, turnRelativeNormY, 0.0f);
+    Vector3 turnWorldNorm = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, turnRelativeNormX, turnRelativeNormY, 0.0f);
 
-    float steeringAngleRelX = ENTITY::GET_ENTITY_SPEED(playerVehicle) * -sin(steeringAngle);
-    float steeringAngleRelY = ENTITY::GET_ENTITY_SPEED(playerVehicle) * cos(steeringAngle);
-    Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(playerVehicle, steeringAngleRelX, steeringAngleRelY, 0.0f);
+    float steeringAngleRelX = ENTITY::GET_ENTITY_SPEED(g_playerVehicle) * -sin(steeringAngle);
+    float steeringAngleRelY = ENTITY::GET_ENTITY_SPEED(g_playerVehicle) * cos(steeringAngle);
+    Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, steeringAngleRelX, steeringAngleRelY, 0.0f);
 
     GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, travelWorld.x, travelWorld.y, travelWorld.z, 0, 255, 0, 255);
     GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, turnWorldNorm.x, turnWorldNorm.y, turnWorldNorm.z, 255, 0, 0, 255);
@@ -584,14 +584,14 @@ void WheelInput::DrawDebugLines() {
 }
 
 float getFloatingSteeredWheelsRatio(Vehicle v) {
-    auto suspensionStates = vehData.mWheelsOnGround;
-    auto angles = vehData.mWheelSteeringAngles;
+    auto suspensionStates = g_vehData.mWheelsOnGround;
+    auto angles = g_vehData.mWheelSteeringAngles;
 
     float wheelsOffGroundRatio = 0.0f;
     float wheelsInAir = 0.0f;
     float wheelsSteered = 0.0f;
 
-    for (int i = 0; i < vehData.mWheelCount; i++) {
+    for (int i = 0; i < g_vehData.mWheelCount; i++) {
         if (angles[i] != 0.0f) {
             wheelsSteered += 1.0f;
             if (suspensionStates[i] == false) {
@@ -606,43 +606,43 @@ float getFloatingSteeredWheelsRatio(Vehicle v) {
 }
 
 float getSteeringLock() {
-    switch (vehData.mClass) {
+    switch (g_vehData.mClass) {
     case VehicleClass::Bike:
     case VehicleClass::Quad:
     case VehicleClass::Bicycle:
-        return settings.Wheel.Steering.AngleBike;
+        return g_settings.Wheel.Steering.AngleBike;
     case VehicleClass::Car:
-        return settings.Wheel.Steering.AngleCar;
+        return g_settings.Wheel.Steering.AngleCar;
     case VehicleClass::Boat:
-        return settings.Wheel.Steering.AngleBoat;
+        return g_settings.Wheel.Steering.AngleBoat;
     case VehicleClass::Plane:
     case VehicleClass::Heli:
     case VehicleClass::Train:
     case VehicleClass::Unknown:
-    default: return settings.Wheel.Steering.AngleCar;
+    default: return g_settings.Wheel.Steering.AngleCar;
     }
 }
 
 void WheelInput::PlayFFBGround() {
-    if (!settings.Wheel.FFB.Enable ||
-        carControls.PrevInput != CarControls::Wheel) {
+    if (!g_settings.Wheel.FFB.Enable ||
+        g_controls.PrevInput != CarControls::Wheel) {
         return;
     }
 
     float rotationScale = 1.0f;
-    if (settings.Wheel.FFB.Scale) {
-        rotationScale = getSteeringLock() / settings.Wheel.Steering.AngleMax * 0.66f + 0.34f;
+    if (g_settings.Wheel.FFB.Scale) {
+        rotationScale = getSteeringLock() / g_settings.Wheel.Steering.AngleMax * 0.66f + 0.34f;
     }
 
-    if (settings.Wheel.Options.LogiLEDs) {
-        carControls.PlayLEDs(vehData.mRPM, 0.45f, 0.95f);
+    if (g_settings.Wheel.Options.LogiLEDs) {
+        g_controls.PlayLEDs(g_vehData.mRPM, 0.45f, 0.95f);
     }
 
-    float avgAngle = ext.GetWheelAverageAngle(playerVehicle);
-    float wheelsOffGroundRatio = getFloatingSteeredWheelsRatio(playerVehicle);
+    float avgAngle = g_ext.GetWheelAverageAngle(g_playerVehicle);
+    float wheelsOffGroundRatio = getFloatingSteeredWheelsRatio(g_playerVehicle);
 
-    int detailForce = std::clamp(calculateDetail(), -settings.Wheel.FFB.DetailLim, settings.Wheel.FFB.DetailLim);
-    int satForce = calculateSat(2500, avgAngle, wheelsOffGroundRatio, vehData.mClass == VehicleClass::Car);
+    int detailForce = std::clamp(calculateDetail(), -g_settings.Wheel.FFB.DetailLim, g_settings.Wheel.FFB.DetailLim);
+    int satForce = calculateSat(2500, avgAngle, wheelsOffGroundRatio, g_vehData.mClass == VehicleClass::Car);
     int damperForce = calculateDamper(50.0f, wheelsOffGroundRatio);
 
     // Decrease damper if sat rises, so constantForce doesn't fight against damper
@@ -652,17 +652,17 @@ void WheelInput::PlayFFBGround() {
     int totalForce = satForce + detailForce;
     totalForce = (int)((float)totalForce * rotationScale);
     calculateSoftLock(totalForce, damperForce);
-    carControls.PlayFFBDynamics(std::clamp(totalForce, -10000, 10000), std::clamp(damperForce, -10000, 10000));
+    g_controls.PlayFFBDynamics(std::clamp(totalForce, -10000, 10000), std::clamp(damperForce, -10000, 10000));
 
     const float minGforce = 5.0f;
     const float maxGforce = 50.0f;
     const float minForce = 500.0f;
     const float maxForce = 10000.0f;
-    float gForce = abs(vehData.mAcceleration.y) / 9.81f; // TODO: Average/dampen later
+    float gForce = abs(g_vehData.mAcceleration.y) / 9.81f; // TODO: Average/dampen later
     bool collision = gForce > minGforce;
-    int res = static_cast<int>(map(gForce, minGforce, maxGforce, minForce, maxForce) * settings.Wheel.FFB.CollisionMult);
+    int res = static_cast<int>(map(gForce, minGforce, maxGforce, minForce, maxForce) * g_settings.Wheel.FFB.CollisionMult);
     if (collision) {
-        carControls.PlayFFBCollision(std::clamp(res, -10000, 10000));
+        g_controls.PlayFFBCollision(std::clamp(res, -10000, 10000));
     }
 
     if (collision) {
@@ -670,8 +670,8 @@ void WheelInput::PlayFFBGround() {
             "FFB: {}", gForce, res));
     }
 
-    if (settings.Debug.DisplayInfo) {
-        showText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > settings.Wheel.FFB.SATMax ? "~r~" : "~w~", satForce), 4);
+    if (g_settings.Debug.DisplayInfo) {
+        showText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > g_settings.Wheel.FFB.SATMax ? "~r~" : "~w~", satForce), 4);
         showText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
         showText(0.85, 0.325, 0.4, fmt::format("Damper:\t\t{}", damperForce), 4);
         showText(0.85, 0.350, 0.4, fmt::format("Detail:\t\t{}", detailForce), 4);
@@ -679,27 +679,27 @@ void WheelInput::PlayFFBGround() {
 }
 
 void WheelInput::PlayFFBWater() {
-    if (!settings.Wheel.FFB.Enable ||
-        carControls.PrevInput != CarControls::Wheel) {
+    if (!g_settings.Wheel.FFB.Enable ||
+        g_controls.PrevInput != CarControls::Wheel) {
         return;
     }
 
     float rotationScale = 1.0f;
-    if (settings.Wheel.FFB.Scale) {
-        rotationScale = getSteeringLock() / settings.Wheel.Steering.AngleMax * 0.66f + 0.34f;
+    if (g_settings.Wheel.FFB.Scale) {
+        rotationScale = getSteeringLock() / g_settings.Wheel.Steering.AngleMax * 0.66f + 0.34f;
     }
 
-    if (settings.Wheel.Options.LogiLEDs) {
-        carControls.PlayLEDs(vehData.mRPM, 0.45f, 0.95f);
+    if (g_settings.Wheel.Options.LogiLEDs) {
+        g_controls.PlayLEDs(g_vehData.mRPM, 0.45f, 0.95f);
     }
 
-    auto suspensionStates = vehData.mWheelsOnGround;
-    auto angles = vehData.mWheelSteeringAngles;
+    auto suspensionStates = g_vehData.mWheelsOnGround;
+    auto angles = g_vehData.mWheelSteeringAngles;
 
-    bool isInWater = ENTITY::GET_ENTITY_SUBMERGED_LEVEL(playerVehicle) > 0.10f;
+    bool isInWater = ENTITY::GET_ENTITY_SUBMERGED_LEVEL(g_playerVehicle) > 0.10f;
     int damperForce = calculateDamper(50.0f, isInWater ? 0.25f : 1.0f);
     int detailForce = calculateDetail();
-    int satForce = calculateSat(750, ENTITY::GET_ENTITY_ROTATION_VELOCITY(playerVehicle).z, 1.0f, false);
+    int satForce = calculateSat(750, ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle).z, 1.0f, false);
 
     if (!isInWater) {
         satForce = 0;
@@ -708,9 +708,9 @@ void WheelInput::PlayFFBWater() {
     int totalForce = satForce + detailForce;
     totalForce = (int)((float)totalForce * rotationScale);
     calculateSoftLock(totalForce, damperForce);
-    carControls.PlayFFBDynamics(totalForce, damperForce);
+    g_controls.PlayFFBDynamics(totalForce, damperForce);
 
-    if (settings.Debug.DisplayInfo) {
+    if (g_settings.Debug.DisplayInfo) {
         showText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
         showText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
         showText(0.85, 0.325, 0.4, fmt::format("Damper:\t{}", damperForce), 4);

@@ -23,7 +23,7 @@ CarControls controls;
 
 std::string settingsGeneralFile = Paths::GetRunningExecutableFolder() + "\\settings_general.ini";
 std::string settingsWheelFile = Paths::GetRunningExecutableFolder() + "\\settings_wheel.ini";
-ScriptSettings settings;
+ScriptSettings g_settings;
 
 uint8_t g_numGears = 11;
 
@@ -120,12 +120,12 @@ void blankBlock(int x, int y, int lines, int rows) {
  * Similar to reInit() in Gears but with console stuff
  */
 void init() {
-    settings.SetFiles(settingsGeneralFile, settingsWheelFile);
-	settings.Read(&controls);
+    g_settings.SetFiles(settingsGeneralFile, settingsWheelFile);
+	g_settings.Read(&controls);
 	logger.Write(INFO, "Settings read");
 
 	controls.InitWheel();
-	controls.CheckGUIDs(settings.Wheel.InputDevices.RegisteredGUIDs);
+	controls.CheckGUIDs(g_settings.Wheel.InputDevices.RegisteredGUIDs);
 	
 	int totalWidth = 0;
 	for (auto guid : controls.GetWheel().GetGuids()) {
@@ -145,7 +145,7 @@ void init() {
  * Simplified playWheelEffects() from in Gears
  */
 void playWheelEffects(float effSteer) {
-	if (settings.Wheel.Options.LogiLEDs) {
+	if (g_settings.Wheel.Options.LogiLEDs) {
 		controls.GetWheel().PlayLedsDInput(controls.WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Steer)], controls.ThrottleVal, 0.5f, 0.95f);
 	}
 
@@ -202,16 +202,16 @@ bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> sta
 void saveAxis(const std::string &gameAxis, const std::string &confTag, std::tuple<GUID, std::string> selectedDevice, int min, int max) {
 	std::wstring wDevName = controls.GetWheel().FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
 	std::string devName = std::string(wDevName.begin(), wDevName.end());
-	auto index = settings.SteeringAppendDevice(std::get<0>(selectedDevice), devName);
-	settings.SteeringSaveAxis(confTag, index, std::get<1>(selectedDevice), min, max);
+	auto index = g_settings.SteeringAppendDevice(std::get<0>(selectedDevice), devName);
+	g_settings.SteeringSaveAxis(confTag, index, std::get<1>(selectedDevice), min, max);
 	if (gameAxis == "steering") {
-		settings.SteeringSaveFFBAxis(confTag, index, std::get<1>(selectedDevice));
+		g_settings.SteeringSaveFFBAxis(confTag, index, std::get<1>(selectedDevice));
 	}
 }
 
 void saveButton(int button, std::string confTag, GUID devGUID, std::string devName) {
-	auto index = settings.SteeringAppendDevice(devGUID, devName.c_str());
-	settings.SteeringSaveButton(confTag, index, button);
+	auto index = g_settings.SteeringAppendDevice(devGUID, devName.c_str());
+	g_settings.SteeringSaveButton(confTag, index, button);
 }
 
 
@@ -292,7 +292,7 @@ void configDynamicAxes(char c) {
 				return;
 			}
 			if (c == TAB) {
-				settings.SteeringSaveAxis(confTag, -1, "", 0, 0);
+				g_settings.SteeringSaveAxis(confTag, -1, "", 0, 0);
 				cls();
 				setCursorPosition(0, csbi.srWindow.Bottom);
 				printf("Cleared axis settings");
@@ -354,7 +354,7 @@ void configDynamicAxes(char c) {
 				return;
 			}
 			if (c == TAB) {
-				settings.SteeringSaveAxis(confTag, -1, "", 0, 0);
+				g_settings.SteeringSaveAxis(confTag, -1, "", 0, 0);
 				cls();
 				setCursorPosition(0, csbi.srWindow.Bottom);
 				printf("Cleared axis settings");
@@ -466,7 +466,7 @@ void configDynamicButtons(char c) {
 				return;
 			}
 			if (c == TAB) {
-				settings.SteeringSaveButton(confTag, -1, -1);
+				g_settings.SteeringSaveButton(confTag, -1, -1);
 				cls();
 				setCursorPosition(0, csbi.srWindow.Bottom);
 				printf("Cleared button settings");
@@ -582,7 +582,7 @@ void configHShift(char c) {
 			}
 			if (c == TAB) {
                 std::vector<int> empty(g_numGears);
-                settings.SteeringSaveHShifter(confTag, -1, empty);
+                g_settings.SteeringSaveHShifter(confTag, -1, empty);
 				cls();
 				setCursorPosition(0, csbi.srWindow.Bottom);
 				printf("Cleared H-shifter settings");
@@ -699,8 +699,8 @@ void configHShift(char c) {
 			}
 			break;
 			default: { // save all the shit
-				auto index = settings.SteeringAppendDevice(devGUID, devName);
-				settings.SteeringSaveHShifter(confTag, index, buttonArray);
+				auto index = g_settings.SteeringAppendDevice(devGUID, devName);
+				g_settings.SteeringSaveHShifter(confTag, index, buttonArray);
 				cls();
 				setCursorPosition(0, csbi.srWindow.Bottom);
 				printf("Saved changes");
@@ -765,7 +765,7 @@ int main() {
 		controls.GetLastInputDevice(CarControls::InputDevices::Wheel);
 		controls.UpdateValues(CarControls::InputDevices::Wheel, justPeeking);
 
-		float steerMult = settings.Wheel.Steering.AngleMax / settings.Wheel.Steering.AngleCar;
+		float steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleCar;
 		float effSteer = steerMult * 2.0f * (controls.SteerVal - 0.5f);
 		
 		GetConsoleScreenBufferInfo(hConsole, &csbi);

@@ -32,9 +32,9 @@ extern std::mutex g_notifyUpdateMutex;
 extern bool g_checkUpdateDone;
 extern std::mutex g_checkUpdateDoneMutex;
 
-extern NativeMenu::Menu menu;
-extern CarControls carControls;
-extern ScriptSettings settings;
+extern NativeMenu::Menu g_menu;
+extern CarControls g_controls;
+extern ScriptSettings g_settings;
 
 struct SFont {
     int ID;
@@ -219,13 +219,13 @@ int getBlockableControlIndex(int control) {
 //                             Menu stuff
 ///////////////////////////////////////////////////////////////////////////////
 void onMenuInit() {
-    menu.ReadSettings();
+    g_menu.ReadSettings();
 }
 
 void saveChanges() {
-    settings.SaveGeneral();
-    settings.SaveController(&carControls);
-    settings.SaveWheel(&carControls);
+    g_settings.SaveGeneral();
+    g_settings.SaveController(&g_controls);
+    g_settings.SaveWheel(&g_controls);
 }
 
 void onMenuClose() {
@@ -233,11 +233,11 @@ void onMenuClose() {
 }
 
 void update_mainmenu() {
-    menu.Title("Manual Transmission", 0.90f);
-    menu.Subtitle(fmt::format("~b~{}", Constants::DisplayVersion));
+    g_menu.Title("Manual Transmission", 0.90f);
+    g_menu.Subtitle(fmt::format("~b~{}", Constants::DisplayVersion));
 
     if (MemoryPatcher::Error) {
-        menu.Option("Patch test error", NativeMenu::solidRed, 
+        g_menu.Option("Patch test error", NativeMenu::solidRed, 
             { "One or more components can't be patched. Mod behavior is uncertain."
               "Usually caused by a game update or using an incompatible version.", 
               "Check Gears.log for more details." });
@@ -261,8 +261,8 @@ void update_mainmenu() {
                     extra.push_back(line);
                 }
 
-                if (menu.OptionPlus("New update available!", extra, nullptr, [] {
-                    settings.Update.IgnoredVersion = g_releaseInfo.Version;
+                if (g_menu.OptionPlus("New update available!", extra, nullptr, [] {
+                    g_settings.Update.IgnoredVersion = g_releaseInfo.Version;
                     g_notifyUpdate = false;
                     saveChanges();
                     }, nullptr, "Update info",
@@ -276,54 +276,54 @@ void update_mainmenu() {
         }
     }
 
-    bool tempEnableRead = settings.MTOptions.Enable;
-    if (menu.BoolOption("Enable manual transmission", tempEnableRead,
+    bool tempEnableRead = g_settings.MTOptions.Enable;
+    if (g_menu.BoolOption("Enable manual transmission", tempEnableRead,
         { "Enable or disable the manual transmission. Steering wheel stays active." })) {
-        toggleManual(!settings.MTOptions.Enable);
+        toggleManual(!g_settings.MTOptions.Enable);
     }
 
-    int tempShiftMode = EToInt(settings.MTOptions.ShiftMode);
+    int tempShiftMode = EToInt(g_settings.MTOptions.ShiftMode);
     std::vector<std::string> gearboxModes = {
         "Sequential",
         "H-pattern",
         "Automatic"
     };
 
-    menu.StringArray("Gearbox", gearboxModes, tempShiftMode,
+    g_menu.StringArray("Gearbox", gearboxModes, tempShiftMode,
         { "Choose your gearbox! Options are Sequential, H-pattern and Automatic." });
 
-    if (tempShiftMode != EToInt(settings.MTOptions.ShiftMode)) {
+    if (tempShiftMode != EToInt(g_settings.MTOptions.ShiftMode)) {
         setShiftMode(static_cast<EShiftMode>(tempShiftMode));
     }
 
-    menu.MenuOption("Settings", "settingsmenu", 
+    g_menu.MenuOption("Settings", "settingsmenu", 
         { "Choose what parts of Manual Transmission are active." });
-    menu.MenuOption("Controller & Keyboard", "controlsmenu", 
+    g_menu.MenuOption("Controller & Keyboard", "controlsmenu", 
         { "Configure the controller and keyboard." });
-    menu.MenuOption("Steering Wheel", "wheelmenu", 
+    g_menu.MenuOption("Steering Wheel", "wheelmenu", 
         { "Set up your steering wheel." });
-    menu.MenuOption("HUD Options", "hudmenu", 
+    g_menu.MenuOption("HUD Options", "hudmenu", 
         { "Toggle and move HUD elements. Choose between imperial or metric speeds." });
-    menu.MenuOption("Driving assists", "driveassistmenu",
+    g_menu.MenuOption("Driving assists", "driveassistmenu",
         { "ABS and TC options." });
-    menu.MenuOption("Gameplay assists", "gameassistmenu",
+    g_menu.MenuOption("Gameplay assists", "gameassistmenu",
         { "Assist to make playing a bit easier." });
-    menu.MenuOption("Debug options", "debugmenu", 
+    g_menu.MenuOption("Debug options", "debugmenu", 
         { "Show technical details and options." });
 
-    if (settings.Debug.DisableInputDetect) {
-        int activeIndex = carControls.PrevInput;
+    if (g_settings.Debug.DisableInputDetect) {
+        int activeIndex = g_controls.PrevInput;
         std::vector<std::string> inputNames {
             "Keyboard", "Controller", "Wheel"
         };
-        if (menu.StringArray("Active input", inputNames, activeIndex, { "Active input is set manually." })) {
-            carControls.PrevInput = static_cast<CarControls::InputDevices>(activeIndex);
+        if (g_menu.StringArray("Active input", inputNames, activeIndex, { "Active input is set manually." })) {
+            g_controls.PrevInput = static_cast<CarControls::InputDevices>(activeIndex);
         }
     }
     else {
         int activeIndex = 0;
         std::string activeInputName;
-        switch (carControls.PrevInput) {
+        switch (g_controls.PrevInput) {
         case CarControls::Keyboard:
             activeInputName = "Keyboard";
             break;
@@ -334,194 +334,194 @@ void update_mainmenu() {
             activeInputName = "Wheel";
             break;
         }
-        menu.StringArray("Active input", { activeInputName }, activeIndex, { "Active input is automatically detected and can't be changed." });
+        g_menu.StringArray("Active input", { activeInputName }, activeIndex, { "Active input is automatically detected and can't be changed." });
     }
 
-    for (const auto& device : carControls.FreeDevices) {
-        if (menu.Option(device.name, NativeMenu::solidRed,
+    for (const auto& device : g_controls.FreeDevices) {
+        if (g_menu.Option(device.name, NativeMenu::solidRed,
             { "~r~<b>This device needs to be configured!</b>~w~",
               "Please assign axes and buttons in ~r~<b>Steering Wheel</b>~w~->"
               "~r~<b>Analog Input Setup</b>~w~, ~r~<b>Button Input Setup</b>~w~ before using this device.",
               "Pressing Select discards this warning.",
               fmt::format("Full name: {}", device.name) })) {
             saveChanges();
-            settings.SteeringAppendDevice(device.guid, device.name);
-            settings.Read(&carControls);
-            carControls.CheckGUIDs(settings.Wheel.InputDevices.RegisteredGUIDs);
+            g_settings.SteeringAppendDevice(device.guid, device.name);
+            g_settings.Read(&g_controls);
+            g_controls.CheckGUIDs(g_settings.Wheel.InputDevices.RegisteredGUIDs);
         }
     }
 }
 
 void update_settingsmenu() {
-    menu.Title("Settings");
-    menu.Subtitle("Manual Transmission settings");
+    g_menu.Title("Settings");
+    g_menu.Subtitle("Manual Transmission settings");
 
-    menu.MenuOption("Features", "featuresmenu",
+    g_menu.MenuOption("Features", "featuresmenu",
         { "Turn on or off parts of Manual Transmission." });
 
-    menu.MenuOption("Finetuning", "finetuneoptionsmenu",
+    g_menu.MenuOption("Finetuning", "finetuneoptionsmenu",
         { "Fine-tune the parameters above." });
 
-    menu.MenuOption("Shifting options", "shiftingoptionsmenu",
+    g_menu.MenuOption("Shifting options", "shiftingoptionsmenu",
         { "Change the shifting behavior for sequential and automatic modes." } );
 
-    menu.MenuOption("Automatic finetuning", "finetuneautooptionsmenu",
+    g_menu.MenuOption("Automatic finetuning", "finetuneautooptionsmenu",
         { "Fine-tune script-provided automatic transmission parameters." });
 }
 
 void update_featuresmenu() {
-    menu.Title("Features");
-    menu.Subtitle("Manual Transmission parts");
-    menu.BoolOption("Engine Damage", settings.MTOptions.EngDamage,
+    g_menu.Title("Features");
+    g_menu.Subtitle("Manual Transmission parts");
+    g_menu.BoolOption("Engine Damage", g_settings.MTOptions.EngDamage,
         { "Damage the engine when over-revving and when mis-shifting." });
 
-    menu.BoolOption("Engine Stalling (H)", settings.MTOptions.EngStallH,
+    g_menu.BoolOption("Engine Stalling (H)", g_settings.MTOptions.EngStallH,
         { "Stall the engine when the wheel speed gets too low. Applies to H-pattern shift mode." });
 
-    menu.BoolOption("Engine Stalling (S)", settings.MTOptions.EngStallS,
+    g_menu.BoolOption("Engine Stalling (S)", g_settings.MTOptions.EngStallS,
         { "Stall the engine when the wheel speed gets too low. Applies to sequential shift mode." });
 
-    menu.BoolOption("Clutch Shift (H)", settings.MTOptions.ClutchShiftH,
+    g_menu.BoolOption("Clutch Shift (H)", g_settings.MTOptions.ClutchShiftH,
         { "Require holding the clutch to shift in H-pattern shift mode." });
 
-    menu.BoolOption("Clutch Shift (S)", settings.MTOptions.ClutchShiftS,
+    g_menu.BoolOption("Clutch Shift (S)", g_settings.MTOptions.ClutchShiftS,
         { "Require holding the clutch to shift in sequential mode." });
 
-    menu.BoolOption("Engine Braking", settings.MTOptions.EngBrake,
+    g_menu.BoolOption("Engine Braking", g_settings.MTOptions.EngBrake,
         { "Help the car braking by slowing down more at high RPMs." });
 
-    menu.BoolOption("Gear/RPM Lockup", settings.MTOptions.EngLock,
+    g_menu.BoolOption("Gear/RPM Lockup", g_settings.MTOptions.EngLock,
         { "Simulate wheel lock-up when mis-shifting to a too low gear for the RPM range." });
 
-    menu.BoolOption("Clutch Creep", settings.MTOptions.ClutchCreep,
+    g_menu.BoolOption("Clutch Creep", g_settings.MTOptions.ClutchCreep,
         { "Simulate clutch creep when stopped with clutch engaged." });
 
-    menu.BoolOption("Hard rev limiter", settings.MTOptions.HardLimiter,
+    g_menu.BoolOption("Hard rev limiter", g_settings.MTOptions.HardLimiter,
         { "Enforce rev limiter for reverse and top speed. No more infinite speed!" });
 }
 
 void update_finetuneoptionsmenu() {
-    menu.Title("Fine-tuning");
-    menu.Subtitle("Gearbox fine-tuning options");
+    g_menu.Title("Fine-tuning");
+    g_menu.Subtitle("Gearbox fine-tuning options");
 
-    menu.FloatOption("Clutch bite threshold", settings.MTParams.ClutchThreshold, 0.0f, 1.0f, 0.05f,
+    g_menu.FloatOption("Clutch bite threshold", g_settings.MTParams.ClutchThreshold, 0.0f, 1.0f, 0.05f,
         { "How far the clutch has to be lifted to start biting. This value should be lower than \"Stalling threshold\"." });
-    menu.FloatOption("Stalling threshold", settings.MTParams.StallingThreshold, 0.0f, 1.0f, 0.05f,
+    g_menu.FloatOption("Stalling threshold", g_settings.MTParams.StallingThreshold, 0.0f, 1.0f, 0.05f,
         { "How far the clutch has to be lifted to start stalling. This value should be higher than \"Clutch bite point\"." });
-    menu.FloatOption("Stalling RPM", settings.MTParams.StallingRPM, 0.0f, 0.2f, 0.01f,
+    g_menu.FloatOption("Stalling RPM", g_settings.MTParams.StallingRPM, 0.0f, 0.2f, 0.01f,
         { "Consider stalling when the expected RPM drops below this number.",
           "The range is 0.0 to 0.2. The engine idles at 0.2, so 0.1 is a decent value." });
 
-    menu.FloatOption("RPM Damage", settings.MTParams.RPMDamage, 0.0f, 10.0f, 0.05f,
+    g_menu.FloatOption("RPM Damage", g_settings.MTParams.RPMDamage, 0.0f, 10.0f, 0.05f,
         { "Damage from redlining too long." });
-    menu.FloatOption("Misshift Damage", settings.MTParams.MisshiftDamage, 0, 100, 5,
+    g_menu.FloatOption("Misshift Damage", g_settings.MTParams.MisshiftDamage, 0, 100, 5,
         { "Damage from being over the rev range." });
-    menu.FloatOption("Engine braking threshold", settings.MTParams.EngBrakeThreshold, 0.0f, 1.0f, 0.05f,
+    g_menu.FloatOption("Engine braking threshold", g_settings.MTParams.EngBrakeThreshold, 0.0f, 1.0f, 0.05f,
         { "RPM where engine braking starts being effective." });
-    menu.FloatOption("Engine braking power", settings.MTParams.EngBrakePower, 0.0f, 5.0f, 0.05f,
+    g_menu.FloatOption("Engine braking power", g_settings.MTParams.EngBrakePower, 0.0f, 5.0f, 0.05f,
         { "Decrease this value if your wheels lock up when engine braking." });
 }
 
 void update_shiftingoptionsmenu() {
-    menu.Title("Shifting options");
-    menu.Subtitle("");
+    g_menu.Title("Shifting options");
+    g_menu.Subtitle("");
 
-    menu.BoolOption("Cut throttle on upshift", settings.ShiftOptions.DownshiftBlip,
+    g_menu.BoolOption("Cut throttle on upshift", g_settings.ShiftOptions.DownshiftBlip,
         { "Helps rev matching.",
             "Only applies to sequential mode."});
-    menu.BoolOption("Blip throttle on downshift", settings.ShiftOptions.UpshiftCut,
+    g_menu.BoolOption("Blip throttle on downshift", g_settings.ShiftOptions.UpshiftCut,
         { "Helps rev matching.",
             "Only applies to sequential mode." });
-    menu.FloatOption("Clutch rate multiplier", settings.ShiftOptions.ClutchRateMult, 0.05f, 20.0f, 0.05f,
+    g_menu.FloatOption("Clutch rate multiplier", g_settings.ShiftOptions.ClutchRateMult, 0.05f, 20.0f, 0.05f,
         { "Change how fast clutching is. Below 1 is slower, higher than 1 is faster.",
             "Only applies to sequential mode." });
 
-    menu.FloatOption("Shifting RPM tolerance", settings.ShiftOptions.RPMTolerance, 0.0f, 1.0f, 0.05f,
+    g_menu.FloatOption("Shifting RPM tolerance", g_settings.ShiftOptions.RPMTolerance, 0.0f, 1.0f, 0.05f,
         { "RPM mismatch tolerance on shifts",
             "Only applies to H-pattern with \"Clutch Shift\" enabled.",
-            fmt::format("Clutch Shift (H) is {}abled.", settings.MTOptions.ClutchShiftH ? "~g~en" : "~r~dis")
+            fmt::format("Clutch Shift (H) is {}abled.", g_settings.MTOptions.ClutchShiftH ? "~g~en" : "~r~dis")
         });
 }
 
 void update_finetuneautooptionsmenu() {
-    menu.Title("Automatic transmission finetuning");
-    menu.Subtitle("Script-driven automatic transmission");
+    g_menu.Title("Automatic transmission finetuning");
+    g_menu.Subtitle("Script-driven automatic transmission");
 
-    menu.FloatOption("Upshift engine load", settings.AutoParams.UpshiftLoad, 0.01f, 0.20f, 0.01f,
+    g_menu.FloatOption("Upshift engine load", g_settings.AutoParams.UpshiftLoad, 0.01f, 0.20f, 0.01f,
         { "Upshift when the engine load drops below this value. "
           "Raise this value if the car can't upshift."});
-    menu.FloatOption("Downshift engine load", settings.AutoParams.DownshiftLoad, 0.30f, 1.00f, 0.01f,
+    g_menu.FloatOption("Downshift engine load", g_settings.AutoParams.DownshiftLoad, 0.30f, 1.00f, 0.01f,
         { "Downshift when the engine load rises over this value. "
           "Raise this value if the car downshifts right after upshifting." });
-    menu.FloatOption("Downshift timeout multiplier", settings.AutoParams.DownshiftTimeoutMult, 0.05f, 4.00f, 0.05f,
+    g_menu.FloatOption("Downshift timeout multiplier", g_settings.AutoParams.DownshiftTimeoutMult, 0.05f, 4.00f, 0.05f,
         { "Don't downshift while car has just shifted up. "
           "Timeout based on clutch change rate.",
           "Raise for longer timeout, lower to allow earlier downshifting after an upshift." });
-    menu.FloatOption("Next gear min RPM",    settings.AutoParams.NextGearMinRPM, 0.20f, 0.50f, 0.01f, 
+    g_menu.FloatOption("Next gear min RPM",    g_settings.AutoParams.NextGearMinRPM, 0.20f, 0.50f, 0.01f, 
         { "Don't upshift until next gears' RPM is over this value." });
-    menu.FloatOption("Current gear min RPM", settings.AutoParams.CurrGearMinRPM, 0.20f, 0.50f, 0.01f, 
+    g_menu.FloatOption("Current gear min RPM", g_settings.AutoParams.CurrGearMinRPM, 0.20f, 0.50f, 0.01f, 
         { "Downshift when RPM drops below this value." });
-    menu.FloatOption("Economy rate", settings.AutoParams.EcoRate, 0.01f, 0.50f, 0.01f,
+    g_menu.FloatOption("Economy rate", g_settings.AutoParams.EcoRate, 0.01f, 0.50f, 0.01f,
         { "On releasing throttle, high values cause earlier upshifts.",
           "Set this low to stay in gear longer when releasing throttle." });
 }
 
 void update_controlsmenu() {
-    menu.Title("Controls");
-    menu.Subtitle("Controller & Keyboard");
+    g_menu.Title("Controls");
+    g_menu.Subtitle("Controller & Keyboard");
 
-    menu.MenuOption("Controller options", "controlleroptionsmenu");
+    g_menu.MenuOption("Controller options", "controlleroptionsmenu");
 
-    if (settings.Controller.Native.Enable) {
-        menu.MenuOption("Controller bindings (Native)", "legacycontrollermenu",
+    if (g_settings.Controller.Native.Enable) {
+        g_menu.MenuOption("Controller bindings (Native)", "legacycontrollermenu",
             { "Set up controller bindings." });
     }
     else {
-        menu.MenuOption("Controller bindings (XInput)", "controllermenu",
+        g_menu.MenuOption("Controller bindings (XInput)", "controllermenu",
             { "Set up controller bindings." });
     }
 
-    menu.MenuOption("Keyboard bindings", "keyboardmenu",
+    g_menu.MenuOption("Keyboard bindings", "keyboardmenu",
         { "Change keyboard control bindings." });
 
-    menu.MenuOption("Steering assists", "steeringassistmenu",
+    g_menu.MenuOption("Steering assists", "steeringassistmenu",
         { "Customize steering input for keyboards and controllers." });
 }
 
 void update_controlleroptionsmenu() {
-    menu.Title("Controller options");
-    menu.Subtitle("Controller options");
+    g_menu.Title("Controller options");
+    g_menu.Subtitle("Controller options");
 
-    menu.BoolOption("Engine button toggles", settings.Controller.ToggleEngine,
+    g_menu.BoolOption("Engine button toggles", g_settings.Controller.ToggleEngine,
         { "Checked: the engine button turns the engine on AND off.",
             "Not checked: the button only turns the engine on when it's off." });
 
-    menu.IntOption("Long press time (ms)", settings.Controller.HoldTimeMs, 100, 5000, 50,
+    g_menu.IntOption("Long press time (ms)", g_settings.Controller.HoldTimeMs, 100, 5000, 50,
         { "Timeout for long press buttons to activate." });
 
-    menu.IntOption("Max tap time (ms)", settings.Controller.MaxTapTimeMs, 50, 1000, 10,
+    g_menu.IntOption("Max tap time (ms)", g_settings.Controller.MaxTapTimeMs, 50, 1000, 10,
         { "Buttons pressed and released within this time are regarded as a tap. Shift up, shift down are tap controls." });
 
-    menu.FloatOption("Trigger value", settings.Controller.TriggerValue, 0.25, 1.0, 0.05,
+    g_menu.FloatOption("Trigger value", g_settings.Controller.TriggerValue, 0.25, 1.0, 0.05,
         { "Threshold for an analog input to be detected as button press." });
 
-    menu.BoolOption("Block car controls", settings.Controller.BlockCarControls,
+    g_menu.BoolOption("Block car controls", g_settings.Controller.BlockCarControls,
         { "Blocks car action controls. Holding activates the original button again.",
             "Experimental!" });
 
-    menu.BoolOption("Block H-pattern on controller", settings.Controller.BlockHShift,
+    g_menu.BoolOption("Block H-pattern on controller", g_settings.Controller.BlockHShift,
         { "Block H-pattern mode when using controller input." });
 
-    menu.BoolOption("Ignore shifts in UI", settings.Controller.IgnoreShiftsUI,
+    g_menu.BoolOption("Ignore shifts in UI", g_settings.Controller.IgnoreShiftsUI,
         { "Ignore shift up/shift down while using the phone or when the menu is open" });
 
-    menu.BoolOption("Native controller input", settings.Controller.Native.Enable,
+    g_menu.BoolOption("Native controller input", g_settings.Controller.Native.Enable,
         { "Using a controller not supported by XInput? Enable this option and re-bind your controls." });
 }
 
 void update_legacycontrollermenu() {
-    menu.Title("Controller bindings");
-    menu.Subtitle("Native controls");
+    g_menu.Title("Controller bindings");
+    g_menu.Subtitle("Native controls");
 
     std::vector<std::string> blockableControlsHelp;
     blockableControlsHelp.reserve(blockableControls.size());
@@ -529,19 +529,19 @@ void update_legacycontrollermenu() {
         blockableControlsHelp.emplace_back(control.Text);
     }
 
-    int oldIndexUp = getBlockableControlIndex(carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
-    if (menu.StringArray("Shift Up blocks", blockableControlsHelp, oldIndexUp)) {
-        carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = blockableControls[oldIndexUp].Control;
+    int oldIndexUp = getBlockableControlIndex(g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
+    if (g_menu.StringArray("Shift Up blocks", blockableControlsHelp, oldIndexUp)) {
+        g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = blockableControls[oldIndexUp].Control;
     }
 
-    int oldIndexDown = getBlockableControlIndex(carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
-    if (menu.StringArray("Shift Down blocks", blockableControlsHelp, oldIndexDown)) {
-        carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = blockableControls[oldIndexDown].Control;
+    int oldIndexDown = getBlockableControlIndex(g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
+    if (g_menu.StringArray("Shift Down blocks", blockableControlsHelp, oldIndexDown)) {
+        g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = blockableControls[oldIndexDown].Control;
     }
 
-    int oldIndexClutch = getBlockableControlIndex(carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
-    if (menu.StringArray("Clutch blocks", blockableControlsHelp, oldIndexClutch)) {
-        carControls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] = blockableControls[oldIndexClutch].Control;
+    int oldIndexClutch = getBlockableControlIndex(g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
+    if (g_menu.StringArray("Clutch blocks", blockableControlsHelp, oldIndexClutch)) {
+        g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] = blockableControls[oldIndexClutch].Control;
     }
 
     std::vector<std::string> controllerInfo = {
@@ -552,10 +552,10 @@ void update_legacycontrollermenu() {
 
     for (const auto& confTag : controllerConfTags) {
         controllerInfo.back() = confTag.Info;
-        int nativeControl = carControls.ConfTagLController2Value(confTag.Tag);
-        controllerInfo.push_back(fmt::format("Assigned to {} ({})", carControls.NativeControl2Text(nativeControl), nativeControl));
+        int nativeControl = g_controls.ConfTagLController2Value(confTag.Tag);
+        controllerInfo.push_back(fmt::format("Assigned to {} ({})", g_controls.NativeControl2Text(nativeControl), nativeControl));
 
-        if (menu.OptionPlus(fmt::format("Assign {}", confTag.Tag), controllerInfo, nullptr, std::bind(clearLControllerButton, confTag.Tag), nullptr, "Current setting")) {
+        if (g_menu.OptionPlus(fmt::format("Assign {}", confTag.Tag), controllerInfo, nullptr, std::bind(clearLControllerButton, confTag.Tag), nullptr, "Current setting")) {
             WAIT(500);
             bool result = configLControllerButton(confTag.Tag);
             if (!result)
@@ -567,8 +567,8 @@ void update_legacycontrollermenu() {
 }
 
 void update_controllermenu() {
-    menu.Title("Controller bindings");
-    menu.Subtitle("XInput controls");
+    g_menu.Title("Controller bindings");
+    g_menu.Subtitle("XInput controls");
 
     std::vector<std::string> blockableControlsHelp;
     blockableControlsHelp.reserve(blockableControls.size());
@@ -576,19 +576,19 @@ void update_controllermenu() {
         blockableControlsHelp.emplace_back(control.Text);
     }
 
-    int oldIndexUp = getBlockableControlIndex(carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)]);
-    if (menu.StringArray("Shift Up blocks", blockableControlsHelp, oldIndexUp)) {
-        carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] = blockableControls[oldIndexUp].Control;
+    int oldIndexUp = getBlockableControlIndex(g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)]);
+    if (g_menu.StringArray("Shift Up blocks", blockableControlsHelp, oldIndexUp)) {
+        g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] = blockableControls[oldIndexUp].Control;
     }
 
-    int oldIndexDown = getBlockableControlIndex(carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)]);
-    if (menu.StringArray("Shift Down blocks", blockableControlsHelp, oldIndexDown)) {
-        carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = blockableControls[oldIndexDown].Control;
+    int oldIndexDown = getBlockableControlIndex(g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)]);
+    if (g_menu.StringArray("Shift Down blocks", blockableControlsHelp, oldIndexDown)) {
+        g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = blockableControls[oldIndexDown].Control;
     }
 
-    int oldIndexClutch = getBlockableControlIndex(carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)]);
-    if (menu.StringArray("Clutch blocks", blockableControlsHelp, oldIndexClutch)) {
-        carControls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)] = blockableControls[oldIndexClutch].Control;
+    int oldIndexClutch = getBlockableControlIndex(g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)]);
+    if (g_menu.StringArray("Clutch blocks", blockableControlsHelp, oldIndexClutch)) {
+        g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)] = blockableControls[oldIndexClutch].Control;
     }
 
     std::vector<std::string> controllerInfo = {
@@ -599,8 +599,8 @@ void update_controllermenu() {
 
     for (const auto& confTag : controllerConfTags) {
         controllerInfo.back() = confTag.Info;
-        controllerInfo.push_back(fmt::format("Assigned to {}", carControls.ConfTagController2Value(confTag.Tag)));
-        if (menu.OptionPlus(fmt::format("Assign {}", confTag.Tag), controllerInfo, nullptr, std::bind(clearControllerButton, confTag.Tag), nullptr, "Current setting")) {
+        controllerInfo.push_back(fmt::format("Assigned to {}", g_controls.ConfTagController2Value(confTag.Tag)));
+        if (g_menu.OptionPlus(fmt::format("Assign {}", confTag.Tag), controllerInfo, nullptr, std::bind(clearControllerButton, confTag.Tag), nullptr, "Current setting")) {
             WAIT(500);
             bool result = configControllerButton(confTag.Tag);
             if (!result)
@@ -612,8 +612,8 @@ void update_controllermenu() {
 }
 
 void update_keyboardmenu() {
-    menu.Title("Keyboard bindings");
-    menu.Subtitle("Keyboard bindings");
+    g_menu.Title("Keyboard bindings");
+    g_menu.Subtitle("Keyboard bindings");
 
     std::vector<std::string> keyboardInfo = {
         "Press RIGHT to clear key",
@@ -623,8 +623,8 @@ void update_keyboardmenu() {
 
     for (const auto& confTag : keyboardConfTags) {
         keyboardInfo.back() = confTag.Info;
-        keyboardInfo.push_back(fmt::format("Assigned to {}", key2str(carControls.ConfTagKB2key(confTag.Tag))));
-        if (menu.OptionPlus(fmt::format("Assign {}", confTag.Tag), keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag.Tag), nullptr, "Current setting")) {
+        keyboardInfo.push_back(fmt::format("Assigned to {}", key2str(g_controls.ConfTagKB2key(confTag.Tag))));
+        if (g_menu.OptionPlus(fmt::format("Assign {}", confTag.Tag), keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag.Tag), nullptr, "Current setting")) {
             WAIT(500);
             bool result = configKeyboardKey(confTag.Tag);
             if (!result)
@@ -636,49 +636,49 @@ void update_keyboardmenu() {
 }
 
 void update_wheelmenu() {
-    menu.Title("Steering wheel");
-    menu.Subtitle("Steering wheel options");
+    g_menu.Title("Steering wheel");
+    g_menu.Subtitle("Steering wheel options");
 
-    if (menu.BoolOption("Enable wheel", settings.Wheel.Options.Enable,
+    if (g_menu.BoolOption("Enable wheel", g_settings.Wheel.Options.Enable,
         { "Enable usage of a steering wheel." })) {
         saveChanges();
-        settings.Read(&carControls);
+        g_settings.Read(&g_controls);
         initWheel();
     }
 
-    if (menu.FloatOption("Steering multiplier (wheel)", settings.Wheel.Steering.SteerMult, 0.1f, 2.0f, 0.01f,
+    if (g_menu.FloatOption("Steering multiplier (wheel)", g_settings.Wheel.Steering.SteerMult, 0.1f, 2.0f, 0.01f,
         { "Increase steering lock for all cars. You might want to increase it for faster steering and more steering lock." })) {
     }
 
-    if (menu.BoolOption("Logitech RPM LEDs", settings.Wheel.Options.LogiLEDs,
+    if (g_menu.BoolOption("Logitech RPM LEDs", g_settings.Wheel.Options.LogiLEDs,
         { "Show the RPM LEDs on Logitech steering wheels. If the wheel doesn't have compatible RPM LEDs, this might crash." })) {
-        settings.SaveWheel(&carControls);
+        g_settings.SaveWheel(&g_controls);
     }
 
-    menu.MenuOption("Analog input setup", "axesmenu",
+    g_menu.MenuOption("Analog input setup", "axesmenu",
         { "Configure the analog inputs." });
 
-    menu.MenuOption("Button input setup", "buttonsmenu",
+    g_menu.MenuOption("Button input setup", "buttonsmenu",
         { "Set up your buttons on your steering wheel." });
 
-    menu.MenuOption("Force feedback options", "forcefeedbackmenu",
+    g_menu.MenuOption("Force feedback options", "forcefeedbackmenu",
         { "Fine-tune your force feedback parameters." });
 
-    menu.MenuOption("Soft lock options", "anglemenu",
+    g_menu.MenuOption("Soft lock options", "anglemenu",
         { "Set up soft lock options here." });
 
     std::vector<std::string> hpatInfo = {
         "Press RIGHT to clear H-pattern shifter",
         "Active gear:"
     };
-    if (carControls.ButtonIn(CarControls::WheelControlType::HR)) hpatInfo.emplace_back("Reverse");
+    if (g_controls.ButtonIn(CarControls::WheelControlType::HR)) hpatInfo.emplace_back("Reverse");
     for (uint8_t gear = 1; gear < g_numGears; ++gear) {
         // H1 == 1
-        if (carControls.ButtonIn(static_cast<CarControls::WheelControlType>(gear))) 
+        if (g_controls.ButtonIn(static_cast<CarControls::WheelControlType>(gear))) 
             hpatInfo.emplace_back(fmt::format("Gear {}", gear));
     }
 
-    if (menu.OptionPlus("H-pattern shifter setup", hpatInfo, nullptr, std::bind(clearHShifter), nullptr, "Input values",
+    if (g_menu.OptionPlus("H-pattern shifter setup", hpatInfo, nullptr, std::bind(clearHShifter), nullptr, "Input values",
         { "Select this option to start H-pattern shifter setup. Follow the on-screen instructions." })) {
         bool result = configHPattern();
         UI::Notify(WARN, result ? "H-pattern shifter saved" : "Cancelled H-pattern shifter setup");
@@ -688,41 +688,41 @@ void update_wheelmenu() {
         "Press RIGHT to clear H-pattern auto",
         "Active gear:"
     };
-    if (carControls.ButtonIn(CarControls::WheelControlType::APark)) hAutoInfo.emplace_back("Auto Park");
-    if (carControls.ButtonIn(CarControls::WheelControlType::AReverse)) hAutoInfo.emplace_back("Auto Reverse");
-    if (carControls.ButtonIn(CarControls::WheelControlType::ANeutral)) hAutoInfo.emplace_back("Auto Neutral");
-    if (carControls.ButtonIn(CarControls::WheelControlType::ADrive)) hAutoInfo.emplace_back("Auto Drive");
+    if (g_controls.ButtonIn(CarControls::WheelControlType::APark)) hAutoInfo.emplace_back("Auto Park");
+    if (g_controls.ButtonIn(CarControls::WheelControlType::AReverse)) hAutoInfo.emplace_back("Auto Reverse");
+    if (g_controls.ButtonIn(CarControls::WheelControlType::ANeutral)) hAutoInfo.emplace_back("Auto Neutral");
+    if (g_controls.ButtonIn(CarControls::WheelControlType::ADrive)) hAutoInfo.emplace_back("Auto Drive");
 
-    if (menu.OptionPlus("Shifter setup for automatic", hAutoInfo, nullptr, [] { clearASelect(); }, nullptr, "Input values",
+    if (g_menu.OptionPlus("Shifter setup for automatic", hAutoInfo, nullptr, [] { clearASelect(); }, nullptr, "Input values",
         { "Set up H-pattern shifter for automatic gearbox. Follow the on-screen instructions." })) {
         bool result = configASelect();
         UI::Notify(WARN, result ? "H-pattern shifter (auto) saved" : "Cancelled H-pattern shifter (auto) setup");
     }
 
-    menu.BoolOption("Keyboard H-pattern", settings.Wheel.Options.HPatternKeyboard,
+    g_menu.BoolOption("Keyboard H-pattern", g_settings.Wheel.Options.HPatternKeyboard,
         { "This allows you to use the keyboard for H-pattern shifting. Configure the controls in the keyboard section." });
 
-    menu.BoolOption("Use shifter for automatic", settings.Wheel.Options.UseShifterForAuto,
+    g_menu.BoolOption("Use shifter for automatic", g_settings.Wheel.Options.UseShifterForAuto,
         { "Use the H-pattern shifter to select the Drive/Reverse gears." });
 }
 
 void update_anglemenu() {
-    menu.Title("Soft lock");
-    menu.Subtitle("Soft lock & angle setup");
+    g_menu.Title("Soft lock");
+    g_menu.Subtitle("Soft lock & angle setup");
     float minLock = 180.0f;
-    if (menu.FloatOption("Physical degrees", settings.Wheel.Steering.AngleMax, minLock, 1080.0, 30.0,
+    if (g_menu.FloatOption("Physical degrees", g_settings.Wheel.Steering.AngleMax, minLock, 1080.0, 30.0,
         { "How many degrees your wheel can physically turn." })) {
-        if (settings.Wheel.Steering.AngleCar > settings.Wheel.Steering.AngleMax) { settings.Wheel.Steering.AngleCar = settings.Wheel.Steering.AngleMax; }
-        if (settings.Wheel.Steering.AngleBike > settings.Wheel.Steering.AngleMax) { settings.Wheel.Steering.AngleBike = settings.Wheel.Steering.AngleMax; }
-        if (settings.Wheel.Steering.AngleBoat > settings.Wheel.Steering.AngleMax) { settings.Wheel.Steering.AngleBoat = settings.Wheel.Steering.AngleMax; }
+        if (g_settings.Wheel.Steering.AngleCar > g_settings.Wheel.Steering.AngleMax) { g_settings.Wheel.Steering.AngleCar = g_settings.Wheel.Steering.AngleMax; }
+        if (g_settings.Wheel.Steering.AngleBike > g_settings.Wheel.Steering.AngleMax) { g_settings.Wheel.Steering.AngleBike = g_settings.Wheel.Steering.AngleMax; }
+        if (g_settings.Wheel.Steering.AngleBoat > g_settings.Wheel.Steering.AngleMax) { g_settings.Wheel.Steering.AngleBoat = g_settings.Wheel.Steering.AngleMax; }
     }
-    menu.FloatOption("Car soft lock", settings.Wheel.Steering.AngleCar, minLock, settings.Wheel.Steering.AngleMax, 30.0,
+    g_menu.FloatOption("Car soft lock", g_settings.Wheel.Steering.AngleCar, minLock, g_settings.Wheel.Steering.AngleMax, 30.0,
         { "Soft lock for cars and trucks. (degrees)" });
 
-    menu.FloatOption("Bike soft lock", settings.Wheel.Steering.AngleBike, minLock, settings.Wheel.Steering.AngleMax, 30.0,
+    g_menu.FloatOption("Bike soft lock", g_settings.Wheel.Steering.AngleBike, minLock, g_settings.Wheel.Steering.AngleMax, 30.0,
         { "Soft lock for bikes and quads. (degrees)" });
 
-    menu.FloatOption("Boat soft lock", settings.Wheel.Steering.AngleBoat, minLock, settings.Wheel.Steering.AngleMax, 30.0,
+    g_menu.FloatOption("Boat soft lock", g_settings.Wheel.Steering.AngleBoat, minLock, g_settings.Wheel.Steering.AngleMax, 30.0,
         { "Soft lock for boats. (degrees)" });
 }
 
@@ -791,199 +791,199 @@ std::vector<std::string> showGammaCurve(const std::string& axis, const float inp
 }
 
 void update_axesmenu() {
-    menu.Title("Configure axes");
-    menu.Subtitle("Setup steering and pedals");
-    carControls.UpdateValues(CarControls::Wheel, true);
+    g_menu.Title("Configure axes");
+    g_menu.Subtitle("Setup steering and pedals");
+    g_controls.UpdateValues(CarControls::Wheel, true);
     std::vector<std::string> info = {
         "Press RIGHT to clear this axis" ,
-        fmt::format("Steer:\t\t{:.3f}", carControls.SteerVal),
-        fmt::format("Throttle:\t\t{:.3f}", carControls.ThrottleVal),
-        fmt::format("Brake:\t\t{:.3f}", carControls.BrakeVal),
-        fmt::format("Clutch:\t\t{:.3f}", carControls.ClutchVal),
-        fmt::format("Handbrake:\t{:.3f}", carControls.HandbrakeVal),
+        fmt::format("Steer:\t\t{:.3f}", g_controls.SteerVal),
+        fmt::format("Throttle:\t\t{:.3f}", g_controls.ThrottleVal),
+        fmt::format("Brake:\t\t{:.3f}", g_controls.BrakeVal),
+        fmt::format("Clutch:\t\t{:.3f}", g_controls.ClutchVal),
+        fmt::format("Handbrake:\t{:.3f}", g_controls.HandbrakeVal),
     };
 
-    if (menu.OptionPlus("Configure steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr, "Input values")) {
+    if (g_menu.OptionPlus("Configure steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr, "Input values")) {
         bool result = configAxis("STEER");
         UI::Notify(WARN, result ? "Steering axis saved" : "Cancelled steering axis configuration");
         if (result) 
             initWheel();
     }
-    if (menu.OptionPlus("Configure throttle", info, nullptr, std::bind(clearAxis, "THROTTLE"), nullptr, "Input values")) {
+    if (g_menu.OptionPlus("Configure throttle", info, nullptr, std::bind(clearAxis, "THROTTLE"), nullptr, "Input values")) {
         bool result = configAxis("THROTTLE");
         UI::Notify(WARN, result ? "Throttle axis saved" : "Cancelled throttle axis configuration");
         if (result) 
             initWheel();
     }
-    if (menu.OptionPlus("Configure brake", info, nullptr, std::bind(clearAxis, "BRAKE"), nullptr, "Input values")) {
+    if (g_menu.OptionPlus("Configure brake", info, nullptr, std::bind(clearAxis, "BRAKE"), nullptr, "Input values")) {
         bool result = configAxis("BRAKE");
         UI::Notify(WARN, result ? "Brake axis saved" : "Cancelled brake axis configuration");
         if (result) 
             initWheel();
     }
-    if (menu.OptionPlus("Configure clutch", info, nullptr, std::bind(clearAxis, "CLUTCH"), nullptr, "Input values")) {
+    if (g_menu.OptionPlus("Configure clutch", info, nullptr, std::bind(clearAxis, "CLUTCH"), nullptr, "Input values")) {
         bool result = configAxis("CLUTCH");
         UI::Notify(WARN, result ? "Clutch axis saved" : "Cancelled clutch axis configuration");
         if (result) 
             initWheel();
     }
-    if (menu.OptionPlus("Configure handbrake", info, nullptr, std::bind(clearAxis, "HANDBRAKE_ANALOG"), nullptr, "Input values")) {
+    if (g_menu.OptionPlus("Configure handbrake", info, nullptr, std::bind(clearAxis, "HANDBRAKE_ANALOG"), nullptr, "Input values")) {
         bool result = configAxis("HANDBRAKE_ANALOG");
         UI::Notify(WARN, result ? "Handbrake axis saved" : "Cancelled handbrake axis configuration");
         if (result) 
             initWheel();
     }
 
-    menu.FloatOption("Steering deadzone", settings.Wheel.Steering.DeadZone, 0.0f, 0.5f, 0.01f,
+    g_menu.FloatOption("Steering deadzone", g_settings.Wheel.Steering.DeadZone, 0.0f, 0.5f, 0.01f,
         { "Deadzone size, from the center of the wheel." });
 
-    menu.FloatOption("Steering deadzone offset", settings.Wheel.Steering.DeadZoneOffset, -0.5f, 0.5f, 0.01f,
+    g_menu.FloatOption("Steering deadzone offset", g_settings.Wheel.Steering.DeadZoneOffset, -0.5f, 0.5f, 0.01f,
         { "Put the deadzone with an offset from the center." });
 
-    menu.FloatOption("Throttle anti-deadzone", settings.Wheel.Throttle.AntiDeadZone, 0.0f, 1.0f, 0.01f,
+    g_menu.FloatOption("Throttle anti-deadzone", g_settings.Wheel.Throttle.AntiDeadZone, 0.0f, 1.0f, 0.01f,
         { "GTA V ignores 25% input for analog controls by default." });
 
-    menu.FloatOption("Brake anti-deadzone", settings.Wheel.Brake.AntiDeadZone, 0.0f, 1.0f, 0.01f,
+    g_menu.FloatOption("Brake anti-deadzone", g_settings.Wheel.Brake.AntiDeadZone, 0.0f, 1.0f, 0.01f,
         { "GTA V ignores 25% input for analog controls by default." });
 
     bool showBrakeGammaBox = false;
     std::vector<std::string> extras = {};
-    menu.OptionPlus("Brake gamma", extras, &showBrakeGammaBox,
-        [=] { return incGamma(settings.Wheel.Brake.Gamma, 5.0f, 0.01f); },
-        [=] { return decGamma(settings.Wheel.Brake.Gamma, 0.1f, 0.01f); },
+    g_menu.OptionPlus("Brake gamma", extras, &showBrakeGammaBox,
+        [=] { return incGamma(g_settings.Wheel.Brake.Gamma, 5.0f, 0.01f); },
+        [=] { return decGamma(g_settings.Wheel.Brake.Gamma, 0.1f, 0.01f); },
         "Brake gamma",
         { "Linearity of the brake pedal. Values over 1.0 feel more real if you have progressive springs." });
 
     if (showBrakeGammaBox) {
-        extras = showGammaCurve("Brake", carControls.BrakeVal, settings.Wheel.Brake.Gamma);
-        menu.OptionPlusPlus(extras, "Brake gamma");
+        extras = showGammaCurve("Brake", g_controls.BrakeVal, g_settings.Wheel.Brake.Gamma);
+        g_menu.OptionPlusPlus(extras, "Brake gamma");
     }
 
     bool showThrottleGammaBox = false;
     extras = {};
-    menu.OptionPlus("Throttle gamma", extras, &showThrottleGammaBox,
-        [=] { return incGamma(settings.Wheel.Throttle.Gamma, 5.0f, 0.01f); },
-        [=] { return decGamma(settings.Wheel.Throttle.Gamma, 0.1f, 0.01f); },
+    g_menu.OptionPlus("Throttle gamma", extras, &showThrottleGammaBox,
+        [=] { return incGamma(g_settings.Wheel.Throttle.Gamma, 5.0f, 0.01f); },
+        [=] { return decGamma(g_settings.Wheel.Throttle.Gamma, 0.1f, 0.01f); },
         "Throttle gamma",
         { "Linearity of the throttle pedal." });
 
     if (showThrottleGammaBox) {
-        extras = showGammaCurve("Throttle", carControls.ThrottleVal, settings.Wheel.Throttle.Gamma);
-        menu.OptionPlusPlus(extras, "Throttle gamma");
+        extras = showGammaCurve("Throttle", g_controls.ThrottleVal, g_settings.Wheel.Throttle.Gamma);
+        g_menu.OptionPlusPlus(extras, "Throttle gamma");
     }
 
     bool showSteeringGammaBox = false;
     extras = {};
-    menu.OptionPlus("Steering gamma", extras, &showSteeringGammaBox,
-        [=] { return incGamma(settings.Wheel.Steering.Gamma, 5.0f, 0.01f); },
-        [=] { return decGamma(settings.Wheel.Steering.Gamma, 0.1f, 0.01f); },
+    g_menu.OptionPlus("Steering gamma", extras, &showSteeringGammaBox,
+        [=] { return incGamma(g_settings.Wheel.Steering.Gamma, 5.0f, 0.01f); },
+        [=] { return decGamma(g_settings.Wheel.Steering.Gamma, 0.1f, 0.01f); },
         "Steering gamma",
         { "Linearity of the steering wheel." });
 
     if (showSteeringGammaBox) {
-        float steerValL = map(carControls.SteerVal, 0.0f, 0.5f, 1.0f, 0.0f);
-        float steerValR = map(carControls.SteerVal, 0.5f, 1.0f, 0.0f, 1.0f);
-        float steerVal = carControls.SteerVal < 0.5f ? steerValL : steerValR;
-        extras = showGammaCurve("Steering", steerVal, settings.Wheel.Steering.Gamma);
-        menu.OptionPlusPlus(extras, "Steering gamma");
+        float steerValL = map(g_controls.SteerVal, 0.0f, 0.5f, 1.0f, 0.0f);
+        float steerValR = map(g_controls.SteerVal, 0.5f, 1.0f, 0.0f, 1.0f);
+        float steerVal = g_controls.SteerVal < 0.5f ? steerValL : steerValR;
+        extras = showGammaCurve("Steering", steerVal, g_settings.Wheel.Steering.Gamma);
+        g_menu.OptionPlusPlus(extras, "Steering gamma");
     }
 }
 
 void update_forcefeedbackmenu() {
-    menu.Title("Force feedback");
-    menu.Subtitle("Force feedback setup");
+    g_menu.Title("Force feedback");
+    g_menu.Subtitle("Force feedback setup");
 
-    menu.BoolOption("Enable", settings.Wheel.FFB.Enable,
+    g_menu.BoolOption("Enable", g_settings.Wheel.FFB.Enable,
         { "Enable or disable force feedback entirely." });
 
-    menu.BoolOption("Scale forces", settings.Wheel.FFB.Scale,
+    g_menu.BoolOption("Scale forces", g_settings.Wheel.FFB.Scale,
         { "Scale forces to degree of rotation." });
 
-    menu.FloatOption("Self aligning torque multiplier", settings.Wheel.FFB.SATAmpMult, 0.1f, 10.0f, 0.05f,
+    g_menu.FloatOption("Self aligning torque multiplier", g_settings.Wheel.FFB.SATAmpMult, 0.1f, 10.0f, 0.05f,
         { "Force feedback strength for steering. Increase for weak wheels, decrease for strong/fast wheels.",
         "Putting this too high clips force feedback. Too low and the car doesn't feel responsive." });
 
-    menu.IntOption("Self aligning torque limit", settings.Wheel.FFB.SATMax, 0, 10000, 100,
+    g_menu.IntOption("Self aligning torque limit", g_settings.Wheel.FFB.SATMax, 0, 10000, 100,
         { "Clamp effect amplitude to this value. 10000 is the technical limit." });
 
-    menu.FloatOption("Self aligning torque factor", settings.Wheel.FFB.SATFactor, 0.0f, 1.0f, 0.01f,
+    g_menu.FloatOption("Self aligning torque factor", g_settings.Wheel.FFB.SATFactor, 0.0f, 1.0f, 0.01f,
         { "Reactive force offset/multiplier, when not going straight.",
           "Depending on wheel strength, a larger value helps reaching countersteer faster or reduce overcorrection."});
 
-    menu.FloatOption("Detail effect multiplier", settings.Wheel.FFB.DetailMult, 0.0f, 10.0f, 0.1f,
+    g_menu.FloatOption("Detail effect multiplier", g_settings.Wheel.FFB.DetailMult, 0.0f, 10.0f, 0.1f,
         { "Force feedback effects caused by the suspension. This effect is muxed with the main effect." });
 
-    menu.IntOption("Detail effect limit", settings.Wheel.FFB.DetailLim, 0, 20000, 100, 
+    g_menu.IntOption("Detail effect limit", g_settings.Wheel.FFB.DetailLim, 0, 20000, 100, 
         { "Clamp effect amplitude to this value. 20000 allows muxing with the main effect." });
 
-    menu.IntOption("Detail effect averaging", settings.Wheel.FFB.DetailMAW, 1, 100, 1,
+    g_menu.IntOption("Detail effect averaging", g_settings.Wheel.FFB.DetailMAW, 1, 100, 1,
         { "Averages the detail effect to prevent force feedback spikes.",
         "Recommended to keep as low as possible, as higher values delay more."});
 
-    menu.FloatOption("Collision effect multiplier", settings.Wheel.FFB.CollisionMult, 0.0f, 10.0f, 0.1f,
+    g_menu.FloatOption("Collision effect multiplier", g_settings.Wheel.FFB.CollisionMult, 0.0f, 10.0f, 0.1f,
         { "Force feedback effect caused by frontal/rear collisions." });
 
-    menu.IntOption("Damper max (low speed)", settings.Wheel.FFB.DamperMax, 0, 200, 1,
+    g_menu.IntOption("Damper max (low speed)", g_settings.Wheel.FFB.DamperMax, 0, 200, 1,
         { "Wheel friction at low speed." });
 
-    menu.IntOption("Damper min (high speed)", settings.Wheel.FFB.DamperMin, 0, 200, 1,
+    g_menu.IntOption("Damper min (high speed)", g_settings.Wheel.FFB.DamperMin, 0, 200, 1,
         { "Wheel friction at high speed." });
 
-    menu.FloatOption("Damper min speed", settings.Wheel.FFB.DamperMinSpeed, 0.0f, 40.0f, 0.2f,
+    g_menu.FloatOption("Damper min speed", g_settings.Wheel.FFB.DamperMinSpeed, 0.0f, 40.0f, 0.2f,
         { "Speed where the damper strength should be minimal.", "In m/s." });
 
-    if (menu.Option("Tune FFB Anti-Deadzone")) {
-        carControls.PlayFFBCollision(0);
-        carControls.PlayFFBDynamics(0, 0);
+    if (g_menu.Option("Tune FFB Anti-Deadzone")) {
+        g_controls.PlayFFBCollision(0);
+        g_controls.PlayFFBDynamics(0, 0);
         while (true) {
             if (IsKeyJustUp(str2key(escapeKey))) {
                 break;
             }
 
             if (IsKeyJustUp(str2key("LEFT"))) {
-                settings.Wheel.FFB.AntiDeadForce -= 100;
-                if (settings.Wheel.FFB.AntiDeadForce < 100) {
-                    settings.Wheel.FFB.AntiDeadForce = 0;
+                g_settings.Wheel.FFB.AntiDeadForce -= 100;
+                if (g_settings.Wheel.FFB.AntiDeadForce < 100) {
+                    g_settings.Wheel.FFB.AntiDeadForce = 0;
                 }
             }
 
             if (IsKeyJustUp(str2key("RIGHT"))) {
-                settings.Wheel.FFB.AntiDeadForce += 100;
-                if (settings.Wheel.FFB.AntiDeadForce > 10000 - 100) {
-                    settings.Wheel.FFB.AntiDeadForce = 10000;
+                g_settings.Wheel.FFB.AntiDeadForce += 100;
+                if (g_settings.Wheel.FFB.AntiDeadForce > 10000 - 100) {
+                    g_settings.Wheel.FFB.AntiDeadForce = 10000;
                 }
             }
-            carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
+            g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
-            carControls.PlayFFBDynamics(settings.Wheel.FFB.AntiDeadForce, 0);
+            g_controls.PlayFFBDynamics(g_settings.Wheel.FFB.AntiDeadForce, 0);
             
             showSubtitle(fmt::format("Press LEFT and RIGHT to decrease and increase force feedback anti-deadzone. "
-                "Use the highest value before your wheel starts moving. Currently [{}]. Press {} to exit.", settings.Wheel.FFB.AntiDeadForce, escapeKey));
+                "Use the highest value before your wheel starts moving. Currently [{}]. Press {} to exit.", g_settings.Wheel.FFB.AntiDeadForce, escapeKey));
             WAIT(0);
         }
     }
 }
 
 void update_buttonsmenu() {
-    menu.Title("Configure buttons");
-    menu.Subtitle("Button setup and review");
+    g_menu.Title("Configure buttons");
+    g_menu.Subtitle("Button setup and review");
 
     std::vector<std::string> wheelToKeyInfo = {
         "Active wheel-to-key options:",
         "Press RIGHT to clear a button",
-        fmt::format("Device: {}", settings.GUIDToDeviceIndex(carControls.WheelToKeyGUID))
+        fmt::format("Device: {}", g_settings.GUIDToDeviceIndex(g_controls.WheelToKeyGUID))
     };
 
     for (int i = 0; i < MAX_RGBBUTTONS; i++) {
-        if (carControls.WheelToKey[i] != -1) {
-            wheelToKeyInfo.push_back(fmt::format("{} = {}", i, key2str(carControls.WheelToKey[i])));
-            if (carControls.GetWheel().IsButtonPressed(i, carControls.WheelToKeyGUID)) {
+        if (g_controls.WheelToKey[i] != -1) {
+            wheelToKeyInfo.push_back(fmt::format("{} = {}", i, key2str(g_controls.WheelToKey[i])));
+            if (g_controls.GetWheel().IsButtonPressed(i, g_controls.WheelToKeyGUID)) {
                 wheelToKeyInfo.back() = fmt::format("{} (Pressed)", wheelToKeyInfo.back());
             }
         }
     }
 
-    if (menu.OptionPlus("Set up WheelToKey", wheelToKeyInfo, nullptr, clearWheelToKey, nullptr, "Info",
+    if (g_menu.OptionPlus("Set up WheelToKey", wheelToKeyInfo, nullptr, clearWheelToKey, nullptr, "Info",
         { "Set up wheel buttons that press a keyboard key. Only one device can be used for this." })) {
         bool result = configWheelToKey();
         UI::Notify(WARN, result ? "Entry added" : "Cancelled entry addition");
@@ -993,15 +993,15 @@ void update_buttonsmenu() {
     buttonInfo.emplace_back("Press RIGHT to clear this button");
     buttonInfo.emplace_back("Active buttons:");
     for (const auto& wheelButton : wheelMenuButtons) {
-        if (carControls.ButtonIn(wheelButton.Control))
+        if (g_controls.ButtonIn(wheelButton.Control))
             buttonInfo.emplace_back(wheelButton.Text);
     }
     if (buttonInfo.size() == 2)
         buttonInfo.emplace_back("None");
 
     for (auto confTag : buttonConfTags) {
-        buttonInfo.push_back(fmt::format("Assigned to {}", carControls.ConfTagWheel2Value(confTag)));
-        if (menu.OptionPlus(fmt::format("Assign {}", confTag), buttonInfo, nullptr, std::bind(clearButton, confTag), nullptr, "Current inputs")) {
+        buttonInfo.push_back(fmt::format("Assigned to {}", g_controls.ConfTagWheel2Value(confTag)));
+        if (g_menu.OptionPlus(fmt::format("Assign {}", confTag), buttonInfo, nullptr, std::bind(clearButton, confTag), nullptr, "Current inputs")) {
             bool result = configButton(confTag);
             UI::Notify(WARN, fmt::format("[{}] {}", confTag, result ? "saved" : "assignment cancelled."));
         }
@@ -1010,153 +1010,153 @@ void update_buttonsmenu() {
 }
 
 void update_hudmenu() {
-    menu.Title("HUD Options");
-    menu.Subtitle("");
+    g_menu.Title("HUD Options");
+    g_menu.Subtitle("");
 
-    menu.BoolOption("Enable", settings.HUD.Enable,
+    g_menu.BoolOption("Enable", g_settings.HUD.Enable,
         { "Display HUD elements." });
 
-    menu.BoolOption("Always enable", settings.HUD.Always,
+    g_menu.BoolOption("Always enable", g_settings.HUD.Always,
         { "Display HUD even if manual transmission is off." });
 
-    auto fontIt = std::find_if(fonts.begin(), fonts.end(), [](const SFont& font) { return font.ID == settings.HUD.Font; });
+    auto fontIt = std::find_if(fonts.begin(), fonts.end(), [](const SFont& font) { return font.ID == g_settings.HUD.Font; });
     if (fontIt != fonts.end()) {
         std::vector<std::string> strFonts;
         strFonts.reserve(fonts.size());
         for (const auto& font : fonts)
             strFonts.push_back(font.Name);
         int fontIndex = static_cast<int>(fontIt - fonts.begin());
-        if (menu.StringArray("Font", strFonts, fontIndex, { "Select the font for speed, gearbox mode, current gear." })) {
-            settings.HUD.Font = fonts.at(fontIndex).ID;
+        if (g_menu.StringArray("Font", strFonts, fontIndex, { "Select the font for speed, gearbox mode, current gear." })) {
+            g_settings.HUD.Font = fonts.at(fontIndex).ID;
         }
     }
     else {
-        menu.Option("Invalid font ID in settings");
+        g_menu.Option("Invalid font ID in settings");
     }
 
-    menu.StringArray("Notification level", notifyLevelStrings, settings.HUD.NotifyLevel,
+    g_menu.StringArray("Notification level", notifyLevelStrings, g_settings.HUD.NotifyLevel,
         { "What kind of notifications to display.",
         "Debug: All",
         "Info: Mode switching",
         "UI: Menu actions and setup",
         "None: Hide all notifications" });
 
-    menu.MenuOption("Gear and shift mode", "geardisplaymenu");
-    menu.MenuOption("Speedometer", "speedodisplaymenu");
-    menu.MenuOption("RPM Gauge", "rpmdisplaymenu");
-    menu.MenuOption("Wheel & Pedal Info", "wheelinfomenu");
+    g_menu.MenuOption("Gear and shift mode", "geardisplaymenu");
+    g_menu.MenuOption("Speedometer", "speedodisplaymenu");
+    g_menu.MenuOption("RPM Gauge", "rpmdisplaymenu");
+    g_menu.MenuOption("Wheel & Pedal Info", "wheelinfomenu");
 }
 
 void update_geardisplaymenu() {
-    menu.Title("Gear options");
-    menu.Subtitle("");
+    g_menu.Title("Gear options");
+    g_menu.Subtitle("");
 
-    menu.BoolOption("Gear", settings.HUD.Gear.Enable);
-    menu.BoolOption("Shift Mode", settings.HUD.ShiftMode.Enable);
+    g_menu.BoolOption("Gear", g_settings.HUD.Gear.Enable);
+    g_menu.BoolOption("Shift Mode", g_settings.HUD.ShiftMode.Enable);
 
-    menu.FloatOption("Gear X", settings.HUD.Gear.XPos, 0.0f, 1.0f, 0.005f);
-    menu.FloatOption("Gear Y", settings.HUD.Gear.YPos, 0.0f, 1.0f, 0.005f);
-    menu.FloatOption("Gear Size", settings.HUD.Gear.Size, 0.0f, 3.0f, 0.05f);
-    menu.IntOption("Gear Top Color Red", settings.HUD.Gear.TopColorR, 0, 255);
-    menu.IntOption("Gear Top Color Green", settings.HUD.Gear.TopColorG, 0, 255);
-    menu.IntOption("Gear Top Color Blue", settings.HUD.Gear.TopColorB, 0, 255);
+    g_menu.FloatOption("Gear X", g_settings.HUD.Gear.XPos, 0.0f, 1.0f, 0.005f);
+    g_menu.FloatOption("Gear Y", g_settings.HUD.Gear.YPos, 0.0f, 1.0f, 0.005f);
+    g_menu.FloatOption("Gear Size", g_settings.HUD.Gear.Size, 0.0f, 3.0f, 0.05f);
+    g_menu.IntOption("Gear Top Color Red", g_settings.HUD.Gear.TopColorR, 0, 255);
+    g_menu.IntOption("Gear Top Color Green", g_settings.HUD.Gear.TopColorG, 0, 255);
+    g_menu.IntOption("Gear Top Color Blue", g_settings.HUD.Gear.TopColorB, 0, 255);
 
-    menu.FloatOption("Shift Mode X", settings.HUD.ShiftMode.XPos, 0.0f, 1.0f, 0.005f);
-    menu.FloatOption("Shift Mode Y", settings.HUD.ShiftMode.YPos, 0.0f, 1.0f, 0.005f);
-    menu.FloatOption("Shift Mode Size", settings.HUD.ShiftMode.Size, 0.0f, 3.0f, 0.05f);
+    g_menu.FloatOption("Shift Mode X", g_settings.HUD.ShiftMode.XPos, 0.0f, 1.0f, 0.005f);
+    g_menu.FloatOption("Shift Mode Y", g_settings.HUD.ShiftMode.YPos, 0.0f, 1.0f, 0.005f);
+    g_menu.FloatOption("Shift Mode Size", g_settings.HUD.ShiftMode.Size, 0.0f, 3.0f, 0.05f);
 }
 
 void update_speedodisplaymenu() {
-    menu.Title("Speedometer options");
-    menu.Subtitle("");
+    g_menu.Title("Speedometer options");
+    g_menu.Subtitle("");
 
-    ptrdiff_t oldPos = std::find(speedoTypes.begin(), speedoTypes.end(), settings.HUD.Speedo.Speedo) - speedoTypes.begin();
+    ptrdiff_t oldPos = std::find(speedoTypes.begin(), speedoTypes.end(), g_settings.HUD.Speedo.Speedo) - speedoTypes.begin();
     int newPos = static_cast<int>(oldPos);
-    menu.StringArray("Speedometer", speedoTypes, newPos);
+    g_menu.StringArray("Speedometer", speedoTypes, newPos);
     if (newPos != oldPos) {
-        settings.HUD.Speedo.Speedo = speedoTypes.at(newPos);
+        g_settings.HUD.Speedo.Speedo = speedoTypes.at(newPos);
     }
-    menu.BoolOption("Show units", settings.HUD.Speedo.ShowUnit);
+    g_menu.BoolOption("Show units", g_settings.HUD.Speedo.ShowUnit);
 
-    menu.FloatOption("Speedometer X", settings.HUD.Speedo.XPos, 0.0f, 1.0f, 0.005f);
-    menu.FloatOption("Speedometer Y", settings.HUD.Speedo.YPos, 0.0f, 1.0f, 0.005f);
-    menu.FloatOption("Speedometer Size", settings.HUD.Speedo.Size, 0.0f, 3.0f, 0.05f);
+    g_menu.FloatOption("Speedometer X", g_settings.HUD.Speedo.XPos, 0.0f, 1.0f, 0.005f);
+    g_menu.FloatOption("Speedometer Y", g_settings.HUD.Speedo.YPos, 0.0f, 1.0f, 0.005f);
+    g_menu.FloatOption("Speedometer Size", g_settings.HUD.Speedo.Size, 0.0f, 3.0f, 0.05f);
 }
 
 void update_rpmdisplaymenu() {
-    menu.Title("RPM Gauge options");
-    menu.Subtitle("");
+    g_menu.Title("RPM Gauge options");
+    g_menu.Subtitle("");
 
-    menu.BoolOption("RPM Gauge", settings.HUD.RPMBar.Enable);
-    menu.FloatOption("RPM Redline", settings.HUD.RPMBar.Redline, 0.0f, 1.0f, 0.01f);
+    g_menu.BoolOption("RPM Gauge", g_settings.HUD.RPMBar.Enable);
+    g_menu.FloatOption("RPM Redline", g_settings.HUD.RPMBar.Redline, 0.0f, 1.0f, 0.01f);
 
-    menu.FloatOption("RPM X", settings.HUD.RPMBar.XPos, 0.0f, 1.0f, 0.0025f);
-    menu.FloatOption("RPM Y", settings.HUD.RPMBar.YPos, 0.0f, 1.0f, 0.0025f);
-    menu.FloatOption("RPM Width", settings.HUD.RPMBar.XSz, 0.0f, 1.0f, 0.0025f);
-    menu.FloatOption("RPM Height", settings.HUD.RPMBar.YSz, 0.0f, 1.0f, 0.0025f);
+    g_menu.FloatOption("RPM X", g_settings.HUD.RPMBar.XPos, 0.0f, 1.0f, 0.0025f);
+    g_menu.FloatOption("RPM Y", g_settings.HUD.RPMBar.YPos, 0.0f, 1.0f, 0.0025f);
+    g_menu.FloatOption("RPM Width", g_settings.HUD.RPMBar.XSz, 0.0f, 1.0f, 0.0025f);
+    g_menu.FloatOption("RPM Height", g_settings.HUD.RPMBar.YSz, 0.0f, 1.0f, 0.0025f);
 
-    menu.IntOption("RPM Background Red  ", settings.HUD.RPMBar.BgR, 0, 255);
-    menu.IntOption("RPM Background Green", settings.HUD.RPMBar.BgG, 0, 255);
-    menu.IntOption("RPM Background Blue ", settings.HUD.RPMBar.BgB, 0, 255);
-    menu.IntOption("RPM Background Alpha", settings.HUD.RPMBar.BgA, 0, 255);
+    g_menu.IntOption("RPM Background Red  ", g_settings.HUD.RPMBar.BgR, 0, 255);
+    g_menu.IntOption("RPM Background Green", g_settings.HUD.RPMBar.BgG, 0, 255);
+    g_menu.IntOption("RPM Background Blue ", g_settings.HUD.RPMBar.BgB, 0, 255);
+    g_menu.IntOption("RPM Background Alpha", g_settings.HUD.RPMBar.BgA, 0, 255);
 
-    menu.IntOption("RPM Foreground Red  ", settings.HUD.RPMBar.FgR, 0, 255);
-    menu.IntOption("RPM Foreground Green", settings.HUD.RPMBar.FgG, 0, 255);
-    menu.IntOption("RPM Foreground Blue ", settings.HUD.RPMBar.FgB, 0, 255);
-    menu.IntOption("RPM Foreground Alpha", settings.HUD.RPMBar.FgA, 0, 255);
+    g_menu.IntOption("RPM Foreground Red  ", g_settings.HUD.RPMBar.FgR, 0, 255);
+    g_menu.IntOption("RPM Foreground Green", g_settings.HUD.RPMBar.FgG, 0, 255);
+    g_menu.IntOption("RPM Foreground Blue ", g_settings.HUD.RPMBar.FgB, 0, 255);
+    g_menu.IntOption("RPM Foreground Alpha", g_settings.HUD.RPMBar.FgA, 0, 255);
 
-    menu.IntOption("RPM Redline Red     ", settings.HUD.RPMBar.RedlineR, 0, 255);
-    menu.IntOption("RPM Redline Green   ", settings.HUD.RPMBar.RedlineG, 0, 255);
-    menu.IntOption("RPM Redline Blue    ", settings.HUD.RPMBar.RedlineB, 0, 255);
-    menu.IntOption("RPM Redline Alpha   ", settings.HUD.RPMBar.RedlineA, 0, 255);
+    g_menu.IntOption("RPM Redline Red     ", g_settings.HUD.RPMBar.RedlineR, 0, 255);
+    g_menu.IntOption("RPM Redline Green   ", g_settings.HUD.RPMBar.RedlineG, 0, 255);
+    g_menu.IntOption("RPM Redline Blue    ", g_settings.HUD.RPMBar.RedlineB, 0, 255);
+    g_menu.IntOption("RPM Redline Alpha   ", g_settings.HUD.RPMBar.RedlineA, 0, 255);
 
-    menu.IntOption("RPM Revlimit Red    ", settings.HUD.RPMBar.RevLimitR, 0, 255);
-    menu.IntOption("RPM Revlimit Green  ", settings.HUD.RPMBar.RevLimitG, 0, 255);
-    menu.IntOption("RPM Revlimit Blue   ", settings.HUD.RPMBar.RevLimitB, 0, 255);
-    menu.IntOption("RPM Revlimit Alpha  ", settings.HUD.RPMBar.RevLimitA, 0, 255);
+    g_menu.IntOption("RPM Revlimit Red    ", g_settings.HUD.RPMBar.RevLimitR, 0, 255);
+    g_menu.IntOption("RPM Revlimit Green  ", g_settings.HUD.RPMBar.RevLimitG, 0, 255);
+    g_menu.IntOption("RPM Revlimit Blue   ", g_settings.HUD.RPMBar.RevLimitB, 0, 255);
+    g_menu.IntOption("RPM Revlimit Alpha  ", g_settings.HUD.RPMBar.RevLimitA, 0, 255);
 }
 
 void update_wheelinfomenu() {
-    menu.Title("Wheel & Pedal Info");
-    menu.Subtitle("");
+    g_menu.Title("Wheel & Pedal Info");
+    g_menu.Subtitle("");
 
-    menu.BoolOption("Display steering wheel info", settings.HUD.Wheel.Enable, { "Show input info graphically." });
-    menu.BoolOption("Always display info", settings.HUD.Wheel.Always, { "Display the info even without a steering wheel." });
-    menu.FloatOption("Wheel image X", settings.HUD.Wheel.ImgXPos, 0.0f, 1.0f, 0.01f);
-    menu.FloatOption("Wheel image Y", settings.HUD.Wheel.ImgYPos, 0.0f, 1.0f, 0.01f);
-    menu.FloatOption("Wheel image size", settings.HUD.Wheel.ImgSize, 0.0f, 1.0f, 0.01f);
-    menu.FloatOption("Pedals X", settings.HUD.Wheel.PedalXPos, 0.0f, 1.0f, 0.01f);
-    menu.FloatOption("Pedals Y", settings.HUD.Wheel.PedalYPos, 0.0f, 1.0f, 0.01f);
-    menu.FloatOption("Pedals Height", settings.HUD.Wheel.PedalYSz, 0.0f, 1.0f, 0.01f);
-    menu.FloatOption("Pedals Width", settings.HUD.Wheel.PedalXSz, 0.0f, 1.0f, 0.01f);
-    menu.FloatOption("Pedals Pad X", settings.HUD.Wheel.PedalXPad, 0.0f, 1.0f, 0.01f);
-    menu.FloatOption("Pedals Pad Y", settings.HUD.Wheel.PedalYPad, 0.0f, 1.0f, 0.01f);
-    menu.IntOption("Pedals Background Alpha", settings.HUD.Wheel.PedalBgA, 0, 255);
-    menu.IntOption("Throttle Bar Red    ", settings.HUD.Wheel.PedalThrottleR, 0, 255);
-    menu.IntOption("Throttle Bar Green  ", settings.HUD.Wheel.PedalThrottleG, 0, 255);
-    menu.IntOption("Throttle Bar Blue   ", settings.HUD.Wheel.PedalThrottleB, 0, 255);
-    menu.IntOption("Throttle Bar Alpha  ", settings.HUD.Wheel.PedalThrottleA, 0, 255);
-    menu.IntOption("Brake Bar Red    ", settings.HUD.Wheel.PedalBrakeR, 0, 255);
-    menu.IntOption("Brake Bar Green  ", settings.HUD.Wheel.PedalBrakeG, 0, 255);
-    menu.IntOption("Brake Bar Blue   ", settings.HUD.Wheel.PedalBrakeB, 0, 255);
-    menu.IntOption("Brake Bar Alpha  ", settings.HUD.Wheel.PedalBrakeA   , 0, 255);
-    menu.IntOption("Clutch Bar Red    ", settings.HUD.Wheel.PedalClutchR, 0, 255);
-    menu.IntOption("Clutch Bar Green  ", settings.HUD.Wheel.PedalClutchG, 0, 255);
-    menu.IntOption("Clutch Bar Blue   ", settings.HUD.Wheel.PedalClutchB, 0, 255);
-    menu.IntOption("Clutch Bar Alpha  ", settings.HUD.Wheel.PedalClutchA  , 0, 255);
+    g_menu.BoolOption("Display steering wheel info", g_settings.HUD.Wheel.Enable, { "Show input info graphically." });
+    g_menu.BoolOption("Always display info", g_settings.HUD.Wheel.Always, { "Display the info even without a steering wheel." });
+    g_menu.FloatOption("Wheel image X", g_settings.HUD.Wheel.ImgXPos, 0.0f, 1.0f, 0.01f);
+    g_menu.FloatOption("Wheel image Y", g_settings.HUD.Wheel.ImgYPos, 0.0f, 1.0f, 0.01f);
+    g_menu.FloatOption("Wheel image size", g_settings.HUD.Wheel.ImgSize, 0.0f, 1.0f, 0.01f);
+    g_menu.FloatOption("Pedals X", g_settings.HUD.Wheel.PedalXPos, 0.0f, 1.0f, 0.01f);
+    g_menu.FloatOption("Pedals Y", g_settings.HUD.Wheel.PedalYPos, 0.0f, 1.0f, 0.01f);
+    g_menu.FloatOption("Pedals Height", g_settings.HUD.Wheel.PedalYSz, 0.0f, 1.0f, 0.01f);
+    g_menu.FloatOption("Pedals Width", g_settings.HUD.Wheel.PedalXSz, 0.0f, 1.0f, 0.01f);
+    g_menu.FloatOption("Pedals Pad X", g_settings.HUD.Wheel.PedalXPad, 0.0f, 1.0f, 0.01f);
+    g_menu.FloatOption("Pedals Pad Y", g_settings.HUD.Wheel.PedalYPad, 0.0f, 1.0f, 0.01f);
+    g_menu.IntOption("Pedals Background Alpha", g_settings.HUD.Wheel.PedalBgA, 0, 255);
+    g_menu.IntOption("Throttle Bar Red    ", g_settings.HUD.Wheel.PedalThrottleR, 0, 255);
+    g_menu.IntOption("Throttle Bar Green  ", g_settings.HUD.Wheel.PedalThrottleG, 0, 255);
+    g_menu.IntOption("Throttle Bar Blue   ", g_settings.HUD.Wheel.PedalThrottleB, 0, 255);
+    g_menu.IntOption("Throttle Bar Alpha  ", g_settings.HUD.Wheel.PedalThrottleA, 0, 255);
+    g_menu.IntOption("Brake Bar Red    ", g_settings.HUD.Wheel.PedalBrakeR, 0, 255);
+    g_menu.IntOption("Brake Bar Green  ", g_settings.HUD.Wheel.PedalBrakeG, 0, 255);
+    g_menu.IntOption("Brake Bar Blue   ", g_settings.HUD.Wheel.PedalBrakeB, 0, 255);
+    g_menu.IntOption("Brake Bar Alpha  ", g_settings.HUD.Wheel.PedalBrakeA   , 0, 255);
+    g_menu.IntOption("Clutch Bar Red    ", g_settings.HUD.Wheel.PedalClutchR, 0, 255);
+    g_menu.IntOption("Clutch Bar Green  ", g_settings.HUD.Wheel.PedalClutchG, 0, 255);
+    g_menu.IntOption("Clutch Bar Blue   ", g_settings.HUD.Wheel.PedalClutchB, 0, 255);
+    g_menu.IntOption("Clutch Bar Alpha  ", g_settings.HUD.Wheel.PedalClutchA  , 0, 255);
 }
 
 void update_driveassistmenu() {
-    menu.Title("Driving assists");
-    menu.Subtitle("Assists to make driving easier");
+    g_menu.Title("Driving assists");
+    g_menu.Subtitle("Assists to make driving easier");
 
-    menu.BoolOption("Enable ABS", settings.DriveAssists.CustomABS,
+    g_menu.BoolOption("Enable ABS", g_settings.DriveAssists.CustomABS,
         { "Experimental script-driven ABS." });
 
-    menu.BoolOption("Only enable ABS if not present", settings.DriveAssists.ABSFilter,
+    g_menu.BoolOption("Only enable ABS if not present", g_settings.DriveAssists.ABSFilter,
         { "Only enables script-driven ABS on vehicles without the ABS flag." });
 
-    menu.StringArray("Traction Control mode", tcsStrings, settings.DriveAssists.TCMode,
+    g_menu.StringArray("Traction Control mode", tcsStrings, g_settings.DriveAssists.TCMode,
         { "On traction loss: ",
             "Disabled: Do nothing",
             "Brakes: Apply brake per wheel",
@@ -1164,39 +1164,39 @@ void update_driveassistmenu() {
 }
 
 void update_gameassistmenu() {
-    menu.Title("Gameplay assists");
-    menu.Subtitle("Simplify Manual Transmission");
+    g_menu.Title("Gameplay assists");
+    g_menu.Subtitle("Simplify Manual Transmission");
 
-    menu.BoolOption("Default Neutral gear", settings.GameAssists.DefaultNeutral,
+    g_menu.BoolOption("Default Neutral gear", g_settings.GameAssists.DefaultNeutral,
         { "The car will be in neutral when you get in." });
 
-    menu.BoolOption("Simple Bike", settings.GameAssists.SimpleBike,
+    g_menu.BoolOption("Simple Bike", g_settings.GameAssists.SimpleBike,
         { "Disables bike engine stalling and the clutch bite simulation." });
 
-    menu.BoolOption("Hill gravity workaround", settings.GameAssists.HillGravity,
+    g_menu.BoolOption("Hill gravity workaround", g_settings.GameAssists.HillGravity,
         { "Gives the car a push to overcome the games' default brakes when stopped." });
 
-    menu.BoolOption("Auto gear 1", settings.GameAssists.AutoGear1,
+    g_menu.BoolOption("Auto gear 1", g_settings.GameAssists.AutoGear1,
         { "Automatically switch to first gear when the car reaches a standstill." });
 
-    menu.BoolOption("Auto look back", settings.GameAssists.AutoLookBack,
+    g_menu.BoolOption("Auto look back", g_settings.GameAssists.AutoLookBack,
         { "Automatically look back whenever in reverse gear." });
 
-    menu.BoolOption("Clutch + throttle start", settings.GameAssists.ThrottleStart,
+    g_menu.BoolOption("Clutch + throttle start", g_settings.GameAssists.ThrottleStart,
         { "Allow to start the engine by pressing clutch and throttle." });
 
-    if (menu.BoolOption("Hide player in FPV", settings.GameAssists.HidePlayerInFPV,
+    if (g_menu.BoolOption("Hide player in FPV", g_settings.GameAssists.HidePlayerInFPV,
         { "Hides the player in first person view." })) {
         functionHidePlayerInFPV(true);
     }
 }
 
 void update_steeringassistmenu() {
-    menu.Title("Steering assists");
-    menu.Subtitle("Custom steering assist options");
+    g_menu.Title("Steering assists");
+    g_menu.Subtitle("Custom steering assist options");
 
     std::vector<std::string> steeringModeDescription;
-    switch(settings.CustomSteering.Mode) {
+    switch(g_settings.CustomSteering.Mode) {
     case 0:
         steeringModeDescription.emplace_back("Default: Original game steering.");
         steeringModeDescription.emplace_back("Only applies Steering Multiplier.");
@@ -1208,132 +1208,132 @@ void update_steeringassistmenu() {
     default:
         steeringModeDescription.emplace_back("Invalid option?");
     }
-    menu.StringArray("Steering Mode", { "Default", "Enhanced" }, settings.CustomSteering.Mode, 
+    g_menu.StringArray("Steering Mode", { "Default", "Enhanced" }, g_settings.CustomSteering.Mode, 
         steeringModeDescription);
-    menu.FloatOption("Countersteer multiplier", settings.CustomSteering.CountersteerMult, 0.0f, 2.0f, 0.05f,
+    g_menu.FloatOption("Countersteer multiplier", g_settings.CustomSteering.CountersteerMult, 0.0f, 2.0f, 0.05f,
         { "How much countersteer should be given." });
-    menu.FloatOption("Countersteer limit", settings.CustomSteering.CountersteerLimit, 0.0f, 360.0f, 1.0f, 
+    g_menu.FloatOption("Countersteer limit", g_settings.CustomSteering.CountersteerLimit, 0.0f, 360.0f, 1.0f, 
         { "Maximum angle in degrees for automatic countersteering. Game default is 15 degrees." });
-    menu.FloatOption("Steering Reduction", settings.CustomSteering.SteeringReduction, 0.0f, 1.0f, 0.01f,
+    g_menu.FloatOption("Steering Reduction", g_settings.CustomSteering.SteeringReduction, 0.0f, 1.0f, 0.01f,
         { "Reduce steering input at higher speeds.", "From InfamousSabre's Custom Steering." });
-    menu.FloatOption("Steering Multiplier", settings.CustomSteering.SteeringMult, 0.01f, 2.0f, 0.01f,
+    g_menu.FloatOption("Steering Multiplier", g_settings.CustomSteering.SteeringMult, 0.01f, 2.0f, 0.01f,
         { "Increase/decrease steering lock.", "From InfamousSabre's Custom Steering." });
-    menu.FloatOption("Steering Gamma", settings.CustomSteering.Gamma, 0.01f, 2.0f, 0.01f,
+    g_menu.FloatOption("Steering Gamma", g_settings.CustomSteering.Gamma, 0.01f, 2.0f, 0.01f,
         { "Change linearity of steering input." });
 }
 
 void update_debugmenu() {
-    menu.Title("Debug settings");
-    menu.Subtitle("Extra mod info");
+    g_menu.Title("Debug settings");
+    g_menu.Subtitle("Extra mod info");
 
-    menu.BoolOption("Display info", settings.Debug.DisplayInfo,
+    g_menu.BoolOption("Display info", g_settings.Debug.DisplayInfo,
         { "Show all detailed technical info of the gearbox and inputs calculations." });
-    menu.BoolOption("Display car wheel info", settings.Debug.DisplayWheelInfo,
+    g_menu.BoolOption("Display car wheel info", g_settings.Debug.DisplayWheelInfo,
         { "Show per-wheel debug info with off-ground detection, lockup detection and suspension info." });
-    menu.BoolOption("Display gearing info", settings.Debug.DisplayGearingInfo,
+    g_menu.BoolOption("Display gearing info", g_settings.Debug.DisplayGearingInfo,
         { "Show gear ratios and shift points from auto mode." });
-    menu.BoolOption("Display force feedback lines", settings.Debug.DisplayFFBInfo,
+    g_menu.BoolOption("Display force feedback lines", g_settings.Debug.DisplayFFBInfo,
         { "Show lines detailing force feedback direction and force.",
             "Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction" });
-    menu.BoolOption("Show NPC info", settings.Debug.DisplayNPCInfo,
+    g_menu.BoolOption("Show NPC info", g_settings.Debug.DisplayNPCInfo,
         { "Show vehicle info of NPC vehicles near you." });
-    menu.BoolOption("Disable input detection", settings.Debug.DisableInputDetect,
+    g_menu.BoolOption("Disable input detection", g_settings.Debug.DisableInputDetect,
         { "Allows for manual input selection." });
-    menu.BoolOption("Disable player hiding", settings.Debug.DisablePlayerHide, 
+    g_menu.BoolOption("Disable player hiding", g_settings.Debug.DisablePlayerHide, 
         { "Disables toggling player visibility by script.",
             "Use this when some other script controls visibility." });
 
-    menu.BoolOption("Enable update check", settings.Update.EnableUpdate,
+    g_menu.BoolOption("Enable update check", g_settings.Update.EnableUpdate,
         { "Check for mod updates."});
 
-    if (menu.Option("Check for updates", { "Manually check for updates. "
+    if (g_menu.Option("Check for updates", { "Manually check for updates. "
         "Re-enables update checking and clears ignored update." })) {
-        settings.Update.EnableUpdate = true;
-        settings.Update.IgnoredVersion = "v0.0.0";
+        g_settings.Update.EnableUpdate = true;
+        g_settings.Update.IgnoredVersion = "v0.0.0";
 
         threadCheckUpdate();
     }
 }
 
 void update_menu() {
-    menu.CheckKeys();
+    g_menu.CheckKeys();
 
     /* mainmenu */
-    if (menu.CurrentMenu("mainmenu")) { update_mainmenu(); }
+    if (g_menu.CurrentMenu("mainmenu")) { update_mainmenu(); }
 
     /* mainmenu -> settingsmenu */
-    if (menu.CurrentMenu("settingsmenu")) { update_settingsmenu(); }
+    if (g_menu.CurrentMenu("settingsmenu")) { update_settingsmenu(); }
 
     /* mainmenu -> settingsmenu -> featuresmenu */
-    if (menu.CurrentMenu("featuresmenu")) { update_featuresmenu(); }
+    if (g_menu.CurrentMenu("featuresmenu")) { update_featuresmenu(); }
 
     /* mainmenu -> settingsmenu -> finetuneoptionsmenu */
-    if (menu.CurrentMenu("finetuneoptionsmenu")) { update_finetuneoptionsmenu(); }
+    if (g_menu.CurrentMenu("finetuneoptionsmenu")) { update_finetuneoptionsmenu(); }
 
     /* mainmenu -> settingsmenu -> shiftingoptionsmenu */
-    if (menu.CurrentMenu("shiftingoptionsmenu")) { update_shiftingoptionsmenu(); }
+    if (g_menu.CurrentMenu("shiftingoptionsmenu")) { update_shiftingoptionsmenu(); }
 
     /* mainmenu -> settingsmenu -> finetuneautooptionsmenu */
-    if (menu.CurrentMenu("finetuneautooptionsmenu")) { update_finetuneautooptionsmenu(); }
+    if (g_menu.CurrentMenu("finetuneautooptionsmenu")) { update_finetuneautooptionsmenu(); }
 
     /* mainmenu -> controlsmenu */
-    if (menu.CurrentMenu("controlsmenu")) { update_controlsmenu(); }
+    if (g_menu.CurrentMenu("controlsmenu")) { update_controlsmenu(); }
 
     /* mainmenu -> controlsmenu -> controlleroptionsmenu */
-    if (menu.CurrentMenu("controlleroptionsmenu")) { update_controlleroptionsmenu(); }
+    if (g_menu.CurrentMenu("controlleroptionsmenu")) { update_controlleroptionsmenu(); }
 
     /* mainmenu -> controlsmenu -> legacycontrollermenu */
-    if (menu.CurrentMenu("legacycontrollermenu")) { update_legacycontrollermenu(); }
+    if (g_menu.CurrentMenu("legacycontrollermenu")) { update_legacycontrollermenu(); }
 
     /* mainmenu -> controlsmenu -> controllerbindingsmenu */
-    if (menu.CurrentMenu("controllermenu")) { update_controllermenu(); }
+    if (g_menu.CurrentMenu("controllermenu")) { update_controllermenu(); }
 
     /* mainmenu -> controlsmenu -> keyboardmenu */
-    if (menu.CurrentMenu("keyboardmenu")) { update_keyboardmenu(); }
+    if (g_menu.CurrentMenu("keyboardmenu")) { update_keyboardmenu(); }
 
     /* mainmenu -> controlsmenu -> steeringassistmenu */
-    if (menu.CurrentMenu("steeringassistmenu")) { update_steeringassistmenu(); }
+    if (g_menu.CurrentMenu("steeringassistmenu")) { update_steeringassistmenu(); }
 
     /* mainmenu -> wheelmenu */
-    if (menu.CurrentMenu("wheelmenu")) { update_wheelmenu(); }
+    if (g_menu.CurrentMenu("wheelmenu")) { update_wheelmenu(); }
 
     /* mainmenu -> wheelmenu -> anglemenu */
-    if (menu.CurrentMenu("anglemenu")) { update_anglemenu(); }
+    if (g_menu.CurrentMenu("anglemenu")) { update_anglemenu(); }
 
     /* mainmenu -> wheelmenu -> axesmenu */
-    if (menu.CurrentMenu("axesmenu")) { update_axesmenu(); }
+    if (g_menu.CurrentMenu("axesmenu")) { update_axesmenu(); }
 
     /* mainmenu -> wheelmenu -> forcefeedbackmenu */
-    if (menu.CurrentMenu("forcefeedbackmenu")) { update_forcefeedbackmenu(); }
+    if (g_menu.CurrentMenu("forcefeedbackmenu")) { update_forcefeedbackmenu(); }
 
     /* mainmenu -> wheelmenu -> buttonsmenu */
-    if (menu.CurrentMenu("buttonsmenu")) { update_buttonsmenu(); }
+    if (g_menu.CurrentMenu("buttonsmenu")) { update_buttonsmenu(); }
 
     /* mainmenu -> hudmenu */
-    if (menu.CurrentMenu("hudmenu")) { update_hudmenu(); }
+    if (g_menu.CurrentMenu("hudmenu")) { update_hudmenu(); }
 
     /* mainmenu -> hudmenu -> geardisplaymenu*/
-    if (menu.CurrentMenu("geardisplaymenu")) { update_geardisplaymenu(); }
+    if (g_menu.CurrentMenu("geardisplaymenu")) { update_geardisplaymenu(); }
 
     /* mainmenu -> hudmenu -> speedodisplaymenu*/
-    if (menu.CurrentMenu("speedodisplaymenu")) { update_speedodisplaymenu(); }
+    if (g_menu.CurrentMenu("speedodisplaymenu")) { update_speedodisplaymenu(); }
 
     /* mainmenu -> hudmenu -> rpmdisplaymenu*/
-    if (menu.CurrentMenu("rpmdisplaymenu")) { update_rpmdisplaymenu(); }
+    if (g_menu.CurrentMenu("rpmdisplaymenu")) { update_rpmdisplaymenu(); }
 
     /* mainmenu -> hudmenu -> wheelinfomenu*/
-    if (menu.CurrentMenu("wheelinfomenu")) { update_wheelinfomenu(); }
+    if (g_menu.CurrentMenu("wheelinfomenu")) { update_wheelinfomenu(); }
 
     /* mainmenu -> driveassistmenu */
-    if (menu.CurrentMenu("driveassistmenu")) { update_driveassistmenu(); }
+    if (g_menu.CurrentMenu("driveassistmenu")) { update_driveassistmenu(); }
 
     /* mainmenu -> gameassistmenu */
-    if (menu.CurrentMenu("gameassistmenu")) { update_gameassistmenu(); }
+    if (g_menu.CurrentMenu("gameassistmenu")) { update_gameassistmenu(); }
 
     /* mainmenu -> debugmenu */
-    if (menu.CurrentMenu("debugmenu")) { update_debugmenu(); }
+    if (g_menu.CurrentMenu("debugmenu")) { update_debugmenu(); }
 
-    menu.EndMenu();
+    g_menu.EndMenu();
 }
 
 
@@ -1344,47 +1344,47 @@ void update_menu() {
 
 void saveAxis(const std::string &confTag, GUID devGUID, const std::string& axis, int min, int max) {
     saveChanges();
-    std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
+    std::wstring wDevName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     std::string devName = std::string(wDevName.begin(), wDevName.end());
-    auto index = settings.SteeringAppendDevice(devGUID, devName);
-    settings.SteeringSaveAxis(confTag, index, axis, min, max);
+    auto index = g_settings.SteeringAppendDevice(devGUID, devName);
+    g_settings.SteeringSaveAxis(confTag, index, axis, min, max);
     if (confTag == "STEER") {
-        settings.SteeringSaveFFBAxis(confTag, index, axis);
+        g_settings.SteeringSaveFFBAxis(confTag, index, axis);
     }
-    settings.Read(&carControls);
+    g_settings.Read(&g_controls);
 }
 
 void saveButton(const std::string &confTag, GUID devGUID, int button) {
     saveChanges();
-    std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
+    std::wstring wDevName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     std::string devName = std::string(wDevName.begin(), wDevName.end());
-    auto index = settings.SteeringAppendDevice(devGUID, devName);
-    settings.SteeringSaveButton(confTag, index, button);
-    settings.Read(&carControls);
+    auto index = g_settings.SteeringAppendDevice(devGUID, devName);
+    g_settings.SteeringSaveButton(confTag, index, button);
+    g_settings.Read(&g_controls);
 }
 
 void addWheelToKey(const std::string &confTag, GUID devGUID, int button, const std::string& keyName) {
     saveChanges();
-    std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
+    std::wstring wDevName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     std::string devName = std::string(wDevName.begin(), wDevName.end());
-    auto index = settings.SteeringAppendDevice(devGUID, devName);
-    settings.SteeringAddWheelToKey(confTag, index, button, keyName);
-    settings.Read(&carControls);
+    auto index = g_settings.SteeringAppendDevice(devGUID, devName);
+    g_settings.SteeringAddWheelToKey(confTag, index, button, keyName);
+    g_settings.Read(&g_controls);
 }
 
 void saveHShifter(const std::string &confTag, GUID devGUID, const std::vector<int>& buttonArray) {
     saveChanges();
-    std::wstring wDevName = carControls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
+    std::wstring wDevName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     std::string devName = std::string(wDevName.begin(), wDevName.end());
-    auto index = settings.SteeringAppendDevice(devGUID, devName);
-    settings.SteeringSaveHShifter(confTag, index, buttonArray);
-    settings.Read(&carControls);
+    auto index = g_settings.SteeringAppendDevice(devGUID, devName);
+    g_settings.SteeringSaveHShifter(confTag, index, buttonArray);
+    g_settings.Read(&g_controls);
 }
 
 void clearAxis(const std::string& confTag) {
     saveChanges();
-    settings.SteeringSaveAxis(confTag, -1, "", 0, 0);
-    settings.Read(&carControls);
+    g_settings.SteeringSaveAxis(confTag, -1, "", 0, 0);
+    g_settings.Read(&g_controls);
     UI::Notify(WARN, fmt::format("Cleared axis {}", confTag));
     initWheel();
 }
@@ -1403,11 +1403,11 @@ void clearWheelToKey() {
         UI::Notify(WARN, fmt::format("Invalid input: {} is not a valid number!", result));
         return;
     }
-    bool found = settings.SteeringClearWheelToKey(button);
+    bool found = g_settings.SteeringClearWheelToKey(button);
     if (found) {
         saveChanges();
         UI::Notify(WARN, fmt::format("Removed button {}", result));
-        settings.Read(&carControls);
+        g_settings.Read(&g_controls);
     }
     else {
         UI::Notify(WARN, fmt::format("Button {} not found.", result));
@@ -1416,8 +1416,8 @@ void clearWheelToKey() {
 
 void clearButton(const std::string& confTag) {
     saveChanges();
-    settings.SteeringSaveButton(confTag, -1, -1);
-    settings.Read(&carControls);
+    g_settings.SteeringSaveButton(confTag, -1, -1);
+    g_settings.Read(&g_controls);
     UI::Notify(WARN, fmt::format("Cleared button {}", confTag));
 }
 
@@ -1426,59 +1426,59 @@ void clearHShifter() {
     std::vector<int> empty(g_numGears);
     std::fill(empty.begin(), empty.end(), -1);
 
-    settings.SteeringSaveHShifter("SHIFTER", -1, empty);
-    settings.Read(&carControls);
+    g_settings.SteeringSaveHShifter("SHIFTER", -1, empty);
+    g_settings.Read(&g_controls);
     UI::Notify(WARN, "Cleared H-pattern shifter");
 }
 
 void clearASelect() {
     saveChanges();
-    settings.SteeringSaveButton("AUTO_R", -1, -1);
-    settings.SteeringSaveButton("AUTO_D", -1, -1);
-    settings.Read(&carControls);
+    g_settings.SteeringSaveButton("AUTO_R", -1, -1);
+    g_settings.SteeringSaveButton("AUTO_D", -1, -1);
+    g_settings.Read(&g_controls);
     UI::Notify(WARN, "Cleared H-pattern shifter (auto)");
 }
 
 // Controller and keyboard
 void saveKeyboardKey(const std::string& confTag, const std::string& key) {
     saveChanges();
-    settings.KeyboardSaveKey(confTag, key);
-    settings.Read(&carControls);
+    g_settings.KeyboardSaveKey(confTag, key);
+    g_settings.Read(&g_controls);
     UI::Notify(WARN, fmt::format("Saved key {}: {}.", confTag, key));
 }
 
 void saveControllerButton(const std::string& confTag, const std::string& button) {
     saveChanges();
-    settings.ControllerSaveButton(confTag, button);
-    settings.Read(&carControls);
+    g_settings.ControllerSaveButton(confTag, button);
+    g_settings.Read(&g_controls);
     UI::Notify(WARN, fmt::format("Saved button {}: {}.", confTag, button));
 }
 
 void saveLControllerButton(const std::string& confTag, int button) {
     saveChanges();
-    settings.LControllerSaveButton(confTag, button);
-    settings.Read(&carControls);
+    g_settings.LControllerSaveButton(confTag, button);
+    g_settings.Read(&g_controls);
     UI::Notify(WARN, fmt::format("Saved button {}: {}", confTag, button));
 }
 
 void clearKeyboardKey(const std::string& confTag) {
     saveChanges();
-    settings.KeyboardSaveKey(confTag, "UNKNOWN");
-    settings.Read(&carControls);
+    g_settings.KeyboardSaveKey(confTag, "UNKNOWN");
+    g_settings.Read(&g_controls);
     UI::Notify(WARN, fmt::format("Cleared key {}", confTag));
 }
 
 void clearControllerButton(const std::string& confTag) {
     saveChanges();
-    settings.ControllerSaveButton(confTag, "UNKNOWN");
-    settings.Read(&carControls);
+    g_settings.ControllerSaveButton(confTag, "UNKNOWN");
+    g_settings.Read(&g_controls);
     UI::Notify(WARN, fmt::format("Cleared button {}", confTag));
 }
 
 void clearLControllerButton(const std::string& confTag) {
     saveChanges();
-    settings.LControllerSaveButton(confTag, -1);
-    settings.Read(&carControls);
+    g_settings.LControllerSaveButton(confTag, -1);
+    g_settings.Read(&g_controls);
     UI::Notify(WARN, fmt::format("Cleared button {}", confTag));
 }
 
@@ -1506,13 +1506,13 @@ bool configAxis(const std::string& confTag) {
         additionalInfo += fmt::format(" Fully press and release the {} pedal to register axis.", confTag);
     }
 
-    carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
+    g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
     // Save current state
     std::vector<SAxisState> axisStates;
-    for (auto guid : carControls.GetWheel().GetGuids()) {
+    for (auto guid : g_controls.GetWheel().GetGuids()) {
         for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
             auto axis = static_cast<WheelDirectInput::DIAxis>(i);
-            int axisValue = carControls.GetWheel().GetAxisValue(axis, guid);
+            int axisValue = g_controls.GetWheel().GetAxisValue(axis, guid);
             axisStates.push_back({ guid, axis, axisValue, axisValue });
         }
     }
@@ -1525,9 +1525,9 @@ bool configAxis(const std::string& confTag) {
         if (IsKeyJustUp(str2key(escapeKey))) {
             return false;
         }
-        carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
+        g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
-        for (auto guid : carControls.GetWheel().GetGuids()) {
+        for (auto guid : g_controls.GetWheel().GetGuids()) {
             for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
                 auto axis = static_cast<WheelDirectInput::DIAxis>(i);
                 for (auto& axisState : axisStates) {
@@ -1537,7 +1537,7 @@ bool configAxis(const std::string& confTag) {
                     if (axisState.Axis != axis)
                         continue;
 
-                    int axisValue = carControls.GetWheel().GetAxisValue(axis, guid);
+                    int axisValue = g_controls.GetWheel().GetAxisValue(axis, guid);
 
                     if (axisValue == -1)
                         continue;
@@ -1582,7 +1582,7 @@ bool configAxis(const std::string& confTag) {
             foundAxis = axisState;
         }
     }
-    std::string axisName = carControls.GetWheel().DIAxisHelper[foundAxis.Axis];
+    std::string axisName = g_controls.GetWheel().DIAxisHelper[foundAxis.Axis];
 
     // Use full range instead of registered values, since steering is full range.
     if (confSteer) {
@@ -1601,7 +1601,7 @@ bool configAxis(const std::string& confTag) {
 bool configWheelToKey() {
     std::string additionalInfo = fmt::format("Press a button to configure. Press {} to exit", escapeKey);
 
-    carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
+    g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
     /*
      * 0: Wait for button select
@@ -1617,20 +1617,20 @@ bool configWheelToKey() {
         if (IsKeyJustUp(str2key(escapeKey))) {
             return false;
         }
-        carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
+        g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
         if (progress == 0) {
-            for (auto guid : carControls.GetWheel().GetGuids()) {
+            for (auto guid : g_controls.GetWheel().GetGuids()) {
                 for (int i = 0; i < MAX_RGBBUTTONS; i++) {
-                    if (carControls.GetWheel().IsButtonJustReleased(i, guid)) {
+                    if (g_controls.GetWheel().IsButtonJustReleased(i, guid)) {
                         selectedGuid = guid;
                         button = i;
                         progress++;
                     }
                 }
                 //POV hat
-                for (auto d : carControls.GetWheel().POVDirections) {
-                    if (carControls.GetWheel().IsButtonJustReleased(d, guid)) {
+                for (auto d : g_controls.GetWheel().POVDirections) {
+                    if (g_controls.GetWheel().IsButtonJustReleased(d, guid)) {
                         selectedGuid = guid;
                         button = d;
                         progress++;
@@ -1670,24 +1670,24 @@ bool configWheelToKey() {
 bool configButton(const std::string& confTag) {
     std::string additionalInfo = fmt::format("Press {} to exit. Press a button to set {}.", escapeKey, confTag);
 
-    carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
+    g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
     while (true) {
         if (IsKeyJustUp(str2key(escapeKey))) {
             return false;
         }
-        carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
+        g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
-        for (auto guid : carControls.GetWheel().GetGuids()) {
+        for (auto guid : g_controls.GetWheel().GetGuids()) {
             for (int i = 0; i < MAX_RGBBUTTONS; i++) {
-                if (carControls.GetWheel().IsButtonJustReleased(i, guid)) {
+                if (g_controls.GetWheel().IsButtonJustReleased(i, guid)) {
                     saveButton(confTag, guid, i);
                     return true;
                 }
             }
 
-            for (auto d : carControls.GetWheel().POVDirections) {
-                if (carControls.GetWheel().IsButtonJustReleased(d, guid)) {
+            for (auto d : g_controls.GetWheel().POVDirections) {
+                if (g_controls.GetWheel().IsButtonJustReleased(d, guid)) {
                     saveButton(confTag, guid, d);
                     return true;
                 }
@@ -1716,12 +1716,12 @@ bool configHPattern() {
             progress++;
         }
 
-        carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
+        g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
-        for (auto guid : carControls.GetWheel().GetGuids()) {
+        for (auto guid : g_controls.GetWheel().GetGuids()) {
             for (int i = 0; i < MAX_RGBBUTTONS; i++) {
                 // only find unregistered buttons
-                if (carControls.GetWheel().IsButtonJustPressed(i, guid) &&
+                if (g_controls.GetWheel().IsButtonJustPressed(i, guid) &&
                     find(begin(buttonArray), end(buttonArray), i) == end(buttonArray)) {
                     if (progress == 0) { // also save device info when just started
                         devGUID = guid;
@@ -1765,12 +1765,12 @@ bool configASelect() {
             return false;
         }
 
-        carControls.UpdateValues(CarControls::InputDevices::Wheel, true);
+        g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
-        for (auto guid : carControls.GetWheel().GetGuids()) {
+        for (auto guid : g_controls.GetWheel().GetGuids()) {
             for (int i = 0; i < MAX_RGBBUTTONS; i++) {
                 // only find unregistered buttons
-                if (carControls.GetWheel().IsButtonJustPressed(i, guid) &&
+                if (g_controls.GetWheel().IsButtonJustPressed(i, guid) &&
                     find(begin(buttonArray), end(buttonArray), i) == end(buttonArray)) {
                     if (progress == 0) { // also save device info when just started
                         devGUID = guid;
@@ -1822,9 +1822,9 @@ bool configASelect() {
 
 // Keyboard
 bool isMenuControl(int control) {
-    return control == menu.GetControls().ControlKeys[NativeMenu::MenuControls::ControlType::MenuKey] ||
-        control == menu.GetControls().ControlKeys[NativeMenu::MenuControls::ControlType::MenuSelect] ||
-        control == menu.GetControls().ControlKeys[NativeMenu::MenuControls::ControlType::MenuCancel];
+    return control == g_menu.GetControls().ControlKeys[NativeMenu::MenuControls::ControlType::MenuKey] ||
+        control == g_menu.GetControls().ControlKeys[NativeMenu::MenuControls::ControlType::MenuSelect] ||
+        control == g_menu.GetControls().ControlKeys[NativeMenu::MenuControls::ControlType::MenuCancel];
 }
 
 bool configKeyboardKey(const std::string &confTag) {
@@ -1865,13 +1865,13 @@ bool configKeyboardKey(const std::string &confTag) {
 // Controller
 bool configControllerButton(const std::string &confTag) {
     std::string additionalInfo = fmt::format("Press {} to exit", escapeKey);
-    XInputController controller = carControls.GetController();
+    XInputController controller = g_controls.GetController();
 
     while (true) {
         if (IsKeyJustUp(str2key(escapeKey))) {
             return false;
         }
-        carControls.UpdateValues(CarControls::InputDevices::Controller, true);
+        g_controls.UpdateValues(CarControls::InputDevices::Controller, true);
         for (const std::string& buttonHelper : controller.XboxButtonsHelper) {
             auto button = controller.StringToButton(buttonHelper);
             if (controller.IsButtonJustPressed(button)) {
@@ -1891,9 +1891,9 @@ bool configLControllerButton(const std::string &confTag) {
         if (IsKeyJustUp(str2key(escapeKey))) {
             return false;
         }
-        carControls.UpdateValues(CarControls::InputDevices::Controller, true);
+        g_controls.UpdateValues(CarControls::InputDevices::Controller, true);
 
-        for (auto mapItem : carControls.LegacyControlsMap) {
+        for (auto mapItem : g_controls.LegacyControlsMap) {
             if (CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, mapItem.second)) {
                 saveLControllerButton(confTag, mapItem.second);
                 return true;

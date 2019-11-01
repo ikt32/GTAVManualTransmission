@@ -8,7 +8,7 @@
 
 
 #include "ScriptSettings.hpp"
-extern ScriptSettings settings;
+extern ScriptSettings g_settings;
 
 VehicleData::VehicleData(VehicleExtensions& ext)
     : mVehicle(0), mExt(ext), mHandlingPtr(0)
@@ -118,7 +118,7 @@ void VehicleData::Update() {
     mAcceleration = getAcceleration();
 
     mSuspensionTravelSpeedsHistory.push_back(mSuspensionTravelSpeeds);
-    while (mSuspensionTravelSpeedsHistory.size() > settings.Wheel.FFB.DetailMAW) {
+    while (mSuspensionTravelSpeedsHistory.size() > g_settings.Wheel.FFB.DetailMAW) {
         mSuspensionTravelSpeedsHistory.erase(mSuspensionTravelSpeedsHistory.begin());
     }
 
@@ -130,7 +130,7 @@ void VehicleData::Update() {
         }
     }
     for(size_t i = 0; i < averageSpeeds.size(); ++i) {
-        averageSpeeds[i] /= static_cast<float>(settings.Wheel.FFB.DetailMAW);
+        averageSpeeds[i] /= static_cast<float>(g_settings.Wheel.FFB.DetailMAW);
     }
 
     mSuspensionTravelSpeeds = averageSpeeds;
