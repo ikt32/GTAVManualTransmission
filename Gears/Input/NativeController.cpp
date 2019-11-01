@@ -21,7 +21,7 @@ bool NativeController::IsButtonPressed(GameButtons gameButton) {
     if (CONTROLS::IS_CONTROL_PRESSED(0, GameEnums[gameButton])) {
         return true;
     }
-    if (CONTROLS::GET_CONTROL_NORMAL(0, GameEnums[gameButton]) > settings.Controller.TriggerValue) {
+    if (CONTROLS::GET_CONTROL_NORMAL(0, GameEnums[gameButton]) > g_settings.Controller.TriggerValue) {
         return true;
     }
     return false;

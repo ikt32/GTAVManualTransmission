@@ -22,8 +22,8 @@ extern VehicleExtensions g_ext;
 extern Ped g_playerPed;
 extern Vehicle g_playerVehicle;
 
-std::vector<Vehicle> ignoredVehicles;
-std::vector<NPCVehicle> npcVehicles;
+std::vector<Vehicle> g_ignoredVehicles;
+std::vector<NPCVehicle> g_npcVehicles;
 
 DWORD   raycastUpdateTime = 0;
 
@@ -293,9 +293,9 @@ void updateNPCVehicles(std::vector<NPCVehicle>& vehicles) {
         if (Util::IsPedOnSeat(vehicle.GetVehicle(), g_playerPed, -1))
             continue;
 
-        bool ignored = std::find_if(ignoredVehicles.begin(), ignoredVehicles.end(), [&](const auto & ignoredVehicle) {
+        bool ignored = std::find_if(g_ignoredVehicles.begin(), g_ignoredVehicles.end(), [&](const auto & ignoredVehicle) {
             return ignoredVehicle == vehicle.GetVehicle();
-        }) != ignoredVehicles.end();
+        }) != g_ignoredVehicles.end();
         if (ignored)
             continue;
 
@@ -346,25 +346,25 @@ void update_npc() {
             raycastUpdateTime = GetTickCount();
             auto raycastVehicles = updateRaycastVehicles();
             auto raycastVehicles_ = std::vector<Vehicle>(raycastVehicles.begin(), raycastVehicles.end());
-            updateNPCVehicleList(raycastVehicles_, npcVehicles);
+            updateNPCVehicleList(raycastVehicles_, g_npcVehicles);
 
             if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(g_playerVehicle, -1) != g_playerPed) {
-                npcVehicles.emplace_back(g_playerVehicle);
+                g_npcVehicles.emplace_back(g_playerVehicle);
             }
 
         }
     }
     else {
-        updateNPCVehicleList(vehicles, npcVehicles);
+        updateNPCVehicleList(vehicles, g_npcVehicles);
     }
 
     if (g_settings.Debug.DisplayNPCInfo) {
         showText(0.9, 0.5, 0.4, "NPC Vehs: " + std::to_string(count));
-        showNPCsInfo(npcVehicles);
+        showNPCsInfo(g_npcVehicles);
     }
 
     if (mtActive) {
-        updateNPCVehicles(npcVehicles);
+        updateNPCVehicles(g_npcVehicles);
     }
 }
 

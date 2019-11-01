@@ -16,7 +16,7 @@ extern CarControls g_controls;
 extern Vehicle g_playerVehicle;
 extern VehicleGearboxStates g_gearStates;
 extern VehicleData g_vehData;
-extern std::vector<Vehicle> ignoredVehicles;
+extern std::vector<Vehicle> g_ignoredVehicles;
 
 const char* MT_GetVersion() {
     return Constants::DisplayVersion;
@@ -70,28 +70,28 @@ int MT_GetShiftIndicator() {
 }
 
 void MT_AddIgnoreVehicle(int vehicle) {
-    if (std::find(ignoredVehicles.begin(), ignoredVehicles.end(), vehicle) == ignoredVehicles.end()) {
-        ignoredVehicles.push_back(vehicle);
+    if (std::find(g_ignoredVehicles.begin(), g_ignoredVehicles.end(), vehicle) == g_ignoredVehicles.end()) {
+        g_ignoredVehicles.push_back(vehicle);
     }
 }
 
 void MT_DelIgnoreVehicle(int vehicle) {
-    auto it = std::find(ignoredVehicles.begin(), ignoredVehicles.end(), vehicle);
-    if (it != ignoredVehicles.end()) {
-        ignoredVehicles.erase(it);
+    auto it = std::find(g_ignoredVehicles.begin(), g_ignoredVehicles.end(), vehicle);
+    if (it != g_ignoredVehicles.end()) {
+        g_ignoredVehicles.erase(it);
     }
 }
 
 void MT_ClearIgnoredVehicles() {
-    ignoredVehicles.clear();
+    g_ignoredVehicles.clear();
 }
 
 unsigned MT_NumIgnoredVehicles() {
-    return static_cast<unsigned>(ignoredVehicles.size());
+    return static_cast<unsigned>(g_ignoredVehicles.size());
 }
 
 const int* MT_GetIgnoredVehicles() {
-    return ignoredVehicles.data();
+    return g_ignoredVehicles.data();
 }
 
 int MT_GetManagedVehicle() {
