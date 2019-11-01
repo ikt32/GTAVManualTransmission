@@ -29,20 +29,20 @@
     <ClCompile Include="Util\Util.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\GTAVMenuBase\menu.cpp">
+    <ClCompile Include="..\thirdparty\GTAVMenuBase\menu.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\GTAVMenuBase\menucontrols.cpp">
+    <ClCompile Include="..\thirdparty\GTAVMenuBase\menucontrols.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\GTAVMenuBase\menukeyboard.cpp">
+    <ClCompile Include="..\thirdparty\GTAVMenuBase\menukeyboard.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
     <ClCompile Include="ScriptMenu.cpp" />
-    <ClCompile Include="..\..\GTAVMenuBase\menuutils.cpp">
+    <ClCompile Include="..\thirdparty\GTAVMenuBase\menuutils.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\GTAVMenuBase\menusettings.cpp">
+    <ClCompile Include="..\thirdparty\GTAVMenuBase\menusettings.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
     <ClCompile Include="Util\Paths.cpp">
@@ -95,7 +95,7 @@
     <ClCompile Include="Util\FileVersion.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\GTAVMenuBase\menumemutils.cpp">
+    <ClCompile Include="..\thirdparty\GTAVMenuBase\menumemutils.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
     <ClCompile Include="CustomSteering.cpp" />
@@ -107,16 +107,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
-    <ClInclude Include="..\..\ScriptHookV_SDK\inc\main.h">
+    <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\main.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ScriptHookV_SDK\inc\enums.h">
+    <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\enums.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h">
+    <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\natives.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h">
+    <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\types.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="ScriptSettings.hpp" />
@@ -145,22 +145,22 @@
     <ClInclude Include="Util\TimeHelper.hpp">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\GTAVMenuBase\menu.h">
+    <ClInclude Include="..\thirdparty\GTAVMenuBase\menu.h">
       <Filter>Menu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\GTAVMenuBase\menucontrols.h">
+    <ClInclude Include="..\thirdparty\GTAVMenuBase\menucontrols.h">
       <Filter>Menu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\GTAVMenuBase\menukeyboard.h">
+    <ClInclude Include="..\thirdparty\GTAVMenuBase\menukeyboard.h">
       <Filter>Menu</Filter>
     </ClInclude>
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h">
       <Filter>Thirdparty</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\GTAVMenuBase\menuutils.h">
+    <ClInclude Include="..\thirdparty\GTAVMenuBase\menuutils.h">
       <Filter>Menu</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\GTAVMenuBase\menusettings.h">
+    <ClInclude Include="..\thirdparty\GTAVMenuBase\menusettings.h">
       <Filter>Menu</Filter>
     </ClInclude>
     <ClInclude Include="Memory\Offsets.hpp">
@@ -255,7 +255,7 @@
     <ClInclude Include="Util\FileVersion.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\GTAVMenuBase\menumemutils.hpp">
+    <ClInclude Include="..\thirdparty\GTAVMenuBase\menumemutils.hpp">
       <Filter>Menu</Filter>
     </ClInclude>
     <ClInclude Include="CustomSteering.h" />

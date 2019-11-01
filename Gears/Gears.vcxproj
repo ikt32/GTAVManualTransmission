@@ -61,12 +61,12 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>..\..\ScriptHookV_SDK;..\..\GTAVMenuBase;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\fmt\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)thirdparty\ScriptHookV_SDK;$(SolutionDir)thirdparty\GTAVMenuBase;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\fmt\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>MT_EXPORTS;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalOptions>..\..\ScriptHookV_SDK\lib\ScriptHookV.lib</AdditionalOptions>
+      <AdditionalOptions>..\thirdparty\ScriptHookV_SDK\lib\ScriptHookV.lib</AdditionalOptions>
       <GenerateDebugInformation>No</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -93,14 +93,14 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>..\..\ScriptHookV_SDK;..\..\GTAVMenuBase;$(SolutionDir)thirdparty</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\thirdparty\ScriptHookV_SDK;..\thirdparty\GTAVMenuBase;$(SolutionDir)thirdparty</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <ExceptionHandling>Async</ExceptionHandling>
       <PreprocessorDefinitions>MT_EXPORTS;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;CURL_STATICLIB;NODEFAULTLIB:library;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalOptions>..\..\ScriptHookV_SDK\lib\ScriptHookV.lib</AdditionalOptions>
+      <AdditionalOptions>..\thirdparty\ScriptHookV_SDK\lib\ScriptHookV.lib</AdditionalOptions>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -115,12 +115,12 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\GTAVMenuBase\menu.cpp" />
-    <ClCompile Include="..\..\GTAVMenuBase\menucontrols.cpp" />
-    <ClCompile Include="..\..\GTAVMenuBase\menukeyboard.cpp" />
-    <ClCompile Include="..\..\GTAVMenuBase\menumemutils.cpp" />
-    <ClCompile Include="..\..\GTAVMenuBase\menusettings.cpp" />
-    <ClCompile Include="..\..\GTAVMenuBase\menuutils.cpp" />
+    <ClCompile Include="..\thirdparty\GTAVMenuBase\menu.cpp" />
+    <ClCompile Include="..\thirdparty\GTAVMenuBase\menucontrols.cpp" />
+    <ClCompile Include="..\thirdparty\GTAVMenuBase\menukeyboard.cpp" />
+    <ClCompile Include="..\thirdparty\GTAVMenuBase\menumemutils.cpp" />
+    <ClCompile Include="..\thirdparty\GTAVMenuBase\menusettings.cpp" />
+    <ClCompile Include="..\thirdparty\GTAVMenuBase\menuutils.cpp" />
     <ClCompile Include="..\thirdparty\fmt\src\format.cc" />
     <ClCompile Include="..\thirdparty\fmt\src\posix.cc" />
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp" />
@@ -158,16 +158,16 @@
     <ClCompile Include="WheelInput.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\GTAVMenuBase\menu.h" />
-    <ClInclude Include="..\..\GTAVMenuBase\menucontrols.h" />
-    <ClInclude Include="..\..\GTAVMenuBase\menukeyboard.h" />
-    <ClInclude Include="..\..\GTAVMenuBase\menumemutils.hpp" />
-    <ClInclude Include="..\..\GTAVMenuBase\menusettings.h" />
-    <ClInclude Include="..\..\GTAVMenuBase\menuutils.h" />
-    <ClInclude Include="..\..\ScriptHookV_SDK\inc\enums.h" />
-    <ClInclude Include="..\..\ScriptHookV_SDK\inc\main.h" />
-    <ClInclude Include="..\..\ScriptHookV_SDK\inc\natives.h" />
-    <ClInclude Include="..\..\ScriptHookV_SDK\inc\types.h" />
+    <ClInclude Include="..\thirdparty\GTAVMenuBase\menu.h" />
+    <ClInclude Include="..\thirdparty\GTAVMenuBase\menucontrols.h" />
+    <ClInclude Include="..\thirdparty\GTAVMenuBase\menukeyboard.h" />
+    <ClInclude Include="..\thirdparty\GTAVMenuBase\menumemutils.hpp" />
+    <ClInclude Include="..\thirdparty\GTAVMenuBase\menusettings.h" />
+    <ClInclude Include="..\thirdparty\GTAVMenuBase\menuutils.h" />
+    <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\enums.h" />
+    <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\main.h" />
+    <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\natives.h" />
+    <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\types.h" />
     <ClInclude Include="..\thirdparty\curl\curl.h" />
     <ClInclude Include="..\thirdparty\curl\curlver.h" />
     <ClInclude Include="..\thirdparty\curl\easy.h" />
