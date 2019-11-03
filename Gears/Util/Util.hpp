@@ -2,11 +2,13 @@
 
 #ifndef DIRECTINPUT_VERSION
 #define DIRECTINPUT_VERSION 0x0800
+#include <algorithm>
 #endif
 #include <dinput.h>
 
 #include <string>
 #include <vector>
+#include <sstream>
 
 enum STR2INT_ERROR {
     STR2INT_SUCCESS, 
@@ -45,3 +47,19 @@ constexpr auto EToInt(E e) -> typename std::underlying_type<E>::type {
 bool operator < (const GUID& guid1, const GUID& guid2);
 std::string GUID2String(GUID guid);
 GUID String2GUID(std::string guidStr);
+
+namespace StrUtil {
+    template<typename Out>
+    void split(const std::string& s, char delim, Out result) {
+        std::stringstream ss;
+        ss.str(s);
+        std::string item;
+        while (std::getline(ss, item, delim)) {
+            *(result++) = item;
+        }
+    }
+
+    std::vector<std::string> split(const std::string& s, char delim);
+
+    std::string toLower(std::string s);
+}

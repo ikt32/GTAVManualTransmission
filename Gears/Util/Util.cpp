@@ -44,3 +44,14 @@ GUID String2GUID(std::string guidStr) {
     }
     return guid;
 }
+
+std::vector<std::string> StrUtil::split(const std::string& s, char delim) {
+    std::vector<std::string> elems;
+    StrUtil::split(s, delim, std::back_inserter(elems));
+    return elems;
+}
+
+std::string StrUtil::toLower(std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+    return s;
+}

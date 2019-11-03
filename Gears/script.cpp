@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <thread>
 #include <mutex>
+#include <filesystem>
 
 #include <inc/natives.h>
 #include <inc/enums.h>
@@ -33,6 +34,9 @@
 #include "CustomSteering.h"
 #include "WheelInput.h"
 #include "ScriptUtils.h"
+#include "VehicleConfig.h"
+
+namespace fs = std::filesystem;
 
 ReleaseInfo g_releaseInfo;
 std::mutex g_releaseInfoMutex;
@@ -60,6 +64,9 @@ WheelPatchStates g_wheelPatchStates;
 
 VehicleExtensions g_ext;
 VehicleData g_vehData(g_ext);
+
+std::vector<VehicleConfig> g_vehConfigs;
+VehicleConfig* g_ActiveConfig;
 
 void updateShifting();
 void blockButtons();
@@ -121,6 +128,31 @@ void update_vehicle() {
         g_wheelPatchStates = WheelPatchStates();
         g_vehData.SetVehicle(g_playerVehicle); // assign new vehicle;
         functionHidePlayerInFPV(true);
+
+        g_ActiveConfig = nullptr;
+        if (ENTITY::DOES_ENTITY_EXIST(g_playerVehicle)) {
+            auto currModel = ENTITY::GET_ENTITY_MODEL(g_playerVehicle);
+            auto it = std::find_if(g_vehConfigs.begin(), g_vehConfigs.end(),
+                [currModel](const VehicleConfig & config) {
+                    auto modelsIt = std::find_if(config.ModelNames.begin(), config.ModelNames.end(),
+                        [currModel](const std::string & modelName) {
+                            return joaat(modelName.c_str()) == currModel;
+                        });
+                    auto platesIt = std::find_if(config.Plates.begin(), config.Plates.end(),
+                        [](const std::string & plate) {
+                            return StrUtil::toLower(plate) == StrUtil::toLower(VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(g_playerVehicle));
+                        });
+                    if (platesIt != config.Plates.end())
+                        return true;
+                    if (modelsIt != config.ModelNames.end())
+                        return true;
+                    return false;
+                });
+            if (it != g_vehConfigs.end()) {
+                g_ActiveConfig = &*it;
+                setShiftMode(g_ActiveConfig->MTOptions.ShiftMode);
+            }
+        }
     }
     if (Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
         g_vehData.Update(); // Update before doing anything else
@@ -1762,6 +1794,23 @@ void readSettings() {
 
     g_gearStates.FakeNeutral = g_settings.GameAssists.DefaultNeutral;
     g_menu.ReadSettings();
+
+    g_vehConfigs.clear();
+    const std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
+    std::string vehSettingsPath = absoluteModPath + "\\Vehicles";
+    for (auto& file : fs::directory_iterator(vehSettingsPath)) {
+        if (StrUtil::toLower(fs::path(file).extension().string()) != ".ini")
+            continue;
+
+        VehicleConfig settings(g_settings, file.path().string());
+        if (settings.ModelNames.empty() && settings.Plates.empty()) {
+            logger.Write(WARN,
+                "Vehicle settings file [%s] contained no model names or plates, skipping...",
+                file.path().string().c_str());
+            continue;
+        }
+        g_vehConfigs.push_back(settings);
+    }
     logger.Write(INFO, "Settings read");
 }
 

@@ -104,6 +104,7 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="VehicleConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -264,6 +265,7 @@
     <ClInclude Include="Timer.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="VehicleConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
