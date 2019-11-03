@@ -8,6 +8,7 @@
 #include "Util/Util.hpp"
 #include "Input/keyboard.h"
 #include "Input/CarControls.hpp"
+#include "VehicleConfig.h"
 
 // TODO: Settings shouldn't *do* anything, other stuff just needs to take stuff from this.
 
@@ -17,11 +18,75 @@
         __FUNCTION__, operation, result); \
     }
 
+namespace {
+    ScriptSettings localSettings;
+    VehicleConfig* activeConfig = nullptr;
+}
 EShiftMode Next(EShiftMode mode) {
     return static_cast<EShiftMode>((static_cast<int>(mode) + 1) % 3);
 }
 
 ScriptSettings::ScriptSettings() = default;
+
+void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
+    activeConfig = cfg;
+    localSettings = *this;
+    if (!cfg)
+        return;
+
+    localSettings.MTOptions.ShiftMode = activeConfig->MTOptions.ShiftMode;
+    localSettings.MTOptions.ClutchCreep = activeConfig->MTOptions.ClutchCreep;
+
+    localSettings.MTParams.EngBrakePower      = activeConfig->MTParams.EngBrakePower    ;
+    localSettings.MTParams.EngBrakeThreshold  = activeConfig->MTParams.EngBrakeThreshold;
+    localSettings.MTParams.ClutchThreshold    = activeConfig->MTParams.ClutchThreshold  ;
+    localSettings.MTParams.StallingThreshold  = activeConfig->MTParams.StallingThreshold;
+    localSettings.MTParams.StallingRPM        = activeConfig->MTParams.StallingRPM      ;
+    localSettings.MTParams.RPMDamage          = activeConfig->MTParams.RPMDamage        ;
+    localSettings.MTParams.MisshiftDamage     = activeConfig->MTParams.MisshiftDamage   ;
+
+    localSettings.DriveAssists.CustomABS = activeConfig->DriveAssists.CustomABS;
+    localSettings.DriveAssists.ABSFilter = activeConfig->DriveAssists.ABSFilter;
+    localSettings.DriveAssists.TCMode    = activeConfig->DriveAssists.TCMode   ;
+
+    localSettings.ShiftOptions.UpshiftCut     = activeConfig->ShiftOptions.UpshiftCut    ;
+    localSettings.ShiftOptions.DownshiftBlip  = activeConfig->ShiftOptions.DownshiftBlip ;
+    localSettings.ShiftOptions.ClutchRateMult = activeConfig->ShiftOptions.ClutchRateMult;
+    localSettings.ShiftOptions.RPMTolerance   = activeConfig->ShiftOptions.RPMTolerance  ;
+
+    localSettings.AutoParams.UpshiftLoad                  = activeConfig->AutoParams.UpshiftLoad         ;
+    localSettings.AutoParams.DownshiftLoad                = activeConfig->AutoParams.DownshiftLoad       ;
+    localSettings.AutoParams.NextGearMinRPM               = activeConfig->AutoParams.NextGearMinRPM      ;
+    localSettings.AutoParams.CurrGearMinRPM               = activeConfig->AutoParams.CurrGearMinRPM      ;
+    localSettings.AutoParams.EcoRate                      = activeConfig->AutoParams.EcoRate             ;
+    localSettings.AutoParams.DownshiftTimeoutMult         = activeConfig->AutoParams.DownshiftTimeoutMult;
+
+
+    localSettings.Wheel.FFB.Enable         = activeConfig->Wheel.FFB.Enable        ;
+    localSettings.Wheel.FFB.Scale          = activeConfig->Wheel.FFB.Scale         ;
+    localSettings.Wheel.FFB.AntiDeadForce  = activeConfig->Wheel.FFB.AntiDeadForce ;
+    localSettings.Wheel.FFB.SATAmpMult     = activeConfig->Wheel.FFB.SATAmpMult    ;
+    localSettings.Wheel.FFB.SATMax         = activeConfig->Wheel.FFB.SATMax        ;
+    localSettings.Wheel.FFB.SATFactor      = activeConfig->Wheel.FFB.SATFactor     ;
+    localSettings.Wheel.FFB.DamperMax      = activeConfig->Wheel.FFB.DamperMax     ;
+    localSettings.Wheel.FFB.DamperMin      = activeConfig->Wheel.FFB.DamperMin     ;
+    localSettings.Wheel.FFB.DamperMinSpeed = activeConfig->Wheel.FFB.DamperMinSpeed;
+    localSettings.Wheel.FFB.DetailMult     = activeConfig->Wheel.FFB.DetailMult    ;
+    localSettings.Wheel.FFB.DetailLim      = activeConfig->Wheel.FFB.DetailLim     ;
+    localSettings.Wheel.FFB.DetailMAW      = activeConfig->Wheel.FFB.DetailMAW     ;
+    localSettings.Wheel.FFB.CollisionMult  = activeConfig->Wheel.FFB.CollisionMult ;
+
+    localSettings.Wheel.Steering.AngleCar  = activeConfig->Wheel.Steering.Angle;
+    localSettings.Wheel.Steering.AngleBike = activeConfig->Wheel.Steering.Angle;
+    localSettings.Wheel.Steering.AngleBoat = activeConfig->Wheel.Steering.Angle;
+}
+
+ScriptSettings ScriptSettings::operator()() {
+    if (activeConfig) {
+        return localSettings;
+    }
+    return *this;
+}
 
 #pragma warning(push)
 #pragma warning(disable: 4244)
@@ -294,7 +359,7 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     SI_Error result = settingsGeneral.LoadFile(settingsGeneralFile.c_str());
     CHECK_LOG_SI_ERROR(result, "load");
 
-    // [OPTIONS]
+    // [MT_OPTIONS]
     MTOptions.Enable = settingsGeneral.GetBoolValue("MT_OPTIONS", "Enable", MTOptions.Enable);
     MTOptions.ShiftMode = 
         static_cast<EShiftMode>(settingsGeneral.GetLongValue("MT_OPTIONS", "ShiftMode", EToInt(MTOptions.ShiftMode)));

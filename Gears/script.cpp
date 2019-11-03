@@ -130,6 +130,7 @@ void update_vehicle() {
         functionHidePlayerInFPV(true);
 
         g_ActiveConfig = nullptr;
+        g_settings.SetVehicleConfig(nullptr);
         if (ENTITY::DOES_ENTITY_EXIST(g_playerVehicle)) {
             auto currModel = ENTITY::GET_ENTITY_MODEL(g_playerVehicle);
             auto it = std::find_if(g_vehConfigs.begin(), g_vehConfigs.end(),
@@ -150,6 +151,7 @@ void update_vehicle() {
                 });
             if (it != g_vehConfigs.end()) {
                 g_ActiveConfig = &*it;
+                g_settings.SetVehicleConfig(g_ActiveConfig);
                 setShiftMode(g_ActiveConfig->MTOptions.ShiftMode);
             }
         }

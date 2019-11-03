@@ -5,6 +5,7 @@
 #include "Util/Logger.hpp"
 #include "simpleini/SimpleIni.h"
 
+class VehicleConfig;
 class Logger;
 class CarControls;
 
@@ -24,6 +25,9 @@ public:
     void SaveGeneral() const;
     void SaveController(CarControls *scriptControl) const;
     void SaveWheel(CarControls *scriptControl) const;
+
+    void SetVehicleConfig(VehicleConfig* cfg);
+    ScriptSettings operator()();
 
     // settings_general.ini parts
     // [MT_OPTIONS]
