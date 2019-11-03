@@ -228,14 +228,14 @@ void drawDebugInfo() {
 
         float rateUp = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(g_playerVehicle) + hOffsets.fClutchChangeRateScaleUpShift);
         float rateDown = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(g_playerVehicle) + hOffsets.fClutchChangeRateScaleDownShift);
-        float upshiftDuration = 1.0f / (rateUp * g_settings.ShiftOptions.ClutchRateMult);
-        float downshiftDuration = 1.0f / (rateDown * g_settings.ShiftOptions.ClutchRateMult);
+        float upshiftDuration = 1.0f / (rateUp * g_settings().ShiftOptions.ClutchRateMult);
+        float downshiftDuration = 1.0f / (rateDown * g_settings().ShiftOptions.ClutchRateMult);
 
         showText(0.60f, 0.050f, 0.35f, fmt::format("ClutchRate Up: {:.3f}", rateUp));
         showText(0.60f, 0.075f, 0.35f, fmt::format("ClutchRate Dn: {:.3f}", rateDown));
         showText(0.60f, 0.100f, 0.35f, fmt::format("Duration Up: {:.3f}", upshiftDuration));
         showText(0.60f, 0.125f, 0.35f, fmt::format("Duration Dn: {:.3f}", downshiftDuration));
-        showText(0.60f, 0.150f, 0.35f, fmt::format("Shift timeout (dn): {:.3f}", downshiftDuration * g_settings.AutoParams.DownshiftTimeoutMult));
+        showText(0.60f, 0.150f, 0.35f, fmt::format("Shift timeout (dn): {:.3f}", downshiftDuration * g_settings().AutoParams.DownshiftTimeoutMult));
     }
 }
 

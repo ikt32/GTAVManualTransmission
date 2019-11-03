@@ -338,7 +338,7 @@ void update_manual_features() {
 
         // Simulate "catch point"
         // When the clutch "grabs" and the car starts moving without input
-        if (g_settings.MTOptions.ClutchCreep && VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle)) {
+        if (g_settings().MTOptions.ClutchCreep && VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle)) {
             functionClutchCatch();
         }
     }
@@ -607,9 +607,9 @@ void functionHShiftTo(int i) {
 
     // shifting from neutral into gear is OK when rev matched
     float expectedRPM = g_vehData.mWheelAverageDrivenTyreSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[i]);
-    bool rpmInRange = Math::Near(g_vehData.mRPM, expectedRPM, g_settings.ShiftOptions.RPMTolerance);
+    bool rpmInRange = Math::Near(g_vehData.mRPM, expectedRPM, g_settings().ShiftOptions.RPMTolerance);
 
-    bool clutchPass = g_controls.ClutchVal > 1.0f - g_settings.MTParams.ClutchThreshold;
+    bool clutchPass = g_controls.ClutchVal > 1.0f - g_settings().MTParams.ClutchThreshold;
 
     if (!checkShift)
         shiftPass = true;
@@ -629,7 +629,7 @@ void functionHShiftTo(int i) {
         if (g_settings.MTOptions.EngDamage && g_vehData.mHasClutch) {
             VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
                 g_playerVehicle,
-                VEHICLE::GET_VEHICLE_ENGINE_HEALTH(g_playerVehicle) - g_settings.MTParams.MisshiftDamage);
+                VEHICLE::GET_VEHICLE_ENGINE_HEALTH(g_playerVehicle) - g_settings().MTParams.MisshiftDamage);
         }
     }
 }
@@ -673,7 +673,7 @@ void functionHShiftWheel() {
     if (isHShifterJustNeutral()) {
         if (g_settings.MTOptions.ClutchShiftH &&
             g_settings.MTOptions.EngDamage && g_vehData.mHasClutch) {
-            if (g_controls.ClutchVal < 1.0 - g_settings.MTParams.ClutchThreshold) {
+            if (g_controls.ClutchVal < 1.0 - g_settings().MTParams.ClutchThreshold) {
             }
         }
         g_gearStates.FakeNeutral = g_vehData.mHasClutch;
@@ -709,7 +709,7 @@ void updateShifting() {
     float rateDown = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleDownShift);
 
     float shiftRate = g_gearStates.ShiftDirection == ShiftDirection::Up ? rateUp : rateDown;
-    shiftRate *= g_settings.ShiftOptions.ClutchRateMult;
+    shiftRate *= g_settings().ShiftOptions.ClutchRateMult;
 
     /*
      * 4.0 gives similar perf as base - probably the whole shift takes 1/rate seconds
@@ -769,7 +769,7 @@ void functionSShift() {
 
         // Shift block /w clutch shifting for seq.
         if (g_settings.MTOptions.ClutchShiftS && 
-            g_controls.ClutchVal < 1.0f - g_settings.MTParams.ClutchThreshold) {
+            g_controls.ClutchVal < 1.0f - g_settings().MTParams.ClutchThreshold) {
             return;
         }
 
@@ -810,7 +810,7 @@ void functionSShift() {
 
         // Shift block /w clutch shifting for seq.
         if (g_settings.MTOptions.ClutchShiftS &&
-            g_controls.ClutchVal < 1.0f - g_settings.MTParams.ClutchThreshold) {
+            g_controls.ClutchVal < 1.0f - g_settings().MTParams.ClutchThreshold) {
             return;
         }
 
@@ -974,7 +974,7 @@ void functionAShift() {
     if (g_controls.ThrottleVal >= g_gearStates.ThrottleHang)
         g_gearStates.ThrottleHang = g_controls.ThrottleVal;
     else if (g_gearStates.ThrottleHang > 0.0f)
-        g_gearStates.ThrottleHang -= GAMEPLAY::GET_FRAME_TIME() * g_settings.AutoParams.EcoRate;
+        g_gearStates.ThrottleHang -= GAMEPLAY::GET_FRAME_TIME() * g_settings().AutoParams.EcoRate;
 
     if (g_gearStates.ThrottleHang < 0.0f)
         g_gearStates.ThrottleHang = 0.0f;
@@ -983,14 +983,14 @@ void functionAShift() {
 
     float nextGearMinSpeed = 0.0f; // don't care about top gear
     if (currGear < g_vehData.mGearTop) {
-        nextGearMinSpeed = g_settings.AutoParams.NextGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear + 1];
+        nextGearMinSpeed = g_settings().AutoParams.NextGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear + 1];
     }
 
-    float currGearMinSpeed = g_settings.AutoParams.CurrGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear];
+    float currGearMinSpeed = g_settings().AutoParams.CurrGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear];
 
     float engineLoad = g_gearStates.ThrottleHang - map(g_vehData.mRPM, 0.2f, 1.0f, 0.0f, 1.0f);
     g_gearStates.EngineLoad = engineLoad;
-    g_gearStates.UpshiftLoad = g_settings.AutoParams.UpshiftLoad;
+    g_gearStates.UpshiftLoad = g_settings().AutoParams.UpshiftLoad;
 
     bool skidding = false;
     for (auto x : g_ext.GetWheelSkidSmokeEffect(g_playerVehicle)) {
@@ -1000,7 +1000,7 @@ void functionAShift() {
 
     // Shift up.
     if (currGear < g_vehData.mGearTop) {
-        if (engineLoad < g_settings.AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
+        if (engineLoad < g_settings().AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
             shiftTo(g_vehData.mGearCurr + 1, true);
             g_gearStates.FakeNeutral = false;
             g_gearStates.LastUpshiftTime = GAMEPLAY::GET_GAME_TIMER();
@@ -1016,13 +1016,13 @@ void functionAShift() {
     }
 
     float rateUp = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
-    float upshiftDuration = 1.0f / (rateUp * g_settings.ShiftOptions.ClutchRateMult);
+    float upshiftDuration = 1.0f / (rateUp * g_settings().ShiftOptions.ClutchRateMult);
     bool tpPassed = GAMEPLAY::GET_GAME_TIMER() > g_gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings.AutoParams.DownshiftTimeoutMult);
-    g_gearStates.DownshiftLoad = g_settings.AutoParams.DownshiftLoad * gearRatioRatio;
+    g_gearStates.DownshiftLoad = g_settings().AutoParams.DownshiftLoad * gearRatioRatio;
 
     // Shift down
     if (currGear > 1) {
-        if (tpPassed && engineLoad > g_settings.AutoParams.DownshiftLoad * gearRatioRatio || currSpeed < currGearMinSpeed) {
+        if (tpPassed && engineLoad > g_settings().AutoParams.DownshiftLoad * gearRatioRatio || currSpeed < currGearMinSpeed) {
             shiftTo(currGear - 1, true);
             g_gearStates.FakeNeutral = false;
         }
@@ -1037,12 +1037,12 @@ void functionClutchCatch() {
     // TODO: Make more subtle / use throttle?
     const float idleThrottle = 0.24f; // TODO -> Settings?
 
-    float clutchRatio = map(g_controls.ClutchVal, 1.0f - g_settings.MTParams.ClutchThreshold, 0.0f, 0.0f, 1.0f);
+    float clutchRatio = map(g_controls.ClutchVal, 1.0f - g_settings().MTParams.ClutchThreshold, 0.0f, 0.0f, 1.0f);
     clutchRatio = std::clamp(clutchRatio, 0.0f, 1.0f);
 
     // TODO: Check for settings.MTOptions.ShiftMode == Automatic if anybody complains...
 
-    bool clutchEngaged = g_controls.ClutchVal < 1.0f - g_settings.MTParams.ClutchThreshold;
+    bool clutchEngaged = g_controls.ClutchVal < 1.0f - g_settings().MTParams.ClutchThreshold;
     float minSpeed = 0.2f * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
     float expectedSpeed = g_vehData.mRPM * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]) * clutchRatio;
     float actualSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
@@ -1064,7 +1064,7 @@ void functionClutchCatch() {
 void functionEngStall() {
     const float stallRate = GAMEPLAY::GET_FRAME_TIME() * 3.33f;
 
-    float minSpeed = g_settings.MTParams.StallingRPM * abs(g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
+    float minSpeed = g_settings().MTParams.StallingRPM * abs(g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
     float actualSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
 
     // Closer to idle speed = less buildup for stalling
@@ -1073,8 +1073,8 @@ void functionEngStall() {
     if (speedDiffRatio < 0.45f)
         speedDiffRatio = 0.0f; //ignore if we're close-ish to idle
     
-    bool clutchEngaged = g_controls.ClutchVal < 1.0f - g_settings.MTParams.ClutchThreshold;
-    bool stallEngaged = g_controls.ClutchVal < 1.0f - g_settings.MTParams.StallingThreshold;
+    bool clutchEngaged = g_controls.ClutchVal < 1.0f - g_settings().MTParams.ClutchThreshold;
+    bool stallEngaged = g_controls.ClutchVal < 1.0f - g_settings().MTParams.StallingThreshold;
 
     // this thing is big when the clutch isnt pressed
     float invClutch = 1.0f - g_controls.ClutchVal;
@@ -1122,7 +1122,7 @@ void functionEngDamage() {
         g_vehData.mRPM > 0.98f &&
         g_controls.ThrottleVal > 0.98f) {
         VEHICLE::SET_VEHICLE_ENGINE_HEALTH(g_playerVehicle, 
-                                           VEHICLE::GET_VEHICLE_ENGINE_HEALTH(g_playerVehicle) - (g_settings.MTParams.RPMDamage));
+                                           VEHICLE::GET_VEHICLE_ENGINE_HEALTH(g_playerVehicle) - (g_settings().MTParams.RPMDamage));
     }
 }
 
@@ -1162,7 +1162,7 @@ void functionEngLock() {
     }
 
     // Wheels are locking up due to bad (down)shifts
-    if ((speed > abs(maxSpeed * 1.15f) + 3.334f || wrongDirection) && inputMultiplier > g_settings.MTParams.ClutchThreshold) {
+    if ((speed > abs(maxSpeed * 1.15f) + 3.334f || wrongDirection) && inputMultiplier > g_settings().MTParams.ClutchThreshold) {
         g_wheelPatchStates.EngLockActive = true;
         float lockingForce = 60.0f * inputMultiplier;
         auto wheelsToLock = g_vehData.mWheelsDriven;//getDrivenWheels();
@@ -1179,7 +1179,7 @@ void functionEngLock() {
         }
         fakeRev(true, 1.0f);
         float oldEngineHealth = VEHICLE::GET_VEHICLE_ENGINE_HEALTH(g_playerVehicle);
-        float damageToApply = g_settings.MTParams.MisshiftDamage * inputMultiplier;
+        float damageToApply = g_settings().MTParams.MisshiftDamage * inputMultiplier;
         if (g_settings.MTOptions.EngDamage) {
             if (oldEngineHealth >= damageToApply) {
                 VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
@@ -1202,7 +1202,7 @@ void functionEngLock() {
 
 void functionEngBrake() {
     // When you let go of the throttle at high RPMs
-    float activeBrakeThreshold = g_settings.MTParams.EngBrakeThreshold;
+    float activeBrakeThreshold = g_settings().MTParams.EngBrakeThreshold;
 
     if (g_vehData.mRPM >= activeBrakeThreshold && ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y > 5.0f && !g_gearStates.FakeNeutral) {
         float handlingBrakeForce = *reinterpret_cast<float *>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
@@ -1214,7 +1214,7 @@ void functionEngBrake() {
         if (inputMultiplier > 0.05f) {
             g_wheelPatchStates.EngBrakeActive = true;
             float rpmMultiplier = (g_vehData.mRPM - activeBrakeThreshold) / (1.0f - activeBrakeThreshold);
-            float engBrakeForce = g_settings.MTParams.EngBrakePower * inputMultiplier * rpmMultiplier;
+            float engBrakeForce = g_settings().MTParams.EngBrakePower * inputMultiplier * rpmMultiplier;
             auto wheelsToBrake = g_vehData.mWheelsDriven;
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
                 if (wheelsToBrake[i]) {
@@ -1262,15 +1262,15 @@ void handleBrakePatch() {
         }
         if (ebrk || brn)
             lockedUp = false;
-        bool absNativePresent = g_vehData.mHasABS && g_settings.DriveAssists.ABSFilter;
+        bool absNativePresent = g_vehData.mHasABS && g_settings().DriveAssists.ABSFilter;
 
-        if (g_settings.DriveAssists.CustomABS && lockedUp && !absNativePresent)
+        if (g_settings().DriveAssists.CustomABS && lockedUp && !absNativePresent)
             useABS = true;
     }
     
     {
         bool tractionLoss = false;
-        if (g_settings.DriveAssists.TCMode != 0) {
+        if (g_settings().DriveAssists.TCMode != 0) {
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
                 if (speeds[i] > g_vehData.mVelocity.y + 2.5f && susps[i] > 0.0f && g_vehData.mWheelsDriven[i])
                     tractionLoss = true;
@@ -1279,12 +1279,12 @@ void handleBrakePatch() {
                 tractionLoss = false;
         }
 
-        if (g_settings.DriveAssists.TCMode != 0 && tractionLoss)
+        if (g_settings().DriveAssists.TCMode != 0 && tractionLoss)
             useTCS = true;
     }
 
 
-    if (useTCS && g_settings.DriveAssists.TCMode == 2) {
+    if (useTCS && g_settings().DriveAssists.TCMode == 2) {
         CONTROLS::DISABLE_CONTROL_ACTION(2, eControl::ControlVehicleAccelerate, true);
         if (g_settings.Debug.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~(TCS/T)");
@@ -1319,7 +1319,7 @@ void handleBrakePatch() {
         if (g_settings.Debug.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~(ABS)");
     }
-    else if (useTCS && g_settings.DriveAssists.TCMode == 1) {
+    else if (useTCS && g_settings().DriveAssists.TCMode == 1) {
         if (!MemoryPatcher::BrakePatcher.Patched()) {
             MemoryPatcher::PatchBrake();
         }
@@ -1390,11 +1390,11 @@ void handleRPM() {
         // Only lift and blip when no clutch used
         if (g_controls.ClutchVal == 0.0f) {
             if (g_gearStates.ShiftDirection == ShiftDirection::Up &&
-                g_settings.ShiftOptions.UpshiftCut) {
+                g_settings().ShiftOptions.UpshiftCut) {
                 CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
             }
             if (g_gearStates.ShiftDirection == ShiftDirection::Down &&
-                g_settings.ShiftOptions.DownshiftBlip) {
+                g_settings().ShiftOptions.DownshiftBlip) {
                 float expectedRPM = g_vehData.mWheelAverageDrivenTyreSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr - 1]);
                 if (g_vehData.mRPM < expectedRPM * 0.75f)
                     CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.66f);
@@ -1532,7 +1532,7 @@ void functionRealReverse() {
             g_ext.SetBrakeP(g_playerVehicle, 1.0f);
         }
         // RT behavior when rolling back: Burnout
-        if (!g_gearStates.FakeNeutral && g_controls.ThrottleVal > 0.5f && g_controls.ClutchVal < 1.0f - g_settings.MTParams.ClutchThreshold && 
+        if (!g_gearStates.FakeNeutral && g_controls.ThrottleVal > 0.5f && g_controls.ClutchVal < 1.0f - g_settings().MTParams.ClutchThreshold && 
             ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y < -1.0f ) {
             //showText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Rollback");
             //CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, carControls.ThrottleVal);
@@ -1700,7 +1700,7 @@ void startStopEngine() {
         g_controls.PrevInput == CarControls::Controller	&& g_controls.ButtonHeldOver(CarControls::LegacyControlType::Engine, 200) ||
         g_controls.PrevInput == CarControls::Keyboard		&& g_controls.ButtonJustPressed(CarControls::KeyboardControlType::Engine) ||
         g_controls.PrevInput == CarControls::Wheel			&& g_controls.ButtonJustPressed(CarControls::WheelControlType::Engine) ||
-        g_settings.GameAssists.ThrottleStart && g_controls.ThrottleVal > 0.75f && (g_controls.ClutchVal > 1.0f - g_settings.MTParams.ClutchThreshold || g_gearStates.FakeNeutral))) {
+        g_settings.GameAssists.ThrottleStart && g_controls.ThrottleVal > 0.75f && (g_controls.ClutchVal > 1.0f - g_settings().MTParams.ClutchThreshold || g_gearStates.FakeNeutral))) {
         VEHICLE::SET_VEHICLE_ENGINE_ON(g_playerVehicle, true, false, true);
     }
     if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle) &&
@@ -1813,6 +1813,7 @@ void readSettings() {
         }
         g_vehConfigs.push_back(settings);
     }
+
     logger.Write(INFO, "Settings read");
 }
 

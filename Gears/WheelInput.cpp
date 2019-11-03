@@ -93,7 +93,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
                 brakelights = true;
             }
 
-            if (!g_gearStates.FakeNeutral && wheelThrottleVal > 0.01f && g_controls.ClutchVal < 1.0f - g_settings.MTParams.ClutchThreshold) {
+            if (!g_gearStates.FakeNeutral && wheelThrottleVal > 0.01f && g_controls.ClutchVal < 1.0f - g_settings().MTParams.ClutchThreshold) {
                 //showText(0.3, 0.0, 1.0, "We should burnout");
                 if (g_controls.BrakeVal < 0.1f) {
                     VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, false);
@@ -116,7 +116,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
                 g_wheelPatchStates.InduceBurnout = true;
             }
 
-            if (wheelThrottleVal > 0.01f && (g_controls.ClutchVal > 1.0f - g_settings.MTParams.ClutchThreshold || g_gearStates.FakeNeutral)) {
+            if (wheelThrottleVal > 0.01f && (g_controls.ClutchVal > 1.0f - g_settings().MTParams.ClutchThreshold || g_gearStates.FakeNeutral)) {
                 if (wheelBrakeVal > 0.01f) {
                     //showText(0.3, 0.0, 1.0, "We should rev and brake");
                     //showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)) );
@@ -185,7 +185,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             //bool brakelights = false;
 
             if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y > reverseThreshold) {
-                if (g_controls.ClutchVal < 1.0f - g_settings.MTParams.ClutchThreshold) {
+                if (g_controls.ClutchVal < 1.0f - g_settings().MTParams.ClutchThreshold) {
                     CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
                 }
                 // Brake Pedal Reverse
@@ -374,11 +374,11 @@ void WheelInput::DoSteering() {
 
     float steerMult;
     if (g_vehData.mClass == VehicleClass::Bike || g_vehData.mClass == VehicleClass::Quad)
-        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleBike;
+        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings().Wheel.Steering.AngleBike;
     else if (g_vehData.mClass == VehicleClass::Car)
-        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleCar;
+        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings().Wheel.Steering.AngleCar;
     else {
-        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleBoat;
+        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings().Wheel.Steering.AngleBoat;
     }
 
     float steerValL = map(g_controls.SteerVal, 0.0f, 0.5f, 1.0f, 0.0f);
@@ -407,9 +407,9 @@ int calculateDamper(float gain, float wheelsOffGroundRatio) {
     Vector3 accelValsAvg = g_vehData.mAcceleration; //TODO: Avg/dampen later
 
     // Just to use floats everywhere here
-    float damperMax = static_cast<float>(g_settings.Wheel.FFB.DamperMax);
-    float damperMin = static_cast<float>(g_settings.Wheel.FFB.DamperMin);
-    float damperMinSpeed = static_cast<float>(g_settings.Wheel.FFB.DamperMinSpeed);
+    float damperMax = static_cast<float>(g_settings().Wheel.FFB.DamperMax);
+    float damperMin = static_cast<float>(g_settings().Wheel.FFB.DamperMin);
+    float damperMinSpeed = static_cast<float>(g_settings().Wheel.FFB.DamperMinSpeed);
 
     float absVehicleSpeed = abs(ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y);
     float damperFactorSpeed = map(absVehicleSpeed, 0.0f, damperMinSpeed, damperMax, damperMin);
@@ -463,17 +463,17 @@ int calculateDetail() {
         compSpeedTotal = -compSpeed[0] + compSpeed[1];
     }
 
-    return static_cast<int>(1000.0f * g_settings.Wheel.FFB.DetailMult * compSpeedTotal);
+    return static_cast<int>(1000.0f * g_settings().Wheel.FFB.DetailMult * compSpeedTotal);
 }
 
 void calculateSoftLock(int& totalForce, int& damperForce) {
     float steerMult;
     if (g_vehData.mClass == VehicleClass::Bike || g_vehData.mClass == VehicleClass::Quad)
-        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleBike;
+        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings().Wheel.Steering.AngleBike;
     else if (g_vehData.mClass == VehicleClass::Car)
-        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleCar;
+        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings().Wheel.Steering.AngleCar;
     else {
-        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleBoat;
+        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings().Wheel.Steering.AngleBoat;
     }
     float effSteer = steerMult * 2.0f * (g_controls.SteerVal - 0.5f);
     float steerSpeed = g_controls.GetAxisSpeed(CarControls::WheelAxisType::Steer);
@@ -509,9 +509,9 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
         0, 0
     };
     
-    float error = static_cast<float>(pid.getOutput(expectedVector.x, static_cast<double>(speedVector.x) * g_settings.Wheel.FFB.SATFactor));
+    float error = static_cast<float>(pid.getOutput(expectedVector.x, static_cast<double>(speedVector.x) * g_settings().Wheel.FFB.SATFactor));
 
-    int satForce = static_cast<int>(g_settings.Wheel.FFB.SATAmpMult * static_cast<float>(defaultGain) * -error);
+    int satForce = static_cast<int>(g_settings().Wheel.FFB.SATAmpMult * static_cast<float>(defaultGain) * -error);
 
     // "Reduction" effects - those that affect already calculated things
     bool understeering = false;
@@ -549,12 +549,12 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
         showText(0.85, 0.250, 0.4, fmt::format("{}Under:\t\t{:.3f}~w~", understeering ? "~b~" : "~w~", understeer), 4);
     }
     if (satForce > 0) {
-        satForce = map(satForce, 0, 10000, g_settings.Wheel.FFB.AntiDeadForce, 10000);
+        satForce = map(satForce, 0, 10000, g_settings().Wheel.FFB.AntiDeadForce, 10000);
     }
     if (satForce < 0) {
-        satForce = map(satForce, -10000, 0, -10000, -g_settings.Wheel.FFB.AntiDeadForce);
+        satForce = map(satForce, -10000, 0, -10000, -g_settings().Wheel.FFB.AntiDeadForce);
     }
-    satForce = std::clamp(satForce, -g_settings.Wheel.FFB.SATMax, g_settings.Wheel.FFB.SATMax);
+    satForce = std::clamp(satForce, -g_settings().Wheel.FFB.SATMax, g_settings().Wheel.FFB.SATMax);
 
     return satForce;
 }
@@ -610,11 +610,11 @@ float getSteeringLock() {
     case VehicleClass::Bike:
     case VehicleClass::Quad:
     case VehicleClass::Bicycle:
-        return g_settings.Wheel.Steering.AngleBike;
+        return g_settings().Wheel.Steering.AngleBike;
     case VehicleClass::Car:
-        return g_settings.Wheel.Steering.AngleCar;
+        return g_settings().Wheel.Steering.AngleCar;
     case VehicleClass::Boat:
-        return g_settings.Wheel.Steering.AngleBoat;
+        return g_settings().Wheel.Steering.AngleBoat;
     case VehicleClass::Plane:
     case VehicleClass::Heli:
     case VehicleClass::Train:
@@ -624,13 +624,13 @@ float getSteeringLock() {
 }
 
 void WheelInput::PlayFFBGround() {
-    if (!g_settings.Wheel.FFB.Enable ||
+    if (!g_settings().Wheel.FFB.Enable ||
         g_controls.PrevInput != CarControls::Wheel) {
         return;
     }
 
     float rotationScale = 1.0f;
-    if (g_settings.Wheel.FFB.Scale) {
+    if (g_settings().Wheel.FFB.Scale) {
         rotationScale = getSteeringLock() / g_settings.Wheel.Steering.AngleMax * 0.66f + 0.34f;
     }
 
@@ -641,7 +641,7 @@ void WheelInput::PlayFFBGround() {
     float avgAngle = g_ext.GetWheelAverageAngle(g_playerVehicle);
     float wheelsOffGroundRatio = getFloatingSteeredWheelsRatio(g_playerVehicle);
 
-    int detailForce = std::clamp(calculateDetail(), -g_settings.Wheel.FFB.DetailLim, g_settings.Wheel.FFB.DetailLim);
+    int detailForce = std::clamp(calculateDetail(), -g_settings().Wheel.FFB.DetailLim, g_settings().Wheel.FFB.DetailLim);
     int satForce = calculateSat(2500, avgAngle, wheelsOffGroundRatio, g_vehData.mClass == VehicleClass::Car);
     int damperForce = calculateDamper(50.0f, wheelsOffGroundRatio);
 
@@ -660,7 +660,7 @@ void WheelInput::PlayFFBGround() {
     const float maxForce = 10000.0f;
     float gForce = abs(g_vehData.mAcceleration.y) / 9.81f; // TODO: Average/dampen later
     bool collision = gForce > minGforce;
-    int res = static_cast<int>(map(gForce, minGforce, maxGforce, minForce, maxForce) * g_settings.Wheel.FFB.CollisionMult);
+    int res = static_cast<int>(map(gForce, minGforce, maxGforce, minForce, maxForce) * g_settings().Wheel.FFB.CollisionMult);
     if (collision) {
         g_controls.PlayFFBCollision(std::clamp(res, -10000, 10000));
     }
@@ -679,13 +679,13 @@ void WheelInput::PlayFFBGround() {
 }
 
 void WheelInput::PlayFFBWater() {
-    if (!g_settings.Wheel.FFB.Enable ||
+    if (!g_settings().Wheel.FFB.Enable ||
         g_controls.PrevInput != CarControls::Wheel) {
         return;
     }
 
     float rotationScale = 1.0f;
-    if (g_settings.Wheel.FFB.Scale) {
+    if (g_settings().Wheel.FFB.Scale) {
         rotationScale = getSteeringLock() / g_settings.Wheel.Steering.AngleMax * 0.66f + 0.34f;
     }
 
