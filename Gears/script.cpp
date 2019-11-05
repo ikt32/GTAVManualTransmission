@@ -66,7 +66,7 @@ VehicleExtensions g_ext;
 VehicleData g_vehData(g_ext);
 
 std::vector<VehicleConfig> g_vehConfigs;
-VehicleConfig* g_ActiveConfig;
+VehicleConfig* g_activeConfig;
 
 void updateShifting();
 void blockButtons();
@@ -114,7 +114,7 @@ void functionAutoGear1();
 void functionHillGravity();
 
 void setVehicleConfig(Vehicle vehicle) {
-    g_ActiveConfig = nullptr;
+    g_activeConfig = nullptr;
     g_settings.SetVehicleConfig(nullptr);
     if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
         auto currModel = ENTITY::GET_ENTITY_MODEL(vehicle);
@@ -135,9 +135,9 @@ void setVehicleConfig(Vehicle vehicle) {
                 return false;
             });
         if (it != g_vehConfigs.end()) {
-            g_ActiveConfig = &*it;
-            g_settings.SetVehicleConfig(g_ActiveConfig);
-            UI::Notify(INFO, fmt::format("Config [{}] loaded.", g_ActiveConfig->Name));
+            g_activeConfig = &*it;
+            g_settings.SetVehicleConfig(g_activeConfig);
+            UI::Notify(INFO, fmt::format("Config [{}] loaded.", g_activeConfig->Name));
         }
     }
 }
@@ -576,9 +576,9 @@ void setShiftMode(EShiftMode shiftMode) {
         tempMode = EShiftMode::Automatic;
     }
 
-    if (g_settings.MTOptions.Override && g_ActiveConfig != nullptr) {
-        g_ActiveConfig->MTOptions.ShiftMode = tempMode;
-        g_settings.SetVehicleConfig(g_ActiveConfig);
+    if (g_settings.MTOptions.Override && g_activeConfig != nullptr) {
+        g_activeConfig->MTOptions.ShiftMode = tempMode;
+        g_settings.SetVehicleConfig(g_activeConfig);
     }
     else {
         g_settings.MTOptions.ShiftMode = tempMode;

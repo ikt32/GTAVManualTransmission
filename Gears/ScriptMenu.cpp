@@ -37,7 +37,7 @@ extern NativeMenu::Menu g_menu;
 extern CarControls g_controls;
 extern ScriptSettings g_settings;
 
-extern VehicleConfig* g_ActiveConfig;
+extern VehicleConfig* g_activeConfig;
 
 struct SFont {
     int ID;
@@ -298,7 +298,7 @@ void update_mainmenu() {
     };
 
     if (g_settings.MTOptions.Override) {
-        detailsTemp.push_back(fmt::format("Temporarily change shift mode for current override: [{}]", g_ActiveConfig->Name));
+        detailsTemp.push_back(fmt::format("Temporarily change shift mode for current override: [{}]", g_activeConfig->Name));
     }
 
     g_menu.StringArray("Gearbox", gearboxModes, tempShiftMode,
