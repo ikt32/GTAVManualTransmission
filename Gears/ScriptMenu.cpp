@@ -11,6 +11,7 @@
 #include "Memory/VehicleExtensions.hpp"
 #include "Util/MathExt.h"
 #include "ScriptUtils.h"
+#include "VehicleConfig.h"
 
 #include <menu.h>
 #include <menukeyboard.h>
@@ -35,6 +36,8 @@ extern std::mutex g_checkUpdateDoneMutex;
 extern NativeMenu::Menu g_menu;
 extern CarControls g_controls;
 extern ScriptSettings g_settings;
+
+extern VehicleConfig* g_ActiveConfig;
 
 struct SFont {
     int ID;
@@ -74,6 +77,12 @@ namespace {
     const std::string escapeKey = "BACKSPACE";
     const std::string skipKey = "RIGHT";
     const std::string modUrl = "https://www.gta5-mods.com/scripts/manual-transmission-ikt";
+
+    const std::vector<std::string> gearboxModes = {
+        "Sequential",
+        "H-pattern",
+        "Automatic"
+    };
 
     const std::vector<SControlText<CarControls::WheelControlType>> wheelMenuButtons {
         { CarControls::WheelControlType::HR             , "[Gear R]" },
@@ -282,17 +291,20 @@ void update_mainmenu() {
         toggleManual(!g_settings.MTOptions.Enable);
     }
 
-    int tempShiftMode = EToInt(g_settings.MTOptions.ShiftMode);
-    std::vector<std::string> gearboxModes = {
-        "Sequential",
-        "H-pattern",
-        "Automatic"
+    int tempShiftMode = EToInt(g_settings().MTOptions.ShiftMode);
+
+    std::vector<std::string> detailsTemp {
+        "Choose your gearbox! Options are Sequential, H-pattern and Automatic."
     };
 
-    g_menu.StringArray("Gearbox", gearboxModes, tempShiftMode,
-        { "Choose your gearbox! Options are Sequential, H-pattern and Automatic." });
+    if (g_settings.MTOptions.Override) {
+        detailsTemp.push_back(fmt::format("Temporarily change shift mode for current override: [{}]", g_ActiveConfig->Name));
+    }
 
-    if (tempShiftMode != EToInt(g_settings.MTOptions.ShiftMode)) {
+    g_menu.StringArray("Gearbox", gearboxModes, tempShiftMode,
+        detailsTemp);
+
+    if (tempShiftMode != EToInt(g_settings().MTOptions.ShiftMode)) {
         setShiftMode(static_cast<EShiftMode>(tempShiftMode));
     }
 

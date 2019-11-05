@@ -80,7 +80,6 @@ void updateSteeringMultiplier();
 //                           Mod functions: Shifting
 ///////////////////////////////////////////////////////////////////////////////
 
-void cycleShiftMode();
 void shiftTo(int gear, bool autoClutch);
 void functionHShiftTo(int i);
 void functionHShiftKeyboard();
@@ -138,6 +137,7 @@ void setVehicleConfig(Vehicle vehicle) {
         if (it != g_vehConfigs.end()) {
             g_ActiveConfig = &*it;
             g_settings.SetVehicleConfig(g_ActiveConfig);
+            UI::Notify(INFO, fmt::format("Config [{}] loaded.", g_ActiveConfig->Name));
         }
     }
 }
@@ -333,8 +333,8 @@ void update_manual_features() {
     if (!g_gearStates.FakeNeutral &&
         !(g_settings.GameAssists.SimpleBike && g_vehData.mClass == VehicleClass::Bike) && g_vehData.mHasClutch) {
         // Stalling
-        if (g_settings.MTOptions.EngStallH && g_settings.MTOptions.ShiftMode == EShiftMode::HPattern ||
-            g_settings.MTOptions.EngStallS && g_settings.MTOptions.ShiftMode == EShiftMode::Sequential) {
+        if (g_settings.MTOptions.EngStallH && g_settings().MTOptions.ShiftMode == EShiftMode::HPattern ||
+            g_settings.MTOptions.EngStallS && g_settings().MTOptions.ShiftMode == EShiftMode::Sequential) {
             functionEngStall();
         }
 
@@ -375,7 +375,8 @@ void update_manual_transmission() {
         g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleH) ||
         g_controls.ButtonHeld(CarControls::ControllerControlType::ToggleH) ||
         g_controls.PrevInput == CarControls::Controller	&& g_controls.ButtonHeld(CarControls::LegacyControlType::ToggleH)) {
-        cycleShiftMode();
+        setShiftMode(Next(g_settings().MTOptions.ShiftMode));
+        g_settings.SaveGeneral();
     }
 
     if (MemoryPatcher::NumGearboxPatched != MemoryPatcher::NumGearboxPatches) {
@@ -383,7 +384,7 @@ void update_manual_transmission() {
     }
     update_manual_features();
 
-    switch(g_settings.MTOptions.ShiftMode) {
+    switch(g_settings().MTOptions.ShiftMode) {
         case EShiftMode::Sequential: {
             functionSShift();
             if (g_settings.GameAssists.AutoGear1) {
@@ -531,10 +532,15 @@ void updateLastInputDevice() {
                 break;
             case CarControls::Controller:
                 message += "Controller";
-                if (g_settings.MTOptions.ShiftMode == EShiftMode::HPattern &&
+                if (g_settings().MTOptions.ShiftMode == EShiftMode::HPattern &&
                     g_settings.Controller.BlockHShift) {
                     message += "~n~Mode: Sequential";
-                    setShiftMode(EShiftMode::Sequential);
+                    if (g_settings.MTOptions.Override) {
+                        
+                    }
+                    else {
+                        setShiftMode(EShiftMode::Sequential);
+                    }
                 }
                 break;
             case CarControls::Wheel:
@@ -563,29 +569,30 @@ void setShiftMode(EShiftMode shiftMode) {
     if (Util::VehicleAvailable(g_playerVehicle, g_playerPed) && shiftMode != EShiftMode::HPattern && g_vehData.mGearCurr > 1)
         g_gearStates.FakeNeutral = false;
 
+    EShiftMode tempMode = shiftMode;
     if (shiftMode == EShiftMode::HPattern &&
         g_controls.PrevInput == CarControls::Controller && 
         g_settings.Controller.BlockHShift) {
-        g_settings.MTOptions.ShiftMode = EShiftMode::Automatic;
+        tempMode = EShiftMode::Automatic;
+    }
+
+    if (g_settings.MTOptions.Override && g_ActiveConfig != nullptr) {
+        g_ActiveConfig->MTOptions.ShiftMode = tempMode;
+        g_settings.SetVehicleConfig(g_ActiveConfig);
     }
     else {
-        g_settings.MTOptions.ShiftMode = shiftMode;
+        g_settings.MTOptions.ShiftMode = tempMode;
     }
 
     std::string mode = "Mode: ";
     // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
-    switch (g_settings.MTOptions.ShiftMode) {
+    switch (g_settings().MTOptions.ShiftMode) {
         case EShiftMode::Sequential:    mode += "Sequential";   break;
         case EShiftMode::HPattern:      mode += "H-Pattern";    break;
         case EShiftMode::Automatic:     mode += "Automatic";    break;
         default:                                                break;
     }
     UI::Notify(INFO, mode);
-}
-
-void cycleShiftMode() {
-    setShiftMode(Next(g_settings.MTOptions.ShiftMode));
-    g_settings.SaveGeneral();
 }
 
 void shiftTo(int gear, bool autoClutch) {
@@ -1114,7 +1121,7 @@ void functionEngStall() {
 }
 
 void functionEngDamage() {
-    if (g_settings.MTOptions.ShiftMode == EShiftMode::Automatic ||
+    if (g_settings().MTOptions.ShiftMode == EShiftMode::Automatic ||
         g_vehData.mFlags[1] & eVehicleFlag2::FLAG_IS_ELECTRIC || 
         g_vehData.mGearTop == 1) {
         return;
@@ -1129,7 +1136,7 @@ void functionEngDamage() {
 }
 
 void functionEngLock() {
-    if (g_settings.MTOptions.ShiftMode == EShiftMode::Automatic ||
+    if (g_settings().MTOptions.ShiftMode == EShiftMode::Automatic ||
         g_vehData.mFlags[1] & eVehicleFlag2::FLAG_IS_ELECTRIC ||
         g_vehData.mGearTop == 1 || 
         g_vehData.mGearCurr == g_vehData.mGearTop ||
@@ -1406,7 +1413,7 @@ void handleRPM() {
 
     // Ignores clutch 
     if (!g_gearStates.Shifting) {
-        if (g_settings.MTOptions.ShiftMode == EShiftMode::Automatic ||
+        if (g_settings().MTOptions.ShiftMode == EShiftMode::Automatic ||
             g_vehData.mClass == VehicleClass::Bike && g_settings.GameAssists.SimpleBike) {
             clutch = 0.0f;
         }
@@ -1647,7 +1654,7 @@ void blockButtons() {
         g_controls.PrevInput != CarControls::Controller || !Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
         return;
     }
-    if (g_settings.MTOptions.ShiftMode == EShiftMode::Automatic && g_vehData.mGearCurr > 1) {
+    if (g_settings().MTOptions.ShiftMode == EShiftMode::Automatic && g_vehData.mGearCurr > 1) {
         return;
     }
 
