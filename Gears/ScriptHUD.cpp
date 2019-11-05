@@ -117,7 +117,7 @@ void drawSpeedoMeter() {
 void drawShiftModeIndicator() {
     std::string shiftModeText;
     auto color = solidWhite;
-    switch (g_settings.MTOptions.ShiftMode) {
+    switch (g_settings().MTOptions.ShiftMode) {
         case EShiftMode::Sequential:    shiftModeText = "S"; break;
         case EShiftMode::HPattern:      shiftModeText = "H"; break;
         case EShiftMode::Automatic:     shiftModeText = "A"; break;
