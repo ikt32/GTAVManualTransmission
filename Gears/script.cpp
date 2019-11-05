@@ -114,6 +114,34 @@ void functionAutoLookback();
 void functionAutoGear1();
 void functionHillGravity();
 
+void setVehicleConfig(Vehicle vehicle) {
+    g_ActiveConfig = nullptr;
+    g_settings.SetVehicleConfig(nullptr);
+    if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
+        auto currModel = ENTITY::GET_ENTITY_MODEL(vehicle);
+        auto it = std::find_if(g_vehConfigs.begin(), g_vehConfigs.end(),
+            [currModel, vehicle](const VehicleConfig & config) {
+                auto modelsIt = std::find_if(config.ModelNames.begin(), config.ModelNames.end(),
+                    [currModel](const std::string & modelName) {
+                        return joaat(modelName.c_str()) == currModel;
+                    });
+                auto platesIt = std::find_if(config.Plates.begin(), config.Plates.end(),
+                    [vehicle](const std::string & plate) {
+                        return StrUtil::toLower(plate) == StrUtil::toLower(VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(vehicle));
+                    });
+                if (platesIt != config.Plates.end())
+                    return true;
+                if (modelsIt != config.ModelNames.end())
+                    return true;
+                return false;
+            });
+        if (it != g_vehConfigs.end()) {
+            g_ActiveConfig = &*it;
+            g_settings.SetVehicleConfig(g_ActiveConfig);
+        }
+    }
+}
+
 void update_player() {
     g_player = PLAYER::PLAYER_ID();
     g_playerPed = PLAYER::PLAYER_PED_ID();
@@ -128,33 +156,7 @@ void update_vehicle() {
         g_wheelPatchStates = WheelPatchStates();
         g_vehData.SetVehicle(g_playerVehicle); // assign new vehicle;
         functionHidePlayerInFPV(true);
-
-        g_ActiveConfig = nullptr;
-        g_settings.SetVehicleConfig(nullptr);
-        if (ENTITY::DOES_ENTITY_EXIST(g_playerVehicle)) {
-            auto currModel = ENTITY::GET_ENTITY_MODEL(g_playerVehicle);
-            auto it = std::find_if(g_vehConfigs.begin(), g_vehConfigs.end(),
-                [currModel](const VehicleConfig & config) {
-                    auto modelsIt = std::find_if(config.ModelNames.begin(), config.ModelNames.end(),
-                        [currModel](const std::string & modelName) {
-                            return joaat(modelName.c_str()) == currModel;
-                        });
-                    auto platesIt = std::find_if(config.Plates.begin(), config.Plates.end(),
-                        [](const std::string & plate) {
-                            return StrUtil::toLower(plate) == StrUtil::toLower(VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(g_playerVehicle));
-                        });
-                    if (platesIt != config.Plates.end())
-                        return true;
-                    if (modelsIt != config.ModelNames.end())
-                        return true;
-                    return false;
-                });
-            if (it != g_vehConfigs.end()) {
-                g_ActiveConfig = &*it;
-                g_settings.SetVehicleConfig(g_ActiveConfig);
-                setShiftMode(g_ActiveConfig->MTOptions.ShiftMode);
-            }
-        }
+        setVehicleConfig(g_playerVehicle);
     }
     if (Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
         g_vehData.Update(); // Update before doing anything else
