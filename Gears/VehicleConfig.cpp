@@ -1,5 +1,6 @@
 #include "VehicleConfig.h"
 #include "Util/Util.hpp"
+#include <filesystem>
 
 #define CHECK_LOG_SI_ERROR(result, operation) \
     if (result < 0) { \
@@ -11,11 +12,15 @@ VehicleConfig::VehicleConfig(const ScriptSettings& gSettings, const std::string&
     loadSettings(gSettings, file);
 }
 
+#pragma warning(push)
+#pragma warning(disable: 4244)
 void VehicleConfig::loadSettings(const ScriptSettings& gSettings, const std::string& file) {
     CSimpleIniA settingsIni;
     settingsIni.SetUnicode();
     SI_Error result = settingsIni.LoadFile(file.c_str());
     CHECK_LOG_SI_ERROR(result, "load");
+
+    Name = std::filesystem::path(file).stem().string();
 
     // [ID]
     std::string allNames = settingsIni.GetValue("ID", "ModelName", "");
@@ -74,3 +79,4 @@ void VehicleConfig::loadSettings(const ScriptSettings& gSettings, const std::str
     // [STEER]
     Wheel.Steering.Angle = settingsIni.GetDoubleValue("STEER", "Steer", gSettings.Wheel.Steering.AngleCar);
 }
+#pragma warning(pop)

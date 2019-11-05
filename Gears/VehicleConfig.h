@@ -6,6 +6,8 @@ public:
     VehicleConfig(const ScriptSettings& gSettings,
         const std::string& file);
 
+    std::string Name;
+
     // ID
     std::vector<std::string> ModelNames;
     std::vector<std::string> Plates;
