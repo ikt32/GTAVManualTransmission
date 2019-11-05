@@ -82,7 +82,7 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
 }
 
 ScriptSettings ScriptSettings::operator()() {
-    if (activeConfig) {
+    if (MTOptions.Override && activeConfig) {
         return localSettings;
     }
     return *this;
@@ -110,6 +110,8 @@ void ScriptSettings::SaveGeneral() const {
     // [MT_OPTIONS]
     settingsGeneral.SetBoolValue("MT_OPTIONS", "Enable", MTOptions.Enable);
     settingsGeneral.SetLongValue("MT_OPTIONS", "ShiftMode", EToInt(MTOptions.ShiftMode));
+    settingsGeneral.SetLongValue("MT_OPTIONS", "Override", MTOptions.Override);
+
     settingsGeneral.SetBoolValue("MT_OPTIONS", "EngineDamage", MTOptions.EngDamage);
     settingsGeneral.SetBoolValue("MT_OPTIONS", "EngineStalling", MTOptions.EngStallH);
     settingsGeneral.SetBoolValue("MT_OPTIONS", "EngineStallingS", MTOptions.EngStallS);
@@ -363,6 +365,8 @@ void ScriptSettings::parseSettingsGeneral(CarControls *scriptControl) {
     MTOptions.Enable = settingsGeneral.GetBoolValue("MT_OPTIONS", "Enable", MTOptions.Enable);
     MTOptions.ShiftMode = 
         static_cast<EShiftMode>(settingsGeneral.GetLongValue("MT_OPTIONS", "ShiftMode", EToInt(MTOptions.ShiftMode)));
+    MTOptions.Override = settingsGeneral.GetBoolValue("MT_OPTIONS", "Override", MTOptions.Override);
+
     MTOptions.EngDamage = settingsGeneral.GetBoolValue("MT_OPTIONS", "EngineDamage", MTOptions.EngDamage);
     MTOptions.EngStallH = settingsGeneral.GetBoolValue("MT_OPTIONS", "EngineStalling", MTOptions.EngStallH);
     MTOptions.EngStallS = settingsGeneral.GetBoolValue("MT_OPTIONS", "EngineStallingS", MTOptions.EngStallS);

@@ -35,6 +35,8 @@ public:
         bool Enable = true;
         // 0 Seq, 1 H, 2 Auto
         EShiftMode ShiftMode = EShiftMode::Sequential;
+        bool Override = true;
+
         bool EngDamage = false;
         // H-Pattern
         bool EngStallH = true;
