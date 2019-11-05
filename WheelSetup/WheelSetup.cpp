@@ -6,6 +6,7 @@
 #include "../Gears/ScriptSettings.hpp"
 #include "../Gears/Input/CarControls.hpp"
 #include "../Gears/Util/Paths.h"
+#include "../Gears/Util/Util.hpp"
 #include "../Gears/Constants.h"
 
 #define ESC 0x1B
@@ -201,7 +202,7 @@ bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> sta
 
 void saveAxis(const std::string &gameAxis, const std::string &confTag, std::tuple<GUID, std::string> selectedDevice, int min, int max) {
 	std::wstring wDevName = controls.GetWheel().FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
-	std::string devName = std::string(wDevName.begin(), wDevName.end());
+	std::string devName = StrUtil::utf8_encode(wDevName);
 	auto index = g_settings.SteeringAppendDevice(std::get<0>(selectedDevice), devName);
 	g_settings.SteeringSaveAxis(confTag, index, std::get<1>(selectedDevice), min, max);
 	if (gameAxis == "steering") {
@@ -210,7 +211,7 @@ void saveAxis(const std::string &gameAxis, const std::string &confTag, std::tupl
 }
 
 void saveButton(int button, std::string confTag, GUID devGUID, std::string devName) {
-	auto index = g_settings.SteeringAppendDevice(devGUID, devName.c_str());
+	auto index = g_settings.SteeringAppendDevice(devGUID, devName);
 	g_settings.SteeringSaveButton(confTag, index, button);
 }
 
@@ -343,7 +344,7 @@ void configDynamicAxes(char c) {
 
 	int prevAxisValue = controls.GetWheel().GetAxisValue(controls.GetWheel().StringToAxis(std::get<1>(selectedDevice)), std::get<0>(selectedDevice));
 	std::wstring wDevName = controls.GetWheel().FindEntryFromGUID(std::get<0>(selectedDevice))->diDeviceInstance.tszInstanceName;
-	std::string selectedDevName = std::string(wDevName.begin(), wDevName.end()).c_str();
+    std::string selectedDevName = StrUtil::utf8_encode(wDevName);
 	std::string selectedAxis = std::get<1>(selectedDevice);
 	GUID selectedGUID = std::get<0>(selectedDevice);
 	while(true) {
@@ -484,7 +485,7 @@ void configDynamicButtons(char c) {
 
 		for (auto guid : controls.GetWheel().GetGuids()) {
 			std::wstring wDevName = controls.GetWheel().FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
-			std::string devName = std::string(wDevName.begin(), wDevName.end()).c_str();
+			std::string devName = StrUtil::utf8_encode(wDevName);
 			for (int i = 0; i < 255; i++) {
 				if (controls.GetWheel().IsButtonPressed(i, guid)) {
 					printf("%d @ %s", i, devName.c_str());
@@ -641,7 +642,7 @@ void configHShift(char c) {
 				int devNumber = 0;
 				for (auto guid : controls.GetWheel().GetGuids()) {
 					wDevName = controls.GetWheel().FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
-					devName = std::string(wDevName.begin(), wDevName.end()).c_str();
+					devName = StrUtil::utf8_encode(wDevName);
 					std::cout << devNumber << ": " << devName << "\n";
 					devNumber++;
 				}
@@ -662,7 +663,7 @@ void configHShift(char c) {
 				setCursorPosition(0, 1);
 				for (int i = 0; i < 255; i++) {
 					if (controls.GetWheel().IsButtonPressed(i, devGUID)) {
-						devName = std::string(wDevName.begin(), wDevName.end()).c_str();
+						devName = StrUtil::utf8_encode(wDevName);
 						printf("%d @ %s", i, devName.c_str());
 						buttonsActive++;
 						buttonArray[progress] = i;
@@ -683,7 +684,7 @@ void configHShift(char c) {
 				setCursorPosition(0, 1);
 				for (int i = 0; i < 255; i++) {
 					if (controls.GetWheel().IsButtonPressed(i, devGUID)) {
-						devName = std::string(wDevName.begin(), wDevName.end()).c_str();
+						devName = StrUtil::utf8_encode(wDevName);
 						printf("%d @ %s", i, devName.c_str());
 						buttonsActive++;
 						buttonArray[0] = i;
@@ -783,7 +784,7 @@ int main() {
 			setCursorPosition(xCursorPos, pRow);
 			pRow++;
 			std::wstring wDevName = controls.GetWheel().FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
-			std::string devName = std::string(wDevName.begin(), wDevName.end());
+			std::string devName = StrUtil::utf8_encode(wDevName);
 			if (devName.length() > devWidth) {
 				devName.replace(devWidth - 4, 3, "...");
 				devName[devWidth - 1] = '\0';

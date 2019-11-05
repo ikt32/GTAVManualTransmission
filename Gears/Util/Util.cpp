@@ -31,7 +31,7 @@ std::string GUID2String(GUID guid) {
     wchar_t szGuidW[40] = {0};
     StringFromGUID2(guid, szGuidW, 40);
     std::wstring wGuid = szGuidW;
-    return (std::string(wGuid.begin(), wGuid.end()));
+    return StrUtil::utf8_encode(wGuid);
 }
 
 GUID String2GUID(std::string guidStr) {
@@ -54,4 +54,22 @@ std::vector<std::string> StrUtil::split(const std::string& s, char delim) {
 std::string StrUtil::toLower(std::string s) {
     std::transform(s.begin(), s.end(), s.begin(), ::tolower);
     return s;
+}
+
+std::string StrUtil::utf8_encode(const std::wstring& wstr) {
+    if (wstr.empty())
+        return std::string();
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+    std::string strTo(size_needed, 0);
+    WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+    return strTo;
+}
+
+std::wstring StrUtil::utf8_decode(const std::string& str) {
+    if (str.empty())
+        return std::wstring();
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
+    std::wstring wstrTo(size_needed, 0);
+    MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
+    return wstrTo;
 }

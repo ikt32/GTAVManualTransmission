@@ -1345,7 +1345,7 @@ void update_menu() {
 void saveAxis(const std::string &confTag, GUID devGUID, const std::string& axis, int min, int max) {
     saveChanges();
     std::wstring wDevName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
-    std::string devName = std::string(wDevName.begin(), wDevName.end());
+    std::string devName = StrUtil::utf8_encode(wDevName);
     auto index = g_settings.SteeringAppendDevice(devGUID, devName);
     g_settings.SteeringSaveAxis(confTag, index, axis, min, max);
     if (confTag == "STEER") {
@@ -1357,7 +1357,7 @@ void saveAxis(const std::string &confTag, GUID devGUID, const std::string& axis,
 void saveButton(const std::string &confTag, GUID devGUID, int button) {
     saveChanges();
     std::wstring wDevName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
-    std::string devName = std::string(wDevName.begin(), wDevName.end());
+    std::string devName = StrUtil::utf8_encode(wDevName);
     auto index = g_settings.SteeringAppendDevice(devGUID, devName);
     g_settings.SteeringSaveButton(confTag, index, button);
     g_settings.Read(&g_controls);
@@ -1366,7 +1366,7 @@ void saveButton(const std::string &confTag, GUID devGUID, int button) {
 void addWheelToKey(const std::string &confTag, GUID devGUID, int button, const std::string& keyName) {
     saveChanges();
     std::wstring wDevName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
-    std::string devName = std::string(wDevName.begin(), wDevName.end());
+    std::string devName = StrUtil::utf8_encode(wDevName);
     auto index = g_settings.SteeringAppendDevice(devGUID, devName);
     g_settings.SteeringAddWheelToKey(confTag, index, button, keyName);
     g_settings.Read(&g_controls);
@@ -1375,7 +1375,7 @@ void addWheelToKey(const std::string &confTag, GUID devGUID, int button, const s
 void saveHShifter(const std::string &confTag, GUID devGUID, const std::vector<int>& buttonArray) {
     saveChanges();
     std::wstring wDevName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
-    std::string devName = std::string(wDevName.begin(), wDevName.end());
+    std::string devName = StrUtil::utf8_encode(wDevName);
     auto index = g_settings.SteeringAppendDevice(devGUID, devName);
     g_settings.SteeringSaveHShifter(confTag, index, buttonArray);
     g_settings.Read(&g_controls);
