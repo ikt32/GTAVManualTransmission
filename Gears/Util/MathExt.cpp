@@ -7,7 +7,7 @@ float lerp(float a, float b, float f) {
 }
 
 float Length(Vector3 vec) {
-    return sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+    return static_cast<float>(sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z));
 }
 
 float Distance(Vector3 vec1, Vector3 vec2) {
@@ -84,10 +84,10 @@ Vector3 GetOffsetInWorldCoords(Vector3 position, Vector3 rotation, Vector3 forwa
 }
 
 float GetAngleBetween(float h1, float h2, float separation) {
-    auto diff = fabs(h1 - h2);
+    auto diff = abs(h1 - h2);
     if (diff < separation)
         return (separation - diff) / separation;
-    if (fabs(diff - 360.0f) < separation)
-        return (separation - fabs(diff - 360.0f)) / separation;
+    if (abs(diff - 360.0f) < separation)
+        return (separation - abs(diff - 360.0f)) / separation;
     return separation;
 }

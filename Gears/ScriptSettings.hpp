@@ -5,6 +5,7 @@
 #include "Util/Logger.hpp"
 #include "simpleini/SimpleIni.h"
 
+class VehicleConfig;
 class Logger;
 class CarControls;
 
@@ -19,11 +20,14 @@ EShiftMode Next(EShiftMode mode);
 class ScriptSettings {
 public:
     ScriptSettings();
-    void SetFiles(const std::string &general, const std::string &wheel);
+    void SetFiles(const std::string &general, const std::string& controls, const std::string &wheel);
     void Read(CarControls* scriptControl);
     void SaveGeneral() const;
-    void SaveController(CarControls *scriptControl) const;
-    void SaveWheel(CarControls *scriptControl) const;
+    void SaveController() const;
+    void SaveWheel() const;
+
+    void SetVehicleConfig(VehicleConfig* cfg);
+    ScriptSettings operator()();
 
     // settings_general.ini parts
     // [MT_OPTIONS]
@@ -31,6 +35,8 @@ public:
         bool Enable = true;
         // 0 Seq, 1 H, 2 Auto
         EShiftMode ShiftMode = EShiftMode::Sequential;
+        bool Override = true;
+
         bool EngDamage = false;
         // H-Pattern
         bool EngStallH = true;
@@ -355,7 +361,8 @@ public:
     bool SteeringClearWheelToKey(int button);
 
 private:
-    void parseSettingsGeneral(CarControls *scriptControl);
+    void parseSettingsGeneral();
+    void parseSettingsControls(CarControls* scriptControl);
     void parseSettingsWheel(CarControls *scriptControl);
 
     // Just looks up which GUID corresponds with what number and returns the GUID.
@@ -363,6 +370,7 @@ private:
 
     int nDevices = 0;
     std::string settingsGeneralFile;
+    std::string settingsControlsFile;
     std::string settingsWheelFile;
     std::string settingsMenuFile;
 };

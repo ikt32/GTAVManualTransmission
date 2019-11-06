@@ -104,7 +104,7 @@ bool WheelDirectInput::InitWheel() {
         std::wstring wDevName = device->diDeviceInstance.tszInstanceName;
         GUID guid = device->diDeviceInstance.guidInstance;
         
-        logger.Write(INFO, "[Wheel]     Name:   %s", std::string(wDevName.begin(), wDevName.end()).c_str());
+        logger.Write(INFO, "[Wheel]     Name:   %s", StrUtil::utf8_encode(wDevName).c_str());
         logger.Write(INFO, "[Wheel]     GUID:   %s", GUID2String(guid).c_str());
         foundGuids.push_back(guid);
 

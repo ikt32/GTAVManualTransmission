@@ -13,10 +13,10 @@
 
 #include <algorithm>
 
-extern Vehicle playerVehicle;
-extern Ped playerPed;
-extern VehicleExtensions ext;
-extern ScriptSettings settings;
+extern Vehicle g_playerVehicle;
+extern Ped g_playerPed;
+extern VehicleExtensions g_ext;
+extern ScriptSettings g_settings;
 
 namespace {
     float steerPrev = 0.0f;
@@ -29,7 +29,7 @@ namespace CustomSteering {
 }
 
 float CustomSteering::calculateReduction() {
-    Vehicle mVehicle = playerVehicle;
+    Vehicle mVehicle = g_playerVehicle;
     float mult = 1;
     Vector3 vel = ENTITY::GET_ENTITY_VELOCITY(mVehicle);
     Vector3 pos = ENTITY::GET_ENTITY_COORDS(mVehicle, 1);
@@ -40,7 +40,7 @@ float CustomSteering::calculateReduction() {
         if (mult != 0) { mult = floorf(mult * 1000) / 1000; }
         if (mult > 1) { mult = 1; }
     }
-    mult = (1 + (mult - 1) * settings.CustomSteering.SteeringReduction);
+    mult = (1 + (mult - 1) * g_settings.CustomSteering.SteeringReduction);
     return mult;
 }
 
@@ -50,7 +50,7 @@ float CustomSteering::calculateDesiredHeading(float steeringMax, float desiredHe
     desiredHeading = desiredHeading * reduction * steeringMax;
     float correction = desiredHeading;
 
-    Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true);
+    Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
     if (abs(speedVector.y) > 3.0f) {
         Vector3 target = Normalize(speedVector);
         float travelDir = atan2(target.y, target.x) - static_cast<float>(M_PI) / 2.0f;
@@ -64,10 +64,10 @@ float CustomSteering::calculateDesiredHeading(float steeringMax, float desiredHe
         travelDir *= sgn(speedVector.y);
 
         // Custom user multiplier. Division by steeringmult needed to neutralize over-correction.
-        travelDir *= settings.CustomSteering.CountersteerMult / settings.CustomSteering.SteeringMult;
+        travelDir *= g_settings.CustomSteering.CountersteerMult / g_settings.CustomSteering.SteeringMult;
 
         // clamp auto correction to countersteer limit
-        travelDir = std::clamp(travelDir, deg2rad(-settings.CustomSteering.CountersteerLimit), deg2rad(settings.CustomSteering.CountersteerLimit));
+        travelDir = std::clamp(travelDir, deg2rad(-g_settings.CustomSteering.CountersteerLimit), deg2rad(g_settings.CustomSteering.CountersteerLimit));
 
         correction = travelDir + desiredHeading;
     }
@@ -75,15 +75,15 @@ float CustomSteering::calculateDesiredHeading(float steeringMax, float desiredHe
 }
 
 void CustomSteering::drawDebug() {
-    float steeringAngle = ext.GetWheelLargestAngle(playerVehicle);
+    float steeringAngle = g_ext.GetWheelLargestAngle(g_playerVehicle);
 
-    Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(playerVehicle, true);
-    Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(playerVehicle, 1);
-    Vector3 travelRelative = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(playerVehicle, speedVector.x, speedVector.y, speedVector.z);
+    Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
+    Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, 1);
+    Vector3 travelRelative = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, speedVector.x, speedVector.y, speedVector.z);
 
-    float steeringAngleRelX = ENTITY::GET_ENTITY_SPEED(playerVehicle) * -sin(steeringAngle);
-    float steeringAngleRelY = ENTITY::GET_ENTITY_SPEED(playerVehicle) * cos(steeringAngle);
-    Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(playerVehicle, steeringAngleRelX, steeringAngleRelY, 0.0f);
+    float steeringAngleRelX = ENTITY::GET_ENTITY_SPEED(g_playerVehicle) * -sin(steeringAngle);
+    float steeringAngleRelY = ENTITY::GET_ENTITY_SPEED(g_playerVehicle) * cos(steeringAngle);
+    Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, steeringAngleRelX, steeringAngleRelY, 0.0f);
 
     //showText(0.3f, 0.15f, 0.5f, fmt::format("Angle: {}", rad2deg(steeringAngle)));
 
@@ -95,21 +95,21 @@ void CustomSteering::drawDebug() {
 
 // Main custom steering function - called by main loop.
 void CustomSteering::Update() {
-    if (!Util::VehicleAvailable(playerVehicle, playerPed))
+    if (!Util::VehicleAvailable(g_playerVehicle, g_playerPed))
         return;
 
-    if (settings.Debug.DisplayInfo)
+    if (g_settings.Debug.DisplayInfo)
         drawDebug();
 
-    float limitRadians = ext.GetMaxSteeringAngle(playerVehicle);
+    float limitRadians = g_ext.GetMaxSteeringAngle(g_playerVehicle);
     float reduction = calculateReduction();
 
     float steer = -CONTROLS::GET_DISABLED_CONTROL_NORMAL(1, ControlMoveLeftRight);
 
     float steerCurr;
 
-    float steerValGammaL = pow(-steer, settings.CustomSteering.Gamma);
-    float steerValGammaR = pow(steer, settings.CustomSteering.Gamma);
+    float steerValGammaL = pow(-steer, g_settings.CustomSteering.Gamma);
+    float steerValGammaR = pow(steer, g_settings.CustomSteering.Gamma);
     float steerValGamma = steer < 0.0f ? -steerValGammaL : steerValGammaR;
 
     // TODO: Other approach to smoothing input. Config transform speed.
@@ -132,22 +132,22 @@ void CustomSteering::Update() {
 //https://developercommunity.visualstudio.com/content/problem/549386/c4307-warning-in-c17-constexpr-code-reported-with.html
 //https://developercommunity.visualstudio.com/content/problem/211134/unsigned-integer-overflows-in-constexpr-functionsa.html
 #pragma warning( disable : 4307 )
-    switch (ENTITY::GET_ENTITY_MODEL(playerVehicle)) {
+    switch (ENTITY::GET_ENTITY_MODEL(g_playerVehicle)) {
     case joaat("TOWTRUCK"):
     case joaat("TOWTRUCK2"):
-        if (!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(playerVehicle))
+        if (!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(g_playerVehicle))
             CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveUpDown, true);
         CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
         break;
     case joaat("deluxo"):
     case joaat("stromberg"):
-        if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(playerVehicle)) {
+        if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(g_playerVehicle)) {
             CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveUpDown, true);
             CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
         }
     case joaat("oppressor"):
     case joaat("oppressor2"):
-        if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(playerVehicle))
+        if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(g_playerVehicle))
             CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
         break;
     default:
@@ -157,6 +157,6 @@ void CustomSteering::Update() {
     }
 
     // Both need to be set, top one with radian limit
-    ext.SetSteeringAngle(playerVehicle, desiredHeading);
-    ext.SetSteeringInputAngle(playerVehicle, desiredHeading * (1.0f / limitRadians));
+    g_ext.SetSteeringAngle(g_playerVehicle, desiredHeading);
+    g_ext.SetSteeringInputAngle(g_playerVehicle, desiredHeading * (1.0f / limitRadians));
 }

@@ -3,7 +3,7 @@
 #include "../Util/TimeHelper.hpp"
 #include <string>
 
-extern ScriptSettings settings;
+extern ScriptSettings g_settings;
 
 XInputController::XInputController(int playerNumber)
     : pressTime()
@@ -66,7 +66,7 @@ bool XInputController::IsButtonPressed(XboxButtons buttonType) {
         buttonType == LeftThumbDown ||
         buttonType == RightThumbUp ||
         buttonType == RightThumbDown) {
-        return (GetAnalogValue(buttonType) > settings.Controller.TriggerValue);
+        return (GetAnalogValue(buttonType) > g_settings.Controller.TriggerValue);
     }
     return (buttonState & XboxButtonMasks[buttonType]) != 0;
 }

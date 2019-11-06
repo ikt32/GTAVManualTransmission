@@ -17,13 +17,13 @@
 
 class NPCVehicle;
 
-extern ScriptSettings settings;
-extern VehicleExtensions ext;
-extern Ped playerPed;
-extern Vehicle playerVehicle;
+extern ScriptSettings g_settings;
+extern VehicleExtensions g_ext;
+extern Ped g_playerPed;
+extern Vehicle g_playerVehicle;
 
-std::vector<Vehicle> ignoredVehicles;
-std::vector<NPCVehicle> npcVehicles;
+std::vector<Vehicle> g_ignoredVehicles;
+std::vector<NPCVehicle> g_npcVehicles;
 
 DWORD   raycastUpdateTime = 0;
 
@@ -48,18 +48,18 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
     if (npcVehicle == 0 || !ENTITY::DOES_ENTITY_EXIST(npcVehicle))
         return;
 
-    bool playerPassenger = !Util::IsPedOnSeat(npcVehicle, playerPed, -1) && 
-        PED::GET_VEHICLE_PED_IS_IN(playerPed, false) == npcVehicle;
+    bool playerPassenger = !Util::IsPedOnSeat(npcVehicle, g_playerPed, -1) && 
+        PED::GET_VEHICLE_PED_IS_IN(g_playerPed, false) == npcVehicle;
 
     bool lookBack = CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleLookBehind) == TRUE;
-    auto vehPos = ENTITY::GET_ENTITY_COORDS(playerVehicle, true);
+    auto vehPos = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
     float searchdist = 50.0f;
     float searchfov = 15.0f;
 
     Vector3 targetPos = ENTITY::GET_ENTITY_COORDS(npcVehicle, true);
     Vector3 direction = Normalize(targetPos - vehPos);
     float vehDirection = atan2(direction.y, direction.x) * (180.0f / 3.14159f);
-    float myHeading = ENTITY::GET_ENTITY_HEADING(playerVehicle) + 90.0f;
+    float myHeading = ENTITY::GET_ENTITY_HEADING(g_playerVehicle) + 90.0f;
     if (lookBack) myHeading += 180.0f;
     float latDist = GetAngleBetween(vehDirection, myHeading, searchfov);
     if (latDist < searchfov || playerPassenger) {
@@ -74,7 +74,7 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
             auto plate = VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(npcVehicle);
 
             Color thColor = fgColor;
-            float throttle = ext.GetThrottleP(npcVehicle);
+            float throttle = g_ext.GetThrottleP(npcVehicle);
 
             if (throttle >= 0.0f) {
                 thColor.R = static_cast<int>(map(throttle, 0.0f, 1.0f, 255.0f, 0.0f));
@@ -86,18 +86,18 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
             }
 
             Color brColor = fgColor;
-            float brake = ext.GetBrakeP(npcVehicle);
+            float brake = g_ext.GetBrakeP(npcVehicle);
 
             brColor.B = static_cast<int>(map(brake, 0.0f, 1.0f, 255.0f, 0.0f));
             brColor.G = static_cast<int>(map(brake, 0.0f, 1.0f, 255.0f, 0.0f));
 
             Color rpmColor = fgColor;
-            float rpm = ext.GetCurrentRPM(npcVehicle);
+            float rpm = g_ext.GetCurrentRPM(npcVehicle);
             rpmColor.G = static_cast<int>(map(rpm, 0.0f, 1.0f, 255.0f, 165.0f));
             rpmColor.B = static_cast<int>(map(rpm, 0.0f, 1.0f, 255.0f, 0.0f));
 
             auto gearStates = _npcVehicle.GetGearbox();
-            auto load = gearStates.ThrottleHang - map(ext.GetCurrentRPM(npcVehicle), 0.2f, 1.0f, 0.0f, 1.0f);
+            auto load = gearStates.ThrottleHang - map(g_ext.GetCurrentRPM(npcVehicle), 0.2f, 1.0f, 0.0f, 1.0f);
 
             showDebugInfo3DColors(targetPos,
                 {
@@ -105,9 +105,9 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
                     //{ plate, fgColor },
                     { "Throttle: " + std::to_string(throttle), thColor },
                     { "Brake: " + std::to_string(brake), brColor },
-                    { "Steer:" + std::to_string(ext.GetSteeringAngle(npcVehicle)), fgColor },
+                    { "Steer:" + std::to_string(g_ext.GetSteeringAngle(npcVehicle)), fgColor },
                     { "RPM: " + std::to_string(rpm), rpmColor },
-                    { fmt::format("Gear: {}/{}", ext.GetGearCurr(npcVehicle), ext.GetTopGear(npcVehicle)), fgColor },
+                    { fmt::format("Gear: {}/{}", g_ext.GetGearCurr(npcVehicle), g_ext.GetTopGear(npcVehicle)), fgColor },
                     { fmt::format("Load: {}", load), fgColor },
                     { fmt::format("Shifting: {}", gearStates.Shifting), fgColor },
                     { fmt::format("TH: {}", gearStates.ThrottleHang), fgColor },
@@ -119,7 +119,7 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
 
 void showNPCsInfo(const std::vector<NPCVehicle>& vehicles) {
     for (const auto& vehicle : vehicles) {
-        if (Util::IsPedOnSeat(vehicle.GetVehicle(), playerPed, -1))
+        if (Util::IsPedOnSeat(vehicle.GetVehicle(), g_playerPed, -1))
             continue;
         showNPCInfo(vehicle);
     }
@@ -143,13 +143,13 @@ void updateShifting(Vehicle npcVehicle, VehicleGearboxStates& gearStates) {
     if (!gearStates.Shifting)
         return;
 
-    auto handlingPtr = ext.GetHandlingPtr(npcVehicle);
+    auto handlingPtr = g_ext.GetHandlingPtr(npcVehicle);
     // This is x Clutch per second? e.g. changerate 2.5 -> clutch fully (dis)engages in 1/2.5 seconds? or whole thing?
     float rateUp = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
     float rateDown = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleDownShift);
 
     float shiftRate = gearStates.ShiftDirection == ShiftDirection::Up ? rateUp : rateDown;
-    shiftRate *= settings.ShiftOptions.ClutchRateMult;
+    shiftRate *= g_settings.ShiftOptions.ClutchRateMult;
 
     /*
      * 4.0 gives similar perf as base - probably the whole shift takes 1/rate seconds
@@ -196,21 +196,21 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
     if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(npcVehicle)) 
         return;
 
-    auto topGear = ext.GetTopGear(npcVehicle);
-    auto currGear = ext.GetGearCurr(npcVehicle);
+    auto topGear = g_ext.GetTopGear(npcVehicle);
+    auto currGear = g_ext.GetGearCurr(npcVehicle);
 
     if (topGear == 1 || currGear == 0)
         return;
 
-    float throttle = ext.GetThrottleP(npcVehicle);
-    auto gearRatios = ext.GetGearRatios(npcVehicle);
-    float driveMaxFlatVel = ext.GetDriveMaxFlatVel(npcVehicle);
-    float rpm = ext.GetCurrentRPM(npcVehicle);
+    float throttle = g_ext.GetThrottleP(npcVehicle);
+    auto gearRatios = g_ext.GetGearRatios(npcVehicle);
+    float driveMaxFlatVel = g_ext.GetDriveMaxFlatVel(npcVehicle);
+    float rpm = g_ext.GetCurrentRPM(npcVehicle);
 
     if (throttle >= gearStates.ThrottleHang)
         gearStates.ThrottleHang = throttle;
     else if (gearStates.ThrottleHang > 0.0f)
-        gearStates.ThrottleHang -= GAMEPLAY::GET_FRAME_TIME() * settings.AutoParams.EcoRate;
+        gearStates.ThrottleHang -= GAMEPLAY::GET_FRAME_TIME() * g_settings.AutoParams.EcoRate;
 
     if (gearStates.ThrottleHang < 0.0f)
         gearStates.ThrottleHang = 0.0f;
@@ -219,22 +219,22 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
 
     float nextGearMinSpeed = 0.0f; // don't care about top gear
     if (currGear < topGear) {
-        nextGearMinSpeed = settings.AutoParams.NextGearMinRPM * driveMaxFlatVel / gearRatios[currGear + 1];
+        nextGearMinSpeed = g_settings.AutoParams.NextGearMinRPM * driveMaxFlatVel / gearRatios[currGear + 1];
     }
 
-    float currGearMinSpeed = settings.AutoParams.CurrGearMinRPM * driveMaxFlatVel / gearRatios[currGear];
+    float currGearMinSpeed = g_settings.AutoParams.CurrGearMinRPM * driveMaxFlatVel / gearRatios[currGear];
 
     float engineLoad = gearStates.ThrottleHang - map(rpm, 0.2f, 1.0f, 0.0f, 1.0f);
 
     bool skidding = false;
-    for (auto x : ext.GetWheelSkidSmokeEffect(npcVehicle)) {
+    for (auto x : g_ext.GetWheelSkidSmokeEffect(npcVehicle)) {
         if (abs(x) > 3.5f)
             skidding = true;
     }
 
     // Shift up.
     if (currGear < topGear) {
-        if (engineLoad < settings.AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
+        if (engineLoad < g_settings.AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
             shiftTo(gearStates, currGear + 1, true);
             gearStates.FakeNeutral = false;
             gearStates.LastUpshiftTime = GAMEPLAY::GET_GAME_TIMER();
@@ -251,13 +251,13 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
         gearRatioRatio = map(gearRatioRatio, 1.0f, 2.0f, 1.0f, 4.0f);
     }
 
-    float rateUp = *reinterpret_cast<float*>(ext.GetHandlingPtr(npcVehicle) + hOffsets.fClutchChangeRateScaleUpShift);
-    float upshiftDuration = 1.0f / (rateUp * settings.ShiftOptions.ClutchRateMult);
-    bool tpPassed = GAMEPLAY::GET_GAME_TIMER() > gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * settings.AutoParams.DownshiftTimeoutMult);
+    float rateUp = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(npcVehicle) + hOffsets.fClutchChangeRateScaleUpShift);
+    float upshiftDuration = 1.0f / (rateUp * g_settings.ShiftOptions.ClutchRateMult);
+    bool tpPassed = GAMEPLAY::GET_GAME_TIMER() > gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings.AutoParams.DownshiftTimeoutMult);
 
     // Shift down
     if (currGear > 1) {
-        if (tpPassed && engineLoad > settings.AutoParams.DownshiftLoad * gearRatioRatio || currSpeed < currGearMinSpeed) {
+        if (tpPassed && engineLoad > g_settings.AutoParams.DownshiftLoad * gearRatioRatio || currSpeed < currGearMinSpeed) {
             shiftTo(gearStates, currGear - 1, true);
             gearStates.FakeNeutral = false;
         }
@@ -271,10 +271,10 @@ std::set<Vehicle> updateRaycastVehicles() {
     std::set<Vehicle> uniqueVehicles;
     for (uint32_t i = 0; i < numCasts; ++i) {
         auto angle = static_cast<float>(static_cast<double>(i) / static_cast<double>(numCasts) * 2.0 * M_PI);
-        auto raycastCoordA = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(playerPed, distMin * cos(angle), distMin * sin(angle), 0.0f);
-        auto raycastCoordB = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(playerPed, distMax * cos(angle), distMax * sin(angle), 0.0f);
+        auto raycastCoordA = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerPed, distMin * cos(angle), distMin * sin(angle), 0.0f);
+        auto raycastCoordB = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerPed, distMax * cos(angle), distMax * sin(angle), 0.0f);
         auto ray = WORLDPROBE::_START_SHAPE_TEST_RAY(
-            raycastCoordA.x, raycastCoordA.y, raycastCoordA.z, raycastCoordB.x, raycastCoordB.y, raycastCoordB.z, 10, playerVehicle, 0);
+            raycastCoordA.x, raycastCoordA.y, raycastCoordA.z, raycastCoordB.x, raycastCoordB.y, raycastCoordB.z, 10, g_playerVehicle, 0);
         BOOL hit;
         Vector3 endCoords, surfaceNormal;
         Entity entity;
@@ -290,20 +290,20 @@ std::set<Vehicle> updateRaycastVehicles() {
 
 void updateNPCVehicles(std::vector<NPCVehicle>& vehicles) {
     for(auto& vehicle : vehicles) {
-        if (Util::IsPedOnSeat(vehicle.GetVehicle(), playerPed, -1))
+        if (Util::IsPedOnSeat(vehicle.GetVehicle(), g_playerPed, -1))
             continue;
 
-        bool ignored = std::find_if(ignoredVehicles.begin(), ignoredVehicles.end(), [&](const auto & ignoredVehicle) {
+        bool ignored = std::find_if(g_ignoredVehicles.begin(), g_ignoredVehicles.end(), [&](const auto & ignoredVehicle) {
             return ignoredVehicle == vehicle.GetVehicle();
-        }) != ignoredVehicles.end();
+        }) != g_ignoredVehicles.end();
         if (ignored)
             continue;
 
         updateNPCVehicle(vehicle);
 
         updateShifting(vehicle.GetVehicle(), vehicle.GetGearbox());
-        ext.SetGearCurr(vehicle.GetVehicle(), vehicle.GetGearbox().LockGear);
-        ext.SetGearNext(vehicle.GetVehicle(), vehicle.GetGearbox().LockGear);
+        g_ext.SetGearCurr(vehicle.GetVehicle(), vehicle.GetGearbox().LockGear);
+        g_ext.SetGearNext(vehicle.GetVehicle(), vehicle.GetGearbox().LockGear);
     }
 }
 
@@ -332,7 +332,7 @@ void updateNPCVehicleList(const std::vector<Vehicle>& newVehicles, std::vector<N
 
 void update_npc() {
     bool mtActive = MemoryPatcher::NumGearboxPatched > 0;
-    if (!settings.Debug.DisplayNPCInfo && !mtActive) 
+    if (!g_settings.Debug.DisplayNPCInfo && !mtActive) 
         return;
 
     const int ARR_SIZE = 1024;
@@ -346,25 +346,25 @@ void update_npc() {
             raycastUpdateTime = GetTickCount();
             auto raycastVehicles = updateRaycastVehicles();
             auto raycastVehicles_ = std::vector<Vehicle>(raycastVehicles.begin(), raycastVehicles.end());
-            updateNPCVehicleList(raycastVehicles_, npcVehicles);
+            updateNPCVehicleList(raycastVehicles_, g_npcVehicles);
 
-            if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(playerVehicle, -1) != playerPed) {
-                npcVehicles.emplace_back(playerVehicle);
+            if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(g_playerVehicle, -1) != g_playerPed) {
+                g_npcVehicles.emplace_back(g_playerVehicle);
             }
 
         }
     }
     else {
-        updateNPCVehicleList(vehicles, npcVehicles);
+        updateNPCVehicleList(vehicles, g_npcVehicles);
     }
 
-    if (settings.Debug.DisplayNPCInfo) {
+    if (g_settings.Debug.DisplayNPCInfo) {
         showText(0.9, 0.5, 0.4, "NPC Vehs: " + std::to_string(count));
-        showNPCsInfo(npcVehicles);
+        showNPCsInfo(g_npcVehicles);
     }
 
     if (mtActive) {
-        updateNPCVehicles(npcVehicles);
+        updateNPCVehicles(g_npcVehicles);
     }
 }
 
