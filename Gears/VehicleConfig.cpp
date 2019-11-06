@@ -77,6 +77,6 @@ void VehicleConfig::loadSettings(const ScriptSettings& gSettings, const std::str
     Wheel.FFB.CollisionMult = settingsIni.GetDoubleValue("FORCE_FEEDBACK", "CollisionMult", gSettings.Wheel.FFB.CollisionMult);
 
     // [STEER]
-    Wheel.Steering.Angle = settingsIni.GetDoubleValue("STEER", "Steer", gSettings.Wheel.Steering.AngleCar);
+    Wheel.Steering.Angle = settingsIni.GetDoubleValue("STEER", "Angle", gSettings.Wheel.Steering.AngleCar);
 }
 #pragma warning(pop)
