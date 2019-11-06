@@ -110,7 +110,7 @@ void ScriptSettings::SaveGeneral() const {
     // [MT_OPTIONS]
     settingsGeneral.SetBoolValue("MT_OPTIONS", "Enable", MTOptions.Enable);
     settingsGeneral.SetLongValue("MT_OPTIONS", "ShiftMode", EToInt(MTOptions.ShiftMode));
-    settingsGeneral.SetLongValue("MT_OPTIONS", "Override", MTOptions.Override);
+    settingsGeneral.SetBoolValue("MT_OPTIONS", "Override", MTOptions.Override);
 
     settingsGeneral.SetBoolValue("MT_OPTIONS", "EngineDamage", MTOptions.EngDamage);
     settingsGeneral.SetBoolValue("MT_OPTIONS", "EngineStalling", MTOptions.EngStallH);
