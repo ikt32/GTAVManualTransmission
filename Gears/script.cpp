@@ -116,6 +116,9 @@ void functionHillGravity();
 void setVehicleConfig(Vehicle vehicle) {
     g_activeConfig = nullptr;
     g_settings.SetVehicleConfig(nullptr);
+    if (!g_settings.MTOptions.Override)
+        return;
+
     if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
         auto currModel = ENTITY::GET_ENTITY_MODEL(vehicle);
         auto it = std::find_if(g_vehConfigs.begin(), g_vehConfigs.end(),
