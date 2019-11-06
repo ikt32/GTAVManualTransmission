@@ -2,7 +2,7 @@
 
 ## 4.7.0
 
-Warning: Many options are relocated. The script will generate missing entries, so no action is needed, but affected settings will be reset to their default values. However, it's recommended to start with a clean settings file to reduce confusion when manually changing settings.
+Warning: Many options are relocated. The script will generate missing entries, so no action is needed, but affected settings will be reset to their default values. However, it's recommended to start with clean default settings.
 
 New Steering Wheel features and improvements:
 
@@ -14,6 +14,7 @@ New Steering Wheel features and improvements:
 
 New general features and improvements:
 
+* Add per-vehicle configuration, overriding a selection of main settings
 * Add an enhanced custom steering mode for keyboard and controller
 * Add Traction Control as driving assist
 * Upgrade AI shifting logic to player logic, allowing AI to cruise at higher gears and select lower gears on demand more dynamically
