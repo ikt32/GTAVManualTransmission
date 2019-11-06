@@ -238,8 +238,8 @@ void onMenuInit() {
 
 void saveChanges() {
     g_settings.SaveGeneral();
-    g_settings.SaveController(&g_controls);
-    g_settings.SaveWheel(&g_controls);
+    g_settings.SaveController();
+    g_settings.SaveWheel();
     loadConfigs();
 }
 
@@ -774,7 +774,7 @@ void update_wheelmenu() {
 
     if (g_menu.BoolOption("Logitech RPM LEDs", g_settings.Wheel.Options.LogiLEDs,
         { "Show the RPM LEDs on Logitech steering wheels. If the wheel doesn't have compatible RPM LEDs, this might crash." })) {
-        g_settings.SaveWheel(&g_controls);
+        g_settings.SaveWheel();
     }
 
     g_menu.MenuOption("Analog input setup", "axesmenu",

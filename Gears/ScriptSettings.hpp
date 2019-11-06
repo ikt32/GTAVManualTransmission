@@ -23,8 +23,8 @@ public:
     void SetFiles(const std::string &general, const std::string &wheel);
     void Read(CarControls* scriptControl);
     void SaveGeneral() const;
-    void SaveController(CarControls *scriptControl) const;
-    void SaveWheel(CarControls *scriptControl) const;
+    void SaveController() const;
+    void SaveWheel() const;
 
     void SetVehicleConfig(VehicleConfig* cfg);
     ScriptSettings operator()();
@@ -361,7 +361,8 @@ public:
     bool SteeringClearWheelToKey(int button);
 
 private:
-    void parseSettingsGeneral(CarControls *scriptControl);
+    void parseSettingsGeneral();
+    void parseSettingsControls(CarControls* scriptControl);
     void parseSettingsWheel(CarControls *scriptControl);
 
     // Just looks up which GUID corresponds with what number and returns the GUID.
