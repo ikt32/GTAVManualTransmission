@@ -302,7 +302,7 @@ void update_mainmenu() {
         "Choose your gearbox! Options are Sequential, H-pattern and Automatic."
     };
 
-    if (g_settings.MTOptions.Override) {
+    if (g_settings.MTOptions.Override && g_activeConfig != nullptr) {
         detailsTemp.push_back(fmt::format("Temporarily change shift mode for current override: [{}]", g_activeConfig->Name));
     }
 
