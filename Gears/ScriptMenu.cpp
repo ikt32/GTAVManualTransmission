@@ -240,6 +240,7 @@ void saveChanges() {
     g_settings.SaveGeneral();
     g_settings.SaveController(&g_controls);
     g_settings.SaveWheel(&g_controls);
+    loadConfigs();
 }
 
 void onMenuClose() {

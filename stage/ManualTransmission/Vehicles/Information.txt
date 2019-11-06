@@ -2,6 +2,11 @@
 ; When your current car matches a model or a plate, the ini settings are
 ; used instead of the main script settings.
 
+; Note: While a custom vehicle settings configuration is active, live changes
+; in the menu do not apply _until the menu is closed_.
+;   Closing the menu saves settings_general.ini and settings_wheel.ini,
+;   and reloads the overrides with the new main settings.
+
 [ID]
 ; Model (spawn) names, separated by a space.
 ModelName = futo ae86
@@ -9,9 +14,9 @@ ModelName = futo ae86
 ; When a plate matches, the model isn't checked.
 Plate = TOFU FUJIWARA
 
-; All settings listed below can be set, and override the corresponding
+; All settings listed below can be used to override the corresponding
 ; main settings.
-; When a setting is not set, the main setting will be used.
+; When a setting is not present, the main setting will be used.
 
 [MT_OPTIONS]
 ShiftMode = 1
