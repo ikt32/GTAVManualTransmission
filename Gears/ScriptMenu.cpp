@@ -37,6 +37,7 @@ extern NativeMenu::Menu g_menu;
 extern CarControls g_controls;
 extern ScriptSettings g_settings;
 
+extern std::vector<VehicleConfig> g_vehConfigs;
 extern VehicleConfig* g_activeConfig;
 
 struct SFont {
@@ -206,6 +207,10 @@ namespace {
 
     const std::vector<std::string> tcsStrings{
         "Disabled", "Brakes", "Throttle"
+    };
+
+    const std::vector<std::string> absStrings = {
+        "Disabled", "On if missing", "Always on"
     };
 
     const std::vector<std::string> notifyLevelStrings{
@@ -379,6 +384,9 @@ void update_settingsmenu() {
 
     g_menu.MenuOption("Automatic finetuning", "finetuneautooptionsmenu",
         { "Fine-tune script-provided automatic transmission parameters." });
+
+    g_menu.MenuOption("Custom vehicle settings", "vehconfigmenu",
+        { "Configurations overriding mod-wide settings, for specific vehicles." });
 }
 
 void update_featuresmenu() {
@@ -477,6 +485,107 @@ void update_finetuneautooptionsmenu() {
         { "On releasing throttle, high values cause earlier upshifts.",
           "Set this low to stay in gear longer when releasing throttle." });
 }
+
+std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
+    std::string modelNames;
+    for (auto it = config.ModelNames.begin(); it != config.ModelNames.end(); ++it) {
+        modelNames += fmt::format("[{}]", *it);
+        if (std::next(it) != config.ModelNames.end())
+            modelNames += " ";
+    }
+    if (config.ModelNames.empty())
+        modelNames = "None";
+
+    std::string plates;
+    for (auto it = config.Plates.begin(); it != config.Plates.end(); ++it) {
+        plates += fmt::format("[{}]", *it);
+        if (std::next(it) != config.Plates.end())
+            plates += " ";
+    }
+    if (config.Plates.empty())
+        plates = "None";
+
+    unsigned absMode = 0;
+    if (config.DriveAssists.CustomABS) {
+        if (config.DriveAssists.ABSFilter) {
+            absMode = 1;
+        }
+        else {
+            absMode = 2;
+        }
+    }
+
+    std::string shiftAssist;
+    if (config.ShiftOptions.UpshiftCut)
+        shiftAssist += "Up";
+    if (config.ShiftOptions.DownshiftBlip)
+        shiftAssist += " & Down";
+    if (shiftAssist.empty())
+        shiftAssist = "None";
+
+    std::vector<std::string> extras{
+        "Compatible cars:",
+        fmt::format("\tModels: {}", modelNames),
+        fmt::format("\tPlates: {}", plates),
+        "Shifting options:",
+        fmt::format("\tShift mode: {}", gearboxModes[static_cast<int>(config.MTOptions.ShiftMode)]),
+        fmt::format("\tClutch creep: {}", config.MTOptions.ClutchCreep),
+        fmt::format("\tSequential assist: {}", shiftAssist),
+        "Driving assists:",
+        fmt::format("\tABS: {}", absStrings[absMode]),
+        fmt::format("\tTCS: {}", tcsStrings[config.DriveAssists.TCMode]),
+        "Steering wheel:",
+        fmt::format("\tAngle: {:.0f}", config.Wheel.Steering.Angle),
+        fmt::format("\tFFB Mult: {:.0f}", config.Wheel.FFB.SATAmpMult),
+        fmt::format("\tFFB Limit: {:.0f}", config.Wheel.FFB.SATMax)
+    };
+    return extras;
+}
+
+void update_vehconfigmenu() {
+    g_menu.Title("Custom vehicle settings");
+    std::string cfgName = "No active override";
+    if (g_activeConfig != nullptr)
+        cfgName = g_activeConfig->Name;
+    g_menu.Subtitle(cfgName);
+
+    g_menu.BoolOption("Enable overrides", g_settings.MTOptions.Override);
+
+    if (g_activeConfig != nullptr) {
+        bool sel = false;
+        g_menu.OptionPlus(fmt::format("[{}] Overview", g_activeConfig->Name), {}, &sel, nullptr, nullptr, "", {
+            "For more info, check the file itself." });
+        if (sel) {
+            auto extras = formatVehicleConfig(*g_activeConfig);
+            g_menu.OptionPlusPlus(extras, "Config overview");
+        }
+    }
+    else {
+        g_menu.Option("No active override");
+    }
+
+    for (const auto& vehConfig : g_vehConfigs) {
+        bool sel = false;
+        g_menu.OptionPlus(vehConfig.Name, {}, &sel, nullptr, nullptr, "");
+        if (sel) {
+            auto extras = formatVehicleConfig(vehConfig);
+            g_menu.OptionPlusPlus(extras, "Config overview");
+        }
+    }
+
+    if (g_vehConfigs.empty()) {
+        g_menu.OptionPlus("No configurations found", {}, nullptr, nullptr, nullptr, "Instructions", {
+            "Overrides allow you to specify custom rules for specific vehicles, that override the global settings.",
+            "For example, you can set different default shift modes, set which assists are active, or use different force feedback profiles for each car.",
+            R"(Check the "Vehicles" folder inside the "ManualTransmission folder for more information!")"
+            });
+    }
+
+    if (g_menu.Option("Reload configs")) {
+        loadConfigs();
+    }
+}
+
 
 void update_controlsmenu() {
     g_menu.Title("Controls");
@@ -1287,6 +1396,9 @@ void update_menu() {
 
     /* mainmenu -> settingsmenu -> finetuneautooptionsmenu */
     if (g_menu.CurrentMenu("finetuneautooptionsmenu")) { update_finetuneautooptionsmenu(); }
+
+    /* mainmenu -> vehconfigmenu */
+    if (g_menu.CurrentMenu("vehconfigmenu")) { update_vehconfigmenu(); }
 
     /* mainmenu -> controlsmenu */
     if (g_menu.CurrentMenu("controlsmenu")) { update_controlsmenu(); }

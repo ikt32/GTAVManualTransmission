@@ -1798,6 +1798,34 @@ void functionHidePlayerInFPV(bool optionToggled) {
 //                              Script entry
 ///////////////////////////////////////////////////////////////////////////////
 
+void loadConfigs() {
+    logger.Write(DEBUG, "Clearing and reloading vehicle configs...");
+    g_vehConfigs.clear();
+    const std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
+    const std::string vehConfigsPath = absoluteModPath + "\\Vehicles";
+
+    if (!(fs::exists(fs::path(vehConfigsPath)) && fs::is_directory(fs::path(vehConfigsPath)))) {
+        logger.Write(WARN, "Directory [%s] not found!", vehConfigsPath.c_str());
+        return;
+    }
+
+    for (auto& file : fs::directory_iterator(vehConfigsPath)) {
+        if (StrUtil::toLower(fs::path(file).extension().string()) != ".ini")
+            continue;
+
+        VehicleConfig config(g_settings, file.path().string());
+        if (config.ModelNames.empty() && config.Plates.empty()) {
+            logger.Write(WARN,
+                "Vehicle settings file [%s] contained no model names or plates, skipping...",
+                file.path().string().c_str());
+            continue;
+        }
+        g_vehConfigs.push_back(config);
+        logger.Write(DEBUG, "Loaded vehicle config [%s]", config.Name.c_str());
+    }
+    logger.Write(INFO, "Configs loaded: %d", g_vehConfigs.size());
+}
+
 void readSettings() {
     g_settings.Read(&g_controls);
     if (g_settings.Debug.LogLevel > 4) g_settings.Debug.LogLevel = 1;
@@ -1805,23 +1833,6 @@ void readSettings() {
 
     g_gearStates.FakeNeutral = g_settings.GameAssists.DefaultNeutral;
     g_menu.ReadSettings();
-
-    g_vehConfigs.clear();
-    const std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
-    std::string vehSettingsPath = absoluteModPath + "\\Vehicles";
-    for (auto& file : fs::directory_iterator(vehSettingsPath)) {
-        if (StrUtil::toLower(fs::path(file).extension().string()) != ".ini")
-            continue;
-
-        VehicleConfig settings(g_settings, file.path().string());
-        if (settings.ModelNames.empty() && settings.Plates.empty()) {
-            logger.Write(WARN,
-                "Vehicle settings file [%s] contained no model names or plates, skipping...",
-                file.path().string().c_str());
-            continue;
-        }
-        g_vehConfigs.push_back(settings);
-    }
 
     logger.Write(INFO, "Settings read");
 }
@@ -1879,6 +1890,7 @@ void main() {
     g_menu.SetFiles(settingsMenuFile);
     g_menu.Initialize();
     readSettings();
+    loadConfigs();
 
     if (g_settings.Update.EnableUpdate) {
         threadCheckUpdate();

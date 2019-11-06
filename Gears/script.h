@@ -35,6 +35,7 @@ void fakeRev(bool customThrottle = false, float customThrottleVal = 0.0f);
 ///////////////////////////////////////////////////////////////////////////////
 //                              Script entry
 ///////////////////////////////////////////////////////////////////////////////
+void loadConfigs(); // Vehicle override configs
 void readSettings();
 void ScriptMain();
 void NPCMain();

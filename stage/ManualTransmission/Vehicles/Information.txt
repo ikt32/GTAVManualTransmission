@@ -1,0 +1,66 @@
+; The script finds .ini files in this folder and loads them into the script.
+; When your current car matches a model or a plate, the ini settings are
+; used instead of the main script settings.
+
+[ID]
+; Model (spawn) names, separated by a space.
+ModelName = futo ae86
+; Plates, separated by a space.
+; When a plate matches, the model isn't checked.
+Plate = TOFU FUJIWARA
+
+; All settings listed below can be set, and override the corresponding
+; main settings.
+; When a setting is not set, the main setting will be used.
+
+[MT_OPTIONS]
+ShiftMode = 1
+ClutchCatching = true
+
+[MT_PARAMS]
+ClutchCatchpoint = 0.250000
+StallingThreshold = 0.300000
+StallingRPM = 0.150000
+RPMDamage = 0.100000
+MisshiftDamage = 5.000000
+EngBrakePower = 0.050000
+EngBrakeThreshold = 0.750000
+
+[DRIVING_ASSISTS]
+CustomABS = false
+ABSFilter = true
+TractionControl = 0
+
+[SHIFT_OPTIONS]
+UpshiftCut = false
+DownshiftBlip = false
+ClutchRateMult = 1.000000
+RPMTolerance = 0.200000
+
+[AUTO_PARAMS]
+UpshiftLoad = 0.040000
+DownshiftLoad = 0.450000
+NextGearMinRPM = 0.330000
+CurrGearMinRPM = 0.270000
+EcoRate = 0.050000
+DownshiftTimeoutMult = 1.000000
+
+; Different configurations can now use 
+; completely different force feedback profiles.
+[FORCE_FEEDBACK]
+Enable = true
+Scale = true
+AntiDeadForce = 600
+SATAmpMult = 1.0
+SATMax = 10000
+SATFactor = 0.5
+DamperMax = 100
+DamperMin = 25
+DamperMinSpeed = 2.4
+DetailMult = 2.0
+DetailLim = 5000
+DetailMAW = 2
+CollisionMult = 2.5
+
+[STEER]
+Angle=900
