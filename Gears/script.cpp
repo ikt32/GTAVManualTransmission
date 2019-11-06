@@ -1827,6 +1827,7 @@ void loadConfigs() {
         logger.Write(DEBUG, "Loaded vehicle config [%s]", config.Name.c_str());
     }
     logger.Write(INFO, "Configs loaded: %d", g_vehConfigs.size());
+    setVehicleConfig(g_playerVehicle);
 }
 
 void readSettings() {
