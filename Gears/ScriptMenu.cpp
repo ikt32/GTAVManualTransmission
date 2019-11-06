@@ -537,7 +537,7 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
         "Steering wheel:",
         fmt::format("\tAngle: {:.0f}", config.Wheel.Steering.Angle),
         fmt::format("\tFFB Mult: {:.0f}", config.Wheel.FFB.SATAmpMult),
-        fmt::format("\tFFB Limit: {:.0f}", config.Wheel.FFB.SATMax)
+        fmt::format("\tFFB Limit: {}", config.Wheel.FFB.SATMax)
     };
     return extras;
 }
