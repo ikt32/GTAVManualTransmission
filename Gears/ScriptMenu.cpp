@@ -1990,7 +1990,7 @@ bool configKeyboardKey(const std::string &confTag) {
 // Controller
 bool configControllerButton(const std::string &confTag) {
     std::string additionalInfo = fmt::format("Press {} to exit", escapeKey);
-    XInputController controller = g_controls.GetController();
+    XInputController& controller = g_controls.GetController();
 
     while (true) {
         if (IsKeyJustUp(str2key(escapeKey))) {
