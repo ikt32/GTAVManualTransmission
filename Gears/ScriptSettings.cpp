@@ -91,8 +91,9 @@ ScriptSettings ScriptSettings::operator()() {
 #pragma warning(push)
 #pragma warning(disable: 4244)
 
-void ScriptSettings::SetFiles(const std::string &general, const std::string &wheel) {
+void ScriptSettings::SetFiles(const std::string &general, const std::string& controls, const std::string &wheel) {
     settingsGeneralFile = general;
+    settingsControlsFile = controls;
     settingsWheelFile = wheel;
 }
 
@@ -272,7 +273,7 @@ void ScriptSettings::SaveGeneral() const {
 void ScriptSettings::SaveController() const {
     CSimpleIniA ini;
     ini.SetUnicode();
-    SI_Error result = ini.LoadFile(settingsGeneralFile.c_str());
+    SI_Error result = ini.LoadFile(settingsControlsFile.c_str());
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [CONTROLLER]
@@ -296,7 +297,7 @@ void ScriptSettings::SaveController() const {
     ini.SetLongValue("CONTROLLER_NATIVE", "ShiftDownBlocks", Controller.Native.ShiftDownBlocks);
     ini.SetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", Controller.Native.ClutchBlocks);
 
-    result = ini.SaveFile(settingsGeneralFile.c_str());
+    result = ini.SaveFile(settingsControlsFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
 }
 
@@ -520,7 +521,7 @@ void ScriptSettings::parseSettingsGeneral() {
 void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     CSimpleIniA ini;
     ini.SetUnicode();
-    SI_Error result = ini.LoadFile(settingsGeneralFile.c_str());
+    SI_Error result = ini.LoadFile(settingsControlsFile.c_str());
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [CONTROLLER]
@@ -1006,34 +1007,34 @@ bool ScriptSettings::SteeringClearWheelToKey(int button) {
 void ScriptSettings::KeyboardSaveKey(const std::string &confTag, const std::string &key) {
     CSimpleIniA ini;
     ini.SetUnicode();
-    SI_Error result = ini.LoadFile(settingsGeneralFile.c_str());
+    SI_Error result = ini.LoadFile(settingsControlsFile.c_str());
     CHECK_LOG_SI_ERROR(result, "load");
 
     ini.SetValue("KEYBOARD", confTag.c_str(), key.c_str());
-    result = ini.SaveFile(settingsGeneralFile.c_str());
+    result = ini.SaveFile(settingsControlsFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
 }
 void ScriptSettings::ControllerSaveButton(const std::string &confTag, const std::string &button) {
     CSimpleIniA ini;
     ini.SetUnicode();
-    SI_Error result = ini.LoadFile(settingsGeneralFile.c_str());
+    SI_Error result = ini.LoadFile(settingsControlsFile.c_str());
     CHECK_LOG_SI_ERROR(result, "load");
 
     ini.SetValue("CONTROLLER", confTag.c_str(), button.c_str());
 
-    result = ini.SaveFile(settingsGeneralFile.c_str());
+    result = ini.SaveFile(settingsControlsFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
 }
 
 void ScriptSettings::LControllerSaveButton(const std::string &confTag, int button) {
     CSimpleIniA ini;
     ini.SetUnicode();
-    SI_Error result = ini.LoadFile(settingsGeneralFile.c_str());
+    SI_Error result = ini.LoadFile(settingsControlsFile.c_str());
     CHECK_LOG_SI_ERROR(result, "load");
 
     ini.SetLongValue("CONTROLLER_NATIVE", confTag.c_str(), button);
 
-    result = ini.SaveFile(settingsGeneralFile.c_str());
+    result = ini.SaveFile(settingsControlsFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
 }
 

@@ -23,6 +23,7 @@ CONSOLE_SCREEN_BUFFER_INFO csbi;
 CarControls controls;
 
 std::string settingsGeneralFile = Paths::GetRunningExecutableFolder() + "\\settings_general.ini";
+std::string settingsControlsFile = Paths::GetRunningExecutableFolder() + "\\settings_controls.ini";
 std::string settingsWheelFile = Paths::GetRunningExecutableFolder() + "\\settings_wheel.ini";
 ScriptSettings g_settings;
 
@@ -121,7 +122,7 @@ void blankBlock(int x, int y, int lines, int rows) {
  * Similar to reInit() in Gears but with console stuff
  */
 void init() {
-    g_settings.SetFiles(settingsGeneralFile, settingsWheelFile);
+    g_settings.SetFiles(settingsGeneralFile, settingsControlsFile,settingsWheelFile);
 	g_settings.Read(&controls);
 	logger.Write(INFO, "Settings read");
 

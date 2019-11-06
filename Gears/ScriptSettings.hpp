@@ -20,7 +20,7 @@ EShiftMode Next(EShiftMode mode);
 class ScriptSettings {
 public:
     ScriptSettings();
-    void SetFiles(const std::string &general, const std::string &wheel);
+    void SetFiles(const std::string &general, const std::string& controls, const std::string &wheel);
     void Read(CarControls* scriptControl);
     void SaveGeneral() const;
     void SaveController() const;
@@ -370,6 +370,7 @@ private:
 
     int nDevices = 0;
     std::string settingsGeneralFile;
+    std::string settingsControlsFile;
     std::string settingsWheelFile;
     std::string settingsMenuFile;
 };

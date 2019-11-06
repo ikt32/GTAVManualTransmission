@@ -1883,12 +1883,12 @@ void main() {
     logger.Write(INFO, "Script started");
     std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
     std::string settingsGeneralFile = absoluteModPath + "\\settings_general.ini";
+    std::string settingsControlsFile = absoluteModPath + "\\settings_controls.ini";
     std::string settingsWheelFile = absoluteModPath + "\\settings_wheel.ini";
-    std::string settingsStickFile = absoluteModPath + "\\settings_stick.ini";
     std::string settingsMenuFile = absoluteModPath + "\\settings_menu.ini";
     std::string textureWheelFile = absoluteModPath + "\\texture_wheel.png";
 
-    g_settings.SetFiles(settingsGeneralFile, settingsWheelFile);
+    g_settings.SetFiles(settingsGeneralFile, settingsControlsFile,settingsWheelFile);
     g_menu.RegisterOnMain([] { onMenuInit(); });
     g_menu.RegisterOnExit([] { onMenuClose(); });
     g_menu.SetFiles(settingsMenuFile);
