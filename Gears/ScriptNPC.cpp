@@ -14,6 +14,7 @@
 
 #include <fmt/format.h>
 #include "ScriptUtils.h"
+#include "Dump.h"
 
 class NPCVehicle;
 
@@ -371,9 +372,23 @@ void update_npc() {
     }
 }
 
+int filterExceptionNPC(int code, PEXCEPTION_POINTERS ex) {
+    logger.Write(FATAL, "[ NPC ] Caught exception 0x%X", code);
+    logger.Write(FATAL, "[ NPC ]     Exception address 0x%p", ex->ExceptionRecord->ExceptionAddress);
+#ifdef _DEBUG
+    DumpStackTrace(ex);
+#endif
+    return EXCEPTION_EXECUTE_HANDLER;
+}
+
 void NPCMain() {
-    while (true) {
-        update_npc();
-        WAIT(0);
+    __try {
+        while (true) {
+            update_npc();
+            WAIT(0);
+        }
+    }
+    __except (filterExceptionNPC(GetExceptionCode(), GetExceptionInformation())) {
+        logger.Write(FATAL, "Exception in NPC thread?");
     }
 }
