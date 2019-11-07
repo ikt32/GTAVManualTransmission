@@ -69,6 +69,8 @@ VehicleData g_vehData(g_ext);
 std::vector<VehicleConfig> g_vehConfigs;
 VehicleConfig* g_activeConfig;
 
+bool g_focused;
+
 void updateShifting();
 void blockButtons();
 void startStopEngine();
@@ -177,6 +179,19 @@ void update_vehicle() {
 
 // Read inputs
 void update_inputs() {
+    if (g_focused != SysUtil::IsWindowFocused()) {
+        // no focus -> focus
+        if (!g_focused) {
+            logger.Write(DEBUG, "[Wheel] Focus change detected, re-init FFB?");
+            initWheel();// g_controls.InitWheel();
+        }
+        else {
+            logger.Write(DEBUG, "[Wheel] Focus lost");
+            g_controls.StopFFB(true);
+        }
+    }
+    g_focused = SysUtil::IsWindowFocused();
+
     updateLastInputDevice();
     g_controls.UpdateValues(g_controls.PrevInput, false);
 }
@@ -1931,6 +1946,8 @@ void main() {
     USB::Init([]() {
         g_controls.InitWheel();
     });
+
+    g_focused = SysUtil::IsWindowFocused();
 
     logger.Write(DEBUG, "START: Starting with MT:  %s", g_settings.MTOptions.Enable ? "ON" : "OFF");
     logger.Write(INFO, "START: Initialization finished");

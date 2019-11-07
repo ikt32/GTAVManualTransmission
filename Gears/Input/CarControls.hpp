@@ -152,6 +152,7 @@ public:
     ~CarControls();
 
     void InitWheel();
+    void InitFFB();
     void updateKeyboard();
     void updateController();
     float getInputValue(WheelAxisType axisType, WheelControlType buttonType, float minRaw, float maxRaw);

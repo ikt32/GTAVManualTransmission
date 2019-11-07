@@ -22,10 +22,15 @@ void CarControls::InitWheel() {
         return;
     }
 
+    InitFFB();
+}
+
+void CarControls::InitFFB() {
+
     auto steerGUID = WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)];
     auto steerAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)]);
     auto ffAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]);
-    
+
     if (mWheelInput.InitFFB(steerGUID, steerAxis)) {
         mWheelInput.UpdateCenterSteering(steerGUID, ffAxis);
     }
@@ -420,6 +425,8 @@ void CarControls::StopFFB(bool turnOffLeds) {
     if (turnOffLeds) {
         mWheelInput.PlayLedsDInput(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)], 0.0, 0.5, 1.0);
     }
+    PlayFFBDynamics(0, 0);
+    PlayFFBCollision(0);
     mWheelInput.StopEffects();
 }
 

@@ -131,6 +131,7 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
         return false;
     }
 
+    StopEffects();
     e->diDevice->Unacquire();
     HRESULT hr;
     if (FAILED(hr = e->diDevice->SetCooperativeLevel(GetForegroundWindow(),
@@ -148,7 +149,7 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
         hasForceFeedback[guid][ffAxis] = false;
         return false;
     } 
-    logger.Write(INFO, "[Wheel] Inititalizing force feedback success");
+    logger.Write(INFO, "[Wheel] Initializing force feedback success");
     hasForceFeedback[guid][ffAxis] = true;
     return true;
 }
