@@ -128,6 +128,7 @@
     <ClCompile Include="Compatibility.cpp" />
     <ClCompile Include="CustomSteering.cpp" />
     <ClCompile Include="Input\DIDeviceFactory.cpp" />
+    <ClCompile Include="Input\USBNotify.cpp" />
     <ClCompile Include="ManualTransmission.cpp" />
     <ClCompile Include="ScriptHUD.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="CustomSteering.h" />
+    <ClInclude Include="Input\USBNotify.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="ManualTransmission.h" />
     <ClInclude Include="Memory\Patcher.h" />
