@@ -1,6 +1,6 @@
 #pragma once
 #include "ScriptSettings.hpp"
-void threadCheckUpdate();
+void threadCheckUpdate(unsigned milliseconds);
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Helper functions/tools

@@ -1866,11 +1866,13 @@ void readSettings() {
     logger.Write(INFO, "Settings read");
 }
 
-void threadCheckUpdate() {
-    std::thread([]() {
+void threadCheckUpdate(unsigned milliseconds) {
+    std::thread([milliseconds]() {
         std::lock_guard releaseInfoLock(g_releaseInfoMutex);
         std::lock_guard checkUpdateLock(g_checkUpdateDoneMutex);
         std::lock_guard notifyUpdateLock(g_notifyUpdateMutex);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 
         bool newAvailable = CheckUpdate(g_releaseInfo);
 
@@ -1922,7 +1924,7 @@ void main() {
     loadConfigs();
 
     if (g_settings.Update.EnableUpdate) {
-        threadCheckUpdate();
+        threadCheckUpdate(10000);
     }
 
     g_ext.initOffsets();

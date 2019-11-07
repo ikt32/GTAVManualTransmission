@@ -1383,7 +1383,7 @@ void update_debugmenu() {
         g_settings.Update.EnableUpdate = true;
         g_settings.Update.IgnoredVersion = "v0.0.0";
 
-        threadCheckUpdate();
+        threadCheckUpdate(0);
     }
 }
 
