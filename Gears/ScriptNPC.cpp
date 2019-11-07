@@ -290,6 +290,9 @@ std::set<Vehicle> updateRaycastVehicles() {
 
 void updateNPCVehicles(std::vector<NPCVehicle>& vehicles) {
     for(auto& vehicle : vehicles) {
+        if (!ENTITY::DOES_ENTITY_EXIST(vehicle.GetVehicle()))
+            continue;
+
         if (Util::IsPedOnSeat(vehicle.GetVehicle(), g_playerPed, -1))
             continue;
 
