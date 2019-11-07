@@ -14,7 +14,9 @@
 
 #include <fmt/format.h>
 #include "ScriptUtils.h"
+#ifdef _DEBUG
 #include "Dump.h"
+#endif
 
 class NPCVehicle;
 
