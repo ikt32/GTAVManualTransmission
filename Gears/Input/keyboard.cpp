@@ -1,5 +1,6 @@
 #include "keyboard.h"
 #include <map>
+#include "../Util/Util.hpp"
 
 const int KEYS_SIZE = 255;
 
@@ -154,17 +155,8 @@ const std::unordered_map<std::string, int> keyMap = {
     { "VK_OEM_102" , VK_OEM_102 },		    // > <	
 };
 
-
-bool IsWindowFocused() {
-    auto foregroundHwnd = GetForegroundWindow();
-    DWORD foregroundProcId;
-    GetWindowThreadProcessId(foregroundHwnd, &foregroundProcId);
-    auto currentProcId = GetCurrentProcessId();
-    return foregroundProcId == currentProcId;
-}
-
 bool IsKeyDown(DWORD key) {
-    if (!IsWindowFocused()) return false;
+    if (!SysUtil::IsWindowFocused()) return false;
     return (GetAsyncKeyState(key) & 0x8000) != 0;
 }
 

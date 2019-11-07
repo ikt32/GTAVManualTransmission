@@ -73,3 +73,11 @@ std::wstring StrUtil::utf8_decode(const std::string& str) {
     MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
     return wstrTo;
 }
+
+bool SysUtil::IsWindowFocused() {
+    auto foregroundHwnd = GetForegroundWindow();
+    DWORD foregroundProcId;
+    GetWindowThreadProcessId(foregroundHwnd, &foregroundProcId);
+    auto currentProcId = GetCurrentProcessId();
+    return foregroundProcId == currentProcId;
+}

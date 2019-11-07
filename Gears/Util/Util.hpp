@@ -70,3 +70,7 @@ namespace StrUtil {
     // Convert an UTF8 string to a wide Unicode String
     std::wstring utf8_decode(const std::string& str);
 }
+
+namespace SysUtil {
+    bool IsWindowFocused();
+}

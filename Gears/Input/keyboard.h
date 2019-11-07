@@ -4,8 +4,6 @@
 #include <string>
 #include <unordered_map>
 
-bool IsWindowFocused();
-
 bool IsKeyDown(DWORD key);
 bool IsKeyJustUp(DWORD key, bool exclusive = true);
 
