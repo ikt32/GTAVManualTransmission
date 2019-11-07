@@ -240,11 +240,19 @@ void saveChanges() {
     g_settings.SaveGeneral();
     g_settings.SaveController();
     g_settings.SaveWheel();
-    loadConfigs();
 }
 
 void onMenuClose() {
     saveChanges();
+
+    if (g_activeConfig) {
+        auto tempShiftMode = g_activeConfig->MTOptions.ShiftMode;
+        loadConfigs();
+        setShiftMode(tempShiftMode);
+    }
+    else {
+        loadConfigs();
+    }
 }
 
 void update_mainmenu() {
