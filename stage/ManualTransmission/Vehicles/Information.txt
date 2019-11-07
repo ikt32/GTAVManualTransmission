@@ -35,6 +35,7 @@ EngBrakeThreshold = 0.750000
 CustomABS = false
 ABSFilter = true
 TractionControl = 0
+TCSlipMax = 2.500000
 
 [SHIFT_OPTIONS]
 UpshiftCut = false

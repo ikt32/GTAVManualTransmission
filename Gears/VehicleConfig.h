@@ -37,6 +37,7 @@ public:
         bool CustomABS = false;
         bool ABSFilter = true;
         int TCMode = 0;
+        float TCSlipMax = 2.5f;
     } DriveAssists;
 
     // [SHIFT_OPTIONS]

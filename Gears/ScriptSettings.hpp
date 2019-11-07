@@ -79,6 +79,8 @@ public:
         bool ABSFilter = true;
         // 0 Disabled, 1 Brake, 2 Throttle (patch) 
         int TCMode = 0;
+        // m/s
+        float TCSlipMax = 2.5f;
     } DriveAssists;
 
     // [SHIFT_OPTIONS]

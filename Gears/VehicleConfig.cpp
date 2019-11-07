@@ -46,6 +46,7 @@ void VehicleConfig::loadSettings(const ScriptSettings& gSettings, const std::str
     DriveAssists.CustomABS = settingsIni.GetBoolValue("DRIVING_ASSISTS", "CustomABS", gSettings.DriveAssists.CustomABS);
     DriveAssists.ABSFilter = settingsIni.GetBoolValue("DRIVING_ASSISTS", "ABSFilter", gSettings.DriveAssists.ABSFilter);
     DriveAssists.TCMode = settingsIni.GetLongValue("DRIVING_ASSISTS", "TractionControl", gSettings.DriveAssists.TCMode);
+    DriveAssists.TCSlipMax = settingsIni.GetDoubleValue("DRIVING_ASSISTS", "TCSlipMax", gSettings.DriveAssists.TCSlipMax);
 
     // [SHIFT_OPTIONS]
     ShiftOptions.UpshiftCut = settingsIni.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", gSettings.ShiftOptions.UpshiftCut);

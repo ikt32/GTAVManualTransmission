@@ -1265,6 +1265,8 @@ void handleBrakePatch() {
     auto lockUps = g_vehData.mWheelsLockedUp;
     auto speeds = g_vehData.mWheelTyreSpeeds;
 
+    auto slipped = std::vector<bool>(g_vehData.mWheelCount);
+
     {
         bool lockedUp = false;
         auto brakePressures = g_ext.GetWheelBrakePressure(g_playerVehicle);
@@ -1283,9 +1285,16 @@ void handleBrakePatch() {
     {
         bool tractionLoss = false;
         if (g_settings().DriveAssists.TCMode != 0) {
+            auto pows = g_ext.GetWheelPower(g_playerVehicle);
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
-                if (speeds[i] > g_vehData.mVelocity.y + 2.5f && susps[i] > 0.0f && g_vehData.mWheelsDriven[i])
+                // TODO: Customizable slip
+                if (speeds[i] > g_vehData.mVelocity.y + g_settings().DriveAssists.TCSlipMax && 
+                    susps[i] > 0.0f && 
+                    g_vehData.mWheelsDriven[i] && 
+                    pows[i] > 0.1f) {
                     tractionLoss = true;
+                    slipped[i] = true;
+                }
             }
             if (ebrk || brn)
                 tractionLoss = false;
@@ -1335,10 +1344,10 @@ void handleBrakePatch() {
         if (!MemoryPatcher::BrakePatcher.Patched()) {
             MemoryPatcher::PatchBrake();
         }
-        auto pows = g_ext.GetWheelPower(g_playerVehicle);
         for (int i = 0; i < g_vehData.mWheelCount; i++) {
-            if (speeds[i] > g_vehData.mVelocity.y + 2.5f && susps[i] > 0.0f && g_vehData.mWheelsDriven[i] && pows[i] > 0.1f) {
-                g_ext.SetWheelBrakePressure(g_playerVehicle, i, map(speeds[i], g_vehData.mVelocity.y, g_vehData.mVelocity.y + 2.5f, 0.0f, 0.5f));
+            if (slipped[i]) {
+                g_ext.SetWheelBrakePressure(g_playerVehicle, i, 
+                    map(speeds[i], g_vehData.mVelocity.y, g_vehData.mVelocity.y + 2.5f, 0.0f, 0.5f));
                 g_vehData.mWheelsTcs[i] = true;
             }
             else {

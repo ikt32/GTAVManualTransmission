@@ -1283,6 +1283,8 @@ void update_driveassistmenu() {
             "Disabled: Do nothing",
             "Brakes: Apply brake per wheel",
             "Throttle: Cut throttle" });
+
+    g_menu.FloatOption("TC Slip threshold", g_settings.DriveAssists.TCSlipMax, 0.0f, 20.0f, 0.1f);
 }
 
 void update_gameassistmenu() {

@@ -146,6 +146,7 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetBoolValue("DRIVING_ASSISTS", "CustomABS", DriveAssists.CustomABS);
     ini.SetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABSFilter);
     ini.SetLongValue("DRIVING_ASSISTS", "TractionControl", DriveAssists.TCMode);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "TCSlipMax", DriveAssists.TCSlipMax);
 
     //[CUSTOM_STEERING]
     ini.SetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
@@ -399,6 +400,7 @@ void ScriptSettings::parseSettingsGeneral() {
     DriveAssists.CustomABS = ini.GetBoolValue("DRIVING_ASSISTS", "CustomABS", DriveAssists.CustomABS);
     DriveAssists.ABSFilter = ini.GetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABSFilter);
     DriveAssists.TCMode = ini.GetLongValue("DRIVING_ASSISTS", "TractionControl", DriveAssists.TCMode);
+    DriveAssists.TCSlipMax = ini.GetDoubleValue("DRIVING_ASSISTS", "TCSlipMax", DriveAssists.TCSlipMax);
 
     // [SHIFT_OPTIONS]
     ShiftOptions.UpshiftCut = ini.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
