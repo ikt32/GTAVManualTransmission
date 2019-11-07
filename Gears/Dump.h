@@ -92,7 +92,7 @@ public:
 // record as a local copy. Note that you must do the stack dump at the
 // earliest opportunity, to avoid the interesting stack-frames being gone
 // by the time you do the dump.
-DWORD DumpStackTrace(EXCEPTION_POINTERS *ep)
+inline DWORD DumpStackTrace(EXCEPTION_POINTERS *ep)
 {
     HANDLE process = GetCurrentProcess();
     HANDLE hThread = GetCurrentThread();
