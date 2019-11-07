@@ -14,9 +14,17 @@ namespace {
 }
 
 void UI::Notify(int level, const std::string& message) {
+    Notify(level, message, true);
+}
+
+void UI::Notify(int level, const std::string& message, bool removePrevious) {
     if (level < g_settings.HUD.NotifyLevel)
         return;
-    int* notifHandleAddr = &notificationHandle; // prevents optimizing away the pointery thing
+
+    int* notifHandleAddr = nullptr;
+    if (removePrevious) {
+        notifHandleAddr = &notificationHandle;
+    }
     showNotification(fmt::format("{}\n{}", Constants::NotificationPrefix, message), notifHandleAddr);
 }
 

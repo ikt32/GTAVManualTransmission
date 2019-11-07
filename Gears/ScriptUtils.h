@@ -10,6 +10,7 @@
 
 namespace UI {
     void Notify(int level, const std::string& message);
+    void Notify(int level, const std::string& message, bool removePrevious);
 }
 
 namespace Controls {

@@ -1893,14 +1893,14 @@ void update_update_notification() {
             g_checkUpdateDone = false;
             if (g_notifyUpdate) {
                 UI::Notify(INFO, fmt::format("Manual Transmission: Update available, new version: {}.",
-                                         g_releaseInfo.Version));
+                                         g_releaseInfo.Version), false);
             }
             else if (g_releaseInfo.Version.empty()) {
-                UI::Notify(INFO, "Manual Transmission: Failed to check for update.");
+                UI::Notify(INFO, "Manual Transmission: Failed to check for update.", false);
             }
             else {
                 UI::Notify(INFO, fmt::format("Manual Transmission: No update available, latest version: {}.",
-                                         g_releaseInfo.Version));
+                                         g_releaseInfo.Version), false);
             }
         }
     }
