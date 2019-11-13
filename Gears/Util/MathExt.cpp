@@ -23,6 +23,10 @@ Vector3 Cross(Vector3 left, Vector3 right) {
     return result;
 }
 
+float Dot(Vector3 a, Vector3 b) {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
 Vector3 operator + (Vector3 left, Vector3 right) {
     return Vector3{
         left.x + right.x,
@@ -90,4 +94,13 @@ float GetAngleBetween(float h1, float h2, float separation) {
     if (abs(diff - 360.0f) < separation)
         return (separation - abs(diff - 360.0f)) / separation;
     return separation;
+}
+
+float GetAngleBetween(Vector3 a, Vector3 b) {
+    Vector3 normal{};
+    normal.z = 1.0f;
+    float angle = acos(Dot(a, b) / (Length(a) * Length(b)));
+    if (Dot(normal, Cross(a, b)) < 0.0f)
+        angle = -angle;
+    return angle;
 }

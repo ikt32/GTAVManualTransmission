@@ -27,6 +27,73 @@ extern VehicleData g_vehData;
 ///////////////////////////////////////////////////////////////////////////////
 //                           Display elements
 ///////////////////////////////////////////////////////////////////////////////
+
+namespace {
+    std::vector<std::pair<float, float>> oldGCoords;
+    Vector3 prevAccel;
+    std::vector<Vector3> oldCoords(3);
+    float prevWorldRotVel;
+}
+
+void drawGForces() {
+    float locX = 0.075f;
+    float locY = 0.125f;
+    float szX = 0.20f / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+    float szY = 0.20f;
+
+    Vector3 accel = (g_vehData.mAcceleration + prevAccel) * 0.5f;
+    prevAccel = g_vehData.mAcceleration;
+
+    Vector3 absPos = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
+    oldCoords.push_back(absPos);
+    while (oldCoords.size() > 3) {
+        oldCoords.erase(oldCoords.begin());
+    }
+
+    float worldSpeed = sqrt(g_vehData.mVelocity.x * g_vehData.mVelocity.x + g_vehData.mVelocity.y * g_vehData.mVelocity.y);
+    float worldRotVel = GetAngleBetween(oldCoords[1] - oldCoords[0], oldCoords[2] - oldCoords[1]) / GAMEPLAY::GET_FRAME_TIME();
+    if (isnan(worldRotVel)) {
+        worldRotVel = prevWorldRotVel;
+    }
+    float avgWorldRotVel = (worldRotVel + prevWorldRotVel) / 2.0f;
+    prevWorldRotVel = worldRotVel;
+    float GForceX = (accel.x / 9.81f) + ( worldSpeed * avgWorldRotVel / 9.81f);
+    float GForceY = accel.y / 9.81f;
+    showText(0.175f, 0.050f, 0.5f, fmt::format("LAT: {:.2f} g", GForceX));
+    showText(0.175f, 0.150f, 0.5f, fmt::format("LON: {:.2f} g", GForceY));
+    
+    // 1 div = 2G
+    float offX = (szX * 0.5f) * GForceX * 0.5f;
+    float offY = (szX * 0.5f) * GForceY * 0.5f;
+
+    oldGCoords.emplace_back(offX, offY);
+    while (oldGCoords.size() > 15) {
+        oldGCoords.erase(oldGCoords.begin());
+    }
+
+    GRAPHICS::DRAW_RECT(locX, locY, szX, szY, 0, 0, 0, 127);
+    GRAPHICS::DRAW_RECT(locX, locY, 0.001f, szY, 255, 255, 255, 127);
+    GRAPHICS::DRAW_RECT(locX, locY, szX, 0.001f, 255, 255, 255, 127);
+
+    GRAPHICS::DRAW_RECT(locX + 0.25f * szX, locY, 0.001f, szY, 127, 127, 127, 127);
+    GRAPHICS::DRAW_RECT(locX, locY + 0.25f * szY, szX, 0.001f, 127, 127, 127, 127);
+
+    GRAPHICS::DRAW_RECT(locX - 0.25f * szX, locY, 0.001f, szY, 127, 127, 127, 127);
+    GRAPHICS::DRAW_RECT(locX, locY - 0.25f * szY, szX, 0.001f, 127, 127, 127, 127);
+
+    int alpha = 0;
+    for (auto it = oldGCoords.begin(); it != oldGCoords.end(); ++it) {
+        auto c = *it;
+        if (std::next(it) == oldGCoords.end()) {
+            GRAPHICS::DRAW_RECT(locX + c.first, locY + c.second, szX * 0.025f, szY * 0.025f, 255, 255, 255, 255);
+        }
+        else {
+            GRAPHICS::DRAW_RECT(locX + c.first, locY + c.second, szX * 0.025f, szY * 0.025f, 127, 127, 127, alpha);
+        }
+        alpha += 255 / oldGCoords.size();
+    }
+}
+
 void drawRPMIndicator(float x, float y, float width, float height, Color fg, Color bg, float rpm) {
     float bgpaddingx = 0.00f;
     float bgpaddingy = 0.01f;
@@ -196,6 +263,8 @@ void drawDebugInfo() {
             g_gearStates.Shifting ? "~c~" : "", g_gearStates.EngineLoad, g_gearStates.UpshiftLoad));
         showText(0.01, 0.675, 0.3, fmt::format("{}Load/dnReq: {:.3f}\t/{:.3f}",
             g_gearStates.Shifting ? "~c~" : "", g_gearStates.EngineLoad, g_gearStates.DownshiftLoad));
+
+        drawGForces();
     }
 
     showText(0.85, 0.050, 0.4, fmt::format("Throttle:\t{:.3f}", g_controls.ThrottleVal) , 4);
