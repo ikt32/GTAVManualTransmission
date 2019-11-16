@@ -131,6 +131,9 @@
     <ClCompile Include="Input\DIDeviceFactory.cpp" />
     <ClCompile Include="Input\USBNotify.cpp" />
     <ClCompile Include="ManualTransmission.cpp" />
+    <ClCompile Include="Memory\NativeMatrix.cpp" />
+    <ClCompile Include="Memory\NativeVectors.cpp" />
+    <ClCompile Include="Memory\VehicleBone.cpp" />
     <ClCompile Include="ScriptHUD.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
     <ClCompile Include="ScriptUtils.cpp" />
@@ -186,6 +189,9 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="CustomSteering.h" />
     <ClInclude Include="Input\USBNotify.h" />
+    <ClInclude Include="Memory\NativeMatrix.h" />
+    <ClInclude Include="Memory\NativeVectors.h" />
+    <ClInclude Include="Memory\VehicleBone.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="ManualTransmission.h" />
     <ClInclude Include="Memory\Patcher.h" />

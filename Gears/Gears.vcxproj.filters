@@ -108,6 +108,15 @@
     <ClCompile Include="Input\USBNotify.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="Memory\NativeVectors.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\VehicleBone.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\NativeMatrix.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -271,6 +280,15 @@
     <ClInclude Include="VehicleConfig.h" />
     <ClInclude Include="Input\USBNotify.h">
       <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\VehicleBone.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\NativeVectors.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\NativeMatrix.h">
+      <Filter>Memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
