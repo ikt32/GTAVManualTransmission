@@ -6,6 +6,7 @@
 #include "Util/UIUtils.h"
 #include "Util/Util.hpp"
 #include "Memory/VehicleExtensions.hpp"
+#include "Memory/VehicleBone.h"
 
 #include "inc/enums.h"
 #include "inc/natives.h"
@@ -159,4 +160,19 @@ void CustomSteering::Update() {
     // Both need to be set, top one with radian limit
     g_ext.SetSteeringAngle(g_playerVehicle, desiredHeading);
     g_ext.SetSteeringInputAngle(g_playerVehicle, desiredHeading * (1.0f / limitRadians));
+
+    auto boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "steeringwheel");
+    if (boneIdx != -1 && g_settings.CustomSteering.CustomRotation) {
+        Vector3 rotAxis{};
+        rotAxis.y = 1.0f;
+
+        float corrDesiredHeading = -desiredHeading * (1.0f / limitRadians);
+        float rotDeg = g_settings.CustomSteering.CustomRotationDegrees / 2.0f * corrDesiredHeading;
+
+        // Setting angle using the g_ext calls above causes the angle to overshoot the "real" coords
+        // Not sure if this is the best solution, but hey, it works!
+        rotDeg -= 2.0f * rad2deg(corrDesiredHeading * g_ext.GetMaxSteeringAngle(g_playerVehicle));
+
+        VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotDeg);
+    }
 }

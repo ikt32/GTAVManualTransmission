@@ -117,6 +117,8 @@ public:
         float SteeringMult = 1.0f;
         float SteeringReduction = 1.0f;
         float Gamma = 1.0f;
+        bool CustomRotation = false;
+        float CustomRotationDegrees = 900.0f;
     } CustomSteering;
 
     // [HUD]

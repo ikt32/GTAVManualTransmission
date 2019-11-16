@@ -1355,6 +1355,12 @@ void update_steeringassistmenu() {
         { "Increase/decrease steering lock.", "From InfamousSabre's Custom Steering." });
     g_menu.FloatOption("Steering Gamma", g_settings.CustomSteering.Gamma, 0.01f, 2.0f, 0.01f,
         { "Change linearity of steering input." });
+
+    g_menu.BoolOption("Custom wheel rotation", g_settings.CustomSteering.CustomRotation, 
+        { "Override GTA's default 180 degree steering with whatever you want.",
+          "This is purely cosmetic and does not change handling." });
+    g_menu.FloatOption("Wheel rotation", g_settings.CustomSteering.CustomRotationDegrees, 180.0f, 1440.0f, 30.0f, 
+        { "Rotation in degrees." });
 }
 
 void update_debugmenu() {

@@ -155,6 +155,8 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetDoubleValue("CUSTOM_STEERING", "SteeringMult", CustomSteering.SteeringMult);
     ini.SetDoubleValue("CUSTOM_STEERING", "SteeringReduction", CustomSteering.SteeringReduction);
     ini.SetDoubleValue("CUSTOM_STEERING", "Gamma", CustomSteering.Gamma);
+    ini.SetBoolValue("CUSTOM_STEERING", "CustomRotation", CustomSteering.CustomRotation);
+    ini.SetDoubleValue("CUSTOM_STEERING", "CustomRotationDegrees", CustomSteering.CustomRotationDegrees);
 
     // [SHIFT_OPTIONS]
     ini.SetBoolValue("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
@@ -424,6 +426,8 @@ void ScriptSettings::parseSettingsGeneral() {
     CustomSteering.SteeringMult = ini.GetDoubleValue("CUSTOM_STEERING", "SteeringMult", CustomSteering.SteeringMult);
     CustomSteering.SteeringReduction = ini.GetDoubleValue("CUSTOM_STEERING", "SteeringReduction", CustomSteering.SteeringReduction);
     CustomSteering.Gamma = ini.GetDoubleValue("CUSTOM_STEERING", "Gamma", CustomSteering.Gamma);
+    CustomSteering.CustomRotation = ini.GetBoolValue("CUSTOM_STEERING", "CustomRotation", CustomSteering.CustomRotation);
+    CustomSteering.CustomRotationDegrees = ini.GetDoubleValue("CUSTOM_STEERING", "CustomRotationDegrees", CustomSteering.CustomRotationDegrees);
 
     // [HUD]
     HUD.Enable = ini.GetBoolValue("HUD", "EnableHUD", HUD.Enable);
