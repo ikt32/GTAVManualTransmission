@@ -266,6 +266,7 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetBoolValue("DEBUG", "DisplayFFBInfo", Debug.DisplayFFBInfo);
     ini.SetBoolValue("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
     ini.SetBoolValue("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
+    ini.SetBoolValue("DEBUG", "DisplayMetrics", Debug.DisplayMetrics);
     ini.SetBoolValue("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
     ini.SetBoolValue("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
 
@@ -521,6 +522,7 @@ void ScriptSettings::parseSettingsGeneral() {
     Debug.DisplayGearingInfo = ini.GetBoolValue("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
     Debug.DisplayFFBInfo = ini.GetBoolValue("DEBUG", "DisplayFFBInfo", Debug.DisplayFFBInfo);
     Debug.DisplayNPCInfo = ini.GetBoolValue("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
+    Debug.DisplayMetrics = ini.GetBoolValue("DEBUG", "DisplayMetrics", Debug.DisplayMetrics);
     Debug.DisableInputDetect = ini.GetBoolValue("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
     Debug.DisablePlayerHide = ini.GetBoolValue("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
 }

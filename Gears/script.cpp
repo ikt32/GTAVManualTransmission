@@ -72,7 +72,8 @@ VehicleConfig* g_activeConfig;
 
 bool g_focused;
 Timer g_wheelInitDelayTimer(0);
-
+Timer g_accelerationTimer(0);
+bool g_speedHit;
 
 void updateShifting();
 void blockButtons();
@@ -177,6 +178,19 @@ void update_vehicle() {
             g_gearStates.FakeNeutral = g_settings.GameAssists.DefaultNeutral;
     }
 
+    if (g_settings.Debug.DisplayMetrics && ENTITY::DOES_ENTITY_EXIST(g_playerVehicle)) {
+        if (Math::Near(g_vehData.mVelocity.y, 0.0f, 0.01f)) {
+            g_accelerationTimer.Reset();
+            g_speedHit = false;
+        }
+
+        if (g_vehData.mVelocity.y >  100.0f/3.6f && !g_speedHit) {
+            g_speedHit = true;
+            auto millis = g_accelerationTimer.Elapsed();
+            UI::Notify(INFO, fmt::format("0-100: {}.{:03d}", millis/1000, millis%1000));
+        }
+    }
+    
     g_lastPlayerVehicle = g_playerVehicle;
 }
 

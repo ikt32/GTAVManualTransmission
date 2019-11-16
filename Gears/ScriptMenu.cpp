@@ -1378,6 +1378,8 @@ void update_debugmenu() {
             "Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction" });
     g_menu.BoolOption("Show NPC info", g_settings.Debug.DisplayNPCInfo,
         { "Show vehicle info of NPC vehicles near you." });
+    g_menu.BoolOption("Display performance metrics", g_settings.Debug.DisplayMetrics,
+        { "Monitor G-forces and 0-100kph acceleration." });
     g_menu.BoolOption("Disable input detection", g_settings.Debug.DisableInputDetect,
         { "Allows for manual input selection." });
     g_menu.BoolOption("Disable player hiding", g_settings.Debug.DisablePlayerHide, 

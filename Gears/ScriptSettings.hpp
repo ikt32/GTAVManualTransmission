@@ -266,6 +266,7 @@ public:
         bool DisplayWheelInfo = false;
         bool DisplayFFBInfo = false;
         bool DisplayNPCInfo = false;
+        bool DisplayMetrics = false;
         bool DisableInputDetect = false;
         bool DisablePlayerHide = false;
     } Debug;
