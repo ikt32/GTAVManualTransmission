@@ -311,6 +311,7 @@ void ScriptSettings::SaveWheel() const {
 
     // [OPTIONS]
     ini.SetBoolValue("MT_OPTIONS", "EnableWheel", Wheel.Options.Enable);
+    ini.SetBoolValue("MT_OPTIONS", "SyncRotation", Wheel.Options.SyncRotation);
 
     ini.SetBoolValue("MT_OPTIONS", "LogitechLEDs", Wheel.Options.LogiLEDs);
     ini.SetBoolValue("MT_OPTIONS", "HPatternKeyboard", Wheel.Options.HPatternKeyboard);
@@ -605,6 +606,7 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 
     // [OPTIONS]
     Wheel.Options.Enable = ini.GetBoolValue("MT_OPTIONS", "EnableWheel", Wheel.Options.Enable);
+    Wheel.Options.SyncRotation = ini.GetBoolValue("MT_OPTIONS", "SyncRotation", Wheel.Options.SyncRotation);
     Wheel.Options.LogiLEDs = ini.GetBoolValue("MT_OPTIONS", "LogitechLEDs", Wheel.Options.LogiLEDs);
     Wheel.Options.HPatternKeyboard = ini.GetBoolValue("MT_OPTIONS", "HPatternKeyboard", Wheel.Options.HPatternKeyboard);
     Wheel.Options.UseShifterForAuto = ini.GetBoolValue("MT_OPTIONS", "UseShifterForAuto", Wheel.Options.UseShifterForAuto);

@@ -776,6 +776,9 @@ void update_wheelmenu() {
         initWheel();
     }
 
+    g_menu.BoolOption("Sync steering wheel rotation", g_settings.Wheel.Options.SyncRotation, 
+        { "Sync the cars' steering wheel with your actual steering wheel." });
+
     if (g_menu.FloatOption("Steering multiplier (wheel)", g_settings.Wheel.Steering.SteerMult, 0.1f, 2.0f, 0.01f,
         { "Increase steering lock for all cars. You might want to increase it for faster steering and more steering lock." })) {
     }

@@ -273,6 +273,7 @@ public:
         // [OPTIONS]
         struct {
             bool Enable = true;
+            bool SyncRotation = true;
             bool LogiLEDs = false;
             bool HPatternKeyboard = false;
             bool UseShifterForAuto = false;
