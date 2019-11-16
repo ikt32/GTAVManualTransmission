@@ -67,7 +67,7 @@ void drawGForces() {
     
     // 1 div = 2G
     float offX = (szX * 0.5f) * GForceX * 0.5f;
-    float offY = (szX * 0.5f) * GForceY * 0.5f;
+    float offY = (szY * 0.5f) * GForceY * 0.5f;
 
     oldGCoords.emplace_back(offX, offY);
     while (oldGCoords.size() > 15) {
