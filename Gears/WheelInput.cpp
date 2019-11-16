@@ -369,8 +369,6 @@ void WheelInput::CheckButtons() {
 //                    Wheel input and force feedback
 ///////////////////////////////////////////////////////////////////////////////
 
-
-float g_wheelVisMult = 1.0f;
 void WheelInput::DoSteering() {
     if (g_controls.PrevInput != CarControls::Wheel)
         return;
@@ -383,6 +381,8 @@ void WheelInput::DoSteering() {
     else {
         steerMult = g_settings.Wheel.Steering.AngleMax / g_settings().Wheel.Steering.AngleBoat;
     }
+
+    float steerClamp = g_settings.Wheel.Steering.AngleMax / steerMult;
 
     float steerValL = map(g_controls.SteerVal, 0.0f, 0.5f, 1.0f, 0.0f);
     float steerValR = map(g_controls.SteerVal, 0.5f, 1.0f, 0.0f, 1.0f);
@@ -406,12 +406,17 @@ void WheelInput::DoSteering() {
             Vector3 rotAxis{};
             rotAxis.y = 1.0f;
             float rotDeg = g_settings.Wheel.Steering.AngleMax / 2.0f * steerValGamma;
-            float rotCorr = 1.0f;// cos(g_ext.GetMaxSteeringAngle(g_playerVehicle));
-            VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotDeg * rotCorr * g_wheelVisMult);
-        }
-        else {
-            // TODO: Proper warning
-            showText(0.6f, 0.1f, 0.5f, "No steering bone");
+
+            // clamp
+            if (abs(rotDeg) > steerClamp / 2.0f) {
+                rotDeg = std::clamp(rotDeg, -steerClamp / 2.0f, steerClamp / 2.0f);
+            }
+
+            // Setting angle using the g_ext calls above causes the angle to overshoot the "real" coords
+            // Not sure if this is the best solution, but hey, it works!
+            rotDeg -= 2.0f * rad2deg(std::clamp(effSteer, -1.0f, 1.0f) * g_ext.GetMaxSteeringAngle(g_playerVehicle));
+
+            VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotDeg);
         }
     }
     else {
