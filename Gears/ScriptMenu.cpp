@@ -463,7 +463,7 @@ void update_shiftingoptionsmenu() {
             "Only applies to sequential mode." });
     g_menu.FloatOption("Clutch rate multiplier", g_settings.ShiftOptions.ClutchRateMult, 0.05f, 20.0f, 0.05f,
         { "Change how fast clutching is. Below 1 is slower, higher than 1 is faster.",
-            "Only applies to sequential mode." });
+            "Applies to sequential and automatic mode." });
 
     g_menu.FloatOption("Shifting RPM tolerance", g_settings.ShiftOptions.RPMTolerance, 0.0f, 1.0f, 0.05f,
         { "RPM mismatch tolerance on shifts",
