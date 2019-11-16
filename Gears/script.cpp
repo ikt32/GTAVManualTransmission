@@ -36,6 +36,7 @@
 #include "WheelInput.h"
 #include "ScriptUtils.h"
 #include "VehicleConfig.h"
+#include "Timer.h"
 
 namespace fs = std::filesystem;
 
@@ -70,6 +71,8 @@ std::vector<VehicleConfig> g_vehConfigs;
 VehicleConfig* g_activeConfig;
 
 bool g_focused;
+Timer g_wheelInitDelayTimer(0);
+
 
 void updateShifting();
 void blockButtons();
@@ -183,7 +186,7 @@ void update_inputs() {
         // no focus -> focus
         if (!g_focused) {
             logger.Write(DEBUG, "[Wheel] Focus change detected, re-init FFB?");
-            initWheel();// g_controls.InitWheel();
+            g_wheelInitDelayTimer.Reset(1000);
         }
         else {
             logger.Write(DEBUG, "[Wheel] Focus lost");
@@ -191,6 +194,11 @@ void update_inputs() {
         }
     }
     g_focused = SysUtil::IsWindowFocused();
+
+    if (g_wheelInitDelayTimer.Expired() && g_wheelInitDelayTimer.Period() > 0) {
+        initWheel();
+        g_wheelInitDelayTimer.Reset(0);
+    }
 
     updateLastInputDevice();
     g_controls.UpdateValues(g_controls.PrevInput, false);
