@@ -18,6 +18,7 @@
 #include "MiniPID/MiniPID.h"
 #include "fmt/format.h"
 #include <algorithm>
+#include "Memory/VehicleBone.h"
 
 extern Vehicle g_playerVehicle;
 extern Ped g_playerPed;
@@ -368,6 +369,8 @@ void WheelInput::CheckButtons() {
 //                    Wheel input and force feedback
 ///////////////////////////////////////////////////////////////////////////////
 
+
+float g_wheelVisMult = 1.0f;
 void WheelInput::DoSteering() {
     if (g_controls.PrevInput != CarControls::Wheel)
         return;
@@ -397,6 +400,19 @@ void WheelInput::DoSteering() {
     if (g_vehData.mClass == VehicleClass::Car) {
         g_ext.SetSteeringAngle(g_playerVehicle, -effSteer * g_ext.GetMaxSteeringAngle(g_playerVehicle));
         g_ext.SetSteeringInputAngle(g_playerVehicle, -effSteer);
+
+        auto boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "steeringwheel");
+        if (boneIdx != -1) {
+            Vector3 rotAxis{};
+            rotAxis.y = 1.0f;
+            float rotDeg = g_settings.Wheel.Steering.AngleMax / 2.0f * steerValGamma;
+            float rotCorr = 1.0f;// cos(g_ext.GetMaxSteeringAngle(g_playerVehicle));
+            VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotDeg * rotCorr * g_wheelVisMult);
+        }
+        else {
+            // TODO: Proper warning
+            showText(0.6f, 0.1f, 0.5f, "No steering bone");
+        }
     }
     else {
         Controls::SetControlADZ(ControlVehicleMoveLeftRight, effSteer, g_settings.Wheel.Steering.AntiDeadZone);

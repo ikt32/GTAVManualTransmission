@@ -765,6 +765,7 @@ void update_keyboardmenu() {
     }
 }
 
+extern float g_wheelVisMult;
 void update_wheelmenu() {
     g_menu.Title("Steering wheel");
     g_menu.Subtitle("Steering wheel options");
@@ -778,6 +779,9 @@ void update_wheelmenu() {
 
     if (g_menu.FloatOption("Steering multiplier (wheel)", g_settings.Wheel.Steering.SteerMult, 0.1f, 2.0f, 0.01f,
         { "Increase steering lock for all cars. You might want to increase it for faster steering and more steering lock." })) {
+    }
+    
+    if (g_menu.FloatOption("WheelVisMult", g_wheelVisMult, 0.0f, 2.0f, 0.01f)) {
     }
 
     if (g_menu.BoolOption("Logitech RPM LEDs", g_settings.Wheel.Options.LogiLEDs,
