@@ -229,6 +229,9 @@ void update_hud() {
     if (g_settings.Debug.DisplayWheelInfo) {
         drawVehicleWheelInfo();
     }
+    if (g_settings.Debug.DisplayMetrics) {
+        drawGForces();
+    }
     if (g_settings.HUD.Enable && g_vehData.mDomain == VehicleDomain::Road &&
         (g_settings.MTOptions.Enable || g_settings.HUD.Always)) {
         drawHUD();

@@ -36,6 +36,9 @@ namespace {
 }
 
 void drawGForces() {
+    if (g_menu.IsThisOpen())
+        return;
+
     float locX = 0.075f;
     float locY = 0.125f;
     float szX = 0.20f / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
@@ -263,8 +266,6 @@ void drawDebugInfo() {
             g_gearStates.Shifting ? "~c~" : "", g_gearStates.EngineLoad, g_gearStates.UpshiftLoad));
         showText(0.01, 0.675, 0.3, fmt::format("{}Load/dnReq: {:.3f}\t/{:.3f}",
             g_gearStates.Shifting ? "~c~" : "", g_gearStates.EngineLoad, g_gearStates.DownshiftLoad));
-
-        drawGForces();
     }
 
     showText(0.85, 0.050, 0.4, fmt::format("Throttle:\t{:.3f}", g_controls.ThrottleVal) , 4);

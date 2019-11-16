@@ -8,6 +8,7 @@ void threadCheckUpdate(unsigned milliseconds);
 
 void drawHUD();
 void drawDebugInfo();
+void drawGForces();
 void drawVehicleWheelInfo();
 void drawInputWheelInfo();
 
