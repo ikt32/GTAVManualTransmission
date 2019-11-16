@@ -577,7 +577,7 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
 
 // Despite being scientifically inaccurate, "self-aligning torque" is the best description.
 void WheelInput::DrawDebugLines() {
-    float steeringAngle = g_ext.GetWheelAverageAngle(g_playerVehicle);
+    float steeringAngle = g_ext.GetWheelAverageAngle(g_playerVehicle) * g_settings.Wheel.Steering.SteerMult;
     Vector3 velocityWorld = ENTITY::GET_ENTITY_VELOCITY(g_playerVehicle);
     Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, 1);
     Vector3 travelWorld = velocityWorld + positionWorld;
@@ -654,7 +654,7 @@ void WheelInput::PlayFFBGround() {
         g_controls.PlayLEDs(g_vehData.mRPM, 0.45f, 0.95f);
     }
 
-    float avgAngle = g_ext.GetWheelAverageAngle(g_playerVehicle);
+    float avgAngle = g_ext.GetWheelAverageAngle(g_playerVehicle) * g_settings.Wheel.Steering.SteerMult;
     float wheelsOffGroundRatio = getFloatingSteeredWheelsRatio(g_playerVehicle);
 
     int detailForce = std::clamp(calculateDetail(), -g_settings().Wheel.FFB.DetailLim, g_settings().Wheel.FFB.DetailLim);
