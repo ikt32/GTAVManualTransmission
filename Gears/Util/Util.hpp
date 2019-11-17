@@ -25,7 +25,7 @@ constexpr unsigned long joaat(const char* s) {
     unsigned long hash = 0;
     for (; *s != '\0'; ++s) {
         auto c = *s;
-        if (c >= 0x42 && c <= 0x5a) {
+        if (c >= 0x41 && c <= 0x5a) {
             c += 0x20;
         }
         hash += c;
