@@ -659,7 +659,16 @@ void WheelInput::PlayFFBGround() {
         g_controls.PlayLEDs(g_vehData.mRPM, 0.45f, 0.95f);
     }
 
+    // avgAngle: left is positive
+    // steerVal: left is negative
+    // Rear-wheel steered cars don't match, so this needs to be flipped in that case.
     float avgAngle = g_ext.GetWheelAverageAngle(g_playerVehicle) * g_settings.Wheel.Steering.SteerMult;
+
+    float steerVal = map(g_controls.SteerVal, 0.0f, 1.0f, -1.0f, 1.0f);    
+    if (sgn(avgAngle) == sgn(steerVal)) {
+        avgAngle = -avgAngle;
+    }
+
     float wheelsOffGroundRatio = getFloatingSteeredWheelsRatio(g_playerVehicle);
 
     int detailForce = std::clamp(calculateDetail(), -g_settings().Wheel.FFB.DetailLim, g_settings().Wheel.FFB.DetailLim);
