@@ -7,7 +7,6 @@
 #include "NativeMemory.hpp"
 #include "Versions.h"
 #include "Offsets.hpp"
-#include "../Util/MathExt.h"
 #include "../Util/Logger.hpp"
 
 // <= b1493: 8  (Top gear = 7)
@@ -15,6 +14,12 @@
 uint8_t g_numGears = 8;
 
 eGameVersion g_gameVersion = getGameVersion();
+
+namespace {
+    template <typename T> T Sign(T val) {
+        return static_cast<T>((T{} < val) - (val < T{}));
+    }
+}
 
 int findOffset(const std::map<int, int, std::greater<int>> &offsets) {
     return offsets.lower_bound(g_gameVersion)->second;
@@ -574,7 +579,7 @@ void VehicleExtensions::SetSteeringMultiplier(Vehicle handle, float value) {
 
     for (int i = 0; i<numWheels; i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-        float sign = sgn(*reinterpret_cast<float*>(wheelAddr + steeringMultOffset));
+        float sign = Sign(*reinterpret_cast<float*>(wheelAddr + steeringMultOffset));
         *reinterpret_cast<float*>(wheelAddr + steeringMultOffset) = value * sign;
     }
 }
@@ -596,17 +601,6 @@ std::vector<Vector3> VehicleExtensions::GetWheelOffsets(Vehicle handle) {
         });
     }
     return positions;
-}
-
-std::vector<Vector3> VehicleExtensions::GetWheelCoords(Vehicle handle, Vector3 position, Vector3 rotation, Vector3 direction) {
-    std::vector<Vector3> worldCoords;
-    std::vector<Vector3> positions = GetWheelOffsets(handle);
-
-    worldCoords.reserve(positions.size());
-    for (Vector3 wheelPos : positions) {
-        worldCoords.emplace_back(GetOffsetInWorldCoords(position, rotation, direction, wheelPos));
-    }
-    return worldCoords;
 }
 
 std::vector<Vector3> VehicleExtensions::GetWheelLastContactCoords(Vehicle handle) {

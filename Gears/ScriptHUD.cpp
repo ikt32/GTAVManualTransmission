@@ -338,6 +338,23 @@ void drawInputWheelInfo() {
         g_settings.HUD.Wheel.PedalClutchR, g_settings.HUD.Wheel.PedalClutchG, g_settings.HUD.Wheel.PedalClutchB, g_settings.HUD.Wheel.PedalClutchA);
 }
 
+std::vector<Vector3> GetWheelCoords(Vehicle handle) {
+    std::vector<Vector3> worldCoords;
+    std::vector<Vector3> positions = g_ext.GetWheelOffsets(handle);
+    Vector3 position = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
+    Vector3 rotation = ENTITY::GET_ENTITY_ROTATION(g_playerVehicle, 0);
+    rotation.x = deg2rad(rotation.x);
+    rotation.y = deg2rad(rotation.y);
+    rotation.z = deg2rad(rotation.z);
+    Vector3 direction = ENTITY::GET_ENTITY_FORWARD_VECTOR(g_playerVehicle);
+
+    worldCoords.reserve(positions.size());
+    for (Vector3 wheelPos : positions) {
+        worldCoords.emplace_back(GetOffsetInWorldCoords(position, rotation, direction, wheelPos));
+    }
+    return worldCoords;
+}
+
 void drawVehicleWheelInfo() {
     auto numWheels = g_ext.GetNumWheels(g_playerVehicle);
     auto wheelsSpeed = g_ext.GetTyreSpeeds(g_playerVehicle);
@@ -345,7 +362,8 @@ void drawVehicleWheelInfo() {
     auto wheelsHealt = g_ext.GetWheelHealths(g_playerVehicle);
     auto wheelsContactCoords = g_ext.GetWheelLastContactCoords(g_playerVehicle);
     auto wheelsOnGround = g_ext.GetWheelsOnGround(g_playerVehicle);
-    auto wheelCoords = g_ext.GetWheelCoords(g_playerVehicle, ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true), ENTITY::GET_ENTITY_ROTATION(g_playerVehicle, 0), ENTITY::GET_ENTITY_FORWARD_VECTOR(g_playerVehicle));
+    // TODO: Here
+    auto wheelCoords = GetWheelCoords(g_playerVehicle);
     auto wheelsPower = g_ext.GetWheelPower(g_playerVehicle);
     auto wheelsBrake = g_ext.GetWheelBrakePressure(g_playerVehicle);
     for (int i = 0; i < numWheels; i++) {

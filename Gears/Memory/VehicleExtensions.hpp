@@ -131,7 +131,6 @@ public:
     void SetSteeringMultiplier(Vehicle handle, float value);
 
     std::vector<Vector3> GetWheelOffsets(Vehicle handle);
-    std::vector<Vector3> GetWheelCoords(Vehicle handle, Vector3 base, Vector3 rotation, Vector3 direction);
     std::vector<Vector3> GetWheelLastContactCoords(Vehicle handle);
     std::vector<float> GetWheelCompressions(Vehicle handle);
     std::vector<float> GetWheelSteeringAngles(Vehicle handle);
