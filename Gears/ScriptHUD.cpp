@@ -32,7 +32,7 @@ namespace {
     std::vector<std::pair<float, float>> oldGCoords;
     Vector3 prevAccel;
     std::vector<Vector3> oldCoords(3);
-    float prevWorldRotVel;
+    double prevWorldRotVel;
 }
 
 void drawGForces() {
@@ -44,7 +44,7 @@ void drawGForces() {
     float szX = 0.20f / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
     float szY = 0.20f;
 
-    Vector3 accel = (g_vehData.mAcceleration + prevAccel) * 0.5f;
+    V3D accel = (V3D(g_vehData.mAcceleration) + V3D(prevAccel)) * 0.5;
     prevAccel = g_vehData.mAcceleration;
 
     Vector3 absPos = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
@@ -53,14 +53,15 @@ void drawGForces() {
         oldCoords.erase(oldCoords.begin());
     }
 
-    float worldSpeed = sqrt(g_vehData.mVelocity.x * g_vehData.mVelocity.x + g_vehData.mVelocity.y * g_vehData.mVelocity.y);
-    float worldRotVel = GetAngleBetween(oldCoords[1] - oldCoords[0], oldCoords[2] - oldCoords[1]) / GAMEPLAY::GET_FRAME_TIME();
+    double worldSpeed = sqrt(static_cast<double>(g_vehData.mVelocity.x) * static_cast<double>(g_vehData.mVelocity.x) +
+        static_cast<double>(g_vehData.mVelocity.y) * static_cast<double>(g_vehData.mVelocity.y));
+    double worldRotVel = GetAngleBetween(V3D(oldCoords[1]) - V3D(oldCoords[0]), V3D(oldCoords[2]) - V3D(oldCoords[1])) / static_cast<double>(GAMEPLAY::GET_FRAME_TIME());
     if (isnan(worldRotVel)) {
         worldRotVel = prevWorldRotVel;
     }
-    float avgWorldRotVel = (worldRotVel + prevWorldRotVel) / 2.0f;
+    double avgWorldRotVel = (worldRotVel + prevWorldRotVel) / 2.0;
     prevWorldRotVel = worldRotVel;
-    float GForceX = (accel.x / 9.81f) + ( worldSpeed * avgWorldRotVel / 9.81f);
+    float GForceX = (accel.x / 9.81) + ( worldSpeed * avgWorldRotVel / 9.81);
     float GForceY = accel.y / 9.81f;
     showText(0.175f, 0.050f, 0.5f, fmt::format("LAT: {:.2f} g", GForceX));
     showText(0.175f, 0.150f, 0.5f, fmt::format("LON: {:.2f} g", GForceY));
