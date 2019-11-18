@@ -142,7 +142,6 @@
     <ClCompile Include="Util\Files.cpp" />
     <ClCompile Include="Util\FileVersion.cpp" />
     <ClCompile Include="Util\GameSound.cpp" />
-    <ClCompile Include="Util\MathExt.cpp" />
     <ClCompile Include="ScriptMenu.cpp" />
     <ClCompile Include="Util\Paths.cpp" />
     <ClCompile Include="Input\keyboard.cpp" />

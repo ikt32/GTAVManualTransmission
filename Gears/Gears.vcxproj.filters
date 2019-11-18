@@ -48,9 +48,6 @@
     <ClCompile Include="Util\Paths.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Util\MathExt.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp">
       <Filter>Thirdparty</Filter>
     </ClCompile>
