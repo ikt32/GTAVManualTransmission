@@ -66,23 +66,23 @@ T lerp(T a, T b, T f) {
 }
 
 template <typename Vector3T>
-auto Length(Vector3T vec) -> decltype(vec.x) {
+auto Length(Vector3T vec) {
     return std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
 }
 
 template <typename Vector3T>
-auto Distance(Vector3T vec1, Vector3T vec2) -> decltype(vec1.x) {
+auto Distance(Vector3T vec1, Vector3T vec2) {
     Vector3T distance = vec1 - vec2;
     return Length(distance);
 }
 
 template <typename Vector3T>
-auto Dot(Vector3T a, Vector3T b) -> decltype(a.x) {
+auto Dot(Vector3T a, Vector3T b)  {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 template <typename Vector3T>
-auto Cross(Vector3T left, Vector3T right) -> Vector3T {
+Vector3T Cross(Vector3T left, Vector3T right) {
     Vector3T result{};
     result.x = left.y * right.z - left.z * right.y;
     result.y = left.z * right.x - left.x * right.z;
@@ -125,7 +125,7 @@ Vector3T operator * (decltype(std::declval<Vector3T>().x) scale, Vector3T vec) {
 template <typename Vector3T>
 Vector3T Normalize(Vector3T vec) {
     Vector3T vector = {};
-    decltype(vec.x) length = Length(vec);
+    auto length = Length(vec);
 
     if (length != static_cast<decltype(vec.x)>(0.0)) {
         vector.x = vec.x / length;
@@ -159,10 +159,10 @@ T GetAngleBetween(T h1, T h2, T separation) {
 }
 
 template <typename Vector3T>
-auto GetAngleBetween(Vector3T a, Vector3T b) -> decltype(a.x) {
+auto GetAngleBetween(Vector3T a, Vector3T b) {
     Vector3T normal{};
     normal.z = static_cast < decltype(a.x) >(1.0);
-    decltype(a.x) angle = acos(Dot(a, b) / (Length(a) * Length(b)));
+    auto angle = acos(Dot(a, b) / (Length(a) * Length(b)));
     if (Dot(normal, Cross(a, b)) < 0.0f)
         angle = -angle;
     return angle;
