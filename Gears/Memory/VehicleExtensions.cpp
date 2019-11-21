@@ -53,6 +53,17 @@ void VehicleExtensions::initOffsets() {
     rocketBoostChargeOffset = addr == 0 ? 0 : *(int*)(addr + 9);
     logger.Write(rocketBoostChargeOffset == 0 ? WARN : DEBUG, "Rocket Boost Charge Offset: 0x%X", rocketBoostChargeOffset);
 
+    // Unknown
+    addr = mem::FindPattern("\xF3\x0F\x11\xB3\x00\x00\x00\x00\x44\x88\x00\x00\x00\x00\x00\x48\x85\xC9",
+        "xxxx????xx?????xxx");
+    hoverTransformRatioOffset = addr == 0 ? 0 : *(int*)(addr + 4);
+    logger.Write(hoverTransformRatioOffset == 0 ? WARN : DEBUG, "Hover Transform Active Offset: 0x%X", hoverTransformRatioOffset);
+
+    //addr = mem::FindPattern("\xF3\x0F\x11\xB3\x00\x00\x00\x00\x44\x88\x00\x00\x00\x00\x00\x48\x85\xC9",
+    //    "xxxx????xx?????xxx");
+    hoverTransformRatioLerpOffset = addr == 0 ? 0 : *(int*)(addr + 4) + 0x28;
+    logger.Write(hoverTransformRatioLerpOffset == 0 ? WARN : DEBUG, "Hover Transform Ratio Offset: 0x%X", hoverTransformRatioLerpOffset);
+
     addr = mem::FindPattern("\x74\x26\x0F\x57\xC9", "xxxxx");
     fuelLevelOffset = addr == 0 ? 0 : *(int*)(addr + 8);
     logger.Write(fuelLevelOffset == 0 ? WARN : DEBUG, "Fuel Level Offset: 0x%X", fuelLevelOffset);
@@ -222,6 +233,26 @@ float VehicleExtensions::GetRocketBoostCharge(Vehicle handle) {
 void VehicleExtensions::SetRocketBoostCharge(Vehicle handle, float value) {
     if (rocketBoostChargeOffset == 0) return;
     *reinterpret_cast<float *>(GetAddress(handle) + rocketBoostChargeOffset) = value;
+}
+
+float VehicleExtensions::GetHoverTransformRatio(Vehicle handle) {
+    if (hoverTransformRatioOffset == 0) return false;
+    return *reinterpret_cast<float *>(GetAddress(handle) + hoverTransformRatioOffset);
+}
+
+void VehicleExtensions::SetHoverTransformRatio(Vehicle handle, float value) {
+    if (hoverTransformRatioOffset == 0) return;
+    *reinterpret_cast<float *>(GetAddress(handle) + hoverTransformRatioOffset) = value;
+}
+
+float VehicleExtensions::GetHoverTransformRatioLerp(Vehicle handle) {
+    if (hoverTransformRatioLerpOffset == 0) return 0.0f;
+    return *reinterpret_cast<float *>(GetAddress(handle) + hoverTransformRatioLerpOffset);
+}
+
+void VehicleExtensions::SetHoverTransformRatioLerp(Vehicle handle, float value) {
+    if (hoverTransformRatioLerpOffset == 0) return;
+    *reinterpret_cast<float *>(GetAddress(handle) + hoverTransformRatioLerpOffset) = value;
 }
 
 float VehicleExtensions::GetFuelLevel(Vehicle handle) {

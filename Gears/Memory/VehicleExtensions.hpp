@@ -28,6 +28,12 @@ public:
     float GetRocketBoostCharge(Vehicle handle);
     void SetRocketBoostCharge(Vehicle handle, float value);
 
+    float GetHoverTransformRatio(Vehicle handle);
+    void SetHoverTransformRatio(Vehicle handle, float value);
+
+    float GetHoverTransformRatioLerp(Vehicle handle);
+    void SetHoverTransformRatioLerp(Vehicle handle, float value);
+
     float GetFuelLevel(Vehicle handle);
     void SetFuelLevel(Vehicle handle, float value);
 
@@ -173,6 +179,8 @@ public:
 private:
     int rocketBoostActiveOffset = 0;
     int rocketBoostChargeOffset = 0;
+    int hoverTransformRatioOffset = 0;
+    int hoverTransformRatioLerpOffset = 0;
     int fuelLevelOffset = 0;
     int nextGearOffset = 0;
     int currentGearOffset = 0;
