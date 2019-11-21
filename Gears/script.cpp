@@ -29,6 +29,7 @@
 #include "Util/MathExt.h"
 #include "Util/Files.h"
 #include "Util/UIUtils.h"
+#include "Util/Timer.h"
 #include "UpdateChecker.h"
 #include "Constants.h"
 #include "Compatibility.h"
@@ -36,7 +37,6 @@
 #include "WheelInput.h"
 #include "ScriptUtils.h"
 #include "VehicleConfig.h"
-#include "Timer.h"
 
 namespace fs = std::filesystem;
 

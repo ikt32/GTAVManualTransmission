@@ -98,9 +98,6 @@
     <ClCompile Include="CustomSteering.cpp" />
     <ClCompile Include="WheelInput.cpp" />
     <ClCompile Include="ScriptUtils.cpp" />
-    <ClCompile Include="Timer.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
     <ClCompile Include="VehicleConfig.cpp" />
     <ClCompile Include="Input\USBNotify.cpp">
       <Filter>Input</Filter>
@@ -113,6 +110,9 @@
     </ClCompile>
     <ClCompile Include="Memory\NativeMatrix.cpp">
       <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Timer.cpp">
+      <Filter>Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -271,9 +271,6 @@
     <ClInclude Include="CustomSteering.h" />
     <ClInclude Include="WheelInput.h" />
     <ClInclude Include="ScriptUtils.h" />
-    <ClInclude Include="Timer.h">
-      <Filter>Util</Filter>
-    </ClInclude>
     <ClInclude Include="VehicleConfig.h" />
     <ClInclude Include="Input\USBNotify.h">
       <Filter>Input</Filter>
@@ -286,6 +283,12 @@
     </ClInclude>
     <ClInclude Include="Memory\NativeMatrix.h">
       <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\ValueTimer.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Timer.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

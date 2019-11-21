@@ -137,7 +137,6 @@
     <ClCompile Include="ScriptHUD.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
     <ClCompile Include="ScriptUtils.cpp" />
-    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="Util\Files.cpp" />
     <ClCompile Include="Util\FileVersion.cpp" />
@@ -155,6 +154,7 @@
     <ClCompile Include="Memory\VehicleExtensions.cpp" />
     <ClCompile Include="script.cpp" />
     <ClCompile Include="ScriptSettings.cpp" />
+    <ClCompile Include="Util\Timer.cpp" />
     <ClCompile Include="Util\UIUtils.cpp" />
     <ClCompile Include="Util\Util.cpp" />
     <ClCompile Include="Util\TimeHelper.cpp" />
@@ -191,7 +191,6 @@
     <ClInclude Include="Memory\NativeMatrix.h" />
     <ClInclude Include="Memory\NativeVectors.h" />
     <ClInclude Include="Memory\VehicleBone.h" />
-    <ClInclude Include="Timer.h" />
     <ClInclude Include="ManualTransmission.h" />
     <ClInclude Include="Memory\Patcher.h" />
     <ClInclude Include="Memory\PatternInfo.h" />
@@ -222,8 +221,10 @@
     <ClInclude Include="ScriptSettings.hpp" />
     <ClInclude Include="Util\Logger.hpp" />
     <ClInclude Include="Util\TimeHelper.hpp" />
+    <ClInclude Include="Util\Timer.h" />
     <ClInclude Include="Util\UIUtils.h" />
     <ClInclude Include="Util\Util.hpp" />
+    <ClInclude Include="Util\ValueTimer.h" />
     <ClInclude Include="VehicleData.hpp" />
     <ClInclude Include="VehicleConfig.h" />
     <ClInclude Include="WheelInput.h" />
