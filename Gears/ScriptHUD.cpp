@@ -61,8 +61,8 @@ void drawGForces() {
     }
     double avgWorldRotVel = (worldRotVel + prevWorldRotVel) / 2.0;
     prevWorldRotVel = worldRotVel;
-    float GForceX = (accel.x / 9.81) + ( worldSpeed * avgWorldRotVel / 9.81);
-    float GForceY = accel.y / 9.81f;
+    float GForceX = static_cast<float>((accel.x / 9.81) + (worldSpeed * avgWorldRotVel / 9.81));
+    float GForceY = static_cast<float>(accel.y) / 9.81f;
     showText(0.175f, 0.050f, 0.5f, fmt::format("LAT: {:.2f} g", GForceX));
     showText(0.175f, 0.150f, 0.5f, fmt::format("LON: {:.2f} g", GForceY));
     
@@ -94,7 +94,7 @@ void drawGForces() {
         else {
             GRAPHICS::DRAW_RECT(locX + c.first, locY + c.second, szX * 0.025f, szY * 0.025f, 127, 127, 127, alpha);
         }
-        alpha += 255 / oldGCoords.size();
+        alpha += 255 / static_cast<int>(oldGCoords.size());
     }
 }
 
