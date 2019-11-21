@@ -94,6 +94,67 @@ void CustomSteering::drawDebug() {
     drawSphere(steeringWorld, 0.25f, { 255, 0, 255, 255 });
 }
 
+// Only disable the "magic" movements, such as burnout or in-air acrobatics.
+// Exceptions:
+//   - Bikes
+//      - Should be able to pitch.
+//      - Should be able to shift weight.
+//          - Needs testing with default handling?
+//   - Special functions
+//      - Tow arm
+//      - Forklift
+//   - Amphibious when wet
+//   - Flying when in-air
+void disableControls() {
+
+    Hash vehicleModel = ENTITY::GET_ENTITY_MODEL(g_playerVehicle);
+
+    bool allWheelsOnGround = VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(g_playerVehicle);
+    float submergeLevel = ENTITY::GET_ENTITY_SUBMERGED_LEVEL(g_playerVehicle);
+    // 5: Stromberg
+    // 6: Amphibious cars / APC
+    // 7: Amphibious bike
+    int modelType = g_ext.GetModelType(g_playerVehicle);
+    bool isFrog = modelType == 5 || modelType == 6 || modelType == 7;//*(int*)(modelInfo + 0x340) == 6 || *(int*)(modelInfo + 0x340) == 7;
+    bool hasFork = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "forks") != -1;
+    bool hasTow = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "tow_arm") != -1;
+    float hoverRatio = g_ext.GetHoverTransformRatio(g_playerVehicle);
+
+    bool disableLeftRight = false;
+    bool disableUpDown = false;
+
+    // Never disable anything for bikes
+    if (VEHICLE::IS_THIS_MODEL_A_BIKE(vehicleModel)) {
+        disableUpDown = false;
+        disableLeftRight = false;
+    }
+    // Don't disable anything for wet amphibious vehicles
+    else if (isFrog && submergeLevel > 0.0f) {
+        disableUpDown = false;
+        disableLeftRight = false;
+    }
+    // Don't disable when hovering
+    else if (hoverRatio > 0.0f) {
+        disableUpDown = false;
+        disableLeftRight = false;
+    }
+    // Don't disable up/down in forklift and towtrucks
+    else if ((hasFork || hasTow) && allWheelsOnGround) {
+        disableUpDown = false;
+        disableLeftRight = true;
+    }
+    // Everything else
+    else {
+        disableLeftRight = true;
+        disableUpDown = true;
+    }
+
+    if (disableUpDown)
+        CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveUpDown, true);
+    if (disableLeftRight)
+        CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
+}
+
 // Main custom steering function - called by main loop.
 void CustomSteering::Update() {
     if (!Util::VehicleAvailable(g_playerVehicle, g_playerPed))
@@ -130,32 +191,7 @@ void CustomSteering::Update() {
 
     float desiredHeading = calculateDesiredHeading(limitRadians, steerCurr, reduction);
 
-//https://developercommunity.visualstudio.com/content/problem/549386/c4307-warning-in-c17-constexpr-code-reported-with.html
-//https://developercommunity.visualstudio.com/content/problem/211134/unsigned-integer-overflows-in-constexpr-functionsa.html
-#pragma warning( disable : 4307 )
-    switch (ENTITY::GET_ENTITY_MODEL(g_playerVehicle)) {
-    case joaat("TOWTRUCK"):
-    case joaat("TOWTRUCK2"):
-        if (!VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(g_playerVehicle))
-            CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveUpDown, true);
-        CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
-        break;
-    case joaat("deluxo"):
-    case joaat("stromberg"):
-        if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(g_playerVehicle)) {
-            CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveUpDown, true);
-            CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
-        }
-    case joaat("oppressor"):
-    case joaat("oppressor2"):
-        if (VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(g_playerVehicle))
-            CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
-        break;
-    default:
-        CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveUpDown, true);
-        CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
-        break;
-    }
+    disableControls();
 
     // Both need to be set, top one with radian limit
     g_ext.SetSteeringAngle(g_playerVehicle, desiredHeading);
