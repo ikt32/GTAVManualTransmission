@@ -30,6 +30,8 @@
 #include "Util/Files.h"
 #include "Util/UIUtils.h"
 #include "Util/Timer.h"
+#include "Util/ValueTimer.h"
+
 #include "UpdateChecker.h"
 #include "Constants.h"
 #include "Compatibility.h"
@@ -72,8 +74,17 @@ VehicleConfig* g_activeConfig;
 
 bool g_focused;
 Timer g_wheelInitDelayTimer(0);
-Timer g_accelerationTimer(0);
-bool g_speedHit;
+
+void NotifyOnTrigger(const std::string& msg) {
+    UI::Notify(
+        INFO,
+        msg,
+        false
+    );
+}
+
+ValueTimer<float> accelerationTimer("kph", NotifyOnTrigger, 0.0f, 100.0f, 0.1f);
+ValueTimer<float> brakeTimer("kph", NotifyOnTrigger, 100.0f, 0.0f, 0.1f);
 
 void updateShifting();
 void blockButtons();
@@ -179,16 +190,8 @@ void update_vehicle() {
     }
 
     if (g_settings.Debug.DisplayMetrics && ENTITY::DOES_ENTITY_EXIST(g_playerVehicle)) {
-        if (Math::Near(g_vehData.mVelocity.y, 0.0f, 0.01f)) {
-            g_accelerationTimer.Reset();
-            g_speedHit = false;
-        }
-
-        if (g_vehData.mVelocity.y >  100.0f/3.6f && !g_speedHit) {
-            g_speedHit = true;
-            auto millis = g_accelerationTimer.Elapsed();
-            UI::Notify(INFO, fmt::format("0-100: {}.{:03d}", millis/1000, millis%1000));
-        }
+        accelerationTimer.Update(g_vehData.mVelocity.y * 3.6f);
+        brakeTimer.Update(g_vehData.mVelocity.y * 3.6f);
     }
     
     g_lastPlayerVehicle = g_playerVehicle;
