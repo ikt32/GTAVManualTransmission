@@ -33,6 +33,7 @@ namespace {
     Vector3 prevAccel;
     std::vector<Vector3> oldCoords(3);
     double prevWorldRotVel;
+    int lastT = 0;
 }
 
 void drawGForces() {
@@ -53,9 +54,13 @@ void drawGForces() {
         oldCoords.erase(oldCoords.begin());
     }
 
+    int nowT = GAMEPLAY::GET_GAME_TIMER();
+    int dT = nowT - lastT;
+    lastT = nowT;
+
     double worldSpeed = sqrt(static_cast<double>(g_vehData.mVelocity.x) * static_cast<double>(g_vehData.mVelocity.x) +
         static_cast<double>(g_vehData.mVelocity.y) * static_cast<double>(g_vehData.mVelocity.y));
-    double worldRotVel = GetAngleBetween(V3D(oldCoords[1]) - V3D(oldCoords[0]), V3D(oldCoords[2]) - V3D(oldCoords[1])) / static_cast<double>(GAMEPLAY::GET_FRAME_TIME());
+    double worldRotVel = GetAngleBetween(V3D(oldCoords[1]) - V3D(oldCoords[0]), V3D(oldCoords[2]) - V3D(oldCoords[1])) / (static_cast<double>(dT) / 1000.0);
     if (isnan(worldRotVel)) {
         worldRotVel = prevWorldRotVel;
     }
