@@ -36,7 +36,64 @@ namespace {
 }
 
 namespace WheelInput {
+    // Use alternative throttle - brake - 
+    void SetControlADZAlt(eControl control, float value, float adz, bool alt) {
+        Controls::SetControlADZ(control, value, adz);
+        if (alt) {
+            eControl newControl;
+            switch (control) {
+                case ControlVehicleAccelerate:
+                    newControl = (ControlVehicleSubThrottleUp);
+                    break;
+                case ControlVehicleBrake:
+                    newControl = (ControlVehicleSubThrottleDown);
+                    break;
+                case ControlVehicleMoveLeftRight:
+                    newControl = (ControlVehicleSubTurnLeftRight);
+                    break;
+                default:
+                    newControl = (control);
+                    break;
+            }
 
+            Controls::SetControlADZ(newControl, value, adz);
+        }
+    }
+}
+
+// Check for "alternative" movement methods for cars.
+// Applies to:
+//   - Amphibious when wet
+//   - Flying when in-air
+bool hasAltInputs(Vehicle vehicle) {
+    Hash vehicleModel = ENTITY::GET_ENTITY_MODEL(vehicle);
+
+    bool allWheelsOnGround = VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(vehicle);
+    float submergeLevel = ENTITY::GET_ENTITY_SUBMERGED_LEVEL(vehicle);
+    // 5: Stromberg
+    // 6: Amphibious cars / APC
+    // 7: Amphibious bike
+    int modelType = g_ext.GetModelType(vehicle);
+    bool isFrog = modelType == 5 || modelType == 6 || modelType == 7;
+
+    float hoverRatio = g_ext.GetHoverTransformRatio(vehicle);
+
+    bool altInput;
+
+    // Wet amphibious vehicles
+    if (isFrog && submergeLevel > 0.0f) {
+        altInput = true;
+    }
+    // Hovering
+    else if (hoverRatio > 0.0f) {
+        altInput = true;
+    }
+    // Everything else
+    else {
+        altInput = false;
+    }
+
+    return altInput;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -46,6 +103,8 @@ namespace WheelInput {
 // Forward gear: Throttle accelerates, Brake brakes (exclusive)
 // Reverse gear: Throttle reverses, Brake brakes (exclusive)
 void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
+    bool altInput = hasAltInputs(g_playerVehicle);
+
     wheelThrottleVal = pow(wheelThrottleVal, g_settings.Wheel.Throttle.Gamma);
     wheelBrakeVal = pow(wheelBrakeVal, g_settings.Wheel.Brake.Gamma);
 
@@ -204,13 +263,15 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
 
 // Pedals behave like RT/LT
 void WheelInput::HandlePedalsArcade(float wheelThrottleVal, float wheelBrakeVal) {
+    bool altInput = hasAltInputs(g_playerVehicle);
     wheelThrottleVal = pow(wheelThrottleVal, g_settings.Wheel.Throttle.Gamma);
     wheelBrakeVal = pow(wheelBrakeVal, g_settings.Wheel.Brake.Gamma);
+
     if (wheelThrottleVal > 0.01f) {
-        Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, g_settings.Wheel.Throttle.AntiDeadZone);
+        SetControlADZAlt(ControlVehicleAccelerate, wheelThrottleVal, g_settings.Wheel.Throttle.AntiDeadZone, altInput);
     }
     if (wheelBrakeVal > 0.01f) {
-        Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone);
+        SetControlADZAlt(ControlVehicleBrake, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone, altInput);
     }
 }
 
@@ -391,6 +452,7 @@ void WheelInput::DoSteering() {
     float steerValGamma = g_controls.SteerVal < 0.5f ? -steerValGammaL : steerValGammaR;
     float effSteer = steerMult * steerValGamma;
 
+    bool altInputs = hasAltInputs(g_playerVehicle);
     /*
      * Patched steering is direct without any processing, and super direct.
      * _SET_CONTROL_NORMAL is with game processing and could have a bit of assist
@@ -419,8 +481,8 @@ void WheelInput::DoSteering() {
             VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotDeg);
         }
     }
-    else {
-        Controls::SetControlADZ(ControlVehicleMoveLeftRight, effSteer, g_settings.Wheel.Steering.AntiDeadZone);
+    if (g_vehData.mClass != VehicleClass::Car || altInputs){
+        SetControlADZAlt(ControlVehicleMoveLeftRight, effSteer, g_settings.Wheel.Steering.AntiDeadZone, altInputs);
     }
 }
 
@@ -679,9 +741,17 @@ void WheelInput::PlayFFBGround() {
     float damperMult = 1.0f - std::min(fabs((float)satForce), 10000.0f) / 10000.0f;
     damperForce = (int)(damperMult * (float)damperForce);
 
+    // Dampen suspension, minimize damper, minimize SAT
+    if (hasAltInputs(g_playerVehicle)) {
+        detailForce /= 10;
+        satForce /= 5;
+        damperForce = g_settings().Wheel.FFB.DamperMin;
+    }
+
     int totalForce = satForce + detailForce;
     totalForce = (int)((float)totalForce * rotationScale);
     calculateSoftLock(totalForce, damperForce);
+
     g_controls.PlayFFBDynamics(std::clamp(totalForce, -10000, 10000), std::clamp(damperForce, -10000, 10000));
 
     const float minGforce = 5.0f;
