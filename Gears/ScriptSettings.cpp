@@ -270,6 +270,10 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetBoolValue("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
     ini.SetBoolValue("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
 
+    ini.SetDoubleValue("DEBUG", "GForcePosX", Debug.GForcePosX);
+    ini.SetDoubleValue("DEBUG", "GForcePosY", Debug.GForcePosY);
+    ini.SetDoubleValue("DEBUG", "GForceSize", Debug.GForceSize);
+
     result = ini.SaveFile(settingsGeneralFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
 }
@@ -525,6 +529,10 @@ void ScriptSettings::parseSettingsGeneral() {
     Debug.DisplayMetrics = ini.GetBoolValue("DEBUG", "DisplayMetrics", Debug.DisplayMetrics);
     Debug.DisableInputDetect = ini.GetBoolValue("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
     Debug.DisablePlayerHide = ini.GetBoolValue("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
+
+    Debug.GForcePosX = ini.GetDoubleValue("DEBUG", "GForcePosX", Debug.GForcePosX);
+    Debug.GForcePosY = ini.GetDoubleValue("DEBUG", "GForcePosY", Debug.GForcePosY);
+    Debug.GForceSize = ini.GetDoubleValue("DEBUG", "GForceSize", Debug.GForceSize);
 }
 
 void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {

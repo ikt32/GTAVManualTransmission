@@ -269,6 +269,10 @@ public:
         bool DisplayMetrics = false;
         bool DisableInputDetect = false;
         bool DisablePlayerHide = false;
+
+        float GForcePosX = 0.075f;
+        float GForcePosY = 0.125f;
+        float GForceSize = 0.200f;
     } Debug;
 
     // settings_wheel.ini parts
