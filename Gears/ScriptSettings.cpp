@@ -266,10 +266,12 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetBoolValue("DEBUG", "DisplayFFBInfo", Debug.DisplayFFBInfo);
     ini.SetBoolValue("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
     ini.SetBoolValue("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
-    ini.SetBoolValue("DEBUG", "DisplayMetrics", Debug.DisplayMetrics);
     ini.SetBoolValue("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
     ini.SetBoolValue("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
 
+    ini.SetBoolValue("DEBUG", "EnableTimers", Debug.Metrics.EnableTimers);
+
+    ini.SetBoolValue("DEBUG", "EnableGForce", Debug.Metrics.GForce.Enable);
     ini.SetDoubleValue("DEBUG", "GForcePosX", Debug.Metrics.GForce.PosX);
     ini.SetDoubleValue("DEBUG", "GForcePosY", Debug.Metrics.GForce.PosY);
     ini.SetDoubleValue("DEBUG", "GForceSize", Debug.Metrics.GForce.Size);
@@ -526,9 +528,10 @@ void ScriptSettings::parseSettingsGeneral() {
     Debug.DisplayGearingInfo = ini.GetBoolValue("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
     Debug.DisplayFFBInfo = ini.GetBoolValue("DEBUG", "DisplayFFBInfo", Debug.DisplayFFBInfo);
     Debug.DisplayNPCInfo = ini.GetBoolValue("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
-    Debug.DisplayMetrics = ini.GetBoolValue("DEBUG", "DisplayMetrics", Debug.DisplayMetrics);
     Debug.DisableInputDetect = ini.GetBoolValue("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
     Debug.DisablePlayerHide = ini.GetBoolValue("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
+
+    Debug.Metrics.EnableTimers = ini.GetBoolValue("DEBUG", "EnableTimers", Debug.Metrics.EnableTimers);
 
     int it = 0;
     Debug.Metrics.Timers.clear();
@@ -574,6 +577,7 @@ void ScriptSettings::parseSettingsGeneral() {
         it++;
     }
 
+    Debug.Metrics.GForce.Enable = ini.GetBoolValue("DEBUG", "EnableGForce", Debug.Metrics.GForce.Enable);
     Debug.Metrics.GForce.PosX = ini.GetDoubleValue("DEBUG", "GForcePosX", Debug.Metrics.GForce.PosX);
     Debug.Metrics.GForce.PosY = ini.GetDoubleValue("DEBUG", "GForcePosY", Debug.Metrics.GForce.PosY);
     Debug.Metrics.GForce.Size = ini.GetDoubleValue("DEBUG", "GForceSize", Debug.Metrics.GForce.Size);

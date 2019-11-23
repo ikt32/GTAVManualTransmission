@@ -273,16 +273,17 @@ public:
         bool DisplayWheelInfo = false;
         bool DisplayFFBInfo = false;
         bool DisplayNPCInfo = false;
-        bool DisplayMetrics = false;
         bool DisableInputDetect = false;
         bool DisablePlayerHide = false;
 
         struct {
+            bool EnableTimers = false;
             std::vector<TimerParams> Timers{
                 { "kph", 0.0f, 100.0f, 0.1f },
                 { "mph", 0.0f,  60.0f, 0.1f }
             };
             struct {
+                bool Enable = false;
                 float PosX = 0.075f;
                 float PosY = 0.125f;
                 float Size = 0.200f;

@@ -181,7 +181,7 @@ void update_vehicle() {
             g_gearStates.FakeNeutral = g_settings.GameAssists.DefaultNeutral;
     }
 
-    if (g_settings.Debug.DisplayMetrics && ENTITY::DOES_ENTITY_EXIST(g_playerVehicle)) {
+    if (g_settings.Debug.Metrics.EnableTimers && ENTITY::DOES_ENTITY_EXIST(g_playerVehicle)) {
         for(auto& valueTimer : g_speedTimers) {
             float speed;
             switch(joaat(valueTimer.mUnit.c_str())) {
@@ -236,7 +236,7 @@ void update_hud() {
     if (g_settings.Debug.DisplayWheelInfo) {
         drawVehicleWheelInfo();
     }
-    if (g_settings.Debug.DisplayMetrics) {
+    if (g_settings.Debug.Metrics.GForce.Enable) {
         drawGForces();
     }
     if (g_settings.HUD.Enable && g_vehData.mDomain == VehicleDomain::Road &&
@@ -1896,7 +1896,7 @@ void readSettings() {
     g_gearStates.FakeNeutral = g_settings.GameAssists.DefaultNeutral;
     g_menu.ReadSettings();
 
-    if (g_settings.Debug.DisplayMetrics) {
+    if (g_settings.Debug.Metrics.EnableTimers) {
         g_speedTimers.clear();
         for (const auto& params : g_settings.Debug.Metrics.Timers) {
             g_speedTimers.emplace_back(params.Unit,

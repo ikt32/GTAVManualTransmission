@@ -1378,13 +1378,13 @@ void update_debugmenu() {
             "Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction" });
     g_menu.BoolOption("Show NPC info", g_settings.Debug.DisplayNPCInfo,
         { "Show vehicle info of NPC vehicles near you." });
-    g_menu.BoolOption("Display performance metrics", g_settings.Debug.DisplayMetrics,
-        { "Monitor G-forces and 0-100kph acceleration." });
     g_menu.BoolOption("Disable input detection", g_settings.Debug.DisableInputDetect,
         { "Allows for manual input selection." });
     g_menu.BoolOption("Disable player hiding", g_settings.Debug.DisablePlayerHide, 
         { "Disables toggling player visibility by script.",
             "Use this when some other script controls visibility." });
+    g_menu.MenuOption("Metrics settings", "metricsmenu", 
+        { "Show the G-Force graph and speed timers." });
 
     g_menu.BoolOption("Enable update check", g_settings.Update.EnableUpdate,
         { "Check for mod updates."});
@@ -1396,6 +1396,22 @@ void update_debugmenu() {
 
         threadCheckUpdate(0);
     }
+}
+
+void update_metricsmenu() {
+    g_menu.Title("Metrics settings");
+    g_menu.Subtitle("Performance tools");
+
+    g_menu.BoolOption("Display G force meter", g_settings.Debug.Metrics.GForce.Enable,
+        { "Show a graph with G forces.", 
+            "Change the screen coordinates and sizes in settings_general.ini." });
+
+    g_menu.BoolOption("Enable timers", g_settings.Debug.Metrics.EnableTimers,
+        { "Enable speed timers as defined in settings_general.ini, [DEBUG]. Example:",
+            "Timer0Unit = kph",
+            "Timer0LimA = 0.0",
+            "Timer0LimB = 120.0",
+            "Timer0Tolerance = 0.1"});
 }
 
 void update_menu() {
@@ -1478,6 +1494,9 @@ void update_menu() {
 
     /* mainmenu -> debugmenu */
     if (g_menu.CurrentMenu("debugmenu")) { update_debugmenu(); }
+
+    /* mainmenu -> debugmenu -> metricsmenu */
+    if (g_menu.CurrentMenu("metricsmenu")) { update_metricsmenu(); }
 
     g_menu.EndMenu();
 }
