@@ -253,7 +253,6 @@ void onMenuClose() {
     else {
         loadConfigs();
     }
-    readSettings();
 }
 
 void update_mainmenu() {
