@@ -1887,6 +1887,18 @@ void loadConfigs() {
     setVehicleConfig(g_playerVehicle);
 }
 
+// Always call *after* settings have been (re)loaded
+void initTimers() {
+    g_speedTimers.clear();
+    if (g_settings.Debug.Metrics.EnableTimers) {
+        for (const auto& params : g_settings.Debug.Metrics.Timers) {
+            g_speedTimers.emplace_back(params.Unit,
+                [](const std::string& msg) { UI::Notify(INFO, msg, false); },
+                params.LimA, params.LimB, params.Tolerance);
+        }
+    }
+}
+
 void readSettings() {
     g_settings.Read(&g_controls);
     if (g_settings.Debug.LogLevel > 4)
@@ -1895,16 +1907,7 @@ void readSettings() {
 
     g_gearStates.FakeNeutral = g_settings.GameAssists.DefaultNeutral;
     g_menu.ReadSettings();
-
-    if (g_settings.Debug.Metrics.EnableTimers) {
-        g_speedTimers.clear();
-        for (const auto& params : g_settings.Debug.Metrics.Timers) {
-            g_speedTimers.emplace_back(params.Unit,
-                [](const std::string& msg) { UI::Notify( INFO, msg, false); },
-                params.LimA, params.LimB, params.Tolerance);
-        }
-    }
-
+    initTimers();
     logger.Write(INFO, "Settings read");
 }
 

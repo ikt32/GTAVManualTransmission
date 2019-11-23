@@ -1406,12 +1406,16 @@ void update_metricsmenu() {
         { "Show a graph with G forces.", 
             "Change the screen coordinates and sizes in settings_general.ini." });
 
-    g_menu.BoolOption("Enable timers", g_settings.Debug.Metrics.EnableTimers,
+    if (g_menu.BoolOption("Enable timers", g_settings.Debug.Metrics.EnableTimers,
         { "Enable speed timers as defined in settings_general.ini, [DEBUG]. Example:",
             "Timer0Unit = kph",
             "Timer0LimA = 0.0",
             "Timer0LimB = 120.0",
-            "Timer0Tolerance = 0.1"});
+            "Timer0Tolerance = 0.1"})) {
+        saveChanges();
+        g_settings.Read(&g_controls);
+        initTimers();
+    }
 }
 
 void update_menu() {

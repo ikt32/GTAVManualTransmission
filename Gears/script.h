@@ -40,7 +40,7 @@ void loadConfigs(); // Vehicle override configs
 void readSettings();
 void ScriptMain();
 void NPCMain();
-
+void initTimers();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                              Menu-related
