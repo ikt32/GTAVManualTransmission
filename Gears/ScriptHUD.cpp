@@ -37,13 +37,19 @@ namespace {
 }
 
 void drawGForces() {
-    if (g_menu.IsThisOpen())
-        return;
 
     float locX = g_settings.Debug.Metrics.GForce.PosX;
     float locY = g_settings.Debug.Metrics.GForce.PosY;
     float szX = g_settings.Debug.Metrics.GForce.Size / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
     float szY = g_settings.Debug.Metrics.GForce.Size;
+
+    // menu width = 0.225f
+    bool screenLocationConflict = 
+        locX > g_menu.menuX - 0.225f / 2.0f && 
+        locX < g_menu.menuX + 0.225f / 2.0f;
+
+    if (g_menu.IsThisOpen() && screenLocationConflict)
+        return;
 
     V3D accel = (V3D(g_vehData.mAcceleration) + V3D(prevAccel)) * 0.5;
     prevAccel = g_vehData.mAcceleration;
