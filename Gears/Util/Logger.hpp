@@ -25,11 +25,11 @@ private:
     std::string levelText(LogLevel level) const;
     LogLevel minLevel = INFO;
     const std::vector<std::string> levelStrings{
-        "DEBUG", 
-        " INFO",
-        " WARN",
-        "ERROR",
-        "FATAL",
+        " DEBUG ",
+        " INFO  ",
+        "WARNING",
+        " ERROR ",
+        " FATAL ",
     };
 };
 
