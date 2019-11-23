@@ -40,10 +40,10 @@ void drawGForces() {
     if (g_menu.IsThisOpen())
         return;
 
-    float locX = g_settings.Debug.GForcePosX;
-    float locY = g_settings.Debug.GForcePosY;
-    float szX = g_settings.Debug.GForceSize / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
-    float szY = g_settings.Debug.GForceSize;
+    float locX = g_settings.Debug.Metrics.GForce.PosX;
+    float locY = g_settings.Debug.Metrics.GForce.PosY;
+    float szX = g_settings.Debug.Metrics.GForce.Size / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+    float szY = g_settings.Debug.Metrics.GForce.Size;
 
     V3D accel = (V3D(g_vehData.mAcceleration) + V3D(prevAccel)) * 0.5;
     prevAccel = g_vehData.mAcceleration;

@@ -270,9 +270,13 @@ public:
         bool DisableInputDetect = false;
         bool DisablePlayerHide = false;
 
-        float GForcePosX = 0.075f;
-        float GForcePosY = 0.125f;
-        float GForceSize = 0.200f;
+        struct {
+            struct {
+                float PosX = 0.075f;
+                float PosY = 0.125f;
+                float Size = 0.200f;
+            } GForce;
+        } Metrics;
     } Debug;
 
     // settings_wheel.ini parts
