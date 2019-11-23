@@ -34,8 +34,8 @@ public:
         if (triggeredNow) {
             mTriggered = true;
             auto millis = mTimer.Elapsed();
-            mFunc(fmt::format("{} {} - {} {}: {}.{:03d}",
-                mLimA, mUnit, mLimB, mUnit, millis / 1000, millis % 1000));
+            mFunc(fmt::format("Timer: \n{} - {} {}: {}.{:03d}",
+                mLimA, mLimB, mUnit, millis / 1000, millis % 1000));
         }
     }
 
