@@ -11,22 +11,30 @@ New Steering Wheel features and improvements:
 * Add anti-deadzone support on force feedback power
 * Add damper effect to soft lock for a harder cutoff
 * Add "Park" and "Neutral" positions for H-shifter automatic gear selection
+* Synchronize the game steering wheel with the physical wheel
 
 New general features and improvements:
 
 * Add per-vehicle configuration, overriding a selection of main settings
 * Add an enhanced custom steering mode for keyboard and controller
+* Add an option for custom steering mode to override in-game steering wheel angle
 * Add Traction Control as driving assist
+* Add a G-force graph
+* Add configurable speed timers
 * Upgrade AI shifting logic to player logic, allowing AI to cruise at higher gears and select lower gears on demand more dynamically
 * Fix an issue where a burnout condition is triggered when rolling back in a forward gear despite the clutch being fully held
 * Fix an issue where ABS reduced brakes to all wheels instead of just affected wheels
-* Reorder assist/feature priorities to: Burnout -> Engine lock -> ABS -> Traction Control -> Engine braking.
+* Reorder assist/feature priorities to: Burnout -> Engine lock -> ABS -> Traction Control -> Engine braking
 
 Wheel fixes:
 
 * Fix an issue where Logitech LEDs caused force feedback to get stuck to last command
 * Fix an issue causing no throttle being applied when rolling back in a forward gear
+* Fix an issue where rear-steered vehicle have a reversed force feedback direction
 * Improve wheel axis mapping, now registers axis after lifting off the control significantly
+* Support alternative input method vehicles (Deluxo, Stromberg)
+* Monitor for device plugin and window switching, this should always re-gain wheel focus
+* Increase wheel rotation to 1440 degrees in the menu
 
 Other changes and fixes:
 
@@ -40,6 +48,7 @@ Other changes and fixes:
 * Fix an issue where the update check freezes the game momentarily (run in another thread)
 * Fix an issue where the update check crashes the game when no network is present
 * Fix an issue causing a crash of the calling application when MT_GetShiftIndicator is called without a valid `vehData`
+* Delay initial update check with 10 seconds so the notification is visible
 * Remove usage of decorators for cross-script information
 
 ## 4.6.7
