@@ -530,6 +530,50 @@ void ScriptSettings::parseSettingsGeneral() {
     Debug.DisableInputDetect = ini.GetBoolValue("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
     Debug.DisablePlayerHide = ini.GetBoolValue("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
 
+    int it = 0;
+    Debug.Metrics.Timers.clear();
+    while (true) {
+        std::string unitKey = fmt::format("Timer{}Unit", it);
+        std::string limAKey = fmt::format("Timer{}LimA", it);
+        std::string limBKey = fmt::format("Timer{}LimB", it);
+        std::string toleranceKey = fmt::format("Timer{}Tolerance", it);
+
+        std::string unit = ini.GetValue("DEBUG", unitKey.c_str(), "");
+        if (unit == "") {
+            logger.Write(INFO, "[Settings] Timers: Stopped after %d timers", it);
+            break;
+        }
+
+        float limA = ini.GetDoubleValue("DEBUG", limAKey.c_str(), 0.0f);
+        float limB = ini.GetDoubleValue("DEBUG", limBKey.c_str(), 0.0f);
+        float tolerance = ini.GetDoubleValue("DEBUG", toleranceKey.c_str(), 0.1f);
+
+        if (limA == 0.0f && limB == 0.0f) {
+            logger.Write(WARN, "[Settings] Timer%d: Invalid limits, skipping", it);
+            it++;
+            continue;
+        }
+
+        switch (joaat(unit.c_str())) {
+            case joaat("kph"): // fall-through
+            case joaat("mph"): // fall-through
+            case joaat("m/s"):
+                logger.Write(INFO, "[Settings] Timer%d: Added [%f - %f] [%s] timer",
+                    it, limA, limB, unit.c_str());
+                break;
+            default:
+                logger.Write(WARN, "[Settings] Timer%d: Skipping. Invalid unit: %s",
+                    it, unit.c_str());
+                logger.Write(WARN, "[Settings] Timer%d: Valid units: kph, mph or m/s",
+                    it);
+                it++;
+                continue;
+        }
+
+        Debug.Metrics.Timers.push_back(TimerParams{ unit, limA, limB, tolerance });
+        it++;
+    }
+
     Debug.Metrics.GForce.PosX = ini.GetDoubleValue("DEBUG", "GForcePosX", Debug.Metrics.GForce.PosX);
     Debug.Metrics.GForce.PosY = ini.GetDoubleValue("DEBUG", "GForcePosY", Debug.Metrics.GForce.PosY);
     Debug.Metrics.GForce.Size = ini.GetDoubleValue("DEBUG", "GForceSize", Debug.Metrics.GForce.Size);
@@ -659,7 +703,7 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
             Wheel.InputDevices.RegisteredGUIDs.push_back(guid);
         }
         else {
-            logger.Write(ERROR, "Failed to parse GUID. GUID [%s] @ [%s]", currGuid.c_str(), currDevice.c_str());
+            logger.Write(ERROR, "[Settings] Failed to parse GUID. GUID [%s] @ [%s]", currGuid.c_str(), currDevice.c_str());
         }
         it++;
     }
