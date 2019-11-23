@@ -75,16 +75,8 @@ VehicleConfig* g_activeConfig;
 bool g_focused;
 Timer g_wheelInitDelayTimer(0);
 
-void NotifyOnTrigger(const std::string& msg) {
-    UI::Notify(
-        INFO,
-        msg,
-        false
-    );
-}
+std::vector<ValueTimer<float>> g_speedTimers;
 
-ValueTimer<float> accelerationTimer("kph", NotifyOnTrigger, 0.0f, 100.0f, 0.1f);
-ValueTimer<float> brakeTimer("kph", NotifyOnTrigger, 100.0f, 0.0f, 0.1f);
 
 void updateShifting();
 void blockButtons();
@@ -190,8 +182,20 @@ void update_vehicle() {
     }
 
     if (g_settings.Debug.DisplayMetrics && ENTITY::DOES_ENTITY_EXIST(g_playerVehicle)) {
-        accelerationTimer.Update(g_vehData.mVelocity.y * 3.6f);
-        brakeTimer.Update(g_vehData.mVelocity.y * 3.6f);
+        for(auto& valueTimer : g_speedTimers) {
+            float speed;
+            switch(joaat(valueTimer.mUnit.c_str())) {
+                case (joaat("kph")):
+                    speed = g_vehData.mVelocity.y * 3.6f;
+                    break;
+                case (joaat("mph")):
+                    speed = g_vehData.mVelocity.y / 0.44704f;
+                    break;
+                default:
+                    speed = g_vehData.mVelocity.y;
+            }
+            valueTimer.Update(speed);
+        }
     }
     
     g_lastPlayerVehicle = g_playerVehicle;
@@ -1885,11 +1889,21 @@ void loadConfigs() {
 
 void readSettings() {
     g_settings.Read(&g_controls);
-    if (g_settings.Debug.LogLevel > 4) g_settings.Debug.LogLevel = 1;
+    if (g_settings.Debug.LogLevel > 4)
+        g_settings.Debug.LogLevel = 1;
     logger.SetMinLevel(static_cast<LogLevel>(g_settings.Debug.LogLevel));
 
     g_gearStates.FakeNeutral = g_settings.GameAssists.DefaultNeutral;
     g_menu.ReadSettings();
+
+    if (g_settings.Debug.DisplayMetrics) {
+        g_speedTimers.clear();
+        for (const auto& params : g_settings.Debug.Metrics.Timers) {
+            g_speedTimers.emplace_back(params.Unit,
+                [](const std::string& msg) { UI::Notify( INFO, msg, false); },
+                params.LimA, params.LimB, params.Tolerance);
+        }
+    }
 
     logger.Write(INFO, "Settings read");
 }

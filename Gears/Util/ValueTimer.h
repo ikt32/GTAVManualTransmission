@@ -10,7 +10,7 @@ class ValueTimer {
 public:
     ValueTimer(std::string unit, std::function<void(const std::string&)> func, T limA, T limB, T tolerance)
         : mLimA(limA), mLimB(limB), mTolerance(tolerance), mTriggered(false)
-        , mTimer(0), mUnit(std::move(unit)), mFunc(func) {
+        , mUnit(std::move(unit)), mTimer(0), mFunc(func) {
     }
 
     void Update(T newVal) {
@@ -43,8 +43,8 @@ public:
     T mLimB;
     T mTolerance;
     bool mTriggered;
+    std::string mUnit;
 protected:
     Timer mTimer;
-    std::string mUnit;
     std::function<void(const std::string&)> mFunc;
 };

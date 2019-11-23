@@ -29,6 +29,13 @@ public:
     void SetVehicleConfig(VehicleConfig* cfg);
     ScriptSettings operator()();
 
+    struct TimerParams {
+        std::string Unit;
+        float LimA;
+        float LimB;
+        float Tolerance;
+    };
+
     // settings_general.ini parts
     // [MT_OPTIONS]
     struct {
@@ -271,6 +278,10 @@ public:
         bool DisablePlayerHide = false;
 
         struct {
+            std::vector<TimerParams> Timers{
+                { "kph", 0.0f, 100.0f, 0.1f },
+                { "mph", 0.0f,  60.0f, 0.1f }
+            };
             struct {
                 float PosX = 0.075f;
                 float PosY = 0.125f;
