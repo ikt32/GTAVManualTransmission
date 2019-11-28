@@ -36,6 +36,9 @@ namespace {
     int lastT = 0;
 }
 
+float accelX;
+float accelY;
+
 void drawGForces() {
 
     float locX = g_settings.Debug.Metrics.GForce.PosX;
@@ -76,7 +79,10 @@ void drawGForces() {
     float GForceY = static_cast<float>(accel.y) / 9.81f;
     showText(locX + 0.100f, locY - 0.075f, 0.5f, fmt::format("LAT: {:.2f} g", GForceX));
     showText(locX + 0.100f, locY + 0.025f, 0.5f, fmt::format("LON: {:.2f} g", GForceY));
-    
+
+    accelX = GForceX * 9.81f;
+    accelY = GForceY * 9.81f;
+
     // 1 div = 2G
     float offX = (szX * 0.5f) * GForceX * 0.5f;
     float offY = (szY * 0.5f) * GForceY * 0.5f;

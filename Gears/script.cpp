@@ -39,6 +39,8 @@
 #include "WheelInput.h"
 #include "ScriptUtils.h"
 #include "VehicleConfig.h"
+#include "UDPTelemetry/Socket.h"
+#include "UDPTelemetry/TelemetryPacket.h"
 
 namespace fs = std::filesystem;
 
@@ -1950,6 +1952,72 @@ void update_update_notification() {
         }
     }
 }
+Socket g_sok;
+
+void update_simhub() {
+    if (Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
+        TelemetryPacket packet{};
+
+        packet.Time = (float)GAMEPLAY::GET_GAME_TIMER() / 1000.0f;
+
+        auto worldPos = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
+        auto worldSpeed = ENTITY::GET_ENTITY_VELOCITY(g_playerVehicle);
+        auto relRotation = ENTITY::GET_ENTITY_ROTATION(g_playerVehicle, 0);
+        packet.X = worldPos.x;
+        packet.Y = worldPos.y;
+        packet.Z = worldPos.z;
+
+        packet.Speed = g_vehData.mWheelAverageDrivenTyreSpeed;
+        packet.WorldSpeedX = worldSpeed.x;
+        packet.WorldSpeedY = worldSpeed.y;
+        packet.WorldSpeedZ = worldSpeed.z;
+
+        packet.XR = relRotation.x;
+        packet.Roll = relRotation.y;
+        packet.ZR = relRotation.z;
+
+        if (g_vehData.mWheelCount == 4) {
+            packet.SuspensionPositionRearLeft   = g_vehData.mSuspensionTravel[2];
+            packet.SuspensionPositionRearRight  = g_vehData.mSuspensionTravel[3];
+            packet.SuspensionPositionFrontLeft  = g_vehData.mSuspensionTravel[0];
+            packet.SuspensionPositionFrontRight = g_vehData.mSuspensionTravel[1];
+
+            packet.SuspensionVelocityRearLeft   = g_vehData.mSuspensionTravelSpeeds[2];
+            packet.SuspensionVelocityRearRight  = g_vehData.mSuspensionTravelSpeeds[3];
+            packet.SuspensionVelocityFrontLeft  = g_vehData.mSuspensionTravelSpeeds[0];
+            packet.SuspensionVelocityFrontRight = g_vehData.mSuspensionTravelSpeeds[1];
+
+            packet.WheelSpeedRearLeft   = g_vehData.mWheelTyreSpeeds[2];
+            packet.WheelSpeedRearRight  = g_vehData.mWheelTyreSpeeds[3];
+            packet.WheelSpeedFrontLeft  = g_vehData.mWheelTyreSpeeds[0];
+            packet.WheelSpeedFrontRight = g_vehData.mWheelTyreSpeeds[1];
+        }
+
+        packet.Throttle = g_controls.ThrottleVal;
+        packet.Steer    = g_controls.SteerVal;
+        packet.Brake    = g_controls.BrakeVal;
+        packet.Clutch   = g_controls.ClutchVal;
+        packet.Gear     = g_vehData.mGearCurr;
+
+        extern float accelX;
+        extern float accelY;
+
+        packet.LateralAcceleration = accelX;
+        packet.LongitudinalAcceleration = accelY;
+
+        //packet.MaxRpm = 1.0f;
+        //packet.IdleRpm = 0.2f;
+        packet.EngineRevs = g_vehData.mRPM * 600.0f;
+        packet.MaxGears = (float)g_vehData.mGearTop;
+
+        packet.FuelCapacity = 65.0f;
+        packet.FuelRemaining = g_ext.GetFuelLevel(g_playerVehicle);
+
+
+        g_sok.SendPacket((char*)&packet, sizeof(packet));
+    }
+}
+
 
 void main() {
     logger.Write(INFO, "Script started");
@@ -1999,6 +2067,9 @@ void main() {
     logger.Write(DEBUG, "START: Starting with MT:  %s", g_settings.MTOptions.Enable ? "ON" : "OFF");
     logger.Write(INFO, "START: Initialization finished");
 
+    logger.Write(DEBUG, "Starting UDP thing");
+    g_sok.Start(20777);
+
     while (true) {
         USB::Update();
         update_player();
@@ -2011,6 +2082,7 @@ void main() {
         update_misc_features();
         update_menu();
         update_update_notification();
+        update_simhub();
         WAIT(0);
     }
 }

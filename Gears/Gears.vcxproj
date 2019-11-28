@@ -199,6 +199,8 @@
     <ClInclude Include="newNatives.h" />
     <ClInclude Include="ScriptUtils.h" />
     <ClInclude Include="Compatibility.h" />
+    <ClInclude Include="UDPTelemetry\Socket.h" />
+    <ClInclude Include="UDPTelemetry\TelemetryPacket.h" />
     <ClInclude Include="UpdateChecker.h" />
     <ClInclude Include="Util\Color.h" />
     <ClInclude Include="Util\Files.h" />
