@@ -1306,6 +1306,14 @@ void functionEngBrake() {
 void handleBrakePatch() {
     bool useABS = false;
     bool useTCS = false;
+    bool useESP = false;
+
+    bool espUndersteer = false;
+    float understeer = 0.0f;
+
+    bool espOversteer = false;
+    bool oppositeLock = false;
+    float oversteerAngle = 0.0f;
 
     bool ebrk = g_vehData.mHandbrake;
     bool brn = VEHICLE::IS_VEHICLE_IN_BURNOUT(g_playerVehicle);
@@ -1352,6 +1360,61 @@ void handleBrakePatch() {
             useTCS = true;
     }
 
+    float steerMult = g_settings.CustomSteering.SteeringMult;
+    if (g_controls.PrevInput == CarControls::InputDevices::Wheel)
+        steerMult = g_settings.Wheel.Steering.SteerMult;
+    float avgAngle = g_ext.GetWheelAverageAngle(g_playerVehicle) * steerMult;
+    {
+        // data
+        float speed = ENTITY::GET_ENTITY_SPEED(g_playerVehicle);
+        Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
+        Vector3 rotVector = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
+        Vector3 rotRelative{
+            speed * -sin(rotVector.z), 0,
+            speed * cos(rotVector.z), 0,
+            0, 0
+        };
+
+        Vector3 expectedVector{
+            speed * -sin(avgAngle / g_settings.Wheel.Steering.SteerMult), 0,
+            speed * cos(avgAngle / g_settings.Wheel.Steering.SteerMult), 0,
+            0, 0
+        };
+
+        // understeer
+        {
+            float expTurnX = speedVector.x * 0.5f + rotRelative.x * 0.5f;
+            understeer = sgn(speedVector.x - expectedVector.x) * (expTurnX - expectedVector.x);
+            if (expectedVector.x > expTurnX && expTurnX * 1.20f > speedVector.x ||
+                expectedVector.x < expTurnX && expTurnX * 0.80f < speedVector.x) {
+                if (understeer > 0.5f && g_vehData.mVelocity.y > 5.0f)
+                    espUndersteer = true;
+            }
+        }
+
+        // oversteer
+        {
+            oversteerAngle = acos(g_vehData.mVelocity.y / speed);
+            if (isnan(oversteerAngle))
+                oversteerAngle = 0.0;
+
+
+            if (oversteerAngle > deg2rad(5.0f) && g_vehData.mVelocity.y > 1.0f) {
+                espOversteer = true;
+
+                if (sgn(g_vehData.mVelocity.x) == sgn(avgAngle)) {
+                    oppositeLock = true;
+                }
+            }
+        }
+
+        if (g_settings().DriveAssists.CustomESP && g_vehData.mWheelCount == 4) {
+            if (espOversteer || espUndersteer) {
+                useESP = true;
+            }
+        }
+    }
+
 
     if (useTCS && g_settings().DriveAssists.TCMode == 2) {
         CONTROLS::DISABLE_CONTROL_ACTION(2, eControl::ControlVehicleAccelerate, true);
@@ -1387,6 +1450,68 @@ void handleBrakePatch() {
         }
         if (g_settings.Debug.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~(ABS)");
+    }
+    else if (useESP) {
+        float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
+        float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
+        if (!MemoryPatcher::BrakePatcher.Patched()) {
+            MemoryPatcher::PatchBrake();
+        }
+        for (auto i = 0; i < g_vehData.mWheelCount; ++i) {
+            g_vehData.mWheelsAbs[i] = false;
+        }
+        if (espUndersteer) {
+            if (avgAngle < 0.0f) {
+                // 3 = right rear
+                g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce);
+                g_ext.SetWheelBrakePressure(g_playerVehicle, 1, inpBrakeForce);
+                g_ext.SetWheelBrakePressure(g_playerVehicle, 2, inpBrakeForce);
+                g_ext.SetWheelBrakePressure(g_playerVehicle, 3, inpBrakeForce + handlingBrakeForce * understeer);
+                g_vehData.mWheelsEsp[3] = true;
+            }
+            else {
+                // 4 = left rear
+                g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce);
+                g_ext.SetWheelBrakePressure(g_playerVehicle, 1, inpBrakeForce);
+                g_ext.SetWheelBrakePressure(g_playerVehicle, 2, inpBrakeForce + handlingBrakeForce * understeer);
+                g_ext.SetWheelBrakePressure(g_playerVehicle, 3, inpBrakeForce);
+                g_vehData.mWheelsEsp[2] = true;
+            }
+        }
+        if (espOversteer) {
+            float avgAngle_ = -avgAngle;
+            if (oppositeLock) {
+                avgAngle_ = avgAngle;
+            }
+            float oversteerComp = map(abs(rad2deg(oversteerAngle)), 0.0f, 15.0f, 0.0f, 1.0f);
+            if (avgAngle_ < 0.0f) {
+                // 0 = left front
+                g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce + handlingBrakeForce * oversteerComp);
+                g_ext.SetWheelBrakePressure(g_playerVehicle, 1, inpBrakeForce);
+                g_ext.SetWheelBrakePressure(g_playerVehicle, 2, inpBrakeForce);
+                g_ext.SetWheelBrakePressure(g_playerVehicle, 3, inpBrakeForce);
+                g_vehData.mWheelsEsp[0] = true;
+            }
+            else {
+                // 1 = right front
+                g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce);
+                g_ext.SetWheelBrakePressure(g_playerVehicle, 1, inpBrakeForce + handlingBrakeForce * oversteerComp);
+                g_ext.SetWheelBrakePressure(g_playerVehicle, 2, inpBrakeForce);
+                g_ext.SetWheelBrakePressure(g_playerVehicle, 3, inpBrakeForce);
+                g_vehData.mWheelsEsp[1] = true;
+            }
+        }
+        if (g_settings.Debug.DisplayInfo) {
+            std::string espString;
+            if (espOversteer && espUndersteer)
+                espString = "O+U";
+            else if (espOversteer)
+                espString = "O";
+            else if (espUndersteer)
+                espString = "U";
+
+            showText(0.45, 0.75, 1.0, fmt::format("~r~(ESP_{})", espString));
+        }
     }
     else if (useTCS && g_settings().DriveAssists.TCMode == 1) {
         if (!MemoryPatcher::BrakePatcher.Patched()) {
@@ -1428,6 +1553,7 @@ void handleBrakePatch() {
         for (int i = 0; i < g_vehData.mWheelCount; i++) {
             g_vehData.mWheelsTcs[i] = false;
             g_vehData.mWheelsAbs[i] = false;
+            g_vehData.mWheelsEsp[i] = false;
         }
     }
 }

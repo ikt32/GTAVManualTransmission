@@ -137,6 +137,7 @@ public:
     // set externally, boo?
     std::vector<bool> mWheelsTcs;
     std::vector<bool> mWheelsAbs;
+    std::vector<bool> mWheelsEsp;
     // Workaround
     bool mHasSpeedo;
 

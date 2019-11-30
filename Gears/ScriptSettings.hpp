@@ -88,6 +88,7 @@ public:
         int TCMode = 0;
         // m/s
         float TCSlipMax = 2.5f;
+        bool CustomESP = false;
     } DriveAssists;
 
     // [SHIFT_OPTIONS]

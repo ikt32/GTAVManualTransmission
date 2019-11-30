@@ -48,6 +48,7 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
     localSettings.DriveAssists.CustomABS = activeConfig->DriveAssists.CustomABS;
     localSettings.DriveAssists.ABSFilter = activeConfig->DriveAssists.ABSFilter;
     localSettings.DriveAssists.TCMode    = activeConfig->DriveAssists.TCMode   ;
+    localSettings.DriveAssists.CustomESP = activeConfig->DriveAssists.CustomESP;
 
     localSettings.ShiftOptions.UpshiftCut     = activeConfig->ShiftOptions.UpshiftCut    ;
     localSettings.ShiftOptions.DownshiftBlip  = activeConfig->ShiftOptions.DownshiftBlip ;
@@ -147,6 +148,7 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABSFilter);
     ini.SetLongValue("DRIVING_ASSISTS", "TractionControl", DriveAssists.TCMode);
     ini.SetDoubleValue("DRIVING_ASSISTS", "TCSlipMax", DriveAssists.TCSlipMax);
+    ini.SetBoolValue("DRIVING_ASSISTS", "CustomESP", DriveAssists.CustomESP);
 
     //[CUSTOM_STEERING]
     ini.SetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
@@ -411,6 +413,7 @@ void ScriptSettings::parseSettingsGeneral() {
     DriveAssists.ABSFilter = ini.GetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABSFilter);
     DriveAssists.TCMode = ini.GetLongValue("DRIVING_ASSISTS", "TractionControl", DriveAssists.TCMode);
     DriveAssists.TCSlipMax = ini.GetDoubleValue("DRIVING_ASSISTS", "TCSlipMax", DriveAssists.TCSlipMax);
+    DriveAssists.CustomESP = ini.GetBoolValue("DRIVING_ASSISTS", "CustomESP", DriveAssists.CustomESP);
 
     // [SHIFT_OPTIONS]
     ShiftOptions.UpshiftCut = ini.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);

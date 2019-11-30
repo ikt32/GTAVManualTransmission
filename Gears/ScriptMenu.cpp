@@ -1295,7 +1295,11 @@ void update_driveassistmenu() {
             "Brakes: Apply brake per wheel",
             "Throttle: Cut throttle" });
 
-    g_menu.FloatOption("TC Slip threshold", g_settings.DriveAssists.TCSlipMax, 0.0f, 20.0f, 0.1f);
+    g_menu.FloatOption("TC Slip threshold", g_settings.DriveAssists.TCSlipMax, 0.0f, 20.0f, 0.1f,
+        { "Speed in m/s an individual wheel may slip before TC kicks in." });
+
+    g_menu.BoolOption("Enable ESP", g_settings.DriveAssists.CustomESP,
+        { "Experimental script-driven stability control." });
 }
 
 void update_gameassistmenu() {

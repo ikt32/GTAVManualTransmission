@@ -383,6 +383,9 @@ void drawVehicleWheelInfo() {
         if (g_vehData.mWheelsTcs[i]) {
             color = Color{ 255, 255, 0, 127 };
         }
+        if (g_vehData.mWheelsEsp[i]) {
+            color = Color{ 0, 0, 255, 127 };
+        }
         if (g_vehData.mWheelsAbs[i]) {
             color = Color{ 255, 0, 0, 127 };
         }

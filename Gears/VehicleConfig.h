@@ -38,6 +38,7 @@ public:
         bool ABSFilter = true;
         int TCMode = 0;
         float TCSlipMax = 2.5f;
+        bool CustomESP = false;
     } DriveAssists;
 
     // [SHIFT_OPTIONS]
