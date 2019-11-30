@@ -23,7 +23,7 @@ public:
     void SetFiles(const std::string &general, const std::string& controls, const std::string &wheel);
     void Read(CarControls* scriptControl);
     void SaveGeneral() const;
-    void SaveController() const;
+    void SaveController(CarControls* scriptControl) const;
     void SaveWheel() const;
 
     void SetVehicleConfig(VehicleConfig* cfg);
@@ -247,15 +247,15 @@ public:
         bool IgnoreShiftsUI = false;
         bool BlockHShift = true;
 
-        long ShiftUpBlocks = -1;
-        long ShiftDownBlocks = -1;
-        long ClutchBlocks = -1;
+        //long ShiftUpBlocks = -1;
+        //long ShiftDownBlocks = -1;
+        //long ClutchBlocks = -1;
 
         struct {
             bool Enable = false;
-            long ShiftUpBlocks = -1;
-            long ShiftDownBlocks = -1;
-            long ClutchBlocks = -1;
+            //long ShiftUpBlocks = -1;
+            //long ShiftDownBlocks = -1;
+            //long ClutchBlocks = -1;
         } Native;
     } Controller;
 

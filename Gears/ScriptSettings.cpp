@@ -280,7 +280,7 @@ void ScriptSettings::SaveGeneral() const {
     CHECK_LOG_SI_ERROR(result, "save");
 }
 
-void ScriptSettings::SaveController() const {
+void ScriptSettings::SaveController(CarControls* scriptControl) const {
     CSimpleIniA ini;
     ini.SetUnicode();
     SI_Error result = ini.LoadFile(settingsControlsFile.c_str());
@@ -297,15 +297,15 @@ void ScriptSettings::SaveController() const {
     ini.SetBoolValue("CONTROLLER", "BlockHShift", Controller.BlockHShift);
 
     
-    ini.SetLongValue("CONTROLLER", "ShiftUpBlocks", Controller.ShiftUpBlocks);
-    ini.SetLongValue("CONTROLLER", "ShiftDownBlocks", Controller.ShiftDownBlocks);
-    ini.SetLongValue("CONTROLLER", "ClutchBlocks", Controller.ClutchBlocks);
+    ini.SetLongValue("CONTROLLER", "ShiftUpBlocks",   scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
+    ini.SetLongValue("CONTROLLER", "ShiftDownBlocks", scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
+    ini.SetLongValue("CONTROLLER", "ClutchBlocks",    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
 
     // [CONTROLLER_NATIVE]
     ini.SetBoolValue("CONTROLLER_NATIVE", "Enable", Controller.Native.Enable);
-    ini.SetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", Controller.Native.ShiftUpBlocks);
-    ini.SetLongValue("CONTROLLER_NATIVE", "ShiftDownBlocks", Controller.Native.ShiftDownBlocks);
-    ini.SetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", Controller.Native.ClutchBlocks);
+    ini.SetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
+    ini.SetLongValue("CONTROLLER_NATIVE", "ShiftDownBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
+    ini.SetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
 
     result = ini.SaveFile(settingsControlsFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
@@ -600,8 +600,8 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     Controller.IgnoreShiftsUI = ini.GetBoolValue("CONTROLLER", "IgnoreShiftsUI", Controller.IgnoreShiftsUI);
     Controller.BlockHShift = ini.GetBoolValue("CONTROLLER", "BlockHShift", Controller.BlockHShift);
 
-    Controller.HoldTimeMs = ini.GetLongValue("CONTROLLER", "ToggleTime", Controller.HoldTimeMs);
-    Controller.MaxTapTimeMs = ini.GetLongValue("CONTROLLER", "MaxTapTime", Controller.MaxTapTimeMs);
+    Controller.HoldTimeMs = ini.GetLongValue("CONTROLLER", "HoldTimeMs", Controller.HoldTimeMs);
+    Controller.MaxTapTimeMs = ini.GetLongValue("CONTROLLER", "MaxTapTimeMs", Controller.MaxTapTimeMs);
     Controller.TriggerValue = ini.GetDoubleValue("CONTROLLER", "TriggerValue", Controller.TriggerValue);
 
     Controller.ToggleEngine = ini.GetBoolValue("CONTROLLER", "ToggleEngine", Controller.ToggleEngine);
@@ -630,9 +630,9 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Throttle)] = ini.GetLongValue("CONTROLLER_NATIVE", "Throttle", ControlFrontendRt);
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Brake)] = ini.GetLongValue("CONTROLLER_NATIVE", "Brake", ControlFrontendLt);
 
-    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", -1);
+    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] =   ini.GetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", -1)  ;
     scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftDownBlocks", -1);
-    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] = ini.GetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", -1);
+    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] =    ini.GetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", -1)   ;
 
     // [KEYBOARD]
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Toggle)] = str2key(ini.GetValue("KEYBOARD", "Toggle", "VK_OEM_5"));

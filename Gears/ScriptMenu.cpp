@@ -182,7 +182,7 @@ namespace {
         { "ShiftUp"    , "Shift up usage: press"       },
         { "ShiftDown"  , "Shift down usage: press"     },
         { "Clutch"     , "Clutch usage: axis or button"},
-        { "Engine"     , "Engine usage: press"         },
+        { "Engine"     , "Engine usage: hold"          },
         { "Throttle"   , "Throttle: axis or button"    },
         { "Brake"      , "Brake: axis or button"       }
     };
@@ -238,7 +238,7 @@ void onMenuInit() {
 
 void saveChanges() {
     g_settings.SaveGeneral();
-    g_settings.SaveController();
+    g_settings.SaveController(&g_controls);
     g_settings.SaveWheel();
 }
 
