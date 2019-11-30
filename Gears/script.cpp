@@ -1724,14 +1724,14 @@ void blockButtons() {
             if (i != static_cast<int>(CarControls::LegacyControlType::ShiftUp) && 
                 i != static_cast<int>(CarControls::LegacyControlType::ShiftDown)) continue;
 
-            if (g_controls.ButtonHeldOver(static_cast<CarControls::LegacyControlType>(i), 200)) {
+            if (g_controls.ButtonHeldOver(static_cast<CarControls::LegacyControlType>(i), g_settings.Controller.HoldTimeMs)) {
                 CONTROLS::_SET_CONTROL_NORMAL(0, g_controls.ControlNativeBlocks[i], 1.0f);
             }
             else {
                 CONTROLS::DISABLE_CONTROL_ACTION(0, g_controls.ControlNativeBlocks[i], true);
             }
 
-            if (g_controls.ButtonReleasedAfter(static_cast<CarControls::LegacyControlType>(i), 200)) {
+            if (g_controls.ButtonReleasedAfter(static_cast<CarControls::LegacyControlType>(i), g_settings.Controller.HoldTimeMs)) {
                 // todo
             }
         }
@@ -1745,14 +1745,14 @@ void blockButtons() {
             if (i != static_cast<int>(CarControls::ControllerControlType::ShiftUp) && 
                 i != static_cast<int>(CarControls::ControllerControlType::ShiftDown)) continue;
 
-            if (g_controls.ButtonHeldOver(static_cast<CarControls::ControllerControlType>(i), 200)) {
+            if (g_controls.ButtonHeldOver(static_cast<CarControls::ControllerControlType>(i), g_settings.Controller.HoldTimeMs)) {
                 CONTROLS::_SET_CONTROL_NORMAL(0, g_controls.ControlXboxBlocks[i], 1.0f);
             }
             else {
                 CONTROLS::DISABLE_CONTROL_ACTION(0, g_controls.ControlXboxBlocks[i], true);
             }
 
-            if (g_controls.ButtonReleasedAfter(static_cast<CarControls::ControllerControlType>(i), 200)) {
+            if (g_controls.ButtonReleasedAfter(static_cast<CarControls::ControllerControlType>(i), g_settings.Controller.HoldTimeMs)) {
                 // todo
             }
         }
@@ -1764,19 +1764,34 @@ void blockButtons() {
 
 // TODO: Proper held values from settings or something
 void startStopEngine() {
+    bool prevController = g_controls.PrevInput == CarControls::Controller;
+    bool prevKeyboard = g_controls.PrevInput == CarControls::Keyboard;
+    bool prevWheel = g_controls.PrevInput == CarControls::Wheel;
+
+    bool heldControllerXinput = g_controls.ButtonHeldOver(CarControls::ControllerControlType::Engine, g_settings.Controller.HoldTimeMs);
+    bool heldControllerNative = g_controls.ButtonHeldOver(CarControls::LegacyControlType::Engine, g_settings.Controller.HoldTimeMs);
+
+    bool pressedKeyboard = g_controls.ButtonJustPressed(CarControls::KeyboardControlType::Engine);
+    bool pressedWheel = g_controls.ButtonJustPressed(CarControls::WheelControlType::Engine);
+
+    bool controllerActive = prevController && heldControllerXinput || prevController && heldControllerNative;
+    bool keyboardActive = prevKeyboard && pressedKeyboard;
+    bool wheelActive = prevWheel && pressedWheel;
+
+    bool throttleStart = false;
+    if (g_settings.GameAssists.ThrottleStart) {
+        bool clutchedIn = g_controls.ClutchVal > 1.0f - g_settings().MTParams.ClutchThreshold;
+        bool freeGear = clutchedIn || g_gearStates.FakeNeutral;
+        throttleStart = g_controls.ThrottleVal > 0.75f && freeGear;
+    }
+
     if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle) &&
-        (g_controls.PrevInput == CarControls::Controller	&& g_controls.ButtonHeldOver(CarControls::ControllerControlType::Engine, 200) ||
-        g_controls.PrevInput == CarControls::Controller	&& g_controls.ButtonHeldOver(CarControls::LegacyControlType::Engine, 200) ||
-        g_controls.PrevInput == CarControls::Keyboard		&& g_controls.ButtonJustPressed(CarControls::KeyboardControlType::Engine) ||
-        g_controls.PrevInput == CarControls::Wheel			&& g_controls.ButtonJustPressed(CarControls::WheelControlType::Engine) ||
-        g_settings.GameAssists.ThrottleStart && g_controls.ThrottleVal > 0.75f && (g_controls.ClutchVal > 1.0f - g_settings().MTParams.ClutchThreshold || g_gearStates.FakeNeutral))) {
+        (controllerActive || keyboardActive || wheelActive || throttleStart)) {
         VEHICLE::SET_VEHICLE_ENGINE_ON(g_playerVehicle, true, false, true);
     }
+
     if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle) &&
-        (g_controls.PrevInput == CarControls::Controller	&& g_controls.ButtonHeldOver(CarControls::ControllerControlType::Engine, 200) && g_settings.Controller.ToggleEngine ||
-        g_controls.PrevInput == CarControls::Controller	&& g_controls.ButtonHeldOver(CarControls::LegacyControlType::Engine, 200) && g_settings.Controller.ToggleEngine ||
-        g_controls.PrevInput == CarControls::Keyboard		&& g_controls.ButtonJustPressed(CarControls::KeyboardControlType::Engine) ||
-        g_controls.PrevInput == CarControls::Wheel			&& g_controls.ButtonJustPressed(CarControls::WheelControlType::Engine))) {
+        (controllerActive && g_settings.Controller.ToggleEngine || keyboardActive || wheelActive)) {
         VEHICLE::SET_VEHICLE_ENGINE_ON(g_playerVehicle, false, true, true);
     }
 }
