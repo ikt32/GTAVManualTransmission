@@ -1415,6 +1415,8 @@ void handleBrakePatch() {
         }
     }
 
+    float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
+    float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
 
     if (useTCS && g_settings().DriveAssists.TCMode == 2) {
         CONTROLS::DISABLE_CONTROL_ACTION(2, eControl::ControlVehicleAccelerate, true);
@@ -1444,9 +1446,14 @@ void handleBrakePatch() {
             MemoryPatcher::PatchBrake();
         }
         for (uint8_t i = 0; i < lockUps.size(); i++) {
-            if (lockUps[i])
+            if (lockUps[i]) {
                 g_ext.SetWheelBrakePressure(g_playerVehicle, i, 0.0f);
-            g_vehData.mWheelsAbs[i] = true;
+                g_vehData.mWheelsAbs[i] = true;
+            }
+            else {                
+                g_ext.SetWheelBrakePressure(g_playerVehicle, i, inpBrakeForce);
+                g_vehData.mWheelsAbs[i] = false;
+            }
         }
         if (g_settings.Debug.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~(ABS)");
