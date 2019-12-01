@@ -1539,7 +1539,7 @@ void handleBrakePatch() {
                 g_vehData.mWheelsTcs[i] = true;
             }
             else {
-                g_ext.SetWheelBrakePressure(g_playerVehicle, i, 0.0f);
+                g_ext.SetWheelBrakePressure(g_playerVehicle, i, inpBrakeForce);
                 g_vehData.mWheelsTcs[i] = false;
             }
         }
