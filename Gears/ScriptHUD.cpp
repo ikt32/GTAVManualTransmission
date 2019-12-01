@@ -18,6 +18,10 @@ extern NativeMenu::Menu g_menu;
 extern ScriptSettings g_settings;
 extern CarControls g_controls;
 extern int g_textureWheelId;
+extern int g_textureAbsId;
+extern int g_textureTcsId;
+extern int g_textureEspId;
+extern int g_textureBrkId;
 
 extern VehicleGearboxStates g_gearStates;
 extern VehicleExtensions g_ext;
@@ -34,6 +38,47 @@ namespace {
     std::vector<Vector3> oldCoords(3);
     double prevWorldRotVel;
     int lastT = 0;
+}
+
+void drawWarningLights() {
+    bool abs = false;
+    bool tcs = false;
+    bool esp = false;
+    bool brk = g_ext.GetHandbrake(g_playerVehicle);
+
+    for(int i = 0; i < g_vehData.mWheelCount; ++i) {
+        abs |= g_vehData.mWheelsAbs[i];
+        tcs |= g_vehData.mWheelsTcs[i];
+        esp |= g_vehData.mWheelsEsp[i];
+    }
+
+    drawTexture(g_textureAbsId, 0, -9998, 100,
+        0.025f, 0.025f,
+        0.5f, 0.5f, // center of texture
+        0.895f, 0.95f,
+        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, abs ? 1.0f : 0.0f);
+
+    drawTexture(g_textureTcsId, 0, -9998, 100,
+        0.025f, 0.025f,
+        0.5f, 0.5f, // center of texture
+        0.925f, 0.95f,
+        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, tcs ? 1.0f : 0.0f);
+
+    drawTexture(g_textureEspId, 0, -9998, 100,
+        0.025f, 0.025f,
+        0.5f, 0.5f, // center of texture
+        0.950f, 0.95f,
+        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, esp ? 1.0f : 0.0f);
+
+    drawTexture(g_textureBrkId, 0, -9998, 100,
+        0.025f, 0.025f,
+        0.5f, 0.5f, // center of texture
+        0.980f, 0.95f,
+        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, brk ? 1.0f : 0.0f);
+
+    GRAPHICS::DRAW_RECT(0.935f, 0.950f, 
+        0.125f, 0.050f, 
+        0, 0, 0, 127);
 }
 
 void drawGForces() {

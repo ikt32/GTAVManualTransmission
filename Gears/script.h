@@ -11,6 +11,7 @@ void drawDebugInfo();
 void drawGForces();
 void drawVehicleWheelInfo();
 void drawInputWheelInfo();
+void drawWarningLights();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Mod functions: Mod control

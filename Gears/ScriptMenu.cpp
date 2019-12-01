@@ -1178,6 +1178,7 @@ void update_hudmenu() {
     g_menu.MenuOption("Speedometer", "speedodisplaymenu");
     g_menu.MenuOption("RPM Gauge", "rpmdisplaymenu");
     g_menu.MenuOption("Wheel & Pedal Info", "wheelinfomenu");
+    g_menu.BoolOption("Warning lights", g_settings.HUD.SystemLights.Enable);
 }
 
 void update_geardisplaymenu() {
