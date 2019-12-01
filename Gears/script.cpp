@@ -1465,59 +1465,23 @@ void handleBrakePatch() {
         for (auto i = 0; i < g_vehData.mWheelCount; ++i) {
             g_vehData.mWheelsAbs[i] = false;
         }
-        if (espOversteer) {
-            float avgAngle_ = -avgAngle;
-            if (oppositeLock) {
-                avgAngle_ = avgAngle;
-            }
-            float oversteerComp = map(abs(rad2deg(oversteerAngle)), 0.0f, 25.0f, 0.0f, 2.0f);
-            if (avgAngle_ < 0.0f) {
-                // 0 = left front
-                g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce + handlingBrakeForce * oversteerComp);
-                g_ext.SetWheelBrakePressure(g_playerVehicle, 1, inpBrakeForce);
-                g_ext.SetWheelBrakePressure(g_playerVehicle, 2, inpBrakeForce);
-                g_ext.SetWheelBrakePressure(g_playerVehicle, 3, inpBrakeForce);
-                g_vehData.mWheelsEsp[0] = true;
-                g_vehData.mWheelsEsp[1] = false;
-                g_vehData.mWheelsEsp[2] = false;
-                g_vehData.mWheelsEsp[3] = false;
-            }
-            else {
-                // 1 = right front
-                g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce);
-                g_ext.SetWheelBrakePressure(g_playerVehicle, 1, inpBrakeForce + handlingBrakeForce * oversteerComp);
-                g_ext.SetWheelBrakePressure(g_playerVehicle, 2, inpBrakeForce);
-                g_ext.SetWheelBrakePressure(g_playerVehicle, 3, inpBrakeForce);
-                g_vehData.mWheelsEsp[0] = false;
-                g_vehData.mWheelsEsp[1] = true;
-                g_vehData.mWheelsEsp[2] = false;
-                g_vehData.mWheelsEsp[3] = false;
-            }
+        float avgAngle_ = -avgAngle;
+        if (oppositeLock) {
+            avgAngle_ = avgAngle;
         }
-        else if (espUndersteer) {
-            if (avgAngle < 0.0f) {
-                // 3 = right rear
-                g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce);
-                g_ext.SetWheelBrakePressure(g_playerVehicle, 1, inpBrakeForce);
-                g_ext.SetWheelBrakePressure(g_playerVehicle, 2, inpBrakeForce);
-                g_ext.SetWheelBrakePressure(g_playerVehicle, 3, inpBrakeForce + handlingBrakeForce * understeer);
-                g_vehData.mWheelsEsp[0] = false;
-                g_vehData.mWheelsEsp[1] = false;
-                g_vehData.mWheelsEsp[2] = false;
-                g_vehData.mWheelsEsp[3] = true;
-            }
-            else {
-                // 4 = left rear
-                g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce);
-                g_ext.SetWheelBrakePressure(g_playerVehicle, 1, inpBrakeForce);
-                g_ext.SetWheelBrakePressure(g_playerVehicle, 2, inpBrakeForce + handlingBrakeForce * understeer);
-                g_ext.SetWheelBrakePressure(g_playerVehicle, 3, inpBrakeForce);
-                g_vehData.mWheelsEsp[0] = false;
-                g_vehData.mWheelsEsp[1] = false;
-                g_vehData.mWheelsEsp[2] = true;
-                g_vehData.mWheelsEsp[3] = false;
-            }
-        }
+        float oversteerComp = map(abs(rad2deg(oversteerAngle)), 0.0f, 25.0f, 0.0f, 2.0f);
+
+        float oversteerAdd = handlingBrakeForce * oversteerComp;
+        float understeerAdd = handlingBrakeForce * understeer;
+        g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce + avgAngle_ < 0.0f && espOversteer ? oversteerAdd : 0.0f);
+        g_ext.SetWheelBrakePressure(g_playerVehicle, 1, inpBrakeForce + avgAngle_ > 0.0f && espOversteer ? oversteerAdd : 0.0f);
+        g_ext.SetWheelBrakePressure(g_playerVehicle, 2, inpBrakeForce + avgAngle_ < 0.0f && espUndersteer? understeerAdd :0.0f);
+        g_ext.SetWheelBrakePressure(g_playerVehicle, 3, inpBrakeForce + avgAngle_ > 0.0f && espUndersteer? understeerAdd :0.0f);
+        g_vehData.mWheelsEsp[0] = avgAngle_ < 0.0f && espOversteer  ? true : false;
+        g_vehData.mWheelsEsp[1] = avgAngle_ > 0.0f && espOversteer  ? true : false;
+        g_vehData.mWheelsEsp[2] = avgAngle_ < 0.0f && espUndersteer ? true : false;
+        g_vehData.mWheelsEsp[3] = avgAngle_ > 0.0f && espUndersteer ? true : false;
+        
         if (g_settings.Debug.DisplayInfo) {
             std::string espString;
             if (espOversteer)
