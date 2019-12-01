@@ -1387,7 +1387,7 @@ void handleBrakePatch() {
             understeer = sgn(speedVector.x - expectedVector.x) * (expTurnX - expectedVector.x);
             if (expectedVector.x > expTurnX && expTurnX * 1.20f > speedVector.x ||
                 expectedVector.x < expTurnX && expTurnX * 0.80f < speedVector.x) {
-                if (understeer > 0.5f && g_vehData.mVelocity.y > 5.0f)
+                if (understeer > 1.0f && g_vehData.mVelocity.y > 5.0f)
                     espUndersteer = true;
             }
         }
@@ -1399,7 +1399,7 @@ void handleBrakePatch() {
                 oversteerAngle = 0.0;
 
 
-            if (oversteerAngle > deg2rad(5.0f) && g_vehData.mVelocity.y > 1.0f) {
+            if (oversteerAngle > deg2rad(5.0f) && g_vehData.mVelocity.y > 5.0f) {
                 espOversteer = true;
 
                 if (sgn(g_vehData.mVelocity.x) == sgn(avgAngle)) {
