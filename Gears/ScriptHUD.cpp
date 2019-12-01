@@ -396,11 +396,10 @@ void drawVehicleWheelInfo() {
             color = Color{ 0, 0, 0, 0 };
         }
         showDebugInfo3D(wheelCoords[i], {
-            fmt::format("Index: \t{}", i),
-            fmt::format("{}Powered", g_ext.IsWheelPowered(g_playerVehicle, i) ? "~g~" : "~r~"),
+            fmt::format("[{}] {}Powered", i, g_ext.IsWheelPowered(g_playerVehicle, i) ? "~g~" : "~r~"),
             fmt::format("Speed: \t{:.3f}", wheelsSpeed[i]),
-            fmt::format("Compr: \t{:.3f}", wheelsCompr[i]),
-            fmt::format("Health: \t{:.3f}", wheelsHealt[i]),
+            //fmt::format("Compr: \t{:.3f}", wheelsCompr[i]),
+            //fmt::format("Health: \t{:.3f}", wheelsHealt[i]),
             fmt::format("Power: \t{:.3f}", wheelsPower[i]),
             fmt::format("Brake: \t{:.3f}", wheelsBrake[i])}, color);
         GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
