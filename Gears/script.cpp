@@ -1473,14 +1473,15 @@ void handleBrakePatch() {
 
         float oversteerAdd = handlingBrakeForce * oversteerComp;
         float understeerAdd = handlingBrakeForce * understeer;
+        espOversteer = espOversteer && !espUndersteer;
         g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce + avgAngle_ < 0.0f && espOversteer ? oversteerAdd : 0.0f);
         g_ext.SetWheelBrakePressure(g_playerVehicle, 1, inpBrakeForce + avgAngle_ > 0.0f && espOversteer ? oversteerAdd : 0.0f);
-        g_ext.SetWheelBrakePressure(g_playerVehicle, 2, inpBrakeForce + avgAngle_ < 0.0f && espUndersteer? understeerAdd :0.0f);
-        g_ext.SetWheelBrakePressure(g_playerVehicle, 3, inpBrakeForce + avgAngle_ > 0.0f && espUndersteer? understeerAdd :0.0f);
-        g_vehData.mWheelsEsp[0] = avgAngle_ < 0.0f && espOversteer  ? true : false;
-        g_vehData.mWheelsEsp[1] = avgAngle_ > 0.0f && espOversteer  ? true : false;
-        g_vehData.mWheelsEsp[2] = avgAngle_ < 0.0f && espUndersteer ? true : false;
-        g_vehData.mWheelsEsp[3] = avgAngle_ > 0.0f && espUndersteer ? true : false;
+        g_ext.SetWheelBrakePressure(g_playerVehicle, 2, inpBrakeForce + avgAngle > 0.0f && espUndersteer ? understeerAdd : 0.0f);
+        g_ext.SetWheelBrakePressure(g_playerVehicle, 3, inpBrakeForce + avgAngle < 0.0f && espUndersteer ? understeerAdd : 0.0f);
+        g_vehData.mWheelsEsp[0] = avgAngle_ < 0.0f && espOversteer ? true : false;
+        g_vehData.mWheelsEsp[1] = avgAngle_ > 0.0f && espOversteer ? true : false;
+        g_vehData.mWheelsEsp[2] = avgAngle > 0.0f && espUndersteer ? true : false;
+        g_vehData.mWheelsEsp[3] = avgAngle < 0.0f && espUndersteer ? true : false;
         
         if (g_settings.Debug.DisplayInfo) {
             std::string espString;
