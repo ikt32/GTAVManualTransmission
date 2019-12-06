@@ -237,10 +237,10 @@ public:
 
         struct {
             bool Enable = false;
-            float XPos = 0.860f; // TODO
-            float YPos = 0.885f;
-            float Size = 0.700f;
-        } SystemLights;
+            float XPos = 0.500f;
+            float YPos = 0.035f;
+            float Size = 1.000f;
+        } DashIndicators;
     } HUD;
 
     // [CONTROLLER]

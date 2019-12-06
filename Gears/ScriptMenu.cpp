@@ -1178,7 +1178,8 @@ void update_hudmenu() {
     g_menu.MenuOption("Speedometer", "speedodisplaymenu");
     g_menu.MenuOption("RPM Gauge", "rpmdisplaymenu");
     g_menu.MenuOption("Wheel & Pedal Info", "wheelinfomenu");
-    g_menu.BoolOption("Warning lights", g_settings.HUD.SystemLights.Enable);
+    g_menu.MenuOption("Dashboard indicators", "dashindicatormenu", 
+        { "Indicator icons for ABS, TSC, ESP and the hand brake." });
 }
 
 void update_geardisplaymenu() {
@@ -1278,6 +1279,16 @@ void update_wheelinfomenu() {
     g_menu.IntOption("Clutch Bar Green  ", g_settings.HUD.Wheel.PedalClutchG, 0, 255);
     g_menu.IntOption("Clutch Bar Blue   ", g_settings.HUD.Wheel.PedalClutchB, 0, 255);
     g_menu.IntOption("Clutch Bar Alpha  ", g_settings.HUD.Wheel.PedalClutchA  , 0, 255);
+}
+
+void update_dashindicatormenu() {
+    g_menu.Title("Dashboard indicators");
+    g_menu.Subtitle("");
+
+    g_menu.BoolOption("Enable", g_settings.HUD.DashIndicators.Enable);
+    g_menu.FloatOption("Position X", g_settings.HUD.DashIndicators.XPos, 0.0f, 1.0f, 0.005f);
+    g_menu.FloatOption("Position Y", g_settings.HUD.DashIndicators.YPos, 0.0f, 1.0f, 0.005f);
+    g_menu.FloatOption("Size", g_settings.HUD.DashIndicators.Size, 0.25f, 4.0f, 0.05f);
 }
 
 void update_driveassistmenu() {
@@ -1494,6 +1505,9 @@ void update_menu() {
 
     /* mainmenu -> hudmenu -> wheelinfomenu*/
     if (g_menu.CurrentMenu("wheelinfomenu")) { update_wheelinfomenu(); }
+
+    /* mainmenu -> hudmenu -> dashindicatormenu*/
+    if (g_menu.CurrentMenu("dashindicatormenu")) { update_dashindicatormenu(); }
 
     /* mainmenu -> driveassistmenu */
     if (g_menu.CurrentMenu("driveassistmenu")) { update_driveassistmenu(); }

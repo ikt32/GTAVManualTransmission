@@ -255,6 +255,11 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetLongValue("HUD", "PedalInfoClutchB", HUD.Wheel.PedalClutchB);
     ini.SetLongValue("HUD", "PedalInfoClutchA", HUD.Wheel.PedalClutchA);
 
+    ini.SetBoolValue("HUD", "DashIndicators", HUD.DashIndicators.Enable);
+    ini.SetDoubleValue("HUD", "DashIndicatorsXpos", HUD.DashIndicators.XPos);
+    ini.SetDoubleValue("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
+    ini.SetDoubleValue("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
+
     // [UPDATE]
     ini.SetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);
     if (!Update.IgnoredVersion.empty())
@@ -519,6 +524,11 @@ void ScriptSettings::parseSettingsGeneral() {
     HUD.Wheel.PedalClutchG = ini.GetLongValue("HUD", "PedalInfoClutchG", HUD.Wheel.PedalClutchG);
     HUD.Wheel.PedalClutchB = ini.GetLongValue("HUD", "PedalInfoClutchB", HUD.Wheel.PedalClutchB);
     HUD.Wheel.PedalClutchA = ini.GetLongValue("HUD", "PedalInfoClutchA", HUD.Wheel.PedalClutchA);
+
+    HUD.DashIndicators.Enable = ini.GetBoolValue("HUD", "DashIndicators", HUD.DashIndicators.Enable);
+    HUD.DashIndicators.XPos = ini.GetDoubleValue("HUD", "DashIndicatorsXpos", HUD.DashIndicators.XPos);
+    HUD.DashIndicators.YPos = ini.GetDoubleValue("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
+    HUD.DashIndicators.Size = ini.GetDoubleValue("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
 
     // [UPDATE]
     Update.EnableUpdate = ini.GetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);

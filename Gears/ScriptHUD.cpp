@@ -52,32 +52,39 @@ void drawWarningLights() {
         esp |= g_vehData.mWheelsEsp[i];
     }
 
+    const float size = g_settings.HUD.DashIndicators.Size;
+    const float txSz = 0.025f * size;
+    const float rectSzX = 0.125f * g_settings.HUD.DashIndicators.Size;
+    const float rectSzY = 0.050f * g_settings.HUD.DashIndicators.Size;
+    const float XPos = g_settings.HUD.DashIndicators.XPos;
+    const float YPos = g_settings.HUD.DashIndicators.YPos;
+
     drawTexture(g_textureAbsId, 0, -9998, 100,
-        0.025f, 0.025f,
+        txSz, txSz,
         0.5f, 0.5f, // center of texture
-        0.895f, 0.95f,
+        XPos - 0.045f * size, YPos,
         0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, abs ? 1.0f : 0.0f);
 
     drawTexture(g_textureTcsId, 0, -9998, 100,
-        0.025f, 0.025f,
+        txSz, txSz,
         0.5f, 0.5f, // center of texture
-        0.925f, 0.95f,
+        XPos - 0.015f * size, YPos,
         0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, tcs ? 1.0f : 0.0f);
 
     drawTexture(g_textureEspId, 0, -9998, 100,
-        0.025f, 0.025f,
+        txSz, txSz,
         0.5f, 0.5f, // center of texture
-        0.950f, 0.95f,
+        XPos + 0.015f * size, YPos,
         0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, esp ? 1.0f : 0.0f);
 
     drawTexture(g_textureBrkId, 0, -9998, 100,
-        0.025f, 0.025f,
+        txSz, txSz,
         0.5f, 0.5f, // center of texture
-        0.980f, 0.95f,
+        XPos + 0.045f * size, YPos,
         0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, brk ? 1.0f : 0.0f);
 
-    GRAPHICS::DRAW_RECT(0.935f, 0.950f, 
-        0.125f, 0.050f, 
+    GRAPHICS::DRAW_RECT(XPos, YPos,
+        rectSzX, rectSzY,
         0, 0, 0, 127);
 }
 

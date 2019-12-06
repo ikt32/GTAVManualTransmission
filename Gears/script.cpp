@@ -258,7 +258,7 @@ void update_hud() {
         WheelInput::DrawDebugLines();
     }
 
-    if (g_settings.HUD.SystemLights.Enable) {
+    if (g_settings.HUD.DashIndicators.Enable) {
         drawWarningLights();
     }
 }
