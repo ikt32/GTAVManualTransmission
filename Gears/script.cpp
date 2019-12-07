@@ -1421,8 +1421,11 @@ void handleBrakePatch() {
                 }
             }
         }
-
-        if (g_settings().DriveAssists.CustomESP && g_vehData.mWheelCount == 4) {
+        bool anyWheelOnGround = false;
+        for (bool value : g_vehData.mWheelsOnGround) {
+            anyWheelOnGround |= value;
+        }
+        if (g_settings().DriveAssists.CustomESP && g_vehData.mWheelCount == 4 && anyWheelOnGround) {
             if (espOversteer || espUndersteer) {
                 useESP = true;
             }
