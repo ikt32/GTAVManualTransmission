@@ -253,13 +253,13 @@ void update_hud() {
         g_settings.HUD.Wheel.Enable && g_textureWheelId != -1) {
         drawInputWheelInfo();
     }
+    if (g_settings.HUD.Enable && g_vehData.mDomain == VehicleDomain::Road &&
+        g_settings.HUD.DashIndicators.Enable) {
+        drawWarningLights();
+    }
 
     if (g_settings.Debug.DisplayFFBInfo) {
         WheelInput::DrawDebugLines();
-    }
-
-    if (g_settings.HUD.DashIndicators.Enable) {
-        drawWarningLights();
     }
 }
 
