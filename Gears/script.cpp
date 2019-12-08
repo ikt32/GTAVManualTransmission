@@ -1433,6 +1433,8 @@ void handleBrakePatch() {
     }
 
     float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
+    float bbalF = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasFront);
+    float bbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasRear);
     float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
 
     if (useTCS && g_settings().DriveAssists.TCMode == 2) {
@@ -1492,9 +1494,11 @@ void handleBrakePatch() {
         float understeerAdd = handlingBrakeForce * understeer;
         espOversteer = espOversteer && !espUndersteer;
         g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce + avgAngle_ < 0.0f && espOversteer ? oversteerAdd : 0.0f);
-        g_ext.SetWheelBrakePressure(g_playerVehicle, 1, inpBrakeForce + avgAngle_ > 0.0f && espOversteer ? oversteerAdd : 0.0f);
-        g_ext.SetWheelBrakePressure(g_playerVehicle, 2, inpBrakeForce + avgAngle > 0.0f && espUndersteer ? understeerAdd : 0.0f);
-        g_ext.SetWheelBrakePressure(g_playerVehicle, 3, inpBrakeForce + avgAngle < 0.0f && espUndersteer ? understeerAdd : 0.0f);
+
+        g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce * bbalF + (avgAngle_ < 0.0f && espOversteer ? oversteerAdd : 0.0f));
+        g_ext.SetWheelBrakePressure(g_playerVehicle, 1, inpBrakeForce * bbalF + (avgAngle_ > 0.0f && espOversteer ? oversteerAdd : 0.0f));
+        g_ext.SetWheelBrakePressure(g_playerVehicle, 2, inpBrakeForce * bbalR + (avgAngle > 0.0f && espUndersteer ? understeerAdd : 0.0f));
+        g_ext.SetWheelBrakePressure(g_playerVehicle, 3, inpBrakeForce * bbalR + (avgAngle < 0.0f && espUndersteer ? understeerAdd : 0.0f));
         g_vehData.mWheelsEsp[0] = avgAngle_ < 0.0f && espOversteer ? true : false;
         g_vehData.mWheelsEsp[1] = avgAngle_ > 0.0f && espOversteer ? true : false;
         g_vehData.mWheelsEsp[2] = avgAngle > 0.0f && espUndersteer ? true : false;
