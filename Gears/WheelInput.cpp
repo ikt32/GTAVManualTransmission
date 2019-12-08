@@ -588,7 +588,7 @@ void calculateSoftLock(int& totalForce, int& damperForce) {
 // Despite being scientifically inaccurate, "self-aligning torque" is the best description.
 int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRatio, bool isCar) {
     float speed = ENTITY::GET_ENTITY_SPEED(g_playerVehicle);
-    pid.setD(static_cast<double>(speed) * 0.1);
+
     Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
     Vector3 rotVector = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
     Vector3 rotRelative{
