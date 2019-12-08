@@ -610,13 +610,33 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     // "Reduction" effects - those that affect already calculated things
     bool understeering = false;
     float understeer = 0.0f;
-    if (isCar) {
-        float expTurnX = speedVector.x * 0.5f + rotRelative.x * 0.5f;
-        understeer = sgn(speedVector.x - expectedVector.x) * (expTurnX - expectedVector.x);
-        if (expectedVector.x > expTurnX && expTurnX > speedVector.x ||
-            expectedVector.x < expTurnX && expTurnX < speedVector.x) {
-            satForce = static_cast<int>(static_cast<float>(satForce) / std::max(1.0f, 3.3f * understeer + 1.0f));
-            understeering = true;
+
+    // understeer
+    if (isCar)  {
+        float avgAngle = g_ext.GetWheelAverageAngle(g_playerVehicle) * g_settings.Wheel.Steering.SteerMult;
+
+        Vector3 vecPredStr{
+            speed * -sin(avgAngle / g_settings.Wheel.Steering.SteerMult), 0,
+            speed * cos(avgAngle / g_settings.Wheel.Steering.SteerMult), 0,
+            0, 0
+        };
+
+        Vector3 vecNextSpd = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
+        Vector3 vecNextRot = (vecNextSpd + rotRelative) * 0.5f;
+        float understeerAngle = GetAngleBetween(vecNextRot, vecPredStr);
+
+        float dSpdStr = Distance(vecNextSpd, vecPredStr);
+        float aSpdRot = GetAngleBetween(vecNextSpd, vecNextRot);
+
+        float dSpdRot = Distance(vecNextSpd, vecNextRot);
+        float aSpdStr = GetAngleBetween(vecNextSpd, vecPredStr);
+
+        if (dSpdStr > dSpdRot&& sgn(aSpdRot) == sgn(aSpdStr)) {
+            if (abs(understeerAngle) > deg2rad(5.0f) && g_vehData.mVelocity.y > 10.0f && abs(avgAngle) > deg2rad(2.0f)) {
+                understeer = sgn(speedVector.x - expectedVector.x) * (vecNextRot.x - expectedVector.x);
+                understeering = true;
+                satForce = static_cast<int>(static_cast<float>(satForce) / std::max(1.0f, 3.3f * understeer + 1.0f));
+            }
         }
     }
 
@@ -655,7 +675,7 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
 
 // Despite being scientifically inaccurate, "self-aligning torque" is the best description.
 void WheelInput::DrawDebugLines() {
-    float steeringAngle = g_ext.GetWheelAverageAngle(g_playerVehicle) * g_settings.Wheel.Steering.SteerMult;
+    float steeringAngle = g_ext.GetWheelAverageAngle(g_playerVehicle) * g_ext.GetSteeringMultiplier(g_playerVehicle);
     Vector3 velocityWorld = ENTITY::GET_ENTITY_VELOCITY(g_playerVehicle);
     Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, 1);
     Vector3 travelWorld = velocityWorld + positionWorld;
