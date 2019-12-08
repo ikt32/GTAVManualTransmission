@@ -1323,11 +1323,13 @@ void handleBrakePatch() {
     bool useESP = false;
 
     bool espUndersteer = false;
-    float understeer = 0.0f;
+    // average front wheels slip angle
+    float understeerAngle = 0.0f; // rad
 
     bool espOversteer = false;
     bool oppositeLock = false;
-    float oversteerAngle = 0.0f;
+    // average rear wheels slip angle
+    float oversteerAngle = 0.0f; // rad
 
     bool ebrk = g_vehData.mHandbrake;
     bool brn = VEHICLE::IS_VEHICLE_IN_BURNOUT(g_playerVehicle);
@@ -1357,7 +1359,6 @@ void handleBrakePatch() {
         if (g_settings().DriveAssists.TCMode != 0) {
             auto pows = g_ext.GetWheelPower(g_playerVehicle);
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
-                // TODO: Customizable slip
                 if (speeds[i] > g_vehData.mVelocity.y + g_settings().DriveAssists.TCSlipMax && 
                     susps[i] > 0.0f && 
                     g_vehData.mWheelsDriven[i] && 
@@ -1381,15 +1382,15 @@ void handleBrakePatch() {
     {
         // data
         float speed = ENTITY::GET_ENTITY_SPEED(g_playerVehicle);
-        Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
-        Vector3 rotVector = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
+        Vector3 vecNextSpd = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
+        Vector3 rotVel = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
         Vector3 rotRelative{
-            speed * -sin(rotVector.z), 0,
-            speed * cos(rotVector.z), 0,
+            speed * -sin(rotVel.z), 0,
+            speed * cos(rotVel.z), 0,
             0, 0
         };
 
-        Vector3 expectedVector{
+        Vector3 vecPredStr{
             speed * -sin(avgAngle / g_settings.Wheel.Steering.SteerMult), 0,
             speed * cos(avgAngle / g_settings.Wheel.Steering.SteerMult), 0,
             0, 0
@@ -1397,12 +1398,19 @@ void handleBrakePatch() {
 
         // understeer
         {
-            float expTurnX = speedVector.x * 0.5f + rotRelative.x * 0.5f;
-            understeer = sgn(speedVector.x - expectedVector.x) * (expTurnX - expectedVector.x);
-            if (expectedVector.x > expTurnX && expTurnX * 1.20f > speedVector.x ||
-                expectedVector.x < expTurnX && expTurnX * 0.80f < speedVector.x) {
-                if (understeer > 1.0f && g_vehData.mVelocity.y > 5.0f)
+            Vector3 vecNextRot = (vecNextSpd + rotRelative) * 0.5f;
+            understeerAngle = GetAngleBetween(vecNextRot, vecPredStr);
+
+            float dSpdStr = Distance(vecNextSpd, vecPredStr);
+            float aSpdStr = GetAngleBetween(vecNextSpd, vecPredStr);
+
+            float dSpdRot = Distance(vecNextSpd, vecNextRot);
+            float aSpdRot = GetAngleBetween(vecNextSpd, vecNextRot);
+
+            if (dSpdStr > dSpdRot && sgn(aSpdRot) == sgn(aSpdStr)) {
+                if (abs(understeerAngle) > deg2rad(g_settings.DriveAssists.ESPUnderMin) && g_vehData.mVelocity.y > 10.0f && abs(avgAngle) > deg2rad(2.0f)) {
                     espUndersteer = true;
+                }
             }
         }
 
@@ -1412,8 +1420,7 @@ void handleBrakePatch() {
             if (isnan(oversteerAngle))
                 oversteerAngle = 0.0;
 
-
-            if (oversteerAngle > deg2rad(5.0f) && g_vehData.mVelocity.y > 5.0f) {
+            if (oversteerAngle > deg2rad(g_settings.DriveAssists.ESPOverMin) && g_vehData.mVelocity.y > 10.0f) {
                 espOversteer = true;
 
                 if (sgn(g_vehData.mVelocity.x) == sgn(avgAngle)) {
@@ -1488,10 +1495,19 @@ void handleBrakePatch() {
         if (oppositeLock) {
             avgAngle_ = avgAngle;
         }
-        float oversteerComp = map(abs(rad2deg(oversteerAngle)), 0.0f, 25.0f, 0.0f, 2.0f);
+        float oversteerAngleDeg = abs(rad2deg(oversteerAngle));
+        float oversteerComp = map(oversteerAngleDeg, 
+            g_settings.DriveAssists.ESPOverMin, g_settings.DriveAssists.ESPOverMax,
+            g_settings.DriveAssists.ESPOverMinComp, g_settings.DriveAssists.ESPOverMaxComp);
 
         float oversteerAdd = handlingBrakeForce * oversteerComp;
-        float understeerAdd = handlingBrakeForce * understeer;
+
+        float understeerAngleDeg(abs(rad2deg(understeerAngle)));
+        float understeerComp = map(understeerAngleDeg, 
+            g_settings.DriveAssists.ESPUnderMin, g_settings.DriveAssists.ESPUnderMax,
+            g_settings.DriveAssists.ESPUnderMinComp, g_settings.DriveAssists.ESPUnderMaxComp);
+
+        float understeerAdd = handlingBrakeForce * understeerComp;
         espOversteer = espOversteer && !espUndersteer;
 
         g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce * bbalF + (avgAngle_ < 0.0f && espOversteer ? oversteerAdd : 0.0f));
@@ -1504,12 +1520,9 @@ void handleBrakePatch() {
         g_vehData.mWheelsEsp[3] = avgAngle < 0.0f && espUndersteer ? true : false;
         
         if (g_settings.Debug.DisplayInfo) {
-            std::string espString;
-            if (espOversteer)
-                espString = "O";
-            else
-                espString = "U";
-
+            std::string         espString;
+            if (espUndersteer)  espString = "U";
+            else                espString = "O";
             showText(0.45, 0.75, 1.0, fmt::format("~r~(ESP_{})", espString));
         }
     }

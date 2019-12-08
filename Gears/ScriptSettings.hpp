@@ -84,11 +84,24 @@ public:
     struct {
         bool CustomABS = false;
         bool ABSFilter = true;
+
         // 0 Disabled, 1 Brake, 2 Throttle (patch) 
         int TCMode = 0;
-        // m/s
-        float TCSlipMax = 2.5f;
+        float TCSlipMax = 2.5f;        // m/s
+
         bool CustomESP = false;
+
+        float ESPOverMin = 05.0f;        // deg
+        float ESPOverMax = 15.0f;
+
+        float ESPOverMinComp = 0.0f;
+        float ESPOverMaxComp = 2.0f;
+        
+        float ESPUnderMin = 5.0f; // deg
+        float ESPUnderMax = 10.0f; // deg
+
+        float ESPUnderMinComp = 0.0f;
+        float ESPUnderMaxComp = 1.0f;
     } DriveAssists;
 
     // [SHIFT_OPTIONS]

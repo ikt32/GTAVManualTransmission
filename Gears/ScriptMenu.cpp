@@ -1312,6 +1312,16 @@ void update_driveassistmenu() {
 
     g_menu.BoolOption("Enable ESP", g_settings.DriveAssists.CustomESP,
         { "Experimental script-driven stability control." });
+
+    g_menu.FloatOption("ESP_O_MIN_DEG", g_settings.DriveAssists.ESPOverMin, 0.0f, 90.0f, 0.1f);
+    g_menu.FloatOption("ESP_O_MAX_DEG", g_settings.DriveAssists.ESPOverMax, 0.0f, 90.0f, 0.1f);
+    g_menu.FloatOption("ESP_O_MIN_COMP", g_settings.DriveAssists.ESPOverMinComp, 0.0f, 90.0f, 0.1f);
+    g_menu.FloatOption("ESP_O_MAX_COMP", g_settings.DriveAssists.ESPOverMaxComp, 0.0f, 90.0f, 0.1f);
+
+    g_menu.FloatOption("ESP_U_MIN_DEG", g_settings.DriveAssists.ESPUnderMin, 0.0f, 90.0f, 0.1f);
+    g_menu.FloatOption("ESP_U_MAX_DEG", g_settings.DriveAssists.ESPUnderMax, 0.0f, 90.0f, 0.1f);
+    g_menu.FloatOption("ESP_U_MIN_COMP", g_settings.DriveAssists.ESPUnderMinComp, 0.0f, 90.0f, 0.1f);
+    g_menu.FloatOption("ESP_U_MAX_COMP", g_settings.DriveAssists.ESPUnderMaxComp, 0.0f, 90.0f, 0.1f);
 }
 
 void update_gameassistmenu() {
