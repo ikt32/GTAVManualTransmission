@@ -1493,7 +1493,6 @@ void handleBrakePatch() {
         float oversteerAdd = handlingBrakeForce * oversteerComp;
         float understeerAdd = handlingBrakeForce * understeer;
         espOversteer = espOversteer && !espUndersteer;
-        g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce + avgAngle_ < 0.0f && espOversteer ? oversteerAdd : 0.0f);
 
         g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce * bbalF + (avgAngle_ < 0.0f && espOversteer ? oversteerAdd : 0.0f));
         g_ext.SetWheelBrakePressure(g_playerVehicle, 1, inpBrakeForce * bbalF + (avgAngle_ > 0.0f && espOversteer ? oversteerAdd : 0.0f));
