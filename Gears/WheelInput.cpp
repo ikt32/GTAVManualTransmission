@@ -113,7 +113,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
 
     if (g_vehData.mGearCurr > 0) {
         // Going forward
-        if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y > speedThreshold) {
+        if (g_vehData.mVelocity.y >= speedThreshold) {
             //showText(0.3, 0.0, 1.0, "We are going forward");
             // Throttle Pedal normal
             if (wheelThrottleVal > 0.01f) {
@@ -126,22 +126,33 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
         }
 
         // Standing still
-        if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y < speedThreshold && ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y >= -speedThreshold) {
+        if (abs(g_vehData.mVelocity.y) < speedThreshold) {
             //showText(0.3, 0.0, 1.0, "We are stopped");
-
+            // Throttle Pedal normal
             if (wheelThrottleVal > 0.01f) {
                 Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, g_settings.Wheel.Throttle.AntiDeadZone);
             }
-
-            if (wheelBrakeVal > 0.01f) {
-                g_ext.SetThrottleP(g_playerVehicle, 0.1f);
-                g_ext.SetBrakeP(g_playerVehicle, 1.0f);
-                VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, true);
+            // Brake Pedal conditional
+            if (wheelBrakeVal > wheelThrottleVal) {
+                //showText(0.3, 0.0, 1.0, "We are stopped + just brake lights");
+                
+                if (wheelBrakeVal > 0.01f) {
+                    //g_ext.SetThrottleP(g_playerVehicle, 0.1f);
+                    g_ext.SetBrakeP(g_playerVehicle, 1.0f);
+                    VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, true);
+                }
+            }
+            else {
+                //showText(0.3, 0.0, 1.0, "We are stopped + burnout");
+                // Brake Pedal normal
+                if (wheelBrakeVal > 0.01f) {
+                    Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone);
+                }
             }
         }
 
         // Rolling back
-        if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y < -speedThreshold) {
+        if (g_vehData.mVelocity.y <= -speedThreshold) {
             bool brakelights = false;
             // Just brake
             if (wheelThrottleVal <= 0.01f && wheelBrakeVal > 0.01f) {
