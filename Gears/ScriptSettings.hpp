@@ -310,6 +310,9 @@ public:
                 float Size = 0.200f;
             } GForce;
         } Metrics;
+
+        bool DisableNPCBrake = false;
+        bool DisableNPCGearbox = false;
     } Debug;
 
     // settings_wheel.ini parts

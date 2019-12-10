@@ -1411,7 +1411,8 @@ void update_debugmenu() {
             "Use this when some other script controls visibility." });
     g_menu.MenuOption("Metrics settings", "metricsmenu", 
         { "Show the G-Force graph and speed timers." });
-
+    g_menu.MenuOption("Performance settings", "perfmenu",
+        { "Every tick AI is also updated, which might impact performance." });
     g_menu.BoolOption("Enable update check", g_settings.Update.EnableUpdate,
         { "Check for mod updates."});
 
@@ -1442,6 +1443,19 @@ void update_metricsmenu() {
         g_settings.Read(&g_controls);
         initTimers();
     }
+}
+
+void update_perfmenu() {
+    g_menu.Title("Performance settings");
+    g_menu.Subtitle("");
+
+    g_menu.BoolOption("Disable NPC Gearbox", g_settings.Debug.DisableNPCGearbox,
+        { "While MT is enabled, NPC uses custom script-driven gearbox logic."
+            "Disabling makes NPCs drive unpredictable and cars never shift up." });
+
+    g_menu.BoolOption("Disable timers", g_settings.Debug.DisableNPCBrake,
+        { "While ABS, TCS or ESP are active, NPC braking is replaced by script.",
+            "Disabling hampers AI braking." });
 }
 
 void update_menu() {
@@ -1530,6 +1544,9 @@ void update_menu() {
 
     /* mainmenu -> debugmenu -> metricsmenu */
     if (g_menu.CurrentMenu("metricsmenu")) { update_metricsmenu(); }
+
+    /* mainmenu -> debugmenu -> perfmenu */
+    if (g_menu.CurrentMenu("perfmenu")) { update_perfmenu(); }
 
     g_menu.EndMenu();
 }
