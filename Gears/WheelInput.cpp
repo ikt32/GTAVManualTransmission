@@ -632,7 +632,7 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
         float aSpdStr = GetAngleBetween(vecNextSpd, vecPredStr);
 
         if (dSpdStr > dSpdRot&& sgn(aSpdRot) == sgn(aSpdStr)) {
-            if (abs(understeerAngle) > deg2rad(5.0f) && g_vehData.mVelocity.y > 10.0f && abs(avgAngle) > deg2rad(2.0f)) {
+            if (g_vehData.mVelocity.y > 10.0f && abs(avgAngle) > deg2rad(2.0f)) {
                 understeer = sgn(speedVector.x - expectedVector.x) * (vecNextRot.x - expectedVector.x);
                 understeering = true;
                 satForce = static_cast<int>(static_cast<float>(satForce) / std::max(1.0f, 3.3f * understeer + 1.0f));
