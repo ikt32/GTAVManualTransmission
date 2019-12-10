@@ -265,6 +265,33 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
             gearStates.FakeNeutral = false;
         }
     }
+        // Braking!
+        if (MemoryPatcher::BrakePatcher.Patched()) {
+            // TODO: Proper way of finding out what the fronts/rears are!
+            auto numWheels = g_ext.GetNumWheels(npcVehicle);
+
+            float handlingBrakeForce = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(npcVehicle) + hOffsets.fBrakeForce);
+            float bbalF = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(npcVehicle) + hOffsets.fBrakeBiasFront);
+            float bbalR = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(npcVehicle) + hOffsets.fBrakeBiasRear);
+            float inpBrakeForce = handlingBrakeForce * g_ext.GetBrakeP(npcVehicle);
+
+            if (numWheels == 2) {
+                g_ext.SetWheelBrakePressure(npcVehicle, 0, inpBrakeForce * bbalF);
+                g_ext.SetWheelBrakePressure(npcVehicle, 1, inpBrakeForce * bbalR);
+            }
+            else if (numWheels >= 4 && numWheels % 2 == 0) {
+                g_ext.SetWheelBrakePressure(npcVehicle, 0, inpBrakeForce * bbalF);
+                g_ext.SetWheelBrakePressure(npcVehicle, 1, inpBrakeForce * bbalF);
+                for (uint8_t i = 2; i < numWheels; ++i) {
+                    g_ext.SetWheelBrakePressure(npcVehicle, i, inpBrakeForce * bbalR);
+                }
+            }
+            else {
+                for (uint8_t i = 0; i < numWheels; ++i) {
+                    g_ext.SetWheelBrakePressure(npcVehicle, i, inpBrakeForce);
+                }
+            }
+        }
 }
 
 std::set<Vehicle> updateRaycastVehicles() {
@@ -337,6 +364,7 @@ void updateNPCVehicleList(const std::vector<Vehicle>& newVehicles, std::vector<N
 }
 
 void update_npc() {
+    // I only patch brakes for ABS/TCS/ESP when other stuff is also patched
     bool mtActive = MemoryPatcher::NumGearboxPatched > 0;
     if (!g_settings.Debug.DisplayNPCInfo && !mtActive) 
         return;
