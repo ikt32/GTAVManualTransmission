@@ -2180,9 +2180,9 @@ void main() {
         g_textureBrkId = -1;
     }
 
-    USB::Init([]() {
-        g_controls.InitWheel();
-    });
+    //USB::Init([]() {
+    //    g_controls.InitWheel();
+    //});
 
     g_focused = SysUtil::IsWindowFocused();
 
@@ -2190,7 +2190,7 @@ void main() {
     logger.Write(INFO, "START: Initialization finished");
 
     while (true) {
-        USB::Update();
+        //USB::Update();
         update_player();
         update_vehicle();
         update_inputs();
