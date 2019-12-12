@@ -1,5 +1,28 @@
 # Changelog
 
+## 4.7.1
+
+New features:
+
+* Add ESC (Electronic Stability Control)
+* Add ABS/TCS/ESC/Handbrake warning lights HUD element
+
+Fixes and improvements:
+
+* Fix controller settings not updated properly
+* Fix controller hold time settings not being used
+* Fix ABS acting on all wheels instead of an individual one
+* Apply normal brake forces on wheels unaffected by ABS
+* Allow keyboard shifting while using controller
+* Add option to disable NPC scripts when MT or assists are active
+
+Wheel fixes and improvements:
+
+* Fix burnout using wheel pedals not fully engaging
+* Fix "bump" when FFB changes direction
+* Improve understeer calculations
+* Disable USB detection, caused crashes while game is paused
+
 ## 4.7.0
 
 Warning: Many options are relocated. The script will generate missing entries, so no action is needed, but affected settings will be reset to their default values. However, it's recommended to start with clean default settings.
@@ -248,7 +271,7 @@ Additions:
 * Add throttle and brake anti-deadzone 
 * Add steering wheel and pedal input HUD
 * Separate stalling for H-patt. shift and seq. shift
-	* Seq. clutch catch behaves like auto now, regarding brakes
+    * Seq. clutch catch behaves like auto now, regarding brakes
 
 Fixes:
 * Properly disable steering wheel
