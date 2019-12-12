@@ -1449,11 +1449,11 @@ void update_perfmenu() {
     g_menu.Title("Performance settings");
     g_menu.Subtitle("");
 
-    g_menu.BoolOption("Disable NPC Gearbox", g_settings.Debug.DisableNPCGearbox,
+    g_menu.BoolOption("Disable NPC gearbox", g_settings.Debug.DisableNPCGearbox,
         { "While MT is enabled, NPC uses custom script-driven gearbox logic."
             "Disabling makes NPCs drive unpredictable and cars never shift up." });
 
-    g_menu.BoolOption("Disable timers", g_settings.Debug.DisableNPCBrake,
+    g_menu.BoolOption("Disable NPC brakes", g_settings.Debug.DisableNPCBrake,
         { "While ABS, TCS or ESP are active, NPC braking is replaced by script.",
             "Disabling hampers AI braking." });
 }
