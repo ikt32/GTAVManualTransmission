@@ -329,9 +329,9 @@ void update_mainmenu() {
     g_menu.MenuOption("Steering Wheel", "wheelmenu", 
         { "Set up your steering wheel." });
     g_menu.MenuOption("HUD Options", "hudmenu", 
-        { "Toggle and move HUD elements. Choose between imperial or metric speeds." });
+        { "Change and move HUD elements." });
     g_menu.MenuOption("Driving assists", "driveassistmenu",
-        { "ABS and TC options." });
+        { "ABS, TCS and ESP assist options for the player." });
     g_menu.MenuOption("Gameplay assists", "gameassistmenu",
         { "Assist to make playing a bit easier." });
     g_menu.MenuOption("Debug options", "debugmenu", 
@@ -515,8 +515,8 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
         plates = "None";
 
     unsigned absMode = 0;
-    if (config.DriveAssists.CustomABS) {
-        if (config.DriveAssists.ABSFilter) {
+    if (config.DriveAssists.ABS.Enable) {
+        if (config.DriveAssists.ABS.Filter) {
             absMode = 1;
         }
         else {
@@ -542,7 +542,7 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
         fmt::format("\tSequential assist: {}", shiftAssist),
         "Driving assists:",
         fmt::format("\tABS: {}", absStrings[absMode]),
-        fmt::format("\tTCS: {}", tcsStrings[config.DriveAssists.TCMode]),
+        fmt::format("\tTCS: {}", tcsStrings[config.DriveAssists.TCS.Mode]),
         "Steering wheel:",
         fmt::format("\tAngle: {:.0f}", config.Wheel.Steering.Angle),
         fmt::format("\tFFB Mult: {:.0f}", config.Wheel.FFB.SATAmpMult),
@@ -1295,33 +1295,36 @@ void update_driveassistmenu() {
     g_menu.Title("Driving assists");
     g_menu.Subtitle("Assists to make driving easier");
 
-    g_menu.BoolOption("Enable ABS", g_settings.DriveAssists.CustomABS,
-        { "Experimental script-driven ABS." });
+    g_menu.BoolOption("Enable ABS", g_settings.DriveAssists.ABS.Enable,
+        { "Script-driven ABS." });
 
-    g_menu.BoolOption("Only enable ABS if not present", g_settings.DriveAssists.ABSFilter,
+    g_menu.BoolOption("Only enable ABS if not present", g_settings.DriveAssists.ABS.Filter,
         { "Only enables script-driven ABS on vehicles without the ABS flag." });
 
-    g_menu.StringArray("Traction Control mode", tcsStrings, g_settings.DriveAssists.TCMode,
+    g_menu.StringArray("Traction Control mode", tcsStrings, g_settings.DriveAssists.TCS.Mode,
         { "On traction loss: ",
             "Disabled: Do nothing",
             "Brakes: Apply brake per wheel",
             "Throttle: Cut throttle" });
 
-    g_menu.FloatOption("TC Slip threshold", g_settings.DriveAssists.TCSlipMax, 0.0f, 20.0f, 0.1f,
+    g_menu.FloatOption("TC Slip threshold", g_settings.DriveAssists.TCS.SlipMax, 0.0f, 20.0f, 0.1f,
         { "Speed in m/s an individual wheel may slip before TC kicks in." });
 
-    g_menu.BoolOption("Enable ESP", g_settings.DriveAssists.CustomESP,
-        { "Experimental script-driven stability control." });
+    g_menu.BoolOption("Enable ESP", g_settings.DriveAssists.ESP.Enable,
+        { "Experimental script-driven stability control.",
+            "ESP_O: Oversteer. ESP_U: Understeer.",
+            "Min angle: Starting angle to apply brake, using the \"min compensation\" multiplier.",
+            "Max angle: Angle where brake is set to the \"max compensation\" multiplier."});
 
-    g_menu.FloatOption("ESP_O_MIN_DEG", g_settings.DriveAssists.ESPOverMin, 0.0f, 90.0f, 0.1f);
-    g_menu.FloatOption("ESP_O_MAX_DEG", g_settings.DriveAssists.ESPOverMax, 0.0f, 90.0f, 0.1f);
-    g_menu.FloatOption("ESP_O_MIN_COMP", g_settings.DriveAssists.ESPOverMinComp, 0.0f, 90.0f, 0.1f);
-    g_menu.FloatOption("ESP_O_MAX_COMP", g_settings.DriveAssists.ESPOverMaxComp, 0.0f, 90.0f, 0.1f);
+    g_menu.FloatOption("ESP_O min angle", g_settings.DriveAssists.ESP.OverMin,      0.0f, 90.0f, 0.1f);
+    g_menu.FloatOption("ESP_O max angle", g_settings.DriveAssists.ESP.OverMax,      0.0f, 90.0f, 0.1f);
+    g_menu.FloatOption("ESP_O min comp",  g_settings.DriveAssists.ESP.OverMinComp,  0.0f, 90.0f, 0.1f);
+    g_menu.FloatOption("ESP_O max comp",  g_settings.DriveAssists.ESP.OverMaxComp,  0.0f, 90.0f, 0.1f);
 
-    g_menu.FloatOption("ESP_U_MIN_DEG", g_settings.DriveAssists.ESPUnderMin, 0.0f, 90.0f, 0.1f);
-    g_menu.FloatOption("ESP_U_MAX_DEG", g_settings.DriveAssists.ESPUnderMax, 0.0f, 90.0f, 0.1f);
-    g_menu.FloatOption("ESP_U_MIN_COMP", g_settings.DriveAssists.ESPUnderMinComp, 0.0f, 90.0f, 0.1f);
-    g_menu.FloatOption("ESP_U_MAX_COMP", g_settings.DriveAssists.ESPUnderMaxComp, 0.0f, 90.0f, 0.1f);
+    g_menu.FloatOption("ESP_U min angle", g_settings.DriveAssists.ESP.UnderMin,     0.0f, 90.0f, 0.1f);
+    g_menu.FloatOption("ESP_U max angle", g_settings.DriveAssists.ESP.UnderMax,     0.0f, 90.0f, 0.1f);
+    g_menu.FloatOption("ESP_U min comp",  g_settings.DriveAssists.ESP.UnderMinComp, 0.0f, 90.0f, 0.1f);
+    g_menu.FloatOption("ESP_U max comp",  g_settings.DriveAssists.ESP.UnderMaxComp, 0.0f, 90.0f, 0.1f);
 }
 
 void update_gameassistmenu() {

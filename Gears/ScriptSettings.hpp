@@ -82,26 +82,35 @@ public:
 
     // [DRIVING_ASSISTS]
     struct {
-        bool CustomABS = false;
-        bool ABSFilter = true;
+        struct {
+            bool Enable = false;
+            // true: only applied to abs-less vehicles
+            bool Filter = true;
+        } ABS;
 
-        // 0 Disabled, 1 Brake, 2 Throttle (patch) 
-        int TCMode = 0;
-        float TCSlipMax = 2.5f;        // m/s
+        struct {
+            // 0 Disabled, 1 Brake, 2 Throttle (patch) 
+            int Mode = 0;
+            // tyre speed threshold, m/s
+            float SlipMax = 2.5f;
+        } TCS;
 
-        bool CustomESP = false;
+        struct {
+            bool Enable = false;
 
-        float ESPOverMin = 05.0f;        // deg
-        float ESPOverMax = 15.0f;
+            float OverMin = 05.0f; // deg
+            float OverMax = 15.0f; // deg
 
-        float ESPOverMinComp = 0.0f;
-        float ESPOverMaxComp = 2.0f;
-        
-        float ESPUnderMin = 5.0f; // deg
-        float ESPUnderMax = 10.0f; // deg
+            float OverMinComp = 0.0f; // brake mult
+            float OverMaxComp = 2.0f; // brake mult
 
-        float ESPUnderMinComp = 0.0f;
-        float ESPUnderMaxComp = 1.0f;
+            float UnderMin = 5.0f; // deg
+            float UnderMax = 10.0f; // deg
+
+            float UnderMinComp = 0.0f; // brake mult
+            float UnderMaxComp = 1.0f; // brake mult
+
+        } ESP;
     } DriveAssists;
 
     // [SHIFT_OPTIONS]

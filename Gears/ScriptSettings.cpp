@@ -45,22 +45,30 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
     localSettings.MTParams.RPMDamage          = activeConfig->MTParams.RPMDamage        ;
     localSettings.MTParams.MisshiftDamage     = activeConfig->MTParams.MisshiftDamage   ;
 
-    localSettings.DriveAssists.CustomABS = activeConfig->DriveAssists.CustomABS;
-    localSettings.DriveAssists.ABSFilter = activeConfig->DriveAssists.ABSFilter;
-    localSettings.DriveAssists.TCMode    = activeConfig->DriveAssists.TCMode   ;
-    localSettings.DriveAssists.CustomESP = activeConfig->DriveAssists.CustomESP;
+    localSettings.DriveAssists.ABS.Enable       = activeConfig->DriveAssists.ABS.Enable      ;
+    localSettings.DriveAssists.ABS.Filter       = activeConfig->DriveAssists.ABS.Filter      ;
+    localSettings.DriveAssists.TCS.Mode         = activeConfig->DriveAssists.TCS.Mode        ;
+    localSettings.DriveAssists.TCS.SlipMax      = activeConfig->DriveAssists.TCS.SlipMax     ;
+    localSettings.DriveAssists.ESP.OverMin      = activeConfig->DriveAssists.ESP.OverMin     ;
+    localSettings.DriveAssists.ESP.OverMax      = activeConfig->DriveAssists.ESP.OverMax     ;
+    localSettings.DriveAssists.ESP.OverMinComp  = activeConfig->DriveAssists.ESP.OverMinComp ;
+    localSettings.DriveAssists.ESP.OverMaxComp  = activeConfig->DriveAssists.ESP.OverMaxComp ;
+    localSettings.DriveAssists.ESP.UnderMin     = activeConfig->DriveAssists.ESP.UnderMin    ;
+    localSettings.DriveAssists.ESP.UnderMax     = activeConfig->DriveAssists.ESP.UnderMax    ;
+    localSettings.DriveAssists.ESP.UnderMinComp = activeConfig->DriveAssists.ESP.UnderMinComp;
+    localSettings.DriveAssists.ESP.UnderMaxComp = activeConfig->DriveAssists.ESP.UnderMaxComp;
 
     localSettings.ShiftOptions.UpshiftCut     = activeConfig->ShiftOptions.UpshiftCut    ;
     localSettings.ShiftOptions.DownshiftBlip  = activeConfig->ShiftOptions.DownshiftBlip ;
     localSettings.ShiftOptions.ClutchRateMult = activeConfig->ShiftOptions.ClutchRateMult;
     localSettings.ShiftOptions.RPMTolerance   = activeConfig->ShiftOptions.RPMTolerance  ;
 
-    localSettings.AutoParams.UpshiftLoad                  = activeConfig->AutoParams.UpshiftLoad         ;
-    localSettings.AutoParams.DownshiftLoad                = activeConfig->AutoParams.DownshiftLoad       ;
-    localSettings.AutoParams.NextGearMinRPM               = activeConfig->AutoParams.NextGearMinRPM      ;
-    localSettings.AutoParams.CurrGearMinRPM               = activeConfig->AutoParams.CurrGearMinRPM      ;
-    localSettings.AutoParams.EcoRate                      = activeConfig->AutoParams.EcoRate             ;
-    localSettings.AutoParams.DownshiftTimeoutMult         = activeConfig->AutoParams.DownshiftTimeoutMult;
+    localSettings.AutoParams.UpshiftLoad          = activeConfig->AutoParams.UpshiftLoad         ;
+    localSettings.AutoParams.DownshiftLoad        = activeConfig->AutoParams.DownshiftLoad       ;
+    localSettings.AutoParams.NextGearMinRPM       = activeConfig->AutoParams.NextGearMinRPM      ;
+    localSettings.AutoParams.CurrGearMinRPM       = activeConfig->AutoParams.CurrGearMinRPM      ;
+    localSettings.AutoParams.EcoRate              = activeConfig->AutoParams.EcoRate             ;
+    localSettings.AutoParams.DownshiftTimeoutMult = activeConfig->AutoParams.DownshiftTimeoutMult;
 
 
     localSettings.Wheel.FFB.Enable         = activeConfig->Wheel.FFB.Enable        ;
@@ -144,11 +152,19 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetBoolValue("GAMEPLAY_ASSISTS", "DefaultNeutral", GameAssists.DefaultNeutral);
 
     // [DRIVING_ASSISTS]
-    ini.SetBoolValue("DRIVING_ASSISTS", "CustomABS", DriveAssists.CustomABS);
-    ini.SetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABSFilter);
-    ini.SetLongValue("DRIVING_ASSISTS", "TractionControl", DriveAssists.TCMode);
-    ini.SetDoubleValue("DRIVING_ASSISTS", "TCSlipMax", DriveAssists.TCSlipMax);
-    ini.SetBoolValue("DRIVING_ASSISTS", "CustomESP", DriveAssists.CustomESP);
+    ini.SetBoolValue("DRIVING_ASSISTS", "ABS", DriveAssists.ABS.Enable);
+    ini.SetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABS.Filter);
+    ini.SetLongValue("DRIVING_ASSISTS", "TCS", DriveAssists.TCS.Mode);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "TCSSlipMax", DriveAssists.TCS.SlipMax);
+    ini.SetBoolValue("DRIVING_ASSISTS", "ESP", DriveAssists.ESP.Enable);
+    ini.SetDoubleValue("DRIVING_ASSIST", "ESPOverMin", DriveAssists.ESP.OverMin);
+    ini.SetDoubleValue("DRIVING_ASSIST", "ESPOverMax", DriveAssists.ESP.OverMax);
+    ini.SetDoubleValue("DRIVING_ASSIST", "ESPOverMinComp", DriveAssists.ESP.OverMinComp);
+    ini.SetDoubleValue("DRIVING_ASSIST", "ESPOverMaxComp", DriveAssists.ESP.OverMaxComp);
+    ini.SetDoubleValue("DRIVING_ASSIST", "ESPUnderMin", DriveAssists.ESP.UnderMin);
+    ini.SetDoubleValue("DRIVING_ASSIST", "ESPUnderMax", DriveAssists.ESP.UnderMax);
+    ini.SetDoubleValue("DRIVING_ASSIST", "ESPUnderMinComp", DriveAssists.ESP.UnderMinComp);
+    ini.SetDoubleValue("DRIVING_ASSIST", "ESPUnderMaxComp", DriveAssists.ESP.UnderMaxComp);
 
     //[CUSTOM_STEERING]
     ini.SetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
@@ -414,11 +430,19 @@ void ScriptSettings::parseSettingsGeneral() {
     GameAssists.HidePlayerInFPV =   ini.GetBoolValue("GAMEPLAY_ASSISTS", "HidePlayerInFPV", GameAssists.HidePlayerInFPV);
 
     // [DRIVING_ASSISTS]
-    DriveAssists.CustomABS = ini.GetBoolValue("DRIVING_ASSISTS", "CustomABS", DriveAssists.CustomABS);
-    DriveAssists.ABSFilter = ini.GetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABSFilter);
-    DriveAssists.TCMode = ini.GetLongValue("DRIVING_ASSISTS", "TractionControl", DriveAssists.TCMode);
-    DriveAssists.TCSlipMax = ini.GetDoubleValue("DRIVING_ASSISTS", "TCSlipMax", DriveAssists.TCSlipMax);
-    DriveAssists.CustomESP = ini.GetBoolValue("DRIVING_ASSISTS", "CustomESP", DriveAssists.CustomESP);
+    DriveAssists.ABS.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "ABS", DriveAssists.ABS.Enable);
+    DriveAssists.ABS.Filter = ini.GetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABS.Filter);
+    DriveAssists.TCS.Mode = ini.GetLongValue("DRIVING_ASSISTS", "TCS", DriveAssists.TCS.Mode);
+    DriveAssists.TCS.SlipMax = ini.GetDoubleValue("DRIVING_ASSISTS", "TCSSlipMax", DriveAssists.TCS.SlipMax);
+    DriveAssists.ESP.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "ESP", DriveAssists.ESP.Enable);
+    DriveAssists.ESP.OverMin = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMin", DriveAssists.ESP.OverMin);
+    DriveAssists.ESP.OverMax = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMax", DriveAssists.ESP.OverMax);
+    DriveAssists.ESP.OverMinComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMinComp", DriveAssists.ESP.OverMinComp);
+    DriveAssists.ESP.OverMaxComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMaxComp", DriveAssists.ESP.OverMaxComp);
+    DriveAssists.ESP.UnderMin = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMin", DriveAssists.ESP.UnderMin);
+    DriveAssists.ESP.UnderMax = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMax", DriveAssists.ESP.UnderMax);
+    DriveAssists.ESP.UnderMinComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMinComp", DriveAssists.ESP.UnderMinComp);
+    DriveAssists.ESP.UnderMaxComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMaxComp", DriveAssists.ESP.UnderMaxComp);
 
     // [SHIFT_OPTIONS]
     ShiftOptions.UpshiftCut = ini.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);

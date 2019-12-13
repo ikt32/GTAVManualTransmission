@@ -1348,18 +1348,18 @@ void handleBrakePatch() {
         }
         if (ebrk || brn)
             lockedUp = false;
-        bool absNativePresent = g_vehData.mHasABS && g_settings().DriveAssists.ABSFilter;
+        bool absNativePresent = g_vehData.mHasABS && g_settings().DriveAssists.ABS.Filter;
 
-        if (g_settings().DriveAssists.CustomABS && lockedUp && !absNativePresent)
+        if (g_settings().DriveAssists.ABS.Enable && lockedUp && !absNativePresent)
             useABS = true;
     }
     
     {
         bool tractionLoss = false;
-        if (g_settings().DriveAssists.TCMode != 0) {
+        if (g_settings().DriveAssists.TCS.Mode != 0) {
             auto pows = g_ext.GetWheelPower(g_playerVehicle);
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
-                if (speeds[i] > g_vehData.mVelocity.y + g_settings().DriveAssists.TCSlipMax && 
+                if (speeds[i] > g_vehData.mVelocity.y + g_settings().DriveAssists.TCS.SlipMax && 
                     susps[i] > 0.0f && 
                     g_vehData.mWheelsDriven[i] && 
                     pows[i] > 0.1f) {
@@ -1371,7 +1371,7 @@ void handleBrakePatch() {
                 tractionLoss = false;
         }
 
-        if (g_settings().DriveAssists.TCMode != 0 && tractionLoss)
+        if (g_settings().DriveAssists.TCS.Mode != 0 && tractionLoss)
             useTCS = true;
     }
 
@@ -1408,7 +1408,7 @@ void handleBrakePatch() {
             float aSpdRot = GetAngleBetween(vecNextSpd, vecNextRot);
 
             if (dSpdStr > dSpdRot && sgn(aSpdRot) == sgn(aSpdStr)) {
-                if (abs(understeerAngle) > deg2rad(g_settings.DriveAssists.ESPUnderMin) && g_vehData.mVelocity.y > 10.0f && abs(avgAngle) > deg2rad(2.0f)) {
+                if (abs(understeerAngle) > deg2rad(g_settings.DriveAssists.ESP.UnderMin) && g_vehData.mVelocity.y > 10.0f && abs(avgAngle) > deg2rad(2.0f)) {
                     espUndersteer = true;
                 }
             }
@@ -1420,7 +1420,7 @@ void handleBrakePatch() {
             if (isnan(oversteerAngle))
                 oversteerAngle = 0.0;
 
-            if (oversteerAngle > deg2rad(g_settings.DriveAssists.ESPOverMin) && g_vehData.mVelocity.y > 10.0f) {
+            if (oversteerAngle > deg2rad(g_settings.DriveAssists.ESP.OverMin) && g_vehData.mVelocity.y > 10.0f) {
                 espOversteer = true;
 
                 if (sgn(g_vehData.mVelocity.x) == sgn(avgAngle)) {
@@ -1432,7 +1432,7 @@ void handleBrakePatch() {
         for (bool value : g_vehData.mWheelsOnGround) {
             anyWheelOnGround |= value;
         }
-        if (g_settings().DriveAssists.CustomESP && g_vehData.mWheelCount == 4 && anyWheelOnGround) {
+        if (g_settings().DriveAssists.ESP.Enable && g_vehData.mWheelCount == 4 && anyWheelOnGround) {
             if (espOversteer || espUndersteer) {
                 useESP = true;
             }
@@ -1444,7 +1444,7 @@ void handleBrakePatch() {
     float bbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasRear);
     float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
 
-    if (useTCS && g_settings().DriveAssists.TCMode == 2) {
+    if (useTCS && g_settings().DriveAssists.TCS.Mode == 2) {
         CONTROLS::DISABLE_CONTROL_ACTION(2, eControl::ControlVehicleAccelerate, true);
         if (g_settings.Debug.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~(TCS/T)");
@@ -1497,15 +1497,15 @@ void handleBrakePatch() {
         }
         float oversteerAngleDeg = abs(rad2deg(oversteerAngle));
         float oversteerComp = map(oversteerAngleDeg, 
-            g_settings.DriveAssists.ESPOverMin, g_settings.DriveAssists.ESPOverMax,
-            g_settings.DriveAssists.ESPOverMinComp, g_settings.DriveAssists.ESPOverMaxComp);
+            g_settings.DriveAssists.ESP.OverMin, g_settings.DriveAssists.ESP.OverMax,
+            g_settings.DriveAssists.ESP.OverMinComp, g_settings.DriveAssists.ESP.OverMaxComp);
 
         float oversteerAdd = handlingBrakeForce * oversteerComp;
 
         float understeerAngleDeg(abs(rad2deg(understeerAngle)));
         float understeerComp = map(understeerAngleDeg, 
-            g_settings.DriveAssists.ESPUnderMin, g_settings.DriveAssists.ESPUnderMax,
-            g_settings.DriveAssists.ESPUnderMinComp, g_settings.DriveAssists.ESPUnderMaxComp);
+            g_settings.DriveAssists.ESP.UnderMin, g_settings.DriveAssists.ESP.UnderMax,
+            g_settings.DriveAssists.ESP.UnderMinComp, g_settings.DriveAssists.ESP.UnderMaxComp);
 
         float understeerAdd = handlingBrakeForce * understeerComp;
         espOversteer = espOversteer && !espUndersteer;
@@ -1526,7 +1526,7 @@ void handleBrakePatch() {
             showText(0.45, 0.75, 1.0, fmt::format("~r~(ESP_{})", espString));
         }
     }
-    else if (useTCS && g_settings().DriveAssists.TCMode == 1) {
+    else if (useTCS && g_settings().DriveAssists.TCS.Mode == 1) {
         if (!MemoryPatcher::BrakePatcher.Patched()) {
             MemoryPatcher::PatchBrake();
         }
