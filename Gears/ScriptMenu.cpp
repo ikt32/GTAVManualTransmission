@@ -1296,10 +1296,10 @@ void update_driveassistmenu() {
     g_menu.Subtitle("Assists to make driving easier");
 
     g_menu.BoolOption("Enable ABS", g_settings.DriveAssists.ABS.Enable,
-        { "Script-driven ABS." });
+        { "Custom script-driven ABS." });
 
     g_menu.BoolOption("Only enable ABS if not present", g_settings.DriveAssists.ABS.Filter,
-        { "Only enables script-driven ABS on vehicles without the ABS flag." });
+        { "Only enables custom ABS on cars without the ABS flag." });
 
     g_menu.StringArray("Traction Control mode", tcsStrings, g_settings.DriveAssists.TCS.Mode,
         { "On traction loss: ",
@@ -1311,20 +1311,32 @@ void update_driveassistmenu() {
         { "Speed in m/s an individual wheel may slip before TC kicks in." });
 
     g_menu.BoolOption("Enable ESP", g_settings.DriveAssists.ESP.Enable,
-        { "Experimental script-driven stability control.",
-            "ESP_O: Oversteer. ESP_U: Understeer.",
-            "Min angle: Starting angle to apply brake, using the \"min compensation\" multiplier.",
-            "Max angle: Angle where brake is set to the \"max compensation\" multiplier."});
+        { "Script-driven stability control." });
 
-    g_menu.FloatOption("ESP_O min angle", g_settings.DriveAssists.ESP.OverMin,      0.0f, 90.0f, 0.1f);
-    g_menu.FloatOption("ESP_O max angle", g_settings.DriveAssists.ESP.OverMax,      0.0f, 90.0f, 0.1f);
-    g_menu.FloatOption("ESP_O min comp",  g_settings.DriveAssists.ESP.OverMinComp,  0.0f, 90.0f, 0.1f);
-    g_menu.FloatOption("ESP_O max comp",  g_settings.DriveAssists.ESP.OverMaxComp,  0.0f, 90.0f, 0.1f);
+    g_menu.MenuOption("ESP settings", "espsettingsmenu", 
+        { "Change the behaviour and tolerances of the stability control system." });
+}
 
-    g_menu.FloatOption("ESP_U min angle", g_settings.DriveAssists.ESP.UnderMin,     0.0f, 90.0f, 0.1f);
-    g_menu.FloatOption("ESP_U max angle", g_settings.DriveAssists.ESP.UnderMax,     0.0f, 90.0f, 0.1f);
-    g_menu.FloatOption("ESP_U min comp",  g_settings.DriveAssists.ESP.UnderMinComp, 0.0f, 90.0f, 0.1f);
-    g_menu.FloatOption("ESP_U max comp",  g_settings.DriveAssists.ESP.UnderMaxComp, 0.0f, 90.0f, 0.1f);
+void update_espsettingsmenu() {
+    g_menu.Title("ESP settings");
+    g_menu.Subtitle("");
+    g_menu.FloatOption("Oversteer starting angle", g_settings.DriveAssists.ESP.OverMin, 0.0f, 90.0f, 0.1f,
+        { "Angle (degrees) where ESP starts correcting for oversteer." });
+    g_menu.FloatOption("Oversteer starting correction", g_settings.DriveAssists.ESP.OverMinComp, 0.0f, 10.0f, 0.1f,
+        { "Starting ESP oversteer correction value. Additional braking force for the affected wheel." });
+    g_menu.FloatOption("Oversteer max angle", g_settings.DriveAssists.ESP.OverMax, 0.0f, 90.0f, 0.1f,
+        { "Angle (degrees) where ESP oversteer correction is maximized." });
+    g_menu.FloatOption("Oversteer max correction", g_settings.DriveAssists.ESP.OverMaxComp, 0.0f, 10.0f, 0.1f,
+        { "Max ESP oversteer correction value. Additional braking force for the affected wheel." });
+
+    g_menu.FloatOption("Understeer starting angle", g_settings.DriveAssists.ESP.UnderMin, 0.0f, 90.0f, 0.1f,
+        { "Angle (degrees) where ESP starts correcting for understeer." });
+    g_menu.FloatOption("Understeer starting correction", g_settings.DriveAssists.ESP.UnderMinComp, 0.0f, 10.0f, 0.1f,
+        { "Starting ESP understeer correction value. Additional braking force for the affected wheel." });
+    g_menu.FloatOption("Understeer max angle", g_settings.DriveAssists.ESP.UnderMax, 0.0f, 90.0f, 0.1f,
+        { "Angle (degrees) where ESP understeer correction is maximized." });
+    g_menu.FloatOption("Understeer max correction", g_settings.DriveAssists.ESP.UnderMaxComp, 0.0f, 10.0f, 0.1f,
+        { "Max ESP oversteer understeer value. Additional braking force for the affected wheel." });
 }
 
 void update_gameassistmenu() {
@@ -1538,6 +1550,9 @@ void update_menu() {
 
     /* mainmenu -> driveassistmenu */
     if (g_menu.CurrentMenu("driveassistmenu")) { update_driveassistmenu(); }
+
+    /* mainmenu -> driveassistmenu -> espsettingsmenu*/
+    if (g_menu.CurrentMenu("espsettingsmenu")) { update_espsettingsmenu(); }
 
     /* mainmenu -> gameassistmenu */
     if (g_menu.CurrentMenu("gameassistmenu")) { update_gameassistmenu(); }
