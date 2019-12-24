@@ -22,7 +22,6 @@
 #include "Memory/VehicleFlags.h"
 
 #include "Input/CarControls.hpp"
-#include "Input/USBNotify.h"
 
 #include "Util/Logger.hpp"
 #include "Util/Paths.h"
@@ -2169,17 +2168,12 @@ void main() {
         g_textureBrkId = -1;
     }
 
-    //USB::Init([]() {
-    //    g_controls.InitWheel();
-    //});
-
     g_focused = SysUtil::IsWindowFocused();
 
     logger.Write(DEBUG, "START: Starting with MT:  %s", g_settings.MTOptions.Enable ? "ON" : "OFF");
     logger.Write(INFO, "START: Initialization finished");
 
     while (true) {
-        //USB::Update();
         update_player();
         update_vehicle();
         update_inputs();
