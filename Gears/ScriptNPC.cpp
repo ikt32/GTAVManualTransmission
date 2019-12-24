@@ -232,8 +232,9 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
         float engineLoad = gearStates.ThrottleHang - map(rpm, 0.2f, 1.0f, 0.0f, 1.0f);
 
         bool skidding = false;
-        for (auto x : g_ext.GetWheelSkidSmokeEffect(npcVehicle)) {
-            if (abs(x) > 3.5f)
+        auto skids = g_ext.GetWheelSkidSmokeEffect(npcVehicle);
+        for (uint8_t i = 0; i < g_ext.GetNumWheels(npcVehicle); ++i) {
+            if (abs(skids[i]) > 3.5f && g_ext.IsWheelPowered(npcVehicle, i))
                 skidding = true;
         }
 

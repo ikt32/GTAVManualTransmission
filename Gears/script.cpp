@@ -1067,8 +1067,9 @@ void functionAShift() {
     g_gearStates.UpshiftLoad = g_settings().AutoParams.UpshiftLoad;
 
     bool skidding = false;
-    for (auto x : g_ext.GetWheelSkidSmokeEffect(g_playerVehicle)) {
-        if (abs(x) > 3.5f)
+    auto skids = g_ext.GetWheelSkidSmokeEffect(g_playerVehicle);
+    for (uint8_t i = 0; i < g_vehData.mWheelCount; ++i) {
+        if (abs(skids[i]) > 3.5f && g_ext.IsWheelPowered(g_playerVehicle, i))
             skidding = true;
     }
 
