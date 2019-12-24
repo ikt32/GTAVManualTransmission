@@ -210,11 +210,11 @@ void update_inputs() {
     if (g_focused != SysUtil::IsWindowFocused()) {
         // no focus -> focus
         if (!g_focused) {
-            logger.Write(DEBUG, "[Wheel] Focus change detected, re-init FFB?");
-            g_wheelInitDelayTimer.Reset(1000);
+            logger.Write(DEBUG, "[Wheel] Window focus gained: re-initializing FFB");
+            g_wheelInitDelayTimer.Reset(100);
         }
         else {
-            logger.Write(DEBUG, "[Wheel] Focus lost");
+            logger.Write(DEBUG, "[Wheel] Window focus lost");
         }
     }
     g_focused = SysUtil::IsWindowFocused();
