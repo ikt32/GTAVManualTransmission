@@ -43,7 +43,6 @@ WheelDirectInput::~WheelDirectInput() {
     for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
         auto device = DIDeviceFactory::Get().GetEntry(i);
         if (device) {
-            StopEffects();
             HRESULT hr = device->diDevice->Unacquire();
             if (FAILED(hr)) {
                 logger.Write(ERROR, "[Wheel] Failed unacquiring device: %s", 
@@ -131,7 +130,6 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
         return false;
     }
 
-    StopEffects();
     e->diDevice->Unacquire();
     HRESULT hr;
     if (FAILED(hr = e->diDevice->SetCooperativeLevel(GetForegroundWindow(),
@@ -313,7 +311,7 @@ void WheelDirectInput::createConstantForceEffect(DWORD axis, int numAxes, DIEFFE
     diEffect.rgdwAxes = rgdwAxes;
     diEffect.rglDirection = rglDirection;
     diEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
-    diEffect.dwDuration = INFINITE;
+    diEffect.dwDuration = 100000;
     diEffect.dwSamplePeriod = 0;
     diEffect.dwGain = DI_FFNOMINALMAX;
     diEffect.dwTriggerButton = DIEB_NOTRIGGER;
@@ -340,7 +338,7 @@ void WheelDirectInput::createDamperEffect(DWORD axis, int numAxes, DIEFFECT &diE
     ZeroMemory(&diEffect, sizeof(DIEFFECT));
     diEffect.dwSize = sizeof(DIEFFECT);
     diEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
-    diEffect.dwDuration = INFINITE;
+    diEffect.dwDuration = 100000;
     diEffect.dwSamplePeriod = 0;
     diEffect.dwGain = DI_FFNOMINALMAX;
     diEffect.dwTriggerButton = DIEB_NOTRIGGER;
@@ -368,7 +366,6 @@ void WheelDirectInput::createCollisionEffect(DWORD axis, int numAxes, DIEFFECT &
     diEffect.rgdwAxes = rgdwAxes;
     diEffect.rglDirection = rglDirection;
     diEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
-    diEffect.dwDuration = INFINITE;
     diEffect.dwSamplePeriod = 0;
     diEffect.dwGain = DI_FFNOMINALMAX;
     diEffect.dwTriggerButton = DIEB_NOTRIGGER;
@@ -545,19 +542,6 @@ void WheelDirectInput::SetCollision(GUID device, DIAxis ffAxis, int force) {
     m_colEffect->SetParameters(&effect,
         DIEP_DIRECTION | DIEP_TYPESPECIFICPARAMS | DIEP_START);
     m_colEffect->Start(1, 0);
-}
-
-void WheelDirectInput::StopEffects() {
-    if (m_cfEffect != nullptr) {
-        m_cfEffect->Stop();
-    }
-    if (m_dEffect != nullptr) {
-        m_dEffect->Stop();
-    }
-    if (m_colEffect != nullptr) {
-        m_colEffect->Stop();
-    }
-
 }
 
 WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString) {

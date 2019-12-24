@@ -20,7 +20,6 @@ void drawWarningLights();
 void resetSteeringMultiplier();
 void toggleManual(bool enable);
 void initWheel();
-void stopForceFeedback();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Mod functions: Shifting

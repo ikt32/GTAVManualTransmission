@@ -215,7 +215,6 @@ void update_inputs() {
         }
         else {
             logger.Write(DEBUG, "[Wheel] Focus lost");
-            g_controls.StopFFB(true);
         }
     }
     g_focused = SysUtil::IsWindowFocused();
@@ -291,7 +290,6 @@ void wheelControlRoad() {
 // Apply input as controls for selected devices
 void update_input_controls() {
     if (!Util::PlayerAvailable(g_player, g_playerPed)) {
-        stopForceFeedback();
         return;
     }
 
@@ -333,9 +331,6 @@ void update_input_controls() {
         }
         default: { }
         }
-    }
-    else {
-        stopForceFeedback();
     }
 }
 
@@ -521,10 +516,6 @@ void initWheel() {
     logger.Write(INFO, "[Wheel] Steering wheel initialization finished");
 }
 
-void stopForceFeedback() {
-    g_controls.StopFFB(g_settings.Wheel.Options.LogiLEDs);
-}
-
 void update_steering() {
     bool isCar = g_vehData.mClass == VehicleClass::Car;
     bool useWheel = g_controls.PrevInput == CarControls::Wheel;
@@ -614,9 +605,6 @@ void updateLastInputDevice() {
     }
     if (g_controls.PrevInput == CarControls::Wheel) {
         CONTROLS::STOP_PAD_SHAKE(0);
-    }
-    else {
-        stopForceFeedback();
     }
 }
 

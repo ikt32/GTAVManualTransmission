@@ -21,6 +21,7 @@ Wheel fixes and improvements:
 
 * Fix burnout using wheel pedals not fully engaging
 * Fix "bump" when FFB changes direction
+* Fix FFB continue playing when paused or ejected from car (for real this time!)
 * Improve understeer calculations
 * Disable USB detection, caused crashes while game is paused
 
