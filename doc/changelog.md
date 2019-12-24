@@ -15,6 +15,7 @@ Fixes and improvements:
 * Apply normal brake forces on wheels unaffected by ABS
 * Allow keyboard shifting while using controller
 * Add option to disable NPC scripts when MT or assists are active
+* Fix automatic gearbox not shifting when a non-driven wheel is locked up
 
 Wheel fixes and improvements:
 
