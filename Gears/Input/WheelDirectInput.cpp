@@ -629,7 +629,7 @@ void WheelDirectInput::PlayLedsDInput(GUID guid, float currentRPM, float rpmFirs
     WheelData wheelData_{};
     ZeroMemory(&wheelData_, sizeof(wheelData_));
 
-    float rpm = std::clamp(currentRPM, rpmFirstLedTurnsOn, rpmRedLine);
+    float rpm = std::clamp(currentRPM, 0.0f, 1.0f);
 
     wheelData_.size = sizeof(WheelData);
     wheelData_.versionNbr = LEDS_VERSION_NUMBER;
