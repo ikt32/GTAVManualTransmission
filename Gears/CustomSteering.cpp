@@ -118,6 +118,10 @@ void disableControls() {
     bool isFrog = modelType == 5 || modelType == 6 || modelType == 7;//*(int*)(modelInfo + 0x340) == 6 || *(int*)(modelInfo + 0x340) == 7;
     bool hasFork = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "forks") != -1;
     bool hasTow = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "tow_arm") != -1;
+    bool hasScoop = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "scoop") != -1;
+
+    bool hasEquipment = hasFork || hasTow || hasScoop;
+
     float hoverRatio = g_ext.GetHoverTransformRatio(g_playerVehicle);
 
     bool disableLeftRight = false;
@@ -139,7 +143,7 @@ void disableControls() {
         disableLeftRight = false;
     }
     // Don't disable up/down in forklift and towtrucks
-    else if ((hasFork || hasTow) && allWheelsOnGround) {
+    else if (hasEquipment && allWheelsOnGround) {
         disableUpDown = false;
         disableLeftRight = true;
     }
