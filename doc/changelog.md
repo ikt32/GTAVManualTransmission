@@ -16,6 +16,7 @@ Fixes and improvements:
 * Allow keyboard shifting while using controller
 * Add option to disable NPC scripts when MT or assists are active
 * Fix automatic gearbox not shifting when a non-driven wheel is locked up
+* Fix disabled scoop on dozers while custom steering is active
 
 Wheel fixes and improvements:
 
