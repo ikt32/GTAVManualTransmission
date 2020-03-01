@@ -589,11 +589,28 @@ void calculateSoftLock(int& totalForce, int& damperForce) {
 int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRatio, bool isCar) {
     float speed = ENTITY::GET_ENTITY_SPEED(g_playerVehicle);
 
+    const float maxSpeed = g_settings.Wheel.FFB.MaxSpeed;
+    // gamma: should be < 1 for tapering off force when reaching maxSpeed
+    //float spdMap = pow(std::min(speed, maxSpeed) / maxSpeed, g_settings.Wheel.FFB.Gamma) * maxSpeed / 2.0f;
+    float spdMap = pow(std::min(speed, maxSpeed * 2.0f) / (maxSpeed * 2.0f), g_settings.Wheel.FFB.Gamma) * maxSpeed;
+    float spdRatio = spdMap / speed;
+
+    if (speed == 0.0f)
+        spdRatio = 1.0f;
+
     Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
+    Vector3 speedVectorMapped = speedVector;
+    speedVectorMapped.x = speedVector.x * (spdRatio);
     Vector3 rotVector = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
     Vector3 rotRelative{
         speed * -sin(rotVector.z), 0,
         speed * cos(rotVector.z), 0,
+        0, 0
+    };
+
+    Vector3 expectedVectorMapped{
+        spdMap * -sin(steeringAngle / g_settings.Wheel.Steering.SteerMult), 0,
+        spdMap * cos(steeringAngle / g_settings.Wheel.Steering.SteerMult), 0,
         0, 0
     };
 
@@ -603,7 +620,7 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
         0, 0
     };
     
-    float error = static_cast<float>(pid.getOutput(expectedVector.x, static_cast<double>(speedVector.x) * g_settings().Wheel.FFB.SATFactor));
+    float error = static_cast<float>(pid.getOutput(expectedVectorMapped.x, static_cast<double>(speedVectorMapped.x) * g_settings().Wheel.FFB.SATFactor));
 
     int satForce = static_cast<int>(g_settings().Wheel.FFB.SATAmpMult * static_cast<float>(defaultGain) * -error);
 

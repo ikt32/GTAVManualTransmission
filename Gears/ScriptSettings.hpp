@@ -355,6 +355,8 @@ public:
             int DetailLim = 20000;
             int DetailMAW = 1;
             float CollisionMult = 1.0f;
+            float Gamma = 0.8f;
+            float MaxSpeed = 80.0f;
         } FFB;
 
         // [STEER]

@@ -84,10 +84,14 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
     localSettings.Wheel.FFB.DetailLim      = activeConfig->Wheel.FFB.DetailLim     ;
     localSettings.Wheel.FFB.DetailMAW      = activeConfig->Wheel.FFB.DetailMAW     ;
     localSettings.Wheel.FFB.CollisionMult  = activeConfig->Wheel.FFB.CollisionMult ;
+    localSettings.Wheel.FFB.Gamma          = activeConfig->Wheel.FFB.Gamma         ;
+    localSettings.Wheel.FFB.MaxSpeed       = activeConfig->Wheel.FFB.MaxSpeed      ;
+
 
     localSettings.Wheel.Steering.AngleCar  = activeConfig->Wheel.Steering.Angle;
     localSettings.Wheel.Steering.AngleBike = activeConfig->Wheel.Steering.Angle;
     localSettings.Wheel.Steering.AngleBoat = activeConfig->Wheel.Steering.Angle;
+    localSettings.Wheel.Steering.Gamma     = activeConfig->Wheel.Steering.Gamma;
 }
 
 ScriptSettings ScriptSettings::operator()() {
@@ -364,6 +368,8 @@ void ScriptSettings::SaveWheel() const {
     ini.SetLongValue("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin);
     ini.SetDoubleValue("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
     ini.SetDoubleValue("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
+    ini.SetDoubleValue("FORCE_FEEDBACK", "Gamma", Wheel.FFB.Gamma);
+    ini.SetDoubleValue("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
 
     // [INPUT_DEVICES]
     ini.SetValue("INPUT_DEVICES", nullptr, nullptr);
@@ -724,6 +730,8 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     Wheel.FFB.DetailLim = ini.GetLongValue("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
     Wheel.FFB.DetailMAW = ini.GetLongValue("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
     Wheel.FFB.CollisionMult = ini.GetDoubleValue("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
+    Wheel.FFB.Gamma = ini.GetDoubleValue("FORCE_FEEDBACK", "Gamma", Wheel.FFB.Gamma);
+    Wheel.FFB.MaxSpeed = ini.GetDoubleValue("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
 
     // [INPUT_DEVICES]
     int it = 0;

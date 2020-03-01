@@ -1043,6 +1043,15 @@ void update_forcefeedbackmenu() {
         { "Reactive force offset/multiplier, when not going straight.",
           "Depending on wheel strength, a larger value helps reaching countersteer faster or reduce overcorrection."});
 
+    g_menu.FloatOption("Self aligning torque gamma", g_settings.Wheel.FFB.Gamma, 0.01f, 2.0f, 0.01f,
+        { "< 1.0: More FFB at low speeds, FFB tapers off towards speed cap.",
+          "> 1.0: Less FFB at low speeds, FFB increases towards speed cap.",
+          "Keep at 1.0 for linear response. ~h~Not~h~ recommended to go higher than 1.0!"});
+
+    g_menu.FloatOption("Self aligning torque speed cap", g_settings.Wheel.FFB.MaxSpeed, 10.0f, 1000.0f, 1.0f,
+        { "Speed where FFB stops increasing. Helpful against too strong FFB at extreme speeds.",
+          fmt::format("{} kph / {} mph", g_settings.Wheel.FFB.MaxSpeed * 3.6f, g_settings.Wheel.FFB.MaxSpeed * 2.23694f)});
+
     g_menu.FloatOption("Detail effect multiplier", g_settings.Wheel.FFB.DetailMult, 0.0f, 10.0f, 0.1f,
         { "Force feedback effects caused by the suspension. This effect is muxed with the main effect." });
 
