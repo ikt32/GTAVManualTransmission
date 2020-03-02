@@ -30,6 +30,7 @@
 #include "Util/UIUtils.h"
 #include "Util/Timer.h"
 #include "Util/ValueTimer.h"
+#include "Util/GameSound.h"
 
 #include "UpdateChecker.h"
 #include "Constants.h"
@@ -80,6 +81,7 @@ Timer g_wheelInitDelayTimer(0);
 
 std::vector<ValueTimer<float>> g_speedTimers;
 
+GameSound g_gearRattle("DAMAGED_TRUCK_IDLE", "", "");
 
 void updateShifting();
 void blockButtons();
@@ -173,6 +175,7 @@ void update_vehicle() {
         g_vehData.SetVehicle(g_playerVehicle); // assign new vehicle;
         functionHidePlayerInFPV(true);
         setVehicleConfig(g_playerVehicle);
+        g_gearRattle.Stop();
     }
     if (Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
         g_vehData.Update(); // Update before doing anything else
@@ -641,6 +644,10 @@ void setShiftMode(EShiftMode shiftMode) {
     UI::Notify(INFO, mode);
 }
 
+bool isClutchPressed() {
+    return g_controls.ClutchVal > 1.0f - g_settings().MTParams.ClutchThreshold;
+}
+
 void shiftTo(int gear, bool autoClutch) {
     if (autoClutch) {
         if (g_gearStates.Shifting)
@@ -726,11 +733,6 @@ void functionHShiftWheel() {
     }
 
     if (isHShifterJustNeutral()) {
-        if (g_settings.MTOptions.ClutchShiftH &&
-            g_settings.MTOptions.EngDamage && g_vehData.mHasClutch) {
-            if (g_controls.ClutchVal < 1.0 - g_settings().MTParams.ClutchThreshold) {
-            }
-        }
         g_gearStates.FakeNeutral = g_vehData.mHasClutch;
     }
 
@@ -827,7 +829,7 @@ void functionSShift() {
 
         // Shift block /w clutch shifting for seq.
         if (g_settings.MTOptions.ClutchShiftS && 
-            g_controls.ClutchVal < 1.0f - g_settings().MTParams.ClutchThreshold) {
+            !isClutchPressed()) {
             return;
         }
 
@@ -868,7 +870,7 @@ void functionSShift() {
 
         // Shift block /w clutch shifting for seq.
         if (g_settings.MTOptions.ClutchShiftS &&
-            g_controls.ClutchVal < 1.0f - g_settings().MTParams.ClutchThreshold) {
+            !isClutchPressed()) {
             return;
         }
 
@@ -1104,7 +1106,7 @@ void functionClutchCatch() {
 
     // TODO: Check for settings.MTOptions.ShiftMode == Automatic if anybody complains...
 
-    bool clutchEngaged = g_controls.ClutchVal < 1.0f - g_settings().MTParams.ClutchThreshold;
+    bool clutchEngaged = !isClutchPressed();
     float minSpeed = 0.2f * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
     float expectedSpeed = g_vehData.mRPM * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]) * clutchRatio;
     float actualSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
@@ -1135,7 +1137,7 @@ void functionEngStall() {
     if (speedDiffRatio < 0.45f)
         speedDiffRatio = 0.0f; //ignore if we're close-ish to idle
     
-    bool clutchEngaged = g_controls.ClutchVal < 1.0f - g_settings().MTParams.ClutchThreshold;
+    bool clutchEngaged = !isClutchPressed();
     bool stallEngaged = g_controls.ClutchVal < 1.0f - g_settings().MTParams.StallingThreshold;
 
     // this thing is big when the clutch isnt pressed
@@ -1224,7 +1226,7 @@ void functionEngLock() {
     }
 
     // Wheels are locking up due to bad (down)shifts
-    if ((speed > abs(maxSpeed * 1.15f) + 3.334f || wrongDirection) && inputMultiplier > g_settings().MTParams.ClutchThreshold) {
+    if ((speed > abs(maxSpeed * 1.15f) + 3.334f || wrongDirection) && !isClutchPressed()) {
         g_wheelPatchStates.EngLockActive = true;
         float lockingForce = 60.0f * inputMultiplier;
         auto wheelsToLock = g_vehData.mWheelsDriven;//getDrivenWheels();
@@ -1728,7 +1730,7 @@ void functionRealReverse() {
             g_ext.SetBrakeP(g_playerVehicle, 1.0f);
         }
         // RT behavior when rolling back: Burnout
-        if (!g_gearStates.FakeNeutral && g_controls.ThrottleVal > 0.5f && g_controls.ClutchVal < 1.0f - g_settings().MTParams.ClutchThreshold && 
+        if (!g_gearStates.FakeNeutral && g_controls.ThrottleVal > 0.5f && !isClutchPressed() &&
             ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y < -1.0f ) {
             //showText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Rollback");
             //CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, carControls.ThrottleVal);
@@ -1907,7 +1909,7 @@ void startStopEngine() {
 
     bool throttleStart = false;
     if (g_settings.GameAssists.ThrottleStart) {
-        bool clutchedIn = g_controls.ClutchVal > 1.0f - g_settings().MTParams.ClutchThreshold;
+        bool clutchedIn = isClutchPressed();
         bool freeGear = clutchedIn || g_gearStates.FakeNeutral;
         throttleStart = g_controls.ThrottleVal > 0.75f && freeGear;
     }

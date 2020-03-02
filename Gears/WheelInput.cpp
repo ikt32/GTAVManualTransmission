@@ -164,7 +164,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
                 brakelights = true;
             }
 
-            if (!g_gearStates.FakeNeutral && wheelThrottleVal > 0.01f && g_controls.ClutchVal < 1.0f - g_settings().MTParams.ClutchThreshold) {
+            if (!g_gearStates.FakeNeutral && wheelThrottleVal > 0.01f && !isClutchPressed()) {
                 //showText(0.3, 0.0, 1.0, "We should burnout");
                 if (g_controls.BrakeVal < 0.1f) {
                     VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, false);
@@ -187,7 +187,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
                 g_wheelPatchStates.InduceBurnout = true;
             }
 
-            if (wheelThrottleVal > 0.01f && (g_controls.ClutchVal > 1.0f - g_settings().MTParams.ClutchThreshold || g_gearStates.FakeNeutral)) {
+            if (wheelThrottleVal > 0.01f && (isClutchPressed() || g_gearStates.FakeNeutral)) {
                 if (wheelBrakeVal > 0.01f) {
                     //showText(0.3, 0.0, 1.0, "We should rev and brake");
                     //showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)) );
@@ -256,7 +256,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             //bool brakelights = false;
 
             if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y > reverseThreshold) {
-                if (g_controls.ClutchVal < 1.0f - g_settings().MTParams.ClutchThreshold) {
+                if (!isClutchPressed()) {
                     CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
                 }
                 // Brake Pedal Reverse
