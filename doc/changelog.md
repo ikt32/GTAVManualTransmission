@@ -20,6 +20,7 @@ Fixes and improvements:
 
 Wheel fixes and improvements:
 
+* Add back misshift sounds - only works for wheels in H-pattern mode
 * Fix burnout using wheel pedals not fully engaging
 * Disable USB detection, caused crashes while game is paused
 
