@@ -21,10 +21,15 @@ Fixes and improvements:
 Wheel fixes and improvements:
 
 * Fix burnout using wheel pedals not fully engaging
+* Disable USB detection, caused crashes while game is paused
+
+Force feedback changes:
+
+* Add gamma and speed limit parameters. Gamma helps increasing FFB response at low
+  speeds and decreases wobble when nearing the speed limit.  
 * Fix "bump" when FFB changes direction
 * Fix FFB continue playing when paused or ejected from car (for real this time!)
 * Improve understeer calculations
-* Disable USB detection, caused crashes while game is paused
 
 ## 4.7.0
 
