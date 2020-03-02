@@ -81,7 +81,10 @@ Timer g_wheelInitDelayTimer(0);
 
 std::vector<ValueTimer<float>> g_speedTimers;
 
-GameSound g_gearRattle("DAMAGED_TRUCK_IDLE", "", "");
+// sadly there's no initial BONK, but the sound works.
+GameSound g_gearRattle1("DAMAGED_TRUCK_IDLE", "", "");
+// primitively double the volume...
+GameSound g_gearRattle2("DAMAGED_TRUCK_IDLE", "", "");
 
 void updateShifting();
 void blockButtons();
@@ -127,6 +130,7 @@ void functionLimiter();
 void functionAutoLookback();
 void functionAutoGear1();
 void functionHillGravity();
+void functionAudioFX();
 
 void setVehicleConfig(Vehicle vehicle) {
     g_activeConfig = nullptr;
@@ -175,7 +179,8 @@ void update_vehicle() {
         g_vehData.SetVehicle(g_playerVehicle); // assign new vehicle;
         functionHidePlayerInFPV(true);
         setVehicleConfig(g_playerVehicle);
-        g_gearRattle.Stop();
+        g_gearRattle1.Stop();
+        g_gearRattle2.Stop();
     }
     if (Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
         g_vehData.Update(); // Update before doing anything else
@@ -348,6 +353,7 @@ void update_misc_features() {
     }
 
     functionHidePlayerInFPV(false);
+    functionAudioFX();
 }
 
 // Only when mod is working or writes clutch stuff.
@@ -1995,6 +2001,54 @@ void functionHidePlayerInFPV(bool optionToggled) {
     }
     if (!visible && !shouldHide) {
         ENTITY::SET_ENTITY_VISIBLE(g_playerPed, true, false);
+    }
+}
+
+bool isHShifterInAnySlot() {
+    return g_controls.ButtonIn(CarControls::WheelControlType::HR) ||
+        g_controls.ButtonIn(CarControls::WheelControlType::H1) ||
+        g_controls.ButtonIn(CarControls::WheelControlType::H2) ||
+        g_controls.ButtonIn(CarControls::WheelControlType::H3) ||
+        g_controls.ButtonIn(CarControls::WheelControlType::H4) ||
+        g_controls.ButtonIn(CarControls::WheelControlType::H5) ||
+        g_controls.ButtonIn(CarControls::WheelControlType::H6) ||
+        g_controls.ButtonIn(CarControls::WheelControlType::H7) ||
+        g_controls.ButtonIn(CarControls::WheelControlType::H8) ||
+        g_controls.ButtonIn(CarControls::WheelControlType::H9) ||
+        g_controls.ButtonIn(CarControls::WheelControlType::H10);
+}
+
+void functionAudioFX() {
+    if (!g_gearRattle1.Playing()) {
+        // play on misshift in wheel
+        if (g_controls.PrevInput == CarControls::Wheel && g_settings().MTOptions.ShiftMode == EShiftMode::HPattern) {
+            // When the shifter is in a slot, but the gearbox is neutral.
+            // Also grinds for nonexisting gears on that car, but you shouldn't be shifting in there anyway.
+            if (g_gearStates.FakeNeutral && isHShifterInAnySlot() && !isClutchPressed()) {
+                g_gearRattle1.Play(g_playerVehicle);
+                g_gearRattle2.Play(g_playerVehicle);
+            }
+        }
+        // No keeb support, as I'd need to mutilate the code even more to jam it in.
+    }
+    else {
+        // no control check, since we wanna be able to cancel easily
+        if (g_settings().MTOptions.ShiftMode == EShiftMode::HPattern) {
+            // Stop when popping out of any gear
+            // Stop when engine is off
+            // Stop when clutch is pressed
+            if (isHShifterJustNeutral() ||
+                !VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle) || 
+                isClutchPressed()) {
+                g_gearRattle1.Stop();
+                g_gearRattle2.Stop();
+            }
+        }
+        else {
+            // Stop when switching gearboxes
+            g_gearRattle1.Stop();
+            g_gearRattle2.Stop();
+        }
     }
 }
 
