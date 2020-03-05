@@ -1282,38 +1282,33 @@ void functionEngBrake() {
     // When you let go of the throttle at high RPMs
     float activeBrakeThreshold = g_settings().MTParams.EngBrakeThreshold;
 
-    if (g_vehData.mRPM >= activeBrakeThreshold && ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y > 5.0f && !g_gearStates.FakeNeutral) {
-        float handlingBrakeForce = *reinterpret_cast<float *>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
-        float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
+    float throttleMultiplier = 1.0f - g_controls.ThrottleVal;
+    float clutchMultiplier = 1.0f - g_controls.ClutchVal;
+    float inputMultiplier = throttleMultiplier * clutchMultiplier;
 
-        float throttleMultiplier = 1.0f - g_controls.ThrottleVal;
-        float clutchMultiplier = 1.0f - g_controls.ClutchVal;
-        float inputMultiplier = throttleMultiplier * clutchMultiplier;
-        if (inputMultiplier > 0.05f) {
-            g_wheelPatchStates.EngBrakeActive = true;
-            float rpmMultiplier = (g_vehData.mRPM - activeBrakeThreshold) / (1.0f - activeBrakeThreshold);
-            float engBrakeForce = g_settings().MTParams.EngBrakePower * inputMultiplier * rpmMultiplier;
-            auto wheelsToBrake = g_vehData.mWheelsDriven;
-            for (int i = 0; i < g_vehData.mWheelCount; i++) {
-                if (wheelsToBrake[i]) {
-                    g_ext.SetWheelBrakePressure(g_playerVehicle, i, inpBrakeForce + engBrakeForce);
-                }
-                else {
-                    g_ext.SetWheelBrakePressure(g_playerVehicle, i, inpBrakeForce);
-                }
-            }
-            if (g_settings.Debug.DisplayInfo) {
-                showText(0.85, 0.500, 0.4, fmt::format("EngBrake:\t\t{:.3f}", inputMultiplier), 4);
-                showText(0.85, 0.525, 0.4, fmt::format("Pressure:\t\t{:.3f}", engBrakeForce), 4);
-                showText(0.85, 0.550, 0.4, fmt::format("BrkInput:\t\t{:.3f}", inpBrakeForce), 4);
-            }
-        }
-        else {
-            g_wheelPatchStates.EngBrakeActive = false;
+    if (g_wheelPatchStates.EngLockActive || 
+        g_wheelPatchStates.InduceBurnout || 
+        g_gearStates.FakeNeutral ||
+        ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y < 5.0f ||
+        g_vehData.mRPM < activeBrakeThreshold || 
+        inputMultiplier < 0.05f) {
+        g_wheelPatchStates.EngBrakeActive = false;
+        return;
+    }
+
+    g_wheelPatchStates.EngBrakeActive = true;
+    float rpmMultiplier = (g_vehData.mRPM - activeBrakeThreshold) / (1.0f - activeBrakeThreshold);
+    float engBrakeForce = g_settings().MTParams.EngBrakePower * inputMultiplier * rpmMultiplier;
+    auto wheelsToBrake = g_vehData.mWheelsDriven;
+    for (int i = 0; i < g_vehData.mWheelCount; i++) {
+        if (wheelsToBrake[i]) {
+            g_ext.SetWheelPower(g_playerVehicle, i, -engBrakeForce);
         }
     }
-    else {
-        g_wheelPatchStates.EngBrakeActive = false;
+    if (g_settings.Debug.DisplayInfo) {
+        showText(0.85, 0.500, 0.4, fmt::format("EngBrake:\t\t{:.3f}", inputMultiplier), 4);
+        showText(0.85, 0.525, 0.4, fmt::format("Pressure:\t\t{:.3f}", engBrakeForce), 4);
+        showText(0.45, 0.75, 1.0, "~r~EngBrake");
     }
 }
 
@@ -1463,13 +1458,13 @@ void handleBrakePatch() {
     }
 
     bool patchThrottle =
-        g_wheelPatchStates.EngLockActive;
+        g_wheelPatchStates.EngLockActive ||
+        g_wheelPatchStates.EngBrakeActive;
 
     bool patchBrake =
         useABS ||
         useESP ||
-        useTCS && g_settings().DriveAssists.TCS.Mode == 1 ||
-        g_wheelPatchStates.EngBrakeActive;
+        useTCS && g_settings().DriveAssists.TCS.Mode == 1;
 
     if (g_wheelPatchStates.InduceBurnout) {
         patchThrottle = true;
@@ -1563,11 +1558,6 @@ void handleBrakePatch() {
             }
             if (g_settings.Debug.DisplayInfo)
                 showText(0.45, 0.75, 1.0, "~r~(ABS)");
-        }
-
-        if (g_wheelPatchStates.EngBrakeActive) {
-            if (g_settings.Debug.DisplayInfo)
-                showText(0.45, 0.75, 1.0, "~r~EngBrake");
         }
     }
     if (!patchBrake) {
