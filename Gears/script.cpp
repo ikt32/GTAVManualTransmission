@@ -1247,7 +1247,14 @@ void functionEngLock() {
                 //ext.SetWheelBrakePressure(vehicle, i, inpBrakeForce);
             }
         }
-        fakeRev(true, 1.0f);
+        if (wrongDirection) {
+            g_ext.SetCurrentRPM(g_playerVehicle, 0.0f);
+            VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, false);
+        }
+        else {
+            fakeRev(true, 1.0f);
+        }
+
         float oldEngineHealth = VEHICLE::GET_VEHICLE_ENGINE_HEALTH(g_playerVehicle);
         float damageToApply = g_settings().MTParams.MisshiftDamage * inputMultiplier;
         if (g_settings.MTOptions.EngDamage) {
