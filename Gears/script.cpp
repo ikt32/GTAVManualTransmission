@@ -1201,7 +1201,8 @@ void functionEngLock() {
         g_vehData.mFlags[1] & eVehicleFlag2::FLAG_IS_ELECTRIC ||
         g_vehData.mGearTop == 1 || 
         g_vehData.mGearCurr == g_vehData.mGearTop ||
-        g_gearStates.FakeNeutral) {
+        g_gearStates.FakeNeutral ||
+        g_wheelPatchStates.InduceBurnout) {
         g_wheelPatchStates.EngLockActive = false;
         return;
     }
@@ -1461,7 +1462,18 @@ void handleBrakePatch() {
             showText(0.45, 0.75, 1.0, "~r~(TCS/T)");
     }
 
+    bool patchThrottle =
+        g_wheelPatchStates.EngLockActive;
+
+    bool patchBrake =
+        useABS ||
+        useESP ||
+        useTCS && g_settings().DriveAssists.TCS.Mode == 1 ||
+        g_wheelPatchStates.EngBrakeActive;
+
     if (g_wheelPatchStates.InduceBurnout) {
+        patchThrottle = true;
+        patchBrake = true;
         if (!MemoryPatcher::BrakePatcher.Patched()) {
             MemoryPatcher::PatchBrake();
         }
@@ -1471,98 +1483,94 @@ void handleBrakePatch() {
         if (g_settings.Debug.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~Burnout");
     }
-    else if (g_wheelPatchStates.EngLockActive) {
-        if (!MemoryPatcher::ThrottlePatcher.Patched()) {
-            MemoryPatcher::PatchThrottle();
-        }
-        if (g_settings.Debug.DisplayInfo)
-            showText(0.45, 0.75, 1.0, "~r~EngLock");
-    }
-    else if (useABS) {
-        if (!MemoryPatcher::BrakePatcher.Patched()) {
-            MemoryPatcher::PatchBrake();
-        }
-        for (uint8_t i = 0; i < lockUps.size(); i++) {
-            if (lockUps[i]) {
-                g_ext.SetWheelBrakePressure(g_playerVehicle, i, 0.0f);
-                g_vehData.mWheelsAbs[i] = true;
+    else {
+        if (patchThrottle) {
+            if (!MemoryPatcher::ThrottlePatcher.Patched()) {
+                MemoryPatcher::PatchThrottle();
             }
-            else {                
-                g_ext.SetWheelBrakePressure(g_playerVehicle, i, inpBrakeForce);
+        }
+
+        if (patchBrake) {
+            if (!MemoryPatcher::BrakePatcher.Patched()) {
+                MemoryPatcher::PatchBrake();
+            }
+        }
+
+        if (useESP) {
+            for (auto i = 0; i < g_vehData.mWheelCount; ++i) {
                 g_vehData.mWheelsAbs[i] = false;
             }
-        }
-        if (g_settings.Debug.DisplayInfo)
-            showText(0.45, 0.75, 1.0, "~r~(ABS)");
-    }
-    else if (useESP) {
-        if (!MemoryPatcher::BrakePatcher.Patched()) {
-            MemoryPatcher::PatchBrake();
-        }
-        for (auto i = 0; i < g_vehData.mWheelCount; ++i) {
-            g_vehData.mWheelsAbs[i] = false;
-        }
-        float avgAngle_ = -avgAngle;
-        if (oppositeLock) {
-            avgAngle_ = avgAngle;
-        }
-        float oversteerAngleDeg = abs(rad2deg(oversteerAngle));
-        float oversteerComp = map(oversteerAngleDeg, 
-            g_settings.DriveAssists.ESP.OverMin, g_settings.DriveAssists.ESP.OverMax,
-            g_settings.DriveAssists.ESP.OverMinComp, g_settings.DriveAssists.ESP.OverMaxComp);
-
-        float oversteerAdd = handlingBrakeForce * oversteerComp;
-
-        float understeerAngleDeg(abs(rad2deg(understeerAngle)));
-        float understeerComp = map(understeerAngleDeg, 
-            g_settings.DriveAssists.ESP.UnderMin, g_settings.DriveAssists.ESP.UnderMax,
-            g_settings.DriveAssists.ESP.UnderMinComp, g_settings.DriveAssists.ESP.UnderMaxComp);
-
-        float understeerAdd = handlingBrakeForce * understeerComp;
-        espOversteer = espOversteer && !espUndersteer;
-
-        g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce * bbalF + (avgAngle_ < 0.0f && espOversteer ? oversteerAdd : 0.0f));
-        g_ext.SetWheelBrakePressure(g_playerVehicle, 1, inpBrakeForce * bbalF + (avgAngle_ > 0.0f && espOversteer ? oversteerAdd : 0.0f));
-        g_ext.SetWheelBrakePressure(g_playerVehicle, 2, inpBrakeForce * bbalR + (avgAngle > 0.0f && espUndersteer ? understeerAdd : 0.0f));
-        g_ext.SetWheelBrakePressure(g_playerVehicle, 3, inpBrakeForce * bbalR + (avgAngle < 0.0f && espUndersteer ? understeerAdd : 0.0f));
-        g_vehData.mWheelsEsp[0] = avgAngle_ < 0.0f && espOversteer ? true : false;
-        g_vehData.mWheelsEsp[1] = avgAngle_ > 0.0f && espOversteer ? true : false;
-        g_vehData.mWheelsEsp[2] = avgAngle > 0.0f && espUndersteer ? true : false;
-        g_vehData.mWheelsEsp[3] = avgAngle < 0.0f && espUndersteer ? true : false;
-        
-        if (g_settings.Debug.DisplayInfo) {
-            std::string         espString;
-            if (espUndersteer)  espString = "U";
-            else                espString = "O";
-            showText(0.45, 0.75, 1.0, fmt::format("~r~(ESP_{})", espString));
-        }
-    }
-    else if (useTCS && g_settings().DriveAssists.TCS.Mode == 1) {
-        if (!MemoryPatcher::BrakePatcher.Patched()) {
-            MemoryPatcher::PatchBrake();
-        }
-        for (int i = 0; i < g_vehData.mWheelCount; i++) {
-            if (slipped[i]) {
-                g_ext.SetWheelBrakePressure(g_playerVehicle, i, 
-                    map(speeds[i], g_vehData.mVelocity.y, g_vehData.mVelocity.y + 2.5f, 0.0f, 0.5f));
-                g_vehData.mWheelsTcs[i] = true;
+            float avgAngle_ = -avgAngle;
+            if (oppositeLock) {
+                avgAngle_ = avgAngle;
             }
-            else {
-                g_ext.SetWheelBrakePressure(g_playerVehicle, i, inpBrakeForce);
-                g_vehData.mWheelsTcs[i] = false;
+            float oversteerAngleDeg = abs(rad2deg(oversteerAngle));
+            float oversteerComp = map(oversteerAngleDeg,
+                g_settings.DriveAssists.ESP.OverMin, g_settings.DriveAssists.ESP.OverMax,
+                g_settings.DriveAssists.ESP.OverMinComp, g_settings.DriveAssists.ESP.OverMaxComp);
+
+            float oversteerAdd = handlingBrakeForce * oversteerComp;
+
+            float understeerAngleDeg(abs(rad2deg(understeerAngle)));
+            float understeerComp = map(understeerAngleDeg,
+                g_settings.DriveAssists.ESP.UnderMin, g_settings.DriveAssists.ESP.UnderMax,
+                g_settings.DriveAssists.ESP.UnderMinComp, g_settings.DriveAssists.ESP.UnderMaxComp);
+
+            float understeerAdd = handlingBrakeForce * understeerComp;
+            espOversteer = espOversteer && !espUndersteer;
+
+            g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce * bbalF + (avgAngle_ < 0.0f && espOversteer ? oversteerAdd : 0.0f));
+            g_ext.SetWheelBrakePressure(g_playerVehicle, 1, inpBrakeForce * bbalF + (avgAngle_ > 0.0f && espOversteer ? oversteerAdd : 0.0f));
+            g_ext.SetWheelBrakePressure(g_playerVehicle, 2, inpBrakeForce * bbalR + (avgAngle > 0.0f && espUndersteer ? understeerAdd : 0.0f));
+            g_ext.SetWheelBrakePressure(g_playerVehicle, 3, inpBrakeForce * bbalR + (avgAngle < 0.0f && espUndersteer ? understeerAdd : 0.0f));
+            g_vehData.mWheelsEsp[0] = avgAngle_ < 0.0f && espOversteer ? true : false;
+            g_vehData.mWheelsEsp[1] = avgAngle_ > 0.0f && espOversteer ? true : false;
+            g_vehData.mWheelsEsp[2] = avgAngle > 0.0f && espUndersteer ? true : false;
+            g_vehData.mWheelsEsp[3] = avgAngle < 0.0f && espUndersteer ? true : false;
+
+            if (g_settings.Debug.DisplayInfo) {
+                std::string         espString;
+                if (espUndersteer)  espString = "U";
+                else                espString = "O";
+                showText(0.45, 0.75, 1.0, fmt::format("~r~(ESP_{})", espString));
             }
         }
-        if (g_settings.Debug.DisplayInfo)
-            showText(0.45, 0.75, 1.0, "~r~(TCS/B)");
-    }
-    else if (g_wheelPatchStates.EngBrakeActive) {
-        if (!MemoryPatcher::BrakePatcher.Patched()) {
-            MemoryPatcher::PatchBrake();
+        if (useTCS && g_settings().DriveAssists.TCS.Mode == 1) {
+            for (int i = 0; i < g_vehData.mWheelCount; i++) {
+                if (slipped[i]) {
+                    g_ext.SetWheelBrakePressure(g_playerVehicle, i,
+                        map(speeds[i], g_vehData.mVelocity.y, g_vehData.mVelocity.y + 2.5f, 0.0f, 0.5f));
+                    g_vehData.mWheelsTcs[i] = true;
+                }
+                else {
+                    g_ext.SetWheelBrakePressure(g_playerVehicle, i, inpBrakeForce);
+                    g_vehData.mWheelsTcs[i] = false;
+                }
+            }
+            if (g_settings.Debug.DisplayInfo)
+                showText(0.45, 0.75, 1.0, "~r~(TCS/B)");
         }
-        if (g_settings.Debug.DisplayInfo)
-            showText(0.45, 0.75, 1.0, "~r~EngBrake");
+        if (useABS) {
+            for (uint8_t i = 0; i < lockUps.size(); i++) {
+                if (lockUps[i]) {
+                    g_ext.SetWheelBrakePressure(g_playerVehicle, i, 0.0f);
+                    g_vehData.mWheelsAbs[i] = true;
+                }
+                else {
+                    g_ext.SetWheelBrakePressure(g_playerVehicle, i, inpBrakeForce);
+                    g_vehData.mWheelsAbs[i] = false;
+                }
+            }
+            if (g_settings.Debug.DisplayInfo)
+                showText(0.45, 0.75, 1.0, "~r~(ABS)");
+        }
+
+        if (g_wheelPatchStates.EngBrakeActive) {
+            if (g_settings.Debug.DisplayInfo)
+                showText(0.45, 0.75, 1.0, "~r~EngBrake");
+        }
     }
-    else {
+    if (!patchBrake) {
         if (MemoryPatcher::BrakePatcher.Patched()) {
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
                 if (g_controls.BrakeVal == 0.0f) {
@@ -1571,13 +1579,23 @@ void handleBrakePatch() {
             }
             MemoryPatcher::RestoreBrake();
         }
+        for (int i = 0; i < g_vehData.mWheelCount; i++) {
+            g_vehData.mWheelsAbs[i] = false;
+            g_vehData.mWheelsEsp[i] = false;
+        }
+    }
+    if (!patchThrottle) {
         if (MemoryPatcher::ThrottlePatcher.Patched()) {
+            for (int i = 0; i < g_vehData.mWheelCount; i++) {
+                if (g_controls.ThrottleVal == 0.0f) {
+                    g_ext.SetWheelPower(g_playerVehicle, i, 0.0f);
+                }
+            }
             MemoryPatcher::RestoreThrottle();
         }
         for (int i = 0; i < g_vehData.mWheelCount; i++) {
-            g_vehData.mWheelsTcs[i] = false;
-            g_vehData.mWheelsAbs[i] = false;
-            g_vehData.mWheelsEsp[i] = false;
+            if (!useTCS)
+                g_vehData.mWheelsTcs[i] = false;
         }
     }
 }
