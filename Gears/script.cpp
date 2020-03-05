@@ -1449,6 +1449,14 @@ void handleBrakePatch() {
 
     if (useTCS && g_settings().DriveAssists.TCS.Mode == 2) {
         CONTROLS::DISABLE_CONTROL_ACTION(2, eControl::ControlVehicleAccelerate, true);
+        for (int i = 0; i < g_vehData.mWheelCount; i++) {
+            if (slipped[i]) {
+                g_vehData.mWheelsTcs[i] = true;
+            }
+            else {
+                g_vehData.mWheelsTcs[i] = false;
+            }
+        }
         if (g_settings.Debug.DisplayInfo)
             showText(0.45, 0.75, 1.0, "~r~(TCS/T)");
     }
