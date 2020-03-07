@@ -7,7 +7,7 @@
 #include "Patcher.h"
 
 namespace MemoryPatcher {
-const int NumGearboxPatches = 4;
+const int NumGearboxPatches = 5;
 int NumGearboxPatched = 0;
 
 const int maxAttempts = 4;
@@ -32,6 +32,11 @@ Patcher ClutchLowRPMPatcher("Gears: Clutch Low RPM", clutchLow, true);
 // (in the RPM region where shift-up would've been triggered)
 PatternInfo clutchRevLimit;
 Patcher ClutchRevLimPatcher("Gears: Clutch Rev lim", clutchRevLimit, true);
+
+// When disabled, game doesn't lift throttle during shifts
+// Also useful to set throttle in 2nd+ while in fakeNeutral/clutched in
+PatternInfo throttleLift;
+Patcher ThrottleLiftPatcher("Gears: Throttle lift", throttleLift, true);
 
 // When disabled, throttle doesn't decrease.
 PatternInfo throttle;
@@ -89,6 +94,8 @@ void SetPatterns(int version) {
             { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D });
         clutchRevLimit = PatternInfo("\xC7\x43\x40\xCD\xCC\xCC\x3D\x44\x89\x6B\x6C\x44\x89\x73\x68", "xx?xxxxxx??xx??",
             { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D });
+        throttleLift = PatternInfo("\x44\x89\x77\x50\xf3\x0f\x11\x7d\x4f", "xxxxxxxx?",
+            { 0x90, 0x90, 0x90, 0x90 });
         steeringAssist = PatternInfo("\x45\x84\xED\x0F\x84\xD0\x01\x00\x00\x0F\x28\x4B\x70"
             "\xF3\x0F\x10\x25\x00\x00\x00\x00\xF3\x0F\x10\x1D\x00\x00\x00\x00\x0F\x28\xC1\x0F\x28\xD1", 
             "xxxxx????xx??xxx?????xxx?????xx?xx?",
@@ -102,6 +109,7 @@ bool Test() {
     success &= 0 != ShiftDownPatcher.Test();
     success &= 0 != ClutchLowRPMPatcher.Test();
     success &= 0 != ClutchRevLimPatcher.Test();
+    success &= 0 != ThrottleLiftPatcher.Test();
     success &= 0 != ThrottlePatcher.Test();
     success &= 0 != BrakePatcher.Test();
     success &= 0 != SteeringAssistPatcher.Test();
@@ -134,6 +142,10 @@ bool ApplyGearboxPatches() {
     }
 
     if (ShiftUpPatcher.Patch()) {
+        NumGearboxPatched++;
+    }
+
+    if (ThrottleLiftPatcher.Patch()) {
         NumGearboxPatched++;
     }
 
@@ -173,6 +185,10 @@ bool RevertGearboxPatches() {
     }
 
     if (ShiftUpPatcher.Restore()) {
+        NumGearboxPatched--;
+    }
+
+    if (ThrottleLiftPatcher.Restore()) {
         NumGearboxPatched--;
     }
 
