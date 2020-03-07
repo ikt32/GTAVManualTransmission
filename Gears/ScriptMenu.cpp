@@ -455,10 +455,10 @@ void update_shiftingoptionsmenu() {
     g_menu.Title("Shifting options");
     g_menu.Subtitle("");
 
-    g_menu.BoolOption("Cut throttle on upshift", g_settings.ShiftOptions.DownshiftBlip,
+    g_menu.BoolOption("Cut throttle on upshift", g_settings.ShiftOptions.UpshiftCut,
         { "Helps rev matching.",
             "Only applies to sequential mode."});
-    g_menu.BoolOption("Blip throttle on downshift", g_settings.ShiftOptions.UpshiftCut,
+    g_menu.BoolOption("Blip throttle on downshift", g_settings.ShiftOptions.DownshiftBlip,
         { "Helps rev matching.",
             "Only applies to sequential mode." });
     g_menu.FloatOption("Clutch rate multiplier", g_settings.ShiftOptions.ClutchRateMult, 0.05f, 20.0f, 0.05f,
