@@ -54,6 +54,7 @@ public:
         bool ClutchShiftH = true;
         bool ClutchShiftS = false;
         bool HardLimiter = true;
+        bool RealTurbo = true;
     } MTOptions;
 
     // [MT_PARAMS]

@@ -131,6 +131,7 @@ void functionAutoLookback();
 void functionAutoGear1();
 void functionHillGravity();
 void functionAudioFX();
+void functionTurbo();
 
 void setVehicleConfig(Vehicle vehicle) {
     g_activeConfig = nullptr;
@@ -184,6 +185,7 @@ void update_vehicle() {
     }
     if (Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
         g_vehData.Update(); // Update before doing anything else
+        functionTurbo();
     }
     if (g_playerVehicle != g_lastPlayerVehicle && Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
         if (g_vehData.mGearTop == 1 || g_vehData.mFlags[1] & FLAG_IS_ELECTRIC)
@@ -2073,6 +2075,33 @@ void functionAudioFX() {
             g_gearRattle2.Stop();
         }
     }
+}
+
+void functionTurbo() {
+    if (!g_settings.MTOptions.RealTurbo ||
+        !VEHICLE::IS_TOGGLE_MOD_ON(g_playerVehicle, VehicleToggleModTurbo))
+        return;
+
+    // closed throttle: negative boost
+    // open throttle: boost ~ RPM * throttle
+
+    float rpm = g_ext.GetCurrentRPM(g_playerVehicle);
+    rpm = map(rpm, 0.2f, 0.5f, 0.0f, 1.0f);
+    rpm = std::clamp(rpm, 0.0f, 1.0f);
+
+    float throttle = abs(g_ext.GetThrottle(g_playerVehicle));
+
+    float now = throttle * rpm;
+    now = map(now, 0.0f, 1.0f, -0.8f, 1.0f);
+
+    float lerpRate;
+    if (now > g_vehData.mTurbo)
+        lerpRate = 0.999f;
+    else
+        lerpRate = 0.97f;
+
+    float turbo = lerp(g_vehData.mTurbo, now, 1.0f - pow(1.0f - lerpRate, GAMEPLAY::GET_FRAME_TIME()));
+    g_ext.SetTurbo(g_playerVehicle, turbo);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
