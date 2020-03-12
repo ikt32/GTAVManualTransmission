@@ -486,7 +486,7 @@ void update_finetuneautooptionsmenu() {
     g_menu.FloatOption("Downshift engine load", g_settings.AutoParams.DownshiftLoad, 0.30f, 1.00f, 0.01f,
         { "Downshift when the engine load rises over this value. "
           "Raise this value if the car downshifts right after upshifting." });
-    g_menu.FloatOption("Downshift timeout multiplier", g_settings.AutoParams.DownshiftTimeoutMult, 0.05f, 4.00f, 0.05f,
+    g_menu.FloatOption("Downshift timeout multiplier", g_settings.AutoParams.DownshiftTimeoutMult, 0.05f, 10.00f, 0.05f,
         { "Don't downshift while car has just shifted up. "
           "Timeout based on clutch change rate.",
           "Raise for longer timeout, lower to allow earlier downshifting after an upshift." });

@@ -250,11 +250,9 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
         // Shift down later when ratios are far apart
         float gearRatioRatio = 1.0f;
 
-        if (topGear > 1) {
-            float baseGearRatio = 1.948768f / 3.333333f;
-            float thisGearRatio = gearRatios[2] / gearRatios[1];
-            gearRatioRatio = baseGearRatio / thisGearRatio;
-            gearRatioRatio = map(gearRatioRatio, 1.0f, 2.0f, 1.0f, 4.0f);
+        if (topGear > 1 && currGear > 1) {
+            float thisGearRatio = gearRatios[currGear - 1] / gearRatios[currGear];
+            gearRatioRatio = thisGearRatio;
         }
 
         float rateUp = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(npcVehicle) + hOffsets.fClutchChangeRateScaleUpShift);

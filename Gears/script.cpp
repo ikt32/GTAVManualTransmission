@@ -1082,8 +1082,8 @@ void functionAShift() {
     // Shift down later when ratios are far apart
     float gearRatioRatio = 1.0f;
 
-    if (g_vehData.mGearTop > 1 && currGear < g_vehData.mGearTop) {
-        float thisGearRatio = g_vehData.mGearRatios[currGear] / g_vehData.mGearRatios[currGear + 1];
+    if (g_vehData.mGearTop > 1 && currGear > 1) {
+        float thisGearRatio = g_vehData.mGearRatios[currGear - 1] / g_vehData.mGearRatios[currGear];
         gearRatioRatio = thisGearRatio;
     }
 
