@@ -553,7 +553,7 @@ void update_steering() {
         updateSteeringMultiplier();
     }
 
-    if (customSteering) {
+    if (isCar && customSteering) {
         CustomSteering::Update();
     }
 }
