@@ -106,7 +106,6 @@ void CustomSteering::drawDebug() {
 //   - Amphibious when wet
 //   - Flying when in-air
 void disableControls() {
-
     Hash vehicleModel = ENTITY::GET_ENTITY_MODEL(g_playerVehicle);
 
     bool allWheelsOnGround = VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(g_playerVehicle);
@@ -192,6 +191,14 @@ void CustomSteering::Update() {
             1.0f - pow(0.0001f, GAMEPLAY::GET_FRAME_TIME()));
     }
     steerPrev = steerCurr;
+
+    // Ignore reduction for wet vehicles.
+    int modelType = g_ext.GetModelType(g_playerVehicle);
+    bool isFrog = modelType == 5 || modelType == 6 || modelType == 7;
+    bool isBoat = modelType == 13;
+    float submergeLevel = ENTITY::GET_ENTITY_SUBMERGED_LEVEL(g_playerVehicle);
+    if (isFrog && submergeLevel > 0.0f || isBoat)
+        reduction = 1.0f;
 
     float desiredHeading = calculateDesiredHeading(limitRadians, steerCurr, reduction);
 

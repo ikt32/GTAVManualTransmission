@@ -553,7 +553,9 @@ void update_steering() {
         updateSteeringMultiplier();
     }
 
-    if (isCar && customSteering) {
+    bool isRoad = g_vehData.mDomain == VehicleDomain::Road;
+
+    if (isRoad && customSteering) {
         CustomSteering::Update();
     }
 }
