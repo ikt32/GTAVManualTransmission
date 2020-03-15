@@ -1,5 +1,23 @@
 # Changelog
 
+## 4.7.2
+
+New:
+
+* Add realistic turbo fix
+
+Fixes and improvements:
+
+* Fix engine revving when locked up due to direction
+* Fix throttle-based TCS not firing dashboard light
+* Fix swapped up/downshift cut/blip settings in menu
+* Fix delta-gear ratio for automatic transission downshifts
+* Fix NPCs not shifting for forward/reverse
+* Apply TCS, ESP and ABS simultaneously
+* Change engine braking to use negative throttle instead of the brakes
+* Disable CustomSteering for boats
+* Improve CustomSteering for amphibious cars in water
+
 ## 4.7.1
 
 New features:
