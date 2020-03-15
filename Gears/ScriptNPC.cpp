@@ -112,7 +112,7 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
                     { "RPM: " + std::to_string(rpm), rpmColor },
                     { fmt::format("Gear: {}/{}", g_ext.GetGearCurr(npcVehicle), g_ext.GetTopGear(npcVehicle)), fgColor },
                     { fmt::format("Load: {}", load), fgColor },
-                    { fmt::format("Shifting: {}", gearStates.Shifting), fgColor },
+                    { fmt::format("{}Shifting", gearStates.Shifting ? "~g~" : ""), fgColor },
                     { fmt::format("TH: {}", gearStates.ThrottleHang), fgColor },
                 },
                 bgColor);
@@ -265,6 +265,19 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
                 shiftTo(gearStates, currGear - 1, true);
                 gearStates.FakeNeutral = false;
             }
+        }
+
+        // Shift to forward/reverse when "stuck" in the opposite gear?
+        if (currGear == 0 && g_ext.GetThrottleP(npcVehicle) > 0.2f) {
+            gearStates.Shifting = false;
+            shiftTo(gearStates, 1, true);
+            gearStates.FakeNeutral = false;
+        }
+
+        if (currGear == 1 && g_ext.GetThrottleP(npcVehicle) < -0.2f) {
+            gearStates.Shifting = false;
+            shiftTo(gearStates, 0, true);
+            gearStates.FakeNeutral = false;
         }
     }
 
