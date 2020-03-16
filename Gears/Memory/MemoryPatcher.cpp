@@ -77,6 +77,10 @@ void SetPatterns(int version) {
         "xxxx??xx" "xxxx??xx" "xxxx??xx" "xxxx", 
         { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
 
+    // Valid for 1180 to 1868+
+    throttleLift = PatternInfo("\x44\x89\x77\x50\xf3\x0f\x11\x7d\x4f", "xxxxxxxx?",
+        { 0x90, 0x90, 0x90, 0x90 });
+
     if (version >= G_VER_1_0_1365_1_STEAM) {
         shiftUp = PatternInfo("\x66\x89\x0B\x8D\x46\x04\x66\x89\x43\04", "xx?xx?xxx?", 
             { 0x66, 0x89, 0x0B });
@@ -94,8 +98,6 @@ void SetPatterns(int version) {
             { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D });
         clutchRevLimit = PatternInfo("\xC7\x43\x40\xCD\xCC\xCC\x3D\x44\x89\x6B\x6C\x44\x89\x73\x68", "xx?xxxxxx??xx??",
             { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D });
-        throttleLift = PatternInfo("\x44\x89\x77\x50\xf3\x0f\x11\x7d\x4f", "xxxxxxxx?",
-            { 0x90, 0x90, 0x90, 0x90 });
         steeringAssist = PatternInfo("\x45\x84\xED\x0F\x84\xD0\x01\x00\x00\x0F\x28\x4B\x70"
             "\xF3\x0F\x10\x25\x00\x00\x00\x00\xF3\x0F\x10\x1D\x00\x00\x00\x00\x0F\x28\xC1\x0F\x28\xD1", 
             "xxxxx????xx??xxx?????xxx?????xx?xx?",
