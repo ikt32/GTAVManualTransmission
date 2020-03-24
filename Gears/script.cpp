@@ -1930,8 +1930,8 @@ void startStopEngine() {
     bool prevKeyboard = g_controls.PrevInput == CarControls::Keyboard;
     bool prevWheel = g_controls.PrevInput == CarControls::Wheel;
 
-    bool heldControllerXinput = g_controls.ButtonHeldOver(CarControls::ControllerControlType::Engine, g_settings.Controller.HoldTimeMs);
-    bool heldControllerNative = g_controls.ButtonHeldOver(CarControls::LegacyControlType::Engine, g_settings.Controller.HoldTimeMs);
+    bool heldControllerXinput = g_controls.ButtonReleasedAfter(CarControls::ControllerControlType::Engine, g_settings.Controller.HoldTimeMs);
+    bool heldControllerNative = g_controls.ButtonReleasedAfter(CarControls::LegacyControlType::Engine, g_settings.Controller.HoldTimeMs);
 
     bool pressedKeyboard = g_controls.ButtonJustPressed(CarControls::KeyboardControlType::Engine);
     bool pressedWheel = g_controls.ButtonJustPressed(CarControls::WheelControlType::Engine);
