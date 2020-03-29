@@ -7,3 +7,9 @@
 [submodule "thirdparty/GTAVMenuBase"]
 	path = thirdparty/GTAVMenuBase
 	url = https://github.com/E66666666/GTAVMenuBase
+[submodule "thirdparty/--force"]
+	path = thirdparty/--force
+	url = https://github.com/E66666666/GTAVDashHook
+[submodule "thirdparty/GTAVDashHook"]
+	path = thirdparty/GTAVDashHook
+	url = https://github.com/E66666666/GTAVDashHook

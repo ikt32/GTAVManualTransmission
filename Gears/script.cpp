@@ -14,6 +14,8 @@
 #include <menu.h>
 #include <fmt/format.h>
 
+#include <GTAVDashHook/DashHook/DashHook.h>
+
 #include "ScriptSettings.hpp"
 #include "VehicleData.hpp"
 
@@ -133,6 +135,19 @@ void functionHillGravity();
 void functionAudioFX();
 void functionTurbo();
 
+void functionDash() {
+    if (!g_settings.GameAssists.DashExt)
+        return;
+
+    auto data = DashHook_GetDataCurrent();
+
+    for (const auto& abs : g_vehData.mWheelsAbs) {
+        data.ABSLight |= abs;
+    }
+
+    DashHook_SetData(data);
+}
+
 void setVehicleConfig(Vehicle vehicle) {
     g_activeConfig = nullptr;
     g_settings.SetVehicleConfig(nullptr);
@@ -186,6 +201,7 @@ void update_vehicle() {
     if (Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
         g_vehData.Update(); // Update before doing anything else
         functionTurbo();
+        functionDash();
     }
     if (g_playerVehicle != g_lastPlayerVehicle && Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
         if (g_vehData.mGearTop == 1 || g_vehData.mFlags[1] & FLAG_IS_ELECTRIC)

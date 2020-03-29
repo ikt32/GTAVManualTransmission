@@ -62,21 +62,20 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
       <AdditionalIncludeDirectories>$(SolutionDir)thirdparty\ScriptHookV_SDK;$(SolutionDir)thirdparty\GTAVMenuBase;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\fmt\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>MT_EXPORTS;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MT_EXPORTS;DASHHOOK_RUNTIME;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalOptions>..\thirdparty\ScriptHookV_SDK\lib\ScriptHookV.lib</AdditionalOptions>
+      <AdditionalOptions>
+      </AdditionalOptions>
       <GenerateDebugInformation>No</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>$(DXSDK_DIR)Lib\x64\XInput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(DXSDK_DIR)Lib\x64\XInput.lib;$(SolutionDir)thirdparty\ScriptHookV_SDK\lib\ScriptHookV.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <BuildLog>
-      <Path>$(IntDir)$(MSBuildProjectName).log</Path>
-    </BuildLog>
+    <BuildLog />
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
     </Bscmake>
@@ -164,6 +163,8 @@
     <ClCompile Include="WheelInput.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\GTAVDashHook\GTAVDashHook\DashHook.h" />
+    <ClInclude Include="..\thirdparty\GTAVDashHook\DashHook\DashHook.h" />
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menu.h" />
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menucontrols.h" />
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menukeyboard.h" />

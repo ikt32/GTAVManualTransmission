@@ -79,6 +79,7 @@ public:
         bool ThrottleStart = false;
         bool HidePlayerInFPV = false;
         bool DefaultNeutral = true;
+        bool DashExt = true;
     } GameAssists;
 
     // [DRIVING_ASSISTS]

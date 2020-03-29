@@ -1378,6 +1378,9 @@ void update_gameassistmenu() {
         { "Hides the player in first person view." })) {
         functionHidePlayerInFPV(true);
     }
+
+    g_menu.BoolOption("DashHook", g_settings.GameAssists.DashExt,
+        { "!!!" });
 }
 
 void update_steeringassistmenu() {
