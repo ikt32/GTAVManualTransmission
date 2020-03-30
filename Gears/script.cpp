@@ -41,6 +41,8 @@
 #include "WheelInput.h"
 #include "ScriptUtils.h"
 #include "VehicleConfig.h"
+#include "UDPTelemetry/Socket.h"
+#include "UDPTelemetry/UDPTelemetry.h"
 
 namespace fs = std::filesystem;
 
@@ -52,6 +54,8 @@ std::mutex g_notifyUpdateMutex;
 
 bool g_checkUpdateDone;
 std::mutex g_checkUpdateDoneMutex;
+
+Socket g_socket;
 
 int g_textureWheelId;
 int g_textureAbsId;
@@ -2122,6 +2126,18 @@ void functionTurbo() {
     g_ext.SetTurbo(g_playerVehicle, turbo);
 }
 
+void StartUDPTelemetry() {
+    if (g_settings.Misc.UDPTelemetry)
+        if (!g_socket.Started())
+            g_socket.Start(20777);
+}
+
+void update_UDPTelemetry() {
+    if (Util::VehicleAvailable(g_playerVehicle, g_playerPed) && g_settings.Misc.UDPTelemetry) {
+        UDPTelemetry::UpdatePacket(g_socket, g_playerVehicle, g_vehData, g_controls, g_ext);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //                              Script entry
 ///////////////////////////////////////////////////////////////////////////////
@@ -2299,6 +2315,8 @@ void main() {
     logger.Write(DEBUG, "START: Starting with MT:  %s", g_settings.MTOptions.Enable ? "ON" : "OFF");
     logger.Write(INFO, "START: Initialization finished");
 
+    StartUDPTelemetry();
+
     while (true) {
         update_player();
         update_vehicle();
@@ -2310,6 +2328,7 @@ void main() {
         update_misc_features();
         update_menu();
         update_update_notification();
+        update_UDPTelemetry();
         WAIT(0);
     }
 }

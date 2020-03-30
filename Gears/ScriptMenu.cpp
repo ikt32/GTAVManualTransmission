@@ -1381,6 +1381,11 @@ void update_gameassistmenu() {
 
     g_menu.BoolOption("DashHook", g_settings.GameAssists.DashExt,
         { "!!!" });
+
+    if (g_menu.BoolOption("Enable UDP telemetry", g_settings.Misc.UDPTelemetry,
+        { "Allows programs like SimHub to use data from this script." })) {
+        StartUDPTelemetry();
+    }
 }
 
 void update_steeringassistmenu() {

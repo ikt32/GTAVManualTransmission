@@ -291,6 +291,11 @@ public:
         } Native;
     } Controller;
 
+    // [MISC]
+    struct {
+        bool UDPTelemetry = true;
+    } Misc;
+
     // [UPDATE]
     struct {
         bool EnableUpdate = true;

@@ -55,3 +55,4 @@ void onMenuClose();
 //                             Misc features
 ///////////////////////////////////////////////////////////////////////////////
 void functionHidePlayerInFPV(bool optionToggled);
+void StartUDPTelemetry();

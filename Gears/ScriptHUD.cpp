@@ -128,7 +128,7 @@ void drawGForces() {
     float GForceY = static_cast<float>(accel.y) / 9.81f;
     showText(locX + 0.100f, locY - 0.075f, 0.5f, fmt::format("LAT: {:.2f} g", GForceX));
     showText(locX + 0.100f, locY + 0.025f, 0.5f, fmt::format("LON: {:.2f} g", GForceY));
-    
+
     // 1 div = 2G
     float offX = (szX * 0.5f) * GForceX * 0.5f;
     float offY = (szY * 0.5f) * GForceY * 0.5f;
