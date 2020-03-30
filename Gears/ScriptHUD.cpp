@@ -18,6 +18,10 @@ extern NativeMenu::Menu g_menu;
 extern ScriptSettings g_settings;
 extern CarControls g_controls;
 extern int g_textureWheelId;
+extern int g_textureAbsId;
+extern int g_textureTcsId;
+extern int g_textureEspId;
+extern int g_textureBrkId;
 
 extern VehicleGearboxStates g_gearStates;
 extern VehicleExtensions g_ext;
@@ -34,6 +38,54 @@ namespace {
     std::vector<Vector3> oldCoords(3);
     double prevWorldRotVel;
     int lastT = 0;
+}
+
+void drawWarningLights() {
+    bool abs = false;
+    bool tcs = false;
+    bool esp = false;
+    bool brk = g_ext.GetHandbrake(g_playerVehicle);
+
+    for(int i = 0; i < g_vehData.mWheelCount; ++i) {
+        abs |= g_vehData.mWheelsAbs[i];
+        tcs |= g_vehData.mWheelsTcs[i];
+        esp |= g_vehData.mWheelsEsp[i];
+    }
+
+    const float size = g_settings.HUD.DashIndicators.Size;
+    const float txSz = 0.025f * size;
+    const float rectSzX = 0.125f * g_settings.HUD.DashIndicators.Size;
+    const float rectSzY = 0.050f * g_settings.HUD.DashIndicators.Size;
+    const float XPos = g_settings.HUD.DashIndicators.XPos;
+    const float YPos = g_settings.HUD.DashIndicators.YPos;
+
+    drawTexture(g_textureAbsId, 0, -9998, 100,
+        txSz, txSz,
+        0.5f, 0.5f, // center of texture
+        XPos - 0.045f * size, YPos,
+        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, abs ? 1.0f : 0.0f);
+
+    drawTexture(g_textureTcsId, 0, -9998, 100,
+        txSz, txSz,
+        0.5f, 0.5f, // center of texture
+        XPos - 0.015f * size, YPos,
+        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, tcs ? 1.0f : 0.0f);
+
+    drawTexture(g_textureEspId, 0, -9998, 100,
+        txSz, txSz,
+        0.5f, 0.5f, // center of texture
+        XPos + 0.015f * size, YPos,
+        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, esp ? 1.0f : 0.0f);
+
+    drawTexture(g_textureBrkId, 0, -9998, 100,
+        txSz, txSz,
+        0.5f, 0.5f, // center of texture
+        XPos + 0.045f * size, YPos,
+        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, brk ? 1.0f : 0.0f);
+
+    GRAPHICS::DRAW_RECT(XPos, YPos,
+        rectSzX, rectSzY,
+        0, 0, 0, 127);
 }
 
 void drawGForces() {
@@ -383,6 +435,9 @@ void drawVehicleWheelInfo() {
         if (g_vehData.mWheelsTcs[i]) {
             color = Color{ 255, 255, 0, 127 };
         }
+        if (g_vehData.mWheelsEsp[i]) {
+            color = Color{ 0, 0, 255, 127 };
+        }
         if (g_vehData.mWheelsAbs[i]) {
             color = Color{ 255, 0, 0, 127 };
         }
@@ -393,11 +448,10 @@ void drawVehicleWheelInfo() {
             color = Color{ 0, 0, 0, 0 };
         }
         showDebugInfo3D(wheelCoords[i], {
-            fmt::format("Index: \t{}", i),
-            fmt::format("{}Powered", g_ext.IsWheelPowered(g_playerVehicle, i) ? "~g~" : "~r~"),
+            fmt::format("[{}] {}Powered", i, g_ext.IsWheelPowered(g_playerVehicle, i) ? "~g~" : "~r~"),
             fmt::format("Speed: \t{:.3f}", wheelsSpeed[i]),
-            fmt::format("Compr: \t{:.3f}", wheelsCompr[i]),
-            fmt::format("Health: \t{:.3f}", wheelsHealt[i]),
+            //fmt::format("Compr: \t{:.3f}", wheelsCompr[i]),
+            //fmt::format("Health: \t{:.3f}", wheelsHealt[i]),
             fmt::format("Power: \t{:.3f}", wheelsPower[i]),
             fmt::format("Brake: \t{:.3f}", wheelsBrake[i])}, color);
         GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,

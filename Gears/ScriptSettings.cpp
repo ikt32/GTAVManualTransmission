@@ -45,21 +45,30 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
     localSettings.MTParams.RPMDamage          = activeConfig->MTParams.RPMDamage        ;
     localSettings.MTParams.MisshiftDamage     = activeConfig->MTParams.MisshiftDamage   ;
 
-    localSettings.DriveAssists.CustomABS = activeConfig->DriveAssists.CustomABS;
-    localSettings.DriveAssists.ABSFilter = activeConfig->DriveAssists.ABSFilter;
-    localSettings.DriveAssists.TCMode    = activeConfig->DriveAssists.TCMode   ;
+    localSettings.DriveAssists.ABS.Enable       = activeConfig->DriveAssists.ABS.Enable      ;
+    localSettings.DriveAssists.ABS.Filter       = activeConfig->DriveAssists.ABS.Filter      ;
+    localSettings.DriveAssists.TCS.Mode         = activeConfig->DriveAssists.TCS.Mode        ;
+    localSettings.DriveAssists.TCS.SlipMax      = activeConfig->DriveAssists.TCS.SlipMax     ;
+    localSettings.DriveAssists.ESP.OverMin      = activeConfig->DriveAssists.ESP.OverMin     ;
+    localSettings.DriveAssists.ESP.OverMax      = activeConfig->DriveAssists.ESP.OverMax     ;
+    localSettings.DriveAssists.ESP.OverMinComp  = activeConfig->DriveAssists.ESP.OverMinComp ;
+    localSettings.DriveAssists.ESP.OverMaxComp  = activeConfig->DriveAssists.ESP.OverMaxComp ;
+    localSettings.DriveAssists.ESP.UnderMin     = activeConfig->DriveAssists.ESP.UnderMin    ;
+    localSettings.DriveAssists.ESP.UnderMax     = activeConfig->DriveAssists.ESP.UnderMax    ;
+    localSettings.DriveAssists.ESP.UnderMinComp = activeConfig->DriveAssists.ESP.UnderMinComp;
+    localSettings.DriveAssists.ESP.UnderMaxComp = activeConfig->DriveAssists.ESP.UnderMaxComp;
 
     localSettings.ShiftOptions.UpshiftCut     = activeConfig->ShiftOptions.UpshiftCut    ;
     localSettings.ShiftOptions.DownshiftBlip  = activeConfig->ShiftOptions.DownshiftBlip ;
     localSettings.ShiftOptions.ClutchRateMult = activeConfig->ShiftOptions.ClutchRateMult;
     localSettings.ShiftOptions.RPMTolerance   = activeConfig->ShiftOptions.RPMTolerance  ;
 
-    localSettings.AutoParams.UpshiftLoad                  = activeConfig->AutoParams.UpshiftLoad         ;
-    localSettings.AutoParams.DownshiftLoad                = activeConfig->AutoParams.DownshiftLoad       ;
-    localSettings.AutoParams.NextGearMinRPM               = activeConfig->AutoParams.NextGearMinRPM      ;
-    localSettings.AutoParams.CurrGearMinRPM               = activeConfig->AutoParams.CurrGearMinRPM      ;
-    localSettings.AutoParams.EcoRate                      = activeConfig->AutoParams.EcoRate             ;
-    localSettings.AutoParams.DownshiftTimeoutMult         = activeConfig->AutoParams.DownshiftTimeoutMult;
+    localSettings.AutoParams.UpshiftLoad          = activeConfig->AutoParams.UpshiftLoad         ;
+    localSettings.AutoParams.DownshiftLoad        = activeConfig->AutoParams.DownshiftLoad       ;
+    localSettings.AutoParams.NextGearMinRPM       = activeConfig->AutoParams.NextGearMinRPM      ;
+    localSettings.AutoParams.CurrGearMinRPM       = activeConfig->AutoParams.CurrGearMinRPM      ;
+    localSettings.AutoParams.EcoRate              = activeConfig->AutoParams.EcoRate             ;
+    localSettings.AutoParams.DownshiftTimeoutMult = activeConfig->AutoParams.DownshiftTimeoutMult;
 
 
     localSettings.Wheel.FFB.Enable         = activeConfig->Wheel.FFB.Enable        ;
@@ -75,10 +84,14 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
     localSettings.Wheel.FFB.DetailLim      = activeConfig->Wheel.FFB.DetailLim     ;
     localSettings.Wheel.FFB.DetailMAW      = activeConfig->Wheel.FFB.DetailMAW     ;
     localSettings.Wheel.FFB.CollisionMult  = activeConfig->Wheel.FFB.CollisionMult ;
+    localSettings.Wheel.FFB.Gamma          = activeConfig->Wheel.FFB.Gamma         ;
+    localSettings.Wheel.FFB.MaxSpeed       = activeConfig->Wheel.FFB.MaxSpeed      ;
+
 
     localSettings.Wheel.Steering.AngleCar  = activeConfig->Wheel.Steering.Angle;
     localSettings.Wheel.Steering.AngleBike = activeConfig->Wheel.Steering.Angle;
     localSettings.Wheel.Steering.AngleBoat = activeConfig->Wheel.Steering.Angle;
+    localSettings.Wheel.Steering.Gamma     = activeConfig->Wheel.Steering.Gamma;
 }
 
 ScriptSettings ScriptSettings::operator()() {
@@ -123,6 +136,7 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetBoolValue("MT_OPTIONS", "ClutchShiftingH", MTOptions.ClutchShiftH);
     ini.SetBoolValue("MT_OPTIONS", "ClutchShiftingS", MTOptions.ClutchShiftS);
     ini.SetBoolValue("MT_OPTIONS", "HardLimiter", MTOptions.HardLimiter);
+    ini.SetBoolValue("MT_OPTIONS", "RealTurbo", MTOptions.RealTurbo);
 
     // [MT_PARAMS]
     ini.SetDoubleValue("MT_PARAMS", "ClutchCatchpoint", MTParams.ClutchThreshold);
@@ -143,10 +157,19 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetBoolValue("GAMEPLAY_ASSISTS", "DefaultNeutral", GameAssists.DefaultNeutral);
 
     // [DRIVING_ASSISTS]
-    ini.SetBoolValue("DRIVING_ASSISTS", "CustomABS", DriveAssists.CustomABS);
-    ini.SetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABSFilter);
-    ini.SetLongValue("DRIVING_ASSISTS", "TractionControl", DriveAssists.TCMode);
-    ini.SetDoubleValue("DRIVING_ASSISTS", "TCSlipMax", DriveAssists.TCSlipMax);
+    ini.SetBoolValue("DRIVING_ASSISTS", "ABS", DriveAssists.ABS.Enable);
+    ini.SetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABS.Filter);
+    ini.SetLongValue("DRIVING_ASSISTS", "TCS", DriveAssists.TCS.Mode);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "TCSSlipMax", DriveAssists.TCS.SlipMax);
+    ini.SetBoolValue("DRIVING_ASSISTS", "ESP", DriveAssists.ESP.Enable);
+    ini.SetDoubleValue("DRIVING_ASSIST", "ESPOverMin", DriveAssists.ESP.OverMin);
+    ini.SetDoubleValue("DRIVING_ASSIST", "ESPOverMax", DriveAssists.ESP.OverMax);
+    ini.SetDoubleValue("DRIVING_ASSIST", "ESPOverMinComp", DriveAssists.ESP.OverMinComp);
+    ini.SetDoubleValue("DRIVING_ASSIST", "ESPOverMaxComp", DriveAssists.ESP.OverMaxComp);
+    ini.SetDoubleValue("DRIVING_ASSIST", "ESPUnderMin", DriveAssists.ESP.UnderMin);
+    ini.SetDoubleValue("DRIVING_ASSIST", "ESPUnderMax", DriveAssists.ESP.UnderMax);
+    ini.SetDoubleValue("DRIVING_ASSIST", "ESPUnderMinComp", DriveAssists.ESP.UnderMinComp);
+    ini.SetDoubleValue("DRIVING_ASSIST", "ESPUnderMaxComp", DriveAssists.ESP.UnderMaxComp);
 
     //[CUSTOM_STEERING]
     ini.SetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
@@ -253,6 +276,11 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetLongValue("HUD", "PedalInfoClutchB", HUD.Wheel.PedalClutchB);
     ini.SetLongValue("HUD", "PedalInfoClutchA", HUD.Wheel.PedalClutchA);
 
+    ini.SetBoolValue("HUD", "DashIndicators", HUD.DashIndicators.Enable);
+    ini.SetDoubleValue("HUD", "DashIndicatorsXpos", HUD.DashIndicators.XPos);
+    ini.SetDoubleValue("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
+    ini.SetDoubleValue("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
+
     // [MISC]
     ini.SetBoolValue("MISC", "UDPTelemetry", Misc.UDPTelemetry);
 
@@ -283,7 +311,7 @@ void ScriptSettings::SaveGeneral() const {
     CHECK_LOG_SI_ERROR(result, "save");
 }
 
-void ScriptSettings::SaveController() const {
+void ScriptSettings::SaveController(CarControls* scriptControl) const {
     CSimpleIniA ini;
     ini.SetUnicode();
     SI_Error result = ini.LoadFile(settingsControlsFile.c_str());
@@ -300,15 +328,15 @@ void ScriptSettings::SaveController() const {
     ini.SetBoolValue("CONTROLLER", "BlockHShift", Controller.BlockHShift);
 
     
-    ini.SetLongValue("CONTROLLER", "ShiftUpBlocks", Controller.ShiftUpBlocks);
-    ini.SetLongValue("CONTROLLER", "ShiftDownBlocks", Controller.ShiftDownBlocks);
-    ini.SetLongValue("CONTROLLER", "ClutchBlocks", Controller.ClutchBlocks);
+    ini.SetLongValue("CONTROLLER", "ShiftUpBlocks",   scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
+    ini.SetLongValue("CONTROLLER", "ShiftDownBlocks", scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
+    ini.SetLongValue("CONTROLLER", "ClutchBlocks",    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
 
     // [CONTROLLER_NATIVE]
     ini.SetBoolValue("CONTROLLER_NATIVE", "Enable", Controller.Native.Enable);
-    ini.SetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", Controller.Native.ShiftUpBlocks);
-    ini.SetLongValue("CONTROLLER_NATIVE", "ShiftDownBlocks", Controller.Native.ShiftDownBlocks);
-    ini.SetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", Controller.Native.ClutchBlocks);
+    ini.SetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
+    ini.SetLongValue("CONTROLLER_NATIVE", "ShiftDownBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
+    ini.SetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
 
     result = ini.SaveFile(settingsControlsFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
@@ -344,6 +372,8 @@ void ScriptSettings::SaveWheel() const {
     ini.SetLongValue("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin);
     ini.SetDoubleValue("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
     ini.SetDoubleValue("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
+    ini.SetDoubleValue("FORCE_FEEDBACK", "Gamma", Wheel.FFB.Gamma);
+    ini.SetDoubleValue("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
 
     // [INPUT_DEVICES]
     ini.SetValue("INPUT_DEVICES", nullptr, nullptr);
@@ -392,6 +422,7 @@ void ScriptSettings::parseSettingsGeneral() {
     MTOptions.ClutchShiftH = ini.GetBoolValue("MT_OPTIONS", "ClutchShiftingH", MTOptions.ClutchShiftH);
     MTOptions.ClutchShiftS = ini.GetBoolValue("MT_OPTIONS", "ClutchShiftingS", MTOptions.ClutchShiftS);
     MTOptions.HardLimiter = ini.GetBoolValue("MT_OPTIONS", "HardLimiter", MTOptions.HardLimiter);
+    MTOptions.RealTurbo = ini.GetBoolValue("MT_OPTIONS", "RealTurbo", MTOptions.RealTurbo);
 
     MTParams.ClutchThreshold =      ini.GetDoubleValue("MT_PARAMS", "ClutchCatchpoint", MTParams.ClutchThreshold);
     MTParams.StallingThreshold =    ini.GetDoubleValue("MT_PARAMS", "StallingThreshold", MTParams.StallingThreshold);
@@ -410,10 +441,19 @@ void ScriptSettings::parseSettingsGeneral() {
     GameAssists.HidePlayerInFPV =   ini.GetBoolValue("GAMEPLAY_ASSISTS", "HidePlayerInFPV", GameAssists.HidePlayerInFPV);
 
     // [DRIVING_ASSISTS]
-    DriveAssists.CustomABS = ini.GetBoolValue("DRIVING_ASSISTS", "CustomABS", DriveAssists.CustomABS);
-    DriveAssists.ABSFilter = ini.GetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABSFilter);
-    DriveAssists.TCMode = ini.GetLongValue("DRIVING_ASSISTS", "TractionControl", DriveAssists.TCMode);
-    DriveAssists.TCSlipMax = ini.GetDoubleValue("DRIVING_ASSISTS", "TCSlipMax", DriveAssists.TCSlipMax);
+    DriveAssists.ABS.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "ABS", DriveAssists.ABS.Enable);
+    DriveAssists.ABS.Filter = ini.GetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABS.Filter);
+    DriveAssists.TCS.Mode = ini.GetLongValue("DRIVING_ASSISTS", "TCS", DriveAssists.TCS.Mode);
+    DriveAssists.TCS.SlipMax = ini.GetDoubleValue("DRIVING_ASSISTS", "TCSSlipMax", DriveAssists.TCS.SlipMax);
+    DriveAssists.ESP.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "ESP", DriveAssists.ESP.Enable);
+    DriveAssists.ESP.OverMin = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMin", DriveAssists.ESP.OverMin);
+    DriveAssists.ESP.OverMax = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMax", DriveAssists.ESP.OverMax);
+    DriveAssists.ESP.OverMinComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMinComp", DriveAssists.ESP.OverMinComp);
+    DriveAssists.ESP.OverMaxComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMaxComp", DriveAssists.ESP.OverMaxComp);
+    DriveAssists.ESP.UnderMin = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMin", DriveAssists.ESP.UnderMin);
+    DriveAssists.ESP.UnderMax = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMax", DriveAssists.ESP.UnderMax);
+    DriveAssists.ESP.UnderMinComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMinComp", DriveAssists.ESP.UnderMinComp);
+    DriveAssists.ESP.UnderMaxComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMaxComp", DriveAssists.ESP.UnderMaxComp);
 
     // [SHIFT_OPTIONS]
     ShiftOptions.UpshiftCut = ini.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
@@ -520,6 +560,11 @@ void ScriptSettings::parseSettingsGeneral() {
     HUD.Wheel.PedalClutchB = ini.GetLongValue("HUD", "PedalInfoClutchB", HUD.Wheel.PedalClutchB);
     HUD.Wheel.PedalClutchA = ini.GetLongValue("HUD", "PedalInfoClutchA", HUD.Wheel.PedalClutchA);
 
+    HUD.DashIndicators.Enable = ini.GetBoolValue("HUD", "DashIndicators", HUD.DashIndicators.Enable);
+    HUD.DashIndicators.XPos = ini.GetDoubleValue("HUD", "DashIndicatorsXpos", HUD.DashIndicators.XPos);
+    HUD.DashIndicators.YPos = ini.GetDoubleValue("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
+    HUD.DashIndicators.Size = ini.GetDoubleValue("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
+
     // [MISC]
     Misc.UDPTelemetry = ini.GetBoolValue("MISC", "UDPTelemetry", Misc.UDPTelemetry);
 
@@ -606,8 +651,8 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     Controller.IgnoreShiftsUI = ini.GetBoolValue("CONTROLLER", "IgnoreShiftsUI", Controller.IgnoreShiftsUI);
     Controller.BlockHShift = ini.GetBoolValue("CONTROLLER", "BlockHShift", Controller.BlockHShift);
 
-    Controller.HoldTimeMs = ini.GetLongValue("CONTROLLER", "ToggleTime", Controller.HoldTimeMs);
-    Controller.MaxTapTimeMs = ini.GetLongValue("CONTROLLER", "MaxTapTime", Controller.MaxTapTimeMs);
+    Controller.HoldTimeMs = ini.GetLongValue("CONTROLLER", "HoldTimeMs", Controller.HoldTimeMs);
+    Controller.MaxTapTimeMs = ini.GetLongValue("CONTROLLER", "MaxTapTimeMs", Controller.MaxTapTimeMs);
     Controller.TriggerValue = ini.GetDoubleValue("CONTROLLER", "TriggerValue", Controller.TriggerValue);
 
     Controller.ToggleEngine = ini.GetBoolValue("CONTROLLER", "ToggleEngine", Controller.ToggleEngine);
@@ -636,9 +681,9 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Throttle)] = ini.GetLongValue("CONTROLLER_NATIVE", "Throttle", ControlFrontendRt);
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Brake)] = ini.GetLongValue("CONTROLLER_NATIVE", "Brake", ControlFrontendLt);
 
-    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", -1);
+    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] =   ini.GetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", -1)  ;
     scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftDownBlocks", -1);
-    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] = ini.GetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", -1);
+    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] =    ini.GetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", -1)   ;
 
     // [KEYBOARD]
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Toggle)] = str2key(ini.GetValue("KEYBOARD", "Toggle", "VK_OEM_5"));
@@ -693,6 +738,8 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     Wheel.FFB.DetailLim = ini.GetLongValue("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
     Wheel.FFB.DetailMAW = ini.GetLongValue("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
     Wheel.FFB.CollisionMult = ini.GetDoubleValue("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
+    Wheel.FFB.Gamma = ini.GetDoubleValue("FORCE_FEEDBACK", "Gamma", Wheel.FFB.Gamma);
+    Wheel.FFB.MaxSpeed = ini.GetDoubleValue("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
 
     // [INPUT_DEVICES]
     int it = 0;

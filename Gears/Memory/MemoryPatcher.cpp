@@ -7,7 +7,7 @@
 #include "Patcher.h"
 
 namespace MemoryPatcher {
-const int NumGearboxPatches = 4;
+const int NumGearboxPatches = 5;
 int NumGearboxPatched = 0;
 
 const int maxAttempts = 4;
@@ -32,6 +32,11 @@ Patcher ClutchLowRPMPatcher("Gears: Clutch Low RPM", clutchLow, true);
 // (in the RPM region where shift-up would've been triggered)
 PatternInfo clutchRevLimit;
 Patcher ClutchRevLimPatcher("Gears: Clutch Rev lim", clutchRevLimit, true);
+
+// When disabled, game doesn't lift throttle during shifts
+// Also useful to set throttle in 2nd+ while in fakeNeutral/clutched in
+PatternInfo throttleLift;
+Patcher ThrottleLiftPatcher("Gears: Throttle lift", throttleLift, true);
 
 // When disabled, throttle doesn't decrease.
 PatternInfo throttle;
@@ -72,6 +77,10 @@ void SetPatterns(int version) {
         "xxxx??xx" "xxxx??xx" "xxxx??xx" "xxxx", 
         { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
 
+    // Valid for 1180 to 1868+
+    throttleLift = PatternInfo("\x44\x89\x77\x50\xf3\x0f\x11\x7d\x4f", "xxxxxxxx?",
+        { 0x90, 0x90, 0x90, 0x90 });
+
     if (version >= G_VER_1_0_1365_1_STEAM) {
         shiftUp = PatternInfo("\x66\x89\x0B\x8D\x46\x04\x66\x89\x43\04", "xx?xx?xxx?", 
             { 0x66, 0x89, 0x0B });
@@ -102,6 +111,7 @@ bool Test() {
     success &= 0 != ShiftDownPatcher.Test();
     success &= 0 != ClutchLowRPMPatcher.Test();
     success &= 0 != ClutchRevLimPatcher.Test();
+    success &= 0 != ThrottleLiftPatcher.Test();
     success &= 0 != ThrottlePatcher.Test();
     success &= 0 != BrakePatcher.Test();
     success &= 0 != SteeringAssistPatcher.Test();
@@ -134,6 +144,10 @@ bool ApplyGearboxPatches() {
     }
 
     if (ShiftUpPatcher.Patch()) {
+        NumGearboxPatched++;
+    }
+
+    if (ThrottleLiftPatcher.Patch()) {
         NumGearboxPatched++;
     }
 
@@ -173,6 +187,10 @@ bool RevertGearboxPatches() {
     }
 
     if (ShiftUpPatcher.Restore()) {
+        NumGearboxPatched--;
+    }
+
+    if (ThrottleLiftPatcher.Restore()) {
         NumGearboxPatched--;
     }
 

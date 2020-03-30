@@ -112,7 +112,7 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
                     { "RPM: " + std::to_string(rpm), rpmColor },
                     { fmt::format("Gear: {}/{}", g_ext.GetGearCurr(npcVehicle), g_ext.GetTopGear(npcVehicle)), fgColor },
                     { fmt::format("Load: {}", load), fgColor },
-                    { fmt::format("Shifting: {}", gearStates.Shifting), fgColor },
+                    { fmt::format("{}Shifting", gearStates.Shifting ? "~g~" : ""), fgColor },
                     { fmt::format("TH: {}", gearStates.ThrottleHang), fgColor },
                 },
                 bgColor);
@@ -187,82 +187,127 @@ void updateShifting(Vehicle npcVehicle, VehicleGearboxStates& gearStates) {
 
 void updateNPCVehicle(NPCVehicle& _npcVehicle) {
     Vehicle npcVehicle = _npcVehicle.GetVehicle();
-    auto& gearStates = _npcVehicle.GetGearbox();
 
-    if (npcVehicle == 0 ||
-        !ENTITY::DOES_ENTITY_EXIST(npcVehicle))
-        return;
+    if (!g_settings.Debug.DisableNPCGearbox) {
+        auto& gearStates = _npcVehicle.GetGearbox();
 
-    if (gearStates.Shifting)
-        return;
+        if (npcVehicle == 0 ||
+            !ENTITY::DOES_ENTITY_EXIST(npcVehicle))
+            return;
 
-    if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(npcVehicle)) 
-        return;
+        if (gearStates.Shifting)
+            return;
 
-    auto topGear = g_ext.GetTopGear(npcVehicle);
-    auto currGear = g_ext.GetGearCurr(npcVehicle);
+        if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(npcVehicle))
+            return;
 
-    if (topGear == 1 || currGear == 0)
-        return;
+        auto topGear = g_ext.GetTopGear(npcVehicle);
+        auto currGear = g_ext.GetGearCurr(npcVehicle);
 
-    float throttle = g_ext.GetThrottleP(npcVehicle);
-    auto gearRatios = g_ext.GetGearRatios(npcVehicle);
-    float driveMaxFlatVel = g_ext.GetDriveMaxFlatVel(npcVehicle);
-    float rpm = g_ext.GetCurrentRPM(npcVehicle);
+        if (topGear == 1 || currGear == 0)
+            return;
 
-    if (throttle >= gearStates.ThrottleHang)
-        gearStates.ThrottleHang = throttle;
-    else if (gearStates.ThrottleHang > 0.0f)
-        gearStates.ThrottleHang -= GAMEPLAY::GET_FRAME_TIME() * g_settings.AutoParams.EcoRate;
+        float throttle = g_ext.GetThrottleP(npcVehicle);
+        auto gearRatios = g_ext.GetGearRatios(npcVehicle);
+        float driveMaxFlatVel = g_ext.GetDriveMaxFlatVel(npcVehicle);
+        float rpm = g_ext.GetCurrentRPM(npcVehicle);
 
-    if (gearStates.ThrottleHang < 0.0f)
-        gearStates.ThrottleHang = 0.0f;
+        if (throttle >= gearStates.ThrottleHang)
+            gearStates.ThrottleHang = throttle;
+        else if (gearStates.ThrottleHang > 0.0f)
+            gearStates.ThrottleHang -= GAMEPLAY::GET_FRAME_TIME() * g_settings.AutoParams.EcoRate;
 
-    float currSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(npcVehicle, true).y;
+        if (gearStates.ThrottleHang < 0.0f)
+            gearStates.ThrottleHang = 0.0f;
 
-    float nextGearMinSpeed = 0.0f; // don't care about top gear
-    if (currGear < topGear) {
-        nextGearMinSpeed = g_settings.AutoParams.NextGearMinRPM * driveMaxFlatVel / gearRatios[currGear + 1];
-    }
+        float currSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(npcVehicle, true).y;
 
-    float currGearMinSpeed = g_settings.AutoParams.CurrGearMinRPM * driveMaxFlatVel / gearRatios[currGear];
+        float nextGearMinSpeed = 0.0f; // don't care about top gear
+        if (currGear < topGear) {
+            nextGearMinSpeed = g_settings.AutoParams.NextGearMinRPM * driveMaxFlatVel / gearRatios[currGear + 1];
+        }
 
-    float engineLoad = gearStates.ThrottleHang - map(rpm, 0.2f, 1.0f, 0.0f, 1.0f);
+        float currGearMinSpeed = g_settings.AutoParams.CurrGearMinRPM * driveMaxFlatVel / gearRatios[currGear];
 
-    bool skidding = false;
-    for (auto x : g_ext.GetWheelSkidSmokeEffect(npcVehicle)) {
-        if (abs(x) > 3.5f)
-            skidding = true;
-    }
+        float engineLoad = gearStates.ThrottleHang - map(rpm, 0.2f, 1.0f, 0.0f, 1.0f);
 
-    // Shift up.
-    if (currGear < topGear) {
-        if (engineLoad < g_settings.AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
-            shiftTo(gearStates, currGear + 1, true);
+        bool skidding = false;
+        auto skids = g_ext.GetWheelSkidSmokeEffect(npcVehicle);
+        for (uint8_t i = 0; i < g_ext.GetNumWheels(npcVehicle); ++i) {
+            if (abs(skids[i]) > 3.5f && g_ext.IsWheelPowered(npcVehicle, i))
+                skidding = true;
+        }
+
+        // Shift up.
+        if (currGear < topGear) {
+            if (engineLoad < g_settings.AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
+                shiftTo(gearStates, currGear + 1, true);
+                gearStates.FakeNeutral = false;
+                gearStates.LastUpshiftTime = GAMEPLAY::GET_GAME_TIMER();
+            }
+        }
+
+        // Shift down later when ratios are far apart
+        float gearRatioRatio = 1.0f;
+
+        if (topGear > 1 && currGear > 1) {
+            float thisGearRatio = gearRatios[currGear - 1] / gearRatios[currGear];
+            gearRatioRatio = thisGearRatio;
+        }
+
+        float rateUp = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(npcVehicle) + hOffsets.fClutchChangeRateScaleUpShift);
+        float upshiftDuration = 1.0f / (rateUp * g_settings.ShiftOptions.ClutchRateMult);
+        bool tpPassed = GAMEPLAY::GET_GAME_TIMER() > gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings.AutoParams.DownshiftTimeoutMult);
+
+        // Shift down
+        if (currGear > 1) {
+            if (tpPassed && engineLoad > g_settings.AutoParams.DownshiftLoad* gearRatioRatio || currSpeed < currGearMinSpeed) {
+                shiftTo(gearStates, currGear - 1, true);
+                gearStates.FakeNeutral = false;
+            }
+        }
+
+        // Shift to forward/reverse when "stuck" in the opposite gear?
+        if (currGear == 0 && g_ext.GetThrottleP(npcVehicle) > 0.2f) {
+            gearStates.Shifting = false;
+            shiftTo(gearStates, 1, true);
             gearStates.FakeNeutral = false;
-            gearStates.LastUpshiftTime = GAMEPLAY::GET_GAME_TIMER();
+        }
+
+        if (currGear == 1 && g_ext.GetThrottleP(npcVehicle) < -0.2f) {
+            gearStates.Shifting = false;
+            shiftTo(gearStates, 0, true);
+            gearStates.FakeNeutral = false;
         }
     }
 
-    // Shift down later when ratios are far apart
-    float gearRatioRatio = 1.0f;
+    if (!g_settings.Debug.DisableNPCBrake) {
+        // Braking!
+        if (MemoryPatcher::BrakePatcher.Patched()) {
+            // TODO: Proper way of finding out what the fronts/rears are!
+            auto numWheels = g_ext.GetNumWheels(npcVehicle);
 
-    if (topGear > 1) {
-        float baseGearRatio = 1.948768f / 3.333333f;
-        float thisGearRatio = gearRatios[2] / gearRatios[1];
-        gearRatioRatio = baseGearRatio / thisGearRatio;
-        gearRatioRatio = map(gearRatioRatio, 1.0f, 2.0f, 1.0f, 4.0f);
-    }
+            float handlingBrakeForce = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(npcVehicle) + hOffsets.fBrakeForce);
+            float bbalF = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(npcVehicle) + hOffsets.fBrakeBiasFront);
+            float bbalR = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(npcVehicle) + hOffsets.fBrakeBiasRear);
+            float inpBrakeForce = handlingBrakeForce * g_ext.GetBrakeP(npcVehicle);
 
-    float rateUp = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(npcVehicle) + hOffsets.fClutchChangeRateScaleUpShift);
-    float upshiftDuration = 1.0f / (rateUp * g_settings.ShiftOptions.ClutchRateMult);
-    bool tpPassed = GAMEPLAY::GET_GAME_TIMER() > gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings.AutoParams.DownshiftTimeoutMult);
-
-    // Shift down
-    if (currGear > 1) {
-        if (tpPassed && engineLoad > g_settings.AutoParams.DownshiftLoad * gearRatioRatio || currSpeed < currGearMinSpeed) {
-            shiftTo(gearStates, currGear - 1, true);
-            gearStates.FakeNeutral = false;
+            if (numWheels == 2) {
+                g_ext.SetWheelBrakePressure(npcVehicle, 0, inpBrakeForce * bbalF);
+                g_ext.SetWheelBrakePressure(npcVehicle, 1, inpBrakeForce * bbalR);
+            }
+            else if (numWheels >= 4 && numWheels % 2 == 0) {
+                g_ext.SetWheelBrakePressure(npcVehicle, 0, inpBrakeForce * bbalF);
+                g_ext.SetWheelBrakePressure(npcVehicle, 1, inpBrakeForce * bbalF);
+                for (uint8_t i = 2; i < numWheels; ++i) {
+                    g_ext.SetWheelBrakePressure(npcVehicle, i, inpBrakeForce * bbalR);
+                }
+            }
+            else {
+                for (uint8_t i = 0; i < numWheels; ++i) {
+                    g_ext.SetWheelBrakePressure(npcVehicle, i, inpBrakeForce);
+                }
+            }
         }
     }
 }
@@ -337,6 +382,7 @@ void updateNPCVehicleList(const std::vector<Vehicle>& newVehicles, std::vector<N
 }
 
 void update_npc() {
+    // I only patch brakes for ABS/TCS/ESP when other stuff is also patched
     bool mtActive = MemoryPatcher::NumGearboxPatched > 0;
     if (!g_settings.Debug.DisplayNPCInfo && !mtActive) 
         return;

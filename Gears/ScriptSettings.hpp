@@ -23,7 +23,7 @@ public:
     void SetFiles(const std::string &general, const std::string& controls, const std::string &wheel);
     void Read(CarControls* scriptControl);
     void SaveGeneral() const;
-    void SaveController() const;
+    void SaveController(CarControls* scriptControl) const;
     void SaveWheel() const;
 
     void SetVehicleConfig(VehicleConfig* cfg);
@@ -54,6 +54,7 @@ public:
         bool ClutchShiftH = true;
         bool ClutchShiftS = false;
         bool HardLimiter = true;
+        bool RealTurbo = true;
     } MTOptions;
 
     // [MT_PARAMS]
@@ -82,12 +83,35 @@ public:
 
     // [DRIVING_ASSISTS]
     struct {
-        bool CustomABS = false;
-        bool ABSFilter = true;
-        // 0 Disabled, 1 Brake, 2 Throttle (patch) 
-        int TCMode = 0;
-        // m/s
-        float TCSlipMax = 2.5f;
+        struct {
+            bool Enable = false;
+            // true: only applied to abs-less vehicles
+            bool Filter = true;
+        } ABS;
+
+        struct {
+            // 0 Disabled, 1 Brake, 2 Throttle (patch) 
+            int Mode = 0;
+            // tyre speed threshold, m/s
+            float SlipMax = 2.5f;
+        } TCS;
+
+        struct {
+            bool Enable = false;
+
+            float OverMin = 05.0f; // deg
+            float OverMax = 15.0f; // deg
+
+            float OverMinComp = 0.0f; // brake mult
+            float OverMaxComp = 2.0f; // brake mult
+
+            float UnderMin = 5.0f; // deg
+            float UnderMax = 10.0f; // deg
+
+            float UnderMinComp = 0.0f; // brake mult
+            float UnderMaxComp = 1.0f; // brake mult
+
+        } ESP;
     } DriveAssists;
 
     // [SHIFT_OPTIONS]
@@ -233,6 +257,13 @@ public:
             int PedalClutchB = 255;
             int PedalClutchA = 255;
         } Wheel;
+
+        struct {
+            bool Enable = false;
+            float XPos = 0.500f;
+            float YPos = 0.035f;
+            float Size = 1.000f;
+        } DashIndicators;
     } HUD;
 
     // [CONTROLLER]
@@ -247,15 +278,15 @@ public:
         bool IgnoreShiftsUI = false;
         bool BlockHShift = true;
 
-        long ShiftUpBlocks = -1;
-        long ShiftDownBlocks = -1;
-        long ClutchBlocks = -1;
+        //long ShiftUpBlocks = -1;
+        //long ShiftDownBlocks = -1;
+        //long ClutchBlocks = -1;
 
         struct {
             bool Enable = false;
-            long ShiftUpBlocks = -1;
-            long ShiftDownBlocks = -1;
-            long ClutchBlocks = -1;
+            //long ShiftUpBlocks = -1;
+            //long ShiftDownBlocks = -1;
+            //long ClutchBlocks = -1;
         } Native;
     } Controller;
 
@@ -294,6 +325,9 @@ public:
                 float Size = 0.200f;
             } GForce;
         } Metrics;
+
+        bool DisableNPCBrake = false;
+        bool DisableNPCGearbox = false;
     } Debug;
 
     // settings_wheel.ini parts
@@ -327,6 +361,8 @@ public:
             int DetailLim = 20000;
             int DetailMAW = 1;
             float CollisionMult = 1.0f;
+            float Gamma = 0.8f;
+            float MaxSpeed = 80.0f;
         } FFB;
 
         // [STEER]

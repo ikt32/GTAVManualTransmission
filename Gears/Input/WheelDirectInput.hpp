@@ -87,7 +87,6 @@ public:
     void SetConstantForce(GUID device, DIAxis ffAxis, int force);
     void SetDamper(GUID device, DIAxis ffAxis, int force);
     void SetCollision(GUID device, DIAxis ffAxis, int force);
-    void StopEffects();
 
     DIAxis StringToAxis(std::string& axisString);
 

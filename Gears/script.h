@@ -11,6 +11,7 @@ void drawDebugInfo();
 void drawGForces();
 void drawVehicleWheelInfo();
 void drawInputWheelInfo();
+void drawWarningLights();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Mod functions: Mod control
@@ -19,13 +20,13 @@ void drawInputWheelInfo();
 void resetSteeringMultiplier();
 void toggleManual(bool enable);
 void initWheel();
-void stopForceFeedback();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Mod functions: Shifting
 ///////////////////////////////////////////////////////////////////////////////
 
 void setShiftMode(EShiftMode shiftMode);
+bool isClutchPressed();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                       Mod functions: Gearbox control

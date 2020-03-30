@@ -26,7 +26,8 @@ struct V3D {
     double z;
 };
 
-template <typename T> T sgn(T val) {
+template <typename T>
+constexpr T sgn(T val) {
     return static_cast<T>((T{} < val) - (val < T{}));
 }
 
@@ -39,12 +40,12 @@ T avg(std::vector<T, A> const& vec) {
 }
 
 template <typename T, typename = typename std::enable_if<std::is_floating_point<T>::value, T>::type>
-T rad2deg(T rad) {
+constexpr T rad2deg(T rad) {
     return static_cast<T>(static_cast<double>(rad) * (180.0 / M_PI));
 }
 
 template <typename T, typename = typename std::enable_if<std::is_floating_point<T>::value, T>::type>
-T deg2rad(T deg) {
+constexpr T deg2rad(T deg) {
     return static_cast<T>(static_cast<double>(deg) * M_PI / 180.0);
 }
 

@@ -421,15 +421,6 @@ void CarControls::PlayLEDs(float rpm, float firstLed, float lastLed) {
     mWheelInput.PlayLedsDInput(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)], rpm, firstLed, lastLed);
 }
 
-void CarControls::StopFFB(bool turnOffLeds) {
-    if (turnOffLeds) {
-        mWheelInput.PlayLedsDInput(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)], 0.0, 0.5, 1.0);
-    }
-    PlayFFBDynamics(0, 0);
-    PlayFFBCollision(0);
-    mWheelInput.StopEffects();
-}
-
 float CarControls::GetAxisSpeed(WheelAxisType axis) {
     auto diAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(axis)]);
     return mWheelInput.GetAxisSpeed(diAxis, WheelAxesGUIDs[static_cast<int>(axis)]);

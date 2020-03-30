@@ -1,5 +1,55 @@
 # Changelog
 
+## 4.7.2
+
+New:
+
+* Add realistic turbo fix
+
+Fixes and improvements:
+
+* Fix engine revving when locked up due to direction
+* Fix throttle-based TCS not firing dashboard light
+* Fix swapped up/downshift cut/blip settings in menu
+* Fix delta-gear ratio for automatic transission downshifts
+* Fix NPCs not shifting for forward/reverse
+* Apply TCS, ESP and ABS simultaneously
+* Change engine braking to use negative throttle instead of the brakes
+* Disable CustomSteering for boats
+* Improve CustomSteering for amphibious cars in water
+
+## 4.7.1
+
+New features:
+
+* Add ESC (Electronic Stability Control)
+* Add ABS/TCS/ESC/Handbrake warning lights HUD element
+
+Fixes and improvements:
+
+* Fix controller settings not updated properly
+* Fix controller hold time settings not being used
+* Fix ABS acting on all wheels instead of an individual one
+* Apply normal brake forces on wheels unaffected by ABS
+* Allow keyboard shifting while using controller
+* Add option to disable NPC scripts when MT or assists are active
+* Fix automatic gearbox not shifting when a non-driven wheel is locked up
+* Fix disabled scoop on dozers while custom steering is active
+
+Wheel fixes and improvements:
+
+* Add back misshift sounds - only works for wheels in H-pattern mode
+* Fix burnout using wheel pedals not fully engaging
+* Disable USB detection, caused crashes while game is paused
+
+Force feedback changes:
+
+* Add gamma and speed limit parameters. Gamma helps increasing FFB response at low
+  speeds and decreases wobble when nearing the speed limit.  
+* Fix "bump" when FFB changes direction
+* Fix FFB continue playing when paused or ejected from car (for real this time!)
+* Improve understeer calculations
+
 ## 4.7.0
 
 Warning: Many options are relocated. The script will generate missing entries, so no action is needed, but affected settings will be reset to their default values. However, it's recommended to start with clean default settings.
@@ -248,7 +298,7 @@ Additions:
 * Add throttle and brake anti-deadzone 
 * Add steering wheel and pedal input HUD
 * Separate stalling for H-patt. shift and seq. shift
-	* Seq. clutch catch behaves like auto now, regarding brakes
+    * Seq. clutch catch behaves like auto now, regarding brakes
 
 Fixes:
 * Properly disable steering wheel

@@ -91,7 +91,6 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             }
 
             resetSteeringMultiplier();
-            stopForceFeedback();
             releaseCompatibility();
 
             scriptUnregister(hInstance);

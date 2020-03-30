@@ -182,7 +182,7 @@ namespace {
         { "ShiftUp"    , "Shift up usage: press"       },
         { "ShiftDown"  , "Shift down usage: press"     },
         { "Clutch"     , "Clutch usage: axis or button"},
-        { "Engine"     , "Engine usage: press"         },
+        { "Engine"     , "Engine usage: hold"          },
         { "Throttle"   , "Throttle: axis or button"    },
         { "Brake"      , "Brake: axis or button"       }
     };
@@ -238,7 +238,7 @@ void onMenuInit() {
 
 void saveChanges() {
     g_settings.SaveGeneral();
-    g_settings.SaveController();
+    g_settings.SaveController(&g_controls);
     g_settings.SaveWheel();
 }
 
@@ -329,9 +329,9 @@ void update_mainmenu() {
     g_menu.MenuOption("Steering Wheel", "wheelmenu", 
         { "Set up your steering wheel." });
     g_menu.MenuOption("HUD Options", "hudmenu", 
-        { "Toggle and move HUD elements. Choose between imperial or metric speeds." });
+        { "Change and move HUD elements." });
     g_menu.MenuOption("Driving assists", "driveassistmenu",
-        { "ABS and TC options." });
+        { "ABS, TCS and ESP assist options for the player." });
     g_menu.MenuOption("Gameplay assists", "gameassistmenu",
         { "Assist to make playing a bit easier." });
     g_menu.MenuOption("Debug options", "debugmenu", 
@@ -427,6 +427,10 @@ void update_featuresmenu() {
 
     g_menu.BoolOption("Hard rev limiter", g_settings.MTOptions.HardLimiter,
         { "Enforce rev limiter for reverse and top speed. No more infinite speed!" });
+
+    g_menu.BoolOption("Real turbo response", g_settings.MTOptions.RealTurbo,
+        { "Change turbo to pressurize and depressurize more realistically.",
+            "Use a speedometer mod with turbo gauge to see the difference." });
 }
 
 void update_finetuneoptionsmenu() {
@@ -455,10 +459,10 @@ void update_shiftingoptionsmenu() {
     g_menu.Title("Shifting options");
     g_menu.Subtitle("");
 
-    g_menu.BoolOption("Cut throttle on upshift", g_settings.ShiftOptions.DownshiftBlip,
+    g_menu.BoolOption("Cut throttle on upshift", g_settings.ShiftOptions.UpshiftCut,
         { "Helps rev matching.",
             "Only applies to sequential mode."});
-    g_menu.BoolOption("Blip throttle on downshift", g_settings.ShiftOptions.UpshiftCut,
+    g_menu.BoolOption("Blip throttle on downshift", g_settings.ShiftOptions.DownshiftBlip,
         { "Helps rev matching.",
             "Only applies to sequential mode." });
     g_menu.FloatOption("Clutch rate multiplier", g_settings.ShiftOptions.ClutchRateMult, 0.05f, 20.0f, 0.05f,
@@ -482,7 +486,7 @@ void update_finetuneautooptionsmenu() {
     g_menu.FloatOption("Downshift engine load", g_settings.AutoParams.DownshiftLoad, 0.30f, 1.00f, 0.01f,
         { "Downshift when the engine load rises over this value. "
           "Raise this value if the car downshifts right after upshifting." });
-    g_menu.FloatOption("Downshift timeout multiplier", g_settings.AutoParams.DownshiftTimeoutMult, 0.05f, 4.00f, 0.05f,
+    g_menu.FloatOption("Downshift timeout multiplier", g_settings.AutoParams.DownshiftTimeoutMult, 0.05f, 10.00f, 0.05f,
         { "Don't downshift while car has just shifted up. "
           "Timeout based on clutch change rate.",
           "Raise for longer timeout, lower to allow earlier downshifting after an upshift." });
@@ -515,8 +519,8 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
         plates = "None";
 
     unsigned absMode = 0;
-    if (config.DriveAssists.CustomABS) {
-        if (config.DriveAssists.ABSFilter) {
+    if (config.DriveAssists.ABS.Enable) {
+        if (config.DriveAssists.ABS.Filter) {
             absMode = 1;
         }
         else {
@@ -542,7 +546,7 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
         fmt::format("\tSequential assist: {}", shiftAssist),
         "Driving assists:",
         fmt::format("\tABS: {}", absStrings[absMode]),
-        fmt::format("\tTCS: {}", tcsStrings[config.DriveAssists.TCMode]),
+        fmt::format("\tTCS: {}", tcsStrings[config.DriveAssists.TCS.Mode]),
         "Steering wheel:",
         fmt::format("\tAngle: {:.0f}", config.Wheel.Steering.Angle),
         fmt::format("\tFFB Mult: {:.0f}", config.Wheel.FFB.SATAmpMult),
@@ -1043,6 +1047,15 @@ void update_forcefeedbackmenu() {
         { "Reactive force offset/multiplier, when not going straight.",
           "Depending on wheel strength, a larger value helps reaching countersteer faster or reduce overcorrection."});
 
+    g_menu.FloatOption("Self aligning torque gamma", g_settings.Wheel.FFB.Gamma, 0.01f, 2.0f, 0.01f,
+        { "< 1.0: More FFB at low speeds, FFB tapers off towards speed cap.",
+          "> 1.0: Less FFB at low speeds, FFB increases towards speed cap.",
+          "Keep at 1.0 for linear response. ~h~Not~h~ recommended to go higher than 1.0!"});
+
+    g_menu.FloatOption("Self aligning torque speed cap", g_settings.Wheel.FFB.MaxSpeed, 10.0f, 1000.0f, 1.0f,
+        { "Speed where FFB stops increasing. Helpful against too strong FFB at extreme speeds.",
+          fmt::format("{} kph / {} mph", g_settings.Wheel.FFB.MaxSpeed * 3.6f, g_settings.Wheel.FFB.MaxSpeed * 2.23694f)});
+
     g_menu.FloatOption("Detail effect multiplier", g_settings.Wheel.FFB.DetailMult, 0.0f, 10.0f, 0.1f,
         { "Force feedback effects caused by the suspension. This effect is muxed with the main effect." });
 
@@ -1178,6 +1191,8 @@ void update_hudmenu() {
     g_menu.MenuOption("Speedometer", "speedodisplaymenu");
     g_menu.MenuOption("RPM Gauge", "rpmdisplaymenu");
     g_menu.MenuOption("Wheel & Pedal Info", "wheelinfomenu");
+    g_menu.MenuOption("Dashboard indicators", "dashindicatormenu", 
+        { "Indicator icons for ABS, TSC, ESP and the hand brake." });
 }
 
 void update_geardisplaymenu() {
@@ -1279,23 +1294,62 @@ void update_wheelinfomenu() {
     g_menu.IntOption("Clutch Bar Alpha  ", g_settings.HUD.Wheel.PedalClutchA  , 0, 255);
 }
 
+void update_dashindicatormenu() {
+    g_menu.Title("Dashboard indicators");
+    g_menu.Subtitle("");
+
+    g_menu.BoolOption("Enable", g_settings.HUD.DashIndicators.Enable);
+    g_menu.FloatOption("Position X", g_settings.HUD.DashIndicators.XPos, 0.0f, 1.0f, 0.005f);
+    g_menu.FloatOption("Position Y", g_settings.HUD.DashIndicators.YPos, 0.0f, 1.0f, 0.005f);
+    g_menu.FloatOption("Size", g_settings.HUD.DashIndicators.Size, 0.25f, 4.0f, 0.05f);
+}
+
 void update_driveassistmenu() {
     g_menu.Title("Driving assists");
     g_menu.Subtitle("Assists to make driving easier");
 
-    g_menu.BoolOption("Enable ABS", g_settings.DriveAssists.CustomABS,
-        { "Experimental script-driven ABS." });
+    g_menu.BoolOption("Enable ABS", g_settings.DriveAssists.ABS.Enable,
+        { "Custom script-driven ABS." });
 
-    g_menu.BoolOption("Only enable ABS if not present", g_settings.DriveAssists.ABSFilter,
-        { "Only enables script-driven ABS on vehicles without the ABS flag." });
+    g_menu.BoolOption("Only enable ABS if not present", g_settings.DriveAssists.ABS.Filter,
+        { "Only enables custom ABS on cars without the ABS flag." });
 
-    g_menu.StringArray("Traction Control mode", tcsStrings, g_settings.DriveAssists.TCMode,
+    g_menu.StringArray("Traction Control mode", tcsStrings, g_settings.DriveAssists.TCS.Mode,
         { "On traction loss: ",
             "Disabled: Do nothing",
             "Brakes: Apply brake per wheel",
             "Throttle: Cut throttle" });
 
-    g_menu.FloatOption("TC Slip threshold", g_settings.DriveAssists.TCSlipMax, 0.0f, 20.0f, 0.1f);
+    g_menu.FloatOption("TC Slip threshold", g_settings.DriveAssists.TCS.SlipMax, 0.0f, 20.0f, 0.1f,
+        { "Speed in m/s an individual wheel may slip before TC kicks in." });
+
+    g_menu.BoolOption("Enable ESP", g_settings.DriveAssists.ESP.Enable,
+        { "Script-driven stability control." });
+
+    g_menu.MenuOption("ESP settings", "espsettingsmenu", 
+        { "Change the behaviour and tolerances of the stability control system." });
+}
+
+void update_espsettingsmenu() {
+    g_menu.Title("ESP settings");
+    g_menu.Subtitle("");
+    g_menu.FloatOption("Oversteer starting angle", g_settings.DriveAssists.ESP.OverMin, 0.0f, 90.0f, 0.1f,
+        { "Angle (degrees) where ESP starts correcting for oversteer." });
+    g_menu.FloatOption("Oversteer starting correction", g_settings.DriveAssists.ESP.OverMinComp, 0.0f, 10.0f, 0.1f,
+        { "Starting ESP oversteer correction value. Additional braking force for the affected wheel." });
+    g_menu.FloatOption("Oversteer max angle", g_settings.DriveAssists.ESP.OverMax, 0.0f, 90.0f, 0.1f,
+        { "Angle (degrees) where ESP oversteer correction is maximized." });
+    g_menu.FloatOption("Oversteer max correction", g_settings.DriveAssists.ESP.OverMaxComp, 0.0f, 10.0f, 0.1f,
+        { "Max ESP oversteer correction value. Additional braking force for the affected wheel." });
+
+    g_menu.FloatOption("Understeer starting angle", g_settings.DriveAssists.ESP.UnderMin, 0.0f, 90.0f, 0.1f,
+        { "Angle (degrees) where ESP starts correcting for understeer." });
+    g_menu.FloatOption("Understeer starting correction", g_settings.DriveAssists.ESP.UnderMinComp, 0.0f, 10.0f, 0.1f,
+        { "Starting ESP understeer correction value. Additional braking force for the affected wheel." });
+    g_menu.FloatOption("Understeer max angle", g_settings.DriveAssists.ESP.UnderMax, 0.0f, 90.0f, 0.1f,
+        { "Angle (degrees) where ESP understeer correction is maximized." });
+    g_menu.FloatOption("Understeer max correction", g_settings.DriveAssists.ESP.UnderMaxComp, 0.0f, 10.0f, 0.1f,
+        { "Max ESP oversteer understeer value. Additional braking force for the affected wheel." });
 }
 
 void update_gameassistmenu() {
@@ -1390,7 +1444,8 @@ void update_debugmenu() {
             "Use this when some other script controls visibility." });
     g_menu.MenuOption("Metrics settings", "metricsmenu", 
         { "Show the G-Force graph and speed timers." });
-
+    g_menu.MenuOption("Performance settings", "perfmenu",
+        { "Every tick AI is also updated, which might impact performance." });
     g_menu.BoolOption("Enable update check", g_settings.Update.EnableUpdate,
         { "Check for mod updates."});
 
@@ -1421,6 +1476,19 @@ void update_metricsmenu() {
         g_settings.Read(&g_controls);
         initTimers();
     }
+}
+
+void update_perfmenu() {
+    g_menu.Title("Performance settings");
+    g_menu.Subtitle("");
+
+    g_menu.BoolOption("Disable NPC gearbox", g_settings.Debug.DisableNPCGearbox,
+        { "While MT is enabled, NPC uses custom script-driven gearbox logic."
+            "Disabling makes NPCs drive unpredictable and cars never shift up." });
+
+    g_menu.BoolOption("Disable NPC brakes", g_settings.Debug.DisableNPCBrake,
+        { "While ABS, TCS or ESP are active, NPC braking is replaced by script.",
+            "Disabling hampers AI braking." });
 }
 
 void update_menu() {
@@ -1495,8 +1563,14 @@ void update_menu() {
     /* mainmenu -> hudmenu -> wheelinfomenu*/
     if (g_menu.CurrentMenu("wheelinfomenu")) { update_wheelinfomenu(); }
 
+    /* mainmenu -> hudmenu -> dashindicatormenu*/
+    if (g_menu.CurrentMenu("dashindicatormenu")) { update_dashindicatormenu(); }
+
     /* mainmenu -> driveassistmenu */
     if (g_menu.CurrentMenu("driveassistmenu")) { update_driveassistmenu(); }
+
+    /* mainmenu -> driveassistmenu -> espsettingsmenu*/
+    if (g_menu.CurrentMenu("espsettingsmenu")) { update_espsettingsmenu(); }
 
     /* mainmenu -> gameassistmenu */
     if (g_menu.CurrentMenu("gameassistmenu")) { update_gameassistmenu(); }
@@ -1506,6 +1580,9 @@ void update_menu() {
 
     /* mainmenu -> debugmenu -> metricsmenu */
     if (g_menu.CurrentMenu("metricsmenu")) { update_metricsmenu(); }
+
+    /* mainmenu -> debugmenu -> perfmenu */
+    if (g_menu.CurrentMenu("perfmenu")) { update_perfmenu(); }
 
     g_menu.EndMenu();
 }

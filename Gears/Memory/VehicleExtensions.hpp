@@ -101,6 +101,9 @@ public:
     float GetDashSpeed(Vehicle handle);
     // No set impl.
 
+    // 0 = car, 1 = plane, 2 = trailer, 3 = quad,
+    // 6 = amphibious car, 7 = amphibious quad,
+    // 8 = heli, 11 = motorcycle, 12 = bicycle, 13 = boat, 14 = train
     int GetModelType(Vehicle handle);
 
     uint64_t GetWheelsPtr(Vehicle handle);
@@ -204,7 +207,6 @@ private:
     int dashSpeedOffset = 0;
     int wheelsPtrOffset = 0;
     int numWheelsOffset = 0;
-    // 0 = car, 1 = plane, 2 = trailer, 3 = quad, 6 = amphibious car, 7 = amphibious quad, 8 = heli, 11 = motorcycle, 12 = bicycle, 14 = train, 
     int modelTypeOffset = 0; 
     const int vehicleModelInfoOffset = 0x020;
     int vehicleFlagsOffset = 0;

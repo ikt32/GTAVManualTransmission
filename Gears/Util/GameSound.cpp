@@ -12,12 +12,6 @@ GameSound::GameSound(std::string sound, std::string soundSet, std::string audioB
 
 GameSound::~GameSound() = default;
 
-void GameSound::Release() {
-    if (mSoundID == -1)
-        return;
-    AUDIO::RELEASE_SOUND_ID(mSoundID);
-}
-
 void GameSound::Play(Entity ent) {
     if (mSoundID != -1) {
         Stop();
@@ -33,4 +27,8 @@ void GameSound::Stop() {
     AUDIO::STOP_SOUND(mSoundID);
     AUDIO::RELEASE_SOUND_ID(mSoundID);
     mSoundID = -1;
+}
+
+bool GameSound::Playing() {
+    return mSoundID != -1;
 }

@@ -4,7 +4,7 @@
 
 #define VERSION_MAJOR 4
 #define VERSION_MINOR 7
-#define VERSION_PATCH 0
+#define VERSION_PATCH 2
 
 namespace Constants {
     static const char* const DisplayVersion = "v" STR(VERSION_MAJOR) "."  STR(VERSION_MINOR) "." STR(VERSION_PATCH);
