@@ -253,6 +253,9 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetLongValue("HUD", "PedalInfoClutchB", HUD.Wheel.PedalClutchB);
     ini.SetLongValue("HUD", "PedalInfoClutchA", HUD.Wheel.PedalClutchA);
 
+    // [MISC]
+    ini.SetBoolValue("MISC", "UDPTelemetry", Misc.UDPTelemetry);
+
     // [UPDATE]
     ini.SetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);
     if (!Update.IgnoredVersion.empty())
@@ -516,6 +519,9 @@ void ScriptSettings::parseSettingsGeneral() {
     HUD.Wheel.PedalClutchG = ini.GetLongValue("HUD", "PedalInfoClutchG", HUD.Wheel.PedalClutchG);
     HUD.Wheel.PedalClutchB = ini.GetLongValue("HUD", "PedalInfoClutchB", HUD.Wheel.PedalClutchB);
     HUD.Wheel.PedalClutchA = ini.GetLongValue("HUD", "PedalInfoClutchA", HUD.Wheel.PedalClutchA);
+
+    // [MISC]
+    Misc.UDPTelemetry = ini.GetBoolValue("MISC", "UDPTelemetry", Misc.UDPTelemetry);
 
     // [UPDATE]
     Update.EnableUpdate = ini.GetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);

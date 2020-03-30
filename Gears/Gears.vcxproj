@@ -137,6 +137,7 @@
     <ClCompile Include="ScriptHUD.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
     <ClCompile Include="ScriptUtils.cpp" />
+    <ClCompile Include="UDPTelemetry\UDPTelemetry.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="Util\Files.cpp" />
     <ClCompile Include="Util\FileVersion.cpp" />
@@ -199,6 +200,7 @@
     <ClInclude Include="newNatives.h" />
     <ClInclude Include="ScriptUtils.h" />
     <ClInclude Include="Compatibility.h" />
+    <ClInclude Include="UDPTelemetry\UDPTelemetry.h" />
     <ClInclude Include="UDPTelemetry\Socket.h" />
     <ClInclude Include="UDPTelemetry\TelemetryPacket.h" />
     <ClInclude Include="UpdateChecker.h" />

@@ -114,6 +114,9 @@
     <ClCompile Include="Util\Timer.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="UDPTelemetry\UDPTelemetry.cpp">
+      <Filter>UDPTelemetry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -294,6 +297,9 @@
       <Filter>UDPTelemetry</Filter>
     </ClInclude>
     <ClInclude Include="UDPTelemetry\Socket.h">
+      <Filter>UDPTelemetry</Filter>
+    </ClInclude>
+    <ClInclude Include="UDPTelemetry\UDPTelemetry.h">
       <Filter>UDPTelemetry</Filter>
     </ClInclude>
   </ItemGroup>
