@@ -1378,6 +1378,11 @@ void update_gameassistmenu() {
         { "Hides the player in first person view." })) {
         functionHidePlayerInFPV(true);
     }
+
+    if (g_menu.BoolOption("Enable UDP telemetry", g_settings.Misc.UDPTelemetry,
+        { "Allows programs like SimHub to use data from this script." })) {
+        StartUDPTelemetry();
+    }
 }
 
 void update_steeringassistmenu() {

@@ -281,6 +281,9 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetDoubleValue("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
     ini.SetDoubleValue("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
 
+    // [MISC]
+    ini.SetBoolValue("MISC", "UDPTelemetry", Misc.UDPTelemetry);
+
     // [UPDATE]
     ini.SetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);
     if (!Update.IgnoredVersion.empty())
@@ -561,6 +564,9 @@ void ScriptSettings::parseSettingsGeneral() {
     HUD.DashIndicators.XPos = ini.GetDoubleValue("HUD", "DashIndicatorsXpos", HUD.DashIndicators.XPos);
     HUD.DashIndicators.YPos = ini.GetDoubleValue("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
     HUD.DashIndicators.Size = ini.GetDoubleValue("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
+
+    // [MISC]
+    Misc.UDPTelemetry = ini.GetBoolValue("MISC", "UDPTelemetry", Misc.UDPTelemetry);
 
     // [UPDATE]
     Update.EnableUpdate = ini.GetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);

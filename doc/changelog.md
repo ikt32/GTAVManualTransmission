@@ -5,6 +5,7 @@
 New:
 
 * Add realistic turbo fix
+* Add UDP telemetry support for programs like SimHub
 
 Fixes and improvements:
 
