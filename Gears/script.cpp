@@ -143,7 +143,8 @@ void functionDash() {
     if (!g_settings.GameAssists.DashExt)
         return;
 
-    auto data = DashHook_GetDataCurrent();
+    VehicleDashboardData data{};
+    DashHook_GetData(&data);
 
     for (const auto& abs : g_vehData.mWheelsAbs) {
         data.ABSLight |= abs;

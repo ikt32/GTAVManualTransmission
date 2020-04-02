@@ -15,13 +15,10 @@ HMODULE g_DashHookModule = nullptr;
 void(*g_DashHook_GetData)(VehicleDashboardData*);
 void(*g_DashHook_SetData)(VehicleDashboardData);
 
-VehicleDashboardData DashHook_GetDataCurrent() {
+void DashHook_GetData(VehicleDashboardData* data) {
     if (g_DashHook_GetData) {
-        VehicleDashboardData data;
-        g_DashHook_GetData(&data);
-        return data;
+        g_DashHook_GetData(data);
     }
-    return {};
 }
 
 void DashHook_SetData(VehicleDashboardData data) {
@@ -68,7 +65,7 @@ void setupDashHook() {
         g_DashHookLoadLibbed = true;
     }
 
-    g_DashHook_GetData = CheckAddr<void(*)(VehicleDashboardData*)>(g_DashHookModule, "DashHook_GetDataCurrent");
+    g_DashHook_GetData = CheckAddr<void(*)(VehicleDashboardData*)>(g_DashHookModule, "DashHook_GetData");
     g_DashHook_SetData = CheckAddr<void(*)(VehicleDashboardData)>(g_DashHookModule, "DashHook_SetData");
 }
 
