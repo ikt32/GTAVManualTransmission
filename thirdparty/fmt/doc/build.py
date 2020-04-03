@@ -6,7 +6,7 @@ import errno, os, shutil, sys, tempfile
 from subprocess import check_call, check_output, CalledProcessError, Popen, PIPE
 from distutils.version import LooseVersion
 
-versions = ['1.0.0', '1.1.0', '2.0.0', '3.0.2', '4.0.0', '4.1.0', '5.0.0', '5.1.0', '5.2.0', '5.2.1', '5.3.0']
+versions = ['1.0.0', '1.1.0', '2.0.0', '3.0.2', '4.0.0', '4.1.0', '5.0.0', '5.1.0', '5.2.0', '5.2.1', '5.3.0', '6.0.0', '6.1.0', '6.1.1', '6.1.2']
 
 def pip_install(package, commit=None, **kwargs):
   "Install package using pip."
@@ -94,7 +94,7 @@ def build_docs(version='dev', **kwargs):
                           "FMT_BEGIN_NAMESPACE=namespace fmt {{" \
                           "FMT_END_NAMESPACE=}}" \
                           "FMT_STRING_ALIAS=1" \
-                          "FMT_ENABLE_IF_T(B, T)=T"
+                          "FMT_ENABLE_IF(B)="
       EXCLUDE_SYMBOLS   = fmt::internal::* StringValue write_str
     '''.format(include_dir, doxyxml_dir).encode('UTF-8'))
   if p.returncode != 0:
