@@ -164,7 +164,6 @@
     <ClCompile Include="WheelInput.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\GTAVDashHook\GTAVDashHook\DashHook.h" />
     <ClInclude Include="..\thirdparty\GTAVDashHook\DashHook\DashHook.h" />
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menu.h" />
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menucontrols.h" />

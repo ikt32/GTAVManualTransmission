@@ -85,12 +85,12 @@ void releaseCompatibility() {
     g_TrainerVActive = nullptr;
 
     if (g_DashHookLoadLibbed) {
-        logger.Write(INFO, "GTAVDashHook.dll FreeLibrary");
+        logger.Write(DEBUG, "DashHook.dll FreeLibrary");
         if (FreeLibrary(g_DashHookModule)) {
             g_DashHookModule = nullptr;
         }
         else {
-            logger.Write(ERROR, "GTAVDashHook.dll FreeLibrary failed [%ul]", GetLastError());
+            logger.Write(ERROR, "DashHook.dll FreeLibrary failed [%ul]", GetLastError());
         }
     }
     g_DashHook_GetData = nullptr;

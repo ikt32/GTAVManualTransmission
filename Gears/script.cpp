@@ -139,7 +139,7 @@ void functionHillGravity();
 void functionAudioFX();
 
 void functionDash() {
-    if (!g_settings.GameAssists.DashExt)
+    if (!g_settings.Misc.DashExtensions)
         return;
 
     VehicleDashboardData data{};

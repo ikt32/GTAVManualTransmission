@@ -292,6 +292,7 @@ public:
     // [MISC]
     struct {
         bool UDPTelemetry = true;
+        bool DashExtensions = true;
     } Misc;
 
     // [UPDATE]

@@ -293,7 +293,6 @@
     <ClInclude Include="Util\Timer.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\GTAVDashHook\GTAVDashHook\DashHook.h" />
     <ClInclude Include="..\thirdparty\GTAVDashHook\DashHook\DashHook.h">
       <Filter>DashHook</Filter>
     </ClInclude>
