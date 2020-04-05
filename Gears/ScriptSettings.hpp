@@ -54,7 +54,6 @@ public:
         bool ClutchShiftH = true;
         bool ClutchShiftS = false;
         bool HardLimiter = true;
-        bool RealTurbo = true;
     } MTOptions;
 
     // [MT_PARAMS]
@@ -79,7 +78,6 @@ public:
         bool ThrottleStart = false;
         bool HidePlayerInFPV = false;
         bool DefaultNeutral = true;
-        bool DashExt = true;
     } GameAssists;
 
     // [DRIVING_ASSISTS]

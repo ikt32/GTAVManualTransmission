@@ -427,10 +427,6 @@ void update_featuresmenu() {
 
     g_menu.BoolOption("Hard rev limiter", g_settings.MTOptions.HardLimiter,
         { "Enforce rev limiter for reverse and top speed. No more infinite speed!" });
-
-    g_menu.BoolOption("Real turbo response", g_settings.MTOptions.RealTurbo,
-        { "Change turbo to pressurize and depressurize more realistically.",
-            "Use a speedometer mod with turbo gauge to see the difference." });
 }
 
 void update_finetuneoptionsmenu() {
