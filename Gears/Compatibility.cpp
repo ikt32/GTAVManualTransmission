@@ -1,11 +1,31 @@
 #include "Compatibility.h"
 #include "Util/Logger.hpp"
+
+#include <GTAVDashHook/DashHook/DashHook.h>
+
 #include <Windows.h>
 #include <string>
 
-bool* pActive = nullptr;
+bool* g_TrainerVActive = nullptr;
+HMODULE g_TrainerVModule = nullptr;
 
-HMODULE TrainerVModule = nullptr;
+bool g_DashHookLoadLibbed = false;
+HMODULE g_DashHookModule = nullptr;
+
+void(*g_DashHook_GetData)(VehicleDashboardData*);
+void(*g_DashHook_SetData)(VehicleDashboardData);
+
+void DashHook_GetData(VehicleDashboardData* data) {
+    if (g_DashHook_GetData) {
+        g_DashHook_GetData(data);
+    }
+}
+
+void DashHook_SetData(VehicleDashboardData data) {
+    if (g_DashHook_SetData) {
+        g_DashHook_SetData(data);
+    }
+}
 
 template <typename T>
 T CheckAddr(HMODULE lib, const std::string& funcName)
@@ -20,24 +40,59 @@ T CheckAddr(HMODULE lib, const std::string& funcName)
     return reinterpret_cast<T>(func);
 }
 
-void setupCompatibility() {
+void setupTrainerV() {
     logger.Write(INFO, "Setting up TrainerV compatibility");
-    TrainerVModule = GetModuleHandle(L"trainerv.asi");
-    if (!TrainerVModule) {
+    g_TrainerVModule = GetModuleHandle(L"trainerv.asi");
+    if (!g_TrainerVModule) {
         logger.Write(INFO, "TrainerV.asi not found");
         return;
     }
+    g_TrainerVActive = CheckAddr<bool*>(g_TrainerVModule, "?Menu1@@3_NA");
+}
 
-    pActive = CheckAddr<bool*>(TrainerVModule, "?Menu1@@3_NA");
+void setupDashHook() {
+    g_DashHookLoadLibbed = false;
+    logger.Write(INFO, "Setting up DashHook compatibility");
+    g_DashHookModule = GetModuleHandle(L"DashHook.dll");
+    if (!g_DashHookModule) {
+        logger.Write(INFO, "DashHook.dll not found running, loading...");
+        g_DashHookModule = LoadLibrary(L"DashHook.dll");
+        if (!g_DashHookModule) {
+            DWORD lastError = GetLastError();
+            logger.Write(INFO, "DashHook.dll load failed, error [%lu]", lastError);
+            return;
+        }
+        g_DashHookLoadLibbed = true;
+    }
+
+    g_DashHook_GetData = CheckAddr<void(*)(VehicleDashboardData*)>(g_DashHookModule, "DashHook_GetData");
+    g_DashHook_SetData = CheckAddr<void(*)(VehicleDashboardData)>(g_DashHookModule, "DashHook_SetData");
+}
+
+void setupCompatibility() {
+    setupTrainerV();
+    setupDashHook();
 }
 
 bool TrainerV::Active() {
-    if (pActive)
-        return *pActive;
+    if (g_TrainerVActive)
+        return *g_TrainerVActive;
     return false;
 }
 
 void releaseCompatibility() {
-    TrainerVModule = nullptr;
-    pActive = nullptr;
+    g_TrainerVModule = nullptr;
+    g_TrainerVActive = nullptr;
+
+    if (g_DashHookLoadLibbed) {
+        logger.Write(DEBUG, "DashHook.dll FreeLibrary");
+        if (FreeLibrary(g_DashHookModule)) {
+            g_DashHookModule = nullptr;
+        }
+        else {
+            logger.Write(ERROR, "DashHook.dll FreeLibrary failed [%ul]", GetLastError());
+        }
+    }
+    g_DashHook_GetData = nullptr;
+    g_DashHook_SetData = nullptr;
 }

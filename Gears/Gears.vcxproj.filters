@@ -293,6 +293,9 @@
     <ClInclude Include="Util\Timer.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="..\thirdparty\GTAVDashHook\DashHook\DashHook.h">
+      <Filter>DashHook</Filter>
+    </ClInclude>
     <ClInclude Include="UDPTelemetry\TelemetryPacket.h">
       <Filter>UDPTelemetry</Filter>
     </ClInclude>
@@ -333,6 +336,9 @@
     </Filter>
     <Filter Include="Thirdparty\fmt">
       <UniqueIdentifier>{ed736439-0f02-423b-8962-64053e0896cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DashHook">
+      <UniqueIdentifier>{3bca7d29-ffa2-4bd2-9d7c-d6a61e15c7d9}</UniqueIdentifier>
     </Filter>
     <Filter Include="UDPTelemetry">
       <UniqueIdentifier>{84c60810-1f1b-46a9-a810-08f9629ad9a6}</UniqueIdentifier>

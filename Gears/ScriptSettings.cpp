@@ -136,7 +136,6 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetBoolValue("MT_OPTIONS", "ClutchShiftingH", MTOptions.ClutchShiftH);
     ini.SetBoolValue("MT_OPTIONS", "ClutchShiftingS", MTOptions.ClutchShiftS);
     ini.SetBoolValue("MT_OPTIONS", "HardLimiter", MTOptions.HardLimiter);
-    ini.SetBoolValue("MT_OPTIONS", "RealTurbo", MTOptions.RealTurbo);
 
     // [MT_PARAMS]
     ini.SetDoubleValue("MT_PARAMS", "ClutchCatchpoint", MTParams.ClutchThreshold);
@@ -283,6 +282,7 @@ void ScriptSettings::SaveGeneral() const {
 
     // [MISC]
     ini.SetBoolValue("MISC", "UDPTelemetry", Misc.UDPTelemetry);
+    ini.SetBoolValue("MISC", "DashExtensions", Misc.DashExtensions);
 
     // [UPDATE]
     ini.SetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);
@@ -422,7 +422,6 @@ void ScriptSettings::parseSettingsGeneral() {
     MTOptions.ClutchShiftH = ini.GetBoolValue("MT_OPTIONS", "ClutchShiftingH", MTOptions.ClutchShiftH);
     MTOptions.ClutchShiftS = ini.GetBoolValue("MT_OPTIONS", "ClutchShiftingS", MTOptions.ClutchShiftS);
     MTOptions.HardLimiter = ini.GetBoolValue("MT_OPTIONS", "HardLimiter", MTOptions.HardLimiter);
-    MTOptions.RealTurbo = ini.GetBoolValue("MT_OPTIONS", "RealTurbo", MTOptions.RealTurbo);
 
     MTParams.ClutchThreshold =      ini.GetDoubleValue("MT_PARAMS", "ClutchCatchpoint", MTParams.ClutchThreshold);
     MTParams.StallingThreshold =    ini.GetDoubleValue("MT_PARAMS", "StallingThreshold", MTParams.StallingThreshold);
@@ -567,6 +566,7 @@ void ScriptSettings::parseSettingsGeneral() {
 
     // [MISC]
     Misc.UDPTelemetry = ini.GetBoolValue("MISC", "UDPTelemetry", Misc.UDPTelemetry);
+    Misc.DashExtensions = ini.GetBoolValue("MISC", "DashExtensions", Misc.DashExtensions);
 
     // [UPDATE]
     Update.EnableUpdate = ini.GetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);

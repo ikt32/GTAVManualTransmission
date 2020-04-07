@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     
-    <title>Format String Syntax &mdash; fmt 5.3.0 documentation</title>
+    <title>Format String Syntax &mdash; fmt 6.1.2 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '5.3.0',
+        VERSION:     '6.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -66,15 +66,15 @@
           <ul class="nav navbar-nav">
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown"
-                 role="button" aria-expanded="false">5.3.0
+                 role="button" aria-expanded="false">6.1.2
                 <span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">
                 
-                <li><a href="http://fmtlib.net/5.3.0">5.3.0</a></li>
+                <li><a href="https://fmt.dev/6.1.2">6.1.2</a></li>
                 
-                <li><a href="http://fmtlib.net/5.2.1">5.2.1</a></li>
+                <li><a href="https://fmt.dev/6.1.1">6.1.1</a></li>
                 
-                <li><a href="http://fmtlib.net/5.2.0">5.2.0</a></li>
+                <li><a href="https://fmt.dev/6.1.0">6.1.0</a></li>
                 
               </ul>
             </li>
@@ -169,7 +169,7 @@ described in the next section.</p>
 positions within it. These nested replacement fields can contain only an
 argument id; format specifications are not allowed. This allows the formatting
 of a value to be dynamically specified.</p>
-<p>See the <a class="reference internal" href="#formatexamples"><span class="std std-ref">Format examples</span></a> section for some examples.</p>
+<p>See the <a class="reference internal" href="#formatexamples"><span class="std std-ref">Format Examples</span></a> section for some examples.</p>
 <div class="section" id="format-specification-mini-language">
 <span id="formatspec"></span><h2>Format Specification Mini-Language<a class="headerlink" href="#format-specification-mini-language" title="Permalink to this headline">¶</a></h2>
 <p>&#8220;Format specifications&#8221; are used within replacement fields contained within a
@@ -214,13 +214,7 @@ space (this is the default for most objects).</td>
 <td>Forces the field to be right-aligned within the
 available space (this is the default for numbers).</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">'='</span></code></td>
-<td>Forces the padding to be placed after the sign (if any)
-but before the digits.  This is used for printing fields
-in the form &#8216;+000000120&#8217;. This alignment option is only
-valid for numeric types.</td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">'^'</span></code></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">'^'</span></code></td>
 <td>Forces the field to be centered within the available
 space.</td>
 </tr>
@@ -272,9 +266,11 @@ only if a digit follows it. In addition, for <code class="docutils literal"><spa
 conversions, trailing zeros are not removed from the result.</p>
 <p><em>width</em> is a decimal integer defining the minimum field width.  If not
 specified, then the field width will be determined by the content.</p>
-<p>Preceding the <em>width</em> field by a zero (<code class="docutils literal"><span class="pre">'0'</span></code>) character enables
-sign-aware zero-padding for numeric types.  This is equivalent to a <em>fill</em>
-character of <code class="docutils literal"><span class="pre">'0'</span></code> with an <em>alignment</em> type of <code class="docutils literal"><span class="pre">'='</span></code>.</p>
+<p>Preceding the <em>width</em> field by a zero (<code class="docutils literal"><span class="pre">'0'</span></code>) character enables sign-aware
+zero-padding for numeric types. It forces the padding to be placed after the
+sign or base (if any) but before the digits. This is used for printing fields in
+the form &#8216;+000000120&#8217;. This option is only valid for numeric types and it has no
+effect on formatting of infinity and NaN.</p>
 <p>The <em>precision</em> is a decimal number indicating how many digits should be
 displayed after the decimal point for a floating-point value formatted with
 <code class="docutils literal"><span class="pre">'f'</span></code> and <code class="docutils literal"><span class="pre">'F'</span></code>, or before and after the decimal point for a floating-point
@@ -405,7 +401,7 @@ notation using the letter &#8216;e&#8217; to indicate the exponent.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">'E'</span></code></td>
 <td>Exponent notation. Same as <code class="docutils literal"><span class="pre">'e'</span></code> except it uses an
-upper-case &#8216;E&#8217; as the separator character.</td>
+upper-case <code class="docutils literal"><span class="pre">'E'</span></code> as the separator character.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">'f'</span></code></td>
 <td>Fixed point. Displays the number as a fixed-point
@@ -429,12 +425,19 @@ precision of <code class="docutils literal"><span class="pre">1</span></code>.</
 <code class="docutils literal"><span class="pre">'E'</span></code> if the number gets too large. The
 representations of infinity and NaN are uppercased, too.</td>
 </tr>
-<tr class="row-even"><td>none</td>
-<td>The same as <code class="docutils literal"><span class="pre">'g'</span></code>.</td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">'n'</span></code></td>
+<td>Number. This is the same as <code class="docutils literal"><span class="pre">'g'</span></code>, except that it uses
+the current locale setting to insert the appropriate
+number separator characters.</td>
+</tr>
+<tr class="row-odd"><td>none</td>
+<td>Similar to <code class="docutils literal"><span class="pre">'g'</span></code>, except that fixed-point notation,
+when used, has at least one digit past the decimal
+point. The default precision is as high as needed to
+represent the particular value.</td>
 </tr>
 </tbody>
 </table>
-<p>Floating-point formatting is locale-dependent.</p>
 <p>The available presentation types for pointers are:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -458,7 +461,7 @@ pointers and may be omitted.</td>
 </table>
 </div>
 <div class="section" id="format-examples">
-<span id="formatexamples"></span><h2>Format examples<a class="headerlink" href="#format-examples" title="Permalink to this headline">¶</a></h2>
+<span id="formatexamples"></span><h2>Format Examples<a class="headerlink" href="#format-examples" title="Permalink to this headline">¶</a></h2>
 <p>This section contains examples of the format syntax and comparison with
 the printf formatting.</p>
 <p>In most of the cases the syntax is similar to the printf formatting, with the
@@ -505,6 +508,13 @@ following examples.</p>
 <span class="c1">// Result: &quot; 3.140000; -3.140000&quot;</span>
 <span class="n">format</span><span class="p">(</span><span class="s">&quot;{:-f}; {:-f}&quot;</span><span class="p">,</span> <span class="mf">3.14</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.14</span><span class="p">);</span>  <span class="c1">// show only the minus -- same as &#39;{:f}; {:f}&#39;</span>
 <span class="c1">// Result: &quot;3.140000; -3.140000&quot;</span>
+</pre></div>
+</div>
+<p>As a percentage:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">format</span><span class="p">(</span><span class="s">&quot;{0:f} or {0:%}&quot;</span><span class="p">,</span> <span class="mf">.635</span><span class="p">);</span>
+<span class="c1">// Result: &quot;0.635000 or 63.500000%&quot;</span>
+<span class="n">format</span><span class="p">(</span><span class="s">&quot;{:*^{}.{}%}&quot;</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span> <span class="c1">// With fill, dynamic width and dynamic precision.</span>
+<span class="c1">// Result: &quot;****100.00%****&quot;</span>
 </pre></div>
 </div>
 <p>Replacing <code class="docutils literal"><span class="pre">%x</span></code> and <code class="docutils literal"><span class="pre">%o</span></code> and converting the value to different bases:</p>

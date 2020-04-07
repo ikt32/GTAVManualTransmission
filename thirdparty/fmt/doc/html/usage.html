@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     
-    <title>Usage &mdash; fmt 5.3.0 documentation</title>
+    <title>Usage &mdash; fmt 6.1.2 documentation</title>
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '5.3.0',
+        VERSION:     '6.1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -67,15 +67,15 @@
           <ul class="nav navbar-nav">
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown"
-                 role="button" aria-expanded="false">5.3.0
+                 role="button" aria-expanded="false">6.1.2
                 <span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">
                 
-                <li><a href="http://fmtlib.net/5.3.0">5.3.0</a></li>
+                <li><a href="https://fmt.dev/6.1.2">6.1.2</a></li>
                 
-                <li><a href="http://fmtlib.net/5.2.1">5.2.1</a></li>
+                <li><a href="https://fmt.dev/6.1.1">6.1.1</a></li>
                 
-                <li><a href="http://fmtlib.net/5.2.0">5.2.0</a></li>
+                <li><a href="https://fmt.dev/6.1.0">6.1.0</a></li>
                 
               </ul>
             </li>
@@ -127,18 +127,13 @@
       
   <div class="section" id="usage">
 <h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
-<p>To use the fmt library, add <code class="file docutils literal"><span class="pre">format.h</span></code> and <code class="file docutils literal"><span class="pre">format.cc</span></code> from
-a <a class="reference external" href="https://github.com/fmtlib/fmt/releases/latest">release archive</a>
-or the <a class="reference external" href="https://github.com/fmtlib/fmt">Git repository</a> to your project.
+<p>To use the {fmt} library, add <code class="file docutils literal"><span class="pre">fmt/core.h</span></code>, <code class="file docutils literal"><span class="pre">fmt/format.h</span></code>,
+<code class="file docutils literal"><span class="pre">fmt/format-inl.h</span></code>, <code class="file docutils literal"><span class="pre">src/format.cc</span></code> and optionally other headers
+from a <a class="reference external" href="https://github.com/fmtlib/fmt/releases/latest">release archive</a> or
+the <a class="reference external" href="https://github.com/fmtlib/fmt">Git repository</a> to your project.
 Alternatively, you can <a class="reference internal" href="#building"><span class="std std-ref">build the library with CMake</span></a>.</p>
-<p>If you are using Visual C++ with precompiled headers, you might need to add
-the line</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;stdafx.h&quot;</span><span class="cp"></span>
-</pre></div>
-</div>
-<p>before other includes in <code class="file docutils literal"><span class="pre">format.cc</span></code>.</p>
 <div class="section" id="building-the-library">
-<span id="building"></span><h2>Building the library<a class="headerlink" href="#building-the-library" title="Permalink to this headline">¶</a></h2>
+<span id="building"></span><h2>Building the Library<a class="headerlink" href="#building-the-library" title="Permalink to this headline">¶</a></h2>
 <p>The included <a class="reference external" href="https://github.com/fmtlib/fmt/blob/master/CMakeLists.txt">CMake build script</a> can be used to build the fmt
 library on a wide range of platforms. CMake is freely available for
 download from <a class="reference external" href="http://www.cmake.org/download/">http://www.cmake.org/download/</a>.</p>
@@ -147,7 +142,7 @@ be used in the compiler environment of your choice. The typical
 workflow starts with:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span></span>mkdir build          # Create a directory to hold the build output.
 cd build
-cmake &lt;path/to/fmt&gt;  # Generate native build scripts.
+cmake ..  # Generate native build scripts.
 </pre></div>
 </div>
 <p>where <code class="file docutils literal"><em><span class="pre">&lt;path/to/fmt&gt;</span></em></code> is a path to the <code class="docutils literal"><span class="pre">fmt</span></code> repository.</p>
@@ -168,8 +163,13 @@ using Visual Studio or msbuild.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="header-only-usage-with-cmake">
-<h2>Header-only usage with CMake<a class="headerlink" href="#header-only-usage-with-cmake" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="installing-the-library">
+<h2>Installing the Library<a class="headerlink" href="#installing-the-library" title="Permalink to this headline">¶</a></h2>
+<p>After building the library you can install it on a Unix-like system by running
+<strong class="command">sudo make install</strong>.</p>
+</div>
+<div class="section" id="usage-with-cmake">
+<h2>Usage with CMake<a class="headerlink" href="#usage-with-cmake" title="Permalink to this headline">¶</a></h2>
 <p>You can add the <code class="docutils literal"><span class="pre">fmt</span></code> library directory into your project and include it in
 your <code class="docutils literal"><span class="pre">CMakeLists.txt</span></code> file:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">add_subdirectory</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
@@ -185,13 +185,13 @@ your <code class="docutils literal"><span class="pre">CMakeLists.txt</span></cod
 <span class="n">target_link_libraries</span><span class="p">(</span><span class="o">&lt;</span><span class="n">your</span><span class="o">-</span><span class="n">target</span><span class="o">&gt;</span> <span class="n">fmt</span><span class="o">::</span><span class="n">fmt</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Setting up your target to use a header-only version of <code class="docutils literal"><span class="pre">fmt</span></code> is equaly easy:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">target_link_libraries</span><span class="p">(</span><span class="o">&lt;</span><span class="n">your</span><span class="o">-</span><span class="n">target</span><span class="o">&gt;</span> <span class="n">PRIVATE</span> <span class="n">fmt</span><span class="o">-</span><span class="n">header</span><span class="o">-</span><span class="n">only</span><span class="p">)</span>
+<p>Setting up your target to use a header-only version of <code class="docutils literal"><span class="pre">fmt</span></code> is equally easy:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">target_link_libraries</span><span class="p">(</span><span class="o">&lt;</span><span class="n">your</span><span class="o">-</span><span class="n">target</span><span class="o">&gt;</span> <span class="n">PRIVATE</span> <span class="n">fmt</span><span class="o">::</span><span class="n">fmt</span><span class="o">-</span><span class="n">header</span><span class="o">-</span><span class="n">only</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="building-the-documentation">
-<h2>Building the documentation<a class="headerlink" href="#building-the-documentation" title="Permalink to this headline">¶</a></h2>
+<h2>Building the Documentation<a class="headerlink" href="#building-the-documentation" title="Permalink to this headline">¶</a></h2>
 <p>To build the documentation you need the following software installed on your
 system:</p>
 <ul>
@@ -213,6 +213,16 @@ the previous section. Then compile the <code class="docutils literal"><span clas
 </pre></div>
 </div>
 <p>This will generate the HTML documentation in <code class="docutils literal"><span class="pre">doc/html</span></code>.</p>
+</div>
+<div class="section" id="conda">
+<h2>Conda<a class="headerlink" href="#conda" title="Permalink to this headline">¶</a></h2>
+<p>fmt can be installed on Linux, macOS and Windows with
+<a class="reference external" href="https://docs.conda.io/en/latest/">Conda</a>, using its
+<a class="reference external" href="https://conda-forge.org">conda-forge</a>
+<a class="reference external" href="https://github.com/conda-forge/fmt-feedstock">package</a>, as follows:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">fmt</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="android-ndk">
 <h2>Android NDK<a class="headerlink" href="#android-ndk" title="Permalink to this headline">¶</a></h2>

@@ -10,6 +10,7 @@
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/VehicleExtensions.hpp"
 #include "Util/MathExt.h"
+#include "Util/Logger.hpp"
 #include "ScriptUtils.h"
 #include "VehicleConfig.h"
 
@@ -256,7 +257,7 @@ void onMenuClose() {
 }
 
 void update_mainmenu() {
-    g_menu.Title("Manual Transmission", 0.90f);
+    g_menu.Title("Manual Transmission");
     g_menu.Subtitle(fmt::format("~b~{}", Constants::DisplayVersion));
 
     if (MemoryPatcher::Error) {
@@ -300,7 +301,7 @@ void update_mainmenu() {
     }
 
     bool tempEnableRead = g_settings.MTOptions.Enable;
-    if (g_menu.BoolOption("Enable manual transmission", tempEnableRead,
+    if (g_menu.BoolOption("Enable Manual Transmission", tempEnableRead,
         { "Enable or disable the manual transmission. Steering wheel stays active." })) {
         toggleManual(!g_settings.MTOptions.Enable);
     }
@@ -322,20 +323,23 @@ void update_mainmenu() {
         setShiftMode(static_cast<EShiftMode>(tempShiftMode));
     }
 
-    g_menu.MenuOption("Settings", "settingsmenu", 
-        { "Choose what parts of Manual Transmission are active." });
-    g_menu.MenuOption("Controller & Keyboard", "controlsmenu", 
-        { "Configure the controller and keyboard." });
-    g_menu.MenuOption("Steering Wheel", "wheelmenu", 
-        { "Set up your steering wheel." });
-    g_menu.MenuOption("HUD Options", "hudmenu", 
-        { "Change and move HUD elements." });
+    g_menu.MenuOption("Manual Transmission settings", "settingsmenu", 
+        { "Choose what parts of the Manual Transmission script are active." });
+
+    g_menu.MenuOption("Controls", "controlsmenu", 
+        { "Configure controls for the script." });
+
     g_menu.MenuOption("Driving assists", "driveassistmenu",
         { "ABS, TCS and ESP assist options for the player." });
+
     g_menu.MenuOption("Gameplay assists", "gameassistmenu",
         { "Assist to make playing a bit easier." });
-    g_menu.MenuOption("Debug options", "debugmenu", 
-        { "Show technical details and options." });
+
+    g_menu.MenuOption("HUD options", "hudmenu",
+        { "Change and move HUD elements." });
+
+    g_menu.MenuOption("Extra settings", "extrasettingsmenu", 
+        { "Various settings for debugging, compatibility, etc." });
 
     if (g_settings.Debug.DisableInputDetect) {
         int activeIndex = g_controls.PrevInput;
@@ -379,8 +383,8 @@ void update_mainmenu() {
 }
 
 void update_settingsmenu() {
-    g_menu.Title("Settings");
-    g_menu.Subtitle("Manual Transmission settings");
+    g_menu.Title("Manual Transmission");
+    g_menu.Subtitle("Settings");
 
     g_menu.MenuOption("Features", "featuresmenu",
         { "Turn on or off parts of Manual Transmission." });
@@ -400,42 +404,38 @@ void update_settingsmenu() {
 
 void update_featuresmenu() {
     g_menu.Title("Features");
-    g_menu.Subtitle("Manual Transmission parts");
+    g_menu.Subtitle("");
     g_menu.BoolOption("Engine Damage", g_settings.MTOptions.EngDamage,
         { "Damage the engine when over-revving and when mis-shifting." });
 
-    g_menu.BoolOption("Engine Stalling (H)", g_settings.MTOptions.EngStallH,
+    g_menu.BoolOption("Engine stalling (H)", g_settings.MTOptions.EngStallH,
         { "Stall the engine when the wheel speed gets too low. Applies to H-pattern shift mode." });
 
-    g_menu.BoolOption("Engine Stalling (S)", g_settings.MTOptions.EngStallS,
+    g_menu.BoolOption("Engine stalling (S)", g_settings.MTOptions.EngStallS,
         { "Stall the engine when the wheel speed gets too low. Applies to sequential shift mode." });
 
-    g_menu.BoolOption("Clutch Shift (H)", g_settings.MTOptions.ClutchShiftH,
+    g_menu.BoolOption("Clutch shift (H)", g_settings.MTOptions.ClutchShiftH,
         { "Require holding the clutch to shift in H-pattern shift mode." });
 
-    g_menu.BoolOption("Clutch Shift (S)", g_settings.MTOptions.ClutchShiftS,
+    g_menu.BoolOption("Clutch shift (S)", g_settings.MTOptions.ClutchShiftS,
         { "Require holding the clutch to shift in sequential mode." });
 
-    g_menu.BoolOption("Engine Braking", g_settings.MTOptions.EngBrake,
+    g_menu.BoolOption("Engine braking", g_settings.MTOptions.EngBrake,
         { "Help the car braking by slowing down more at high RPMs." });
 
-    g_menu.BoolOption("Gear/RPM Lockup", g_settings.MTOptions.EngLock,
+    g_menu.BoolOption("Gear/RPM lockup", g_settings.MTOptions.EngLock,
         { "Simulate wheel lock-up when mis-shifting to a too low gear for the RPM range." });
 
-    g_menu.BoolOption("Clutch Creep", g_settings.MTOptions.ClutchCreep,
+    g_menu.BoolOption("Clutch creep", g_settings.MTOptions.ClutchCreep,
         { "Simulate clutch creep when stopped with clutch engaged." });
 
     g_menu.BoolOption("Hard rev limiter", g_settings.MTOptions.HardLimiter,
         { "Enforce rev limiter for reverse and top speed. No more infinite speed!" });
-
-    g_menu.BoolOption("Real turbo response", g_settings.MTOptions.RealTurbo,
-        { "Change turbo to pressurize and depressurize more realistically.",
-            "Use a speedometer mod with turbo gauge to see the difference." });
 }
 
 void update_finetuneoptionsmenu() {
-    g_menu.Title("Fine-tuning");
-    g_menu.Subtitle("Gearbox fine-tuning options");
+    g_menu.Title("Finetuning");
+    g_menu.Subtitle("");
 
     g_menu.FloatOption("Clutch bite threshold", g_settings.MTParams.ClutchThreshold, 0.0f, 1.0f, 0.05f,
         { "How far the clutch has to be lifted to start biting. This value should be lower than \"Stalling threshold\"." });
@@ -445,9 +445,9 @@ void update_finetuneoptionsmenu() {
         { "Consider stalling when the expected RPM drops below this number.",
           "The range is 0.0 to 0.2. The engine idles at 0.2, so 0.1 is a decent value." });
 
-    g_menu.FloatOption("RPM Damage", g_settings.MTParams.RPMDamage, 0.0f, 10.0f, 0.05f,
+    g_menu.FloatOption("RPM damage", g_settings.MTParams.RPMDamage, 0.0f, 10.0f, 0.05f,
         { "Damage from redlining too long." });
-    g_menu.FloatOption("Misshift Damage", g_settings.MTParams.MisshiftDamage, 0, 100, 5,
+    g_menu.FloatOption("Misshift damage", g_settings.MTParams.MisshiftDamage, 0, 100, 5,
         { "Damage from being over the rev range." });
     g_menu.FloatOption("Engine braking threshold", g_settings.MTParams.EngBrakeThreshold, 0.0f, 1.0f, 0.05f,
         { "RPM where engine braking starts being effective." });
@@ -477,8 +477,8 @@ void update_shiftingoptionsmenu() {
 }
 
 void update_finetuneautooptionsmenu() {
-    g_menu.Title("Automatic transmission finetuning");
-    g_menu.Subtitle("Script-driven automatic transmission");
+    g_menu.Title("Automatic finetuning");
+    g_menu.Subtitle("");
 
     g_menu.FloatOption("Upshift engine load", g_settings.AutoParams.UpshiftLoad, 0.01f, 0.20f, 0.01f,
         { "Upshift when the engine load drops below this value. "
@@ -602,29 +602,33 @@ void update_vehconfigmenu() {
 
 void update_controlsmenu() {
     g_menu.Title("Controls");
-    g_menu.Subtitle("Controller & Keyboard");
+    g_menu.Subtitle("");
 
-    g_menu.MenuOption("Controller options", "controlleroptionsmenu");
+    g_menu.MenuOption("Controller", "controllermenu");
 
-    if (g_settings.Controller.Native.Enable) {
-        g_menu.MenuOption("Controller bindings (Native)", "legacycontrollermenu",
-            { "Set up controller bindings." });
-    }
-    else {
-        g_menu.MenuOption("Controller bindings (XInput)", "controllermenu",
-            { "Set up controller bindings." });
-    }
+    g_menu.MenuOption("Keyboard", "keyboardmenu");
 
-    g_menu.MenuOption("Keyboard bindings", "keyboardmenu",
-        { "Change keyboard control bindings." });
+    g_menu.MenuOption("Wheel & pedals", "wheelmenu");
 
     g_menu.MenuOption("Steering assists", "steeringassistmenu",
         { "Customize steering input for keyboards and controllers." });
 }
 
-void update_controlleroptionsmenu() {
-    g_menu.Title("Controller options");
-    g_menu.Subtitle("Controller options");
+void update_controllermenu() {
+    g_menu.Title("Controller");
+    g_menu.Subtitle("");
+
+    g_menu.BoolOption("Native input", g_settings.Controller.Native.Enable,
+        { "Using a controller not supported by XInput? Enable this option and re-bind your controls." });
+
+    if (g_settings.Controller.Native.Enable) {
+        g_menu.MenuOption("Controller bindings (Native)", "controllerbindingsnativemenu",
+            { "Set up controller bindings." });
+    }
+    else {
+        g_menu.MenuOption("Controller bindings (XInput)", "controllerbindingsxinputmenu",
+            { "Set up controller bindings." });
+    }
 
     g_menu.BoolOption("Engine button toggles", g_settings.Controller.ToggleEngine,
         { "Checked: the engine button turns the engine on AND off.",
@@ -648,14 +652,11 @@ void update_controlleroptionsmenu() {
 
     g_menu.BoolOption("Ignore shifts in UI", g_settings.Controller.IgnoreShiftsUI,
         { "Ignore shift up/shift down while using the phone or when the menu is open" });
-
-    g_menu.BoolOption("Native controller input", g_settings.Controller.Native.Enable,
-        { "Using a controller not supported by XInput? Enable this option and re-bind your controls." });
 }
 
-void update_legacycontrollermenu() {
+void update_controllerbindingsnativemenu() {
     g_menu.Title("Controller bindings");
-    g_menu.Subtitle("Native controls");
+    g_menu.Subtitle("Native mode");
 
     std::vector<std::string> blockableControlsHelp;
     blockableControlsHelp.reserve(blockableControls.size());
@@ -700,9 +701,9 @@ void update_legacycontrollermenu() {
     }
 }
 
-void update_controllermenu() {
+void update_controllerbindingsxinputmenu() {
     g_menu.Title("Controller bindings");
-    g_menu.Subtitle("XInput controls");
+    g_menu.Subtitle("XInput mode");
 
     std::vector<std::string> blockableControlsHelp;
     blockableControlsHelp.reserve(blockableControls.size());
@@ -747,7 +748,7 @@ void update_controllermenu() {
 
 void update_keyboardmenu() {
     g_menu.Title("Keyboard bindings");
-    g_menu.Subtitle("Keyboard bindings");
+    g_menu.Subtitle("");
 
     std::vector<std::string> keyboardInfo = {
         "Press RIGHT to clear key",
@@ -770,11 +771,18 @@ void update_keyboardmenu() {
 }
 
 void update_wheelmenu() {
-    g_menu.Title("Steering wheel");
-    g_menu.Subtitle("Steering wheel options");
+    g_menu.Title("Wheel & pedals");
+    auto wheelGuid = g_controls.WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Steer)];
+    auto deviceEntry = g_controls.GetWheel().FindEntryFromGUID(wheelGuid);
+    std::string wheelName = "No wheel";
+    if (deviceEntry) {
+        std::wstring wDevName = deviceEntry->diDeviceInstance.tszInstanceName;
+        wheelName = StrUtil::utf8_encode(wDevName);
+    }
+    g_menu.Subtitle(wheelName);
 
     if (g_menu.BoolOption("Enable wheel", g_settings.Wheel.Options.Enable,
-        { "Enable usage of a steering wheel." })) {
+        { "Enable usage of a steering wheel and pedals." })) {
         saveChanges();
         g_settings.Read(&g_controls);
         initWheel();
@@ -845,7 +853,7 @@ void update_wheelmenu() {
 
 void update_anglemenu() {
     g_menu.Title("Soft lock");
-    g_menu.Subtitle("Soft lock & angle setup");
+    g_menu.Subtitle("");
     float minLock = 180.0f;
     if (g_menu.FloatOption("Physical degrees", g_settings.Wheel.Steering.AngleMax, minLock, 1440.0, 30.0,
         { "How many degrees your wheel can physically turn." })) {
@@ -928,8 +936,8 @@ std::vector<std::string> showGammaCurve(const std::string& axis, const float inp
 }
 
 void update_axesmenu() {
-    g_menu.Title("Configure axes");
-    g_menu.Subtitle("Setup steering and pedals");
+    g_menu.Title("Analog inputs");
+    g_menu.Subtitle("");
     g_controls.UpdateValues(CarControls::Wheel, true);
     std::vector<std::string> info = {
         "Press RIGHT to clear this axis" ,
@@ -1028,7 +1036,7 @@ void update_axesmenu() {
 
 void update_forcefeedbackmenu() {
     g_menu.Title("Force feedback");
-    g_menu.Subtitle("Force feedback setup");
+    g_menu.Subtitle("");
 
     g_menu.BoolOption("Enable", g_settings.Wheel.FFB.Enable,
         { "Enable or disable force feedback entirely." });
@@ -1078,7 +1086,7 @@ void update_forcefeedbackmenu() {
     g_menu.FloatOption("Damper min speed", g_settings.Wheel.FFB.DamperMinSpeed, 0.0f, 40.0f, 0.2f,
         { "Speed where the damper strength should be minimal.", "In m/s." });
 
-    if (g_menu.Option("Tune FFB Anti-Deadzone")) {
+    if (g_menu.Option("Tune FFB anti-deadzone")) {
         g_controls.PlayFFBCollision(0);
         g_controls.PlayFFBDynamics(0, 0);
         while (true) {
@@ -1111,8 +1119,8 @@ void update_forcefeedbackmenu() {
 }
 
 void update_buttonsmenu() {
-    g_menu.Title("Configure buttons");
-    g_menu.Subtitle("Button setup and review");
+    g_menu.Title("Buttons");
+    g_menu.Subtitle("");
 
     std::vector<std::string> wheelToKeyInfo = {
         "Active wheel-to-key options:",
@@ -1156,7 +1164,7 @@ void update_buttonsmenu() {
 }
 
 void update_hudmenu() {
-    g_menu.Title("HUD Options");
+    g_menu.Title("HUD options");
     g_menu.Subtitle("");
 
     g_menu.BoolOption("Enable", g_settings.HUD.Enable,
@@ -1265,7 +1273,7 @@ void update_rpmdisplaymenu() {
 }
 
 void update_wheelinfomenu() {
-    g_menu.Title("Wheel & Pedal Info");
+    g_menu.Title("Wheel & pedal info");
     g_menu.Subtitle("");
 
     g_menu.BoolOption("Display steering wheel info", g_settings.HUD.Wheel.Enable, { "Show input info graphically." });
@@ -1306,7 +1314,7 @@ void update_dashindicatormenu() {
 
 void update_driveassistmenu() {
     g_menu.Title("Driving assists");
-    g_menu.Subtitle("Assists to make driving easier");
+    g_menu.Subtitle("");
 
     g_menu.BoolOption("Enable ABS", g_settings.DriveAssists.ABS.Enable,
         { "Custom script-driven ABS." });
@@ -1323,71 +1331,66 @@ void update_driveassistmenu() {
     g_menu.FloatOption("TC Slip threshold", g_settings.DriveAssists.TCS.SlipMax, 0.0f, 20.0f, 0.1f,
         { "Speed in m/s an individual wheel may slip before TC kicks in." });
 
-    g_menu.BoolOption("Enable ESP", g_settings.DriveAssists.ESP.Enable,
+    g_menu.BoolOption("Enable ESC", g_settings.DriveAssists.ESP.Enable,
         { "Script-driven stability control." });
 
-    g_menu.MenuOption("ESP settings", "espsettingsmenu", 
+    g_menu.MenuOption("ESC settings", "espsettingsmenu", 
         { "Change the behaviour and tolerances of the stability control system." });
 }
 
 void update_espsettingsmenu() {
-    g_menu.Title("ESP settings");
+    g_menu.Title("ESC settings");
     g_menu.Subtitle("");
     g_menu.FloatOption("Oversteer starting angle", g_settings.DriveAssists.ESP.OverMin, 0.0f, 90.0f, 0.1f,
-        { "Angle (degrees) where ESP starts correcting for oversteer." });
+        { "Angle (degrees) where ESC starts correcting for oversteer." });
     g_menu.FloatOption("Oversteer starting correction", g_settings.DriveAssists.ESP.OverMinComp, 0.0f, 10.0f, 0.1f,
-        { "Starting ESP oversteer correction value. Additional braking force for the affected wheel." });
+        { "Starting ESC oversteer correction value. Additional braking force for the affected wheel." });
     g_menu.FloatOption("Oversteer max angle", g_settings.DriveAssists.ESP.OverMax, 0.0f, 90.0f, 0.1f,
-        { "Angle (degrees) where ESP oversteer correction is maximized." });
+        { "Angle (degrees) where ESC oversteer correction is maximized." });
     g_menu.FloatOption("Oversteer max correction", g_settings.DriveAssists.ESP.OverMaxComp, 0.0f, 10.0f, 0.1f,
-        { "Max ESP oversteer correction value. Additional braking force for the affected wheel." });
+        { "Max ESC oversteer correction value. Additional braking force for the affected wheel." });
 
     g_menu.FloatOption("Understeer starting angle", g_settings.DriveAssists.ESP.UnderMin, 0.0f, 90.0f, 0.1f,
-        { "Angle (degrees) where ESP starts correcting for understeer." });
+        { "Angle (degrees) where ESC starts correcting for understeer." });
     g_menu.FloatOption("Understeer starting correction", g_settings.DriveAssists.ESP.UnderMinComp, 0.0f, 10.0f, 0.1f,
-        { "Starting ESP understeer correction value. Additional braking force for the affected wheel." });
+        { "Starting ESC understeer correction value. Additional braking force for the affected wheel." });
     g_menu.FloatOption("Understeer max angle", g_settings.DriveAssists.ESP.UnderMax, 0.0f, 90.0f, 0.1f,
-        { "Angle (degrees) where ESP understeer correction is maximized." });
+        { "Angle (degrees) where ESC understeer correction is maximized." });
     g_menu.FloatOption("Understeer max correction", g_settings.DriveAssists.ESP.UnderMaxComp, 0.0f, 10.0f, 0.1f,
-        { "Max ESP oversteer understeer value. Additional braking force for the affected wheel." });
+        { "Max ESC oversteer understeer value. Additional braking force for the affected wheel." });
 }
 
 void update_gameassistmenu() {
     g_menu.Title("Gameplay assists");
-    g_menu.Subtitle("Simplify Manual Transmission");
+    g_menu.Subtitle("");
 
-    g_menu.BoolOption("Default Neutral gear", g_settings.GameAssists.DefaultNeutral,
+    g_menu.BoolOption("Default neutral gear", g_settings.GameAssists.DefaultNeutral,
         { "The car will be in neutral when you get in." });
 
-    g_menu.BoolOption("Simple Bike", g_settings.GameAssists.SimpleBike,
+    g_menu.BoolOption("Simplified bike", g_settings.GameAssists.SimpleBike,
         { "Disables bike engine stalling and the clutch bite simulation." });
 
     g_menu.BoolOption("Hill gravity workaround", g_settings.GameAssists.HillGravity,
         { "Gives the car a push to overcome the games' default brakes when stopped." });
 
-    g_menu.BoolOption("Auto gear 1", g_settings.GameAssists.AutoGear1,
+    g_menu.BoolOption("Auto 1st gear", g_settings.GameAssists.AutoGear1,
         { "Automatically switch to first gear when the car reaches a standstill." });
 
     g_menu.BoolOption("Auto look back", g_settings.GameAssists.AutoLookBack,
         { "Automatically look back whenever in reverse gear." });
 
-    g_menu.BoolOption("Clutch + throttle start", g_settings.GameAssists.ThrottleStart,
+    g_menu.BoolOption("Clutch & throttle start", g_settings.GameAssists.ThrottleStart,
         { "Allow to start the engine by pressing clutch and throttle." });
 
     if (g_menu.BoolOption("Hide player in FPV", g_settings.GameAssists.HidePlayerInFPV,
         { "Hides the player in first person view." })) {
         functionHidePlayerInFPV(true);
     }
-
-    if (g_menu.BoolOption("Enable UDP telemetry", g_settings.Misc.UDPTelemetry,
-        { "Allows programs like SimHub to use data from this script." })) {
-        StartUDPTelemetry();
-    }
 }
 
 void update_steeringassistmenu() {
     g_menu.Title("Steering assists");
-    g_menu.Subtitle("Custom steering assist options");
+    g_menu.Subtitle("");
 
     std::vector<std::string> steeringModeDescription;
     switch(g_settings.CustomSteering.Mode) {
@@ -1402,17 +1405,17 @@ void update_steeringassistmenu() {
     default:
         steeringModeDescription.emplace_back("Invalid option?");
     }
-    g_menu.StringArray("Steering Mode", { "Default", "Enhanced" }, g_settings.CustomSteering.Mode, 
+    g_menu.StringArray("Steering mode", { "Default", "Enhanced" }, g_settings.CustomSteering.Mode, 
         steeringModeDescription);
     g_menu.FloatOption("Countersteer multiplier", g_settings.CustomSteering.CountersteerMult, 0.0f, 2.0f, 0.05f,
         { "How much countersteer should be given." });
     g_menu.FloatOption("Countersteer limit", g_settings.CustomSteering.CountersteerLimit, 0.0f, 360.0f, 1.0f, 
         { "Maximum angle in degrees for automatic countersteering. Game default is 15 degrees." });
-    g_menu.FloatOption("Steering Reduction", g_settings.CustomSteering.SteeringReduction, 0.0f, 1.0f, 0.01f,
+    g_menu.FloatOption("Steering reduction", g_settings.CustomSteering.SteeringReduction, 0.0f, 1.0f, 0.01f,
         { "Reduce steering input at higher speeds.", "From InfamousSabre's Custom Steering." });
-    g_menu.FloatOption("Steering Multiplier", g_settings.CustomSteering.SteeringMult, 0.01f, 2.0f, 0.01f,
+    g_menu.FloatOption("Steering multiplier", g_settings.CustomSteering.SteeringMult, 0.01f, 2.0f, 0.01f,
         { "Increase/decrease steering lock.", "From InfamousSabre's Custom Steering." });
-    g_menu.FloatOption("Steering Gamma", g_settings.CustomSteering.Gamma, 0.01f, 2.0f, 0.01f,
+    g_menu.FloatOption("Steering gamma", g_settings.CustomSteering.Gamma, 0.01f, 2.0f, 0.01f,
         { "Change linearity of steering input." });
 
     g_menu.BoolOption("Custom wheel rotation", g_settings.CustomSteering.CustomRotation, 
@@ -1422,30 +1425,27 @@ void update_steeringassistmenu() {
         { "Rotation in degrees." });
 }
 
-void update_debugmenu() {
-    g_menu.Title("Debug settings");
-    g_menu.Subtitle("Extra mod info");
+void update_extrasettingsmenu() {
+    g_menu.Title("Extra settings");
+    g_menu.Subtitle("");
 
-    g_menu.BoolOption("Display info", g_settings.Debug.DisplayInfo,
-        { "Show all detailed technical info of the gearbox and inputs calculations." });
-    g_menu.BoolOption("Display car wheel info", g_settings.Debug.DisplayWheelInfo,
-        { "Show per-wheel debug info with off-ground detection, lockup detection and suspension info." });
-    g_menu.BoolOption("Display gearing info", g_settings.Debug.DisplayGearingInfo,
-        { "Show gear ratios and shift points from auto mode." });
-    g_menu.BoolOption("Display force feedback lines", g_settings.Debug.DisplayFFBInfo,
-        { "Show lines detailing force feedback direction and force.",
-            "Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction" });
-    g_menu.BoolOption("Show NPC info", g_settings.Debug.DisplayNPCInfo,
-        { "Show vehicle info of NPC vehicles near you." });
-    g_menu.BoolOption("Disable input detection", g_settings.Debug.DisableInputDetect,
-        { "Allows for manual input selection." });
-    g_menu.BoolOption("Disable player hiding", g_settings.Debug.DisablePlayerHide, 
-        { "Disables toggling player visibility by script.",
-            "Use this when some other script controls visibility." });
+    g_menu.MenuOption("Debug settings", "debugmenu");
+
     g_menu.MenuOption("Metrics settings", "metricsmenu", 
         { "Show the G-Force graph and speed timers." });
+
     g_menu.MenuOption("Performance settings", "perfmenu",
         { "Every tick AI is also updated, which might impact performance." });
+
+    g_menu.MenuOption("Compatibility settings", "compatmenu");
+
+    g_menu.BoolOption("Disable input detection", g_settings.Debug.DisableInputDetect,
+        { "Allows for manual input selection." });
+
+    g_menu.BoolOption("Disable player hiding", g_settings.Debug.DisablePlayerHide,
+        { "Disables toggling player visibility by script.",
+            "Use this when some other script controls visibility." });
+
     g_menu.BoolOption("Enable update check", g_settings.Update.EnableUpdate,
         { "Check for mod updates."});
 
@@ -1458,9 +1458,39 @@ void update_debugmenu() {
     }
 }
 
+void update_debugmenu() {
+    g_menu.Title("Debug settings");
+    g_menu.Subtitle("");
+
+    g_menu.BoolOption("Display debug info", g_settings.Debug.DisplayInfo,
+        { "Show all detailed technical info of the gearbox and inputs calculations." });
+    g_menu.BoolOption("Display car wheel info", g_settings.Debug.DisplayWheelInfo,
+        { "Show per-wheel debug info with off-ground detection, lockup detection and suspension info." });
+    g_menu.BoolOption("Display gearing info", g_settings.Debug.DisplayGearingInfo,
+        { "Show gear ratios and shift points from auto mode." });
+    g_menu.BoolOption("Display force feedback lines", g_settings.Debug.DisplayFFBInfo,
+        { "Show lines detailing force feedback direction and force.",
+            "Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction" });
+    g_menu.BoolOption("Show NPC info", g_settings.Debug.DisplayNPCInfo,
+        { "Show vehicle info of NPC vehicles near you." });
+}
+
+void update_compatmenu() {
+    g_menu.Title("Compatibility settings");
+    g_menu.Subtitle("");
+
+    g_menu.BoolOption("Enable dashboard extensions", g_settings.Misc.DashExtensions,
+        { "If DashHook is installed, allows lighting the ABS light." });
+
+    if (g_menu.BoolOption("Enable UDP telemetry", g_settings.Misc.UDPTelemetry,
+        { "Allows programs like SimHub to use data from this script." })) {
+        StartUDPTelemetry();
+    }
+}
+
 void update_metricsmenu() {
     g_menu.Title("Metrics settings");
-    g_menu.Subtitle("Performance tools");
+    g_menu.Subtitle("");
 
     g_menu.BoolOption("Display G force meter", g_settings.Debug.Metrics.GForce.Enable,
         { "Show a graph with G forces.", 
@@ -1518,14 +1548,14 @@ void update_menu() {
     /* mainmenu -> controlsmenu */
     if (g_menu.CurrentMenu("controlsmenu")) { update_controlsmenu(); }
 
-    /* mainmenu -> controlsmenu -> controlleroptionsmenu */
-    if (g_menu.CurrentMenu("controlleroptionsmenu")) { update_controlleroptionsmenu(); }
-
-    /* mainmenu -> controlsmenu -> legacycontrollermenu */
-    if (g_menu.CurrentMenu("legacycontrollermenu")) { update_legacycontrollermenu(); }
-
-    /* mainmenu -> controlsmenu -> controllerbindingsmenu */
+    /* mainmenu -> controlsmenu -> controllermenu */
     if (g_menu.CurrentMenu("controllermenu")) { update_controllermenu(); }
+
+    /* mainmenu -> controlsmenu -> controllermenu -> controllerbindingsnativemenu */
+    if (g_menu.CurrentMenu("controllerbindingsnativemenu")) { update_controllerbindingsnativemenu(); }
+
+    /* mainmenu -> controlsmenu -> controllermenu -> controllerbindingsxinputmenu */
+    if (g_menu.CurrentMenu("controllerbindingsxinputmenu")) { update_controllerbindingsxinputmenu(); }
 
     /* mainmenu -> controlsmenu -> keyboardmenu */
     if (g_menu.CurrentMenu("keyboardmenu")) { update_keyboardmenu(); }
@@ -1533,19 +1563,19 @@ void update_menu() {
     /* mainmenu -> controlsmenu -> steeringassistmenu */
     if (g_menu.CurrentMenu("steeringassistmenu")) { update_steeringassistmenu(); }
 
-    /* mainmenu -> wheelmenu */
+    /* mainmenu -> controlsmenu -> wheelmenu */
     if (g_menu.CurrentMenu("wheelmenu")) { update_wheelmenu(); }
 
-    /* mainmenu -> wheelmenu -> anglemenu */
+    /* mainmenu -> controlsmenu -> wheelmenu -> anglemenu */
     if (g_menu.CurrentMenu("anglemenu")) { update_anglemenu(); }
 
-    /* mainmenu -> wheelmenu -> axesmenu */
+    /* mainmenu -> controlsmenu -> wheelmenu -> axesmenu */
     if (g_menu.CurrentMenu("axesmenu")) { update_axesmenu(); }
 
-    /* mainmenu -> wheelmenu -> forcefeedbackmenu */
+    /* mainmenu -> controlsmenu -> wheelmenu -> forcefeedbackmenu */
     if (g_menu.CurrentMenu("forcefeedbackmenu")) { update_forcefeedbackmenu(); }
 
-    /* mainmenu -> wheelmenu -> buttonsmenu */
+    /* mainmenu -> controlsmenu -> wheelmenu -> buttonsmenu */
     if (g_menu.CurrentMenu("buttonsmenu")) { update_buttonsmenu(); }
 
     /* mainmenu -> hudmenu */
@@ -1575,14 +1605,20 @@ void update_menu() {
     /* mainmenu -> gameassistmenu */
     if (g_menu.CurrentMenu("gameassistmenu")) { update_gameassistmenu(); }
 
-    /* mainmenu -> debugmenu */
+    /* mainmenu -> extrasettingsmenu */
+    if (g_menu.CurrentMenu("extrasettingsmenu")) { update_extrasettingsmenu(); }
+
+    /* mainmenu -> extrasettingsmenu -> debugmenu */
     if (g_menu.CurrentMenu("debugmenu")) { update_debugmenu(); }
 
-    /* mainmenu -> debugmenu -> metricsmenu */
+    /* mainmenu -> extrasettingsmenu -> metricsmenu */
     if (g_menu.CurrentMenu("metricsmenu")) { update_metricsmenu(); }
 
-    /* mainmenu -> debugmenu -> perfmenu */
+    /* mainmenu -> extrasettingsmenu -> perfmenu */
     if (g_menu.CurrentMenu("perfmenu")) { update_perfmenu(); }
+
+    /* mainmenu -> extrasettingsmenu -> compatmenu */
+    if (g_menu.CurrentMenu("compatmenu")) { update_compatmenu(); }
 
     g_menu.EndMenu();
 }

@@ -54,7 +54,6 @@ public:
         bool ClutchShiftH = true;
         bool ClutchShiftS = false;
         bool HardLimiter = true;
-        bool RealTurbo = true;
     } MTOptions;
 
     // [MT_PARAMS]
@@ -293,6 +292,7 @@ public:
     // [MISC]
     struct {
         bool UDPTelemetry = true;
+        bool DashExtensions = true;
     } Misc;
 
     // [UPDATE]
