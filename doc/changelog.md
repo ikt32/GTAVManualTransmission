@@ -4,7 +4,7 @@
 
 New:
 
-* Add realistic turbo fix
+* Add DashHook support
 * Add UDP telemetry support for programs like SimHub
 
 Fixes and improvements:
@@ -18,6 +18,7 @@ Fixes and improvements:
 * Change engine braking to use negative throttle instead of the brakes
 * Disable CustomSteering for boats
 * Improve CustomSteering for amphibious cars in water
+* Improve menu layout (hopefully)
 
 ## 4.7.1
 
