@@ -1,10 +1,8 @@
 #pragma once
 #include <inc/types.h>
+
 #include <cmath>
 #include <vector>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
 
 // Vector3 but double and no padding. 
 struct V3D {
