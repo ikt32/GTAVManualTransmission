@@ -204,6 +204,19 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
         auto topGear = g_ext.GetTopGear(npcVehicle);
         auto currGear = g_ext.GetGearCurr(npcVehicle);
 
+        // Shift to forward/reverse when "stuck" in the opposite gear?
+        if (currGear == 0 && g_ext.GetThrottleP(npcVehicle) > 0.2f) {
+            gearStates.Shifting = false;
+            shiftTo(gearStates, 1, true);
+            gearStates.FakeNeutral = false;
+        }
+
+        if (currGear == 1 && g_ext.GetThrottleP(npcVehicle) < -0.2f) {
+            gearStates.Shifting = false;
+            shiftTo(gearStates, 0, true);
+            gearStates.FakeNeutral = false;
+        }
+
         if (topGear == 1 || currGear == 0)
             return;
 
@@ -265,19 +278,6 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
                 shiftTo(gearStates, currGear - 1, true);
                 gearStates.FakeNeutral = false;
             }
-        }
-
-        // Shift to forward/reverse when "stuck" in the opposite gear?
-        if (currGear == 0 && g_ext.GetThrottleP(npcVehicle) > 0.2f) {
-            gearStates.Shifting = false;
-            shiftTo(gearStates, 1, true);
-            gearStates.FakeNeutral = false;
-        }
-
-        if (currGear == 1 && g_ext.GetThrottleP(npcVehicle) < -0.2f) {
-            gearStates.Shifting = false;
-            shiftTo(gearStates, 0, true);
-            gearStates.FakeNeutral = false;
         }
     }
 
