@@ -1483,7 +1483,7 @@ void update_compatmenu() {
         { "If DashHook is installed, allows lighting the ABS light." });
 
     if (g_menu.BoolOption("Enable UDP telemetry", g_settings.Misc.UDPTelemetry,
-        { "Allows programs like SimHub to use data from this script." })) {
+        { "Allows programs like SimHub to use data from this script. This script uses DIRT 4 format for telemetry data." })) {
         StartUDPTelemetry();
     }
 }
