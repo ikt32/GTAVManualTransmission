@@ -118,6 +118,14 @@ void VehicleExtensions::initOffsets() {
     turboOffset = addr == 0 ? 0 : *(int*)(addr + 4);
     logger.Write(turboOffset == 0 ? WARN : DEBUG, "Turbo Offset: 0x%X", turboOffset);
 
+    if (g_gameVersion >= G_VER_1_0_1604_0_STEAM) {
+        // TODO: pattern
+        arenaBoostOffset = turboOffset + 0x30;
+    }
+    else {
+        arenaBoostOffset = 0;
+    }
+
     addr = mem::FindPattern("\x3C\x03\x0F\x85\x00\x00\x00\x00\x48\x8B\x41\x20\x48\x8B\x88",
                             "xxxx????xxxxxxx");
     handlingOffset = addr == 0 ? 0 : *(int*)(addr + 0x16);
@@ -393,6 +401,18 @@ void VehicleExtensions::SetTurbo(Vehicle handle, float value) {
     if (turboOffset == 0) return;
     auto address = GetAddress(handle);
     *reinterpret_cast<float *>(address + turboOffset) = value;
+}
+
+float VehicleExtensions::GetArenaBoost(Vehicle handle) {
+    if (arenaBoostOffset == 0) return 0.0f;
+    auto address = GetAddress(handle);
+    return address == nullptr ? 0 : *reinterpret_cast<const float*>(address + arenaBoostOffset);
+}
+
+void VehicleExtensions::SetArenaBoost(Vehicle handle, float value) {
+    if (arenaBoostOffset == 0) return;
+    auto address = GetAddress(handle);
+    *reinterpret_cast<float*>(address + arenaBoostOffset) = value;
 }
 
 uint64_t VehicleExtensions::GetHandlingPtr(Vehicle handle) {

@@ -73,6 +73,9 @@ public:
     float GetTurbo(Vehicle handle);
     void SetTurbo(Vehicle handle, float value);
 
+    float GetArenaBoost(Vehicle handle);
+    void SetArenaBoost(Vehicle handle, float value);
+
     uint64_t GetHandlingPtr(Vehicle handle);
 
     // Steering input angle, steering lock independent
@@ -193,6 +196,7 @@ private:
     int clutchOffset = 0;
     int throttleOffset = 0;
     int turboOffset = 0;
+    int arenaBoostOffset = 0;
     int handlingOffset = 0;
     int steeringAngleInputOffset = 0;
     int steeringAngleOffset = 0;
