@@ -3,6 +3,8 @@
 
 #include <inc/natives.h>
 
+extern VehicleGearboxStates g_gearStates;
+
 void UDPTelemetry::UpdatePacket(Socket& socket, Vehicle vehicle, const VehicleData& vehData, 
     const CarControls& controls, VehicleExtensions& ext) {
     TelemetryPacket packet{};
@@ -48,6 +50,11 @@ void UDPTelemetry::UpdatePacket(Socket& socket, Vehicle vehicle, const VehicleDa
     packet.Clutch = controls.ClutchVal;
     packet.Gear = vehData.mGearCurr;
 
+    if (g_gearStates.FakeNeutral) {
+        packet.Gear = 0;
+    } else if (vehData.mGearCurr == 0) {
+        packet.Gear = 10;
+    }
     packet.LateralAcceleration = vehData.mAcceleration.x;
     packet.LongitudinalAcceleration = vehData.mAcceleration.y;
 
