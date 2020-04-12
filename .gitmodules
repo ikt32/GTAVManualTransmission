@@ -9,4 +9,4 @@
 	url = https://github.com/E66666666/GTAVMenuBase
 [submodule "thirdparty/GTAVDashHook"]
 	path = thirdparty/GTAVDashHook
-	url = git@github.com:E66666666/GTAVDashHook.git
+	url = https://github.com/E66666666/GTAVDashHook
