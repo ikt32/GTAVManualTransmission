@@ -13,6 +13,7 @@
 #include "inc/types.h"
 
 #include <algorithm>
+#include "SteeringAnim.h"
 
 extern Vehicle g_playerVehicle;
 extern Ped g_playerPed;
@@ -215,11 +216,13 @@ void CustomSteering::Update() {
 
         float corrDesiredHeading = -desiredHeading * (1.0f / limitRadians);
         float rotDeg = g_settings.CustomSteering.CustomRotationDegrees / 2.0f * corrDesiredHeading;
+        float rotDegRaw = rotDeg;
 
         // Setting angle using the g_ext calls above causes the angle to overshoot the "real" coords
         // Not sure if this is the best solution, but hey, it works!
         rotDeg -= 2.0f * rad2deg(corrDesiredHeading * g_ext.GetMaxSteeringAngle(g_playerVehicle));
 
         VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotDeg);
+        UpdateSteeringAnimations(rotDegRaw, g_settings.CustomSteering.CustomRotationDegrees);
     }
 }

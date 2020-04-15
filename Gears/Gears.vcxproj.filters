@@ -117,6 +117,7 @@
     <ClCompile Include="UDPTelemetry\UDPTelemetry.cpp">
       <Filter>UDPTelemetry</Filter>
     </ClCompile>
+    <ClCompile Include="SteeringAnim.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -305,6 +306,7 @@
     <ClInclude Include="UDPTelemetry\UDPTelemetry.h">
       <Filter>UDPTelemetry</Filter>
     </ClInclude>
+    <ClInclude Include="SteeringAnim.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

@@ -19,6 +19,7 @@
 #include "fmt/format.h"
 #include <algorithm>
 #include "Memory/VehicleBone.h"
+#include "SteeringAnim.h"
 
 extern Vehicle g_playerVehicle;
 extern Ped g_playerPed;
@@ -478,18 +479,19 @@ void WheelInput::DoSteering() {
         if (boneIdx != -1 && g_settings.Wheel.Options.SyncRotation) {
             Vector3 rotAxis{};
             rotAxis.y = 1.0f;
-            float rotDeg = g_settings.Wheel.Steering.AngleMax / 2.0f * steerValGamma;
+            float rotDeg = g_settings().Wheel.Steering.AngleMax / 2.0f * steerValGamma;
 
             // clamp
             if (abs(rotDeg) > steerClamp / 2.0f) {
                 rotDeg = std::clamp(rotDeg, -steerClamp / 2.0f, steerClamp / 2.0f);
             }
-
+            float rotDegRaw = rotDeg;
             // Setting angle using the g_ext calls above causes the angle to overshoot the "real" coords
             // Not sure if this is the best solution, but hey, it works!
             rotDeg -= 2.0f * rad2deg(std::clamp(effSteer, -1.0f, 1.0f) * g_ext.GetMaxSteeringAngle(g_playerVehicle));
 
             VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotDeg);
+            UpdateSteeringAnimations(rotDegRaw, g_settings().Wheel.Steering.AngleMax);
         }
     }
     if (g_vehData.mClass != VehicleClass::Car || altInputs){

@@ -256,9 +256,19 @@ void onMenuClose() {
     }
 }
 
+extern float g_tempSteerOffsetAnim;
+extern int g_steerAnimDictIdx;
+extern std::vector<std::string> g_steerAnimDicts;
+extern Ped g_playerPed;
+extern bool g_customAnim;
+
 void update_mainmenu() {
     g_menu.Title("Manual Transmission");
     g_menu.Subtitle(fmt::format("~b~{}", Constants::DisplayVersion));
+
+    g_menu.BoolOption("Anim", g_customAnim);
+    g_menu.FloatOption("Anim offset", g_tempSteerOffsetAnim, -0.5f, 0.5f, 0.01f);
+    g_menu.StringArray("Anim dict", g_steerAnimDicts, g_steerAnimDictIdx);
 
     if (MemoryPatcher::Error) {
         g_menu.Option("Patch test error", NativeMenu::solidRed, 
