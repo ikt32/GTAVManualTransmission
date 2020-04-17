@@ -6,6 +6,7 @@ New:
 
 * Add DashHook support
 * Add UDP telemetry support for programs like SimHub
+* Add adjustable speeds for CustomSteering
 
 Fixes and improvements:
 
@@ -16,6 +17,7 @@ Fixes and improvements:
 * Fix NPCs not shifting for forward/reverse
 * Apply TCS, ESP and ABS simultaneously
 * Change engine braking to use negative throttle instead of the brakes
+* Use system timer in CustomSteering, fixes slow steering in slowmotion/bullet time
 * Disable CustomSteering for boats
 * Improve CustomSteering for amphibious cars in water
 * Improve menu layout (hopefully)
