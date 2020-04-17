@@ -220,6 +220,37 @@ namespace {
         "UI",
         "None"
     };
+
+    bool getKbEntry(float& val) {
+        UI::Notify(INFO, "Enter value");
+        GAMEPLAY::DISPLAY_ONSCREEN_KEYBOARD(UNK::_GET_CURRENT_LANGUAGE_ID() == 0, "FMMC_KEY_TIP8", "",
+            fmt::format("{:f}", val).c_str(), "", "", "", 64);
+        while (GAMEPLAY::UPDATE_ONSCREEN_KEYBOARD() == 0) {
+            WAIT(0);
+        }
+        if (!GAMEPLAY::GET_ONSCREEN_KEYBOARD_RESULT()) {
+            UI::Notify(INFO, "Cancelled value entry");
+            return false;
+        }
+
+        std::string floatStr = GAMEPLAY::GET_ONSCREEN_KEYBOARD_RESULT();
+        if (floatStr.empty()) {
+            UI::Notify(INFO, "Cancelled value entry");
+            return false;
+        }
+
+        float parsedValue;
+        try {
+            parsedValue = std::stof(floatStr, nullptr);
+        }
+        catch (std::invalid_argument&) {
+            UI::Notify(INFO, "Failed to parse entry.");
+            return false;
+        }
+
+        val = parsedValue;
+        return true;
+    }
 }
 
 int getBlockableControlIndex(int control) {
@@ -1417,6 +1448,14 @@ void update_steeringassistmenu() {
         { "Increase/decrease steering lock.", "From InfamousSabre's Custom Steering." });
     g_menu.FloatOption("Steering gamma", g_settings.CustomSteering.Gamma, 0.01f, 2.0f, 0.01f,
         { "Change linearity of steering input." });
+    g_menu.FloatOptionCb("Steering time", g_settings.CustomSteering.SteerTime, 0.000001f, 0.90f, 0.000001f,
+        getKbEntry,
+        { "The lower the value, the faster the steering is.",
+          "Press Enter to enter a value manually." });
+    g_menu.FloatOptionCb("Centering time", g_settings.CustomSteering.CenterTime, 0.000001f, 0.99f, 0.000001f,
+        getKbEntry,
+        { "The lower the value, the faster the wheels return to center after letting go.",
+          "Press Enter to enter a value manually." });
 
     g_menu.BoolOption("Custom wheel rotation", g_settings.CustomSteering.CustomRotation, 
         { "Override GTA's default 180 degree steering with whatever you want.",
