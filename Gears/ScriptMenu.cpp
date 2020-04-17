@@ -256,10 +256,10 @@ void onMenuClose() {
     }
 }
 
+// TODO: temp
 extern float g_tempSteerOffsetAnim;
 extern int g_steerAnimDictIdx;
 extern std::vector<std::string> g_steerAnimDicts;
-extern Ped g_playerPed;
 extern bool g_customAnim;
 
 void update_mainmenu() {

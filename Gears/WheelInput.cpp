@@ -491,7 +491,7 @@ void WheelInput::DoSteering() {
             rotDeg -= 2.0f * rad2deg(std::clamp(effSteer, -1.0f, 1.0f) * g_ext.GetMaxSteeringAngle(g_playerVehicle));
 
             VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotDeg);
-            UpdateSteeringAnimations(rotDegRaw, g_settings().Wheel.Steering.AngleMax);
+            UpdateSteeringAnimations(rotDegRaw);
         }
     }
     if (g_vehData.mClass != VehicleClass::Car || altInputs){

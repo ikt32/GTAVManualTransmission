@@ -57,13 +57,13 @@ std::vector<std::string> g_steerAnimDicts{
 //  0.0  0.0  0.0  0.0  0.0   0.5  1.0  1.0  1.0  1.0  1.0 // animTime @ 180 max
 //  0.0  0.0  0.0  0.0        0.5       1.0  1.0  1.0  1.0 // animTime @ 360 max
 //  0.0  0.0                  0.5                 1.0  1.0 // animTime @ 720 max
-float figureOutAnimModulation(float wheelDegrees, float maxAnimAngle, float maxWheelAngle) {    
+float figureOutAnimModulation(float wheelDegrees, float maxAnimAngle) {    
     float animTime = map(wheelDegrees, -maxAnimAngle, maxAnimAngle, 0.0f, 1.0f);
     animTime = std::clamp(animTime, 0.01f, 0.99f);
     return animTime;
 }
 
-void UpdateSteeringAnimations(float wheelDegrees, float maxWheelAngle) {
+void UpdateSteeringAnimations(float wheelDegrees) {
     const std::string& dict = g_steerAnimDicts[g_steerAnimDictIdx];
     const bool playing = ENTITY::IS_ENTITY_PLAYING_ANIM(g_playerPed, dict.c_str(), "steer_no_lean", 3);
     if (!g_customAnim) {
@@ -79,10 +79,9 @@ void UpdateSteeringAnimations(float wheelDegrees, float maxWheelAngle) {
     }
 
     // div 2 cuz one-way angle
-    float finalSteerVal = figureOutAnimModulation(wheelDegrees, maxAnimAngle / 2.0f, maxWheelAngle / 2.0f);
+    float finalSteerVal = figureOutAnimModulation(wheelDegrees, maxAnimAngle / 2.0f);
 
     showText(0.1f, 0.00f, 0.5f, fmt::format("maxAnimAngle: {}", maxAnimAngle));
-    showText(0.1f, 0.05f, 0.5f, fmt::format("maxWheelAngle: {}", maxWheelAngle));
     showText(0.1f, 0.10f, 0.5f, fmt::format("wheelDegs: {}", wheelDegrees));
     showText(0.1f, 0.15f, 0.5f, fmt::format("finalSteerVal: {}", finalSteerVal));
 
