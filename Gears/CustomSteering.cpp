@@ -5,6 +5,7 @@
 #include "Util/MathExt.h"
 #include "Util/UIUtils.h"
 #include "Util/Util.hpp"
+#include "Util/TimeHelper.hpp"
 #include "Memory/VehicleExtensions.hpp"
 #include "Memory/VehicleBone.h"
 
@@ -22,6 +23,7 @@ extern ScriptSettings g_settings;
 
 namespace {
     float steerPrev = 0.0f;
+    long long lastTickTime = 0;
 }
 
 namespace CustomSteering {
@@ -178,19 +180,21 @@ void CustomSteering::Update() {
     float steerValGammaR = pow(steer, g_settings.CustomSteering.Gamma);
     float steerValGamma = steer < 0.0f ? -steerValGammaL : steerValGammaR;
 
-    // TODO: Other approach to smoothing input. Config transform speed.
+    float secondsSinceLastTick = static_cast<float>(milliseconds_now() - lastTickTime) / 1000.0f;
+
     if (steer == 0.0f) {
         steerCurr = lerp(
             steerPrev,
             steerValGamma,
-            1.0f - pow(0.000001f, GAMEPLAY::GET_FRAME_TIME()));
+            1.0f - pow(g_settings.CustomSteering.CenterTime, secondsSinceLastTick));
     }
     else {
         steerCurr = lerp(
             steerPrev,
             steerValGamma,
-            1.0f - pow(0.0001f, GAMEPLAY::GET_FRAME_TIME()));
+            1.0f - pow(g_settings.CustomSteering.SteerTime, secondsSinceLastTick));
     }
+    lastTickTime = milliseconds_now();
     steerPrev = steerCurr;
 
     // Ignore reduction for wet vehicles.
