@@ -149,6 +149,8 @@ public:
         float Gamma = 1.0f;
         bool CustomRotation = false;
         float CustomRotationDegrees = 900.0f;
+        float CenterTime = 0.000001f;
+        float SteerTime = 0.0001f;
     } CustomSteering;
 
     // [HUD]
