@@ -104,6 +104,7 @@ void playAnimTime(const std::string& dict, const std::string& anim, float time) 
         AI::TASK_PLAY_ANIM(g_playerPed, dict.c_str(), anim.c_str(), -8.0f, 8.0f, -1, flag, 1.0f, 0, 0, 0);
     }
     else {
+        ENTITY::SET_ENTITY_ANIM_SPEED(g_playerPed, dict.c_str(), anim.c_str(), 0.0f);
         ENTITY::SET_ENTITY_ANIM_CURRENT_TIME(g_playerPed, dict.c_str(), anim.c_str(), time);
     }
 }
