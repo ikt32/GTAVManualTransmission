@@ -62,7 +62,8 @@ void VehicleData::SetVehicle(Vehicle v) {
         mABSType = getABSType(mModelFlags);
         mWheelsTcs.resize(mExt.GetNumWheels(mVehicle));
         mWheelsAbs.resize(mExt.GetNumWheels(mVehicle));
-        mWheelsEsp.resize(mExt.GetNumWheels(mVehicle));
+        mWheelsEspO.resize(mExt.GetNumWheels(mVehicle));
+        mWheelsEspU.resize(mExt.GetNumWheels(mVehicle));
         mSuspensionTravelSpeedsHistory.clear();
         Update();
     }
