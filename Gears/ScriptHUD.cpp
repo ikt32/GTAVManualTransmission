@@ -49,7 +49,7 @@ void drawWarningLights() {
     for(int i = 0; i < g_vehData.mWheelCount; ++i) {
         abs |= g_vehData.mWheelsAbs[i];
         tcs |= g_vehData.mWheelsTcs[i];
-        esp |= g_vehData.mWheelsEsp[i];
+        esp |= g_vehData.mWheelsEspO[i] || g_vehData.mWheelsEspU[i];
     }
 
     const float size = g_settings.HUD.DashIndicators.Size;
@@ -435,7 +435,7 @@ void drawVehicleWheelInfo() {
         if (g_vehData.mWheelsTcs[i]) {
             color = Color{ 255, 255, 0, 127 };
         }
-        if (g_vehData.mWheelsEsp[i]) {
+        if (g_vehData.mWheelsEspO[i] || g_vehData.mWheelsEspU[i]) {
             color = Color{ 0, 0, 255, 127 };
         }
         if (g_vehData.mWheelsAbs[i]) {
@@ -448,12 +448,21 @@ void drawVehicleWheelInfo() {
             color = Color{ 0, 0, 0, 0 };
         }
         showDebugInfo3D(wheelCoords[i], {
-            fmt::format("[{}] {}Powered", i, g_ext.IsWheelPowered(g_playerVehicle, i) ? "~g~" : "~r~"),
-            fmt::format("Speed: \t{:.3f}", wheelsSpeed[i]),
-            //fmt::format("Compr: \t{:.3f}", wheelsCompr[i]),
-            //fmt::format("Health: \t{:.3f}", wheelsHealt[i]),
-            fmt::format("Power: \t{:.3f}", wheelsPower[i]),
-            fmt::format("Brake: \t{:.3f}", wheelsBrake[i])}, color);
+                fmt::format("[{}] {}Powered", i, g_ext.IsWheelPowered(g_playerVehicle, i) ? "~g~" : "~r~"),
+                fmt::format("Speed: \t{:.3f}", wheelsSpeed[i]),
+                //fmt::format("Compr: \t{:.3f}", wheelsCompr[i]),
+                //fmt::format("Health: \t{:.3f}", wheelsHealt[i]),
+                fmt::format("Power: \t{:.3f}", wheelsPower[i]),
+                fmt::format("Brake: \t{:.3f}", wheelsBrake[i]),
+                fmt::format("{}ABS~w~ | {}TSC~w~ | {}ESP{}", 
+                    g_vehData.mWheelsAbs[i] ? "~r~" : "",
+                    g_vehData.mWheelsTcs[i] ? "~r~" : "",
+                    g_vehData.mWheelsEspO[i] || g_vehData.mWheelsEspU[i] ? "~r~" : "",
+                    g_vehData.mWheelsEspO[i] && g_vehData.mWheelsEspU[i] ? "_O+U" 
+                        : g_vehData.mWheelsEspO[i] ? "_O" 
+                        : g_vehData.mWheelsEspU[i] ? "_U" : "")
+                }, 
+            color);
         GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
             wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z + 1.0f + 2.5f * wheelsCompr[i], 255, 0, 0, 255);
     }

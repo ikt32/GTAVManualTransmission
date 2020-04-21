@@ -1529,27 +1529,48 @@ void handleBrakePatch() {
 
             float oversteerAdd = handlingBrakeForce * oversteerComp;
 
+            float oversteerRearAdd = handlingBrakeForce * map(
+                oversteerAngleDeg, g_settings.DriveAssists.ESP.OverMax, g_settings.DriveAssists.ESP.OverMax * 2.0f,
+                g_settings.DriveAssists.ESP.OverMinComp, g_settings.DriveAssists.ESP.OverMaxComp);
+            oversteerRearAdd = std::clamp(oversteerRearAdd, 0.0f, g_settings.DriveAssists.ESP.OverMaxComp);
+
             float understeerAngleDeg(abs(rad2deg(understeerAngle)));
             float understeerComp = map(understeerAngleDeg,
                 g_settings.DriveAssists.ESP.UnderMin, g_settings.DriveAssists.ESP.UnderMax,
                 g_settings.DriveAssists.ESP.UnderMinComp, g_settings.DriveAssists.ESP.UnderMaxComp);
 
             float understeerAdd = handlingBrakeForce * understeerComp;
-            espOversteer = espOversteer && !espUndersteer;
 
-            g_ext.SetWheelBrakePressure(g_playerVehicle, 0, inpBrakeForce * bbalF + (avgAngle_ < 0.0f && espOversteer ? oversteerAdd : 0.0f));
-            g_ext.SetWheelBrakePressure(g_playerVehicle, 1, inpBrakeForce * bbalF + (avgAngle_ > 0.0f && espOversteer ? oversteerAdd : 0.0f));
-            g_ext.SetWheelBrakePressure(g_playerVehicle, 2, inpBrakeForce * bbalR + (avgAngle > 0.0f && espUndersteer ? understeerAdd : 0.0f));
-            g_ext.SetWheelBrakePressure(g_playerVehicle, 3, inpBrakeForce * bbalR + (avgAngle < 0.0f && espUndersteer ? understeerAdd : 0.0f));
-            g_vehData.mWheelsEsp[0] = avgAngle_ < 0.0f && espOversteer ? true : false;
-            g_vehData.mWheelsEsp[1] = avgAngle_ > 0.0f && espOversteer ? true : false;
-            g_vehData.mWheelsEsp[2] = avgAngle > 0.0f && espUndersteer ? true : false;
-            g_vehData.mWheelsEsp[3] = avgAngle < 0.0f && espUndersteer ? true : false;
+            float brkFBase = inpBrakeForce * bbalF;
+            g_ext.SetWheelBrakePressure(g_playerVehicle, 0, brkFBase + (avgAngle_ < 0.0f && espOversteer ? oversteerAdd : 0.0f));
+            g_ext.SetWheelBrakePressure(g_playerVehicle, 1, brkFBase + (avgAngle_ > 0.0f && espOversteer ? oversteerAdd : 0.0f));
+
+            float brkRBase = inpBrakeForce * bbalR;
+            float brkRUnderL = (avgAngle > 0.0f && espUndersteer ? understeerAdd : 0.0f);
+            float brkRUnderR = (avgAngle < 0.0f && espUndersteer ? understeerAdd : 0.0f);
+
+            float brkROverL = (avgAngle_ < 0.0f && espOversteer ? oversteerRearAdd : 0.0f);
+            float brkROverR = (avgAngle_ > 0.0f && espOversteer ? oversteerRearAdd : 0.0f);
+
+            g_ext.SetWheelBrakePressure(g_playerVehicle, 2, brkRBase + brkRUnderL + brkROverL);
+            g_ext.SetWheelBrakePressure(g_playerVehicle, 3, brkRBase + brkRUnderR + brkROverR);
+
+            g_vehData.mWheelsEspO[0] = avgAngle_ < 0.0f && espOversteer ? true : false;
+            g_vehData.mWheelsEspO[1] = avgAngle_ > 0.0f && espOversteer ? true : false;
+            g_vehData.mWheelsEspU[2] = avgAngle > 0.0f && espUndersteer ? true : false;
+            g_vehData.mWheelsEspU[3] = avgAngle < 0.0f && espUndersteer ? true : false;
+
+            g_vehData.mWheelsEspO[2] = avgAngle_ < 0.0f && oversteerRearAdd > 0.0f ? true : false;
+            g_vehData.mWheelsEspO[3] = avgAngle_ > 0.0f && oversteerRearAdd > 0.0f ? true : false;
 
             if (g_settings.Debug.DisplayInfo) {
                 std::string         espString;
-                if (espUndersteer)  espString = "U";
-                else                espString = "O";
+                if (espOversteer && espUndersteer)
+                    espString = "O+U";
+                else if (espOversteer)
+                    espString = "O";
+                else if (espUndersteer)
+                    espString = "U";
                 showText(0.45, 0.75, 1.0, fmt::format("~r~(ESP_{})", espString));
             }
         }
@@ -1594,7 +1615,8 @@ void handleBrakePatch() {
         }
         for (int i = 0; i < g_vehData.mWheelCount; i++) {
             g_vehData.mWheelsAbs[i] = false;
-            g_vehData.mWheelsEsp[i] = false;
+            g_vehData.mWheelsEspO[i] = false;
+            g_vehData.mWheelsEspU[i] = false;
         }
     }
     if (!patchThrottle) {
