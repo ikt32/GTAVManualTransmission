@@ -16,7 +16,10 @@ public:
     struct {
         // Only ShiftMode should be changed on-the-fly
         EShiftMode ShiftMode = EShiftMode::Sequential;
+
         bool ClutchCreep = false;
+        bool ClutchShiftH = true;
+        bool ClutchShiftS = false;
     } MTOptions;
 
     // [MT_PARAMS]

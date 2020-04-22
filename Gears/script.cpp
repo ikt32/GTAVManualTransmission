@@ -694,7 +694,7 @@ void shiftTo(int gear, bool autoClutch) {
 void functionHShiftTo(int i) {
     bool shiftPass;
 
-    bool checkShift = g_settings.MTOptions.ClutchShiftH && g_vehData.mHasClutch;
+    bool checkShift = g_settings().MTOptions.ClutchShiftH && g_vehData.mHasClutch;
 
     // shifting from neutral into gear is OK when rev matched
     float expectedRPM = g_vehData.mWheelAverageDrivenTyreSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[i]);
@@ -857,7 +857,7 @@ void functionSShift() {
         }
 
         // Shift block /w clutch shifting for seq.
-        if (g_settings.MTOptions.ClutchShiftS && 
+        if (g_settings().MTOptions.ClutchShiftS && 
             !isClutchPressed()) {
             return;
         }
@@ -898,7 +898,7 @@ void functionSShift() {
         }
 
         // Shift block /w clutch shifting for seq.
-        if (g_settings.MTOptions.ClutchShiftS &&
+        if (g_settings().MTOptions.ClutchShiftS &&
             !isClutchPressed()) {
             return;
         }

@@ -21,6 +21,8 @@ Plate = TOFU FUJIWARA
 [MT_OPTIONS]
 ShiftMode = 1
 ClutchCatching = true
+ClutchShiftingH = true
+ClutchShiftingS = false
 
 [MT_PARAMS]
 ClutchCatchpoint = 0.250000

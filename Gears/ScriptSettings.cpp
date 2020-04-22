@@ -36,6 +36,8 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
 
     localSettings.MTOptions.ShiftMode = activeConfig->MTOptions.ShiftMode;
     localSettings.MTOptions.ClutchCreep = activeConfig->MTOptions.ClutchCreep;
+    localSettings.MTOptions.ClutchShiftH = activeConfig->MTOptions.ClutchShiftH;
+    localSettings.MTOptions.ClutchShiftS = activeConfig->MTOptions.ClutchShiftS;
 
     localSettings.MTParams.EngBrakePower      = activeConfig->MTParams.EngBrakePower    ;
     localSettings.MTParams.EngBrakeThreshold  = activeConfig->MTParams.EngBrakeThreshold;
