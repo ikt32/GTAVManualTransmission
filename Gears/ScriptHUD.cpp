@@ -59,29 +59,76 @@ void drawWarningLights() {
     const float XPos = g_settings.HUD.DashIndicators.XPos;
     const float YPos = g_settings.HUD.DashIndicators.YPos;
 
+    Util::ColorF absColor{};
+    if (g_settings().DriveAssists.ABS.Enable) {
+        if (abs) {
+            absColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+        }
+        else {
+            absColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+        }
+    }
+    else {
+        absColor.A = 0.0f;
+    }
+
     drawTexture(g_textureAbsId, 0, -9998, 100,
         txSz, txSz,
         0.5f, 0.5f, // center of texture
         XPos - 0.045f * size, YPos,
-        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, abs ? 1.0f : 0.0f);
+        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), absColor.R, absColor.G, absColor.B, absColor.A);
+
+    Util::ColorF tcsColor{};
+    if (g_settings().DriveAssists.TCS.Enable) {
+        if (tcs) {
+            tcsColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+        }
+        else {
+            tcsColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+        }
+    }
+    else {
+        tcsColor.A = 0.0f;
+    }
 
     drawTexture(g_textureTcsId, 0, -9998, 100,
         txSz, txSz,
         0.5f, 0.5f, // center of texture
         XPos - 0.015f * size, YPos,
-        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, tcs ? 1.0f : 0.0f);
+        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), tcsColor.R, tcsColor.G, tcsColor.B, tcsColor.A);
+
+    Util::ColorF espColor{};
+    if (g_settings().DriveAssists.ESP.Enable) {
+        if (esp) {
+            espColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+        }
+        else {
+            espColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+        }
+    }
+    else {
+        espColor.A = 0.0f;
+    }
 
     drawTexture(g_textureEspId, 0, -9998, 100,
         txSz, txSz,
         0.5f, 0.5f, // center of texture
         XPos + 0.015f * size, YPos,
-        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, esp ? 1.0f : 0.0f);
+        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), espColor.R, espColor.G, espColor.B, espColor.A);
+
+    Util::ColorF brkColor;
+    if (tcs) {
+        brkColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+    }
+    else {
+        brkColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+    }
 
     drawTexture(g_textureBrkId, 0, -9998, 100,
         txSz, txSz,
         0.5f, 0.5f, // center of texture
         XPos + 0.045f * size, YPos,
-        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, brk ? 1.0f : 0.0f);
+        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), brkColor.R, brkColor.G, brkColor.B, brkColor.A);
 
     GRAPHICS::DRAW_RECT(XPos, YPos,
         rectSzX, rectSzY,
