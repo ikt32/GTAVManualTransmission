@@ -15,7 +15,7 @@ namespace {
     }
 }
 
-void showText(float x, float y, float scale, const std::string &text, int font, const Color &rgba, bool outline) {
+void showText(float x, float y, float scale, const std::string &text, int font, const Util::ColorI &rgba, bool outline) {
     UI::SET_TEXT_FONT(font);
     UI::SET_TEXT_SCALE(scale, scale);
     UI::SET_TEXT_COLOUR(rgba.R, rgba.G, rgba.B, rgba.A);
@@ -27,7 +27,7 @@ void showText(float x, float y, float scale, const std::string &text, int font, 
     UI::END_TEXT_COMMAND_DISPLAY_TEXT(x, y);
 }
 
-void showDebugInfo3D(Vector3 location, const std::vector<std::string> &textLines, Color backgroundColor, Color fontColor) {
+void showDebugInfo3D(Vector3 location, const std::vector<std::string> &textLines, Util::ColorI backgroundColor, Util::ColorI fontColor) {
     float height = 0.0125f;
 
     GRAPHICS::SET_DRAW_ORIGIN(location.x, location.y, location.z, 0);
@@ -49,7 +49,7 @@ void showDebugInfo3D(Vector3 location, const std::vector<std::string> &textLines
     GRAPHICS::CLEAR_DRAW_ORIGIN();
 }
 
-void showDebugInfo3DColors(Vector3 location, const std::vector<std::pair<std::string, Color>> &textLines, Color backgroundColor) {
+void showDebugInfo3DColors(Vector3 location, const std::vector<std::pair<std::string, Util::ColorI>> &textLines, Util::ColorI backgroundColor) {
     float height = 0.0125f;
 
     GRAPHICS::SET_DRAW_ORIGIN(location.x, location.y, location.z, 0);
@@ -98,7 +98,7 @@ void showSubtitle(const std::string &message, int duration) {
     UI::END_TEXT_COMMAND_PRINT(duration, 1);
 }
 
-void drawSphere(Vector3 p, float scale, Color c) {
+void drawSphere(Vector3 p, float scale, Util::ColorI c) {
     GRAPHICS::DRAW_MARKER(eMarkerType::MarkerTypeDebugSphere,
                           p.x, p.y, p.z,
                           0.0f, 0.0f, 0.0f,

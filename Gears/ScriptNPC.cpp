@@ -70,13 +70,13 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
         if (dist < searchdist || playerPassenger) {
             float meCloseness = pow(2.0f * (searchdist - dist) / searchdist, 2.0f);
             int drawAlpha = std::min(static_cast<int>(255 * latDist * meCloseness), 255);
-            Color bgColor = transparentGray;
-            Color fgColor = solidWhite;
+            Util::ColorI bgColor = Util::ColorsI::TransparentGray;
+            Util::ColorI fgColor = Util::ColorsI::SolidWhite;
             if (drawAlpha < bgColor.A) bgColor.A = drawAlpha;
             if (drawAlpha < fgColor.A) fgColor.A = drawAlpha;
             auto plate = VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(npcVehicle);
 
-            Color thColor = fgColor;
+            Util::ColorI thColor = fgColor;
             float throttle = g_ext.GetThrottleP(npcVehicle);
 
             if (throttle >= 0.0f) {
@@ -88,13 +88,13 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
                 thColor.G = static_cast<int>(map(throttle, 0.0f, 1.0f, 255.0f, 0.0f));
             }
 
-            Color brColor = fgColor;
+            Util::ColorI brColor = fgColor;
             float brake = g_ext.GetBrakeP(npcVehicle);
 
             brColor.B = static_cast<int>(map(brake, 0.0f, 1.0f, 255.0f, 0.0f));
             brColor.G = static_cast<int>(map(brake, 0.0f, 1.0f, 255.0f, 0.0f));
 
-            Color rpmColor = fgColor;
+            Util::ColorI rpmColor = fgColor;
             float rpm = g_ext.GetCurrentRPM(npcVehicle);
             rpmColor.G = static_cast<int>(map(rpm, 0.0f, 1.0f, 255.0f, 165.0f));
             rpmColor.B = static_cast<int>(map(rpm, 0.0f, 1.0f, 255.0f, 0.0f));

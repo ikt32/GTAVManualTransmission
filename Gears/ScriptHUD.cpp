@@ -161,7 +161,7 @@ void drawGForces() {
     }
 }
 
-void drawRPMIndicator(float x, float y, float width, float height, Color fg, Color bg, float rpm) {
+void drawRPMIndicator(float x, float y, float width, float height, Util::ColorI fg, Util::ColorI bg, float rpm) {
     float bgpaddingx = 0.00f;
     float bgpaddingy = 0.01f;
     // background
@@ -172,23 +172,23 @@ void drawRPMIndicator(float x, float y, float width, float height, Color fg, Col
 }
 
 void drawRPMIndicator() {
-    Color background = {
+    Util::ColorI background = {
         g_settings.HUD.RPMBar.BgR,
         g_settings.HUD.RPMBar.BgG,
         g_settings.HUD.RPMBar.BgB,
         g_settings.HUD.RPMBar.BgA
     };
 
-    Color foreground = {
+    Util::ColorI foreground = {
         g_settings.HUD.RPMBar.FgR,
         g_settings.HUD.RPMBar.FgG,
         g_settings.HUD.RPMBar.FgB,
         g_settings.HUD.RPMBar.FgA
     };
 
-    Color rpmcolor = foreground;
+    Util::ColorI rpmcolor = foreground;
     if (g_vehData.mRPM > g_settings.HUD.RPMBar.Redline) {
-        Color redline = {
+        Util::ColorI redline = {
             g_settings.HUD.RPMBar.RedlineR,
             g_settings.HUD.RPMBar.RedlineG,
             g_settings.HUD.RPMBar.RedlineB,
@@ -200,7 +200,7 @@ void drawRPMIndicator() {
     float minUpshift = g_ext.GetInitialDriveMaxFlatVel(g_playerVehicle);
     float maxUpshift = g_ext.GetDriveMaxFlatVel(g_playerVehicle);
     if (g_vehData.mRPM > map(minUpshift / ratio, 0.0f, maxUpshift / ratio, 0.0f, 1.0f)) {
-        Color rpmlimiter = {
+        Util::ColorI rpmlimiter = {
             g_settings.HUD.RPMBar.RevLimitR,
             g_settings.HUD.RPMBar.RevLimitG,
             g_settings.HUD.RPMBar.RevLimitB,
@@ -250,7 +250,7 @@ void drawSpeedoMeter() {
 
 void drawShiftModeIndicator() {
     std::string shiftModeText;
-    auto color = solidWhite;
+    auto color = Util::ColorsI::SolidWhite;
     switch (g_settings().MTOptions.ShiftMode) {
         case EShiftMode::Sequential:    shiftModeText = "S"; break;
         case EShiftMode::HPattern:      shiftModeText = "H"; break;
@@ -275,7 +275,7 @@ void drawGearIndicator() {
     else if (g_ext.GetGearCurr(g_playerVehicle) == 0) {
         gear = "R";
     }
-    Color c;
+    Util::ColorI c;
     if (g_ext.GetGearCurr(g_playerVehicle) == g_ext.GetTopGear(g_playerVehicle)) {
         c.R = g_settings.HUD.Gear.TopColorR;
         c.G = g_settings.HUD.Gear.TopColorG;
@@ -283,7 +283,7 @@ void drawGearIndicator() {
         c.A = 255;
     }
     else {
-        c = solidWhite;
+        c = Util::ColorsI::SolidWhite;
     }
     showText(g_settings.HUD.Gear.XPos, g_settings.HUD.Gear.YPos, g_settings.HUD.Gear.Size, gear, g_settings.HUD.Font, c, true);
 }
@@ -431,21 +431,21 @@ void drawVehicleWheelInfo() {
     auto wheelsPower = g_ext.GetWheelPower(g_playerVehicle);
     auto wheelsBrake = g_ext.GetWheelBrakePressure(g_playerVehicle);
     for (int i = 0; i < numWheels; i++) {
-        Color color = transparentGray;
+        Util::ColorI color = Util::ColorsI::TransparentGray;
         if (g_vehData.mWheelsTcs[i]) {
-            color = Color{ 255, 255, 0, 127 };
+            color = Util::ColorI{ 255, 255, 0, 127 };
         }
         if (g_vehData.mWheelsEspO[i] || g_vehData.mWheelsEspU[i]) {
-            color = Color{ 0, 0, 255, 127 };
+            color = Util::ColorI{ 0, 0, 255, 127 };
         }
         if (g_vehData.mWheelsAbs[i]) {
-            color = Color{ 255, 0, 0, 127 };
+            color = Util::ColorI{ 255, 0, 0, 127 };
         }
         if (g_vehData.mWheelsLockedUp[i]) {
-            color = Color{ 127, 0, 255, 127 };
+            color = Util::ColorI{ 127, 0, 255, 127 };
         }
         if (!wheelsOnGround[i]) {
-            color = Color{ 0, 0, 0, 0 };
+            color = Util::ColorI{ 0, 0, 0, 0 };
         }
         showDebugInfo3D(wheelCoords[i], {
                 fmt::format("[{}] {}Powered", i, g_ext.IsWheelPowered(g_playerVehicle, i) ? "~g~" : "~r~"),
