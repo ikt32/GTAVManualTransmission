@@ -24,6 +24,7 @@ public:
         Toggle,
         ToggleH,
         Engine,
+        SwitchAssist,
         SIZEOF_ControllerControlType
     };
 
@@ -36,6 +37,7 @@ public:
         Toggle,
         ToggleH,
         Engine,
+        SwitchAssist,
         SIZEOF_LegacyControlType
     };
 
@@ -59,7 +61,8 @@ public:
         Brake,
         Engine,
         Toggle,
-        ToggleH, 
+        ToggleH,
+        SwitchAssist,
         SIZEOF_KeyboardControlType
     };
 
@@ -100,6 +103,7 @@ public:
         AReverse,
         ANeutral,
         ADrive,
+        SwitchAssist,
         UNKNOWN,
         SIZEOF_WheelControlType
     };
@@ -261,7 +265,7 @@ public:
         if (confTag == "H9") return KBControl[static_cast<int>(KeyboardControlType::H9)];
         if (confTag == "H10") return KBControl[static_cast<int>(KeyboardControlType::H10)];
         if (confTag == "HN") return KBControl[static_cast<int>(KeyboardControlType::HN)];
-
+        if (confTag == "SwitchAssist") return KBControl[static_cast<int>(KeyboardControlType::SwitchAssist)];
         return -1;
     }
 
@@ -274,6 +278,7 @@ public:
         if (confTag == "Engine") return ControlXbox[static_cast<int>(ControllerControlType::Engine)];
         if (confTag == "Throttle") return ControlXbox[static_cast<int>(ControllerControlType::Throttle)];
         if (confTag == "Brake") return ControlXbox[static_cast<int>(ControllerControlType::Brake)];
+        if (confTag == "SwitchAssist") return ControlXbox[static_cast<int>(ControllerControlType::SwitchAssist)];
 
         return "UNKNOWN";
     }
@@ -287,12 +292,13 @@ public:
         if (confTag == "Engine")		return LegacyControls[static_cast<int>(LegacyControlType::Engine)];
         if (confTag == "Throttle")		return LegacyControls[static_cast<int>(LegacyControlType::Throttle)];
         if (confTag == "Brake")			return LegacyControls[static_cast<int>(LegacyControlType::Brake)];
+        if (confTag == "SwitchAssist")	return LegacyControls[static_cast<int>(LegacyControlType::SwitchAssist)];
 
         return -1;
     }
 
     std::string NativeControl2Text(int nativeControl) const {
-        for (auto mapItem : LegacyControlsMap) {
+        for (const auto& mapItem : LegacyControlsMap) {
             if (mapItem.second == nativeControl) {
                 return mapItem.first;
             }
@@ -320,7 +326,8 @@ public:
         if (confTag == "RADIO_PREVIOUS"		) return WheelButton[static_cast<int>(WheelControlType::RadioPrev)];
         if (confTag == "INDICATOR_LEFT"		) return WheelButton[static_cast<int>(WheelControlType::IndicatorLeft)];
         if (confTag == "INDICATOR_RIGHT"	) return WheelButton[static_cast<int>(WheelControlType::IndicatorRight)];
-        if (confTag == "INDICATOR_HAZARD"	) return WheelButton[static_cast<int>(WheelControlType::IndicatorHazard)];
+        if (confTag == "INDICATOR_HAZARD") return WheelButton[static_cast<int>(WheelControlType::IndicatorHazard)];
+        if (confTag == "SWITCH_ASSIST") return WheelButton[static_cast<int>(WheelControlType::SwitchAssist)];
 
         return -1;
     }

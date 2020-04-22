@@ -45,7 +45,8 @@ public:
         } ABS;
 
         struct {
-            // 0 Disabled, 1 Brake, 2 Throttle (patch) 
+            bool Enable = false;
+            // 0 Brake, 1 Throttle 
             int Mode = 0;
             // tyre speed threshold, m/s
             float SlipMax = 2.5f;
