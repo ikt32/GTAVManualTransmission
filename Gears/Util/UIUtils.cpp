@@ -8,14 +8,15 @@
 namespace {
     float getStringWidth(const std::string& text, float scale, int font) {
         UI::_BEGIN_TEXT_COMMAND_WIDTH("STRING");
-        UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char*)text.c_str());
+        UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text.c_str());
         UI::SET_TEXT_FONT(font);
         UI::SET_TEXT_SCALE(scale, scale);
         return UI::_END_TEXT_COMMAND_GET_WIDTH(true);
     }
 }
 
-void showText(float x, float y, float scale, const std::string &text, int font, const Util::ColorI &rgba, bool outline) {
+void showText(float x, float y, float scale, const std::string &text, 
+    int font, const Util::ColorI &rgba, bool outline) {
     UI::SET_TEXT_FONT(font);
     UI::SET_TEXT_SCALE(scale, scale);
     UI::SET_TEXT_COLOUR(rgba.R, rgba.G, rgba.B, rgba.A);
@@ -23,11 +24,12 @@ void showText(float x, float y, float scale, const std::string &text, int font, 
     UI::SET_TEXT_CENTRE(0);
     if (outline) UI::SET_TEXT_OUTLINE();
     UI::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
-    UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char*)text.c_str());
+    UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text.c_str());
     UI::END_TEXT_COMMAND_DISPLAY_TEXT(x, y);
 }
 
-void showDebugInfo3D(Vector3 location, const std::vector<std::string> &textLines, Util::ColorI backgroundColor, Util::ColorI fontColor) {
+void showDebugInfo3D(Vector3 location, const std::vector<std::string> &textLines, 
+    const Util::ColorI& backgroundColor, const Util::ColorI& fontColor) {
     float height = 0.0125f;
 
     GRAPHICS::SET_DRAW_ORIGIN(location.x, location.y, location.z, 0);
@@ -49,7 +51,8 @@ void showDebugInfo3D(Vector3 location, const std::vector<std::string> &textLines
     GRAPHICS::CLEAR_DRAW_ORIGIN();
 }
 
-void showDebugInfo3DColors(Vector3 location, const std::vector<std::pair<std::string, Util::ColorI>> &textLines, Util::ColorI backgroundColor) {
+void showDebugInfo3DColors(Vector3 location, const std::vector<std::pair<std::string, Util::ColorI>> &textLines, 
+    const Util::ColorI& backgroundColor) {
     float height = 0.0125f;
 
     GRAPHICS::SET_DRAW_ORIGIN(location.x, location.y, location.z, 0);
@@ -77,7 +80,7 @@ void showNotification(const std::string &message, int *prevNotification) {
     }
     UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
 
-    UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char*)message.c_str());
+    UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(message.c_str());
 
     int id = UI::_DRAW_NOTIFICATION(false, false);
     if (prevNotification != nullptr) {
@@ -92,13 +95,13 @@ void showSubtitle(const std::string &message, int duration) {
 
     for (int i = 0; i < message.size(); i += maxStringLength) {
         int npos = std::min(maxStringLength, static_cast<int>(message.size()) - i);
-        UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME((char*)message.substr(i, npos).c_str());
+        UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(message.substr(i, npos).c_str());
     }
 
     UI::END_TEXT_COMMAND_PRINT(duration, 1);
 }
 
-void drawSphere(Vector3 p, float scale, Util::ColorI c) {
+void drawSphere(Vector3 p, float scale, const Util::ColorI& c) {
     GRAPHICS::DRAW_MARKER(eMarkerType::MarkerTypeDebugSphere,
                           p.x, p.y, p.z,
                           0.0f, 0.0f, 0.0f,

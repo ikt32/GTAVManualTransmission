@@ -11,13 +11,13 @@ void showText(float x, float y, float scale, const std::string &text,
     bool outline = true);
 
 void showDebugInfo3D(Vector3 location, const std::vector<std::string> &textLines,
-    Util::ColorI backgroundColor = Util::ColorsI::TransparentGray, 
-    Util::ColorI fontColor = Util::ColorsI::SolidWhite);
+    const Util::ColorI& backgroundColor = Util::ColorsI::TransparentGray,
+    const Util::ColorI& fontColor = Util::ColorsI::SolidWhite);
 
 void showDebugInfo3DColors(Vector3 location, const std::vector<std::pair<std::string, Util::ColorI>> &textLines,
-    Util::ColorI backgroundColor = Util::ColorsI::TransparentGray);
+    const Util::ColorI& backgroundColor = Util::ColorsI::TransparentGray);
 
 void showNotification(const std::string &message, int *prevNotification);
 void showSubtitle(const std::string &message, int duration = 2500);
 
-void drawSphere(Vector3 p, float scale, Util::ColorI c);
+void drawSphere(Vector3 p, float scale, const Util::ColorI& c);
