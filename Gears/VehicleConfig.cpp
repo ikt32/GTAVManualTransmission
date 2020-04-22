@@ -27,11 +27,14 @@ void VehicleConfig::loadSettings(const ScriptSettings& gSettings, const std::str
     std::string allPlates = ini.GetValue("ID", "Plate", "");
     ModelNames = StrUtil::split(allNames, ' ');
     Plates = StrUtil::split(allPlates, ' ');
+    Description = ini.GetValue("ID", "Description", "No description.");
     
     // [MT_OPTIONS]
     MTOptions.ShiftMode =
         static_cast<EShiftMode>(ini.GetLongValue("MT_OPTIONS", "ShiftMode", EToInt(gSettings.MTOptions.ShiftMode)));
     MTOptions.ClutchCreep = ini.GetBoolValue("MT_OPTIONS", "ClutchCatching", gSettings.MTOptions.ClutchCreep);
+    MTOptions.ClutchShiftH = ini.GetBoolValue("MT_OPTIONS", "ClutchShiftingH", gSettings.MTOptions.ClutchShiftH);
+    MTOptions.ClutchShiftS = ini.GetBoolValue("MT_OPTIONS", "ClutchShiftingS", gSettings.MTOptions.ClutchShiftS);
 
     // [MT_PARAMS]
     MTParams.ClutchThreshold = ini.GetDoubleValue("MT_PARAMS", "ClutchCatchpoint", gSettings.MTParams.ClutchThreshold);
@@ -45,17 +48,18 @@ void VehicleConfig::loadSettings(const ScriptSettings& gSettings, const std::str
     // [DRIVING_ASSISTS]
     DriveAssists.ABS.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "ABS", DriveAssists.ABS.Enable);
     DriveAssists.ABS.Filter = ini.GetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABS.Filter);
-    DriveAssists.TCS.Mode = ini.GetLongValue("DRIVING_ASSISTS", "TCS", DriveAssists.TCS.Mode);
+    DriveAssists.TCS.Enable = ini.GetLongValue("DRIVING_ASSISTS", "TCS", DriveAssists.TCS.Enable);
+    DriveAssists.TCS.Mode = ini.GetLongValue("DRIVING_ASSISTS", "TCSMode", DriveAssists.TCS.Mode);
     DriveAssists.TCS.SlipMax = ini.GetDoubleValue("DRIVING_ASSISTS", "TCSSlipMax", DriveAssists.TCS.SlipMax);
     DriveAssists.ESP.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "ESP", DriveAssists.ESP.Enable);
-    DriveAssists.ESP.OverMin = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMin", DriveAssists.ESP.OverMin);
-    DriveAssists.ESP.OverMax = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMax", DriveAssists.ESP.OverMax);
-    DriveAssists.ESP.OverMinComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMinComp", DriveAssists.ESP.OverMinComp);
-    DriveAssists.ESP.OverMaxComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMaxComp", DriveAssists.ESP.OverMaxComp);
-    DriveAssists.ESP.UnderMin = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMin", DriveAssists.ESP.UnderMin);
-    DriveAssists.ESP.UnderMax = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMax", DriveAssists.ESP.UnderMax);
-    DriveAssists.ESP.UnderMinComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMinComp", DriveAssists.ESP.UnderMinComp);
-    DriveAssists.ESP.UnderMaxComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMaxComp", DriveAssists.ESP.UnderMaxComp);
+    DriveAssists.ESP.OverMin = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMin", DriveAssists.ESP.OverMin);
+    DriveAssists.ESP.OverMax = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMax", DriveAssists.ESP.OverMax);
+    DriveAssists.ESP.OverMinComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMinComp", DriveAssists.ESP.OverMinComp);
+    DriveAssists.ESP.OverMaxComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMaxComp", DriveAssists.ESP.OverMaxComp);
+    DriveAssists.ESP.UnderMin = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMin", DriveAssists.ESP.UnderMin);
+    DriveAssists.ESP.UnderMax = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMax", DriveAssists.ESP.UnderMax);
+    DriveAssists.ESP.UnderMinComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMinComp", DriveAssists.ESP.UnderMinComp);
+    DriveAssists.ESP.UnderMaxComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMaxComp", DriveAssists.ESP.UnderMaxComp);
 
     // [SHIFT_OPTIONS]
     ShiftOptions.UpshiftCut = ini.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", gSettings.ShiftOptions.UpshiftCut);

@@ -120,6 +120,7 @@ namespace {
         { CarControls::WheelControlType::IndicatorHazard, "[IndicatorHazard]" },
         { CarControls::WheelControlType::Toggle         , "[ToggleMod]" },
         { CarControls::WheelControlType::ToggleH        , "[ChangeShiftMode]" },
+        { CarControls::WheelControlType::SwitchAssist   , "[SwitchAssist]" },
     };
 
     const std::vector<SFont> fonts {
@@ -133,6 +134,7 @@ namespace {
     const std::vector<std::string> buttonConfTags {
         { "TOGGLE_MOD" },
         { "CHANGE_SHIFTMODE" },
+        { "SWITCH_ASSIST" },
         { "THROTTLE_BUTTON" },
         { "BRAKE_BUTTON" },
         { "CLUTCH_BUTTON" },
@@ -156,6 +158,7 @@ namespace {
     const std::vector<STagInfo> keyboardConfTags {
         { "Toggle"   , "Toggle mod on/off"      },
         { "ToggleH"  , "Switch shift mode"      },
+        { "SwitchAssist", "Switch assist mode"  },
         { "ShiftUp"  , "Shift up"               },
         { "ShiftDown", "Shift down"             },
         { "Clutch"   , "Hold for clutch"        },
@@ -180,12 +183,13 @@ namespace {
     const std::vector<STagInfo> controllerConfTags {
         { "Toggle"     , "Toggle mod usage: hold"      },
         { "ToggleShift", "Toggle shift usage: hold"    },
+        { "SwitchAssist", "Switch assist mode" },
         { "ShiftUp"    , "Shift up usage: press"       },
         { "ShiftDown"  , "Shift down usage: press"     },
         { "Clutch"     , "Clutch usage: axis or button"},
         { "Engine"     , "Engine usage: hold"          },
         { "Throttle"   , "Throttle: axis or button"    },
-        { "Brake"      , "Brake: axis or button"       }
+        { "Brake"      , "Brake: axis or button"       },
     };
 
     const std::vector<std::string> speedoTypes {
@@ -207,7 +211,7 @@ namespace {
     };
 
     const std::vector<std::string> tcsStrings{
-        "Disabled", "Brakes", "Throttle"
+        "Brakes", "Throttle"
     };
 
     const std::vector<std::string> absStrings = {
@@ -568,6 +572,7 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
         shiftAssist = "None";
 
     std::vector<std::string> extras{
+        fmt::format("\t{}", config.Description),
         "Compatible cars:",
         fmt::format("\tModels: {}", modelNames),
         fmt::format("\tPlates: {}", plates),
@@ -1353,9 +1358,11 @@ void update_driveassistmenu() {
     g_menu.BoolOption("Only enable ABS if not present", g_settings.DriveAssists.ABS.Filter,
         { "Only enables custom ABS on cars without the ABS flag." });
 
+    g_menu.BoolOption("Enable TCS", g_settings.DriveAssists.TCS.Enable,
+        { "Script-driven traction control." });
+
     g_menu.StringArray("Traction Control mode", tcsStrings, g_settings.DriveAssists.TCS.Mode,
         { "On traction loss: ",
-            "Disabled: Do nothing",
             "Brakes: Apply brake per wheel",
             "Throttle: Cut throttle" });
 

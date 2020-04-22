@@ -11,12 +11,16 @@ public:
     // ID
     std::vector<std::string> ModelNames;
     std::vector<std::string> Plates;
+    std::string Description;
 
     // [MT_OPTIONS]
     struct {
         // Only ShiftMode should be changed on-the-fly
         EShiftMode ShiftMode = EShiftMode::Sequential;
+
         bool ClutchCreep = false;
+        bool ClutchShiftH = true;
+        bool ClutchShiftS = false;
     } MTOptions;
 
     // [MT_PARAMS]
@@ -41,7 +45,8 @@ public:
         } ABS;
 
         struct {
-            // 0 Disabled, 1 Brake, 2 Throttle (patch) 
+            bool Enable = false;
+            // 0 Brake, 1 Throttle 
             int Mode = 0;
             // tyre speed threshold, m/s
             float SlipMax = 2.5f;

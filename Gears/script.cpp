@@ -462,6 +462,61 @@ void update_manual_transmission() {
         g_settings.SaveGeneral();
     }
 
+    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::SwitchAssist) || 
+        g_controls.ButtonJustPressed(CarControls::WheelControlType::SwitchAssist) ||
+        g_controls.ButtonHeld(CarControls::ControllerControlType::SwitchAssist) ||
+        g_controls.PrevInput == CarControls::Controller && g_controls.ButtonHeld(CarControls::LegacyControlType::SwitchAssist)) {
+
+        uint8_t currMode = 0;
+        // 3: ABS + ESC + TCS
+        // 2: ABS + ESC || TSC
+        // 1: ABS
+        // 0: None!
+
+        currMode += g_settings.DriveAssists.ABS.Enable;
+        currMode += g_settings.DriveAssists.ESP.Enable;
+        currMode += g_settings.DriveAssists.TCS.Enable;
+
+        if (currMode == 0) {
+            currMode = 3;
+        }
+        else {
+            currMode = currMode - 1;
+        }
+
+        switch(currMode) {
+            case 3:
+                UI::Notify(INFO, "Assist: Switched to ABS + ESC + TCS");
+                g_settings.DriveAssists.ABS.Enable = true;
+                g_settings.DriveAssists.ESP.Enable = true;
+                g_settings.DriveAssists.TCS.Enable = true;
+                break;
+            case 2:
+                UI::Notify(INFO, "Assist: Switched to ABS + ESC");
+                g_settings.DriveAssists.ABS.Enable = true;
+                g_settings.DriveAssists.ESP.Enable = true;
+                g_settings.DriveAssists.TCS.Enable = false;
+                break;
+            case 1:
+                g_settings.DriveAssists.ABS.Enable = true;
+                g_settings.DriveAssists.ESP.Enable = false;
+                g_settings.DriveAssists.TCS.Enable = false;
+                UI::Notify(INFO, "Assist: Switched to ABS only");
+                break;
+            case 0:
+                g_settings.DriveAssists.ABS.Enable = false;
+                g_settings.DriveAssists.ESP.Enable = false;
+                g_settings.DriveAssists.TCS.Enable = false;
+                UI::Notify(INFO, "Assist: Switched to no assists");
+                break;
+            default:
+                UI::Notify(ERROR, "Assist: Switched to an invalid mode?");
+                break;
+        }
+        g_settings.SaveGeneral();
+        setVehicleConfig(g_playerVehicle);
+    }
+
     if (MemoryPatcher::NumGearboxPatched != MemoryPatcher::NumGearboxPatches) {
         MemoryPatcher::ApplyGearboxPatches();
     }
@@ -694,7 +749,7 @@ void shiftTo(int gear, bool autoClutch) {
 void functionHShiftTo(int i) {
     bool shiftPass;
 
-    bool checkShift = g_settings.MTOptions.ClutchShiftH && g_vehData.mHasClutch;
+    bool checkShift = g_settings().MTOptions.ClutchShiftH && g_vehData.mHasClutch;
 
     // shifting from neutral into gear is OK when rev matched
     float expectedRPM = g_vehData.mWheelAverageDrivenTyreSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[i]);
@@ -857,7 +912,7 @@ void functionSShift() {
         }
 
         // Shift block /w clutch shifting for seq.
-        if (g_settings.MTOptions.ClutchShiftS && 
+        if (g_settings().MTOptions.ClutchShiftS && 
             !isClutchPressed()) {
             return;
         }
@@ -898,7 +953,7 @@ void functionSShift() {
         }
 
         // Shift block /w clutch shifting for seq.
-        if (g_settings.MTOptions.ClutchShiftS &&
+        if (g_settings().MTOptions.ClutchShiftS &&
             !isClutchPressed()) {
             return;
         }
@@ -1378,7 +1433,7 @@ void handleBrakePatch() {
     
     {
         bool tractionLoss = false;
-        if (g_settings().DriveAssists.TCS.Mode != 0) {
+        if (g_settings().DriveAssists.TCS.Enable) {
             auto pows = g_ext.GetWheelPower(g_playerVehicle);
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
                 if (speeds[i] > g_vehData.mVelocity.y + g_settings().DriveAssists.TCS.SlipMax && 
@@ -1393,7 +1448,7 @@ void handleBrakePatch() {
                 tractionLoss = false;
         }
 
-        if (g_settings().DriveAssists.TCS.Mode != 0 && tractionLoss)
+        if (g_settings().DriveAssists.TCS.Enable && tractionLoss)
             useTCS = true;
     }
 
@@ -1466,7 +1521,7 @@ void handleBrakePatch() {
     float bbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasRear);
     float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
 
-    if (useTCS && g_settings().DriveAssists.TCS.Mode == 2) {
+    if (useTCS && g_settings().DriveAssists.TCS.Mode == 1) {
         CONTROLS::DISABLE_CONTROL_ACTION(2, eControl::ControlVehicleAccelerate, true);
         for (int i = 0; i < g_vehData.mWheelCount; i++) {
             if (slipped[i]) {
@@ -1487,7 +1542,7 @@ void handleBrakePatch() {
     bool patchBrake =
         useABS ||
         useESP ||
-        useTCS && g_settings().DriveAssists.TCS.Mode == 1;
+        useTCS && g_settings().DriveAssists.TCS.Mode == 0;
 
     if (g_wheelPatchStates.InduceBurnout) {
         patchThrottle = true;
@@ -1574,7 +1629,7 @@ void handleBrakePatch() {
                 showText(0.45, 0.75, 1.0, fmt::format("~r~(ESP_{})", espString));
             }
         }
-        if (useTCS && g_settings().DriveAssists.TCS.Mode == 1) {
+        if (useTCS && g_settings().DriveAssists.TCS.Mode == 0) {
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
                 if (slipped[i]) {
                     g_ext.SetWheelBrakePressure(g_playerVehicle, i,
