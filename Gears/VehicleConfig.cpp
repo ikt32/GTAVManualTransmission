@@ -51,14 +51,14 @@ void VehicleConfig::loadSettings(const ScriptSettings& gSettings, const std::str
     DriveAssists.TCS.Mode = ini.GetLongValue("DRIVING_ASSISTS", "TCS", DriveAssists.TCS.Mode);
     DriveAssists.TCS.SlipMax = ini.GetDoubleValue("DRIVING_ASSISTS", "TCSSlipMax", DriveAssists.TCS.SlipMax);
     DriveAssists.ESP.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "ESP", DriveAssists.ESP.Enable);
-    DriveAssists.ESP.OverMin = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMin", DriveAssists.ESP.OverMin);
-    DriveAssists.ESP.OverMax = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMax", DriveAssists.ESP.OverMax);
-    DriveAssists.ESP.OverMinComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMinComp", DriveAssists.ESP.OverMinComp);
-    DriveAssists.ESP.OverMaxComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMaxComp", DriveAssists.ESP.OverMaxComp);
-    DriveAssists.ESP.UnderMin = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMin", DriveAssists.ESP.UnderMin);
-    DriveAssists.ESP.UnderMax = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMax", DriveAssists.ESP.UnderMax);
-    DriveAssists.ESP.UnderMinComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMinComp", DriveAssists.ESP.UnderMinComp);
-    DriveAssists.ESP.UnderMaxComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMaxComp", DriveAssists.ESP.UnderMaxComp);
+    DriveAssists.ESP.OverMin = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMin", DriveAssists.ESP.OverMin);
+    DriveAssists.ESP.OverMax = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMax", DriveAssists.ESP.OverMax);
+    DriveAssists.ESP.OverMinComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMinComp", DriveAssists.ESP.OverMinComp);
+    DriveAssists.ESP.OverMaxComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMaxComp", DriveAssists.ESP.OverMaxComp);
+    DriveAssists.ESP.UnderMin = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMin", DriveAssists.ESP.UnderMin);
+    DriveAssists.ESP.UnderMax = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMax", DriveAssists.ESP.UnderMax);
+    DriveAssists.ESP.UnderMinComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMinComp", DriveAssists.ESP.UnderMinComp);
+    DriveAssists.ESP.UnderMaxComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMaxComp", DriveAssists.ESP.UnderMaxComp);
 
     // [SHIFT_OPTIONS]
     ShiftOptions.UpshiftCut = ini.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", gSettings.ShiftOptions.UpshiftCut);
