@@ -568,6 +568,7 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
         shiftAssist = "None";
 
     std::vector<std::string> extras{
+        fmt::format("\t{}", config.Description),
         "Compatible cars:",
         fmt::format("\tModels: {}", modelNames),
         fmt::format("\tPlates: {}", plates),

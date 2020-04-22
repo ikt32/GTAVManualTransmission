@@ -27,6 +27,7 @@ void VehicleConfig::loadSettings(const ScriptSettings& gSettings, const std::str
     std::string allPlates = ini.GetValue("ID", "Plate", "");
     ModelNames = StrUtil::split(allNames, ' ');
     Plates = StrUtil::split(allPlates, ' ');
+    Description = ini.GetValue("ID", "Description", "No description.");
     
     // [MT_OPTIONS]
     MTOptions.ShiftMode =

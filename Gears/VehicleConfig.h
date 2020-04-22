@@ -11,6 +11,7 @@ public:
     // ID
     std::vector<std::string> ModelNames;
     std::vector<std::string> Plates;
+    std::string Description;
 
     // [MT_OPTIONS]
     struct {
