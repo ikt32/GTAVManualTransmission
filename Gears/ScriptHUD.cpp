@@ -117,7 +117,7 @@ void drawWarningLights() {
         0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), espColor.R, espColor.G, espColor.B, espColor.A);
 
     Util::ColorF brkColor;
-    if (tcs) {
+    if (brk) {
         brkColor = { 1.0f, 1.0f, 1.0f, 1.0f };
     }
     else {
