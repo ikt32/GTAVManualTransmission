@@ -2,25 +2,38 @@
 
 ## 4.7.2
 
-New:
-
-* Add DashHook support
-* Add UDP telemetry support for programs like SimHub
-* Add adjustable speeds for CustomSteering
-
 Fixes and improvements:
 
-* Fix engine revving when locked up due to direction
-* Fix throttle-based TCS not firing dashboard light
-* Fix swapped up/downshift cut/blip settings in menu
-* Fix delta-gear ratio for automatic transission downshifts
-* Fix NPCs not shifting for forward/reverse
-* Apply TCS, ESP and ABS simultaneously
-* Change engine braking to use negative throttle instead of the brakes
-* Use system timer in CustomSteering, fixes slow steering in slowmotion/bullet time
-* Disable CustomSteering for boats
-* Improve CustomSteering for amphibious cars in water
-* Improve menu layout (hopefully)
+* Engine and transmission
+  * Fix engine revving when locked up due to direction
+  * Fix delta-gear ratio for automatic transission downshifts
+  * Fix NPCs not shifting for forward/reverse
+  * Change engine braking to use negative throttle instead of the brakes
+* Settings
+  * Add ClutchShift options to Vehicle Configs
+  * Add descriptions to Vehicle Configs
+  * Fix swapped up/downshift cut/blip settings in menu
+  * Fix typo for DRIVE_ASSISTS ini section
+* Driving assists
+  * Add button to switch between driving assists sets
+  * Apply TCS, ESC and ABS simultaneously
+  * Improve ESC: Also use rear wheels at large corrections
+* Custom steering
+  * Add adjustable speeds for CustomSteering
+  * Use system timer in CustomSteering, fixes slow steering in slowmotion
+  * Improve CustomSteering for amphibious cars in water
+  * Disable CustomSteering for boats
+  * Disable CustomSteering for cutscenes
+  * Fix CustomSteering deactivation timing for better ACSPatch control
+* UI
+  * Add DashHook support for ABS light
+  * Add UDP telemetry support for programs like SimHub
+  * Improve menu layout (hopefully)
+  * Show enabled but untriggered assists as black on dashboard indicators
+  * Fix throttle-based TCS not firing dashboard indicator icon
+* General
+  * Fix control acquire/release timing (CustomSteering deactivation timing)
+  * Fix controller engine on/off hold trigger
 
 ## 4.7.1
 
