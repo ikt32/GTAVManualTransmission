@@ -604,6 +604,13 @@ void update_steering() {
     bool isCar = g_vehData.mClass == VehicleClass::Car;
     bool useWheel = g_controls.PrevInput == CarControls::Wheel;
     bool customSteering = g_settings.CustomSteering.Mode > 0 && !useWheel;
+    bool hasControl = PLAYER::IS_PLAYER_CONTROL_ON(g_player) && 
+        PED::IS_PED_SITTING_IN_VEHICLE(g_playerPed, g_playerVehicle);
+
+    if (!hasControl) {
+        customSteering = false;
+        useWheel = false;
+    }
 
     if (isCar && (useWheel || customSteering)) {
         if (!MemoryPatcher::SteeringAssistPatcher.Patched())
