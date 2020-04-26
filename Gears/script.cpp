@@ -145,9 +145,8 @@ void functionDash() {
     VehicleDashboardData data{};
     DashHook_GetData(&data);
 
-    for (const auto& abs : g_vehData.mWheelsAbs) {
-        data.ABSLight |= abs;
-    }
+    bool abs = DashLights::LastAbsTime + DashLights::LightDuration >= GAMEPLAY::GET_GAME_TIMER();
+    data.ABSLight |= abs;
 
     DashHook_SetData(data);
 }
@@ -261,6 +260,8 @@ void update_hud() {
         return;
     }
 
+    updateDashLights();
+
     if (g_settings.Debug.DisplayInfo) {
         drawDebugInfo();
     }
@@ -282,7 +283,7 @@ void update_hud() {
     }
     if (g_settings.HUD.Enable && g_vehData.mDomain == VehicleDomain::Road &&
         g_settings.HUD.DashIndicators.Enable) {
-        drawWarningLights();
+        drawDashLights();
     }
 
     if (g_settings.Debug.DisplayFFBInfo) {

@@ -40,17 +40,41 @@ namespace {
     int lastT = 0;
 }
 
-void drawWarningLights() {
+namespace DashLights {
+    int LastAbsTime = 0;
+    int LastTcsTime = 0;
+    int LastEspTime = 0;
+    const int LightDuration = 300; // milliseconds
+}
+
+void updateDashLights() {
+    const int currentTime = GAMEPLAY::GET_GAME_TIMER();
+
     bool abs = false;
     bool tcs = false;
     bool esp = false;
-    bool brk = g_ext.GetHandbrake(g_playerVehicle);
 
-    for(int i = 0; i < g_vehData.mWheelCount; ++i) {
+    for (int i = 0; i < g_vehData.mWheelCount; ++i) {
         abs |= g_vehData.mWheelsAbs[i];
         tcs |= g_vehData.mWheelsTcs[i];
         esp |= g_vehData.mWheelsEspO[i] || g_vehData.mWheelsEspU[i];
     }
+
+    if (abs)
+        DashLights::LastAbsTime = currentTime;
+    if (tcs)
+        DashLights::LastTcsTime = currentTime;
+    if (esp)
+        DashLights::LastEspTime = currentTime;
+}
+
+void drawDashLights() {
+    const int currentTime = GAMEPLAY::GET_GAME_TIMER();
+
+    bool abs = DashLights::LastAbsTime + DashLights::LightDuration >= currentTime;
+    bool tcs = DashLights::LastTcsTime + DashLights::LightDuration >= currentTime;
+    bool esp = DashLights::LastEspTime + DashLights::LightDuration >= currentTime;
+    bool brk = g_ext.GetHandbrake(g_playerVehicle);
 
     const float size = g_settings.HUD.DashIndicators.Size;
     const float txSz = 0.025f * size;
