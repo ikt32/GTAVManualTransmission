@@ -321,7 +321,7 @@ void drawSpeedoMeter() {
     };
     showText(g_settings.HUD.Speedo.XPos, g_settings.HUD.Speedo.YPos, g_settings.HUD.Speedo.Size,
         formatSpeedo(g_settings.HUD.Speedo.Speedo, dashms, g_settings.HUD.Speedo.ShowUnit, g_settings.HUD.Font),
-        g_settings.HUD.Font, color);
+        g_settings.HUD.Font, color, g_settings.HUD.Outline);
 }
 
 void drawShiftModeIndicator() {
@@ -342,7 +342,8 @@ void drawShiftModeIndicator() {
         shiftModeText = "A";
         color = { 0, 126, 232, 255 };
     }
-    showText(g_settings.HUD.ShiftMode.XPos, g_settings.HUD.ShiftMode.YPos, g_settings.HUD.ShiftMode.Size, shiftModeText, g_settings.HUD.Font, color, true);
+    showText(g_settings.HUD.ShiftMode.XPos, g_settings.HUD.ShiftMode.YPos, g_settings.HUD.ShiftMode.Size, 
+        shiftModeText, g_settings.HUD.Font, color, g_settings.HUD.Outline);
 }
 
 void drawGearIndicator() {
@@ -356,19 +357,20 @@ void drawGearIndicator() {
     else if (g_ext.GetGearCurr(g_playerVehicle) == 0) {
         gear = "R";
     }
-    Util::ColorI c {
+    Util::ColorI color {
         g_settings.HUD.Gear.ColorR,
         g_settings.HUD.Gear.ColorG,
         g_settings.HUD.Gear.ColorB,
         255
     };
     if (g_ext.GetGearCurr(g_playerVehicle) == g_ext.GetTopGear(g_playerVehicle)) {
-        c.R = g_settings.HUD.Gear.TopColorR;
-        c.G = g_settings.HUD.Gear.TopColorG;
-        c.B = g_settings.HUD.Gear.TopColorB;
-        c.A = 255;
+        color.R = g_settings.HUD.Gear.TopColorR;
+        color.G = g_settings.HUD.Gear.TopColorG;
+        color.B = g_settings.HUD.Gear.TopColorB;
+        color.A = 255;
     }
-    showText(g_settings.HUD.Gear.XPos, g_settings.HUD.Gear.YPos, g_settings.HUD.Gear.Size, gear, g_settings.HUD.Font, c, true);
+    showText(g_settings.HUD.Gear.XPos, g_settings.HUD.Gear.YPos, g_settings.HUD.Gear.Size, 
+        gear, g_settings.HUD.Font, color, g_settings.HUD.Outline);
 }
 
 void drawHUD() {

@@ -204,6 +204,7 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetBoolValue("HUD", "EnableHUD", HUD.Enable);
     ini.SetBoolValue("HUD", "AlwaysHUD", HUD.Always);
     ini.SetLongValue("HUD", "HUDFont", HUD.Font);
+    ini.SetBoolValue("HUD", "Outline", HUD.Outline);
     ini.SetLongValue("HUD", "NotifyLevel", HUD.NotifyLevel);
 
     ini.SetBoolValue("HUD", "GearIndicator", HUD.Gear.Enable);
@@ -501,6 +502,7 @@ void ScriptSettings::parseSettingsGeneral() {
     HUD.Enable = ini.GetBoolValue("HUD", "EnableHUD", HUD.Enable);
     HUD.Always = ini.GetBoolValue("HUD", "AlwaysHUD", HUD.Always);
     HUD.Font = ini.GetLongValue("HUD", "HUDFont", HUD.Font);
+    HUD.Outline = ini.GetBoolValue("HUD", "Outline", HUD.Outline);
     HUD.NotifyLevel = ini.GetLongValue("HUD", "NotifyLevel", HUD.NotifyLevel);
 
     HUD.Gear.Enable = ini.GetBoolValue("HUD", "GearIndicator", HUD.Gear.Enable);

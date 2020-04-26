@@ -166,6 +166,8 @@ public:
         // 7 - Pricedown
         int Font = 4;
 
+        bool Outline = true;
+
         // Levels:
         // 0 - Debug
         // 1 - Info

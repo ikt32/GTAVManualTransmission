@@ -1221,8 +1221,10 @@ void update_hudmenu() {
         }
     }
     else {
-        g_menu.Option("Invalid font ID in settings");
+        g_menu.Option("Invalid font ID in settings!", NativeMenu::solidRed, { "Fix the font index in settings_general.ini." });
     }
+
+    g_menu.BoolOption("Outline text", g_settings.HUD.Outline);
 
     g_menu.StringArray("Notification level", notifyLevelStrings, g_settings.HUD.NotifyLevel,
         { "What kind of notifications to display.",
