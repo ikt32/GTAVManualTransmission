@@ -21,6 +21,8 @@ Plate = TOFU FUJIWARA
 [MT_OPTIONS]
 ShiftMode = 1
 ClutchCatching = true
+ClutchShiftingH = true
+ClutchShiftingS = false
 
 [MT_PARAMS]
 ClutchCatchpoint = 0.250000
@@ -32,10 +34,20 @@ EngBrakePower = 0.050000
 EngBrakeThreshold = 0.750000
 
 [DRIVING_ASSISTS]
-CustomABS = false
+ABS = false
 ABSFilter = true
-TractionControl = 0
-TCSlipMax = 2.500000
+TCS = false
+TCSMode = 1
+TCSSlipMax = 3.199999
+ESP = false
+ESPOverMin = 5.000000
+ESPOverMax = 15.000000
+ESPOverMinComp = 0.000000
+ESPOverMaxComp = 2.000000
+ESPUnderMin = 5.000000
+ESPUnderMax = 10.000000
+ESPUnderMinComp = 0.000000
+ESPUnderMaxComp = 1.000000
 
 [SHIFT_OPTIONS]
 UpshiftCut = false

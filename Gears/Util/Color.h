@@ -1,25 +1,36 @@
 #pragma once
 
-struct Color {
-    int R;
-    int G;
-    int B;
-    int A;
-};
+namespace Util {
+    struct ColorI {
+        int R;
+        int G;
+        int B;
+        int A;
+    };
 
-const Color solidWhite = { 255,	255, 255, 255 };
-const Color solidBlack = { 0, 0, 0, 255 };
+    struct ColorF {
+        float R;
+        float G;
+        float B;
+        float A;
+    };
 
-const Color solidRed = { 255, 0, 0,	255 };
-const Color solidGreen = { 0, 255, 0, 255 };
-const Color solidBlue = { 0, 0, 255, 255 };
+    namespace ColorsI {
+        const ColorI SolidWhite = { 255, 255, 255, 255 };
+        const ColorI SolidBlack = { 0, 0, 0, 255 };
 
-const Color solidPink = { 255, 0, 255, 255 };
-const Color solidYellow = { 255, 255, 0, 255 };
-const Color solidCyan = { 0, 255, 255, 255 };
+        const ColorI SolidRed = { 255, 0, 0, 255 };
+        const ColorI SolidGreen = { 0, 255, 0, 255 };
+        const ColorI SolidBlue = { 0, 0, 255, 255 };
 
-const Color solidOrange = { 255, 127, 0, 255 };
-const Color solidLime = { 127, 255, 0, 255 };
-const Color solidPurple = { 127, 0, 255, 255 };
+        const ColorI SolidPink = { 255, 0, 255, 255 };
+        const ColorI SolidYellow = { 255, 255, 0, 255 };
+        const ColorI SolidCyan = { 0, 255, 255, 255 };
 
-const Color transparentGray = { 75, 75, 75, 75 };
+        const ColorI SolidOrange = { 255, 127, 0, 255 };
+        const ColorI SolidLime = { 127, 255, 0, 255 };
+        const ColorI SolidPurple = { 127, 0, 255, 255 };
+
+        const ColorI TransparentGray = { 75, 75, 75, 75 };
+    }
+}

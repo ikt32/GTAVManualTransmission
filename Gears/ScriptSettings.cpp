@@ -36,6 +36,8 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
 
     localSettings.MTOptions.ShiftMode = activeConfig->MTOptions.ShiftMode;
     localSettings.MTOptions.ClutchCreep = activeConfig->MTOptions.ClutchCreep;
+    localSettings.MTOptions.ClutchShiftH = activeConfig->MTOptions.ClutchShiftH;
+    localSettings.MTOptions.ClutchShiftS = activeConfig->MTOptions.ClutchShiftS;
 
     localSettings.MTParams.EngBrakePower      = activeConfig->MTParams.EngBrakePower    ;
     localSettings.MTParams.EngBrakeThreshold  = activeConfig->MTParams.EngBrakeThreshold;
@@ -158,17 +160,18 @@ void ScriptSettings::SaveGeneral() const {
     // [DRIVING_ASSISTS]
     ini.SetBoolValue("DRIVING_ASSISTS", "ABS", DriveAssists.ABS.Enable);
     ini.SetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABS.Filter);
-    ini.SetLongValue("DRIVING_ASSISTS", "TCS", DriveAssists.TCS.Mode);
+    ini.SetBoolValue("DRIVING_ASSISTS", "TCS", DriveAssists.TCS.Enable);
+    ini.SetLongValue("DRIVING_ASSISTS", "TCSMode", DriveAssists.TCS.Mode);
     ini.SetDoubleValue("DRIVING_ASSISTS", "TCSSlipMax", DriveAssists.TCS.SlipMax);
     ini.SetBoolValue("DRIVING_ASSISTS", "ESP", DriveAssists.ESP.Enable);
-    ini.SetDoubleValue("DRIVING_ASSIST", "ESPOverMin", DriveAssists.ESP.OverMin);
-    ini.SetDoubleValue("DRIVING_ASSIST", "ESPOverMax", DriveAssists.ESP.OverMax);
-    ini.SetDoubleValue("DRIVING_ASSIST", "ESPOverMinComp", DriveAssists.ESP.OverMinComp);
-    ini.SetDoubleValue("DRIVING_ASSIST", "ESPOverMaxComp", DriveAssists.ESP.OverMaxComp);
-    ini.SetDoubleValue("DRIVING_ASSIST", "ESPUnderMin", DriveAssists.ESP.UnderMin);
-    ini.SetDoubleValue("DRIVING_ASSIST", "ESPUnderMax", DriveAssists.ESP.UnderMax);
-    ini.SetDoubleValue("DRIVING_ASSIST", "ESPUnderMinComp", DriveAssists.ESP.UnderMinComp);
-    ini.SetDoubleValue("DRIVING_ASSIST", "ESPUnderMaxComp", DriveAssists.ESP.UnderMaxComp);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "ESPOverMin", DriveAssists.ESP.OverMin);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "ESPOverMax", DriveAssists.ESP.OverMax);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "ESPOverMinComp", DriveAssists.ESP.OverMinComp);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "ESPOverMaxComp", DriveAssists.ESP.OverMaxComp);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "ESPUnderMin", DriveAssists.ESP.UnderMin);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "ESPUnderMax", DriveAssists.ESP.UnderMax);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "ESPUnderMinComp", DriveAssists.ESP.UnderMinComp);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "ESPUnderMaxComp", DriveAssists.ESP.UnderMaxComp);
 
     //[CUSTOM_STEERING]
     ini.SetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
@@ -445,17 +448,18 @@ void ScriptSettings::parseSettingsGeneral() {
     // [DRIVING_ASSISTS]
     DriveAssists.ABS.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "ABS", DriveAssists.ABS.Enable);
     DriveAssists.ABS.Filter = ini.GetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABS.Filter);
-    DriveAssists.TCS.Mode = ini.GetLongValue("DRIVING_ASSISTS", "TCS", DriveAssists.TCS.Mode);
+    DriveAssists.TCS.Enable = ini.GetLongValue("DRIVING_ASSISTS", "TCS", DriveAssists.TCS.Enable);
+    DriveAssists.TCS.Mode = ini.GetLongValue("DRIVING_ASSISTS", "TCSMode", DriveAssists.TCS.Mode);
     DriveAssists.TCS.SlipMax = ini.GetDoubleValue("DRIVING_ASSISTS", "TCSSlipMax", DriveAssists.TCS.SlipMax);
     DriveAssists.ESP.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "ESP", DriveAssists.ESP.Enable);
-    DriveAssists.ESP.OverMin = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMin", DriveAssists.ESP.OverMin);
-    DriveAssists.ESP.OverMax = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMax", DriveAssists.ESP.OverMax);
-    DriveAssists.ESP.OverMinComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMinComp", DriveAssists.ESP.OverMinComp);
-    DriveAssists.ESP.OverMaxComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPOverMaxComp", DriveAssists.ESP.OverMaxComp);
-    DriveAssists.ESP.UnderMin = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMin", DriveAssists.ESP.UnderMin);
-    DriveAssists.ESP.UnderMax = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMax", DriveAssists.ESP.UnderMax);
-    DriveAssists.ESP.UnderMinComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMinComp", DriveAssists.ESP.UnderMinComp);
-    DriveAssists.ESP.UnderMaxComp = ini.GetDoubleValue("DRIVING_ASSIST", "ESPUnderMaxComp", DriveAssists.ESP.UnderMaxComp);
+    DriveAssists.ESP.OverMin = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMin", DriveAssists.ESP.OverMin);
+    DriveAssists.ESP.OverMax = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMax", DriveAssists.ESP.OverMax);
+    DriveAssists.ESP.OverMinComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMinComp", DriveAssists.ESP.OverMinComp);
+    DriveAssists.ESP.OverMaxComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMaxComp", DriveAssists.ESP.OverMaxComp);
+    DriveAssists.ESP.UnderMin = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMin", DriveAssists.ESP.UnderMin);
+    DriveAssists.ESP.UnderMax = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMax", DriveAssists.ESP.UnderMax);
+    DriveAssists.ESP.UnderMinComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMinComp", DriveAssists.ESP.UnderMinComp);
+    DriveAssists.ESP.UnderMaxComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMaxComp", DriveAssists.ESP.UnderMaxComp);
 
     // [SHIFT_OPTIONS]
     ShiftOptions.UpshiftCut = ini.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
@@ -652,6 +656,8 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
         ini.GetValue("CONTROLLER", "Toggle", "UNKNOWN");
     scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ToggleH)] =
         ini.GetValue("CONTROLLER", "ToggleShift", "B");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::SwitchAssist)] = 
+        ini.GetValue("CONTROLLER", "SwitchAssist", "UNKNOWN");
 
     Controller.BlockCarControls = ini.GetBoolValue("CONTROLLER", "BlockCarControls", Controller.BlockCarControls);
     Controller.IgnoreShiftsUI = ini.GetBoolValue("CONTROLLER", "IgnoreShiftsUI", Controller.IgnoreShiftsUI);
@@ -680,6 +686,7 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
 
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Toggle)] = ini.GetLongValue("CONTROLLER_NATIVE", "Toggle", -1);
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ToggleH)] = ini.GetLongValue("CONTROLLER_NATIVE", "ToggleShift", ControlFrontendCancel);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::SwitchAssist)] = ini.GetLongValue("CONTROLLER_NATIVE", "SwitchAssist", -1);
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftUp", ControlFrontendAccept);
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftDown", ControlFrontendX);
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Clutch)] = ini.GetLongValue("CONTROLLER_NATIVE", "Clutch", ControlFrontendAxisY);
@@ -694,6 +701,8 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     // [KEYBOARD]
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Toggle)] = str2key(ini.GetValue("KEYBOARD", "Toggle", "VK_OEM_5"));
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleH)] = str2key(ini.GetValue("KEYBOARD", "ToggleH", "VK_OEM_6"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::SwitchAssist)] = str2key(ini.GetValue("KEYBOARD", "SwitchAssist", "UNKNOWN"));
+
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftUp)] = str2key(ini.GetValue("KEYBOARD", "ShiftUp", "LSHIFT"));
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftDown)] = str2key(ini.GetValue("KEYBOARD", "ShiftDown", "LCTRL"));
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Clutch)] = str2key(ini.GetValue("KEYBOARD", "Clutch", "Z"));
@@ -784,6 +793,11 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ToggleH)] =
         ini.GetLongValue("CHANGE_SHIFTMODE", "BUTTON", -1);
 
+    // [SWITCH_ASSIST]
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::SwitchAssist)] =
+        DeviceIndexToGUID(ini.GetLongValue("SWITCH_ASSIST", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::SwitchAssist)] =
+        ini.GetLongValue("SWITCH_ASSIST", "BUTTON", -1);
 
     // [STEER]
     scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Steer)] =
