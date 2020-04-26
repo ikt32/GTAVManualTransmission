@@ -213,17 +213,26 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetLongValue("HUD", "GearTopColorR", HUD.Gear.TopColorR);
     ini.SetLongValue("HUD", "GearTopColorG", HUD.Gear.TopColorG);
     ini.SetLongValue("HUD", "GearTopColorB", HUD.Gear.TopColorB);
+    ini.SetLongValue("HUD", "GearColorR", HUD.Gear.ColorR);
+    ini.SetLongValue("HUD", "GearColorG", HUD.Gear.ColorG);
+    ini.SetLongValue("HUD", "GearColorB", HUD.Gear.ColorB);
 
     ini.SetBoolValue("HUD", "ShiftModeIndicator", HUD.ShiftMode.Enable);
     ini.SetDoubleValue("HUD", "ShiftModeXpos", HUD.ShiftMode.XPos);
     ini.SetDoubleValue("HUD", "ShiftModeYpos", HUD.ShiftMode.YPos);
     ini.SetDoubleValue("HUD", "ShiftModeSize", HUD.ShiftMode.Size);
+    ini.SetLongValue("HUD", "ShiftModeColorR", HUD.ShiftMode.ColorR);
+    ini.SetLongValue("HUD", "ShiftModeColorG", HUD.ShiftMode.ColorG);
+    ini.SetLongValue("HUD", "ShiftModeColorB", HUD.ShiftMode.ColorB);
 
     ini.SetValue("HUD", "Speedo", HUD.Speedo.Speedo.c_str());
     ini.SetBoolValue("HUD", "SpeedoShowUnit", HUD.Speedo.ShowUnit);
     ini.SetDoubleValue("HUD", "SpeedoXpos", HUD.Speedo.XPos);
     ini.SetDoubleValue("HUD", "SpeedoYpos", HUD.Speedo.YPos);
     ini.SetDoubleValue("HUD", "SpeedoSize", HUD.Speedo.Size);
+    ini.SetLongValue("HUD", "SpeedoColorR", HUD.Speedo.ColorR);
+    ini.SetLongValue("HUD", "SpeedoColorG", HUD.Speedo.ColorG);
+    ini.SetLongValue("HUD", "SpeedoColorB", HUD.Speedo.ColorB);
 
     ini.SetBoolValue("HUD", "EnableRPMIndicator", HUD.RPMBar.Enable);
     ini.SetDoubleValue("HUD", "RPMIndicatorXpos", HUD.RPMBar.XPos);
@@ -501,17 +510,26 @@ void ScriptSettings::parseSettingsGeneral() {
     HUD.Gear.TopColorR = ini.GetLongValue("HUD", "GearTopColorR", HUD.Gear.TopColorR);
     HUD.Gear.TopColorG = ini.GetLongValue("HUD", "GearTopColorG", HUD.Gear.TopColorG);
     HUD.Gear.TopColorB = ini.GetLongValue("HUD", "GearTopColorB", HUD.Gear.TopColorB);
+    HUD.Gear.ColorR = ini.GetLongValue("HUD", "GearColorR", HUD.Gear.ColorR);
+    HUD.Gear.ColorG = ini.GetLongValue("HUD", "GearColorG", HUD.Gear.ColorG);
+    HUD.Gear.ColorB = ini.GetLongValue("HUD", "GearColorB", HUD.Gear.ColorB);
 
     HUD.ShiftMode.Enable = ini.GetBoolValue("HUD", "ShiftModeIndicator", true);
     HUD.ShiftMode.XPos = ini.GetDoubleValue("HUD", "ShiftModeXpos", HUD.ShiftMode.XPos);
     HUD.ShiftMode.YPos = ini.GetDoubleValue("HUD", "ShiftModeYpos", HUD.ShiftMode.YPos);
     HUD.ShiftMode.Size = ini.GetDoubleValue("HUD", "ShiftModeSize", HUD.ShiftMode.Size);
+    HUD.ShiftMode.ColorR = ini.GetLongValue("HUD", "ShiftModeColorR", HUD.ShiftMode.ColorR);
+    HUD.ShiftMode.ColorG = ini.GetLongValue("HUD", "ShiftModeColorG", HUD.ShiftMode.ColorG);
+    HUD.ShiftMode.ColorB = ini.GetLongValue("HUD", "ShiftModeColorB", HUD.ShiftMode.ColorB);
 
     HUD.Speedo.Speedo = ini.GetValue("HUD", "Speedo", HUD.Speedo.Speedo.c_str());
     HUD.Speedo.ShowUnit = ini.GetBoolValue("HUD", "SpeedoShowUnit", HUD.Speedo.ShowUnit);
     HUD.Speedo.XPos = ini.GetDoubleValue("HUD", "SpeedoXpos", HUD.Speedo.XPos);
     HUD.Speedo.YPos = ini.GetDoubleValue("HUD", "SpeedoYpos", HUD.Speedo.YPos);
     HUD.Speedo.Size = ini.GetDoubleValue("HUD", "SpeedoSize", HUD.Speedo.Size);
+    HUD.Speedo.ColorR = ini.GetLongValue("HUD", "SpeedoColorR", HUD.Speedo.ColorR);
+    HUD.Speedo.ColorG = ini.GetLongValue("HUD", "SpeedoColorG", HUD.Speedo.ColorG);
+    HUD.Speedo.ColorB = ini.GetLongValue("HUD", "SpeedoColorB", HUD.Speedo.ColorB);
 
     HUD.RPMBar.Enable = ini.GetBoolValue("HUD", "EnableRPMIndicator", HUD.RPMBar.Enable);
     HUD.RPMBar.XPos = ini.GetDoubleValue("HUD", "RPMIndicatorXpos", HUD.RPMBar.XPos);

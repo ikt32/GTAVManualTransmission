@@ -313,15 +313,25 @@ std::string formatSpeedo(std::string units, float speed, bool showUnit, int hudF
 
 void drawSpeedoMeter() {
     float dashms = g_vehData.mHasSpeedo ? g_ext.GetDashSpeed(g_playerVehicle) : abs(ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y);
-
+    const Util::ColorI color {
+        g_settings.HUD.Speedo.ColorR,
+        g_settings.HUD.Speedo.ColorG,
+        g_settings.HUD.Speedo.ColorB,
+        255
+    };
     showText(g_settings.HUD.Speedo.XPos, g_settings.HUD.Speedo.YPos, g_settings.HUD.Speedo.Size,
         formatSpeedo(g_settings.HUD.Speedo.Speedo, dashms, g_settings.HUD.Speedo.ShowUnit, g_settings.HUD.Font),
-        g_settings.HUD.Font);
+        g_settings.HUD.Font, color);
 }
 
 void drawShiftModeIndicator() {
     std::string shiftModeText;
-    auto color = Util::ColorsI::SolidWhite;
+    Util::ColorI color {
+        g_settings.HUD.ShiftMode.ColorR,
+        g_settings.HUD.ShiftMode.ColorG,
+        g_settings.HUD.ShiftMode.ColorB,
+        255
+    };
     switch (g_settings().MTOptions.ShiftMode) {
         case EShiftMode::Sequential:    shiftModeText = "S"; break;
         case EShiftMode::HPattern:      shiftModeText = "H"; break;
@@ -346,15 +356,17 @@ void drawGearIndicator() {
     else if (g_ext.GetGearCurr(g_playerVehicle) == 0) {
         gear = "R";
     }
-    Util::ColorI c;
+    Util::ColorI c {
+        g_settings.HUD.Gear.ColorR,
+        g_settings.HUD.Gear.ColorG,
+        g_settings.HUD.Gear.ColorB,
+        255
+    };
     if (g_ext.GetGearCurr(g_playerVehicle) == g_ext.GetTopGear(g_playerVehicle)) {
         c.R = g_settings.HUD.Gear.TopColorR;
         c.G = g_settings.HUD.Gear.TopColorG;
         c.B = g_settings.HUD.Gear.TopColorB;
         c.A = 255;
-    }
-    else {
-        c = Util::ColorsI::SolidWhite;
     }
     showText(g_settings.HUD.Gear.XPos, g_settings.HUD.Gear.YPos, g_settings.HUD.Gear.Size, gear, g_settings.HUD.Font, c, true);
 }

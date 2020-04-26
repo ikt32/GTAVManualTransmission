@@ -181,6 +181,9 @@ public:
             int TopColorR = 255;
             int TopColorG = 63;
             int TopColorB = 63;
+            int ColorR = 255;
+            int ColorG = 255;
+            int ColorB = 255;
         } Gear;
 
         struct {
@@ -188,6 +191,9 @@ public:
             float XPos = 0.935f;
             float YPos = 0.885f;
             float Size = 0.700f;
+            int ColorR = 255;
+            int ColorG = 255;
+            int ColorB = 255;
         } ShiftMode;
 
         struct {
@@ -197,6 +203,9 @@ public:
             float XPos = 0.860f;
             float YPos = 0.885f;
             float Size = 0.700f;
+            int ColorR = 255;
+            int ColorG = 255;
+            int ColorB = 255;
         } Speedo;
 
         struct {
