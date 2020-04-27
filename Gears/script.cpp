@@ -1139,7 +1139,7 @@ void functionAShift() {
         g_gearStates.ThrottleHang = 0.0f;
 
     float currSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
-
+    float currSpeedWorld = g_vehData.mVelocity.y;
     float nextGearMinSpeed = 0.0f; // don't care about top gear
     if (currGear < g_vehData.mGearTop) {
         nextGearMinSpeed = g_settings().AutoParams.NextGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear + 1];
@@ -1151,12 +1151,19 @@ void functionAShift() {
     g_gearStates.EngineLoad = engineLoad;
     g_gearStates.UpshiftLoad = g_settings().AutoParams.UpshiftLoad;
 
-    bool skidding = false;
-    auto skids = g_ext.GetWheelSkidSmokeEffect(g_playerVehicle);
-    for (uint8_t i = 0; i < g_vehData.mWheelCount; ++i) {
-        if (abs(skids[i]) > 3.5f && g_ext.IsWheelPowered(g_playerVehicle, i))
-            skidding = true;
+    bool skidding = abs(currSpeed - currSpeedWorld) > 3.5f;
+    if (!skidding) {
+        auto skids = g_ext.GetWheelSkidSmokeEffect(g_playerVehicle);
+        for (uint8_t i = 0; i < g_vehData.mWheelCount; ++i) {
+            if (abs(skids[i]) > 3.5f && g_ext.IsWheelPowered(g_playerVehicle, i)) {
+                skidding = true;
+                break;
+            }
+        }
     }
+
+    if (skidding)
+        return;
 
     // Shift up.
     if (currGear < g_vehData.mGearTop) {
