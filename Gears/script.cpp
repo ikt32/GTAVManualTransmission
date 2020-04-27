@@ -1213,18 +1213,34 @@ void functionClutchCatch() {
     float minSpeed = 0.2f * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
     float expectedSpeed = g_vehData.mRPM * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]) * clutchRatio;
     float actualSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
-    if (abs(actualSpeed) < abs(minSpeed) &&
-    	clutchEngaged) {
-        float throttle = map(abs(actualSpeed), 0.0f, abs(expectedSpeed), idleThrottle, 0.0f);
-    	throttle = std::clamp(throttle, 0.0f, idleThrottle);
 
-    	bool userThrottle = abs(g_controls.ThrottleVal) > idleThrottle || abs(g_controls.BrakeVal) > idleThrottle;
-    	if (!userThrottle) {
-    		if (g_vehData.mGearCurr > 0)
+    if (abs(actualSpeed) < abs(minSpeed) &&
+        clutchEngaged && !g_vehData.mHandbrake) {
+        float throttle = map(abs(actualSpeed), 0.0f, abs(expectedSpeed), idleThrottle, 0.0f);
+        throttle = std::clamp(throttle, 0.0f, idleThrottle);
+
+        bool userThrottle = abs(g_controls.ThrottleVal) > idleThrottle || abs(g_controls.BrakeVal) > idleThrottle;
+
+        bool allWheelsOnGround = true;
+        for (uint8_t i = 0; i < g_vehData.mWheelCount; ++i) {
+            if (g_vehData.mWheelsDriven[i]) {
+                allWheelsOnGround &= g_vehData.mWheelsOnGround[i];
+            }
+        }
+        if (!userThrottle && allWheelsOnGround) {
+            if (g_vehData.mGearCurr > 0)
                 Controls::SetControlADZ(ControlVehicleAccelerate, throttle, 0.25f);
-    		else
+            else
                 Controls::SetControlADZ(ControlVehicleBrake, throttle, 0.25f);
-    	}
+        }
+        else if (!userThrottle && !allWheelsOnGround) {
+            auto wheelDims = g_ext.GetWheelDimensions(g_playerVehicle);
+            for (uint8_t i = 0; i < g_vehData.mWheelCount; ++i) {
+                if (g_vehData.mWheelsDriven[i]) {
+                    g_ext.SetWheelRotationSpeed(g_playerVehicle, i, -minSpeed / wheelDims[i].TyreRadius);
+                }
+            }
+        }
     }
 }
 
