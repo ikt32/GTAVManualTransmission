@@ -190,6 +190,11 @@ void update_player() {
 
 void update_vehicle() {
     g_playerVehicle = PED::GET_VEHICLE_PED_IS_IN(g_playerPed, false);
+    bool vehAvail = Util::VehicleAvailable(g_playerVehicle, g_playerPed);
+    if (!vehAvail) {
+        g_playerVehicle = 0;
+    }
+
     // Reset vehicle stats on vehicle change (or leave)
     if (g_playerVehicle != g_lastPlayerVehicle) {
         g_peripherals = VehiclePeripherals();
@@ -201,18 +206,18 @@ void update_vehicle() {
         g_gearRattle1.Stop();
         g_gearRattle2.Stop();
     }
-    if (Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
+    if (vehAvail) {
         g_vehData.Update(); // Update before doing anything else
         functionDash();
     }
-    if (g_playerVehicle != g_lastPlayerVehicle && Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
+    if (g_playerVehicle != g_lastPlayerVehicle && vehAvail) {
         if (g_vehData.mGearTop == 1 || g_vehData.mFlags[1] & FLAG_IS_ELECTRIC)
             g_gearStates.FakeNeutral = false;
         else
             g_gearStates.FakeNeutral = g_settings.GameAssists.DefaultNeutral;
     }
 
-    if (g_settings.Debug.Metrics.EnableTimers && ENTITY::DOES_ENTITY_EXIST(g_playerVehicle)) {
+    if (g_settings.Debug.Metrics.EnableTimers && vehAvail) {
         for(auto& valueTimer : g_speedTimers) {
             float speed;
             switch(joaat(valueTimer.mUnit.c_str())) {
@@ -726,7 +731,6 @@ void setShiftMode(EShiftMode shiftMode) {
     }
 
     std::string mode = "Mode: ";
-    // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
     switch (g_settings().MTOptions.ShiftMode) {
         case EShiftMode::Sequential:    mode += "Sequential";   break;
         case EShiftMode::HPattern:      mode += "H-Pattern";    break;
