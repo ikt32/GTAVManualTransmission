@@ -344,7 +344,6 @@ void update_input_controls() {
             break;
         }
         case VehicleDomain::Water: {
-            // TODO: Option to disable for water
             wheelControlWater();
             break;
         }
@@ -1201,13 +1200,10 @@ void functionAShift() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void functionClutchCatch() {
-    // TODO: Make more subtle / use throttle?
-    const float idleThrottle = 0.24f; // TODO -> Settings?
+    const float idleThrottle = 0.24f;
 
     float clutchRatio = map(g_controls.ClutchVal, 1.0f - g_settings().MTParams.ClutchThreshold, 0.0f, 0.0f, 1.0f);
     clutchRatio = std::clamp(clutchRatio, 0.0f, 1.0f);
-
-    // TODO: Check for settings.MTOptions.ShiftMode == Automatic if anybody complains...
 
     bool clutchEngaged = !isClutchPressed();
     float minSpeed = 0.2f * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
@@ -2055,7 +2051,6 @@ void blockButtons() {
     }
 }
 
-// TODO: Proper held values from settings or something
 void startStopEngine() {
     bool prevController = g_controls.PrevInput == CarControls::Controller;
     bool prevKeyboard = g_controls.PrevInput == CarControls::Keyboard;
