@@ -145,9 +145,8 @@ void functionDash() {
     VehicleDashboardData data{};
     DashHook_GetData(&data);
 
-    for (const auto& abs : g_vehData.mWheelsAbs) {
-        data.ABSLight |= abs;
-    }
+    bool abs = DashLights::LastAbsTime + DashLights::LightDuration >= GAMEPLAY::GET_GAME_TIMER();
+    data.ABSLight |= abs;
 
     DashHook_SetData(data);
 }
@@ -191,6 +190,11 @@ void update_player() {
 
 void update_vehicle() {
     g_playerVehicle = PED::GET_VEHICLE_PED_IS_IN(g_playerPed, false);
+    bool vehAvail = Util::VehicleAvailable(g_playerVehicle, g_playerPed);
+    if (!vehAvail) {
+        g_playerVehicle = 0;
+    }
+
     // Reset vehicle stats on vehicle change (or leave)
     if (g_playerVehicle != g_lastPlayerVehicle) {
         g_peripherals = VehiclePeripherals();
@@ -202,18 +206,18 @@ void update_vehicle() {
         g_gearRattle1.Stop();
         g_gearRattle2.Stop();
     }
-    if (Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
+    if (vehAvail) {
         g_vehData.Update(); // Update before doing anything else
         functionDash();
     }
-    if (g_playerVehicle != g_lastPlayerVehicle && Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
+    if (g_playerVehicle != g_lastPlayerVehicle && vehAvail) {
         if (g_vehData.mGearTop == 1 || g_vehData.mFlags[1] & FLAG_IS_ELECTRIC)
             g_gearStates.FakeNeutral = false;
         else
             g_gearStates.FakeNeutral = g_settings.GameAssists.DefaultNeutral;
     }
 
-    if (g_settings.Debug.Metrics.EnableTimers && ENTITY::DOES_ENTITY_EXIST(g_playerVehicle)) {
+    if (g_settings.Debug.Metrics.EnableTimers && vehAvail) {
         for(auto& valueTimer : g_speedTimers) {
             float speed;
             switch(joaat(valueTimer.mUnit.c_str())) {
@@ -261,6 +265,8 @@ void update_hud() {
         return;
     }
 
+    updateDashLights();
+
     if (g_settings.Debug.DisplayInfo) {
         drawDebugInfo();
     }
@@ -282,7 +288,7 @@ void update_hud() {
     }
     if (g_settings.HUD.Enable && g_vehData.mDomain == VehicleDomain::Road &&
         g_settings.HUD.DashIndicators.Enable) {
-        drawWarningLights();
+        drawDashLights();
     }
 
     if (g_settings.Debug.DisplayFFBInfo) {
@@ -338,7 +344,6 @@ void update_input_controls() {
             break;
         }
         case VehicleDomain::Water: {
-            // TODO: Option to disable for water
             wheelControlWater();
             break;
         }
@@ -725,7 +730,6 @@ void setShiftMode(EShiftMode shiftMode) {
     }
 
     std::string mode = "Mode: ";
-    // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
     switch (g_settings().MTOptions.ShiftMode) {
         case EShiftMode::Sequential:    mode += "Sequential";   break;
         case EShiftMode::HPattern:      mode += "H-Pattern";    break;
@@ -1134,7 +1138,7 @@ void functionAShift() {
         g_gearStates.ThrottleHang = 0.0f;
 
     float currSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
-
+    float currSpeedWorld = g_vehData.mVelocity.y;
     float nextGearMinSpeed = 0.0f; // don't care about top gear
     if (currGear < g_vehData.mGearTop) {
         nextGearMinSpeed = g_settings().AutoParams.NextGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear + 1];
@@ -1146,12 +1150,19 @@ void functionAShift() {
     g_gearStates.EngineLoad = engineLoad;
     g_gearStates.UpshiftLoad = g_settings().AutoParams.UpshiftLoad;
 
-    bool skidding = false;
-    auto skids = g_ext.GetWheelSkidSmokeEffect(g_playerVehicle);
-    for (uint8_t i = 0; i < g_vehData.mWheelCount; ++i) {
-        if (abs(skids[i]) > 3.5f && g_ext.IsWheelPowered(g_playerVehicle, i))
-            skidding = true;
+    bool skidding = abs(currSpeed - currSpeedWorld) > 3.5f;
+    if (!skidding) {
+        auto skids = g_ext.GetWheelSkidSmokeEffect(g_playerVehicle);
+        for (uint8_t i = 0; i < g_vehData.mWheelCount; ++i) {
+            if (abs(skids[i]) > 3.5f && g_ext.IsWheelPowered(g_playerVehicle, i)) {
+                skidding = true;
+                break;
+            }
+        }
     }
+
+    if (skidding)
+        return;
 
     // Shift up.
     if (currGear < g_vehData.mGearTop) {
@@ -1189,30 +1200,43 @@ void functionAShift() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void functionClutchCatch() {
-    // TODO: Make more subtle / use throttle?
-    const float idleThrottle = 0.24f; // TODO -> Settings?
+    const float idleThrottle = 0.24f;
 
     float clutchRatio = map(g_controls.ClutchVal, 1.0f - g_settings().MTParams.ClutchThreshold, 0.0f, 0.0f, 1.0f);
     clutchRatio = std::clamp(clutchRatio, 0.0f, 1.0f);
-
-    // TODO: Check for settings.MTOptions.ShiftMode == Automatic if anybody complains...
 
     bool clutchEngaged = !isClutchPressed();
     float minSpeed = 0.2f * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
     float expectedSpeed = g_vehData.mRPM * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]) * clutchRatio;
     float actualSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
-    if (abs(actualSpeed) < abs(minSpeed) &&
-    	clutchEngaged) {
-        float throttle = map(abs(actualSpeed), 0.0f, abs(expectedSpeed), idleThrottle, 0.0f);
-    	throttle = std::clamp(throttle, 0.0f, idleThrottle);
 
-    	bool userThrottle = abs(g_controls.ThrottleVal) > idleThrottle || abs(g_controls.BrakeVal) > idleThrottle;
-    	if (!userThrottle) {
-    		if (g_vehData.mGearCurr > 0)
+    if (abs(actualSpeed) < abs(minSpeed) &&
+        clutchEngaged && !g_vehData.mHandbrake) {
+        float throttle = map(abs(actualSpeed), 0.0f, abs(expectedSpeed), idleThrottle, 0.0f);
+        throttle = std::clamp(throttle, 0.0f, idleThrottle);
+
+        bool userThrottle = abs(g_controls.ThrottleVal) > idleThrottle || abs(g_controls.BrakeVal) > idleThrottle;
+
+        bool allWheelsOnGround = true;
+        for (uint8_t i = 0; i < g_vehData.mWheelCount; ++i) {
+            if (g_vehData.mWheelsDriven[i]) {
+                allWheelsOnGround &= g_vehData.mWheelsOnGround[i];
+            }
+        }
+        if (!userThrottle && allWheelsOnGround) {
+            if (g_vehData.mGearCurr > 0)
                 Controls::SetControlADZ(ControlVehicleAccelerate, throttle, 0.25f);
-    		else
+            else
                 Controls::SetControlADZ(ControlVehicleBrake, throttle, 0.25f);
-    	}
+        }
+        else if (!userThrottle && !allWheelsOnGround) {
+            auto wheelDims = g_ext.GetWheelDimensions(g_playerVehicle);
+            for (uint8_t i = 0; i < g_vehData.mWheelCount; ++i) {
+                if (g_vehData.mWheelsDriven[i]) {
+                    g_ext.SetWheelRotationSpeed(g_playerVehicle, i, -minSpeed / wheelDims[i].TyreRadius);
+                }
+            }
+        }
     }
 }
 
@@ -2027,7 +2051,6 @@ void blockButtons() {
     }
 }
 
-// TODO: Proper held values from settings or something
 void startStopEngine() {
     bool prevController = g_controls.PrevInput == CarControls::Controller;
     bool prevKeyboard = g_controls.PrevInput == CarControls::Keyboard;

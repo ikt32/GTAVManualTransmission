@@ -786,6 +786,16 @@ std::vector<float> VehicleExtensions::GetWheelRotationSpeeds(Vehicle handle) {
     return speeds;
 }
 
+void VehicleExtensions::SetWheelRotationSpeed(Vehicle handle, uint8_t index, float value) {
+    if (index > GetNumWheels(handle)) return;
+    if (wheelAngularVelocityOffset == 0) return;
+
+    auto wheelPtr = GetWheelsPtr(handle);
+
+    auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * index);
+    *reinterpret_cast<float*>(wheelAddr + wheelAngularVelocityOffset) = value;
+}
+
 std::vector<float> VehicleExtensions::GetTyreSpeeds(Vehicle handle) {
     int numWheels = GetNumWheels(handle);
     std::vector<float> rotationSpeed = GetWheelRotationSpeeds(handle);

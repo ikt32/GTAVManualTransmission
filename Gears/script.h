@@ -1,5 +1,14 @@
 #pragma once
 #include "ScriptSettings.hpp"
+
+// ScriptHUD
+namespace DashLights {
+    extern int LastAbsTime;
+    extern int LastTcsTime;
+    extern int LastEspTime;
+    extern const int LightDuration; // milliseconds
+}
+
 void threadCheckUpdate(unsigned milliseconds);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -11,7 +20,8 @@ void drawDebugInfo();
 void drawGForces();
 void drawVehicleWheelInfo();
 void drawInputWheelInfo();
-void drawWarningLights();
+void updateDashLights();
+void drawDashLights();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Mod functions: Mod control
