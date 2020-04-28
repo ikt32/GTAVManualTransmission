@@ -2,18 +2,23 @@
 
 ## 4.7.2
 
-Fixes and improvements:
+Lots of small fixes and improvements! The settings files are generally
+compatible, but a `SHIFT_ASSISTS` typo fix now ignores the old
+wrongly spelled `SHIFT_ASSIST` section.
 
 * Engine and transmission
   * Fix engine revving when locked up due to direction
   * Fix delta-gear ratio for automatic transission downshifts
+  * Fix ABS affecting automatic transmission shifting
   * Fix NPCs not shifting for forward/reverse
+  * Fix clutch creep revving engine when a driven wheel is off the ground
   * Change engine braking to use negative throttle instead of the brakes
 * Settings
+  * Add UI settings to Vehicle Configs
   * Add ClutchShift options to Vehicle Configs
   * Add descriptions to Vehicle Configs
   * Fix swapped up/downshift cut/blip settings in menu
-  * Fix typo for DRIVE_ASSISTS ini section
+  * Fix typo for `DRIVE_ASSISTS` ini section
 * Driving assists
   * Add button to switch between driving assists sets
   * Apply TCS, ESC and ABS simultaneously
@@ -26,13 +31,16 @@ Fixes and improvements:
   * Disable CustomSteering for cutscenes
   * Fix CustomSteering deactivation timing for better ACSPatch control
 * UI
-  * Add DashHook support for ABS light
-  * Add UDP telemetry support for programs like SimHub
   * Improve menu layout (hopefully)
+  * Add DashHook support for ABS light
+  * Add color options for speedo, gear and shift mode UI elements
+  * Add option to turn off UI font outlines
   * Show enabled but untriggered assists as black on dashboard indicators
+  * Show triggered lights for at least 300 milliseconds before turning off
   * Fix throttle-based TCS not firing dashboard indicator icon
 * General
-  * Fix control acquire/release timing (CustomSteering deactivation timing)
+  * Add UDP telemetry support for programs like SimHub
+  * Fix control acquire/release timing (now only when ped has control of car)
   * Fix controller engine on/off hold trigger
 
 ## 4.7.1
