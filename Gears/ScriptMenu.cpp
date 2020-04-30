@@ -365,7 +365,7 @@ void update_mainmenu() {
         { "Configure controls for the script." });
 
     g_menu.MenuOption("Driving assists", "driveassistmenu",
-        { "ABS, TCS and ESP assist options for the player." });
+        { "ABS, TCS and ESC assist options for the player." });
 
     g_menu.MenuOption("Gameplay assists", "gameassistmenu",
         { "Assist to make playing a bit easier." });
@@ -1238,7 +1238,7 @@ void update_hudmenu() {
     g_menu.MenuOption("RPM Gauge", "rpmdisplaymenu");
     g_menu.MenuOption("Wheel & Pedal Info", "wheelinfomenu");
     g_menu.MenuOption("Dashboard indicators", "dashindicatormenu", 
-        { "Indicator icons for ABS, TSC, ESP and the hand brake." });
+        { "Indicator icons for ABS, TCS, ESC and the hand brake." });
 }
 
 void update_geardisplaymenu() {
@@ -1575,7 +1575,7 @@ void update_perfmenu() {
             "Disabling makes NPCs drive unpredictable and cars never shift up." });
 
     g_menu.BoolOption("Disable NPC brakes", g_settings.Debug.DisableNPCBrake,
-        { "While ABS, TCS or ESP are active, NPC braking is replaced by script.",
+        { "While ABS, TCS or ESC are active, NPC braking is replaced by script.",
             "Disabling hampers AI braking." });
 }
 
