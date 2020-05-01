@@ -155,6 +155,8 @@ public:
     std::vector<WheelDimensions> GetWheelDimensions(Vehicle handle);
     // Unit: rad/s
     std::vector<float> GetWheelRotationSpeeds(Vehicle handle);
+    // For forward, use negative speed.
+    void SetWheelRotationSpeed(Vehicle handle, uint8_t index, float value);
     // Unit: m/s, at the tyres. This probably doesn't work well for popped tyres.
     std::vector<float> GetTyreSpeeds(Vehicle handle);
 

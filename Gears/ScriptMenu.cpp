@@ -375,7 +375,7 @@ void update_mainmenu() {
         { "Configure controls for the script." });
 
     g_menu.MenuOption("Driving assists", "driveassistmenu",
-        { "ABS, TCS and ESP assist options for the player." });
+        { "ABS, TCS and ESC assist options for the player." });
 
     g_menu.MenuOption("Gameplay assists", "gameassistmenu",
         { "Assist to make playing a bit easier." });
@@ -1231,8 +1231,10 @@ void update_hudmenu() {
         }
     }
     else {
-        g_menu.Option("Invalid font ID in settings");
+        g_menu.Option("Invalid font ID in settings!", NativeMenu::solidRed, { "Fix the font index in settings_general.ini." });
     }
+
+    g_menu.BoolOption("Outline text", g_settings.HUD.Outline);
 
     g_menu.StringArray("Notification level", notifyLevelStrings, g_settings.HUD.NotifyLevel,
         { "What kind of notifications to display.",
@@ -1246,7 +1248,7 @@ void update_hudmenu() {
     g_menu.MenuOption("RPM Gauge", "rpmdisplaymenu");
     g_menu.MenuOption("Wheel & Pedal Info", "wheelinfomenu");
     g_menu.MenuOption("Dashboard indicators", "dashindicatormenu", 
-        { "Indicator icons for ABS, TSC, ESP and the hand brake." });
+        { "Indicator icons for ABS, TCS, ESC and the hand brake." });
 }
 
 void update_geardisplaymenu() {
@@ -1259,6 +1261,9 @@ void update_geardisplaymenu() {
     g_menu.FloatOption("Gear X", g_settings.HUD.Gear.XPos, 0.0f, 1.0f, 0.005f);
     g_menu.FloatOption("Gear Y", g_settings.HUD.Gear.YPos, 0.0f, 1.0f, 0.005f);
     g_menu.FloatOption("Gear Size", g_settings.HUD.Gear.Size, 0.0f, 3.0f, 0.05f);
+    g_menu.IntOption("Gear Color Red", g_settings.HUD.Gear.ColorR, 0, 255);
+    g_menu.IntOption("Gear Color Green", g_settings.HUD.Gear.ColorG, 0, 255);
+    g_menu.IntOption("Gear Color Blue", g_settings.HUD.Gear.ColorB, 0, 255);
     g_menu.IntOption("Gear Top Color Red", g_settings.HUD.Gear.TopColorR, 0, 255);
     g_menu.IntOption("Gear Top Color Green", g_settings.HUD.Gear.TopColorG, 0, 255);
     g_menu.IntOption("Gear Top Color Blue", g_settings.HUD.Gear.TopColorB, 0, 255);
@@ -1266,6 +1271,9 @@ void update_geardisplaymenu() {
     g_menu.FloatOption("Shift Mode X", g_settings.HUD.ShiftMode.XPos, 0.0f, 1.0f, 0.005f);
     g_menu.FloatOption("Shift Mode Y", g_settings.HUD.ShiftMode.YPos, 0.0f, 1.0f, 0.005f);
     g_menu.FloatOption("Shift Mode Size", g_settings.HUD.ShiftMode.Size, 0.0f, 3.0f, 0.05f);
+    g_menu.IntOption("Shift Mode Red", g_settings.HUD.ShiftMode.ColorR, 0, 255);
+    g_menu.IntOption("Shift Mode Green", g_settings.HUD.ShiftMode.ColorG, 0, 255);
+    g_menu.IntOption("Shift Mode Blue", g_settings.HUD.ShiftMode.ColorB, 0, 255);
 }
 
 void update_speedodisplaymenu() {
@@ -1283,6 +1291,10 @@ void update_speedodisplaymenu() {
     g_menu.FloatOption("Speedometer X", g_settings.HUD.Speedo.XPos, 0.0f, 1.0f, 0.005f);
     g_menu.FloatOption("Speedometer Y", g_settings.HUD.Speedo.YPos, 0.0f, 1.0f, 0.005f);
     g_menu.FloatOption("Speedometer Size", g_settings.HUD.Speedo.Size, 0.0f, 3.0f, 0.05f);
+
+    g_menu.IntOption("Speedometer Color Red", g_settings.HUD.Speedo.ColorR, 0, 255);
+    g_menu.IntOption("Speedometer Color Green", g_settings.HUD.Speedo.ColorG, 0, 255);
+    g_menu.IntOption("Speedometer Color Blue", g_settings.HUD.Speedo.ColorB, 0, 255);
 }
 
 void update_rpmdisplaymenu() {
@@ -1573,7 +1585,7 @@ void update_perfmenu() {
             "Disabling makes NPCs drive unpredictable and cars never shift up." });
 
     g_menu.BoolOption("Disable NPC brakes", g_settings.Debug.DisableNPCBrake,
-        { "While ABS, TCS or ESP are active, NPC braking is replaced by script.",
+        { "While ABS, TCS or ESC are active, NPC braking is replaced by script.",
             "Disabling hampers AI braking." });
 }
 

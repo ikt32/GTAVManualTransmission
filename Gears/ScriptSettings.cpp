@@ -94,6 +94,71 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
     localSettings.Wheel.Steering.AngleBike = activeConfig->Wheel.Steering.Angle;
     localSettings.Wheel.Steering.AngleBoat = activeConfig->Wheel.Steering.Angle;
     localSettings.Wheel.Steering.Gamma     = activeConfig->Wheel.Steering.Gamma;
+
+    // oh dear lord
+    localSettings.HUD.Enable =               activeConfig->HUD.Enable;               
+    localSettings.HUD.Font =                 activeConfig->HUD.Font;                 
+    localSettings.HUD.Outline =              activeConfig->HUD.Outline;              
+
+    localSettings.HUD.Gear.Enable =          activeConfig->HUD.Gear.Enable;          
+    localSettings.HUD.Gear.XPos =            activeConfig->HUD.Gear.XPos;            
+    localSettings.HUD.Gear.YPos =            activeConfig->HUD.Gear.YPos;            
+    localSettings.HUD.Gear.Size =            activeConfig->HUD.Gear.Size;            
+    localSettings.HUD.Gear.TopColorR =       activeConfig->HUD.Gear.TopColorR;       
+    localSettings.HUD.Gear.TopColorG =       activeConfig->HUD.Gear.TopColorG;       
+    localSettings.HUD.Gear.TopColorB =       activeConfig->HUD.Gear.TopColorB;       
+    localSettings.HUD.Gear.ColorR =          activeConfig->HUD.Gear.ColorR;          
+    localSettings.HUD.Gear.ColorG =          activeConfig->HUD.Gear.ColorG;          
+    localSettings.HUD.Gear.ColorB =          activeConfig->HUD.Gear.ColorB;          
+
+    localSettings.HUD.ShiftMode.Enable =     activeConfig->HUD.ShiftMode.Enable;     
+    localSettings.HUD.ShiftMode.XPos =       activeConfig->HUD.ShiftMode.XPos;       
+    localSettings.HUD.ShiftMode.YPos =       activeConfig->HUD.ShiftMode.YPos;       
+    localSettings.HUD.ShiftMode.Size =       activeConfig->HUD.ShiftMode.Size;       
+    localSettings.HUD.ShiftMode.ColorR =     activeConfig->HUD.ShiftMode.ColorR;     
+    localSettings.HUD.ShiftMode.ColorG =     activeConfig->HUD.ShiftMode.ColorG;     
+    localSettings.HUD.ShiftMode.ColorB =     activeConfig->HUD.ShiftMode.ColorB;     
+
+    localSettings.HUD.Speedo.Speedo =        activeConfig->HUD.Speedo.Speedo;        
+    localSettings.HUD.Speedo.ShowUnit =      activeConfig->HUD.Speedo.ShowUnit;      
+    localSettings.HUD.Speedo.XPos =          activeConfig->HUD.Speedo.XPos;          
+    localSettings.HUD.Speedo.YPos =          activeConfig->HUD.Speedo.YPos;          
+    localSettings.HUD.Speedo.Size =          activeConfig->HUD.Speedo.Size;          
+    localSettings.HUD.Speedo.ColorR =        activeConfig->HUD.Speedo.ColorR;        
+    localSettings.HUD.Speedo.ColorG =        activeConfig->HUD.Speedo.ColorG;        
+    localSettings.HUD.Speedo.ColorB =        activeConfig->HUD.Speedo.ColorB;        
+
+    localSettings.HUD.RPMBar.Enable =        activeConfig->HUD.RPMBar.Enable;        
+    localSettings.HUD.RPMBar.XPos =          activeConfig->HUD.RPMBar.XPos;          
+    localSettings.HUD.RPMBar.YPos =          activeConfig->HUD.RPMBar.YPos;          
+    localSettings.HUD.RPMBar.XSz =           activeConfig->HUD.RPMBar.XSz;           
+    localSettings.HUD.RPMBar.YSz =           activeConfig->HUD.RPMBar.YSz;           
+    localSettings.HUD.RPMBar.Redline =       activeConfig->HUD.RPMBar.Redline;       
+
+    localSettings.HUD.RPMBar.BgR =           activeConfig->HUD.RPMBar.BgR;           
+    localSettings.HUD.RPMBar.BgG =           activeConfig->HUD.RPMBar.BgG;           
+    localSettings.HUD.RPMBar.BgB =           activeConfig->HUD.RPMBar.BgB;           
+    localSettings.HUD.RPMBar.BgA =           activeConfig->HUD.RPMBar.BgA;           
+
+    localSettings.HUD.RPMBar.FgR =           activeConfig->HUD.RPMBar.FgR;           
+    localSettings.HUD.RPMBar.FgG =           activeConfig->HUD.RPMBar.FgG;           
+    localSettings.HUD.RPMBar.FgB =           activeConfig->HUD.RPMBar.FgB;           
+    localSettings.HUD.RPMBar.FgA =           activeConfig->HUD.RPMBar.FgA;           
+
+    localSettings.HUD.RPMBar.RedlineR =      activeConfig->HUD.RPMBar.RedlineR;      
+    localSettings.HUD.RPMBar.RedlineG =      activeConfig->HUD.RPMBar.RedlineG;      
+    localSettings.HUD.RPMBar.RedlineB =      activeConfig->HUD.RPMBar.RedlineB;      
+    localSettings.HUD.RPMBar.RedlineA =      activeConfig->HUD.RPMBar.RedlineA;      
+
+    localSettings.HUD.RPMBar.RevLimitR =     activeConfig->HUD.RPMBar.RevLimitR;     
+    localSettings.HUD.RPMBar.RevLimitG =     activeConfig->HUD.RPMBar.RevLimitG;     
+    localSettings.HUD.RPMBar.RevLimitB =     activeConfig->HUD.RPMBar.RevLimitB;     
+    localSettings.HUD.RPMBar.RevLimitA =     activeConfig->HUD.RPMBar.RevLimitA;     
+
+    localSettings.HUD.DashIndicators.Enable =activeConfig->HUD.DashIndicators.Enable;
+    localSettings.HUD.DashIndicators.XPos =  activeConfig->HUD.DashIndicators.XPos;  
+    localSettings.HUD.DashIndicators.YPos =  activeConfig->HUD.DashIndicators.YPos;  
+    localSettings.HUD.DashIndicators.Size =  activeConfig->HUD.DashIndicators.Size;  
 }
 
 ScriptSettings ScriptSettings::operator()() {
@@ -204,6 +269,7 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetBoolValue("HUD", "EnableHUD", HUD.Enable);
     ini.SetBoolValue("HUD", "AlwaysHUD", HUD.Always);
     ini.SetLongValue("HUD", "HUDFont", HUD.Font);
+    ini.SetBoolValue("HUD", "Outline", HUD.Outline);
     ini.SetLongValue("HUD", "NotifyLevel", HUD.NotifyLevel);
 
     ini.SetBoolValue("HUD", "GearIndicator", HUD.Gear.Enable);
@@ -213,17 +279,26 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetLongValue("HUD", "GearTopColorR", HUD.Gear.TopColorR);
     ini.SetLongValue("HUD", "GearTopColorG", HUD.Gear.TopColorG);
     ini.SetLongValue("HUD", "GearTopColorB", HUD.Gear.TopColorB);
+    ini.SetLongValue("HUD", "GearColorR", HUD.Gear.ColorR);
+    ini.SetLongValue("HUD", "GearColorG", HUD.Gear.ColorG);
+    ini.SetLongValue("HUD", "GearColorB", HUD.Gear.ColorB);
 
     ini.SetBoolValue("HUD", "ShiftModeIndicator", HUD.ShiftMode.Enable);
     ini.SetDoubleValue("HUD", "ShiftModeXpos", HUD.ShiftMode.XPos);
     ini.SetDoubleValue("HUD", "ShiftModeYpos", HUD.ShiftMode.YPos);
     ini.SetDoubleValue("HUD", "ShiftModeSize", HUD.ShiftMode.Size);
+    ini.SetLongValue("HUD", "ShiftModeColorR", HUD.ShiftMode.ColorR);
+    ini.SetLongValue("HUD", "ShiftModeColorG", HUD.ShiftMode.ColorG);
+    ini.SetLongValue("HUD", "ShiftModeColorB", HUD.ShiftMode.ColorB);
 
     ini.SetValue("HUD", "Speedo", HUD.Speedo.Speedo.c_str());
     ini.SetBoolValue("HUD", "SpeedoShowUnit", HUD.Speedo.ShowUnit);
     ini.SetDoubleValue("HUD", "SpeedoXpos", HUD.Speedo.XPos);
     ini.SetDoubleValue("HUD", "SpeedoYpos", HUD.Speedo.YPos);
     ini.SetDoubleValue("HUD", "SpeedoSize", HUD.Speedo.Size);
+    ini.SetLongValue("HUD", "SpeedoColorR", HUD.Speedo.ColorR);
+    ini.SetLongValue("HUD", "SpeedoColorG", HUD.Speedo.ColorG);
+    ini.SetLongValue("HUD", "SpeedoColorB", HUD.Speedo.ColorB);
 
     ini.SetBoolValue("HUD", "EnableRPMIndicator", HUD.RPMBar.Enable);
     ini.SetDoubleValue("HUD", "RPMIndicatorXpos", HUD.RPMBar.XPos);
@@ -492,6 +567,7 @@ void ScriptSettings::parseSettingsGeneral() {
     HUD.Enable = ini.GetBoolValue("HUD", "EnableHUD", HUD.Enable);
     HUD.Always = ini.GetBoolValue("HUD", "AlwaysHUD", HUD.Always);
     HUD.Font = ini.GetLongValue("HUD", "HUDFont", HUD.Font);
+    HUD.Outline = ini.GetBoolValue("HUD", "Outline", HUD.Outline);
     HUD.NotifyLevel = ini.GetLongValue("HUD", "NotifyLevel", HUD.NotifyLevel);
 
     HUD.Gear.Enable = ini.GetBoolValue("HUD", "GearIndicator", HUD.Gear.Enable);
@@ -501,17 +577,26 @@ void ScriptSettings::parseSettingsGeneral() {
     HUD.Gear.TopColorR = ini.GetLongValue("HUD", "GearTopColorR", HUD.Gear.TopColorR);
     HUD.Gear.TopColorG = ini.GetLongValue("HUD", "GearTopColorG", HUD.Gear.TopColorG);
     HUD.Gear.TopColorB = ini.GetLongValue("HUD", "GearTopColorB", HUD.Gear.TopColorB);
+    HUD.Gear.ColorR = ini.GetLongValue("HUD", "GearColorR", HUD.Gear.ColorR);
+    HUD.Gear.ColorG = ini.GetLongValue("HUD", "GearColorG", HUD.Gear.ColorG);
+    HUD.Gear.ColorB = ini.GetLongValue("HUD", "GearColorB", HUD.Gear.ColorB);
 
     HUD.ShiftMode.Enable = ini.GetBoolValue("HUD", "ShiftModeIndicator", true);
     HUD.ShiftMode.XPos = ini.GetDoubleValue("HUD", "ShiftModeXpos", HUD.ShiftMode.XPos);
     HUD.ShiftMode.YPos = ini.GetDoubleValue("HUD", "ShiftModeYpos", HUD.ShiftMode.YPos);
     HUD.ShiftMode.Size = ini.GetDoubleValue("HUD", "ShiftModeSize", HUD.ShiftMode.Size);
+    HUD.ShiftMode.ColorR = ini.GetLongValue("HUD", "ShiftModeColorR", HUD.ShiftMode.ColorR);
+    HUD.ShiftMode.ColorG = ini.GetLongValue("HUD", "ShiftModeColorG", HUD.ShiftMode.ColorG);
+    HUD.ShiftMode.ColorB = ini.GetLongValue("HUD", "ShiftModeColorB", HUD.ShiftMode.ColorB);
 
     HUD.Speedo.Speedo = ini.GetValue("HUD", "Speedo", HUD.Speedo.Speedo.c_str());
     HUD.Speedo.ShowUnit = ini.GetBoolValue("HUD", "SpeedoShowUnit", HUD.Speedo.ShowUnit);
     HUD.Speedo.XPos = ini.GetDoubleValue("HUD", "SpeedoXpos", HUD.Speedo.XPos);
     HUD.Speedo.YPos = ini.GetDoubleValue("HUD", "SpeedoYpos", HUD.Speedo.YPos);
     HUD.Speedo.Size = ini.GetDoubleValue("HUD", "SpeedoSize", HUD.Speedo.Size);
+    HUD.Speedo.ColorR = ini.GetLongValue("HUD", "SpeedoColorR", HUD.Speedo.ColorR);
+    HUD.Speedo.ColorG = ini.GetLongValue("HUD", "SpeedoColorG", HUD.Speedo.ColorG);
+    HUD.Speedo.ColorB = ini.GetLongValue("HUD", "SpeedoColorB", HUD.Speedo.ColorB);
 
     HUD.RPMBar.Enable = ini.GetBoolValue("HUD", "EnableRPMIndicator", HUD.RPMBar.Enable);
     HUD.RPMBar.XPos = ini.GetDoubleValue("HUD", "RPMIndicatorXpos", HUD.RPMBar.XPos);
