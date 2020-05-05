@@ -32,3 +32,4 @@ packages.config
 Server/
 *.TMP
 doc/changelog.pdf
+/thirdparty/fmt/out/build/x64-Debug

@@ -136,6 +136,8 @@ public:
         float EcoRate = 0.05f;
         // Timeout mult for not downshifting after an upshift
         float DownshiftTimeoutMult = 1.0f;
+        // Experimental new tcu
+        bool UsingNewTCU = false;
     } AutoParams;
 
     // [CUSTOM_STEERING]

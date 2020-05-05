@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <filesystem>
+#include <numeric>
 
 #include <inc/natives.h>
 #include <inc/enums.h>
@@ -110,6 +111,10 @@ void functionHShiftKeyboard();
 void functionHShiftWheel();
 void functionSShift();
 void functionAShift();
+float getGearMinSpeed(int gear);
+float getGearMaxSpeed(int gear);
+float gearPredictStandardPower(int gear);
+bool isSkidding(float threshold);
 
 ///////////////////////////////////////////////////////////////////////////////
 //                   Mod functions: Gearbox features
@@ -1112,17 +1117,17 @@ bool subAutoShiftSelect() {
     return false;
 }
 
-void functionAShift() { 
+void functionAShift() {
     // Manual part
     if (g_controls.PrevInput == CarControls::Wheel && g_settings.Wheel.Options.UseShifterForAuto) {
-        if (subAutoShiftSelect()) 
+        if (subAutoShiftSelect())
             return;
     }
     else {
-        if (subAutoShiftSequential()) 
+        if (subAutoShiftSequential())
             return;
     }
-    
+
     int currGear = g_vehData.mGearCurr;
     if (currGear == 0)
         return;
@@ -1139,60 +1144,181 @@ void functionAShift() {
 
     float currSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
     float currSpeedWorld = g_vehData.mVelocity.y;
-    float nextGearMinSpeed = 0.0f; // don't care about top gear
-    if (currGear < g_vehData.mGearTop) {
-        nextGearMinSpeed = g_settings().AutoParams.NextGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear + 1];
+    bool skidding = isSkidding(3.5f);
+
+    bool useTCU = g_settings().AutoParams.UsingNewTCU; // configurable point (using experimental new tcu)
+    if (!useTCU) {
+
+        float nextGearMinSpeed = 0.0f; // don't care about top gear
+        if (currGear < g_vehData.mGearTop) {
+            nextGearMinSpeed = g_settings().AutoParams.NextGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear + 1];
+        }
+        float currGearMinSpeed = g_settings().AutoParams.CurrGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear];
+        float engineLoad = g_gearStates.ThrottleHang - map(g_vehData.mRPM, 0.2f, 1.0f, 0.0f, 1.0f);
+        g_gearStates.EngineLoad = engineLoad;
+        g_gearStates.UpshiftLoad = g_settings().AutoParams.UpshiftLoad;
+
+        if (skidding)
+            return;
+
+        // Shift up.
+        if (currGear < g_vehData.mGearTop) {
+            if (engineLoad < g_settings().AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
+                shiftTo(g_vehData.mGearCurr + 1, true);
+                g_gearStates.FakeNeutral = false;
+                g_gearStates.LastUpshiftTime = GAMEPLAY::GET_GAME_TIMER();
+            }
+        }
+
+        // Shift down later when ratios are far apart
+        float gearRatioRatio = 1.0f;
+
+        if (g_vehData.mGearTop > 1 && currGear > 1) {
+            float thisGearRatio = g_vehData.mGearRatios[currGear - 1] / g_vehData.mGearRatios[currGear];
+            gearRatioRatio = thisGearRatio;
+        }
+
+        float rateUp = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
+        float upshiftDuration = 1.0f / (rateUp * g_settings().ShiftOptions.ClutchRateMult);
+        bool tpPassed = GAMEPLAY::GET_GAME_TIMER() > g_gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings.AutoParams.DownshiftTimeoutMult);
+        g_gearStates.DownshiftLoad = g_settings().AutoParams.DownshiftLoad * gearRatioRatio;
+
+        // Shift down
+        if (currGear > 1) {
+            if (tpPassed && engineLoad > g_settings().AutoParams.DownshiftLoad * gearRatioRatio || currSpeed < currGearMinSpeed) {
+                shiftTo(currGear - 1, true);
+                g_gearStates.FakeNeutral = false;
+            }
+        }
     }
-
-    float currGearMinSpeed = g_settings().AutoParams.CurrGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear];
-
-    float engineLoad = g_gearStates.ThrottleHang - map(g_vehData.mRPM, 0.2f, 1.0f, 0.0f, 1.0f);
-    g_gearStates.EngineLoad = engineLoad;
-    g_gearStates.UpshiftLoad = g_settings().AutoParams.UpshiftLoad;
-
-    bool skidding = abs(currSpeed - currSpeedWorld) > 3.5f;
+    else {
+        // Using new TCU
+        // introduce 'powertrain' based algorithm:
+        // ratio between gear ratio and wheels power output are always constant, this ratio named 'powertrain ratio'
+        // this ratio effected by vehicle engine, throttle and brakes
+        // it also effected while vehicle in collision included bump
+        // .
+        // this algorithm predicts next gear 's wheels power output, and then shift up when current output drop below next gear 's wheels power output
+        float economyCorrection = (g_controls.ThrottleVal * 0.8f) + 0.2f; // configurable point (economy) 0.2 - 0.8
+        auto currGameTime = GAMEPLAY::GET_GAME_TIMER();
+        g_gearStates.PowertrainSecondCounter++;
+        if ((g_gearStates.PowertrainTimer + 2) < (currGameTime / 1000)) {
+            if (g_gearStates.PowertrainSecondCounter - g_gearStates.PowertrainHistorySize > 100) g_gearStates.PowertrainSecondCounter += 100;
+            g_gearStates.PowertrainTimer = currGameTime / 1000;
+            g_gearStates.PowertrainSecondCounter = 0;
+        }
+        auto wp = g_ext.GetWheelPower(g_playerVehicle);
+        float currTotalPower = std::accumulate(wp.begin(), wp.end(), 0.0f);
+        currTotalPower = currTotalPower / g_vehData.mWheelCount;
+        float currRatio = g_vehData.mGearRatios[g_vehData.mGearCurr];
+        float powertrainRatio = currTotalPower / currRatio;
+        if (economyCorrection >= 0.95f && (powertrainRatio - g_gearStates.parsePowertrainRatioThreshold()) >= -0.000001f) {
+            float rateUp = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
+            float upshiftDuration = 1.0f / (rateUp * g_settings().ShiftOptions.ClutchRateMult);
+            bool tpPassed = currGameTime > (g_gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration) + 100);
+            bool isStable = V3D(g_vehData.mAcceleration).x < 0.8f && V3D(g_vehData.mAcceleration).x > -0.8f;
+            if (isStable && tpPassed && g_vehData.mRPM < 0.80f && g_controls.BrakeVal < 0.01f && g_controls.HandbrakeVal < 0.01f) {
+                bool allWheelOnGround = true;
+                for (uint8_t i = 0; i < g_vehData.mWheelCount; ++i) {
+                    if (!g_vehData.mWheelsOnGround[i]) {
+                        allWheelOnGround = false;
+                        break;
+                    }
+                }
+                if (allWheelOnGround && !isSkidding(3.0f)) {
+                    g_gearStates.updatePowertrainRatioDistribution(powertrainRatio);
+                }
+                else {
+                    g_gearStates.LastUpshiftTime = currGameTime; // dont update powertrain data after bump or skidding
+                }
+            }
+        }
+        //shift up
+        if (currGear < g_vehData.mGearTop) {
+            if (skidding) {
+                // use world speed instead when skiding
+                if (currSpeedWorld > (getGearMaxSpeed(currGear) * 0.9f)) {
+                    shiftTo(g_vehData.mGearCurr + 1, true);
+                    g_gearStates.FakeNeutral = false;
+                    g_gearStates.LastUpshiftTime = currGameTime;
+                }
+            }
+            else {
+                if (g_gearStates.isPowertrainRatioTrustworthy()) {
+                    if (currTotalPower <= (gearPredictStandardPower(currGear + 1) * 0.99f) && currSpeed > (getGearMinSpeed(currGear + 1) * economyCorrection)) {
+                        shiftTo(g_vehData.mGearCurr + 1, true);
+                        g_gearStates.FakeNeutral = false;
+                        g_gearStates.LastUpshiftTime = currGameTime;
+                    }
+                    else if (g_vehData.mRPM > 0.98f && currSpeedWorld > getGearMaxSpeed(currGear)) {
+                        shiftTo(g_vehData.mGearCurr + 1, true);
+                        g_gearStates.FakeNeutral = false;
+                        g_gearStates.LastUpshiftTime = currGameTime;
+                    }
+                }
+                else {
+                    auto currGearMaxSpeed = getGearMaxSpeed(currGear);
+                    auto prevGearMaxSpeed = getGearMaxSpeed(currGear - 1);
+                    if (currSpeed > (((currGearMaxSpeed - prevGearMaxSpeed) * economyCorrection) + (prevGearMaxSpeed * economyCorrection))) {
+                        shiftTo(g_vehData.mGearCurr + 1, true);
+                        g_gearStates.FakeNeutral = false;
+                        g_gearStates.LastUpshiftTime = currGameTime;
+                    }
+                }
+            }
+        }
+        // Shift down
+        if (currGear > 1) {
+            if (skidding) {
+                float currGearMinSpeed = getGearMinSpeed(currGear);
+                float speedGap = (currGearMinSpeed - getGearMinSpeed(currGear - 1)) / 5;
+                if (speedGap < 8) speedGap = 8;
+                if (currSpeedWorld < ((currGearMinSpeed - speedGap) * economyCorrection)) {
+                    shiftTo(currGear - 1, true);
+                    g_gearStates.FakeNeutral = false;
+                }
+            }
+            else {
+                float currGearMinSpeed = getGearMinSpeed(currGear);
+                float speedGap = (currGearMinSpeed - getGearMinSpeed(currGear - 1)) / 5;
+                if (speedGap < 8) speedGap = 8;
+                if (currSpeed < ((currGearMinSpeed - speedGap) * economyCorrection)) {
+                    shiftTo(currGear - 1, true);
+                    g_gearStates.FakeNeutral = false;
+                }
+            }
+        }
+    }
+}
+//For TCU
+float getGearMinSpeed(int gear) {
+    int currGear = g_vehData.mGearCurr;
+    float peakTorqueSpeed = (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[gear]) * 0.75f;
+    float prevGearMaxSpeed = getGearMaxSpeed(gear - 1); // however, the previous gear ratio might not happy with 0.75f
+    return gear > 1 ? (peakTorqueSpeed < prevGearMaxSpeed ? peakTorqueSpeed : prevGearMaxSpeed) : peakTorqueSpeed;
+}
+//For TCU
+float getGearMaxSpeed(int gear) {
+    if (gear < 1) return 0;
+    return (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[gear]) * 0.93f; // rev further more unlikely provides good effcient or performance due to power loss
+}
+float gearPredictStandardPower(int gear) {
+    return (g_gearStates.parsePowertrainRatio() * g_vehData.mGearRatios[gear]);
+}
+bool isSkidding(float threshold) {
+    float currSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
+    float currSpeedWorld = g_vehData.mVelocity.y;
+    bool skidding = abs(currSpeed - currSpeedWorld) > threshold;
     if (!skidding) {
         auto skids = g_ext.GetWheelSkidSmokeEffect(g_playerVehicle);
         for (uint8_t i = 0; i < g_vehData.mWheelCount; ++i) {
-            if (abs(skids[i]) > 3.5f && g_ext.IsWheelPowered(g_playerVehicle, i)) {
+            if (abs(skids[i]) > threshold && g_ext.IsWheelPowered(g_playerVehicle, i)) {
                 skidding = true;
                 break;
             }
         }
     }
-
-    if (skidding)
-        return;
-
-    // Shift up.
-    if (currGear < g_vehData.mGearTop) {
-        if (engineLoad < g_settings().AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
-            shiftTo(g_vehData.mGearCurr + 1, true);
-            g_gearStates.FakeNeutral = false;
-            g_gearStates.LastUpshiftTime = GAMEPLAY::GET_GAME_TIMER();
-        }
-    }
-
-    // Shift down later when ratios are far apart
-    float gearRatioRatio = 1.0f;
-
-    if (g_vehData.mGearTop > 1 && currGear > 1) {
-        float thisGearRatio = g_vehData.mGearRatios[currGear - 1] / g_vehData.mGearRatios[currGear];
-        gearRatioRatio = thisGearRatio;
-    }
-
-    float rateUp = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
-    float upshiftDuration = 1.0f / (rateUp * g_settings().ShiftOptions.ClutchRateMult);
-    bool tpPassed = GAMEPLAY::GET_GAME_TIMER() > g_gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings.AutoParams.DownshiftTimeoutMult);
-    g_gearStates.DownshiftLoad = g_settings().AutoParams.DownshiftLoad * gearRatioRatio;
-
-    // Shift down
-    if (currGear > 1) {
-        if (tpPassed && engineLoad > g_settings().AutoParams.DownshiftLoad * gearRatioRatio || currSpeed < currGearMinSpeed) {
-            shiftTo(currGear - 1, true);
-            g_gearStates.FakeNeutral = false;
-        }
-    }
+    return skidding;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

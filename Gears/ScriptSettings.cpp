@@ -264,6 +264,7 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetDoubleValue("AUTO_PARAMS", "CurrGearMinRPM", AutoParams.CurrGearMinRPM);
     ini.SetDoubleValue("AUTO_PARAMS", "EcoRate", AutoParams.EcoRate);
     ini.SetDoubleValue("AUTO_PARAMS", "DownshiftTimeoutMult", AutoParams.DownshiftTimeoutMult);
+    ini.SetDoubleValue("AUTO_PARAMS", "UsingNewTCU", AutoParams.UsingNewTCU);
 
     // [HUD]
     ini.SetBoolValue("HUD", "EnableHUD", HUD.Enable);
