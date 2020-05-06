@@ -4,10 +4,6 @@ GTA V Manual Transmission
 =========================
 [![Build status](https://ci.appveyor.com/api/projects/status/gy6yh17lp5l1k48d?svg=true)](https://ci.appveyor.com/project/E66666666/gtavmanualtransmission) [![GitHub total downloads](https://img.shields.io/github/downloads/E66666666/GTAVManualTransmission/total.svg?label=downloads&logo=GitHub)](https://github.com/E66666666/GTAVManualTransmission/releases) [![Discord](https://img.shields.io/discord/499483293679353861.svg?logo=discord)](https://discord.gg/gHee23U)
 
-Nyconing's Fork
-  * Faster Automatic 
-
-
 This mod for Grand Theft Auto V enables manual transmission and offers various gearbox modes:
   * Sequential 
   * H-pattern
