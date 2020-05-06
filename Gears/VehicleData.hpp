@@ -5,6 +5,7 @@
 #include <vector>
 #include <chrono>
 #include "Memory/VehicleExtensions.hpp"
+#include "AtcuGearbox.h"
 
 enum class VehicleClass {
     Car,
@@ -73,15 +74,8 @@ struct VehicleGearboxStates {
     float UpshiftLoad = 0.0f;
     float DownshiftLoad = 0.0f;
 
-    // TCU stuff
-    std::vector<float> PowertrainHistoryDistribution = { 0.000123f };
-    int PowertrainHistorySize = 120;
-    int PowertrainSecondCounter = 0;
-    int PowertrainTimer = 0;
-    float parsePowertrainRatioThreshold();
-    float parsePowertrainRatio();
-    void updatePowertrainRatioDistribution(float ratio);
-    bool isPowertrainRatioTrustworthy();
+    //ATCU
+    AtcuGearbox Atcu = AtcuGearbox();
 };
 
 struct WheelPatchStates {

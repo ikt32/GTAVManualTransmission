@@ -137,7 +137,7 @@ public:
         // Timeout mult for not downshifting after an upshift
         float DownshiftTimeoutMult = 1.0f;
         // Experimental new tcu
-        bool UsingNewTCU = false;
+        bool UsingATCU = false;
     } AutoParams;
 
     // [CUSTOM_STEERING]

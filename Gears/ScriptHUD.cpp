@@ -416,13 +416,13 @@ void drawDebugInfo() {
             g_gearStates.Shifting ? "~c~" : "", g_gearStates.EngineLoad, g_gearStates.UpshiftLoad));
         showText(0.01, 0.675, 0.3, fmt::format("{}Load/dnReq: {:.3f}\t/{:.3f}",
             g_gearStates.Shifting ? "~c~" : "", g_gearStates.EngineLoad, g_gearStates.DownshiftLoad));
-        showText(0.01, 0.700, 0.3, fmt::format("Using powertrain ratio: {:n}{}", g_gearStates.parsePowertrainRatio(), g_gearStates.isPowertrainRatioTrustworthy() ? "" : "(in training)"));
+        showText(0.01, 0.700, 0.3, fmt::format("Using powertrain ratio: {:n}{}", g_gearStates.Atcu.parsePowertrainRatio(), g_gearStates.Atcu.isPowertrainRatioTrustworthy() ? "" : "(in training)"));
         auto wp = g_ext.GetWheelPower(g_playerVehicle);
         float totalPower = std::accumulate(wp.begin(), wp.end(), 0.0f);
         totalPower = totalPower / g_vehData.mWheelCount;
         float currGearRatio = g_vehData.mGearRatios[g_vehData.mGearCurr];
         showText(0.01, 0.725, 0.3, fmt::format("Current powertrain ratio: {:n}", totalPower / currGearRatio));
-        showText(0.01, 0.750, 0.3, fmt::format("Powertrain training threshold: {:n}", g_gearStates.parsePowertrainRatioThreshold()));
+        showText(0.01, 0.750, 0.3, fmt::format("Powertrain training threshold: {:n}", g_gearStates.Atcu.parsePowertrainRatioThreshold()));
     }
 
     showText(0.85, 0.050, 0.4, fmt::format("Throttle:\t{:.3f}", g_controls.ThrottleVal) , 4);
@@ -547,10 +547,9 @@ void drawVehicleWheelInfo() {
                 //fmt::format("Health: \t{:.3f}", wheelsHealt[i]),
                 fmt::format("Power: \t{:.3f}", wheelsPower[i]),
                 fmt::format("Brake: \t{:.3f}", wheelsBrake[i]),
-                fmt::format("{}ABS~w~ {}TCS~w~ {}GRD~w~ {}ESC{}",
+                fmt::format("{}ABS~w~ | {}TSC~w~ | {}ESP{}",
                     g_vehData.mWheelsAbs[i] ? "~r~" : "",
                     g_vehData.mWheelsTcs[i] ? "~r~" : "",
-                    g_vehData.mWheelsOnGround[i] ? "" : "~r~",
                     g_vehData.mWheelsEspO[i] || g_vehData.mWheelsEspU[i] ? "~r~" : "",
                     g_vehData.mWheelsEspO[i] && g_vehData.mWheelsEspU[i] ? "_O+U"
                         : g_vehData.mWheelsEspO[i] ? "_O"

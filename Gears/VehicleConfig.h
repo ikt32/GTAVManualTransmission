@@ -86,6 +86,7 @@ public:
         float CurrGearMinRPM = 0.27f;
         float EcoRate = 0.05f;
         float DownshiftTimeoutMult = 1.0f;
+        bool UsingATCU = false;
     } AutoParams;
 
     struct {

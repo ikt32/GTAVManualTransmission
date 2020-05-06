@@ -37,12 +37,14 @@ void initWheel();
 
 void setShiftMode(EShiftMode shiftMode);
 bool isClutchPressed();
+void shiftTo(int gear, bool autoClutch);
 
 ///////////////////////////////////////////////////////////////////////////////
 //                       Mod functions: Gearbox control
 ///////////////////////////////////////////////////////////////////////////////
 
 void fakeRev(bool customThrottle = false, float customThrottleVal = 0.0f);
+bool isSkidding(float threshold);
 
 ///////////////////////////////////////////////////////////////////////////////
 //                              Script entry
