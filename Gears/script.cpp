@@ -476,7 +476,7 @@ void update_manual_transmission() {
 
         uint8_t currMode = 0;
         // 3: ABS + ESC + TCS
-        // 2: ABS + ESC || TSC
+        // 2: ABS + ESC || TCS
         // 1: ABS
         // 0: None!
 

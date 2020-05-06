@@ -547,7 +547,7 @@ void drawVehicleWheelInfo() {
                 //fmt::format("Health: \t{:.3f}", wheelsHealt[i]),
                 fmt::format("Power: \t{:.3f}", wheelsPower[i]),
                 fmt::format("Brake: \t{:.3f}", wheelsBrake[i]),
-                fmt::format("{}ABS~w~ | {}TSC~w~ | {}ESP{}",
+                fmt::format("{}ABS~w~ | {}TCS~w~ | {}ESC{}",
                     g_vehData.mWheelsAbs[i] ? "~r~" : "",
                     g_vehData.mWheelsTcs[i] ? "~r~" : "",
                     g_vehData.mWheelsEspO[i] || g_vehData.mWheelsEspU[i] ? "~r~" : "",
