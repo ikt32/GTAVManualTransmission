@@ -307,6 +307,7 @@ public:
     struct {
         bool UDPTelemetry = true;
         bool DashExtensions = true;
+        bool SyncAnimations = true;
     } Misc;
 
     // [UPDATE]

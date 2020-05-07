@@ -227,6 +227,6 @@ void CustomSteering::Update() {
         rotDeg -= 2.0f * rad2deg(corrDesiredHeading * g_ext.GetMaxSteeringAngle(g_playerVehicle));
 
         VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotDeg);
-        UpdateSteeringAnimations(rotDegRaw);
+        SteeringAnimation::SetRotation(rotDegRaw);
     }
 }

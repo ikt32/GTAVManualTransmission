@@ -40,6 +40,7 @@
 #include "CustomSteering.h"
 #include "WheelInput.h"
 #include "ScriptUtils.h"
+#include "SteeringAnim.h"
 #include "VehicleConfig.h"
 #include "UDPTelemetry/Socket.h"
 #include "UDPTelemetry/UDPTelemetry.h"
@@ -2408,6 +2409,7 @@ void main() {
         update_menu();
         update_update_notification();
         update_UDPTelemetry();
+        SteeringAnimation::Update();
         WAIT(0);
     }
 }

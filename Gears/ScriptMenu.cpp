@@ -13,6 +13,7 @@
 #include "Util/Logger.hpp"
 #include "ScriptUtils.h"
 #include "VehicleConfig.h"
+#include "SteeringAnim.h"
 
 #include <menu.h>
 #include <menukeyboard.h>
@@ -292,18 +293,19 @@ void onMenuClose() {
 }
 
 // TODO: temp
-extern float g_tempSteerOffsetAnim;
 extern int g_steerAnimDictIdx;
-extern std::vector<std::string> g_steerAnimDicts;
-extern bool g_customAnim;
 
 void update_mainmenu() {
     g_menu.Title("Manual Transmission");
     g_menu.Subtitle(fmt::format("~b~{}", Constants::DisplayVersion));
 
-    g_menu.BoolOption("Anim", g_customAnim);
-    g_menu.FloatOption("Anim offset", g_tempSteerOffsetAnim, -0.5f, 0.5f, 0.01f);
-    g_menu.StringArray("Anim dict", g_steerAnimDicts, g_steerAnimDictIdx);
+    std::vector<std::string> dictNames;
+    dictNames.reserve(SteeringAnimation::GetAnimations().size());
+    for (const auto& anim : SteeringAnimation::GetAnimations()) {
+        dictNames.push_back(anim.Dictionary);
+    }
+
+    g_menu.StringArray("Anim dict", dictNames, g_steerAnimDictIdx);
 
     if (MemoryPatcher::Error) {
         g_menu.Option("Patch test error", NativeMenu::solidRed, 
@@ -1554,6 +1556,10 @@ void update_compatmenu() {
         { "Allows programs like SimHub to use data from this script. This script uses DIRT 4 format for telemetry data." })) {
         StartUDPTelemetry();
     }
+
+    g_menu.BoolOption("Sync steering animation", g_settings.Misc.SyncAnimations,
+        { "Synchronize animations with wheel rotation.",
+          "Only active for synced steering wheel rotation or custom controller wheel rotation." });
 }
 
 void update_metricsmenu() {

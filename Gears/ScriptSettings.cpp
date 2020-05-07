@@ -364,6 +364,7 @@ void ScriptSettings::SaveGeneral() const {
     // [MISC]
     ini.SetBoolValue("MISC", "UDPTelemetry", Misc.UDPTelemetry);
     ini.SetBoolValue("MISC", "DashExtensions", Misc.DashExtensions);
+    ini.SetBoolValue("MISC", "SyncAnimations", Misc.SyncAnimations);
 
     // [UPDATE]
     ini.SetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);
@@ -662,6 +663,7 @@ void ScriptSettings::parseSettingsGeneral() {
     // [MISC]
     Misc.UDPTelemetry = ini.GetBoolValue("MISC", "UDPTelemetry", Misc.UDPTelemetry);
     Misc.DashExtensions = ini.GetBoolValue("MISC", "DashExtensions", Misc.DashExtensions);
+    Misc.SyncAnimations = ini.GetBoolValue("MISC", "SyncAnimations", Misc.SyncAnimations);
 
     // [UPDATE]
     Update.EnableUpdate = ini.GetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);

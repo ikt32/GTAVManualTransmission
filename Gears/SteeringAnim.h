@@ -1,3 +1,17 @@
 #pragma once
+#include <string>
+#include <vector>
 
-void UpdateSteeringAnimations(float wheelDegrees);
+namespace SteeringAnimation {
+    struct Animation {
+        std::string Dictionary;
+        std::string Name;
+        float Rotation;
+    };
+    const std::vector<Animation>& GetAnimations();
+
+    void Update();
+
+    void SetRotation(float wheelDegrees);
+}
+
