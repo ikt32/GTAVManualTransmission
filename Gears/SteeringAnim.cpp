@@ -24,7 +24,6 @@ extern ScriptSettings g_settings;
 int g_steerAnimDictIdx = 0;
 
 // TODO:
-// - "Action" animation pass-through (Cancel current animation?)
 // - Animation dictionary detection
 // - Reorder whatever mess I made in this file
 
@@ -62,7 +61,9 @@ const std::vector<SteeringAnimation::Animation>& SteeringAnimation::GetAnimation
 void SteeringAnimation::Update() {
     // Not active, cancel all animations.
     if (!Util::VehicleAvailable(g_playerVehicle, g_playerPed) || 
-        !g_settings.Misc.SyncAnimations) {
+        !g_settings.Misc.SyncAnimations ||
+        PLAYER::IS_PLAYER_FREE_AIMING(PLAYER::PLAYER_ID()) ||
+        PLAYER::IS_PLAYER_PRESSING_HORN(PLAYER::PLAYER_ID())) {
         cancelAnim(lastAnimation);
         return;
     }
