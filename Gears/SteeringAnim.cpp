@@ -105,11 +105,7 @@ void cancelAnim(const SteeringAnimation::Animation& anim) {
 
     if (playing) {
         UI::Notify(DEBUG, fmt::format("Cancelled steering animation ({})", lastAnimation.Dictionary), false);
-        // Why do the top 3 not work? No idea!
-        //ENTITY::STOP_ENTITY_ANIM(g_playerPed, dict, name, 8.0f);
-        //AI::STOP_ANIM_TASK(g_playerPed, dict, name, 8.0f);
-        //AI::CLEAR_PED_TASKS_IMMEDIATELY(g_playerPed);
-        AI::CLEAR_PED_SECONDARY_TASK(g_playerPed);
+        AI::STOP_ANIM_TASK(g_playerPed, dict, name, -8.0f);
         lastAnimation = SteeringAnimation::Animation();
     }
 }
