@@ -106,7 +106,6 @@ void updateSteeringMultiplier();
 //                           Mod functions: Shifting
 ///////////////////////////////////////////////////////////////////////////////
 
-//void shiftTo(int gear, bool autoClutch); moved to h
 void functionHShiftTo(int i);
 void functionHShiftKeyboard();
 void functionHShiftWheel();
