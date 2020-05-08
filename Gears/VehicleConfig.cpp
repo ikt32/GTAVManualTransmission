@@ -74,7 +74,7 @@ void VehicleConfig::loadSettings(const ScriptSettings& gSettings, const std::str
     AutoParams.CurrGearMinRPM = ini.GetDoubleValue("AUTO_PARAMS", "CurrGearMinRPM", gSettings.AutoParams.CurrGearMinRPM);
     AutoParams.EcoRate = ini.GetDoubleValue("AUTO_PARAMS", "EcoRate", gSettings.AutoParams.EcoRate);
     AutoParams.DownshiftTimeoutMult = ini.GetDoubleValue("AUTO_PARAMS", "DownshiftTimeoutMult", gSettings.AutoParams.DownshiftTimeoutMult);
-    AutoParams.UsingATCU = ini.GetDoubleValue("AUTO_PARAMS", "UsingATCU", gSettings.AutoParams.UsingATCU);
+    AutoParams.UsingATCU = ini.GetBoolValue("AUTO_PARAMS", "UsingATCU", gSettings.AutoParams.UsingATCU);
 
     // [FORCE_FEEDBACK]
     Wheel.FFB.Enable = ini.GetBoolValue("FORCE_FEEDBACK", "Enable", gSettings.Wheel.FFB.Enable);
