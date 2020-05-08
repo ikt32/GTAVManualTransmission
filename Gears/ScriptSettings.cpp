@@ -551,7 +551,7 @@ void ScriptSettings::parseSettingsGeneral() {
     AutoParams.CurrGearMinRPM = ini.GetDoubleValue("AUTO_PARAMS", "CurrGearMinRPM", AutoParams.CurrGearMinRPM);
     AutoParams.EcoRate = ini.GetDoubleValue("AUTO_PARAMS", "EcoRate", AutoParams.EcoRate);
     AutoParams.DownshiftTimeoutMult = ini.GetDoubleValue("AUTO_PARAMS", "DownshiftTimeoutMult", AutoParams.DownshiftTimeoutMult);
-    AutoParams.UsingATCU = ini.GetDoubleValue("AUTO_PARAMS", "UsingATCU", AutoParams.DownshiftTimeoutMult);
+    AutoParams.UsingATCU = ini.GetBoolValue("AUTO_PARAMS", "UsingATCU", AutoParams.UsingATCU);
 
     // [CUSTOM_STEERING]
     CustomSteering.Mode = ini.GetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
