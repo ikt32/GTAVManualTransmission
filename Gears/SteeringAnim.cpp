@@ -98,13 +98,13 @@ void cancelAnim(const SteeringAnimation::Animation& anim) {
     const char* name = anim.Name.c_str();
 
     if (anim.Dictionary.empty() || anim.Name.empty()) {
-        lastAnimation = SteeringAnimation::Animation();
         return;
     }
 
     const bool playing = ENTITY::IS_ENTITY_PLAYING_ANIM(g_playerPed, dict, name, 3);
 
     if (playing) {
+        UI::Notify(DEBUG, fmt::format("Cancelled steering animation ({})", lastAnimation.Dictionary), false);
         // Why do the top 3 not work? No idea!
         //ENTITY::STOP_ENTITY_ANIM(g_playerPed, dict, name, 8.0f);
         //AI::STOP_ANIM_TASK(g_playerPed, dict, name, 8.0f);
@@ -128,7 +128,7 @@ void playAnimTime(const SteeringAnimation::Animation& anim, float time) {
         STREAMING::REQUEST_ANIM_DICT(dict);
         while (!STREAMING::HAS_ANIM_DICT_LOADED(dict)) {
             if (t.Expired()) {
-                UI::Notify(ERROR, "Failed to load animation dictionary [%s]", dict);
+                UI::Notify(ERROR, fmt::format("Failed to load animation dictionary [{}}]", dict), false);
                 break;
             }
             WAIT(0);
@@ -137,6 +137,8 @@ void playAnimTime(const SteeringAnimation::Animation& anim, float time) {
         constexpr int flag = ANIM_FLAG_UPPERBODY | ANIM_FLAG_ENABLE_PLAYER_CONTROL;
         AI::TASK_PLAY_ANIM(g_playerPed, dict, name, -8.0f, 8.0f, -1, flag, 1.0f, 0, 0, 0);
         lastAnimation = anim;
+        UI::Notify(DEBUG, fmt::format("Started steering animation ({})", lastAnimation.Dictionary), false);
+
     }
     else {
         ENTITY::SET_ENTITY_ANIM_SPEED(g_playerPed, dict, name, 0.0f);
