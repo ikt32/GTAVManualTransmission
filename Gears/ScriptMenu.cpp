@@ -299,13 +299,20 @@ void update_mainmenu() {
     g_menu.Title("Manual Transmission");
     g_menu.Subtitle(fmt::format("~b~{}", Constants::DisplayVersion));
 
-    std::vector<std::string> dictNames;
-    dictNames.reserve(SteeringAnimation::GetAnimations().size());
-    for (const auto& anim : SteeringAnimation::GetAnimations()) {
-        dictNames.push_back(anim.Dictionary);
+    if (g_steerAnimDictIdx >= SteeringAnimation::GetAnimations().size()) {
+        bool t = g_menu.Option("Anim dict idx reset", { fmt::format("Currently {}", g_steerAnimDictIdx) });
+        if (t) {
+            g_steerAnimDictIdx = 0;
+        }
     }
-
-    g_menu.StringArray("Anim dict", dictNames, g_steerAnimDictIdx);
+    else {
+        std::vector<std::string> dictNames;
+        dictNames.reserve(SteeringAnimation::GetAnimations().size());
+        for (const auto& anim : SteeringAnimation::GetAnimations()) {
+            dictNames.push_back(anim.Dictionary);
+        }
+        g_menu.StringArray("Anim dict", dictNames, g_steerAnimDictIdx);
+    }
 
     if (MemoryPatcher::Error) {
         g_menu.Option("Patch test error", NativeMenu::solidRed, 

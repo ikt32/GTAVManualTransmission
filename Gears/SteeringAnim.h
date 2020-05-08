@@ -7,6 +7,7 @@ namespace SteeringAnimation {
         std::string Dictionary;
         std::string Name;
         float Rotation;
+        std::vector<std::string> Layouts;
     };
     const std::vector<Animation>& GetAnimations();
 
