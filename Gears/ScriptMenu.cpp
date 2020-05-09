@@ -533,6 +533,9 @@ void update_finetuneautooptionsmenu() {
     g_menu.FloatOption("Economy rate", g_settings.AutoParams.EcoRate, 0.01f, 0.50f, 0.01f,
         { "On releasing throttle, high values cause earlier upshifts.",
           "Set this low to stay in gear longer when releasing throttle." });
+    g_menu.BoolOption("Using ATCU (experimental)", g_settings.AutoParams.UsingATCU,
+        { "Using experimental new Automatic Transmission Control Unit by Nyconing.",
+          "ATCU is configurationless, the above settings are ignored." });
 }
 
 std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {

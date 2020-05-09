@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <filesystem>
+#include <numeric>
 
 #include <inc/natives.h>
 #include <inc/enums.h>
@@ -44,6 +45,7 @@
 #include "VehicleConfig.h"
 #include "UDPTelemetry/Socket.h"
 #include "UDPTelemetry/UDPTelemetry.h"
+#include "AtcuLogic.h"
 
 namespace fs = std::filesystem;
 
@@ -105,7 +107,6 @@ void updateSteeringMultiplier();
 //                           Mod functions: Shifting
 ///////////////////////////////////////////////////////////////////////////////
 
-void shiftTo(int gear, bool autoClutch);
 void functionHShiftTo(int i);
 void functionHShiftKeyboard();
 void functionHShiftWheel();
@@ -1139,17 +1140,17 @@ bool subAutoShiftSelect() {
     return false;
 }
 
-void functionAShift() { 
+void functionAShift() {
     // Manual part
     if (g_controls.PrevInput == CarControls::Wheel && g_settings.Wheel.Options.UseShifterForAuto) {
-        if (subAutoShiftSelect()) 
+        if (subAutoShiftSelect())
             return;
     }
     else {
-        if (subAutoShiftSequential()) 
+        if (subAutoShiftSequential())
             return;
     }
-    
+
     int currGear = g_vehData.mGearCurr;
     if (currGear == 0)
         return;
@@ -1164,62 +1165,71 @@ void functionAShift() {
     if (g_gearStates.ThrottleHang < 0.0f)
         g_gearStates.ThrottleHang = 0.0f;
 
+    if (g_settings().AutoParams.UsingATCU) {
+        AtcuLogic::Cycle();
+    }
+    else {
+        float currSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
+        bool skidding = isSkidding(3.5f);
+
+        float nextGearMinSpeed = 0.0f; // don't care about top gear
+        if (currGear < g_vehData.mGearTop) {
+            nextGearMinSpeed = g_settings().AutoParams.NextGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear + 1];
+        }
+        float currGearMinSpeed = g_settings().AutoParams.CurrGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear];
+        float engineLoad = g_gearStates.ThrottleHang - map(g_vehData.mRPM, 0.2f, 1.0f, 0.0f, 1.0f);
+        g_gearStates.EngineLoad = engineLoad;
+        g_gearStates.UpshiftLoad = g_settings().AutoParams.UpshiftLoad;
+
+        if (skidding)
+            return;
+
+        // Shift up.
+        if (currGear < g_vehData.mGearTop) {
+            if (engineLoad < g_settings().AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
+                shiftTo(g_vehData.mGearCurr + 1, true);
+                g_gearStates.FakeNeutral = false;
+                g_gearStates.LastUpshiftTime = GAMEPLAY::GET_GAME_TIMER();
+            }
+        }
+
+        // Shift down later when ratios are far apart
+        float gearRatioRatio = 1.0f;
+
+        if (g_vehData.mGearTop > 1 && currGear > 1) {
+            float thisGearRatio = g_vehData.mGearRatios[currGear - 1] / g_vehData.mGearRatios[currGear];
+            gearRatioRatio = thisGearRatio;
+        }
+
+        float rateUp = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
+        float upshiftDuration = 1.0f / (rateUp * g_settings().ShiftOptions.ClutchRateMult);
+        bool tpPassed = GAMEPLAY::GET_GAME_TIMER() > g_gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings.AutoParams.DownshiftTimeoutMult);
+        g_gearStates.DownshiftLoad = g_settings().AutoParams.DownshiftLoad * gearRatioRatio;
+
+        // Shift down
+        if (currGear > 1) {
+            if (tpPassed && engineLoad > g_settings().AutoParams.DownshiftLoad * gearRatioRatio || currSpeed < currGearMinSpeed) {
+                shiftTo(currGear - 1, true);
+                g_gearStates.FakeNeutral = false;
+            }
+        }
+    }
+}
+
+bool isSkidding(float threshold) {
     float currSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
     float currSpeedWorld = g_vehData.mVelocity.y;
-    float nextGearMinSpeed = 0.0f; // don't care about top gear
-    if (currGear < g_vehData.mGearTop) {
-        nextGearMinSpeed = g_settings().AutoParams.NextGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear + 1];
-    }
-
-    float currGearMinSpeed = g_settings().AutoParams.CurrGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear];
-
-    float engineLoad = g_gearStates.ThrottleHang - map(g_vehData.mRPM, 0.2f, 1.0f, 0.0f, 1.0f);
-    g_gearStates.EngineLoad = engineLoad;
-    g_gearStates.UpshiftLoad = g_settings().AutoParams.UpshiftLoad;
-
-    bool skidding = abs(currSpeed - currSpeedWorld) > 3.5f;
+    bool skidding = abs(currSpeed - currSpeedWorld) > threshold;
     if (!skidding) {
         auto skids = g_ext.GetWheelSkidSmokeEffect(g_playerVehicle);
         for (uint8_t i = 0; i < g_vehData.mWheelCount; ++i) {
-            if (abs(skids[i]) > 3.5f && g_ext.IsWheelPowered(g_playerVehicle, i)) {
+            if (abs(skids[i]) > threshold && g_ext.IsWheelPowered(g_playerVehicle, i)) {
                 skidding = true;
                 break;
             }
         }
     }
-
-    if (skidding)
-        return;
-
-    // Shift up.
-    if (currGear < g_vehData.mGearTop) {
-        if (engineLoad < g_settings().AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
-            shiftTo(g_vehData.mGearCurr + 1, true);
-            g_gearStates.FakeNeutral = false;
-            g_gearStates.LastUpshiftTime = GAMEPLAY::GET_GAME_TIMER();
-        }
-    }
-
-    // Shift down later when ratios are far apart
-    float gearRatioRatio = 1.0f;
-
-    if (g_vehData.mGearTop > 1 && currGear > 1) {
-        float thisGearRatio = g_vehData.mGearRatios[currGear - 1] / g_vehData.mGearRatios[currGear];
-        gearRatioRatio = thisGearRatio;
-    }
-
-    float rateUp = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
-    float upshiftDuration = 1.0f / (rateUp * g_settings().ShiftOptions.ClutchRateMult);
-    bool tpPassed = GAMEPLAY::GET_GAME_TIMER() > g_gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings.AutoParams.DownshiftTimeoutMult);
-    g_gearStates.DownshiftLoad = g_settings().AutoParams.DownshiftLoad * gearRatioRatio;
-
-    // Shift down
-    if (currGear > 1) {
-        if (tpPassed && engineLoad > g_settings().AutoParams.DownshiftLoad * gearRatioRatio || currSpeed < currGearMinSpeed) {
-            shiftTo(currGear - 1, true);
-            g_gearStates.FakeNeutral = false;
-        }
-    }
+    return skidding;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

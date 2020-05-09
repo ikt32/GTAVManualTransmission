@@ -211,6 +211,8 @@
     <ClCompile Include="..\thirdparty\yaml-cpp\src\contrib\graphbuilderadapter.cpp">
       <Filter>Thirdparty\yaml</Filter>
     </ClCompile>
+    <ClCompile Include="AtcuLogic.cpp" />
+    <ClCompile Include="AtcuGearbox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -466,6 +468,8 @@
     <ClInclude Include="..\thirdparty\yaml-cpp\src\contrib\graphbuilderadapter.h">
       <Filter>Thirdparty\yaml</Filter>
     </ClInclude>
+    <ClInclude Include="AtcuLogic.h" />
+    <ClInclude Include="AtcuGearbox.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
