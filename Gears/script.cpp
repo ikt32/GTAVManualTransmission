@@ -188,7 +188,31 @@ void update_player() {
     g_player = PLAYER::PLAYER_ID();
     g_playerPed = PLAYER::PLAYER_PED_ID();
 }
-extern int g_steerAnimDictIdx;
+
+void updateActiveSteeringAnim(Vehicle vehicle) {
+    const auto& anims = SteeringAnimation::GetAnimations();
+    auto layoutHash = VEHICLE::GET_VEHICLE_LAYOUT_HASH(vehicle);
+    size_t animIdx = anims.size();
+    for (size_t i = 0; i < anims.size(); ++i) {
+        bool found = false;
+        for (const std::string& layout : anims[i].Layouts) {
+            if (joaat(layout.c_str()) == layoutHash) {
+                animIdx = i;
+                found = true;
+                break;
+            }
+        }
+        if (found)
+            break;
+    }
+    if (animIdx == anims.size() && layoutHash != 0) {
+        std::string msg = fmt::format("Animations: No valid animation found for layout hash 0x{:08X}", layoutHash);
+        logger.Write(WARN, msg);
+        UI::Notify(DEBUG, msg);
+    }
+    SteeringAnimation::SetAnimationIndex(animIdx);
+}
+
 void update_vehicle() {
     g_playerVehicle = PED::GET_VEHICLE_PED_IS_IN(g_playerPed, false);
     bool vehAvail = Util::VehicleAvailable(g_playerVehicle, g_playerPed);
@@ -206,26 +230,9 @@ void update_vehicle() {
         setVehicleConfig(g_playerVehicle);
         g_gearRattle1.Stop();
         g_gearRattle2.Stop();
-        const auto& anims = SteeringAnimation::GetAnimations();
-        auto layoutHash = VEHICLE::GET_VEHICLE_LAYOUT_HASH(g_playerVehicle);
-        uint32_t animIdx = anims.size();
-        for (uint32_t i = 0; i < anims.size(); ++i) {
-            bool found = false;
-            for (const std::string& layout : anims[i].Layouts) {
-                if (joaat(layout.c_str()) == layoutHash) {
-                    animIdx = i;
-                    found = true;
-                    break;
-                }
-            }
-            if (found)
-                break;
-        }
-        if (animIdx == anims.size() && layoutHash != 0) {
-            logger.Write(WARN, "Animations: No valid animation found for layout hash 0x%X", layoutHash);
-        }
-        g_steerAnimDictIdx = animIdx;
+        updateActiveSteeringAnim(g_playerVehicle);
     }
+
     if (vehAvail) {
         g_vehData.Update(); // Update before doing anything else
         functionDash();
@@ -2291,6 +2298,11 @@ void readSettings() {
     g_gearStates.FakeNeutral = g_settings.GameAssists.DefaultNeutral;
     g_menu.ReadSettings();
     initTimers();
+
+    std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
+    std::string animationsFile = absoluteModPath + "\\animations.yml";
+    SteeringAnimation::Load(animationsFile);
+
     logger.Write(INFO, "Settings read");
 }
 

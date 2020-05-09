@@ -118,6 +118,99 @@
       <Filter>UDPTelemetry</Filter>
     </ClCompile>
     <ClCompile Include="SteeringAnim.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\binary.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\convert.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\depthguard.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\directives.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\emit.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\emitfromevents.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\emitter.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\emitterstate.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\emitterutils.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\exceptions.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\exp.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\memory.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\node.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\node_data.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\nodebuilder.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\nodeevents.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\null.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\ostream_wrapper.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\parse.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\parser.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\regex_yaml.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\scanner.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\scanscalar.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\scantag.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\scantoken.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\simplekey.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\singledocparser.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\stream.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\tag.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\contrib\graphbuilder.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\contrib\graphbuilderadapter.cpp">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -307,6 +400,72 @@
       <Filter>UDPTelemetry</Filter>
     </ClInclude>
     <ClInclude Include="SteeringAnim.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\collectionstack.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\directives.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\emitterstate.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\emitterutils.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\exp.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\indentation.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\nodebuilder.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\nodeevents.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\ptr_vector.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\regex_yaml.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\regeximpl.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\scanner.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\scanscalar.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\scantag.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\setting.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\singledocparser.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\stream.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\streamcharsource.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\stringsource.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\tag.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\token.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\contrib\graphbuilderadapter.h">
+      <Filter>Thirdparty\yaml</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -344,6 +503,9 @@
     </Filter>
     <Filter Include="UDPTelemetry">
       <UniqueIdentifier>{84c60810-1f1b-46a9-a810-08f9629ad9a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thirdparty\yaml">
+      <UniqueIdentifier>{e0f6edc3-ef31-40c5-9dc2-78a926d1ce40}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

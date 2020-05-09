@@ -292,27 +292,9 @@ void onMenuClose() {
     }
 }
 
-// TODO: temp
-extern int g_steerAnimDictIdx;
-
 void update_mainmenu() {
     g_menu.Title("Manual Transmission");
     g_menu.Subtitle(fmt::format("~b~{}", Constants::DisplayVersion));
-
-    if (g_steerAnimDictIdx >= SteeringAnimation::GetAnimations().size()) {
-        bool t = g_menu.Option("Anim dict idx reset", { fmt::format("Currently {}", g_steerAnimDictIdx) });
-        if (t) {
-            g_steerAnimDictIdx = 0;
-        }
-    }
-    else {
-        std::vector<std::string> dictNames;
-        dictNames.reserve(SteeringAnimation::GetAnimations().size());
-        for (const auto& anim : SteeringAnimation::GetAnimations()) {
-            dictNames.push_back(anim.Dictionary);
-        }
-        g_menu.StringArray("Anim dict", dictNames, g_steerAnimDictIdx);
-    }
 
     if (MemoryPatcher::Error) {
         g_menu.Option("Patch test error", NativeMenu::solidRed, 
@@ -667,6 +649,10 @@ void update_controlsmenu() {
 
     g_menu.MenuOption("Steering assists", "steeringassistmenu",
         { "Customize steering input for keyboards and controllers." });
+
+    g_menu.BoolOption("Sync steering animation", g_settings.Misc.SyncAnimations,
+        { "Synchronize animations with wheel rotation.",
+          "Only active for synced steering wheel rotation or custom controller wheel rotation." });
 }
 
 void update_controllermenu() {
@@ -1550,6 +1536,57 @@ void update_debugmenu() {
             "Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction" });
     g_menu.BoolOption("Show NPC info", g_settings.Debug.DisplayNPCInfo,
         { "Show vehicle info of NPC vehicles near you." });
+
+    std::vector <std::string> extras;
+
+    extras.emplace_back("Available animation dictionaries:");
+
+    const auto& anims = SteeringAnimation::GetAnimations();
+    const size_t index = SteeringAnimation::GetAnimationIndex();
+    for (size_t i = 0; i < anims.size(); ++i) {
+        const auto& anim = anims[i];
+        std::string mark = "[ ]";
+        if (i == index) {
+            mark = "[*]";
+        }
+        extras.emplace_back(fmt::format("{} {}", mark, anim.Dictionary));
+    }
+
+    extras.emplace_back("");
+    extras.emplace_back("* marks active dictionary.");
+    if (index >= SteeringAnimation::GetAnimations().size()) {
+        extras.push_back(fmt::format("Index out of range ({})", index));
+    }
+
+    extras.emplace_back("");
+    extras.emplace_back("Press left/right to change animation manually.");
+
+    std::function<void()> onLeft = [index, anims]() {
+        if (!anims.empty()) {
+            if (index == 0) {
+                // Set to "none"
+                SteeringAnimation::SetAnimationIndex(anims.size());
+            }
+            else {
+                SteeringAnimation::SetAnimationIndex(index - 1);
+            }
+        }
+    };
+
+    std::function<void()> onRight = [index, anims]() {
+        if (!anims.empty()) {
+            // allow 1 past, to set to none
+            if (index >= anims.size()) {
+                SteeringAnimation::SetAnimationIndex(0);
+            }
+            else {
+                SteeringAnimation::SetAnimationIndex(index + 1);
+            }
+        }
+    };
+
+    g_menu.OptionPlus("Animation info", extras, 
+        nullptr, onRight, onLeft, "Animations", { "Shows current animation override status" });
 }
 
 void update_compatmenu() {
@@ -1563,10 +1600,6 @@ void update_compatmenu() {
         { "Allows programs like SimHub to use data from this script. This script uses DIRT 4 format for telemetry data." })) {
         StartUDPTelemetry();
     }
-
-    g_menu.BoolOption("Sync steering animation", g_settings.Misc.SyncAnimations,
-        { "Synchronize animations with wheel rotation.",
-          "Only active for synced steering wheel rotation or custom controller wheel rotation." });
 }
 
 void update_metricsmenu() {

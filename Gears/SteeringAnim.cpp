@@ -2,30 +2,23 @@
 
 #include "ScriptUtils.h"
 #include "ScriptSettings.hpp"
-#include "Input/CarControls.hpp"
 
 #include "Util/Logger.hpp"
 #include "Util/MathExt.h"
 #include "Util/Timer.h"
-#include "Util/UIUtils.h"
 
 #include <inc/natives.h>
 #include <fmt/format.h>
+#include <yaml-cpp/yaml.h>
 
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <filesystem>
 
 extern Vehicle g_playerVehicle;
 extern Ped g_playerPed;
 extern ScriptSettings g_settings;
-
-// TODO: Ew.
-int g_steerAnimDictIdx = 0;
-
-// TODO:
-// - User-definable animations
-// - Reorder whatever mess I made in this file
 
 namespace {
     enum eAnimationFlags {
@@ -37,79 +30,39 @@ namespace {
         ANIM_FLAG_CANCELABLE = 120,
     };
 
-    // List from a63nt-5m1th @ 5mods:
-    // https://forums.gta5-mods.com/topic/23755/how-do-you-change-the-character-s-driving-animation
-    const std::vector<SteeringAnimation::Animation> steeringAnimations{
-        { "veh@std@ds@base", "steer_no_lean", 720.0f, {
-            "LAYOUT_STANDARD",
-            "LAYOUT_STD_LOWROOF",
-            "LAYOUT_STD_HABANERO",
-            "LAYOUT_STD_HIGHWINDOW",
-            "LAYOUT_STD_EXITFIXUP",
-            "LAYOUT_STD_RIPLEY",
-            "LAYOUT_STD_STRATUM",
-            "LAYOUT_STD_STRETCH",
-            "LAYOUT_STD_ZTYPE",
-            "LAYOUT_RANGER",
-            "LAYOUT_RANGER_SWAT", // Granger
-            // Add-on vehicles
-            "LAYOUT_STD_RHD",
-            "LAYOUT_STD_AE86", // FreedomGundam's AE86
-            "LAYOUT_STD_SIM22", // Zievs' 22B
-        }},
-        { "veh@low@front_ds@base", "steer_no_lean", 360.0f, {
-            "LAYOUT_LOW",
-            "LAYOUT_LOW_RESTRICTED",
-            "LAYOUT_LOW_BFINJECTION",
-            "LAYOUT_LOW_CHEETAH",
-            "LAYOUT_LOW_DUNE",
-            "LAYOUT_LOW_ENTITYXF",
-            "LAYOUT_LOW_INFERNUS",
-            "LAYOUT_LOW_SENTINEL2",
-            // Add-on vehicles
-            "LAYOUT_LOW_RHD",
-        }},
-        { "veh@truck@ds@base", "steer_no_lean", 720.0f, {
-            "LAYOUT_TRUCK",
-            "LAYOUT_TRUCK_BIFF",
-            "LAYOUT_TRUCK_TOW",
-            "LAYOUT_TRUCK_DOCKTUG",
-            "LAYOUT_TRUCK_BARRACKS",
-            "LAYOUT_TRUCK_MIXER",
-            "LAYOUT_FIRETRUCK",
-            "LAYOUT_DUMPTRUCK",
-        }},
-        { "veh@van@ds@base", "steer_no_lean", 720.0f, {
-            "LAYOUT_VAN",
-            "LAYOUT_VAN_POLICE",
-            "LAYOUT_VAN_BODHI",
-            "LAYOUT_VAN_CADDY",
-            "LAYOUT_VAN_MULE",
-            "LAYOUT_VAN_PONY",
-            "LAYOUT_VAN_BOXVILLE",
-            "LAYOUT_VAN_TRASH",
-            "LAYOUT_VAN_JOURNEY",
-            "LAYOUT_ONE_DOOR_VAN",
-            "LAYOUT_RIOT_VAN",
-        }},
-        { "veh@bus@bus@driver@base", "steer_no_lean", 720.0f, {
-            "LAYOUT_BUS",
-            "LAYOUT_TOURBUS",
-            "LAYOUT_PRISON_BUS",
-            "LAYOUT_COACH",
-        }},
-    };
-
+    std::vector<SteeringAnimation::Animation> steeringAnimations;
     SteeringAnimation::Animation lastAnimation;
-
+    size_t steeringAnimIdx = 0;
     float setAngle = 0.0f;
 }
 
 void playAnimTime(const SteeringAnimation::Animation& anim, float time);
 void cancelAnim(const SteeringAnimation::Animation& anim);
+float mapAnim(float wheelDegrees, float maxAnimAngle);
 
 const std::vector<SteeringAnimation::Animation>& SteeringAnimation::GetAnimations() {
     return steeringAnimations;
+}
+
+size_t SteeringAnimation::GetAnimationIndex() {
+    return steeringAnimIdx;
+}
+
+void SteeringAnimation::SetAnimationIndex(size_t index) {
+    steeringAnimIdx = index;
+}
+
+void SteeringAnimation::SetRotation(float wheelDegrees) {
+    // No valid thing found?
+    if (steeringAnimIdx >= steeringAnimations.size())
+        return;
+
+    float maxAnimAngle = steeringAnimations[steeringAnimIdx].Rotation;
+
+    // div 2 cuz one-way angle
+    float finalSteerVal = mapAnim(wheelDegrees, maxAnimAngle / 2.0f);
+
+    setAngle = finalSteerVal;
 }
 
 void SteeringAnimation::Update() {
@@ -117,42 +70,52 @@ void SteeringAnimation::Update() {
     if (!Util::VehicleAvailable(g_playerVehicle, g_playerPed) || 
         !g_settings.Misc.SyncAnimations ||
         PLAYER::IS_PLAYER_FREE_AIMING(PLAYER::PLAYER_ID()) ||
-        PLAYER::IS_PLAYER_PRESSING_HORN(PLAYER::PLAYER_ID())) {
+        PLAYER::IS_PLAYER_PRESSING_HORN(PLAYER::PLAYER_ID()) || 
+        steeringAnimIdx >= steeringAnimations.size()) {
         cancelAnim(lastAnimation);
         return;
     }
 
-    // No valid thing found?
-    if (g_steerAnimDictIdx >= steeringAnimations.size())
-        return;
-
     playAnimTime(
-        steeringAnimations[g_steerAnimDictIdx],
+        steeringAnimations[steeringAnimIdx],
         setAngle);
 }
 
-// map
-// -450 -360 -270 -180  -90    0    90  180  270  360  450 // wheeldegrees
-//  0.0  0.0  0.0  0.0  0.0   0.5  1.0  1.0  1.0  1.0  1.0 // animTime @ 180 max
-//  0.0  0.0  0.0  0.0        0.5       1.0  1.0  1.0  1.0 // animTime @ 360 max
-//  0.0  0.0                  0.5                 1.0  1.0 // animTime @ 720 max
-float figureOutAnimModulation(float wheelDegrees, float maxAnimAngle) {    
-    float animTime = map(wheelDegrees, -maxAnimAngle, maxAnimAngle, 0.0f, 1.0f);
-    animTime = std::clamp(animTime, 0.01f, 0.99f);
-    return animTime;
-}
+void SteeringAnimation::Load(const std::string& path) {
+    try {
+        YAML::Node animRoot = YAML::LoadFile(path);
+        auto animNodes = animRoot["Animations"];
 
-void SteeringAnimation::SetRotation(float wheelDegrees) {
-    // No valid thing found?
-    if (g_steerAnimDictIdx >= steeringAnimations.size())
-        return;
+        steeringAnimations.clear();
+        for (const auto& animNode : animNodes) {
+            Animation anim{};
 
-    float maxAnimAngle = steeringAnimations[g_steerAnimDictIdx].Rotation;
+            anim.Dictionary = animNode["Dictionary"].as<std::string>();
 
-    // div 2 cuz one-way angle
-    float finalSteerVal = figureOutAnimModulation(wheelDegrees, maxAnimAngle / 2.0f);
+            anim.Name = animNode["AnimName"].as<std::string>();
 
-    setAngle = finalSteerVal;
+            anim.Rotation = animNode["Rotation"].as<float>();
+
+            anim.Layouts = animNode["Layouts"].as<std::vector<std::string>>();
+
+            //for (const auto& layoutNode : animNode["Layouts"]) {
+            //    anim.Layouts.push_back(layoutNode.as<std::string>());
+            //    logger.Write(DEBUG, fmt::format("\t\tLayt: {}", anim.Layouts.back()));
+            //}
+            steeringAnimations.push_back(anim);
+        }
+        logger.Write(DEBUG, fmt::format("Animation: Loaded {} animations", steeringAnimations.size()));
+    }
+    catch (const YAML::ParserException& ex) {
+        logger.Write(ERROR, fmt::format("Encountered a YAML exception (parse)"));
+        logger.Write(ERROR, fmt::format("{}", ex.what()));
+        logger.Write(ERROR, fmt::format("at Line {}, Column {}", ex.mark.line, ex.mark.column));
+        logger.Write(ERROR, fmt::format("msg: {}", ex.msg));
+    }
+    catch (const std::exception& ex) {
+        logger.Write(ERROR, fmt::format("Encountered a YAML exception (std)"));
+        logger.Write(ERROR, fmt::format("{}", ex.what()));
+    }
 }
 
 void cancelAnim(const SteeringAnimation::Animation& anim) {
@@ -202,4 +165,15 @@ void playAnimTime(const SteeringAnimation::Animation& anim, float time) {
         ENTITY::SET_ENTITY_ANIM_SPEED(g_playerPed, dict, name, 0.0f);
         ENTITY::SET_ENTITY_ANIM_CURRENT_TIME(g_playerPed, dict, name, time);
     }
+}
+
+// map
+// -450 -360 -270 -180  -90    0    90  180  270  360  450 // wheeldegrees
+//  0.0  0.0  0.0  0.0  0.0   0.5  1.0  1.0  1.0  1.0  1.0 // animTime @ 180 max
+//  0.0  0.0  0.0  0.0        0.5       1.0  1.0  1.0  1.0 // animTime @ 360 max
+//  0.0  0.0                  0.5                 1.0  1.0 // animTime @ 720 max
+float mapAnim(float wheelDegrees, float maxAnimAngle) {
+    float animTime = map(wheelDegrees, -maxAnimAngle, maxAnimAngle, 0.0f, 1.0f);
+    animTime = std::clamp(animTime, 0.01f, 0.99f);
+    return animTime;
 }

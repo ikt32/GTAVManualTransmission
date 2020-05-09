@@ -1,0 +1,74 @@
+Animations:
+  - Animation:
+    Dictionary: veh@std@ds@base
+    AnimName: steer_no_lean
+    Rotation: 720.0
+    Layouts:
+      - LAYOUT_STANDARD
+      - LAYOUT_STD_LOWROOF
+      - LAYOUT_STD_HABANERO
+      - LAYOUT_STD_HIGHWINDOW
+      - LAYOUT_STD_EXITFIXUP
+      - LAYOUT_STD_RIPLEY
+      - LAYOUT_STD_STRATUM
+      - LAYOUT_STD_STRETCH
+      - LAYOUT_STD_ZTYPE
+      - LAYOUT_RANGER
+      - LAYOUT_RANGER_SWAT # Granger
+      # Add-on vehicles
+      - LAYOUT_STD_RHD
+      - LAYOUT_STD_AE86 # FreedomGundam's AE86
+      - LAYOUT_STD_SIM22 # Zievs' 22B
+  - Animation:
+    Dictionary: veh@low@front_ds@base
+    AnimName: steer_no_lean
+    Rotation: 360.0
+    Layouts:
+      - LAYOUT_LOW
+      - LAYOUT_LOW_RESTRICTED
+      - LAYOUT_LOW_BFINJECTION
+      - LAYOUT_LOW_CHEETAH
+      - LAYOUT_LOW_DUNE
+      - LAYOUT_LOW_ENTITYXF
+      - LAYOUT_LOW_INFERNUS
+      - LAYOUT_LOW_SENTINEL2
+      # Add-on vehicles
+      - LAYOUT_LOW_RHD
+  - Animation:
+    Dictionary: veh@truck@ds@base
+    AnimName: steer_no_lean
+    Rotation: 720.0
+    Layouts:
+      - LAYOUT_TRUCK
+      - LAYOUT_TRUCK_BIFF
+      - LAYOUT_TRUCK_TOW
+      - LAYOUT_TRUCK_DOCKTUG
+      - LAYOUT_TRUCK_BARRACKS
+      - LAYOUT_TRUCK_MIXER
+      - LAYOUT_FIRETRUCK
+      - LAYOUT_DUMPTRUCK
+  - Animation:
+    Dictionary: veh@van@ds@base
+    AnimName: steer_no_lean
+    Rotation: 720.0
+    Layouts:
+      - LAYOUT_VAN
+      - LAYOUT_VAN_POLICE
+      - LAYOUT_VAN_BODHI
+      - LAYOUT_VAN_CADDY
+      - LAYOUT_VAN_MULE
+      - LAYOUT_VAN_PONY
+      - LAYOUT_VAN_BOXVILLE
+      - LAYOUT_VAN_TRASH
+      - LAYOUT_VAN_JOURNEY
+      - LAYOUT_ONE_DOOR_VAN
+      - LAYOUT_RIOT_VAN
+  - Animation:
+    Dictionary: veh@bus@bus@driver@base
+    AnimName: steer_no_lean
+    Rotation: 720.0
+    Layouts:
+      - LAYOUT_BUS
+      - LAYOUT_TOURBUS
+      - LAYOUT_PRISON_BUS
+      - LAYOUT_COACH
