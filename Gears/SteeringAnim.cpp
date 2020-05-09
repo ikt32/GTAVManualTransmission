@@ -164,6 +164,11 @@ void playAnimTime(const SteeringAnimation::Animation& anim, float time) {
     else {
         ENTITY::SET_ENTITY_ANIM_SPEED(g_playerPed, dict, name, 0.0f);
         ENTITY::SET_ENTITY_ANIM_CURRENT_TIME(g_playerPed, dict, name, time);
+
+        // Fix for if anim is playing while the script starts
+        if (lastAnimation.Dictionary.empty()) {
+            lastAnimation = anim;
+        }
     }
 }
 

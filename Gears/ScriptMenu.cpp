@@ -651,7 +651,7 @@ void update_controlsmenu() {
         { "Customize steering input for keyboards and controllers." });
 
     g_menu.BoolOption("Sync steering animation", g_settings.Misc.SyncAnimations,
-        { "Synchronize animations with wheel rotation.",
+        { "Synchronize animations with wheel rotation using third-person animations.",
           "Only active for synced steering wheel rotation or custom controller wheel rotation." });
 }
 
