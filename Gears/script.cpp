@@ -1138,14 +1138,13 @@ void functionAShift() {
     if (g_gearStates.ThrottleHang < 0.0f)
         g_gearStates.ThrottleHang = 0.0f;
 
-    float currSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
-    float currSpeedWorld = g_vehData.mVelocity.y;
-    bool skidding = isSkidding(3.5f);
-
     if (g_settings().AutoParams.UsingATCU) {
         AtcuLogic::Cycle();
     }
     else {
+        float currSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
+        bool skidding = isSkidding(3.5f);
+
         float nextGearMinSpeed = 0.0f; // don't care about top gear
         if (currGear < g_vehData.mGearTop) {
             nextGearMinSpeed = g_settings().AutoParams.NextGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear + 1];

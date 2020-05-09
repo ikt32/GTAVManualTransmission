@@ -7,6 +7,7 @@ compatible, but a `SHIFT_ASSISTS` typo fix now ignores the old
 wrongly spelled `SHIFT_ASSIST` section.
 
 * Engine and transmission
+  * Add alternate automatic transmission mode, by [Nyconing](https://github.com/Nyconing)
   * Fix engine revving when locked up due to direction
   * Fix delta-gear ratio for automatic transission downshifts
   * Fix ABS affecting automatic transmission shifting
@@ -39,7 +40,7 @@ wrongly spelled `SHIFT_ASSIST` section.
   * Show triggered lights for at least 300 milliseconds before turning off
   * Fix throttle-based TCS not firing dashboard indicator icon
 * General
-  * Add UDP telemetry support for programs like SimHub
+  * Add UDP telemetry support for programs like SimHub. DiRT4 thanks to [guilhermelimak](https://github.com/guilhermelimak)
   * Fix control acquire/release timing (now only when ped has control of car)
   * Fix controller engine on/off hold trigger
 
