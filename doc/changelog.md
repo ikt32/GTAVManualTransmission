@@ -41,6 +41,7 @@ wrongly spelled `SHIFT_ASSIST` section.
   * Fix throttle-based TCS not firing dashboard indicator icon
 * General
   * Add UDP telemetry support for programs like SimHub. DiRT4 thanks to [guilhermelimak](https://github.com/guilhermelimak)
+  * Add animation syncing!
   * Fix control acquire/release timing (now only when ped has control of car)
   * Fix controller engine on/off hold trigger
 
