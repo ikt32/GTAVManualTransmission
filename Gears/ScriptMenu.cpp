@@ -13,6 +13,7 @@
 #include "Util/Logger.hpp"
 #include "ScriptUtils.h"
 #include "VehicleConfig.h"
+#include "SteeringAnim.h"
 
 #include <menu.h>
 #include <menukeyboard.h>
@@ -651,6 +652,10 @@ void update_controlsmenu() {
 
     g_menu.MenuOption("Steering assists", "steeringassistmenu",
         { "Customize steering input for keyboards and controllers." });
+
+    g_menu.BoolOption("Sync steering animation", g_settings.Misc.SyncAnimations,
+        { "Synchronize animations with wheel rotation using third-person animations.",
+          "Only active for synced steering wheel rotation or custom controller wheel rotation." });
 }
 
 void update_controllermenu() {
@@ -1534,6 +1539,57 @@ void update_debugmenu() {
             "Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction" });
     g_menu.BoolOption("Show NPC info", g_settings.Debug.DisplayNPCInfo,
         { "Show vehicle info of NPC vehicles near you." });
+
+    std::vector <std::string> extras;
+
+    extras.emplace_back("Available animation dictionaries:");
+
+    const auto& anims = SteeringAnimation::GetAnimations();
+    const size_t index = SteeringAnimation::GetAnimationIndex();
+    for (size_t i = 0; i < anims.size(); ++i) {
+        const auto& anim = anims[i];
+        std::string mark = "[ ]";
+        if (i == index) {
+            mark = "[*]";
+        }
+        extras.emplace_back(fmt::format("{} {}", mark, anim.Dictionary));
+    }
+
+    extras.emplace_back("");
+    extras.emplace_back("* marks active dictionary.");
+    if (index >= SteeringAnimation::GetAnimations().size()) {
+        extras.push_back(fmt::format("Index out of range ({})", index));
+    }
+
+    extras.emplace_back("");
+    extras.emplace_back("Press left/right to change animation manually.");
+
+    std::function<void()> onLeft = [index, anims]() {
+        if (!anims.empty()) {
+            if (index == 0) {
+                // Set to "none"
+                SteeringAnimation::SetAnimationIndex(anims.size());
+            }
+            else {
+                SteeringAnimation::SetAnimationIndex(index - 1);
+            }
+        }
+    };
+
+    std::function<void()> onRight = [index, anims]() {
+        if (!anims.empty()) {
+            // allow 1 past, to set to none
+            if (index >= anims.size()) {
+                SteeringAnimation::SetAnimationIndex(0);
+            }
+            else {
+                SteeringAnimation::SetAnimationIndex(index + 1);
+            }
+        }
+    };
+
+    g_menu.OptionPlus("Animation info", extras, 
+        nullptr, onRight, onLeft, "Animations", { "Shows current animation override status" });
 }
 
 void update_compatmenu() {
