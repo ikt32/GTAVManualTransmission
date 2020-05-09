@@ -125,6 +125,8 @@
     <ClCompile Include="..\thirdparty\fmt\src\format.cc" />
     <ClCompile Include="..\thirdparty\fmt\src\posix.cc" />
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp" />
+    <ClCompile Include="AtcuGearbox.cpp" />
+    <ClCompile Include="AtcuLogic.cpp" />
     <ClCompile Include="Compatibility.cpp" />
     <ClCompile Include="CustomSteering.cpp" />
     <ClCompile Include="Input\DIDeviceFactory.cpp" />
@@ -186,6 +188,8 @@
     <ClInclude Include="..\thirdparty\curl\urlapi.h" />
     <ClInclude Include="..\thirdparty\MiniPID\MiniPID.h" />
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
+    <ClInclude Include="AtcuGearbox.h" />
+    <ClInclude Include="AtcuLogic.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="CustomSteering.h" />
     <ClInclude Include="Input\USBNotify.h" />

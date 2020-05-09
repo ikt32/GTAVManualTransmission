@@ -5,6 +5,7 @@
 #include <vector>
 #include <chrono>
 #include "Memory/VehicleExtensions.hpp"
+#include "AtcuGearbox.h"
 
 enum class VehicleClass {
     Car,
@@ -72,6 +73,9 @@ struct VehicleGearboxStates {
     float EngineLoad = 0.0f;
     float UpshiftLoad = 0.0f;
     float DownshiftLoad = 0.0f;
+
+    //ATCU
+    AtcuGearbox Atcu = AtcuGearbox();
 };
 
 struct WheelPatchStates {

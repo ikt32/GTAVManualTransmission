@@ -71,6 +71,7 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
     localSettings.AutoParams.CurrGearMinRPM       = activeConfig->AutoParams.CurrGearMinRPM      ;
     localSettings.AutoParams.EcoRate              = activeConfig->AutoParams.EcoRate             ;
     localSettings.AutoParams.DownshiftTimeoutMult = activeConfig->AutoParams.DownshiftTimeoutMult;
+    localSettings.AutoParams.UsingATCU = activeConfig->AutoParams.UsingATCU;
 
 
     localSettings.Wheel.FFB.Enable         = activeConfig->Wheel.FFB.Enable        ;
@@ -264,6 +265,7 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetDoubleValue("AUTO_PARAMS", "CurrGearMinRPM", AutoParams.CurrGearMinRPM);
     ini.SetDoubleValue("AUTO_PARAMS", "EcoRate", AutoParams.EcoRate);
     ini.SetDoubleValue("AUTO_PARAMS", "DownshiftTimeoutMult", AutoParams.DownshiftTimeoutMult);
+    ini.SetDoubleValue("AUTO_PARAMS", "UsingATCU", AutoParams.UsingATCU);
 
     // [HUD]
     ini.SetBoolValue("HUD", "EnableHUD", HUD.Enable);
@@ -549,6 +551,7 @@ void ScriptSettings::parseSettingsGeneral() {
     AutoParams.CurrGearMinRPM = ini.GetDoubleValue("AUTO_PARAMS", "CurrGearMinRPM", AutoParams.CurrGearMinRPM);
     AutoParams.EcoRate = ini.GetDoubleValue("AUTO_PARAMS", "EcoRate", AutoParams.EcoRate);
     AutoParams.DownshiftTimeoutMult = ini.GetDoubleValue("AUTO_PARAMS", "DownshiftTimeoutMult", AutoParams.DownshiftTimeoutMult);
+    AutoParams.UsingATCU = ini.GetBoolValue("AUTO_PARAMS", "UsingATCU", AutoParams.UsingATCU);
 
     // [CUSTOM_STEERING]
     CustomSteering.Mode = ini.GetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
