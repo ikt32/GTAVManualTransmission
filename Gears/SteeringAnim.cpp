@@ -89,19 +89,10 @@ void SteeringAnimation::Load(const std::string& path) {
         steeringAnimations.clear();
         for (const auto& animNode : animNodes) {
             Animation anim{};
-
             anim.Dictionary = animNode["Dictionary"].as<std::string>();
-
             anim.Name = animNode["AnimName"].as<std::string>();
-
             anim.Rotation = animNode["Rotation"].as<float>();
-
             anim.Layouts = animNode["Layouts"].as<std::vector<std::string>>();
-
-            //for (const auto& layoutNode : animNode["Layouts"]) {
-            //    anim.Layouts.push_back(layoutNode.as<std::string>());
-            //    logger.Write(DEBUG, fmt::format("\t\tLayt: {}", anim.Layouts.back()));
-            //}
             steeringAnimations.push_back(anim);
         }
         logger.Write(DEBUG, fmt::format("Animation: Loaded {} animations", steeringAnimations.size()));
