@@ -61,7 +61,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>$(SolutionDir)thirdparty\ScriptHookV_SDK;$(SolutionDir)thirdparty\GTAVMenuBase;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\fmt\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)thirdparty\ScriptHookV_SDK;$(SolutionDir)thirdparty\GTAVMenuBase;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\fmt\include;$(SolutionDir)thirdparty\yaml-cpp\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>MT_EXPORTS;DASHHOOK_RUNTIME;CURL_STATICLIB;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -125,6 +125,37 @@
     <ClCompile Include="..\thirdparty\fmt\src\format.cc" />
     <ClCompile Include="..\thirdparty\fmt\src\posix.cc" />
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\binary.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\contrib\graphbuilder.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\contrib\graphbuilderadapter.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\convert.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\depthguard.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\directives.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\emit.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\emitfromevents.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\emitter.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\emitterstate.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\emitterutils.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\exceptions.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\exp.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\memory.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\node.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\nodebuilder.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\nodeevents.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\node_data.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\null.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\ostream_wrapper.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\parse.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\parser.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\regex_yaml.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\scanner.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\scanscalar.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\scantag.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\scantoken.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\simplekey.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\singledocparser.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\stream.cpp" />
+    <ClCompile Include="..\thirdparty\yaml-cpp\src\tag.cpp" />
     <ClCompile Include="AtcuGearbox.cpp" />
     <ClCompile Include="AtcuLogic.cpp" />
     <ClCompile Include="Compatibility.cpp" />
@@ -138,6 +169,7 @@
     <ClCompile Include="ScriptHUD.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
     <ClCompile Include="ScriptUtils.cpp" />
+    <ClCompile Include="SteeringAnim.cpp" />
     <ClCompile Include="UDPTelemetry\UDPTelemetry.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="Util\Files.cpp" />
@@ -188,6 +220,28 @@
     <ClInclude Include="..\thirdparty\curl\urlapi.h" />
     <ClInclude Include="..\thirdparty\MiniPID\MiniPID.h" />
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\collectionstack.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\contrib\graphbuilderadapter.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\directives.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\emitterstate.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\emitterutils.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\exp.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\indentation.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\nodebuilder.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\nodeevents.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\ptr_vector.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\regeximpl.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\regex_yaml.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\scanner.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\scanscalar.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\scantag.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\setting.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\singledocparser.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\stream.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\streamcharsource.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\stringsource.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\tag.h" />
+    <ClInclude Include="..\thirdparty\yaml-cpp\src\token.h" />
     <ClInclude Include="AtcuGearbox.h" />
     <ClInclude Include="AtcuLogic.h" />
     <ClInclude Include="Constants.h" />
@@ -204,6 +258,7 @@
     <ClInclude Include="newNatives.h" />
     <ClInclude Include="ScriptUtils.h" />
     <ClInclude Include="Compatibility.h" />
+    <ClInclude Include="SteeringAnim.h" />
     <ClInclude Include="UDPTelemetry\UDPTelemetry.h" />
     <ClInclude Include="UDPTelemetry\Socket.h" />
     <ClInclude Include="UDPTelemetry\TelemetryPacket.h" />

@@ -41,6 +41,7 @@
 #include "CustomSteering.h"
 #include "WheelInput.h"
 #include "ScriptUtils.h"
+#include "SteeringAnim.h"
 #include "VehicleConfig.h"
 #include "UDPTelemetry/Socket.h"
 #include "UDPTelemetry/UDPTelemetry.h"
@@ -189,6 +190,30 @@ void update_player() {
     g_playerPed = PLAYER::PLAYER_PED_ID();
 }
 
+void updateActiveSteeringAnim(Vehicle vehicle) {
+    const auto& anims = SteeringAnimation::GetAnimations();
+    auto layoutHash = VEHICLE::GET_VEHICLE_LAYOUT_HASH(vehicle);
+    size_t animIdx = anims.size();
+    for (size_t i = 0; i < anims.size(); ++i) {
+        bool found = false;
+        for (const std::string& layout : anims[i].Layouts) {
+            if (joaat(layout.c_str()) == layoutHash) {
+                animIdx = i;
+                found = true;
+                break;
+            }
+        }
+        if (found)
+            break;
+    }
+    if (animIdx == anims.size() && layoutHash != 0) {
+        std::string msg = fmt::format("Animations: No valid animation found for layout hash 0x{:08X}", layoutHash);
+        logger.Write(WARN, msg);
+        UI::Notify(DEBUG, msg);
+    }
+    SteeringAnimation::SetAnimationIndex(animIdx);
+}
+
 void update_vehicle() {
     g_playerVehicle = PED::GET_VEHICLE_PED_IS_IN(g_playerPed, false);
     bool vehAvail = Util::VehicleAvailable(g_playerVehicle, g_playerPed);
@@ -206,7 +231,9 @@ void update_vehicle() {
         setVehicleConfig(g_playerVehicle);
         g_gearRattle1.Stop();
         g_gearRattle2.Stop();
+        updateActiveSteeringAnim(g_playerVehicle);
     }
+
     if (vehAvail) {
         g_vehData.Update(); // Update before doing anything else
         functionDash();
@@ -1138,14 +1165,13 @@ void functionAShift() {
     if (g_gearStates.ThrottleHang < 0.0f)
         g_gearStates.ThrottleHang = 0.0f;
 
-    float currSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
-    float currSpeedWorld = g_vehData.mVelocity.y;
-    bool skidding = isSkidding(3.5f);
-
     if (g_settings().AutoParams.UsingATCU) {
         AtcuLogic::Cycle();
     }
     else {
+        float currSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
+        bool skidding = isSkidding(3.5f);
+
         float nextGearMinSpeed = 0.0f; // don't care about top gear
         if (currGear < g_vehData.mGearTop) {
             nextGearMinSpeed = g_settings().AutoParams.NextGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear + 1];
@@ -2282,6 +2308,11 @@ void readSettings() {
     g_gearStates.FakeNeutral = g_settings.GameAssists.DefaultNeutral;
     g_menu.ReadSettings();
     initTimers();
+
+    std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
+    std::string animationsFile = absoluteModPath + "\\animations.yml";
+    SteeringAnimation::Load(animationsFile);
+
     logger.Write(INFO, "Settings read");
 }
 
@@ -2419,6 +2450,7 @@ void main() {
         update_menu();
         update_update_notification();
         update_UDPTelemetry();
+        SteeringAnimation::Update();
         WAIT(0);
     }
 }
