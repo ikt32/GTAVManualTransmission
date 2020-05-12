@@ -52,7 +52,7 @@ void AtcuLogic::Cycle() {
     if (currGear < g_vehData.mGearTop) {
         if (skidding) {
             // use world speed instead when skiding
-            if (currSpeedWorld > (getGearMaxSpeed(currGear) * 0.95f)) {
+            if (currSpeedWorld > (getGearMaxSpeed(currGear))) {
                 shiftTo(g_vehData.mGearCurr + 1, true);
                 g_gearStates.FakeNeutral = false;
             }
