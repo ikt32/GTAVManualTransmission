@@ -19,7 +19,7 @@ float AtcuGearbox::parsePowertrainRatioThreshold() {
             [](const std::pair<float, int>& p1, const std::pair<float, int> p2) {
                 return p1.second < p2.second;
             });
-        avg = (avg + most.first + most.first) / 3;
+        avg = (avg + (most.first * 9)) / 10;
         for (auto& c : PowertrainHistoryDistribution)
             if (c > avg) gapElements.push_back(c);
         auto ratio = avg - ((gap * ((gapElements.size() + 0.0f) / (PowertrainHistoryDistribution.size() + 0.00f))) * 2.0f);
@@ -49,7 +49,7 @@ float AtcuGearbox::parsePowertrainRatio() {
             [](const std::pair<float, int>& p1, const std::pair<float, int> p2) {
                 return p1.second < p2.second;
             });
-        avg = (avg + most.first + most.first) / 3;
+        avg = (avg + (most.first * 9)) / 10;
         for (auto& c : PowertrainHistoryDistribution) {
             if (c > avg) gapElements.push_back(c);
         }

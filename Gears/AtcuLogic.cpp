@@ -35,7 +35,7 @@ void AtcuLogic::Cycle() {
                     break;
                 }
             }
-            if (allWheelOnGround && !isSkidding(3.0f)) {
+            if (allWheelOnGround && !isSkidding(3.0f) && g_gearStates.Atcu.CurrentRpm <= g_vehData.mRPM) {
                 g_gearStates.Atcu.updatePowertrainRatioDistribution(powertrainRatio);
             }
             else {
@@ -47,6 +47,7 @@ void AtcuLogic::Cycle() {
     float currSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
     float currSpeedWorld = g_vehData.mVelocity.y;
     bool skidding = isSkidding(3.5f);
+    g_gearStates.Atcu.CurrentRpm = g_vehData.mRPM;
     //shift up
     if (currGear < g_vehData.mGearTop) {
         if (skidding) {
@@ -54,7 +55,6 @@ void AtcuLogic::Cycle() {
             if (currSpeedWorld > (getGearMaxSpeed(currGear) * 0.95f)) {
                 shiftTo(g_vehData.mGearCurr + 1, true);
                 g_gearStates.FakeNeutral = false;
-                g_gearStates.LastUpshiftTime = currGameTime;
             }
         }
         else {
@@ -62,12 +62,10 @@ void AtcuLogic::Cycle() {
                 if (currTotalPower <= (gearPredictStandardPower(currGear + 1) * 0.99f) && currSpeed > (getGearMinSpeed(currGear + 1) * economyCorrection)) {
                     shiftTo(g_vehData.mGearCurr + 1, true);
                     g_gearStates.FakeNeutral = false;
-                    g_gearStates.LastUpshiftTime = currGameTime;
                 }
                 else if (g_vehData.mRPM > 0.98f && currSpeedWorld > getGearMaxSpeed(currGear)) {
                     shiftTo(g_vehData.mGearCurr + 1, true);
                     g_gearStates.FakeNeutral = false;
-                    g_gearStates.LastUpshiftTime = currGameTime;
                 }
             }
             else {
@@ -76,7 +74,6 @@ void AtcuLogic::Cycle() {
                 if (currSpeed > (((currGearMaxSpeed - prevGearMaxSpeed) * economyCorrection) + (prevGearMaxSpeed * economyCorrection))) {
                     shiftTo(g_vehData.mGearCurr + 1, true);
                     g_gearStates.FakeNeutral = false;
-                    g_gearStates.LastUpshiftTime = currGameTime;
                 }
             }
         }
