@@ -298,8 +298,8 @@ void update_mainmenu() {
 
     if (MemoryPatcher::Error) {
         g_menu.Option("Patch test error", NativeMenu::solidRed, 
-            { "One or more components can't be patched. Mod behavior is uncertain."
-              "Usually caused by a game update or using an incompatible version.", 
+            { "One or more components failed to patch. Mod behavior is uncertain.",
+              "Usually caused by a game update, or an incompatible version.", 
               "Check Gears.log for more details." });
     }
 
