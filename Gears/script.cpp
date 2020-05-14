@@ -2141,8 +2141,9 @@ void functionAutoGear1() {
 
 void functionHillGravity() {
     // TODO: Needs improvement/proper fix
-    if (g_controls.BrakeVal == 0.0f
-        && ENTITY::GET_ENTITY_SPEED(g_playerVehicle) < 2.0f &&
+    if (g_controls.HandbrakeVal < 0.1f && 
+        g_controls.BrakeVal < 0.1f &&
+        ENTITY::GET_ENTITY_SPEED(g_playerVehicle) < 2.0f &&
         VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(g_playerVehicle)) {
         float pitch = ENTITY::GET_ENTITY_PITCH(g_playerVehicle);;
 
