@@ -209,8 +209,6 @@ void CustomSteering::Update() {
 
     disableControls();
 
-    // Both need to be set, top one with radian limit
-    g_ext.SetSteeringAngle(g_playerVehicle, desiredHeading);
     g_ext.SetSteeringInputAngle(g_playerVehicle, desiredHeading * (1.0f / limitRadians));
 
     auto boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "steeringwheel");

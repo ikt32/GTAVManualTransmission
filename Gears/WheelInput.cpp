@@ -465,14 +465,8 @@ void WheelInput::DoSteering() {
     float effSteer = steerMult * steerValGamma;
 
     bool altInputs = hasAltInputs(g_playerVehicle);
-    /*
-     * Patched steering is direct without any processing, and super direct.
-     * _SET_CONTROL_NORMAL is with game processing and could have a bit of assist
-     * Both should work without any deadzone, with a note that the second one
-     * does need a specified anti-deadzone (recommended: 24-25%)
-     */
+
     if (g_vehData.mClass == VehicleClass::Car) {
-        g_ext.SetSteeringAngle(g_playerVehicle, -effSteer * g_ext.GetMaxSteeringAngle(g_playerVehicle));
         g_ext.SetSteeringInputAngle(g_playerVehicle, -effSteer);
 
         auto boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "steeringwheel");
