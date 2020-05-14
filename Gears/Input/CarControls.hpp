@@ -24,7 +24,7 @@ public:
         Toggle,
         ToggleH,
         Engine,
-        SwitchAssist,
+        CycleAssists,
         SIZEOF_ControllerControlType
     };
 
@@ -37,7 +37,7 @@ public:
         Toggle,
         ToggleH,
         Engine,
-        SwitchAssist,
+        CycleAssists,
         SIZEOF_LegacyControlType
     };
 
@@ -62,7 +62,7 @@ public:
         Engine,
         Toggle,
         ToggleH,
-        SwitchAssist,
+        CycleAssists,
         SIZEOF_KeyboardControlType
     };
 
@@ -103,7 +103,10 @@ public:
         AReverse,
         ANeutral,
         ADrive,
-        SwitchAssist,
+        CycleAssists,
+        ToggleABS,
+        ToggleESC,
+        ToggleTCS,
         UNKNOWN,
         SIZEOF_WheelControlType
     };
@@ -265,7 +268,7 @@ public:
         if (confTag == "H9") return KBControl[static_cast<int>(KeyboardControlType::H9)];
         if (confTag == "H10") return KBControl[static_cast<int>(KeyboardControlType::H10)];
         if (confTag == "HN") return KBControl[static_cast<int>(KeyboardControlType::HN)];
-        if (confTag == "SwitchAssist") return KBControl[static_cast<int>(KeyboardControlType::SwitchAssist)];
+        if (confTag == "SwitchAssist") return KBControl[static_cast<int>(KeyboardControlType::CycleAssists)];
         return -1;
     }
 
@@ -278,7 +281,7 @@ public:
         if (confTag == "Engine") return ControlXbox[static_cast<int>(ControllerControlType::Engine)];
         if (confTag == "Throttle") return ControlXbox[static_cast<int>(ControllerControlType::Throttle)];
         if (confTag == "Brake") return ControlXbox[static_cast<int>(ControllerControlType::Brake)];
-        if (confTag == "SwitchAssist") return ControlXbox[static_cast<int>(ControllerControlType::SwitchAssist)];
+        if (confTag == "SwitchAssist") return ControlXbox[static_cast<int>(ControllerControlType::CycleAssists)];
 
         return "UNKNOWN";
     }
@@ -292,7 +295,7 @@ public:
         if (confTag == "Engine")		return LegacyControls[static_cast<int>(LegacyControlType::Engine)];
         if (confTag == "Throttle")		return LegacyControls[static_cast<int>(LegacyControlType::Throttle)];
         if (confTag == "Brake")			return LegacyControls[static_cast<int>(LegacyControlType::Brake)];
-        if (confTag == "SwitchAssist")	return LegacyControls[static_cast<int>(LegacyControlType::SwitchAssist)];
+        if (confTag == "SwitchAssist")	return LegacyControls[static_cast<int>(LegacyControlType::CycleAssists)];
 
         return -1;
     }
@@ -327,7 +330,7 @@ public:
         if (confTag == "INDICATOR_LEFT"		) return WheelButton[static_cast<int>(WheelControlType::IndicatorLeft)];
         if (confTag == "INDICATOR_RIGHT"	) return WheelButton[static_cast<int>(WheelControlType::IndicatorRight)];
         if (confTag == "INDICATOR_HAZARD") return WheelButton[static_cast<int>(WheelControlType::IndicatorHazard)];
-        if (confTag == "SWITCH_ASSIST") return WheelButton[static_cast<int>(WheelControlType::SwitchAssist)];
+        if (confTag == "CYCLE_ASSISTS") return WheelButton[static_cast<int>(WheelControlType::CycleAssists)];
 
         return -1;
     }

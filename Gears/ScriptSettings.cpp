@@ -746,8 +746,8 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
         ini.GetValue("CONTROLLER", "Toggle", "UNKNOWN");
     scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ToggleH)] =
         ini.GetValue("CONTROLLER", "ToggleShift", "B");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::SwitchAssist)] = 
-        ini.GetValue("CONTROLLER", "SwitchAssist", "UNKNOWN");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::CycleAssists)] = 
+        ini.GetValue("CONTROLLER", "CycleAssists", "UNKNOWN");
 
     Controller.BlockCarControls = ini.GetBoolValue("CONTROLLER", "BlockCarControls", Controller.BlockCarControls);
     Controller.IgnoreShiftsUI = ini.GetBoolValue("CONTROLLER", "IgnoreShiftsUI", Controller.IgnoreShiftsUI);
@@ -776,7 +776,7 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
 
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Toggle)] = ini.GetLongValue("CONTROLLER_NATIVE", "Toggle", -1);
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ToggleH)] = ini.GetLongValue("CONTROLLER_NATIVE", "ToggleShift", ControlFrontendCancel);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::SwitchAssist)] = ini.GetLongValue("CONTROLLER_NATIVE", "SwitchAssist", -1);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::CycleAssists)] = ini.GetLongValue("CONTROLLER_NATIVE", "CycleAssists", -1);
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftUp", ControlFrontendAccept);
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftDown", ControlFrontendX);
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Clutch)] = ini.GetLongValue("CONTROLLER_NATIVE", "Clutch", ControlFrontendAxisY);
@@ -791,7 +791,7 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     // [KEYBOARD]
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Toggle)] = str2key(ini.GetValue("KEYBOARD", "Toggle", "VK_OEM_5"));
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleH)] = str2key(ini.GetValue("KEYBOARD", "ToggleH", "VK_OEM_6"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::SwitchAssist)] = str2key(ini.GetValue("KEYBOARD", "SwitchAssist", "UNKNOWN"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::CycleAssists)] = str2key(ini.GetValue("KEYBOARD", "CycleAssists", "UNKNOWN"));
 
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftUp)] = str2key(ini.GetValue("KEYBOARD", "ShiftUp", "LSHIFT"));
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftDown)] = str2key(ini.GetValue("KEYBOARD", "ShiftDown", "LCTRL"));
@@ -883,11 +883,11 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ToggleH)] =
         ini.GetLongValue("CHANGE_SHIFTMODE", "BUTTON", -1);
 
-    // [SWITCH_ASSIST]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::SwitchAssist)] =
-        DeviceIndexToGUID(ini.GetLongValue("SWITCH_ASSIST", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::SwitchAssist)] =
-        ini.GetLongValue("SWITCH_ASSIST", "BUTTON", -1);
+    // [CYCLE_ASSISTS]
+    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::CycleAssists)] =
+        DeviceIndexToGUID(ini.GetLongValue("CYCLE_ASSISTS", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::CycleAssists)] =
+        ini.GetLongValue("CYCLE_ASSISTS", "BUTTON", -1);
 
     // [STEER]
     scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Steer)] =

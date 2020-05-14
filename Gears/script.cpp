@@ -495,10 +495,10 @@ void update_manual_transmission() {
         g_settings.SaveGeneral();
     }
 
-    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::SwitchAssist) || 
-        g_controls.ButtonJustPressed(CarControls::WheelControlType::SwitchAssist) ||
-        g_controls.ButtonHeld(CarControls::ControllerControlType::SwitchAssist) ||
-        g_controls.PrevInput == CarControls::Controller && g_controls.ButtonHeld(CarControls::LegacyControlType::SwitchAssist)) {
+    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::CycleAssists) || 
+        g_controls.ButtonJustPressed(CarControls::WheelControlType::CycleAssists) ||
+        g_controls.ButtonHeld(CarControls::ControllerControlType::CycleAssists) ||
+        g_controls.PrevInput == CarControls::Controller && g_controls.ButtonHeld(CarControls::LegacyControlType::CycleAssists)) {
 
         uint8_t currMode = 0;
         // 3: ABS + ESC + TCS

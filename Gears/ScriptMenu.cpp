@@ -121,7 +121,7 @@ namespace {
         { CarControls::WheelControlType::IndicatorHazard, "[IndicatorHazard]" },
         { CarControls::WheelControlType::Toggle         , "[ToggleMod]" },
         { CarControls::WheelControlType::ToggleH        , "[ChangeShiftMode]" },
-        { CarControls::WheelControlType::SwitchAssist   , "[SwitchAssist]" },
+        { CarControls::WheelControlType::CycleAssists   , "[SwitchAssist]" },
     };
 
     const std::vector<SFont> fonts {
