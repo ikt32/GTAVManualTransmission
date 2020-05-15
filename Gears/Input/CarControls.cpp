@@ -29,10 +29,9 @@ void CarControls::InitWheel() {
 void CarControls::InitFFB() {
 
     auto steerGUID = WheelAxes[static_cast<int>(WheelAxisType::Steer)].Guid;
-    auto steerAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)].Control);
     auto ffAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)].Control);
 
-    if (mWheelInput.InitFFB(steerGUID, steerAxis)) {
+    if (mWheelInput.InitFFB(steerGUID, ffAxis)) {
         mWheelInput.UpdateCenterSteering(steerGUID, ffAxis);
     }
 }

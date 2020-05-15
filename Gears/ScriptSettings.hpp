@@ -435,7 +435,6 @@ public:
     int GUIDToDeviceIndex(GUID guid);
 
     void SteeringSaveAxis(const std::string &confTag, ptrdiff_t index, const std::string &axis, int minVal, int maxVal);
-    void SteeringSaveFFBAxis(const std::string &confTag, ptrdiff_t index, const std::string &axis);
     void SteeringSaveButton(const std::string &confTag, ptrdiff_t index, int button);
     void SteeringSaveHShifter(const std::string &confTag, ptrdiff_t index, const std::vector<int>& button);
     void KeyboardSaveKey(const std::string &confTag, const std::string &key);

@@ -1709,9 +1709,6 @@ void saveAxis(const std::string &confTag, GUID devGUID, const std::string& axis,
     std::string devName = StrUtil::utf8_encode(wDevName);
     auto index = g_settings.SteeringAppendDevice(devGUID, devName);
     g_settings.SteeringSaveAxis(confTag, index, axis, min, max);
-    if (confTag == "STEER") {
-        g_settings.SteeringSaveFFBAxis(confTag, index, axis);
-    }
     g_settings.Read(&g_controls);
 }
 

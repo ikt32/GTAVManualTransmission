@@ -881,16 +881,13 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 
     // [STEER]
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Steer)] =
-        CarControls::SWheelInput<std::string>("STEER",
-            DeviceIndexToGUID(ini.GetLongValue("STEER", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
-            ini.GetValue("STEER", "AXLE", ""),
-            "Steer");
+        parseWheelItem<std::string>(ini, "STEER", "", "Steering");
 
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::ForceFeedback)] =
         CarControls::SWheelInput<std::string>("FFB",
             DeviceIndexToGUID(ini.GetLongValue("STEER", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
             ini.GetValue("STEER", "FFB", ""),
-            "FFB");
+            "Force feedback");
 
     Wheel.Steering.Min = ini.GetLongValue("STEER", "MIN", -1);
     Wheel.Steering.Max = ini.GetLongValue("STEER", "MAX", -1);
@@ -908,10 +905,7 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 
     // [THROTTLE]
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Throttle)] =
-        CarControls::SWheelInput<std::string>("THROTTLE",
-            DeviceIndexToGUID(ini.GetLongValue("THROTTLE", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
-            ini.GetValue("THROTTLE", "AXLE", ""),
-            "Throttle");
+        parseWheelItem<std::string>(ini, "THROTTLE", "");
     Wheel.Throttle.Min = ini.GetLongValue("THROTTLE", "MIN", -1);
     Wheel.Throttle.Max = ini.GetLongValue("THROTTLE", "MAX", -1);
     Wheel.Throttle.AntiDeadZone = ini.GetDoubleValue("THROTTLE", "ANTIDEADZONE", 0.25);
@@ -919,10 +913,7 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 
     // [BRAKE]
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Brake)] =
-        CarControls::SWheelInput<std::string>("BRAKE",
-            DeviceIndexToGUID(ini.GetLongValue("BRAKE", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
-            ini.GetValue("BRAKE", "AXLE", ""),
-            "Brake");
+        parseWheelItem<std::string>(ini, "BRAKE", "");
     Wheel.Brake.Min = ini.GetLongValue("BRAKE", "MIN", -1);
     Wheel.Brake.Max = ini.GetLongValue("BRAKE", "MAX", -1);
     Wheel.Brake.AntiDeadZone = ini.GetDoubleValue("BRAKE", "ANTIDEADZONE", 0.25);
@@ -930,19 +921,13 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 
     // [CLUTCH]
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Clutch)] =
-        CarControls::SWheelInput<std::string>("CLUTCH",
-            DeviceIndexToGUID(ini.GetLongValue("CLUTCH", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
-            ini.GetValue("CLUTCH", "AXLE", ""),
-            "Clutch");
+        parseWheelItem<std::string>(ini, "Clutch", "");
     Wheel.Clutch.Min = ini.GetLongValue("CLUTCH", "MIN", -1);
     Wheel.Clutch.Max = ini.GetLongValue("CLUTCH", "MAX", -1);
 
     // [HANDBRAKE_ANALOG]
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Handbrake)] =
-        CarControls::SWheelInput<std::string>("HANDBRAKE_ANALOG",
-            DeviceIndexToGUID(ini.GetLongValue("HANDBRAKE_ANALOG", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
-            ini.GetValue("HANDBRAKE_ANALOG", "AXLE", ""),
-            "Handbrake (Analog)");
+        parseWheelItem<std::string>(ini, "HANDBRAKE_ANALOG", "", "Handbrake (analog)");
     Wheel.HandbrakeA.Min = ini.GetLongValue("HANDBRAKE_ANALOG", "MIN", -1);
     Wheel.HandbrakeA.Max = ini.GetLongValue("HANDBRAKE_ANALOG", "MAX", -1);
 
@@ -1110,18 +1095,10 @@ void ScriptSettings::SteeringSaveAxis(const std::string &confTag, ptrdiff_t inde
     ini.SetValue(confTag.c_str(), "AXLE", axis.c_str());
     ini.SetValue(confTag.c_str(), "MIN", std::to_string(minVal).c_str());
     ini.SetValue(confTag.c_str(), "MAX", std::to_string(maxVal).c_str());
-    result = ini.SaveFile(settingsWheelFile.c_str());
-    CHECK_LOG_SI_ERROR(result, "save");
-}
 
-void ScriptSettings::SteeringSaveFFBAxis(const std::string & confTag, ptrdiff_t index, const std::string & axis) {
-    CSimpleIniA ini;
-    ini.SetUnicode();
-    SI_Error result = ini.LoadFile(settingsWheelFile.c_str());
-    CHECK_LOG_SI_ERROR(result, "load");
+    if (confTag == "STEER")
+        ini.SetValue(confTag.c_str(), "FFB", axis.c_str());
 
-    ini.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
-    ini.SetValue(confTag.c_str(), "FFB", axis.c_str());
     result = ini.SaveFile(settingsWheelFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
 }
@@ -1258,7 +1235,7 @@ CarControls::SWheelInput<T> ScriptSettings::parseWheelItem(CSimpleIniA& ini, con
     else if constexpr (std::is_same<T, std::string>::value) {
         return CarControls::SWheelInput<T>(section,
             DeviceIndexToGUID(ini.GetLongValue(section, "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
-            ini.GetValue(section, "AXLE", default), nameFmt.c_str());
+            ini.GetValue(section, "AXLE", default.c_str()), nameFmt.c_str());
     }
     else {
         static_assert(false, "Type must be string or int.");
