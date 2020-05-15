@@ -1116,7 +1116,7 @@ bool subAutoShiftSelect() {
         return true;
     }
     // Unassigned neutral -> pop into neutral when any gear is released
-    if (g_controls.WheelButton[static_cast<int>(CarControls::WheelControlType::ANeutral)] == -1) {
+    if (g_controls.WheelButton[static_cast<int>(CarControls::WheelControlType::ANeutral)].Control == -1) {
         if (g_controls.ButtonReleased(CarControls::WheelControlType::APark) ||
             g_controls.ButtonReleased(CarControls::WheelControlType::AReverse) ||
             g_controls.ButtonReleased(CarControls::WheelControlType::ADrive)) {

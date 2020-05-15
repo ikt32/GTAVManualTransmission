@@ -1,13 +1,13 @@
 #pragma once
-#include <Windows.h>
 
-#include <vector>
+#include "Input/CarControls.hpp"
 #include "Util/Logger.hpp"
-#include "simpleini/SimpleIni.h"
+
+#include <simpleini/SimpleIni.h>
+#include <vector>
+#include <string>
 
 class VehicleConfig;
-class Logger;
-class CarControls;
 
 enum class EShiftMode : int {
     Sequential = 0,
@@ -451,6 +451,9 @@ private:
 
     // Just looks up which GUID corresponds with what number and returns the GUID.
     GUID DeviceIndexToGUID(int device, std::vector<GUID> guids);
+
+    template<typename T>
+    CarControls::SWheelInput<T> parseWheelItem(CSimpleIniA& ini, const char* section, T default, const char* name = nullptr);
 
     int nDevices = 0;
     std::string settingsGeneralFile;

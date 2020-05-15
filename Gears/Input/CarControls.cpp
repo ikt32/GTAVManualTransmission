@@ -304,39 +304,39 @@ bool CarControls::ButtonReleasedAfter(LegacyControlType control, int time) {
  */
 
 bool CarControls::ButtonJustPressed(WheelControlType control) {
-    if (!mWheelInput.IsConnected(WheelButtonGUIDs[static_cast<int>(control)]) ||
-        WheelButton[static_cast<int>(control)] == -1) {
+    if (!mWheelInput.IsConnected(WheelButton[static_cast<int>(control)].Guid) ||
+        WheelButton[static_cast<int>(control)].Control == -1) {
         return false;
     }
-    return mWheelInput.IsButtonJustPressed(WheelButton[static_cast<int>(control)],
-                                           WheelButtonGUIDs[static_cast<int>(control)]);
+    return mWheelInput.IsButtonJustPressed(WheelButton[static_cast<int>(control)].Control,
+                                           WheelButton[static_cast<int>(control)].Guid);
 }
 
 bool CarControls::ButtonReleased(WheelControlType control) {
-    if (!mWheelInput.IsConnected(WheelButtonGUIDs[static_cast<int>(control)]) ||
-        WheelButton[static_cast<int>(control)] == -1) {
+    if (!mWheelInput.IsConnected(WheelButton[static_cast<int>(control)].Guid) ||
+        WheelButton[static_cast<int>(control)].Control == -1) {
         return false;
     }
-    return mWheelInput.IsButtonJustReleased(WheelButton[static_cast<int>(control)],
-                                            WheelButtonGUIDs[static_cast<int>(control)]);
+    return mWheelInput.IsButtonJustReleased(WheelButton[static_cast<int>(control)].Control,
+                                            WheelButton[static_cast<int>(control)].Guid);
 }
 
 bool CarControls::ButtonHeld(WheelControlType control, int delay) {
-    if (!mWheelInput.IsConnected(WheelButtonGUIDs[static_cast<int>(control)]) ||
-        WheelButton[static_cast<int>(control)] == -1) {
+    if (!mWheelInput.IsConnected(WheelButton[static_cast<int>(control)].Guid) ||
+        WheelButton[static_cast<int>(control)].Control == -1) {
         return false;
     }
-    return mWheelInput.WasButtonHeldForMs(WheelButton[static_cast<int>(control)],
-                                          WheelButtonGUIDs[static_cast<int>(control)], delay);
+    return mWheelInput.WasButtonHeldForMs(WheelButton[static_cast<int>(control)].Control,
+                                          WheelButton[static_cast<int>(control)].Guid, delay);
 }
 
 bool CarControls::ButtonIn(WheelControlType control) {
-    if (!mWheelInput.IsConnected(WheelButtonGUIDs[static_cast<int>(control)]) ||
-        WheelButton[static_cast<int>(control)] == -1) {
+    if (!mWheelInput.IsConnected(WheelButton[static_cast<int>(control)].Guid) ||
+        WheelButton[static_cast<int>(control)].Control == -1) {
         return false;
     }
-    return mWheelInput.IsButtonPressed(WheelButton[static_cast<int>(control)],
-                                       WheelButtonGUIDs[static_cast<int>(control)]);
+    return mWheelInput.IsButtonPressed(WheelButton[static_cast<int>(control)].Control,
+                                       WheelButton[static_cast<int>(control)].Guid);
 }
 
 void CarControls::CheckCustomButtons() {

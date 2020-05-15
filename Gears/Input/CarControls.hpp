@@ -127,6 +127,20 @@ public:
         Wheel = 2
     };
 
+    template <typename TControl>
+    struct SWheelInput {
+        SWheelInput()
+            : Guid({}), Control() {}
+
+        SWheelInput(std::string configTag, GUID guid, TControl control, std::string name)
+            : ConfigTag(std::move(configTag)), Guid(guid), Control(control), Name(std::move(name)) {}
+
+        std::string ConfigTag;
+        GUID Guid;
+        TControl Control;
+        std::string Name;
+    };
+
     const std::vector<std::pair<std::string, int>> LegacyControlsMap = {
         { "ControlFrontendDown",		187 },
         { "ControlFrontendUp",			188 },
@@ -233,24 +247,10 @@ public:
 
     std::array<int, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
 
-    template <typename TControl>
-    struct SWheelInput {
-        SWheelInput()
-            : Guid({}), Control({}) {}
-
-        SWheelInput(GUID guid, TControl control, std::string name, std::string configTag)
-            : Guid(guid), Control(control), Name(std::move(name)), ConfigTag(std::move(configTag)) {}
-
-        GUID Guid;
-        TControl Control;
-        std::string Name;
-        std::string ConfigTag;
-    };
-
     std::array<SWheelInput<std::string>, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
 
-    std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
-    std::array<GUID, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButtonGUIDs = {};
+    std::array<SWheelInput<int>, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
+
     std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
 
     GUID WheelToKeyGUID = {};
@@ -321,32 +321,6 @@ public:
             }
         }
         return std::to_string(nativeControl);
-    }
-
-    int ConfTagWheel2Value(const std::string &confTag) {
-        if (confTag == "TOGGLE_MOD"			) return WheelButton[static_cast<int>(WheelControlType::Toggle)];
-        if (confTag == "CHANGE_SHIFTMODE"	) return WheelButton[static_cast<int>(WheelControlType::ToggleH)];
-        if (confTag == "THROTTLE_BUTTON") return WheelButton[static_cast<int>(WheelControlType::Throttle)];
-        if (confTag == "BRAKE_BUTTON") return WheelButton[static_cast<int>(WheelControlType::Brake)];
-        if (confTag == "CLUTCH_BUTTON"		) return WheelButton[static_cast<int>(WheelControlType::Clutch)];
-        if (confTag == "SHIFT_UP"			) return WheelButton[static_cast<int>(WheelControlType::ShiftUp)];
-        if (confTag == "SHIFT_DOWN"			) return WheelButton[static_cast<int>(WheelControlType::ShiftDown)];
-        if (confTag == "ENGINE"				) return WheelButton[static_cast<int>(WheelControlType::Engine)];
-        if (confTag == "HANDBRAKE"			) return WheelButton[static_cast<int>(WheelControlType::Handbrake)];
-        if (confTag == "HORN"				) return WheelButton[static_cast<int>(WheelControlType::Horn)];
-        if (confTag == "LIGHTS"				) return WheelButton[static_cast<int>(WheelControlType::Lights)];
-        if (confTag == "LOOK_BACK"			) return WheelButton[static_cast<int>(WheelControlType::LookBack)];
-        if (confTag == "LOOK_LEFT"			) return WheelButton[static_cast<int>(WheelControlType::LookLeft)];
-        if (confTag == "LOOK_RIGHT"			) return WheelButton[static_cast<int>(WheelControlType::LookRight)];
-        if (confTag == "CHANGE_CAMERA"		) return WheelButton[static_cast<int>(WheelControlType::Camera)];
-        if (confTag == "RADIO_NEXT"			) return WheelButton[static_cast<int>(WheelControlType::RadioNext)];
-        if (confTag == "RADIO_PREVIOUS"		) return WheelButton[static_cast<int>(WheelControlType::RadioPrev)];
-        if (confTag == "INDICATOR_LEFT"		) return WheelButton[static_cast<int>(WheelControlType::IndicatorLeft)];
-        if (confTag == "INDICATOR_RIGHT"	) return WheelButton[static_cast<int>(WheelControlType::IndicatorRight)];
-        if (confTag == "INDICATOR_HAZARD") return WheelButton[static_cast<int>(WheelControlType::IndicatorHazard)];
-        if (confTag == "CYCLE_ASSISTS") return WheelButton[static_cast<int>(WheelControlType::CycleAssists)];
-
-        return -1;
     }
 
 private:

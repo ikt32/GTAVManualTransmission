@@ -20,9 +20,10 @@
 #include <inc/main.h>
 #include <inc/natives.h>
 
-#include <windows.h>
-#include <shellapi.h>
 #include <fmt/format.h>
+
+#include <Windows.h>
+#include <shellapi.h>
 #include <string>
 #include <mutex>
 
@@ -87,73 +88,12 @@ namespace {
         "Automatic"
     };
 
-    const std::vector<SControlText<CarControls::WheelControlType>> wheelMenuButtons {
-        { CarControls::WheelControlType::HR             , "[Gear R]" },
-        { CarControls::WheelControlType::H1             , "[Gear 1]" },
-        { CarControls::WheelControlType::H2             , "[Gear 2]" },
-        { CarControls::WheelControlType::H3             , "[Gear 3]" },
-        { CarControls::WheelControlType::H4             , "[Gear 4]" },
-        { CarControls::WheelControlType::H5             , "[Gear 5]" },
-        { CarControls::WheelControlType::H6             , "[Gear 6]" },
-        { CarControls::WheelControlType::H7             , "[Gear 7]" },
-        { CarControls::WheelControlType::H8             , "[Gear 8]" },
-        { CarControls::WheelControlType::H9             , "[Gear 9]" },
-        { CarControls::WheelControlType::H10            , "[Gear 10]" },
-        { CarControls::WheelControlType::APark          , "[Auto Park]" },
-        { CarControls::WheelControlType::AReverse       , "[Auto Reverse]" },
-        { CarControls::WheelControlType::ANeutral       , "[Auto Reverse]" },
-        { CarControls::WheelControlType::ADrive         , "[Auto Drive]" },
-        { CarControls::WheelControlType::ShiftUp        , "[ShiftUp]" },
-        { CarControls::WheelControlType::ShiftDown      , "[ShiftDown]" },
-        { CarControls::WheelControlType::Clutch         , "[ClutchButton]" },
-        { CarControls::WheelControlType::Engine         , "[Engine]" },
-        { CarControls::WheelControlType::Handbrake      , "[Handbrake]" },
-        { CarControls::WheelControlType::Horn           , "[Horn]" },
-        { CarControls::WheelControlType::Lights         , "[Lights]" },
-        { CarControls::WheelControlType::LookBack       , "[LookBack]" },
-        { CarControls::WheelControlType::LookLeft       , "[LookLeft]" },
-        { CarControls::WheelControlType::LookRight      , "[LookRight]" },
-        { CarControls::WheelControlType::Camera         , "[Camera]" },
-        { CarControls::WheelControlType::RadioNext      , "[RadioNext]" },
-        { CarControls::WheelControlType::RadioPrev      , "[RadioPrev]" },
-        { CarControls::WheelControlType::IndicatorLeft  , "[IndicatorLeft]" },
-        { CarControls::WheelControlType::IndicatorRight , "[IndicatorRight]" },
-        { CarControls::WheelControlType::IndicatorHazard, "[IndicatorHazard]" },
-        { CarControls::WheelControlType::Toggle         , "[ToggleMod]" },
-        { CarControls::WheelControlType::ToggleH        , "[ChangeShiftMode]" },
-        { CarControls::WheelControlType::CycleAssists   , "[SwitchAssist]" },
-    };
-
     const std::vector<SFont> fonts {
         { 0, "Chalet London" },
         { 1, "Sign Painter" },
         { 2, "Slab Serif" },
         { 4, "Chalet Cologne" },
         { 7, "Pricedown" },
-    };
-
-    const std::vector<std::string> buttonConfTags {
-        { "TOGGLE_MOD" },
-        { "CHANGE_SHIFTMODE" },
-        { "SWITCH_ASSIST" },
-        { "THROTTLE_BUTTON" },
-        { "BRAKE_BUTTON" },
-        { "CLUTCH_BUTTON" },
-        { "SHIFT_UP" },
-        { "SHIFT_DOWN" },
-        { "ENGINE" },
-        { "HANDBRAKE" },
-        { "HORN" },
-        { "LIGHTS" },
-        { "LOOK_BACK" },
-        { "LOOK_LEFT" },
-        { "LOOK_RIGHT" },
-        { "CHANGE_CAMERA" },
-        { "RADIO_NEXT" },
-        { "RADIO_PREVIOUS" },
-        { "INDICATOR_LEFT" },
-        { "INDICATOR_RIGHT" },
-        { "INDICATOR_HAZARD" },
     };
 
     const std::vector<STagInfo> keyboardConfTags {
@@ -993,6 +933,9 @@ void update_axesmenu() {
     };
 
     for (const auto& input : g_controls.WheelAxes) {
+        if (input.ConfigTag.empty())
+            continue;
+
         // FFB handled in the wheel case of configAxis
         if (input.ConfigTag == "FFB")
             continue;
@@ -1180,18 +1123,42 @@ void update_buttonsmenu() {
     std::vector<std::string> buttonInfo;
     buttonInfo.emplace_back("Press RIGHT to clear this button");
     buttonInfo.emplace_back("Active buttons:");
-    for (const auto& wheelButton : wheelMenuButtons) {
-        if (g_controls.ButtonIn(wheelButton.Control))
-            buttonInfo.emplace_back(wheelButton.Text);
+
+    for (uint32_t i = 0; i < static_cast<uint32_t>(CarControls::WheelControlType::SIZEOF_WheelControlType); ++i) {
+        const auto& input = g_controls.WheelButton[i];
+
+        // Don't show the H-pattern shifter in this menu, it has its own options
+        if (input.ConfigTag.rfind("HPATTERN_", 0) == 0 ||
+            input.ConfigTag.rfind("AUTO_", 0) == 0)
+            continue;
+
+        if (g_controls.ButtonIn(static_cast<CarControls::WheelControlType>(i)))
+            buttonInfo.emplace_back(input.Name);
     }
     if (buttonInfo.size() == 2)
         buttonInfo.emplace_back("None");
 
-    for (auto confTag : buttonConfTags) {
-        buttonInfo.push_back(fmt::format("Assigned to {}", g_controls.ConfTagWheel2Value(confTag)));
-        if (g_menu.OptionPlus(fmt::format("Assign {}", confTag), buttonInfo, nullptr, std::bind(clearButton, confTag), nullptr, "Current inputs")) {
-            bool result = configButton(confTag);
-            UI::Notify(WARN, fmt::format("[{}] {}", confTag, result ? "saved" : "assignment cancelled."));
+    for (const auto& input : g_controls.WheelButton) {
+        // Don't show the H-pattern shifter in this menu, it has its own options
+        if (input.ConfigTag.rfind("HPATTERN_", 0) == 0 ||
+            input.ConfigTag.rfind("AUTO_", 0) == 0 ||
+            input.ConfigTag.empty())
+            continue;
+
+        buttonInfo.push_back(fmt::format("Assigned to {}", input.Control));
+        if (g_menu.OptionPlus(
+            fmt::format("Assign [{}]", input.Name),
+            buttonInfo,
+            nullptr,
+            [&input] { return clearButton(input.ConfigTag); },
+            nullptr,
+            "Current inputs")) {
+            bool result = configButton(input.ConfigTag);
+            UI::Notify(WARN, result ?
+                fmt::format("[{}] saved", input.Name) :
+                fmt::format("[{}] cancelled", input.Name));
+            if (result)
+                initWheel();
         }
         buttonInfo.pop_back();
     }
@@ -1771,7 +1738,11 @@ void saveHShifter(const std::string &confTag, GUID devGUID, const std::vector<in
     std::wstring wDevName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     std::string devName = StrUtil::utf8_encode(wDevName);
     auto index = g_settings.SteeringAppendDevice(devGUID, devName);
-    g_settings.SteeringSaveHShifter(confTag, index, buttonArray);
+
+    for (uint8_t i = 0; i < buttonArray.size(); ++i) {
+        g_settings.SteeringSaveButton(fmt::format("HPATTERN_{}", i), index, buttonArray[i]);
+    }
+
     g_settings.Read(&g_controls);
 }
 
@@ -1817,17 +1788,18 @@ void clearButton(const std::string& confTag) {
 
 void clearHShifter() {
     saveChanges();
-    std::vector<int> empty(g_numGears);
-    std::fill(empty.begin(), empty.end(), -1);
-
-    g_settings.SteeringSaveHShifter("SHIFTER", -1, empty);
+    for (uint8_t i = 0; i < g_numGears; ++i) {
+        g_settings.SteeringSaveButton(fmt::format("HPATTERN_{}", i), -1, -1);
+    }
     g_settings.Read(&g_controls);
     UI::Notify(WARN, "Cleared H-pattern shifter");
 }
 
 void clearASelect() {
     saveChanges();
+    g_settings.SteeringSaveButton("AUTO_P", -1, -1);
     g_settings.SteeringSaveButton("AUTO_R", -1, -1);
+    g_settings.SteeringSaveButton("AUTO_N", -1, -1);
     g_settings.SteeringSaveButton("AUTO_D", -1, -1);
     g_settings.Read(&g_controls);
     UI::Notify(WARN, "Cleared H-pattern shifter (auto)");
