@@ -890,12 +890,18 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
         ini.GetLongValue("CYCLE_ASSISTS", "BUTTON", -1);
 
     // [STEER]
-    scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Steer)] =
-        DeviceIndexToGUID(ini.GetLongValue("STEER", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Steer)] =
-        ini.GetValue("STEER", "AXLE", "");
+        CarControls::SWheelInput<std::string>(
+            DeviceIndexToGUID(ini.GetLongValue("STEER", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
+            ini.GetValue("STEER", "AXLE", ""),
+            "Steer", "STEER");
+
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::ForceFeedback)] =
-        ini.GetValue("STEER", "FFB", "");
+        CarControls::SWheelInput<std::string>(
+            DeviceIndexToGUID(ini.GetLongValue("STEER", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
+            ini.GetValue("STEER", "FFB", ""),
+            "FFB", "FFB");
+
     Wheel.Steering.Min = ini.GetLongValue("STEER", "MIN", -1);
     Wheel.Steering.Max = ini.GetLongValue("STEER", "MAX", -1);
 
@@ -911,38 +917,42 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     Wheel.Steering.SteerMult = ini.GetDoubleValue("STEER", "GameSteerMultWheel", Wheel.Steering.SteerMult);
 
     // [THROTTLE]
-    scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Throttle)] =
-        DeviceIndexToGUID(ini.GetLongValue("THROTTLE", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Throttle)] =
-        ini.GetValue("THROTTLE", "AXLE", "");
+        CarControls::SWheelInput<std::string>(
+            DeviceIndexToGUID(ini.GetLongValue("THROTTLE", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
+            ini.GetValue("THROTTLE", "AXLE", ""),
+            "Throttle", "THROTTLE");
     Wheel.Throttle.Min = ini.GetLongValue("THROTTLE", "MIN", -1);
     Wheel.Throttle.Max = ini.GetLongValue("THROTTLE", "MAX", -1);
     Wheel.Throttle.AntiDeadZone = ini.GetDoubleValue("THROTTLE", "ANTIDEADZONE", 0.25);
     Wheel.Throttle.Gamma = ini.GetDoubleValue("THROTTLE", "GAMMA", 1.0);
 
     // [BRAKE]
-    scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Brake)] =
-        DeviceIndexToGUID(ini.GetLongValue("BRAKE", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Brake)] =
-        ini.GetValue("BRAKE", "AXLE", "");
+        CarControls::SWheelInput<std::string>(
+            DeviceIndexToGUID(ini.GetLongValue("BRAKE", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
+            ini.GetValue("BRAKE", "AXLE", ""),
+            "Brake", "BRAKE");
     Wheel.Brake.Min = ini.GetLongValue("BRAKE", "MIN", -1);
     Wheel.Brake.Max = ini.GetLongValue("BRAKE", "MAX", -1);
     Wheel.Brake.AntiDeadZone = ini.GetDoubleValue("BRAKE", "ANTIDEADZONE", 0.25);
     Wheel.Brake.Gamma = ini.GetDoubleValue("BRAKE", "GAMMA", 1.0);
 
     // [CLUTCH]
-    scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Clutch)] =
-        DeviceIndexToGUID(ini.GetLongValue("CLUTCH", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Clutch)] =
-        ini.GetValue("CLUTCH", "AXLE", "");
+        CarControls::SWheelInput<std::string>(
+            DeviceIndexToGUID(ini.GetLongValue("CLUTCH", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
+            ini.GetValue("CLUTCH", "AXLE", ""),
+            "Clutch", "CLUTCH");
     Wheel.Clutch.Min = ini.GetLongValue("CLUTCH", "MIN", -1);
     Wheel.Clutch.Max = ini.GetLongValue("CLUTCH", "MAX", -1);
 
     // [HANDBRAKE_ANALOG]
-    scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Handbrake)] =
-        DeviceIndexToGUID(ini.GetLongValue("HANDBRAKE_ANALOG", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Handbrake)] =
-        ini.GetValue("HANDBRAKE_ANALOG", "AXLE", "");
+        CarControls::SWheelInput<std::string>(
+            DeviceIndexToGUID(ini.GetLongValue("HANDBRAKE_ANALOG", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
+            ini.GetValue("HANDBRAKE_ANALOG", "AXLE", ""),
+            "Handbrake (Analog)", "HANDBRAKE_ANALOG");
     Wheel.HandbrakeA.Min = ini.GetLongValue("HANDBRAKE_ANALOG", "MIN", -1);
     Wheel.HandbrakeA.Max = ini.GetLongValue("HANDBRAKE_ANALOG", "MAX", -1);
 

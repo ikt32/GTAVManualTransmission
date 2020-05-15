@@ -232,9 +232,23 @@ public:
     std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> ControlNativeBlocks = {};
 
     std::array<int, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
-    
-    std::array<std::string, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
-    std::array<GUID, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxesGUIDs = {};
+
+    template <typename TControl>
+    struct SWheelInput {
+        SWheelInput()
+            : Guid({}), Control({}) {}
+
+        SWheelInput(GUID guid, TControl control, std::string name, std::string configTag)
+            : Guid(guid), Control(control), Name(std::move(name)), ConfigTag(std::move(configTag)) {}
+
+        GUID Guid;
+        TControl Control;
+        std::string Name;
+        std::string ConfigTag;
+    };
+
+    std::array<SWheelInput<std::string>, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
+
     std::array<int, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
     std::array<GUID, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButtonGUIDs = {};
     std::array<int, MAX_RGBBUTTONS> WheelToKey = {};

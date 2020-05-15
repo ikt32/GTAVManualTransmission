@@ -816,7 +816,7 @@ void update_keyboardmenu() {
 
 void update_wheelmenu() {
     g_menu.Title("Wheel & pedals");
-    auto wheelGuid = g_controls.WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Steer)];
+    auto wheelGuid = g_controls.WheelAxes[static_cast<int>(CarControls::WheelAxisType::Steer)].Guid;
     auto deviceEntry = g_controls.GetWheel().FindEntryFromGUID(wheelGuid);
     std::string wheelName = "No wheel";
     if (deviceEntry) {
@@ -992,35 +992,25 @@ void update_axesmenu() {
         fmt::format("Handbrake:\t{:.3f}", g_controls.HandbrakeVal),
     };
 
-    if (g_menu.OptionPlus("Configure steering", info, nullptr, std::bind(clearAxis, "STEER"), nullptr, "Input values")) {
-        bool result = configAxis("STEER");
-        UI::Notify(WARN, result ? "Steering axis saved" : "Cancelled steering axis configuration");
-        if (result) 
-            initWheel();
-    }
-    if (g_menu.OptionPlus("Configure throttle", info, nullptr, std::bind(clearAxis, "THROTTLE"), nullptr, "Input values")) {
-        bool result = configAxis("THROTTLE");
-        UI::Notify(WARN, result ? "Throttle axis saved" : "Cancelled throttle axis configuration");
-        if (result) 
-            initWheel();
-    }
-    if (g_menu.OptionPlus("Configure brake", info, nullptr, std::bind(clearAxis, "BRAKE"), nullptr, "Input values")) {
-        bool result = configAxis("BRAKE");
-        UI::Notify(WARN, result ? "Brake axis saved" : "Cancelled brake axis configuration");
-        if (result) 
-            initWheel();
-    }
-    if (g_menu.OptionPlus("Configure clutch", info, nullptr, std::bind(clearAxis, "CLUTCH"), nullptr, "Input values")) {
-        bool result = configAxis("CLUTCH");
-        UI::Notify(WARN, result ? "Clutch axis saved" : "Cancelled clutch axis configuration");
-        if (result) 
-            initWheel();
-    }
-    if (g_menu.OptionPlus("Configure handbrake", info, nullptr, std::bind(clearAxis, "HANDBRAKE_ANALOG"), nullptr, "Input values")) {
-        bool result = configAxis("HANDBRAKE_ANALOG");
-        UI::Notify(WARN, result ? "Handbrake axis saved" : "Cancelled handbrake axis configuration");
-        if (result) 
-            initWheel();
+    for (const auto& input : g_controls.WheelAxes) {
+        // FFB handled in the wheel case of configAxis
+        if (input.ConfigTag == "FFB")
+            continue;
+
+        if (g_menu.OptionPlus(
+            fmt::format("Configure {}", input.Name),
+            info, 
+            nullptr,
+            [&input] { return clearAxis(input.ConfigTag); }, 
+            nullptr, 
+            "Input values")) {
+            bool result = configAxis(input.ConfigTag);
+            UI::Notify(WARN, result ? 
+                fmt::format("[{}] saved", input.Name) : 
+                fmt::format("[{}] cancelled", input.Name));
+            if (result)
+                initWheel();
+        }
     }
 
     g_menu.FloatOption("Steering deadzone", g_settings.Wheel.Steering.DeadZone, 0.0f, 0.5f, 0.01f,
