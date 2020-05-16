@@ -148,7 +148,10 @@ void init() {
  */
 void playWheelEffects(float effSteer) {
 	if (g_settings.Wheel.Options.LogiLEDs) {
-		controls.GetWheel().PlayLedsDInput(controls.WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Steer)], controls.ThrottleVal, 0.5f, 0.95f);
+		controls.GetWheel().PlayLedsDInput(
+			controls.WheelAxes[static_cast<int>(CarControls::WheelAxisType::Steer)].Guid,
+			controls.ThrottleVal,
+			0.5f, 0.95f);
 	}
 
 	auto totalForce = static_cast<int>(controls.ThrottleVal * 20000.0f * 2.0f * (controls.SteerVal - 0.5f));
@@ -206,9 +209,6 @@ void saveAxis(const std::string& confTag, GUID devGUID, const std::string& axis,
 	std::string devName = StrUtil::utf8_encode(wDevName);
 	auto index = g_settings.SteeringAppendDevice(devGUID, devName);
 	g_settings.SteeringSaveAxis(confTag, index, axis, min, max);
-	if (confTag == "STEER") {
-		g_settings.SteeringSaveFFBAxis(confTag, index, axis);
-	}
 	g_settings.Read(&controls);
 }
 
@@ -890,7 +890,7 @@ int main() {
 		if (controls.ButtonIn(CarControls::WheelControlType::Toggle)) std::cout << "ToggleMod ";
 		if (controls.ButtonIn(CarControls::WheelControlType::ToggleH)) std::cout << "ChangeShiftMode ";
 
-		if (controls.GetWheel().IsConnected(controls.WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Steer)]))
+		if (controls.GetWheel().IsConnected(controls.WheelAxes[static_cast<int>(CarControls::WheelAxisType::ForceFeedback)].Guid))
 			playWheelEffects(effSteer);
 		
 		setCursorPosition(0, csbi.srWindow.Bottom - 9);
