@@ -921,7 +921,7 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 
     // [CLUTCH]
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Clutch)] =
-        parseWheelItem<std::string>(ini, "Clutch", "");
+        parseWheelItem<std::string>(ini, "CLUTCH", "");
     Wheel.Clutch.Min = ini.GetLongValue("CLUTCH", "MIN", -1);
     Wheel.Clutch.Max = ini.GetLongValue("CLUTCH", "MAX", -1);
 

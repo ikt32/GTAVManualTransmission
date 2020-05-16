@@ -1,10 +1,12 @@
 # Changelog
 
-## 4.7.2
+## 4.8.0
 
 Lots of small fixes and improvements! The settings files are generally
-compatible, but a `SHIFT_ASSISTS` typo fix now ignores the old
-wrongly spelled `SHIFT_ASSIST` section.
+compatible, aside from the following:
+
+* `SHIFT_ASSISTS` typo fix: now ignores the old wrongly spelled `SHIFT_ASSIST` section
+* H-Pattern shifter assignment changed, now each gear has its own entry
 
 * Engine and transmission
   * Add alternate automatic transmission mode, by [Nyconing](https://github.com/Nyconing)
