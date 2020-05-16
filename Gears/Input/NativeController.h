@@ -1,8 +1,7 @@
 #pragma once
 #include <inc/enums.h>
 
-#include <vector>
-#include <map>
+#include <unordered_map>
 #include <stdexcept>
 #include <string>
 
@@ -15,7 +14,7 @@ public:
         Tapped
     };
 
-    static inline const std::map<eControl, std::string> NativeGamepadInputs = {
+    static inline const std::unordered_map<eControl, std::string> NativeGamepadInputs = {
         { ControlFrontendDown      , "Dpad down" },
         { ControlFrontendUp        , "Dpad up" },
         { ControlFrontendLeft      , "Dpad left" },
@@ -63,11 +62,11 @@ public:
     }
 
 private:
-    std::map<eControl, __int64> pressTime;
-    std::map<eControl, __int64> releaseTime;
-    std::map<eControl, __int64> tapPressTime;
-    std::map<eControl, __int64> tapReleaseTime;
-    std::map<eControl, bool> gameButtonCurr;
-    std::map<eControl, bool> gameButtonPrev;
+    std::unordered_map<eControl, __int64> pressTime;
+    std::unordered_map<eControl, __int64> releaseTime;
+    std::unordered_map<eControl, __int64> tapPressTime;
+    std::unordered_map<eControl, __int64> tapReleaseTime;
+    std::unordered_map<eControl, bool> gameButtonCurr;
+    std::unordered_map<eControl, bool> gameButtonPrev;
 };
 
