@@ -37,9 +37,9 @@ void CarControls::InitFFB() {
 }
 
 void CarControls::updateKeyboard() {
-    ThrottleVal = IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)]) ? 1.0f : 0.0f;
-    BrakeVal = IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Brake)]) ? 1.0f : 0.0f;
-    ClutchVal = IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Clutch)]) ? 1.0f : 0.0f;
+    ThrottleVal = IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)].Control) ? 1.0f : 0.0f;
+    BrakeVal = IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Brake)].Control) ? 1.0f : 0.0f;
+    ClutchVal = IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Clutch)].Control) ? 1.0f : 0.0f;
 }
 
 void CarControls::updateController() {
@@ -144,10 +144,10 @@ void CarControls::UpdateValues(InputDevices prevInput, bool skipKeyboardInput) {
 CarControls::InputDevices CarControls::GetLastInputDevice(InputDevices previousInput, bool enableWheel) {
     auto kbThrottleIdx = static_cast<int>(KeyboardControlType::Throttle);
     auto kbBrakeIdx = static_cast<int>(KeyboardControlType::Brake);
-    if (IsKeyJustPressed(KBControl[kbThrottleIdx], KeyboardControlType::Throttle) ||
-        IsKeyPressed(KBControl[kbThrottleIdx]) ||
-        IsKeyJustPressed(KBControl[kbBrakeIdx], KeyboardControlType::Brake) ||
-        IsKeyPressed(KBControl[kbBrakeIdx])) {
+    if (IsKeyJustPressed(KBControl[kbThrottleIdx].Control, KeyboardControlType::Throttle) ||
+        IsKeyPressed(KBControl[kbThrottleIdx].Control) ||
+        IsKeyJustPressed(KBControl[kbBrakeIdx].Control, KeyboardControlType::Brake) ||
+        IsKeyPressed(KBControl[kbBrakeIdx].Control)) {
         return Keyboard;
     }
 
@@ -214,7 +214,7 @@ bool CarControls::IsKeyJustPressed(int key, KeyboardControlType control) {
 }
 
 bool CarControls::ButtonJustPressed(KeyboardControlType control) {
-    return IsKeyJustPressed(KBControl[static_cast<int>(control)], control);
+    return IsKeyJustPressed(KBControl[static_cast<int>(control)].Control, control);
 }
 
 /*

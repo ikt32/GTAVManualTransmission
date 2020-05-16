@@ -96,31 +96,6 @@ namespace {
         { 7, "Pricedown" },
     };
 
-    const std::vector<STagInfo> keyboardConfTags {
-        { "Toggle"   , "Toggle mod on/off"      },
-        { "ToggleH"  , "Switch shift mode"      },
-        { "SwitchAssist", "Switch assist mode"  },
-        { "ShiftUp"  , "Shift up"               },
-        { "ShiftDown", "Shift down"             },
-        { "Clutch"   , "Hold for clutch"        },
-        { "Engine"   , "Toggle engine on/off"   },
-        { "Throttle" , "Key used for throttle"  },
-        { "Brake"    , "Key used for brake"     },
-        { "HR"       , "H-pattern gear R press" },
-        { "H1"       , "H-pattern gear 1 press" },
-        { "H2"       , "H-pattern gear 2 press" },
-        { "H3"       , "H-pattern gear 3 press" },
-        { "H4"       , "H-pattern gear 4 press" },
-        { "H5"       , "H-pattern gear 5 press" },
-        { "H6"       , "H-pattern gear 6 press" },
-        { "H7"       , "H-pattern gear 7 press" },
-        { "H8"       , "H-pattern gear 8 press" },
-        { "H9"       , "H-pattern gear 9 press" },
-        { "H10"      , "H-pattern gear 10 press"},
-        { "HN"       , "H-pattern Neutral"      },
-    };
-
-
     const std::vector<STagInfo> controllerConfTags {
         { "Toggle"     , "Toggle mod usage: hold"      },
         { "ToggleShift", "Toggle shift usage: hold"    },
@@ -736,18 +711,26 @@ void update_keyboardmenu() {
 
     std::vector<std::string> keyboardInfo = {
         "Press RIGHT to clear key",
-        "Press RETURN to configure button",
-        "",
+        "Active inputs:",
     };
 
-    for (const auto& confTag : keyboardConfTags) {
-        keyboardInfo.back() = confTag.Info;
-        keyboardInfo.push_back(fmt::format("Assigned to {}", key2str(g_controls.ConfTagKB2key(confTag.Tag))));
-        if (g_menu.OptionPlus(fmt::format("Assign {}", confTag.Tag), keyboardInfo, nullptr, std::bind(clearKeyboardKey, confTag.Tag), nullptr, "Current setting")) {
+    for (uint32_t i = 0; i < static_cast<uint32_t>(CarControls::KeyboardControlType::SIZEOF_KeyboardControlType); ++i) {
+        const auto& input = g_controls.KBControl[i];
+
+        if (g_controls.IsKeyPressed(input.Control))
+            keyboardInfo.emplace_back(input.Name);
+    }
+    if (keyboardInfo.size() == 2)
+        keyboardInfo.emplace_back("None");
+
+    for (const auto& input : g_controls.KBControl) {
+        keyboardInfo.push_back(fmt::format("Assigned to {}", key2str(input.Control)));
+        if (g_menu.OptionPlus(fmt::format("Assign {}", input.Name), keyboardInfo, nullptr, std::bind(clearKeyboardKey, input.ConfigTag), nullptr, "Current setting")) {
             WAIT(500);
-            bool result = configKeyboardKey(confTag.Tag);
-            if (!result)
-                UI::Notify(WARN, fmt::format("Cancelled {} assignment", confTag.Tag));
+            bool result = configKeyboardKey(input.ConfigTag);
+            UI::Notify(WARN, result ?
+                fmt::format("[{}] saved", input.Name) :
+                fmt::format("[{}] cancelled", input.Name));
             WAIT(500);
         }
         keyboardInfo.pop_back();

@@ -141,6 +141,16 @@ public:
         std::string Name;
     };
 
+    struct SKeyboardInput {
+        SKeyboardInput() = default;
+        SKeyboardInput(std::string configTag, int control, std::string name)
+            : ConfigTag(std::move(configTag)), Control(control), Name(std::move(name)) {}
+
+        std::string ConfigTag;
+        int Control = -1;
+        std::string Name;
+    };
+
     const std::vector<std::pair<std::string, int>> LegacyControlsMap = {
         { "ControlFrontendDown",		187 },
         { "ControlFrontendUp",			188 },
@@ -228,24 +238,13 @@ public:
     float SteerValRaw = 0.0f;   // For readout purposes. SteerVal is used for gameplay.
     float HandbrakeVal = 0.0f;
 
-    //int ThrottleMin = 0;
-    //int ThrottleMax = 0;
-    //int BrakeMin = 0;
-    //int BrakeMax = 0;
-    //int ClutchMin = 0;
-    //int ClutchMax = 0;
-    //int SteerMin = 0;
-    //int SteerMax = 0;
-    //int HandbrakeMax = 0;
-    //int HandbrakeMin = 0;
-
     std::array<std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
     std::array<int, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXboxBlocks = {};
 
     std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> LegacyControls = {};
     std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> ControlNativeBlocks = {};
 
-    std::array<int, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
+    std::array<SKeyboardInput, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
 
     std::array<SWheelInput<std::string>, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
 
@@ -259,31 +258,6 @@ public:
 
     XInputController& GetController() {
         return mXInputController;
-    }
-
-    int ConfTagKB2key(const std::string &confTag) {
-        if (confTag == "Toggle") return KBControl[static_cast<int>(KeyboardControlType::Toggle)];
-        if (confTag == "ToggleH") return KBControl[static_cast<int>(KeyboardControlType::ToggleH)];
-        if (confTag == "ShiftUp") return KBControl[static_cast<int>(KeyboardControlType::ShiftUp)];
-        if (confTag == "ShiftDown") return KBControl[static_cast<int>(KeyboardControlType::ShiftDown)];
-        if (confTag == "Clutch") return KBControl[static_cast<int>(KeyboardControlType::Clutch)];
-        if (confTag == "Engine") return KBControl[static_cast<int>(KeyboardControlType::Engine)];
-        if (confTag == "Throttle") return KBControl[static_cast<int>(KeyboardControlType::Throttle)];
-        if (confTag == "Brake") return KBControl[static_cast<int>(KeyboardControlType::Brake)];
-        if (confTag == "HR") return KBControl[static_cast<int>(KeyboardControlType::HR)];
-        if (confTag == "H1") return KBControl[static_cast<int>(KeyboardControlType::H1)];
-        if (confTag == "H2") return KBControl[static_cast<int>(KeyboardControlType::H2)];
-        if (confTag == "H3") return KBControl[static_cast<int>(KeyboardControlType::H3)];
-        if (confTag == "H4") return KBControl[static_cast<int>(KeyboardControlType::H4)];
-        if (confTag == "H5") return KBControl[static_cast<int>(KeyboardControlType::H5)];
-        if (confTag == "H6") return KBControl[static_cast<int>(KeyboardControlType::H6)];
-        if (confTag == "H7") return KBControl[static_cast<int>(KeyboardControlType::H7)];
-        if (confTag == "H8") return KBControl[static_cast<int>(KeyboardControlType::H8)];
-        if (confTag == "H9") return KBControl[static_cast<int>(KeyboardControlType::H9)];
-        if (confTag == "H10") return KBControl[static_cast<int>(KeyboardControlType::H10)];
-        if (confTag == "HN") return KBControl[static_cast<int>(KeyboardControlType::HN)];
-        if (confTag == "SwitchAssist") return KBControl[static_cast<int>(KeyboardControlType::CycleAssists)];
-        return -1;
     }
 
     std::string ConfTagController2Value(const std::string &confTag) {

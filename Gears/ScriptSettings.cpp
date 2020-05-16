@@ -21,6 +21,24 @@
 namespace {
     ScriptSettings localSettings;
     VehicleConfig* activeConfig = nullptr;
+
+    // Returns a tidied-up version of the configuration tag, if no name is provided.
+    std::string formatInputName(const char* cfgTag, const char* name) {
+        std::string nameFmt;
+        if (name == nullptr) {
+            nameFmt = cfgTag;
+            std::transform(nameFmt.begin(), nameFmt.end(), nameFmt.begin(), [](char ch) {
+                return ch == '_' ? ' ' : ch;
+                });
+            nameFmt[0] = std::toupper(nameFmt[0]);
+            for (std::size_t i = 1; i < nameFmt.length(); ++i)
+                nameFmt[i] = std::tolower(nameFmt[i]);
+        }
+        else {
+            nameFmt = name;
+        }
+        return nameFmt;
+    }
 }
 EShiftMode Next(EShiftMode mode) {
     return static_cast<EShiftMode>((static_cast<int>(mode) + 1) % 3);
@@ -789,31 +807,30 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] =    ini.GetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", -1)   ;
 
     // [KEYBOARD]
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Toggle)] = str2key(ini.GetValue("KEYBOARD", "Toggle", "VK_OEM_5"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleH)] = str2key(ini.GetValue("KEYBOARD", "ToggleH", "VK_OEM_6"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::CycleAssists)] = str2key(ini.GetValue("KEYBOARD", "CycleAssists", "UNKNOWN"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Toggle)] = parseKeyboardItem(ini, "Toggle", "VK_OEM_5", "Toggle MT");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleH)] = parseKeyboardItem(ini, "ToggleH", "VK_OEM_6", "Switch shift mode");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::CycleAssists)] = parseKeyboardItem(ini, "CycleAssists", "UNKNOWN", "Cycle assists");
 
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftUp)] = str2key(ini.GetValue("KEYBOARD", "ShiftUp", "LSHIFT"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftDown)] = str2key(ini.GetValue("KEYBOARD", "ShiftDown", "LCTRL"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Clutch)] = str2key(ini.GetValue("KEYBOARD", "Clutch", "Z"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Engine)] = str2key(ini.GetValue("KEYBOARD", "Engine", "X"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftUp)] = parseKeyboardItem(ini, "ShiftUp", "LSHIFT", "Shift up");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftDown)] = parseKeyboardItem(ini, "ShiftDown", "LCTRL", "Shift down");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Clutch)] = parseKeyboardItem(ini, "Clutch", "Z");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Engine)] = parseKeyboardItem(ini, "Engine", "X");
 
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Throttle)] = str2key(ini.GetValue("KEYBOARD", "Throttle", "W"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Brake)] = str2key(ini.GetValue("KEYBOARD", "Brake", "S"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Throttle)] = parseKeyboardItem(ini, "Throttle", "W");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Brake)] = parseKeyboardItem(ini, "Brake", "S");
 
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HR)] = str2key(ini.GetValue("KEYBOARD", "HR", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H1)] = str2key(ini.GetValue("KEYBOARD", "H1", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H2)] = str2key(ini.GetValue("KEYBOARD", "H2", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H3)] = str2key(ini.GetValue("KEYBOARD", "H3", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H4)] = str2key(ini.GetValue("KEYBOARD", "H4", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H5)] = str2key(ini.GetValue("KEYBOARD", "H5", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H6)] = str2key(ini.GetValue("KEYBOARD", "H6", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] = str2key(ini.GetValue("KEYBOARD", "H7", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H8)] = str2key(ini.GetValue("KEYBOARD", "H8", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H9)] = str2key(ini.GetValue("KEYBOARD", "H9", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H10)] = str2key(ini.GetValue("KEYBOARD", "H10", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HN)] = str2key(ini.GetValue("KEYBOARD", "HN", "UNKNOWN"));
-
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HR)] =  parseKeyboardItem(ini, "HR", "UNKNOWN", "H-pattern reverse");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H1)] =  parseKeyboardItem(ini, "H1", "UNKNOWN", "H-pattern 1");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H2)] =  parseKeyboardItem(ini, "H2", "UNKNOWN", "H-pattern 2");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H3)] =  parseKeyboardItem(ini, "H3", "UNKNOWN", "H-pattern 3");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H4)] =  parseKeyboardItem(ini, "H4", "UNKNOWN", "H-pattern 4");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H5)] =  parseKeyboardItem(ini, "H5", "UNKNOWN", "H-pattern 5");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H6)] =  parseKeyboardItem(ini, "H6", "UNKNOWN", "H-pattern 6");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] =  parseKeyboardItem(ini, "H7", "UNKNOWN", "H-pattern 7");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H8)] =  parseKeyboardItem(ini, "H8", "UNKNOWN", "H-pattern 8");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H9)] =  parseKeyboardItem(ini, "H9", "UNKNOWN", "H-pattern 9");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H10)] = parseKeyboardItem(ini, "H10", "UNKNOWN", "H-pattern 10");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HN)] =  parseKeyboardItem(ini, "HN", "UNKNOWN", "H-pattern neutral");
 }
 
 void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
@@ -1213,20 +1230,7 @@ int ScriptSettings::GUIDToDeviceIndex(GUID guidToFind) {
 
 template <typename T>
 CarControls::SWheelInput<T> ScriptSettings::parseWheelItem(CSimpleIniA& ini, const char* section, T default, const char* name) {
-    std::string nameFmt;
-    if (name == nullptr) {
-        nameFmt = section;
-        std::transform(nameFmt.begin(), nameFmt.end(), nameFmt.begin(), [](char ch) {
-            return ch == '_' ? ' ' : ch;
-            });
-        nameFmt[0] = std::toupper(nameFmt[0]);
-        for (std::size_t i = 1; i < nameFmt.length(); ++i)
-            nameFmt[i] = std::tolower(nameFmt[i]);
-    }
-    else {
-        nameFmt = name;
-    }
-
+    std::string nameFmt = formatInputName(section, name);
     if constexpr (std::is_same<T, int>::value) {
         return CarControls::SWheelInput<T>(section,
             DeviceIndexToGUID(ini.GetLongValue(section, "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
@@ -1240,6 +1244,11 @@ CarControls::SWheelInput<T> ScriptSettings::parseWheelItem(CSimpleIniA& ini, con
     else {
         static_assert(false, "Type must be string or int.");
     }
+}
+
+CarControls::SKeyboardInput ScriptSettings::parseKeyboardItem(CSimpleIniA& ini, const char* key, const char* default, const char* name) {
+    std::string nameFmt = formatInputName(key, name);
+    return CarControls::SKeyboardInput(key, str2key(ini.GetValue("KEYBOARD", key, default)), nameFmt);
 }
 
 #pragma warning(pop)
