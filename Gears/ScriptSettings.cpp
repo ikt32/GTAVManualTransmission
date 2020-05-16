@@ -759,14 +759,6 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [CONTROLLER]
-    // TODO: Fix this somehow
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Toggle)] =
-        ini.GetValue("CONTROLLER", "Toggle", "UNKNOWN");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ToggleH)] =
-        ini.GetValue("CONTROLLER", "ToggleShift", "B");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::CycleAssists)] = 
-        ini.GetValue("CONTROLLER", "CycleAssists", "UNKNOWN");
-
     Controller.BlockCarControls = ini.GetBoolValue("CONTROLLER", "BlockCarControls", Controller.BlockCarControls);
     Controller.IgnoreShiftsUI = ini.GetBoolValue("CONTROLLER", "IgnoreShiftsUI", Controller.IgnoreShiftsUI);
     Controller.BlockHShift = ini.GetBoolValue("CONTROLLER", "BlockHShift", Controller.BlockHShift);
@@ -777,30 +769,34 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
 
     Controller.ToggleEngine = ini.GetBoolValue("CONTROLLER", "ToggleEngine", Controller.ToggleEngine);
 
-    // TODO: Also this
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] = ini.GetValue("CONTROLLER", "ShiftUp", "A");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = ini.GetValue("CONTROLLER", "ShiftDown", "X");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Clutch)] = ini.GetValue("CONTROLLER", "Clutch", "LeftThumbUp");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Engine)] = ini.GetValue("CONTROLLER", "Engine", "DpadDown");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Throttle)] = ini.GetValue("CONTROLLER", "Throttle", "RightTrigger");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Brake)] = ini.GetValue("CONTROLLER", "Brake", "LeftTrigger");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Toggle)] = parseControllerItem<std::string>(ini, "Toggle", "UNKNOWN", "Toggle MT", "Usage: hold");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ToggleH)] = parseControllerItem<std::string>(ini, "ToggleShift", "B", "Change shift mode", "Usage: hold");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::CycleAssists)] = parseControllerItem<std::string>(ini, "CycleAssists", "UNKNOWN", "Cycle assists", "Usage: hold");
 
-    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] = ini.GetLongValue("CONTROLLER", "ShiftUpBlocks", -1);
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] =   parseControllerItem<std::string>(ini, "ShiftUp", "A", "Shift up", "Usage: tap");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = parseControllerItem<std::string>(ini, "ShiftDown", "X", "Shift down", "Usage: tap");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Engine)] =    parseControllerItem<std::string>(ini, "Engine", "DpadDown", "Engine", "Usage: hold");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Throttle)] =  parseControllerItem<std::string>(ini, "Throttle", "RightTrigger", "Throttle", "Usage: analog");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Brake)] =     parseControllerItem<std::string>(ini, "Brake", "LeftTrigger", "Brake", "Usage: analog");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Clutch)] =    parseControllerItem<std::string>(ini, "Clutch", "LeftThumbUp", "Clutch", "Usage: hold/analog");
+
+    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] =   ini.GetLongValue("CONTROLLER", "ShiftUpBlocks", -1);
     scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = ini.GetLongValue("CONTROLLER", "ShiftDownBlocks", -1);
-    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)] = ini.GetLongValue("CONTROLLER", "ClutchBlocks", -1);
+    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)] =    ini.GetLongValue("CONTROLLER", "ClutchBlocks", -1);
 
     // [CONTROLLER_NATIVE]
     Controller.Native.Enable = ini.GetBoolValue("CONTROLLER_NATIVE", "Enable", Controller.Native.Enable);
 
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Toggle)] = ini.GetLongValue("CONTROLLER_NATIVE", "Toggle", -1);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ToggleH)] = ini.GetLongValue("CONTROLLER_NATIVE", "ToggleShift", ControlFrontendCancel);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::CycleAssists)] = ini.GetLongValue("CONTROLLER_NATIVE", "CycleAssists", -1);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftUp", ControlFrontendAccept);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftDown", ControlFrontendX);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Clutch)] = ini.GetLongValue("CONTROLLER_NATIVE", "Clutch", ControlFrontendAxisY);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Engine)] = ini.GetLongValue("CONTROLLER_NATIVE", "Engine", ControlFrontendDown);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Throttle)] = ini.GetLongValue("CONTROLLER_NATIVE", "Throttle", ControlFrontendRt);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Brake)] = ini.GetLongValue("CONTROLLER_NATIVE", "Brake", ControlFrontendLt);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Toggle)] =       parseControllerItem<eControl>(ini, "Toggle", static_cast<eControl>(-1), "Toggle MT", "Usage: hold");
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ToggleH)] =      parseControllerItem<eControl>(ini, "ToggleShift", ControlFrontendCancel, "Change shift mode", "Usage: hold");
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::CycleAssists)] = parseControllerItem<eControl>(ini, "CycleAssists", static_cast<eControl>(-1), "Cycle assists", "Usage: hold");
+
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] =   parseControllerItem<eControl>(ini, "ShiftUp", ControlFrontendAccept, "Shift up", "Usage: tap");
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = parseControllerItem<eControl>(ini, "ShiftDown", ControlFrontendX   , "Shift down", "Usage: tap");
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Engine)] =    parseControllerItem<eControl>(ini, "Engine", ControlFrontendDown   , "Engine", "Usage: hold");
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Throttle)] =  parseControllerItem<eControl>(ini, "Throttle", ControlFrontendRt   , "Throttle", "Usage: analog");
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Brake)] =     parseControllerItem<eControl>(ini, "Brake", ControlFrontendLt      , "Brake", "Usage: analog");
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Clutch)] =    parseControllerItem<eControl>(ini, "Clutch", ControlFrontendAxisY  , "Clutch", "Usage: hold/analog");
 
     scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] =   ini.GetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", -1)  ;
     scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftDownBlocks", -1);
@@ -1249,6 +1245,23 @@ CarControls::SWheelInput<T> ScriptSettings::parseWheelItem(CSimpleIniA& ini, con
 CarControls::SKeyboardInput ScriptSettings::parseKeyboardItem(CSimpleIniA& ini, const char* key, const char* default, const char* name) {
     std::string nameFmt = formatInputName(key, name);
     return CarControls::SKeyboardInput(key, str2key(ini.GetValue("KEYBOARD", key, default)), nameFmt);
+}
+
+template <typename T>
+CarControls::SControllerInput<T> ScriptSettings::parseControllerItem(CSimpleIniA& ini, const char* key, T default, const char* name, const char* description) {
+    if constexpr (std::is_same<T, eControl>::value) {
+        return CarControls::SControllerInput<T>(key,
+            static_cast<T>(ini.GetLongValue("CONTROLLER_NATIVE", key, static_cast<int>(default))),
+            name, description);
+    }
+    else if constexpr (std::is_same<T, std::string>::value) {
+        return CarControls::SControllerInput<T>(key,
+            ini.GetValue("CONTROLLER", key, default.c_str()),
+            name, description);
+    }
+    else {
+        static_assert(false, "Type must be string or eControl.");
+    }
 }
 
 #pragma warning(pop)

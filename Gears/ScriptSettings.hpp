@@ -453,7 +453,11 @@ private:
 
     template<typename T>
     CarControls::SWheelInput<T> parseWheelItem(CSimpleIniA& ini, const char* section, T default, const char* name = nullptr);
+
     CarControls::SKeyboardInput parseKeyboardItem(CSimpleIniA& ini, const char* key, const char* default, const char* name = nullptr);
+
+    template<typename T>
+    CarControls::SControllerInput<T> parseControllerItem(CSimpleIniA& ini, const char* key, T default, const char* name, const char* description);
 
     int nDevices = 0;
     std::string settingsGeneralFile;

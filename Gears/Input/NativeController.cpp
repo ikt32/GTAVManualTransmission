@@ -5,47 +5,38 @@
 
 extern ScriptSettings g_settings;
 
-NativeController::NativeController(): pressTime()
-                                    , releaseTime()
-                                    , tapPressTime()
-                                    , tapReleaseTime()
-                                    , gameButtonCurr()
-                                    , gameButtonPrev() {
-    
-}
-
-NativeController::~NativeController() = default;
+NativeController::NativeController() = default;
 
 #ifndef NO_NATIVES
-bool NativeController::IsButtonPressed(GameButtons gameButton) {
-    if (CONTROLS::IS_CONTROL_PRESSED(0, GameEnums[gameButton])) {
+bool NativeController::IsButtonPressed(eControl gameButton) {
+    if (CONTROLS::IS_CONTROL_PRESSED(0, gameButton)) {
         return true;
     }
-    if (CONTROLS::GET_CONTROL_NORMAL(0, GameEnums[gameButton]) > g_settings.Controller.TriggerValue) {
+    if (CONTROLS::GET_CONTROL_NORMAL(0, gameButton) > g_settings.Controller.TriggerValue) {
         return true;
     }
     return false;
 }
 
-bool NativeController::IsButtonJustPressed(GameButtons gameButton) {
+bool NativeController::IsButtonJustPressed(eControl gameButton) {
     gameButtonCurr[gameButton] = IsButtonPressed(gameButton);
 
     // raising edge
     return gameButtonCurr[gameButton] && !gameButtonPrev[gameButton];
 }
 
-bool NativeController::IsButtonJustReleased(GameButtons gameButton) {
+bool NativeController::IsButtonJustReleased(eControl gameButton) {
     gameButtonCurr[gameButton] = IsButtonPressed(gameButton);
 
     // falling edge
     return !gameButtonCurr[gameButton] && gameButtonPrev[gameButton];
 }
 
-bool NativeController::WasButtonHeldForMs(GameButtons gameButton, int milliseconds) {
-    if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, GameEnums[gameButton])) {
+bool NativeController::WasButtonHeldForMs(eControl gameButton, int milliseconds) {
+    if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, gameButton)) {
         pressTime[gameButton] = milliseconds_now();
     }
-    if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, GameEnums[gameButton])) {
+    if (CONTROLS::IS_CONTROL_JUST_RELEASED(0, gameButton)) {
         releaseTime[gameButton] = milliseconds_now();
     }
 
@@ -57,16 +48,16 @@ bool NativeController::WasButtonHeldForMs(GameButtons gameButton, int millisecon
     return false;
 }
 
-bool NativeController::WasButtonHeldOverMs(GameButtons gameButton, int milliseconds) {
-    if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, GameEnums[gameButton])) {
+bool NativeController::WasButtonHeldOverMs(eControl gameButton, int milliseconds) {
+    if (CONTROLS::IS_CONTROL_JUST_PRESSED(0, gameButton)) {
         pressTime[gameButton] = milliseconds_now();
     }
 
-    return CONTROLS::IS_CONTROL_PRESSED(0, GameEnums[gameButton]) && pressTime[gameButton] != 0 && (milliseconds_now() -
+    return CONTROLS::IS_CONTROL_PRESSED(0, gameButton) && pressTime[gameButton] != 0 && (milliseconds_now() -
         pressTime[gameButton]) >= milliseconds;
 }
 
-NativeController::TapState NativeController::WasButtonTapped(GameButtons gameButton, int milliseconds) {
+NativeController::TapState NativeController::WasButtonTapped(eControl gameButton, int milliseconds) {
     if (IsButtonJustPressed(gameButton)) {
         tapPressTime[gameButton] = milliseconds_now();
     }
@@ -87,61 +78,25 @@ NativeController::TapState NativeController::WasButtonTapped(GameButtons gameBut
 }
 
 void NativeController::Update() {
-    for (int i = 0; i < SIZEOF_GameButtons; i++) {
-        gameButtonPrev[i] = gameButtonCurr[i];
+    for (const auto& input : NativeGamepadInputs) {
+        gameButtonPrev[input.first] = gameButtonCurr[input.first];
     }
 }
 
-float NativeController::GetAnalogValue(GameButtons gameButton) {
-    return CONTROLS::GET_CONTROL_NORMAL(0, GameEnums[gameButton]);
-}
-
-NativeController::GameButtons NativeController::EControlToButton(int eControlItem) {
-    for (int i = 0; i < SIZEOF_GameButtons; i++) {
-        if (eControlItem == GameEnums[i]) {
-            return static_cast<GameButtons>(i);
-        }
-    }
-    return UNKNOWN;
+float NativeController::GetAnalogValue(eControl gameButton) {
+    return CONTROLS::GET_CONTROL_NORMAL(0, gameButton);
 }
 
 #else
 
 // Stubs
-bool NativeController::IsButtonPressed(GameButtons gameButton) {
-    return false;
-}
-
-bool NativeController::IsButtonJustPressed(GameButtons gameButton) {
-    return false;
-}
-
-bool NativeController::IsButtonJustReleased(GameButtons gameButton) {
-    return false;
-}
-
-bool NativeController::WasButtonHeldForMs(GameButtons gameButton, int milliseconds) {
-    return false;
-}
-
-bool NativeController::WasButtonHeldOverMs(GameButtons gameButton, int milliseconds) {
-    return false;
-}
-
-NativeController::TapState NativeController::WasButtonTapped(GameButtons gameButton, int milliseconds) {
-    return TapState::ButtonUp;
-}
-
-void NativeController::Update() {
-
-}
-
-float NativeController::GetAnalogValue(GameButtons gameButton) {
-    return false;
-}
-
-NativeController::GameButtons NativeController::EControlToButton(int eControlItem) {
-    return UNKNOWN;
-}
+bool NativeController::IsButtonPressed(eControl gameButton) { return false; }
+bool NativeController::IsButtonJustPressed(eControl gameButton) { return false; }
+bool NativeController::IsButtonJustReleased(eControl gameButton) { return false; }
+bool NativeController::WasButtonHeldForMs(eControl, int) { return false; }
+bool NativeController::WasButtonHeldOverMs(eControl, int) { return false; }
+NativeController::TapState NativeController::WasButtonTapped(eControl, int) { return TapState::ButtonUp; }
+void NativeController::Update() {}
+float NativeController::GetAnalogValue(eControl gameButton) { return false; }
 
 #endif

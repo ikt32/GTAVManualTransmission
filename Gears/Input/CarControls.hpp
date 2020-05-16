@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 #include <string>
 #include <utility>
 
@@ -151,32 +152,20 @@ public:
         std::string Name;
     };
 
-    const std::vector<std::pair<std::string, int>> LegacyControlsMap = {
-        { "ControlFrontendDown",		187 },
-        { "ControlFrontendUp",			188 },
-        { "ControlFrontendLeft",		189 },
-        { "ControlFrontendRight",		190 },
-        { "ControlFrontendRdown",		191 },
-        { "ControlFrontendRup",			192 },
-        { "ControlFrontendRleft",		193 },
-        { "ControlFrontendRright",		194 },
-        { "ControlFrontendAxisX",		195 },
-        { "ControlFrontendAxisY",		196 },
-        { "ControlFrontendRightAxisX",	197 },
-        { "ControlFrontendRightAxisY",	198 },
-        { "ControlFrontendPause",		199 },
-        { "ControlFrontendAccept",		201 },
-        { "ControlFrontendCancel",		202 },
-        { "ControlFrontendX",			203 },
-        { "ControlFrontendY",			204 },
-        { "ControlFrontendLb",			205 },
-        { "ControlFrontendRb",			206 },
-        { "ControlFrontendLt",			207 },
-        { "ControlFrontendRt",			208 },
-        { "ControlFrontendLs",			209 },
-        { "ControlFrontendRs",			210 },
-        { "ControlFrontendDelete",		214 },
-        { "ControlFrontendSelect",		217 },
+    template <typename TControl>
+    struct SControllerInput {
+        SControllerInput() = default;
+
+        SControllerInput(std::string configTag, TControl control, std::string name, std::string description)
+            : ConfigTag(std::move(configTag))
+            , Control(control)
+            , Name(std::move(name))
+            , Description(std::move(description)) {}
+
+        std::string ConfigTag;
+        TControl Control;
+        std::string Name;
+        std::string Description;
     };
 
     CarControls();
@@ -238,10 +227,10 @@ public:
     float SteerValRaw = 0.0f;   // For readout purposes. SteerVal is used for gameplay.
     float HandbrakeVal = 0.0f;
 
-    std::array<std::string, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
+    std::array<SControllerInput<std::string>, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
     std::array<int, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXboxBlocks = {};
 
-    std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> LegacyControls = {};
+    std::array<SControllerInput<eControl>, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> LegacyControls = {};
     std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> ControlNativeBlocks = {};
 
     std::array<SKeyboardInput, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
@@ -258,43 +247,6 @@ public:
 
     XInputController& GetController() {
         return mXInputController;
-    }
-
-    std::string ConfTagController2Value(const std::string &confTag) {
-        if (confTag == "Toggle") return ControlXbox[static_cast<int>(ControllerControlType::Toggle)];
-        if (confTag == "ToggleShift") return ControlXbox[static_cast<int>(ControllerControlType::ToggleH)];
-        if (confTag == "ShiftUp") return ControlXbox[static_cast<int>(ControllerControlType::ShiftUp)];
-        if (confTag == "ShiftDown") return ControlXbox[static_cast<int>(ControllerControlType::ShiftDown)];
-        if (confTag == "Clutch") return ControlXbox[static_cast<int>(ControllerControlType::Clutch)];
-        if (confTag == "Engine") return ControlXbox[static_cast<int>(ControllerControlType::Engine)];
-        if (confTag == "Throttle") return ControlXbox[static_cast<int>(ControllerControlType::Throttle)];
-        if (confTag == "Brake") return ControlXbox[static_cast<int>(ControllerControlType::Brake)];
-        if (confTag == "SwitchAssist") return ControlXbox[static_cast<int>(ControllerControlType::CycleAssists)];
-
-        return "UNKNOWN";
-    }
-
-    int ConfTagLController2Value(const std::string &confTag) {
-        if (confTag == "Toggle")		return LegacyControls[static_cast<int>(LegacyControlType::Toggle)];
-        if (confTag == "ToggleShift")	return LegacyControls[static_cast<int>(LegacyControlType::ToggleH)];
-        if (confTag == "ShiftUp")		return LegacyControls[static_cast<int>(LegacyControlType::ShiftUp)];
-        if (confTag == "ShiftDown")		return LegacyControls[static_cast<int>(LegacyControlType::ShiftDown)];
-        if (confTag == "Clutch")		return LegacyControls[static_cast<int>(LegacyControlType::Clutch)];
-        if (confTag == "Engine")		return LegacyControls[static_cast<int>(LegacyControlType::Engine)];
-        if (confTag == "Throttle")		return LegacyControls[static_cast<int>(LegacyControlType::Throttle)];
-        if (confTag == "Brake")			return LegacyControls[static_cast<int>(LegacyControlType::Brake)];
-        if (confTag == "SwitchAssist")	return LegacyControls[static_cast<int>(LegacyControlType::CycleAssists)];
-
-        return -1;
-    }
-
-    std::string NativeControl2Text(int nativeControl) const {
-        for (const auto& mapItem : LegacyControlsMap) {
-            if (mapItem.second == nativeControl) {
-                return mapItem.first;
-            }
-        }
-        return std::to_string(nativeControl);
     }
 
 private:

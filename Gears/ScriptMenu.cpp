@@ -2,6 +2,7 @@
 
 #include "ScriptSettings.hpp"
 #include "Input/CarControls.hpp"
+#include "Input/NativeController.h"
 #include "Input/keyboard.h"
 #include "Util/UIUtils.h"
 #include "Util/Util.hpp"
@@ -94,18 +95,6 @@ namespace {
         { 2, "Slab Serif" },
         { 4, "Chalet Cologne" },
         { 7, "Pricedown" },
-    };
-
-    const std::vector<STagInfo> controllerConfTags {
-        { "Toggle"     , "Toggle mod usage: hold"      },
-        { "ToggleShift", "Toggle shift usage: hold"    },
-        { "SwitchAssist", "Switch assist mode" },
-        { "ShiftUp"    , "Shift up usage: press"       },
-        { "ShiftDown"  , "Shift down usage: press"     },
-        { "Clutch"     , "Clutch usage: axis or button"},
-        { "Engine"     , "Engine usage: hold"          },
-        { "Throttle"   , "Throttle: axis or button"    },
-        { "Brake"      , "Brake: axis or button"       },
     };
 
     const std::vector<std::string> speedoTypes {
@@ -644,16 +633,15 @@ void update_controllerbindingsnativemenu() {
         "",
     };
 
-    for (const auto& confTag : controllerConfTags) {
-        controllerInfo.back() = confTag.Info;
-        int nativeControl = g_controls.ConfTagLController2Value(confTag.Tag);
-        controllerInfo.push_back(fmt::format("Assigned to {} ({})", g_controls.NativeControl2Text(nativeControl), nativeControl));
+    for (const auto& input : g_controls.LegacyControls) {
+        controllerInfo.back() = input.Description;
+        controllerInfo.push_back(fmt::format("Assigned to {} ({})", NativeController::GetControlName(input.Control), input.Control));
 
-        if (g_menu.OptionPlus(fmt::format("Assign {}", confTag.Tag), controllerInfo, nullptr, std::bind(clearLControllerButton, confTag.Tag), nullptr, "Current setting")) {
+        if (g_menu.OptionPlus(fmt::format("Assign {}", input.Name), controllerInfo, nullptr, std::bind(clearLControllerButton, input.ConfigTag), nullptr, "Current setting")) {
             WAIT(500);
-            bool result = configLControllerButton(confTag.Tag);
+            bool result = configLControllerButton(input.ConfigTag);
             if (!result)
-                UI::Notify(WARN, fmt::format("Cancelled {} assignment", confTag.Tag));
+                UI::Notify(WARN, fmt::format("Cancelled {} assignment", input.Name));
             WAIT(500);
         }
         controllerInfo.pop_back();
@@ -691,14 +679,14 @@ void update_controllerbindingsxinputmenu() {
         "",
     };
 
-    for (const auto& confTag : controllerConfTags) {
-        controllerInfo.back() = confTag.Info;
-        controllerInfo.push_back(fmt::format("Assigned to {}", g_controls.ConfTagController2Value(confTag.Tag)));
-        if (g_menu.OptionPlus(fmt::format("Assign {}", confTag.Tag), controllerInfo, nullptr, std::bind(clearControllerButton, confTag.Tag), nullptr, "Current setting")) {
+    for (const auto& input : g_controls.ControlXbox) {
+        controllerInfo.back() = input.Description;
+        controllerInfo.push_back(fmt::format("Assigned to {}", input.Control));
+        if (g_menu.OptionPlus(fmt::format("Assign {}", input.Name), controllerInfo, nullptr, std::bind(clearControllerButton, input.ConfigTag), nullptr, "Current setting")) {
             WAIT(500);
-            bool result = configControllerButton(confTag.Tag);
+            bool result = configControllerButton(input.ConfigTag);
             if (!result)
-                UI::Notify(WARN, fmt::format("Cancelled {} assignment", confTag.Tag));
+                UI::Notify(WARN, fmt::format("Cancelled {} assignment", input.Name));
             WAIT(500);
         }
         controllerInfo.pop_back();
@@ -2238,10 +2226,9 @@ bool configLControllerButton(const std::string &confTag) {
             return false;
         }
         g_controls.UpdateValues(CarControls::InputDevices::Controller, true);
-
-        for (auto mapItem : g_controls.LegacyControlsMap) {
-            if (CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, mapItem.second)) {
-                saveLControllerButton(confTag, mapItem.second);
+        for (const auto& input : NativeController::NativeGamepadInputs) {
+            if (CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, input.first)) {
+                saveLControllerButton(confTag, input.first);
                 return true;
             }
         }
