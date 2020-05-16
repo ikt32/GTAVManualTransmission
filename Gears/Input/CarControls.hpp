@@ -1,5 +1,4 @@
 #pragma once
-#include <map>
 #include <string>
 #include <utility>
 
@@ -129,40 +128,19 @@ public:
     };
 
     template <typename TControl>
-    struct SWheelInput {
-        SWheelInput()
+    struct SInput {
+        SInput()
             : Guid({}), Control() {}
 
-        SWheelInput(std::string configTag, GUID guid, TControl control, std::string name)
-            : ConfigTag(std::move(configTag)), Guid(guid), Control(control), Name(std::move(name)) {}
-
-        std::string ConfigTag;
-        GUID Guid;
-        TControl Control;
-        std::string Name;
-    };
-
-    struct SKeyboardInput {
-        SKeyboardInput() = default;
-        SKeyboardInput(std::string configTag, int control, std::string name)
-            : ConfigTag(std::move(configTag)), Control(control), Name(std::move(name)) {}
-
-        std::string ConfigTag;
-        int Control = -1;
-        std::string Name;
-    };
-
-    template <typename TControl>
-    struct SControllerInput {
-        SControllerInput() = default;
-
-        SControllerInput(std::string configTag, TControl control, std::string name, std::string description)
+        SInput(std::string configTag, GUID guid, TControl control, std::string name, std::string description)
             : ConfigTag(std::move(configTag))
+            , Guid(guid)
             , Control(control)
             , Name(std::move(name))
             , Description(std::move(description)) {}
 
         std::string ConfigTag;
+        GUID Guid;
         TControl Control;
         std::string Name;
         std::string Description;
@@ -227,17 +205,17 @@ public:
     float SteerValRaw = 0.0f;   // For readout purposes. SteerVal is used for gameplay.
     float HandbrakeVal = 0.0f;
 
-    std::array<SControllerInput<std::string>, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
+    std::array<SInput<std::string>, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
     std::array<int, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXboxBlocks = {};
 
-    std::array<SControllerInput<eControl>, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> LegacyControls = {};
+    std::array<SInput<eControl>, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> LegacyControls = {};
     std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> ControlNativeBlocks = {};
 
-    std::array<SKeyboardInput, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
+    std::array<SInput<int>, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
 
-    std::array<SWheelInput<std::string>, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
+    std::array<SInput<std::string>, static_cast<int>(WheelAxisType::SIZEOF_WheelAxisType)> WheelAxes = {};
 
-    std::array<SWheelInput<int>, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
+    std::array<SInput<int>, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
 
     std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
 
