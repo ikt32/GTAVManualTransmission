@@ -21,6 +21,24 @@
 namespace {
     ScriptSettings localSettings;
     VehicleConfig* activeConfig = nullptr;
+
+    // Returns a tidied-up version of the configuration tag, if no name is provided.
+    std::string formatInputName(const char* cfgTag, const char* name) {
+        std::string nameFmt;
+        if (name == nullptr) {
+            nameFmt = cfgTag;
+            std::transform(nameFmt.begin(), nameFmt.end(), nameFmt.begin(), [](char ch) {
+                return ch == '_' ? ' ' : ch;
+                });
+            nameFmt[0] = std::toupper(nameFmt[0]);
+            for (std::size_t i = 1; i < nameFmt.length(); ++i)
+                nameFmt[i] = std::tolower(nameFmt[i]);
+        }
+        else {
+            nameFmt = name;
+        }
+        return nameFmt;
+    }
 }
 EShiftMode Next(EShiftMode mode) {
     return static_cast<EShiftMode>((static_cast<int>(mode) + 1) % 3);
@@ -741,14 +759,6 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [CONTROLLER]
-    // TODO: Fix this somehow
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Toggle)] =
-        ini.GetValue("CONTROLLER", "Toggle", "UNKNOWN");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ToggleH)] =
-        ini.GetValue("CONTROLLER", "ToggleShift", "B");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::SwitchAssist)] = 
-        ini.GetValue("CONTROLLER", "SwitchAssist", "UNKNOWN");
-
     Controller.BlockCarControls = ini.GetBoolValue("CONTROLLER", "BlockCarControls", Controller.BlockCarControls);
     Controller.IgnoreShiftsUI = ini.GetBoolValue("CONTROLLER", "IgnoreShiftsUI", Controller.IgnoreShiftsUI);
     Controller.BlockHShift = ini.GetBoolValue("CONTROLLER", "BlockHShift", Controller.BlockHShift);
@@ -759,61 +769,64 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
 
     Controller.ToggleEngine = ini.GetBoolValue("CONTROLLER", "ToggleEngine", Controller.ToggleEngine);
 
-    // TODO: Also this
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] = ini.GetValue("CONTROLLER", "ShiftUp", "A");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = ini.GetValue("CONTROLLER", "ShiftDown", "X");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Clutch)] = ini.GetValue("CONTROLLER", "Clutch", "LeftThumbUp");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Engine)] = ini.GetValue("CONTROLLER", "Engine", "DpadDown");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Throttle)] = ini.GetValue("CONTROLLER", "Throttle", "RightTrigger");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Brake)] = ini.GetValue("CONTROLLER", "Brake", "LeftTrigger");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Toggle)] = parseControllerItem<std::string>(ini, "Toggle", "UNKNOWN", "Toggle MT", "Usage: hold");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ToggleH)] = parseControllerItem<std::string>(ini, "ToggleShift", "B", "Change shift mode", "Usage: hold");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::CycleAssists)] = parseControllerItem<std::string>(ini, "CycleAssists", "UNKNOWN", "Cycle assists", "Usage: hold");
 
-    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] = ini.GetLongValue("CONTROLLER", "ShiftUpBlocks", -1);
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] =   parseControllerItem<std::string>(ini, "ShiftUp", "A", "Shift up", "Usage: tap");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = parseControllerItem<std::string>(ini, "ShiftDown", "X", "Shift down", "Usage: tap");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Engine)] =    parseControllerItem<std::string>(ini, "Engine", "DpadDown", "Engine", "Usage: hold");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Throttle)] =  parseControllerItem<std::string>(ini, "Throttle", "RightTrigger", "Throttle", "Usage: analog");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Brake)] =     parseControllerItem<std::string>(ini, "Brake", "LeftTrigger", "Brake", "Usage: analog");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Clutch)] =    parseControllerItem<std::string>(ini, "Clutch", "LeftThumbUp", "Clutch", "Usage: hold/analog");
+
+    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] =   ini.GetLongValue("CONTROLLER", "ShiftUpBlocks", -1);
     scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = ini.GetLongValue("CONTROLLER", "ShiftDownBlocks", -1);
-    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)] = ini.GetLongValue("CONTROLLER", "ClutchBlocks", -1);
+    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)] =    ini.GetLongValue("CONTROLLER", "ClutchBlocks", -1);
 
     // [CONTROLLER_NATIVE]
     Controller.Native.Enable = ini.GetBoolValue("CONTROLLER_NATIVE", "Enable", Controller.Native.Enable);
 
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Toggle)] = ini.GetLongValue("CONTROLLER_NATIVE", "Toggle", -1);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ToggleH)] = ini.GetLongValue("CONTROLLER_NATIVE", "ToggleShift", ControlFrontendCancel);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::SwitchAssist)] = ini.GetLongValue("CONTROLLER_NATIVE", "SwitchAssist", -1);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftUp", ControlFrontendAccept);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftDown", ControlFrontendX);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Clutch)] = ini.GetLongValue("CONTROLLER_NATIVE", "Clutch", ControlFrontendAxisY);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Engine)] = ini.GetLongValue("CONTROLLER_NATIVE", "Engine", ControlFrontendDown);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Throttle)] = ini.GetLongValue("CONTROLLER_NATIVE", "Throttle", ControlFrontendRt);
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Brake)] = ini.GetLongValue("CONTROLLER_NATIVE", "Brake", ControlFrontendLt);
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Toggle)] =       parseControllerItem<eControl>(ini, "Toggle", static_cast<eControl>(-1), "Toggle MT", "Usage: hold");
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ToggleH)] =      parseControllerItem<eControl>(ini, "ToggleShift", ControlFrontendCancel, "Change shift mode", "Usage: hold");
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::CycleAssists)] = parseControllerItem<eControl>(ini, "CycleAssists", static_cast<eControl>(-1), "Cycle assists", "Usage: hold");
+
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] =   parseControllerItem<eControl>(ini, "ShiftUp", ControlFrontendAccept, "Shift up", "Usage: tap");
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = parseControllerItem<eControl>(ini, "ShiftDown", ControlFrontendX   , "Shift down", "Usage: tap");
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Engine)] =    parseControllerItem<eControl>(ini, "Engine", ControlFrontendDown   , "Engine", "Usage: hold");
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Throttle)] =  parseControllerItem<eControl>(ini, "Throttle", ControlFrontendRt   , "Throttle", "Usage: analog");
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Brake)] =     parseControllerItem<eControl>(ini, "Brake", ControlFrontendLt      , "Brake", "Usage: analog");
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Clutch)] =    parseControllerItem<eControl>(ini, "Clutch", ControlFrontendAxisY  , "Clutch", "Usage: hold/analog");
 
     scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] =   ini.GetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", -1)  ;
     scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftDownBlocks", -1);
     scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] =    ini.GetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", -1)   ;
 
     // [KEYBOARD]
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Toggle)] = str2key(ini.GetValue("KEYBOARD", "Toggle", "VK_OEM_5"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleH)] = str2key(ini.GetValue("KEYBOARD", "ToggleH", "VK_OEM_6"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::SwitchAssist)] = str2key(ini.GetValue("KEYBOARD", "SwitchAssist", "UNKNOWN"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Toggle)] = parseKeyboardItem(ini, "Toggle", "VK_OEM_5", "Toggle MT");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleH)] = parseKeyboardItem(ini, "ToggleH", "VK_OEM_6", "Switch shift mode");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::CycleAssists)] = parseKeyboardItem(ini, "CycleAssists", "UNKNOWN", "Cycle assists");
 
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftUp)] = str2key(ini.GetValue("KEYBOARD", "ShiftUp", "LSHIFT"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftDown)] = str2key(ini.GetValue("KEYBOARD", "ShiftDown", "LCTRL"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Clutch)] = str2key(ini.GetValue("KEYBOARD", "Clutch", "Z"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Engine)] = str2key(ini.GetValue("KEYBOARD", "Engine", "X"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftUp)] = parseKeyboardItem(ini, "ShiftUp", "LSHIFT", "Shift up");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftDown)] = parseKeyboardItem(ini, "ShiftDown", "LCTRL", "Shift down");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Clutch)] = parseKeyboardItem(ini, "Clutch", "Z");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Engine)] = parseKeyboardItem(ini, "Engine", "X");
 
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Throttle)] = str2key(ini.GetValue("KEYBOARD", "Throttle", "W"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Brake)] = str2key(ini.GetValue("KEYBOARD", "Brake", "S"));
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Throttle)] = parseKeyboardItem(ini, "Throttle", "W");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Brake)] = parseKeyboardItem(ini, "Brake", "S");
 
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HR)] = str2key(ini.GetValue("KEYBOARD", "HR", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H1)] = str2key(ini.GetValue("KEYBOARD", "H1", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H2)] = str2key(ini.GetValue("KEYBOARD", "H2", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H3)] = str2key(ini.GetValue("KEYBOARD", "H3", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H4)] = str2key(ini.GetValue("KEYBOARD", "H4", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H5)] = str2key(ini.GetValue("KEYBOARD", "H5", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H6)] = str2key(ini.GetValue("KEYBOARD", "H6", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] = str2key(ini.GetValue("KEYBOARD", "H7", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H8)] = str2key(ini.GetValue("KEYBOARD", "H8", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H9)] = str2key(ini.GetValue("KEYBOARD", "H9", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H10)] = str2key(ini.GetValue("KEYBOARD", "H10", "UNKNOWN"));
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HN)] = str2key(ini.GetValue("KEYBOARD", "HN", "UNKNOWN"));
-
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HR)] =  parseKeyboardItem(ini, "HR", "UNKNOWN", "H-pattern reverse");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H1)] =  parseKeyboardItem(ini, "H1", "UNKNOWN", "H-pattern 1");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H2)] =  parseKeyboardItem(ini, "H2", "UNKNOWN", "H-pattern 2");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H3)] =  parseKeyboardItem(ini, "H3", "UNKNOWN", "H-pattern 3");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H4)] =  parseKeyboardItem(ini, "H4", "UNKNOWN", "H-pattern 4");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H5)] =  parseKeyboardItem(ini, "H5", "UNKNOWN", "H-pattern 5");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H6)] =  parseKeyboardItem(ini, "H6", "UNKNOWN", "H-pattern 6");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] =  parseKeyboardItem(ini, "H7", "UNKNOWN", "H-pattern 7");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H8)] =  parseKeyboardItem(ini, "H8", "UNKNOWN", "H-pattern 8");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H9)] =  parseKeyboardItem(ini, "H9", "UNKNOWN", "H-pattern 9");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H10)] = parseKeyboardItem(ini, "H10", "UNKNOWN", "H-pattern 10");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HN)] =  parseKeyboardItem(ini, "HN", "UNKNOWN", "H-pattern neutral");
 }
 
 void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
@@ -872,30 +885,23 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     nDevices = it;
 
     // [TOGGLE_MOD]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Toggle)] =
-        DeviceIndexToGUID(ini.GetLongValue("TOGGLE_MOD", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Toggle)] =
-        ini.GetLongValue("TOGGLE_MOD", "BUTTON", -1);
+        parseWheelItem<int>(ini, "TOGGLE_MOD", -1, "Toggle MT");
 
     // [CHANGE_SHIFTMODE]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::ToggleH)] =
-        DeviceIndexToGUID(ini.GetLongValue("CHANGE_SHIFTMODE", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ToggleH)] =
-        ini.GetLongValue("CHANGE_SHIFTMODE", "BUTTON", -1);
-
-    // [SWITCH_ASSIST]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::SwitchAssist)] =
-        DeviceIndexToGUID(ini.GetLongValue("SWITCH_ASSIST", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::SwitchAssist)] =
-        ini.GetLongValue("SWITCH_ASSIST", "BUTTON", -1);
+        parseWheelItem<int>(ini, "CHANGE_SHIFTMODE", -1, "Change shift mode");
 
     // [STEER]
-    scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Steer)] =
-        DeviceIndexToGUID(ini.GetLongValue("STEER", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Steer)] =
-        ini.GetValue("STEER", "AXLE", "");
+        parseWheelItem<std::string>(ini, "STEER", "", "Steering");
+
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::ForceFeedback)] =
-        ini.GetValue("STEER", "FFB", "");
+        CarControls::SInput<std::string>("FFB",
+            DeviceIndexToGUID(ini.GetLongValue("STEER", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
+            ini.GetValue("STEER", "FFB", ""),
+            "Force feedback", "Force feedback");
+
     Wheel.Steering.Min = ini.GetLongValue("STEER", "MIN", -1);
     Wheel.Steering.Max = ini.GetLongValue("STEER", "MAX", -1);
 
@@ -911,209 +917,147 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     Wheel.Steering.SteerMult = ini.GetDoubleValue("STEER", "GameSteerMultWheel", Wheel.Steering.SteerMult);
 
     // [THROTTLE]
-    scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Throttle)] =
-        DeviceIndexToGUID(ini.GetLongValue("THROTTLE", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Throttle)] =
-        ini.GetValue("THROTTLE", "AXLE", "");
+        parseWheelItem<std::string>(ini, "THROTTLE", "");
     Wheel.Throttle.Min = ini.GetLongValue("THROTTLE", "MIN", -1);
     Wheel.Throttle.Max = ini.GetLongValue("THROTTLE", "MAX", -1);
     Wheel.Throttle.AntiDeadZone = ini.GetDoubleValue("THROTTLE", "ANTIDEADZONE", 0.25);
     Wheel.Throttle.Gamma = ini.GetDoubleValue("THROTTLE", "GAMMA", 1.0);
 
     // [BRAKE]
-    scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Brake)] =
-        DeviceIndexToGUID(ini.GetLongValue("BRAKE", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Brake)] =
-        ini.GetValue("BRAKE", "AXLE", "");
+        parseWheelItem<std::string>(ini, "BRAKE", "");
     Wheel.Brake.Min = ini.GetLongValue("BRAKE", "MIN", -1);
     Wheel.Brake.Max = ini.GetLongValue("BRAKE", "MAX", -1);
     Wheel.Brake.AntiDeadZone = ini.GetDoubleValue("BRAKE", "ANTIDEADZONE", 0.25);
     Wheel.Brake.Gamma = ini.GetDoubleValue("BRAKE", "GAMMA", 1.0);
 
     // [CLUTCH]
-    scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Clutch)] =
-        DeviceIndexToGUID(ini.GetLongValue("CLUTCH", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Clutch)] =
-        ini.GetValue("CLUTCH", "AXLE", "");
+        parseWheelItem<std::string>(ini, "CLUTCH", "");
     Wheel.Clutch.Min = ini.GetLongValue("CLUTCH", "MIN", -1);
     Wheel.Clutch.Max = ini.GetLongValue("CLUTCH", "MAX", -1);
 
     // [HANDBRAKE_ANALOG]
-    scriptControl->WheelAxesGUIDs[static_cast<int>(CarControls::WheelAxisType::Handbrake)] =
-        DeviceIndexToGUID(ini.GetLongValue("HANDBRAKE_ANALOG", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Handbrake)] =
-        ini.GetValue("HANDBRAKE_ANALOG", "AXLE", "");
+        parseWheelItem<std::string>(ini, "HANDBRAKE_ANALOG", "", "Handbrake (analog)");
     Wheel.HandbrakeA.Min = ini.GetLongValue("HANDBRAKE_ANALOG", "MIN", -1);
     Wheel.HandbrakeA.Max = ini.GetLongValue("HANDBRAKE_ANALOG", "MAX", -1);
 
-    // [SHIFTER]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H1)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H2)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H3)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H4)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H5)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H6)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H7)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H8)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H9)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::H10)] =
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::HR)] =
-        DeviceIndexToGUID(ini.GetLongValue("SHIFTER", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
+    // enums HR through H10 are explicitly defined as 0 through 10
+    // [HPATTERN_0]
+    scriptControl->WheelButton[0] =
+        parseWheelItem<int>(ini, "HPATTERN_0", -1, "H-pattern reverse");
 
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H1)] =
-        ini.GetLongValue("SHIFTER", "GEAR_1", -1);
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H2)] =
-        ini.GetLongValue("SHIFTER", "GEAR_2", -1);
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H3)] =
-        ini.GetLongValue("SHIFTER", "GEAR_3", -1);
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H4)] =
-        ini.GetLongValue("SHIFTER", "GEAR_4", -1);
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H5)] =
-        ini.GetLongValue("SHIFTER", "GEAR_5", -1);
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H6)] =
-        ini.GetLongValue("SHIFTER", "GEAR_6", -1);
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H7)] =
-        ini.GetLongValue("SHIFTER", "GEAR_7", -1);
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H8)] =
-        ini.GetLongValue("SHIFTER", "GEAR_8", -1);
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H9)] =
-        ini.GetLongValue("SHIFTER", "GEAR_9", -1);
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::H10)] =
-        ini.GetLongValue("SHIFTER", "GEAR_10", -1); 
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::HR)] =
-        ini.GetLongValue("SHIFTER", "GEAR_R", -1);
+    // [HPATTERN_<gear>]
+    for (uint8_t i = 1; i < 11; ++i) {
+        scriptControl->WheelButton[i] =
+            parseWheelItem<int>(ini, fmt::format("HPATTERN_{}", i).c_str(), -1, fmt::format("H-pattern {}", i).c_str());
+    }
 
     // [THROTTLE_BUTTON]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Throttle)] =
-        DeviceIndexToGUID(ini.GetLongValue("THROTTLE_BUTTON", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Throttle)] =
-        ini.GetLongValue("THROTTLE_BUTTON", "BUTTON", -1);
+        parseWheelItem<int>(ini, "THROTTLE_BUTTON", -1, "Throttle (Button)");
 
     // [BRAKE_BUTTON]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Brake)] =
-        DeviceIndexToGUID(ini.GetLongValue("BRAKE_BUTTON", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Brake)] =
-        ini.GetLongValue("BRAKE_BUTTON", "BUTTON", -1);
+        parseWheelItem<int>(ini, "BRAKE_BUTTON", -1, "Brake (Button)");
 
     // [CLUTCH_BUTTON]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Clutch)] =
-        DeviceIndexToGUID(ini.GetLongValue("CLUTCH_BUTTON", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Clutch)] =
-        ini.GetLongValue("CLUTCH_BUTTON", "BUTTON", -1);
+        parseWheelItem<int>(ini, "CLUTCH_BUTTON", -1, "Clutch (Button)");
 
     // [SHIFT_UP]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::ShiftUp)] =
-        DeviceIndexToGUID(ini.GetLongValue("SHIFT_UP", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ShiftUp)] =
-        ini.GetLongValue("SHIFT_UP", "BUTTON", -1);
+        parseWheelItem<int>(ini, "SHIFT_UP", -1);
 
     // [SHIFT_DOWN]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::ShiftDown)] =
-        DeviceIndexToGUID(ini.GetLongValue("SHIFT_DOWN", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ShiftDown)] =
-        ini.GetLongValue("SHIFT_DOWN", "BUTTON", -1);
+        parseWheelItem<int>(ini, "SHIFT_DOWN", -1);
 
     // [HANDBRAKE]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Handbrake)] =
-        DeviceIndexToGUID(ini.GetLongValue("HANDBRAKE", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Handbrake)] =
-        ini.GetLongValue("HANDBRAKE", "BUTTON", -1);
+        parseWheelItem<int>(ini, "HANDBRAKE", -1);
 
     // [ENGINE]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Engine)] =
-        DeviceIndexToGUID(ini.GetLongValue("ENGINE", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Engine)] =
-        ini.GetLongValue("ENGINE", "BUTTON", -1);
+        parseWheelItem<int>(ini, "ENGINE", -1);
 
     // [LIGHTS]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Lights)] =
-        DeviceIndexToGUID(ini.GetLongValue("LIGHTS", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Lights)] =
-        ini.GetLongValue("LIGHTS", "BUTTON", -1);
+        parseWheelItem<int>(ini, "LIGHTS", -1);
 
     // [HORN]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Horn)] =
-        DeviceIndexToGUID(ini.GetLongValue("HORN", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Horn)] =
-        ini.GetLongValue("HORN", "BUTTON", -1);
+        parseWheelItem<int>(ini, "HORN", -1);
 
     // [LOOK_BACK]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::LookBack)] =
-        DeviceIndexToGUID(ini.GetLongValue("LOOK_BACK", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::LookBack)] =
-        ini.GetLongValue("LOOK_BACK", "BUTTON", -1);
-    
+        parseWheelItem<int>(ini, "LOOK_BACK", -1);
+
     // [LOOK_LEFT]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::LookLeft)] =
-        DeviceIndexToGUID(ini.GetLongValue("LOOK_LEFT", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::LookLeft)] =
-        ini.GetLongValue("LOOK_LEFT", "BUTTON", -1);
-    
+        parseWheelItem<int>(ini, "LOOK_LEFT", -1);
+
     // [LOOK_RIGHT]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::LookRight)] =
-        DeviceIndexToGUID(ini.GetLongValue("LOOK_RIGHT", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::LookRight)] =
-        ini.GetLongValue("LOOK_RIGHT", "BUTTON", -1);
+        parseWheelItem<int>(ini, "LOOK_RIGHT", -1);
 
     // [CHANGE_CAMERA]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::Camera)] =
-        DeviceIndexToGUID(ini.GetLongValue("CHANGE_CAMERA", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Camera)] =
-        ini.GetLongValue("CHANGE_CAMERA", "BUTTON", -1);
+        parseWheelItem<int>(ini, "CHANGE_CAMERA", -1);
 
     // [RADIO_NEXT]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::RadioNext)] =
-        DeviceIndexToGUID(ini.GetLongValue("RADIO_NEXT", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::RadioNext)] =
-        ini.GetLongValue("RADIO_NEXT", "BUTTON", -1);
+        parseWheelItem<int>(ini, "RADIO_NEXT", -1);
 
     // [RADIO_PREVIOUS]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::RadioPrev)] =
-        DeviceIndexToGUID(ini.GetLongValue("RADIO_PREVIOUS", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::RadioPrev)] =
-        ini.GetLongValue("RADIO_PREVIOUS", "BUTTON", -1);
+        parseWheelItem<int>(ini, "RADIO_PREVIOUS", -1);
 
     // [INDICATOR_LEFT]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::IndicatorLeft)] =
-        DeviceIndexToGUID(ini.GetLongValue("INDICATOR_LEFT", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::IndicatorLeft)] =
-        ini.GetLongValue("INDICATOR_LEFT", "BUTTON", -1);
+        parseWheelItem<int>(ini, "INDICATOR_LEFT", -1);
 
     // [INDICATOR_RIGHT]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::IndicatorRight)] =
-        DeviceIndexToGUID(ini.GetLongValue("INDICATOR_RIGHT", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::IndicatorRight)] =
-        ini.GetLongValue("INDICATOR_RIGHT", "BUTTON", -1);
+        parseWheelItem<int>(ini, "INDICATOR_RIGHT", -1);
 
     // [INDICATOR_HAZARD]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::IndicatorHazard)] =
-        DeviceIndexToGUID(ini.GetLongValue("INDICATOR_HAZARD", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::IndicatorHazard)] =
-        ini.GetLongValue("INDICATOR_HAZARD", "BUTTON", -1);
+        parseWheelItem<int>(ini, "INDICATOR_HAZARD", -1);
 
     // [AUTO_P]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::APark)] =
-        DeviceIndexToGUID(ini.GetLongValue("AUTO_P", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::APark)] =
-        ini.GetLongValue("AUTO_P", "BUTTON", -1);
+        parseWheelItem<int>(ini, "AUTO_P", -1, "Automatic park");
 
     // [AUTO_R]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::AReverse)] =
-        DeviceIndexToGUID(ini.GetLongValue("AUTO_R", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::AReverse)] =
-        ini.GetLongValue("AUTO_R", "BUTTON", -1);
+        parseWheelItem<int>(ini, "AUTO_R", -1, "Automatic reverse");
 
     // [AUTO_N]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::ANeutral)] =
-        DeviceIndexToGUID(ini.GetLongValue("AUTO_N", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ANeutral)] =
-        ini.GetLongValue("AUTO_N", "BUTTON", -1);
+        parseWheelItem<int>(ini, "AUTO_N", -1, "Automatic neutral");
 
     // [AUTO_D]
-    scriptControl->WheelButtonGUIDs[static_cast<int>(CarControls::WheelControlType::ADrive)] =
-        DeviceIndexToGUID(ini.GetLongValue("AUTO_D", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ADrive)] =
-        ini.GetLongValue("AUTO_D", "BUTTON", -1);
+        parseWheelItem<int>(ini, "AUTO_D", -1, "Automatic drive");
+
+    // [CYCLE_ASSISTS]
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::CycleAssists)] =
+        parseWheelItem<int>(ini, "CYCLE_ASSISTS", -1);
+
+    // [TOGGLE_ABS]
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ToggleABS)] =
+        parseWheelItem<int>(ini, "TOGGLE_ABS", -1, "Toggle ABS");
+
+    // [TOGGLE_ESC]
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ToggleESC)] =
+        parseWheelItem<int>(ini, "TOGGLE_ESC", -1, "Toggle ESC");
+
+    // [TOGGLE_TCS]
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ToggleTCS)] =
+        parseWheelItem<int>(ini, "TOGGLE_TCS", -1, "Toggle TCS");
 
     // [TO_KEYBOARD]
     scriptControl->WheelToKeyGUID = 
@@ -1164,18 +1108,10 @@ void ScriptSettings::SteeringSaveAxis(const std::string &confTag, ptrdiff_t inde
     ini.SetValue(confTag.c_str(), "AXLE", axis.c_str());
     ini.SetValue(confTag.c_str(), "MIN", std::to_string(minVal).c_str());
     ini.SetValue(confTag.c_str(), "MAX", std::to_string(maxVal).c_str());
-    result = ini.SaveFile(settingsWheelFile.c_str());
-    CHECK_LOG_SI_ERROR(result, "save");
-}
 
-void ScriptSettings::SteeringSaveFFBAxis(const std::string & confTag, ptrdiff_t index, const std::string & axis) {
-    CSimpleIniA ini;
-    ini.SetUnicode();
-    SI_Error result = ini.LoadFile(settingsWheelFile.c_str());
-    CHECK_LOG_SI_ERROR(result, "load");
+    if (confTag == "STEER")
+        ini.SetValue(confTag.c_str(), "FFB", axis.c_str());
 
-    ini.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
-    ini.SetValue(confTag.c_str(), "FFB", axis.c_str());
     result = ini.SaveFile(settingsWheelFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
 }
@@ -1286,6 +1222,46 @@ int ScriptSettings::GUIDToDeviceIndex(GUID guidToFind) {
         i++;
     }
     return -1;
+}
+
+template <typename T>
+CarControls::SInput<T> ScriptSettings::parseWheelItem(CSimpleIniA& ini, const char* section, T default, const char* name) {
+    std::string nameFmt = formatInputName(section, name);
+    if constexpr (std::is_same<T, int>::value) {
+        return CarControls::SInput<T>(section,
+            DeviceIndexToGUID(ini.GetLongValue(section, "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
+            ini.GetLongValue(section, "BUTTON", default), nameFmt.c_str(), "");
+    }
+    else if constexpr (std::is_same<T, std::string>::value) {
+        return CarControls::SInput<T>(section,
+            DeviceIndexToGUID(ini.GetLongValue(section, "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
+            ini.GetValue(section, "AXLE", default.c_str()), nameFmt.c_str(), "");
+    }
+    else {
+        static_assert(false, "Type must be string or int.");
+    }
+}
+
+CarControls::SInput<int> ScriptSettings::parseKeyboardItem(CSimpleIniA& ini, const char* key, const char* default, const char* name) {
+    std::string nameFmt = formatInputName(key, name);
+    return CarControls::SInput<int>(key, {}, str2key(ini.GetValue("KEYBOARD", key, default)), nameFmt, "");
+}
+
+template <typename T>
+CarControls::SInput<T> ScriptSettings::parseControllerItem(CSimpleIniA& ini, const char* key, T default, const char* name, const char* description) {
+    if constexpr (std::is_same<T, eControl>::value) {
+        return CarControls::SInput<T>(key, {},
+            static_cast<T>(ini.GetLongValue("CONTROLLER_NATIVE", key, static_cast<int>(default))),
+            name, description);
+    }
+    else if constexpr (std::is_same<T, std::string>::value) {
+        return CarControls::SInput<T>(key, {},
+            ini.GetValue("CONTROLLER", key, default.c_str()),
+            name, description);
+    }
+    else {
+        static_assert(false, "Type must be string or eControl.");
+    }
 }
 
 #pragma warning(pop)

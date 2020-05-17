@@ -9,8 +9,9 @@
 
 extern ScriptSettings g_settings;
 
-CarControls::CarControls(): PrevInput(Keyboard)
-                          , mXInputController(1) {
+CarControls::CarControls()
+    : PrevInput(Keyboard)
+    , mXInputController(1) {
     std::fill(ControlXboxBlocks.begin(), ControlXboxBlocks.end(), -1);
 }
 
@@ -27,38 +28,37 @@ void CarControls::InitWheel() {
 
 void CarControls::InitFFB() {
 
-    auto steerGUID = WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)];
-    auto steerAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)]);
-    auto ffAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::Steer)]);
+    auto steerGUID = WheelAxes[static_cast<int>(WheelAxisType::Steer)].Guid;
+    auto ffAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)].Control);
 
-    if (mWheelInput.InitFFB(steerGUID, steerAxis)) {
+    if (mWheelInput.InitFFB(steerGUID, ffAxis)) {
         mWheelInput.UpdateCenterSteering(steerGUID, ffAxis);
     }
 }
 
 void CarControls::updateKeyboard() {
-    ThrottleVal = IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)]) ? 1.0f : 0.0f;
-    BrakeVal = IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Brake)]) ? 1.0f : 0.0f;
-    ClutchVal = IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Clutch)]) ? 1.0f : 0.0f;
+    ThrottleVal = IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Throttle)].Control) ? 1.0f : 0.0f;
+    BrakeVal = IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Brake)].Control) ? 1.0f : 0.0f;
+    ClutchVal = IsKeyPressed(KBControl[static_cast<int>(KeyboardControlType::Clutch)].Control) ? 1.0f : 0.0f;
 }
 
 void CarControls::updateController() {
     if (g_settings.Controller.Native.Enable) {
-        ThrottleVal = mNativeController.GetAnalogValue(mNativeController.EControlToButton(LegacyControls[static_cast<int>(LegacyControlType::Throttle)]));
-        BrakeVal = mNativeController.GetAnalogValue(mNativeController.EControlToButton(LegacyControls[static_cast<int>(LegacyControlType::Brake)]));
-        ClutchVal = mNativeController.GetAnalogValue(mNativeController.EControlToButton(LegacyControls[static_cast<int>(LegacyControlType::Clutch)]));
+        ThrottleVal = mNativeController.GetAnalogValue(LegacyControls[static_cast<int>(LegacyControlType::Throttle)].Control);
+        BrakeVal = mNativeController.GetAnalogValue(LegacyControls[static_cast<int>(LegacyControlType::Brake)].Control);
+        ClutchVal = mNativeController.GetAnalogValue(LegacyControls[static_cast<int>(LegacyControlType::Clutch)].Control);
     } else {
-        ThrottleVal = mXInputController.GetAnalogValue(mXInputController.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)]));
-        BrakeVal = mXInputController.GetAnalogValue(mXInputController.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Brake)]));
-        ClutchVal = mXInputController.GetAnalogValue(mXInputController.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Clutch)]));
+        ThrottleVal = mXInputController.GetAnalogValue(mXInputController.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)].Control));
+        BrakeVal = mXInputController.GetAnalogValue(mXInputController.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Brake)].Control));
+        ClutchVal = mXInputController.GetAnalogValue(mXInputController.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Clutch)].Control));
     }
 }
 
 // analog > button
 float CarControls::getInputValue(WheelAxisType axisType, WheelControlType buttonType, float minRaw, float maxRaw) {
     float inputValue;
-    auto axis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(axisType)]);
-    auto axisGUID = WheelAxesGUIDs[static_cast<int>(axisType)];
+    auto axis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(axisType)].Control);
+    auto axisGUID = WheelAxes[static_cast<int>(axisType)].Guid;
 
     int axisValue = mWheelInput.GetAxisValue(axis, axisGUID);
 
@@ -144,18 +144,18 @@ void CarControls::UpdateValues(InputDevices prevInput, bool skipKeyboardInput) {
 CarControls::InputDevices CarControls::GetLastInputDevice(InputDevices previousInput, bool enableWheel) {
     auto kbThrottleIdx = static_cast<int>(KeyboardControlType::Throttle);
     auto kbBrakeIdx = static_cast<int>(KeyboardControlType::Brake);
-    if (IsKeyJustPressed(KBControl[kbThrottleIdx], KeyboardControlType::Throttle) ||
-        IsKeyPressed(KBControl[kbThrottleIdx]) ||
-        IsKeyJustPressed(KBControl[kbBrakeIdx], KeyboardControlType::Brake) ||
-        IsKeyPressed(KBControl[kbBrakeIdx])) {
+    if (IsKeyJustPressed(KBControl[kbThrottleIdx].Control, KeyboardControlType::Throttle) ||
+        IsKeyPressed(KBControl[kbThrottleIdx].Control) ||
+        IsKeyJustPressed(KBControl[kbBrakeIdx].Control, KeyboardControlType::Brake) ||
+        IsKeyPressed(KBControl[kbBrakeIdx].Control)) {
         return Keyboard;
     }
 
     if (g_settings.Controller.Native.Enable) {
         auto lcThrottleIdx = static_cast<int>(LegacyControlType::Throttle);
-        auto lcThrottleBtn = mNativeController.EControlToButton(LegacyControls[lcThrottleIdx]);
+        auto lcThrottleBtn = LegacyControls[lcThrottleIdx].Control;
         auto lcBrakeIdx = static_cast<int>(LegacyControlType::Brake);
-        auto lcBrakeBtn = mNativeController.EControlToButton(LegacyControls[lcBrakeIdx]);
+        auto lcBrakeBtn = LegacyControls[lcBrakeIdx].Control;
         if (mNativeController.IsButtonJustPressed(lcThrottleBtn) ||
             mNativeController.IsButtonPressed(lcThrottleBtn) ||
             mNativeController.IsButtonJustPressed(lcBrakeBtn) ||
@@ -165,9 +165,9 @@ CarControls::InputDevices CarControls::GetLastInputDevice(InputDevices previousI
     } 
     else {
         auto cThrottleIdx = static_cast<int>(ControllerControlType::Throttle);
-        auto cThrottleBtn = mXInputController.StringToButton(ControlXbox[cThrottleIdx]);
+        auto cThrottleBtn = mXInputController.StringToButton(ControlXbox[cThrottleIdx].Control);
         auto cBrakeIdx = static_cast<int>(ControllerControlType::Brake);
-        auto cBrakeBtn = mXInputController.StringToButton(ControlXbox[cBrakeIdx]);
+        auto cBrakeBtn = mXInputController.StringToButton(ControlXbox[cBrakeIdx].Control);
         if (mXInputController.IsButtonJustPressed(cThrottleBtn) ||
             mXInputController.IsButtonPressed(cThrottleBtn) ||
             mXInputController.IsButtonJustPressed(cBrakeBtn) ||
@@ -175,7 +175,7 @@ CarControls::InputDevices CarControls::GetLastInputDevice(InputDevices previousI
             return Controller;
         }
     }
-    if (enableWheel && mWheelInput.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
+    if (enableWheel && mWheelInput.IsConnected(WheelAxes[static_cast<int>(WheelAxisType::Steer)].Guid)) {
         float throttleVal = getInputValue(WheelAxisType::Throttle, WheelControlType::Throttle, 
             static_cast<float>(g_settings.Wheel.Throttle.Min), static_cast<float>(g_settings.Wheel.Throttle.Max));
         float brakeVal = getInputValue(WheelAxisType::Brake, WheelControlType::Brake, 
@@ -214,7 +214,7 @@ bool CarControls::IsKeyJustPressed(int key, KeyboardControlType control) {
 }
 
 bool CarControls::ButtonJustPressed(KeyboardControlType control) {
-    return IsKeyJustPressed(KBControl[static_cast<int>(control)], control);
+    return IsKeyJustPressed(KBControl[static_cast<int>(control)].Control, control);
 }
 
 /*
@@ -223,78 +223,78 @@ bool CarControls::ButtonJustPressed(KeyboardControlType control) {
 
 bool CarControls::ButtonJustPressed(ControllerControlType control) {
     return mXInputController.IsButtonJustPressed(
-        mXInputController.StringToButton(ControlXbox[static_cast<int>(control)]));
+        mXInputController.StringToButton(ControlXbox[static_cast<int>(control)].Control));
 }
 
 bool CarControls::ButtonReleased(ControllerControlType control) {
     return mXInputController.IsButtonJustReleased(
-        mXInputController.StringToButton(ControlXbox[static_cast<int>(control)]));
+        mXInputController.StringToButton(ControlXbox[static_cast<int>(control)].Control));
 }
 
 bool CarControls::ButtonReleasedAfter(ControllerControlType control, int time) {
     return mXInputController.WasButtonHeldForMs(
-        mXInputController.StringToButton(ControlXbox[static_cast<int>(control)]), time);
+        mXInputController.StringToButton(ControlXbox[static_cast<int>(control)].Control), time);
 }
 
 bool CarControls::ButtonHeld(ControllerControlType control) {
     return mXInputController.WasButtonHeldForMs(
-        mXInputController.StringToButton(ControlXbox[static_cast<int>(control)]), g_settings.Controller.HoldTimeMs);
+        mXInputController.StringToButton(ControlXbox[static_cast<int>(control)].Control), g_settings.Controller.HoldTimeMs);
 }
 
 bool CarControls::ButtonHeldOver(ControllerControlType control, int millis) {
     return mXInputController.WasButtonHeldOverMs(
-        mXInputController.StringToButton(ControlXbox[static_cast<int>(control)]), millis);
+        mXInputController.StringToButton(ControlXbox[static_cast<int>(control)].Control), millis);
 }
 
 XInputController::TapState CarControls::ButtonTapped(ControllerControlType control) {
-    return mXInputController.WasButtonTapped(mXInputController.StringToButton(ControlXbox[static_cast<int>(control)]), g_settings.Controller.MaxTapTimeMs);
+    return mXInputController.WasButtonTapped(mXInputController.StringToButton(ControlXbox[static_cast<int>(control)].Control), g_settings.Controller.MaxTapTimeMs);
 }
 
 bool CarControls::ButtonIn(ControllerControlType control) {
-    return mXInputController.IsButtonPressed(mXInputController.StringToButton(ControlXbox[static_cast<int>(control)]));
+    return mXInputController.IsButtonPressed(mXInputController.StringToButton(ControlXbox[static_cast<int>(control)].Control));
 }
 
 /*
- * Legacy stuff
+ * Native stuff
  */
 bool CarControls::ButtonJustPressed(LegacyControlType control) {
     if (!g_settings.Controller.Native.Enable) return false;
-    auto gameButton = mNativeController.EControlToButton(LegacyControls[static_cast<int>(control)]);
+    auto gameButton = LegacyControls[static_cast<int>(control)].Control;
     return mNativeController.IsButtonJustPressed(gameButton);
 }
 bool CarControls::ButtonReleased(LegacyControlType control) {
     if (!g_settings.Controller.Native.Enable) return false;
-    auto gameButton = mNativeController.EControlToButton(LegacyControls[static_cast<int>(control)]);
+    auto gameButton = LegacyControls[static_cast<int>(control)].Control;
     return mNativeController.IsButtonJustReleased(gameButton);
 }
 
 bool CarControls::ButtonHeld(LegacyControlType control) {
     if (!g_settings.Controller.Native.Enable) return false;
-    auto gameButton = mNativeController.EControlToButton(LegacyControls[static_cast<int>(control)]);
+    auto gameButton = LegacyControls[static_cast<int>(control)].Control;
     return mNativeController.WasButtonHeldForMs(gameButton, g_settings.Controller.HoldTimeMs);
 }
 
 bool CarControls::ButtonHeldOver(LegacyControlType control, int millis) {
     if (!g_settings.Controller.Native.Enable) return false;
-    auto gameButton = mNativeController.EControlToButton(LegacyControls[static_cast<int>(control)]);
+    auto gameButton = LegacyControls[static_cast<int>(control)].Control;
     return mNativeController.WasButtonHeldOverMs(gameButton, millis);
 }
 
 bool CarControls::ButtonIn(LegacyControlType control) {
     if (!g_settings.Controller.Native.Enable) return false;
-    auto gameButton = mNativeController.EControlToButton(LegacyControls[static_cast<int>(control)]);
+    auto gameButton = LegacyControls[static_cast<int>(control)].Control;
     return mNativeController.IsButtonPressed(gameButton);
 }
 
 NativeController::TapState CarControls::ButtonTapped(LegacyControlType control) {
     if (!g_settings.Controller.Native.Enable) return NativeController::TapState::ButtonUp;
-    auto gameButton = mNativeController.EControlToButton(LegacyControls[static_cast<int>(control)]);
+    auto gameButton = LegacyControls[static_cast<int>(control)].Control;
     return mNativeController.WasButtonTapped(gameButton, g_settings.Controller.MaxTapTimeMs);
 }
 
 bool CarControls::ButtonReleasedAfter(LegacyControlType control, int time) {
     if (!g_settings.Controller.Native.Enable) return false;
-    auto gameButton = mNativeController.EControlToButton(LegacyControls[static_cast<int>(control)]);
+    auto gameButton = LegacyControls[static_cast<int>(control)].Control;
     return mNativeController.WasButtonHeldForMs(gameButton, time);
 }
 
@@ -303,43 +303,43 @@ bool CarControls::ButtonReleasedAfter(LegacyControlType control, int time) {
  */
 
 bool CarControls::ButtonJustPressed(WheelControlType control) {
-    if (!mWheelInput.IsConnected(WheelButtonGUIDs[static_cast<int>(control)]) ||
-        WheelButton[static_cast<int>(control)] == -1) {
+    if (!mWheelInput.IsConnected(WheelButton[static_cast<int>(control)].Guid) ||
+        WheelButton[static_cast<int>(control)].Control == -1) {
         return false;
     }
-    return mWheelInput.IsButtonJustPressed(WheelButton[static_cast<int>(control)],
-                                           WheelButtonGUIDs[static_cast<int>(control)]);
+    return mWheelInput.IsButtonJustPressed(WheelButton[static_cast<int>(control)].Control,
+                                           WheelButton[static_cast<int>(control)].Guid);
 }
 
 bool CarControls::ButtonReleased(WheelControlType control) {
-    if (!mWheelInput.IsConnected(WheelButtonGUIDs[static_cast<int>(control)]) ||
-        WheelButton[static_cast<int>(control)] == -1) {
+    if (!mWheelInput.IsConnected(WheelButton[static_cast<int>(control)].Guid) ||
+        WheelButton[static_cast<int>(control)].Control == -1) {
         return false;
     }
-    return mWheelInput.IsButtonJustReleased(WheelButton[static_cast<int>(control)],
-                                            WheelButtonGUIDs[static_cast<int>(control)]);
+    return mWheelInput.IsButtonJustReleased(WheelButton[static_cast<int>(control)].Control,
+                                            WheelButton[static_cast<int>(control)].Guid);
 }
 
 bool CarControls::ButtonHeld(WheelControlType control, int delay) {
-    if (!mWheelInput.IsConnected(WheelButtonGUIDs[static_cast<int>(control)]) ||
-        WheelButton[static_cast<int>(control)] == -1) {
+    if (!mWheelInput.IsConnected(WheelButton[static_cast<int>(control)].Guid) ||
+        WheelButton[static_cast<int>(control)].Control == -1) {
         return false;
     }
-    return mWheelInput.WasButtonHeldForMs(WheelButton[static_cast<int>(control)],
-                                          WheelButtonGUIDs[static_cast<int>(control)], delay);
+    return mWheelInput.WasButtonHeldForMs(WheelButton[static_cast<int>(control)].Control,
+                                          WheelButton[static_cast<int>(control)].Guid, delay);
 }
 
 bool CarControls::ButtonIn(WheelControlType control) {
-    if (!mWheelInput.IsConnected(WheelButtonGUIDs[static_cast<int>(control)]) ||
-        WheelButton[static_cast<int>(control)] == -1) {
+    if (!mWheelInput.IsConnected(WheelButton[static_cast<int>(control)].Guid) ||
+        WheelButton[static_cast<int>(control)].Control == -1) {
         return false;
     }
-    return mWheelInput.IsButtonPressed(WheelButton[static_cast<int>(control)],
-                                       WheelButtonGUIDs[static_cast<int>(control)]);
+    return mWheelInput.IsButtonPressed(WheelButton[static_cast<int>(control)].Control,
+                                       WheelButton[static_cast<int>(control)].Guid);
 }
 
 void CarControls::CheckCustomButtons() {
-    if (!mWheelInput.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)])) {
+    if (!mWheelInput.IsConnected(WheelAxes[static_cast<int>(WheelAxisType::Steer)].Guid)) {
         return;
     }
     for (int i = 0; i < MAX_RGBBUTTONS; i++) {
@@ -407,27 +407,32 @@ void CarControls::CheckGUIDs(const std::vector<_GUID> & guids) {
 }
 
 void CarControls::PlayFFBDynamics(int totalForce, int damperForce) {
-    auto ffAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)]);
-    mWheelInput.SetConstantForce(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)], ffAxis, totalForce);
-    mWheelInput.SetDamper(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)], ffAxis, damperForce);
+    auto ffbCtrl = WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)];
+    auto axis = mWheelInput.StringToAxis(ffbCtrl.Control);
+    mWheelInput.SetConstantForce(ffbCtrl.Guid, axis, totalForce);
+    mWheelInput.SetDamper(ffbCtrl.Guid, axis, damperForce);
 }
 
 void CarControls::PlayFFBCollision(int collisionForce) {
-    auto ffAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)]);
-    mWheelInput.SetCollision(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)], ffAxis, collisionForce);
+    auto ffbCtrl = WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)];
+    auto axis = mWheelInput.StringToAxis(ffbCtrl.Control);
+    mWheelInput.SetCollision(ffbCtrl.Guid, axis, collisionForce);
 }
 
 void CarControls::PlayLEDs(float rpm, float firstLed, float lastLed) {
-    mWheelInput.PlayLedsDInput(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)], rpm, firstLed, lastLed);
+    auto ctrl = WheelAxes[static_cast<int>(WheelAxisType::Steer)];
+    mWheelInput.PlayLedsDInput(ctrl.Guid, rpm, firstLed, lastLed);
 }
 
 float CarControls::GetAxisSpeed(WheelAxisType axis) {
-    auto diAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(axis)]);
-    return mWheelInput.GetAxisSpeed(diAxis, WheelAxesGUIDs[static_cast<int>(axis)]);
+    auto ctrl = WheelAxes[static_cast<int>(axis)];
+    auto diAxis = mWheelInput.StringToAxis(ctrl.Control);
+    return mWheelInput.GetAxisSpeed(diAxis, ctrl.Guid);
 }
 
 bool CarControls::WheelAvailable() {
-    return mWheelInput.IsConnected(WheelAxesGUIDs[static_cast<int>(WheelAxisType::Steer)]);
+    auto ctrl = WheelAxes[static_cast<int>(WheelAxisType::Steer)];
+    return mWheelInput.IsConnected(ctrl.Guid);
 }
 
 WheelDirectInput& CarControls::GetWheel() {

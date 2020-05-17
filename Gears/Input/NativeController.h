@@ -1,6 +1,9 @@
 #pragma once
-#include <array>
 #include <inc/enums.h>
+
+#include <unordered_map>
+#include <stdexcept>
+#include <string>
 
 class NativeController
 {
@@ -11,85 +14,59 @@ public:
         Tapped
     };
 
-    enum GameButtons {
-        ControlFrontendDown		 ,
-        ControlFrontendUp		 ,
-        ControlFrontendLeft		 ,
-        ControlFrontendRight	 ,
-        ControlFrontendRdown	 ,
-        ControlFrontendRup		 ,
-        ControlFrontendRleft	 ,
-        ControlFrontendRright	 ,
-        ControlFrontendAxisX	 ,
-        ControlFrontendAxisY	 ,
-        ControlFrontendRightAxisX,
-        ControlFrontendRightAxisY,
-        ControlFrontendPause	 ,
-        ControlFrontendAccept	 ,
-        ControlFrontendCancel	 ,
-        ControlFrontendX		 ,
-        ControlFrontendY		 ,
-        ControlFrontendLb		 ,
-        ControlFrontendRb		 ,
-        ControlFrontendLt		 ,
-        ControlFrontendRt		 ,
-        ControlFrontendLs		 ,
-        ControlFrontendRs		 ,
-        ControlFrontendDelete	 ,
-        ControlFrontendSelect	 ,
-        UNKNOWN,
-        SIZEOF_GameButtons
-    };
-
-    std::array<int, SIZEOF_GameButtons> GameEnums = {
-        eControl::ControlFrontendDown		,
-        eControl::ControlFrontendUp			,
-        eControl::ControlFrontendLeft		,
-        eControl::ControlFrontendRight		,
-        eControl::ControlFrontendRdown		,
-        eControl::ControlFrontendRup		,
-        eControl::ControlFrontendRleft		,
-        eControl::ControlFrontendRright		,
-        eControl::ControlFrontendAxisX		,
-        eControl::ControlFrontendAxisY		,
-        eControl::ControlFrontendRightAxisX	,
-        eControl::ControlFrontendRightAxisY	,
-        eControl::ControlFrontendPause		,
-        eControl::ControlFrontendAccept		,
-        eControl::ControlFrontendCancel		,
-        eControl::ControlFrontendX			,
-        eControl::ControlFrontendY			,
-        eControl::ControlFrontendLb			,
-        eControl::ControlFrontendRb			,
-        eControl::ControlFrontendLt			,
-        eControl::ControlFrontendRt			,
-        eControl::ControlFrontendLs			,
-        eControl::ControlFrontendRs			,
-        eControl::ControlFrontendDelete		,
-        eControl::ControlFrontendSelect		,
-        -1 // UNKNOWN
+    static inline const std::unordered_map<eControl, std::string> NativeGamepadInputs = {
+        { ControlFrontendDown      , "Dpad down" },
+        { ControlFrontendUp        , "Dpad up" },
+        { ControlFrontendLeft      , "Dpad left" },
+        { ControlFrontendRight     , "Dpad right" },
+        { ControlFrontendAxisX     , "Left stick X" },
+        { ControlFrontendAxisY     , "Left stick Y" },
+        { ControlFrontendRightAxisX, "Right stick X" },
+        { ControlFrontendRightAxisY, "Right stick Y" },
+        { ControlFrontendPause     , "Start" },
+        { ControlFrontendAccept    , "A" },
+        { ControlFrontendCancel    , "B" },
+        { ControlFrontendX         , "X" },
+        { ControlFrontendY         , "Y" },
+        { ControlFrontendLb        , "Left shoulder" },
+        { ControlFrontendRb        , "Right shoulder" },
+        { ControlFrontendLt        , "Left trigger" },
+        { ControlFrontendRt        , "Right trigger" },
+        { ControlFrontendLs        , "Left stick click" },
+        { ControlFrontendRs        , "Right stick click" },
+        { ControlFrontendSelect    , "Select" },
     };
 
     NativeController();
-    ~NativeController();
 
-    bool IsButtonPressed(GameButtons gameButton);
-    bool IsButtonJustPressed(GameButtons gameButton);
-    bool IsButtonJustReleased(GameButtons gameButton);
-    bool WasButtonHeldForMs(GameButtons gameButton, int milliseconds);
-    bool WasButtonHeldOverMs(GameButtons gameButton, int milliseconds);
-    TapState WasButtonTapped(GameButtons gameButton, int milliseconds);
+    bool IsButtonPressed(eControl gameButton);
+    bool IsButtonJustPressed(eControl gameButton);
+    bool IsButtonJustReleased(eControl gameButton);
+    bool WasButtonHeldForMs(eControl gameButton, int milliseconds);
+    bool WasButtonHeldOverMs(eControl gameButton, int milliseconds);
+    TapState WasButtonTapped(eControl gameButton, int milliseconds);
     void Update();
 
-    float GetAnalogValue(GameButtons gameButton);
-    GameButtons EControlToButton(int eControlItem);
+    float GetAnalogValue(eControl gameButton);
+
+    static std::string GetControlName(int control) {
+        if (control == -1)
+            return "None";
+
+        try {
+            return NativeGamepadInputs.at(static_cast<eControl>(control));
+        }
+        catch (std::out_of_range&) {
+            return "Unknown input type";
+        }
+    }
 
 private:
-    std::array<__int64, SIZEOF_GameButtons> pressTime;
-    std::array<__int64, SIZEOF_GameButtons> releaseTime;
-    std::array<__int64, SIZEOF_GameButtons> tapPressTime;
-    std::array<__int64, SIZEOF_GameButtons> tapReleaseTime;
-    std::array<bool, SIZEOF_GameButtons> gameButtonCurr;
-    std::array<bool, SIZEOF_GameButtons> gameButtonPrev;
+    std::unordered_map<eControl, __int64> pressTime;
+    std::unordered_map<eControl, __int64> releaseTime;
+    std::unordered_map<eControl, __int64> tapPressTime;
+    std::unordered_map<eControl, __int64> tapReleaseTime;
+    std::unordered_map<eControl, bool> gameButtonCurr;
+    std::unordered_map<eControl, bool> gameButtonPrev;
 };
 

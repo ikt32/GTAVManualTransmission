@@ -1,13 +1,13 @@
 #pragma once
-#include <Windows.h>
 
-#include <vector>
+#include "Input/CarControls.hpp"
 #include "Util/Logger.hpp"
-#include "simpleini/SimpleIni.h"
+
+#include <simpleini/SimpleIni.h>
+#include <vector>
+#include <string>
 
 class VehicleConfig;
-class Logger;
-class CarControls;
 
 enum class EShiftMode : int {
     Sequential = 0,
@@ -435,7 +435,6 @@ public:
     int GUIDToDeviceIndex(GUID guid);
 
     void SteeringSaveAxis(const std::string &confTag, ptrdiff_t index, const std::string &axis, int minVal, int maxVal);
-    void SteeringSaveFFBAxis(const std::string &confTag, ptrdiff_t index, const std::string &axis);
     void SteeringSaveButton(const std::string &confTag, ptrdiff_t index, int button);
     void SteeringSaveHShifter(const std::string &confTag, ptrdiff_t index, const std::vector<int>& button);
     void KeyboardSaveKey(const std::string &confTag, const std::string &key);
@@ -451,6 +450,14 @@ private:
 
     // Just looks up which GUID corresponds with what number and returns the GUID.
     GUID DeviceIndexToGUID(int device, std::vector<GUID> guids);
+
+    template<typename T>
+    CarControls::SInput<T> parseWheelItem(CSimpleIniA& ini, const char* section, T default, const char* name = nullptr);
+
+    CarControls::SInput<int> parseKeyboardItem(CSimpleIniA& ini, const char* key, const char* default, const char* name = nullptr);
+
+    template<typename T>
+    CarControls::SInput<T> parseControllerItem(CSimpleIniA& ini, const char* key, T default, const char* name, const char* description);
 
     int nDevices = 0;
     std::string settingsGeneralFile;
