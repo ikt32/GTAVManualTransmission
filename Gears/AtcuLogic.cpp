@@ -1,5 +1,26 @@
 #include "AtcuLogic.h"
+
+#include "script.h"
+#include "ScriptSettings.hpp"
+#include "VehicleData.hpp"
+#include "Input/CarControls.hpp"
+#include "Util/MathExt.h"
+#include "Memory/Offsets.hpp"
+#include <inc\types.h>
+#include <inc\natives.h>
 #include <numeric>
+
+extern ScriptSettings g_settings;
+extern CarControls g_controls;
+extern Vehicle g_playerVehicle;
+extern VehicleGearboxStates g_gearStates;
+extern VehicleData g_vehData;
+extern VehicleExtensions g_ext;
+
+namespace AtcuLogic {
+    float getGearMinSpeed(int gear);
+    float getGearMaxSpeed(int gear);
+}
 
 void AtcuLogic::Cycle() {
     // Using new TCU

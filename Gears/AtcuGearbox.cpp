@@ -1,8 +1,9 @@
-#include <numeric>
-#include <vector>
-#include <algorithm>
 #include "AtcuGearbox.h"
+
+#include <algorithm>
+#include <numeric>
 #include <map>
+#include <vector>
 
 float AtcuGearbox::parsePowertrainRatioThreshold() {
     auto avg = (std::accumulate(PowertrainHistoryDistribution.begin(), PowertrainHistoryDistribution.end(), 0.0f)) / PowertrainHistoryDistribution.size();
