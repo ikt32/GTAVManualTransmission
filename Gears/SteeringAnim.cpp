@@ -1,5 +1,6 @@
 #include "SteeringAnim.h"
 
+#include "Input/CarControls.hpp"
 #include "ScriptUtils.h"
 #include "ScriptSettings.hpp"
 
@@ -19,6 +20,7 @@
 extern Vehicle g_playerVehicle;
 extern Ped g_playerPed;
 extern ScriptSettings g_settings;
+extern CarControls g_controls;
 
 namespace {
     enum eAnimationFlags {
@@ -66,8 +68,12 @@ void SteeringAnimation::SetRotation(float wheelDegrees) {
 }
 
 void SteeringAnimation::Update() {
+    bool steeringWheelSync = g_controls.PrevInput == CarControls::Wheel && g_settings.Wheel.Options.SyncRotation;
+    bool customSteeringSync = g_settings.CustomSteering.Mode > 0 && g_settings.CustomSteering.CustomRotation;
+
     // Not active, cancel all animations.
-    if (!Util::VehicleAvailable(g_playerVehicle, g_playerPed) || 
+    if (!Util::VehicleAvailable(g_playerVehicle, g_playerPed) ||
+        !(steeringWheelSync || customSteeringSync) ||
         !g_settings.Misc.SyncAnimations ||
         PLAYER::IS_PLAYER_FREE_AIMING(PLAYER::PLAYER_ID()) ||
         PLAYER::IS_PLAYER_PRESSING_HORN(PLAYER::PLAYER_ID()) || 
