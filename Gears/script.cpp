@@ -1181,9 +1181,6 @@ void functionAShift() {
         g_gearStates.EngineLoad = engineLoad;
         g_gearStates.UpshiftLoad = g_settings().AutoParams.UpshiftLoad;
 
-        if (skidding)
-            return;
-
         // Shift up.
         if (currGear < g_vehData.mGearTop) {
             if (engineLoad < g_settings().AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
