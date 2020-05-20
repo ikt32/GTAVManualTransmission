@@ -749,13 +749,7 @@ void setShiftMode(EShiftMode shiftMode) {
         tempMode = EShiftMode::Automatic;
     }
 
-    if (g_settings.MTOptions.Override && g_activeConfig != nullptr) {
-        g_activeConfig->MTOptions.ShiftMode = tempMode;
-        g_settings.SetVehicleConfig(g_activeConfig);
-    }
-    else {
-        g_settings.MTOptions.ShiftMode = tempMode;
-    }
+    APPLY_CONFIG_VALUE(MTOptions.ShiftMode, tempMode);
 
     std::string mode = "Mode: ";
     switch (g_settings().MTOptions.ShiftMode) {

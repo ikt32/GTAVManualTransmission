@@ -7,6 +7,16 @@
 #include <vector>
 #include <string>
 
+// oh god why
+#define APPLY_CONFIG_VALUE(option, value) \
+    if (g_settings.MTOptions.Override && g_activeConfig != nullptr) { \
+        g_activeConfig->option = (value);                             \
+        g_settings.SetVehicleConfig(g_activeConfig);                  \
+    }                                                                 \
+    else {                                                            \
+        g_settings.option = (value);                                  \
+    }
+
 class VehicleConfig;
 
 enum class EShiftMode : int {
