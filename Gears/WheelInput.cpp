@@ -1,5 +1,6 @@
 #include "WheelInput.h"
 
+#include "VehicleConfig.h"
 #include "script.h"
 #include "ScriptUtils.h"
 #include "ScriptSettings.hpp"
@@ -25,6 +26,7 @@ extern Vehicle g_playerVehicle;
 extern Ped g_playerPed;
 extern VehicleExtensions g_ext;
 extern ScriptSettings g_settings;
+extern VehicleConfig* g_activeConfig;
 extern VehicleData g_vehData;
 extern CarControls g_controls;
 
@@ -427,11 +429,24 @@ void checkVehicleInputButtons() {
     }
 }
 
+void checkAssistButtons() {
+    if (g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleABS)) {
+        APPLY_CONFIG_VALUE(DriveAssists.ABS.Enable, !g_settings().DriveAssists.ABS.Enable);
+    }
+    if (g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleESC)) {
+        APPLY_CONFIG_VALUE(DriveAssists.ESP.Enable, !g_settings().DriveAssists.ESP.Enable);
+    }
+    if (g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleTCS)) {
+        APPLY_CONFIG_VALUE(DriveAssists.TCS.Enable, !g_settings().DriveAssists.TCS.Enable);
+    }
+}
+
 void WheelInput::CheckButtons() {
     if (g_controls.PrevInput != CarControls::Wheel) {
         return;
     }
 
+    checkAssistButtons();
     checkVehicleInputButtons();
     checkCameraButtons();
     checkRadioButtons();
