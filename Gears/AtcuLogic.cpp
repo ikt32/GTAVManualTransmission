@@ -18,9 +18,8 @@ extern VehicleData g_vehData;
 extern VehicleExtensions g_ext;
 
 namespace AtcuLogic {
-    float getGearMinSpeed(int gear);
-    float getGearMaxSpeed(int gear);
-}
+    void Cycle();
+};
 
 void AtcuLogic::Cycle() {
     // Using new TCU

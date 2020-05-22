@@ -4,6 +4,13 @@
 #include "AtcuLogic.h"
 #include <map>
 #include <vector>
+#include "VehicleData.hpp"
+
+extern VehicleData g_vehData;
+
+namespace AtcuLogic {
+    void Cycle();
+};
 
 float AtcuGearbox::parsePowerIntersectionRpm(int gear) {
     if (g_vehData.mGearTop == gear) return 1.0f;
