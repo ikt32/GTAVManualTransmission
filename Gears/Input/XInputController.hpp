@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <Xinput.h>
 #include <array>
+#include <string>
 
 class XInputController {
 public:
