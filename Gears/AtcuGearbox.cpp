@@ -1,71 +1,31 @@
-#include "AtcuGearbox.h"
-
-#include <algorithm>
 #include <numeric>
+#include <vector>
+#include <algorithm>
+#include "AtcuLogic.h"
 #include <map>
 #include <vector>
+#include "VehicleData.hpp"
 
-float AtcuGearbox::parsePowertrainRatioThreshold() {
-    auto avg = (std::accumulate(PowertrainHistoryDistribution.begin(), PowertrainHistoryDistribution.end(), 0.0f)) / PowertrainHistoryDistribution.size();
-    auto max = *std::max_element(PowertrainHistoryDistribution.begin(), PowertrainHistoryDistribution.end());
-    if (max > avg) {
-        std::vector<float> gapElements = {};
-        auto gap = max - avg;
-        std::map<float, int> group = {};
-        for (auto& c : PowertrainHistoryDistribution) {
-            if (group.find(c) != group.end()) group[c]++;
-            else group.insert({ c,1 });
-        }
-        auto most = *std::max_element(group.begin(), group.end(),
-            [](const std::pair<float, int>& p1, const std::pair<float, int> p2) {
-                return p1.second < p2.second;
-            });
-        avg = (avg + (most.first * 9)) / 10;
-        for (auto& c : PowertrainHistoryDistribution)
-            if (c > avg) gapElements.push_back(c);
-        auto ratio = avg - ((gap * ((gapElements.size() + 0.0f) / (PowertrainHistoryDistribution.size() + 0.00f))) * 2.0f);
-        auto integralityIndex = (PowertrainHistoryDistribution.size() + 1.0f) / (PowertrainHistorySize + 1.0f);
-        if (integralityIndex > 1.0f) integralityIndex = 1.0f;
-        return ratio * integralityIndex;
-    }
-    else {
-        auto integralityIndex = (PowertrainHistoryDistribution.size() + 1.0f) / (PowertrainHistorySize + 1.0f);
-        if (integralityIndex > 1.0f) integralityIndex = 1.0f;
-        return avg * integralityIndex;
-    }
+extern VehicleData g_vehData;
+
+namespace AtcuLogic {
+    void Cycle();
+};
+
+float AtcuGearbox::parsePowerIntersectionRpm(int gear) {
+    if (g_vehData.mGearTop == gear) return 1.0f;
+    float currRatio = g_vehData.mGearRatios[gear];
+    float currRetardedRatio = currRatio * 0.6f;
+    float nextRatio = g_vehData.mGearRatios[gear + 1];
+    if (currRetardedRatio > nextRatio) return 0.99f;
+    float currGap = currRatio - currRetardedRatio;
+    float nextOffset = nextRatio - currRetardedRatio;
+    float goldenRatio = nextOffset / currGap;
+    return 0.8f + (0.2f * (1.0f - goldenRatio));
 }
 
-float AtcuGearbox::parsePowertrainRatio() {
-    auto avg = (std::accumulate(PowertrainHistoryDistribution.begin(), PowertrainHistoryDistribution.end(), 0.0f)) / PowertrainHistoryDistribution.size();
-    auto max = *std::max_element(PowertrainHistoryDistribution.begin(), PowertrainHistoryDistribution.end());
-    if (max > avg) {
-        std::vector<float> gapElements = {};
-        auto gap = max - avg;
-        std::map<float, int> group = {};
-        for (auto& c : PowertrainHistoryDistribution) {
-            if (group.find(c) != group.end()) group[c]++;
-            else group.insert({ c,1 });
-        }
-        auto most = *std::max_element(group.begin(), group.end(),
-            [](const std::pair<float, int>& p1, const std::pair<float, int> p2) {
-                return p1.second < p2.second;
-            });
-        avg = (avg + (most.first * 9)) / 10;
-        for (auto& c : PowertrainHistoryDistribution) {
-            if (c > avg) gapElements.push_back(c);
-        }
-        return avg + (gap * ((gapElements.size() + 0.0f) / (PowertrainHistoryDistribution.size() + 0.00f)));
-    }
-    else return avg;
-}
-
-void AtcuGearbox::updatePowertrainRatioDistribution(float ratio) {
-    PowertrainHistoryDistribution.push_back(ratio);
-    while (PowertrainHistoryDistribution.size() > PowertrainHistorySize || PowertrainHistoryDistribution[0] == 0.000123f)
-        PowertrainHistoryDistribution.erase(PowertrainHistoryDistribution.begin());
-}
-
-bool AtcuGearbox::isPowertrainRatioTrustworthy() {
-    auto ratio = parsePowertrainRatio();
-    return PowertrainHistoryDistribution.size() > (PowertrainHistorySize * 0.5) && (abs(ratio - parsePowertrainRatioThreshold()) / ratio) < 0.08f;
+float AtcuGearbox::rpmPredictSpeed(int gear, float rpm) {
+    float currRatio = g_vehData.mGearRatios[gear];
+    float maxSpeed = g_vehData.mDriveMaxFlatVel / currRatio;
+    return maxSpeed * rpm;
 }

@@ -422,13 +422,8 @@ void drawDebugInfo() {
         }
         // Nyconing's ATCU
         else {
-            showText(0.01, 0.650, 0.3, fmt::format("Using powertrain ratio: {:n}{}", g_gearStates.Atcu.parsePowertrainRatio(), g_gearStates.Atcu.isPowertrainRatioTrustworthy() ? "" : "(in training)"));
-            auto wp = g_ext.GetWheelPower(g_playerVehicle);
-            float totalPower = std::accumulate(wp.begin(), wp.end(), 0.0f);
-            totalPower = totalPower / g_vehData.mWheelCount;
-            float currGearRatio = g_vehData.mGearRatios[g_vehData.mGearCurr];
-            showText(0.01, 0.675, 0.3, fmt::format("Current powertrain ratio: {:n}", totalPower / currGearRatio));
-            showText(0.01, 0.700, 0.3, fmt::format("Powertrain training threshold: {:n}", g_gearStates.Atcu.parsePowertrainRatioThreshold()));
+            showText(0.01, 0.650, 0.3, fmt::format("Next optimal up-shifting: {:.2f}%", g_gearStates.Atcu.upshiftingIndex * 100.0f));
+            showText(0.01, 0.675, 0.3, fmt::format("Next optimal down-shifting: {:.2f}%", g_gearStates.Atcu.downshiftingIndex * 100.0f));
         }
     }
 
