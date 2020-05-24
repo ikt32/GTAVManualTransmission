@@ -64,6 +64,8 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
     localSettings.MTParams.StallingRPM        = activeConfig->MTParams.StallingRPM      ;
     localSettings.MTParams.RPMDamage          = activeConfig->MTParams.RPMDamage        ;
     localSettings.MTParams.MisshiftDamage     = activeConfig->MTParams.MisshiftDamage   ;
+    localSettings.MTParams.CreepIdleThrottle  = activeConfig->MTParams.CreepIdleThrottle;
+    localSettings.MTParams.CreepIdleRPM       = activeConfig->MTParams.CreepIdleRPM     ;
 
     localSettings.DriveAssists.ABS.Enable       = activeConfig->DriveAssists.ABS.Enable      ;
     localSettings.DriveAssists.ABS.Filter       = activeConfig->DriveAssists.ABS.Filter      ;
@@ -231,6 +233,8 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetDoubleValue("MT_PARAMS", "MisshiftDamage", MTParams.MisshiftDamage);
     ini.SetDoubleValue("MT_PARAMS", "EngBrakePower", MTParams.EngBrakePower);
     ini.SetDoubleValue("MT_PARAMS", "EngBrakeThreshold", MTParams.EngBrakeThreshold);
+    ini.SetDoubleValue("MT_PARAMS", "CreepIdleThrottle", MTParams.CreepIdleThrottle);
+    ini.SetDoubleValue("MT_PARAMS", "CreepIdleRPM", MTParams.CreepIdleRPM);
 
     // [GAMEPLAY_ASSISTS]
     ini.SetBoolValue("GAMEPLAY_ASSISTS", "SimpleBike", GameAssists.SimpleBike);
@@ -532,6 +536,8 @@ void ScriptSettings::parseSettingsGeneral() {
     MTParams.MisshiftDamage =       ini.GetDoubleValue("MT_PARAMS", "MisshiftDamage", MTParams.MisshiftDamage);
     MTParams.EngBrakePower =        ini.GetDoubleValue("MT_PARAMS", "EngBrakePower", MTParams.EngBrakePower);
     MTParams.EngBrakeThreshold =    ini.GetDoubleValue("MT_PARAMS", "EngBrakeThreshold", MTParams.EngBrakeThreshold);
+    MTParams.CreepIdleThrottle =    ini.GetDoubleValue("MT_PARAMS", "CreepIdleThrottle", MTParams.CreepIdleThrottle);
+    MTParams.CreepIdleRPM      =    ini.GetDoubleValue("MT_PARAMS", "CreepIdleRPM"     , MTParams.CreepIdleRPM     );
 
     GameAssists.DefaultNeutral =    ini.GetBoolValue("GAMEPLAY_ASSISTS", "DefaultNeutral", GameAssists.DefaultNeutral);
     GameAssists.SimpleBike =        ini.GetBoolValue("GAMEPLAY_ASSISTS", "SimpleBike", GameAssists.SimpleBike);

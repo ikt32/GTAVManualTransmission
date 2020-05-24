@@ -393,6 +393,13 @@ void update_finetuneoptionsmenu() {
         { "RPM where engine braking starts being effective." });
     g_menu.FloatOption("Engine braking power", g_settings.MTParams.EngBrakePower, 0.0f, 5.0f, 0.05f,
         { "Decrease this value if your wheels lock up when engine braking." });
+
+    // Clutch creep params
+    g_menu.FloatOption("Clutch creep idle RPM", g_settings.MTParams.CreepIdleRPM, 0.0f, 0.5f, 0.01f,
+        { "RPM at which the engine should be idling and the car wants to move by itself.",
+          "Engines in GTA idle at 0.2, but this is rather high."});
+    g_menu.FloatOption("Clutch creep throttle", g_settings.MTParams.CreepIdleThrottle, 0.0f, 1.0f, 0.01f,
+        { "How much throttle is given when the car speed drops below the idle RPM." });
 }
 
 void update_shiftingoptionsmenu() {

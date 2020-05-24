@@ -1228,13 +1228,14 @@ bool isSkidding(float threshold) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void functionClutchCatch() {
-    const float idleThrottle = 0.24f;
+    const float idleThrottle = g_settings().MTParams.CreepIdleThrottle;
+    const float idleRPM = g_settings().MTParams.CreepIdleRPM;
 
     float clutchRatio = map(g_controls.ClutchVal, 1.0f - g_settings().MTParams.ClutchThreshold, 0.0f, 0.0f, 1.0f);
     clutchRatio = std::clamp(clutchRatio, 0.0f, 1.0f);
 
     bool clutchEngaged = !isClutchPressed();
-    float minSpeed = 0.2f * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
+    float minSpeed = idleRPM * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
     float expectedSpeed = g_vehData.mRPM * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]) * clutchRatio;
     float actualSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
 

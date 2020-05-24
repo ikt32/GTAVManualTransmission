@@ -77,6 +77,8 @@ public:
         float StallingRPM = 0.1f;
         float RPMDamage = 0.1f;
         float MisshiftDamage = 5.0f;
+        float CreepIdleThrottle = 0.1f;
+        float CreepIdleRPM = 0.1f;
     } MTParams;
 
     // [GAMEPLAY_ASSISTS]
