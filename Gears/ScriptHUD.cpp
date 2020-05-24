@@ -28,6 +28,7 @@ extern VehicleGearboxStates g_gearStates;
 extern VehicleExtensions g_ext;
 extern Vehicle g_playerVehicle;
 extern VehicleData g_vehData;
+extern VehiclePeripherals g_peripherals;
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Display elements
@@ -59,6 +60,12 @@ void updateDashLights() {
         abs |= g_vehData.mWheelsAbs[i];
         tcs |= g_vehData.mWheelsTcs[i];
         esp |= g_vehData.mWheelsEspO[i] || g_vehData.mWheelsEspU[i];
+    }
+
+    if (g_peripherals.IgnitionState == IgnitionState::Stall) {
+        abs = true;
+        tcs = true;
+        esp = true;
     }
 
     if (abs)

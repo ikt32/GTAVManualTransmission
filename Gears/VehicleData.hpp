@@ -36,6 +36,12 @@ enum class ABSType {
     ABS_ALT_OPTION,
 };
 
+enum class IgnitionState {
+    Off,
+    Stall,
+    On,
+};
+
 struct VehiclePeripherals {
     // "Peripherals"
     bool BlinkerLeft = false;
@@ -44,6 +50,7 @@ struct VehiclePeripherals {
     int BlinkerTicks = 0;
     bool LookBackRShoulder = false;
     int RadioStationIndex = 0;
+    IgnitionState IgnitionState = IgnitionState::Off;
 };
 
 enum class ShiftDirection {

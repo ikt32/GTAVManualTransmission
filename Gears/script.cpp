@@ -150,6 +150,19 @@ void functionDash() {
     bool abs = DashLights::LastAbsTime + DashLights::LightDuration >= GAMEPLAY::GET_GAME_TIMER();
     data.ABSLight |= abs;
 
+    if (g_peripherals.IgnitionState == IgnitionState::Stall) {
+        // data.indicator_left = true;
+        // data.indicator_right = true;
+        // data.handbrakeLight = true;
+        data.engineLight = true;
+        data.ABSLight = true;
+        data.petrolLight = true;
+        data.oilLight = true;
+        // data.headlights = true;
+        // data.fullBeam = true;
+        data.batteryLight = true;
+    }
+
     DashHook_SetData(data);
 }
 
@@ -236,6 +249,14 @@ void update_vehicle() {
 
     if (vehAvail) {
         g_vehData.Update(); // Update before doing anything else
+
+        if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle)) {
+            g_peripherals.IgnitionState = IgnitionState::On;
+        }
+        else if (!(g_peripherals.IgnitionState == IgnitionState::Stall)) {
+            // Engine off, but not stalled
+            g_peripherals.IgnitionState = IgnitionState::Off;
+        }
         functionDash();
     }
     if (g_playerVehicle != g_lastPlayerVehicle && vehAvail) {
@@ -1302,6 +1323,9 @@ void functionEngStall() {
     if (g_gearStates.StallProgress > 1.0f) {
         if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle)) {
             VEHICLE::SET_VEHICLE_ENGINE_ON(g_playerVehicle, false, true, true);
+            g_controls.PlayFFBCollision(g_settings().Wheel.FFB.DetailLim / 2);
+            CONTROLS::SET_PAD_SHAKE(0, 100, 255);
+            g_peripherals.IgnitionState = IgnitionState::Stall;
         }
         g_gearStates.StallProgress = 0.0f;
     }
