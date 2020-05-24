@@ -431,13 +431,19 @@ void checkVehicleInputButtons() {
 
 void checkAssistButtons() {
     if (g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleABS)) {
-        APPLY_CONFIG_VALUE(DriveAssists.ABS.Enable, !g_settings().DriveAssists.ABS.Enable);
+        bool newState = !g_settings().DriveAssists.ABS.Enable;
+        UI::Notify(INFO, fmt::format("ABS {}", newState ? "~g~ON" : "~r~OFF"));
+        APPLY_CONFIG_VALUE(DriveAssists.ABS.Enable, newState);
     }
     if (g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleESC)) {
-        APPLY_CONFIG_VALUE(DriveAssists.ESP.Enable, !g_settings().DriveAssists.ESP.Enable);
+        bool newState = !g_settings().DriveAssists.ESP.Enable;
+        UI::Notify(INFO, fmt::format("ESC {}", newState ? "~g~ON" : "~r~OFF"));
+        APPLY_CONFIG_VALUE(DriveAssists.ESP.Enable, newState);
     }
     if (g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleTCS)) {
-        APPLY_CONFIG_VALUE(DriveAssists.TCS.Enable, !g_settings().DriveAssists.TCS.Enable);
+        bool newState = !g_settings().DriveAssists.TCS.Enable;
+        UI::Notify(INFO, fmt::format("TCS {}", newState ? "~g~ON" : "~r~OFF"));
+        APPLY_CONFIG_VALUE(DriveAssists.TCS.Enable, newState);
     }
 }
 
