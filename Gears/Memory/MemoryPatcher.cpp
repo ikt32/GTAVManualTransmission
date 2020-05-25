@@ -77,7 +77,7 @@ void SetPatterns(int version) {
         "xxxx??xx" "xxxx??xx" "xxxx??xx" "xxxx", 
         { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
 
-    // Valid for 1180 to 1868+
+    // Valid for 1604 (FiveM) to 1868+
     throttleLift = PatternInfo("\x44\x89\x77\x50\xf3\x0f\x11\x7d\x4f", "xxxxxxxx?",
         { 0x90, 0x90, 0x90, 0x90 });
 
