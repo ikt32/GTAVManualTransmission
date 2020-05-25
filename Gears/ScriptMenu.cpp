@@ -378,12 +378,15 @@ void update_finetuneoptionsmenu() {
     g_menu.Subtitle("");
 
     g_menu.FloatOption("Clutch bite threshold", g_settings.MTParams.ClutchThreshold, 0.0f, 1.0f, 0.05f,
-        { "How far the clutch has to be lifted to start biting. This value should be lower than \"Stalling threshold\"." });
-    g_menu.FloatOption("Stalling threshold", g_settings.MTParams.StallingThreshold, 0.0f, 1.0f, 0.05f,
-        { "How far the clutch has to be lifted to start stalling. This value should be higher than \"Clutch bite point\"." });
+        { "How far the clutch has to be lifted to start biting." });
     g_menu.FloatOption("Stalling RPM", g_settings.MTParams.StallingRPM, 0.0f, 0.2f, 0.01f,
-        { "Consider stalling when the expected RPM drops below this number.",
-          "The range is 0.0 to 0.2. The engine idles at 0.2, so 0.1 is a decent value." });
+        { "Consider stalling when the expected RPM drops below this value.",
+          "The range is 0.0 to 0.2. The engine idles at 0.2 in GTA.",
+          "Expected RPM is based on car speed and current gear ratio."});
+    g_menu.FloatOption("Stalling rate", g_settings.MTParams.StallingRate, 0.0f, 10.0f, 0.05f,
+        { "How quick the engine should stall. Higher values make it stall faster." });
+    g_menu.FloatOption("Stalling slip", g_settings.MTParams.StallingSlip, 0.0f, 1.0f, 0.05f,
+        { "How much the clutch may slip before the stalling rate picks up." });
 
     g_menu.FloatOption("RPM damage", g_settings.MTParams.RPMDamage, 0.0f, 10.0f, 0.05f,
         { "Damage from redlining too long." });
