@@ -287,6 +287,20 @@ void drawRPMIndicator() {
         };
         rpmcolor = rpmlimiter;
     }
+
+    float rpm = g_vehData.mRPM;
+
+    // Stall indicator
+    if (Math::Near(g_vehData.mRPM, 0.2f, 0.01f) && g_gearStates.StallProgress > 0.0f) {
+        rpm = map(g_gearStates.StallProgress, 0.0f, 1.0f, 0.2f, 0.0f);
+        rpmcolor = {
+            255,
+            std::clamp((int)map(rpm, 0.0f, 0.2f, 255.0f, 0.0f), 0, 255),
+            std::clamp((int)map(rpm, 0.0f, 0.1f, 255.0f, 0.0f), 0, 255),
+            255
+        };
+    }
+
     drawRPMIndicator(
         g_settings.HUD.RPMBar.XPos,
         g_settings.HUD.RPMBar.YPos,
@@ -294,7 +308,7 @@ void drawRPMIndicator() {
         g_settings.HUD.RPMBar.YSz,
         rpmcolor,
         background,
-        g_vehData.mRPM
+        rpm
     );
 }
 
