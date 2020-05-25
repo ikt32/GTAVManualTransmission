@@ -33,4 +33,16 @@ namespace Util {
 
         const ColorI TransparentGray = { 75, 75, 75, 75 };
     }
+
+    // Returns HSV in RGB Color struct
+    // R -> H
+    // G -> S
+    // B -> V
+    ColorF RGB2HSV(ColorF rgb);
+
+    // Takes HSV in RGB Color struct
+    // R -> H
+    // G -> S
+    // B -> V
+    ColorF HSV2RGB(ColorF hsv);
 }

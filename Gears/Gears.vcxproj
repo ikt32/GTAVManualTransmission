@@ -173,6 +173,7 @@
     <ClCompile Include="SteeringAnim.cpp" />
     <ClCompile Include="UDPTelemetry\UDPTelemetry.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
+    <ClCompile Include="Util\Color.cpp" />
     <ClCompile Include="Util\Files.cpp" />
     <ClCompile Include="Util\FileVersion.cpp" />
     <ClCompile Include="Util\GameSound.cpp" />
