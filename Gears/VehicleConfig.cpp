@@ -38,28 +38,31 @@ void VehicleConfig::loadSettings(const ScriptSettings& gSettings, const std::str
 
     // [MT_PARAMS]
     MTParams.ClutchThreshold = ini.GetDoubleValue("MT_PARAMS", "ClutchCatchpoint", gSettings.MTParams.ClutchThreshold);
-    MTParams.StallingThreshold = ini.GetDoubleValue("MT_PARAMS", "StallingThreshold", gSettings.MTParams.StallingThreshold);
     MTParams.StallingRPM = ini.GetDoubleValue("MT_PARAMS", "StallingRPM", gSettings.MTParams.StallingRPM);
+    MTParams.StallingRate = ini.GetDoubleValue("MT_PARAMS", "StallingRate", gSettings.MTParams.StallingRate);
+    MTParams.StallingSlip = ini.GetDoubleValue("MT_PARAMS", "StallingSlip", gSettings.MTParams.StallingSlip);
     MTParams.RPMDamage = ini.GetDoubleValue("MT_PARAMS", "RPMDamage", gSettings.MTParams.RPMDamage);
     MTParams.MisshiftDamage = ini.GetDoubleValue("MT_PARAMS", "MisshiftDamage", gSettings.MTParams.MisshiftDamage);
     MTParams.EngBrakePower = ini.GetDoubleValue("MT_PARAMS", "EngBrakePower", gSettings.MTParams.EngBrakePower);
     MTParams.EngBrakeThreshold = ini.GetDoubleValue("MT_PARAMS", "EngBrakeThreshold", gSettings.MTParams.EngBrakeThreshold);
+    MTParams.CreepIdleThrottle = ini.GetDoubleValue("MT_PARAMS", "CreepIdleThrottle", gSettings.MTParams.CreepIdleThrottle);
+    MTParams.CreepIdleRPM = ini.GetDoubleValue("MT_PARAMS", "CreepIdleRPM", gSettings.MTParams.CreepIdleRPM);
 
     // [DRIVING_ASSISTS]
-    DriveAssists.ABS.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "ABS", DriveAssists.ABS.Enable);
-    DriveAssists.ABS.Filter = ini.GetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABS.Filter);
-    DriveAssists.TCS.Enable = ini.GetLongValue("DRIVING_ASSISTS", "TCS", DriveAssists.TCS.Enable);
-    DriveAssists.TCS.Mode = ini.GetLongValue("DRIVING_ASSISTS", "TCSMode", DriveAssists.TCS.Mode);
-    DriveAssists.TCS.SlipMax = ini.GetDoubleValue("DRIVING_ASSISTS", "TCSSlipMax", DriveAssists.TCS.SlipMax);
-    DriveAssists.ESP.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "ESP", DriveAssists.ESP.Enable);
-    DriveAssists.ESP.OverMin = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMin", DriveAssists.ESP.OverMin);
-    DriveAssists.ESP.OverMax = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMax", DriveAssists.ESP.OverMax);
-    DriveAssists.ESP.OverMinComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMinComp", DriveAssists.ESP.OverMinComp);
-    DriveAssists.ESP.OverMaxComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMaxComp", DriveAssists.ESP.OverMaxComp);
-    DriveAssists.ESP.UnderMin = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMin", DriveAssists.ESP.UnderMin);
-    DriveAssists.ESP.UnderMax = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMax", DriveAssists.ESP.UnderMax);
-    DriveAssists.ESP.UnderMinComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMinComp", DriveAssists.ESP.UnderMinComp);
-    DriveAssists.ESP.UnderMaxComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMaxComp", DriveAssists.ESP.UnderMaxComp);
+    DriveAssists.ABS.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "ABS", gSettings.DriveAssists.ABS.Enable);
+    DriveAssists.ABS.Filter = ini.GetBoolValue("DRIVING_ASSISTS", "ABSFilter", gSettings.DriveAssists.ABS.Filter);
+    DriveAssists.TCS.Enable = ini.GetLongValue("DRIVING_ASSISTS", "TCS", gSettings.DriveAssists.TCS.Enable);
+    DriveAssists.TCS.Mode = ini.GetLongValue("DRIVING_ASSISTS", "TCSMode", gSettings.DriveAssists.TCS.Mode);
+    DriveAssists.TCS.SlipMax = ini.GetDoubleValue("DRIVING_ASSISTS", "TCSSlipMax", gSettings.DriveAssists.TCS.SlipMax);
+    DriveAssists.ESP.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "ESP", gSettings.DriveAssists.ESP.Enable);
+    DriveAssists.ESP.OverMin = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMin", gSettings.DriveAssists.ESP.OverMin);
+    DriveAssists.ESP.OverMax = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMax", gSettings.DriveAssists.ESP.OverMax);
+    DriveAssists.ESP.OverMinComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMinComp", gSettings.DriveAssists.ESP.OverMinComp);
+    DriveAssists.ESP.OverMaxComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPOverMaxComp", gSettings.DriveAssists.ESP.OverMaxComp);
+    DriveAssists.ESP.UnderMin = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMin", gSettings.DriveAssists.ESP.UnderMin);
+    DriveAssists.ESP.UnderMax = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMax", gSettings.DriveAssists.ESP.UnderMax);
+    DriveAssists.ESP.UnderMinComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMinComp", gSettings.DriveAssists.ESP.UnderMinComp);
+    DriveAssists.ESP.UnderMaxComp = ini.GetDoubleValue("DRIVING_ASSISTS", "ESPUnderMaxComp", gSettings.DriveAssists.ESP.UnderMaxComp);
 
     // [SHIFT_OPTIONS]
     ShiftOptions.UpshiftCut = ini.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", gSettings.ShiftOptions.UpshiftCut);
@@ -98,68 +101,68 @@ void VehicleConfig::loadSettings(const ScriptSettings& gSettings, const std::str
     Wheel.Steering.Gamma = ini.GetDoubleValue("STEER", "Gamma", gSettings.Wheel.Steering.Gamma);
 
     // [HUD]
-    HUD.Enable = ini.GetBoolValue("HUD", "EnableHUD", HUD.Enable);
-    HUD.Font = ini.GetLongValue("HUD", "HUDFont", HUD.Font);
-    HUD.Outline = ini.GetBoolValue("HUD", "Outline", HUD.Outline);
+    HUD.Enable = ini.GetBoolValue("HUD", "EnableHUD", gSettings.HUD.Enable);
+    HUD.Font = ini.GetLongValue("HUD", "HUDFont", gSettings.HUD.Font);
+    HUD.Outline = ini.GetBoolValue("HUD", "Outline", gSettings.HUD.Outline);
 
-    HUD.Gear.Enable = ini.GetBoolValue("HUD", "GearIndicator", HUD.Gear.Enable);
-    HUD.Gear.XPos = ini.GetDoubleValue("HUD", "GearXpos", HUD.Gear.XPos);
-    HUD.Gear.YPos = ini.GetDoubleValue("HUD", "GearYpos", HUD.Gear.YPos);
-    HUD.Gear.Size = ini.GetDoubleValue("HUD", "GearSize", HUD.Gear.Size);
-    HUD.Gear.TopColorR = ini.GetLongValue("HUD", "GearTopColorR", HUD.Gear.TopColorR);
-    HUD.Gear.TopColorG = ini.GetLongValue("HUD", "GearTopColorG", HUD.Gear.TopColorG);
-    HUD.Gear.TopColorB = ini.GetLongValue("HUD", "GearTopColorB", HUD.Gear.TopColorB);
-    HUD.Gear.ColorR = ini.GetLongValue("HUD", "GearColorR", HUD.Gear.ColorR);
-    HUD.Gear.ColorG = ini.GetLongValue("HUD", "GearColorG", HUD.Gear.ColorG);
-    HUD.Gear.ColorB = ini.GetLongValue("HUD", "GearColorB", HUD.Gear.ColorB);
+    HUD.Gear.Enable = ini.GetBoolValue("HUD", "GearIndicator", gSettings.HUD.Gear.Enable);
+    HUD.Gear.XPos = ini.GetDoubleValue("HUD", "GearXpos", gSettings.HUD.Gear.XPos);
+    HUD.Gear.YPos = ini.GetDoubleValue("HUD", "GearYpos", gSettings.HUD.Gear.YPos);
+    HUD.Gear.Size = ini.GetDoubleValue("HUD", "GearSize", gSettings.HUD.Gear.Size);
+    HUD.Gear.TopColorR = ini.GetLongValue("HUD", "GearTopColorR", gSettings.HUD.Gear.TopColorR);
+    HUD.Gear.TopColorG = ini.GetLongValue("HUD", "GearTopColorG", gSettings.HUD.Gear.TopColorG);
+    HUD.Gear.TopColorB = ini.GetLongValue("HUD", "GearTopColorB", gSettings.HUD.Gear.TopColorB);
+    HUD.Gear.ColorR = ini.GetLongValue("HUD", "GearColorR", gSettings.HUD.Gear.ColorR);
+    HUD.Gear.ColorG = ini.GetLongValue("HUD", "GearColorG", gSettings.HUD.Gear.ColorG);
+    HUD.Gear.ColorB = ini.GetLongValue("HUD", "GearColorB", gSettings.HUD.Gear.ColorB);
 
-    HUD.ShiftMode.Enable = ini.GetBoolValue("HUD", "ShiftModeIndicator", true);
-    HUD.ShiftMode.XPos = ini.GetDoubleValue("HUD", "ShiftModeXpos", HUD.ShiftMode.XPos);
-    HUD.ShiftMode.YPos = ini.GetDoubleValue("HUD", "ShiftModeYpos", HUD.ShiftMode.YPos);
-    HUD.ShiftMode.Size = ini.GetDoubleValue("HUD", "ShiftModeSize", HUD.ShiftMode.Size);
-    HUD.ShiftMode.ColorR = ini.GetLongValue("HUD", "ShiftModeColorR", HUD.ShiftMode.ColorR);
-    HUD.ShiftMode.ColorG = ini.GetLongValue("HUD", "ShiftModeColorG", HUD.ShiftMode.ColorG);
-    HUD.ShiftMode.ColorB = ini.GetLongValue("HUD", "ShiftModeColorB", HUD.ShiftMode.ColorB);
+    HUD.ShiftMode.Enable = ini.GetBoolValue("HUD", "ShiftModeIndicator", gSettings.HUD.ShiftMode.Enable);
+    HUD.ShiftMode.XPos = ini.GetDoubleValue("HUD", "ShiftModeXpos", gSettings.HUD.ShiftMode.XPos);
+    HUD.ShiftMode.YPos = ini.GetDoubleValue("HUD", "ShiftModeYpos", gSettings.HUD.ShiftMode.YPos);
+    HUD.ShiftMode.Size = ini.GetDoubleValue("HUD", "ShiftModeSize", gSettings.HUD.ShiftMode.Size);
+    HUD.ShiftMode.ColorR = ini.GetLongValue("HUD", "ShiftModeColorR", gSettings.HUD.ShiftMode.ColorR);
+    HUD.ShiftMode.ColorG = ini.GetLongValue("HUD", "ShiftModeColorG", gSettings.HUD.ShiftMode.ColorG);
+    HUD.ShiftMode.ColorB = ini.GetLongValue("HUD", "ShiftModeColorB", gSettings.HUD.ShiftMode.ColorB);
 
-    HUD.Speedo.Speedo = ini.GetValue("HUD", "Speedo", HUD.Speedo.Speedo.c_str());
-    HUD.Speedo.ShowUnit = ini.GetBoolValue("HUD", "SpeedoShowUnit", HUD.Speedo.ShowUnit);
-    HUD.Speedo.XPos = ini.GetDoubleValue("HUD", "SpeedoXpos", HUD.Speedo.XPos);
-    HUD.Speedo.YPos = ini.GetDoubleValue("HUD", "SpeedoYpos", HUD.Speedo.YPos);
-    HUD.Speedo.Size = ini.GetDoubleValue("HUD", "SpeedoSize", HUD.Speedo.Size);
-    HUD.Speedo.ColorR = ini.GetLongValue("HUD", "SpeedoColorR", HUD.Speedo.ColorR);
-    HUD.Speedo.ColorG = ini.GetLongValue("HUD", "SpeedoColorG", HUD.Speedo.ColorG);
-    HUD.Speedo.ColorB = ini.GetLongValue("HUD", "SpeedoColorB", HUD.Speedo.ColorB);
+    HUD.Speedo.Speedo = ini.GetValue("HUD", "Speedo", gSettings.HUD.Speedo.Speedo.c_str());
+    HUD.Speedo.ShowUnit = ini.GetBoolValue("HUD", "SpeedoShowUnit", gSettings.HUD.Speedo.ShowUnit);
+    HUD.Speedo.XPos = ini.GetDoubleValue("HUD", "SpeedoXpos", gSettings.HUD.Speedo.XPos);
+    HUD.Speedo.YPos = ini.GetDoubleValue("HUD", "SpeedoYpos", gSettings.HUD.Speedo.YPos);
+    HUD.Speedo.Size = ini.GetDoubleValue("HUD", "SpeedoSize", gSettings.HUD.Speedo.Size);
+    HUD.Speedo.ColorR = ini.GetLongValue("HUD", "SpeedoColorR", gSettings.HUD.Speedo.ColorR);
+    HUD.Speedo.ColorG = ini.GetLongValue("HUD", "SpeedoColorG", gSettings.HUD.Speedo.ColorG);
+    HUD.Speedo.ColorB = ini.GetLongValue("HUD", "SpeedoColorB", gSettings.HUD.Speedo.ColorB);
 
-    HUD.RPMBar.Enable = ini.GetBoolValue("HUD", "EnableRPMIndicator", HUD.RPMBar.Enable);
-    HUD.RPMBar.XPos = ini.GetDoubleValue("HUD", "RPMIndicatorXpos", HUD.RPMBar.XPos);
-    HUD.RPMBar.YPos = ini.GetDoubleValue("HUD", "RPMIndicatorYpos", HUD.RPMBar.YPos);
-    HUD.RPMBar.XSz = ini.GetDoubleValue("HUD", "RPMIndicatorWidth", HUD.RPMBar.XSz);
-    HUD.RPMBar.YSz = ini.GetDoubleValue("HUD", "RPMIndicatorHeight", HUD.RPMBar.YSz);
-    HUD.RPMBar.Redline = ini.GetDoubleValue("HUD", "RPMIndicatorRedline", HUD.RPMBar.Redline);
+    HUD.RPMBar.Enable = ini.GetBoolValue("HUD", "EnableRPMIndicator", gSettings.HUD.RPMBar.Enable);
+    HUD.RPMBar.XPos = ini.GetDoubleValue("HUD", "RPMIndicatorXpos", gSettings.HUD.RPMBar.XPos);
+    HUD.RPMBar.YPos = ini.GetDoubleValue("HUD", "RPMIndicatorYpos", gSettings.HUD.RPMBar.YPos);
+    HUD.RPMBar.XSz = ini.GetDoubleValue("HUD", "RPMIndicatorWidth", gSettings.HUD.RPMBar.XSz);
+    HUD.RPMBar.YSz = ini.GetDoubleValue("HUD", "RPMIndicatorHeight", gSettings.HUD.RPMBar.YSz);
+    HUD.RPMBar.Redline = ini.GetDoubleValue("HUD", "RPMIndicatorRedline", gSettings.HUD.RPMBar.Redline);
 
-    HUD.RPMBar.BgR = ini.GetLongValue("HUD", "RPMIndicatorBackgroundR", HUD.RPMBar.BgR);
-    HUD.RPMBar.BgG = ini.GetLongValue("HUD", "RPMIndicatorBackgroundG", HUD.RPMBar.BgG);
-    HUD.RPMBar.BgB = ini.GetLongValue("HUD", "RPMIndicatorBackgroundB", HUD.RPMBar.BgB);
-    HUD.RPMBar.BgA = ini.GetLongValue("HUD", "RPMIndicatorBackgroundA", HUD.RPMBar.BgA);
+    HUD.RPMBar.BgR = ini.GetLongValue("HUD", "RPMIndicatorBackgroundR", gSettings.HUD.RPMBar.BgR);
+    HUD.RPMBar.BgG = ini.GetLongValue("HUD", "RPMIndicatorBackgroundG", gSettings.HUD.RPMBar.BgG);
+    HUD.RPMBar.BgB = ini.GetLongValue("HUD", "RPMIndicatorBackgroundB", gSettings.HUD.RPMBar.BgB);
+    HUD.RPMBar.BgA = ini.GetLongValue("HUD", "RPMIndicatorBackgroundA", gSettings.HUD.RPMBar.BgA);
 
-    HUD.RPMBar.FgR = ini.GetLongValue("HUD", "RPMIndicatorForegroundR", HUD.RPMBar.FgR);
-    HUD.RPMBar.FgG = ini.GetLongValue("HUD", "RPMIndicatorForegroundG", HUD.RPMBar.FgG);
-    HUD.RPMBar.FgB = ini.GetLongValue("HUD", "RPMIndicatorForegroundB", HUD.RPMBar.FgB);
-    HUD.RPMBar.FgA = ini.GetLongValue("HUD", "RPMIndicatorForegroundA", HUD.RPMBar.FgA);
+    HUD.RPMBar.FgR = ini.GetLongValue("HUD", "RPMIndicatorForegroundR", gSettings.HUD.RPMBar.FgR);
+    HUD.RPMBar.FgG = ini.GetLongValue("HUD", "RPMIndicatorForegroundG", gSettings.HUD.RPMBar.FgG);
+    HUD.RPMBar.FgB = ini.GetLongValue("HUD", "RPMIndicatorForegroundB", gSettings.HUD.RPMBar.FgB);
+    HUD.RPMBar.FgA = ini.GetLongValue("HUD", "RPMIndicatorForegroundA", gSettings.HUD.RPMBar.FgA);
 
-    HUD.RPMBar.RedlineR = ini.GetLongValue("HUD", "RPMIndicatorRedlineR", HUD.RPMBar.RedlineR);
-    HUD.RPMBar.RedlineG = ini.GetLongValue("HUD", "RPMIndicatorRedlineG", HUD.RPMBar.RedlineG);
-    HUD.RPMBar.RedlineB = ini.GetLongValue("HUD", "RPMIndicatorRedlineB", HUD.RPMBar.RedlineB);
-    HUD.RPMBar.RedlineA = ini.GetLongValue("HUD", "RPMIndicatorRedlineA", HUD.RPMBar.RedlineA);
+    HUD.RPMBar.RedlineR = ini.GetLongValue("HUD", "RPMIndicatorRedlineR", gSettings.HUD.RPMBar.RedlineR);
+    HUD.RPMBar.RedlineG = ini.GetLongValue("HUD", "RPMIndicatorRedlineG", gSettings.HUD.RPMBar.RedlineG);
+    HUD.RPMBar.RedlineB = ini.GetLongValue("HUD", "RPMIndicatorRedlineB", gSettings.HUD.RPMBar.RedlineB);
+    HUD.RPMBar.RedlineA = ini.GetLongValue("HUD", "RPMIndicatorRedlineA", gSettings.HUD.RPMBar.RedlineA);
 
-    HUD.RPMBar.RevLimitR = ini.GetLongValue("HUD", "RPMIndicatorRevlimitR", HUD.RPMBar.RevLimitR);
-    HUD.RPMBar.RevLimitG = ini.GetLongValue("HUD", "RPMIndicatorRevlimitG", HUD.RPMBar.RevLimitG);
-    HUD.RPMBar.RevLimitB = ini.GetLongValue("HUD", "RPMIndicatorRevlimitB", HUD.RPMBar.RevLimitB);
-    HUD.RPMBar.RevLimitA = ini.GetLongValue("HUD", "RPMIndicatorRevlimitA", HUD.RPMBar.RevLimitA);
+    HUD.RPMBar.RevLimitR = ini.GetLongValue("HUD", "RPMIndicatorRevlimitR", gSettings.HUD.RPMBar.RevLimitR);
+    HUD.RPMBar.RevLimitG = ini.GetLongValue("HUD", "RPMIndicatorRevlimitG", gSettings.HUD.RPMBar.RevLimitG);
+    HUD.RPMBar.RevLimitB = ini.GetLongValue("HUD", "RPMIndicatorRevlimitB", gSettings.HUD.RPMBar.RevLimitB);
+    HUD.RPMBar.RevLimitA = ini.GetLongValue("HUD", "RPMIndicatorRevlimitA", gSettings.HUD.RPMBar.RevLimitA);
 
-    HUD.DashIndicators.Enable = ini.GetBoolValue("HUD", "DashIndicators", HUD.DashIndicators.Enable);
-    HUD.DashIndicators.XPos = ini.GetDoubleValue("HUD", "DashIndicatorsXpos", HUD.DashIndicators.XPos);
-    HUD.DashIndicators.YPos = ini.GetDoubleValue("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
-    HUD.DashIndicators.Size = ini.GetDoubleValue("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
+    HUD.DashIndicators.Enable = ini.GetBoolValue("HUD", "DashIndicators", gSettings.HUD.DashIndicators.Enable);
+    HUD.DashIndicators.XPos = ini.GetDoubleValue("HUD", "DashIndicatorsXpos", gSettings.HUD.DashIndicators.XPos);
+    HUD.DashIndicators.YPos = ini.GetDoubleValue("HUD", "DashIndicatorsYpos", gSettings.HUD.DashIndicators.YPos);
+    HUD.DashIndicators.Size = ini.GetDoubleValue("HUD", "DashIndicatorsSize", gSettings.HUD.DashIndicators.Size);
 }
 #pragma warning(pop)

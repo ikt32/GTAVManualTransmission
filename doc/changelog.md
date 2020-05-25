@@ -10,6 +10,9 @@ compatible, aside from the following:
 
 * Engine and transmission
   * Add alternate automatic transmission mode, by [Nyconing](https://github.com/Nyconing)
+  * Add visual and physical feedback to stalling
+  * Improve stalling with additional settings
+  * Improve clutch creep with additional settings
   * Fix engine revving when locked up due to direction
   * Fix delta-gear ratio for automatic transission downshifts
   * Fix ABS affecting automatic transmission shifting
@@ -35,17 +38,19 @@ compatible, aside from the following:
   * Fix CustomSteering deactivation timing for better ACSPatch control
 * UI
   * Improve menu layout (hopefully)
-  * Add DashHook support for ABS light
+  * Add DashHook support for ABS light and other warning lights when stalled
   * Add color options for speedo, gear and shift mode UI elements
   * Add option to turn off UI font outlines
   * Show enabled but untriggered assists as black on dashboard indicators
   * Show triggered lights for at least 300 milliseconds before turning off
+  * Show stalling progress in RPM bar
   * Fix throttle-based TCS not firing dashboard indicator icon
 * General
   * Add UDP telemetry support for programs like SimHub. DiRT4 thanks to [guilhermelimak](https://github.com/guilhermelimak)
   * Add animation syncing!
   * Fix control acquire/release timing (now only when ped has control of car)
   * Fix controller engine on/off hold trigger
+  * Fix an issue for VehicleConfig, where an unspecified option used the class defaults instead of the active main settings
 
 ## 4.7.1
 

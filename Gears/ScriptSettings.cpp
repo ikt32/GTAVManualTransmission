@@ -60,10 +60,13 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
     localSettings.MTParams.EngBrakePower      = activeConfig->MTParams.EngBrakePower    ;
     localSettings.MTParams.EngBrakeThreshold  = activeConfig->MTParams.EngBrakeThreshold;
     localSettings.MTParams.ClutchThreshold    = activeConfig->MTParams.ClutchThreshold  ;
-    localSettings.MTParams.StallingThreshold  = activeConfig->MTParams.StallingThreshold;
     localSettings.MTParams.StallingRPM        = activeConfig->MTParams.StallingRPM      ;
+    localSettings.MTParams.StallingRate       = activeConfig->MTParams.StallingRate     ;
+    localSettings.MTParams.StallingSlip       = activeConfig->MTParams.StallingSlip     ;
     localSettings.MTParams.RPMDamage          = activeConfig->MTParams.RPMDamage        ;
     localSettings.MTParams.MisshiftDamage     = activeConfig->MTParams.MisshiftDamage   ;
+    localSettings.MTParams.CreepIdleThrottle  = activeConfig->MTParams.CreepIdleThrottle;
+    localSettings.MTParams.CreepIdleRPM       = activeConfig->MTParams.CreepIdleRPM     ;
 
     localSettings.DriveAssists.ABS.Enable       = activeConfig->DriveAssists.ABS.Enable      ;
     localSettings.DriveAssists.ABS.Filter       = activeConfig->DriveAssists.ABS.Filter      ;
@@ -225,12 +228,15 @@ void ScriptSettings::SaveGeneral() const {
 
     // [MT_PARAMS]
     ini.SetDoubleValue("MT_PARAMS", "ClutchCatchpoint", MTParams.ClutchThreshold);
-    ini.SetDoubleValue("MT_PARAMS", "StallingThreshold", MTParams.StallingThreshold);
     ini.SetDoubleValue("MT_PARAMS", "StallingRPM", MTParams.StallingRPM);
+    ini.SetDoubleValue("MT_PARAMS", "StallingRate", MTParams.StallingRate);
+    ini.SetDoubleValue("MT_PARAMS", "StallingSlip", MTParams.StallingSlip);
     ini.SetDoubleValue("MT_PARAMS", "RPMDamage", MTParams.RPMDamage);
     ini.SetDoubleValue("MT_PARAMS", "MisshiftDamage", MTParams.MisshiftDamage);
     ini.SetDoubleValue("MT_PARAMS", "EngBrakePower", MTParams.EngBrakePower);
     ini.SetDoubleValue("MT_PARAMS", "EngBrakeThreshold", MTParams.EngBrakeThreshold);
+    ini.SetDoubleValue("MT_PARAMS", "CreepIdleThrottle", MTParams.CreepIdleThrottle);
+    ini.SetDoubleValue("MT_PARAMS", "CreepIdleRPM", MTParams.CreepIdleRPM);
 
     // [GAMEPLAY_ASSISTS]
     ini.SetBoolValue("GAMEPLAY_ASSISTS", "SimpleBike", GameAssists.SimpleBike);
@@ -526,12 +532,15 @@ void ScriptSettings::parseSettingsGeneral() {
     MTOptions.HardLimiter = ini.GetBoolValue("MT_OPTIONS", "HardLimiter", MTOptions.HardLimiter);
 
     MTParams.ClutchThreshold =      ini.GetDoubleValue("MT_PARAMS", "ClutchCatchpoint", MTParams.ClutchThreshold);
-    MTParams.StallingThreshold =    ini.GetDoubleValue("MT_PARAMS", "StallingThreshold", MTParams.StallingThreshold);
     MTParams.StallingRPM =          ini.GetDoubleValue("MT_PARAMS", "StallingRPM", MTParams.StallingRPM);
+    MTParams.StallingRate =         ini.GetDoubleValue("MT_PARAMS", "StallingRate", MTParams.StallingRate);
+    MTParams.StallingSlip =         ini.GetDoubleValue("MT_PARAMS", "StallingSlip", MTParams.StallingSlip);
     MTParams.RPMDamage =            ini.GetDoubleValue("MT_PARAMS", "RPMDamage", MTParams.RPMDamage);
     MTParams.MisshiftDamage =       ini.GetDoubleValue("MT_PARAMS", "MisshiftDamage", MTParams.MisshiftDamage);
     MTParams.EngBrakePower =        ini.GetDoubleValue("MT_PARAMS", "EngBrakePower", MTParams.EngBrakePower);
     MTParams.EngBrakeThreshold =    ini.GetDoubleValue("MT_PARAMS", "EngBrakeThreshold", MTParams.EngBrakeThreshold);
+    MTParams.CreepIdleThrottle =    ini.GetDoubleValue("MT_PARAMS", "CreepIdleThrottle", MTParams.CreepIdleThrottle);
+    MTParams.CreepIdleRPM      =    ini.GetDoubleValue("MT_PARAMS", "CreepIdleRPM"     , MTParams.CreepIdleRPM     );
 
     GameAssists.DefaultNeutral =    ini.GetBoolValue("GAMEPLAY_ASSISTS", "DefaultNeutral", GameAssists.DefaultNeutral);
     GameAssists.SimpleBike =        ini.GetBoolValue("GAMEPLAY_ASSISTS", "SimpleBike", GameAssists.SimpleBike);

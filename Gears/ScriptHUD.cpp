@@ -28,6 +28,7 @@ extern VehicleGearboxStates g_gearStates;
 extern VehicleExtensions g_ext;
 extern Vehicle g_playerVehicle;
 extern VehicleData g_vehData;
+extern VehiclePeripherals g_peripherals;
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Display elements
@@ -59,6 +60,12 @@ void updateDashLights() {
         abs |= g_vehData.mWheelsAbs[i];
         tcs |= g_vehData.mWheelsTcs[i];
         esp |= g_vehData.mWheelsEspO[i] || g_vehData.mWheelsEspU[i];
+    }
+
+    if (g_peripherals.IgnitionState == IgnitionState::Stall) {
+        abs = true;
+        tcs = true;
+        esp = true;
     }
 
     if (abs)
@@ -280,6 +287,39 @@ void drawRPMIndicator() {
         };
         rpmcolor = rpmlimiter;
     }
+
+    float rpm = g_vehData.mRPM;
+
+    // Stall indicator
+    if (Math::Near(g_vehData.mRPM, 0.2f, 0.01f) && g_gearStates.StallProgress > 0.0f) {
+        rpm = map(g_gearStates.StallProgress, 0.0f, 1.0f, 0.2f, 0.0f);
+
+        auto hsvColor = Util::RGB2HSV(Util::ColorF {
+            static_cast<float>(rpmcolor.R) / 255.0f,
+            static_cast<float>(rpmcolor.G) / 255.0f,
+            static_cast<float>(rpmcolor.B) / 255.0f,
+            1.0f, // alpha is ignored anyway
+        });
+
+        // hue: transition orange to red
+        hsvColor.R = map(rpm, 0.0f, 0.2f, 0.0f, 30.0f);        
+
+        // sat: transition whatever to full saturation
+        hsvColor.G = std::clamp(map(rpm, 0.1f, 0.2f, 1.0f, hsvColor.G), 0.0f, 1.0f);
+
+        // val: transition whatever to max saturated brightness
+        hsvColor.B = std::clamp(map(rpm, 0.1f, 0.2f, 1.0f, hsvColor.B), 0.0f, 1.0f);
+
+        auto rgbF = Util::HSV2RGB(hsvColor);
+
+        rpmcolor = Util::ColorI {
+            static_cast<int>(rgbF.R * 255.0f),
+            static_cast<int>(rgbF.G * 255.0f),
+            static_cast<int>(rgbF.B * 255.0f),
+            rpmcolor.A,
+        };
+    }
+
     drawRPMIndicator(
         g_settings.HUD.RPMBar.XPos,
         g_settings.HUD.RPMBar.YPos,
@@ -287,7 +327,7 @@ void drawRPMIndicator() {
         g_settings.HUD.RPMBar.YSz,
         rpmcolor,
         background,
-        g_vehData.mRPM
+        rpm
     );
 }
 

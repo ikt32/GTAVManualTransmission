@@ -72,11 +72,13 @@ public:
         float EngBrakeThreshold = 0.75f;
         // Clutch _lift_ distance
         float ClutchThreshold = 0.15f;
-        // Clutch _lift_ distance
-        float StallingThreshold = 0.35f;
-        float StallingRPM = 0.1f;
+        float StallingRPM = 0.09f;
+        float StallingRate = 3.75f;
+        float StallingSlip = 0.40f;
         float RPMDamage = 0.1f;
         float MisshiftDamage = 5.0f;
+        float CreepIdleThrottle = 0.1f;
+        float CreepIdleRPM = 0.1f;
     } MTParams;
 
     // [GAMEPLAY_ASSISTS]

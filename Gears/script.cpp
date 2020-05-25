@@ -150,6 +150,19 @@ void functionDash() {
     bool abs = DashLights::LastAbsTime + DashLights::LightDuration >= GAMEPLAY::GET_GAME_TIMER();
     data.ABSLight |= abs;
 
+    if (g_peripherals.IgnitionState == IgnitionState::Stall) {
+        // data.indicator_left = true;
+        // data.indicator_right = true;
+        // data.handbrakeLight = true;
+        data.engineLight = true;
+        data.ABSLight = true;
+        data.petrolLight = true;
+        data.oilLight = true;
+        // data.headlights = true;
+        // data.fullBeam = true;
+        data.batteryLight = true;
+    }
+
     DashHook_SetData(data);
 }
 
@@ -236,6 +249,14 @@ void update_vehicle() {
 
     if (vehAvail) {
         g_vehData.Update(); // Update before doing anything else
+
+        if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle)) {
+            g_peripherals.IgnitionState = IgnitionState::On;
+        }
+        else if (!(g_peripherals.IgnitionState == IgnitionState::Stall)) {
+            // Engine off, but not stalled
+            g_peripherals.IgnitionState = IgnitionState::Off;
+        }
         functionDash();
     }
     if (g_playerVehicle != g_lastPlayerVehicle && vehAvail) {
@@ -1228,13 +1249,14 @@ bool isSkidding(float threshold) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void functionClutchCatch() {
-    const float idleThrottle = 0.24f;
+    const float idleThrottle = g_settings().MTParams.CreepIdleThrottle;
+    const float idleRPM = g_settings().MTParams.CreepIdleRPM;
 
     float clutchRatio = map(g_controls.ClutchVal, 1.0f - g_settings().MTParams.ClutchThreshold, 0.0f, 0.0f, 1.0f);
     clutchRatio = std::clamp(clutchRatio, 0.0f, 1.0f);
 
     bool clutchEngaged = !isClutchPressed();
-    float minSpeed = 0.2f * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
+    float minSpeed = idleRPM * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
     float expectedSpeed = g_vehData.mRPM * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]) * clutchRatio;
     float actualSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
 
@@ -1269,7 +1291,8 @@ void functionClutchCatch() {
 }
 
 void functionEngStall() {
-    const float stallRate = GAMEPLAY::GET_FRAME_TIME() * 3.33f;
+    const float stallRate = GAMEPLAY::GET_FRAME_TIME() * g_settings().MTParams.StallingRate;
+    const float stallSlip = g_settings().MTParams.StallingSlip;
 
     float minSpeed = g_settings().MTParams.StallingRPM * abs(g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
     float actualSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
@@ -1277,20 +1300,17 @@ void functionEngStall() {
     // Closer to idle speed = less buildup for stalling
     float speedDiffRatio = map(abs(minSpeed) - abs(actualSpeed), 0.0f, abs(minSpeed), 0.0f, 1.0f);
     speedDiffRatio = std::clamp(speedDiffRatio, 0.0f, 1.0f);
-    if (speedDiffRatio < 0.45f)
-        speedDiffRatio = 0.0f; //ignore if we're close-ish to idle
     
     bool clutchEngaged = !isClutchPressed();
-    bool stallEngaged = g_controls.ClutchVal < 1.0f - g_settings().MTParams.StallingThreshold;
 
-    // this thing is big when the clutch isnt pressed
-    float invClutch = 1.0f - g_controls.ClutchVal;
+    float clutchRatio = map(g_controls.ClutchVal, 1.0f - g_settings().MTParams.ClutchThreshold, 0.0f, 0.0f, 1.0f);
 
-    if (stallEngaged &&
-        g_vehData.mRPM < 0.25f && //engine actually has to idle
+    if (clutchEngaged &&
+        g_vehData.mRPM <= 0.201f && //engine actually has to idle
         abs(actualSpeed) < abs(minSpeed) &&
         VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle)) {
-        float change = invClutch * speedDiffRatio * stallRate;
+        float finalClutchRatio = map(clutchRatio, stallSlip, 1.0f, 0.0f, 1.0f);
+        float change = finalClutchRatio * speedDiffRatio * stallRate;
         g_gearStates.StallProgress += change;
     }
     else if (g_gearStates.StallProgress > 0.0f) {
@@ -1301,14 +1321,20 @@ void functionEngStall() {
     if (g_gearStates.StallProgress > 1.0f) {
         if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle)) {
             VEHICLE::SET_VEHICLE_ENGINE_ON(g_playerVehicle, false, true, true);
+            g_controls.PlayFFBCollision(g_settings().Wheel.FFB.DetailLim / 2);
+            CONTROLS::SET_PAD_SHAKE(0, 100, 255);
+            g_peripherals.IgnitionState = IgnitionState::Stall;
         }
+        g_gearStates.StallProgress = 0.0f;
+    }
+    if (g_gearStates.StallProgress < 0.0f) {
         g_gearStates.StallProgress = 0.0f;
     }
 
     // Simulate push-start
     // We'll just assume the ignition thing is in the "on" position.
     if (actualSpeed > minSpeed && !VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle) &&
-        stallEngaged) {
+        clutchEngaged) {
         VEHICLE::SET_VEHICLE_ENGINE_ON(g_playerVehicle, true, true, true);
     }
 

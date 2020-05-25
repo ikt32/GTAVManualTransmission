@@ -213,6 +213,9 @@
     </ClCompile>
     <ClCompile Include="AtcuLogic.cpp" />
     <ClCompile Include="AtcuGearbox.cpp" />
+    <ClCompile Include="Util\Color.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
