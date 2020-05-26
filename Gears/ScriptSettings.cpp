@@ -70,8 +70,10 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
 
     localSettings.DriveAssists.ABS.Enable       = activeConfig->DriveAssists.ABS.Enable      ;
     localSettings.DriveAssists.ABS.Filter       = activeConfig->DriveAssists.ABS.Filter      ;
+    localSettings.DriveAssists.TCS.Enable       = activeConfig->DriveAssists.TCS.Enable      ;
     localSettings.DriveAssists.TCS.Mode         = activeConfig->DriveAssists.TCS.Mode        ;
     localSettings.DriveAssists.TCS.SlipMax      = activeConfig->DriveAssists.TCS.SlipMax     ;
+    localSettings.DriveAssists.ESP.Enable       = activeConfig->DriveAssists.ESP.Enable      ;
     localSettings.DriveAssists.ESP.OverMin      = activeConfig->DriveAssists.ESP.OverMin     ;
     localSettings.DriveAssists.ESP.OverMax      = activeConfig->DriveAssists.ESP.OverMax     ;
     localSettings.DriveAssists.ESP.OverMinComp  = activeConfig->DriveAssists.ESP.OverMinComp ;
@@ -553,7 +555,7 @@ void ScriptSettings::parseSettingsGeneral() {
     // [DRIVING_ASSISTS]
     DriveAssists.ABS.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "ABS", DriveAssists.ABS.Enable);
     DriveAssists.ABS.Filter = ini.GetBoolValue("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABS.Filter);
-    DriveAssists.TCS.Enable = ini.GetLongValue("DRIVING_ASSISTS", "TCS", DriveAssists.TCS.Enable);
+    DriveAssists.TCS.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "TCS", DriveAssists.TCS.Enable);
     DriveAssists.TCS.Mode = ini.GetLongValue("DRIVING_ASSISTS", "TCSMode", DriveAssists.TCS.Mode);
     DriveAssists.TCS.SlipMax = ini.GetDoubleValue("DRIVING_ASSISTS", "TCSSlipMax", DriveAssists.TCS.SlipMax);
     DriveAssists.ESP.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "ESP", DriveAssists.ESP.Enable);
