@@ -14,8 +14,8 @@ const std::unordered_map<std::string, int> keyMap = {
     // CTRL/SHIFT already have their left and right variants mapped
     //keymap["SHIFT"] = VK_SHIFT;
     //keymap["CTRL"] = VK_CONTROL;
-    { "XB1" , VK_XBUTTON1 },
-    { "XB2" , VK_XBUTTON2 },
+    { "XB1" , VK_XBUTTON1 }, // Back
+    { "XB2" , VK_XBUTTON2 }, // Forward
     { "LMB" , VK_LBUTTON },
     { "RMB" , VK_RBUTTON },
     { "MMB" , VK_MBUTTON },

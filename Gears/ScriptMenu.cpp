@@ -1082,13 +1082,28 @@ void update_buttonsmenu() {
 
     std::vector<std::string> wheelToKeyInfo = {
         "Active wheel-to-key options:",
-        "Press RIGHT to clear a button",
+        "Press RIGHT to clear all keys bound to button",
         fmt::format("Device: {}", g_settings.GUIDToDeviceIndex(g_controls.WheelToKeyGUID))
     };
 
     for (int i = 0; i < MAX_RGBBUTTONS; i++) {
-        if (g_controls.WheelToKey[i] != -1) {
-            wheelToKeyInfo.push_back(fmt::format("{} = {}", i, key2str(g_controls.WheelToKey[i])));
+        if (g_controls.WheelToKey[i].empty())
+            continue;
+        
+        for (const auto& keyval : g_controls.WheelToKey[i]) {
+            wheelToKeyInfo.push_back(fmt::format("{} = {}", i, key2str(keyval)));
+            if (g_controls.GetWheel().IsButtonPressed(i, g_controls.WheelToKeyGUID)) {
+                wheelToKeyInfo.back() = fmt::format("{} (Pressed)", wheelToKeyInfo.back());
+            }
+        }
+    }
+
+    for (const auto w2kBindingPov : g_controls.WheelToKeyPov) {
+        if (w2kBindingPov.second.empty())
+            continue;
+        auto i = w2kBindingPov.first;
+        for (const auto& keyval : w2kBindingPov.second) {
+            wheelToKeyInfo.push_back(fmt::format("{} = {}", i, key2str(keyval)));
             if (g_controls.GetWheel().IsButtonPressed(i, g_controls.WheelToKeyGUID)) {
                 wheelToKeyInfo.back() = fmt::format("{} (Pressed)", wheelToKeyInfo.back());
             }

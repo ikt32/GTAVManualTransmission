@@ -48,7 +48,7 @@ public:
         SIZEOF_POV,
     };
 
-    const std::array<POV, POVDIRECTIONS> POVDirections{
+    inline static const std::array<POV, POVDIRECTIONS> POVDirections {
         N, NE, E, SE, S, SW, W, NW
     };
 

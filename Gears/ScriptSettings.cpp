@@ -843,6 +843,7 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
 void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     CSimpleIniA ini;
     ini.SetUnicode();
+    ini.SetMultiKey();
     SI_Error result = ini.LoadFile(settingsWheelFile.c_str());
     CHECK_LOG_SI_ERROR(result, "load");
 
@@ -1074,15 +1075,26 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     scriptControl->WheelToKeyGUID = 
         DeviceIndexToGUID(ini.GetLongValue("TO_KEYBOARD", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
     for (int i = 0; i < MAX_RGBBUTTONS; i++) {
-        std::string entryString = ini.GetValue("TO_KEYBOARD", std::to_string(i).c_str(), "UNKNOWN");
-        if (entryString == "UNKNOWN") {
-            scriptControl->WheelToKey[i] = -1;
-        }
-        else {
-            scriptControl->WheelToKey[i] = str2key(entryString);
+        scriptControl->WheelToKey[i].clear();
+        CSimpleIniA::TNamesDepend values;
+        if (ini.GetAllValues("TO_KEYBOARD", std::to_string(i).c_str(), values)) {
+            values.sort(CSimpleIniA::Entry::LoadOrder());
+            for (const auto& entry : values) {
+                scriptControl->WheelToKey[i].push_back(str2key(entry.pItem));
+            }
         }
     }
 
+    for (const auto& pov : WheelDirectInput::POVDirections) {
+        scriptControl->WheelToKeyPov[pov].clear();
+        CSimpleIniA::TNamesDepend values;
+        if (ini.GetAllValues("TO_KEYBOARD", std::to_string(pov).c_str(), values)) {
+            values.sort(CSimpleIniA::Entry::LoadOrder());
+            for (const auto& entry : values) {
+                scriptControl->WheelToKeyPov[pov].push_back(str2key(entry.pItem));
+            }
+        }
+    }
 }
 
 ptrdiff_t ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, const std::string& dev_name) {
@@ -1159,10 +1171,19 @@ void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t
 void ScriptSettings::SteeringAddWheelToKey(const std::string &confTag, ptrdiff_t index, int button, const std::string &keyName) {
     CSimpleIniA ini;
     ini.SetUnicode();
+    ini.SetMultiKey();
     SI_Error result = ini.LoadFile(settingsWheelFile.c_str());
     CHECK_LOG_SI_ERROR(result, "load");
 
-    ini.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
+    std::string device = ini.GetValue(confTag.c_str(), "DEVICE", "");
+    if (device.empty()) {
+        ini.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
+    }
+    else if (device != std::to_string(index)) {
+        ini.Delete(confTag.c_str(), "DEVICE");
+        ini.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
+    }
+
     ini.SetValue(confTag.c_str(), std::to_string(button).c_str(), keyName.c_str());
     result = ini.SaveFile(settingsWheelFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
@@ -1171,6 +1192,7 @@ void ScriptSettings::SteeringAddWheelToKey(const std::string &confTag, ptrdiff_t
 bool ScriptSettings::SteeringClearWheelToKey(int button) {
     CSimpleIniA ini;
     ini.SetUnicode();
+    ini.SetMultiKey();
     SI_Error result = ini.LoadFile(settingsWheelFile.c_str());
     CHECK_LOG_SI_ERROR(result, "load");
 

@@ -19,6 +19,10 @@ compatible, aside from the following:
   * Fix NPCs not shifting for forward/reverse
   * Fix clutch creep revving engine when a driven wheel is off the ground
   * Change engine braking to use negative throttle instead of the brakes
+* Wheel button to keyboard mapping
+  * Add mouse input support: LMB, RMB, MMB, X1 and X2
+  * Add support for 1 button -> multiple keyboard keys
+  * Add dpad support: 8 directions mappable to keyboard keys
 * Settings
   * Add UI settings to Vehicle Configs
   * Add ClutchShift options to Vehicle Configs

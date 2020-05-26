@@ -9,6 +9,37 @@
 
 extern ScriptSettings g_settings;
 
+namespace {
+    // For Wheel2Key mouse click
+    MOUSEINPUT MouseButton2Event(int keyval, bool up) {
+        DWORD mouseFlag = 0;
+        DWORD mouseData = 0;
+        switch (keyval) {
+            case VK_LBUTTON:
+                mouseFlag = MOUSEEVENTF_LEFTDOWN;
+                break;
+            case VK_RBUTTON:
+                mouseFlag = MOUSEEVENTF_RIGHTDOWN;
+                break;
+            case VK_MBUTTON:
+                mouseFlag = MOUSEEVENTF_MIDDLEDOWN;
+                break;
+            case VK_XBUTTON1:
+                mouseFlag = MOUSEEVENTF_XDOWN;
+                mouseData = XBUTTON1;
+                break;
+            case VK_XBUTTON2:
+                mouseFlag = MOUSEEVENTF_XDOWN;
+                mouseData = XBUTTON2;
+                break;
+        }
+        if (up)
+            mouseFlag <<= 1;
+
+        return { 0, 0, mouseData, mouseFlag, 0, NULL };
+    }
+}
+
 CarControls::CarControls()
     : PrevInput(Keyboard)
     , mXInputController(1) {
@@ -343,18 +374,46 @@ void CarControls::CheckCustomButtons() {
         return;
     }
     for (int i = 0; i < MAX_RGBBUTTONS; i++) {
-        if (WheelToKey[i] != -1) {
+        updateKeyInputEvents(i, WheelToKey[i]);
+    }
+    for (const auto& buttonKeys : WheelToKeyPov) {
+        updateKeyInputEvents(buttonKeys.first, buttonKeys.second);
+    }
+}
+
+void CarControls::updateKeyInputEvents(int button, const std::vector<int>& keys) {
+    for (const auto& keyval : keys) {
+        // Mouse (VK 0x01 through 0x06 are mouse)
+        if (keyval >= 1 && keyval <= 6) {
+            INPUT input;
+            input.type = INPUT_MOUSE;
+
+            if (mWheelInput.IsButtonJustPressed(button, WheelToKeyGUID)) {
+                input.mi = MouseButton2Event(keyval, false);
+                if (input.mi.dwFlags != 0) {
+                    SendInput(1, &input, sizeof(INPUT));
+                }
+            }
+            if (mWheelInput.IsButtonJustReleased(button, WheelToKeyGUID)) {
+                input.mi = MouseButton2Event(keyval, true);
+                if (input.mi.dwFlags != 0) {
+                    SendInput(1, &input, sizeof(INPUT));
+                }
+            }
+        }
+        // Keyboard
+        else {
             INPUT input;
             input.type = INPUT_KEYBOARD;
             input.ki.dwExtraInfo = 0;
             input.ki.wVk = 0;
-            input.ki.wScan = MapVirtualKey(WheelToKey[i], MAPVK_VK_TO_VSC);
+            input.ki.wScan = MapVirtualKey(keyval, MAPVK_VK_TO_VSC);
 
-            if (mWheelInput.IsButtonJustPressed(i,WheelToKeyGUID)) {
+            if (mWheelInput.IsButtonJustPressed(button, WheelToKeyGUID)) {
                 input.ki.dwFlags = KEYEVENTF_SCANCODE;
                 SendInput(1, &input, sizeof(INPUT));
             }
-            if (mWheelInput.IsButtonJustReleased(i, WheelToKeyGUID)) {
+            if (mWheelInput.IsButtonJustReleased(button, WheelToKeyGUID)) {
                 input.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
                 SendInput(1, &input, sizeof(INPUT));
             }

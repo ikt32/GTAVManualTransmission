@@ -217,7 +217,8 @@ public:
 
     std::array<SInput<int>, static_cast<int>(WheelControlType::SIZEOF_WheelControlType)> WheelButton = {};
 
-    std::array<int, MAX_RGBBUTTONS> WheelToKey = {};
+    std::array<std::vector<int>, MAX_RGBBUTTONS> WheelToKey = {};
+    std::unordered_map<int, std::vector<int>> WheelToKeyPov = {};
 
     GUID WheelToKeyGUID = {};
 
@@ -234,4 +235,6 @@ private:
 
     bool KBControlCurr[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
     bool KBControlPrev[static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)] = {};
+
+    void updateKeyInputEvents(int button, const std::vector<int>& keys);
 };
