@@ -1151,23 +1151,6 @@ void ScriptSettings::SteeringSaveButton(const std::string & confTag, ptrdiff_t i
     CHECK_LOG_SI_ERROR(result, "save");
 }
 
-void ScriptSettings::SteeringSaveHShifter(const std::string & confTag, ptrdiff_t index, const std::vector<int>& button) {
-    CSimpleIniA ini;
-    ini.SetUnicode();
-    SI_Error result = ini.LoadFile(settingsWheelFile.c_str());
-    CHECK_LOG_SI_ERROR(result, "load");
-
-    ini.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
-
-    ini.SetLongValue(confTag.c_str(), "GEAR_R", button[0]);
-    for (uint8_t i = 1; i < button.size(); ++i) {
-        ini.SetLongValue(confTag.c_str(), fmt::format("GEAR_{}", i).c_str(), button[i]);
-    }
-
-    result = ini.SaveFile(settingsWheelFile.c_str());
-    CHECK_LOG_SI_ERROR(result, "save");
-}
-
 void ScriptSettings::SteeringAddWheelToKey(const std::string &confTag, ptrdiff_t index, int button, const std::string &keyName) {
     CSimpleIniA ini;
     ini.SetUnicode();
