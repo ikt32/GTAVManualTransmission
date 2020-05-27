@@ -5,8 +5,11 @@
 Lots of small fixes and improvements! The settings files are generally
 compatible, aside from the following:
 
-* `SHIFT_ASSISTS` typo fix: now ignores the old wrongly spelled `SHIFT_ASSIST` section
-* H-Pattern shifter assignment changed, now each gear has its own entry
+* ini updates
+  * `SHIFT_ASSISTS` typo fix: now ignores the old wrongly spelled `SHIFT_ASSIST` section
+  * H-Pattern shifter assignment changed, now each gear has its own entry
+
+New features, feature improvements and bug fixes:
 
 * Engine and transmission
   * Add alternate automatic transmission mode, by [Nyconing](https://github.com/Nyconing)
@@ -41,7 +44,7 @@ compatible, aside from the following:
   * Disable CustomSteering for cutscenes
   * Fix CustomSteering deactivation timing for better ACSPatch control
 * UI
-  * Improve menu layout (hopefully)
+  * Improve menu layout
   * Add DashHook support for ABS light and other warning lights when stalled
   * Add color options for speedo, gear and shift mode UI elements
   * Add option to turn off UI font outlines
