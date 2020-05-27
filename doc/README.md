@@ -2,34 +2,35 @@
 
 # Manual Transmission and Steering Wheel Support for GTA V
 
-Version 4.7.0
+Version 4.8.0
 
 ![Gameplay](Gameplay.jpg)
 
 ## Description
 
-This mod enables manual transmission and offers various options to fine-tune
-your gameplay, from gearbox selection to engine braking.
+This mod adds manual transmission support, with loads of customization options
+for the drivetrain and handling.
 
-Support for steering wheels is fully integrated into this mod: full force
-feedback, multiple input devices, every setting is customizable to fit your
-wheel and personal preferences.
+Fully supports steering wheels: It adds force feedback, works with about all
+driving hardware, and every imaginable setting is customizable to fit
+your wheel and driving style.
 
 ## Features
 
-* Friendly in-game menu for configuration
-* Supports keyboard, controller and wheel input
-* Supports for all land-based engine-powered vehicles
-* Loads of options for every aspect of the mod!
-* Choose between the following transmission systems:
-  * Sequential gearbox
-  * H-pattern gearbox
-  * Custom automatic gearbox
+* Steering wheel, gamepad and keyboard support
+* Seamless input switching
+* Easy in-game configuration menu, with many options
+* Per-vehicle settings
+* Sequential, H-pattern and custom automatic transmissions
 * Engine and transmission mechanics:
-  * Clutch support
-  * Engine braking
+  * Working clutch
+  * Engine braking, engine damage, stalling
   * Engine damage
   * Engine stalling
+* Customizable steering assists
+* Custom realistic Stability Control, Traction Control, Anti-Lock Brakes
+* Supports UDP telemetry (DiRT 4 format) for SimHub and similar tools
+* Syncronized steering animations
 
 ## Downloads
 
@@ -50,11 +51,11 @@ wheel and personal preferences.
     * [FiveM installation](#fivem-installation)
   * [Updating](#updating)
   * [Recommended mods](#recommended-mods)
-  * [Controls](#controls)
+  * [Default controls](#default-controls)
     * [Keyboard defaults (US-ANSI)](#keyboard-defaults-us-ansi)
     * [Controller defaults](#controller-defaults)
     * [Wheel defaults](#wheel-defaults)
-    * [Controls priority](#controls-priority)
+    * [Input switching](#input-switching)
   * [Driving with Manual Transmission](#driving-with-manual-transmission)
   * [Configuration files](#configuration-files)
     * [`settings_general.ini`](#settings_generalini)
@@ -63,49 +64,61 @@ wheel and personal preferences.
     * [`settings_menu.ini`](#settings_menuini)
   * [Troubleshooting](#troubleshooting)
     * [Compatibility](#compatibility)
-    * [Known generic issues](#known-generic-issues)
+    * [Known issues](#known-issues)
     * [Steering wheel issues](#steering-wheel-issues)
   * [Credits](#credits)
   * [Source code](#source-code)
 
 ## Requirements
 
-* [Grand Theft Auto V](http://store.steampowered.com/app/271590/Grand_Theft_Auto_V/) 1.0.877.1 to 1.0.1737.6
+* [Grand Theft Auto V](https://www.rockstargames.com/V/)
 * [ScriptHookV](http://www.dev-c.com/gtav/scripthookv/)
+
+For the script to interact with dashboard lights:
+[DashHook](https://www.gta5-mods.com/tools/dashhook)
 
 ## Installation and usage
 
 Put `Gears.asi` and the folder `ManualTransmission` in your GTA V folder
  (overwrite when asked).
 
+__Make sure the folder is writeable! (not `Read Only`)__
+
 Open the menu using the `mtmenu` cheat or the `\|` hotkey, and start
 customizing things.
 
 ### Additional steps for wheel users
 
-1. Remove or disable any XInput or DirectInput input hook configurations for
+0. Remove or disable any XInput or DirectInput input hook configurations for
 your wheel for GTA V (x360ce, for example).
-2. Open the menu, navigate to `Steering Wheel`.
-3. Open `Analog input setup` and set up your basic axes.
-4. Go back to the `Steering Wheel` menu and go through __all__ options. __Read the description of each option.__
+1. Open the menu, navigate to `Controls`, `Wheel & pedals`.
+2. Open `Analog input setup` and set up your analog inputs (throttle, brakes, steering).
+3. Go back to the `Wheel & pedals` menu and go through __all__ options. __Read the description of each option.__
 
 ### FiveM installation
 
-1. Create a plugins folder in FiveM Application Data
-2. Put `Gears.asi` and the folder `ManualTransmission` in plugins
+1. Create a `plugins` folder in FiveM Application Data.
+2. Put `Gears.asi` and the folder `ManualTransmission` in `plugins`.
 
-No official support for FiveM is given beyond this package. If you'd like to give conversion to server or FiveM itself a try, I'll try helping where I can.
+You can also just copy-paste the `ManualTransmission` folder if you have
+configured the mod for singleplayer already.
+
+No active support for FiveM is given beyond this package. If you'd like to
+convert this to FiveM, I'll help where I can.
 
 ## Updating
 
 Replace `Gears.asi` and the folder `ManualTransmission` in your GTA V folder.
 If the changelog indicated settings changed, you might want to
-check the options. Otherwise it should be fine to keep `settings_wheel.ini`,
- `settings_general.ini` and `settings_menu.ini`.
+check the options. Otherwise it should be fine to keep your old settings.
 
 ## Recommended mods
 
-You might want to install some additional mods to enhance your experience.
+* [Realistic Driving V](https://www.gta5-mods.com/vehicles/realistic-driving-v): Improves general car physics. Must-have if you have a force-feedback wheel, since it correctly reduces lateral grip to more realistic levels.
+* [Custom Gear Ratios](https://www.gta5-mods.com/scripts/custom-gear-ratios): Essential if you have cars with more than 6 gears, and allows matching gear ratios with the real car counterparts.
+[Autosport Racing System by Eddlm](https://www.gta5-mods.com/scripts/autosport-racing-system): Complete custom racing system with advanced AI.
+* [Turbo Fix](https://www.gta5-mods.com/scripts/turbo-fix): Fixes spool rates of the turbo upgrade.
+* [Dial Accuracy Fix](https://www.gta5-mods.com/scripts/dial-accuracy-fix): Remap dashboard dials to match your actual speed.
 
 Any speedometer supporting RPM/Gear reading from memory:
 
@@ -113,24 +126,13 @@ Any speedometer supporting RPM/Gear reading from memory:
 * [LeFix Speedometer](https://www.gta5-mods.com/scripts/speedometer-improvedalexbladeversion)
 * [NFSU Speedometer](https://www.gta5-mods.com/scripts/need-for-speed-underground-speedometer)
 
-Any handling mod that aims to improve handling accuracy:
-
-* [Realistic Driving V](https://www.gta5-mods.com/vehicles/realistic-driving-v)
-
 Mods that counter the power loss when sliding sideways:
 
 * [InversePower](https://www.gta5-mods.com/scripts/inversepower)
 * [Drift Assist](https://www.gta5-mods.com/scripts/drift-assist)
+* [True Realistic Driving V](https://www.gta5-mods.com/scripts/true-realistic-driving-v-realistic-mass-v0-1-beta)
 
-Fix gear ratios:
-
-* [Custom Gear Ratios](https://www.gta5-mods.com/scripts/custom-gear-ratios)
-
-Camera:
-
-* [Better Vehicle First Person](https://www.gta5-mods.com/scripts/better-vehicle-first-person)
-
-## Controls
+## Default controls
 
 Refer to `settings_controls.ini` for the default controls.
 
@@ -183,7 +185,7 @@ There are no defaults. You need to use the menu to assign your controls.
 
 ![Wheel setup](Menu-Wheel1.png)
 
-### Controls priority
+### Input switching
 
 The mod picks up the last control and is only active for that set of controls.
 To switch between inputs (keyboard, controller or wheel), you only need to tap
@@ -969,25 +971,28 @@ listed in the (legacy) Controller section.
 
 ### Compatibility
 
-The mod has been tested with GTA V version v1.0.877.1 to v1.0.1604.0 with:
+The current version of the mod has been tested with GTA V version v1.0.1604.0
+through v1.0.1868.4. Limited support runs back to v1.0.877.1, but new features
+have been added since.
 
 * ScriptHookV
 * ScriptHookVDotNet
 * RAGEPluginHook
 * OpenIV
+* FiveM
 
-### Known generic issues
+### Known issues
 
 * __x360ce__ will conflict with input detection if throttle, brake, clutch or steering axes are mapped in x360ce. Assigning inputs without overlap is no problem.
 * [__Strapped__](https://www.gta5-mods.com/scripts/pull-out-strap) will conflict with inputs.
-* [__CustomSteering__](https://www.gta5-mods.com/scripts/custom-steering) will conflict with steering patching. Remove CustomSteering if `PatchSteering` is enabled.
+* [__CustomSteering__](https://www.gta5-mods.com/scripts/custom-steering) will conflict with steering patching.
 * [__ScriptHookVDotNet__](https://github.com/crosire/scripthookvdotnet/releases) crashes the Logitech G920.
   * Workaround: Disable ScriptHookVDotNet.
-  * Workaround: Launch the game with RAGEPluginHook. \[Found by BULLFAYCE\]
+  * Workaround: Launch the game with RAGEPluginHook. (Found by BULLFAYCE)
 * Steering wheel sticks to full left/full throttle.
   * Workaround: Re-toggle the script, prevent alt-tabbing while not paused.
 * Wheel not detected at all when using Steam.
-  * Fix: Uncheck `Generic Gamepad Configuration Support` in Steam Big Picture settings, Controller settings. \[Found by Kaerali\]
+  * Fix: Uncheck `Generic Gamepad Configuration Support` in Steam Big Picture settings, Controller settings. (Found by Kaerali)
 
 ### Steering wheel issues
 
