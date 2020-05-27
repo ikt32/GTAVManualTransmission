@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <iostream>
 #include <thread>
+#include <fmt/format.h>
 #include "../Gears/Input/WheelDirectInput.hpp"
 #include "../Gears/ScriptSettings.hpp"
 #include "../Gears/Input/CarControls.hpp"
@@ -121,7 +122,7 @@ void blankBlock(int x, int y, int lines, int rows) {
 /*
  * Similar to reInit() in Gears but with console stuff
  */
-void init() {
+void init() {	
 	g_settings.SetFiles(settingsGeneralFile, settingsControlsFile,settingsWheelFile);
 	g_settings.Read(&controls);
 	logger.Write(INFO, "Settings read");
@@ -177,7 +178,11 @@ void playWheelEffects(float effSteer) {
 /*
  * Fun starts here!
  */
-bool getConfigAxisWithValues(std::vector<std::tuple<GUID, std::string, int>> startStates, std::tuple<GUID, std::string> &selectedDevice, int hyst, bool &positive, int &startValue_) {
+bool getConfigAxisWithValues(
+	const std::vector<std::tuple<GUID, std::string, int>>& startStates,
+	std::tuple<GUID, std::string> &selectedDevice,
+	int hyst,
+	bool &positive, int &startValue_) {
 	for (auto guid : controls.GetWheel().GetGuids()) {
 		for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
 			for (auto startState : startStates) {
@@ -212,11 +217,27 @@ void saveAxis(const std::string& confTag, GUID devGUID, const std::string& axis,
 	g_settings.Read(&controls);
 }
 
-void saveButton(int button, std::string confTag, GUID devGUID, std::string devName) {
+void saveButton(int button, const std::string& confTag, GUID devGUID, const std::string& devName) {
 	auto index = g_settings.SteeringAppendDevice(devGUID, devName);
 	g_settings.SteeringSaveButton(confTag, index, button);
 }
 
+void clearHShifter() {
+	for (uint8_t i = 0; i < g_numGears; ++i) {
+		g_settings.SteeringSaveButton(fmt::format("HPATTERN_{}", i), -1, -1);
+	}
+	g_settings.Read(&controls);
+}
+
+void saveHShifter(const std::string& confTag, GUID devGUID, const std::vector<int>& buttonArray) {
+	std::wstring wDevName = controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
+	std::string devName = StrUtil::utf8_encode(wDevName);
+	auto index = g_settings.SteeringAppendDevice(devGUID, devName);
+	for (uint8_t i = 0; i < buttonArray.size(); ++i) {
+		g_settings.SteeringSaveButton(fmt::format("HPATTERN_{}", i), index, buttonArray[i]);
+	}
+	g_settings.Read(&controls);
+}
 
 std::tuple<char, std::string, std::string> isAcceptedAxisChar(char c) {
 	for (auto t : axisInfos) {
@@ -244,7 +265,7 @@ void configDynamicAxes(char c) {
 	};
 	
 	auto axisInfo = isAcceptedAxisChar(c);
-	if (std::get<1>(axisInfo) == "") {
+	if (std::get<1>(axisInfo).empty()) {
 		return;
 	}
 
@@ -302,7 +323,7 @@ void configDynamicAxes(char c) {
 				cls();
 				setCursorPosition(0, csbi.srWindow.Bottom);
 				printf("Cleared axis settings");
-				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 				cls();
 				init();
 				return;
@@ -410,7 +431,7 @@ void configDynamicAxes(char c) {
 	cls();
 	setCursorPosition(0, csbi.srWindow.Bottom);
 	printf("Saved changes");
-	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	cls();
 	init();
 }
@@ -425,7 +446,7 @@ std::tuple<char, std::string, std::string> isAcceptedButtonChar(char c) {
 
 void configDynamicButtons(char c) {
 	auto buttonInfo = isAcceptedButtonChar(c);
-	if (std::get<1>(buttonInfo) == "") {
+	if (std::get<1>(buttonInfo).empty()) {
 		return;
 	}
 
@@ -444,7 +465,7 @@ void configDynamicButtons(char c) {
 				buttonsActive++;
 			}
 		}
-		for (auto d : controls.GetWheel().POVDirections) {
+		for (auto d : WheelDirectInput::POVDirections) {
 			if (controls.GetWheel().IsButtonPressed(d, guid)) {
 				buttonsActive++;
 			}
@@ -454,7 +475,7 @@ void configDynamicButtons(char c) {
 	if (buttonsActive > 0) {
 		setCursorPosition(0, 0);
 		printf("Some button was already pressed on start. Stop pressing that and try again.");
-		std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		cls();
 		init();
 		return;
@@ -472,7 +493,7 @@ void configDynamicButtons(char c) {
 				cls();
 				setCursorPosition(0, csbi.srWindow.Bottom);
 				printf("Cleared button settings");
-				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 				cls();
 				init();
 				return;
@@ -494,16 +515,16 @@ void configDynamicButtons(char c) {
 					blankLines(csbi.srWindow.Bottom - 5, 6);
 					setCursorPosition(0, csbi.srWindow.Bottom);
 					printf("Saved changes");
-					std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+					std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 					cls();
 					init();
 					return;
 				}
 			}
 
-			//POV hat shit
+			//POV hat
 			std::string directionsStr = "?";
-			for (auto d : controls.GetWheel().POVDirections) {
+			for (auto d : WheelDirectInput::POVDirections) {
 				if (controls.GetWheel().IsButtonPressed(d, guid)) {
 					if (d == WheelDirectInput::N) directionsStr = "N ";
 					if (d == WheelDirectInput::NE) directionsStr = "NE";
@@ -518,7 +539,7 @@ void configDynamicButtons(char c) {
 					blankLines(csbi.srWindow.Bottom - 5, 6);
 					setCursorPosition(0, csbi.srWindow.Bottom);
 					printf("Saved changes");
-					std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+					std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 					cls();
 					init();
 					return;
@@ -584,11 +605,11 @@ void configHShift(char c) {
 			}
 			if (c == TAB) {
 				std::vector<int> empty(g_numGears);
-				g_settings.SteeringSaveHShifter(confTag, -1, empty);
+				clearHShifter();
 				cls();
 				setCursorPosition(0, csbi.srWindow.Bottom);
 				printf("Cleared H-shifter settings");
-				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 				cls();
 				init();
 				return;
@@ -618,14 +639,14 @@ void configHShift(char c) {
 						setCursorPosition(0, 0);
 						printf("More than 1 button pressed. You can only select one.");
 						std::this_thread::yield();
-						std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+						std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 					}
 					else if (buttonsActive == 0) {
 						blankLines(0, 5);
 						setCursorPosition(0, 0);
 						printf("No buttons pressed. Skipping this gear!");
 						std::this_thread::yield();
-						std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+						std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 						progress++;
 					} else {
 						progress++;
@@ -658,7 +679,10 @@ void configHShift(char c) {
 			case 4:
 			case 5:
 			case 6:
-			case 7: { // Muh GEARS
+			case 7:
+			case 8:
+			case 9:
+			case 10: {
 				setCursorPosition(0, 0);
 				printf("Select for gear %d:", progress);
 				setCursorPosition(0, 1);
@@ -679,7 +703,7 @@ void configHShift(char c) {
 				printf("Using device %d: %s", devEntry, devName.c_str());
 			}
 			break;
-			case 8: { // Reverse gear
+			case 11: { // Reverse gear
 				setCursorPosition(0, 0);
 				printf("Select for reverse gear");
 				setCursorPosition(0, 1);
@@ -700,13 +724,12 @@ void configHShift(char c) {
 				printf("Using device %d: %s", devEntry, devName.c_str());
 			}
 			break;
-			default: { // save all the shit
-				auto index = g_settings.SteeringAppendDevice(devGUID, devName);
-				g_settings.SteeringSaveHShifter(confTag, index, buttonArray);
+			default: {
+				saveHShifter(confTag, devGUID, buttonArray);
 				cls();
 				setCursorPosition(0, csbi.srWindow.Bottom);
 				printf("Saved changes");
-				std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 				cls();
 				init();
 				return;
@@ -726,6 +749,7 @@ void configHShift(char c) {
 
 int main() {
 	std::string logFile = Paths::GetRunningExecutableFolder() + "\\" + Paths::GetRunningExecutableNameWithoutExtension() + ".log";
+	logger.SetMinLevel(DEBUG);
 	logger.SetFile(logFile);
 
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -828,7 +852,7 @@ int main() {
 			std::string directionsStr;
 			blankBlock(xCursorPos, pRow, 1, devWidth);
 			setCursorPosition(xCursorPos, pRow);
-			for (auto d : controls.GetWheel().POVDirections) {
+			for (auto d : WheelDirectInput::POVDirections) {
 				if (d == WheelDirectInput::N ) directionsStr = "N ";
 				if (d == WheelDirectInput::NE) directionsStr = "NE";
 				if (d == WheelDirectInput::E ) directionsStr = " E";
@@ -861,13 +885,10 @@ int main() {
 
 		std::string gear = "N";
 		if (controls.ButtonIn(CarControls::WheelControlType::HR)) gear = "R";
-		if (controls.ButtonIn(CarControls::WheelControlType::H1)) gear = "1";
-		if (controls.ButtonIn(CarControls::WheelControlType::H2)) gear = "2";
-		if (controls.ButtonIn(CarControls::WheelControlType::H3)) gear = "3";
-		if (controls.ButtonIn(CarControls::WheelControlType::H4)) gear = "4";
-		if (controls.ButtonIn(CarControls::WheelControlType::H5)) gear = "5";
-		if (controls.ButtonIn(CarControls::WheelControlType::H6)) gear = "6";
-		if (controls.ButtonIn(CarControls::WheelControlType::H7)) gear = "7";
+		for (uint32_t i = 1; i < 11; ++i) {
+			if (controls.ButtonIn(CarControls::WheelControlType::H1)) gear = std::to_string(i);
+		}
+
 		std::cout << "Gear      " << gear;
 		pRowMax += 6; // Because we printed text 6 lines
 
