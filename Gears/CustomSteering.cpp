@@ -51,8 +51,7 @@ float CustomSteering::calculateReduction() {
 // Returns in radians
 float CustomSteering::calculateDesiredHeading(float steeringMax, float desiredHeading, float reduction) {
     // Scale input with both reduction and steering limit
-    desiredHeading = desiredHeading * reduction * steeringMax;
-    float correction = desiredHeading;
+    float correction;
 
     Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
     if (abs(speedVector.y) > 3.0f) {
@@ -73,7 +72,12 @@ float CustomSteering::calculateDesiredHeading(float steeringMax, float desiredHe
         // clamp auto correction to countersteer limit
         travelDir = std::clamp(travelDir, deg2rad(-g_settings.CustomSteering.CountersteerLimit), deg2rad(g_settings.CustomSteering.CountersteerLimit));
 
-        correction = travelDir + desiredHeading;
+        float finalReduction = map(abs(travelDir), 0.0f, g_settings.CustomSteering.CountersteerLimit, reduction, 1.0f);
+
+        correction = travelDir + desiredHeading * finalReduction * steeringMax;
+    }
+    else {
+        correction = desiredHeading * reduction * steeringMax;
     }
     return std::clamp(correction, -steeringMax, steeringMax);
 }

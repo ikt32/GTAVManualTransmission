@@ -160,12 +160,12 @@ public:
         // In Degrees
         float CountersteerLimit = 15.0f;
         float SteeringMult = 1.0f;
-        float SteeringReduction = 1.0f;
+        float SteeringReduction = 0.9f;
         float Gamma = 1.0f;
         bool CustomRotation = false;
         float CustomRotationDegrees = 900.0f;
-        float CenterTime = 0.000001f;
-        float SteerTime = 0.0001f;
+        float CenterTime = 0.000100f;
+        float SteerTime = 0.000010f;
     } CustomSteering;
 
     // [HUD]

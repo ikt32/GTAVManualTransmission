@@ -37,8 +37,9 @@ New features, feature improvements and bug fixes:
   * Apply TCS, ESC and ABS simultaneously
   * Improve ESC: Also use rear wheels at large corrections
 * Custom steering
-  * Add adjustable speeds for CustomSteering
+  * Add adjustable input speeds for CustomSteering
   * Use system timer in CustomSteering, fixes slow steering in slowmotion
+  * Improve responsiveness while countersteering
   * Improve CustomSteering for amphibious cars in water
   * Disable CustomSteering for boats
   * Disable CustomSteering for cutscenes
