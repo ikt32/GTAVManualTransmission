@@ -72,7 +72,10 @@ float CustomSteering::calculateDesiredHeading(float steeringMax, float desiredHe
         // clamp auto correction to countersteer limit
         travelDir = std::clamp(travelDir, deg2rad(-g_settings.CustomSteering.CountersteerLimit), deg2rad(g_settings.CustomSteering.CountersteerLimit));
 
+        // CountersteerLimit can be 0, resulting in finalReduction == nan
         float finalReduction = map(abs(travelDir), 0.0f, g_settings.CustomSteering.CountersteerLimit, reduction, 1.0f);
+        if (std::isnan(finalReduction))
+            finalReduction = 0.0f;
 
         correction = travelDir + desiredHeading * finalReduction * steeringMax;
     }
