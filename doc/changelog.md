@@ -56,6 +56,8 @@ New features, feature improvements and bug fixes:
 * General
   * Add UDP telemetry support for programs like SimHub. DiRT4 thanks to [guilhermelimak](https://github.com/guilhermelimak)
   * Add animation syncing!
+  * Add wheel size in debug (e.g. 265/35R21)
+  * Improve G-force graph smoothness
   * Fix control acquire/release timing (now only when ped has control of car)
   * Fix controller engine on/off hold trigger
   * Fix an issue for VehicleConfig, where an unspecified option used the class defaults instead of the active main settings
