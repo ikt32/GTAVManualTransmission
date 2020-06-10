@@ -39,7 +39,6 @@ namespace GForce {
     std::vector<Vector3> LastCoords(3);
     Vector3 PrevAccel;
     double PrevRotVel;
-    int LastUpdate = 0;
 }
 
 namespace DashLights {
@@ -191,13 +190,12 @@ void drawGForces() {
         LastCoords.erase(LastCoords.begin());
     }
 
-    int nowT = GAMEPLAY::GET_GAME_TIMER();
-    int dT = nowT - LastUpdate;
-    LastUpdate = nowT;
-
     double worldSpeed = sqrt(static_cast<double>(g_vehData.mVelocity.x) * static_cast<double>(g_vehData.mVelocity.x) +
         static_cast<double>(g_vehData.mVelocity.y) * static_cast<double>(g_vehData.mVelocity.y));
-    double worldRotVel = GetAngleBetween(V3D(LastCoords[1]) - V3D(LastCoords[0]), V3D(LastCoords[2]) - V3D(LastCoords[1])) / (static_cast<double>(dT) / 1000.0);
+    double worldRotVel = 
+        GetAngleBetween(V3D(LastCoords[1]) - V3D(LastCoords[0]), V3D(LastCoords[2]) - V3D(LastCoords[1])) /
+        static_cast<double>(GAMEPLAY::GET_FRAME_TIME());
+
     if (isnan(worldRotVel)) {
         worldRotVel = PrevRotVel;
     }
