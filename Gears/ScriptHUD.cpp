@@ -559,10 +559,12 @@ void drawVehicleWheelInfo() {
     auto wheelsHealt = g_ext.GetWheelHealths(g_playerVehicle);
     auto wheelsContactCoords = g_ext.GetWheelLastContactCoords(g_playerVehicle);
     auto wheelsOnGround = g_ext.GetWheelsOnGround(g_playerVehicle);
-    // TODO: Here
+
     auto wheelCoords = GetWheelCoords(g_playerVehicle);
     auto wheelsPower = g_ext.GetWheelPower(g_playerVehicle);
     auto wheelsBrake = g_ext.GetWheelBrakePressure(g_playerVehicle);
+    auto wheelDims = g_ext.GetWheelDimensions(g_playerVehicle);
+
     for (int i = 0; i < numWheels; i++) {
         Util::ColorI color = Util::ColorsI::TransparentGray;
         if (g_vehData.mWheelsTcs[i]) {
@@ -580,6 +582,11 @@ void drawVehicleWheelInfo() {
         if (!wheelsOnGround[i]) {
             color = Util::ColorI{ 0, 0, 0, 0 };
         }
+
+        // The heck were tyre guys thinking mixing metric and imperial units?
+        float tyreAr = 100.0f * ((wheelDims[i].TyreRadius - wheelDims[i].RimRadius) / wheelDims[i].TyreWidth);
+        float rimSize = 2.0f * wheelDims[i].RimRadius * 39.3701f; // inches
+
         showDebugInfo3D(wheelCoords[i], {
                 fmt::format("[{}] {}Powered", i, g_ext.IsWheelPowered(g_playerVehicle, i) ? "~g~" : "~r~"),
                 fmt::format("Speed: \t{:.3f}", wheelsSpeed[i]),
@@ -587,6 +594,7 @@ void drawVehicleWheelInfo() {
                 //fmt::format("Health: \t{:.3f}", wheelsHealt[i]),
                 fmt::format("Power: \t{:.3f}", wheelsPower[i]),
                 fmt::format("Brake: \t{:.3f}", wheelsBrake[i]),
+                fmt::format("Tyre: {:.0f}/{:.0f}R{:.0f}", wheelDims[i].TyreWidth * 1000.0f, tyreAr, rimSize),
                 fmt::format("{}ABS~w~ | {}TCS~w~ | {}ESC{}",
                     g_vehData.mWheelsAbs[i] ? "~r~" : "",
                     g_vehData.mWheelsTcs[i] ? "~r~" : "",
