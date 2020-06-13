@@ -10,6 +10,24 @@
 #include "ScriptSettings.hpp"
 extern ScriptSettings g_settings;
 
+namespace {
+    bool GetIsRhd(Vehicle v) {
+        Vector3 driverSeatPos = 
+            ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(v, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(v, "seat_dside_f"));
+        Vector3 driverSeatPosRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(v,
+            driverSeatPos.x, driverSeatPos.y, driverSeatPos.z);
+
+        //Vector3 dimMin, dimMax;
+        //GAMEPLAY::GET_MODEL_DIMENSIONS(ENTITY::GET_ENTITY_MODEL(v), &dimMin, &dimMax);
+
+        if (driverSeatPosRel.x > 0.01f && 
+            sgn(driverSeatPosRel.x) == sgn(1.0f)) {
+            return true;
+        }
+        return false;
+    }
+}
+
 VehicleData::VehicleData(VehicleExtensions& ext)
     : mVehicle(0), mExt(ext), mHandlingPtr(0)
     , mVelocity(), mAcceleration(), mRPM(0), mRPMPrev(0)
@@ -22,7 +40,7 @@ VehicleData::VehicleData(VehicleExtensions& ext)
     , mHandlingFlags(0), mModelFlags(0)
     , mIsElectric(false), mIsCVT(false), mHasClutch(false)
     , mHasABS(false), mABSType()
-    , mClass(), mDomain(), mIsAmphibious(false)
+    , mClass(), mDomain(), mIsAmphibious(false), mIsRhd(false)
     , mPrevVelocity() {}
 
 void VehicleData::SetVehicle(Vehicle v) {
@@ -35,6 +53,7 @@ void VehicleData::SetVehicle(Vehicle v) {
         auto type = mExt.GetModelType(mVehicle);
         mIsAmphibious = (type == 6 || type == 7);
         mHasSpeedo = false;
+        mIsRhd = GetIsRhd(v);
 
         // initialize prev's init state
         mVelocity = ENTITY::GET_ENTITY_SPEED_VECTOR(mVehicle, true);

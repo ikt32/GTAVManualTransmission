@@ -171,7 +171,7 @@ public:
     VehicleClass mClass;
     VehicleDomain mDomain;
     bool mIsAmphibious;
-
+    bool mIsRhd;
 private:
     std::vector<bool> getDrivenWheels();
     float getAverageDrivenWheelTyreSpeeds();
