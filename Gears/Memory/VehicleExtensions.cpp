@@ -45,7 +45,7 @@ void VehicleExtensions::ChangeVersion(int version) {
  */
 void VehicleExtensions::initOffsets() {
     mem::init();
-    uintptr_t addr = mem::FindPattern("\x3A\x91\x00\x00\x00\x00\x74\x00\x84\xD2", "xx????x?xx");
+    uintptr_t addr = mem::FindPattern("3A 91 ? ? ? ? 74 ? 84 D2");
     rocketBoostActiveOffset = addr == 0 ? 0 : *(int*)(addr + 2);
     logger.Write(rocketBoostActiveOffset == 0 ? WARN : DEBUG, "Rocket Boost Active Offset: 0x%X", rocketBoostActiveOffset);
 
@@ -130,6 +130,10 @@ void VehicleExtensions::initOffsets() {
                             "xxxx????xxxxxxx");
     handlingOffset = addr == 0 ? 0 : *(int*)(addr + 0x16);
     logger.Write(handlingOffset == 0 ? WARN : DEBUG, "Handling Offset: 0x%X", handlingOffset);
+
+    addr = mem::FindPattern("FD 02 DB 08 98 ? ? ? ? 48 8B 5C 24 30");
+    lightStatesOffset = addr == 0 ? 0 : *(int*)(addr - 4) - 1;
+    logger.Write(lightStatesOffset == 0 ? WARN : DEBUG, "Light States Offset: 0x%X", lightStatesOffset);
 
     addr = mem::FindPattern("\x74\x0A\xF3\x0F\x11\xB3\x1C\x09\x00\x00\xEB\x25", "xxxxxx????xx");
     steeringAngleInputOffset = addr == 0 ? 0 : *(int*)(addr + 6);
@@ -419,6 +423,18 @@ uint64_t VehicleExtensions::GetHandlingPtr(Vehicle handle) {
     if (handlingOffset == 0) return 0;
     auto address = GetAddress(handle);
     return *reinterpret_cast<uint64_t *>(address + handlingOffset);
+}
+
+uint32_t VehicleExtensions::GetLightStates(Vehicle handle) {
+    if (lightStatesOffset == 0) return 0;
+    auto address = GetAddress(handle);
+    return *reinterpret_cast<uint32_t*>(address + lightStatesOffset);
+}
+
+void VehicleExtensions::SetLightStates(Vehicle handle, uint32_t value) {
+    if (lightStatesOffset == 0) return;
+    auto address = GetAddress(handle);
+    *reinterpret_cast<uint32_t*>(address + lightStatesOffset) = value;
 }
 
 float VehicleExtensions::GetSteeringInputAngle(Vehicle handle) {

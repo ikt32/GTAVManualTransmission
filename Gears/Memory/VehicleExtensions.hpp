@@ -37,6 +37,8 @@ public:
     float GetFuelLevel(Vehicle handle);
     void SetFuelLevel(Vehicle handle, float value);
 
+    // TODO: CVeh + 0x84c (1604 - 1868) (Lights damaged)
+
     uint16_t GetGearNext(Vehicle handle);
     void SetGearNext(Vehicle handle, uint16_t value);
 
@@ -77,6 +79,9 @@ public:
     void SetArenaBoost(Vehicle handle, float value);
 
     uint64_t GetHandlingPtr(Vehicle handle);
+
+    uint32_t GetLightStates(Vehicle handle);
+    void SetLightStates(Vehicle handle, uint32_t value);
 
     // Steering input angle, steering lock independent
     float GetSteeringInputAngle(Vehicle handle);
@@ -203,6 +208,7 @@ private:
     int turboOffset = 0;
     int arenaBoostOffset = 0;
     int handlingOffset = 0;
+    int lightStatesOffset = 0;
     int steeringAngleInputOffset = 0;
     int steeringAngleOffset = 0;
     int throttlePOffset = 0;
