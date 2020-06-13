@@ -216,6 +216,7 @@
     <ClCompile Include="Util\Color.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -473,6 +474,7 @@
     </ClInclude>
     <ClInclude Include="AtcuLogic.h" />
     <ClInclude Include="AtcuGearbox.h" />
+    <ClInclude Include="Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

@@ -1448,6 +1448,11 @@ void update_miscoptionsmenu() {
           "FPV camera angle is limited, consider enabling the custom FPV camera.",
           "Check animations.yml for more details!" });
 
+    g_menu.BoolOption("Enable custom FPV camera", g_settings.Misc.Camera.Enable,
+        { "Camera mounted to the player head." });
+
+    g_menu.MenuOption("Camera options", "cameraoptionsmenu",
+        { "Adjust the custom FPV camera" });
 
     if (g_menu.BoolOption("Hide player in FPV", g_settings.Misc.HidePlayerInFPV,
         { "Hides the player in first person view.",
@@ -1466,6 +1471,25 @@ void update_miscoptionsmenu() {
     }
 }
 
+void update_cameraoptionsmenu() {
+    g_menu.Title("Camera options");
+    g_menu.Subtitle("");
+
+    g_menu.BoolOption("Follow movement", g_settings.Misc.Camera.FollowMovement,
+        { "Camera moves with motion and rotation, somewhat like NFS Shift." });
+
+    g_menu.FloatOptionCb("Field of view", g_settings.Misc.Camera.FOV, 1.0f, 120.0f, 0.5f, getKbEntry, 
+        { "In degrees." });
+
+    g_menu.FloatOption("Offset height", g_settings.Misc.Camera.OffsetHeight, -0.5f, 0.5f, 0.01f, 
+        { "Distance in meters." });
+
+    g_menu.FloatOption("Offset forward", g_settings.Misc.Camera.OffsetForward, -0.5f, 0.5f, 0.01f, 
+        { "Distance in meters." });
+
+    g_menu.FloatOptionCb("Change rate", g_settings.Misc.Camera.LookTime, 0.000001f, 0.99f, 0.000001f, getKbEntry,
+        { "How fast the camera changes.", "Press enter to enter a value manually." });
+}
 
 void update_devoptionsmenu() {
     g_menu.Title("Developer options");
@@ -1685,6 +1709,9 @@ void update_menu() {
 
     /* mainmenu -> miscoptionsmenu */
     if (g_menu.CurrentMenu("miscoptionsmenu")) { update_miscoptionsmenu(); }
+
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu */
+    if (g_menu.CurrentMenu("cameraoptionsmenu")) { update_cameraoptionsmenu(); }
 
     /* mainmenu -> devoptionsmenu */
     if (g_menu.CurrentMenu("devoptionsmenu")) { update_devoptionsmenu(); }

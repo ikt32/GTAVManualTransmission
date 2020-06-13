@@ -394,6 +394,13 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetBoolValue("MISC", "SyncAnimations", Misc.SyncAnimations);
     ini.SetBoolValue("MISC", "HidePlayerInFPV", Misc.HidePlayerInFPV);
 
+    // [CAM]
+    ini.SetBoolValue("CAM", "Enable", Misc.Camera.Enable);
+    ini.SetBoolValue("CAM", "FollowMovement", Misc.Camera.FollowMovement);
+    ini.SetDoubleValue("CAM", "FOV", Misc.Camera.FOV);
+    ini.SetDoubleValue("CAM", "OffsetHeight", Misc.Camera.OffsetHeight);
+    ini.SetDoubleValue("CAM", "OffsetForward", Misc.Camera.OffsetForward);
+
     // [UPDATE]
     ini.SetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);
     if (!Update.IgnoredVersion.empty())
@@ -696,6 +703,13 @@ void ScriptSettings::parseSettingsGeneral() {
     Misc.DashExtensions = ini.GetBoolValue("MISC", "DashExtensions", Misc.DashExtensions);
     Misc.SyncAnimations = ini.GetBoolValue("MISC", "SyncAnimations", Misc.SyncAnimations);
     Misc.HidePlayerInFPV = ini.GetBoolValue("MISC", "HidePlayerInFPV", Misc.HidePlayerInFPV);
+
+    // [CAM]
+    Misc.Camera.Enable = ini.GetBoolValue("CAM", "Enable", Misc.Camera.Enable);
+    Misc.Camera.FollowMovement = ini.GetBoolValue("CAM", "FollowMovement", Misc.Camera.FollowMovement);
+    Misc.Camera.FOV = ini.GetDoubleValue("CAM", "FOV", Misc.Camera.FOV);
+    Misc.Camera.OffsetHeight = ini.GetDoubleValue("CAM", "OffsetHeight", Misc.Camera.OffsetHeight);
+    Misc.Camera.OffsetForward = ini.GetDoubleValue("CAM", "OffsetForward", Misc.Camera.OffsetForward);
 
     // [UPDATE]
     Update.EnableUpdate = ini.GetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);

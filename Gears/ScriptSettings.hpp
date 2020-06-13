@@ -321,6 +321,14 @@ public:
         bool UDPTelemetry = true;
         bool DashExtensions = true;
         bool SyncAnimations = true;
+        struct {
+            bool Enable = true;
+            bool FollowMovement = true;
+            float FOV = 54.0f;
+            float OffsetHeight = 0.075f;
+            float OffsetForward = 0.050f;
+            float LookTime = 0.001000f;
+        } Camera;
         bool HidePlayerInFPV = false;
     } Misc;
 
