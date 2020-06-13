@@ -76,7 +76,9 @@ void SteeringAnimation::Update() {
         !(steeringWheelSync || customSteeringSync) ||
         !g_settings.Misc.SyncAnimations ||
         PLAYER::IS_PLAYER_FREE_AIMING(PLAYER::PLAYER_ID()) ||
-        PLAYER::IS_PLAYER_PRESSING_HORN(PLAYER::PLAYER_ID()) || 
+        PED::IS_PED_DOING_DRIVEBY(g_playerPed) ||
+        PLAYER::IS_PLAYER_PRESSING_HORN(PLAYER::PLAYER_ID()) ||
+        CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlVehicleDuck) ||
         steeringAnimIdx >= steeringAnimations.size()) {
         cancelAnim(lastAnimation);
         return;
@@ -156,7 +158,6 @@ void playAnimTime(const SteeringAnimation::Animation& anim, float time) {
         AI::TASK_PLAY_ANIM(g_playerPed, dict, name, -8.0f, 8.0f, -1, flag, 1.0f, 0, 0, 0);
         lastAnimation = anim;
         UI::Notify(DEBUG, fmt::format("Started steering animation ({})", lastAnimation.Dictionary), false);
-
     }
     else {
         ENTITY::SET_ENTITY_ANIM_SPEED(g_playerPed, dict, name, 0.0f);
