@@ -180,5 +180,6 @@ bool CheckUpdate(ReleaseInfo& relInfo) {
         return true;
     }
 
+    logger.Write(INFO, "No update available, latest version: [%s]", relInfo.Version.c_str());
     return false;
 }
