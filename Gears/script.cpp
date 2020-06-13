@@ -2200,7 +2200,7 @@ void functionHidePlayerInFPV(bool optionToggled) {
     bool visible = ENTITY::IS_ENTITY_VISIBLE(g_playerPed);
     bool shouldHide = false;
 
-    if (g_settings.GameAssists.HidePlayerInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4 && Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
+    if (g_settings.Misc.HidePlayerInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4 && Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
         shouldHide = true;
     }
 

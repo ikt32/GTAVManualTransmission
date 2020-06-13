@@ -88,7 +88,6 @@ public:
         bool AutoGear1 = false;
         bool AutoLookBack = false;
         bool ThrottleStart = false;
-        bool HidePlayerInFPV = false;
         bool DefaultNeutral = true;
     } GameAssists;
 
@@ -322,6 +321,7 @@ public:
         bool UDPTelemetry = true;
         bool DashExtensions = true;
         bool SyncAnimations = true;
+        bool HidePlayerInFPV = false;
     } Misc;
 
     // [UPDATE]

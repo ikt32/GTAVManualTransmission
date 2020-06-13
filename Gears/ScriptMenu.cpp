@@ -275,10 +275,13 @@ void update_mainmenu() {
     g_menu.MenuOption("Gameplay assists", "gameassistmenu",
         { "Assist to make playing a bit easier." });
 
+    g_menu.MenuOption("Misc options", "miscoptionsmenu",
+        { "Various features that don't fit in the other categories." });
+
     g_menu.MenuOption("HUD options", "hudmenu",
         { "Change and move HUD elements." });
 
-    g_menu.MenuOption("Extra settings", "extrasettingsmenu", 
+    g_menu.MenuOption("Developer options", "devoptionsmenu", 
         { "Various settings for debugging, compatibility, etc." });
 
     if (g_settings.Debug.DisableInputDetect) {
@@ -566,10 +569,6 @@ void update_controlsmenu() {
 
     g_menu.MenuOption("Steering assists", "steeringassistmenu",
         { "Customize steering input for keyboards and controllers." });
-
-    g_menu.BoolOption("Sync steering animation", g_settings.Misc.SyncAnimations,
-        { "Synchronize animations with wheel rotation using third-person animations.",
-          "Only active for synced steering wheel rotation or custom controller wheel rotation." });
 }
 
 void update_controllermenu() {
@@ -1392,11 +1391,6 @@ void update_gameassistmenu() {
 
     g_menu.BoolOption("Clutch & throttle start", g_settings.GameAssists.ThrottleStart,
         { "Allow to start the engine by pressing clutch and throttle." });
-
-    if (g_menu.BoolOption("Hide player in FPV", g_settings.GameAssists.HidePlayerInFPV,
-        { "Hides the player in first person view." })) {
-        functionHidePlayerInFPV(true);
-    }
 }
 
 void update_steeringassistmenu() {
@@ -1444,8 +1438,37 @@ void update_steeringassistmenu() {
         { "Rotation in degrees." });
 }
 
-void update_extrasettingsmenu() {
-    g_menu.Title("Extra settings");
+void update_miscoptionsmenu() {
+    g_menu.Title("Misc options");
+    g_menu.Subtitle("");
+
+    g_menu.BoolOption("Sync steering animation", g_settings.Misc.SyncAnimations,
+        { "Synchronize animations with wheel rotation using third-person animations.",
+          "Only active for synced steering wheel rotation or custom controller wheel rotation.",
+          "FPV camera angle is limited, consider enabling the custom FPV camera.",
+          "Check animations.yml for more details!" });
+
+
+    if (g_menu.BoolOption("Hide player in FPV", g_settings.Misc.HidePlayerInFPV,
+        { "Hides the player in first person view.",
+          "If you use another script that does the same, "
+            "enable [Disable Player Hiding] in dev settings."})) {
+        functionHidePlayerInFPV(true);
+    }
+
+    g_menu.BoolOption("Enable dashboard extensions", g_settings.Misc.DashExtensions,
+        { "If DashHook is installed, the script controls some dashboard lights such as the ABS light." });
+
+    if (g_menu.BoolOption("Enable UDP telemetry", g_settings.Misc.UDPTelemetry,
+        { "Allows programs like SimHub to use data from this script."
+            "This script uses DIRT 4 format for telemetry data." })) {
+        StartUDPTelemetry();
+    }
+}
+
+
+void update_devoptionsmenu() {
+    g_menu.Title("Developer options");
     g_menu.Subtitle("");
 
     g_menu.MenuOption("Debug settings", "debugmenu");
@@ -1455,8 +1478,6 @@ void update_extrasettingsmenu() {
 
     g_menu.MenuOption("Performance settings", "perfmenu",
         { "Every tick AI is also updated, which might impact performance." });
-
-    g_menu.MenuOption("Compatibility settings", "compatmenu");
 
     g_menu.BoolOption("Disable input detection", g_settings.Debug.DisableInputDetect,
         { "Allows for manual input selection." });
@@ -1543,19 +1564,6 @@ void update_debugmenu() {
 
     g_menu.OptionPlus("Animation info", extras, 
         nullptr, onRight, onLeft, "Animations", { "Shows current animation override status" });
-}
-
-void update_compatmenu() {
-    g_menu.Title("Compatibility settings");
-    g_menu.Subtitle("");
-
-    g_menu.BoolOption("Enable dashboard extensions", g_settings.Misc.DashExtensions,
-        { "If DashHook is installed, allows lighting the ABS light." });
-
-    if (g_menu.BoolOption("Enable UDP telemetry", g_settings.Misc.UDPTelemetry,
-        { "Allows programs like SimHub to use data from this script. This script uses DIRT 4 format for telemetry data." })) {
-        StartUDPTelemetry();
-    }
 }
 
 void update_metricsmenu() {
@@ -1675,20 +1683,20 @@ void update_menu() {
     /* mainmenu -> gameassistmenu */
     if (g_menu.CurrentMenu("gameassistmenu")) { update_gameassistmenu(); }
 
-    /* mainmenu -> extrasettingsmenu */
-    if (g_menu.CurrentMenu("extrasettingsmenu")) { update_extrasettingsmenu(); }
+    /* mainmenu -> miscoptionsmenu */
+    if (g_menu.CurrentMenu("miscoptionsmenu")) { update_miscoptionsmenu(); }
 
-    /* mainmenu -> extrasettingsmenu -> debugmenu */
+    /* mainmenu -> devoptionsmenu */
+    if (g_menu.CurrentMenu("devoptionsmenu")) { update_devoptionsmenu(); }
+
+    /* mainmenu -> devoptionsmenu -> debugmenu */
     if (g_menu.CurrentMenu("debugmenu")) { update_debugmenu(); }
 
-    /* mainmenu -> extrasettingsmenu -> metricsmenu */
+    /* mainmenu -> devoptionsmenu -> metricsmenu */
     if (g_menu.CurrentMenu("metricsmenu")) { update_metricsmenu(); }
 
-    /* mainmenu -> extrasettingsmenu -> perfmenu */
+    /* mainmenu -> devoptionsmenu -> perfmenu */
     if (g_menu.CurrentMenu("perfmenu")) { update_perfmenu(); }
-
-    /* mainmenu -> extrasettingsmenu -> compatmenu */
-    if (g_menu.CurrentMenu("compatmenu")) { update_compatmenu(); }
 
     g_menu.EndMenu();
 }
