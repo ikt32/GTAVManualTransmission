@@ -21,10 +21,10 @@ namespace {
     Vector3 camRot{};
 
     // Distance in meters to lean over to the center when looking back
-    const float lookLeanCenterDist = 0.25f;
+    const float lookLeanCenterDist = 0.20f;
 
     // Distance in meters to lean forward when looking back/sideways
-    const float lookLeanFrontDist = 0.15f;
+    const float lookLeanFrontDist = 0.05f;
 
     Timer lastMouseLookInputTimer(500);
 
@@ -58,7 +58,7 @@ void FPVCam::Update() {
     bool enable = g_settings.Misc.Camera.Enable;
     bool fpv = CAM::GET_FOLLOW_VEHICLE_CAM_VIEW_MODE() == 4;
     bool inCar = Util::VehicleAvailable(g_playerVehicle, g_playerPed);
-    bool lookingIntoGlass;
+    bool lookingIntoGlass = false;
 
     if (!enable || !fpv || !inCar) {
         cancelCam();
@@ -131,13 +131,13 @@ void FPVCam::Update() {
         // Left
         if (camRot.z > 85.0f) {
             float frontLean = map(camRot.z, 85.0f, 180.0f, 0.0f, lookLeanFrontDist);
-            frontLean = std::clamp(frontLean, lookLeanFrontDist, 0.0f);
+            frontLean = std::clamp(frontLean, 0.0f, lookLeanFrontDist);
             offsetY += frontLean;
         }
         // Right
         if (camRot.z < -85.0f) {
             float frontLean = map(camRot.z, -85.0f, -180.0f, 0.0f, lookLeanFrontDist);
-            frontLean = std::clamp(frontLean, lookLeanFrontDist, 0.0f);
+            frontLean = std::clamp(frontLean, 0.0f, lookLeanFrontDist);
             offsetY += frontLean;
         }
     }
