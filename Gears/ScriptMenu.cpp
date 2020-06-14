@@ -1487,8 +1487,16 @@ void update_cameraoptionsmenu() {
     g_menu.FloatOption("Offset forward", g_settings.Misc.Camera.OffsetForward, -0.5f, 0.5f, 0.01f, 
         { "Distance in meters." });
 
-    g_menu.FloatOptionCb("Change rate", g_settings.Misc.Camera.LookTime, 0.000001f, 0.99f, 0.000001f, getKbEntry,
-        { "How fast the camera changes.", "Press enter to enter a value manually." });
+    g_menu.FloatOptionCb("Controller smoothing", g_settings.Misc.Camera.LookTime, 0.0f, 0.5f, 0.000001f, getKbEntry,
+        { "How smooth the camera moves.", "Press enter to enter a value manually. Range: 0.0 to 0.5." });
+
+    g_menu.FloatOption("Mouse sensitivity", g_settings.Misc.Camera.MouseSensitivity, 0.1f, 2.0f, 0.1f);
+
+    g_menu.FloatOptionCb("Mouse smoothing", g_settings.Misc.Camera.MouseLookTime, 0.0f, 0.5f, 0.000001f, getKbEntry,
+        { "How smooth the camera moves.", "Press enter to enter a value manually. Range: 0.0 to 0.5." });
+
+    g_menu.IntOption("Mouse center timeout", g_settings.Misc.Camera.MouseCenterTimeout, 0, 1000, 1,
+        { "Milliseconds before centering the camera after looking with the mouse." });
 }
 
 void update_devoptionsmenu() {

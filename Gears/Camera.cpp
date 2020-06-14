@@ -27,10 +27,11 @@ namespace {
     // when looking back
     const float lookLeanDist = 0.25f;
 
-    Timer lastMouseLookInputTimer(0500);
+    Timer lastMouseLookInputTimer(500);
+
+    // Accumulated values for mouse look
     float lookUpDownAcc = 0.0f;
     float lookLeftRightAcc = 0.0f;
-    const float mouseLookSens = 0.5f;
 }
 
 void updateControllerLook();
@@ -171,8 +172,11 @@ void updateControllerLook() {
 }
 
 void updateMouseLook() {
-    float lookLeftRight = CONTROLS::GET_CONTROL_NORMAL(0, eControl::ControlLookLeftRight) * mouseLookSens;
-    float lookUpDown = CONTROLS::GET_CONTROL_NORMAL(0, eControl::ControlLookUpDown) * mouseLookSens;
+    float lookLeftRight = 
+        CONTROLS::GET_CONTROL_NORMAL(0, eControl::ControlLookLeftRight) * g_settings.Misc.Camera.MouseSensitivity;
+    float lookUpDown = 
+        CONTROLS::GET_CONTROL_NORMAL(0, eControl::ControlLookUpDown) * g_settings.Misc.Camera.MouseSensitivity;
+
     bool lookBehind = CONTROLS::GET_CONTROL_NORMAL(0, eControl::ControlVehicleLookBehind) != 0.0f;
     bool lookingIntoGlass = false;
 
@@ -186,7 +190,7 @@ void updateMouseLook() {
 
     // Re-center on no input
     if (lookLeftRight != 0.0f || lookUpDown != 0.0f) {
-        lastMouseLookInputTimer.Reset();
+        lastMouseLookInputTimer.Reset(g_settings.Misc.Camera.MouseCenterTimeout);
     }
 
     if (lastMouseLookInputTimer.Expired() && Length(g_vehData.mVelocity) > 1.0f && !lookBehind) {
@@ -204,7 +208,7 @@ void updateMouseLook() {
     }
 
     camRot.x = lerp(camRot.x, 90 * -lookUpDownAcc,
-        1.0f - pow(g_settings.Misc.Camera.LookTimeMouse, GAMEPLAY::GET_FRAME_TIME()));
+        1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
 
     // Override any camRot.z changes while looking back 
     if (lookBehind) {
@@ -218,7 +222,7 @@ void updateMouseLook() {
     else {
         float maxAngle = lookingIntoGlass ? 135.0f : 179.0f;
         camRot.z = lerp(camRot.z, maxAngle * -lookLeftRightAcc,
-            1.0f - pow(g_settings.Misc.Camera.LookTimeMouse, GAMEPLAY::GET_FRAME_TIME()));
+            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
     }
 
     float directionLookAngle = 0.0f;

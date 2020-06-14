@@ -328,7 +328,9 @@ public:
             float OffsetHeight = 0.075f;
             float OffsetForward = 0.050f;
             float LookTime = 0.001000f;
-            float LookTimeMouse = 0.000010f;
+            float MouseLookTime = 0.000010f;
+            int MouseCenterTimeout = 500;
+            float MouseSensitivity = 0.5f;
         } Camera;
         bool HidePlayerInFPV = false;
     } Misc;
