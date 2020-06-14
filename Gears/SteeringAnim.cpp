@@ -75,7 +75,7 @@ void SteeringAnimation::Update() {
     if (!Util::VehicleAvailable(g_playerVehicle, g_playerPed) ||
         !(steeringWheelSync || customSteeringSync) ||
         !g_settings.Misc.SyncAnimations ||
-        PLAYER::IS_PLAYER_FREE_AIMING(PLAYER::PLAYER_ID()) ||
+        CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleAim) ||
         PED::IS_PED_DOING_DRIVEBY(g_playerPed) ||
         PLAYER::IS_PLAYER_PRESSING_HORN(PLAYER::PLAYER_ID()) ||
         CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlVehicleDuck) ||

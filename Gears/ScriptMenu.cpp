@@ -1487,6 +1487,9 @@ void update_cameraoptionsmenu() {
     g_menu.FloatOption("Offset forward", g_settings.Misc.Camera.OffsetForward, -0.5f, 0.5f, 0.01f, 
         { "Distance in meters." });
 
+    g_menu.FloatOption("Pitch", g_settings.Misc.Camera.Pitch, -10.0f, 10.0f, 0.1f,
+        { "In degrees." });
+
     g_menu.FloatOptionCb("Controller smoothing", g_settings.Misc.Camera.LookTime, 0.0f, 0.5f, 0.000001f, getKbEntry,
         { "How smooth the camera moves.", "Press enter to enter a value manually. Range: 0.0 to 0.5." });
 

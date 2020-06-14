@@ -327,6 +327,7 @@ public:
             float FOV = 54.0f;
             float OffsetHeight = 0.075f;
             float OffsetForward = 0.050f;
+            float Pitch = 0.0f;
             float LookTime = 0.001000f;
             float MouseLookTime = 0.000010f;
             int MouseCenterTimeout = 500;

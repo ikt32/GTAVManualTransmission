@@ -180,7 +180,7 @@ void updateControllerLook() {
 
     CAM::SET_CAM_ROT(
         cameraHandle,
-        rot.x + camRot.x,
+        rot.x + camRot.x + g_settings.Misc.Camera.Pitch,
         rot.y,
         rot.z + camRot.z - directionLookAngle,
         0);
@@ -305,7 +305,7 @@ void updateMouseLook() {
     auto rot = ENTITY::GET_ENTITY_ROTATION(g_playerPed, 0);
     CAM::SET_CAM_ROT(
         cameraHandle,
-        rot.x + camRot.x,
+        rot.x + camRot.x + g_settings.Misc.Camera.Pitch,
         rot.y,
         rot.z + camRot.z - directionLookAngle,
         0);
