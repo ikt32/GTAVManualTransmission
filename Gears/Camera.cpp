@@ -247,8 +247,6 @@ void updateMouseLook(bool& lookingIntoGlass) {
         lookLeftRightAcc = std::clamp(lookLeftRightAcc, -1.0f, 1.0f);
     }
 
-    showText(0.5f, 0.000f + 5.0f * 0.025f, 0.5f, fmt::format("lookAcc {:.2f}", lookLeftRightAcc));
-
     camRot.x = lerp(camRot.x, 90 * -lookUpDownAcc,
         1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
 
