@@ -328,6 +328,7 @@ public:
             float OffsetHeight = 0.075f;
             float OffsetForward = 0.050f;
             float LookTime = 0.001000f;
+            float LookTimeMouse = 0.000010f;
         } Camera;
         bool HidePlayerInFPV = false;
     } Misc;
