@@ -166,3 +166,31 @@ auto GetAngleBetween(Vector3T a, Vector3T b) {
         angle = -angle;
     return angle;
 }
+
+inline Vector3 DirectionToRotation(Vector3 dir, float roll) {
+    dir = Normalize(dir);
+    Vector3 rotval{};
+    rotval.z = -rad2deg(atan2(dir.x, dir.y));
+    Vector3 rotpos = Normalize(Vector3{ dir.z, 0, Length(Vector3{dir.x, 0, dir.y, 0, 0.0f, 0}), 0, 0.0f, 0});
+    rotval.x = rad2deg(atan2(rotpos.x, rotpos.y));
+    rotval.y = roll;
+    return rotval;
+}
+
+inline Vector3 RotationToDirection(Vector3 Rotation) {
+    float rotZ = deg2rad(Rotation.z);
+    float rotX = deg2rad(Rotation.x);
+    float multXY = abs(cos(rotX));
+    return Vector3{ -sin(rotZ) * multXY, 0, cos(rotZ) * multXY, 0, sin(rotX), 0 };
+}
+
+inline float DirectionToHeading(Vector3 dir) {
+    dir.z = 0.0f;
+    dir = Normalize(dir);
+    return rad2deg(atan2(dir.x, dir.y));
+}
+
+inline Vector3 HeadingToDirection(float Heading) {
+    Heading = deg2rad(Heading);
+    return Vector3{ -sin(Heading), 0, cos(Heading), 0, 0.0f, 0 };
+}
