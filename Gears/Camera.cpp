@@ -75,6 +75,12 @@ void FPVCam::Update() {
         CAM::RENDER_SCRIPT_CAMS(true, false, 0, true, false);
     }
 
+    CAM::SET_CAM_AFFECTS_AIMING(cameraHandle, true);
+
+    if (CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleAim)) {
+        UI::SHOW_HUD_COMPONENT_THIS_FRAME(14);
+    }
+
     // Mouse look
     if (CONTROLS::_IS_INPUT_DISABLED(2) == TRUE) {
         updateMouseLook();
