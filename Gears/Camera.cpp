@@ -28,6 +28,9 @@ namespace {
     const float lookLeanDist = 0.25f;
 }
 
+void updateControllerLook();
+void updateMouseLook();
+
 void cancelCam() {
     if (CAM::DOES_CAM_EXIST(cameraHandle)) {
         CAM::RENDER_SCRIPT_CAMS(false, false, 0, true, false);
@@ -64,12 +67,19 @@ void FPVCam::Update() {
         CAM::RENDER_SCRIPT_CAMS(true, false, 0, true, false);
     }
 
-    auto rot = ENTITY::GET_ENTITY_ROTATION(g_playerPed, 0);
+    // Mouse look
+    if (CONTROLS::_IS_INPUT_DISABLED(2) == TRUE) {
+        updateMouseLook();
+    }
+    // Controller look
+    else {
+        updateControllerLook();
+    }
+}
 
-    camRot.x = lerp(camRot.x, 90.0f * -CONTROLS::GET_CONTROL_NORMAL(0, eControl::ControlLookUpDown),
-        1.0f - pow(g_settings.CustomSteering.CenterTime, GAMEPLAY::GET_FRAME_TIME()));
-
+void updateControllerLook() {
     float lookLeftRight = CONTROLS::GET_CONTROL_NORMAL(0, eControl::ControlLookLeftRight);
+    float lookUpDown = CONTROLS::GET_CONTROL_NORMAL(0, eControl::ControlLookUpDown);
     bool lookingIntoGlass = false;
 
     if (g_vehData.mIsRhd && lookLeftRight > 0.01f) {
@@ -80,6 +90,11 @@ void FPVCam::Update() {
         lookingIntoGlass = true;
     }
 
+    auto rot = ENTITY::GET_ENTITY_ROTATION(g_playerPed, 0);
+
+    camRot.x = lerp(camRot.x, 90.0f * -lookUpDown,
+        1.0f - pow(g_settings.CustomSteering.CenterTime, GAMEPLAY::GET_FRAME_TIME()));
+
     if (CONTROLS::GET_CONTROL_NORMAL(0, eControl::ControlVehicleLookBehind) != 0.0f) {
         float lookBackAngle = -179.0f; // Look over right shoulder
         if (g_vehData.mIsRhd) {
@@ -89,6 +104,7 @@ void FPVCam::Update() {
             1.0f - pow(g_settings.Misc.Camera.LookTime, GAMEPLAY::GET_FRAME_TIME()));
     }
     else {
+        // Manual look
         float maxAngle = lookingIntoGlass ? 135.0f : 179.0f;
         camRot.z = lerp(camRot.z, maxAngle * -lookLeftRight,
             1.0f - pow(g_settings.Misc.Camera.LookTime, GAMEPLAY::GET_FRAME_TIME()));
@@ -109,7 +125,7 @@ void FPVCam::Update() {
 
             Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
 
-            directionLookAngle = - (rad2deg(travelDir) / 2.0f + rad2deg(rotationVelocity.z) / 4.0f);
+            directionLookAngle = -(rad2deg(travelDir) / 2.0f + rad2deg(rotationVelocity.z) / 4.0f);
         }
     }
 
@@ -136,11 +152,15 @@ void FPVCam::Update() {
         g_settings.Misc.Camera.OffsetHeight, true);
 
     CAM::SET_CAM_ROT(
-        cameraHandle, 
-        rot.x + camRot.x, 
-        rot.y, 
+        cameraHandle,
+        rot.x + camRot.x,
+        rot.y,
         rot.z + camRot.z - directionLookAngle,
         0);
 
     CAM::SET_CAM_FOV(cameraHandle, g_settings.Misc.Camera.FOV);
+}
+
+void updateMouseLook() {
+    
 }
