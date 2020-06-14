@@ -46,6 +46,7 @@
 #include "UDPTelemetry/Socket.h"
 #include "UDPTelemetry/UDPTelemetry.h"
 #include "AtcuLogic.h"
+#include "Camera.h"
 
 namespace fs = std::filesystem;
 
@@ -2469,6 +2470,7 @@ void main() {
         update_update_notification();
         update_UDPTelemetry();
         SteeringAnimation::Update();
+        FPVCam::Update();
         WAIT(0);
     }
 }
