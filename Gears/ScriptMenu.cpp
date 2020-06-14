@@ -1195,10 +1195,11 @@ void update_hudmenu() {
 
     g_menu.MenuOption("Gear and shift mode", "geardisplaymenu");
     g_menu.MenuOption("Speedometer", "speedodisplaymenu");
-    g_menu.MenuOption("RPM Gauge", "rpmdisplaymenu");
-    g_menu.MenuOption("Wheel & Pedal Info", "wheelinfomenu");
+    g_menu.MenuOption("RPM gauge", "rpmdisplaymenu");
+    g_menu.MenuOption("Wheel & Pedal info", "wheelinfomenu");
     g_menu.MenuOption("Dashboard indicators", "dashindicatormenu", 
         { "Indicator icons for ABS, TCS, ESC and the hand brake." });
+    g_menu.MenuOption("Mouse steering", "mousehudmenu");
 }
 
 void update_geardisplaymenu() {
@@ -1320,6 +1321,29 @@ void update_dashindicatormenu() {
     g_menu.FloatOption("Size", g_settings.HUD.DashIndicators.Size, 0.25f, 4.0f, 0.05f);
 }
 
+void update_mousehudmenu() {
+    g_menu.Title("Mouse steering HUD options");
+    g_menu.Subtitle("");
+
+    g_menu.BoolOption("Enable", g_settings.HUD.MouseSteering.Enable);
+
+    g_menu.FloatOption("Pos X", g_settings.HUD.MouseSteering.XPos, 0.0f, 1.0f, 0.0025f);
+    g_menu.FloatOption("Pos Y", g_settings.HUD.MouseSteering.YPos, 0.0f, 1.0f, 0.0025f);
+    g_menu.FloatOption("Width", g_settings.HUD.MouseSteering.XSz, 0.0f, 1.0f, 0.0025f);
+    g_menu.FloatOption("Height", g_settings.HUD.MouseSteering.YSz, 0.0f, 1.0f, 0.0025f);
+    g_menu.FloatOption("Marker width", g_settings.HUD.MouseSteering.MarkerXSz, 0.0f, 1.0f, 0.0025f);
+
+    g_menu.IntOption("RPM Background Red  ", g_settings.HUD.MouseSteering.BgR, 0, 255);
+    g_menu.IntOption("RPM Background Green", g_settings.HUD.MouseSteering.BgG, 0, 255);
+    g_menu.IntOption("RPM Background Blue ", g_settings.HUD.MouseSteering.BgB, 0, 255);
+    g_menu.IntOption("RPM Background Alpha", g_settings.HUD.MouseSteering.BgA, 0, 255);
+
+    g_menu.IntOption("RPM Foreground Red  ", g_settings.HUD.MouseSteering.FgR, 0, 255);
+    g_menu.IntOption("RPM Foreground Green", g_settings.HUD.MouseSteering.FgG, 0, 255);
+    g_menu.IntOption("RPM Foreground Blue ", g_settings.HUD.MouseSteering.FgB, 0, 255);
+    g_menu.IntOption("RPM Foreground Alpha", g_settings.HUD.MouseSteering.FgA, 0, 255);
+}
+
 void update_driveassistmenu() {
     g_menu.Title("Driving assists");
     g_menu.Subtitle("");
@@ -1436,6 +1460,19 @@ void update_steeringassistmenu() {
           "This is purely cosmetic and does not change handling." });
     g_menu.FloatOption("Wheel rotation", g_settings.CustomSteering.CustomRotationDegrees, 180.0f, 1440.0f, 30.0f, 
         { "Rotation in degrees." });
+
+    g_menu.BoolOption("Enable mouse steering", g_settings.CustomSteering.MouseSteering,
+        { "When enabled, hold the mouse steering override button to use mouse steering." });
+
+    g_menu.MenuOption("Mouse steering options", "mousesteeringoptionsmenu");
+}
+
+void update_mousesteeringoptionsmenu() {
+    g_menu.Title("Mouse steering");
+    g_menu.Subtitle("");
+
+    g_menu.FloatOption("Mouse sensitivity", g_settings.CustomSteering.MouseSensitivity, 0.05f, 2.0f, 0.05f,
+        { "Sensitivity for mouse steering." });
 }
 
 void update_miscoptionsmenu() {
@@ -1676,6 +1713,9 @@ void update_menu() {
     /* mainmenu -> controlsmenu -> steeringassistmenu */
     if (g_menu.CurrentMenu("steeringassistmenu")) { update_steeringassistmenu(); }
 
+    /* mainmenu -> controlsmenu -> steeringassistmenu -> mousesteeringoptionsmenu */
+    if (g_menu.CurrentMenu("mousesteeringoptionsmenu")) { update_mousesteeringoptionsmenu(); }
+
     /* mainmenu -> controlsmenu -> wheelmenu */
     if (g_menu.CurrentMenu("wheelmenu")) { update_wheelmenu(); }
 
@@ -1708,6 +1748,9 @@ void update_menu() {
 
     /* mainmenu -> hudmenu -> dashindicatormenu*/
     if (g_menu.CurrentMenu("dashindicatormenu")) { update_dashindicatormenu(); }
+
+    /* mainmenu -> hudmenu -> mousehudmenu*/
+    if (g_menu.CurrentMenu("mousehudmenu")) { update_mousehudmenu(); }
 
     /* mainmenu -> driveassistmenu */
     if (g_menu.CurrentMenu("driveassistmenu")) { update_driveassistmenu(); }

@@ -165,6 +165,8 @@ public:
         float CustomRotationDegrees = 900.0f;
         float CenterTime = 0.000100f;
         float SteerTime = 0.000010f;
+        bool MouseSteering = true;
+        float MouseSensitivity = 1.0f;
     } CustomSteering;
 
     // [HUD]
@@ -290,6 +292,25 @@ public:
             float YPos = 0.035f;
             float Size = 1.000f;
         } DashIndicators;
+
+        struct {
+            bool Enable = false;
+            float XPos = 0.5f;
+            float YPos = 0.95f;
+            float XSz = 0.5f;
+            float YSz = 0.05f;
+            float MarkerXSz = 0.020f;
+
+            int BgR = 0;
+            int BgG = 0;
+            int BgB = 0;
+            int BgA = 128;
+
+            int FgR = 255;
+            int FgG = 255;
+            int FgB = 255;
+            int FgA = 255;
+        } MouseSteering;
     } HUD;
 
     // [CONTROLLER]

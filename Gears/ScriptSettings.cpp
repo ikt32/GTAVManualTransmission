@@ -388,6 +388,23 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetDoubleValue("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
     ini.SetDoubleValue("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
 
+    ini.SetBoolValue("HUD", "MouseEnable", HUD.MouseSteering.Enable);
+    ini.SetDoubleValue("HUD", "MouseXPos", HUD.MouseSteering.XPos);
+    ini.SetDoubleValue("HUD", "MouseYPos", HUD.MouseSteering.YPos);
+    ini.SetDoubleValue("HUD", "MouseXSz ", HUD.MouseSteering.XSz);
+    ini.SetDoubleValue("HUD", "MouseYSz ", HUD.MouseSteering.YSz);
+    ini.SetDoubleValue("HUD", "MouseMarkerXSz", HUD.MouseSteering.MarkerXSz);
+
+    ini.SetLongValue("HUD", "MouseBgR", HUD.MouseSteering.BgR);
+    ini.SetLongValue("HUD", "MouseBgG", HUD.MouseSteering.BgG);
+    ini.SetLongValue("HUD", "MouseBgB", HUD.MouseSteering.BgB);
+    ini.SetLongValue("HUD", "MouseBgA", HUD.MouseSteering.BgA);
+
+    ini.SetLongValue("HUD", "MouseFgR", HUD.MouseSteering.FgR);
+    ini.SetLongValue("HUD", "MouseFgG", HUD.MouseSteering.FgG);
+    ini.SetLongValue("HUD", "MouseFgB", HUD.MouseSteering.FgB);
+    ini.SetLongValue("HUD", "MouseFgA", HUD.MouseSteering.FgA);
+
     // [MISC]
     ini.SetBoolValue("MISC", "UDPTelemetry", Misc.UDPTelemetry);
     ini.SetBoolValue("MISC", "DashExtensions", Misc.DashExtensions);
@@ -702,6 +719,23 @@ void ScriptSettings::parseSettingsGeneral() {
     HUD.DashIndicators.XPos = ini.GetDoubleValue("HUD", "DashIndicatorsXpos", HUD.DashIndicators.XPos);
     HUD.DashIndicators.YPos = ini.GetDoubleValue("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
     HUD.DashIndicators.Size = ini.GetDoubleValue("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
+
+    HUD.MouseSteering.Enable = ini.GetBoolValue("HUD", "MouseEnable", HUD.MouseSteering.Enable);
+    HUD.MouseSteering.XPos = ini.GetDoubleValue("HUD", "MouseXPos", HUD.MouseSteering.XPos);
+    HUD.MouseSteering.YPos = ini.GetDoubleValue("HUD", "MouseYPos", HUD.MouseSteering.YPos);
+    HUD.MouseSteering.XSz = ini.GetDoubleValue("HUD", "MouseXSz ", HUD.MouseSteering.XSz);
+    HUD.MouseSteering.YSz = ini.GetDoubleValue("HUD", "MouseYSz ", HUD.MouseSteering.YSz);
+    HUD.MouseSteering.MarkerXSz = ini.GetDoubleValue("HUD", "MouseMarkerXSz", HUD.MouseSteering.MarkerXSz);
+
+    HUD.MouseSteering.BgR = ini.GetLongValue("HUD", "MouseBgR", HUD.MouseSteering.BgR);
+    HUD.MouseSteering.BgG = ini.GetLongValue("HUD", "MouseBgG", HUD.MouseSteering.BgG);
+    HUD.MouseSteering.BgB = ini.GetLongValue("HUD", "MouseBgB", HUD.MouseSteering.BgB);
+    HUD.MouseSteering.BgA = ini.GetLongValue("HUD", "MouseBgA", HUD.MouseSteering.BgA);
+
+    HUD.MouseSteering.FgR = ini.GetLongValue("HUD", "MouseFgR", HUD.MouseSteering.FgR);
+    HUD.MouseSteering.FgG = ini.GetLongValue("HUD", "MouseFgG", HUD.MouseSteering.FgG);
+    HUD.MouseSteering.FgB = ini.GetLongValue("HUD", "MouseFgB", HUD.MouseSteering.FgB);
+    HUD.MouseSteering.FgA = ini.GetLongValue("HUD", "MouseFgA", HUD.MouseSteering.FgA);
 
     // [MISC]
     Misc.UDPTelemetry = ini.GetBoolValue("MISC", "UDPTelemetry", Misc.UDPTelemetry);
