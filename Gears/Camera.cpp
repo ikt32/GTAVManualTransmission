@@ -118,7 +118,7 @@ void updateControllerLook() {
     float directionLookAngle = 0.0f;
     if (g_settings.Misc.Camera.FollowMovement) {
         Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
-        if (speedVector.y > 3.0f) {
+        if (speedVector.y > 0.0f) {
             Vector3 target = Normalize(speedVector);
             float travelDir = atan2(target.y, target.x) - static_cast<float>(M_PI) / 2.0f;
             if (travelDir > static_cast<float>(M_PI) / 2.0f) {
@@ -131,6 +131,10 @@ void updateControllerLook() {
             Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
 
             directionLookAngle = -(rad2deg(travelDir) / 2.0f + rad2deg(rotationVelocity.z) / 4.0f);
+
+            if (Length(speedVector) < 3.0f) {
+                directionLookAngle = map(speedVector.y, 0.0f, 3.0f, 0.0f, directionLookAngle);
+            }
         }
     }
 
@@ -220,7 +224,7 @@ void updateMouseLook() {
     float directionLookAngle = 0.0f;
     if (g_settings.Misc.Camera.FollowMovement) {
         Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
-        if (speedVector.y > 3.0f) {
+        if (speedVector.y > 0.0f) {
             Vector3 target = Normalize(speedVector);
             float travelDir = atan2(target.y, target.x) - static_cast<float>(M_PI) / 2.0f;
             if (travelDir > static_cast<float>(M_PI) / 2.0f) {
@@ -233,6 +237,10 @@ void updateMouseLook() {
             Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
 
             directionLookAngle = -(rad2deg(travelDir) / 2.0f + rad2deg(rotationVelocity.z) / 4.0f);
+
+            if (Length(speedVector) < 3.0f) {
+                directionLookAngle = map(speedVector.y, 0.0f, 3.0f, 0.0f, directionLookAngle);
+            }
         }
     }
 
