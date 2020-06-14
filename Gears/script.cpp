@@ -1776,7 +1776,6 @@ void handleBrakePatch() {
     }
 }
 
-// TODO: Change ratios for additional param RPM rise speed
 void fakeRev(bool customThrottle, float customThrottleVal) {
     const float driveInertia = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fDriveInertia);
     float throttleVal = customThrottle ? customThrottleVal : g_controls.ThrottleVal;
