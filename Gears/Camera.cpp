@@ -172,6 +172,14 @@ void updateControllerLook(bool& lookingIntoGlass) {
         lookingIntoGlass = true;
     }
 
+    float maxAngle = lookingIntoGlass ? 135.0f : 179.0f;
+
+    if (lookingIntoGlass) {
+        if (abs(lookLeftRight * 179.0f) > maxAngle) {
+            lookLeftRight = sgn(lookLeftRight) * (maxAngle / 179.0f);
+        }
+    }
+
     camRot.x = lerp(camRot.x, 90.0f * -lookUpDown,
         1.0f - pow(g_settings.Misc.Camera.LookTime, GAMEPLAY::GET_FRAME_TIME()));
 
@@ -185,8 +193,7 @@ void updateControllerLook(bool& lookingIntoGlass) {
     }
     else {
         // Manual look
-        float maxAngle = lookingIntoGlass ? 135.0f : 179.0f;
-        camRot.z = lerp(camRot.z, maxAngle * -lookLeftRight,
+        camRot.z = lerp(camRot.z, 179.0f * -lookLeftRight,
             1.0f - pow(g_settings.Misc.Camera.LookTime, GAMEPLAY::GET_FRAME_TIME()));
     }
 }
@@ -207,6 +214,8 @@ void updateMouseLook(bool& lookingIntoGlass) {
         lookingIntoGlass = true;
     }
 
+    float maxAngle = lookingIntoGlass ? 135.0f : 179.0f;
+
     // Re-center on no input
     if (lookLeftRight != 0.0f || lookUpDown != 0.0f) {
         lastMouseLookInputTimer.Reset(g_settings.Misc.Camera.MouseCenterTimeout);
@@ -220,11 +229,25 @@ void updateMouseLook(bool& lookingIntoGlass) {
     }
     else {
         lookUpDownAcc += lookUpDown;
-        lookLeftRightAcc += lookLeftRight;
+
+        if (lookingIntoGlass) {
+            if (sgn(lookLeftRight) != sgn(lookLeftRightAcc) || abs(camRot.z) + abs(lookLeftRight * 179.0f) < maxAngle) {
+                lookLeftRightAcc += lookLeftRight;
+            }
+
+            if (abs(lookLeftRightAcc * 179.0f) > maxAngle) {
+                lookLeftRightAcc = sgn(lookLeftRightAcc) * (maxAngle / 179.0f);
+            }
+        }
+        else {
+            lookLeftRightAcc += lookLeftRight;
+        }
 
         lookUpDownAcc = std::clamp(lookUpDownAcc, -1.0f, 1.0f);
         lookLeftRightAcc = std::clamp(lookLeftRightAcc, -1.0f, 1.0f);
     }
+
+    showText(0.5f, 0.000f + 5.0f * 0.025f, 0.5f, fmt::format("lookAcc {:.2f}", lookLeftRightAcc));
 
     camRot.x = lerp(camRot.x, 90 * -lookUpDownAcc,
         1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
@@ -239,8 +262,7 @@ void updateMouseLook(bool& lookingIntoGlass) {
             1.0f - pow(g_settings.Misc.Camera.LookTime, GAMEPLAY::GET_FRAME_TIME()));
     }
     else {
-        float maxAngle = lookingIntoGlass ? 135.0f : 179.0f;
-        camRot.z = lerp(camRot.z, maxAngle * -lookLeftRightAcc,
+        camRot.z = lerp(camRot.z, 179.0f * -lookLeftRightAcc,
             1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
     }
 }
