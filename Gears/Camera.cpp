@@ -52,6 +52,10 @@ void initCam() {
         cV.x, cV.y, cV.z,
         0, 0, 0,
         g_settings.Misc.Camera.FOV, 1, 2);
+
+    // This should be named something else, like "_SET_VEHICLE_SPEED_JITTER" or something.
+    // Thanks for finding it, Jitnaught!
+    VEHICLE::_SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(0.0f);
 }
 
 void FPVCam::Update() {
