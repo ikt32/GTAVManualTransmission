@@ -1778,9 +1778,10 @@ void handleBrakePatch() {
 
 // TODO: Change ratios for additional param RPM rise speed
 void fakeRev(bool customThrottle, float customThrottleVal) {
+    const float driveInertia = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fDriveInertia);
     float throttleVal = customThrottle ? customThrottleVal : g_controls.ThrottleVal;
     float timeStep = GAMEPLAY::GET_FRAME_TIME();
-    float accelRatio = 2.5f * timeStep;
+    float accelRatio = 2.0f * driveInertia * timeStep;
     float rpmValTemp = g_vehData.mRPMPrev > g_vehData.mRPM ? g_vehData.mRPMPrev - g_vehData.mRPM : 0.0f;
     if (g_vehData.mGearCurr == 1) {			// For some reason, first gear revs slower
         rpmValTemp *= 2.0f;
@@ -1789,7 +1790,7 @@ void fakeRev(bool customThrottle, float customThrottleVal) {
         rpmValTemp +						// Keep it constant
         throttleVal * accelRatio;	// Addition value, depends on delta T
     //showText(0.4, 0.4, 1.0, fmt("FakeRev %d %.02f", customThrottle, rpmVal));
-    g_ext.SetCurrentRPM(g_playerVehicle, rpmVal);
+    g_ext.SetCurrentRPM(g_playerVehicle, std::clamp(rpmVal, 0.0f, 1.0f));
 }
 
 void handleRPM() {
