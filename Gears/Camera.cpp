@@ -23,9 +23,11 @@ namespace {
     Cam cameraHandle = -1;
     Vector3 camRot{};
 
-    // Distance in meters to lean over to the center
-    // when looking back
-    const float lookLeanDist = 0.25f;
+    // Distance in meters to lean over to the center when looking back
+    const float lookLeanCenterDist = 0.25f;
+
+    // Distance in meters to lean forward when looking back/sideways
+    const float lookLeanFrontDist = 0.15f;
 
     Timer lastMouseLookInputTimer(500);
 
@@ -145,13 +147,28 @@ void updateControllerLook() {
     if (!lookingIntoGlass) {
         // Left
         if (camRot.z > 85.0f) {
-            offsetX = map(camRot.z, 85.0f, 180.0f, 0.0f, -lookLeanDist);
-            offsetX = std::clamp(offsetX, -lookLeanDist, 0.0f);
+            offsetX = map(camRot.z, 85.0f, 180.0f, 0.0f, -lookLeanCenterDist);
+            offsetX = std::clamp(offsetX, -lookLeanCenterDist, 0.0f);
         }
         // Right
         if (camRot.z < -85.0f) {
-            offsetX = map(camRot.z, -85.0f, -180.0f, 0.0f, lookLeanDist);
-            offsetX = std::clamp(offsetX, 0.0f, lookLeanDist);
+            offsetX = map(camRot.z, -85.0f, -180.0f, 0.0f, lookLeanCenterDist);
+            offsetX = std::clamp(offsetX, 0.0f, lookLeanCenterDist);
+        }
+    }
+
+    {
+        // Left
+        if (camRot.z > 85.0f) {
+            float frontLean = map(camRot.z, 85.0f, 180.0f, 0.0f, lookLeanFrontDist);
+            frontLean = std::clamp(frontLean, lookLeanFrontDist, 0.0f);
+            offsetY += frontLean;
+        }
+        // Right
+        if (camRot.z < -85.0f) {
+            float frontLean = map(camRot.z, -85.0f, -180.0f, 0.0f, lookLeanFrontDist);
+            frontLean = std::clamp(frontLean, lookLeanFrontDist, 0.0f);
+            offsetY += frontLean;
         }
     }
 
@@ -254,13 +271,28 @@ void updateMouseLook() {
     if (!lookingIntoGlass) {
         // Left
         if (camRot.z > 85.0f) {
-            offsetX = map(camRot.z, 85.0f, 180.0f, 0.0f, -lookLeanDist);
-            offsetX = std::clamp(offsetX, -lookLeanDist, 0.0f);
+            offsetX = map(camRot.z, 85.0f, 180.0f, 0.0f, -lookLeanCenterDist);
+            offsetX = std::clamp(offsetX, -lookLeanCenterDist, 0.0f);
         }
         // Right
         if (camRot.z < -85.0f) {
-            offsetX = map(camRot.z, -85.0f, -180.0f, 0.0f, lookLeanDist);
-            offsetX = std::clamp(offsetX, 0.0f, lookLeanDist);
+            offsetX = map(camRot.z, -85.0f, -180.0f, 0.0f, lookLeanCenterDist);
+            offsetX = std::clamp(offsetX, 0.0f, lookLeanCenterDist);
+        }
+    }
+
+    {
+        // Left
+        if (camRot.z > 85.0f) {
+            float frontLean = map(camRot.z, 85.0f, 180.0f, 0.0f, lookLeanFrontDist);
+            frontLean = std::clamp(frontLean, lookLeanFrontDist, 0.0f);
+            offsetY += frontLean;
+        }
+        // Right
+        if (camRot.z < -85.0f) {
+            float frontLean = map(camRot.z, -85.0f, -180.0f, 0.0f, lookLeanFrontDist);
+            frontLean = std::clamp(frontLean, lookLeanFrontDist, 0.0f);
+            offsetY += frontLean;
         }
     }
 
