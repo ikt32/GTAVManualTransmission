@@ -67,6 +67,14 @@ void updateDashLights() {
         esp = true;
     }
 
+    if (g_vehData.mHasABS) {
+        for (int i = 0; i < g_vehData.mWheelCount; ++i) {
+            abs |= g_vehData.mWheelTyreSpeeds[i] == 0.0f &&
+                g_ext.GetBrakeP(g_playerVehicle) > 0.0f &&
+                g_vehData.mVelocity.y > 3.0f;
+        }
+    }
+
     if (abs)
         DashLights::LastAbsTime = currentTime;
     if (tcs)
@@ -91,7 +99,7 @@ void drawDashLights() {
     const float YPos = g_settings.HUD.DashIndicators.YPos;
 
     Util::ColorF absColor{};
-    if (g_settings().DriveAssists.ABS.Enable) {
+    if (g_settings().DriveAssists.ABS.Enable || g_vehData.mHasABS) {
         if (abs) {
             absColor = { 1.0f, 1.0f, 1.0f, 1.0f };
         }
