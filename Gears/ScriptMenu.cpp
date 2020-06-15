@@ -160,6 +160,8 @@ namespace {
         val = parsedValue;
         return true;
     }
+
+    std::vector<std::string> diDevicesInfo { "Press Enter to refresh." };
 }
 
 int getBlockableControlIndex(int control) {
