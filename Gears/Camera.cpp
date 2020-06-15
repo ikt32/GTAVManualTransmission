@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "Compatibility.h"
 #include "ScriptSettings.hpp"
 #include "VehicleData.hpp"
 #include "Input/CarControls.hpp"
@@ -42,6 +43,9 @@ void cancelCam() {
         CAM::SET_CAM_ACTIVE(cameraHandle, false);
         CAM::DESTROY_CAM(cameraHandle, false);
         cameraHandle = -1;
+        if (g_settings.Misc.Camera.RemoveHead && Dismemberment::Available()) {
+            Dismemberment::RemoveBoneDraw(g_playerPed);
+        }
     }
 }
 
@@ -81,6 +85,12 @@ void FPVCam::Update() {
 
     if (CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleAim)) {
         UI::SHOW_HUD_COMPONENT_THIS_FRAME(14);
+        if (g_settings.Misc.Camera.RemoveHead && Dismemberment::Available()) {
+            Dismemberment::AddBoneDraw(g_playerPed, 0x796E, -1);
+            // cam is deleted so don't need to reset clipping params after removal
+            CAM::SET_CAM_NEAR_CLIP(cameraHandle, 0.05f); // Same as FPV walking gameplay
+            CAM::SET_CAM_FAR_CLIP(cameraHandle, 10000.0f); // Seems 10km everywhere else
+        }
     }
 
     // Mouse look

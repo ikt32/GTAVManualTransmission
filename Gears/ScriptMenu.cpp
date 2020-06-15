@@ -1515,6 +1515,10 @@ void update_cameraoptionsmenu() {
     g_menu.BoolOption("Follow movement", g_settings.Misc.Camera.FollowMovement,
         { "Camera moves with motion and rotation, somewhat like NFS Shift." });
 
+    g_menu.BoolOption("Remove head", g_settings.Misc.Camera.RemoveHead,
+        { "If DismembermentASI from Jedijosh' dismemberment mod is present,  "
+          "the player head can be hidden. This also turns on better near clipping." });
+
     g_menu.FloatOptionCb("Field of view", g_settings.Misc.Camera.FOV, 1.0f, 120.0f, 0.5f, getKbEntry, 
         { "In degrees." });
 

@@ -345,6 +345,7 @@ public:
         struct {
             bool Enable = true;
             bool FollowMovement = true;
+            bool RemoveHead = true;
             float FOV = 54.0f;
             float OffsetHeight = 0.075f;
             float OffsetForward = 0.050f;

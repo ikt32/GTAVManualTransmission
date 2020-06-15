@@ -15,6 +15,11 @@ HMODULE g_DashHookModule = nullptr;
 void(*g_DashHook_GetData)(VehicleDashboardData*);
 void(*g_DashHook_SetData)(VehicleDashboardData);
 
+HMODULE g_DismembermentModule = nullptr;
+
+void(*g_Dismemberbent_AddBoneDraw)(int handle, int start, int end) = nullptr;
+void(*g_Dismemberbent_RemoveBoneDraw)(int handle) = nullptr;
+
 void DashHook_GetData(VehicleDashboardData* data) {
     if (g_DashHook_GetData) {
         g_DashHook_GetData(data);
@@ -69,9 +74,22 @@ void setupDashHook() {
     g_DashHook_SetData = CheckAddr<void(*)(VehicleDashboardData)>(g_DashHookModule, "DashHook_SetData");
 }
 
+void setupDismemberment() {
+    logger.Write(INFO, "Setting up DismembermentASI");
+    g_DismembermentModule = GetModuleHandle(L"DismembermentASI.asi");
+    if (!g_DismembermentModule) {
+        logger.Write(INFO, "DismembermentASI.asi not found");
+        return;
+    }
+
+    g_Dismemberbent_AddBoneDraw = CheckAddr<void(*)(int, int, int)>(g_DismembermentModule, "AddBoneDraw");
+    g_Dismemberbent_RemoveBoneDraw = CheckAddr<void(*)(int)>(g_DismembermentModule, "RemoveBoneDraw");
+}
+
 void setupCompatibility() {
     setupTrainerV();
     setupDashHook();
+    setupDismemberment();
 }
 
 bool TrainerV::Active() {
@@ -95,4 +113,24 @@ void releaseCompatibility() {
     }
     g_DashHook_GetData = nullptr;
     g_DashHook_SetData = nullptr;
+
+    g_DismembermentModule = nullptr;
+    g_Dismemberbent_AddBoneDraw = nullptr;
+    g_Dismemberbent_RemoveBoneDraw = nullptr;
 }
+
+bool Dismemberment::Available() {
+    return g_Dismemberbent_AddBoneDraw != nullptr &&
+        g_Dismemberbent_RemoveBoneDraw != nullptr;
+}
+
+void Dismemberment::AddBoneDraw(int handle, int start, int end) {
+    if (g_Dismemberbent_AddBoneDraw)
+        g_Dismemberbent_AddBoneDraw(handle, start, end);
+}
+
+void Dismemberment::RemoveBoneDraw(int handle) {
+    if (g_Dismemberbent_RemoveBoneDraw)
+        g_Dismemberbent_RemoveBoneDraw(handle);
+}
+
