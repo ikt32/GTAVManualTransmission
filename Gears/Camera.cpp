@@ -73,9 +73,11 @@ void FPVCam::Update() {
     bool enable = g_settings.Misc.Camera.Enable;
     bool fpv = CAM::GET_FOLLOW_VEHICLE_CAM_VIEW_MODE() == 4;
     bool inCar = Util::VehicleAvailable(g_playerVehicle, g_playerPed);
+    bool hasControl = PLAYER::IS_PLAYER_CONTROL_ON(PLAYER::PLAYER_ID()) &&
+        PED::IS_PED_SITTING_IN_VEHICLE(g_playerPed, g_playerVehicle);
     bool lookingIntoGlass = false;
 
-    if (!enable || !fpv || !inCar) {
+    if (!enable || !fpv || !inCar || !hasControl || CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleAim)) {
         cancelCam();
         return;
     }
@@ -86,12 +88,7 @@ void FPVCam::Update() {
 
         CAM::SET_CAM_ACTIVE(cameraHandle, true);
         CAM::RENDER_SCRIPT_CAMS(true, false, 0, true, false);
-    }
 
-    CAM::SET_CAM_AFFECTS_AIMING(cameraHandle, true);
-
-    if (CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleAim)) {
-        UI::SHOW_HUD_COMPONENT_THIS_FRAME(14);
     }
 
     // Mouse look
