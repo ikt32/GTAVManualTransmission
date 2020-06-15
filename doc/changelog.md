@@ -2,17 +2,28 @@
 
 ## 4.8.0
 
-Lots of small fixes and improvements! The settings files are generally
-compatible, aside from the following:
+New features and lots of small fixes and improvements! The settings files are
+generally compatible, aside from the following:
 
 * ini updates
   * `SHIFT_ASSISTS` typo fix: now ignores the old wrongly spelled `SHIFT_ASSIST` section
   * H-Pattern shifter assignment changed, now each gear has its own entry
 
-New features, feature improvements and bug fixes:
+New features!
+
+* Custom first person driving camera with physics effects! Grab jedijosh920's
+[Dismemberment](https://www.gta5-mods.com/scripts/dismemberment) for a clean,
+no-clipping first person camera.
+* Synchronized steering animations with wheel rotation
+* Support mouse steering with Enhanced Custom Steering
+* New alternate automatic transmission mode, by
+[Nyconing](https://github.com/Nyconing)!
+* Add UDP telemetry support for programs like SimHub.
+DiRT 4 format thanks to [guilhermelimak](https://github.com/guilhermelimak).
+
+Improvements and bug fixes:
 
 * Engine and transmission
-  * Add alternate automatic transmission mode, by [Nyconing](https://github.com/Nyconing)
   * Add visual and physical feedback to stalling
   * Improve stalling with additional settings
   * Improve clutch creep with additional settings
@@ -33,7 +44,7 @@ New features, feature improvements and bug fixes:
   * Fix swapped up/downshift cut/blip settings in menu
   * Fix typo for `DRIVE_ASSISTS` ini section
 * Driving assists
-  * Add button to switch between driving assists sets
+  * Add buttons to switch between or toggle driving assists sets
   * Apply TCS, ESC and ABS simultaneously
   * Improve ESC: Also use rear wheels at large corrections
 * Custom steering
@@ -54,8 +65,6 @@ New features, feature improvements and bug fixes:
   * Show stalling progress in RPM bar
   * Fix throttle-based TCS not firing dashboard indicator icon
 * General
-  * Add UDP telemetry support for programs like SimHub. DiRT4 thanks to [guilhermelimak](https://github.com/guilhermelimak)
-  * Add animation syncing!
   * Add wheel size in debug (e.g. 265/35R21)
   * Improve G-force graph smoothness
   * Fix control acquire/release timing (now only when ped has control of car)
