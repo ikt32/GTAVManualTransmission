@@ -391,8 +391,8 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetBoolValue("HUD", "MouseEnable", HUD.MouseSteering.Enable);
     ini.SetDoubleValue("HUD", "MouseXPos", HUD.MouseSteering.XPos);
     ini.SetDoubleValue("HUD", "MouseYPos", HUD.MouseSteering.YPos);
-    ini.SetDoubleValue("HUD", "MouseXSz ", HUD.MouseSteering.XSz);
-    ini.SetDoubleValue("HUD", "MouseYSz ", HUD.MouseSteering.YSz);
+    ini.SetDoubleValue("HUD", "MouseXSz", HUD.MouseSteering.XSz);
+    ini.SetDoubleValue("HUD", "MouseYSz", HUD.MouseSteering.YSz);
     ini.SetDoubleValue("HUD", "MouseMarkerXSz", HUD.MouseSteering.MarkerXSz);
 
     ini.SetLongValue("HUD", "MouseBgR", HUD.MouseSteering.BgR);
@@ -724,8 +724,8 @@ void ScriptSettings::parseSettingsGeneral() {
     HUD.MouseSteering.Enable = ini.GetBoolValue("HUD", "MouseEnable", HUD.MouseSteering.Enable);
     HUD.MouseSteering.XPos = ini.GetDoubleValue("HUD", "MouseXPos", HUD.MouseSteering.XPos);
     HUD.MouseSteering.YPos = ini.GetDoubleValue("HUD", "MouseYPos", HUD.MouseSteering.YPos);
-    HUD.MouseSteering.XSz = ini.GetDoubleValue("HUD", "MouseXSz ", HUD.MouseSteering.XSz);
-    HUD.MouseSteering.YSz = ini.GetDoubleValue("HUD", "MouseYSz ", HUD.MouseSteering.YSz);
+    HUD.MouseSteering.XSz = ini.GetDoubleValue("HUD", "MouseXSz", HUD.MouseSteering.XSz);
+    HUD.MouseSteering.YSz = ini.GetDoubleValue("HUD", "MouseYSz", HUD.MouseSteering.YSz);
     HUD.MouseSteering.MarkerXSz = ini.GetDoubleValue("HUD", "MouseMarkerXSz", HUD.MouseSteering.MarkerXSz);
 
     HUD.MouseSteering.BgR = ini.GetLongValue("HUD", "MouseBgR", HUD.MouseSteering.BgR);
