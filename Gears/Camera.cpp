@@ -32,14 +32,25 @@ namespace {
     // Accumulated values for mouse look
     float lookUpDownAcc = 0.0f;
     float lookLeftRightAcc = 0.0f;
+
+    Timer lastPosUpdateTimer(500);
+    Vector3 driverHeadOffsetStatic{};
 }
 
 namespace FPVCam {
     void initCam();
+    void updateDriverHeadOffset();
 }
 
 void updateControllerLook(bool& lookingIntoGlass);
 void updateMouseLook(bool& lookingIntoGlass);
+
+void FPVCam::updateDriverHeadOffset() {
+    Vector3 dHeadPos = PED::GET_PED_BONE_COORDS(g_playerPed, 0x796E, 0.0f, 0.0f, 0.0f);
+    Vector3 dHeadOff = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(g_playerVehicle,
+        dHeadPos.x, dHeadPos.y, dHeadPos.z);
+    driverHeadOffsetStatic = dHeadOff;
+}
 
 void FPVCam::CancelCam() {
     if (CAM::DOES_CAM_EXIST(cameraHandle)) {
@@ -106,6 +117,8 @@ void FPVCam::Update() {
         CAM::SET_CAM_ACTIVE(cameraHandle, true);
         CAM::RENDER_SCRIPT_CAMS(true, false, 0, true, false);
 
+        // Just so we have a valid-ish offset
+        updateDriverHeadOffset();
     }
 
     // Mouse look
@@ -171,11 +184,28 @@ void FPVCam::Update() {
         }
     }
 
-    // 0x796E skel_head id
-    CAM::ATTACH_CAM_TO_PED_BONE(cameraHandle, g_playerPed, 0x796E,
-        offsetX,
-        offsetY,
-        g_settings.Misc.Camera.OffsetHeight, true);
+    if (g_settings.Misc.Camera.AttachId == 0) {
+        // 0x796E skel_head id
+        CAM::ATTACH_CAM_TO_PED_BONE(cameraHandle, g_playerPed, 0x796E,
+            offsetX,
+            offsetY,
+            g_settings.Misc.Camera.OffsetHeight, true);
+    }
+    else {
+        // Only update every so often, when not moving.
+        if (lastPosUpdateTimer.Expired()) {
+            if (Math::Near(Length(g_vehData.mVelocity), 0.0f, 0.01f) && 
+                Math::Near(g_vehData.mSteeringAngle, 0.0f, 0.01f)) {
+                updateDriverHeadOffset();
+                lastPosUpdateTimer.Reset();
+            }
+        }
+
+        CAM::ATTACH_CAM_TO_ENTITY(cameraHandle, g_playerVehicle,
+            driverHeadOffsetStatic.x + offsetX,
+            driverHeadOffsetStatic.y + offsetY,
+            driverHeadOffsetStatic.z + g_settings.Misc.Camera.OffsetHeight, true);
+    }
 
     auto rot = ENTITY::GET_ENTITY_ROTATION(g_playerPed, 0);
     CAM::SET_CAM_ROT(
@@ -186,7 +216,6 @@ void FPVCam::Update() {
         0);
 
     CAM::SET_CAM_FOV(cameraHandle, g_settings.Misc.Camera.FOV);
-
 }
 
 void updateControllerLook(bool& lookingIntoGlass) {

@@ -131,6 +131,11 @@ namespace {
         "None"
     };
 
+    std::vector<std::string> camAttachPoints {
+        "Player head",
+        "Car"
+    };
+
     bool getKbEntry(float& val) {
         UI::Notify(INFO, "Enter value");
         GAMEPLAY::DISPLAY_ONSCREEN_KEYBOARD(UNK::_GET_CURRENT_LANGUAGE_ID() == 0, "FMMC_KEY_TIP8", "",
@@ -1514,6 +1519,13 @@ void update_miscoptionsmenu() {
 void update_cameraoptionsmenu() {
     g_menu.Title("Camera options");
     g_menu.Subtitle("");
+
+    if (g_menu.StringArray("Attach to", camAttachPoints, g_settings.Misc.Camera.AttachId, 
+        { "Player head: Camera moves with character head while steering.",
+          "Car: Camera is smoother while steering, but needs a while to center when entering a new car. "
+          "Make sure the car is stopped and you're not steering, to center the camera position."})) {
+        FPVCam::CancelCam(); // it'll re-acquire next tick with the correct position.
+    }
 
     g_menu.BoolOption("Follow movement", g_settings.Misc.Camera.FollowMovement,
         { "Camera moves with motion and rotation, somewhat like NFS Shift." });

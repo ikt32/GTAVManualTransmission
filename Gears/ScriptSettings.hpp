@@ -344,6 +344,7 @@ public:
         bool SyncAnimations = true;
         struct {
             bool Enable = true;
+            int AttachId = 0; // 0: Head, 1: Vehicle
             bool FollowMovement = true;
             bool RemoveHead = true;
             float FOV = 54.0f;

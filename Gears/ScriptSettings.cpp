@@ -413,6 +413,7 @@ void ScriptSettings::SaveGeneral() const {
 
     // [CAM]
     ini.SetBoolValue("CAM", "Enable", Misc.Camera.Enable);
+    ini.SetLongValue("CAM", "AttachId", Misc.Camera.AttachId);
     ini.SetBoolValue("CAM", "FollowMovement", Misc.Camera.FollowMovement);
     ini.SetBoolValue("CAM", "RemoveHead", Misc.Camera.RemoveHead);
     ini.SetDoubleValue("CAM", "FOV", Misc.Camera.FOV);
@@ -746,6 +747,7 @@ void ScriptSettings::parseSettingsGeneral() {
 
     // [CAM]
     Misc.Camera.Enable = ini.GetBoolValue("CAM", "Enable", Misc.Camera.Enable);
+    Misc.Camera.AttachId = ini.GetLongValue("CAM", "AttachId", Misc.Camera.AttachId);
     Misc.Camera.FollowMovement = ini.GetBoolValue("CAM", "FollowMovement", Misc.Camera.FollowMovement);
     Misc.Camera.RemoveHead = ini.GetBoolValue("CAM", "RemoveHead", Misc.Camera.RemoveHead);
     Misc.Camera.FOV = ini.GetDoubleValue("CAM", "FOV", Misc.Camera.FOV);
