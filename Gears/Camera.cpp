@@ -60,6 +60,13 @@ void initCam() {
     // This should be named something else, like "_SET_VEHICLE_SPEED_JITTER" or something.
     // Thanks for finding it, Jitnaught!
     VEHICLE::_SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(0.0f);
+
+    if (g_settings.Misc.Camera.RemoveHead && Dismemberment::Available()) {
+        Dismemberment::AddBoneDraw(g_playerPed, 0x796E, -1);
+        // cam is deleted so don't need to reset clipping params after removal
+        CAM::SET_CAM_NEAR_CLIP(cameraHandle, 0.05f); // Same as FPV walking gameplay
+        CAM::SET_CAM_FAR_CLIP(cameraHandle, 10000.0f); // Seems 10km everywhere else
+    }
 }
 
 void FPVCam::Update() {
@@ -85,12 +92,6 @@ void FPVCam::Update() {
 
     if (CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleAim)) {
         UI::SHOW_HUD_COMPONENT_THIS_FRAME(14);
-        if (g_settings.Misc.Camera.RemoveHead && Dismemberment::Available()) {
-            Dismemberment::AddBoneDraw(g_playerPed, 0x796E, -1);
-            // cam is deleted so don't need to reset clipping params after removal
-            CAM::SET_CAM_NEAR_CLIP(cameraHandle, 0.05f); // Same as FPV walking gameplay
-            CAM::SET_CAM_FAR_CLIP(cameraHandle, 10000.0f); // Seems 10km everywhere else
-        }
     }
 
     // Mouse look
