@@ -1638,6 +1638,53 @@ void update_debugmenu() {
         g_menu.OptionPlus("Animation info", extras,
             nullptr, onRight, onLeft, "Animations", { "Shows current animation override status" });
     }
+
+    {
+        auto fetchInfo = [](std::vector<std::string>& diDevicesInfo_) {
+            logger.Write(DEBUG, "Re-scanning DirectInput devices");
+            diDevicesInfo_.clear();
+
+            LPDIRECTINPUT lpDi = nullptr;
+            HRESULT result = DirectInput8Create(GetModuleHandle(nullptr),
+                DIRECTINPUT_VERSION,
+                IID_IDirectInput8,
+                reinterpret_cast<void**>(&lpDi),
+                nullptr);
+
+            if (FAILED(result)) {
+                logger.Write(DEBUG, "Failed to DirectInput8Create, HRESULT: %d", result);
+                diDevicesInfo_.push_back(fmt::format("Failed to get DI, HRESULT: {}", result));
+            }
+
+            DIDeviceFactory::Get().Enumerate(lpDi);
+
+            diDevicesInfo_.push_back(fmt::format("Devices: {}", DIDeviceFactory::Get().GetEntryCount()));
+            diDevicesInfo_.push_back("");
+
+            for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
+                const auto* device = DIDeviceFactory::Get().GetEntry(i);
+                std::wstring wDevName = device->diDeviceInstance.tszInstanceName;
+                GUID guid = device->diDeviceInstance.guidInstance;
+
+                // Name
+                diDevicesInfo_.push_back(fmt::format("{}", StrUtil::utf8_encode(wDevName)));
+                diDevicesInfo_.push_back(fmt::format("    GUID: {}", GUID2String(guid)));
+                diDevicesInfo_.push_back(fmt::format("    Type: 0x{:X}", device->diDevCaps.dwDevType));
+                diDevicesInfo_.push_back(fmt::format("    FFB: {}", device->diDevCaps.dwFlags & DIDC_FORCEFEEDBACK));
+                diDevicesInfo_.push_back("");
+            }
+        };
+
+        bool selected = false;
+        if (g_menu.OptionPlus("DirectInput devices", diDevicesInfo, 
+            &selected, nullptr, nullptr, "DirectInput info", { "Enter to refresh." })) {
+            fetchInfo(diDevicesInfo);
+        }
+
+        if (selected) {
+            g_menu.OptionPlusPlus(diDevicesInfo, "DirectInput info");
+        }
+    }
 }
 
 void update_metricsmenu() {
