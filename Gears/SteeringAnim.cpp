@@ -154,7 +154,7 @@ void playAnimTime(const SteeringAnimation::Animation& anim, float time) {
             WAIT(0);
         }
 
-        constexpr int flag = ANIM_FLAG_UPPERBODY | ANIM_FLAG_ENABLE_PLAYER_CONTROL;
+        constexpr int flag = ANIM_FLAG_ENABLE_PLAYER_CONTROL;
         AI::TASK_PLAY_ANIM(g_playerPed, dict, name, -8.0f, 8.0f, -1, flag, 1.0f, 0, 0, 0);
         lastAnimation = anim;
         UI::Notify(DEBUG, fmt::format("Started steering animation ({})", lastAnimation.Dictionary), false);
