@@ -1539,10 +1539,13 @@ void update_cameraoptionsmenu() {
     g_menu.FloatOptionCb("Field of view", g_settings.Misc.Camera.FOV, 1.0f, 120.0f, 0.5f, getKbEntry, 
         { "In degrees." });
 
-    g_menu.FloatOption("Offset height", g_settings.Misc.Camera.OffsetHeight, -0.5f, 0.5f, 0.01f, 
+    g_menu.FloatOption("Offset height", g_settings.Misc.Camera.OffsetHeight, -2.0f, 2.0f, 0.01f, 
         { "Distance in meters." });
 
-    g_menu.FloatOption("Offset forward", g_settings.Misc.Camera.OffsetForward, -0.5f, 0.5f, 0.01f, 
+    g_menu.FloatOption("Offset forward", g_settings.Misc.Camera.OffsetForward, -2.0f, 2.0f, 0.01f,
+        { "Distance in meters." });
+
+    g_menu.FloatOption("Offset side", g_settings.Misc.Camera.OffsetSide, -2.0f, 2.0f, 0.01f,
         { "Distance in meters." });
 
     g_menu.FloatOption("Pitch", g_settings.Misc.Camera.Pitch, -10.0f, 10.0f, 0.1f,

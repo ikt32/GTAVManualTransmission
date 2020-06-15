@@ -419,6 +419,7 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetDoubleValue("CAM", "FOV", Misc.Camera.FOV);
     ini.SetDoubleValue("CAM", "OffsetHeight", Misc.Camera.OffsetHeight);
     ini.SetDoubleValue("CAM", "OffsetForward", Misc.Camera.OffsetForward);
+    ini.SetDoubleValue("CAM", "OffsetSide", Misc.Camera.OffsetSide);
     ini.SetDoubleValue("CAM", "Pitch", Misc.Camera.Pitch);
     ini.SetDoubleValue("CAM", "LookTime", Misc.Camera.LookTime);
     ini.SetDoubleValue("CAM", "MouseLookTime", Misc.Camera.MouseLookTime);
@@ -753,6 +754,7 @@ void ScriptSettings::parseSettingsGeneral() {
     Misc.Camera.FOV = ini.GetDoubleValue("CAM", "FOV", Misc.Camera.FOV);
     Misc.Camera.OffsetHeight = ini.GetDoubleValue("CAM", "OffsetHeight", Misc.Camera.OffsetHeight);
     Misc.Camera.OffsetForward = ini.GetDoubleValue("CAM", "OffsetForward", Misc.Camera.OffsetForward);
+    Misc.Camera.OffsetSide = ini.GetDoubleValue("CAM", "OffsetSide", Misc.Camera.OffsetSide);
     Misc.Camera.Pitch = ini.GetDoubleValue("CAM", "Pitch", Misc.Camera.Pitch);
     Misc.Camera.LookTime = ini.GetDoubleValue("CAM", "LookTime", Misc.Camera.LookTime);
     Misc.Camera.MouseLookTime = ini.GetDoubleValue("CAM", "MouseLookTime", Misc.Camera.MouseLookTime);

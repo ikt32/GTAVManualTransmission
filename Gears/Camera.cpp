@@ -187,8 +187,8 @@ void FPVCam::Update() {
     if (g_settings.Misc.Camera.AttachId == 0) {
         // 0x796E skel_head id
         CAM::ATTACH_CAM_TO_PED_BONE(cameraHandle, g_playerPed, 0x796E,
-            offsetX,
-            offsetY,
+            g_settings.Misc.Camera.OffsetSide + offsetX,
+            g_settings.Misc.Camera.OffsetForward + offsetY,
             g_settings.Misc.Camera.OffsetHeight, true);
     }
     else {
@@ -202,8 +202,8 @@ void FPVCam::Update() {
         }
 
         CAM::ATTACH_CAM_TO_ENTITY(cameraHandle, g_playerVehicle,
-            driverHeadOffsetStatic.x + offsetX,
-            driverHeadOffsetStatic.y + offsetY,
+            driverHeadOffsetStatic.x + g_settings.Misc.Camera.OffsetSide + offsetX,
+            driverHeadOffsetStatic.y + g_settings.Misc.Camera.OffsetForward + offsetY,
             driverHeadOffsetStatic.z + g_settings.Misc.Camera.OffsetHeight, true);
     }
 
