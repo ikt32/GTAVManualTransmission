@@ -34,22 +34,42 @@ namespace {
     float lookLeftRightAcc = 0.0f;
 }
 
+namespace FPVCam {
+    void initCam();
+}
+
 void updateControllerLook(bool& lookingIntoGlass);
 void updateMouseLook(bool& lookingIntoGlass);
 
-void cancelCam() {
+void FPVCam::CancelCam() {
     if (CAM::DOES_CAM_EXIST(cameraHandle)) {
         CAM::RENDER_SCRIPT_CAMS(false, false, 0, true, false);
         CAM::SET_CAM_ACTIVE(cameraHandle, false);
         CAM::DESTROY_CAM(cameraHandle, false);
         cameraHandle = -1;
-        if (g_settings.Misc.Camera.RemoveHead && Dismemberment::Available()) {
-            Dismemberment::RemoveBoneDraw(g_playerPed);
+        if (g_settings.Misc.Camera.RemoveHead) {
+            HideHead(false);
         }
     }
 }
 
-void initCam() {
+void FPVCam::HideHead(bool remove) {
+    if (Dismemberment::Available()) {
+        if (remove) {
+            Dismemberment::AddBoneDraw(g_playerPed, 0x796E, -1);
+
+            CAM::SET_CAM_NEAR_CLIP(cameraHandle, 0.05f); // Same as FPV walking gameplay
+            CAM::SET_CAM_FAR_CLIP(cameraHandle, 10000.0f); // Seems 10km everywhere else
+        }
+        else {
+            Dismemberment::RemoveBoneDraw(g_playerPed);
+
+            CAM::SET_CAM_NEAR_CLIP(cameraHandle, 0.149f); // Same as FPV driving gameplay
+        }
+    }
+}
+
+void FPVCam::initCam() {
     auto cV = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, 0.0f, 2.0f, 0.5f);
     cameraHandle = CAM::CREATE_CAM_WITH_PARAMS(
         "DEFAULT_SCRIPTED_CAMERA",
@@ -62,10 +82,7 @@ void initCam() {
     VEHICLE::_SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(0.0f);
 
     if (g_settings.Misc.Camera.RemoveHead && Dismemberment::Available()) {
-        Dismemberment::AddBoneDraw(g_playerPed, 0x796E, -1);
-        // cam is deleted so don't need to reset clipping params after removal
-        CAM::SET_CAM_NEAR_CLIP(cameraHandle, 0.05f); // Same as FPV walking gameplay
-        CAM::SET_CAM_FAR_CLIP(cameraHandle, 10000.0f); // Seems 10km everywhere else
+        HideHead(true);
     }
 }
 
@@ -78,7 +95,7 @@ void FPVCam::Update() {
     bool lookingIntoGlass = false;
 
     if (!enable || !fpv || !inCar || !hasControl || CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleAim)) {
-        cancelCam();
+        CancelCam();
         return;
     }
 
