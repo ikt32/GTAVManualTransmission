@@ -166,7 +166,7 @@ public:
         float CenterTime = 0.000100f;
         float SteerTime = 0.000010f;
         bool MouseSteering = true;
-        float MouseSensitivity = 1.0f;
+        float MouseSensitivity = 0.5f;
     } CustomSteering;
 
     // [HUD]
@@ -355,9 +355,9 @@ public:
             float OffsetForward = 0.050f;
             float OffsetSide = 0.0f;
             float Pitch = 0.0f;
-            float LookTime = 0.001000f;
-            float MouseLookTime = 0.000010f;
-            int MouseCenterTimeout = 500;
+            float LookTime = 0.000010f;
+            float MouseLookTime = 0.000001f;
+            int MouseCenterTimeout = 750;
             float MouseSensitivity = 0.5f;
         } Camera;
         bool HidePlayerInFPV = false;
