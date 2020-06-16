@@ -346,6 +346,9 @@ public:
             bool Enable = true;
             int AttachId = 0; // 0: Head, 1: Vehicle
             bool FollowMovement = true;
+            float MovementMultVel = 0.750f;
+            float MovementMultRot = 0.15f;
+            float MovementCap = 45.0f;
             bool RemoveHead = true;
             float FOV = 54.0f;
             float OffsetHeight = 0.075f;

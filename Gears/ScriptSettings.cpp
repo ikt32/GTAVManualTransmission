@@ -415,6 +415,9 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetBoolValue("CAM", "Enable", Misc.Camera.Enable);
     ini.SetLongValue("CAM", "AttachId", Misc.Camera.AttachId);
     ini.SetBoolValue("CAM", "FollowMovement", Misc.Camera.FollowMovement);
+    ini.SetDoubleValue("CAM", "MovementMultVel", Misc.Camera.MovementMultVel);
+    ini.SetDoubleValue("CAM", "MovementMultRot", Misc.Camera.MovementMultRot);
+    ini.SetDoubleValue("CAM", "MovementCap", Misc.Camera.MovementCap);
     ini.SetBoolValue("CAM", "RemoveHead", Misc.Camera.RemoveHead);
     ini.SetDoubleValue("CAM", "FOV", Misc.Camera.FOV);
     ini.SetDoubleValue("CAM", "OffsetHeight", Misc.Camera.OffsetHeight);
@@ -750,6 +753,9 @@ void ScriptSettings::parseSettingsGeneral() {
     Misc.Camera.Enable = ini.GetBoolValue("CAM", "Enable", Misc.Camera.Enable);
     Misc.Camera.AttachId = ini.GetLongValue("CAM", "AttachId", Misc.Camera.AttachId);
     Misc.Camera.FollowMovement = ini.GetBoolValue("CAM", "FollowMovement", Misc.Camera.FollowMovement);
+    Misc.Camera.MovementMultVel = ini.GetDoubleValue("CAM", "MovementMultVel", Misc.Camera.MovementMultVel);
+    Misc.Camera.MovementMultRot = ini.GetDoubleValue("CAM", "MovementMultRot", Misc.Camera.MovementMultRot);
+    Misc.Camera.MovementCap = ini.GetDoubleValue("CAM", "MovementCap", Misc.Camera.MovementCap);
     Misc.Camera.RemoveHead = ini.GetBoolValue("CAM", "RemoveHead", Misc.Camera.RemoveHead);
     Misc.Camera.FOV = ini.GetDoubleValue("CAM", "FOV", Misc.Camera.FOV);
     Misc.Camera.OffsetHeight = ini.GetDoubleValue("CAM", "OffsetHeight", Misc.Camera.OffsetHeight);

@@ -1527,14 +1527,23 @@ void update_cameraoptionsmenu() {
         FPVCam::CancelCam(); // it'll re-acquire next tick with the correct position.
     }
 
-    g_menu.BoolOption("Follow movement", g_settings.Misc.Camera.FollowMovement,
-        { "Camera moves with motion and rotation, somewhat like NFS Shift." });
-
     if (g_menu.BoolOption("Hide head", g_settings.Misc.Camera.RemoveHead,
         { "If DismembermentASI from Jedijosh' dismemberment mod is present,  "
           "the player head can be hidden. This also turns on better near clipping." })){
         FPVCam::HideHead(g_settings.Misc.Camera.RemoveHead);
     }
+
+    g_menu.BoolOption("Follow movement", g_settings.Misc.Camera.FollowMovement,
+        { "Camera moves with motion and rotation, somewhat like NFS Shift." });
+
+    g_menu.FloatOption("Motion multiplier", g_settings.Misc.Camera.MovementMultVel, 0.0f, 4.0f, 0.1f,
+        { "How much the direction of travel affects the camera." });
+
+    g_menu.FloatOption("Rotation movement", g_settings.Misc.Camera.MovementMultRot, 0.0f, 4.0f, 0.1f,
+        { "How much the rotation speed affects the camera." });
+
+    g_menu.FloatOption("Movement cap", g_settings.Misc.Camera.MovementCap, 0.0f, 90.0f, 1.0f,
+        { "To how many degrees camera movement is capped." });
 
     g_menu.FloatOptionCb("Field of view", g_settings.Misc.Camera.FOV, 1.0f, 120.0f, 0.5f, getKbEntry, 
         { "In degrees." });

@@ -148,7 +148,12 @@ void FPVCam::Update() {
 
             Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
 
-            directionLookAngle = -(rad2deg(travelDir) / 2.0f + rad2deg(rotationVelocity.z) / 4.0f);
+            float velComponent = travelDir * g_settings.Misc.Camera.MovementMultVel;
+            float rotComponent = rotationVelocity.z * g_settings.Misc.Camera.MovementMultRot;
+            float totalMove = std::clamp(velComponent + rotComponent,
+                -deg2rad(g_settings.Misc.Camera.MovementCap),
+                 deg2rad(g_settings.Misc.Camera.MovementCap));
+            directionLookAngle = -rad2deg(totalMove);
 
             if (Length(speedVector) < 3.0f) {
                 directionLookAngle = map(speedVector.y, 0.0f, 3.0f, 0.0f, directionLookAngle);
@@ -284,9 +289,9 @@ void updateMouseLook(bool& lookingIntoGlass) {
 
     if (lastMouseLookInputTimer.Expired() && Length(g_vehData.mVelocity) > 1.0f && !lookBehind) {
         lookUpDownAcc = lerp(lookUpDownAcc, 0.0f,
-            1.0f - pow(g_settings.Misc.Camera.LookTime, GAMEPLAY::GET_FRAME_TIME()));
+            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
         lookLeftRightAcc = lerp(lookLeftRightAcc, 0.0f,
-            1.0f - pow(g_settings.Misc.Camera.LookTime, GAMEPLAY::GET_FRAME_TIME()));
+            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
     }
     else {
         lookUpDownAcc += lookUpDown;
@@ -318,7 +323,7 @@ void updateMouseLook(bool& lookingIntoGlass) {
             lookBackAngle = 179.0f; // Look over left shoulder
         }
         camRot.z = lerp(camRot.z, lookBackAngle,
-            1.0f - pow(g_settings.Misc.Camera.LookTime, GAMEPLAY::GET_FRAME_TIME()));
+            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
     }
     else {
         camRot.z = lerp(camRot.z, 179.0f * -lookLeftRightAcc,
