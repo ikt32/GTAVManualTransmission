@@ -148,8 +148,8 @@ void playAnimTime(const SteeringAnimation::Animation& anim, float time) {
         STREAMING::REQUEST_ANIM_DICT(dict);
         while (!STREAMING::HAS_ANIM_DICT_LOADED(dict)) {
             if (t.Expired()) {
-                UI::Notify(ERROR, fmt::format("Failed to load animation dictionary [{}}]", dict), false);
                 break;
+                UI::Notify(ERROR, fmt::format("Failed to load animation dictionary [{}]", dict), false);
             }
             WAIT(0);
         }
