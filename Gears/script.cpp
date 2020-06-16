@@ -2328,9 +2328,7 @@ void readSettings() {
     g_menu.ReadSettings();
     initTimers();
 
-    std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
-    std::string animationsFile = absoluteModPath + "\\animations.yml";
-    SteeringAnimation::Load(animationsFile);
+    SteeringAnimation::Load();
 
     logger.Write(INFO, "Settings read");
 }
@@ -2382,6 +2380,8 @@ void main() {
     std::string settingsControlsFile = absoluteModPath + "\\settings_controls.ini";
     std::string settingsWheelFile = absoluteModPath + "\\settings_wheel.ini";
     std::string settingsMenuFile = absoluteModPath + "\\settings_menu.ini";
+    std::string animationsFile = absoluteModPath + "\\animations.yml";
+
     std::string textureWheelFile = absoluteModPath + "\\texture_wheel.png";
     std::string textureABSFile = absoluteModPath + "\\texture_abs.png";
     std::string textureTCSFile = absoluteModPath + "\\texture_tcs.png";
@@ -2393,6 +2393,9 @@ void main() {
     g_menu.RegisterOnExit([] { onMenuClose(); });
     g_menu.SetFiles(settingsMenuFile);
     g_menu.Initialize();
+
+    SteeringAnimation::SetFile(animationsFile);
+
     readSettings();
     loadConfigs();
 

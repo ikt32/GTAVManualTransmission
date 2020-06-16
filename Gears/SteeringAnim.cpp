@@ -1,5 +1,6 @@
 #include "SteeringAnim.h"
 
+#include "Constants.h"
 #include "Input/CarControls.hpp"
 #include "ScriptUtils.h"
 #include "ScriptSettings.hpp"
@@ -23,6 +24,7 @@ extern ScriptSettings g_settings;
 extern CarControls g_controls;
 
 namespace {
+    std::string animFile = std::string(Constants::ModDir) + "\\animations.yml";
     enum eAnimationFlags {
         ANIM_FLAG_NORMAL = 0,
         ANIM_FLAG_REPEAT = 1,
@@ -42,6 +44,10 @@ void playAnimTime(const SteeringAnimation::Animation& anim, float time);
 void cancelAnim(const SteeringAnimation::Animation& anim);
 float mapAnim(float wheelDegrees, float maxAnimAngle);
 
+void SteeringAnimation::SetFile(const std::string& cs) {
+    animFile = cs;
+}
+
 const std::vector<SteeringAnimation::Animation>& SteeringAnimation::GetAnimations() {
     return steeringAnimations;
 }
@@ -51,6 +57,7 @@ size_t SteeringAnimation::GetAnimationIndex() {
 }
 
 void SteeringAnimation::SetAnimationIndex(size_t index) {
+    cancelAnim(lastAnimation);
     steeringAnimIdx = index;
 }
 
@@ -89,9 +96,10 @@ void SteeringAnimation::Update() {
         setAngle);
 }
 
-void SteeringAnimation::Load(const std::string& path) {
+void SteeringAnimation::Load() {
     try {
-        YAML::Node animRoot = YAML::LoadFile(path);
+        cancelAnim(lastAnimation);
+        YAML::Node animRoot = YAML::LoadFile(animFile);
         auto animNodes = animRoot["Animations"];
 
         steeringAnimations.clear();
@@ -118,12 +126,12 @@ void SteeringAnimation::Load(const std::string& path) {
 }
 
 void cancelAnim(const SteeringAnimation::Animation& anim) {
-    const char* dict = anim.Dictionary.c_str();
-    const char* name = anim.Name.c_str();
-
     if (anim.Dictionary.empty() || anim.Name.empty()) {
         return;
     }
+
+    const char* dict = anim.Dictionary.c_str();
+    const char* name = anim.Name.c_str();
 
     const bool playing = ENTITY::IS_ENTITY_PLAYING_ANIM(g_playerPed, dict, name, 3);
 
@@ -135,6 +143,10 @@ void cancelAnim(const SteeringAnimation::Animation& anim) {
 }
 
 void playAnimTime(const SteeringAnimation::Animation& anim, float time) {
+    if (anim.Dictionary.empty() || anim.Name.empty()) {
+        return;
+    }
+
     const char* dict = anim.Dictionary.c_str();
     const char* name = anim.Name.c_str();
 
@@ -145,11 +157,22 @@ void playAnimTime(const SteeringAnimation::Animation& anim, float time) {
 
         Timer t(500);
 
+        if (!STREAMING::DOES_ANIM_DICT_EXIST(dict)) {
+            UI::Notify(ERROR, fmt::format("Animation: dictionary does not exist [{}]", dict), false);
+            logger.Write(ERROR, fmt::format("Animation: dictionary does not exist [{}]", dict));
+            // Clear dict so we don't keep loading it
+            steeringAnimations[steeringAnimIdx].Dictionary = std::string();
+            return;
+        }
+
         STREAMING::REQUEST_ANIM_DICT(dict);
         while (!STREAMING::HAS_ANIM_DICT_LOADED(dict)) {
             if (t.Expired()) {
-                break;
                 UI::Notify(ERROR, fmt::format("Failed to load animation dictionary [{}]", dict), false);
+                logger.Write(ERROR, fmt::format("Animation: Failed to load dictionary [{}]", dict));
+                // Clear dict so we don't keep loading it
+                steeringAnimations[steeringAnimIdx].Dictionary = std::string();
+                return;
             }
             WAIT(0);
         }

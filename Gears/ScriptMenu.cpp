@@ -1659,8 +1659,11 @@ void update_debugmenu() {
             }
         };
 
-        g_menu.OptionPlus("Animation info", extras,
-            nullptr, onRight, onLeft, "Animations", { "Shows current animation override status" });
+        if (g_menu.OptionPlus("Animation info", extras,
+            nullptr, onRight, onLeft, "Animations", 
+            { "Shows current animation override status. Enter to reload." })) {
+            SteeringAnimation::Load();
+        }
     }
 
     {

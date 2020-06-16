@@ -10,7 +10,7 @@ namespace SteeringAnimation {
         std::vector<std::string> Layouts;
     };
 
-    void Load(const std::string& path);
+    void Load();
 
     const std::vector<Animation>& GetAnimations();
     size_t GetAnimationIndex();
@@ -18,5 +18,6 @@ namespace SteeringAnimation {
     void SetRotation(float wheelDegrees);
 
     void Update();
+    void SetFile(const std::string& cs);
 }
 
