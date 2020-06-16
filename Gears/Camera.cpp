@@ -117,6 +117,9 @@ void FPVCam::Update() {
         CAM::SET_CAM_ACTIVE(cameraHandle, true);
         CAM::RENDER_SCRIPT_CAMS(true, false, 0, true, false);
 
+        if (Length(driverHeadOffsetStatic) == 0.0f || 
+            Math::Near(Length(g_vehData.mVelocity), 0.0f, 0.01f) &&
+            Math::Near(g_vehData.mSteeringAngle, 0.0f, 0.01f))
         // Just so we have a valid-ish offset
         updateDriverHeadOffset();
     }
