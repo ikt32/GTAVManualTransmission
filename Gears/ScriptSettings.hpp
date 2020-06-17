@@ -344,7 +344,7 @@ public:
         bool SyncAnimations = true;
         struct {
             bool Enable = true;
-            int AttachId = 0; // 0: Head, 1: Vehicle
+            int AttachId = 0; // 0: Head, 1: Vehicle, 2: FPV Offset?
             bool FollowMovement = true;
             float MovementMultVel = 0.750f;
             float MovementMultRot = 0.15f;
@@ -359,6 +359,12 @@ public:
             float MouseLookTime = 0.000001f;
             int MouseCenterTimeout = 750;
             float MouseSensitivity = 0.5f;
+            struct {
+                float OffsetHeight = 0.0f;
+                float OffsetForward = 0.0f;
+                float OffsetSide = 0.0f;
+                float Pitch = 0.0f;
+            } VFPV;
         } Camera;
         bool HidePlayerInFPV = false;
     } Misc;

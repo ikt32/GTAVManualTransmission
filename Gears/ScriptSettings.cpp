@@ -432,6 +432,11 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetLongValue("CAM", "MouseCenterTimeout", Misc.Camera.MouseCenterTimeout);
     ini.SetDoubleValue("CAM", "MouseSensitivity", Misc.Camera.MouseSensitivity);
 
+    ini.SetDoubleValue("CAM", "VFPVOffsetHeight", Misc.Camera.VFPV.OffsetHeight);
+    ini.SetDoubleValue("CAM", "VFPVOffsetForward", Misc.Camera.VFPV.OffsetForward);
+    ini.SetDoubleValue("CAM", "VFPVOffsetSide", Misc.Camera.VFPV.OffsetSide);
+    ini.SetDoubleValue("CAM", "VFPVPitch", Misc.Camera.VFPV.Pitch);
+
     // [UPDATE]
     ini.SetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);
     if (!Update.IgnoredVersion.empty())
@@ -772,6 +777,11 @@ void ScriptSettings::parseSettingsGeneral() {
     Misc.Camera.MouseLookTime = ini.GetDoubleValue("CAM", "MouseLookTime", Misc.Camera.MouseLookTime);
     Misc.Camera.MouseCenterTimeout = ini.GetLongValue("CAM", "MouseCenterTimeout", Misc.Camera.MouseCenterTimeout);
     Misc.Camera.MouseSensitivity = ini.GetDoubleValue("CAM", "MouseSensitivity", Misc.Camera.MouseSensitivity);
+
+    Misc.Camera.VFPV.OffsetHeight = ini.GetDoubleValue("CAM", "VFPVOffsetHeight", Misc.Camera.VFPV.OffsetHeight);
+    Misc.Camera.VFPV.OffsetForward = ini.GetDoubleValue("CAM", "VFPVOffsetForward", Misc.Camera.VFPV.OffsetForward);
+    Misc.Camera.VFPV.OffsetSide = ini.GetDoubleValue("CAM", "VFPVOffsetSide", Misc.Camera.VFPV.OffsetSide);
+    Misc.Camera.VFPV.Pitch = ini.GetDoubleValue("CAM", "VFPVPitch", Misc.Camera.VFPV.Pitch);
 
     // [UPDATE]
     Update.EnableUpdate = ini.GetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);

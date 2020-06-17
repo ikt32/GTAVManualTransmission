@@ -133,7 +133,8 @@ namespace {
 
     std::vector<std::string> camAttachPoints {
         "Player head",
-        "Car"
+        "Car",
+        "Vanilla FPV"
     };
 
     bool getKbEntry(float& val) {
@@ -1520,10 +1521,26 @@ void update_cameraoptionsmenu() {
     g_menu.Title("Camera options");
     g_menu.Subtitle("");
 
+    std::string camInfo;
+
+    switch(g_settings.Misc.Camera.AttachId) {
+        case 0:
+            camInfo = "Camera moves with character while steering.";
+            break;
+        case 1:
+            camInfo = "Camera is static with car. You need to be stopped and not steering, "
+                        "for the camera to get centered properly.";
+            break;
+        case 2:
+            camInfo = "Camera is static with car and uses vanilla FPV camera offsets.";
+            break;
+        default:
+            camInfo = "Invalid selection";
+            break;
+    }
+
     if (g_menu.StringArray("Attach to", camAttachPoints, g_settings.Misc.Camera.AttachId, 
-        { "Player head: Camera moves with character head while steering.",
-          "Car: Camera is smoother while steering, but needs a while to center when entering a new car. "
-          "Make sure the car is stopped and you're not steering, to center the camera position."})) {
+        { camInfo })) {
         FPVCam::CancelCam(); // it'll re-acquire next tick with the correct position.
     }
 
@@ -1548,17 +1565,33 @@ void update_cameraoptionsmenu() {
     g_menu.FloatOptionCb("Field of view", g_settings.Misc.Camera.FOV, 1.0f, 120.0f, 0.5f, getKbEntry, 
         { "In degrees." });
 
-    g_menu.FloatOption("Offset height", g_settings.Misc.Camera.OffsetHeight, -2.0f, 2.0f, 0.01f, 
-        { "Distance in meters." });
+    // Vanilla FPV is somewhere else than the player head.
+    if (g_settings.Misc.Camera.AttachId == 2) {
+        g_menu.FloatOptionCb("Offset height", g_settings.Misc.Camera.VFPV.OffsetHeight, -2.0f, 2.0f, 0.01f, getKbEntry,
+            { "Distance in meters. (Vanilla FPV)" });
 
-    g_menu.FloatOption("Offset forward", g_settings.Misc.Camera.OffsetForward, -2.0f, 2.0f, 0.01f,
-        { "Distance in meters." });
+        g_menu.FloatOptionCb("Offset forward", g_settings.Misc.Camera.VFPV.OffsetForward, -2.0f, 2.0f, 0.01f, getKbEntry,
+            { "Distance in meters. (Vanilla FPV)" });
 
-    g_menu.FloatOption("Offset side", g_settings.Misc.Camera.OffsetSide, -2.0f, 2.0f, 0.01f,
-        { "Distance in meters." });
+        g_menu.FloatOptionCb("Offset side", g_settings.Misc.Camera.VFPV.OffsetSide, -2.0f, 2.0f, 0.01f, getKbEntry,
+            { "Distance in meters. (Vanilla FPV)" });
 
-    g_menu.FloatOption("Pitch", g_settings.Misc.Camera.Pitch, -20.0f, 20.0f, 0.1f,
-        { "In degrees." });
+        g_menu.FloatOption("Pitch", g_settings.Misc.Camera.VFPV.Pitch, -20.0f, 20.0f, 0.1f,
+            { "In degrees. (Vanilla FPV)" });
+    }
+    else {
+        g_menu.FloatOptionCb("Offset height", g_settings.Misc.Camera.OffsetHeight, -2.0f, 2.0f, 0.01f, getKbEntry,
+            { "Distance in meters." });
+
+        g_menu.FloatOptionCb("Offset forward", g_settings.Misc.Camera.OffsetForward, -2.0f, 2.0f, 0.01f, getKbEntry,
+            { "Distance in meters." });
+
+        g_menu.FloatOptionCb("Offset side", g_settings.Misc.Camera.OffsetSide, -2.0f, 2.0f, 0.01f, getKbEntry,
+            { "Distance in meters." });
+
+        g_menu.FloatOption("Pitch", g_settings.Misc.Camera.Pitch, -20.0f, 20.0f, 0.1f,
+            { "In degrees." });
+    }
 
     g_menu.FloatOptionCb("Controller smoothing", g_settings.Misc.Camera.LookTime, 0.0f, 0.5f, 0.000001f, getKbEntry,
         { "How smooth the camera moves.", "Press enter to enter a value manually. Range: 0.0 to 0.5." });

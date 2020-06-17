@@ -6,6 +6,7 @@
 #include "ScriptUtils.h"
 #include "Util/MathExt.h"
 #include "Util/Timer.h"
+#include "Memory/NativeMemory.hpp"
 
 #include <inc/enums.h>
 #include <inc/natives.h>
@@ -192,27 +193,70 @@ void FPVCam::Update() {
         }
     }
 
-    if (g_settings.Misc.Camera.AttachId == 0) {
-        // 0x796E skel_head id
-        CAM::ATTACH_CAM_TO_PED_BONE(cameraHandle, g_playerPed, 0x796E,
-            g_settings.Misc.Camera.OffsetSide + offsetX,
-            g_settings.Misc.Camera.OffsetForward + offsetY,
-            g_settings.Misc.Camera.OffsetHeight, true);
-    }
-    else {
-        // Only update every so often, when not moving.
-        if (lastPosUpdateTimer.Expired()) {
-            if (Math::Near(Length(g_vehData.mVelocity), 0.0f, 0.01f) && 
-                Math::Near(g_vehData.mSteeringAngle, 0.0f, 0.01f)) {
-                updateDriverHeadOffset();
-                lastPosUpdateTimer.Reset();
-            }
-        }
+    // TODO: ISSUES
+    // - Player helmet causes issues - how is it hidden/shown in proper FPV?
+    // Honestly at this point I might as well try and just change the sideways limits.
 
-        CAM::ATTACH_CAM_TO_ENTITY(cameraHandle, g_playerVehicle,
-            driverHeadOffsetStatic.x + g_settings.Misc.Camera.OffsetSide + offsetX,
-            driverHeadOffsetStatic.y + g_settings.Misc.Camera.OffsetForward + offsetY,
-            driverHeadOffsetStatic.z + g_settings.Misc.Camera.OffsetHeight, true);
+    auto attachIdOverride = g_settings.Misc.Camera.AttachId;
+    if (g_vehData.mClass == VehicleClass::Bike ||
+        g_vehData.mClass == VehicleClass::Quad ||
+        g_vehData.mClass == VehicleClass::Bicycle) {
+        attachIdOverride = 0;
+    }
+
+    switch(attachIdOverride) {
+        case 2: {
+            Hash modelHash = ENTITY::GET_ENTITY_MODEL(g_playerVehicle);
+            int index = 0xFFFF;
+            uintptr_t pModelInfo = mem::GetModelInfo(modelHash, &index);
+
+            // offset from seat?
+            // These offsets don't seem very version-sturdy. Oh well, hope R* doesn't knock em over.
+            Vector3 camSeatOffset;
+            camSeatOffset.x = *reinterpret_cast<float*>(pModelInfo + 0x450);
+            camSeatOffset.y = *reinterpret_cast<float*>(pModelInfo + 0x454);
+            camSeatOffset.z = *reinterpret_cast<float*>(pModelInfo + 0x458);
+            float rollbarOffset = 0.0f;
+
+            if (VEHICLE::GET_VEHICLE_MOD(g_playerVehicle, eVehicleMod::VehicleModFrame) != -1)
+                rollbarOffset = *reinterpret_cast<float*>(pModelInfo + 0x480);
+
+            Vector3 seatCoords = ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(
+                g_playerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "seat_dside_f"));
+            Vector3 seatOffset = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(
+                g_playerVehicle, seatCoords.x, seatCoords.y, seatCoords.z);
+            
+            CAM::ATTACH_CAM_TO_ENTITY(cameraHandle, g_playerVehicle,
+                seatOffset.x + camSeatOffset.x + g_settings.Misc.Camera.VFPV.OffsetSide + offsetX,
+                seatOffset.y + camSeatOffset.y + g_settings.Misc.Camera.VFPV.OffsetForward + offsetY,
+                seatOffset.z + camSeatOffset.z + g_settings.Misc.Camera.VFPV.OffsetHeight + rollbarOffset, true);
+            break;
+        }
+        case 1: {
+            // Only update every so often, when not moving.
+            if (lastPosUpdateTimer.Expired()) {
+                if (Math::Near(Length(g_vehData.mVelocity), 0.0f, 0.01f) &&
+                    Math::Near(g_vehData.mSteeringAngle, 0.0f, 0.01f)) {
+                    updateDriverHeadOffset();
+                    lastPosUpdateTimer.Reset();
+                }
+            }
+
+            CAM::ATTACH_CAM_TO_ENTITY(cameraHandle, g_playerVehicle,
+                driverHeadOffsetStatic.x + g_settings.Misc.Camera.OffsetSide + offsetX,
+                driverHeadOffsetStatic.y + g_settings.Misc.Camera.OffsetForward + offsetY,
+                driverHeadOffsetStatic.z + g_settings.Misc.Camera.OffsetHeight, true);
+            break;
+        }
+        default:
+        case 0: {
+            // 0x796E skel_head id
+            CAM::ATTACH_CAM_TO_PED_BONE(cameraHandle, g_playerPed, 0x796E,
+                g_settings.Misc.Camera.OffsetSide + offsetX,
+                g_settings.Misc.Camera.OffsetForward + offsetY,
+                g_settings.Misc.Camera.OffsetHeight, true);
+            break;
+        }
     }
 
     auto rot = ENTITY::GET_ENTITY_ROTATION(g_playerPed, 0);
