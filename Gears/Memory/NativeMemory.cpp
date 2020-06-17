@@ -5,6 +5,8 @@
 #include <Psapi.h>
 #include <sstream>
 
+#include "inc/main.h"
+
 namespace {
     template<typename Out>
     void split(const std::string& s, char delim, Out result) {
@@ -23,6 +25,8 @@ namespace {
     }
 }
 
+extern eGameVersion g_gameVersion;
+
 namespace mem {
 
     uintptr_t(*GetAddressOfEntity)(int entity) = nullptr;
@@ -33,17 +37,35 @@ namespace mem {
                                                             "xxxxxxxx????xxxxxxx");
         if (!addr) logger.Write(ERROR, "Couldn't find GetAddressOfEntity");
         GetAddressOfEntity = reinterpret_cast<uintptr_t(*)(int)>(addr);
-        
-        addr = FindPattern("\x0F\xB7\x05\x00\x00\x00\x00"
-            "\x45\x33\xC9\x4C\x8B\xDA\x66\x85\xC0"
-            "\x0F\x84\x00\x00\x00\x00"
-            "\x44\x0F\xB7\xC0\x33\xD2\x8B\xC1\x41\xF7\xF0\x48"
-            "\x8B\x05\x00\x00\x00\x00"
-            "\x4C\x8B\x14\xD0\xEB\x09\x41\x3B\x0A\x74\x54",
-            "xxx????xxxxxxxxxxx????"
-            "xxxxxxxxxxxxxx????xxxxxxxxxxx");
-        if (!addr) logger.Write(ERROR, "Couldn't find GetModelInfo");
-        GetModelInfo = reinterpret_cast<uintptr_t(*)(unsigned int modelHash, int *index)>(addr);
+
+        if (g_gameVersion <= 56) {
+            addr = FindPattern(
+                "\x0F\xB7\x05\x00\x00\x00\x00"
+                "\x45\x33\xC9\x4C\x8B\xDA\x66\x85\xC0"
+                "\x0F\x84\x00\x00\x00\x00"
+                "\x44\x0F\xB7\xC0\x33\xD2\x8B\xC1\x41\xF7\xF0\x48"
+                "\x8B\x05\x00\x00\x00\x00"
+                "\x4C\x8B\x14\xD0\xEB\x09\x41\x3B\x0A\x74\x54",
+                "xxx????"
+                "xxxxxxxxx"
+                "xx????"
+                "xxxxxxxxxxxx"
+                "xx????"
+                "xxxxxxxxxxx");
+
+            if (!addr) {
+                logger.Write(ERROR, "Couldn't find GetModelInfo");
+            }
+        }
+        else {
+            addr = FindPattern("\xEB\x09\x41\x3B\x0A\x74\x54", "xxxxxxx");
+            if (!addr) {
+                logger.Write(ERROR, "Couldn't find GetModelInfo (v57+)");
+            }
+            addr = addr - 0x2C;
+        }
+
+        GetModelInfo = reinterpret_cast<uintptr_t(*)(unsigned int modelHash, int* index)>(addr);
     }
 
     uintptr_t FindPattern(const char* pattern, const char* mask) {
