@@ -111,6 +111,8 @@ void FPVCam::Update() {
         return;
     }
 
+    CONTROLS::DISABLE_CONTROL_ACTION(0, eControl::ControlVehicleCinCam, true);
+
     // Initialize camera
     if (cameraHandle == -1) {
         initCam();
