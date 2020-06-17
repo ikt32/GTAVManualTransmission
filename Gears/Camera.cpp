@@ -212,6 +212,16 @@ void FPVCam::Update() {
         attachIdOverride = 0;
     }
 
+    bool wearingHelmet = PED::IS_PED_WEARING_HELMET(g_playerPed);
+
+    if (wearingHelmet) {
+        CAM::SET_CAM_NEAR_CLIP(cameraHandle, 0.175f);
+        offsetY = 0.0f;
+    }
+    else {
+        CAM::SET_CAM_NEAR_CLIP(cameraHandle, 0.05f);
+    }
+
     switch(attachIdOverride) {
         case 2: {
             Hash modelHash = ENTITY::GET_ENTITY_MODEL(g_playerVehicle);
