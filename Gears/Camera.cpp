@@ -1,3 +1,5 @@
+// I wish I never considered touching the camera.
+
 #include "Camera.h"
 #include "Compatibility.h"
 #include "ScriptSettings.hpp"
@@ -106,7 +108,11 @@ void FPVCam::Update() {
         PED::IS_PED_SITTING_IN_VEHICLE(g_playerPed, g_playerVehicle);
     bool lookingIntoGlass = false;
 
-    if (!enable || !fpv || !inCar || !hasControl || CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleAim)) {
+    bool aiming = CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleAim);
+    if (g_vehData.mDomain == VehicleDomain::Air)
+        aiming = false;
+
+    if (!enable || !fpv || !inCar || !hasControl || aiming) {
         CancelCam();
         return;
     }
