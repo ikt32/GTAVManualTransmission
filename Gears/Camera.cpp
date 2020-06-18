@@ -38,6 +38,7 @@ namespace {
 
     Timer lastPosUpdateTimer(500);
     Vector3 driverHeadOffsetStatic{};
+    bool headRemoved = false;
 }
 
 namespace FPVCam {
@@ -71,14 +72,11 @@ void FPVCam::HideHead(bool remove) {
     if (Dismemberment::Available()) {
         if (remove) {
             Dismemberment::AddBoneDraw(g_playerPed, 0x796E, -1);
-
-            CAM::SET_CAM_NEAR_CLIP(cameraHandle, 0.05f); // Same as FPV walking gameplay
-            CAM::SET_CAM_FAR_CLIP(cameraHandle, 10000.0f); // Seems 10km everywhere else
+            headRemoved = true;
         }
         else {
             Dismemberment::RemoveBoneDraw(g_playerPed);
-
-            CAM::SET_CAM_NEAR_CLIP(cameraHandle, 0.149f); // Same as FPV driving gameplay
+            headRemoved = false;
         }
     }
 }
@@ -214,13 +212,17 @@ void FPVCam::Update() {
 
     bool wearingHelmet = PED::IS_PED_WEARING_HELMET(g_playerPed);
 
-    if (wearingHelmet) {
+    if (wearingHelmet || !headRemoved) {
+        // FPV driving gameplay is 0.149
+        // Add 2.6cm so the helmet or head model are entirely clipped out
         CAM::SET_CAM_NEAR_CLIP(cameraHandle, 0.175f);
-        offsetY = 0.0f;
     }
     else {
+        // Same as FPV walking gameplay
         CAM::SET_CAM_NEAR_CLIP(cameraHandle, 0.05f);
     }
+    // 10km in city, 15km outside
+    CAM::SET_CAM_FAR_CLIP(cameraHandle, 12500.0f);
 
     switch(attachIdOverride) {
         case 2: {
