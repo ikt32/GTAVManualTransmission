@@ -47,6 +47,7 @@ your wheel and driving style.
   * [Table of Contents](#table-of-contents)
   * [Requirements](#requirements)
   * [Installation and usage](#installation-and-usage)
+    * [Optional requirements](#optional-requirements)
     * [Additional steps for wheel users](#additional-steps-for-wheel-users)
     * [FiveM installation](#fivem-installation)
   * [Updating](#updating)
@@ -77,6 +78,9 @@ your wheel and driving style.
 For the script to interact with dashboard lights:
 [DashHook](https://www.gta5-mods.com/tools/dashhook)
 
+Hide player head in the custom first person camera:
+[Dismemberment](https://www.gta5-mods.com/scripts/dismemberment)
+
 ## Installation and usage
 
 Put `Gears.asi` and the folder `ManualTransmission` in your GTA V folder
@@ -86,6 +90,12 @@ __Make sure the folder is writeable! (not `Read Only`)__
 
 Open the menu using the `mtmenu` cheat or the `\|` hotkey, and start
 customizing things.
+
+### Optional requirements
+
+* **DashHook**: Install as instructed by the mod page.
+* **Dismemberment**: If not already installed, you only need to place
+`DismembermentASI.asi` in your GTA V folder.
 
 ### Additional steps for wheel users
 

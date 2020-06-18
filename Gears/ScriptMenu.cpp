@@ -29,6 +29,8 @@
 #include <string>
 #include <mutex>
 
+#include "Compatibility.h"
+
 extern ReleaseInfo g_releaseInfo;
 extern std::mutex g_releaseInfoMutex;
 
@@ -239,8 +241,8 @@ void update_mainmenu() {
                     g_notifyUpdate = false;
                     saveChanges();
                     }, nullptr, "Update info",
-                    { "Press accept to check GTA5-Mods.com.",
-                        "Press right to ignore current update." })) {
+                    { "Press Select/Enter to check GTA5-Mods.com.",
+                        "Press right to ignore the current update." })) {
                     WAIT(20);
                     CONTROLS::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
                     ShellExecuteA(0, 0, modUrl.c_str(), 0, 0, SW_SHOW);
@@ -1544,10 +1546,22 @@ void update_cameraoptionsmenu() {
         FPVCam::CancelCam(); // it'll re-acquire next tick with the correct position.
     }
 
-    if (g_menu.BoolOption("Hide head", g_settings.Misc.Camera.RemoveHead,
-        { "If DismembermentASI from Jedijosh' dismemberment mod is present,  "
-          "the player head can be hidden. This also turns on better near clipping." })){
-        FPVCam::HideHead(g_settings.Misc.Camera.RemoveHead);
+    if (Dismemberment::Available()) {
+        if (g_menu.BoolOption("Hide head", g_settings.Misc.Camera.RemoveHead,
+            { "Using DismembermentASI by CamxxCore from Jedijosh' dismemberment mod, "
+              "the player head can be hidden. This also turns on better near clipping." })) {
+            FPVCam::HideHead(g_settings.Misc.Camera.RemoveHead);
+        }
+    }
+    else {
+        if (g_menu.Option("Hide head (download needed)", NativeMenu::solidRed,
+            { "Press Select/Enter to open Dismemberment on GTA5-Mods.com.",
+              "DismembermentASI.asi by CamxxCore from Jedijosh' dismemberment mod is "
+              "needed to hide the player head." })) {
+            WAIT(20);
+            CONTROLS::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
+            ShellExecuteA(0, 0, "https://www.gta5-mods.com/scripts/dismemberment", 0, 0, SW_SHOW);
+        }
     }
 
     g_menu.BoolOption("Follow movement", g_settings.Misc.Camera.FollowMovement,
