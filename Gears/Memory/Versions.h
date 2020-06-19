@@ -93,6 +93,8 @@ static std::vector<std::string> GameVersionString = {
 
     "VER_1_0_1868_1_STEAM",     // 56
     "VER_1_0_1868_1_NOSTEAM",   // 57
+
+    "VER_1_0_1868_4_EGS",       // 58
 };
 
 enum G_GameVersion : int {
@@ -185,40 +187,43 @@ enum G_GameVersion : int {
 
     G_VER_1_0_1868_1_STEAM,     // 56
     G_VER_1_0_1868_1_NOSTEAM,   // 57
+
+    G_VER_1_0_1868_4_EGS,       // 58
 };
 
-static std::vector<std::pair<SVersion, int>> ExeVersionMap = {
-    { {   0, 0 },                      -1 },
-    { { 335, 2 },   G_VER_1_0_335_2_STEAM },
-    { { 350, 1 },   G_VER_1_0_350_1_STEAM },  
-    { { 372, 2 },   G_VER_1_0_372_2_STEAM },  
-    { { 393, 2 },   G_VER_1_0_393_2_STEAM },  
-    { { 393, 4 },   G_VER_1_0_393_4_STEAM },  
-    { { 463, 1 },   G_VER_1_0_463_1_STEAM },  
-    { { 505, 2 },   G_VER_1_0_505_2_STEAM },  
-    { { 573, 1 },   G_VER_1_0_573_1_STEAM },  
-    { { 617, 1 },   G_VER_1_0_617_1_STEAM },  
-    { { 678, 1 },   G_VER_1_0_678_1_STEAM },  
-    { { 757, 2 },   G_VER_1_0_757_2_STEAM },  
-    { { 757, 4 },   G_VER_1_0_757_4_STEAM },  
-    { { 791, 2 },   G_VER_1_0_791_2_STEAM },  
-    { { 877, 1 },   G_VER_1_0_877_1_STEAM },  
-    { { 944, 2 },   G_VER_1_0_944_2_STEAM },  
-    { { 1011, 1 },  G_VER_1_0_1011_1_STEAM }, 
-    { { 1032, 1 },  G_VER_1_0_1032_1_STEAM }, 
-    { { 1103, 2 },  G_VER_1_0_1103_2_STEAM }, 
-    { { 1180, 2 },  G_VER_1_0_1180_2_STEAM }, 
-    { { 1290, 1 },  G_VER_1_0_1290_1_STEAM }, 
-    { { 1365, 1 },  G_VER_1_0_1365_1_STEAM }, 
-    { { 1493, 0 },  G_VER_1_0_1493_0_STEAM },
-    { { 1493, 1 },  G_VER_1_0_1493_1_STEAM },
-    { { 1604, 0 },  G_VER_1_0_1604_0_STEAM },
-    { { 1604, 1 },  G_VER_1_0_1604_1_STEAM },
-    //{ { 1734, 0 },  G_VER_1_0_1734_0_STEAM },
-    { { 1737, 0 },  G_VER_1_0_1737_0_STEAM },
-    { { 1737, 6 },  G_VER_1_0_1737_6_STEAM },
-    { { 1868, 0 },  G_VER_1_0_1868_0_STEAM },
-    { { 1868, 1 },  G_VER_1_0_1868_1_STEAM },
+static std::vector<std::pair<SVersion, std::vector<int>>> ExeVersionMap = {
+    { {   0, 0 },   { -1} },
+    { { 335, 2 },   { G_VER_1_0_335_2_STEAM, G_VER_1_0_335_2_NOSTEAM } },
+    { { 350, 1 },   { G_VER_1_0_350_1_STEAM, G_VER_1_0_350_2_NOSTEAM } },
+    { { 372, 2 },   { G_VER_1_0_372_2_STEAM, G_VER_1_0_372_2_NOSTEAM } },
+    { { 393, 2 },   { G_VER_1_0_393_2_STEAM, G_VER_1_0_393_2_NOSTEAM } },
+    { { 393, 4 },   { G_VER_1_0_393_4_STEAM, G_VER_1_0_393_4_NOSTEAM } },
+    { { 463, 1 },   { G_VER_1_0_463_1_STEAM, G_VER_1_0_463_1_NOSTEAM } },
+    { { 505, 2 },   { G_VER_1_0_505_2_STEAM, G_VER_1_0_505_2_NOSTEAM } },
+    { { 573, 1 },   { G_VER_1_0_573_1_STEAM, G_VER_1_0_573_1_NOSTEAM } },
+    { { 617, 1 },   { G_VER_1_0_617_1_STEAM, G_VER_1_0_617_1_NOSTEAM } },
+    { { 678, 1 },   { G_VER_1_0_678_1_STEAM, G_VER_1_0_678_1_NOSTEAM } },
+    { { 757, 2 },   { G_VER_1_0_757_2_STEAM, G_VER_1_0_757_2_NOSTEAM } },
+    { { 757, 4 },   { G_VER_1_0_757_4_STEAM, G_VER_1_0_757_4_NOSTEAM } },
+    { { 791, 2 },   { G_VER_1_0_791_2_STEAM, G_VER_1_0_791_2_NOSTEAM } },
+    { { 877, 1 },   { G_VER_1_0_877_1_STEAM, G_VER_1_0_877_1_NOSTEAM } },
+    { { 944, 2 },   { G_VER_1_0_944_2_STEAM, G_VER_1_0_944_2_NOSTEAM } },
+    { { 1011, 1 },  { G_VER_1_0_1011_1_STEAM, G_VER_1_0_1011_1_NOSTEAM } },
+    { { 1032, 1 },  { G_VER_1_0_1032_1_STEAM, G_VER_1_0_1032_1_NOSTEAM } },
+    { { 1103, 2 },  { G_VER_1_0_1103_2_STEAM, G_VER_1_0_1103_2_NOSTEAM } },
+    { { 1180, 2 },  { G_VER_1_0_1180_2_STEAM, G_VER_1_0_1180_2_NOSTEAM } },
+    { { 1290, 1 },  { G_VER_1_0_1290_1_STEAM, G_VER_1_0_1290_1_NOSTEAM } },
+    { { 1365, 1 },  { G_VER_1_0_1365_1_STEAM, G_VER_1_0_1365_1_NOSTEAM } },
+    { { 1493, 0 },  { G_VER_1_0_1493_0_STEAM, G_VER_1_0_1493_0_NOSTEAM } },
+    { { 1493, 1 },  { G_VER_1_0_1493_1_STEAM, G_VER_1_0_1493_1_NOSTEAM } },
+    { { 1604, 0 },  { G_VER_1_0_1604_0_STEAM, G_VER_1_0_1604_0_NOSTEAM } },
+    { { 1604, 1 },  { G_VER_1_0_1604_1_STEAM, G_VER_1_0_1604_1_NOSTEAM } },
+  //{ { 1734, 0 },  { G_VER_1_0_1734_0_STEAM, G_VER_1_0_1734_0_NOSTEAM } },
+    { { 1737, 0 },  { G_VER_1_0_1737_0_STEAM, G_VER_1_0_1737_0_NOSTEAM } },
+    { { 1737, 6 },  { G_VER_1_0_1737_6_STEAM, G_VER_1_0_1737_6_NOSTEAM } },
+    { { 1868, 0 },  { G_VER_1_0_1868_0_STEAM, G_VER_1_0_1868_0_NOSTEAM } },
+    { { 1868, 1 },  { G_VER_1_0_1868_1_STEAM, G_VER_1_0_1868_1_NOSTEAM } },
+    { { 1868, 4 },  { G_VER_1_0_1868_4_EGS} },
 };
 
 static std::string eGameVersionToString(int version) {

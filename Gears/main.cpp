@@ -16,6 +16,57 @@
 
 namespace fs = std::filesystem;
 
+void resolveVersion() {
+    int shvVersion = getGameVersion();
+
+    logger.Write(INFO, "SHV API Game version: %s (%d)", eGameVersionToString(shvVersion).c_str(), shvVersion);
+    // Also prints the other stuff, annoyingly.
+    SVersion exeVersion = getExeInfo();
+
+    if (shvVersion < G_VER_1_0_877_1_STEAM) {
+        logger.Write(WARN, "Outdated game version! Update your game.");
+    }
+
+    // Version we *explicitly* support
+    std::vector<int> exeVersionsSupp = findNextLowest(ExeVersionMap, exeVersion);
+    if (exeVersionsSupp.empty() || exeVersionsSupp.size() == 1 && exeVersionsSupp[0] == -1) {
+        logger.Write(ERROR, "Failed to find a corresponding game version.");
+        logger.Write(WARN, "    Using SHV API version [%s] (%d)",
+            eGameVersionToString(shvVersion).c_str(), shvVersion);
+        MemoryPatcher::SetPatterns(shvVersion);
+        return;
+    }
+
+    int highestSupportedVersion = *std::max_element(std::begin(exeVersionsSupp), std::end(exeVersionsSupp));
+    if (shvVersion > highestSupportedVersion) {
+        logger.Write(WARN, "Game newer than last supported version");
+        logger.Write(WARN, "    You might experience instabilities or crashes");
+        logger.Write(WARN, "    Using SHV API version [%s] (%d)",
+            eGameVersionToString(shvVersion).c_str(), shvVersion);
+        MemoryPatcher::SetPatterns(shvVersion);
+        return;
+    }
+
+    int lowestSupportedVersion = *std::min_element(std::begin(exeVersionsSupp), std::end(exeVersionsSupp));
+    if (shvVersion < lowestSupportedVersion) {
+        logger.Write(WARN, "SHV API reported lower version than actual EXE version.");
+        logger.Write(WARN, "    EXE version     [%s] (%d)",
+            eGameVersionToString(lowestSupportedVersion).c_str(), lowestSupportedVersion);
+        logger.Write(WARN, "    SHV API version [%s] (%d)",
+            eGameVersionToString(shvVersion).c_str(), shvVersion);
+        logger.Write(WARN, "    Using EXE version [%s] (%d)",
+            eGameVersionToString(lowestSupportedVersion).c_str(), lowestSupportedVersion);
+        MemoryPatcher::SetPatterns(lowestSupportedVersion);
+        // Actually need to change stuff
+        VehicleExtensions::ChangeVersion(lowestSupportedVersion);
+        return;
+    }
+
+    logger.Write(DEBUG, "Using offsets based on SHV API version [%s] (%d)",
+        eGameVersionToString(shvVersion).c_str(), shvVersion);
+    MemoryPatcher::SetPatterns(shvVersion);
+}
+
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
     const std::string modPath = Paths::GetModuleFolder(hInstance) + Constants::ModDir;
     const std::string logFile = modPath + "\\" + Paths::GetModuleNameWithoutExtension(hInstance) + ".log";
@@ -29,38 +80,11 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 
     switch (reason) {
         case DLL_PROCESS_ATTACH: {
-            int scriptingVersion = getGameVersion();
             logger.Clear();
             logger.Write(INFO, "Manual Transmission %s (built %s %s)", Constants::DisplayVersion, __DATE__, __TIME__);
-            logger.Write(INFO, "Game version " + eGameVersionToString(scriptingVersion));
-            if (scriptingVersion < G_VER_1_0_877_1_STEAM) {
-                logger.Write(WARN, "Unsupported game version! Update your game.");
-            }
 
-            SVersion exeVersion = getExeInfo();
-            int actualVersion = findNextLowest(ExeVersionMap, exeVersion);
-            if (scriptingVersion % 2) {
-                scriptingVersion--;
-            }
-            if (actualVersion != scriptingVersion) {
-                logger.Write(WARN, "Version mismatch!");
-                logger.Write(WARN, "    Detected: %s", eGameVersionToString(actualVersion).c_str());
-                logger.Write(WARN, "    Reported: %s", eGameVersionToString(scriptingVersion).c_str());
-                if (actualVersion == -1) {
-                    logger.Write(WARN, "Version detection failed");
-                    logger.Write(WARN, "    Using reported version (%s)", eGameVersionToString(scriptingVersion).c_str());
-                    actualVersion = scriptingVersion;
-                }
-                else {
-                    logger.Write(WARN, "Using detected version (%s)", eGameVersionToString(actualVersion).c_str());
-                }
-                MemoryPatcher::SetPatterns(actualVersion);
-                VehicleExtensions::ChangeVersion(actualVersion);
-            }
-            else {                
-                MemoryPatcher::SetPatterns(scriptingVersion);
-            }
-            
+            resolveVersion();
+
             scriptRegister(hInstance, ScriptMain);
             scriptRegisterAdditionalThread(hInstance, NPCMain);
             
