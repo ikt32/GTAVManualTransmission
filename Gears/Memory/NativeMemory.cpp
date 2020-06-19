@@ -38,7 +38,7 @@ namespace mem {
         if (!addr) logger.Write(ERROR, "Couldn't find GetAddressOfEntity");
         GetAddressOfEntity = reinterpret_cast<uintptr_t(*)(int)>(addr);
 
-        if (g_gameVersion <= 56) {
+        if (g_gameVersion < 58) {
             addr = FindPattern(
                 "\x0F\xB7\x05\x00\x00\x00\x00"
                 "\x45\x33\xC9\x4C\x8B\xDA\x66\x85\xC0"
@@ -60,7 +60,7 @@ namespace mem {
         else {
             addr = FindPattern("\xEB\x09\x41\x3B\x0A\x74\x54", "xxxxxxx");
             if (!addr) {
-                logger.Write(ERROR, "Couldn't find GetModelInfo (v57+)");
+                logger.Write(ERROR, "Couldn't find GetModelInfo (v58+)");
             }
             addr = addr - 0x2C;
         }
