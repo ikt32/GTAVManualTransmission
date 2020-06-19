@@ -432,10 +432,13 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetLongValue("CAM", "MouseCenterTimeout", Misc.Camera.MouseCenterTimeout);
     ini.SetDoubleValue("CAM", "MouseSensitivity", Misc.Camera.MouseSensitivity);
 
-    ini.SetDoubleValue("CAM", "VFPVOffsetHeight", Misc.Camera.VFPV.OffsetHeight);
-    ini.SetDoubleValue("CAM", "VFPVOffsetForward", Misc.Camera.VFPV.OffsetForward);
-    ini.SetDoubleValue("CAM", "VFPVOffsetSide", Misc.Camera.VFPV.OffsetSide);
-    ini.SetDoubleValue("CAM", "VFPVPitch", Misc.Camera.VFPV.Pitch);
+    ini.SetBoolValue("CAM", "BikeDisable", Misc.Camera.Bike.Disable);
+    ini.SetLongValue("CAM", "BikeAttachId", Misc.Camera.Bike.AttachId);
+    ini.SetDoubleValue("CAM", "BikeFOV", Misc.Camera.Bike.FOV);
+    ini.SetDoubleValue("CAM", "BikeOffsetHeight", Misc.Camera.Bike.OffsetHeight);
+    ini.SetDoubleValue("CAM", "BikeOffsetForward", Misc.Camera.Bike.OffsetForward);
+    ini.SetDoubleValue("CAM", "BikeOffsetSide", Misc.Camera.Bike.OffsetSide);
+    ini.SetDoubleValue("CAM", "BikePitch", Misc.Camera.Bike.Pitch);
 
     // [UPDATE]
     ini.SetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);
@@ -778,10 +781,13 @@ void ScriptSettings::parseSettingsGeneral() {
     Misc.Camera.MouseCenterTimeout = ini.GetLongValue("CAM", "MouseCenterTimeout", Misc.Camera.MouseCenterTimeout);
     Misc.Camera.MouseSensitivity = ini.GetDoubleValue("CAM", "MouseSensitivity", Misc.Camera.MouseSensitivity);
 
-    Misc.Camera.VFPV.OffsetHeight = ini.GetDoubleValue("CAM", "VFPVOffsetHeight", Misc.Camera.VFPV.OffsetHeight);
-    Misc.Camera.VFPV.OffsetForward = ini.GetDoubleValue("CAM", "VFPVOffsetForward", Misc.Camera.VFPV.OffsetForward);
-    Misc.Camera.VFPV.OffsetSide = ini.GetDoubleValue("CAM", "VFPVOffsetSide", Misc.Camera.VFPV.OffsetSide);
-    Misc.Camera.VFPV.Pitch = ini.GetDoubleValue("CAM", "VFPVPitch", Misc.Camera.VFPV.Pitch);
+    Misc.Camera.Bike.Disable = ini.GetBoolValue("CAM", "BikeDisable", Misc.Camera.Bike.Disable);
+    Misc.Camera.Bike.AttachId = ini.GetLongValue("CAM", "BikeAttachId", Misc.Camera.Bike.AttachId);
+    Misc.Camera.Bike.FOV = ini.GetDoubleValue("CAM", "BikeFOV", Misc.Camera.Bike.FOV);
+    Misc.Camera.Bike.OffsetHeight = ini.GetDoubleValue("CAM", "BikeOffsetHeight", Misc.Camera.Bike.OffsetHeight);
+    Misc.Camera.Bike.OffsetForward = ini.GetDoubleValue("CAM", "BikeOffsetForward", Misc.Camera.Bike.OffsetForward);
+    Misc.Camera.Bike.OffsetSide = ini.GetDoubleValue("CAM", "BikeOffsetSide", Misc.Camera.Bike.OffsetSide);
+    Misc.Camera.Bike.Pitch = ini.GetDoubleValue("CAM", "BikePitch", Misc.Camera.Bike.Pitch);
 
     // [UPDATE]
     Update.EnableUpdate = ini.GetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);

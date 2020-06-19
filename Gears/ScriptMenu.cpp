@@ -135,7 +135,7 @@ namespace {
 
     std::vector<std::string> camAttachPoints {
         "Player head",
-        "Car",
+        "Vehicle",
         "Vanilla FPV"
     };
 
@@ -1530,11 +1530,11 @@ void update_cameraoptionsmenu() {
             camInfo = "Camera moves with character while steering.";
             break;
         case 1:
-            camInfo = "Camera is static with car. You need to be stopped and not steering, "
+            camInfo = "Camera is static with vehicle. You need to be stopped and not steering, "
                         "for the camera to get centered properly.";
             break;
         case 2:
-            camInfo = "Camera is static with car and uses vanilla FPV camera offsets.";
+            camInfo = "Camera is static with vehicle and uses vanilla FPV camera offsets.";
             break;
         default:
             camInfo = "Invalid selection";
@@ -1545,6 +1545,10 @@ void update_cameraoptionsmenu() {
         { camInfo })) {
         FPVCam::CancelCam(); // it'll re-acquire next tick with the correct position.
     }
+
+    g_menu.MenuOption("Motorcycle camera options", "bikecameraoptionsmenu",
+        { "The FPV camera for 2-wheelers, quads and every between behaves differently,"
+            "so these have their own options." });
 
     if (Dismemberment::Available()) {
         if (g_menu.BoolOption("Hide head", g_settings.Misc.Camera.RemoveHead,
@@ -1579,33 +1583,17 @@ void update_cameraoptionsmenu() {
     g_menu.FloatOptionCb("Field of view", g_settings.Misc.Camera.FOV, 1.0f, 120.0f, 0.5f, getKbEntry, 
         { "In degrees." });
 
-    // Vanilla FPV is somewhere else than the player head.
-    if (g_settings.Misc.Camera.AttachId == 2) {
-        g_menu.FloatOptionCb("Offset height", g_settings.Misc.Camera.VFPV.OffsetHeight, -2.0f, 2.0f, 0.01f, getKbEntry,
-            { "Distance in meters. (Vanilla FPV)" });
+    g_menu.FloatOptionCb("Offset height", g_settings.Misc.Camera.OffsetHeight, -2.0f, 2.0f, 0.01f, getKbEntry,
+        { "Distance in meters." });
 
-        g_menu.FloatOptionCb("Offset forward", g_settings.Misc.Camera.VFPV.OffsetForward, -2.0f, 2.0f, 0.01f, getKbEntry,
-            { "Distance in meters. (Vanilla FPV)" });
+    g_menu.FloatOptionCb("Offset forward", g_settings.Misc.Camera.OffsetForward, -2.0f, 2.0f, 0.01f, getKbEntry,
+        { "Distance in meters." });
 
-        g_menu.FloatOptionCb("Offset side", g_settings.Misc.Camera.VFPV.OffsetSide, -2.0f, 2.0f, 0.01f, getKbEntry,
-            { "Distance in meters. (Vanilla FPV)" });
+    g_menu.FloatOptionCb("Offset side", g_settings.Misc.Camera.OffsetSide, -2.0f, 2.0f, 0.01f, getKbEntry,
+        { "Distance in meters." });
 
-        g_menu.FloatOption("Pitch", g_settings.Misc.Camera.VFPV.Pitch, -20.0f, 20.0f, 0.1f,
-            { "In degrees. (Vanilla FPV)" });
-    }
-    else {
-        g_menu.FloatOptionCb("Offset height", g_settings.Misc.Camera.OffsetHeight, -2.0f, 2.0f, 0.01f, getKbEntry,
-            { "Distance in meters." });
-
-        g_menu.FloatOptionCb("Offset forward", g_settings.Misc.Camera.OffsetForward, -2.0f, 2.0f, 0.01f, getKbEntry,
-            { "Distance in meters." });
-
-        g_menu.FloatOptionCb("Offset side", g_settings.Misc.Camera.OffsetSide, -2.0f, 2.0f, 0.01f, getKbEntry,
-            { "Distance in meters." });
-
-        g_menu.FloatOption("Pitch", g_settings.Misc.Camera.Pitch, -20.0f, 20.0f, 0.1f,
-            { "In degrees." });
-    }
+    g_menu.FloatOption("Pitch", g_settings.Misc.Camera.Pitch, -20.0f, 20.0f, 0.1f,
+        { "In degrees." });
 
     g_menu.FloatOptionCb("Controller smoothing", g_settings.Misc.Camera.LookTime, 0.0f, 0.5f, 0.000001f, getKbEntry,
         { "How smooth the camera moves.", "Press enter to enter a value manually. Range: 0.0 to 0.5." });
@@ -1617,6 +1605,33 @@ void update_cameraoptionsmenu() {
 
     g_menu.IntOption("Mouse center timeout", g_settings.Misc.Camera.MouseCenterTimeout, 0, 2000, 25,
         { "Milliseconds before centering the camera after looking with the mouse." });
+}
+
+void update_bikecameraoptionsmenu() {
+    g_menu.Title("Camera options");
+    g_menu.Subtitle("2-wheelers - Quads");
+
+    g_menu.BoolOption("Disable for 2-ish wheelers", g_settings.Misc.Camera.Bike.Disable,
+        { "Use the the vanilla FPV camera on these vehicles." });
+
+    if (g_menu.StringArray("Attach to", camAttachPoints, g_settings.Misc.Camera.Bike.AttachId)) {
+        FPVCam::CancelCam();
+    }
+
+    g_menu.FloatOptionCb("Field of view", g_settings.Misc.Camera.Bike.FOV, 1.0f, 120.0f, 0.5f, getKbEntry,
+        { "In degrees." });
+
+    g_menu.FloatOptionCb("Offset height", g_settings.Misc.Camera.Bike.OffsetHeight, -2.0f, 2.0f, 0.01f, getKbEntry,
+        { "Distance in meters." });
+
+    g_menu.FloatOptionCb("Offset forward", g_settings.Misc.Camera.Bike.OffsetForward, -2.0f, 2.0f, 0.01f, getKbEntry,
+        { "Distance in meters." });
+
+    g_menu.FloatOptionCb("Offset side", g_settings.Misc.Camera.Bike.OffsetSide, -2.0f, 2.0f, 0.01f, getKbEntry,
+        { "Distance in meters." });
+
+    g_menu.FloatOption("Pitch", g_settings.Misc.Camera.Bike.Pitch, -20.0f, 20.0f, 0.1f,
+        { "In degrees." });
 }
 
 void update_devoptionsmenu() {
@@ -1898,6 +1913,9 @@ void update_menu() {
 
     /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu */
     if (g_menu.CurrentMenu("cameraoptionsmenu")) { update_cameraoptionsmenu(); }
+
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> bike*/
+    if (g_menu.CurrentMenu("bikecameraoptionsmenu")) { update_bikecameraoptionsmenu(); }
 
     /* mainmenu -> devoptionsmenu */
     if (g_menu.CurrentMenu("devoptionsmenu")) { update_devoptionsmenu(); }

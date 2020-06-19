@@ -345,11 +345,11 @@ public:
         struct {
             bool Enable = true;
             int AttachId = 0; // 0: Head, 1: Vehicle, 2: FPV Offset?
+            bool RemoveHead = true;
             bool FollowMovement = true;
             float MovementMultVel = 0.750f;
             float MovementMultRot = 0.15f;
             float MovementCap = 45.0f;
-            bool RemoveHead = true;
             float FOV = 54.0f;
             float OffsetHeight = 0.075f;
             float OffsetForward = 0.050f;
@@ -360,11 +360,14 @@ public:
             int MouseCenterTimeout = 750;
             float MouseSensitivity = 0.5f;
             struct {
+                bool Disable = false;
+                int AttachId = 0; // 0: Head, 1: Vehicle, 2: FPV Offset?
+                float FOV = 54.0f;
                 float OffsetHeight = 0.0f;
                 float OffsetForward = 0.0f;
                 float OffsetSide = 0.0f;
                 float Pitch = 0.0f;
-            } VFPV;
+            } Bike;
         } Camera;
         bool HidePlayerInFPV = false;
     } Misc;

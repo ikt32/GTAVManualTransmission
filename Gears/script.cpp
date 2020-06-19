@@ -2403,6 +2403,7 @@ void main() {
         threadCheckUpdate(10000);
     }
 
+    FPVCam::InitOffsets();
     g_ext.initOffsets();
     if (!MemoryPatcher::Test()) {
         logger.Write(ERROR, "Patchability test failed!");
