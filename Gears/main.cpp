@@ -54,7 +54,7 @@ void resolveVersion() {
             eGameVersionToString(lowestSupportedVersion).c_str(), lowestSupportedVersion);
         logger.Write(WARN, "    SHV API version [%s] (%d)",
             eGameVersionToString(shvVersion).c_str(), shvVersion);
-        logger.Write(WARN, "    Using EXE version [%s] (%d)",
+        logger.Write(WARN, "    Using EXE version, or highest supported version [%s] (%d)",
             eGameVersionToString(lowestSupportedVersion).c_str(), lowestSupportedVersion);
         MemoryPatcher::SetPatterns(lowestSupportedVersion);
         // Actually need to change stuff
