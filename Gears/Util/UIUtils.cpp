@@ -36,8 +36,8 @@ void showDebugInfo3D(Vector3 location, const std::vector<std::string> &textLines
     int i = 0;
 
     float szX = 0.060f;
-    for (auto line : textLines) {
-        showText(0, 0 + height * i, 0.2f, line.c_str(), 0, fontColor, true);
+    for (const auto& line : textLines) {
+        showText(0, 0 + height * static_cast<float>(i), 0.2f, line, 0, fontColor, true);
         float currWidth = getStringWidth(line, 0.2f, 0);
         if (currWidth > szX) {
             szX = currWidth;
@@ -45,8 +45,8 @@ void showDebugInfo3D(Vector3 location, const std::vector<std::string> &textLines
         i++;
     }
 
-    float szY = (height * i) + 0.02f;
-    GRAPHICS::DRAW_RECT(0.027f, (height * i) / 2.0f, szX, szY,
+    float szY = (height * static_cast<float>(i)) + 0.02f;
+    GRAPHICS::DRAW_RECT(0.027f, (height * static_cast<float>(i)) / 2.0f, szX, szY,
         backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A);
     GRAPHICS::CLEAR_DRAW_ORIGIN();
 }
@@ -59,8 +59,8 @@ void showDebugInfo3DColors(Vector3 location, const std::vector<std::pair<std::st
     int i = 0;
 
     float szX = 0.060f;
-    for (auto line : textLines) {
-        showText(0, 0 + height * i, 0.2f, line.first.c_str(), 0, line.second, true);
+    for (const auto& line : textLines) {
+        showText(0, 0 + height * static_cast<float>(i), 0.2f, line.first, 0, line.second, true);
         float currWidth = getStringWidth(line.first, 0.2f, 0);
         if (currWidth > szX) {
             szX = currWidth;
@@ -68,8 +68,8 @@ void showDebugInfo3DColors(Vector3 location, const std::vector<std::pair<std::st
         i++;
     }
 
-    float szY = (height * i) + 0.02f;
-    GRAPHICS::DRAW_RECT(0.027f, (height * i) / 2.0f, szX, szY,
+    float szY = (height * static_cast<float>(i)) + 0.02f;
+    GRAPHICS::DRAW_RECT(0.027f, (height * static_cast<float>(i)) / 2.0f, szX, szY,
         backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A);
     GRAPHICS::CLEAR_DRAW_ORIGIN();
 }
@@ -91,10 +91,10 @@ void showNotification(const std::string &message, int *prevNotification) {
 void showSubtitle(const std::string &message, int duration) {
     UI::BEGIN_TEXT_COMMAND_PRINT("CELL_EMAIL_BCON");
 
-    const int maxStringLength = 99;
+    const size_t maxStringLength = 99;
 
-    for (int i = 0; i < message.size(); i += maxStringLength) {
-        int npos = std::min(maxStringLength, static_cast<int>(message.size()) - i);
+    for (size_t i = 0; i < message.size(); i += maxStringLength) {
+        size_t npos = std::min(maxStringLength, static_cast<int>(message.size()) - i);
         UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(message.substr(i, npos).c_str());
     }
 
