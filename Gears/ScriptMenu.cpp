@@ -1381,6 +1381,13 @@ void update_driveassistmenu() {
 
     g_menu.MenuOption("ESC settings", "espsettingsmenu", 
         { "Change the behaviour and tolerances of the stability control system." });
+
+    g_menu.BoolOption("Enable LSD", g_settings.DriveAssists.LSD.Enable,
+        { "Simulate a viscous limited slip differential.",
+          "Feature by any333." });
+
+    g_menu.FloatOption("LSD viscosity", g_settings.DriveAssists.LSD.Viscosity, 0.0f, 100.0f, 0.5f,
+        { "How much the slower wheel tries to match the faster wheel." });
 }
 
 void update_espsettingsmenu() {
