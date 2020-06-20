@@ -1545,20 +1545,22 @@ void handleBrakePatch() {
         }
     }
 
-    std::string fddcol;
-    if (fdd >  0.1f) { fddcol = "~r~"; }
-    if (fdd < -0.1f) { fddcol = "~b~"; }
+    if (g_settings.Debug.DisplayInfo) {
+        std::string fddcol;
+        if (fdd > 0.1f) { fddcol = "~r~"; }
+        if (fdd < -0.1f) { fddcol = "~b~"; }
 
-    std::string rddcol;
-    if (rdd >  0.1f) { rddcol = "~r~"; }
-    if (rdd < -0.1f) { rddcol = "~b~"; }
-    showText(0.7f, 0.0f, 0.5f, fmt::format("LF LSD: {:.2f}", lsdBrakeLF));
-    showText(0.8f, 0.0f, 0.5f, fmt::format("RF LSD: {:.2f}", lsdBrakeRF));
-    showText(0.9f, 0.0f, 0.5f, fmt::format("{}L-R: {:.2f}", fddcol, fdd));
-    showText(0.7f, 0.05f, 0.5f, fmt::format("LR LSD: {:.2f}", lsdBrakeLR));
-    showText(0.8f, 0.05f, 0.5f, fmt::format("RR LSD: {:.2f}", lsdBrakeRR));
-    showText(0.9f, 0.05f, 0.5f, fmt::format("{}L-R: {:.2f}", rddcol, rdd));
-    showText(0.7f, 0.10f, 0.5f, fmt::format("{}LSD: {}", useLSD ? "~g~" : "~r~", useLSD));
+        std::string rddcol;
+        if (rdd > 0.1f) { rddcol = "~r~"; }
+        if (rdd < -0.1f) { rddcol = "~b~"; }
+        showText(0.60f, 0.000f, 0.25f, fmt::format("LF LSD: {:.2f}", lsdBrakeLF));
+        showText(0.65f, 0.000f, 0.25f, fmt::format("RF LSD: {:.2f}", lsdBrakeRF));
+        showText(0.70f, 0.000f, 0.25f, fmt::format("{}L-R: {:.2f}", fddcol, fdd));
+        showText(0.60f, 0.025f, 0.25f, fmt::format("LR LSD: {:.2f}", lsdBrakeLR));
+        showText(0.65f, 0.025f, 0.25f, fmt::format("RR LSD: {:.2f}", lsdBrakeRR));
+        showText(0.70f, 0.025f, 0.25f, fmt::format("{}L-R: {:.2f}", rddcol, rdd));
+        showText(0.60f, 0.050f, 0.25f, fmt::format("{}LSD: {}", useLSD ? "~g~" : "~r~", useLSD ? "Active" : "Idle/Off"));
+    }
 
     bool espUndersteer = false;
     // average front wheels slip angle
@@ -1677,16 +1679,12 @@ void handleBrakePatch() {
         }
     }
 
-    float handlingPower = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fInitialDriveForce);
     float dbalF = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fDriveBiasFront);
     float dbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fDriveBiasRear);
 
     float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
     float bbalF = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasFront);
     float bbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasRear);
-
-    showText(0.2f, 0.000f, 0.5f, fmt::format("drive F{:2f}/R{:2f}", dbalF, dbalR));
-    showText(0.2f, 0.025f, 0.5f, fmt::format("brake F{:2f}/R{:2f}", bbalF, bbalR));
 
     float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
 

@@ -1383,14 +1383,12 @@ void update_driveassistmenu() {
         { "Change the behaviour and tolerances of the stability control system." });
 
     g_menu.BoolOption("Enable LSD", g_settings.DriveAssists.LSD.Enable,
-        { "Simulate a viscous limited slip differential. "
-            "Credits to any333.",
-          "LSD simulation will fight with ESC and TCS, "
-            "so it's better to turn those off when using this."});
+        { "Simulate a viscous limited slip differential. Credits to any333.",
+          "LSD simulation is overridden when ABS, ESC and TCS kick in."});
 
     g_menu.FloatOption("LSD viscosity", g_settings.DriveAssists.LSD.Viscosity, 0.0f, 100.0f, 1.0f,
         { "How much the slower wheel tries to match the faster wheel.",
-          "A very high value might speed up the car too much.",
+          "A very high value might speed up the car too much, because this LSD adds power to the slower wheel. "
           "About 10 is decent and doesn't affect acceleration."});
 }
 
