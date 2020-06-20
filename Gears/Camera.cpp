@@ -162,28 +162,27 @@ void FPVCam::Update() {
     float directionLookAngle = 0.0f;
     if (g_settings.Misc.Camera.FollowMovement) {
         Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
-        if (speedVector.y > 0.0f) {
-            Vector3 target = Normalize(speedVector);
-            float travelDir = atan2(target.y, target.x) - static_cast<float>(M_PI) / 2.0f;
-            if (travelDir > static_cast<float>(M_PI) / 2.0f) {
-                travelDir -= static_cast<float>(M_PI);
-            }
-            if (travelDir < -static_cast<float>(M_PI) / 2.0f) {
-                travelDir += static_cast<float>(M_PI);
-            }
 
-            Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
+        Vector3 target = Normalize(speedVector);
+        float travelDir = atan2(target.y, target.x) - static_cast<float>(M_PI) / 2.0f;
+        if (travelDir > static_cast<float>(M_PI) / 2.0f) {
+            travelDir -= static_cast<float>(M_PI);
+        }
+        if (travelDir < -static_cast<float>(M_PI) / 2.0f) {
+            travelDir += static_cast<float>(M_PI);
+        }
 
-            float velComponent = travelDir * g_settings.Misc.Camera.MovementMultVel;
-            float rotComponent = rotationVelocity.z * g_settings.Misc.Camera.MovementMultRot;
-            float totalMove = std::clamp(velComponent + rotComponent,
-                -deg2rad(g_settings.Misc.Camera.MovementCap),
-                 deg2rad(g_settings.Misc.Camera.MovementCap));
-            directionLookAngle = -rad2deg(totalMove);
+        Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
 
-            if (Length(speedVector) < 3.0f) {
-                directionLookAngle = map(speedVector.y, 0.0f, 3.0f, 0.0f, directionLookAngle);
-            }
+        float velComponent = travelDir * g_settings.Misc.Camera.MovementMultVel;
+        float rotComponent = rotationVelocity.z * g_settings.Misc.Camera.MovementMultRot;
+        float totalMove = std::clamp(velComponent + rotComponent,
+            -deg2rad(g_settings.Misc.Camera.MovementCap),
+             deg2rad(g_settings.Misc.Camera.MovementCap));
+        directionLookAngle = -rad2deg(totalMove);
+
+        if (speedVector.y < 3.0f) {
+            directionLookAngle = map(speedVector.y, 0.0f, 3.0f, 0.0f, directionLookAngle);
         }
     }
 
