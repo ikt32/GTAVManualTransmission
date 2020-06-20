@@ -1386,7 +1386,7 @@ void update_driveassistmenu() {
         { "Simulate a viscous limited slip differential.",
           "Feature by any333." });
 
-    g_menu.FloatOption("LSD viscosity", g_settings.DriveAssists.LSD.Viscosity, 0.0f, 100.0f, 0.5f,
+    g_menu.FloatOption("LSD viscosity", g_settings.DriveAssists.LSD.Viscosity, 0.0f, 100.0f, 1.0f,
         { "How much the slower wheel tries to match the faster wheel." });
 }
 
