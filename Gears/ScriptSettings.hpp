@@ -123,6 +123,11 @@ public:
             float UnderMaxComp = 1.0f; // brake mult
 
         } ESP;
+
+        struct {
+            bool Enable = false;
+            float Viscosity = 10.0f;
+        } LSD;
     } DriveAssists;
 
     // [SHIFT_OPTIONS]
