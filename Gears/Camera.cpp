@@ -443,19 +443,14 @@ void updateWheelLook(bool& lookingIntoGlass) {
         if (g_vehData.mIsRhd && g_peripherals.LookBackRShoulder) {
             lookingIntoGlass = true;
         }
-
         if (!g_vehData.mIsRhd && !g_peripherals.LookBackRShoulder) {
             lookingIntoGlass = true;
         }
 
         float maxAngle = lookingIntoGlass ? 135.0f : 179.0f;
-
-
         float lookBackAngle = g_peripherals.LookBackRShoulder ? -1.0f * maxAngle : maxAngle;
         camRot.z = lerp(camRot.z, lookBackAngle,
             1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
-
-
     }
     else {
         float angle;
