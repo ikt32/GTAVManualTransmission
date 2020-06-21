@@ -11,15 +11,15 @@ generally compatible, aside from the following:
 
 New features!
 
-* Custom first person driving camera with physics effects! Grab jedijosh920's
-[Dismemberment](https://www.gta5-mods.com/scripts/dismemberment) for a clean,
-no-clipping first person camera.
+* Custom first person driving camera with physics effects! Install the
+`DismembermentASI.asi` file by CamxxCore for a clean, first person camera.
 * Synchronized steering animations with wheel rotation
 * Support mouse steering with Enhanced Custom Steering
 * New alternate automatic transmission mode, by
 [Nyconing](https://github.com/Nyconing)!
 * Add UDP telemetry support for programs like SimHub.
 DiRT 4 format thanks to [guilhermelimak](https://github.com/guilhermelimak).
+* Add a simulated limited slip differential, thanks to [any333](https://www.gta5-mods.com/users/any333).
 
 Improvements and bug fixes:
 
