@@ -10,6 +10,7 @@
 #include "Util/Timer.h"
 #include "Memory/NativeMemory.hpp"
 #include "Memory/Versions.h"
+#include "ManualTransmission.h"
 
 #include <inc/enums.h>
 #include <inc/natives.h>
@@ -21,6 +22,7 @@ extern ScriptSettings g_settings;
 extern CarControls g_controls;
 extern VehicleData g_vehData;
 extern eGameVersion g_gameVersion;
+extern VehiclePeripherals g_peripherals;
 
 namespace {
     Cam cameraHandle = -1;
@@ -52,6 +54,7 @@ namespace FPVCam {
 
 void updateControllerLook(bool& lookingIntoGlass);
 void updateMouseLook(bool& lookingIntoGlass);
+void updateWheelLook(bool& lookingIntoGlass);
 
 void FPVCam::InitOffsets() {
     if (g_gameVersion < G_VER_1_0_1290_1_STEAM) {
@@ -151,8 +154,11 @@ void FPVCam::Update() {
         updateDriverHeadOffset();
     }
 
+    if (MT_LookingLeft() || MT_LookingRight()) {
+        updateWheelLook(lookingIntoGlass);
+    }
     // Mouse look
-    if (CONTROLS::_IS_INPUT_DISABLED(2) == TRUE) {
+    else if (CONTROLS::_IS_INPUT_DISABLED(2) == TRUE) {
         updateMouseLook(lookingIntoGlass);
     }
     // Controller look
@@ -428,6 +434,38 @@ void updateMouseLook(bool& lookingIntoGlass) {
     }
     else {
         camRot.z = lerp(camRot.z, 179.0f * -lookLeftRightAcc,
+            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
+    }
+}
+
+void updateWheelLook(bool& lookingIntoGlass) {
+    if (MT_LookingLeft() && MT_LookingRight()) {
+        if (g_vehData.mIsRhd && g_peripherals.LookBackRShoulder) {
+            lookingIntoGlass = true;
+        }
+
+        if (!g_vehData.mIsRhd && !g_peripherals.LookBackRShoulder) {
+            lookingIntoGlass = true;
+        }
+
+        float maxAngle = lookingIntoGlass ? 135.0f : 179.0f;
+
+
+        float lookBackAngle = g_peripherals.LookBackRShoulder ? -1.0f * maxAngle : maxAngle;
+        camRot.z = lerp(camRot.z, lookBackAngle,
+            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
+
+
+    }
+    else {
+        float angle;
+        if (MT_LookingLeft()) {
+            angle = 90.0f;
+        }
+        else {
+            angle = -90.0f;
+        }
+        camRot.z = lerp(camRot.z, angle,
             1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
     }
 }
