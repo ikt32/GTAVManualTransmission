@@ -75,6 +75,7 @@ void FPVCam::CancelCam() {
         if (g_settings.Misc.Camera.RemoveHead) {
             HideHead(false);
         }
+        UI::UNLOCK_MINIMAP_ANGLE();
     }
 }
 
@@ -323,6 +324,7 @@ void FPVCam::Update() {
         0);
 
     CAM::SET_CAM_FOV(cameraHandle, fov);
+    UI::LOCK_MINIMAP_ANGLE(static_cast<int>(rot.z + camRot.z) % 360);
 }
 
 void updateControllerLook(bool& lookingIntoGlass) {
