@@ -789,8 +789,12 @@ bool isClutchPressed() {
 
 void shiftTo(int gear, bool autoClutch) {
     if (autoClutch) {
-        if (g_gearStates.Shifting)
+        if (g_gearStates.Shifting) {
+            g_gearStates.LockGear = g_gearStates.NextGear;
+            g_gearStates.NextGear = gear;
+            g_gearStates.ShiftDirection = gear > g_gearStates.LockGear ? ShiftDirection::Up : ShiftDirection::Down;
             return;
+        }
         g_gearStates.NextGear = gear;
         g_gearStates.Shifting = true;
         g_gearStates.ClutchVal = 0.0f;
