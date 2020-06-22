@@ -5,6 +5,7 @@
 * Replace exceptions-using error handling, as workaround for an
 [issue with ScriptHookVDotNet](https://github.com/crosire/scripthookvdotnet/issues/936)
 * Update default configuration files to auto-generated ones
+* Allow faster sequential shifting
 
 ## 4.8.0
 
