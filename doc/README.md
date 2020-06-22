@@ -74,7 +74,7 @@ your wheel and driving style.
 ### Optional requirements (Downloads)
 
 * [DashHook](https://www.gta5-mods.com/tools/dashhook)
-* [DismembermentASI](https://www.gta5-mods.com/scripts/dismemberment)
+* [CamxxCore's DismembermentASI](https://www.gta5-mods.com/scripts/dismemberment)
 
 ## Installation and usage
 
