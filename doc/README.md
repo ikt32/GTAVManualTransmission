@@ -2,7 +2,7 @@
 
 # Manual Transmission and Steering Wheel Support for GTA V
 
-Version 4.8.0
+Version 4.8.1
 
 ![Gameplay](Gameplay.jpg)
 
@@ -125,6 +125,7 @@ check the options. Otherwise it should be fine to keep your old settings.
 [Autosport Racing System by Eddlm](https://www.gta5-mods.com/scripts/autosport-racing-system): Complete custom racing system with advanced AI.
 * [Turbo Fix](https://www.gta5-mods.com/scripts/turbo-fix): Fixes spool rates of the turbo upgrade.
 * [Dial Accuracy Fix](https://www.gta5-mods.com/scripts/dial-accuracy-fix): Remap dashboard dials to match your actual speed.
+* [ACSPatch]: Keep wheels turned when exiting cars
 
 Any speedometer supporting RPM/Gear reading from memory:
 
@@ -132,7 +133,7 @@ Any speedometer supporting RPM/Gear reading from memory:
 * [LeFix Speedometer](https://www.gta5-mods.com/scripts/speedometer-improvedalexbladeversion)
 * [NFSU Speedometer](https://www.gta5-mods.com/scripts/need-for-speed-underground-speedometer)
 
-Mods that counter the power loss when sliding sideways:
+Mods that counter the power loss when sliding sideways (Also partially mitigated by LSD):
 
 * [InversePower](https://www.gta5-mods.com/scripts/inversepower)
 * [Drift Assist](https://www.gta5-mods.com/scripts/drift-assist)
@@ -287,6 +288,7 @@ A massive *Thank You* to everyone who contributed!
 * [CamxxCore](https://github.com/CamxxCore)
 * [guilhermelimak](https://github.com/guilhermelimak)
 * [Rbn3D](https://github.com/Rbn3D)
+* [LeeC2202](https://gtaforums.com/profile/1170715-leec22/)
 * All others who helped :)
 
 ## Source code
