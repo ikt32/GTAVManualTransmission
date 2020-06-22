@@ -53,12 +53,13 @@ public:
         if (control == -1)
             return "None";
 
-        try {
-            return NativeGamepadInputs.at(static_cast<eControl>(control));
-        }
-        catch (std::out_of_range&) {
+        auto it = NativeGamepadInputs.find(static_cast<eControl>(control));
+
+        if (it == NativeGamepadInputs.end()) {
             return "Unknown input type";
         }
+
+        return it->second;
     }
 
 private:
