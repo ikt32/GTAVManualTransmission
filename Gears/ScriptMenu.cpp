@@ -157,11 +157,10 @@ namespace {
             return false;
         }
 
-        float parsedValue;
-        try {
-            parsedValue = std::stof(floatStr, nullptr);
-        }
-        catch (std::invalid_argument&) {
+        char* pEnd;
+        float parsedValue = strtof(floatStr.c_str(), &pEnd);
+
+        if (parsedValue == 0.0f && *pEnd != 0) {
             UI::Notify(INFO, "Failed to parse entry.");
             return false;
         }
