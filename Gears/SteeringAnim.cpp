@@ -40,6 +40,19 @@ namespace {
     float setAngle = 0.0f;
 }
 
+namespace YAML {
+    template<>
+    struct convert<SteeringAnimation::Animation> {
+        static bool decode(const Node& node, SteeringAnimation::Animation& anim) {
+            anim.Dictionary = node["Dictionary"].as<std::string>();
+            anim.Name = node["AnimName"].as<std::string>();
+            anim.Rotation = node["Rotation"].as<float>();
+            anim.Layouts = node["Layouts"].as<std::vector<std::string>>();
+            return true;
+        }
+    };
+}
+
 void playAnimTime(const SteeringAnimation::Animation& anim, float time);
 void cancelAnim(const SteeringAnimation::Animation& anim);
 float mapAnim(float wheelDegrees, float maxAnimAngle);
@@ -103,14 +116,7 @@ void SteeringAnimation::Load() {
         auto animNodes = animRoot["Animations"];
 
         steeringAnimations.clear();
-        for (const auto& animNode : animNodes) {
-            Animation anim{};
-            anim.Dictionary = animNode["Dictionary"].as<std::string>();
-            anim.Name = animNode["AnimName"].as<std::string>();
-            anim.Rotation = animNode["Rotation"].as<float>();
-            anim.Layouts = animNode["Layouts"].as<std::vector<std::string>>();
-            steeringAnimations.push_back(anim);
-        }
+        steeringAnimations = animRoot["Animations"].as<std::vector<Animation>>();
         logger.Write(DEBUG, fmt::format("Animation: Loaded {} animations", steeringAnimations.size()));
     }
     catch (const YAML::ParserException& ex) {
