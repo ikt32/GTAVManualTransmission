@@ -823,8 +823,16 @@ void ScriptSettings::parseSettingsGeneral() {
         std::string toleranceKey = fmt::format("Timer{}Tolerance", it);
 
         std::string unit = ini.GetValue("DEBUG", unitKey.c_str(), "");
-        if (unit == "") {
-            logger.Write(INFO, "[Settings] Timers: Stopped after %d timers", it);
+        if (unit.empty()) {
+            if (it == 0) {
+                logger.Write(INFO, "[Settings] Timers: No timers registered");
+            }
+            else if (it == 1) {
+                logger.Write(INFO, "[Settings] Timers: Registered 1 timer");
+            }
+            else {
+                logger.Write(INFO, "[Settings] Timers: Registered %d timers", it);
+            }
             break;
         }
 

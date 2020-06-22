@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.8.1
+
+* Replace exceptions-using error handling, as workaround for an
+[issue with ScriptHookVDotNet](https://github.com/crosire/scripthookvdotnet/issues/936)
+* Update default configuration files to auto-generated ones
+
 ## 4.8.0
 
 New features and lots of small fixes and improvements! The settings files are

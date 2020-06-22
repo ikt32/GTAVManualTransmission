@@ -114,7 +114,7 @@ public:
             float OverMax = 15.0f; // deg
 
             float OverMinComp = 0.0f; // brake mult
-            float OverMaxComp = 2.0f; // brake mult
+            float OverMaxComp = 1.0f; // brake mult
 
             float UnderMin = 5.0f; // deg
             float UnderMax = 10.0f; // deg
@@ -141,7 +141,7 @@ public:
     // [AUTO_PARAMS]
     struct {
         // Lower = upshift later
-        float UpshiftLoad = 0.05f;
+        float UpshiftLoad = 0.12f;
         // Higher = downshift later
         float DownshiftLoad = 0.60f;
         // Don't upshift until next gears' RPM is over this value.
@@ -166,10 +166,10 @@ public:
         float SteeringMult = 1.0f;
         float SteeringReduction = 0.9f;
         float Gamma = 1.0f;
-        bool CustomRotation = false;
-        float CustomRotationDegrees = 900.0f;
+        bool CustomRotation = true;
+        float CustomRotationDegrees = 720.0f;
         float CenterTime = 0.000100f;
-        float SteerTime = 0.000010f;
+        float SteerTime = 0.001000f;
         bool MouseSteering = true;
         float MouseSensitivity = 0.5f;
     } CustomSteering;
@@ -326,8 +326,8 @@ public:
 
         bool ToggleEngine = false;
 
-        bool BlockCarControls = false;
-        bool IgnoreShiftsUI = false;
+        bool BlockCarControls = true;
+        bool IgnoreShiftsUI = true;
         bool BlockHShift = true;
 
         //long ShiftUpBlocks = -1;
@@ -355,23 +355,23 @@ public:
             float MovementMultVel = 0.750f;
             float MovementMultRot = 0.15f;
             float MovementCap = 45.0f;
-            float FOV = 54.0f;
-            float OffsetHeight = 0.075f;
-            float OffsetForward = 0.050f;
+            float FOV = 55.0f;
+            float OffsetHeight = 0.04f;
+            float OffsetForward = 0.05f;
             float OffsetSide = 0.0f;
             float Pitch = 0.0f;
             float LookTime = 0.000010f;
             float MouseLookTime = 0.000001f;
             int MouseCenterTimeout = 750;
-            float MouseSensitivity = 0.5f;
+            float MouseSensitivity = 0.3f;
             struct {
                 bool Disable = false;
                 int AttachId = 0; // 0: Head, 1: Vehicle, 2: FPV Offset?
-                float FOV = 54.0f;
-                float OffsetHeight = 0.0f;
-                float OffsetForward = 0.0f;
+                float FOV = 55.0f;
+                float OffsetHeight = -0.05f;
+                float OffsetForward = -0.08f;
                 float OffsetSide = 0.0f;
-                float Pitch = 0.0f;
+                float Pitch = -11.0f;
             } Bike;
         } Camera;
         bool HidePlayerInFPV = false;
@@ -432,17 +432,17 @@ public:
         struct {
             bool Enable = true;
             bool Scale = true;
-            int AntiDeadForce = 0;
-            float SATAmpMult = 1.0f;
+            int AntiDeadForce = 1600;
+            float SATAmpMult = 1.25f;
             int SATMax = 10000;
-            float SATFactor = 0.66f;
-            int DamperMax = 50;
-            int DamperMin = 10;
-            float DamperMinSpeed = 1.2f; // TargetSpeed in m/s
-            float DetailMult = 2.5f;
-            int DetailLim = 20000;
-            int DetailMAW = 1;
-            float CollisionMult = 1.0f;
+            float SATFactor = 0.75f;
+            int DamperMax = 100;
+            int DamperMin = 40;
+            float DamperMinSpeed = 6.4f; // TargetSpeed in m/s
+            float DetailMult = 4.0f;
+            int DetailLim = 5000;
+            int DetailMAW = 3;
+            float CollisionMult = 2.5f;
             float Gamma = 0.8f;
             float MaxSpeed = 80.0f;
         } FFB;
