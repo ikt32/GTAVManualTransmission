@@ -221,7 +221,7 @@ void updateActiveSteeringAnim(Vehicle vehicle) {
             break;
     }
     if (animIdx == anims.size() && layoutHash != 0) {
-        std::string msg = fmt::format("Animations: No valid animation found for layout hash 0x{:08X}", layoutHash);
+        std::string msg = fmt::format("Animation: No valid animation found for layout hash 0x{:08X}", layoutHash);
         logger.Write(WARN, msg);
         UI::Notify(DEBUG, msg);
     }

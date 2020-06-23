@@ -19,5 +19,6 @@ namespace SteeringAnimation {
 
     void Update();
     void SetFile(const std::string& cs);
+    bool FileProblem();
 }
 

@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <filesystem>
 
+#include "Util/Files.h"
+
 extern Vehicle g_playerVehicle;
 extern Ped g_playerPed;
 extern ScriptSettings g_settings;
@@ -38,6 +40,7 @@ namespace {
     SteeringAnimation::Animation lastAnimation;
     size_t steeringAnimIdx = 0;
     float setAngle = 0.0f;
+    bool fileProblem = false;
 }
 
 namespace YAML {
@@ -59,6 +62,10 @@ float mapAnim(float wheelDegrees, float maxAnimAngle);
 
 void SteeringAnimation::SetFile(const std::string& cs) {
     animFile = cs;
+}
+
+bool SteeringAnimation::FileProblem() {
+    return fileProblem;
 }
 
 const std::vector<SteeringAnimation::Animation>& SteeringAnimation::GetAnimations() {
@@ -110,6 +117,12 @@ void SteeringAnimation::Update() {
 }
 
 void SteeringAnimation::Load() {
+    if (!FileExists(animFile)) {
+        logger.Write(ERROR, fmt::format("Animation: File \"{}\" not found, skipping animations", animFile));
+        fileProblem = true;
+        return;
+    }
+
     try {
         cancelAnim(lastAnimation);
         YAML::Node animRoot = YAML::LoadFile(animFile);
@@ -118,6 +131,7 @@ void SteeringAnimation::Load() {
         steeringAnimations.clear();
         steeringAnimations = animRoot["Animations"].as<std::vector<Animation>>();
         logger.Write(DEBUG, fmt::format("Animation: Loaded {} animations", steeringAnimations.size()));
+        fileProblem = false;
     }
     catch (const YAML::ParserException& ex) {
         logger.Write(ERROR, fmt::format("Encountered a YAML exception (parse)"));

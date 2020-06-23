@@ -1498,11 +1498,17 @@ void update_miscoptionsmenu() {
     g_menu.Title("Misc options");
     g_menu.Subtitle("");
 
-    g_menu.BoolOption("Sync steering animation", g_settings.Misc.SyncAnimations,
-        { "Synchronize animations with wheel rotation using third-person animations.",
-          "Only active for synced steering wheel rotation or custom controller wheel rotation.",
-          "FPV camera angle is limited, consider enabling the custom FPV camera.",
-          "Check animations.yml for more details!" });
+    if (SteeringAnimation::FileProblem()) {
+        g_menu.Option("Animation file error", NativeMenu::solidRed,
+            { "An error occurred reading the animation file. Check Gears.log for more details." });
+    }
+    else {
+        g_menu.BoolOption("Sync steering animation", g_settings.Misc.SyncAnimations,
+            { "Synchronize animations with wheel rotation using third-person animations.",
+              "Only active for synced steering wheel rotation or custom controller wheel rotation.",
+              "FPV camera angle is limited, consider enabling the custom FPV camera.",
+              "Check animations.yml for more details!" });
+    }
 
     g_menu.BoolOption("Enable custom FPV camera", g_settings.Misc.Camera.Enable,
         { "Camera mounted to the player head." });
@@ -1689,7 +1695,11 @@ void update_debugmenu() {
     g_menu.BoolOption("Show NPC info", g_settings.Debug.DisplayNPCInfo,
         { "Show vehicle info of NPC vehicles near you." });
 
-    {
+    if (SteeringAnimation::FileProblem()) {
+        g_menu.Option("Animation file error", NativeMenu::solidRed, 
+            { "An error occurred reading the animation file. Check Gears.log for more details." });
+    }
+    else {
         std::vector <std::string> extras;
 
         extras.emplace_back("Available animation dictionaries:");
