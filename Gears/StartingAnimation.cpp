@@ -5,12 +5,9 @@
 #include "inc/main.h"
 #include "inc/natives.h"
 #include "Memory/VehicleExtensions.hpp"
-#include "Util/Logger.hpp"
 #include "Util/Timer.h"
 
 #include <fmt/format.h>
-
-#include "Util/UIUtils.h"
 
 extern Vehicle g_playerVehicle;
 extern Ped g_playerPed;
@@ -26,7 +23,7 @@ void StartingAnimation::Update() {
 
         // We're starting the engine, so kick off the animation.
         if (engineState == 2 && lastEngineState != engineState) {
-            showText(0.5f, 0.5f, 0.5f, "Starting");
+            //showText(0.5f, 0.5f, 0.5f, "Starting");
 
             auto steeringAnimIdx = SteeringAnimation::GetAnimationIndex();
             auto steeringAnimations = SteeringAnimation::GetAnimations();
@@ -53,7 +50,7 @@ void StartingAnimation::Update() {
                 currentAnim.Name = "start_engine";
                 constexpr int flag = 32;
                 AI::TASK_PLAY_ANIM(g_playerPed, currentAnim.Dictionary.c_str(), "start_engine", -8.0f, 8.0f, -1, flag, 0.2f, 0, 0, 0);
-                UI::Notify(INFO, "Starting");
+                //UI::Notify(INFO, "Starting");
             }
         }
 

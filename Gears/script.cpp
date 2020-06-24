@@ -2604,7 +2604,7 @@ void main() {
         update_update_notification();
         update_UDPTelemetry();
         SteeringAnimation::Update();
-        // StartingAnimation::Update(); // Somewhat buggy, disabled.
+        StartingAnimation::Update();
         FPVCam::Update();
         WAIT(0);
     }
