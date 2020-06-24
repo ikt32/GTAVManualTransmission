@@ -5,8 +5,6 @@
 #include <inc/types.h>
 #include <inc/nativeCaller.h>
 
-extern uint8_t g_numGears;
-
 struct WheelDimensions {
     float TyreRadius;
     float RimRadius;
@@ -15,224 +13,182 @@ struct WheelDimensions {
 
 class VehicleExtensions {
 public:
-    VehicleExtensions();
     static void ChangeVersion(int version);
-    BYTE *GetAddress(Vehicle handle);
+
+    static void Init();
+
+    static BYTE* GetAddress(Vehicle handle);
+
+    // <  1604:  8 gears
+    // >= 1604: 11 gears
+    static uint8_t GearsAvailable();
 
     /*
      * Vehicle struct
      */
-    bool GetRocketBoostActive(Vehicle handle);
-    void SetRocketBoostActive(Vehicle handle, bool val);
+    static bool GetRocketBoostActive(Vehicle handle);
+    static void SetRocketBoostActive(Vehicle handle, bool val);
 
-    float GetRocketBoostCharge(Vehicle handle);
-    void SetRocketBoostCharge(Vehicle handle, float value);
+    static float GetRocketBoostCharge(Vehicle handle);
+    static void SetRocketBoostCharge(Vehicle handle, float value);
 
-    float GetHoverTransformRatio(Vehicle handle);
-    void SetHoverTransformRatio(Vehicle handle, float value);
+    static float GetHoverTransformRatio(Vehicle handle);
+    static void SetHoverTransformRatio(Vehicle handle, float value);
 
-    float GetHoverTransformRatioLerp(Vehicle handle);
-    void SetHoverTransformRatioLerp(Vehicle handle, float value);
+    static float GetHoverTransformRatioLerp(Vehicle handle);
+    static void SetHoverTransformRatioLerp(Vehicle handle, float value);
 
-    float GetFuelLevel(Vehicle handle);
-    void SetFuelLevel(Vehicle handle, float value);
+    static float GetFuelLevel(Vehicle handle);
+    static void SetFuelLevel(Vehicle handle, float value);
 
     // TODO: CVeh + 0x84c (1604 - 1868) (Lights damaged)
 
-    uint16_t GetGearNext(Vehicle handle);
-    void SetGearNext(Vehicle handle, uint16_t value);
+    static uint16_t GetGearNext(Vehicle handle);
+    static void SetGearNext(Vehicle handle, uint16_t value);
 
-    uint16_t GetGearCurr(Vehicle handle);
-    void SetGearCurr(Vehicle handle, uint16_t value);
+    static uint16_t GetGearCurr(Vehicle handle);
+    static void SetGearCurr(Vehicle handle, uint16_t value);
 
-    uint8_t GetTopGear(Vehicle handle);
-    void SetTopGear(Vehicle handle, uint8_t value);
+    static uint8_t GetTopGear(Vehicle handle);
+    static void SetTopGear(Vehicle handle, uint8_t value);
 
     // Divide GetDriveMaxFlatVel by the values in this thing to get the top
     // speed for the gear.
-    float* GetGearRatioPtr(Vehicle handle, uint8_t gear);
-    std::vector<float> GetGearRatios(Vehicle handle);
-    void SetGearRatios(Vehicle handle, const std::vector<float>& values);
+    static float* GetGearRatioPtr(Vehicle handle, uint8_t gear);
+    static std::vector<float> GetGearRatios(Vehicle handle);
+    static void SetGearRatios(Vehicle handle, const std::vector<float>& values);
 
-    float GetDriveForce(Vehicle handle);
-    void SetDriveForce(Vehicle handle, float value);
+    static float GetDriveForce(Vehicle handle);
+    static void SetDriveForce(Vehicle handle, float value);
 
-    float GetInitialDriveMaxFlatVel(Vehicle handle);
-    void SetInitialDriveMaxFlatVel(Vehicle handle, float value);
+    static float GetInitialDriveMaxFlatVel(Vehicle handle);
+    static void SetInitialDriveMaxFlatVel(Vehicle handle, float value);
 
-    float GetDriveMaxFlatVel(Vehicle handle);
-    void SetDriveMaxFlatVel(Vehicle handle, float value);
+    static float GetDriveMaxFlatVel(Vehicle handle);
+    static void SetDriveMaxFlatVel(Vehicle handle, float value);
 
-    float GetCurrentRPM(Vehicle handle);
-    void SetCurrentRPM(Vehicle handle, float value);
+    static float GetCurrentRPM(Vehicle handle);
+    static void SetCurrentRPM(Vehicle handle, float value);
     
-    float GetClutch(Vehicle handle);
-    void SetClutch(Vehicle handle, float value);
+    static float GetClutch(Vehicle handle);
+    static void SetClutch(Vehicle handle, float value);
     
-    float GetThrottle(Vehicle handle);
-    void SetThrottle(Vehicle handle, float value);
+    static float GetThrottle(Vehicle handle);
+    static void SetThrottle(Vehicle handle, float value);
 
-    float GetTurbo(Vehicle handle);
-    void SetTurbo(Vehicle handle, float value);
+    static float GetTurbo(Vehicle handle);
+    static void SetTurbo(Vehicle handle, float value);
 
-    float GetArenaBoost(Vehicle handle);
-    void SetArenaBoost(Vehicle handle, float value);
+    static float GetArenaBoost(Vehicle handle);
+    static void SetArenaBoost(Vehicle handle, float value);
 
-    uint64_t GetHandlingPtr(Vehicle handle);
+    static uint64_t GetHandlingPtr(Vehicle handle);
 
-    uint32_t GetLightStates(Vehicle handle);
-    void SetLightStates(Vehicle handle, uint32_t value);
+    static uint32_t GetLightStates(Vehicle handle);
+    static void SetLightStates(Vehicle handle, uint32_t value);
 
     // Steering input angle, steering lock independent
-    float GetSteeringInputAngle(Vehicle handle);
-    void SetSteeringInputAngle(Vehicle handle, float value);
+    static float GetSteeringInputAngle(Vehicle handle);
+    static void SetSteeringInputAngle(Vehicle handle, float value);
 
     // Wheel angle, steering lock dependent
-    float GetSteeringAngle(Vehicle handle);
-    void SetSteeringAngle(Vehicle handle, float value);
+    static float GetSteeringAngle(Vehicle handle);
+    static void SetSteeringAngle(Vehicle handle, float value);
    
-    float GetThrottleP(Vehicle handle);
-    void SetThrottleP(Vehicle handle, float value);
+    static float GetThrottleP(Vehicle handle);
+    static void SetThrottleP(Vehicle handle, float value);
     
-    float GetBrakeP(Vehicle handle);
-    void SetBrakeP(Vehicle handle, float value);
+    static float GetBrakeP(Vehicle handle);
+    static void SetBrakeP(Vehicle handle, float value);
     
-    bool GetHandbrake(Vehicle handle);
-    void SetHandbrake(Vehicle handle, bool value);
+    static bool GetHandbrake(Vehicle handle);
+    static void SetHandbrake(Vehicle handle, bool value);
 
-    float GetDirtLevel(Vehicle handle);
+    static float GetDirtLevel(Vehicle handle);
     // No set impl.
 
-    float GetEngineTemp(Vehicle handle);
+    static float GetEngineTemp(Vehicle handle);
     // No set impl.
 
-    float GetDashSpeed(Vehicle handle);
+    static float GetDashSpeed(Vehicle handle);
     // No set impl.
 
     // 0 = car, 1 = plane, 2 = trailer, 3 = quad,
     // 6 = amphibious car, 7 = amphibious quad,
     // 8 = heli, 11 = motorcycle, 12 = bicycle, 13 = boat, 14 = train
-    int GetModelType(Vehicle handle);
+    static int GetModelType(Vehicle handle);
 
-    uint64_t GetWheelsPtr(Vehicle handle);
-    uint8_t GetNumWheels(Vehicle handle);
+    static uint64_t GetWheelsPtr(Vehicle handle);
+    static uint8_t GetNumWheels(Vehicle handle);
 
     /*
      * Handling data related getters
      */
-    float GetDriveBiasFront(Vehicle handle);
-    float GetDriveBiasRear(Vehicle handle);
-    float GetPetrolTankVolume(Vehicle handle);
-    float GetOilVolume(Vehicle handle);
-    float GetMaxSteeringAngle(Vehicle handle);
-    Hash GetAIHandling(Vehicle handle);
+    static float GetDriveBiasFront(Vehicle handle);
+    static float GetDriveBiasRear(Vehicle handle);
+    static float GetPetrolTankVolume(Vehicle handle);
+    static float GetOilVolume(Vehicle handle);
+    static float GetMaxSteeringAngle(Vehicle handle);
+    static Hash GetAIHandling(Vehicle handle);
 
     /*
      * Suspension info struct
      */
     
-    std::vector<uint64_t> GetWheelPtrs(Vehicle handle);
+    static std::vector<uint64_t> GetWheelPtrs(Vehicle handle);
     
     // 0 is default. Pos is lowered, Neg = change height. Used by LSC. Set once.
     // Physics are NOT affected, including hitbox.
-    float GetVisualHeight(Vehicle handle);
-    void SetVisualHeight(Vehicle handle, float height);
+    static float GetVisualHeight(Vehicle handle);
+    static void SetVisualHeight(Vehicle handle, float height);
 
     /*
      * Wheel struct
      */	
-    std::vector<float> GetWheelHealths(Vehicle handle);
-    void SetWheelsHealth(Vehicle handle, float health);
+    static std::vector<float> GetWheelHealths(Vehicle handle);
+    static void SetWheelsHealth(Vehicle handle, float health);
     
-    float GetSteeringMultiplier(Vehicle handle);
-    void SetSteeringMultiplier(Vehicle handle, float value);
+    static float GetSteeringMultiplier(Vehicle handle);
+    static void SetSteeringMultiplier(Vehicle handle, float value);
 
-    std::vector<Vector3> GetWheelOffsets(Vehicle handle);
-    std::vector<Vector3> GetWheelLastContactCoords(Vehicle handle);
-    std::vector<float> GetWheelCompressions(Vehicle handle);
-    std::vector<float> GetWheelSteeringAngles(Vehicle handle);
-    std::vector<bool> GetWheelsOnGround(Vehicle handle);
+    static std::vector<Vector3> GetWheelOffsets(Vehicle handle);
+    static std::vector<Vector3> GetWheelLastContactCoords(Vehicle handle);
+    static std::vector<float> GetWheelCompressions(Vehicle handle);
+    static std::vector<float> GetWheelSteeringAngles(Vehicle handle);
+    static std::vector<bool> GetWheelsOnGround(Vehicle handle);
 
-    float GetWheelLargestAngle(Vehicle handle);
-    float GetWheelAverageAngle(Vehicle handle);
+    static float GetWheelLargestAngle(Vehicle handle);
+    static float GetWheelAverageAngle(Vehicle handle);
 
     // Unit: meters, probably.
-    std::vector<WheelDimensions> GetWheelDimensions(Vehicle handle);
+    static std::vector<WheelDimensions> GetWheelDimensions(Vehicle handle);
     // Unit: rad/s
-    std::vector<float> GetWheelRotationSpeeds(Vehicle handle);
+    static std::vector<float> GetWheelRotationSpeeds(Vehicle handle);
     // For forward, use negative speed.
-    void SetWheelRotationSpeed(Vehicle handle, uint8_t index, float value);
+    static void SetWheelRotationSpeed(Vehicle handle, uint8_t index, float value);
     // Unit: m/s, at the tyres. This probably doesn't work well for popped tyres.
-    std::vector<float> GetTyreSpeeds(Vehicle handle);
+    static std::vector<float> GetTyreSpeeds(Vehicle handle);
 
     // How much smoke and skidmarks the wheels/tires are generating.
-    std::vector<float> GetWheelSkidSmokeEffect(Vehicle handle);
-    void SetWheelSkidSmokeEffect(Vehicle handle, uint8_t index, float speed);
+    static std::vector<float> GetWheelSkidSmokeEffect(Vehicle handle);
+    static void SetWheelSkidSmokeEffect(Vehicle handle, uint8_t index, float speed);
 
     // Needs patching the decreasing thing
-    std::vector<float> GetWheelPower(Vehicle handle);
-    void SetWheelPower(Vehicle handle, uint8_t index, float value);
+    static std::vector<float> GetWheelPower(Vehicle handle);
+    static void SetWheelPower(Vehicle handle, uint8_t index, float value);
 
     // Strangely, braking/pulling the handbrake just adds to this value.
     // This behavior is visible when the instruction decreasing this is patched away.
     // Needs patching of the instruction manipulating this field for applied values
     // to stick properly.
-    std::vector<float> GetWheelBrakePressure(Vehicle handle);
-    void SetWheelBrakePressure(Vehicle handle, uint8_t index, float value);
+    static std::vector<float> GetWheelBrakePressure(Vehicle handle);
+    static void SetWheelBrakePressure(Vehicle handle, uint8_t index, float value);
 
 
-    bool IsWheelPowered(Vehicle handle, uint8_t index);
-    std::vector<uint16_t> GetWheelFlags(Vehicle handle);
+    static bool IsWheelPowered(Vehicle handle, uint8_t index);
+    static std::vector<uint16_t> GetWheelFlags(Vehicle handle);
 
-    std::vector<uint32_t> GetVehicleFlags(Vehicle handle);
-
-    void initOffsets();
-
-
+    static std::vector<uint32_t> GetVehicleFlags(Vehicle handle);
 private:
-    int rocketBoostActiveOffset = 0;
-    int rocketBoostChargeOffset = 0;
-    int hoverTransformRatioOffset = 0;
-    int hoverTransformRatioLerpOffset = 0;
-    int fuelLevelOffset = 0;
-    int nextGearOffset = 0;
-    int currentGearOffset = 0;
-    int topGearOffset = 0;
-    int gearRatiosOffset = 0;
-    int driveForceOffset = 0;
-    int initialDriveMaxFlatVelOffset = 0;
-    int driveMaxFlatVelOffset = 0;
-    int currentRPMOffset = 0;
-    int clutchOffset = 0;
-    int throttleOffset = 0;
-    int turboOffset = 0;
-    int arenaBoostOffset = 0;
-    int handlingOffset = 0;
-    int lightStatesOffset = 0;
-    int steeringAngleInputOffset = 0;
-    int steeringAngleOffset = 0;
-    int throttlePOffset = 0;
-    int brakePOffset = 0;
-    int handbrakeOffset = 0;
-    int dirtLevelOffset = 0;
-    int engineTempOffset = 0;
-    int dashSpeedOffset = 0;
-    int wheelsPtrOffset = 0;
-    int numWheelsOffset = 0;
-    int modelTypeOffset = 0; 
-    const int vehicleModelInfoOffset = 0x020;
-    int vehicleFlagsOffset = 0;
-
-    int steeringMultOffset = 0;
-
-    // Wheel stuff
-    int wheelHealthOffset = 0;
-    int wheelSuspensionCompressionOffset = 0;
-    int wheelSteeringAngleOffset = 0;
-    int wheelAngularVelocityOffset = 0;
-    int wheelSmokeOffset = 0;
-    int wheelPowerOffset = 0;
-    int wheelBrakeOffset = 0;
-    int wheelFlagsOffset = 0;
-
+    VehicleExtensions() = default;
 };

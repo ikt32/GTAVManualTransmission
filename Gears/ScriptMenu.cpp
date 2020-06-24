@@ -31,6 +31,8 @@
 
 #include "Compatibility.h"
 
+using VExt = VehicleExtensions;
+
 extern ReleaseInfo g_releaseInfo;
 extern std::mutex g_releaseInfoMutex;
 
@@ -791,7 +793,7 @@ void update_wheelmenu() {
         "Active gear:"
     };
     if (g_controls.ButtonIn(CarControls::WheelControlType::HR)) hpatInfo.emplace_back("Reverse");
-    for (uint8_t gear = 1; gear < g_numGears; ++gear) {
+    for (uint8_t gear = 1; gear < VExt::GearsAvailable(); ++gear) {
         // H1 == 1
         if (g_controls.ButtonIn(static_cast<CarControls::WheelControlType>(gear))) 
             hpatInfo.emplace_back(fmt::format("Gear {}", gear));
@@ -2038,7 +2040,7 @@ void clearButton(const std::string& confTag) {
 
 void clearHShifter() {
     saveChanges();
-    for (uint8_t i = 0; i < g_numGears; ++i) {
+    for (uint8_t i = 0; i < VExt::GearsAvailable(); ++i) {
         g_settings.SteeringSaveButton(fmt::format("HPATTERN_{}", i), -1, -1);
     }
     g_settings.Read(&g_controls);
@@ -2319,7 +2321,7 @@ bool configHPattern() {
     std::string additionalInfo = fmt::format("Press {} to exit. Press {} to skip gear.", escapeKey, skipKey);
 
     GUID devGUID = {};
-    std::vector<int> buttonArray(g_numGears);
+    std::vector<int> buttonArray(VExt::GearsAvailable());
     std::fill(buttonArray.begin(), buttonArray.end(), -1);
 
     int progress = 0;
@@ -2352,7 +2354,7 @@ bool configHPattern() {
             }
         }
 
-        if (progress > g_numGears - 1) {
+        if (progress > VExt::GearsAvailable() - 1) {
             break;
         }
         std::string gearDisplay;

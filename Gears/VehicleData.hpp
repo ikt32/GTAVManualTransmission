@@ -98,7 +98,7 @@ struct WheelPatchStates {
 // all the damn time.
 class VehicleData {
 public:
-    VehicleData(VehicleExtensions& ext);
+    VehicleData();
 
     void SetVehicle(Vehicle v);
     void Update();
@@ -106,7 +106,6 @@ public:
     // These should be read-only, but I cba to write getters for all of these.    
     // Vehicle this data is valid for
     Vehicle mVehicle;
-    VehicleExtensions& mExt;
     uint64_t mHandlingPtr;
 
     Vector3 mVelocity;

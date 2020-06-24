@@ -6,5 +6,5 @@
 
 namespace UDPTelemetry {
     void UpdatePacket(Socket& socket, Vehicle vehicle, const VehicleData& vehData,
-        const CarControls& controls, VehicleExtensions& ext);
+                      const CarControls& controls);
 }

@@ -49,6 +49,7 @@
 #include "Camera.h"
 
 namespace fs = std::filesystem;
+using VExt = VehicleExtensions;
 
 ReleaseInfo g_releaseInfo;
 std::mutex g_releaseInfoMutex;
@@ -80,8 +81,7 @@ VehiclePeripherals g_peripherals;
 VehicleGearboxStates g_gearStates;
 WheelPatchStates g_wheelPatchStates;
 
-VehicleExtensions g_ext;
-VehicleData g_vehData(g_ext);
+VehicleData g_vehData;
 
 std::vector<VehicleConfig> g_vehConfigs;
 VehicleConfig* g_activeConfig;
@@ -608,8 +608,8 @@ void update_manual_transmission() {
 
     // Finally, update memory each loop
     handleRPM();
-    g_ext.SetGearCurr(g_playerVehicle, g_gearStates.LockGear);
-    g_ext.SetGearNext(g_playerVehicle, g_gearStates.LockGear);
+    VExt::SetGearCurr(g_playerVehicle, g_gearStates.LockGear);
+    VExt::SetGearNext(g_playerVehicle, g_gearStates.LockGear);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -705,12 +705,12 @@ void updateSteeringMultiplier() {
     else {
         mult = g_settings.CustomSteering.SteeringMult;
     }
-    g_ext.SetSteeringMultiplier(g_playerVehicle, mult);
+    VExt::SetSteeringMultiplier(g_playerVehicle, mult);
 }
 
 void resetSteeringMultiplier() {
     if (g_playerVehicle != 0) {
-        g_ext.SetSteeringMultiplier(g_playerVehicle, 1.0f);
+        VExt::SetSteeringMultiplier(g_playerVehicle, 1.0f);
     }
 }
 
@@ -840,7 +840,7 @@ void functionHShiftTo(int i) {
 }
 
 void functionHShiftKeyboard() {
-    int clamp = g_numGears - 1;
+    int clamp = VExt::GearsAvailable() - 1;
     if (g_vehData.mGearTop <= clamp) {
         clamp = g_vehData.mGearTop;
     }
@@ -865,7 +865,7 @@ bool isHShifterJustNeutral() {
 }
 
 void functionHShiftWheel() {
-    int clamp = g_numGears - 1;
+    int clamp = VExt::GearsAvailable() - 1;
     if (g_vehData.mGearTop <= clamp) {
         clamp = g_vehData.mGearTop;
     }
@@ -903,7 +903,7 @@ void updateShifting() {
     if (!g_gearStates.Shifting)
         return;
 
-    auto handlingPtr = g_ext.GetHandlingPtr(g_playerVehicle);
+    auto handlingPtr = VExt::GetHandlingPtr(g_playerVehicle);
     // This is x Clutch per second? e.g. changerate 2.5 -> clutch fully (dis)engages in 1/2.5 seconds? or whole thing?
     float rateUp = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
     float rateDown = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleDownShift);
@@ -1238,9 +1238,9 @@ bool isSkidding(float threshold) {
     float currSpeedWorld = g_vehData.mVelocity.y;
     bool skidding = abs(currSpeed - currSpeedWorld) > threshold;
     if (!skidding) {
-        auto skids = g_ext.GetWheelSkidSmokeEffect(g_playerVehicle);
+        auto skids = VExt::GetWheelSkidSmokeEffect(g_playerVehicle);
         for (uint8_t i = 0; i < g_vehData.mWheelCount; ++i) {
-            if (abs(skids[i]) > threshold && g_ext.IsWheelPowered(g_playerVehicle, i)) {
+            if (abs(skids[i]) > threshold && VExt::IsWheelPowered(g_playerVehicle, i)) {
                 skidding = true;
                 break;
             }
@@ -1285,10 +1285,10 @@ void functionClutchCatch() {
                 Controls::SetControlADZ(ControlVehicleBrake, throttle, 0.25f);
         }
         else if (!userThrottle && !allWheelsOnGround) {
-            auto wheelDims = g_ext.GetWheelDimensions(g_playerVehicle);
+            auto wheelDims = VExt::GetWheelDimensions(g_playerVehicle);
             for (uint8_t i = 0; i < g_vehData.mWheelCount; ++i) {
                 if (g_vehData.mWheelsDriven[i]) {
-                    g_ext.SetWheelRotationSpeed(g_playerVehicle, i, -minSpeed / wheelDims[i].TyreRadius);
+                    VExt::SetWheelRotationSpeed(g_playerVehicle, i, -minSpeed / wheelDims[i].TyreRadius);
                 }
             }
         }
@@ -1408,8 +1408,8 @@ void functionEngLock() {
 
         for (int i = 0; i < g_vehData.mWheelCount; i++) {
             if (i >= wheelsToLock.size() || wheelsToLock[i]) {
-                g_ext.SetWheelPower(g_playerVehicle, i, -lockingForce * sgn(g_vehData.mVelocity.y));
-                g_ext.SetWheelSkidSmokeEffect(g_playerVehicle, i, lockingForce);
+                VExt::SetWheelPower(g_playerVehicle, i, -lockingForce * sgn(g_vehData.mVelocity.y));
+                VExt::SetWheelSkidSmokeEffect(g_playerVehicle, i, lockingForce);
             }
             else {
                 float inpBrakeForce = *reinterpret_cast<float *>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce) * g_controls.BrakeVal;
@@ -1417,7 +1417,7 @@ void functionEngLock() {
             }
         }
         if (wrongDirection) {
-            g_ext.SetCurrentRPM(g_playerVehicle, 0.0f);
+            VExt::SetCurrentRPM(g_playerVehicle, 0.0f);
             VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, false);
         }
         else {
@@ -1470,7 +1470,7 @@ void functionEngBrake() {
     auto wheelsToBrake = g_vehData.mWheelsDriven;
     for (int i = 0; i < g_vehData.mWheelCount; i++) {
         if (wheelsToBrake[i]) {
-            g_ext.SetWheelPower(g_playerVehicle, i, -engBrakeForce);
+            VExt::SetWheelPower(g_playerVehicle, i, -engBrakeForce);
         }
     }
     if (g_settings.Debug.DisplayInfo) {
@@ -1499,7 +1499,7 @@ void handleBrakePatch() {
     float rdd = 0.0f;
     if (g_vehData.mWheelCount == 4 && g_settings().DriveAssists.LSD.Enable) {
         if (g_vehData.mWheelAverageDrivenTyreSpeed > 0.0f) {
-            auto angularVelocities = g_ext.GetWheelRotationSpeeds(g_playerVehicle);
+            auto angularVelocities = VExt::GetWheelRotationSpeeds(g_playerVehicle);
             float WheelSpeedLF = angularVelocities[0];
             float WheelSpeedRF = angularVelocities[1];
             float WheelSpeedLR = angularVelocities[2];
@@ -1585,7 +1585,7 @@ void handleBrakePatch() {
 
     {
         bool lockedUp = false;
-        auto brakePressures = g_ext.GetWheelBrakePressure(g_playerVehicle);
+        auto brakePressures = VExt::GetWheelBrakePressure(g_playerVehicle);
         for (int i = 0; i < g_vehData.mWheelCount; i++) {
             if (lockUps[i] && susps[i] > 0.0f && brakePressures[i] > 0.0f)
                 lockedUp = true;
@@ -1601,7 +1601,7 @@ void handleBrakePatch() {
     {
         bool tractionLoss = false;
         if (g_settings().DriveAssists.TCS.Enable) {
-            auto pows = g_ext.GetWheelPower(g_playerVehicle);
+            auto pows = VExt::GetWheelPower(g_playerVehicle);
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
                 if (speeds[i] > g_vehData.mVelocity.y + g_settings().DriveAssists.TCS.SlipMax && 
                     susps[i] > 0.0f && 
@@ -1622,7 +1622,7 @@ void handleBrakePatch() {
     float steerMult = g_settings.CustomSteering.SteeringMult;
     if (g_controls.PrevInput == CarControls::InputDevices::Wheel)
         steerMult = g_settings.Wheel.Steering.SteerMult;
-    float avgAngle = g_ext.GetWheelAverageAngle(g_playerVehicle) * steerMult;
+    float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * steerMult;
     {
         // data
         float speed = ENTITY::GET_ENTITY_SPEED(g_playerVehicle);
@@ -1781,8 +1781,8 @@ void handleBrakePatch() {
             float understeerAdd = handlingBrakeForce * understeerComp;
 
             float brkFBase = inpBrakeForce * bbalF;
-            g_ext.SetWheelBrakePressure(g_playerVehicle, 0, brkFBase + (avgAngle_ < 0.0f && espOversteer ? oversteerAdd : 0.0f) + lsdBrakeLF);
-            g_ext.SetWheelBrakePressure(g_playerVehicle, 1, brkFBase + (avgAngle_ > 0.0f && espOversteer ? oversteerAdd : 0.0f) + lsdBrakeRF);
+            VExt::SetWheelBrakePressure(g_playerVehicle, 0, brkFBase + (avgAngle_ < 0.0f && espOversteer ? oversteerAdd : 0.0f) + lsdBrakeLF);
+            VExt::SetWheelBrakePressure(g_playerVehicle, 1, brkFBase + (avgAngle_ > 0.0f && espOversteer ? oversteerAdd : 0.0f) + lsdBrakeRF);
 
             float brkRBase = inpBrakeForce * bbalR;
             float brkRUnderL = (avgAngle > 0.0f && espUndersteer ? understeerAdd : 0.0f);
@@ -1791,8 +1791,8 @@ void handleBrakePatch() {
             float brkROverL = (avgAngle_ < 0.0f && espOversteer ? oversteerRearAdd : 0.0f);
             float brkROverR = (avgAngle_ > 0.0f && espOversteer ? oversteerRearAdd : 0.0f);
 
-            g_ext.SetWheelBrakePressure(g_playerVehicle, 2, brkRBase + brkRUnderL + brkROverL + lsdBrakeLR);
-            g_ext.SetWheelBrakePressure(g_playerVehicle, 3, brkRBase + brkRUnderR + brkROverR + lsdBrakeRR);
+            VExt::SetWheelBrakePressure(g_playerVehicle, 2, brkRBase + brkRUnderL + brkROverL + lsdBrakeLR);
+            VExt::SetWheelBrakePressure(g_playerVehicle, 3, brkRBase + brkRUnderR + brkROverR + lsdBrakeRR);
 
             g_vehData.mWheelsEspO[0] = avgAngle_ < 0.0f && espOversteer ? true : false;
             g_vehData.mWheelsEspO[1] = avgAngle_ > 0.0f && espOversteer ? true : false;
@@ -1827,12 +1827,12 @@ void handleBrakePatch() {
 
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
                 if (slipped[i]) {
-                    g_ext.SetWheelBrakePressure(g_playerVehicle, i,
+                    VExt::SetWheelBrakePressure(g_playerVehicle, i,
                         map(speeds[i], g_vehData.mVelocity.y, g_vehData.mVelocity.y + 2.5f, 0.0f, 0.5f) + lsdVals[i]);
                     g_vehData.mWheelsTcs[i] = true;
                 }
                 else {
-                    g_ext.SetWheelBrakePressure(g_playerVehicle, i, inpBrakeForce + lsdVals[i]);
+                    VExt::SetWheelBrakePressure(g_playerVehicle, i, inpBrakeForce + lsdVals[i]);
                     g_vehData.mWheelsTcs[i] = false;
                 }
             }
@@ -1853,11 +1853,11 @@ void handleBrakePatch() {
 
             for (uint8_t i = 0; i < lockUps.size(); i++) {
                 if (lockUps[i]) {
-                    g_ext.SetWheelBrakePressure(g_playerVehicle, i, 0.0f + lsdVals[i]);
+                    VExt::SetWheelBrakePressure(g_playerVehicle, i, 0.0f + lsdVals[i]);
                     g_vehData.mWheelsAbs[i] = true;
                 }
                 else {
-                    g_ext.SetWheelBrakePressure(g_playerVehicle, i, inpBrakeForce + lsdVals[i]);
+                    VExt::SetWheelBrakePressure(g_playerVehicle, i, inpBrakeForce + lsdVals[i]);
                     g_vehData.mWheelsAbs[i] = false;
                 }
             }
@@ -1866,17 +1866,17 @@ void handleBrakePatch() {
         }
 
         if (!useABS && !useESP && !useTCS && useLSD) {
-            g_ext.SetWheelBrakePressure(g_playerVehicle, 0, lsdBrakeLF + g_controls.BrakeVal * bbalF * handlingBrakeForce);
-            g_ext.SetWheelBrakePressure(g_playerVehicle, 1, lsdBrakeRF + g_controls.BrakeVal * bbalF * handlingBrakeForce);
-            g_ext.SetWheelBrakePressure(g_playerVehicle, 2, lsdBrakeLR + g_controls.BrakeVal * bbalR * handlingBrakeForce);
-            g_ext.SetWheelBrakePressure(g_playerVehicle, 3, lsdBrakeRR + g_controls.BrakeVal * bbalR * handlingBrakeForce);
+            VExt::SetWheelBrakePressure(g_playerVehicle, 0, lsdBrakeLF + g_controls.BrakeVal * bbalF * handlingBrakeForce);
+            VExt::SetWheelBrakePressure(g_playerVehicle, 1, lsdBrakeRF + g_controls.BrakeVal * bbalF * handlingBrakeForce);
+            VExt::SetWheelBrakePressure(g_playerVehicle, 2, lsdBrakeLR + g_controls.BrakeVal * bbalR * handlingBrakeForce);
+            VExt::SetWheelBrakePressure(g_playerVehicle, 3, lsdBrakeRR + g_controls.BrakeVal * bbalR * handlingBrakeForce);
         }
     }
     if (!patchBrake) {
         if (MemoryPatcher::BrakePatcher.Patched()) {
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
                 if (g_controls.BrakeVal == 0.0f) {
-                    g_ext.SetWheelBrakePressure(g_playerVehicle, i, 0.0f);
+                    VExt::SetWheelBrakePressure(g_playerVehicle, i, 0.0f);
                 }
             }
             MemoryPatcher::RestoreBrake();
@@ -1891,7 +1891,7 @@ void handleBrakePatch() {
         if (MemoryPatcher::ThrottlePatcher.Patched()) {
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
                 if (g_controls.ThrottleVal == 0.0f) {
-                    g_ext.SetWheelPower(g_playerVehicle, i, 0.0f);
+                    VExt::SetWheelPower(g_playerVehicle, i, 0.0f);
                 }
             }
             MemoryPatcher::RestoreThrottle();
@@ -1916,7 +1916,7 @@ void fakeRev(bool customThrottle, float customThrottleVal) {
         rpmValTemp +						// Keep it constant
         throttleVal * accelRatio;	// Addition value, depends on delta T
     //showText(0.4, 0.4, 1.0, fmt("FakeRev %d %.02f", customThrottle, rpmVal));
-    g_ext.SetCurrentRPM(g_playerVehicle, std::clamp(rpmVal, 0.0f, 1.0f));
+    VExt::SetCurrentRPM(g_playerVehicle, std::clamp(rpmVal, 0.0f, 1.0f));
 }
 
 void handleRPM() {
@@ -1959,7 +1959,7 @@ void handleRPM() {
     // shiftUp completely?
     if (g_vehData.mGearCurr > 0 &&
         (g_gearStates.HitRPMSpeedLimiter && ENTITY::GET_ENTITY_SPEED(g_playerVehicle) > 2.0f)) {
-        g_ext.SetThrottle(g_playerVehicle, 1.0f);
+        VExt::SetThrottle(g_playerVehicle, 1.0f);
         fakeRev(false, 1.0f);
         CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
         float counterForce = 0.25f*-(static_cast<float>(g_vehData.mGearTop) - static_cast<float>(g_vehData.mGearCurr))/static_cast<float>(g_vehData.mGearTop);
@@ -1968,7 +1968,7 @@ void handleRPM() {
         //showText(0.4, 0.15, 1.0, "CF: " + std::to_string(counterForce));
     }
     if (g_gearStates.HitRPMLimiter) {
-        g_ext.SetCurrentRPM(g_playerVehicle, 1.0f);
+        VExt::SetCurrentRPM(g_playerVehicle, 1.0f);
         //showText(0.4, 0.1, 1.0, "REV LIM RPM");
     }
     
@@ -1998,12 +1998,12 @@ void handleRPM() {
             !rollingback &&
             (!g_gearStates.Shifting || g_controls.ClutchVal > 0.4f)) {
             fakeRev(false, 0);
-            g_ext.SetThrottle(g_playerVehicle, g_controls.ThrottleVal);
+            VExt::SetThrottle(g_playerVehicle, g_controls.ThrottleVal);
         }
         // Don't care about clutch slippage, just handle RPM now
         if (g_gearStates.FakeNeutral) {
             fakeRev(false, 0);
-            g_ext.SetThrottle(g_playerVehicle, g_controls.ThrottleVal);
+            VExt::SetThrottle(g_playerVehicle, g_controls.ThrottleVal);
         }
     }
 
@@ -2016,7 +2016,7 @@ void handleRPM() {
         }
     }
 
-    g_ext.SetClutch(g_playerVehicle, finalClutch);
+    VExt::SetClutch(g_playerVehicle, finalClutch);
 }
 
 /*
@@ -2056,8 +2056,8 @@ void functionRealReverse() {
             ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y < 0.5f && ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y >= -0.5f) { // < 0.5 so reverse never triggers
                                                                     //showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Stop");
             CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-            g_ext.SetThrottleP(g_playerVehicle, 0.1f);
-            g_ext.SetBrakeP(g_playerVehicle, 1.0f);
+            VExt::SetThrottleP(g_playerVehicle, 0.1f);
+            VExt::SetBrakeP(g_playerVehicle, 1.0f);
             VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, true);
         }
         // LT behavior when rolling back: Brake
@@ -2067,9 +2067,9 @@ void functionRealReverse() {
             VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, true);
             CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
             CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, g_controls.BrakeVal);
-            g_ext.SetThrottle(g_playerVehicle, 0.0f);
-            g_ext.SetThrottleP(g_playerVehicle, 0.1f);
-            g_ext.SetBrakeP(g_playerVehicle, 1.0f);
+            VExt::SetThrottle(g_playerVehicle, 0.0f);
+            VExt::SetThrottleP(g_playerVehicle, 0.1f);
+            VExt::SetBrakeP(g_playerVehicle, 1.0f);
         }
         // RT behavior when rolling back: Burnout
         if (!g_gearStates.FakeNeutral && g_controls.ThrottleVal > 0.5f && !isClutchPressed() &&
@@ -2080,20 +2080,20 @@ void functionRealReverse() {
                 VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, false);
             }
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
-                if (g_ext.IsWheelPowered(g_playerVehicle, i)) {
-                    g_ext.SetWheelBrakePressure(g_playerVehicle, i, 0.0f);
-                    g_ext.SetWheelPower(g_playerVehicle, i, 2.0f * g_ext.GetDriveForce(g_playerVehicle));
+                if (VExt::IsWheelPowered(g_playerVehicle, i)) {
+                    VExt::SetWheelBrakePressure(g_playerVehicle, i, 0.0f);
+                    VExt::SetWheelPower(g_playerVehicle, i, 2.0f * VExt::GetDriveForce(g_playerVehicle));
                 }
                 else {
                     float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
                     float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
-                    g_ext.SetWheelPower(g_playerVehicle, i, 0.0f);
-                    g_ext.SetWheelBrakePressure(g_playerVehicle, i, inpBrakeForce);
+                    VExt::SetWheelPower(g_playerVehicle, i, 0.0f);
+                    VExt::SetWheelBrakePressure(g_playerVehicle, i, inpBrakeForce);
                 }
             }
             fakeRev();
-            g_ext.SetThrottle(g_playerVehicle, g_controls.ThrottleVal);
-            g_ext.SetThrottleP(g_playerVehicle, g_controls.ThrottleVal);
+            VExt::SetThrottle(g_playerVehicle, g_controls.ThrottleVal);
+            VExt::SetThrottleP(g_playerVehicle, g_controls.ThrottleVal);
             g_wheelPatchStates.InduceBurnout = true;
         }
         else {
@@ -2104,7 +2104,7 @@ void functionRealReverse() {
     // Desired: RT reverses, LT brakes
     if (g_vehData.mGearCurr == 0) {
         // Enables reverse lights
-        g_ext.SetThrottleP(g_playerVehicle, -0.1f);
+        VExt::SetThrottleP(g_playerVehicle, -0.1f);
         // RT behavior
         int throttleAndSomeBrake = 0;
         if (g_controls.ThrottleVal > 0.01f && g_controls.ThrottleVal > g_controls.BrakeVal) {
@@ -2141,7 +2141,7 @@ void functionRealReverse() {
             CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, g_controls.BrakeVal);
 
             //CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-            g_ext.SetBrakeP(g_playerVehicle, 1.0f);
+            VExt::SetBrakeP(g_playerVehicle, 1.0f);
         }
 
         // LT behavior when still
@@ -2151,7 +2151,7 @@ void functionRealReverse() {
 
             VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, true);
             CONTROLS::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
-            g_ext.SetBrakeP(g_playerVehicle, 1.0f);
+            VExt::SetBrakeP(g_playerVehicle, 1.0f);
         }
     }
 }
@@ -2396,7 +2396,7 @@ void StartUDPTelemetry() {
 
 void update_UDPTelemetry() {
     if (Util::VehicleAvailable(g_playerVehicle, g_playerPed) && g_settings.Misc.UDPTelemetry) {
-        UDPTelemetry::UpdatePacket(g_socket, g_playerVehicle, g_vehData, g_controls, g_ext);
+        UDPTelemetry::UpdatePacket(g_socket, g_playerVehicle, g_vehData, g_controls);
     }
 }
 
@@ -2531,7 +2531,7 @@ void main() {
     }
 
     FPVCam::InitOffsets();
-    g_ext.initOffsets();
+    VExt::Init();
     if (!MemoryPatcher::Test()) {
         logger.Write(ERROR, "Patchability test failed!");
         MemoryPatcher::Error = true;

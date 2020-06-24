@@ -19,17 +19,51 @@ namespace {
     template <typename T> T Sign(T val) {
         return static_cast<T>((T{} < val) - (val < T{}));
     }
-}
 
-int findOffset(const std::map<int, int, std::greater<int>> &offsets) {
-    return offsets.lower_bound(g_gameVersion)->second;
-}
+    int rocketBoostActiveOffset = 0;
+    int rocketBoostChargeOffset = 0;
+    int hoverTransformRatioOffset = 0;
+    int hoverTransformRatioLerpOffset = 0;
+    int fuelLevelOffset = 0;
+    int nextGearOffset = 0;
+    int currentGearOffset = 0;
+    int topGearOffset = 0;
+    int gearRatiosOffset = 0;
+    int driveForceOffset = 0;
+    int initialDriveMaxFlatVelOffset = 0;
+    int driveMaxFlatVelOffset = 0;
+    int currentRPMOffset = 0;
+    int clutchOffset = 0;
+    int throttleOffset = 0;
+    int turboOffset = 0;
+    int arenaBoostOffset = 0;
+    int handlingOffset = 0;
+    int lightStatesOffset = 0;
+    int steeringAngleInputOffset = 0;
+    int steeringAngleOffset = 0;
+    int throttlePOffset = 0;
+    int brakePOffset = 0;
+    int handbrakeOffset = 0;
+    int dirtLevelOffset = 0;
+    int engineTempOffset = 0;
+    int dashSpeedOffset = 0;
+    int wheelsPtrOffset = 0;
+    int numWheelsOffset = 0;
+    int modelTypeOffset = 0;
+    int vehicleModelInfoOffset = 0x020;
+    int vehicleFlagsOffset = 0;
 
-VehicleExtensions::VehicleExtensions() {
-    g_gameVersion = getGameVersion();
-    if (g_gameVersion >= G_VER_1_0_1604_0_STEAM) {
-        g_numGears = 11;
-    }
+    int steeringMultOffset = 0;
+
+    // Wheel stuff
+    int wheelHealthOffset = 0;
+    int wheelSuspensionCompressionOffset = 0;
+    int wheelSteeringAngleOffset = 0;
+    int wheelAngularVelocityOffset = 0;
+    int wheelSmokeOffset = 0;
+    int wheelPowerOffset = 0;
+    int wheelBrakeOffset = 0;
+    int wheelFlagsOffset = 0;
 }
 
 void VehicleExtensions::ChangeVersion(int version) {
@@ -39,12 +73,17 @@ void VehicleExtensions::ChangeVersion(int version) {
     }
 }
 
+uint8_t VehicleExtensions::GearsAvailable() {
+    return g_numGears;
+}
+
 /*
  * Offsets/patterns done by me might need revision, but they've been checked 
  * against b1180.2 and b877.1 and are okay.
  */
-void VehicleExtensions::initOffsets() {
+void VehicleExtensions::Init() {
     mem::init();
+
     uintptr_t addr = mem::FindPattern("3A 91 ? ? ? ? 74 ? 84 D2");
     rocketBoostActiveOffset = addr == 0 ? 0 : *(int*)(addr + 2);
     logger.Write(rocketBoostActiveOffset == 0 ? WARN : DEBUG, "Rocket Boost Active Offset: 0x%X", rocketBoostActiveOffset);
