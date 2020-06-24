@@ -48,6 +48,7 @@
 #include "AtcuLogic.h"
 #include "Camera.h"
 #include "Misc.h"
+#include "StartingAnimation.h"
 
 namespace fs = std::filesystem;
 using VExt = VehicleExtensions;
@@ -2603,6 +2604,7 @@ void main() {
         update_update_notification();
         update_UDPTelemetry();
         SteeringAnimation::Update();
+        // StartingAnimation::Update(); // Somewhat buggy, disabled.
         FPVCam::Update();
         WAIT(0);
     }

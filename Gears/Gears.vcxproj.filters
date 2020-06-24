@@ -221,6 +221,7 @@
     <ClCompile Include="Input\NativeInput.cpp">
       <Filter>Input</Filter>
     </ClCompile>
+    <ClCompile Include="StartingAnimation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -483,6 +484,7 @@
     <ClInclude Include="Input\NativeInput.h">
       <Filter>Input</Filter>
     </ClInclude>
+    <ClInclude Include="StartingAnimation.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

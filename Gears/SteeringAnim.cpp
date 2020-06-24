@@ -8,6 +8,7 @@
 #include "Util/Logger.hpp"
 #include "Util/MathExt.h"
 #include "Util/Timer.h"
+#include "Util/Files.h"
 
 #include <inc/natives.h>
 #include <fmt/format.h>
@@ -17,8 +18,6 @@
 #include <string>
 #include <algorithm>
 #include <filesystem>
-
-#include "Util/Files.h"
 
 extern Vehicle g_playerVehicle;
 extern Ped g_playerPed;

@@ -173,6 +173,7 @@
     <ClCompile Include="ScriptHUD.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
     <ClCompile Include="ScriptUtils.cpp" />
+    <ClCompile Include="StartingAnimation.cpp" />
     <ClCompile Include="SteeringAnim.cpp" />
     <ClCompile Include="UDPTelemetry\UDPTelemetry.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
@@ -266,6 +267,7 @@
     <ClInclude Include="newNatives.h" />
     <ClInclude Include="ScriptUtils.h" />
     <ClInclude Include="Compatibility.h" />
+    <ClInclude Include="StartingAnimation.h" />
     <ClInclude Include="SteeringAnim.h" />
     <ClInclude Include="UDPTelemetry\UDPTelemetry.h" />
     <ClInclude Include="UDPTelemetry\Socket.h" />
