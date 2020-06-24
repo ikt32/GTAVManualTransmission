@@ -108,6 +108,7 @@ void SteeringAnimation::Update() {
         PLAYER::IS_PLAYER_PRESSING_HORN(PLAYER::PLAYER_ID()) ||
         CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlVehicleDuck) ||
         StartingAnimation::Playing() ||
+        PED::IS_PED_RUNNING_MOBILE_PHONE_TASK(g_playerPed) ||
         steeringAnimIdx >= steeringAnimations.size()) {
         cancelAnim(lastAnimation);
         return;
