@@ -217,6 +217,10 @@
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Misc.cpp" />
+    <ClCompile Include="Input\NativeInput.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -475,6 +479,10 @@
     <ClInclude Include="AtcuLogic.h" />
     <ClInclude Include="AtcuGearbox.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Misc.h" />
+    <ClInclude Include="Input\NativeInput.h">
+      <Filter>Input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

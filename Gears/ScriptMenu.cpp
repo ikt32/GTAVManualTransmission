@@ -1422,6 +1422,12 @@ void update_gameassistmenu() {
     g_menu.BoolOption("Default neutral gear", g_settings.GameAssists.DefaultNeutral,
         { "The car will be in neutral when you get in." });
 
+    g_menu.BoolOption("Disable autostart", g_settings.GameAssists.DisableAutostart,
+        { "The character will not start the vehicle when getting in." });
+
+    g_menu.BoolOption("Leave engine running", g_settings.GameAssists.LeaveEngineRunning,
+        { "The character will not turn the engine off when exiting the car, if you use a short press." });
+
     g_menu.BoolOption("Simplified bike", g_settings.GameAssists.SimpleBike,
         { "Disables bike engine stalling and the clutch bite simulation." });
 

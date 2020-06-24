@@ -250,6 +250,8 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetBoolValue("GAMEPLAY_ASSISTS", "AutoLookBack", GameAssists.AutoLookBack);
     ini.SetBoolValue("GAMEPLAY_ASSISTS", "ThrottleStart", GameAssists.ThrottleStart);
     ini.SetBoolValue("GAMEPLAY_ASSISTS", "DefaultNeutral", GameAssists.DefaultNeutral);
+    ini.SetBoolValue("GAMEPLAY_ASSISTS", "DisableAutostart", GameAssists.DisableAutostart);
+    ini.SetBoolValue("GAMEPLAY_ASSISTS", "LeaveEngineRunning", GameAssists.LeaveEngineRunning);
 
     // [DRIVING_ASSISTS]
     ini.SetBoolValue("DRIVING_ASSISTS", "ABS", DriveAssists.ABS.Enable);
@@ -602,6 +604,8 @@ void ScriptSettings::parseSettingsGeneral() {
     GameAssists.AutoGear1 =         ini.GetBoolValue("GAMEPLAY_ASSISTS", "AutoGear1", GameAssists.AutoGear1);
     GameAssists.AutoLookBack =      ini.GetBoolValue("GAMEPLAY_ASSISTS", "AutoLookBack", GameAssists.AutoLookBack);
     GameAssists.ThrottleStart =     ini.GetBoolValue("GAMEPLAY_ASSISTS", "ThrottleStart", GameAssists.ThrottleStart);
+    GameAssists.DisableAutostart =  ini.GetBoolValue("GAMEPLAY_ASSISTS", "DisableAutostart", GameAssists.DisableAutostart);
+    GameAssists.LeaveEngineRunning = ini.GetBoolValue("GAMEPLAY_ASSISTS", "LeaveEngineRunning", GameAssists.LeaveEngineRunning);
 
     // [DRIVING_ASSISTS]
     DriveAssists.ABS.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "ABS", DriveAssists.ABS.Enable);

@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.8.2
+
+* Add "Disable autostart" option
+* Add "Leave engine running" option
+
 ## 4.8.1
 
 * Replace exceptions-using error handling, as workaround for an

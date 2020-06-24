@@ -89,6 +89,8 @@ public:
         bool AutoLookBack = false;
         bool ThrottleStart = false;
         bool DefaultNeutral = true;
+        bool DisableAutostart = false;
+        bool LeaveEngineRunning = false;
     } GameAssists;
 
     // [DRIVING_ASSISTS]

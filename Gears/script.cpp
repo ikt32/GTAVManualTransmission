@@ -47,6 +47,7 @@
 #include "UDPTelemetry/UDPTelemetry.h"
 #include "AtcuLogic.h"
 #include "Camera.h"
+#include "Misc.h"
 
 namespace fs = std::filesystem;
 using VExt = VehicleExtensions;
@@ -2591,6 +2592,7 @@ void main() {
     while (true) {
         update_player();
         update_vehicle();
+        Misc::UpdateEngineOnOff();
         update_inputs();
         update_steering();
         update_hud();

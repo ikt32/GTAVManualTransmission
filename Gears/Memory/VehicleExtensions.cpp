@@ -174,6 +174,7 @@ void VehicleExtensions::Init() {
     addr = mem::FindPattern("FD 02 DB 08 98 ? ? ? ? 48 8B 5C 24 30");
     lightStatesOffset = addr == 0 ? 0 : *(int*)(addr - 4) - 1;
     logger.Write(lightStatesOffset == 0 ? WARN : DEBUG, "Light States Offset: 0x%X", lightStatesOffset);
+    // Or "8A 96 ? ? ? ? 0F B6 C8 84 D2 41", +10 or something (+31 is the engine starting bit), (0x928 starting addr)
 
     addr = mem::FindPattern("\x74\x0A\xF3\x0F\x11\xB3\x1C\x09\x00\x00\xEB\x25", "xxxxxx????xx");
     steeringAngleInputOffset = addr == 0 ? 0 : *(int*)(addr + 6);
