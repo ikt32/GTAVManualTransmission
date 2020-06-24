@@ -1,5 +1,7 @@
 #include "SteeringAnim.h"
 
+#include "StartingAnimation.h"
+
 #include "Constants.h"
 #include "Input/CarControls.hpp"
 #include "ScriptUtils.h"
@@ -105,6 +107,7 @@ void SteeringAnimation::Update() {
         PED::IS_PED_DOING_DRIVEBY(g_playerPed) ||
         PLAYER::IS_PLAYER_PRESSING_HORN(PLAYER::PLAYER_ID()) ||
         CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlVehicleDuck) ||
+        StartingAnimation::Playing() ||
         steeringAnimIdx >= steeringAnimations.size()) {
         cancelAnim(lastAnimation);
         return;
