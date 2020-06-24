@@ -14,6 +14,7 @@ extern Ped g_playerPed;
 
 namespace {
     uint8_t lastEngineState = 0;
+    bool forcePlay = false;
     SteeringAnimation::Animation currentAnim;
 }
 
@@ -22,7 +23,8 @@ void StartingAnimation::Update() {
         uint8_t engineState = (VehicleExtensions::GetLightStates(g_playerVehicle) & 0x00F00000) >> 20;
 
         // We're starting the engine, so kick off the animation.
-        if (engineState == 2 && lastEngineState != engineState) {
+        if (engineState == 2 && lastEngineState != engineState || 
+            forcePlay) {
             //showText(0.5f, 0.5f, 0.5f, "Starting");
 
             auto steeringAnimIdx = SteeringAnimation::GetAnimationIndex();
@@ -43,6 +45,7 @@ void StartingAnimation::Update() {
                     if (t.Expired()) {
                         currentAnim.Dictionary = std::string();
                         currentAnim.Name = std::string();
+                        forcePlay = false;
                         return;
                     }
                     WAIT(0);
@@ -50,6 +53,7 @@ void StartingAnimation::Update() {
                 currentAnim.Name = "start_engine";
                 constexpr int flag = 32;
                 AI::TASK_PLAY_ANIM(g_playerPed, currentAnim.Dictionary.c_str(), "start_engine", -8.0f, 8.0f, -1, flag, 0.2f, 0, 0, 0);
+                forcePlay = false;
                 //UI::Notify(INFO, "Starting");
             }
         }
@@ -61,4 +65,8 @@ void StartingAnimation::Update() {
 bool StartingAnimation::Playing() {
     return !currentAnim.Dictionary.empty() &&
         ENTITY::IS_ENTITY_PLAYING_ANIM(g_playerPed, currentAnim.Dictionary.c_str(), "start_engine", 3);
+}
+
+void StartingAnimation::PlayManual() {
+    forcePlay = true;
 }

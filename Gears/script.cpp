@@ -2265,6 +2265,7 @@ void startStopEngine() {
     if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle) &&
         (controllerActive && g_settings.Controller.ToggleEngine || keyboardActive || wheelActive)) {
         VEHICLE::SET_VEHICLE_ENGINE_ON(g_playerVehicle, false, true, true);
+        StartingAnimation::PlayManual();
     }
 }
 
