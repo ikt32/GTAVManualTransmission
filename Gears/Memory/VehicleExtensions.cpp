@@ -1,13 +1,14 @@
 #include "VehicleExtensions.hpp"
 
-#include <vector>
-#include <functional>
-#include <map>
-
 #include "NativeMemory.hpp"
 #include "Versions.h"
 #include "Offsets.hpp"
 #include "../Util/Logger.hpp"
+
+#include <inc/main.h>
+
+#include <vector>
+#include <functional>
 
 // <= b1493: 8  (Top gear = 7)
 // >= b1604: 11 (Top gear = 10)

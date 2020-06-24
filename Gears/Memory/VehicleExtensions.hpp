@@ -1,9 +1,7 @@
 #pragma once
-
+#include <inc/types.h>
 #include <vector>
 #include <cstdint>
-#include <inc/types.h>
-#include <inc/nativeCaller.h>
 
 struct WheelDimensions {
     float TyreRadius;
