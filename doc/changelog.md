@@ -4,7 +4,9 @@
 
 * Add "Disable autostart" option
 * Add "Leave engine running" option
+* Add engine on/off animations
 * Fix haptic stalling effect playing on wrong device
+* Fix phone animation in cars not playing
 
 ## 4.8.1
 
