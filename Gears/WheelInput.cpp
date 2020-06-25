@@ -490,6 +490,9 @@ void WheelInput::DoSteering() {
     if (g_vehData.mClass == VehicleClass::Car) {
         g_ext.SetSteeringInputAngle(g_playerVehicle, -effSteer);
 
+        if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle))
+            g_ext.SetSteeringAngle(g_playerVehicle, -effSteer * g_ext.GetMaxSteeringAngle(g_playerVehicle));
+
         auto boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "steeringwheel");
         if (boneIdx != -1 && g_settings.Wheel.Options.SyncRotation) {
             Vector3 rotAxis{};
