@@ -37,6 +37,11 @@ namespace {
         ANIM_FLAG_CANCELABLE = 120,
     };
 
+    enum eTaskTypeIndex {
+        // For more, see https://pastebin.com/2gFqJ3Px by CamxxCore
+        CTaskCloseVehicleDoorFromInside = 164,
+    };
+
     std::vector<SteeringAnimation::Animation> steeringAnimations;
     SteeringAnimation::Animation lastAnimation;
     size_t steeringAnimIdx = 0;
@@ -103,12 +108,13 @@ void SteeringAnimation::Update() {
     if (!Util::VehicleAvailable(g_playerVehicle, g_playerPed) ||
         !(steeringWheelSync || customSteeringSync) ||
         !g_settings.Misc.SyncAnimations ||
-        CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleAim) ||
+        CONTROLS::IS_CONTROL_PRESSED(2, eControl::ControlVehicleAim) ||
         PED::IS_PED_DOING_DRIVEBY(g_playerPed) ||
         PLAYER::IS_PLAYER_PRESSING_HORN(PLAYER::PLAYER_ID()) ||
         CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlVehicleDuck) ||
         StartingAnimation::Playing() ||
         PED::IS_PED_RUNNING_MOBILE_PHONE_TASK(g_playerPed) ||
+        AI::GET_IS_TASK_ACTIVE(g_playerPed, eTaskTypeIndex::CTaskCloseVehicleDoorFromInside) ||
         steeringAnimIdx >= steeringAnimations.size()) {
         cancelAnim(lastAnimation);
         return;
