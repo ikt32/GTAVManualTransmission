@@ -7,6 +7,7 @@
 * Add engine on/off animations
 * Fix haptic stalling effect playing on wrong device
 * Fix phone animation in cars not playing
+* Fix LSD settings not being vehicle-specific
 
 ## 4.8.1
 
