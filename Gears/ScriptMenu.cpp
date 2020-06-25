@@ -1593,10 +1593,10 @@ void update_cameraoptionsmenu() {
     g_menu.BoolOption("Follow movement", g_settings.Misc.Camera.FollowMovement,
         { "Camera moves with motion and rotation, somewhat like NFS Shift." });
 
-    g_menu.FloatOption("Motion multiplier", g_settings.Misc.Camera.MovementMultVel, 0.0f, 4.0f, 0.1f,
+    g_menu.FloatOption("Motion multiplier", g_settings.Misc.Camera.MovementMultVel, 0.0f, 4.0f, 0.01f,
         { "How much the direction of travel affects the camera." });
 
-    g_menu.FloatOption("Rotation movement", g_settings.Misc.Camera.MovementMultRot, 0.0f, 4.0f, 0.1f,
+    g_menu.FloatOption("Rotation movement", g_settings.Misc.Camera.MovementMultRot, 0.0f, 4.0f, 0.01f,
         { "How much the rotation speed affects the camera." });
 
     g_menu.FloatOption("Movement cap", g_settings.Misc.Camera.MovementCap, 0.0f, 90.0f, 1.0f,
