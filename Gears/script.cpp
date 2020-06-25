@@ -1328,9 +1328,12 @@ void functionEngStall() {
     if (g_gearStates.StallProgress > 1.0f) {
         if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle)) {
             VEHICLE::SET_VEHICLE_ENGINE_ON(g_playerVehicle, false, true, true);
-            g_controls.PlayFFBCollision(g_settings().Wheel.FFB.DetailLim / 2);
-            CONTROLS::SET_PAD_SHAKE(0, 100, 255);
             g_peripherals.IgnitionState = IgnitionState::Stall;
+
+            if (g_controls.PrevInput == CarControls::Wheel)
+                g_controls.PlayFFBCollision(g_settings().Wheel.FFB.DetailLim / 2);
+            else if (g_controls.PrevInput == CarControls::Controller)
+                CONTROLS::SET_PAD_SHAKE(0, 100, 255);
         }
         g_gearStates.StallProgress = 0.0f;
     }

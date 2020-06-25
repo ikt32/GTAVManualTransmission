@@ -4,6 +4,7 @@
 
 * Add "Disable autostart" option
 * Add "Leave engine running" option
+* Fix haptic stalling effect playing on wrong device
 
 ## 4.8.1
 
