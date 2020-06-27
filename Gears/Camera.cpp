@@ -330,7 +330,12 @@ void FPVCam::Update() {
         0);
 
     CAM::SET_CAM_FOV(cameraHandle, fov);
-    UI::LOCK_MINIMAP_ANGLE(static_cast<int>(rot.z + camRot.z) % 360);
+
+    float minimapAngle = rot.z + camRot.z - directionLookAngle;
+    if (minimapAngle > 360.0f) minimapAngle = minimapAngle - 360.0f;
+    if (minimapAngle < 0.0f) minimapAngle = minimapAngle + 360.0f;
+
+    UI::LOCK_MINIMAP_ANGLE(static_cast<int>(minimapAngle));
 }
 
 void updateControllerLook(bool& lookingIntoGlass) {
