@@ -196,7 +196,7 @@ void FPVCam::Update() {
     float offsetX = 0.0f;
     float offsetY = g_settings.Misc.Camera.OffsetForward;
 
-    if (!lookingIntoGlass) {
+    {
         // Left
         if (camRot.z > 85.0f) {
             offsetX = map(camRot.z, 85.0f, 180.0f, 0.0f, -lookLeanCenterDist);
