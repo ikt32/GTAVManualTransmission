@@ -29,7 +29,7 @@ namespace {
     Vector3 camRot{};
 
     // Distance in meters to lean over to the center when looking back
-    const float lookLeanCenterDist = 0.20f;
+    const float lookLeanCenterDist = 0.25f;
 
     // Distance in meters to lean forward when looking back/sideways
     const float lookLeanFrontDist = 0.05f;
