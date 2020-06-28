@@ -9,10 +9,10 @@ NativeInput::NativeInput() = default;
 
 #ifndef NO_NATIVES
 bool NativeInput::IsButtonPressed(eControl gameButton) {
-    if (CONTROLS::IS_DISABLED_CONTROL_PRESSED(0, gameButton)) {
+    if (PAD::IS_DISABLED_CONTROL_PRESSED(0, gameButton)) {
         return true;
     }
-    if (CONTROLS::GET_DISABLED_CONTROL_NORMAL(0, gameButton) > g_settings.Controller.TriggerValue) {
+    if (PAD::GET_DISABLED_CONTROL_NORMAL(0, gameButton) > g_settings.Controller.TriggerValue) {
         return true;
     }
     return false;
@@ -33,10 +33,10 @@ bool NativeInput::IsButtonJustReleased(eControl gameButton) {
 }
 
 bool NativeInput::WasButtonHeldForMs(eControl gameButton, int milliseconds) {
-    if (CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, gameButton)) {
+    if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, gameButton)) {
         pressTime[gameButton] = milliseconds_now();
     }
-    if (CONTROLS::IS_DISABLED_CONTROL_JUST_RELEASED(0, gameButton)) {
+    if (PAD::IS_DISABLED_CONTROL_JUST_RELEASED(0, gameButton)) {
         releaseTime[gameButton] = milliseconds_now();
     }
 
@@ -49,11 +49,11 @@ bool NativeInput::WasButtonHeldForMs(eControl gameButton, int milliseconds) {
 }
 
 bool NativeInput::WasButtonHeldOverMs(eControl gameButton, int milliseconds) {
-    if (CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, gameButton)) {
+    if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, gameButton)) {
         pressTime[gameButton] = milliseconds_now();
     }
 
-    return CONTROLS::IS_CONTROL_PRESSED(0, gameButton) && pressTime[gameButton] != 0 && (milliseconds_now() -
+    return PAD::IS_CONTROL_PRESSED(0, gameButton) && pressTime[gameButton] != 0 && (milliseconds_now() -
         pressTime[gameButton]) >= milliseconds;
 }
 
@@ -90,7 +90,7 @@ void NativeInput::Update() {
 }
 
 float NativeInput::GetAnalogValue(eControl gameButton) {
-    return CONTROLS::GET_DISABLED_CONTROL_NORMAL(0, gameButton);
+    return PAD::GET_DISABLED_CONTROL_NORMAL(0, gameButton);
 }
 
 #else

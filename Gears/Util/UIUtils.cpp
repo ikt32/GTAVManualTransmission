@@ -7,25 +7,25 @@
 
 namespace {
     float getStringWidth(const std::string& text, float scale, int font) {
-        UI::_BEGIN_TEXT_COMMAND_WIDTH("STRING");
-        UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text.c_str());
-        UI::SET_TEXT_FONT(font);
-        UI::SET_TEXT_SCALE(scale, scale);
-        return UI::_END_TEXT_COMMAND_GET_WIDTH(true);
+        HUD::_BEGIN_TEXT_COMMAND_GET_WIDTH("STRING");
+        HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text.c_str());
+        HUD::SET_TEXT_FONT(font);
+        HUD::SET_TEXT_SCALE(scale, scale);
+        return HUD::_END_TEXT_COMMAND_GET_WIDTH(true);
     }
 }
 
 void showText(float x, float y, float scale, const std::string &text, 
     int font, const Util::ColorI &rgba, bool outline) {
-    UI::SET_TEXT_FONT(font);
-    UI::SET_TEXT_SCALE(scale, scale);
-    UI::SET_TEXT_COLOUR(rgba.R, rgba.G, rgba.B, rgba.A);
-    UI::SET_TEXT_WRAP(0.0, 1.0);
-    UI::SET_TEXT_CENTRE(0);
-    if (outline) UI::SET_TEXT_OUTLINE();
-    UI::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
-    UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text.c_str());
-    UI::END_TEXT_COMMAND_DISPLAY_TEXT(x, y);
+    HUD::SET_TEXT_FONT(font);
+    HUD::SET_TEXT_SCALE(scale, scale);
+    HUD::SET_TEXT_COLOUR(rgba.R, rgba.G, rgba.B, rgba.A);
+    HUD::SET_TEXT_WRAP(0.0, 1.0);
+    HUD::SET_TEXT_CENTRE(0);
+    if (outline) HUD::SET_TEXT_OUTLINE();
+    HUD::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
+    HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text.c_str());
+    HUD::END_TEXT_COMMAND_DISPLAY_TEXT(x, y, 0);
 }
 
 void showDebugInfo3D(Vector3 location, const std::vector<std::string> &textLines, 
@@ -47,7 +47,7 @@ void showDebugInfo3D(Vector3 location, const std::vector<std::string> &textLines
 
     float szY = (height * static_cast<float>(i)) + 0.02f;
     GRAPHICS::DRAW_RECT(0.027f, (height * static_cast<float>(i)) / 2.0f, szX, szY,
-        backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A);
+        backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A, 0);
     GRAPHICS::CLEAR_DRAW_ORIGIN();
 }
 
@@ -70,35 +70,35 @@ void showDebugInfo3DColors(Vector3 location, const std::vector<std::pair<std::st
 
     float szY = (height * static_cast<float>(i)) + 0.02f;
     GRAPHICS::DRAW_RECT(0.027f, (height * static_cast<float>(i)) / 2.0f, szX, szY,
-        backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A);
+        backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A, 0);
     GRAPHICS::CLEAR_DRAW_ORIGIN();
 }
 
 void showNotification(const std::string &message, int *prevNotification) {
     if (prevNotification != nullptr && *prevNotification != 0) {
-        UI::_REMOVE_NOTIFICATION(*prevNotification);
+        HUD::THEFEED_REMOVE_ITEM(*prevNotification);
     }
-    UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
+    HUD::BEGIN_TEXT_COMMAND_THEFEED_POST("STRING");
 
-    UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(message.c_str());
+    HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(message.c_str());
 
-    int id = UI::_DRAW_NOTIFICATION(false, false);
+    int id = HUD::END_TEXT_COMMAND_THEFEED_POST_TICKER(false, false);
     if (prevNotification != nullptr) {
         *prevNotification = id;
     }
 }
 
 void showSubtitle(const std::string &message, int duration) {
-    UI::BEGIN_TEXT_COMMAND_PRINT("CELL_EMAIL_BCON");
+    HUD::BEGIN_TEXT_COMMAND_PRINT("CELL_EMAIL_BCON");
 
     const size_t maxStringLength = 99;
 
     for (size_t i = 0; i < message.size(); i += maxStringLength) {
         size_t npos = std::min(maxStringLength, static_cast<int>(message.size()) - i);
-        UI::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(message.substr(i, npos).c_str());
+        HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(message.substr(i, npos).c_str());
     }
 
-    UI::END_TEXT_COMMAND_PRINT(duration, 1);
+    HUD::END_TEXT_COMMAND_PRINT(duration, 1);
 }
 
 void drawSphere(Vector3 p, float scale, const Util::ColorI& c) {

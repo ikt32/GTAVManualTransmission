@@ -170,9 +170,9 @@ void disableControls() {
     }
 
     if (disableUpDown)
-        CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveUpDown, true);
+        PAD::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveUpDown, true);
     if (disableLeftRight)
-        CONTROLS::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
+        PAD::DISABLE_CONTROL_ACTION(1, ControlVehicleMoveLeftRight, true);
 }
 
 // Main custom steering function - called by main loop.
@@ -186,7 +186,7 @@ void CustomSteering::Update() {
     float limitRadians = g_ext.GetMaxSteeringAngle(g_playerVehicle);
     float reduction = calculateReduction();
 
-    float steer = -CONTROLS::GET_DISABLED_CONTROL_NORMAL(1, ControlMoveLeftRight);
+    float steer = -PAD::GET_DISABLED_CONTROL_NORMAL(1, ControlMoveLeftRight);
 
     float steerCurr;
 
@@ -252,7 +252,7 @@ void CustomSteering::Update() {
 
 void CustomSteering::updateMouseSteer(float& steer) {
     bool mouseControl =
-        CONTROLS::GET_CONTROL_NORMAL(0, eControl::ControlVehicleMouseControlOverride) != 0.0f &&
+        PAD::GET_CONTROL_NORMAL(0, eControl::ControlVehicleMouseControlOverride) != 0.0f &&
         !PLAYER::IS_PLAYER_FREE_AIMING(PLAYER::GET_PLAYER_INDEX());
 
     // on press
@@ -270,10 +270,10 @@ void CustomSteering::updateMouseSteer(float& steer) {
     }
 
     if (mouseDown && mouseControl) {
-        CONTROLS::DISABLE_CONTROL_ACTION(0, eControl::ControlLookLeftRight, true);
-        CONTROLS::DISABLE_CONTROL_ACTION(0, eControl::ControlLookUpDown, true);
+        PAD::DISABLE_CONTROL_ACTION(0, eControl::ControlLookLeftRight, true);
+        PAD::DISABLE_CONTROL_ACTION(0, eControl::ControlLookUpDown, true);
 
-        float mouseVal = CONTROLS::GET_DISABLED_CONTROL_NORMAL(0, eControl::ControlLookLeftRight);
+        float mouseVal = PAD::GET_DISABLED_CONTROL_NORMAL(0, eControl::ControlLookLeftRight);
         mouseXTravel += mouseVal * g_settings.CustomSteering.MouseSensitivity;
         mouseXTravel = std::clamp(mouseXTravel, -1.0f, 1.0f);
 
@@ -288,7 +288,7 @@ void CustomSteering::updateMouseSteer(float& steer) {
                 g_settings.HUD.MouseSteering.BgR,
                 g_settings.HUD.MouseSteering.BgG,
                 g_settings.HUD.MouseSteering.BgB,
-                g_settings.HUD.MouseSteering.BgA);
+                g_settings.HUD.MouseSteering.BgA, 0);
             GRAPHICS::DRAW_RECT(
                 g_settings.HUD.MouseSteering.XPos + mouseXTravel * g_settings.HUD.MouseSteering.XSz * 0.5f,
                 g_settings.HUD.MouseSteering.YPos,
@@ -297,7 +297,7 @@ void CustomSteering::updateMouseSteer(float& steer) {
                 g_settings.HUD.MouseSteering.FgR,
                 g_settings.HUD.MouseSteering.FgG,
                 g_settings.HUD.MouseSteering.FgB,
-                g_settings.HUD.MouseSteering.FgA);
+                g_settings.HUD.MouseSteering.FgA, 0);
         }
     }
 }

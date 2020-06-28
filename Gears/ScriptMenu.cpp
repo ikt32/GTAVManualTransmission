@@ -143,17 +143,17 @@ namespace {
 
     bool getKbEntry(float& val) {
         UI::Notify(INFO, "Enter value");
-        GAMEPLAY::DISPLAY_ONSCREEN_KEYBOARD(UNK::_GET_CURRENT_LANGUAGE_ID() == 0, "FMMC_KEY_TIP8", "",
+        MISC::DISPLAY_ONSCREEN_KEYBOARD(LOCALIZATION::GET_CURRENT_LANGUAGE() == 0, "FMMC_KEY_TIP8", "",
             fmt::format("{:f}", val).c_str(), "", "", "", 64);
-        while (GAMEPLAY::UPDATE_ONSCREEN_KEYBOARD() == 0) {
+        while (MISC::UPDATE_ONSCREEN_KEYBOARD() == 0) {
             WAIT(0);
         }
-        if (!GAMEPLAY::GET_ONSCREEN_KEYBOARD_RESULT()) {
+        if (!MISC::GET_ONSCREEN_KEYBOARD_RESULT()) {
             UI::Notify(INFO, "Cancelled value entry");
             return false;
         }
 
-        std::string floatStr = GAMEPLAY::GET_ONSCREEN_KEYBOARD_RESULT();
+        std::string floatStr = MISC::GET_ONSCREEN_KEYBOARD_RESULT();
         if (floatStr.empty()) {
             UI::Notify(INFO, "Cancelled value entry");
             return false;
@@ -245,7 +245,7 @@ void update_mainmenu() {
                     { "Press Select/Enter to check GTA5-Mods.com.",
                         "Press right to ignore the current update." })) {
                     WAIT(20);
-                    CONTROLS::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
+                    PAD::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
                     ShellExecuteA(0, 0, modUrl.c_str(), 0, 0, SW_SHOW);
                 }
             }
@@ -888,17 +888,17 @@ std::vector<std::string> showGammaCurve(const std::string& axis, const float inp
 
     GRAPHICS::DRAW_RECT(rectX, rectY,
         rectW + 3.0f*blockW, rectH + 3.0f*blockH,
-        255, 255, 255, 191);
+        255, 255, 255, 191, 0);
     GRAPHICS::DRAW_RECT(rectX, rectY,
         rectW + blockW / 2.0f, rectH + blockH / 2.0f,
-        0, 0, 0, 239);
+        0, 0, 0, 239, 0);
 
     for (auto point : points) {
         float pointX = rectX - 0.5f*rectW + point.first *rectW;
         float pointY = rectY + 0.5f*rectH - point.second *rectH;
         GRAPHICS::DRAW_RECT(pointX, pointY,
             blockW, blockH,
-            255, 255, 255, 255);
+            255, 255, 255, 255, 0);
     }
 
     std::pair<float, float> currentPoint = { input, pow(input, gamma) };
@@ -906,7 +906,7 @@ std::vector<std::string> showGammaCurve(const std::string& axis, const float inp
     float pointY = rectY + 0.5f*rectH - currentPoint.second * rectH;
     GRAPHICS::DRAW_RECT(pointX, pointY,
         3.0f*blockW, 3.0f*blockH,
-        255, 0, 0, 255);
+        255, 0, 0, 255, 0);
 
     return info;
 }
@@ -1585,7 +1585,7 @@ void update_cameraoptionsmenu() {
               "DismembermentASI.asi by CamxxCore from Jedijosh' dismemberment mod is "
               "needed to hide the player head." })) {
             WAIT(20);
-            CONTROLS::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
+            PAD::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
             ShellExecuteA(0, 0, "https://www.gta5-mods.com/scripts/dismemberment", 0, 0, SW_SHOW);
         }
     }
@@ -2013,13 +2013,13 @@ void clearAxis(const std::string& confTag) {
 }
 
 void clearWheelToKey() {
-    GAMEPLAY::DISPLAY_ONSCREEN_KEYBOARD(1, "VEUI_ENTER_TEXT", "", "", "", "", "", 30);
-    while (GAMEPLAY::UPDATE_ONSCREEN_KEYBOARD() == 0) {
-        CONTROLS::DISABLE_ALL_CONTROL_ACTIONS(0);
+    MISC::DISPLAY_ONSCREEN_KEYBOARD(1, "VEUI_ENTER_TEXT", "", "", "", "", "", 30);
+    while (MISC::UPDATE_ONSCREEN_KEYBOARD() == 0) {
+        PAD::DISABLE_ALL_CONTROL_ACTIONS(0);
         WAIT(0);
     }
-    if (!GAMEPLAY::GET_ONSCREEN_KEYBOARD_RESULT()) return;
-    std::string result = GAMEPLAY::GET_ONSCREEN_KEYBOARD_RESULT();
+    if (!MISC::GET_ONSCREEN_KEYBOARD_RESULT()) return;
+    std::string result = MISC::GET_ONSCREEN_KEYBOARD_RESULT();
 
     int button;
     if (str2int(button, result.c_str(), 10) != STR2INT_SUCCESS) {
@@ -2517,7 +2517,7 @@ bool configLControllerButton(const std::string &confTag) {
         }
         g_controls.UpdateValues(CarControls::InputDevices::Controller, true);
         for (const auto& input : NativeController::NativeGamepadInputs) {
-            if (CONTROLS::IS_DISABLED_CONTROL_JUST_PRESSED(0, input.first)) {
+            if (PAD::IS_DISABLED_CONTROL_JUST_PRESSED(0, input.first)) {
                 saveLControllerButton(confTag, input.first);
                 return true;
             }

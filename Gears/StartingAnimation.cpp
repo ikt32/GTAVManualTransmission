@@ -52,7 +52,7 @@ void StartingAnimation::Update() {
                 }
                 currentAnim.Name = "start_engine";
                 constexpr int flag = 32;
-                AI::TASK_PLAY_ANIM(g_playerPed, currentAnim.Dictionary.c_str(), "start_engine", -8.0f, 8.0f, -1, flag, 0.2f, 0, 0, 0);
+                TASK::TASK_PLAY_ANIM(g_playerPed, currentAnim.Dictionary.c_str(), "start_engine", -8.0f, 8.0f, -1, flag, 0.2f, 0, 0, 0);
                 forcePlay = false;
                 //UI::Notify(INFO, "Starting");
             }

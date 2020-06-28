@@ -49,7 +49,7 @@ namespace DashLights {
 }
 
 void updateDashLights() {
-    const int currentTime = GAMEPLAY::GET_GAME_TIMER();
+    const int currentTime = MISC::GET_GAME_TIMER();
 
     bool abs = false;
     bool tcs = false;
@@ -84,7 +84,7 @@ void updateDashLights() {
 }
 
 void drawDashLights() {
-    const int currentTime = GAMEPLAY::GET_GAME_TIMER();
+    const int currentTime = MISC::GET_GAME_TIMER();
 
     bool abs = DashLights::LastAbsTime + DashLights::LightDuration >= currentTime;
     bool tcs = DashLights::LastTcsTime + DashLights::LightDuration >= currentTime;
@@ -171,7 +171,7 @@ void drawDashLights() {
 
     GRAPHICS::DRAW_RECT(XPos, YPos,
         rectSzX, rectSzY,
-        0, 0, 0, 127);
+        0, 0, 0, 127, 0);
 }
 
 void drawGForces() {
@@ -202,7 +202,7 @@ void drawGForces() {
         static_cast<double>(g_vehData.mVelocity.y) * static_cast<double>(g_vehData.mVelocity.y));
     double worldRotVel = 
         GetAngleBetween(V3D(LastCoords[1]) - V3D(LastCoords[0]), V3D(LastCoords[2]) - V3D(LastCoords[1])) /
-        static_cast<double>(GAMEPLAY::GET_FRAME_TIME());
+        static_cast<double>(MISC::GET_FRAME_TIME());
 
     if (isnan(worldRotVel)) {
         worldRotVel = PrevRotVel;
@@ -223,24 +223,24 @@ void drawGForces() {
         CoordTrails.erase(CoordTrails.begin());
     }
 
-    GRAPHICS::DRAW_RECT(locX, locY, szX, szY, 0, 0, 0, 127);
-    GRAPHICS::DRAW_RECT(locX, locY, 0.001f, szY, 255, 255, 255, 127);
-    GRAPHICS::DRAW_RECT(locX, locY, szX, 0.001f, 255, 255, 255, 127);
+    GRAPHICS::DRAW_RECT(locX, locY, szX, szY, 0, 0, 0, 127, 0);
+    GRAPHICS::DRAW_RECT(locX, locY, 0.001f, szY, 255, 255, 255, 127, 0);
+    GRAPHICS::DRAW_RECT(locX, locY, szX, 0.001f, 255, 255, 255, 127, 0);
 
-    GRAPHICS::DRAW_RECT(locX + 0.25f * szX, locY, 0.001f, szY, 127, 127, 127, 127);
-    GRAPHICS::DRAW_RECT(locX, locY + 0.25f * szY, szX, 0.001f, 127, 127, 127, 127);
+    GRAPHICS::DRAW_RECT(locX + 0.25f * szX, locY, 0.001f, szY, 127, 127, 127, 127, 0);
+    GRAPHICS::DRAW_RECT(locX, locY + 0.25f * szY, szX, 0.001f, 127, 127, 127, 127, 0);
 
-    GRAPHICS::DRAW_RECT(locX - 0.25f * szX, locY, 0.001f, szY, 127, 127, 127, 127);
-    GRAPHICS::DRAW_RECT(locX, locY - 0.25f * szY, szX, 0.001f, 127, 127, 127, 127);
+    GRAPHICS::DRAW_RECT(locX - 0.25f * szX, locY, 0.001f, szY, 127, 127, 127, 127, 0);
+    GRAPHICS::DRAW_RECT(locX, locY - 0.25f * szY, szX, 0.001f, 127, 127, 127, 127, 0);
 
     int alpha = 0;
     for (auto it = CoordTrails.begin(); it != CoordTrails.end(); ++it) {
         auto c = *it;
         if (std::next(it) == CoordTrails.end()) {
-            GRAPHICS::DRAW_RECT(locX + c.first, locY + c.second, szX * 0.025f, szY * 0.025f, 255, 255, 255, 255);
+            GRAPHICS::DRAW_RECT(locX + c.first, locY + c.second, szX * 0.025f, szY * 0.025f, 255, 255, 255, 255, 0);
         }
         else {
-            GRAPHICS::DRAW_RECT(locX + c.first, locY + c.second, szX * 0.025f, szY * 0.025f, 127, 127, 127, alpha);
+            GRAPHICS::DRAW_RECT(locX + c.first, locY + c.second, szX * 0.025f, szY * 0.025f, 127, 127, 127, alpha, 0);
         }
         alpha += 255 / static_cast<int>(CoordTrails.size());
     }
@@ -250,10 +250,10 @@ void drawRPMIndicator(float x, float y, float width, float height, Util::ColorI 
     float bgpaddingx = 0.00f;
     float bgpaddingy = 0.01f;
     // background
-    GRAPHICS::DRAW_RECT(x, y, width + bgpaddingx, height + bgpaddingy, bg.R, bg.G, bg.B, bg.A);
+    GRAPHICS::DRAW_RECT(x, y, width + bgpaddingx, height + bgpaddingy, bg.R, bg.G, bg.B, bg.A, 0);
 
     // rpm bar
-    GRAPHICS::DRAW_RECT(x - width*0.5f + rpm*width*0.5f, y, width*rpm, height, fg.R, fg.G, fg.B, fg.A);
+    GRAPHICS::DRAW_RECT(x - width*0.5f + rpm*width*0.5f, y, width*rpm, height, fg.R, fg.G, fg.B, fg.A, 0);
 }
 
 void drawRPMIndicator() {
@@ -534,16 +534,16 @@ void drawInputWheelInfo() {
     float barYBase = (g_settings.HUD.Wheel.PedalYPos + g_settings.HUD.Wheel.PedalYSz * 0.5f);
 
     GRAPHICS::DRAW_RECT(g_settings.HUD.Wheel.PedalXPos, g_settings.HUD.Wheel.PedalYPos, 3.0f * barWidth + g_settings.HUD.Wheel.PedalXPad, g_settings.HUD.Wheel.PedalYSz + g_settings.HUD.Wheel.PedalYPad, 
-        0, 0, 0, g_settings.HUD.Wheel.PedalBgA);
+        0, 0, 0, g_settings.HUD.Wheel.PedalBgA, 0);
     GRAPHICS::DRAW_RECT(g_settings.HUD.Wheel.PedalXPos + 1.0f * barWidth, barYBase - g_controls.ThrottleVal * g_settings.HUD.Wheel.PedalYSz * 0.5f,
         barWidth, g_controls.ThrottleVal * g_settings.HUD.Wheel.PedalYSz, 
-        g_settings.HUD.Wheel.PedalThrottleR, g_settings.HUD.Wheel.PedalThrottleG, g_settings.HUD.Wheel.PedalThrottleB, g_settings.HUD.Wheel.PedalThrottleA);
+        g_settings.HUD.Wheel.PedalThrottleR, g_settings.HUD.Wheel.PedalThrottleG, g_settings.HUD.Wheel.PedalThrottleB, g_settings.HUD.Wheel.PedalThrottleA, 0);
     GRAPHICS::DRAW_RECT(g_settings.HUD.Wheel.PedalXPos + 0.0f * barWidth, barYBase - g_controls.BrakeVal * g_settings.HUD.Wheel.PedalYSz * 0.5f,
         barWidth, g_controls.BrakeVal * g_settings.HUD.Wheel.PedalYSz,
-        g_settings.HUD.Wheel.PedalBrakeR, g_settings.HUD.Wheel.PedalBrakeG, g_settings.HUD.Wheel.PedalBrakeB, g_settings.HUD.Wheel.PedalBrakeA);
+        g_settings.HUD.Wheel.PedalBrakeR, g_settings.HUD.Wheel.PedalBrakeG, g_settings.HUD.Wheel.PedalBrakeB, g_settings.HUD.Wheel.PedalBrakeA, 0);
     GRAPHICS::DRAW_RECT(g_settings.HUD.Wheel.PedalXPos - 1.0f * barWidth, barYBase - g_controls.ClutchVal * g_settings.HUD.Wheel.PedalYSz * 0.5f,
         barWidth, g_controls.ClutchVal * g_settings.HUD.Wheel.PedalYSz,
-        g_settings.HUD.Wheel.PedalClutchR, g_settings.HUD.Wheel.PedalClutchG, g_settings.HUD.Wheel.PedalClutchB, g_settings.HUD.Wheel.PedalClutchA);
+        g_settings.HUD.Wheel.PedalClutchR, g_settings.HUD.Wheel.PedalClutchG, g_settings.HUD.Wheel.PedalClutchB, g_settings.HUD.Wheel.PedalClutchA, 0);
 }
 
 std::vector<Vector3> GetWheelCoords(Vehicle handle) {

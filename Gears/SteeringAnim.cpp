@@ -108,13 +108,13 @@ void SteeringAnimation::Update() {
     if (!Util::VehicleAvailable(g_playerVehicle, g_playerPed) ||
         !(steeringWheelSync || customSteeringSync) ||
         !g_settings.Misc.SyncAnimations ||
-        CONTROLS::IS_CONTROL_PRESSED(2, eControl::ControlVehicleAim) ||
+        PAD::IS_CONTROL_PRESSED(2, eControl::ControlVehicleAim) ||
         PED::IS_PED_DOING_DRIVEBY(g_playerPed) ||
         PLAYER::IS_PLAYER_PRESSING_HORN(PLAYER::PLAYER_ID()) ||
-        CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlVehicleDuck) ||
+        PAD::IS_CONTROL_PRESSED(0, eControl::ControlVehicleDuck) ||
         StartingAnimation::Playing() ||
         PED::IS_PED_RUNNING_MOBILE_PHONE_TASK(g_playerPed) ||
-        AI::GET_IS_TASK_ACTIVE(g_playerPed, eTaskTypeIndex::CTaskCloseVehicleDoorFromInside) ||
+        TASK::GET_IS_TASK_ACTIVE(g_playerPed, eTaskTypeIndex::CTaskCloseVehicleDoorFromInside) ||
         steeringAnimIdx >= steeringAnimations.size()) {
         cancelAnim(lastAnimation);
         return;
@@ -166,7 +166,7 @@ void cancelAnim(const SteeringAnimation::Animation& anim) {
 
     if (playing) {
         UI::Notify(DEBUG, fmt::format("Cancelled steering animation ({})", lastAnimation.Dictionary), false);
-        AI::STOP_ANIM_TASK(g_playerPed, dict, name, -8.0f);
+        TASK::STOP_ANIM_TASK(g_playerPed, dict, name, -8.0f);
         lastAnimation = SteeringAnimation::Animation();
     }
 }
@@ -207,7 +207,7 @@ void playAnimTime(const SteeringAnimation::Animation& anim, float time) {
         }
 
         constexpr int flag = ANIM_FLAG_ENABLE_PLAYER_CONTROL;
-        AI::TASK_PLAY_ANIM(g_playerPed, dict, name, -8.0f, 8.0f, -1, flag, 1.0f, 0, 0, 0);
+        TASK::TASK_PLAY_ANIM(g_playerPed, dict, name, -8.0f, 8.0f, -1, flag, 1.0f, 0, 0, 0);
         lastAnimation = anim;
         UI::Notify(DEBUG, fmt::format("Started steering animation ({})", lastAnimation.Dictionary), false);
     }

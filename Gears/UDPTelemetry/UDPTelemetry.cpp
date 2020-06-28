@@ -11,7 +11,7 @@ void UDPTelemetry::UpdatePacket(Socket& socket, Vehicle vehicle, const VehicleDa
                                 const CarControls& controls) {
     TelemetryPacket packet{};
 
-    packet.Time = static_cast<float>(GAMEPLAY::GET_GAME_TIMER()) / 1000.0f;
+    packet.Time = static_cast<float>(MISC::GET_GAME_TIMER()) / 1000.0f;
 
     auto worldPos = ENTITY::GET_ENTITY_COORDS(vehicle, true);
     auto worldSpeed = ENTITY::GET_ENTITY_VELOCITY(vehicle);

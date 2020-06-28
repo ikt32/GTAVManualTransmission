@@ -54,7 +54,7 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
     bool playerPassenger = !Util::IsPedOnSeat(npcVehicle, g_playerPed, -1) && 
         PED::GET_VEHICLE_PED_IS_IN(g_playerPed, false) == npcVehicle;
 
-    bool lookBack = CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleLookBehind) == TRUE;
+    bool lookBack = PAD::IS_CONTROL_PRESSED(2, ControlVehicleLookBehind) == TRUE;
     auto vehPos = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
     float searchdist = 50.0f;
     float searchfov = 15.0f;
@@ -104,7 +104,7 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
 
             showDebugInfo3DColors(targetPos,
                 {
-                    //{ UI::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(npcVehicle))), fgColor },
+                    //{ HUD::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(npcVehicle))), fgColor },
                     //{ plate, fgColor },
                     { "Throttle: " + std::to_string(throttle), thColor },
                     { "Brake: " + std::to_string(brake), brColor },
@@ -158,7 +158,7 @@ void updateShifting(Vehicle npcVehicle, VehicleGearboxStates& gearStates) {
      * 4.0 gives similar perf as base - probably the whole shift takes 1/rate seconds
      * with my extra disengage step, the whole thing should take also 1/rate seconds
      */
-    shiftRate = shiftRate * GAMEPLAY::GET_FRAME_TIME() * 4.0f;
+    shiftRate = shiftRate * MISC::GET_FRAME_TIME() * 4.0f;
 
     // Something went wrong, abort and just shift to NextGear.
     if (gearStates.ClutchVal > 1.5f) {
@@ -228,7 +228,7 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
         if (throttle >= gearStates.ThrottleHang)
             gearStates.ThrottleHang = throttle;
         else if (gearStates.ThrottleHang > 0.0f)
-            gearStates.ThrottleHang -= GAMEPLAY::GET_FRAME_TIME() * g_settings.AutoParams.EcoRate;
+            gearStates.ThrottleHang -= MISC::GET_FRAME_TIME() * g_settings.AutoParams.EcoRate;
 
         if (gearStates.ThrottleHang < 0.0f)
             gearStates.ThrottleHang = 0.0f;
@@ -256,7 +256,7 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
             if (engineLoad < g_settings.AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
                 shiftTo(gearStates, currGear + 1, true);
                 gearStates.FakeNeutral = false;
-                gearStates.LastUpshiftTime = GAMEPLAY::GET_GAME_TIMER();
+                gearStates.LastUpshiftTime = MISC::GET_GAME_TIMER();
             }
         }
 
@@ -270,7 +270,7 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
 
         float rateUp = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(npcVehicle) + hOffsets.fClutchChangeRateScaleUpShift);
         float upshiftDuration = 1.0f / (rateUp * g_settings.ShiftOptions.ClutchRateMult);
-        bool tpPassed = GAMEPLAY::GET_GAME_TIMER() > gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings.AutoParams.DownshiftTimeoutMult);
+        bool tpPassed = MISC::GET_GAME_TIMER() > gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings.AutoParams.DownshiftTimeoutMult);
 
         // Shift down
         if (currGear > 1) {
@@ -321,12 +321,12 @@ std::set<Vehicle> updateRaycastVehicles() {
         auto angle = static_cast<float>(static_cast<double>(i) / static_cast<double>(numCasts) * 2.0 * M_PI);
         auto raycastCoordA = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerPed, distMin * cos(angle), distMin * sin(angle), 0.0f);
         auto raycastCoordB = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerPed, distMax * cos(angle), distMax * sin(angle), 0.0f);
-        auto ray = WORLDPROBE::_START_SHAPE_TEST_RAY(
+        auto ray = SHAPETEST::_START_SHAPE_TEST_RAY(
             raycastCoordA.x, raycastCoordA.y, raycastCoordA.z, raycastCoordB.x, raycastCoordB.y, raycastCoordB.z, 10, g_playerVehicle, 0);
         BOOL hit;
         Vector3 endCoords, surfaceNormal;
         Entity entity;
-        WORLDPROBE::GET_SHAPE_TEST_RESULT(ray, &hit, &endCoords, &surfaceNormal, &entity);
+        SHAPETEST::GET_SHAPE_TEST_RESULT(ray, &hit, &endCoords, &surfaceNormal, &entity);
         if (hit) {
             if (ENTITY::GET_ENTITY_TYPE(entity) == 2) {
                 uniqueVehicles.insert(entity);
@@ -400,7 +400,7 @@ void update_npc() {
             auto raycastVehicles_ = std::vector<Vehicle>(raycastVehicles.begin(), raycastVehicles.end());
             updateNPCVehicleList(raycastVehicles_, g_npcVehicles);
 
-            if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(g_playerVehicle, -1) != g_playerPed) {
+            if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(g_playerVehicle, -1, 0) != g_playerPed) {
                 g_npcVehicles.emplace_back(g_playerVehicle);
             }
 

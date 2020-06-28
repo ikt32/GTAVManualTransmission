@@ -71,14 +71,14 @@ void FPVCam::updateDriverHeadOffset() {
 
 void FPVCam::CancelCam() {
     if (CAM::DOES_CAM_EXIST(cameraHandle)) {
-        CAM::RENDER_SCRIPT_CAMS(false, false, 0, true, false);
+        CAM::RENDER_SCRIPT_CAMS(false, false, 0, true, false, 0);
         CAM::SET_CAM_ACTIVE(cameraHandle, false);
         CAM::DESTROY_CAM(cameraHandle, false);
         cameraHandle = -1;
         if (g_settings.Misc.Camera.RemoveHead) {
             HideHead(false);
         }
-        UI::UNLOCK_MINIMAP_ANGLE();
+        HUD::UNLOCK_MINIMAP_ANGLE();
     }
 }
 
@@ -120,7 +120,7 @@ void FPVCam::Update() {
         PED::IS_PED_SITTING_IN_VEHICLE(g_playerPed, g_playerVehicle);
     bool lookingIntoGlass = false;
 
-    bool aiming = CONTROLS::IS_CONTROL_PRESSED(2, ControlVehicleAim);
+    bool aiming = PAD::IS_CONTROL_PRESSED(2, ControlVehicleAim);
     if (g_vehData.mDomain == VehicleDomain::Air)
         aiming = false;
 
@@ -138,14 +138,14 @@ void FPVCam::Update() {
         return;
     }
 
-    CONTROLS::DISABLE_CONTROL_ACTION(0, eControl::ControlVehicleCinCam, true);
+    PAD::DISABLE_CONTROL_ACTION(0, eControl::ControlVehicleCinCam, true);
 
     // Initialize camera
     if (cameraHandle == -1) {
         initCam();
 
         CAM::SET_CAM_ACTIVE(cameraHandle, true);
-        CAM::RENDER_SCRIPT_CAMS(true, false, 0, true, false);
+        CAM::RENDER_SCRIPT_CAMS(true, false, 0, true, false, 0);
 
         if (Length(driverHeadOffsetStatic) == 0.0f || 
             Math::Near(Length(g_vehData.mVelocity), 0.0f, 0.01f) &&
@@ -158,7 +158,7 @@ void FPVCam::Update() {
         updateWheelLook(lookingIntoGlass);
     }
     // Mouse look
-    else if (CONTROLS::_IS_INPUT_DISABLED(2) == TRUE) {
+    else if (PAD::_IS_INPUT_DISABLED(2) == TRUE) {
         updateMouseLook(lookingIntoGlass);
     }
     // Controller look
@@ -335,12 +335,12 @@ void FPVCam::Update() {
     if (minimapAngle > 360.0f) minimapAngle = minimapAngle - 360.0f;
     if (minimapAngle < 0.0f) minimapAngle = minimapAngle + 360.0f;
 
-    UI::LOCK_MINIMAP_ANGLE(static_cast<int>(minimapAngle));
+    HUD::LOCK_MINIMAP_ANGLE(static_cast<int>(minimapAngle));
 }
 
 void updateControllerLook(bool& lookingIntoGlass) {
-    float lookLeftRight = CONTROLS::GET_CONTROL_NORMAL(0, eControl::ControlLookLeftRight);
-    float lookUpDown = CONTROLS::GET_CONTROL_NORMAL(0, eControl::ControlLookUpDown);
+    float lookLeftRight = PAD::GET_CONTROL_NORMAL(0, eControl::ControlLookLeftRight);
+    float lookUpDown = PAD::GET_CONTROL_NORMAL(0, eControl::ControlLookUpDown);
 
     if (g_vehData.mIsRhd && lookLeftRight > 0.01f) {
         lookingIntoGlass = true;
@@ -359,30 +359,30 @@ void updateControllerLook(bool& lookingIntoGlass) {
     }
 
     camRot.x = lerp(camRot.x, 90.0f * -lookUpDown,
-        1.0f - pow(g_settings.Misc.Camera.LookTime, GAMEPLAY::GET_FRAME_TIME()));
+        1.0f - pow(g_settings.Misc.Camera.LookTime, MISC::GET_FRAME_TIME()));
 
-    if (CONTROLS::GET_CONTROL_NORMAL(0, eControl::ControlVehicleLookBehind) != 0.0f) {
+    if (PAD::GET_CONTROL_NORMAL(0, eControl::ControlVehicleLookBehind) != 0.0f) {
         float lookBackAngle = -179.0f; // Look over right shoulder
         if (g_vehData.mIsRhd) {
             lookBackAngle = 179.0f; // Look over left shoulder
         }
         camRot.z = lerp(camRot.z, lookBackAngle,
-            1.0f - pow(g_settings.Misc.Camera.LookTime, GAMEPLAY::GET_FRAME_TIME()));
+            1.0f - pow(g_settings.Misc.Camera.LookTime, MISC::GET_FRAME_TIME()));
     }
     else {
         // Manual look
         camRot.z = lerp(camRot.z, 179.0f * -lookLeftRight,
-            1.0f - pow(g_settings.Misc.Camera.LookTime, GAMEPLAY::GET_FRAME_TIME()));
+            1.0f - pow(g_settings.Misc.Camera.LookTime, MISC::GET_FRAME_TIME()));
     }
 }
 
 void updateMouseLook(bool& lookingIntoGlass) {
     float lookLeftRight = 
-        CONTROLS::GET_CONTROL_NORMAL(0, eControl::ControlLookLeftRight) * g_settings.Misc.Camera.MouseSensitivity;
+        PAD::GET_CONTROL_NORMAL(0, eControl::ControlLookLeftRight) * g_settings.Misc.Camera.MouseSensitivity;
     float lookUpDown = 
-        CONTROLS::GET_CONTROL_NORMAL(0, eControl::ControlLookUpDown) * g_settings.Misc.Camera.MouseSensitivity;
+        PAD::GET_CONTROL_NORMAL(0, eControl::ControlLookUpDown) * g_settings.Misc.Camera.MouseSensitivity;
 
-    bool lookBehind = CONTROLS::GET_CONTROL_NORMAL(0, eControl::ControlVehicleLookBehind) != 0.0f;
+    bool lookBehind = PAD::GET_CONTROL_NORMAL(0, eControl::ControlVehicleLookBehind) != 0.0f;
 
     if (g_vehData.mIsRhd && lookLeftRightAcc > 0.01f) {
         lookingIntoGlass = true;
@@ -401,9 +401,9 @@ void updateMouseLook(bool& lookingIntoGlass) {
 
     if (lastMouseLookInputTimer.Expired() && Length(g_vehData.mVelocity) > 1.0f && !lookBehind) {
         lookUpDownAcc = lerp(lookUpDownAcc, 0.0f,
-            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
+            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, MISC::GET_FRAME_TIME()));
         lookLeftRightAcc = lerp(lookLeftRightAcc, 0.0f,
-            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
+            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, MISC::GET_FRAME_TIME()));
     }
     else {
         lookUpDownAcc += lookUpDown;
@@ -426,7 +426,7 @@ void updateMouseLook(bool& lookingIntoGlass) {
     }
 
     camRot.x = lerp(camRot.x, 90 * -lookUpDownAcc,
-        1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
+        1.0f - pow(g_settings.Misc.Camera.MouseLookTime, MISC::GET_FRAME_TIME()));
 
     // Override any camRot.z changes while looking back 
     if (lookBehind) {
@@ -435,11 +435,11 @@ void updateMouseLook(bool& lookingIntoGlass) {
             lookBackAngle = 179.0f; // Look over left shoulder
         }
         camRot.z = lerp(camRot.z, lookBackAngle,
-            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
+            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, MISC::GET_FRAME_TIME()));
     }
     else {
         camRot.z = lerp(camRot.z, 179.0f * -lookLeftRightAcc,
-            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
+            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, MISC::GET_FRAME_TIME()));
     }
 }
 
@@ -455,7 +455,7 @@ void updateWheelLook(bool& lookingIntoGlass) {
         float maxAngle = lookingIntoGlass ? 135.0f : 179.0f;
         float lookBackAngle = g_peripherals.LookBackRShoulder ? -1.0f * maxAngle : maxAngle;
         camRot.z = lerp(camRot.z, lookBackAngle,
-            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
+            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, MISC::GET_FRAME_TIME()));
     }
     else {
         float angle;
@@ -466,6 +466,6 @@ void updateWheelLook(bool& lookingIntoGlass) {
             angle = -90.0f;
         }
         camRot.z = lerp(camRot.z, angle,
-            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, GAMEPLAY::GET_FRAME_TIME()));
+            1.0f - pow(g_settings.Misc.Camera.MouseLookTime, MISC::GET_FRAME_TIME()));
     }
 }

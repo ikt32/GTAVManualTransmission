@@ -260,7 +260,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
 
             if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y > reverseThreshold) {
                 if (!isClutchPressed()) {
-                    CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
+                    PAD::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
                 }
                 // Brake Pedal Reverse
                 if (wheelBrakeVal > 0.01f) {
@@ -379,7 +379,7 @@ void checkRadioButtons() {
 
 void checkCameraButtons() {
     if (g_controls.ButtonIn(CarControls::WheelControlType::LookBack)) {
-        CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleLookBehind, 1.0f);
+        PAD::_SET_CONTROL_NORMAL(0, ControlVehicleLookBehind, 1.0f);
     }
 
     // who was first?
@@ -410,22 +410,22 @@ void checkCameraButtons() {
     }
 
     if (g_controls.ButtonJustPressed(CarControls::WheelControlType::Camera)) {
-        CONTROLS::_SET_CONTROL_NORMAL(0, ControlNextCamera, 1.0f);
+        PAD::_SET_CONTROL_NORMAL(0, ControlNextCamera, 1.0f);
     }
 }
 
 void checkVehicleInputButtons() {
     if (g_controls.HandbrakeVal > 0.1f) {
-        CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, g_controls.HandbrakeVal);
+        PAD::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, g_controls.HandbrakeVal);
     }
     if (g_controls.ButtonIn(CarControls::WheelControlType::Handbrake)) {
-        CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
+        PAD::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
     }
     if (g_controls.ButtonIn(CarControls::WheelControlType::Horn)) {
-        CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHorn, 1.0f);
+        PAD::_SET_CONTROL_NORMAL(0, ControlVehicleHorn, 1.0f);
     }
     if (g_controls.ButtonJustPressed(CarControls::WheelControlType::Lights)) {
-        CONTROLS::_SET_CONTROL_NORMAL(0, ControlVehicleHeadlight, 1.0f);
+        PAD::_SET_CONTROL_NORMAL(0, ControlVehicleHeadlight, 1.0f);
     }
 }
 

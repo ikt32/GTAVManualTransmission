@@ -19,7 +19,7 @@ namespace {
             driverSeatPos.x, driverSeatPos.y, driverSeatPos.z);
 
         //Vector3 dimMin, dimMax;
-        //GAMEPLAY::GET_MODEL_DIMENSIONS(ENTITY::GET_ENTITY_MODEL(v), &dimMin, &dimMax);
+        //MISC::GET_MODEL_DIMENSIONS(ENTITY::GET_ENTITY_MODEL(v), &dimMin, &dimMax);
 
         if (driverSeatPosRel.x > 0.01f && 
             sgn(driverSeatPosRel.x) == sgn(1.0f)) {
@@ -196,7 +196,7 @@ std::vector<float> VehicleData::getSuspensionTravelSpeeds() {
     std::vector<float> suspensionTravelSpeeds(mWheelCount);
     for (size_t i = 0; i < mWheelCount; ++i) {
         suspensionTravelSpeeds[i] =
-            (mSuspensionTravel[i] - mPrevSuspensionTravel[i]) / GAMEPLAY::GET_FRAME_TIME();
+            (mSuspensionTravel[i] - mPrevSuspensionTravel[i]) / MISC::GET_FRAME_TIME();
     }
     return suspensionTravelSpeeds;
 }
@@ -204,9 +204,9 @@ std::vector<float> VehicleData::getSuspensionTravelSpeeds() {
 Vector3 VehicleData::getAcceleration() {
     Vector3 acceleration{};
 
-    acceleration.x = (mVelocity.x - mPrevVelocity.x) / GAMEPLAY::GET_FRAME_TIME();
-    acceleration.y = (mVelocity.y - mPrevVelocity.y) / GAMEPLAY::GET_FRAME_TIME();
-    acceleration.z = (mVelocity.z - mPrevVelocity.z) / GAMEPLAY::GET_FRAME_TIME();
+    acceleration.x = (mVelocity.x - mPrevVelocity.x) / MISC::GET_FRAME_TIME();
+    acceleration.y = (mVelocity.y - mPrevVelocity.y) / MISC::GET_FRAME_TIME();
+    acceleration.z = (mVelocity.z - mPrevVelocity.z) / MISC::GET_FRAME_TIME();
 
     return acceleration;
 }
