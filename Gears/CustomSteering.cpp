@@ -20,6 +20,7 @@ extern Vehicle g_playerVehicle;
 extern Ped g_playerPed;
 extern VehicleExtensions g_ext;
 extern ScriptSettings g_settings;
+extern CarControls g_controls;
 
 namespace {
     float steerPrev = 0.0f;
@@ -187,6 +188,11 @@ void CustomSteering::Update() {
     float reduction = calculateReduction();
 
     float steer = -PAD::GET_DISABLED_CONTROL_NORMAL(1, ControlMoveLeftRight);
+    if (g_controls.PrevInput == CarControls::Controller) {
+        if (g_settings.Controller.Native.Enable == false) {
+            steer = g_controls.SteerVal;
+        }
+    }
 
     float steerCurr;
 

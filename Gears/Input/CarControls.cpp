@@ -82,6 +82,8 @@ void CarControls::updateController() {
         ThrottleVal = mXInputController.GetAnalogValue(mXInputController.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Throttle)].Control));
         BrakeVal = mXInputController.GetAnalogValue(mXInputController.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Brake)].Control));
         ClutchVal = mXInputController.GetAnalogValue(mXInputController.StringToButton(ControlXbox[static_cast<int>(ControllerControlType::Clutch)].Control));
+        SteerVal = mXInputController.GetAnalogValue(mXInputController.StringToButton("LeftThumbLeft")) - 
+                   mXInputController.GetAnalogValue(mXInputController.StringToButton("LeftThumbRight"));
     }
 }
 
