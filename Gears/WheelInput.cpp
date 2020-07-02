@@ -119,7 +119,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
     if (g_vehData.mGearCurr > 0) {
         // Going forward
         if (g_vehData.mVelocity.y >= speedThreshold) {
-            //showText(0.3, 0.0, 1.0, "We are going forward");
+            //UI::ShowText(0.3, 0.0, 1.0, "We are going forward");
             // Throttle Pedal normal
             if (wheelThrottleVal > 0.01f) {
                 Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, g_settings.Wheel.Throttle.AntiDeadZone);
@@ -132,14 +132,14 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
 
         // Standing still
         if (abs(g_vehData.mVelocity.y) < speedThreshold) {
-            //showText(0.3, 0.0, 1.0, "We are stopped");
+            //UI::ShowText(0.3, 0.0, 1.0, "We are stopped");
             // Throttle Pedal normal
             if (wheelThrottleVal > 0.01f) {
                 Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, g_settings.Wheel.Throttle.AntiDeadZone);
             }
             // Brake Pedal conditional
             if (wheelBrakeVal > wheelThrottleVal) {
-                //showText(0.3, 0.0, 1.0, "We are stopped + just brake lights");
+                //UI::ShowText(0.3, 0.0, 1.0, "We are stopped + just brake lights");
                 
                 if (wheelBrakeVal > 0.01f) {
                     //g_ext.SetThrottleP(g_playerVehicle, 0.1f);
@@ -148,7 +148,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
                 }
             }
             else {
-                //showText(0.3, 0.0, 1.0, "We are stopped + burnout");
+                //UI::ShowText(0.3, 0.0, 1.0, "We are stopped + burnout");
                 // Brake Pedal normal
                 if (wheelBrakeVal > 0.01f) {
                     Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone);
@@ -161,8 +161,8 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             bool brakelights = false;
             // Just brake
             if (wheelThrottleVal <= 0.01f && wheelBrakeVal > 0.01f) {
-                //showText(0.3, 0.0, 1.0, "We should brake");
-                //showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)));
+                //UI::ShowText(0.3, 0.0, 1.0, "We should brake");
+                //UI::ShowText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)));
                 Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone);
                 g_ext.SetThrottleP(g_playerVehicle, 0.1f);
                 g_ext.SetBrakeP(g_playerVehicle, 1.0f);
@@ -170,7 +170,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             }
 
             if (!g_gearStates.FakeNeutral && wheelThrottleVal > 0.01f && !isClutchPressed()) {
-                //showText(0.3, 0.0, 1.0, "We should burnout");
+                //UI::ShowText(0.3, 0.0, 1.0, "We should burnout");
                 if (g_controls.BrakeVal < 0.1f) {
                     VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, false);
                 }
@@ -194,8 +194,8 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
 
             if (wheelThrottleVal > 0.01f && (isClutchPressed() || g_gearStates.FakeNeutral)) {
                 if (wheelBrakeVal > 0.01f) {
-                    //showText(0.3, 0.0, 1.0, "We should rev and brake");
-                    //showText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)) );
+                    //UI::ShowText(0.3, 0.0, 1.0, "We should rev and brake");
+                    //UI::ShowText(0.3, 0.05, 1.0, ("Brake pressure:" + std::to_string(wheelBrakeVal)) );
                     Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone);
                     g_ext.SetThrottleP(g_playerVehicle, 0.1f);
                     g_ext.SetBrakeP(g_playerVehicle, 1.0f);
@@ -203,12 +203,12 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
                     fakeRev(false, 0);
                 }
                 else if (g_controls.ClutchVal > 0.9 || g_gearStates.FakeNeutral) {
-                    //showText(0.3, 0.0, 1.0, "We should rev and do nothing");
+                    //UI::ShowText(0.3, 0.0, 1.0, "We should rev and do nothing");
                     g_ext.SetThrottleP(g_playerVehicle, wheelThrottleVal);
                     fakeRev(false, 0);
                 }
                 else {
-                    //showText(0.3, 0.0, 1.0, "We should rev and apply throttle");
+                    //UI::ShowText(0.3, 0.0, 1.0, "We should rev and apply throttle");
                     Controls::SetControlADZ(ControlVehicleAccelerate, wheelThrottleVal, g_settings.Wheel.Throttle.AntiDeadZone);
                     g_ext.SetThrottleP(g_playerVehicle, wheelThrottleVal);
                     fakeRev(false, 0);
@@ -227,7 +227,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
 
         // We're reversing
         if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y < -speedThreshold) {
-            //showText(0.3, 0.0, 1.0, "We are reversing");
+            //UI::ShowText(0.3, 0.0, 1.0, "We are reversing");
             // Throttle Pedal Reverse
             if (wheelThrottleVal > 0.01f) {
                 Controls::SetControlADZ(ControlVehicleBrake, wheelThrottleVal, g_settings.Wheel.Throttle.AntiDeadZone);
@@ -242,7 +242,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
 
         // Standing still
         if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y < speedThreshold && ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y >= -speedThreshold) {
-            //showText(0.3, 0.0, 1.0, "We are stopped");
+            //UI::ShowText(0.3, 0.0, 1.0, "We are stopped");
 
             if (wheelThrottleVal > 0.01f) {
                 Controls::SetControlADZ(ControlVehicleBrake, wheelThrottleVal, g_settings.Wheel.Throttle.AntiDeadZone);
@@ -257,7 +257,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
 
         // We're rolling forwards
         if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y > speedThreshold) {
-            //showText(0.3, 0.0, 1.0, "We are rolling forwards");
+            //UI::ShowText(0.3, 0.0, 1.0, "We are rolling forwards");
             //bool brakelights = false;
 
             if (ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y > reverseThreshold) {
@@ -696,10 +696,10 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     }
 
     if (g_settings.Debug.DisplayInfo) {
-        //showText(0.85, 0.175, 0.4, fmt::format("RelSteer:\t{:.3f}", steeringRelative.x), 4);
-        //showText(0.85, 0.200, 0.4, fmt::format("SetPoint:\t{:.3f}", travelRelative.x), 4);
-        showText(0.85, 0.225, 0.4, fmt::format("Error:\t\t{:.3f}", error), 4);
-        showText(0.85, 0.250, 0.4, fmt::format("{}Under:\t\t{:.3f}~w~", understeering ? "~b~" : "~w~", understeer), 4);
+        //UI::ShowText(0.85, 0.175, 0.4, fmt::format("RelSteer:\t{:.3f}", steeringRelative.x), 4);
+        //UI::ShowText(0.85, 0.200, 0.4, fmt::format("SetPoint:\t{:.3f}", travelRelative.x), 4);
+        UI::ShowText(0.85, 0.225, 0.4, fmt::format("Error:\t\t{:.3f}", error), 4);
+        UI::ShowText(0.85, 0.250, 0.4, fmt::format("{}Under:\t\t{:.3f}~w~", understeering ? "~b~" : "~w~", understeer), 4);
     }
     if (satForce > 0) {
         satForce = map(satForce, 0, 10000, g_settings().Wheel.FFB.AntiDeadForce, 10000);
@@ -841,10 +841,10 @@ void WheelInput::PlayFFBGround() {
     }
 
     if (g_settings.Debug.DisplayInfo) {
-        showText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > g_settings.Wheel.FFB.SATMax ? "~r~" : "~w~", satForce), 4);
-        showText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
-        showText(0.85, 0.325, 0.4, fmt::format("Damper:\t\t{}", damperForce), 4);
-        showText(0.85, 0.350, 0.4, fmt::format("Detail:\t\t{}", detailForce), 4);
+        UI::ShowText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > g_settings.Wheel.FFB.SATMax ? "~r~" : "~w~", satForce), 4);
+        UI::ShowText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
+        UI::ShowText(0.85, 0.325, 0.4, fmt::format("Damper:\t\t{}", damperForce), 4);
+        UI::ShowText(0.85, 0.350, 0.4, fmt::format("Detail:\t\t{}", detailForce), 4);
     }
 }
 
@@ -881,8 +881,8 @@ void WheelInput::PlayFFBWater() {
     g_controls.PlayFFBDynamics(totalForce, damperForce);
 
     if (g_settings.Debug.DisplayInfo) {
-        showText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
-        showText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
-        showText(0.85, 0.325, 0.4, fmt::format("Damper:\t{}", damperForce), 4);
+        UI::ShowText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
+        UI::ShowText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
+        UI::ShowText(0.85, 0.325, 0.4, fmt::format("Damper:\t{}", damperForce), 4);
     }
 }

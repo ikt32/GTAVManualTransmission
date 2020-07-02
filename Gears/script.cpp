@@ -1349,10 +1349,10 @@ void functionEngStall() {
         VEHICLE::SET_VEHICLE_ENGINE_ON(g_playerVehicle, true, true, true);
     }
 
-    //showText(0.1, 0.00, 0.4, fmt("Stall progress: %.02f", gearStates.StallProgress));
-    //showText(0.1, 0.02, 0.4, fmt("Clutch: %d", clutchEngaged));
-    //showText(0.1, 0.04, 0.4, fmt("Stall?: %d", stallEngaged));
-    //showText(0.1, 0.06, 0.4, fmt("SpeedDiffRatio: %.02f", speedDiffRatio));
+    //UI::ShowText(0.1, 0.00, 0.4, fmt("Stall progress: %.02f", gearStates.StallProgress));
+    //UI::ShowText(0.1, 0.02, 0.4, fmt("Clutch: %d", clutchEngaged));
+    //UI::ShowText(0.1, 0.04, 0.4, fmt("Stall?: %d", stallEngaged));
+    //UI::ShowText(0.1, 0.06, 0.4, fmt("SpeedDiffRatio: %.02f", speedDiffRatio));
 }
 
 void functionEngDamage() {
@@ -1443,8 +1443,8 @@ void functionEngLock() {
             }
         }
         if (g_settings.Debug.DisplayInfo) {
-            showText(0.5, 0.80, 0.25, fmt::format("Eng block: {:.3f}", inputMultiplier));
-            showText(0.5, 0.85, 0.25, fmt::format("Eng block force: {:.3f}", lockingForce));
+            UI::ShowText(0.5, 0.80, 0.25, fmt::format("Eng block: {:.3f}", inputMultiplier));
+            UI::ShowText(0.5, 0.85, 0.25, fmt::format("Eng block force: {:.3f}", lockingForce));
         }
     }
     else {
@@ -1480,9 +1480,9 @@ void functionEngBrake() {
         }
     }
     if (g_settings.Debug.DisplayInfo) {
-        showText(0.85, 0.500, 0.4, fmt::format("EngBrake:\t\t{:.3f}", inputMultiplier), 4);
-        showText(0.85, 0.525, 0.4, fmt::format("Pressure:\t\t{:.3f}", engBrakeForce), 4);
-        showText(0.45, 0.75, 1.0, "~r~EngBrake");
+        UI::ShowText(0.85, 0.500, 0.4, fmt::format("EngBrake:\t\t{:.3f}", inputMultiplier), 4);
+        UI::ShowText(0.85, 0.525, 0.4, fmt::format("Pressure:\t\t{:.3f}", engBrakeForce), 4);
+        UI::ShowText(0.45, 0.75, 1.0, "~r~EngBrake");
     }
 }
 
@@ -1559,13 +1559,13 @@ void handleBrakePatch() {
         std::string rddcol;
         if (rdd > 0.1f) { rddcol = "~r~"; }
         if (rdd < -0.1f) { rddcol = "~b~"; }
-        showText(0.60f, 0.000f, 0.25f, fmt::format("LF LSD: {:.2f}", lsdBrakeLF));
-        showText(0.65f, 0.000f, 0.25f, fmt::format("RF LSD: {:.2f}", lsdBrakeRF));
-        showText(0.70f, 0.000f, 0.25f, fmt::format("{}L-R: {:.2f}", fddcol, fdd));
-        showText(0.60f, 0.025f, 0.25f, fmt::format("LR LSD: {:.2f}", lsdBrakeLR));
-        showText(0.65f, 0.025f, 0.25f, fmt::format("RR LSD: {:.2f}", lsdBrakeRR));
-        showText(0.70f, 0.025f, 0.25f, fmt::format("{}L-R: {:.2f}", rddcol, rdd));
-        showText(0.60f, 0.050f, 0.25f, fmt::format("{}LSD: {}", useLSD ? "~g~" : "~r~", useLSD ? "Active" : "Idle/Off"));
+        UI::ShowText(0.60f, 0.000f, 0.25f, fmt::format("LF LSD: {:.2f}", lsdBrakeLF));
+        UI::ShowText(0.65f, 0.000f, 0.25f, fmt::format("RF LSD: {:.2f}", lsdBrakeRF));
+        UI::ShowText(0.70f, 0.000f, 0.25f, fmt::format("{}L-R: {:.2f}", fddcol, fdd));
+        UI::ShowText(0.60f, 0.025f, 0.25f, fmt::format("LR LSD: {:.2f}", lsdBrakeLR));
+        UI::ShowText(0.65f, 0.025f, 0.25f, fmt::format("RR LSD: {:.2f}", lsdBrakeRR));
+        UI::ShowText(0.70f, 0.025f, 0.25f, fmt::format("{}L-R: {:.2f}", rddcol, rdd));
+        UI::ShowText(0.60f, 0.050f, 0.25f, fmt::format("{}LSD: {}", useLSD ? "~g~" : "~r~", useLSD ? "Active" : "Idle/Off"));
     }
 
     bool espUndersteer = false;
@@ -1705,7 +1705,7 @@ void handleBrakePatch() {
             }
         }
         if (g_settings.Debug.DisplayInfo)
-            showText(0.45, 0.75, 1.0, "~r~(TCS/T)");
+            UI::ShowText(0.45, 0.75, 1.0, "~r~(TCS/T)");
     }
 
     bool patchThrottle =
@@ -1740,7 +1740,7 @@ void handleBrakePatch() {
             MemoryPatcher::PatchThrottle();
         }
         if (g_settings.Debug.DisplayInfo)
-            showText(0.45, 0.75, 1.0, "~r~Burnout");
+            UI::ShowText(0.45, 0.75, 1.0, "~r~Burnout");
     }
     else {
         if (patchThrottle) {
@@ -1812,7 +1812,7 @@ void handleBrakePatch() {
                     espString = "O";
                 else if (espUndersteer)
                     espString = "U";
-                showText(0.45, 0.75, 1.0, fmt::format("~r~(ESP_{})", espString));
+                UI::ShowText(0.45, 0.75, 1.0, fmt::format("~r~(ESP_{})", espString));
             }
         }
         if (useTCS && g_settings().DriveAssists.TCS.Mode == 0) {
@@ -1839,7 +1839,7 @@ void handleBrakePatch() {
                 }
             }
             if (g_settings.Debug.DisplayInfo)
-                showText(0.45, 0.75, 1.0, "~r~(TCS/B)");
+                UI::ShowText(0.45, 0.75, 1.0, "~r~(TCS/B)");
         }
         if (useABS) {
             std::vector<float> lsdVals(g_vehData.mWheelCount);
@@ -1864,7 +1864,7 @@ void handleBrakePatch() {
                 }
             }
             if (g_settings.Debug.DisplayInfo)
-                showText(0.45, 0.75, 1.0, "~r~(ABS)");
+                UI::ShowText(0.45, 0.75, 1.0, "~r~(ABS)");
         }
 
         if (!useABS && !useESP && !useTCS && useLSD) {
@@ -1917,7 +1917,7 @@ void fakeRev(bool customThrottle, float customThrottleVal) {
     float rpmVal = g_vehData.mRPM +			// Base value
         rpmValTemp +						// Keep it constant
         throttleVal * accelRatio;	// Addition value, depends on delta T
-    //showText(0.4, 0.4, 1.0, fmt("FakeRev %d %.02f", customThrottle, rpmVal));
+    //UI::ShowText(0.4, 0.4, 1.0, fmt("FakeRev %d %.02f", customThrottle, rpmVal));
     VExt::SetCurrentRPM(g_playerVehicle, std::clamp(rpmVal, 0.0f, 1.0f));
 }
 
@@ -1966,12 +1966,12 @@ void handleRPM() {
         PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
         float counterForce = 0.25f*-(static_cast<float>(g_vehData.mGearTop) - static_cast<float>(g_vehData.mGearCurr))/static_cast<float>(g_vehData.mGearTop);
         ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(g_playerVehicle, 1, 0.0f, counterForce, 0.0f, true, true, true, true);
-        //showText(0.4, 0.1, 1.0, "REV LIM SPD");
-        //showText(0.4, 0.15, 1.0, "CF: " + std::to_string(counterForce));
+        //UI::ShowText(0.4, 0.1, 1.0, "REV LIM SPD");
+        //UI::ShowText(0.4, 0.15, 1.0, "CF: " + std::to_string(counterForce));
     }
     if (g_gearStates.HitRPMLimiter) {
         VExt::SetCurrentRPM(g_playerVehicle, 1.0f);
-        //showText(0.4, 0.1, 1.0, "REV LIM RPM");
+        //UI::ShowText(0.4, 0.1, 1.0, "REV LIM RPM");
     }
     
     /*
@@ -2056,7 +2056,7 @@ void functionRealReverse() {
         // LT behavior when stopped: Just brake
         if (g_controls.BrakeVal > 0.01f && g_controls.ThrottleVal < g_controls.BrakeVal &&
             ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y < 0.5f && ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y >= -0.5f) { // < 0.5 so reverse never triggers
-                                                                    //showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Stop");
+                                                                    //UI::ShowText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Stop");
             PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
             VExt::SetThrottleP(g_playerVehicle, 0.1f);
             VExt::SetBrakeP(g_playerVehicle, 1.0f);
@@ -2065,7 +2065,7 @@ void functionRealReverse() {
         // LT behavior when rolling back: Brake
         if (g_controls.BrakeVal > 0.01f && g_controls.ThrottleVal < g_controls.BrakeVal &&
             ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y < -0.5f) {
-            //showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Rollback");
+            //UI::ShowText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Rollback");
             VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, true);
             PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
             PAD::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, g_controls.BrakeVal);
@@ -2076,7 +2076,7 @@ void functionRealReverse() {
         // RT behavior when rolling back: Burnout
         if (!g_gearStates.FakeNeutral && g_controls.ThrottleVal > 0.5f && !isClutchPressed() &&
             ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y < -1.0f ) {
-            //showText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Rollback");
+            //UI::ShowText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Rollback");
             //PAD::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, carControls.ThrottleVal);
             if (g_controls.BrakeVal < 0.1f) {
                 VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, false);
@@ -2111,7 +2111,7 @@ void functionRealReverse() {
         int throttleAndSomeBrake = 0;
         if (g_controls.ThrottleVal > 0.01f && g_controls.ThrottleVal > g_controls.BrakeVal) {
             throttleAndSomeBrake++;
-            //showText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Active Reverse");
+            //UI::ShowText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Active Reverse");
 
             PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
             PAD::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, g_controls.ThrottleVal);
@@ -2120,14 +2120,14 @@ void functionRealReverse() {
         if (g_controls.BrakeVal > 0.01f &&
             ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y <= -0.5f) {
             throttleAndSomeBrake++;
-            //showText(0.3, 0.35, 0.5, "functionRealReverse: Brake @ Reverse");
+            //UI::ShowText(0.3, 0.35, 0.5, "functionRealReverse: Brake @ Reverse");
 
             PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
             PAD::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, g_controls.BrakeVal);
         }
         // Throttle > brake  && BrakeVal > 0.1f
         if (throttleAndSomeBrake >= 2) {
-            //showText(0.3, 0.4, 0.5, "functionRealReverse: Weird combo + rev it");
+            //UI::ShowText(0.3, 0.4, 0.5, "functionRealReverse: Weird combo + rev it");
 
             PAD::ENABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
             PAD::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, g_controls.BrakeVal);
@@ -2137,7 +2137,7 @@ void functionRealReverse() {
         // LT behavior when forward
         if (g_controls.BrakeVal > 0.01f && g_controls.ThrottleVal <= g_controls.BrakeVal &&
             ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y > 0.1f) {
-            //showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Rollforwrd");
+            //UI::ShowText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Rollforwrd");
 
             VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, true);
             PAD::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, g_controls.BrakeVal);
@@ -2149,7 +2149,7 @@ void functionRealReverse() {
         // LT behavior when still
         if (g_controls.BrakeVal > 0.01f && g_controls.ThrottleVal <= g_controls.BrakeVal &&
             ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y > -0.5f && ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y <= 0.1f) {
-            //showText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Stopped");
+            //UI::ShowText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Stopped");
 
             VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, true);
             PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);

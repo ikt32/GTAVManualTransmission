@@ -211,8 +211,8 @@ void drawGForces() {
     PrevRotVel = worldRotVel;
     float GForceX = static_cast<float>((accel.x / 9.81) + (worldSpeed * avgWorldRotVel / 9.81));
     float GForceY = static_cast<float>(accel.y) / 9.81f;
-    showText(locX + 0.100f, locY - 0.075f, 0.5f, fmt::format("LAT: {:.2f} g", GForceX));
-    showText(locX + 0.100f, locY + 0.025f, 0.5f, fmt::format("LON: {:.2f} g", GForceY));
+    UI::ShowText(locX + 0.100f, locY - 0.075f, 0.5f, fmt::format("LAT: {:.2f} g", GForceX));
+    UI::ShowText(locX + 0.100f, locY + 0.025f, 0.5f, fmt::format("LON: {:.2f} g", GForceY));
 
     // 1 div = 2G
     float offX = (szX * 0.5f) * GForceX * 0.5f;
@@ -366,7 +366,7 @@ void drawSpeedoMeter() {
         g_settings.HUD.Speedo.ColorB,
         255
     };
-    showText(g_settings.HUD.Speedo.XPos, g_settings.HUD.Speedo.YPos, g_settings.HUD.Speedo.Size,
+    UI::ShowText(g_settings.HUD.Speedo.XPos, g_settings.HUD.Speedo.YPos, g_settings.HUD.Speedo.Size,
         formatSpeedo(g_settings.HUD.Speedo.Speedo, dashms, g_settings.HUD.Speedo.ShowUnit, g_settings.HUD.Font),
         g_settings.HUD.Font, color, g_settings.HUD.Outline);
 }
@@ -389,7 +389,7 @@ void drawShiftModeIndicator() {
         shiftModeText = "A";
         color = { 0, 126, 232, 255 };
     }
-    showText(g_settings.HUD.ShiftMode.XPos, g_settings.HUD.ShiftMode.YPos, g_settings.HUD.ShiftMode.Size, 
+    UI::ShowText(g_settings.HUD.ShiftMode.XPos, g_settings.HUD.ShiftMode.YPos, g_settings.HUD.ShiftMode.Size, 
         shiftModeText, g_settings.HUD.Font, color, g_settings.HUD.Outline);
 }
 
@@ -416,7 +416,7 @@ void drawGearIndicator() {
         color.B = g_settings.HUD.Gear.TopColorB;
         color.A = 255;
     }
-    showText(g_settings.HUD.Gear.XPos, g_settings.HUD.Gear.YPos, g_settings.HUD.Gear.Size, 
+    UI::ShowText(g_settings.HUD.Gear.XPos, g_settings.HUD.Gear.YPos, g_settings.HUD.Gear.Size, 
         gear, g_settings.HUD.Font, color, g_settings.HUD.Outline);
 }
 
@@ -439,47 +439,47 @@ void drawHUD() {
 
 void drawDebugInfo() {
     if (!g_menu.IsThisOpen()) {
-        showText(0.01, 0.250, 0.3, fmt::format("Address: 0x{:X}", reinterpret_cast<uintptr_t>(g_ext.GetAddress(g_playerVehicle))));
-        showText(0.01, 0.275, 0.3, fmt::format("Mod Enabled:\t\t{}" , g_settings.MTOptions.Enable));
-        showText(0.01, 0.300, 0.3, fmt::format("RPM:\t\t\t{:.3f}", g_vehData.mRPM));
-        showText(0.01, 0.325, 0.3, fmt::format("Current Gear:\t\t{}", g_ext.GetGearCurr(g_playerVehicle)));
-        showText(0.01, 0.350, 0.3, fmt::format("Next Gear:\t\t{}", g_ext.GetGearNext(g_playerVehicle)));
-        showText(0.01, 0.375, 0.3, fmt::format("Clutch:\t\t\t{:.2f}", g_ext.GetClutch(g_playerVehicle)));
-        showText(0.01, 0.400, 0.3, fmt::format("Throttle:\t\t\t{:.2f}", g_ext.GetThrottle(g_playerVehicle)));
-        showText(0.01, 0.425, 0.3, fmt::format("Turbo:\t\t\t{:.2f}", g_ext.GetTurbo(g_playerVehicle)));
-        showText(0.01, 0.450, 0.3, fmt::format("{}Speedo", g_vehData.mHasSpeedo ? "~g~" : "~r~"));
-        showText(0.01, 0.475, 0.3, fmt::format("{}E {}CVT -> {}Clutch",
+        UI::ShowText(0.01, 0.250, 0.3, fmt::format("Address: 0x{:X}", reinterpret_cast<uintptr_t>(g_ext.GetAddress(g_playerVehicle))));
+        UI::ShowText(0.01, 0.275, 0.3, fmt::format("Mod Enabled:\t\t{}" , g_settings.MTOptions.Enable));
+        UI::ShowText(0.01, 0.300, 0.3, fmt::format("RPM:\t\t\t{:.3f}", g_vehData.mRPM));
+        UI::ShowText(0.01, 0.325, 0.3, fmt::format("Current Gear:\t\t{}", g_ext.GetGearCurr(g_playerVehicle)));
+        UI::ShowText(0.01, 0.350, 0.3, fmt::format("Next Gear:\t\t{}", g_ext.GetGearNext(g_playerVehicle)));
+        UI::ShowText(0.01, 0.375, 0.3, fmt::format("Clutch:\t\t\t{:.2f}", g_ext.GetClutch(g_playerVehicle)));
+        UI::ShowText(0.01, 0.400, 0.3, fmt::format("Throttle:\t\t\t{:.2f}", g_ext.GetThrottle(g_playerVehicle)));
+        UI::ShowText(0.01, 0.425, 0.3, fmt::format("Turbo:\t\t\t{:.2f}", g_ext.GetTurbo(g_playerVehicle)));
+        UI::ShowText(0.01, 0.450, 0.3, fmt::format("{}Speedo", g_vehData.mHasSpeedo ? "~g~" : "~r~"));
+        UI::ShowText(0.01, 0.475, 0.3, fmt::format("{}E {}CVT -> {}Clutch",
             g_vehData.mIsElectric ? "~g~" : "~r~", g_vehData.mIsCVT ? "~g~" : "~r~",
             g_vehData.mHasClutch ? "~g~" : "~r~"));
-        showText(0.01, 0.500, 0.3, fmt::format("{}ABS",
+        UI::ShowText(0.01, 0.500, 0.3, fmt::format("{}ABS",
             g_vehData.mHasABS ? "~g~" : "~r~"));
 
-        showText(0.01, 0.550, 0.3, fmt::format("{}Shifting", g_gearStates.Shifting ? "~g~" : "~r~"));
-        showText(0.01, 0.575, 0.3, fmt::format("Clutch: {}" ,g_gearStates.ClutchVal));
-        showText(0.01, 0.600, 0.3, fmt::format("Lock: {}" ,g_gearStates.LockGear));
-        showText(0.01, 0.625, 0.3, fmt::format("Next: {}" ,g_gearStates.NextGear));
+        UI::ShowText(0.01, 0.550, 0.3, fmt::format("{}Shifting", g_gearStates.Shifting ? "~g~" : "~r~"));
+        UI::ShowText(0.01, 0.575, 0.3, fmt::format("Clutch: {}" ,g_gearStates.ClutchVal));
+        UI::ShowText(0.01, 0.600, 0.3, fmt::format("Lock: {}" ,g_gearStates.LockGear));
+        UI::ShowText(0.01, 0.625, 0.3, fmt::format("Next: {}" ,g_gearStates.NextGear));
 
         // Old automatic gearbox
         if (!g_settings().AutoParams.UsingATCU) {
-            showText(0.01, 0.650, 0.3, fmt::format("{}Load/upReq: {:.3f}\t/{:.3f}",
+            UI::ShowText(0.01, 0.650, 0.3, fmt::format("{}Load/upReq: {:.3f}\t/{:.3f}",
                 g_gearStates.Shifting ? "~c~" : "", g_gearStates.EngineLoad, g_gearStates.UpshiftLoad));
-            showText(0.01, 0.675, 0.3, fmt::format("{}Load/dnReq: {:.3f}\t/{:.3f}",
+            UI::ShowText(0.01, 0.675, 0.3, fmt::format("{}Load/dnReq: {:.3f}\t/{:.3f}",
                 g_gearStates.Shifting ? "~c~" : "", g_gearStates.EngineLoad, g_gearStates.DownshiftLoad));
         }
         // Nyconing's ATCU
         else {
-            showText(0.01, 0.650, 0.3, fmt::format("Next optimal up-shifting: {:.2f}%", g_gearStates.Atcu.upshiftingIndex * 100.0f));
-            showText(0.01, 0.675, 0.3, fmt::format("Next optimal down-shifting: {:.2f}%", g_gearStates.Atcu.downshiftingIndex * 100.0f));
+            UI::ShowText(0.01, 0.650, 0.3, fmt::format("Next optimal up-shifting: {:.2f}%", g_gearStates.Atcu.upshiftingIndex * 100.0f));
+            UI::ShowText(0.01, 0.675, 0.3, fmt::format("Next optimal down-shifting: {:.2f}%", g_gearStates.Atcu.downshiftingIndex * 100.0f));
         }
     }
 
-    showText(0.85, 0.050, 0.4, fmt::format("Throttle:\t{:.3f}", g_controls.ThrottleVal) , 4);
-    showText(0.85, 0.075, 0.4, fmt::format("Brake:\t\t{:.3f}" , g_controls.BrakeVal)    , 4);
-    showText(0.85, 0.100, 0.4, fmt::format("Clutch:\t\t{:.3f}", g_controls.ClutchVal)   , 4);
-    showText(0.85, 0.125, 0.4, fmt::format("Handb:\t\t{:.3f}" , g_controls.HandbrakeVal), 4);
+    UI::ShowText(0.85, 0.050, 0.4, fmt::format("Throttle:\t{:.3f}", g_controls.ThrottleVal) , 4);
+    UI::ShowText(0.85, 0.075, 0.4, fmt::format("Brake:\t\t{:.3f}" , g_controls.BrakeVal)    , 4);
+    UI::ShowText(0.85, 0.100, 0.4, fmt::format("Clutch:\t\t{:.3f}", g_controls.ClutchVal)   , 4);
+    UI::ShowText(0.85, 0.125, 0.4, fmt::format("Handb:\t\t{:.3f}" , g_controls.HandbrakeVal), 4);
 
     if (g_settings.Wheel.Options.Enable)
-        showText(0.85, 0.150, 0.4, fmt::format("Wheel {} present", g_controls.WheelAvailable() ? "" : " not"), 4);
+        UI::ShowText(0.85, 0.150, 0.4, fmt::format("Wheel {} present", g_controls.WheelAvailable() ? "" : " not"), 4);
     
 
     if (g_settings.Debug.DisplayGearingInfo) {
@@ -487,17 +487,17 @@ void drawDebugInfo() {
         float DriveMaxFlatVel = g_ext.GetDriveMaxFlatVel(g_playerVehicle);
 
         int i = 0;
-        showText(0.30f, 0.05f, 0.35f, "Ratios");
+        UI::ShowText(0.30f, 0.05f, 0.35f, "Ratios");
         for (auto ratio : ratios) {
-            showText(0.30f, 0.10f + 0.025f * i, 0.35f, fmt::format("G{}: {:.3f}", i, ratio));
+            UI::ShowText(0.30f, 0.10f + 0.025f * i, 0.35f, fmt::format("G{}: {:.3f}", i, ratio));
             i++;
         }
 
         i = 0;
-        showText(0.45f, 0.05f, 0.35f, "DriveMaxFlatVel");
+        UI::ShowText(0.45f, 0.05f, 0.35f, "DriveMaxFlatVel");
         for (auto ratio : ratios) {
             float maxSpeed = DriveMaxFlatVel / ratio;
-            showText(0.45f, 0.10f + 0.025f * i, 0.35f, fmt::format("G{}: {:.3f}", i, maxSpeed));
+            UI::ShowText(0.45f, 0.10f + 0.025f * i, 0.35f, fmt::format("G{}: {:.3f}", i, maxSpeed));
             i++;
         }
 
@@ -506,11 +506,11 @@ void drawDebugInfo() {
         float upshiftDuration = 1.0f / (rateUp * g_settings().ShiftOptions.ClutchRateMult);
         float downshiftDuration = 1.0f / (rateDown * g_settings().ShiftOptions.ClutchRateMult);
 
-        showText(0.60f, 0.050f, 0.35f, fmt::format("ClutchRate Up: {:.3f}", rateUp));
-        showText(0.60f, 0.075f, 0.35f, fmt::format("ClutchRate Dn: {:.3f}", rateDown));
-        showText(0.60f, 0.100f, 0.35f, fmt::format("Duration Up: {:.3f}", upshiftDuration));
-        showText(0.60f, 0.125f, 0.35f, fmt::format("Duration Dn: {:.3f}", downshiftDuration));
-        showText(0.60f, 0.150f, 0.35f, fmt::format("Shift timeout (dn): {:.3f}", downshiftDuration * g_settings().AutoParams.DownshiftTimeoutMult));
+        UI::ShowText(0.60f, 0.050f, 0.35f, fmt::format("ClutchRate Up: {:.3f}", rateUp));
+        UI::ShowText(0.60f, 0.075f, 0.35f, fmt::format("ClutchRate Dn: {:.3f}", rateDown));
+        UI::ShowText(0.60f, 0.100f, 0.35f, fmt::format("Duration Up: {:.3f}", upshiftDuration));
+        UI::ShowText(0.60f, 0.125f, 0.35f, fmt::format("Duration Dn: {:.3f}", downshiftDuration));
+        UI::ShowText(0.60f, 0.150f, 0.35f, fmt::format("Shift timeout (dn): {:.3f}", downshiftDuration * g_settings().AutoParams.DownshiftTimeoutMult));
     }
 }
 
@@ -598,7 +598,7 @@ void drawVehicleWheelInfo() {
         float tyreAr = 100.0f * ((wheelDims[i].TyreRadius - wheelDims[i].RimRadius) / wheelDims[i].TyreWidth);
         float rimSize = 2.0f * wheelDims[i].RimRadius * 39.3701f; // inches
 
-        showDebugInfo3D(wheelCoords[i], {
+        UI::ShowText3D(wheelCoords[i], {
                 fmt::format("[{}] {}Powered", i, g_ext.IsWheelPowered(g_playerVehicle, i) ? "~g~" : "~r~"),
                 fmt::format("Speed: \t{:.3f}", wheelsSpeed[i]),
                 //fmt::format("Compr: \t{:.3f}", wheelsCompr[i]),

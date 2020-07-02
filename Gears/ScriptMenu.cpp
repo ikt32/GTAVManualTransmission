@@ -1085,7 +1085,7 @@ void update_forcefeedbackmenu() {
 
             g_controls.PlayFFBDynamics(g_settings.Wheel.FFB.AntiDeadForce, 0);
             
-            showSubtitle(fmt::format("Press LEFT and RIGHT to decrease and increase force feedback anti-deadzone. "
+            UI::ShowSubtitle(fmt::format("Press LEFT and RIGHT to decrease and increase force feedback anti-deadzone. "
                 "Use the highest value before your wheel starts moving. Currently [{}]. Press {} to exit.", g_settings.Wheel.FFB.AntiDeadForce, escapeKey));
             WAIT(0);
         }
@@ -2198,7 +2198,7 @@ bool configAxis(const std::string& confTag) {
             }
         }
 
-        showSubtitle(additionalInfo);
+        UI::ShowSubtitle(additionalInfo);
         WAIT(0);
     }
 
@@ -2291,7 +2291,7 @@ bool configWheelToKey() {
             addWheelToKey("TO_KEYBOARD", selectedGuid, button, keyName);
             return true;
         }
-        showSubtitle(additionalInfo);
+        UI::ShowSubtitle(additionalInfo);
         WAIT(0);
     }
 }
@@ -2322,7 +2322,7 @@ bool configButton(const std::string& confTag) {
                 }
             }
         }
-        showSubtitle(additionalInfo);
+        UI::ShowSubtitle(additionalInfo);
         WAIT(0);
     }
 }
@@ -2376,7 +2376,7 @@ bool configHPattern() {
         case 3: gearDisplay = "3rd gear"; break;
         default: gearDisplay = fmt::format("{}th gear", progress); break;
         }
-        showSubtitle(fmt::format("Shift into {}. {}", gearDisplay, additionalInfo));
+        UI::ShowSubtitle(fmt::format("Shift into {}. {}", gearDisplay, additionalInfo));
         WAIT(0);
     }
     saveHShifter(confTag, devGUID, buttonArray);
@@ -2439,10 +2439,10 @@ bool configASelect() {
                 progress++;
                 saveButton("AUTO_N", devGUID, -1);
             }
-            showSubtitle(fmt::format("Shift into {}. {}", gearDisplay, additionalInfoN));
+            UI::ShowSubtitle(fmt::format("Shift into {}. {}", gearDisplay, additionalInfoN));
         }
         else {
-            showSubtitle(fmt::format("Shift into {}. {}", gearDisplay, additionalInfo));
+            UI::ShowSubtitle(fmt::format("Shift into {}. {}", gearDisplay, additionalInfo));
         }
         WAIT(0);
     }
@@ -2486,7 +2486,7 @@ bool configKeyboardKey(const std::string &confTag) {
             }
         }
 
-        showSubtitle(fmt::format("Press {}. Menu keys can't be chosen. {}", confTag, additionalInfo));
+        UI::ShowSubtitle(fmt::format("Press {}. Menu keys can't be chosen. {}", confTag, additionalInfo));
         WAIT(0);
     }
 }
@@ -2508,7 +2508,7 @@ bool configControllerButton(const std::string &confTag) {
                 return true;
             }
         }
-        showSubtitle(fmt::format("Press {}. {}", confTag, additionalInfo));
+        UI::ShowSubtitle(fmt::format("Press {}. {}", confTag, additionalInfo));
         WAIT(0);
     }
 }
@@ -2528,7 +2528,7 @@ bool configLControllerButton(const std::string &confTag) {
             }
         }
 
-        showSubtitle(fmt::format("Press {}. {}", confTag, additionalInfo));
+        UI::ShowSubtitle(fmt::format("Press {}. {}", confTag, additionalInfo));
         WAIT(0);
     }
 }

@@ -105,9 +105,9 @@ void CustomSteering::drawDebug() {
     //showText(0.3f, 0.15f, 0.5f, fmt::format("Angle: {}", rad2deg(steeringAngle)));
 
     GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, travelRelative.x, travelRelative.y, travelRelative.z, 0, 255, 0, 255);
-    drawSphere(travelRelative, 0.25f, { 0, 255, 0, 255 });
+    UI::DrawSphere(travelRelative, 0.25f, { 0, 255, 0, 255 });
     GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, steeringWorld.x, steeringWorld.y, steeringWorld.z, 255, 0, 255, 255);
-    drawSphere(steeringWorld, 0.25f, { 255, 0, 255, 255 });
+    UI::DrawSphere(steeringWorld, 0.25f, { 255, 0, 255, 255 });
 }
 
 // Only disable the "magic" movements, such as burnout or in-air acrobatics.

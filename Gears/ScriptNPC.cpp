@@ -105,7 +105,7 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
             auto gearStates = _npcVehicle.GetGearbox();
             auto load = gearStates.ThrottleHang - map(g_ext.GetCurrentRPM(npcVehicle), 0.2f, 1.0f, 0.0f, 1.0f);
 
-            showDebugInfo3DColors(targetPos,
+            UI::ShowText3DColors(targetPos,
                 {
                     //{ HUD::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(npcVehicle))), fgColor },
                     //{ plate, fgColor },
@@ -414,7 +414,7 @@ void update_npc() {
     }
 
     if (g_settings.Debug.DisplayNPCInfo) {
-        showText(0.9, 0.5, 0.4, "NPC Vehs: " + std::to_string(count));
+        UI::ShowText(0.9, 0.5, 0.4, "NPC Vehs: " + std::to_string(count));
         showNPCsInfo(g_npcVehicles);
     }
 

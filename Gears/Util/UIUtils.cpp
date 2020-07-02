@@ -14,6 +14,20 @@ namespace {
     int notificationHandle = 0;
 }
 
+void showNotification(const std::string& message, int* prevNotification) {
+    if (prevNotification != nullptr && *prevNotification != 0) {
+        HUD::THEFEED_REMOVE_ITEM(*prevNotification);
+    }
+    HUD::BEGIN_TEXT_COMMAND_THEFEED_POST("STRING");
+
+    HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(message.c_str());
+
+    int id = HUD::END_TEXT_COMMAND_THEFEED_POST_TICKER(false, false);
+    if (prevNotification != nullptr) {
+        *prevNotification = id;
+    }
+}
+
 float UI::GetStringWidth(const std::string& text, float scale, int font) {
     HUD::_BEGIN_TEXT_COMMAND_GET_WIDTH("STRING");
     HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text.c_str());
@@ -37,7 +51,7 @@ void UI::Notify(int level, const std::string& message, bool removePrevious) {
     showNotification(fmt::format("{}\n{}", Constants::NotificationPrefix, message), notifHandleAddr);
 }
 
-void showText(float x, float y, float scale, const std::string &text, 
+void UI::ShowText(float x, float y, float scale, const std::string &text,
     int font, const Util::ColorI &rgba, bool outline) {
     HUD::SET_TEXT_FONT(font);
     HUD::SET_TEXT_SCALE(scale, scale);
@@ -50,7 +64,7 @@ void showText(float x, float y, float scale, const std::string &text,
     HUD::END_TEXT_COMMAND_DISPLAY_TEXT(x, y, 0);
 }
 
-void showDebugInfo3D(Vector3 location, const std::vector<std::string> &textLines, 
+void UI::ShowText3D(Vector3 location, const std::vector<std::string> &textLines,
     const Util::ColorI& backgroundColor, const Util::ColorI& fontColor) {
     float height = 0.0125f;
 
@@ -59,7 +73,7 @@ void showDebugInfo3D(Vector3 location, const std::vector<std::string> &textLines
 
     float szX = 0.060f;
     for (const auto& line : textLines) {
-        showText(0, 0 + height * static_cast<float>(i), 0.2f, line, 0, fontColor, true);
+        ShowText(0, 0 + height * static_cast<float>(i), 0.2f, line, 0, fontColor, true);
         float currWidth = UI::GetStringWidth(line, 0.2f, 0);
         if (currWidth > szX) {
             szX = currWidth;
@@ -73,7 +87,7 @@ void showDebugInfo3D(Vector3 location, const std::vector<std::string> &textLines
     GRAPHICS::CLEAR_DRAW_ORIGIN();
 }
 
-void showDebugInfo3DColors(Vector3 location, const std::vector<std::pair<std::string, Util::ColorI>> &textLines, 
+void UI::ShowText3DColors(Vector3 location, const std::vector<std::pair<std::string, Util::ColorI>> &textLines,
     const Util::ColorI& backgroundColor) {
     float height = 0.0125f;
 
@@ -82,7 +96,7 @@ void showDebugInfo3DColors(Vector3 location, const std::vector<std::pair<std::st
 
     float szX = 0.060f;
     for (const auto& line : textLines) {
-        showText(0, 0 + height * static_cast<float>(i), 0.2f, line.first, 0, line.second, true);
+        ShowText(0, 0 + height * static_cast<float>(i), 0.2f, line.first, 0, line.second, true);
         float currWidth = UI::GetStringWidth(line.first, 0.2f, 0);
         if (currWidth > szX) {
             szX = currWidth;
@@ -96,21 +110,7 @@ void showDebugInfo3DColors(Vector3 location, const std::vector<std::pair<std::st
     GRAPHICS::CLEAR_DRAW_ORIGIN();
 }
 
-void showNotification(const std::string &message, int *prevNotification) {
-    if (prevNotification != nullptr && *prevNotification != 0) {
-        HUD::THEFEED_REMOVE_ITEM(*prevNotification);
-    }
-    HUD::BEGIN_TEXT_COMMAND_THEFEED_POST("STRING");
-
-    HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(message.c_str());
-
-    int id = HUD::END_TEXT_COMMAND_THEFEED_POST_TICKER(false, false);
-    if (prevNotification != nullptr) {
-        *prevNotification = id;
-    }
-}
-
-void showSubtitle(const std::string &message, int duration) {
+void UI::ShowSubtitle(const std::string &message, int duration) {
     HUD::BEGIN_TEXT_COMMAND_PRINT("CELL_EMAIL_BCON");
 
     const size_t maxStringLength = 99;
@@ -123,7 +123,7 @@ void showSubtitle(const std::string &message, int duration) {
     HUD::END_TEXT_COMMAND_PRINT(duration, 1);
 }
 
-void drawSphere(Vector3 p, float scale, const Util::ColorI& c) {
+void UI::DrawSphere(Vector3 p, float scale, const Util::ColorI& c) {
     GRAPHICS::DRAW_MARKER(eMarkerType::MarkerTypeDebugSphere,
                           p.x, p.y, p.z,
                           0.0f, 0.0f, 0.0f,
