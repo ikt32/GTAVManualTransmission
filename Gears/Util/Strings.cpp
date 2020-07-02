@@ -1,4 +1,8 @@
-#include "Util.hpp"
+#include "Strings.hpp"
+
+#include "Windows.h"
+
+#include <algorithm>
 
 STR2INT_ERROR str2int(int &i, char const *s, int base) {
     char *end;
@@ -25,24 +29,6 @@ std::string ByteArrayToString(uint8_t *byteArray, size_t length) {
         instructionBytes += buff;
     }
     return instructionBytes;
-}
-
-std::string GUID2String(GUID guid) {
-    wchar_t szGuidW[40] = {0};
-    StringFromGUID2(guid, szGuidW, 40);
-    std::wstring wGuid = szGuidW;
-    return StrUtil::utf8_encode(wGuid);
-}
-
-GUID String2GUID(std::string guidStr) {
-    GUID guid;
-    std::wstring clsidStr;
-    clsidStr.assign(guidStr.begin(), guidStr.end());
-    HRESULT hr = CLSIDFromString(clsidStr.c_str(), &guid);
-    if (hr != NOERROR) {
-        return GUID();
-    }
-    return guid;
 }
 
 std::vector<std::string> StrUtil::split(const std::string& s, char delim) {
@@ -72,12 +58,4 @@ std::wstring StrUtil::utf8_decode(const std::string& str) {
     std::wstring wstrTo(size_needed, 0);
     MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
     return wstrTo;
-}
-
-bool SysUtil::IsWindowFocused() {
-    auto foregroundHwnd = GetForegroundWindow();
-    DWORD foregroundProcId;
-    GetWindowThreadProcessId(foregroundHwnd, &foregroundProcId);
-    auto currentProcId = GetCurrentProcessId();
-    return foregroundProcId == currentProcId;
 }

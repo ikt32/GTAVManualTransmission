@@ -1,6 +1,6 @@
 #include "keyboard.h"
+#include "../Util/SysUtils.h"
 #include <map>
-#include "../Util/Util.hpp"
 
 const int KEYS_SIZE = 255;
 

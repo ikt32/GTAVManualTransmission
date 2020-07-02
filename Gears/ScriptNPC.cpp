@@ -1,22 +1,25 @@
 #include "script.h"
-#include <set>
-#include <inc/natives.h>
 
-#include "Input/NativeController.h"
-#include "Memory/VehicleExtensions.hpp"
-#include "Memory/MemoryPatcher.hpp"
-#include "ScriptSettings.hpp"
-
-#include "Util/MathExt.h"
-#include "Util/UIUtils.h"
-#include "VehicleData.hpp"
-#include "Memory/Offsets.hpp"
-
-#include <fmt/format.h>
-#include "ScriptUtils.h"
 #ifdef _DEBUG
 #include "Dump.h"
 #endif
+
+#include "VehicleData.hpp"
+#include "ScriptSettings.hpp"
+
+#include "Memory/VehicleExtensions.hpp"
+#include "Memory/MemoryPatcher.hpp"
+#include "Memory/Offsets.hpp"
+
+#include "Util/MathExt.h"
+#include "Util/UIUtils.h"
+#include "Util/ScriptUtils.h"
+
+
+
+#include <inc/natives.h>
+#include <fmt/format.h>
+#include <set>
 
 class NPCVehicle;
 

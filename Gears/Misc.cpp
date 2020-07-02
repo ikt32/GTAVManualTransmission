@@ -2,7 +2,7 @@
 #include "Input/NativeInput.h"
 #include "ScriptSettings.hpp"
 #include "Input/CarControls.hpp"
-#include "ScriptUtils.h"
+#include "Util/ScriptUtils.h"
 
 #include <inc/natives.h>
 

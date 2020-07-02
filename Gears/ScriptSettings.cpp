@@ -1,14 +1,16 @@
 #include "ScriptSettings.hpp"
 
-#include <string>
-#include <fmt/format.h>
-#include <simpleini/SimpleIni.h>
+#include "VehicleConfig.h"
 
+#include "Util/GUID.h"
 #include "Util/Logger.hpp"
-#include "Util/Util.hpp"
+#include "Util/Strings.hpp"
 #include "Input/keyboard.h"
 #include "Input/CarControls.hpp"
-#include "VehicleConfig.h"
+
+#include <simpleini/SimpleIni.h>
+#include <fmt/format.h>
+#include <string>
 
 // TODO: Settings shouldn't *do* anything, other stuff just needs to take stuff from this.
 

@@ -4,13 +4,14 @@
 
 #include "Constants.h"
 #include "Input/CarControls.hpp"
-#include "ScriptUtils.h"
 #include "ScriptSettings.hpp"
 
 #include "Util/Logger.hpp"
 #include "Util/MathExt.h"
 #include "Util/Timer.h"
 #include "Util/Files.h"
+#include "Util/UIUtils.h"
+#include "Util/ScriptUtils.h"
 
 #include <inc/natives.h>
 #include <fmt/format.h>

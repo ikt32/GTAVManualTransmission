@@ -3,10 +3,11 @@
 #include "script.h"
 #include "Constants.h"
 #include "ScriptSettings.hpp"
+#include "VehicleData.hpp"
 #include "Memory/MemoryPatcher.hpp"
 #include "Input/CarControls.hpp"
-#include "VehicleData.hpp"
 #include "Util/MathExt.h"
+#include "Util/Strings.hpp"
 
 #include "inc/natives.h"
 #include "inc/types.h"

@@ -1,10 +1,10 @@
 #include "CustomSteering.h"
 
-#include "ScriptUtils.h"
+#include "SteeringAnim.h"
 #include "ScriptSettings.hpp"
 #include "Util/MathExt.h"
 #include "Util/UIUtils.h"
-#include "Util/Util.hpp"
+#include "Util/ScriptUtils.h"
 #include "Util/TimeHelper.hpp"
 #include "Memory/VehicleExtensions.hpp"
 #include "Memory/VehicleBone.h"
@@ -14,7 +14,6 @@
 #include "inc/types.h"
 
 #include <algorithm>
-#include "SteeringAnim.h"
 
 extern Vehicle g_playerVehicle;
 extern Ped g_playerPed;

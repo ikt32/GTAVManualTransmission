@@ -3,7 +3,8 @@
 #include "../ScriptSettings.hpp"
 #include "../Util/Logger.hpp"
 #include "../Util/MathExt.h"
-#include "../Util/Util.hpp"
+#include "../Util/Strings.hpp"
+#include "../Util/GUID.h"
 #include "keyboard.h"
 #include <Windows.h>
 

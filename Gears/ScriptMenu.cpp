@@ -1,18 +1,25 @@
 #include "script.h"
 
+#include "Constants.h"
+#include "UpdateChecker.h"
+#include "Compatibility.h"
+
 #include "ScriptSettings.hpp"
+
 #include "Input/CarControls.hpp"
 #include "Input/NativeController.h"
 #include "Input/keyboard.h"
+
 #include "Util/UIUtils.h"
-#include "Util/Util.hpp"
-#include "Constants.h"
-#include "UpdateChecker.h"
-#include "Memory/MemoryPatcher.hpp"
-#include "Memory/VehicleExtensions.hpp"
+#include "Util/Strings.hpp"
+#include "Util/GUID.h"
 #include "Util/MathExt.h"
 #include "Util/Logger.hpp"
-#include "ScriptUtils.h"
+#include "Util/ScriptUtils.h"
+
+#include "Memory/MemoryPatcher.hpp"
+#include "Memory/VehicleExtensions.hpp"
+
 #include "VehicleConfig.h"
 #include "SteeringAnim.h"
 #include "Camera.h"
@@ -28,8 +35,6 @@
 #include <shellapi.h>
 #include <string>
 #include <mutex>
-
-#include "Compatibility.h"
 
 using VExt = VehicleExtensions;
 

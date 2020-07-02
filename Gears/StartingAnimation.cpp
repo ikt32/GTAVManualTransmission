@@ -1,11 +1,11 @@
 #include "StartingAnimation.h"
-
-#include "ScriptUtils.h"
 #include "SteeringAnim.h"
-#include "inc/main.h"
-#include "inc/natives.h"
 #include "Memory/VehicleExtensions.hpp"
+#include "Util/ScriptUtils.h"
 #include "Util/Timer.h"
+
+#include <inc/main.h>
+#include <inc/natives.h>
 
 #include <fmt/format.h>
 

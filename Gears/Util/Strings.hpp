@@ -1,11 +1,5 @@
 #pragma once
 
-#ifndef DIRECTINPUT_VERSION
-#define DIRECTINPUT_VERSION 0x0800
-#include <algorithm>
-#endif
-#include <dinput.h>
-
 #include <string>
 #include <vector>
 #include <sstream>
@@ -43,11 +37,6 @@ constexpr auto EToInt(E e) -> typename std::underlying_type<E>::type {
     return static_cast<typename std::underlying_type<E>::type>(e);
 }
 
-// GUID utils
-bool operator < (const GUID& guid1, const GUID& guid2);
-std::string GUID2String(GUID guid);
-GUID String2GUID(std::string guidStr);
-
 namespace StrUtil {
     template<typename Out>
     void split(const std::string& s, char delim, Out result) {
@@ -69,8 +58,4 @@ namespace StrUtil {
 
     // Convert an UTF8 string to a wide Unicode String
     std::wstring utf8_decode(const std::string& str);
-}
-
-namespace SysUtil {
-    bool IsWindowFocused();
 }

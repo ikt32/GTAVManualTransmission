@@ -1,5 +1,4 @@
 #pragma once
-#include "../ScriptUtils.h"
 #include "MathExt.h"
 #include "Timer.h"
 #include <string>

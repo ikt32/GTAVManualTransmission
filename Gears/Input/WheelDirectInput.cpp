@@ -1,17 +1,18 @@
 #include "WheelDirectInput.hpp"
 
-#include <winerror.h>
-
-#include <chrono>
-#include <vector>
-
 #include "../Util/TimeHelper.hpp"
 #include "../Util/Logger.hpp"
-#include "../Util/Util.hpp"
+#include "../Util/Strings.hpp"
+#include "../Util/GUID.h"
 
 #ifdef _DEBUG
 #include "../Dump.h"
 #endif
+
+#include <winerror.h>
+
+#include <chrono>
+#include <vector>
 
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")

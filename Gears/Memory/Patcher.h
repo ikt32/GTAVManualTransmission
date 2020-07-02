@@ -1,10 +1,10 @@
 #pragma once
-#include <string>
-#include <utility>
+#include "NativeMemory.hpp"
 #include "PatternInfo.h"
 #include "../Util/Logger.hpp"
-#include "NativeMemory.hpp"
-#include "../Util/Util.hpp"
+#include "../Util/Strings.hpp"
+#include <string>
+#include <utility>
 
 namespace MemoryPatcher {
 // simple NOP patcher

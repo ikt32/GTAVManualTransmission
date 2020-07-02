@@ -26,9 +26,6 @@
     <ClCompile Include="Util\TimeHelper.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Util\Util.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
     <ClCompile Include="..\thirdparty\GTAVMenuBase\menu.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
@@ -97,7 +94,6 @@
     </ClCompile>
     <ClCompile Include="CustomSteering.cpp" />
     <ClCompile Include="WheelInput.cpp" />
-    <ClCompile Include="ScriptUtils.cpp" />
     <ClCompile Include="VehicleConfig.cpp" />
     <ClCompile Include="Input\USBNotify.cpp">
       <Filter>Input</Filter>
@@ -222,6 +218,18 @@
       <Filter>Input</Filter>
     </ClCompile>
     <ClCompile Include="StartingAnimation.cpp" />
+    <ClCompile Include="Util\Strings.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\GUID.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\ScriptUtils.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\SysUtils.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -253,9 +261,6 @@
     </ClInclude>
     <ClInclude Include="Memory\VehicleExtensions.hpp">
       <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Util\Util.hpp">
-      <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="Util\Logger.hpp">
       <Filter>Util</Filter>
@@ -378,7 +383,6 @@
     </ClInclude>
     <ClInclude Include="CustomSteering.h" />
     <ClInclude Include="WheelInput.h" />
-    <ClInclude Include="ScriptUtils.h" />
     <ClInclude Include="VehicleConfig.h" />
     <ClInclude Include="Input\USBNotify.h">
       <Filter>Input</Filter>
@@ -485,6 +489,18 @@
       <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="StartingAnimation.h" />
+    <ClInclude Include="Util\Strings.hpp">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\GUID.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\ScriptUtils.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\SysUtils.h">
+      <Filter>Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

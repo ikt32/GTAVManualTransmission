@@ -4,7 +4,7 @@
 #define _WIN32_WINNT   0x0501
 
 #include "USBNotify.h"
-#include "../Util/Util.hpp"
+#include "../Util/Strings.hpp"
 #include "../Util/Logger.hpp"
 
 #include <windows.h>

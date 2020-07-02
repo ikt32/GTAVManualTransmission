@@ -1,24 +1,21 @@
 #include "script.h"
 
-#include <string>
-#include <algorithm>
-#include <thread>
-#include <mutex>
-#include <filesystem>
-#include <numeric>
-
-#include <inc/natives.h>
-#include <inc/enums.h>
-#include <inc/main.h>
-#include <inc/types.h>
-
-#include <menu.h>
-#include <fmt/format.h>
-
-#include <GTAVDashHook/DashHook/DashHook.h>
-
 #include "ScriptSettings.hpp"
 #include "VehicleData.hpp"
+#include "UpdateChecker.h"
+#include "Constants.h"
+#include "Compatibility.h"
+#include "CustomSteering.h"
+#include "WheelInput.h"
+#include "SteeringAnim.h"
+#include "VehicleConfig.h"
+#include "AtcuLogic.h"
+#include "Camera.h"
+#include "Misc.h"
+#include "StartingAnimation.h"
+
+#include "UDPTelemetry/Socket.h"
+#include "UDPTelemetry/UDPTelemetry.h"
 
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/Offsets.hpp"
@@ -26,6 +23,7 @@
 
 #include "Input/CarControls.hpp"
 
+#include "Util/ScriptUtils.h"
 #include "Util/Logger.hpp"
 #include "Util/Paths.h"
 #include "Util/MathExt.h"
@@ -34,21 +32,24 @@
 #include "Util/Timer.h"
 #include "Util/ValueTimer.h"
 #include "Util/GameSound.h"
+#include "Util/SysUtils.h"
+#include "Util/Strings.hpp"
 
-#include "UpdateChecker.h"
-#include "Constants.h"
-#include "Compatibility.h"
-#include "CustomSteering.h"
-#include "WheelInput.h"
-#include "ScriptUtils.h"
-#include "SteeringAnim.h"
-#include "VehicleConfig.h"
-#include "UDPTelemetry/Socket.h"
-#include "UDPTelemetry/UDPTelemetry.h"
-#include "AtcuLogic.h"
-#include "Camera.h"
-#include "Misc.h"
-#include "StartingAnimation.h"
+#include <GTAVDashHook/DashHook/DashHook.h>
+#include <menu.h>
+
+#include <inc/natives.h>
+#include <inc/enums.h>
+#include <inc/main.h>
+#include <inc/types.h>
+
+#include <fmt/format.h>
+#include <string>
+#include <algorithm>
+#include <thread>
+#include <mutex>
+#include <filesystem>
+#include <numeric>
 
 namespace fs = std::filesystem;
 using VExt = VehicleExtensions;

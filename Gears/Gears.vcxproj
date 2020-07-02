@@ -172,7 +172,6 @@
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="ScriptHUD.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
-    <ClCompile Include="ScriptUtils.cpp" />
     <ClCompile Include="StartingAnimation.cpp" />
     <ClCompile Include="SteeringAnim.cpp" />
     <ClCompile Include="UDPTelemetry\UDPTelemetry.cpp" />
@@ -182,6 +181,7 @@
     <ClCompile Include="Util\FileVersion.cpp" />
     <ClCompile Include="Util\GameSound.cpp" />
     <ClCompile Include="ScriptMenu.cpp" />
+    <ClCompile Include="Util\GUID.cpp" />
     <ClCompile Include="Util\Paths.cpp" />
     <ClCompile Include="Input\keyboard.cpp" />
     <ClCompile Include="Input\CarControls.cpp" />
@@ -194,9 +194,11 @@
     <ClCompile Include="Memory\VehicleExtensions.cpp" />
     <ClCompile Include="script.cpp" />
     <ClCompile Include="ScriptSettings.cpp" />
+    <ClCompile Include="Util\ScriptUtils.cpp" />
+    <ClCompile Include="Util\SysUtils.cpp" />
     <ClCompile Include="Util\Timer.cpp" />
     <ClCompile Include="Util\UIUtils.cpp" />
-    <ClCompile Include="Util\Util.cpp" />
+    <ClCompile Include="Util\Strings.cpp" />
     <ClCompile Include="Util\TimeHelper.cpp" />
     <ClCompile Include="Util\Logger.cpp" />
     <ClCompile Include="VehicleData.cpp" />
@@ -265,7 +267,6 @@
     <ClInclude Include="Memory\Versions.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="newNatives.h" />
-    <ClInclude Include="ScriptUtils.h" />
     <ClInclude Include="Compatibility.h" />
     <ClInclude Include="StartingAnimation.h" />
     <ClInclude Include="SteeringAnim.h" />
@@ -277,6 +278,7 @@
     <ClInclude Include="Util\Files.h" />
     <ClInclude Include="Util\FileVersion.h" />
     <ClInclude Include="Util\GameSound.h" />
+    <ClInclude Include="Util\GUID.h" />
     <ClInclude Include="Util\MathExt.h" />
     <ClInclude Include="Memory\Offsets.hpp" />
     <ClInclude Include="Util\MiscEnums.h" />
@@ -293,10 +295,12 @@
     <ClInclude Include="script.h" />
     <ClInclude Include="ScriptSettings.hpp" />
     <ClInclude Include="Util\Logger.hpp" />
+    <ClInclude Include="Util\ScriptUtils.h" />
+    <ClInclude Include="Util\SysUtils.h" />
     <ClInclude Include="Util\TimeHelper.hpp" />
     <ClInclude Include="Util\Timer.h" />
     <ClInclude Include="Util\UIUtils.h" />
-    <ClInclude Include="Util\Util.hpp" />
+    <ClInclude Include="Util\Strings.hpp" />
     <ClInclude Include="Util\ValueTimer.h" />
     <ClInclude Include="VehicleData.hpp" />
     <ClInclude Include="VehicleConfig.h" />

@@ -21,3 +21,9 @@ void showNotification(const std::string &message, int *prevNotification);
 void showSubtitle(const std::string &message, int duration = 2500);
 
 void drawSphere(Vector3 p, float scale, const Util::ColorI& c);
+
+namespace UI {
+    void Notify(int level, const std::string& message);
+    void Notify(int level, const std::string& message, bool removePrevious);
+    float GetStringWidth(const std::string& text, float scale, int font);
+}

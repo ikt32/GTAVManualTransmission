@@ -5,7 +5,7 @@
 #include "ScriptSettings.hpp"
 #include "VehicleData.hpp"
 #include "Input/CarControls.hpp"
-#include "ScriptUtils.h"
+#include "Util/ScriptUtils.h"
 #include "Util/MathExt.h"
 #include "Util/Timer.h"
 #include "Memory/NativeMemory.hpp"
@@ -48,6 +48,10 @@ namespace {
 
     // rotation camera movement
     float directionLookAngle = 0.0f;
+
+    // forward camera movement
+    float accelMoveFwd = 0.0f;
+    std::vector<float> accelAvg;
 }
 
 namespace FPVCam {
@@ -59,6 +63,7 @@ void updateControllerLook(bool& lookingIntoGlass);
 void updateMouseLook(bool& lookingIntoGlass);
 void updateWheelLook(bool& lookingIntoGlass);
 void updateRotationCameraMovement();
+void updateLongitudinalCameraMovement();
 
 void FPVCam::InitOffsets() {
     if (g_gameVersion < G_VER_1_0_1290_1_STEAM) {
@@ -170,8 +175,9 @@ void FPVCam::Update() {
         updateControllerLook(lookingIntoGlass);
     }
 
-    if (g_settings.Misc.Camera.FollowMovement) {
+    if (g_settings.Misc.Camera.Movement.Follow) {
         updateRotationCameraMovement();
+        updateLongitudinalCameraMovement();
     }
 
     float offsetX = 0.0f;
@@ -262,7 +268,7 @@ void FPVCam::Update() {
             
             CAM::ATTACH_CAM_TO_ENTITY(cameraHandle, g_playerVehicle,
                 seatOffset.x + camSeatOffset.x + additionalOffset.x + g_settings.Misc.Camera.OffsetSide + offsetX,
-                seatOffset.y + camSeatOffset.y + additionalOffset.y + g_settings.Misc.Camera.OffsetForward + offsetY,
+                seatOffset.y + camSeatOffset.y + additionalOffset.y + g_settings.Misc.Camera.OffsetForward + offsetY + accelMoveFwd,
                 seatOffset.z + camSeatOffset.z + additionalOffset.z + g_settings.Misc.Camera.OffsetHeight + rollbarOffset, true);
             break;
         }
@@ -274,7 +280,7 @@ void FPVCam::Update() {
 
             CAM::ATTACH_CAM_TO_ENTITY(cameraHandle, g_playerVehicle,
                 driverHeadOffsetStatic.x + additionalOffset.x + g_settings.Misc.Camera.OffsetSide + offsetX,
-                driverHeadOffsetStatic.y + additionalOffset.y + g_settings.Misc.Camera.OffsetForward + offsetY,
+                driverHeadOffsetStatic.y + additionalOffset.y + g_settings.Misc.Camera.OffsetForward + offsetY + accelMoveFwd,
                 driverHeadOffsetStatic.z + additionalOffset.z + g_settings.Misc.Camera.OffsetHeight, true);
             break;
         }
@@ -283,7 +289,7 @@ void FPVCam::Update() {
             // 0x796E skel_head id
             CAM::ATTACH_CAM_TO_PED_BONE(cameraHandle, g_playerPed, 0x796E,
                 additionalOffset.x + g_settings.Misc.Camera.OffsetSide + offsetX,
-                additionalOffset.y + g_settings.Misc.Camera.OffsetForward + offsetY,
+                additionalOffset.y + g_settings.Misc.Camera.OffsetForward + offsetY + accelMoveFwd,
                 additionalOffset.z + g_settings.Misc.Camera.OffsetHeight, true);
             break;
         }
@@ -456,11 +462,11 @@ void updateRotationCameraMovement() {
 
     Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
 
-    float velComponent = travelDir * g_settings.Misc.Camera.MovementMultVel;
-    float rotComponent = rotationVelocity.z * g_settings.Misc.Camera.MovementMultRot;
+    float velComponent = travelDir * g_settings.Misc.Camera.Movement.RotationDirectionMult;
+    float rotComponent = rotationVelocity.z * g_settings.Misc.Camera.Movement.RotationRotationMult;
     float totalMove = std::clamp(velComponent + rotComponent,
-        -deg2rad(g_settings.Misc.Camera.MovementCap),
-        deg2rad(g_settings.Misc.Camera.MovementCap));
+        -deg2rad(g_settings.Misc.Camera.Movement.RotationMaxAngle),
+        deg2rad(g_settings.Misc.Camera.Movement.RotationMaxAngle));
     directionLookAngle = -rad2deg(totalMove);
 
     if (speedVector.y < 3.0f) {
@@ -468,3 +474,36 @@ void updateRotationCameraMovement() {
     }
 }
 
+void updateLongitudinalCameraMovement() {
+    accelAvg.push_back(g_vehData.mAcceleration.y);
+    while (accelAvg.size() > 4) {
+        accelAvg.erase(accelAvg.begin());
+    }
+
+    float lerpF = 1.0f - pow(0.000001f, MISC::GET_FRAME_TIME());
+
+    float gForce = avg(accelAvg) / 9.81f;
+
+    //gForce = abs(pow(gForce, g_settings.Misc.Camera.Movement.LongGamma)) * sgn(gForce);
+
+    float mappedAccel = 0.0f;
+    float deadzone = g_settings.Misc.Camera.Movement.LongDeadzone;
+
+    float mult = 0.0f;
+    // Accelerate
+    if (gForce > deadzone) {
+        mappedAccel = map(gForce, deadzone, 10.0f, 0.0f, 10.0f);
+        mult = g_settings.Misc.Camera.Movement.LongBackwardMult;
+    }
+    // Decelerate
+    if (gForce < -deadzone) {
+        mappedAccel = map(gForce, -deadzone, -10.0f, 0.0f, -10.0f);
+        mult = g_settings.Misc.Camera.Movement.LongForwardMult;
+    }
+
+    float accelVal = 
+        std::clamp(-mappedAccel * mult,
+            -g_settings.Misc.Camera.Movement.LongBackwardLimit,
+            g_settings.Misc.Camera.Movement.LongForwardLimit);
+    accelMoveFwd = lerp(accelMoveFwd, accelVal, lerpF); // just for smoothness
+}
