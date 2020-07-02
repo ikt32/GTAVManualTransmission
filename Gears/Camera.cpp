@@ -177,32 +177,23 @@ void FPVCam::Update() {
     float offsetX = 0.0f;
     float offsetY = g_settings.Misc.Camera.OffsetForward;
 
-    {
-        // Left
-        if (camRot.z > 85.0f) {
-            offsetX = map(camRot.z, 85.0f, 180.0f, 0.0f, -lookLeanCenterDist);
-            offsetX = std::clamp(offsetX, -lookLeanCenterDist, 0.0f);
-        }
-        // Right
-        if (camRot.z < -85.0f) {
-            offsetX = map(camRot.z, -85.0f, -180.0f, 0.0f, lookLeanCenterDist);
-            offsetX = std::clamp(offsetX, 0.0f, lookLeanCenterDist);
-        }
-    }
+    // Left
+    if (camRot.z > 85.0f) {
+        offsetX = map(camRot.z, 85.0f, 180.0f, 0.0f, -lookLeanCenterDist);
+        offsetX = std::clamp(offsetX, -lookLeanCenterDist, 0.0f);
 
-    {
-        // Left
-        if (camRot.z > 85.0f) {
-            float frontLean = map(camRot.z, 85.0f, 180.0f, 0.0f, lookLeanFrontDist);
-            frontLean = std::clamp(frontLean, 0.0f, lookLeanFrontDist);
-            offsetY += frontLean;
-        }
-        // Right
-        if (camRot.z < -85.0f) {
-            float frontLean = map(camRot.z, -85.0f, -180.0f, 0.0f, lookLeanFrontDist);
-            frontLean = std::clamp(frontLean, 0.0f, lookLeanFrontDist);
-            offsetY += frontLean;
-        }
+        float frontLean = map(camRot.z, 85.0f, 180.0f, 0.0f, lookLeanFrontDist);
+        frontLean = std::clamp(frontLean, 0.0f, lookLeanFrontDist);
+        offsetY += frontLean;
+    }
+    // Right
+    if (camRot.z < -85.0f) {
+        offsetX = map(camRot.z, -85.0f, -180.0f, 0.0f, lookLeanCenterDist);
+        offsetX = std::clamp(offsetX, 0.0f, lookLeanCenterDist);
+
+        float frontLean = map(camRot.z, -85.0f, -180.0f, 0.0f, lookLeanFrontDist);
+        frontLean = std::clamp(frontLean, 0.0f, lookLeanFrontDist);
+        offsetY += frontLean;
     }
 
     bool wearingHelmet = PED::IS_PED_WEARING_HELMET(g_playerPed);
