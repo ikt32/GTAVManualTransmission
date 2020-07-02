@@ -45,6 +45,9 @@ namespace {
 
     // 1290+?
     unsigned fpvCamOffsetXOffset = 0x450;
+
+    // rotation camera movement
+    float directionLookAngle = 0.0f;
 }
 
 namespace FPVCam {
@@ -55,6 +58,7 @@ namespace FPVCam {
 void updateControllerLook(bool& lookingIntoGlass);
 void updateMouseLook(bool& lookingIntoGlass);
 void updateWheelLook(bool& lookingIntoGlass);
+void updateRotationCameraMovement();
 
 void FPVCam::InitOffsets() {
     if (g_gameVersion < G_VER_1_0_1290_1_STEAM) {
@@ -166,31 +170,8 @@ void FPVCam::Update() {
         updateControllerLook(lookingIntoGlass);
     }
 
-    float directionLookAngle = 0.0f;
     if (g_settings.Misc.Camera.FollowMovement) {
-        Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
-
-        Vector3 target = Normalize(speedVector);
-        float travelDir = atan2(target.y, target.x) - static_cast<float>(M_PI) / 2.0f;
-        if (travelDir > static_cast<float>(M_PI) / 2.0f) {
-            travelDir -= static_cast<float>(M_PI);
-        }
-        if (travelDir < -static_cast<float>(M_PI) / 2.0f) {
-            travelDir += static_cast<float>(M_PI);
-        }
-
-        Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
-
-        float velComponent = travelDir * g_settings.Misc.Camera.MovementMultVel;
-        float rotComponent = rotationVelocity.z * g_settings.Misc.Camera.MovementMultRot;
-        float totalMove = std::clamp(velComponent + rotComponent,
-            -deg2rad(g_settings.Misc.Camera.MovementCap),
-             deg2rad(g_settings.Misc.Camera.MovementCap));
-        directionLookAngle = -rad2deg(totalMove);
-
-        if (speedVector.y < 3.0f) {
-            directionLookAngle = map(speedVector.y, 0.0f, 3.0f, 0.0f, directionLookAngle);
-        }
+        updateRotationCameraMovement();
     }
 
     float offsetX = 0.0f;
@@ -469,3 +450,30 @@ void updateWheelLook(bool& lookingIntoGlass) {
             1.0f - pow(g_settings.Misc.Camera.MouseLookTime, MISC::GET_FRAME_TIME()));
     }
 }
+
+void updateRotationCameraMovement() {
+    Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
+
+    Vector3 target = Normalize(speedVector);
+    float travelDir = atan2(target.y, target.x) - static_cast<float>(M_PI) / 2.0f;
+    if (travelDir > static_cast<float>(M_PI) / 2.0f) {
+        travelDir -= static_cast<float>(M_PI);
+    }
+    if (travelDir < -static_cast<float>(M_PI) / 2.0f) {
+        travelDir += static_cast<float>(M_PI);
+    }
+
+    Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
+
+    float velComponent = travelDir * g_settings.Misc.Camera.MovementMultVel;
+    float rotComponent = rotationVelocity.z * g_settings.Misc.Camera.MovementMultRot;
+    float totalMove = std::clamp(velComponent + rotComponent,
+        -deg2rad(g_settings.Misc.Camera.MovementCap),
+        deg2rad(g_settings.Misc.Camera.MovementCap));
+    directionLookAngle = -rad2deg(totalMove);
+
+    if (speedVector.y < 3.0f) {
+        directionLookAngle = map(speedVector.y, 0.0f, 3.0f, 0.0f, directionLookAngle);
+    }
+}
+
