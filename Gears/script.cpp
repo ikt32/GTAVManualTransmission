@@ -1522,8 +1522,6 @@ void handleBrakePatch() {
                 frontDiffDiff = 0.0f;
             lsdBrakeLF =  frontDiffDiff / 2.0f * dbalF * visc * g_vehData.mThrottle * clutch;
             lsdBrakeRF = -frontDiffDiff / 2.0f * dbalF * visc * g_vehData.mThrottle * clutch;
-            if (dbalF == 0.0f)
-                frontDiffDiff = 0.0f;
 
             float rearDiffDiff = (WheelSpeedLR - WheelSpeedRR)/(WheelSpeedLR + WheelSpeedRR);
             rdd = rearDiffDiff;
@@ -1531,8 +1529,6 @@ void handleBrakePatch() {
                 rearDiffDiff = 0.0f;
             lsdBrakeLR =  rearDiffDiff / 2.0f * dbalR * visc * g_vehData.mThrottle * clutch;
             lsdBrakeRR = -rearDiffDiff / 2.0f * dbalR * visc * g_vehData.mThrottle * clutch;
-            if (dbalR == 0.0f)
-                rearDiffDiff = 0.0f;
 
             if (lsdBrakeLF > 0.0f) { lsdBrakeLF = 0.0f; }
             if (lsdBrakeRF > 0.0f) { lsdBrakeRF = 0.0f; }
