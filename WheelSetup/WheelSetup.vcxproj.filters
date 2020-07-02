@@ -55,7 +55,13 @@
     <ClInclude Include="..\Gears\Input\DIDeviceFactory.h">
       <Filter>Gears\Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\Gears\Util\Util.hpp">
+    <ClInclude Include="..\Gears\Util\SysUtils.h">
+      <Filter>Gears\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Gears\Util\GUID.h">
+      <Filter>Gears\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Gears\Util\Strings.hpp">
       <Filter>Gears\Util</Filter>
     </ClInclude>
   </ItemGroup>
@@ -97,7 +103,13 @@
     <ClCompile Include="..\thirdparty\fmt\src\format.cc">
       <Filter>Lib</Filter>
     </ClCompile>
-    <ClCompile Include="..\Gears\Util\Util.cpp">
+    <ClCompile Include="..\Gears\Util\SysUtils.cpp">
+      <Filter>Gears\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Gears\Util\GUID.cpp">
+      <Filter>Gears\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Gears\Util\Strings.cpp">
       <Filter>Gears\Util</Filter>
     </ClCompile>
   </ItemGroup>
