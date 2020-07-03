@@ -41,4 +41,5 @@ namespace DrivingAssists {
     std::vector<float> GetESPBrakes(ESPData espData, LSDData lsdData);
     std::vector<float> GetTCSBrakes(TCSData tcsData, LSDData lsdData);
     std::vector<float> GetABSBrakes(ABSData absData, LSDData lsdData);
+    std::vector<float> GetLSDBrakes(LSDData lsdData);
 }

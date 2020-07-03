@@ -346,3 +346,17 @@ std::vector<float> DrivingAssists::GetABSBrakes(ABSData absData, LSDData lsdData
 
     return brakeVals;
 }
+
+std::vector<float> DrivingAssists::GetLSDBrakes(LSDData lsdData) {
+    std::vector<float> brakeVals(g_vehData.mWheelCount); // only works for 4 wheels but ok
+
+    float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
+    float bbalF = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasFront);
+    float bbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasRear);
+    brakeVals[0] = lsdData.BrakeLF + g_controls.BrakeVal * bbalF * handlingBrakeForce;
+    brakeVals[1] = lsdData.BrakeRF + g_controls.BrakeVal * bbalF * handlingBrakeForce;
+    brakeVals[2] = lsdData.BrakeLR + g_controls.BrakeVal * bbalR * handlingBrakeForce;
+    brakeVals[3] = lsdData.BrakeRR + g_controls.BrakeVal * bbalR * handlingBrakeForce;
+
+    return brakeVals;
+}

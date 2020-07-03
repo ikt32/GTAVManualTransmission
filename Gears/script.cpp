@@ -1497,12 +1497,6 @@ void handleBrakePatch() {
     auto espData = DrivingAssists::GetESP();
     auto lsdData = DrivingAssists::GetLSD();
 
-    float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
-    float bbalF = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasFront);
-    float bbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasRear);
-
-    float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
-
     if (tcsData.Use && g_settings().DriveAssists.TCS.Mode == 1) {
         PAD::DISABLE_CONTROL_ACTION(2, eControl::ControlVehicleAccelerate, true);
         for (int i = 0; i < g_vehData.mWheelCount; i++) {
@@ -1564,6 +1558,14 @@ void handleBrakePatch() {
             }
         }
 
+        // LSD is used in all assists, but this case if for when no other
+        // assists are active.
+        if (lsdData.Use) {
+            auto brakeVals = DrivingAssists::GetLSDBrakes(lsdData);
+            for (int i = 0; i < g_vehData.mWheelCount; i++) {
+                VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVals[i]);
+            }
+        }
         if (espData.Use) {
             auto brakeVals = DrivingAssists::GetESPBrakes(espData, lsdData);
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
@@ -1581,12 +1583,6 @@ void handleBrakePatch() {
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
                 VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVals[i]);
             }
-        }
-        if (!absData.Use && !espData.Use && !tcsData.Use && lsdData.Use) {
-            VExt::SetWheelBrakePressure(g_playerVehicle, 0, lsdData.BrakeLF + g_controls.BrakeVal * bbalF * handlingBrakeForce);
-            VExt::SetWheelBrakePressure(g_playerVehicle, 1, lsdData.BrakeRF + g_controls.BrakeVal * bbalF * handlingBrakeForce);
-            VExt::SetWheelBrakePressure(g_playerVehicle, 2, lsdData.BrakeLR + g_controls.BrakeVal * bbalR * handlingBrakeForce);
-            VExt::SetWheelBrakePressure(g_playerVehicle, 3, lsdData.BrakeRR + g_controls.BrakeVal * bbalR * handlingBrakeForce);
         }
     }
     if (!patchBrake) {
