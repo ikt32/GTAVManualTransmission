@@ -34,6 +34,9 @@ namespace {
     // Distance in meters to lean forward when looking back/sideways
     const float lookLeanFrontDist = 0.05f;
 
+    // Distance in meters to peek up when looking back
+    const float lookLeanUpDist = 0.08f;
+
     Timer lastMouseLookInputTimer(500);
 
     // Accumulated values for mouse look
@@ -182,6 +185,7 @@ void FPVCam::Update() {
 
     float offsetX = 0.0f;
     float offsetY = g_settings.Misc.Camera.OffsetForward;
+    float offsetZ = 0.0f;
 
     // Left
     if (camRot.z > 85.0f) {
@@ -200,6 +204,12 @@ void FPVCam::Update() {
         float frontLean = map(camRot.z, -85.0f, -180.0f, 0.0f, lookLeanFrontDist);
         frontLean = std::clamp(frontLean, 0.0f, lookLeanFrontDist);
         offsetY += frontLean;
+    }
+    // Don't care
+    if (!lookingIntoGlass && abs(camRot.z) > 85.0f) {
+        float upPeek = map(abs(camRot.z), 85.0f, 160.0f, 0.0f, lookLeanUpDist);
+        upPeek = std::clamp(upPeek, 0.0f, lookLeanUpDist);
+        offsetZ += upPeek;
     }
 
     bool wearingHelmet = PED::IS_PED_WEARING_HELMET(g_playerPed);
@@ -269,7 +279,7 @@ void FPVCam::Update() {
             CAM::ATTACH_CAM_TO_ENTITY(cameraHandle, g_playerVehicle,
                 seatOffset.x + camSeatOffset.x + additionalOffset.x + g_settings.Misc.Camera.OffsetSide + offsetX,
                 seatOffset.y + camSeatOffset.y + additionalOffset.y + g_settings.Misc.Camera.OffsetForward + offsetY + accelMoveFwd,
-                seatOffset.z + camSeatOffset.z + additionalOffset.z + g_settings.Misc.Camera.OffsetHeight + rollbarOffset, true);
+                seatOffset.z + camSeatOffset.z + additionalOffset.z + g_settings.Misc.Camera.OffsetHeight + offsetZ + rollbarOffset, true);
             break;
         }
         case 1: {
@@ -281,7 +291,7 @@ void FPVCam::Update() {
             CAM::ATTACH_CAM_TO_ENTITY(cameraHandle, g_playerVehicle,
                 driverHeadOffsetStatic.x + additionalOffset.x + g_settings.Misc.Camera.OffsetSide + offsetX,
                 driverHeadOffsetStatic.y + additionalOffset.y + g_settings.Misc.Camera.OffsetForward + offsetY + accelMoveFwd,
-                driverHeadOffsetStatic.z + additionalOffset.z + g_settings.Misc.Camera.OffsetHeight, true);
+                driverHeadOffsetStatic.z + additionalOffset.z + g_settings.Misc.Camera.OffsetHeight + offsetZ, true);
             break;
         }
         default:
@@ -290,7 +300,7 @@ void FPVCam::Update() {
             CAM::ATTACH_CAM_TO_PED_BONE(cameraHandle, g_playerPed, 0x796E,
                 additionalOffset.x + g_settings.Misc.Camera.OffsetSide + offsetX,
                 additionalOffset.y + g_settings.Misc.Camera.OffsetForward + offsetY + accelMoveFwd,
-                additionalOffset.z + g_settings.Misc.Camera.OffsetHeight, true);
+                additionalOffset.z + g_settings.Misc.Camera.OffsetHeight + offsetZ, true);
             break;
         }
     }

@@ -13,6 +13,8 @@
 * Fix minimap rotation with custom camera
 * Use help texts instead of subtitles for configuration hints
 * Improve error handling on missing `animations.yml` file
+* Improve movement camera rotation smoothness
+* Improve camera looking back visibility (raise camera)
 * Minor code "improvements"
 
 ## 4.8.1
