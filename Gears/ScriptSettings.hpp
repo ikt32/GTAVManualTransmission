@@ -353,10 +353,21 @@ public:
             bool Enable = true;
             int AttachId = 0; // 0: Head, 1: Vehicle, 2: FPV Offset?
             bool RemoveHead = true;
-            bool FollowMovement = true;
-            float MovementMultVel = 0.750f;
-            float MovementMultRot = 0.15f;
-            float MovementCap = 45.0f;
+
+            struct {
+                bool Follow = true;
+                float RotationDirectionMult = 0.750f;
+                float RotationRotationMult = 0.15f;
+                float RotationMaxAngle = 45.0f;
+
+                float LongForwardMult = 0.05f;
+                float LongBackwardMult = 0.10f;
+                float LongDeadzone = 0.95f;
+                float LongGamma = 1.0f;
+                float LongForwardLimit = 0.10f;
+                float LongBackwardLimit = 0.12f;
+            } Movement;
+
             float FOV = 55.0f;
             float OffsetHeight = 0.04f;
             float OffsetForward = 0.05f;

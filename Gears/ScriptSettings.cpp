@@ -427,10 +427,19 @@ void ScriptSettings::SaveGeneral() const {
     // [CAM]
     ini.SetBoolValue("CAM", "Enable", Misc.Camera.Enable);
     ini.SetLongValue("CAM", "AttachId", Misc.Camera.AttachId);
-    ini.SetBoolValue("CAM", "FollowMovement", Misc.Camera.FollowMovement);
-    ini.SetDoubleValue("CAM", "MovementMultVel", Misc.Camera.MovementMultVel);
-    ini.SetDoubleValue("CAM", "MovementMultRot", Misc.Camera.MovementMultRot);
-    ini.SetDoubleValue("CAM", "MovementCap", Misc.Camera.MovementCap);
+
+    ini.SetBoolValue("CAM", "FollowMovement", Misc.Camera.Movement.Follow);
+    ini.SetDoubleValue("CAM", "MovementMultVel", Misc.Camera.Movement.RotationDirectionMult);
+    ini.SetDoubleValue("CAM", "MovementMultRot", Misc.Camera.Movement.RotationRotationMult);
+    ini.SetDoubleValue("CAM", "MovementCap", Misc.Camera.Movement.RotationMaxAngle);
+
+    ini.SetDoubleValue("CAM", "LongForwardMult"  , Misc.Camera.Movement.LongForwardMult  );
+    ini.SetDoubleValue("CAM", "LongBackwardMult" , Misc.Camera.Movement.LongBackwardMult );
+    ini.SetDoubleValue("CAM", "LongDeadzone"     , Misc.Camera.Movement.LongDeadzone     );
+    ini.SetDoubleValue("CAM", "LongGamma"        , Misc.Camera.Movement.LongGamma        );
+    ini.SetDoubleValue("CAM", "LongForwardLimit" , Misc.Camera.Movement.LongForwardLimit );
+    ini.SetDoubleValue("CAM", "LongBackwardLimit", Misc.Camera.Movement.LongBackwardLimit);
+
     ini.SetBoolValue("CAM", "RemoveHead", Misc.Camera.RemoveHead);
     ini.SetDoubleValue("CAM", "FOV", Misc.Camera.FOV);
     ini.SetDoubleValue("CAM", "OffsetHeight", Misc.Camera.OffsetHeight);
@@ -781,10 +790,19 @@ void ScriptSettings::parseSettingsGeneral() {
     // [CAM]
     Misc.Camera.Enable = ini.GetBoolValue("CAM", "Enable", Misc.Camera.Enable);
     Misc.Camera.AttachId = ini.GetLongValue("CAM", "AttachId", Misc.Camera.AttachId);
-    Misc.Camera.FollowMovement = ini.GetBoolValue("CAM", "FollowMovement", Misc.Camera.FollowMovement);
-    Misc.Camera.MovementMultVel = ini.GetDoubleValue("CAM", "MovementMultVel", Misc.Camera.MovementMultVel);
-    Misc.Camera.MovementMultRot = ini.GetDoubleValue("CAM", "MovementMultRot", Misc.Camera.MovementMultRot);
-    Misc.Camera.MovementCap = ini.GetDoubleValue("CAM", "MovementCap", Misc.Camera.MovementCap);
+
+    Misc.Camera.Movement.Follow = ini.GetBoolValue("CAM", "FollowMovement", Misc.Camera.Movement.Follow);
+    Misc.Camera.Movement.RotationDirectionMult = ini.GetDoubleValue("CAM", "MovementMultVel", Misc.Camera.Movement.RotationDirectionMult);
+    Misc.Camera.Movement.RotationRotationMult = ini.GetDoubleValue("CAM", "MovementMultRot", Misc.Camera.Movement.RotationRotationMult);
+    Misc.Camera.Movement.RotationMaxAngle = ini.GetDoubleValue("CAM", "MovementCap", Misc.Camera.Movement.RotationMaxAngle);
+
+    Misc.Camera.Movement.LongForwardMult   = ini.GetDoubleValue("CAM", "LongForwardMult", Misc.Camera.Movement.LongForwardMult  );
+    Misc.Camera.Movement.LongBackwardMult  = ini.GetDoubleValue("CAM", "LongBackwardMult", Misc.Camera.Movement.LongBackwardMult );
+    Misc.Camera.Movement.LongDeadzone      = ini.GetDoubleValue("CAM", "LongDeadzone", Misc.Camera.Movement.LongDeadzone     );
+    Misc.Camera.Movement.LongGamma         = ini.GetDoubleValue("CAM", "LongGamma", Misc.Camera.Movement.LongGamma        );
+    Misc.Camera.Movement.LongForwardLimit  = ini.GetDoubleValue("CAM", "LongForwardLimit", Misc.Camera.Movement.LongForwardLimit );
+    Misc.Camera.Movement.LongBackwardLimit = ini.GetDoubleValue("CAM", "LongBackwardLimit", Misc.Camera.Movement.LongBackwardLimit);
+
     Misc.Camera.RemoveHead = ini.GetBoolValue("CAM", "RemoveHead", Misc.Camera.RemoveHead);
     Misc.Camera.FOV = ini.GetDoubleValue("CAM", "FOV", Misc.Camera.FOV);
     Misc.Camera.OffsetHeight = ini.GetDoubleValue("CAM", "OffsetHeight", Misc.Camera.OffsetHeight);
