@@ -7,7 +7,7 @@
 #include "../Gears/ScriptSettings.hpp"
 #include "../Gears/Input/CarControls.hpp"
 #include "../Gears/Util/Paths.h"
-#include "../Gears/Util/Util.hpp"
+#include "../Gears/Util/Strings.hpp"
 #include "../Gears/Constants.h"
 
 #define ESC 0x1B
