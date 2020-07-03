@@ -5,9 +5,15 @@
 * Add "Disable autostart" option
 * Add "Leave engine running" option
 * Add engine on/off animations
+* Add camera forward/backward movement options
+* Fix wheel angles when engine is off
 * Fix haptic stalling effect playing on wrong device
 * Fix phone animation in cars not playing
 * Fix LSD settings not being vehicle-specific
+* Fix minimap rotation with custom camera
+* Use help texts instead of subtitles for configuration hints
+* Improve error handling on missing `animations.yml` file
+* Minor code "improvements"
 
 ## 4.8.1
 
