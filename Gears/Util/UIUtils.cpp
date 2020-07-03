@@ -11,6 +11,7 @@
 extern ScriptSettings g_settings;
 
 namespace {
+    const size_t maxStringLength = 99;
     int notificationHandle = 0;
 }
 
@@ -113,14 +114,23 @@ void UI::ShowText3DColors(Vector3 location, const std::vector<std::pair<std::str
 void UI::ShowSubtitle(const std::string &message, int duration) {
     HUD::BEGIN_TEXT_COMMAND_PRINT("CELL_EMAIL_BCON");
 
-    const size_t maxStringLength = 99;
-
     for (size_t i = 0; i < message.size(); i += maxStringLength) {
         size_t npos = std::min(maxStringLength, static_cast<int>(message.size()) - i);
         HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(message.substr(i, npos).c_str());
     }
 
     HUD::END_TEXT_COMMAND_PRINT(duration, 1);
+}
+
+void UI::ShowHelpText(const std::string& message) {
+    HUD::BEGIN_TEXT_COMMAND_DISPLAY_HELP("CELL_EMAIL_BCON");
+
+    for (size_t i = 0; i < message.size(); i += maxStringLength) {
+        size_t npos = std::min(maxStringLength, static_cast<int>(message.size()) - i);
+        HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(message.substr(i, npos).c_str());
+    }
+
+    HUD::END_TEXT_COMMAND_DISPLAY_HELP(0, false, false, -1);
 }
 
 void UI::DrawSphere(Vector3 p, float scale, const Util::ColorI& c) {

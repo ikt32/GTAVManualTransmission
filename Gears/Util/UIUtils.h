@@ -13,6 +13,8 @@ namespace UI {
 
     void ShowSubtitle(const std::string& message, int duration = 2500);
 
+    void ShowHelpText(const std::string& message);
+
     void ShowText(float x, float y, float scale, const std::string& text,
         int font = 0,
         const Util::ColorI& rgba = Util::ColorsI::SolidWhite,
