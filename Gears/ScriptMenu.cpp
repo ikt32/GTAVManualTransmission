@@ -1085,8 +1085,8 @@ void update_forcefeedbackmenu() {
 
             g_controls.PlayFFBDynamics(g_settings.Wheel.FFB.AntiDeadForce, 0);
             
-            UI::ShowSubtitle(fmt::format("Press LEFT and RIGHT to decrease and increase force feedback anti-deadzone. "
-                "Use the highest value before your wheel starts moving. Currently [{}]. Press {} to exit.", g_settings.Wheel.FFB.AntiDeadForce, escapeKey));
+            UI::ShowHelpText(fmt::format("Press [Left] and [Right] to decrease and increase force feedback anti-deadzone. "
+                "Use the highest value before your wheel starts moving. Currently [{}]. Press [{}] to exit.", g_settings.Wheel.FFB.AntiDeadForce, escapeKey));
             WAIT(0);
         }
     }
@@ -2161,17 +2161,18 @@ bool configAxis(const std::string& confTag) {
         int ValueEnd;
     };
 
-    std::string additionalInfo = fmt::format("Press {} to exit.", escapeKey);
+    std::string additionalInfo;
     bool confSteer = confTag == "STEER";
     if (confTag == "STEER") {
-        additionalInfo += " Steer right to register axis.";
+        additionalInfo = "Steer right to register axis.";
     }
     else if (confTag == "HANDBRAKE_ANALOG") {
-        additionalInfo += " Fully pull and set back handbrake to register axis.";
+        additionalInfo = "Fully pull and set back handbrake to register axis.";
     }
     else {
-        additionalInfo += fmt::format(" Fully press and release the {} pedal to register axis.", confTag);
+        additionalInfo = fmt::format("Fully press and release the {} pedal to register axis.", confTag);
     }
+    additionalInfo += fmt::format(" Press [{}] to exit.", escapeKey);
 
     g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
     // Save current state
@@ -2236,7 +2237,7 @@ bool configAxis(const std::string& confTag) {
             }
         }
 
-        UI::ShowSubtitle(additionalInfo);
+        UI::ShowHelpText(additionalInfo);
         WAIT(0);
     }
 
@@ -2266,7 +2267,7 @@ bool configAxis(const std::string& confTag) {
 }
 
 bool configWheelToKey() {
-    std::string additionalInfo = fmt::format("Press a button to configure. Press {} to exit", escapeKey);
+    std::string additionalInfo = fmt::format("Press a button to configure. Press [{}] to exit", escapeKey);
 
     g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
@@ -2305,7 +2306,7 @@ bool configWheelToKey() {
                 }
             }
             if (progress == 1) {
-                additionalInfo = fmt::format("Press a keyboard key to configure. Press {} to exit", escapeKey);
+                additionalInfo = fmt::format("Press a keyboard key to configure. Press [{}] to exit", escapeKey);
             }
         }
         if (progress == 1) {
@@ -2329,13 +2330,13 @@ bool configWheelToKey() {
             addWheelToKey("TO_KEYBOARD", selectedGuid, button, keyName);
             return true;
         }
-        UI::ShowSubtitle(additionalInfo);
+        UI::ShowHelpText(additionalInfo);
         WAIT(0);
     }
 }
 
 bool configButton(const std::string& confTag) {
-    std::string additionalInfo = fmt::format("Press {} to exit. Press a button to set {}.", escapeKey, confTag);
+    std::string additionalInfo = fmt::format("Press a button to set {}. Press [{}] to exit.", confTag, escapeKey);
 
     g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
@@ -2360,14 +2361,14 @@ bool configButton(const std::string& confTag) {
                 }
             }
         }
-        UI::ShowSubtitle(additionalInfo);
+        UI::ShowHelpText(additionalInfo);
         WAIT(0);
     }
 }
 
 bool configHPattern() {
     std::string confTag = "SHIFTER";
-    std::string additionalInfo = fmt::format("Press {} to exit. Press {} to skip gear.", escapeKey, skipKey);
+    std::string additionalInfo = fmt::format("Press [{}] to skip gear. Press [{}] to exit.", skipKey, escapeKey);
 
     GUID devGUID = {};
     std::vector<int> buttonArray(VExt::GearsAvailable());
@@ -2414,7 +2415,7 @@ bool configHPattern() {
         case 3: gearDisplay = "3rd gear"; break;
         default: gearDisplay = fmt::format("{}th gear", progress); break;
         }
-        UI::ShowSubtitle(fmt::format("Shift into {}. {}", gearDisplay, additionalInfo));
+        UI::ShowHelpText(fmt::format("Shift into {}. {}", gearDisplay, additionalInfo));
         WAIT(0);
     }
     saveHShifter(confTag, devGUID, buttonArray);
@@ -2422,7 +2423,7 @@ bool configHPattern() {
 }
 
 bool configASelect() {
-    std::string additionalInfo = fmt::format("Press {} to exit.", escapeKey);
+    std::string additionalInfo = fmt::format("Press [{}] to exit.", escapeKey);
     GUID devGUID = {};
     std::array<int, 4> buttonArray{ -1, -1, -1, -1 };
     int progress = 0;
@@ -2477,10 +2478,10 @@ bool configASelect() {
                 progress++;
                 saveButton("AUTO_N", devGUID, -1);
             }
-            UI::ShowSubtitle(fmt::format("Shift into {}. {}", gearDisplay, additionalInfoN));
+            UI::ShowHelpText(fmt::format("Shift into {}. {}", gearDisplay, additionalInfoN));
         }
         else {
-            UI::ShowSubtitle(fmt::format("Shift into {}. {}", gearDisplay, additionalInfo));
+            UI::ShowHelpText(fmt::format("Shift into {}. {}", gearDisplay, additionalInfo));
         }
         WAIT(0);
     }
@@ -2495,7 +2496,7 @@ bool isMenuControl(int control) {
 }
 
 bool configKeyboardKey(const std::string &confTag) {
-    std::string additionalInfo = fmt::format("Press {} to exit", escapeKey);
+    std::string additionalInfo = fmt::format("Press [{}] to exit.", escapeKey);
     while (true) {
         if (IsKeyJustUp(str2key(escapeKey))) {
             return false;
@@ -2524,14 +2525,14 @@ bool configKeyboardKey(const std::string &confTag) {
             }
         }
 
-        UI::ShowSubtitle(fmt::format("Press {}. Menu keys can't be chosen. {}", confTag, additionalInfo));
+        UI::ShowHelpText(fmt::format("Press {}. Menu keys can't be chosen. {}", confTag, additionalInfo));
         WAIT(0);
     }
 }
 
 // Controller
 bool configControllerButton(const std::string &confTag) {
-    std::string additionalInfo = fmt::format("Press {} to exit", escapeKey);
+    std::string additionalInfo = fmt::format("Press [{}] to exit.", escapeKey);
     XInputController& controller = g_controls.GetController();
 
     while (true) {
@@ -2546,13 +2547,13 @@ bool configControllerButton(const std::string &confTag) {
                 return true;
             }
         }
-        UI::ShowSubtitle(fmt::format("Press {}. {}", confTag, additionalInfo));
+        UI::ShowHelpText(fmt::format("Press {}. {}", confTag, additionalInfo));
         WAIT(0);
     }
 }
 
 bool configLControllerButton(const std::string &confTag) {
-    std::string additionalInfo = fmt::format("Press {} to exit", escapeKey);
+    std::string additionalInfo = fmt::format("Press [{}] to exit", escapeKey);
 
     while (true) {
         if (IsKeyJustUp(str2key(escapeKey))) {
@@ -2566,7 +2567,7 @@ bool configLControllerButton(const std::string &confTag) {
             }
         }
 
-        UI::ShowSubtitle(fmt::format("Press {}. {}", confTag, additionalInfo));
+        UI::ShowHelpText(fmt::format("Press {}. {}", confTag, additionalInfo));
         WAIT(0);
     }
 }
