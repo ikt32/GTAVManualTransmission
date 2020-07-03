@@ -467,11 +467,14 @@ void updateRotationCameraMovement() {
     float totalMove = std::clamp(velComponent + rotComponent,
         -deg2rad(g_settings.Misc.Camera.Movement.RotationMaxAngle),
         deg2rad(g_settings.Misc.Camera.Movement.RotationMaxAngle));
-    directionLookAngle = -rad2deg(totalMove);
+    float newAngle = -rad2deg(totalMove);
 
     if (speedVector.y < 3.0f) {
-        directionLookAngle = map(speedVector.y, 0.0f, 3.0f, 0.0f, directionLookAngle);
+        newAngle = map(speedVector.y, 0.0f, 3.0f, 0.0f, newAngle);
     }
+
+    directionLookAngle = lerp(directionLookAngle, newAngle,
+        1.0f - pow(0.000001f, MISC::GET_FRAME_TIME()));
 }
 
 void updateLongitudinalCameraMovement() {
