@@ -230,6 +230,7 @@
     <ClCompile Include="Util\SysUtils.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="DrivingAssists.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -501,6 +502,7 @@
     <ClInclude Include="Util\SysUtils.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="DrivingAssists.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

@@ -162,6 +162,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Compatibility.cpp" />
     <ClCompile Include="CustomSteering.cpp" />
+    <ClCompile Include="DrivingAssists.cpp" />
     <ClCompile Include="Input\DIDeviceFactory.cpp" />
     <ClCompile Include="Input\NativeInput.cpp" />
     <ClCompile Include="Input\USBNotify.cpp" />
@@ -255,6 +256,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="CustomSteering.h" />
+    <ClInclude Include="DrivingAssists.h" />
     <ClInclude Include="Input\NativeInput.h" />
     <ClInclude Include="Input\USBNotify.h" />
     <ClInclude Include="Memory\NativeMatrix.h" />
