@@ -16,6 +16,8 @@
 #include <inc/natives.h>
 #include <fmt/format.h>
 
+using VehExt = VehicleExtensions;
+
 extern Vehicle g_playerVehicle;
 extern Ped g_playerPed;
 extern ScriptSettings g_settings;
@@ -482,6 +484,16 @@ void updateRotationCameraMovement() {
     if (speedVector.y < 3.0f) {
         newAngle = map(speedVector.y, 0.0f, 3.0f, 0.0f, newAngle);
         newAngle = std::clamp(newAngle, 0.0f, newAngle);
+    }
+
+    bool isHeli = g_vehData.mClass == VehicleClass::Heli;
+    bool isHover = VehExt::GetHoverTransformRatio(g_playerVehicle) > 0.0f;
+    // 0.0f: Forward, 1.0f: Vertical
+    bool isAirHover = g_gameVersion >= G_VER_1_0_1180_2_STEAM && g_vehData.mDomain == VehicleDomain::Air &&
+        VEHICLE::_GET_VEHICLE_FLIGHT_NOZZLE_POSITION(g_playerVehicle) > 0.5f;
+
+    if (isHeli || isHover || isAirHover) {
+        newAngle = 0.0f;
     }
 
     directionLookAngle = lerp(directionLookAngle, newAngle,

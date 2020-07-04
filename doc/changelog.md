@@ -15,6 +15,7 @@
 * Improve error handling on missing `animations.yml` file
 * Improve movement camera rotation smoothness
 * Improve camera looking back visibility (raise camera)
+* Disable movement camera rotation for hovering vehicles
 * Minor code "improvements"
 
 ## 4.8.1
