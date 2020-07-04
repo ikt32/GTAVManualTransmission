@@ -481,6 +481,7 @@ void updateRotationCameraMovement() {
 
     if (speedVector.y < 3.0f) {
         newAngle = map(speedVector.y, 0.0f, 3.0f, 0.0f, newAngle);
+        newAngle = std::clamp(newAngle, 0.0f, newAngle);
     }
 
     directionLookAngle = lerp(directionLookAngle, newAngle,
