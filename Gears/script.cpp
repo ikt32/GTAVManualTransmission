@@ -472,8 +472,7 @@ void update_manual_features() {
         g_wheelPatchStates.EngLockActive = false;
     }
 
-    if (!g_gearStates.FakeNeutral &&
-        !(g_settings.GameAssists.SimpleBike && g_vehData.mClass == VehicleClass::Bike) && g_vehData.mHasClutch) {
+    if (!(g_settings.GameAssists.SimpleBike && g_vehData.mClass == VehicleClass::Bike) && g_vehData.mHasClutch) {
         // Stalling
         if (g_settings.MTOptions.EngStallH && g_settings().MTOptions.ShiftMode == EShiftMode::HPattern ||
             g_settings.MTOptions.EngStallS && g_settings().MTOptions.ShiftMode == EShiftMode::Sequential) {
@@ -1264,7 +1263,7 @@ void functionClutchCatch() {
     float clutchRatio = map(g_controls.ClutchVal, 1.0f - g_settings().MTParams.ClutchThreshold, 0.0f, 0.0f, 1.0f);
     clutchRatio = std::clamp(clutchRatio, 0.0f, 1.0f);
 
-    bool clutchEngaged = !isClutchPressed();
+    bool clutchEngaged = !isClutchPressed() && !g_gearStates.FakeNeutral;
     float minSpeed = idleRPM * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
     float expectedSpeed = g_vehData.mRPM * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]) * clutchRatio;
     float actualSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
@@ -1316,8 +1315,8 @@ void functionEngStall() {
     // Closer to idle speed = less buildup for stalling
     float speedDiffRatio = map(abs(minSpeed) - abs(actualSpeed), 0.0f, abs(minSpeed), 0.0f, 1.0f);
     speedDiffRatio = std::clamp(speedDiffRatio, 0.0f, 1.0f);
-    
-    bool clutchEngaged = !isClutchPressed();
+
+    bool clutchEngaged = !isClutchPressed() && !g_gearStates.FakeNeutral;
 
     float clutchRatio = map(g_controls.ClutchVal, 1.0f - g_settings().MTParams.ClutchThreshold, 0.0f, 0.0f, 1.0f);
 
@@ -1357,10 +1356,9 @@ void functionEngStall() {
         VEHICLE::SET_VEHICLE_ENGINE_ON(g_playerVehicle, true, true, true);
     }
 
-    //UI::ShowText(0.1, 0.00, 0.4, fmt("Stall progress: %.02f", gearStates.StallProgress));
-    //UI::ShowText(0.1, 0.02, 0.4, fmt("Clutch: %d", clutchEngaged));
-    //UI::ShowText(0.1, 0.04, 0.4, fmt("Stall?: %d", stallEngaged));
-    //UI::ShowText(0.1, 0.06, 0.4, fmt("SpeedDiffRatio: %.02f", speedDiffRatio));
+    //UI::ShowText(0.1, 0.00, 0.4, fmt::format("Stall progress: {:.2f}", g_gearStates.StallProgress));
+    //UI::ShowText(0.1, 0.02, 0.4, fmt::format("Clutch: {}", clutchEngaged));
+    //UI::ShowText(0.1, 0.06, 0.4, fmt::format("SpeedDiffRatio: {:.2f}", speedDiffRatio));
 }
 
 void functionEngDamage() {

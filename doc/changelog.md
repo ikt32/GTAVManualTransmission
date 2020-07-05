@@ -14,6 +14,7 @@ A few new goodies, and fixes to minor things.
 * Fix LSD settings not being vehicle-specific
 * Fix minimap rotation with custom camera
 * Fix gamepad clutch creep disengage before throttle deadzone end
+* Fix stall progress not reset when shifting to neutral
 * Use help texts instead of subtitles for configuration hints
 * Improve error handling on missing `animations.yml` file
 * Improve movement camera rotation smoothness
