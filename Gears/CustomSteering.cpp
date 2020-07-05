@@ -237,7 +237,7 @@ void CustomSteering::Update() {
         rotAxis.y = 1.0f;
 
         float corrDesiredHeading = -desiredHeading * (1.0f / limitRadians);
-        float rotDeg = g_settings.CustomSteering.CustomRotationDegrees / 2.0f * corrDesiredHeading;
+        float rotDeg = g_settings().CustomSteering.CustomRotationDegrees / 2.0f * corrDesiredHeading;
         float rotDegRaw = rotDeg;
 
         // Setting angle using the g_ext calls above causes the angle to overshoot the "real" coords
