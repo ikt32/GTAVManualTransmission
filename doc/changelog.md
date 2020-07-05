@@ -16,6 +16,7 @@ A few new goodies, and fixes to minor things.
 * Fix gamepad clutch creep disengage before throttle deadzone end
 * Fix stall progress not reset when shifting to neutral
 * Fix ESP not using vehicle config settings
+* Fix HUD not using vehicle config settings
 * Use help texts instead of subtitles for configuration hints
 * Improve error handling on missing `animations.yml` file
 * Improve movement camera rotation smoothness

@@ -278,25 +278,25 @@ void CustomSteering::updateMouseSteer(float& steer) {
 
         steer = -mouseXTravel;
 
-        if (g_settings.HUD.MouseSteering.Enable) {
+        if (g_settings().HUD.MouseSteering.Enable) {
             GRAPHICS::DRAW_RECT(
-                g_settings.HUD.MouseSteering.XPos,
-                g_settings.HUD.MouseSteering.YPos,
-                g_settings.HUD.MouseSteering.XSz,
-                g_settings.HUD.MouseSteering.YSz,
-                g_settings.HUD.MouseSteering.BgR,
-                g_settings.HUD.MouseSteering.BgG,
-                g_settings.HUD.MouseSteering.BgB,
-                g_settings.HUD.MouseSteering.BgA, 0);
+                g_settings().HUD.MouseSteering.XPos,
+                g_settings().HUD.MouseSteering.YPos,
+                g_settings().HUD.MouseSteering.XSz,
+                g_settings().HUD.MouseSteering.YSz,
+                g_settings().HUD.MouseSteering.BgR,
+                g_settings().HUD.MouseSteering.BgG,
+                g_settings().HUD.MouseSteering.BgB,
+                g_settings().HUD.MouseSteering.BgA, 0);
             GRAPHICS::DRAW_RECT(
-                g_settings.HUD.MouseSteering.XPos + mouseXTravel * g_settings.HUD.MouseSteering.XSz * 0.5f,
-                g_settings.HUD.MouseSteering.YPos,
-                g_settings.HUD.MouseSteering.MarkerXSz,
-                g_settings.HUD.MouseSteering.YSz,
-                g_settings.HUD.MouseSteering.FgR,
-                g_settings.HUD.MouseSteering.FgG,
-                g_settings.HUD.MouseSteering.FgB,
-                g_settings.HUD.MouseSteering.FgA, 0);
+                g_settings().HUD.MouseSteering.XPos + mouseXTravel * g_settings().HUD.MouseSteering.XSz * 0.5f,
+                g_settings().HUD.MouseSteering.YPos,
+                g_settings().HUD.MouseSteering.MarkerXSz,
+                g_settings().HUD.MouseSteering.YSz,
+                g_settings().HUD.MouseSteering.FgR,
+                g_settings().HUD.MouseSteering.FgG,
+                g_settings().HUD.MouseSteering.FgB,
+                g_settings().HUD.MouseSteering.FgA, 0);
         }
     }
 }

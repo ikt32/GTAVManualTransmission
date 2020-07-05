@@ -91,12 +91,12 @@ void drawDashLights() {
     bool esp = DashLights::LastEspTime + DashLights::LightDuration >= currentTime;
     bool brk = g_ext.GetHandbrake(g_playerVehicle);
 
-    const float size = g_settings.HUD.DashIndicators.Size;
+    const float size = g_settings().HUD.DashIndicators.Size;
     const float txSz = 0.025f * size;
-    const float rectSzX = 0.125f * g_settings.HUD.DashIndicators.Size;
-    const float rectSzY = 0.050f * g_settings.HUD.DashIndicators.Size;
-    const float XPos = g_settings.HUD.DashIndicators.XPos;
-    const float YPos = g_settings.HUD.DashIndicators.YPos;
+    const float rectSzX = 0.125f * g_settings().HUD.DashIndicators.Size;
+    const float rectSzY = 0.050f * g_settings().HUD.DashIndicators.Size;
+    const float XPos = g_settings().HUD.DashIndicators.XPos;
+    const float YPos = g_settings().HUD.DashIndicators.YPos;
 
     Util::ColorF absColor{};
     if (g_settings().DriveAssists.ABS.Enable || g_vehData.mHasABS) {
@@ -258,26 +258,26 @@ void drawRPMIndicator(float x, float y, float width, float height, Util::ColorI 
 
 void drawRPMIndicator() {
     Util::ColorI background = {
-        g_settings.HUD.RPMBar.BgR,
-        g_settings.HUD.RPMBar.BgG,
-        g_settings.HUD.RPMBar.BgB,
-        g_settings.HUD.RPMBar.BgA
+        g_settings().HUD.RPMBar.BgR,
+        g_settings().HUD.RPMBar.BgG,
+        g_settings().HUD.RPMBar.BgB,
+        g_settings().HUD.RPMBar.BgA
     };
 
     Util::ColorI foreground = {
-        g_settings.HUD.RPMBar.FgR,
-        g_settings.HUD.RPMBar.FgG,
-        g_settings.HUD.RPMBar.FgB,
-        g_settings.HUD.RPMBar.FgA
+        g_settings().HUD.RPMBar.FgR,
+        g_settings().HUD.RPMBar.FgG,
+        g_settings().HUD.RPMBar.FgB,
+        g_settings().HUD.RPMBar.FgA
     };
 
     Util::ColorI rpmcolor = foreground;
-    if (g_vehData.mRPM > g_settings.HUD.RPMBar.Redline) {
+    if (g_vehData.mRPM > g_settings().HUD.RPMBar.Redline) {
         Util::ColorI redline = {
-            g_settings.HUD.RPMBar.RedlineR,
-            g_settings.HUD.RPMBar.RedlineG,
-            g_settings.HUD.RPMBar.RedlineB,
-            g_settings.HUD.RPMBar.RedlineA
+            g_settings().HUD.RPMBar.RedlineR,
+            g_settings().HUD.RPMBar.RedlineG,
+            g_settings().HUD.RPMBar.RedlineB,
+            g_settings().HUD.RPMBar.RedlineA
         };
         rpmcolor = redline;
     }
@@ -286,10 +286,10 @@ void drawRPMIndicator() {
     float maxUpshift = g_ext.GetDriveMaxFlatVel(g_playerVehicle);
     if (g_vehData.mRPM > map(minUpshift / ratio, 0.0f, maxUpshift / ratio, 0.0f, 1.0f)) {
         Util::ColorI rpmlimiter = {
-            g_settings.HUD.RPMBar.RevLimitR,
-            g_settings.HUD.RPMBar.RevLimitG,
-            g_settings.HUD.RPMBar.RevLimitB,
-            g_settings.HUD.RPMBar.RevLimitA
+            g_settings().HUD.RPMBar.RevLimitR,
+            g_settings().HUD.RPMBar.RevLimitG,
+            g_settings().HUD.RPMBar.RevLimitB,
+            g_settings().HUD.RPMBar.RevLimitA
         };
         rpmcolor = rpmlimiter;
     }
@@ -327,10 +327,10 @@ void drawRPMIndicator() {
     }
 
     drawRPMIndicator(
-        g_settings.HUD.RPMBar.XPos,
-        g_settings.HUD.RPMBar.YPos,
-        g_settings.HUD.RPMBar.XSz,
-        g_settings.HUD.RPMBar.YSz,
+        g_settings().HUD.RPMBar.XPos,
+        g_settings().HUD.RPMBar.YPos,
+        g_settings().HUD.RPMBar.XSz,
+        g_settings().HUD.RPMBar.YSz,
         rpmcolor,
         background,
         rpm
@@ -361,22 +361,22 @@ std::string formatSpeedo(std::string units, float speed, bool showUnit, int hudF
 void drawSpeedoMeter() {
     float dashms = g_vehData.mHasSpeedo ? g_ext.GetDashSpeed(g_playerVehicle) : abs(ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y);
     const Util::ColorI color {
-        g_settings.HUD.Speedo.ColorR,
-        g_settings.HUD.Speedo.ColorG,
-        g_settings.HUD.Speedo.ColorB,
+        g_settings().HUD.Speedo.ColorR,
+        g_settings().HUD.Speedo.ColorG,
+        g_settings().HUD.Speedo.ColorB,
         255
     };
-    UI::ShowText(g_settings.HUD.Speedo.XPos, g_settings.HUD.Speedo.YPos, g_settings.HUD.Speedo.Size,
-        formatSpeedo(g_settings.HUD.Speedo.Speedo, dashms, g_settings.HUD.Speedo.ShowUnit, g_settings.HUD.Font),
-        g_settings.HUD.Font, color, g_settings.HUD.Outline);
+    UI::ShowText(g_settings().HUD.Speedo.XPos, g_settings().HUD.Speedo.YPos, g_settings().HUD.Speedo.Size,
+        formatSpeedo(g_settings().HUD.Speedo.Speedo, dashms, g_settings().HUD.Speedo.ShowUnit, g_settings().HUD.Font),
+        g_settings().HUD.Font, color, g_settings().HUD.Outline);
 }
 
 void drawShiftModeIndicator() {
     std::string shiftModeText;
     Util::ColorI color {
-        g_settings.HUD.ShiftMode.ColorR,
-        g_settings.HUD.ShiftMode.ColorG,
-        g_settings.HUD.ShiftMode.ColorB,
+        g_settings().HUD.ShiftMode.ColorR,
+        g_settings().HUD.ShiftMode.ColorG,
+        g_settings().HUD.ShiftMode.ColorB,
         255
     };
     switch (g_settings().MTOptions.ShiftMode) {
@@ -389,8 +389,8 @@ void drawShiftModeIndicator() {
         shiftModeText = "A";
         color = { 0, 126, 232, 255 };
     }
-    UI::ShowText(g_settings.HUD.ShiftMode.XPos, g_settings.HUD.ShiftMode.YPos, g_settings.HUD.ShiftMode.Size, 
-        shiftModeText, g_settings.HUD.Font, color, g_settings.HUD.Outline);
+    UI::ShowText(g_settings().HUD.ShiftMode.XPos, g_settings().HUD.ShiftMode.YPos, g_settings().HUD.ShiftMode.Size, 
+        shiftModeText, g_settings().HUD.Font, color, g_settings().HUD.Outline);
 }
 
 void drawGearIndicator() {
@@ -405,34 +405,34 @@ void drawGearIndicator() {
         gear = "R";
     }
     Util::ColorI color {
-        g_settings.HUD.Gear.ColorR,
-        g_settings.HUD.Gear.ColorG,
-        g_settings.HUD.Gear.ColorB,
+        g_settings().HUD.Gear.ColorR,
+        g_settings().HUD.Gear.ColorG,
+        g_settings().HUD.Gear.ColorB,
         255
     };
     if (g_ext.GetGearCurr(g_playerVehicle) == g_ext.GetTopGear(g_playerVehicle)) {
-        color.R = g_settings.HUD.Gear.TopColorR;
-        color.G = g_settings.HUD.Gear.TopColorG;
-        color.B = g_settings.HUD.Gear.TopColorB;
+        color.R = g_settings().HUD.Gear.TopColorR;
+        color.G = g_settings().HUD.Gear.TopColorG;
+        color.B = g_settings().HUD.Gear.TopColorB;
         color.A = 255;
     }
-    UI::ShowText(g_settings.HUD.Gear.XPos, g_settings.HUD.Gear.YPos, g_settings.HUD.Gear.Size, 
-        gear, g_settings.HUD.Font, color, g_settings.HUD.Outline);
+    UI::ShowText(g_settings().HUD.Gear.XPos, g_settings().HUD.Gear.YPos, g_settings().HUD.Gear.Size, 
+        gear, g_settings().HUD.Font, color, g_settings().HUD.Outline);
 }
 
 void drawHUD() {
-    if (g_settings.HUD.Gear.Enable) {
+    if (g_settings().HUD.Gear.Enable) {
         drawGearIndicator();
     }
-    if (g_settings.HUD.ShiftMode.Enable) {
+    if (g_settings().HUD.ShiftMode.Enable) {
         drawShiftModeIndicator();
     }
-    if (g_settings.HUD.Speedo.Speedo == "kph" ||
-        g_settings.HUD.Speedo.Speedo == "mph" ||
-        g_settings.HUD.Speedo.Speedo == "ms") {
+    if (g_settings().HUD.Speedo.Speedo == "kph" ||
+        g_settings().HUD.Speedo.Speedo == "mph" ||
+        g_settings().HUD.Speedo.Speedo == "ms") {
         drawSpeedoMeter();
     }
-    if (g_settings.HUD.RPMBar.Enable) {
+    if (g_settings().HUD.RPMBar.Enable) {
         drawRPMIndicator();
     }
 }
@@ -523,27 +523,27 @@ void drawInputWheelInfo() {
         rotation = g_settings().CustomSteering.CustomRotationDegrees * 0.5f * -g_ext.GetSteeringInputAngle(g_playerVehicle);
 
     drawTexture(g_textureWheelId, 0, -9998, 100,
-        g_settings.HUD.Wheel.ImgSize, g_settings.HUD.Wheel.ImgSize,
+        g_settings().HUD.Wheel.ImgSize, g_settings().HUD.Wheel.ImgSize,
         0.5f, 0.5f, // center of texture
-        g_settings.HUD.Wheel.ImgXPos, g_settings.HUD.Wheel.ImgYPos,
+        g_settings().HUD.Wheel.ImgXPos, g_settings().HUD.Wheel.ImgYPos,
         rotation / 360.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
 
     // Pedals
-    float barWidth = g_settings.HUD.Wheel.PedalXSz / 3.0f;
+    float barWidth = g_settings().HUD.Wheel.PedalXSz / 3.0f;
 
-    float barYBase = (g_settings.HUD.Wheel.PedalYPos + g_settings.HUD.Wheel.PedalYSz * 0.5f);
+    float barYBase = (g_settings().HUD.Wheel.PedalYPos + g_settings().HUD.Wheel.PedalYSz * 0.5f);
 
-    GRAPHICS::DRAW_RECT(g_settings.HUD.Wheel.PedalXPos, g_settings.HUD.Wheel.PedalYPos, 3.0f * barWidth + g_settings.HUD.Wheel.PedalXPad, g_settings.HUD.Wheel.PedalYSz + g_settings.HUD.Wheel.PedalYPad, 
-        0, 0, 0, g_settings.HUD.Wheel.PedalBgA, 0);
-    GRAPHICS::DRAW_RECT(g_settings.HUD.Wheel.PedalXPos + 1.0f * barWidth, barYBase - g_controls.ThrottleVal * g_settings.HUD.Wheel.PedalYSz * 0.5f,
-        barWidth, g_controls.ThrottleVal * g_settings.HUD.Wheel.PedalYSz, 
-        g_settings.HUD.Wheel.PedalThrottleR, g_settings.HUD.Wheel.PedalThrottleG, g_settings.HUD.Wheel.PedalThrottleB, g_settings.HUD.Wheel.PedalThrottleA, 0);
-    GRAPHICS::DRAW_RECT(g_settings.HUD.Wheel.PedalXPos + 0.0f * barWidth, barYBase - g_controls.BrakeVal * g_settings.HUD.Wheel.PedalYSz * 0.5f,
-        barWidth, g_controls.BrakeVal * g_settings.HUD.Wheel.PedalYSz,
-        g_settings.HUD.Wheel.PedalBrakeR, g_settings.HUD.Wheel.PedalBrakeG, g_settings.HUD.Wheel.PedalBrakeB, g_settings.HUD.Wheel.PedalBrakeA, 0);
-    GRAPHICS::DRAW_RECT(g_settings.HUD.Wheel.PedalXPos - 1.0f * barWidth, barYBase - g_controls.ClutchVal * g_settings.HUD.Wheel.PedalYSz * 0.5f,
-        barWidth, g_controls.ClutchVal * g_settings.HUD.Wheel.PedalYSz,
-        g_settings.HUD.Wheel.PedalClutchR, g_settings.HUD.Wheel.PedalClutchG, g_settings.HUD.Wheel.PedalClutchB, g_settings.HUD.Wheel.PedalClutchA, 0);
+    GRAPHICS::DRAW_RECT(g_settings().HUD.Wheel.PedalXPos, g_settings().HUD.Wheel.PedalYPos, 3.0f * barWidth + g_settings().HUD.Wheel.PedalXPad, g_settings().HUD.Wheel.PedalYSz + g_settings().HUD.Wheel.PedalYPad, 
+        0, 0, 0, g_settings().HUD.Wheel.PedalBgA, 0);
+    GRAPHICS::DRAW_RECT(g_settings().HUD.Wheel.PedalXPos + 1.0f * barWidth, barYBase - g_controls.ThrottleVal * g_settings().HUD.Wheel.PedalYSz * 0.5f,
+        barWidth, g_controls.ThrottleVal * g_settings().HUD.Wheel.PedalYSz, 
+        g_settings().HUD.Wheel.PedalThrottleR, g_settings().HUD.Wheel.PedalThrottleG, g_settings().HUD.Wheel.PedalThrottleB, g_settings().HUD.Wheel.PedalThrottleA, 0);
+    GRAPHICS::DRAW_RECT(g_settings().HUD.Wheel.PedalXPos + 0.0f * barWidth, barYBase - g_controls.BrakeVal * g_settings().HUD.Wheel.PedalYSz * 0.5f,
+        barWidth, g_controls.BrakeVal * g_settings().HUD.Wheel.PedalYSz,
+        g_settings().HUD.Wheel.PedalBrakeR, g_settings().HUD.Wheel.PedalBrakeG, g_settings().HUD.Wheel.PedalBrakeB, g_settings().HUD.Wheel.PedalBrakeA, 0);
+    GRAPHICS::DRAW_RECT(g_settings().HUD.Wheel.PedalXPos - 1.0f * barWidth, barYBase - g_controls.ClutchVal * g_settings().HUD.Wheel.PedalYSz * 0.5f,
+        barWidth, g_controls.ClutchVal * g_settings().HUD.Wheel.PedalYSz,
+        g_settings().HUD.Wheel.PedalClutchR, g_settings().HUD.Wheel.PedalClutchG, g_settings().HUD.Wheel.PedalClutchB, g_settings().HUD.Wheel.PedalClutchA, 0);
 }
 
 std::vector<Vector3> GetWheelCoords(Vehicle handle) {

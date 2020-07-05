@@ -330,18 +330,18 @@ void update_hud() {
     if (g_settings.Debug.Metrics.GForce.Enable) {
         drawGForces();
     }
-    if (g_settings.HUD.Enable && g_vehData.mDomain == VehicleDomain::Road &&
-        (g_settings.MTOptions.Enable || g_settings.HUD.Always)) {
+    if (g_settings().HUD.Enable && g_vehData.mDomain == VehicleDomain::Road &&
+        (g_settings.MTOptions.Enable || g_settings().HUD.Always)) {
         drawHUD();
     }
-    if (g_settings.HUD.Enable &&
+    if (g_settings().HUD.Enable &&
         (g_vehData.mDomain == VehicleDomain::Road || g_vehData.mDomain == VehicleDomain::Water) &&
-        (g_controls.PrevInput == CarControls::Wheel || g_settings.HUD.Wheel.Always) &&
-        g_settings.HUD.Wheel.Enable && g_textureWheelId != -1) {
+        (g_controls.PrevInput == CarControls::Wheel || g_settings().HUD.Wheel.Always) &&
+        g_settings().HUD.Wheel.Enable && g_textureWheelId != -1) {
         drawInputWheelInfo();
     }
-    if (g_settings.HUD.Enable && g_vehData.mDomain == VehicleDomain::Road &&
-        g_settings.HUD.DashIndicators.Enable) {
+    if (g_settings().HUD.Enable && g_vehData.mDomain == VehicleDomain::Road &&
+        g_settings().HUD.DashIndicators.Enable) {
         drawDashLights();
     }
 
