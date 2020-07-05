@@ -482,8 +482,8 @@ void WheelInput::DoSteering() {
 
     float steerValL = map(g_controls.SteerVal, 0.0f, 0.5f, 1.0f, 0.0f);
     float steerValR = map(g_controls.SteerVal, 0.5f, 1.0f, 0.0f, 1.0f);
-    float steerValGammaL = pow(steerValL, g_settings.Wheel.Steering.Gamma);
-    float steerValGammaR = pow(steerValR, g_settings.Wheel.Steering.Gamma);
+    float steerValGammaL = pow(steerValL, g_settings().Wheel.Steering.Gamma);
+    float steerValGammaR = pow(steerValR, g_settings().Wheel.Steering.Gamma);
     float steerValGamma = g_controls.SteerVal < 0.5f ? -steerValGammaL : steerValGammaR;
     float effSteer = steerMult * steerValGamma;
 
@@ -772,7 +772,7 @@ float getSteeringLock() {
     case VehicleClass::Heli:
     case VehicleClass::Train:
     case VehicleClass::Unknown:
-    default: return g_settings.Wheel.Steering.AngleCar;
+    default: return g_settings().Wheel.Steering.AngleCar;
     }
 }
 
