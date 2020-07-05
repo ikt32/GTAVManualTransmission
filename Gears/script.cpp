@@ -1274,7 +1274,14 @@ void functionClutchCatch() {
         float throttle = map(abs(actualSpeed), 0.0f, abs(expectedSpeed), idleThrottle, 0.0f);
         throttle = std::clamp(throttle, 0.0f, idleThrottle);
 
-        bool userThrottle = abs(g_controls.ThrottleVal) > idleThrottle || abs(g_controls.BrakeVal) > idleThrottle;
+        float inputThrottle = g_controls.ThrottleVal;
+
+        // Controller has 0.25 deadzone, take it into account (important for stalling)
+        if (g_controls.PrevInput == CarControls::Controller) {
+            inputThrottle = std::clamp(map(inputThrottle, 0.25f, 1.0f, 0.0f, 1.0f), 0.0f, 1.0f);
+        }
+
+        bool userThrottle = inputThrottle > idleThrottle || abs(g_controls.BrakeVal) > idleThrottle;
 
         bool allWheelsOnGround = true;
         for (uint8_t i = 0; i < g_vehData.mWheelCount; ++i) {

@@ -2,6 +2,8 @@
 
 ## 4.8.2
 
+A few new goodies, and fixes to minor things.
+
 * Add "Disable autostart" option
 * Add "Leave engine running" option
 * Add engine on/off animations
@@ -11,12 +13,13 @@
 * Fix phone animation in cars not playing
 * Fix LSD settings not being vehicle-specific
 * Fix minimap rotation with custom camera
+* Fix gamepad clutch creep disengage before throttle deadzone end
 * Use help texts instead of subtitles for configuration hints
 * Improve error handling on missing `animations.yml` file
 * Improve movement camera rotation smoothness
 * Improve camera looking back visibility (raise camera)
 * Disable movement camera rotation for hovering vehicles
-* Minor code "improvements"
+* Internal code improvements
 
 ## 4.8.1
 
