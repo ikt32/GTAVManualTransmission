@@ -93,7 +93,7 @@ DrivingAssists::ESPData DrivingAssists::GetESP() {
         float aSpdRot = GetAngleBetween(vecNextSpd, vecNextRot);
 
         if (dSpdStr > dSpdRot && sgn(aSpdRot) == sgn(aSpdStr)) {
-            if (abs(espData.UndersteerAngle) > deg2rad(g_settings.DriveAssists.ESP.UnderMin) && g_vehData.mVelocity.y > 10.0f && abs(avgAngle) > deg2rad(2.0f)) {
+            if (abs(espData.UndersteerAngle) > deg2rad(g_settings().DriveAssists.ESP.UnderMin) && g_vehData.mVelocity.y > 10.0f && abs(avgAngle) > deg2rad(2.0f)) {
                 espData.Understeer = true;
             }
         }
@@ -105,7 +105,7 @@ DrivingAssists::ESPData DrivingAssists::GetESP() {
         if (isnan(espData.OversteerAngle))
             espData.OversteerAngle = 0.0;
 
-        if (espData.OversteerAngle > deg2rad(g_settings.DriveAssists.ESP.OverMin) && g_vehData.mVelocity.y > 10.0f) {
+        if (espData.OversteerAngle > deg2rad(g_settings().DriveAssists.ESP.OverMin) && g_vehData.mVelocity.y > 10.0f) {
             espData.Oversteer = true;
 
             if (sgn(g_vehData.mVelocity.x) == sgn(avgAngle)) {
@@ -211,7 +211,7 @@ std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData, LSDData lsdData
 
     float steerMult = g_settings.CustomSteering.SteeringMult;
     if (g_controls.PrevInput == CarControls::InputDevices::Wheel)
-        steerMult = g_settings.Wheel.Steering.SteerMult;
+        steerMult = g_settings().Wheel.Steering.SteerMult;
     float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * steerMult;
 
     float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
@@ -228,20 +228,20 @@ std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData, LSDData lsdData
     }
     float oversteerAngleDeg = abs(rad2deg(espData.OversteerAngle));
     float oversteerComp = map(oversteerAngleDeg,
-        g_settings.DriveAssists.ESP.OverMin, g_settings.DriveAssists.ESP.OverMax,
-        g_settings.DriveAssists.ESP.OverMinComp, g_settings.DriveAssists.ESP.OverMaxComp);
+        g_settings().DriveAssists.ESP.OverMin, g_settings().DriveAssists.ESP.OverMax,
+        g_settings().DriveAssists.ESP.OverMinComp, g_settings().DriveAssists.ESP.OverMaxComp);
 
     float oversteerAdd = handlingBrakeForce * oversteerComp;
 
     float oversteerRearAdd = handlingBrakeForce * map(
-        oversteerAngleDeg, g_settings.DriveAssists.ESP.OverMax, g_settings.DriveAssists.ESP.OverMax * 2.0f,
-        g_settings.DriveAssists.ESP.OverMinComp, g_settings.DriveAssists.ESP.OverMaxComp);
-    oversteerRearAdd = std::clamp(oversteerRearAdd, 0.0f, g_settings.DriveAssists.ESP.OverMaxComp);
+        oversteerAngleDeg, g_settings().DriveAssists.ESP.OverMax, g_settings().DriveAssists.ESP.OverMax * 2.0f,
+        g_settings().DriveAssists.ESP.OverMinComp, g_settings().DriveAssists.ESP.OverMaxComp);
+    oversteerRearAdd = std::clamp(oversteerRearAdd, 0.0f, g_settings().DriveAssists.ESP.OverMaxComp);
 
     float understeerAngleDeg(abs(rad2deg(espData.UndersteerAngle)));
     float understeerComp = map(understeerAngleDeg,
-        g_settings.DriveAssists.ESP.UnderMin, g_settings.DriveAssists.ESP.UnderMax,
-        g_settings.DriveAssists.ESP.UnderMinComp, g_settings.DriveAssists.ESP.UnderMaxComp);
+        g_settings().DriveAssists.ESP.UnderMin, g_settings().DriveAssists.ESP.UnderMax,
+        g_settings().DriveAssists.ESP.UnderMinComp, g_settings().DriveAssists.ESP.UnderMaxComp);
 
     float understeerAdd = handlingBrakeForce * understeerComp;
 
