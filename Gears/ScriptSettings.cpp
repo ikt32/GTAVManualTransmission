@@ -124,6 +124,8 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
     localSettings.Wheel.Steering.AngleBoat = activeConfig->Wheel.Steering.Angle;
     localSettings.Wheel.Steering.Gamma     = activeConfig->Wheel.Steering.Gamma;
 
+    localSettings.CustomSteering.CustomRotationDegrees = activeConfig->CustomSteering.CustomRotationDegrees;
+
     // oh dear lord
     localSettings.HUD.Enable =               activeConfig->HUD.Enable;               
     localSettings.HUD.Font =                 activeConfig->HUD.Font;                 

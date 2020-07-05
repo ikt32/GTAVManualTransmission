@@ -20,6 +20,7 @@ A few new goodies, and fixes to minor things.
 * Improve movement camera rotation smoothness
 * Improve camera looking back visibility (raise camera)
 * Disable movement camera rotation for hovering vehicles
+* Add wheel rotation from Custom Steering to vehicle configs
 * Internal code improvements
 
 ## 4.8.1

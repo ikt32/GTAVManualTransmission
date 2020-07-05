@@ -103,6 +103,9 @@ void VehicleConfig::loadSettings(const ScriptSettings& gSettings, const std::str
     Wheel.Steering.Angle = ini.GetDoubleValue("STEER", "Angle", gSettings.Wheel.Steering.AngleCar);
     Wheel.Steering.Gamma = ini.GetDoubleValue("STEER", "Gamma", gSettings.Wheel.Steering.Gamma);
 
+    // [CUSTOM_STEERING]
+    CustomSteering.CustomRotationDegrees = ini.GetDoubleValue("CUSTOM_STEERING", "CustomRotationDegrees", gSettings.CustomSteering.CustomRotationDegrees);
+
     // [HUD]
     HUD.Enable = ini.GetBoolValue("HUD", "EnableHUD", gSettings.HUD.Enable);
     HUD.Font = ini.GetLongValue("HUD", "HUDFont", gSettings.HUD.Font);

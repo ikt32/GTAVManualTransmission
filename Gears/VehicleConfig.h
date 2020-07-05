@@ -123,6 +123,11 @@ public:
         } Steering;
     } Wheel;
 
+    // [CUSTOM_STEERING]
+    struct {
+        float CustomRotationDegrees = 720.0f;
+    } CustomSteering;
+
     // [HUD]
     struct {
         bool Enable = true;

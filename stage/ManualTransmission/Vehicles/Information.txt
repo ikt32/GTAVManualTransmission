@@ -2,6 +2,9 @@
 ; When your current car matches a model or a plate, the ini settings are
 ; used instead of the main script settings.
 
+; Tip: You can make a copy of this file and rename it with an ini extension.
+; Tip: Use Notepad++ for helpful syntax highlighting for .ini files.
+
 ; Note: While a custom vehicle settings configuration is active, live changes
 ; in the menu do not apply _until the menu is closed_.
 ;   Closing the menu saves settings_general.ini and settings_wheel.ini,
@@ -13,6 +16,7 @@ ModelName = futo ae86
 ; Plates, separated by a space.
 ; When a plate matches, the model isn't checked.
 Plate = TOFU FUJIWARA
+Description = Example configuration
 
 ; All settings listed below can be used to override the corresponding
 ; main settings.
@@ -25,29 +29,35 @@ ClutchShiftingH = true
 ClutchShiftingS = false
 
 [MT_PARAMS]
-ClutchCatchpoint = 0.250000
-StallingThreshold = 0.300000
-StallingRPM = 0.150000
+ClutchCatchpoint = 0.150000
+StallingThreshold = 0.350000
+StallingRPM = 0.100000
 RPMDamage = 0.100000
 MisshiftDamage = 5.000000
-EngBrakePower = 0.050000
+EngBrakePower = 0.150000
 EngBrakeThreshold = 0.750000
+CreepIdleThrottle = 0.100000
+CreepIdleRPM = 0.100000
+StallingRate = 3.750000
+StallingSlip = 0.400000
 
 [DRIVING_ASSISTS]
 ABS = false
 ABSFilter = true
 TCS = false
-TCSMode = 1
-TCSSlipMax = 3.199999
+TCSMode = 0
+TCSSlipMax = 2.500000
 ESP = false
 ESPOverMin = 5.000000
-ESPOverMax = 15.000000
+ESPOverMax = 16.000004
 ESPOverMinComp = 0.000000
-ESPOverMaxComp = 2.000000
+ESPOverMaxComp = 1.000000
 ESPUnderMin = 5.000000
 ESPUnderMax = 10.000000
 ESPUnderMinComp = 0.000000
 ESPUnderMaxComp = 1.000000
+LSD = false
+LSDViscosity = 25.000000
 
 [SHIFT_OPTIONS]
 UpshiftCut = false
@@ -56,12 +66,13 @@ ClutchRateMult = 1.000000
 RPMTolerance = 0.200000
 
 [AUTO_PARAMS]
-UpshiftLoad = 0.040000
-DownshiftLoad = 0.450000
+UpshiftLoad = 0.120000
+DownshiftLoad = 0.400000
 NextGearMinRPM = 0.330000
 CurrGearMinRPM = 0.270000
 EcoRate = 0.050000
 DownshiftTimeoutMult = 1.000000
+UsingATCU = false
 
 ; Different configurations can now use 
 ; completely different force feedback profiles.
@@ -82,3 +93,6 @@ CollisionMult = 2.5
 
 [STEER]
 Angle=900
+
+[CUSTOM_STEERING]
+CustomRotationDegrees = 720.0
