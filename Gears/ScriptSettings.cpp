@@ -189,7 +189,41 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
     localSettings.HUD.DashIndicators.Enable =activeConfig->HUD.DashIndicators.Enable;
     localSettings.HUD.DashIndicators.XPos =  activeConfig->HUD.DashIndicators.XPos;  
     localSettings.HUD.DashIndicators.YPos =  activeConfig->HUD.DashIndicators.YPos;  
-    localSettings.HUD.DashIndicators.Size =  activeConfig->HUD.DashIndicators.Size;  
+    localSettings.HUD.DashIndicators.Size =  activeConfig->HUD.DashIndicators.Size;
+
+    localSettings.Misc.Camera.Enable                         = activeConfig->Misc.Camera.Enable                        ;
+    localSettings.Misc.Camera.AttachId                       = activeConfig->Misc.Camera.AttachId                      ;
+
+    localSettings.Misc.Camera.Movement.Follow                = activeConfig->Misc.Camera.Movement.Follow               ;
+    localSettings.Misc.Camera.Movement.RotationDirectionMult = activeConfig->Misc.Camera.Movement.RotationDirectionMult;
+    localSettings.Misc.Camera.Movement.RotationRotationMult  = activeConfig->Misc.Camera.Movement.RotationRotationMult ;
+    localSettings.Misc.Camera.Movement.RotationMaxAngle      = activeConfig->Misc.Camera.Movement.RotationMaxAngle     ;
+
+    localSettings.Misc.Camera.Movement.LongForwardMult       = activeConfig->Misc.Camera.Movement.LongForwardMult      ;
+    localSettings.Misc.Camera.Movement.LongBackwardMult      = activeConfig->Misc.Camera.Movement.LongBackwardMult     ;
+    localSettings.Misc.Camera.Movement.LongDeadzone          = activeConfig->Misc.Camera.Movement.LongDeadzone         ;
+    localSettings.Misc.Camera.Movement.LongGamma             = activeConfig->Misc.Camera.Movement.LongGamma            ;
+    localSettings.Misc.Camera.Movement.LongForwardLimit      = activeConfig->Misc.Camera.Movement.LongForwardLimit     ;
+    localSettings.Misc.Camera.Movement.LongBackwardLimit     = activeConfig->Misc.Camera.Movement.LongBackwardLimit    ;
+
+    localSettings.Misc.Camera.RemoveHead                     = activeConfig->Misc.Camera.RemoveHead                    ;
+    localSettings.Misc.Camera.FOV                            = activeConfig->Misc.Camera.FOV                           ;
+    localSettings.Misc.Camera.OffsetHeight                   = activeConfig->Misc.Camera.OffsetHeight                  ;
+    localSettings.Misc.Camera.OffsetForward                  = activeConfig->Misc.Camera.OffsetForward                 ;
+    localSettings.Misc.Camera.OffsetSide                     = activeConfig->Misc.Camera.OffsetSide                    ;
+    localSettings.Misc.Camera.Pitch                          = activeConfig->Misc.Camera.Pitch                         ;
+    localSettings.Misc.Camera.LookTime                       = activeConfig->Misc.Camera.LookTime                      ;
+    localSettings.Misc.Camera.MouseLookTime                  = activeConfig->Misc.Camera.MouseLookTime                 ;
+    localSettings.Misc.Camera.MouseCenterTimeout             = activeConfig->Misc.Camera.MouseCenterTimeout            ;
+    localSettings.Misc.Camera.MouseSensitivity               = activeConfig->Misc.Camera.MouseSensitivity              ;
+
+    localSettings.Misc.Camera.Bike.Disable                   = activeConfig->Misc.Camera.Bike.Disable                  ;
+    localSettings.Misc.Camera.Bike.AttachId                  = activeConfig->Misc.Camera.Bike.AttachId                 ;
+    localSettings.Misc.Camera.Bike.FOV                       = activeConfig->Misc.Camera.Bike.FOV                      ;
+    localSettings.Misc.Camera.Bike.OffsetHeight              = activeConfig->Misc.Camera.Bike.OffsetHeight             ;
+    localSettings.Misc.Camera.Bike.OffsetForward             = activeConfig->Misc.Camera.Bike.OffsetForward            ;
+    localSettings.Misc.Camera.Bike.OffsetSide                = activeConfig->Misc.Camera.Bike.OffsetSide               ;
+    localSettings.Misc.Camera.Bike.Pitch                     = activeConfig->Misc.Camera.Bike.Pitch                    ;
 }
 
 ScriptSettings ScriptSettings::operator()() {

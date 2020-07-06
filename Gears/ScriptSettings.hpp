@@ -349,6 +349,8 @@ public:
         bool UDPTelemetry = true;
         bool DashExtensions = true;
         bool SyncAnimations = true;
+
+        // [CAM]
         struct {
             bool Enable = true;
             int AttachId = 0; // 0: Head, 1: Vehicle, 2: FPV Offset?

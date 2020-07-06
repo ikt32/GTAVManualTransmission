@@ -96,3 +96,34 @@ Angle=900
 
 [CUSTOM_STEERING]
 CustomRotationDegrees = 720.0
+
+[CAM]
+Enable = true
+AttachId = 0
+FollowMovement = true
+MovementMultVel = 0.750000
+MovementMultRot = 0.150000
+MovementCap = 45.000000
+LongForwardMult = 0.050000
+LongBackwardMult = 0.100000
+LongDeadzone = 0.950000
+LongGamma = 1.000000
+LongForwardLimit = 0.100000
+LongBackwardLimit = 0.120000
+RemoveHead = true
+FOV = 55.000000
+OffsetHeight = 0.040000
+OffsetForward = 0.050000
+OffsetSide = 0.000000
+Pitch = 0.000000
+LookTime = 0.000010
+MouseLookTime = 0.000001
+MouseCenterTimeout = 750
+MouseSensitivity = 0.300000
+BikeDisable = false
+BikeAttachId = 0
+BikeFOV = 55.000000
+BikeOffsetHeight = -0.050000
+BikeOffsetForward = -0.080000
+BikeOffsetSide = 0.000000
+BikePitch = -11.000000

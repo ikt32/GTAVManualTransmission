@@ -8,6 +8,8 @@ A few new goodies, and fixes to minor things.
 * Add "Leave engine running" option
 * Add engine on/off animations
 * Add camera forward/backward movement options
+* Add wheel rotation from Custom Steering to vehicle configs
+* Add camera settings to vehicle configs
 * Fix wheel angles when engine is off
 * Fix haptic stalling effect playing on wrong device
 * Fix phone animation in cars not playing
@@ -22,7 +24,6 @@ A few new goodies, and fixes to minor things.
 * Improve movement camera rotation smoothness
 * Improve camera looking back visibility (raise camera)
 * Disable movement camera rotation for hovering vehicles
-* Add wheel rotation from Custom Steering to vehicle configs
 * Internal code improvements
 
 ## 4.8.1

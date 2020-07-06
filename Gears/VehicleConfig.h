@@ -215,6 +215,49 @@ public:
         } DashIndicators;
     } HUD;
 
+    // [MISC]
+    struct {
+        // [CAM]
+        struct {
+            bool Enable = true;
+            int AttachId = 0; // 0: Head, 1: Vehicle, 2: FPV Offset?
+            bool RemoveHead = true;
+
+            struct {
+                bool Follow = true;
+                float RotationDirectionMult = 0.750f;
+                float RotationRotationMult = 0.15f;
+                float RotationMaxAngle = 45.0f;
+
+                float LongForwardMult = 0.05f;
+                float LongBackwardMult = 0.10f;
+                float LongDeadzone = 0.95f;
+                float LongGamma = 1.0f;
+                float LongForwardLimit = 0.10f;
+                float LongBackwardLimit = 0.12f;
+            } Movement;
+
+            float FOV = 55.0f;
+            float OffsetHeight = 0.04f;
+            float OffsetForward = 0.05f;
+            float OffsetSide = 0.0f;
+            float Pitch = 0.0f;
+            float LookTime = 0.000010f;
+            float MouseLookTime = 0.000001f;
+            int MouseCenterTimeout = 750;
+            float MouseSensitivity = 0.3f;
+            struct {
+                bool Disable = false;
+                int AttachId = 0; // 0: Head, 1: Vehicle, 2: FPV Offset?
+                float FOV = 55.0f;
+                float OffsetHeight = -0.05f;
+                float OffsetForward = -0.08f;
+                float OffsetSide = 0.0f;
+                float Pitch = -11.0f;
+            } Bike;
+        } Camera;
+    } Misc;
+
 protected:
     void loadSettings(const ScriptSettings& gSettings,
         const std::string& file);

@@ -170,5 +170,41 @@ void VehicleConfig::loadSettings(const ScriptSettings& gSettings, const std::str
     HUD.DashIndicators.XPos = ini.GetDoubleValue("HUD", "DashIndicatorsXpos", gSettings.HUD.DashIndicators.XPos);
     HUD.DashIndicators.YPos = ini.GetDoubleValue("HUD", "DashIndicatorsYpos", gSettings.HUD.DashIndicators.YPos);
     HUD.DashIndicators.Size = ini.GetDoubleValue("HUD", "DashIndicatorsSize", gSettings.HUD.DashIndicators.Size);
+
+    // [CAM]
+    Misc.Camera.Enable = ini.GetBoolValue("CAM", "Enable", gSettings.Misc.Camera.Enable);
+    Misc.Camera.AttachId = ini.GetLongValue("CAM", "AttachId", gSettings.Misc.Camera.AttachId);
+
+    Misc.Camera.Movement.Follow = ini.GetBoolValue("CAM", "FollowMovement", gSettings.Misc.Camera.Movement.Follow);
+    Misc.Camera.Movement.RotationDirectionMult = ini.GetDoubleValue("CAM", "MovementMultVel", gSettings.Misc.Camera.Movement.RotationDirectionMult);
+    Misc.Camera.Movement.RotationRotationMult = ini.GetDoubleValue("CAM", "MovementMultRot", gSettings.Misc.Camera.Movement.RotationRotationMult);
+    Misc.Camera.Movement.RotationMaxAngle = ini.GetDoubleValue("CAM", "MovementCap", gSettings.Misc.Camera.Movement.RotationMaxAngle);
+
+    Misc.Camera.Movement.LongForwardMult = ini.GetDoubleValue("CAM", "LongForwardMult", gSettings.Misc.Camera.Movement.LongForwardMult);
+    Misc.Camera.Movement.LongBackwardMult = ini.GetDoubleValue("CAM", "LongBackwardMult", gSettings.Misc.Camera.Movement.LongBackwardMult);
+    Misc.Camera.Movement.LongDeadzone = ini.GetDoubleValue("CAM", "LongDeadzone", gSettings.Misc.Camera.Movement.LongDeadzone);
+    Misc.Camera.Movement.LongGamma = ini.GetDoubleValue("CAM", "LongGamma", gSettings.Misc.Camera.Movement.LongGamma);
+    Misc.Camera.Movement.LongForwardLimit = ini.GetDoubleValue("CAM", "LongForwardLimit", gSettings.Misc.Camera.Movement.LongForwardLimit);
+    Misc.Camera.Movement.LongBackwardLimit = ini.GetDoubleValue("CAM", "LongBackwardLimit", gSettings.Misc.Camera.Movement.LongBackwardLimit);
+
+    Misc.Camera.RemoveHead = ini.GetBoolValue("CAM", "RemoveHead", gSettings.Misc.Camera.RemoveHead);
+    Misc.Camera.FOV = ini.GetDoubleValue("CAM", "FOV", gSettings.Misc.Camera.FOV);
+    Misc.Camera.OffsetHeight = ini.GetDoubleValue("CAM", "OffsetHeight", gSettings.Misc.Camera.OffsetHeight);
+    Misc.Camera.OffsetForward = ini.GetDoubleValue("CAM", "OffsetForward", gSettings.Misc.Camera.OffsetForward);
+    Misc.Camera.OffsetSide = ini.GetDoubleValue("CAM", "OffsetSide", gSettings.Misc.Camera.OffsetSide);
+    Misc.Camera.Pitch = ini.GetDoubleValue("CAM", "Pitch", gSettings.Misc.Camera.Pitch);
+    Misc.Camera.LookTime = ini.GetDoubleValue("CAM", "LookTime", gSettings.Misc.Camera.LookTime);
+    Misc.Camera.MouseLookTime = ini.GetDoubleValue("CAM", "MouseLookTime", gSettings.Misc.Camera.MouseLookTime);
+    Misc.Camera.MouseCenterTimeout = ini.GetLongValue("CAM", "MouseCenterTimeout", gSettings.Misc.Camera.MouseCenterTimeout);
+    Misc.Camera.MouseSensitivity = ini.GetDoubleValue("CAM", "MouseSensitivity", gSettings.Misc.Camera.MouseSensitivity);
+
+    Misc.Camera.Bike.Disable = ini.GetBoolValue("CAM", "BikeDisable", gSettings.Misc.Camera.Bike.Disable);
+    Misc.Camera.Bike.AttachId = ini.GetLongValue("CAM", "BikeAttachId", gSettings.Misc.Camera.Bike.AttachId);
+    Misc.Camera.Bike.FOV = ini.GetDoubleValue("CAM", "BikeFOV", gSettings.Misc.Camera.Bike.FOV);
+    Misc.Camera.Bike.OffsetHeight = ini.GetDoubleValue("CAM", "BikeOffsetHeight", gSettings.Misc.Camera.Bike.OffsetHeight);
+    Misc.Camera.Bike.OffsetForward = ini.GetDoubleValue("CAM", "BikeOffsetForward", gSettings.Misc.Camera.Bike.OffsetForward);
+    Misc.Camera.Bike.OffsetSide = ini.GetDoubleValue("CAM", "BikeOffsetSide", gSettings.Misc.Camera.Bike.OffsetSide);
+    Misc.Camera.Bike.Pitch = ini.GetDoubleValue("CAM", "BikePitch", gSettings.Misc.Camera.Bike.Pitch);
+
 }
 #pragma warning(pop)
