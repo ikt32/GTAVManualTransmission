@@ -6,22 +6,10 @@ namespace DashLights {
     extern int LastAbsTime;
     extern int LastTcsTime;
     extern int LastEspTime;
-    extern const int LightDuration; // milliseconds
+    extern int LightDuration; // milliseconds
 }
 
 void threadCheckUpdate(unsigned milliseconds);
-
-///////////////////////////////////////////////////////////////////////////////
-//                           Helper functions/tools
-///////////////////////////////////////////////////////////////////////////////
-
-void drawHUD();
-void drawDebugInfo();
-void drawGForces();
-void drawVehicleWheelInfo();
-void drawInputWheelInfo();
-void updateDashLights();
-void drawDashLights();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                           Mod functions: Mod control

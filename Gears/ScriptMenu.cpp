@@ -1734,7 +1734,8 @@ void update_debugmenu() {
     g_menu.BoolOption("Display debug info", g_settings.Debug.DisplayInfo,
         { "Show all detailed technical info of the gearbox and inputs calculations." });
     g_menu.BoolOption("Display car wheel info", g_settings.Debug.DisplayWheelInfo,
-        { "Show per-wheel debug info with off-ground detection, lockup detection and suspension info." });
+        { "Show per-wheel debug info with off-ground detection, lockup detection and suspension info.",
+          "[TCS: Yellow] [ESP: Blue] [ABS: Red] [Locked up: Purple] [Off ground: Transparent]"});
     g_menu.BoolOption("Display gearing info", g_settings.Debug.DisplayGearingInfo,
         { "Show gear ratios and shift points from auto mode." });
     g_menu.BoolOption("Display force feedback lines", g_settings.Debug.DisplayFFBInfo,

@@ -270,6 +270,7 @@
     <ClInclude Include="Misc.h" />
     <ClInclude Include="newNatives.h" />
     <ClInclude Include="Compatibility.h" />
+    <ClInclude Include="ScriptHUD.h" />
     <ClInclude Include="StartingAnimation.h" />
     <ClInclude Include="SteeringAnim.h" />
     <ClInclude Include="UDPTelemetry\UDPTelemetry.h" />

@@ -2,4 +2,5 @@
 
 namespace CustomSteering {
     void Update();
+    void DrawDebug();
 }

@@ -28,6 +28,8 @@ namespace DrivingAssists {
         float BrakeRF;
         float BrakeLR;
         float BrakeRR;
+        float FDD; // debug, front diff speeddiff
+        float RDD; // debug, rear  diff speeddiff
     };
 
     ABSData GetABS();

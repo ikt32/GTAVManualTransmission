@@ -14,6 +14,7 @@
 #include "Misc.h"
 #include "StartingAnimation.h"
 #include "DrivingAssists.h"
+#include "ScriptHUD.h"
 
 #include "UDPTelemetry/Socket.h"
 #include "UDPTelemetry/UDPTelemetry.h"
@@ -51,6 +52,7 @@
 #include <mutex>
 #include <filesystem>
 #include <numeric>
+
 
 namespace fs = std::filesystem;
 using VExt = VehicleExtensions;
@@ -319,35 +321,7 @@ void update_hud() {
         return;
     }
 
-    updateDashLights();
-
-    if (g_settings.Debug.DisplayInfo) {
-        drawDebugInfo();
-    }
-    if (g_settings.Debug.DisplayWheelInfo) {
-        drawVehicleWheelInfo();
-    }
-    if (g_settings.Debug.Metrics.GForce.Enable) {
-        drawGForces();
-    }
-    if (g_settings().HUD.Enable && g_vehData.mDomain == VehicleDomain::Road &&
-        (g_settings.MTOptions.Enable || g_settings().HUD.Always)) {
-        drawHUD();
-    }
-    if (g_settings().HUD.Enable &&
-        (g_vehData.mDomain == VehicleDomain::Road || g_vehData.mDomain == VehicleDomain::Water) &&
-        (g_controls.PrevInput == CarControls::Wheel || g_settings().HUD.Wheel.Always) &&
-        g_settings().HUD.Wheel.Enable && g_textureWheelId != -1) {
-        drawInputWheelInfo();
-    }
-    if (g_settings().HUD.Enable && g_vehData.mDomain == VehicleDomain::Road &&
-        g_settings().HUD.DashIndicators.Enable) {
-        drawDashLights();
-    }
-
-    if (g_settings.Debug.DisplayFFBInfo) {
-        WheelInput::DrawDebugLines();
-    }
+    MTHUD::UpdateHUD();
 }
 
 void wheelControlWater() {
@@ -1512,8 +1486,6 @@ void handleBrakePatch() {
                 g_vehData.mWheelsTcs[i] = false;
             }
         }
-        if (g_settings.Debug.DisplayInfo)
-            UI::ShowText(0.45, 0.75, 1.0, "~r~(TCS/T)");
     }
 
     bool patchThrottle =

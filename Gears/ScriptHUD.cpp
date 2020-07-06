@@ -1,10 +1,13 @@
-#include "script.h"
+#include "ScriptHUD.h"
 #include <fmt/format.h>
 #include <inc/natives.h>
 #include <numeric>
 
 #include <menu.h>
 
+
+#include "CustomSteering.h"
+#include "DrivingAssists.h"
 #include "Memory/VehicleExtensions.hpp"
 
 #include "Util/MathExt.h"
@@ -13,6 +16,7 @@
 #include "Input/CarControls.hpp"
 #include "VehicleData.hpp"
 #include "ScriptSettings.hpp"
+#include "WheelInput.h"
 #include "Memory/Offsets.hpp"
 
 extern NativeMenu::Menu g_menu;
@@ -30,9 +34,13 @@ extern Vehicle g_playerVehicle;
 extern VehicleData g_vehData;
 extern VehiclePeripherals g_peripherals;
 
-///////////////////////////////////////////////////////////////////////////////
-//                           Display elements
-///////////////////////////////////////////////////////////////////////////////
+void drawDebugInfo();
+void drawGForces();
+void drawVehicleWheelInfo();
+void drawInputWheelInfo();
+void updateDashLights();
+void drawDashLights();
+void drawLSDInfo();
 
 namespace GForce {
     std::vector<std::pair<float, float>> CoordTrails;
@@ -43,7 +51,7 @@ namespace DashLights {
     int LastAbsTime = 0;
     int LastTcsTime = 0;
     int LastEspTime = 0;
-    const int LightDuration = 300; // milliseconds
+    int LightDuration = 300; // milliseconds
 }
 
 void updateDashLights() {
@@ -426,20 +434,61 @@ void drawGearIndicator() {
         gear, g_settings().HUD.Font, color, g_settings().HUD.Outline);
 }
 
-void drawHUD() {
-    if (g_settings().HUD.Gear.Enable) {
-        drawGearIndicator();
+void MTHUD::UpdateHUD() {
+    updateDashLights();
+
+    // main HUD elements
+    if (g_settings().HUD.Enable && g_vehData.mDomain == VehicleDomain::Road &&
+        (g_settings.MTOptions.Enable || g_settings().HUD.Always)) {
+        if (g_settings().HUD.Gear.Enable) {
+            drawGearIndicator();
+        }
+        if (g_settings().HUD.ShiftMode.Enable) {
+            drawShiftModeIndicator();
+        }
+        if (g_settings().HUD.Speedo.Speedo == "kph" ||
+            g_settings().HUD.Speedo.Speedo == "mph" ||
+            g_settings().HUD.Speedo.Speedo == "ms") {
+            drawSpeedoMeter();
+        }
+        if (g_settings().HUD.RPMBar.Enable) {
+            drawRPMIndicator();
+        }
+
+        if (g_settings().HUD.DashIndicators.Enable) {
+            drawDashLights();
+        }
     }
-    if (g_settings().HUD.ShiftMode.Enable) {
-        drawShiftModeIndicator();
+
+    // wheel stuff
+    if (g_settings().HUD.Enable &&
+        (g_vehData.mDomain == VehicleDomain::Road || g_vehData.mDomain == VehicleDomain::Water) &&
+        (g_controls.PrevInput == CarControls::Wheel || g_settings().HUD.Wheel.Always) &&
+        g_settings().HUD.Wheel.Enable && g_textureWheelId != -1) {
+        drawInputWheelInfo();
     }
-    if (g_settings().HUD.Speedo.Speedo == "kph" ||
-        g_settings().HUD.Speedo.Speedo == "mph" ||
-        g_settings().HUD.Speedo.Speedo == "ms") {
-        drawSpeedoMeter();
+
+    if (g_settings.Debug.DisplayFFBInfo) {
+        WheelInput::DrawDebugLines();
     }
-    if (g_settings().HUD.RPMBar.Enable) {
-        drawRPMIndicator();
+
+    // debug stuff
+    if (g_settings.Debug.DisplayInfo) {
+        drawDebugInfo();
+        drawLSDInfo();
+    }
+    if (g_settings.Debug.DisplayWheelInfo) {
+        drawVehicleWheelInfo();
+    }
+    if (g_settings.Debug.Metrics.GForce.Enable) {
+        drawGForces();
+    }
+
+    if (g_settings.Debug.DisplayInfo &&
+        g_settings.CustomSteering.Mode > 0 &&
+        g_controls.PrevInput != CarControls::Wheel &&
+        g_vehData.mDomain == VehicleDomain::Road) {
+        CustomSteering::DrawDebug();
     }
 }
 
@@ -584,18 +633,23 @@ void drawVehicleWheelInfo() {
 
     for (int i = 0; i < numWheels; i++) {
         Util::ColorI color = Util::ColorsI::TransparentGray;
+        // TCS: Yellow
         if (g_vehData.mWheelsTcs[i]) {
             color = Util::ColorI{ 255, 255, 0, 127 };
         }
+        // ESP: Blue
         if (g_vehData.mWheelsEspO[i] || g_vehData.mWheelsEspU[i]) {
             color = Util::ColorI{ 0, 0, 255, 127 };
         }
+        // ABS: Red
         if (g_vehData.mWheelsAbs[i]) {
             color = Util::ColorI{ 255, 0, 0, 127 };
         }
+        // Locked up: Purple
         if (g_vehData.mWheelsLockedUp[i]) {
             color = Util::ColorI{ 127, 0, 255, 127 };
         }
+        // Off ground: Transparent
         if (!wheelsOnGround[i]) {
             color = Util::ColorI{ 0, 0, 0, 0 };
         }
@@ -625,4 +679,23 @@ void drawVehicleWheelInfo() {
         GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
             wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z + 1.0f + 2.5f * wheelsCompr[i], 255, 0, 0, 255);
     }
+}
+
+void drawLSDInfo() {
+    auto lsdData = DrivingAssists::GetLSD();
+    std::string fddcol;
+    if (lsdData.FDD > 0.1f) { fddcol = "~r~"; }
+    if (lsdData.FDD < -0.1f) { fddcol = "~b~"; }
+
+    std::string rddcol;
+    if (lsdData.RDD > 0.1f) { rddcol = "~r~"; }
+    if (lsdData.RDD < -0.1f) { rddcol = "~b~"; }
+    UI::ShowText(0.60f, 0.000f, 0.25f, fmt::format("LF LSD: {:.2f}", lsdData.BrakeLF));
+    UI::ShowText(0.65f, 0.000f, 0.25f, fmt::format("RF LSD: {:.2f}", lsdData.BrakeRF));
+    UI::ShowText(0.70f, 0.000f, 0.25f, fmt::format("{}L-R: {:.2f}", fddcol, lsdData.FDD));
+    UI::ShowText(0.60f, 0.025f, 0.25f, fmt::format("LR LSD: {:.2f}", lsdData.BrakeLR));
+    UI::ShowText(0.65f, 0.025f, 0.25f, fmt::format("RR LSD: {:.2f}", lsdData.BrakeRR));
+    UI::ShowText(0.70f, 0.025f, 0.25f, fmt::format("{}L-R: {:.2f}", rddcol, lsdData.RDD));
+    UI::ShowText(0.60f, 0.050f, 0.25f, fmt::format(
+        "{}LSD: {}", lsdData.Use ? "~g~" : "~r~", lsdData.Use ? "Active" : "Idle/Off"));
 }

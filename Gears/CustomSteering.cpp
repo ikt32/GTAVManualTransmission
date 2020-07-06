@@ -31,7 +31,7 @@ namespace {
 namespace CustomSteering {
     float calculateReduction();
     float calculateDesiredHeading(float steeringMax, float desiredHeading, float reduction);
-    void drawDebug();
+
     // Doesn't change steer when not mouse steering
     void updateMouseSteer(float& steer);
 }
@@ -91,7 +91,7 @@ float CustomSteering::calculateDesiredHeading(float steeringMax, float desiredHe
     return std::clamp(correction, -steeringMax, steeringMax);
 }
 
-void CustomSteering::drawDebug() {
+void CustomSteering::DrawDebug() {
     float steeringAngle = g_ext.GetWheelLargestAngle(g_playerVehicle);
 
     Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
@@ -178,9 +178,6 @@ void disableControls() {
 void CustomSteering::Update() {
     if (!Util::VehicleAvailable(g_playerVehicle, g_playerPed))
         return;
-
-    if (g_settings.Debug.DisplayInfo)
-        drawDebug();
 
     float limitRadians = g_ext.GetMaxSteeringAngle(g_playerVehicle);
     float reduction = calculateReduction();

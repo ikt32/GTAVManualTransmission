@@ -6,7 +6,6 @@
 #include "Memory/VehicleExtensions.hpp"
 
 #include "Util/MathExt.h"
-#include "Util/UIUtils.h"
 
 #include <inc/natives.h>
 #include <fmt/format.h>
@@ -131,9 +130,6 @@ DrivingAssists::LSDData DrivingAssists::GetLSD() {
 
     if (g_vehData.mWheelCount == 4 && g_settings().DriveAssists.LSD.Enable) {
 
-        float fdd = 0.0f;
-        float rdd = 0.0f;
-
         if (g_vehData.mWheelAverageDrivenTyreSpeed > 0.0f) {
             auto angularVelocities = VExt::GetWheelRotationSpeeds(g_playerVehicle);
             float WheelSpeedLF = angularVelocities[0];
@@ -148,18 +144,18 @@ DrivingAssists::LSDData DrivingAssists::GetLSD() {
 
             // pos: neg brake left, neg throttle right
             float frontDiffDiff = (WheelSpeedLF - WheelSpeedRF) / (WheelSpeedLF + WheelSpeedRF);
-            fdd = frontDiffDiff;
             if (WheelSpeedLF == 0.0f || WheelSpeedRF == 0.0f)
                 frontDiffDiff = 0.0f;
             lsdData.BrakeLF = frontDiffDiff / 2.0f * dbalF * visc * g_vehData.mThrottle * clutch;
             lsdData.BrakeRF = -frontDiffDiff / 2.0f * dbalF * visc * g_vehData.mThrottle * clutch;
+            lsdData.FDD = frontDiffDiff;
 
             float rearDiffDiff = (WheelSpeedLR - WheelSpeedRR) / (WheelSpeedLR + WheelSpeedRR);
-            rdd = rearDiffDiff;
             if (WheelSpeedLR == 0.0f || WheelSpeedRR == 0.0f)
                 rearDiffDiff = 0.0f;
             lsdData.BrakeLR = rearDiffDiff / 2.0f * dbalR * visc * g_vehData.mThrottle * clutch;
             lsdData.BrakeRR = -rearDiffDiff / 2.0f * dbalR * visc * g_vehData.mThrottle * clutch;
+            lsdData.RDD = rearDiffDiff;
 
             if (lsdData.BrakeLF > 0.0f) { lsdData.BrakeLF = 0.0f; }
             if (lsdData.BrakeRF > 0.0f) { lsdData.BrakeRF = 0.0f; }
@@ -183,24 +179,6 @@ DrivingAssists::LSDData DrivingAssists::GetLSD() {
                 lsdData.BrakeLF = 0.0f;
                 lsdData.BrakeRF = 0.0f;
             }
-        }
-
-        if (g_settings.Debug.DisplayInfo) {
-            std::string fddcol;
-            if (fdd > 0.1f) { fddcol = "~r~"; }
-            if (fdd < -0.1f) { fddcol = "~b~"; }
-
-            std::string rddcol;
-            if (rdd > 0.1f) { rddcol = "~r~"; }
-            if (rdd < -0.1f) { rddcol = "~b~"; }
-            UI::ShowText(0.60f, 0.000f, 0.25f, fmt::format("LF LSD: {:.2f}", lsdData.BrakeLF));
-            UI::ShowText(0.65f, 0.000f, 0.25f, fmt::format("RF LSD: {:.2f}", lsdData.BrakeRF));
-            UI::ShowText(0.70f, 0.000f, 0.25f, fmt::format("{}L-R: {:.2f}", fddcol, fdd));
-            UI::ShowText(0.60f, 0.025f, 0.25f, fmt::format("LR LSD: {:.2f}", lsdData.BrakeLR));
-            UI::ShowText(0.65f, 0.025f, 0.25f, fmt::format("RR LSD: {:.2f}", lsdData.BrakeRR));
-            UI::ShowText(0.70f, 0.025f, 0.25f, fmt::format("{}L-R: {:.2f}", rddcol, rdd));
-            UI::ShowText(0.60f, 0.050f, 0.25f, fmt::format(
-                "{}LSD: {}", lsdData.Use ? "~g~" : "~r~", lsdData.Use ? "Active" : "Idle/Off"));
         }
     }
     return lsdData;
@@ -267,16 +245,6 @@ std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData, LSDData lsdData
     g_vehData.mWheelsEspO[2] = avgAngle_ < 0.0f && oversteerRearAdd > 0.0f ? true : false;
     g_vehData.mWheelsEspO[3] = avgAngle_ > 0.0f && oversteerRearAdd > 0.0f ? true : false;
 
-    if (g_settings.Debug.DisplayInfo) {
-        std::string         espString;
-        if (espData.Oversteer && espData.Understeer)
-            espString = "O+U";
-        else if (espData.Oversteer)
-            espString = "O";
-        else if (espData.Understeer)
-            espString = "U";
-        UI::ShowText(0.45, 0.75, 1.0, fmt::format("~r~(ESP_{})", espString));
-    }
     return brakeVals;
 }
 
@@ -309,8 +277,6 @@ std::vector<float> DrivingAssists::GetTCSBrakes(TCSData tcsData, LSDData lsdData
             g_vehData.mWheelsTcs[i] = false;
         }
     }
-    if (g_settings.Debug.DisplayInfo)
-        UI::ShowText(0.45, 0.75, 1.0, "~r~(TCS/B)");
 
     return brakeVals;
 }
@@ -341,8 +307,6 @@ std::vector<float> DrivingAssists::GetABSBrakes(ABSData absData, LSDData lsdData
             g_vehData.mWheelsAbs[i] = false;
         }
     }
-    if (g_settings.Debug.DisplayInfo)
-        UI::ShowText(0.45, 0.75, 1.0, "~r~(ABS)");
 
     return brakeVals;
 }

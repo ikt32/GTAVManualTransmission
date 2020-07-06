@@ -503,6 +503,7 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="DrivingAssists.h" />
+    <ClInclude Include="ScriptHUD.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
