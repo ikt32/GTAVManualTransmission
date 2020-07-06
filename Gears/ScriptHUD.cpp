@@ -36,9 +36,7 @@ extern VehiclePeripherals g_peripherals;
 
 namespace GForce {
     std::vector<std::pair<float, float>> CoordTrails;
-    std::vector<Vector3> LastCoords(3);
-    Vector3 PrevAccel;
-    double PrevRotVel;
+    Vector3 PrevWorldVel;
 }
 
 namespace DashLights {
@@ -189,32 +187,31 @@ void drawGForces() {
     if (g_menu.IsThisOpen() && screenLocationConflict)
         return;
 
-    V3D accel = (V3D(g_vehData.mAcceleration) + V3D(PrevAccel)) * 0.5;
-    PrevAccel = g_vehData.mAcceleration;
+    Vector3 worldVel = ENTITY::GET_ENTITY_VELOCITY(g_playerVehicle);
+    Vector3 worldVelDelta = (worldVel - PrevWorldVel);
 
-    Vector3 absPos = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
-    LastCoords.push_back(absPos);
-    while (LastCoords.size() > 3) {
-        LastCoords.erase(LastCoords.begin());
-    }
+    Vector3 fwdVec = ENTITY::GET_ENTITY_FORWARD_VECTOR(g_playerVehicle);
+    Vector3 upVec = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, 0.0f, 0.0f, 1.0f) - ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
+    Vector3 rightVec = Cross(fwdVec, upVec);
 
-    double worldSpeed = sqrt(static_cast<double>(g_vehData.mVelocity.x) * static_cast<double>(g_vehData.mVelocity.x) +
-        static_cast<double>(g_vehData.mVelocity.y) * static_cast<double>(g_vehData.mVelocity.y));
-    double worldRotVel = 
-        GetAngleBetween(V3D(LastCoords[1]) - V3D(LastCoords[0]), V3D(LastCoords[2]) - V3D(LastCoords[1])) /
-        static_cast<double>(MISC::GET_FRAME_TIME());
+    Vector3 relVelDelta {
+        -Dot(worldVelDelta, rightVec), 0,
+        Dot(worldVelDelta, fwdVec), 0,
+        Dot(worldVelDelta, upVec), 0,
+    };
 
-    if (isnan(worldRotVel)) {
-        worldRotVel = PrevRotVel;
-    }
-    double avgWorldRotVel = (worldRotVel + PrevRotVel) / 2.0;
-    PrevRotVel = worldRotVel;
-    float GForceX = static_cast<float>((accel.x / 9.81) + (worldSpeed * avgWorldRotVel / 9.81));
-    float GForceY = static_cast<float>(accel.y) / 9.81f;
+    Vector3 accel = relVelDelta * (1.0f / MISC::GET_FRAME_TIME());
+
+    float GForceX = accel.x / 9.8f;
+    float GForceY = accel.y / 9.8f;
+    float GForceZ = accel.z / 9.8f;
+    PrevWorldVel = worldVel;
+
     UI::ShowText(locX + 0.100f, locY - 0.075f, 0.5f, fmt::format("LAT: {:.2f} g", GForceX));
-    UI::ShowText(locX + 0.100f, locY + 0.025f, 0.5f, fmt::format("LON: {:.2f} g", GForceY));
-
-    // 1 div = 2G
+    UI::ShowText(locX + 0.100f, locY - 0.025f, 0.5f, fmt::format("LON: {:.2f} g", GForceY));
+    UI::ShowText(locX + 0.100f, locY + 0.025f, 0.5f, fmt::format("VERT: {:.2f} g", GForceZ));
+    
+    // 1 div = 1G, entire thing = 2g
     float offX = (szX * 0.5f) * GForceX * 0.5f;
     float offY = (szY * 0.5f) * GForceY * 0.5f;
 
@@ -233,17 +230,26 @@ void drawGForces() {
     GRAPHICS::DRAW_RECT(locX - 0.25f * szX, locY, 0.001f, szY, 127, 127, 127, 127, 0);
     GRAPHICS::DRAW_RECT(locX, locY - 0.25f * szY, szX, 0.001f, 127, 127, 127, 127, 0);
 
+    std::vector<float> allX;
+    std::vector<float> allY;
+
     int alpha = 0;
     for (auto it = CoordTrails.begin(); it != CoordTrails.end(); ++it) {
         auto c = *it;
         if (std::next(it) == CoordTrails.end()) {
             GRAPHICS::DRAW_RECT(locX + c.first, locY + c.second, szX * 0.025f, szY * 0.025f, 255, 255, 255, 255, 0);
+            allX.push_back(locX + c.first);
+            allY.push_back(locY + c.second);
         }
         else {
             GRAPHICS::DRAW_RECT(locX + c.first, locY + c.second, szX * 0.025f, szY * 0.025f, 127, 127, 127, alpha, 0);
+            allX.push_back(locX + c.first);
+            allY.push_back(locY + c.second);
         }
         alpha += 255 / static_cast<int>(CoordTrails.size());
     }
+
+    GRAPHICS::DRAW_RECT(avg(allX), avg(allY), szX * 0.05f, szY * 0.05f, 255, 0, 0, 255, 0);
 }
 
 void drawRPMIndicator(float x, float y, float width, float height, Util::ColorI fg, Util::ColorI bg, float rpm) {

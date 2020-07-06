@@ -162,7 +162,7 @@ auto GetAngleBetween(Vector3T a, Vector3T b) {
     Vector3T normal{};
     normal.z = static_cast < decltype(a.x) >(1.0);
     auto angle = acos(Dot(a, b) / (Length(a) * Length(b)));
-    if (Dot(normal, Cross(a, b)) < 0.0f)
+    if (Dot(normal, Cross(a, b)) < 0.0)
         angle = -angle;
     return angle;
 }
