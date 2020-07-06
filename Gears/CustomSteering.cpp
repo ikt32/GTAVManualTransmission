@@ -15,9 +15,10 @@
 
 #include <algorithm>
 
+using VExt = VehicleExtensions;
+
 extern Vehicle g_playerVehicle;
 extern Ped g_playerPed;
-extern VehicleExtensions g_ext;
 extern ScriptSettings g_settings;
 
 namespace {
@@ -96,7 +97,7 @@ float CustomSteering::calculateDesiredHeading(float steeringMax, float desiredHe
 }
 
 void CustomSteering::DrawDebug() {
-    float steeringAngle = g_ext.GetWheelLargestAngle(g_playerVehicle);
+    float steeringAngle = VExt::GetWheelLargestAngle(g_playerVehicle);
 
     Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
     Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, 1);
@@ -133,7 +134,7 @@ void disableControls() {
     // 5: Stromberg
     // 6: Amphibious cars / APC
     // 7: Amphibious bike
-    int modelType = g_ext.GetModelType(g_playerVehicle);
+    int modelType = VExt::GetModelType(g_playerVehicle);
     bool isFrog = modelType == 5 || modelType == 6 || modelType == 7;//*(int*)(modelInfo + 0x340) == 6 || *(int*)(modelInfo + 0x340) == 7;
     bool hasFork = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "forks") != -1;
     bool hasTow = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "tow_arm") != -1;
@@ -141,7 +142,7 @@ void disableControls() {
 
     bool hasEquipment = hasFork || hasTow || hasScoop;
 
-    float hoverRatio = g_ext.GetHoverTransformRatio(g_playerVehicle);
+    float hoverRatio = VExt::GetHoverTransformRatio(g_playerVehicle);
 
     bool disableLeftRight = false;
     bool disableUpDown = false;
@@ -183,7 +184,7 @@ void CustomSteering::Update() {
     if (!Util::VehicleAvailable(g_playerVehicle, g_playerPed))
         return;
 
-    float limitRadians = g_ext.GetMaxSteeringAngle(g_playerVehicle);
+    float limitRadians = VExt::GetMaxSteeringAngle(g_playerVehicle);
     float reduction = calculateReduction();
 
     float steer = -PAD::GET_DISABLED_CONTROL_NORMAL(1, ControlMoveLeftRight);
@@ -216,7 +217,7 @@ void CustomSteering::Update() {
         updateMouseSteer(steerCurr);
 
     // Ignore reduction for wet vehicles.
-    int modelType = g_ext.GetModelType(g_playerVehicle);
+    int modelType = VExt::GetModelType(g_playerVehicle);
     bool isFrog = modelType == 5 || modelType == 6 || modelType == 7;
     bool isBoat = modelType == 13;
     float submergeLevel = ENTITY::GET_ENTITY_SUBMERGED_LEVEL(g_playerVehicle);
@@ -227,10 +228,10 @@ void CustomSteering::Update() {
 
     disableControls();
 
-    g_ext.SetSteeringInputAngle(g_playerVehicle, desiredHeading * (1.0f / limitRadians));
+    VExt::SetSteeringInputAngle(g_playerVehicle, desiredHeading * (1.0f / limitRadians));
 
     if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle))
-        g_ext.SetSteeringAngle(g_playerVehicle, desiredHeading);
+        VExt::SetSteeringAngle(g_playerVehicle, desiredHeading);
 
     auto boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "steeringwheel");
     if (boneIdx != -1 && g_settings.CustomSteering.CustomRotation) {
@@ -241,9 +242,9 @@ void CustomSteering::Update() {
         float rotDeg = g_settings().CustomSteering.CustomRotationDegrees / 2.0f * corrDesiredHeading;
         float rotDegRaw = rotDeg;
 
-        // Setting angle using the g_ext calls above causes the angle to overshoot the "real" coords
+        // Setting angle using the VExt:: calls above causes the angle to overshoot the "real" coords
         // Not sure if this is the best solution, but hey, it works!
-        rotDeg -= 2.0f * rad2deg(corrDesiredHeading * g_ext.GetMaxSteeringAngle(g_playerVehicle));
+        rotDeg -= 2.0f * rad2deg(corrDesiredHeading * VExt::GetMaxSteeringAngle(g_playerVehicle));
 
         VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotDeg);
         SteeringAnimation::SetRotation(rotDegRaw);

@@ -19,6 +19,8 @@
 #include "WheelInput.h"
 #include "Memory/Offsets.hpp"
 
+using VExt = VehicleExtensions;
+
 extern NativeMenu::Menu g_menu;
 extern ScriptSettings g_settings;
 extern CarControls g_controls;
@@ -29,7 +31,6 @@ extern int g_textureEspId;
 extern int g_textureBrkId;
 
 extern VehicleGearboxStates g_gearStates;
-extern VehicleExtensions g_ext;
 extern Vehicle g_playerVehicle;
 extern VehicleData g_vehData;
 extern VehiclePeripherals g_peripherals;
@@ -77,7 +78,7 @@ void updateDashLights() {
     if (g_vehData.mHasABS) {
         for (int i = 0; i < g_vehData.mWheelCount; ++i) {
             abs |= g_vehData.mWheelTyreSpeeds[i] == 0.0f &&
-                g_ext.GetBrakeP(g_playerVehicle) > 0.0f &&
+                VExt::GetBrakeP(g_playerVehicle) > 0.0f &&
                 g_vehData.mVelocity.y > 3.0f;
         }
     }
@@ -96,7 +97,7 @@ void drawDashLights() {
     bool abs = DashLights::LastAbsTime + DashLights::LightDuration >= currentTime;
     bool tcs = DashLights::LastTcsTime + DashLights::LightDuration >= currentTime;
     bool esp = DashLights::LastEspTime + DashLights::LightDuration >= currentTime;
-    bool brk = g_ext.GetHandbrake(g_playerVehicle);
+    bool brk = VExt::GetHandbrake(g_playerVehicle);
 
     const float size = g_settings().HUD.DashIndicators.Size;
     const float txSz = 0.025f * size;
@@ -296,9 +297,9 @@ void drawRPMIndicator() {
         };
         rpmcolor = redline;
     }
-    float ratio = g_ext.GetGearRatios(g_playerVehicle)[g_ext.GetGearCurr(g_playerVehicle)];
-    float minUpshift = g_ext.GetInitialDriveMaxFlatVel(g_playerVehicle);
-    float maxUpshift = g_ext.GetDriveMaxFlatVel(g_playerVehicle);
+    float ratio = VExt::GetGearRatios(g_playerVehicle)[VExt::GetGearCurr(g_playerVehicle)];
+    float minUpshift = VExt::GetInitialDriveMaxFlatVel(g_playerVehicle);
+    float maxUpshift = VExt::GetDriveMaxFlatVel(g_playerVehicle);
     if (g_vehData.mRPM > map(minUpshift / ratio, 0.0f, maxUpshift / ratio, 0.0f, 1.0f)) {
         Util::ColorI rpmlimiter = {
             g_settings().HUD.RPMBar.RevLimitR,
@@ -374,7 +375,7 @@ std::string formatSpeedo(std::string units, float speed, bool showUnit, int hudF
 }
 
 void drawSpeedoMeter() {
-    float dashms = g_vehData.mHasSpeedo ? g_ext.GetDashSpeed(g_playerVehicle) : abs(ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y);
+    float dashms = g_vehData.mHasSpeedo ? VExt::GetDashSpeed(g_playerVehicle) : abs(ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y);
     const Util::ColorI color {
         g_settings().HUD.Speedo.ColorR,
         g_settings().HUD.Speedo.ColorG,
@@ -409,14 +410,14 @@ void drawShiftModeIndicator() {
 }
 
 void drawGearIndicator() {
-    std::string gear = std::to_string(g_ext.GetGearCurr(g_playerVehicle));
-    if (g_ext.GetHandbrake(g_playerVehicle)) {
+    std::string gear = std::to_string(VExt::GetGearCurr(g_playerVehicle));
+    if (VExt::GetHandbrake(g_playerVehicle)) {
         gear = "P";
     }
     else if (g_gearStates.FakeNeutral && g_settings.MTOptions.Enable) {
         gear = "N";
     }
-    else if (g_ext.GetGearCurr(g_playerVehicle) == 0) {
+    else if (VExt::GetGearCurr(g_playerVehicle) == 0) {
         gear = "R";
     }
     Util::ColorI color {
@@ -425,7 +426,7 @@ void drawGearIndicator() {
         g_settings().HUD.Gear.ColorB,
         255
     };
-    if (g_ext.GetGearCurr(g_playerVehicle) == g_ext.GetTopGear(g_playerVehicle)) {
+    if (VExt::GetGearCurr(g_playerVehicle) == VExt::GetTopGear(g_playerVehicle)) {
         color.R = g_settings().HUD.Gear.TopColorR;
         color.G = g_settings().HUD.Gear.TopColorG;
         color.B = g_settings().HUD.Gear.TopColorB;
@@ -499,14 +500,14 @@ void MTHUD::UpdateHUD() {
 
 void drawDebugInfo() {
     if (!g_menu.IsThisOpen()) {
-        UI::ShowText(0.01, 0.250, 0.3, fmt::format("Address: 0x{:X}", reinterpret_cast<uintptr_t>(g_ext.GetAddress(g_playerVehicle))));
+        UI::ShowText(0.01, 0.250, 0.3, fmt::format("Address: 0x{:X}", reinterpret_cast<uintptr_t>(VExt::GetAddress(g_playerVehicle))));
         UI::ShowText(0.01, 0.275, 0.3, fmt::format("Mod Enabled:\t\t{}" , g_settings.MTOptions.Enable));
         UI::ShowText(0.01, 0.300, 0.3, fmt::format("RPM:\t\t\t{:.3f}", g_vehData.mRPM));
-        UI::ShowText(0.01, 0.325, 0.3, fmt::format("Current Gear:\t\t{}", g_ext.GetGearCurr(g_playerVehicle)));
-        UI::ShowText(0.01, 0.350, 0.3, fmt::format("Next Gear:\t\t{}", g_ext.GetGearNext(g_playerVehicle)));
-        UI::ShowText(0.01, 0.375, 0.3, fmt::format("Clutch:\t\t\t{:.2f}", g_ext.GetClutch(g_playerVehicle)));
-        UI::ShowText(0.01, 0.400, 0.3, fmt::format("Throttle:\t\t\t{:.2f}", g_ext.GetThrottle(g_playerVehicle)));
-        UI::ShowText(0.01, 0.425, 0.3, fmt::format("Turbo:\t\t\t{:.2f}", g_ext.GetTurbo(g_playerVehicle)));
+        UI::ShowText(0.01, 0.325, 0.3, fmt::format("Current Gear:\t\t{}", VExt::GetGearCurr(g_playerVehicle)));
+        UI::ShowText(0.01, 0.350, 0.3, fmt::format("Next Gear:\t\t{}", VExt::GetGearNext(g_playerVehicle)));
+        UI::ShowText(0.01, 0.375, 0.3, fmt::format("Clutch:\t\t\t{:.2f}", VExt::GetClutch(g_playerVehicle)));
+        UI::ShowText(0.01, 0.400, 0.3, fmt::format("Throttle:\t\t\t{:.2f}", VExt::GetThrottle(g_playerVehicle)));
+        UI::ShowText(0.01, 0.425, 0.3, fmt::format("Turbo:\t\t\t{:.2f}", VExt::GetTurbo(g_playerVehicle)));
         UI::ShowText(0.01, 0.450, 0.3, fmt::format("{}Speedo", g_vehData.mHasSpeedo ? "~g~" : "~r~"));
         UI::ShowText(0.01, 0.475, 0.3, fmt::format("{}E {}CVT -> {}Clutch",
             g_vehData.mIsElectric ? "~g~" : "~r~", g_vehData.mIsCVT ? "~g~" : "~r~",
@@ -543,8 +544,8 @@ void drawDebugInfo() {
     
 
     if (g_settings.Debug.DisplayGearingInfo) {
-        auto ratios = g_ext.GetGearRatios(g_playerVehicle);
-        float DriveMaxFlatVel = g_ext.GetDriveMaxFlatVel(g_playerVehicle);
+        auto ratios = VExt::GetGearRatios(g_playerVehicle);
+        float DriveMaxFlatVel = VExt::GetDriveMaxFlatVel(g_playerVehicle);
 
         int i = 0;
         UI::ShowText(0.30f, 0.05f, 0.35f, "Ratios");
@@ -561,8 +562,8 @@ void drawDebugInfo() {
             i++;
         }
 
-        float rateUp = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(g_playerVehicle) + hOffsets.fClutchChangeRateScaleUpShift);
-        float rateDown = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(g_playerVehicle) + hOffsets.fClutchChangeRateScaleDownShift);
+        float rateUp = *reinterpret_cast<float*>(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets.fClutchChangeRateScaleUpShift);
+        float rateDown = *reinterpret_cast<float*>(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets.fClutchChangeRateScaleDownShift);
         float upshiftDuration = 1.0f / (rateUp * g_settings().ShiftOptions.ClutchRateMult);
         float downshiftDuration = 1.0f / (rateDown * g_settings().ShiftOptions.ClutchRateMult);
 
@@ -580,7 +581,7 @@ void drawInputWheelInfo() {
     if (g_controls.PrevInput == CarControls::Wheel) 
         rotation = g_settings().Wheel.Steering.AngleMax * (g_controls.SteerVal - 0.5f);
     else if (g_settings().CustomSteering.CustomRotation)
-        rotation = g_settings().CustomSteering.CustomRotationDegrees * 0.5f * -g_ext.GetSteeringInputAngle(g_playerVehicle);
+        rotation = g_settings().CustomSteering.CustomRotationDegrees * 0.5f * -VExt::GetSteeringInputAngle(g_playerVehicle);
 
     drawTexture(g_textureWheelId, 0, -9998, 100,
         g_settings().HUD.Wheel.ImgSize, g_settings().HUD.Wheel.ImgSize,
@@ -608,7 +609,7 @@ void drawInputWheelInfo() {
 
 std::vector<Vector3> GetWheelCoords(Vehicle handle) {
     std::vector<Vector3> worldCoords;
-    std::vector<Vector3> positions = g_ext.GetWheelOffsets(handle);
+    std::vector<Vector3> positions = VExt::GetWheelOffsets(handle);
     Vector3 position = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
     Vector3 rotation = ENTITY::GET_ENTITY_ROTATION(g_playerVehicle, 0);
     rotation.x = deg2rad(rotation.x);
@@ -624,17 +625,17 @@ std::vector<Vector3> GetWheelCoords(Vehicle handle) {
 }
 
 void drawVehicleWheelInfo() {
-    auto numWheels = g_ext.GetNumWheels(g_playerVehicle);
-    auto wheelsSpeed = g_ext.GetTyreSpeeds(g_playerVehicle);
-    auto wheelsCompr = g_ext.GetWheelCompressions(g_playerVehicle);
-    auto wheelsHealt = g_ext.GetWheelHealths(g_playerVehicle);
-    auto wheelsContactCoords = g_ext.GetWheelLastContactCoords(g_playerVehicle);
-    auto wheelsOnGround = g_ext.GetWheelsOnGround(g_playerVehicle);
+    auto numWheels = VExt::GetNumWheels(g_playerVehicle);
+    auto wheelsSpeed = VExt::GetTyreSpeeds(g_playerVehicle);
+    auto wheelsCompr = VExt::GetWheelCompressions(g_playerVehicle);
+    auto wheelsHealt = VExt::GetWheelHealths(g_playerVehicle);
+    auto wheelsContactCoords = VExt::GetWheelLastContactCoords(g_playerVehicle);
+    auto wheelsOnGround = VExt::GetWheelsOnGround(g_playerVehicle);
 
     auto wheelCoords = GetWheelCoords(g_playerVehicle);
-    auto wheelsPower = g_ext.GetWheelPower(g_playerVehicle);
-    auto wheelsBrake = g_ext.GetWheelBrakePressure(g_playerVehicle);
-    auto wheelDims = g_ext.GetWheelDimensions(g_playerVehicle);
+    auto wheelsPower = VExt::GetWheelPower(g_playerVehicle);
+    auto wheelsBrake = VExt::GetWheelBrakePressure(g_playerVehicle);
+    auto wheelDims = VExt::GetWheelDimensions(g_playerVehicle);
 
     for (int i = 0; i < numWheels; i++) {
         Util::ColorI color = Util::ColorsI::TransparentGray;
@@ -664,7 +665,7 @@ void drawVehicleWheelInfo() {
         float rimSize = 2.0f * wheelDims[i].RimRadius * 39.3701f; // inches
 
         UI::ShowText3D(wheelCoords[i], {
-                fmt::format("[{}] {}Powered", i, g_ext.IsWheelPowered(g_playerVehicle, i) ? "~g~" : "~r~"),
+                fmt::format("[{}] {}Powered", i, VExt::IsWheelPowered(g_playerVehicle, i) ? "~g~" : "~r~"),
                 fmt::format("Speed: \t{:.3f}", wheelsSpeed[i]),
                 //fmt::format("Compr: \t{:.3f}", wheelsCompr[i]),
                 //fmt::format("Health: \t{:.3f}", wheelsHealt[i]),

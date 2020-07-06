@@ -10,12 +10,13 @@
 #include <inc\natives.h>
 #include <numeric>
 
+using VExt = VehicleExtensions;
+
 extern ScriptSettings g_settings;
 extern CarControls g_controls;
 extern Vehicle g_playerVehicle;
 extern VehicleGearboxStates g_gearStates;
 extern VehicleData g_vehData;
-extern VehicleExtensions g_ext;
 
 namespace AtcuLogic {
     void Cycle();

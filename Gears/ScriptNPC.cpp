@@ -21,10 +21,11 @@
 #include <fmt/format.h>
 #include <set>
 
+using VExt = VehicleExtensions;
+
 class NPCVehicle;
 
 extern ScriptSettings g_settings;
-extern VehicleExtensions g_ext;
 extern Ped g_playerPed;
 extern Vehicle g_playerVehicle;
 
@@ -80,7 +81,7 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
             auto plate = VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(npcVehicle);
 
             Util::ColorI thColor = fgColor;
-            float throttle = g_ext.GetThrottleP(npcVehicle);
+            float throttle = VExt::GetThrottleP(npcVehicle);
 
             if (throttle >= 0.0f) {
                 thColor.R = static_cast<int>(map(throttle, 0.0f, 1.0f, 255.0f, 0.0f));
@@ -92,18 +93,18 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
             }
 
             Util::ColorI brColor = fgColor;
-            float brake = g_ext.GetBrakeP(npcVehicle);
+            float brake = VExt::GetBrakeP(npcVehicle);
 
             brColor.B = static_cast<int>(map(brake, 0.0f, 1.0f, 255.0f, 0.0f));
             brColor.G = static_cast<int>(map(brake, 0.0f, 1.0f, 255.0f, 0.0f));
 
             Util::ColorI rpmColor = fgColor;
-            float rpm = g_ext.GetCurrentRPM(npcVehicle);
+            float rpm = VExt::GetCurrentRPM(npcVehicle);
             rpmColor.G = static_cast<int>(map(rpm, 0.0f, 1.0f, 255.0f, 165.0f));
             rpmColor.B = static_cast<int>(map(rpm, 0.0f, 1.0f, 255.0f, 0.0f));
 
             auto gearStates = _npcVehicle.GetGearbox();
-            auto load = gearStates.ThrottleHang - map(g_ext.GetCurrentRPM(npcVehicle), 0.2f, 1.0f, 0.0f, 1.0f);
+            auto load = gearStates.ThrottleHang - map(VExt::GetCurrentRPM(npcVehicle), 0.2f, 1.0f, 0.0f, 1.0f);
 
             UI::ShowText3DColors(targetPos,
                 {
@@ -111,9 +112,9 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
                     //{ plate, fgColor },
                     { "Throttle: " + std::to_string(throttle), thColor },
                     { "Brake: " + std::to_string(brake), brColor },
-                    { "Steer:" + std::to_string(g_ext.GetSteeringAngle(npcVehicle)), fgColor },
+                    { "Steer:" + std::to_string(VExt::GetSteeringAngle(npcVehicle)), fgColor },
                     { "RPM: " + std::to_string(rpm), rpmColor },
-                    { fmt::format("Gear: {}/{}", g_ext.GetGearCurr(npcVehicle), g_ext.GetTopGear(npcVehicle)), fgColor },
+                    { fmt::format("Gear: {}/{}", VExt::GetGearCurr(npcVehicle), VExt::GetTopGear(npcVehicle)), fgColor },
                     { fmt::format("Load: {}", load), fgColor },
                     { fmt::format("{}Shifting", gearStates.Shifting ? "~g~" : ""), fgColor },
                     { fmt::format("TH: {}", gearStates.ThrottleHang), fgColor },
@@ -149,7 +150,7 @@ void updateShifting(Vehicle npcVehicle, VehicleGearboxStates& gearStates) {
     if (!gearStates.Shifting)
         return;
 
-    auto handlingPtr = g_ext.GetHandlingPtr(npcVehicle);
+    auto handlingPtr = VExt::GetHandlingPtr(npcVehicle);
     // This is x Clutch per second? e.g. changerate 2.5 -> clutch fully (dis)engages in 1/2.5 seconds? or whole thing?
     float rateUp = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
     float rateDown = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleDownShift);
@@ -204,17 +205,17 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
         if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(npcVehicle))
             return;
 
-        auto topGear = g_ext.GetTopGear(npcVehicle);
-        auto currGear = g_ext.GetGearCurr(npcVehicle);
+        auto topGear = VExt::GetTopGear(npcVehicle);
+        auto currGear = VExt::GetGearCurr(npcVehicle);
 
         // Shift to forward/reverse when "stuck" in the opposite gear?
-        if (currGear == 0 && g_ext.GetThrottleP(npcVehicle) > 0.2f) {
+        if (currGear == 0 && VExt::GetThrottleP(npcVehicle) > 0.2f) {
             gearStates.Shifting = false;
             shiftTo(gearStates, 1, true);
             gearStates.FakeNeutral = false;
         }
 
-        if (currGear == 1 && g_ext.GetThrottleP(npcVehicle) < -0.2f) {
+        if (currGear == 1 && VExt::GetThrottleP(npcVehicle) < -0.2f) {
             gearStates.Shifting = false;
             shiftTo(gearStates, 0, true);
             gearStates.FakeNeutral = false;
@@ -223,10 +224,10 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
         if (topGear == 1 || currGear == 0)
             return;
 
-        float throttle = g_ext.GetThrottleP(npcVehicle);
-        auto gearRatios = g_ext.GetGearRatios(npcVehicle);
-        float driveMaxFlatVel = g_ext.GetDriveMaxFlatVel(npcVehicle);
-        float rpm = g_ext.GetCurrentRPM(npcVehicle);
+        float throttle = VExt::GetThrottleP(npcVehicle);
+        auto gearRatios = VExt::GetGearRatios(npcVehicle);
+        float driveMaxFlatVel = VExt::GetDriveMaxFlatVel(npcVehicle);
+        float rpm = VExt::GetCurrentRPM(npcVehicle);
 
         if (throttle >= gearStates.ThrottleHang)
             gearStates.ThrottleHang = throttle;
@@ -248,9 +249,9 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
         float engineLoad = gearStates.ThrottleHang - map(rpm, 0.2f, 1.0f, 0.0f, 1.0f);
 
         bool skidding = false;
-        auto skids = g_ext.GetWheelSkidSmokeEffect(npcVehicle);
-        for (uint8_t i = 0; i < g_ext.GetNumWheels(npcVehicle); ++i) {
-            if (abs(skids[i]) > 3.5f && g_ext.IsWheelPowered(npcVehicle, i))
+        auto skids = VExt::GetWheelSkidSmokeEffect(npcVehicle);
+        for (uint8_t i = 0; i < VExt::GetNumWheels(npcVehicle); ++i) {
+            if (abs(skids[i]) > 3.5f && VExt::IsWheelPowered(npcVehicle, i))
                 skidding = true;
         }
 
@@ -271,7 +272,7 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
             gearRatioRatio = thisGearRatio;
         }
 
-        float rateUp = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(npcVehicle) + hOffsets.fClutchChangeRateScaleUpShift);
+        float rateUp = *reinterpret_cast<float*>(VExt::GetHandlingPtr(npcVehicle) + hOffsets.fClutchChangeRateScaleUpShift);
         float upshiftDuration = 1.0f / (rateUp * g_settings.ShiftOptions.ClutchRateMult);
         bool tpPassed = MISC::GET_GAME_TIMER() > gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings.AutoParams.DownshiftTimeoutMult);
 
@@ -288,27 +289,27 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
         // Braking!
         if (MemoryPatcher::BrakePatcher.Patched()) {
             // TODO: Proper way of finding out what the fronts/rears are!
-            auto numWheels = g_ext.GetNumWheels(npcVehicle);
+            auto numWheels = VExt::GetNumWheels(npcVehicle);
 
-            float handlingBrakeForce = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(npcVehicle) + hOffsets.fBrakeForce);
-            float bbalF = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(npcVehicle) + hOffsets.fBrakeBiasFront);
-            float bbalR = *reinterpret_cast<float*>(g_ext.GetHandlingPtr(npcVehicle) + hOffsets.fBrakeBiasRear);
-            float inpBrakeForce = handlingBrakeForce * g_ext.GetBrakeP(npcVehicle);
+            float handlingBrakeForce = *reinterpret_cast<float*>(VExt::GetHandlingPtr(npcVehicle) + hOffsets.fBrakeForce);
+            float bbalF = *reinterpret_cast<float*>(VExt::GetHandlingPtr(npcVehicle) + hOffsets.fBrakeBiasFront);
+            float bbalR = *reinterpret_cast<float*>(VExt::GetHandlingPtr(npcVehicle) + hOffsets.fBrakeBiasRear);
+            float inpBrakeForce = handlingBrakeForce * VExt::GetBrakeP(npcVehicle);
 
             if (numWheels == 2) {
-                g_ext.SetWheelBrakePressure(npcVehicle, 0, inpBrakeForce * bbalF);
-                g_ext.SetWheelBrakePressure(npcVehicle, 1, inpBrakeForce * bbalR);
+                VExt::SetWheelBrakePressure(npcVehicle, 0, inpBrakeForce * bbalF);
+                VExt::SetWheelBrakePressure(npcVehicle, 1, inpBrakeForce * bbalR);
             }
             else if (numWheels >= 4 && numWheels % 2 == 0) {
-                g_ext.SetWheelBrakePressure(npcVehicle, 0, inpBrakeForce * bbalF);
-                g_ext.SetWheelBrakePressure(npcVehicle, 1, inpBrakeForce * bbalF);
+                VExt::SetWheelBrakePressure(npcVehicle, 0, inpBrakeForce * bbalF);
+                VExt::SetWheelBrakePressure(npcVehicle, 1, inpBrakeForce * bbalF);
                 for (uint8_t i = 2; i < numWheels; ++i) {
-                    g_ext.SetWheelBrakePressure(npcVehicle, i, inpBrakeForce * bbalR);
+                    VExt::SetWheelBrakePressure(npcVehicle, i, inpBrakeForce * bbalR);
                 }
             }
             else {
                 for (uint8_t i = 0; i < numWheels; ++i) {
-                    g_ext.SetWheelBrakePressure(npcVehicle, i, inpBrakeForce);
+                    VExt::SetWheelBrakePressure(npcVehicle, i, inpBrakeForce);
                 }
             }
         }
@@ -356,8 +357,8 @@ void updateNPCVehicles(std::vector<NPCVehicle>& vehicles) {
         updateNPCVehicle(vehicle);
 
         updateShifting(vehicle.GetVehicle(), vehicle.GetGearbox());
-        g_ext.SetGearCurr(vehicle.GetVehicle(), vehicle.GetGearbox().LockGear);
-        g_ext.SetGearNext(vehicle.GetVehicle(), vehicle.GetGearbox().LockGear);
+        VExt::SetGearCurr(vehicle.GetVehicle(), vehicle.GetGearbox().LockGear);
+        VExt::SetGearNext(vehicle.GetVehicle(), vehicle.GetGearbox().LockGear);
     }
 }
 

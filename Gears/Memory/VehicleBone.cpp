@@ -7,10 +7,10 @@
 #include "../Util/MathExt.h"
 #include "VehicleExtensions.hpp"
 
-extern VehicleExtensions g_ext;
+using VExt = VehicleExtensions;
 
 void VehicleBones::RotateAxis(Vehicle vehicle, int index, Vector3 axis, float degrees) {
-    auto address = g_ext.GetAddress(vehicle);
+    auto address = VExt::GetAddress(vehicle);
     auto fragInstGtaPtr = *reinterpret_cast<uint64_t*>(address + 0x30);
     auto inst = reinterpret_cast<fragInstGta*>(fragInstGtaPtr);
 
