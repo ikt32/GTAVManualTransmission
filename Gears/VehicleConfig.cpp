@@ -171,6 +171,23 @@ void VehicleConfig::loadSettings(const ScriptSettings& gSettings, const std::str
     HUD.DashIndicators.YPos = ini.GetDoubleValue("HUD", "DashIndicatorsYpos", gSettings.HUD.DashIndicators.YPos);
     HUD.DashIndicators.Size = ini.GetDoubleValue("HUD", "DashIndicatorsSize", gSettings.HUD.DashIndicators.Size);
 
+    HUD.MouseSteering.Enable = ini.GetBoolValue("HUD", "MouseEnable", gSettings.HUD.MouseSteering.Enable);
+    HUD.MouseSteering.XPos = ini.GetDoubleValue("HUD", "MouseXPos", gSettings.HUD.MouseSteering.XPos);
+    HUD.MouseSteering.YPos = ini.GetDoubleValue("HUD", "MouseYPos", gSettings.HUD.MouseSteering.YPos);
+    HUD.MouseSteering.XSz = ini.GetDoubleValue("HUD", "MouseXSz", gSettings.HUD.MouseSteering.XSz);
+    HUD.MouseSteering.YSz = ini.GetDoubleValue("HUD", "MouseYSz", gSettings.HUD.MouseSteering.YSz);
+    HUD.MouseSteering.MarkerXSz = ini.GetDoubleValue("HUD", "MouseMarkerXSz", gSettings.HUD.MouseSteering.MarkerXSz);
+
+    HUD.MouseSteering.BgR = ini.GetLongValue("HUD", "MouseBgR", gSettings.HUD.MouseSteering.BgR);
+    HUD.MouseSteering.BgG = ini.GetLongValue("HUD", "MouseBgG", gSettings.HUD.MouseSteering.BgG);
+    HUD.MouseSteering.BgB = ini.GetLongValue("HUD", "MouseBgB", gSettings.HUD.MouseSteering.BgB);
+    HUD.MouseSteering.BgA = ini.GetLongValue("HUD", "MouseBgA", gSettings.HUD.MouseSteering.BgA);
+
+    HUD.MouseSteering.FgR = ini.GetLongValue("HUD", "MouseFgR", gSettings.HUD.MouseSteering.FgR);
+    HUD.MouseSteering.FgG = ini.GetLongValue("HUD", "MouseFgG", gSettings.HUD.MouseSteering.FgG);
+    HUD.MouseSteering.FgB = ini.GetLongValue("HUD", "MouseFgB", gSettings.HUD.MouseSteering.FgB);
+    HUD.MouseSteering.FgA = ini.GetLongValue("HUD", "MouseFgA", gSettings.HUD.MouseSteering.FgA);
+
     // [CAM]
     Misc.Camera.Enable = ini.GetBoolValue("CAM", "Enable", gSettings.Misc.Camera.Enable);
     Misc.Camera.AttachId = ini.GetLongValue("CAM", "AttachId", gSettings.Misc.Camera.AttachId);

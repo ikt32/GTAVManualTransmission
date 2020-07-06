@@ -191,6 +191,23 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
     localSettings.HUD.DashIndicators.YPos =  activeConfig->HUD.DashIndicators.YPos;  
     localSettings.HUD.DashIndicators.Size =  activeConfig->HUD.DashIndicators.Size;
 
+    localSettings.HUD.MouseSteering.Enable    = activeConfig->HUD.MouseSteering.Enable   ;
+    localSettings.HUD.MouseSteering.XPos      = activeConfig->HUD.MouseSteering.XPos     ;
+    localSettings.HUD.MouseSteering.YPos      = activeConfig->HUD.MouseSteering.YPos     ;
+    localSettings.HUD.MouseSteering.XSz       = activeConfig->HUD.MouseSteering.XSz      ;
+    localSettings.HUD.MouseSteering.YSz       = activeConfig->HUD.MouseSteering.YSz      ;
+    localSettings.HUD.MouseSteering.MarkerXSz = activeConfig->HUD.MouseSteering.MarkerXSz;
+
+    localSettings.HUD.MouseSteering.BgR       = activeConfig->HUD.MouseSteering.BgR      ;
+    localSettings.HUD.MouseSteering.BgG       = activeConfig->HUD.MouseSteering.BgG      ;
+    localSettings.HUD.MouseSteering.BgB       = activeConfig->HUD.MouseSteering.BgB      ;
+    localSettings.HUD.MouseSteering.BgA       = activeConfig->HUD.MouseSteering.BgA      ;
+
+    localSettings.HUD.MouseSteering.FgR       = activeConfig->HUD.MouseSteering.FgR      ;
+    localSettings.HUD.MouseSteering.FgG       = activeConfig->HUD.MouseSteering.FgG      ;
+    localSettings.HUD.MouseSteering.FgB       = activeConfig->HUD.MouseSteering.FgB      ;
+    localSettings.HUD.MouseSteering.FgA       = activeConfig->HUD.MouseSteering.FgA      ;
+
     localSettings.Misc.Camera.Enable                         = activeConfig->Misc.Camera.Enable                        ;
     localSettings.Misc.Camera.AttachId                       = activeConfig->Misc.Camera.AttachId                      ;
 
