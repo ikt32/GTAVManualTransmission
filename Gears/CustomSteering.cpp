@@ -267,7 +267,7 @@ void CustomSteering::updateMouseSteer(float& steer) {
     if (mouseDown && !mouseControl) {
         mouseDown = false;
         PLAYER::SET_PLAYER_CAN_DO_DRIVE_BY(PLAYER::GET_PLAYER_INDEX(), true);
-        //xTravel = 0.0f;
+        mouseXTravel = 0.0f;
     }
 
     if (mouseDown && mouseControl) {
