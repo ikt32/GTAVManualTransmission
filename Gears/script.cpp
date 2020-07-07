@@ -1870,6 +1870,29 @@ void functionAutoReverse() {
 ///////////////////////////////////////////////////////////////////////////////
 // Blocks some vehicle controls on tapping, tries to activate them when holding.
 // TODO: Some original "tap" controls don't work.
+
+template <typename CtrlType>
+void doodoo(const std::array<int, static_cast<int>(CtrlType::SIZEOF)>& blockList) {
+    for (int i = 0; i < static_cast<int>(CtrlType::SIZEOF); i++) {
+        if (blockList[i] == -1) continue;
+        if (i != static_cast<int>(CtrlType::ShiftUp) &&
+            i != static_cast<int>(CtrlType::ShiftDown)) continue;
+
+        bool releasedThisFrame = g_controls.ButtonReleasedAfter(static_cast<CtrlType>(i), g_settings.Controller.HoldTimeMs);
+
+        if (g_controls.ButtonHeldOver(static_cast<CtrlType>(i), g_settings.Controller.HoldTimeMs)) {
+            PAD::_SET_CONTROL_NORMAL(0, blockList[i], 1.0f);
+        }
+        else {
+            PAD::DISABLE_CONTROL_ACTION(0, blockList[i], true);
+        }
+        }
+    }
+    if (blockList[static_cast<int>(CtrlType::Clutch)] != -1) {
+        PAD::DISABLE_CONTROL_ACTION(0, blockList[static_cast<int>(CtrlType::Clutch)], true);
+    }
+}
+
 void blockButtons() {
     if (!g_settings.MTOptions.Enable || !g_settings.Controller.BlockCarControls || g_vehData.mDomain != VehicleDomain::Road ||
         g_controls.PrevInput != CarControls::Controller || !Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
@@ -1880,46 +1903,10 @@ void blockButtons() {
     }
 
     if (g_settings.Controller.Native.Enable) {
-        for (int i = 0; i < static_cast<int>(CarControls::LegacyControlType::SIZEOF_LegacyControlType); i++) {
-            if (g_controls.ControlNativeBlocks[i] == -1) continue;
-            if (i != static_cast<int>(CarControls::LegacyControlType::ShiftUp) && 
-                i != static_cast<int>(CarControls::LegacyControlType::ShiftDown)) continue;
-
-            if (g_controls.ButtonHeldOver(static_cast<CarControls::LegacyControlType>(i), g_settings.Controller.HoldTimeMs)) {
-                PAD::_SET_CONTROL_NORMAL(0, g_controls.ControlNativeBlocks[i], 1.0f);
-            }
-            else {
-                PAD::DISABLE_CONTROL_ACTION(0, g_controls.ControlNativeBlocks[i], true);
-            }
-
-            if (g_controls.ButtonReleasedAfter(static_cast<CarControls::LegacyControlType>(i), g_settings.Controller.HoldTimeMs)) {
-                // todo
-            }
-        }
-        if (g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] != -1) {
-            PAD::DISABLE_CONTROL_ACTION(0, g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)], true);
-        }
+        doodoo<CarControls::LegacyControlType>(g_controls.ControlNativeBlocks);
     }
     else {
-        for (int i = 0; i < static_cast<int>(CarControls::ControllerControlType::SIZEOF_ControllerControlType); i++) {
-            if (g_controls.ControlXboxBlocks[i] == -1) continue;
-            if (i != static_cast<int>(CarControls::ControllerControlType::ShiftUp) && 
-                i != static_cast<int>(CarControls::ControllerControlType::ShiftDown)) continue;
-
-            if (g_controls.ButtonHeldOver(static_cast<CarControls::ControllerControlType>(i), g_settings.Controller.HoldTimeMs)) {
-                PAD::_SET_CONTROL_NORMAL(0, g_controls.ControlXboxBlocks[i], 1.0f);
-            }
-            else {
-                PAD::DISABLE_CONTROL_ACTION(0, g_controls.ControlXboxBlocks[i], true);
-            }
-
-            if (g_controls.ButtonReleasedAfter(static_cast<CarControls::ControllerControlType>(i), g_settings.Controller.HoldTimeMs)) {
-                // todo
-            }
-        }
-        if (g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)] != -1) {
-            PAD::DISABLE_CONTROL_ACTION(0, g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)], true);
-        }
+        doodoo<CarControls::ControllerControlType>(g_controls.ControlXboxBlocks);
     }
 }
 

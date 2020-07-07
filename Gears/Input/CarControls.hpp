@@ -25,7 +25,7 @@ public:
         ToggleH,
         Engine,
         CycleAssists,
-        SIZEOF_ControllerControlType
+        SIZEOF
     };
 
     enum class LegacyControlType {
@@ -38,7 +38,7 @@ public:
         ToggleH,
         Engine,
         CycleAssists,
-        SIZEOF_LegacyControlType
+        SIZEOF
     };
 
     enum class KeyboardControlType : uint32_t {
@@ -205,11 +205,11 @@ public:
     float SteerValRaw = 0.0f;   // For readout purposes. SteerVal is used for gameplay.
     float HandbrakeVal = 0.0f;
 
-    std::array<SInput<std::string>, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXbox = {};
-    std::array<int, static_cast<int>(ControllerControlType::SIZEOF_ControllerControlType)> ControlXboxBlocks = {};
+    std::array<SInput<std::string>, static_cast<int>(ControllerControlType::SIZEOF)> ControlXbox = {};
+    std::array<int, static_cast<int>(ControllerControlType::SIZEOF)> ControlXboxBlocks = {};
 
-    std::array<SInput<eControl>, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> LegacyControls = {};
-    std::array<int, static_cast<int>(LegacyControlType::SIZEOF_LegacyControlType)> ControlNativeBlocks = {};
+    std::array<SInput<eControl>, static_cast<int>(LegacyControlType::SIZEOF)> LegacyControls = {};
+    std::array<int, static_cast<int>(LegacyControlType::SIZEOF)> ControlNativeBlocks = {};
 
     std::array<SInput<int>, static_cast<int>(KeyboardControlType::SIZEOF_KeyboardControlType)> KBControl = {};
 

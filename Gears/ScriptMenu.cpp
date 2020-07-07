@@ -36,6 +36,8 @@
 #include <string>
 #include <mutex>
 
+#include "BlockableControls.h"
+
 using VExt = VehicleExtensions;
 
 extern ReleaseInfo g_releaseInfo;
@@ -62,12 +64,6 @@ struct SFont {
 struct STagInfo {
     std::string Tag;
     std::string Info;
-};
-
-template <typename T>
-struct SControlText {
-    T Control;
-    std::string Text;
 };
 
 void clearAxis(const std::string& confTag);
@@ -112,17 +108,6 @@ namespace {
         "kph",
         "mph",
         "ms"
-    };
-
-    const std::vector<SControlText<int>> blockableControls {
-        { -1,                             "None"},
-        { ControlVehicleAim,              "Aim"},
-        { ControlVehicleHandbrake,        "Handbrake"},
-        { ControlVehicleAttack,           "Attack"},
-        { ControlVehicleDuck,             "Duck"},
-        { ControlVehicleSelectNextWeapon, "NextWeapon"},
-        { ControlVehicleCinCam,           "Cinematic Cam"},
-        { ControlVehicleExit,             "Exit Car"}
     };
 
     const std::vector<std::string> tcsStrings{
@@ -177,14 +162,6 @@ namespace {
     }
 
     std::vector<std::string> diDevicesInfo { "Press Enter to refresh." };
-}
-
-int getBlockableControlIndex(int control) {
-    for (size_t i = 0; i < blockableControls.size(); i++) {
-        if (control == blockableControls[i].Control)
-            return static_cast<int>(i);
-    }
-    return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -633,22 +610,23 @@ void update_controllerbindingsnativemenu() {
     g_menu.Subtitle("Native mode");
 
     std::vector<std::string> blockableControlsHelp;
+    const auto& blockableControls = BlockableControls::GetList();
     blockableControlsHelp.reserve(blockableControls.size());
     for (const auto& control : blockableControls) {
         blockableControlsHelp.emplace_back(control.Text);
     }
 
-    int oldIndexUp = getBlockableControlIndex(g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
+    int oldIndexUp = BlockableControls::GetIndex(g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
     if (g_menu.StringArray("Shift Up blocks", blockableControlsHelp, oldIndexUp)) {
         g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] = blockableControls[oldIndexUp].Control;
     }
 
-    int oldIndexDown = getBlockableControlIndex(g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
+    int oldIndexDown = BlockableControls::GetIndex(g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
     if (g_menu.StringArray("Shift Down blocks", blockableControlsHelp, oldIndexDown)) {
         g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = blockableControls[oldIndexDown].Control;
     }
 
-    int oldIndexClutch = getBlockableControlIndex(g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
+    int oldIndexClutch = BlockableControls::GetIndex(g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
     if (g_menu.StringArray("Clutch blocks", blockableControlsHelp, oldIndexClutch)) {
         g_controls.ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] = blockableControls[oldIndexClutch].Control;
     }
@@ -679,22 +657,23 @@ void update_controllerbindingsxinputmenu() {
     g_menu.Subtitle("XInput mode");
 
     std::vector<std::string> blockableControlsHelp;
+    const auto& blockableControls = BlockableControls::GetList();
     blockableControlsHelp.reserve(blockableControls.size());
     for (const auto& control : blockableControls) {
         blockableControlsHelp.emplace_back(control.Text);
     }
 
-    int oldIndexUp = getBlockableControlIndex(g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)]);
+    int oldIndexUp = BlockableControls::GetIndex(g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)]);
     if (g_menu.StringArray("Shift Up blocks", blockableControlsHelp, oldIndexUp)) {
         g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] = blockableControls[oldIndexUp].Control;
     }
 
-    int oldIndexDown = getBlockableControlIndex(g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)]);
+    int oldIndexDown = BlockableControls::GetIndex(g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)]);
     if (g_menu.StringArray("Shift Down blocks", blockableControlsHelp, oldIndexDown)) {
         g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = blockableControls[oldIndexDown].Control;
     }
 
-    int oldIndexClutch = getBlockableControlIndex(g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)]);
+    int oldIndexClutch = BlockableControls::GetIndex(g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)]);
     if (g_menu.StringArray("Clutch blocks", blockableControlsHelp, oldIndexClutch)) {
         g_controls.ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)] = blockableControls[oldIndexClutch].Control;
     }

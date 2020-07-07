@@ -159,6 +159,7 @@
     <ClCompile Include="..\thirdparty\yaml-cpp\src\tag.cpp" />
     <ClCompile Include="AtcuGearbox.cpp" />
     <ClCompile Include="AtcuLogic.cpp" />
+    <ClCompile Include="BlockableControls.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Compatibility.cpp" />
     <ClCompile Include="CustomSteering.cpp" />
@@ -253,6 +254,7 @@
     <ClInclude Include="..\thirdparty\yaml-cpp\src\token.h" />
     <ClInclude Include="AtcuGearbox.h" />
     <ClInclude Include="AtcuLogic.h" />
+    <ClInclude Include="BlockableControls.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="CustomSteering.h" />

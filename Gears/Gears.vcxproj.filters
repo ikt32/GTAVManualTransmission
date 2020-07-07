@@ -231,6 +231,7 @@
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="DrivingAssists.cpp" />
+    <ClCompile Include="BlockableControls.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -504,6 +505,7 @@
     </ClInclude>
     <ClInclude Include="DrivingAssists.h" />
     <ClInclude Include="ScriptHUD.h" />
+    <ClInclude Include="BlockableControls.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
