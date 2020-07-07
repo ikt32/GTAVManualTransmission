@@ -734,7 +734,7 @@ void update_wheelmenu() {
     g_menu.Title("Wheel & pedals");
     auto wheelGuid = g_controls.WheelAxes[static_cast<int>(CarControls::WheelAxisType::Steer)].Guid;
     auto deviceEntry = g_controls.GetWheel().FindEntryFromGUID(wheelGuid);
-    std::string wheelName = "No wheel";
+    std::string wheelName = "No wheel in use";
     if (deviceEntry) {
         std::wstring wDevName = deviceEntry->diDeviceInstance.tszInstanceName;
         wheelName = StrUtil::utf8_encode(wDevName);
@@ -763,14 +763,14 @@ void update_wheelmenu() {
     g_menu.MenuOption("Analog input setup", "axesmenu",
         { "Configure the analog inputs." });
 
-    g_menu.MenuOption("Button input setup", "buttonsmenu",
-        { "Set up your buttons on your steering wheel." });
-
     g_menu.MenuOption("Force feedback options", "forcefeedbackmenu",
         { "Fine-tune your force feedback parameters." });
 
     g_menu.MenuOption("Soft lock options", "anglemenu",
         { "Set up soft lock options here." });
+
+    g_menu.MenuOption("Button input setup", "buttonsmenu",
+        { "Set up your buttons on your steering wheel." });
 
     std::vector<std::string> hpatInfo = {
         "Press RIGHT to clear H-pattern shifter",
@@ -789,6 +789,9 @@ void update_wheelmenu() {
         UI::Notify(WARN, result ? "H-pattern shifter saved" : "Cancelled H-pattern shifter setup");
     }
 
+    g_menu.BoolOption("Use shifter for automatic", g_settings.Wheel.Options.UseShifterForAuto,
+        { "Use the H-pattern shifter to select the Drive/Reverse gears." });
+
     std::vector<std::string> hAutoInfo = {
         "Press RIGHT to clear H-pattern auto",
         "Active gear:"
@@ -806,9 +809,6 @@ void update_wheelmenu() {
 
     g_menu.BoolOption("Keyboard H-pattern", g_settings.Wheel.Options.HPatternKeyboard,
         { "This allows you to use the keyboard for H-pattern shifting. Configure the controls in the keyboard section." });
-
-    g_menu.BoolOption("Use shifter for automatic", g_settings.Wheel.Options.UseShifterForAuto,
-        { "Use the H-pattern shifter to select the Drive/Reverse gears." });
 }
 
 void update_anglemenu() {
