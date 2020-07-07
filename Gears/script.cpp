@@ -1872,7 +1872,7 @@ void functionAutoReverse() {
 // TODO: Some original "tap" controls don't work.
 
 template <typename CtrlType>
-void doodoo(const std::array<int, static_cast<int>(CtrlType::SIZEOF)>& blockList) {
+void blockButtons(const std::array<int, static_cast<int>(CtrlType::SIZEOF)>& blockList) {
     for (int i = 0; i < static_cast<int>(CtrlType::SIZEOF); i++) {
         if (blockList[i] == -1) continue;
         if (i != static_cast<int>(CtrlType::ShiftUp) &&
@@ -1903,10 +1903,10 @@ void blockButtons() {
     }
 
     if (g_settings.Controller.Native.Enable) {
-        doodoo<CarControls::LegacyControlType>(g_controls.ControlNativeBlocks);
+        blockButtons<CarControls::LegacyControlType>(g_controls.ControlNativeBlocks);
     }
     else {
-        doodoo<CarControls::ControllerControlType>(g_controls.ControlXboxBlocks);
+        blockButtons<CarControls::ControllerControlType>(g_controls.ControlXboxBlocks);
     }
 }
 
