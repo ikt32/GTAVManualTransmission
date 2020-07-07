@@ -579,11 +579,14 @@ void drawDebugInfo() {
 
 void drawInputWheelInfo() {
     // Steering Wheel
-    float rotation;
+    float rotation = 0.0f;
     if (g_controls.PrevInput == CarControls::Wheel) 
         rotation = g_settings().Wheel.Steering.AngleMax * (g_controls.SteerVal - 0.5f);
-    else if (g_settings().CustomSteering.CustomRotation)
+    else if (g_settings().CustomSteering.Mode > 0 &&
+        g_settings().CustomSteering.CustomRotation)
         rotation = g_settings().CustomSteering.CustomRotationDegrees * 0.5f * -VExt::GetSteeringInputAngle(g_playerVehicle);
+    else
+        rotation = 90.0f * -VExt::GetSteeringInputAngle(g_playerVehicle);
 
     drawTexture(g_textureWheelId, 0, -9998, 100,
         g_settings().HUD.Wheel.ImgSize, g_settings().HUD.Wheel.ImgSize,
