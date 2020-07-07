@@ -209,12 +209,13 @@ void CustomSteering::Update() {
             steerValGamma,
             1.0f - pow(g_settings.CustomSteering.SteerTime, secondsSinceLastTick));
     }
-    lastTickTime = milliseconds_now();
-    steerPrev = steerCurr;
 
-    // No smoothing for mouse input
+    // Mouse input inherits lerp-to-center
     if (g_settings.CustomSteering.MouseSteering)
         updateMouseSteer(steerCurr);
+
+    lastTickTime = milliseconds_now();
+    steerPrev = steerCurr;
 
     // Ignore reduction for wet vehicles.
     int modelType = VExt::GetModelType(g_playerVehicle);
@@ -259,7 +260,6 @@ void CustomSteering::updateMouseSteer(float& steer) {
     // on press
     if (!mouseDown && mouseControl) {
         mouseDown = true;
-        mouseXTravel = 0.0f;
         PLAYER::SET_PLAYER_CAN_DO_DRIVE_BY(PLAYER::GET_PLAYER_INDEX(), false);
     }
 
@@ -267,7 +267,6 @@ void CustomSteering::updateMouseSteer(float& steer) {
     if (mouseDown && !mouseControl) {
         mouseDown = false;
         PLAYER::SET_PLAYER_CAN_DO_DRIVE_BY(PLAYER::GET_PLAYER_INDEX(), true);
-        mouseXTravel = 0.0f;
     }
 
     if (mouseDown && mouseControl) {
@@ -279,5 +278,9 @@ void CustomSteering::updateMouseSteer(float& steer) {
         mouseXTravel = std::clamp(mouseXTravel, -1.0f, 1.0f);
 
         steer = -mouseXTravel;
+    }
+    else {
+        // Inherit value when not controlling
+        mouseXTravel = -steer;
     }
 }
