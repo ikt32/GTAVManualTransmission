@@ -1886,7 +1886,6 @@ void blockButtons(const std::array<int, static_cast<int>(CtrlType::SIZEOF)>& blo
         else {
             PAD::DISABLE_CONTROL_ACTION(0, blockList[i], true);
         }
-        }
     }
     if (blockList[static_cast<int>(CtrlType::Clutch)] != -1) {
         PAD::DISABLE_CONTROL_ACTION(0, blockList[static_cast<int>(CtrlType::Clutch)], true);
