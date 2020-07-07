@@ -461,7 +461,9 @@ void MTHUD::UpdateHUD() {
             drawDashLights();
         }
 
-        if (g_settings().HUD.MouseSteering.Enable) {
+        if (g_settings().HUD.MouseSteering.Enable &&
+            g_settings().CustomSteering.MouseSteering &&
+            g_settings().CustomSteering.Mode > 0) {
             drawMouseSteering();
         }
     }
