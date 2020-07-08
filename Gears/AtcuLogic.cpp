@@ -24,7 +24,8 @@ namespace AtcuLogic {
 
 void AtcuLogic::Cycle() {
     // Using new TCU
-    float economyCorrection = (g_controls.ThrottleVal * 0.7f) + 0.3f;
+    float eco = g_settings().AutoParams.EcoRate * 1.4f;
+    float economyCorrection = (g_controls.ThrottleVal * eco) + (1.0f - eco);
 
     int currGear = g_vehData.mGearCurr;
     float currRpm = g_vehData.mRPM;
