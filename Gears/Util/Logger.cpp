@@ -15,6 +15,7 @@ void Logger::SetMinLevel(LogLevel level) {
 }
 
 void Logger::Clear() const {
+    std::lock_guard lock(mutex);
     std::ofstream logFile(file, std::ofstream::out | std::ofstream::trunc);
 }
 
@@ -22,6 +23,7 @@ void Logger::Write(LogLevel level, const std::string& text) const {
 #ifndef _DEBUG
     if (level < minLevel) return;
 #endif
+    std::lock_guard lock(mutex);
     std::ofstream logFile(file, std::ios_base::out | std::ios_base::app);
     SYSTEMTIME currTimeLog;
     GetLocalTime(&currTimeLog);

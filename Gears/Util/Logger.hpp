@@ -1,4 +1,5 @@
 #pragma once
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -31,6 +32,7 @@ private:
         " ERROR ",
         " FATAL ",
     };
+    mutable std::mutex mutex;
 };
 
 extern Logger logger;
