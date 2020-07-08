@@ -303,20 +303,6 @@ void update_mainmenu() {
         }
         g_menu.StringArray("Active input", { activeInputName }, activeIndex, { "Active input is automatically detected and can't be changed." });
     }
-
-    for (const auto& device : g_controls.FreeDevices) {
-        if (g_menu.Option(device.name, NativeMenu::solidRed,
-            { "~r~<b>This device needs to be configured!</b>~w~",
-              "Please assign axes and buttons in ~r~<b>Steering Wheel</b>~w~->"
-              "~r~<b>Analog Input Setup</b>~w~, ~r~<b>Button Input Setup</b>~w~ before using this device.",
-              "Pressing Select discards this warning.",
-              fmt::format("Full name: {}", device.name) })) {
-            saveChanges();
-            g_settings.SteeringAppendDevice(device.guid, device.name);
-            g_settings.Read(&g_controls);
-            g_controls.CheckGUIDs(g_settings.Wheel.InputDevices.RegisteredGUIDs);
-        }
-    }
 }
 
 void update_settingsmenu() {
@@ -740,6 +726,20 @@ void update_wheelmenu() {
         wheelName = StrUtil::utf8_encode(wDevName);
     }
     g_menu.Subtitle(wheelName);
+
+    if (!g_controls.FreeDevices.empty())
+    {
+        for (const auto& device : g_controls.FreeDevices) {
+            if (g_menu.Option(device.name, NativeMenu::solidRed,
+                { "~r~<b>This device can be used as input device!</b>~w~",
+                  "Set it up with the options below, or press Select to discard this message." })) {
+                saveChanges();
+                g_settings.SteeringAppendDevice(device.guid, device.name);
+                g_settings.Read(&g_controls);
+                g_controls.CheckGUIDs(g_settings.Wheel.InputDevices.RegisteredGUIDs);
+            }
+        }
+    }
 
     if (g_menu.BoolOption("Enable wheel", g_settings.Wheel.Options.Enable,
         { "Enable usage of a steering wheel and pedals." })) {
