@@ -62,7 +62,7 @@ void resolveVersion() {
         return;
     }
 
-    logger.Write(DEBUG, "Using offsets based on SHV API version [%s] (%d)",
+    logger.Write(INFO, "Using offsets based on SHV API version [%s] (%d)",
         eGameVersionToString(shvVersion).c_str(), shvVersion);
     MemoryPatcher::SetPatterns(shvVersion);
 }
