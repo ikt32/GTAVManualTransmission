@@ -2089,6 +2089,8 @@ void loadConfigs() {
 
     if (!(fs::exists(fs::path(vehConfigsPath)) && fs::is_directory(fs::path(vehConfigsPath)))) {
         logger.Write(WARN, "Directory [%s] not found!", vehConfigsPath.c_str());
+        g_settings.MTOptions.Override = false;
+        setVehicleConfig(g_playerVehicle);
         return;
     }
 

@@ -8,6 +8,7 @@
 #include "Input/CarControls.hpp"
 #include "Util/MathExt.h"
 #include "Util/Strings.hpp"
+#include "VehicleConfig.h"
 
 #include "inc/natives.h"
 #include "inc/types.h"
@@ -75,8 +76,8 @@ float MT_GetAutoEcoRate() {
 }
 
 void MT_SetAutoEcoRate(float rate) {
-    g_settings.AutoParams.EcoRate = rate;
-    g_settings.SaveGeneral();
+    extern VehicleConfig* g_activeConfig;
+    APPLY_CONFIG_VALUE(AutoParams.EcoRate, rate);
 }
 
 void MT_AddIgnoreVehicle(int vehicle) {
