@@ -462,7 +462,7 @@ void MTHUD::UpdateHUD() {
         }
 
         if (g_settings().HUD.MouseSteering.Enable &&
-            g_settings().CustomSteering.MouseSteering &&
+            g_settings().CustomSteering.Mouse.Enable &&
             g_settings().CustomSteering.Mode > 0) {
             drawMouseSteering();
         }

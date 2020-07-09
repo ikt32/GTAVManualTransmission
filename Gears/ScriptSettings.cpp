@@ -340,8 +340,10 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetBoolValue("CUSTOM_STEERING", "CustomRotation", CustomSteering.CustomRotation);
     ini.SetDoubleValue("CUSTOM_STEERING", "CustomRotationDegrees", CustomSteering.CustomRotationDegrees);
 
-    ini.SetBoolValue("CUSTOM_STEERING", "MouseSteering", CustomSteering.MouseSteering);
-    ini.SetDoubleValue("CUSTOM_STEERING", "MouseSensitivity", CustomSteering.MouseSensitivity);
+    ini.SetBoolValue("CUSTOM_STEERING", "MouseSteering", CustomSteering.Mouse.Enable);
+    ini.SetDoubleValue("CUSTOM_STEERING", "MouseSensitivity", CustomSteering.Mouse.Sensitivity);
+    ini.SetBoolValue("CUSTOM_STEERING", "MouseDisableSteerAssist", CustomSteering.Mouse.DisableSteerAssist);
+    ini.SetBoolValue("CUSTOM_STEERING", "MouseDisableReduction", CustomSteering.Mouse.DisableReduction);
 
     // [SHIFT_OPTIONS]
     ini.SetBoolValue("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
@@ -718,8 +720,10 @@ void ScriptSettings::parseSettingsGeneral() {
     CustomSteering.CustomRotation = ini.GetBoolValue("CUSTOM_STEERING", "CustomRotation", CustomSteering.CustomRotation);
     CustomSteering.CustomRotationDegrees = ini.GetDoubleValue("CUSTOM_STEERING", "CustomRotationDegrees", CustomSteering.CustomRotationDegrees);
 
-    CustomSteering.MouseSteering = ini.GetBoolValue("CUSTOM_STEERING", "MouseSteering", CustomSteering.MouseSteering);
-    CustomSteering.MouseSensitivity = ini.GetDoubleValue("CUSTOM_STEERING", "MouseSensitivity", CustomSteering.MouseSensitivity);
+    CustomSteering.Mouse.Enable = ini.GetBoolValue("CUSTOM_STEERING", "MouseSteering", CustomSteering.Mouse.Enable);
+    CustomSteering.Mouse.Sensitivity = ini.GetDoubleValue("CUSTOM_STEERING", "MouseSensitivity", CustomSteering.Mouse.Sensitivity);
+    CustomSteering.Mouse.DisableSteerAssist = ini.GetBoolValue("CUSTOM_STEERING", "MouseDisableSteerAssist", CustomSteering.Mouse.DisableSteerAssist);
+    CustomSteering.Mouse.DisableReduction = ini.GetBoolValue("CUSTOM_STEERING", "MouseDisableReduction", CustomSteering.Mouse.DisableReduction);
 
     // [HUD]
     HUD.Enable = ini.GetBoolValue("HUD", "EnableHUD", HUD.Enable);

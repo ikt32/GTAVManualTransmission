@@ -34,7 +34,7 @@ namespace CustomSteering {
     float calculateDesiredHeading(float steeringMax, float desiredHeading, float reduction);
 
     // Doesn't change steer when not mouse steering
-    void updateMouseSteer(float& steer);
+    bool updateMouseSteer(float& steer);
 }
 
 float CustomSteering::GetMouseX() {
@@ -210,9 +210,10 @@ void CustomSteering::Update() {
             1.0f - pow(g_settings.CustomSteering.SteerTime, secondsSinceLastTick));
     }
 
+    bool mouseInputThisTick = false;
     // Mouse input inherits lerp-to-center
-    if (g_settings.CustomSteering.MouseSteering)
-        updateMouseSteer(steerCurr);
+    if (g_settings().CustomSteering.Mouse.Enable)
+        mouseInputThisTick = updateMouseSteer(steerCurr);
 
     lastTickTime = milliseconds_now();
     steerPrev = steerCurr;
@@ -225,7 +226,17 @@ void CustomSteering::Update() {
     if (isFrog && submergeLevel > 0.0f || isBoat)
         reduction = 1.0f;
 
-    float desiredHeading = calculateDesiredHeading(limitRadians, steerCurr, reduction);
+    float desiredHeading;
+    if (mouseInputThisTick && g_settings().CustomSteering.Mouse.DisableReduction) {
+        reduction = 1.0f;
+    }
+
+    if (mouseInputThisTick && g_settings().CustomSteering.Mouse.DisableSteerAssist) {
+        desiredHeading = steerCurr * limitRadians * reduction;
+    }
+    else {
+        desiredHeading = calculateDesiredHeading(limitRadians, steerCurr, reduction);
+    }
 
     disableControls();
 
@@ -252,7 +263,7 @@ void CustomSteering::Update() {
     }
 }
 
-void CustomSteering::updateMouseSteer(float& steer) {
+bool CustomSteering::updateMouseSteer(float& steer) {
     bool mouseControl =
         PAD::GET_CONTROL_NORMAL(0, eControl::ControlVehicleMouseControlOverride) != 0.0f &&
         !PLAYER::IS_PLAYER_FREE_AIMING(PLAYER::GET_PLAYER_INDEX());
@@ -274,13 +285,15 @@ void CustomSteering::updateMouseSteer(float& steer) {
         PAD::DISABLE_CONTROL_ACTION(0, eControl::ControlLookUpDown, true);
 
         float mouseVal = PAD::GET_DISABLED_CONTROL_NORMAL(0, eControl::ControlLookLeftRight);
-        mouseXTravel += mouseVal * g_settings.CustomSteering.MouseSensitivity;
+        mouseXTravel += mouseVal * g_settings().CustomSteering.Mouse.Sensitivity;
         mouseXTravel = std::clamp(mouseXTravel, -1.0f, 1.0f);
 
         steer = -mouseXTravel;
+        return true;
     }
     else {
         // Inherit value when not controlling
         mouseXTravel = -steer;
+        return false;
     }
 }

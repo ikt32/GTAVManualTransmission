@@ -1472,9 +1472,6 @@ void update_steeringassistmenu() {
     g_menu.FloatOption("Wheel rotation", g_settings.CustomSteering.CustomRotationDegrees, 180.0f, 1440.0f, 30.0f, 
         { "Rotation in degrees." });
 
-    g_menu.BoolOption("Enable mouse steering", g_settings.CustomSteering.MouseSteering,
-        { "When enabled, hold the mouse steering override button to use mouse steering." });
-
     g_menu.MenuOption("Mouse steering options", "mousesteeringoptionsmenu");
 }
 
@@ -1482,8 +1479,17 @@ void update_mousesteeringoptionsmenu() {
     g_menu.Title("Mouse steering");
     g_menu.Subtitle("");
 
-    g_menu.FloatOption("Mouse sensitivity", g_settings.CustomSteering.MouseSensitivity, 0.05f, 2.0f, 0.05f,
+    g_menu.BoolOption("Enable mouse steering", g_settings.CustomSteering.Mouse.Enable,
+        { "When enabled, hold the mouse steering override button to use mouse steering." });
+
+    g_menu.FloatOption("Mouse sensitivity", g_settings.CustomSteering.Mouse.Sensitivity, 0.05f, 2.0f, 0.05f,
         { "Sensitivity for mouse steering." });
+
+    g_menu.BoolOption("Disable countersteer", g_settings.CustomSteering.Mouse.DisableSteerAssist,
+        { "Disables countersteer assist." });
+
+    g_menu.BoolOption("Disable reduction", g_settings.CustomSteering.Mouse.DisableReduction,
+        { "Disables countersteer assist." });
 }
 
 void update_miscoptionsmenu() {

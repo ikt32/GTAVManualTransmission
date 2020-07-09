@@ -172,8 +172,12 @@ public:
         float CustomRotationDegrees = 720.0f;
         float CenterTime = 0.000100f;
         float SteerTime = 0.001000f;
-        bool MouseSteering = true;
-        float MouseSensitivity = 0.5f;
+        struct {
+            bool Enable = true;
+            float Sensitivity = 0.5f;
+            bool DisableSteerAssist = false;
+            bool DisableReduction = false;
+        } Mouse;
     } CustomSteering;
 
     // [HUD]

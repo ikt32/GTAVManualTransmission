@@ -25,6 +25,7 @@ A few new goodies, and fixes to minor things.
 * Improve camera looking back visibility (raise camera)
 * Disable movement camera rotation for hovering vehicles
 * Smooth mouse steer return-to-center on release
+* Allow disabling assists in mouse steering mode
 * Internal code improvements and other fixes
 
 ## 4.8.1
