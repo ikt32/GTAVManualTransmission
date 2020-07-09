@@ -242,7 +242,7 @@ be added.
 5. Check the dictionary in `clip_anim.rpf`
 6. Open the `.ycd` in notepad and hope you find a `steer_no_lean` or `pov_steer`
 7. Copy an `- Animation:` entry in `animations.yml` - **mind the indentation!**
-8. Substutite the dictionary and animation name for your vehicle, replace
+8. Substitute the dictionary and animation name for your vehicle, replace
 layouts with your new layout and throw in an educated guess what the rotation
 degree is.
 
