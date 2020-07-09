@@ -59,6 +59,19 @@ MT_API void         MT_SetShiftMode(int mode);
  */
 MT_API int          MT_GetShiftIndicator();
 
+/**
+ * \brief           Get the eco rate for the auto gearbox.
+ * \return          The eco rate value, likely between 0.01 and 0.50
+ */
+MT_API float        MT_GetAutoEcoRate();
+
+/**
+ * \brief           Set the eco rate for the auto gearbox.
+ *                  Warning: Settings will save after this call!
+ * \param [in] rate The desired rate. Recommended between 0.01 and 0.50
+ */
+MT_API void         MT_SetAutoEcoRate(float rate);
+
 /*
  * AI shifting override
  */

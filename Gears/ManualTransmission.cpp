@@ -70,6 +70,15 @@ int MT_GetShiftIndicator() {
     return 0;
 }
 
+float MT_GetAutoEcoRate() {
+    return g_settings().AutoParams.EcoRate;
+}
+
+void MT_SetAutoEcoRate(float rate) {
+    g_settings.AutoParams.EcoRate = rate;
+    g_settings.SaveGeneral();
+}
+
 void MT_AddIgnoreVehicle(int vehicle) {
     if (std::find(g_ignoredVehicles.begin(), g_ignoredVehicles.end(), vehicle) == g_ignoredVehicles.end()) {
         g_ignoredVehicles.push_back(vehicle);
