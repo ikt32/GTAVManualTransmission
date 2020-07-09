@@ -2,9 +2,9 @@
 
 # Manual Transmission and Steering Wheel Support for GTA V
 
-Version 4.8.1
+Version 4.8.2
 
-![Gameplay](Gameplay.jpg)
+![5mods Thumbnail](MTThumb.jpg)
 
 ## Description
 
@@ -58,6 +58,8 @@ your wheel and driving style.
     * [Controller defaults](#controller-defaults)
     * [Wheel defaults](#wheel-defaults)
     * [Input switching](#input-switching)
+  * [Vehicle Configurations](#vehicle-configurations)
+  * [Animations](#animations)
   * [Driving with Manual Transmission](#driving-with-manual-transmission)
   * [Troubleshooting](#troubleshooting)
     * [Compatibility](#compatibility)
@@ -90,7 +92,7 @@ customizing things.
 
 * **DashHook**: Install as instructed by the mod page.
 * **Dismemberment**: Place `DismembermentASI.asi` in your GTA V folder. It
-is used by the custom first person vehicle camera.
+is used by the custom first person vehicle camera to hide the player head.
 
 ### Additional steps for wheel users
 
@@ -114,9 +116,11 @@ integrating this script with FiveM.
 
 ## Updating
 
-Replace `Gears.asi` and the folder `ManualTransmission` in your GTA V folder.
-If the changelog indicated settings changed, you might want to
-check the options. Otherwise it should be fine to keep your old settings.
+Replace `Gears.asi` and copy the `ManualTransmission` folder. You do **not**
+need to overwrite changes in the `ManualTransmission` fodler.
+
+It's okay to keep your old settings. If the changelog indicated settings
+changed, it's a good idea to check the new or changed options.
 
 ## Recommended mods
 
@@ -125,7 +129,7 @@ check the options. Otherwise it should be fine to keep your old settings.
 [Autosport Racing System by Eddlm](https://www.gta5-mods.com/scripts/autosport-racing-system): Complete custom racing system with advanced AI.
 * [Turbo Fix](https://www.gta5-mods.com/scripts/turbo-fix): Fixes spool rates of the turbo upgrade.
 * [Dial Accuracy Fix](https://www.gta5-mods.com/scripts/dial-accuracy-fix): Remap dashboard dials to match your actual speed.
-* [ACSPatch]: Keep wheels turned when exiting cars
+* [ACSPatch](https://www.gta5-mods.com/scripts/auto-center-steering-patch-temp-fix): Keep wheels turned when exiting cars
 
 Any speedometer supporting RPM/Gear reading from memory:
 
@@ -151,11 +155,11 @@ Opening the menu:
 
 These shortcuts can be changed in `settings_menu.ini`.
 
-![Menu main](Menu-Main.png) ![Menu setup](Menu-Options.png)
+![Menu main](MTMenu_4.8.2.jpg)
 
 ### Keyboard defaults (US-ANSI)
 
-By default, `W` and `S` are assigned to throttle and brake respectively.
+By default, `W` is throttle and `S` is brake.
 
 * Press `\|` to disable or enable manual transmission
 * Press `]}` to switch between sequential, H-pattern or automatic
@@ -167,18 +171,11 @@ Sequential and Automatic:
 * Press `LSHIFT` to shift up
 * Press `LCTRL` to shift down
 
-H-shifter mode:
-
-* Press `Numpad 0` for Reverse
-* Press `Numpad 1-7` for H-shifter gears 1-7
-* Press `Numpad 9` for Neutral
-
 ### Controller defaults
 
-By default, `RightTrigger` and `LeftTrigger` are assigned to throttle and brake respectively.
+By default, `RightTrigger` is throttle and `LeftTrigger` is brake.
 
-* Hold `Dpad Right` to disable or enable manual transmission (disabled at the moment)
-* Hold `B` to switch between sequential, H-pattern or automatic
+* Hold `B` to switch between sequential or automatic
 * Press `A` to shift up
 * Press `X` to shift down
 * Use `LeftThumbUp` to control the clutch
@@ -204,6 +201,56 @@ pedal or clutch pedal (once) if the mod keeps swapping away from the
 
 If for some reason you want to lock the controls, head over to `Debug` and check
 `Disable input detection`. This allows switching inputs manually in the main menu.
+
+## Vehicle Configurations
+
+The mod supports using a different mod configuration depending on the vehicle
+you are in. For instructions for this feature, check
+`ManualTransmission/Vehicles/Information.txt`.
+
+## Animations
+
+The script now overrides the animations and matches the steering wheel
+rotation. The system needs a bit of help to understand what to do, though.
+
+Let me know if anything is missing, so I can update `animations.yml` to support
+as many vehicle types as possible out-of-the-box.
+
+`animations.yml` is a text file containing the animation definitions: What
+animations to use for which vehicle layouts, and how many degrees of rotation
+chosen the animation supports. *Most* game vehicles are present already, but
+most add-ons need to be added.
+
+If a vehicle doesn't have matching animations, do this:
+
+1. Open the `vehicles.meta` containing your car.
+2. Find the `<layout>` for your car entry.
+3. Copy the contents of that (for example, `LAYOUT_STD_AE86`).
+4. Paste it in `animations.yml` in a suitable animation.
+
+You can usually guess what's suitable from the other entries already present.
+The debug menu has an animation section where you can force animations, you
+can also use that to find a suitable animation.
+
+If a vehicle defines an animation clipset *not* in `animations.yml`, it can
+be added.
+
+1. Check the layout name in `vehicles.meta`.
+2. Check the corresponding clipset dictionaries in `vehiclelayouts.meta`
+3. Check the corresponding clipset dictionaries in `clip_sets.xml`
+4. Make an educated guess what the dictionary is for your vehicle
+5. Check the dictionary in `clip_anim.rpf`
+6. Open the `.ycd` in notepad and hope you find a `steer_no_lean` or `pov_steer`
+7. Copy an `- Animation:` entry in `animations.yml` - **mind the indentation!**
+8. Substutite the dictionary and animation name for your vehicle, replace
+layouts with your new layout and throw in an educated guess what the rotation
+degree is.
+
+Useful resource:
+[AlexGuirre's animation list](https://alexguirre.github.io/animations-list/).
+
+If the current steering angle is more than what the animation supports, it will
+just stay at the maximum.
 
 ## Driving with Manual Transmission
 
