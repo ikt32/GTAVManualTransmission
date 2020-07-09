@@ -183,11 +183,7 @@ By default, `RightTrigger` is throttle and `LeftTrigger` is brake.
 
 ### Wheel defaults
 
-There are no defaults. You need to use the menu to assign your controls.
-
-![Wheel setup](Menu-Wheel0.png)
-
-![Wheel setup](Menu-Wheel1.png)
+There are no defaults. Use the menu to assign your controls.
 
 ### Input switching
 
