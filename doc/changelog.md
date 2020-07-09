@@ -8,8 +8,6 @@ A few new goodies, and fixes to minor things.
 * Add "Leave engine running" option
 * Add engine on/off animations
 * Add camera forward/backward movement options
-* Add wheel rotation from Custom Steering to vehicle configs
-* Add camera settings to vehicle configs
 * Fix wheel angles when engine is off
 * Fix haptic stalling effect playing on wrong device
 * Fix phone animation in cars not playing
@@ -19,6 +17,8 @@ A few new goodies, and fixes to minor things.
 * Fix stall progress not reset when shifting to neutral
 * Fix ESP not using vehicle config settings
 * Fix HUD not using vehicle config settings
+* Include wheel rotation from Custom Steering in vehicle configs
+* Include camera settings in vehicle configs
 * Use help texts instead of subtitles for configuration hints
 * Improve error handling on missing `animations.yml` file
 * Improve movement camera rotation smoothness
