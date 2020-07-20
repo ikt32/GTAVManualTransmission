@@ -761,6 +761,8 @@ void setShiftMode(EShiftMode shiftMode) {
 }
 
 bool isClutchPressed() {
+    if (g_settings().MTOptions.ShiftMode == EShiftMode::Automatic)
+        return false;
     return g_controls.ClutchVal > 1.0f - g_settings().MTParams.ClutchThreshold;
 }
 
@@ -791,13 +793,11 @@ void functionHShiftTo(int i) {
     float expectedRPM = g_vehData.mWheelAverageDrivenTyreSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[i]);
     bool rpmInRange = Math::Near(g_vehData.mRPM, expectedRPM, g_settings().ShiftOptions.RPMTolerance);
 
-    bool clutchPass = g_controls.ClutchVal > 1.0f - g_settings().MTParams.ClutchThreshold;
-
     if (!checkShift)
         shiftPass = true;
     else if (rpmInRange)
         shiftPass = true;
-    else if (clutchPass)
+    else if (isClutchPressed())
         shiftPass = true;
     else
         shiftPass = false;
@@ -1238,6 +1238,13 @@ void functionClutchCatch() {
     clutchRatio = std::clamp(clutchRatio, 0.0f, 1.0f);
 
     bool clutchEngaged = !isClutchPressed() && !g_gearStates.FakeNeutral;
+
+    // Always do the thing for automatic cars
+    if (g_settings().MTOptions.ShiftMode == EShiftMode::Automatic) {
+        clutchRatio = 1.0f;
+        clutchEngaged = !g_gearStates.FakeNeutral;
+    }
+
     float minSpeed = idleRPM * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
     float expectedSpeed = g_vehData.mRPM * (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]) * clutchRatio;
     float actualSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
@@ -1438,6 +1445,11 @@ void functionEngBrake() {
 
     float throttleMultiplier = 1.0f - g_controls.ThrottleVal;
     float clutchMultiplier = 1.0f - g_controls.ClutchVal;
+
+    // Always treat clutch pedal as unpressed for auto
+    if (g_settings().MTOptions.ShiftMode == EShiftMode::Automatic)
+        clutchMultiplier = 1.0f;
+
     float inputMultiplier = throttleMultiplier * clutchMultiplier;
 
     if (g_wheelPatchStates.EngLockActive || 
@@ -1610,7 +1622,14 @@ void fakeRev(bool customThrottle, float customThrottleVal) {
 }
 
 void handleRPM() {
+    float clutchInput = g_controls.ClutchVal;
     float clutch = g_controls.ClutchVal;
+
+    // Always treat clutch pedal as unpressed for auto
+    if (g_settings().MTOptions.ShiftMode == EShiftMode::Automatic) {
+        clutch = 0.0f;
+        clutchInput = 0.0f;
+    }
 
     // Shifting is only true in Automatic and Sequential mode
     if (g_gearStates.Shifting) {
@@ -1618,7 +1637,7 @@ void handleRPM() {
             clutch = g_gearStates.ClutchVal;
 
         // Only lift and blip when no clutch used
-        if (g_controls.ClutchVal == 0.0f) {
+        if (clutchInput == 0.0f) {
             if (g_gearStates.ShiftDirection == ShiftDirection::Up &&
                 g_settings().ShiftOptions.UpshiftCut) {
                 PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
@@ -1686,7 +1705,7 @@ void handleRPM() {
             g_controls.ThrottleVal > 0.05f &&
             !g_gearStates.FakeNeutral && 
             !rollingback &&
-            (!g_gearStates.Shifting || g_controls.ClutchVal > 0.4f)) {
+            (!g_gearStates.Shifting || clutchInput > 0.4f)) {
             fakeRev(false, 0);
             VExt::SetThrottle(g_playerVehicle, g_controls.ThrottleVal);
         }
@@ -1969,7 +1988,14 @@ void functionHillGravity() {
         VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(g_playerVehicle)) {
         float pitch = ENTITY::GET_ENTITY_PITCH(g_playerVehicle);;
 
-        float clutchNeutral = g_gearStates.FakeNeutral ? 1.0f : g_controls.ClutchVal;
+        float clutchNeutral;
+        if (g_gearStates.FakeNeutral)
+            clutchNeutral = 1.0f;
+        else if (g_settings().MTOptions.ShiftMode == EShiftMode::Automatic)
+            clutchNeutral = 0.0f;
+        else
+            clutchNeutral = g_controls.ClutchVal;
+
         if (pitch < 0 || clutchNeutral) {
             ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(
                 g_playerVehicle, 1, 0.0f, -1 * (pitch / 150.0f) * 1.1f * clutchNeutral, 0.0f, true, true, true, true);
