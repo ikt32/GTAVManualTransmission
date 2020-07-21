@@ -23,20 +23,13 @@ XINPUT_STATE XInputController::getState() {
     ZeroMemory(&controllerState, sizeof(XINPUT_STATE));
 
     // Get the state
-    XInputGetState(controllerNum, &controllerState);
+    lastResult = XInputGetState(controllerNum, &controllerState);
 
     return controllerState;
 }
 
 bool XInputController::isConnected() {
-    // Zeroise the state
-    XINPUT_STATE discard_this;
-    ZeroMemory(&discard_this, sizeof(XINPUT_STATE));
-
-    // Get the state
-    DWORD Result = XInputGetState(controllerNum, &discard_this);
-
-    return Result == ERROR_SUCCESS;
+    return lastResult == ERROR_SUCCESS;
 }
 
 void XInputController::Vibrate(int leftVal, int rightVal) {
@@ -161,9 +154,12 @@ float XInputController::GetAnalogValue(XboxButtons buttonType) {
 }
 
 void XInputController::Update() {
+    auto state = getState();
+
     if (!isConnected()) return;
 
-    buttonState = getState().Gamepad.wButtons;
+    buttonState = state.Gamepad.wButtons;
+
     for (int i = 0; i < SIZEOF_XboxButtons; i++) {
         xboxButtonPrev[i] = xboxButtonCurr[i];
     }

@@ -124,6 +124,7 @@ private:
     XINPUT_STATE controllerState;
     WORD buttonState;
     int controllerNum;
+    DWORD lastResult;
 
     XINPUT_STATE getState();
     bool isConnected();
