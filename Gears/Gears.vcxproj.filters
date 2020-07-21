@@ -23,9 +23,6 @@
     <ClCompile Include="Util\Logger.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Util\TimeHelper.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
     <ClCompile Include="..\thirdparty\GTAVMenuBase\menu.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
@@ -265,9 +262,6 @@
       <Filter>Memory</Filter>
     </ClInclude>
     <ClInclude Include="Util\Logger.hpp">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="Util\TimeHelper.hpp">
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menu.h">

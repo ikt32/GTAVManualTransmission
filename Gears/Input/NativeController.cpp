@@ -1,6 +1,5 @@
 #include "NativeController.h"
 #include <inc/natives.h>
-#include "../Util/TimeHelper.hpp"
 #include "../ScriptSettings.hpp"
 
 extern ScriptSettings g_settings;
@@ -34,10 +33,10 @@ bool NativeController::IsButtonJustReleased(eControl gameButton) {
 
 bool NativeController::WasButtonHeldForMs(eControl gameButton, int milliseconds) {
     if (PAD::IS_CONTROL_JUST_PRESSED(0, gameButton)) {
-        pressTime[gameButton] = milliseconds_now();
+        pressTime[gameButton] = GetTickCount64();
     }
     if (PAD::IS_CONTROL_JUST_RELEASED(0, gameButton)) {
-        releaseTime[gameButton] = milliseconds_now();
+        releaseTime[gameButton] = GetTickCount64();
     }
 
     if ((releaseTime[gameButton] - pressTime[gameButton]) >= milliseconds) {
@@ -50,19 +49,19 @@ bool NativeController::WasButtonHeldForMs(eControl gameButton, int milliseconds)
 
 bool NativeController::WasButtonHeldOverMs(eControl gameButton, int milliseconds) {
     if (PAD::IS_CONTROL_JUST_PRESSED(0, gameButton)) {
-        pressTime[gameButton] = milliseconds_now();
+        pressTime[gameButton] = GetTickCount64();
     }
 
-    return PAD::IS_CONTROL_PRESSED(0, gameButton) && pressTime[gameButton] != 0 && (milliseconds_now() -
+    return PAD::IS_CONTROL_PRESSED(0, gameButton) && pressTime[gameButton] != 0 && (GetTickCount64() -
         pressTime[gameButton]) >= milliseconds;
 }
 
 NativeController::TapState NativeController::WasButtonTapped(eControl gameButton, int milliseconds) {
     if (IsButtonJustPressed(gameButton)) {
-        tapPressTime[gameButton] = milliseconds_now();
+        tapPressTime[gameButton] = GetTickCount64();
     }
     if (IsButtonJustReleased(gameButton)) {
-        tapReleaseTime[gameButton] = milliseconds_now();
+        tapReleaseTime[gameButton] = GetTickCount64();
     }
 
     if ((tapReleaseTime[gameButton] - tapPressTime[gameButton]) > 1 &&
@@ -71,7 +70,7 @@ NativeController::TapState NativeController::WasButtonTapped(eControl gameButton
         tapReleaseTime[gameButton] = 0;
         return TapState::Tapped;
     }
-    if ((milliseconds_now() - tapPressTime[gameButton]) <= milliseconds) {
+    if ((GetTickCount64() - tapPressTime[gameButton]) <= milliseconds) {
         return TapState::ButtonDown;
     }
     return TapState::ButtonUp;

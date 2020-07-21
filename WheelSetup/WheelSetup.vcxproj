@@ -185,7 +185,6 @@
     <ClCompile Include="..\Gears\Util\Paths.cpp" />
     <ClCompile Include="..\Gears\Util\Strings.cpp" />
     <ClCompile Include="..\Gears\Util\SysUtils.cpp" />
-    <ClCompile Include="..\Gears\Util\TimeHelper.cpp" />
     <ClCompile Include="..\thirdparty\fmt\src\format.cc" />
     <ClCompile Include="..\thirdparty\fmt\src\posix.cc" />
     <ClCompile Include="WheelSetup.cpp" />

@@ -1,6 +1,5 @@
 #include "WheelDirectInput.hpp"
 
-#include "../Util/TimeHelper.hpp"
 #include "../Util/Logger.hpp"
 #include "../Util/Strings.hpp"
 #include "../Util/GUID.h"
@@ -252,10 +251,10 @@ bool WheelDirectInput::WasButtonHeldForMs(int buttonType, GUID device, int milli
         int povIndex = povDirectionToIndex(buttonType);
         if (povIndex == -1) return false;
         if (IsButtonJustPressed(buttonType,device)) {
-            povPressTime[device][povIndex] = milliseconds_now();
+            povPressTime[device][povIndex] = GetTickCount64();
         }
         if (IsButtonJustReleased(buttonType,device)) {
-            povReleaseTime[device][povIndex] = milliseconds_now();
+            povReleaseTime[device][povIndex] = GetTickCount64();
         }
 
         if ((povReleaseTime[device][povIndex] - povPressTime[device][povIndex]) >= millis) {
@@ -266,10 +265,10 @@ bool WheelDirectInput::WasButtonHeldForMs(int buttonType, GUID device, int milli
         return false;
     }
     if (IsButtonJustPressed(buttonType,device)) {
-        rgbPressTime[device][buttonType] = milliseconds_now();
+        rgbPressTime[device][buttonType] = GetTickCount64();
     }
     if (IsButtonJustReleased(buttonType,device)) {
-        rgbReleaseTime[device][buttonType] = milliseconds_now();
+        rgbReleaseTime[device][buttonType] = GetTickCount64();
     }
 
     if ((rgbReleaseTime[device][buttonType] - rgbPressTime[device][buttonType]) >= millis) {

@@ -5,7 +5,6 @@
 #include "Util/MathExt.h"
 #include "Util/UIUtils.h"
 #include "Util/ScriptUtils.h"
-#include "Util/TimeHelper.hpp"
 #include "Memory/VehicleExtensions.hpp"
 #include "Memory/VehicleBone.h"
 
@@ -195,7 +194,7 @@ void CustomSteering::Update() {
     float steerValGammaR = pow(steer, g_settings.CustomSteering.Gamma);
     float steerValGamma = steer < 0.0f ? -steerValGammaL : steerValGammaR;
 
-    float secondsSinceLastTick = static_cast<float>(milliseconds_now() - lastTickTime) / 1000.0f;
+    float secondsSinceLastTick = static_cast<float>(GetTickCount64() - lastTickTime) / 1000.0f;
 
     if (steer == 0.0f) {
         steerCurr = lerp(
@@ -215,7 +214,7 @@ void CustomSteering::Update() {
     if (g_settings().CustomSteering.Mouse.Enable)
         mouseInputThisTick = updateMouseSteer(steerCurr);
 
-    lastTickTime = milliseconds_now();
+    lastTickTime = GetTickCount64();
     steerPrev = steerCurr;
 
     // Ignore reduction for wet vehicles.

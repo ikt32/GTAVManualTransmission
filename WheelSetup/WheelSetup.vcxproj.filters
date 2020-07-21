@@ -82,9 +82,6 @@
     <ClCompile Include="..\Gears\Input\XInputController.cpp">
       <Filter>Gears\Input</Filter>
     </ClCompile>
-    <ClCompile Include="..\Gears\Util\TimeHelper.cpp">
-      <Filter>Gears\Util</Filter>
-    </ClCompile>
     <ClCompile Include="..\Gears\Util\Paths.cpp">
       <Filter>Gears\Util</Filter>
     </ClCompile>

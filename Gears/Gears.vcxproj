@@ -201,7 +201,6 @@
     <ClCompile Include="Util\Timer.cpp" />
     <ClCompile Include="Util\UIUtils.cpp" />
     <ClCompile Include="Util\Strings.cpp" />
-    <ClCompile Include="Util\TimeHelper.cpp" />
     <ClCompile Include="Util\Logger.cpp" />
     <ClCompile Include="VehicleData.cpp" />
     <ClCompile Include="VehicleConfig.cpp" />
@@ -302,7 +301,6 @@
     <ClInclude Include="Util\Logger.hpp" />
     <ClInclude Include="Util\ScriptUtils.h" />
     <ClInclude Include="Util\SysUtils.h" />
-    <ClInclude Include="Util\TimeHelper.hpp" />
     <ClInclude Include="Util\Timer.h" />
     <ClInclude Include="Util\UIUtils.h" />
     <ClInclude Include="Util\Strings.hpp" />
