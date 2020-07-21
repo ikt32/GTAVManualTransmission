@@ -182,6 +182,25 @@ void drawDashLights() {
         0, 0, 0, 127, 0);
 }
 
+Vector3 GetAccelVector() {
+    Vector3 worldVel = ENTITY::GET_ENTITY_VELOCITY(g_playerVehicle);
+    Vector3 worldVelDelta = (worldVel - GForce::PrevWorldVel);
+
+    Vector3 fwdVec = ENTITY::GET_ENTITY_FORWARD_VECTOR(g_playerVehicle);
+    Vector3 upVec = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, 0.0f, 0.0f, 1.0f) - ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
+    Vector3 rightVec = Cross(fwdVec, upVec);
+
+    Vector3 relVelDelta{
+        -Dot(worldVelDelta, rightVec), 0,
+        Dot(worldVelDelta, fwdVec), 0,
+        Dot(worldVelDelta, upVec), 0,
+    };
+
+    GForce::PrevWorldVel = worldVel;
+
+    return relVelDelta * (1.0f / MISC::GET_FRAME_TIME());
+}
+
 void drawGForces() {
     using namespace GForce;
     float locX = g_settings.Debug.Metrics.GForce.PosX;
@@ -197,25 +216,11 @@ void drawGForces() {
     if (g_menu.IsThisOpen() && screenLocationConflict)
         return;
 
-    Vector3 worldVel = ENTITY::GET_ENTITY_VELOCITY(g_playerVehicle);
-    Vector3 worldVelDelta = (worldVel - PrevWorldVel);
-
-    Vector3 fwdVec = ENTITY::GET_ENTITY_FORWARD_VECTOR(g_playerVehicle);
-    Vector3 upVec = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, 0.0f, 0.0f, 1.0f) - ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
-    Vector3 rightVec = Cross(fwdVec, upVec);
-
-    Vector3 relVelDelta {
-        -Dot(worldVelDelta, rightVec), 0,
-        Dot(worldVelDelta, fwdVec), 0,
-        Dot(worldVelDelta, upVec), 0,
-    };
-
-    Vector3 accel = relVelDelta * (1.0f / MISC::GET_FRAME_TIME());
+    Vector3 accel = GetAccelVector();
 
     float GForceX = accel.x / 9.8f;
     float GForceY = accel.y / 9.8f;
     float GForceZ = accel.z / 9.8f;
-    PrevWorldVel = worldVel;
 
     UI::ShowText(locX + 0.100f, locY - 0.075f, 0.5f, fmt::format("LAT: {:.2f} g", GForceX));
     UI::ShowText(locX + 0.100f, locY - 0.025f, 0.5f, fmt::format("LON: {:.2f} g", GForceY));
@@ -259,7 +264,7 @@ void drawGForces() {
         alpha += 255 / static_cast<int>(CoordTrails.size());
     }
 
-    GRAPHICS::DRAW_RECT(avg(allX), avg(allY), szX * 0.05f, szY * 0.05f, 255, 0, 0, 255, 0);
+    GRAPHICS::DRAW_RECT(avg(allX), avg(allY), szX * 0.020f, szY * 0.020f, 255, 0, 0, 255, 0);
 }
 
 void drawRPMIndicator(float x, float y, float width, float height, Util::ColorI fg, Util::ColorI bg, float rpm) {
