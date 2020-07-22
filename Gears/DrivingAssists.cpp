@@ -128,57 +128,58 @@ DrivingAssists::ESPData DrivingAssists::GetESP() {
 DrivingAssists::LSDData DrivingAssists::GetLSD() {
     LSDData lsdData{};
 
-    if (g_vehData.mWheelCount == 4 && g_settings().DriveAssists.LSD.Enable) {
+    if (g_settings().DriveAssists.LSD.Enable &&
+        g_vehData.mWheelCount == 4 &&
+        g_vehData.mWheelAverageDrivenTyreSpeed > 0.0f &&
+        !VExt::GetHandbrake(g_playerVehicle) &&
+        !VEHICLE::IS_VEHICLE_IN_BURNOUT(g_playerVehicle)) {
+        auto angularVelocities = VExt::GetWheelRotationSpeeds(g_playerVehicle);
+        float WheelSpeedLF = angularVelocities[0];
+        float WheelSpeedRF = angularVelocities[1];
+        float WheelSpeedLR = angularVelocities[2];
+        float WheelSpeedRR = angularVelocities[3];
 
-        if (g_vehData.mWheelAverageDrivenTyreSpeed > 0.0f) {
-            auto angularVelocities = VExt::GetWheelRotationSpeeds(g_playerVehicle);
-            float WheelSpeedLF = angularVelocities[0];
-            float WheelSpeedRF = angularVelocities[1];
-            float WheelSpeedLR = angularVelocities[2];
-            float WheelSpeedRR = angularVelocities[3];
+        float visc = g_settings().DriveAssists.LSD.Viscosity;
+        float dbalF = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fDriveBiasFront);
+        float dbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fDriveBiasRear);
+        float clutch = std::clamp(g_vehData.mClutch, 0.0f, 1.0f);
 
-            float visc = g_settings().DriveAssists.LSD.Viscosity;
-            float dbalF = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fDriveBiasFront);
-            float dbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fDriveBiasRear);
-            float clutch = std::clamp(g_vehData.mClutch, 0.0f, 1.0f);
+        // pos: neg brake left, neg throttle right
+        float frontDiffDiff = (WheelSpeedLF - WheelSpeedRF) / (WheelSpeedLF + WheelSpeedRF);
+        if (WheelSpeedLF == 0.0f || WheelSpeedRF == 0.0f)
+            frontDiffDiff = 0.0f;
+        lsdData.BrakeLF = frontDiffDiff / 2.0f * dbalF * visc * g_vehData.mThrottle * clutch;
+        lsdData.BrakeRF = -frontDiffDiff / 2.0f * dbalF * visc * g_vehData.mThrottle * clutch;
+        lsdData.FDD = frontDiffDiff;
 
-            // pos: neg brake left, neg throttle right
-            float frontDiffDiff = (WheelSpeedLF - WheelSpeedRF) / (WheelSpeedLF + WheelSpeedRF);
-            if (WheelSpeedLF == 0.0f || WheelSpeedRF == 0.0f)
-                frontDiffDiff = 0.0f;
-            lsdData.BrakeLF = frontDiffDiff / 2.0f * dbalF * visc * g_vehData.mThrottle * clutch;
-            lsdData.BrakeRF = -frontDiffDiff / 2.0f * dbalF * visc * g_vehData.mThrottle * clutch;
-            lsdData.FDD = frontDiffDiff;
+        float rearDiffDiff = (WheelSpeedLR - WheelSpeedRR) / (WheelSpeedLR + WheelSpeedRR);
+        if (WheelSpeedLR == 0.0f || WheelSpeedRR == 0.0f)
+            rearDiffDiff = 0.0f;
+        lsdData.BrakeLR = rearDiffDiff / 2.0f * dbalR * visc * g_vehData.mThrottle * clutch;
+        lsdData.BrakeRR = -rearDiffDiff / 2.0f * dbalR * visc * g_vehData.mThrottle * clutch;
+        lsdData.RDD = rearDiffDiff;
 
-            float rearDiffDiff = (WheelSpeedLR - WheelSpeedRR) / (WheelSpeedLR + WheelSpeedRR);
-            if (WheelSpeedLR == 0.0f || WheelSpeedRR == 0.0f)
-                rearDiffDiff = 0.0f;
-            lsdData.BrakeLR = rearDiffDiff / 2.0f * dbalR * visc * g_vehData.mThrottle * clutch;
-            lsdData.BrakeRR = -rearDiffDiff / 2.0f * dbalR * visc * g_vehData.mThrottle * clutch;
-            lsdData.RDD = rearDiffDiff;
+        if (lsdData.BrakeLF > 0.0f) { lsdData.BrakeLF = 0.0f; }
+        if (lsdData.BrakeRF > 0.0f) { lsdData.BrakeRF = 0.0f; }
+        if (lsdData.BrakeLR > 0.0f) { lsdData.BrakeLR = 0.0f; }
+        if (lsdData.BrakeRR > 0.0f) { lsdData.BrakeRR = 0.0f; }
 
-            if (lsdData.BrakeLF > 0.0f) { lsdData.BrakeLF = 0.0f; }
-            if (lsdData.BrakeRF > 0.0f) { lsdData.BrakeRF = 0.0f; }
-            if (lsdData.BrakeLR > 0.0f) { lsdData.BrakeLR = 0.0f; }
-            if (lsdData.BrakeRR > 0.0f) { lsdData.BrakeRR = 0.0f; }
+        auto unBrakes = {
+            lsdData.BrakeLF,
+            lsdData.BrakeRF,
+            lsdData.BrakeLR,
+            lsdData.BrakeRR
+        };
 
-            auto unBrakes = {
-                lsdData.BrakeLF,
-                lsdData.BrakeRF,
-                lsdData.BrakeLR,
-                lsdData.BrakeRR
-            };
-
-            if (*std::min_element(unBrakes.begin(), unBrakes.end()) < -0.05f) {
-                lsdData.Use = true;
-            }
-            else {
-                lsdData.Use = false;
-                lsdData.BrakeLR = 0.0f;
-                lsdData.BrakeRR = 0.0f;
-                lsdData.BrakeLF = 0.0f;
-                lsdData.BrakeRF = 0.0f;
-            }
+        if (*std::min_element(unBrakes.begin(), unBrakes.end()) < -0.05f) {
+            lsdData.Use = true;
+        }
+        else {
+            lsdData.Use = false;
+            lsdData.BrakeLR = 0.0f;
+            lsdData.BrakeRR = 0.0f;
+            lsdData.BrakeLF = 0.0f;
+            lsdData.BrakeRF = 0.0f;
         }
     }
     return lsdData;
