@@ -229,6 +229,7 @@
     </ClCompile>
     <ClCompile Include="DrivingAssists.cpp" />
     <ClCompile Include="BlockableControls.cpp" />
+    <ClCompile Include="AWD.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -500,6 +501,7 @@
     <ClInclude Include="DrivingAssists.h" />
     <ClInclude Include="ScriptHUD.h" />
     <ClInclude Include="BlockableControls.h" />
+    <ClInclude Include="AWD.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

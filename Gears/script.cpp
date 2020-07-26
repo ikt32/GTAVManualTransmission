@@ -53,6 +53,8 @@
 #include <filesystem>
 #include <numeric>
 
+#include "AWD.h"
+
 
 namespace fs = std::filesystem;
 using VExt = VehicleExtensions;
@@ -147,6 +149,8 @@ void functionAutoGear1();
 void functionHillGravity();
 void functionAudioFX();
 
+float g_DriveBiasTransfer = 0.0f;
+
 void functionDash() {
     if (!g_settings.Misc.DashExtensions)
         return;
@@ -168,6 +172,14 @@ void functionDash() {
         // data.headlights = true;
         // data.fullBeam = true;
         data.batteryLight = true;
+    }
+
+    // https://www.gta5-mods.com/vehicles/nissan-skyline-gt-r-bnr32
+    if (ENTITY::GET_ENTITY_MODEL(g_playerVehicle) == joaat("r32")) {
+        data.oilPressure = g_DriveBiasTransfer;
+
+        // oil pressure gauge uses data.temp
+        // battery voltage uses data.temp
     }
 
     DashHook_SetData(data);
@@ -234,6 +246,9 @@ void updateActiveSteeringAnim(Vehicle vehicle) {
     SteeringAnimation::SetAnimationIndex(animIdx);
 }
 
+//                                     front, rear
+std::unordered_map<uint32_t, std::pair<float, float>> g_driveBiasMap;
+
 void update_vehicle() {
     g_playerVehicle = PED::GET_VEHICLE_PED_IS_IN(g_playerPed, false);
     bool vehAvail = Util::VehicleAvailable(g_playerVehicle, g_playerPed);
@@ -271,6 +286,20 @@ void update_vehicle() {
             g_gearStates.FakeNeutral = false;
         else
             g_gearStates.FakeNeutral = g_settings.GameAssists.DefaultNeutral;
+
+        // replace handling
+        auto handlingAddr = VExt::GetHandlingPtr(g_playerVehicle);
+        uint32_t handlingHash = *(uint32_t*)(handlingAddr + 0x8);
+        if (g_driveBiasMap.find(handlingHash) == g_driveBiasMap.end()) {
+            g_driveBiasMap[handlingHash] = std::make_pair(
+                *(float*)(handlingAddr + hOffsets1604.fDriveBiasFront),
+                *(float*)(handlingAddr + hOffsets1604.fDriveBiasRear));
+
+            UI::Notify(INFO, fmt::format("{:x}\nF: {}\nR: {}",
+                handlingHash,
+                g_driveBiasMap[handlingHash].first,
+                g_driveBiasMap[handlingHash].second));
+        }
     }
 
     if (g_settings.Debug.Metrics.EnableTimers && vehAvail) {
@@ -458,6 +487,10 @@ void update_manual_features() {
         if (g_settings().MTOptions.ClutchCreep && VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle)) {
             functionClutchCatch();
         }
+    }
+
+    if (ENTITY::GET_ENTITY_MODEL(g_playerVehicle) == joaat("r32")) {
+        AWD::Update();
     }
 
     handleBrakePatch();
