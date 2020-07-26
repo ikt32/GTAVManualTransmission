@@ -17,7 +17,7 @@
 
 extern float g_DriveBiasTransfer;
 extern Vehicle g_playerVehicle;
-extern std::unordered_map<uint32_t, std::pair<float, float>> g_driveBiasMap;
+extern std::unordered_map<uint32_t, float> g_driveBiasMap;
 
 using VExt = VehicleExtensions;
 
@@ -37,8 +37,12 @@ void AWD::Update() {
     // TODO: Currently only runs for R32, might wanna enable for some... list? of vehicles? idk!
     // When we're in here, we can assume g_driveBiasMap contains the thing we should have.
 
-    float driveBiasF = g_driveBiasMap[joaat("r32")].first;
-    float driveBiasR = g_driveBiasMap[joaat("r32")].second;
+    float driveBiasF = g_driveBiasMap[joaat("r32")];
+
+    if (driveBiasF == 0.0f || driveBiasF == 1.0f || driveBiasF == 0.5f) {
+        UI::ShowText(0.5f, 0.000f, 0.5f, "Unsupported");
+        return;
+    }
 
     auto wheelSpeeds = VExt::GetWheelRotationSpeeds(g_playerVehicle);
 
@@ -55,11 +59,10 @@ void AWD::Update() {
         g_DriveBiasTransfer = map(maxSpeed, avgFrontSpeed * 1.05f, avgFrontSpeed * 1.50f, 0.0f, 1.0f) * throttle;
         g_DriveBiasTransfer = std::clamp(g_DriveBiasTransfer, 0.0f, 1.0f);
 
-        driveBiasF = map(g_DriveBiasTransfer, 0.0f, 1.0f, driveBiasF, 0.5f);
-        driveBiasR = map(g_DriveBiasTransfer, 0.0f, 1.0f, driveBiasR, 0.5f);
+        driveBiasF = map(g_DriveBiasTransfer, 0.0f, 1.0f, driveBiasF, 0.5f); // max for fwd
 
         driveBiasF = std::clamp(driveBiasF, 0.0f, 0.5f);
-        driveBiasR = std::clamp(driveBiasR, 0.5f, 1.0f);
+
     }
     else {
         g_DriveBiasTransfer = 0.0f;
@@ -67,10 +70,12 @@ void AWD::Update() {
 
     UI::ShowText(0.5f, 0.000f, 0.5f, fmt::format("T: {:.2f}", g_DriveBiasTransfer));
     UI::ShowText(0.5f, 0.025f, 0.5f, fmt::format("F: {:.2f}", driveBiasF));
-    UI::ShowText(0.5f, 0.050f, 0.5f, fmt::format("R: {:.2f}", driveBiasR));
+    //UI::ShowText(0.5f, 0.050f, 0.5f, fmt::format("R: {:.2f}", driveBiasR));
 
     // replace value in handling
     auto handlingAddr = VExt::GetHandlingPtr(g_playerVehicle);
-    *(float*)(handlingAddr + hOffsets1604.fDriveBiasFront) = driveBiasF;
-    *(float*)(handlingAddr + hOffsets1604.fDriveBiasRear)  = driveBiasR;
+
+    // Don't care about 0.0 or 1.0, as it never occurs.
+    *(float*)(handlingAddr + hOffsets1604.fDriveBiasFront) = driveBiasF * 2.0f;
+    *(float*)(handlingAddr + hOffsets1604.fDriveBiasRear) = 2.0f * (1.0f - (driveBiasF));
 }

@@ -246,8 +246,8 @@ void updateActiveSteeringAnim(Vehicle vehicle) {
     SteeringAnimation::SetAnimationIndex(animIdx);
 }
 
-//                                     front, rear
-std::unordered_map<uint32_t, std::pair<float, float>> g_driveBiasMap;
+// front
+std::unordered_map<uint32_t, float> g_driveBiasMap;
 
 void update_vehicle() {
     g_playerVehicle = PED::GET_VEHICLE_PED_IS_IN(g_playerPed, false);
@@ -291,14 +291,23 @@ void update_vehicle() {
         auto handlingAddr = VExt::GetHandlingPtr(g_playerVehicle);
         uint32_t handlingHash = *(uint32_t*)(handlingAddr + 0x8);
         if (g_driveBiasMap.find(handlingHash) == g_driveBiasMap.end()) {
-            g_driveBiasMap[handlingHash] = std::make_pair(
-                *(float*)(handlingAddr + hOffsets1604.fDriveBiasFront),
-                *(float*)(handlingAddr + hOffsets1604.fDriveBiasRear));
+            float fDriveBiasFront = *(float*)(handlingAddr + hOffsets1604.fDriveBiasFront);
+            float fDriveBiasRear = *(float*)(handlingAddr + hOffsets1604.fDriveBiasRear);
 
-            UI::Notify(INFO, fmt::format("{:x}\nF: {}\nR: {}",
-                handlingHash,
-                g_driveBiasMap[handlingHash].first,
-                g_driveBiasMap[handlingHash].second));
+            float fDriveBiasFrontNorm;
+
+            // Full FWD
+            if (fDriveBiasFront == 1.0f && fDriveBiasRear == 0.0f) {
+                fDriveBiasFrontNorm = 1.0f;
+            }
+            // Full RWD
+            else if (fDriveBiasFront == 0.0f && fDriveBiasRear == 1.0f) {
+                fDriveBiasFrontNorm = 0.0f;
+            }
+            else {
+                fDriveBiasFrontNorm = fDriveBiasFront / 2.0f;
+            }
+            g_driveBiasMap[handlingHash] = fDriveBiasFrontNorm;
         }
     }
 
