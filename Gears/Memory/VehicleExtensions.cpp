@@ -463,7 +463,14 @@ void VehicleExtensions::SetArenaBoost(Vehicle handle, float value) {
 uint64_t VehicleExtensions::GetHandlingPtr(Vehicle handle) {
     if (handlingOffset == 0) return 0;
     auto address = GetAddress(handle);
-    return *reinterpret_cast<uint64_t *>(address + handlingOffset);
+    return *reinterpret_cast<uint64_t*>(address + handlingOffset);
+}
+
+void VehicleExtensions::SetHandlingPtr(Vehicle handle, uint64_t value) {
+    if (handlingOffset == 0) return;
+    auto address = GetAddress(handle);
+    if (address == 0) return;
+    *reinterpret_cast<uint64_t*>(address + handlingOffset) = value;
 }
 
 uint32_t VehicleExtensions::GetLightStates(Vehicle handle) {
@@ -571,6 +578,7 @@ uint64_t VehicleExtensions::GetWheelsPtr(Vehicle handle) {
 uint8_t VehicleExtensions::GetNumWheels(Vehicle handle) {
     if (numWheelsOffset == 0) return 0;
     auto address = GetAddress(handle);
+    if (address == 0) return 0;
     return *reinterpret_cast<int *>(address + numWheelsOffset);
 }
 
@@ -960,6 +968,26 @@ std::vector<uint16_t> VehicleExtensions::GetWheelFlags(Vehicle handle) {
         flags[i] = *reinterpret_cast<uint16_t *>(wheelAddr + wheelFlagsOffset);
     }
     return flags;
+}
+
+uint64_t VehicleExtensions::GetWheelHandlingPtr(Vehicle handle, uint8_t index) {
+    if (handlingOffset == 0) return 0;
+
+    auto wheelPtr = GetWheelsPtr(handle);
+    auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * index);
+
+    return *reinterpret_cast<uint64_t*>(wheelAddr + 0x120);
+}
+
+void VehicleExtensions::SetWheelHandlingPtr(Vehicle handle, uint8_t index, uint64_t value) {
+    if (handlingOffset == 0) return;
+    auto address = GetAddress(handle);
+    if (address == 0) return;
+
+    auto wheelPtr = GetWheelsPtr(handle);
+    auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * index);
+
+    *reinterpret_cast<uint64_t*>(wheelAddr + 0x120) = value;
 }
 
 std::vector<uint32_t> VehicleExtensions::GetVehicleFlags(Vehicle handle) {

@@ -54,6 +54,7 @@
 #include <numeric>
 
 #include "AWD.h"
+#include "Memory/HandlingReplace.h"
 
 
 namespace fs = std::filesystem;
@@ -249,9 +250,6 @@ void updateActiveSteeringAnim(Vehicle vehicle) {
     SteeringAnimation::SetAnimationIndex(animIdx);
 }
 
-// front
-std::unordered_map<uint32_t, float> g_driveBiasMap;
-
 void update_vehicle() {
     g_playerVehicle = PED::GET_VEHICLE_PED_IS_IN(g_playerPed, false);
     bool vehAvail = Util::VehicleAvailable(g_playerVehicle, g_playerPed);
@@ -291,27 +289,7 @@ void update_vehicle() {
             g_gearStates.FakeNeutral = g_settings.GameAssists.DefaultNeutral;
 
         // replace handling
-        auto handlingAddr = VExt::GetHandlingPtr(g_playerVehicle);
-        uint32_t handlingHash = *(uint32_t*)(handlingAddr + 0x8);
-        if (g_driveBiasMap.find(handlingHash) == g_driveBiasMap.end()) {
-            float fDriveBiasFront = *(float*)(handlingAddr + hOffsets1604.fDriveBiasFront);
-            float fDriveBiasRear = *(float*)(handlingAddr + hOffsets1604.fDriveBiasRear);
-
-            float fDriveBiasFrontNorm;
-
-            // Full FWD
-            if (fDriveBiasFront == 1.0f && fDriveBiasRear == 0.0f) {
-                fDriveBiasFrontNorm = 1.0f;
-            }
-            // Full RWD
-            else if (fDriveBiasFront == 0.0f && fDriveBiasRear == 1.0f) {
-                fDriveBiasFrontNorm = 0.0f;
-            }
-            else {
-                fDriveBiasFrontNorm = fDriveBiasFront / 2.0f;
-            }
-            g_driveBiasMap[handlingHash] = fDriveBiasFrontNorm;
-        }
+        HandlingReplace::UpdateVehicles(g_playerVehicle);
     }
 
     if (g_settings.Debug.Metrics.EnableTimers && vehAvail) {

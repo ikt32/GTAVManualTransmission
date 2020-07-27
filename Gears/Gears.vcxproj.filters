@@ -230,6 +230,9 @@
     <ClCompile Include="DrivingAssists.cpp" />
     <ClCompile Include="BlockableControls.cpp" />
     <ClCompile Include="AWD.cpp" />
+    <ClCompile Include="Memory\HandlingReplace.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -502,6 +505,9 @@
     <ClInclude Include="ScriptHUD.h" />
     <ClInclude Include="BlockableControls.h" />
     <ClInclude Include="AWD.h" />
+    <ClInclude Include="Memory\HandlingReplace.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
