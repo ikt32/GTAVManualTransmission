@@ -176,7 +176,10 @@ void functionDash() {
 
     // https://www.gta5-mods.com/vehicles/nissan-skyline-gt-r-bnr32
     if (ENTITY::GET_ENTITY_MODEL(g_playerVehicle) == joaat("r32")) {
-        data.oilPressure = g_DriveBiasTransfer;
+        data.oilPressure = lerp(
+            data.oilPressure,
+            g_DriveBiasTransfer,
+            1.0f - pow(0.0001f, MISC::GET_FRAME_TIME()));
 
         // oil pressure gauge uses data.temp
         // battery voltage uses data.temp
