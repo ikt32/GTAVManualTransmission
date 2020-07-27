@@ -130,6 +130,8 @@ public:
             bool Enable = false;
             float Viscosity = 10.0f;
         } LSD;
+
+        bool AWD = true;
     } DriveAssists;
 
     // [SHIFT_OPTIONS]

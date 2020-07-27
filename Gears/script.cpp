@@ -498,7 +498,7 @@ void update_manual_features() {
         }
     }
 
-    if (ENTITY::GET_ENTITY_MODEL(g_playerVehicle) == joaat("r32")) {
+    if (g_settings().DriveAssists.AWD) {
         AWD::Update();
     }
 

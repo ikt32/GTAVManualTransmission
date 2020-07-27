@@ -1375,6 +1375,9 @@ void update_driveassistmenu() {
         { "How much the slower wheel tries to match the faster wheel.",
           "A very high value might speed up the car too much, because this LSD adds power to the slower wheel. "
           "About 10 is decent and doesn't affect acceleration."});
+
+    g_menu.BoolOption("AWD", g_settings.DriveAssists.AWD,
+        { "-" });
 }
 
 void update_espsettingsmenu() {
