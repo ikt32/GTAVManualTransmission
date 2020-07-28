@@ -233,6 +233,9 @@
     <ClCompile Include="Memory\HandlingReplace.cpp">
       <Filter>Memory</Filter>
     </ClCompile>
+    <ClCompile Include="Memory\sysAllocator.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -506,6 +509,12 @@
     <ClInclude Include="BlockableControls.h" />
     <ClInclude Include="AWD.h" />
     <ClInclude Include="Memory\HandlingReplace.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\atArray.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\sysAllocator.h">
       <Filter>Memory</Filter>
     </ClInclude>
   </ItemGroup>

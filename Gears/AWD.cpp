@@ -30,6 +30,9 @@ void AWD::Update() {
     // When we're in here, we can assume g_driveBiasMap contains the thing we should have.
     Hash model = ENTITY::GET_ENTITY_MODEL(g_playerVehicle);
     auto* pHandling = (uint8_t*)HandlingReplace::GetOriginalHandling(g_playerVehicle);
+
+    if (!pHandling)
+        return;
    
     float driveBiasF;
     {

@@ -157,6 +157,7 @@
     <ClCompile Include="..\thirdparty\yaml-cpp\src\singledocparser.cpp" />
     <ClCompile Include="..\thirdparty\yaml-cpp\src\stream.cpp" />
     <ClCompile Include="..\thirdparty\yaml-cpp\src\tag.cpp" />
+    <ClCompile Include="Memory\sysAllocator.cpp" />
     <ClCompile Include="AtcuGearbox.cpp" />
     <ClCompile Include="AtcuLogic.cpp" />
     <ClCompile Include="AWD.cpp" />
@@ -253,6 +254,7 @@
     <ClInclude Include="..\thirdparty\yaml-cpp\src\stringsource.h" />
     <ClInclude Include="..\thirdparty\yaml-cpp\src\tag.h" />
     <ClInclude Include="..\thirdparty\yaml-cpp\src\token.h" />
+    <ClInclude Include="Memory\sysAllocator.h" />
     <ClInclude Include="AtcuGearbox.h" />
     <ClInclude Include="AtcuLogic.h" />
     <ClInclude Include="AWD.h" />
@@ -263,6 +265,7 @@
     <ClInclude Include="DrivingAssists.h" />
     <ClInclude Include="Input\NativeInput.h" />
     <ClInclude Include="Input\USBNotify.h" />
+    <ClInclude Include="Memory\atArray.h" />
     <ClInclude Include="Memory\HandlingReplace.h" />
     <ClInclude Include="Memory\NativeMatrix.h" />
     <ClInclude Include="Memory\NativeVectors.h" />
