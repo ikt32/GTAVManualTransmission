@@ -176,7 +176,7 @@ void functionDash() {
     }
 
     // https://www.gta5-mods.com/vehicles/nissan-skyline-gt-r-bnr32
-    if (ENTITY::GET_ENTITY_MODEL(g_playerVehicle) == joaat("r32")) {
+    if (g_settings().DriveAssists.AWD.SpecialFlags & AWD::AWD_REMAP_DIAL_Y97Y_R32) {
         data.oilPressure = lerp(
             data.oilPressure,
             g_DriveBiasTransfer,
@@ -479,7 +479,7 @@ void update_manual_features() {
         }
     }
 
-    if (g_settings().DriveAssists.AWD) {
+    if (g_settings().DriveAssists.AWD.Enable) {
         AWD::Update();
     }
 

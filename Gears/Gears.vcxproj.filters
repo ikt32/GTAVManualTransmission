@@ -89,8 +89,6 @@
     <ClCompile Include="..\thirdparty\GTAVMenuBase\menumemutils.cpp">
       <Filter>Menu</Filter>
     </ClCompile>
-    <ClCompile Include="CustomSteering.cpp" />
-    <ClCompile Include="WheelInput.cpp" />
     <ClCompile Include="VehicleConfig.cpp" />
     <ClCompile Include="Input\USBNotify.cpp">
       <Filter>Input</Filter>
@@ -108,9 +106,8 @@
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="UDPTelemetry\UDPTelemetry.cpp">
-      <Filter>UDPTelemetry</Filter>
+      <Filter>Features\UDPTelemetry</Filter>
     </ClCompile>
-    <ClCompile Include="SteeringAnim.cpp" />
     <ClCompile Include="..\thirdparty\yaml-cpp\src\binary.cpp">
       <Filter>Thirdparty\yaml</Filter>
     </ClCompile>
@@ -204,17 +201,12 @@
     <ClCompile Include="..\thirdparty\yaml-cpp\src\contrib\graphbuilderadapter.cpp">
       <Filter>Thirdparty\yaml</Filter>
     </ClCompile>
-    <ClCompile Include="AtcuLogic.cpp" />
-    <ClCompile Include="AtcuGearbox.cpp" />
     <ClCompile Include="Util\Color.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Misc.cpp" />
     <ClCompile Include="Input\NativeInput.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="StartingAnimation.cpp" />
     <ClCompile Include="Util\Strings.cpp">
       <Filter>Util</Filter>
     </ClCompile>
@@ -227,14 +219,42 @@
     <ClCompile Include="Util\SysUtils.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="DrivingAssists.cpp" />
     <ClCompile Include="BlockableControls.cpp" />
-    <ClCompile Include="AWD.cpp" />
     <ClCompile Include="Memory\HandlingReplace.cpp">
       <Filter>Memory</Filter>
     </ClCompile>
     <ClCompile Include="Memory\sysAllocator.cpp">
       <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="AWD.cpp">
+      <Filter>Features\AWD</Filter>
+    </ClCompile>
+    <ClCompile Include="AtcuGearbox.cpp">
+      <Filter>Features\Gearbox ATCU</Filter>
+    </ClCompile>
+    <ClCompile Include="AtcuLogic.cpp">
+      <Filter>Features\Gearbox ATCU</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomSteering.cpp">
+      <Filter>Features\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="WheelInput.cpp">
+      <Filter>Features\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="DrivingAssists.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="StartingAnimation.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="SteeringAnim.cpp">
+      <Filter>Features</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -384,8 +404,6 @@
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menumemutils.hpp">
       <Filter>Menu</Filter>
     </ClInclude>
-    <ClInclude Include="CustomSteering.h" />
-    <ClInclude Include="WheelInput.h" />
     <ClInclude Include="VehicleConfig.h" />
     <ClInclude Include="Input\USBNotify.h">
       <Filter>Input</Filter>
@@ -409,15 +427,14 @@
       <Filter>DashHook</Filter>
     </ClInclude>
     <ClInclude Include="UDPTelemetry\TelemetryPacket.h">
-      <Filter>UDPTelemetry</Filter>
+      <Filter>Features\UDPTelemetry</Filter>
     </ClInclude>
     <ClInclude Include="UDPTelemetry\Socket.h">
-      <Filter>UDPTelemetry</Filter>
+      <Filter>Features\UDPTelemetry</Filter>
     </ClInclude>
     <ClInclude Include="UDPTelemetry\UDPTelemetry.h">
-      <Filter>UDPTelemetry</Filter>
+      <Filter>Features\UDPTelemetry</Filter>
     </ClInclude>
-    <ClInclude Include="SteeringAnim.h" />
     <ClInclude Include="..\thirdparty\yaml-cpp\src\collectionstack.h">
       <Filter>Thirdparty\yaml</Filter>
     </ClInclude>
@@ -484,14 +501,9 @@
     <ClInclude Include="..\thirdparty\yaml-cpp\src\contrib\graphbuilderadapter.h">
       <Filter>Thirdparty\yaml</Filter>
     </ClInclude>
-    <ClInclude Include="AtcuLogic.h" />
-    <ClInclude Include="AtcuGearbox.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Misc.h" />
     <ClInclude Include="Input\NativeInput.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="StartingAnimation.h" />
     <ClInclude Include="Util\Strings.hpp">
       <Filter>Util</Filter>
     </ClInclude>
@@ -504,10 +516,8 @@
     <ClInclude Include="Util\SysUtils.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="DrivingAssists.h" />
     <ClInclude Include="ScriptHUD.h" />
     <ClInclude Include="BlockableControls.h" />
-    <ClInclude Include="AWD.h" />
     <ClInclude Include="Memory\HandlingReplace.h">
       <Filter>Memory</Filter>
     </ClInclude>
@@ -516,6 +526,36 @@
     </ClInclude>
     <ClInclude Include="Memory\sysAllocator.h">
       <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="AWD.h">
+      <Filter>Features\AWD</Filter>
+    </ClInclude>
+    <ClInclude Include="AtcuGearbox.h">
+      <Filter>Features\Gearbox ATCU</Filter>
+    </ClInclude>
+    <ClInclude Include="AtcuLogic.h">
+      <Filter>Features\Gearbox ATCU</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomSteering.h">
+      <Filter>Features\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="WheelInput.h">
+      <Filter>Features\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="DrivingAssists.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="StartingAnimation.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="SteeringAnim.h">
+      <Filter>Features</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -552,11 +592,23 @@
     <Filter Include="DashHook">
       <UniqueIdentifier>{3bca7d29-ffa2-4bd2-9d7c-d6a61e15c7d9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UDPTelemetry">
-      <UniqueIdentifier>{84c60810-1f1b-46a9-a810-08f9629ad9a6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Thirdparty\yaml">
       <UniqueIdentifier>{e0f6edc3-ef31-40c5-9dc2-78a926d1ce40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features">
+      <UniqueIdentifier>{aa74f79e-2406-4d3e-b2fd-ab2f038b4a60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\AWD">
+      <UniqueIdentifier>{eeb838bb-6c3f-48c2-83f1-7219ca5f765b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Gearbox ATCU">
+      <UniqueIdentifier>{67921eb8-a051-4146-b09f-0c0801bba34b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Input">
+      <UniqueIdentifier>{78585d2c-5798-4b05-bba1-f904dc2f4df9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\UDPTelemetry">
+      <UniqueIdentifier>{84c60810-1f1b-46a9-a810-08f9629ad9a6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

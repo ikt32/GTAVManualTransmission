@@ -131,7 +131,38 @@ public:
             float Viscosity = 10.0f;
         } LSD;
 
-        bool AWD = true;
+        struct {
+            // Only active for cars with
+            // fDriveBiasFront >= 0.1 &&
+            // fDriveBiasFront <= 0.9 &&
+            // fDriveBiasFront != 0.5
+            bool Enable = false;
+
+            // Max bias, from the perspective of the "weak" axle
+            float TransferMax = 0.5f;
+
+            // AWD::EAWDMode Mode = AWD::EAWDMode::Automatic;
+
+            bool UseCustomBaseBias = false;
+            float CustomBaseBias = 0.01f;
+
+            bool UseTraction = false;
+            float TractionLossMin = 1.05f; // "Strong" axle is  5% faster than "weak" axle 
+            float TractionLossMax = 1.50f; // "Strong" axle is 50% faster than "weak" axle
+
+            // Should only be used for RWD-biased cars
+            bool UseOversteer = false;
+            float OversteerMin = 5.0f; // degrees
+            float OversteerMax = 15.0f; // degrees
+
+            // Should only be used for FWD-biased cars
+            bool UseUndersteer = false;
+            float UndersteerMin = 5.0f; // degrees
+            float UndersteerMax = 15.0f; // degrees
+
+            // See AWD.h for currently supported flags
+            uint32_t SpecialFlags = 0;
+        } AWD;
     } DriveAssists;
 
     // [SHIFT_OPTIONS]

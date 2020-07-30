@@ -161,6 +161,45 @@ namespace {
         return true;
     }
 
+    std::string GetKbEntryStr(const std::string& existingString) {
+        std::string val;
+        UI::Notify(INFO, "Enter value");
+        MISC::DISPLAY_ONSCREEN_KEYBOARD(LOCALIZATION::GET_CURRENT_LANGUAGE() == 0, "FMMC_KEY_TIP8", "",
+            existingString.c_str(), "", "", "", 64);
+        while (MISC::UPDATE_ONSCREEN_KEYBOARD() == 0) {
+            WAIT(0);
+        }
+        if (!MISC::GET_ONSCREEN_KEYBOARD_RESULT()) {
+            UI::Notify(INFO, "Cancelled value entry");
+            return {};
+        }
+
+        std::string enteredVal = MISC::GET_ONSCREEN_KEYBOARD_RESULT();
+        if (enteredVal.empty()) {
+            UI::Notify(INFO, "Cancelled value entry");
+            return {};
+        }
+
+        return enteredVal;
+    }
+
+    void SetFlags(unsigned& flagArea, std::string& newFlags) {
+        if (!newFlags.empty()) {
+            try {
+                flagArea = std::stoul(newFlags, nullptr, 16);
+            }
+            catch (std::invalid_argument&) {
+                UI::Notify(ERROR, "Error: Couldn't convert entered value to int.");
+            }
+            catch (std::out_of_range&) {
+                UI::Notify(ERROR, "Error: Entered value out of range.");
+            }
+        }
+        else {
+            UI::Notify(ERROR, "Error: No flags entered.");
+        }
+    }
+
     std::vector<std::string> diDevicesInfo { "Press Enter to refresh." };
 }
 
@@ -1376,8 +1415,11 @@ void update_driveassistmenu() {
           "A very high value might speed up the car too much, because this LSD adds power to the slower wheel. "
           "About 10 is decent and doesn't affect acceleration."});
 
-    g_menu.BoolOption("AWD", g_settings.DriveAssists.AWD,
-        { "-" });
+    g_menu.BoolOption("Enable AWD torque transfer", g_settings.DriveAssists.AWD.Enable,
+        { "Transfers torque to stabilize the car. See Nissans' ATTESA, Audis' Quattro and similar technologies.",
+          "Only active for AWD cars that don't have a 50/50 distribution."});
+
+    g_menu.MenuOption("AWD torque transfer options", "awdsettingsmenu");
 }
 
 void update_espsettingsmenu() {
@@ -1400,6 +1442,38 @@ void update_espsettingsmenu() {
         { "Angle (degrees) where ESC understeer correction is maximized." });
     g_menu.FloatOption("Understeer max correction", g_settings.DriveAssists.ESP.UnderMaxComp, 0.0f, 10.0f, 0.1f,
         { "Max ESC oversteer understeer value. Additional braking force for the affected wheel." });
+}
+
+void update_awdsettingsmenu() {
+    g_menu.Title("AWD settings");
+    g_menu.Subtitle("");
+
+    // Max bias, from the perspective of the "weak" axle
+    g_menu.FloatOption("Max transfer", g_settings.DriveAssists.AWD.TransferMax, 0.10f, 1.0f, 0.05f);
+
+    g_menu.BoolOption("Use custom base drive bias", g_settings.DriveAssists.AWD.UseCustomBaseBias);
+    g_menu.FloatOption("Custom base drive bias", g_settings.DriveAssists.AWD.CustomBaseBias, 0.01f, 0.99f, 0.01f);
+
+    g_menu.BoolOption("On traction loss", g_settings.DriveAssists.AWD.UseTraction);
+    g_menu.FloatOption("Speed min", g_settings.DriveAssists.AWD.TractionLossMin, 1.0f, 2.0f, 0.05f); // "Strong" axle is  5% faster than "weak" axle 
+    g_menu.FloatOption("Speed max", g_settings.DriveAssists.AWD.TractionLossMax, 1.0f, 2.0f, 0.05f); // "Strong" axle is 50% faster than "weak" axle
+
+    // Should only be used for RWD-biased cars
+    g_menu.BoolOption("On oversteer", g_settings.DriveAssists.AWD.UseOversteer);
+    g_menu.FloatOption("Oversteer min", g_settings.DriveAssists.AWD.OversteerMin, 0.0f, 45.0f, 1.0f); // degrees
+    g_menu.FloatOption("Oversteer max", g_settings.DriveAssists.AWD.OversteerMax, 0.0f, 45.0f, 1.0f); // degrees
+
+    // Should only be used for FWD-biased cars
+    g_menu.BoolOption("On understeer", g_settings.DriveAssists.AWD.UseUndersteer);
+    g_menu.FloatOption("Understeer min", g_settings.DriveAssists.AWD.UndersteerMin, 0.0f, 45.0f, 1.0f); // degrees
+    g_menu.FloatOption("Understeer max", g_settings.DriveAssists.AWD.UndersteerMax, 0.0f, 45.0f, 1.0f); // degrees
+
+    // See AWD.h for currently supported flags
+    std::string specialFlagsStr = fmt::format("{:8X}", g_settings.DriveAssists.AWD.SpecialFlags);
+    if (g_menu.Option(fmt::format("Special flags: {}", specialFlagsStr))) {
+        std::string newFlags = GetKbEntryStr(specialFlagsStr);
+        SetFlags(g_settings.DriveAssists.AWD.SpecialFlags, newFlags);
+    }
 }
 
 void update_gameassistmenu() {
@@ -1957,8 +2031,11 @@ void update_menu() {
     /* mainmenu -> driveassistmenu */
     if (g_menu.CurrentMenu("driveassistmenu")) { update_driveassistmenu(); }
 
-    /* mainmenu -> driveassistmenu -> espsettingsmenu*/
+    /* mainmenu -> driveassistmenu -> espsettingsmenu */
     if (g_menu.CurrentMenu("espsettingsmenu")) { update_espsettingsmenu(); }
+
+    /* mainmenu -> driveassistmenu -> awdsettingsmenu */
+    if (g_menu.CurrentMenu("awdsettingsmenu")) { update_awdsettingsmenu(); }
 
     /* mainmenu -> gameassistmenu */
     if (g_menu.CurrentMenu("gameassistmenu")) { update_gameassistmenu(); }
