@@ -22,6 +22,8 @@
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/Offsets.hpp"
 #include "Memory/VehicleFlags.h"
+#include "Memory/sysAllocator.h"
+#include "Memory/HandlingReplace.h"
 
 #include "Input/CarControls.hpp"
 
@@ -54,8 +56,6 @@
 #include <numeric>
 
 #include "AWD.h"
-#include "Memory/HandlingReplace.h"
-
 
 namespace fs = std::filesystem;
 using VExt = VehicleExtensions;
@@ -2264,6 +2264,8 @@ void main() {
         logger.Write(ERROR, "Patchability test failed!");
         MemoryPatcher::Error = true;
     }
+
+    rage::init();
 
     setupCompatibility();
 
