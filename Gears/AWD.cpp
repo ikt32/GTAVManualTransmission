@@ -26,33 +26,35 @@ namespace {
     float MaxTransfer = 0.5f;
 }
 
-void AWD::Update() {
-    // When we're in here, we can assume g_driveBiasMap contains the thing we should have.
-    Hash model = ENTITY::GET_ENTITY_MODEL(g_playerVehicle);
-    auto* pHandling = (uint8_t*)HandlingReplace::GetOriginalHandling(g_playerVehicle);
-   
-    float driveBiasF;
-    {
-        float fDriveBiasFront = *(float*)(pHandling + hOffsets1604.fDriveBiasFront);
-        float fDriveBiasRear = *(float*)(pHandling + hOffsets1604.fDriveBiasRear);
+float GetDriveBiasFront(Vehicle vehicle) {
+    auto* pHandling = (uint8_t*)HandlingReplace::GetOriginalHandling(vehicle);
 
-        float fDriveBiasFrontNorm;
+    if (!pHandling)
+        return -1.0f;
 
-        // Full FWD
-        if (fDriveBiasFront == 1.0f && fDriveBiasRear == 0.0f) {
-            fDriveBiasFrontNorm = 1.0f;
-        }
-        // Full RWD
-        else if (fDriveBiasFront == 0.0f && fDriveBiasRear == 1.0f) {
-            fDriveBiasFrontNorm = 0.0f;
-        }
-        else {
-            fDriveBiasFrontNorm = fDriveBiasFront / 2.0f;
-        }
-        driveBiasF = fDriveBiasFrontNorm;
+    float fDriveBiasFront = *(float*)(pHandling + hOffsets1604.fDriveBiasFront);
+    float fDriveBiasRear = *(float*)(pHandling + hOffsets1604.fDriveBiasRear);
+
+    float fDriveBiasFrontNorm;
+
+    // Full FWD
+    if (fDriveBiasFront == 1.0f && fDriveBiasRear == 0.0f) {
+        fDriveBiasFrontNorm = 1.0f;
     }
+    // Full RWD
+    else if (fDriveBiasFront == 0.0f && fDriveBiasRear == 1.0f) {
+        fDriveBiasFrontNorm = 0.0f;
+    }
+    else {
+        fDriveBiasFrontNorm = fDriveBiasFront / 2.0f;
+    }
+    return fDriveBiasFrontNorm;
+}
 
-    if (driveBiasF == 0.0f || driveBiasF == 1.0f || driveBiasF == 0.5f) {
+void AWD::Update() {
+    float driveBiasF = GetDriveBiasFront(g_playerVehicle);
+
+    if (driveBiasF <= 0.0f || driveBiasF == 1.0f || driveBiasF == 0.5f) {
         UI::ShowText(0.5f, 0.000f, 0.5f, "Unsupported");
         UI::ShowText(0.5f, 0.025f, 0.5f, fmt::format("F: {:.2f}", driveBiasF));
         return;
