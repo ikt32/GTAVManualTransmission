@@ -168,8 +168,8 @@ public:
     static std::vector<float> GetTyreSpeeds(Vehicle handle);
 
     // How much smoke and skidmarks the wheels/tires are generating.
-    static std::vector<float> GetWheelSkidSmokeEffect(Vehicle handle);
-    static void SetWheelSkidSmokeEffect(Vehicle handle, uint8_t index, float speed);
+    static std::vector<float> GetWheelTractionVectorLength(Vehicle handle);
+    static void SetWheelTractionVectorLength(Vehicle handle, uint8_t index, float value);
 
     // Needs patching the decreasing thing
     static std::vector<float> GetWheelPower(Vehicle handle);

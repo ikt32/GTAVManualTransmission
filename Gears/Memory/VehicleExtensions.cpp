@@ -61,7 +61,7 @@ namespace {
     int wheelSuspensionCompressionOffset = 0;
     int wheelSteeringAngleOffset = 0;
     int wheelAngularVelocityOffset = 0;
-    int wheelSmokeOffset = 0;
+    int wheelTractionVectorLengthOffset = 0;
     int wheelPowerOffset = 0;
     int wheelBrakeOffset = 0;
     int wheelFlagsOffset = 0;
@@ -260,8 +260,8 @@ void VehicleExtensions::Init() {
     wheelPowerOffset = addr == 0 ? 0 : (*(int*)(addr + 3)) + 0x8;
     logger.Write(wheelPowerOffset == 0 ? WARN : DEBUG, "Wheel Power Offset: 0x%X", wheelPowerOffset);
 
-    wheelSmokeOffset = addr == 0 ? 0 : (*(int*)(addr + 3)) - 0x14;
-    logger.Write(wheelSmokeOffset == 0 ? WARN : DEBUG, "Wheel Smoke Offset: 0x%X", wheelSmokeOffset);
+    wheelTractionVectorLengthOffset = addr == 0 ? 0 : (*(int*)(addr + 3)) - 0x14;
+    logger.Write(wheelTractionVectorLengthOffset == 0 ? WARN : DEBUG, "Wheel Traction Vector Length Offset: 0x%X", wheelTractionVectorLengthOffset);
 }
 
 BYTE *VehicleExtensions::GetAddress(Vehicle handle) {
@@ -865,26 +865,26 @@ std::vector<float> VehicleExtensions::GetTyreSpeeds(Vehicle handle) {
     return wheelSpeeds;
 }
 
-void VehicleExtensions::SetWheelSkidSmokeEffect(Vehicle handle, uint8_t index, float value) {
+void VehicleExtensions::SetWheelTractionVectorLength(Vehicle handle, uint8_t index, float value) {
     if (index > GetNumWheels(handle)) return;
-    if (wheelSmokeOffset == 0) return;
+    if (wheelTractionVectorLengthOffset == 0) return;
 
     auto wheelPtr = GetWheelsPtr(handle);
 
     auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
-    *reinterpret_cast<float *>(wheelAddr + wheelSmokeOffset) = value;
+    *reinterpret_cast<float *>(wheelAddr + wheelTractionVectorLengthOffset) = value;
 }
 
-std::vector<float> VehicleExtensions::GetWheelSkidSmokeEffect(Vehicle handle) {
+std::vector<float> VehicleExtensions::GetWheelTractionVectorLength(Vehicle handle) {
     auto numWheels = GetNumWheels(handle);
     std::vector<float> values(numWheels);
     auto wheelPtr = GetWheelsPtr(handle);
 
-    if (wheelSmokeOffset == 0) return values;
+    if (wheelTractionVectorLengthOffset == 0) return values;
 
     for (auto i = 0; i < numWheels; i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-        values[i] = (-*reinterpret_cast<float *>(wheelAddr + wheelSmokeOffset));
+        values[i] = (-*reinterpret_cast<float *>(wheelAddr + wheelTractionVectorLengthOffset));
     }
     return values;
 }
