@@ -52,8 +52,10 @@ void AWD::Update() {
     void* handlingDataReplace = nullptr;
     
     if (!HR::GetHandlingData(g_playerVehicle, &handlingDataOrig, &handlingDataReplace)) {
-        HR::Enable(g_playerVehicle, &handlingDataReplace);
-        return;
+        if (!HR::Enable(g_playerVehicle, &handlingDataReplace)) {
+            UI::ShowText(0.5f, 0.000f, 0.5f, "Unsupported (check library)");
+            return;
+        }
     }
 
     float driveBiasFOriginal = GetDriveBiasFront(handlingDataOrig);
