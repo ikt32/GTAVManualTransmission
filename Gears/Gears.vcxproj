@@ -71,7 +71,6 @@
       <AdditionalOptions>
       </AdditionalOptions>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalDependencies>$(DXSDK_DIR)Lib\x64\XInput.lib;$(SolutionDir)thirdparty\ScriptHookV_SDK\lib\ScriptHookV.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -157,7 +156,6 @@
     <ClCompile Include="..\thirdparty\yaml-cpp\src\singledocparser.cpp" />
     <ClCompile Include="..\thirdparty\yaml-cpp\src\stream.cpp" />
     <ClCompile Include="..\thirdparty\yaml-cpp\src\tag.cpp" />
-    <ClCompile Include="Memory\sysAllocator.cpp" />
     <ClCompile Include="AtcuGearbox.cpp" />
     <ClCompile Include="AtcuLogic.cpp" />
     <ClCompile Include="AWD.cpp" />
@@ -170,7 +168,6 @@
     <ClCompile Include="Input\NativeInput.cpp" />
     <ClCompile Include="Input\USBNotify.cpp" />
     <ClCompile Include="ManualTransmission.cpp" />
-    <ClCompile Include="Memory\HandlingReplace.cpp" />
     <ClCompile Include="Memory\NativeMatrix.cpp" />
     <ClCompile Include="Memory\NativeVectors.cpp" />
     <ClCompile Include="Memory\VehicleBone.cpp" />
@@ -254,7 +251,6 @@
     <ClInclude Include="..\thirdparty\yaml-cpp\src\stringsource.h" />
     <ClInclude Include="..\thirdparty\yaml-cpp\src\tag.h" />
     <ClInclude Include="..\thirdparty\yaml-cpp\src\token.h" />
-    <ClInclude Include="Memory\sysAllocator.h" />
     <ClInclude Include="AtcuGearbox.h" />
     <ClInclude Include="AtcuLogic.h" />
     <ClInclude Include="AWD.h" />
@@ -265,8 +261,6 @@
     <ClInclude Include="DrivingAssists.h" />
     <ClInclude Include="Input\NativeInput.h" />
     <ClInclude Include="Input\USBNotify.h" />
-    <ClInclude Include="Memory\atArray.h" />
-    <ClInclude Include="Memory\HandlingReplace.h" />
     <ClInclude Include="Memory\NativeMatrix.h" />
     <ClInclude Include="Memory\NativeVectors.h" />
     <ClInclude Include="Memory\VehicleBone.h" />

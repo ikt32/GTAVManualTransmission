@@ -71,11 +71,8 @@
     <ClCompile Include="UpdateChecker.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="ManualTransmission.cpp">
-      <Filter>API</Filter>
-    </ClCompile>
     <ClCompile Include="Compatibility.cpp">
-      <Filter>API</Filter>
+      <Filter>Lib</Filter>
     </ClCompile>
     <ClCompile Include="..\thirdparty\fmt\src\posix.cc">
       <Filter>Thirdparty\fmt</Filter>
@@ -220,12 +217,6 @@
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="BlockableControls.cpp" />
-    <ClCompile Include="Memory\HandlingReplace.cpp">
-      <Filter>Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="Memory\sysAllocator.cpp">
-      <Filter>Memory</Filter>
-    </ClCompile>
     <ClCompile Include="AWD.cpp">
       <Filter>Features\AWD</Filter>
     </ClCompile>
@@ -255,6 +246,9 @@
     </ClCompile>
     <ClCompile Include="SteeringAnim.cpp">
       <Filter>Features</Filter>
+    </ClCompile>
+    <ClCompile Include="ManualTransmission.cpp">
+      <Filter>API</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -392,11 +386,8 @@
     <ClInclude Include="..\thirdparty\curl\urlapi.h">
       <Filter>Thirdparty\curl</Filter>
     </ClInclude>
-    <ClInclude Include="ManualTransmission.h">
-      <Filter>API</Filter>
-    </ClInclude>
     <ClInclude Include="Compatibility.h">
-      <Filter>API</Filter>
+      <Filter>Lib</Filter>
     </ClInclude>
     <ClInclude Include="Util\FileVersion.h">
       <Filter>Util</Filter>
@@ -424,7 +415,7 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\thirdparty\GTAVDashHook\DashHook\DashHook.h">
-      <Filter>DashHook</Filter>
+      <Filter>Lib\External Headers</Filter>
     </ClInclude>
     <ClInclude Include="UDPTelemetry\TelemetryPacket.h">
       <Filter>Features\UDPTelemetry</Filter>
@@ -518,15 +509,6 @@
     </ClInclude>
     <ClInclude Include="ScriptHUD.h" />
     <ClInclude Include="BlockableControls.h" />
-    <ClInclude Include="Memory\HandlingReplace.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Memory\atArray.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Memory\sysAllocator.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
     <ClInclude Include="AWD.h">
       <Filter>Features\AWD</Filter>
     </ClInclude>
@@ -557,6 +539,9 @@
     <ClInclude Include="SteeringAnim.h">
       <Filter>Features</Filter>
     </ClInclude>
+    <ClInclude Include="ManualTransmission.h">
+      <Filter>API</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -583,14 +568,8 @@
     <Filter Include="Thirdparty\curl">
       <UniqueIdentifier>{86991d65-e172-479c-8c09-1e4747551205}</UniqueIdentifier>
     </Filter>
-    <Filter Include="API">
-      <UniqueIdentifier>{05abafde-5223-4634-93cd-877f6570d6a7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Thirdparty\fmt">
       <UniqueIdentifier>{ed736439-0f02-423b-8962-64053e0896cd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DashHook">
-      <UniqueIdentifier>{3bca7d29-ffa2-4bd2-9d7c-d6a61e15c7d9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Thirdparty\yaml">
       <UniqueIdentifier>{e0f6edc3-ef31-40c5-9dc2-78a926d1ce40}</UniqueIdentifier>
@@ -609,6 +588,15 @@
     </Filter>
     <Filter Include="Features\UDPTelemetry">
       <UniqueIdentifier>{84c60810-1f1b-46a9-a810-08f9629ad9a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lib">
+      <UniqueIdentifier>{05abafde-5223-4634-93cd-877f6570d6a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API">
+      <UniqueIdentifier>{4f7ab765-680d-4dea-97a5-76c12b1f5444}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lib\External Headers">
+      <UniqueIdentifier>{3bca7d29-ffa2-4bd2-9d7c-d6a61e15c7d9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

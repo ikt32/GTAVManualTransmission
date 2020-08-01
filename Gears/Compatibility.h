@@ -1,12 +1,18 @@
 #pragma once
 namespace TrainerV {
-    extern bool Active();
+    bool Active();
 }
 
 namespace Dismemberment {
-    extern bool Available();
-    extern void AddBoneDraw(int handle, int start, int end);
-    extern void RemoveBoneDraw(int handle);
+    bool Available();
+    void AddBoneDraw(int handle, int start, int end);
+    void RemoveBoneDraw(int handle);
+}
+
+namespace HandlingReplacement {
+    bool Enable(int vehicle, void** ppHandlingData);
+    bool Disable(int vehicle, void** ppHandlingData);
+    bool GetHandlingData(int vehicle, void** ppHandlingDataOriginal, void** ppHandlingDataReplaced);
 }
 
 void setupCompatibility();

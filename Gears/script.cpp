@@ -22,8 +22,6 @@
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/Offsets.hpp"
 #include "Memory/VehicleFlags.h"
-#include "Memory/sysAllocator.h"
-#include "Memory/HandlingReplace.h"
 
 #include "Input/CarControls.hpp"
 
@@ -287,9 +285,6 @@ void update_vehicle() {
             g_gearStates.FakeNeutral = false;
         else
             g_gearStates.FakeNeutral = g_settings.GameAssists.DefaultNeutral;
-
-        // replace handling
-        HandlingReplace::UpdateVehicles(g_playerVehicle);
     }
 
     if (g_settings.Debug.Metrics.EnableTimers && vehAvail) {
@@ -2264,8 +2259,6 @@ void main() {
         logger.Write(ERROR, "Patchability test failed!");
         MemoryPatcher::Error = true;
     }
-
-    rage::init();
 
     setupCompatibility();
 

@@ -1,12 +1,12 @@
 #include "AWD.h"
 
+#include "Compatibility.h"
 #include "ScriptSettings.hpp"
 
 #include "Util/MathExt.h"
 #include "Util/Strings.hpp"
 #include "Util/UIUtils.h"
 
-#include "Memory/HandlingReplace.h"
 #include "Memory/Offsets.hpp"
 #include "Memory/VehicleExtensions.hpp"
 
@@ -16,22 +16,20 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <unordered_map>
 
 extern float g_DriveBiasTransfer;
 extern Vehicle g_playerVehicle;
 extern ScriptSettings g_settings;
 
 using VExt = VehicleExtensions;
+namespace HR = HandlingReplacement;
 
-float GetDriveBiasFront(Vehicle vehicle) {
-    auto* pHandling = (uint8_t*)HandlingReplace::GetOriginalHandling(vehicle);
-
-    if (!pHandling)
+float GetDriveBiasFront(void* pHandlingDataOrig) {
+    if (!pHandlingDataOrig)
         return -1.0f;
 
-    float fDriveBiasFront = *(float*)(pHandling + hOffsets1604.fDriveBiasFront);
-    float fDriveBiasRear = *(float*)(pHandling + hOffsets1604.fDriveBiasRear);
+    float fDriveBiasFront = *(float*)((uint8_t*)pHandlingDataOrig + hOffsets1604.fDriveBiasFront);
+    float fDriveBiasRear = *(float*)((uint8_t*)pHandlingDataOrig + hOffsets1604.fDriveBiasRear);
 
     float fDriveBiasFrontNorm;
 
@@ -50,7 +48,15 @@ float GetDriveBiasFront(Vehicle vehicle) {
 }
 
 void AWD::Update() {
-    float driveBiasFOriginal = GetDriveBiasFront(g_playerVehicle);
+    void* handlingDataOrig = nullptr;
+    void* handlingDataReplace = nullptr;
+    
+    if (!HR::GetHandlingData(g_playerVehicle, &handlingDataOrig, &handlingDataReplace)) {
+        HR::Enable(g_playerVehicle, &handlingDataReplace);
+        return;
+    }
+
+    float driveBiasFOriginal = GetDriveBiasFront(handlingDataOrig);
     float driveBiasFCustom = g_settings().DriveAssists.AWD.CustomBaseBias;
     float driveBiasF = driveBiasFOriginal;
 
