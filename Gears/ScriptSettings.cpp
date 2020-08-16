@@ -88,6 +88,21 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
     localSettings.DriveAssists.LSD.Enable = activeConfig->DriveAssists.LSD.Enable;
     localSettings.DriveAssists.LSD.Viscosity = activeConfig->DriveAssists.LSD.Viscosity;
 
+    localSettings.DriveAssists.AWD.Enable             = activeConfig->DriveAssists.AWD.Enable           ;
+    localSettings.DriveAssists.AWD.TransferMax        = activeConfig->DriveAssists.AWD.TransferMax      ;
+    localSettings.DriveAssists.AWD.UseCustomBaseBias  = activeConfig->DriveAssists.AWD.UseCustomBaseBias;
+    localSettings.DriveAssists.AWD.CustomBaseBias     = activeConfig->DriveAssists.AWD.CustomBaseBias   ;
+    localSettings.DriveAssists.AWD.UseTraction        = activeConfig->DriveAssists.AWD.UseTraction      ;
+    localSettings.DriveAssists.AWD.TractionLossMin    = activeConfig->DriveAssists.AWD.TractionLossMin  ;
+    localSettings.DriveAssists.AWD.TractionLossMax    = activeConfig->DriveAssists.AWD.TractionLossMax  ;
+    localSettings.DriveAssists.AWD.UseOversteer       = activeConfig->DriveAssists.AWD.UseOversteer     ;
+    localSettings.DriveAssists.AWD.OversteerMin       = activeConfig->DriveAssists.AWD.OversteerMin     ;
+    localSettings.DriveAssists.AWD.OversteerMax       = activeConfig->DriveAssists.AWD.OversteerMax     ;
+    localSettings.DriveAssists.AWD.UseUndersteer      = activeConfig->DriveAssists.AWD.UseUndersteer    ;
+    localSettings.DriveAssists.AWD.UndersteerMin      = activeConfig->DriveAssists.AWD.UndersteerMin    ;
+    localSettings.DriveAssists.AWD.UndersteerMax      = activeConfig->DriveAssists.AWD.UndersteerMax    ;
+    localSettings.DriveAssists.AWD.SpecialFlags       = activeConfig->DriveAssists.AWD.SpecialFlags     ;
+
     localSettings.ShiftOptions.UpshiftCut     = activeConfig->ShiftOptions.UpshiftCut    ;
     localSettings.ShiftOptions.DownshiftBlip  = activeConfig->ShiftOptions.DownshiftBlip ;
     localSettings.ShiftOptions.ClutchRateMult = activeConfig->ShiftOptions.ClutchRateMult;
@@ -244,6 +259,21 @@ void ScriptSettings::SaveGeneral() const {
 
     ini.SetBoolValue("DRIVING_ASSISTS", "LSD", DriveAssists.LSD.Enable);
     ini.SetDoubleValue("DRIVING_ASSISTS", "LSDViscosity", DriveAssists.LSD.Viscosity);
+
+    ini.SetBoolValue("DRIVING_ASSISTS",   "AWD", DriveAssists.AWD.Enable);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDTransferMax", DriveAssists.AWD.TransferMax);
+    ini.SetBoolValue("DRIVING_ASSISTS",   "AWDCustomBaseBias", DriveAssists.AWD.UseCustomBaseBias);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDCustomBaseBias", DriveAssists.AWD.CustomBaseBias);
+    ini.SetBoolValue("DRIVING_ASSISTS",   "AWDUseTraction", DriveAssists.AWD.UseTraction);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMin", DriveAssists.AWD.TractionLossMin);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMax", DriveAssists.AWD.TractionLossMax);
+    ini.SetBoolValue("DRIVING_ASSISTS",   "AWDUseOversteer", DriveAssists.AWD.UseOversteer);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDOversteerMin", DriveAssists.AWD.OversteerMin);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDOversteerMax", DriveAssists.AWD.OversteerMax);
+    ini.SetBoolValue("DRIVING_ASSISTS",   "AWDUseUndersteer", DriveAssists.AWD.UseUndersteer);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDUndersteerMin", DriveAssists.AWD.UndersteerMin);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDUndersteerMax", DriveAssists.AWD.UndersteerMax);
+    ini.SetLongValue("DRIVING_ASSISTS",   "AWDSpecialFlags", DriveAssists.AWD.SpecialFlags, nullptr, true);
 
     //[CUSTOM_STEERING]
     ini.SetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
@@ -609,6 +639,21 @@ void ScriptSettings::parseSettingsGeneral() {
 
     DriveAssists.LSD.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "LSD", DriveAssists.LSD.Enable);
     DriveAssists.LSD.Viscosity = ini.GetDoubleValue("DRIVING_ASSISTS", "LSDViscosity", DriveAssists.LSD.Viscosity);
+
+    DriveAssists.AWD.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "AWD", DriveAssists.AWD.Enable);
+    DriveAssists.AWD.TransferMax = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDTransferMax", DriveAssists.AWD.TransferMax);
+    DriveAssists.AWD.UseCustomBaseBias = ini.GetBoolValue("DRIVING_ASSISTS", "AWDCustomBaseBias", DriveAssists.AWD.UseCustomBaseBias);
+    DriveAssists.AWD.CustomBaseBias = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDCustomBaseBias", DriveAssists.AWD.CustomBaseBias);
+    DriveAssists.AWD.UseTraction = ini.GetBoolValue("DRIVING_ASSISTS", "AWDUseTraction", DriveAssists.AWD.UseTraction);
+    DriveAssists.AWD.TractionLossMin = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMin", DriveAssists.AWD.TractionLossMin);
+    DriveAssists.AWD.TractionLossMax = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMax", DriveAssists.AWD.TractionLossMax);
+    DriveAssists.AWD.UseOversteer = ini.GetBoolValue("DRIVING_ASSISTS", "AWDUseOversteer", DriveAssists.AWD.UseOversteer);
+    DriveAssists.AWD.OversteerMin = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDOversteerMin", DriveAssists.AWD.OversteerMin);
+    DriveAssists.AWD.OversteerMax = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDOversteerMax", DriveAssists.AWD.OversteerMax);
+    DriveAssists.AWD.UseUndersteer = ini.GetBoolValue("DRIVING_ASSISTS", "AWDUseUndersteer", DriveAssists.AWD.UseUndersteer);
+    DriveAssists.AWD.UndersteerMin = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDUndersteerMin", DriveAssists.AWD.UndersteerMin);
+    DriveAssists.AWD.UndersteerMax = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDUndersteerMax", DriveAssists.AWD.UndersteerMax);
+    DriveAssists.AWD.SpecialFlags = ini.GetLongValue("DRIVING_ASSISTS", "AWDSpecialFlags", DriveAssists.AWD.SpecialFlags);
 
     // [SHIFT_OPTIONS]
     ShiftOptions.UpshiftCut = ini.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);

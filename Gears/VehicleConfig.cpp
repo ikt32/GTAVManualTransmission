@@ -67,6 +67,21 @@ void VehicleConfig::loadSettings(const ScriptSettings& gSettings, const std::str
     DriveAssists.LSD.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "LSD", gSettings.DriveAssists.LSD.Enable);
     DriveAssists.LSD.Viscosity = ini.GetDoubleValue("DRIVING_ASSISTS", "LSDViscosity", gSettings.DriveAssists.LSD.Viscosity);
 
+    DriveAssists.AWD.Enable            = ini.GetBoolValue("DRIVING_ASSISTS",   "AWD", gSettings.DriveAssists.AWD.Enable);
+    DriveAssists.AWD.TransferMax       = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDTransferMax", gSettings.DriveAssists.AWD.TransferMax);
+    DriveAssists.AWD.UseCustomBaseBias = ini.GetBoolValue("DRIVING_ASSISTS",   "AWDCustomBaseBias", gSettings.DriveAssists.AWD.UseCustomBaseBias);
+    DriveAssists.AWD.CustomBaseBias    = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDCustomBaseBias", gSettings.DriveAssists.AWD.CustomBaseBias);
+    DriveAssists.AWD.UseTraction       = ini.GetBoolValue("DRIVING_ASSISTS",   "AWDUseTraction", gSettings.DriveAssists.AWD.UseTraction);
+    DriveAssists.AWD.TractionLossMin   = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMin", gSettings.DriveAssists.AWD.TractionLossMin);
+    DriveAssists.AWD.TractionLossMax   = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMax", gSettings.DriveAssists.AWD.TractionLossMax);
+    DriveAssists.AWD.UseOversteer      = ini.GetBoolValue("DRIVING_ASSISTS",   "AWDUseOversteer", gSettings.DriveAssists.AWD.UseOversteer);
+    DriveAssists.AWD.OversteerMin      = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDOversteerMin", gSettings.DriveAssists.AWD.OversteerMin);
+    DriveAssists.AWD.OversteerMax      = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDOversteerMax", gSettings.DriveAssists.AWD.OversteerMax);
+    DriveAssists.AWD.UseUndersteer     = ini.GetBoolValue("DRIVING_ASSISTS",   "AWDUseUndersteer", gSettings.DriveAssists.AWD.UseUndersteer);
+    DriveAssists.AWD.UndersteerMin     = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDUndersteerMin", gSettings.DriveAssists.AWD.UndersteerMin);
+    DriveAssists.AWD.UndersteerMax     = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDUndersteerMax", gSettings.DriveAssists.AWD.UndersteerMax);
+    DriveAssists.AWD.SpecialFlags      = ini.GetLongValue("DRIVING_ASSISTS",   "AWDSpecialFlags", gSettings.DriveAssists.AWD.SpecialFlags);
+
     // [SHIFT_OPTIONS]
     ShiftOptions.UpshiftCut = ini.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", gSettings.ShiftOptions.UpshiftCut);
     ShiftOptions.DownshiftBlip = ini.GetBoolValue("SHIFT_OPTIONS", "DownshiftBlip", gSettings.ShiftOptions.DownshiftBlip);

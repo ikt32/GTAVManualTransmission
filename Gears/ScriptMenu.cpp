@@ -1448,6 +1448,10 @@ void update_awdsettingsmenu() {
     g_menu.Title("AWD settings");
     g_menu.Subtitle("");
 
+    if (!HandlingReplacement::Available()) {
+        g_menu.Option("HandlingReplacement.asi not present");
+    }
+
     // Max bias, from the perspective of the "weak" axle
     g_menu.FloatOption("Max transfer", g_settings.DriveAssists.AWD.TransferMax, 0.10f, 1.0f, 0.05f);
 
@@ -1469,8 +1473,8 @@ void update_awdsettingsmenu() {
     g_menu.FloatOption("Understeer max", g_settings.DriveAssists.AWD.UndersteerMax, 0.0f, 45.0f, 1.0f); // degrees
 
     // See AWD.h for currently supported flags
-    std::string specialFlagsStr = fmt::format("{:8X}", g_settings.DriveAssists.AWD.SpecialFlags);
-    if (g_menu.Option(fmt::format("Special flags: {}", specialFlagsStr))) {
+    std::string specialFlagsStr = fmt::format("{:08X}", g_settings.DriveAssists.AWD.SpecialFlags);
+    if (g_menu.Option(fmt::format("Special flags (hex): {}", specialFlagsStr))) {
         std::string newFlags = GetKbEntryStr(specialFlagsStr);
         SetFlags(g_settings.DriveAssists.AWD.SpecialFlags, newFlags);
     }
