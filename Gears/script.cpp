@@ -1233,7 +1233,7 @@ bool isSkidding(float threshold) {
     float currSpeedWorld = g_vehData.mVelocity.y;
     bool skidding = abs(currSpeed - currSpeedWorld) > threshold;
     if (!skidding) {
-        auto skids = VExt::GetWheelSkidSmokeEffect(g_playerVehicle);
+        auto skids = VExt::GetWheelTractionVectorLength(g_playerVehicle);
         for (uint8_t i = 0; i < g_vehData.mWheelCount; ++i) {
             if (abs(skids[i]) > threshold && VExt::IsWheelPowered(g_playerVehicle, i)) {
                 skidding = true;
@@ -1420,7 +1420,7 @@ void functionEngLock() {
         for (int i = 0; i < g_vehData.mWheelCount; i++) {
             if (i >= wheelsToLock.size() || wheelsToLock[i]) {
                 VExt::SetWheelPower(g_playerVehicle, i, -lockingForce * sgn(g_vehData.mVelocity.y));
-                VExt::SetWheelSkidSmokeEffect(g_playerVehicle, i, lockingForce);
+                VExt::SetWheelTractionVectorLength(g_playerVehicle, i, lockingForce);
             }
             else {
                 float inpBrakeForce = *reinterpret_cast<float *>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce) * g_controls.BrakeVal;

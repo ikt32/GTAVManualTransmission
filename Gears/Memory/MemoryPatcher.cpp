@@ -73,8 +73,10 @@ void SetPatterns(int version) {
     steeringAssist = PatternInfo("\x0F\x84\xD0\x01\x00\x00" "\x0F\x28\x4B\x70" "\xF3\x0F\x10\x25\x00\x00\x00\x00" "\xF3\x0F\x10\x1D\x00\x00\x00\x00" "\x0F\x28\xC1" "\x0F\x28\xD1",
         "xx????" "xxx?" "xxx?????" "xxx?????" "xx?" "xx?", 
         { 0xE9, 0x00, 0x00, 0x00, 0x00, 0x90 });
+
+    // Valid for 877 to 1868, in 2060 last byte changed to 0xC4
     steeringControl = PatternInfo("\xF3\x0F\x11\x8B\xFC\x08\x00\x00" "\xF3\x0F\x10\x83\x00\x09\x00\x00" "\xF3\x0F\x58\x83\xFC\x08\x00\x00" "\x41\x0F\x2F\xC3",
-        "xxxx??xx" "xxxx??xx" "xxxx??xx" "xxxx", 
+        "xxxx??xx" "xxxx??xx" "xxxx??xx" "xxx?", 
         { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
 
     // Valid for 1604 (FiveM) to 1868+

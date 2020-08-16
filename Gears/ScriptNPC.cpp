@@ -249,7 +249,7 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
         float engineLoad = gearStates.ThrottleHang - map(rpm, 0.2f, 1.0f, 0.0f, 1.0f);
 
         bool skidding = false;
-        auto skids = VExt::GetWheelSkidSmokeEffect(npcVehicle);
+        auto skids = VExt::GetWheelTractionVectorLength(npcVehicle);
         for (uint8_t i = 0; i < VExt::GetNumWheels(npcVehicle); ++i) {
             if (abs(skids[i]) > 3.5f && VExt::IsWheelPowered(npcVehicle, i))
                 skidding = true;
