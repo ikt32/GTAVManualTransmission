@@ -15,6 +15,7 @@
 #include "StartingAnimation.h"
 #include "DrivingAssists.h"
 #include "ScriptHUD.h"
+#include "AWD.h"
 
 #include "UDPTelemetry/Socket.h"
 #include "UDPTelemetry/UDPTelemetry.h"
@@ -52,8 +53,6 @@
 #include <mutex>
 #include <filesystem>
 #include <numeric>
-
-#include "AWD.h"
 
 namespace fs = std::filesystem;
 using VExt = VehicleExtensions;
