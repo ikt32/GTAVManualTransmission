@@ -124,6 +124,10 @@ bool TrainerV::Active() {
     return false;
 }
 
+bool DashHook::Available() {
+    return g_DashHook_GetData && g_DashHook_SetData;
+}
+
 void DashHook_GetData(VehicleDashboardData* data) {
     if (g_DashHook_GetData) {
         g_DashHook_GetData(data);
@@ -149,6 +153,10 @@ void Dismemberment::AddBoneDraw(int handle, int start, int end) {
 void Dismemberment::RemoveBoneDraw(int handle) {
     if (g_Dismemberbent_RemoveBoneDraw)
         g_Dismemberbent_RemoveBoneDraw(handle);
+}
+
+bool HandlingReplacement::Available() {
+    return g_HR_Enable && g_HR_Disable && g_HR_GetHandlingData;
 }
 
 bool HandlingReplacement::Enable(int vehicle, void** pHandlingData) {
