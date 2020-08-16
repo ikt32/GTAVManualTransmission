@@ -189,8 +189,14 @@ void VehicleExtensions::Init() {
     brakePOffset = addr == 0 ? 0 : *(int*)(addr + 6) + 0x14;
     logger.Write(brakePOffset == 0 ? WARN : DEBUG, "BrakeP Offset: 0x%X", brakePOffset);
 
-    addr = mem::FindPattern("\x44\x88\xA3\x00\x00\x00\x00\x45\x8A\xF4", "xxx????xxx");
-    handbrakeOffset = addr == 0 ? 0 : *(int*)(addr + 3);
+    if (g_gameVersion >= G_VER_1_0_2060_0_STEAM) {
+        addr = mem::FindPattern("8A C2 24 01 C0 E0 04 08 81");
+        handbrakeOffset = addr == 0 ? 0 : *(int*)(addr + 19);
+    }
+    else {
+        addr = mem::FindPattern("\x44\x88\xA3\x00\x00\x00\x00\x45\x8A\xF4", "xxx????xxx");
+        handbrakeOffset = addr == 0 ? 0 : *(int*)(addr + 3);
+    }
     logger.Write(handbrakeOffset == 0 ? WARN : DEBUG, "Handbrake Offset: 0x%X", handbrakeOffset);
 
     addr = mem::FindPattern("\x0F\x29\x7C\x24\x30\x0F\x85\xE3\x00\x00\x00\xF3\x0F\x10\xB9\x68\x09\x00\x00", 
