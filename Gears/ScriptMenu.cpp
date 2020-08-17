@@ -1449,34 +1449,49 @@ void update_awdsettingsmenu() {
     g_menu.Subtitle("");
 
     if (!HandlingReplacement::Available()) {
-        g_menu.Option("HandlingReplacement.asi not present");
+        if (g_menu.Option("HandlingReplacement.asi missing",
+            { "Custom AWD needs HandlingReplacement. Press Select to go to the download page." })) {
+            WAIT(20);
+            PAD::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
+            ShellExecuteA(0, 0, "https://www.gta5-mods.com/tools/handling-replacement-library", 0, 0, SW_SHOW);
+        }
     }
+
+    g_menu.BoolOption("Use custom drive bias", g_settings.DriveAssists.AWD.UseCustomBaseBias, 
+        { "Override the front drive bias." });
+    g_menu.FloatOption("Custom front drive bias", g_settings.DriveAssists.AWD.CustomBaseBias, 0.01f, 0.99f, 0.01f, 
+        { "Value is front bias based: 0.01 is 1% front, 99% rear. 0.99 is 99% front, 1% rear.",
+          "Useful to set 1% to 9% and 91% to 99% drive biases, as GTA snaps to full FWD at more than 0.9 fDriveBiasFront and full RWD on less than 0.1 fDriveBiasFront." });
 
     g_menu.FloatOption("Drive bias @ max transfer", g_settings.DriveAssists.AWD.BiasAtMaxTransfer, 0.01f, 0.99f, 0.01f,
         { "Value is front bias based: 0.01 is 1% front, 99% rear. 0.99 is 99% front, 1% rear.",
-          "Example: if your usual Drive bias is 0.1 (so 90/10), and traction-loss transfer is enabled, a value here of 0.9 will send 90% of the torque to the front."});
+          "Example: if your usual Drive bias is 0.1 (so 90/10), and traction-loss transfer is enabled, a value here of 0.9 will send 90% of the torque to the front." });
 
-    g_menu.BoolOption("Use custom base drive bias", g_settings.DriveAssists.AWD.UseCustomBaseBias);
-    g_menu.FloatOption("Custom base drive bias", g_settings.DriveAssists.AWD.CustomBaseBias, 0.01f, 0.99f, 0.01f, 
-        { "Value is front bias based: 0.01 is 1% front, 99% rear. 0.99 is 99% front, 1% rear." });
+    g_menu.BoolOption("On traction loss", g_settings.DriveAssists.AWD.UseTraction, 
+        { "Transfer drive bias to the weaker wheels when the strong wheels break traction." } );
 
-    g_menu.BoolOption("On traction loss", g_settings.DriveAssists.AWD.UseTraction);
-    g_menu.FloatOption("Speed min", g_settings.DriveAssists.AWD.TractionLossMin, 1.0f, 2.0f, 0.05f); // "Strong" axle is  5% faster than "weak" axle 
-    g_menu.FloatOption("Speed max", g_settings.DriveAssists.AWD.TractionLossMax, 1.0f, 2.0f, 0.05f); // "Strong" axle is 50% faster than "weak" axle
+    g_menu.FloatOption("Speed min difference", g_settings.DriveAssists.AWD.TractionLossMin, 1.0f, 2.0f, 0.05f,
+        { "Speed difference for the transfer to kick in.", "1.05 is 5% faster, 1.50 is 50% faster, etc." });
+    g_menu.FloatOption("Speed max difference", g_settings.DriveAssists.AWD.TractionLossMax, 1.0f, 2.0f, 0.05f,
+        { "Speed difference for max transfer.", "1.05 is 5% faster, 1.50 is 50% faster, etc." });
 
-    // Should only be used for RWD-biased cars
-    g_menu.BoolOption("On oversteer", g_settings.DriveAssists.AWD.UseOversteer);
-    g_menu.FloatOption("Oversteer min", g_settings.DriveAssists.AWD.OversteerMin, 0.0f, 45.0f, 1.0f); // degrees
-    g_menu.FloatOption("Oversteer max", g_settings.DriveAssists.AWD.OversteerMax, 0.0f, 45.0f, 1.0f); // degrees
+    // // Should only be used for RWD-biased cars
+    // g_menu.BoolOption("On oversteer", g_settings.DriveAssists.AWD.UseOversteer);
+    // g_menu.FloatOption("Oversteer min", g_settings.DriveAssists.AWD.OversteerMin, 0.0f, 45.0f, 1.0f); // degrees
+    // g_menu.FloatOption("Oversteer max", g_settings.DriveAssists.AWD.OversteerMax, 0.0f, 45.0f, 1.0f); // degrees
+    // 
+    // // Should only be used for FWD-biased cars
+    // g_menu.BoolOption("On understeer", g_settings.DriveAssists.AWD.UseUndersteer);
+    // g_menu.FloatOption("Understeer min", g_settings.DriveAssists.AWD.UndersteerMin, 0.0f, 45.0f, 1.0f); // degrees
+    // g_menu.FloatOption("Understeer max", g_settings.DriveAssists.AWD.UndersteerMax, 0.0f, 45.0f, 1.0f); // degrees
 
-    // Should only be used for FWD-biased cars
-    g_menu.BoolOption("On understeer", g_settings.DriveAssists.AWD.UseUndersteer);
-    g_menu.FloatOption("Understeer min", g_settings.DriveAssists.AWD.UndersteerMin, 0.0f, 45.0f, 1.0f); // degrees
-    g_menu.FloatOption("Understeer max", g_settings.DriveAssists.AWD.UndersteerMax, 0.0f, 45.0f, 1.0f); // degrees
-
-    // See AWD.h for currently supported flags
+    const std::vector<std::string> specialFlagsDescr = 
+    {
+        "Flags for extra features. Current flags:",
+        "0: Enable torque transfer dial on y97y's BNR32",
+    };
     std::string specialFlagsStr = fmt::format("{:08X}", g_settings.DriveAssists.AWD.SpecialFlags);
-    if (g_menu.Option(fmt::format("Special flags (hex): {}", specialFlagsStr))) {
+    if (g_menu.Option(fmt::format("Special flags (hex): {}", specialFlagsStr), specialFlagsDescr)) {
         std::string newFlags = GetKbEntryStr(specialFlagsStr);
         SetFlags(g_settings.DriveAssists.AWD.SpecialFlags, newFlags);
     }
