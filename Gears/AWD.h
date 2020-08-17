@@ -11,4 +11,5 @@ namespace AWD {
     };
 
     void Update();
+    float GetTransferValue();
 }

@@ -138,8 +138,8 @@ public:
             // fDriveBiasFront != 0.5
             bool Enable = false;
 
-            // Max bias, from the perspective of the "weak" axle
-            float TransferMax = 0.5f;
+            // Bias when bias transfer is maximized
+            float BiasAtMaxTransfer = 0.5f;
 
             // AWD::EAWDMode Mode = AWD::EAWDMode::Automatic;
 

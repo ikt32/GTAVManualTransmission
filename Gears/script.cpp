@@ -147,8 +147,6 @@ void functionAutoGear1();
 void functionHillGravity();
 void functionAudioFX();
 
-float g_DriveBiasTransfer = 0.0f;
-
 void functionDash() {
     if (!g_settings.Misc.DashExtensions)
         return;
@@ -173,10 +171,11 @@ void functionDash() {
     }
 
     // https://www.gta5-mods.com/vehicles/nissan-skyline-gt-r-bnr32
-    if (g_settings().DriveAssists.AWD.SpecialFlags & AWD::AWD_REMAP_DIAL_Y97Y_R32) {
+    if (g_settings().DriveAssists.AWD.Enable && 
+        g_settings().DriveAssists.AWD.SpecialFlags & AWD::AWD_REMAP_DIAL_Y97Y_R32) {
         data.oilPressure = lerp(
             data.oilPressure,
-            g_DriveBiasTransfer,
+            AWD::GetTransferValue(),
             1.0f - pow(0.0001f, MISC::GET_FRAME_TIME()));
 
         // oil pressure gauge uses data.temp

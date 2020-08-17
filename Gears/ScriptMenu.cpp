@@ -1452,11 +1452,13 @@ void update_awdsettingsmenu() {
         g_menu.Option("HandlingReplacement.asi not present");
     }
 
-    // Max bias, from the perspective of the "weak" axle
-    g_menu.FloatOption("Max transfer", g_settings.DriveAssists.AWD.TransferMax, 0.10f, 1.0f, 0.05f);
+    g_menu.FloatOption("Drive bias @ max transfer", g_settings.DriveAssists.AWD.BiasAtMaxTransfer, 0.01f, 0.99f, 0.01f,
+        { "Value is front bias based: 0.01 is 1% front, 99% rear. 0.99 is 99% front, 1% rear.",
+          "Example: if your usual Drive bias is 0.1 (so 90/10), and traction-loss transfer is enabled, a value here of 0.9 will send 90% of the torque to the front."});
 
     g_menu.BoolOption("Use custom base drive bias", g_settings.DriveAssists.AWD.UseCustomBaseBias);
-    g_menu.FloatOption("Custom base drive bias", g_settings.DriveAssists.AWD.CustomBaseBias, 0.01f, 0.99f, 0.01f);
+    g_menu.FloatOption("Custom base drive bias", g_settings.DriveAssists.AWD.CustomBaseBias, 0.01f, 0.99f, 0.01f, 
+        { "Value is front bias based: 0.01 is 1% front, 99% rear. 0.99 is 99% front, 1% rear." });
 
     g_menu.BoolOption("On traction loss", g_settings.DriveAssists.AWD.UseTraction);
     g_menu.FloatOption("Speed min", g_settings.DriveAssists.AWD.TractionLossMin, 1.0f, 2.0f, 0.05f); // "Strong" axle is  5% faster than "weak" axle 

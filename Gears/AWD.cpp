@@ -17,12 +17,22 @@
 #include <algorithm>
 #include <cstdint>
 
-extern float g_DriveBiasTransfer;
 extern Vehicle g_playerVehicle;
 extern ScriptSettings g_settings;
 
 using VExt = VehicleExtensions;
 namespace HR = HandlingReplacement;
+
+namespace {
+    //  - 0.0: original drive bias
+    //  - 1.0: max drive bias transfer (from the weak axle)
+    float driveBiasTransferRatio = 0.0f;
+
+    const float dbgX = 0.5f;
+    const float dbgY = 0.0f;
+}
+
+float GetTraction(float driveBiasF, float maxTransfer);
 
 float GetDriveBiasFront(void* pHandlingDataOrig) {
     if (!pHandlingDataOrig)
@@ -53,7 +63,9 @@ void AWD::Update() {
     
     if (!HR::GetHandlingData(g_playerVehicle, &handlingDataOrig, &handlingDataReplace)) {
         if (!HR::Enable(g_playerVehicle, &handlingDataReplace)) {
-            UI::ShowText(0.5f, 0.000f, 0.5f, "Unsupported (check library)");
+            if (g_settings.Debug.DisplayInfo) {
+                UI::ShowText(dbgX, dbgY, 0.5f, "Unsupported (check library)");
+            }
             return;
         }
     }
@@ -64,22 +76,58 @@ void AWD::Update() {
 
     if (driveBiasFOriginal <= 0.0f || driveBiasFOriginal >= 1.0f ||
         driveBiasFCustom <= 0.0f || driveBiasFCustom >= 1.0f) {
-        UI::ShowText(0.5f, 0.000f, 0.5f, "Unsupported (change handling)");
-        UI::ShowText(0.5f, 0.025f, 0.5f, fmt::format("F: {:.2f}", driveBiasFOriginal));
+        if (g_settings.Debug.DisplayInfo) {
+            UI::ShowText(dbgX, dbgY, 0.5f, "Unsupported (change handling)");
+            UI::ShowText(dbgX, dbgY + 0.025f, 0.5f, fmt::format("F: {:.2f}", driveBiasFOriginal));
+        }
         return;
     }
 
     if (VExt::GetNumWheels(g_playerVehicle) != 4) {
-        UI::ShowText(0.5f, 0.000f, 0.5f, "Unsupported (need 4 wheels)");
+        if (g_settings.Debug.DisplayInfo) {
+            UI::ShowText(dbgX, dbgY, 0.5f, "Unsupported (need 4 wheels)");
+        }
         return;
     }
 
-    float MaxTransfer = g_settings().DriveAssists.AWD.TransferMax;
+    float maxTransfer = g_settings().DriveAssists.AWD.BiasAtMaxTransfer;
 
     if (g_settings().DriveAssists.AWD.UseCustomBaseBias) {
         driveBiasF = driveBiasFCustom;
     }
 
+    if (g_settings().DriveAssists.AWD.UseTraction) {
+        driveBiasF = GetTraction(driveBiasF, maxTransfer);
+    }
+
+    if (g_settings().DriveAssists.AWD.UseOversteer) {
+        
+    }
+
+    if (g_settings().DriveAssists.AWD.UseUndersteer) {
+
+    }
+
+    if (g_settings.Debug.DisplayInfo) {
+        UI::ShowText(dbgX, dbgY, 0.5f, fmt::format("T: {:.2f}", driveBiasTransferRatio));
+        UI::ShowText(dbgX, dbgY + 0.025f, 0.5f, fmt::format("F: {:.2f}", driveBiasF));
+    }
+
+    // replace value in (current) handling
+    auto handlingAddr = VExt::GetHandlingPtr(g_playerVehicle);
+
+    // Don't care about 0.0 or 1.0, as it never occurs.
+    *(float*)(handlingAddr + hOffsets1604.fDriveBiasFront) = driveBiasF * 2.0f;
+    *(float*)(handlingAddr + hOffsets1604.fDriveBiasRear) = 2.0f * (1.0f - (driveBiasF));
+}
+
+float AWD::GetTransferValue() {
+    return driveBiasTransferRatio;
+}
+
+// TODO: Handle case of 50/50 but send more power to whatever is not slipping
+float GetTraction(float driveBiasF, float maxTransfer) {
+    float outBias = driveBiasF;
     auto wheelSpeeds = VExt::GetTyreSpeeds(g_playerVehicle);
 
     float avgFrontSpeed = (wheelSpeeds[0] + wheelSpeeds[1]) / 2.0f;
@@ -92,44 +140,36 @@ void AWD::Update() {
     // rear biased
     if (driveBiasF < 0.5f && avgFrontSpeed > 1.0f &&
         (wheelSpeeds[2] > avgFrontSpeed * tlMin ||
-         wheelSpeeds[3] > avgFrontSpeed * tlMin)) {
+            wheelSpeeds[3] > avgFrontSpeed * tlMin)) {
 
         float maxSpeed = std::max(wheelSpeeds[2], wheelSpeeds[3]);
         float throttle = VExt::GetThrottle(g_playerVehicle);
 
-        g_DriveBiasTransfer = map(maxSpeed, avgFrontSpeed * tlMin, avgFrontSpeed * tlMax, 0.0f, 1.0f) * throttle;
-        g_DriveBiasTransfer = std::clamp(g_DriveBiasTransfer, 0.0f, 1.0f);
+        driveBiasTransferRatio = map(maxSpeed, avgFrontSpeed * tlMin, avgFrontSpeed * tlMax, 0.0f, 1.0f) * throttle;
+        driveBiasTransferRatio = std::clamp(driveBiasTransferRatio, 0.0f, 1.0f);
 
-        driveBiasF = map(g_DriveBiasTransfer, 0.0f, 1.0f, driveBiasF, MaxTransfer);
+        outBias = map(driveBiasTransferRatio, 0.0f, 1.0f, driveBiasF, maxTransfer);
 
-        driveBiasF = std::clamp(driveBiasF, 0.0f, MaxTransfer);
+        outBias = std::clamp(outBias, 0.0f, maxTransfer);
     }
     // front biased
     else if (driveBiasF > 0.5f && avgRearSpeed > 1.0f &&
         (wheelSpeeds[0] > avgRearSpeed * tlMin ||
-         wheelSpeeds[1] > avgRearSpeed * tlMin)) {
+            wheelSpeeds[1] > avgRearSpeed * tlMin)) {
 
         float maxSpeed = std::max(wheelSpeeds[0], wheelSpeeds[1]);
         float throttle = VExt::GetThrottle(g_playerVehicle);
 
-        g_DriveBiasTransfer = map(maxSpeed, avgRearSpeed * tlMin, avgRearSpeed * tlMax, 0.0f, 1.0f) * throttle;
-        g_DriveBiasTransfer = std::clamp(g_DriveBiasTransfer, 0.0f, 1.0f);
+        driveBiasTransferRatio = map(maxSpeed, avgRearSpeed * tlMin, avgRearSpeed * tlMax, 0.0f, 1.0f) * throttle;
+        driveBiasTransferRatio = std::clamp(driveBiasTransferRatio, 0.0f, 1.0f);
 
-        driveBiasF = map(g_DriveBiasTransfer, 0.0f, 1.0f, driveBiasF, MaxTransfer);
+        outBias = map(driveBiasTransferRatio, 0.0f, 1.0f, driveBiasF, maxTransfer);
 
-        driveBiasF = std::clamp(driveBiasF, MaxTransfer, 1.0f);
+        outBias = std::clamp(outBias, maxTransfer, 1.0f);
     }
     else {
-        g_DriveBiasTransfer = 0.0f;
+        driveBiasTransferRatio = 0.0f;
     }
 
-    UI::ShowText(0.5f, 0.000f, 0.5f, fmt::format("T: {:.2f}", g_DriveBiasTransfer));
-    UI::ShowText(0.5f, 0.025f, 0.5f, fmt::format("F: {:.2f}", driveBiasF));
-
-    // replace value in (current) handling
-    auto handlingAddr = VExt::GetHandlingPtr(g_playerVehicle);
-
-    // Don't care about 0.0 or 1.0, as it never occurs.
-    *(float*)(handlingAddr + hOffsets1604.fDriveBiasFront) = driveBiasF * 2.0f;
-    *(float*)(handlingAddr + hOffsets1604.fDriveBiasRear) = 2.0f * (1.0f - (driveBiasF));
+    return outBias;
 }
