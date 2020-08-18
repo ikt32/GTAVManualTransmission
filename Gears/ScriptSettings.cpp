@@ -262,7 +262,7 @@ void ScriptSettings::SaveGeneral() const {
 
     ini.SetBoolValue("DRIVING_ASSISTS",   "AWD", DriveAssists.AWD.Enable);
     ini.SetDoubleValue("DRIVING_ASSISTS", "AWDBiasAtMaxTransfer", DriveAssists.AWD.BiasAtMaxTransfer);
-    ini.SetBoolValue("DRIVING_ASSISTS",   "AWDCustomBaseBias", DriveAssists.AWD.UseCustomBaseBias);
+    ini.SetBoolValue("DRIVING_ASSISTS",   "AWDUseCustomBaseBias", DriveAssists.AWD.UseCustomBaseBias);
     ini.SetDoubleValue("DRIVING_ASSISTS", "AWDCustomBaseBias", DriveAssists.AWD.CustomBaseBias);
     ini.SetBoolValue("DRIVING_ASSISTS",   "AWDUseTraction", DriveAssists.AWD.UseTraction);
     ini.SetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMin", DriveAssists.AWD.TractionLossMin);
@@ -642,7 +642,7 @@ void ScriptSettings::parseSettingsGeneral() {
 
     DriveAssists.AWD.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "AWD", DriveAssists.AWD.Enable);
     DriveAssists.AWD.BiasAtMaxTransfer = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDBiasAtMaxTransfer", DriveAssists.AWD.BiasAtMaxTransfer);
-    DriveAssists.AWD.UseCustomBaseBias = ini.GetBoolValue("DRIVING_ASSISTS", "AWDCustomBaseBias", DriveAssists.AWD.UseCustomBaseBias);
+    DriveAssists.AWD.UseCustomBaseBias = ini.GetBoolValue("DRIVING_ASSISTS", "AWDUseCustomBaseBias", DriveAssists.AWD.UseCustomBaseBias);
     DriveAssists.AWD.CustomBaseBias = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDCustomBaseBias", DriveAssists.AWD.CustomBaseBias);
     DriveAssists.AWD.UseTraction = ini.GetBoolValue("DRIVING_ASSISTS", "AWDUseTraction", DriveAssists.AWD.UseTraction);
     DriveAssists.AWD.TractionLossMin = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMin", DriveAssists.AWD.TractionLossMin);

@@ -69,7 +69,7 @@ void VehicleConfig::loadSettings(const ScriptSettings& gSettings, const std::str
 
     DriveAssists.AWD.Enable            = ini.GetBoolValue("DRIVING_ASSISTS",   "AWD", gSettings.DriveAssists.AWD.Enable);
     DriveAssists.AWD.BiasAtMaxTransfer = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDBiasAtMaxTransfer", gSettings.DriveAssists.AWD.BiasAtMaxTransfer);
-    DriveAssists.AWD.UseCustomBaseBias = ini.GetBoolValue("DRIVING_ASSISTS",   "AWDCustomBaseBias", gSettings.DriveAssists.AWD.UseCustomBaseBias);
+    DriveAssists.AWD.UseCustomBaseBias = ini.GetBoolValue("DRIVING_ASSISTS",   "AWDUseCustomBaseBias", gSettings.DriveAssists.AWD.UseCustomBaseBias);
     DriveAssists.AWD.CustomBaseBias    = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDCustomBaseBias", gSettings.DriveAssists.AWD.CustomBaseBias);
     DriveAssists.AWD.UseTraction       = ini.GetBoolValue("DRIVING_ASSISTS",   "AWDUseTraction", gSettings.DriveAssists.AWD.UseTraction);
     DriveAssists.AWD.TractionLossMin   = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMin", gSettings.DriveAssists.AWD.TractionLossMin);
