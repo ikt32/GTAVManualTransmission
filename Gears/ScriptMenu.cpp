@@ -1415,11 +1415,11 @@ void update_driveassistmenu() {
           "A very high value might speed up the car too much, because this LSD adds power to the slower wheel. "
           "About 10 is decent and doesn't affect acceleration."});
 
-    g_menu.BoolOption("Enable AWD torque transfer", g_settings.DriveAssists.AWD.Enable,
+    g_menu.BoolOption("Enable adaptive AWD", g_settings.DriveAssists.AWD.Enable,
         { "Transfers torque to stabilize the car. See Nissans' ATTESA, Audis' Quattro and similar technologies.",
-          "Only active for AWD cars that don't have a 50/50 distribution."});
+          "Only works for AWD cars."});
 
-    g_menu.MenuOption("AWD torque transfer options", "awdsettingsmenu");
+    g_menu.MenuOption("Adaptive AWD options", "awdsettingsmenu");
 }
 
 void update_espsettingsmenu() {
@@ -1445,12 +1445,12 @@ void update_espsettingsmenu() {
 }
 
 void update_awdsettingsmenu() {
-    g_menu.Title("AWD settings");
+    g_menu.Title("Adaptive AWD");
     g_menu.Subtitle("");
 
     if (!HandlingReplacement::Available()) {
         if (g_menu.Option("HandlingReplacement.asi missing",
-            { "Custom AWD needs HandlingReplacement. Press Select to go to the download page." })) {
+            { "Adaptive AWD needs HandlingReplacement. Press Select to go to the download page." })) {
             WAIT(20);
             PAD::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
             ShellExecuteA(0, 0, "https://www.gta5-mods.com/tools/handling-replacement-library", 0, 0, SW_SHOW);
@@ -1475,20 +1475,22 @@ void update_awdsettingsmenu() {
     g_menu.FloatOption("Speed max difference", g_settings.DriveAssists.AWD.TractionLossMax, 1.0f, 2.0f, 0.05f,
         { "Speed difference for max transfer.", "1.05 is 5% faster, 1.50 is 50% faster, etc." });
 
-    // // Should only be used for RWD-biased cars
-    // g_menu.BoolOption("On oversteer", g_settings.DriveAssists.AWD.UseOversteer);
-    // g_menu.FloatOption("Oversteer min", g_settings.DriveAssists.AWD.OversteerMin, 0.0f, 45.0f, 1.0f); // degrees
-    // g_menu.FloatOption("Oversteer max", g_settings.DriveAssists.AWD.OversteerMax, 0.0f, 45.0f, 1.0f); // degrees
-    // 
-    // // Should only be used for FWD-biased cars
-    // g_menu.BoolOption("On understeer", g_settings.DriveAssists.AWD.UseUndersteer);
-    // g_menu.FloatOption("Understeer min", g_settings.DriveAssists.AWD.UndersteerMin, 0.0f, 45.0f, 1.0f); // degrees
-    // g_menu.FloatOption("Understeer max", g_settings.DriveAssists.AWD.UndersteerMax, 0.0f, 45.0f, 1.0f); // degrees
+    // Should only be used for RWD-biased cars
+    g_menu.BoolOption("On oversteer", g_settings.DriveAssists.AWD.UseOversteer,
+        { "Transfer drive bias when oversteer is detected. Mostly useful for RWD-biased cars." });
+    g_menu.FloatOption("Oversteer min", g_settings.DriveAssists.AWD.OversteerMin, 0.0f, 90.0f, 1.0f); // degrees
+    g_menu.FloatOption("Oversteer max", g_settings.DriveAssists.AWD.OversteerMax, 0.0f, 90.0f, 1.0f); // degrees
+    
+    // Should only be used for FWD-biased cars
+    g_menu.BoolOption("On understeer", g_settings.DriveAssists.AWD.UseUndersteer,
+        { "Transfer drive bias when understeer is detected. Mostly useful for FWD-biased cars." });
+    g_menu.FloatOption("Understeer min", g_settings.DriveAssists.AWD.UndersteerMin, 0.0f, 90.0f, 1.0f); // degrees
+    g_menu.FloatOption("Understeer max", g_settings.DriveAssists.AWD.UndersteerMax, 0.0f, 90.0f, 1.0f); // degrees
 
     const std::vector<std::string> specialFlagsDescr = 
     {
         "Flags for extra features. Current flags:",
-        "0: Enable torque transfer dial on y97y's BNR32",
+        "Bit 0: Enable torque transfer dial on y97y's BNR32",
     };
     std::string specialFlagsStr = fmt::format("{:08X}", g_settings.DriveAssists.AWD.SpecialFlags);
     if (g_menu.Option(fmt::format("Special flags (hex): {}", specialFlagsStr), specialFlagsDescr)) {

@@ -2,6 +2,7 @@
 
 #include "Compatibility.h"
 #include "ScriptSettings.hpp"
+#include "DrivingAssists.h"
 
 #include "Util/MathExt.h"
 #include "Util/Strings.hpp"
@@ -23,6 +24,11 @@ extern ScriptSettings g_settings;
 using VExt = VehicleExtensions;
 namespace HR = HandlingReplacement;
 
+struct STransferInfo {
+    float TransferRatio;
+    float NewDriveBiasF;
+};
+
 namespace {
     //  - 0.0: original drive bias
     //  - 1.0: max drive bias transfer (from the weak axle)
@@ -32,7 +38,9 @@ namespace {
     const float dbgY = 0.0f;
 }
 
-float GetTraction(float driveBiasF, float maxTransfer);
+STransferInfo GetTractionTransfer(float driveBiasF, float biasMax);
+STransferInfo GetOversteerTransfer(float driveBiasF, float biasMax, DrivingAssists::ESPData espData);
+STransferInfo GetUndersteerTransfer(float driveBiasF, float biasMax, DrivingAssists::ESPData espData);
 
 float GetDriveBiasFront(void* pHandlingDataOrig) {
     if (!pHandlingDataOrig)
@@ -90,22 +98,42 @@ void AWD::Update() {
         return;
     }
 
-    float maxTransfer = g_settings().DriveAssists.AWD.BiasAtMaxTransfer;
+    float biasMax = g_settings().DriveAssists.AWD.BiasAtMaxTransfer;
 
     if (g_settings().DriveAssists.AWD.UseCustomBaseBias) {
         driveBiasF = driveBiasFCustom;
     }
 
+    std::vector<STransferInfo> transferInfos{
+      { -1.0f, -1.0f }, // Traction
+      { -1.0f, -1.0f }, // Oversteer
+      { -1.0f, -1.0f }, // Understeer
+    };
+
     if (g_settings().DriveAssists.AWD.UseTraction) {
-        driveBiasF = GetTraction(driveBiasF, maxTransfer);
+        transferInfos[0] = GetTractionTransfer(driveBiasF, biasMax);
     }
 
-    if (g_settings().DriveAssists.AWD.UseOversteer) {
-        
+
+    if (g_settings().DriveAssists.AWD.UseOversteer || g_settings().DriveAssists.AWD.UseUndersteer) {
+        DrivingAssists::ESPData espData = DrivingAssists::GetESP();
+        if (g_settings().DriveAssists.AWD.UseOversteer) {
+            transferInfos[1] = GetOversteerTransfer(driveBiasF, biasMax, espData);
+        }
+        if (g_settings().DriveAssists.AWD.UseUndersteer) {
+            transferInfos[2] = GetUndersteerTransfer(driveBiasF, biasMax, espData);
+        }
     }
 
-    if (g_settings().DriveAssists.AWD.UseUndersteer) {
+    STransferInfo maxTransferInfo = *std::max_element(transferInfos.begin(), transferInfos.end(),
+        [](const auto& a, const auto& b) { return a.TransferRatio < b.TransferRatio; });
 
+    if (maxTransferInfo.TransferRatio > 0.0f) {
+        driveBiasTransferRatio = maxTransferInfo.TransferRatio;
+        driveBiasF = maxTransferInfo.NewDriveBiasF;
+    }
+    else {
+        driveBiasTransferRatio = 0.0f;
     }
 
     if (g_settings.Debug.DisplayInfo) {
@@ -125,8 +153,8 @@ float AWD::GetTransferValue() {
     return driveBiasTransferRatio;
 }
 
-// TODO: Handle case of 50/50 but send more power to whatever is not slipping
-float GetTraction(float driveBiasF, float maxTransfer) {
+STransferInfo GetTractionTransfer(float driveBiasF, float biasMax) {
+    float driveBiasTransferRatio = 0.0f;
     float outBias = driveBiasF;
     auto wheelSpeeds = VExt::GetTyreSpeeds(g_playerVehicle);
 
@@ -148,9 +176,9 @@ float GetTraction(float driveBiasF, float maxTransfer) {
         driveBiasTransferRatio = map(maxSpeed, avgFrontSpeed * tlMin, avgFrontSpeed * tlMax, 0.0f, 1.0f) * throttle;
         driveBiasTransferRatio = std::clamp(driveBiasTransferRatio, 0.0f, 1.0f);
 
-        outBias = map(driveBiasTransferRatio, 0.0f, 1.0f, driveBiasF, maxTransfer);
+        outBias = map(driveBiasTransferRatio, 0.0f, 1.0f, driveBiasF, biasMax);
 
-        outBias = std::clamp(outBias, 0.0f, maxTransfer);
+        outBias = std::clamp(outBias, 0.0f, biasMax);
     }
     // front biased
     else if (driveBiasF > 0.5f && avgRearSpeed > 1.0f &&
@@ -163,13 +191,57 @@ float GetTraction(float driveBiasF, float maxTransfer) {
         driveBiasTransferRatio = map(maxSpeed, avgRearSpeed * tlMin, avgRearSpeed * tlMax, 0.0f, 1.0f) * throttle;
         driveBiasTransferRatio = std::clamp(driveBiasTransferRatio, 0.0f, 1.0f);
 
-        outBias = map(driveBiasTransferRatio, 0.0f, 1.0f, driveBiasF, maxTransfer);
+        outBias = map(driveBiasTransferRatio, 0.0f, 1.0f, driveBiasF, biasMax);
 
-        outBias = std::clamp(outBias, maxTransfer, 1.0f);
+        outBias = std::clamp(outBias, biasMax, 1.0f);
     }
     else {
         driveBiasTransferRatio = 0.0f;
     }
 
-    return outBias;
+    return { driveBiasTransferRatio, outBias };
+}
+
+STransferInfo GetOversteerTransfer(float driveBiasF, float biasMax, DrivingAssists::ESPData espData) {
+    float transferRatio = 0.0f;
+    float outBias = driveBiasF;
+
+    float oversteerDeg = rad2deg(espData.OversteerAngle);
+    if (abs(oversteerDeg) > g_settings().DriveAssists.AWD.OversteerMin &&
+        ENTITY::GET_ENTITY_SPEED(g_playerVehicle) > 1.0f) {
+        float throttle = VExt::GetThrottle(g_playerVehicle);
+
+        transferRatio = map(
+            oversteerDeg,
+            g_settings().DriveAssists.AWD.OversteerMin, g_settings().DriveAssists.AWD.OversteerMax,
+            0.0f, 1.0f) * throttle;
+        transferRatio = std::clamp(transferRatio, 0.0f, 1.0f);
+
+        outBias = map(transferRatio, 0.0f, 1.0f, driveBiasF, biasMax);
+        outBias = std::clamp(outBias, 0.0f, 1.0f);
+    }
+
+    return { transferRatio, outBias };
+}
+
+STransferInfo GetUndersteerTransfer(float driveBiasF, float biasMax, DrivingAssists::ESPData espData) {
+    float transferRatio = 0.0f;
+    float outBias = driveBiasF;
+
+    float understeerDeg = rad2deg(espData.UndersteerAngle);
+    if (abs(understeerDeg) > g_settings().DriveAssists.AWD.UndersteerMin &&
+        ENTITY::GET_ENTITY_SPEED(g_playerVehicle) > 1.0f) {
+        float throttle = VExt::GetThrottle(g_playerVehicle);
+
+        transferRatio = map(
+            understeerDeg,
+            g_settings().DriveAssists.AWD.UndersteerMin, g_settings().DriveAssists.AWD.UndersteerMax,
+            0.0f, 1.0f) * throttle;
+        transferRatio = std::clamp(transferRatio, 0.0f, 1.0f);
+
+        outBias = map(transferRatio, 0.0f, 1.0f, driveBiasF, biasMax);
+        outBias = std::clamp(outBias, 0.0f, 1.0f);
+    }
+
+    return { transferRatio, outBias };
 }
