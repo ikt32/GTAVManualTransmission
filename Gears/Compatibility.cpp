@@ -6,19 +6,127 @@
 #include <Windows.h>
 #include <string>
 
-bool* g_TrainerVActive = nullptr;
 HMODULE g_TrainerVModule = nullptr;
+bool* g_TrainerVActive = nullptr;
 
-bool g_DashHookLoadLibbed = false;
 HMODULE g_DashHookModule = nullptr;
-
+bool g_DashHookLoadLibbed = false;
 void(*g_DashHook_GetData)(VehicleDashboardData*);
 void(*g_DashHook_SetData)(VehicleDashboardData);
 
 HMODULE g_DismembermentModule = nullptr;
-
 void(*g_Dismemberbent_AddBoneDraw)(int handle, int start, int end) = nullptr;
 void(*g_Dismemberbent_RemoveBoneDraw)(int handle) = nullptr;
+
+HMODULE g_HandlingReplacementModule = nullptr;
+bool(*g_HR_Enable)(int handle, void** pHandlingData) = nullptr;
+bool(*g_HR_Disable)(int handle, void** pHandlingData) = nullptr;
+bool(*g_HR_GetHandlingData)(int handle, void** pHandlingDataOriginal, void** pHandlingDataReplaced) = nullptr;
+
+template <typename T>
+T CheckAddr(HMODULE lib, const std::string& funcName)
+{
+    FARPROC func = GetProcAddress(lib, funcName.c_str());
+    if (!func)
+    {
+        logger.Write(ERROR, "[Compat] Couldn't get function [%s]", funcName.c_str());
+        return nullptr;
+    }
+    logger.Write(DEBUG, "[Compat] Found function [%s]", funcName.c_str());
+    return reinterpret_cast<T>(func);
+}
+
+void setupTrainerV() {
+    logger.Write(INFO, "[Compat] Setting up TrainerV");
+    g_TrainerVModule = GetModuleHandle(L"trainerv.asi");
+    if (!g_TrainerVModule) {
+        logger.Write(INFO, "[Compat] TrainerV.asi not found");
+        return;
+    }
+    g_TrainerVActive = CheckAddr<bool*>(g_TrainerVModule, "?Menu1@@3_NA");
+}
+
+void setupDashHook() {
+    g_DashHookLoadLibbed = false;
+    logger.Write(INFO, "[Compat] Setting up DashHook");
+    g_DashHookModule = GetModuleHandle(L"DashHook.dll");
+    if (!g_DashHookModule) {
+        logger.Write(INFO, "DashHook.dll not found running, loading...");
+        g_DashHookModule = LoadLibrary(L"DashHook.dll");
+        if (!g_DashHookModule) {
+            DWORD lastError = GetLastError();
+            logger.Write(INFO, "[Compat] DashHook.dll load failed, error [%lu]", lastError);
+            return;
+        }
+        g_DashHookLoadLibbed = true;
+    }
+
+    g_DashHook_GetData = CheckAddr<void(*)(VehicleDashboardData*)>(g_DashHookModule, "DashHook_GetData");
+    g_DashHook_SetData = CheckAddr<void(*)(VehicleDashboardData)>(g_DashHookModule, "DashHook_SetData");
+}
+
+void setupDismemberment() {
+    logger.Write(INFO, "[Compat] Setting up DismembermentASI");
+    g_DismembermentModule = GetModuleHandle(L"DismembermentASI.asi");
+    if (!g_DismembermentModule) {
+        logger.Write(INFO, "[Compat] DismembermentASI.asi not found");
+        return;
+    }
+
+    g_Dismemberbent_AddBoneDraw = CheckAddr<void(*)(int, int, int)>(g_DismembermentModule, "AddBoneDraw");
+    g_Dismemberbent_RemoveBoneDraw = CheckAddr<void(*)(int)>(g_DismembermentModule, "RemoveBoneDraw");
+}
+
+void setupHandlingReplacement() {
+    logger.Write(INFO, "[Compat] Setting up HandlingReplacement");
+    g_HandlingReplacementModule = GetModuleHandle(L"HandlingReplacement.asi");
+    if (!g_HandlingReplacementModule) {
+        logger.Write(INFO, "[Compat] HandlingReplacement.asi not found");
+        return;
+    }
+
+    g_HR_Enable = CheckAddr<bool(*)(int, void**)>(g_HandlingReplacementModule, "HR_Enable");
+    g_HR_Disable = CheckAddr<bool(*)(int, void**)>(g_HandlingReplacementModule, "HR_Disable");
+    g_HR_GetHandlingData = CheckAddr<bool(*)(int, void**, void**)>(g_HandlingReplacementModule, "HR_GetHandlingData");
+}
+
+void setupCompatibility() {
+    setupTrainerV();
+    setupDashHook();
+    setupDismemberment();
+    setupHandlingReplacement();
+}
+
+void releaseCompatibility() {
+    g_TrainerVModule = nullptr;
+    g_TrainerVActive = nullptr;
+
+    if (g_DashHookLoadLibbed) {
+        logger.Write(DEBUG, "[Compat] DashHook.dll FreeLibrary");
+        if (FreeLibrary(g_DashHookModule)) {
+            g_DashHookModule = nullptr;
+        }
+        else {
+            logger.Write(ERROR, "[Compat] DashHook.dll FreeLibrary failed [%ul]", GetLastError());
+        }
+    }
+    g_DashHook_GetData = nullptr;
+    g_DashHook_SetData = nullptr;
+
+    g_DismembermentModule = nullptr;
+    g_Dismemberbent_AddBoneDraw = nullptr;
+    g_Dismemberbent_RemoveBoneDraw = nullptr;
+}
+
+bool TrainerV::Active() {
+    if (g_TrainerVActive)
+        return *g_TrainerVActive;
+    return false;
+}
+
+bool DashHook::Available() {
+    return g_DashHook_GetData && g_DashHook_SetData;
+}
 
 void DashHook_GetData(VehicleDashboardData* data) {
     if (g_DashHook_GetData) {
@@ -30,93 +138,6 @@ void DashHook_SetData(VehicleDashboardData data) {
     if (g_DashHook_SetData) {
         g_DashHook_SetData(data);
     }
-}
-
-template <typename T>
-T CheckAddr(HMODULE lib, const std::string& funcName)
-{
-    FARPROC func = GetProcAddress(lib, funcName.c_str());
-    if (!func)
-    {
-        logger.Write(ERROR, "Couldn't get function [%s]", funcName.c_str());
-        return nullptr;
-    }
-    logger.Write(DEBUG, "Found function [%s]", funcName.c_str());
-    return reinterpret_cast<T>(func);
-}
-
-void setupTrainerV() {
-    logger.Write(INFO, "Setting up TrainerV compatibility");
-    g_TrainerVModule = GetModuleHandle(L"trainerv.asi");
-    if (!g_TrainerVModule) {
-        logger.Write(INFO, "TrainerV.asi not found");
-        return;
-    }
-    g_TrainerVActive = CheckAddr<bool*>(g_TrainerVModule, "?Menu1@@3_NA");
-}
-
-void setupDashHook() {
-    g_DashHookLoadLibbed = false;
-    logger.Write(INFO, "Setting up DashHook compatibility");
-    g_DashHookModule = GetModuleHandle(L"DashHook.dll");
-    if (!g_DashHookModule) {
-        logger.Write(INFO, "DashHook.dll not found running, loading...");
-        g_DashHookModule = LoadLibrary(L"DashHook.dll");
-        if (!g_DashHookModule) {
-            DWORD lastError = GetLastError();
-            logger.Write(INFO, "DashHook.dll load failed, error [%lu]", lastError);
-            return;
-        }
-        g_DashHookLoadLibbed = true;
-    }
-
-    g_DashHook_GetData = CheckAddr<void(*)(VehicleDashboardData*)>(g_DashHookModule, "DashHook_GetData");
-    g_DashHook_SetData = CheckAddr<void(*)(VehicleDashboardData)>(g_DashHookModule, "DashHook_SetData");
-}
-
-void setupDismemberment() {
-    logger.Write(INFO, "Setting up DismembermentASI");
-    g_DismembermentModule = GetModuleHandle(L"DismembermentASI.asi");
-    if (!g_DismembermentModule) {
-        logger.Write(INFO, "DismembermentASI.asi not found");
-        return;
-    }
-
-    g_Dismemberbent_AddBoneDraw = CheckAddr<void(*)(int, int, int)>(g_DismembermentModule, "AddBoneDraw");
-    g_Dismemberbent_RemoveBoneDraw = CheckAddr<void(*)(int)>(g_DismembermentModule, "RemoveBoneDraw");
-}
-
-void setupCompatibility() {
-    setupTrainerV();
-    setupDashHook();
-    setupDismemberment();
-}
-
-bool TrainerV::Active() {
-    if (g_TrainerVActive)
-        return *g_TrainerVActive;
-    return false;
-}
-
-void releaseCompatibility() {
-    g_TrainerVModule = nullptr;
-    g_TrainerVActive = nullptr;
-
-    if (g_DashHookLoadLibbed) {
-        logger.Write(DEBUG, "DashHook.dll FreeLibrary");
-        if (FreeLibrary(g_DashHookModule)) {
-            g_DashHookModule = nullptr;
-        }
-        else {
-            logger.Write(ERROR, "DashHook.dll FreeLibrary failed [%ul]", GetLastError());
-        }
-    }
-    g_DashHook_GetData = nullptr;
-    g_DashHook_SetData = nullptr;
-
-    g_DismembermentModule = nullptr;
-    g_Dismemberbent_AddBoneDraw = nullptr;
-    g_Dismemberbent_RemoveBoneDraw = nullptr;
 }
 
 bool Dismemberment::Available() {
@@ -134,3 +155,27 @@ void Dismemberment::RemoveBoneDraw(int handle) {
         g_Dismemberbent_RemoveBoneDraw(handle);
 }
 
+bool HandlingReplacement::Available() {
+    return g_HR_Enable && g_HR_Disable && g_HR_GetHandlingData;
+}
+
+bool HandlingReplacement::Enable(int vehicle, void** pHandlingData) {
+    if (g_HR_Enable) {
+        return g_HR_Enable(vehicle, pHandlingData);
+    }
+    return false;
+}
+
+bool HandlingReplacement::Disable(int vehicle, void** pHandlingData) {
+    if (g_HR_Disable) {
+        return g_HR_Disable(vehicle, pHandlingData);
+    }
+    return false;
+}
+
+bool HandlingReplacement::GetHandlingData(int vehicle, void** pHandlingDataOriginal, void** pHandlingDataReplaced) {
+    if (g_HR_GetHandlingData) {
+        return g_HR_GetHandlingData(vehicle, pHandlingDataOriginal, pHandlingDataReplaced);
+    }
+    return false;
+}

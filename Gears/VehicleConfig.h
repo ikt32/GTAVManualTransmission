@@ -75,6 +75,39 @@ public:
             bool Enable = false;
             float Viscosity = 1.0f;
         } LSD;
+
+        struct {
+            // Only active for cars with
+            // fDriveBiasFront >= 0.1 &&
+            // fDriveBiasFront <= 0.9 &&
+            // fDriveBiasFront != 0.5
+            bool Enable = false;
+
+            // Bias when bias transfer is maximized
+            float BiasAtMaxTransfer = 0.5f;
+
+            // AWD::EAWDMode Mode = AWD::EAWDMode::Automatic;
+
+            bool UseCustomBaseBias = false;
+            float CustomBaseBias = 0.01f;
+
+            bool UseTraction = false;
+            float TractionLossMin = 1.05f; // "Strong" axle is  5% faster than "weak" axle 
+            float TractionLossMax = 1.50f; // "Strong" axle is 50% faster than "weak" axle
+
+            // Should only be used for RWD-biased cars
+            bool UseOversteer = false;
+            float OversteerMin = 5.0f; // degrees
+            float OversteerMax = 15.0f; // degrees
+
+            // Should only be used for FWD-biased cars
+            bool UseUndersteer = false;
+            float UndersteerMin = 5.0f; // degrees
+            float UndersteerMax = 15.0f; // degrees
+
+            // See AWD.h for currently supported flags
+            uint32_t SpecialFlags = 0;
+        } AWD;
     } DriveAssists;
 
     // [SHIFT_OPTIONS]
@@ -127,112 +160,6 @@ public:
     struct {
         float CustomRotationDegrees = 720.0f;
     } CustomSteering;
-
-    // [HUD]
-    struct {
-        bool Enable = true;
-
-        // Fonts:
-        // 0 - Chalet London
-        // 1 - Sign Painter
-        // 2 - Slab Serif
-        // 4 - Chalet Cologne
-        // 7 - Pricedown
-        int Font = 4;
-
-        bool Outline = true;
-
-        struct {
-            bool Enable = true;
-            float XPos = 0.9525f;
-            float YPos = 0.885f;
-            float Size = 0.700f;
-            int TopColorR = 255;
-            int TopColorG = 63;
-            int TopColorB = 63;
-            int ColorR = 255;
-            int ColorG = 255;
-            int ColorB = 255;
-        } Gear;
-
-        struct {
-            bool Enable = true;
-            float XPos = 0.935f;
-            float YPos = 0.885f;
-            float Size = 0.700f;
-            int ColorR = 255;
-            int ColorG = 255;
-            int ColorB = 255;
-        } ShiftMode;
-
-        struct {
-            // can be kph, mph, or ms
-            std::string Speedo = "kph";
-            bool ShowUnit = true;
-            float XPos = 0.860f;
-            float YPos = 0.885f;
-            float Size = 0.700f;
-            int ColorR = 255;
-            int ColorG = 255;
-            int ColorB = 255;
-        } Speedo;
-
-        struct {
-            bool Enable = true;
-            float Redline = 0.850f;
-
-            float XPos = 0.120f;
-            float YPos = 0.765f;
-            float XSz = 0.140f;
-            float YSz = 0.005f;
-
-            int BgR = 0;
-            int BgG = 0;
-            int BgB = 0;
-            int BgA = 128;
-
-            int FgR = 255;
-            int FgG = 255;
-            int FgB = 255;
-            int FgA = 255;
-
-            int RedlineR = 255;
-            int RedlineG = 92;
-            int RedlineB = 0;
-            int RedlineA = 255;
-
-            int RevLimitR = 255;
-            int RevLimitG = 0;
-            int RevLimitB = 0;
-            int RevLimitA = 255;
-        } RPMBar;
-
-        struct {
-            bool Enable = false;
-            float XPos = 0.500f;
-            float YPos = 0.035f;
-            float Size = 1.000f;
-        } DashIndicators;
-
-        struct {
-            bool Enable = false;
-            float XPos = 0.5f;
-            float YPos = 0.95f;
-            float XSz = 0.5f;
-            float YSz = 0.05f;
-            float MarkerXSz = 0.020f;
-
-            int BgR = 0;
-            int BgG = 0;
-            int BgB = 0;
-            int BgA = 128;
-
-            int FgR = 255;
-            int FgG = 255;
-            int FgB = 255;
-            int FgA = 255;
-        } MouseSteering;
-    } HUD;
 
     // [MISC]
     struct {

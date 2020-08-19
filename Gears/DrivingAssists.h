@@ -13,9 +13,15 @@ namespace DrivingAssists {
 
     struct ESPData {
         bool Use;
+        // Whether it passed the ESP Understeer threshold
         bool Understeer;
+
+        // Whether it's a valid understeer angle
+        bool UndersteerAngleValid;
+
         // average front wheels slip angle
         float UndersteerAngle; // rad
+
         bool Oversteer;
         // average rear wheels slip angle
         float OversteerAngle; // rad

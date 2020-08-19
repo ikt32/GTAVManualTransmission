@@ -10,6 +10,8 @@
 #include <inc/natives.h>
 #include <fmt/format.h>
 
+#include "Util/UIUtils.h"
+
 using VExt = VehicleExtensions;
 
 extern ScriptSettings g_settings;
@@ -74,27 +76,20 @@ DrivingAssists::ESPData DrivingAssists::GetESP() {
 
     float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * steerMult;
 
-    Vector3 vecPredStr{
-        speed * -sin(avgAngle / g_settings.Wheel.Steering.SteerMult), 0,
-        speed * cos(avgAngle / g_settings.Wheel.Steering.SteerMult), 0,
-        0, 0
-    };
-
     // understeer
     {
         Vector3 vecNextRot = (vecNextSpd + rotRelative) * 0.5f;
-        espData.UndersteerAngle = GetAngleBetween(vecNextRot, vecPredStr);
+        Vector3 vecNextRotNorm = Normalize(vecNextRot);
+        Vector3 vecFrontNorm{};
+        vecFrontNorm.y = 1.0f;
 
-        float dSpdStr = Distance(vecNextSpd, vecPredStr);
-        float aSpdStr = GetAngleBetween(vecNextSpd, vecPredStr);
+        float anglePhys = GetAngleBetween(vecFrontNorm, vecNextRotNorm);
+        espData.UndersteerAngle = abs(avgAngle) - abs(anglePhys);
+        espData.UndersteerAngleValid = espData.UndersteerAngle > 0.0f && Length(vecNextRot) > 3.0f;
 
-        float dSpdRot = Distance(vecNextSpd, vecNextRot);
-        float aSpdRot = GetAngleBetween(vecNextSpd, vecNextRot);
-
-        if (dSpdStr > dSpdRot && sgn(aSpdRot) == sgn(aSpdStr)) {
-            if (abs(espData.UndersteerAngle) > deg2rad(g_settings().DriveAssists.ESP.UnderMin) && g_vehData.mVelocity.y > 10.0f && abs(avgAngle) > deg2rad(2.0f)) {
-                espData.Understeer = true;
-            }
+        if (espData.UndersteerAngleValid &&
+            abs(espData.UndersteerAngle) > deg2rad(g_settings().DriveAssists.ESP.UnderMin)) {
+            espData.Understeer = true;
         }
     }
 

@@ -10,6 +10,7 @@
 
 #include <winerror.h>
 
+#include <algorithm>
 #include <chrono>
 #include <vector>
 

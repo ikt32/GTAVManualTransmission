@@ -81,6 +81,7 @@ public:
     static void SetArenaBoost(Vehicle handle, float value);
 
     static uint64_t GetHandlingPtr(Vehicle handle);
+    static void SetHandlingPtr(Vehicle handle, uint64_t value);
 
     static uint32_t GetLightStates(Vehicle handle);
     static void SetLightStates(Vehicle handle, uint32_t value);
@@ -185,6 +186,9 @@ public:
 
     static bool IsWheelPowered(Vehicle handle, uint8_t index);
     static std::vector<uint16_t> GetWheelFlags(Vehicle handle);
+
+    static uint64_t GetWheelHandlingPtr(Vehicle handle, uint8_t index);
+    static void SetWheelHandlingPtr(Vehicle handle, uint8_t index, uint64_t value);
 
     static std::vector<uint32_t> GetVehicleFlags(Vehicle handle);
 private:

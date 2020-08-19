@@ -88,6 +88,21 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
     localSettings.DriveAssists.LSD.Enable = activeConfig->DriveAssists.LSD.Enable;
     localSettings.DriveAssists.LSD.Viscosity = activeConfig->DriveAssists.LSD.Viscosity;
 
+    localSettings.DriveAssists.AWD.Enable             = activeConfig->DriveAssists.AWD.Enable           ;
+    localSettings.DriveAssists.AWD.BiasAtMaxTransfer  = activeConfig->DriveAssists.AWD.BiasAtMaxTransfer;
+    localSettings.DriveAssists.AWD.UseCustomBaseBias  = activeConfig->DriveAssists.AWD.UseCustomBaseBias;
+    localSettings.DriveAssists.AWD.CustomBaseBias     = activeConfig->DriveAssists.AWD.CustomBaseBias   ;
+    localSettings.DriveAssists.AWD.UseTraction        = activeConfig->DriveAssists.AWD.UseTraction      ;
+    localSettings.DriveAssists.AWD.TractionLossMin    = activeConfig->DriveAssists.AWD.TractionLossMin  ;
+    localSettings.DriveAssists.AWD.TractionLossMax    = activeConfig->DriveAssists.AWD.TractionLossMax  ;
+    localSettings.DriveAssists.AWD.UseOversteer       = activeConfig->DriveAssists.AWD.UseOversteer     ;
+    localSettings.DriveAssists.AWD.OversteerMin       = activeConfig->DriveAssists.AWD.OversteerMin     ;
+    localSettings.DriveAssists.AWD.OversteerMax       = activeConfig->DriveAssists.AWD.OversteerMax     ;
+    localSettings.DriveAssists.AWD.UseUndersteer      = activeConfig->DriveAssists.AWD.UseUndersteer    ;
+    localSettings.DriveAssists.AWD.UndersteerMin      = activeConfig->DriveAssists.AWD.UndersteerMin    ;
+    localSettings.DriveAssists.AWD.UndersteerMax      = activeConfig->DriveAssists.AWD.UndersteerMax    ;
+    localSettings.DriveAssists.AWD.SpecialFlags       = activeConfig->DriveAssists.AWD.SpecialFlags     ;
+
     localSettings.ShiftOptions.UpshiftCut     = activeConfig->ShiftOptions.UpshiftCut    ;
     localSettings.ShiftOptions.DownshiftBlip  = activeConfig->ShiftOptions.DownshiftBlip ;
     localSettings.ShiftOptions.ClutchRateMult = activeConfig->ShiftOptions.ClutchRateMult;
@@ -125,88 +140,6 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
     localSettings.Wheel.Steering.Gamma     = activeConfig->Wheel.Steering.Gamma;
 
     localSettings.CustomSteering.CustomRotationDegrees = activeConfig->CustomSteering.CustomRotationDegrees;
-
-    // oh dear lord
-    localSettings.HUD.Enable =               activeConfig->HUD.Enable;               
-    localSettings.HUD.Font =                 activeConfig->HUD.Font;                 
-    localSettings.HUD.Outline =              activeConfig->HUD.Outline;              
-
-    localSettings.HUD.Gear.Enable =          activeConfig->HUD.Gear.Enable;          
-    localSettings.HUD.Gear.XPos =            activeConfig->HUD.Gear.XPos;            
-    localSettings.HUD.Gear.YPos =            activeConfig->HUD.Gear.YPos;            
-    localSettings.HUD.Gear.Size =            activeConfig->HUD.Gear.Size;            
-    localSettings.HUD.Gear.TopColorR =       activeConfig->HUD.Gear.TopColorR;       
-    localSettings.HUD.Gear.TopColorG =       activeConfig->HUD.Gear.TopColorG;       
-    localSettings.HUD.Gear.TopColorB =       activeConfig->HUD.Gear.TopColorB;       
-    localSettings.HUD.Gear.ColorR =          activeConfig->HUD.Gear.ColorR;          
-    localSettings.HUD.Gear.ColorG =          activeConfig->HUD.Gear.ColorG;          
-    localSettings.HUD.Gear.ColorB =          activeConfig->HUD.Gear.ColorB;          
-
-    localSettings.HUD.ShiftMode.Enable =     activeConfig->HUD.ShiftMode.Enable;     
-    localSettings.HUD.ShiftMode.XPos =       activeConfig->HUD.ShiftMode.XPos;       
-    localSettings.HUD.ShiftMode.YPos =       activeConfig->HUD.ShiftMode.YPos;       
-    localSettings.HUD.ShiftMode.Size =       activeConfig->HUD.ShiftMode.Size;       
-    localSettings.HUD.ShiftMode.ColorR =     activeConfig->HUD.ShiftMode.ColorR;     
-    localSettings.HUD.ShiftMode.ColorG =     activeConfig->HUD.ShiftMode.ColorG;     
-    localSettings.HUD.ShiftMode.ColorB =     activeConfig->HUD.ShiftMode.ColorB;     
-
-    localSettings.HUD.Speedo.Speedo =        activeConfig->HUD.Speedo.Speedo;        
-    localSettings.HUD.Speedo.ShowUnit =      activeConfig->HUD.Speedo.ShowUnit;      
-    localSettings.HUD.Speedo.XPos =          activeConfig->HUD.Speedo.XPos;          
-    localSettings.HUD.Speedo.YPos =          activeConfig->HUD.Speedo.YPos;          
-    localSettings.HUD.Speedo.Size =          activeConfig->HUD.Speedo.Size;          
-    localSettings.HUD.Speedo.ColorR =        activeConfig->HUD.Speedo.ColorR;        
-    localSettings.HUD.Speedo.ColorG =        activeConfig->HUD.Speedo.ColorG;        
-    localSettings.HUD.Speedo.ColorB =        activeConfig->HUD.Speedo.ColorB;        
-
-    localSettings.HUD.RPMBar.Enable =        activeConfig->HUD.RPMBar.Enable;        
-    localSettings.HUD.RPMBar.XPos =          activeConfig->HUD.RPMBar.XPos;          
-    localSettings.HUD.RPMBar.YPos =          activeConfig->HUD.RPMBar.YPos;          
-    localSettings.HUD.RPMBar.XSz =           activeConfig->HUD.RPMBar.XSz;           
-    localSettings.HUD.RPMBar.YSz =           activeConfig->HUD.RPMBar.YSz;           
-    localSettings.HUD.RPMBar.Redline =       activeConfig->HUD.RPMBar.Redline;       
-
-    localSettings.HUD.RPMBar.BgR =           activeConfig->HUD.RPMBar.BgR;           
-    localSettings.HUD.RPMBar.BgG =           activeConfig->HUD.RPMBar.BgG;           
-    localSettings.HUD.RPMBar.BgB =           activeConfig->HUD.RPMBar.BgB;           
-    localSettings.HUD.RPMBar.BgA =           activeConfig->HUD.RPMBar.BgA;           
-
-    localSettings.HUD.RPMBar.FgR =           activeConfig->HUD.RPMBar.FgR;           
-    localSettings.HUD.RPMBar.FgG =           activeConfig->HUD.RPMBar.FgG;           
-    localSettings.HUD.RPMBar.FgB =           activeConfig->HUD.RPMBar.FgB;           
-    localSettings.HUD.RPMBar.FgA =           activeConfig->HUD.RPMBar.FgA;           
-
-    localSettings.HUD.RPMBar.RedlineR =      activeConfig->HUD.RPMBar.RedlineR;      
-    localSettings.HUD.RPMBar.RedlineG =      activeConfig->HUD.RPMBar.RedlineG;      
-    localSettings.HUD.RPMBar.RedlineB =      activeConfig->HUD.RPMBar.RedlineB;      
-    localSettings.HUD.RPMBar.RedlineA =      activeConfig->HUD.RPMBar.RedlineA;      
-
-    localSettings.HUD.RPMBar.RevLimitR =     activeConfig->HUD.RPMBar.RevLimitR;     
-    localSettings.HUD.RPMBar.RevLimitG =     activeConfig->HUD.RPMBar.RevLimitG;     
-    localSettings.HUD.RPMBar.RevLimitB =     activeConfig->HUD.RPMBar.RevLimitB;     
-    localSettings.HUD.RPMBar.RevLimitA =     activeConfig->HUD.RPMBar.RevLimitA;     
-
-    localSettings.HUD.DashIndicators.Enable =activeConfig->HUD.DashIndicators.Enable;
-    localSettings.HUD.DashIndicators.XPos =  activeConfig->HUD.DashIndicators.XPos;  
-    localSettings.HUD.DashIndicators.YPos =  activeConfig->HUD.DashIndicators.YPos;  
-    localSettings.HUD.DashIndicators.Size =  activeConfig->HUD.DashIndicators.Size;
-
-    localSettings.HUD.MouseSteering.Enable    = activeConfig->HUD.MouseSteering.Enable   ;
-    localSettings.HUD.MouseSteering.XPos      = activeConfig->HUD.MouseSteering.XPos     ;
-    localSettings.HUD.MouseSteering.YPos      = activeConfig->HUD.MouseSteering.YPos     ;
-    localSettings.HUD.MouseSteering.XSz       = activeConfig->HUD.MouseSteering.XSz      ;
-    localSettings.HUD.MouseSteering.YSz       = activeConfig->HUD.MouseSteering.YSz      ;
-    localSettings.HUD.MouseSteering.MarkerXSz = activeConfig->HUD.MouseSteering.MarkerXSz;
-
-    localSettings.HUD.MouseSteering.BgR       = activeConfig->HUD.MouseSteering.BgR      ;
-    localSettings.HUD.MouseSteering.BgG       = activeConfig->HUD.MouseSteering.BgG      ;
-    localSettings.HUD.MouseSteering.BgB       = activeConfig->HUD.MouseSteering.BgB      ;
-    localSettings.HUD.MouseSteering.BgA       = activeConfig->HUD.MouseSteering.BgA      ;
-
-    localSettings.HUD.MouseSteering.FgR       = activeConfig->HUD.MouseSteering.FgR      ;
-    localSettings.HUD.MouseSteering.FgG       = activeConfig->HUD.MouseSteering.FgG      ;
-    localSettings.HUD.MouseSteering.FgB       = activeConfig->HUD.MouseSteering.FgB      ;
-    localSettings.HUD.MouseSteering.FgA       = activeConfig->HUD.MouseSteering.FgA      ;
 
     localSettings.Misc.Camera.Enable                         = activeConfig->Misc.Camera.Enable                        ;
     localSettings.Misc.Camera.AttachId                       = activeConfig->Misc.Camera.AttachId                      ;
@@ -326,6 +259,21 @@ void ScriptSettings::SaveGeneral() const {
 
     ini.SetBoolValue("DRIVING_ASSISTS", "LSD", DriveAssists.LSD.Enable);
     ini.SetDoubleValue("DRIVING_ASSISTS", "LSDViscosity", DriveAssists.LSD.Viscosity);
+
+    ini.SetBoolValue("DRIVING_ASSISTS",   "AWD", DriveAssists.AWD.Enable);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDBiasAtMaxTransfer", DriveAssists.AWD.BiasAtMaxTransfer);
+    ini.SetBoolValue("DRIVING_ASSISTS",   "AWDUseCustomBaseBias", DriveAssists.AWD.UseCustomBaseBias);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDCustomBaseBias", DriveAssists.AWD.CustomBaseBias);
+    ini.SetBoolValue("DRIVING_ASSISTS",   "AWDUseTraction", DriveAssists.AWD.UseTraction);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMin", DriveAssists.AWD.TractionLossMin);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMax", DriveAssists.AWD.TractionLossMax);
+    ini.SetBoolValue("DRIVING_ASSISTS",   "AWDUseOversteer", DriveAssists.AWD.UseOversteer);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDOversteerMin", DriveAssists.AWD.OversteerMin);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDOversteerMax", DriveAssists.AWD.OversteerMax);
+    ini.SetBoolValue("DRIVING_ASSISTS",   "AWDUseUndersteer", DriveAssists.AWD.UseUndersteer);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDUndersteerMin", DriveAssists.AWD.UndersteerMin);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDUndersteerMax", DriveAssists.AWD.UndersteerMax);
+    ini.SetLongValue("DRIVING_ASSISTS",   "AWDSpecialFlags", DriveAssists.AWD.SpecialFlags, nullptr, true);
 
     //[CUSTOM_STEERING]
     ini.SetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
@@ -691,6 +639,21 @@ void ScriptSettings::parseSettingsGeneral() {
 
     DriveAssists.LSD.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "LSD", DriveAssists.LSD.Enable);
     DriveAssists.LSD.Viscosity = ini.GetDoubleValue("DRIVING_ASSISTS", "LSDViscosity", DriveAssists.LSD.Viscosity);
+
+    DriveAssists.AWD.Enable = ini.GetBoolValue("DRIVING_ASSISTS", "AWD", DriveAssists.AWD.Enable);
+    DriveAssists.AWD.BiasAtMaxTransfer = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDBiasAtMaxTransfer", DriveAssists.AWD.BiasAtMaxTransfer);
+    DriveAssists.AWD.UseCustomBaseBias = ini.GetBoolValue("DRIVING_ASSISTS", "AWDUseCustomBaseBias", DriveAssists.AWD.UseCustomBaseBias);
+    DriveAssists.AWD.CustomBaseBias = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDCustomBaseBias", DriveAssists.AWD.CustomBaseBias);
+    DriveAssists.AWD.UseTraction = ini.GetBoolValue("DRIVING_ASSISTS", "AWDUseTraction", DriveAssists.AWD.UseTraction);
+    DriveAssists.AWD.TractionLossMin = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMin", DriveAssists.AWD.TractionLossMin);
+    DriveAssists.AWD.TractionLossMax = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMax", DriveAssists.AWD.TractionLossMax);
+    DriveAssists.AWD.UseOversteer = ini.GetBoolValue("DRIVING_ASSISTS", "AWDUseOversteer", DriveAssists.AWD.UseOversteer);
+    DriveAssists.AWD.OversteerMin = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDOversteerMin", DriveAssists.AWD.OversteerMin);
+    DriveAssists.AWD.OversteerMax = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDOversteerMax", DriveAssists.AWD.OversteerMax);
+    DriveAssists.AWD.UseUndersteer = ini.GetBoolValue("DRIVING_ASSISTS", "AWDUseUndersteer", DriveAssists.AWD.UseUndersteer);
+    DriveAssists.AWD.UndersteerMin = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDUndersteerMin", DriveAssists.AWD.UndersteerMin);
+    DriveAssists.AWD.UndersteerMax = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDUndersteerMax", DriveAssists.AWD.UndersteerMax);
+    DriveAssists.AWD.SpecialFlags = ini.GetLongValue("DRIVING_ASSISTS", "AWDSpecialFlags", DriveAssists.AWD.SpecialFlags);
 
     // [SHIFT_OPTIONS]
     ShiftOptions.UpshiftCut = ini.GetBoolValue("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);

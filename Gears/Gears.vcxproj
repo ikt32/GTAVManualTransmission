@@ -63,7 +63,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <AdditionalIncludeDirectories>$(SolutionDir)thirdparty\ScriptHookV_SDK;$(SolutionDir)thirdparty\GTAVMenuBase;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\fmt\include;$(SolutionDir)thirdparty\yaml-cpp\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>MT_EXPORTS;DASHHOOK_RUNTIME;CURL_STATICLIB;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -71,7 +71,6 @@
       <AdditionalOptions>
       </AdditionalOptions>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalDependencies>$(DXSDK_DIR)Lib\x64\XInput.lib;$(SolutionDir)thirdparty\ScriptHookV_SDK\lib\ScriptHookV.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -159,6 +158,7 @@
     <ClCompile Include="..\thirdparty\yaml-cpp\src\tag.cpp" />
     <ClCompile Include="AtcuGearbox.cpp" />
     <ClCompile Include="AtcuLogic.cpp" />
+    <ClCompile Include="AWD.cpp" />
     <ClCompile Include="BlockableControls.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Compatibility.cpp" />
@@ -253,6 +253,7 @@
     <ClInclude Include="..\thirdparty\yaml-cpp\src\token.h" />
     <ClInclude Include="AtcuGearbox.h" />
     <ClInclude Include="AtcuLogic.h" />
+    <ClInclude Include="AWD.h" />
     <ClInclude Include="BlockableControls.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Constants.h" />
