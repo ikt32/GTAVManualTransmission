@@ -92,6 +92,8 @@ void ScriptSettings::SetVehicleConfig(VehicleConfig* cfg) {
     localSettings.DriveAssists.AWD.BiasAtMaxTransfer  = activeConfig->DriveAssists.AWD.BiasAtMaxTransfer;
     localSettings.DriveAssists.AWD.UseCustomBaseBias  = activeConfig->DriveAssists.AWD.UseCustomBaseBias;
     localSettings.DriveAssists.AWD.CustomBaseBias     = activeConfig->DriveAssists.AWD.CustomBaseBias   ;
+    localSettings.DriveAssists.AWD.CustomMin          = activeConfig->DriveAssists.AWD.CustomMin        ;
+    localSettings.DriveAssists.AWD.CustomMax          = activeConfig->DriveAssists.AWD.CustomMax        ;
     localSettings.DriveAssists.AWD.UseTraction        = activeConfig->DriveAssists.AWD.UseTraction      ;
     localSettings.DriveAssists.AWD.TractionLossMin    = activeConfig->DriveAssists.AWD.TractionLossMin  ;
     localSettings.DriveAssists.AWD.TractionLossMax    = activeConfig->DriveAssists.AWD.TractionLossMax  ;
@@ -183,6 +185,14 @@ ScriptSettings ScriptSettings::operator()() {
     return *this;
 }
 
+ScriptSettings& ScriptSettings::GetRef() {
+    if (MTOptions.Override && activeConfig) {
+        return localSettings;
+    }
+    return *this;
+}
+
+
 #pragma warning(push)
 #pragma warning(disable: 4244)
 
@@ -264,6 +274,8 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetDoubleValue("DRIVING_ASSISTS", "AWDBiasAtMaxTransfer", DriveAssists.AWD.BiasAtMaxTransfer);
     ini.SetBoolValue("DRIVING_ASSISTS",   "AWDUseCustomBaseBias", DriveAssists.AWD.UseCustomBaseBias);
     ini.SetDoubleValue("DRIVING_ASSISTS", "AWDCustomBaseBias", DriveAssists.AWD.CustomBaseBias);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDCustomMin", DriveAssists.AWD.CustomMin);
+    ini.SetDoubleValue("DRIVING_ASSISTS", "AWDCustomMax", DriveAssists.AWD.CustomMax);
     ini.SetBoolValue("DRIVING_ASSISTS",   "AWDUseTraction", DriveAssists.AWD.UseTraction);
     ini.SetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMin", DriveAssists.AWD.TractionLossMin);
     ini.SetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMax", DriveAssists.AWD.TractionLossMax);
@@ -644,6 +656,8 @@ void ScriptSettings::parseSettingsGeneral() {
     DriveAssists.AWD.BiasAtMaxTransfer = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDBiasAtMaxTransfer", DriveAssists.AWD.BiasAtMaxTransfer);
     DriveAssists.AWD.UseCustomBaseBias = ini.GetBoolValue("DRIVING_ASSISTS", "AWDUseCustomBaseBias", DriveAssists.AWD.UseCustomBaseBias);
     DriveAssists.AWD.CustomBaseBias = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDCustomBaseBias", DriveAssists.AWD.CustomBaseBias);
+    DriveAssists.AWD.CustomMin = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDCustomMin", DriveAssists.AWD.CustomMin);
+    DriveAssists.AWD.CustomMax = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDCustomMax", DriveAssists.AWD.CustomMax);
     DriveAssists.AWD.UseTraction = ini.GetBoolValue("DRIVING_ASSISTS", "AWDUseTraction", DriveAssists.AWD.UseTraction);
     DriveAssists.AWD.TractionLossMin = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMin", DriveAssists.AWD.TractionLossMin);
     DriveAssists.AWD.TractionLossMax = ini.GetDoubleValue("DRIVING_ASSISTS", "AWDTractionLossMax", DriveAssists.AWD.TractionLossMax);
@@ -969,7 +983,13 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     // [KEYBOARD]
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Toggle)] = parseKeyboardItem(ini, "Toggle", "VK_OEM_5", "Toggle MT");
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleH)] = parseKeyboardItem(ini, "ToggleH", "VK_OEM_6", "Switch shift mode");
+
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::CycleAssists)] = parseKeyboardItem(ini, "CycleAssists", "UNKNOWN", "Cycle assists");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleABS)] = parseKeyboardItem(ini, "ToggleABS", "UNKNOWN", "Toggle ABS");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleESC)] = parseKeyboardItem(ini, "ToggleESC", "UNKNOWN", "Toggle ESC");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleTCS)] = parseKeyboardItem(ini, "ToggleTCS", "UNKNOWN", "Toggle TCS");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::DriveBiasFInc)] = parseKeyboardItem(ini, "DriveBiasFInc", "UNKNOWN", "Front drive bias +5%");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::DriveBiasFDec)] = parseKeyboardItem(ini, "DriveBiasFDec", "UNKNOWN", "Front drive bias -5%");
 
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftUp)] = parseKeyboardItem(ini, "ShiftUp", "LSHIFT", "Shift up");
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftDown)] = parseKeyboardItem(ini, "ShiftDown", "LCTRL", "Shift down");
@@ -1223,6 +1243,14 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     // [TOGGLE_TCS]
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ToggleTCS)] =
         parseWheelItem<int>(ini, "TOGGLE_TCS", -1, "Toggle TCS");
+
+    // [DRIVE_BIAS_F_INC]
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::DriveBiasFInc)] =
+        parseWheelItem<int>(ini, "DRIVE_BIAS_F_INC", -1, "Front drive bias +5%");
+
+    // [DRIVE_BIAS_F_DEC]
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::DriveBiasFDec)] =
+        parseWheelItem<int>(ini, "DRIVE_BIAS_F_DEC", -1, "Front drive bias -5%");
 
     // [TO_KEYBOARD]
     scriptControl->WheelToKeyGUID = 

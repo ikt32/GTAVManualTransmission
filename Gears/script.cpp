@@ -565,6 +565,38 @@ void update_manual_transmission() {
         setVehicleConfig(g_playerVehicle);
     }
 
+    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::DriveBiasFInc) ||
+        g_controls.ButtonJustPressed(CarControls::WheelControlType::DriveBiasFInc)) {
+
+        g_settings.GetRef().DriveAssists.AWD.CustomBaseBias += 0.05f;
+
+        g_settings.GetRef().DriveAssists.AWD.CustomBaseBias = round(g_settings.GetRef().DriveAssists.AWD.CustomBaseBias * 20.0f) / 20.0f;
+
+        if (g_settings.GetRef().DriveAssists.AWD.CustomBaseBias > 0.99f) {
+            g_settings.GetRef().DriveAssists.AWD.CustomBaseBias = 0.99f;
+        }
+
+        if (g_settings.GetRef().DriveAssists.AWD.CustomBaseBias > g_settings.GetRef().DriveAssists.AWD.CustomMax) {
+            g_settings.GetRef().DriveAssists.AWD.CustomBaseBias = g_settings.GetRef().DriveAssists.AWD.CustomMax;
+        }
+    }
+
+    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::DriveBiasFDec) ||
+        g_controls.ButtonJustPressed(CarControls::WheelControlType::DriveBiasFDec)) {
+
+        g_settings.GetRef().DriveAssists.AWD.CustomBaseBias -= 0.05f;
+
+        g_settings.GetRef().DriveAssists.AWD.CustomBaseBias = round(g_settings.GetRef().DriveAssists.AWD.CustomBaseBias * 20.0f) / 20.0f;
+
+        if (g_settings.GetRef().DriveAssists.AWD.CustomBaseBias < 0.01f) {
+            g_settings.GetRef().DriveAssists.AWD.CustomBaseBias = 0.01f;
+        }
+
+        if (g_settings.GetRef().DriveAssists.AWD.CustomBaseBias < g_settings.GetRef().DriveAssists.AWD.CustomMin) {
+            g_settings.GetRef().DriveAssists.AWD.CustomBaseBias = g_settings.GetRef().DriveAssists.AWD.CustomMin;
+        }
+    }
+
     if (MemoryPatcher::NumGearboxPatched != MemoryPatcher::NumGearboxPatches) {
         MemoryPatcher::ApplyGearboxPatches();
     }

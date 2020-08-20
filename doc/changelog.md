@@ -1,5 +1,33 @@
 # Changelog
 
+## 4.9.0
+
+I really should've incremented major/minor versions instead of patches for
+those older releases that had a ton of new stuff. Oh well. Might as well start
+now!
+
+### New features
+
+#### Adaptive all-wheel drive
+
+This new feature, under Driving Assists, simulates all kinds of all-wheel-drive
+systems. The torque split (front drive bias) is updated in real-time depending
+on grip, understeer or oversteer. This very much affects the driving
+characteristics, so it's wise to just use through the vehicle-specific configs.
+
+Demo: [Skyline GT-R R32 - ATTESA E-TS test](https://www.youtube.com/watch?v=XpsykqjwiMM),
+using an early implementation.
+
+The feature requires the
+[Handling Replacement](https://www.gta5-mods.com/tools/handling-replacement-library) 
+library.
+
+Minor fixes and improvements:
+
+* Improve understeer calculations for ESP (and AWD)
+* Fix clutch affecting automatic shifting
+* Fix LSD active while car shouldn't be moving
+
 ## 4.8.2
 
 A few new goodies, and fixes to minor things.

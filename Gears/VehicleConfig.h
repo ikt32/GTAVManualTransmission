@@ -90,6 +90,8 @@ public:
 
             bool UseCustomBaseBias = false;
             float CustomBaseBias = 0.01f;
+            float CustomMin = 0.0f;
+            float CustomMax = 1.0f;
 
             bool UseTraction = false;
             float TractionLossMin = 1.05f; // "Strong" axle is  5% faster than "weak" axle 

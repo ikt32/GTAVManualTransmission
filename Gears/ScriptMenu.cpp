@@ -1417,7 +1417,7 @@ void update_driveassistmenu() {
 
     g_menu.BoolOption("Enable adaptive AWD", g_settings.DriveAssists.AWD.Enable,
         { "Transfers torque to stabilize the car. See Nissans' ATTESA, Audis' Quattro and similar technologies.",
-          "Only works for AWD cars."});
+          "Only works for AWD cars. Recommended to use only in vehicle-specific configurations!"});
 
     g_menu.MenuOption("Adaptive AWD options", "awdsettingsmenu");
 }
@@ -1459,9 +1459,14 @@ void update_awdsettingsmenu() {
 
     g_menu.BoolOption("Use custom drive bias", g_settings.DriveAssists.AWD.UseCustomBaseBias, 
         { "Override the front drive bias." });
-    g_menu.FloatOption("Custom front drive bias", g_settings.DriveAssists.AWD.CustomBaseBias, 0.01f, 0.99f, 0.01f, 
+    g_menu.FloatOption("Custom front drive bias", g_settings.DriveAssists.AWD.CustomBaseBias, 0.01f, 0.99f, 0.01f,
         { "Value is front bias based: 0.01 is 1% front, 99% rear. 0.99 is 99% front, 1% rear.",
           "Useful to set 1% to 9% and 91% to 99% drive biases, as GTA snaps to full FWD at more than 0.9 fDriveBiasFront and full RWD on less than 0.1 fDriveBiasFront." });
+
+    g_menu.FloatOption("Custom bias min", g_settings.DriveAssists.AWD.CustomMin, 0.01f, 0.99f, 0.01f,
+        { "Lowest value custom bias can be when manually adjusting drive bias." });
+    g_menu.FloatOption("Custom bias max", g_settings.DriveAssists.AWD.CustomMax, 0.01f, 0.99f, 0.01f,
+        { "Highest value custom bias can be when manually adjusting drive bias." });
 
     g_menu.FloatOption("Drive bias @ max transfer", g_settings.DriveAssists.AWD.BiasAtMaxTransfer, 0.01f, 0.99f, 0.01f,
         { "Value is front bias based: 0.01 is 1% front, 99% rear. 0.99 is 99% front, 1% rear.",

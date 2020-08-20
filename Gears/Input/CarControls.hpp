@@ -63,6 +63,11 @@ public:
         Toggle,
         ToggleH,
         CycleAssists,
+        ToggleABS,
+        ToggleESC,
+        ToggleTCS,
+        DriveBiasFInc,
+        DriveBiasFDec,
         SIZEOF_KeyboardControlType
     };
 
@@ -107,6 +112,8 @@ public:
         ToggleABS,
         ToggleESC,
         ToggleTCS,
+        DriveBiasFInc,
+        DriveBiasFDec,
         UNKNOWN,
         SIZEOF_WheelControlType
     };
