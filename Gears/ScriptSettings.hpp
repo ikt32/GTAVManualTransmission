@@ -366,6 +366,9 @@ public:
         int MaxTapTimeMs = 200;
         float TriggerValue = 0.75f;
 
+        int DeadzoneRightThumb = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+        int DeadzoneLeftThumb = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+
         bool ToggleEngine = false;
 
         bool BlockCarControls = true;

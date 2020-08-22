@@ -512,6 +512,9 @@ void ScriptSettings::SaveController(CarControls* scriptControl) const {
     ini.SetLongValue("CONTROLLER", "MaxTapTimeMs", Controller.MaxTapTimeMs);
     ini.SetDoubleValue("CONTROLLER", "TriggerValue", Controller.TriggerValue);
 
+    ini.SetLongValue("CONTROLLER", "DeadzoneLeftThumb", Controller.DeadzoneLeftThumb);
+    ini.SetLongValue("CONTROLLER", "DeadzoneRightThumb", Controller.DeadzoneRightThumb);
+
     ini.SetBoolValue("CONTROLLER", "ToggleEngine", Controller.ToggleEngine);
     ini.SetBoolValue("CONTROLLER", "BlockCarControls", Controller.BlockCarControls);
     ini.SetBoolValue("CONTROLLER", "IgnoreShiftsUI", Controller.IgnoreShiftsUI);
@@ -944,6 +947,9 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     Controller.HoldTimeMs = ini.GetLongValue("CONTROLLER", "HoldTimeMs", Controller.HoldTimeMs);
     Controller.MaxTapTimeMs = ini.GetLongValue("CONTROLLER", "MaxTapTimeMs", Controller.MaxTapTimeMs);
     Controller.TriggerValue = ini.GetDoubleValue("CONTROLLER", "TriggerValue", Controller.TriggerValue);
+
+    Controller.DeadzoneLeftThumb = ini.GetLongValue("CONTROLLER", "DeadzoneLeftThumb", Controller.DeadzoneLeftThumb);
+    Controller.DeadzoneRightThumb = ini.GetLongValue("CONTROLLER", "DeadzoneRightThumb", Controller.DeadzoneRightThumb);
 
     Controller.ToggleEngine = ini.GetBoolValue("CONTROLLER", "ToggleEngine", Controller.ToggleEngine);
 

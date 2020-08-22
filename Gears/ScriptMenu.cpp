@@ -1815,6 +1815,20 @@ void update_devoptionsmenu() {
 
         threadCheckUpdate(0);
     }
+
+    float ljVal = static_cast<float>(g_settings.Controller.DeadzoneLeftThumb);
+    if (g_menu.FloatOptionCb("Deadzone left thumb", ljVal, 0.0f, 32767.0f, 1.0f, getKbEntry,
+        { "Deadzone for left thumb joystick. Works for XInput mode only!",
+          fmt::format("Default value: {}", XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) })) {
+        g_settings.Controller.DeadzoneLeftThumb = static_cast<int>(ljVal);
+    }
+
+    float rjVal = static_cast<float>(g_settings.Controller.DeadzoneRightThumb);
+    if (g_menu.FloatOptionCb("Deadzone right thumb", rjVal, 0.0f, 32767.0f, 1.0f, getKbEntry,
+        { "Deadzone for right thumb joystick. Works for XInput mode only!",
+          fmt::format("Default value: {}", XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE) })) {
+        g_settings.Controller.DeadzoneRightThumb = static_cast<int>(rjVal);
+    }
 }
 
 void update_debugmenu() {
