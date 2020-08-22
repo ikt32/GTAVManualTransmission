@@ -24,6 +24,7 @@ library.
 
 Minor fixes and improvements:
 
+* Add custom (XInput) controller steering deadzones
 * Improve understeer calculations for ESP (and AWD)
 * Fix clutch affecting automatic shifting
 * Fix LSD active while car shouldn't be moving

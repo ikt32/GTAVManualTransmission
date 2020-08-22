@@ -25,6 +25,8 @@ public:
         ToggleH,
         Engine,
         CycleAssists,
+        SteerLeft,
+        SteerRight,
         SIZEOF
     };
 

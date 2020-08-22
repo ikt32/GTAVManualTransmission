@@ -108,7 +108,7 @@ public:
     TapState WasButtonTapped(XboxButtons xboxButton, int milliseconds);
     void Update();
 
-    float GetAnalogValue(XboxButtons buttonType);
+    float GetAnalogValue(XboxButtons buttonType, bool customDz = false);
     XboxButtons StringToButton(const std::string &buttonString);
 
     void Vibrate(int leftval = 0, int rightval = 0);
@@ -128,5 +128,5 @@ private:
 
     XINPUT_STATE getState();
     bool isConnected();
-    float filterDeadzone(XboxButtons buttonType, int input);
+    float filterDeadzone(XboxButtons buttonType, int input, bool customDz);
 };

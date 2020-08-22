@@ -188,10 +188,11 @@ void CustomSteering::Update() {
     float reduction = calculateReduction();
 
     float steer = -PAD::GET_DISABLED_CONTROL_NORMAL(1, ControlMoveLeftRight);
-    if (g_controls.PrevInput == CarControls::Controller) {
-        if (g_settings.Controller.Native.Enable == false) {
-            steer = g_controls.SteerVal;
-        }
+
+    if (!g_settings.Controller.Native.Enable &&
+        g_settings.Controller.CustomDeadzone &&
+        g_controls.PrevInput == CarControls::Controller) {
+        steer = g_controls.SteerVal;
     }
 
     float steerCurr;

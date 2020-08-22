@@ -511,15 +511,15 @@ void ScriptSettings::SaveController(CarControls* scriptControl) const {
     ini.SetLongValue("CONTROLLER", "HoldTimeMs", Controller.HoldTimeMs);
     ini.SetLongValue("CONTROLLER", "MaxTapTimeMs", Controller.MaxTapTimeMs);
     ini.SetDoubleValue("CONTROLLER", "TriggerValue", Controller.TriggerValue);
-
-    ini.SetLongValue("CONTROLLER", "DeadzoneLeftThumb", Controller.DeadzoneLeftThumb);
-    ini.SetLongValue("CONTROLLER", "DeadzoneRightThumb", Controller.DeadzoneRightThumb);
-
     ini.SetBoolValue("CONTROLLER", "ToggleEngine", Controller.ToggleEngine);
+
     ini.SetBoolValue("CONTROLLER", "BlockCarControls", Controller.BlockCarControls);
     ini.SetBoolValue("CONTROLLER", "IgnoreShiftsUI", Controller.IgnoreShiftsUI);
     ini.SetBoolValue("CONTROLLER", "BlockHShift", Controller.BlockHShift);
 
+    ini.SetBoolValue("CONTROLLER", "CustomDeadzone", Controller.CustomDeadzone);
+    ini.SetLongValue("CONTROLLER", "DeadzoneLeftThumb", Controller.DeadzoneLeftThumb);
+    ini.SetLongValue("CONTROLLER", "DeadzoneRightThumb", Controller.DeadzoneRightThumb);
     
     ini.SetLongValue("CONTROLLER", "ShiftUpBlocks",   scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
     ini.SetLongValue("CONTROLLER", "ShiftDownBlocks", scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
@@ -943,15 +943,15 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     Controller.BlockCarControls = ini.GetBoolValue("CONTROLLER", "BlockCarControls", Controller.BlockCarControls);
     Controller.IgnoreShiftsUI = ini.GetBoolValue("CONTROLLER", "IgnoreShiftsUI", Controller.IgnoreShiftsUI);
     Controller.BlockHShift = ini.GetBoolValue("CONTROLLER", "BlockHShift", Controller.BlockHShift);
+    Controller.ToggleEngine = ini.GetBoolValue("CONTROLLER", "ToggleEngine", Controller.ToggleEngine);
 
     Controller.HoldTimeMs = ini.GetLongValue("CONTROLLER", "HoldTimeMs", Controller.HoldTimeMs);
     Controller.MaxTapTimeMs = ini.GetLongValue("CONTROLLER", "MaxTapTimeMs", Controller.MaxTapTimeMs);
     Controller.TriggerValue = ini.GetDoubleValue("CONTROLLER", "TriggerValue", Controller.TriggerValue);
 
+    Controller.CustomDeadzone = ini.GetBoolValue("CONTROLLER", "CustomDeadzone", Controller.CustomDeadzone);
     Controller.DeadzoneLeftThumb = ini.GetLongValue("CONTROLLER", "DeadzoneLeftThumb", Controller.DeadzoneLeftThumb);
     Controller.DeadzoneRightThumb = ini.GetLongValue("CONTROLLER", "DeadzoneRightThumb", Controller.DeadzoneRightThumb);
-
-    Controller.ToggleEngine = ini.GetBoolValue("CONTROLLER", "ToggleEngine", Controller.ToggleEngine);
 
     scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Toggle)] = parseControllerItem<std::string>(ini, "Toggle", "UNKNOWN", "Toggle MT", "Usage: hold");
     scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ToggleH)] = parseControllerItem<std::string>(ini, "ToggleShift", "B", "Change shift mode", "Usage: hold");
@@ -962,7 +962,10 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Engine)] =    parseControllerItem<std::string>(ini, "Engine", "DpadDown", "Engine", "Usage: hold");
     scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Throttle)] =  parseControllerItem<std::string>(ini, "Throttle", "RightTrigger", "Throttle", "Usage: analog");
     scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Brake)] =     parseControllerItem<std::string>(ini, "Brake", "LeftTrigger", "Brake", "Usage: analog");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Clutch)] =    parseControllerItem<std::string>(ini, "Clutch", "LeftThumbUp", "Clutch", "Usage: hold/analog");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Clutch)] = parseControllerItem<std::string>(ini, "Clutch", "LeftThumbUp", "Clutch", "Usage: hold/analog");
+
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::SteerLeft)] = parseControllerItem<std::string>(ini, "SteerLeft", "LeftThumbLeft", "Steer left", "Usage: analog");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::SteerRight)] = parseControllerItem<std::string>(ini, "SteerRight", "LeftThumbRight", "Steer right", "Usage: analog");
 
     scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] =   ini.GetLongValue("CONTROLLER", "ShiftUpBlocks", -1);
     scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = ini.GetLongValue("CONTROLLER", "ShiftDownBlocks", -1);

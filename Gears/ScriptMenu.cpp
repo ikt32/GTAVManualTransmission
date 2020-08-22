@@ -628,6 +628,27 @@ void update_controllermenu() {
 
     g_menu.BoolOption("Ignore shifts in UI", g_settings.Controller.IgnoreShiftsUI,
         { "Ignore shift up/shift down while using the phone or when the menu is open" });
+
+    if (!g_settings.Controller.Native.Enable) {
+        g_menu.BoolOption("Custom XInput deadzones", g_settings.Controller.CustomDeadzone,
+            { "Use custom deadzones for XInput controller joysticks. Affects enhanced steering (when using XInput)." });
+
+        if (g_settings.Controller.CustomDeadzone) {
+            float ljVal = static_cast<float>(g_settings.Controller.DeadzoneLeftThumb);
+            if (g_menu.FloatOptionCb("Deadzone left thumb", ljVal, 0.0f, 32767.0f, 1.0f, getKbEntry,
+                { "Deadzone for left thumb joystick. Works for XInput mode only!",
+                  fmt::format("Default value: {}", XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) })) {
+                g_settings.Controller.DeadzoneLeftThumb = static_cast<int>(ljVal);
+            }
+
+            float rjVal = static_cast<float>(g_settings.Controller.DeadzoneRightThumb);
+            if (g_menu.FloatOptionCb("Deadzone right thumb", rjVal, 0.0f, 32767.0f, 1.0f, getKbEntry,
+                { "Deadzone for right thumb joystick. Works for XInput mode only!",
+                  fmt::format("Default value: {}", XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE) })) {
+                g_settings.Controller.DeadzoneRightThumb = static_cast<int>(rjVal);
+            }
+        }
+    }
 }
 
 void update_controllerbindingsnativemenu() {
@@ -1814,20 +1835,6 @@ void update_devoptionsmenu() {
         g_settings.Update.IgnoredVersion = "v0.0.0";
 
         threadCheckUpdate(0);
-    }
-
-    float ljVal = static_cast<float>(g_settings.Controller.DeadzoneLeftThumb);
-    if (g_menu.FloatOptionCb("Deadzone left thumb", ljVal, 0.0f, 32767.0f, 1.0f, getKbEntry,
-        { "Deadzone for left thumb joystick. Works for XInput mode only!",
-          fmt::format("Default value: {}", XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) })) {
-        g_settings.Controller.DeadzoneLeftThumb = static_cast<int>(ljVal);
-    }
-
-    float rjVal = static_cast<float>(g_settings.Controller.DeadzoneRightThumb);
-    if (g_menu.FloatOptionCb("Deadzone right thumb", rjVal, 0.0f, 32767.0f, 1.0f, getKbEntry,
-        { "Deadzone for right thumb joystick. Works for XInput mode only!",
-          fmt::format("Default value: {}", XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE) })) {
-        g_settings.Controller.DeadzoneRightThumb = static_cast<int>(rjVal);
     }
 }
 

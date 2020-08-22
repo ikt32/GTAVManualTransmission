@@ -366,6 +366,7 @@ public:
         int MaxTapTimeMs = 200;
         float TriggerValue = 0.75f;
 
+        bool CustomDeadzone = false;
         int DeadzoneRightThumb = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
         int DeadzoneLeftThumb = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
 
