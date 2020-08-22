@@ -65,6 +65,7 @@ namespace {
     int wheelPowerOffset = 0;
     int wheelBrakeOffset = 0;
     int wheelFlagsOffset = 0;
+    int wheelDownforceOffset = 0;
 }
 
 void VehicleExtensions::ChangeVersion(int version) {
@@ -237,6 +238,10 @@ void VehicleExtensions::Init() {
     addr = mem::FindPattern("\x75\x11\x48\x8b\x01\x8b\x88", "xxxxxxx");
     wheelFlagsOffset = addr == 0 ? 0 : *(int*)(addr + 7);
     logger.Write(wheelFlagsOffset == 0 ? WARN : DEBUG, "Wheel Flags Offset: 0x%X", wheelFlagsOffset);
+
+    wheelDownforceOffset = addr == 0 ? 0 : *(int*)(addr + 7) + 0x1C;
+    logger.Write(wheelDownforceOffset == 0 ? WARN : DEBUG, "Wheel Downforce Offset: 0x%X", wheelDownforceOffset);
+
 
     addr = mem::FindPattern("\x75\x24\xF3\x0F\x10\x81\xE0\x01\x00\x00\xF3\x0F\x5C\xC1", "xxxxx???xxxx??");
     wheelHealthOffset = addr == 0 ? 0 : *(int*)(addr + 6);
@@ -974,6 +979,20 @@ std::vector<uint16_t> VehicleExtensions::GetWheelFlags(Vehicle handle) {
         flags[i] = *reinterpret_cast<uint16_t *>(wheelAddr + wheelFlagsOffset);
     }
     return flags;
+}
+
+std::vector<float> VehicleExtensions::GetWheelDownforces(Vehicle handle) {
+    auto wheelPtr = GetWheelsPtr(handle);
+    auto numWheels = GetNumWheels(handle);
+    std::vector<float> dfs(numWheels);
+
+    if (wheelDownforceOffset == 0) return dfs;
+
+    for (auto i = 0; i < numWheels; i++) {
+        auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * i);
+        dfs[i] = *reinterpret_cast<float*>(wheelAddr + 0x220);
+    }
+    return dfs;
 }
 
 uint64_t VehicleExtensions::GetWheelHandlingPtr(Vehicle handle, uint8_t index) {

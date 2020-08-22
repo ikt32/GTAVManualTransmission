@@ -183,9 +183,10 @@ public:
     static std::vector<float> GetWheelBrakePressure(Vehicle handle);
     static void SetWheelBrakePressure(Vehicle handle, uint8_t index, float value);
 
-
     static bool IsWheelPowered(Vehicle handle, uint8_t index);
     static std::vector<uint16_t> GetWheelFlags(Vehicle handle);
+
+    static std::vector<float> GetWheelDownforces(Vehicle handle);
 
     static uint64_t GetWheelHandlingPtr(Vehicle handle, uint8_t index);
     static void SetWheelHandlingPtr(Vehicle handle, uint8_t index, uint64_t value);

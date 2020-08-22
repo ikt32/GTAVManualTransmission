@@ -646,7 +646,7 @@ void drawVehicleWheelInfo() {
     auto wheelsPower = VExt::GetWheelPower(g_playerVehicle);
     auto wheelsBrake = VExt::GetWheelBrakePressure(g_playerVehicle);
     auto wheelDims = VExt::GetWheelDimensions(g_playerVehicle);
-
+    auto wheelDfs = VExt::GetWheelDownforces(g_playerVehicle);
     for (int i = 0; i < numWheels; i++) {
         Util::ColorI color = Util::ColorsI::TransparentGray;
         // TCS: Yellow
@@ -689,7 +689,8 @@ void drawVehicleWheelInfo() {
                     g_vehData.mWheelsEspO[i] && g_vehData.mWheelsEspU[i] ? "_O+U"
                         : g_vehData.mWheelsEspO[i] ? "_O"
                         : g_vehData.mWheelsEspU[i] ? "_U" : ""
-                    )
+                    ),
+                fmt::format("DF: {:.3f}", wheelDfs[i]),
             },
             color);
         GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
