@@ -2,8 +2,8 @@
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
 
-#define VERSION_MAJOR 4
-#define VERSION_MINOR 9
+#define VERSION_MAJOR 5
+#define VERSION_MINOR 0
 #define VERSION_PATCH 0
 
 namespace Constants {

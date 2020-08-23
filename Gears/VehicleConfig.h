@@ -1,10 +1,24 @@
 #pragma once
-#include "ScriptSettings.hpp"
+
+enum class EShiftMode : int {
+    Sequential = 0,
+    HPattern = 1,
+    Automatic = 2,
+};
+
+EShiftMode Next(EShiftMode mode);
+
+#include <string>
+#include <vector>
 
 class VehicleConfig {
 public:
-    VehicleConfig(const ScriptSettings& gSettings,
+    VehicleConfig();
+    VehicleConfig(VehicleConfig* baseConfig,
         const std::string& file);
+
+    void LoadSettings(const std::string& file);
+    void SaveSettings();
 
     std::string Name;
 
@@ -15,7 +29,6 @@ public:
 
     // [MT_OPTIONS]
     struct {
-        // Only ShiftMode should be changed on-the-fly
         EShiftMode ShiftMode = EShiftMode::Sequential;
 
         bool ClutchCreep = false;
@@ -122,39 +135,26 @@ public:
 
     // [AUTO_PARAMS]
     struct {
-        float UpshiftLoad = 0.05f;
+        // Lower = upshift later
+        float UpshiftLoad = 0.12f;
+        // Higher = downshift later
         float DownshiftLoad = 0.60f;
+        // Don't upshift until next gears' RPM is over this value.
         float NextGearMinRPM = 0.33f;
+        // Downshift when RPM drops below this value.
         float CurrGearMinRPM = 0.27f;
+        // Lower = keep in low gear longer // eco - 0.33
         float EcoRate = 0.05f;
+        // Timeout mult for not downshifting after an upshift
         float DownshiftTimeoutMult = 1.0f;
+        // Experimental new tcu
         bool UsingATCU = false;
     } AutoParams;
 
     struct {
-        // [FORCE_FEEDBACK]
-        struct {
-            bool Enable = true;
-            bool Scale = true;
-            int AntiDeadForce = 0;
-            float SATAmpMult = 1.0f;
-            int SATMax = 10000;
-            float SATFactor = 0.66f;
-            int DamperMax = 50;
-            int DamperMin = 10;
-            float DamperMinSpeed = 1.2f; // TargetSpeed in m/s
-            float DetailMult = 2.5f;
-            int DetailLim = 20000;
-            int DetailMAW = 1;
-            float CollisionMult = 1.0f;
-            float Gamma = 0.8f;
-            float MaxSpeed = 80.0f;
-        } FFB;
-
         // [STEER]
         struct {
-            float Angle = 720.0f;
-            float Gamma = 1.0f;
+            float SoftLock = 720.0f;
         } Steering;
     } Wheel;
 
@@ -207,6 +207,10 @@ public:
     } Misc;
 
 protected:
-    void loadSettings(const ScriptSettings& gSettings,
-        const std::string& file);
+    void saveGeneral();
+
+    std::string mFile;
+
+    // Reference to one unique "master" instance.
+    VehicleConfig* mBaseConfig;
 };

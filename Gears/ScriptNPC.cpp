@@ -156,7 +156,7 @@ void updateShifting(Vehicle npcVehicle, VehicleGearboxStates& gearStates) {
     float rateDown = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleDownShift);
 
     float shiftRate = gearStates.ShiftDirection == ShiftDirection::Up ? rateUp : rateDown;
-    shiftRate *= g_settings.ShiftOptions.ClutchRateMult;
+    shiftRate *= g_settings.BaseConfig()->ShiftOptions.ClutchRateMult;
 
     /*
      * 4.0 gives similar perf as base - probably the whole shift takes 1/rate seconds
@@ -232,7 +232,7 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
         if (throttle >= gearStates.ThrottleHang)
             gearStates.ThrottleHang = throttle;
         else if (gearStates.ThrottleHang > 0.0f)
-            gearStates.ThrottleHang -= MISC::GET_FRAME_TIME() * g_settings.AutoParams.EcoRate;
+            gearStates.ThrottleHang -= MISC::GET_FRAME_TIME() * g_settings.BaseConfig()->AutoParams.EcoRate;
 
         if (gearStates.ThrottleHang < 0.0f)
             gearStates.ThrottleHang = 0.0f;
@@ -241,10 +241,10 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
 
         float nextGearMinSpeed = 0.0f; // don't care about top gear
         if (currGear < topGear) {
-            nextGearMinSpeed = g_settings.AutoParams.NextGearMinRPM * driveMaxFlatVel / gearRatios[currGear + 1];
+            nextGearMinSpeed = g_settings.BaseConfig()->AutoParams.NextGearMinRPM * driveMaxFlatVel / gearRatios[currGear + 1];
         }
 
-        float currGearMinSpeed = g_settings.AutoParams.CurrGearMinRPM * driveMaxFlatVel / gearRatios[currGear];
+        float currGearMinSpeed = g_settings.BaseConfig()->AutoParams.CurrGearMinRPM * driveMaxFlatVel / gearRatios[currGear];
 
         float engineLoad = gearStates.ThrottleHang - map(rpm, 0.2f, 1.0f, 0.0f, 1.0f);
 
@@ -257,7 +257,7 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
 
         // Shift up.
         if (currGear < topGear) {
-            if (engineLoad < g_settings.AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
+            if (engineLoad < g_settings.BaseConfig()->AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
                 shiftTo(gearStates, currGear + 1, true);
                 gearStates.FakeNeutral = false;
                 gearStates.LastUpshiftTime = MISC::GET_GAME_TIMER();
@@ -273,12 +273,12 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
         }
 
         float rateUp = *reinterpret_cast<float*>(VExt::GetHandlingPtr(npcVehicle) + hOffsets.fClutchChangeRateScaleUpShift);
-        float upshiftDuration = 1.0f / (rateUp * g_settings.ShiftOptions.ClutchRateMult);
-        bool tpPassed = MISC::GET_GAME_TIMER() > gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings.AutoParams.DownshiftTimeoutMult);
+        float upshiftDuration = 1.0f / (rateUp * g_settings.BaseConfig()->ShiftOptions.ClutchRateMult);
+        bool tpPassed = MISC::GET_GAME_TIMER() > gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings.BaseConfig()->AutoParams.DownshiftTimeoutMult);
 
         // Shift down
         if (currGear > 1) {
-            if (tpPassed && engineLoad > g_settings.AutoParams.DownshiftLoad* gearRatioRatio || currSpeed < currGearMinSpeed) {
+            if (tpPassed && engineLoad > g_settings.BaseConfig()->AutoParams.DownshiftLoad* gearRatioRatio || currSpeed < currGearMinSpeed) {
                 shiftTo(gearStates, currGear - 1, true);
                 gearStates.FakeNeutral = false;
             }
