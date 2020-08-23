@@ -283,7 +283,7 @@ void update_mainmenu() {
         toggleManual(!g_settings.MTOptions.Enable);
     }
 
-    int tempShiftMode = EToInt(g_settings().MTOptions.ShiftMode);
+    int tempShiftMode = static_cast<int>(g_settings().MTOptions.ShiftMode);
 
     std::vector<std::string> detailsTemp {
         "Choose your gearbox! Options are Sequential, H-pattern and Automatic."
@@ -292,7 +292,7 @@ void update_mainmenu() {
     g_menu.StringArray("Gearbox", gearboxModes, tempShiftMode,
         detailsTemp);
 
-    if (tempShiftMode != EToInt(g_settings().MTOptions.ShiftMode)) {
+    if (tempShiftMode != static_cast<int>(g_settings().MTOptions.ShiftMode)) {
         setShiftMode(static_cast<EShiftMode>(tempShiftMode));
     }
 

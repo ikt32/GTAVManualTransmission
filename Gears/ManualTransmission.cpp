@@ -36,7 +36,7 @@ bool MT_NeutralGear() {
 }
 
 int MT_GetShiftMode() {
-    return EToInt(g_settings().MTOptions.ShiftMode) + 1;
+    return static_cast<int>(g_settings().MTOptions.ShiftMode) + 1;
 }
 
 void MT_SetShiftMode(int mode) {
