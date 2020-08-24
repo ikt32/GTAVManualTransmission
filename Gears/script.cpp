@@ -201,7 +201,7 @@ void setVehicleConfig(Vehicle vehicle) {
                     [vehicle](const std::string & plate) {
                         return StrUtil::toLower(plate) == StrUtil::toLower(VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(vehicle));
                     });
-                if (platesIt != config.Plates.end())
+                if (platesIt != config.Plates.end() && modelsIt != config.ModelNames.end())
                     return true;
                 if (modelsIt != config.ModelNames.end())
                     return true;
