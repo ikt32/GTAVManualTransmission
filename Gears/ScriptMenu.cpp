@@ -1906,6 +1906,19 @@ void update_devoptionsmenu() {
         { "Disables toggling player visibility by script.",
             "Use this when some other script controls visibility." });
 
+    if (g_menu.Option("Export base VehicleConfig", 
+        { "Exports the base configuration to the Vehicles folder. If you lost it, or something." })) {
+        const std::string saveFile = "baseVehicleConfig";
+        const std::string vehConfigDir = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir + "\\Vehicles";
+        const std::string finalFile = fmt::format("{}\\{}.ini", vehConfigDir, saveFile);
+
+        VehicleConfig config;
+        config.ModelNames = { "Model0", "Model1", "Model2" };
+        config.Plates = { "46EEK572", "20KDA975", "83OCW456" };
+        config.Description = "This is a base configuration file with all possible sections and keys.";
+        config.SaveSettings(&config, finalFile);
+    }
+
     g_menu.BoolOption("Enable update check", g_settings.Update.EnableUpdate,
         { "Check for mod updates."});
 
