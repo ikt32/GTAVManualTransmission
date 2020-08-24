@@ -210,7 +210,7 @@ void setVehicleConfig(Vehicle vehicle) {
         if (it != g_vehConfigs.end()) {
             g_activeConfig = &*it;
             g_settings.SetVehicleConfig(g_activeConfig);
-            UI::Notify(INFO, fmt::format("Config [{}] loaded.", g_activeConfig->Name));
+            UI::Notify(INFO, fmt::format("Configuration [{}] loaded.", g_activeConfig->Name));
         }
     }
 }

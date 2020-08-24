@@ -58,7 +58,6 @@ extern CarControls g_controls;
 extern ScriptSettings g_settings;
 
 extern std::vector<VehicleConfig> g_vehConfigs;
-extern VehicleConfig* g_activeConfig;
 
 struct SFont {
     int ID;
@@ -135,6 +134,8 @@ namespace {
         "Vanilla FPV"
     };
 
+    std::vector<std::string> diDevicesInfo{ "Press Enter to refresh." };
+
     bool getKbEntry(float& val) {
         UI::Notify(INFO, "Enter value");
         MISC::DISPLAY_ONSCREEN_KEYBOARD(LOCALIZATION::GET_CURRENT_LANGUAGE() == 0, "FMMC_KEY_TIP8", "",
@@ -204,7 +205,12 @@ namespace {
         }
     }
 
-    std::vector<std::string> diDevicesInfo { "Press Enter to refresh." };
+    std::string MenuSubtitleConfig() {
+        std::string cfgName = "Base";
+        if (g_settings.ConfigActive())
+            cfgName = g_settings().Name;
+        return fmt::format("CFG: [{}]", cfgName);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -222,15 +228,7 @@ void saveChanges() {
 
 void onMenuClose() {
     saveChanges();
-
-    if (g_activeConfig) {
-        auto tempShiftMode = g_activeConfig->MTOptions.ShiftMode;
-        loadConfigs();
-        setShiftMode(tempShiftMode);
-    }
-    else {
-        loadConfigs();
-    }
+    loadConfigs();
 }
 
 void update_mainmenu() {
@@ -288,6 +286,10 @@ void update_mainmenu() {
     std::vector<std::string> detailsTemp {
         "Choose your gearbox! Options are Sequential, H-pattern and Automatic."
     };
+
+    if (g_settings.ConfigActive()) {
+        detailsTemp.push_back(fmt::format("CFG: [{}]", g_settings().Name));
+    }
 
     g_menu.StringArray("Gearbox", gearboxModes, tempShiftMode,
         detailsTemp);
@@ -360,16 +362,20 @@ void update_settingsmenu() {
     g_menu.MenuOption("Automatic finetuning", "finetuneautooptionsmenu",
         { "Fine-tune script-provided automatic transmission parameters." });
 
-    g_menu.MenuOption("Custom vehicle settings", "vehconfigmenu",
-        { "Configurations overriding mod-wide settings, for specific vehicles." });
+    g_menu.MenuOption("Vehicle configurations", "vehconfigmenu",
+        { "Vehicle configurations override the base mod settings, for specific vehicles. This allows selectively "
+          "enabling assists or per-vehicle tweaked finetuning options.",
+          "\"CFG: [...]\" in a menu subtitle or setting "
+          "description indicates that the settings you change are vehicle-specific."});
 }
 
 void update_featuresmenu() {
     g_menu.Title("Features");
-    std::string cfgName = "None";
-    if (g_activeConfig != nullptr)
-        cfgName = g_activeConfig->Name;
-    g_menu.Subtitle(fmt::format("Config: {}", cfgName));
+
+    if (g_settings.ConfigActive())
+        g_menu.Subtitle(fmt::format("CFG: [{} (Partial)]", g_settings().Name));
+    else
+        g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.BoolOption("Engine Damage", g_settings.MTOptions.EngDamage,
         { "Damage the engine when over-revving and when mis-shifting." });
@@ -401,10 +407,7 @@ void update_featuresmenu() {
 
 void update_finetuneoptionsmenu() {
     g_menu.Title("Finetuning");
-    std::string cfgName = "None";
-    if (g_activeConfig != nullptr)
-        cfgName = g_activeConfig->Name;
-    g_menu.Subtitle(fmt::format("Config: {}", cfgName));
+    g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.FloatOption("Clutch bite threshold", g_settings().MTParams.ClutchThreshold, 0.0f, 1.0f, 0.05f,
         { "How far the clutch has to be lifted to start biting." });
@@ -436,10 +439,7 @@ void update_finetuneoptionsmenu() {
 
 void update_shiftingoptionsmenu() {
     g_menu.Title("Shifting options");
-    std::string cfgName = "None";
-    if (g_activeConfig != nullptr)
-        cfgName = g_activeConfig->Name;
-    g_menu.Subtitle(fmt::format("Config: {}", cfgName));
+    g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.BoolOption("Cut throttle on upshift", g_settings().ShiftOptions.UpshiftCut,
         { "Helps rev matching.",
@@ -460,7 +460,7 @@ void update_shiftingoptionsmenu() {
 
 void update_finetuneautooptionsmenu() {
     g_menu.Title("Automatic finetuning");
-    g_menu.Subtitle("");
+    g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.FloatOption("Upshift engine load", g_settings().AutoParams.UpshiftLoad, 0.01f, 0.20f, 0.01f,
         { "Upshift when the engine load drops below this value. "
@@ -479,7 +479,7 @@ void update_finetuneautooptionsmenu() {
     g_menu.FloatOption("Economy rate", g_settings().AutoParams.EcoRate, 0.01f, 0.50f, 0.01f,
         { "On releasing throttle, high values cause earlier upshifts.",
           "Set this low to stay in gear longer when releasing throttle." });
-    g_menu.BoolOption("Using ATCU (experimental)", g_settings().AutoParams.UsingATCU,
+    g_menu.BoolOption("Use ATCU (experimental)", g_settings().AutoParams.UsingATCU,
         { "Using experimental new Automatic Transmission Control Unit by Nyconing.",
           "ATCU is configurationless, the above settings are ignored." });
 }
@@ -522,7 +522,7 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
         shiftAssist = "None";
 
     std::vector<std::string> extras{
-        fmt::format("\t{}", config.Description),
+        fmt::format("{}", config.Description),
         "Compatible cars:",
         fmt::format("\tModels: {}", modelNames),
         fmt::format("\tPlates: {}", plates),
@@ -533,6 +533,8 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
         "Driving assists:",
         fmt::format("\tABS: {}", absStrings[absMode]),
         fmt::format("\tTCS: {}", tcsStrings[config.DriveAssists.TCS.Mode]),
+        fmt::format("\tESP: {}", config.DriveAssists.ESP.Enable ? "Yes" : "No"),
+        fmt::format("\tLSD: {}", config.DriveAssists.LSD.Enable ? "Yes" : "No"),
         "Steering wheel:",
         fmt::format("\tSoft lock: {:.0f}", config.SteeringOverride.SoftLockWheelInput)
     };
@@ -557,10 +559,10 @@ void saveVehicleConfig() {
     // Pre-fill with actual model name, if Add-on Spawner is present.
     const std::string modelName = getASCachedModelName(ENTITY::GET_ENTITY_MODEL(g_playerVehicle));
 
-    UI::ShowHelpText("Enter file name, without extension.");
+    UI::ShowHelpText("Enter configuration name.");
     std::string fileName = GetKbEntryStr(modelName);
     if (fileName.empty()) {
-        UI::Notify(INFO, "Cancelled config save.");
+        UI::Notify(INFO, "Cancelled configuration save.");
         return;
     }
 
@@ -588,7 +590,7 @@ void saveVehicleConfig() {
     std::string userModels = GetKbEntryStr(modelName);
 
     if (userModels.empty()) {
-        UI::Notify(INFO, "Cancelled config save.");
+        UI::Notify(INFO, "Cancelled configuration save.");
         return;
     }
 
@@ -596,44 +598,46 @@ void saveVehicleConfig() {
     config.ModelNames = StrUtil::split(userModels, ' ');
     config.SaveSettings();
     loadConfigs();
-    UI::Notify(INFO, fmt::format("Saved VehicleConfig as {}", finalFile.c_str()));
+    UI::Notify(INFO, fmt::format("Saved configuration as {}", finalFile.c_str()));
 }
 
 void update_vehconfigmenu() {
     g_menu.Title("Custom vehicle settings");
-    std::string cfgName = "None";
-    if (g_activeConfig != nullptr)
-        cfgName = g_activeConfig->Name;
-    g_menu.Subtitle(fmt::format("Config: {}", cfgName));
+    g_menu.Subtitle(MenuSubtitleConfig());
 
-    if (g_menu.Option("Save current config", 
-        { "Save the current configuration to a (new) file." })) {
+    if (g_menu.Option("Save current configuration", 
+        { "Save the current configuration to a new file." })) {
         saveVehicleConfig();
     }
 
-    if (g_menu.Option("Reload configs")) {
+    if (g_menu.Option("Reload configurations")) {
         loadConfigs();
     }
 
-    if (g_activeConfig != nullptr) {
+    if (g_settings.ConfigActive()) {
         bool sel = false;
-        g_menu.OptionPlus(fmt::format("Active config: {}", g_activeConfig->Name), {}, &sel, nullptr, nullptr, "", {
-            "For more info, check the file itself." });
+        g_menu.OptionPlus(fmt::format("Active configuration: [{}]", g_settings().Name), {}, &sel, nullptr, nullptr, "",
+            { "Currently using this configuration. Any changes made are saved into the current configuration.",
+              "When multiple configurations work with the same model, the configuration that comes first "
+              "alphabetically is used." });
         if (sel) {
-            auto extras = formatVehicleConfig(*g_activeConfig);
-            g_menu.OptionPlusPlus(extras, "Config overview");
+            auto extras = formatVehicleConfig(g_settings());
+            g_menu.OptionPlusPlus(extras, "Configuration overview");
         }
     }
     else {
-        g_menu.Option("No active config");
+        g_menu.Option("No active configuration");
     }
 
     for (const auto& vehConfig : g_vehConfigs) {
         bool sel = false;
-        g_menu.OptionPlus(vehConfig.Name, {}, &sel, nullptr, nullptr, "");
+        std::vector<std::string> descr = {
+            "This config will activate if you get into a compatible vehicle (by license plate and/or model)."
+        };
+        g_menu.OptionPlus(vehConfig.Name, {}, &sel, nullptr, nullptr, "", descr);
         if (sel) {
             auto extras = formatVehicleConfig(vehConfig);
-            g_menu.OptionPlusPlus(extras, "Config overview");
+            g_menu.OptionPlusPlus(extras, "Configuration overview");
         }
     }
 
@@ -649,7 +653,11 @@ void update_vehconfigmenu() {
 
 void update_controlsmenu() {
     g_menu.Title("Controls");
-    g_menu.Subtitle("");
+
+    if (g_settings.ConfigActive())
+        g_menu.Subtitle(fmt::format("CFG: [{} (Partial)]", g_settings().Name));
+    else
+        g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.MenuOption("Controller", "controllermenu");
 
@@ -1479,10 +1487,7 @@ void update_mousehudmenu() {
 
 void update_driveassistmenu() {
     g_menu.Title("Driving assists");
-    std::string cfgName = "None";
-    if (g_activeConfig != nullptr)
-        cfgName = g_activeConfig->Name;
-    g_menu.Subtitle(fmt::format("Config: {}", cfgName));
+    g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.BoolOption("Enable ABS", g_settings().DriveAssists.ABS.Enable,
         { "Custom script-driven ABS." });
@@ -1525,10 +1530,7 @@ void update_driveassistmenu() {
 
 void update_espsettingsmenu() {
     g_menu.Title("ESC settings");
-    std::string cfgName = "None";
-    if (g_activeConfig != nullptr)
-        cfgName = g_activeConfig->Name;
-    g_menu.Subtitle(fmt::format("Config: {}", cfgName));
+    g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.FloatOption("Oversteer starting angle", g_settings().DriveAssists.ESP.OverMin, 0.0f, 90.0f, 0.1f,
         { "Angle (degrees) where ESC starts correcting for oversteer." });
@@ -1551,10 +1553,7 @@ void update_espsettingsmenu() {
 
 void update_awdsettingsmenu() {
     g_menu.Title("Adaptive AWD");
-    std::string cfgName = "None";
-    if (g_activeConfig != nullptr)
-        cfgName = g_activeConfig->Name;
-    g_menu.Subtitle(fmt::format("Config: {}", cfgName));
+    g_menu.Subtitle(MenuSubtitleConfig());
 
     if (!HandlingReplacement::Available()) {
         if (g_menu.Option("HandlingReplacement.asi missing",
@@ -1703,6 +1702,9 @@ void update_miscoptionsmenu() {
     g_menu.Title("Misc options");
     g_menu.Subtitle("");
 
+    g_menu.MenuOption("Camera options", "cameraoptionsmenu",
+        { "Adjust the custom FPV camera." });
+
     if (SteeringAnimation::FileProblem()) {
         g_menu.Option("Animation file error", NativeMenu::solidRed,
             { "An error occurred reading the animation file. Check Gears.log for more details." });
@@ -1714,9 +1716,6 @@ void update_miscoptionsmenu() {
               "FPV camera angle is limited, consider enabling the custom FPV camera.",
               "Check animations.yml for more details!" });
     }
-
-    g_menu.MenuOption("Camera options", "cameraoptionsmenu",
-        { "Adjust the custom FPV camera" });
 
     if (g_menu.BoolOption("Hide player in FPV", g_settings.Misc.HidePlayerInFPV,
         { "Hides the player in first person view.",
@@ -1737,10 +1736,7 @@ void update_miscoptionsmenu() {
 
 void update_cameraoptionsmenu() {
     g_menu.Title("Camera options");
-    std::string cfgName = "None";
-    if (g_activeConfig != nullptr)
-        cfgName = g_activeConfig->Name;
-    g_menu.Subtitle(fmt::format("Config: {}", cfgName));
+    g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.BoolOption("Enable custom FPV camera", g_settings().Misc.Camera.Enable,
         { "Camera mounted to the player head." });
@@ -1822,10 +1818,7 @@ void update_cameraoptionsmenu() {
 
 void update_cameramovementoptionsmenu() {
     g_menu.Title("Camera movement");
-    std::string cfgName = "None";
-    if (g_activeConfig != nullptr)
-        cfgName = g_activeConfig->Name;
-    g_menu.Subtitle(fmt::format("Config: {}", cfgName));
+    g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.BoolOption("Follow movement", g_settings().Misc.Camera.Movement.Follow,
         { "Camera moves with motion and rotation, somewhat like NFS Shift." });
@@ -1869,10 +1862,7 @@ void update_cameramovementoptionsmenu() {
 
 void update_bikecameraoptionsmenu() {
     g_menu.Title("Camera bikes");
-    std::string cfgName = "None";
-    if (g_activeConfig != nullptr)
-        cfgName = g_activeConfig->Name;
-    g_menu.Subtitle(fmt::format("Config: {}", cfgName));
+    g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.BoolOption("Disable for 2-ish wheelers", g_settings().Misc.Camera.Bike.Disable,
         { "Use the the vanilla FPV camera on these vehicles." });
@@ -1930,7 +1920,7 @@ void update_devoptionsmenu() {
 
 void update_debugmenu() {
     g_menu.Title("Debug settings");
-    g_menu.Subtitle("");
+    g_menu.Subtitle("Under the hood");
 
     g_menu.BoolOption("Display debug info", g_settings.Debug.DisplayInfo,
         { "Show all detailed technical info of the gearbox and inputs calculations." });
