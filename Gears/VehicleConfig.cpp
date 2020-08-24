@@ -186,6 +186,9 @@ void VehicleConfig::SaveSettings() {
 }
 
 void VehicleConfig::saveGeneral() {
+    if (!mBaseConfig)
+        logger.Write(FATAL, "VehicleConfig::mBaseConfig not set. Skipping save!");
+
     CSimpleIniA ini;
     ini.SetUnicode();
     SI_Error result = ini.LoadFile(mFile.c_str());
