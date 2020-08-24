@@ -195,11 +195,13 @@ void VehicleConfig::saveGeneral() {
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [ID]
-    ini.SetValue("ID", "ModelName", fmt::format("{}", fmt::join(ModelNames, " ")).c_str());
-    //std::string allPlates = ini.GetValue("ID", "Plate", "");
-    //ModelNames = StrUtil::split(allNames, ' ');
-    //Plates = StrUtil::split(allPlates, ' ');
-    //Description = ini.GetValue("ID", "Description", "No description.");
+    std::string modelNames = fmt::format("{}", fmt::join(ModelNames, " "));
+    ini.SetValue("ID", "ModelName", modelNames.c_str());
+
+    std::string plates = fmt::format("{}", fmt::join(Plates, " "));
+    ini.SetValue("ID", "Plate", plates.c_str());
+
+    ini.SetValue("ID", "Description", Description.c_str());
 
     // [MT_OPTIONS]
     if (MTOptions.ShiftMode != mBaseConfig->MTOptions.ShiftMode) {
