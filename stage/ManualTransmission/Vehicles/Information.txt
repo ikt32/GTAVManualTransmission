@@ -1,45 +1,53 @@
-; The script finds .ini files in this folder and loads them into the script.
+; The script finds and uses .ini files in this folder.
 ; When your current car matches a model or a plate, the ini settings are
 ; used instead of the main script settings.
 
 ; Tip: You can make a copy of this file and rename it with an ini extension.
 ; Tip: Use Notepad++ for helpful syntax highlighting for .ini files.
+; Tip: The Debug menu has an option to export a base configuration.
 
 ; Note: While a custom vehicle settings configuration is active, live changes
-; in the menu do not apply _until the menu is closed_.
-;   Closing the menu saves settings_general.ini and settings_wheel.ini,
-;   and reloads the overrides with the new main settings.
+; in the menu only apply to that configuration. They are saved back into the
+; specific ini.
+
+; When a setting is not present, it will inherit it from the main settings:
+; so this file layers on top of the base settings.
+
+; [ID] -> ModelName:
+; Model (spawn) names, separated by a space.
+; When multiple configurations contain the same model, the first match is used.
+
+; [ID] -> Plate:
+; License plate text, within quotes, separated by a comma.
+; Only matches first 8 characters, spaces respected. Spaces after last
+; character are ignored.
+; Plate is used in conjunction with model. If both model and plate match, that
+; configuration will be used.
+; Replace in-plate spaces with dots: "AE.86" will match "AE 86" plates.
 
 [ID]
-; Model (spawn) names, separated by a space.
-ModelName = futo ae86
-; Plates, separated by a space.
-; When a plate matches, the model isn't checked.
-Plate = TOFU FUJIWARA
-Description = Example configuration
-
-; All settings listed below can be used to override the corresponding
-; main settings.
-; When a setting is not present, the main setting will be used.
+ModelName = Model0 Model1 Model2
+Plate = [46EEK572], [   MT   ], [ NO GRIP]
+Description = This is a base configuration file with all possible sections and keys.
 
 [MT_OPTIONS]
-ShiftMode = 1
-ClutchCatching = true
+ClutchCatching = false
 ClutchShiftingH = true
 ClutchShiftingS = false
 
+
 [MT_PARAMS]
 ClutchCatchpoint = 0.150000
-StallingThreshold = 0.350000
-StallingRPM = 0.100000
+StallingRPM = 0.090000
+StallingRate = 3.750000
+StallingSlip = 0.400000
 RPMDamage = 0.100000
 MisshiftDamage = 5.000000
-EngBrakePower = 0.150000
+EngBrakePower = 0.000000
 EngBrakeThreshold = 0.750000
 CreepIdleThrottle = 0.100000
 CreepIdleRPM = 0.100000
-StallingRate = 3.750000
-StallingSlip = 0.400000
+
 
 [DRIVING_ASSISTS]
 ABS = false
@@ -49,56 +57,82 @@ TCSMode = 0
 TCSSlipMax = 2.500000
 ESP = false
 ESPOverMin = 5.000000
-ESPOverMax = 16.000004
+ESPOverMax = 15.000000
 ESPOverMinComp = 0.000000
-ESPOverMaxComp = 1.000000
+ESPOverMaxComp = 2.000000
 ESPUnderMin = 5.000000
 ESPUnderMax = 10.000000
 ESPUnderMinComp = 0.000000
 ESPUnderMaxComp = 1.000000
 LSD = false
-LSDViscosity = 25.000000
+LSDViscosity = 1.000000
+AWD = false
+AWDBiasAtMaxTransfer = 0.500000
+AWDUseCustomBaseBias = false
+AWDCustomBaseBias = 0.010000
+AWDCustomMin = 0.000000
+AWDCustomMax = 1.000000
+AWDUseTraction = false
+AWDTractionLossMin = 1.050000
+AWDTractionLossMax = 1.500000
+AWDUseOversteer = false
+AWDOversteerMin = 5.000000
+AWDOversteerMax = 15.000000
+AWDUseUndersteer = false
+AWDUndersteerMin = 5.000000
+AWDUndersteerMax = 15.000000
+
+
+[STEERING_OVERRIDE]
+UseForCustomSteering = true
+SoftLockCustomSteering = 720.000000
+SoftLockWheelInput = 720.000000
+
 
 [SHIFT_OPTIONS]
-UpshiftCut = false
-DownshiftBlip = false
+UpshiftCut = true
+DownshiftBlip = true
 ClutchRateMult = 1.000000
 RPMTolerance = 0.200000
 
+
 [AUTO_PARAMS]
 UpshiftLoad = 0.120000
-DownshiftLoad = 0.400000
+DownshiftLoad = 0.600000
 NextGearMinRPM = 0.330000
 CurrGearMinRPM = 0.270000
 EcoRate = 0.050000
 DownshiftTimeoutMult = 1.000000
 UsingATCU = false
 
-; Different configurations can now use 
-; completely different force feedback profiles.
-[FORCE_FEEDBACK]
-Enable = true
-Scale = true
-AntiDeadForce = 600
-SATAmpMult = 1.0
-SATMax = 10000
-SATFactor = 0.5
-DamperMax = 100
-DamperMin = 25
-DamperMinSpeed = 2.4
-DetailMult = 2.0
-DetailLim = 5000
-DetailMAW = 2
-CollisionMult = 2.5
-
-[STEER]
-Angle=900
-
-[CUSTOM_STEERING]
-CustomRotationDegrees = 720.0
 
 [CAM]
-; Everything from the main settings
-
-[HUD]
-; Everything from the main settings
+Enable = true
+AttachId = 0
+FollowMovement = true
+MovementMultVel = 0.750000
+MovementMultRot = 0.150000
+MovementCap = 45.000000
+LongForwardMult = 0.050000
+LongBackwardMult = 0.100000
+LongDeadzone = 0.950000
+LongGamma = 1.000000
+LongForwardLimit = 0.100000
+LongBackwardLimit = 0.120000
+RemoveHead = true
+FOV = 55.000000
+OffsetHeight = 0.040000
+OffsetForward = 0.050000
+OffsetSide = 0.000000
+Pitch = 0.000000
+LookTime = 0.000010
+MouseLookTime = 0.000001
+MouseCenterTimeout = 750
+MouseSensitivity = 0.300000
+BikeDisable = false
+BikeAttachId = 0
+BikeFOV = 55.000000
+BikeOffsetHeight = -0.050000
+BikeOffsetForward = -0.080000
+BikeOffsetSide = 0.000000
+BikePitch = -11.000000

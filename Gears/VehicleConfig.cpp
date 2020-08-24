@@ -67,9 +67,32 @@ void VehicleConfig::LoadSettings(const std::string& file) {
     std::string allNames = ini.GetValue("ID", "ModelName", "");
     std::string allPlates = ini.GetValue("ID", "Plate", "");
     ModelNames = StrUtil::split(allNames, ' ');
-    Plates = StrUtil::split(allPlates, ' ');
+
+    Plates = StrUtil::split(allPlates, ',');
+    for (auto& plate : Plates) {
+        auto first = plate.find_first_of('[');
+        auto last = plate.find_last_of(']');
+
+        if (first == std::string::npos ||
+            last == std::string::npos) {
+            plate = "DELETE_THIS_PLATE";
+            continue;
+        }
+
+        first += 1;
+        plate = plate.substr(first, last - first);
+        plate.erase(std::find_if(plate.rbegin(), plate.rend(), [](int ch) {
+            return !std::isspace(ch);
+            }).base(), plate.end());
+    }
+
+    Plates.erase(std::remove_if(
+        Plates.begin(), Plates.end(),
+        [](const auto& elem) -> bool { return elem == "DELETE_THIS_PLATE"; }
+    ), Plates.end());
+
     Description = ini.GetValue("ID", "Description", "No description.");
-    
+
     // [MT_OPTIONS]
     MTOptions.ShiftMode =
         static_cast<EShiftMode>(ini.GetLongValue("MT_OPTIONS", "ShiftMode", static_cast<int>(gSettings.MTOptions.ShiftMode)));
@@ -211,7 +234,12 @@ void VehicleConfig::saveGeneral() {
     std::string modelNames = fmt::format("{}", fmt::join(ModelNames, " "));
     ini.SetValue("ID", "ModelName", modelNames.c_str());
 
-    std::string plates = fmt::format("{}", fmt::join(Plates, " "));
+    std::vector<std::string> fmtPlates;
+    for(const auto& plate : Plates) {
+        fmtPlates.push_back(fmt::format("[{}]", plate));
+    }
+
+    std::string plates = fmt::format("{}", fmt::join(fmtPlates, ", "));
     ini.SetValue("ID", "Plate", plates.c_str());
 
     ini.SetValue("ID", "Description", Description.c_str());

@@ -1914,7 +1914,7 @@ void update_devoptionsmenu() {
 
         VehicleConfig config;
         config.ModelNames = { "Model0", "Model1", "Model2" };
-        config.Plates = { "46EEK572", "20KDA975", "83OCW456" };
+        config.Plates = { "46EEK572", "   MT   ", " NO GRIP" };
         config.Description = "This is a base configuration file with all possible sections and keys.";
         config.SaveSettings(&config, finalFile);
     }
