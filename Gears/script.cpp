@@ -2154,6 +2154,9 @@ void loadConfigs() {
         if (StrUtil::toLower(fs::path(file).extension().string()) != ".ini")
             continue;
 
+        if (StrUtil::toLower(fs::path(file).stem().string()) == "baseVehicleConfig")
+            continue;
+
         VehicleConfig config(g_settings.BaseConfig(), file.path().string());
         if (config.ModelNames.empty() && config.Plates.empty()) {
             logger.Write(WARN,
