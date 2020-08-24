@@ -185,6 +185,19 @@ void VehicleConfig::SaveSettings() {
     saveGeneral();
 }
 
+void VehicleConfig::SaveSettings(VehicleConfig* baseConfig, const std::string& customPath) {
+    std::string oldPath = mFile;
+    mFile = customPath;
+
+    VehicleConfig* oldConfig = mBaseConfig;
+    mBaseConfig = baseConfig;
+
+    saveGeneral();
+
+    mBaseConfig = oldConfig;
+    mFile = oldPath;
+}
+
 void VehicleConfig::saveGeneral() {
     if (!mBaseConfig)
         logger.Write(FATAL, "VehicleConfig::mBaseConfig not set. Skipping save!");

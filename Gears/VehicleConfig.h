@@ -19,6 +19,7 @@ public:
 
     void LoadSettings(const std::string& file);
     void SaveSettings();
+    void SaveSettings(VehicleConfig* baseConfig, const std::string& customPath);
 
     std::string Name;
 
