@@ -185,7 +185,7 @@ std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData, LSDData lsdData
 
     float steerMult = g_settings.CustomSteering.SteeringMult;
     if (g_controls.PrevInput == CarControls::InputDevices::Wheel)
-        steerMult = g_settings().Wheel.Steering.SteerMult;
+        steerMult = g_settings.Wheel.Steering.SteerMult;
     float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * steerMult;
 
     float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);

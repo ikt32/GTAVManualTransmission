@@ -178,6 +178,7 @@
     <ClCompile Include="SteeringAnim.cpp" />
     <ClCompile Include="UDPTelemetry\UDPTelemetry.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
+    <ClCompile Include="Util\AddonSpawnerCache.cpp" />
     <ClCompile Include="Util\Color.cpp" />
     <ClCompile Include="Util\Files.cpp" />
     <ClCompile Include="Util\FileVersion.cpp" />
@@ -279,6 +280,7 @@
     <ClInclude Include="UDPTelemetry\Socket.h" />
     <ClInclude Include="UDPTelemetry\TelemetryPacket.h" />
     <ClInclude Include="UpdateChecker.h" />
+    <ClInclude Include="Util\AddonSpawnerCache.h" />
     <ClInclude Include="Util\Color.h" />
     <ClInclude Include="Util\Files.h" />
     <ClInclude Include="Util\FileVersion.h" />

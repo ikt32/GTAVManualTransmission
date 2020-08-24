@@ -8,7 +8,6 @@
 #include "Input/CarControls.hpp"
 #include "Util/MathExt.h"
 #include "Util/Strings.hpp"
-#include "VehicleConfig.h"
 
 #include "inc/natives.h"
 #include "inc/types.h"
@@ -37,7 +36,7 @@ bool MT_NeutralGear() {
 }
 
 int MT_GetShiftMode() {
-    return EToInt(g_settings().MTOptions.ShiftMode) + 1;
+    return static_cast<int>(g_settings().MTOptions.ShiftMode) + 1;
 }
 
 void MT_SetShiftMode(int mode) {
@@ -76,8 +75,7 @@ float MT_GetAutoEcoRate() {
 }
 
 void MT_SetAutoEcoRate(float rate) {
-    extern VehicleConfig* g_activeConfig;
-    APPLY_CONFIG_VALUE(AutoParams.EcoRate, rate);
+    g_settings().AutoParams.EcoRate = rate;
 }
 
 void MT_AddIgnoreVehicle(int vehicle) {

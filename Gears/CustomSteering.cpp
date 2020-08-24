@@ -218,7 +218,7 @@ void CustomSteering::Update() {
 
     bool mouseInputThisTick = false;
     // Mouse input inherits lerp-to-center
-    if (g_settings().CustomSteering.Mouse.Enable)
+    if (g_settings.CustomSteering.Mouse.Enable)
         mouseInputThisTick = updateMouseSteer(steerCurr);
 
     lastTickTime = GetTickCount64();
@@ -233,11 +233,11 @@ void CustomSteering::Update() {
         reduction = 1.0f;
 
     float desiredHeading;
-    if (mouseInputThisTick && g_settings().CustomSteering.Mouse.DisableReduction) {
+    if (mouseInputThisTick && g_settings.CustomSteering.Mouse.DisableReduction) {
         reduction = 1.0f;
     }
 
-    if (mouseInputThisTick && g_settings().CustomSteering.Mouse.DisableSteerAssist) {
+    if (mouseInputThisTick && g_settings.CustomSteering.Mouse.DisableSteerAssist) {
         desiredHeading = steerCurr * limitRadians * reduction;
     }
     else {
@@ -252,12 +252,12 @@ void CustomSteering::Update() {
         VExt::SetSteeringAngle(g_playerVehicle, desiredHeading);
 
     auto boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "steeringwheel");
-    if (boneIdx != -1 && g_settings.CustomSteering.CustomRotation) {
+    if (boneIdx != -1 && g_settings().SteeringOverride.UseForCustomSteering) {
         Vector3 rotAxis{};
         rotAxis.y = 1.0f;
 
         float corrDesiredHeading = -desiredHeading * (1.0f / limitRadians);
-        float rotDeg = g_settings().CustomSteering.CustomRotationDegrees / 2.0f * corrDesiredHeading;
+        float rotDeg = g_settings().SteeringOverride.SoftLockCustomSteering / 2.0f * corrDesiredHeading;
         float rotDegRaw = rotDeg;
 
         // Setting angle using the VExt:: calls above causes the angle to overshoot the "real" coords
@@ -291,7 +291,7 @@ bool CustomSteering::updateMouseSteer(float& steer) {
         PAD::DISABLE_CONTROL_ACTION(0, eControl::ControlLookUpDown, true);
 
         float mouseVal = PAD::GET_DISABLED_CONTROL_NORMAL(0, eControl::ControlLookLeftRight);
-        mouseXTravel += mouseVal * g_settings().CustomSteering.Mouse.Sensitivity;
+        mouseXTravel += mouseVal * g_settings.CustomSteering.Mouse.Sensitivity;
         mouseXTravel = std::clamp(mouseXTravel, -1.0f, 1.0f);
 
         steer = -mouseXTravel;

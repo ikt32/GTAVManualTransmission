@@ -188,8 +188,6 @@ void functionDash() {
 void setVehicleConfig(Vehicle vehicle) {
     g_activeConfig = nullptr;
     g_settings.SetVehicleConfig(nullptr);
-    if (!g_settings.MTOptions.Override)
-        return;
 
     if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
         auto currModel = ENTITY::GET_ENTITY_MODEL(vehicle);
@@ -203,7 +201,7 @@ void setVehicleConfig(Vehicle vehicle) {
                     [vehicle](const std::string & plate) {
                         return StrUtil::toLower(plate) == StrUtil::toLower(VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(vehicle));
                     });
-                if (platesIt != config.Plates.end())
+                if (platesIt != config.Plates.end() && modelsIt != config.ModelNames.end())
                     return true;
                 if (modelsIt != config.ModelNames.end())
                     return true;
@@ -212,7 +210,7 @@ void setVehicleConfig(Vehicle vehicle) {
         if (it != g_vehConfigs.end()) {
             g_activeConfig = &*it;
             g_settings.SetVehicleConfig(g_activeConfig);
-            UI::Notify(INFO, fmt::format("Config [{}] loaded.", g_activeConfig->Name));
+            UI::Notify(INFO, fmt::format("Configuration [{}] loaded.", g_activeConfig->Name));
         }
     }
 }
@@ -521,9 +519,9 @@ void update_manual_transmission() {
         // 1: ABS
         // 0: None!
 
-        currMode += g_settings.DriveAssists.ABS.Enable;
-        currMode += g_settings.DriveAssists.ESP.Enable;
-        currMode += g_settings.DriveAssists.TCS.Enable;
+        currMode += g_settings().DriveAssists.ABS.Enable;
+        currMode += g_settings().DriveAssists.ESP.Enable;
+        currMode += g_settings().DriveAssists.TCS.Enable;
 
         if (currMode == 0) {
             currMode = 3;
@@ -535,26 +533,26 @@ void update_manual_transmission() {
         switch(currMode) {
             case 3:
                 UI::Notify(INFO, "Assist: Switched to ABS + ESC + TCS");
-                g_settings.DriveAssists.ABS.Enable = true;
-                g_settings.DriveAssists.ESP.Enable = true;
-                g_settings.DriveAssists.TCS.Enable = true;
+                g_settings().DriveAssists.ABS.Enable = true;
+                g_settings().DriveAssists.ESP.Enable = true;
+                g_settings().DriveAssists.TCS.Enable = true;
                 break;
             case 2:
                 UI::Notify(INFO, "Assist: Switched to ABS + ESC");
-                g_settings.DriveAssists.ABS.Enable = true;
-                g_settings.DriveAssists.ESP.Enable = true;
-                g_settings.DriveAssists.TCS.Enable = false;
+                g_settings().DriveAssists.ABS.Enable = true;
+                g_settings().DriveAssists.ESP.Enable = true;
+                g_settings().DriveAssists.TCS.Enable = false;
                 break;
             case 1:
-                g_settings.DriveAssists.ABS.Enable = true;
-                g_settings.DriveAssists.ESP.Enable = false;
-                g_settings.DriveAssists.TCS.Enable = false;
+                g_settings().DriveAssists.ABS.Enable = true;
+                g_settings().DriveAssists.ESP.Enable = false;
+                g_settings().DriveAssists.TCS.Enable = false;
                 UI::Notify(INFO, "Assist: Switched to ABS only");
                 break;
             case 0:
-                g_settings.DriveAssists.ABS.Enable = false;
-                g_settings.DriveAssists.ESP.Enable = false;
-                g_settings.DriveAssists.TCS.Enable = false;
+                g_settings().DriveAssists.ABS.Enable = false;
+                g_settings().DriveAssists.ESP.Enable = false;
+                g_settings().DriveAssists.TCS.Enable = false;
                 UI::Notify(INFO, "Assist: Switched to no assists");
                 break;
             default:
@@ -567,34 +565,24 @@ void update_manual_transmission() {
 
     if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::DriveBiasFInc) ||
         g_controls.ButtonJustPressed(CarControls::WheelControlType::DriveBiasFInc)) {
-
-        g_settings.GetRef().DriveAssists.AWD.CustomBaseBias += 0.05f;
-
-        g_settings.GetRef().DriveAssists.AWD.CustomBaseBias = round(g_settings.GetRef().DriveAssists.AWD.CustomBaseBias * 20.0f) / 20.0f;
-
-        if (g_settings.GetRef().DriveAssists.AWD.CustomBaseBias > 0.99f) {
-            g_settings.GetRef().DriveAssists.AWD.CustomBaseBias = 0.99f;
-        }
-
-        if (g_settings.GetRef().DriveAssists.AWD.CustomBaseBias > g_settings.GetRef().DriveAssists.AWD.CustomMax) {
-            g_settings.GetRef().DriveAssists.AWD.CustomBaseBias = g_settings.GetRef().DriveAssists.AWD.CustomMax;
-        }
+        float bias = g_settings().DriveAssists.AWD.CustomBaseBias;
+        bias += 0.05f;
+        bias = std::clamp(
+            round(bias * 20.0f) / 20.0f,
+            0.01f,
+            g_settings().DriveAssists.AWD.CustomMax);
+        g_settings().DriveAssists.AWD.CustomBaseBias = bias;
     }
 
     if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::DriveBiasFDec) ||
         g_controls.ButtonJustPressed(CarControls::WheelControlType::DriveBiasFDec)) {
-
-        g_settings.GetRef().DriveAssists.AWD.CustomBaseBias -= 0.05f;
-
-        g_settings.GetRef().DriveAssists.AWD.CustomBaseBias = round(g_settings.GetRef().DriveAssists.AWD.CustomBaseBias * 20.0f) / 20.0f;
-
-        if (g_settings.GetRef().DriveAssists.AWD.CustomBaseBias < 0.01f) {
-            g_settings.GetRef().DriveAssists.AWD.CustomBaseBias = 0.01f;
-        }
-
-        if (g_settings.GetRef().DriveAssists.AWD.CustomBaseBias < g_settings.GetRef().DriveAssists.AWD.CustomMin) {
-            g_settings.GetRef().DriveAssists.AWD.CustomBaseBias = g_settings.GetRef().DriveAssists.AWD.CustomMin;
-        }
+        float bias = g_settings().DriveAssists.AWD.CustomBaseBias;
+        bias -= 0.05f;
+        bias = std::clamp(
+            round(bias * 20.0f) / 20.0f,
+            g_settings().DriveAssists.AWD.CustomMin,
+            0.99f);
+        g_settings().DriveAssists.AWD.CustomBaseBias = bias;
     }
 
     if (MemoryPatcher::NumGearboxPatched != MemoryPatcher::NumGearboxPatches) {
@@ -758,12 +746,7 @@ void updateLastInputDevice() {
                 if (g_settings().MTOptions.ShiftMode == EShiftMode::HPattern &&
                     g_settings.Controller.BlockHShift) {
                     message += "~n~Mode: Sequential";
-                    if (g_settings.MTOptions.Override) {
-                        
-                    }
-                    else {
-                        setShiftMode(EShiftMode::Sequential);
-                    }
+                    setShiftMode(EShiftMode::Sequential);
                 }
                 break;
             case CarControls::Wheel:
@@ -796,7 +779,7 @@ void setShiftMode(EShiftMode shiftMode) {
         tempMode = EShiftMode::Automatic;
     }
 
-    APPLY_CONFIG_VALUE(MTOptions.ShiftMode, tempMode);
+    g_settings().MTOptions.ShiftMode = tempMode;
 
     std::string mode = "Mode: ";
     switch (g_settings().MTOptions.ShiftMode) {
@@ -1245,7 +1228,7 @@ void functionAShift() {
 
         float rateUp = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
         float upshiftDuration = 1.0f / (rateUp * g_settings().ShiftOptions.ClutchRateMult);
-        bool tpPassed = MISC::GET_GAME_TIMER() > g_gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings.AutoParams.DownshiftTimeoutMult);
+        bool tpPassed = MISC::GET_GAME_TIMER() > g_gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings().AutoParams.DownshiftTimeoutMult);
         g_gearStates.DownshiftLoad = g_settings().AutoParams.DownshiftLoad * gearRatioRatio;
 
         // Shift down
@@ -1368,7 +1351,7 @@ void functionEngStall() {
             g_peripherals.IgnitionState = IgnitionState::Stall;
 
             if (g_controls.PrevInput == CarControls::Wheel)
-                g_controls.PlayFFBCollision(g_settings().Wheel.FFB.DetailLim / 2);
+                g_controls.PlayFFBCollision(g_settings.Wheel.FFB.DetailLim / 2);
             else if (g_controls.PrevInput == CarControls::Controller)
                 PAD::SET_PAD_SHAKE(0, 100, 255);
         }
@@ -2163,7 +2146,6 @@ void loadConfigs() {
 
     if (!(fs::exists(fs::path(vehConfigsPath)) && fs::is_directory(fs::path(vehConfigsPath)))) {
         logger.Write(WARN, "Directory [%s] not found!", vehConfigsPath.c_str());
-        g_settings.MTOptions.Override = false;
         setVehicleConfig(g_playerVehicle);
         return;
     }
@@ -2172,7 +2154,7 @@ void loadConfigs() {
         if (StrUtil::toLower(fs::path(file).extension().string()) != ".ini")
             continue;
 
-        VehicleConfig config(g_settings, file.path().string());
+        VehicleConfig config(g_settings.BaseConfig(), file.path().string());
         if (config.ModelNames.empty() && config.Plates.empty()) {
             logger.Write(WARN,
                 "Vehicle settings file [%s] contained no model names or plates, skipping...",

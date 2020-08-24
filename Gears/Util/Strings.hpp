@@ -32,11 +32,6 @@ constexpr unsigned long joaat(const char* s) {
     return hash;
 }
 
-template<typename E>
-constexpr auto EToInt(E e) -> typename std::underlying_type<E>::type {
-    return static_cast<typename std::underlying_type<E>::type>(e);
-}
-
 namespace StrUtil {
     template<typename Out>
     void split(const std::string& s, char delim, Out result) {

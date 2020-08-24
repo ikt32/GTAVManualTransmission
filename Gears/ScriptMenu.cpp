@@ -1,3 +1,5 @@
+#include <filesystem>
+
 #include "script.h"
 
 #include "Constants.h"
@@ -37,6 +39,8 @@
 #include <mutex>
 
 #include "BlockableControls.h"
+#include "Util/AddonSpawnerCache.h"
+#include "Util/Paths.h"
 
 using VExt = VehicleExtensions;
 
@@ -54,7 +58,6 @@ extern CarControls g_controls;
 extern ScriptSettings g_settings;
 
 extern std::vector<VehicleConfig> g_vehConfigs;
-extern VehicleConfig* g_activeConfig;
 
 struct SFont {
     int ID;
@@ -131,6 +134,8 @@ namespace {
         "Vanilla FPV"
     };
 
+    std::vector<std::string> diDevicesInfo{ "Press Enter to refresh." };
+
     bool getKbEntry(float& val) {
         UI::Notify(INFO, "Enter value");
         MISC::DISPLAY_ONSCREEN_KEYBOARD(LOCALIZATION::GET_CURRENT_LANGUAGE() == 0, "FMMC_KEY_TIP8", "",
@@ -200,7 +205,12 @@ namespace {
         }
     }
 
-    std::vector<std::string> diDevicesInfo { "Press Enter to refresh." };
+    std::string MenuSubtitleConfig() {
+        std::string cfgName = "Base";
+        if (g_settings.ConfigActive())
+            cfgName = g_settings().Name;
+        return fmt::format("CFG: [{}]", cfgName);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -218,15 +228,7 @@ void saveChanges() {
 
 void onMenuClose() {
     saveChanges();
-
-    if (g_activeConfig) {
-        auto tempShiftMode = g_activeConfig->MTOptions.ShiftMode;
-        loadConfigs();
-        setShiftMode(tempShiftMode);
-    }
-    else {
-        loadConfigs();
-    }
+    loadConfigs();
 }
 
 void update_mainmenu() {
@@ -279,20 +281,20 @@ void update_mainmenu() {
         toggleManual(!g_settings.MTOptions.Enable);
     }
 
-    int tempShiftMode = EToInt(g_settings().MTOptions.ShiftMode);
+    int tempShiftMode = static_cast<int>(g_settings().MTOptions.ShiftMode);
 
     std::vector<std::string> detailsTemp {
         "Choose your gearbox! Options are Sequential, H-pattern and Automatic."
     };
 
-    if (g_settings.MTOptions.Override && g_activeConfig != nullptr) {
-        detailsTemp.push_back(fmt::format("Temporarily change shift mode for current override: [{}]", g_activeConfig->Name));
+    if (g_settings.ConfigActive()) {
+        detailsTemp.push_back(fmt::format("CFG: [{}]", g_settings().Name));
     }
 
     g_menu.StringArray("Gearbox", gearboxModes, tempShiftMode,
         detailsTemp);
 
-    if (tempShiftMode != EToInt(g_settings().MTOptions.ShiftMode)) {
+    if (tempShiftMode != static_cast<int>(g_settings().MTOptions.ShiftMode)) {
         setShiftMode(static_cast<EShiftMode>(tempShiftMode));
     }
 
@@ -360,13 +362,21 @@ void update_settingsmenu() {
     g_menu.MenuOption("Automatic finetuning", "finetuneautooptionsmenu",
         { "Fine-tune script-provided automatic transmission parameters." });
 
-    g_menu.MenuOption("Custom vehicle settings", "vehconfigmenu",
-        { "Configurations overriding mod-wide settings, for specific vehicles." });
+    g_menu.MenuOption("Vehicle configurations", "vehconfigmenu",
+        { "Vehicle configurations override the base mod settings, for specific vehicles. This allows selectively "
+          "enabling assists or per-vehicle tweaked finetuning options.",
+          "\"CFG: [...]\" in a menu subtitle or setting "
+          "description indicates that the settings you change are vehicle-specific."});
 }
 
 void update_featuresmenu() {
     g_menu.Title("Features");
-    g_menu.Subtitle("");
+
+    if (g_settings.ConfigActive())
+        g_menu.Subtitle(fmt::format("CFG: [{} (Partial)]", g_settings().Name));
+    else
+        g_menu.Subtitle(MenuSubtitleConfig());
+
     g_menu.BoolOption("Engine Damage", g_settings.MTOptions.EngDamage,
         { "Damage the engine when over-revving and when mis-shifting." });
 
@@ -376,100 +386,100 @@ void update_featuresmenu() {
     g_menu.BoolOption("Engine stalling (S)", g_settings.MTOptions.EngStallS,
         { "Stall the engine when the wheel speed gets too low. Applies to sequential shift mode." });
 
-    g_menu.BoolOption("Clutch shift (H)", g_settings.MTOptions.ClutchShiftH,
-        { "Require holding the clutch to shift in H-pattern shift mode." });
-
-    g_menu.BoolOption("Clutch shift (S)", g_settings.MTOptions.ClutchShiftS,
-        { "Require holding the clutch to shift in sequential mode." });
-
     g_menu.BoolOption("Engine braking", g_settings.MTOptions.EngBrake,
         { "Help the car braking by slowing down more at high RPMs." });
 
     g_menu.BoolOption("Gear/RPM lockup", g_settings.MTOptions.EngLock,
         { "Simulate wheel lock-up when mis-shifting to a too low gear for the RPM range." });
 
-    g_menu.BoolOption("Clutch creep", g_settings.MTOptions.ClutchCreep,
-        { "Simulate clutch creep when stopped with clutch engaged." });
-
     g_menu.BoolOption("Hard rev limiter", g_settings.MTOptions.HardLimiter,
         { "Enforce rev limiter for reverse and top speed. No more infinite speed!" });
+
+    g_menu.BoolOption("Clutch shift (H)", g_settings().MTOptions.ClutchShiftH,
+        { "Require holding the clutch to shift in H-pattern shift mode. (Vehicle specific)" });
+
+    g_menu.BoolOption("Clutch shift (S)", g_settings().MTOptions.ClutchShiftS,
+        { "Require holding the clutch to shift in sequential mode. (Vehicle specific)" });
+
+    g_menu.BoolOption("Clutch creep", g_settings().MTOptions.ClutchCreep,
+        { "Simulate clutch creep when stopped with clutch engaged. (Vehicle specific)" });
 }
 
 void update_finetuneoptionsmenu() {
     g_menu.Title("Finetuning");
-    g_menu.Subtitle("");
+    g_menu.Subtitle(MenuSubtitleConfig());
 
-    g_menu.FloatOption("Clutch bite threshold", g_settings.MTParams.ClutchThreshold, 0.0f, 1.0f, 0.05f,
+    g_menu.FloatOption("Clutch bite threshold", g_settings().MTParams.ClutchThreshold, 0.0f, 1.0f, 0.05f,
         { "How far the clutch has to be lifted to start biting." });
-    g_menu.FloatOption("Stalling RPM", g_settings.MTParams.StallingRPM, 0.0f, 0.2f, 0.01f,
+    g_menu.FloatOption("Stalling RPM", g_settings().MTParams.StallingRPM, 0.0f, 0.2f, 0.01f,
         { "Consider stalling when the expected RPM drops below this value.",
           "The range is 0.0 to 0.2. The engine idles at 0.2 in GTA.",
           "Expected RPM is based on car speed and current gear ratio."});
-    g_menu.FloatOption("Stalling rate", g_settings.MTParams.StallingRate, 0.0f, 10.0f, 0.05f,
+    g_menu.FloatOption("Stalling rate", g_settings().MTParams.StallingRate, 0.0f, 10.0f, 0.05f,
         { "How quick the engine should stall. Higher values make it stall faster." });
-    g_menu.FloatOption("Stalling slip", g_settings.MTParams.StallingSlip, 0.0f, 1.0f, 0.05f,
+    g_menu.FloatOption("Stalling slip", g_settings().MTParams.StallingSlip, 0.0f, 1.0f, 0.05f,
         { "How much the clutch may slip before the stalling rate picks up." });
 
-    g_menu.FloatOption("RPM damage", g_settings.MTParams.RPMDamage, 0.0f, 10.0f, 0.05f,
+    g_menu.FloatOption("RPM damage", g_settings().MTParams.RPMDamage, 0.0f, 10.0f, 0.05f,
         { "Damage from redlining too long." });
-    g_menu.FloatOption("Misshift damage", g_settings.MTParams.MisshiftDamage, 0, 100, 5,
+    g_menu.FloatOption("Misshift damage", g_settings().MTParams.MisshiftDamage, 0, 100, 5,
         { "Damage from being over the rev range." });
-    g_menu.FloatOption("Engine braking threshold", g_settings.MTParams.EngBrakeThreshold, 0.0f, 1.0f, 0.05f,
+    g_menu.FloatOption("Engine braking threshold", g_settings().MTParams.EngBrakeThreshold, 0.0f, 1.0f, 0.05f,
         { "RPM where engine braking starts being effective." });
-    g_menu.FloatOption("Engine braking power", g_settings.MTParams.EngBrakePower, 0.0f, 5.0f, 0.05f,
+    g_menu.FloatOption("Engine braking power", g_settings().MTParams.EngBrakePower, 0.0f, 5.0f, 0.05f,
         { "Decrease this value if your wheels lock up when engine braking." });
 
     // Clutch creep params
-    g_menu.FloatOption("Clutch creep idle RPM", g_settings.MTParams.CreepIdleRPM, 0.0f, 0.5f, 0.01f,
+    g_menu.FloatOption("Clutch creep idle RPM", g_settings().MTParams.CreepIdleRPM, 0.0f, 0.5f, 0.01f,
         { "RPM at which the engine should be idling and the car wants to move by itself.",
           "Engines in GTA idle at 0.2, but this is rather high."});
-    g_menu.FloatOption("Clutch creep throttle", g_settings.MTParams.CreepIdleThrottle, 0.0f, 1.0f, 0.01f,
+    g_menu.FloatOption("Clutch creep throttle", g_settings().MTParams.CreepIdleThrottle, 0.0f, 1.0f, 0.01f,
         { "How much throttle is given when the car speed drops below the idle RPM." });
 }
 
 void update_shiftingoptionsmenu() {
     g_menu.Title("Shifting options");
-    g_menu.Subtitle("");
+    g_menu.Subtitle(MenuSubtitleConfig());
 
-    g_menu.BoolOption("Cut throttle on upshift", g_settings.ShiftOptions.UpshiftCut,
+    g_menu.BoolOption("Cut throttle on upshift", g_settings().ShiftOptions.UpshiftCut,
         { "Helps rev matching.",
             "Only applies to sequential mode."});
-    g_menu.BoolOption("Blip throttle on downshift", g_settings.ShiftOptions.DownshiftBlip,
+    g_menu.BoolOption("Blip throttle on downshift", g_settings().ShiftOptions.DownshiftBlip,
         { "Helps rev matching.",
             "Only applies to sequential mode." });
-    g_menu.FloatOption("Clutch rate multiplier", g_settings.ShiftOptions.ClutchRateMult, 0.05f, 20.0f, 0.05f,
+    g_menu.FloatOption("Clutch rate multiplier", g_settings().ShiftOptions.ClutchRateMult, 0.05f, 20.0f, 0.05f,
         { "Change how fast clutching is. Below 1 is slower, higher than 1 is faster.",
             "Applies to sequential and automatic mode." });
 
-    g_menu.FloatOption("Shifting RPM tolerance", g_settings.ShiftOptions.RPMTolerance, 0.0f, 1.0f, 0.05f,
+    g_menu.FloatOption("Shifting RPM tolerance", g_settings().ShiftOptions.RPMTolerance, 0.0f, 1.0f, 0.05f,
         { "RPM mismatch tolerance on shifts",
             "Only applies to H-pattern with \"Clutch Shift\" enabled.",
-            fmt::format("Clutch Shift (H) is {}abled.", g_settings.MTOptions.ClutchShiftH ? "~g~en" : "~r~dis")
+            fmt::format("Clutch Shift (H) is {}abled.", g_settings().MTOptions.ClutchShiftH ? "~g~en" : "~r~dis")
         });
 }
 
 void update_finetuneautooptionsmenu() {
     g_menu.Title("Automatic finetuning");
-    g_menu.Subtitle("");
+    g_menu.Subtitle(MenuSubtitleConfig());
 
-    g_menu.FloatOption("Upshift engine load", g_settings.AutoParams.UpshiftLoad, 0.01f, 0.20f, 0.01f,
+    g_menu.FloatOption("Upshift engine load", g_settings().AutoParams.UpshiftLoad, 0.01f, 0.20f, 0.01f,
         { "Upshift when the engine load drops below this value. "
           "Raise this value if the car can't upshift."});
-    g_menu.FloatOption("Downshift engine load", g_settings.AutoParams.DownshiftLoad, 0.30f, 1.00f, 0.01f,
+    g_menu.FloatOption("Downshift engine load", g_settings().AutoParams.DownshiftLoad, 0.30f, 1.00f, 0.01f,
         { "Downshift when the engine load rises over this value. "
           "Raise this value if the car downshifts right after upshifting." });
-    g_menu.FloatOption("Downshift timeout multiplier", g_settings.AutoParams.DownshiftTimeoutMult, 0.05f, 10.00f, 0.05f,
+    g_menu.FloatOption("Downshift timeout multiplier", g_settings().AutoParams.DownshiftTimeoutMult, 0.05f, 10.00f, 0.05f,
         { "Don't downshift while car has just shifted up. "
           "Timeout based on clutch change rate.",
           "Raise for longer timeout, lower to allow earlier downshifting after an upshift." });
-    g_menu.FloatOption("Next gear min RPM",    g_settings.AutoParams.NextGearMinRPM, 0.20f, 0.50f, 0.01f, 
+    g_menu.FloatOption("Next gear min RPM",    g_settings().AutoParams.NextGearMinRPM, 0.20f, 0.50f, 0.01f, 
         { "Don't upshift until next gears' RPM is over this value." });
-    g_menu.FloatOption("Current gear min RPM", g_settings.AutoParams.CurrGearMinRPM, 0.20f, 0.50f, 0.01f, 
+    g_menu.FloatOption("Current gear min RPM", g_settings().AutoParams.CurrGearMinRPM, 0.20f, 0.50f, 0.01f, 
         { "Downshift when RPM drops below this value." });
-    g_menu.FloatOption("Economy rate", g_settings.AutoParams.EcoRate, 0.01f, 0.50f, 0.01f,
+    g_menu.FloatOption("Economy rate", g_settings().AutoParams.EcoRate, 0.01f, 0.50f, 0.01f,
         { "On releasing throttle, high values cause earlier upshifts.",
           "Set this low to stay in gear longer when releasing throttle." });
-    g_menu.BoolOption("Using ATCU (experimental)", g_settings.AutoParams.UsingATCU,
+    g_menu.BoolOption("Use ATCU (experimental)", g_settings().AutoParams.UsingATCU,
         { "Using experimental new Automatic Transmission Control Unit by Nyconing.",
           "ATCU is configurationless, the above settings are ignored." });
 }
@@ -512,7 +522,7 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
         shiftAssist = "None";
 
     std::vector<std::string> extras{
-        fmt::format("\t{}", config.Description),
+        fmt::format("{}", config.Description),
         "Compatible cars:",
         fmt::format("\tModels: {}", modelNames),
         fmt::format("\tPlates: {}", plates),
@@ -523,42 +533,111 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
         "Driving assists:",
         fmt::format("\tABS: {}", absStrings[absMode]),
         fmt::format("\tTCS: {}", tcsStrings[config.DriveAssists.TCS.Mode]),
+        fmt::format("\tESP: {}", config.DriveAssists.ESP.Enable ? "Yes" : "No"),
+        fmt::format("\tLSD: {}", config.DriveAssists.LSD.Enable ? "Yes" : "No"),
         "Steering wheel:",
-        fmt::format("\tAngle: {:.0f}", config.Wheel.Steering.Angle),
-        fmt::format("\tFFB Mult: {:.0f}", config.Wheel.FFB.SATAmpMult),
-        fmt::format("\tFFB Limit: {}", config.Wheel.FFB.SATMax)
+        fmt::format("\tSoft lock: {:.0f}", config.SteeringOverride.SoftLockWheelInput)
     };
     return extras;
 }
 
+std::string getASCachedModelName(Hash model) {
+    std::unordered_map<Hash, std::string> cache = ASCache::Get();
+    if (!cache.empty()) {
+        auto bla = cache.find(model);
+        if (bla != cache.end())
+            return bla->second;
+    }
+    return {};
+}
+
+void saveVehicleConfig() {
+    const std::string vehConfigDir = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir + "\\Vehicles";
+
+    // Amazing, I haven't referred to this ever since throwing a menu in...
+    extern Vehicle g_playerVehicle;
+    // Pre-fill with actual model name, if Add-on Spawner is present.
+    const std::string modelName = getASCachedModelName(ENTITY::GET_ENTITY_MODEL(g_playerVehicle));
+
+    UI::ShowHelpText("Enter configuration name.");
+    std::string fileName = GetKbEntryStr(modelName);
+    if (fileName.empty()) {
+        UI::Notify(INFO, "Cancelled configuration save.");
+        return;
+    }
+
+    uint32_t saveFileSuffix = 0;
+    std::string saveFile = fileName;
+    bool duplicate;
+    do {
+        duplicate = false;
+        for (const auto& p : std::filesystem::directory_iterator(vehConfigDir)) {
+            if (p.path().stem() == saveFile) {
+                duplicate = true;
+                saveFile = fmt::format("{}_{:02d}", fileName.c_str(), saveFileSuffix++);
+            }
+        }
+    } while (duplicate);
+
+    if (saveFile != fileName) {
+        UI::Notify(WARN, fmt::format("Duplicate filename(s) detected. Actual filename: {}", saveFile.c_str()));
+    }
+
+    std::string finalFile = fmt::format("{}\\{}.ini", vehConfigDir, saveFile);
+
+    UI::ShowHelpText("Enter model name. Multiple models can be entered, separated by a space.");
+
+    std::string userModels = GetKbEntryStr(modelName);
+
+    if (userModels.empty()) {
+        UI::Notify(INFO, "Cancelled configuration save.");
+        return;
+    }
+
+    VehicleConfig config(&g_settings(), finalFile);
+    config.ModelNames = StrUtil::split(userModels, ' ');
+    config.SaveSettings();
+    loadConfigs();
+    UI::Notify(INFO, fmt::format("Saved configuration as {}", finalFile.c_str()));
+}
+
 void update_vehconfigmenu() {
     g_menu.Title("Custom vehicle settings");
-    std::string cfgName = "No active override";
-    if (g_activeConfig != nullptr)
-        cfgName = g_activeConfig->Name;
-    g_menu.Subtitle(cfgName);
+    g_menu.Subtitle(MenuSubtitleConfig());
 
-    g_menu.BoolOption("Enable overrides", g_settings.MTOptions.Override);
+    if (g_menu.Option("Save current configuration", 
+        { "Save the current configuration to a new file." })) {
+        saveVehicleConfig();
+    }
 
-    if (g_activeConfig != nullptr) {
+    if (g_menu.Option("Reload configurations")) {
+        loadConfigs();
+    }
+
+    if (g_settings.ConfigActive()) {
         bool sel = false;
-        g_menu.OptionPlus(fmt::format("[{}] Overview", g_activeConfig->Name), {}, &sel, nullptr, nullptr, "", {
-            "For more info, check the file itself." });
+        g_menu.OptionPlus(fmt::format("Active configuration: [{}]", g_settings().Name), {}, &sel, nullptr, nullptr, "",
+            { "Currently using this configuration. Any changes made are saved into the current configuration.",
+              "When multiple configurations work with the same model, the configuration that comes first "
+              "alphabetically is used." });
         if (sel) {
-            auto extras = formatVehicleConfig(*g_activeConfig);
-            g_menu.OptionPlusPlus(extras, "Config overview");
+            auto extras = formatVehicleConfig(g_settings());
+            g_menu.OptionPlusPlus(extras, "Configuration overview");
         }
     }
     else {
-        g_menu.Option("No active override");
+        g_menu.Option("No active configuration");
     }
 
     for (const auto& vehConfig : g_vehConfigs) {
         bool sel = false;
-        g_menu.OptionPlus(vehConfig.Name, {}, &sel, nullptr, nullptr, "");
+        std::vector<std::string> descr = {
+            "This config will activate if you get into a compatible vehicle (by license plate and/or model)."
+        };
+        g_menu.OptionPlus(vehConfig.Name, {}, &sel, nullptr, nullptr, "", descr);
         if (sel) {
             auto extras = formatVehicleConfig(vehConfig);
-            g_menu.OptionPlusPlus(extras, "Config overview");
+            g_menu.OptionPlusPlus(extras, "Configuration overview");
         }
     }
 
@@ -569,16 +648,16 @@ void update_vehconfigmenu() {
             R"(Check the "Vehicles" folder inside the "ManualTransmission folder for more information!")"
             });
     }
-
-    if (g_menu.Option("Reload configs")) {
-        loadConfigs();
-    }
 }
 
 
 void update_controlsmenu() {
     g_menu.Title("Controls");
-    g_menu.Subtitle("");
+
+    if (g_settings.ConfigActive())
+        g_menu.Subtitle(fmt::format("CFG: [{} (Partial)]", g_settings().Name));
+    else
+        g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.MenuOption("Controller", "controllermenu");
 
@@ -588,6 +667,15 @@ void update_controlsmenu() {
 
     g_menu.MenuOption("Steering assists", "steeringassistmenu",
         { "Customize steering input for keyboards and controllers." });
+
+    g_menu.BoolOption("Enhanced steering: Override", g_settings().SteeringOverride.UseForCustomSteering,
+        { "Override the default 180 degree steering wheel rotation. (Vehicle specific)" });
+
+    g_menu.FloatOption("Enhanced steering: Rotation", g_settings().SteeringOverride.SoftLockCustomSteering, 180.0f, 1440.0f, 30.0f,
+        { "Degrees of rotation for the vehicle steering wheel. (Vehicle specific)" });
+
+    g_menu.FloatOption("Steering wheel: Soft lock", g_settings().SteeringOverride.SoftLockWheelInput, 180.0f, 1440.0f, 30.0f,
+        { "Degrees of rotation for your steering wheel, before hitting steering lock. (Vehicle specific)" });
 }
 
 void update_controllermenu() {
@@ -807,9 +895,6 @@ void update_wheelmenu() {
         g_settings.Read(&g_controls);
         initWheel();
     }
-
-    g_menu.BoolOption("Sync steering wheel rotation", g_settings.Wheel.Options.SyncRotation, 
-        { "Sync the cars' steering wheel with your actual steering wheel." });
 
     if (g_menu.FloatOption("Steering multiplier (wheel)", g_settings.Wheel.Steering.SteerMult, 0.1f, 2.0f, 0.01f,
         { "Increase steering lock for all cars. You might want to increase it for faster steering and more steering lock." })) {
@@ -1402,41 +1487,41 @@ void update_mousehudmenu() {
 
 void update_driveassistmenu() {
     g_menu.Title("Driving assists");
-    g_menu.Subtitle("");
+    g_menu.Subtitle(MenuSubtitleConfig());
 
-    g_menu.BoolOption("Enable ABS", g_settings.DriveAssists.ABS.Enable,
+    g_menu.BoolOption("Enable ABS", g_settings().DriveAssists.ABS.Enable,
         { "Custom script-driven ABS." });
 
-    g_menu.BoolOption("Only enable ABS if not present", g_settings.DriveAssists.ABS.Filter,
+    g_menu.BoolOption("Only enable ABS if not present", g_settings().DriveAssists.ABS.Filter,
         { "Only enables custom ABS on cars without the ABS flag." });
 
-    g_menu.BoolOption("Enable TCS", g_settings.DriveAssists.TCS.Enable,
+    g_menu.BoolOption("Enable TCS", g_settings().DriveAssists.TCS.Enable,
         { "Script-driven traction control." });
 
-    g_menu.StringArray("Traction Control mode", tcsStrings, g_settings.DriveAssists.TCS.Mode,
+    g_menu.StringArray("Traction Control mode", tcsStrings, g_settings().DriveAssists.TCS.Mode,
         { "On traction loss: ",
             "Brakes: Apply brake per wheel",
             "Throttle: Cut throttle" });
 
-    g_menu.FloatOption("TC Slip threshold", g_settings.DriveAssists.TCS.SlipMax, 0.0f, 20.0f, 0.1f,
+    g_menu.FloatOption("TC Slip threshold", g_settings().DriveAssists.TCS.SlipMax, 0.0f, 20.0f, 0.1f,
         { "Speed in m/s an individual wheel may slip before TC kicks in." });
 
-    g_menu.BoolOption("Enable ESC", g_settings.DriveAssists.ESP.Enable,
+    g_menu.BoolOption("Enable ESC", g_settings().DriveAssists.ESP.Enable,
         { "Script-driven stability control." });
 
     g_menu.MenuOption("ESC settings", "espsettingsmenu", 
         { "Change the behaviour and tolerances of the stability control system." });
 
-    g_menu.BoolOption("Enable LSD", g_settings.DriveAssists.LSD.Enable,
+    g_menu.BoolOption("Enable LSD", g_settings().DriveAssists.LSD.Enable,
         { "Simulate a viscous limited slip differential. Credits to any333.",
           "LSD simulation is overridden when ABS, ESC and TCS kick in."});
 
-    g_menu.FloatOption("LSD viscosity", g_settings.DriveAssists.LSD.Viscosity, 0.0f, 100.0f, 1.0f,
+    g_menu.FloatOption("LSD viscosity", g_settings().DriveAssists.LSD.Viscosity, 0.0f, 100.0f, 1.0f,
         { "How much the slower wheel tries to match the faster wheel.",
           "A very high value might speed up the car too much, because this LSD adds power to the slower wheel. "
           "About 10 is decent and doesn't affect acceleration."});
 
-    g_menu.BoolOption("Enable adaptive AWD", g_settings.DriveAssists.AWD.Enable,
+    g_menu.BoolOption("Enable adaptive AWD", g_settings().DriveAssists.AWD.Enable,
         { "Transfers torque to stabilize the car. See Nissans' ATTESA, Audis' Quattro and similar technologies.",
           "Only works for AWD cars. Recommended to use only in vehicle-specific configurations!"});
 
@@ -1445,29 +1530,30 @@ void update_driveassistmenu() {
 
 void update_espsettingsmenu() {
     g_menu.Title("ESC settings");
-    g_menu.Subtitle("");
-    g_menu.FloatOption("Oversteer starting angle", g_settings.DriveAssists.ESP.OverMin, 0.0f, 90.0f, 0.1f,
+    g_menu.Subtitle(MenuSubtitleConfig());
+
+    g_menu.FloatOption("Oversteer starting angle", g_settings().DriveAssists.ESP.OverMin, 0.0f, 90.0f, 0.1f,
         { "Angle (degrees) where ESC starts correcting for oversteer." });
-    g_menu.FloatOption("Oversteer starting correction", g_settings.DriveAssists.ESP.OverMinComp, 0.0f, 10.0f, 0.1f,
+    g_menu.FloatOption("Oversteer starting correction", g_settings().DriveAssists.ESP.OverMinComp, 0.0f, 10.0f, 0.1f,
         { "Starting ESC oversteer correction value. Additional braking force for the affected wheel." });
-    g_menu.FloatOption("Oversteer max angle", g_settings.DriveAssists.ESP.OverMax, 0.0f, 90.0f, 0.1f,
+    g_menu.FloatOption("Oversteer max angle", g_settings().DriveAssists.ESP.OverMax, 0.0f, 90.0f, 0.1f,
         { "Angle (degrees) where ESC oversteer correction is maximized." });
-    g_menu.FloatOption("Oversteer max correction", g_settings.DriveAssists.ESP.OverMaxComp, 0.0f, 10.0f, 0.1f,
+    g_menu.FloatOption("Oversteer max correction", g_settings().DriveAssists.ESP.OverMaxComp, 0.0f, 10.0f, 0.1f,
         { "Max ESC oversteer correction value. Additional braking force for the affected wheel." });
 
-    g_menu.FloatOption("Understeer starting angle", g_settings.DriveAssists.ESP.UnderMin, 0.0f, 90.0f, 0.1f,
+    g_menu.FloatOption("Understeer starting angle", g_settings().DriveAssists.ESP.UnderMin, 0.0f, 90.0f, 0.1f,
         { "Angle (degrees) where ESC starts correcting for understeer." });
-    g_menu.FloatOption("Understeer starting correction", g_settings.DriveAssists.ESP.UnderMinComp, 0.0f, 10.0f, 0.1f,
+    g_menu.FloatOption("Understeer starting correction", g_settings().DriveAssists.ESP.UnderMinComp, 0.0f, 10.0f, 0.1f,
         { "Starting ESC understeer correction value. Additional braking force for the affected wheel." });
-    g_menu.FloatOption("Understeer max angle", g_settings.DriveAssists.ESP.UnderMax, 0.0f, 90.0f, 0.1f,
+    g_menu.FloatOption("Understeer max angle", g_settings().DriveAssists.ESP.UnderMax, 0.0f, 90.0f, 0.1f,
         { "Angle (degrees) where ESC understeer correction is maximized." });
-    g_menu.FloatOption("Understeer max correction", g_settings.DriveAssists.ESP.UnderMaxComp, 0.0f, 10.0f, 0.1f,
+    g_menu.FloatOption("Understeer max correction", g_settings().DriveAssists.ESP.UnderMaxComp, 0.0f, 10.0f, 0.1f,
         { "Max ESC oversteer understeer value. Additional braking force for the affected wheel." });
 }
 
 void update_awdsettingsmenu() {
     g_menu.Title("Adaptive AWD");
-    g_menu.Subtitle("");
+    g_menu.Subtitle(MenuSubtitleConfig());
 
     if (!HandlingReplacement::Available()) {
         if (g_menu.Option("HandlingReplacement.asi missing",
@@ -1478,50 +1564,50 @@ void update_awdsettingsmenu() {
         }
     }
 
-    g_menu.BoolOption("Use custom drive bias", g_settings.DriveAssists.AWD.UseCustomBaseBias, 
+    g_menu.BoolOption("Use custom drive bias", g_settings().DriveAssists.AWD.UseCustomBaseBias, 
         { "Override the front drive bias." });
-    g_menu.FloatOption("Custom front drive bias", g_settings.DriveAssists.AWD.CustomBaseBias, 0.01f, 0.99f, 0.01f,
+    g_menu.FloatOption("Custom front drive bias", g_settings().DriveAssists.AWD.CustomBaseBias, 0.01f, 0.99f, 0.01f,
         { "Value is front bias based: 0.01 is 1% front, 99% rear. 0.99 is 99% front, 1% rear.",
           "Useful to set 1% to 9% and 91% to 99% drive biases, as GTA snaps to full FWD at more than 0.9 fDriveBiasFront and full RWD on less than 0.1 fDriveBiasFront." });
 
-    g_menu.FloatOption("Custom bias min", g_settings.DriveAssists.AWD.CustomMin, 0.01f, 0.99f, 0.01f,
+    g_menu.FloatOption("Custom bias min", g_settings().DriveAssists.AWD.CustomMin, 0.01f, 0.99f, 0.01f,
         { "Lowest value custom bias can be when manually adjusting drive bias." });
-    g_menu.FloatOption("Custom bias max", g_settings.DriveAssists.AWD.CustomMax, 0.01f, 0.99f, 0.01f,
+    g_menu.FloatOption("Custom bias max", g_settings().DriveAssists.AWD.CustomMax, 0.01f, 0.99f, 0.01f,
         { "Highest value custom bias can be when manually adjusting drive bias." });
 
-    g_menu.FloatOption("Drive bias @ max transfer", g_settings.DriveAssists.AWD.BiasAtMaxTransfer, 0.01f, 0.99f, 0.01f,
+    g_menu.FloatOption("Drive bias @ max transfer", g_settings().DriveAssists.AWD.BiasAtMaxTransfer, 0.01f, 0.99f, 0.01f,
         { "Value is front bias based: 0.01 is 1% front, 99% rear. 0.99 is 99% front, 1% rear.",
           "Example: if your usual Drive bias is 0.1 (so 90/10), and traction-loss transfer is enabled, a value here of 0.9 will send 90% of the torque to the front." });
 
-    g_menu.BoolOption("On traction loss", g_settings.DriveAssists.AWD.UseTraction, 
+    g_menu.BoolOption("On traction loss", g_settings().DriveAssists.AWD.UseTraction, 
         { "Transfer drive bias to the weaker wheels when the strong wheels break traction." } );
 
-    g_menu.FloatOption("Speed min difference", g_settings.DriveAssists.AWD.TractionLossMin, 1.0f, 2.0f, 0.05f,
+    g_menu.FloatOption("Speed min difference", g_settings().DriveAssists.AWD.TractionLossMin, 1.0f, 2.0f, 0.05f,
         { "Speed difference for the transfer to kick in.", "1.05 is 5% faster, 1.50 is 50% faster, etc." });
-    g_menu.FloatOption("Speed max difference", g_settings.DriveAssists.AWD.TractionLossMax, 1.0f, 2.0f, 0.05f,
+    g_menu.FloatOption("Speed max difference", g_settings().DriveAssists.AWD.TractionLossMax, 1.0f, 2.0f, 0.05f,
         { "Speed difference for max transfer.", "1.05 is 5% faster, 1.50 is 50% faster, etc." });
 
     // Should only be used for RWD-biased cars
-    g_menu.BoolOption("On oversteer", g_settings.DriveAssists.AWD.UseOversteer,
+    g_menu.BoolOption("On oversteer", g_settings().DriveAssists.AWD.UseOversteer,
         { "Transfer drive bias when oversteer is detected. Mostly useful for RWD-biased cars." });
-    g_menu.FloatOption("Oversteer min", g_settings.DriveAssists.AWD.OversteerMin, 0.0f, 90.0f, 1.0f); // degrees
-    g_menu.FloatOption("Oversteer max", g_settings.DriveAssists.AWD.OversteerMax, 0.0f, 90.0f, 1.0f); // degrees
+    g_menu.FloatOption("Oversteer min", g_settings().DriveAssists.AWD.OversteerMin, 0.0f, 90.0f, 1.0f); // degrees
+    g_menu.FloatOption("Oversteer max", g_settings().DriveAssists.AWD.OversteerMax, 0.0f, 90.0f, 1.0f); // degrees
     
     // Should only be used for FWD-biased cars
-    g_menu.BoolOption("On understeer", g_settings.DriveAssists.AWD.UseUndersteer,
+    g_menu.BoolOption("On understeer", g_settings().DriveAssists.AWD.UseUndersteer,
         { "Transfer drive bias when understeer is detected. Mostly useful for FWD-biased cars." });
-    g_menu.FloatOption("Understeer min", g_settings.DriveAssists.AWD.UndersteerMin, 0.0f, 90.0f, 1.0f); // degrees
-    g_menu.FloatOption("Understeer max", g_settings.DriveAssists.AWD.UndersteerMax, 0.0f, 90.0f, 1.0f); // degrees
+    g_menu.FloatOption("Understeer min", g_settings().DriveAssists.AWD.UndersteerMin, 0.0f, 90.0f, 1.0f); // degrees
+    g_menu.FloatOption("Understeer max", g_settings().DriveAssists.AWD.UndersteerMax, 0.0f, 90.0f, 1.0f); // degrees
 
     const std::vector<std::string> specialFlagsDescr = 
     {
         "Flags for extra features. Current flags:",
         "Bit 0: Enable torque transfer dial on y97y's BNR32",
     };
-    std::string specialFlagsStr = fmt::format("{:08X}", g_settings.DriveAssists.AWD.SpecialFlags);
+    std::string specialFlagsStr = fmt::format("{:08X}", g_settings().DriveAssists.AWD.SpecialFlags);
     if (g_menu.Option(fmt::format("Special flags (hex): {}", specialFlagsStr), specialFlagsDescr)) {
         std::string newFlags = GetKbEntryStr(specialFlagsStr);
-        SetFlags(g_settings.DriveAssists.AWD.SpecialFlags, newFlags);
+        SetFlags(g_settings().DriveAssists.AWD.SpecialFlags, newFlags);
     }
 }
 
@@ -1592,12 +1678,6 @@ void update_steeringassistmenu() {
         { "The lower the value, the faster the wheels return to center after letting go.",
           "Press Enter to enter a value manually." });
 
-    g_menu.BoolOption("Custom wheel rotation", g_settings.CustomSteering.CustomRotation, 
-        { "Override GTA's default 180 degree steering with whatever you want.",
-          "This is purely cosmetic and does not change handling." });
-    g_menu.FloatOption("Wheel rotation", g_settings.CustomSteering.CustomRotationDegrees, 180.0f, 1440.0f, 30.0f, 
-        { "Rotation in degrees." });
-
     g_menu.MenuOption("Mouse steering options", "mousesteeringoptionsmenu");
 }
 
@@ -1622,6 +1702,9 @@ void update_miscoptionsmenu() {
     g_menu.Title("Misc options");
     g_menu.Subtitle("");
 
+    g_menu.MenuOption("Camera options", "cameraoptionsmenu",
+        { "Adjust the custom FPV camera." });
+
     if (SteeringAnimation::FileProblem()) {
         g_menu.Option("Animation file error", NativeMenu::solidRed,
             { "An error occurred reading the animation file. Check Gears.log for more details." });
@@ -1633,12 +1716,6 @@ void update_miscoptionsmenu() {
               "FPV camera angle is limited, consider enabling the custom FPV camera.",
               "Check animations.yml for more details!" });
     }
-
-    g_menu.BoolOption("Enable custom FPV camera", g_settings.Misc.Camera.Enable,
-        { "Camera mounted to the player head." });
-
-    g_menu.MenuOption("Camera options", "cameraoptionsmenu",
-        { "Adjust the custom FPV camera" });
 
     if (g_menu.BoolOption("Hide player in FPV", g_settings.Misc.HidePlayerInFPV,
         { "Hides the player in first person view.",
@@ -1659,11 +1736,14 @@ void update_miscoptionsmenu() {
 
 void update_cameraoptionsmenu() {
     g_menu.Title("Camera options");
-    g_menu.Subtitle("");
+    g_menu.Subtitle(MenuSubtitleConfig());
+
+    g_menu.BoolOption("Enable custom FPV camera", g_settings().Misc.Camera.Enable,
+        { "Camera mounted to the player head." });
 
     std::string camInfo;
 
-    switch(g_settings.Misc.Camera.AttachId) {
+    switch(g_settings().Misc.Camera.AttachId) {
         case 0:
             camInfo = "Camera moves with character while steering.";
             break;
@@ -1679,16 +1759,16 @@ void update_cameraoptionsmenu() {
             break;
     }
 
-    if (g_menu.StringArray("Attach to", camAttachPoints, g_settings.Misc.Camera.AttachId, 
+    if (g_menu.StringArray("Attach to", camAttachPoints, g_settings().Misc.Camera.AttachId, 
         { camInfo })) {
         FPVCam::CancelCam(); // it'll re-acquire next tick with the correct position.
     }
 
     if (Dismemberment::Available()) {
-        if (g_menu.BoolOption("Hide head", g_settings.Misc.Camera.RemoveHead,
+        if (g_menu.BoolOption("Hide head", g_settings().Misc.Camera.RemoveHead,
             { "Using DismembermentASI by CamxxCore from Jedijosh' dismemberment mod, "
               "the player head can be hidden. This also turns on better near clipping." })) {
-            FPVCam::HideHead(g_settings.Misc.Camera.RemoveHead);
+            FPVCam::HideHead(g_settings().Misc.Camera.RemoveHead);
         }
     }
     else {
@@ -1709,101 +1789,101 @@ void update_cameraoptionsmenu() {
     g_menu.MenuOption("Camera movement options", "cameramovementoptionsmenu",
         { "Enable and tweak the movement of the first person camera." });
 
-    g_menu.FloatOptionCb("Field of view", g_settings.Misc.Camera.FOV, 1.0f, 120.0f, 0.5f, getKbEntry, 
+    g_menu.FloatOptionCb("Field of view", g_settings().Misc.Camera.FOV, 1.0f, 120.0f, 0.5f, getKbEntry, 
         { "In degrees." });
 
-    g_menu.FloatOptionCb("Offset height", g_settings.Misc.Camera.OffsetHeight, -2.0f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("Offset height", g_settings().Misc.Camera.OffsetHeight, -2.0f, 2.0f, 0.01f, getKbEntry,
         { "Distance in meters." });
 
-    g_menu.FloatOptionCb("Offset forward", g_settings.Misc.Camera.OffsetForward, -2.0f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("Offset forward", g_settings().Misc.Camera.OffsetForward, -2.0f, 2.0f, 0.01f, getKbEntry,
         { "Distance in meters." });
 
-    g_menu.FloatOptionCb("Offset side", g_settings.Misc.Camera.OffsetSide, -2.0f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("Offset side", g_settings().Misc.Camera.OffsetSide, -2.0f, 2.0f, 0.01f, getKbEntry,
         { "Distance in meters." });
 
-    g_menu.FloatOption("Pitch", g_settings.Misc.Camera.Pitch, -20.0f, 20.0f, 0.1f,
+    g_menu.FloatOption("Pitch", g_settings().Misc.Camera.Pitch, -20.0f, 20.0f, 0.1f,
         { "In degrees." });
 
-    g_menu.FloatOptionCb("Controller smoothing", g_settings.Misc.Camera.LookTime, 0.0f, 0.5f, 0.000001f, getKbEntry,
+    g_menu.FloatOptionCb("Controller smoothing", g_settings().Misc.Camera.LookTime, 0.0f, 0.5f, 0.000001f, getKbEntry,
         { "How smooth the camera moves.", "Press enter to enter a value manually. Range: 0.0 to 0.5." });
 
-    g_menu.FloatOption("Mouse sensitivity", g_settings.Misc.Camera.MouseSensitivity, 0.05f, 2.0f, 0.05f);
+    g_menu.FloatOption("Mouse sensitivity", g_settings().Misc.Camera.MouseSensitivity, 0.05f, 2.0f, 0.05f);
 
-    g_menu.FloatOptionCb("Mouse smoothing", g_settings.Misc.Camera.MouseLookTime, 0.0f, 0.5f, 0.000001f, getKbEntry,
+    g_menu.FloatOptionCb("Mouse smoothing", g_settings().Misc.Camera.MouseLookTime, 0.0f, 0.5f, 0.000001f, getKbEntry,
         { "How smooth the camera moves.", "Press enter to enter a value manually. Range: 0.0 to 0.5." });
 
-    g_menu.IntOption("Mouse center timeout", g_settings.Misc.Camera.MouseCenterTimeout, 0, 2000, 25,
+    g_menu.IntOption("Mouse center timeout", g_settings().Misc.Camera.MouseCenterTimeout, 0, 2000, 25,
         { "Milliseconds before centering the camera after looking with the mouse." });
 }
 
 void update_cameramovementoptionsmenu() {
-    g_menu.Title("Camera options");
-    g_menu.Subtitle("Movement");
+    g_menu.Title("Camera movement");
+    g_menu.Subtitle(MenuSubtitleConfig());
 
-    g_menu.BoolOption("Follow movement", g_settings.Misc.Camera.Movement.Follow,
+    g_menu.BoolOption("Follow movement", g_settings().Misc.Camera.Movement.Follow,
         { "Camera moves with motion and rotation, somewhat like NFS Shift." });
 
-    g_menu.FloatOption("Rotation: direction", g_settings.Misc.Camera.Movement.RotationDirectionMult, 0.0f, 4.0f, 0.01f,
+    g_menu.FloatOption("Rotation: direction", g_settings().Misc.Camera.Movement.RotationDirectionMult, 0.0f, 4.0f, 0.01f,
         { "How much the direction of travel affects the camera." });
 
-    g_menu.FloatOption("Rotation: rotation", g_settings.Misc.Camera.Movement.RotationRotationMult, 0.0f, 4.0f, 0.01f,
+    g_menu.FloatOption("Rotation: rotation", g_settings().Misc.Camera.Movement.RotationRotationMult, 0.0f, 4.0f, 0.01f,
         { "How much the rotation speed affects the camera." });
 
-    g_menu.FloatOption("Rotation: max angle", g_settings.Misc.Camera.Movement.RotationMaxAngle, 0.0f, 90.0f, 1.0f,
+    g_menu.FloatOption("Rotation: max angle", g_settings().Misc.Camera.Movement.RotationMaxAngle, 0.0f, 90.0f, 1.0f,
         { "To how many degrees camera movement is capped." });
 
-    g_menu.FloatOption("Movement: Minimum Gs", g_settings.Misc.Camera.Movement.LongDeadzone, 0.0f, 2.0f, 0.01f,
+    g_menu.FloatOption("Movement: Minimum Gs", g_settings().Misc.Camera.Movement.LongDeadzone, 0.0f, 2.0f, 0.01f,
         { "How hard the car should accelerate or decelerate for the camera to start moving.",
           "Unit in Gs." });
 
-    g_menu.FloatOption("Movement: Forward scale", g_settings.Misc.Camera.Movement.LongForwardMult, 0.0f, 2.0f, 0.01f,
+    g_menu.FloatOption("Movement: Forward scale", g_settings().Misc.Camera.Movement.LongForwardMult, 0.0f, 2.0f, 0.01f,
         { "How much to move the camera with, depending on how hard you decelerate.",
           "A scale of 1.0 makes the camera move 1 meter at 1G acceleration.",
           "A scale of 0.1 makes the camera move 10 centimeter at 1G acceleration." });
 
-    g_menu.FloatOption("Movement: Backward scale", g_settings.Misc.Camera.Movement.LongBackwardMult, 0.0f, 2.0f, 0.01f,
+    g_menu.FloatOption("Movement: Backward scale", g_settings().Misc.Camera.Movement.LongBackwardMult, 0.0f, 2.0f, 0.01f,
         { "How much to move the camera with, depending on how hard you accelerate.",
           "A scale of 1.0 makes the camera move 1 meter at 1G acceleration.",
           "A scale of 0.1 makes the camera move 10 centimeter at 1G acceleration." });
 
-    g_menu.FloatOption("Movement: Forward limit", g_settings.Misc.Camera.Movement.LongForwardLimit, 0.0f, 1.0f, 0.01f,
+    g_menu.FloatOption("Movement: Forward limit", g_settings().Misc.Camera.Movement.LongForwardLimit, 0.0f, 1.0f, 0.01f,
         { "Distance the camera can move forward (under deceleration).",
           "Unit in meter." });
 
-    g_menu.FloatOption("Movement: Backward limit", g_settings.Misc.Camera.Movement.LongBackwardLimit, 0.0f, 1.0f, 0.01f,
+    g_menu.FloatOption("Movement: Backward limit", g_settings().Misc.Camera.Movement.LongBackwardLimit, 0.0f, 1.0f, 0.01f,
         { "Distance the camera can move backward (under acceleration).",
           "Unit in meter." });
 
-    g_menu.FloatOption("Movement: Gamma", g_settings.Misc.Camera.Movement.LongGamma, 0.0f, 5.0f, 0.1f,
+    g_menu.FloatOption("Movement: Gamma", g_settings().Misc.Camera.Movement.LongGamma, 0.0f, 5.0f, 0.1f,
         { "Linearity in movement response.",
           "Less than 1: Camera moves a lot with small Gs but tops out quickly.",
           "More than 1: Camera moves little with small Gs but increases exponentially with more Gs." });
 }
 
 void update_bikecameraoptionsmenu() {
-    g_menu.Title("Camera options");
-    g_menu.Subtitle("2-wheelers - Quads");
+    g_menu.Title("Camera bikes");
+    g_menu.Subtitle(MenuSubtitleConfig());
 
-    g_menu.BoolOption("Disable for 2-ish wheelers", g_settings.Misc.Camera.Bike.Disable,
+    g_menu.BoolOption("Disable for 2-ish wheelers", g_settings().Misc.Camera.Bike.Disable,
         { "Use the the vanilla FPV camera on these vehicles." });
 
-    if (g_menu.StringArray("Attach to", camAttachPoints, g_settings.Misc.Camera.Bike.AttachId)) {
+    if (g_menu.StringArray("Attach to", camAttachPoints, g_settings().Misc.Camera.Bike.AttachId)) {
         FPVCam::CancelCam();
     }
 
-    g_menu.FloatOptionCb("Field of view", g_settings.Misc.Camera.Bike.FOV, 1.0f, 120.0f, 0.5f, getKbEntry,
+    g_menu.FloatOptionCb("Field of view", g_settings().Misc.Camera.Bike.FOV, 1.0f, 120.0f, 0.5f, getKbEntry,
         { "In degrees." });
 
-    g_menu.FloatOptionCb("Offset height", g_settings.Misc.Camera.Bike.OffsetHeight, -2.0f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("Offset height", g_settings().Misc.Camera.Bike.OffsetHeight, -2.0f, 2.0f, 0.01f, getKbEntry,
         { "Distance in meters." });
 
-    g_menu.FloatOptionCb("Offset forward", g_settings.Misc.Camera.Bike.OffsetForward, -2.0f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("Offset forward", g_settings().Misc.Camera.Bike.OffsetForward, -2.0f, 2.0f, 0.01f, getKbEntry,
         { "Distance in meters." });
 
-    g_menu.FloatOptionCb("Offset side", g_settings.Misc.Camera.Bike.OffsetSide, -2.0f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("Offset side", g_settings().Misc.Camera.Bike.OffsetSide, -2.0f, 2.0f, 0.01f, getKbEntry,
         { "Distance in meters." });
 
-    g_menu.FloatOption("Pitch", g_settings.Misc.Camera.Bike.Pitch, -20.0f, 20.0f, 0.1f,
+    g_menu.FloatOption("Pitch", g_settings().Misc.Camera.Bike.Pitch, -20.0f, 20.0f, 0.1f,
         { "In degrees." });
 }
 
@@ -1840,7 +1920,7 @@ void update_devoptionsmenu() {
 
 void update_debugmenu() {
     g_menu.Title("Debug settings");
-    g_menu.Subtitle("");
+    g_menu.Subtitle("Under the hood");
 
     g_menu.BoolOption("Display debug info", g_settings.Debug.DisplayInfo,
         { "Show all detailed technical info of the gearbox and inputs calculations." });

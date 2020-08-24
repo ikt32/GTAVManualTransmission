@@ -250,6 +250,9 @@
     <ClCompile Include="ManualTransmission.cpp">
       <Filter>API</Filter>
     </ClCompile>
+    <ClCompile Include="Util\AddonSpawnerCache.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -541,6 +544,9 @@
     </ClInclude>
     <ClInclude Include="ManualTransmission.h">
       <Filter>API</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\AddonSpawnerCache.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
