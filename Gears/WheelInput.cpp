@@ -472,7 +472,7 @@ void WheelInput::DoSteering() {
 
     float steerMult;
     if (g_settings.ConfigActive())
-        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings().Wheel.Steering.SoftLock;
+        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings().SteeringOverride.SoftLockWheelInput;
     else if (g_vehData.mClass == VehicleClass::Bike || g_vehData.mClass == VehicleClass::Quad)
         steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleBike;
     else if (g_vehData.mClass == VehicleClass::Car)
@@ -499,7 +499,7 @@ void WheelInput::DoSteering() {
             VExt::SetSteeringAngle(g_playerVehicle, -effSteer * VExt::GetMaxSteeringAngle(g_playerVehicle));
 
         auto boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "steeringwheel");
-        if (boneIdx != -1 && g_settings.Wheel.Options.SyncRotation) {
+        if (boneIdx != -1) {
             Vector3 rotAxis{};
             rotAxis.y = 1.0f;
             float rotDeg = g_settings.Wheel.Steering.AngleMax / 2.0f * steerValGamma;
@@ -589,7 +589,7 @@ void calculateSoftLock(int& totalForce, int& damperForce) {
     float steerMult;
 
     if (g_settings.ConfigActive())
-        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings().Wheel.Steering.SoftLock;
+        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings().SteeringOverride.SoftLockWheelInput;
     else if (g_vehData.mClass == VehicleClass::Bike || g_vehData.mClass == VehicleClass::Quad)
         steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleBike;
     else if (g_vehData.mClass == VehicleClass::Car)

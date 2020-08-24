@@ -65,7 +65,6 @@ public:
         float SteeringMult = 1.0f;
         float SteeringReduction = 0.9f;
         float Gamma = 1.0f;
-        bool CustomRotation = true;
         float CenterTime = 0.000100f;
         float SteerTime = 0.001000f;
         struct {
@@ -297,7 +296,6 @@ public:
         // [OPTIONS]
         struct {
             bool Enable = true;
-            bool SyncRotation = true;
             bool LogiLEDs = false;
             bool HPatternKeyboard = false;
             bool UseShifterForAuto = false;

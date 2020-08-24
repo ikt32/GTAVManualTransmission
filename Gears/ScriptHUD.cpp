@@ -588,8 +588,8 @@ void drawInputWheelInfo() {
     if (g_controls.PrevInput == CarControls::Wheel) 
         rotation = g_settings.Wheel.Steering.AngleMax * (g_controls.SteerVal - 0.5f);
     else if (g_settings.CustomSteering.Mode > 0 &&
-        g_settings.CustomSteering.CustomRotation)
-        rotation = g_settings().CustomSteering.CustomRotationDegrees * 0.5f * -VExt::GetSteeringInputAngle(g_playerVehicle);
+        g_settings().SteeringOverride.UseForCustomSteering)
+        rotation = g_settings().SteeringOverride.SoftLockCustomSteering * 0.5f * -VExt::GetSteeringInputAngle(g_playerVehicle);
     else
         rotation = 90.0f * -VExt::GetSteeringInputAngle(g_playerVehicle);
 

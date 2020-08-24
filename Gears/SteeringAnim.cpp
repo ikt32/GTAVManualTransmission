@@ -102,8 +102,9 @@ void SteeringAnimation::SetRotation(float wheelDegrees) {
 }
 
 void SteeringAnimation::Update() {
-    bool steeringWheelSync = g_controls.PrevInput == CarControls::Wheel && g_settings.Wheel.Options.SyncRotation;
-    bool customSteeringSync = g_settings.CustomSteering.Mode > 0 && g_settings.CustomSteering.CustomRotation;
+    bool steeringWheelSync = g_controls.PrevInput == CarControls::Wheel;
+    bool customSteeringSync = g_settings.CustomSteering.Mode > 0 &&
+        g_settings().SteeringOverride.UseForCustomSteering;
 
     // Not active, cancel all animations.
     if (!Util::VehicleAvailable(g_playerVehicle, g_playerPed) ||

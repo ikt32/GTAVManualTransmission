@@ -252,12 +252,12 @@ void CustomSteering::Update() {
         VExt::SetSteeringAngle(g_playerVehicle, desiredHeading);
 
     auto boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "steeringwheel");
-    if (boneIdx != -1 && g_settings.CustomSteering.CustomRotation) {
+    if (boneIdx != -1 && g_settings().SteeringOverride.UseForCustomSteering) {
         Vector3 rotAxis{};
         rotAxis.y = 1.0f;
 
         float corrDesiredHeading = -desiredHeading * (1.0f / limitRadians);
-        float rotDeg = g_settings().CustomSteering.CustomRotationDegrees / 2.0f * corrDesiredHeading;
+        float rotDeg = g_settings().SteeringOverride.SoftLockCustomSteering / 2.0f * corrDesiredHeading;
         float rotDegRaw = rotDeg;
 
         // Setting angle using the VExt:: calls above causes the angle to overshoot the "real" coords

@@ -140,11 +140,10 @@ void VehicleConfig::LoadSettings(const std::string& file) {
     AutoParams.DownshiftTimeoutMult = ini.GetDoubleValue("AUTO_PARAMS", "DownshiftTimeoutMult", gSettings.AutoParams.DownshiftTimeoutMult);
     AutoParams.UsingATCU = ini.GetBoolValue("AUTO_PARAMS", "UsingATCU", gSettings.AutoParams.UsingATCU);
 
-    // [STEER]
-    Wheel.Steering.SoftLock = ini.GetDoubleValue("STEER", "Angle", gSettings.Wheel.Steering.SoftLock);
-
-    // [CUSTOM_STEERING]
-    CustomSteering.CustomRotationDegrees = ini.GetDoubleValue("CUSTOM_STEERING", "CustomRotationDegrees", gSettings.CustomSteering.CustomRotationDegrees);
+    //[STEERING_OVERRIDE]
+    SteeringOverride.UseForCustomSteering = ini.GetBoolValue("STEERING_OVERRIDE", "UseForCustomSteering", SteeringOverride.UseForCustomSteering);
+    SteeringOverride.SoftLockCustomSteering = ini.GetDoubleValue("STEERING_OVERRIDE", "SoftLockCustomSteering", SteeringOverride.SoftLockCustomSteering);
+    SteeringOverride.SoftLockWheelInput = ini.GetDoubleValue("STEERING_OVERRIDE", "SoftLockWheelInput", SteeringOverride.SoftLockWheelInput);
 
     // [CAM]
     Misc.Camera.Enable = ini.GetBoolValue("CAM", "Enable", gSettings.Misc.Camera.Enable);
@@ -258,8 +257,10 @@ void VehicleConfig::saveGeneral() {
     if (DriveAssists.AWD.SpecialFlags != mBaseConfig->DriveAssists.AWD.SpecialFlags)
         ini.SetLongValue("DRIVING_ASSISTS", "AWDSpecialFlags", DriveAssists.AWD.SpecialFlags, nullptr, true);
 
-    //[CUSTOM_STEERING]
-    SET_VALUE("CUSTOM_STEERING", "CustomRotationDegrees", CustomSteering.CustomRotationDegrees);
+    //[STEERING_OVERRIDE]
+    SET_VALUE("STEERING_OVERRIDE", "UseForCustomSteering", SteeringOverride.UseForCustomSteering);
+    SET_VALUE("STEERING_OVERRIDE", "SoftLockCustomSteering", SteeringOverride.SoftLockCustomSteering);
+    SET_VALUE("STEERING_OVERRIDE", "SoftLockWheelInput", SteeringOverride.SoftLockWheelInput);
 
     // [SHIFT_OPTIONS]
     SET_VALUE("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);

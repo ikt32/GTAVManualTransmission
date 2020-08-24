@@ -534,7 +534,7 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
         fmt::format("\tABS: {}", absStrings[absMode]),
         fmt::format("\tTCS: {}", tcsStrings[config.DriveAssists.TCS.Mode]),
         "Steering wheel:",
-        fmt::format("\tSoft lock: {:.0f}", config.Wheel.Steering.SoftLock)
+        fmt::format("\tSoft lock: {:.0f}", config.SteeringOverride.SoftLockWheelInput)
     };
     return extras;
 }
@@ -659,6 +659,15 @@ void update_controlsmenu() {
 
     g_menu.MenuOption("Steering assists", "steeringassistmenu",
         { "Customize steering input for keyboards and controllers." });
+
+    g_menu.BoolOption("Enhanced steering: Override", g_settings().SteeringOverride.UseForCustomSteering,
+        { "Override the default 180 degree steering wheel rotation. (Vehicle specific)" });
+
+    g_menu.FloatOption("Enhanced steering: Rotation", g_settings().SteeringOverride.SoftLockCustomSteering, 180.0f, 1440.0f, 30.0f,
+        { "Degrees of rotation for the vehicle steering wheel. (Vehicle specific)" });
+
+    g_menu.FloatOption("Steering wheel: Soft lock", g_settings().SteeringOverride.SoftLockWheelInput, 180.0f, 1440.0f, 30.0f,
+        { "Degrees of rotation for your steering wheel, before hitting steering lock. (Vehicle specific)" });
 }
 
 void update_controllermenu() {
@@ -878,9 +887,6 @@ void update_wheelmenu() {
         g_settings.Read(&g_controls);
         initWheel();
     }
-
-    g_menu.BoolOption("Sync steering wheel rotation", g_settings.Wheel.Options.SyncRotation, 
-        { "Sync the cars' steering wheel with your actual steering wheel." });
 
     if (g_menu.FloatOption("Steering multiplier (wheel)", g_settings.Wheel.Steering.SteerMult, 0.1f, 2.0f, 0.01f,
         { "Increase steering lock for all cars. You might want to increase it for faster steering and more steering lock." })) {
@@ -1672,12 +1678,6 @@ void update_steeringassistmenu() {
         getKbEntry,
         { "The lower the value, the faster the wheels return to center after letting go.",
           "Press Enter to enter a value manually." });
-
-    g_menu.BoolOption("Custom wheel rotation", g_settings.CustomSteering.CustomRotation, 
-        { "Override GTA's default 180 degree steering with whatever you want.",
-          "This is purely cosmetic and does not change handling." });
-    g_menu.FloatOption("Wheel rotation", g_settings().CustomSteering.CustomRotationDegrees, 180.0f, 1440.0f, 30.0f, 
-        { "Rotation in degrees. (Vehicle specific)" });
 
     g_menu.MenuOption("Mouse steering options", "mousesteeringoptionsmenu");
 }

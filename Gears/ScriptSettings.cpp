@@ -116,8 +116,6 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetDoubleValue("CUSTOM_STEERING", "SteerTime", CustomSteering.SteerTime);
     ini.SetDoubleValue("CUSTOM_STEERING", "CenterTime", CustomSteering.CenterTime);
 
-    ini.SetBoolValue("CUSTOM_STEERING", "CustomRotation", CustomSteering.CustomRotation);
-
     ini.SetBoolValue("CUSTOM_STEERING", "MouseSteering", CustomSteering.Mouse.Enable);
     ini.SetDoubleValue("CUSTOM_STEERING", "MouseSensitivity", CustomSteering.Mouse.Sensitivity);
     ini.SetBoolValue("CUSTOM_STEERING", "MouseDisableSteerAssist", CustomSteering.Mouse.DisableSteerAssist);
@@ -316,7 +314,6 @@ void ScriptSettings::SaveWheel() const {
 
     // [OPTIONS]
     ini.SetBoolValue("MT_OPTIONS", "EnableWheel", Wheel.Options.Enable);
-    ini.SetBoolValue("MT_OPTIONS", "SyncRotation", Wheel.Options.SyncRotation);
 
     ini.SetBoolValue("MT_OPTIONS", "LogitechLEDs", Wheel.Options.LogiLEDs);
     ini.SetBoolValue("MT_OPTIONS", "HPatternKeyboard", Wheel.Options.HPatternKeyboard);
@@ -400,8 +397,6 @@ void ScriptSettings::parseSettingsGeneral() {
     CustomSteering.Gamma = ini.GetDoubleValue("CUSTOM_STEERING", "Gamma", CustomSteering.Gamma);
     CustomSteering.SteerTime = ini.GetDoubleValue("CUSTOM_STEERING", "SteerTime", CustomSteering.SteerTime);
     CustomSteering.CenterTime = ini.GetDoubleValue("CUSTOM_STEERING", "CenterTime", CustomSteering.CenterTime);
-
-    CustomSteering.CustomRotation = ini.GetBoolValue("CUSTOM_STEERING", "CustomRotation", CustomSteering.CustomRotation);
 
     CustomSteering.Mouse.Enable = ini.GetBoolValue("CUSTOM_STEERING", "MouseSteering", CustomSteering.Mouse.Enable);
     CustomSteering.Mouse.Sensitivity = ini.GetDoubleValue("CUSTOM_STEERING", "MouseSensitivity", CustomSteering.Mouse.Sensitivity);
@@ -699,7 +694,6 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 
     // [OPTIONS]
     Wheel.Options.Enable = ini.GetBoolValue("MT_OPTIONS", "EnableWheel", Wheel.Options.Enable);
-    Wheel.Options.SyncRotation = ini.GetBoolValue("MT_OPTIONS", "SyncRotation", Wheel.Options.SyncRotation);
     Wheel.Options.LogiLEDs = ini.GetBoolValue("MT_OPTIONS", "LogitechLEDs", Wheel.Options.LogiLEDs);
     Wheel.Options.HPatternKeyboard = ini.GetBoolValue("MT_OPTIONS", "HPatternKeyboard", Wheel.Options.HPatternKeyboard);
     Wheel.Options.UseShifterForAuto = ini.GetBoolValue("MT_OPTIONS", "UseShifterForAuto", Wheel.Options.UseShifterForAuto);
