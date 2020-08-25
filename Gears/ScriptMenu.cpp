@@ -1667,7 +1667,7 @@ void update_steeringassistmenu() {
         { "Reduce steering input at higher speeds.", "From InfamousSabre's Custom Steering." });
     g_menu.FloatOption("Steering multiplier", g_settings.CustomSteering.SteeringMult, 0.01f, 2.0f, 0.01f,
         { "Increase/decrease steering lock.", "From InfamousSabre's Custom Steering." });
-    g_menu.FloatOption("Steering gamma", g_settings.CustomSteering.Gamma, 0.01f, 2.0f, 0.01f,
+    g_menu.FloatOption("Steering gamma", g_settings.CustomSteering.Gamma, 0.01f, 5.0f, 0.01f,
         { "Change linearity of steering input." });
     g_menu.FloatOptionCb("Steering time", g_settings.CustomSteering.SteerTime, 0.000001f, 0.90f, 0.000001f,
         getKbEntry,
