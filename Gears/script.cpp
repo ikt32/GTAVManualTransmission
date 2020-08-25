@@ -90,7 +90,6 @@ WheelPatchStates g_wheelPatchStates;
 VehicleData g_vehData;
 
 std::vector<VehicleConfig> g_vehConfigs;
-VehicleConfig* g_activeConfig;
 
 bool g_focused;
 Timer g_wheelInitDelayTimer(0);
@@ -191,7 +190,6 @@ void setVehicleConfig(Vehicle vehicle) {
         oldName = g_settings().Name;
     }
 
-    g_activeConfig = nullptr;
     g_settings.SetVehicleConfig(nullptr);
 
     if (ENTITY::DOES_ENTITY_EXIST(vehicle)) {
@@ -227,10 +225,9 @@ void setVehicleConfig(Vehicle vehicle) {
             itMatch = itModelMatch;
 
         if (itMatch != g_vehConfigs.end()) {
-            g_activeConfig = &*itMatch;
-            g_settings.SetVehicleConfig(g_activeConfig);
-            if (g_activeConfig->Name != oldName) {
-                UI::Notify(INFO, fmt::format("Configuration [{}] loaded.", g_activeConfig->Name));
+            g_settings.SetVehicleConfig(&*itMatch);
+            if (itMatch->Name != oldName) {
+                UI::Notify(INFO, fmt::format("Configuration [{}] loaded.", itMatch->Name));
             }
         }
     }
