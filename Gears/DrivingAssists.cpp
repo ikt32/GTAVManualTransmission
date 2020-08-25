@@ -70,9 +70,9 @@ DrivingAssists::ESPData DrivingAssists::GetESP() {
         speed * cos(rotVel.z), 0,
         0, 0
     };
-    float steerMult = g_settings.CustomSteering.SteeringMult;
+    float steerMult = g_settings().Steering.CustomSteering.SteeringMult;
     if (g_controls.PrevInput == CarControls::InputDevices::Wheel)
-        steerMult = g_settings.Wheel.Steering.SteerMult;
+        steerMult = g_settings().Steering.Wheel.SteeringMult;
 
     float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * steerMult;
 
@@ -183,9 +183,9 @@ DrivingAssists::LSDData DrivingAssists::GetLSD() {
 std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData, LSDData lsdData) {
     std::vector<float> brakeVals(g_vehData.mWheelCount); // only works for 4 wheels but ok
 
-    float steerMult = g_settings.CustomSteering.SteeringMult;
+    float steerMult = g_settings().Steering.CustomSteering.SteeringMult;
     if (g_controls.PrevInput == CarControls::InputDevices::Wheel)
-        steerMult = g_settings.Wheel.Steering.SteerMult;
+        steerMult = g_settings().Steering.Wheel.SteeringMult;
     float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * steerMult;
 
     float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);

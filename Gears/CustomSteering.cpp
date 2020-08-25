@@ -76,7 +76,7 @@ float CustomSteering::calculateDesiredHeading(float steeringMax, float desiredHe
         travelDir *= sgn(speedVector.y);
 
         // Custom user multiplier. Division by steeringmult needed to neutralize over-correction.
-        travelDir *= g_settings.CustomSteering.CountersteerMult / g_settings.CustomSteering.SteeringMult;
+        travelDir *= g_settings.CustomSteering.CountersteerMult / g_settings().Steering.CustomSteering.SteeringMult;
 
         // clamp auto correction to countersteer limit
         travelDir = std::clamp(travelDir, deg2rad(-g_settings.CustomSteering.CountersteerLimit), deg2rad(g_settings.CustomSteering.CountersteerLimit));
@@ -252,12 +252,12 @@ void CustomSteering::Update() {
         VExt::SetSteeringAngle(g_playerVehicle, desiredHeading);
 
     auto boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "steeringwheel");
-    if (boneIdx != -1 && g_settings().SteeringOverride.UseForCustomSteering) {
+    if (boneIdx != -1 && g_settings().Steering.CustomSteering.UseCustomLock) {
         Vector3 rotAxis{};
         rotAxis.y = 1.0f;
 
         float corrDesiredHeading = -desiredHeading * (1.0f / limitRadians);
-        float rotDeg = g_settings().SteeringOverride.SoftLockCustomSteering / 2.0f * corrDesiredHeading;
+        float rotDeg = g_settings().Steering.CustomSteering.SoftLock / 2.0f * corrDesiredHeading;
         float rotDegRaw = rotDeg;
 
         // Setting angle using the VExt:: calls above causes the angle to overshoot the "real" coords

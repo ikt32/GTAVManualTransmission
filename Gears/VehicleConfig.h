@@ -152,13 +152,19 @@ public:
         bool UsingATCU = false;
     } AutoParams;
 
-    // [STEERING_OVERRIDE]
+    // [STEERING]
     struct {
-        bool UseForCustomSteering = true;
+        struct {
+            bool UseCustomLock = true;
+            float SoftLock = 720.0f;
+            float SteeringMult = 1.0f;
+        } CustomSteering;
 
-        float SoftLockCustomSteering = 720.0f;
-        float SoftLockWheelInput = 720.0f;
-    } SteeringOverride;
+        struct {
+            float SoftLock = 720.0f;
+            float SteeringMult = 1.0f;
+        } Wheel;
+    } Steering;
 
     // [MISC]
     struct {

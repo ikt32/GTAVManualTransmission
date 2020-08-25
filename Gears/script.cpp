@@ -731,10 +731,10 @@ void updateSteeringMultiplier() {
     float mult;
 
     if (g_controls.PrevInput == CarControls::Wheel) {
-        mult = g_settings.Wheel.Steering.SteerMult;
+        mult = g_settings().Steering.Wheel.SteeringMult;
     }
     else {
-        mult = g_settings.CustomSteering.SteeringMult;
+        mult = g_settings().Steering.CustomSteering.SteeringMult;
     }
     VExt::SetSteeringMultiplier(g_playerVehicle, mult);
 }

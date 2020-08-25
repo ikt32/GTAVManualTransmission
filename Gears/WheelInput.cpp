@@ -472,7 +472,7 @@ void WheelInput::DoSteering() {
 
     float steerMult;
     if (g_settings.ConfigActive())
-        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings().SteeringOverride.SoftLockWheelInput;
+        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings().Steering.Wheel.SoftLock;
     else if (g_vehData.mClass == VehicleClass::Bike || g_vehData.mClass == VehicleClass::Quad)
         steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleBike;
     else if (g_vehData.mClass == VehicleClass::Car)
@@ -589,7 +589,7 @@ void calculateSoftLock(int& totalForce, int& damperForce) {
     float steerMult;
 
     if (g_settings.ConfigActive())
-        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings().SteeringOverride.SoftLockWheelInput;
+        steerMult = g_settings.Wheel.Steering.AngleMax / g_settings().Steering.Wheel.SoftLock;
     else if (g_vehData.mClass == VehicleClass::Bike || g_vehData.mClass == VehicleClass::Quad)
         steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleBike;
     else if (g_vehData.mClass == VehicleClass::Car)
@@ -637,14 +637,14 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     };
 
     Vector3 expectedVectorMapped{
-        spdMap * -sin(steeringAngle / g_settings.Wheel.Steering.SteerMult), 0,
-        spdMap * cos(steeringAngle / g_settings.Wheel.Steering.SteerMult), 0,
+        spdMap * -sin(steeringAngle / g_settings().Steering.Wheel.SteeringMult), 0,
+        spdMap * cos(steeringAngle /  g_settings().Steering.Wheel.SteeringMult), 0,
         0, 0
     };
 
     Vector3 expectedVector{
-        speed * -sin(steeringAngle / g_settings.Wheel.Steering.SteerMult), 0,
-        speed * cos(steeringAngle / g_settings.Wheel.Steering.SteerMult), 0,
+        speed * -sin(steeringAngle / g_settings().Steering.Wheel.SteeringMult), 0,
+        speed * cos(steeringAngle /  g_settings().Steering.Wheel.SteeringMult), 0,
         0, 0
     };
     
@@ -660,11 +660,11 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
 
     // understeer
     if (isCar)  {
-        float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * g_settings.Wheel.Steering.SteerMult;
+        float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * g_settings().Steering.Wheel.SteeringMult;
 
         Vector3 vecPredStr{
-            speed * -sin(avgAngle / g_settings.Wheel.Steering.SteerMult), 0,
-            speed * cos(avgAngle / g_settings.Wheel.Steering.SteerMult), 0,
+            speed * -sin(avgAngle / g_settings().Steering.Wheel.SteeringMult), 0,
+            speed * cos(avgAngle /  g_settings().Steering.Wheel.SteeringMult), 0,
             0, 0
         };
 
@@ -802,7 +802,7 @@ void WheelInput::PlayFFBGround() {
     // avgAngle: left is positive
     // steerVal: left is negative
     // Rear-wheel steered cars don't match, so this needs to be flipped in that case.
-    float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * g_settings.Wheel.Steering.SteerMult;
+    float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * g_settings().Steering.Wheel.SteeringMult;
 
     float steerVal = map(g_controls.SteerVal, 0.0f, 1.0f, -1.0f, 1.0f);    
     if (sgn(avgAngle) == sgn(steerVal)) {

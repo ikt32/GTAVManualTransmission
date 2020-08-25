@@ -255,6 +255,12 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
                 skidding = true;
         }
 
+        float theoryTopSpeed = 1.0f * driveMaxFlatVel / gearRatios[currGear];
+        // Also (allow) shifting up if the wheelspeed is greater than possible
+        if (skidding && currSpeed > theoryTopSpeed * 1.1f) {
+            skidding = false;
+        }
+
         // Shift up.
         if (currGear < topGear) {
             if (engineLoad < g_settings.BaseConfig()->AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {

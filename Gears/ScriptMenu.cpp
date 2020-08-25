@@ -536,7 +536,7 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
         fmt::format("\tESP: {}", config.DriveAssists.ESP.Enable ? "Yes" : "No"),
         fmt::format("\tLSD: {}", config.DriveAssists.LSD.Enable ? "Yes" : "No"),
         "Steering wheel:",
-        fmt::format("\tSoft lock: {:.0f}", config.SteeringOverride.SoftLockWheelInput)
+        fmt::format("\tSoft lock: {:.0f}", config.Steering.Wheel.SoftLock)
     };
     return extras;
 }
@@ -653,11 +653,7 @@ void update_vehconfigmenu() {
 
 void update_controlsmenu() {
     g_menu.Title("Controls");
-
-    if (g_settings.ConfigActive())
-        g_menu.Subtitle(fmt::format("CFG: [{} (Partial)]", g_settings().Name));
-    else
-        g_menu.Subtitle(MenuSubtitleConfig());
+    g_menu.Subtitle("");
 
     g_menu.MenuOption("Controller", "controllermenu");
 
@@ -668,14 +664,28 @@ void update_controlsmenu() {
     g_menu.MenuOption("Steering assists", "steeringassistmenu",
         { "Customize steering input for keyboards and controllers." });
 
-    g_menu.BoolOption("Enhanced steering: Override", g_settings().SteeringOverride.UseForCustomSteering,
-        { "Override the default 180 degree steering wheel rotation. (Vehicle specific)" });
+    g_menu.MenuOption("Vehicle specific", "vehiclecontroladjustsmenu");
+}
 
-    g_menu.FloatOption("Enhanced steering: Rotation", g_settings().SteeringOverride.SoftLockCustomSteering, 180.0f, 1440.0f, 30.0f,
-        { "Degrees of rotation for the vehicle steering wheel. (Vehicle specific)" });
+void update_controlsvehconfmenu() {
+    g_menu.Title("Controls");
+    g_menu.Subtitle(MenuSubtitleConfig());
 
-    g_menu.FloatOption("Steering wheel: Soft lock", g_settings().SteeringOverride.SoftLockWheelInput, 180.0f, 1440.0f, 30.0f,
-        { "Degrees of rotation for your steering wheel, before hitting steering lock. (Vehicle specific)" });
+    g_menu.BoolOption("Enhanced Steering: Override wheel rotation", g_settings().Steering.CustomSteering.UseCustomLock,
+        { "Override the default 180 degree steering wheel rotation." });
+
+    g_menu.FloatOption("Enhanced Steering: Wheel rotation", g_settings().Steering.CustomSteering.SoftLock, 180.0f, 1440.0f, 30.0f,
+        { "Degrees of rotation for the vehicle steering wheel. Does not change max steering angle." });
+
+    g_menu.FloatOption("Enhanced Steering: Steering multiplier", g_settings().Steering.CustomSteering.SteeringMult, 0.01f, 2.0f, 0.01f,
+        { "Increase or decrease actual max steering angle." });
+
+    g_menu.FloatOption("Wheel: Soft lock", g_settings().Steering.Wheel.SoftLock, 180.0f, 1440.0f, 30.0f,
+        { "Steering range for your real wheel, in degrees. Reduce for quicker steering." });
+
+    if (g_menu.FloatOption("Wheel: Steering multiplier", g_settings().Steering.Wheel.SteeringMult, 0.1f, 2.0f, 0.01f,
+        { "Increase or decrease actual steering lock. Increase for faster steering and more angle." })) {
+    }
 }
 
 void update_controllermenu() {
@@ -894,10 +904,6 @@ void update_wheelmenu() {
         saveChanges();
         g_settings.Read(&g_controls);
         initWheel();
-    }
-
-    if (g_menu.FloatOption("Steering multiplier (wheel)", g_settings.Wheel.Steering.SteerMult, 0.1f, 2.0f, 0.01f,
-        { "Increase steering lock for all cars. You might want to increase it for faster steering and more steering lock." })) {
     }
 
     if (g_menu.BoolOption("Logitech RPM LEDs", g_settings.Wheel.Options.LogiLEDs,
@@ -1665,8 +1671,6 @@ void update_steeringassistmenu() {
         { "Maximum angle in degrees for automatic countersteering. Game default is 15 degrees." });
     g_menu.FloatOption("Steering reduction", g_settings.CustomSteering.SteeringReduction, 0.0f, 1.0f, 0.01f,
         { "Reduce steering input at higher speeds.", "From InfamousSabre's Custom Steering." });
-    g_menu.FloatOption("Steering multiplier", g_settings.CustomSteering.SteeringMult, 0.01f, 2.0f, 0.01f,
-        { "Increase/decrease steering lock.", "From InfamousSabre's Custom Steering." });
     g_menu.FloatOption("Steering gamma", g_settings.CustomSteering.Gamma, 0.01f, 5.0f, 0.01f,
         { "Change linearity of steering input." });
     g_menu.FloatOptionCb("Steering time", g_settings.CustomSteering.SteerTime, 0.000001f, 0.90f, 0.000001f,

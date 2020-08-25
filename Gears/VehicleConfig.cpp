@@ -164,9 +164,12 @@ void VehicleConfig::LoadSettings(const std::string& file) {
     AutoParams.UsingATCU = ini.GetBoolValue("AUTO_PARAMS", "UsingATCU", gSettings.AutoParams.UsingATCU);
 
     //[STEERING_OVERRIDE]
-    SteeringOverride.UseForCustomSteering = ini.GetBoolValue("STEERING_OVERRIDE", "UseForCustomSteering", SteeringOverride.UseForCustomSteering);
-    SteeringOverride.SoftLockCustomSteering = ini.GetDoubleValue("STEERING_OVERRIDE", "SoftLockCustomSteering", SteeringOverride.SoftLockCustomSteering);
-    SteeringOverride.SoftLockWheelInput = ini.GetDoubleValue("STEERING_OVERRIDE", "SoftLockWheelInput", SteeringOverride.SoftLockWheelInput);
+    Steering.CustomSteering.UseCustomLock = ini.GetBoolValue("STEERING", "CSUseCustomLock", Steering.CustomSteering.UseCustomLock);
+    Steering.CustomSteering.SoftLock = ini.GetDoubleValue("STEERING", "CSSoftLock", Steering.CustomSteering.SoftLock);
+    Steering.CustomSteering.SteeringMult = ini.GetDoubleValue("STEERING", "CSSteeringMult", Steering.CustomSteering.SteeringMult);
+
+    Steering.Wheel.SoftLock = ini.GetDoubleValue("STEERING", "WSoftLock", Steering.Wheel.SoftLock);
+    Steering.Wheel.SteeringMult = ini.GetDoubleValue("STEERING", "WSteeringMult", Steering.Wheel.SteeringMult);
 
     // [CAM]
     Misc.Camera.Enable = ini.GetBoolValue("CAM", "Enable", gSettings.Misc.Camera.Enable);
@@ -304,9 +307,12 @@ void VehicleConfig::saveGeneral() {
         ini.SetLongValue("DRIVING_ASSISTS", "AWDSpecialFlags", DriveAssists.AWD.SpecialFlags, nullptr, true);
 
     //[STEERING_OVERRIDE]
-    SET_VALUE("STEERING_OVERRIDE", "UseForCustomSteering", SteeringOverride.UseForCustomSteering);
-    SET_VALUE("STEERING_OVERRIDE", "SoftLockCustomSteering", SteeringOverride.SoftLockCustomSteering);
-    SET_VALUE("STEERING_OVERRIDE", "SoftLockWheelInput", SteeringOverride.SoftLockWheelInput);
+    SET_VALUE("STEERING", "CSUseCustomLock", Steering.CustomSteering.UseCustomLock);
+    SET_VALUE("STEERING", "CSSoftLock", Steering.CustomSteering.SoftLock);
+    SET_VALUE("STEERING", "CSSteeringMult", Steering.CustomSteering.SteeringMult);
+
+    SET_VALUE("STEERING", "WSoftLock", Steering.Wheel.SoftLock);
+    SET_VALUE("STEERING", "WSteeringMult", Steering.Wheel.SteeringMult);
 
     // [SHIFT_OPTIONS]
     SET_VALUE("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);

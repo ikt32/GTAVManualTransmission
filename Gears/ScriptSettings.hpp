@@ -62,7 +62,6 @@ public:
         float CountersteerMult = 1.0f;
         // In Degrees
         float CountersteerLimit = 15.0f;
-        float SteeringMult = 1.0f;
         float SteeringReduction = 0.9f;
         float Gamma = 1.0f;
         float CenterTime = 0.000100f;
@@ -331,7 +330,6 @@ public:
             float AngleCar = 720.0f;
             float AngleBike = 180.0f;
             float AngleBoat = 360.0f;
-            float SteerMult = 1.0f;
             float Gamma = 1.0f;
             float AntiDeadZone = 0.25f;
             float DeadZone = 0.0f;

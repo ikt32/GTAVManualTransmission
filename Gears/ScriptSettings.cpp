@@ -110,7 +110,6 @@ void ScriptSettings::SaveGeneral() const {
     ini.SetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
     ini.SetDoubleValue("CUSTOM_STEERING", "CountersteerMult", CustomSteering.CountersteerMult);
     ini.SetDoubleValue("CUSTOM_STEERING", "CountersteerLimit", CustomSteering.CountersteerLimit);
-    ini.SetDoubleValue("CUSTOM_STEERING", "SteeringMult", CustomSteering.SteeringMult);
     ini.SetDoubleValue("CUSTOM_STEERING", "SteeringReduction", CustomSteering.SteeringReduction);
     ini.SetDoubleValue("CUSTOM_STEERING", "Gamma", CustomSteering.Gamma);
     ini.SetDoubleValue("CUSTOM_STEERING", "SteerTime", CustomSteering.SteerTime);
@@ -349,7 +348,6 @@ void ScriptSettings::SaveWheel() const {
     ini.SetDoubleValue("STEER", "SteerAngleBike",Wheel.Steering.AngleBike);
     ini.SetDoubleValue("STEER", "SteerAngleBoat", Wheel.Steering.AngleBoat);
     ini.SetDoubleValue("STEER", "GAMMA", Wheel.Steering.Gamma);
-    ini.SetDoubleValue("STEER", "GameSteerMultWheel", Wheel.Steering.SteerMult);
 
     // [THROTTLE]
     ini.SetDoubleValue("THROTTLE", "GAMMA", Wheel.Throttle.Gamma);
@@ -392,7 +390,6 @@ void ScriptSettings::parseSettingsGeneral() {
     CustomSteering.Mode = ini.GetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
     CustomSteering.CountersteerMult = ini.GetDoubleValue("CUSTOM_STEERING", "CountersteerMult", CustomSteering.CountersteerMult);
     CustomSteering.CountersteerLimit = ini.GetDoubleValue("CUSTOM_STEERING", "CountersteerLimit", CustomSteering.CountersteerLimit);
-    CustomSteering.SteeringMult = ini.GetDoubleValue("CUSTOM_STEERING", "SteeringMult", CustomSteering.SteeringMult);
     CustomSteering.SteeringReduction = ini.GetDoubleValue("CUSTOM_STEERING", "SteeringReduction", CustomSteering.SteeringReduction);
     CustomSteering.Gamma = ini.GetDoubleValue("CUSTOM_STEERING", "Gamma", CustomSteering.Gamma);
     CustomSteering.SteerTime = ini.GetDoubleValue("CUSTOM_STEERING", "SteerTime", CustomSteering.SteerTime);
@@ -770,7 +767,6 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     Wheel.Steering.AngleCar = ini.GetDoubleValue("STEER", "SteerAngleCar", Wheel.Steering.AngleCar);
     Wheel.Steering.AngleBike = ini.GetDoubleValue("STEER", "SteerAngleBike", Wheel.Steering.AngleBike);
     Wheel.Steering.AngleBoat = ini.GetDoubleValue("STEER", "SteerAngleBoat", Wheel.Steering.AngleBoat);
-    Wheel.Steering.SteerMult = ini.GetDoubleValue("STEER", "GameSteerMultWheel", Wheel.Steering.SteerMult);
 
     // [THROTTLE]
     scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Throttle)] =
