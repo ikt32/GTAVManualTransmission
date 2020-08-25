@@ -186,6 +186,11 @@ void functionDash() {
 }
 
 void setVehicleConfig(Vehicle vehicle) {
+    std::string oldName;
+    if (g_settings.ConfigActive()) {
+        oldName = g_settings().Name;
+    }
+
     g_activeConfig = nullptr;
     g_settings.SetVehicleConfig(nullptr);
 
@@ -224,7 +229,9 @@ void setVehicleConfig(Vehicle vehicle) {
         if (itMatch != g_vehConfigs.end()) {
             g_activeConfig = &*itMatch;
             g_settings.SetVehicleConfig(g_activeConfig);
-            UI::Notify(INFO, fmt::format("Configuration [{}] loaded.", g_activeConfig->Name));
+            if (g_activeConfig->Name != oldName) {
+                UI::Notify(INFO, fmt::format("Configuration [{}] loaded.", g_activeConfig->Name));
+            }
         }
     }
 }
