@@ -37,15 +37,18 @@ T avg(std::vector<T, A> const& vec) {
     return average / static_cast<T>(vec.size());
 }
 
-template <typename T, typename = typename std::enable_if<std::is_floating_point<T>::value, T>::type>
+#pragma warning(push)
+#pragma warning(disable: 4244)
+template <typename T>
 constexpr T rad2deg(T rad) {
     return static_cast<T>(static_cast<double>(rad) * (180.0 / M_PI));
 }
 
-template <typename T, typename = typename std::enable_if<std::is_floating_point<T>::value, T>::type>
+template <typename T>
 constexpr T deg2rad(T deg) {
     return static_cast<T>(static_cast<double>(deg) * M_PI / 180.0);
 }
+#pragma warning(pop)
 
 template <typename T>
 T map(T x, T in_min, T in_max, T out_min, T out_max) {
