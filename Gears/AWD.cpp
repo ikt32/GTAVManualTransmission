@@ -43,7 +43,7 @@ STransferInfo GetTractionTransfer(float driveBiasF, float biasMax);
 STransferInfo GetOversteerTransfer(float driveBiasF, float biasMax, DrivingAssists::ESPData espData);
 STransferInfo GetUndersteerTransfer(float driveBiasF, float biasMax, DrivingAssists::ESPData espData);
 
-float GetDriveBiasFront(void* pHandlingDataOrig) {
+float AWD::GetDriveBiasFront(void* pHandlingDataOrig) {
     if (!pHandlingDataOrig)
         return -1.0f;
 
@@ -103,6 +103,9 @@ void AWD::Update() {
 
     if (g_settings().DriveAssists.AWD.UseCustomBaseBias) {
         driveBiasF = driveBiasFCustom;
+    }
+    else {
+        driveBiasF = driveBiasFOriginal;
     }
 
     std::vector<STransferInfo> transferInfos{

@@ -38,6 +38,8 @@
 #include <string>
 #include <mutex>
 
+
+#include "AWD.h"
 #include "BlockableControls.h"
 #include "Util/AddonSpawnerCache.h"
 #include "Util/Paths.h"
@@ -1563,6 +1565,76 @@ void update_espsettingsmenu() {
         { "Max ESC oversteer understeer value. Additional braking force for the affected wheel." });
 }
 
+std::vector<std::string> GetAWDInfo(Vehicle vehicle) {
+    namespace HR = HandlingReplacement;
+
+    void* handlingDataOrig = nullptr;
+    void* handlingDataReplace = nullptr;
+
+    if (!HR::Available()) {
+        return { "HandlingReplacement.asi missing" };
+    }
+
+    bool replaced = HR::GetHandlingData(vehicle, &handlingDataOrig, &handlingDataReplace);
+
+    if (handlingDataOrig == nullptr) {
+        return {
+            "Could not find handling data.",
+            "Something went wrong within HandlingReplacement.asi.",
+            "You shouldn't even be able to see this message."
+        };
+    }
+
+    float driveBiasFOriginal = AWD::GetDriveBiasFront(handlingDataOrig);
+    float driveBiasFCustom = g_settings().DriveAssists.AWD.CustomBaseBias;
+
+    if (VExt::GetNumWheels(vehicle) != 4) {
+        return { "Only vehicles with 4 wheels are supported." };
+    }
+
+    if (driveBiasFOriginal <= 0.0f || driveBiasFOriginal >= 1.0f) {
+        return {
+            (fmt::format("Drive layout: {}", driveBiasFOriginal == 0.0f ? "RWD" : "FWD")),
+            "Not AWD compatible.",
+            "Set fDriveBiasFront in handling data to between 0.10 and 0.90 for AWD support."
+        };
+    }
+
+    if (driveBiasFCustom <= 0.0f || driveBiasFCustom >= 1.0f) {
+        return {
+            (fmt::format("Custom drive layout corrupt: Full {}", driveBiasFOriginal == 0.0f ? "RWD" : "FWD")),
+            "This shouldn't happen.",
+            "Reset custom drive layout to between 0.01 and 0.99."
+        };
+    }
+
+    std::vector<std::string> awdInfo;
+
+    float driveBiasFrontBase;
+    float driveBiasFrontLive;
+    if (replaced) {
+        driveBiasFrontBase = g_settings().DriveAssists.AWD.UseCustomBaseBias ? driveBiasFCustom : driveBiasFOriginal;
+        driveBiasFrontLive = AWD::GetDriveBiasFront(handlingDataReplace);
+    }
+    else {
+        driveBiasFrontBase = driveBiasFOriginal;
+    }
+
+    awdInfo.emplace_back("Drive layout: AWD");
+    std::string baseDistrStr = fmt::format("Base distribution: F{:.0f}/R{:.0f}", driveBiasFrontBase * 100.0f, (1.0f - driveBiasFrontBase) * 100.0f);
+    if (replaced) {
+        awdInfo.emplace_back("AWD mode: Adaptive");
+        awdInfo.push_back(baseDistrStr);
+        awdInfo.push_back(fmt::format("Live distribution: F{:.0f}/R{:.0f}", driveBiasFrontLive * 100.0f, (1.0f - driveBiasFrontLive) * 100.0f));
+        awdInfo.push_back(fmt::format("Live transfer percentage: {:.0f}%", AWD::GetTransferValue() * 100.0f));
+    }
+    else {
+        awdInfo.emplace_back("AWD mode: Static");
+        awdInfo.push_back(baseDistrStr);
+    }
+    return awdInfo;
+}
+
 void update_awdsettingsmenu() {
     g_menu.Title("Adaptive AWD");
     g_menu.Subtitle(MenuSubtitleConfig());
@@ -1574,6 +1646,20 @@ void update_awdsettingsmenu() {
             PAD::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
             ShellExecuteA(0, 0, "https://www.gta5-mods.com/tools/handling-replacement-library", 0, 0, SW_SHOW);
         }
+    }
+
+    bool resolveAWD = false;
+    g_menu.OptionPlus("AWD Status", {}, &resolveAWD, nullptr, nullptr, "", { "Real-time AWD overview status" });
+    if (resolveAWD) {
+        std::vector<std::string> awdStats;
+        extern Vehicle g_playerVehicle;
+        if (ENTITY::DOES_ENTITY_EXIST(g_playerVehicle)) {
+            awdStats = GetAWDInfo(g_playerVehicle);
+        }
+        else {
+            awdStats = { "No current vehicle" };
+        }
+        g_menu.OptionPlusPlus(awdStats, "Status");
     }
 
     g_menu.BoolOption("Use custom drive bias", g_settings().DriveAssists.AWD.UseCustomBaseBias, 

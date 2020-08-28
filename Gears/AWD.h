@@ -12,4 +12,5 @@ namespace AWD {
 
     void Update();
     float GetTransferValue();
+    float GetDriveBiasFront(void* pHandlingDataOrig);
 }
