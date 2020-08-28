@@ -114,7 +114,6 @@ void VehicleConfig::LoadSettings(const std::string& file) {
 
     // [MT_OPTIONS]
     MTOptions.ShiftMode.Set(static_cast<EShiftMode>(ini.GetLongValue("MT_OPTIONS", "ShiftMode", baseConfig.MTOptions.ShiftMode)));
-
     LOAD_VAL("MT_OPTIONS", "ClutchCatching", MTOptions.ClutchCreep);
     LOAD_VAL("MT_OPTIONS", "ClutchShiftingH", MTOptions.ClutchShiftH);
     LOAD_VAL("MT_OPTIONS", "ClutchShiftingS", MTOptions.ClutchShiftS);
@@ -165,7 +164,7 @@ void VehicleConfig::LoadSettings(const std::string& file) {
     LOAD_VAL("DRIVING_ASSISTS",   "AWDUseUndersteer", DriveAssists.AWD.UseUndersteer);
     LOAD_VAL("DRIVING_ASSISTS", "AWDUndersteerMin", DriveAssists.AWD.UndersteerMin);
     LOAD_VAL("DRIVING_ASSISTS", "AWDUndersteerMax", DriveAssists.AWD.UndersteerMax);
-    DriveAssists.AWD.SpecialFlags      = ini.GetLongValue  ("DRIVING_ASSISTS",   "AWDSpecialFlags", DriveAssists.AWD.SpecialFlags);
+    DriveAssists.AWD.SpecialFlags.Set(ini.GetLongValue("DRIVING_ASSISTS", "AWDSpecialFlags", DriveAssists.AWD.SpecialFlags));
 
     // [SHIFT_OPTIONS]
     LOAD_VAL("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
