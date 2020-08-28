@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.9.0
+## 5.0.0
 
 I really should've incremented major/minor versions instead of patches for
 those older releases that had a ton of new stuff. Oh well. Might as well start
@@ -19,15 +19,29 @@ Demo: [Skyline GT-R R32 - ATTESA E-TS test](https://www.youtube.com/watch?v=Xpsy
 using an early implementation.
 
 The feature requires the
-[Handling Replacement](https://www.gta5-mods.com/tools/handling-replacement-library) 
+[Handling Replacement](https://www.gta5-mods.com/tools/handling-replacement-library)
 library.
 
-Minor fixes and improvements:
+#### Vehicle Configuration improvements
+
+Per-vehicle configurations has been completely reworked internally. Changes
+in the menu now properly affect and save for the current active configuration.
+
+New configurations can be created in-game too. Improvements in selectively
+saving individual options now enable you to "touch" a setting, have it saved
+to the file, and share it easily.
+
+Almost all settings carry over, save for a few small things that have been
+moved, removed and/or renamed. Most significantly is the plate-matching:
+Spaces are significant now. Check `Information.txt` for more info.
+
+### Minor fixes and improvements
 
 * Add custom (XInput) controller steering deadzones
 * Improve understeer calculations for ESP (and AWD)
 * Fix clutch affecting automatic shifting
 * Fix LSD active while car shouldn't be moving
+* LukeRoss' RealVR compatibility: Disable custom camera when RealVR is active
 
 ## 4.8.2
 
