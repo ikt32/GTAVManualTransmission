@@ -2159,6 +2159,9 @@ void update_menu() {
     /* mainmenu -> controlsmenu -> wheelmenu -> buttonsmenu */
     if (g_menu.CurrentMenu("buttonsmenu")) { update_buttonsmenu(); }
 
+    /* mainmenu -> controlsmenu -> update_controlsvehconfmenu */
+    if (g_menu.CurrentMenu("vehiclecontroladjustsmenu")) { update_controlsvehconfmenu(); }
+
     /* mainmenu -> hudmenu */
     if (g_menu.CurrentMenu("hudmenu")) { update_hudmenu(); }
 
