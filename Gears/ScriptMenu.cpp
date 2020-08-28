@@ -521,20 +521,26 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
     if (shiftAssist.empty())
         shiftAssist = "None";
 
+    EShiftMode shiftMode = config.MTOptions.ShiftMode;
+    bool clutchCreep = config.MTOptions.ClutchCreep;
+    int tcsMode = config.DriveAssists.TCS.Mode;
+    bool espEn = config.DriveAssists.ESP.Enable;
+    bool lsdEn = config.DriveAssists.LSD.Enable;
+
     std::vector<std::string> extras{
         fmt::format("{}", config.Description),
         "Compatible cars:",
         fmt::format("\tModels: {}", modelNames),
         fmt::format("\tPlates: {}", plates),
         "Shifting options:",
-        fmt::format("\tShift mode: {}", gearboxModes[static_cast<int>(config.MTOptions.ShiftMode)]),
-        fmt::format("\tClutch creep: {}", config.MTOptions.ClutchCreep),
+        fmt::format("\tShift mode: {}", gearboxModes[shiftMode]),
+        fmt::format("\tClutch creep: {}", clutchCreep),
         fmt::format("\tSequential assist: {}", shiftAssist),
         "Driving assists:",
         fmt::format("\tABS: {}", absStrings[absMode]),
-        fmt::format("\tTCS: {}", tcsStrings[config.DriveAssists.TCS.Mode]),
-        fmt::format("\tESP: {}", config.DriveAssists.ESP.Enable ? "Yes" : "No"),
-        fmt::format("\tLSD: {}", config.DriveAssists.LSD.Enable ? "Yes" : "No"),
+        fmt::format("\tTCS: {}", tcsStrings[tcsMode]),
+        fmt::format("\tESP: {}", espEn ? "Yes" : "No"),
+        fmt::format("\tLSD: {}", lsdEn ? "Yes" : "No"),
         "Steering wheel:",
         fmt::format("\tSoft lock: {:.0f}", config.Steering.Wheel.SoftLock)
     };

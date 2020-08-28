@@ -584,21 +584,23 @@ void update_manual_transmission() {
     if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::DriveBiasFInc) ||
         g_controls.ButtonJustPressed(CarControls::WheelControlType::DriveBiasFInc)) {
         float bias = g_settings().DriveAssists.AWD.CustomBaseBias;
+        float customMax = g_settings().DriveAssists.AWD.CustomMax;
         bias += 0.05f;
         bias = std::clamp(
             round(bias * 20.0f) / 20.0f,
             0.01f,
-            g_settings().DriveAssists.AWD.CustomMax);
+            customMax);
         g_settings().DriveAssists.AWD.CustomBaseBias = bias;
     }
 
     if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::DriveBiasFDec) ||
         g_controls.ButtonJustPressed(CarControls::WheelControlType::DriveBiasFDec)) {
         float bias = g_settings().DriveAssists.AWD.CustomBaseBias;
+        float customMin = g_settings().DriveAssists.AWD.CustomMin;
         bias -= 0.05f;
         bias = std::clamp(
             round(bias * 20.0f) / 20.0f,
-            g_settings().DriveAssists.AWD.CustomMin,
+            customMin,
             0.99f);
         g_settings().DriveAssists.AWD.CustomBaseBias = bias;
     }
@@ -840,7 +842,8 @@ void functionHShiftTo(int i) {
 
     // shifting from neutral into gear is OK when rev matched
     float expectedRPM = g_vehData.mWheelAverageDrivenTyreSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[i]);
-    bool rpmInRange = Math::Near(g_vehData.mRPM, expectedRPM, g_settings().ShiftOptions.RPMTolerance);
+    float rpmTol = g_settings().ShiftOptions.RPMTolerance;
+    bool rpmInRange = Math::Near(g_vehData.mRPM, expectedRPM, rpmTol);
 
     if (!checkShift)
         shiftPass = true;

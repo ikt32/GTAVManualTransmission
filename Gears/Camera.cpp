@@ -479,9 +479,10 @@ void updateRotationCameraMovement() {
 
     float velComponent = travelDir * g_settings().Misc.Camera.Movement.RotationDirectionMult;
     float rotComponent = rotationVelocity.z * g_settings().Misc.Camera.Movement.RotationRotationMult;
+    float rotMax = deg2rad(g_settings().Misc.Camera.Movement.RotationMaxAngle);
     float totalMove = std::clamp(velComponent + rotComponent,
-        -deg2rad(g_settings().Misc.Camera.Movement.RotationMaxAngle),
-        deg2rad(g_settings().Misc.Camera.Movement.RotationMaxAngle));
+        -rotMax,
+        rotMax);
     float newAngle = -rad2deg(totalMove);
 
     if (speedVector.y < 3.0f) {
@@ -529,10 +530,11 @@ void updateLongitudinalCameraMovement() {
         mappedAccel = map(gForce, -deadzone, -10.0f, 0.0f, -10.0f);
         mult = g_settings().Misc.Camera.Movement.LongForwardMult;
     }
-
+    float longBwLim = g_settings().Misc.Camera.Movement.LongBackwardLimit;
+    float longFwLim = g_settings().Misc.Camera.Movement.LongForwardLimit;
     float accelVal = 
         std::clamp(-mappedAccel * mult,
-            -g_settings().Misc.Camera.Movement.LongBackwardLimit,
-            g_settings().Misc.Camera.Movement.LongForwardLimit);
+            -longBwLim,
+            longFwLim);
     accelMoveFwd = lerp(accelMoveFwd, accelVal, lerpF); // just for smoothness
 }
