@@ -201,21 +201,32 @@ std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData, LSDData lsdData
         avgAngle_ = avgAngle;
     }
     float oversteerAngleDeg = abs(rad2deg(espData.OversteerAngle));
+    float overMin = g_settings().DriveAssists.ESP.OverMin;
+    float overMax = g_settings().DriveAssists.ESP.OverMax;
+    float overMinComp = g_settings().DriveAssists.ESP.OverMinComp;
+    float overMaxComp = g_settings().DriveAssists.ESP.OverMaxComp;
     float oversteerComp = map(oversteerAngleDeg,
-        g_settings().DriveAssists.ESP.OverMin, g_settings().DriveAssists.ESP.OverMax,
-        g_settings().DriveAssists.ESP.OverMinComp, g_settings().DriveAssists.ESP.OverMaxComp);
+        overMin, overMax,
+        overMinComp, overMaxComp);
 
     float oversteerAdd = handlingBrakeForce * oversteerComp;
 
+
     float oversteerRearAdd = handlingBrakeForce * map(
-        oversteerAngleDeg, g_settings().DriveAssists.ESP.OverMax, g_settings().DriveAssists.ESP.OverMax * 2.0f,
-        g_settings().DriveAssists.ESP.OverMinComp, g_settings().DriveAssists.ESP.OverMaxComp);
-    oversteerRearAdd = std::clamp(oversteerRearAdd, 0.0f, g_settings().DriveAssists.ESP.OverMaxComp);
+        oversteerAngleDeg, overMax, overMax * 2.0f,
+        overMinComp, overMaxComp);
+    oversteerRearAdd = std::clamp(oversteerRearAdd, 0.0f, overMaxComp);
 
     float understeerAngleDeg(abs(rad2deg(espData.UndersteerAngle)));
+
+    float underMin = g_settings().DriveAssists.ESP.UnderMin;
+    float underMax = g_settings().DriveAssists.ESP.UnderMax;
+    float underMinComp = g_settings().DriveAssists.ESP.UnderMinComp;
+    float underMaxComp = g_settings().DriveAssists.ESP.UnderMaxComp;
+
     float understeerComp = map(understeerAngleDeg,
-        g_settings().DriveAssists.ESP.UnderMin, g_settings().DriveAssists.ESP.UnderMax,
-        g_settings().DriveAssists.ESP.UnderMinComp, g_settings().DriveAssists.ESP.UnderMaxComp);
+        underMin, underMax,
+        underMinComp, underMaxComp);
 
     float understeerAdd = handlingBrakeForce * understeerComp;
 

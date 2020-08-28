@@ -215,10 +215,12 @@ STransferInfo GetOversteerTransfer(float driveBiasF, float biasMax, DrivingAssis
     if (abs(oversteerDeg) > g_settings().DriveAssists.AWD.OversteerMin &&
         ENTITY::GET_ENTITY_SPEED(g_playerVehicle) > 1.0f) {
         float throttle = VExt::GetThrottle(g_playerVehicle);
+        float osMin = g_settings().DriveAssists.AWD.OversteerMin;
+        float osMax = g_settings().DriveAssists.AWD.OversteerMax;
 
         transferRatio = map(
             oversteerDeg,
-            g_settings().DriveAssists.AWD.OversteerMin, g_settings().DriveAssists.AWD.OversteerMax,
+            osMin, osMax,
             0.0f, 1.0f) * throttle;
         transferRatio = std::clamp(transferRatio, 0.0f, 1.0f);
 
@@ -237,10 +239,12 @@ STransferInfo GetUndersteerTransfer(float driveBiasF, float biasMax, DrivingAssi
     if (espData.UndersteerAngleValid &&
         understeerDeg > g_settings().DriveAssists.AWD.UndersteerMin) {
         float throttle = VExt::GetThrottle(g_playerVehicle);
+        float usMin = g_settings().DriveAssists.AWD.UndersteerMin;
+        float usMax = g_settings().DriveAssists.AWD.UndersteerMax;
 
         transferRatio = map(
             understeerDeg,
-            g_settings().DriveAssists.AWD.UndersteerMin, g_settings().DriveAssists.AWD.UndersteerMax,
+            usMin, usMax,
             0.0f, 1.0f) * throttle;
         transferRatio = std::clamp(transferRatio, 0.0f, 1.0f);
 
