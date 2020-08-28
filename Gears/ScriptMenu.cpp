@@ -679,14 +679,14 @@ void update_controlsvehconfmenu() {
     g_menu.Title("Controls");
     g_menu.Subtitle(MenuSubtitleConfig());
 
-    g_menu.BoolOption("Enhanced Steering: Override wheel rotation", g_settings().Steering.CustomSteering.UseCustomLock,
-        { "Override the default 180 degree steering wheel rotation." });
+    g_menu.BoolOption("ES: Override wheel rotation", g_settings().Steering.CustomSteering.UseCustomLock,
+        { "Enhanced Steering: Override the default 180 degree steering wheel rotation." });
 
-    g_menu.FloatOption("Enhanced Steering: Wheel rotation", g_settings().Steering.CustomSteering.SoftLock, 180.0f, 1440.0f, 30.0f,
-        { "Degrees of rotation for the vehicle steering wheel. Does not change max steering angle." });
+    g_menu.FloatOption("ES: Wheel rotation", g_settings().Steering.CustomSteering.SoftLock, 180.0f, 1440.0f, 30.0f,
+        { "Enhanced Steering: Degrees of rotation for the vehicle steering wheel. Does not change max steering angle." });
 
-    g_menu.FloatOption("Enhanced Steering: Steering multiplier", g_settings().Steering.CustomSteering.SteeringMult, 0.01f, 2.0f, 0.01f,
-        { "Increase or decrease actual max steering angle." });
+    g_menu.FloatOption("ES: Steering multiplier", g_settings().Steering.CustomSteering.SteeringMult, 0.01f, 2.0f, 0.01f,
+        { "Enhanced Steering: Increase or decrease actual max steering angle." });
 
     g_menu.FloatOption("Wheel: Soft lock", g_settings().Steering.Wheel.SoftLock, 180.0f, 1440.0f, 30.0f,
         { "Steering range for your real wheel, in degrees. Reduce for quicker steering." });
