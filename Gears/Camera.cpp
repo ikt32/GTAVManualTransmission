@@ -127,6 +127,9 @@ void FPVCam::initCam() {
 }
 
 void FPVCam::Update() {
+    if (RealVR::Available())
+        return;
+
     bool enable = g_settings().Misc.Camera.Enable;
     bool fpv = CAM::GET_FOLLOW_VEHICLE_CAM_VIEW_MODE() == 4;
     bool inCar = Util::VehicleAvailable(g_playerVehicle, g_playerPed);

@@ -1742,6 +1742,12 @@ void update_cameraoptionsmenu() {
     g_menu.Title("Camera options");
     g_menu.Subtitle(MenuSubtitleConfig());
 
+    if (RealVR::Available()) {
+        g_menu.Option("RealVR.asi detected: Custom camera disabled", NativeMenu::solidRed, 
+            { "Custom camera is incompatible with LukeRoss' R.E.A.L. VR mod and is disabled.",
+              "Changing options is still possible, but they will not do anything while RealVR.asi is present." });
+    }
+
     g_menu.BoolOption("Enable custom FPV camera", g_settings().Misc.Camera.Enable,
         { "Camera mounted to the player head." });
 
