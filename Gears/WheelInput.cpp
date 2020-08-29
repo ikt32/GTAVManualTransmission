@@ -766,33 +766,10 @@ float getFloatingSteeredWheelsRatio(Vehicle v) {
     return wheelsOffGroundRatio;
 }
 
-float getSteeringLock() {
-    switch (g_vehData.mClass) {
-    case VehicleClass::Bike:
-    case VehicleClass::Quad:
-    case VehicleClass::Bicycle:
-        return g_settings.Wheel.Steering.AngleBike;
-    case VehicleClass::Car:
-        return g_settings.Wheel.Steering.AngleCar;
-    case VehicleClass::Boat:
-        return g_settings.Wheel.Steering.AngleBoat;
-    case VehicleClass::Plane:
-    case VehicleClass::Heli:
-    case VehicleClass::Train:
-    case VehicleClass::Unknown:
-    default: return g_settings.Wheel.Steering.AngleCar;
-    }
-}
-
 void WheelInput::PlayFFBGround() {
     if (!g_settings.Wheel.FFB.Enable ||
         g_controls.PrevInput != CarControls::Wheel) {
         return;
-    }
-
-    float rotationScale = 1.0f;
-    if (g_settings.Wheel.FFB.Scale) {
-        rotationScale = getSteeringLock() / g_settings.Wheel.Steering.AngleMax * 0.66f + 0.34f;
     }
 
     if (g_settings.Wheel.Options.LogiLEDs) {
@@ -827,7 +804,7 @@ void WheelInput::PlayFFBGround() {
     }
 
     int totalForce = satForce + detailForce;
-    totalForce = (int)((float)totalForce * rotationScale);
+    totalForce = (int)((float)totalForce);
     calculateSoftLock(totalForce, damperForce);
 
     g_controls.PlayFFBDynamics(std::clamp(totalForce, -10000, 10000), std::clamp(damperForce, -10000, 10000));
@@ -862,11 +839,6 @@ void WheelInput::PlayFFBWater() {
         return;
     }
 
-    float rotationScale = 1.0f;
-    if (g_settings.Wheel.FFB.Scale) {
-        rotationScale = getSteeringLock() / g_settings.Wheel.Steering.AngleMax * 0.66f + 0.34f;
-    }
-
     if (g_settings.Wheel.Options.LogiLEDs) {
         g_controls.PlayLEDs(g_vehData.mRPM, 0.45f, 0.95f);
     }
@@ -884,7 +856,7 @@ void WheelInput::PlayFFBWater() {
     }
 
     int totalForce = satForce + detailForce;
-    totalForce = (int)((float)totalForce * rotationScale);
+    totalForce = (int)((float)totalForce);
     calculateSoftLock(totalForce, damperForce);
     g_controls.PlayFFBDynamics(totalForce, damperForce);
 

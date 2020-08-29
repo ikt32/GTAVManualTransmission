@@ -308,7 +308,6 @@ public:
         // [FORCE_FEEDBACK]
         struct {
             bool Enable = true;
-            bool Scale = true;
             int AntiDeadForce = 1600;
             float SATAmpMult = 1.25f;
             int SATMax = 10000;

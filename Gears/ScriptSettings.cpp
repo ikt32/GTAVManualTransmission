@@ -321,7 +321,6 @@ void ScriptSettings::SaveWheel() const {
 
     // [FORCE_FEEDBACK]
     ini.SetBoolValue("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
-    ini.SetBoolValue("FORCE_FEEDBACK", "Scale", Wheel.FFB.Scale);
     ini.SetLongValue("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
     ini.SetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
     ini.SetLongValue("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
@@ -697,7 +696,6 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 
     // [FORCE_FEEDBACK]
     Wheel.FFB.Enable = ini.GetBoolValue("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
-    Wheel.FFB.Scale = ini.GetBoolValue("FORCE_FEEDBACK", "Scale", Wheel.FFB.Scale);
     Wheel.FFB.AntiDeadForce = ini.GetLongValue("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
     Wheel.FFB.SATAmpMult = ini.GetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
     Wheel.FFB.SATMax = ini.GetLongValue("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
