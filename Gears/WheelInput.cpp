@@ -600,14 +600,14 @@ void calculateSoftLock(int& totalForce, int& damperForce) {
     float effSteer = steerMult * 2.0f * (g_controls.SteerVal - 0.5f);
     float steerSpeed = g_controls.GetAxisSpeed(CarControls::WheelAxisType::Steer);
     if (effSteer > 1.0f) {
-        if (steerSpeed > 0.1f) {
-            damperForce = (int)map(steerSpeed, 0.1f, 0.4f, (float)damperForce, 40000.0f);
+        if (steerSpeed > 0.0f) {
+            damperForce = 10000;
         }
         totalForce = (int)map(effSteer, 1.0f, steerMult, (float)totalForce, 40000.0f);
     }
     else if (effSteer < -1.0f) {
-        if (steerSpeed < -0.1f) {
-            damperForce = (int)map(steerSpeed, -0.1f, -0.4f, (float)damperForce, 40000.0f);
+        if (steerSpeed < 0.0f) {
+            damperForce = 10000;
         }
         totalForce = (int)map(effSteer, -1.0f, -steerMult, (float)totalForce, -40000.0f);
     }
