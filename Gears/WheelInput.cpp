@@ -652,7 +652,7 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
         expectedVectorMapped.x,
         static_cast<double>(speedVectorMapped.x) * g_settings.Wheel.FFB.SATFactor));
 
-    int satForce = static_cast<int>(g_settings.Wheel.FFB.SATAmpMult * static_cast<float>(defaultGain) * -error);
+    float satForce = g_settings.Wheel.FFB.SATAmpMult * static_cast<float>(defaultGain) * -error;
 
     // "Reduction" effects - those that affect already calculated things
     bool understeering = false;
@@ -682,24 +682,24 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
             if (g_vehData.mVelocity.y > 10.0f && abs(avgAngle) > deg2rad(2.0f)) {
                 understeer = sgn(speedVector.x - expectedVector.x) * (vecNextRot.x - expectedVector.x);
                 understeering = true;
-                satForce = static_cast<int>(static_cast<float>(satForce) / std::max(1.0f, 3.3f * understeer + 1.0f));
+                satForce = static_cast<float>(satForce) / std::max(1.0f, 3.3f * understeer + 1.0f);
             }
         }
     }
 
-    satForce = static_cast<int>(static_cast<float>(satForce) * (1.0f - wheelsOffGroundRatio));
+    satForce = static_cast<float>(satForce) * (1.0f - wheelsOffGroundRatio);
 
     if (g_vehData.mClass == VehicleClass::Car || g_vehData.mClass == VehicleClass::Quad) {
         if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 0, true)) {
-            satForce = satForce / 4;
+            satForce = satForce / 4.0f;
         }
         if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 1, true)) {
-            satForce = satForce / 4;
+            satForce = satForce / 4.0f;
         }
     }
     else if (g_vehData.mClass == VehicleClass::Bike) {
         if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 0, true)) {
-            satForce = satForce / 10;
+            satForce = satForce / 10.0f;
         }
     }
 
@@ -709,15 +709,19 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
         UI::ShowText(0.85, 0.225, 0.4, fmt::format("Error:\t\t{:.3f}", error), 4);
         UI::ShowText(0.85, 0.250, 0.4, fmt::format("{}Under:\t\t{:.3f}~w~", understeering ? "~b~" : "~w~", understeer), 4);
     }
-    if (satForce > 0) {
-        satForce = map(satForce, 0, 10000, g_settings.Wheel.FFB.AntiDeadForce, 10000);
+    float adf = static_cast<float>(g_settings.Wheel.FFB.AntiDeadForce);
+    if (satForce > 0.0f) {
+        satForce = map(satForce, 0.0f, 10000.0f, adf, 10000.0f);
     }
-    if (satForce < 0) {
-        satForce = map(satForce, -10000, 0, -10000, -g_settings.Wheel.FFB.AntiDeadForce);
+    if (satForce < 0.0f) {
+        satForce = map(satForce, -10000.0f, -0.0f, -10000.0f, -adf);
     }
-    satForce = std::clamp(satForce, -g_settings.Wheel.FFB.SATMax, g_settings.Wheel.FFB.SATMax);
-
-    return satForce;
+    float satMax = static_cast<float>(g_settings.Wheel.FFB.SATMax);
+    satForce = std::clamp(satForce, -satMax, satMax);
+    if (Math::Near(speed, 0.0f, 0.1f)) {
+        satForce *= speed;
+    }
+    return static_cast<int>(satForce);
 }
 
 // Despite being scientifically inaccurate, "self-aligning torque" is the best description.
