@@ -13,19 +13,20 @@ EShiftMode Next(EShiftMode mode);
 template <typename T>
 class Tracked {
     T mValue;
+    T mInitialValue;
     bool mChanged = false;
 public:
-    Tracked(T val) : mValue(val), mChanged(false) { }
+    Tracked(T val) : mValue(val), mInitialValue(val), mChanged(false) { }
     Tracked& operator=(T v) { mChanged = true; mValue = v; return *this; }
  
     operator T() const { return mValue; }
-    operator T&() { return mValue; }
+    operator T&() { if (mValue != mInitialValue) { mChanged = true; } return mValue; }
 
     bool operator==(const T& rhs) { return mValue == rhs; }
     bool operator!=(const T& rhs) { return !(mValue == rhs); }
 
-    bool Changed() const { return mChanged; }
-    void Set(T val) { mValue = val;  mChanged = false; }
+    bool Changed() const { return mChanged || mValue != mInitialValue; }
+    void Set(T val) { mValue = mInitialValue = val; mChanged = false; }
 };
 
 class VehicleConfig {
