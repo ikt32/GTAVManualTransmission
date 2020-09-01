@@ -606,19 +606,22 @@ void saveVehicleConfig() {
     config.ModelNames = StrUtil::split(userModels, ' ');
     config.SaveSettings();
     loadConfigs();
-    UI::Notify(INFO, fmt::format("Saved configuration as {}", finalFile.c_str()));
+    UI::Notify(INFO, fmt::format("Stored new configuration as {}", finalFile.c_str()));
 }
 
 void update_vehconfigmenu() {
     g_menu.Title("Custom vehicle settings");
     g_menu.Subtitle(MenuSubtitleConfig());
 
-    if (g_menu.Option("Save current configuration", 
-        { "Save the current configuration to a new file." })) {
+    if (g_menu.Option("Create configuration...", 
+        { "Create a new, empty current configuration file.",
+          "Changes made within a configuration are saved to that configuration only."
+          "The submenu subtitles indicate what configuration is being edited." })) {
         saveVehicleConfig();
     }
 
-    if (g_menu.Option("Reload configurations")) {
+    if (g_menu.Option("Reload configurations", 
+        { "Reload to update manual changes in the Vehicles folder." })) {
         loadConfigs();
     }
 
@@ -640,7 +643,8 @@ void update_vehconfigmenu() {
     for (const auto& vehConfig : g_vehConfigs) {
         bool sel = false;
         std::vector<std::string> descr = {
-            "This config will activate if you get into a compatible vehicle (by license plate and/or model)."
+            "This config will activate if you get into a compatible vehicle.",
+            "First matches by model & plate, then just checks model."
         };
         g_menu.OptionPlus(vehConfig.Name, {}, &sel, nullptr, nullptr, "", descr);
         if (sel) {
