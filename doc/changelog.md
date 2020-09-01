@@ -41,6 +41,7 @@ Spaces are significant now. Check `Information.txt` for more info.
 * Improve understeer calculations for ESP (and AWD)
 * Fix clutch affecting automatic shifting
 * Fix LSD active while car shouldn't be moving
+* Fix erratic FFB when revving when stopped
 * LukeRoss' RealVR compatibility: Disable custom camera when RealVR is active
 
 ## 4.8.2
