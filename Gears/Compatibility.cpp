@@ -10,7 +10,6 @@ HMODULE g_TrainerVModule = nullptr;
 bool* g_TrainerVActive = nullptr;
 
 HMODULE g_DashHookModule = nullptr;
-bool g_DashHookLoadLibbed = false;
 void(*g_DashHook_GetData)(VehicleDashboardData*);
 void(*g_DashHook_SetData)(VehicleDashboardData);
 
@@ -26,11 +25,9 @@ bool(*g_HR_GetHandlingData)(int handle, void** pHandlingDataOriginal, void** pHa
 HMODULE g_RealVRModule = nullptr;
 
 template <typename T>
-T CheckAddr(HMODULE lib, const std::string& funcName)
-{
+T CheckAddr(HMODULE lib, const std::string& funcName) {
     FARPROC func = GetProcAddress(lib, funcName.c_str());
-    if (!func)
-    {
+    if (!func) {
         logger.Write(ERROR, "[Compat] Couldn't get function [%s]", funcName.c_str());
         return nullptr;
     }
@@ -49,18 +46,11 @@ void setupTrainerV() {
 }
 
 void setupDashHook() {
-    g_DashHookLoadLibbed = false;
     logger.Write(INFO, "[Compat] Setting up DashHook");
-    g_DashHookModule = GetModuleHandle(L"DashHook.dll");
+    g_DashHookModule = LoadLibrary(L"DashHook.dll");
     if (!g_DashHookModule) {
-        logger.Write(INFO, "DashHook.dll not found running, loading...");
-        g_DashHookModule = LoadLibrary(L"DashHook.dll");
-        if (!g_DashHookModule) {
-            DWORD lastError = GetLastError();
-            logger.Write(INFO, "[Compat] DashHook.dll load failed, error [%lu]", lastError);
-            return;
-        }
-        g_DashHookLoadLibbed = true;
+        logger.Write(INFO, "DashHook.dll not found");
+        return;
     }
 
     g_DashHook_GetData = CheckAddr<void(*)(VehicleDashboardData*)>(g_DashHookModule, "DashHook_GetData");
@@ -112,15 +102,13 @@ void releaseCompatibility() {
     g_TrainerVModule = nullptr;
     g_TrainerVActive = nullptr;
 
-    if (g_DashHookLoadLibbed) {
-        logger.Write(DEBUG, "[Compat] DashHook.dll FreeLibrary");
-        if (FreeLibrary(g_DashHookModule)) {
-            g_DashHookModule = nullptr;
-        }
-        else {
-            logger.Write(ERROR, "[Compat] DashHook.dll FreeLibrary failed [%ul]", GetLastError());
-        }
+    if (FreeLibrary(g_DashHookModule)) {
+        g_DashHookModule = nullptr;
     }
+    else {
+        logger.Write(ERROR, "[Compat] DashHook.dll FreeLibrary failed [%ul]", GetLastError());
+    }
+    
     g_DashHook_GetData = nullptr;
     g_DashHook_SetData = nullptr;
 
