@@ -253,6 +253,7 @@
     <ClCompile Include="Util\AddonSpawnerCache.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="InputConfiguration.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -548,6 +549,7 @@
     <ClInclude Include="Util\AddonSpawnerCache.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="InputConfiguration.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

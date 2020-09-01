@@ -42,6 +42,7 @@ void readSettings();
 void ScriptMain();
 void NPCMain();
 void initTimers();
+void saveAllSettings();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                              Menu-related
