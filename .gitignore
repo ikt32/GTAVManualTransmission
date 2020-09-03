@@ -32,3 +32,4 @@ packages.config
 Server/
 *.TMP
 doc/changelog.pdf
+Gears/GitInfo.h

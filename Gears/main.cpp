@@ -1,18 +1,19 @@
-#include <inc/main.h>
-
-#include <filesystem>
-#include <Psapi.h>
-
 #include "script.h"
 
-#include "Compatibility.h"
 #include "Constants.h"
+#include "GitInfo.h"
+
+#include "Compatibility.h"
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/VehicleExtensions.hpp"
 #include "Memory/Versions.h"
 #include "Util/FileVersion.h"
 #include "Util/Logger.hpp"
 #include "Util/Paths.h"
+
+#include <inc/main.h>
+#include <Psapi.h>
+#include <filesystem>
 
 namespace fs = std::filesystem;
 
@@ -81,7 +82,8 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
     switch (reason) {
         case DLL_PROCESS_ATTACH: {
             logger.Clear();
-            logger.Write(INFO, "Manual Transmission %s (built %s %s)", Constants::DisplayVersion, __DATE__, __TIME__);
+            logger.Write(INFO, "Manual Transmission %s (built %s %s) (%s)",
+                Constants::DisplayVersion, __DATE__, __TIME__, GIT_HASH GIT_DIFF);
 
             resolveVersion();
 

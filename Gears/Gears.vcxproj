@@ -80,7 +80,7 @@
       <PreserveSbr>true</PreserveSbr>
     </Bscmake>
     <PreBuildEvent>
-      <Command>copy /b $(ProjectDir)main.cpp +,,</Command>
+      <Command>Prebuild.bat $(ProjectDir)</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>PostBuild.bat $(ProjectDir)$(OutDir) "D:\Games\Steam\steamapps\common\Grand Theft Auto V" $(TargetFileName)</Command>
