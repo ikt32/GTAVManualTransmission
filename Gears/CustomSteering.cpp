@@ -97,7 +97,7 @@ float CustomSteering::calculateDesiredHeading(float steeringMax, float desiredHe
 }
 
 void CustomSteering::DrawDebug() {
-    float steeringAngle = VExt::GetWheelLargestAngle(g_playerVehicle);
+    float steeringAngle = VExt::GetSteeringAngle(g_playerVehicle);
 
     Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
     Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, 1);
