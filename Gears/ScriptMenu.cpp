@@ -879,7 +879,7 @@ void update_wheelmenu() {
     if (!g_controls.FreeDevices.empty())
     {
         for (const auto& device : g_controls.FreeDevices) {
-            if (g_menu.Option(device.name, NativeMenu::solidRed,
+            if (g_menu.Option(device.name, NativeMenu::solidGreen,
                 { "~r~<b>This device can be used as input device!</b>~w~",
                   "Set it up with the options below, or press Select to discard this message." })) {
                 saveAllSettings();
