@@ -15,12 +15,36 @@ systems. The torque split (front drive bias) is updated in real-time depending
 on grip, understeer or oversteer. This very much affects the driving
 characteristics, so it's wise to just use through the vehicle-specific configs.
 
+For steering wheels and keyboards, the drive bias can be adjusted in real-time
+with hotkeys, to simulate manual AWD systems like in the old Subaru Impreza STi.
+
 Demo: [Skyline GT-R R32 - ATTESA E-TS test](https://www.youtube.com/watch?v=XpsykqjwiMM),
 using an early implementation.
 
 The feature requires the
 [Handling Replacement](https://www.gta5-mods.com/tools/handling-replacement-library)
 library.
+
+#### Launch control
+
+Launch control, also known as two-step holds the RPM at a set value. When used
+with [Turbo Fix x.y.z](https://www.gta5-mods.com/scripts/turbo-fix), it helps
+spool up the turbo while maintaining a good RPM to launch. With the right
+Turbo Fix settings, many explosions can be had.
+
+Demo: [Launch control and anti-lag test](https://www.youtube.com/watch?v=IboURUSP32s)
+
+To use launch control:
+
+1. Stop the car and engage first gear
+2. Hold the brakes
+3. Apply throttle
+4. Release the brakes to launch!
+
+While launch control limits the revs, it also manages the clutch for you, so
+you can safely remove your foot or finger from the clutch pedal.
+
+Launch control can be turned off and on with a hotkey/button for any input.
 
 #### Vehicle Configuration improvements
 

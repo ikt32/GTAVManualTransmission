@@ -141,6 +141,11 @@ public:
             // See AWD.h for currently supported flags
             Tracked<uint32_t> SpecialFlags = 0;
         } AWD;
+
+        struct {
+            Tracked<bool> Enable = false;
+            Tracked<float> LaunchRPM = 0.625f;
+        } LaunchControl;
     } DriveAssists;
 
     // [SHIFT_OPTIONS]

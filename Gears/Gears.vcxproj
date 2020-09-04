@@ -168,6 +168,7 @@
     <ClCompile Include="Input\DIDeviceFactory.cpp" />
     <ClCompile Include="Input\NativeInput.cpp" />
     <ClCompile Include="Input\USBNotify.cpp" />
+    <ClCompile Include="LaunchControl.cpp" />
     <ClCompile Include="ManualTransmission.cpp" />
     <ClCompile Include="Memory\NativeMatrix.cpp" />
     <ClCompile Include="Memory\NativeVectors.cpp" />
@@ -264,6 +265,7 @@
     <ClInclude Include="InputConfiguration.h" />
     <ClInclude Include="Input\NativeInput.h" />
     <ClInclude Include="Input\USBNotify.h" />
+    <ClInclude Include="LaunchControl.h" />
     <ClInclude Include="Memory\NativeMatrix.h" />
     <ClInclude Include="Memory\NativeVectors.h" />
     <ClInclude Include="Memory\VehicleBone.h" />

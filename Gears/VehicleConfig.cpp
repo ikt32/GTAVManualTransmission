@@ -166,6 +166,9 @@ void VehicleConfig::LoadSettings(const std::string& file) {
     LOAD_VAL("DRIVING_ASSISTS", "AWDUndersteerMax", DriveAssists.AWD.UndersteerMax);
     DriveAssists.AWD.SpecialFlags.Set(ini.GetLongValue("DRIVING_ASSISTS", "AWDSpecialFlags", DriveAssists.AWD.SpecialFlags));
 
+    LOAD_VAL("DRIVING_ASSISTS", "LaunchControl", DriveAssists.LaunchControl.Enable);
+    LOAD_VAL("DRIVING_ASSISTS", "LaunchRPM", DriveAssists.LaunchControl.LaunchRPM);
+
     // [SHIFT_OPTIONS]
     LOAD_VAL("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
     LOAD_VAL("SHIFT_OPTIONS", "DownshiftBlip", ShiftOptions.DownshiftBlip);
@@ -320,6 +323,9 @@ void VehicleConfig::saveGeneral() {
 
     if (mBaseConfig == this || DriveAssists.AWD.SpecialFlags != mBaseConfig->DriveAssists.AWD.SpecialFlags || DriveAssists.AWD.SpecialFlags.Changed())
         ini.SetLongValue("DRIVING_ASSISTS", "AWDSpecialFlags", DriveAssists.AWD.SpecialFlags, nullptr, true);
+
+    SAVE_VAL("DRIVING_ASSISTS", "LaunchControl", DriveAssists.LaunchControl.Enable);
+    SAVE_VAL("DRIVING_ASSISTS", "LaunchRPM", DriveAssists.LaunchControl.LaunchRPM);
 
     //[STEERING_OVERRIDE]
     SAVE_VAL("STEERING", "CSUseCustomLock", Steering.CustomSteering.UseCustomLock);

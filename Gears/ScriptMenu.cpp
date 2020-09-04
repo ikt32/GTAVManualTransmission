@@ -1520,6 +1520,13 @@ void update_driveassistmenu() {
           "Only works for AWD cars. Recommended to use only in vehicle-specific configurations!"});
 
     g_menu.MenuOption("Adaptive AWD options", "awdsettingsmenu");
+
+    g_menu.BoolOption("Launch control", g_settings().DriveAssists.LaunchControl.Enable,
+        { "Maintains a specific RPM. When enabled, to stage for launch control: "
+          "1: Stop the car and go in first gear. 2: Hold the brakes. 3: Apply throttle. 4: Release brakes to launch!",
+          "While RPM is limiting, the clutch can be released. Launch control manages the clutch during this." });
+
+    g_menu.FloatOption("Launch control RPM", g_settings().DriveAssists.LaunchControl.LaunchRPM, 0.3f, 0.9f, 0.05f);
 }
 
 void update_espsettingsmenu() {

@@ -8,6 +8,7 @@
 
 #include "CustomSteering.h"
 #include "DrivingAssists.h"
+#include "LaunchControl.h"
 #include "Memory/VehicleExtensions.hpp"
 
 #include "Util/MathExt.h"
@@ -345,6 +346,14 @@ void drawRPMIndicator() {
             static_cast<int>(rgbF.B * 255.0f),
             rpmcolor.A,
         };
+    }
+
+    // Launch control colors
+    if (LaunchControl::GetState() == LaunchControl::ELCState::Staged) {
+        rpmcolor = Util::ColorsI::SolidYellow;
+    }
+    else if (LaunchControl::GetState() == LaunchControl::ELCState::Limiting) {
+        rpmcolor = Util::ColorsI::SolidOrange;
     }
 
     drawRPMIndicator(

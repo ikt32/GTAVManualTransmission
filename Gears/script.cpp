@@ -16,6 +16,7 @@
 #include "DrivingAssists.h"
 #include "ScriptHUD.h"
 #include "AWD.h"
+#include "LaunchControl.h"
 
 #include "UDPTelemetry/Socket.h"
 #include "UDPTelemetry/UDPTelemetry.h"
@@ -503,6 +504,8 @@ void update_manual_transmission() {
 
     //updateSteeringMultiplier();
 
+    // TODO: Move these button checks somewhere else.
+
     if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::Toggle) ||
         g_controls.ButtonHeld(CarControls::WheelControlType::Toggle, 500) ||
         g_controls.ButtonHeld(CarControls::ControllerControlType::Toggle) ||
@@ -603,6 +606,16 @@ void update_manual_transmission() {
             customMin,
             0.99f);
         g_settings().DriveAssists.AWD.CustomBaseBias = bias;
+    }
+
+    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ToggleLC) ||
+        g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleLC) ||
+        g_controls.ButtonHeld(CarControls::ControllerControlType::ToggleLC) ||
+        g_controls.PrevInput == CarControls::Controller && g_controls.ButtonHeld(CarControls::LegacyControlType::ToggleLC)) {
+        bool newValue = !g_settings().DriveAssists.LaunchControl.Enable;
+        g_settings().DriveAssists.LaunchControl.Enable = newValue;
+
+        UI::Notify(INFO, fmt::format("Assist: {}abled launch control", newValue ? "En" : "Dis"));
     }
 
     if (MemoryPatcher::NumGearboxPatched != MemoryPatcher::NumGearboxPatches) {
@@ -1792,6 +1805,9 @@ void handleRPM() {
             g_gearStates.LastRedline = 0;
         }
     }
+
+    // Sets finalClutch to 0 when limiting RPM
+    LaunchControl::Update(finalClutch);
 
     VExt::SetClutch(g_playerVehicle, finalClutch);
 }

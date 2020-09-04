@@ -254,6 +254,9 @@
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="InputConfiguration.cpp" />
+    <ClCompile Include="LaunchControl.cpp">
+      <Filter>Features\Launch control</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -550,6 +553,9 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="InputConfiguration.h" />
+    <ClInclude Include="LaunchControl.h">
+      <Filter>Features\Launch control</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -605,6 +611,9 @@
     </Filter>
     <Filter Include="Lib\External Headers">
       <UniqueIdentifier>{3bca7d29-ffa2-4bd2-9d7c-d6a61e15c7d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Launch control">
+      <UniqueIdentifier>{5e2df4c6-f8bf-478a-acb8-d56a2a71eb54}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

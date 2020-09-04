@@ -615,6 +615,7 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Toggle)] = parseControllerItem<std::string>(ini, "Toggle", "UNKNOWN", "Toggle MT", "Usage: hold");
     scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ToggleH)] = parseControllerItem<std::string>(ini, "ToggleShift", "B", "Change shift mode", "Usage: hold");
     scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::CycleAssists)] = parseControllerItem<std::string>(ini, "CycleAssists", "UNKNOWN", "Cycle assists", "Usage: hold");
+    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ToggleLC)] = parseControllerItem<std::string>(ini, "ToggleLC", "UNKNOWN", "Toggle launch control", "Usage: hold");
 
     scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] =   parseControllerItem<std::string>(ini, "ShiftUp", "A", "Shift up", "Usage: tap");
     scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = parseControllerItem<std::string>(ini, "ShiftDown", "X", "Shift down", "Usage: tap");
@@ -636,6 +637,7 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Toggle)] =       parseControllerItem<eControl>(ini, "Toggle", static_cast<eControl>(-1), "Toggle MT", "Usage: hold");
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ToggleH)] =      parseControllerItem<eControl>(ini, "ToggleShift", ControlFrontendCancel, "Change shift mode", "Usage: hold");
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::CycleAssists)] = parseControllerItem<eControl>(ini, "CycleAssists", static_cast<eControl>(-1), "Cycle assists", "Usage: hold");
+    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ToggleLC)] =     parseControllerItem<eControl>(ini, "ToggleLC", static_cast<eControl>(-1), "Toggle launch control", "Usage: hold");
 
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] =   parseControllerItem<eControl>(ini, "ShiftUp", ControlFrontendAccept, "Shift up", "Usage: tap");
     scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = parseControllerItem<eControl>(ini, "ShiftDown", ControlFrontendX   , "Shift down", "Usage: tap");
@@ -658,6 +660,7 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleTCS)] = parseKeyboardItem(ini, "ToggleTCS", "UNKNOWN", "Toggle TCS");
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::DriveBiasFInc)] = parseKeyboardItem(ini, "DriveBiasFInc", "UNKNOWN", "Front drive bias +5%");
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::DriveBiasFDec)] = parseKeyboardItem(ini, "DriveBiasFDec", "UNKNOWN", "Front drive bias -5%");
+    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleLC)] = parseKeyboardItem(ini, "ToggleLC", "UNKNOWN", "Toggle launch control");
 
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftUp)] = parseKeyboardItem(ini, "ShiftUp", "LSHIFT", "Shift up");
     scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftDown)] = parseKeyboardItem(ini, "ShiftDown", "LCTRL", "Shift down");
@@ -916,6 +919,10 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     // [DRIVE_BIAS_F_DEC]
     scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::DriveBiasFDec)] =
         parseWheelItem<int>(ini, "DRIVE_BIAS_F_DEC", -1, "Front drive bias -5%");
+
+    // [TOGGLE_LC]
+    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ToggleLC)] =
+        parseWheelItem<int>(ini, "TOGGLE_LC", -1, "Toggle launch control");
 
     // [TO_KEYBOARD]
     scriptControl->WheelToKeyGUID = 
