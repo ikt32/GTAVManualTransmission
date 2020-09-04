@@ -1777,6 +1777,22 @@ void handleRPM() {
         }
     }
 
+    // >= 1.0 RPM custom rev limit: oscillates RPM, and off-throttle triggers exhaust pops
+    if (g_gearStates.FakeNeutral || clutch >= 1.0f || VExt::GetHandbrake(g_playerVehicle)) {
+        if (VExt::GetCurrentRPM(g_playerVehicle) >= 1.0f && g_gearStates.LastRedline == 0) {
+            g_gearStates.LastRedline = MISC::GET_GAME_TIMER();
+        }
+
+        if (g_gearStates.LastRedline > 0 && MISC::GET_GAME_TIMER() >= g_gearStates.LastRedline + 25 &&
+            VExt::GetCurrentRPM(g_playerVehicle) >= 1.0f && VExt::GetThrottleP(g_playerVehicle) > 0.0f) {
+            VExt::SetThrottle(g_playerVehicle, 1.0f);
+            fakeRev(false, 1.0f);
+            PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
+            VExt::SetCurrentRPM(g_playerVehicle, 0.98f);
+            g_gearStates.LastRedline = 0;
+        }
+    }
+
     VExt::SetClutch(g_playerVehicle, finalClutch);
 }
 
