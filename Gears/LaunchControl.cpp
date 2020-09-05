@@ -47,7 +47,7 @@ void LaunchControl::Update(float& clutchVal) {
                 else if (g_controls.BrakeVal > 0.1f && g_controls.ThrottleVal > 0.1f) {
                     PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
                     VEHICLE::SET_VEHICLE_BURNOUT(g_playerVehicle, false);
-                    clutchVal = 0.0f;
+                    clutchVal = -5.0f;
                     if (g_vehData.mRPM > g_settings().DriveAssists.LaunchControl.LaunchRPM) {
                         PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
                     }

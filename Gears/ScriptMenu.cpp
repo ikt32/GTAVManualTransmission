@@ -1527,7 +1527,7 @@ void update_driveassistmenu() {
           "1: Stop the car and go in first gear. 2: Hold the brakes. 3: Apply throttle. 4: Release brakes to launch!",
           "While RPM is limiting, the clutch can be released. Launch control manages the clutch during this." });
 
-    g_menu.FloatOption("Launch control RPM", g_settings().DriveAssists.LaunchControl.LaunchRPM, 0.3f, 0.9f, 0.05f);
+    g_menu.FloatOption("Launch control RPM", g_settings().DriveAssists.LaunchControl.LaunchRPM, 0.3f, 0.9f, 0.025f);
 }
 
 void update_espsettingsmenu() {
