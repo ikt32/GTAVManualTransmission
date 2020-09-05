@@ -583,6 +583,7 @@ void saveVehicleConfig() {
 
     VehicleConfig config;
     config.SetFiles(&g_settings(), finalFile);
+    config.LoadSettings();
     config.ModelNames = StrUtil::split(userModels, ' ');
     config.SaveSettings();
     loadConfigs();

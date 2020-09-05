@@ -2196,6 +2196,7 @@ void loadConfigs() {
 
         VehicleConfig config;
         config.SetFiles(g_settings.BaseConfig(), file.path().string());
+        config.LoadSettings();
         if (config.ModelNames.empty() && config.Plates.empty()) {
             logger.Write(WARN,
                 "Vehicle settings file [%s] contained no model names or plates, skipping...",
