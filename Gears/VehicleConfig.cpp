@@ -165,7 +165,7 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("DRIVING_ASSISTS",   "AWDUseUndersteer", DriveAssists.AWD.UseUndersteer);
     LOAD_VAL("DRIVING_ASSISTS", "AWDUndersteerMin", DriveAssists.AWD.UndersteerMin);
     LOAD_VAL("DRIVING_ASSISTS", "AWDUndersteerMax", DriveAssists.AWD.UndersteerMax);
-    DriveAssists.AWD.SpecialFlags.Set(ini.GetLongValue("DRIVING_ASSISTS", "AWDSpecialFlags", DriveAssists.AWD.SpecialFlags));
+    DriveAssists.AWD.SpecialFlags.Set(ini.GetLongValue("DRIVING_ASSISTS", "AWDSpecialFlags", baseConfig.DriveAssists.AWD.SpecialFlags));
 
     LOAD_VAL("DRIVING_ASSISTS", "LaunchControl", DriveAssists.LaunchControl.Enable);
     LOAD_VAL("DRIVING_ASSISTS", "LaunchRPM", DriveAssists.LaunchControl.LaunchRPM);
@@ -322,8 +322,10 @@ void VehicleConfig::saveGeneral() {
     SAVE_VAL("DRIVING_ASSISTS", "AWDUndersteerMin", DriveAssists.AWD.UndersteerMin);
     SAVE_VAL("DRIVING_ASSISTS", "AWDUndersteerMax", DriveAssists.AWD.UndersteerMax);
 
-    if (mBaseConfig == this || DriveAssists.AWD.SpecialFlags != mBaseConfig->DriveAssists.AWD.SpecialFlags || DriveAssists.AWD.SpecialFlags.Changed())
+    if (mBaseConfig == this || DriveAssists.AWD.SpecialFlags != mBaseConfig->DriveAssists.AWD.SpecialFlags || DriveAssists.AWD.SpecialFlags.Changed()) {
         ini.SetLongValue("DRIVING_ASSISTS", "AWDSpecialFlags", DriveAssists.AWD.SpecialFlags, nullptr, true);
+        DriveAssists.AWD.SpecialFlags.Reset();
+    }
 
     SAVE_VAL("DRIVING_ASSISTS", "LaunchControl", DriveAssists.LaunchControl.Enable);
     SAVE_VAL("DRIVING_ASSISTS", "LaunchRPM", DriveAssists.LaunchControl.LaunchRPM);
