@@ -27,15 +27,15 @@ public:
 
     bool Changed() const { return mChanged || mValue != mInitialValue; }
     void Set(T val) { mValue = mInitialValue = val; mChanged = false; }
+    void Reset() { mInitialValue = mValue; mChanged = false; }
 };
 
 class VehicleConfig {
 public:
     VehicleConfig();
-    VehicleConfig(VehicleConfig* baseConfig,
-        const std::string& file);
+    void SetFiles(VehicleConfig* baseConfig, const std::string& file);
 
-    void LoadSettings(const std::string& file);
+    void LoadSettings();
     void SaveSettings();
     void SaveSettings(VehicleConfig* baseConfig, const std::string& customPath);
 
@@ -231,7 +231,7 @@ public:
         } Camera;
     } Misc;
 
-protected:
+public:
     void saveGeneral();
 
     std::string mFile;

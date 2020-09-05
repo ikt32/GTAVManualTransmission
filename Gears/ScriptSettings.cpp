@@ -71,16 +71,18 @@ void ScriptSettings::SetFiles(const std::string &general, const std::string& con
     settingsGeneralFile = general;
     settingsControlsFile = controls;
     settingsWheelFile = wheel;
+
+    baseConfig.SetFiles(&baseConfig, general);
 }
 
 void ScriptSettings::Read(CarControls* scriptControl) {
     parseSettingsGeneral();
     parseSettingsControls(scriptControl);
     parseSettingsWheel(scriptControl);
-    baseConfig.LoadSettings(settingsGeneralFile);
+    baseConfig.LoadSettings();
 }
 
-void ScriptSettings::SaveGeneral() const {
+void ScriptSettings::SaveGeneral() {
     CSimpleIniA ini;
     ini.SetUnicode();
     SI_Error result = ini.LoadFile(settingsGeneralFile.c_str());
@@ -265,6 +267,7 @@ void ScriptSettings::SaveGeneral() const {
     result = ini.SaveFile(settingsGeneralFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
 
+    baseConfig.SaveSettings();
     if (activeConfig) {
         activeConfig->SaveSettings();
     }

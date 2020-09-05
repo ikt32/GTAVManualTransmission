@@ -14,6 +14,7 @@
 #define SAVE_VAL(section, key, option) \
     if (mBaseConfig == this || option != mBaseConfig->option || option.Changed()) { \
         SetValue(ini, section, key, option); \
+        option.Reset(); \
     }
 
 #define LOAD_VAL(section, key, option) \
@@ -57,15 +58,15 @@ EShiftMode Next(EShiftMode mode) {
 
 VehicleConfig::VehicleConfig() : mBaseConfig(nullptr) { }
 
-VehicleConfig::VehicleConfig(VehicleConfig* baseConfig, const std::string& file)
-    : mBaseConfig(baseConfig) {
+void VehicleConfig::SetFiles(VehicleConfig* baseConfig, const std::string& file) {
+    mBaseConfig = baseConfig;
     mFile = file;
-    LoadSettings(file);
 }
 
 #pragma warning(push)
 #pragma warning(disable: 4244)
-void VehicleConfig::LoadSettings(const std::string& file) {
+void VehicleConfig::LoadSettings() {
+    std::string file = mFile;
     VehicleConfig* pConfig = mBaseConfig;
 
     // Current instance is the base config.

@@ -13,7 +13,7 @@ public:
     ScriptSettings();
     void SetFiles(const std::string &general, const std::string& controls, const std::string &wheel);
     void Read(CarControls* scriptControl);
-    void SaveGeneral() const;
+    void SaveGeneral();
     void SaveController(CarControls* scriptControl) const;
     void SaveWheel() const;
 

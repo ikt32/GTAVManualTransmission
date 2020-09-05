@@ -526,7 +526,6 @@ void update_manual_transmission() {
         g_controls.ButtonHeld(CarControls::ControllerControlType::ToggleH) ||
         g_controls.PrevInput == CarControls::Controller	&& g_controls.ButtonHeld(CarControls::LegacyControlType::ToggleH)) {
         setShiftMode(Next(g_settings().MTOptions.ShiftMode));
-        g_settings.SaveGeneral();
     }
 
     if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::CycleAssists) || 
@@ -580,8 +579,6 @@ void update_manual_transmission() {
                 UI::Notify(ERROR, "Assist: Switched to an invalid mode?");
                 break;
         }
-        g_settings.SaveGeneral();
-        setVehicleConfig(g_playerVehicle);
     }
 
     if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::DriveBiasFInc) ||
@@ -2210,7 +2207,8 @@ void loadConfigs() {
         if (StrUtil::toLower(fs::path(file).stem().string()) == "basevehicleconfig")
             continue;
 
-        VehicleConfig config(g_settings.BaseConfig(), file.path().string());
+        VehicleConfig config;
+        config.SetFiles(g_settings.BaseConfig(), file.path().string());
         if (config.ModelNames.empty() && config.Plates.empty()) {
             logger.Write(WARN,
                 "Vehicle settings file [%s] contained no model names or plates, skipping...",
