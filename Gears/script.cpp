@@ -1679,7 +1679,7 @@ void fakeRev(bool customThrottle, float customThrottleVal) {
     float rpmVal = g_vehData.mRPM +			// Base value
         rpmValTemp +						// Keep it constant
         throttleVal * accelRatio;	// Addition value, depends on delta T
-    //UI::ShowText(0.4, 0.4, 1.0, fmt("FakeRev %d %.02f", customThrottle, rpmVal));
+    //UI::ShowText(0.4, 0.4, 1.0, fmt::format("FakeRev {} {:.2f}", customThrottle, rpmVal));
     VExt::SetCurrentRPM(g_playerVehicle, std::clamp(rpmVal, 0.0f, 1.0f));
 }
 
@@ -1721,8 +1721,6 @@ void handleRPM() {
         }
     }
 
-    //bool skip = false;
-
     // Game wants to shift up. Triggered at high RPM, high speed.
     // Desired result: high RPM, same gear, no more accelerating
     // Result:	Is as desired. Speed may drop a bit because of game clutch.
@@ -1730,13 +1728,11 @@ void handleRPM() {
     // shiftUp completely?
     if (g_vehData.mGearCurr > 0 &&
         (g_gearStates.HitRPMSpeedLimiter && ENTITY::GET_ENTITY_SPEED(g_playerVehicle) > 2.0f)) {
-        VExt::SetThrottle(g_playerVehicle, 1.0f);
-        fakeRev(false, 1.0f);
         PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
-        float counterForce = 0.25f*-(static_cast<float>(g_vehData.mGearTop) - static_cast<float>(g_vehData.mGearCurr))/static_cast<float>(g_vehData.mGearTop);
-        ENTITY::APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(g_playerVehicle, 1, 0.0f, counterForce, 0.0f, true, true, true, true);
+        VExt::SetThrottle(g_playerVehicle, 0.0f);
+        VExt::SetThrottleP(g_playerVehicle, 0.0f);
+        fakeRev(false, 1.0f);
         //UI::ShowText(0.4, 0.1, 1.0, "REV LIM SPD");
-        //UI::ShowText(0.4, 0.15, 1.0, "CF: " + std::to_string(counterForce));
     }
     if (g_gearStates.HitRPMLimiter) {
         VExt::SetCurrentRPM(g_playerVehicle, 1.0f);
@@ -1755,24 +1751,16 @@ void handleRPM() {
     
     if (g_vehData.mGearCurr > 1) {
         finalClutch = map(clutch, 0.0f, 1.0f, 1.0f, 0.6f);
-
-        // The next statement is a workaround for rolling back + brake + gear > 1 because it shouldn't rev then.
-        // Also because we're checking on the game Control accel value and not the pedal position
-        bool rollingback = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y < 0.0 && 
-                           g_controls.BrakeVal > 0.1f && 
-                           g_controls.ThrottleVal > 0.05f;
-
-        // When pressing clutch and throttle, handle clutch and RPM
-        if (clutch > 0.4f &&
-            g_controls.ThrottleVal > 0.05f &&
-            !g_gearStates.FakeNeutral && 
-            !rollingback &&
-            (!g_gearStates.Shifting || clutchInput > 0.4f)) {
+   
+        // Don't care about clutch slippage, just handle RPM now
+        if (g_gearStates.FakeNeutral) {
             fakeRev(false, 0);
             VExt::SetThrottle(g_playerVehicle, g_controls.ThrottleVal);
         }
-        // Don't care about clutch slippage, just handle RPM now
-        if (g_gearStates.FakeNeutral) {
+        // When pressing clutch and throttle, handle clutch and RPM
+        else if (clutch > 0.4f &&
+            g_controls.ThrottleVal > 0.0f &&
+            (!g_gearStates.Shifting || clutchInput > 0.4f)) {
             fakeRev(false, 0);
             VExt::SetThrottle(g_playerVehicle, g_controls.ThrottleVal);
         }
@@ -1795,10 +1783,9 @@ void handleRPM() {
 
         if (g_gearStates.LastRedline > 0 && MISC::GET_GAME_TIMER() >= g_gearStates.LastRedline + 25 &&
             VExt::GetCurrentRPM(g_playerVehicle) >= 1.0f && VExt::GetThrottleP(g_playerVehicle) > 0.0f) {
-            VExt::SetThrottle(g_playerVehicle, 1.0f);
-            fakeRev(false, 1.0f);
-            PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
-            VExt::SetCurrentRPM(g_playerVehicle, 0.98f);
+            VExt::SetCurrentRPM(g_playerVehicle, 0.975f);
+            VExt::SetThrottle(g_playerVehicle, 0.0f);
+            VExt::SetThrottleP(g_playerVehicle, 0.0f);
             g_gearStates.LastRedline = 0;
         }
     }
