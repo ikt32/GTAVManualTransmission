@@ -103,7 +103,7 @@
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="UDPTelemetry\UDPTelemetry.cpp">
-      <Filter>Features\UDPTelemetry</Filter>
+      <Filter>Features\UDP Telemetry</Filter>
     </ClCompile>
     <ClCompile Include="..\thirdparty\yaml-cpp\src\binary.cpp">
       <Filter>Thirdparty\yaml</Filter>
@@ -255,7 +255,7 @@
     </ClCompile>
     <ClCompile Include="InputConfiguration.cpp" />
     <ClCompile Include="LaunchControl.cpp">
-      <Filter>Features\Launch control</Filter>
+      <Filter>Features\Launch Control</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -425,13 +425,13 @@
       <Filter>Lib\External Headers</Filter>
     </ClInclude>
     <ClInclude Include="UDPTelemetry\TelemetryPacket.h">
-      <Filter>Features\UDPTelemetry</Filter>
+      <Filter>Features\UDP Telemetry</Filter>
     </ClInclude>
     <ClInclude Include="UDPTelemetry\Socket.h">
-      <Filter>Features\UDPTelemetry</Filter>
+      <Filter>Features\UDP Telemetry</Filter>
     </ClInclude>
     <ClInclude Include="UDPTelemetry\UDPTelemetry.h">
-      <Filter>Features\UDPTelemetry</Filter>
+      <Filter>Features\UDP Telemetry</Filter>
     </ClInclude>
     <ClInclude Include="..\thirdparty\yaml-cpp\src\collectionstack.h">
       <Filter>Thirdparty\yaml</Filter>
@@ -554,7 +554,7 @@
     </ClInclude>
     <ClInclude Include="InputConfiguration.h" />
     <ClInclude Include="LaunchControl.h">
-      <Filter>Features\Launch control</Filter>
+      <Filter>Features\Launch Control</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -600,9 +600,6 @@
     <Filter Include="Features\Input">
       <UniqueIdentifier>{78585d2c-5798-4b05-bba1-f904dc2f4df9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Features\UDPTelemetry">
-      <UniqueIdentifier>{84c60810-1f1b-46a9-a810-08f9629ad9a6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Lib">
       <UniqueIdentifier>{05abafde-5223-4634-93cd-877f6570d6a7}</UniqueIdentifier>
     </Filter>
@@ -612,7 +609,10 @@
     <Filter Include="Lib\External Headers">
       <UniqueIdentifier>{3bca7d29-ffa2-4bd2-9d7c-d6a61e15c7d9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Features\Launch control">
+    <Filter Include="Features\UDP Telemetry">
+      <UniqueIdentifier>{84c60810-1f1b-46a9-a810-08f9629ad9a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Features\Launch Control">
       <UniqueIdentifier>{5e2df4c6-f8bf-478a-acb8-d56a2a71eb54}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
