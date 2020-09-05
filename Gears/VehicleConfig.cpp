@@ -66,7 +66,6 @@ void VehicleConfig::SetFiles(VehicleConfig* baseConfig, const std::string& file)
 #pragma warning(push)
 #pragma warning(disable: 4244)
 void VehicleConfig::LoadSettings() {
-    std::string file = mFile;
     VehicleConfig* pConfig = mBaseConfig;
 
     // Current instance is the base config.
@@ -78,10 +77,10 @@ void VehicleConfig::LoadSettings() {
 
     CSimpleIniA ini;
     ini.SetUnicode();
-    SI_Error result = ini.LoadFile(file.c_str());
-    CHECK_LOG_SI_ERROR(result, "load");
+    SI_Error result = ini.LoadFile(mFile.c_str());
+    CHECK_LOG_SI_ERROR(result, fmt::format("load {}", mFile).c_str());
 
-    Name = std::filesystem::path(file).stem().string();
+    Name = std::filesystem::path(mFile).stem().string();
 
     // [ID]
     std::string allNames = ini.GetValue("ID", "ModelName", "");
@@ -253,7 +252,7 @@ void VehicleConfig::saveGeneral() {
     CSimpleIniA ini;
     ini.SetUnicode();
     SI_Error result = ini.LoadFile(mFile.c_str());
-    CHECK_LOG_SI_ERROR(result, "load");
+    CHECK_LOG_SI_ERROR(result, fmt::format("load {}", mFile).c_str());
 
     // [ID]
     std::string modelNames = fmt::format("{}", fmt::join(ModelNames, " "));
@@ -389,7 +388,7 @@ void VehicleConfig::saveGeneral() {
     SAVE_VAL("CAM", "BikePitch", Misc.Camera.Bike.Pitch);
 
     result = ini.SaveFile(mFile.c_str());
-    CHECK_LOG_SI_ERROR(result, "save");
+    CHECK_LOG_SI_ERROR(result, fmt::format("save {}", mFile).c_str());
 }
 
 #pragma warning(pop)
