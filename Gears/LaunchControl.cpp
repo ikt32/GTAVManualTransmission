@@ -18,7 +18,9 @@ namespace {
 }
 
 void LaunchControl::Update(float& clutchVal) {
-    if (g_settings().DriveAssists.LaunchControl.Enable && g_vehData.mGearCurr == 1) {
+    if (g_settings().DriveAssists.LaunchControl.Enable &&
+        g_vehData.mGearCurr == 1 &&
+        VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle)) {
         switch (launchState) {
             case ELCState::Inactive: {
                 //(g_gearStates.FakeNeutral || clutch >= 1.0f || VExt::GetHandbrake(g_playerVehicle)) && )
