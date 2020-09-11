@@ -3,15 +3,18 @@ copy /b %ProjDir%main.cpp +,,
 copy /b/v/y %ProjDir%GitInfo.h.template %ProjDir%GitInfo.h
 
 FOR /F "tokens=* USEBACKQ" %%F IN (`git rev-parse --short HEAD`) DO (
-SET GitInfo=%%F
+  SET GitInfo=%%F
 )
 
 git diff --quiet
 
-if errorlevel 1 (
-SET GitDirty=-dirty
-) else (
 SET GitDirty=
+if errorlevel 1 (
+  SET GitDirty=-dirty
+)
+
+IF "%CI%"=="true" (
+ SET GitDirty=%GitDirty%-CI
 )
 
 ECHO #define GIT_HASH "%GitInfo%" >>"%ProjDir%GitInfo.h"
