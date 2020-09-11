@@ -1,5 +1,6 @@
 #include "script.h"
 
+#include "GitInfo.h"
 #include "InputConfiguration.h"
 #include "ScriptSettings.hpp"
 
@@ -214,7 +215,7 @@ void onMenuClose() {
 
 void update_mainmenu() {
     g_menu.Title("Manual Transmission");
-    g_menu.Subtitle(fmt::format("~b~{}", Constants::DisplayVersion));
+    g_menu.Subtitle(fmt::format("~b~{}{}", Constants::DisplayVersion, GIT_DIFF));
 
     if (MemoryPatcher::Error) {
         g_menu.Option("Patch test error", NativeMenu::solidRed, 

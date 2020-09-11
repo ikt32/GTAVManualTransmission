@@ -9,6 +9,7 @@
 #include "../Gears/Util/Paths.h"
 #include "../Gears/Util/Strings.hpp"
 #include "../Gears/Constants.h"
+#include "../Gears/GitInfo.h"
 
 #define ESC 0x1B
 #define TAB 0x09
@@ -761,8 +762,8 @@ int main() {
 	GetWindowRect(consoleWindow, &r);
 	
 	logger.Clear();
-	logger.Write(INFO, "Manual Transmission %s - Wheel setup tool", Constants::DisplayVersion);
-
+	logger.Write(INFO, "Manual Transmission %s - Wheel setup tool (%s)", Constants::DisplayVersion, GIT_HASH GIT_DIFF);
+	
 	init();
 	bool justPeeking = true;
 	while (true)

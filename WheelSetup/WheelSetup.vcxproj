@@ -191,6 +191,11 @@
     <ClCompile Include="..\thirdparty\fmt\src\posix.cc" />
     <ClCompile Include="WheelSetup.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Gears\Gears.vcxproj">
+      <Project>{71d4c2a8-9e78-47a8-a2b7-3fb2de014d27}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

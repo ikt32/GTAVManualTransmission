@@ -6,15 +6,16 @@ FOR /F "tokens=* USEBACKQ" %%F IN (`git rev-parse --short HEAD`) DO (
   SET GitInfo=%%F
 )
 
+SET GitDirty=
+
 git diff --quiet
 
-SET GitDirty=
 if errorlevel 1 (
   SET GitDirty=-dirty
 )
 
-IF "%CI%"=="true" (
- SET GitDirty=%GitDirty%-CI
+IF NOT "%CI%"=="" (
+ SET GitDirty=%GitDirty%-auto
 )
 
 ECHO #define GIT_HASH "%GitInfo%" >>"%ProjDir%GitInfo.h"
