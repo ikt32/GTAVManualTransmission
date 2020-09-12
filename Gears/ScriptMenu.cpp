@@ -1830,8 +1830,10 @@ void update_cameraoptionsmenu() {
               "Changing options is still possible, but they will not do anything while RealVR.asi is present." });
     }
 
-    g_menu.BoolOption("Enable custom FPV camera", g_settings().Misc.Camera.Enable,
-        { "Camera mounted to the player head." });
+    if (g_menu.BoolOption("Enable custom FPV camera", g_settings().Misc.Camera.Enable,
+        { "Camera mounted to the player head." })) {
+        FPVCam::CancelCam();
+    }
 
     std::string camInfo;
 
@@ -1912,8 +1914,10 @@ void update_cameramovementoptionsmenu() {
     g_menu.Title("Camera movement");
     g_menu.Subtitle(MenuSubtitleConfig());
 
-    g_menu.BoolOption("Follow movement", g_settings().Misc.Camera.Movement.Follow,
-        { "Camera moves with motion and rotation, somewhat like NFS Shift." });
+    if (g_menu.BoolOption("Follow movement", g_settings().Misc.Camera.Movement.Follow,
+        { "Camera moves with motion and rotation, somewhat like NFS Shift." })) {
+        FPVCam::CancelCam();
+    }
 
     g_menu.FloatOption("Rotation: direction", g_settings().Misc.Camera.Movement.RotationDirectionMult, 0.0f, 4.0f, 0.01f,
         { "How much the direction of travel affects the camera." });

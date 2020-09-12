@@ -94,6 +94,8 @@ void FPVCam::CancelCam() {
         }
         HUD::UNLOCK_MINIMAP_ANGLE();
     }
+    directionLookAngle = 0.0f;
+    driverHeadOffsetStatic = {};
 }
 
 void FPVCam::HideHead(bool remove) {
