@@ -95,6 +95,8 @@ void FPVCam::CancelCam() {
         HUD::UNLOCK_MINIMAP_ANGLE();
     }
     directionLookAngle = 0.0f;
+    accelMoveFwd = 0.0f;
+    accelAvg.clear();
     driverHeadOffsetStatic = {};
 }
 
