@@ -2,7 +2,7 @@
 
 # Manual Transmission and Steering Wheel Support for GTA V
 
-Version 4.8.2
+Version 5.0.0
 
 ![5mods Thumbnail](MTThumb.jpg)
 
@@ -38,98 +38,14 @@ your wheel and driving style.
 * [GitHub release (older versions)](https://github.com/E66666666/GTAVManualTransmission/releases)
 * [Latest automated builds](https://ci.appveyor.com/project/E66666666/gtavmanualtransmission/build/artifacts)
 
-## Table of Contents
-
-* [Manual Transmission and Steering Wheel Support for GTA V](#manual-transmission-and-steering-wheel-support-for-gta-v)
-  * [Description](#description)
-  * [Features](#features)
-  * [Downloads](#downloads)
-  * [Table of Contents](#table-of-contents)
-  * [Requirements](#requirements)
-    * [Optional requirements (Downloads)](#optional-requirements-downloads)
-  * [Installation and usage](#installation-and-usage)
-    * [Optional requirements (Install)](#optional-requirements-install)
-    * [Additional steps for wheel users](#additional-steps-for-wheel-users)
-    * [FiveM installation (unsupported)](#fivem-installation-unsupported)
-  * [Updating](#updating)
-  * [Recommended mods](#recommended-mods)
-  * [Default controls](#default-controls)
-    * [Keyboard defaults (US-ANSI)](#keyboard-defaults-us-ansi)
-    * [Controller defaults](#controller-defaults)
-    * [Wheel defaults](#wheel-defaults)
-    * [Input switching](#input-switching)
-  * [Vehicle Configurations](#vehicle-configurations)
-  * [Animations](#animations)
-  * [Driving with Manual Transmission](#driving-with-manual-transmission)
-  * [Troubleshooting](#troubleshooting)
-    * [Compatibility](#compatibility)
-    * [Known issues](#known-issues)
-    * [Steering wheel issues](#steering-wheel-issues)
-  * [Credits](#credits)
-  * [Source code](#source-code)
-
-## Requirements
-
-* [Grand Theft Auto V](https://www.rockstargames.com/V/)
-* [ScriptHookV](http://www.dev-c.com/gtav/scripthookv/)
-
-### Optional requirements (Downloads)
-
-* [DashHook](https://www.gta5-mods.com/tools/dashhook)
-* [CamxxCore's DismembermentASI](https://www.gta5-mods.com/scripts/dismemberment)
-
-## Installation and usage
-
-Put `Gears.asi` and the folder `ManualTransmission` in your GTA V folder
- (overwrite when asked).
-
-__Make sure the folder is writeable! (not `Read Only`)__
-
-Open the menu using the `mtmenu` cheat or the `\|` hotkey, and start
-customizing things.
-
-### Optional requirements (Install)
-
-* **DashHook**: Install as instructed by the mod page.
-* **Dismemberment**: Place `DismembermentASI.asi` in your GTA V folder. It
-is used by the custom first person vehicle camera to hide the player head.
-
-### Additional steps for wheel users
-
-0. Remove or disable any XInput or DirectInput input hook configurations for
-your wheel for GTA V (x360ce, for example).
-1. Open the menu, navigate to `Controls`, `Wheel & pedals`.
-2. Open `Analog input setup` and set up your analog inputs (throttle, brakes, steering).
-3. Go back to the `Wheel & pedals` menu and go through __all__ options. __Read the description of each option.__
-
-### FiveM installation (unsupported)
-
-1. Create a `plugins` folder in FiveM Application Data.
-2. Put `Gears.asi` and the folder `ManualTransmission` in `plugins`.
-
-You can also just copy-paste the `ManualTransmission` folder if you have
-configured the mod for singleplayer already.
-
-No further support is given for FiveM. If you want to convert this to FiveM,
-I'm available for help. Otherwise, I'm not planning on converting it to or
-integrating this script with FiveM.
-
-## Updating
-
-Replace `Gears.asi` and copy the `ManualTransmission` folder. You do **not**
-need to overwrite changes in the `ManualTransmission` fodler.
-
-It's okay to keep your old settings. If the changelog indicated settings
-changed, it's a good idea to check the new or changed options.
-
-## Recommended mods
+### Recommended mods
 
 * [Realistic Driving V](https://www.gta5-mods.com/vehicles/realistic-driving-v): Improves general car physics. Must-have if you have a force-feedback wheel, since it correctly reduces lateral grip to more realistic levels.
 * [Custom Gear Ratios](https://www.gta5-mods.com/scripts/custom-gear-ratios): Essential if you have cars with more than 6 gears, and allows matching gear ratios with the real car counterparts.
 [Autosport Racing System by Eddlm](https://www.gta5-mods.com/scripts/autosport-racing-system): Complete custom racing system with advanced AI.
 * [Turbo Fix](https://www.gta5-mods.com/scripts/turbo-fix): Fixes spool rates of the turbo upgrade.
 * [Dial Accuracy Fix](https://www.gta5-mods.com/scripts/dial-accuracy-fix): Remap dashboard dials to match your actual speed.
-* [ACSPatch](https://www.gta5-mods.com/scripts/auto-center-steering-patch-temp-fix): Keep wheels turned when exiting cars
+* [ACSPatch](https://www.gta5-mods.com/scripts/auto-center-steering-patch-temp-fix): Keep wheels turned when exiting cars.
 
 Any speedometer supporting RPM/Gear reading from memory:
 
@@ -143,6 +59,87 @@ Mods that counter the power loss when sliding sideways (Also partially mitigated
 * [Drift Assist](https://www.gta5-mods.com/scripts/drift-assist)
 * [True Realistic Driving V](https://www.gta5-mods.com/scripts/true-realistic-driving-v-realistic-mass-v0-1-beta)
 
+## Table of Contents
+
+* [Manual Transmission and Steering Wheel Support for GTA V](#manual-transmission-and-steering-wheel-support-for-gta-v)
+  * [Description](#description)
+  * [Features](#features)
+  * [Downloads](#downloads)
+    * [Recommended mods](#recommended-mods)
+  * [Table of Contents](#table-of-contents)
+  * [Requirements](#requirements)
+  * [Installation](#installation)
+    * [Wheel setup](#wheel-setup)
+    * [FiveM installation](#fivem-installation)
+    * [Updating](#updating)
+  * [Default controls](#default-controls)
+    * [Keyboard defaults (US-ANSI)](#keyboard-defaults-us-ansi)
+    * [Controller defaults](#controller-defaults)
+    * [Wheel defaults](#wheel-defaults)
+  * [Usage and setup](#usage-and-setup)
+    * [Driving basics](#driving-basics)
+    * [Input switching](#input-switching)
+    * [Vehicle Configurations](#vehicle-configurations)
+    * [Driving assists](#driving-assists)
+    * [Custom camera](#custom-camera)
+    * [Animations](#animations)
+  * [Troubleshooting](#troubleshooting)
+    * [Compatibility](#compatibility)
+    * [Known issues](#known-issues)
+    * [Steering wheel issues](#steering-wheel-issues)
+  * [Credits](#credits)
+  * [Source code](#source-code)
+  * [Contact](#contact)
+
+## Requirements
+
+* [Grand Theft Auto V](https://www.rockstargames.com/V/)
+* [ScriptHookV](http://www.dev-c.com/gtav/scripthookv/)
+
+Optional: (Downloads)
+
+* [DashHook](https://www.gta5-mods.com/tools/dashhook)
+* [Handling Replacement](https://www.gta5-mods.com/tools/handling-replacement-library)
+* [CamxxCore's DismembermentASI](https://www.gta5-mods.com/scripts/dismemberment)
+
+## Installation
+
+Put `Gears.asi` and the folder `ManualTransmission` in your GTA V folder
+ (overwrite when asked).
+
+__Make sure the folder is writeable! (not `Read Only`)__
+
+Open the menu using the `mtmenu` cheat or the `\|` hotkey, and start
+customizing things.
+
+### Wheel setup
+
+1. Remove or disable any XInput or DirectInput input hook configurations for
+your wheel for GTA V (x360ce, for example).
+2. Open the menu, navigate to `Controls`, `Wheel & pedals`.
+3. Set up your analog inputs in `Analog input setup` and set up your analog inputs (throttle, brakes, steering).
+4. Go back to the `Wheel & pedals` menu and go through __all__ options. __Read the description of each option.__
+
+### FiveM installation
+
+1. Create a `plugins` folder in FiveM Application Data.
+2. Put `Gears.asi` and the folder `ManualTransmission` in `plugins`.
+
+You can also just copy-paste the `ManualTransmission` folder if you have
+configured the mod for singleplayer already.
+
+The script works in servers that allow user plugins (ScriptHookV scripts). Last
+checked to work with MT v5.0.0 and FiveM using the 1604 version of the game.
+
+No plans exist to port this into FiveM or "convert" it to server-script, but
+if you have solid plans to do so, feel free to contact me if you have questions.
+
+### Updating
+
+Replace `Gears.asi` and copy the `ManualTransmission` folder. You do **not**
+need to overwrite changes in the `ManualTransmission` folder, the script will
+write new settings in the file when saving.
+
 ## Default controls
 
 Refer to `settings_controls.ini` for the default controls.
@@ -154,8 +151,6 @@ Opening the menu:
 * Press `RB` + `B` on your controller.
 
 These shortcuts can be changed in `settings_menu.ini`.
-
-![Menu main](MTMenu_4.8.2.jpg)
 
 ### Keyboard defaults (US-ANSI)
 
@@ -183,13 +178,49 @@ By default, `RightTrigger` is throttle and `LeftTrigger` is brake.
 
 ### Wheel defaults
 
-There are no defaults. Use the menu to assign your controls.
+**There are no defaults.** Use the menu to assign your controls.
+
+## Usage and setup
+
+After installation use the menu key, button(s) or cheat to open the Manual
+Transmission menu. You will need this menu to change all the options of the
+script and set up things like steering wheels or custom controls.
+
+### Driving basics
+
+Manual Transmission simulates a real car, so you might want to know how to
+drive a manual.
+
+__Using the clutch:__  Depending on your settings, you might need to operate
+the clutch to drive your car.
+
+When the stalling option is enabled, remember to not let the RPM dip too low.
+It might stall otherwise. Stalling can be noticed by the RPM bar dropping below
+the stationary RPM.
+
+When using a H-pattern shifter, remember to clutch in to shift. Not pressing
+the clutch might cause a misshift, which might damage the car, and the car
+will not go in gear. You'll hear a grinding sound when this happens.
+
+When timed right, it's possible to shift into gear without clutching, when the
+speed of the car and the RPM match up.
+
+__Braking and reversing:__ While Manual Transmission is active, the brake input will only
+work as a brake. When stopped, the brake input will not reverse your car.
+
+To reverse, shift into the reverse gear. Press the accelerator
+input to accelerate in reverse.
+
+__Wheel-specific:__ While Manual Transmission is active, the pedals behave
+like real pedals. When the manual transmission part of the mod is turned off,
+the throttle and the brake work like the left or right triggers on a controller.
 
 ### Input switching
 
 The mod picks up the last control and is only active for that set of controls.
 To switch between inputs (keyboard, controller or wheel), you only need to tap
- the throttle on that device. The mod automagically switches between these inputs.
+the throttle on that device. The mod switches between these inputs by itself,
+and the main menu shows what the current active input is.
 
 Specifically for wheel users, you might need to fully depress the throttle
 pedal or clutch pedal (once) if the mod keeps swapping away from the
@@ -198,13 +229,60 @@ pedal or clutch pedal (once) if the mod keeps swapping away from the
 If for some reason you want to lock the controls, head over to `Debug` and check
 `Disable input detection`. This allows switching inputs manually in the main menu.
 
-## Vehicle Configurations
+### Vehicle Configurations
 
-The mod supports using a different mod configuration depending on the vehicle
-you are in. For instructions for this feature, check
+The script supports various vehicle-specific options, such as shifting
+behavior and driving assists. The submenu `Manual Transmission settings` ->
+`Vehicle configurations` shows the current known configurations. When you're
+in a vehicle that fits the model and/or plate, that configuration is loaded.
+
+With the option `Create configuration...`, a new, clean configuration is
+generated and activated. Some submenu subtitles show `CFG: [<Configuration>]`,
+which means the options in that submenu are loaded from and saved to that
+configuration. Edits you make for these options don't get applied globally.
+
+When hand-making a configuration yourself, options that are missing in the
+configuration file will use whatever the global settings are.
+
+For instructions for this feature, check
 `ManualTransmission/Vehicles/Information.txt`.
 
-## Animations
+### Driving assists
+
+Have trouble keeping the car on the road? The `Driving assists` feature might
+help!
+
+The following assists are available:
+
+* Anti-lock Braking System: Prevents the wheels from completely locking up
+under heavy braking, so steering input is still effective.
+* Traction Control System: Prevents the wheels from spinning too much and
+losing control under hard acceleration.
+* Electronic Stability Control: Detects understeer and oversteer and applies
+the brakes to counter these effects.
+* Limited Slip Differential: Simulates a limited slip differential and sends
+more power to the slower wheel.
+* Adaptive All-Wheel-Drive: Changes all-wheel drive distribution between front
+and rear in real-time, depending on wheel slip, oversteer or understeer.
+The [Handling Replacement library](https://www.gta5-mods.com/tools/handling-replacement-library)
+is needed for this feature.
+* Launch Control: Keeps the RPMs steady at a custom level,
+to prevent too much wheelspin on launch.
+
+### Custom camera
+
+When animations are active, the stock first person vehicle camera is clamped
+to about 15 degrees. As a workaround, the mod has a custom camera feature.
+
+Aside from restoring the looking angles, it can also react to acceleration and
+turning forces. Make sure to take a look at the camera options and their
+descriptions in `Misc options` -> `Camera options`.
+
+To hide the player head, you'll need to install
+[CamxxCore](https://www.gta5-mods.com/users/CamxxCore)s' DismembermentASI,
+which is included with the mod.
+
+### Animations
 
 The script now overrides the animations and matches the steering wheel
 rotation. The system needs a bit of help to understand what to do, though.
@@ -248,43 +326,15 @@ Useful resource:
 If the current steering angle is more than what the animation supports, it will
 just stay at the maximum.
 
-## Driving with Manual Transmission
-
-Just like with literally any other non-automatic vehicle, you'll need to use
-the clutch. If this is troublesome I recommend you to get familiar with your
-average car.
-
-__Stalling:__  Depending on your settings, you might or might not
-need to operate the clutch to make a smooth start. Like a real vehicle, remember
-to not let the RPM dip too low for the current gear. It might stall otherwise.
-
-__Braking:__ To brake, press the brake/reverse key, button or pedal.
-When coming to a halt, the vehicle will not reverse like the original game.
-
-__Reversing:__ To reverse, shift into the reverse gear. Press the accelerator
-key, button or pedal. Pressing brake only applies the brake.
-
-All of this can feel unnatural if done on a controller or keyboard, but should
-feel perfectly normal like a normal car when you use a wheel.
-
-__Wheel-specific:__ While the *Manual Transmission* is active, the pedals behave
-like real pedals. When the manual transmission part of the mod is turned off,
-the throttle and the brake work like the left or right triggers on a controller.
-Steering is still direct, and other car controls (blinkers, lights) still work.
-
 ## Troubleshooting
+
+Something don't work? Read this first.
 
 ### Compatibility
 
 The current version of the mod has been tested with GTA V version v1.0.1604.0
-through v1.0.1868.4. Limited support runs back to v1.0.877.1, but new features
+through v1.0.2060.1. Limited support runs back to v1.0.877.1, but new features
 have been added since.
-
-* ScriptHookV
-* ScriptHookVDotNet
-* RAGEPluginHook
-* OpenIV
-* FiveM
 
 ### Known issues
 
@@ -298,19 +348,21 @@ have been added since.
   * Workaround: Re-toggle the script, prevent alt-tabbing while not paused.
 * Wheel not detected at all when using Steam.
   * Fix: Uncheck `Generic Gamepad Configuration Support` in Steam Big Picture settings, Controller settings. (Found by Kaerali)
+* Menu doesn't open.
+  * Check if the script really is active: Is a Gears.log generated? Are you sure
+  you used the correct menu key or cheat?
 
 ### Steering wheel issues
 
 #### Strange values reported
 
-Check if your wheel is recognized correctly, a recent Windows 10 update forces
-new Logitech software which will mess up older Logitech steering wheels.
+Check if your wheel is recognized correctly, an issue with the steering wheel
+drivers can cause issues with reading the correct values.
 
 #### Steering wheel not detected
 
 * Try toggling the mod (|\ key)
 * Ensure you have removed xinput dlls from the GTA V directory
-* [Tag me on this page](https://www.gta5-mods.com/scripts/manual-transmission-ikt) or any of the linked forum threads with a copy of `ManualTransmission\Gears.log`.
 
 ## Credits
 
@@ -340,3 +392,13 @@ You can check the source code at
 [https://github.com/E66666666/GTAVManualTransmission](https://github.com/E66666666/GTAVManualTransmission).
 
 Feel free to make issues, PRs and other contributions :)
+
+## Contact
+
+If you have any issues or questions, you can find me (ikt) on the following channels:
+
+* [My Discord server](https://discord.gg/gHee23U)
+* [GTA5-Mods.com Discord server](https://discord.com/invite/hwYVCmw)
+* [GTA5-Mods.com Manual Transmission page](https://www.gta5-mods.com/scripts/manual-transmission-ikt)
+
+Please *directly* ask your question, and remember to provide the log files :)
