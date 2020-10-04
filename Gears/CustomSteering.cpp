@@ -139,8 +139,11 @@ void disableControls() {
     bool hasFork = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "forks") != -1;
     bool hasTow = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "tow_arm") != -1;
     bool hasScoop = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "scoop") != -1;
+    bool hasFrame1 = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "frame_1") != -1;
+    bool hasFrame2 = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "frame_2") != -1;
+    bool hasFrame = hasFrame1 && hasFrame2;
 
-    bool hasEquipment = hasFork || hasTow || hasScoop;
+    bool hasEquipment = hasFork || hasTow || hasScoop || hasFrame;
 
     float hoverRatio = VExt::GetHoverTransformRatio(g_playerVehicle);
 
