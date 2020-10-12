@@ -213,6 +213,10 @@ void onMenuClose() {
     loadConfigs();
 }
 
+float g_rotZ = 0.0f;
+float g_rotX = 0.0f;
+float g_rotY = 0.0f;
+
 void update_mainmenu() {
     g_menu.Title("Manual Transmission");
     g_menu.Subtitle(fmt::format("~b~{}{}", Constants::DisplayVersion, GIT_DIFF));
@@ -230,6 +234,9 @@ void update_mainmenu() {
               "This may be caused by the ManualTransmission folder and the files within being marked as read-only.",
               "Deselect read-only on the folder properties to try and fix it." });
     }
+    g_menu.FloatOptionCb("rotx", g_rotX, -180.0f, 180.0f, 1.0f, getKbEntry);
+    g_menu.FloatOptionCb("roty", g_rotY, -180.0f, 180.0f, 1.0f, getKbEntry);
+    g_menu.FloatOptionCb("rotz", g_rotZ, -180.0f, 180.0f, 1.0f, getKbEntry);
 
     if (MemoryPatcher::Error) {
         g_menu.Option("Patch test error", NativeMenu::solidRed, 

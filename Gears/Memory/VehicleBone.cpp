@@ -9,7 +9,7 @@
 
 using VExt = VehicleExtensions;
 
-void VehicleBones::RotateAxis(Vehicle vehicle, int index, Vector3 axis, float degrees) {
+void VehicleBones::RotateAxis(Vehicle vehicle, int index, Vector3 axis, float radians) {
     auto address = VExt::GetAddress(vehicle);
     auto fragInstGtaPtr = *reinterpret_cast<uint64_t*>(address + 0x30);
     auto inst = reinterpret_cast<fragInstGta*>(fragInstGtaPtr);
@@ -19,7 +19,7 @@ void VehicleBones::RotateAxis(Vehicle vehicle, int index, Vector3 axis, float de
     scalar.x = 1.0f;
     scalar.y = 1.0f;
     scalar.z = 1.0f;
-    NativeMatrix4x4 newMatrix = Scaling(scalar) * RotationAxis(axis, deg2rad(degrees)) * (*matrix);
+    NativeMatrix4x4 newMatrix = Scaling(scalar) * RotationAxis(axis, radians) * (*matrix);
     *matrix = newMatrix;
 }
 

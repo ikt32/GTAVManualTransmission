@@ -54,6 +54,67 @@ NativeMatrix4x4 RotationAxis(Vector3 axis, float angle) {
     return result;
 }
 
+Vector3 GetRotation(NativeMatrix4x4 matrix) {
+    float rotXangle = 0.0f;
+    float rotYangle = 0.0f;
+    float rotZangle = 0.0f;
+
+    rotXangle = atan2(-matrix.M2().Z, matrix.M3().Z);
+    float cosYangle = sqrt(pow(matrix.M1().X, 2) + pow(matrix.M1().Y, 2));
+    rotYangle = atan2(matrix.M1().Z, cosYangle);
+    float sinXangle = sin(rotXangle);
+    float cosXangle = cos(rotXangle);
+    rotZangle = atan2(cosXangle * matrix.M2().X + sinXangle * matrix.M3().X, cosXangle * matrix.M2().Y + sinXangle * matrix.M3().Y);
+
+    Vector3 vals{};
+    vals.x = rotXangle;
+    vals.y = rotYangle;
+    vals.z = rotZangle;
+    return vals;
+}
+//
+//#include <inc/natives.h>
+//Vector3 GetRotation(Vector3 axis, NativeMatrix4x4 matrix) {
+//    float Yaw;  float Pitch; float Roll;
+//    if (matrix.M11 == 1.0f || matrix.M11 == -1.0f) {
+//        Yaw = atan2f(matrix.M13, matrix.M34);
+//        Pitch = 0;
+//        Roll = 0;
+//    }
+//    else {
+//        Yaw = atan2(-matrix.M31, matrix.M11);
+//        Pitch = asin(matrix.M21);
+//        Roll = atan2(-matrix.M23, matrix.M22);
+//    }
+//
+//
+//    // float x = axis.x;
+//    // float y = axis.y;
+//    // float z = axis.z;
+//    // 
+//    // float xx = x * x;
+//    // float yy = y * y;
+//    // float zz = z * z;
+//    // float xy = x * y;
+//    // float xz = x * z;
+//    // float yz = y * z;
+//    // 
+//    // 
+//    // 
+//    // //    result.M11 = xx + (cos_ * (1.0f - xx));
+//    // //    result.M11 - xx = cos_ * (1.0f - xx);
+//    // //    (result.M11 - xx) / ( 1.0f - xx) = cos_;
+//    // 
+//    // float aCosValx = acos((matrix.M11 - xx) / (1.0f - xx));
+//    // float aCosValy = acos((matrix.M22 - yy) / (1.0f - yy));
+//    // float aCosValz = acos((matrix.M33 - zz) / (1.0f - zz));
+//    Vector3 vals{};
+//    vals.x = Pitch;
+//    vals.y = Roll;
+//    vals.z = Yaw;
+//    return vals;
+//}
+
 NativeMatrix4x4 Multiply(const NativeMatrix4x4& left, const NativeMatrix4x4& right) {
     NativeMatrix4x4 temp;
     temp.M11 = (left.M11 * right.M11) + (left.M12 * right.M21) + (left.M13 * right.M31) + (left.M14 * right.M41);

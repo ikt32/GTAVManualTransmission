@@ -40,3 +40,6 @@ NativeMatrix4x4 Scaling(Vector3 scale);
 NativeMatrix4x4 RotationAxis(Vector3 axis, float angle);
 NativeMatrix4x4 Multiply(const NativeMatrix4x4& left, const NativeMatrix4x4& right);
 NativeMatrix4x4 operator *(const NativeMatrix4x4& left, const NativeMatrix4x4& right);
+
+
+Vector3 GetRotation(NativeMatrix4x4 matrix);

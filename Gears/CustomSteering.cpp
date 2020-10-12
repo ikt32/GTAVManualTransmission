@@ -12,7 +12,12 @@
 #include <inc/natives.h>
 #include <inc/types.h>
 
+#include <fmt/format.h>
 #include <algorithm>
+
+extern float g_rotZ;
+extern float g_rotX;
+extern float g_rotY;
 
 using VExt = VehicleExtensions;
 
@@ -261,24 +266,67 @@ void CustomSteering::Update() {
         Vector3 rotAxis{};
         rotAxis.y = 1.0f;
 
-        float corrDesiredHeading = -VExt::GetSteeringAngle(g_playerVehicle) * (1.0f / limitRadians);
-        float rotDeg = g_settings().Steering.CustomSteering.SoftLock / 2.0f * corrDesiredHeading;
-        float rotDegRaw = rotDeg;
+        float corrDesiredHeading = -desiredHeading * (1.0f / limitRadians);
+        float rotRad = deg2rad(g_settings().Steering.CustomSteering.SoftLock) / 2.0f * corrDesiredHeading;
+        float rotRadRaw = rotRad;
 
         // Setting angle using the VExt:: calls above causes the angle to overshoot the "real" coords
         // Not sure if this is the best solution, but hey, it works!
-        rotDeg -= 2.0f * rad2deg(corrDesiredHeading * VExt::GetMaxSteeringAngle(g_playerVehicle));
+        rotRad -= 2.0f * (corrDesiredHeading * VExt::GetMaxSteeringAngle(g_playerVehicle));
 
-        Vector3 scale { 1.0f, 0, 1.0f, 0, 1.0f, 0 };
+        Vector3 scale{ 1.0f, 0, 1.0f, 0, 1.0f, 0 };
         if (g_settings.Misc.HideWheelInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4) {
             scale.x = 0.0f;
             scale.y = 0.0f;
             scale.z = 0.0f;
         }
 
-        VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotDeg);
+        VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotRad);
         VehicleBones::Scale(g_playerVehicle, boneIdx, scale);
-        SteeringAnimation::SetRotation(rotDegRaw);
+        SteeringAnimation::SetRotation(rad2deg(rotRadRaw));
+
+    }
+
+    /// <summary>
+    /// TESTO!!!11!
+    /// </summary>
+
+    auto boneIdx_l = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "headlight_l");
+    auto boneIdx_r = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "headlight_r");
+    if (boneIdx_l != -1 && boneIdx_r != -1) {
+        Vector3 rotAxisX{};
+        Vector3 rotAxisY{};
+        Vector3 rotAxisZ{};
+
+        rotAxisX.x = 1.0f;
+        rotAxisY.y = 1.0f;
+        rotAxisZ.z = 1.0f;
+
+        float newRotX = deg2rad(g_rotX);
+        float newRotY = deg2rad(g_rotY);
+        float newRotZ = deg2rad(g_rotZ);
+
+        /// Testo
+        auto address = VExt::GetAddress(g_playerVehicle);
+        auto fragInstGtaPtr = *reinterpret_cast<uint64_t*>(address + 0x30);
+        auto inst = reinterpret_cast<VehicleBones::fragInstGta*>(fragInstGtaPtr);
+
+        NativeMatrix4x4* matrix = &(inst->CacheEntry->Skeleton->ObjectMatrices[boneIdx_l]);
+
+        Vector3 rotation = GetRotation(*matrix);
+
+        UI::ShowText(0.0f, 0.025f, 0.5f, fmt::format("{:.2f}", rotation.x));
+        UI::ShowText(0.0f, 0.050f, 0.5f, fmt::format("{:.2f}", rotation.y));
+        UI::ShowText(0.0f, 0.075f, 0.5f, fmt::format("{:.2f}", rotation.z));
+        
+        VehicleBones::RotateAxis(g_playerVehicle, boneIdx_l, rotAxisX, newRotX + rotation.x);
+        VehicleBones::RotateAxis(g_playerVehicle, boneIdx_r, rotAxisX, newRotX + rotation.x);
+
+        VehicleBones::RotateAxis(g_playerVehicle, boneIdx_l, rotAxisY, newRotY + rotation.y);
+        VehicleBones::RotateAxis(g_playerVehicle, boneIdx_r, rotAxisY, newRotY + rotation.y);
+
+        VehicleBones::RotateAxis(g_playerVehicle, boneIdx_l, rotAxisZ, newRotZ + rotation.z);
+        VehicleBones::RotateAxis(g_playerVehicle, boneIdx_r, rotAxisZ, newRotZ + rotation.z);
     }
 }
 
