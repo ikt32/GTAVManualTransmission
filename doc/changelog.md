@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.1.0
+
+* Add an option to hide the steering wheel in FPV
+* Fix Dock Handler lift unusable when using Custom Steering
+* Fix keyboard ESP/TCS/ABS toggles not working
+
 ## 5.0.0
 
 I really should've incremented major/minor versions instead of patches for
