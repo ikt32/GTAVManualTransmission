@@ -253,6 +253,7 @@ public:
         bool SyncAnimations = true;
 
         bool HidePlayerInFPV = false;
+        bool HideWheelInFPV = false;
     } Misc;
 
     // [UPDATE]

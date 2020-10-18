@@ -22,3 +22,13 @@ void VehicleBones::RotateAxis(Vehicle vehicle, int index, Vector3 axis, float de
     NativeMatrix4x4 newMatrix = Scaling(scalar) * RotationAxis(axis, deg2rad(degrees)) * (*matrix);
     *matrix = newMatrix;
 }
+
+void VehicleBones::Scale(Vehicle vehicle, int boneIndex, Vector3 scalar) {
+    auto address = VExt::GetAddress(vehicle);
+    auto fragInstGtaPtr = *reinterpret_cast<uint64_t*>(address + 0x30);
+    auto inst = reinterpret_cast<fragInstGta*>(fragInstGtaPtr);
+
+    NativeMatrix4x4* matrix = &(inst->CacheEntry->Skeleton->ObjectMatrices[boneIndex]);
+    NativeMatrix4x4 newMatrix = Scaling(scalar) * (*matrix);
+    *matrix = newMatrix;
+}

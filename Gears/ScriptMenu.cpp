@@ -1810,6 +1810,8 @@ void update_miscoptionsmenu() {
         functionHidePlayerInFPV(true);
     }
 
+    g_menu.BoolOption("Hide wheel in FPV", g_settings.Misc.HideWheelInFPV);
+
     g_menu.BoolOption("Enable dashboard extensions", g_settings.Misc.DashExtensions,
         { "If DashHook is installed, the script controls some dashboard lights such as the ABS light." });
 

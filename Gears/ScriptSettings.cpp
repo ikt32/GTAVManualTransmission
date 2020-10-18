@@ -240,6 +240,7 @@ void ScriptSettings::SaveGeneral() {
     ini.SetBoolValue("MISC", "DashExtensions", Misc.DashExtensions);
     ini.SetBoolValue("MISC", "SyncAnimations", Misc.SyncAnimations);
     ini.SetBoolValue("MISC", "HidePlayerInFPV", Misc.HidePlayerInFPV);
+    ini.SetBoolValue("MISC", "HideWheelInFPV", Misc.HideWheelInFPV);
 
     // [UPDATE]
     ini.SetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);
@@ -520,6 +521,7 @@ void ScriptSettings::parseSettingsGeneral() {
     Misc.DashExtensions = ini.GetBoolValue("MISC", "DashExtensions", Misc.DashExtensions);
     Misc.SyncAnimations = ini.GetBoolValue("MISC", "SyncAnimations", Misc.SyncAnimations);
     Misc.HidePlayerInFPV = ini.GetBoolValue("MISC", "HidePlayerInFPV", Misc.HidePlayerInFPV);
+    Misc.HideWheelInFPV = ini.GetBoolValue("MISC", "HideWheelInFPV", Misc.HideWheelInFPV);
 
     // [UPDATE]
     Update.EnableUpdate = ini.GetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);

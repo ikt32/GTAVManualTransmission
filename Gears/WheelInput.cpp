@@ -513,7 +513,15 @@ void WheelInput::DoSteering() {
             // Not sure if this is the best solution, but hey, it works!
             rotDeg -= 2.0f * rad2deg(std::clamp(effSteer, -1.0f, 1.0f) * VExt::GetMaxSteeringAngle(g_playerVehicle));
 
+            Vector3 scale{ 1.0f, 0, 1.0f, 0, 1.0f, 0 };
+            if (g_settings.Misc.HideWheelInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4) {
+                scale.x = 0.0f;
+                scale.y = 0.0f;
+                scale.z = 0.0f;
+            }
+
             VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotDeg);
+            VehicleBones::Scale(g_playerVehicle, boneIdx, scale);
             SteeringAnimation::SetRotation(rotDegRaw);
         }
     }

@@ -98,4 +98,5 @@ struct CVehicle {
 static_assert(offsetof(CVehicle, Inst) == 0x30, "bad alignment");
 
 void RotateAxis(Vehicle vehicle, int index, Vector3 axis, float degrees);
+void Scale(Vehicle vehicle, int boneIndex, Vector3 scalar);
 }
