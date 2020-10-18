@@ -615,6 +615,25 @@ void update_manual_transmission() {
         UI::Notify(INFO, fmt::format("Assist: {}abled launch control", newValue ? "En" : "Dis"));
     }
 
+    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ToggleABS) ||
+        g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleABS)) {
+        bool newState = !g_settings().DriveAssists.ABS.Enable;
+        UI::Notify(INFO, fmt::format("ABS {}", newState ? "~g~ON" : "~r~OFF"));
+        g_settings().DriveAssists.ABS.Enable = newState;
+    }
+    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ToggleESC) ||
+        g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleESC)) {
+        bool newState = !g_settings().DriveAssists.ESP.Enable;
+        UI::Notify(INFO, fmt::format("ESC {}", newState ? "~g~ON" : "~r~OFF"));
+        g_settings().DriveAssists.ESP.Enable = newState;
+    }
+    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ToggleTCS) ||
+        g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleTCS)) {
+        bool newState = !g_settings().DriveAssists.TCS.Enable;
+        UI::Notify(INFO, fmt::format("TCS {}", newState ? "~g~ON" : "~r~OFF"));
+        g_settings().DriveAssists.TCS.Enable = newState;
+    }
+
     if (MemoryPatcher::NumGearboxPatched != MemoryPatcher::NumGearboxPatches) {
         MemoryPatcher::ApplyGearboxPatches();
     }

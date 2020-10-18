@@ -432,30 +432,11 @@ void checkVehicleInputButtons() {
     }
 }
 
-void checkAssistButtons() {
-    if (g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleABS)) {
-        bool newState = !g_settings().DriveAssists.ABS.Enable;
-        UI::Notify(INFO, fmt::format("ABS {}", newState ? "~g~ON" : "~r~OFF"));
-        g_settings().DriveAssists.ABS.Enable = newState;
-    }
-    if (g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleESC)) {
-        bool newState = !g_settings().DriveAssists.ESP.Enable;
-        UI::Notify(INFO, fmt::format("ESC {}", newState ? "~g~ON" : "~r~OFF"));
-        g_settings().DriveAssists.ESP.Enable = newState;
-    }
-    if (g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleTCS)) {
-        bool newState = !g_settings().DriveAssists.TCS.Enable;
-        UI::Notify(INFO, fmt::format("TCS {}", newState ? "~g~ON" : "~r~OFF"));
-        g_settings().DriveAssists.TCS.Enable = newState;
-    }
-}
-
 void WheelInput::CheckButtons() {
     if (g_controls.PrevInput != CarControls::Wheel) {
         return;
     }
 
-    checkAssistButtons();
     checkVehicleInputButtons();
     checkCameraButtons();
     checkRadioButtons();
