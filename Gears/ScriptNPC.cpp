@@ -15,8 +15,6 @@
 #include "Util/UIUtils.h"
 #include "Util/ScriptUtils.h"
 
-
-
 #include <inc/natives.h>
 #include <fmt/format.h>
 #include <set>
@@ -106,20 +104,22 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
             auto gearStates = _npcVehicle.GetGearbox();
             auto load = gearStates.ThrottleHang - map(VExt::GetCurrentRPM(npcVehicle), 0.2f, 1.0f, 0.0f, 1.0f);
 
-            UI::ShowText3DColors(targetPos,
-                {
-                    //{ HUD::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(npcVehicle))), fgColor },
-                    //{ plate, fgColor },
-                    { "Throttle: " + std::to_string(throttle), thColor },
-                    { "Brake: " + std::to_string(brake), brColor },
-                    { "Steer:" + std::to_string(VExt::GetSteeringAngle(npcVehicle)), fgColor },
-                    { "RPM: " + std::to_string(rpm), rpmColor },
+            std::vector<std::pair<std::string, Util::ColorI>> dbgLines = {
+                    { fmt::format("Throttle: {:.2f}", throttle), thColor },
+                    { fmt::format("Brake: {:.2f}", brake), brColor },
+                    { fmt::format("Steer: {:.2f}", VExt::GetSteeringAngle(npcVehicle)), fgColor },
+                    { fmt::format("RPM: {:.2f}", rpm), rpmColor },
                     { fmt::format("Gear: {}/{}", VExt::GetGearCurr(npcVehicle), VExt::GetTopGear(npcVehicle)), fgColor },
-                    { fmt::format("Load: {}", load), fgColor },
+                    { fmt::format("Load: {:.2f}", load), fgColor },
                     { fmt::format("{}Shifting", gearStates.Shifting ? "~g~" : ""), fgColor },
                     { fmt::format("TH: {}", gearStates.ThrottleHang), fgColor },
-                },
-                bgColor);
+            };
+
+            if (VEHICLE::IS_TOGGLE_MOD_ON(npcVehicle, VehicleToggleModTurbo)) {
+                dbgLines.emplace_back(fmt::format("Turbo: {:.2f}", VExt::GetTurbo(npcVehicle)), fgColor);
+            }
+
+            UI::ShowText3DColors(targetPos, dbgLines, bgColor);
         }
     }
 }
