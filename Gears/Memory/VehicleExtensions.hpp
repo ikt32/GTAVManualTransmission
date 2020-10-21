@@ -112,9 +112,22 @@ public:
     static float GetDashSpeed(Vehicle handle);
     // No set impl.
 
-    // 0 = car, 1 = plane, 2 = trailer, 3 = quad,
-    // 6 = amphibious car, 7 = amphibious quad,
-    // 8 = heli, 11 = motorcycle, 12 = bicycle, 13 = boat, 14 = train
+    //  0: car
+    //  1: plane
+    //  2: trailer
+    //  3: quad
+    //  4: ?
+    //  5: stromberg/sub
+    //  6: amphibious car
+    //  7: amphibious quad
+    //  8: heli
+    //  9: ?
+    // 10: ?
+    // 11: motorcycle
+    // 12: bicycle
+    // 13: boat
+    // 14: train
+    // 15: submarine
     static int GetModelType(Vehicle handle);
 
     static uint64_t GetWheelsPtr(Vehicle handle);

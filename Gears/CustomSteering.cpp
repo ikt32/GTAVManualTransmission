@@ -8,9 +8,9 @@
 #include "Memory/VehicleExtensions.hpp"
 #include "Memory/VehicleBone.h"
 
-#include "inc/enums.h"
-#include "inc/natives.h"
-#include "inc/types.h"
+#include <inc/enums.h>
+#include <inc/natives.h>
+#include <inc/types.h>
 
 #include <algorithm>
 
@@ -230,9 +230,11 @@ void CustomSteering::Update() {
     // Ignore reduction for wet vehicles.
     int modelType = VExt::GetModelType(g_playerVehicle);
     bool isFrog = modelType == 5 || modelType == 6 || modelType == 7;
-    bool isBoat = modelType == 13;
+    bool isBoat = modelType == 13 || modelType == 15;
     float submergeLevel = ENTITY::GET_ENTITY_SUBMERGED_LEVEL(g_playerVehicle);
-    if (isFrog && submergeLevel > 0.0f || isBoat)
+    bool is2Wheel = modelType == 11 || modelType == 12 || modelType == 3 || modelType == 7;
+
+    if (isFrog && submergeLevel > 0.0f || isBoat || is2Wheel)
         reduction = 1.0f;
 
     float desiredHeading;
