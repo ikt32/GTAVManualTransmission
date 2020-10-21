@@ -172,6 +172,13 @@ void updateShifting(Vehicle npcVehicle, VehicleGearboxStates& gearStates) {
         return;
     }
 
+    if (gearStates.ClutchVal == 0.0f) {
+        if (gearStates.ShiftDirection == ShiftDirection::Up) {
+            VExt::SetThrottle(npcVehicle, 0.0f);
+            VExt::SetThrottleP(npcVehicle, 0.0f);
+        }
+    }
+
     if (gearStates.NextGear != gearStates.LockGear) {
         gearStates.ClutchVal += shiftRate;
     }
