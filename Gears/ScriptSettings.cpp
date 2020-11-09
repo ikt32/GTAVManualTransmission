@@ -255,8 +255,12 @@ void ScriptSettings::SaveGeneral() {
     ini.SetBoolValue("DEBUG", "DisplayFFBInfo", Debug.DisplayFFBInfo);
     ini.SetBoolValue("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
     ini.SetBoolValue("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
+
     ini.SetBoolValue("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
     ini.SetBoolValue("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
+    ini.SetBoolValue("DEBUG", "DisableNPCGearbox", Debug.DisableNPCGearbox);
+    ini.SetBoolValue("DEBUG", "DisableNPCBrake", Debug.DisableNPCBrake);
+    ini.SetBoolValue("DEBUG", "DisableFPVCam", Debug.DisableFPVCam);
 
     ini.SetBoolValue("DEBUG", "EnableTimers", Debug.Metrics.EnableTimers);
 
@@ -534,8 +538,12 @@ void ScriptSettings::parseSettingsGeneral() {
     Debug.DisplayGearingInfo = ini.GetBoolValue("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
     Debug.DisplayFFBInfo = ini.GetBoolValue("DEBUG", "DisplayFFBInfo", Debug.DisplayFFBInfo);
     Debug.DisplayNPCInfo = ini.GetBoolValue("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
+
     Debug.DisableInputDetect = ini.GetBoolValue("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
     Debug.DisablePlayerHide = ini.GetBoolValue("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
+    Debug.DisableNPCGearbox = ini.GetBoolValue("DEBUG", "DisableNPCGearbox", Debug.DisableNPCGearbox);
+    Debug.DisableNPCBrake = ini.GetBoolValue("DEBUG", "DisableNPCBrake", Debug.DisableNPCBrake);
+    Debug.DisableFPVCam = ini.GetBoolValue("DEBUG", "DisableFPVCam", Debug.DisableFPVCam);
 
     Debug.Metrics.EnableTimers = ini.GetBoolValue("DEBUG", "EnableTimers", Debug.Metrics.EnableTimers);
 

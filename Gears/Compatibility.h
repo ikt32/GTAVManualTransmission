@@ -20,10 +20,6 @@ namespace HandlingReplacement {
     bool GetHandlingData(int vehicle, void** ppHandlingDataOriginal, void** ppHandlingDataReplaced);
 }
 
-namespace RealVR {
-    bool Available();
-}
-
 void setupCompatibility();
 
 void releaseCompatibility();

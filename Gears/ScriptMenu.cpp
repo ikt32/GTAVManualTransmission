@@ -1826,10 +1826,10 @@ void update_cameraoptionsmenu() {
     g_menu.Title("Camera options");
     g_menu.Subtitle(MenuSubtitleConfig());
 
-    if (RealVR::Available()) {
-        g_menu.Option("RealVR.asi detected: Custom camera disabled", NativeMenu::solidRed, 
-            { "Custom camera is incompatible with LukeRoss' R.E.A.L. VR mod and is disabled.",
-              "Changing options is still possible, but they will not do anything while RealVR.asi is present." });
+    if (g_settings.Debug.DisableFPVCam) {
+        g_menu.Option("Warning: Custom camera disabled", NativeMenu::solidRed, 
+            { "The custom FPV camera is disabled. Check the debug options to enable it again.",
+              "Changing options is still possible, but they will not do anything while the camera is disabled." });
     }
 
     if (g_menu.BoolOption("Enable custom FPV camera", g_settings().Misc.Camera.Enable,
@@ -1994,15 +1994,8 @@ void update_devoptionsmenu() {
     g_menu.MenuOption("Metrics settings", "metricsmenu", 
         { "Show the G-Force graph and speed timers." });
 
-    g_menu.MenuOption("Performance settings", "perfmenu",
-        { "Every tick AI is also updated, which might impact performance." });
-
-    g_menu.BoolOption("Disable input detection", g_settings.Debug.DisableInputDetect,
-        { "Allows for manual input selection." });
-
-    g_menu.BoolOption("Disable player hiding", g_settings.Debug.DisablePlayerHide,
-        { "Disables toggling player visibility by script.",
-            "Use this when some other script controls visibility." });
+    g_menu.MenuOption("Compatibility settings", "compatmenu",
+        { "Disable various features to improve compatibility." });
 
     if (g_menu.Option("Export base VehicleConfig", 
         { "Exports the base configuration to the Vehicles folder. If you lost it, or something." })) {
@@ -2174,17 +2167,31 @@ void update_metricsmenu() {
     }
 }
 
-void update_perfmenu() {
-    g_menu.Title("Performance settings");
+void update_compatmenu() {
+    g_menu.Title("Compatibility settings");
     g_menu.Subtitle("");
 
     g_menu.BoolOption("Disable NPC gearbox", g_settings.Debug.DisableNPCGearbox,
-        { "While MT is enabled, NPC uses custom script-driven gearbox logic."
-            "Disabling makes NPCs drive unpredictable and cars never shift up." });
+        { "Disable the script from controlling NPC vehicle gearboxes, when Manual Transmission is enabled.",
+            "Disabling makes NPC vehicles drive unpredictably and never shift up.",
+            "Use the script API to disable script control on a per-vehicle basis, "
+            "if you're a developer and wish to implement your own NPC vehicle shifting logic." });
 
     g_menu.BoolOption("Disable NPC brakes", g_settings.Debug.DisableNPCBrake,
         { "While ABS, TCS or ESC are active, NPC braking is replaced by script.",
-            "Disabling hampers AI braking." });
+            "Disabling hampers AI braking, but can improve performance." });
+
+    g_menu.BoolOption("Disable input detection", g_settings.Debug.DisableInputDetect,
+        {  "Disable automatic detection and switching of input method.",
+            "Allows for manual input selection on the main menu." });
+
+    g_menu.BoolOption("Disable player hiding", g_settings.Debug.DisablePlayerHide,
+        { "Disables toggling player visibility by script.",
+            "Useful when another script hide the player." });
+
+    g_menu.BoolOption("Disable FPV camera", g_settings.Debug.DisableFPVCam,
+        { "Disables the FPV camera for all cars.",
+            "Useful when another script customizes the camera." });
 }
 
 void update_menu() {
@@ -2304,8 +2311,8 @@ void update_menu() {
     /* mainmenu -> devoptionsmenu -> metricsmenu */
     if (g_menu.CurrentMenu("metricsmenu")) { update_metricsmenu(); }
 
-    /* mainmenu -> devoptionsmenu -> perfmenu */
-    if (g_menu.CurrentMenu("perfmenu")) { update_perfmenu(); }
+    /* mainmenu -> devoptionsmenu -> compatmenu */
+    if (g_menu.CurrentMenu("compatmenu")) { update_compatmenu(); }
 
     g_menu.EndMenu();
 }

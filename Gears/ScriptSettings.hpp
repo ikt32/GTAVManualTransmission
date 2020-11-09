@@ -270,8 +270,12 @@ public:
         bool DisplayWheelInfo = false;
         bool DisplayFFBInfo = false;
         bool DisplayNPCInfo = false;
+
         bool DisableInputDetect = false;
         bool DisablePlayerHide = false;
+        bool DisableNPCGearbox = false;
+        bool DisableNPCBrake = false;
+        bool DisableFPVCam = false;
 
         struct {
             bool EnableTimers = false;
@@ -286,9 +290,6 @@ public:
                 float Size = 0.200f;
             } GForce;
         } Metrics;
-
-        bool DisableNPCBrake = false;
-        bool DisableNPCGearbox = false;
     } Debug;
 
     // settings_wheel.ini parts

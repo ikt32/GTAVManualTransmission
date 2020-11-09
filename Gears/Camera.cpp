@@ -131,7 +131,7 @@ void FPVCam::initCam() {
 }
 
 void FPVCam::Update() {
-    if (RealVR::Available())
+    if (g_settings.Debug.DisableFPVCam)
         return;
 
     bool enable = g_settings().Misc.Camera.Enable;

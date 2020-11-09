@@ -22,8 +22,6 @@ bool(*g_HR_Enable)(int handle, void** pHandlingData) = nullptr;
 bool(*g_HR_Disable)(int handle, void** pHandlingData) = nullptr;
 bool(*g_HR_GetHandlingData)(int handle, void** pHandlingDataOriginal, void** pHandlingDataReplaced) = nullptr;
 
-HMODULE g_RealVRModule = nullptr;
-
 template <typename T>
 T CheckAddr(HMODULE lib, const std::string& funcName) {
     FARPROC func = GetProcAddress(lib, funcName.c_str());
@@ -82,20 +80,11 @@ void setupHandlingReplacement() {
     g_HR_GetHandlingData = CheckAddr<bool(*)(int, void**, void**)>(g_HandlingReplacementModule, "HR_GetHandlingData");
 }
 
-void setupRealVR() {
-    logger.Write(INFO, "[Compat] Setting up RealVR");
-    g_RealVRModule = GetModuleHandle(L"RealVR.asi");
-    if (!g_RealVRModule) {
-        logger.Write(INFO, "[Compat] RealVR.asi not found");
-    }
-}
-
 void setupCompatibility() {
     setupTrainerV();
     setupDashHook();
     setupDismemberment();
     setupHandlingReplacement();
-    setupRealVR();
 }
 
 void releaseCompatibility() {
@@ -179,6 +168,3 @@ bool HandlingReplacement::GetHandlingData(int vehicle, void** pHandlingDataOrigi
     return false;
 }
 
-bool RealVR::Available() {
-    return g_RealVRModule != nullptr;
-}
