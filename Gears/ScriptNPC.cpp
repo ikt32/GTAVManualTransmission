@@ -30,8 +30,6 @@ extern Vehicle g_playerVehicle;
 std::vector<Vehicle> g_ignoredVehicles;
 std::vector<NPCVehicle> g_npcVehicles;
 
-DWORD   raycastUpdateTime = 0;
-
 class NPCVehicle {
 public:
     NPCVehicle(Vehicle vehicle)
@@ -329,30 +327,6 @@ void updateNPCVehicle(NPCVehicle& _npcVehicle) {
     }
 }
 
-std::set<Vehicle> updateRaycastVehicles() {
-    uint32_t numCasts = 128;
-    float distMin = 4.0f;
-    float distMax = 50.0f;
-    std::set<Vehicle> uniqueVehicles;
-    for (uint32_t i = 0; i < numCasts; ++i) {
-        auto angle = static_cast<float>(static_cast<double>(i) / static_cast<double>(numCasts) * 2.0 * M_PI);
-        auto raycastCoordA = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerPed, distMin * cos(angle), distMin * sin(angle), 0.0f);
-        auto raycastCoordB = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerPed, distMax * cos(angle), distMax * sin(angle), 0.0f);
-        auto ray = SHAPETEST::_START_SHAPE_TEST_RAY(
-            raycastCoordA.x, raycastCoordA.y, raycastCoordA.z, raycastCoordB.x, raycastCoordB.y, raycastCoordB.z, 10, g_playerVehicle, 0);
-        BOOL hit;
-        Vector3 endCoords, surfaceNormal;
-        Entity entity;
-        SHAPETEST::GET_SHAPE_TEST_RESULT(ray, &hit, &endCoords, &surfaceNormal, &entity);
-        if (hit) {
-            if (ENTITY::GET_ENTITY_TYPE(entity) == 2) {
-                uniqueVehicles.insert(entity);
-            }
-        }
-    }
-    return uniqueVehicles;
-}
-
 void updateNPCVehicles(std::vector<NPCVehicle>& vehicles) {
     for(auto& vehicle : vehicles) {
         if (!ENTITY::DOES_ENTITY_EXIST(vehicle.GetVehicle()))
@@ -409,23 +383,7 @@ void update_npc() {
     int count = worldGetAllVehicles(vehicles.data(), ARR_SIZE);
     vehicles.resize(count);
 
-    // ScriptHookV did not return any vehicles, check manually
-    if (count == 0) {
-        if (raycastUpdateTime + 1000 < GetTickCount()) {
-            raycastUpdateTime = GetTickCount();
-            auto raycastVehicles = updateRaycastVehicles();
-            auto raycastVehicles_ = std::vector<Vehicle>(raycastVehicles.begin(), raycastVehicles.end());
-            updateNPCVehicleList(raycastVehicles_, g_npcVehicles);
-
-            if (VEHICLE::GET_PED_IN_VEHICLE_SEAT(g_playerVehicle, -1, 0) != g_playerPed) {
-                g_npcVehicles.emplace_back(g_playerVehicle);
-            }
-
-        }
-    }
-    else {
-        updateNPCVehicleList(vehicles, g_npcVehicles);
-    }
+    updateNPCVehicleList(vehicles, g_npcVehicles);
 
     if (g_settings.Debug.DisplayNPCInfo) {
         UI::ShowText(0.9, 0.5, 0.4, "NPC Vehs: " + std::to_string(count));
