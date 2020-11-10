@@ -131,8 +131,10 @@ void FPVCam::initCam() {
 }
 
 void FPVCam::Update() {
-    if (g_settings.Debug.DisableFPVCam)
+    if (g_settings.Debug.DisableFPVCam) {
+        CancelCam();
         return;
+    }
 
     bool enable = g_settings().Misc.Camera.Enable;
     bool fpv = CAM::GET_FOLLOW_VEHICLE_CAM_VIEW_MODE() == 4;
