@@ -1,6 +1,7 @@
 #pragma once
 #include "MathExt.h"
 #include "Timer.h"
+#include <fmt/format.h>
 #include <string>
 #include <functional>
 

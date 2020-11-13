@@ -392,12 +392,12 @@ private:
     GUID DeviceIndexToGUID(int device, std::vector<GUID> guids);
 
     template<typename T>
-    CarControls::SInput<T> parseWheelItem(CSimpleIniA& ini, const char* section, T default, const char* name = nullptr);
+    CarControls::SInput<T> parseWheelItem(CSimpleIniA& ini, const char* section, T defaultValue, const char* name = nullptr);
 
-    CarControls::SInput<int> parseKeyboardItem(CSimpleIniA& ini, const char* key, const char* default, const char* name = nullptr);
+    CarControls::SInput<int> parseKeyboardItem(CSimpleIniA& ini, const char* key, const char* defaultValue, const char* name = nullptr);
 
     template<typename T>
-    CarControls::SInput<T> parseControllerItem(CSimpleIniA& ini, const char* key, T default, const char* name, const char* description);
+    CarControls::SInput<T> parseControllerItem(CSimpleIniA& ini, const char* key, T defaultValue, const char* name, const char* description);
 
     int nDevices = 0;
     std::string settingsGeneralFile;

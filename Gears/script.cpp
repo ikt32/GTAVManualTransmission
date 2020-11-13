@@ -2296,7 +2296,8 @@ void update_update_notification() {
     }
 }
 
-void main() {
+void ScriptMain() {
+    srand(GetTickCount());
     logger.Write(INFO, "Script started");
     std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
     std::string settingsGeneralFile = absoluteModPath + "\\settings_general.ini";
@@ -2402,9 +2403,4 @@ void main() {
         FPVCam::Update();
         WAIT(0);
     }
-}
-
-void ScriptMain() {
-    srand(GetTickCount());
-    main();
 }

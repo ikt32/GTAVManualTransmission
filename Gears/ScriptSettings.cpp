@@ -1107,38 +1107,38 @@ int ScriptSettings::GUIDToDeviceIndex(GUID guidToFind) {
 }
 
 template <typename T>
-CarControls::SInput<T> ScriptSettings::parseWheelItem(CSimpleIniA& ini, const char* section, T default, const char* name) {
+CarControls::SInput<T> ScriptSettings::parseWheelItem(CSimpleIniA& ini, const char* section, T defaultValue, const char* name) {
     std::string nameFmt = formatInputName(section, name);
     if constexpr (std::is_same<T, int>::value) {
         return CarControls::SInput<T>(section,
             DeviceIndexToGUID(ini.GetLongValue(section, "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
-            ini.GetLongValue(section, "BUTTON", default), nameFmt.c_str(), "");
+            ini.GetLongValue(section, "BUTTON", defaultValue), nameFmt.c_str(), "");
     }
     else if constexpr (std::is_same<T, std::string>::value) {
         return CarControls::SInput<T>(section,
             DeviceIndexToGUID(ini.GetLongValue(section, "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
-            ini.GetValue(section, "AXLE", default.c_str()), nameFmt.c_str(), "");
+            ini.GetValue(section, "AXLE", defaultValue.c_str()), nameFmt.c_str(), "");
     }
     else {
         static_assert(false, "Type must be string or int.");
     }
 }
 
-CarControls::SInput<int> ScriptSettings::parseKeyboardItem(CSimpleIniA& ini, const char* key, const char* default, const char* name) {
+CarControls::SInput<int> ScriptSettings::parseKeyboardItem(CSimpleIniA& ini, const char* key, const char* defaultValue, const char* name) {
     std::string nameFmt = formatInputName(key, name);
-    return CarControls::SInput<int>(key, {}, str2key(ini.GetValue("KEYBOARD", key, default)), nameFmt, "");
+    return CarControls::SInput<int>(key, {}, str2key(ini.GetValue("KEYBOARD", key, defaultValue)), nameFmt, "");
 }
 
 template <typename T>
-CarControls::SInput<T> ScriptSettings::parseControllerItem(CSimpleIniA& ini, const char* key, T default, const char* name, const char* description) {
+CarControls::SInput<T> ScriptSettings::parseControllerItem(CSimpleIniA& ini, const char* key, T defaultValue, const char* name, const char* description) {
     if constexpr (std::is_same<T, eControl>::value) {
         return CarControls::SInput<T>(key, {},
-            static_cast<T>(ini.GetLongValue("CONTROLLER_NATIVE", key, static_cast<int>(default))),
+            static_cast<T>(ini.GetLongValue("CONTROLLER_NATIVE", key, static_cast<int>(defaultValue))),
             name, description);
     }
     else if constexpr (std::is_same<T, std::string>::value) {
         return CarControls::SInput<T>(key, {},
-            ini.GetValue("CONTROLLER", key, default.c_str()),
+            ini.GetValue("CONTROLLER", key, defaultValue.c_str()),
             name, description);
     }
     else {
