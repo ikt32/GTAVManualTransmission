@@ -1369,8 +1369,12 @@ void update_speedodisplaymenu() {
     g_menu.Title("Speedometer options");
     g_menu.Subtitle("");
 
-    ptrdiff_t oldPos = std::find(speedoTypes.begin(), speedoTypes.end(), g_settings.HUD.Speedo.Speedo) - speedoTypes.begin();
-    int newPos = static_cast<int>(oldPos);
+    int oldPos = 0;
+    auto speedoTypeIt = std::find(speedoTypes.begin(), speedoTypes.end(), g_settings.HUD.Speedo.Speedo);
+    if (speedoTypeIt != speedoTypes.end()) {
+        oldPos = static_cast<int>(speedoTypeIt - speedoTypes.begin());
+    }
+    int newPos = oldPos;
     g_menu.StringArray("Speedometer", speedoTypes, newPos);
     if (newPos != oldPos) {
         g_settings.HUD.Speedo.Speedo = speedoTypes.at(newPos);
