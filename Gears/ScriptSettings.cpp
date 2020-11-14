@@ -2,6 +2,7 @@
 
 #include "VehicleConfig.h"
 
+#include "SettingsCommon.h"
 #include "Util/GUID.h"
 #include "Util/Logger.hpp"
 #include "Util/Strings.hpp"
@@ -20,6 +21,12 @@
         logger.Write(ERROR, "[Settings] %s Failed to %s, SI_Error [%d]", \
         __FUNCTION__, operation, result); \
     }
+
+#define SAVE_VAL(section, key, option) \
+    SetValue(ini, section, key, option)
+
+#define LOAD_VAL(section, key, option) \
+    option = GetValue(ini, section, key, option)
 
 namespace {
     VehicleConfig* activeConfig = nullptr;
@@ -89,185 +96,185 @@ void ScriptSettings::SaveGeneral() {
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [MT_OPTIONS]
-    ini.SetBoolValue("MT_OPTIONS", "Enable", MTOptions.Enable);
+    SAVE_VAL("MT_OPTIONS", "Enable", MTOptions.Enable);
 
-    ini.SetBoolValue("MT_OPTIONS", "EngineDamage", MTOptions.EngDamage);
-    ini.SetBoolValue("MT_OPTIONS", "EngineStalling", MTOptions.EngStallH);
-    ini.SetBoolValue("MT_OPTIONS", "EngineStallingS", MTOptions.EngStallS);
-    ini.SetBoolValue("MT_OPTIONS", "EngineBraking", MTOptions.EngBrake);
-    ini.SetBoolValue("MT_OPTIONS", "EngineLocking", MTOptions.EngLock);
-    ini.SetBoolValue("MT_OPTIONS", "HardLimiter", MTOptions.HardLimiter);
+    SAVE_VAL("MT_OPTIONS", "EngineDamage", MTOptions.EngDamage);
+    SAVE_VAL("MT_OPTIONS", "EngineStalling", MTOptions.EngStallH);
+    SAVE_VAL("MT_OPTIONS", "EngineStallingS", MTOptions.EngStallS);
+    SAVE_VAL("MT_OPTIONS", "EngineBraking", MTOptions.EngBrake);
+    SAVE_VAL("MT_OPTIONS", "EngineLocking", MTOptions.EngLock);
+    SAVE_VAL("MT_OPTIONS", "HardLimiter", MTOptions.HardLimiter);
 
     // [GAMEPLAY_ASSISTS]
-    ini.SetBoolValue("GAMEPLAY_ASSISTS", "SimpleBike", GameAssists.SimpleBike);
-    ini.SetBoolValue("GAMEPLAY_ASSISTS", "HillBrakeWorkaround", GameAssists.HillGravity);
-    ini.SetBoolValue("GAMEPLAY_ASSISTS", "AutoGear1", GameAssists.AutoGear1);
-    ini.SetBoolValue("GAMEPLAY_ASSISTS", "AutoLookBack", GameAssists.AutoLookBack);
-    ini.SetBoolValue("GAMEPLAY_ASSISTS", "ThrottleStart", GameAssists.ThrottleStart);
-    ini.SetBoolValue("GAMEPLAY_ASSISTS", "DefaultNeutral", GameAssists.DefaultNeutral);
-    ini.SetBoolValue("GAMEPLAY_ASSISTS", "DisableAutostart", GameAssists.DisableAutostart);
-    ini.SetBoolValue("GAMEPLAY_ASSISTS", "LeaveEngineRunning", GameAssists.LeaveEngineRunning);
+    SAVE_VAL("GAMEPLAY_ASSISTS", "SimpleBike", GameAssists.SimpleBike);
+    SAVE_VAL("GAMEPLAY_ASSISTS", "HillBrakeWorkaround", GameAssists.HillGravity);
+    SAVE_VAL("GAMEPLAY_ASSISTS", "AutoGear1", GameAssists.AutoGear1);
+    SAVE_VAL("GAMEPLAY_ASSISTS", "AutoLookBack", GameAssists.AutoLookBack);
+    SAVE_VAL("GAMEPLAY_ASSISTS", "ThrottleStart", GameAssists.ThrottleStart);
+    SAVE_VAL("GAMEPLAY_ASSISTS", "DefaultNeutral", GameAssists.DefaultNeutral);
+    SAVE_VAL("GAMEPLAY_ASSISTS", "DisableAutostart", GameAssists.DisableAutostart);
+    SAVE_VAL("GAMEPLAY_ASSISTS", "LeaveEngineRunning", GameAssists.LeaveEngineRunning);
 
     //[CUSTOM_STEERING]
-    ini.SetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
-    ini.SetDoubleValue("CUSTOM_STEERING", "CountersteerMult", CustomSteering.CountersteerMult);
-    ini.SetDoubleValue("CUSTOM_STEERING", "CountersteerLimit", CustomSteering.CountersteerLimit);
-    ini.SetDoubleValue("CUSTOM_STEERING", "SteeringReduction", CustomSteering.SteeringReduction);
-    ini.SetDoubleValue("CUSTOM_STEERING", "Gamma", CustomSteering.Gamma);
-    ini.SetDoubleValue("CUSTOM_STEERING", "SteerTime", CustomSteering.SteerTime);
-    ini.SetDoubleValue("CUSTOM_STEERING", "CenterTime", CustomSteering.CenterTime);
+    SAVE_VAL("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
+    SAVE_VAL("CUSTOM_STEERING", "CountersteerMult", CustomSteering.CountersteerMult);
+    SAVE_VAL("CUSTOM_STEERING", "CountersteerLimit", CustomSteering.CountersteerLimit);
+    SAVE_VAL("CUSTOM_STEERING", "SteeringReduction", CustomSteering.SteeringReduction);
+    SAVE_VAL("CUSTOM_STEERING", "Gamma", CustomSteering.Gamma);
+    SAVE_VAL("CUSTOM_STEERING", "SteerTime", CustomSteering.SteerTime);
+    SAVE_VAL("CUSTOM_STEERING", "CenterTime", CustomSteering.CenterTime);
 
-    ini.SetBoolValue("CUSTOM_STEERING", "MouseSteering", CustomSteering.Mouse.Enable);
-    ini.SetDoubleValue("CUSTOM_STEERING", "MouseSensitivity", CustomSteering.Mouse.Sensitivity);
-    ini.SetBoolValue("CUSTOM_STEERING", "MouseDisableSteerAssist", CustomSteering.Mouse.DisableSteerAssist);
-    ini.SetBoolValue("CUSTOM_STEERING", "MouseDisableReduction", CustomSteering.Mouse.DisableReduction);
+    SAVE_VAL("CUSTOM_STEERING", "MouseSteering", CustomSteering.Mouse.Enable);
+    SAVE_VAL("CUSTOM_STEERING", "MouseSensitivity", CustomSteering.Mouse.Sensitivity);
+    SAVE_VAL("CUSTOM_STEERING", "MouseDisableSteerAssist", CustomSteering.Mouse.DisableSteerAssist);
+    SAVE_VAL("CUSTOM_STEERING", "MouseDisableReduction", CustomSteering.Mouse.DisableReduction);
 
     // [HUD]
-    ini.SetBoolValue("HUD", "EnableHUD", HUD.Enable);
-    ini.SetBoolValue("HUD", "AlwaysHUD", HUD.Always);
-    ini.SetLongValue("HUD", "HUDFont", HUD.Font);
-    ini.SetBoolValue("HUD", "Outline", HUD.Outline);
-    ini.SetLongValue("HUD", "NotifyLevel", HUD.NotifyLevel);
+    SAVE_VAL("HUD", "EnableHUD", HUD.Enable);
+    SAVE_VAL("HUD", "AlwaysHUD", HUD.Always);
+    SAVE_VAL("HUD", "HUDFont", HUD.Font);
+    SAVE_VAL("HUD", "Outline", HUD.Outline);
+    SAVE_VAL("HUD", "NotifyLevel", HUD.NotifyLevel);
 
-    ini.SetBoolValue("HUD", "GearIndicator", HUD.Gear.Enable);
-    ini.SetDoubleValue("HUD", "GearXpos", HUD.Gear.XPos);
-    ini.SetDoubleValue("HUD", "GearYpos", HUD.Gear.YPos);
-    ini.SetDoubleValue("HUD", "GearSize", HUD.Gear.Size);
-    ini.SetLongValue("HUD", "GearTopColorR", HUD.Gear.TopColorR);
-    ini.SetLongValue("HUD", "GearTopColorG", HUD.Gear.TopColorG);
-    ini.SetLongValue("HUD", "GearTopColorB", HUD.Gear.TopColorB);
-    ini.SetLongValue("HUD", "GearColorR", HUD.Gear.ColorR);
-    ini.SetLongValue("HUD", "GearColorG", HUD.Gear.ColorG);
-    ini.SetLongValue("HUD", "GearColorB", HUD.Gear.ColorB);
+    SAVE_VAL("HUD", "GearIndicator", HUD.Gear.Enable);
+    SAVE_VAL("HUD", "GearXpos", HUD.Gear.XPos);
+    SAVE_VAL("HUD", "GearYpos", HUD.Gear.YPos);
+    SAVE_VAL("HUD", "GearSize", HUD.Gear.Size);
+    SAVE_VAL("HUD", "GearTopColorR", HUD.Gear.TopColorR);
+    SAVE_VAL("HUD", "GearTopColorG", HUD.Gear.TopColorG);
+    SAVE_VAL("HUD", "GearTopColorB", HUD.Gear.TopColorB);
+    SAVE_VAL("HUD", "GearColorR", HUD.Gear.ColorR);
+    SAVE_VAL("HUD", "GearColorG", HUD.Gear.ColorG);
+    SAVE_VAL("HUD", "GearColorB", HUD.Gear.ColorB);
 
-    ini.SetBoolValue("HUD", "ShiftModeIndicator", HUD.ShiftMode.Enable);
-    ini.SetDoubleValue("HUD", "ShiftModeXpos", HUD.ShiftMode.XPos);
-    ini.SetDoubleValue("HUD", "ShiftModeYpos", HUD.ShiftMode.YPos);
-    ini.SetDoubleValue("HUD", "ShiftModeSize", HUD.ShiftMode.Size);
-    ini.SetLongValue("HUD", "ShiftModeColorR", HUD.ShiftMode.ColorR);
-    ini.SetLongValue("HUD", "ShiftModeColorG", HUD.ShiftMode.ColorG);
-    ini.SetLongValue("HUD", "ShiftModeColorB", HUD.ShiftMode.ColorB);
+    SAVE_VAL("HUD", "ShiftModeIndicator", HUD.ShiftMode.Enable);
+    SAVE_VAL("HUD", "ShiftModeXpos", HUD.ShiftMode.XPos);
+    SAVE_VAL("HUD", "ShiftModeYpos", HUD.ShiftMode.YPos);
+    SAVE_VAL("HUD", "ShiftModeSize", HUD.ShiftMode.Size);
+    SAVE_VAL("HUD", "ShiftModeColorR", HUD.ShiftMode.ColorR);
+    SAVE_VAL("HUD", "ShiftModeColorG", HUD.ShiftMode.ColorG);
+    SAVE_VAL("HUD", "ShiftModeColorB", HUD.ShiftMode.ColorB);
 
-    ini.SetValue("HUD", "Speedo", HUD.Speedo.Speedo.c_str());
-    ini.SetBoolValue("HUD", "SpeedoShowUnit", HUD.Speedo.ShowUnit);
-    ini.SetDoubleValue("HUD", "SpeedoXpos", HUD.Speedo.XPos);
-    ini.SetDoubleValue("HUD", "SpeedoYpos", HUD.Speedo.YPos);
-    ini.SetDoubleValue("HUD", "SpeedoSize", HUD.Speedo.Size);
-    ini.SetLongValue("HUD", "SpeedoColorR", HUD.Speedo.ColorR);
-    ini.SetLongValue("HUD", "SpeedoColorG", HUD.Speedo.ColorG);
-    ini.SetLongValue("HUD", "SpeedoColorB", HUD.Speedo.ColorB);
+    SAVE_VAL("HUD", "Speedo", HUD.Speedo.Speedo);
+    SAVE_VAL("HUD", "SpeedoShowUnit", HUD.Speedo.ShowUnit);
+    SAVE_VAL("HUD", "SpeedoXpos", HUD.Speedo.XPos);
+    SAVE_VAL("HUD", "SpeedoYpos", HUD.Speedo.YPos);
+    SAVE_VAL("HUD", "SpeedoSize", HUD.Speedo.Size);
+    SAVE_VAL("HUD", "SpeedoColorR", HUD.Speedo.ColorR);
+    SAVE_VAL("HUD", "SpeedoColorG", HUD.Speedo.ColorG);
+    SAVE_VAL("HUD", "SpeedoColorB", HUD.Speedo.ColorB);
 
-    ini.SetBoolValue("HUD", "EnableRPMIndicator", HUD.RPMBar.Enable);
-    ini.SetDoubleValue("HUD", "RPMIndicatorXpos", HUD.RPMBar.XPos);
-    ini.SetDoubleValue("HUD", "RPMIndicatorYpos", HUD.RPMBar.YPos);
-    ini.SetDoubleValue("HUD", "RPMIndicatorWidth", HUD.RPMBar.XSz);
-    ini.SetDoubleValue("HUD", "RPMIndicatorHeight", HUD.RPMBar.YSz);
-    ini.SetDoubleValue("HUD", "RPMIndicatorRedline", HUD.RPMBar.Redline);
+    SAVE_VAL("HUD", "EnableRPMIndicator", HUD.RPMBar.Enable);
+    SAVE_VAL("HUD", "RPMIndicatorXpos", HUD.RPMBar.XPos);
+    SAVE_VAL("HUD", "RPMIndicatorYpos", HUD.RPMBar.YPos);
+    SAVE_VAL("HUD", "RPMIndicatorWidth", HUD.RPMBar.XSz);
+    SAVE_VAL("HUD", "RPMIndicatorHeight", HUD.RPMBar.YSz);
+    SAVE_VAL("HUD", "RPMIndicatorRedline", HUD.RPMBar.Redline);
 
-    ini.SetLongValue("HUD", "RPMIndicatorBackgroundR", HUD.RPMBar.BgR);
-    ini.SetLongValue("HUD", "RPMIndicatorBackgroundG", HUD.RPMBar.BgG);
-    ini.SetLongValue("HUD", "RPMIndicatorBackgroundB", HUD.RPMBar.BgB);
-    ini.SetLongValue("HUD", "RPMIndicatorBackgroundA", HUD.RPMBar.BgA);
+    SAVE_VAL("HUD", "RPMIndicatorBackgroundR", HUD.RPMBar.BgR);
+    SAVE_VAL("HUD", "RPMIndicatorBackgroundG", HUD.RPMBar.BgG);
+    SAVE_VAL("HUD", "RPMIndicatorBackgroundB", HUD.RPMBar.BgB);
+    SAVE_VAL("HUD", "RPMIndicatorBackgroundA", HUD.RPMBar.BgA);
 
-    ini.SetLongValue("HUD", "RPMIndicatorForegroundR", HUD.RPMBar.FgR);
-    ini.SetLongValue("HUD", "RPMIndicatorForegroundG", HUD.RPMBar.FgG);
-    ini.SetLongValue("HUD", "RPMIndicatorForegroundB", HUD.RPMBar.FgB);
-    ini.SetLongValue("HUD", "RPMIndicatorForegroundA", HUD.RPMBar.FgA);
+    SAVE_VAL("HUD", "RPMIndicatorForegroundR", HUD.RPMBar.FgR);
+    SAVE_VAL("HUD", "RPMIndicatorForegroundG", HUD.RPMBar.FgG);
+    SAVE_VAL("HUD", "RPMIndicatorForegroundB", HUD.RPMBar.FgB);
+    SAVE_VAL("HUD", "RPMIndicatorForegroundA", HUD.RPMBar.FgA);
 
-    ini.SetLongValue("HUD", "RPMIndicatorRedlineR", HUD.RPMBar.RedlineR);
-    ini.SetLongValue("HUD", "RPMIndicatorRedlineG", HUD.RPMBar.RedlineG);
-    ini.SetLongValue("HUD", "RPMIndicatorRedlineB", HUD.RPMBar.RedlineB);
-    ini.SetLongValue("HUD", "RPMIndicatorRedlineA", HUD.RPMBar.RedlineA);
+    SAVE_VAL("HUD", "RPMIndicatorRedlineR", HUD.RPMBar.RedlineR);
+    SAVE_VAL("HUD", "RPMIndicatorRedlineG", HUD.RPMBar.RedlineG);
+    SAVE_VAL("HUD", "RPMIndicatorRedlineB", HUD.RPMBar.RedlineB);
+    SAVE_VAL("HUD", "RPMIndicatorRedlineA", HUD.RPMBar.RedlineA);
 
-    ini.SetLongValue("HUD", "RPMIndicatorRevlimitR", HUD.RPMBar.RevLimitR);
-    ini.SetLongValue("HUD", "RPMIndicatorRevlimitG", HUD.RPMBar.RevLimitG);
-    ini.SetLongValue("HUD", "RPMIndicatorRevlimitB", HUD.RPMBar.RevLimitB);
-    ini.SetLongValue("HUD", "RPMIndicatorRevlimitA", HUD.RPMBar.RevLimitA);
+    SAVE_VAL("HUD", "RPMIndicatorRevlimitR", HUD.RPMBar.RevLimitR);
+    SAVE_VAL("HUD", "RPMIndicatorRevlimitG", HUD.RPMBar.RevLimitG);
+    SAVE_VAL("HUD", "RPMIndicatorRevlimitB", HUD.RPMBar.RevLimitB);
+    SAVE_VAL("HUD", "RPMIndicatorRevlimitA", HUD.RPMBar.RevLimitA);
 
-    ini.SetBoolValue("HUD", "SteeringWheelInfo", HUD.Wheel.Enable);
-    ini.SetBoolValue("HUD", "AlwaysSteeringWheelInfo", HUD.Wheel.Always);
-    ini.SetDoubleValue("HUD", "SteeringWheelTextureX", HUD.Wheel.ImgXPos);
-    ini.SetDoubleValue("HUD", "SteeringWheelTextureY", HUD.Wheel.ImgYPos);
-    ini.SetDoubleValue("HUD", "SteeringWheelTextureSz", HUD.Wheel.ImgSize);
-    ini.SetDoubleValue("HUD", "PedalInfoX", HUD.Wheel.PedalXPos);
-    ini.SetDoubleValue("HUD", "PedalInfoY", HUD.Wheel.PedalYPos);
-    ini.SetDoubleValue("HUD", "PedalInfoH"	   , HUD.Wheel.PedalYSz);
-    ini.SetDoubleValue("HUD", "PedalInfoW"	   , HUD.Wheel.PedalXSz);
-    ini.SetDoubleValue("HUD", "PedalInfoPadX"  , HUD.Wheel.PedalXPad);
-    ini.SetDoubleValue("HUD", "PedalInfoPadY"  , HUD.Wheel.PedalYPad);
+    SAVE_VAL("HUD", "SteeringWheelInfo", HUD.Wheel.Enable);
+    SAVE_VAL("HUD", "AlwaysSteeringWheelInfo", HUD.Wheel.Always);
+    SAVE_VAL("HUD", "SteeringWheelTextureX", HUD.Wheel.ImgXPos);
+    SAVE_VAL("HUD", "SteeringWheelTextureY", HUD.Wheel.ImgYPos);
+    SAVE_VAL("HUD", "SteeringWheelTextureSz", HUD.Wheel.ImgSize);
+    SAVE_VAL("HUD", "PedalInfoX", HUD.Wheel.PedalXPos);
+    SAVE_VAL("HUD", "PedalInfoY", HUD.Wheel.PedalYPos);
+    SAVE_VAL("HUD", "PedalInfoH"	   , HUD.Wheel.PedalYSz);
+    SAVE_VAL("HUD", "PedalInfoW"	   , HUD.Wheel.PedalXSz);
+    SAVE_VAL("HUD", "PedalInfoPadX"  , HUD.Wheel.PedalXPad);
+    SAVE_VAL("HUD", "PedalInfoPadY"  , HUD.Wheel.PedalYPad);
 
-    ini.SetLongValue("HUD", "PedalBackgroundA", HUD.Wheel.PedalBgA);
+    SAVE_VAL("HUD", "PedalBackgroundA", HUD.Wheel.PedalBgA);
 
-    ini.SetLongValue("HUD", "PedalInfoThrottleR", HUD.Wheel.PedalThrottleR);
-    ini.SetLongValue("HUD", "PedalInfoThrottleG", HUD.Wheel.PedalThrottleG);
-    ini.SetLongValue("HUD", "PedalInfoThrottleB", HUD.Wheel.PedalThrottleB);
-    ini.SetLongValue("HUD", "PedalInfoThrottleA", HUD.Wheel.PedalThrottleA);
+    SAVE_VAL("HUD", "PedalInfoThrottleR", HUD.Wheel.PedalThrottleR);
+    SAVE_VAL("HUD", "PedalInfoThrottleG", HUD.Wheel.PedalThrottleG);
+    SAVE_VAL("HUD", "PedalInfoThrottleB", HUD.Wheel.PedalThrottleB);
+    SAVE_VAL("HUD", "PedalInfoThrottleA", HUD.Wheel.PedalThrottleA);
 
-    ini.SetLongValue("HUD", "PedalInfoBrakeR", HUD.Wheel.PedalBrakeR);
-    ini.SetLongValue("HUD", "PedalInfoBrakeG", HUD.Wheel.PedalBrakeG);
-    ini.SetLongValue("HUD", "PedalInfoBrakeB", HUD.Wheel.PedalBrakeB);
-    ini.SetLongValue("HUD", "PedalInfoBrakeA", HUD.Wheel.PedalBrakeA);
+    SAVE_VAL("HUD", "PedalInfoBrakeR", HUD.Wheel.PedalBrakeR);
+    SAVE_VAL("HUD", "PedalInfoBrakeG", HUD.Wheel.PedalBrakeG);
+    SAVE_VAL("HUD", "PedalInfoBrakeB", HUD.Wheel.PedalBrakeB);
+    SAVE_VAL("HUD", "PedalInfoBrakeA", HUD.Wheel.PedalBrakeA);
 
-    ini.SetLongValue("HUD", "PedalInfoClutchR", HUD.Wheel.PedalClutchR);
-    ini.SetLongValue("HUD", "PedalInfoClutchG", HUD.Wheel.PedalClutchG);
-    ini.SetLongValue("HUD", "PedalInfoClutchB", HUD.Wheel.PedalClutchB);
-    ini.SetLongValue("HUD", "PedalInfoClutchA", HUD.Wheel.PedalClutchA);
+    SAVE_VAL("HUD", "PedalInfoClutchR", HUD.Wheel.PedalClutchR);
+    SAVE_VAL("HUD", "PedalInfoClutchG", HUD.Wheel.PedalClutchG);
+    SAVE_VAL("HUD", "PedalInfoClutchB", HUD.Wheel.PedalClutchB);
+    SAVE_VAL("HUD", "PedalInfoClutchA", HUD.Wheel.PedalClutchA);
 
-    ini.SetBoolValue("HUD", "DashIndicators", HUD.DashIndicators.Enable);
-    ini.SetDoubleValue("HUD", "DashIndicatorsXpos", HUD.DashIndicators.XPos);
-    ini.SetDoubleValue("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
-    ini.SetDoubleValue("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
+    SAVE_VAL("HUD", "DashIndicators", HUD.DashIndicators.Enable);
+    SAVE_VAL("HUD", "DashIndicatorsXpos", HUD.DashIndicators.XPos);
+    SAVE_VAL("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
+    SAVE_VAL("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
 
-    ini.SetBoolValue("HUD", "MouseEnable", HUD.MouseSteering.Enable);
-    ini.SetDoubleValue("HUD", "MouseXPos", HUD.MouseSteering.XPos);
-    ini.SetDoubleValue("HUD", "MouseYPos", HUD.MouseSteering.YPos);
-    ini.SetDoubleValue("HUD", "MouseXSz", HUD.MouseSteering.XSz);
-    ini.SetDoubleValue("HUD", "MouseYSz", HUD.MouseSteering.YSz);
-    ini.SetDoubleValue("HUD", "MouseMarkerXSz", HUD.MouseSteering.MarkerXSz);
+    SAVE_VAL("HUD", "MouseEnable", HUD.MouseSteering.Enable);
+    SAVE_VAL("HUD", "MouseXPos", HUD.MouseSteering.XPos);
+    SAVE_VAL("HUD", "MouseYPos", HUD.MouseSteering.YPos);
+    SAVE_VAL("HUD", "MouseXSz", HUD.MouseSteering.XSz);
+    SAVE_VAL("HUD", "MouseYSz", HUD.MouseSteering.YSz);
+    SAVE_VAL("HUD", "MouseMarkerXSz", HUD.MouseSteering.MarkerXSz);
 
-    ini.SetLongValue("HUD", "MouseBgR", HUD.MouseSteering.BgR);
-    ini.SetLongValue("HUD", "MouseBgG", HUD.MouseSteering.BgG);
-    ini.SetLongValue("HUD", "MouseBgB", HUD.MouseSteering.BgB);
-    ini.SetLongValue("HUD", "MouseBgA", HUD.MouseSteering.BgA);
+    SAVE_VAL("HUD", "MouseBgR", HUD.MouseSteering.BgR);
+    SAVE_VAL("HUD", "MouseBgG", HUD.MouseSteering.BgG);
+    SAVE_VAL("HUD", "MouseBgB", HUD.MouseSteering.BgB);
+    SAVE_VAL("HUD", "MouseBgA", HUD.MouseSteering.BgA);
 
-    ini.SetLongValue("HUD", "MouseFgR", HUD.MouseSteering.FgR);
-    ini.SetLongValue("HUD", "MouseFgG", HUD.MouseSteering.FgG);
-    ini.SetLongValue("HUD", "MouseFgB", HUD.MouseSteering.FgB);
-    ini.SetLongValue("HUD", "MouseFgA", HUD.MouseSteering.FgA);
+    SAVE_VAL("HUD", "MouseFgR", HUD.MouseSteering.FgR);
+    SAVE_VAL("HUD", "MouseFgG", HUD.MouseSteering.FgG);
+    SAVE_VAL("HUD", "MouseFgB", HUD.MouseSteering.FgB);
+    SAVE_VAL("HUD", "MouseFgA", HUD.MouseSteering.FgA);
 
     // [MISC]
-    ini.SetBoolValue("MISC", "UDPTelemetry", Misc.UDPTelemetry);
-    ini.SetBoolValue("MISC", "DashExtensions", Misc.DashExtensions);
-    ini.SetBoolValue("MISC", "SyncAnimations", Misc.SyncAnimations);
-    ini.SetBoolValue("MISC", "HidePlayerInFPV", Misc.HidePlayerInFPV);
-    ini.SetBoolValue("MISC", "HideWheelInFPV", Misc.HideWheelInFPV);
+    SAVE_VAL("MISC", "UDPTelemetry", Misc.UDPTelemetry);
+    SAVE_VAL("MISC", "DashExtensions", Misc.DashExtensions);
+    SAVE_VAL("MISC", "SyncAnimations", Misc.SyncAnimations);
+    SAVE_VAL("MISC", "HidePlayerInFPV", Misc.HidePlayerInFPV);
+    SAVE_VAL("MISC", "HideWheelInFPV", Misc.HideWheelInFPV);
 
     // [UPDATE]
-    ini.SetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);
+    SAVE_VAL("UPDATE", "EnableUpdate", Update.EnableUpdate);
     if (!Update.IgnoredVersion.empty())
-        ini.SetValue("UPDATE", "IgnoredVersion", Update.IgnoredVersion.c_str());
+        SAVE_VAL("UPDATE", "IgnoredVersion", Update.IgnoredVersion.c_str());
     else
-        ini.SetValue("UPDATE", "IgnoredVersion", "v0.0.0");
+        SAVE_VAL("UPDATE", "IgnoredVersion", "v0.0.0");
 
     // [DEBUG]
-    ini.SetBoolValue("DEBUG", "DisplayInfo", Debug.DisplayInfo);
-    ini.SetBoolValue("DEBUG", "DisplayWheelInfo", Debug.DisplayWheelInfo);
-    ini.SetBoolValue("DEBUG", "DisplayFFBInfo", Debug.DisplayFFBInfo);
-    ini.SetBoolValue("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
-    ini.SetBoolValue("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
+    SAVE_VAL("DEBUG", "DisplayInfo", Debug.DisplayInfo);
+    SAVE_VAL("DEBUG", "DisplayWheelInfo", Debug.DisplayWheelInfo);
+    SAVE_VAL("DEBUG", "DisplayFFBInfo", Debug.DisplayFFBInfo);
+    SAVE_VAL("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
+    SAVE_VAL("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
 
-    ini.SetBoolValue("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
-    ini.SetBoolValue("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
-    ini.SetBoolValue("DEBUG", "DisableNPCGearbox", Debug.DisableNPCGearbox);
-    ini.SetBoolValue("DEBUG", "DisableNPCBrake", Debug.DisableNPCBrake);
-    ini.SetBoolValue("DEBUG", "DisableFPVCam", Debug.DisableFPVCam);
+    SAVE_VAL("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
+    SAVE_VAL("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
+    SAVE_VAL("DEBUG", "DisableNPCGearbox", Debug.DisableNPCGearbox);
+    SAVE_VAL("DEBUG", "DisableNPCBrake", Debug.DisableNPCBrake);
+    SAVE_VAL("DEBUG", "DisableFPVCam", Debug.DisableFPVCam);
 
-    ini.SetBoolValue("DEBUG", "EnableTimers", Debug.Metrics.EnableTimers);
+    SAVE_VAL("DEBUG", "EnableTimers", Debug.Metrics.EnableTimers);
 
-    ini.SetBoolValue("DEBUG", "EnableGForce", Debug.Metrics.GForce.Enable);
-    ini.SetDoubleValue("DEBUG", "GForcePosX", Debug.Metrics.GForce.PosX);
-    ini.SetDoubleValue("DEBUG", "GForcePosY", Debug.Metrics.GForce.PosY);
-    ini.SetDoubleValue("DEBUG", "GForceSize", Debug.Metrics.GForce.Size);
+    SAVE_VAL("DEBUG", "EnableGForce", Debug.Metrics.GForce.Enable);
+    SAVE_VAL("DEBUG", "GForcePosX", Debug.Metrics.GForce.PosX);
+    SAVE_VAL("DEBUG", "GForcePosY", Debug.Metrics.GForce.PosY);
+    SAVE_VAL("DEBUG", "GForceSize", Debug.Metrics.GForce.Size);
 
     result = ini.SaveFile(settingsGeneralFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
@@ -285,28 +292,28 @@ void ScriptSettings::SaveController(CarControls* scriptControl) const {
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [CONTROLLER]
-    ini.SetLongValue("CONTROLLER", "HoldTimeMs", Controller.HoldTimeMs);
-    ini.SetLongValue("CONTROLLER", "MaxTapTimeMs", Controller.MaxTapTimeMs);
-    ini.SetDoubleValue("CONTROLLER", "TriggerValue", Controller.TriggerValue);
-    ini.SetBoolValue("CONTROLLER", "ToggleEngine", Controller.ToggleEngine);
+    SAVE_VAL("CONTROLLER", "HoldTimeMs", Controller.HoldTimeMs);
+    SAVE_VAL("CONTROLLER", "MaxTapTimeMs", Controller.MaxTapTimeMs);
+    SAVE_VAL("CONTROLLER", "TriggerValue", Controller.TriggerValue);
+    SAVE_VAL("CONTROLLER", "ToggleEngine", Controller.ToggleEngine);
 
-    ini.SetBoolValue("CONTROLLER", "BlockCarControls", Controller.BlockCarControls);
-    ini.SetBoolValue("CONTROLLER", "IgnoreShiftsUI", Controller.IgnoreShiftsUI);
-    ini.SetBoolValue("CONTROLLER", "BlockHShift", Controller.BlockHShift);
+    SAVE_VAL("CONTROLLER", "BlockCarControls", Controller.BlockCarControls);
+    SAVE_VAL("CONTROLLER", "IgnoreShiftsUI", Controller.IgnoreShiftsUI);
+    SAVE_VAL("CONTROLLER", "BlockHShift", Controller.BlockHShift);
 
-    ini.SetBoolValue("CONTROLLER", "CustomDeadzone", Controller.CustomDeadzone);
-    ini.SetLongValue("CONTROLLER", "DeadzoneLeftThumb", Controller.DeadzoneLeftThumb);
-    ini.SetLongValue("CONTROLLER", "DeadzoneRightThumb", Controller.DeadzoneRightThumb);
-    
-    ini.SetLongValue("CONTROLLER", "ShiftUpBlocks",   scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
-    ini.SetLongValue("CONTROLLER", "ShiftDownBlocks", scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
-    ini.SetLongValue("CONTROLLER", "ClutchBlocks",    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
+    SAVE_VAL("CONTROLLER", "CustomDeadzone", Controller.CustomDeadzone);
+    SAVE_VAL("CONTROLLER", "DeadzoneLeftThumb", Controller.DeadzoneLeftThumb);
+    SAVE_VAL("CONTROLLER", "DeadzoneRightThumb", Controller.DeadzoneRightThumb);
+
+    SAVE_VAL("CONTROLLER", "ShiftUpBlocks",   scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
+    SAVE_VAL("CONTROLLER", "ShiftDownBlocks", scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
+    SAVE_VAL("CONTROLLER", "ClutchBlocks",    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
 
     // [CONTROLLER_NATIVE]
-    ini.SetBoolValue("CONTROLLER_NATIVE", "Enable", Controller.Native.Enable);
-    ini.SetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
-    ini.SetLongValue("CONTROLLER_NATIVE", "ShiftDownBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
-    ini.SetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
+    SAVE_VAL("CONTROLLER_NATIVE", "Enable", Controller.Native.Enable);
+    SAVE_VAL("CONTROLLER_NATIVE", "ShiftUpBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)]);
+    SAVE_VAL("CONTROLLER_NATIVE", "ShiftDownBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)]);
+    SAVE_VAL("CONTROLLER_NATIVE", "ClutchBlocks", scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)]);
 
     result = ini.SaveFile(settingsControlsFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
@@ -320,49 +327,49 @@ void ScriptSettings::SaveWheel() const {
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [OPTIONS]
-    ini.SetBoolValue("MT_OPTIONS", "EnableWheel", Wheel.Options.Enable);
+    SAVE_VAL("MT_OPTIONS", "EnableWheel", Wheel.Options.Enable);
 
-    ini.SetBoolValue("MT_OPTIONS", "LogitechLEDs", Wheel.Options.LogiLEDs);
-    ini.SetBoolValue("MT_OPTIONS", "HPatternKeyboard", Wheel.Options.HPatternKeyboard);
+    SAVE_VAL("MT_OPTIONS", "LogitechLEDs", Wheel.Options.LogiLEDs);
+    SAVE_VAL("MT_OPTIONS", "HPatternKeyboard", Wheel.Options.HPatternKeyboard);
 
-    ini.SetBoolValue("MT_OPTIONS", "UseShifterForAuto", Wheel.Options.UseShifterForAuto);
+    SAVE_VAL("MT_OPTIONS", "UseShifterForAuto", Wheel.Options.UseShifterForAuto);
 
     // [FORCE_FEEDBACK]
-    ini.SetBoolValue("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
-    ini.SetLongValue("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
-    ini.SetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
-    ini.SetLongValue("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
-    ini.SetDoubleValue("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
-    ini.SetDoubleValue("FORCE_FEEDBACK", "DetailMult", Wheel.FFB.DetailMult);
-    ini.SetLongValue("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
-    ini.SetLongValue("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
-    ini.SetLongValue("FORCE_FEEDBACK", "DamperMax", Wheel.FFB.DamperMax);
-    ini.SetLongValue("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin);
-    ini.SetDoubleValue("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
-    ini.SetDoubleValue("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
-    ini.SetDoubleValue("FORCE_FEEDBACK", "Gamma", Wheel.FFB.Gamma);
-    ini.SetDoubleValue("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
-
+    SAVE_VAL("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
+    SAVE_VAL("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
+    SAVE_VAL("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
+    SAVE_VAL("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
+    SAVE_VAL("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
+    SAVE_VAL("FORCE_FEEDBACK", "DetailMult", Wheel.FFB.DetailMult);
+    SAVE_VAL("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
+    SAVE_VAL("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
+    SAVE_VAL("FORCE_FEEDBACK", "DamperMax", Wheel.FFB.DamperMax);
+    SAVE_VAL("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin);
+    SAVE_VAL("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
+    SAVE_VAL("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
+    SAVE_VAL("FORCE_FEEDBACK", "Gamma", Wheel.FFB.Gamma);
+    SAVE_VAL("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
+    
     // [INPUT_DEVICES]
     ini.SetValue("INPUT_DEVICES", nullptr, nullptr);
 
     // [STEER]
-    ini.SetDoubleValue("STEER", "ANTIDEADZONE", Wheel.Steering.AntiDeadZone);
-    ini.SetDoubleValue("STEER", "DEADZONE", Wheel.Steering.DeadZone);
-    ini.SetDoubleValue("STEER", "DEADZONEOFFSET", Wheel.Steering.DeadZoneOffset);
-    ini.SetDoubleValue("STEER", "SteerAngleMax", Wheel.Steering.AngleMax);
-    ini.SetDoubleValue("STEER", "SteerAngleCar", Wheel.Steering.AngleCar);
-    ini.SetDoubleValue("STEER", "SteerAngleBike",Wheel.Steering.AngleBike);
-    ini.SetDoubleValue("STEER", "SteerAngleBoat", Wheel.Steering.AngleBoat);
-    ini.SetDoubleValue("STEER", "GAMMA", Wheel.Steering.Gamma);
+    SAVE_VAL("STEER", "ANTIDEADZONE", Wheel.Steering.AntiDeadZone);
+    SAVE_VAL("STEER", "DEADZONE", Wheel.Steering.DeadZone);
+    SAVE_VAL("STEER", "DEADZONEOFFSET", Wheel.Steering.DeadZoneOffset);
+    SAVE_VAL("STEER", "SteerAngleMax", Wheel.Steering.AngleMax);
+    SAVE_VAL("STEER", "SteerAngleCar", Wheel.Steering.AngleCar);
+    SAVE_VAL("STEER", "SteerAngleBike",Wheel.Steering.AngleBike);
+    SAVE_VAL("STEER", "SteerAngleBoat", Wheel.Steering.AngleBoat);
+    SAVE_VAL("STEER", "GAMMA", Wheel.Steering.Gamma);
 
     // [THROTTLE]
-    ini.SetDoubleValue("THROTTLE", "GAMMA", Wheel.Throttle.Gamma);
-    ini.SetDoubleValue("THROTTLE", "ANTIDEADZONE", Wheel.Throttle.AntiDeadZone);
+    SAVE_VAL("THROTTLE", "GAMMA", Wheel.Throttle.Gamma);
+    SAVE_VAL("THROTTLE", "ANTIDEADZONE", Wheel.Throttle.AntiDeadZone);
 
     // [BRAKE]
-    ini.SetDoubleValue("BRAKE", "GAMMA", Wheel.Brake.Gamma);
-    ini.SetDoubleValue("BRAKE", "ANTIDEADZONE", Wheel.Brake.AntiDeadZone);
+    SAVE_VAL("BRAKE", "GAMMA", Wheel.Brake.Gamma);
+    SAVE_VAL("BRAKE", "ANTIDEADZONE", Wheel.Brake.AntiDeadZone);
 
     result = ini.SaveFile(settingsWheelFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
@@ -375,177 +382,177 @@ void ScriptSettings::parseSettingsGeneral() {
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [MT_OPTIONS]
-    MTOptions.Enable = ini.GetBoolValue("MT_OPTIONS", "Enable", MTOptions.Enable);
+    LOAD_VAL("MT_OPTIONS", "Enable", MTOptions.Enable);
 
-    MTOptions.EngDamage = ini.GetBoolValue("MT_OPTIONS", "EngineDamage", MTOptions.EngDamage);
-    MTOptions.EngStallH = ini.GetBoolValue("MT_OPTIONS", "EngineStalling", MTOptions.EngStallH);
-    MTOptions.EngStallS = ini.GetBoolValue("MT_OPTIONS", "EngineStallingS", MTOptions.EngStallS);
-    MTOptions.EngBrake = ini.GetBoolValue("MT_OPTIONS", "EngineBraking", MTOptions.EngBrake);
-    MTOptions.EngLock  = ini.GetBoolValue("MT_OPTIONS", "EngineLocking", MTOptions.EngLock);
-    MTOptions.HardLimiter = ini.GetBoolValue("MT_OPTIONS", "HardLimiter", MTOptions.HardLimiter);
+    LOAD_VAL("MT_OPTIONS", "EngineDamage", MTOptions.EngDamage);
+    LOAD_VAL("MT_OPTIONS", "EngineStalling", MTOptions.EngStallH);
+    LOAD_VAL("MT_OPTIONS", "EngineStallingS", MTOptions.EngStallS);
+    LOAD_VAL("MT_OPTIONS", "EngineBraking", MTOptions.EngBrake);
+    LOAD_VAL("MT_OPTIONS", "EngineLocking", MTOptions.EngLock);
+    LOAD_VAL("MT_OPTIONS", "HardLimiter", MTOptions.HardLimiter);
 
-    GameAssists.DefaultNeutral =    ini.GetBoolValue("GAMEPLAY_ASSISTS", "DefaultNeutral", GameAssists.DefaultNeutral);
-    GameAssists.SimpleBike =        ini.GetBoolValue("GAMEPLAY_ASSISTS", "SimpleBike", GameAssists.SimpleBike);
-    GameAssists.HillGravity =       ini.GetBoolValue("GAMEPLAY_ASSISTS", "HillBrakeWorkaround", GameAssists.HillGravity);
-    GameAssists.AutoGear1 =         ini.GetBoolValue("GAMEPLAY_ASSISTS", "AutoGear1", GameAssists.AutoGear1);
-    GameAssists.AutoLookBack =      ini.GetBoolValue("GAMEPLAY_ASSISTS", "AutoLookBack", GameAssists.AutoLookBack);
-    GameAssists.ThrottleStart =     ini.GetBoolValue("GAMEPLAY_ASSISTS", "ThrottleStart", GameAssists.ThrottleStart);
-    GameAssists.DisableAutostart =  ini.GetBoolValue("GAMEPLAY_ASSISTS", "DisableAutostart", GameAssists.DisableAutostart);
-    GameAssists.LeaveEngineRunning = ini.GetBoolValue("GAMEPLAY_ASSISTS", "LeaveEngineRunning", GameAssists.LeaveEngineRunning);
+    LOAD_VAL("GAMEPLAY_ASSISTS", "DefaultNeutral", GameAssists.DefaultNeutral);
+    LOAD_VAL("GAMEPLAY_ASSISTS", "SimpleBike", GameAssists.SimpleBike);
+    LOAD_VAL("GAMEPLAY_ASSISTS", "HillBrakeWorkaround", GameAssists.HillGravity);
+    LOAD_VAL("GAMEPLAY_ASSISTS", "AutoGear1", GameAssists.AutoGear1);
+    LOAD_VAL("GAMEPLAY_ASSISTS", "AutoLookBack", GameAssists.AutoLookBack);
+    LOAD_VAL("GAMEPLAY_ASSISTS", "ThrottleStart", GameAssists.ThrottleStart);
+    LOAD_VAL("GAMEPLAY_ASSISTS", "DisableAutostart", GameAssists.DisableAutostart);
+    LOAD_VAL("GAMEPLAY_ASSISTS", "LeaveEngineRunning", GameAssists.LeaveEngineRunning);
 
     // [CUSTOM_STEERING]
-    CustomSteering.Mode = ini.GetLongValue("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
-    CustomSteering.CountersteerMult = ini.GetDoubleValue("CUSTOM_STEERING", "CountersteerMult", CustomSteering.CountersteerMult);
-    CustomSteering.CountersteerLimit = ini.GetDoubleValue("CUSTOM_STEERING", "CountersteerLimit", CustomSteering.CountersteerLimit);
-    CustomSteering.SteeringReduction = ini.GetDoubleValue("CUSTOM_STEERING", "SteeringReduction", CustomSteering.SteeringReduction);
-    CustomSteering.Gamma = ini.GetDoubleValue("CUSTOM_STEERING", "Gamma", CustomSteering.Gamma);
-    CustomSteering.SteerTime = ini.GetDoubleValue("CUSTOM_STEERING", "SteerTime", CustomSteering.SteerTime);
-    CustomSteering.CenterTime = ini.GetDoubleValue("CUSTOM_STEERING", "CenterTime", CustomSteering.CenterTime);
+    LOAD_VAL("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
+    LOAD_VAL("CUSTOM_STEERING", "CountersteerMult", CustomSteering.CountersteerMult);
+    LOAD_VAL("CUSTOM_STEERING", "CountersteerLimit", CustomSteering.CountersteerLimit);
+    LOAD_VAL("CUSTOM_STEERING", "SteeringReduction", CustomSteering.SteeringReduction);
+    LOAD_VAL("CUSTOM_STEERING", "Gamma", CustomSteering.Gamma);
+    LOAD_VAL("CUSTOM_STEERING", "SteerTime", CustomSteering.SteerTime);
+    LOAD_VAL("CUSTOM_STEERING", "CenterTime", CustomSteering.CenterTime);
 
-    CustomSteering.Mouse.Enable = ini.GetBoolValue("CUSTOM_STEERING", "MouseSteering", CustomSteering.Mouse.Enable);
-    CustomSteering.Mouse.Sensitivity = ini.GetDoubleValue("CUSTOM_STEERING", "MouseSensitivity", CustomSteering.Mouse.Sensitivity);
-    CustomSteering.Mouse.DisableSteerAssist = ini.GetBoolValue("CUSTOM_STEERING", "MouseDisableSteerAssist", CustomSteering.Mouse.DisableSteerAssist);
-    CustomSteering.Mouse.DisableReduction = ini.GetBoolValue("CUSTOM_STEERING", "MouseDisableReduction", CustomSteering.Mouse.DisableReduction);
+    LOAD_VAL("CUSTOM_STEERING", "MouseSteering", CustomSteering.Mouse.Enable);
+    LOAD_VAL("CUSTOM_STEERING", "MouseSensitivity", CustomSteering.Mouse.Sensitivity);
+    LOAD_VAL("CUSTOM_STEERING", "MouseDisableSteerAssist", CustomSteering.Mouse.DisableSteerAssist);
+    LOAD_VAL("CUSTOM_STEERING", "MouseDisableReduction", CustomSteering.Mouse.DisableReduction);
 
     // [HUD]
-    HUD.Enable = ini.GetBoolValue("HUD", "EnableHUD", HUD.Enable);
-    HUD.Always = ini.GetBoolValue("HUD", "AlwaysHUD", HUD.Always);
-    HUD.Font = ini.GetLongValue("HUD", "HUDFont", HUD.Font);
-    HUD.Outline = ini.GetBoolValue("HUD", "Outline", HUD.Outline);
-    HUD.NotifyLevel = ini.GetLongValue("HUD", "NotifyLevel", HUD.NotifyLevel);
+    LOAD_VAL("HUD", "EnableHUD", HUD.Enable);
+    LOAD_VAL("HUD", "AlwaysHUD", HUD.Always);
+    LOAD_VAL("HUD", "HUDFont", HUD.Font);
+    LOAD_VAL("HUD", "Outline", HUD.Outline);
+    LOAD_VAL("HUD", "NotifyLevel", HUD.NotifyLevel);
 
-    HUD.Gear.Enable = ini.GetBoolValue("HUD", "GearIndicator", HUD.Gear.Enable);
-    HUD.Gear.XPos = ini.GetDoubleValue("HUD", "GearXpos", HUD.Gear.XPos);
-    HUD.Gear.YPos = ini.GetDoubleValue("HUD", "GearYpos", HUD.Gear.YPos);
-    HUD.Gear.Size = ini.GetDoubleValue("HUD", "GearSize", HUD.Gear.Size);
-    HUD.Gear.TopColorR = ini.GetLongValue("HUD", "GearTopColorR", HUD.Gear.TopColorR);
-    HUD.Gear.TopColorG = ini.GetLongValue("HUD", "GearTopColorG", HUD.Gear.TopColorG);
-    HUD.Gear.TopColorB = ini.GetLongValue("HUD", "GearTopColorB", HUD.Gear.TopColorB);
-    HUD.Gear.ColorR = ini.GetLongValue("HUD", "GearColorR", HUD.Gear.ColorR);
-    HUD.Gear.ColorG = ini.GetLongValue("HUD", "GearColorG", HUD.Gear.ColorG);
-    HUD.Gear.ColorB = ini.GetLongValue("HUD", "GearColorB", HUD.Gear.ColorB);
+    LOAD_VAL("HUD", "GearIndicator", HUD.Gear.Enable);
+    LOAD_VAL("HUD", "GearXpos", HUD.Gear.XPos);
+    LOAD_VAL("HUD", "GearYpos", HUD.Gear.YPos);
+    LOAD_VAL("HUD", "GearSize", HUD.Gear.Size);
+    LOAD_VAL("HUD", "GearTopColorR", HUD.Gear.TopColorR);
+    LOAD_VAL("HUD", "GearTopColorG", HUD.Gear.TopColorG);
+    LOAD_VAL("HUD", "GearTopColorB", HUD.Gear.TopColorB);
+    LOAD_VAL("HUD", "GearColorR", HUD.Gear.ColorR);
+    LOAD_VAL("HUD", "GearColorG", HUD.Gear.ColorG);
+    LOAD_VAL("HUD", "GearColorB", HUD.Gear.ColorB);
 
-    HUD.ShiftMode.Enable = ini.GetBoolValue("HUD", "ShiftModeIndicator", true);
-    HUD.ShiftMode.XPos = ini.GetDoubleValue("HUD", "ShiftModeXpos", HUD.ShiftMode.XPos);
-    HUD.ShiftMode.YPos = ini.GetDoubleValue("HUD", "ShiftModeYpos", HUD.ShiftMode.YPos);
-    HUD.ShiftMode.Size = ini.GetDoubleValue("HUD", "ShiftModeSize", HUD.ShiftMode.Size);
-    HUD.ShiftMode.ColorR = ini.GetLongValue("HUD", "ShiftModeColorR", HUD.ShiftMode.ColorR);
-    HUD.ShiftMode.ColorG = ini.GetLongValue("HUD", "ShiftModeColorG", HUD.ShiftMode.ColorG);
-    HUD.ShiftMode.ColorB = ini.GetLongValue("HUD", "ShiftModeColorB", HUD.ShiftMode.ColorB);
+    LOAD_VAL("HUD", "ShiftModeIndicator", HUD.ShiftMode.Enable);
+    LOAD_VAL("HUD", "ShiftModeXpos", HUD.ShiftMode.XPos);
+    LOAD_VAL("HUD", "ShiftModeYpos", HUD.ShiftMode.YPos);
+    LOAD_VAL("HUD", "ShiftModeSize", HUD.ShiftMode.Size);
+    LOAD_VAL("HUD", "ShiftModeColorR", HUD.ShiftMode.ColorR);
+    LOAD_VAL("HUD", "ShiftModeColorG", HUD.ShiftMode.ColorG);
+    LOAD_VAL("HUD", "ShiftModeColorB", HUD.ShiftMode.ColorB);
 
-    HUD.Speedo.Speedo = ini.GetValue("HUD", "Speedo", HUD.Speedo.Speedo.c_str());
-    HUD.Speedo.ShowUnit = ini.GetBoolValue("HUD", "SpeedoShowUnit", HUD.Speedo.ShowUnit);
-    HUD.Speedo.XPos = ini.GetDoubleValue("HUD", "SpeedoXpos", HUD.Speedo.XPos);
-    HUD.Speedo.YPos = ini.GetDoubleValue("HUD", "SpeedoYpos", HUD.Speedo.YPos);
-    HUD.Speedo.Size = ini.GetDoubleValue("HUD", "SpeedoSize", HUD.Speedo.Size);
-    HUD.Speedo.ColorR = ini.GetLongValue("HUD", "SpeedoColorR", HUD.Speedo.ColorR);
-    HUD.Speedo.ColorG = ini.GetLongValue("HUD", "SpeedoColorG", HUD.Speedo.ColorG);
-    HUD.Speedo.ColorB = ini.GetLongValue("HUD", "SpeedoColorB", HUD.Speedo.ColorB);
+    LOAD_VAL("HUD", "Speedo", HUD.Speedo.Speedo);
+    LOAD_VAL("HUD", "SpeedoShowUnit", HUD.Speedo.ShowUnit);
+    LOAD_VAL("HUD", "SpeedoXpos", HUD.Speedo.XPos);
+    LOAD_VAL("HUD", "SpeedoYpos", HUD.Speedo.YPos);
+    LOAD_VAL("HUD", "SpeedoSize", HUD.Speedo.Size);
+    LOAD_VAL("HUD", "SpeedoColorR", HUD.Speedo.ColorR);
+    LOAD_VAL("HUD", "SpeedoColorG", HUD.Speedo.ColorG);
+    LOAD_VAL("HUD", "SpeedoColorB", HUD.Speedo.ColorB);
 
-    HUD.RPMBar.Enable = ini.GetBoolValue("HUD", "EnableRPMIndicator", HUD.RPMBar.Enable);
-    HUD.RPMBar.XPos = ini.GetDoubleValue("HUD", "RPMIndicatorXpos", HUD.RPMBar.XPos);
-    HUD.RPMBar.YPos = ini.GetDoubleValue("HUD", "RPMIndicatorYpos", HUD.RPMBar.YPos);
-    HUD.RPMBar.XSz = ini.GetDoubleValue("HUD", "RPMIndicatorWidth", HUD.RPMBar.XSz);
-    HUD.RPMBar.YSz = ini.GetDoubleValue("HUD", "RPMIndicatorHeight", HUD.RPMBar.YSz);
-    HUD.RPMBar.Redline = ini.GetDoubleValue("HUD", "RPMIndicatorRedline", HUD.RPMBar.Redline);
+    LOAD_VAL("HUD", "EnableRPMIndicator", HUD.RPMBar.Enable);
+    LOAD_VAL("HUD", "RPMIndicatorXpos", HUD.RPMBar.XPos);
+    LOAD_VAL("HUD", "RPMIndicatorYpos", HUD.RPMBar.YPos);
+    LOAD_VAL("HUD", "RPMIndicatorWidth", HUD.RPMBar.XSz);
+    LOAD_VAL("HUD", "RPMIndicatorHeight", HUD.RPMBar.YSz);
+    LOAD_VAL("HUD", "RPMIndicatorRedline", HUD.RPMBar.Redline);
 
-    HUD.RPMBar.BgR = ini.GetLongValue("HUD", "RPMIndicatorBackgroundR", HUD.RPMBar.BgR);
-    HUD.RPMBar.BgG = ini.GetLongValue("HUD", "RPMIndicatorBackgroundG", HUD.RPMBar.BgG);
-    HUD.RPMBar.BgB = ini.GetLongValue("HUD", "RPMIndicatorBackgroundB", HUD.RPMBar.BgB);
-    HUD.RPMBar.BgA = ini.GetLongValue("HUD", "RPMIndicatorBackgroundA", HUD.RPMBar.BgA);
+    LOAD_VAL("HUD", "RPMIndicatorBackgroundR", HUD.RPMBar.BgR);
+    LOAD_VAL("HUD", "RPMIndicatorBackgroundG", HUD.RPMBar.BgG);
+    LOAD_VAL("HUD", "RPMIndicatorBackgroundB", HUD.RPMBar.BgB);
+    LOAD_VAL("HUD", "RPMIndicatorBackgroundA", HUD.RPMBar.BgA);
                                     
-    HUD.RPMBar.FgR = ini.GetLongValue("HUD", "RPMIndicatorForegroundR", HUD.RPMBar.FgR);
-    HUD.RPMBar.FgG = ini.GetLongValue("HUD", "RPMIndicatorForegroundG", HUD.RPMBar.FgG);
-    HUD.RPMBar.FgB = ini.GetLongValue("HUD", "RPMIndicatorForegroundB", HUD.RPMBar.FgB);
-    HUD.RPMBar.FgA = ini.GetLongValue("HUD", "RPMIndicatorForegroundA", HUD.RPMBar.FgA);
+    LOAD_VAL("HUD", "RPMIndicatorForegroundR", HUD.RPMBar.FgR);
+    LOAD_VAL("HUD", "RPMIndicatorForegroundG", HUD.RPMBar.FgG);
+    LOAD_VAL("HUD", "RPMIndicatorForegroundB", HUD.RPMBar.FgB);
+    LOAD_VAL("HUD", "RPMIndicatorForegroundA", HUD.RPMBar.FgA);
                                     
-    HUD.RPMBar.RedlineR = ini.GetLongValue("HUD", "RPMIndicatorRedlineR", HUD.RPMBar.RedlineR);
-    HUD.RPMBar.RedlineG = ini.GetLongValue("HUD", "RPMIndicatorRedlineG", HUD.RPMBar.RedlineG);
-    HUD.RPMBar.RedlineB = ini.GetLongValue("HUD", "RPMIndicatorRedlineB", HUD.RPMBar.RedlineB);
-    HUD.RPMBar.RedlineA = ini.GetLongValue("HUD", "RPMIndicatorRedlineA", HUD.RPMBar.RedlineA);
+    LOAD_VAL("HUD", "RPMIndicatorRedlineR", HUD.RPMBar.RedlineR);
+    LOAD_VAL("HUD", "RPMIndicatorRedlineG", HUD.RPMBar.RedlineG);
+    LOAD_VAL("HUD", "RPMIndicatorRedlineB", HUD.RPMBar.RedlineB);
+    LOAD_VAL("HUD", "RPMIndicatorRedlineA", HUD.RPMBar.RedlineA);
 
-    HUD.RPMBar.RevLimitR = ini.GetLongValue("HUD", "RPMIndicatorRevlimitR", HUD.RPMBar.RevLimitR);
-    HUD.RPMBar.RevLimitG = ini.GetLongValue("HUD", "RPMIndicatorRevlimitG", HUD.RPMBar.RevLimitG);
-    HUD.RPMBar.RevLimitB = ini.GetLongValue("HUD", "RPMIndicatorRevlimitB", HUD.RPMBar.RevLimitB);
-    HUD.RPMBar.RevLimitA = ini.GetLongValue("HUD", "RPMIndicatorRevlimitA", HUD.RPMBar.RevLimitA);
+    LOAD_VAL("HUD", "RPMIndicatorRevlimitR", HUD.RPMBar.RevLimitR);
+    LOAD_VAL("HUD", "RPMIndicatorRevlimitG", HUD.RPMBar.RevLimitG);
+    LOAD_VAL("HUD", "RPMIndicatorRevlimitB", HUD.RPMBar.RevLimitB);
+    LOAD_VAL("HUD", "RPMIndicatorRevlimitA", HUD.RPMBar.RevLimitA);
 
-    HUD.Wheel.Enable = ini.GetBoolValue("HUD", "SteeringWheelInfo", HUD.Wheel.Enable);
-    HUD.Wheel.Always = ini.GetBoolValue("HUD", "AlwaysSteeringWheelInfo", HUD.Wheel.Always);
-    HUD.Wheel.ImgXPos = ini.GetDoubleValue("HUD", "SteeringWheelTextureX", HUD.Wheel.ImgXPos);
-    HUD.Wheel.ImgYPos = ini.GetDoubleValue("HUD", "SteeringWheelTextureY", HUD.Wheel.ImgYPos);
-    HUD.Wheel.ImgSize = ini.GetDoubleValue("HUD", "SteeringWheelTextureSz", HUD.Wheel.ImgSize);
+    LOAD_VAL("HUD", "SteeringWheelInfo", HUD.Wheel.Enable);
+    LOAD_VAL("HUD", "AlwaysSteeringWheelInfo", HUD.Wheel.Always);
+    LOAD_VAL("HUD", "SteeringWheelTextureX", HUD.Wheel.ImgXPos);
+    LOAD_VAL("HUD", "SteeringWheelTextureY", HUD.Wheel.ImgYPos);
+    LOAD_VAL("HUD", "SteeringWheelTextureSz", HUD.Wheel.ImgSize);
 
-    HUD.Wheel.PedalXPos = ini.GetDoubleValue("HUD", "PedalInfoX", HUD.Wheel.PedalXPos);
-    HUD.Wheel.PedalYPos = ini.GetDoubleValue("HUD", "PedalInfoY", HUD.Wheel.PedalYPos);
-    HUD.Wheel.PedalYSz = ini.GetDoubleValue("HUD", "PedalInfoH", HUD.Wheel.PedalYSz);
-    HUD.Wheel.PedalXSz = ini.GetDoubleValue("HUD", "PedalInfoW", HUD.Wheel.PedalXSz);
-    HUD.Wheel.PedalXPad = ini.GetDoubleValue("HUD", "PedalInfoPadX", HUD.Wheel.PedalXPad);
-    HUD.Wheel.PedalYPad = ini.GetDoubleValue("HUD", "PedalInfoPadY", HUD.Wheel.PedalYPad);
-    HUD.Wheel.PedalBgA = ini.GetLongValue("HUD", "PedalBackgroundA", HUD.Wheel.PedalBgA);
+    LOAD_VAL("HUD", "PedalInfoX", HUD.Wheel.PedalXPos);
+    LOAD_VAL("HUD", "PedalInfoY", HUD.Wheel.PedalYPos);
+    LOAD_VAL("HUD", "PedalInfoH", HUD.Wheel.PedalYSz);
+    LOAD_VAL("HUD", "PedalInfoW", HUD.Wheel.PedalXSz);
+    LOAD_VAL("HUD", "PedalInfoPadX", HUD.Wheel.PedalXPad);
+    LOAD_VAL("HUD", "PedalInfoPadY", HUD.Wheel.PedalYPad);
+    LOAD_VAL("HUD", "PedalBackgroundA", HUD.Wheel.PedalBgA);
 
-    HUD.Wheel.PedalThrottleR = ini.GetLongValue("HUD", "PedalInfoThrottleR", HUD.Wheel.PedalThrottleR);
-    HUD.Wheel.PedalThrottleG = ini.GetLongValue("HUD", "PedalInfoThrottleG", HUD.Wheel.PedalThrottleG);
-    HUD.Wheel.PedalThrottleB = ini.GetLongValue("HUD", "PedalInfoThrottleB", HUD.Wheel.PedalThrottleB);
-    HUD.Wheel.PedalThrottleA = ini.GetLongValue("HUD", "PedalInfoThrottleA", HUD.Wheel.PedalThrottleA);
+    LOAD_VAL("HUD", "PedalInfoThrottleR", HUD.Wheel.PedalThrottleR);
+    LOAD_VAL("HUD", "PedalInfoThrottleG", HUD.Wheel.PedalThrottleG);
+    LOAD_VAL("HUD", "PedalInfoThrottleB", HUD.Wheel.PedalThrottleB);
+    LOAD_VAL("HUD", "PedalInfoThrottleA", HUD.Wheel.PedalThrottleA);
 
-    HUD.Wheel.PedalBrakeR = ini.GetLongValue("HUD", "PedalInfoBrakeR", HUD.Wheel.PedalBrakeR);
-    HUD.Wheel.PedalBrakeG = ini.GetLongValue("HUD", "PedalInfoBrakeG", HUD.Wheel.PedalBrakeG);
-    HUD.Wheel.PedalBrakeB = ini.GetLongValue("HUD", "PedalInfoBrakeB", HUD.Wheel.PedalBrakeB);
-    HUD.Wheel.PedalBrakeA = ini.GetLongValue("HUD", "PedalInfoBrakeA", HUD.Wheel.PedalBrakeA);
+    LOAD_VAL("HUD", "PedalInfoBrakeR", HUD.Wheel.PedalBrakeR);
+    LOAD_VAL("HUD", "PedalInfoBrakeG", HUD.Wheel.PedalBrakeG);
+    LOAD_VAL("HUD", "PedalInfoBrakeB", HUD.Wheel.PedalBrakeB);
+    LOAD_VAL("HUD", "PedalInfoBrakeA", HUD.Wheel.PedalBrakeA);
 
-    HUD.Wheel.PedalClutchR = ini.GetLongValue("HUD", "PedalInfoClutchR", HUD.Wheel.PedalClutchR);
-    HUD.Wheel.PedalClutchG = ini.GetLongValue("HUD", "PedalInfoClutchG", HUD.Wheel.PedalClutchG);
-    HUD.Wheel.PedalClutchB = ini.GetLongValue("HUD", "PedalInfoClutchB", HUD.Wheel.PedalClutchB);
-    HUD.Wheel.PedalClutchA = ini.GetLongValue("HUD", "PedalInfoClutchA", HUD.Wheel.PedalClutchA);
+    LOAD_VAL("HUD", "PedalInfoClutchR", HUD.Wheel.PedalClutchR);
+    LOAD_VAL("HUD", "PedalInfoClutchG", HUD.Wheel.PedalClutchG);
+    LOAD_VAL("HUD", "PedalInfoClutchB", HUD.Wheel.PedalClutchB);
+    LOAD_VAL("HUD", "PedalInfoClutchA", HUD.Wheel.PedalClutchA);
 
-    HUD.DashIndicators.Enable = ini.GetBoolValue("HUD", "DashIndicators", HUD.DashIndicators.Enable);
-    HUD.DashIndicators.XPos = ini.GetDoubleValue("HUD", "DashIndicatorsXpos", HUD.DashIndicators.XPos);
-    HUD.DashIndicators.YPos = ini.GetDoubleValue("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
-    HUD.DashIndicators.Size = ini.GetDoubleValue("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
+    LOAD_VAL("HUD", "DashIndicators", HUD.DashIndicators.Enable);
+    LOAD_VAL("HUD", "DashIndicatorsXpos", HUD.DashIndicators.XPos);
+    LOAD_VAL("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
+    LOAD_VAL("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
 
-    HUD.MouseSteering.Enable = ini.GetBoolValue("HUD", "MouseEnable", HUD.MouseSteering.Enable);
-    HUD.MouseSteering.XPos = ini.GetDoubleValue("HUD", "MouseXPos", HUD.MouseSteering.XPos);
-    HUD.MouseSteering.YPos = ini.GetDoubleValue("HUD", "MouseYPos", HUD.MouseSteering.YPos);
-    HUD.MouseSteering.XSz = ini.GetDoubleValue("HUD", "MouseXSz", HUD.MouseSteering.XSz);
-    HUD.MouseSteering.YSz = ini.GetDoubleValue("HUD", "MouseYSz", HUD.MouseSteering.YSz);
-    HUD.MouseSteering.MarkerXSz = ini.GetDoubleValue("HUD", "MouseMarkerXSz", HUD.MouseSteering.MarkerXSz);
+    LOAD_VAL("HUD", "MouseEnable", HUD.MouseSteering.Enable);
+    LOAD_VAL("HUD", "MouseXPos", HUD.MouseSteering.XPos);
+    LOAD_VAL("HUD", "MouseYPos", HUD.MouseSteering.YPos);
+    LOAD_VAL("HUD", "MouseXSz", HUD.MouseSteering.XSz);
+    LOAD_VAL("HUD", "MouseYSz", HUD.MouseSteering.YSz);
+    LOAD_VAL("HUD", "MouseMarkerXSz", HUD.MouseSteering.MarkerXSz);
 
-    HUD.MouseSteering.BgR = ini.GetLongValue("HUD", "MouseBgR", HUD.MouseSteering.BgR);
-    HUD.MouseSteering.BgG = ini.GetLongValue("HUD", "MouseBgG", HUD.MouseSteering.BgG);
-    HUD.MouseSteering.BgB = ini.GetLongValue("HUD", "MouseBgB", HUD.MouseSteering.BgB);
-    HUD.MouseSteering.BgA = ini.GetLongValue("HUD", "MouseBgA", HUD.MouseSteering.BgA);
+    LOAD_VAL("HUD", "MouseBgR", HUD.MouseSteering.BgR);
+    LOAD_VAL("HUD", "MouseBgG", HUD.MouseSteering.BgG);
+    LOAD_VAL("HUD", "MouseBgB", HUD.MouseSteering.BgB);
+    LOAD_VAL("HUD", "MouseBgA", HUD.MouseSteering.BgA);
 
-    HUD.MouseSteering.FgR = ini.GetLongValue("HUD", "MouseFgR", HUD.MouseSteering.FgR);
-    HUD.MouseSteering.FgG = ini.GetLongValue("HUD", "MouseFgG", HUD.MouseSteering.FgG);
-    HUD.MouseSteering.FgB = ini.GetLongValue("HUD", "MouseFgB", HUD.MouseSteering.FgB);
-    HUD.MouseSteering.FgA = ini.GetLongValue("HUD", "MouseFgA", HUD.MouseSteering.FgA);
+    LOAD_VAL("HUD", "MouseFgR", HUD.MouseSteering.FgR);
+    LOAD_VAL("HUD", "MouseFgG", HUD.MouseSteering.FgG);
+    LOAD_VAL("HUD", "MouseFgB", HUD.MouseSteering.FgB);
+    LOAD_VAL("HUD", "MouseFgA", HUD.MouseSteering.FgA);
 
     // [MISC]
-    Misc.UDPTelemetry = ini.GetBoolValue("MISC", "UDPTelemetry", Misc.UDPTelemetry);
-    Misc.DashExtensions = ini.GetBoolValue("MISC", "DashExtensions", Misc.DashExtensions);
-    Misc.SyncAnimations = ini.GetBoolValue("MISC", "SyncAnimations", Misc.SyncAnimations);
-    Misc.HidePlayerInFPV = ini.GetBoolValue("MISC", "HidePlayerInFPV", Misc.HidePlayerInFPV);
-    Misc.HideWheelInFPV = ini.GetBoolValue("MISC", "HideWheelInFPV", Misc.HideWheelInFPV);
+    LOAD_VAL("MISC", "UDPTelemetry", Misc.UDPTelemetry);
+    LOAD_VAL("MISC", "DashExtensions", Misc.DashExtensions);
+    LOAD_VAL("MISC", "SyncAnimations", Misc.SyncAnimations);
+    LOAD_VAL("MISC", "HidePlayerInFPV", Misc.HidePlayerInFPV);
+    LOAD_VAL("MISC", "HideWheelInFPV", Misc.HideWheelInFPV);
 
     // [UPDATE]
-    Update.EnableUpdate = ini.GetBoolValue("UPDATE", "EnableUpdate", Update.EnableUpdate);
-    Update.IgnoredVersion = ini.GetValue("UPDATE", "IgnoredVersion", Update.IgnoredVersion.c_str());
+    LOAD_VAL("UPDATE", "EnableUpdate", Update.EnableUpdate);
+    LOAD_VAL("UPDATE", "IgnoredVersion", Update.IgnoredVersion);
 
     // [DEBUG]
-    Debug.LogLevel = ini.GetLongValue("DEBUG", "LogLevel", Debug.LogLevel);
-    Debug.DisplayInfo = ini.GetBoolValue("DEBUG", "DisplayInfo", Debug.DisplayInfo);
-    Debug.DisplayWheelInfo = ini.GetBoolValue("DEBUG", "DisplayWheelInfo", Debug.DisplayWheelInfo);
-    Debug.DisplayGearingInfo = ini.GetBoolValue("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
-    Debug.DisplayFFBInfo = ini.GetBoolValue("DEBUG", "DisplayFFBInfo", Debug.DisplayFFBInfo);
-    Debug.DisplayNPCInfo = ini.GetBoolValue("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
+    LOAD_VAL("DEBUG", "LogLevel", Debug.LogLevel);
+    LOAD_VAL("DEBUG", "DisplayInfo", Debug.DisplayInfo);
+    LOAD_VAL("DEBUG", "DisplayWheelInfo", Debug.DisplayWheelInfo);
+    LOAD_VAL("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
+    LOAD_VAL("DEBUG", "DisplayFFBInfo", Debug.DisplayFFBInfo);
+    LOAD_VAL("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
 
-    Debug.DisableInputDetect = ini.GetBoolValue("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
-    Debug.DisablePlayerHide = ini.GetBoolValue("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
-    Debug.DisableNPCGearbox = ini.GetBoolValue("DEBUG", "DisableNPCGearbox", Debug.DisableNPCGearbox);
-    Debug.DisableNPCBrake = ini.GetBoolValue("DEBUG", "DisableNPCBrake", Debug.DisableNPCBrake);
-    Debug.DisableFPVCam = ini.GetBoolValue("DEBUG", "DisableFPVCam", Debug.DisableFPVCam);
+    LOAD_VAL("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
+    LOAD_VAL("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
+    LOAD_VAL("DEBUG", "DisableNPCGearbox", Debug.DisableNPCGearbox);
+    LOAD_VAL("DEBUG", "DisableNPCBrake", Debug.DisableNPCBrake);
+    LOAD_VAL("DEBUG", "DisableFPVCam", Debug.DisableFPVCam);
 
-    Debug.Metrics.EnableTimers = ini.GetBoolValue("DEBUG", "EnableTimers", Debug.Metrics.EnableTimers);
+    LOAD_VAL("DEBUG", "EnableTimers", Debug.Metrics.EnableTimers);
 
     int it = 0;
     Debug.Metrics.Timers.clear();
@@ -599,11 +606,21 @@ void ScriptSettings::parseSettingsGeneral() {
         it++;
     }
 
-    Debug.Metrics.GForce.Enable = ini.GetBoolValue("DEBUG", "EnableGForce", Debug.Metrics.GForce.Enable);
-    Debug.Metrics.GForce.PosX = ini.GetDoubleValue("DEBUG", "GForcePosX", Debug.Metrics.GForce.PosX);
-    Debug.Metrics.GForce.PosY = ini.GetDoubleValue("DEBUG", "GForcePosY", Debug.Metrics.GForce.PosY);
-    Debug.Metrics.GForce.Size = ini.GetDoubleValue("DEBUG", "GForceSize", Debug.Metrics.GForce.Size);
+    LOAD_VAL("DEBUG", "EnableGForce", Debug.Metrics.GForce.Enable);
+    LOAD_VAL("DEBUG", "GForcePosX", Debug.Metrics.GForce.PosX);
+    LOAD_VAL("DEBUG", "GForcePosY", Debug.Metrics.GForce.PosY);
+    LOAD_VAL("DEBUG", "GForceSize", Debug.Metrics.GForce.Size);
 }
+
+
+#define GET_CT(control) \
+    static_cast<int>(CarControls::ControllerControlType::control) \
+
+#define GET_LT(control) \
+    static_cast<int>(CarControls::ControllerControlType::control) \
+
+#define GET_KT(control) \
+    static_cast<int>(CarControls::KeyboardControlType::control) \
 
 void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     CSimpleIniA ini;
@@ -612,90 +629,100 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [CONTROLLER]
-    Controller.BlockCarControls = ini.GetBoolValue("CONTROLLER", "BlockCarControls", Controller.BlockCarControls);
-    Controller.IgnoreShiftsUI = ini.GetBoolValue("CONTROLLER", "IgnoreShiftsUI", Controller.IgnoreShiftsUI);
-    Controller.BlockHShift = ini.GetBoolValue("CONTROLLER", "BlockHShift", Controller.BlockHShift);
-    Controller.ToggleEngine = ini.GetBoolValue("CONTROLLER", "ToggleEngine", Controller.ToggleEngine);
+    LOAD_VAL("CONTROLLER", "BlockCarControls", Controller.BlockCarControls);
+    LOAD_VAL("CONTROLLER", "IgnoreShiftsUI", Controller.IgnoreShiftsUI);
+    LOAD_VAL("CONTROLLER", "BlockHShift", Controller.BlockHShift);
+    LOAD_VAL("CONTROLLER", "ToggleEngine", Controller.ToggleEngine);
 
-    Controller.HoldTimeMs = ini.GetLongValue("CONTROLLER", "HoldTimeMs", Controller.HoldTimeMs);
-    Controller.MaxTapTimeMs = ini.GetLongValue("CONTROLLER", "MaxTapTimeMs", Controller.MaxTapTimeMs);
-    Controller.TriggerValue = ini.GetDoubleValue("CONTROLLER", "TriggerValue", Controller.TriggerValue);
+    LOAD_VAL("CONTROLLER", "HoldTimeMs", Controller.HoldTimeMs);
+    LOAD_VAL("CONTROLLER", "MaxTapTimeMs", Controller.MaxTapTimeMs);
+    LOAD_VAL("CONTROLLER", "TriggerValue", Controller.TriggerValue);
 
-    Controller.CustomDeadzone = ini.GetBoolValue("CONTROLLER", "CustomDeadzone", Controller.CustomDeadzone);
-    Controller.DeadzoneLeftThumb = ini.GetLongValue("CONTROLLER", "DeadzoneLeftThumb", Controller.DeadzoneLeftThumb);
-    Controller.DeadzoneRightThumb = ini.GetLongValue("CONTROLLER", "DeadzoneRightThumb", Controller.DeadzoneRightThumb);
+    LOAD_VAL("CONTROLLER", "CustomDeadzone", Controller.CustomDeadzone);
+    LOAD_VAL("CONTROLLER", "DeadzoneLeftThumb", Controller.DeadzoneLeftThumb);
+    LOAD_VAL("CONTROLLER", "DeadzoneRightThumb", Controller.DeadzoneRightThumb);
 
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Toggle)] = parseControllerItem<std::string>(ini, "Toggle", "UNKNOWN", "Toggle MT", "Usage: hold");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ToggleH)] = parseControllerItem<std::string>(ini, "ToggleShift", "B", "Change shift mode", "Usage: hold");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::CycleAssists)] = parseControllerItem<std::string>(ini, "CycleAssists", "UNKNOWN", "Cycle assists", "Usage: hold");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ToggleLC)] = parseControllerItem<std::string>(ini, "ToggleLC", "UNKNOWN", "Toggle launch control", "Usage: hold");
+    scriptControl->ControlXbox[GET_CT(Toggle)] = parseControllerItem<std::string>(ini, "Toggle", "UNKNOWN", "Toggle MT", "Usage: hold");
+    scriptControl->ControlXbox[GET_CT(ToggleH)] = parseControllerItem<std::string>(ini, "ToggleShift", "B", "Change shift mode", "Usage: hold");
+    scriptControl->ControlXbox[GET_CT(CycleAssists)] = parseControllerItem<std::string>(ini, "CycleAssists", "UNKNOWN", "Cycle assists", "Usage: hold");
+    scriptControl->ControlXbox[GET_CT(ToggleLC)] = parseControllerItem<std::string>(ini, "ToggleLC", "UNKNOWN", "Toggle launch control", "Usage: hold");
 
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] =   parseControllerItem<std::string>(ini, "ShiftUp", "A", "Shift up", "Usage: tap");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = parseControllerItem<std::string>(ini, "ShiftDown", "X", "Shift down", "Usage: tap");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Engine)] =    parseControllerItem<std::string>(ini, "Engine", "DpadDown", "Engine", "Usage: hold");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Throttle)] =  parseControllerItem<std::string>(ini, "Throttle", "RightTrigger", "Throttle", "Usage: analog");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Brake)] =     parseControllerItem<std::string>(ini, "Brake", "LeftTrigger", "Brake", "Usage: analog");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::Clutch)] = parseControllerItem<std::string>(ini, "Clutch", "LeftThumbUp", "Clutch", "Usage: hold/analog");
+    scriptControl->ControlXbox[GET_CT(ShiftUp)]   = parseControllerItem<std::string>(ini, "ShiftUp", "A", "Shift up", "Usage: tap");
+    scriptControl->ControlXbox[GET_CT(ShiftDown)] = parseControllerItem<std::string>(ini, "ShiftDown", "X", "Shift down", "Usage: tap");
+    scriptControl->ControlXbox[GET_CT(Engine)]    = parseControllerItem<std::string>(ini, "Engine", "DpadDown", "Engine", "Usage: hold");
+    scriptControl->ControlXbox[GET_CT(Throttle)]  = parseControllerItem<std::string>(ini, "Throttle", "RightTrigger", "Throttle", "Usage: analog");
+    scriptControl->ControlXbox[GET_CT(Brake)]     = parseControllerItem<std::string>(ini, "Brake", "LeftTrigger", "Brake", "Usage: analog");
+    scriptControl->ControlXbox[GET_CT(Clutch)]    = parseControllerItem<std::string>(ini, "Clutch", "LeftThumbUp", "Clutch", "Usage: hold/analog");
 
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::SteerLeft)] = parseControllerItem<std::string>(ini, "SteerLeft", "LeftThumbLeft", "Steer left", "Usage: analog");
-    scriptControl->ControlXbox[static_cast<int>(CarControls::ControllerControlType::SteerRight)] = parseControllerItem<std::string>(ini, "SteerRight", "LeftThumbRight", "Steer right", "Usage: analog");
+    scriptControl->ControlXbox[GET_CT(SteerLeft)]  = parseControllerItem<std::string>(ini, "SteerLeft", "LeftThumbLeft", "Steer left", "Usage: analog");
+    scriptControl->ControlXbox[GET_CT(SteerRight)] = parseControllerItem<std::string>(ini, "SteerRight", "LeftThumbRight", "Steer right", "Usage: analog");
 
-    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftUp)] =   ini.GetLongValue("CONTROLLER", "ShiftUpBlocks", -1);
-    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::ShiftDown)] = ini.GetLongValue("CONTROLLER", "ShiftDownBlocks", -1);
-    scriptControl->ControlXboxBlocks[static_cast<int>(CarControls::ControllerControlType::Clutch)] =    ini.GetLongValue("CONTROLLER", "ClutchBlocks", -1);
+    scriptControl->ControlXboxBlocks[GET_CT(ShiftUp)]   = ini.GetLongValue("CONTROLLER", "ShiftUpBlocks", -1);
+    scriptControl->ControlXboxBlocks[GET_CT(ShiftDown)] = ini.GetLongValue("CONTROLLER", "ShiftDownBlocks", -1);
+    scriptControl->ControlXboxBlocks[GET_CT(Clutch)]    = ini.GetLongValue("CONTROLLER", "ClutchBlocks", -1);
 
     // [CONTROLLER_NATIVE]
-    Controller.Native.Enable = ini.GetBoolValue("CONTROLLER_NATIVE", "Enable", Controller.Native.Enable);
+    LOAD_VAL("CONTROLLER_NATIVE", "Enable", Controller.Native.Enable);
 
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Toggle)] =       parseControllerItem<eControl>(ini, "Toggle", static_cast<eControl>(-1), "Toggle MT", "Usage: hold");
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ToggleH)] =      parseControllerItem<eControl>(ini, "ToggleShift", ControlFrontendCancel, "Change shift mode", "Usage: hold");
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::CycleAssists)] = parseControllerItem<eControl>(ini, "CycleAssists", static_cast<eControl>(-1), "Cycle assists", "Usage: hold");
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ToggleLC)] =     parseControllerItem<eControl>(ini, "ToggleLC", static_cast<eControl>(-1), "Toggle launch control", "Usage: hold");
+    scriptControl->LegacyControls[GET_LT(Toggle)]       = parseControllerItem<eControl>(ini, "Toggle", static_cast<eControl>(-1), "Toggle MT", "Usage: hold");
+    scriptControl->LegacyControls[GET_LT(ToggleH)]      = parseControllerItem<eControl>(ini, "ToggleShift", ControlFrontendCancel, "Change shift mode", "Usage: hold");
+    scriptControl->LegacyControls[GET_LT(CycleAssists)] = parseControllerItem<eControl>(ini, "CycleAssists", static_cast<eControl>(-1), "Cycle assists", "Usage: hold");
+    scriptControl->LegacyControls[GET_LT(ToggleLC)]     = parseControllerItem<eControl>(ini, "ToggleLC", static_cast<eControl>(-1), "Toggle launch control", "Usage: hold");
 
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] =   parseControllerItem<eControl>(ini, "ShiftUp", ControlFrontendAccept, "Shift up", "Usage: tap");
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = parseControllerItem<eControl>(ini, "ShiftDown", ControlFrontendX   , "Shift down", "Usage: tap");
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Engine)] =    parseControllerItem<eControl>(ini, "Engine", ControlFrontendDown   , "Engine", "Usage: hold");
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Throttle)] =  parseControllerItem<eControl>(ini, "Throttle", ControlFrontendRt   , "Throttle", "Usage: analog");
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Brake)] =     parseControllerItem<eControl>(ini, "Brake", ControlFrontendLt      , "Brake", "Usage: analog");
-    scriptControl->LegacyControls[static_cast<int>(CarControls::LegacyControlType::Clutch)] =    parseControllerItem<eControl>(ini, "Clutch", ControlFrontendAxisY  , "Clutch", "Usage: hold/analog");
+    scriptControl->LegacyControls[GET_LT(ShiftUp)]      = parseControllerItem<eControl>(ini, "ShiftUp", ControlFrontendAccept, "Shift up", "Usage: tap");
+    scriptControl->LegacyControls[GET_LT(ShiftDown)]    = parseControllerItem<eControl>(ini, "ShiftDown", ControlFrontendX   , "Shift down", "Usage: tap");
+    scriptControl->LegacyControls[GET_LT(Engine)]       = parseControllerItem<eControl>(ini, "Engine", ControlFrontendDown   , "Engine", "Usage: hold");
+    scriptControl->LegacyControls[GET_LT(Throttle)]     = parseControllerItem<eControl>(ini, "Throttle", ControlFrontendRt   , "Throttle", "Usage: analog");
+    scriptControl->LegacyControls[GET_LT(Brake)]        = parseControllerItem<eControl>(ini, "Brake", ControlFrontendLt      , "Brake", "Usage: analog");
+    scriptControl->LegacyControls[GET_LT(Clutch)]       = parseControllerItem<eControl>(ini, "Clutch", ControlFrontendAxisY  , "Clutch", "Usage: hold/analog");
 
-    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftUp)] =   ini.GetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", -1)  ;
-    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::ShiftDown)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftDownBlocks", -1);
-    scriptControl->ControlNativeBlocks[static_cast<int>(CarControls::LegacyControlType::Clutch)] =    ini.GetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", -1)   ;
+    scriptControl->ControlNativeBlocks[GET_LT(ShiftUp)]   = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", -1);
+    scriptControl->ControlNativeBlocks[GET_LT(ShiftDown)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftDownBlocks", -1);
+    scriptControl->ControlNativeBlocks[GET_LT(Clutch)]    = ini.GetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", -1);
 
     // [KEYBOARD]
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Toggle)] = parseKeyboardItem(ini, "Toggle", "VK_OEM_5", "Toggle MT");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleH)] = parseKeyboardItem(ini, "ToggleH", "VK_OEM_6", "Switch shift mode");
+    scriptControl->KBControl[GET_KT(Toggle)] = parseKeyboardItem(ini, "Toggle", "VK_OEM_5", "Toggle MT");
+    scriptControl->KBControl[GET_KT(ToggleH)] = parseKeyboardItem(ini, "ToggleH", "VK_OEM_6", "Switch shift mode");
 
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::CycleAssists)] = parseKeyboardItem(ini, "CycleAssists", "UNKNOWN", "Cycle assists");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleABS)] = parseKeyboardItem(ini, "ToggleABS", "UNKNOWN", "Toggle ABS");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleESC)] = parseKeyboardItem(ini, "ToggleESC", "UNKNOWN", "Toggle ESC");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleTCS)] = parseKeyboardItem(ini, "ToggleTCS", "UNKNOWN", "Toggle TCS");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::DriveBiasFInc)] = parseKeyboardItem(ini, "DriveBiasFInc", "UNKNOWN", "Front drive bias +5%");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::DriveBiasFDec)] = parseKeyboardItem(ini, "DriveBiasFDec", "UNKNOWN", "Front drive bias -5%");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ToggleLC)] = parseKeyboardItem(ini, "ToggleLC", "UNKNOWN", "Toggle launch control");
+    scriptControl->KBControl[GET_KT(CycleAssists)] = parseKeyboardItem(ini, "CycleAssists", "UNKNOWN", "Cycle assists");
+    scriptControl->KBControl[GET_KT(ToggleABS)] = parseKeyboardItem(ini, "ToggleABS", "UNKNOWN", "Toggle ABS");
+    scriptControl->KBControl[GET_KT(ToggleESC)] = parseKeyboardItem(ini, "ToggleESC", "UNKNOWN", "Toggle ESC");
+    scriptControl->KBControl[GET_KT(ToggleTCS)] = parseKeyboardItem(ini, "ToggleTCS", "UNKNOWN", "Toggle TCS");
+    scriptControl->KBControl[GET_KT(DriveBiasFInc)] = parseKeyboardItem(ini, "DriveBiasFInc", "UNKNOWN", "Front drive bias +5%");
+    scriptControl->KBControl[GET_KT(DriveBiasFDec)] = parseKeyboardItem(ini, "DriveBiasFDec", "UNKNOWN", "Front drive bias -5%");
+    scriptControl->KBControl[GET_KT(ToggleLC)] = parseKeyboardItem(ini, "ToggleLC", "UNKNOWN", "Toggle launch control");
 
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftUp)] = parseKeyboardItem(ini, "ShiftUp", "LSHIFT", "Shift up");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::ShiftDown)] = parseKeyboardItem(ini, "ShiftDown", "LCTRL", "Shift down");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Clutch)] = parseKeyboardItem(ini, "Clutch", "Z");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Engine)] = parseKeyboardItem(ini, "Engine", "X");
+    scriptControl->KBControl[GET_KT(ShiftUp)] = parseKeyboardItem(ini, "ShiftUp", "LSHIFT", "Shift up");
+    scriptControl->KBControl[GET_KT(ShiftDown)] = parseKeyboardItem(ini, "ShiftDown", "LCTRL", "Shift down");
+    scriptControl->KBControl[GET_KT(Clutch)] = parseKeyboardItem(ini, "Clutch", "Z");
+    scriptControl->KBControl[GET_KT(Engine)] = parseKeyboardItem(ini, "Engine", "X");
 
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Throttle)] = parseKeyboardItem(ini, "Throttle", "W");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::Brake)] = parseKeyboardItem(ini, "Brake", "S");
+    scriptControl->KBControl[GET_KT(Throttle)] = parseKeyboardItem(ini, "Throttle", "W");
+    scriptControl->KBControl[GET_KT(Brake)] = parseKeyboardItem(ini, "Brake", "S");
 
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HR)] =  parseKeyboardItem(ini, "HR", "UNKNOWN", "H-pattern reverse");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H1)] =  parseKeyboardItem(ini, "H1", "UNKNOWN", "H-pattern 1");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H2)] =  parseKeyboardItem(ini, "H2", "UNKNOWN", "H-pattern 2");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H3)] =  parseKeyboardItem(ini, "H3", "UNKNOWN", "H-pattern 3");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H4)] =  parseKeyboardItem(ini, "H4", "UNKNOWN", "H-pattern 4");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H5)] =  parseKeyboardItem(ini, "H5", "UNKNOWN", "H-pattern 5");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H6)] =  parseKeyboardItem(ini, "H6", "UNKNOWN", "H-pattern 6");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H7)] =  parseKeyboardItem(ini, "H7", "UNKNOWN", "H-pattern 7");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H8)] =  parseKeyboardItem(ini, "H8", "UNKNOWN", "H-pattern 8");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H9)] =  parseKeyboardItem(ini, "H9", "UNKNOWN", "H-pattern 9");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::H10)] = parseKeyboardItem(ini, "H10", "UNKNOWN", "H-pattern 10");
-    scriptControl->KBControl[static_cast<int>(CarControls::KeyboardControlType::HN)] =  parseKeyboardItem(ini, "HN", "UNKNOWN", "H-pattern neutral");
+    scriptControl->KBControl[GET_KT(HR)] =  parseKeyboardItem(ini, "HR", "UNKNOWN", "H-pattern reverse");
+    scriptControl->KBControl[GET_KT(H1)] =  parseKeyboardItem(ini, "H1", "UNKNOWN", "H-pattern 1");
+    scriptControl->KBControl[GET_KT(H2)] =  parseKeyboardItem(ini, "H2", "UNKNOWN", "H-pattern 2");
+    scriptControl->KBControl[GET_KT(H3)] =  parseKeyboardItem(ini, "H3", "UNKNOWN", "H-pattern 3");
+    scriptControl->KBControl[GET_KT(H4)] =  parseKeyboardItem(ini, "H4", "UNKNOWN", "H-pattern 4");
+    scriptControl->KBControl[GET_KT(H5)] =  parseKeyboardItem(ini, "H5", "UNKNOWN", "H-pattern 5");
+    scriptControl->KBControl[GET_KT(H6)] =  parseKeyboardItem(ini, "H6", "UNKNOWN", "H-pattern 6");
+    scriptControl->KBControl[GET_KT(H7)] =  parseKeyboardItem(ini, "H7", "UNKNOWN", "H-pattern 7");
+    scriptControl->KBControl[GET_KT(H8)] =  parseKeyboardItem(ini, "H8", "UNKNOWN", "H-pattern 8");
+    scriptControl->KBControl[GET_KT(H9)] =  parseKeyboardItem(ini, "H9", "UNKNOWN", "H-pattern 9");
+    scriptControl->KBControl[GET_KT(H10)] = parseKeyboardItem(ini, "H10", "UNKNOWN", "H-pattern 10");
+    scriptControl->KBControl[GET_KT(HN)] =  parseKeyboardItem(ini, "HN", "UNKNOWN", "H-pattern neutral");
 }
+
+#undef GET_KT
+#undef GET_LT
+#undef GET_CT
+
+#define GET_WT(control) \
+    static_cast<int>(CarControls::WheelControlType::control) \
+
+#define GET_AT(control) \
+    static_cast<int>(CarControls::WheelAxisType::control) \
 
 void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     CSimpleIniA ini;
@@ -705,26 +732,26 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     CHECK_LOG_SI_ERROR(result, "load");
 
     // [OPTIONS]
-    Wheel.Options.Enable = ini.GetBoolValue("MT_OPTIONS", "EnableWheel", Wheel.Options.Enable);
-    Wheel.Options.LogiLEDs = ini.GetBoolValue("MT_OPTIONS", "LogitechLEDs", Wheel.Options.LogiLEDs);
-    Wheel.Options.HPatternKeyboard = ini.GetBoolValue("MT_OPTIONS", "HPatternKeyboard", Wheel.Options.HPatternKeyboard);
-    Wheel.Options.UseShifterForAuto = ini.GetBoolValue("MT_OPTIONS", "UseShifterForAuto", Wheel.Options.UseShifterForAuto);
+    LOAD_VAL("MT_OPTIONS", "EnableWheel", Wheel.Options.Enable);
+    LOAD_VAL("MT_OPTIONS", "LogitechLEDs", Wheel.Options.LogiLEDs);
+    LOAD_VAL("MT_OPTIONS", "HPatternKeyboard", Wheel.Options.HPatternKeyboard);
+    LOAD_VAL("MT_OPTIONS", "UseShifterForAuto", Wheel.Options.UseShifterForAuto);
 
     // [FORCE_FEEDBACK]
-    Wheel.FFB.Enable = ini.GetBoolValue("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
-    Wheel.FFB.AntiDeadForce = ini.GetLongValue("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
-    Wheel.FFB.SATAmpMult = ini.GetDoubleValue("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
-    Wheel.FFB.SATMax = ini.GetLongValue("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
-    Wheel.FFB.SATFactor = ini.GetDoubleValue("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
-    Wheel.FFB.DamperMax = ini.GetLongValue("FORCE_FEEDBACK", "DamperMax", Wheel.FFB.DamperMax);
-    Wheel.FFB.DamperMin = ini.GetLongValue("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin); ;
-    Wheel.FFB.DamperMinSpeed = ini.GetDoubleValue("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
-    Wheel.FFB.DetailMult = ini.GetDoubleValue("FORCE_FEEDBACK", "DetailMult", Wheel.FFB.DetailMult);
-    Wheel.FFB.DetailLim = ini.GetLongValue("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
-    Wheel.FFB.DetailMAW = ini.GetLongValue("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
-    Wheel.FFB.CollisionMult = ini.GetDoubleValue("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
-    Wheel.FFB.Gamma = ini.GetDoubleValue("FORCE_FEEDBACK", "Gamma", Wheel.FFB.Gamma);
-    Wheel.FFB.MaxSpeed = ini.GetDoubleValue("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
+    LOAD_VAL("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
+    LOAD_VAL("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
+    LOAD_VAL("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
+    LOAD_VAL("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
+    LOAD_VAL("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
+    LOAD_VAL("FORCE_FEEDBACK", "DamperMax", Wheel.FFB.DamperMax);
+    LOAD_VAL("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin); ;
+    LOAD_VAL("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
+    LOAD_VAL("FORCE_FEEDBACK", "DetailMult", Wheel.FFB.DetailMult);
+    LOAD_VAL("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
+    LOAD_VAL("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
+    LOAD_VAL("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
+    LOAD_VAL("FORCE_FEEDBACK", "Gamma", Wheel.FFB.Gamma);
+    LOAD_VAL("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
 
     // [INPUT_DEVICES]
     int it = 0;
@@ -752,63 +779,67 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     nDevices = it;
 
     // [TOGGLE_MOD]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Toggle)] =
+    scriptControl->WheelButton[GET_WT(Toggle)] =
         parseWheelItem<int>(ini, "TOGGLE_MOD", -1, "Toggle MT");
 
     // [CHANGE_SHIFTMODE]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ToggleH)] =
+    scriptControl->WheelButton[GET_WT(ToggleH)] =
         parseWheelItem<int>(ini, "CHANGE_SHIFTMODE", -1, "Change shift mode");
 
     // [STEER]
-    scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Steer)] =
+    scriptControl->WheelAxes[GET_AT(Steer)] =
         parseWheelItem<std::string>(ini, "STEER", "", "Steering");
 
-    scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::ForceFeedback)] =
+    scriptControl->WheelAxes[GET_AT(ForceFeedback)] =
         CarControls::SInput<std::string>("FFB",
             DeviceIndexToGUID(ini.GetLongValue("STEER", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
             ini.GetValue("STEER", "FFB", ""),
             "Force feedback", "Force feedback");
 
-    Wheel.Steering.Min = ini.GetLongValue("STEER", "MIN", -1);
-    Wheel.Steering.Max = ini.GetLongValue("STEER", "MAX", -1);
+    LOAD_VAL("STEER", "MIN", Wheel.Steering.Min);
+    LOAD_VAL("STEER", "MAX", Wheel.Steering.Max);
 
-    Wheel.Steering.AntiDeadZone = ini.GetDoubleValue("STEER", "ANTIDEADZONE", Wheel.Steering.AntiDeadZone);
-    Wheel.Steering.DeadZone = ini.GetDoubleValue("STEER", "DEADZONE", Wheel.Steering.DeadZone);
-    Wheel.Steering.DeadZoneOffset = ini.GetDoubleValue("STEER", "DEADZONEOFFSET", Wheel.Steering.DeadZoneOffset);
-    Wheel.Steering.Gamma = ini.GetDoubleValue("STEER", "GAMMA", Wheel.Steering.Gamma);
+    LOAD_VAL("STEER", "ANTIDEADZONE", Wheel.Steering.AntiDeadZone);
+    LOAD_VAL("STEER", "DEADZONE", Wheel.Steering.DeadZone);
+    LOAD_VAL("STEER", "DEADZONEOFFSET", Wheel.Steering.DeadZoneOffset);
+    LOAD_VAL("STEER", "GAMMA", Wheel.Steering.Gamma);
 
-    Wheel.Steering.AngleMax = ini.GetDoubleValue("STEER", "SteerAngleMax", Wheel.Steering.AngleMax);
-    Wheel.Steering.AngleCar = ini.GetDoubleValue("STEER", "SteerAngleCar", Wheel.Steering.AngleCar);
-    Wheel.Steering.AngleBike = ini.GetDoubleValue("STEER", "SteerAngleBike", Wheel.Steering.AngleBike);
-    Wheel.Steering.AngleBoat = ini.GetDoubleValue("STEER", "SteerAngleBoat", Wheel.Steering.AngleBoat);
+    LOAD_VAL("STEER", "SteerAngleMax", Wheel.Steering.AngleMax);
+    LOAD_VAL("STEER", "SteerAngleCar", Wheel.Steering.AngleCar);
+    LOAD_VAL("STEER", "SteerAngleBike", Wheel.Steering.AngleBike);
+    LOAD_VAL("STEER", "SteerAngleBoat", Wheel.Steering.AngleBoat);
 
     // [THROTTLE]
-    scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Throttle)] =
+    scriptControl->WheelAxes[GET_AT(Throttle)] =
         parseWheelItem<std::string>(ini, "THROTTLE", "");
-    Wheel.Throttle.Min = ini.GetLongValue("THROTTLE", "MIN", -1);
-    Wheel.Throttle.Max = ini.GetLongValue("THROTTLE", "MAX", -1);
-    Wheel.Throttle.AntiDeadZone = ini.GetDoubleValue("THROTTLE", "ANTIDEADZONE", 0.25);
-    Wheel.Throttle.Gamma = ini.GetDoubleValue("THROTTLE", "GAMMA", 1.0);
+
+    LOAD_VAL("THROTTLE", "MIN", Wheel.Throttle.Min);
+    LOAD_VAL("THROTTLE", "MAX", Wheel.Throttle.Max);
+    LOAD_VAL("THROTTLE", "ANTIDEADZONE", Wheel.Throttle.AntiDeadZone);
+    LOAD_VAL("THROTTLE", "GAMMA", Wheel.Throttle.Gamma);
 
     // [BRAKE]
-    scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Brake)] =
+    scriptControl->WheelAxes[GET_AT(Brake)] =
         parseWheelItem<std::string>(ini, "BRAKE", "");
-    Wheel.Brake.Min = ini.GetLongValue("BRAKE", "MIN", -1);
-    Wheel.Brake.Max = ini.GetLongValue("BRAKE", "MAX", -1);
-    Wheel.Brake.AntiDeadZone = ini.GetDoubleValue("BRAKE", "ANTIDEADZONE", 0.25);
-    Wheel.Brake.Gamma = ini.GetDoubleValue("BRAKE", "GAMMA", 1.0);
+
+    LOAD_VAL("BRAKE", "MIN", Wheel.Brake.Min);
+    LOAD_VAL("BRAKE", "MAX", Wheel.Brake.Max);
+    LOAD_VAL("BRAKE", "ANTIDEADZONE", Wheel.Brake.AntiDeadZone);
+    LOAD_VAL("BRAKE", "GAMMA", Wheel.Brake.Gamma);
 
     // [CLUTCH]
-    scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Clutch)] =
+    scriptControl->WheelAxes[GET_AT(Clutch)] =
         parseWheelItem<std::string>(ini, "CLUTCH", "");
-    Wheel.Clutch.Min = ini.GetLongValue("CLUTCH", "MIN", -1);
-    Wheel.Clutch.Max = ini.GetLongValue("CLUTCH", "MAX", -1);
+
+    LOAD_VAL("CLUTCH", "MIN", Wheel.Clutch.Min);
+    LOAD_VAL("CLUTCH", "MAX", Wheel.Clutch.Max);
 
     // [HANDBRAKE_ANALOG]
-    scriptControl->WheelAxes[static_cast<int>(CarControls::WheelAxisType::Handbrake)] =
+    scriptControl->WheelAxes[GET_AT(Handbrake)] =
         parseWheelItem<std::string>(ini, "HANDBRAKE_ANALOG", "", "Handbrake (analog)");
-    Wheel.HandbrakeA.Min = ini.GetLongValue("HANDBRAKE_ANALOG", "MIN", -1);
-    Wheel.HandbrakeA.Max = ini.GetLongValue("HANDBRAKE_ANALOG", "MAX", -1);
+
+    LOAD_VAL("HANDBRAKE_ANALOG", "MIN", Wheel.HandbrakeA.Min);
+    LOAD_VAL("HANDBRAKE_ANALOG", "MAX", Wheel.HandbrakeA.Max);
 
     // enums HR through H10 are explicitly defined as 0 through 10
     // [HPATTERN_0]
@@ -817,124 +848,126 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 
     // [HPATTERN_<gear>]
     for (uint8_t i = 1; i < 11; ++i) {
+        const char* iniStr = fmt::format("HPATTERN_{}", i).c_str();
+        const char* menuStr = fmt::format("H-pattern {}", i).c_str();
         scriptControl->WheelButton[i] =
-            parseWheelItem<int>(ini, fmt::format("HPATTERN_{}", i).c_str(), -1, fmt::format("H-pattern {}", i).c_str());
+            parseWheelItem<int>(ini, iniStr, -1, menuStr);
     }
 
     // [THROTTLE_BUTTON]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Throttle)] =
+    scriptControl->WheelButton[GET_WT(Throttle)] =
         parseWheelItem<int>(ini, "THROTTLE_BUTTON", -1, "Throttle (Button)");
 
     // [BRAKE_BUTTON]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Brake)] =
+    scriptControl->WheelButton[GET_WT(Brake)] =
         parseWheelItem<int>(ini, "BRAKE_BUTTON", -1, "Brake (Button)");
 
     // [CLUTCH_BUTTON]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Clutch)] =
+    scriptControl->WheelButton[GET_WT(Clutch)] =
         parseWheelItem<int>(ini, "CLUTCH_BUTTON", -1, "Clutch (Button)");
 
     // [SHIFT_UP]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ShiftUp)] =
+    scriptControl->WheelButton[GET_WT(ShiftUp)] =
         parseWheelItem<int>(ini, "SHIFT_UP", -1);
 
     // [SHIFT_DOWN]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ShiftDown)] =
+    scriptControl->WheelButton[GET_WT(ShiftDown)] =
         parseWheelItem<int>(ini, "SHIFT_DOWN", -1);
 
     // [HANDBRAKE]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Handbrake)] =
+    scriptControl->WheelButton[GET_WT(Handbrake)] =
         parseWheelItem<int>(ini, "HANDBRAKE", -1);
 
     // [ENGINE]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Engine)] =
+    scriptControl->WheelButton[GET_WT(Engine)] =
         parseWheelItem<int>(ini, "ENGINE", -1);
 
     // [LIGHTS]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Lights)] =
+    scriptControl->WheelButton[GET_WT(Lights)] =
         parseWheelItem<int>(ini, "LIGHTS", -1);
 
     // [HORN]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Horn)] =
+    scriptControl->WheelButton[GET_WT(Horn)] =
         parseWheelItem<int>(ini, "HORN", -1);
 
     // [LOOK_BACK]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::LookBack)] =
+    scriptControl->WheelButton[GET_WT(LookBack)] =
         parseWheelItem<int>(ini, "LOOK_BACK", -1);
 
     // [LOOK_LEFT]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::LookLeft)] =
+    scriptControl->WheelButton[GET_WT(LookLeft)] =
         parseWheelItem<int>(ini, "LOOK_LEFT", -1);
 
     // [LOOK_RIGHT]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::LookRight)] =
+    scriptControl->WheelButton[GET_WT(LookRight)] =
         parseWheelItem<int>(ini, "LOOK_RIGHT", -1);
 
     // [CHANGE_CAMERA]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::Camera)] =
+    scriptControl->WheelButton[GET_WT(Camera)] =
         parseWheelItem<int>(ini, "CHANGE_CAMERA", -1);
 
     // [RADIO_NEXT]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::RadioNext)] =
+    scriptControl->WheelButton[GET_WT(RadioNext)] =
         parseWheelItem<int>(ini, "RADIO_NEXT", -1);
 
     // [RADIO_PREVIOUS]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::RadioPrev)] =
+    scriptControl->WheelButton[GET_WT(RadioPrev)] =
         parseWheelItem<int>(ini, "RADIO_PREVIOUS", -1);
 
     // [INDICATOR_LEFT]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::IndicatorLeft)] =
+    scriptControl->WheelButton[GET_WT(IndicatorLeft)] =
         parseWheelItem<int>(ini, "INDICATOR_LEFT", -1);
 
     // [INDICATOR_RIGHT]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::IndicatorRight)] =
+    scriptControl->WheelButton[GET_WT(IndicatorRight)] =
         parseWheelItem<int>(ini, "INDICATOR_RIGHT", -1);
 
     // [INDICATOR_HAZARD]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::IndicatorHazard)] =
+    scriptControl->WheelButton[GET_WT(IndicatorHazard)] =
         parseWheelItem<int>(ini, "INDICATOR_HAZARD", -1);
 
     // [AUTO_P]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::APark)] =
+    scriptControl->WheelButton[GET_WT(APark)] =
         parseWheelItem<int>(ini, "AUTO_P", -1, "Automatic park");
 
     // [AUTO_R]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::AReverse)] =
+    scriptControl->WheelButton[GET_WT(AReverse)] =
         parseWheelItem<int>(ini, "AUTO_R", -1, "Automatic reverse");
 
     // [AUTO_N]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ANeutral)] =
+    scriptControl->WheelButton[GET_WT(ANeutral)] =
         parseWheelItem<int>(ini, "AUTO_N", -1, "Automatic neutral");
 
     // [AUTO_D]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ADrive)] =
+    scriptControl->WheelButton[GET_WT(ADrive)] =
         parseWheelItem<int>(ini, "AUTO_D", -1, "Automatic drive");
 
     // [CYCLE_ASSISTS]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::CycleAssists)] =
+    scriptControl->WheelButton[GET_WT(CycleAssists)] =
         parseWheelItem<int>(ini, "CYCLE_ASSISTS", -1);
 
     // [TOGGLE_ABS]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ToggleABS)] =
+    scriptControl->WheelButton[GET_WT(ToggleABS)] =
         parseWheelItem<int>(ini, "TOGGLE_ABS", -1, "Toggle ABS");
 
     // [TOGGLE_ESC]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ToggleESC)] =
+    scriptControl->WheelButton[GET_WT(ToggleESC)] =
         parseWheelItem<int>(ini, "TOGGLE_ESC", -1, "Toggle ESC");
 
     // [TOGGLE_TCS]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ToggleTCS)] =
+    scriptControl->WheelButton[GET_WT(ToggleTCS)] =
         parseWheelItem<int>(ini, "TOGGLE_TCS", -1, "Toggle TCS");
 
     // [DRIVE_BIAS_F_INC]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::DriveBiasFInc)] =
+    scriptControl->WheelButton[GET_WT(DriveBiasFInc)] =
         parseWheelItem<int>(ini, "DRIVE_BIAS_F_INC", -1, "Front drive bias +5%");
 
     // [DRIVE_BIAS_F_DEC]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::DriveBiasFDec)] =
+    scriptControl->WheelButton[GET_WT(DriveBiasFDec)] =
         parseWheelItem<int>(ini, "DRIVE_BIAS_F_DEC", -1, "Front drive bias -5%");
 
     // [TOGGLE_LC]
-    scriptControl->WheelButton[static_cast<int>(CarControls::WheelControlType::ToggleLC)] =
+    scriptControl->WheelButton[GET_WT(ToggleLC)] =
         parseWheelItem<int>(ini, "TOGGLE_LC", -1, "Toggle launch control");
 
     // [TO_KEYBOARD]
@@ -962,6 +995,9 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
         }
     }
 }
+
+#undef GET_AT
+#undef GET_WT
 
 ptrdiff_t ScriptSettings::SteeringAppendDevice(const GUID &dev_guid, const std::string& dev_name) {
     auto found = find(Wheel.InputDevices.RegisteredGUIDs.begin(), Wheel.InputDevices.RegisteredGUIDs.end(), dev_guid);

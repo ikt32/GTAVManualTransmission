@@ -257,6 +257,7 @@
     <ClCompile Include="LaunchControl.cpp">
       <Filter>Features\Launch Control</Filter>
     </ClCompile>
+    <ClCompile Include="SettingsCommon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -556,6 +557,7 @@
     <ClInclude Include="LaunchControl.h">
       <Filter>Features\Launch Control</Filter>
     </ClInclude>
+    <ClInclude Include="SettingsCommon.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

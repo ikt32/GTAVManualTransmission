@@ -67,6 +67,9 @@
     <ClInclude Include="..\Gears\VehicleConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Gears\SettingsCommon.h">
+      <Filter>Gears</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Gears\ScriptSettings.cpp">
@@ -113,5 +116,8 @@
       <Filter>Gears\Util</Filter>
     </ClCompile>
     <ClCompile Include="..\Gears\VehicleConfig.cpp" />
+    <ClCompile Include="..\Gears\SettingsCommon.cpp">
+      <Filter>Gears</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -165,6 +165,7 @@
     <ClInclude Include="..\Gears\Input\WheelDirectInput.hpp" />
     <ClInclude Include="..\Gears\Input\XInputController.hpp" />
     <ClInclude Include="..\Gears\ScriptSettings.hpp" />
+    <ClInclude Include="..\Gears\SettingsCommon.h" />
     <ClInclude Include="..\Gears\Util\GUID.h" />
     <ClInclude Include="..\Gears\Util\Logger.hpp" />
     <ClInclude Include="..\Gears\Util\Paths.h" />
@@ -181,6 +182,7 @@
     <ClCompile Include="..\Gears\Input\WheelDirectInput.cpp" />
     <ClCompile Include="..\Gears\Input\XInputController.cpp" />
     <ClCompile Include="..\Gears\ScriptSettings.cpp" />
+    <ClCompile Include="..\Gears\SettingsCommon.cpp" />
     <ClCompile Include="..\Gears\Util\GUID.cpp" />
     <ClCompile Include="..\Gears\Util\Logger.cpp" />
     <ClCompile Include="..\Gears\Util\Paths.cpp" />
