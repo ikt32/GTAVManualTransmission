@@ -56,10 +56,10 @@ int MT_GetShiftIndicator() {
     float engineLoad = g_controls.ThrottleVal - map(g_vehData.mRPM, 0.2f, 1.0f, 0.0f, 1.0f);
     bool shiftUpLoad = g_gearStates.LockGear < g_vehData.mGearTop && 
         engineLoad < g_settings().AutoParams.UpshiftLoad && 
-        g_vehData.mWheelAverageDrivenTyreSpeed > nextGearMinSpeed;
+        g_vehData.mDiffSpeed > nextGearMinSpeed;
 
     float currGearMinSpeed = g_settings().AutoParams.CurrGearMinRPM * g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.LockGear];
-    bool shiftDownLoad = engineLoad > g_settings().AutoParams.DownshiftLoad || g_vehData.mWheelAverageDrivenTyreSpeed < currGearMinSpeed;
+    bool shiftDownLoad = engineLoad > g_settings().AutoParams.DownshiftLoad || g_vehData.mDiffSpeed < currGearMinSpeed;
 
     if (g_gearStates.HitRPMSpeedLimiter || g_gearStates.HitRPMLimiter || shiftUpLoad) {
         return 1;

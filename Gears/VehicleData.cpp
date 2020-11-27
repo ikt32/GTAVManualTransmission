@@ -36,7 +36,9 @@ VehicleData::VehicleData()
     , mSteeringInput(0), mSteeringAngle(0), mSteeringMult(0)
     , mGearCurr(0), mGearNext(0), mGearTop(0)
     , mDriveMaxFlatVel(0), mInitialDriveMaxFlatVel(0)
-    , mWheelCount(0), mWheelAverageDrivenTyreSpeed(0)
+    , mWheelCount(0), mDiffSpeed(0)
+    , mNonLockSpeed(0), mLastNonLockSpeed(0)
+    , mEstimatedSpeed(0), mLastEstimatedSpeed(0), mEstimatedSpeedUsed(false)
     , mHasSpeedo(false)
     , mHandlingFlags(0), mModelFlags(0)
     , mIsElectric(false), mIsCVT(false), mHasClutch(false)
@@ -134,10 +136,12 @@ void VehicleData::Update() {
 
     // These depend on values retrieved in the current tick
     mWheelsDriven = getDrivenWheels();
-    mWheelAverageDrivenTyreSpeed = getAverageDrivenWheelTyreSpeeds();
+    mDiffSpeed = getAverageDrivenWheelTyreSpeeds();
     mWheelsLockedUp = getWheelsLockedUp();
+    mNonLockSpeed = getAverageNonLockedWheelTyreSpeeds();
     mSuspensionTravelSpeeds = getSuspensionTravelSpeeds();
     mAcceleration = getAcceleration();
+    mEstimatedSpeed = getEstimatedForwardSpeed();
 
     mSuspensionTravelSpeedsHistory.push_back(mSuspensionTravelSpeeds);
     while (mSuspensionTravelSpeedsHistory.size() > g_settings.Wheel.FFB.DetailMAW) {
@@ -168,16 +172,88 @@ std::vector<bool> VehicleData::getDrivenWheels() {
 }
 
 float VehicleData::getAverageDrivenWheelTyreSpeeds() {
-    unsigned drivenWheelCount = 0;
+    float drivenWheelCount = 0.0f;
     float speeds = 0.0f;
 
     for (uint8_t i = 0; i < mWheelTyreSpeeds.size(); ++i) {
         if (mWheelsDriven[i]) {
             speeds += mWheelTyreSpeeds[i];
-            drivenWheelCount++;
+            drivenWheelCount += 1.0f;
         }
     }
-    return speeds / static_cast<float>(drivenWheelCount);
+    return speeds / drivenWheelCount;
+}
+
+float VehicleData::getAverageNonLockedWheelTyreSpeeds() {
+    mLastNonLockSpeed = mNonLockSpeed;
+
+    float nonLockedWheelCount = 0.0f;
+    float speeds = 0.0f;
+
+    auto brakePressures = VExt::GetWheelBrakePressure(mVehicle);
+    float topTyreSpeed = *std::max_element(mWheelTyreSpeeds.begin(), mWheelTyreSpeeds.end());
+
+    for (uint8_t i = 0; i < mWheelTyreSpeeds.size(); ++i) {
+        bool lockedUp = false;
+        if (mWheelsLockedUp[i] && mSuspensionTravel[i] > 0.0f && brakePressures[i] > 0.0f)
+            lockedUp = true;
+
+        if (mWheelTyreSpeeds[i] < abs(topTyreSpeed) / 2.0f)
+            lockedUp = true;
+
+        if (!lockedUp) {
+            speeds += mWheelTyreSpeeds[i];
+            nonLockedWheelCount += 1.0f;
+        }
+    }
+
+    if (nonLockedWheelCount == 0.0f)
+        return avg(mWheelTyreSpeeds);
+
+    return speeds / nonLockedWheelCount;
+}
+
+float VehicleData::getEstimatedForwardSpeed() {
+    float accelNonLock = (mNonLockSpeed - mLastNonLockSpeed) / MISC::GET_FRAME_TIME();
+
+    // Wheels are decelerating faster than the acceleration sensor measured, so wheel speed is probably invalid.
+    if (mAcceleration.y < 0.0f && 
+        accelNonLock < mAcceleration.y && 
+        abs(accelNonLock) > abs(mAcceleration.y) * 4.0f) {
+
+        // If we also entered this during the previous tick, two or more improbable decelerations happened in a row.
+        // Re-estimated the speed and return it.
+        if (mEstimatedSpeedUsed) {
+            float estimatedSpeed = mLastEstimatedSpeed - (mPrevVelocity - mVelocity).y;
+            mLastEstimatedSpeed = estimatedSpeed;
+            return mLastEstimatedSpeed;
+        }
+
+        float estimatedSpeed = mLastNonLockSpeed - (mPrevVelocity - mVelocity).y;
+        mLastEstimatedSpeed = estimatedSpeed;
+
+        // Indicate the estimated speed was used.
+        mEstimatedSpeedUsed = true;
+
+        return estimatedSpeed;
+    }
+
+    // We used the estimated speed the last tick. However the previous check only compared the previous
+    // frame with the current, but not before that - so as a sanity check, check if the non-lock speed is in range
+    // of the speed that we should have been decelerating with.
+    if (mAcceleration.y < 0.0f && mEstimatedSpeedUsed) {
+        float deltaV = (mPrevVelocity - mVelocity).y;
+        float estimatedSpeed = mLastEstimatedSpeed - deltaV;
+
+        if (!Math::Near(mNonLockSpeed, estimatedSpeed, abs(deltaV))) {
+            mLastEstimatedSpeed = estimatedSpeed;
+            return estimatedSpeed;
+        }
+    }
+
+    mEstimatedSpeedUsed = false;
+    mLastEstimatedSpeed = mNonLockSpeed;
+    return mNonLockSpeed;
 }
 
 std::vector<bool> VehicleData::getWheelsLockedUp() {

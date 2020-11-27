@@ -142,3 +142,13 @@ void UI::DrawSphere(Vector3 p, float scale, const Util::ColorI& c) {
                           c.R, c.G, c.B, c.A,
                           false, false, 2, false, nullptr, nullptr, false);
 }
+
+void UI::DrawBar(float x, float y, float width, float height, Util::ColorI fg, Util::ColorI bg, float value) {
+    float bgpaddingx = 0.00f;
+    float bgpaddingy = 0.01f;
+    // background
+    GRAPHICS::DRAW_RECT(x, y, width + bgpaddingx, height + bgpaddingy, bg.R, bg.G, bg.B, bg.A, 0);
+
+    // rpm bar
+    GRAPHICS::DRAW_RECT(x - width * 0.5f + value * width * 0.5f, y, width * value, height, fg.R, fg.G, fg.B, fg.A, 0);
+}

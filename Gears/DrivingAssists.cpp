@@ -125,7 +125,7 @@ DrivingAssists::LSDData DrivingAssists::GetLSD() {
 
     if (g_settings().DriveAssists.LSD.Enable &&
         g_vehData.mWheelCount == 4 &&
-        g_vehData.mWheelAverageDrivenTyreSpeed > 0.0f &&
+        g_vehData.mDiffSpeed > 0.0f &&
         !VExt::GetHandbrake(g_playerVehicle) &&
         !VEHICLE::IS_VEHICLE_IN_BURNOUT(g_playerVehicle)) {
         auto angularVelocities = VExt::GetWheelRotationSpeeds(g_playerVehicle);

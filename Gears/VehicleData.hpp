@@ -134,7 +134,12 @@ public:
     uint8_t mWheelCount;
     std::vector<bool> mWheelsDriven;
     std::vector<float> mWheelTyreSpeeds;
-    float mWheelAverageDrivenTyreSpeed;
+    float mDiffSpeed; // Data: Wheels connected to the engine output.
+    float mNonLockSpeed; // Data: All wheels, except those at 0.0f.
+    float mLastNonLockSpeed;
+    float mEstimatedSpeed; // Data: mNonLockSpeed, but filtered for dips.
+    float mLastEstimatedSpeed;
+    bool mEstimatedSpeedUsed;
 
     std::vector<bool> mWheelsLockedUp;
     std::vector<bool> mWheelsOnGround;
@@ -175,6 +180,8 @@ public:
 private:
     std::vector<bool> getDrivenWheels();
     float getAverageDrivenWheelTyreSpeeds();
+    float getAverageNonLockedWheelTyreSpeeds();
+    float getEstimatedForwardSpeed();
     std::vector<bool> getWheelsLockedUp();
     std::vector<float> getSuspensionTravelSpeeds();
     Vector3 getAcceleration();

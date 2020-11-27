@@ -29,7 +29,7 @@ void AtcuLogic::Cycle() {
 
     int currGear = g_vehData.mGearCurr;
     float currRpm = g_vehData.mRPM;
-    float currSpeed = g_vehData.mWheelAverageDrivenTyreSpeed;
+    float currSpeed = g_vehData.mDiffSpeed;
     float currSpeedWorld = g_vehData.mVelocity.y;
     bool skidding = isSkidding(3.5f);
     float currPowerIntersection = g_gearStates.Atcu.parsePowerIntersectionRpm(currGear);

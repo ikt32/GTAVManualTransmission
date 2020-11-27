@@ -20,7 +20,7 @@ void UDPTelemetry::UpdatePacket(Socket& socket, Vehicle vehicle, const VehicleDa
     packet.Y = worldPos.y;
     packet.Z = worldPos.z;
 
-    packet.Speed = vehData.mWheelAverageDrivenTyreSpeed;
+    packet.Speed = vehData.mDiffSpeed;
     packet.WorldSpeedX = worldSpeed.x;
     packet.WorldSpeedY = worldSpeed.y;
     packet.WorldSpeedZ = worldSpeed.z;

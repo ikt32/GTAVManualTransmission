@@ -389,7 +389,7 @@ std::string formatSpeedo(std::string units, float speed, bool showUnit, int hudF
 }
 
 void drawSpeedoMeter() {
-    float dashms = g_vehData.mHasSpeedo ? VExt::GetDashSpeed(g_playerVehicle) : abs(ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true).y);
+    float dashms = g_vehData.mHasSpeedo ? VExt::GetDashSpeed(g_playerVehicle) : abs(g_vehData.mDiffSpeed);
     const Util::ColorI color {
         g_settings.HUD.Speedo.ColorR,
         g_settings.HUD.Speedo.ColorG,

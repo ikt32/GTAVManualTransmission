@@ -3,6 +3,7 @@
 #include "Compatibility.h"
 #include "ScriptSettings.hpp"
 #include "DrivingAssists.h"
+#include "VehicleData.hpp"
 
 #include "Util/MathExt.h"
 #include "Util/Strings.hpp"
@@ -20,6 +21,7 @@
 
 extern Vehicle g_playerVehicle;
 extern ScriptSettings g_settings;
+extern VehicleData g_vehData;
 
 using VExt = VehicleExtensions;
 namespace HR = HandlingReplacement;
@@ -216,7 +218,7 @@ STransferInfo GetOversteerTransfer(float driveBiasF, float biasMax, DrivingAssis
 
     float oversteerDeg = rad2deg(espData.OversteerAngle);
     if (abs(oversteerDeg) > g_settings().DriveAssists.AWD.OversteerMin &&
-        ENTITY::GET_ENTITY_SPEED(g_playerVehicle) > 1.0f) {
+        g_vehData.mDiffSpeed > 1.0f) {
         float throttle = VExt::GetThrottle(g_playerVehicle);
         float osMin = g_settings().DriveAssists.AWD.OversteerMin;
         float osMax = g_settings().DriveAssists.AWD.OversteerMax;

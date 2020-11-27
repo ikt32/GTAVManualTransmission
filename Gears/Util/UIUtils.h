@@ -28,4 +28,6 @@ namespace UI {
         const Util::ColorI& backgroundColor = Util::ColorsI::TransparentGray);
 
     void DrawSphere(Vector3 p, float scale, const Util::ColorI& c);
+
+    void DrawBar(float x, float y, float width, float height, Util::ColorI fg, Util::ColorI bg, float value);
 }
