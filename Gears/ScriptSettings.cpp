@@ -848,10 +848,10 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 
     // [HPATTERN_<gear>]
     for (uint8_t i = 1; i < 11; ++i) {
-        const char* iniStr = fmt::format("HPATTERN_{}", i).c_str();
-        const char* menuStr = fmt::format("H-pattern {}", i).c_str();
+        std::string iniStr = fmt::format("HPATTERN_{}", i);
+        std::string menuStr = fmt::format("H-pattern {}", i);
         scriptControl->WheelButton[i] =
-            parseWheelItem<int>(ini, iniStr, -1, menuStr);
+            parseWheelItem<int>(ini, iniStr.c_str(), -1, menuStr.c_str());
     }
 
     // [THROTTLE_BUTTON]
