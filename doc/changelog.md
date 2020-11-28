@@ -3,10 +3,12 @@
 ## 5.1.0
 
 * Add an option to hide the steering wheel in FPV
+* Improve Automatic Transmission during braking with locking up
 * Cut throttle during NPC upshifts
 * Fix Dock Handler lift unusable when using Custom Steering
 * Fix keyboard ESP/TCS/ABS toggles not working
 * Fix steering reduction for two-wheelers
+* Fix menu crash when invalid speedometer format used
 * Remove NPC raycast find method
 * Add global FPV cam disable option in debug
 * Remove RealVR detection
