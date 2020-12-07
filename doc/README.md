@@ -136,8 +136,11 @@ checked to work with MT v5.0.0 and FiveM using the 1604 version of the game.
 No plans exist to port this into FiveM or "convert" it to server-script, but
 if you have solid plans to do so, feel free to contact me if you have questions.
 
-A FiveM "resource" which seems to work well, was made some time ago,
+A FiveM resource research project seems to work well,
 [so check that out instead.](https://forum.cfx.re/t/discussion-research-manual-transmission-resource/146444)
+
+[LegacyFuel](https://forum.cfx.re/t/prerelease-trew-hud-ui-legacyfuel-advanced-fuel-usage-efficiency-displays-advanced-cruise-control/1433922)
+implements the code discussed above.
 
 ### Updating
 
