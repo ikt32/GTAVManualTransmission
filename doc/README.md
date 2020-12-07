@@ -70,7 +70,7 @@ Mods that counter the power loss when sliding sideways (Also partially mitigated
   * [Requirements](#requirements)
   * [Installation](#installation)
     * [Wheel setup](#wheel-setup)
-    * [FiveM installation](#fivem-installation)
+    * [FiveM](#fivem)
     * [Updating](#updating)
   * [Default controls](#default-controls)
     * [Keyboard defaults (US-ANSI)](#keyboard-defaults-us-ansi)
@@ -120,7 +120,9 @@ your wheel for GTA V (x360ce, for example).
 3. Set up your analog inputs in `Analog input setup` and set up your analog inputs (throttle, brakes, steering).
 4. Go back to the `Wheel & pedals` menu and go through __all__ options. __Read the description of each option.__
 
-### FiveM installation
+### FiveM
+
+FiveM is not supported. You can try to use it as user plugin, but don't expect any support.
 
 1. Create a `plugins` folder in FiveM Application Data.
 2. Put `Gears.asi` and the folder `ManualTransmission` in `plugins`.
@@ -133,6 +135,9 @@ checked to work with MT v5.0.0 and FiveM using the 1604 version of the game.
 
 No plans exist to port this into FiveM or "convert" it to server-script, but
 if you have solid plans to do so, feel free to contact me if you have questions.
+
+A FiveM "resource" which seems to work well, was made some time ago,
+[so check that out instead.](https://forum.cfx.re/t/discussion-research-manual-transmission-resource/146444)
 
 ### Updating
 
