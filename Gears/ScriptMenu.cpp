@@ -1912,7 +1912,7 @@ void update_cameraoptionsmenu() {
     g_menu.FloatOptionCb("Mouse smoothing", g_settings().Misc.Camera.MouseLookTime, 0.0f, 0.5f, 0.000001f, getKbEntry,
         { "How smooth the camera moves.", "Press enter to enter a value manually. Range: 0.0 to 0.5." });
 
-    g_menu.IntOption("Mouse center timeout", g_settings().Misc.Camera.MouseCenterTimeout, 0, 2000, 25,
+    g_menu.IntOption("Mouse center timeout", g_settings().Misc.Camera.MouseCenterTimeout, 0, 120000, 500,
         { "Milliseconds before centering the camera after looking with the mouse." });
 }
 
