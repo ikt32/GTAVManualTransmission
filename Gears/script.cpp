@@ -1271,8 +1271,10 @@ void functionAShift() {
         AtcuLogic::Cycle();
     }
     else {
-        float currSpeed = g_vehData.mEstimatedSpeed;
-        bool skidding = isSkidding(3.5f);
+        float currSpeed = g_vehData.mVelocity.y;
+        bool skidding = isSkidding(2.4f);
+
+        //UI::ShowText(0.5f, 0.20f, 0.5f, fmt::format("We are {}skidding", skidding ? "" : "not "));
 
         float nextGearMinSpeed = 0.0f; // don't care about top gear
         if (currGear < g_vehData.mGearTop) {
@@ -1770,7 +1772,7 @@ void handleRPM() {
     // Update 2017-08-12: We know the gear speeds now, consider patching
     // shiftUp completely?
     if (g_vehData.mGearCurr > 0 &&
-        (g_gearStates.HitRPMSpeedLimiter && g_vehData.mDiffSpeed > 2.0f)) {
+        (g_gearStates.HitRPMSpeedLimiter && abs(g_vehData.mVelocity.y) > 2.0f)) {
         PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
         VExt::SetThrottle(g_playerVehicle, 0.0f);
         VExt::SetThrottleP(g_playerVehicle, 0.0f);
@@ -1855,7 +1857,7 @@ void functionLimiter() {
     float DriveMaxFlatVel = g_vehData.mDriveMaxFlatVel;
     float maxSpeed = DriveMaxFlatVel / ratios[g_vehData.mGearCurr];
 
-    if (g_vehData.mDiffSpeed > maxSpeed && g_vehData.mRPM >= 1.0f) {
+    if (g_vehData.mEstimatedSpeed > maxSpeed && g_vehData.mRPM >= 1.0f) {
         g_gearStates.HitRPMSpeedLimiter = true;
     }
     else {
@@ -1868,13 +1870,15 @@ void functionLimiter() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void functionRealReverse() {
+    float roadSpeed = g_vehData.mVelocity.y;
+
     // Forward gear
     // Desired: Only brake
     if (g_vehData.mGearCurr > 0) {
         // LT behavior when stopped: Just brake
         if (g_controls.BrakeVal > 0.01f && g_controls.ThrottleVal < g_controls.BrakeVal &&
-            g_vehData.mDiffSpeed < 0.5f && g_vehData.mDiffSpeed >= -0.5f) { // < 0.5 so reverse never triggers
-                                                                    //UI::ShowText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Stop");
+            roadSpeed < 0.5f && roadSpeed >= -0.5f) { // < 0.5 so reverse never triggers
+            //UI::ShowText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Stop");
             PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
             VExt::SetThrottleP(g_playerVehicle, 0.1f);
             VExt::SetBrakeP(g_playerVehicle, 1.0f);
@@ -1882,7 +1886,7 @@ void functionRealReverse() {
         }
         // LT behavior when rolling back: Brake
         if (g_controls.BrakeVal > 0.01f && g_controls.ThrottleVal < g_controls.BrakeVal &&
-            g_vehData.mDiffSpeed < -0.5f) {
+            roadSpeed < -0.5f) {
             //UI::ShowText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Rollback");
             VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, true);
             PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleBrake, true);
@@ -1893,7 +1897,7 @@ void functionRealReverse() {
         }
         // RT behavior when rolling back: Burnout
         if (!g_gearStates.FakeNeutral && g_controls.ThrottleVal > 0.5f && !isClutchPressed() &&
-            g_vehData.mDiffSpeed < -1.0f ) {
+            roadSpeed < -1.0f ) {
             //UI::ShowText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Rollback");
             //PAD::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, carControls.ThrottleVal);
             if (g_controls.BrakeVal < 0.1f) {
@@ -1936,7 +1940,7 @@ void functionRealReverse() {
         }
         // LT behavior when reversing
         if (g_controls.BrakeVal > 0.01f &&
-            g_vehData.mDiffSpeed <= -0.5f) {
+            roadSpeed <= -0.5f) {
             throttleAndSomeBrake++;
             //UI::ShowText(0.3, 0.35, 0.5, "functionRealReverse: Brake @ Reverse");
 
@@ -1954,7 +1958,7 @@ void functionRealReverse() {
 
         // LT behavior when forward
         if (g_controls.BrakeVal > 0.01f && g_controls.ThrottleVal <= g_controls.BrakeVal &&
-            g_vehData.mDiffSpeed > 0.1f) {
+            roadSpeed > 0.1f) {
             //UI::ShowText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Rollforwrd");
 
             VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, true);
@@ -1966,7 +1970,7 @@ void functionRealReverse() {
 
         // LT behavior when still
         if (g_controls.BrakeVal > 0.01f && g_controls.ThrottleVal <= g_controls.BrakeVal &&
-            g_vehData.mDiffSpeed > -0.5f && g_vehData.mDiffSpeed <= 0.1f) {
+            roadSpeed > -0.5f && roadSpeed <= 0.1f) {
             //UI::ShowText(0.3, 0.3, 0.5, "functionRealReverse: Brake @ Stopped");
 
             VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, true);
@@ -1977,10 +1981,12 @@ void functionRealReverse() {
 }
 
 void functionAutoReverse() {
+    float roadSpeed = g_vehData.mVelocity.y;
+
     // Go forward
     if (PAD::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) && 
         !PAD::IS_CONTROL_PRESSED(0, ControlVehicleBrake) &&
-        g_vehData.mDiffSpeed > -1.0f &&
+        roadSpeed > -0.5f &&
         g_vehData.mGearCurr == 0) {
         shiftTo(1, false);
     }
@@ -1988,7 +1994,7 @@ void functionAutoReverse() {
     // Reverse
     if (PAD::IS_CONTROL_PRESSED(0, ControlVehicleBrake) && 
         !PAD::IS_CONTROL_PRESSED(0, ControlVehicleAccelerate) &&
-        g_vehData.mDiffSpeed < 1.0f &&
+        roadSpeed < 0.5f &&
         g_vehData.mGearCurr > 0) {
         g_gearStates.FakeNeutral = false;
         shiftTo(0, false);

@@ -656,6 +656,8 @@ void drawVehicleWheelInfo() {
     auto wheelsBrake = VExt::GetWheelBrakePressure(g_playerVehicle);
     auto wheelDims = VExt::GetWheelDimensions(g_playerVehicle);
     auto wheelDfs = VExt::GetWheelDownforces(g_playerVehicle);
+    auto wheelTVLs = VExt::GetWheelTractionVectorLength(g_playerVehicle);
+
     for (int i = 0; i < numWheels; i++) {
         Util::ColorI color = Util::ColorsI::TransparentGray;
         // TCS: Yellow
@@ -682,7 +684,6 @@ void drawVehicleWheelInfo() {
         // The heck were tyre guys thinking mixing metric and imperial units?
         float tyreAr = 100.0f * ((wheelDims[i].TyreRadius - wheelDims[i].RimRadius) / wheelDims[i].TyreWidth);
         float rimSize = 2.0f * wheelDims[i].RimRadius * 39.3701f; // inches
-
         UI::ShowText3D(wheelCoords[i], {
                 fmt::format("[{}] {}Powered", i, VExt::IsWheelPowered(g_playerVehicle, i) ? "~g~" : "~r~"),
                 fmt::format("Speed: \t{:.3f}", wheelsSpeed[i]),
@@ -700,6 +701,7 @@ void drawVehicleWheelInfo() {
                         : g_vehData.mWheelsEspU[i] ? "_U" : ""
                     ),
                 fmt::format("DF: {:.3f}", wheelDfs[i]),
+                fmt::format("TVL: {:.3f}", wheelTVLs[i]),
             },
             color);
         GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
