@@ -34,6 +34,9 @@ void Logger::Write(LogLevel level, const std::string& text) const {
         std::setw(3) << std::setfill('0') << currTimeLog.wMilliseconds << "] " <<
         "[" << levelText(level) << "] " <<
         text << "\n";
+
+    if (logFile.bad())
+        mError = true;
 }
 
 void Logger::Write(LogLevel level, const char *fmt, ...) const {
@@ -45,6 +48,8 @@ void Logger::Write(LogLevel level, const char *fmt, ...) const {
     va_end(args);
     Write(level, std::string(buff));
 }
+
+bool Logger::Error() { return mError; }
 
 std::string Logger::levelText(LogLevel level) const {
     return levelStrings[level];

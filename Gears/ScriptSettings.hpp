@@ -22,6 +22,8 @@ public:
     bool ConfigActive();
     VehicleConfig* BaseConfig();
 
+    bool Error() const;
+
     struct TimerParams {
         std::string Unit;
         float LimA;
@@ -405,4 +407,5 @@ private:
     std::string settingsWheelFile;
     std::string settingsMenuFile;
     VehicleConfig baseConfig;
+    mutable bool mError;
 };

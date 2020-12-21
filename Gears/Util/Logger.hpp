@@ -20,8 +20,10 @@ public:
     void Clear() const;
     void Write(LogLevel level, const std::string& text) const;
     void Write(LogLevel level, const char *fmt, ...) const;
+    bool Error();
 
 private:
+    mutable bool mError;
     std::string file = "";
     std::string levelText(LogLevel level) const;
     LogLevel minLevel = INFO;

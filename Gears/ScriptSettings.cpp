@@ -20,6 +20,7 @@
     if (result < 0) { \
         logger.Write(ERROR, "[Settings] %s Failed to %s, SI_Error [%d]", \
         __FUNCTION__, operation, result); \
+        mError = true; \
     }
 
 #define SAVE_VAL(section, key, option) \
@@ -69,6 +70,10 @@ bool ScriptSettings::ConfigActive() {
 
 VehicleConfig* ScriptSettings::BaseConfig() {
     return &baseConfig;
+}
+
+bool ScriptSettings::Error() const {
+    return mError;
 }
 
 #pragma warning(push)

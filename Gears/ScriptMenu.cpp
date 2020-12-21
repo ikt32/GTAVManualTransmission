@@ -217,6 +217,20 @@ void update_mainmenu() {
     g_menu.Title("Manual Transmission");
     g_menu.Subtitle(fmt::format("~b~{}{}", Constants::DisplayVersion, GIT_DIFF));
 
+    if (g_settings.Error()) {
+        g_menu.Option("Settings load/save error", NativeMenu::solidRed,
+            { "Script failed to read or write the settings file(s).",
+              "This may be caused by the ManualTransmission folder and the files within being marked as read-only.",
+              "Deselect read-only on the folder properties to try and fix it." });
+    }
+
+    if (logger.Error()) {
+        g_menu.Option("Logging error", NativeMenu::solidRed,
+            { "Script failed to write to the log file.",
+              "This may be caused by the ManualTransmission folder and the files within being marked as read-only.",
+              "Deselect read-only on the folder properties to try and fix it." });
+    }
+
     if (MemoryPatcher::Error) {
         g_menu.Option("Patch test error", NativeMenu::solidRed, 
             { "One or more components failed to patch. Mod behavior is uncertain.",
