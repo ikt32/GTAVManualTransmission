@@ -316,7 +316,7 @@ void FPVCam::Update() {
         }
     }
 
-    auto rot = ENTITY::GET_ENTITY_ROTATION(g_playerPed, 0);
+    auto rot = ENTITY::GET_ENTITY_ROTATION(g_playerVehicle, 0);
     float pitchLookComp = -rot.x * 2.0f * abs(camRot.z) / 180.0f;
     float rollLookComp = -rot.y * 2.0f * abs(camRot.z) / 180.0f;
     float rollPitchComp = sin(deg2rad(camRot.z)) * rot.y;
