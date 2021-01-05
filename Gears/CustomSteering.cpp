@@ -261,7 +261,7 @@ void CustomSteering::Update() {
         Vector3 rotAxis{};
         rotAxis.y = 1.0f;
 
-        float corrDesiredHeading = -desiredHeading * (1.0f / limitRadians);
+        float corrDesiredHeading = -VExt::GetSteeringAngle(g_playerVehicle) * (1.0f / limitRadians);
         float rotDeg = g_settings().Steering.CustomSteering.SoftLock / 2.0f * corrDesiredHeading;
         float rotDegRaw = rotDeg;
 

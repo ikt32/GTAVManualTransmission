@@ -594,13 +594,17 @@ void drawDebugInfo() {
 void drawInputWheelInfo() {
     // Steering Wheel
     float rotation = 0.0f;
-    if (g_controls.PrevInput == CarControls::Wheel) 
+    if (g_controls.PrevInput == CarControls::Wheel) {
         rotation = g_settings.Wheel.Steering.AngleMax * (g_controls.SteerVal - 0.5f);
+    }
     else if (g_settings.CustomSteering.Mode > 0 &&
-        g_settings().Steering.CustomSteering.UseCustomLock)
-        rotation = g_settings().Steering.CustomSteering.SoftLock * 0.5f * -VExt::GetSteeringInputAngle(g_playerVehicle);
-    else
+        g_settings().Steering.CustomSteering.UseCustomLock) {
+        float corrDesiredHeading = -VExt::GetSteeringAngle(g_playerVehicle) * (1.0f / VExt::GetMaxSteeringAngle(g_playerVehicle));
+        rotation = g_settings().Steering.CustomSteering.SoftLock / 2.0f * corrDesiredHeading;
+    }
+    else {
         rotation = 90.0f * -VExt::GetSteeringInputAngle(g_playerVehicle);
+    }
 
     drawTexture(g_textureWheelId, 0, -9998, 100,
         g_settings.HUD.Wheel.ImgSize, g_settings.HUD.Wheel.ImgSize,
