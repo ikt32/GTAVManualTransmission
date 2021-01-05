@@ -12,6 +12,8 @@
 * Remove NPC raycast find method
 * Add global FPV cam disable option in debug
 * Remove RealVR detection
+* Increase mouse centering timeout limit to 120 seconds
+* Use steering anim/pic angle data from vehicle
 
 ## 5.0.0
 
