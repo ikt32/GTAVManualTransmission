@@ -1,6 +1,6 @@
 set ProjDir=%1
-copy /b %ProjDir%main.cpp +,,
-copy /b/v/y %ProjDir%GitInfo.h.template %ProjDir%GitInfo.h
+copy /b "%ProjDir%main.cpp" +,,
+copy /b/v/y "%ProjDir%GitInfo.h.template" "%ProjDir%GitInfo.h"
 
 FOR /F "tokens=* USEBACKQ" %%F IN (`git rev-parse --short HEAD`) DO (
   SET GitInfo=%%F

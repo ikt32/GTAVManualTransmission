@@ -1,5 +1,6 @@
 #include "Compatibility.h"
 #include "Util/Logger.hpp"
+#include "Util/Paths.h"
 
 #include <GTAVDashHook/DashHook/DashHook.h>
 
@@ -45,7 +46,8 @@ void setupTrainerV() {
 
 void setupDashHook() {
     logger.Write(INFO, "[Compat] Setting up DashHook");
-    g_DashHookModule = LoadLibrary(L"DashHook.dll");
+    const std::string dashHookPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + "\\DashHook.dll";
+    g_DashHookModule = LoadLibraryA(dashHookPath.c_str());
     if (!g_DashHookModule) {
         logger.Write(INFO, "DashHook.dll not found");
         return;
