@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.1.1
+
+* Fix crash on vehicles without any wheels (boats, trains)
+* Use player vehicle as base camera rotation
+
 ## 5.1.0
 
 * Add an option to hide the steering wheel in FPV
