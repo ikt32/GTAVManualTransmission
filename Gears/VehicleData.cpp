@@ -185,6 +185,9 @@ float VehicleData::getAverageDrivenWheelTyreSpeeds() {
 }
 
 float VehicleData::getAverageNonLockedWheelTyreSpeeds() {
+    if (mWheelCount == 0)
+        return 0.0f;
+
     mLastNonLockSpeed = mNonLockSpeed;
 
     float nonLockedWheelCount = 0.0f;
