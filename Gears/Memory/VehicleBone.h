@@ -23,10 +23,11 @@ struct crBoneData
     char* NamePtr; // 0x38 - 0x3F
     char pad4[0x42 - 0x40]; // 0x40 - 0x41
     uint16_t Index; // 0x42 - 0x43
+    char pad5[0x50 - 0x44]; // 0x44 - 0x49
 
     std::string GetName() const {
         if (NamePtr == nullptr)
-            return "";
+            return "NULL";
         return NamePtr;
     }
 };
@@ -46,7 +47,7 @@ struct crSkeletonData
 
     std::string GetBoneNameForIndex(uint index) const {
         if (index >= NumBones)
-            return "";
+            return "NULL";
 
         return Bones[index].GetName();
     }
