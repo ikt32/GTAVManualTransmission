@@ -11,6 +11,10 @@
 
 namespace fs = std::filesystem;
 
+namespace {
+    bool FiveM = false;
+}
+
 bool strfind(const std::string& strHaystack, const std::string& strNeedle) {
     auto it = std::search(
         strHaystack.begin(), strHaystack.end(),
@@ -94,9 +98,9 @@ SVersion getExeInfo() {
     std::string currExe = Paths::GetRunningExecutablePath();
     logger.Write(INFO, "Running executable: %s", currExe.c_str());
     std::string citizenDir;
-    bool fiveM = isModulePresent("CitizenGame.dll", citizenDir);
+    FiveM = isModulePresent("CitizenGame.dll", citizenDir);
 
-    if (fiveM) {
+    if (FiveM) {
         logger.Write(INFO, "FiveM detected");
         auto FiveMApp = std::string(citizenDir).substr(0, std::string(citizenDir).find_last_of('\\'));
         logger.Write(INFO, "FiveM.app dir: %s", FiveMApp.c_str());
@@ -114,4 +118,8 @@ SVersion getExeInfo() {
         currExe = newestExe;
     }
     return getExeVersion(currExe);
+}
+
+bool FileVersion::IsFiveM() {
+    return FiveM;
 }

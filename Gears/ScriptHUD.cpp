@@ -11,6 +11,7 @@
 #include "LaunchControl.h"
 #include "Memory/VehicleExtensions.hpp"
 
+#include "Util/FileVersion.h"
 #include "Util/MathExt.h"
 #include "Util/UIUtils.h"
 
@@ -606,11 +607,13 @@ void drawInputWheelInfo() {
         rotation = 90.0f * -VExt::GetSteeringInputAngle(g_playerVehicle);
     }
 
+    float rotDiv = FileVersion::IsFiveM() ? 1.0f : 360.0f;
+
     drawTexture(g_textureWheelId, 0, -9998, 100,
         g_settings.HUD.Wheel.ImgSize, g_settings.HUD.Wheel.ImgSize,
         0.5f, 0.5f, // center of texture
         g_settings.HUD.Wheel.ImgXPos, g_settings.HUD.Wheel.ImgYPos,
-        rotation / 360.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
+        rotation / rotDiv, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
 
     // Pedals
     float barWidth = g_settings.HUD.Wheel.PedalXSz / 3.0f;
