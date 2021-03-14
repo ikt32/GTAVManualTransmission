@@ -73,7 +73,7 @@
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>$(DXSDK_DIR)Lib\x64\XInput.lib;$(SolutionDir)thirdparty\ScriptHookV_SDK\lib\ScriptHookV.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)thirdparty\DirectX_SDK_June2010\Lib\x64\XInput.lib;$(SolutionDir)thirdparty\ScriptHookV_SDK\lib\ScriptHookV.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <BuildLog />
     <Bscmake>
