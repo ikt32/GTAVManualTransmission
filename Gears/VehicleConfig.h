@@ -168,6 +168,8 @@ public:
         Tracked<float> CurrGearMinRPM = 0.27f;
         // Lower = keep in low gear longer // eco - 0.33
         Tracked<float> EcoRate = 0.05f;
+        // Timeout mult for not upshifting right after an upshift
+        Tracked<float> UpshiftTimeoutMult = 0.0f;
         // Timeout mult for not downshifting after an upshift
         Tracked<float> DownshiftTimeoutMult = 1.0f;
         // Experimental new tcu

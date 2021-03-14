@@ -151,6 +151,7 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("AUTO_PARAMS", "NextGearMinRPM", AutoParams.NextGearMinRPM);
     LOAD_VAL("AUTO_PARAMS", "CurrGearMinRPM", AutoParams.CurrGearMinRPM);
     LOAD_VAL("AUTO_PARAMS", "EcoRate", AutoParams.EcoRate);
+    LOAD_VAL("AUTO_PARAMS", "UpshiftTimeoutMult", AutoParams.UpshiftTimeoutMult);
     LOAD_VAL("AUTO_PARAMS", "DownshiftTimeoutMult", AutoParams.DownshiftTimeoutMult);
     LOAD_VAL("AUTO_PARAMS", "UsingATCU", AutoParams.UsingATCU);
 
@@ -319,6 +320,7 @@ void VehicleConfig::saveGeneral() {
     SAVE_VAL("AUTO_PARAMS", "NextGearMinRPM", AutoParams.NextGearMinRPM);
     SAVE_VAL("AUTO_PARAMS", "CurrGearMinRPM", AutoParams.CurrGearMinRPM);
     SAVE_VAL("AUTO_PARAMS", "EcoRate", AutoParams.EcoRate);
+    SAVE_VAL("AUTO_PARAMS", "UpshiftTimeoutMult", AutoParams.UpshiftTimeoutMult);
     SAVE_VAL("AUTO_PARAMS", "DownshiftTimeoutMult", AutoParams.DownshiftTimeoutMult);
     SAVE_VAL("AUTO_PARAMS", "UsingATCU", AutoParams.UsingATCU);
 

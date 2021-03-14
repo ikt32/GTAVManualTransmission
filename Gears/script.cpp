@@ -1285,9 +1285,15 @@ void functionAShift() {
         g_gearStates.EngineLoad = engineLoad;
         g_gearStates.UpshiftLoad = g_settings().AutoParams.UpshiftLoad;
 
+
+        float rateUp = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
+        float upshiftDuration = 1.0f / (rateUp * g_settings().ShiftOptions.ClutchRateMult);
+        bool tpPassedUp = MISC::GET_GAME_TIMER() > g_gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings().AutoParams.UpshiftTimeoutMult);
+        bool tpPassedDn = MISC::GET_GAME_TIMER() > g_gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings().AutoParams.DownshiftTimeoutMult);
+
         // Shift up.
         if (currGear < g_vehData.mGearTop) {
-            if (engineLoad < g_settings().AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
+            if (tpPassedUp && engineLoad < g_settings().AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
                 shiftTo(g_vehData.mGearCurr + 1, true);
                 g_gearStates.FakeNeutral = false;
                 g_gearStates.LastUpshiftTime = MISC::GET_GAME_TIMER();
@@ -1302,14 +1308,11 @@ void functionAShift() {
             gearRatioRatio = thisGearRatio;
         }
 
-        float rateUp = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
-        float upshiftDuration = 1.0f / (rateUp * g_settings().ShiftOptions.ClutchRateMult);
-        bool tpPassed = MISC::GET_GAME_TIMER() > g_gearStates.LastUpshiftTime + static_cast<int>(1000.0f * upshiftDuration * g_settings().AutoParams.DownshiftTimeoutMult);
         g_gearStates.DownshiftLoad = g_settings().AutoParams.DownshiftLoad * gearRatioRatio;
 
         // Shift down
         if (currGear > 1) {
-            if (tpPassed && engineLoad > g_settings().AutoParams.DownshiftLoad * gearRatioRatio || currSpeed < currGearMinSpeed) {
+            if (tpPassedDn && engineLoad > g_settings().AutoParams.DownshiftLoad * gearRatioRatio || currSpeed < currGearMinSpeed) {
                 shiftTo(currGear - 1, true);
                 g_gearStates.FakeNeutral = false;
             }
