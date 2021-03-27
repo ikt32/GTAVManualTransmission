@@ -23,7 +23,12 @@ public:
     Patcher(std::string name, PatternInfo& pattern) 
         : Patcher(std::move(name), pattern, false) { }
 
-    virtual ~Patcher() = default;
+    virtual ~Patcher() {
+        if (Patched()) {
+            logger.Write(DEBUG, "Patcher '%s' d'tor cleanup", mName.c_str());
+            Restore();
+        }
+    }
 
     virtual bool Patch() {
         if (mAttempts > mMaxAttempts) {

@@ -38,13 +38,13 @@ Patcher ClutchRevLimPatcher("Gears: Clutch Rev lim", clutchRevLimit, true);
 PatternInfo throttleLift;
 Patcher ThrottleLiftPatcher("Gears: Throttle lift", throttleLift, true);
 
-// When disabled, throttle doesn't decrease.
+// When disabled, drive @ wheel doesn't decrease.
 PatternInfo throttle;
-Patcher ThrottlePatcher("Misc: Throttle", throttle);
+Patcher ThrottlePatcher("Wheel: Throttle", throttle);
 
 // When disabled, brake pressure doesn't decrease.
 PatternInfo brake;
-Patcher BrakePatcher("Misc: Brake", brake);
+Patcher BrakePatcher("Wheel: Brake", brake);
 
 // Disables countersteer/steering assist
 PatternInfo steeringAssist;
@@ -53,6 +53,12 @@ PatcherJmp SteeringAssistPatcher("Steer: Steering assist", steeringAssist, true)
 // Disables user steering input for total script control
 PatternInfo steeringControl;
 Patcher SteeringControlPatcher("Steer: Steering input", steeringControl, true);
+
+// Disables (user?) throttle
+// Probably only want to enable this sporadically,
+// unless the entire input (throttle/brake) system is rewired?
+PatternInfo throttleControl;
+Patcher ThrottleControlPatcher("Throttle: Throttle control", throttleControl);
 
 void SetPatterns(int version) {
     // Valid for 877 to 1290
@@ -82,6 +88,11 @@ void SetPatterns(int version) {
     // Valid for 1604 (FiveM) to 1868+
     throttleLift = PatternInfo("\x44\x89\x77\x50\xf3\x0f\x11\x7d\x4f", "xxxxxxxx?",
         { 0x90, 0x90, 0x90, 0x90 });
+
+    // Valid for 2245+ (untested on others)
+    // movss [rbx+offThrottleP], xmm6
+    throttleControl = PatternInfo("\x0F\x87\xA4\x00\x00\x00" "\xF3\x0F\x11\xB3\xBC\x09\x00\x00", "xx?xxx" "xxx???xx",
+        { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, 6);
 
     if (version >= G_VER_1_0_1365_1_STEAM) {
         shiftUp = PatternInfo("\x66\x89\x0B\x8D\x46\x04\x66\x89\x43\04", "xx?xx?xxx?", 
@@ -118,6 +129,7 @@ bool Test() {
     success &= 0 != BrakePatcher.Test();
     success &= 0 != SteeringAssistPatcher.Test();
     success &= 0 != SteeringControlPatcher.Test();
+    success &= 0 != ThrottleControlPatcher.Test();
     return success;
 }
 
@@ -235,6 +247,14 @@ bool PatchThrottle() {
 
 bool RestoreThrottle() {
     return ThrottlePatcher.Restore();
+}
+
+bool PatchThrottleControl() {
+    return ThrottleControlPatcher.Patch();
+}
+
+bool RestoreThrottleControl() {
+    return ThrottleControlPatcher.Restore();
 }
 }
 

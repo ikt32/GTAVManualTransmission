@@ -441,6 +441,7 @@ float VehicleExtensions::GetThrottle(Vehicle handle) {
     return *reinterpret_cast<float *>(address + throttleOffset);
 }
 
+// Seems to just control the sound.
 void VehicleExtensions::SetThrottle(Vehicle handle, float value) {
     if (throttleOffset == 0) return;
     auto address = GetAddress(handle);

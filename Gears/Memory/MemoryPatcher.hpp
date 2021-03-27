@@ -45,4 +45,5 @@ extern Patcher ThrottlePatcher;
 extern Patcher BrakePatcher;
 extern PatcherJmp SteeringAssistPatcher;
 extern Patcher SteeringControlPatcher;
+extern Patcher ThrottleControlPatcher;
 }
