@@ -1509,58 +1509,71 @@ void update_driveassistmenu() {
     g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.BoolOption("Enable ABS", g_settings().DriveAssists.ABS.Enable,
-        { "Custom script-driven ABS." });
+        { "Custom script-driven anti-lock braking system.",
+          "Prevent wheels from locking up during braking." });
 
-    g_menu.BoolOption("Only enable ABS if not present", g_settings().DriveAssists.ABS.Filter,
-        { "Only enables custom ABS on cars without the ABS flag." });
+    g_menu.MenuOption("ABS settings", "abssettingsmenu",
+        { "Change how the anti-lock braking system works." });
 
     g_menu.BoolOption("Enable TCS", g_settings().DriveAssists.TCS.Enable,
-        { "Script-driven traction control." });
+        { "Script-driven traction control system.",
+          "Prevent traction loss under acceleration." });
 
-    g_menu.StringArray("Traction Control mode", tcsStrings, g_settings().DriveAssists.TCS.Mode,
-        { "On traction loss: ",
-            "Brakes: Apply brake per spinning wheel",
-            "Throttle: Reduce throttle" });
-
-    g_menu.FloatOption("TC Slip min", g_settings().DriveAssists.TCS.SlipMin, 0.0f, 20.0f, 0.1f,
-        { "Wheel slip in m/s where traction control starts to reduce work." });
-
-    g_menu.FloatOption("TC Slip max", g_settings().DriveAssists.TCS.SlipMax, 0.0f, 20.0f, 0.1f,
-        { "Wheel slip in m/s where traction control starts is maximum. Keep this higher than TC Slip min." });
+    g_menu.MenuOption("TCS settings", "tcssettingsmenu",
+        { "Change how and when the traction control system works." });
 
     g_menu.BoolOption("Enable ESC", g_settings().DriveAssists.ESP.Enable,
-        { "Script-driven stability control." });
+        { "Script-driven electronic stability control system.",
+          "Prevent excessive over- and understeer." });
 
     g_menu.MenuOption("ESC settings", "espsettingsmenu", 
         { "Change the behaviour and tolerances of the stability control system." });
 
+    g_menu.BoolOption("Enable Launch control", g_settings().DriveAssists.LaunchControl.Enable,
+        { "Keeps a stable RPM and manages throttle in first gear, for maximum launch performance." });
+
+    g_menu.MenuOption("Launch control settings", "lcssettings",
+        { "Change how and when the launch control works." });
+
     g_menu.BoolOption("Enable LSD", g_settings().DriveAssists.LSD.Enable,
-        { "Simulate a viscous limited slip differential. Credits to any333.",
-          "LSD simulation is overridden when ABS, ESC and TCS kick in."});
+        { "Simulate a viscous limited slip differential.",
+          "Thanks to any333!"});
 
-    g_menu.FloatOption("LSD viscosity", g_settings().DriveAssists.LSD.Viscosity, 0.0f, 100.0f, 1.0f,
-        { "How much the slower wheel tries to match the faster wheel.",
-          "A very high value might speed up the car too much, because this LSD adds power to the slower wheel. "
-          "About 10 is decent and doesn't affect acceleration."});
+    g_menu.MenuOption("LSD settings", "lsdsettingsmenu",
+        { "Change how the limited slip differential works." });
 
-    g_menu.BoolOption("Enable adaptive AWD", g_settings().DriveAssists.AWD.Enable,
-        { "Transfers torque to stabilize the car. See Nissans' ATTESA, Audis' Quattro and similar technologies.",
-          "Only works for AWD cars. Recommended to use only in vehicle-specific configurations!"});
+    g_menu.BoolOption("Enable Adaptive AWD", g_settings().DriveAssists.AWD.Enable,
+        { "Transfers torque to stabilize the car. See Nissans' ATTESA, Audis' Quattro, etc.",
+          "Only works on AWD cars. Recommended to use only in vehicle-specific configurations!"});
 
     g_menu.MenuOption("Adaptive AWD options", "awdsettingsmenu");
+}
 
-    g_menu.BoolOption("Launch control", g_settings().DriveAssists.LaunchControl.Enable,
-        { "Maintains a specific RPM. When enabled, to stage for launch control: "
-          "1: Stop the car and go in first gear. 2: Hold the brakes. 3: Apply throttle. 4: Release brakes to launch!",
-          "While RPM is limiting, the clutch can be released. Launch control manages the clutch during this." });
+void update_abssettingsmenu() {
+    g_menu.Title("ABS settings");
+    g_menu.Subtitle(MenuSubtitleConfig());
 
-    g_menu.FloatOption("Launch control RPM", g_settings().DriveAssists.LaunchControl.RPM, 0.3f, 0.9f, 0.025f);
+    // TODO: Remove
+    g_menu.BoolOption("Only enable ABS when missing", g_settings().DriveAssists.ABS.Filter,
+        { "Only enables custom ABS on cars without ABS."
+          "Keep this enabled unless you know what you're doing." });
+}
 
-    g_menu.FloatOption("LC Slip min", g_settings().DriveAssists.LaunchControl.SlipMin, 0.0f, 20.0f, 0.1f,
-        { "Wheel slip in m/s where launch control starts to reduces throttle." });
+void update_tcssettingsmenu() {
+    g_menu.Title("TCS settings");
+    g_menu.Subtitle(MenuSubtitleConfig());
 
-    g_menu.FloatOption("LC Slip max", g_settings().DriveAssists.LaunchControl.SlipMax, 0.0f, 20.0f, 0.1f,
-        { "Wheel slip in m/s where launch control reduces throttle to 0. Keep this higher than LC Slip min." });
+    g_menu.StringArray("Traction control mode", tcsStrings, g_settings().DriveAssists.TCS.Mode,
+        { "Brakes: Uses the brakes to stop a wheel from losing traction.",
+          "Throttle: Reduce throttle to stop the wheels from losing traction." });
+
+    g_menu.FloatOption("Minimum slip", g_settings().DriveAssists.TCS.SlipMin, 0.0f, 20.0f, 0.1f,
+        { "Wheel slip in m/s where traction control starts to reduce throttle, or apply the brakes." });
+
+    float min = g_settings().DriveAssists.TCS.SlipMin;
+    g_menu.FloatOption("Maximum slip", g_settings().DriveAssists.TCS.SlipMax, min, 20.0f, 0.1f,
+        { "Wheel slip in m/s where traction control stops applying throttle, or brake application is max.",
+          "Has to be higher than 'Minimum slip'." });
 }
 
 void update_espsettingsmenu() {
@@ -1576,6 +1589,7 @@ void update_espsettingsmenu() {
     g_menu.FloatOption("Oversteer max correction", g_settings().DriveAssists.ESP.OverMaxComp, 0.0f, 10.0f, 0.1f,
         { "Max ESC oversteer correction value. Additional braking force for the affected wheel." });
 
+    // TODO: Understeer detection needs looking at.
     g_menu.FloatOption("Understeer starting angle", g_settings().DriveAssists.ESP.UnderMin, 0.0f, 90.0f, 0.1f,
         { "Angle (degrees) where ESC starts correcting for understeer." });
     g_menu.FloatOption("Understeer starting correction", g_settings().DriveAssists.ESP.UnderMinComp, 0.0f, 10.0f, 0.1f,
@@ -1584,6 +1598,43 @@ void update_espsettingsmenu() {
         { "Angle (degrees) where ESC understeer correction is maximized." });
     g_menu.FloatOption("Understeer max correction", g_settings().DriveAssists.ESP.UnderMaxComp, 0.0f, 10.0f, 0.1f,
         { "Max ESC oversteer understeer value. Additional braking force for the affected wheel." });
+}
+
+void update_lcssettingsmenu() {
+    g_menu.Title("Launch control settings");
+    g_menu.Subtitle(MenuSubtitleConfig());
+
+    g_menu.FloatOption("Launch control RPM", g_settings().DriveAssists.LaunchControl.RPM, 0.3f, 0.9f, 0.025f,
+        { "When staged, hold this RPM." });
+
+    g_menu.FloatOption("Minimum slip", g_settings().DriveAssists.LaunchControl.SlipMin, 0.0f, 20.0f, 0.1f,
+        { "Wheel slip in m/s where launch control starts to reduce throttle." });
+
+    float min = g_settings().DriveAssists.LaunchControl.SlipMin;
+    g_menu.FloatOption("Maximum slip", g_settings().DriveAssists.LaunchControl.SlipMax, min, 20.0f, 0.1f,
+        { "Wheel slip in m/s where launch control reduces throttle to 0.",
+          "Has to be higher than 'Minimum slip'." });
+
+    const std::vector<std::string> instructions{
+        "Staging for launch control:",
+        "1: Stop car, select 1st gear",
+        "2: Hold brakes",
+        "3: Apply throttle",
+        "4: Release brake to launch!",
+        "While staged, clutch can be released. Launch control manages the clutch.",
+    };
+
+    g_menu.OptionPlus("Instructions", instructions);
+}
+
+void update_lsdsettingsmenu() {
+    g_menu.Title("LSD settings");
+    g_menu.Subtitle(MenuSubtitleConfig());
+
+    g_menu.FloatOption("LSD viscosity", g_settings().DriveAssists.LSD.Viscosity, 0.0f, 100.0f, 1.0f,
+        { "How much the slower wheel tries to match the faster wheel.",
+          "A very high value might speed up the car too much, because this LSD adds power to the slower wheel. "
+          "About 10 is decent and doesn't affect acceleration." });
 }
 
 std::vector<std::string> GetAWDInfo(Vehicle vehicle) {
@@ -2312,8 +2363,20 @@ void update_menu() {
     /* mainmenu -> driveassistmenu */
     if (g_menu.CurrentMenu("driveassistmenu")) { update_driveassistmenu(); }
 
+    /* mainmenu -> driveassistmenu -> abssettingsmenu */
+    if (g_menu.CurrentMenu("abssettingsmenu")) { update_abssettingsmenu(); }
+
+    /* mainmenu -> driveassistmenu -> tcssettingsmenu */
+    if (g_menu.CurrentMenu("tcssettingsmenu")) { update_tcssettingsmenu(); }
+
     /* mainmenu -> driveassistmenu -> espsettingsmenu */
     if (g_menu.CurrentMenu("espsettingsmenu")) { update_espsettingsmenu(); }
+
+    /* mainmenu -> driveassistmenu -> lcssettings */
+    if (g_menu.CurrentMenu("lcssettings")) { update_lcssettingsmenu(); }
+
+    /* mainmenu -> driveassistmenu -> lsdsettingsmenu */
+    if (g_menu.CurrentMenu("lsdsettingsmenu")) { update_lsdsettingsmenu(); }
 
     /* mainmenu -> driveassistmenu -> awdsettingsmenu */
     if (g_menu.CurrentMenu("awdsettingsmenu")) { update_awdsettingsmenu(); }
