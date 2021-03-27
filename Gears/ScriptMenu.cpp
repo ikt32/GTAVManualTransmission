@@ -1555,7 +1555,7 @@ void update_abssettingsmenu() {
 
     // TODO: Remove
     g_menu.BoolOption("Only enable ABS when missing", g_settings().DriveAssists.ABS.Filter,
-        { "Only enables custom ABS on cars without ABS."
+        { "Only enables custom ABS on cars without ABS.",
           "Keep this enabled unless you know what you're doing." });
 }
 
