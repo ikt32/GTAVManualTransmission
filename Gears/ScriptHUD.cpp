@@ -136,6 +136,9 @@ void drawDashLights() {
             tcsColor = { 0.0f, 0.0f, 0.0f, 1.0f };
         }
     }
+    else if (LaunchControl::GetState() == LaunchControl::ELCState::Controlling) {
+        tcsColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+    }
     else {
         tcsColor.A = 0.0f;
     }
@@ -353,7 +356,8 @@ void drawRPMIndicator() {
     if (LaunchControl::GetState() == LaunchControl::ELCState::Staged) {
         rpmcolor = Util::ColorsI::SolidYellow;
     }
-    else if (LaunchControl::GetState() == LaunchControl::ELCState::Limiting) {
+    else if (LaunchControl::GetState() == LaunchControl::ELCState::Limiting ||
+        LaunchControl::GetState() == LaunchControl::ELCState::Controlling) {
         rpmcolor = Util::ColorsI::SolidOrange;
     }
 

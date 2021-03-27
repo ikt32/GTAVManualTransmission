@@ -4,6 +4,7 @@ namespace LaunchControl {
         Inactive,
         Staged,
         Limiting,
+        Controlling,
     };
 
     void Update(float& clutchVal);
