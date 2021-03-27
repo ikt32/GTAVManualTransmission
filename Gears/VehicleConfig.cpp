@@ -140,7 +140,9 @@ void VehicleConfig::LoadSettings() {
     DriveAssists.AWD.SpecialFlags.Set(ini.GetLongValue("DRIVING_ASSISTS", "AWDSpecialFlags", baseConfig.DriveAssists.AWD.SpecialFlags));
 
     LOAD_VAL("DRIVING_ASSISTS", "LaunchControl", DriveAssists.LaunchControl.Enable);
-    LOAD_VAL("DRIVING_ASSISTS", "LaunchRPM", DriveAssists.LaunchControl.LaunchRPM);
+    LOAD_VAL("DRIVING_ASSISTS", "LaunchControlRPM", DriveAssists.LaunchControl.RPM);
+    LOAD_VAL("DRIVING_ASSISTS", "LaunchControlSlipMin", DriveAssists.LaunchControl.SlipMin);
+    LOAD_VAL("DRIVING_ASSISTS", "LaunchControlSlipMax", DriveAssists.LaunchControl.SlipMax);
 
     // [SHIFT_OPTIONS]
     LOAD_VAL("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
@@ -301,7 +303,9 @@ void VehicleConfig::saveGeneral() {
     }
 
     SAVE_VAL("DRIVING_ASSISTS", "LaunchControl", DriveAssists.LaunchControl.Enable);
-    SAVE_VAL("DRIVING_ASSISTS", "LaunchRPM", DriveAssists.LaunchControl.LaunchRPM);
+    SAVE_VAL("DRIVING_ASSISTS", "LaunchControlRPM", DriveAssists.LaunchControl.RPM);
+    SAVE_VAL("DRIVING_ASSISTS", "LaunchControlSlipMin", DriveAssists.LaunchControl.SlipMin);
+    SAVE_VAL("DRIVING_ASSISTS", "LaunchControlSlipMax", DriveAssists.LaunchControl.SlipMax);
 
     //[STEERING_OVERRIDE]
     SAVE_VAL("STEERING", "CSUseCustomLock", Steering.CustomSteering.UseCustomLock);

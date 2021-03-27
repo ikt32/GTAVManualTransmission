@@ -1598,8 +1598,40 @@ void handleBrakePatch() {
     auto espData = DrivingAssists::GetESP();
     auto lsdData = DrivingAssists::GetLSD();
 
-    if (tcsData.Use && g_settings().DriveAssists.TCS.Mode == 1) {
-        PAD::DISABLE_CONTROL_ACTION(2, eControl::ControlVehicleAccelerate, true);
+    bool tcsThrottle = tcsData.Use && g_settings().DriveAssists.TCS.Mode == 1;
+    bool lcThrottle = g_settings().DriveAssists.LaunchControl.Enable &&
+        LaunchControl::GetState() == LaunchControl::ELCState::Controlling;
+
+    float newThrottle = 0.0f;
+    if (tcsThrottle ||
+        lcThrottle) {
+        float tcsSlipMin = g_settings().DriveAssists.TCS.SlipMin;
+        float tcsSlipMax = g_settings().DriveAssists.TCS.SlipMax;
+
+        float lcSlipMin = g_settings().DriveAssists.LaunchControl.SlipMin;
+        float lcSlipMax = g_settings().DriveAssists.LaunchControl.SlipMax;
+
+        float slipMin;
+        float slipMax;
+
+        // Launch control overrides traction control
+        if (lcThrottle) {
+            slipMin = lcSlipMin;
+            slipMax = lcSlipMax;
+        }
+        else {
+            slipMin = tcsSlipMin;
+            slipMax = tcsSlipMax;
+        }
+        
+        newThrottle = map(tcsData.AverageSlip,
+            slipMin, slipMax,
+            g_controls.ThrottleVal, 0.0f);
+        newThrottle = std::clamp(newThrottle, 0.0f, 1.0f);
+
+        VExt::SetThrottle(g_playerVehicle,  newThrottle);
+        VExt::SetThrottleP(g_playerVehicle, newThrottle);
+
         for (int i = 0; i < g_vehData.mWheelCount; i++) {
             if (tcsData.SlippingWheels[i]) {
                 g_vehData.mWheelsTcs[i] = true;
@@ -1609,6 +1641,19 @@ void handleBrakePatch() {
             }
         }
     }
+
+    // Ew
+    if (g_settings.Debug.DisplayInfo) {
+        UI::ShowText(0.60f, 0.075f, 0.25f, fmt::format("{}TCS~s~ / {}LC",
+            tcsThrottle ? "~g~" : "", lcThrottle ? "~g~" : ""));
+        std::string controlledThrottle = tcsThrottle || lcThrottle ? fmt::format("{:.2f}", newThrottle) : "N/A";
+        UI::ShowText(0.60f, 0.100f, 0.25f, fmt::format("Average slip: {:.2f} m/s", tcsData.AverageSlip));
+        UI::ShowText(0.60f, 0.125f, 0.25f, fmt::format("Throttle: {}", controlledThrottle));
+    }
+
+    bool patchThrottleControl =
+        tcsThrottle ||
+        lcThrottle;
 
     bool patchThrottle =
         g_wheelPatchStates.EngLockActive ||
@@ -1711,6 +1756,17 @@ void handleBrakePatch() {
         for (int i = 0; i < g_vehData.mWheelCount; i++) {
             if (!tcsData.Use)
                 g_vehData.mWheelsTcs[i] = false;
+        }
+    }
+
+    if (patchThrottleControl) {
+        if (!MemoryPatcher::ThrottleControlPatcher.Patched()) {
+            MemoryPatcher::ThrottleControlPatcher.Patch();
+        }
+    }
+    else {
+        if (MemoryPatcher::ThrottleControlPatcher.Patched()) {
+            MemoryPatcher::ThrottleControlPatcher.Restore();
         }
     }
 }

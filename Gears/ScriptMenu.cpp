@@ -1519,11 +1519,14 @@ void update_driveassistmenu() {
 
     g_menu.StringArray("Traction Control mode", tcsStrings, g_settings().DriveAssists.TCS.Mode,
         { "On traction loss: ",
-            "Brakes: Apply brake per wheel",
-            "Throttle: Cut throttle" });
+            "Brakes: Apply brake per spinning wheel",
+            "Throttle: Reduce throttle" });
 
-    g_menu.FloatOption("TC Slip threshold", g_settings().DriveAssists.TCS.SlipMax, 0.0f, 20.0f, 0.1f,
-        { "Speed in m/s an individual wheel may slip before TC kicks in." });
+    g_menu.FloatOption("TC Slip min", g_settings().DriveAssists.TCS.SlipMin, 0.0f, 20.0f, 0.1f,
+        { "Wheel slip in m/s where traction control starts to reduce work." });
+
+    g_menu.FloatOption("TC Slip max", g_settings().DriveAssists.TCS.SlipMax, 0.0f, 20.0f, 0.1f,
+        { "Wheel slip in m/s where traction control starts is maximum. Keep this higher than TC Slip min." });
 
     g_menu.BoolOption("Enable ESC", g_settings().DriveAssists.ESP.Enable,
         { "Script-driven stability control." });
@@ -1551,7 +1554,13 @@ void update_driveassistmenu() {
           "1: Stop the car and go in first gear. 2: Hold the brakes. 3: Apply throttle. 4: Release brakes to launch!",
           "While RPM is limiting, the clutch can be released. Launch control manages the clutch during this." });
 
-    g_menu.FloatOption("Launch control RPM", g_settings().DriveAssists.LaunchControl.LaunchRPM, 0.3f, 0.9f, 0.025f);
+    g_menu.FloatOption("Launch control RPM", g_settings().DriveAssists.LaunchControl.RPM, 0.3f, 0.9f, 0.025f);
+
+    g_menu.FloatOption("LC Slip min", g_settings().DriveAssists.LaunchControl.SlipMin, 0.0f, 20.0f, 0.1f,
+        { "Wheel slip in m/s where launch control starts to reduces throttle." });
+
+    g_menu.FloatOption("LC Slip max", g_settings().DriveAssists.LaunchControl.SlipMax, 0.0f, 20.0f, 0.1f,
+        { "Wheel slip in m/s where launch control reduces throttle to 0. Keep this higher than LC Slip min." });
 }
 
 void update_espsettingsmenu() {

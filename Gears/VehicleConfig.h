@@ -82,7 +82,8 @@ public:
             // 0 Brake, 1 Throttle 
             Tracked<int> Mode = 0;
             // tyre speed threshold, m/s
-            Tracked<float> SlipMax = 2.5f;
+            Tracked<float> SlipMin = 1.0f;
+            Tracked<float> SlipMax = 2.0f;
         } TCS;
 
         struct {
@@ -144,7 +145,10 @@ public:
 
         struct {
             Tracked<bool> Enable = false;
-            Tracked<float> LaunchRPM = 0.625f;
+            Tracked<float> RPM = 0.625f;
+            // tyre speed threshold, m/s
+            Tracked<float> SlipMin = 1.0f;
+            Tracked<float> SlipMax = 2.0f;
         } LaunchControl;
     } DriveAssists;
 
