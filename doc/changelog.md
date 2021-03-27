@@ -1,5 +1,19 @@
 # Changelog
 
+## 5.2.0
+
+* Add timeout for automatic gearbox upshifting
+* Add active throttle control for launch control
+* Add active throttle control for traction control
+* Add Min/Max thresholds for launch and traction control
+* Improve understeer calculations for stability control
+* Improve default settings
+
+Warning, this *will* invalidate the following settings:
+
+* Traction Control, Max Slip -> Is Min/Max now
+* Stability Control, Understeer -> More sensitive
+
 ## 5.1.1
 
 * Fix crash on vehicles without any wheels (boats, trains)
