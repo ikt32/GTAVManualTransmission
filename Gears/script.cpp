@@ -1629,7 +1629,7 @@ void handleBrakePatch() {
             g_controls.ThrottleVal, 0.0f);
         newThrottle = std::clamp(newThrottle, 0.0f, 1.0f);
 
-        VExt::SetThrottle(g_playerVehicle,  newThrottle);
+        VExt::SetThrottle(g_playerVehicle,  1.0f); // throathy audio
         VExt::SetThrottleP(g_playerVehicle, newThrottle);
 
         for (int i = 0; i < g_vehData.mWheelCount; i++) {
@@ -1859,14 +1859,16 @@ void handleRPM() {
         // Don't care about clutch slippage, just handle RPM now
         if (g_gearStates.FakeNeutral) {
             fakeRev(false, 0);
-            VExt::SetThrottle(g_playerVehicle, g_controls.ThrottleVal);
+            VExt::SetThrottle(g_playerVehicle, 1.0f);
+            VExt::SetThrottleP(g_playerVehicle, g_controls.ThrottleVal);
         }
         // When pressing clutch and throttle, handle clutch and RPM
         else if (clutch > 0.4f &&
             g_controls.ThrottleVal > 0.0f &&
             (!g_gearStates.Shifting || clutchInput > 0.4f)) {
             fakeRev(false, 0);
-            VExt::SetThrottle(g_playerVehicle, g_controls.ThrottleVal);
+            VExt::SetThrottle(g_playerVehicle, 1.0f);
+            VExt::SetThrottleP(g_playerVehicle, g_controls.ThrottleVal);
         }
     }
 
