@@ -17,9 +17,6 @@ namespace DrivingAssists {
         // Whether it passed the ESP Understeer threshold
         bool Understeer;
 
-        // Whether it's a valid understeer angle
-        bool UndersteerAngleValid;
-
         // average front wheels slip angle
         float UndersteerAngle; // rad
 

@@ -84,25 +84,25 @@ DrivingAssists::ESPData DrivingAssists::GetESP() {
         speed * cos(rotVel.z), 0,
         0, 0
     };
-    float steerMult = g_settings().Steering.CustomSteering.SteeringMult;
-    if (g_controls.PrevInput == CarControls::InputDevices::Wheel)
-        steerMult = g_settings().Steering.Wheel.SteeringMult;
 
-    float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * steerMult;
+    float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle);
 
     // understeer
     {
         Vector3 vecNextRot = (vecNextSpd + rotRelative) * 0.5f;
-        Vector3 vecNextRotNorm = Normalize(vecNextRot);
-        Vector3 vecFrontNorm{};
-        vecFrontNorm.y = 1.0f;
+        Vector3 vecPredStr{
+            speed * -sin(avgAngle), 0,
+            speed * cos(avgAngle), 0,
+            0, 0
+        };
 
-        float anglePhys = GetAngleBetween(vecFrontNorm, vecNextRotNorm);
-        espData.UndersteerAngle = abs(avgAngle) - abs(anglePhys);
-        espData.UndersteerAngleValid = espData.UndersteerAngle > 0.0f && Length(vecNextRot) > 3.0f;
+        espData.UndersteerAngle = GetAngleBetween(vecNextRot, vecPredStr);
 
-        if (espData.UndersteerAngleValid &&
-            abs(espData.UndersteerAngle) > deg2rad(g_settings().DriveAssists.ESP.UnderMin)) {
+        if (vecNextSpd.y > 5.0f &&
+            sgn(avgAngle) == sgn(espData.UndersteerAngle) &&
+            rad2deg(abs(abs(avgAngle) - abs(espData.UndersteerAngle))) > g_settings().DriveAssists.ESP.UnderMax &&
+            abs(rad2deg(avgAngle)) > g_settings().DriveAssists.ESP.UnderMin &&
+            abs(rad2deg(espData.UndersteerAngle)) > g_settings().DriveAssists.ESP.UnderMin) {
             espData.Understeer = true;
         }
     }

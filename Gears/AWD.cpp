@@ -241,7 +241,7 @@ STransferInfo GetUndersteerTransfer(float driveBiasF, float biasMax, DrivingAssi
     float outBias = driveBiasF;
 
     float understeerDeg = rad2deg(espData.UndersteerAngle);
-    if (espData.UndersteerAngleValid &&
+    if (espData.Understeer &&
         understeerDeg > g_settings().DriveAssists.AWD.UndersteerMin) {
         float throttle = VExt::GetThrottle(g_playerVehicle);
         float usMin = g_settings().DriveAssists.AWD.UndersteerMin;
