@@ -60,14 +60,14 @@ public:
     // [CUSTOM_STEERING]
     struct {
         // 0 Default, 1 Enhanced
-        int Mode = 0;
+        int Mode = 1;
         float CountersteerMult = 1.0f;
         // In Degrees
         float CountersteerLimit = 15.0f;
         float SteeringReduction = 0.9f;
         float Gamma = 1.0f;
-        float CenterTime = 0.000100f;
-        float SteerTime = 0.001000f;
+        float CenterTime = 0.01f;
+        float SteerTime = 0.01f;
         struct {
             bool Enable = true;
             float Sensitivity = 0.5f;
@@ -312,10 +312,10 @@ public:
         // [FORCE_FEEDBACK]
         struct {
             bool Enable = true;
-            int AntiDeadForce = 1600;
-            float SATAmpMult = 1.25f;
+            int AntiDeadForce = 1000;
+            float SATAmpMult = 1.00f;
             int SATMax = 10000;
-            float SATFactor = 0.75f;
+            float SATFactor = 0.80f;
             int DamperMax = 100;
             int DamperMin = 40;
             float DamperMinSpeed = 6.4f; // TargetSpeed in m/s
@@ -323,7 +323,7 @@ public:
             int DetailLim = 5000;
             int DetailMAW = 3;
             float CollisionMult = 2.5f;
-            float Gamma = 0.8f;
+            float Gamma = 0.75f;
             float MaxSpeed = 80.0f;
         } FFB;
 

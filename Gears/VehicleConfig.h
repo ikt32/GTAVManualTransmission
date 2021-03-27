@@ -80,7 +80,7 @@ public:
         struct {
             Tracked<bool> Enable = false;
             // 0 Brake, 1 Throttle 
-            Tracked<int> Mode = 0;
+            Tracked<int> Mode = 1;
             // tyre speed threshold, m/s
             Tracked<float> SlipMin = 1.0f;
             Tracked<float> SlipMax = 2.0f;
@@ -93,7 +93,7 @@ public:
             Tracked<float> OverMax = 15.0f; // deg
 
             Tracked<float> OverMinComp = 0.0f; // brake mult
-            Tracked<float> OverMaxComp = 2.0f; // brake mult
+            Tracked<float> OverMaxComp = 1.0f; // brake mult
 
             Tracked<float> UnderMin = 5.0f; // deg
             Tracked<float> UnderMax = 10.0f; // deg
@@ -105,7 +105,7 @@ public:
 
         struct {
             Tracked<bool> Enable = false;
-            Tracked<float> Viscosity = 1.0f;
+            Tracked<float> Viscosity = 10.0f;
         } LSD;
 
         struct {
@@ -165,7 +165,7 @@ public:
         // Lower = upshift later
         Tracked<float> UpshiftLoad = 0.12f;
         // Higher = downshift later
-        Tracked<float> DownshiftLoad = 0.60f;
+        Tracked<float> DownshiftLoad = 0.50f;
         // Don't upshift until next gears' RPM is over this value.
         Tracked<float> NextGearMinRPM = 0.33f;
         // Downshift when RPM drops below this value.
@@ -173,7 +173,7 @@ public:
         // Lower = keep in low gear longer // eco - 0.33
         Tracked<float> EcoRate = 0.05f;
         // Timeout mult for not upshifting right after an upshift
-        Tracked<float> UpshiftTimeoutMult = 0.0f;
+        Tracked<float> UpshiftTimeoutMult = 1.0f;
         // Timeout mult for not downshifting after an upshift
         Tracked<float> DownshiftTimeoutMult = 1.0f;
         // Experimental new tcu

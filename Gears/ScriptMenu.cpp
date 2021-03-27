@@ -1915,7 +1915,7 @@ void update_cameraoptionsmenu() {
     }
 
     if (g_menu.BoolOption("Enable custom FPV camera", g_settings().Misc.Camera.Enable,
-        { "Camera mounted to the player head." })) {
+        { "Custom camera for FPV, with acceleration effects and custom mounting points." })) {
         FPVCam::CancelCam();
     }
 
