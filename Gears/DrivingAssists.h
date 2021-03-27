@@ -9,6 +9,7 @@ namespace DrivingAssists {
     struct TCSData {
         bool Use;
         std::vector<bool> SlippingWheels;
+        float AverageSlip;
     };
 
     struct ESPData {

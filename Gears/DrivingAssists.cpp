@@ -40,24 +40,33 @@ DrivingAssists::ABSData DrivingAssists::GetABS() {
 DrivingAssists::TCSData DrivingAssists::GetTCS() {
     std::vector<bool> slipped(g_vehData.mWheelCount);
     bool tractionLoss = false;
-    if (g_settings().DriveAssists.TCS.Enable) {
-        auto pows = VExt::GetWheelPower(g_playerVehicle);
-        for (int i = 0; i < g_vehData.mWheelCount; i++) {
-            if (g_vehData.mWheelTyreSpeeds[i] > g_vehData.mVelocity.y + g_settings().DriveAssists.TCS.SlipMax &&
-                g_vehData.mSuspensionTravel[i] > 0.0f &&
-                g_vehData.mWheelsDriven[i] &&
-                pows[i] > 0.1f) {
-                tractionLoss = true;
-                slipped[i] = true;
-            }
+    float averageLoss = 0.0f;
+    float numLoss = 0.0f;
+
+    auto pows = VExt::GetWheelPower(g_playerVehicle);
+    for (int i = 0; i < g_vehData.mWheelCount; i++) {
+        if (g_vehData.mWheelTyreSpeeds[i] > g_vehData.mVelocity.y + g_settings().DriveAssists.TCS.SlipMax &&
+            g_vehData.mSuspensionTravel[i] > 0.0f &&
+            g_vehData.mWheelsDriven[i] &&
+            pows[i] > 0.1f) {
+            tractionLoss = true;
+            slipped[i] = true;
+            averageLoss += g_vehData.mWheelTyreSpeeds[i] - g_vehData.mVelocity.y;
+            numLoss += 1.0f;
         }
-        if (g_vehData.mHandbrake || VEHICLE::IS_VEHICLE_IN_BURNOUT(g_playerVehicle))
-            tractionLoss = false;
+    }
+    if (g_vehData.mHandbrake || VEHICLE::IS_VEHICLE_IN_BURNOUT(g_playerVehicle))
+        tractionLoss = false;
+
+    if (tractionLoss) {
+        averageLoss /= numLoss;
     }
 
-    if (g_settings().DriveAssists.TCS.Enable && tractionLoss)
-        return { true, slipped };
-    return { false, slipped };
+    return {
+        g_settings().DriveAssists.TCS.Enable && tractionLoss,
+        slipped,
+        averageLoss
+    };
 }
 
 DrivingAssists::ESPData DrivingAssists::GetESP() {
