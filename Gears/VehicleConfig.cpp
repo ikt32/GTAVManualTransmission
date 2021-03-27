@@ -122,23 +122,18 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("DRIVING_ASSISTS", "LSD", DriveAssists.LSD.Enable);
     LOAD_VAL("DRIVING_ASSISTS", "LSDViscosity", DriveAssists.LSD.Viscosity);
 
-    LOAD_VAL("DRIVING_ASSISTS",   "AWD", DriveAssists.AWD.Enable);
     LOAD_VAL("DRIVING_ASSISTS", "AWD", DriveAssists.AWD.Enable);
     LOAD_VAL("DRIVING_ASSISTS", "AWDBiasAtMaxTransfer", DriveAssists.AWD.BiasAtMaxTransfer);
-    LOAD_VAL("DRIVING_ASSISTS",   "AWDUseCustomBaseBias", DriveAssists.AWD.UseCustomBaseBias);
     LOAD_VAL("DRIVING_ASSISTS", "AWDUseCustomBaseBias", DriveAssists.AWD.UseCustomBaseBias);
     LOAD_VAL("DRIVING_ASSISTS", "AWDCustomBaseBias", DriveAssists.AWD.CustomBaseBias);
     LOAD_VAL("DRIVING_ASSISTS", "AWDCustomMin", DriveAssists.AWD.CustomMin);
     LOAD_VAL("DRIVING_ASSISTS", "AWDCustomMax", DriveAssists.AWD.CustomMax);
-    LOAD_VAL("DRIVING_ASSISTS",   "AWDUseTraction", DriveAssists.AWD.UseTraction);
     LOAD_VAL("DRIVING_ASSISTS", "AWDUseTraction", DriveAssists.AWD.UseTraction);
     LOAD_VAL("DRIVING_ASSISTS", "AWDTractionLossMin", DriveAssists.AWD.TractionLossMin);
     LOAD_VAL("DRIVING_ASSISTS", "AWDTractionLossMax", DriveAssists.AWD.TractionLossMax);
-    LOAD_VAL("DRIVING_ASSISTS",   "AWDUseOversteer", DriveAssists.AWD.UseOversteer);
     LOAD_VAL("DRIVING_ASSISTS", "AWDUseOversteer", DriveAssists.AWD.UseOversteer);
     LOAD_VAL("DRIVING_ASSISTS", "AWDOversteerMin", DriveAssists.AWD.OversteerMin);
     LOAD_VAL("DRIVING_ASSISTS", "AWDOversteerMax", DriveAssists.AWD.OversteerMax);
-    LOAD_VAL("DRIVING_ASSISTS",   "AWDUseUndersteer", DriveAssists.AWD.UseUndersteer);
     LOAD_VAL("DRIVING_ASSISTS", "AWDUseUndersteer", DriveAssists.AWD.UseUndersteer);
     LOAD_VAL("DRIVING_ASSISTS", "AWDUndersteerMin", DriveAssists.AWD.UndersteerMin);
     LOAD_VAL("DRIVING_ASSISTS", "AWDUndersteerMax", DriveAssists.AWD.UndersteerMax);
