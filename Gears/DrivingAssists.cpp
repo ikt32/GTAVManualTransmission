@@ -45,12 +45,17 @@ DrivingAssists::TCSData DrivingAssists::GetTCS() {
 
     auto pows = VExt::GetWheelPower(g_playerVehicle);
     for (int i = 0; i < g_vehData.mWheelCount; i++) {
-        if (g_vehData.mWheelTyreSpeeds[i] > g_vehData.mVelocity.y + g_settings().DriveAssists.TCS.SlipMax &&
+        if (g_vehData.mWheelTyreSpeeds[i] > g_vehData.mVelocity.y + g_settings().DriveAssists.TCS.SlipMin &&
             g_vehData.mSuspensionTravel[i] > 0.0f &&
             g_vehData.mWheelsDriven[i] &&
             pows[i] > 0.1f) {
             tractionLoss = true;
             slipped[i] = true;
+        }
+        if (g_vehData.mWheelTyreSpeeds[i] > g_vehData.mVelocity.y + g_settings().DriveAssists.LaunchControl.SlipMin &&
+            g_vehData.mSuspensionTravel[i] > 0.0f &&
+            g_vehData.mWheelsDriven[i] &&
+            pows[i] > 0.1f) {
             averageLoss += g_vehData.mWheelTyreSpeeds[i] - g_vehData.mVelocity.y;
             numLoss += 1.0f;
         }
