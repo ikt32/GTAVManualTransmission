@@ -42,7 +42,7 @@ DrivingAssists::TCSData DrivingAssists::GetTCS() {
     bool tractionLoss = false;
     float averageLoss = 0.0f;
     float numLoss = 0.0f;
-
+    float minLoss = std::min(g_settings().DriveAssists.TCS.SlipMin, g_settings().DriveAssists.LaunchControl.SlipMin);
     auto pows = VExt::GetWheelPower(g_playerVehicle);
     for (int i = 0; i < g_vehData.mWheelCount; i++) {
         if (g_vehData.mWheelTyreSpeeds[i] > g_vehData.mVelocity.y + g_settings().DriveAssists.TCS.SlipMin &&
@@ -52,7 +52,7 @@ DrivingAssists::TCSData DrivingAssists::GetTCS() {
             tractionLoss = true;
             slipped[i] = true;
         }
-        if (g_vehData.mWheelTyreSpeeds[i] > g_vehData.mVelocity.y + g_settings().DriveAssists.LaunchControl.SlipMin &&
+        if (g_vehData.mWheelTyreSpeeds[i] > g_vehData.mVelocity.y + minLoss &&
             g_vehData.mSuspensionTravel[i] > 0.0f &&
             g_vehData.mWheelsDriven[i] &&
             pows[i] > 0.1f) {
@@ -285,12 +285,18 @@ std::vector<float> DrivingAssists::GetTCSBrakes(TCSData tcsData, LSDData lsdData
         };
     }
 
+    float tcsSlipMin = g_settings().DriveAssists.TCS.SlipMin;
+    float tcsSlipMax = g_settings().DriveAssists.TCS.SlipMax;
+
     for (int i = 0; i < g_vehData.mWheelCount; i++) {
         if (tcsData.SlippingWheels[i]) {
-            brakeVals[i] = map(
-                g_vehData.mWheelTyreSpeeds[i],
-                g_vehData.mVelocity.y,
-                g_vehData.mVelocity.y + 2.5f, 0.0f, 0.5f) + lsdVals[i];
+            float mappedVal = map(
+                tcsData.AverageSlip,
+                tcsSlipMin, tcsSlipMax,
+                0.0f, 1.0f);
+            mappedVal = std::clamp(mappedVal, 0.0f, 1.0f);
+
+            brakeVals[i] = mappedVal + lsdVals[i];
             g_vehData.mWheelsTcs[i] = true;
         }
         else {
