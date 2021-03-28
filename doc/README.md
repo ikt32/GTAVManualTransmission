@@ -40,24 +40,39 @@ your wheel and driving style.
 
 ### Recommended mods
 
-* [Realistic Driving V](https://www.gta5-mods.com/vehicles/realistic-driving-v): Improves general car physics. Must-have if you have a force-feedback wheel, since it correctly reduces lateral grip to more realistic levels.
+For gameplay and driving:
+
+* A realistic handling mod
 * [Custom Gear Ratios](https://www.gta5-mods.com/scripts/custom-gear-ratios): Essential if you have cars with more than 6 gears, and allows matching gear ratios with the real car counterparts.
-[Autosport Racing System by Eddlm](https://www.gta5-mods.com/scripts/autosport-racing-system): Complete custom racing system with advanced AI.
 * [Turbo Fix](https://www.gta5-mods.com/scripts/turbo-fix): Fixes spool rates of the turbo upgrade.
 * [Dial Accuracy Fix](https://www.gta5-mods.com/scripts/dial-accuracy-fix): Remap dashboard dials to match your actual speed.
 * [ACSPatch](https://www.gta5-mods.com/scripts/auto-center-steering-patch-temp-fix): Keep wheels turned when exiting cars.
+* [Autosport Racing System by Eddlm](https://www.gta5-mods.com/scripts/autosport-racing-system): Complete custom racing system with advanced AI.
 
 Any speedometer supporting RPM/Gear reading from memory:
 
 * [NFS Speedo](https://www.gta5-mods.com/scripts/nfsgauge-rpm-gear-speedometer)
 * [LeFix Speedometer](https://www.gta5-mods.com/scripts/speedometer-improvedalexbladeversion)
 * [NFSU Speedometer](https://www.gta5-mods.com/scripts/need-for-speed-underground-speedometer)
+* Any ScriptHookVDotNet-based speedometer with gears and RPM
 
 Mods that counter the power loss when sliding sideways (Also partially mitigated by LSD):
 
 * [InversePower](https://www.gta5-mods.com/scripts/inversepower)
 * [Drift Assist](https://www.gta5-mods.com/scripts/drift-assist)
-* [True Realistic Driving V](https://www.gta5-mods.com/scripts/true-realistic-driving-v-realistic-mass-v0-1-beta)
+* [True Realistic Driving V](https://www.gta5-mods.com/scripts/true-realistic-driving-v-realistic-mass-v0-1-beta): Script-based physics
+* [Stop!Powercutting](https://www.gta5-mods.com/scripts/stop-powercutting): InversePower alternative
+* [InverseTorque](https://www.gta5-mods.com/scripts/inversetorque): InversePower alternative
+
+Recommended handling mods
+
+The default grip levels cause the wheel to bounce left and right because they're too grippy.
+These handlings have reduced grip to realistic levels, and are essential for playing with a wheel. Mix and match all you need, as these don't overlap much.
+
+* [Realistic Driving V](https://www.gta5-mods.com/vehicles/realistic-driving-v) by killatomate
+* [Aquaphobic's Realistic Handling Pack](https://www.gta5-mods.com/vehicles/realistic-handling-packs)
+* [Lore Friendly Handling Pack](https://www.gta5-mods.com/vehicles/lore-friendly-handling-pack) by Eddlm
+* [Realish Handling Pack](https://www.gta5-mods.com/vehicles/realish-handling-pack) by Eddlm
 
 ## Table of Contents
 
@@ -84,7 +99,8 @@ Mods that counter the power loss when sliding sideways (Also partially mitigated
     * [Custom camera](#custom-camera)
     * [Animations](#animations)
   * [Troubleshooting](#troubleshooting)
-    * [Compatibility](#compatibility)
+    * [Game compatibility](#game-compatibility)
+    * [Compatibility options](#compatibility-options)
     * [Known issues](#known-issues)
     * [Steering wheel issues](#steering-wheel-issues)
   * [Credits](#credits)
@@ -338,11 +354,18 @@ just stay at the maximum.
 
 Something don't work? Read this first.
 
-### Compatibility
+### Game compatibility
 
 The current version of the mod has been tested with GTA V version v1.0.1604.0
-through v1.0.2060.1. Limited support runs back to v1.0.877.1, but new features
+through v1.0.2245.1. Limited support runs back to v1.0.877.1, but new features
 have been added since.
+
+### Compatibility options
+
+Check the `Developer options` -> `Compatibility settings`.
+
+* For the VR mod [R.E.A.L.](https://github.com/LukeRoss00/gta5-real-mod), check `Disable FPV camera`
+* For wheels recognized as gamepad, check `Disable input detection` and choose wheel input in main menu.
 
 ### Known issues
 
@@ -352,13 +375,10 @@ have been added since.
 * [__ScriptHookVDotNet__](https://github.com/crosire/scripthookvdotnet/releases) crashes the Logitech G920.
   * Workaround: Disable ScriptHookVDotNet.
   * Workaround: Launch the game with RAGEPluginHook. (Found by BULLFAYCE)
-* Steering wheel sticks to full left/full throttle.
-  * Workaround: Re-toggle the script, prevent alt-tabbing while not paused.
+* Thrustmaster TMX seems to have similar issues.
 * Wheel not detected at all when using Steam.
   * Fix: Uncheck `Generic Gamepad Configuration Support` in Steam Big Picture settings, Controller settings. (Found by Kaerali)
-* Menu doesn't open.
-  * Check if the script really is active: Is a Gears.log generated? Are you sure
-  you used the correct menu key or cheat?
+  * Fix: Check your wheel drivers and software (Logitech)
 
 ### Steering wheel issues
 
