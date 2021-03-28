@@ -45,7 +45,6 @@ Animations:
       - LAYOUT_STD_PARAGON
       - LAYOUT_STD_RIPLEY
       - LAYOUT_STD_SLAMVAN4
-      - LAYOUT_STD_STRATUM
       - LAYOUT_STD_STRETCH
       - LAYOUT_STD_TECHNICAL
       - LAYOUT_STD_TECHNICAL3
@@ -124,11 +123,15 @@ Animations:
       - LAYOUT_LOW_VERLIERER
       - LAYOUT_LOW_VIGILANTE
       - LAYOUT_LOW_VISIONE
+      # Manual fix
+      - LAYOUT_STD_STRATUM
       # Add-on vehicles
       - LAYOUT_LOW_CW2019
       - LAYOUT_LOW_RHD
       - LAYOUT_LOW_NSX
       - LAYOUT_LOW_EP3
+      # Wanted188's R32
+      - LAYOUT_STD_F250TR
   - Animation:
     Dictionary: anim@veh@low_racer@front@ds@base
     AnimName: pov_steer
@@ -217,3 +220,16 @@ Animations:
       - LAYOUT_TOURBUS
       - LAYOUT_PRISON_BUS
       - LAYOUT_COACH
+  - Animation:
+    Dictionary: veh@mower@base
+    AnimName: steer_no_lean
+    Rotation: 630.0
+    Layouts:
+      - LAYOUT_MOWER
+  - Animation:
+    Dictionary: veh@forklift@base
+    AnimName: steer_no_lean
+    Rotation: 540.0
+    Layouts:
+      - LAYOUT_FORK_LIFT
+    
