@@ -2153,7 +2153,7 @@ void functionAutoLookback() {
 }
 
 void functionAutoGear1() {
-    if (g_vehData.mThrottle < 0.1f && g_vehData.mDiffSpeed < 0.1f && g_vehData.mGearCurr > 1) {
+    if (g_vehData.mThrottle < 0.1f && ENTITY::GET_ENTITY_SPEED(g_playerVehicle) < 0.1f && g_vehData.mGearCurr > 1) {
         shiftTo(1, false);
     }
 }
@@ -2162,7 +2162,7 @@ void functionHillGravity() {
     // TODO: Needs improvement/proper fix
     if (g_controls.HandbrakeVal < 0.1f && 
         g_controls.BrakeVal < 0.1f &&
-        g_vehData.mDiffSpeed < 2.0f &&
+        ENTITY::GET_ENTITY_SPEED(g_playerVehicle) < 2.0f &&
         VEHICLE::IS_VEHICLE_ON_ALL_WHEELS(g_playerVehicle)) {
         float pitch = ENTITY::GET_ENTITY_PITCH(g_playerVehicle);;
 
