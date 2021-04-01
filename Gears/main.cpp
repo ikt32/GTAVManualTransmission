@@ -95,7 +95,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
         }
         case DLL_PROCESS_DETACH: {
             logger.Write(INFO, "PATCH: Init shutdown");
-            const uint8_t expected = 5;
+            const uint8_t expected = 6;
             uint8_t actual = 0;
 
             if (MemoryPatcher::RevertGearboxPatches()) 
@@ -107,6 +107,8 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             if (MemoryPatcher::RestoreBrake())
                 actual++;
             if (MemoryPatcher::RestoreThrottle())
+                actual++;
+            if (MemoryPatcher::RestoreThrottleControl())
                 actual++;
 
             if (actual == expected) {

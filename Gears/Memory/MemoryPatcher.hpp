@@ -35,6 +35,7 @@ bool RestoreBrake();
 */
 bool PatchThrottle();
 bool RestoreThrottle();
+bool RestoreThrottleControl();
 
 extern bool Error;
 
