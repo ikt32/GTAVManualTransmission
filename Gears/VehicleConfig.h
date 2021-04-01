@@ -150,6 +150,12 @@ public:
             Tracked<float> SlipMin = 1.0f;
             Tracked<float> SlipMax = 2.0f;
         } LaunchControl;
+
+        struct {
+            Tracked<bool> Enable = false;
+            // m/s -> default 130 kph-ish
+            Tracked<float> Speed = 36.0f;
+        } CruiseControl;
     } DriveAssists;
 
     // [SHIFT_OPTIONS]

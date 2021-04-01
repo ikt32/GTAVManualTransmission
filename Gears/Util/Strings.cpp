@@ -59,3 +59,23 @@ std::wstring StrUtil::utf8_decode(const std::string& str) {
     MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
     return wstrTo;
 }
+
+std::string GetSpeedUnitMultiplier(const std::string& unit, float& speedValMul) {
+    std::string speedNameUnit;
+    switch (joaat(unit.c_str())) {
+    case joaat("mph"):
+        speedValMul = 2.23693629205f;
+        speedNameUnit = "mph";
+        break;
+    case joaat("ms"):
+        speedValMul = 1.0f;
+        speedNameUnit = "m/s";
+        break;
+    case joaat("kph"):
+    default:
+        speedValMul = 3.6f;
+        speedNameUnit = "km/h";
+    }
+
+    return speedNameUnit;
+}

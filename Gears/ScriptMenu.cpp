@@ -1547,6 +1547,10 @@ void update_driveassistmenu() {
           "Only works on AWD cars. Recommended to use only in vehicle-specific configurations!"});
 
     g_menu.MenuOption("Adaptive AWD settings", "awdsettingsmenu");
+
+    g_menu.BoolOption("Enable cruise control", g_settings().DriveAssists.CruiseControl.Enable);
+
+    g_menu.MenuOption("Cruise control settings", "cruisecontrolsettingsmenu");
 }
 
 void update_abssettingsmenu() {
@@ -1778,6 +1782,24 @@ void update_awdsettingsmenu() {
     if (g_menu.Option(fmt::format("Special flags (hex): {}", specialFlagsStr), specialFlagsDescr)) {
         std::string newFlags = GetKbEntryStr(specialFlagsStr);
         SetFlags(g_settings().DriveAssists.AWD.SpecialFlags, newFlags);
+    }
+}
+
+void update_cruisecontrolsettingsmenu() {
+    g_menu.Title("Cruise control");
+    g_menu.Subtitle(MenuSubtitleConfig());
+
+    float speedValMul;
+    float speedValRaw = g_settings().DriveAssists.CruiseControl.Speed;
+    std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Speedo, speedValMul);
+    float speedValUnit = speedValRaw * speedValMul;
+
+    if (g_menu.FloatOptionCb(fmt::format("Speed ({})", speedNameUnit), speedValUnit, 0.0f, 500.0f, 5.0f,
+        getKbEntry,
+        { "Speed for cruise control. Speeds higher than vehicle top speed are ignored.",
+          "You can also change this with the hotkeys or wheel buttons." })) {
+
+        g_settings().DriveAssists.CruiseControl.Speed = speedValUnit / speedValMul;
     }
 }
 
@@ -2380,6 +2402,9 @@ void update_menu() {
 
     /* mainmenu -> driveassistmenu -> awdsettingsmenu */
     if (g_menu.CurrentMenu("awdsettingsmenu")) { update_awdsettingsmenu(); }
+
+    /* mainmenu -> driveassistmenu -> cruisecontrolsettingsmenu */
+    if (g_menu.CurrentMenu("cruisecontrolsettingsmenu")) { update_cruisecontrolsettingsmenu(); }
 
     /* mainmenu -> gameassistmenu */
     if (g_menu.CurrentMenu("gameassistmenu")) { update_gameassistmenu(); }

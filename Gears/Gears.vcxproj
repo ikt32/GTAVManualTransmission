@@ -162,6 +162,7 @@
     <ClCompile Include="BlockableControls.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Compatibility.cpp" />
+    <ClCompile Include="CruiseControl.cpp" />
     <ClCompile Include="CustomSteering.cpp" />
     <ClCompile Include="DrivingAssists.cpp" />
     <ClCompile Include="InputConfiguration.cpp" />
@@ -261,6 +262,7 @@
     <ClInclude Include="BlockableControls.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="CruiseControl.h" />
     <ClInclude Include="CustomSteering.h" />
     <ClInclude Include="DrivingAssists.h" />
     <ClInclude Include="InputConfiguration.h" />

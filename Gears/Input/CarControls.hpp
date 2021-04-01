@@ -26,6 +26,7 @@ public:
         Engine,
         CycleAssists,
         ToggleLC,
+        ToggleCC,
         SteerLeft,
         SteerRight,
         SIZEOF
@@ -42,6 +43,7 @@ public:
         Engine,
         CycleAssists,
         ToggleLC,
+        ToggleCC,
         SIZEOF
     };
 
@@ -73,6 +75,9 @@ public:
         DriveBiasFInc,
         DriveBiasFDec,
         ToggleLC,
+        ToggleCC,
+        CCInc,
+        CCDec,
         SIZEOF_KeyboardControlType
     };
 
@@ -120,6 +125,9 @@ public:
         DriveBiasFInc,
         DriveBiasFDec,
         ToggleLC,
+        ToggleCC,
+        CCInc,
+        CCDec,
         UNKNOWN,
         SIZEOF_WheelControlType
     };

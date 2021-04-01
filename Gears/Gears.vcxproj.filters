@@ -255,9 +255,12 @@
     </ClCompile>
     <ClCompile Include="InputConfiguration.cpp" />
     <ClCompile Include="LaunchControl.cpp">
-      <Filter>Features\Launch Control</Filter>
+      <Filter>Features\Assists</Filter>
     </ClCompile>
     <ClCompile Include="SettingsCommon.cpp" />
+    <ClCompile Include="CruiseControl.cpp">
+      <Filter>Features\Assists</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -555,9 +558,12 @@
     </ClInclude>
     <ClInclude Include="InputConfiguration.h" />
     <ClInclude Include="LaunchControl.h">
-      <Filter>Features\Launch Control</Filter>
+      <Filter>Features\Assists</Filter>
     </ClInclude>
     <ClInclude Include="SettingsCommon.h" />
+    <ClInclude Include="CruiseControl.h">
+      <Filter>Features\Assists</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -614,7 +620,7 @@
     <Filter Include="Features\UDP Telemetry">
       <UniqueIdentifier>{84c60810-1f1b-46a9-a810-08f9629ad9a6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Features\Launch Control">
+    <Filter Include="Features\Assists">
       <UniqueIdentifier>{5e2df4c6-f8bf-478a-acb8-d56a2a71eb54}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

@@ -144,6 +144,9 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("DRIVING_ASSISTS", "LaunchControlSlipMin", DriveAssists.LaunchControl.SlipMin);
     LOAD_VAL("DRIVING_ASSISTS", "LaunchControlSlipMax", DriveAssists.LaunchControl.SlipMax);
 
+    LOAD_VAL("DRIVING_ASSISTS", "CruiseControl", DriveAssists.CruiseControl.Enable);
+    LOAD_VAL("DRIVING_ASSISTS", "CruiseControlSpeed", DriveAssists.CruiseControl.Speed);
+
     // [SHIFT_OPTIONS]
     LOAD_VAL("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
     LOAD_VAL("SHIFT_OPTIONS", "DownshiftBlip", ShiftOptions.DownshiftBlip);
@@ -309,6 +312,9 @@ void VehicleConfig::saveGeneral() {
     SAVE_VAL("DRIVING_ASSISTS", "LaunchControlRPM", DriveAssists.LaunchControl.RPM);
     SAVE_VAL("DRIVING_ASSISTS", "LaunchControlSlipMin", DriveAssists.LaunchControl.SlipMin);
     SAVE_VAL("DRIVING_ASSISTS", "LaunchControlSlipMax", DriveAssists.LaunchControl.SlipMax);
+
+    SAVE_VAL("DRIVING_ASSISTS", "CruiseControl", DriveAssists.CruiseControl.Enable);
+    SAVE_VAL("DRIVING_ASSISTS", "CruiseControlSpeed", DriveAssists.CruiseControl.Speed);
 
     //[STEERING_OVERRIDE]
     SAVE_VAL("STEERING", "CSUseCustomLock", Steering.CustomSteering.UseCustomLock);

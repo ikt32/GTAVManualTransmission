@@ -17,6 +17,7 @@
 #include "ScriptHUD.h"
 #include "AWD.h"
 #include "LaunchControl.h"
+#include "CruiseControl.h"
 
 #include "UDPTelemetry/Socket.h"
 #include "UDPTelemetry/UDPTelemetry.h"
@@ -605,6 +606,39 @@ void update_manual_transmission() {
             0.99f);
         g_settings().DriveAssists.AWD.CustomBaseBias = bias;
         UI::Notify(INFO, fmt::format("Drive bias: {:.0f}F/{:.0f}R", bias * 100.0f, (1.0f - bias) * 100.0f), true);
+    }
+
+    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ToggleCC) ||
+        g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleCC) ||
+        g_controls.ButtonHeld(CarControls::ControllerControlType::ToggleCC) ||
+        g_controls.PrevInput == CarControls::Controller && g_controls.ButtonHeld(CarControls::LegacyControlType::ToggleCC)) {
+        bool newValue = !g_settings().DriveAssists.CruiseControl.Enable;
+        g_settings().DriveAssists.CruiseControl.Enable = newValue;
+        UI::Notify(INFO, fmt::format("Cruise control {}", newValue ? "~g~ON" : "~r~OFF"));
+    }
+
+    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::CCInc) ||
+        g_controls.ButtonJustPressed(CarControls::WheelControlType::CCInc)) {
+        float speedValMul;
+        std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Speedo, speedValMul);
+        float speed = g_settings().DriveAssists.CruiseControl.Speed;
+
+        float speedValUnit = speed * speedValMul;
+        speedValUnit = std::clamp(speedValUnit + 5.0f ,0.0f, 500.0f);
+        g_settings().DriveAssists.AWD.CustomBaseBias = speedValUnit / speedValMul;
+        UI::Notify(INFO, fmt::format("Cruise control {:.0f} {}", speedValUnit, speedNameUnit), true);
+    }
+
+    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::CCDec) ||
+        g_controls.ButtonJustPressed(CarControls::WheelControlType::CCDec)) {
+        float speedValMul;
+        std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Speedo, speedValMul);
+        float speed = g_settings().DriveAssists.CruiseControl.Speed;
+
+        float speedValUnit = speed * speedValMul;
+        speedValUnit = std::clamp(speedValUnit - 5.0f, 0.0f, 500.0f);
+        g_settings().DriveAssists.AWD.CustomBaseBias = speedValUnit / speedValMul;
+        UI::Notify(INFO, fmt::format("Cruise control {:.0f} {}", speedValUnit, speedNameUnit), true);
     }
 
     if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ToggleLC) ||
@@ -1652,9 +1686,36 @@ void handleBrakePatch() {
         UI::ShowText(0.60f, 0.125f, 0.25f, fmt::format("Throttle: {}", controlledThrottle));
     }
 
+    if (PAD::IS_CONTROL_JUST_PRESSED(0, eControl::ControlVehicleHorn)) {
+        CruiseControl::SetActive(!CruiseControl::GetActive());
+    }
+
+    bool ccThrottle = false;
+    float throttle = g_controls.ThrottleVal;
+    float brake = g_controls.BrakeVal;
+    float clutch = g_controls.ClutchVal;
+
+
+    CruiseControl::Update(throttle, brake, clutch);
+    if (g_settings().DriveAssists.CruiseControl.Enable &&
+        CruiseControl::GetActive() && !tcsThrottle && !lcThrottle) {
+
+        Controls::SetControlADZ(eControl::ControlVehicleAccelerate, throttle, 0.25f);
+        Controls::SetControlADZ(eControl::ControlVehicleBrake, brake, 0.25f);
+        // g_controls is read later by auto trans, so safe to update here.
+        g_controls.ThrottleVal = throttle;
+        g_controls.BrakeVal = brake;
+        
+        VExt::SetThrottle(g_playerVehicle, 1.0f); // throathy audio
+        VExt::SetThrottleP(g_playerVehicle, throttle);
+        ccThrottle = true;
+
+    }
+
     bool patchThrottleControl =
         tcsThrottle ||
-        lcThrottle;
+        lcThrottle ||
+        ccThrottle;
 
     bool patchThrottle =
         g_wheelPatchStates.EngLockActive ||

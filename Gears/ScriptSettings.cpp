@@ -651,6 +651,7 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     scriptControl->ControlXbox[GET_CT(ToggleH)] = parseControllerItem<std::string>(ini, "ToggleShift", "B", "Change shift mode", "Usage: hold");
     scriptControl->ControlXbox[GET_CT(CycleAssists)] = parseControllerItem<std::string>(ini, "CycleAssists", "UNKNOWN", "Cycle assists", "Usage: hold");
     scriptControl->ControlXbox[GET_CT(ToggleLC)] = parseControllerItem<std::string>(ini, "ToggleLC", "UNKNOWN", "Toggle launch control", "Usage: hold");
+    scriptControl->ControlXbox[GET_CT(ToggleCC)] = parseControllerItem<std::string>(ini, "ToggleCC", "UNKNOWN", "Toggle cruise control", "Usage: hold");
 
     scriptControl->ControlXbox[GET_CT(ShiftUp)]   = parseControllerItem<std::string>(ini, "ShiftUp", "A", "Shift up", "Usage: tap");
     scriptControl->ControlXbox[GET_CT(ShiftDown)] = parseControllerItem<std::string>(ini, "ShiftDown", "X", "Shift down", "Usage: tap");
@@ -673,6 +674,7 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     scriptControl->LegacyControls[GET_LT(ToggleH)]      = parseControllerItem<eControl>(ini, "ToggleShift", ControlFrontendCancel, "Change shift mode", "Usage: hold");
     scriptControl->LegacyControls[GET_LT(CycleAssists)] = parseControllerItem<eControl>(ini, "CycleAssists", static_cast<eControl>(-1), "Cycle assists", "Usage: hold");
     scriptControl->LegacyControls[GET_LT(ToggleLC)]     = parseControllerItem<eControl>(ini, "ToggleLC", static_cast<eControl>(-1), "Toggle launch control", "Usage: hold");
+    scriptControl->LegacyControls[GET_LT(ToggleCC)]     = parseControllerItem<eControl>(ini, "ToggleCC", static_cast<eControl>(-1), "Toggle cruise control", "Usage: hold");
 
     scriptControl->LegacyControls[GET_LT(ShiftUp)]      = parseControllerItem<eControl>(ini, "ShiftUp", ControlFrontendAccept, "Shift up", "Usage: tap");
     scriptControl->LegacyControls[GET_LT(ShiftDown)]    = parseControllerItem<eControl>(ini, "ShiftDown", ControlFrontendX   , "Shift down", "Usage: tap");
@@ -696,6 +698,9 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     scriptControl->KBControl[GET_KT(DriveBiasFInc)] = parseKeyboardItem(ini, "DriveBiasFInc", "UNKNOWN", "Front drive bias +5%");
     scriptControl->KBControl[GET_KT(DriveBiasFDec)] = parseKeyboardItem(ini, "DriveBiasFDec", "UNKNOWN", "Front drive bias -5%");
     scriptControl->KBControl[GET_KT(ToggleLC)] = parseKeyboardItem(ini, "ToggleLC", "UNKNOWN", "Toggle launch control");
+    scriptControl->KBControl[GET_KT(ToggleCC)] = parseKeyboardItem(ini, "ToggleCC", "UNKNOWN", "Toggle cruise control");
+    scriptControl->KBControl[GET_KT(CCInc)] = parseKeyboardItem(ini, "CCInc", "UNKNOWN", "Cruise control +5");
+    scriptControl->KBControl[GET_KT(CCDec)] = parseKeyboardItem(ini, "CCDec", "UNKNOWN", "Cruise control -5");
 
     scriptControl->KBControl[GET_KT(ShiftUp)] = parseKeyboardItem(ini, "ShiftUp", "LSHIFT", "Shift up");
     scriptControl->KBControl[GET_KT(ShiftDown)] = parseKeyboardItem(ini, "ShiftDown", "LCTRL", "Shift down");
@@ -974,6 +979,18 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     // [TOGGLE_LC]
     scriptControl->WheelButton[GET_WT(ToggleLC)] =
         parseWheelItem<int>(ini, "TOGGLE_LC", -1, "Toggle launch control");
+
+    // [TOGGLE_CC]
+    scriptControl->WheelButton[GET_WT(ToggleCC)] = 
+        parseWheelItem<int>(ini, "TOGGLE_CC", -1, "Toggle cruise control");
+
+    // [TOGGLE_CC]
+    scriptControl->WheelButton[GET_WT(CCInc)] =
+        parseWheelItem<int>(ini, "CC_INC", -1, "Cruise control +5");
+
+    // [TOGGLE_CC]
+    scriptControl->WheelButton[GET_WT(CCDec)] =
+        parseWheelItem<int>(ini, "CC_DEC", -1, "Cruise control -5");
 
     // [TO_KEYBOARD]
     scriptControl->WheelToKeyGUID = 
