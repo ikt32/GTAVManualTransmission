@@ -591,6 +591,7 @@ void update_manual_transmission() {
             0.01f,
             customMax);
         g_settings().DriveAssists.AWD.CustomBaseBias = bias;
+        UI::Notify(INFO, fmt::format("Drive bias: {:.0f}F/{:.0f}R", bias * 100.0f, (1.0f - bias) * 100.0f));
     }
 
     if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::DriveBiasFDec) ||
@@ -603,6 +604,7 @@ void update_manual_transmission() {
             customMin,
             0.99f);
         g_settings().DriveAssists.AWD.CustomBaseBias = bias;
+        UI::Notify(INFO, fmt::format("Drive bias: {:.0f}F/{:.0f}R", bias * 100.0f, (1.0f - bias) * 100.0f));
     }
 
     if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ToggleLC) ||
