@@ -552,31 +552,31 @@ void update_manual_transmission() {
 
         switch(currMode) {
             case 3:
-                UI::Notify(INFO, "Assist: Switched to ABS + ESC + TCS");
+                UI::Notify(INFO, "Assists: ABS + ESC + TCS");
                 g_settings().DriveAssists.ABS.Enable = true;
                 g_settings().DriveAssists.ESP.Enable = true;
                 g_settings().DriveAssists.TCS.Enable = true;
                 break;
             case 2:
-                UI::Notify(INFO, "Assist: Switched to ABS + ESC");
+                UI::Notify(INFO, "Assists: ABS + ESC");
                 g_settings().DriveAssists.ABS.Enable = true;
                 g_settings().DriveAssists.ESP.Enable = true;
                 g_settings().DriveAssists.TCS.Enable = false;
                 break;
             case 1:
+                UI::Notify(INFO, "Assists: ABS only");
                 g_settings().DriveAssists.ABS.Enable = true;
                 g_settings().DriveAssists.ESP.Enable = false;
                 g_settings().DriveAssists.TCS.Enable = false;
-                UI::Notify(INFO, "Assist: Switched to ABS only");
                 break;
             case 0:
+                UI::Notify(INFO, "Assists: None");
                 g_settings().DriveAssists.ABS.Enable = false;
                 g_settings().DriveAssists.ESP.Enable = false;
                 g_settings().DriveAssists.TCS.Enable = false;
-                UI::Notify(INFO, "Assist: Switched to no assists");
                 break;
             default:
-                UI::Notify(ERROR, "Assist: Switched to an invalid mode?");
+                UI::Notify(ERROR, "Assists: Switched to an invalid mode?");
                 break;
         }
     }
@@ -611,8 +611,7 @@ void update_manual_transmission() {
         g_controls.PrevInput == CarControls::Controller && g_controls.ButtonHeld(CarControls::LegacyControlType::ToggleLC)) {
         bool newValue = !g_settings().DriveAssists.LaunchControl.Enable;
         g_settings().DriveAssists.LaunchControl.Enable = newValue;
-
-        UI::Notify(INFO, fmt::format("Assist: {}abled launch control", newValue ? "En" : "Dis"));
+        UI::Notify(INFO, fmt::format("Launch control {}", newValue ? "~g~ON" : "~r~OFF"));
     }
 
     if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ToggleABS) ||

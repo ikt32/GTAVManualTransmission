@@ -1546,7 +1546,7 @@ void update_driveassistmenu() {
         { "Transfers torque to stabilize the car. See Nissans' ATTESA, Audis' Quattro, etc.",
           "Only works on AWD cars. Recommended to use only in vehicle-specific configurations!"});
 
-    g_menu.MenuOption("Adaptive AWD options", "awdsettingsmenu");
+    g_menu.MenuOption("Adaptive AWD settings", "awdsettingsmenu");
 }
 
 void update_abssettingsmenu() {
