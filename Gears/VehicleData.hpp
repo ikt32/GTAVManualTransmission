@@ -177,6 +177,10 @@ public:
     VehicleDomain mDomain;
     bool mIsAmphibious;
     bool mIsRhd;
+
+    Hash mModel;
+    Vector3 mDimMax;
+    Vector3 mDimMin;
 private:
     std::vector<bool> getDrivenWheels();
     float getAverageDrivenWheelTyreSpeeds();

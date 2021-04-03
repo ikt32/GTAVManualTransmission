@@ -58,6 +58,9 @@ void VehicleData::SetVehicle(Vehicle v) {
         mHasSpeedo = false;
         mIsRhd = GetIsRhd(v);
 
+        mModel = ENTITY::GET_ENTITY_MODEL(mVehicle);
+        MISC::GET_MODEL_DIMENSIONS(mVehicle, &mDimMin, &mDimMax);
+
         // initialize prev's init state
         mVelocity = ENTITY::GET_ENTITY_SPEED_VECTOR(mVehicle, true);
         mRPM = VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(mVehicle) ?

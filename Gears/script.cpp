@@ -1686,6 +1686,7 @@ void handleBrakePatch() {
         UI::ShowText(0.60f, 0.125f, 0.25f, fmt::format("Throttle: {}", controlledThrottle));
     }
 
+    // TODO: Delete after tests
     if (PAD::IS_CONTROL_JUST_PRESSED(0, eControl::ControlVehicleHorn)) {
         CruiseControl::SetActive(!CruiseControl::GetActive());
     }
@@ -1695,6 +1696,10 @@ void handleBrakePatch() {
     float brake = g_controls.BrakeVal;
     float clutch = g_controls.ClutchVal;
 
+    bool x = g_settings().DriveAssists.CruiseControl.Enable;
+    UI::ShowText(0.60f, 0.150f, 0.25f, fmt::format("CC: {} / {}",
+        x,
+        CruiseControl::GetActive()));
 
     CruiseControl::Update(throttle, brake, clutch);
     if (g_settings().DriveAssists.CruiseControl.Enable &&
@@ -1706,10 +1711,11 @@ void handleBrakePatch() {
         g_controls.ThrottleVal = throttle;
         g_controls.BrakeVal = brake;
         
-        VExt::SetThrottle(g_playerVehicle, 1.0f); // throathy audio
+        VExt::SetThrottle(g_playerVehicle, throttle); // audio
         VExt::SetThrottleP(g_playerVehicle, throttle);
         ccThrottle = true;
 
+        UI::ShowText(0.60f, 0.175f, 0.25f, fmt::format("doing stuff now @ {:.2f}", throttle));
     }
 
     bool patchThrottleControl =

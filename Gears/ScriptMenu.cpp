@@ -1551,6 +1551,10 @@ void update_driveassistmenu() {
     g_menu.BoolOption("Enable cruise control", g_settings().DriveAssists.CruiseControl.Enable);
 
     g_menu.MenuOption("Cruise control settings", "cruisecontrolsettingsmenu");
+
+    g_menu.BoolOption("Enable speed limiter", g_settings().DriveAssists.SpeedLimiter.Enable);
+
+    g_menu.MenuOption("Speed limiter settings", "speedlimitersettingsmenu");
 }
 
 void update_abssettingsmenu() {
@@ -1800,6 +1804,27 @@ void update_cruisecontrolsettingsmenu() {
           "You can also change this with the hotkeys or wheel buttons." })) {
 
         g_settings().DriveAssists.CruiseControl.Speed = speedValUnit / speedValMul;
+    }
+
+    g_menu.BoolOption("Adaptive", g_settings().DriveAssists.CruiseControl.Adaptive,
+        { "Adapts the speed to the car in front, if there is one." });
+}
+
+void update_speedlimitersettingsmenu() {
+    g_menu.Title("Speed limiter");
+    g_menu.Subtitle(MenuSubtitleConfig());
+
+    float speedValMul;
+    float speedValRaw = g_settings().DriveAssists.SpeedLimiter.Speed;
+    std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Speedo, speedValMul);
+    float speedValUnit = speedValRaw * speedValMul;
+
+    if (g_menu.FloatOptionCb(fmt::format("Max speed ({})", speedNameUnit), speedValUnit, 0.0f, 500.0f, 5.0f,
+        getKbEntry,
+        { "Speed for cruise control. Speeds higher than vehicle top speed are ignored.",
+          "You can also change this with the hotkeys or wheel buttons." })) {
+
+        g_settings().DriveAssists.SpeedLimiter.Speed = speedValUnit / speedValMul;
     }
 }
 
@@ -2405,6 +2430,9 @@ void update_menu() {
 
     /* mainmenu -> driveassistmenu -> cruisecontrolsettingsmenu */
     if (g_menu.CurrentMenu("cruisecontrolsettingsmenu")) { update_cruisecontrolsettingsmenu(); }
+
+    /* mainmenu -> driveassistmenu -> speedlimitersettingsmenu */
+    if (g_menu.CurrentMenu("speedlimitersettingsmenu")) { update_speedlimitersettingsmenu(); }
 
     /* mainmenu -> gameassistmenu */
     if (g_menu.CurrentMenu("gameassistmenu")) { update_gameassistmenu(); }
