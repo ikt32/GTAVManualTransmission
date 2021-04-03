@@ -143,6 +143,11 @@ void UI::DrawSphere(Vector3 p, float scale, const Util::ColorI& c) {
                           false, false, 2, false, nullptr, nullptr, false);
 }
 
+void UI::DrawLine(Vector3 a, Vector3 b, const Util::ColorI& c) {
+    GRAPHICS::DRAW_LINE(a.x, a.y, a.z,
+        b.x, b.y, b.z, c.R, c.G, c.B, c.A);
+}
+
 void UI::DrawBar(float x, float y, float width, float height, Util::ColorI fg, Util::ColorI bg, float value) {
     float bgpaddingx = 0.00f;
     float bgpaddingy = 0.01f;

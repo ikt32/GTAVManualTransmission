@@ -327,6 +327,25 @@ void CustomSteering::Update() {
 
         VehicleBones::RotateAxis(g_playerVehicle, boneIdx_l, rotAxisZ, newRotZ + rotation.z);
         VehicleBones::RotateAxis(g_playerVehicle, boneIdx_r, rotAxisZ, newRotZ + rotation.z);
+
+        auto boneCoord_l = ENTITY::_GET_ENTITY_BONE_COORDS(g_playerVehicle, boneIdx_l);
+        auto boneCoord_r = ENTITY::_GET_ENTITY_BONE_COORDS(g_playerVehicle, boneIdx_r);
+
+        UI::DrawSphere(boneCoord_l, 0.05f, Util::ColorsI::SolidRed);
+        UI::DrawSphere(boneCoord_r, 0.05f, Util::ColorsI::SolidCyan);
+
+        auto boneIdx_c = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "light_cover");
+        if (boneIdx_c != -1) {
+
+            auto boneRot_c = ENTITY::_GET_ENTITY_BONE_ROTATION(g_playerVehicle, boneIdx_c);
+
+            auto boneRotO_l = GetOffsetInWorldCoords(boneCoord_l, boneRot_c, ENTITY::GET_ENTITY_FORWARD_VECTOR(g_playerVehicle), { 0, 0, 1, 0, 0, 0 });
+            auto boneRotO_r = GetOffsetInWorldCoords(boneCoord_r, boneRot_c, ENTITY::GET_ENTITY_FORWARD_VECTOR(g_playerVehicle), { 0, 0, 1, 0, 0, 0 });
+
+            UI::DrawLine(boneCoord_l, boneRotO_l, Util::ColorsI::SolidRed);
+            UI::DrawLine(boneCoord_r, boneRotO_r, Util::ColorsI::SolidCyan);
+
+        }
     }
 }
 
