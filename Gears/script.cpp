@@ -1697,9 +1697,9 @@ void handleBrakePatch() {
     float clutch = g_controls.ClutchVal;
 
     bool x = g_settings().DriveAssists.CruiseControl.Enable;
-    UI::ShowText(0.60f, 0.150f, 0.25f, fmt::format("CC: {} / {}",
-        x,
-        CruiseControl::GetActive()));
+    //UI::ShowText(0.60f, 0.150f, 0.25f, fmt::format("CC: {} / {}",
+    //    x,
+    //    CruiseControl::GetActive()));
 
     CruiseControl::Update(throttle, brake, clutch);
     if (g_settings().DriveAssists.CruiseControl.Enable &&
@@ -1715,7 +1715,7 @@ void handleBrakePatch() {
         VExt::SetThrottleP(g_playerVehicle, throttle);
         ccThrottle = true;
 
-        UI::ShowText(0.60f, 0.175f, 0.25f, fmt::format("doing stuff now @ {:.2f}", throttle));
+        UI::ShowText(0.60f, 0.175f, 0.25f, fmt::format("CC Throttle {:.2f}", throttle));
     }
 
     bool patchThrottleControl =

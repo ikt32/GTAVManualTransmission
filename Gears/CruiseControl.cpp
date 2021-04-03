@@ -38,7 +38,6 @@ void CruiseControl::SetActive(bool active) {
 
 SRayResult RayCast(Vehicle vehicle, float range, Vector3 startOffset, Vector3 endOffset) {
     auto rayOrg = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, startOffset.x, startOffset.y, startOffset.z);
-
     auto rayEnd = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, endOffset.x, endOffset.y + range, endOffset.z);
 
     // START_EXPENSIVE_SYNCHRONOUS_SHAPE_TEST_LOS_PROBE or START_SHAPE_TEST_LOS_PROBE
@@ -46,8 +45,8 @@ SRayResult RayCast(Vehicle vehicle, float range, Vector3 startOffset, Vector3 en
         rayOrg.x, rayOrg.y, rayOrg.z,
         rayEnd.x, rayEnd.y, rayEnd.z, 10, vehicle, 7);
 
-    GRAPHICS::DRAW_LINE(rayOrg.x, rayOrg.y, rayOrg.z,
-        rayEnd.x, rayEnd.y, rayEnd.z, 255, 0, 255, 255);
+    //GRAPHICS::DRAW_LINE(rayOrg.x, rayOrg.y, rayOrg.z,
+    //    rayEnd.x, rayEnd.y, rayEnd.z, 255, 0, 255, 255);
 
     BOOL hit = false;
     Vector3 hitCoord, surfaceNormal;
@@ -157,6 +156,10 @@ void CruiseControl::Update(float& throttle, float& brake, float& clutch) {
         float prevThrottle = VExt::GetThrottleP(g_playerVehicle);
         float prevBrake = VExt::GetBrakeP(g_playerVehicle);
 
+        const float maxCastDist = 120.0f;
+        const float minFrontBuff = 5.0f;
+        const float maxFrontBuff = 10.0f;
+
         float brakeThreshold = 6.0f;
         float deltaMax = 12.0f;
 
@@ -164,12 +167,12 @@ void CruiseControl::Update(float& throttle, float& brake, float& clutch) {
         if (g_settings().DriveAssists.CruiseControl.Adaptive) {
             // 120m to 150m detection range
 
-            auto result = MultiCast(g_playerVehicle, 120.0f);
+            auto result = MultiCast(g_playerVehicle, maxCastDist);
             bool hit = result.Hit;
             Vector3 hitCoord = result.HitCoord;
             Entity hitEntity = result.HitEntity;
 
-            UI::ShowText(0.60f, 0.200f, 0.25f, fmt::format("Adaptive, regulating: {}", hit));
+            UI::ShowText(0.60f, 0.200f, 0.25f, fmt::format("Adaptive {}", hit ? "~g~active" : "~y~stand by"));
 
             // Distances need to scale with vehicles' own speed.
             // min: Distance where it should match speed
@@ -182,8 +185,8 @@ void CruiseControl::Update(float& throttle, float& brake, float& clutch) {
             if (hit) {
                 UI::DrawSphere(hitCoord, 0.10f, Util::ColorsI::SolidPink);
 
-                float distMin = std::max(g_vehData.mDimMax.y + 5.0f, g_vehData.mVelocity.y / 2.0f); // 15.0
-                float distMax = std::clamp(distMin + g_vehData.mVelocity.y * 4.0f, distMin, 120.0f); // 60.0
+                float distMin = std::max(g_vehData.mDimMax.y + minFrontBuff, g_vehData.mVelocity.y / 2.0f); // 15.0
+                float distMax = std::clamp(distMin + g_vehData.mVelocity.y * 4.0f, distMin, maxCastDist); // 60.0
 
                 auto vehPos = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
                 float distance = Distance(vehPos, hitCoord);
@@ -203,8 +206,8 @@ void CruiseControl::Update(float& throttle, float& brake, float& clutch) {
                     UI::ShowText(0.60f, 0.250f, 0.25f, fmt::format("{}Dist: {:.1f}, Min: {:.1f}", distance < distMin ? "~g~" : "", distance, distMin));
                     UI::ShowText(0.60f, 0.275f, 0.25f, fmt::format("Spd: {:.1f}, TgtSpd: {:.1f}", otherSpeed, targetSpeed));
 
-                    if (distance < g_vehData.mDimMax.y + 10.0f) {
-                        brakeThreshold = map(distance, g_vehData.mDimMax.y + 5.0f, g_vehData.mDimMax.y + 10.0f, 0.0f, brakeThreshold);
+                    if (distance < g_vehData.mDimMax.y + maxFrontBuff) {
+                        brakeThreshold = map(distance, g_vehData.mDimMax.y + minFrontBuff, g_vehData.mDimMax.y + maxFrontBuff, 0.0f, brakeThreshold);
                         brakeThreshold = std::max(brakeThreshold, 0.01f);
                     }
 
