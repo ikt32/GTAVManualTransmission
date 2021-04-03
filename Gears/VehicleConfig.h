@@ -52,6 +52,11 @@ public:
         Tracked<bool> ClutchCreep = false;
         Tracked<bool> ClutchShiftH = true;
         Tracked<bool> ClutchShiftS = false;
+        struct {
+            Tracked<bool> Enable = false;
+            // m/s -> default 70 kph-ish
+            Tracked<float> Speed = 70.0f;
+        } SpeedLimiter;
     } MTOptions;
 
     // [MT_PARAMS]
@@ -157,12 +162,6 @@ public:
             Tracked<float> Speed = 36.0f;
             Tracked<bool> Adaptive = false;
         } CruiseControl;
-
-        struct {
-            Tracked<bool> Enable = false;
-            // m/s -> default 70 kph-ish
-            Tracked<float> Speed = 70.0f;
-        } SpeedLimiter;
     } DriveAssists;
 
     // [SHIFT_OPTIONS]

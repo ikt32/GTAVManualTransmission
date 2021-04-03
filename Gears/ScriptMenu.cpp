@@ -391,6 +391,11 @@ void update_featuresmenu() {
     g_menu.BoolOption("Hard rev limiter", g_settings.MTOptions.HardLimiter,
         { "Enforce rev limiter for reverse and top speed. No more infinite speed!" });
 
+    g_menu.BoolOption("Enable speed limiter", g_settings().MTOptions.SpeedLimiter.Enable,
+        { "Electronically limit speed." });
+
+    g_menu.MenuOption("Speed limiter settings", "speedlimitersettingsmenu");
+
     g_menu.BoolOption("Clutch shift (H)", g_settings().MTOptions.ClutchShiftH,
         { "Require holding the clutch to shift in H-pattern shift mode. (Vehicle specific)" });
 
@@ -1551,10 +1556,6 @@ void update_driveassistmenu() {
     g_menu.BoolOption("Enable cruise control", g_settings().DriveAssists.CruiseControl.Enable);
 
     g_menu.MenuOption("Cruise control settings", "cruisecontrolsettingsmenu");
-
-    g_menu.BoolOption("Enable speed limiter", g_settings().DriveAssists.SpeedLimiter.Enable);
-
-    g_menu.MenuOption("Speed limiter settings", "speedlimitersettingsmenu");
 }
 
 void update_abssettingsmenu() {
@@ -1815,16 +1816,15 @@ void update_speedlimitersettingsmenu() {
     g_menu.Subtitle(MenuSubtitleConfig());
 
     float speedValMul;
-    float speedValRaw = g_settings().DriveAssists.SpeedLimiter.Speed;
+    float speedValRaw = g_settings().MTOptions.SpeedLimiter.Speed;
     std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Speedo, speedValMul);
     float speedValUnit = speedValRaw * speedValMul;
 
     if (g_menu.FloatOptionCb(fmt::format("Max speed ({})", speedNameUnit), speedValUnit, 0.0f, 500.0f, 5.0f,
         getKbEntry,
-        { "Speed for cruise control. Speeds higher than vehicle top speed are ignored.",
-          "You can also change this with the hotkeys or wheel buttons." })) {
+        { "Electronically limit speed to this." })) {
 
-        g_settings().DriveAssists.SpeedLimiter.Speed = speedValUnit / speedValMul;
+        g_settings().MTOptions.SpeedLimiter.Speed = speedValUnit / speedValMul;
     }
 }
 
