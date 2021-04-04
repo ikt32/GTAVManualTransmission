@@ -88,7 +88,7 @@ void SteeringAnimation::SetAnimationIndex(size_t index) {
     steeringAnimIdx = index;
 }
 
-void SteeringAnimation::SetRotation(float wheelDegrees) {
+void SteeringAnimation::SetRotation(float wheelRadians) {
     // No valid thing found?
     if (steeringAnimIdx >= steeringAnimations.size())
         return;
@@ -96,7 +96,7 @@ void SteeringAnimation::SetRotation(float wheelDegrees) {
     float maxAnimAngle = steeringAnimations[steeringAnimIdx].Rotation;
 
     // div 2 cuz one-way angle
-    float finalSteerVal = mapAnim(wheelDegrees, maxAnimAngle / 2.0f);
+    float finalSteerVal = mapAnim(rad2deg(wheelRadians), maxAnimAngle / 2.0f);
 
     setAngle = finalSteerVal;
 }

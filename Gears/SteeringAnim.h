@@ -15,7 +15,7 @@ namespace SteeringAnimation {
     const std::vector<Animation>& GetAnimations();
     size_t GetAnimationIndex();
     void SetAnimationIndex(size_t index);
-    void SetRotation(float wheelDegrees);
+    void SetRotation(float wheelRadians);
 
     void Update();
     void SetFile(const std::string& cs);

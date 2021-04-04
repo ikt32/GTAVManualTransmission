@@ -262,12 +262,12 @@ void CustomSteering::Update() {
         rotAxis.y = 1.0f;
 
         float corrDesiredHeading = -VExt::GetSteeringAngle(g_playerVehicle) * (1.0f / limitRadians);
-        float rotDeg = g_settings().Steering.CustomSteering.SoftLock / 2.0f * corrDesiredHeading;
-        float rotDegRaw = rotDeg;
+        float rotRad = deg2rad(g_settings().Steering.CustomSteering.SoftLock) / 2.0f * corrDesiredHeading;
+        float rotRadRaw = rotRad;
 
         // Setting angle using the VExt:: calls above causes the angle to overshoot the "real" coords
         // Not sure if this is the best solution, but hey, it works!
-        rotDeg -= 2.0f * rad2deg(corrDesiredHeading * VExt::GetMaxSteeringAngle(g_playerVehicle));
+        rotRad -= 2.0f * (corrDesiredHeading * VExt::GetMaxSteeringAngle(g_playerVehicle));
 
         Vector3 scale { 1.0f, 0, 1.0f, 0, 1.0f, 0 };
         if (g_settings.Misc.HideWheelInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4) {
@@ -276,9 +276,9 @@ void CustomSteering::Update() {
             scale.z = 0.0f;
         }
 
-        VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotDeg);
+        VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotRad);
         VehicleBones::Scale(g_playerVehicle, boneIdx, scale);
-        SteeringAnimation::SetRotation(rotDegRaw);
+        SteeringAnimation::SetRotation(rotRadRaw);
     }
 }
 
