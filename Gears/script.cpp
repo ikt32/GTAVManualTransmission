@@ -437,6 +437,14 @@ void update_misc_features() {
 
     functionHidePlayerInFPV(false);
     functionAudioFX();
+
+    if (g_settings().DriveAssists.ABS.Flash && g_controls.BrakeVal > 0.0f && DashLights::AbsNotify) {
+        // Don't flash the initial 500ms
+        bool delayPassed = MISC::GET_GAME_TIMER() > DashLights::LastAbsTrigger + 500;
+        if (delayPassed) {
+            VEHICLE::SET_VEHICLE_BRAKE_LIGHTS(g_playerVehicle, DashLights::AbsBulbState);
+        }
+    }
 }
 
 // Only when mod is working or writes clutch stuff.
