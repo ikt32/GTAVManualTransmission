@@ -1,14 +1,6 @@
 #pragma once
 #include "ScriptSettings.hpp"
 
-// ScriptHUD
-namespace DashLights {
-    extern int LastAbsTime;
-    extern int LastTcsTime;
-    extern int LastEspTime;
-    extern int LightDuration; // milliseconds
-}
-
 void threadCheckUpdate(unsigned milliseconds);
 
 ///////////////////////////////////////////////////////////////////////////////

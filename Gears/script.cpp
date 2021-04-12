@@ -155,8 +155,7 @@ void functionDash() {
     VehicleDashboardData data{};
     DashHook_GetData(&data);
 
-    bool abs = DashLights::LastAbsTime + DashLights::LightDuration >= MISC::GET_GAME_TIMER();
-    data.ABSLight |= abs;
+    data.ABSLight |= DashLights::AbsBulbState && DashLights::AbsNotify;
 
     if (g_peripherals.IgnitionState == IgnitionState::Stall) {
         // data.indicator_left = true;

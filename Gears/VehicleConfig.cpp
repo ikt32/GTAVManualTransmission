@@ -103,6 +103,7 @@ void VehicleConfig::LoadSettings() {
     // [DRIVING_ASSISTS]
     LOAD_VAL("DRIVING_ASSISTS", "ABS", DriveAssists.ABS.Enable);
     LOAD_VAL("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABS.Filter);
+    LOAD_VAL("DRIVING_ASSISTS", "ABSFlash", DriveAssists.ABS.Flash);
 
     LOAD_VAL("DRIVING_ASSISTS", "TCS", DriveAssists.TCS.Enable);
     LOAD_VAL("DRIVING_ASSISTS", "TCSMode", DriveAssists.TCS.Mode);
@@ -269,6 +270,7 @@ void VehicleConfig::saveGeneral() {
     // [DRIVING_ASSISTS]
     SAVE_VAL("DRIVING_ASSISTS", "ABS", DriveAssists.ABS.Enable);
     SAVE_VAL("DRIVING_ASSISTS", "ABSFilter", DriveAssists.ABS.Filter);
+    SAVE_VAL("DRIVING_ASSISTS", "ABSFlash", DriveAssists.ABS.Flash);
 
     SAVE_VAL("DRIVING_ASSISTS", "TCS", DriveAssists.TCS.Enable);
     SAVE_VAL("DRIVING_ASSISTS", "TCSMode", DriveAssists.TCS.Mode);

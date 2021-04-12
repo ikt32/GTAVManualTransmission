@@ -80,6 +80,7 @@ public:
             Tracked<bool> Enable = false;
             // true: only applied to abs-less vehicles
             Tracked<bool> Filter = true;
+            Tracked<bool> Flash = false;
         } ABS;
 
         struct {

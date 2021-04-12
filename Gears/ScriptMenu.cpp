@@ -1562,10 +1562,13 @@ void update_abssettingsmenu() {
     g_menu.Title("ABS settings");
     g_menu.Subtitle(MenuSubtitleConfig());
 
-    // TODO: Remove
     g_menu.BoolOption("Only enable ABS when missing", g_settings().DriveAssists.ABS.Filter,
         { "Only enables custom ABS on cars without ABS.",
           "Keep this enabled unless you know what you're doing." });
+
+    g_menu.BoolOption("Flash brake lights", g_settings().DriveAssists.ABS.Flash,
+        { "Flash brakes light when ABS is active." });
+
 }
 
 void update_tcssettingsmenu() {

@@ -5,7 +5,6 @@
 
 #include <menu.h>
 
-
 #include "CustomSteering.h"
 #include "DrivingAssists.h"
 #include "LaunchControl.h"
@@ -55,7 +54,16 @@ namespace DashLights {
     int LastAbsTime = 0;
     int LastTcsTime = 0;
     int LastEspTime = 0;
-    int LightDuration = 300; // milliseconds
+
+    int LastAbsTrigger = 0;
+    int LastTcsTrigger = 0;
+    int LastEspTrigger = 0;
+
+    const int LightDuration = 500; // milliseconds
+    const int FlashDuration = 100; // milliseconds
+
+    bool AbsNotify = false;
+    bool AbsBulbState = false;
 }
 
 void updateDashLights() {
@@ -69,6 +77,19 @@ void updateDashLights() {
         abs |= g_vehData.mWheelsAbs[i];
         tcs |= g_vehData.mWheelsTcs[i];
         esp |= g_vehData.mWheelsEspO[i] || g_vehData.mWheelsEspU[i];
+    }
+
+    // Turn on
+    if (DashLights::LastAbsTrigger == 0 && abs) {
+        DashLights::AbsNotify = true;
+        DashLights::LastAbsTrigger = currentTime;
+    }
+    // Turn off
+    if (DashLights::LastAbsTrigger != 0 && !abs &&
+        currentTime > DashLights::LastAbsTime + DashLights::LightDuration) {
+        DashLights::LastAbsTrigger = 0;
+        DashLights::AbsBulbState = false;
+        DashLights::AbsNotify = false;
     }
 
     if (g_peripherals.IgnitionState == IgnitionState::Stall) {
@@ -96,7 +117,10 @@ void updateDashLights() {
 void drawDashLights() {
     const int currentTime = MISC::GET_GAME_TIMER();
 
-    bool abs = DashLights::LastAbsTime + DashLights::LightDuration >= currentTime;
+    int periods = (currentTime - DashLights::LastAbsTrigger) / DashLights::FlashDuration;
+    DashLights::AbsBulbState = DashLights::LastAbsTrigger != 0 && periods % 2;
+    bool abs = DashLights::AbsBulbState;
+
     bool tcs = DashLights::LastTcsTime + DashLights::LightDuration >= currentTime;
     bool esp = DashLights::LastEspTime + DashLights::LightDuration >= currentTime;
     bool brk = VExt::GetHandbrake(g_playerVehicle);
