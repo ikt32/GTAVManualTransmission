@@ -27,8 +27,10 @@
 #include "VehicleConfig.h"
 #include "SteeringAnim.h"
 #include "Camera.h"
-#include "AWD.h"
 #include "BlockableControls.h"
+
+#include "AWD.h"
+#include "DrivingAssists.h"
 
 #include <menu.h>
 #include <inc/main.h>
@@ -1647,6 +1649,39 @@ void update_lsdsettingsmenu() {
         { "How much the slower wheel tries to match the faster wheel.",
           "A very high value might speed up the car too much, because this LSD adds power to the slower wheel. "
           "About 10 is decent and doesn't affect acceleration." });
+
+    bool statusSelected = false;
+    g_menu.OptionPlus("Status", {}, &statusSelected, nullptr, nullptr, "Status", 
+        { "Live LSD status" });
+
+    if (statusSelected) {
+        std::vector<std::string> extra;
+
+        if (!g_settings().DriveAssists.LSD.Enable) {
+            extra.push_back("LSD Disabled");
+        }
+        else {
+            auto lsdData = DrivingAssists::GetLSD();
+            std::string fddcol;
+            if (lsdData.FDD > 0.1f) { fddcol = "~r~"; }
+            if (lsdData.FDD < -0.1f) { fddcol = "~b~"; }
+
+            std::string rddcol;
+            if (lsdData.RDD > 0.1f) { rddcol = "~r~"; }
+            if (lsdData.RDD < -0.1f) { rddcol = "~b~"; }
+
+            extra.push_back(fmt::format("{}Front: L-R: {:.2f}", fddcol, lsdData.FDD));
+            extra.push_back(fmt::format("{}Rear:  L-R: {:.2f}", rddcol, lsdData.RDD));
+
+            extra.push_back(fmt::format("LF/RF [{:.2f}]/[{:.2f}]", lsdData.BrakeLF, lsdData.BrakeRF));
+            extra.push_back(fmt::format("LR/RR [{:.2f}]/[{:.2f}]", lsdData.BrakeLR, lsdData.BrakeRR));
+            extra.push_back(fmt::format("{}LSD: {}",
+                lsdData.Use ? "~g~" : "~r~",
+                lsdData.Use ? "Active" : "Idle/Off"));
+        }
+
+        g_menu.OptionPlusPlus(extra, "Status");
+    }
 }
 
 std::vector<std::string> GetAWDInfo(Vehicle vehicle) {
