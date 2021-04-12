@@ -101,10 +101,6 @@ namespace {
         "Brakes", "Throttle"
     };
 
-    const std::vector<std::string> absStrings = {
-        "Disabled", "On if missing", "Always on"
-    };
-
     const std::vector<std::string> notifyLevelStrings{
         "Debug",
         "Info",
@@ -510,16 +506,6 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
     if (config.Plates.empty())
         plates = "None";
 
-    unsigned absMode = 0;
-    if (config.DriveAssists.ABS.Enable) {
-        if (config.DriveAssists.ABS.Filter) {
-            absMode = 1;
-        }
-        else {
-            absMode = 2;
-        }
-    }
-
     std::string shiftAssist;
     if (config.ShiftOptions.UpshiftCut)
         shiftAssist += "Up";
@@ -530,9 +516,14 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
 
     EShiftMode shiftMode = config.MTOptions.ShiftMode;
     bool clutchCreep = config.MTOptions.ClutchCreep;
-    int tcsMode = config.DriveAssists.TCS.Mode;
+
+    bool absEn = config.DriveAssists.ABS.Enable;
+    bool tcsEn = config.DriveAssists.TCS.Enable;
     bool espEn = config.DriveAssists.ESP.Enable;
+
     bool lsdEn = config.DriveAssists.LSD.Enable;
+    bool lcEn = config.DriveAssists.LaunchControl.Enable;
+    bool ccEn = config.DriveAssists.CruiseControl.Enable;
 
     std::vector<std::string> extras{
         fmt::format("{}", config.Description),
@@ -544,10 +535,14 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
         fmt::format("\tClutch creep: {}", clutchCreep),
         fmt::format("\tSequential assist: {}", shiftAssist),
         "Driving assists:",
-        fmt::format("\tABS: {}", absStrings[absMode]),
-        fmt::format("\tTCS: {}", tcsStrings[tcsMode]),
-        fmt::format("\tESP: {}", espEn ? "Yes" : "No"),
-        fmt::format("\tLSD: {}", lsdEn ? "Yes" : "No"),
+        fmt::format("\t{}ABS {}TCS {}ESP",
+            absEn ? "~g~" : "~r~",
+            tcsEn ? "~g~" : "~r~",
+            espEn ? "~g~" : "~r~"),
+        fmt::format("\t{}LSD {}Launch {}Cruise",
+            lsdEn ? "~g~" : "~r~",
+            lcEn ? "~g~" : "~r~",
+            ccEn ? "~g~" : "~r~"),
         "Steering wheel:",
         fmt::format("\tSoft lock: {:.0f}", config.Steering.Wheel.SoftLock)
     };
