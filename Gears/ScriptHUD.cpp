@@ -52,18 +52,20 @@ namespace GForce {
 
 namespace DashLights {
     int LastAbsTime = 0;
-    int LastTcsTime = 0;
-    int LastEspTime = 0;
-
     int LastAbsTrigger = 0;
-    int LastTcsTrigger = 0;
-    int LastEspTrigger = 0;
-
-    const int LightDuration = 500; // milliseconds
-    const int FlashDuration = 100; // milliseconds
-
     bool AbsNotify = false;
     bool AbsBulbState = false;
+
+    int LastTcsTime = 0;
+    int LastTcsTrigger = 0;
+    bool TcsBulbState = false;
+
+    int LastEspTime = 0;
+    int LastEspTrigger = 0;
+    bool EspBulbState = false;
+
+    const int LightDuration = 300; // milliseconds
+    const int FlashDuration = 100; // milliseconds
 }
 
 void updateDashLights() {
@@ -79,6 +81,7 @@ void updateDashLights() {
         esp |= g_vehData.mWheelsEspO[i] || g_vehData.mWheelsEspU[i];
     }
 
+    // ABS
     // Turn on
     if (DashLights::LastAbsTrigger == 0 && abs) {
         DashLights::AbsNotify = true;
@@ -90,6 +93,28 @@ void updateDashLights() {
         DashLights::LastAbsTrigger = 0;
         DashLights::AbsBulbState = false;
         DashLights::AbsNotify = false;
+    }
+
+    // TSC
+    if (DashLights::LastTcsTrigger == 0 && tcs) {
+        DashLights::LastTcsTrigger = currentTime;
+    }
+    // Turn off
+    if (DashLights::LastTcsTrigger != 0 && !tcs &&
+        currentTime > DashLights::LastTcsTime + DashLights::LightDuration) {
+        DashLights::LastTcsTrigger = 0;
+        DashLights::TcsBulbState = false;
+    }
+
+    // ESP
+    if (DashLights::LastEspTrigger == 0 && esp) {
+        DashLights::LastEspTrigger = currentTime;
+    }
+    // Turn off
+    if (DashLights::LastEspTrigger != 0 && !esp &&
+        currentTime > DashLights::LastEspTime + DashLights::LightDuration) {
+        DashLights::LastEspTrigger = 0;
+        DashLights::EspBulbState = false;
     }
 
     if (g_peripherals.IgnitionState == IgnitionState::Stall) {
@@ -117,12 +142,18 @@ void updateDashLights() {
 void drawDashLights() {
     const int currentTime = MISC::GET_GAME_TIMER();
 
-    int periods = (currentTime - DashLights::LastAbsTrigger) / DashLights::FlashDuration;
-    DashLights::AbsBulbState = DashLights::LastAbsTrigger != 0 && periods % 2;
+    int absPeriods = (currentTime - DashLights::LastAbsTrigger) / DashLights::FlashDuration;
+    DashLights::AbsBulbState = DashLights::LastAbsTrigger != 0 && absPeriods % 2;
     bool abs = DashLights::AbsBulbState;
 
-    bool tcs = DashLights::LastTcsTime + DashLights::LightDuration >= currentTime;
-    bool esp = DashLights::LastEspTime + DashLights::LightDuration >= currentTime;
+    int tcsPeriods = (currentTime - DashLights::LastTcsTrigger) / DashLights::FlashDuration;
+    DashLights::TcsBulbState = DashLights::LastTcsTrigger != 0 && tcsPeriods % 2;
+    bool tcs = DashLights::TcsBulbState;
+
+    int espPeriods = (currentTime - DashLights::LastEspTrigger) / DashLights::FlashDuration;
+    DashLights::EspBulbState = DashLights::LastEspTrigger != 0 && espPeriods % 2;
+    bool esp = DashLights::EspBulbState;
+
     bool brk = VExt::GetHandbrake(g_playerVehicle);
 
     const float size = g_settings.HUD.DashIndicators.Size;
