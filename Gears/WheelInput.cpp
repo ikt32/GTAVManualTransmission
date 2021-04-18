@@ -462,7 +462,7 @@ void WheelInput::DoSteering() {
         steerMult = g_settings.Wheel.Steering.AngleMax / g_settings.Wheel.Steering.AngleBoat;
     }
 
-    float steerClamp = g_settings.Wheel.Steering.AngleMax / steerMult;
+    float steerClamp = deg2rad(g_settings.Wheel.Steering.AngleMax) / steerMult;
 
     float steerValL = map(g_controls.SteerVal, 0.0f, 0.5f, 1.0f, 0.0f);
     float steerValR = map(g_controls.SteerVal, 0.5f, 1.0f, 0.0f, 1.0f);
@@ -483,16 +483,16 @@ void WheelInput::DoSteering() {
         if (boneIdx != -1) {
             Vector3 rotAxis{};
             rotAxis.y = 1.0f;
-            float rotDeg = g_settings.Wheel.Steering.AngleMax / 2.0f * steerValGamma;
+            float rotRad = deg2rad(g_settings.Wheel.Steering.AngleMax) / 2.0f * steerValGamma;
 
             // clamp
-            if (abs(rotDeg) > steerClamp / 2.0f) {
-                rotDeg = std::clamp(rotDeg, -steerClamp / 2.0f, steerClamp / 2.0f);
+            if (abs(rotRad) > steerClamp / 2.0f) {
+                rotRad = std::clamp(rotRad, -steerClamp / 2.0f, steerClamp / 2.0f);
             }
-            float rotDegRaw = rotDeg;
+            float rotRadRaw = rotRad;
             // Setting angle using the VExt:: calls above causes the angle to overshoot the "real" coords
             // Not sure if this is the best solution, but hey, it works!
-            rotDeg -= 2.0f * rad2deg(std::clamp(effSteer, -1.0f, 1.0f) * VExt::GetMaxSteeringAngle(g_playerVehicle));
+            rotRad -= 2.0f * std::clamp(effSteer, -1.0f, 1.0f) * VExt::GetMaxSteeringAngle(g_playerVehicle);
 
             Vector3 scale{ 1.0f, 0, 1.0f, 0, 1.0f, 0 };
             if (g_settings.Misc.HideWheelInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4) {
@@ -501,9 +501,9 @@ void WheelInput::DoSteering() {
                 scale.z = 0.0f;
             }
 
-            VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotDeg);
+            VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotRad);
             VehicleBones::Scale(g_playerVehicle, boneIdx, scale);
-            SteeringAnimation::SetRotation(rotDegRaw);
+            SteeringAnimation::SetRotation(rotRadRaw);
         }
     }
     if (g_vehData.mClass != VehicleClass::Car || altInputs){
