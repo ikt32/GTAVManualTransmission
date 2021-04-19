@@ -170,16 +170,27 @@ void functionDash() {
         data.batteryLight = true;
     }
 
-    // https://www.gta5-mods.com/vehicles/nissan-skyline-gt-r-bnr32
-    if (g_settings().DriveAssists.AWD.Enable && 
-        g_settings().DriveAssists.AWD.SpecialFlags & AWD::AWD_REMAP_DIAL_Y97Y_R32) {
-        data.oilPressure = lerp(
-            data.oilPressure,
-            AWD::GetTransferValue(),
-            1.0f - pow(0.0001f, MISC::GET_FRAME_TIME()));
+    if (g_settings().DriveAssists.AWD.Enable) {
+        if (g_settings().DriveAssists.AWD.SpecialFlags & AWD::AWD_REMAP_DIAL_Y97Y_R32) {
+            data.oilPressure = lerp(
+                data.oilPressure,
+                AWD::GetTransferValue(),
+                1.0f - pow(0.0001f, MISC::GET_FRAME_TIME()));
+            // https://www.gta5-mods.com/vehicles/nissan-skyline-gt-r-bnr32
+            // oil pressure gauge uses data.temp
+            // battery voltage uses data.temp
+        }
+        else if (g_settings().DriveAssists.AWD.SpecialFlags & AWD::AWD_REMAP_DIAL_WANTED188_R32) {
+            // oil temperature doesn't remember value set here, so keep track of it ourselves
+            // also reduce range.
 
-        // oil pressure gauge uses data.temp
-        // battery voltage uses data.temp
+            AWD::GetDisplayValue() = lerp(
+                AWD::GetDisplayValue(),
+                map(AWD::GetTransferValue(), 0.0f, 1.0f, 0.27f, 0.70f),
+                1.0f - pow(0.0001f, MISC::GET_FRAME_TIME()));
+
+            data.oilTemperature = AWD::GetDisplayValue();
+        }
     }
 
     DashHook_SetData(data);

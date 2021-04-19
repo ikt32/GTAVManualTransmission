@@ -39,11 +39,17 @@ namespace {
 
     const float dbgX = 0.5f;
     const float dbgY = 0.0f;
+
+    float displayValue = 0.0f;
 }
 
 STransferInfo GetTractionTransfer(float driveBiasF, float biasMax);
 STransferInfo GetOversteerTransfer(float driveBiasF, float biasMax, DrivingAssists::ESPData espData);
 STransferInfo GetUndersteerTransfer(float driveBiasF, float biasMax, DrivingAssists::ESPData espData);
+
+float& AWD::GetDisplayValue() {
+    return displayValue;
+}
 
 float AWD::GetDriveBiasFront(void* pHandlingDataOrig) {
     if (!pHandlingDataOrig)
