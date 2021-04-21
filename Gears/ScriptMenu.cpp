@@ -110,8 +110,8 @@ namespace {
 
     std::vector<std::string> camAttachPoints {
         "Player head",
-        "Vehicle",
-        "Vanilla FPV"
+        "Vehicle (1)",
+        "Vehicle (2)"
     };
 
     std::vector<std::string> diDevicesInfo{ "Press Enter to refresh." };
@@ -2003,22 +2003,21 @@ void update_cameraoptionsmenu() {
 
     switch(g_settings().Misc.Camera.AttachId) {
         case 0:
-            camInfo = "Camera moves with character while steering.";
+            camInfo = "Camera is attached to player ped head.";
             break;
         case 1:
-            camInfo = "Camera is static with vehicle. You need to be stopped and not steering, "
-                        "for the camera to get centered properly.";
+            camInfo = "Camera is attached to vehicle, based on vanilla FPV camera offsets.";
             break;
         case 2:
-            camInfo = "Camera is static with vehicle and uses vanilla FPV camera offsets.";
+            camInfo = "Camera is attached to vehicle, based on vanilla FPV camera offsets.";
             break;
         default:
-            camInfo = "Invalid selection";
+            camInfo = "Invalid selection.";
             break;
     }
 
     if (g_menu.StringArray("Attach to", camAttachPoints, g_settings().Misc.Camera.AttachId, 
-        { camInfo })) {
+        { camInfo, "Vehicle (1) and (2) work the same. The (2) is provided to quickly switch different settings." })) {
         FPVCam::CancelCam(); // it'll re-acquire next tick with the correct position.
     }
 
@@ -2047,19 +2046,58 @@ void update_cameraoptionsmenu() {
     g_menu.MenuOption("Camera movement options", "cameramovementoptionsmenu",
         { "Enable and tweak the movement of the first person camera." });
 
-    g_menu.FloatOptionCb("Field of view", g_settings().Misc.Camera.FOV, 1.0f, 120.0f, 0.5f, getKbEntry, 
+    // Might as well initialize with valid pointers.
+    Tracked<float>* pFov =           &g_settings().Misc.Camera.Ped.FOV;
+    Tracked<float>* pOffsetHeight =  &g_settings().Misc.Camera.Ped.OffsetHeight;
+    Tracked<float>* pOffsetForward = &g_settings().Misc.Camera.Ped.OffsetForward;
+    Tracked<float>* pOffsetSide =    &g_settings().Misc.Camera.Ped.OffsetSide;
+    Tracked<float>* pPitch =         &g_settings().Misc.Camera.Ped.Pitch;
+
+    switch (g_settings().Misc.Camera.AttachId) {
+        case 0: {
+            pFov =           &g_settings().Misc.Camera.Ped.FOV;
+            pOffsetHeight =  &g_settings().Misc.Camera.Ped.OffsetHeight;
+            pOffsetForward = &g_settings().Misc.Camera.Ped.OffsetForward;
+            pOffsetSide =    &g_settings().Misc.Camera.Ped.OffsetSide;
+            pPitch =         &g_settings().Misc.Camera.Ped.Pitch;
+            break;
+        }
+        case 1: {
+            pFov =           &g_settings().Misc.Camera.Vehicle1.FOV;
+            pOffsetHeight =  &g_settings().Misc.Camera.Vehicle1.OffsetHeight;
+            pOffsetForward = &g_settings().Misc.Camera.Vehicle1.OffsetForward;
+            pOffsetSide =    &g_settings().Misc.Camera.Vehicle1.OffsetSide;
+            pPitch =         &g_settings().Misc.Camera.Vehicle1.Pitch;
+            break;
+        }
+        case 2: {
+            pFov =           &g_settings().Misc.Camera.Vehicle2.FOV;
+            pOffsetHeight =  &g_settings().Misc.Camera.Vehicle2.OffsetHeight;
+            pOffsetForward = &g_settings().Misc.Camera.Vehicle2.OffsetForward;
+            pOffsetSide =    &g_settings().Misc.Camera.Vehicle2.OffsetSide;
+            pPitch =         &g_settings().Misc.Camera.Vehicle2.Pitch;
+            break;
+        }
+        default: {
+            g_menu.Option("Invalid camera attach ID",
+                { "Camera index out of range.", "Defaulted to ped head." });
+            break;
+        }
+    }
+
+    g_menu.FloatOptionCb("Field of view", *pFov, 1.0f, 120.0f, 0.5f, getKbEntry,
         { "In degrees." });
 
-    g_menu.FloatOptionCb("Offset height", g_settings().Misc.Camera.OffsetHeight, -2.0f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("Offset height", *pOffsetHeight, -2.0f, 2.0f, 0.01f, getKbEntry,
         { "Distance in meters." });
 
-    g_menu.FloatOptionCb("Offset forward", g_settings().Misc.Camera.OffsetForward, -2.0f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("Offset forward", *pOffsetForward, -2.0f, 2.0f, 0.01f, getKbEntry,
         { "Distance in meters." });
 
-    g_menu.FloatOptionCb("Offset side", g_settings().Misc.Camera.OffsetSide, -2.0f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("Offset side", *pOffsetSide, -2.0f, 2.0f, 0.01f, getKbEntry,
         { "Distance in meters." });
 
-    g_menu.FloatOption("Pitch", g_settings().Misc.Camera.Pitch, -20.0f, 20.0f, 0.1f,
+    g_menu.FloatOption("Pitch", *pPitch, -20.0f, 20.0f, 0.1f,
         { "In degrees." });
 
     g_menu.FloatOptionCb("Controller smoothing", g_settings().Misc.Camera.LookTime, 0.0f, 0.5f, 0.000001f, getKbEntry,

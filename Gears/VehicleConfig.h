@@ -212,7 +212,7 @@ public:
         // [CAM]
         struct {
             Tracked<bool> Enable = true;
-            Tracked<int> AttachId = 0; // 0: Head, 1: Vehicle, 2: FPV Offset?
+            Tracked<int> AttachId = 0; // 0: Head, 1: Vehicle (1), 2: Vehicle (2)
             Tracked<bool> RemoveHead = true;
 
             struct {
@@ -229,15 +229,32 @@ public:
                 Tracked<float> LongBackwardLimit = 0.12f;
             } Movement;
 
-            Tracked<float> FOV = 55.0f;
-            Tracked<float> OffsetHeight = 0.04f;
-            Tracked<float> OffsetForward = 0.05f;
-            Tracked<float> OffsetSide = 0.0f;
-            Tracked<float> Pitch = 0.0f;
             Tracked<float> LookTime = 0.000010f;
             Tracked<float> MouseLookTime = 0.000001f;
             Tracked<int> MouseCenterTimeout = 750;
             Tracked<float> MouseSensitivity = 0.3f;
+
+            struct {
+                Tracked<float> FOV = 55.0f;
+                Tracked<float> OffsetHeight = 0.04f;
+                Tracked<float> OffsetForward = 0.05f;
+                Tracked<float> OffsetSide = 0.0f;
+                Tracked<float> Pitch = 0.0f;
+            } Ped;
+            struct {
+                Tracked<float> FOV = 55.0f;
+                Tracked<float> OffsetHeight = 0.00f;
+                Tracked<float> OffsetForward = 0.00f;
+                Tracked<float> OffsetSide = 0.0f;
+                Tracked<float> Pitch = 0.0f;
+            } Vehicle1;
+            struct {
+                Tracked<float> FOV = 55.0f;
+                Tracked<float> OffsetHeight = 0.00f;
+                Tracked<float> OffsetForward = 0.00f;
+                Tracked<float> OffsetSide = 0.0f;
+                Tracked<float> Pitch = 0.0f;
+            } Vehicle2;
             struct {
                 Tracked<bool> Disable = false;
                 Tracked<int> AttachId = 0; // 0: Head, 1: Vehicle, 2: FPV Offset?
