@@ -86,6 +86,8 @@ public:
     static uint32_t GetLightStates(Vehicle handle);
     static void SetLightStates(Vehicle handle, uint32_t value);
 
+    static bool GetIndicatorHigh(Vehicle handle, int gameTime);
+
     // Steering input angle, steering lock independent
     static float GetSteeringInputAngle(Vehicle handle);
     static void SetSteeringInputAngle(Vehicle handle, float value);

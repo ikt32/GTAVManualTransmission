@@ -40,6 +40,7 @@ namespace {
     int arenaBoostOffset = 0;
     int handlingOffset = 0;
     int lightStatesOffset = 0;
+    int indicatorTimingOffset = 0;
     int steeringAngleInputOffset = 0;
     int steeringAngleOffset = 0;
     int throttlePOffset = 0;
@@ -176,6 +177,12 @@ void VehicleExtensions::Init() {
     lightStatesOffset = addr == 0 ? 0 : *(int*)(addr - 4) - 1;
     logger.Write(lightStatesOffset == 0 ? WARN : DEBUG, "Light States Offset: 0x%X", lightStatesOffset);
     // Or "8A 96 ? ? ? ? 0F B6 C8 84 D2 41", +10 or something (+31 is the engine starting bit), (0x928 starting addr)
+
+    // Figuring out indicator timing: LieutenantDan
+    addr = mem::FindPattern("\x44\x0F\xB7\x91\xDC\x00\x00\x00\x0F\xB7\x81\xB0\x0A\x00\x00\x41\xB9\x01\x00\x00\x00\x44\x03\x15\x8C\x63\xDF\x01",
+        "xxxx????xxx????xxxxxxxxx????");
+    indicatorTimingOffset = addr == 0 ? 0 : *(int*)(addr + 4);
+    logger.Write(indicatorTimingOffset == 0 ? WARN : DEBUG, "Indicator timing offset: 0x%X", indicatorTimingOffset);
 
     addr = mem::FindPattern("\x74\x0A\xF3\x0F\x11\xB3\x1C\x09\x00\x00\xEB\x25", "xxxxxx????xx");
     steeringAngleInputOffset = addr == 0 ? 0 : *(int*)(addr + 6);
@@ -495,6 +502,17 @@ void VehicleExtensions::SetLightStates(Vehicle handle, uint32_t value) {
     if (lightStatesOffset == 0) return;
     auto address = GetAddress(handle);
     *reinterpret_cast<uint32_t*>(address + lightStatesOffset) = value;
+}
+
+bool VehicleExtensions::GetIndicatorHigh(Vehicle handle, int gameTime) {
+    if (indicatorTimingOffset == 0) return false;
+    auto address = GetAddress(handle);
+
+    auto a = *reinterpret_cast<uint32_t*>(address + indicatorTimingOffset);
+    a += (uint32_t)gameTime;
+    a = a >> 9;
+    a = a & 1;
+    return a == 1;
 }
 
 float VehicleExtensions::GetSteeringInputAngle(Vehicle handle) {
