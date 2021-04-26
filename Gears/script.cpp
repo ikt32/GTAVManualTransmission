@@ -1704,11 +1704,6 @@ void handleBrakePatch() {
         UI::ShowText(0.60f, 0.125f, 0.25f, fmt::format("Throttle: {}", controlledThrottle));
     }
 
-    // TODO: Delete after tests
-    if (PAD::IS_CONTROL_JUST_PRESSED(0, eControl::ControlVehicleHorn)) {
-        CruiseControl::SetActive(!CruiseControl::GetActive());
-    }
-
     bool ccThrottle = false;
     float throttle = g_controls.ThrottleVal;
     float brake = g_controls.BrakeVal;
