@@ -26,16 +26,25 @@ struct SRayResult {
 
 namespace {
     bool active = false;
+    float cruiseThrottle = 0.0f;
+    bool adaptiveActive = false;
 }
 
-void UpdateAdaptive(float& targetSetpoint, float& brakeThreshold);
+void UpdateAdaptive(float& targetSetpoint, float& brakeValue);
 
 bool CruiseControl::GetActive() {
     return active;
 }
 
 void CruiseControl::SetActive(bool active) {
+    g_settings().DriveAssists.CruiseControl.Enable = active;
     ::active = active;
+    cruiseThrottle = 0.0f;
+    UI::Notify(INFO, fmt::format("Cruise control {}", active ? "~g~ON" : "~r~OFF"), true);
+}
+
+bool CruiseControl::GetAdaptiveActive() {
+    return adaptiveActive;
 }
 
 SRayResult RayCast(Vehicle vehicle, float range, Vector3 startOffset, Vector3 endOffset) {
@@ -46,9 +55,6 @@ SRayResult RayCast(Vehicle vehicle, float range, Vector3 startOffset, Vector3 en
     int ray = SHAPETEST::_START_SHAPE_TEST_RAY(
         rayOrg.x, rayOrg.y, rayOrg.z,
         rayEnd.x, rayEnd.y, rayEnd.z, 10, vehicle, 7);
-
-    //GRAPHICS::DRAW_LINE(rayOrg.x, rayOrg.y, rayOrg.z,
-    //    rayEnd.x, rayEnd.y, rayEnd.z, 255, 0, 255, 255);
 
     BOOL hit = false;
     Vector3 hitCoord, surfaceNormal;
@@ -141,7 +147,7 @@ SRayResult MultiCast(Vehicle vehicle, float range) {
         auto result = RayCast(g_playerVehicle, 120.0f, offset, offVel);
 
         if (result.Hit &&
-            (minResult.HitEntity == 0 || result.Distance < minResult.Distance )) {
+            (minResult.HitEntity == 0 || result.Distance < minResult.Distance)) {
             minResult = result;
         }
     }
@@ -150,63 +156,62 @@ SRayResult MultiCast(Vehicle vehicle, float range) {
 }
 
 void CruiseControl::Update(float& throttle, float& brake, float& clutch) {
+    if (!active) {
+        adaptiveActive = false;
+        cruiseThrottle = 0.0f;
+        return;
     }
 
-    if (active) {
-        float prevThrottle = VExt::GetThrottleP(g_playerVehicle);
-        float prevBrake = VExt::GetBrakeP(g_playerVehicle);
+    float brakeValue = 0.0f;
 
-        float brakeThreshold = 6.0f;
-        float deltaMax = 12.0f;
-
-        float targetSetpoint = g_settings().DriveAssists.CruiseControl.Speed;
-        if (g_settings().DriveAssists.CruiseControl.Adaptive) {
-            UpdateAdaptive(targetSetpoint, brakeThreshold);
-        }
-
-        float delta = g_vehData.mVelocity.y - targetSetpoint;
-
-        // Too fast, slow down
-        if (delta > 0) {
-            // Lift
-            if (prevThrottle > 0) {
-                throttle = prevThrottle - map(delta, 0.0f, deltaMax, 0.0f, 1.0f);
-            }
-            // Brake
-            else if (delta > brakeThreshold) {
-                throttle = 0.0f;
-                brake = map(delta, 0.0f, 2.0f * brakeThreshold, 0.0f, 1.0f);
-            }
-            // Coast
-            else {
-                throttle = prevThrottle;
-            }
-        }
-        // Too slow, accelerate
-        else {
-            // increase speed
-            throttle = prevThrottle + map(delta, 0.0f, -deltaMax, 0.0f, 1.0f);
-            brake = 0.0f;
-        }
-
-        throttle = std::clamp(throttle, 0.0f, 1.0f);
-        brake = std::clamp(brake, 0.0f, 1.0f);
+    float targetSetpoint = g_settings().DriveAssists.CruiseControl.Speed;
+    if (g_settings().DriveAssists.CruiseControl.Adaptive) {
+        UpdateAdaptive(targetSetpoint, brakeValue);
     }
+
+    float delta = g_vehData.mVelocity.y - targetSetpoint;
+
+    if (brakeValue > 0.0f) {
+        throttle = 0.0f;
+        cruiseThrottle = 0.0f;
+        brake = brakeValue;
+    }
+    else {
+        brake = 0.0f;
+
+        // looks constant
+        const float cruiseAccCorrFactor = 1.0f;
+
+        // what is this?
+        float cruiseTgtAccFactor = 0.4f;
+
+        // keep under max grip * 9.8
+        float cruiseMaxAcceleration = g_settings().DriveAssists.CruiseControl.MaxAcceleration;
+
+        // By LieutenantDan
+        float targetAcceleration = std::clamp((targetSetpoint - g_vehData.mVelocity.y) * cruiseTgtAccFactor, -cruiseMaxAcceleration, cruiseMaxAcceleration);
+        cruiseThrottle = std::clamp(cruiseThrottle + (targetAcceleration - g_vehData.mAcceleration.y) * cruiseAccCorrFactor * MISC::GET_FRAME_TIME(), 0.0f, 1.0f);
+        throttle = std::clamp(throttle + cruiseThrottle, 0.0f, 1.0f);
+    }
+
+    brake = std::clamp(brake, 0.0f, 1.0f);
+    throttle = std::clamp(throttle, 0.0f, 1.0f);
 }
 
-void UpdateAdaptive(float& targetSetpoint, float& brakeThreshold) {
-    const float minFrontBuff = 5.0f;
-    const float maxFrontBuff = 10.0f;
-
+void UpdateAdaptive(float& targetSetpoint, float& brakeValue) {
     // 120m to 150m detection range
-    const float maxCastDist = 120.0f;
+    const float maxCastDist = 200.0f;
+
+    // When speed is zero, drive up to here
+    const float minFollowDistance = g_settings().DriveAssists.CruiseControl.MinFollowDistance;
+
+    // Start to match speed here
+    const float maxFollowDistance = g_settings().DriveAssists.CruiseControl.MaxFollowDistance;
 
     auto result = MultiCast(g_playerVehicle, maxCastDist);
     bool hit = result.Hit;
     Vector3 hitCoord = result.HitCoord;
     Entity hitEntity = result.HitEntity;
-
-    UI::ShowText(0.60f, 0.200f, 0.25f, fmt::format("Adaptive {}", hit ? "~g~active" : "~y~stand by"));
 
     // Distances need to scale with vehicles' own speed.
     // min: Distance where it should match speed
@@ -217,18 +222,24 @@ void UpdateAdaptive(float& targetSetpoint, float& brakeThreshold) {
     //  Decrease when slow
 
     if (hit) {
-        UI::DrawSphere(hitCoord, 0.10f, Util::ColorsI::SolidPink);
+        adaptiveActive = true;
+        //UI::DrawSphere(hitCoord, 0.10f, Util::ColorsI::SolidPink);
 
-        float distMin = std::max(g_vehData.mDimMax.y + minFrontBuff, g_vehData.mVelocity.y / 2.0f); // 15.0
-        float distMax = std::clamp(distMin + g_vehData.mVelocity.y * 4.0f, distMin, maxCastDist); // 60.0
+        const float distMinSpdMult = g_settings().DriveAssists.CruiseControl.MinDistanceSpeedMult;
+        const float distMaxSpdMult = g_settings().DriveAssists.CruiseControl.MaxDistanceSpeedMult;
+
+        float distMin = std::max(g_vehData.mDimMax.y + minFollowDistance, g_vehData.mVelocity.y * distMinSpdMult);
+        float distMax = std::clamp(distMin + g_vehData.mVelocity.y * distMaxSpdMult, distMin, maxFollowDistance);
 
         auto vehPos = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
         float distance = Distance(vehPos, hitCoord);
-        float otherSpeed = ENTITY::GET_ENTITY_SPEED(hitEntity);
-
-        UI::ShowText(0.60f, 0.225f, 0.25f, fmt::format("{}Dist: {:.1f}, Max: {:.1f}", distance < distMax ? "~g~" : "", distance, distMax));
+        float otherSpeed = ENTITY::GET_ENTITY_SPEED_VECTOR(hitEntity, true).y;
+        float deltaSpeed = g_vehData.mVelocity.y - otherSpeed;
 
         if (distance < distMax) {
+            const float deltaMinBrkMult = g_settings().DriveAssists.CruiseControl.MinDeltaBrakeMult;
+            const float deltaMaxBrkMult = g_settings().DriveAssists.CruiseControl.MaxDeltaBrakeMult;
+
             float targetSpeed =
                 map(distance,
                     distMin, distMax,
@@ -237,16 +248,20 @@ void UpdateAdaptive(float& targetSetpoint, float& brakeThreshold) {
 
             targetSetpoint = targetSpeed;
 
-            UI::ShowText(0.60f, 0.250f, 0.25f, fmt::format("{}Dist: {:.1f}, Min: {:.1f}", distance < distMin ? "~g~" : "", distance, distMin));
-            UI::ShowText(0.60f, 0.275f, 0.25f, fmt::format("Spd: {:.1f}, TgtSpd: {:.1f}", otherSpeed, targetSpeed));
-
-            if (distance < g_vehData.mDimMax.y + maxFrontBuff) {
-                brakeThreshold = map(distance, g_vehData.mDimMax.y + minFrontBuff, g_vehData.mDimMax.y + maxFrontBuff, 0.0f, brakeThreshold);
-                brakeThreshold = std::max(brakeThreshold, 0.01f);
+            float brakeMinDistance = g_vehData.mDimMax.y + minFollowDistance + deltaSpeed * deltaMinBrkMult;
+            float brakeMaxDistance = g_vehData.mDimMax.y + minFollowDistance + deltaSpeed * deltaMaxBrkMult;
+            if (distance < brakeMinDistance) {
+                brakeValue = map(distance,
+                    brakeMinDistance, brakeMaxDistance,
+                    0.0f, 1.0f);
+                brakeValue = std::clamp(brakeValue, 0.0f, 1.0f);
             }
-
-            UI::ShowText(0.60f, 0.300f, 0.25f, fmt::format("BrkTrs: {:.1f}", brakeThreshold));
-
         }
+        else if (Math::Near(distMin, distMax, 0.1f)) {
+            targetSetpoint = otherSpeed;
+        }
+    }
+    else {
+        adaptiveActive = false;
     }
 }
