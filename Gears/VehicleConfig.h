@@ -159,9 +159,18 @@ public:
 
         struct {
             Tracked<bool> Enable = false;
-            // m/s -> default 130 kph-ish
-            Tracked<float> Speed = 36.0f;
-            Tracked<bool> Adaptive = false;
+            Tracked<float> Speed = 36.0f;           // m/s -> default 130 kph-ish
+            Tracked<float> MaxAcceleration = 4.0f;  // m/s²
+
+            Tracked<bool> Adaptive = false; 
+            Tracked<float> MinFollowDistance = 5.0f; // m
+            Tracked<float> MaxFollowDistance = 100.0f; // m
+
+            Tracked<float> MinDistanceSpeedMult = 1.00f; // 
+            Tracked<float> MaxDistanceSpeedMult = 2.00f; //
+
+            Tracked<float> MinDeltaBrakeMult = 2.4f; // 
+            Tracked<float> MaxDeltaBrakeMult = 1.2f; // 
         } CruiseControl;
     } DriveAssists;
 

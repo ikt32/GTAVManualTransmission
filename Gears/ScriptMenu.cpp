@@ -523,7 +523,6 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
 
     bool lsdEn = config.DriveAssists.LSD.Enable;
     bool lcEn = config.DriveAssists.LaunchControl.Enable;
-    bool ccEn = config.DriveAssists.CruiseControl.Enable;
 
     std::vector<std::string> extras{
         fmt::format("{}", config.Description),
@@ -539,10 +538,9 @@ std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
             absEn ? "~g~" : "~r~",
             tcsEn ? "~g~" : "~r~",
             espEn ? "~g~" : "~r~"),
-        fmt::format("\t{}LSD {}Launch {}Cruise",
+        fmt::format("\t{}LSD {}Launch",
             lsdEn ? "~g~" : "~r~",
-            lcEn ? "~g~" : "~r~",
-            ccEn ? "~g~" : "~r~"),
+            lcEn ? "~g~" : "~r~"),
         "Steering wheel:",
         fmt::format("\tSoft lock: {:.0f}", config.Steering.Wheel.SoftLock)
     };
@@ -1840,8 +1838,43 @@ void update_cruisecontrolsettingsmenu() {
         g_settings().DriveAssists.CruiseControl.Speed = speedValUnit / speedValMul;
     }
 
+    g_menu.FloatOptionCb("Max acceleration", g_settings().DriveAssists.CruiseControl.MaxAcceleration, 0.5f, 40.0f, 0.5f, getKbEntry,
+        { "How quickly cruise control accelerates or slows down to the desired speed.",
+          "In m/s^2. 9.8 m/s^2 is 1G." });
+
     g_menu.BoolOption("Adaptive", g_settings().DriveAssists.CruiseControl.Adaptive,
         { "Adapts the speed to the car in front, if there is one." });
+
+    g_menu.FloatOptionCb("Minimum distance", g_settings().DriveAssists.CruiseControl.MinFollowDistance, 1.0f, 50.0f, 1.0f, getKbEntry,
+        { "Minimum distance to the car ahead, when stopped. In meters.",
+          "Default: 5m" });
+
+    g_menu.FloatOptionCb("Maximum distance", g_settings().DriveAssists.CruiseControl.MaxFollowDistance, 50.0f, 200.0f, 0.5f, getKbEntry,
+        { "Maximum distance where adaptive cruise control starts working. In meters.",
+          "Default: 100m." });
+
+    g_menu.FloatOptionCb("Follow distance", g_settings().DriveAssists.CruiseControl.MinDistanceSpeedMult, 0.1f, 10.0f, 0.1f, getKbEntry,
+        { "How close to follow the car in front.",
+          "Approximates 'seconds between cars'.",
+          "Lower: follows closer.",
+          "Default: 1.0." });
+
+    g_menu.FloatOptionCb("Lifting distance", g_settings().DriveAssists.CruiseControl.MaxDistanceSpeedMult, 0.1f, 10.0f, 0.1f, getKbEntry,
+        { "How close to the car in front to start reducing speed.",
+          "Approximates 'seconds between cars'.",
+          "Lower: starts matching closer while driving.",
+          "Default: 2.0." });
+
+    g_menu.FloatOptionCb("Start brake speed margin", g_settings().DriveAssists.CruiseControl.MinDeltaBrakeMult, 0.1f, 10.0f, 0.1f, getKbEntry,
+        { "How soon to start braking for the car in front.",
+          "Higher: Brake for a smaller speed difference.",
+          "Default: 2.4." });
+
+    g_menu.FloatOptionCb("Full brake speed margin", g_settings().DriveAssists.CruiseControl.MaxDeltaBrakeMult, 0.1f, 10.0f, 0.1f, getKbEntry,
+        { "How soon to fully brake for the car in front.",
+          "Higher: Brake harder for a smaller speed difference.",
+          "Keep lower than the above option.",
+          "Default: 1.2." });
 }
 
 void update_speedlimitersettingsmenu() {

@@ -147,7 +147,14 @@ void VehicleConfig::LoadSettings() {
 
     LOAD_VAL("DRIVING_ASSISTS", "CruiseControl", DriveAssists.CruiseControl.Enable);
     LOAD_VAL("DRIVING_ASSISTS", "CruiseControlSpeed", DriveAssists.CruiseControl.Speed);
+    LOAD_VAL("DRIVING_ASSISTS", "CruiseControlMaxAcceleration", DriveAssists.CruiseControl.MaxAcceleration);
     LOAD_VAL("DRIVING_ASSISTS", "CruiseControlAdaptive", DriveAssists.CruiseControl.Adaptive);
+    LOAD_VAL("DRIVING_ASSISTS", "CruiseControlMinFollowDistance", DriveAssists.CruiseControl.MinFollowDistance);
+    LOAD_VAL("DRIVING_ASSISTS", "CruiseControlMaxFollowDistance", DriveAssists.CruiseControl.MaxFollowDistance);
+    LOAD_VAL("DRIVING_ASSISTS", "CruiseControlMinDistanceSpeedMult", DriveAssists.CruiseControl.MinDistanceSpeedMult);
+    LOAD_VAL("DRIVING_ASSISTS", "CruiseControlMaxDistanceSpeedMult", DriveAssists.CruiseControl.MaxDistanceSpeedMult);
+    LOAD_VAL("DRIVING_ASSISTS", "CruiseControlMinDeltaBrakeMult", DriveAssists.CruiseControl.MinDeltaBrakeMult);
+    LOAD_VAL("DRIVING_ASSISTS", "CruiseControlMaxDeltaBrakeMult", DriveAssists.CruiseControl.MaxDeltaBrakeMult);
 
     // [SHIFT_OPTIONS]
     LOAD_VAL("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
@@ -331,7 +338,14 @@ void VehicleConfig::saveGeneral() {
 
     SAVE_VAL("DRIVING_ASSISTS", "CruiseControl", DriveAssists.CruiseControl.Enable);
     SAVE_VAL("DRIVING_ASSISTS", "CruiseControlSpeed", DriveAssists.CruiseControl.Speed);
+    SAVE_VAL("DRIVING_ASSISTS", "CruiseControlMaxAcceleration", DriveAssists.CruiseControl.MaxAcceleration);
     SAVE_VAL("DRIVING_ASSISTS", "CruiseControlAdaptive", DriveAssists.CruiseControl.Adaptive);
+    SAVE_VAL("DRIVING_ASSISTS", "CruiseControlMinFollowDistance", DriveAssists.CruiseControl.MinFollowDistance);
+    SAVE_VAL("DRIVING_ASSISTS", "CruiseControlMaxFollowDistance", DriveAssists.CruiseControl.MaxFollowDistance);
+    SAVE_VAL("DRIVING_ASSISTS", "CruiseControlMinDistanceSpeedMult", DriveAssists.CruiseControl.MinDistanceSpeedMult);
+    SAVE_VAL("DRIVING_ASSISTS", "CruiseControlMaxDistanceSpeedMult", DriveAssists.CruiseControl.MaxDistanceSpeedMult);
+    SAVE_VAL("DRIVING_ASSISTS", "CruiseControlMinDeltaBrakeMult", DriveAssists.CruiseControl.MinDeltaBrakeMult);
+    SAVE_VAL("DRIVING_ASSISTS", "CruiseControlMaxDeltaBrakeMult", DriveAssists.CruiseControl.MaxDeltaBrakeMult);
 
     //[STEERING_OVERRIDE]
     SAVE_VAL("STEERING", "CSUseCustomLock", Steering.CustomSteering.UseCustomLock);
