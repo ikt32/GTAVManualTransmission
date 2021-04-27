@@ -630,9 +630,7 @@ void update_manual_transmission() {
         g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleCC) ||
         g_controls.ButtonHeld(CarControls::ControllerControlType::ToggleCC) ||
         g_controls.PrevInput == CarControls::Controller && g_controls.ButtonHeld(CarControls::LegacyControlType::ToggleCC)) {
-        bool newValue = !g_settings().DriveAssists.CruiseControl.Enable;
-        g_settings().DriveAssists.CruiseControl.Enable = newValue;
-        UI::Notify(INFO, fmt::format("Cruise control {}", newValue ? "~g~ON" : "~r~OFF"));
+        CruiseControl::SetActive(!CruiseControl::GetActive());
     }
 
     if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::CCInc) ||
@@ -643,7 +641,7 @@ void update_manual_transmission() {
 
         float speedValUnit = speed * speedValMul;
         speedValUnit = std::clamp(speedValUnit + 5.0f ,0.0f, 500.0f);
-        g_settings().DriveAssists.AWD.CustomBaseBias = speedValUnit / speedValMul;
+        g_settings().DriveAssists.CruiseControl.Speed = speedValUnit / speedValMul;
         UI::Notify(INFO, fmt::format("Cruise control {:.0f} {}", speedValUnit, speedNameUnit), true);
     }
 
@@ -655,7 +653,7 @@ void update_manual_transmission() {
 
         float speedValUnit = speed * speedValMul;
         speedValUnit = std::clamp(speedValUnit - 5.0f, 0.0f, 500.0f);
-        g_settings().DriveAssists.AWD.CustomBaseBias = speedValUnit / speedValMul;
+        g_settings().DriveAssists.CruiseControl.Speed = speedValUnit / speedValMul;
         UI::Notify(INFO, fmt::format("Cruise control {:.0f} {}", speedValUnit, speedNameUnit), true);
     }
 
