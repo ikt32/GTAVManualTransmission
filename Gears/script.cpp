@@ -1707,15 +1707,12 @@ void handleBrakePatch() {
     float brake = g_controls.BrakeVal;
     float clutch = g_controls.ClutchVal;
 
-    bool x = g_settings().DriveAssists.CruiseControl.Enable;
-    //UI::ShowText(0.60f, 0.150f, 0.25f, fmt::format("CC: {} / {}",
-    //    x,
-    //    CruiseControl::GetActive()));
+    if (CruiseControl::GetActive() && (throttle > 0.2f || brake > 0.01f || clutch > 0.25f || g_gearStates.FakeNeutral)) {
+        CruiseControl::SetActive(false);
+    }
 
     CruiseControl::Update(throttle, brake, clutch);
-    if (g_settings().DriveAssists.CruiseControl.Enable &&
-        CruiseControl::GetActive() && !tcsThrottle && !lcThrottle) {
-
+    if (CruiseControl::GetActive() && !tcsThrottle && !lcThrottle) {
         Controls::SetControlADZ(eControl::ControlVehicleAccelerate, throttle, 0.25f);
         Controls::SetControlADZ(eControl::ControlVehicleBrake, brake, 0.25f);
         // g_controls is read later by auto trans, so safe to update here.

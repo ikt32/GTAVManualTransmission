@@ -150,8 +150,6 @@ SRayResult MultiCast(Vehicle vehicle, float range) {
 }
 
 void CruiseControl::Update(float& throttle, float& brake, float& clutch) {
-    if (throttle > 0.2f || brake > 0.01f || clutch > 0.25f) {
-        active = false;
     }
 
     if (active) {
