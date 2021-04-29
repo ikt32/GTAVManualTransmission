@@ -723,6 +723,7 @@ void drawVehicleWheelInfo() {
     auto wheelDims = VExt::GetWheelDimensions(g_playerVehicle);
     auto wheelDfs = VExt::GetWheelDownforces(g_playerVehicle);
     auto wheelTVLs = VExt::GetWheelTractionVectorLength(g_playerVehicle);
+    auto wheelLoads = VExt::GetWheelLoads(g_playerVehicle);
 
     for (int i = 0; i < numWheels; i++) {
         Util::ColorI color = Util::ColorsI::TransparentGray;
@@ -768,6 +769,7 @@ void drawVehicleWheelInfo() {
                     ),
                 fmt::format("DF: {:.3f}", wheelDfs[i]),
                 fmt::format("TVL: {:.3f}", wheelTVLs[i]),
+                fmt::format("Load: {:.0f} kg", wheelLoads[i]),
             },
             color);
         GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
