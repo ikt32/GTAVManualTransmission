@@ -201,6 +201,8 @@ public:
     static bool IsWheelPowered(Vehicle handle, uint8_t index);
     static std::vector<uint16_t> GetWheelFlags(Vehicle handle);
 
+    static std::vector<float> GetWheelLoads(Vehicle handle);
+
     static std::vector<float> GetWheelDownforces(Vehicle handle);
 
     static uint64_t GetWheelHandlingPtr(Vehicle handle, uint8_t index);

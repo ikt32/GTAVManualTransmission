@@ -67,6 +67,7 @@ namespace {
     int wheelBrakeOffset = 0;
     int wheelFlagsOffset = 0;
     int wheelDownforceOffset = 0;
+    int wheelLoadOffset = 0;
 }
 
 void VehicleExtensions::ChangeVersion(int version) {
@@ -249,7 +250,6 @@ void VehicleExtensions::Init() {
     wheelDownforceOffset = addr == 0 ? 0 : *(int*)(addr + 7) + 0x1C;
     logger.Write(wheelDownforceOffset == 0 ? WARN : DEBUG, "Wheel Downforce Offset: 0x%X", wheelDownforceOffset);
 
-
     addr = mem::FindPattern("\x75\x24\xF3\x0F\x10\x81\xE0\x01\x00\x00\xF3\x0F\x5C\xC1", "xxxxx???xxxx??");
     wheelHealthOffset = addr == 0 ? 0 : *(int*)(addr + 6);
     logger.Write(wheelHealthOffset == 0 ? WARN : DEBUG, "Wheel Health Offset: 0x%X", wheelHealthOffset);
@@ -271,6 +271,9 @@ void VehicleExtensions::Init() {
     }
     wheelSteeringAngleOffset = addr == 0 ? 0 : *(int*)(addr + 3);
     logger.Write(wheelSteeringAngleOffset == 0 ? WARN : DEBUG, "Wheel Steering Angle Offset: 0x%X", wheelSteeringAngleOffset);
+
+    wheelLoadOffset = addr == 0 ? 0 : *(int*)(addr + 3) - 0x10;
+    logger.Write(wheelLoadOffset == 0 ? WARN : DEBUG, "Wheel Load Offset: 0x%X", wheelLoadOffset);
 
     wheelBrakeOffset = addr == 0 ? 0 : (*(int*)(addr + 3)) + 0x4;
     logger.Write(wheelBrakeOffset == 0 ? WARN : DEBUG, "Wheel Brake Offset: 0x%X", wheelBrakeOffset);
@@ -1000,6 +1003,20 @@ std::vector<uint16_t> VehicleExtensions::GetWheelFlags(Vehicle handle) {
     return flags;
 }
 
+std::vector<float> VehicleExtensions::GetWheelLoads(Vehicle handle) {
+    auto wheelPtr = GetWheelsPtr(handle);
+    auto numWheels = GetNumWheels(handle);
+    std::vector<float> values(numWheels);
+
+    if (wheelLoadOffset == 0) return values;
+
+    for (auto i = 0; i < numWheels; i++) {
+        auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * i);
+        values[i] = *reinterpret_cast<float*>(wheelAddr + 0x1BC);
+    }
+    return values;
+}
+
 std::vector<float> VehicleExtensions::GetWheelDownforces(Vehicle handle) {
     auto wheelPtr = GetWheelsPtr(handle);
     auto numWheels = GetNumWheels(handle);
@@ -1009,7 +1026,7 @@ std::vector<float> VehicleExtensions::GetWheelDownforces(Vehicle handle) {
 
     for (auto i = 0; i < numWheels; i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * i);
-        dfs[i] = *reinterpret_cast<float*>(wheelAddr + 0x220);
+        dfs[i] = *reinterpret_cast<float*>(wheelAddr + wheelDownforceOffset);
     }
     return dfs;
 }
