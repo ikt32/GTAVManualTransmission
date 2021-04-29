@@ -37,6 +37,14 @@ T avg(std::vector<T, A> const& vec) {
     return average / static_cast<T>(vec.size());
 }
 
+template<typename T, typename A>
+T sum(std::vector<T, A> const& vec) {
+    T total{};
+    for (auto elem : vec)
+        total += elem;
+    return total;
+}
+
 #pragma warning(push)
 #pragma warning(disable: 4244)
 template <typename T>
