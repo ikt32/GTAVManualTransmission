@@ -207,6 +207,9 @@ public:
 
     static std::vector<float> GetWheelDownforces(Vehicle handle);
 
+    // 0 to 59 (= pop)
+    static std::vector<float> GetWheelOverheats(Vehicle handle);
+
     static uint64_t GetWheelHandlingPtr(Vehicle handle, uint8_t index);
     static void SetWheelHandlingPtr(Vehicle handle, uint8_t index, uint64_t value);
 

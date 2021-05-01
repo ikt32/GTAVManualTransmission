@@ -62,6 +62,7 @@ namespace {
     int wheelSuspensionCompressionOffset = 0;
     int wheelSteeringAngleOffset = 0;
     int wheelAngularVelocityOffset = 0;
+    int wheelOverheatOffset = 0;
     int wheelTractionVectorLengthOffset = 0;
     int wheelTractionVectorYOffset = 0;
     int wheelTractionVectorXOffset = 0;
@@ -264,6 +265,10 @@ void VehicleExtensions::Init() {
 
     wheelAngularVelocityOffset = addr == 0 ? 0 : (*(int*)(addr + 8)) + 0xc;
     logger.Write(wheelAngularVelocityOffset == 0 ? WARN : DEBUG, "Wheel Angular Velocity Offset: 0x%X", wheelAngularVelocityOffset);
+
+    // angular velocity offset + 0x08
+    wheelOverheatOffset = addr == 0 ? 0 : (*(int*)(addr + 8)) + 0xc + 0x08;
+    logger.Write(wheelOverheatOffset == 0 ? WARN : DEBUG, "Wheel Overheat Offset: 0x%X", wheelOverheatOffset);
 
     if (g_gameVersion >= G_VER_1_0_1737_0_STEAM) {
         addr = mem::FindPattern("\x0F\x2F\x81\xBC\x01\x00\x00" "\x0F\x97\xC0" "\xEB\x00" "\xD1\x00", "xx???xx" "xxx" "x?" "x?");
@@ -1064,6 +1069,21 @@ std::vector<float> VehicleExtensions::GetWheelDownforces(Vehicle handle) {
         dfs[i] = *reinterpret_cast<float*>(wheelAddr + wheelDownforceOffset);
     }
     return dfs;
+}
+
+std::vector<float> VehicleExtensions::GetWheelOverheats(Vehicle handle)
+{
+    auto wheelPtr = GetWheelsPtr(handle);
+    auto numWheels = GetNumWheels(handle);
+    std::vector<float> vals(numWheels);
+
+    if (wheelOverheatOffset == 0) return vals;
+
+    for (auto i = 0; i < numWheels; i++) {
+        auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * i);
+        vals[i] = *reinterpret_cast<float*>(wheelAddr + wheelOverheatOffset);
+    }
+    return vals;
 }
 
 uint64_t VehicleExtensions::GetWheelHandlingPtr(Vehicle handle, uint8_t index) {
