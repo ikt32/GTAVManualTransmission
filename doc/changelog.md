@@ -1,5 +1,18 @@
 # Changelog
 
+## 5.x.x
+
+* Fix misc assists using wrong speed
+* Clean up assists messages
+* Notify drive bias changes
+* Add cruise control with adaptive mode
+* Add speed limiter
+* Make assist icons flash when active
+* Flash brake lights when ABS is active
+* Support Wanted188's R32 (Torque transfer gauge)
+* Remove player-position derived "fixed" camera
+* Add another vehicle-centric camera option
+
 ## 5.2.0
 
 * Add timeout for automatic gearbox upshifting
