@@ -189,6 +189,13 @@ public:
 
     static void SetWheelTractionVectorLength(Vehicle handle, uint8_t index, float value);
 
+    // materials.meta stuff
+    static std::vector<float> GetTyreGrips(Vehicle handle);
+    static std::vector<float> GetWetGrips(Vehicle handle);
+    static std::vector<float> GetTyreDrags(Vehicle handle);
+    static std::vector<float> GetTopSpeedMults(Vehicle handle);
+    static std::vector<uint16_t> GetTireContactMaterial(Vehicle handle);
+
     // Needs patching the decreasing thing
     static std::vector<float> GetWheelPower(Vehicle handle);
     static void SetWheelPower(Vehicle handle, uint8_t index, float value);

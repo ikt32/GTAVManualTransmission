@@ -71,6 +71,12 @@ namespace {
     int wheelFlagsOffset = 0;
     int wheelDownforceOffset = 0;
     int wheelLoadOffset = 0;
+
+    int wheelMatTyreGripOffset = 0;
+    int wheelMatWetGripOffset = 0;
+    int wheelMatTyreDragOffset = 0;
+    int wheelMatTopSpeedMultOffset = 0;
+    int wheelMatTypeOffset = 0;
 }
 
 void VehicleExtensions::ChangeVersion(int version) {
@@ -296,6 +302,24 @@ void VehicleExtensions::Init() {
 
     wheelTractionVectorXOffset = addr == 0 ? 0 : (*(int*)(addr + 3)) - 0x08;
     logger.Write(wheelTractionVectorXOffset == 0 ? WARN : DEBUG, "Wheel Traction Vector X Offset: 0x%X", wheelTractionVectorXOffset);
+
+    // Only tested for b2245
+    addr = mem::FindPattern("89 8B ? ? 00 00 E8 ? ? ? ? 0F 57 ?");
+    wheelMatTyreGripOffset = addr == 0 ? 0 : (*(int*)(addr + 2));
+    logger.Write(wheelMatTyreGripOffset == 0 ? WARN : DEBUG, "Wheel Material TYRE_GRIP Offset: 0x%X", wheelMatTyreGripOffset);
+
+    wheelMatWetGripOffset = addr == 0 ? 0 : (*(int*)(addr + 2) + 4);
+    logger.Write(wheelMatWetGripOffset == 0 ? WARN : DEBUG, "Wheel Material WET_GRIP Offset: 0x%X", wheelMatWetGripOffset);
+
+    wheelMatTyreDragOffset = addr == 0 ? 0 : (*(int*)(addr + 2) + 8);
+    logger.Write(wheelMatTyreDragOffset == 0 ? WARN : DEBUG, "Wheel Material TYRE_DRAG Offset: 0x%X", wheelMatTyreDragOffset);
+
+    wheelMatTopSpeedMultOffset = addr == 0 ? 0 : (*(int*)(addr + 2) + 12);
+    logger.Write(wheelMatTopSpeedMultOffset == 0 ? WARN : DEBUG, "Wheel Material TOP_SPEED_MULT Offset: 0x%X", wheelMatTopSpeedMultOffset);
+
+    addr = mem::FindPattern("88 8B ? ? 00 00 41 0F B6 47 51 66 89 83 ? ? 00 00");
+    wheelMatTypeOffset = addr == 0 ? 0 : (*(int*)(addr + 2));
+    logger.Write(wheelMatTypeOffset == 0 ? WARN : DEBUG, "Wheel Material Type Offset: 0x%X", wheelMatTypeOffset);
 }
 
 BYTE *VehicleExtensions::GetAddress(Vehicle handle) {
@@ -970,6 +994,77 @@ std::vector<float> VehicleExtensions::GetWheelTractionVectorX(Vehicle handle) {
     }
     return values;
 }
+
+std::vector<float> VehicleExtensions::GetTyreGrips(Vehicle handle) {
+    auto numWheels = GetNumWheels(handle);
+    std::vector<float> values(numWheels);
+    auto wheelPtr = GetWheelsPtr(handle);
+
+    if (wheelMatTyreGripOffset == 0) return values;
+
+    for (auto i = 0; i < numWheels; i++) {
+        auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * i);
+        values[i] = (*reinterpret_cast<float*>(wheelAddr + wheelMatTyreGripOffset));
+    }
+    return values;
+}
+
+std::vector<float> VehicleExtensions::GetWetGrips(Vehicle handle) {
+    auto numWheels = GetNumWheels(handle);
+    std::vector<float> values(numWheels);
+    auto wheelPtr = GetWheelsPtr(handle);
+
+    if (wheelMatWetGripOffset == 0) return values;
+
+    for (auto i = 0; i < numWheels; i++) {
+        auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * i);
+        values[i] = (*reinterpret_cast<float*>(wheelAddr + wheelMatWetGripOffset));
+    }
+    return values;
+}
+
+std::vector<float> VehicleExtensions::GetTyreDrags(Vehicle handle) {
+    auto numWheels = GetNumWheels(handle);
+    std::vector<float> values(numWheels);
+    auto wheelPtr = GetWheelsPtr(handle);
+
+    if (wheelMatTyreDragOffset == 0) return values;
+
+    for (auto i = 0; i < numWheels; i++) {
+        auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * i);
+        values[i] = (*reinterpret_cast<float*>(wheelAddr + wheelMatTyreDragOffset));
+    }
+    return values;
+}
+
+std::vector<float> VehicleExtensions::GetTopSpeedMults(Vehicle handle) {
+    auto numWheels = GetNumWheels(handle);
+    std::vector<float> values(numWheels);
+    auto wheelPtr = GetWheelsPtr(handle);
+
+    if (wheelMatTopSpeedMultOffset == 0) return values;
+
+    for (auto i = 0; i < numWheels; i++) {
+        auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * i);
+        values[i] = (*reinterpret_cast<float*>(wheelAddr + wheelMatTopSpeedMultOffset));
+    }
+    return values;
+}
+
+std::vector<uint16_t> VehicleExtensions::GetTireContactMaterial(Vehicle handle) {
+    auto numWheels = GetNumWheels(handle);
+    std::vector<uint16_t> values(numWheels);
+    auto wheelPtr = GetWheelsPtr(handle);
+
+    if (wheelMatTypeOffset == 0) return values;
+
+    for (auto i = 0; i < numWheels; i++) {
+        auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * i);
+        values[i] = (*reinterpret_cast<uint16_t*>(wheelAddr + wheelMatTypeOffset));
+    }
+    return values;
+}
+
 std::vector<float> VehicleExtensions::GetWheelPower(Vehicle handle) {
     auto numWheels = GetNumWheels(handle);
     auto wheelPtr = GetWheelsPtr(handle);
@@ -1150,3 +1245,12 @@ std::vector<uint32_t> VehicleExtensions::GetVehicleFlags(Vehicle handle) {
 // Couldn't find anything torque-related
 
 // wheel+0x1ec - power/brake flags? abs turned off for e-brake with [wheel+0x1ec] & 0xFFFF3FFF
+
+// b2245
+// Wheel
+// 0x198 - TYRE_GRIP
+// 0x19C - 1.0 - (WET_GRIP * Wetness)
+// 0x1A0 - TYRE_DRAG
+// 0x1A4 - TOP_SPEED_MULT
+// 0x208 - Entity type? Bone?
+// 0x20A - Material type (uint16_t)
