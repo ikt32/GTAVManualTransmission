@@ -261,6 +261,9 @@
     <ClCompile Include="CruiseControl.cpp">
       <Filter>Features\Assists</Filter>
     </ClCompile>
+    <ClCompile Include="SpeedLimiter.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -563,6 +566,9 @@
     <ClInclude Include="SettingsCommon.h" />
     <ClInclude Include="CruiseControl.h">
       <Filter>Features\Assists</Filter>
+    </ClInclude>
+    <ClInclude Include="SpeedLimiter.h">
+      <Filter>Features</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

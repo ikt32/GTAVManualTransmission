@@ -54,8 +54,8 @@ public:
         Tracked<bool> ClutchShiftS = false;
         struct {
             Tracked<bool> Enable = false;
-            // m/s -> default 70 kph-ish
-            Tracked<float> Speed = 70.0f;
+            // m/s -> default 120 kph-ish
+            Tracked<float> Speed = 33.3f;
         } SpeedLimiter;
     } MTOptions;
 

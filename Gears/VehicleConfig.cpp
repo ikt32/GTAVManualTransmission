@@ -87,6 +87,8 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("MT_OPTIONS", "ClutchCatching", MTOptions.ClutchCreep);
     LOAD_VAL("MT_OPTIONS", "ClutchShiftingH", MTOptions.ClutchShiftH);
     LOAD_VAL("MT_OPTIONS", "ClutchShiftingS", MTOptions.ClutchShiftS);
+    LOAD_VAL("MT_OPTIONS", "SpeedLimiter", MTOptions.SpeedLimiter.Enable);
+    LOAD_VAL("MT_OPTIONS", "SpeedLimiterSpeed", MTOptions.SpeedLimiter.Speed);
 
     // [MT_PARAMS]
     LOAD_VAL("MT_PARAMS", "ClutchCatchpoint", MTParams.ClutchThreshold);
@@ -274,6 +276,8 @@ void VehicleConfig::saveGeneral() {
     SAVE_VAL("MT_OPTIONS", "ClutchCatching", MTOptions.ClutchCreep);
     SAVE_VAL("MT_OPTIONS", "ClutchShiftingH", MTOptions.ClutchShiftH);
     SAVE_VAL("MT_OPTIONS", "ClutchShiftingS", MTOptions.ClutchShiftS);
+    SAVE_VAL("MT_OPTIONS", "SpeedLimiter", MTOptions.SpeedLimiter.Enable);
+    SAVE_VAL("MT_OPTIONS", "SpeedLimiterSpeed", MTOptions.SpeedLimiter.Speed);
 
     // [MT_PARAMS]
     SAVE_VAL("MT_PARAMS", "ClutchCatchpoint", MTParams.ClutchThreshold);

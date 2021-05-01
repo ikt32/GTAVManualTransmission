@@ -2439,6 +2439,9 @@ void update_menu() {
     /* mainmenu -> settingsmenu -> featuresmenu */
     if (g_menu.CurrentMenu("featuresmenu")) { update_featuresmenu(); }
 
+    /* mainmenu -> settingsmenu -> featuresmenu -> speedlimitersettingsmenu */
+    if (g_menu.CurrentMenu("speedlimitersettingsmenu")) { update_speedlimitersettingsmenu(); }
+
     /* mainmenu -> settingsmenu -> finetuneoptionsmenu */
     if (g_menu.CurrentMenu("finetuneoptionsmenu")) { update_finetuneoptionsmenu(); }
 
@@ -2534,9 +2537,6 @@ void update_menu() {
 
     /* mainmenu -> driveassistmenu -> cruisecontrolsettingsmenu */
     if (g_menu.CurrentMenu("cruisecontrolsettingsmenu")) { update_cruisecontrolsettingsmenu(); }
-
-    /* mainmenu -> driveassistmenu -> speedlimitersettingsmenu */
-    if (g_menu.CurrentMenu("speedlimitersettingsmenu")) { update_speedlimitersettingsmenu(); }
 
     /* mainmenu -> gameassistmenu */
     if (g_menu.CurrentMenu("gameassistmenu")) { update_gameassistmenu(); }

@@ -18,6 +18,7 @@
 #include "AWD.h"
 #include "LaunchControl.h"
 #include "CruiseControl.h"
+#include "SpeedLimiter.h"
 
 #include "UDPTelemetry/Socket.h"
 #include "UDPTelemetry/UDPTelemetry.h"
@@ -1724,10 +1725,21 @@ void handleBrakePatch() {
         ccThrottle = true;
     }
 
+    bool speedLimThrottle = false;
+    if (g_settings().MTOptions.SpeedLimiter.Enable) {
+        speedLimThrottle = SpeedLimiter::Update(throttle);
+        if (speedLimThrottle) {
+            g_controls.ThrottleVal = throttle;
+            VExt::SetThrottle(g_playerVehicle, throttle); // audio
+            VExt::SetThrottleP(g_playerVehicle, throttle);
+        }
+    }
+
     bool patchThrottleControl =
         tcsThrottle ||
         lcThrottle ||
-        ccThrottle;
+        ccThrottle ||
+        speedLimThrottle;
 
     bool patchThrottle =
         g_wheelPatchStates.EngLockActive ||

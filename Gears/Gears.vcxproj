@@ -178,6 +178,7 @@
     <ClCompile Include="ScriptHUD.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
     <ClCompile Include="SettingsCommon.cpp" />
+    <ClCompile Include="SpeedLimiter.cpp" />
     <ClCompile Include="StartingAnimation.cpp" />
     <ClCompile Include="SteeringAnim.cpp" />
     <ClCompile Include="UDPTelemetry\UDPTelemetry.cpp" />
@@ -282,6 +283,7 @@
     <ClInclude Include="Compatibility.h" />
     <ClInclude Include="ScriptHUD.h" />
     <ClInclude Include="SettingsCommon.h" />
+    <ClInclude Include="SpeedLimiter.h" />
     <ClInclude Include="StartingAnimation.h" />
     <ClInclude Include="SteeringAnim.h" />
     <ClInclude Include="UDPTelemetry\UDPTelemetry.h" />
