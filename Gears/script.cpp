@@ -1722,8 +1722,6 @@ void handleBrakePatch() {
         VExt::SetThrottle(g_playerVehicle, throttle); // audio
         VExt::SetThrottleP(g_playerVehicle, throttle);
         ccThrottle = true;
-
-        UI::ShowText(0.60f, 0.175f, 0.25f, fmt::format("CC Throttle {:.2f}", throttle));
     }
 
     bool patchThrottleControl =
