@@ -2264,6 +2264,9 @@ void update_debugmenu() {
     g_menu.BoolOption("Display car wheel info", g_settings.Debug.DisplayWheelInfo,
         { "Show per-wheel debug info with off-ground detection, lockup detection and suspension info.",
           "[TCS: Yellow] [ESP: Blue] [ABS: Red] [Locked up: Purple] [Off ground: Transparent]"});
+    g_menu.BoolOption("Display wheel material info", g_settings.Debug.DisplayMaterialInfo,
+        { "Show material info and various material multipliers.",
+          "Note: WET_GRIP is displayed as 1.0f - (WET_GRIP * Wetness)." });
     g_menu.BoolOption("Display gearing info", g_settings.Debug.DisplayGearingInfo,
         { "Show gear ratios and shift points from auto mode." });
     g_menu.BoolOption("Display force feedback lines", g_settings.Debug.DisplayFFBInfo,

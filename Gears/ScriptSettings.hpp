@@ -270,6 +270,7 @@ public:
         bool DisplayInfo = false;
         bool DisplayGearingInfo = false;
         bool DisplayWheelInfo = false;
+        bool DisplayMaterialInfo = false;
         bool DisplayFFBInfo = false;
         bool DisplayNPCInfo = false;
 

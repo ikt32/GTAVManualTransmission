@@ -13,6 +13,7 @@
 #include "Util/FileVersion.h"
 #include "Util/MathExt.h"
 #include "Util/UIUtils.h"
+#include "Util/Materials.h"
 
 #include "Input/CarControls.hpp"
 #include "VehicleData.hpp"
@@ -39,6 +40,7 @@ extern VehiclePeripherals g_peripherals;
 void drawDebugInfo();
 void drawGForces();
 void drawVehicleWheelInfo();
+void drawVehicleWheelMaterialInfo();
 void drawInputWheelInfo();
 void updateDashLights();
 void drawDashLights();
@@ -559,6 +561,9 @@ void MTHUD::UpdateHUD() {
         drawDebugInfo();
         drawLSDInfo();
     }
+    if (g_settings.Debug.DisplayMaterialInfo) {
+        drawVehicleWheelMaterialInfo();
+    }
     if (g_settings.Debug.DisplayWheelInfo) {
         drawVehicleWheelInfo();
     }
@@ -709,6 +714,30 @@ std::vector<Vector3> GetWheelCoords(Vehicle handle) {
     return worldCoords;
 }
 
+void drawVehicleWheelMaterialInfo() {
+    auto numWheels = VExt::GetNumWheels(g_playerVehicle);
+    auto wheelCoords = GetWheelCoords(g_playerVehicle);
+
+    auto materialIndex = VExt::GetTireContactMaterial(g_playerVehicle);
+    auto tyreGrips = VExt::GetTyreGrips(g_playerVehicle);
+    auto wetGrips = VExt::GetWetGrips(g_playerVehicle);
+    auto tyreDrags = VExt::GetTyreDrags(g_playerVehicle);
+    auto topSpeedMults = VExt::GetTopSpeedMults(g_playerVehicle);
+
+    for (int i = 0; i < numWheels; i++) {
+        Util::ColorI color = Util::ColorsI::TransparentGray;
+
+        UI::ShowText3D(wheelCoords[i], {
+                fmt::format("({}) {}", materialIndex[i], Materials::GetMaterialName(materialIndex[i])),
+                fmt::format("TYRE_GRIP {:.2f}", tyreGrips[i]),
+                fmt::format("WET_GRIP {}", wetGrips[i]),
+                fmt::format("TYRE_DRAG {}", tyreDrags[i]),
+                fmt::format("TOP_SPEED_MULT {}", topSpeedMults[i]),
+            },
+            color);
+    }
+}
+
 void drawVehicleWheelInfo() {
     auto numWheels = VExt::GetNumWheels(g_playerVehicle);
     auto wheelsSpeed = VExt::GetTyreSpeeds(g_playerVehicle);
@@ -724,6 +753,10 @@ void drawVehicleWheelInfo() {
     auto wheelDfs = VExt::GetWheelDownforces(g_playerVehicle);
     auto wheelTVLs = VExt::GetWheelTractionVectorLength(g_playerVehicle);
     auto wheelLoads = VExt::GetWheelLoads(g_playerVehicle);
+    //auto wheelHots = VExt::GetWheelOverheats(g_playerVehicle);
+
+    UI::ShowText(0.60f, 0.200f, 0.25f, fmt::format("Average load: {:.0f} kg", avg(wheelLoads)));
+    UI::ShowText(0.60f, 0.225f, 0.25f, fmt::format("Total load: {:.0f} kg", sum(wheelLoads)));
 
     for (int i = 0; i < numWheels; i++) {
         Util::ColorI color = Util::ColorsI::TransparentGray;
@@ -770,6 +803,7 @@ void drawVehicleWheelInfo() {
                 fmt::format("DF: {:.3f}", wheelDfs[i]),
                 fmt::format("TVL: {:.3f}", wheelTVLs[i]),
                 fmt::format("Load: {:.0f} kg", wheelLoads[i]),
+                //fmt::format("Heat?: {:.1f}", wheelHots[i]),
             },
             color);
         GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,

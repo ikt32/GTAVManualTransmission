@@ -296,6 +296,7 @@
     <ClInclude Include="Util\FileVersion.h" />
     <ClInclude Include="Util\GameSound.h" />
     <ClInclude Include="Util\GUID.h" />
+    <ClInclude Include="Util\Materials.h" />
     <ClInclude Include="Util\MathExt.h" />
     <ClInclude Include="Memory\Offsets.hpp" />
     <ClInclude Include="Util\MiscEnums.h" />

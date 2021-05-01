@@ -570,6 +570,9 @@
     <ClInclude Include="SpeedLimiter.h">
       <Filter>Features</Filter>
     </ClInclude>
+    <ClInclude Include="Util\Materials.h">
+      <Filter>Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
