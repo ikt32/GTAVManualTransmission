@@ -1696,11 +1696,11 @@ void handleBrakePatch() {
 
     // Ew
     if (g_settings.Debug.DisplayInfo) {
-        UI::ShowText(0.60f, 0.075f, 0.25f, fmt::format("{}TCS~s~ / {}LC",
+        UI::ShowText(0.60f, 0.100f, 0.25f, fmt::format("{}TCS~s~ / {}LC",
             tcsThrottle ? "~g~" : "", lcThrottle ? "~g~" : ""));
         std::string controlledThrottle = tcsThrottle || lcThrottle ? fmt::format("{:.2f}", newThrottle) : "N/A";
-        UI::ShowText(0.60f, 0.100f, 0.25f, fmt::format("Average slip: {:.2f} m/s", tcsData.AverageSlip));
-        UI::ShowText(0.60f, 0.125f, 0.25f, fmt::format("Throttle: {}", controlledThrottle));
+        UI::ShowText(0.60f, 0.125f, 0.25f, fmt::format("Average slip: {:.2f} m/s", tcsData.AverageSlip));
+        UI::ShowText(0.60f, 0.150f, 0.25f, fmt::format("Throttle: {}", controlledThrottle));
     }
 
     bool ccThrottle = false;
