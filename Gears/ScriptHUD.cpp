@@ -40,6 +40,7 @@ extern VehiclePeripherals g_peripherals;
 void drawDebugInfo();
 void drawGForces();
 void drawVehicleWheelInfo();
+void drawVehicleWheelTractionVector();
 void drawVehicleWheelMaterialInfo();
 void drawInputWheelInfo();
 void updateDashLights();
@@ -561,6 +562,9 @@ void MTHUD::UpdateHUD() {
         drawDebugInfo();
         drawLSDInfo();
     }
+    if (g_settings.Debug.DisplayTractionInfo) {
+        drawVehicleWheelTractionVector();
+    }
     if (g_settings.Debug.DisplayMaterialInfo) {
         drawVehicleWheelMaterialInfo();
     }
@@ -712,6 +716,27 @@ std::vector<Vector3> GetWheelCoords(Vehicle handle) {
         worldCoords.emplace_back(GetOffsetInWorldCoords(position, rotation, direction, wheelPos));
     }
     return worldCoords;
+}
+
+void drawVehicleWheelTractionVector() {
+    auto numWheels = VExt::GetNumWheels(g_playerVehicle);
+    auto wheelOffs = VExt::GetWheelOffsets(g_playerVehicle);
+    auto wheelTVLYs = VExt::GetWheelTractionVectorY(g_playerVehicle);
+    auto wheelTVLXs = VExt::GetWheelTractionVectorX(g_playerVehicle);
+    auto wheelCoords = GetWheelCoords(g_playerVehicle);
+    for (int i = 0; i < numWheels; i++) {
+        const float div = 1.0f;
+
+        Vector3 tractionVectorWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle,
+            wheelOffs[i].x + -wheelTVLXs[i] / div, wheelOffs[i].y + wheelTVLYs[i] / div, wheelOffs[i].z);
+
+        int red = wheelTVLYs[i] > 0.0f ? 0 : 255;
+        int green = wheelTVLYs[i] > 0.0f ? 255 : 0;
+        GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
+            tractionVectorWorld.x, tractionVectorWorld.y, tractionVectorWorld.z, red, green, 0, 255);
+
+        UI::DrawSphere(tractionVectorWorld, 0.05f, Util::ColorI{ red, green, 0, 255 });
+    }
 }
 
 void drawVehicleWheelMaterialInfo() {

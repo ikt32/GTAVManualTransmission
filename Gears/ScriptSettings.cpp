@@ -265,6 +265,7 @@ void ScriptSettings::SaveGeneral() {
     SAVE_VAL("DEBUG", "DisplayInfo", Debug.DisplayInfo);
     SAVE_VAL("DEBUG", "DisplayWheelInfo", Debug.DisplayWheelInfo);
     SAVE_VAL("DEBUG", "DisplayMaterialInfo", Debug.DisplayMaterialInfo);
+    SAVE_VAL("DEBUG", "DisplayTractionInfo", Debug.DisplayTractionInfo);
     SAVE_VAL("DEBUG", "DisplayFFBInfo", Debug.DisplayFFBInfo);
     SAVE_VAL("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
     SAVE_VAL("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
@@ -549,6 +550,7 @@ void ScriptSettings::parseSettingsGeneral() {
     LOAD_VAL("DEBUG", "DisplayInfo", Debug.DisplayInfo);
     LOAD_VAL("DEBUG", "DisplayWheelInfo", Debug.DisplayWheelInfo);
     LOAD_VAL("DEBUG", "DisplayMaterialInfo", Debug.DisplayMaterialInfo);
+    LOAD_VAL("DEBUG", "DisplayTractionInfo", Debug.DisplayTractionInfo);
     LOAD_VAL("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
     LOAD_VAL("DEBUG", "DisplayFFBInfo", Debug.DisplayFFBInfo);
     LOAD_VAL("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
