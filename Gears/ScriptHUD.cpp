@@ -120,12 +120,6 @@ void updateDashLights() {
         DashLights::EspBulbState = false;
     }
 
-    if (g_peripherals.IgnitionState == IgnitionState::Stall) {
-        abs = true;
-        tcs = true;
-        esp = true;
-    }
-
     if (g_vehData.mHasABS) {
         for (int i = 0; i < g_vehData.mWheelCount; ++i) {
             abs |= g_vehData.mWheelTyreSpeeds[i] == 0.0f &&
@@ -156,6 +150,12 @@ void drawDashLights() {
     int espPeriods = (currentTime - DashLights::LastEspTrigger) / DashLights::FlashDuration;
     DashLights::EspBulbState = DashLights::LastEspTrigger != 0 && espPeriods % 2;
     bool esp = DashLights::EspBulbState;
+
+    if (g_peripherals.IgnitionState == IgnitionState::Stall) {
+        abs = true;
+        tcs = true;
+        esp = true;
+    }
 
     bool brk = VExt::GetHandbrake(g_playerVehicle);
 
