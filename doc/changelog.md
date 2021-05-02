@@ -1,17 +1,22 @@
 # Changelog
 
-## 5.x.x
+## 5.3.0
 
-* Fix misc assists using wrong speed
-* Clean up assists messages
-* Notify drive bias changes
+* Remove player-position derived "fixed" camera
+* Add secondary vehicle-attached camera option
 * Add cruise control with adaptive mode
 * Add speed limiter
-* Make assist icons flash when active
-* Flash brake lights when ABS is active
-* Support Wanted188's R32 (Torque transfer gauge)
-* Remove player-position derived "fixed" camera
-* Add another vehicle-centric camera option
+* Add flashing effect for brake lights when ABS active
+* Add flashing effect for assist icons when active
+* Clean up assists messages
+* Fix autogear1 and hillgravity assists using wrong speed
+* Fix downshift blip affeceting braking performance
+* Support Wanted188's (in-dev) R32 (Torque transfer gauge)
+
+Warning:
+
+* Each camera attach option has its own FOV/offset/pitch settings now
+* This means old camera settings will need to be updated
 
 ## 5.2.0
 
