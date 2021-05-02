@@ -1650,6 +1650,7 @@ void handleBrakePatch() {
     auto espData = DrivingAssists::GetESP();
     auto lsdData = DrivingAssists::GetLSD();
 
+    // tcs & lc
     bool tcsThrottle = tcsData.Use && g_settings().DriveAssists.TCS.Mode == 1;
     bool lcThrottle = g_settings().DriveAssists.LaunchControl.Enable &&
         LaunchControl::GetState() == LaunchControl::ELCState::Controlling;
@@ -1703,6 +1704,7 @@ void handleBrakePatch() {
         UI::ShowText(0.60f, 0.150f, 0.25f, fmt::format("Throttle: {}", controlledThrottle));
     }
 
+    // Cruise control
     bool ccThrottle = false;
     float throttle = g_controls.ThrottleVal;
     float brake = g_controls.BrakeVal;
@@ -1735,11 +1737,51 @@ void handleBrakePatch() {
         }
     }
 
+    // Shift throttle blip/cut
+    bool blipCutThrottle = false;
+    // Shifting is only true in Automatic and Sequential mode
+    if (g_gearStates.Shifting) {
+        float clutchInput = g_controls.ClutchVal;
+
+        // Always treat clutch pedal as unpressed for auto
+        if (g_settings().MTOptions.ShiftMode == EShiftMode::Automatic) {
+            clutchInput = 0.0f;
+        }
+
+        // Only lift and blip when no clutch used
+        if (clutchInput == 0.0f) {
+            if (g_gearStates.ShiftDirection == ShiftDirection::Up &&
+                g_settings().ShiftOptions.UpshiftCut) {
+                float cutThrottle = map(g_gearStates.ClutchVal, 0.0f, 1.0f, g_controls.ThrottleVal, 0.0f);
+                cutThrottle = std::clamp(cutThrottle, 0.0f, 1.0f);
+                if (g_controls.ThrottleVal > cutThrottle) {
+                    blipCutThrottle = true;
+                    VExt::SetThrottle(g_playerVehicle, cutThrottle); // audio
+                    VExt::SetThrottleP(g_playerVehicle, cutThrottle);
+                }
+            }
+            if (g_gearStates.ShiftDirection == ShiftDirection::Down &&
+                g_settings().ShiftOptions.DownshiftBlip) {
+                float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr - 1]);
+                if (g_vehData.mRPM < expectedRPM) {
+                    float blipThrottle = map(g_gearStates.ClutchVal, 0.8f, 1.0f, 0.0f, 1.0f);
+                    blipThrottle = std::clamp(blipThrottle, 0.0f, 1.0f);
+                    if (blipThrottle > g_controls.ThrottleVal) {
+                        blipCutThrottle = true;
+                        VExt::SetThrottle(g_playerVehicle, blipThrottle); // audio
+                        VExt::SetThrottleP(g_playerVehicle, blipThrottle);
+                    }
+                }
+            }
+        }
+    }
+
     bool patchThrottleControl =
         tcsThrottle ||
         lcThrottle ||
         ccThrottle ||
-        speedLimThrottle;
+        speedLimThrottle ||
+        blipCutThrottle;
 
     bool patchThrottle =
         g_wheelPatchStates.EngLockActive ||
@@ -1887,20 +1929,6 @@ void handleRPM() {
     if (g_gearStates.Shifting) {
         if (g_gearStates.ClutchVal > clutch)
             clutch = g_gearStates.ClutchVal;
-
-        // Only lift and blip when no clutch used
-        if (clutchInput == 0.0f) {
-            if (g_gearStates.ShiftDirection == ShiftDirection::Up &&
-                g_settings().ShiftOptions.UpshiftCut) {
-                PAD::DISABLE_CONTROL_ACTION(0, ControlVehicleAccelerate, true);
-            }
-            if (g_gearStates.ShiftDirection == ShiftDirection::Down &&
-                g_settings().ShiftOptions.DownshiftBlip) {
-                float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr - 1]);
-                if (g_vehData.mRPM < expectedRPM * 0.75f)
-                    PAD::_SET_CONTROL_NORMAL(0, ControlVehicleAccelerate, 0.66f);
-            }
-        }
     }
 
     // Ignores clutch 
