@@ -547,6 +547,8 @@ void ScriptSettings::parseSettingsGeneral() {
 
     // [DEBUG]
     LOAD_VAL("DEBUG", "LogLevel", Debug.LogLevel);
+    LOAD_VAL("DEBUG", "CancelAnimOnUnload", Debug.CancelAnimOnUnload);
+
     LOAD_VAL("DEBUG", "DisplayInfo", Debug.DisplayInfo);
     LOAD_VAL("DEBUG", "DisplayWheelInfo", Debug.DisplayWheelInfo);
     LOAD_VAL("DEBUG", "DisplayMaterialInfo", Debug.DisplayMaterialInfo);

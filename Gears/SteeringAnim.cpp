@@ -75,6 +75,11 @@ bool SteeringAnimation::FileProblem() {
     return fileProblem;
 }
 
+void SteeringAnimation::CancelAnimation() {
+    if (g_settings.Debug.CancelAnimOnUnload)
+        cancelAnim(lastAnimation);
+}
+
 const std::vector<SteeringAnimation::Animation>& SteeringAnimation::GetAnimations() {
     return steeringAnimations;
 }

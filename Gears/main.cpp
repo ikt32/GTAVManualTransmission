@@ -3,6 +3,8 @@
 #include "Constants.h"
 #include "GitInfo.h"
 
+#include "SteeringAnim.h"
+
 #include "Compatibility.h"
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/VehicleExtensions.hpp"
@@ -120,6 +122,8 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 
             resetSteeringMultiplier();
             releaseCompatibility();
+
+            SteeringAnimation::CancelAnimation();
 
             scriptUnregister(hInstance);
             break;

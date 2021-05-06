@@ -266,7 +266,8 @@ public:
 
     // [DEBUG]
     struct {
-        int LogLevel = INFO;
+        int LogLevel = INFO; // Only load
+        bool CancelAnimOnUnload = false; // Only load
         bool DisplayInfo = false;
         bool DisplayGearingInfo = false;
         bool DisplayWheelInfo = false;
