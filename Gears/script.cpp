@@ -601,61 +601,65 @@ void update_manual_transmission() {
         }
     }
 
-    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::DriveBiasFInc) ||
-        g_controls.ButtonJustPressed(CarControls::WheelControlType::DriveBiasFInc)) {
-        float bias = g_settings().DriveAssists.AWD.CustomBaseBias;
-        float customMax = g_settings().DriveAssists.AWD.CustomMax;
-        bias += 0.05f;
-        bias = std::clamp(
-            round(bias * 20.0f) / 20.0f,
-            0.01f,
-            customMax);
-        g_settings().DriveAssists.AWD.CustomBaseBias = bias;
-        UI::Notify(INFO, fmt::format("Drive bias: {:.0f}F/{:.0f}R", bias * 100.0f, (1.0f - bias) * 100.0f), true);
+    if (g_settings().DriveAssists.AWD.Enable) {
+        if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::DriveBiasFInc) ||
+            g_controls.ButtonJustPressed(CarControls::WheelControlType::DriveBiasFInc)) {
+            float bias = g_settings().DriveAssists.AWD.CustomBaseBias;
+            float customMax = g_settings().DriveAssists.AWD.CustomMax;
+            bias += 0.05f;
+            bias = std::clamp(
+                round(bias * 20.0f) / 20.0f,
+                0.01f,
+                customMax);
+            g_settings().DriveAssists.AWD.CustomBaseBias = bias;
+            UI::Notify(INFO, fmt::format("Drive bias: {:.0f}F/{:.0f}R", bias * 100.0f, (1.0f - bias) * 100.0f), true);
+        }
+
+        if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::DriveBiasFDec) ||
+            g_controls.ButtonJustPressed(CarControls::WheelControlType::DriveBiasFDec)) {
+            float bias = g_settings().DriveAssists.AWD.CustomBaseBias;
+            float customMin = g_settings().DriveAssists.AWD.CustomMin;
+            bias -= 0.05f;
+            bias = std::clamp(
+                round(bias * 20.0f) / 20.0f,
+                customMin,
+                0.99f);
+            g_settings().DriveAssists.AWD.CustomBaseBias = bias;
+            UI::Notify(INFO, fmt::format("Drive bias: {:.0f}F/{:.0f}R", bias * 100.0f, (1.0f - bias) * 100.0f), true);
+        }
     }
 
-    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::DriveBiasFDec) ||
-        g_controls.ButtonJustPressed(CarControls::WheelControlType::DriveBiasFDec)) {
-        float bias = g_settings().DriveAssists.AWD.CustomBaseBias;
-        float customMin = g_settings().DriveAssists.AWD.CustomMin;
-        bias -= 0.05f;
-        bias = std::clamp(
-            round(bias * 20.0f) / 20.0f,
-            customMin,
-            0.99f);
-        g_settings().DriveAssists.AWD.CustomBaseBias = bias;
-        UI::Notify(INFO, fmt::format("Drive bias: {:.0f}F/{:.0f}R", bias * 100.0f, (1.0f - bias) * 100.0f), true);
-    }
+    if (g_settings().DriveAssists.CruiseControl.Enable) {
+            if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ToggleCC) ||
+            g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleCC) ||
+            g_controls.ButtonHeld(CarControls::ControllerControlType::ToggleCC) ||
+            g_controls.PrevInput == CarControls::Controller && g_controls.ButtonHeld(CarControls::LegacyControlType::ToggleCC)) {
+            CruiseControl::SetActive(!CruiseControl::GetActive());
+        }
 
-    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ToggleCC) ||
-        g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleCC) ||
-        g_controls.ButtonHeld(CarControls::ControllerControlType::ToggleCC) ||
-        g_controls.PrevInput == CarControls::Controller && g_controls.ButtonHeld(CarControls::LegacyControlType::ToggleCC)) {
-        CruiseControl::SetActive(!CruiseControl::GetActive());
-    }
+        if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::CCInc) ||
+            g_controls.ButtonJustPressed(CarControls::WheelControlType::CCInc)) {
+            float speedValMul;
+            std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Speedo, speedValMul);
+            float speed = g_settings().DriveAssists.CruiseControl.Speed;
 
-    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::CCInc) ||
-        g_controls.ButtonJustPressed(CarControls::WheelControlType::CCInc)) {
-        float speedValMul;
-        std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Speedo, speedValMul);
-        float speed = g_settings().DriveAssists.CruiseControl.Speed;
+            float speedValUnit = speed * speedValMul;
+            speedValUnit = std::clamp(speedValUnit + 5.0f, 0.0f, 500.0f);
+            g_settings().DriveAssists.CruiseControl.Speed = speedValUnit / speedValMul;
+            UI::Notify(INFO, fmt::format("Cruise control {:.0f} {}", speedValUnit, speedNameUnit), true);
+        }
 
-        float speedValUnit = speed * speedValMul;
-        speedValUnit = std::clamp(speedValUnit + 5.0f ,0.0f, 500.0f);
-        g_settings().DriveAssists.CruiseControl.Speed = speedValUnit / speedValMul;
-        UI::Notify(INFO, fmt::format("Cruise control {:.0f} {}", speedValUnit, speedNameUnit), true);
-    }
+        if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::CCDec) ||
+            g_controls.ButtonJustPressed(CarControls::WheelControlType::CCDec)) {
+            float speedValMul;
+            std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Speedo, speedValMul);
+            float speed = g_settings().DriveAssists.CruiseControl.Speed;
 
-    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::CCDec) ||
-        g_controls.ButtonJustPressed(CarControls::WheelControlType::CCDec)) {
-        float speedValMul;
-        std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Speedo, speedValMul);
-        float speed = g_settings().DriveAssists.CruiseControl.Speed;
-
-        float speedValUnit = speed * speedValMul;
-        speedValUnit = std::clamp(speedValUnit - 5.0f, 0.0f, 500.0f);
-        g_settings().DriveAssists.CruiseControl.Speed = speedValUnit / speedValMul;
-        UI::Notify(INFO, fmt::format("Cruise control {:.0f} {}", speedValUnit, speedNameUnit), true);
+            float speedValUnit = speed * speedValMul;
+            speedValUnit = std::clamp(speedValUnit - 5.0f, 0.0f, 500.0f);
+            g_settings().DriveAssists.CruiseControl.Speed = speedValUnit / speedValMul;
+            UI::Notify(INFO, fmt::format("Cruise control {:.0f} {}", speedValUnit, speedNameUnit), true);
+        }
     }
 
     if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ToggleLC) ||
