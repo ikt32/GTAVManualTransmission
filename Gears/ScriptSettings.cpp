@@ -125,6 +125,7 @@ void ScriptSettings::SaveGeneral() {
     SAVE_VAL("CUSTOM_STEERING", "CountersteerMult", CustomSteering.CountersteerMult);
     SAVE_VAL("CUSTOM_STEERING", "CountersteerLimit", CustomSteering.CountersteerLimit);
     SAVE_VAL("CUSTOM_STEERING", "SteeringReduction", CustomSteering.SteeringReduction);
+    SAVE_VAL("CUSTOM_STEERING", "NoReductionHandbrake", CustomSteering.NoReductionHandbrake);
     SAVE_VAL("CUSTOM_STEERING", "Gamma", CustomSteering.Gamma);
     SAVE_VAL("CUSTOM_STEERING", "SteerTime", CustomSteering.SteerTime);
     SAVE_VAL("CUSTOM_STEERING", "CenterTime", CustomSteering.CenterTime);
@@ -412,6 +413,7 @@ void ScriptSettings::parseSettingsGeneral() {
     LOAD_VAL("CUSTOM_STEERING", "CountersteerMult", CustomSteering.CountersteerMult);
     LOAD_VAL("CUSTOM_STEERING", "CountersteerLimit", CustomSteering.CountersteerLimit);
     LOAD_VAL("CUSTOM_STEERING", "SteeringReduction", CustomSteering.SteeringReduction);
+    LOAD_VAL("CUSTOM_STEERING", "NoReductionHandbrake", CustomSteering.NoReductionHandbrake);
     LOAD_VAL("CUSTOM_STEERING", "Gamma", CustomSteering.Gamma);
     LOAD_VAL("CUSTOM_STEERING", "SteerTime", CustomSteering.SteerTime);
     LOAD_VAL("CUSTOM_STEERING", "CenterTime", CustomSteering.CenterTime);

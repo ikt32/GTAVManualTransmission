@@ -1956,6 +1956,8 @@ void update_steeringassistmenu() {
         { "Maximum angle in degrees for automatic countersteering. Game default is 15 degrees." });
     g_menu.FloatOption("Steering reduction", g_settings.CustomSteering.SteeringReduction, 0.0f, 1.0f, 0.01f,
         { "Reduce steering input at higher speeds.", "From InfamousSabre's Custom Steering." });
+    g_menu.BoolOption("No reduction on handbrake", g_settings.CustomSteering.NoReductionHandbrake,
+        { "Disable reduction when the handbrake is used." });
     g_menu.FloatOption("Steering gamma", g_settings.CustomSteering.Gamma, 0.01f, 5.0f, 0.01f,
         { "Change linearity of steering input." });
     g_menu.FloatOptionCb("Steering time", g_settings.CustomSteering.SteerTime, 0.000001f, 0.90f, 0.000001f,

@@ -237,6 +237,11 @@ void CustomSteering::Update() {
     if (isFrog && submergeLevel > 0.0f || isBoat || is2Wheel)
         reduction = 1.0f;
 
+    // Ignore reduction on handbrake.
+    if (g_settings.CustomSteering.NoReductionHandbrake && VExt::GetHandbrake(g_playerVehicle)) {
+        reduction = 1.0f;
+    }
+
     float desiredHeading;
     if (mouseInputThisTick && g_settings.CustomSteering.Mouse.DisableReduction) {
         reduction = 1.0f;
