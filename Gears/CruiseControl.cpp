@@ -37,7 +37,6 @@ bool CruiseControl::GetActive() {
 }
 
 void CruiseControl::SetActive(bool active) {
-    g_settings().DriveAssists.CruiseControl.Enable = active;
     ::active = active;
     cruiseThrottle = 0.0f;
     UI::Notify(INFO, fmt::format("Cruise control {}", active ? "~g~ON" : "~r~OFF"), true);

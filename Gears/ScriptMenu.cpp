@@ -31,6 +31,7 @@
 
 #include "AWD.h"
 #include "DrivingAssists.h"
+#include "CruiseControl.h"
 
 #include <menu.h>
 #include <inc/main.h>
@@ -1825,6 +1826,13 @@ void update_cruisecontrolsettingsmenu() {
     g_menu.Title("Cruise control");
     g_menu.Subtitle(MenuSubtitleConfig());
 
+    bool ccActive = CruiseControl::GetActive();
+    if (g_menu.BoolOption("Active", ccActive,
+        { "Activate or deactivate cruise control. Cancelled on throttle, brake or clutch.",
+          "Can also be activated and deactivated from hotkeys or wheel buttons." })) {
+        CruiseControl::SetActive(ccActive);
+    }
+
     float speedValMul;
     float speedValRaw = g_settings().DriveAssists.CruiseControl.Speed;
     std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Speedo, speedValMul);
@@ -1833,7 +1841,7 @@ void update_cruisecontrolsettingsmenu() {
     if (g_menu.FloatOptionCb(fmt::format("Speed ({})", speedNameUnit), speedValUnit, 0.0f, 500.0f, 5.0f,
         getKbEntry,
         { "Speed for cruise control. Speeds higher than vehicle top speed are ignored.",
-          "You can also change this with the hotkeys or wheel buttons." })) {
+          "Can also be changed with hotkeys or wheel buttons." })) {
 
         g_settings().DriveAssists.CruiseControl.Speed = speedValUnit / speedValMul;
     }
