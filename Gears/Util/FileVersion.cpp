@@ -116,8 +116,7 @@ SVersion getExeInfo() {
         }
 
         return { 1604, 0 };
-    }
-    else {
+    } else {
         return getExeVersion(currExe);
     }
 }
