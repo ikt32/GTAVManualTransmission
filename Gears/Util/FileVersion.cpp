@@ -102,22 +102,24 @@ SVersion getExeInfo() {
 
     if (FiveM) {
         logger.Write(INFO, "FiveM detected");
-        auto FiveMApp = std::string(citizenDir).substr(0, std::string(citizenDir).find_last_of('\\'));
-        logger.Write(INFO, "FiveM.app dir: %s", FiveMApp.c_str());
-        auto cacheFolder = FiveMApp + "\\cache\\game";
-        std::string newestExe;
-        fs::directory_entry newestExeEntry;
-        for (auto& file : fs::directory_iterator(cacheFolder)) {
-            if (strfind(fs::path(file).string(), "GTA5.exe")) {
-                if (newestExe.empty() || last_write_time(newestExeEntry) < last_write_time(file)) {
-                    newestExe = fs::path(file).string();
-                    newestExeEntry = file;
-                }
-            }
+
+        if (wcsstr(GetCommandLineW(), L"b2189") != nullptr) {
+            return { 2189, 0 };
         }
-        currExe = newestExe;
+
+        if (wcsstr(GetCommandLineW(), L"b2060") != nullptr) {
+            return { 2060, 0 };
+        } 
+
+        if (wcsstr(GetCommandLineW(), L"b372") != nullptr) {
+            return { 372, 2 };
+        }
+
+        return { 1604, 0 };
     }
-    return getExeVersion(currExe);
+    else {
+        return getExeVersion(currExe);
+    }
 }
 
 bool FileVersion::IsFiveM() {
