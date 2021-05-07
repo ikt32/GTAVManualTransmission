@@ -2155,54 +2155,83 @@ void update_cameraoptionsmenu() {
         { "Milliseconds before centering the camera after looking with the mouse." });
 }
 
-void update_cameramovementoptionsmenu() {
+void update_cameramovementoptionsmenu(bool bike) {
     g_menu.Title("Camera movement");
-    g_menu.Subtitle(MenuSubtitleConfig());
+    VehicleConfig::SMovement* pMovement = nullptr;
+    std::string modeName;
 
-    if (g_menu.BoolOption("Follow movement", g_settings().Misc.Camera.Movement.Follow,
+    if (!bike) {
+        switch (g_settings().Misc.Camera.AttachId) {
+            case 0: pMovement = &g_settings().Misc.Camera.Ped.Movement; break;
+            case 1: pMovement = &g_settings().Misc.Camera.Vehicle1.Movement; break;
+            case 2: pMovement = &g_settings().Misc.Camera.Vehicle2.Movement; break;
+            default:
+                break;
+        }
+    }
+    else {
+        pMovement = &g_settings().Misc.Camera.Bike.Movement;
+    }
+
+    if (pMovement == nullptr) {
+        g_menu.Subtitle("Invalid configuration");
+        g_menu.Option("Invalid configuration");
+        return;
+    }
+
+    if (!bike)
+        modeName = camAttachPoints[g_settings().Misc.Camera.AttachId];
+    else
+        modeName = "Bike";
+
+    g_menu.Subtitle(fmt::format("{} - {}", MenuSubtitleConfig(), modeName));
+
+    VehicleConfig::SMovement& movement = *pMovement;
+
+    if (g_menu.BoolOption("Follow movement", movement.Follow,
         { "Camera moves with motion and rotation, somewhat like NFS Shift." })) {
         FPVCam::CancelCam();
     }
 
-    g_menu.FloatOption("Rotation: direction", g_settings().Misc.Camera.Movement.RotationDirectionMult, 0.0f, 4.0f, 0.01f,
+    g_menu.FloatOption("Rotation: direction", movement.RotationDirectionMult, 0.0f, 4.0f, 0.01f,
         { "How much the direction of travel affects the camera." });
 
-    g_menu.FloatOption("Rotation: rotation", g_settings().Misc.Camera.Movement.RotationRotationMult, 0.0f, 4.0f, 0.01f,
+    g_menu.FloatOption("Rotation: rotation", movement.RotationRotationMult, 0.0f, 4.0f, 0.01f,
         { "How much the rotation speed affects the camera." });
 
-    g_menu.FloatOption("Rotation: max angle", g_settings().Misc.Camera.Movement.RotationMaxAngle, 0.0f, 90.0f, 1.0f,
+    g_menu.FloatOption("Rotation: max angle", movement.RotationMaxAngle, 0.0f, 90.0f, 1.0f,
         { "To how many degrees camera movement is capped." });
 
-    g_menu.FloatOption("Movement: Minimum Gs", g_settings().Misc.Camera.Movement.LongDeadzone, 0.0f, 2.0f, 0.01f,
+    g_menu.FloatOption("Movement: Minimum Gs", movement.LongDeadzone, 0.0f, 2.0f, 0.01f,
         { "How hard the car should accelerate or decelerate for the camera to start moving.",
           "Unit in Gs." });
 
-    g_menu.FloatOption("Movement: Forward scale", g_settings().Misc.Camera.Movement.LongForwardMult, 0.0f, 2.0f, 0.01f,
+    g_menu.FloatOption("Movement: Forward scale", movement.LongForwardMult, 0.0f, 2.0f, 0.01f,
         { "How much to move the camera with, depending on how hard you decelerate.",
           "A scale of 1.0 makes the camera move 1 meter at 1G acceleration.",
           "A scale of 0.1 makes the camera move 10 centimeter at 1G acceleration." });
 
-    g_menu.FloatOption("Movement: Backward scale", g_settings().Misc.Camera.Movement.LongBackwardMult, 0.0f, 2.0f, 0.01f,
+    g_menu.FloatOption("Movement: Backward scale", movement.LongBackwardMult, 0.0f, 2.0f, 0.01f,
         { "How much to move the camera with, depending on how hard you accelerate.",
           "A scale of 1.0 makes the camera move 1 meter at 1G acceleration.",
           "A scale of 0.1 makes the camera move 10 centimeter at 1G acceleration." });
 
-    g_menu.FloatOption("Movement: Forward limit", g_settings().Misc.Camera.Movement.LongForwardLimit, 0.0f, 1.0f, 0.01f,
+    g_menu.FloatOption("Movement: Forward limit", movement.LongForwardLimit, 0.0f, 1.0f, 0.01f,
         { "Distance the camera can move forward (under deceleration).",
           "Unit in meter." });
 
-    g_menu.FloatOption("Movement: Backward limit", g_settings().Misc.Camera.Movement.LongBackwardLimit, 0.0f, 1.0f, 0.01f,
+    g_menu.FloatOption("Movement: Backward limit", movement.LongBackwardLimit, 0.0f, 1.0f, 0.01f,
         { "Distance the camera can move backward (under acceleration).",
           "Unit in meter." });
 
-    g_menu.FloatOption("Movement: Gamma", g_settings().Misc.Camera.Movement.LongGamma, 0.0f, 5.0f, 0.1f,
+    g_menu.FloatOption("Movement: Gamma", movement.LongGamma, 0.0f, 5.0f, 0.1f,
         { "Linearity in movement response.",
           "Less than 1: Camera moves a lot with small Gs but tops out quickly.",
           "More than 1: Camera moves little with small Gs but increases exponentially with more Gs." });
 }
 
 void update_bikecameraoptionsmenu() {
-    g_menu.Title("Camera bikes");
+    g_menu.Title("Camera (bikes)");
     g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.BoolOption("Disable for 2-ish wheelers", g_settings().Misc.Camera.Bike.Disable,
@@ -2226,6 +2255,10 @@ void update_bikecameraoptionsmenu() {
 
     g_menu.FloatOption("Pitch", g_settings().Misc.Camera.Bike.Pitch, -20.0f, 20.0f, 0.1f,
         { "In degrees." });
+
+    g_menu.MenuOption("Camera movement options", "bikecameramovementoptionsmenu",
+        { "Enable and tweak the movement of the first person camera.",
+          "Movement options applies to all bike attach options. (Not unique per attach option)" });
 }
 
 void update_devoptionsmenu() {
@@ -2566,7 +2599,10 @@ void update_menu() {
     if (g_menu.CurrentMenu("bikecameraoptionsmenu")) { update_bikecameraoptionsmenu(); }
 
     /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> cameramovementoptionsmenu*/
-    if (g_menu.CurrentMenu("cameramovementoptionsmenu")) { update_cameramovementoptionsmenu(); }
+    if (g_menu.CurrentMenu("cameramovementoptionsmenu")) { update_cameramovementoptionsmenu(false); }
+
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> bikecameraoptionsmenu -> bikecameramovementoptionsmenu*/
+    if (g_menu.CurrentMenu("bikecameramovementoptionsmenu")) { update_cameramovementoptionsmenu(true); }
 
     /* mainmenu -> devoptionsmenu */
     if (g_menu.CurrentMenu("devoptionsmenu")) { update_devoptionsmenu(); }

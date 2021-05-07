@@ -46,6 +46,20 @@ public:
     std::vector<std::string> Plates;
     std::string Description;
 
+    struct SMovement {
+        Tracked<bool> Follow = true;
+        Tracked<float> RotationDirectionMult = 0.750f;
+        Tracked<float> RotationRotationMult = 0.15f;
+        Tracked<float> RotationMaxAngle = 45.0f;
+
+        Tracked<float> LongForwardMult = 0.05f;
+        Tracked<float> LongBackwardMult = 0.10f;
+        Tracked<float> LongDeadzone = 0.95f;
+        Tracked<float> LongGamma = 1.0f;
+        Tracked<float> LongForwardLimit = 0.10f;
+        Tracked<float> LongBackwardLimit = 0.12f;
+    };
+
     // [MT_OPTIONS]
     struct {
         Tracked<EShiftMode> ShiftMode = EShiftMode::Sequential;
@@ -224,20 +238,6 @@ public:
             Tracked<int> AttachId = 0; // 0: Head, 1: Vehicle (1), 2: Vehicle (2)
             Tracked<bool> RemoveHead = true;
 
-            struct {
-                Tracked<bool> Follow = true;
-                Tracked<float> RotationDirectionMult = 0.750f;
-                Tracked<float> RotationRotationMult = 0.15f;
-                Tracked<float> RotationMaxAngle = 45.0f;
-
-                Tracked<float> LongForwardMult = 0.05f;
-                Tracked<float> LongBackwardMult = 0.10f;
-                Tracked<float> LongDeadzone = 0.95f;
-                Tracked<float> LongGamma = 1.0f;
-                Tracked<float> LongForwardLimit = 0.10f;
-                Tracked<float> LongBackwardLimit = 0.12f;
-            } Movement;
-
             Tracked<float> LookTime = 0.000010f;
             Tracked<float> MouseLookTime = 0.000001f;
             Tracked<int> MouseCenterTimeout = 750;
@@ -249,6 +249,7 @@ public:
                 Tracked<float> OffsetForward = 0.05f;
                 Tracked<float> OffsetSide = 0.0f;
                 Tracked<float> Pitch = 0.0f;
+                SMovement Movement;
             } Ped;
             struct {
                 Tracked<float> FOV = 55.0f;
@@ -256,6 +257,7 @@ public:
                 Tracked<float> OffsetForward = 0.00f;
                 Tracked<float> OffsetSide = 0.0f;
                 Tracked<float> Pitch = 0.0f;
+                SMovement Movement;
             } Vehicle1;
             struct {
                 Tracked<float> FOV = 55.0f;
@@ -263,6 +265,7 @@ public:
                 Tracked<float> OffsetForward = 0.00f;
                 Tracked<float> OffsetSide = 0.0f;
                 Tracked<float> Pitch = 0.0f;
+                SMovement Movement;
             } Vehicle2;
             struct {
                 Tracked<bool> Disable = false;
@@ -272,6 +275,7 @@ public:
                 Tracked<float> OffsetForward = -0.08f;
                 Tracked<float> OffsetSide = 0.0f;
                 Tracked<float> Pitch = -11.0f;
+                SMovement Movement;
             } Bike;
         } Camera;
     } Misc;

@@ -65,8 +65,8 @@ namespace FPVCam {
 void updateControllerLook(bool& lookingIntoGlass);
 void updateMouseLook(bool& lookingIntoGlass);
 void updateWheelLook(bool& lookingIntoGlass);
-void updateRotationCameraMovement();
-void updateLongitudinalCameraMovement();
+void updateRotationCameraMovement(VehicleConfig::SMovement& movement);
+void updateLongitudinalCameraMovement(VehicleConfig::SMovement& movement);
 
 void FPVCam::InitOffsets() {
     if (g_gameVersion < G_VER_1_0_1290_1_STEAM) {
@@ -173,9 +173,26 @@ void FPVCam::Update() {
         updateControllerLook(lookingIntoGlass);
     }
 
-    if (g_settings().Misc.Camera.Movement.Follow) {
-        updateRotationCameraMovement();
-        updateLongitudinalCameraMovement();
+    VehicleConfig::SMovement* pMovement = nullptr;
+
+    if (!bikeSeat) {
+        switch (g_settings().Misc.Camera.AttachId) {
+            case 0: pMovement = &g_settings().Misc.Camera.Ped.Movement; break;
+            case 1: pMovement = &g_settings().Misc.Camera.Vehicle1.Movement; break;
+            case 2: pMovement = &g_settings().Misc.Camera.Vehicle2.Movement; break;
+            default:
+                break;
+        }
+    }
+    else {
+        pMovement = &g_settings().Misc.Camera.Bike.Movement;
+    }
+
+    if (pMovement != nullptr) {
+        if (pMovement->Follow) {
+            updateRotationCameraMovement(*pMovement);
+            updateLongitudinalCameraMovement(*pMovement);
+        }
     }
 
     float offsetX = 0.0f;
@@ -458,7 +475,7 @@ void updateWheelLook(bool& lookingIntoGlass) {
     }
 }
 
-void updateRotationCameraMovement() {
+void updateRotationCameraMovement(VehicleConfig::SMovement& movement) {
     Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
 
     Vector3 target = Normalize(speedVector);
@@ -472,9 +489,9 @@ void updateRotationCameraMovement() {
 
     Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
 
-    float velComponent = travelDir * g_settings().Misc.Camera.Movement.RotationDirectionMult;
-    float rotComponent = rotationVelocity.z * g_settings().Misc.Camera.Movement.RotationRotationMult;
-    float rotMax = deg2rad(g_settings().Misc.Camera.Movement.RotationMaxAngle);
+    float velComponent = travelDir * movement.RotationDirectionMult;
+    float rotComponent = rotationVelocity.z * movement.RotationRotationMult;
+    float rotMax = deg2rad(movement.RotationMaxAngle);
     float totalMove = std::clamp(velComponent + rotComponent,
         -rotMax,
         rotMax);
@@ -499,7 +516,7 @@ void updateRotationCameraMovement() {
         1.0f - pow(0.000001f, MISC::GET_FRAME_TIME()));
 }
 
-void updateLongitudinalCameraMovement() {
+void updateLongitudinalCameraMovement(VehicleConfig::SMovement& movement) {
     accelAvg.push_back(g_vehData.mAcceleration.y);
     while (accelAvg.size() > 4) {
         accelAvg.erase(accelAvg.begin());
@@ -512,21 +529,21 @@ void updateLongitudinalCameraMovement() {
     //gForce = abs(pow(gForce, g_settings().Misc.Camera.Movement.LongGamma)) * sgn(gForce);
 
     float mappedAccel = 0.0f;
-    float deadzone = g_settings().Misc.Camera.Movement.LongDeadzone;
+    float deadzone = movement.LongDeadzone;
 
     float mult = 0.0f;
     // Accelerate
     if (gForce > deadzone) {
         mappedAccel = map(gForce, deadzone, 10.0f, 0.0f, 10.0f);
-        mult = g_settings().Misc.Camera.Movement.LongBackwardMult;
+        mult = movement.LongBackwardMult;
     }
     // Decelerate
     if (gForce < -deadzone) {
         mappedAccel = map(gForce, -deadzone, -10.0f, 0.0f, -10.0f);
-        mult = g_settings().Misc.Camera.Movement.LongForwardMult;
+        mult = movement.LongForwardMult;
     }
-    float longBwLim = g_settings().Misc.Camera.Movement.LongBackwardLimit;
-    float longFwLim = g_settings().Misc.Camera.Movement.LongForwardLimit;
+    float longBwLim = movement.LongBackwardLimit;
+    float longFwLim = movement.LongForwardLimit;
     float accelVal = 
         std::clamp(-mappedAccel * mult,
             -longBwLim,
