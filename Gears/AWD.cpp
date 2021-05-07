@@ -149,9 +149,9 @@ void AWD::Update() {
     }
 
     if (g_settings.Debug.DisplayInfo) {
-        UI::ShowText(dbgX, dbgY, 0.5f, fmt::format("T: {:.2f}", driveBiasTransferRatio));
-        UI::ShowText(dbgX, dbgY + 0.025f, 0.5f, fmt::format("F: {:.2f}", driveBiasF));
-        UI::ShowText(dbgX, dbgY + 0.050f, 0.5f, fmt::format("Src: {}", maxTransferInfo.Source));
+        UI::ShowText(dbgX, dbgY + 0.000f, 0.25f, fmt::format("T: {:.2f}", driveBiasTransferRatio));
+        UI::ShowText(dbgX, dbgY + 0.025f, 0.25f, fmt::format("F: {:.2f}", driveBiasF));
+        UI::ShowText(dbgX, dbgY + 0.050f, 0.25f, fmt::format("Src: {}", maxTransferInfo.Source));
     }
 
     // replace value in (current) handling
