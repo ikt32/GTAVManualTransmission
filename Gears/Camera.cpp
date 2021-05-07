@@ -226,9 +226,12 @@ void FPVCam::Update() {
 
     bool wearingHelmet = PED::IS_PED_WEARING_HELMET(g_playerPed);
 
-    if (wearingHelmet || !headRemoved) {
+    if (wearingHelmet) {
+        CAM::SET_CAM_NEAR_CLIP(cameraHandle, 0.200f);
+    }
+    else if (!headRemoved) {
         // FPV driving gameplay is 0.149
-        // Add 2.6cm so the helmet or head model are entirely clipped out
+        // Add 2.6cm so the head model is entirely clipped out
         CAM::SET_CAM_NEAR_CLIP(cameraHandle, 0.175f);
     }
     else {
