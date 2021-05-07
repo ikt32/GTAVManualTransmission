@@ -27,6 +27,8 @@ namespace {
 
     bool mouseDown = false;
     float mouseXTravel = 0.0f;
+
+    float lastReduction = 1.0f;
 }
 
 namespace CustomSteering {
@@ -246,6 +248,11 @@ void CustomSteering::Update() {
     if (mouseInputThisTick && g_settings.CustomSteering.Mouse.DisableReduction) {
         reduction = 1.0f;
     }
+    reduction = lerp(
+        lastReduction,
+        reduction,
+        1.0f - pow(g_settings.CustomSteering.CenterTime, secondsSinceLastTick));
+    lastReduction = reduction;
 
     if (mouseInputThisTick && g_settings.CustomSteering.Mouse.DisableSteerAssist) {
         desiredHeading = steerCurr * limitRadians * reduction;
