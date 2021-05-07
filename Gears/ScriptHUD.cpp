@@ -134,21 +134,20 @@ void updateDashLights() {
         DashLights::LastTcsTime = currentTime;
     if (esp)
         DashLights::LastEspTime = currentTime;
-}
-
-void drawDashLights() {
-    const int currentTime = MISC::GET_GAME_TIMER();
 
     int absPeriods = (currentTime - DashLights::LastAbsTrigger) / DashLights::FlashDuration;
     DashLights::AbsBulbState = DashLights::LastAbsTrigger != 0 && absPeriods % 2;
-    bool abs = DashLights::AbsBulbState;
 
     int tcsPeriods = (currentTime - DashLights::LastTcsTrigger) / DashLights::FlashDuration;
     DashLights::TcsBulbState = DashLights::LastTcsTrigger != 0 && tcsPeriods % 2;
-    bool tcs = DashLights::TcsBulbState;
 
     int espPeriods = (currentTime - DashLights::LastEspTrigger) / DashLights::FlashDuration;
     DashLights::EspBulbState = DashLights::LastEspTrigger != 0 && espPeriods % 2;
+}
+
+void drawDashLights() {
+    bool abs = DashLights::AbsBulbState;
+    bool tcs = DashLights::TcsBulbState;
     bool esp = DashLights::EspBulbState;
 
     if (g_peripherals.IgnitionState == IgnitionState::Stall) {
