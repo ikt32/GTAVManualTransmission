@@ -97,26 +97,23 @@ SVersion getExeVersion(const std::string & exe) {
 SVersion getExeInfo() {
     std::string currExe = Paths::GetRunningExecutablePath();
     logger.Write(INFO, "Running executable: %s", currExe.c_str());
-    std::string citizenDir;
-    FiveM = isModulePresent("CitizenGame.dll", citizenDir);
 
-    if (FiveM) {
+    HMODULE citizenGameHandle = GetModuleHandle(L"CitizenGame.dll");
+
+    if (citizenGameHandle != nullptr) {
+        FiveM = true;
         logger.Write(INFO, "FiveM detected");
 
-        if (wcsstr(GetCommandLineW(), L"b2189") != nullptr) {
-            return { 2189, 0 };
+        FARPROC funcGetGameVersion = GetProcAddress(citizenGameHandle, "GetGameVersion");
+        if (!funcGetGameVersion) {
+            logger.Write(INFO, "No GetGameVersion in CitizenGame.dll, using default b1604");
+            return { 1604, 0 };
         }
 
-        if (wcsstr(GetCommandLineW(), L"b2060") != nullptr) {
-            return { 2060, 0 };
-        } 
-
-        if (wcsstr(GetCommandLineW(), L"b372") != nullptr) {
-            return { 372, 2 };
-        }
-
-        return { 1604, 0 };
-    } else {
+        int(*GetGameVersion)() = reinterpret_cast<int(*)()>(funcGetGameVersion);
+        return { GetGameVersion(), 0 };
+    }
+    else {
         return getExeVersion(currExe);
     }
 }
