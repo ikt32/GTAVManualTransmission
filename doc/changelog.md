@@ -2,16 +2,19 @@
 
 ## 5.3.0
 
+* Move movement options into camera attachment option
 * Remove player-position derived "fixed" camera
 * Add secondary vehicle-attached camera option
 * Add cruise control with adaptive mode
 * Add speed limiter
 * Add flashing effect for brake lights when ABS active
 * Add flashing effect for assist icons when active
+* Add disable steering reduction on handbrake option
 * Clean up assists messages
 * Fix autogear1 and hillgravity assists using wrong speed
-* Fix downshift blip affeceting braking performance
+* Fix downshift blip affecting braking performance
 * Support Wanted188's (in-dev) R32 (Torque transfer gauge)
+* Fix FiveM version detection
 
 Warning:
 
