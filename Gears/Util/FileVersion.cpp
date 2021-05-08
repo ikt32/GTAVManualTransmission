@@ -15,15 +15,6 @@ namespace {
     bool FiveM = false;
 }
 
-bool strfind(const std::string& strHaystack, const std::string& strNeedle) {
-    auto it = std::search(
-        strHaystack.begin(), strHaystack.end(),
-        strNeedle.begin(), strNeedle.end(),
-        [](char ch1, char ch2) { return tolower(ch1) == tolower(ch2); }
-    );
-    return (it != strHaystack.end());
-}
-
 bool operator==(const SVersion& a, const SVersion& b) {
     return a.Minor == b.Minor && a.Build == b.Build;
 }
@@ -35,31 +26,6 @@ bool operator<=(const SVersion& a, const SVersion& b) {
         if (a.Build <= b.Build)
             return true;
     return false;
-}
-
-bool isModulePresent(const std::string & name, std::string & modulePath) {
-    bool found = false;
-
-    HMODULE hMods[1024];
-    DWORD cbNeeded;
-    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
-        PROCESS_VM_READ,
-        FALSE, GetCurrentProcessId());
-
-    if (EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded)) {
-        for (unsigned int i = 0; i < cbNeeded / sizeof(HMODULE); ++i) {
-            CHAR szModName[MAX_PATH];
-            if (GetModuleFileNameExA(hProcess, hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR))) {
-                if (strfind(szModName, name)) {
-                    found = true;
-                    modulePath = szModName;
-                    break;
-                }
-            }
-        }
-    }
-    CloseHandle(hProcess);
-    return found;
 }
 
 SVersion getExeVersion(const std::string & exe) {
