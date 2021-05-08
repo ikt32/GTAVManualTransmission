@@ -3,7 +3,7 @@
 #define STR(x) STR_HELPER(x)
 
 #define VERSION_MAJOR 5
-#define VERSION_MINOR 2
+#define VERSION_MINOR 3
 #define VERSION_PATCH 0
 
 namespace Constants {
