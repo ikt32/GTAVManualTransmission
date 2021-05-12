@@ -102,16 +102,21 @@ void showNPCInfo(NPCVehicle _npcVehicle) {
             auto gearStates = _npcVehicle.GetGearbox();
             auto load = gearStates.ThrottleHang - map(VExt::GetCurrentRPM(npcVehicle), 0.2f, 1.0f, 0.0f, 1.0f);
 
+            if (gearStates.Shifting) {
+                rpmColor = { 0, 255, 255, fgColor.A };
+            }
+
             std::vector<std::pair<std::string, Util::ColorI>> dbgLines = {
-                    { fmt::format("Throttle: {:.2f}", throttle), thColor },
+                    { fmt::format("Throttle: {:.2f} ({:.2f})", throttle, gearStates.ThrottleHang), thColor },
                     { fmt::format("Brake: {:.2f}", brake), brColor },
                     { fmt::format("Steer: {:.2f}", VExt::GetSteeringAngle(npcVehicle)), fgColor },
-                    { fmt::format("RPM: {:.2f}", rpm), rpmColor },
-                    { fmt::format("Gear: {}/{}", VExt::GetGearCurr(npcVehicle), VExt::GetTopGear(npcVehicle)), fgColor },
+                    { fmt::format("[{}/{}]: {:.2f}", VExt::GetGearCurr(npcVehicle), VExt::GetTopGear(npcVehicle), rpm), rpmColor },
                     { fmt::format("Load: {:.2f}", load), fgColor },
-                    { fmt::format("{}Shifting", gearStates.Shifting ? "~g~" : ""), fgColor },
-                    { fmt::format("TH: {}", gearStates.ThrottleHang), fgColor },
             };
+
+            if (g_settings.Debug.DisplayGearingInfo) {
+                dbgLines.emplace_back(fmt::format("{:.2f}", fmt::join(VExt::GetGearRatios(npcVehicle), " | ")), fgColor);
+            }
 
             if (VEHICLE::IS_TOGGLE_MOD_ON(npcVehicle, VehicleToggleModTurbo)) {
                 dbgLines.emplace_back(fmt::format("Turbo: {:.2f}", VExt::GetTurbo(npcVehicle)), fgColor);

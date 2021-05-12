@@ -97,16 +97,19 @@ void UI::ShowText3DColors(Vector3 location, const std::vector<std::pair<std::str
 
     float szX = 0.060f;
     for (const auto& line : textLines) {
-        ShowText(0, 0 + height * static_cast<float>(i), 0.2f, line.first, 0, line.second, true);
         float currWidth = UI::GetStringWidth(line.first, 0.2f, 0);
         if (currWidth > szX) {
             szX = currWidth;
         }
+    }
+
+    for (const auto& line : textLines) {
+        ShowText(0.0f, 0.0f + height * static_cast<float>(i), 0.2f, line.first, 0, line.second, true);
         i++;
     }
 
-    float szY = (height * static_cast<float>(i)) + 0.02f;
-    GRAPHICS::DRAW_RECT(0.027f, (height * static_cast<float>(i)) / 2.0f, szX, szY,
+    float szY = (height * static_cast<float>(i)) + 0.01f;
+    GRAPHICS::DRAW_RECT(szX * 0.5f, (height * static_cast<float>(i)) / 2.0f, szX + 0.01f, szY,
         backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A, 0);
     GRAPHICS::CLEAR_DRAW_ORIGIN();
 }
