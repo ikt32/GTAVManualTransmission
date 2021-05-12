@@ -85,10 +85,19 @@ void VehicleData::SetVehicle(Vehicle v) {
 
         mHasABS = getABSType(mModelFlags) != ABSType::ABS_NONE;
         mABSType = getABSType(mModelFlags);
+
+        mWheelsTcs.clear();
         mWheelsTcs.resize(VExt::GetNumWheels(mVehicle));
+
+        mWheelsAbs.clear();
         mWheelsAbs.resize(VExt::GetNumWheels(mVehicle));
+
+        mWheelsEspO.clear();
         mWheelsEspO.resize(VExt::GetNumWheels(mVehicle));
+
+        mWheelsEspU.clear();
         mWheelsEspU.resize(VExt::GetNumWheels(mVehicle));
+
         mSuspensionTravelSpeedsHistory.clear();
         Update();
     }

@@ -765,6 +765,7 @@ void toggleManual(bool enable) {
     readSettings();
     initWheel();
     clearPatches();
+    g_vehData.SetVehicle(g_playerVehicle);
 }
 
 void initWheel() {
