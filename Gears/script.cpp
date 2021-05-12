@@ -748,6 +748,12 @@ void clearPatches() {
     if (MemoryPatcher::BrakePatcher.Patched()) {
         MemoryPatcher::RestoreBrake();
     }
+    if (MemoryPatcher::ThrottlePatcher.Patched()) {
+        MemoryPatcher::RestoreThrottle();
+    }
+    if (MemoryPatcher::ThrottleControlPatcher.Patched()) {
+        MemoryPatcher::ThrottleControlPatcher.Restore();
+    }
 }
 
 void toggleManual(bool enable) {
