@@ -592,11 +592,17 @@ void calculateSoftLock(int& totalForce, int& damperForce) {
         if (steerSpeed > 0.0f) {
             damperForce = 10000;
         }
+        else {
+            damperForce = 0;
+        }
         totalForce = (int)map(effSteer, 1.0f, steerMult, (float)totalForce, 40000.0f);
     }
     else if (effSteer < -1.0f) {
         if (steerSpeed < 0.0f) {
             damperForce = 10000;
+        }
+        else {
+            damperForce = 0;
         }
         totalForce = (int)map(effSteer, -1.0f, -steerMult, (float)totalForce, -40000.0f);
     }
