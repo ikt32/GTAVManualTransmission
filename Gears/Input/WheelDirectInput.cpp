@@ -312,7 +312,7 @@ void WheelDirectInput::createConstantForceEffect(DWORD axis, int numAxes, DIEFFE
     diEffect.rgdwAxes = rgdwAxes;
     diEffect.rglDirection = rglDirection;
     diEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
-    diEffect.dwDuration = 50 * 1000; // 50ms
+    diEffect.dwDuration = 500 * 1000; // 500ms
     diEffect.dwSamplePeriod = 0;
     diEffect.dwGain = DI_FFNOMINALMAX;
     diEffect.dwTriggerButton = DIEB_NOTRIGGER;
@@ -339,7 +339,7 @@ void WheelDirectInput::createDamperEffect(DWORD axis, int numAxes, DIEFFECT &diE
     ZeroMemory(&diEffect, sizeof(DIEFFECT));
     diEffect.dwSize = sizeof(DIEFFECT);
     diEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
-    diEffect.dwDuration = 50 * 1000; // 50ms
+    diEffect.dwDuration = 500 * 1000; // 500ms
     diEffect.dwSamplePeriod = 0;
     diEffect.dwGain = DI_FFNOMINALMAX;
     diEffect.dwTriggerButton = DIEB_NOTRIGGER;
