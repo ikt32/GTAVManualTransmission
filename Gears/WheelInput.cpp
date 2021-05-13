@@ -474,10 +474,12 @@ void WheelInput::DoSteering() {
     bool altInputs = hasAltInputs(g_playerVehicle);
 
     if (g_vehData.mClass == VehicleClass::Car) {
-        VExt::SetSteeringInputAngle(g_playerVehicle, -effSteer);
+        VExt::SetSteeringInputAngle(g_playerVehicle, -std::clamp(effSteer, -1.0f, 1.0f));
 
-        if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle))
-            VExt::SetSteeringAngle(g_playerVehicle, -effSteer * VExt::GetMaxSteeringAngle(g_playerVehicle));
+        if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle)) {
+            float angleOff = -std::clamp(effSteer, -1.0f, 1.0f) * VExt::GetMaxSteeringAngle(g_playerVehicle);
+            VExt::SetSteeringAngle(g_playerVehicle, angleOff);
+        }
 
         auto boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "steeringwheel");
         if (boneIdx != -1) {
