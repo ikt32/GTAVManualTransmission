@@ -2512,9 +2512,7 @@ void update_update_notification() {
     }
 }
 
-void ScriptMain() {
-    srand(GetTickCount());
-    logger.Write(INFO, "Script started");
+void ScriptInit() {
     std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
     std::string settingsGeneralFile = absoluteModPath + "\\settings_general.ini";
     std::string settingsControlsFile = absoluteModPath + "\\settings_controls.ini";
@@ -2528,7 +2526,7 @@ void ScriptMain() {
     std::string textureESPFile = absoluteModPath + "\\texture_esp.png";
     std::string textureBRKFile = absoluteModPath + "\\texture_handbrake.png";
 
-    g_settings.SetFiles(settingsGeneralFile, settingsControlsFile,settingsWheelFile);
+    g_settings.SetFiles(settingsGeneralFile, settingsControlsFile, settingsWheelFile);
     g_menu.RegisterOnMain([] { onMenuInit(); });
     g_menu.RegisterOnExit([] { onMenuClose(); });
     g_menu.SetFiles(settingsMenuFile);
@@ -2600,6 +2598,10 @@ void ScriptMain() {
     logger.Write(INFO, "START: Initialization finished");
 
     StartUDPTelemetry();
+}
+
+void ScriptTick() {
+    logger.Write(INFO, "Script started again");
 
     while (true) {
         update_player();
@@ -2619,4 +2621,18 @@ void ScriptMain() {
         FPVCam::Update();
         WAIT(0);
     }
+}
+
+bool initialized = false;
+
+void ScriptMain() {
+    if (!initialized) {
+        logger.Write(INFO, "Script started");
+        ScriptInit();
+        initialized = true;
+    }
+    else {
+        logger.Write(INFO, "Script restarted");
+    }
+    ScriptTick();
 }
