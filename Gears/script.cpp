@@ -2601,8 +2601,6 @@ void ScriptInit() {
 }
 
 void ScriptTick() {
-    logger.Write(INFO, "Script started again");
-
     while (true) {
         update_player();
         update_vehicle();
