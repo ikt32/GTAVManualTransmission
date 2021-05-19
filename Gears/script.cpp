@@ -909,17 +909,36 @@ bool isClutchPressed() {
     return g_controls.ClutchVal > 1.0f - g_settings().MTParams.ClutchThreshold;
 }
 
+float getShiftTime(Vehicle vehicle, ShiftDirection shiftDirection) {
+    auto handlingPtr = VExt::GetHandlingPtr(vehicle);
+
+    float rateUp = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
+    float rateDown = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleDownShift);
+
+    float shiftRate = g_gearStates.ShiftDirection == ShiftDirection::Up ? rateUp : rateDown;
+    shiftRate *= g_settings().ShiftOptions.ClutchRateMult;
+
+    // TODO: Shift rate multiplier from STATS::STAT_GET_INT(joaat(wheelieAbility));
+    // SP0-Michael/SP1-Franklin/SP2-Trevor/MP0 _WHEELIE_ABILITY (0 to 100)
+    shiftRate *= 2.0f; // 2*rate is max ability
+
+    // In seconds
+    return 1000.0f / shiftRate;
+}
+
 void shiftTo(int gear, bool autoClutch) {
     if (autoClutch) {
         if (g_gearStates.Shifting) {
+            // Already shifting, so just queue up the next gear.
             g_gearStates.LockGear = g_gearStates.NextGear;
             g_gearStates.NextGear = gear;
-            g_gearStates.ShiftDirection = gear > g_gearStates.LockGear ? ShiftDirection::Up : ShiftDirection::Down;
-            return;
         }
-        g_gearStates.NextGear = gear;
-        g_gearStates.Shifting = true;
-        g_gearStates.ClutchVal = 0.0f;
+        else {
+            // New shift.
+            g_gearStates.Shifting = true;
+            g_gearStates.NextGear = gear;
+            g_gearStates.ClutchVal = 0.0f;
+        }
         g_gearStates.ShiftDirection = gear > g_gearStates.LockGear ? ShiftDirection::Up : ShiftDirection::Down;
     }
     else {
@@ -1024,40 +1043,28 @@ void updateShifting() {
     if (!g_gearStates.Shifting)
         return;
 
-    auto handlingPtr = VExt::GetHandlingPtr(g_playerVehicle);
-    // This is x Clutch per second? e.g. changerate 2.5 -> clutch fully (dis)engages in 1/2.5 seconds? or whole thing?
-    float rateUp = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
-    float rateDown = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleDownShift);
-
-    float shiftRate = g_gearStates.ShiftDirection == ShiftDirection::Up ? rateUp : rateDown;
-    shiftRate *= g_settings().ShiftOptions.ClutchRateMult;
-
-    /*
-     * 4.0 gives similar perf as base - probably the whole shift takes 1/rate seconds
-     * with my extra disengage step, the whole thing should take also 1/rate seconds
-     */
-    shiftRate = shiftRate * MISC::GET_FRAME_TIME() * 4.0f;
-
     // Something went wrong, abort and just shift to NextGear.
-    if (g_gearStates.ClutchVal > 1.5f) {
+    if (g_gearStates.ClutchVal > 1.25f) {
         g_gearStates.ClutchVal = 0.0f;
         g_gearStates.Shifting = false;
         g_gearStates.LockGear = g_gearStates.NextGear;
         return;
     }
 
-    if (g_gearStates.NextGear != g_gearStates.LockGear) {
-        g_gearStates.ClutchVal += shiftRate;
+    float shiftProgress = static_cast<float>(MISC::GET_GAME_TIMER() - g_gearStates.ShiftStart) / g_gearStates.ShiftTime;
+
+    if (shiftProgress <= 0.1f) {
+        g_gearStates.ClutchVal = map(shiftProgress, 0.0f, 0.1f, 0.0f, 1.0f);
     }
-    if (g_gearStates.ClutchVal >= 1.0f && g_gearStates.LockGear != g_gearStates.NextGear) {
+    else if (g_gearStates.LockGear != g_gearStates.NextGear) {
+        g_gearStates.ClutchVal = 1.0f;
         g_gearStates.LockGear = g_gearStates.NextGear;
-        return;
-    }
-    if (g_gearStates.NextGear == g_gearStates.LockGear) {
-        g_gearStates.ClutchVal -= shiftRate;
     }
 
-    if (g_gearStates.ClutchVal < 0.0f && g_gearStates.NextGear == g_gearStates.LockGear) {
+    if (shiftProgress > 0.5f) {
+        g_gearStates.ClutchVal = map(shiftProgress, 0.5f, 1.0f, 1.0f, 0.0f);
+    }
+    if (shiftProgress >= 1.0f) {
         g_gearStates.ClutchVal = 0.0f;
         g_gearStates.Shifting = false;
     }
@@ -1666,7 +1673,9 @@ void handleBrakePatch() {
     bool lcThrottle = g_settings().DriveAssists.LaunchControl.Enable &&
         LaunchControl::GetState() == LaunchControl::ELCState::Controlling;
 
-    float newThrottle = 0.0f;
+    float finalThrottle = 0.0f;
+
+    float tractionThrottle = 0.0f;
     if (tcsThrottle ||
         lcThrottle) {
         float tcsSlipMin = g_settings().DriveAssists.TCS.SlipMin;
@@ -1688,13 +1697,12 @@ void handleBrakePatch() {
             slipMax = tcsSlipMax;
         }
         
-        newThrottle = map(tcsData.AverageSlip,
+        tractionThrottle = map(tcsData.AverageSlip,
             slipMin, slipMax,
             g_controls.ThrottleVal, 0.0f);
-        newThrottle = std::clamp(newThrottle, 0.0f, 1.0f);
+        tractionThrottle = std::clamp(tractionThrottle, 0.0f, 1.0f);
 
-        VExt::SetThrottle(g_playerVehicle,  1.0f); // throathy audio
-        VExt::SetThrottleP(g_playerVehicle, newThrottle);
+        finalThrottle = tractionThrottle;
 
         for (int i = 0; i < g_vehData.mWheelCount; i++) {
             if (tcsData.SlippingWheels[i]) {
@@ -1704,15 +1712,6 @@ void handleBrakePatch() {
                 g_vehData.mWheelsTcs[i] = false;
             }
         }
-    }
-
-    // Ew
-    if (g_settings.Debug.DisplayInfo) {
-        UI::ShowText(0.60f, 0.100f, 0.25f, fmt::format("{}TCS~s~ / {}LC",
-            tcsThrottle ? "~g~" : "", lcThrottle ? "~g~" : ""));
-        std::string controlledThrottle = tcsThrottle || lcThrottle ? fmt::format("{:.2f}", newThrottle) : "N/A";
-        UI::ShowText(0.60f, 0.125f, 0.25f, fmt::format("Average slip: {:.2f} m/s", tcsData.AverageSlip));
-        UI::ShowText(0.60f, 0.150f, 0.25f, fmt::format("Throttle: {}", controlledThrottle));
     }
 
     // Cruise control
@@ -1733,8 +1732,7 @@ void handleBrakePatch() {
         g_controls.ThrottleVal = throttle;
         g_controls.BrakeVal = brake;
         
-        VExt::SetThrottle(g_playerVehicle, throttle); // audio
-        VExt::SetThrottleP(g_playerVehicle, throttle);
+        finalThrottle = throttle;
         ccThrottle = true;
     }
 
@@ -1743,13 +1741,13 @@ void handleBrakePatch() {
         speedLimThrottle = SpeedLimiter::Update(throttle);
         if (speedLimThrottle) {
             g_controls.ThrottleVal = throttle;
-            VExt::SetThrottle(g_playerVehicle, throttle); // audio
-            VExt::SetThrottleP(g_playerVehicle, throttle);
+            finalThrottle = throttle;
         }
     }
 
     // Shift throttle blip/cut
-    bool blipCutThrottle = false;
+    bool blipThrottle = false;
+    bool cutThrottle = false;
     // Shifting is only true in Automatic and Sequential mode
     if (g_gearStates.Shifting) {
         float clutchInput = g_controls.ClutchVal;
@@ -1763,24 +1761,24 @@ void handleBrakePatch() {
         if (clutchInput == 0.0f) {
             if (g_gearStates.ShiftDirection == ShiftDirection::Up &&
                 g_settings().ShiftOptions.UpshiftCut) {
-                float cutThrottle = map(g_gearStates.ClutchVal, 0.0f, 1.0f, g_controls.ThrottleVal, 0.0f);
-                cutThrottle = std::clamp(cutThrottle, 0.0f, 1.0f);
-                if (g_controls.ThrottleVal > cutThrottle) {
-                    blipCutThrottle = true;
-                    VExt::SetThrottle(g_playerVehicle, cutThrottle); // audio
-                    VExt::SetThrottleP(g_playerVehicle, cutThrottle);
+                float cutThrottleVal = map(g_gearStates.ClutchVal, 0.0f, 0.4f, g_controls.ThrottleVal, 0.0f);
+                cutThrottleVal = std::clamp(cutThrottleVal, 0.0f, 1.0f);
+                if (g_controls.ThrottleVal > cutThrottleVal) {
+                    cutThrottle = true;
+                    finalThrottle = cutThrottleVal;
+                    fakeRev(true, cutThrottleVal);
                 }
             }
             if (g_gearStates.ShiftDirection == ShiftDirection::Down &&
                 g_settings().ShiftOptions.DownshiftBlip) {
-                float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr - 1]);
+                float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.NextGear]);
                 if (g_vehData.mRPM < expectedRPM) {
-                    float blipThrottle = map(g_gearStates.ClutchVal, 0.8f, 1.0f, 0.0f, 1.0f);
-                    blipThrottle = std::clamp(blipThrottle, 0.0f, 1.0f);
-                    if (blipThrottle > g_controls.ThrottleVal) {
-                        blipCutThrottle = true;
-                        VExt::SetThrottle(g_playerVehicle, blipThrottle); // audio
-                        VExt::SetThrottleP(g_playerVehicle, blipThrottle);
+                    float blipThrottleVal = map(g_gearStates.ClutchVal, 0.8f, 1.0f, 0.0f, 1.0f);
+                    blipThrottleVal = std::clamp(blipThrottleVal, 0.0f, 1.0f);
+                    if (blipThrottleVal > g_controls.ThrottleVal) {
+                        blipThrottle = true;
+                        finalThrottle = blipThrottleVal;
+                        fakeRev(true, blipThrottleVal);
                     }
                 }
             }
@@ -1792,7 +1790,8 @@ void handleBrakePatch() {
         lcThrottle ||
         ccThrottle ||
         speedLimThrottle ||
-        blipCutThrottle;
+        blipThrottle ||
+        cutThrottle;
 
     bool patchThrottle =
         g_wheelPatchStates.EngLockActive ||
@@ -1902,11 +1901,29 @@ void handleBrakePatch() {
         if (!MemoryPatcher::ThrottleControlPatcher.Patched()) {
             MemoryPatcher::ThrottleControlPatcher.Patch();
         }
+        VExt::SetThrottle(g_playerVehicle, finalThrottle);
+        VExt::SetThrottleP(g_playerVehicle, finalThrottle);
     }
     else {
         if (MemoryPatcher::ThrottleControlPatcher.Patched()) {
             MemoryPatcher::ThrottleControlPatcher.Restore();
         }
+    }
+
+    if (g_settings.Debug.DisplayInfo) {
+        UI::ShowText(0.60f, 0.100f, 0.25f, fmt::format("{}TCS~s~ / {}LC",
+            tcsThrottle ? "~g~" : "", lcThrottle ? "~g~" : ""));
+        std::string controlledThrottle = tcsThrottle || lcThrottle ? fmt::format("{:.2f}", tractionThrottle) : "N/A";
+        UI::ShowText(0.60f, 0.125f, 0.25f, fmt::format("Average slip: {:.2f} m/s", tcsData.AverageSlip));
+        UI::ShowText(0.60f, 0.150f, 0.25f, fmt::format("Throttle: {}", controlledThrottle));
+
+        if (cutThrottle) {
+            UI::ShowText(0.5f, 0.5f, 0.5f, fmt::format("Cut @ {:.2f}", finalThrottle));
+        }
+        if (blipThrottle) {
+            UI::ShowText(0.5f, 0.5f, 0.5f, fmt::format("Blip @ {:.2f}", finalThrottle));
+        }
+    
     }
 }
 

@@ -72,6 +72,8 @@ struct VehicleGearboxStates {
     uint8_t NextGear = 1;
     float ClutchVal = 0.0f; // Clutch value _while_ Shifting
     ShiftDirection ShiftDirection = ShiftDirection::Up;
+    int ShiftStart = 0;
+    float ShiftTime = 0;
 
     // Auto gearbox stuff
     float ThrottleHang = 0.0f; // throttle value for low load upshifting
