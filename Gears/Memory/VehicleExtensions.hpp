@@ -11,7 +11,7 @@ struct WheelDimensions {
 
 class VehicleExtensions {
 public:
-    static void ChangeVersion(int version);
+    static void SetVersion(int version);
 
     static void Init();
 

@@ -37,6 +37,7 @@ void resolveVersion() {
         logger.Write(WARN, "    Using SHV API version [%s] (%d)",
             eGameVersionToString(shvVersion).c_str(), shvVersion);
         MemoryPatcher::SetPatterns(shvVersion);
+        VehicleExtensions::SetVersion(shvVersion);
         return;
     }
 
@@ -47,6 +48,7 @@ void resolveVersion() {
         logger.Write(WARN, "    Using SHV API version [%s] (%d)",
             eGameVersionToString(shvVersion).c_str(), shvVersion);
         MemoryPatcher::SetPatterns(shvVersion);
+        VehicleExtensions::SetVersion(shvVersion);
         return;
     }
 
@@ -60,14 +62,14 @@ void resolveVersion() {
         logger.Write(WARN, "    Using EXE version, or highest supported version [%s] (%d)",
             eGameVersionToString(lowestSupportedVersion).c_str(), lowestSupportedVersion);
         MemoryPatcher::SetPatterns(lowestSupportedVersion);
-        // Actually need to change stuff
-        VehicleExtensions::ChangeVersion(lowestSupportedVersion);
+        VehicleExtensions::SetVersion(lowestSupportedVersion);
         return;
     }
 
     logger.Write(INFO, "Using offsets based on SHV API version [%s] (%d)",
         eGameVersionToString(shvVersion).c_str(), shvVersion);
     MemoryPatcher::SetPatterns(shvVersion);
+    VehicleExtensions::SetVersion(shvVersion);
 }
 
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {

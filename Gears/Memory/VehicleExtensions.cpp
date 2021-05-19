@@ -79,7 +79,7 @@ namespace {
     int wheelMatTypeOffset = 0;
 }
 
-void VehicleExtensions::ChangeVersion(int version) {
+void VehicleExtensions::SetVersion(int version) {
     g_gameVersion = static_cast<eGameVersion>(version);
     if (g_gameVersion >= G_VER_1_0_1604_0_STEAM) {
         g_numGears = 11;
