@@ -192,7 +192,7 @@ void CustomSteering::Update() {
     float limitRadians = VExt::GetMaxSteeringAngle(g_playerVehicle);
     float reduction = calculateReduction();
 
-    float steer = -PAD::GET_DISABLED_CONTROL_NORMAL(1, ControlMoveLeftRight);
+    float steer = -PAD::GET_DISABLED_CONTROL_NORMAL(1, ControlVehicleMoveLeftRight);
 
     if (!g_settings.Controller.Native.Enable &&
         g_settings.Controller.CustomDeadzone &&
