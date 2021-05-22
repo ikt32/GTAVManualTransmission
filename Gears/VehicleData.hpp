@@ -58,6 +58,13 @@ enum class ShiftDirection {
     Down
 };
 
+enum class ShiftState {
+    InGear,
+    PressingClutch,
+    FullClutch,
+    ReleasingClutch,
+};
+
 struct VehicleGearboxStates {
     // Gearbox stuff
     float StallProgress = 0.0f;
@@ -74,6 +81,7 @@ struct VehicleGearboxStates {
     ShiftDirection ShiftDirection = ShiftDirection::Up;
     int ShiftStart = 0;
     float ShiftTime = 0;
+    ShiftState ShiftState = ShiftState::InGear;
 
     // Auto gearbox stuff
     float ThrottleHang = 0.0f; // throttle value for low load upshifting

@@ -940,6 +940,10 @@ void shiftTo(int gear, bool autoClutch) {
             g_gearStates.ClutchVal = 0.0f;
         }
         g_gearStates.ShiftDirection = gear > g_gearStates.LockGear ? ShiftDirection::Up : ShiftDirection::Down;
+
+        // Timing and shift duration
+        g_gearStates.ShiftStart = MISC::GET_GAME_TIMER();
+        g_gearStates.ShiftTime = getShiftTime(g_playerVehicle, g_gearStates.ShiftDirection);
     }
     else {
         g_gearStates.LockGear = gear;
@@ -1048,6 +1052,7 @@ void updateShifting() {
         g_gearStates.ClutchVal = 0.0f;
         g_gearStates.Shifting = false;
         g_gearStates.LockGear = g_gearStates.NextGear;
+        g_gearStates.ShiftState = ShiftState::InGear;
         return;
     }
 
@@ -1055,18 +1060,22 @@ void updateShifting() {
 
     if (shiftProgress <= 0.1f) {
         g_gearStates.ClutchVal = map(shiftProgress, 0.0f, 0.1f, 0.0f, 1.0f);
+        g_gearStates.ShiftState = ShiftState::PressingClutch;
     }
     else if (g_gearStates.LockGear != g_gearStates.NextGear) {
         g_gearStates.ClutchVal = 1.0f;
         g_gearStates.LockGear = g_gearStates.NextGear;
+        g_gearStates.ShiftState = ShiftState::FullClutch;
     }
 
-    if (shiftProgress > 0.5f) {
-        g_gearStates.ClutchVal = map(shiftProgress, 0.5f, 1.0f, 1.0f, 0.0f);
+    if (shiftProgress > 0.9f) {
+        g_gearStates.ClutchVal = map(shiftProgress, 0.9f, 1.0f, 1.0f, 0.0f);
+        g_gearStates.ShiftState = ShiftState::ReleasingClutch;
     }
     if (shiftProgress >= 1.0f) {
         g_gearStates.ClutchVal = 0.0f;
         g_gearStates.Shifting = false;
+        g_gearStates.ShiftState = ShiftState::InGear;
     }
 }
 
@@ -1759,28 +1768,49 @@ void handleBrakePatch() {
 
         // Only lift and blip when no clutch used
         if (clutchInput == 0.0f) {
+            // Hmm, it doesn't really wanna let me rev the shit out of it.
             if (g_gearStates.ShiftDirection == ShiftDirection::Up &&
                 g_settings().ShiftOptions.UpshiftCut) {
-                float cutThrottleVal = map(g_gearStates.ClutchVal, 0.0f, 0.4f, g_controls.ThrottleVal, 0.0f);
+                float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.NextGear]);
+                float dRPM = g_vehData.mRPM - expectedRPM; // <0 Throttle, >=0 No throttle
+                float cutThrottleVal = map(dRPM, -1.0f, 0.0f, g_controls.ThrottleVal, 0.0f);
                 cutThrottleVal = std::clamp(cutThrottleVal, 0.0f, 1.0f);
-                if (g_controls.ThrottleVal > cutThrottleVal) {
-                    cutThrottle = true;
-                    finalThrottle = cutThrottleVal;
-                    fakeRev(true, cutThrottleVal);
-                }
+
+                cutThrottle = true;
+                finalThrottle = cutThrottleVal;
+                fakeRev(true, cutThrottleVal);
             }
+            // Anti-cut:
+            // Somehow it doesn't free-rev on auto-clutch in HandleRPM
+            else if (g_gearStates.ShiftDirection == ShiftDirection::Up &&
+                !g_settings().ShiftOptions.UpshiftCut) {
+                fakeRev(true, g_controls.ThrottleVal);
+            }
+
             if (g_gearStates.ShiftDirection == ShiftDirection::Down &&
                 g_settings().ShiftOptions.DownshiftBlip) {
                 float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.NextGear]);
-                if (g_vehData.mRPM < expectedRPM) {
-                    float blipThrottleVal = map(g_gearStates.ClutchVal, 0.8f, 1.0f, 0.0f, 1.0f);
-                    blipThrottleVal = std::clamp(blipThrottleVal, 0.0f, 1.0f);
-                    if (blipThrottleVal > g_controls.ThrottleVal) {
-                        blipThrottle = true;
-                        finalThrottle = blipThrottleVal;
-                        fakeRev(true, blipThrottleVal);
+                bool clutchOK = g_gearStates.ShiftState == ShiftState::FullClutch || g_gearStates.ShiftState == ShiftState::ReleasingClutch;
+                if (g_vehData.mRPM < expectedRPM * 1.15f && clutchOK) {
+                    float blipThrottleVal;
+                    if (g_gearStates.ShiftState == ShiftState::FullClutch) {
+                        blipThrottleVal = 1.0f;
                     }
+                    else {
+                        blipThrottleVal = map(g_gearStates.ClutchVal, 0.9f, 1.0f, 0.0f, 1.0f);
+                        blipThrottleVal = std::clamp(blipThrottleVal, 0.0f, 1.0f);
+                    }
+
+                    blipThrottle = true;
+                    finalThrottle = blipThrottleVal;
+                    fakeRev(true, blipThrottleVal);
                 }
+            }
+            // Anti-cut:
+            // Somehow it doesn't free-rev on auto-clutch in HandleRPM
+            else if (g_gearStates.ShiftDirection == ShiftDirection::Down &&
+                !g_settings().ShiftOptions.DownshiftBlip) {
+                fakeRev(true, g_controls.ThrottleVal);
             }
         }
     }
