@@ -1178,6 +1178,9 @@ void update_forcefeedbackmenu() {
         { "Speed where FFB stops increasing. Helpful against too strong FFB at extreme speeds.",
           fmt::format("{} kph / {} mph", g_settings.Wheel.FFB.MaxSpeed * 3.6f, g_settings.Wheel.FFB.MaxSpeed * 2.23694f)});
 
+    g_menu.FloatOption("Understeer loss", g_settings.Wheel.FFB.SATUndersteerMult, 0.0f, 10.0f, 0.1f,
+        { "How much the force feedback is reduced when understeering." });
+
     g_menu.FloatOption("Detail effect multiplier", g_settings.Wheel.FFB.DetailMult, 0.0f, 10.0f, 0.1f,
         { "Force feedback effects caused by the suspension. This effect is muxed with the main effect." });
 

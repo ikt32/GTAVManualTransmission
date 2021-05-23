@@ -354,6 +354,7 @@ public:
             float SATAmpMult = 1.00f;
             int SATMax = 10000;
             float SATFactor = 0.80f;
+            float SATUndersteerMult = 1.0f;
             int DamperMax = 100;
             int DamperMin = 40;
             float DamperMinSpeed = 6.4f; // TargetSpeed in m/s

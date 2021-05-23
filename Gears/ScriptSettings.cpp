@@ -380,6 +380,7 @@ void ScriptSettings::SaveWheel() const {
     SAVE_VAL("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
     SAVE_VAL("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
     SAVE_VAL("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
+    SAVE_VAL("FORCE_FEEDBACK", "SATUndersteerMult", Wheel.FFB.SATUndersteerMult);
     SAVE_VAL("FORCE_FEEDBACK", "DetailMult", Wheel.FFB.DetailMult);
     SAVE_VAL("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
     SAVE_VAL("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
@@ -825,6 +826,7 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     LOAD_VAL("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
     LOAD_VAL("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
     LOAD_VAL("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
+    LOAD_VAL("FORCE_FEEDBACK", "SATUndersteerMult", Wheel.FFB.SATUndersteerMult);
     LOAD_VAL("FORCE_FEEDBACK", "DamperMax", Wheel.FFB.DamperMax);
     LOAD_VAL("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin); ;
     LOAD_VAL("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
