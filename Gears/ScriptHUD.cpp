@@ -411,11 +411,21 @@ void drawRPMIndicator() {
 
     // Launch control colors
     if (LaunchControl::GetState() == LaunchControl::ELCState::Staged) {
-        rpmcolor = Util::ColorsI::SolidYellow;
+        rpmcolor = {
+            g_settings.HUD.RPMBar.LaunchControlStagedR,
+            g_settings.HUD.RPMBar.LaunchControlStagedG,
+            g_settings.HUD.RPMBar.LaunchControlStagedB,
+            g_settings.HUD.RPMBar.LaunchControlStagedA,
+        };
     }
     else if (LaunchControl::GetState() == LaunchControl::ELCState::Limiting ||
         LaunchControl::GetState() == LaunchControl::ELCState::Controlling) {
-        rpmcolor = Util::ColorsI::SolidOrange;
+        rpmcolor = {
+            g_settings.HUD.RPMBar.LaunchControlActiveR,
+            g_settings.HUD.RPMBar.LaunchControlActiveG,
+            g_settings.HUD.RPMBar.LaunchControlActiveB,
+            g_settings.HUD.RPMBar.LaunchControlActiveA,
+        };
     }
 
     drawRPMIndicator(

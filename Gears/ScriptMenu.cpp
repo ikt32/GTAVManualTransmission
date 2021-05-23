@@ -1413,33 +1413,43 @@ void update_rpmdisplaymenu() {
     g_menu.Title("RPM Gauge options");
     g_menu.Subtitle("");
 
-    g_menu.BoolOption("RPM Gauge", g_settings.HUD.RPMBar.Enable);
-    g_menu.FloatOption("RPM Redline", g_settings.HUD.RPMBar.Redline, 0.0f, 1.0f, 0.01f);
+    g_menu.BoolOption("Enable", g_settings.HUD.RPMBar.Enable);
+    g_menu.FloatOption("Redline RPM", g_settings.HUD.RPMBar.Redline, 0.0f, 1.0f, 0.01f);
 
-    g_menu.FloatOption("RPM X", g_settings.HUD.RPMBar.XPos, 0.0f, 1.0f, 0.0025f);
-    g_menu.FloatOption("RPM Y", g_settings.HUD.RPMBar.YPos, 0.0f, 1.0f, 0.0025f);
-    g_menu.FloatOption("RPM Width", g_settings.HUD.RPMBar.XSz, 0.0f, 1.0f, 0.0025f);
-    g_menu.FloatOption("RPM Height", g_settings.HUD.RPMBar.YSz, 0.0f, 1.0f, 0.0025f);
+    g_menu.FloatOption("X position", g_settings.HUD.RPMBar.XPos, 0.0f, 1.0f, 0.0025f);
+    g_menu.FloatOption("Y position", g_settings.HUD.RPMBar.YPos, 0.0f, 1.0f, 0.0025f);
+    g_menu.FloatOption("Width", g_settings.HUD.RPMBar.XSz, 0.0f, 1.0f, 0.0025f);
+    g_menu.FloatOption("Height", g_settings.HUD.RPMBar.YSz, 0.0f, 1.0f, 0.0025f);
 
-    g_menu.IntOption("RPM Background Red  ", g_settings.HUD.RPMBar.BgR, 0, 255);
-    g_menu.IntOption("RPM Background Green", g_settings.HUD.RPMBar.BgG, 0, 255);
-    g_menu.IntOption("RPM Background Blue ", g_settings.HUD.RPMBar.BgB, 0, 255);
-    g_menu.IntOption("RPM Background Alpha", g_settings.HUD.RPMBar.BgA, 0, 255);
+    g_menu.IntOption("Background Red"  , g_settings.HUD.RPMBar.BgR, 0, 255);
+    g_menu.IntOption("Background Green", g_settings.HUD.RPMBar.BgG, 0, 255);
+    g_menu.IntOption("Background Blue" , g_settings.HUD.RPMBar.BgB, 0, 255);
+    g_menu.IntOption("Background Alpha", g_settings.HUD.RPMBar.BgA, 0, 255);
 
-    g_menu.IntOption("RPM Foreground Red  ", g_settings.HUD.RPMBar.FgR, 0, 255);
-    g_menu.IntOption("RPM Foreground Green", g_settings.HUD.RPMBar.FgG, 0, 255);
-    g_menu.IntOption("RPM Foreground Blue ", g_settings.HUD.RPMBar.FgB, 0, 255);
-    g_menu.IntOption("RPM Foreground Alpha", g_settings.HUD.RPMBar.FgA, 0, 255);
+    g_menu.IntOption("Foreground Red"  , g_settings.HUD.RPMBar.FgR, 0, 255);
+    g_menu.IntOption("Foreground Green", g_settings.HUD.RPMBar.FgG, 0, 255);
+    g_menu.IntOption("Foreground Blue" , g_settings.HUD.RPMBar.FgB, 0, 255);
+    g_menu.IntOption("Foreground Alpha", g_settings.HUD.RPMBar.FgA, 0, 255);
 
-    g_menu.IntOption("RPM Redline Red     ", g_settings.HUD.RPMBar.RedlineR, 0, 255);
-    g_menu.IntOption("RPM Redline Green   ", g_settings.HUD.RPMBar.RedlineG, 0, 255);
-    g_menu.IntOption("RPM Redline Blue    ", g_settings.HUD.RPMBar.RedlineB, 0, 255);
-    g_menu.IntOption("RPM Redline Alpha   ", g_settings.HUD.RPMBar.RedlineA, 0, 255);
+    g_menu.IntOption("Redline Red"  , g_settings.HUD.RPMBar.RedlineR, 0, 255);
+    g_menu.IntOption("Redline Green", g_settings.HUD.RPMBar.RedlineG, 0, 255);
+    g_menu.IntOption("Redline Blue" , g_settings.HUD.RPMBar.RedlineB, 0, 255);
+    g_menu.IntOption("Redline Alpha", g_settings.HUD.RPMBar.RedlineA, 0, 255);
 
-    g_menu.IntOption("RPM Revlimit Red    ", g_settings.HUD.RPMBar.RevLimitR, 0, 255);
-    g_menu.IntOption("RPM Revlimit Green  ", g_settings.HUD.RPMBar.RevLimitG, 0, 255);
-    g_menu.IntOption("RPM Revlimit Blue   ", g_settings.HUD.RPMBar.RevLimitB, 0, 255);
-    g_menu.IntOption("RPM Revlimit Alpha  ", g_settings.HUD.RPMBar.RevLimitA, 0, 255);
+    g_menu.IntOption("Revlimit Red"  , g_settings.HUD.RPMBar.RevLimitR, 0, 255);
+    g_menu.IntOption("Revlimit Green", g_settings.HUD.RPMBar.RevLimitG, 0, 255);
+    g_menu.IntOption("Revlimit Blue" , g_settings.HUD.RPMBar.RevLimitB, 0, 255);
+    g_menu.IntOption("Revlimit Alpha", g_settings.HUD.RPMBar.RevLimitA, 0, 255);
+
+    g_menu.IntOption("LaunchControlStaged Red"  , g_settings.HUD.RPMBar.LaunchControlStagedR, 0, 255);
+    g_menu.IntOption("LaunchControlStaged Green", g_settings.HUD.RPMBar.LaunchControlStagedG, 0, 255);
+    g_menu.IntOption("LaunchControlStaged Blue" , g_settings.HUD.RPMBar.LaunchControlStagedB, 0, 255);
+    g_menu.IntOption("LaunchControlStaged Alpha", g_settings.HUD.RPMBar.LaunchControlStagedA, 0, 255);
+
+    g_menu.IntOption("LaunchControlActive Red"  , g_settings.HUD.RPMBar.LaunchControlActiveR, 0, 255);
+    g_menu.IntOption("LaunchControlActive Green", g_settings.HUD.RPMBar.LaunchControlActiveG, 0, 255);
+    g_menu.IntOption("LaunchControlActive Blue" , g_settings.HUD.RPMBar.LaunchControlActiveB, 0, 255);
+    g_menu.IntOption("LaunchControlActive Alpha", g_settings.HUD.RPMBar.LaunchControlActiveA, 0, 255);
 }
 
 void update_wheelinfomenu() {

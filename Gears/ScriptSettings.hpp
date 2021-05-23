@@ -161,6 +161,16 @@ public:
             int RevLimitG = 0;
             int RevLimitB = 0;
             int RevLimitA = 255;
+
+            int LaunchControlStagedR = 255;
+            int LaunchControlStagedG = 255;
+            int LaunchControlStagedB = 0;
+            int LaunchControlStagedA = 255;
+
+            int LaunchControlActiveR = 255;
+            int LaunchControlActiveG = 127;
+            int LaunchControlActiveB = 0;
+            int LaunchControlActiveA = 255;
         } RPMBar;
 
         struct {
