@@ -80,7 +80,7 @@ void VehicleData::SetVehicle(Vehicle v) {
         }
 
         mIsElectric = mFlags[1] & eVehicleFlag2::FLAG_IS_ELECTRIC;
-        mIsCVT = mHandlingFlags & 0x00001000;
+        mIsCVT = mHandlingFlags & 0x00001000; // CVT accelerates while clutch is in?
         mHasClutch = !mIsElectric && !mIsCVT;
 
         mHasABS = getABSType(mModelFlags) != ABSType::ABS_NONE;
