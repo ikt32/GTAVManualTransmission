@@ -197,6 +197,16 @@ void ScriptSettings::SaveGeneral() {
     SAVE_VAL("HUD", "RPMIndicatorRevlimitB", HUD.RPMBar.RevLimitB);
     SAVE_VAL("HUD", "RPMIndicatorRevlimitA", HUD.RPMBar.RevLimitA);
 
+    SAVE_VAL("HUD", "RPMIndicatorLaunchStagedR", HUD.RPMBar.LaunchControlStagedR);
+    SAVE_VAL("HUD", "RPMIndicatorLaunchStagedG", HUD.RPMBar.LaunchControlStagedG);
+    SAVE_VAL("HUD", "RPMIndicatorLaunchStagedB", HUD.RPMBar.LaunchControlStagedB);
+    SAVE_VAL("HUD", "RPMIndicatorLaunchStagedA", HUD.RPMBar.LaunchControlStagedA);
+
+    SAVE_VAL("HUD", "RPMIndicatorLaunchActiveR", HUD.RPMBar.LaunchControlActiveR);
+    SAVE_VAL("HUD", "RPMIndicatorLaunchActiveG", HUD.RPMBar.LaunchControlActiveG);
+    SAVE_VAL("HUD", "RPMIndicatorLaunchActiveB", HUD.RPMBar.LaunchControlActiveB);
+    SAVE_VAL("HUD", "RPMIndicatorLaunchActiveA", HUD.RPMBar.LaunchControlActiveA);
+
     SAVE_VAL("HUD", "SteeringWheelInfo", HUD.Wheel.Enable);
     SAVE_VAL("HUD", "AlwaysSteeringWheelInfo", HUD.Wheel.Always);
     SAVE_VAL("HUD", "SteeringWheelTextureX", HUD.Wheel.ImgXPos);
@@ -484,6 +494,16 @@ void ScriptSettings::parseSettingsGeneral() {
     LOAD_VAL("HUD", "RPMIndicatorRevlimitG", HUD.RPMBar.RevLimitG);
     LOAD_VAL("HUD", "RPMIndicatorRevlimitB", HUD.RPMBar.RevLimitB);
     LOAD_VAL("HUD", "RPMIndicatorRevlimitA", HUD.RPMBar.RevLimitA);
+
+    LOAD_VAL("HUD", "RPMIndicatorLaunchStagedR", HUD.RPMBar.LaunchControlStagedR);
+    LOAD_VAL("HUD", "RPMIndicatorLaunchStagedG", HUD.RPMBar.LaunchControlStagedG);
+    LOAD_VAL("HUD", "RPMIndicatorLaunchStagedB", HUD.RPMBar.LaunchControlStagedB);
+    LOAD_VAL("HUD", "RPMIndicatorLaunchStagedA", HUD.RPMBar.LaunchControlStagedA);
+
+    LOAD_VAL("HUD", "RPMIndicatorLaunchActiveR", HUD.RPMBar.LaunchControlActiveR);
+    LOAD_VAL("HUD", "RPMIndicatorLaunchActiveG", HUD.RPMBar.LaunchControlActiveG);
+    LOAD_VAL("HUD", "RPMIndicatorLaunchActiveB", HUD.RPMBar.LaunchControlActiveB);
+    LOAD_VAL("HUD", "RPMIndicatorLaunchActiveA", HUD.RPMBar.LaunchControlActiveA);
 
     LOAD_VAL("HUD", "SteeringWheelInfo", HUD.Wheel.Enable);
     LOAD_VAL("HUD", "AlwaysSteeringWheelInfo", HUD.Wheel.Always);

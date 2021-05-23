@@ -1504,15 +1504,15 @@ void update_mousehudmenu() {
     g_menu.FloatOption("Height", g_settings.HUD.MouseSteering.YSz, 0.0f, 1.0f, 0.0025f);
     g_menu.FloatOption("Marker width", g_settings.HUD.MouseSteering.MarkerXSz, 0.0f, 1.0f, 0.0025f);
 
-    g_menu.IntOption("RPM Background Red  ", g_settings.HUD.MouseSteering.BgR, 0, 255);
-    g_menu.IntOption("RPM Background Green", g_settings.HUD.MouseSteering.BgG, 0, 255);
-    g_menu.IntOption("RPM Background Blue ", g_settings.HUD.MouseSteering.BgB, 0, 255);
-    g_menu.IntOption("RPM Background Alpha", g_settings.HUD.MouseSteering.BgA, 0, 255);
+    g_menu.IntOption("Background Red  ", g_settings.HUD.MouseSteering.BgR, 0, 255);
+    g_menu.IntOption("Background Green", g_settings.HUD.MouseSteering.BgG, 0, 255);
+    g_menu.IntOption("Background Blue ", g_settings.HUD.MouseSteering.BgB, 0, 255);
+    g_menu.IntOption("Background Alpha", g_settings.HUD.MouseSteering.BgA, 0, 255);
 
-    g_menu.IntOption("RPM Foreground Red  ", g_settings.HUD.MouseSteering.FgR, 0, 255);
-    g_menu.IntOption("RPM Foreground Green", g_settings.HUD.MouseSteering.FgG, 0, 255);
-    g_menu.IntOption("RPM Foreground Blue ", g_settings.HUD.MouseSteering.FgB, 0, 255);
-    g_menu.IntOption("RPM Foreground Alpha", g_settings.HUD.MouseSteering.FgA, 0, 255);
+    g_menu.IntOption("Foreground Red  ", g_settings.HUD.MouseSteering.FgR, 0, 255);
+    g_menu.IntOption("Foreground Green", g_settings.HUD.MouseSteering.FgG, 0, 255);
+    g_menu.IntOption("Foreground Blue ", g_settings.HUD.MouseSteering.FgB, 0, 255);
+    g_menu.IntOption("Foreground Alpha", g_settings.HUD.MouseSteering.FgA, 0, 255);
 }
 
 void update_driveassistmenu() {
