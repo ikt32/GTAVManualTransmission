@@ -42,6 +42,8 @@ namespace {
 }
 
 namespace WheelInput {
+    float lastConstantForce = 0.0f;
+
     // Use alternative throttle - brake - 
     void SetControlADZAlt(eControl control, float value, float adz, bool alt) {
         Controls::SetControlADZ(control, value, adz);
@@ -64,6 +66,10 @@ namespace WheelInput {
 
             Controls::SetControlADZ(newControl, value, adz);
         }
+    }
+
+    float GetFFBConstantForce() {
+        return lastConstantForce / 10000.0f;
     }
 }
 
@@ -679,7 +685,7 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
             if (g_vehData.mVelocity.y > 10.0f && abs(avgAngle) > deg2rad(2.0f)) {
                 understeer = sgn(speedVector.x - expectedVector.x) * (vecNextRot.x - expectedVector.x);
                 understeering = true;
-                satForce = static_cast<float>(satForce) / std::max(1.0f, 3.3f * understeer + 1.0f);
+                satForce = static_cast<float>(satForce) / std::max(1.0f, 3.3f * (understeer * g_settings.Wheel.FFB.SATUndersteerMult) + 1.0f);
             }
         }
     }
@@ -805,9 +811,9 @@ void WheelInput::PlayFFBGround() {
     }
 
     int totalForce = satForce + detailForce;
-    totalForce = (int)((float)totalForce);
     calculateSoftLock(totalForce, damperForce);
 
+    lastConstantForce = totalForce;
     g_controls.PlayFFBDynamics(std::clamp(totalForce, -10000, 10000), std::clamp(damperForce, -10000, 10000));
 
     const float minGforce = 5.0f;
@@ -857,8 +863,8 @@ void WheelInput::PlayFFBWater() {
     }
 
     int totalForce = satForce + detailForce;
-    totalForce = (int)((float)totalForce);
     calculateSoftLock(totalForce, damperForce);
+    lastConstantForce = totalForce;
     g_controls.PlayFFBDynamics(totalForce, damperForce);
 
     if (g_settings.Debug.DisplayInfo) {

@@ -47,6 +47,7 @@ void updateDashLights();
 void drawDashLights();
 void drawLSDInfo();
 void drawMouseSteering();
+void drawSteeringFfb();
 
 namespace GForce {
     std::vector<std::pair<float, float>> CoordTrails;
@@ -708,6 +709,9 @@ void drawInputWheelInfo() {
     GRAPHICS::DRAW_RECT(g_settings.HUD.Wheel.PedalXPos - 1.0f * barWidth, barYBase - g_controls.ClutchVal * g_settings.HUD.Wheel.PedalYSz * 0.5f,
         barWidth, g_controls.ClutchVal * g_settings.HUD.Wheel.PedalYSz,
         g_settings.HUD.Wheel.PedalClutchR, g_settings.HUD.Wheel.PedalClutchG, g_settings.HUD.Wheel.PedalClutchB, g_settings.HUD.Wheel.PedalClutchA, 0);
+
+    if (g_settings.HUD.Wheel.FFB.Enable)
+        drawSteeringFfb();
 }
 
 std::vector<Vector3> GetWheelCoords(Vehicle handle) {
@@ -883,4 +887,69 @@ void drawMouseSteering() {
         g_settings.HUD.MouseSteering.FgG,
         g_settings.HUD.MouseSteering.FgB,
         g_settings.HUD.MouseSteering.FgA, 0);
+}
+
+void drawSteeringFfb() {
+    float x = g_settings.HUD.Wheel.FFB.XPos;
+    float y = g_settings.HUD.Wheel.FFB.YPos;
+
+    float width = g_settings.HUD.Wheel.FFB.XSz;
+    float bgpaddingx = 0.0f;
+    
+    float height = g_settings.HUD.Wheel.FFB.YSz;
+    float bgpaddingy = 0.0f;
+
+    Util::ColorI bg = {
+        g_settings.HUD.Wheel.FFB.BgR,
+        g_settings.HUD.Wheel.FFB.BgG,
+        g_settings.HUD.Wheel.FFB.BgB,
+        g_settings.HUD.Wheel.FFB.BgA
+    };
+
+    Util::ColorI fg = {
+        g_settings.HUD.Wheel.FFB.FgR,
+        g_settings.HUD.Wheel.FFB.FgG,
+        g_settings.HUD.Wheel.FFB.FgB,
+        g_settings.HUD.Wheel.FFB.FgA
+    };
+
+
+    Util::ColorI fgLim = {
+        g_settings.HUD.Wheel.FFB.LimitR,
+        g_settings.HUD.Wheel.FFB.LimitG,
+        g_settings.HUD.Wheel.FFB.LimitB,
+        g_settings.HUD.Wheel.FFB.LimitA
+    };
+
+    float val = -WheelInput::GetFFBConstantForce();
+
+    const float fadeStart = 0.8f;
+    if (abs(val) > fadeStart) {
+        int minR = std::min(fg.R, fgLim.R);
+        int minG = std::min(fg.G, fgLim.G);
+        int minB = std::min(fg.B, fgLim.B);
+        int minA = std::min(fg.A, fgLim.A);
+
+        int maxR = std::max(fg.R, fgLim.R);
+        int maxG = std::max(fg.G, fgLim.G);
+        int maxB = std::max(fg.B, fgLim.B);
+        int maxA = std::max(fg.A, fgLim.A);
+
+        fg = {
+            std::clamp((int)map(abs(val), fadeStart, 1.0f, (float)fg.R, (float)fgLim.R), minR, maxR),
+            std::clamp((int)map(abs(val), fadeStart, 1.0f, (float)fg.G, (float)fgLim.G), minG, maxG),
+            std::clamp((int)map(abs(val), fadeStart, 1.0f, (float)fg.B, (float)fgLim.B), minB, maxB),
+            std::clamp((int)map(abs(val), fadeStart, 1.0f, (float)fg.A, (float)fgLim.A), minA, maxA),
+        };
+        val = std::clamp(val, -1.0f, 1.0f);
+    }
+
+    // background
+    GRAPHICS::DRAW_RECT(x, y, width + bgpaddingx, height + bgpaddingy, bg.R, bg.G, bg.B, bg.A, 0);
+
+    // rpm bar
+    GRAPHICS::DRAW_RECT(
+        x + val * width * 0.25f, y,
+        0.5f * width * val, height,
+        fg.R, fg.G, fg.B, fg.A, 0);
 }

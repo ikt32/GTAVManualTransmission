@@ -202,6 +202,30 @@ public:
             int PedalClutchG = 0;
             int PedalClutchB = 255;
             int PedalClutchA = 255;
+
+            struct {
+                bool Enable = false;
+
+                float XPos = 0.500f;
+                float YPos = 0.025f;
+                float XSz = 0.25f;
+                float YSz = 0.05f;
+
+                int BgR = 0;
+                int BgG = 0;
+                int BgB = 0;
+                int BgA = 128;
+
+                int FgR = 255;
+                int FgG = 255;
+                int FgB = 255;
+                int FgA = 255;
+
+                int LimitR = 255;
+                int LimitG = 0;
+                int LimitB = 0;
+                int LimitA = 255;
+            } FFB;
         } Wheel;
 
         struct {

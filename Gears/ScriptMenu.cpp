@@ -1457,14 +1457,16 @@ void update_wheelinfomenu() {
     g_menu.Subtitle("");
 
     g_menu.BoolOption("Display steering wheel info", g_settings.HUD.Wheel.Enable, { "Show input info graphically." });
+    g_menu.BoolOption("Display FFB level", g_settings.HUD.Wheel.FFB.Enable, { "Show a bar with force feedback level." });
     g_menu.BoolOption("Always display info", g_settings.HUD.Wheel.Always, { "Display the info even without a steering wheel." });
+
     g_menu.FloatOption("Wheel image X", g_settings.HUD.Wheel.ImgXPos, 0.0f, 1.0f, 0.01f);
     g_menu.FloatOption("Wheel image Y", g_settings.HUD.Wheel.ImgYPos, 0.0f, 1.0f, 0.01f);
     g_menu.FloatOption("Wheel image size", g_settings.HUD.Wheel.ImgSize, 0.0f, 1.0f, 0.01f);
     g_menu.FloatOption("Pedals X", g_settings.HUD.Wheel.PedalXPos, 0.0f, 1.0f, 0.01f);
     g_menu.FloatOption("Pedals Y", g_settings.HUD.Wheel.PedalYPos, 0.0f, 1.0f, 0.01f);
-    g_menu.FloatOption("Pedals Height", g_settings.HUD.Wheel.PedalYSz, 0.0f, 1.0f, 0.01f);
     g_menu.FloatOption("Pedals Width", g_settings.HUD.Wheel.PedalXSz, 0.0f, 1.0f, 0.01f);
+    g_menu.FloatOption("Pedals Height", g_settings.HUD.Wheel.PedalYSz, 0.0f, 1.0f, 0.01f);
     g_menu.FloatOption("Pedals Pad X", g_settings.HUD.Wheel.PedalXPad, 0.0f, 1.0f, 0.01f);
     g_menu.FloatOption("Pedals Pad Y", g_settings.HUD.Wheel.PedalYPad, 0.0f, 1.0f, 0.01f);
     g_menu.IntOption("Pedals Background Alpha", g_settings.HUD.Wheel.PedalBgA, 0, 255);
@@ -1480,6 +1482,27 @@ void update_wheelinfomenu() {
     g_menu.IntOption("Clutch Bar Green  ", g_settings.HUD.Wheel.PedalClutchG, 0, 255);
     g_menu.IntOption("Clutch Bar Blue   ", g_settings.HUD.Wheel.PedalClutchB, 0, 255);
     g_menu.IntOption("Clutch Bar Alpha  ", g_settings.HUD.Wheel.PedalClutchA  , 0, 255);
+
+    g_menu.FloatOption("FFB Position X", g_settings.HUD.Wheel.FFB.XPos, 0.0f, 1.0f, 0.01f);
+    g_menu.FloatOption("FFB Position Y", g_settings.HUD.Wheel.FFB.YPos, 0.0f, 1.0f, 0.01f);
+
+    g_menu.FloatOption("FFB Width", g_settings.HUD.Wheel.FFB.XSz, 0.0f, 1.0f, 0.01f);
+    g_menu.FloatOption("FFB Height", g_settings.HUD.Wheel.FFB.YSz, 0.0f, 1.0f, 0.01f);
+
+    g_menu.IntOption("FFB Background Red",   g_settings.HUD.Wheel.FFB.BgR, 0, 255);
+    g_menu.IntOption("FFB Background Green", g_settings.HUD.Wheel.FFB.BgG, 0, 255);
+    g_menu.IntOption("FFB Background Blue",  g_settings.HUD.Wheel.FFB.BgB, 0, 255);
+    g_menu.IntOption("FFB Background Alpha", g_settings.HUD.Wheel.FFB.BgA, 0, 255);
+
+    g_menu.IntOption("FFB Foreground Red",   g_settings.HUD.Wheel.FFB.FgR, 0, 255);
+    g_menu.IntOption("FFB Foreground Green", g_settings.HUD.Wheel.FFB.FgG, 0, 255);
+    g_menu.IntOption("FFB Foreground Blue",  g_settings.HUD.Wheel.FFB.FgB, 0, 255);
+    g_menu.IntOption("FFB Foreground Alpha", g_settings.HUD.Wheel.FFB.FgA, 0, 255);
+
+    g_menu.IntOption("FFB Clipping Red",   g_settings.HUD.Wheel.FFB.LimitR, 0, 255);
+    g_menu.IntOption("FFB Clipping Green", g_settings.HUD.Wheel.FFB.LimitG, 0, 255);
+    g_menu.IntOption("FFB Clipping Blue",  g_settings.HUD.Wheel.FFB.LimitB, 0, 255);
+    g_menu.IntOption("FFB Clipping Alpha", g_settings.HUD.Wheel.FFB.LimitA, 0, 255);
 }
 
 void update_dashindicatormenu() {

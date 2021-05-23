@@ -236,6 +236,28 @@ void ScriptSettings::SaveGeneral() {
     SAVE_VAL("HUD", "PedalInfoClutchB", HUD.Wheel.PedalClutchB);
     SAVE_VAL("HUD", "PedalInfoClutchA", HUD.Wheel.PedalClutchA);
 
+    SAVE_VAL("HUD", "FFBEnable", HUD.Wheel.FFB.Enable);
+
+    SAVE_VAL("HUD", "FFBXPos", HUD.Wheel.FFB.XPos  );
+    SAVE_VAL("HUD", "FFBYPos", HUD.Wheel.FFB.YPos  );
+    SAVE_VAL("HUD", "FFBXSz", HUD.Wheel.FFB.XSz   );
+    SAVE_VAL("HUD", "FFBYSz", HUD.Wheel.FFB.YSz   );
+
+    SAVE_VAL("HUD", "FFBBgR", HUD.Wheel.FFB.BgR   );
+    SAVE_VAL("HUD", "FFBBgG", HUD.Wheel.FFB.BgG   );
+    SAVE_VAL("HUD", "FFBBgB", HUD.Wheel.FFB.BgB   );
+    SAVE_VAL("HUD", "FFBBgA", HUD.Wheel.FFB.BgA   );
+
+    SAVE_VAL("HUD", "FFBFgR", HUD.Wheel.FFB.FgR   );
+    SAVE_VAL("HUD", "FFBFgG", HUD.Wheel.FFB.FgG   );
+    SAVE_VAL("HUD", "FFBFgB", HUD.Wheel.FFB.FgB   );
+    SAVE_VAL("HUD", "FFBFgA", HUD.Wheel.FFB.FgA   );
+
+    SAVE_VAL("HUD", "FFBLimitR", HUD.Wheel.FFB.LimitR);
+    SAVE_VAL("HUD", "FFBLimitG", HUD.Wheel.FFB.LimitG);
+    SAVE_VAL("HUD", "FFBLimitB", HUD.Wheel.FFB.LimitB);
+    SAVE_VAL("HUD", "FFBLimitA", HUD.Wheel.FFB.LimitA);
+
     SAVE_VAL("HUD", "DashIndicators", HUD.DashIndicators.Enable);
     SAVE_VAL("HUD", "DashIndicatorsXpos", HUD.DashIndicators.XPos);
     SAVE_VAL("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
@@ -533,6 +555,28 @@ void ScriptSettings::parseSettingsGeneral() {
     LOAD_VAL("HUD", "PedalInfoClutchG", HUD.Wheel.PedalClutchG);
     LOAD_VAL("HUD", "PedalInfoClutchB", HUD.Wheel.PedalClutchB);
     LOAD_VAL("HUD", "PedalInfoClutchA", HUD.Wheel.PedalClutchA);
+
+    LOAD_VAL("HUD", "FFBEnable", HUD.Wheel.FFB.Enable);
+
+    LOAD_VAL("HUD", "FFBXPos", HUD.Wheel.FFB.XPos);
+    LOAD_VAL("HUD", "FFBYPos", HUD.Wheel.FFB.YPos);
+    LOAD_VAL("HUD", "FFBXSz", HUD.Wheel.FFB.XSz);
+    LOAD_VAL("HUD", "FFBYSz", HUD.Wheel.FFB.YSz);
+
+    LOAD_VAL("HUD", "FFBBgR", HUD.Wheel.FFB.BgR);
+    LOAD_VAL("HUD", "FFBBgG", HUD.Wheel.FFB.BgG);
+    LOAD_VAL("HUD", "FFBBgB", HUD.Wheel.FFB.BgB);
+    LOAD_VAL("HUD", "FFBBgA", HUD.Wheel.FFB.BgA);
+
+    LOAD_VAL("HUD", "FFBFgR", HUD.Wheel.FFB.FgR);
+    LOAD_VAL("HUD", "FFBFgG", HUD.Wheel.FFB.FgG);
+    LOAD_VAL("HUD", "FFBFgB", HUD.Wheel.FFB.FgB);
+    LOAD_VAL("HUD", "FFBFgA", HUD.Wheel.FFB.FgA);
+
+    LOAD_VAL("HUD", "FFBLimitR", HUD.Wheel.FFB.LimitR);
+    LOAD_VAL("HUD", "FFBLimitG", HUD.Wheel.FFB.LimitG);
+    LOAD_VAL("HUD", "FFBLimitB", HUD.Wheel.FFB.LimitB);
+    LOAD_VAL("HUD", "FFBLimitA", HUD.Wheel.FFB.LimitA);
 
     LOAD_VAL("HUD", "DashIndicators", HUD.DashIndicators.Enable);
     LOAD_VAL("HUD", "DashIndicatorsXpos", HUD.DashIndicators.XPos);
