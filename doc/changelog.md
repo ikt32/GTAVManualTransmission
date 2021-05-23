@@ -1,5 +1,24 @@
 # Changelog
 
+## 5.3.1
+
+A bunch of minor changes, mostly improves wheel experience.
+
+Non-wheel:
+
+* Fix throttle blip and cut during down and upshifts
+* Fix CustomSteering not using remapped keyboard settings
+* Allow user-defined colors for launch control in RPM bar
+* Various bug fixes and improvements
+
+Wheel:
+
+* Fix FFB loss during lagspikes (up to 500ms)
+* Fix FFB damper transition for soft lock
+* Fix unclamped soft lock steering angles when engine off
+* Add FFB setting for understeer effect multiplier
+* Add FFB strength UI element
+
 ## 5.3.0
 
 * Move movement options into camera attachment option
