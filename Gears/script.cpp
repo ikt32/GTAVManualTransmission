@@ -2567,12 +2567,6 @@ void ScriptInit() {
     std::string settingsMenuFile = absoluteModPath + "\\settings_menu.ini";
     std::string animationsFile = absoluteModPath + "\\animations.yml";
 
-    std::string textureWheelFile = absoluteModPath + "\\texture_wheel.png";
-    std::string textureABSFile = absoluteModPath + "\\texture_abs.png";
-    std::string textureTCSFile = absoluteModPath + "\\texture_tcs.png";
-    std::string textureESPFile = absoluteModPath + "\\texture_esp.png";
-    std::string textureBRKFile = absoluteModPath + "\\texture_handbrake.png";
-
     g_settings.SetFiles(settingsGeneralFile, settingsControlsFile, settingsWheelFile);
     g_menu.RegisterOnMain([] { onMenuInit(); });
     g_menu.RegisterOnExit([] { onMenuClose(); });
@@ -2598,6 +2592,22 @@ void ScriptInit() {
     setupCompatibility();
 
     initWheel();
+
+    g_focused = SysUtil::IsWindowFocused();
+
+    logger.Write(DEBUG, "START: Starting with MT:  %s", g_settings.MTOptions.Enable ? "ON" : "OFF");
+    logger.Write(INFO, "START: Initialization finished");
+
+    StartUDPTelemetry();
+}
+
+void InitTextures() {
+    std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
+    std::string textureWheelFile = absoluteModPath + "\\texture_wheel.png";
+    std::string textureABSFile = absoluteModPath + "\\texture_abs.png";
+    std::string textureTCSFile = absoluteModPath + "\\texture_tcs.png";
+    std::string textureESPFile = absoluteModPath + "\\texture_esp.png";
+    std::string textureBRKFile = absoluteModPath + "\\texture_handbrake.png";
 
     if (FileExists(textureWheelFile)) {
         g_textureWheelId = createTexture(textureWheelFile.c_str());
@@ -2638,13 +2648,6 @@ void ScriptInit() {
         logger.Write(ERROR, textureBRKFile + " does not exist.");
         g_textureBrkId = -1;
     }
-
-    g_focused = SysUtil::IsWindowFocused();
-
-    logger.Write(DEBUG, "START: Starting with MT:  %s", g_settings.MTOptions.Enable ? "ON" : "OFF");
-    logger.Write(INFO, "START: Initialization finished");
-
-    StartUDPTelemetry();
 }
 
 void ScriptTick() {
@@ -2679,5 +2682,6 @@ void ScriptMain() {
     else {
         logger.Write(INFO, "Script restarted");
     }
+    InitTextures();
     ScriptTick();
 }
