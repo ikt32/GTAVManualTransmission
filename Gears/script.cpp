@@ -1061,6 +1061,9 @@ void updateShifting() {
 
     float shiftProgress = static_cast<float>(MISC::GET_GAME_TIMER() - g_gearStates.ShiftStart) / g_gearStates.ShiftTime;
 
+    // ClutchLift @ shiftProgress timing
+    float cl = g_gearStates.ShiftDirection == ShiftDirection::Up ? 0.1f : 0.9f;
+
     if (shiftProgress <= 0.1f) {
         g_gearStates.ClutchVal = map(shiftProgress, 0.0f, 0.1f, 0.0f, 1.0f);
         g_gearStates.ShiftState = ShiftState::PressingClutch;
@@ -1071,8 +1074,8 @@ void updateShifting() {
         g_gearStates.ShiftState = ShiftState::FullClutch;
     }
 
-    if (shiftProgress > 0.9f) {
-        g_gearStates.ClutchVal = map(shiftProgress, 0.9f, 1.0f, 1.0f, 0.0f);
+    if (shiftProgress > cl) {
+        g_gearStates.ClutchVal = map(shiftProgress, cl, 1.0f, 1.0f, 0.0f);
         g_gearStates.ShiftState = ShiftState::ReleasingClutch;
     }
     if (shiftProgress >= 1.0f) {
