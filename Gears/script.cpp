@@ -918,9 +918,12 @@ float getShiftTime(Vehicle vehicle, ShiftDirection shiftDirection) {
     float shiftRate = g_gearStates.ShiftDirection == ShiftDirection::Up ? rateUp : rateDown;
     shiftRate *= g_settings().ShiftOptions.ClutchRateMult;
 
-    // TODO: Shift rate multiplier from STATS::STAT_GET_INT(joaat(wheelieAbility));
-    // SP0-Michael/SP1-Franklin/SP2-Trevor/MP0 _WHEELIE_ABILITY (0 to 100)
-    shiftRate *= 2.0f; // 2*rate is max ability
+    // TODO: Shift rate multiplier from gearbox tuning.
+    // 1.0 speeds (Sultan):
+    // Stock        912ms       1.0 / (1.00 + 0.10)?
+    // Street       730ms       1.0 / (1.20 + 0.12)?
+    // Sport        610ms       1.0 / (1.50 + 0.15)?
+    // Race         464ms       1.0 / (2.00 + 0.20)?
 
     // In seconds
     return 1000.0f / shiftRate;
