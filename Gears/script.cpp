@@ -1406,16 +1406,29 @@ void functionAShift() {
         float gearRatioRatio = 1.0f;
 
         if (g_vehData.mGearTop > 1 && currGear > 1) {
-            float thisGearRatio = g_vehData.mGearRatios[currGear - 1] / g_vehData.mGearRatios[currGear];
-            gearRatioRatio = thisGearRatio;
+            gearRatioRatio = g_vehData.mGearRatios[currGear - 1] / g_vehData.mGearRatios[currGear];
         }
 
         g_gearStates.DownshiftLoad = g_settings().AutoParams.DownshiftLoad * gearRatioRatio;
 
         // Shift down
         if (currGear > 1) {
-            if (tpPassedDn && engineLoad > g_settings().AutoParams.DownshiftLoad * gearRatioRatio || currSpeed < currGearMinSpeed) {
-                shiftTo(currGear - 1, true);
+            if (tpPassedDn && engineLoad > g_gearStates.DownshiftLoad || currSpeed < currGearMinSpeed) {
+                // TargetGear: Find the lowest gear where engineLoad(gear) < downshiftLoad(gear)
+                int targetGear = currGear - 1;
+
+                for (auto gear = 1; gear < currGear - 1; ++gear) {
+                    float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[gear]);
+                    float engineLoadForGear = g_gearStates.ThrottleHang - map(expectedRPM, 0.2f, 1.0f, 0.0f, 1.0f);
+
+                    if (engineLoadForGear < g_gearStates.UpshiftLoad * 0.9f || expectedRPM < 0.9f)
+                        continue;
+
+                    targetGear = gear;
+                    break;
+                }
+
+                shiftTo(targetGear, true);
                 g_gearStates.FakeNeutral = false;
             }
         }
