@@ -922,15 +922,23 @@ float getShiftTime(Vehicle vehicle, ShiftDirection shiftDirection) {
     float shiftRate = g_gearStates.ShiftDirection == ShiftDirection::Up ? rateUp : rateDown;
     shiftRate *= g_settings().ShiftOptions.ClutchRateMult;
 
-    // TODO: Shift rate multiplier from gearbox tuning.
-    // 1.0 speeds (Sultan):
-    // Stock        912ms       1.0 / (1.00 + 0.10)?
-    // Street       730ms       1.0 / (1.20 + 0.12)?
-    // Sport        610ms       1.0 / (1.50 + 0.15)?
-    // Race         464ms       1.0 / (2.00 + 0.20)?
+    // Rate multipliers for transmission tuning
+    // Based on 1.0 rate with the Sultan.
+    // Stock  1.00
+    // Street 1.25
+    // Sport  1.50
+    // Race   2.00
 
-    // In seconds
-    return 1000.0f / shiftRate;
+    int modVal = VEHICLE::GET_VEHICLE_MOD(vehicle, eVehicleMod::VehicleModTransmission);
+
+    switch (modVal) {
+        case -1: shiftRate *= 1.00f; break;
+        case  0: shiftRate *= 1.25f; break;
+        case  1: shiftRate *= 1.50f; break;
+        case  2: shiftRate *= 2.00f; break;
+        default: shiftRate *= 2.00f; break;
+    }
+
     // In milliseconds
     return 900.0f / shiftRate;
 }
