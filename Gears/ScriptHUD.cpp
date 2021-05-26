@@ -598,6 +598,7 @@ void drawDebugInfo() {
         UI::ShowText(0.01, 0.250, 0.3, fmt::format("Address: 0x{:X}", reinterpret_cast<uintptr_t>(VExt::GetAddress(g_playerVehicle))));
         UI::ShowText(0.01, 0.275, 0.3, fmt::format("Mod Enabled:\t\t{}" , g_settings.MTOptions.Enable));
         UI::ShowText(0.01, 0.300, 0.3, fmt::format("RPM:\t\t\t{:.3f}", g_vehData.mRPM));
+        //UI::ShowText(0.25, 0.300, 0.3, fmt::format("Time:{}", MISC::GET_GAME_TIMER()));
         UI::ShowText(0.01, 0.325, 0.3, fmt::format("Current Gear:\t\t{}", VExt::GetGearCurr(g_playerVehicle)));
         UI::ShowText(0.01, 0.350, 0.3, fmt::format("Next Gear:\t\t{}", VExt::GetGearNext(g_playerVehicle)));
         UI::ShowText(0.01, 0.375, 0.3, fmt::format("Clutch:\t\t\t{:.2f}", VExt::GetClutch(g_playerVehicle)));
