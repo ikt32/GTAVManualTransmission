@@ -1807,14 +1807,18 @@ void handleBrakePatch() {
             // Hmm, it doesn't really wanna let me rev the shit out of it.
             if (g_gearStates.ShiftDirection == ShiftDirection::Up &&
                 g_settings().ShiftOptions.UpshiftCut) {
-                float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.NextGear]);
-                float dRPM = g_vehData.mRPM - expectedRPM; // <0 Throttle, >=0 No throttle
-                float cutThrottleVal = map(dRPM, -1.0f, 0.0f, g_controls.ThrottleVal, 0.0f);
+                float cutThrottleVal = 0.0f;
+
+                if (g_gearStates.ShiftState == ShiftState::ReleasingClutch) {
+                    if (g_gearStates.ClutchVal < 0.4f) {
+                        cutThrottleVal = g_controls.ThrottleVal;
+                    }
+                }
+
                 cutThrottleVal = std::clamp(cutThrottleVal, 0.0f, 1.0f);
 
                 cutThrottle = true;
                 finalThrottle = cutThrottleVal;
-                fakeRev(true, cutThrottleVal);
             }
             // Anti-cut:
             // Somehow it doesn't free-rev on auto-clutch in HandleRPM
