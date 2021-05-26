@@ -14,6 +14,7 @@ extern CarControls g_controls;
 extern ScriptSettings g_settings;
 extern Vehicle g_playerVehicle;
 extern VehicleData g_vehData;
+extern VehicleGearboxStates g_gearStates;
 
 using VExt = VehicleExtensions;
 
@@ -189,7 +190,9 @@ void CruiseControl::Update(float& throttle, float& brake, float& clutch) {
 
         // By LieutenantDan
         float targetAcceleration = std::clamp((targetSetpoint - g_vehData.mVelocity.y) * cruiseTgtAccFactor, -cruiseMaxAcceleration, cruiseMaxAcceleration);
-        cruiseThrottle = std::clamp(cruiseThrottle + (targetAcceleration - g_vehData.mAcceleration.y) * cruiseAccCorrFactor * MISC::GET_FRAME_TIME(), 0.0f, 1.0f);
+        if (!g_gearStates.Shifting)
+            cruiseThrottle = std::clamp(cruiseThrottle + (targetAcceleration - g_vehData.mAcceleration.y) * cruiseAccCorrFactor * MISC::GET_FRAME_TIME(), 0.0f, 1.0f);
+
         throttle = std::clamp(throttle + cruiseThrottle, 0.0f, 1.0f);
     }
 
