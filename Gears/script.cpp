@@ -1392,7 +1392,10 @@ void functionAShift() {
 
         // Shift up.
         if (currGear < g_vehData.mGearTop) {
-            if (tpPassedUp && engineLoad < g_settings().AutoParams.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding) {
+            // Clutch still slipping
+            float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[currGear]);
+            if (tpPassedUp && engineLoad < g_gearStates.UpshiftLoad && currSpeed > nextGearMinSpeed && !skidding
+                && Math::Near(expectedRPM, g_vehData.mRPM, 0.05f)) {
                 shiftTo(g_vehData.mGearCurr + 1, true);
                 g_gearStates.FakeNeutral = false;
                 g_gearStates.LastUpshiftTime = MISC::GET_GAME_TIMER();
