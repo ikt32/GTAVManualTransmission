@@ -2066,7 +2066,12 @@ void handleRPM() {
     float finalClutch = 1.0f - clutch;
     
     if (g_vehData.mGearCurr > 1) {
-        finalClutch = map(clutch, 0.0f, 1.0f, 1.0f, 0.6f);
+        if (g_gearStates.Shifting) {
+            finalClutch = map(clutch, 0.0f, 1.0f, 1.0f, 0.0f);
+        }
+        else {
+            finalClutch = map(clutch, 0.0f, 1.0f, 1.0f, 0.6f);
+        }
    
         // Don't care about clutch slippage, just handle RPM now
         if (g_gearStates.FakeNeutral) {
