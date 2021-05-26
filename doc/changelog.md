@@ -6,8 +6,13 @@ A bunch of minor changes, mostly improves wheel experience.
 
 Non-wheel:
 
-* Fix throttle blip and cut during down and upshifts
+* Transmission tuning now affects shifting speeds (+25%, +50%, +100%)
+* Improve shifting duration calculations, same as game now
+* Improve automatic gearbox downshift, jumps multiple gears now
+* Improve throttle cut duration on upshifts
+* Fix throttle blip on downshifts
 * Fix CustomSteering not using remapped keyboard settings
+* Fix shifting affecting cruise control too much
 * Allow user-defined colors for launch control in RPM bar
 * Various bug fixes and improvements
 
