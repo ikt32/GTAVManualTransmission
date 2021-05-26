@@ -912,6 +912,10 @@ bool isClutchPressed() {
 float getShiftTime(Vehicle vehicle, ShiftDirection shiftDirection) {
     auto handlingPtr = VExt::GetHandlingPtr(vehicle);
 
+    // When a shift is initiated, the clutch drops to 0.1
+    // and then rises at fClutchChangeRateScale<Up/Down>Shift per second until it's 1.0 again
+    // Since it doesn't start at 0, but at 0.1, it's more like:
+    // A shift takes 0.9/fClutchChangeRateScale<Up/Down>Shift seconds.
     float rateUp = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleUpShift);
     float rateDown = *reinterpret_cast<float*>(handlingPtr + hOffsets.fClutchChangeRateScaleDownShift);
 
@@ -927,6 +931,8 @@ float getShiftTime(Vehicle vehicle, ShiftDirection shiftDirection) {
 
     // In seconds
     return 1000.0f / shiftRate;
+    // In milliseconds
+    return 900.0f / shiftRate;
 }
 
 void shiftTo(int gear, bool autoClutch) {
