@@ -1421,7 +1421,7 @@ void functionAShift() {
                     float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[gear]);
                     float engineLoadForGear = g_gearStates.ThrottleHang - map(expectedRPM, 0.2f, 1.0f, 0.0f, 1.0f);
 
-                    if (engineLoadForGear < g_gearStates.UpshiftLoad * 0.9f || expectedRPM < 0.9f)
+                    if (engineLoadForGear < g_gearStates.UpshiftLoad * 0.9f || expectedRPM > 0.9f)
                         continue;
 
                     targetGear = gear;
