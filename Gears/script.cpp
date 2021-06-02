@@ -308,7 +308,7 @@ void update_vehicle() {
         functionDash();
     }
     if (g_playerVehicle != g_lastPlayerVehicle && vehAvail) {
-        if (g_vehData.mGearTop == 1 || g_vehData.mFlags[1] & FLAG_IS_ELECTRIC)
+        if (g_vehData.mIsCVT)
             g_gearStates.FakeNeutral = false;
         else
             g_gearStates.FakeNeutral = g_settings.GameAssists.DefaultNeutral;
@@ -488,7 +488,7 @@ void update_manual_features() {
         functionEngDamage();
     }
 
-    if (g_settings.MTOptions.EngLock) {
+    if (g_settings.MTOptions.EngLock && g_vehData.mHasClutch) {
         functionEngLock();
     }
     else {
@@ -720,7 +720,10 @@ void update_manual_transmission() {
         default: break;
     }
 
-    functionLimiter();
+    if (g_settings.MTOptions.HardLimiter && 
+        g_vehData.mHasClutch) {
+        functionLimiter();
+    }
 
     updateShifting();
 
@@ -991,7 +994,7 @@ void functionHShiftTo(int i) {
         g_gearStates.FakeNeutral = false;
     }
     else {
-        g_gearStates.FakeNeutral = true;
+        g_gearStates.FakeNeutral = !g_vehData.mIsCVT;
         if (g_settings.MTOptions.EngDamage && g_vehData.mHasClutch) {
             VEHICLE::SET_VEHICLE_ENGINE_HEALTH(
                 g_playerVehicle,
@@ -1010,7 +1013,7 @@ void functionHShiftKeyboard() {
             functionHShiftTo(i);
         }
     }
-    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::HN) && g_vehData.mHasClutch) {
+    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::HN) && !g_vehData.mIsCVT) {
         g_gearStates.FakeNeutral = !g_gearStates.FakeNeutral;
     }
 }
@@ -1037,12 +1040,12 @@ void functionHShiftWheel() {
     }
 
     if (isHShifterJustNeutral()) {
-        g_gearStates.FakeNeutral = g_vehData.mHasClutch;
+        g_gearStates.FakeNeutral = !g_vehData.mIsCVT;
     }
 
     if (g_controls.ButtonReleased(CarControls::WheelControlType::HR)) {
         shiftTo(1, false);
-        g_gearStates.FakeNeutral = g_vehData.mHasClutch;
+        g_gearStates.FakeNeutral = !g_vehData.mIsCVT;
     }
 }
 
@@ -1119,7 +1122,7 @@ void functionSShift() {
         g_controls.PrevInput == CarControls::Controller	&& ncTapStateUp == NativeController::TapState::Tapped ||
         allowKeyboard && g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftUp) ||
         g_controls.PrevInput == CarControls::Wheel			&& g_controls.ButtonJustPressed(CarControls::WheelControlType::ShiftUp)) {
-        if (!g_vehData.mHasClutch) {
+        if (g_vehData.mIsCVT) {
             if (g_vehData.mGearCurr < g_vehData.mGearTop) {
                 shiftTo(g_gearStates.LockGear + 1, true);
             }
@@ -1160,7 +1163,7 @@ void functionSShift() {
         g_controls.PrevInput == CarControls::Controller	&& ncTapStateDn == NativeController::TapState::Tapped ||
         allowKeyboard && g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftDown) ||
         g_controls.PrevInput == CarControls::Wheel			&& g_controls.ButtonJustPressed(CarControls::WheelControlType::ShiftDown)) {
-        if (!g_vehData.mHasClutch) {
+        if (g_vehData.mIsCVT) {
             if (g_vehData.mGearCurr > 0) {
                 shiftTo(g_gearStates.LockGear - 1, false);
                 g_gearStates.FakeNeutral = false;
@@ -1219,10 +1222,18 @@ bool subAutoShiftSequential() {
         g_controls.PrevInput == CarControls::Controller	&& ncTapStateUp == NativeController::TapState::Tapped ||
         allowKeyboard  && g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftUp) ||
         g_controls.PrevInput == CarControls::Wheel			&& g_controls.ButtonJustPressed(CarControls::WheelControlType::ShiftUp)) {
+        if (g_vehData.mIsCVT) {
+            if (g_vehData.mGearCurr < g_vehData.mGearTop) {
+                shiftTo(g_gearStates.LockGear + 1, true);
+            }
+            g_gearStates.FakeNeutral = false;
+            return true;
+        }
+        
         // Reverse to Neutral
         if (g_vehData.mGearCurr == 0 && !g_gearStates.FakeNeutral) {
             shiftTo(1, false);
-            g_gearStates.FakeNeutral = true;
+            g_gearStates.FakeNeutral = !g_vehData.mIsCVT;
             return true;
         }
 
@@ -1245,9 +1256,17 @@ bool subAutoShiftSequential() {
         g_controls.PrevInput == CarControls::Controller	&& ncTapStateDn == NativeController::TapState::Tapped ||
         allowKeyboard && g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftDown) ||
         g_controls.PrevInput == CarControls::Wheel			&& g_controls.ButtonJustPressed(CarControls::WheelControlType::ShiftDown)) {
+        if (g_vehData.mIsCVT) {
+            if (g_vehData.mGearCurr > 0) {
+                shiftTo(g_gearStates.LockGear - 1, false);
+                g_gearStates.FakeNeutral = false;
+            }
+            return true;
+        }
+
         // 1 to Neutral
         if (g_vehData.mGearCurr == 1 && !g_gearStates.FakeNeutral) {
-            g_gearStates.FakeNeutral = true;
+            g_gearStates.FakeNeutral = !g_vehData.mIsCVT;
             return true;
         }
 
@@ -1276,7 +1295,7 @@ bool subAutoShiftSelect() {
         if (g_gearStates.LockGear != 1) {
             shiftTo(1, false);
         }
-        g_gearStates.FakeNeutral = true;
+        g_gearStates.FakeNeutral = !g_vehData.mIsCVT;
         PAD::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
         return true;
     }
@@ -1300,7 +1319,7 @@ bool subAutoShiftSelect() {
             if (g_gearStates.LockGear != 1) {
                 shiftTo(1, false);
             }
-            g_gearStates.FakeNeutral = true;
+            g_gearStates.FakeNeutral = !g_vehData.mIsCVT;
             return true;
         }
     }
@@ -1310,7 +1329,7 @@ bool subAutoShiftSelect() {
             if (g_gearStates.LockGear != 1) {
                 shiftTo(1, false);
             }
-            g_gearStates.FakeNeutral = true;
+            g_gearStates.FakeNeutral = !g_vehData.mIsCVT;
             return true;
         }
     }
@@ -1584,8 +1603,6 @@ void functionEngDamage() {
 
 void functionEngLock() {
     if (g_settings().MTOptions.ShiftMode == EShiftMode::Automatic ||
-        g_vehData.mFlags[1] & eVehicleFlag2::FLAG_IS_ELECTRIC ||
-        g_vehData.mGearTop == 1 || 
         g_vehData.mGearCurr == g_vehData.mGearTop ||
         g_gearStates.FakeNeutral ||
         g_wheelPatchStates.InduceBurnout) {
@@ -2124,12 +2141,6 @@ void handleRPM() {
  */
 void functionLimiter() {
     g_gearStates.HitRPMLimiter = g_vehData.mRPM > 1.0f;
-
-    if (!g_settings.MTOptions.HardLimiter && 
-        (g_vehData.mGearCurr == g_vehData.mGearTop || g_vehData.mGearCurr == 0)) {
-        g_gearStates.HitRPMSpeedLimiter = false;
-        return;
-    }
 
     auto ratios = g_vehData.mGearRatios;
     float DriveMaxFlatVel = g_vehData.mDriveMaxFlatVel;
