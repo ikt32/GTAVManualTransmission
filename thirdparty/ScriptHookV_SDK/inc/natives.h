@@ -1,12 +1,13 @@
 #pragma once
 
-// Generated Sun, 28 Jun 2020 13:18:15 GMT
-// https://alloc8or.re/gta5/nativedb/
-
 #include "types.h"
 #include "nativeCaller.h"
 
-namespace SYSTEM {
+// Generated Wed, 02 Jun 2021 20:30:32 GMT
+// https://alloc8or.re/gta5/nativedb/
+
+namespace SYSTEM
+{
 	// Pauses execution of the current script, please note this behavior is only seen when called from one of the game script files(ysc). In order to wait an asi script use "static void WAIT(DWORD time);" found in main.h
 	static void WAIT(int ms) { invoke<Void>(0x4EDE34FBADD967A6, ms); } // 0x4EDE34FBADD967A6 0x7715C03B b323
 	// Examples:
@@ -78,10 +79,11 @@ namespace SYSTEM {
 	// 0 = high
 	// 1 = normal
 	// 2 = low
-	static void _SET_THREAD_PRIORITY(int priority) { invoke<Void>(0x42B65DEEF2EDF2A1, priority); } // 0x42B65DEEF2EDF2A1 b877
+	static void SET_THREAD_PRIORITY(int priority) { invoke<Void>(0x42B65DEEF2EDF2A1, priority); } // 0x42B65DEEF2EDF2A1 b877
 }
 
-namespace APP {
+namespace APP
+{
 	static BOOL APP_DATA_VALID() { return invoke<BOOL>(0x846AA8E7D55EE5B6); } // 0x846AA8E7D55EE5B6 0x72BDE002 b323
 	static int APP_GET_INT(const char* property) { return invoke<int>(0xD3A58A12C77D9D4B, property); } // 0xD3A58A12C77D9D4B 0x2942AAD2 b323
 	static float APP_GET_FLOAT(const char* property) { return invoke<float>(0x1514FB24C02C2322, property); } // 0x1514FB24C02C2322 0xD87F3A1C b323
@@ -104,7 +106,8 @@ namespace APP {
 	static BOOL APP_DELETE_APP_DATA(const char* appName) { return invoke<BOOL>(0x44151AEA95C8A003, appName); } // 0x44151AEA95C8A003 0x2A2FBD1C b323
 }
 
-namespace AUDIO {
+namespace AUDIO
+{
 	// All found occurrences in b617d, sorted alphabetically and identical lines removed: pastebin.com/RFb4GTny
 	// 
 	// AUDIO::PLAY_PED_RINGTONE("Remote_Ring", PLAYER::PLAYER_PED_ID(), 1);
@@ -164,7 +167,7 @@ namespace AUDIO {
 	// One call found in the b617d scripts:
 	// 
 	// AUDIO::_8A694D7A68F8DC38(NETWORK::NET_TO_PED(l_3989._f26F[0/*1*/]), "CONV_INTERRUPT_QUIT_IT", "LESTER");
-	static void INTERRUPT_CONVERSATION_AND_PAUSE(Ped p0, const char* p1, const char* p2) { invoke<Void>(0x8A694D7A68F8DC38, p0, p1, p2); } // 0x8A694D7A68F8DC38 0xDD4A3F1F b323
+	static void INTERRUPT_CONVERSATION_AND_PAUSE(Ped ped, const char* p1, const char* p2) { invoke<Void>(0x8A694D7A68F8DC38, ped, p1, p2); } // 0x8A694D7A68F8DC38 0xDD4A3F1F b323
 	static Any _0xAA19F5572C38B564(Any* p0) { return invoke<Any>(0xAA19F5572C38B564, p0); } // 0xAA19F5572C38B564 0xB58B8FF3 b323
 	static void _0xB542DE8C3D1CB210(BOOL p0) { invoke<Void>(0xB542DE8C3D1CB210, p0); } // 0xB542DE8C3D1CB210 0x789D8C6C b323
 	// This native does absolutely nothing, just a nullsub
@@ -177,7 +180,7 @@ namespace AUDIO {
 	// All occurrences and usages found in b617d, sorted alphabetically and identical lines removed: pastebin.com/XZ1tmGEz
 	static BOOL REQUEST_AMBIENT_AUDIO_BANK(const char* p0, BOOL p1, Any p2) { return invoke<BOOL>(0xFE02FFBED8CA9D99, p0, p1, p2); } // 0xFE02FFBED8CA9D99 0x23C88BC7 b323
 	// All occurrences and usages found in b617d, sorted alphabetically and identical lines removed: pastebin.com/AkmDAVn6
-	static BOOL REQUEST_SCRIPT_AUDIO_BANK(const char* p0, BOOL p1, Any p2) { return invoke<BOOL>(0x2F844A8B08D76685, p0, p1, p2); } // 0x2F844A8B08D76685 0x21322887 b323
+	static BOOL REQUEST_SCRIPT_AUDIO_BANK(const char* p0, BOOL p1, int p2) { return invoke<BOOL>(0x2F844A8B08D76685, p0, p1, p2); } // 0x2F844A8B08D76685 0x21322887 b323
 	static Any _0x40763EA7B9B783E7(Any p0, Any p1, Any p2) { return invoke<Any>(0x40763EA7B9B783E7, p0, p1, p2); } // 0x40763EA7B9B783E7 b573
 	static Any HINT_AMBIENT_AUDIO_BANK(Any p0, Any p1, Any p2) { return invoke<Any>(0x8F8C0E370AE62F5C, p0, p1, p2); } // 0x8F8C0E370AE62F5C 0xF1850DDC b323
 	static Any HINT_SCRIPT_AUDIO_BANK(Any p0, Any p1, Any p2) { return invoke<Any>(0xFB380A29641EC31A, p0, p1, p2); } // 0xFB380A29641EC31A 0x41FA0E51 b323
@@ -191,25 +194,34 @@ namespace AUDIO {
 	static int GET_SOUND_ID() { return invoke<int>(0x430386FE9BF80B45); } // 0x430386FE9BF80B45 0x6AE0AD56 b323
 	static void RELEASE_SOUND_ID(int soundId) { invoke<Void>(0x353FC880830B88FA, soundId); } // 0x353FC880830B88FA 0x9C080899 b323
 	// All found occurrences in b617d, sorted alphabetically and identical lines removed: pastebin.com/A8Ny8AHZ
-	static void PLAY_SOUND(int soundId, const char* audioName, const char* audioRef, BOOL p3, Any p4, BOOL p5) { invoke<Void>(0x7FF4944CC209192D, soundId, audioName, audioRef, p3, p4, p5); } // 0x7FF4944CC209192D 0xB6E1917F b323
-	// list: pastebin.com/DCeRiaLJ
 	// 
-	// All found occurrences in b617d, sorted alphabetically and identical lines removed: pastebin.com/0neZdsZ5
+	// Full list of audio / sound names by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/soundNames.json
+	static void PLAY_SOUND(int soundId, const char* audioName, const char* audioRef, BOOL p3, Any p4, BOOL p5) { invoke<Void>(0x7FF4944CC209192D, soundId, audioName, audioRef, p3, p4, p5); } // 0x7FF4944CC209192D 0xB6E1917F b323
+	// List: https://pastebin.com/DCeRiaLJ
+	// 
+	// All occurrences as of Cayo Perico Heist DLC (b2189), sorted alphabetically and identical lines removed: https://git.io/JtLxM
+	// 
+	// Full list of audio / sound names by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/soundNames.json
 	static void PLAY_SOUND_FRONTEND(int soundId, const char* audioName, const char* audioRef, BOOL p3) { invoke<Void>(0x67C540AA08E4A6F5, soundId, audioName, audioRef, p3); } // 0x67C540AA08E4A6F5 0x2E458F74 b323
 	// Only call found in the b617d scripts:
 	// 
 	// AUDIO::PLAY_DEFERRED_SOUND_FRONTEND("BACK", "HUD_FREEMODE_SOUNDSET");
+	// 
+	// Full list of audio / sound names by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/soundNames.json
 	static void PLAY_DEFERRED_SOUND_FRONTEND(const char* soundName, const char* soundsetName) { invoke<Void>(0xCADA5A0D0702381E, soundName, soundsetName); } // 0xCADA5A0D0702381E 0xC70E6CFA b323
 	// All found occurrences in b617d, sorted alphabetically and identical lines removed: pastebin.com/f2A7vTj0 
 	// No changes made in b678d.
 	// 
 	// gtaforums.com/topic/795622-audio-for-mods
 	// 
+	// Full list of audio / sound names by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/soundNames.json
 	static void PLAY_SOUND_FROM_ENTITY(int soundId, const char* audioName, Entity entity, const char* audioRef, BOOL isNetwork, Any p5) { invoke<Void>(0xE65F427EB70AB1ED, soundId, audioName, entity, audioRef, isNetwork, p5); } // 0xE65F427EB70AB1ED 0x95AE00F8 b323
 	static void _0x5B9853296731E88D(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { invoke<Void>(0x5B9853296731E88D, p0, p1, p2, p3, p4, p5); } // 0x5B9853296731E88D b877
 	// All found occurrences in b617d, sorted alphabetically and identical lines removed: pastebin.com/eeFc5DiW
 	// 
 	// gtaforums.com/topic/795622-audio-for-mods
+	// 
+	// Full list of audio / sound names by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/soundNames.json
 	static void PLAY_SOUND_FROM_COORD(int soundId, const char* audioName, float x, float y, float z, const char* audioRef, BOOL isNetwork, int range, BOOL p8) { invoke<Void>(0x8D8686B622B88120, soundId, audioName, x, y, z, audioRef, isNetwork, range, p8); } // 0x8D8686B622B88120 0xCAD3E2D5 b323
 	static void _0x7EC3C679D0E7E46B(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x7EC3C679D0E7E46B, p0, p1, p2, p3); } // 0x7EC3C679D0E7E46B b678
 	static void STOP_SOUND(int soundId) { invoke<Void>(0xA3B0C41BA5CC0BB5, soundId); } // 0xA3B0C41BA5CC0BB5 0xCD7F4030 b323
@@ -275,26 +287,29 @@ namespace AUDIO {
 	// 
 	// Note: A list of Name and Parameters can be found here pastebin.com/1GZS5dCL
 	// 
-	// Full list of speeches and voices names by some spanish shitbag: gist.github.com/alexguirre/0af600eb3d4c91ad4f900120a63b8992
-	static void _PLAY_AMBIENT_SPEECH1(Ped ped, const char* speechName, const char* speechParam, Any p3) { invoke<Void>(0x8E04FEDD28D42462, ped, speechName, speechParam, p3); } // 0x8E04FEDD28D42462 0x5C57B85D b323
+	// Full list of speeches and voices names by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/speeches.json
+	// 
+	// Old name: _PLAY_AMBIENT_SPEECH1
+	static void PLAY_PED_AMBIENT_SPEECH_NATIVE(Ped ped, const char* speechName, const char* speechParam, Any p3) { invoke<Void>(0x8E04FEDD28D42462, ped, speechName, speechParam, p3); } // 0x8E04FEDD28D42462 0x5C57B85D b323
 	// Plays ambient speech. See also _0x5C57B85D.
 	// 
-	// See _PLAY_AMBIENT_SPEECH1 for parameter specifications.
+	// See PLAY_PED_AMBIENT_SPEECH_NATIVE for parameter specifications.
 	// 
-	// Full list of speeches and voices names by alexguirre: gist.github.com/alexguirre/0af600eb3d4c91ad4f900120a63b8992
-	static void _PLAY_AMBIENT_SPEECH2(Ped ped, const char* speechName, const char* speechParam, Any p3) { invoke<Void>(0xC6941B4A3A8FBBB9, ped, speechName, speechParam, p3); } // 0xC6941B4A3A8FBBB9 0x444180DB b323
-	// This is the same as _PLAY_AMBIENT_SPEECH1 and _PLAY_AMBIENT_SPEECH2 but it will allow you to play a speech file from a specific voice file. It works on players and all peds, even animals.
+	// Full list of speeches and voices names by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/speeches.json
+	static void PLAY_PED_AMBIENT_SPEECH_AND_CLONE_NATIVE(Ped ped, const char* speechName, const char* speechParam, Any p3) { invoke<Void>(0xC6941B4A3A8FBBB9, ped, speechName, speechParam, p3); } // 0xC6941B4A3A8FBBB9 0x444180DB b323
+	// This is the same as PLAY_PED_AMBIENT_SPEECH_NATIVE and PLAY_PED_AMBIENT_SPEECH_AND_CLONE_NATIVE but it will allow you to play a speech file from a specific voice file. It works on players and all peds, even animals.
 	// 
 	// EX (C#):
 	// GTA.Native.Function.Call(Hash._0x3523634255FC3318, Game.Player.Character, "GENERIC_INSULT_HIGH", "s_m_y_sheriff_01_white_full_01", "SPEECH_PARAMS_FORCE_SHOUTED", 0);
 	// 
 	// The first param is the ped you want to play it on, the second is the speech name, the third is the voice name, the fourth is the speech param, and the last param is usually always 0.
 	// 
-	// Full list of speeches and voices names by alexguirre: gist.github.com/alexguirre/0af600eb3d4c91ad4f900120a63b8992
-	static void _PLAY_AMBIENT_SPEECH_WITH_VOICE(Ped p0, const char* speechName, const char* voiceName, const char* speechParam, BOOL p4) { invoke<Void>(0x3523634255FC3318, p0, speechName, voiceName, speechParam, p4); } // 0x3523634255FC3318 0x8386AE28 b323
-	static void _PLAY_AMBIENT_SPEECH_AT_COORDS(const char* p0, const char* p1, float p2, float p3, float p4, const char* p5) { invoke<Void>(0xED640017ED337E45, p0, p1, p2, p3, p4, p5); } // 0xED640017ED337E45 0xA1A1402E b323
-	// Sets audio flag "TrevorRageIsOverriden"
-	static void OVERRIDE_TREVOR_RAGE(const char* p0) { invoke<Void>(0x13AD665062541A7E, p0); } // 0x13AD665062541A7E 0x05B9B5CF b323
+	// Full list of speeches and voices names by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/speeches.json
+	static void PLAY_PED_AMBIENT_SPEECH_WITH_VOICE_NATIVE(Ped ped, const char* speechName, const char* voiceName, const char* speechParam, BOOL p4) { invoke<Void>(0x3523634255FC3318, ped, speechName, voiceName, speechParam, p4); } // 0x3523634255FC3318 0x8386AE28 b323
+	// Full list of speeches and voices names by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/speeches.json
+	static void PLAY_AMBIENT_SPEECH_FROM_POSITION_NATIVE(const char* speechName, const char* voiceName, float x, float y, float z, const char* speechParam) { invoke<Void>(0xED640017ED337E45, speechName, voiceName, x, y, z, speechParam); } // 0xED640017ED337E45 0xA1A1402E b323
+	// This native enables the audio flag "TrevorRageIsOverridden" and sets the voice effect to `voiceEffect`
+	static void OVERRIDE_TREVOR_RAGE(const char* voiceEffect) { invoke<Void>(0x13AD665062541A7E, voiceEffect); } // 0x13AD665062541A7E 0x05B9B5CF b323
 	static void RESET_TREVOR_RAGE() { invoke<Void>(0xE78503B10C4314E0); } // 0xE78503B10C4314E0 0xE80CF0D4 b323
 	static void SET_PLAYER_ANGRY(Ped ped, BOOL toggle) { invoke<Void>(0xEA241BB04110F091, ped, toggle); } // 0xEA241BB04110F091 0x782CA58D b323
 	// Needs another parameter [int p2]. The signature is PED::PLAY_PAIN(Ped ped, int painID, int p1, int p2);
@@ -334,12 +349,13 @@ namespace AUDIO {
 	// AUDIO::_SET_PED_VOICE_GROUP(PLAYER::PLAYER_PED_ID(), MISC::GET_HASH_KEY("FEMALE_LOST_BLACK_PVG"));
 	// AUDIO::_SET_PED_VOICE_GROUP(PLAYER::PLAYER_PED_ID(), MISC::GET_HASH_KEY("FEMALE_LOST_WHITE_PVG"));
 	static void _SET_PED_VOICE_GROUP(Ped ped, Hash voiceGroupHash) { invoke<Void>(0x7CDC8C3B89F661B3, ped, voiceGroupHash); } // 0x7CDC8C3B89F661B3 b323
-	static void _0xA5342D390CDA41D6(Ped ped, BOOL p1) { invoke<Void>(0xA5342D390CDA41D6, ped, p1); } // 0xA5342D390CDA41D6 b323
+	static void _SET_PED_AUDIO_GENDER(Ped ped, BOOL p1) { invoke<Void>(0xA5342D390CDA41D6, ped, p1); } // 0xA5342D390CDA41D6 b323
 	static void STOP_CURRENT_PLAYING_SPEECH(Ped ped) { invoke<Void>(0x7A73D05A607734C7, ped); } // 0x7A73D05A607734C7 0x5B7463F4 b323
 	static void STOP_CURRENT_PLAYING_AMBIENT_SPEECH(Ped ped) { invoke<Void>(0xB8BEC0CA6F0EDB0F, ped); } // 0xB8BEC0CA6F0EDB0F 0xBB8E64BF b323
 	static BOOL IS_AMBIENT_SPEECH_PLAYING(Ped ped) { return invoke<BOOL>(0x9072C8B49907BFAD, ped); } // 0x9072C8B49907BFAD 0x1972E8AA b323
 	static BOOL IS_SCRIPTED_SPEECH_PLAYING(Any p0) { return invoke<BOOL>(0xCC9AA18DCC7084F4, p0); } // 0xCC9AA18DCC7084F4 0x2C653904 b323
 	static BOOL IS_ANY_SPEECH_PLAYING(Ped ped) { return invoke<BOOL>(0x729072355FA39EC9, ped); } // 0x729072355FA39EC9 0x2B74A6D6 b323
+	static Any _0x30CA2EF91D15ADF8() { return invoke<Any>(0x30CA2EF91D15ADF8); } // 0x30CA2EF91D15ADF8 b2189
 	// Checks if the ped can play the speech or has the speech file, last parameter is usually 0
 	// 
 	// DOES_C*
@@ -366,7 +382,10 @@ namespace AUDIO {
 	// And to stop the effect use
 	// RESET_PED_MOVEMENT_CLIPSET
 	static void SET_PED_IS_DRUNK(Ped ped, BOOL toggle) { invoke<Void>(0x95D2D383D5396B8A, ped, toggle); } // 0x95D2D383D5396B8A 0xD2EA77A3 b323
-	static void PLAY_ANIMAL_VOCALIZATION(Ped pedHandle, Any p1, Any* p2) { invoke<Void>(0xEE066C7006C49C0A, pedHandle, p1, p2); } // 0xEE066C7006C49C0A 0x498849F3 b323
+	// Plays sounds from a ped with chop model. For example it used to play bark or sniff sounds. p1 is always 3 or 4294967295 in decompiled scripts. By a quick disassembling I can assume that this arg is unused.
+	// This native is works only when you call it on the ped with right model (ac_chop only ?)
+	// Speech Name can be: CHOP_SNIFF_SEQ CHOP_WHINE CHOP_LICKS_MOUTH CHOP_PANT bark GROWL SNARL BARK_SEQ
+	static void PLAY_ANIMAL_VOCALIZATION(Ped pedHandle, int p1, const char* speechName) { invoke<Void>(0xEE066C7006C49C0A, pedHandle, p1, speechName); } // 0xEE066C7006C49C0A 0x498849F3 b323
 	static BOOL IS_ANIMAL_VOCALIZATION_PLAYING(Ped pedHandle) { return invoke<BOOL>(0xC265DF9FB44A9FBD, pedHandle); } // 0xC265DF9FB44A9FBD 0x0CBAF2EF b323
 	// mood can be 0 or 1 (it's not a boolean value!). Effects audio of the animal.
 	static void SET_ANIMAL_MOOD(Ped animal, int mood) { invoke<Void>(0xCC97B29285B1DC3B, animal, mood); } // 0xCC97B29285B1DC3B 0x3EA7C6CB b323
@@ -397,15 +416,18 @@ namespace AUDIO {
 	static BOOL _0x0BE4BE946463F917(Vehicle vehicle) { return invoke<BOOL>(0x0BE4BE946463F917, vehicle); } // 0x0BE4BE946463F917 b505
 	// SET_VEH*
 	static void _0xC1805D05E6D4FE10(Vehicle vehicle) { invoke<Void>(0xC1805D05E6D4FE10, vehicle); } // 0xC1805D05E6D4FE10 0x7ABB89D2 b323
+	// Full list of static emitters by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/staticEmitters.json
 	static void SET_EMITTER_RADIO_STATION(const char* emitterName, const char* radioStation) { invoke<Void>(0xACF57305B12AF907, emitterName, radioStation); } // 0xACF57305B12AF907 0x87431585 b323
 	// Example:
 	// AUDIO::SET_STATIC_EMITTER_ENABLED((Any*)"LOS_SANTOS_VANILLA_UNICORN_01_STAGE", false);    AUDIO::SET_STATIC_EMITTER_ENABLED((Any*)"LOS_SANTOS_VANILLA_UNICORN_02_MAIN_ROOM", false);    AUDIO::SET_STATIC_EMITTER_ENABLED((Any*)"LOS_SANTOS_VANILLA_UNICORN_03_BACK_ROOM", false);
 	// 
-	// This turns off surrounding sounds not connected directly to peds. 
+	// This turns off surrounding sounds not connected directly to peds.
 	// 
-	// 
+	// Full list of static emitters by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/staticEmitters.json
 	static void SET_STATIC_EMITTER_ENABLED(const char* emitterName, BOOL toggle) { invoke<Void>(0x399D2D3B33F1B8EB, emitterName, toggle); } // 0x399D2D3B33F1B8EB 0x91F72E92 b323
 	// L* (LINK_*?)
+	// 
+	// Full list of static emitters by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/staticEmitters.json
 	static void _LINK_STATIC_EMITTER_TO_ENTITY(const char* emitterName, Entity entity) { invoke<Void>(0x651D3228960D08AF, emitterName, entity); } // 0x651D3228960D08AF b505
 	// Sets radio station by index.
 	static void SET_RADIO_TO_STATION_INDEX(int radioStation) { invoke<Void>(0xA619B168B8A8570F, radioStation); } // 0xA619B168B8A8570F 0x1D82766D b323
@@ -427,6 +449,7 @@ namespace AUDIO {
 	// 
 	static void SET_RADIO_TRACK(const char* radioStation, const char* radioTrack) { invoke<Void>(0xB39786F201FEE30B, radioStation, radioTrack); } // 0xB39786F201FEE30B 0x76E96212 b323
 	static void _SET_RADIO_TRACK_MIX(const char* radioStationName, const char* mixName, int p2) { invoke<Void>(0x2CB0075110BE1E56, radioStationName, mixName, p2); } // 0x2CB0075110BE1E56 b1493
+	static void _0x55ECF4D13D9903B0(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x55ECF4D13D9903B0, p0, p1, p2, p3); } // 0x55ECF4D13D9903B0 b1868
 	static void SET_VEHICLE_RADIO_LOUD(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xBB6F1CAEC68B0BCE, vehicle, toggle); } // 0xBB6F1CAEC68B0BCE 0x8D9EDD99 b323
 	static BOOL _IS_VEHICLE_RADIO_LOUD(Vehicle vehicle) { return invoke<BOOL>(0x032A116663A4D5AC, vehicle); } // 0x032A116663A4D5AC 0xCBA99F4A b323
 	static void SET_MOBILE_RADIO_ENABLED_DURING_GAMEPLAY(BOOL toggle) { invoke<Void>(0x1098355A16064BB3, toggle); } // 0x1098355A16064BB3 0x990085F0 b323
@@ -459,33 +482,38 @@ namespace AUDIO {
 	// AUDIO::SET_RADIO_STATION_MUSIC_ONLY(AUDIO::GET_RADIO_STATION_NAME(10), 0);
 	// AUDIO::SET_RADIO_STATION_MUSIC_ONLY(AUDIO::GET_RADIO_STATION_NAME(10), 1);
 	static void SET_RADIO_STATION_MUSIC_ONLY(const char* radioStation, BOOL toggle) { invoke<Void>(0x774BD811F656A122, radioStation, toggle); } // 0x774BD811F656A122 0xB1FF7137 b323
-	static void SET_RADIO_FRONTEND_FADE_TIME(float p0) { invoke<Void>(0x2C96CDB04FCA358E, p0); } // 0x2C96CDB04FCA358E 0xC8B514E2 b323
+	static void SET_RADIO_FRONTEND_FADE_TIME(float fadeTime) { invoke<Void>(0x2C96CDB04FCA358E, fadeTime); } // 0x2C96CDB04FCA358E 0xC8B514E2 b323
 	// AUDIO::UNLOCK_RADIO_STATION_TRACK_LIST("RADIO_16_SILVERLAKE", "MIRRORPARK_LOCKED");
 	static void UNLOCK_RADIO_STATION_TRACK_LIST(const char* radioStation, const char* trackListName) { invoke<Void>(0x031ACB6ABA18C729, radioStation, trackListName); } // 0x031ACB6ABA18C729 0xBE998184 b323
+	// Just a nullsub (i.e. does absolutely nothing) since build 1604.
 	static void _UPDATE_LSUR(BOOL enableMixes) { invoke<Void>(0x47AED84213A47510, enableMixes); } // 0x47AED84213A47510 b1493
 	// Disables the radio station (hides it from the radio wheel).
 	static void _LOCK_RADIO_STATION(const char* radioStationName, BOOL toggle) { invoke<Void>(0x477D9DB48F889591, radioStationName, toggle); } // 0x477D9DB48F889591 b1493
 	// GET_NE*
-	static BOOL _0xC64A06D939F826F5(float* p0, Any* p1, int* p2) { return invoke<BOOL>(0xC64A06D939F826F5, p0, p1, p2); } // 0xC64A06D939F826F5 b1493
+	// Gets values from the radio?
+	static BOOL _0xC64A06D939F826F5(float* p0, float* p1, int* p2) { return invoke<BOOL>(0xC64A06D939F826F5, p0, p1, p2); } // 0xC64A06D939F826F5 b1493
 	// GET_CURRENT_*
-	static int _0x3E65CDE5215832C1(const char* radioStationName) { return invoke<int>(0x3E65CDE5215832C1, radioStationName); } // 0x3E65CDE5215832C1 b1493
+	// Seems to return hashed radio station name?
+	static int _GET_CURRENT_RADIO_STATION_HASH(const char* radioStationName) { return invoke<int>(0x3E65CDE5215832C1, radioStationName); } // 0x3E65CDE5215832C1 b1493
 	// GET_CURRENT_*
 	static Hash _0x34D66BC058019CE0(const char* radioStationName) { return invoke<Hash>(0x34D66BC058019CE0, radioStationName); } // 0x34D66BC058019CE0 b1493
 	// SET_VEHICLE_*
 	static void _0xF3365489E0DD50F9(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xF3365489E0DD50F9, vehicle, toggle); } // 0xF3365489E0DD50F9 0x8AFC488D b323
+	// Full list of ambient zones by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/ambientZones.json
 	static void SET_AMBIENT_ZONE_STATE(const char* zoneName, BOOL p1, BOOL p2) { invoke<Void>(0xBDA07E5950085E46, zoneName, p1, p2); } // 0xBDA07E5950085E46 0x2849CAC9 b323
 	// This function also has a p2, unknown. Signature AUDIO::CLEAR_AMBIENT_ZONE_STATE(const char* zoneName, bool p1, Any p2);
 	// 
-	// Still needs more research. 
+	// Still needs more research.
 	// 
-	// Here are the names I've found: pastebin.com/AfA0Qjyv
+	// Full list of ambient zones by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/ambientZones.json
 	static void CLEAR_AMBIENT_ZONE_STATE(const char* zoneName, BOOL p1) { invoke<Void>(0x218DD44AAAC964FF, zoneName, p1); } // 0x218DD44AAAC964FF 0xCDFF3C82 b323
 	static void SET_AMBIENT_ZONE_LIST_STATE(Any* p0, BOOL p1, BOOL p2) { invoke<Void>(0x9748FA4DE50CCE3E, p0, p1, p2); } // 0x9748FA4DE50CCE3E 0xBF80B412 b323
 	static void CLEAR_AMBIENT_ZONE_LIST_STATE(Any* p0, BOOL p1) { invoke<Void>(0x120C48C614909FA4, p0, p1); } // 0x120C48C614909FA4 0x38B9B8D4 b323
-	//  All occurrences found in b617d, sorted alphabetically and identical lines removed: pastebin.com/jYvw7N1S
+	// Full list of ambient zones by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/ambientZones.json
 	static void SET_AMBIENT_ZONE_STATE_PERSISTENT(const char* ambientZone, BOOL p1, BOOL p2) { invoke<Void>(0x1D6650420CEC9D3B, ambientZone, p1, p2); } // 0x1D6650420CEC9D3B 0xC1FFB672 b323
-	// All occurrences found in b617d, sorted alphabetically and identical lines removed: pastebin.com/WkXDGgQL
+	// Full list of ambient zones by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/ambientZones.json
 	static void SET_AMBIENT_ZONE_LIST_STATE_PERSISTENT(const char* ambientZone, BOOL p1, BOOL p2) { invoke<Void>(0xF3638DAE8C4045E1, ambientZone, p1, p2); } // 0xF3638DAE8C4045E1 0x5F5A2605 b323
+	// Full list of ambient zones by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/ambientZones.json
 	static BOOL IS_AMBIENT_ZONE_ENABLED(const char* ambientZone) { return invoke<BOOL>(0x01E2817A479A7F9B, ambientZone); } // 0x01E2817A479A7F9B 0xBFABD872 b323
 	static void _0x5D2BFAAB8D956E0E() { invoke<Void>(0x5D2BFAAB8D956E0E); } // 0x5D2BFAAB8D956E0E b573
 	// All occurrences found in b617d, sorted alphabetically and identical lines removed: 
@@ -504,10 +532,13 @@ namespace AUDIO {
 	// Plays the siren sound of a vehicle which is otherwise activated when fastly double-pressing the horn key.
 	// Only works on vehicles with a police siren.
 	static void BLIP_SIREN(Vehicle vehicle) { invoke<Void>(0x1B9025BDA76822B6, vehicle); } // 0x1B9025BDA76822B6 0xC0EB6924 b323
+	// Overrides the vehicle's horn hash.
+	// When changing this hash on a vehicle, it will not return the 'overwritten' hash. It will still always return the default horn hash (same as GET_VEHICLE_DEFAULT_HORN)
+	// 
 	// vehicle - the vehicle whose horn should be overwritten
 	// mute - p1 seems to be an option for muting the horn
 	// p2 - maybe a horn id, since the function AUDIO::GET_VEHICLE_DEFAULT_HORN(veh) exists?
-	static void OVERRIDE_VEH_HORN(Vehicle vehicle, BOOL mute, int p2) { invoke<Void>(0x3CDC1E622CCE0356, vehicle, mute, p2); } // 0x3CDC1E622CCE0356 0x2ACAB783 b323
+	static void OVERRIDE_VEH_HORN(Vehicle vehicle, BOOL override, int hornHash) { invoke<Void>(0x3CDC1E622CCE0356, vehicle, override, hornHash); } // 0x3CDC1E622CCE0356 0x2ACAB783 b323
 	// Checks whether the horn of a vehicle is currently played.
 	static BOOL IS_HORN_ACTIVE(Vehicle vehicle) { return invoke<BOOL>(0x9D6BFC12B05C6121, vehicle); } // 0x9D6BFC12B05C6121 0x20E2BDD0 b323
 	// Makes pedestrians sound their horn longer, faster and more agressive when they use their horn.
@@ -525,19 +556,23 @@ namespace AUDIO {
 	// 
 	// Stream names often ends with "_MASTER", "_SMALL" or "_STREAM". Also "_IN", "_OUT" and numbers.   
 	// 
-	// soundSet is often set to 0 in the scripts. These are common to end the soundSets: "_SOUNDS", "_SOUNDSET" and numbers. 
+	// soundSet is often set to 0 in the scripts. These are common to end the soundSets: "_SOUNDS", "_SOUNDSET" and numbers.
+	// 
+	// Full list of audio / sound names by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/soundNames.json
 	static BOOL LOAD_STREAM(const char* streamName, const char* soundSet) { return invoke<BOOL>(0x1F1F957154EC51DF, streamName, soundSet); } // 0x1F1F957154EC51DF 0x0D89599D b323
 	// Example:
 	// AUDIO::LOAD_STREAM_WITH_START_OFFSET("STASH_TOXIN_STREAM", 2400, "FBI_05_SOUNDS");
 	// 
-	// Only called a few times in the scripts. 
+	// Only called a few times in the scripts.
+	// 
+	// Full list of audio / sound names by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/soundNames.json
 	static BOOL LOAD_STREAM_WITH_START_OFFSET(const char* streamName, int startOffset, const char* soundSet) { return invoke<BOOL>(0x59C16B79F53B3712, streamName, startOffset, soundSet); } // 0x59C16B79F53B3712 0xE5B5745C b323
 	static void PLAY_STREAM_FROM_PED(Ped ped) { invoke<Void>(0x89049DD63C08B5D1, ped); } // 0x89049DD63C08B5D1 0xA1D7FABE b323
 	static void PLAY_STREAM_FROM_VEHICLE(Vehicle vehicle) { invoke<Void>(0xB70374A758007DFA, vehicle); } // 0xB70374A758007DFA 0xF8E4BDA2 b323
 	// Used with AUDIO::LOAD_STREAM
 	// 
 	// Example from finale_heist2b.c4:
-	// AI::TASK_SYNCHRONIZED_SCENE(l_4C8[2/*14*/], l_4C8[2/*14*/]._f7, l_30A, "push_out_vault_l", 4.0, -1.5, 5, 713, 4.0, 0);
+	// TASK::TASK_SYNCHRONIZED_SCENE(l_4C8[2/*14*/], l_4C8[2/*14*/]._f7, l_30A, "push_out_vault_l", 4.0, -1.5, 5, 713, 4.0, 0);
 	//                     PED::SET_SYNCHRONIZED_SCENE_PHASE(l_4C8[2/*14*/]._f7, 0.0);
 	//                     PED::_2208438012482A1A(l_4C8[2/*14*/], 0, 0);
 	//                     PED::SET_PED_COMBAT_ATTRIBUTES(l_4C8[2/*14*/], 38, 1);
@@ -552,6 +587,7 @@ namespace AUDIO {
 	static void STOP_PED_SPEAKING(Ped ped, BOOL shaking) { invoke<Void>(0x9D64D7405520E3D3, ped, shaking); } // 0x9D64D7405520E3D3 0xFF92B49D b323
 	// BL*
 	static void _0xF8AD2EED7C47E8FE(Ped ped, BOOL p1, BOOL p2) { invoke<Void>(0xF8AD2EED7C47E8FE, ped, p1, p2); } // 0xF8AD2EED7C47E8FE b1734
+	static void _0xAB6781A5F3101470(Any p0, Any p1) { invoke<Void>(0xAB6781A5F3101470, p0, p1); } // 0xAB6781A5F3101470 b1868
 	static void DISABLE_PED_PAIN_AUDIO(Ped ped, BOOL toggle) { invoke<Void>(0xA9A41C1E940FB0E8, ped, toggle); } // 0xA9A41C1E940FB0E8 0x3B8E2D5F b323
 	// Common in the scripts:
 	// AUDIO::IS_AMBIENT_SPEECH_DISABLED(PLAYER::PLAYER_PED_ID());
@@ -559,7 +595,7 @@ namespace AUDIO {
 	static void _0xA8A7D434AFB4B97B(const char* p0, int p1) { invoke<Void>(0xA8A7D434AFB4B97B, p0, p1); } // 0xA8A7D434AFB4B97B b1493
 	static void _0x2ACABED337622DF2(const char* p0) { invoke<Void>(0x2ACABED337622DF2, p0); } // 0x2ACABED337622DF2 b1493
 	static void SET_SIREN_WITH_NO_DRIVER(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x1FEF0683B96EBCF2, vehicle, toggle); } // 0x1FEF0683B96EBCF2 0x77182D58 b323
-	static void _0x66C3FB05206041BA(Any p0) { invoke<Void>(0x66C3FB05206041BA, p0); } // 0x66C3FB05206041BA b1290
+	static void _TRIGGER_SIREN(Vehicle vehicle) { invoke<Void>(0x66C3FB05206041BA, vehicle); } // 0x66C3FB05206041BA b1290
 	// SET_*
 	static void _SOUND_VEHICLE_HORN_THIS_FRAME(Vehicle vehicle) { invoke<Void>(0x9C11908013EA4715, vehicle); } // 0x9C11908013EA4715 0xDE8BA3CD b323
 	static void SET_HORN_ENABLED(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x76D683C108594D0E, vehicle, toggle); } // 0x76D683C108594D0E 0x6EB92D05 b323
@@ -577,7 +613,7 @@ namespace AUDIO {
 	// 
 	// FORCE_VEHICLE_???
 	static void _FORCE_VEHICLE_ENGINE_AUDIO(Vehicle vehicle, const char* audioName) { invoke<Void>(0x4F0C413926060B38, vehicle, audioName); } // 0x4F0C413926060B38 0x33B0B007 b323
-	static void _0xCA4CEA6AE0000A7E(Any p0) { invoke<Void>(0xCA4CEA6AE0000A7E, p0); } // 0xCA4CEA6AE0000A7E b1180
+	static void _PRELOAD_VEHICLE_AUDIO(Hash vehicleModel) { invoke<Void>(0xCA4CEA6AE0000A7E, vehicleModel); } // 0xCA4CEA6AE0000A7E b1180
 	// 2 calls found in the b617d scripts:
 	// 
 	// AUDIO::_F1F8157B8C3F171C(l_A42, "Franklin_Bike_Rev", "BIG_SCORE_3A_SOUNDS");
@@ -586,8 +622,7 @@ namespace AUDIO {
 	static void _0xD2DCCD8E16E20997(Any p0) { invoke<Void>(0xD2DCCD8E16E20997, p0); } // 0xD2DCCD8E16E20997 b323
 	static BOOL _0x5DB8010EE71FDEF2(Vehicle vehicle) { return invoke<BOOL>(0x5DB8010EE71FDEF2, vehicle); } // 0x5DB8010EE71FDEF2 0x6E660D3F b323
 	static void SET_VEHICLE_AUDIO_ENGINE_DAMAGE_FACTOR(Vehicle vehicle, float damageFactor) { invoke<Void>(0x59E7B488451F4D3A, vehicle, damageFactor); } // 0x59E7B488451F4D3A 0x23BE6432 b323
-	// SET_VEHICLE_*
-	static void _0x01BB4D577D38BD9E(Vehicle vehicle, float p1) { invoke<Void>(0x01BB4D577D38BD9E, vehicle, p1); } // 0x01BB4D577D38BD9E 0xE81FAC68 b323
+	static void SET_VEHICLE_AUDIO_BODY_DAMAGE_FACTOR(Vehicle vehicle, float p1) { invoke<Void>(0x01BB4D577D38BD9E, vehicle, p1); } // 0x01BB4D577D38BD9E 0xE81FAC68 b323
 	// ENABLE_VEHICLE_*
 	static void _0x1C073274E065C6D2(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x1C073274E065C6D2, vehicle, toggle); } // 0x1C073274E065C6D2 0x9365E042 b323
 	static void ENABLE_VEHICLE_EXHAUST_POPS(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x2BE4BC731D039D5A, vehicle, toggle); } // 0x2BE4BC731D039D5A 0x2A60A90E b323
@@ -626,8 +661,7 @@ namespace AUDIO {
 	static void STOP_AUDIO_SCENES() { invoke<Void>(0xBAC7FC81A75EC1A1); } // 0xBAC7FC81A75EC1A1 0xF6C7342A b323
 	static BOOL IS_AUDIO_SCENE_ACTIVE(const char* scene) { return invoke<BOOL>(0xB65B60556E2A9225, scene); } // 0xB65B60556E2A9225 0xACBED05C b323
 	static void SET_AUDIO_SCENE_VARIABLE(const char* scene, const char* variable, float value) { invoke<Void>(0xEF21A9EF089A2668, scene, variable, value); } // 0xEF21A9EF089A2668 0x19BB3CE8 b323
-	// SET_AUDIO_S*
-	static void _0xA5F377B175A699C5(int p0) { invoke<Void>(0xA5F377B175A699C5, p0); } // 0xA5F377B175A699C5 0xE812925D b323
+	static void SET_AUDIO_SCRIPT_CLEANUP_TIME(int time) { invoke<Void>(0xA5F377B175A699C5, time); } // 0xA5F377B175A699C5 0xE812925D b323
 	// All found occurrences in b678d:
 	// pastebin.com/ceu67jz8
 	static void ADD_ENTITY_TO_AUDIO_MIX_GROUP(Entity entity, const char* groupName, float p2) { invoke<Void>(0x153973AB99FE8980, entity, groupName, p2); } // 0x153973AB99FE8980 0x2BC93264 b323
@@ -707,8 +741,10 @@ namespace AUDIO {
 	static Hash GET_VEHICLE_DEFAULT_HORN(Vehicle vehicle) { return invoke<Hash>(0x02165D55000219AC, vehicle); } // 0x02165D55000219AC 0xE84ABC19 b323
 	static Hash GET_VEHICLE_DEFAULT_HORN_IGNORE_MODS(Vehicle vehicle) { return invoke<Hash>(0xACB5DCCA1EC76840, vehicle); } // 0xACB5DCCA1EC76840 0xFD4B5B3B b323
 	static void RESET_PED_AUDIO_FLAGS(Ped ped) { invoke<Void>(0xF54BB7B61036F335, ped); } // 0xF54BB7B61036F335 0xDF720C86 b323
-	static void _0x0653B735BFBDFE87(Ped ped, BOOL toggle) { invoke<Void>(0x0653B735BFBDFE87, ped, toggle); } // 0x0653B735BFBDFE87 b1493
-	static void _0x29DA3CA8D8B2692D(Ped ped, BOOL toggle) { invoke<Void>(0x29DA3CA8D8B2692D, ped, toggle); } // 0x29DA3CA8D8B2692D b1493
+	// Enables/disables ped's "loud" footstep sound.
+	static void _SET_PED_AUDIO_FOOTSTEP_LOUD(Ped ped, BOOL toggle) { invoke<Void>(0x0653B735BFBDFE87, ped, toggle); } // 0x0653B735BFBDFE87 b1493
+	// Enables/disables ped's "quiet" footstep sound.
+	static void _SET_PED_AUDIO_FOOTSTEP_QUIET(Ped ped, BOOL toggle) { invoke<Void>(0x29DA3CA8D8B2692D, ped, toggle); } // 0x29DA3CA8D8B2692D b1493
 	// Sets audio flag "OverridePlayerGroundMaterial"
 	static void OVERRIDE_PLAYER_GROUND_MATERIAL(Hash hash, BOOL toggle) { invoke<Void>(0xD2CC78CD3D0B50F9, hash, toggle); } // 0xD2CC78CD3D0B50F9 0xC307D531 b323
 	// Something like UPDATE_PED_*
@@ -716,10 +752,7 @@ namespace AUDIO {
 	// Sets audio flag "OverrideMicrophoneSettings"
 	static void _OVERRIDE_MICROPHONE_SETTINGS(Hash hash, BOOL toggle) { invoke<Void>(0x75773E11BA459E90, hash, toggle); } // 0x75773E11BA459E90 b323
 	static void FREEZE_MICROPHONE() { invoke<Void>(0xD57AAAE0E2214D11); } // 0xD57AAAE0E2214D11 0x2B9D91E8 b323
-	// if value is set to true, and ambient siren sound will be played.
-	// 
-	// -------------------------------------------------------------------------
-	// 
+	// If value is set to true, and ambient siren sound will be played.
 	// Appears to enable/disable an audio flag.
 	static void DISTANT_COP_CAR_SIRENS(BOOL value) { invoke<Void>(0x552369F549563AD5, value); } // 0x552369F549563AD5 0x13EB5861 b323
 	static void _0x43FA0DFC5DF87815(Vehicle vehicle, BOOL p1) { invoke<Void>(0x43FA0DFC5DF87815, vehicle, p1); } // 0x43FA0DFC5DF87815 0x7BED1872 b323
@@ -868,7 +901,8 @@ namespace AUDIO {
 	// AUDIO::_950A154B8DAB6185("MNT_DNC", l_5F);
 	// AUDIO::_950A154B8DAB6185("PAP2_IG1_POPPYSEX", l_A00);
 	static void _SET_SYNCHRONIZED_AUDIO_EVENT_POSITION_THIS_FRAME(const char* p0, Entity p1) { invoke<Void>(0x950A154B8DAB6185, p0, p1); } // 0x950A154B8DAB6185 0xA17F9AB0 b323
-	// https://alloc8or.re/gta5/doc/enums/audSpecialEffectMode.txt
+	// Needs to be called every frame.
+	// Audio mode to apply this frame: https://alloc8or.re/gta5/doc/enums/audSpecialEffectMode.txt
 	static void SET_AUDIO_SPECIAL_EFFECT_MODE(int mode) { invoke<Void>(0x12561FCBB62D5B9C, mode); } // 0x12561FCBB62D5B9C 0x62B43677 b323
 	// Found in the b617d scripts, duplicates removed:  
 	// 
@@ -906,7 +940,8 @@ namespace AUDIO {
 	static void _SET_VEHICLE_HORN_VARIATION(Vehicle vehicle, int value) { invoke<Void>(0x0350E7E17BA767D0, vehicle, value); } // 0x0350E7E17BA767D0 b1365
 }
 
-namespace BRAIN {
+namespace BRAIN
+{
 	// BRAIN::ADD_SCRIPT_TO_RANDOM_PED("pb_prostitute", ${s_f_y_hooker_01}, 100, 0);
 	// 
 	// - Nacorpio
@@ -970,7 +1005,8 @@ namespace BRAIN {
 	static void _0x6E91B04E08773030(const char* action) { invoke<Void>(0x6E91B04E08773030, action); } // 0x6E91B04E08773030 0x29CE8BAA b323
 }
 
-namespace CAM {
+namespace CAM
+{
 	// ease - smooth transition between the camera's positions
 	// easeTime - Time in milliseconds for the transition to happen
 	// 
@@ -979,21 +1015,7 @@ namespace CAM {
 	// Setting ease to 1 will smooth the transition.
 	static void RENDER_SCRIPT_CAMS(BOOL render, BOOL ease, int easeTime, BOOL p3, BOOL p4, Any p5) { invoke<Void>(0x07E5B515DB0636FC, render, ease, easeTime, p3, p4, p5); } // 0x07E5B515DB0636FC 0x74337969 b323
 	// This native makes the gameplay camera zoom into first person/third person with a special effect.
-	// 
-	// For example, if you were first person in a mission and after the cutscene ends, the camera would then zoom into the first person camera view.
-	// 
-	// if (CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() != 4)
-	//            CAM::_C819F3CBB62BF692(1, 0, 3, 0)
-	// 
-	// This makes the camera zoom in to first person.
-	// 
-	// --------------------------------------------
-	// 1st Param Options: 0 or 1 (Changes quit often, toggle?)
-	// 2nd Param Options: 0, 0f, 1f, 3.8f, 10f, 20f (Mostly 0) 
-	// 3rd Param Options: 3, 2, 1 (Mostly 3);
-	// Note for the 2nd param 10f (offroad_race.c) and 3rd param 20f (range_modern.c) are the only times those 2 high floats are called.
-	// Note for the 3rd param 2 is only ever set in (franklin0.c), but it also sets it as 3. (0, 0, 3) ||(0, 0f, 2) || (0, 0, 3)
-	static void _RENDER_FIRST_PERSON_CAM(BOOL render, float p1, int p2, Any p3) { invoke<Void>(0xC819F3CBB62BF692, render, p1, p2, p3); } // 0xC819F3CBB62BF692 0xD3C08183 b323
+	static void STOP_RENDERING_SCRIPT_CAMS_USING_CATCH_UP(BOOL render, float p1, int p2, Any p3) { invoke<Void>(0xC819F3CBB62BF692, render, p1, p2, p3); } // 0xC819F3CBB62BF692 0xD3C08183 b323
 	// "DEFAULT_SCRIPTED_CAMERA"
 	// "DEFAULT_ANIMATED_CAMERA"
 	// "DEFAULT_SPLINE_CAMERA"
@@ -1019,9 +1041,9 @@ namespace CAM {
 	// 
 	static Cam CREATE_CAMERA_WITH_PARAMS(Hash camHash, float posX, float posY, float posZ, float rotX, float rotY, float rotZ, float fov, BOOL p8, Any p9) { return invoke<Cam>(0x6ABFA3E16460F22D, camHash, posX, posY, posZ, rotX, rotY, rotZ, fov, p8, p9); } // 0x6ABFA3E16460F22D 0x0688BE9A b323
 	// BOOL param indicates whether the cam should be destroyed if it belongs to the calling script.
-	static void DESTROY_CAM(Cam cam, BOOL netMissionEntity) { invoke<Void>(0x865908C81A2C22E9, cam, netMissionEntity); } // 0x865908C81A2C22E9 0xC39302BD b323
+	static void DESTROY_CAM(Cam cam, BOOL bScriptHostCam) { invoke<Void>(0x865908C81A2C22E9, cam, bScriptHostCam); } // 0x865908C81A2C22E9 0xC39302BD b323
 	// BOOL param indicates whether the cam should be destroyed if it belongs to the calling script.
-	static void DESTROY_ALL_CAMS(BOOL netMissionEntity) { invoke<Void>(0x8E5FB15663F79120, netMissionEntity); } // 0x8E5FB15663F79120 0x10C151CE b323
+	static void DESTROY_ALL_CAMS(BOOL bScriptHostCam) { invoke<Void>(0x8E5FB15663F79120, bScriptHostCam); } // 0x8E5FB15663F79120 0x10C151CE b323
 	// Returns whether or not the passed camera handle exists.
 	static BOOL DOES_CAM_EXIST(Cam cam) { return invoke<BOOL>(0xA7A932170592B50E, cam); } // 0xA7A932170592B50E 0x1EF89DC0 b323
 	// Set camera as active/inactive.
@@ -1052,6 +1074,7 @@ namespace CAM {
 	static void SET_CAM_FOV(Cam cam, float fieldOfView) { invoke<Void>(0xB13C14F66A00D047, cam, fieldOfView); } // 0xB13C14F66A00D047 0xD3D5D74F b323
 	static void SET_CAM_NEAR_CLIP(Cam cam, float nearClip) { invoke<Void>(0xC7848EFCCC545182, cam, nearClip); } // 0xC7848EFCCC545182 0x46DB13B1 b323
 	static void SET_CAM_FAR_CLIP(Cam cam, float farClip) { invoke<Void>(0xAE306F2A904BF86E, cam, farClip); } // 0xAE306F2A904BF86E 0x0D23E381 b323
+	static void _0xAABD62873FFB1A33(Any p0, Any p1) { invoke<Void>(0xAABD62873FFB1A33, p0, p1); } // 0xAABD62873FFB1A33 b2189
 	static void SET_CAM_MOTION_BLUR_STRENGTH(Cam cam, float strength) { invoke<Void>(0x6F0F77FBA9A8F2E6, cam, strength); } // 0x6F0F77FBA9A8F2E6 0xFD6E0D67 b323
 	static void SET_CAM_NEAR_DOF(Cam cam, float nearDOF) { invoke<Void>(0x3FA4BF0A7AB7DE2C, cam, nearDOF); } // 0x3FA4BF0A7AB7DE2C 0xF28254DF b323
 	static void SET_CAM_FAR_DOF(Cam cam, float farDOF) { invoke<Void>(0xEDD91296CD01AEE0, cam, farDOF); } // 0xEDD91296CD01AEE0 0x58515E8E b323
@@ -1064,7 +1087,8 @@ namespace CAM {
 	// This native has its name defined inside its codE
 	// 
 	static void _SET_CAM_DOF_FNUMBER_OF_LENS(Cam camera, float p1) { invoke<Void>(0x7DD234D6F3914C5B, camera, p1); } // 0x7DD234D6F3914C5B b323
-	static void _SET_CAM_DOF_FOCAL_LENGTH_MULTIPLIER(Any p0, Any p1) { invoke<Void>(0x47B595D60664CFFA, p0, p1); } // 0x47B595D60664CFFA b1011
+	// Native name labeled within its code
+	static void _SET_CAM_DOF_FOCAL_LENGTH_MULTIPLIER(Cam camera, float multiplier) { invoke<Void>(0x47B595D60664CFFA, camera, multiplier); } // 0x47B595D60664CFFA b1011
 	// This native has a name defined inside its code
 	static void _SET_CAM_DOF_FOCUS_DISTANCE_BIAS(Cam camera, float p1) { invoke<Void>(0xC669EEA5D031B7DE, camera, p1); } // 0xC669EEA5D031B7DE b323
 	// This native has a name defined inside its code
@@ -1075,7 +1099,9 @@ namespace CAM {
 	static void ATTACH_CAM_TO_ENTITY(Cam cam, Entity entity, float xOffset, float yOffset, float zOffset, BOOL isRelative) { invoke<Void>(0xFEDB7D269E8C60E3, cam, entity, xOffset, yOffset, zOffset, isRelative); } // 0xFEDB7D269E8C60E3 0xAD7C45F6 b323
 	static void ATTACH_CAM_TO_PED_BONE(Cam cam, Ped ped, int boneIndex, float x, float y, float z, BOOL heading) { invoke<Void>(0x61A3DBA14AB7F411, cam, ped, boneIndex, x, y, z, heading); } // 0x61A3DBA14AB7F411 0x506BB35C b323
 	static void _ATTACH_CAM_TO_PED_BONE_2(Cam cam, Ped ped, int boneIndex, float p3, float p4, float p5, float p6, float p7, float p8, BOOL p9) { invoke<Void>(0x149916F50C34A40D, cam, ped, boneIndex, p3, p4, p5, p6, p7, p8, p9); } // 0x149916F50C34A40D b1180
-	static void _ATTACH_CAM_TO_VEHICLE_BONE(Cam cam, Vehicle vehicle, int boneIndex, BOOL p3, float p4, float p5, float p6, float p7, float p8, float p9, BOOL p10) { invoke<Void>(0x8DB3F12A02CAEF72, cam, vehicle, boneIndex, p3, p4, p5, p6, p7, p8, p9, p10); } // 0x8DB3F12A02CAEF72 b1290
+	static void _0x202A5ED9CE01D6E7(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8) { invoke<Void>(0x202A5ED9CE01D6E7, p0, p1, p2, p3, p4, p5, p6, p7, p8); } // 0x202A5ED9CE01D6E7 b2189
+	// This native works with vehicles only. Bone indexes are usually given by this native GET_ENTITY_BONE_INDEX_BY_NAME.
+	static void _ATTACH_CAM_TO_VEHICLE_BONE(Cam cam, Vehicle vehicle, int boneIndex, BOOL relativeRotation, float rotX, float rotY, float rotZ, float offsetX, float offsetY, float offsetZ, BOOL fixedDirection) { invoke<Void>(0x8DB3F12A02CAEF72, cam, vehicle, boneIndex, relativeRotation, rotX, rotY, rotZ, offsetX, offsetY, offsetZ, fixedDirection); } // 0x8DB3F12A02CAEF72 b1290
 	static void DETACH_CAM(Cam cam) { invoke<Void>(0xA2FABBE87F4BAD82, cam); } // 0xA2FABBE87F4BAD82 0xF4FBF14A b323
 	// The native seems to only be called once.
 	// 
@@ -1143,6 +1169,8 @@ namespace CAM {
 	// ROAD_VIBRATION_SHAKE
 	// SKY_DIVING_SHAKE
 	// VIBRATE_SHAKE
+	// 
+	// Full list of cam shake types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/camShakeTypesCompact.json
 	static void SHAKE_CAM(Cam cam, const char* type, float amplitude) { invoke<Void>(0x6A25241C340D3822, cam, type, amplitude); } // 0x6A25241C340D3822 0x1D4211B0 b323
 	// Example from michael2 script.
 	// 
@@ -1152,8 +1180,12 @@ namespace CAM {
 	static void SET_CAM_SHAKE_AMPLITUDE(Cam cam, float amplitude) { invoke<Void>(0xD93DB43B82BC0D00, cam, amplitude); } // 0xD93DB43B82BC0D00 0x60FF6382 b323
 	static void STOP_CAM_SHAKING(Cam cam, BOOL p1) { invoke<Void>(0xBDECF64367884AC3, cam, p1); } // 0xBDECF64367884AC3 0x40D0EB87 b323
 	// CAM::SHAKE_SCRIPT_GLOBAL("HAND_SHAKE", 0.2);
+	// 
+	// Full list of cam shake types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/camShakeTypesCompact.json
 	static void SHAKE_SCRIPT_GLOBAL(const char* p0, float p1) { invoke<Void>(0xF4C8CF9E353AFECA, p0, p1); } // 0xF4C8CF9E353AFECA 0x2B0F05CD b323
 	// CAM::ANIMATED_SHAKE_SCRIPT_GLOBAL("SHAKE_CAM_medium", "medium", "", 0.5f);
+	// 
+	// Full list of cam shake types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/camShakeTypesCompact.json
 	static void ANIMATED_SHAKE_SCRIPT_GLOBAL(const char* p0, const char* p1, const char* p2, float p3) { invoke<Void>(0xC2EAE3FB8CDBED31, p0, p1, p2, p3); } // 0xC2EAE3FB8CDBED31 0xCB75BD9C b323
 	// In drunk_controller.c4, sub_309
 	// if (CAM::IS_SCRIPT_GLOBAL_SHAKING()) {
@@ -1165,12 +1197,14 @@ namespace CAM {
 	//     CAM::STOP_SCRIPT_GLOBAL_SHAKING(0);
 	// }
 	static void STOP_SCRIPT_GLOBAL_SHAKING(BOOL p0) { invoke<Void>(0x1C9D7949FA533490, p0); } // 0x1C9D7949FA533490 0x26FCFB96 b323
+	// p1: 0..16
+	static void _0x5D96CFB59DA076A0(Vehicle vehicle, int p1, float p2) { invoke<Void>(0x5D96CFB59DA076A0, vehicle, p1, p2); } // 0x5D96CFB59DA076A0 b2060
 	// Atleast one time in a script for the zRot Rockstar uses GET_ENTITY_HEADING to help fill the parameter.
 	// 
 	// p9 is unknown at this time.
 	// p10 throughout all the X360 Scripts is always 2.
 	// 
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static BOOL PLAY_CAM_ANIM(Cam cam, const char* animName, const char* animDictionary, float x, float y, float z, float xRot, float yRot, float zRot, BOOL p9, int p10) { return invoke<BOOL>(0x9A2D0FB2E7852392, cam, animName, animDictionary, x, y, z, xRot, yRot, zRot, p9, p10); } // 0x9A2D0FB2E7852392 0xBCEFB87E b323
 	static BOOL IS_CAM_PLAYING_ANIM(Cam cam, const char* animName, const char* animDictionary) { return invoke<BOOL>(0xC90621D8A0CEECF2, cam, animName, animDictionary); } // 0xC90621D8A0CEECF2 0xB998CB49 b323
 	static void SET_CAM_ANIM_CURRENT_PHASE(Cam cam, float phase) { invoke<Void>(0x4145A4C44FF3B5A6, cam, phase); } // 0x4145A4C44FF3B5A6 0x3CB1D17F b323
@@ -1226,17 +1260,13 @@ namespace CAM {
 	// Heading is alwyas 0 in aiming camera.
 	static void SET_GAMEPLAY_CAM_RELATIVE_HEADING(float heading) { invoke<Void>(0xB4EC2312F4E5B1F1, heading); } // 0xB4EC2312F4E5B1F1 0x20C6217C b323
 	static float GET_GAMEPLAY_CAM_RELATIVE_PITCH() { return invoke<float>(0x3A6867B4845BEDA2); } // 0x3A6867B4845BEDA2 0xFC5A4946 b323
-	// Sets the camera pitch.
-	// 
-	// Parameters:
-	// x = pitches the camera on the x axis.
-	// Value2 = always seems to be hex 0x3F800000 (1.000000 float).
-	static void SET_GAMEPLAY_CAM_RELATIVE_PITCH(float x, float Value2) { invoke<Void>(0x6D0858B8EDFD2B7D, x, Value2); } // 0x6D0858B8EDFD2B7D 0x6381B963 b323
-	static void _SET_GAMEPLAY_CAM_RELATIVE_ROTATION(Any p0, Any p1, Any p2) { invoke<Void>(0x48608C3464F58AB4, p0, p1, p2); } // 0x48608C3464F58AB4 b505
+	// This native sets the camera's pitch (rotation on the x-axis).
+	static void SET_GAMEPLAY_CAM_RELATIVE_PITCH(float angle, float scalingFactor) { invoke<Void>(0x6D0858B8EDFD2B7D, angle, scalingFactor); } // 0x6D0858B8EDFD2B7D 0x6381B963 b323
+	static void _SET_GAMEPLAY_CAM_RELATIVE_ROTATION(float roll, float pitch, float yaw) { invoke<Void>(0x48608C3464F58AB4, roll, pitch, yaw); } // 0x48608C3464F58AB4 b505
 	// F*
 	static void _0x28B022A17B068A3A(float p0, float p1) { invoke<Void>(0x28B022A17B068A3A, p0, p1); } // 0x28B022A17B068A3A b1734
 	// Does nothing
-	static void _SET_GAMEPLAY_CAM_RAW_YAW(float yaw, Any p1) { invoke<Void>(0x103991D4A307D472, yaw, p1); } // 0x103991D4A307D472 b323
+	static void _SET_GAMEPLAY_CAM_RAW_YAW(float yaw) { invoke<Void>(0x103991D4A307D472, yaw); } // 0x103991D4A307D472 b323
 	static void _SET_GAMEPLAY_CAM_RAW_PITCH(float pitch) { invoke<Void>(0x759E13EBC1C15C5A, pitch); } // 0x759E13EBC1C15C5A b323
 	static void _0x469F2ECDEC046337(BOOL p0) { invoke<Void>(0x469F2ECDEC046337, p0); } // 0x469F2ECDEC046337 b323
 	// Possible shake types (updated b617d):
@@ -1252,12 +1282,14 @@ namespace CAM {
 	// ROAD_VIBRATION_SHAKE
 	// SKY_DIVING_SHAKE
 	// VIBRATE_SHAKE
+	// 
+	// Full list of cam shake types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/camShakeTypesCompact.json
 	static void SHAKE_GAMEPLAY_CAM(const char* shakeName, float intensity) { invoke<Void>(0xFD55E49555E017CF, shakeName, intensity); } // 0xFD55E49555E017CF 0xF2EFE660 b323
 	static BOOL IS_GAMEPLAY_CAM_SHAKING() { return invoke<BOOL>(0x016C090630DF1F89); } // 0x016C090630DF1F89 0x3457D681 b323
 	// Sets the amplitude for the gameplay (i.e. 3rd or 1st) camera to shake. Used in script "drunk_controller.ysc.c4" to simulate making the player drunk.
 	static void SET_GAMEPLAY_CAM_SHAKE_AMPLITUDE(float amplitude) { invoke<Void>(0xA87E00932DB4D85D, amplitude); } // 0xA87E00932DB4D85D 0x9219D44A b323
 	static void STOP_GAMEPLAY_CAM_SHAKING(BOOL p0) { invoke<Void>(0x0EF93E9F3D08C178, p0); } // 0x0EF93E9F3D08C178 0xFD569E4E b323
-	static void _0x8BBACBF51DA047A8(Any p0) { invoke<Void>(0x8BBACBF51DA047A8, p0); } // 0x8BBACBF51DA047A8 0x7D3007A2 b323
+	static void SET_GAMEPLAY_CAM_FOLLOW_PED_THIS_UPDATE(Ped ped) { invoke<Void>(0x8BBACBF51DA047A8, ped); } // 0x8BBACBF51DA047A8 0x7D3007A2 b323
 	// Examples when this function will return 0 are:
 	// - During busted screen.
 	// - When player is coming out from a hospital.
@@ -1272,9 +1304,11 @@ namespace CAM {
 	// DISABLE_*
 	static void _ENABLE_CROSSHAIR_THIS_FRAME() { invoke<Void>(0xEA7F0AD7E9BA676F); } // 0xEA7F0AD7E9BA676F 0xA61FF9AC b323
 	static BOOL IS_GAMEPLAY_CAM_LOOKING_BEHIND() { return invoke<BOOL>(0x70FDA869F3317EA9); } // 0x70FDA869F3317EA9 0x33C83F17 b323
-	static void _0x2AED6301F67007D5(Entity entity) { invoke<Void>(0x2AED6301F67007D5, entity); } // 0x2AED6301F67007D5 0x2701A9AD b323
-	static void _0x49482F9FCD825AAA(Entity entity) { invoke<Void>(0x49482F9FCD825AAA, entity); } // 0x49482F9FCD825AAA 0xC4736ED3 b323
+	static void _DISABLE_CAM_COLLISION_FOR_ENTITY(Entity entity) { invoke<Void>(0x2AED6301F67007D5, entity); } // 0x2AED6301F67007D5 0x2701A9AD b323
+	static void DISABLE_CAM_COLLISION_FOR_OBJECT(Entity entity) { invoke<Void>(0x49482F9FCD825AAA, entity); } // 0x49482F9FCD825AAA 0xC4736ED3 b323
+	static void _0xA7092AFE81944852() { invoke<Void>(0xA7092AFE81944852); } // 0xA7092AFE81944852 b2189
 	static void _0xFD3151CD37EA2245(Entity entity) { invoke<Void>(0xFD3151CD37EA2245, entity); } // 0xFD3151CD37EA2245 b323
+	// Sets some flag on cinematic camera
 	static void _0xB1381B97F70C7B30() { invoke<Void>(0xB1381B97F70C7B30); } // 0xB1381B97F70C7B30 b1180
 	static void _0xDD79DF9F4D26E1C9() { invoke<Void>(0xDD79DF9F4D26E1C9); } // 0xDD79DF9F4D26E1C9 0x6B0E9D57 b323
 	static BOOL IS_SPHERE_VISIBLE(float x, float y, float z, float radius) { return invoke<BOOL>(0xE33D59DA70B58FDF, x, y, z, radius); } // 0xE33D59DA70B58FDF 0xDD1329E2 b323
@@ -1320,7 +1354,7 @@ namespace CAM {
 	// 
 	// CAM::_ANIMATE_GAMEPLAY_CAM_ZOOM(1f, 1f);
 	static void _ANIMATE_GAMEPLAY_CAM_ZOOM(float p0, float distance) { invoke<Void>(0xDF2E1F7742402E81, p0, distance); } // 0xDF2E1F7742402E81 0x77340650 b323
-	static void _0xE9EA16D6E54CDCA4(Vehicle p0, int p1) { invoke<Void>(0xE9EA16D6E54CDCA4, p0, p1); } // 0xE9EA16D6E54CDCA4 0x4B22C5CB b323
+	static void SET_IN_VEHICLE_CAM_STATE_THIS_UPDATE(Vehicle p0, int p1) { invoke<Void>(0xE9EA16D6E54CDCA4, p0, p1); } // 0xE9EA16D6E54CDCA4 0x4B22C5CB b323
 	// Disables first person camera for the current frame.
 	// 
 	// Found in decompiled scripts:
@@ -1365,41 +1399,39 @@ namespace CAM {
 	// 2 - Third Person Far
 	// 4 - First Person
 	static void SET_FOLLOW_VEHICLE_CAM_VIEW_MODE(int viewMode) { invoke<Void>(0xAC253D7842768F48, viewMode); } // 0xAC253D7842768F48 0xC4FBBBD3 b323
-	// interprets the result of CAM::_0x19CAFA3C87F7C2FF()
-	// 
-	// example: // checks if you're currently in first person
-	// if ((CAM::_EE778F8C7E1142E2(CAM::_19CAFA3C87F7C2FF()) == 4) && (!__463_$28ED382849B17AFC())) {
-	// HUD::_FDEC055AB549E328();
-	// HUD::_SET_NOTIFICATION_TEXT_ENTRY("REC_FEED_WAR");
-	// l_CE[0/*1*/] = HUD::_DRAW_NOTIFICATION(0, 1);
-	// }
-	// 
-	static Any _0xEE778F8C7E1142E2(Any p0) { return invoke<Any>(0xEE778F8C7E1142E2, p0); } // 0xEE778F8C7E1142E2 0xF3B148A6 b323
-	static void _0x2A2173E46DAECD12(Any p0, Any p1) { invoke<Void>(0x2A2173E46DAECD12, p0, p1); } // 0x2A2173E46DAECD12 0x1DEBCB45 b323
-	// Seems to return the current type of view
-	// example: // checks if you're currently in first person
-	// if ((CAM::_EE778F8C7E1142E2(CAM::_19CAFA3C87F7C2FF()) == 4) && (!__463_$28ED382849B17AFC())) {
-	//     HUD::_FDEC055AB549E328();
-	//     HUD::_SET_NOTIFICATION_TEXT_ENTRY("REC_FEED_WAR");
-	//     l_CE[0/*1*/] = HUD::_DRAW_NOTIFICATION(0, 1);
-	// }
-	static Any _0x19CAFA3C87F7C2FF() { return invoke<Any>(0x19CAFA3C87F7C2FF); } // 0x19CAFA3C87F7C2FF b323
+	// context: see _GET_CAM_ACTIVE_VIEW_MODE_CONTEXT
+	static int GET_CAM_VIEW_MODE_FOR_CONTEXT(int context) { return invoke<int>(0xEE778F8C7E1142E2, context); } // 0xEE778F8C7E1142E2 0xF3B148A6 b323
+	// context: see _GET_CAM_ACTIVE_VIEW_MODE_CONTEXT
+	static void SET_CAM_VIEW_MODE_FOR_CONTEXT(int context, int viewMode) { invoke<Void>(0x2A2173E46DAECD12, context, viewMode); } // 0x2A2173E46DAECD12 0x1DEBCB45 b323
+	// enum Context
+	// {
+	// 	ON_FOOT,
+	// 	IN_VEHICLE,
+	// 	ON_BIKE,
+	// 	IN_BOAT,
+	// 	IN_AIRCRAFT,
+	// 	IN_SUBMARINE,
+	// 	IN_HELI,
+	// 	IN_TURRET
+	// };
+	static int _GET_CAM_ACTIVE_VIEW_MODE_CONTEXT() { return invoke<int>(0x19CAFA3C87F7C2FF); } // 0x19CAFA3C87F7C2FF b323
 	static void _USE_STUNT_CAMERA_THIS_FRAME() { invoke<Void>(0x6493CF69859B116A); } // 0x6493CF69859B116A b791
-	static void _0x425A920FDB9A0DDA(const char* camName) { invoke<Void>(0x425A920FDB9A0DDA, camName); } // 0x425A920FDB9A0DDA b1180
+	// Sets gameplay camera to hash
+	static void _SET_GAMEPLAY_CAM_HASH(const char* camName) { invoke<Void>(0x425A920FDB9A0DDA, camName); } // 0x425A920FDB9A0DDA b1180
 	static void _0x0AA27680A0BD43FA() { invoke<Void>(0x0AA27680A0BD43FA); } // 0x0AA27680A0BD43FA b1103
-	static void _0x5C90CAB09951A12F(Any p0) { invoke<Void>(0x5C90CAB09951A12F, p0); } // 0x5C90CAB09951A12F b1365
+	static void _SET_FOLLOW_TURRET_SEAT_CAM(int seatIndex) { invoke<Void>(0x5C90CAB09951A12F, seatIndex); } // 0x5C90CAB09951A12F b1365
 	static BOOL IS_AIM_CAM_ACTIVE() { return invoke<BOOL>(0x68EDDA28A5976D07); } // 0x68EDDA28A5976D07 0xC24B4F6F b323
 	// IS_A*
 	static BOOL _IS_AIM_CAM_THIRD_PERSON_ACTIVE() { return invoke<BOOL>(0x74BD83EA840F6BC9); } // 0x74BD83EA840F6BC9 0x8F320DE4 b323
 	static BOOL IS_FIRST_PERSON_AIM_CAM_ACTIVE() { return invoke<BOOL>(0x5E346D934122613F); } // 0x5E346D934122613F 0xD6280468 b323
 	static void DISABLE_AIM_CAM_THIS_UPDATE() { invoke<Void>(0x1A31FE0049E542F6); } // 0x1A31FE0049E542F6 0x1BAA7182 b323
 	static float GET_FIRST_PERSON_AIM_CAM_ZOOM_FACTOR() { return invoke<float>(0x7EC52CC40597D170); } // 0x7EC52CC40597D170 0x33951005 b323
-	static void SET_FIRST_PERSON_AIM_CAM_ZOOM_FACTOR(float p0) { invoke<Void>(0x70894BD0915C5BCA, p0); } // 0x70894BD0915C5BCA 0x9F4AF763 b323
+	static void SET_FIRST_PERSON_AIM_CAM_ZOOM_FACTOR(float zoomFactor) { invoke<Void>(0x70894BD0915C5BCA, zoomFactor); } // 0x70894BD0915C5BCA 0x9F4AF763 b323
 	static void _0xCED08CBE8EBB97C7(float p0, float p1) { invoke<Void>(0xCED08CBE8EBB97C7, p0, p1); } // 0xCED08CBE8EBB97C7 0x68BA0730 b323
 	static void _0x2F7F2B26DD3F18EE(float p0, float p1) { invoke<Void>(0x2F7F2B26DD3F18EE, p0, p1); } // 0x2F7F2B26DD3F18EE 0x2F29F0D5 b323
 	static void _SET_FIRST_PERSON_CAM_PITCH_RANGE(float p0, float p1) { invoke<Void>(0xBCFC632DB7673BF0, p0, p1); } // 0xBCFC632DB7673BF0 0x76DAC96C b323
-	static void _SET_FIRST_PERSON_CAM_NEAR_CLIP(float p0) { invoke<Void>(0x0AF7B437918103B3, p0); } // 0x0AF7B437918103B3 0x0E21069D b323
-	static void _SET_THIRD_PERSON_AIM_CAM_NEAR_CLIP(float p0) { invoke<Void>(0x42156508606DE65E, p0); } // 0x42156508606DE65E 0x71E9C63E b323
+	static void SET_FIRST_PERSON_AIM_CAM_NEAR_CLIP_THIS_UPDATE(float p0) { invoke<Void>(0x0AF7B437918103B3, p0); } // 0x0AF7B437918103B3 0x0E21069D b323
+	static void SET_THIRD_PERSON_AIM_CAM_NEAR_CLIP_THIS_UPDATE(float p0) { invoke<Void>(0x42156508606DE65E, p0); } // 0x42156508606DE65E 0x71E9C63E b323
 	static void _0x4008EDF7D6E48175(BOOL p0) { invoke<Void>(0x4008EDF7D6E48175, p0); } // 0x4008EDF7D6E48175 0xD1EEBC45 b323
 	static void _0x380B4968D1E09E55() { invoke<Void>(0x380B4968D1E09E55); } // 0x380B4968D1E09E55 b1290
 	static Vector3 GET_FINAL_RENDERED_CAM_COORD() { return invoke<Vector3>(0xA200EB1EE790F448); } // 0xA200EB1EE790F448 0x9C84BDA0 b323
@@ -1407,10 +1439,10 @@ namespace CAM {
 	// 
 	// Function is called faily often by CAM::CREATE_CAM_WITH_PARAMS
 	static Vector3 GET_FINAL_RENDERED_CAM_ROT(int rotationOrder) { return invoke<Vector3>(0x5B4E4C817FCC2DFB, rotationOrder); } // 0x5B4E4C817FCC2DFB 0x1FFBEFC5 b323
-	static Vector3 GET_FINAL_RENDERED_IN_WHEN_FRIENDLY_ROT(Any p0, Any p1) { return invoke<Vector3>(0x26903D9CD1175F2C, p0, p1); } // 0x26903D9CD1175F2C 0xACADF916 b323
-	// gets some camera fov
+	static Vector3 GET_FINAL_RENDERED_IN_WHEN_FRIENDLY_ROT(Player player, int rotationOrder) { return invoke<Vector3>(0x26903D9CD1175F2C, player, rotationOrder); } // 0x26903D9CD1175F2C 0xACADF916 b323
+	// Gets some camera fov
 	static float GET_FINAL_RENDERED_CAM_FOV() { return invoke<float>(0x80EC114669DAEFF4); } // 0x80EC114669DAEFF4 0x721B763B b323
-	static float GET_FINAL_RENDERED_IN_WHEN_FRIENDLY_FOV(Any p0) { return invoke<float>(0x5F35F6732C3FBBA0, p0); } // 0x5F35F6732C3FBBA0 0x23E3F106 b323
+	static float GET_FINAL_RENDERED_IN_WHEN_FRIENDLY_FOV(Player player) { return invoke<float>(0x5F35F6732C3FBBA0, player); } // 0x5F35F6732C3FBBA0 0x23E3F106 b323
 	static float GET_FINAL_RENDERED_CAM_NEAR_CLIP() { return invoke<float>(0xD0082607100D7193); } // 0xD0082607100D7193 0x457AE195 b323
 	static float GET_FINAL_RENDERED_CAM_FAR_CLIP() { return invoke<float>(0xDFC8CBC606FDB0FC); } // 0xDFC8CBC606FDB0FC 0x46CB3A49 b323
 	static float GET_FINAL_RENDERED_CAM_NEAR_DOF() { return invoke<float>(0xA03502FC581F7D9B); } // 0xA03502FC581F7D9B 0x19297A7A b323
@@ -1418,7 +1450,8 @@ namespace CAM {
 	static float GET_FINAL_RENDERED_CAM_MOTION_BLUR_STRENGTH() { return invoke<float>(0x162F9D995753DC19); } // 0x162F9D995753DC19 0x38992E83 b323
 	static void SET_GAMEPLAY_COORD_HINT(float x, float y, float z, int duration, int blendOutDuration, int blendInDuration, int unk) { invoke<Void>(0xD51ADCD2D8BC0FB3, x, y, z, duration, blendOutDuration, blendInDuration, unk); } // 0xD51ADCD2D8BC0FB3 0xF27483C9 b323
 	static void SET_GAMEPLAY_PED_HINT(Ped p0, float x1, float y1, float z1, BOOL p4, Any p5, Any p6, Any p7) { invoke<Void>(0x2B486269ACD548D3, p0, x1, y1, z1, p4, p5, p6, p7); } // 0x2B486269ACD548D3 0x7C27343E b323
-	static void SET_GAMEPLAY_VEHICLE_HINT(Any p0, float p1, float p2, float p3, BOOL p4, Any p5, Any p6, Any p7) { invoke<Void>(0xA2297E18F3E71C2E, p0, p1, p2, p3, p4, p5, p6, p7); } // 0xA2297E18F3E71C2E 0x2C9A11D8 b323
+	// Focuses the camera on the specified vehicle.
+	static void SET_GAMEPLAY_VEHICLE_HINT(Vehicle vehicle, float offsetX, float offsetY, float offsetZ, BOOL p4, int time, int easeInTime, int easeOutTime) { invoke<Void>(0xA2297E18F3E71C2E, vehicle, offsetX, offsetY, offsetZ, p4, time, easeInTime, easeOutTime); } // 0xA2297E18F3E71C2E 0x2C9A11D8 b323
 	static void SET_GAMEPLAY_OBJECT_HINT(Any p0, float p1, float p2, float p3, BOOL p4, Any p5, Any p6, Any p7) { invoke<Void>(0x83E87508A2CA2AC6, p0, p1, p2, p3, p4, p5, p6, p7); } // 0x83E87508A2CA2AC6 0x2ED5E2F8 b323
 	// p6 & p7 - possibly length or time
 	static void SET_GAMEPLAY_ENTITY_HINT(Entity entity, float xOffset, float yOffset, float zOffset, BOOL p4, int p5, int p6, int p7, Any p8) { invoke<Void>(0x189E955A8313E298, entity, xOffset, yOffset, zOffset, p4, p5, p6, p7, p8); } // 0x189E955A8313E298 0x66C32306 b323
@@ -1429,38 +1462,43 @@ namespace CAM {
 	static void _0x247ACBC4ABBC9D1C(BOOL p0) { invoke<Void>(0x247ACBC4ABBC9D1C, p0); } // 0x247ACBC4ABBC9D1C b323
 	static Any _0xBF72910D0F26F025() { return invoke<Any>(0xBF72910D0F26F025); } // 0xBF72910D0F26F025 b323
 	static void SET_GAMEPLAY_HINT_FOV(float FOV) { invoke<Void>(0x513403FB9C56211F, FOV); } // 0x513403FB9C56211F 0x96FD173B b323
-	static void _SET_GAMEPLAY_HINT_ANIM_OFFSETZ(float p0) { invoke<Void>(0xF8BDBF3D573049A1, p0); } // 0xF8BDBF3D573049A1 0x72E8CD3A b323
-	static void _SET_GAMEPLAY_HINT_ANGLE(float p0) { invoke<Void>(0xD1F8363DFAD03848, p0); } // 0xD1F8363DFAD03848 0x79472AE3 b323
-	static void _SET_GAMEPLAY_HINT_ANIM_OFFSETX(float p0) { invoke<Void>(0x5D7B620DAE436138, p0); } // 0x5D7B620DAE436138 0xFC7464A0 b323
-	static void _SET_GAMEPLAY_HINT_ANIM_OFFSETY(float p0) { invoke<Void>(0xC92717EF615B6704, p0); } // 0xC92717EF615B6704 0x3554AA0E b323
-	// SET_GAMEPLAY_*
-	static void _SET_GAMEPLAY_HINT_ANIM_CLOSEUP(BOOL p0) { invoke<Void>(0xE3433EADAAF7EE40, p0); } // 0xE3433EADAAF7EE40 0x2F0CE859 b323
+	// Old name: _SET_GAMEPLAY_HINT_ANIM_OFFSETZ
+	static void SET_GAMEPLAY_HINT_FOLLOW_DISTANCE_SCALAR(float value) { invoke<Void>(0xF8BDBF3D573049A1, value); } // 0xF8BDBF3D573049A1 0x72E8CD3A b323
+	// Old name: _SET_GAMEPLAY_HINT_ANGLE
+	static void SET_GAMEPLAY_HINT_BASE_ORBIT_PITCH_OFFSET(float value) { invoke<Void>(0xD1F8363DFAD03848, value); } // 0xD1F8363DFAD03848 0x79472AE3 b323
+	static void _SET_GAMEPLAY_HINT_ANIM_OFFSETX(float xOffset) { invoke<Void>(0x5D7B620DAE436138, xOffset); } // 0x5D7B620DAE436138 0xFC7464A0 b323
+	static void _SET_GAMEPLAY_HINT_ANIM_OFFSETY(float yOffset) { invoke<Void>(0xC92717EF615B6704, yOffset); } // 0xC92717EF615B6704 0x3554AA0E b323
+	static void _SET_GAMEPLAY_HINT_ANIM_CLOSEUP(BOOL toggle) { invoke<Void>(0xE3433EADAAF7EE40, toggle); } // 0xE3433EADAAF7EE40 0x2F0CE859 b323
 	static void SET_CINEMATIC_BUTTON_ACTIVE(BOOL p0) { invoke<Void>(0x51669F7D1FB53D9F, p0); } // 0x51669F7D1FB53D9F 0x3FBC5D00 b323
 	static BOOL IS_CINEMATIC_CAM_RENDERING() { return invoke<BOOL>(0xB15162CB5826E9E8); } // 0xB15162CB5826E9E8 0x80471AD9 b323
-	// p0 argument found in the b617d scripts: "DRUNK_SHAKE" 
+	// p0 argument found in the b617d scripts: "DRUNK_SHAKE"
+	// 
+	// Full list of cam shake types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/camShakeTypesCompact.json
 	static void SHAKE_CINEMATIC_CAM(const char* p0, float p1) { invoke<Void>(0xDCE214D9ED58F3CF, p0, p1); } // 0xDCE214D9ED58F3CF 0x61815F31 b323
 	static BOOL IS_CINEMATIC_CAM_SHAKING() { return invoke<BOOL>(0xBBC08F6B4CB8FF0A); } // 0xBBC08F6B4CB8FF0A 0x8376D939 b323
 	static void SET_CINEMATIC_CAM_SHAKE_AMPLITUDE(float p0) { invoke<Void>(0xC724C701C30B2FE7, p0); } // 0xC724C701C30B2FE7 0x67510C4B b323
 	static void STOP_CINEMATIC_CAM_SHAKING(BOOL p0) { invoke<Void>(0x2238E588E588A6D7, p0); } // 0x2238E588E588A6D7 0x71C12904 b323
 	static void _DISABLE_VEHICLE_FIRST_PERSON_CAM_THIS_FRAME() { invoke<Void>(0xADFF1B2A555F5FBA); } // 0xADFF1B2A555F5FBA 0x5AC6DAC9 b323
 	static void _0x62ECFCFDEE7885D6() { invoke<Void>(0x62ECFCFDEE7885D6); } // 0x62ECFCFDEE7885D6 0x837F8581 b323
-	static void _0x9E4CFFF989258472() { invoke<Void>(0x9E4CFFF989258472); } // 0x9E4CFFF989258472 0x65DDE8AF b323
+	// Resets the vehicle idle camera timer. Calling this in a loop will disable the idle camera.
+	static void _INVALIDATE_VEHICLE_IDLE_CAM() { invoke<Void>(0x9E4CFFF989258472); } // 0x9E4CFFF989258472 0x65DDE8AF b323
+	// Resets the idle camera timer. Calling that in a loop once every few seconds is enough to disable the idle cinematic camera.
 	static void INVALIDATE_IDLE_CAM() { invoke<Void>(0xF4F2C0D4EE209E20); } // 0xF4F2C0D4EE209E20 0xD75CDD75 b323
-	static BOOL _0xCA9D2AA3E326D720() { return invoke<BOOL>(0xCA9D2AA3E326D720); } // 0xCA9D2AA3E326D720 0x96A07066 b323
+	static BOOL IS_CINEMATIC_IDLE_CAM_RENDERING() { return invoke<BOOL>(0xCA9D2AA3E326D720); } // 0xCA9D2AA3E326D720 0x96A07066 b323
 	static BOOL _IS_IN_VEHICLE_CAM_DISABLED() { return invoke<BOOL>(0x4F32C0D5A90A9B40); } // 0x4F32C0D5A90A9B40 b323
 	static void CREATE_CINEMATIC_SHOT(Any p0, int p1, Any p2, Entity entity) { invoke<Void>(0x741B0129D4560F31, p0, p1, p2, entity); } // 0x741B0129D4560F31 0xAC494E35 b323
 	static BOOL IS_CINEMATIC_SHOT_ACTIVE(Any p0) { return invoke<BOOL>(0xCC9F3371A7C28BC9, p0); } // 0xCC9F3371A7C28BC9 0xA4049042 b323
-	static void STOP_CINEMATIC_SHOT(Any p0) { invoke<Void>(0x7660C6E75D3A078E, p0); } // 0x7660C6E75D3A078E 0xD78358C5 b323
-	static void _0xA41BCD7213805AAC(BOOL p0) { invoke<Void>(0xA41BCD7213805AAC, p0); } // 0xA41BCD7213805AAC 0xFBB85E02 b323
+	// Only used once in carsteal3 with p0 set to -1096069633 (CAMERA_MAN_SHOT)
+	static void STOP_CINEMATIC_SHOT(Hash p0) { invoke<Void>(0x7660C6E75D3A078E, p0); } // 0x7660C6E75D3A078E 0xD78358C5 b323
+	static void FORCE_CINEMATIC_RENDERING_THIS_UPDATE(BOOL p0) { invoke<Void>(0xA41BCD7213805AAC, p0); } // 0xA41BCD7213805AAC 0xFBB85E02 b323
 	static void _0xDC9DA9E8789F5246() { invoke<Void>(0xDC9DA9E8789F5246); } // 0xDC9DA9E8789F5246 0x4938C82F b323
-	// p0 = 0/1 or true/false
-	// 
-	// It doesn't seems to work
-	static void SET_CINEMATIC_MODE_ACTIVE(BOOL p0) { invoke<Void>(0xDCF0754AC3D6FD4E, p0); } // 0xDCF0754AC3D6FD4E 0x2009E747 b323
+	// Toggles the vehicle cinematic cam; requires the player ped to be in a vehicle to work.
+	static void SET_CINEMATIC_MODE_ACTIVE(BOOL toggle) { invoke<Void>(0xDCF0754AC3D6FD4E, toggle); } // 0xDCF0754AC3D6FD4E 0x2009E747 b323
 	static Any _0x1F2300CB7FA7B7F6() { return invoke<Any>(0x1F2300CB7FA7B7F6); } // 0x1F2300CB7FA7B7F6 0x6739AD55 b323
 	static Any _0x17FCA7199A530203() { return invoke<Any>(0x17FCA7199A530203); } // 0x17FCA7199A530203 b323
 	static Any _0xD7360051C885628B() { return invoke<Any>(0xD7360051C885628B); } // 0xD7360051C885628B b372
-	static BOOL _0xF5F1E89A970B7796() { return invoke<BOOL>(0xF5F1E89A970B7796); } // 0xF5F1E89A970B7796 b1493
+	// Tests some cinematic camera flags
+	static BOOL _IS_CINEMATIC_CAM_ACTIVE() { return invoke<BOOL>(0xF5F1E89A970B7796); } // 0xF5F1E89A970B7796 b1493
 	static void _0x7B8A361C1813FBEF() { invoke<Void>(0x7B8A361C1813FBEF); } // 0x7B8A361C1813FBEF b573
 	static void STOP_CUTSCENE_CAM_SHAKING() { invoke<Void>(0xDB629FFD9285FA06); } // 0xDB629FFD9285FA06 0xF07D603D b323
 	static void _0x324C5AA411DA7737(Any p0) { invoke<Void>(0x324C5AA411DA7737, p0); } // 0x324C5AA411DA7737 b323
@@ -1481,13 +1519,14 @@ namespace CAM {
 	// CAM::_21E253A7F8DA5DFB("ISSI2");
 	// CAM::_21E253A7F8DA5DFB("SPEEDO");
 	static void _SET_GAMEPLAY_CAM_VEHICLE_CAMERA(const char* vehicleName) { invoke<Void>(0x21E253A7F8DA5DFB, vehicleName); } // 0x21E253A7F8DA5DFB b323
-	static void _SET_GAMEPLAY_CAM_VEHICLE_CAMERA_NAME(Any p0) { invoke<Void>(0x11FA5D3479C7DD47, p0); } // 0x11FA5D3479C7DD47 b323
+	static void _SET_GAMEPLAY_CAM_VEHICLE_CAMERA_NAME(Hash vehicleModel) { invoke<Void>(0x11FA5D3479C7DD47, vehicleModel); } // 0x11FA5D3479C7DD47 b323
 	static Any _0xEAF0FA793D05C592() { return invoke<Any>(0xEAF0FA793D05C592); } // 0xEAF0FA793D05C592 b323
 	static void _0x62374889A4D59F72() { invoke<Void>(0x62374889A4D59F72); } // 0x62374889A4D59F72 b877
 	static float _REPLAY_FREE_CAM_GET_MAX_RANGE() { return invoke<float>(0x8BFCEB5EA1B161B6); } // 0x8BFCEB5EA1B161B6 b323
 }
 
-namespace CLOCK {
+namespace CLOCK
+{
 	// SET_CLOCK_TIME(12, 34, 56);
 	static void SET_CLOCK_TIME(int hour, int minute, int second) { invoke<Void>(0x47C3B5848C3E45D8, hour, minute, second); } // 0x47C3B5848C3E45D8 0x26F6AF14 b323
 	static void PAUSE_CLOCK(BOOL toggle) { invoke<Void>(0x4055E40BD2DBEC1D, toggle); } // 0x4055E40BD2DBEC1D 0xB02D6124 b323
@@ -1547,7 +1586,8 @@ namespace CLOCK {
 	static void GET_LOCAL_TIME(int* year, int* month, int* day, int* hour, int* minute, int* second) { invoke<Void>(0x50C7A99057A69748, year, month, day, hour, minute, second); } // 0x50C7A99057A69748 0x124BCFA2 b323
 }
 
-namespace CUTSCENE {
+namespace CUTSCENE
+{
 	// flags: Usually 8
 	static void REQUEST_CUTSCENE(const char* cutsceneName, int flags) { invoke<Void>(0x7A86743F475D9E09, cutsceneName, flags); } // 0x7A86743F475D9E09 0xB5977853 b323
 	// flags: Usually 8
@@ -1599,6 +1639,8 @@ namespace CUTSCENE {
 	static void REGISTER_ENTITY_FOR_CUTSCENE(Ped cutscenePed, const char* cutsceneEntName, int p2, Hash modelHash, int p4) { invoke<Void>(0xE40C1C56DF95C2E8, cutscenePed, cutsceneEntName, p2, modelHash, p4); } // 0xE40C1C56DF95C2E8 0x7CBC3EC7 b323
 	static Entity GET_ENTITY_INDEX_OF_REGISTERED_ENTITY(const char* cutsceneEntName, Hash modelHash) { return invoke<Entity>(0xC0741A26499654CD, cutsceneEntName, modelHash); } // 0xC0741A26499654CD 0x46D18755 b323
 	// SET_VEHICLE_*
+	// 
+	// Full list of vehicles by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicles.json
 	static void _0x7F96F23FA9B73327(Hash modelHash) { invoke<Void>(0x7F96F23FA9B73327, modelHash); } // 0x7F96F23FA9B73327 b323
 	// Only used twice in R* scripts
 	static void SET_CUTSCENE_TRIGGER_AREA(float p0, float p1, float p2, float p3, float p4, float p5) { invoke<Void>(0x9896CE4721BE84BA, p0, p1, p2, p3, p4, p5); } // 0x9896CE4721BE84BA 0x9D76D9DE b323
@@ -1617,8 +1659,9 @@ namespace CUTSCENE {
 	static void _0x2F137B508DE238F2(BOOL p0) { invoke<Void>(0x2F137B508DE238F2, p0); } // 0x2F137B508DE238F2 0x8338DA1D b323
 	static void _0xE36A98D8AB3D3C66(BOOL p0) { invoke<Void>(0xE36A98D8AB3D3C66, p0); } // 0xE36A98D8AB3D3C66 0x04377C10 b323
 	static Any _0x5EDEF0CF8C1DAB3C() { return invoke<Any>(0x5EDEF0CF8C1DAB3C); } // 0x5EDEF0CF8C1DAB3C 0xDBD88708 b323
-	static void _0x41FAA8FB2ECE8720(BOOL p0) { invoke<Void>(0x41FAA8FB2ECE8720, p0); } // 0x41FAA8FB2ECE8720 0x28D54A7F b323
+	static void SET_CUTSCENE_CAN_BE_SKIPPED(BOOL p0) { invoke<Void>(0x41FAA8FB2ECE8720, p0); } // 0x41FAA8FB2ECE8720 0x28D54A7F b323
 	static void REGISTER_SYNCHRONISED_SCRIPT_SPEECH() { invoke<Void>(0x2131046957F31B04); } // 0x2131046957F31B04 0xB60CFBB9 b323
+	// Full list of ped components by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pedComponentVariations.json
 	static void SET_CUTSCENE_PED_COMPONENT_VARIATION(const char* cutsceneEntName, int p1, int p2, int p3, Hash modelHash) { invoke<Void>(0xBA01E7B6DEEFBBC9, cutsceneEntName, p1, p2, p3, modelHash); } // 0xBA01E7B6DEEFBBC9 0x6AF994A1 b323
 	static void SET_CUTSCENE_PED_COMPONENT_VARIATION_FROM_PED(const char* cutsceneEntName, Ped ped, Hash modelHash) { invoke<Void>(0x2A56C06EBEF2B0D9, cutsceneEntName, ped, modelHash); } // 0x2A56C06EBEF2B0D9 0x1E7DA95E b323
 	static BOOL DOES_CUTSCENE_ENTITY_EXIST(const char* cutsceneEntName, Hash modelHash) { return invoke<BOOL>(0x499EF20C5DB25C59, cutsceneEntName, modelHash); } // 0x499EF20C5DB25C59 0x58E67409 b323
@@ -1628,14 +1671,16 @@ namespace CUTSCENE {
 	//     sub_2ea27("Trying to set Jimmy prop variation");
 	//     CUTSCENE::_0546524ADE2E9723("Jimmy_Boston", 1, 0, 0, 0);
 	// }
+	// 
+	// Full list of ped components by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pedComponentVariations.json
 	static void SET_CUTSCENE_PED_PROP_VARIATION(const char* cutsceneEntName, int p1, int p2, int p3, Hash modelHash) { invoke<Void>(0x0546524ADE2E9723, cutsceneEntName, p1, p2, p3, modelHash); } // 0x0546524ADE2E9723 0x22E9A9DE b323
 	// HAS_CUTSCENE_*
-	// 
 	// Possibly HAS_CUTSCENE_CUT_THIS_FRAME, needs more research.
-	static BOOL _0x708BDD8CD795B043() { return invoke<BOOL>(0x708BDD8CD795B043); } // 0x708BDD8CD795B043 0x4315A7C5 b323
+	static BOOL _HAS_CUTSCENE_CUT_THIS_FRAME() { return invoke<BOOL>(0x708BDD8CD795B043); } // 0x708BDD8CD795B043 0x4315A7C5 b323
 }
 
-namespace DATAFILE {
+namespace DATAFILE
+{
 	// Adds the given request ID to the watch list.
 	static void DATAFILE_WATCH_REQUEST_ID(int id) { invoke<Void>(0xAD6875BBC0FC899C, id); } // 0xAD6875BBC0FC899C 0x621388FF b323
 	static void DATAFILE_CLEAR_WATCH_LIST() { invoke<Void>(0x6CC86E78358D5119); } // 0x6CC86E78358D5119 0x5B39D0AC b323
@@ -1697,6 +1742,9 @@ namespace DATAFILE {
 	// 
 	// 
 	static BOOL DATAFILE_IS_SAVE_PENDING() { return invoke<BOOL>(0xBEDB96A7584AA8CF); } // 0xBEDB96A7584AA8CF 0x5DCD0796 b323
+	static Any _0xA6EEF01087181EDD(Any p0, Any p1) { return invoke<Any>(0xA6EEF01087181EDD, p0, p1); } // 0xA6EEF01087181EDD b2189
+	static void _0x6AD0BD5E087866CB(Any p0) { invoke<Void>(0x6AD0BD5E087866CB, p0); } // 0x6AD0BD5E087866CB b2189
+	static Any _0xDBF860CF1DB8E599(Any p0) { return invoke<Any>(0xDBF860CF1DB8E599, p0); } // 0xDBF860CF1DB8E599 b2189
 	static void DATADICT_SET_BOOL(Any* objectData, const char* key, BOOL value) { invoke<Void>(0x35124302A556A325, objectData, key, value); } // 0x35124302A556A325 0x9B29D99B b323
 	static void DATADICT_SET_INT(Any* objectData, const char* key, int value) { invoke<Void>(0xE7E035450A7948D5, objectData, key, value); } // 0xE7E035450A7948D5 0xEFCF554A b323
 	static void DATADICT_SET_FLOAT(Any* objectData, const char* key, float value) { invoke<Void>(0xC27E1CC2D795105E, objectData, key, value); } // 0xC27E1CC2D795105E 0xE972CACF b323
@@ -1744,7 +1792,8 @@ namespace DATAFILE {
 	static int DATAARRAY_GET_TYPE(Any* arrayData, int arrayIndex) { return invoke<int>(0x3A0014ADB172A3C5, arrayData, arrayIndex); } // 0x3A0014ADB172A3C5 0xFA2402C8 b323
 }
 
-namespace DECORATOR {
+namespace DECORATOR
+{
 	static BOOL DECOR_SET_TIME(Entity entity, const char* propertyName, int timestamp) { return invoke<BOOL>(0x95AED7B8E39ECAA4, entity, propertyName, timestamp); } // 0x95AED7B8E39ECAA4 0xBBAEEF94 b323
 	// This function sets metadata of type bool to specified entity.
 	// 
@@ -1766,7 +1815,8 @@ namespace DECORATOR {
 	static void DECOR_REGISTER_LOCK() { invoke<Void>(0xA9D14EEA259F9248); } // 0xA9D14EEA259F9248 0x7F3F1C02 b323
 }
 
-namespace DLC {
+namespace DLC
+{
 	// Only used once in scripts, in maintransition.
 	// 
 	// maintransition.c4, line ~82432:
@@ -1780,7 +1830,7 @@ namespace DLC {
 	// Most likely ARE_*
 	static BOOL _0x241FCA5B1AA14F75() { return invoke<BOOL>(0x241FCA5B1AA14F75); } // 0x241FCA5B1AA14F75 0x0AF83036 b323
 	// Example:
-	// DLC2::IS_DLC_PRESENT($\mpbusiness2\);
+	// DLC::IS_DLC_PRESENT($\mpbusiness2\);
 	// ($ = gethashkey)
 	// 
 	// bruteforce these:
@@ -1809,19 +1859,20 @@ namespace DLC {
 	static void ON_ENTER_SP() { invoke<Void>(0xD7C10C4A637992C9); } // 0xD7C10C4A637992C9 0x8BF60FC3 b323
 	// This loads the GTA:O dlc map parts (high end garages, apartments).
 	// Works in singleplayer.
-	// In order to use GTA:O heist IPL's you have to call this native with the following params: _9BAE5AD2508DF078(1);
+	// In order to use GTA:O heist IPL's you have to call this native with the following params: SET_INSTANCE_PRIORITY_MODE(1);
 	static void ON_ENTER_MP() { invoke<Void>(0x0888C3502DBBEEF5); } // 0x0888C3502DBBEEF5 0xC65586A9 b323
 }
 
-namespace ENTITY {
-	// Checks if the Entity exists
+namespace ENTITY
+{
+	// Checks whether an entity exists in the game world.
 	static BOOL DOES_ENTITY_EXIST(Entity entity) { return invoke<BOOL>(0x7239B21A38F536BA, entity); } // 0x7239B21A38F536BA 0x3AC90869 b323
 	static BOOL DOES_ENTITY_BELONG_TO_THIS_SCRIPT(Entity entity, BOOL p1) { return invoke<BOOL>(0xDDE6DF5AE89981D2, entity, p1); } // 0xDDE6DF5AE89981D2 0xACFEB3F9 b323
 	static BOOL DOES_ENTITY_HAVE_DRAWABLE(Entity entity) { return invoke<BOOL>(0x060D6E96F8B8E48D, entity); } // 0x060D6E96F8B8E48D 0xA5B33300 b323
 	static BOOL DOES_ENTITY_HAVE_PHYSICS(Entity entity) { return invoke<BOOL>(0xDA95EA3317CC5064, entity); } // 0xDA95EA3317CC5064 0x9BCD2979 b323
 	// P3 is always 3 as far as i cant tell
 	// 
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static BOOL HAS_ENTITY_ANIM_FINISHED(Entity entity, const char* animDict, const char* animName, int p3) { return invoke<BOOL>(0x20B711662962B472, entity, animDict, animName, p3); } // 0x20B711662962B472 0x1D9CAB92 b323
 	static BOOL HAS_ENTITY_BEEN_DAMAGED_BY_ANY_OBJECT(Entity entity) { return invoke<BOOL>(0x95EB9964FF5C5C65, entity); } // 0x95EB9964FF5C5C65 0x6B74582E b323
 	static BOOL HAS_ENTITY_BEEN_DAMAGED_BY_ANY_PED(Entity entity) { return invoke<BOOL>(0x605F5A140F202491, entity); } // 0x605F5A140F202491 0x53FD4A25 b323
@@ -1838,6 +1889,7 @@ namespace ENTITY {
 	// 126 - in am_hunt_the_beast
 	// 256 & 287 - in fm_mission_controller
 	static BOOL HAS_ENTITY_CLEAR_LOS_TO_ENTITY(Entity entity1, Entity entity2, int traceType) { return invoke<BOOL>(0xFCDFF7B72D23A1AC, entity1, entity2, traceType); } // 0xFCDFF7B72D23A1AC 0x53576FA7 b323
+	static Any _HAS_ENTITY_CLEAR_LOS_TO_ENTITY_2(Entity entity1, Entity entity2, int traceType) { return invoke<Any>(0x394BDE2A7BBA031E, entity1, entity2, traceType); } // 0x394BDE2A7BBA031E b1868
 	// Has the entity1 got a clear line of sight to the other entity2 from the direction entity1 is facing.
 	// This is one of the most CPU demanding BOOL natives in the game; avoid calling this in things like nested for-loops
 	static BOOL HAS_ENTITY_CLEAR_LOS_TO_ENTITY_IN_FRONT(Entity entity1, Entity entity2) { return invoke<BOOL>(0x0267D00AF114F17A, entity1, entity2); } // 0x0267D00AF114F17A 0x210D87C8 b323
@@ -1857,7 +1909,7 @@ namespace ENTITY {
 	// 0.500000 - mark the midpoint of the animation.
 	// 1.000000 - mark the end of animation.
 	// 
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static float GET_ENTITY_ANIM_CURRENT_TIME(Entity entity, const char* animDict, const char* animName) { return invoke<float>(0x346D81500D088F42, entity, animDict, animName); } // 0x346D81500D088F42 0x83943F41 b323
 	// Returns a float value representing animation's total playtime in milliseconds.
 	// 
@@ -1865,15 +1917,17 @@ namespace ENTITY {
 	// GET_ENTITY_ANIM_TOTAL_TIME(PLAYER_ID(),"amb@world_human_yoga@female@base","base_b") 
 	// return 20800.000000
 	// 
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static float GET_ENTITY_ANIM_TOTAL_TIME(Entity entity, const char* animDict, const char* animName) { return invoke<float>(0x50BD2730B191E360, entity, animDict, animName); } // 0x50BD2730B191E360 0x433A9D18 b323
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static float GET_ANIM_DURATION(const char* animDict, const char* animName) { return invoke<float>(0xFEDDF04D62B8D790, animDict, animName); } // 0xFEDDF04D62B8D790 0x8B5E3E3D b323
 	static Entity GET_ENTITY_ATTACHED_TO(Entity entity) { return invoke<Entity>(0x48C2BED9180FE123, entity); } // 0x48C2BED9180FE123 0xFE1589F9 b323
-	// p1 = !IS_ENTITY_DEAD
-	// 
+	// Gets the current coordinates for a specified entity.
+	// `entity` = The entity to get the coordinates from.
+	// `alive` = Unused by the game, potentially used by debug builds of GTA in order to assert whether or not an entity was alive.
 	static Vector3 GET_ENTITY_COORDS(Entity entity, BOOL alive) { return invoke<Vector3>(0x3FEF770D40960D5A, entity, alive); } // 0x3FEF770D40960D5A 0x1647F1CB b323
 	// Gets the entity's forward vector.
-	static Vector3 GET_ENTITY_FORWARD_VECTOR(Hash entity) { return invoke<Vector3>(0x0A794A5A57F8DF91, entity); } // 0x0A794A5A57F8DF91 0x84DCECBF b323
+	static Vector3 GET_ENTITY_FORWARD_VECTOR(Entity entity) { return invoke<Vector3>(0x0A794A5A57F8DF91, entity); } // 0x0A794A5A57F8DF91 0x84DCECBF b323
 	// Gets the X-component of the entity's forward vector.
 	static float GET_ENTITY_FORWARD_X(Entity entity) { return invoke<float>(0x8BB4EF4214E0E6D5, entity); } // 0x8BB4EF4214E0E6D5 0x49FAE914 b323
 	// Gets the Y-component of the entity's forward vector.
@@ -1913,7 +1967,7 @@ namespace ENTITY {
 	// How can i convert it to meters?
 	// Everything seems to be in meters, probably this too.
 	static float GET_ENTITY_HEIGHT_ABOVE_GROUND(Entity entity) { return invoke<float>(0x1DD55701034110E5, entity); } // 0x1DD55701034110E5 0x57F56A4D b323
-	static void GET_ENTITY_MATRIX(Entity entity, Vector3* rightVector, Vector3* forwardVector, Vector3* upVector, Vector3* position) { invoke<Void>(0xECB2FC7235A7D137, entity, rightVector, forwardVector, upVector, position); } // 0xECB2FC7235A7D137 0xEB9EB001 b323
+	static void GET_ENTITY_MATRIX(Entity entity, Vector3* forwardVector, Vector3* rightVector, Vector3* upVector, Vector3* position) { invoke<Void>(0xECB2FC7235A7D137, entity, forwardVector, rightVector, upVector, position); } // 0xECB2FC7235A7D137 0xEB9EB001 b323
 	// Returns the model hash from the entity
 	static Hash GET_ENTITY_MODEL(Entity entity) { return invoke<Hash>(0x9F47B058362C84B5, entity); } // 0x9F47B058362C84B5 0xDAFCB3EC b323
 	// Converts world coords (posX - Z) to coords relative to the entity
@@ -1935,25 +1989,20 @@ namespace ENTITY {
 	// Displays the current ROLL axis of the entity [-180.0000/180.0000+]
 	// (Sideways Roll) such as a vehicle tipped on its side
 	static float GET_ENTITY_ROLL(Entity entity) { return invoke<float>(0x831E0242595560DF, entity); } // 0x831E0242595560DF 0x36610842 b323
-	// rotationOrder refers to the order yaw pitch roll is applied
-	// value ranges from 0 to 5. What you use for rotationOrder when getting must be the same as rotationOrder when setting the rotation. 
-	// Unsure what value corresponds to what rotation order, more testing will be needed for that.
-	// ------
-	// rotationOrder is usually 2 in scripts
-	// ------
-	// ENTITY::GET_ENTITY_ROTATION(Any p0, false or true);
-	// if false than return from -180 to 180
-	// if true than return from -90 to 90
+	// rotationOrder is the order yaw, pitch and roll is applied. Usually 2. Returns a vector where the Z coordinate is the yaw.
 	// 
-	// ---
+	// rotationOrder refers to the order yaw pitch roll is applied; value ranges from 0 to 5 and is usually *2* in scripts.
+	// What you use for rotationOrder when getting must be the same as rotationOrder when setting the rotation.
 	// 
-	// As said above, the value of p1 affects the outcome. R* uses 1 and 2 instead of 0 and 1, so I marked it as an int.
+	// What it returns is the yaw on the z part of the vector, which makes sense considering R* considers z as vertical. Here's a picture for those of you who don't understand pitch, yaw, and roll: www.allstar.fiu.edu/aero/images/pic5-1.gif
 	// 
-	// What it returns is the yaw on the z part of the vector, which makes sense considering R* considers z as vertical. Here's a picture for those of you who don't understand pitch, yaw, and roll:
-	// 
-	// www.allstar.fiu.edu/aero/images/pic5-1.gif
-	// 
-	// I don't know why it returns a Vec3, but sometimes the values x and y go negative, yet they're always zero. Just use GET_ENTITY_PITCH and GET_ENTITY_ROLL for pitch and roll.
+	// Rotation Orders:
+	// 0: ZYX - Rotate around the z-axis, then the y-axis and finally the x-axis.
+	// 1: YZX - Rotate around the y-axis, then the z-axis and finally the x-axis.
+	// 2: ZXY - Rotate around the z-axis, then the x-axis and finally the y-axis.
+	// 3: XZY - Rotate around the x-axis, then the z-axis and finally the y-axis.
+	// 4: YXZ - Rotate around the y-axis, then the x-axis and finally the z-axis.
+	// 5: XYZ - Rotate around the x-axis, then the y-axis and finally the z-axis.
 	static Vector3 GET_ENTITY_ROTATION(Entity entity, int rotationOrder) { return invoke<Vector3>(0xAFBD61CC738D9EB9, entity, rotationOrder); } // 0xAFBD61CC738D9EB9 0x8FF45B04 b323
 	static Vector3 GET_ENTITY_ROTATION_VELOCITY(Entity entity) { return invoke<Vector3>(0x213B91045D09B983, entity); } // 0x213B91045D09B983 0x9BF8A73F b323
 	// All ambient entities in-world seem to have the same value for the second argument (Any *script), depending on when the scripthook was activated/re-activated. I've seen numbers from ~5 to almost 70 when the value was translated with to_string. The function return value seems to always be 0.
@@ -1988,7 +2037,7 @@ namespace ENTITY {
 	// 2 = vehicle
 	// 3 = object
 	static int GET_ENTITY_TYPE(Entity entity) { return invoke<int>(0x8ACD366038D14505, entity); } // 0x8ACD366038D14505 0x0B1BD08D b323
-	// https://alloc8or.re/gta5/doc/enums/ePopulationType.txt
+	// A population type, from the following enum: https://alloc8or.re/gta5/doc/enums/ePopulationType.txt
 	static int GET_ENTITY_POPULATION_TYPE(Entity entity) { return invoke<int>(0xF6F5161F4534EDFF, entity); } // 0xF6F5161F4534EDFF 0xFC30DDFF b323
 	static BOOL IS_AN_ENTITY(int handle) { return invoke<BOOL>(0x731EC8A916BD11A1, handle); } // 0x731EC8A916BD11A1 0xD4B9715A b323
 	static BOOL IS_ENTITY_A_PED(Entity entity) { return invoke<BOOL>(0x524AC5ECEA15343E, entity); } // 0x524AC5ECEA15343E 0x55D33EAB b323
@@ -2003,6 +2052,7 @@ namespace ENTITY {
 	// 
 	// Last three parameters are almost alwasy p5 = 0, p6 = 1, p7 = 0
 	static BOOL IS_ENTITY_AT_ENTITY(Entity entity1, Entity entity2, float xSize, float ySize, float zSize, BOOL p5, BOOL p6, int p7) { return invoke<BOOL>(0x751B70C3D034E187, entity1, entity2, xSize, ySize, zSize, p5, p6, p7); } // 0x751B70C3D034E187 0xDABDCB52 b323
+	// Whether the entity is attached to any other entity.
 	static BOOL IS_ENTITY_ATTACHED(Entity entity) { return invoke<BOOL>(0xB346476EF1A64897, entity); } // 0xB346476EF1A64897 0xEC1479D5 b323
 	static BOOL IS_ENTITY_ATTACHED_TO_ANY_OBJECT(Entity entity) { return invoke<BOOL>(0xCF511840CEEDE0CC, entity); } // 0xCF511840CEEDE0CC 0x0B5DE340 b323
 	static BOOL IS_ENTITY_ATTACHED_TO_ANY_PED(Entity entity) { return invoke<BOOL>(0xB1632E9A5F988D11, entity); } // 0xB1632E9A5F988D11 0x9D7A609C b323
@@ -2010,15 +2060,12 @@ namespace ENTITY {
 	static BOOL IS_ENTITY_ATTACHED_TO_ENTITY(Entity from, Entity to) { return invoke<BOOL>(0xEFBE71898A993728, from, to); } // 0xEFBE71898A993728 0xB0ABFEA8 b323
 	static BOOL IS_ENTITY_DEAD(Entity entity, BOOL p1) { return invoke<BOOL>(0x5F9532F3B5CC2551, entity, p1); } // 0x5F9532F3B5CC2551 0xB6F7CBAC b323
 	static BOOL IS_ENTITY_IN_AIR(Entity entity) { return invoke<BOOL>(0x886E37EC497200B6, entity); } // 0x886E37EC497200B6 0xA4157987 b323
-	// Creates a spherical cone at origin that extends to surface with the angle specified. Then returns true if the entity is inside the spherical cone
-	// 
-	// Angle is measured in degrees.
-	// These values are constant, most likely bogus:
-	// p8 = 0, p9 = 1, p10 = 0
-	// 
-	// This method can also take two float<3> instead of 6 floats.
-	static BOOL IS_ENTITY_IN_ANGLED_AREA(Entity entity, float originX, float originY, float originZ, float edgeX, float edgeY, float edgeZ, float angle, BOOL p8, BOOL p9, Any p10) { return invoke<BOOL>(0x51210CED3DA1C78A, entity, originX, originY, originZ, edgeX, edgeY, edgeZ, angle, p8, p9, p10); } // 0x51210CED3DA1C78A 0x883622FA b323
+	// `p8` is a debug flag invoking functions in the same path as ``DRAW_MARKER``
+	// `p10` is some entity flag check, also used in `IS_ENTITY_AT_ENTITY`, `IS_ENTITY_IN_AREA`, and `IS_ENTITY_AT_COORD`.
+	// See IS_POINT_IN_ANGLED_AREA for the definition of an angled area.
+	static BOOL IS_ENTITY_IN_ANGLED_AREA(Entity entity, float x1, float y1, float z1, float x2, float y2, float z2, float width, BOOL debug, BOOL includeZ, Any p10) { return invoke<BOOL>(0x51210CED3DA1C78A, entity, x1, y1, z1, x2, y2, z2, width, debug, includeZ, p10); } // 0x51210CED3DA1C78A 0x883622FA b323
 	static BOOL IS_ENTITY_IN_AREA(Entity entity, float x1, float y1, float z1, float x2, float y2, float z2, BOOL p7, BOOL p8, Any p9) { return invoke<BOOL>(0x54736AA40E271165, entity, x1, y1, z1, x2, y2, z2, p7, p8, p9); } // 0x54736AA40E271165 0x8C2DFA9D b323
+	// Full list of zones by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/zones.json
 	static BOOL IS_ENTITY_IN_ZONE(Entity entity, const char* zone) { return invoke<BOOL>(0xB6463CF6AF527071, entity, zone); } // 0xB6463CF6AF527071 0x45C82B21 b323
 	static BOOL IS_ENTITY_IN_WATER(Entity entity) { return invoke<BOOL>(0xCFB0A0D8EDD145A3, entity); } // 0xCFB0A0D8EDD145A3 0x4C3C2508 b323
 	// Get how much of the entity is submerged.  1.0f is whole entity.
@@ -2035,9 +2082,9 @@ namespace ENTITY {
 	// 
 	// p4 is always 3 in the scripts.
 	// 
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static BOOL IS_ENTITY_PLAYING_ANIM(Entity entity, const char* animDict, const char* animName, int taskFlag) { return invoke<BOOL>(0x1F0B79228E461EC9, entity, animDict, animName, taskFlag); } // 0x1F0B79228E461EC9 0x0D130D34 b323
-	// a static ped will not react to natives like "APPLY_FORCE_TO_ENTITY" or "SET_ENTITY_VELOCITY" and oftentimes will not react to task-natives like "AI::TASK_COMBAT_PED". The only way I know of to make one of these peds react is to ragdoll them (or sometimes to use CLEAR_PED_TASKS_IMMEDIATELY(). Static peds include almost all far-away peds, beach-combers, peds in certain scenarios, peds crossing a crosswalk, peds walking to get back into their cars, and others. If anyone knows how to make a ped non-static without ragdolling them, please edit this with the solution.
+	// a static ped will not react to natives like "APPLY_FORCE_TO_ENTITY" or "SET_ENTITY_VELOCITY" and oftentimes will not react to task-natives like "TASK::TASK_COMBAT_PED". The only way I know of to make one of these peds react is to ragdoll them (or sometimes to use CLEAR_PED_TASKS_IMMEDIATELY(). Static peds include almost all far-away peds, beach-combers, peds in certain scenarios, peds crossing a crosswalk, peds walking to get back into their cars, and others. If anyone knows how to make a ped non-static without ragdolling them, please edit this with the solution.
 	// 
 	// how can I make an entity static???
 	static BOOL IS_ENTITY_STATIC(Entity entity) { return invoke<BOOL>(0x1218E6886D3D8327, entity); } // 0x1218E6886D3D8327 0x928E12E9 b323
@@ -2050,6 +2097,20 @@ namespace ENTITY {
 	static BOOL IS_ENTITY_OCCLUDED(Entity entity) { return invoke<BOOL>(0xE31C2C72B8692B64, entity); } // 0xE31C2C72B8692B64 0x46BC5B40 b323
 	static BOOL WOULD_ENTITY_BE_OCCLUDED(Hash entityModelHash, float x, float y, float z, BOOL p4) { return invoke<BOOL>(0xEE5D2A122E09EC42, entityModelHash, x, y, z, p4); } // 0xEE5D2A122E09EC42 0xEA127CBC b323
 	static BOOL IS_ENTITY_WAITING_FOR_WORLD_COLLISION(Entity entity) { return invoke<BOOL>(0xD05BFF0C0A12C68F, entity); } // 0xD05BFF0C0A12C68F 0x00AB7A4A b323
+	// Applies a force to the specified entity.
+	// 
+	// **List of force types (p1)**:
+	// public enum ForceType
+	// {
+	//     MinForce = 0,
+	//     MaxForceRot = 1,
+	//     MinForce2 = 2,
+	//     MaxForceRot2 = 3,
+	//     ForceNoRot = 4,
+	//     ForceRotPlusForce = 5
+	// }
+	// Research/documentation on the gtaforums can be found here https://gtaforums.com/topic/885669-precisely-define-object-physics/) and here https://gtaforums.com/topic/887362-apply-forces-and-momentums-to-entityobject/.
+	// 
 	// p6/relative - makes the xyz force not relative to world coords, but to something else
 	// p7/highForce - setting false will make the force really low
 	static void APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(Entity entity, int forceType, float x, float y, float z, BOOL p5, BOOL isDirectionRel, BOOL isForceRel, BOOL p8) { invoke<Void>(0x18FF00FC7EFF559E, entity, forceType, x, y, z, p5, isDirectionRel, isForceRel, p8); } // 0x18FF00FC7EFF559E 0x28924E98 b323
@@ -2156,31 +2217,27 @@ namespace ENTITY {
 	static void CLEAR_ENTITY_LAST_DAMAGE_ENTITY(Entity entity) { invoke<Void>(0xA72CD9CA74A5ECBA, entity); } // 0xA72CD9CA74A5ECBA 0x2B83F43B b323
 	// Deletes the specified entity, then sets the handle pointed to by the pointer to NULL.
 	static void DELETE_ENTITY(Entity* entity) { invoke<Void>(0xAE3CBE5BF394C9C9, entity); } // 0xAE3CBE5BF394C9C9 0xFAA3D236 b323
-	// p1 and p2 have no effect 
-	// maybe a quick disassembly will tell us what they do
-	// 
-	// if p2 is set to true, the both entities won't collide with the other until the distance between them is above 4 meters.
-	// 
-	// 
-	// p1?
-	static void DETACH_ENTITY(Entity entity, BOOL p1, BOOL collision) { invoke<Void>(0x961AC54BF0613F5D, entity, p1, collision); } // 0x961AC54BF0613F5D 0xC8EFCB41 b323
+	// If `collision` is set to true, both entities won't collide with the other until the distance between them is above 4 meters.
+	// Set `dynamic` to true to keep velocity after dettaching
+	static void DETACH_ENTITY(Entity entity, BOOL dynamic, BOOL collision) { invoke<Void>(0x961AC54BF0613F5D, entity, dynamic, collision); } // 0x961AC54BF0613F5D 0xC8EFCB41 b323
+	// Freezes or unfreezes an entity preventing its coordinates to change by the player if set to `true`. You can still change the entity position using SET_ENTITY_COORDS.
 	static void FREEZE_ENTITY_POSITION(Entity entity, BOOL toggle) { invoke<Void>(0x428CA6DBD1094446, entity, toggle); } // 0x428CA6DBD1094446 0x65C16D57 b323
-	// SET_ENTITY_*
-	static void _SET_ENTITY_SOMETHING(Entity entity, BOOL toggle) { invoke<Void>(0x3910051CCECDB00C, entity, toggle); } // 0x3910051CCECDB00C 0xD3850671 b323
+	// True means it can be deleted by the engine when switching lobbies/missions/etc, false means the script is expected to clean it up.
+	static void _SET_ENTITY_CLEANUP_BY_ENGINE(Entity entity, BOOL toggle) { invoke<Void>(0x3910051CCECDB00C, entity, toggle); } // 0x3910051CCECDB00C 0xD3850671 b323
 	// delta and bitset are guessed fields. They are based on the fact that most of the calls have 0 or nil field types passed in.
 	// 
 	// The only time bitset has a value is 0x4000 and the only time delta has a value is during stealth with usually <1.0f values.
 	// 
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static BOOL PLAY_ENTITY_ANIM(Entity entity, const char* animName, const char* animDict, float p3, BOOL loop, BOOL stayInAnim, BOOL p6, float delta, Any bitset) { return invoke<BOOL>(0x7FB218262B810701, entity, animName, animDict, p3, loop, stayInAnim, p6, delta, bitset); } // 0x7FB218262B810701 0x878753D5 b323
 	// p4 and p7 are usually 1000.0f.
 	// 
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static BOOL PLAY_SYNCHRONIZED_ENTITY_ANIM(Entity entity, int syncedScene, const char* animation, const char* propName, float p4, float p5, Any p6, float p7) { return invoke<BOOL>(0xC77720A12FE14A86, entity, syncedScene, animation, propName, p4, p5, p6, p7); } // 0xC77720A12FE14A86 0x012760AA b323
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static BOOL PLAY_SYNCHRONIZED_MAP_ENTITY_ANIM(float p0, float p1, float p2, float p3, Any p4, Any p5, Any* p6, Any* p7, float p8, float p9, Any p10, float p11) { return invoke<BOOL>(0xB9C54555ED30FBC4, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11); } // 0xB9C54555ED30FBC4 0xEB4CBA74 b323
 	static BOOL STOP_SYNCHRONIZED_MAP_ENTITY_ANIM(float p0, float p1, float p2, float p3, Any p4, float p5) { return invoke<BOOL>(0x11E79CAB7183B6F5, p0, p1, p2, p3, p4, p5); } // 0x11E79CAB7183B6F5 0x7253D5B2 b323
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	// 
 	// RAGEPluginHook list: docs.ragepluginhook.net/html/62951c37-a440-478c-b389-c471230ddfc5.htm
 	static Any STOP_ENTITY_ANIM(Entity entity, const char* animation, const char* animGroup, float p3) { return invoke<Any>(0x28004F88151E03E0, entity, animation, animGroup, p3); } // 0x28004F88151E03E0 0xC4769830 b323
@@ -2198,11 +2255,11 @@ namespace ENTITY {
 	// Both v_A and v_B are seemingly used to contain both Vector3's and floats, so I can't say what either really is other than that they are both output parameters. p4 looks more like a *Vector3 though
 	// -alphazolam
 	// 
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static BOOL FIND_ANIM_EVENT_PHASE(const char* animDictionary, const char* animName, const char* p2, Any* p3, Any* p4) { return invoke<BOOL>(0x07F1BE2BCCAA27A7, animDictionary, animName, p2, p3, p4); } // 0x07F1BE2BCCAA27A7 0xC41DDA62 b323
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static void SET_ENTITY_ANIM_CURRENT_TIME(Entity entity, const char* animDictionary, const char* animName, float time) { invoke<Void>(0x4487C259F0F70977, entity, animDictionary, animName, time); } // 0x4487C259F0F70977 0x99D90735 b323
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static void SET_ENTITY_ANIM_SPEED(Entity entity, const char* animDictionary, const char* animName, float speedMultiplier) { invoke<Void>(0x28D1A16553C51776, entity, animDictionary, animName, speedMultiplier); } // 0x28D1A16553C51776 0x3990C90A b323
 	// Makes the specified entity (ped, vehicle or object) persistent. Persistent entities will not automatically be removed by the engine.
 	// 
@@ -2229,20 +2286,22 @@ namespace ENTITY {
 	static void SET_ENTITY_CAN_BE_TARGETED_WITHOUT_LOS(Entity entity, BOOL toggle) { invoke<Void>(0xD3997889736FD899, entity, toggle); } // 0xD3997889736FD899 0x3B13797C b323
 	static void SET_ENTITY_COLLISION(Entity entity, BOOL toggle, BOOL keepPhysics) { invoke<Void>(0x1A9205C1B9EE827F, entity, toggle, keepPhysics); } // 0x1A9205C1B9EE827F 0x139FD37D b323
 	static BOOL GET_ENTITY_COLLISION_DISABLED(Entity entity) { return invoke<BOOL>(0xCCF1E97BEFDAE480, entity); } // 0xCCF1E97BEFDAE480 0xE8C0C629 b323
-	// p2 - mainly set as false in scripts
-	static void SET_ENTITY_COMPLETELY_DISABLE_COLLISION(Entity entity, BOOL p1, BOOL p2) { invoke<Void>(0x9EBC85ED0FFFE51C, entity, p1, p2); } // 0x9EBC85ED0FFFE51C 0xBD0D4831 b323
+	static void SET_ENTITY_COMPLETELY_DISABLE_COLLISION(Entity entity, BOOL toggle, BOOL keepPhysics) { invoke<Void>(0x9EBC85ED0FFFE51C, entity, toggle, keepPhysics); } // 0x9EBC85ED0FFFE51C 0xBD0D4831 b323
 	// p7 is always 1 in the scripts. Set to 1, an area around the destination coords for the moved entity is cleared from other entities. 
 	//  
 	// Often ends with 1, 0, 0, 1); in the scripts. It works. 
 	// 
 	// Axis - Invert Axis Flags
 	static void SET_ENTITY_COORDS(Entity entity, float xPos, float yPos, float zPos, BOOL xAxis, BOOL yAxis, BOOL zAxis, BOOL clearArea) { invoke<Void>(0x06843DA7060A026B, entity, xPos, yPos, zPos, xAxis, yAxis, zAxis, clearArea); } // 0x06843DA7060A026B 0xDF70B41B b323
-	static void _SET_ENTITY_COORDS_2(Entity entity, float xPos, float yPos, float zPos, BOOL xAxis, BOOL yAxis, BOOL zAxis, BOOL clearArea) { invoke<Void>(0x621873ECE1178967, entity, xPos, yPos, zPos, xAxis, yAxis, zAxis, clearArea); } // 0x621873ECE1178967 0x749B282E b323
+	static void SET_ENTITY_COORDS_WITHOUT_PLANTS_RESET(Entity entity, float xPos, float yPos, float zPos, BOOL alive, BOOL deadFlag, BOOL ragdollFlag, BOOL clearArea) { invoke<Void>(0x621873ECE1178967, entity, xPos, yPos, zPos, alive, deadFlag, ragdollFlag, clearArea); } // 0x621873ECE1178967 0x749B282E b323
 	// Axis - Invert Axis Flags
 	static void SET_ENTITY_COORDS_NO_OFFSET(Entity entity, float xPos, float yPos, float zPos, BOOL xAxis, BOOL yAxis, BOOL zAxis) { invoke<Void>(0x239A3351AC1DA385, entity, xPos, yPos, zPos, xAxis, yAxis, zAxis); } // 0x239A3351AC1DA385 0x4C83DE8D b323
 	static void SET_ENTITY_DYNAMIC(Entity entity, BOOL toggle) { invoke<Void>(0x1718DE8E3F2823CA, entity, toggle); } // 0x1718DE8E3F2823CA 0x236F525B b323
+	// Set the heading of an entity in degrees also known as "Yaw".
 	static void SET_ENTITY_HEADING(Entity entity, float heading) { invoke<Void>(0x8E2530AA8ADA980E, entity, heading); } // 0x8E2530AA8ADA980E 0xE0FF064D b323
 	// health >= 0
+	// male ped ~= 100 - 200
+	// female ped ~= 0 - 100
 	static void SET_ENTITY_HEALTH(Entity entity, int health, int p2) { invoke<Void>(0x6B76DC1F3AE6E6A3, entity, health, p2); } // 0x6B76DC1F3AE6E6A3 0xFBCD1831 b323
 	// Sets a ped or an object totally invincible. It doesn't take any kind of damage. Peds will not ragdoll on explosions and the tazer animation won't apply either.
 	// 
@@ -2265,6 +2324,8 @@ namespace ENTITY {
 	static void SET_ENTITY_INVINCIBLE(Entity entity, BOOL toggle) { invoke<Void>(0x3882114BDE571AD4, entity, toggle); } // 0x3882114BDE571AD4 0xC1213A21 b323
 	static void SET_ENTITY_IS_TARGET_PRIORITY(Entity entity, BOOL p1, float p2) { invoke<Void>(0xEA02E132F5C68722, entity, p1, p2); } // 0xEA02E132F5C68722 0x9729EE32 b323
 	static void SET_ENTITY_LIGHTS(Entity entity, BOOL toggle) { invoke<Void>(0x7CFBA6A80BDF3874, entity, toggle); } // 0x7CFBA6A80BDF3874 0xE8FC85AF b323
+	// Loads collision grid for an entity spawned outside of a player's loaded area. This allows peds to execute tasks rather than sit dormant because of a lack of a physics grid.
+	// Certainly not the main usage of this native but when set to true for a Vehicle, it will prevent the vehicle to explode if it is spawned far away from the player.
 	static void SET_ENTITY_LOAD_COLLISION_FLAG(Entity entity, BOOL toggle, Any p2) { invoke<Void>(0x0DC7CABAB1E9B67E, entity, toggle, p2); } // 0x0DC7CABAB1E9B67E 0xC52F295B b323
 	static BOOL HAS_COLLISION_LOADED_AROUND_ENTITY(Entity entity) { return invoke<BOOL>(0xE9676F61BC0B3321, entity); } // 0xE9676F61BC0B3321 0x851687F9 b323
 	static void SET_ENTITY_MAX_SPEED(Entity entity, float speed) { invoke<Void>(0x0E46A3FCBDE2A1B1, entity, speed); } // 0x0E46A3FCBDE2A1B1 0x46AFFED3 b323
@@ -2277,7 +2338,7 @@ namespace ENTITY {
 	// p7 is to to '1' in am_mp_property_ext/int: entity::set_entity_proofs(uParam0->f_19, true, true, true, true, true, true, 1, true);
 	// 
 	static void SET_ENTITY_PROOFS(Entity entity, BOOL bulletProof, BOOL fireProof, BOOL explosionProof, BOOL collisionProof, BOOL meleeProof, BOOL p6, BOOL p7, BOOL drownProof) { invoke<Void>(0xFAEE099C6F890BB8, entity, bulletProof, fireProof, explosionProof, collisionProof, meleeProof, p6, p7, drownProof); } // 0xFAEE099C6F890BB8 0x7E9EAB66 b323
-	static BOOL _GET_ENTITY_PROOFS(Entity entity, BOOL* bulletProof, BOOL* fireProof, BOOL* explosionProof, BOOL* collisionProof, BOOL* meleeProof, BOOL* p6, BOOL* p7, BOOL* drownProof) { return invoke<BOOL>(0xBE8CD9BE829BBEBF, entity, bulletProof, fireProof, explosionProof, collisionProof, meleeProof, p6, p7, drownProof); } // 0xBE8CD9BE829BBEBF b1604
+	static BOOL _GET_ENTITY_PROOFS(Entity entity, BOOL* bulletProof, BOOL* fireProof, BOOL* explosionProof, BOOL* collisionProof, BOOL* meleeProof, BOOL* steamProof, BOOL* p7, BOOL* drownProof) { return invoke<BOOL>(0xBE8CD9BE829BBEBF, entity, bulletProof, fireProof, explosionProof, collisionProof, meleeProof, steamProof, p7, drownProof); } // 0xBE8CD9BE829BBEBF b1604
 	// w is the correct parameter name!
 	static void SET_ENTITY_QUATERNION(Entity entity, float x, float y, float z, float w) { invoke<Void>(0x77B21BE7AC540F07, entity, x, y, z, w); } // 0x77B21BE7AC540F07 0x83B6046F b323
 	static void SET_ENTITY_RECORDS_COLLISIONS(Entity entity, BOOL toggle) { invoke<Void>(0x0A50A1EEDAD01E65, entity, toggle); } // 0x0A50A1EEDAD01E65 0x6B189A1A b323
@@ -2320,6 +2381,7 @@ namespace ENTITY {
 	// 0 = green
 	// 1 = red
 	// 2 = yellow
+	// 3 = reset changes
 	// changing lights may not change the behavior of vehicles
 	static void SET_ENTITY_TRAFFICLIGHT_OVERRIDE(Entity entity, int state) { invoke<Void>(0x57C5DB656185EAC4, entity, state); } // 0x57C5DB656185EAC4 0xC47F5B91 b323
 	// Related to cutscene entities. Unsure about the use.
@@ -2335,11 +2397,16 @@ namespace ENTITY {
 	// Same as the comment for CREATE_MODEL_SWAP unless for some reason p5 affects it this only works with objects as well.
 	// 
 	// Network players do not see changes done with this.
-	static void CREATE_MODEL_HIDE(float x, float y, float z, float radius, Hash model, BOOL p5) { invoke<Void>(0x8A97BCA30A0CE478, x, y, z, radius, model, p5); } // 0x8A97BCA30A0CE478 0x7BD5CF2F b323
-	static void CREATE_MODEL_HIDE_EXCLUDING_SCRIPT_OBJECTS(float x, float y, float z, float radius, Hash model, BOOL p5) { invoke<Void>(0x3A52AE588830BF7F, x, y, z, radius, model, p5); } // 0x3A52AE588830BF7F 0x07AAF22C b323
-	static void REMOVE_MODEL_HIDE(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { invoke<Void>(0xD9E3006FB3CBD765, p0, p1, p2, p3, p4, p5); } // 0xD9E3006FB3CBD765 0x993DBC10 b323
+	static void CREATE_MODEL_HIDE(float x, float y, float z, float radius, Hash modelHash, BOOL p5) { invoke<Void>(0x8A97BCA30A0CE478, x, y, z, radius, modelHash, p5); } // 0x8A97BCA30A0CE478 0x7BD5CF2F b323
+	static void CREATE_MODEL_HIDE_EXCLUDING_SCRIPT_OBJECTS(float x, float y, float z, float radius, Hash modelHash, BOOL p5) { invoke<Void>(0x3A52AE588830BF7F, x, y, z, radius, modelHash, p5); } // 0x3A52AE588830BF7F 0x07AAF22C b323
+	// This native makes entities visible that are hidden by the native CREATE_MODEL_HIDE.
+	// p5 should be false, true does nothing
+	static void REMOVE_MODEL_HIDE(float x, float y, float z, float radius, Hash modelHash, BOOL p5) { invoke<Void>(0xD9E3006FB3CBD765, x, y, z, radius, modelHash, p5); } // 0xD9E3006FB3CBD765 0x993DBC10 b323
 	static void CREATE_FORCED_OBJECT(float x, float y, float z, Any p3, Hash modelHash, BOOL p5) { invoke<Void>(0x150E808B375A385A, x, y, z, p3, modelHash, p5); } // 0x150E808B375A385A 0x335190A2 b323
 	static void REMOVE_FORCED_OBJECT(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0x61B6775E83C0DB6F, p0, p1, p2, p3, p4); } // 0x61B6775E83C0DB6F 0xAED73ADD b323
+	// Calling this function disables collision between two entities.
+	// The importance of the order for entity1 and entity2 is unclear.
+	// The third parameter, `thisFrame`, decides whether the collision is to be disabled until it is turned back on, or if it's just this frame.
 	static void SET_ENTITY_NO_COLLISION_ENTITY(Entity entity1, Entity entity2, BOOL thisFrameOnly) { invoke<Void>(0xA53ED5520C07654A, entity1, entity2, thisFrameOnly); } // 0xA53ED5520C07654A 0x1E11BFE9 b323
 	static void SET_ENTITY_MOTION_BLUR(Entity entity, BOOL toggle) { invoke<Void>(0x295D82A8559F9150, entity, toggle); } // 0x295D82A8559F9150 0xE90005B8 b323
 	// p1 always false.
@@ -2355,79 +2422,112 @@ namespace ENTITY {
 	// set_entity_invincible(uParam0, 1);
 	static void _0xDC6F8601FAF2E893(Entity entity, BOOL toggle) { invoke<Void>(0xDC6F8601FAF2E893, entity, toggle); } // 0xDC6F8601FAF2E893 0xA0466A69 b323
 	// SET_ENTITY_*
-	static void _0x2C2E3DC128F44309(Entity entity, BOOL p1) { invoke<Void>(0x2C2E3DC128F44309, entity, p1); } // 0x2C2E3DC128F44309 b323
+	static void _SET_ENTITY_DECALS_DISABLED(Entity entity, BOOL p1) { invoke<Void>(0x2C2E3DC128F44309, entity, p1); } // 0x2C2E3DC128F44309 b323
 	// SET_ENTITY_*
 	static void _0x1A092BB0C3808B96(Entity entity, BOOL p1) { invoke<Void>(0x1A092BB0C3808B96, entity, p1); } // 0x1A092BB0C3808B96 b323
 	// Gets the world rotation of the specified bone of the specified entity.
 	static Vector3 _GET_ENTITY_BONE_ROTATION(Entity entity, int boneIndex) { return invoke<Vector3>(0xCE6294A232D03786, entity, boneIndex); } // 0xCE6294A232D03786 b791
-	// Gets the position of the specified bone of the specified entity.
-	static Vector3 _GET_ENTITY_BONE_COORDS(Entity entity, int boneIndex) { return invoke<Vector3>(0x46F8696933A63C9B, entity, boneIndex); } // 0x46F8696933A63C9B b877
+	// Gets the world rotation of the specified bone of the specified entity.
+	// This native is used in casinoroulette.c but I don't know yet what is the difference with _GET_ENTITY_BONE_ROTATION
+	static Vector3 _GET_ENTITY_BONE_POSITION_2(Entity entity, int boneIndex) { return invoke<Vector3>(0x46F8696933A63C9B, entity, boneIndex); } // 0x46F8696933A63C9B b877
 	// Gets the local rotation of the specified bone of the specified entity.
 	static Vector3 _GET_ENTITY_BONE_ROTATION_LOCAL(Entity entity, int boneIndex) { return invoke<Vector3>(0xBD8D32550E5CEBFE, entity, boneIndex); } // 0xBD8D32550E5CEBFE b1734
-	static Any _0xB328DCC3A3AA401B(Any p0) { return invoke<Any>(0xB328DCC3A3AA401B, p0); } // 0xB328DCC3A3AA401B b791
+	static int _GET_ENTITY_BONE_COUNT(Entity entity) { return invoke<int>(0xB328DCC3A3AA401B, entity); } // 0xB328DCC3A3AA401B b791
 	// ENABLE_*
 	static void _ENABLE_ENTITY_UNK(Entity entity) { invoke<Void>(0x6CE177D014502E8A, entity); } // 0x6CE177D014502E8A b877
 	static void _0xB17BC6453F6CF5AC(Any p0, Any p1) { invoke<Void>(0xB17BC6453F6CF5AC, p0, p1); } // 0xB17BC6453F6CF5AC b944
-	static void _0x68B562E124CC0AEF(Any p0, Any p1) { invoke<Void>(0x68B562E124CC0AEF, p0, p1); } // 0x68B562E124CC0AEF b1180
+	// Puts pickup2 ptr somewhere in pickup?
+	static void _0x68B562E124CC0AEF(Pickup pickup, Pickup pickup2) { invoke<Void>(0x68B562E124CC0AEF, pickup, pickup2); } // 0x68B562E124CC0AEF b1180
 	static void _0x36F32DE87082343E(Any p0, Any p1) { invoke<Void>(0x36F32DE87082343E, p0, p1); } // 0x36F32DE87082343E b1011
 	// GET_ENTITY_*
 	// 
 	// Seems to return the handle of the entity's portable pickup.
 	static Entity _GET_ENTITY_PICKUP(Entity entity, Hash modelHash) { return invoke<Entity>(0x1F922734E259BD26, entity, modelHash); } // 0x1F922734E259BD26 b1180
-	static void _0xD7B80E7C3BEFC396(Any p0, Any p1) { invoke<Void>(0xD7B80E7C3BEFC396, p0, p1); } // 0xD7B80E7C3BEFC396 b1180
+	// Sets 32nd bit of pickup+188
+	// SET_PICKUP_??
+	static void _0xD7B80E7C3BEFC396(Pickup pickup, BOOL toggle) { invoke<Void>(0xD7B80E7C3BEFC396, pickup, toggle); } // 0xD7B80E7C3BEFC396 b1180
 }
 
-namespace EVENT {
+namespace EVENT
+{
 	static void SET_DECISION_MAKER(Ped ped, Hash name) { invoke<Void>(0xB604A2942ADED0EE, ped, name); } // 0xB604A2942ADED0EE 0x19CEAC9E b323
-	static void CLEAR_DECISION_MAKER_EVENT_RESPONSE(Hash name, int type) { invoke<Void>(0x4FC9381A7AEE8968, name, type); } // 0x4FC9381A7AEE8968 0x07ABD94D b323
-	static void BLOCK_DECISION_MAKER_EVENT(Hash name, int type) { invoke<Void>(0xE42FCDFD0E4196F7, name, type); } // 0xE42FCDFD0E4196F7 0x57506EA6 b323
-	static void UNBLOCK_DECISION_MAKER_EVENT(Hash name, int type) { invoke<Void>(0xD7CD9CF34F2C99E8, name, type); } // 0xD7CD9CF34F2C99E8 0x62A3161D b323
-	// duration is float here
+	// eventType: https://alloc8or.re/gta5/doc/enums/eEventType.txt
+	static void CLEAR_DECISION_MAKER_EVENT_RESPONSE(Hash name, int eventType) { invoke<Void>(0x4FC9381A7AEE8968, name, eventType); } // 0x4FC9381A7AEE8968 0x07ABD94D b323
+	// eventType: https://alloc8or.re/gta5/doc/enums/eEventType.txt
 	// 
-	// Event types- camx.me/gtav/tasks/shockingevents.txt
-	static ScrHandle ADD_SHOCKING_EVENT_AT_POSITION(int type, float x, float y, float z, float duration) { return invoke<ScrHandle>(0xD9F8455409B525E9, type, x, y, z, duration); } // 0xD9F8455409B525E9 0x0B30F779 b323
-	// duration is float here
-	// 
-	// Event types - camx.me/gtav/tasks/shockingevents.txt
-	static ScrHandle ADD_SHOCKING_EVENT_FOR_ENTITY(int type, Entity entity, float duration) { return invoke<ScrHandle>(0x7FD8F3BE76F89422, type, entity, duration); } // 0x7FD8F3BE76F89422 0xA81B5B71 b323
-	// Some events that i found, not sure about them, but seems to have logic based on my tests:
-	// 
-	//         '82 - dead body
-	//         '86 - explosion
-	//         '87 - fire
-	//         '88 - shooting, fire extinguisher in use
-	//         '89 - shooting
-	//         '93 - ped using horn
-	//         '95 - ped receiving melee attack
-	//         '102 - living ped receiving shot
-	//         '104 - player thrown grenade, tear gas, smoke grenade, jerry can dropping gasoline
-	//         '105 - melee attack against veh
-	//         '106 - player running
-	//         '108 - vehicle theft
-	//         '112 - melee attack
-	//         '113 - veh rollover ped
-	//         '114 - dead ped receiving shot
-	//         '116 - aiming at ped
-	//         '121 - armed
-	// 
-	// 
-	// Here is full dump of shocking event types from the exe camx.me/gtav/tasks/shockingevents.txt 
-	static BOOL IS_SHOCKING_EVENT_IN_SPHERE(int type, float x, float y, float z, float radius) { return invoke<BOOL>(0x1374ABB7C15BAB92, type, x, y, z, radius); } // 0x1374ABB7C15BAB92 0x2F98823E b323
+	// This is limited to 4 blocked events at a time.
+	static void BLOCK_DECISION_MAKER_EVENT(Hash name, int eventType) { invoke<Void>(0xE42FCDFD0E4196F7, name, eventType); } // 0xE42FCDFD0E4196F7 0x57506EA6 b323
+	// eventType: https://alloc8or.re/gta5/doc/enums/eEventType.txt
+	static void UNBLOCK_DECISION_MAKER_EVENT(Hash name, int eventType) { invoke<Void>(0xD7CD9CF34F2C99E8, name, eventType); } // 0xD7CD9CF34F2C99E8 0x62A3161D b323
+	// eventType: https://alloc8or.re/gta5/doc/enums/eEventType.txt
+	static ScrHandle ADD_SHOCKING_EVENT_AT_POSITION(int eventType, float x, float y, float z, float duration) { return invoke<ScrHandle>(0xD9F8455409B525E9, eventType, x, y, z, duration); } // 0xD9F8455409B525E9 0x0B30F779 b323
+	// eventType: https://alloc8or.re/gta5/doc/enums/eEventType.txt
+	static ScrHandle ADD_SHOCKING_EVENT_FOR_ENTITY(int eventType, Entity entity, float duration) { return invoke<ScrHandle>(0x7FD8F3BE76F89422, eventType, entity, duration); } // 0x7FD8F3BE76F89422 0xA81B5B71 b323
+	// eventType: https://alloc8or.re/gta5/doc/enums/eEventType.txt
+	static BOOL IS_SHOCKING_EVENT_IN_SPHERE(int eventType, float x, float y, float z, float radius) { return invoke<BOOL>(0x1374ABB7C15BAB92, eventType, x, y, z, radius); } // 0x1374ABB7C15BAB92 0x2F98823E b323
 	static BOOL REMOVE_SHOCKING_EVENT(ScrHandle event) { return invoke<BOOL>(0x2CDA538C44C6CCE5, event); } // 0x2CDA538C44C6CCE5 0xF82D5A87 b323
 	static void REMOVE_ALL_SHOCKING_EVENTS(BOOL p0) { invoke<Void>(0xEAABE8FDFA21274C, p0); } // 0xEAABE8FDFA21274C 0x64DF6282 b323
 	static void REMOVE_SHOCKING_EVENT_SPAWN_BLOCKING_AREAS() { invoke<Void>(0x340F1415B68AEADE); } // 0x340F1415B68AEADE 0xA0CE89C8 b323
 	static void SUPPRESS_SHOCKING_EVENTS_NEXT_FRAME() { invoke<Void>(0x2F9A292AD0A3BD89); } // 0x2F9A292AD0A3BD89 0x4CC674B5 b323
-	static void SUPPRESS_SHOCKING_EVENT_TYPE_NEXT_FRAME(int type) { invoke<Void>(0x3FD2EC8BF1F1CF30, type); } // 0x3FD2EC8BF1F1CF30 0xA0FDCB82 b323
+	// eventType: https://alloc8or.re/gta5/doc/enums/eEventType.txt
+	static void SUPPRESS_SHOCKING_EVENT_TYPE_NEXT_FRAME(int eventType) { invoke<Void>(0x3FD2EC8BF1F1CF30, eventType); } // 0x3FD2EC8BF1F1CF30 0xA0FDCB82 b323
 	static void SUPPRESS_AGITATION_EVENTS_NEXT_FRAME() { invoke<Void>(0x5F3B7749C112D552); } // 0x5F3B7749C112D552 0x80340396 b323
 }
 
-namespace FILES {
-	// GET_NUM_*
-	static int _GET_NUM_DECORATIONS(int character) { return invoke<int>(0x278F76C3B0A8F109, character); } // 0x278F76C3B0A8F109 0x71D0CF3E b323
-	static BOOL _GET_TATTOO_COLLECTION_DATA(int character, int index, Any* outComponent) { return invoke<BOOL>(0xFF56381874F82086, character, index, outComponent); } // 0xFF56381874F82086 0x2E9D628C b323
+namespace FILES
+{
+	// Character types:
+	// 0 = Michael, 
+	// 1 = Franklin, 
+	// 2 = Trevor, 
+	// 3 = MPMale, 
+	// 4 = MPFemale
+	static int GET_NUM_TATTOO_SHOP_DLC_ITEMS(int character) { return invoke<int>(0x278F76C3B0A8F109, character); } // 0x278F76C3B0A8F109 0x71D0CF3E b323
+	// Character types:
+	// 0 = Michael, 
+	// 1 = Franklin, 
+	// 2 = Trevor, 
+	// 3 = MPMale, 
+	// 4 = MPFemale
+	// 
+	// 
+	// enum TattooZoneData
+	// {  
+	//     ZONE_TORSO = 0,  
+	//     ZONE_HEAD = 1,  
+	//     ZONE_LEFT_ARM = 2,  
+	//     ZONE_RIGHT_ARM = 3,  
+	//     ZONE_LEFT_LEG = 4,  
+	//     ZONE_RIGHT_LEG = 5,  
+	//     ZONE_UNKNOWN = 6,
+	//     ZONE_NONE = 7,  
+	// };
+	// struct outComponent
+	// {
+	//     // these vars are suffixed with 4 bytes of padding each.
+	//     uint unk;
+	//     int unk2;
+	//     uint tattooCollectionHash;
+	//     uint tattooNameHash;
+	//     int unk3;
+	//     TattooZoneData zoneId;
+	//     uint unk4;
+	//     uint unk5;
+	//     // maybe more, not sure exactly, decompiled scripts are very vague around this part.
+	// }
+	static BOOL GET_TATTOO_SHOP_DLC_ITEM_DATA(int characterType, int decorationIndex, Any* outComponent) { return invoke<BOOL>(0xFF56381874F82086, characterType, decorationIndex, outComponent); } // 0xFF56381874F82086 0x2E9D628C b323
+	// Returns some sort of index/offset for overlays/decorations.
+	// 
+	// Character types:
+	// 0 = Michael, 
+	// 1 = Franklin, 
+	// 2 = Trevor, 
+	// 3 = MPMale, 
+	// 4 = MPFemale
+	static int _0x10144267DD22866C(Hash overlayHash, Any p1, int character) { return invoke<int>(0x10144267DD22866C, overlayHash, p1, character); } // 0x10144267DD22866C b2189
 	static void INIT_SHOP_PED_COMPONENT(Any* outComponent) { invoke<Void>(0x1E8C308FD312C036, outComponent); } // 0x1E8C308FD312C036 0xB818C7FC b323
 	static void INIT_SHOP_PED_PROP(Any* outProp) { invoke<Void>(0xEB0A2B758F7B850F, outProp); } // 0xEB0A2B758F7B850F 0xF5659E50 b323
-	static int _0x50F457823CE6EB5F(int p0, int p1, int p2, int p3) { return invoke<int>(0x50F457823CE6EB5F, p0, p1, p2, p3); } // 0x50F457823CE6EB5F 0xC937FF3D b323
+	static int SETUP_SHOP_PED_APPAREL_QUERY(int p0, int p1, int p2, int p3) { return invoke<int>(0x50F457823CE6EB5F, p0, p1, p2, p3); } // 0x50F457823CE6EB5F 0xC937FF3D b323
 	// character is 0 for Michael, 1 for Franklin, 2 for Trevor, 3 for freemode male, and 4 for freemode female.
 	// 
 	// componentId is between 0 and 11 and corresponds to the usual component slots.
@@ -2436,19 +2536,31 @@ namespace FILES {
 	// 
 	// p2 is usually -1; unknown function.
 	// 
-	// p3 appears to be a boolean flag; unknown function.
+	// p3 appears to be for selecting between clothes and props; false is used with components/clothes, true is used with props.
 	// 
 	// p4 is usually -1; unknown function.
-	static int _GET_NUM_PROPS_FROM_OUTFIT(int character, int p1, int p2, BOOL p3, int p4, int componentId) { return invoke<int>(0x9BDF59818B1E38C1, character, p1, p2, p3, p4, componentId); } // 0x9BDF59818B1E38C1 0x594E862C b323
-	static void GET_SHOP_PED_QUERY_COMPONENT(int componentId, int* outComponent) { invoke<Void>(0x249E310B2D920699, componentId, outComponent); } // 0x249E310B2D920699 0xC0718904 b323
+	// 
+	// componentId is -1 when p3 is true in decompiled scripts.
+	static int SETUP_SHOP_PED_APPAREL_QUERY_TU(int character, int p1, int p2, BOOL p3, int p4, int componentId) { return invoke<int>(0x9BDF59818B1E38C1, character, p1, p2, p3, p4, componentId); } // 0x9BDF59818B1E38C1 0x594E862C b323
+	// See https://git.io/JtcRf for example and structs.
+	static void GET_SHOP_PED_QUERY_COMPONENT(int componentId, Any* outComponent) { invoke<Void>(0x249E310B2D920699, componentId, outComponent); } // 0x249E310B2D920699 0xC0718904 b323
+	// Returns some sort of index/offset for components.
+	// Needs _GET_NUM_PROPS_FROM_OUTFIT to be called with p3 = false and componentId with the drawable's component slot first, returns -1 otherwise.
+	static int _0x96E2929292A4DB77(Hash componentHash) { return invoke<int>(0x96E2929292A4DB77, componentHash); } // 0x96E2929292A4DB77 b2189
 	// More info here: https://gist.github.com/root-cause/3b80234367b0c856d60bf5cb4b826f86
 	static void GET_SHOP_PED_COMPONENT(Hash componentHash, Any* outComponent) { invoke<Void>(0x74C0E2A57EC66760, componentHash, outComponent); } // 0x74C0E2A57EC66760 0xB39677C5 b323
-	static void GET_SHOP_PED_QUERY_PROP(Any p0, Any* p1) { invoke<Void>(0xDE44A00999B2837D, p0, p1); } // 0xDE44A00999B2837D 0x1D3C1466 b323
+	// See https://git.io/JtcRf for example and structs.
+	static void GET_SHOP_PED_QUERY_PROP(int componentId, Any* outProp) { invoke<Void>(0xDE44A00999B2837D, componentId, outProp); } // 0xDE44A00999B2837D 0x1D3C1466 b323
+	// Returns some sort of index/offset for props.
+	// Needs _GET_NUM_PROPS_FROM_OUTFIT to be called with p3 = true and componentId = -1 first, returns -1 otherwise.
+	static int _0x6CEBE002E58DEE97(Hash componentHash) { return invoke<int>(0x6CEBE002E58DEE97, componentHash); } // 0x6CEBE002E58DEE97 b2189
 	// More info here: https://gist.github.com/root-cause/3b80234367b0c856d60bf5cb4b826f86
 	static void GET_SHOP_PED_PROP(Hash componentHash, Any* outProp) { invoke<Void>(0x5D5CAFF661DDF6FC, componentHash, outProp); } // 0x5D5CAFF661DDF6FC 0xDB0A7A58 b323
 	static Hash GET_HASH_NAME_FOR_COMPONENT(Entity entity, int componentId, int drawableVariant, int textureVariant) { return invoke<Hash>(0x0368B3A838070348, entity, componentId, drawableVariant, textureVariant); } // 0x0368B3A838070348 0xC8A4BF12 b323
 	static Hash GET_HASH_NAME_FOR_PROP(Entity entity, int componentId, int propIndex, int propTextureIndex) { return invoke<Hash>(0x5D6160275CAEC8DD, entity, componentId, propIndex, propTextureIndex); } // 0x5D6160275CAEC8DD 0x7D876DC0 b323
 	static int GET_SHOP_PED_APPAREL_VARIANT_COMPONENT_COUNT(Hash componentHash) { return invoke<int>(0xC17AD0E5752BECDA, componentHash); } // 0xC17AD0E5752BECDA 0x159751B4 b323
+	// `propHash`: Ped helmet prop hash?
+	// This native returns 1 when the player helmet has a visor (there is another prop index for the same helmet with closed/opened visor variant) that can be toggled. 0 if there's no alternative version with a visor for this helmet prop.
 	static int _GET_SHOP_PED_APPAREL_VARIANT_PROP_COUNT(Hash propHash) { return invoke<int>(0xD40AAC51E8E4C663, propHash); } // 0xD40AAC51E8E4C663 b791
 	static void GET_VARIANT_COMPONENT(Hash componentHash, int variantComponentIndex, Hash* nameHash, int* enumValue, int* componentType) { invoke<Void>(0x6E11F282F11863B6, componentHash, variantComponentIndex, nameHash, enumValue, componentType); } // 0x6E11F282F11863B6 0xE4FF7103 b323
 	static void _GET_VARIANT_PROP(Hash componentHash, int variantPropIndex, Hash* nameHash, int* enumValue, int* anchorPoint) { invoke<Void>(0xD81B7F27BC773E66, componentHash, variantPropIndex, nameHash, enumValue, anchorPoint); } // 0xD81B7F27BC773E66 b791
@@ -2458,7 +2570,8 @@ namespace FILES {
 	static int GET_SHOP_PED_APPAREL_FORCED_PROP_COUNT(Hash componentHash) { return invoke<int>(0x017568A8182D98A6, componentHash); } // 0x017568A8182D98A6 0xC560D7C0 b323
 	static void GET_FORCED_COMPONENT(Hash componentHash, int forcedComponentIndex, Hash* nameHash, int* enumValue, int* componentType) { invoke<Void>(0x6C93ED8C2F74859B, componentHash, forcedComponentIndex, nameHash, enumValue, componentType); } // 0x6C93ED8C2F74859B 0x382C70BE b323
 	static void GET_FORCED_PROP(Hash componentHash, int forcedPropIndex, Hash* nameHash, int* enumValue, int* anchorPoint) { invoke<Void>(0xE1CA84EBF72E691D, componentHash, forcedPropIndex, nameHash, enumValue, anchorPoint); } // 0xE1CA84EBF72E691D 0x22DAE257 b323
-	// Restriction tags: https://gist.github.com/root-cause/c831b5f74ccc069059f5100a693022f8
+	// Full list of restriction tags by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pedApparelRestrictionTags.json
+	// 
 	// componentId/last parameter seems to be unused.
 	static BOOL DOES_SHOP_PED_APPAREL_HAVE_RESTRICTION_TAG(Hash componentHash, Hash restrictionTagHash, int componentId) { return invoke<BOOL>(0x341DE7ED1D2A1BFD, componentHash, restrictionTagHash, componentId); } // 0x341DE7ED1D2A1BFD 0x8E2C7FD5 b323
 	// characters
@@ -2468,24 +2581,16 @@ namespace FILES {
 	// 2: Trevor
 	// 3: MPMale
 	// 4: MPFemale
-	static int _0xF3FBE2D50A6A8C28(int character, BOOL p1) { return invoke<int>(0xF3FBE2D50A6A8C28, character, p1); } // 0xF3FBE2D50A6A8C28 0x1ECD23E7 b323
-	// struct Outfit_s
-	//  {
-	//      int mask, torso, pants, parachute, shoes, misc1, tops1, armour, crew, tops2, hat, glasses, earpiece;
-	//       int maskTexture, torsoTexture, pantsTexture, parachuteTexture, shoesTexture, misc1Texture, tops1Texture, 
-	//          armourTexture, crewTexture, tops2Texture, hatTexture, glassesTexture, earpieceTexture;
-	//     };
-	static void GET_SHOP_PED_QUERY_OUTFIT(Any p0, Any* outfit) { invoke<Void>(0x6D793F03A631FE56, p0, outfit); } // 0x6D793F03A631FE56 0x2F8013A1 b323
+	static int SETUP_SHOP_PED_OUTFIT_QUERY(int character, BOOL p1) { return invoke<int>(0xF3FBE2D50A6A8C28, character, p1); } // 0xF3FBE2D50A6A8C28 0x1ECD23E7 b323
+	// outfitIndex: from 0 to _GET_NUM_SHOP_PED_OUTFITS(characterIndex, false) - 1.
+	// See https://git.io/JtcB8 for example and outfit struct.
+	static void GET_SHOP_PED_QUERY_OUTFIT(int outfitIndex, Any* outfit) { invoke<Void>(0x6D793F03A631FE56, outfitIndex, outfit); } // 0x6D793F03A631FE56 0x2F8013A1 b323
 	static void GET_SHOP_PED_OUTFIT(Any p0, Any* p1) { invoke<Void>(0xB7952076E444979D, p0, p1); } // 0xB7952076E444979D 0xCAFE9209 b323
 	static int GET_SHOP_PED_OUTFIT_LOCATE(Any p0) { return invoke<int>(0x073CA26B079F956E, p0); } // 0x073CA26B079F956E 0x2798F56F b323
-	// outfit = a structure passing though it - see GET_SHOP_PED_QUERY_OUTFIT
-	// slot - outfit slot
-	// item - holds 3 ints in a struct
-	static BOOL GET_SHOP_PED_OUTFIT_PROP_VARIANT(Any outfit, int slot, Any* item) { return invoke<BOOL>(0xA9F9C2E0FDE11CBB, outfit, slot, item); } // 0xA9F9C2E0FDE11CBB 0x6641A864 b323
-	// outfit = a structure passing though it - see GET_SHOP_PED_QUERY_OUTFIT
-	// slot - outfit slot
-	// item - holds 3 ints in a struct
-	static BOOL GET_SHOP_PED_OUTFIT_COMPONENT_VARIANT(Any outfit, int slot, Any* item) { return invoke<BOOL>(0x19F2A026EDF0013F, outfit, slot, item); } // 0x19F2A026EDF0013F 0x818534AC b323
+	// See https://git.io/JtcBH for example and structs.
+	static BOOL GET_SHOP_PED_OUTFIT_PROP_VARIANT(Hash outfitHash, int variantIndex, Any* outPropVariant) { return invoke<BOOL>(0xA9F9C2E0FDE11CBB, outfitHash, variantIndex, outPropVariant); } // 0xA9F9C2E0FDE11CBB 0x6641A864 b323
+	// See https://git.io/JtcBH for example and structs.
+	static BOOL GET_SHOP_PED_OUTFIT_COMPONENT_VARIANT(Hash outfitHash, int variantIndex, Any* outComponentVariant) { return invoke<BOOL>(0x19F2A026EDF0013F, outfitHash, variantIndex, outComponentVariant); } // 0x19F2A026EDF0013F 0x818534AC b323
 	static int GET_NUM_DLC_VEHICLES() { return invoke<int>(0xA7A866D21CD2329B); } // 0xA7A866D21CD2329B 0x8EAF9CF6 b323
 	// dlcVehicleIndex is 0 to GET_NUM_DLC_VEHICLS() - 1
 	static Hash GET_DLC_VEHICLE_MODEL(int dlcVehicleIndex) { return invoke<Hash>(0xECC01B7C5763333C, dlcVehicleIndex); } // 0xECC01B7C5763333C 0xA2201E09 b323
@@ -2494,8 +2599,10 @@ namespace FILES {
 	// The Second item in the struct *(Hash *)(outData + 1) is the vehicle hash.
 	static BOOL GET_DLC_VEHICLE_DATA(int dlcVehicleIndex, int* outData) { return invoke<BOOL>(0x33468EDC08E371F6, dlcVehicleIndex, outData); } // 0x33468EDC08E371F6 0xCF428FA4 b323
 	static int GET_DLC_VEHICLE_FLAGS(int dlcVehicleIndex) { return invoke<int>(0x5549EE11FA22FCF2, dlcVehicleIndex); } // 0x5549EE11FA22FCF2 0xAB12738C b323
-	// Gets the total number of DLC weapons.
+	// Returns the total number of DLC weapons.
 	static int GET_NUM_DLC_WEAPONS() { return invoke<int>(0xEE47635F352DA367); } // 0xEE47635F352DA367 0x2B757E6C b323
+	// Returns the total number of DLC weapons that are available in SP (availableInSP field in shop_weapon.meta).
+	static int _GET_NUM_DLC_WEAPONS_SP() { return invoke<int>(0x4160B65AE085B5A9); } // 0x4160B65AE085B5A9 b2060
 	// 
 	// dlcWeaponIndex takes a number from 0 - GET_NUM_DLC_WEAPONS() - 1.
 	// struct DlcWeaponData
@@ -2520,8 +2627,12 @@ namespace FILES {
 	// char upperCaseNameLabel[64];
 	// };
 	static BOOL GET_DLC_WEAPON_DATA(int dlcWeaponIndex, int* outData) { return invoke<BOOL>(0x79923CD21BECE14E, dlcWeaponIndex, outData); } // 0x79923CD21BECE14E 0xD88EC8EA b323
-	// Allowed Values from 0 - DLC1::GET_NUM_DLC_WEAPONS() - 1
+	// Same as GET_DLC_WEAPON_DATA but only works for DLC weapons that are available in SP.
+	static BOOL _GET_DLC_WEAPON_DATA_SP(int dlcWeaponIndex, int* outData) { return invoke<BOOL>(0x310836EE7129BA33, dlcWeaponIndex, outData); } // 0x310836EE7129BA33 b2060
+	// Returns the total number of DLC weapon components.
 	static int GET_NUM_DLC_WEAPON_COMPONENTS(int dlcWeaponIndex) { return invoke<int>(0x405425358A7D61FE, dlcWeaponIndex); } // 0x405425358A7D61FE 0x476B23A9 b323
+	// Returns the total number of DLC weapon components that are available in SP.
+	static int _GET_NUM_DLC_WEAPON_COMPONENTS_SP(int dlcWeaponIndex) { return invoke<int>(0xAD2A7A6DFF55841B, dlcWeaponIndex); } // 0xAD2A7A6DFF55841B b2060
 	// p0 seems to be the weapon index
 	// p1 seems to be the weapon component index
 	// struct DlcComponentData{
@@ -2542,6 +2653,8 @@ namespace FILES {
 	// };
 	// 
 	static BOOL GET_DLC_WEAPON_COMPONENT_DATA(int dlcWeaponIndex, int dlcWeapCompIndex, int* ComponentDataPtr) { return invoke<BOOL>(0x6CF598A2957C2BF8, dlcWeaponIndex, dlcWeapCompIndex, ComponentDataPtr); } // 0x6CF598A2957C2BF8 0x4B83FCAF b323
+	// Same as GET_DLC_WEAPON_COMPONENT_DATA but only works for DLC components that are available in SP.
+	static BOOL _GET_DLC_WEAPON_COMPONENT_DATA_SP(int dlcWeaponIndex, int dlcWeapCompIndex, int* ComponentDataPtr) { return invoke<BOOL>(0x31D5E073B6F93CDC, dlcWeaponIndex, dlcWeapCompIndex, ComponentDataPtr); } // 0x31D5E073B6F93CDC b2060
 	static BOOL IS_CONTENT_ITEM_LOCKED(Hash itemHash) { return invoke<BOOL>(0xD4D7B033C3AA243C, itemHash); } // 0xD4D7B033C3AA243C 0x06396058 b323
 	static BOOL IS_DLC_VEHICLE_MOD(Hash hash) { return invoke<BOOL>(0x0564B9FF9631B82C, hash); } // 0x0564B9FF9631B82C 0x35BCA844 b323
 	static Hash GET_DLC_VEHICLE_MOD_LOCK_HASH(Hash hash) { return invoke<Hash>(0xC098810437312FFF, hash); } // 0xC098810437312FFF 0x59352658 b323
@@ -2557,7 +2670,8 @@ namespace FILES {
 	static void _UNLOAD_CONTENT_CHANGE_SET_GROUP(Hash hash) { invoke<Void>(0x3C1978285B036B25, hash); } // 0x3C1978285B036B25 b1604
 }
 
-namespace FIRE {
+namespace FIRE
+{
 	// Starts a fire:
 	// 
 	// xyz: Location of fire
@@ -2595,15 +2709,17 @@ namespace FIRE {
 	static BOOL IS_EXPLOSION_IN_SPHERE(int explosionType, float x, float y, float z, float radius) { return invoke<BOOL>(0xAB0F816885B0E483, explosionType, x, y, z, radius); } // 0xAB0F816885B0E483 0xD455A7F3 b323
 	// explosionType: See ADD_EXPLOSION.
 	static Entity _GET_ENTITY_INSIDE_EXPLOSION_SPHERE(int explosionType, float x, float y, float z, float radius) { return invoke<Entity>(0xB3CD51E3DB86F176, explosionType, x, y, z, radius); } // 0xB3CD51E3DB86F176 b1290
-	// explosionType: See ADD_EXPLOSION.
-	static BOOL IS_EXPLOSION_IN_ANGLED_AREA(int explosionType, float x1, float y1, float z1, float x2, float y2, float z2, float angle) { return invoke<BOOL>(0xA079A6C51525DC4B, explosionType, x1, y1, z1, x2, y2, z2, angle); } // 0xA079A6C51525DC4B 0x0128FED9 b323
+	// explosionType: See ADD_EXPLOSION, -1 for any explosion type
+	// 
+	static BOOL IS_EXPLOSION_IN_ANGLED_AREA(int explosionType, float x1, float y1, float z1, float x2, float y2, float z2, float width) { return invoke<BOOL>(0xA079A6C51525DC4B, explosionType, x1, y1, z1, x2, y2, z2, width); } // 0xA079A6C51525DC4B 0x0128FED9 b323
 	// Returns a handle to the first entity within the a circle spawned inside the 2 points from a radius.
 	// 
 	// explosionType: See ADD_EXPLOSION.
 	static Entity _GET_ENTITY_INSIDE_EXPLOSION_AREA(int explosionType, float x1, float y1, float z1, float x2, float y2, float z2, float radius) { return invoke<Entity>(0x14BA4BA137AF6CEC, explosionType, x1, y1, z1, x2, y2, z2, radius); } // 0x14BA4BA137AF6CEC 0xAEC0D176 b323
 }
 
-namespace GRAPHICS {
+namespace GRAPHICS
+{
 	// NOTE: Debugging functions are not present in the retail version of the game.
 	static void SET_DEBUG_LINES_AND_SPHERES_DRAWING_ACTIVE(BOOL enabled) { invoke<Void>(0x175B6BFC15CDD0C5, enabled); } // 0x175B6BFC15CDD0C5 0x1418CA37 b323
 	static void DRAW_DEBUG_LINE(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9) { invoke<Void>(0x7FDFADE676AA3CB0, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); } // 0x7FDFADE676AA3CB0 0xABF783AB b323
@@ -2660,11 +2776,13 @@ namespace GRAPHICS {
 	// Used for drawling Deadline trailing lights, see deadline.ytd
 	// 
 	// p15 through p23 are values that appear to be related to illiumation, scaling, and rotation; more testing required.
-	static void _DRAW_SPRITE_POLY(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, int red, int green, int blue, int alpha, const char* textureDict, const char* textureName, float p15, float p16, float p17, float p18, float p19, float p20, float p21, float p22, float p23) { invoke<Void>(0x29280002282F1928, x1, y1, z1, x2, y2, z2, x3, y3, z3, red, green, blue, alpha, textureDict, textureName, p15, p16, p17, p18, p19, p20, p21, p22, p23); } // 0x29280002282F1928 b877
+	// For UVW mapping (u,v,w parameters), reference your favourite internet resource for more details.
+	static void _DRAW_SPRITE_POLY(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, int red, int green, int blue, int alpha, const char* textureDict, const char* textureName, float u1, float v1, float w1, float u2, float v2, float w2, float u3, float v3, float w3) { invoke<Void>(0x29280002282F1928, x1, y1, z1, x2, y2, z2, x3, y3, z3, red, green, blue, alpha, textureDict, textureName, u1, v1, w1, u2, v2, w2, u3, v3, w3); } // 0x29280002282F1928 b877
 	// Used for drawling Deadline trailing lights, see deadline.ytd
 	// 
 	// Each vertex has its own colour that is blended/illuminated on the texture. Additionally, the R, G, and B components are floats that are int-casted internally.
-	static void _DRAW_SPRITE_POLY_2(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float red1, float green1, float blue1, int alpha1, float red2, float green2, float blue2, int alpha2, float red3, float green3, float blue3, int alpha3, const char* textureDict, const char* textureName, float p23, float p24, float p25, float p26, float p27, float p28, float p29, float p30, float p31) { invoke<Void>(0x736D7AA1B750856B, x1, y1, z1, x2, y2, z2, x3, y3, z3, red1, green1, blue1, alpha1, red2, green2, blue2, alpha2, red3, green3, blue3, alpha3, textureDict, textureName, p23, p24, p25, p26, p27, p28, p29, p30, p31); } // 0x736D7AA1B750856B b877
+	// For UVW mapping (u,v,w parameters), reference your favourite internet resource for more details.
+	static void _DRAW_SPRITE_POLY_2(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float red1, float green1, float blue1, int alpha1, float red2, float green2, float blue2, int alpha2, float red3, float green3, float blue3, int alpha3, const char* textureDict, const char* textureName, float u1, float v1, float w1, float u2, float v2, float w2, float u3, float v3, float w3) { invoke<Void>(0x736D7AA1B750856B, x1, y1, z1, x2, y2, z2, x3, y3, z3, red1, green1, blue1, alpha1, red2, green2, blue2, alpha2, red3, green3, blue3, alpha3, textureDict, textureName, u1, v1, w1, u2, v2, w2, u3, v3, w3); } // 0x736D7AA1B750856B b877
 	// x,y,z = start pos
 	// x2,y2,z2 = end pos
 	// 
@@ -2685,46 +2803,38 @@ namespace GRAPHICS {
 	static void DRAW_BOX(float x1, float y1, float z1, float x2, float y2, float z2, int red, int green, int blue, int alpha) { invoke<Void>(0xD3A9971CADAC7252, x1, y1, z1, x2, y2, z2, red, green, blue, alpha); } // 0xD3A9971CADAC7252 0xCD4D9DD5 b323
 	static void SET_BACKFACECULLING(BOOL toggle) { invoke<Void>(0x23BA6B0C2AD7B0D3, toggle); } // 0x23BA6B0C2AD7B0D3 0xC44C2F44 b323
 	static void _0xC5C8F970D4EDFF71(Any p0) { invoke<Void>(0xC5C8F970D4EDFF71, p0); } // 0xC5C8F970D4EDFF71 b877
-	static Any _0x1DD2139A9A20DCE8() { return invoke<Any>(0x1DD2139A9A20DCE8); } // 0x1DD2139A9A20DCE8 0xBA9AD458 b323
-	static Any _0x90A78ECAA4E78453() { return invoke<Any>(0x90A78ECAA4E78453); } // 0x90A78ECAA4E78453 0xADBBA287 b323
-	static void _0x0A46AF8A78DC5E0A() { invoke<Void>(0x0A46AF8A78DC5E0A); } // 0x0A46AF8A78DC5E0A 0x9E553002 b323
-	// LOAD_*
-	static BOOL _0x4862437A486F91B0(Any* p0, Any p1, Any p2, Any p3) { return invoke<BOOL>(0x4862437A486F91B0, p0, p1, p2, p3); } // 0x4862437A486F91B0 0x56C1E488 b323
-	static int _0x1670F8D05056F257(Any* p0) { return invoke<int>(0x1670F8D05056F257, p0); } // 0x1670F8D05056F257 0x226B08EA b323
+	static Any BEGIN_TAKE_MISSION_CREATOR_PHOTO() { return invoke<Any>(0x1DD2139A9A20DCE8); } // 0x1DD2139A9A20DCE8 0xBA9AD458 b323
+	static Any GET_STATUS_OF_TAKE_MISSION_CREATOR_PHOTO() { return invoke<Any>(0x90A78ECAA4E78453); } // 0x90A78ECAA4E78453 0xADBBA287 b323
+	static void FREE_MEMORY_FOR_MISSION_CREATOR_PHOTO() { invoke<Void>(0x0A46AF8A78DC5E0A); } // 0x0A46AF8A78DC5E0A 0x9E553002 b323
+	static BOOL LOAD_MISSION_CREATOR_PHOTO(Any* p0, Any p1, Any p2, Any p3) { return invoke<BOOL>(0x4862437A486F91B0, p0, p1, p2, p3); } // 0x4862437A486F91B0 0x56C1E488 b323
+	static int GET_STATUS_OF_LOAD_MISSION_CREATOR_PHOTO(Any* p0) { return invoke<int>(0x1670F8D05056F257, p0); } // 0x1670F8D05056F257 0x226B08EA b323
 	static Any _0x7FA5D82B8F58EC06() { return invoke<Any>(0x7FA5D82B8F58EC06); } // 0x7FA5D82B8F58EC06 0x1F3CADB0 b323
 	static Any _0x5B0316762AFD4A64() { return invoke<Any>(0x5B0316762AFD4A64); } // 0x5B0316762AFD4A64 0xA9DC8558 b323
 	static void _0x346EF3ECAAAB149E() { invoke<Void>(0x346EF3ECAAAB149E); } // 0x346EF3ECAAAB149E 0x88EAF398 b323
 	static BOOL BEGIN_TAKE_HIGH_QUALITY_PHOTO() { return invoke<BOOL>(0xA67C35C56EB1BD9D); } // 0xA67C35C56EB1BD9D 0x47B0C137 b323
 	static int GET_STATUS_OF_TAKE_HIGH_QUALITY_PHOTO() { return invoke<int>(0x0D6CA79EEEBD8CA3); } // 0x0D6CA79EEEBD8CA3 0x65376C9B b323
-	// 4 matches across 2 scripts.
-	// 
-	// appcamera:
-	// called after HUD::HIDE_HUD_AND_RADAR_THIS_FRAME() and before GRAPHICS::0x108F36CC();
-	// 
-	// cellphone_controller:
-	// called after GRAPHICS::0xE9F2B68F(0, 0) and before GRAPHICS::0x108F36CC();
-	static void _0xD801CC02177FA3F1() { invoke<Void>(0xD801CC02177FA3F1); } // 0xD801CC02177FA3F1 0x9CBA682A b323
+	static void FREE_MEMORY_FOR_HIGH_QUALITY_PHOTO() { invoke<Void>(0xD801CC02177FA3F1); } // 0xD801CC02177FA3F1 0x9CBA682A b323
 	static void _0x1BBC135A4D25EDDE(BOOL p0) { invoke<Void>(0x1BBC135A4D25EDDE, p0); } // 0x1BBC135A4D25EDDE b323
 	static void _0xF3F776ADA161E47D(Any p0, Any p1) { invoke<Void>(0xF3F776ADA161E47D, p0, p1); } // 0xF3F776ADA161E47D b1604
+	static void _0xADD6627C4D325458(Any p0) { invoke<Void>(0xADD6627C4D325458, p0); } // 0xADD6627C4D325458 b2189
 	// 1 match in 1 script. cellphone_controller.
 	// p0 is -1 in scripts.
 	static BOOL SAVE_HIGH_QUALITY_PHOTO(int unused) { return invoke<BOOL>(0x3DEC726C25A11BAC, unused); } // 0x3DEC726C25A11BAC 0x3B15D33C b323
 	static int GET_STATUS_OF_SAVE_HIGH_QUALITY_PHOTO() { return invoke<int>(0x0C0C4E81E1AC60A0); } // 0x0C0C4E81E1AC60A0 0xEC5D0317 b323
 	static BOOL _0x759650634F07B6B4(Any p0) { return invoke<BOOL>(0x759650634F07B6B4, p0); } // 0x759650634F07B6B4 0x25D569EB b323
 	static Any _0xCB82A0BF0E3E3265(Any p0) { return invoke<Any>(0xCB82A0BF0E3E3265, p0); } // 0xCB82A0BF0E3E3265 0xCFCDC518 b323
-	static void _0x6A12D88881435DCA() { invoke<Void>(0x6A12D88881435DCA); } // 0x6A12D88881435DCA 0x108F36CC b323
-	static void _0x1072F115DAB0717E(BOOL p0, BOOL p1) { invoke<Void>(0x1072F115DAB0717E, p0, p1); } // 0x1072F115DAB0717E 0xE9F2B68F b323
+	static void FREE_MEMORY_FOR_LOW_QUALITY_PHOTO() { invoke<Void>(0x6A12D88881435DCA); } // 0x6A12D88881435DCA 0x108F36CC b323
+	static void DRAW_LOW_QUALITY_PHOTO_TO_PHONE(BOOL p0, BOOL p1) { invoke<Void>(0x1072F115DAB0717E, p0, p1); } // 0x1072F115DAB0717E 0xE9F2B68F b323
 	// This function is hard-coded to always return 0.
 	static int GET_MAXIMUM_NUMBER_OF_PHOTOS() { return invoke<int>(0x34D23450F028B0BF); } // 0x34D23450F028B0BF 0x727AA63F b323
 	// This function is hard-coded to always return 96.
 	static int GET_MAXIMUM_NUMBER_OF_CLOUD_PHOTOS() { return invoke<int>(0xDC54A7AF8B3A14EF); } // 0xDC54A7AF8B3A14EF 0x239272BD b323
-	// GET_CURRENT_*
-	static int _GET_CURRENT_NUMBER_OF_PHOTOS() { return invoke<int>(0x473151EBC762C6DA); } // 0x473151EBC762C6DA 0x21DBF0C9 b323
+	static int GET_CURRENT_NUMBER_OF_CLOUD_PHOTOS() { return invoke<int>(0x473151EBC762C6DA); } // 0x473151EBC762C6DA 0x21DBF0C9 b323
 	// 2 matches across 2 scripts. Only showed in appcamera & appmedia. Both were 0.
 	static Any _0x2A893980E96B659A(Any p0) { return invoke<Any>(0x2A893980E96B659A, p0); } // 0x2A893980E96B659A 0x199FABF0 b323
 	// 3 matches across 3 scripts. First 2 were 0, 3rd was 1. Possibly a bool.
 	// appcamera, appmedia, and cellphone_controller.
-	static Any _0xF5BED327CEA362B1(Any p0) { return invoke<Any>(0xF5BED327CEA362B1, p0); } // 0xF5BED327CEA362B1 0x596B900D b323
+	static Any GET_STATUS_OF_SORTED_LIST_OPERATION(Any p0) { return invoke<Any>(0xF5BED327CEA362B1, p0); } // 0xF5BED327CEA362B1 0x596B900D b323
 	static void _0x4AF92ACD3141D96C() { invoke<Void>(0x4AF92ACD3141D96C); } // 0x4AF92ACD3141D96C 0xC9EF81ED b323
 	// This function is hard-coded to always return 0.
 	static Any _0xE791DF1F73ED2C8B(Any p0) { return invoke<Any>(0xE791DF1F73ED2C8B, p0); } // 0xE791DF1F73ED2C8B 0x9D84554C b323
@@ -2819,8 +2929,10 @@ namespace GRAPHICS {
 	// 
 	// 
 	static void DRAW_MARKER(int type, float posX, float posY, float posZ, float dirX, float dirY, float dirZ, float rotX, float rotY, float rotZ, float scaleX, float scaleY, float scaleZ, int red, int green, int blue, int alpha, BOOL bobUpAndDown, BOOL faceCamera, int p19, BOOL rotate, const char* textureDict, const char* textureName, BOOL drawOnEnts) { invoke<Void>(0x28477EC23D892089, type, posX, posY, posZ, dirX, dirY, dirZ, rotX, rotY, rotZ, scaleX, scaleY, scaleZ, red, green, blue, alpha, bobUpAndDown, faceCamera, p19, rotate, textureDict, textureName, drawOnEnts); } // 0x28477EC23D892089 0x48D84A02 b323
-	static void _DRAW_MARKER_2(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9, Any p10, Any p11, Any p12, Any p13, Any p14, Any p15, Any p16, Any p17, Any p18, Any p19, Any p20, Any p21, Any p22, Any p23, Any p24, Any p25) { invoke<Void>(0xE82728F0DE75D13A, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22, p23, p24, p25); } // 0xE82728F0DE75D13A b573
-	static void _DRAW_SPHERE(float x, float y, float z, float radius, int red, int green, int blue, int alpha) { invoke<Void>(0x799017F9E3B10112, x, y, z, radius, red, green, blue, alpha); } // 0x799017F9E3B10112 b463
+	static void _DRAW_MARKER_2(int type, float posX, float posY, float posZ, float dirX, float dirY, float dirZ, float rotX, float rotY, float rotZ, float scaleX, float scaleY, float scaleZ, int red, int green, int blue, int alpha, BOOL bobUpAndDown, BOOL faceCamera, Any p19, BOOL rotate, const char* textureDict, const char* textureName, BOOL drawOnEnts, BOOL p24, BOOL p25) { invoke<Void>(0xE82728F0DE75D13A, type, posX, posY, posZ, dirX, dirY, dirZ, rotX, rotY, rotZ, scaleX, scaleY, scaleZ, red, green, blue, alpha, bobUpAndDown, faceCamera, p19, rotate, textureDict, textureName, drawOnEnts, p24, p25); } // 0xE82728F0DE75D13A b573
+	// Draws a 3D sphere, typically seen in the GTA:O freemode event "Penned In".
+	// Example https://imgur.com/nCbtS4H
+	static void _DRAW_SPHERE(float x, float y, float z, float radius, int red, int green, int blue, float alpha) { invoke<Void>(0x799017F9E3B10112, x, y, z, radius, red, green, blue, alpha); } // 0x799017F9E3B10112 b463
 	// Creates a checkpoint. Returns the handle of the checkpoint.
 	// 
 	// 20/03/17 : Attention, checkpoints are already handled by the game itself, so you must not loop it like markers.
@@ -2860,7 +2972,7 @@ namespace GRAPHICS {
 	// 160-169----Circle  w/ pointer (0-9)
 	// 170-179-------Perforated ring (0-9)
 	// 180-189----------------Sphere (0-9)
-	static int CREATE_CHECKPOINT(int type, float posX1, float posY1, float posZ1, float posX2, float posY2, float posZ2, float radius, int red, int green, int blue, int alpha, int reserved) { return invoke<int>(0x0134F0835AB6BFCB, type, posX1, posY1, posZ1, posX2, posY2, posZ2, radius, red, green, blue, alpha, reserved); } // 0x0134F0835AB6BFCB 0xF541B690 b323
+	static int CREATE_CHECKPOINT(int type, float posX1, float posY1, float posZ1, float posX2, float posY2, float posZ2, float diameter, int red, int green, int blue, int alpha, int reserved) { return invoke<int>(0x0134F0835AB6BFCB, type, posX1, posY1, posZ1, posX2, posY2, posZ2, diameter, red, green, blue, alpha, reserved); } // 0x0134F0835AB6BFCB 0xF541B690 b323
 	// p0 - Scale? Looks to be a normalized value (0.0 - 1.0)
 	// 
 	// offroad_races.c4, line ~67407:
@@ -2871,7 +2983,7 @@ namespace GRAPHICS {
 	// GRAPHICS::SET_CHECKPOINT_CYLINDER_HEIGHT(a_3._f7, 4.0, 4.0, 100.0);
 	// 
 	static void _SET_CHECKPOINT_SCALE(int checkpoint, float p0) { invoke<Void>(0x4B5B4DA5D79F1943, checkpoint, p0); } // 0x4B5B4DA5D79F1943 0x80151CCF b323
-	static void _0x44621483FF966526(Any p0, Any p1) { invoke<Void>(0x44621483FF966526, p0, p1); } // 0x44621483FF966526 b877
+	static void _SET_CHECKPOINT_ICON_SCALE(int checkpoint, float scale) { invoke<Void>(0x44621483FF966526, checkpoint, scale); } // 0x44621483FF966526 b877
 	// Sets the cylinder height of the checkpoint.
 	// 
 	// Parameters:
@@ -2882,7 +2994,7 @@ namespace GRAPHICS {
 	// Sets the checkpoint color.
 	static void SET_CHECKPOINT_RGBA(int checkpoint, int red, int green, int blue, int alpha) { invoke<Void>(0x7167371E8AD747F7, checkpoint, red, green, blue, alpha); } // 0x7167371E8AD747F7 0xEF9C8CB3 b323
 	// Sets the checkpoint icon color.
-	static void _SET_CHECKPOINT_ICON_RGBA(int checkpoint, int red, int green, int blue, int alpha) { invoke<Void>(0xB9EA40907C680580, checkpoint, red, green, blue, alpha); } // 0xB9EA40907C680580 0xA5456DBB b323
+	static void SET_CHECKPOINT_RGBA2(int checkpoint, int red, int green, int blue, int alpha) { invoke<Void>(0xB9EA40907C680580, checkpoint, red, green, blue, alpha); } // 0xB9EA40907C680580 0xA5456DBB b323
 	// This does not move an existing checkpoint... so wtf.
 	static void _0xF51D36185993515D(int checkpoint, float posX, float posY, float posZ, float unkX, float unkY, float unkZ) { invoke<Void>(0xF51D36185993515D, checkpoint, posX, posY, posZ, unkX, unkY, unkZ); } // 0xF51D36185993515D 0x20EABD0F b323
 	// SET_CHECKPOINT_*
@@ -2892,9 +3004,14 @@ namespace GRAPHICS {
 	static void _0xDB1EA9411C8911EC(Any p0) { invoke<Void>(0xDB1EA9411C8911EC, p0); } // 0xDB1EA9411C8911EC b1180
 	static void _0x3C788E7F6438754D(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x3C788E7F6438754D, p0, p1, p2, p3); } // 0x3C788E7F6438754D b1180
 	static void DELETE_CHECKPOINT(int checkpoint) { invoke<Void>(0xF5ED37F54CD4D52E, checkpoint); } // 0xF5ED37F54CD4D52E 0xB66CF3CA b323
-	static void _0x22A249A53034450A(BOOL p0) { invoke<Void>(0x22A249A53034450A, p0); } // 0x22A249A53034450A 0x932FDB81 b323
-	// FORCE_*
-	static void _0xDC459CFA0CCE245B(BOOL toggle) { invoke<Void>(0xDC459CFA0CCE245B, toggle); } // 0xDC459CFA0CCE245B 0x7E946E87 b323
+	static void DONT_RENDER_IN_GAME_UI(BOOL p0) { invoke<Void>(0x22A249A53034450A, p0); } // 0x22A249A53034450A 0x932FDB81 b323
+	static void FORCE_RENDER_IN_GAME_UI(BOOL toggle) { invoke<Void>(0xDC459CFA0CCE245B, toggle); } // 0xDC459CFA0CCE245B 0x7E946E87 b323
+	// This function can requests texture dictonaries from following RPFs:
+	// scaleform_generic.rpf
+	// scaleform_minigames.rpf
+	// scaleform_minimap.rpf
+	// scaleform_web.rpf
+	// 
 	// last param isnt a toggle
 	static void REQUEST_STREAMED_TEXTURE_DICT(const char* textureDict, BOOL p1) { invoke<Void>(0xDFA2EF8E04127DD5, textureDict, p1); } // 0xDFA2EF8E04127DD5 0x4C9B035F b323
 	static BOOL HAS_STREAMED_TEXTURE_DICT_LOADED(const char* textureDict) { return invoke<BOOL>(0x0145F696AAAAD2E4, textureDict); } // 0x0145F696AAAAD2E4 0x3F436EEF b323
@@ -2969,8 +3086,34 @@ namespace GRAPHICS {
 	// 
 	// alpha - opacity level
 	static void DRAW_SPRITE(const char* textureDict, const char* textureName, float screenX, float screenY, float width, float height, float heading, int red, int green, int blue, int alpha, BOOL p11) { invoke<Void>(0xE7FFAE5EBF23D890, textureDict, textureName, screenX, screenY, width, height, heading, red, green, blue, alpha, p11); } // 0xE7FFAE5EBF23D890 0x1FEC16B0 b323
-	static void _0x2D3B147AFAD49DE0(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9, Any p10, Any p11) { invoke<Void>(0x2D3B147AFAD49DE0, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11); } // 0x2D3B147AFAD49DE0 b1290
-	static void _DRAW_INTERACTIVE_SPRITE(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9, Any p10) { invoke<Void>(0x2BC54A8188768488, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10); } // 0x2BC54A8188768488 b877
+	// Used in arcade games and Beam hack minigame in Doomsday Heist. I will most certainly dive into this to try replicate arcade games.
+	// x position must be between 0.0 and 1.0 (1.0 being the most right side of the screen)
+	// y position must be between 0.0 and 1.0 (1.0 being the most bottom side of the screen)
+	// width 0.0 - 1.0 is the reasonable amount generally
+	// height 0.0 - 1.0 is the reasonable amount generally
+	// p6 almost always 0.0
+	// p11 seems to be unknown but almost always 0 int
+	static void _0x2D3B147AFAD49DE0(const char* textureDict, const char* textureName, float x, float y, float width, float height, float p6, int red, int green, int blue, int alpha, Any p11) { invoke<Void>(0x2D3B147AFAD49DE0, textureDict, textureName, x, y, width, height, p6, red, green, blue, alpha, p11); } // 0x2D3B147AFAD49DE0 b1290
+	// Similar to _DRAW_SPRITE, but seems to be some kind of "interactive" sprite, at least used by render targets.
+	// These seem to be the only dicts ever requested by this native:
+	// 
+	// prop_screen_biker_laptop
+	// Prop_Screen_GR_Disruption
+	// Prop_Screen_TaleOfUs
+	// prop_screen_nightclub
+	// Prop_Screen_IE_Adhawk
+	// prop_screen_sm_free_trade_shipping
+	// prop_screen_hacker_truck
+	// MPDesktop
+	// Prop_Screen_Nightclub
+	// And a few others
+	// 
+	static void _DRAW_INTERACTIVE_SPRITE(const char* textureDict, const char* textureName, float screenX, float screenY, float width, float height, float heading, int red, int green, int blue, int alpha) { invoke<Void>(0x2BC54A8188768488, textureDict, textureName, screenX, screenY, width, height, heading, red, green, blue, alpha); } // 0x2BC54A8188768488 b877
+	// Similar to DRAW_SPRITE, but allows to specify the texture coordinates used to draw the sprite.
+	// 
+	// u1, v1 - texture coordinates for the top-left corner
+	// u2, v2 - texture coordinates for the bottom-right corner
+	static void _DRAW_SPRITE_UV(const char* textureDict, const char* textureName, float x, float y, float width, float height, float u1, float v1, float u2, float v2, float heading, int red, int green, int blue, int alpha) { invoke<Void>(0x95812F9B26074726, textureDict, textureName, x, y, width, height, u1, v1, u2, v2, heading, red, green, blue, alpha); } // 0x95812F9B26074726 b1868
 	// Example:
 	// GRAPHICS::ADD_ENTITY_ICON(a_0, "MP_Arrow");
 	// 
@@ -3000,28 +3143,26 @@ namespace GRAPHICS {
 	// 
 	// See GRAPHICS::SET_DRAW_ORIGIN(...) for further information.
 	static void CLEAR_DRAW_ORIGIN() { invoke<Void>(0xFF0B610F6BE0D7AF); } // 0xFF0B610F6BE0D7AF 0xDD76B263 b323
-	static int _SET_BINK_MOVIE_REQUESTED(const char* name) { return invoke<int>(0x338D9F609FD632DB, name); } // 0x338D9F609FD632DB b1290
+	static int _SET_BINK_MOVIE(const char* name) { return invoke<int>(0x338D9F609FD632DB, name); } // 0x338D9F609FD632DB b1290
 	static void _PLAY_BINK_MOVIE(int binkMovie) { invoke<Void>(0x70D2CC8A542A973C, binkMovie); } // 0x70D2CC8A542A973C b1290
 	static void _STOP_BINK_MOVIE(int binkMovie) { invoke<Void>(0x63606A61DE68898A, binkMovie); } // 0x63606A61DE68898A b1290
 	static void _RELEASE_BINK_MOVIE(int binkMovie) { invoke<Void>(0x04D950EEFA4EED8C, binkMovie); } // 0x04D950EEFA4EED8C b1290
 	static void _DRAW_BINK_MOVIE(int binkMovie, float p1, float p2, float p3, float p4, float p5, int r, int g, int b, int a) { invoke<Void>(0x7118E83EEB9F7238, binkMovie, p1, p2, p3, p4, p5, r, g, b, a); } // 0x7118E83EEB9F7238 b1290
 	// In percentage: 0.0 - 100.0
-	static void _SET_BINK_MOVIE_PROGRESS(int binkMovie, float progress) { invoke<Void>(0x0CB6B3446855B57A, binkMovie, progress); } // 0x0CB6B3446855B57A b1290
+	static void _SET_BINK_MOVIE_TIME(int binkMovie, float progress) { invoke<Void>(0x0CB6B3446855B57A, binkMovie, progress); } // 0x0CB6B3446855B57A b1290
 	// In percentage: 0.0 - 100.0
-	static float _GET_BINK_MOVIE_PROGRESS(int binkMovie) { return invoke<float>(0x8E17DDD6B9D5BF29, binkMovie); } // 0x8E17DDD6B9D5BF29 b1734
-	static void _SET_BINK_MOVIE_UNK(int binkMovie, float value) { invoke<Void>(0xAFF33B1178172223, binkMovie, value); } // 0xAFF33B1178172223 b1290
+	static float _GET_BINK_MOVIE_TIME(int binkMovie) { return invoke<float>(0x8E17DDD6B9D5BF29, binkMovie); } // 0x8E17DDD6B9D5BF29 b1734
+	// binkMovie: Is return value from _SET_BINK_MOVIE. Has something to do with bink volume? (audRequestedSettings::SetVolumeCurveScale)
+	static void _SET_BINK_MOVIE_VOLUME(int binkMovie, float value) { invoke<Void>(0xAFF33B1178172223, binkMovie, value); } // 0xAFF33B1178172223 b1290
 	// Might be more appropriate in AUDIO?
 	static void ATTACH_TV_AUDIO_TO_ENTITY(Entity entity) { invoke<Void>(0x845BAD77CC770633, entity); } // 0x845BAD77CC770633 0x784944DB b323
-	// Might be more appropriate in AUDIO?
-	// 
-	// Rockstar made it like this.
-	// 
+	static void _SET_BINK_MOVIE_UNK_2(int binkMovie, BOOL p1) { invoke<Void>(0xF816F2933752322D, binkMovie, p1); } // 0xF816F2933752322D b1868
 	// Probably changes tvs from being a 3d audio to being "global" audio
 	static void SET_TV_AUDIO_FRONTEND(BOOL toggle) { invoke<Void>(0x113D2C5DC57E1774, toggle); } // 0x113D2C5DC57E1774 0x2E0DFA35 b323
-	static void _0x6805D58CAA427B72(Any p0, Any p1) { invoke<Void>(0x6805D58CAA427B72, p0, p1); } // 0x6805D58CAA427B72 b1290
+	static void _SET_BINK_SHOULD_SKIP(int binkMovie, BOOL bShouldSkip) { invoke<Void>(0x6805D58CAA427B72, binkMovie, bShouldSkip); } // 0x6805D58CAA427B72 b1290
 	static int LOAD_MOVIE_MESH_SET(const char* movieMeshSetName) { return invoke<int>(0xB66064452270E8F1, movieMeshSetName); } // 0xB66064452270E8F1 0x9627905C b323
 	static void RELEASE_MOVIE_MESH_SET(int movieMeshSet) { invoke<Void>(0xEB119AA014E89183, movieMeshSet); } // 0xEB119AA014E89183 0x4FA5501D b323
-	static Any _0x9B6E70C5CEEF4EEB(Any p0) { return invoke<Any>(0x9B6E70C5CEEF4EEB, p0); } // 0x9B6E70C5CEEF4EEB 0x9D5D9B38 b323
+	static Any QUERY_MOVIE_MESH_SET_STATE(Any p0) { return invoke<Any>(0x9B6E70C5CEEF4EEB, p0); } // 0x9B6E70C5CEEF4EEB 0x9D5D9B38 b323
 	// int screenresx,screenresy;
 	// GET_SCREEN_RESOLUTION(&screenresx,&screenresy);
 	static void GET_SCREEN_RESOLUTION(int* x, int* y) { invoke<Void>(0x888D57E407E63624, x, y); } // 0x888D57E407E63624 0x29F3572F b323
@@ -3094,7 +3235,8 @@ namespace GRAPHICS {
 	// 
 	// Note: Most texture resolutions are doubled compared to the console version of the game.
 	static Vector3 GET_TEXTURE_RESOLUTION(const char* textureDict, const char* textureName) { return invoke<Vector3>(0x35736EE65BD00C11, textureDict, textureName); } // 0x35736EE65BD00C11 0x096DAA4D b323
-	static Any _0x95EB5E34F821BABE(Any p0, Any p1, Any p2) { return invoke<Any>(0x95EB5E34F821BABE, p0, p1, p2); } // 0x95EB5E34F821BABE b877
+	// Overriding ped badge texture to a passed texture. It's synced between players (even custom textures!), don't forget to request used dict on *all* clients to make it sync properly. Can be removed by passing empty strings.
+	static BOOL _OVERRIDE_PED_BADGE_TEXTURE(Ped ped, const char* txd, const char* txn) { return invoke<BOOL>(0x95EB5E34F821BABE, ped, txd, txn); } // 0x95EB5E34F821BABE b877
 	static void _0xE2892E7E55D7073A(float p0) { invoke<Void>(0xE2892E7E55D7073A, p0); } // 0xE2892E7E55D7073A 0x455F1084 b323
 	// Purpose of p0 and p1 unknown.
 	static void SET_FLASH(float p0, float p1, float fadeIn, float duration, float fadeOut) { invoke<Void>(0x0AB84296FED9CFC6, p0, p1, fadeIn, duration, fadeOut); } // 0x0AB84296FED9CFC6 0x7E55A1EE b323
@@ -3106,6 +3248,8 @@ namespace GRAPHICS {
 	// 
 	// state: True turns off all artificial light sources in the map: buildings, street lights, car lights, etc. False turns them back on.
 	static void SET_ARTIFICIAL_LIGHTS_STATE(BOOL state) { invoke<Void>(0x1268615ACE24D504, state); } // 0x1268615ACE24D504 0xAA2A0EAF b323
+	// If "blackout" is enabled, this native allows you to ignore "blackout" for vehicles.
+	static void _SET_ARTIFICIAL_LIGHTS_STATE_AFFECTS_VEHICLES(BOOL toggle) { invoke<Void>(0xE2B187C0939B3D32, toggle); } // 0xE2B187C0939B3D32 b2060
 	static void _0xC35A6D07C93802B2() { invoke<Void>(0xC35A6D07C93802B2); } // 0xC35A6D07C93802B2 b323
 	// Creates a tracked point, useful for checking the visibility of a 3D point on screen.
 	static int CREATE_TRACKED_POINT() { return invoke<int>(0xE2C9439ED45DEA60); } // 0xE2C9439ED45DEA60 0x3129C31A b323
@@ -3124,18 +3268,19 @@ namespace GRAPHICS {
 	static void _0x1612C45F9E3E0D44() { invoke<Void>(0x1612C45F9E3E0D44); } // 0x1612C45F9E3E0D44 b323
 	static void _0x5DEBD9C4DC995692() { invoke<Void>(0x5DEBD9C4DC995692); } // 0x5DEBD9C4DC995692 b323
 	static void _0xAAE9BE70EC7C69AB(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7) { invoke<Void>(0xAAE9BE70EC7C69AB, p0, p1, p2, p3, p4, p5, p6, p7); } // 0xAAE9BE70EC7C69AB b1290
-	static void _GRASS_LOD_SHRINK_SCRIPT_AREAS(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6) { invoke<Void>(0x6D955F6A9E0295B1, p0, p1, p2, p3, p4, p5, p6); } // 0x6D955F6A9E0295B1 b323
+	// Wraps 0xAAE9BE70EC7C69AB with FLT_MAX as p7, Jenkins: 0x73E96210?
+	static void _GRASS_LOD_SHRINK_SCRIPT_AREAS(float x, float y, float z, float radius, float p4, float p5, float p6) { invoke<Void>(0x6D955F6A9E0295B1, x, y, z, radius, p4, p5, p6); } // 0x6D955F6A9E0295B1 b323
 	static void _GRASS_LOD_RESET_SCRIPT_AREAS() { invoke<Void>(0x302C91AB2D477F7E); } // 0x302C91AB2D477F7E b323
-	static void _0x03FC694AE06C5A20() { invoke<Void>(0x03FC694AE06C5A20); } // 0x03FC694AE06C5A20 0x48F16186 b323
-	static void _0xD2936CAB8B58FCBD(Any p0, BOOL p1, float p2, float p3, float p4, float p5, BOOL p6, float p7) { invoke<Void>(0xD2936CAB8B58FCBD, p0, p1, p2, p3, p4, p5, p6, p7); } // 0xD2936CAB8B58FCBD 0x84F05943 b323
-	static void _0x5F0F3F56635809EF(float p0) { invoke<Void>(0x5F0F3F56635809EF, p0); } // 0x5F0F3F56635809EF 0x13D4ABC0 b323
-	static void _0x5E9DAF5A20F15908(float p0) { invoke<Void>(0x5E9DAF5A20F15908, p0); } // 0x5E9DAF5A20F15908 0xD2157428 b323
+	static void CASCADE_SHADOWS_INIT_SESSION() { invoke<Void>(0x03FC694AE06C5A20); } // 0x03FC694AE06C5A20 0x48F16186 b323
+	static void CASCADE_SHADOWS_SET_CASCADE_BOUNDS(Any p0, BOOL p1, float p2, float p3, float p4, float p5, BOOL p6, float p7) { invoke<Void>(0xD2936CAB8B58FCBD, p0, p1, p2, p3, p4, p5, p6, p7); } // 0xD2936CAB8B58FCBD 0x84F05943 b323
+	static void CASCADE_SHADOWS_SET_CASCADE_BOUNDS_SCALE(float p0) { invoke<Void>(0x5F0F3F56635809EF, p0); } // 0x5F0F3F56635809EF 0x13D4ABC0 b323
+	static void CASCADE_SHADOWS_SET_ENTITY_TRACKER_SCALE(float p0) { invoke<Void>(0x5E9DAF5A20F15908, p0); } // 0x5E9DAF5A20F15908 0xD2157428 b323
 	static void _0x36F6626459D91457(float p0) { invoke<Void>(0x36F6626459D91457, p0); } // 0x36F6626459D91457 0xC07C64C9 b323
 	static void _0x259BA6D4E6F808F1(Any p0) { invoke<Void>(0x259BA6D4E6F808F1, p0); } // 0x259BA6D4E6F808F1 b1011
 	// When this is set to ON, shadows only draw as you get nearer.
 	// 
 	// When OFF, they draw from a further distance.
-	static void _SET_FAR_SHADOWS_SUPPRESSED(BOOL toggle) { invoke<Void>(0x80ECBC0C856D3B0B, toggle); } // 0x80ECBC0C856D3B0B 0xFE903D0F b323
+	static void CASCADE_SHADOWS_ENABLE_ENTITY_TRACKER(BOOL toggle) { invoke<Void>(0x80ECBC0C856D3B0B, toggle); } // 0x80ECBC0C856D3B0B 0xFE903D0F b323
 	static void _0x25FC3E33A31AD0C9(BOOL p0) { invoke<Void>(0x25FC3E33A31AD0C9, p0); } // 0x25FC3E33A31AD0C9 b323
 	// Possible values:
 	// "CSM_ST_POINT"
@@ -3160,11 +3305,11 @@ namespace GRAPHICS {
 	// "CSM_ST_CLOUDS_SOFT16"
 	// "CSM_ST_CLOUDS_DITHER16_RPDB"
 	// "CSM_ST_CLOUDS_POISSON16_RPDB_GNORM"
-	static void _CASCADESHADOWS_SET_TYPE(const char* type) { invoke<Void>(0xB11D94BC55F41932, type); } // 0xB11D94BC55F41932 0xDE10BA1F b323
-	static void _CASCADESHADOWS_RESET_TYPE() { invoke<Void>(0x27CB772218215325); } // 0x27CB772218215325 b323
-	static void _0x6DDBF9DFFC4AC080(BOOL p0) { invoke<Void>(0x6DDBF9DFFC4AC080, p0); } // 0x6DDBF9DFFC4AC080 0x9F470BE3 b323
-	static void _0xD39D13C9FEBF0511(BOOL p0) { invoke<Void>(0xD39D13C9FEBF0511, p0); } // 0xD39D13C9FEBF0511 0x4A124267 b323
-	static void _0x02AC28F3A01FA04A(float p0) { invoke<Void>(0x02AC28F3A01FA04A, p0); } // 0x02AC28F3A01FA04A 0xB19B2764 b323
+	static void CASCADE_SHADOWS_SET_SHADOW_SAMPLE_TYPE(const char* type) { invoke<Void>(0xB11D94BC55F41932, type); } // 0xB11D94BC55F41932 0xDE10BA1F b323
+	static void _CASCADE_SHADOWS_CLEAR_SHADOW_SAMPLE_TYPE() { invoke<Void>(0x27CB772218215325); } // 0x27CB772218215325 b323
+	static void CASCADE_SHADOWS_SET_AIRCRAFT_MODE(BOOL p0) { invoke<Void>(0x6DDBF9DFFC4AC080, p0); } // 0x6DDBF9DFFC4AC080 0x9F470BE3 b323
+	static void CASCADE_SHADOWS_SET_DYNAMIC_DEPTH_MODE(BOOL p0) { invoke<Void>(0xD39D13C9FEBF0511, p0); } // 0xD39D13C9FEBF0511 0x4A124267 b323
+	static void CASCADE_SHADOWS_SET_DYNAMIC_DEPTH_VALUE(float p0) { invoke<Void>(0x02AC28F3A01FA04A, p0); } // 0x02AC28F3A01FA04A 0xB19B2764 b323
 	static void _0x0AE73D8DF3A762B2(BOOL p0) { invoke<Void>(0x0AE73D8DF3A762B2, p0); } // 0x0AE73D8DF3A762B2 0x342FA2B4 b323
 	static void _0xCA465D9CC0D231BA(Any p0) { invoke<Void>(0xCA465D9CC0D231BA, p0); } // 0xCA465D9CC0D231BA b1011
 	static void GOLF_TRAIL_SET_ENABLED(BOOL toggle) { invoke<Void>(0xA51C4B86B71652AE, toggle); } // 0xA51C4B86B71652AE 0x5D3BFFC9 b323
@@ -3183,6 +3328,7 @@ namespace GRAPHICS {
 	// 
 	// Tested but noticed nothing.
 	static void GOLF_TRAIL_SET_FIXED_CONTROL_POINT(int type, float xPos, float yPos, float zPos, float p4, int red, int green, int blue, int alpha) { invoke<Void>(0xB1BB03742917A5D6, type, xPos, yPos, zPos, p4, red, green, blue, alpha); } // 0xB1BB03742917A5D6 0x3BB12B75 b323
+	// Only appeared in Golf & Golf_mp. Parameters were all ptrs
 	static void GOLF_TRAIL_SET_SHADER_PARAMS(float p0, float p1, float p2, float p3, float p4) { invoke<Void>(0x9CFDD90B2B844BF7, p0, p1, p2, p3, p4); } // 0x9CFDD90B2B844BF7 0x4EA70FB4 b323
 	static void GOLF_TRAIL_SET_FACING(BOOL p0) { invoke<Void>(0x06F761EA47C1D3ED, p0); } // 0x06F761EA47C1D3ED 0x0D830DC7 b323
 	static float GOLF_TRAIL_GET_MAX_HEIGHT() { return invoke<float>(0xA4819F5E23E2FFAD); } // 0xA4819F5E23E2FFAD 0xA08B46AD b323
@@ -3194,6 +3340,7 @@ namespace GRAPHICS {
 	static void _SEETHROUGH_SET_FADE_START_DISTANCE(float distance) { invoke<Void>(0xA78DE25577300BA1, distance); } // 0xA78DE25577300BA1 b573
 	static void _SEETHROUGH_SET_FADE_END_DISTANCE(float distance) { invoke<Void>(0x9D75795B9DC6EBBF, distance); } // 0x9D75795B9DC6EBBF b573
 	static float _SEETHROUGH_GET_MAX_THICKNESS() { return invoke<float>(0x43DBAE39626CE83F); } // 0x43DBAE39626CE83F b1290
+	// 0.0 = you will not be able to see people behind the walls. 50.0 and more = you will see everyone through the walls. More value is "better" view. See https://gfycat.com/FirmFlippantGourami
 	// min: 1.0
 	// max: 10000.0
 	static void _SEETHROUGH_SET_MAX_THICKNESS(float thickness) { invoke<Void>(0x0C8FAC83902A62DF, thickness); } // 0x0C8FAC83902A62DF b573
@@ -3225,13 +3372,14 @@ namespace GRAPHICS {
 	static BOOL TRIGGER_SCREENBLUR_FADE_OUT(float transitionTime) { return invoke<BOOL>(0xEFACC8AEF94430D5, transitionTime); } // 0xEFACC8AEF94430D5 0x46617502 b323
 	static void DISABLE_SCREENBLUR_FADE() { invoke<Void>(0xDE81239437E8C5A8); } // 0xDE81239437E8C5A8 0xDB7AECDA b323
 	static float GET_SCREENBLUR_FADE_CURRENT_TIME() { return invoke<float>(0x5CCABFFCA31DDE33); } // 0x5CCABFFCA31DDE33 0xEA432A94 b323
+	// Returns whether screen transition to blur/from blur is running.
 	static BOOL IS_SCREENBLUR_FADE_RUNNING() { return invoke<BOOL>(0x7B226C785A52A0A9); } // 0x7B226C785A52A0A9 0x926B8734 b323
 	static void TOGGLE_PAUSED_RENDERPHASES(BOOL toggle) { invoke<Void>(0xDFC252D8A3E15AB7, toggle); } // 0xDFC252D8A3E15AB7 0x30ADE541 b323
 	static BOOL GET_TOGGLE_PAUSED_RENDERPHASES_STATUS() { return invoke<BOOL>(0xEB3DAC2C86001E5E); } // 0xEB3DAC2C86001E5E 0xD4F5D07D b323
 	static void RESET_PAUSED_RENDERPHASES() { invoke<Void>(0xE1C8709406F2C41C); } // 0xE1C8709406F2C41C 0x0113EAE4 b323
 	static void _0x851CD923176EBA7C() { invoke<Void>(0x851CD923176EBA7C); } // 0x851CD923176EBA7C 0xDCBA251B b323
 	// Every p2 - p5 occurrence was 0f.
-	static void _SET_HIDOF_ENV_BLUR_PARAMS(BOOL p0, BOOL p1, float p2, float p3, float p4, float p5) { invoke<Void>(0xBA3D65906822BED5, p0, p1, p2, p3, p4, p5); } // 0xBA3D65906822BED5 0x513D444B b323
+	static void _SET_HIDOF_ENV_BLUR_PARAMS(BOOL p0, BOOL p1, float nearplaneOut, float nearplaneIn, float farplaneOut, float farplaneIn) { invoke<Void>(0xBA3D65906822BED5, p0, p1, nearplaneOut, nearplaneIn, farplaneOut, farplaneIn); } // 0xBA3D65906822BED5 0x513D444B b323
 	static void _0xB569F41F3E7E83A4(Any p0) { invoke<Void>(0xB569F41F3E7E83A4, p0); } // 0xB569F41F3E7E83A4 b1103
 	static BOOL _0x7AC24EAB6D74118D(BOOL p0) { return invoke<BOOL>(0x7AC24EAB6D74118D, p0); } // 0x7AC24EAB6D74118D 0xB2410EAB b323
 	static Any _0xBCEDB009461DA156() { return invoke<Any>(0xBCEDB009461DA156); } // 0xBCEDB009461DA156 0x5AB94128 b323
@@ -3240,7 +3388,7 @@ namespace GRAPHICS {
 	// 
 	// Axis - Invert Axis Flags
 	// 
-	// list: pastebin.com/N9unUFWY
+	// Full list of particle effect dictionaries and effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/particleEffectsCompact.json
 	// 
 	// 
 	// -------------------------------------------------------------------
@@ -3261,16 +3409,19 @@ namespace GRAPHICS {
 	// example:
 	// Function.Call<int>(Hash.START_PARTICLE_FX_NON_LOOPED_AT_COORD, "scr_fbi4_trucks_crash", GTA.Game.Player.Character.Position.X, GTA.Game.Player.Character.Position.Y, GTA.Game.Player.Character.Position.Z + 4f, 0, 0, 0, 5.5f, 0, 0, 0);
 	static int START_PARTICLE_FX_NON_LOOPED_AT_COORD(const char* effectName, float xPos, float yPos, float zPos, float xRot, float yRot, float zRot, float scale, BOOL xAxis, BOOL yAxis, BOOL zAxis) { return invoke<int>(0x25129531F77B9ED3, effectName, xPos, yPos, zPos, xRot, yRot, zRot, scale, xAxis, yAxis, zAxis); } // 0x25129531F77B9ED3 0xDD79D679 b323
+	// Full list of particle effect dictionaries and effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/particleEffectsCompact.json
 	static BOOL START_NETWORKED_PARTICLE_FX_NON_LOOPED_AT_COORD(const char* effectName, float xPos, float yPos, float zPos, float xRot, float yRot, float zRot, float scale, BOOL xAxis, BOOL yAxis, BOOL zAxis, BOOL p11) { return invoke<BOOL>(0xF56B8137DF10135D, effectName, xPos, yPos, zPos, xRot, yRot, zRot, scale, xAxis, yAxis, zAxis, p11); } // 0xF56B8137DF10135D 0x633F8C48 b323
 	// GRAPHICS::START_PARTICLE_FX_NON_LOOPED_ON_PED_BONE("scr_sh_bong_smoke", PLAYER::PLAYER_PED_ID(), -0.025f, 0.13f, 0f, 0f, 0f, 0f, 31086, 0x3F800000, 0, 0, 0);
 	// 
 	// Axis - Invert Axis Flags
 	// 
-	// list: pastebin.com/N9unUFWY
+	// Full list of particle effect dictionaries and effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/particleEffectsCompact.json
 	static BOOL START_PARTICLE_FX_NON_LOOPED_ON_PED_BONE(const char* effectName, Ped ped, float offsetX, float offsetY, float offsetZ, float rotX, float rotY, float rotZ, int boneIndex, float scale, BOOL axisX, BOOL axisY, BOOL axisZ) { return invoke<BOOL>(0x0E7E72961BA18619, effectName, ped, offsetX, offsetY, offsetZ, rotX, rotY, rotZ, boneIndex, scale, axisX, axisY, axisZ); } // 0x0E7E72961BA18619 0x53DAEF4E b323
+	// Full list of particle effect dictionaries and effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/particleEffectsCompact.json
 	static BOOL START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_PED_BONE(const char* effectName, Ped ped, float offsetX, float offsetY, float offsetZ, float rotX, float rotY, float rotZ, int boneIndex, float scale, BOOL axisX, BOOL axisY, BOOL axisZ) { return invoke<BOOL>(0xA41B6A43642AC2CF, effectName, ped, offsetX, offsetY, offsetZ, rotX, rotY, rotZ, boneIndex, scale, axisX, axisY, axisZ); } // 0xA41B6A43642AC2CF 0x161780C1 b323
 	// Starts a particle effect on an entity for example your player.
-	// List: pastebin.com/N9unUFWY
+	// 
+	// Full list of particle effect dictionaries and effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/particleEffectsCompact.json
 	// 
 	// Example:
 	// C#:
@@ -3281,8 +3432,10 @@ namespace GRAPHICS {
 	// 
 	// -can confirm START_PARTICLE_FX_NON_LOOPED_ON_PED_BONE does NOT work on vehicle bones.
 	static BOOL START_PARTICLE_FX_NON_LOOPED_ON_ENTITY(const char* effectName, Entity entity, float offsetX, float offsetY, float offsetZ, float rotX, float rotY, float rotZ, float scale, BOOL axisX, BOOL axisY, BOOL axisZ) { return invoke<BOOL>(0x0D53A3B8DA0809D2, effectName, entity, offsetX, offsetY, offsetZ, rotX, rotY, rotZ, scale, axisX, axisY, axisZ); } // 0x0D53A3B8DA0809D2 0x9604DAD4 b323
+	// Full list of particle effect dictionaries and effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/particleEffectsCompact.json
 	static BOOL START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_ENTITY(const char* effectName, Entity entity, float offsetX, float offsetY, float offsetZ, float rotX, float rotY, float rotZ, float scale, BOOL axisX, BOOL axisY, BOOL axisZ) { return invoke<BOOL>(0xC95EB1DB6E92113D, effectName, entity, offsetX, offsetY, offsetZ, rotX, rotY, rotZ, scale, axisX, axisY, axisZ); } // 0xC95EB1DB6E92113D 0x469A2B4A b323
-	// only works on some fx's
+	static BOOL _START_NETWORKED_PARTICLE_FX_NON_LOOPED_ON_ENTITY_BONE(const char* effectName, Entity entity, float offsetX, float offsetY, float offsetZ, float rotX, float rotY, float rotZ, int boneIndex, float scale, BOOL axisX, BOOL axisY, BOOL axisZ) { return invoke<BOOL>(0x02B1F2A72E0F5325, effectName, entity, offsetX, offsetY, offsetZ, rotX, rotY, rotZ, boneIndex, scale, axisX, axisY, axisZ); } // 0x02B1F2A72E0F5325 b2189
+	// only works on some fx's, not networked
 	static void SET_PARTICLE_FX_NON_LOOPED_COLOUR(float r, float g, float b) { invoke<Void>(0x26143A59EF48B262, r, g, b); } // 0x26143A59EF48B262 0x7B689E20 b323
 	// Usage example for C#:
 	// 
@@ -3298,12 +3451,18 @@ namespace GRAPHICS {
 	// 
 	// 
 	// p11 seems to be always 0
+	// 
+	// Full list of particle effect dictionaries and effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/particleEffectsCompact.json
 	static int START_PARTICLE_FX_LOOPED_AT_COORD(const char* effectName, float x, float y, float z, float xRot, float yRot, float zRot, float scale, BOOL xAxis, BOOL yAxis, BOOL zAxis, BOOL p11) { return invoke<int>(0xE184F4F0DC5910E7, effectName, x, y, z, xRot, yRot, zRot, scale, xAxis, yAxis, zAxis, p11); } // 0xE184F4F0DC5910E7 0xD348E3E6 b323
+	// Full list of particle effect dictionaries and effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/particleEffectsCompact.json
 	static int START_PARTICLE_FX_LOOPED_ON_PED_BONE(const char* effectName, Ped ped, float xOffset, float yOffset, float zOffset, float xRot, float yRot, float zRot, int boneIndex, float scale, BOOL xAxis, BOOL yAxis, BOOL zAxis) { return invoke<int>(0xF28DA9F38CD1787C, effectName, ped, xOffset, yOffset, zOffset, xRot, yRot, zRot, boneIndex, scale, xAxis, yAxis, zAxis); } // 0xF28DA9F38CD1787C 0xF8FC196F b323
-	// list: pastebin.com/N9unUFWY
+	// Full list of particle effect dictionaries and effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/particleEffectsCompact.json
 	static int START_PARTICLE_FX_LOOPED_ON_ENTITY(const char* effectName, Entity entity, float xOffset, float yOffset, float zOffset, float xRot, float yRot, float zRot, float scale, BOOL xAxis, BOOL yAxis, BOOL zAxis) { return invoke<int>(0x1AE42C1660FD6517, effectName, entity, xOffset, yOffset, zOffset, xRot, yRot, zRot, scale, xAxis, yAxis, zAxis); } // 0x1AE42C1660FD6517 0x0D06FF62 b323
+	// Full list of particle effect dictionaries and effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/particleEffectsCompact.json
 	static int START_PARTICLE_FX_LOOPED_ON_ENTITY_BONE(const char* effectName, Entity entity, float xOffset, float yOffset, float zOffset, float xRot, float yRot, float zRot, int boneIndex, float scale, BOOL xAxis, BOOL yAxis, BOOL zAxis) { return invoke<int>(0xC6EB449E33977F0B, effectName, entity, xOffset, yOffset, zOffset, xRot, yRot, zRot, boneIndex, scale, xAxis, yAxis, zAxis); } // 0xC6EB449E33977F0B 0x23BF0F9B b323
+	// Full list of particle effect dictionaries and effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/particleEffectsCompact.json
 	static int START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY(const char* effectName, Entity entity, float xOffset, float yOffset, float zOffset, float xRot, float yRot, float zRot, float scale, BOOL xAxis, BOOL yAxis, BOOL zAxis, Any p12, Any p13, Any p14, Any p15) { return invoke<int>(0x6F60E89A7B64EE1D, effectName, entity, xOffset, yOffset, zOffset, xRot, yRot, zRot, scale, xAxis, yAxis, zAxis, p12, p13, p14, p15); } // 0x6F60E89A7B64EE1D 0x110752B2 b323
+	// Full list of particle effect dictionaries and effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/particleEffectsCompact.json
 	static int START_NETWORKED_PARTICLE_FX_LOOPED_ON_ENTITY_BONE(const char* effectName, Entity entity, float xOffset, float yOffset, float zOffset, float xRot, float yRot, float zRot, int boneIndex, float scale, BOOL xAxis, BOOL yAxis, BOOL zAxis, Any p13, Any p14, Any p15, Any p16) { return invoke<int>(0xDDE23F30CC5A0F03, effectName, entity, xOffset, yOffset, zOffset, xRot, yRot, zRot, boneIndex, scale, xAxis, yAxis, zAxis, p13, p14, p15, p16); } // 0xDDE23F30CC5A0F03 0xF478EFCF b323
 	// p1 is always 0 in the native scripts
 	static void STOP_PARTICLE_FX_LOOPED(int ptfxHandle, BOOL p1) { invoke<Void>(0x8F75998877616996, ptfxHandle, p1); } // 0x8F75998877616996 0xD245455B b323
@@ -3326,23 +3485,27 @@ namespace GRAPHICS {
 	static void SET_PARTICLE_FX_SHOOTOUT_BOAT(Any p0) { invoke<Void>(0x96EF97DAEB89BEF5, p0); } // 0x96EF97DAEB89BEF5 0xD938DEE0 b323
 	static void _0x2A251AA48B2B46DB() { invoke<Void>(0x2A251AA48B2B46DB); } // 0x2A251AA48B2B46DB b323
 	static void _0x908311265D42A820(Any p0) { invoke<Void>(0x908311265D42A820, p0); } // 0x908311265D42A820 b323
+	static void _0xCFD16F0DB5A3535C(BOOL toggle) { invoke<Void>(0xCFD16F0DB5A3535C, toggle); } // 0xCFD16F0DB5A3535C b2060
 	// DISABLE_*
 	static void _0x5F6DF3D92271E8A1(BOOL toggle) { invoke<Void>(0x5F6DF3D92271E8A1, toggle); } // 0x5F6DF3D92271E8A1 0x18136DE0 b323
 	static void _0x2B40A97646381508(Any p0) { invoke<Void>(0x2B40A97646381508, p0); } // 0x2B40A97646381508 b1011
 	// Creates cartoon effect when Michel smokes the weed
 	static void ENABLE_CLOWN_BLOOD_VFX(BOOL toggle) { invoke<Void>(0xD821490579791273, toggle); } // 0xD821490579791273 0xC61C75E9 b323
+	// Creates a motion-blur sort of effect, this native does not seem to work, however by using the `START_SCREEN_EFFECT` native with `DrugsMichaelAliensFight` as the effect parameter, you should be able to get the effect.
 	static void ENABLE_ALIEN_BLOOD_VFX(BOOL toggle) { invoke<Void>(0x9DCE1F0F78260875, toggle); } // 0x9DCE1F0F78260875 0xCE8B8748 b323
-	static void _0x27E32866E9A5C416(float p0) { invoke<Void>(0x27E32866E9A5C416, p0); } // 0x27E32866E9A5C416 b323
-	static void _0xBB90E12CAC1DAB25(float p0) { invoke<Void>(0xBB90E12CAC1DAB25, p0); } // 0xBB90E12CAC1DAB25 b323
-	static void _0xCA4AE345A153D573(BOOL p0) { invoke<Void>(0xCA4AE345A153D573, p0); } // 0xCA4AE345A153D573 b323
-	static void _0x54E22EA2C1956A8D(float p0) { invoke<Void>(0x54E22EA2C1956A8D, p0); } // 0x54E22EA2C1956A8D b323
-	static void _0x949F397A288B28B3(float p0) { invoke<Void>(0x949F397A288B28B3, p0); } // 0x949F397A288B28B3 b323
+	static void SET_PARTICLE_FX_BULLET_IMPACT_SCALE(float scale) { invoke<Void>(0x27E32866E9A5C416, scale); } // 0x27E32866E9A5C416 0xC1AD5DDF b323
+	static void _0xBB90E12CAC1DAB25(float p0) { invoke<Void>(0xBB90E12CAC1DAB25, p0); } // 0xBB90E12CAC1DAB25 0x3968E915 b323
+	static void _0xCA4AE345A153D573(BOOL p0) { invoke<Void>(0xCA4AE345A153D573, p0); } // 0xCA4AE345A153D573 0x64BA4648 b323
+	static void _0x54E22EA2C1956A8D(float p0) { invoke<Void>(0x54E22EA2C1956A8D, p0); } // 0x54E22EA2C1956A8D 0x8BE3D47F b323
+	static void _0x949F397A288B28B3(float p0) { invoke<Void>(0x949F397A288B28B3, p0); } // 0x949F397A288B28B3 0xE3880F5A b323
 	// SET_PARTICLE_FX_*
+	// 
+	// Full list of particle effect dictionaries and effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/particleEffectsCompact.json
 	static void _0xBA3D194057C79A7B(const char* p0) { invoke<Void>(0xBA3D194057C79A7B, p0); } // 0xBA3D194057C79A7B b877
 	static void _0x5DBF05DB5926D089(Any p0) { invoke<Void>(0x5DBF05DB5926D089, p0); } // 0x5DBF05DB5926D089 b1011
 	// FORCE_*
-	static void _0x9B079E5221D984D3(BOOL p0) { invoke<Void>(0x9B079E5221D984D3, p0); } // 0x9B079E5221D984D3 b323
-	//  From the b678d decompiled scripts:
+	static void _0x9B079E5221D984D3(BOOL p0) { invoke<Void>(0x9B079E5221D984D3, p0); } // 0x9B079E5221D984D3 0x447A9EB9 b323
+	// From the b678d decompiled scripts:
 	// 
 	//  GRAPHICS::_SET_PTFX_ASSET_NEXT_CALL("FM_Mission_Controler");
 	//  GRAPHICS::_SET_PTFX_ASSET_NEXT_CALL("scr_apartment_mp");
@@ -3351,9 +3514,14 @@ namespace GRAPHICS {
 	//  GRAPHICS::_SET_PTFX_ASSET_NEXT_CALL("scr_mp_creator");
 	//  GRAPHICS::_SET_PTFX_ASSET_NEXT_CALL("scr_ornate_heist");
 	//  GRAPHICS::_SET_PTFX_ASSET_NEXT_CALL("scr_prison_break_heist_station");
+	// 
+	// Full list of particle effect dictionaries and effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/particleEffectsCompact.json
 	static void USE_PARTICLE_FX_ASSET(const char* name) { invoke<Void>(0x6C38AF3693A69A91, name); } // 0x6C38AF3693A69A91 0x9C720B61 b323
+	// Full list of particle effect dictionaries and effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/particleEffectsCompact.json
 	static void SET_PARTICLE_FX_OVERRIDE(const char* oldAsset, const char* newAsset) { invoke<Void>(0xEA1E2D93F6F75ED9, oldAsset, newAsset); } // 0xEA1E2D93F6F75ED9 0xC92719A7 b323
 	// Resets the effect of SET_PARTICLE_FX_OVERRIDE
+	// 
+	// Full list of particle effect dictionaries and effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/particleEffectsCompact.json
 	static void RESET_PARTICLE_FX_OVERRIDE(const char* name) { invoke<Void>(0x89C8553DD3274AAE, name); } // 0x89C8553DD3274AAE 0x9E8D8B72 b323
 	static void _0xA46B73FAA3460AE1(BOOL p0) { invoke<Void>(0xA46B73FAA3460AE1, p0); } // 0xA46B73FAA3460AE1 b323
 	static void _0xF78B803082D4386F(float p0) { invoke<Void>(0xF78B803082D4386F, p0); } // 0xF78B803082D4386F b323
@@ -3424,7 +3592,7 @@ namespace GRAPHICS {
 	//     liquidTrail_water = 9050
 	// }
 	static int ADD_DECAL(int decalType, float posX, float posY, float posZ, float p4, float p5, float p6, float p7, float p8, float p9, float width, float height, float rCoef, float gCoef, float bCoef, float opacity, float timeout, BOOL p17, BOOL p18, BOOL p19) { return invoke<int>(0xB302244A1839BDAD, decalType, posX, posY, posZ, p4, p5, p6, p7, p8, p9, width, height, rCoef, gCoef, bCoef, opacity, timeout, p17, p18, p19); } // 0xB302244A1839BDAD 0xEAD0C412 b323
-	static Any ADD_PETROL_DECAL(float x, float y, float z, float groundLvl, float width, float transparency) { return invoke<Any>(0x4F5212C7AD880DF8, x, y, z, groundLvl, width, transparency); } // 0x4F5212C7AD880DF8 0x1259DF42 b323
+	static int ADD_PETROL_DECAL(float x, float y, float z, float groundLvl, float width, float transparency) { return invoke<int>(0x4F5212C7AD880DF8, x, y, z, groundLvl, width, transparency); } // 0x4F5212C7AD880DF8 0x1259DF42 b323
 	static void START_PETROL_TRAIL_DECALS(float p0) { invoke<Void>(0x99AC7F0D8B9C893D, p0); } // 0x99AC7F0D8B9C893D 0xE3938B0B b323
 	static void ADD_PETROL_TRAIL_DECAL_INFO(float x, float y, float z, float p3) { invoke<Void>(0x967278682CB6967A, x, y, z, p3); } // 0x967278682CB6967A 0xBAEC6ADD b323
 	static void END_PETROL_TRAIL_DECALS() { invoke<Void>(0x0A123435A26C36CD); } // 0x0A123435A26C36CD 0xCCCA6855 b323
@@ -3433,11 +3601,12 @@ namespace GRAPHICS {
 	static float GET_DECAL_WASH_LEVEL(int decal) { return invoke<float>(0x323F647679A09103, decal); } // 0x323F647679A09103 0x054448EF b323
 	static void _0xD9454B5752C857DC() { invoke<Void>(0xD9454B5752C857DC); } // 0xD9454B5752C857DC 0xEAB6417C b323
 	static void _0x27CFB1B1E078CB2D() { invoke<Void>(0x27CFB1B1E078CB2D); } // 0x27CFB1B1E078CB2D 0xC2703B88 b323
-	static void _0x4B5CFC83122DF602() { invoke<Void>(0x4B5CFC83122DF602); } // 0x4B5CFC83122DF602 0xA706E84D b323
+	static void SET_DISABLE_DECAL_RENDERING_THIS_FRAME() { invoke<Void>(0x4B5CFC83122DF602); } // 0x4B5CFC83122DF602 0xA706E84D b323
 	static BOOL GET_IS_PETROL_DECAL_IN_RANGE(float xCoord, float yCoord, float zCoord, float radius) { return invoke<BOOL>(0x2F09F7976C512404, xCoord, yCoord, zCoord, radius); } // 0x2F09F7976C512404 0x242C6A04 b323
-	static void _OVERRIDE_DECAL_TEXTURE(int decalType, const char* textureDict, const char* textureName) { invoke<Void>(0x8A35C742130C6080, decalType, textureDict, textureName); } // 0x8A35C742130C6080 0x335695CF b323
-	// UN*
-	static void _UNDO_DECAL_TEXTURE_OVERRIDE(int decalType) { invoke<Void>(0xB7ED70C49521A61D, decalType); } // 0xB7ED70C49521A61D 0x7B786555 b323
+	// Old name: _OVERRIDE_DECAL_TEXTURE
+	static void PATCH_DECAL_DIFFUSE_MAP(int decalType, const char* textureDict, const char* textureName) { invoke<Void>(0x8A35C742130C6080, decalType, textureDict, textureName); } // 0x8A35C742130C6080 0x335695CF b323
+	// Old name: _UNDO_DECAL_TEXTURE_OVERRIDE
+	static void UNPATCH_DECAL_DIFFUSE_MAP(int decalType) { invoke<Void>(0xB7ED70C49521A61D, decalType); } // 0xB7ED70C49521A61D 0x7B786555 b323
 	static void MOVE_VEHICLE_DECALS(Any p0, Any p1) { invoke<Void>(0x84C8D7C2D30D3280, p0, p1); } // 0x84C8D7C2D30D3280 0xCE9E6CF2 b323
 	// boneIndex is always chassis_dummy in the scripts. The x/y/z params are location relative to the chassis bone.
 	static BOOL ADD_VEHICLE_CREW_EMBLEM(Vehicle vehicle, Ped ped, int boneIndex, float x1, float x2, float x3, float y1, float y2, float y3, float z1, float z2, float z3, float scale, Any p13, int alpha) { return invoke<BOOL>(0x428BDCB9DA58DA53, vehicle, ped, boneIndex, x1, x2, x3, y1, y2, y3, z1, z2, z3, scale, p13, alpha); } // 0x428BDCB9DA58DA53 0x12077738 b323
@@ -3476,10 +3645,10 @@ namespace GRAPHICS {
 	// Parameters:
 	// modifierName - The modifier to load (e.g. "V_FIB_IT3", "scanline_cam", etc.)
 	// 
-	// For a full list, see here: pastebin.com/kVPwMemE
+	// Full list of timecycle modifiers by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/timecycleModifiers.json
 	static void SET_TIMECYCLE_MODIFIER(const char* modifierName) { invoke<Void>(0x2C933ABF17A1DF41, modifierName); } // 0x2C933ABF17A1DF41 0xA81F3638 b323
 	static void SET_TIMECYCLE_MODIFIER_STRENGTH(float strength) { invoke<Void>(0x82E7FFCD5B2326B3, strength); } // 0x82E7FFCD5B2326B3 0x458F4F45 b323
-	// For a full list, see here: pastebin.com/kVPwMemE
+	// Full list of timecycle modifiers by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/timecycleModifiers.json
 	static void SET_TRANSITION_TIMECYCLE_MODIFIER(const char* modifierName, float transition) { invoke<Void>(0x3BCF567485E1971C, modifierName, transition); } // 0x3BCF567485E1971C 0xBB2BA72A b323
 	// SET_TRA*
 	static void _0x1CBA05AE7BD7EE05(float p0) { invoke<Void>(0x1CBA05AE7BD7EE05, p0); } // 0x1CBA05AE7BD7EE05 0x56345F6B b323
@@ -3498,15 +3667,21 @@ namespace GRAPHICS {
 	static void SET_PLAYER_TCMODIFIER_TRANSITION(float value) { invoke<Void>(0xBDEB86F4D5809204, value); } // 0xBDEB86F4D5809204 0x9559BB38 b323
 	static void SET_NEXT_PLAYER_TCMODIFIER(const char* modifierName) { invoke<Void>(0xBF59707B3E5ED531, modifierName); } // 0xBF59707B3E5ED531 0x554BA16E b323
 	static void ADD_TCMODIFIER_OVERRIDE(const char* modifierName1, const char* modifierName2) { invoke<Void>(0x1A8E2C8B9CF4549C, modifierName1, modifierName2); } // 0x1A8E2C8B9CF4549C 0xE8F538B5 b323
-	// CLEAR_A*
-	static void _0x15E33297C3E8DC60(const char* p0) { invoke<Void>(0x15E33297C3E8DC60, p0); } // 0x15E33297C3E8DC60 0x805BAB08 b323
+	static void REMOVE_TCMODIFIER_OVERRIDE(const char* p0) { invoke<Void>(0x15E33297C3E8DC60, p0); } // 0x15E33297C3E8DC60 0x805BAB08 b323
+	// Full list of timecycle modifiers by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/timecycleModifiers.json
 	static void _SET_EXTRA_TIMECYCLE_MODIFIER(const char* modifierName) { invoke<Void>(0x5096FD9CCB49056D, modifierName); } // 0x5096FD9CCB49056D 0x908A335E b323
+	// Clears the secondary timecycle modifier usually set with _SET_EXTRA_TIMECYCLE_MODIFIER
 	static void _CLEAR_EXTRA_TIMECYCLE_MODIFIER() { invoke<Void>(0x92CCC17A7A2285DA); } // 0x92CCC17A7A2285DA 0x6776720A b323
+	// See _0xFDF3D97C674AFB66 for use, works the same just for the secondary timecycle modifier.
+	// Returns an integer representing the Timecycle modifier
 	static int _GET_EXTRA_TIMECYCLE_MODIFIER_INDEX() { return invoke<int>(0xBB0527EC6341496D); } // 0xBB0527EC6341496D b323
 	// ENABLE_*
+	// The same as SET_TIMECYCLE_MODIFIER_STRENGTH but for the secondary timecycle modifier.
 	static void _SET_EXTRA_TIMECYCLE_MODIFIER_STRENGTH(float strength) { invoke<Void>(0x2C328AF17210F009, strength); } // 0x2C328AF17210F009 b323
+	// Resets the extra timecycle modifier strength normally set with 0x2C328AF17210F009
 	static void _RESET_EXTRA_TIMECYCLE_MODIFIER_STRENGTH() { invoke<Void>(0x2BF72AD5B41AA739); } // 0x2BF72AD5B41AA739 b323
 	static int REQUEST_SCALEFORM_MOVIE(const char* scaleformName) { return invoke<int>(0x11FE353CF9733E6F, scaleformName); } // 0x11FE353CF9733E6F 0xC67E3DCB b323
+	// Another REQUEST_SCALEFORM_MOVIE equivalent.
 	static int _REQUEST_SCALEFORM_MOVIE_2(const char* scaleformName) { return invoke<int>(0x65E7E78842E74CDB, scaleformName); } // 0x65E7E78842E74CDB b372
 	static int REQUEST_SCALEFORM_MOVIE_INSTANCE(const char* scaleformName) { return invoke<int>(0xC514489CFB8AF806, scaleformName); } // 0xC514489CFB8AF806 0x7CC8057D b323
 	// Similar to REQUEST_SCALEFORM_MOVIE, but seems to be some kind of "interactive" scaleform movie?
@@ -3522,8 +3697,11 @@ namespace GRAPHICS {
 	// 
 	static int _REQUEST_SCALEFORM_MOVIE_INTERACTIVE(const char* scaleformName) { return invoke<int>(0xBD06C611BB9048C2, scaleformName); } // 0xBD06C611BB9048C2 b323
 	static BOOL HAS_SCALEFORM_MOVIE_LOADED(int scaleformHandle) { return invoke<BOOL>(0x85F01B8D5B90570E, scaleformHandle); } // 0x85F01B8D5B90570E 0xDDFB6448 b323
-	static Any _0x2FCB133CA50A49EB(Any p0) { return invoke<Any>(0x2FCB133CA50A49EB, p0); } // 0x2FCB133CA50A49EB b1290
-	static Any _0x86255B1FC929E33E(Any p0) { return invoke<Any>(0x86255B1FC929E33E, p0); } // 0x86255B1FC929E33E b1290
+	// val is 1-20 (0 will return false)
+	// SET_???
+	static BOOL _0x2FCB133CA50A49EB(int val) { return invoke<BOOL>(0x2FCB133CA50A49EB, val); } // 0x2FCB133CA50A49EB b1290
+	// val is 1-20. Return is related to INSTRUCTIONAL_BUTTONS, COLOUR_SWITCHER_02, etc?
+	static BOOL _0x86255B1FC929E33E(int val) { return invoke<BOOL>(0x86255B1FC929E33E, val); } // 0x86255B1FC929E33E b1290
 	// Only values used in the scripts are:
 	// 
 	// "heist_mp"
@@ -3535,7 +3713,8 @@ namespace GRAPHICS {
 	static void SET_SCALEFORM_MOVIE_AS_NO_LONGER_NEEDED(int* scaleformHandle) { invoke<Void>(0x1D132D614DD86811, scaleformHandle); } // 0x1D132D614DD86811 0x5FED3BA1 b323
 	static void SET_SCALEFORM_MOVIE_TO_USE_SYSTEM_TIME(int scaleform, BOOL toggle) { invoke<Void>(0x6D8EB211944DCE08, scaleform, toggle); } // 0x6D8EB211944DCE08 0x18C9DE8D b323
 	static void _0x32F34FF7F617643B(Any p0, Any p1) { invoke<Void>(0x32F34FF7F617643B, p0, p1); } // 0x32F34FF7F617643B b573
-	static void _0xE6A9F00D4240B519(Any p0, Any p1) { invoke<Void>(0xE6A9F00D4240B519, p0, p1); } // 0xE6A9F00D4240B519 b877
+	// This native is used in some casino scripts to fit the scaleform in the rendertarget.
+	static void _SET_SCALEFORM_FIT_RENDERTARGET(int scaleformHandle, BOOL toggle) { invoke<Void>(0xE6A9F00D4240B519, scaleformHandle, toggle); } // 0xE6A9F00D4240B519 b877
 	static void DRAW_SCALEFORM_MOVIE(int scaleformHandle, float x, float y, float width, float height, int red, int green, int blue, int alpha, int unk) { invoke<Void>(0x54972ADAF0294A93, scaleformHandle, x, y, width, height, red, green, blue, alpha, unk); } // 0x54972ADAF0294A93 0x48DA6A58 b323
 	// unk is not used so no need
 	static void DRAW_SCALEFORM_MOVIE_FULLSCREEN(int scaleform, int red, int green, int blue, int alpha, int unk) { invoke<Void>(0x0DF606929C105BE1, scaleform, red, green, blue, alpha, unk); } // 0x0DF606929C105BE1 0x7B48E696 b323
@@ -3576,15 +3755,27 @@ namespace GRAPHICS {
 	// Push a function from the Scaleform onto the stack
 	// 
 	static BOOL BEGIN_SCALEFORM_MOVIE_METHOD(int scaleform, const char* methodName) { return invoke<BOOL>(0xF6E48914C7A8694E, scaleform, methodName); } // 0xF6E48914C7A8694E 0x215ABBE8 b323
+	// Starts frontend (pause menu) scaleform movie methods.
+	// This can be used when you want to make custom frontend menus, and customize things like images or text in the menus etc.
+	// Use `BEGIN_SCALEFORM_MOVIE_METHOD_ON_FRONTEND_HEADER` for header scaleform functions.
 	static BOOL BEGIN_SCALEFORM_MOVIE_METHOD_ON_FRONTEND(const char* methodName) { return invoke<BOOL>(0xAB58C27C2E6123C6, methodName); } // 0xAB58C27C2E6123C6 0xF6015178 b323
+	// Starts frontend (pause menu) scaleform movie methods for header options.
+	// Use `BEGIN_SCALEFORM_MOVIE_METHOD_ON_FRONTEND` to customize the content inside the frontend menus.
 	static BOOL BEGIN_SCALEFORM_MOVIE_METHOD_ON_FRONTEND_HEADER(const char* methodName) { return invoke<BOOL>(0xB9449845F73F5E9C, methodName); } // 0xB9449845F73F5E9C 0x5E219B67 b323
 	// Pops and calls the Scaleform function on the stack
 	static void END_SCALEFORM_MOVIE_METHOD() { invoke<Void>(0xC6796A8FFA375E53); } // 0xC6796A8FFA375E53 0x02DBF2D7 b323
 	static Any END_SCALEFORM_MOVIE_METHOD_RETURN_VALUE() { return invoke<Any>(0xC50AA39A577AF886); } // 0xC50AA39A577AF886 0x2F38B526 b323
-	static BOOL IS_SCALEFORM_MOVIE_METHOD_RETURN_VALUE_READY(Any returnValueData) { return invoke<BOOL>(0x768FF8961BA904D6, returnValueData); } // 0x768FF8961BA904D6 0x5CD7C3C0 b323
-	static int GET_SCALEFORM_MOVIE_METHOD_RETURN_VALUE_INT(Any returnValueData) { return invoke<int>(0x2DE7EFA66B906036, returnValueData); } // 0x2DE7EFA66B906036 0x2CFB0E6D b323
-	static BOOL _GET_SCALEFORM_MOVIE_METHOD_RETURN_VALUE_BOOL(Any returnValueData) { return invoke<BOOL>(0xD80A80346A45D761, returnValueData); } // 0xD80A80346A45D761 b757
-	static const char* GET_SCALEFORM_MOVIE_METHOD_RETURN_VALUE_STRING(Any returnValueData) { return invoke<const char*>(0xE1E258829A885245, returnValueData); } // 0xE1E258829A885245 0x516862EB b323
+	// methodReturn: The return value of this native: END_SCALEFORM_MOVIE_METHOD_RETURN_VALUE
+	// Returns true if the return value of a scaleform function is ready to be collected (using GET_SCALEFORM_MOVIE_METHOD_RETURN_VALUE_STRING or GET_SCALEFORM_MOVIE_METHOD_RETURN_VALUE_INT).
+	static BOOL IS_SCALEFORM_MOVIE_METHOD_RETURN_VALUE_READY(int methodReturn) { return invoke<BOOL>(0x768FF8961BA904D6, methodReturn); } // 0x768FF8961BA904D6 0x5CD7C3C0 b323
+	// methodReturn: The return value of this native: END_SCALEFORM_MOVIE_METHOD_RETURN_VALUE
+	// Used to get a return value from a scaleform function. Returns an int in the same way GET_SCALEFORM_MOVIE_METHOD_RETURN_VALUE_STRING returns a string.
+	static int GET_SCALEFORM_MOVIE_METHOD_RETURN_VALUE_INT(int methodReturn) { return invoke<int>(0x2DE7EFA66B906036, methodReturn); } // 0x2DE7EFA66B906036 0x2CFB0E6D b323
+	// methodReturn: The return value of this native: END_SCALEFORM_MOVIE_METHOD_RETURN_VALUE
+	static BOOL _GET_SCALEFORM_MOVIE_METHOD_RETURN_VALUE_BOOL(int methodReturn) { return invoke<BOOL>(0xD80A80346A45D761, methodReturn); } // 0xD80A80346A45D761 b757
+	// methodReturn: The return value of this native: END_SCALEFORM_MOVIE_METHOD_RETURN_VALUE
+	// Used to get a return value from a scaleform function. Returns a string in the same way GET_SCALEFORM_MOVIE_METHOD_RETURN_VALUE_INT returns an int.
+	static const char* GET_SCALEFORM_MOVIE_METHOD_RETURN_VALUE_STRING(int methodReturn) { return invoke<const char*>(0xE1E258829A885245, methodReturn); } // 0xE1E258829A885245 0x516862EB b323
 	// Pushes an integer for the Scaleform function onto the stack.
 	static void SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT(int value) { invoke<Void>(0xC3D0841A0CC546A6, value); } // 0xC3D0841A0CC546A6 0x716777CB b323
 	// Pushes a float for the Scaleform function onto the stack.
@@ -3615,6 +3806,7 @@ namespace GRAPHICS {
 	// Same as END_TEXT_COMMAND_SCALEFORM_STRING but does not perform HTML conversion for text tokens.
 	static void _END_TEXT_COMMAND_SCALEFORM_STRING_2() { invoke<Void>(0xAE4E8157D9ECF087); } // 0xAE4E8157D9ECF087 0x2E80DB52 b323
 	// Same as SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING
+	// Both SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING / _SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING_2 works, but _SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING_2 is usually used for "name" (organisation, players..).
 	static void _SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING_2(const char* string) { invoke<Void>(0x77FE3402004CD1B0, string); } // 0x77FE3402004CD1B0 b573
 	static void SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING(const char* string) { invoke<Void>(0xBA7148484BD90365, string); } // 0xBA7148484BD90365 0x4DAAD55B b323
 	static void SCALEFORM_MOVIE_METHOD_ADD_PARAM_PLAYER_NAME_STRING(const char* string) { invoke<Void>(0xE83A3E3557A56640, string); } // 0xE83A3E3557A56640 0xCCBF0334 b323
@@ -3660,6 +3852,31 @@ namespace GRAPHICS {
 	// }
 	// 
 	static void DRAW_TV_CHANNEL(float xPos, float yPos, float xScale, float yScale, float rotation, int red, int green, int blue, int alpha) { invoke<Void>(0xFDDC2B4ED3C69DF0, xPos, yPos, xScale, yScale, rotation, red, green, blue, alpha); } // 0xFDDC2B4ED3C69DF0 0x8129EF89 b323
+	// Loads specified video sequence into the TV Channel
+	// TV_Channel ranges from 0-2
+	// VideoSequence can be any of the following:
+	// "PL_STD_CNT" CNT Standard Channel
+	// "PL_STD_WZL" Weazel Standard Channel
+	// "PL_LO_CNT"
+	// "PL_LO_WZL"
+	// "PL_SP_WORKOUT"
+	// "PL_SP_INV" - Jay Norris Assassination Mission Fail
+	// "PL_SP_INV_EXP" - Jay Norris Assassination Mission Success
+	// "PL_LO_RS" - Righteous Slaughter Ad
+	// "PL_LO_RS_CUTSCENE" - Righteous Slaughter Cut-scene
+	// "PL_SP_PLSH1_INTRO"
+	// "PL_LES1_FAME_OR_SHAME"
+	// "PL_STD_WZL_FOS_EP2"
+	// "PL_MP_WEAZEL" - Weazel Logo on loop
+	// "PL_MP_CCTV" - Generic CCTV loop
+	// 
+	// Restart:
+	// 0=video sequence continues as normal
+	// 1=sequence restarts from beginning every time that channel is selected
+	// 
+	// 
+	// The above playlists work as intended, and are commonly used, but there are many more playlists, as seen in `tvplaylists.xml`. A pastebin below outlines all playlists, they will be surronded by the name tag I.E. (<Name>PL_STD_CNT</Name> = PL_STD_CNT).
+	// https://pastebin.com/zUzGB6h7
 	static void SET_TV_CHANNEL_PLAYLIST(int tvChannel, const char* playlistName, BOOL restart) { invoke<Void>(0xF7B38B8305F1FE8B, tvChannel, playlistName, restart); } // 0xF7B38B8305F1FE8B 0xB262DE67 b323
 	static void SET_TV_CHANNEL_PLAYLIST_AT_HOUR(int tvChannel, const char* playlistName, int hour) { invoke<Void>(0x2201C576FACAEBE8, tvChannel, playlistName, hour); } // 0x2201C576FACAEBE8 0x78C4DCBE b323
 	static void CLEAR_TV_CHANNEL_PLAYLIST(int tvChannel) { invoke<Void>(0xBEB3D46BB7F043C0, tvChannel); } // 0xBEB3D46BB7F043C0 0xCBE7068F b323
@@ -3686,37 +3903,47 @@ namespace GRAPHICS {
 	static void _0x7A42B2E236E71415() { invoke<Void>(0x7A42B2E236E71415); } // 0x7A42B2E236E71415 0x431AA036 b323
 	// UI3DSCENE_*
 	static void _0x108BE26959A9D9BB(BOOL toggle) { invoke<Void>(0x108BE26959A9D9BB, toggle); } // 0x108BE26959A9D9BB 0x24A7A7F6 b323
+	// This native enables/disables the gold putting grid display (https://i.imgur.com/TC6cku6.png).
+	// This requires these two natives to be called as well to configure the grid: `0x1c4fc5752bcd8e48` and `0x5ce62918f8d703c7`.
 	static void TERRAINGRID_ACTIVATE(BOOL toggle) { invoke<Void>(0xA356990E161C9E65, toggle); } // 0xA356990E161C9E65 0xA1CB6C94 b323
+	// This native is used along with these two natives: `0xa356990e161c9e65` and `0x5ce62918f8d703c7`.
+	// This native configures the location, size, rotation, normal height, and the difference ratio between min, normal and max.
+	// 
+	// All those natives combined they will output something like this: https://i.imgur.com/TC6cku6.png
 	static void TERRAINGRID_SET_PARAMS(float x, float y, float z, float p3, float rotation, float p5, float width, float height, float p8, float scale, float glowIntensity, float normalHeight, float heightDiff) { invoke<Void>(0x1C4FC5752BCD8E48, x, y, z, p3, rotation, p5, width, height, p8, scale, glowIntensity, normalHeight, heightDiff); } // 0x1C4FC5752BCD8E48 0x3B637AA7 b323
+	// This native is used along with these two natives: `0xa356990e161c9e65` and `0x1c4fc5752bcd8e48`.
+	// This native sets the colors for the golf putting grid. the 'min...' values are for the lower areas that the grid covers, the 'max...' values are for the higher areas that the grid covers, all remaining values are for the 'normal' ground height.
+	// All those natives combined they will output something like this: https://i.imgur.com/TC6cku6.png
 	static void TERRAINGRID_SET_COLOURS(int lowR, int lowG, int lowB, int lowAlpha, int r, int g, int b, int alpha, int highR, int highG, int highB, int highAlpha) { invoke<Void>(0x5CE62918F8D703C7, lowR, lowG, lowB, lowAlpha, r, g, b, alpha, highR, highG, highB, highAlpha); } // 0x5CE62918F8D703C7 0xDF552973 b323
-	// playLength - is how long to play the effect for in milliseconds. If 0, it plays the default length
-	// if loop is true, the effect wont stop until you call _STOP_SCREEN_EFFECT on it. (only loopable effects)
+	// duration - is how long to play the effect for in milliseconds. If 0, it plays the default length
+	// if loop is true, the effect won't stop until you call ANIMPOSTFX_STOP on it. (only loopable effects)
 	// 
-	// Example and list of screen FX: www.pastebin.com/dafBAjs0
-	// 
+	// Full list of animpostFX / screen effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animPostFxNamesCompact.json
 	static void ANIMPOSTFX_PLAY(const char* effectName, int duration, BOOL looped) { invoke<Void>(0x2206BF9A37B7F724, effectName, duration, looped); } // 0x2206BF9A37B7F724 0x1D980479 b323
-	// Example and list of screen FX: www.pastebin.com/dafBAjs0
+	// See ANIMPOSTFX_PLAY
+	// 
+	// Full list of animpostFX / screen effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animPostFxNamesCompact.json
 	static void ANIMPOSTFX_STOP(const char* effectName) { invoke<Void>(0x068E835A1D0DC0E3, effectName); } // 0x068E835A1D0DC0E3 0x06BB5CDA b323
+	// See ANIMPOSTFX_PLAY
+	// 
+	// Full list of animpostFX / screen effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animPostFxNamesCompact.json
 	static float _ANIMPOSTFX_GET_UNK(const char* effectName) { return invoke<float>(0xE35B38A27E8E7179, effectName); } // 0xE35B38A27E8E7179 b877
-	// Returns whether the specified screen effect is active.
-	// See the effects list in _START_SCREEN_EFFECT
+	// Returns whether the specified effect is active.
+	// See ANIMPOSTFX_PLAY
 	// 
-	// Example and list of screen FX: www.pastebin.com/dafBAjs0
+	// Full list of animpostFX / screen effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animPostFxNamesCompact.json
 	static BOOL ANIMPOSTFX_IS_RUNNING(const char* effectName) { return invoke<BOOL>(0x36AD3E690DA5ACEB, effectName); } // 0x36AD3E690DA5ACEB 0x089D5921 b323
+	// Stops ALL currently playing effects.
 	static void ANIMPOSTFX_STOP_ALL() { invoke<Void>(0xB4EDDC19532BFB85); } // 0xB4EDDC19532BFB85 0x4E6D875B b323
-	// "SwitchHUDFranklinOut",
-	// "SwitchHUDMichaelOut",
-	// "SwitchHUDOut",
-	// "SwitchHUDTrevorOut",
-	// "SwitchOpenFranklinOut",
-	// "SwitchOpenMichaelIn",
-	// "SwitchOpenNeutral"
-	// 
 	// Stops the effect and sets a value (bool) in its data (+0x199) to false.
+	// See ANIMPOSTFX_PLAY
+	// 
+	// Full list of animpostFX / screen effects by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animPostFxNamesCompact.json
 	static void _ANIMPOSTFX_STOP_AND_DO_UNK(const char* effectName) { invoke<Void>(0xD2209BE128B5418C, effectName); } // 0xD2209BE128B5418C b323
 }
 
-namespace HUD {
+namespace HUD
+{
 	// Initializes the text entry for the the text next to a loading prompt. All natives for building UI texts can be used here
 	// 
 	// 
@@ -3777,27 +4004,35 @@ namespace HUD {
 	// 6 = Left Arrow
 	// 7 = Right Arrow
 	static void _SET_MOUSE_CURSOR_SPRITE(int spriteId) { invoke<Void>(0x8DB8CFFD58B62552, spriteId); } // 0x8DB8CFFD58B62552 b323
-	static void _0x98215325A695E78A(BOOL p0) { invoke<Void>(0x98215325A695E78A, p0); } // 0x98215325A695E78A b323
+	// Shows/hides the frontend cursor on the pause menu or similar menus.
+	// Clicking off and then on the game window will show it again.
+	static void _SET_MOUSE_CURSOR_VISIBLE_IN_MENUS(BOOL toggle) { invoke<Void>(0x98215325A695E78A, toggle); } // 0x98215325A695E78A b323
 	static Any _0x3D9ACB1EB139E702() { return invoke<Any>(0x3D9ACB1EB139E702); } // 0x3D9ACB1EB139E702 b323
 	static BOOL _0x632B2940C67F4EA9(int scaleformHandle, Any* p1, Any* p2, Any* p3) { return invoke<BOOL>(0x632B2940C67F4EA9, scaleformHandle, p1, p2, p3); } // 0x632B2940C67F4EA9 b323
 	static void THEFEED_ONLY_SHOW_TOOLTIPS(BOOL toggle) { invoke<Void>(0x6F1554B0CC2089FA, toggle); } // 0x6F1554B0CC2089FA 0xA7C8594B b323
 	static void THEFEED_SET_SCRIPTED_MENU_HEIGHT(float pos) { invoke<Void>(0x55598D21339CB998, pos); } // 0x55598D21339CB998 0x1DA7E41A b323
-	static void _THEFEED_DISABLE() { invoke<Void>(0x32888337579A5970); } // 0x32888337579A5970 b463
+	// Stops loading screen tips shown by invoking either `0x488043841BBE156F` or `0x15CFA549788D35EF`
+	static void _THEFEED_DISABLE_LOADING_SCREEN_TIPS() { invoke<Void>(0x32888337579A5970); } // 0x32888337579A5970 b463
+	// Once called each frame hides all above radar notifications.
 	static void THEFEED_HIDE_THIS_FRAME() { invoke<Void>(0x25F87B30C382FCA7); } // 0x25F87B30C382FCA7 0x1E63088A b323
-	static void _0x15CFA549788D35EF() { invoke<Void>(0x15CFA549788D35EF); } // 0x15CFA549788D35EF b463
+	// Displays loading screen tips, requires `0x56C8B608CFD49854` to be called beforehand.
+	static void _THEFEED_DISPLAY_LOADING_SCREEN_TIPS() { invoke<Void>(0x15CFA549788D35EF); } // 0x15CFA549788D35EF b463
 	static void THEFEED_FLUSH_QUEUE() { invoke<Void>(0xA8FDB297A8D25FBA); } // 0xA8FDB297A8D25FBA 0x5205C6F5 b323
 	// Removes a notification instantly instead of waiting for it to disappear
 	static void THEFEED_REMOVE_ITEM(int notificationId) { invoke<Void>(0xBE4390CB40B3E627, notificationId); } // 0xBE4390CB40B3E627 0xECA8ACB9 b323
 	static void THEFEED_FORCE_RENDER_ON() { invoke<Void>(0xA13C11E1B5C06BFC); } // 0xA13C11E1B5C06BFC 0x520FCB6D b323
+	// Enables loading screen tips to be be shown (`_0x15CFA549788D35EF` and `_0x488043841BBE156F`), blocks other kinds of notifications from being displayed (at least from current script). Call `0xADED7F5748ACAFE6` to display those again.
 	static void THEFEED_FORCE_RENDER_OFF() { invoke<Void>(0x583049884A2EEE3C); } // 0x583049884A2EEE3C 0xC8BAB2F2 b323
 	static void THEFEED_PAUSE() { invoke<Void>(0xFDB423997FA30340); } // 0xFDB423997FA30340 0x4D0449C6 b323
 	static void THEFEED_RESUME() { invoke<Void>(0xE1CD1E48E025E661); } // 0xE1CD1E48E025E661 0xD3F40140 b323
 	static BOOL THEFEED_IS_PAUSED() { return invoke<BOOL>(0xA9CBFD40B3FA3010); } // 0xA9CBFD40B3FA3010 0xC5223796 b323
 	static void THEFEED_SPS_EXTEND_WIDESCREEN_ON() { invoke<Void>(0xD4438C0564490E63); } // 0xD4438C0564490E63 0x709B4BCB b323
 	static void THEFEED_SPS_EXTEND_WIDESCREEN_OFF() { invoke<Void>(0xB695E2CD0A2DA9EE); } // 0xB695E2CD0A2DA9EE 0x4A4A40A4 b323
-	// Returns the handle for the notification currently displayed on the screen.
+	// Returns the handle for the notification currently displayed on the screen. Name may be a hash collision, but describes the function accurately.
 	static int THEFEED_GET_FIRST_VISIBLE_DELETE_REMAINING() { return invoke<int>(0x82352748437638CA); } // 0x82352748437638CA 0x294405D4 b323
+	// Enables loading screen tips to be be shown (`_0x15CFA549788D35EF` and `_0x488043841BBE156F`), blocks other kinds of notifications from being displayed (at least from current script). Call `0xADED7F5748ACAFE6` to display those again.
 	static void THEFEED_COMMENT_TELEPORT_POOL_ON() { invoke<Void>(0x56C8B608CFD49854); } // 0x56C8B608CFD49854 0xF881AB87 b323
+	// Displays "normal" notifications again after calling `_0x56C8B608CFD49854` (those that were drawn before calling this native too), though those will have a weird offset and stay on screen forever (tested with notifications created from same script).
 	static void THEFEED_COMMENT_TELEPORT_POOL_OFF() { invoke<Void>(0xADED7F5748ACAFE6); } // 0xADED7F5748ACAFE6 0x1D6859CA b323
 	// From the decompiled scripts:
 	// HUD::_92F0DA1E27DB96DC(6);
@@ -3812,9 +4047,11 @@ namespace HUD {
 	// Here is a list of some colors that can be used: gyazo.com/68bd384455fceb0a85a8729e48216e15
 	static void _THEFEED_SET_NEXT_POST_BACKGROUND_COLOR(int hudColorIndex) { invoke<Void>(0x92F0DA1E27DB96DC, hudColorIndex); } // 0x92F0DA1E27DB96DC 0x07CE2EA4 b323
 	static void _THEFEED_SET_ANIMPOSTFX_COLOR(int red, int green, int blue, int alpha) { invoke<Void>(0x17430B918701C342, red, green, blue, alpha); } // 0x17430B918701C342 0xCF14D7F2 b323
+	// Related to notification color flashing, setting p0 to 0 invalidates a `_SET_NOTIFICATION_FLASH_COLOR` call for the target notification.
 	static void _THEFEED_SET_ANIMPOSTFX_COUNT(int count) { invoke<Void>(0x17AD8C9706BDD88A, count); } // 0x17AD8C9706BDD88A 0x24A97AF8 b323
 	static void _THEFEED_SET_ANIMPOSTFX_SOUND(BOOL toggle) { invoke<Void>(0x4A0C7C9BB10ABB36, toggle); } // 0x4A0C7C9BB10ABB36 0x44018EDB b323
 	static void THEFEED_RESET_ALL_PARAMETERS() { invoke<Void>(0xFDD85225B2DEA55E); } // 0xFDD85225B2DEA55E 0xA4524B23 b323
+	// Requires manual management of game stream handles (i.e., 0xBE4390CB40B3E627).
 	static void THEFEED_FREEZE_NEXT_POST() { invoke<Void>(0xFDEC055AB549E328); } // 0xFDEC055AB549E328 0xAFA1148B b323
 	static void THEFEED_CLEAR_FROZEN_POST() { invoke<Void>(0x80FE4F3AB4E1B62A); } // 0x80FE4F3AB4E1B62A 0x3CD4307C b323
 	static void _THEFEED_SET_FLUSH_ANIMPOSTFX(BOOL p0) { invoke<Void>(0xBAE4F9B97CD43B30, p0); } // 0xBAE4F9B97CD43B30 b323
@@ -3830,8 +4067,11 @@ namespace HUD {
 	// 	return _DRAW_NOTIFICATION(1, 1);
 	// }
 	static void BEGIN_TEXT_COMMAND_THEFEED_POST(const char* text) { invoke<Void>(0x202709F4C58A0424, text); } // 0x202709F4C58A0424 0x574EE85C b323
-	// List of picNames: pastebin.com/XdpJVbHz
-	static int END_TEXT_COMMAND_THEFEED_POST_STATS(const char* txdName, const char* textureName, BOOL flash, int iconType, BOOL p4, const char* sender, const char* subject) { return invoke<int>(0x2B7E9A4EAAA93C89, txdName, textureName, flash, iconType, p4, sender, subject); } // 0x2B7E9A4EAAA93C89 0xED130FA1 b323
+	// List of picture names: https://pastebin.com/XdpJVbHz
+	// Example result: https://i.imgur.com/SdEZ22m.png
+	static int END_TEXT_COMMAND_THEFEED_POST_STATS(const char* statTitle, int iconEnum, BOOL stepVal, int barValue, BOOL isImportant, const char* pictureTextureDict, const char* pictureTextureName) { return invoke<int>(0x2B7E9A4EAAA93C89, statTitle, iconEnum, stepVal, barValue, isImportant, pictureTextureDict, pictureTextureName); } // 0x2B7E9A4EAAA93C89 0xED130FA1 b323
+	// This function can show pictures of every texture that can be requested by REQUEST_STREAMED_TEXTURE_DICT.
+	// 
 	// List of picNames: pastebin.com/XdpJVbHz
 	// 
 	// 
@@ -3849,18 +4089,24 @@ namespace HUD {
 	// 
 	// "sender" is the very top header. This can be any old string.
 	// "subject" is the header under the sender.
-	static int END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT(const char* picName1, const char* picName2, BOOL flash, int iconType, const char* sender, const char* subject) { return invoke<int>(0x1CCD9A37359072CF, picName1, picName2, flash, iconType, sender, subject); } // 0x1CCD9A37359072CF 0xE7E3C98B b323
+	static int END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT(const char* txdName, const char* textureName, BOOL flash, int iconType, const char* sender, const char* subject) { return invoke<int>(0x1CCD9A37359072CF, txdName, textureName, flash, iconType, sender, subject); } // 0x1CCD9A37359072CF 0xE7E3C98B b323
+	// This function can show pictures of every texture that can be requested by REQUEST_STREAMED_TEXTURE_DICT.
+	// 
 	// Needs more research.
 	// 
 	// Only one type of usage in the scripts:
 	// 
 	// HUD::_C6F580E4C94926AC("CHAR_ACTING_UP", "CHAR_ACTING_UP", 0, 0, "DI_FEED_CHAR", a_0);
-	static int _END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT_GXT_ENTRY(const char* picName1, const char* picName2, BOOL flash, int iconType, const char* sender, const char* subject) { return invoke<int>(0xC6F580E4C94926AC, picName1, picName2, flash, iconType, sender, subject); } // 0xC6F580E4C94926AC b323
+	static int _END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT_GXT_ENTRY(const char* txdName, const char* textureName, BOOL flash, int iconType, const char* sender, const char* subject) { return invoke<int>(0xC6F580E4C94926AC, txdName, textureName, flash, iconType, sender, subject); } // 0xC6F580E4C94926AC b323
+	// This function can show pictures of every texture that can be requested by REQUEST_STREAMED_TEXTURE_DICT.
+	// 
 	// NOTE: 'duration' is a multiplier, so 1.0 is normal, 2.0 is twice as long (very slow), and 0.5 is half as long.
 	// 
 	// Example, only occurrence in the scripts:
 	// v_8 = HUD::_1E6611149DB3DB6B("CHAR_SOCIAL_CLUB", "CHAR_SOCIAL_CLUB", 0, 0, &v_9, "", a_5);
-	static int END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT_TU(const char* picName1, const char* picName2, BOOL flash, int iconType, const char* sender, const char* subject, float duration) { return invoke<int>(0x1E6611149DB3DB6B, picName1, picName2, flash, iconType, sender, subject, duration); } // 0x1E6611149DB3DB6B 0x0EB382B7 b323
+	static int END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT_TU(const char* txdName, const char* textureName, BOOL flash, int iconType, const char* sender, const char* subject, float duration) { return invoke<int>(0x1E6611149DB3DB6B, txdName, textureName, flash, iconType, sender, subject, duration); } // 0x1E6611149DB3DB6B 0x0EB382B7 b323
+	// This function can show pictures of every texture that can be requested by REQUEST_STREAMED_TEXTURE_DICT.
+	// 
 	// List of picNames pastebin.com/XdpJVbHz
 	// 
 	// flash is a bool for fading in.
@@ -3879,7 +4125,9 @@ namespace HUD {
 	// "subject" is the header under the sender.
 	// "duration" is a multiplier, so 1.0 is normal, 2.0 is twice as long (very slow), and 0.5 is half as long.
 	// "clanTag" shows a crew tag in the "sender" header, after the text. You need to use 3 underscores as padding. Maximum length of this field seems to be 7. (e.g. "MK" becomes "___MK", "ACE" becomes "___ACE", etc.)
-	static int END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT_WITH_CREW_TAG(const char* picName1, const char* picName2, BOOL flash, int iconType, const char* sender, const char* subject, float duration, const char* clanTag) { return invoke<int>(0x5CBF7BADE20DB93E, picName1, picName2, flash, iconType, sender, subject, duration, clanTag); } // 0x5CBF7BADE20DB93E 0x3E807FE3 b323
+	static int END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT_WITH_CREW_TAG(const char* txdName, const char* textureName, BOOL flash, int iconType, const char* sender, const char* subject, float duration, const char* clanTag) { return invoke<int>(0x5CBF7BADE20DB93E, txdName, textureName, flash, iconType, sender, subject, duration, clanTag); } // 0x5CBF7BADE20DB93E 0x3E807FE3 b323
+	// This function can show pictures of every texture that can be requested by REQUEST_STREAMED_TEXTURE_DICT.
+	// 
 	// List of picNames: pastebin.com/XdpJVbHz
 	// 
 	// flash is a bool for fading in.
@@ -3908,15 +4156,16 @@ namespace HUD {
 	//    _SET_NOTIFICATION_MESSAGE_CLAN_TAG_2("CHAR_SOCIAL_CLUB", "CHAR_SOCIAL_CLUB", 1, 7, text2, Subject, 1.0f, "__EXAMPLE", 7);
 	//    return _DRAW_NOTIFICATION(1, 1);
 	// }
-	static int END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT_WITH_CREW_TAG_AND_ADDITIONAL_ICON(const char* picName1, const char* picName2, BOOL flash, int iconType1, const char* sender, const char* subject, float duration, const char* clanTag, int iconType2, int p9) { return invoke<int>(0x531B84E7DA981FB6, picName1, picName2, flash, iconType1, sender, subject, duration, clanTag, iconType2, p9); } // 0x531B84E7DA981FB6 0xDEB491C8 b323
+	static int END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT_WITH_CREW_TAG_AND_ADDITIONAL_ICON(const char* txdName, const char* textureName, BOOL flash, int iconType1, const char* sender, const char* subject, float duration, const char* clanTag, int iconType2, int p9) { return invoke<int>(0x531B84E7DA981FB6, txdName, textureName, flash, iconType1, sender, subject, duration, clanTag, iconType2, p9); } // 0x531B84E7DA981FB6 0xDEB491C8 b323
 	static int END_TEXT_COMMAND_THEFEED_POST_TICKER(BOOL blink, BOOL p1) { return invoke<int>(0x2ED7843F8F801023, blink, p1); } // 0x2ED7843F8F801023 0x08F7AF78 b323
 	static int END_TEXT_COMMAND_THEFEED_POST_TICKER_FORCED(BOOL blink, BOOL p1) { return invoke<int>(0x44FA03975424A0EE, blink, p1); } // 0x44FA03975424A0EE 0x57B8D0D4 b323
 	static int END_TEXT_COMMAND_THEFEED_POST_TICKER_WITH_TOKENS(BOOL blink, BOOL p1) { return invoke<int>(0x378E809BF61EC840, blink, p1); } // 0x378E809BF61EC840 0x02BCAF9B b323
+	// Shows an "award" notification above the minimap, example: https://i.imgur.com/e2DNaKX.png
 	// Example:
 	// 
 	// HUD::_SET_NOTIFICATION_TEXT_ENTRY("HUNT");
 	// HUD::_0xAA295B6F28BD587D("Hunting", "Hunting_Gold_128", 0, 109, "HUD_MED_UNLKED");
-	static int END_TEXT_COMMAND_THEFEED_POST_AWARD(const char* p0, const char* p1, int p2, int p3, const char* p4) { return invoke<int>(0xAA295B6F28BD587D, p0, p1, p2, p3, p4); } // 0xAA295B6F28BD587D 0x02DED2B8 b323
+	static int END_TEXT_COMMAND_THEFEED_POST_AWARD(const char* textureDict, const char* textureName, int rpBonus, int colorOverlay, const char* titleLabel) { return invoke<int>(0xAA295B6F28BD587D, textureDict, textureName, rpBonus, colorOverlay, titleLabel); } // 0xAA295B6F28BD587D 0x02DED2B8 b323
 	static int END_TEXT_COMMAND_THEFEED_POST_CREWTAG(BOOL p0, BOOL p1, int* p2, int p3, BOOL isLeader, BOOL unk0, int clanDesc, int R, int G, int B) { return invoke<int>(0x97C9E4E7024A8F2C, p0, p1, p2, p3, isLeader, unk0, clanDesc, R, G, B); } // 0x97C9E4E7024A8F2C 0xA9CCEF66 b323
 	// p0 = 1 or 0
 	// 
@@ -4068,12 +4317,15 @@ namespace HUD {
 	//   }
 	static void BEGIN_TEXT_COMMAND_IS_THIS_HELP_MESSAGE_BEING_DISPLAYED(const char* labelName) { invoke<Void>(0x0A24DA3A41B718F5, labelName); } // 0x0A24DA3A41B718F5 0x00E20F2D b323
 	static BOOL END_TEXT_COMMAND_IS_THIS_HELP_MESSAGE_BEING_DISPLAYED(int p0) { return invoke<BOOL>(0x10BDDBFC529428DD, p0); } // 0x10BDDBFC529428DD 0xF63A13EC b323
-	// example:
+	// Starts a text command to change the name of a blip displayed in the pause menu.
+	// This should be paired with `END_TEXT_COMMAND_SET_BLIP_NAME`, once adding all required text components.
+	// Example:
 	// 
 	// HUD::BEGIN_TEXT_COMMAND_SET_BLIP_NAME("STRING");
 	// HUD::_ADD_TEXT_COMPONENT_STRING("Name");
 	// HUD::END_TEXT_COMMAND_SET_BLIP_NAME(blip);
-	static void BEGIN_TEXT_COMMAND_SET_BLIP_NAME(const char* gxtentry) { invoke<Void>(0xF9113A30DE5C6670, gxtentry); } // 0xF9113A30DE5C6670 0xF4C211F6 b323
+	static void BEGIN_TEXT_COMMAND_SET_BLIP_NAME(const char* textLabel) { invoke<Void>(0xF9113A30DE5C6670, textLabel); } // 0xF9113A30DE5C6670 0xF4C211F6 b323
+	// Finalizes a text command started with BEGIN_TEXT_COMMAND_SET_BLIP_NAME, setting the name of the specified blip.
 	static void END_TEXT_COMMAND_SET_BLIP_NAME(Blip blip) { invoke<Void>(0xBC38B49BCB83BC9B, blip); } // 0xBC38B49BCB83BC9B 0xE8E59820 b323
 	static void _BEGIN_TEXT_COMMAND_OBJECTIVE(const char* p0) { invoke<Void>(0x23D69E0465570028, p0); } // 0x23D69E0465570028 0x0E103475 b323
 	static void _END_TEXT_COMMAND_OBJECTIVE(BOOL p0) { invoke<Void>(0xCFDBDF5AE59BA0F4, p0); } // 0xCFDBDF5AE59BA0F4 0x2944A6C5 b323
@@ -4172,8 +4424,8 @@ namespace HUD {
 	static BOOL IS_SUBTITLE_PREFERENCE_SWITCHED_ON() { return invoke<BOOL>(0xAD6DACA4BA53E0A4); } // 0xAD6DACA4BA53E0A4 0x63BA19F5 b323
 	// If Hud should be displayed
 	static void DISPLAY_HUD(BOOL toggle) { invoke<Void>(0xA6294919E56FF02A, toggle); } // 0xA6294919E56FF02A 0xD10E4E31 b323
-	// DISPLAY_HUD_*
-	static void _0x7669F9E39DC17063() { invoke<Void>(0x7669F9E39DC17063); } // 0x7669F9E39DC17063 0xC380AC85 b323
+	// Enables drawing some hud components, such as help labels, this frame, when the player is dead.
+	static void _DISPLAY_HUD_WHEN_DEAD_THIS_FRAME() { invoke<Void>(0x7669F9E39DC17063); } // 0x7669F9E39DC17063 0xC380AC85 b323
 	static void DISPLAY_HUD_WHEN_PAUSED_THIS_FRAME() { invoke<Void>(0x402F9ED62087E898); } // 0x402F9ED62087E898 0xC47AB1B0 b323
 	// If Minimap / Radar should be displayed.
 	static void DISPLAY_RADAR(BOOL toggle) { invoke<Void>(0xA0EBB943C300E693, toggle); } // 0xA0EBB943C300E693 0x52816BD4 b323
@@ -4222,13 +4474,16 @@ namespace HUD {
 	// HUD colors and their values: pastebin.com/d9aHPbXN
 	static void REPLACE_HUD_COLOUR_WITH_RGBA(int hudColorIndex, int r, int g, int b, int a) { invoke<Void>(0xF314CF4F0211894E, hudColorIndex, r, g, b, a); } // 0xF314CF4F0211894E 0xF6E7E92B b323
 	static void _SET_ABILITY_BAR_VISIBILITY_IN_MULTIPLAYER(BOOL visible) { invoke<Void>(0x1DFEDD15019315A9, visible); } // 0x1DFEDD15019315A9 b1493
+	static void _SET_ALLOW_ABILITY_BAR_IN_MULTIPLAYER(BOOL toggle) { invoke<Void>(0x889329C80FE5963C, toggle); } // 0x889329C80FE5963C b1868
 	static void FLASH_ABILITY_BAR(int millisecondsToFlash) { invoke<Void>(0x02CFBA0C9E9275CE, millisecondsToFlash); } // 0x02CFBA0C9E9275CE 0x3648960D b323
 	static void SET_ABILITY_BAR_VALUE(float p0, float p1) { invoke<Void>(0x9969599CCFF5D85E, p0, p1); } // 0x9969599CCFF5D85E 0x24E53FD8 b323
 	static void FLASH_WANTED_DISPLAY(BOOL p0) { invoke<Void>(0xA18AFB39081B6A1F, p0); } // 0xA18AFB39081B6A1F 0x629F866B b323
 	// FORCE_*
 	static void _0xBA8D65C1C65702E5(BOOL toggle) { invoke<Void>(0xBA8D65C1C65702E5, toggle); } // 0xBA8D65C1C65702E5 0x58612465 b323
-	// This get's the height of the FONT and not the total text. You need to get the number of lines your text uses, and get the height of a newline (I'm using a smaller value) to get the total text height.
-	static float _GET_TEXT_SCALE_HEIGHT(float size, int font) { return invoke<float>(0xDB88A37483346780, size, font); } // 0xDB88A37483346780 0x3330175B b323
+	// This gets the height of the FONT and not the total text. You need to get the number of lines your text uses, and get the height of a newline (I'm using a smaller value) to get the total text height.
+	// 
+	// Old name: _GET_TEXT_SCALE_HEIGHT
+	static float GET_RENDERED_CHARACTER_HEIGHT(float size, int font) { return invoke<float>(0xDB88A37483346780, size, font); } // 0xDB88A37483346780 0x3330175B b323
 	// Size range : 0F to 1.0F
 	// p0 is unknown and doesn't seem to have an effect, yet in the game scripts it changes to 1.0F sometimes.
 	static void SET_TEXT_SCALE(float scale, float size) { invoke<Void>(0x07C837F9A01C34C9, scale, size); } // 0x07C837F9A01C34C9 0xB6E15B23 b323
@@ -4276,14 +4531,14 @@ namespace HUD {
 	static BOOL _0x214CD562A939246A() { return invoke<BOOL>(0x214CD562A939246A); } // 0x214CD562A939246A 0x812CBE0E b323
 	static BOOL IS_HELP_MESSAGE_BEING_DISPLAYED() { return invoke<BOOL>(0x4D79439A6B55AC67); } // 0x4D79439A6B55AC67 0xA65F262A b323
 	static BOOL IS_HELP_MESSAGE_FADING_OUT() { return invoke<BOOL>(0x327EDEEEAC55C369); } // 0x327EDEEEAC55C369 0x3E50AE92 b323
-	static void _SET_HELP_MESSAGE_TEXT_STYLE(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0xB9C362BABECDDC7A, p0, p1, p2, p3, p4); } // 0xB9C362BABECDDC7A b463
+	static void _SET_HELP_MESSAGE_TEXT_STYLE(int style, int hudColor, int alpha, int p3, int p4) { invoke<Void>(0xB9C362BABECDDC7A, style, hudColor, alpha, p3, p4); } // 0xB9C362BABECDDC7A b463
 	// This function is hard-coded to always return 1.
 	static BOOL GET_STANDARD_BLIP_ENUM_ID() { return invoke<BOOL>(0x4A9923385BDB9DAD); } // 0x4A9923385BDB9DAD 0x87871CE0 b323
 	static int GET_WAYPOINT_BLIP_ENUM_ID() { return invoke<int>(0x186E5D252FA50E7D); } // 0x186E5D252FA50E7D 0xB9827942 b323
 	static int GET_NUMBER_OF_ACTIVE_BLIPS() { return invoke<int>(0x9A3FF3DE163034E8); } // 0x9A3FF3DE163034E8 0x144020FA b323
 	static Blip GET_NEXT_BLIP_INFO_ID(int blipSprite) { return invoke<Blip>(0x14F96AA50D6FBEA7, blipSprite); } // 0x14F96AA50D6FBEA7 0x9356E92F b323
 	static Blip GET_FIRST_BLIP_INFO_ID(int blipSprite) { return invoke<Blip>(0x1BEDE233E6CD2A1F, blipSprite); } // 0x1BEDE233E6CD2A1F 0x64C0273D b323
-	static Any _0xD484BF71050CA1EE(Any p0) { return invoke<Any>(0xD484BF71050CA1EE, p0); } // 0xD484BF71050CA1EE b1180
+	static Blip _GET_CLOSEST_BLIP_OF_TYPE(int blipSprite) { return invoke<Blip>(0xD484BF71050CA1EE, blipSprite); } // 0xD484BF71050CA1EE b1180
 	static Vector3 GET_BLIP_INFO_ID_COORD(Blip blip) { return invoke<Vector3>(0xFA7C7F0AADF25D09, blip); } // 0xFA7C7F0AADF25D09 0xB7374A66 b323
 	static int GET_BLIP_INFO_ID_DISPLAY(Blip blip) { return invoke<int>(0x1E314167F701DC3B, blip); } // 0x1E314167F701DC3B 0xD0FC19F4 b323
 	// Returns a value based on what the blip is attached to
@@ -4301,7 +4556,18 @@ namespace HUD {
 	// Returns the Blip handle of given Entity.
 	static Blip GET_BLIP_FROM_ENTITY(Entity entity) { return invoke<Blip>(0xBC8DBDCA2436F7E8, entity); } // 0xBC8DBDCA2436F7E8 0x005A2A47 b323
 	static Blip ADD_BLIP_FOR_RADIUS(float posX, float posY, float posZ, float radius) { return invoke<Blip>(0x46818D79B1F7499A, posX, posY, posZ, radius); } // 0x46818D79B1F7499A 0x4626756C b323
-	static Blip _ADD_BLIP_FOR_AREA(float x, float y, float z, float scaleX, float scaleY) { return invoke<Blip>(0xCE5D0E5E315DB238, x, y, z, scaleX, scaleY); } // 0xCE5D0E5E315DB238 b463
+	// Adds a rectangular blip for the specified coordinates/area.
+	// 
+	// It is recommended to use SET_BLIP_ROTATION and SET_BLIP_COLOUR to make the blip not rotate along with the camera.
+	// 
+	// By default, the blip will show as a _regular_ blip with the specified color/sprite if it is outside of the minimap view.
+	// 
+	// Example image:
+	// minimap https://w.wew.wtf/pdcjig.png
+	// big map https://w.wew.wtf/zgcjcm.png
+	// 
+	// (Native name is _likely_ to actually be ADD_BLIP_FOR_AREA, but due to the usual reasons this can't be confirmed)
+	static Blip _ADD_BLIP_FOR_AREA(float x, float y, float z, float width, float height) { return invoke<Blip>(0xCE5D0E5E315DB238, x, y, z, width, height); } // 0xCE5D0E5E315DB238 b463
 	// Returns red ( default ) blip attached to entity.
 	// 
 	// Example:
@@ -4316,7 +4582,7 @@ namespace HUD {
 	static void ALLOW_SONAR_BLIPS(BOOL toggle) { invoke<Void>(0x60734CC207C9833C, toggle); } // 0x60734CC207C9833C 0xE7E1E32B b323
 	static void SET_BLIP_COORDS(Blip blip, float posX, float posY, float posZ) { invoke<Void>(0xAE2AF67E9D9AF65D, blip, posX, posY, posZ); } // 0xAE2AF67E9D9AF65D 0x680A34D4 b323
 	static Vector3 GET_BLIP_COORDS(Blip blip) { return invoke<Vector3>(0x586AFE3FF72D996E, blip); } // 0x586AFE3FF72D996E 0xEF6FF47B b323
-	// Takes a blip object and adds a sprite to it on the map.
+	// Sets the displayed sprite for a specific blip..
 	// 
 	// You may have your own list, but since dev-c didn't show it I was bored and started looking through scripts and functions to get a presumable almost positive list of a majority of blip IDs
 	// h t t p://pastebin.com/Bpj9Sfft
@@ -4346,16 +4612,20 @@ namespace HUD {
 	static int GET_BLIP_ALPHA(Blip blip) { return invoke<int>(0x970F608F0EE6C885, blip); } // 0x970F608F0EE6C885 0x297AF6C8 b323
 	static void SET_BLIP_FADE(Blip blip, int opacity, int duration) { invoke<Void>(0x2AEE8F8390D2298C, blip, opacity, duration); } // 0x2AEE8F8390D2298C 0xA5999031 b323
 	// GET_BLIP_*
+	// 
+	// Seems to always return 0 from what I can tell. I've tried a lot of different blip related natives and it always seems to return 0. Decompiled scripts always pass a blip handle as p0.
 	static int _0x2C173AE2BDB9385E(Blip blip) { return invoke<int>(0x2C173AE2BDB9385E, blip); } // 0x2C173AE2BDB9385E b463
 	// After some testing, looks like you need to use CEIL() on the rotation (vehicle/ped heading) before using it there.
 	static void SET_BLIP_ROTATION(Blip blip, int rotation) { invoke<Void>(0xF87683CDF73C3F6E, blip, rotation); } // 0xF87683CDF73C3F6E 0x6B8F44FE b323
-	static void _SET_BLIP_SQUARED_ROTATION(Any p0, Any p1) { invoke<Void>(0xA8B6AFDAC320AC87, p0, p1); } // 0xA8B6AFDAC320AC87 b877
+	// Does not require whole number/integer rotations.
+	static void _SET_BLIP_SQUARED_ROTATION(Blip blip, float heading) { invoke<Void>(0xA8B6AFDAC320AC87, blip, heading); } // 0xA8B6AFDAC320AC87 b877
+	static int _0x003E92BA477F9D7F(Blip blip) { return invoke<int>(0x003E92BA477F9D7F, blip); } // 0x003E92BA477F9D7F b2060
 	// Adds up after viewing multiple R* scripts. I believe that the duration is in miliseconds.
 	static void SET_BLIP_FLASH_TIMER(Blip blip, int duration) { invoke<Void>(0xD3CD6FD297AE87CC, blip, duration); } // 0xD3CD6FD297AE87CC 0x8D5DF611 b323
 	static void SET_BLIP_FLASH_INTERVAL(Blip blip, Any p1) { invoke<Void>(0xAA51DB313C010A7E, blip, p1); } // 0xAA51DB313C010A7E 0xEAF67377 b323
 	// https://gtaforums.com/topic/864881-all-blip-color-ids-pictured/
 	static void SET_BLIP_COLOUR(Blip blip, int color) { invoke<Void>(0x03D7FB09E75D6B7E, blip, color); } // 0x03D7FB09E75D6B7E 0xBB3C5A41 b323
-	static void SET_BLIP_SECONDARY_COLOUR(Blip blip, float r, float g, float b) { invoke<Void>(0x14892474891E09EB, blip, r, g, b); } // 0x14892474891E09EB 0xC6384D32 b323
+	static void SET_BLIP_SECONDARY_COLOUR(Blip blip, int r, int g, int b) { invoke<Void>(0x14892474891E09EB, blip, r, g, b); } // 0x14892474891E09EB 0xC6384D32 b323
 	static int GET_BLIP_COLOUR(Blip blip) { return invoke<int>(0xDF729E8D20CF7327, blip); } // 0xDF729E8D20CF7327 0xDD6A1E54 b323
 	static int GET_BLIP_HUD_COLOUR(Blip blip) { return invoke<int>(0x729B5F1EFBC0AAEE, blip); } // 0x729B5F1EFBC0AAEE 0xE88B4BC2 b323
 	static BOOL IS_BLIP_SHORT_RANGE(Blip blip) { return invoke<BOOL>(0xDA5F8727EB75B926, blip); } // 0xDA5F8727EB75B926 0x1226765A b323
@@ -4373,25 +4643,45 @@ namespace HUD {
 	static void SET_BLIP_FLASHES(Blip blip, BOOL toggle) { invoke<Void>(0xB14552383D39CE3E, blip, toggle); } // 0xB14552383D39CE3E 0xC0047F15 b323
 	static void SET_BLIP_FLASHES_ALTERNATE(Blip blip, BOOL toggle) { invoke<Void>(0x2E8D9498C56DD0D1, blip, toggle); } // 0x2E8D9498C56DD0D1 0x1A81202B b323
 	static BOOL IS_BLIP_FLASHING(Blip blip) { return invoke<BOOL>(0xA5E41FD83AD6CEF0, blip); } // 0xA5E41FD83AD6CEF0 0x52E111D7 b323
+	// Sets whether or not the specified blip should only be displayed when nearby, or on the minimap.
 	static void SET_BLIP_AS_SHORT_RANGE(Blip blip, BOOL toggle) { invoke<Void>(0xBE8BE4FE60E27B72, blip, toggle); } // 0xBE8BE4FE60E27B72 0x5C67725E b323
 	static void SET_BLIP_SCALE(Blip blip, float scale) { invoke<Void>(0xD38744167B2FA257, blip, scale); } // 0xD38744167B2FA257 0x1E6EC434 b323
-	// SET_BLIP_*
-	static void _0xCD6524439909C979(Blip blip, float p1, float p2) { invoke<Void>(0xCD6524439909C979, blip, p1, p2); } // 0xCD6524439909C979 b1734
+	// See https://imgur.com/a/lLkEsMN
+	static void _SET_BLIP_SCALE_TRANSFORMATION(Blip blip, float xScale, float yScale) { invoke<Void>(0xCD6524439909C979, blip, xScale, yScale); } // 0xCD6524439909C979 b1734
 	// See this topic for more details : gtaforums.com/topic/717612-v-scriptnative-documentation-and-research/page-35?p=1069477935
 	static void SET_BLIP_PRIORITY(Blip blip, int priority) { invoke<Void>(0xAE9FC9EF6A9FAC79, blip, priority); } // 0xAE9FC9EF6A9FAC79 0xCE87DA6F b323
-	// displayId = 8 : shows on radar
+	// Display Id behaviours:
+	// 0 = Doesn't show up, ever, anywhere.
+	// 1 = Doesn't show up, ever, anywhere.
+	// 2 = Shows on both main map and minimap. (Selectable on map)
+	// 3 = Shows on main map only. (Selectable on map)
+	// 4 = Shows on main map only. (Selectable on map)
+	// 5 = Shows on minimap only.
+	// 6 = Shows on both main map and minimap. (Selectable on map)
+	// 7 = Doesn't show up, ever, anywhere.
+	// 8 = Shows on both main map and minimap. (Not selectable on map)
+	// 9 = Shows on minimap only.
+	// 10 = Shows on both main map and minimap. (Not selectable on map)
 	// 
-	// displayId:
-	// 3 = Shows on Main map but not Radar (not selectable on map)
-	// 
-	// displayId = 2 (Shows on Main map + Radar + selectable)
+	// Anything higher than 10 seems to be exactly the same as 10.
 	static void SET_BLIP_DISPLAY(Blip blip, int displayId) { invoke<Void>(0x9029B2F3DA924928, blip, displayId); } // 0x9029B2F3DA924928 0x2B521F91 b323
-	// int index:
+	// Example: https://i.imgur.com/skY6vAJ.png
 	// 
-	// 1 = No Text on blip or Distance
-	// 2 = Text on blip
-	// 3 = No text, just distance
-	// 4+ No Text on blip or distance
+	// Index:
+	// 1 = No distance shown in legend
+	// 2 = Distance shown in legend
+	// 7 = "Other Players" category, also shows distance in legend
+	// 10 = "Property" category
+	// 11 = "Owned Property" category
+	// 
+	// Any other value behaves like index = 1, index wraps around after 255
+	// Blips with categories 7, 10 or 11 will all show under the specific categories listing in the map legend, regardless of sprite or name.
+	// Legend entries:
+	// 7 = Other Players (BLIP_OTHPLYR)
+	// 10 = Property (BLIP_PROPCAT)
+	// 11 = Owned Property (BLIP_APARTCAT)
+	// 
+	// Category needs to be `7` in order for blip names to show on the expanded minimap when using DISPLAY_PLAYER_NAME_TAGS_ON_BLIPS.
 	static void SET_BLIP_CATEGORY(Blip blip, int index) { invoke<Void>(0x234CDD44D996FD9A, blip, index); } // 0x234CDD44D996FD9A 0xEF72F533 b323
 	// In the C++ SDK, this seems not to work-- the blip isn't removed immediately. I use it for saving cars.
 	// 
@@ -4438,9 +4728,13 @@ namespace HUD {
 	// 
 	// Color can be changed with SET_BLIP_SECONDARY_COLOUR
 	static void SHOW_OUTLINE_INDICATOR_ON_BLIP(Blip blip, BOOL toggle) { invoke<Void>(0xB81656BC81FE24D1, blip, toggle); } // 0xB81656BC81FE24D1 0x8DE82C15 b323
-	// Highlights a blip by a half cyan circle.
+	// Highlights a blip by a half cyan circle on the right side of the blip. https://i.imgur.com/FrV9M4e.png
+	// .Indicating that that player is a friend (in GTA:O). This color can not be changed.
+	// To toggle the left side (crew member indicator) of the half circle around the blip, use: `SHOW_CREW_INDICATOR_ON_BLIP`
 	static void SHOW_FRIEND_INDICATOR_ON_BLIP(Blip blip, BOOL toggle) { invoke<Void>(0x23C3EB807312F01A, blip, toggle); } // 0x23C3EB807312F01A 0x4C8F02B4 b323
+	// Enables or disables the blue half circle https://i.imgur.com/iZes9Ec.png around the specified blip on the left side of the blip. This is used to indicate that the player is in your crew in GTA:O. Color is changeable by using `SET_BLIP_SECONDARY_COLOUR`.
 	static void SHOW_CREW_INDICATOR_ON_BLIP(Blip blip, BOOL toggle) { invoke<Void>(0xDCFB5D4DB8BF367E, blip, toggle); } // 0xDCFB5D4DB8BF367E 0xABBE1E45 b323
+	// Must be toggled before being queued for animation
 	static void _SET_BLIP_DISPLAY_INDICATOR_ON_BLIP(Blip blip, BOOL toggle) { invoke<Void>(0xC4278F70131BAA6D, blip, toggle); } // 0xC4278F70131BAA6D 0x6AA6A1CC b323
 	static void _0x4B5B620C9B59ED34(Any p0, Any p1) { invoke<Void>(0x4B5B620C9B59ED34, p0, p1); } // 0x4B5B620C9B59ED34 b678
 	static void _0x2C9F302398E13141(Any p0, Any p1) { invoke<Void>(0x2C9F302398E13141, p0, p1); } // 0x2C9F302398E13141 b1103
@@ -4448,7 +4742,8 @@ namespace HUD {
 	// 
 	// SET_BLIP_AS_*
 	static void _SET_BLIP_SHRINK(Blip blip, BOOL toggle) { invoke<Void>(0x2B6D467DAB714E8D, blip, toggle); } // 0x2B6D467DAB714E8D 0xC575F0BC b323
-	static void SET_RADIUS_BLIP_EDGE(Any p0, BOOL p1) { invoke<Void>(0x25615540D894B814, p0, p1); } // 0x25615540D894B814 0x40E25DB8 b323
+	// Enabling this on a radius blip will make it outline only. See https://cdn.discordapp.com/attachments/553235301632573459/575132227935928330/unknown.png
+	static void SET_RADIUS_BLIP_EDGE(Blip blip, BOOL toggle) { invoke<Void>(0x25615540D894B814, blip, toggle); } // 0x25615540D894B814 0x40E25DB8 b323
 	static BOOL DOES_BLIP_EXIST(Blip blip) { return invoke<BOOL>(0xA6DB27D19ECBB7DA, blip); } // 0xA6DB27D19ECBB7DA 0xAE92DD96 b323
 	// This native removes the current waypoint from the map.
 	// 
@@ -4464,16 +4759,16 @@ namespace HUD {
 	static BOOL IS_WAYPOINT_ACTIVE() { return invoke<BOOL>(0x1DD1F58F493F1DA5); } // 0x1DD1F58F493F1DA5 0x5E4DF47B b323
 	static void SET_NEW_WAYPOINT(float x, float y) { invoke<Void>(0xFE43368D2AA4F2FC, x, y); } // 0xFE43368D2AA4F2FC 0x8444E1F0 b323
 	static void SET_BLIP_BRIGHT(Blip blip, BOOL toggle) { invoke<Void>(0xB203913733F27884, blip, toggle); } // 0xB203913733F27884 0x72BEE6DF b323
-	static void SET_BLIP_SHOW_CONE(Blip blip, BOOL toggle) { invoke<Void>(0x13127EC3665E8EE1, blip, toggle); } // 0x13127EC3665E8EE1 0xFF545AD8 b323
+	static void SET_BLIP_SHOW_CONE(Blip blip, BOOL toggle, Any p2) { invoke<Void>(0x13127EC3665E8EE1, blip, toggle, p2); } // 0x13127EC3665E8EE1 0xFF545AD8 b323
 	// Interesting fact: A hash collision for this is RESET_JETPACK_MODEL_SETTINGS
 	static void _0xC594B315EDF2D4AF(Ped ped) { invoke<Void>(0xC594B315EDF2D4AF, ped); } // 0xC594B315EDF2D4AF 0x41B0D022 b323
-	static void _0xF83D0FEBE75E62C9(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7) { invoke<Void>(0xF83D0FEBE75E62C9, p0, p1, p2, p3, p4, p5, p6, p7); } // 0xF83D0FEBE75E62C9 b1290
-	static void _0x35A3CD97B2C0A6D2(Any p0) { invoke<Void>(0x35A3CD97B2C0A6D2, p0); } // 0x35A3CD97B2C0A6D2 b1290
+	static void _0xF83D0FEBE75E62C9(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8) { invoke<Void>(0xF83D0FEBE75E62C9, p0, p1, p2, p3, p4, p5, p6, p7, p8); } // 0xF83D0FEBE75E62C9 b1290
+	static void _0x35A3CD97B2C0A6D2(Blip blip) { invoke<Void>(0x35A3CD97B2C0A6D2, blip); } // 0x35A3CD97B2C0A6D2 b1290
 	static void _0x8410C5E0CD847B9D() { invoke<Void>(0x8410C5E0CD847B9D); } // 0x8410C5E0CD847B9D b1290
-	// Please change to void.
-	// 
-	// p2 appears to be always -1.
-	static Any SET_MINIMAP_COMPONENT(int p0, BOOL p1, int p2) { return invoke<Any>(0x75A9A10948D1DEA6, p0, p1, p2); } // 0x75A9A10948D1DEA6 0x419DCDC4 b323
+	// This native is used to colorize certain map components like the army base at the top of the map.
+	// p2 appears to be always -1. If p2 is -1 then native wouldn't change the color. See https://gfycat.com/SkinnyPinkChupacabra
+	static Any SET_MINIMAP_COMPONENT(int componentId, BOOL toggle, int overrideColor) { return invoke<Any>(0x75A9A10948D1DEA6, componentId, toggle, overrideColor); } // 0x75A9A10948D1DEA6 0x419DCDC4 b323
+	static void _SET_MINIMAP_SONAR_ENABLED(BOOL toggle) { invoke<Void>(0x6B50FC8749632EC1, toggle); } // 0x6B50FC8749632EC1 b2189
 	static void _SHOW_SIGNIN_UI() { invoke<Void>(0x60E892BA4F5BDCA4); } // 0x60E892BA4F5BDCA4 b323
 	static Blip GET_MAIN_PLAYER_BLIP_ID() { return invoke<Blip>(0xDCD4EC3F419D02FA); } // 0xDCD4EC3F419D02FA 0xAB93F020 b323
 	static void _0x41350B4FC28E3941(BOOL p0) { invoke<Void>(0x41350B4FC28E3941, p0); } // 0x41350B4FC28E3941 b323
@@ -4491,6 +4786,8 @@ namespace HUD {
 	static BOOL _IS_MINIMAP_IN_INTERIOR() { return invoke<BOOL>(0x9049FE339D5F6F6F); } // 0x9049FE339D5F6F6F 0x199DED14 b323
 	static void HIDE_MINIMAP_EXTERIOR_MAP_THIS_FRAME() { invoke<Void>(0x5FBAE526203990C9); } // 0x5FBAE526203990C9 0x1A4318F7 b323
 	static void HIDE_MINIMAP_INTERIOR_MAP_THIS_FRAME() { invoke<Void>(0x20FE7FDFEEAD38C0); } // 0x20FE7FDFEEAD38C0 0xCE36E3FE b323
+	// Toggles the Cayo Perico map.
+	static void _SET_TOGGLE_MINIMAP_HEIST_ISLAND(BOOL toggle) { invoke<Void>(0x5E1460624D194A38, toggle); } // 0x5E1460624D194A38 b2189
 	// When calling this, the current frame will have the players "arrow icon" be focused on the dead center of the radar.
 	static void DONT_TILT_MINIMAP_THIS_FRAME() { invoke<Void>(0x6D14BFDC33B34F55); } // 0x6D14BFDC33B34F55 0x334EFD46 b323
 	static void _0x55F5A5F07134DE60() { invoke<Void>(0x55F5A5F07134DE60); } // 0x55F5A5F07134DE60 b1180
@@ -4538,13 +4835,18 @@ namespace HUD {
 	static void DISPLAY_HELP_TEXT_THIS_FRAME(const char* message, BOOL p1) { invoke<Void>(0x960C9FF8F616E41C, message, p1); } // 0x960C9FF8F616E41C 0x18E3360A b323
 	// Forces the weapon wheel to show/hide.
 	static void HUD_FORCE_WEAPON_WHEEL(BOOL show) { invoke<Void>(0xEB354E5376BC81A7, show); } // 0xEB354E5376BC81A7 0x1EFFB02A b323
-	static void _0x488043841BBE156F() { invoke<Void>(0x488043841BBE156F); } // 0x488043841BBE156F b1011
-	// calling this each frame, it stops the player from receiving a weapon via the weapon wheel.
+	// Displays loading screen tips, requires `_0x56C8B608CFD49854` to be called beforehand.
+	static void _HUD_DISPLAY_LOADING_SCREEN_TIPS() { invoke<Void>(0x488043841BBE156F); } // 0x488043841BBE156F b1011
+	// Calling this each frame, stops the player from receiving a weapon via the weapon wheel.
 	static void _HUD_WEAPON_WHEEL_IGNORE_SELECTION() { invoke<Void>(0x0AFC4AF510774B47); } // 0x0AFC4AF510774B47 0xB26FED2B b323
+	// Returns the weapon hash to the selected/highlighted weapon in the wheel
 	static Hash _HUD_WEAPON_WHEEL_GET_SELECTED_HASH() { return invoke<Hash>(0xA48931185F0536FE); } // 0xA48931185F0536FE 0x22E9F555 b323
-	static void _HUD_WEAPON_WHEEL_SET_SLOT_HASH(Hash weaponHash) { invoke<Void>(0x72C1056D678BB7D8, weaponHash); } // 0x72C1056D678BB7D8 0x83B608A0 b323
-	static Any _HUD_WEAPON_WHEEL_GET_SLOT_HASH(Any p0) { return invoke<Any>(0xA13E93403F26C812, p0); } // 0xA13E93403F26C812 b323
-	static void _HUD_WEAPON_WHEEL_IGNORE_CONTROL_INPUT(BOOL p0) { invoke<Void>(0x14C9FDCC41F81F63, p0); } // 0x14C9FDCC41F81F63 0xE70D1F43 b323
+	// Set the active slotIndex in the wheel weapon to the slot associated with the provided Weapon hash
+	static void HUD_SET_WEAPON_WHEEL_TOP_SLOT(Hash weaponHash) { invoke<Void>(0x72C1056D678BB7D8, weaponHash); } // 0x72C1056D678BB7D8 0x83B608A0 b323
+	// Returns the weapon hash active in a specific weapon wheel slotList
+	static Hash _HUD_WEAPON_WHEEL_GET_SLOT_HASH(int weaponTypeIndex) { return invoke<Hash>(0xA13E93403F26C812, weaponTypeIndex); } // 0xA13E93403F26C812 b323
+	// Sets a global that disables many weapon input tasks (shooting, aiming, etc.). Does not work with vehicle weapons, only used in selector.ysc
+	static void _HUD_WEAPON_WHEEL_IGNORE_CONTROL_INPUT(BOOL toggle) { invoke<Void>(0x14C9FDCC41F81F63, toggle); } // 0x14C9FDCC41F81F63 0xE70D1F43 b323
 	// Only the script that originally called SET_GPS_FLAGS can set them again. Another script cannot set the flags, until the first script that called it has called CLEAR_GPS_FLAGS.
 	// 
 	// Doesn't seem like the flags are actually read by the game at all.
@@ -4556,11 +4858,29 @@ namespace HUD {
 	static void SET_RACE_TRACK_RENDER(BOOL toggle) { invoke<Void>(0x1EAC5F91BCBC5073, toggle); } // 0x1EAC5F91BCBC5073 0xFB9BABF5 b323
 	// Does the same as SET_RACE_TRACK_RENDER(false);
 	static void CLEAR_GPS_RACE_TRACK() { invoke<Void>(0x7AA5B4CE533C858B); } // 0x7AA5B4CE533C858B 0x40C59829 b323
-	static void START_GPS_CUSTOM_ROUTE(int hudColor, BOOL p1, BOOL p2) { invoke<Void>(0xDB34E8D56FC13B08, hudColor, p1, p2); } // 0xDB34E8D56FC13B08 0x7F93799B b323
+	// Starts a new GPS custom-route, allowing you to plot lines on the map.
+	// Lines are drawn directly between points.
+	// The GPS custom route works like the GPS multi route, except it does not follow roads.
+	// Example result: https://i.imgur.com/BDm5pzt.png
+	// hudColor: The HUD color of the GPS path.
+	// displayOnFoot: Draws the path regardless if the player is in a vehicle or not.
+	// followPlayer: Draw the path partially between the previous and next point based on the players position between them. When false, the GPS appears to not disappear after the last leg is completed.
+	static void START_GPS_CUSTOM_ROUTE(int hudColor, BOOL displayOnFoot, BOOL followPlayer) { invoke<Void>(0xDB34E8D56FC13B08, hudColor, displayOnFoot, followPlayer); } // 0xDB34E8D56FC13B08 0x7F93799B b323
 	static void ADD_POINT_TO_GPS_CUSTOM_ROUTE(float x, float y, float z) { invoke<Void>(0x311438A071DD9B1A, x, y, z); } // 0x311438A071DD9B1A 0xEEBDFE55 b323
-	static void SET_GPS_CUSTOM_ROUTE_RENDER(BOOL p0, int p1, int p2) { invoke<Void>(0x900086F371220B6F, p0, p1, p2); } // 0x900086F371220B6F 0xDA0AF00E b323
+	// radarThickness: The width of the GPS route on the radar
+	// mapThickness: The width of the GPS route on the map
+	static void SET_GPS_CUSTOM_ROUTE_RENDER(BOOL toggle, int radarThickness, int mapThickness) { invoke<Void>(0x900086F371220B6F, toggle, radarThickness, mapThickness); } // 0x900086F371220B6F 0xDA0AF00E b323
 	static void CLEAR_GPS_CUSTOM_ROUTE() { invoke<Void>(0xE6DE0561D9232A64); } // 0xE6DE0561D9232A64 0xCF2E3E24 b323
-	static void START_GPS_MULTI_ROUTE(int hudColor, BOOL p1, BOOL p2) { invoke<Void>(0x3D3D15AF7BCAAF83, hudColor, p1, p2); } // 0x3D3D15AF7BCAAF83 0xC3DCBEDB b323
+	// Starts a new GPS multi-route, allowing you to create custom GPS paths.
+	// GPS functions like the waypoint, except it can contain multiple points it's forced to go through.
+	// Once the player has passed a point, the GPS will no longer force its path through it.
+	// 
+	// Works independently from the player-placed waypoint and blip routes.
+	// Example result: https://i.imgur.com/ZZHQatX.png
+	// hudColor: The HUD color of the GPS path.
+	// routeFromPlayer: Makes the GPS draw a path from the player to the next point, rather than the original path from the previous point.
+	// displayOnFoot: Draws the GPS path regardless if the player is in a vehicle or not.
+	static void START_GPS_MULTI_ROUTE(int hudColor, BOOL routeFromPlayer, BOOL displayOnFoot) { invoke<Void>(0x3D3D15AF7BCAAF83, hudColor, routeFromPlayer, displayOnFoot); } // 0x3D3D15AF7BCAAF83 0xC3DCBEDB b323
 	static void ADD_POINT_TO_GPS_MULTI_ROUTE(float x, float y, float z) { invoke<Void>(0xA905192A6781C41B, x, y, z); } // 0xA905192A6781C41B 0xFE485135 b323
 	static void SET_GPS_MULTI_ROUTE_RENDER(BOOL toggle) { invoke<Void>(0x3DDA37128DD1ACA8, toggle); } // 0x3DDA37128DD1ACA8 0xE87CBE4C b323
 	// Does the same as SET_GPS_MULTI_ROUTE_RENDER(false);
@@ -4571,7 +4891,7 @@ namespace HUD {
 	// adds a short flash to the Radar/Minimap
 	// Usage: UI.FLASH_MINIMAP_DISPLAY
 	static void FLASH_MINIMAP_DISPLAY() { invoke<Void>(0xF2DD778C22B15BDA); } // 0xF2DD778C22B15BDA 0xB8359952 b323
-	static void FLASH_MINIMAP_DISPLAY_WITH_COLOR(Any p0) { invoke<Void>(0x6B1DE27EE78E6A19, p0); } // 0x6B1DE27EE78E6A19 0x79A6CAF6 b323
+	static void FLASH_MINIMAP_DISPLAY_WITH_COLOR(int hudColorIndex) { invoke<Void>(0x6B1DE27EE78E6A19, hudColorIndex); } // 0x6B1DE27EE78E6A19 0x79A6CAF6 b323
 	static void TOGGLE_STEALTH_RADAR(BOOL toggle) { invoke<Void>(0x6AFDFB93754950C7, toggle); } // 0x6AFDFB93754950C7 0xC68D47C4 b323
 	static void SET_MINIMAP_IN_SPECTATOR_MODE(BOOL toggle, Ped ped) { invoke<Void>(0x1A5CD7752DD28CD3, toggle, ped); } // 0x1A5CD7752DD28CD3 0xD5BFCADB b323
 	static void SET_MISSION_NAME(BOOL p0, const char* name) { invoke<Void>(0x5F28ECF5FC84772F, p0, name); } // 0x5F28ECF5FC84772F 0x68DCAE10 b323
@@ -4585,11 +4905,15 @@ namespace HUD {
 	// 
 	// FOW = Fog of War
 	static void SET_MINIMAP_HIDE_FOW(BOOL toggle) { invoke<Void>(0xF8DEE0A5600CBB93, toggle); } // 0xF8DEE0A5600CBB93 0xD8D77733 b323
-	static float _GET_MINIMAP_REVEAL_PERCENTAGE() { return invoke<float>(0xE0130B41D3CF4574); } // 0xE0130B41D3CF4574 0xA4098ACC b323
-	// GET_MI*
-	static BOOL _GET_MINIMAP_AREA_IS_REVEALED(float x, float y, float radius) { return invoke<BOOL>(0x6E31B91145873922, x, y, radius); } // 0x6E31B91145873922 0x65B705F6 b323
+	static float GET_MINIMAP_FOW_DISCOVERY_RATIO() { return invoke<float>(0xE0130B41D3CF4574); } // 0xE0130B41D3CF4574 0xA4098ACC b323
+	static BOOL GET_MINIMAP_FOW_COORDINATE_IS_REVEALED(float x, float y, float z) { return invoke<BOOL>(0x6E31B91145873922, x, y, z); } // 0x6E31B91145873922 0x65B705F6 b323
 	static void _0x62E849B7EB28E770(BOOL p0) { invoke<Void>(0x62E849B7EB28E770, p0); } // 0x62E849B7EB28E770 b323
-	static void _0x0923DBF87DFF735E(float x, float y, float z) { invoke<Void>(0x0923DBF87DFF735E, x, y, z); } // 0x0923DBF87DFF735E 0xE010F081 b323
+	static void SET_MINIMAP_FOW_REVEAL_COORDINATE(float x, float y, float z) { invoke<Void>(0x0923DBF87DFF735E, x, y, z); } // 0x0923DBF87DFF735E 0xE010F081 b323
+	// Not much is known so far on what it does _exactly_.
+	// All I know for sure is that it draws the specified hole ID on the pause menu map as well as on the mini-map/radar. This native also seems to change some other things related to the pause menu map's behaviour, for example: you can no longer set waypoints, the pause menu map starts up in a 'zoomed in' state. This native does not need to be executed every tick.
+	// You need to center the minimap manually as well as change/lock it's zoom and angle in order for it to appear correctly on the minimap.
+	// You'll also need to use the `GOLF` scaleform in order to get the correct minmap border to show up.
+	// Use `0x35edd5b2e3ff01c0` to reset the map when you no longer want to display any golf holes (you still need to unlock zoom, position and angle of the radar manually after calling this).
 	static void SET_MINIMAP_GOLF_COURSE(int hole) { invoke<Void>(0x71BDB63DBAF8DA59, hole); } // 0x71BDB63DBAF8DA59 0x5133A750 b323
 	static void SET_MINIMAP_GOLF_COURSE_OFF() { invoke<Void>(0x35EDD5B2E3FF01C0); } // 0x35EDD5B2E3FF01C0 0x20FD3E87 b323
 	// Locks the minimap to the specified angle in integer degrees.
@@ -4602,9 +4926,9 @@ namespace HUD {
 	static void UNLOCK_MINIMAP_POSITION() { invoke<Void>(0x3E93E06DB8EF1F30); } // 0x3E93E06DB8EF1F30 0x5E8E6F54 b323
 	// Argument must be 0.0f or above 38.0f, or it will be ignored.
 	static void _SET_MINIMAP_ALTITUDE_INDICATOR_LEVEL(float altitude, BOOL p1, Any p2) { invoke<Void>(0xD201F3FF917A506D, altitude, p1, p2); } // 0xD201F3FF917A506D 0x0308EDF6 b323
-	static void SET_HEALTH_HUD_DISPLAY_VALUES(Any p0, Any p1, BOOL p2) { invoke<Void>(0x3F5CC444DCAAA8F2, p0, p1, p2); } // 0x3F5CC444DCAAA8F2 0x7FB6FB2A b323
-	static void SET_MAX_HEALTH_HUD_DISPLAY(Any p0) { invoke<Void>(0x975D66A0BC17064C, p0); } // 0x975D66A0BC17064C 0xF07D8CEF b323
-	static void SET_MAX_ARMOUR_HUD_DISPLAY(Any p0) { invoke<Void>(0x06A320535F5F0248, p0); } // 0x06A320535F5F0248 0x827F14DE b323
+	static void SET_HEALTH_HUD_DISPLAY_VALUES(int health, int capacity, BOOL wasAdded) { invoke<Void>(0x3F5CC444DCAAA8F2, health, capacity, wasAdded); } // 0x3F5CC444DCAAA8F2 0x7FB6FB2A b323
+	static void SET_MAX_HEALTH_HUD_DISPLAY(int maximumValue) { invoke<Void>(0x975D66A0BC17064C, maximumValue); } // 0x975D66A0BC17064C 0xF07D8CEF b323
+	static void SET_MAX_ARMOUR_HUD_DISPLAY(int maximumValue) { invoke<Void>(0x06A320535F5F0248, maximumValue); } // 0x06A320535F5F0248 0x827F14DE b323
 	// Toggles the big minimap state like in GTA:Online.
 	static void SET_BIGMAP_ACTIVE(BOOL toggleBigMap, BOOL showFullMap) { invoke<Void>(0x231C8F89D0539D8F, toggleBigMap, showFullMap); } // 0x231C8F89D0539D8F 0x08EB83D2 b323
 	// Full list of components below
@@ -4639,7 +4963,59 @@ namespace HUD {
 	// SHOW_*
 	static void _SHOW_SCRIPTED_HUD_COMPONENT_THIS_FRAME(int id) { invoke<Void>(0x4F38DCA127DAAEA2, id); } // 0x4F38DCA127DAAEA2 b1734
 	static BOOL IS_SCRIPTED_HUD_COMPONENT_HIDDEN_THIS_FRAME(int id) { return invoke<BOOL>(0x09C0403ED9A751C2, id); } // 0x09C0403ED9A751C2 0xE8C8E535 b323
+	// This function hides various HUD (Heads-up Display) components.
+	// Listed below are the integers and the corresponding HUD component.
+	// - 1 : WANTED_STARS
+	// - 2 : WEAPON_ICON
+	// - 3 : CASH
+	// - 4 : MP_CASH
+	// - 5 : MP_MESSAGE
+	// - 6 : VEHICLE_NAME
+	// - 7 : AREA_NAME
+	// - 8 : VEHICLE_CLASS
+	// - 9 : STREET_NAME
+	// - 10 : HELP_TEXT
+	// - 11 : FLOATING_HELP_TEXT_1
+	// - 12 : FLOATING_HELP_TEXT_2
+	// - 13 : CASH_CHANGE
+	// - 14 : RETICLE
+	// - 15 : SUBTITLE_TEXT
+	// - 16 : RADIO_STATIONS
+	// - 17 : SAVING_GAME
+	// - 18 : GAME_STREAM
+	// - 19 : WEAPON_WHEEL
+	// - 20 : WEAPON_WHEEL_STATS
+	// - 21 : HUD_COMPONENTS
+	// - 22 : HUD_WEAPONS
+	// 
+	// These integers also work for the `SHOW_HUD_COMPONENT_THIS_FRAME` native, but instead shows the HUD Component.
 	static void HIDE_HUD_COMPONENT_THIS_FRAME(int id) { invoke<Void>(0x6806C51AD12B83B8, id); } // 0x6806C51AD12B83B8 0xDB2D0762 b323
+	// This function hides various HUD (Heads-up Display) components.
+	// Listed below are the integers and the corresponding HUD component.
+	// - 1 : WANTED_STARS
+	// - 2 : WEAPON_ICON
+	// - 3 : CASH
+	// - 4 : MP_CASH
+	// - 5 : MP_MESSAGE
+	// - 6 : VEHICLE_NAME
+	// - 7 : AREA_NAME
+	// - 8 : VEHICLE_CLASS
+	// - 9 : STREET_NAME
+	// - 10 : HELP_TEXT
+	// - 11 : FLOATING_HELP_TEXT_1
+	// - 12 : FLOATING_HELP_TEXT_2
+	// - 13 : CASH_CHANGE
+	// - 14 : RETICLE
+	// - 15 : SUBTITLE_TEXT
+	// - 16 : RADIO_STATIONS
+	// - 17 : SAVING_GAME
+	// - 18 : GAME_STREAM
+	// - 19 : WEAPON_WHEEL
+	// - 20 : WEAPON_WHEEL_STATS
+	// - 21 : HUD_COMPONENTS
+	// - 22 : HUD_WEAPONS
+	// 
+	// These integers also work for the `HIDE_HUD_COMPONENT_THIS_FRAME` native, but instead hides the HUD Component.
 	static void SHOW_HUD_COMPONENT_THIS_FRAME(int id) { invoke<Void>(0x0B4DF1FA60C0E664, id); } // 0x0B4DF1FA60C0E664 0x95E1546E b323
 	// HIDE_*_THIS_FRAME
 	// 
@@ -4651,20 +5027,23 @@ namespace HUD {
 	static Vector3 GET_HUD_COMPONENT_POSITION(int id) { return invoke<Vector3>(0x223CA69A8C4417FD, id); } // 0x223CA69A8C4417FD 0x080DCED6 b323
 	// This native does absolutely nothing, just a nullsub
 	static void CLEAR_REMINDER_MESSAGE() { invoke<Void>(0xB57D8DD645CFA2CF); } // 0xB57D8DD645CFA2CF 0x5BBCC934 b323
+	// World to relative screen coords, this world to screen will keep the text on screen. Was named _GET_SCREEN_COORD_FROM_WORLD_COORD, but this conflicts with 0x34E82F05DF2974F5. As that hash actually matches GET_SCREEN_COORD_FROM_WORLD_COORD that one supercedes and this one was renamed to _GET_2D_COORD_FROM_3D_COORD
 	static BOOL GET_HUD_SCREEN_POSITION_FROM_WORLD_POSITION(float worldX, float worldY, float worldZ, float* screenX, float* screenY) { return invoke<BOOL>(0xF9904D11F1ACBEC3, worldX, worldY, worldZ, screenX, screenY); } // 0xF9904D11F1ACBEC3 0xFE9A39F8 b323
 	// Shows a menu for reporting UGC content.
 	static void OPEN_REPORTUGC_MENU() { invoke<Void>(0x523A590C1A3CC0D3); } // 0x523A590C1A3CC0D3 0x10DE5150 b323
 	static void FORCE_CLOSE_REPORTUGC_MENU() { invoke<Void>(0xEE4C0E6DBC6F2C6F); } // 0xEE4C0E6DBC6F2C6F 0x67649EE0 b323
 	static BOOL IS_REPORTUGC_MENU_OPEN() { return invoke<BOOL>(0x9135584D09A3437E); } // 0x9135584D09A3437E 0x9D2C94FA b323
-	static BOOL IS_FLOATING_HELP_TEXT_ON_SCREEN(int p0) { return invoke<BOOL>(0x2432784ACA090DA4, p0); } // 0x2432784ACA090DA4 0x45472FD5 b323
-	static void SET_FLOATING_HELP_TEXT_SCREEN_POSITION(int p0, float x, float y) { invoke<Void>(0x7679CC1BCEBE3D4C, p0, x, y); } // 0x7679CC1BCEBE3D4C 0x198F32D7 b323
-	static void SET_FLOATING_HELP_TEXT_WORLD_POSITION(int p0, float x, float y, float z) { invoke<Void>(0x784BA7E0ECEB4178, p0, x, y, z); } // 0x784BA7E0ECEB4178 0x93045157 b323
-	static void SET_FLOATING_HELP_TEXT_TO_ENTITY(int p0, Entity entity, float p2, float p3) { invoke<Void>(0xB094BC1DB4018240, p0, entity, p2, p3); } // 0xB094BC1DB4018240 0x18B012B7 b323
-	static void SET_FLOATING_HELP_TEXT_STYLE(int p0, int p1, int p2, int p3, int p4, int p5) { invoke<Void>(0x788E7FD431BD67F1, p0, p1, p2, p3, p4, p5); } // 0x788E7FD431BD67F1 0x97852A82 b323
-	static void CLEAR_FLOATING_HELP(int p0, BOOL p1) { invoke<Void>(0x50085246ABD3FEFA, p0, p1); } // 0x50085246ABD3FEFA 0xB181F88F b323
-	static void CREATE_MP_GAMER_TAG_WITH_CREW_COLOR(Player player, const char* username, BOOL pointedClanTag, BOOL isRockstarClan, const char* clanTag, Any p5, int r, int g, int b) { invoke<Void>(0x6DD05E9D83EFA4C9, player, username, pointedClanTag, isRockstarClan, clanTag, p5, r, g, b); } // 0x6DD05E9D83EFA4C9 0xC969F2D0 b323
+	static BOOL IS_FLOATING_HELP_TEXT_ON_SCREEN(int hudIndex) { return invoke<BOOL>(0x2432784ACA090DA4, hudIndex); } // 0x2432784ACA090DA4 0x45472FD5 b323
+	static void SET_FLOATING_HELP_TEXT_SCREEN_POSITION(int hudIndex, float x, float y) { invoke<Void>(0x7679CC1BCEBE3D4C, hudIndex, x, y); } // 0x7679CC1BCEBE3D4C 0x198F32D7 b323
+	static void SET_FLOATING_HELP_TEXT_WORLD_POSITION(int hudIndex, float x, float y, float z) { invoke<Void>(0x784BA7E0ECEB4178, hudIndex, x, y, z); } // 0x784BA7E0ECEB4178 0x93045157 b323
+	static void SET_FLOATING_HELP_TEXT_TO_ENTITY(int hudIndex, Entity entity, float offsetX, float offsetY) { invoke<Void>(0xB094BC1DB4018240, hudIndex, entity, offsetX, offsetY); } // 0xB094BC1DB4018240 0x18B012B7 b323
+	static void SET_FLOATING_HELP_TEXT_STYLE(int hudIndex, int p1, int p2, int p3, int p4, int p5) { invoke<Void>(0x788E7FD431BD67F1, hudIndex, p1, p2, p3, p4, p5); } // 0x788E7FD431BD67F1 0x97852A82 b323
+	static void CLEAR_FLOATING_HELP(int hudIndex, BOOL p1) { invoke<Void>(0x50085246ABD3FEFA, hudIndex, p1); } // 0x50085246ABD3FEFA 0xB181F88F b323
+	// clanFlag: takes a number 0-5
+	static void CREATE_MP_GAMER_TAG_WITH_CREW_COLOR(Player player, const char* username, BOOL pointedClanTag, BOOL isRockstarClan, const char* clanTag, int clanFlag, int r, int g, int b) { invoke<Void>(0x6DD05E9D83EFA4C9, player, username, pointedClanTag, isRockstarClan, clanTag, clanFlag, r, g, b); } // 0x6DD05E9D83EFA4C9 0xC969F2D0 b323
 	static BOOL IS_MP_GAMER_TAG_MOVIE_ACTIVE() { return invoke<BOOL>(0x6E0EB3EB47C8D7AA); } // 0x6E0EB3EB47C8D7AA 0xEFD2564A b323
-	static int CREATE_FAKE_MP_GAMER_TAG(Ped ped, const char* username, BOOL pointedClanTag, BOOL isRockstarClan, const char* clanTag, Any p5) { return invoke<int>(0xBFEFE3321A3F5015, ped, username, pointedClanTag, isRockstarClan, clanTag, p5); } // 0xBFEFE3321A3F5015 0xF5CD2AA4 b323
+	// clanFlag: takes a number 0-5
+	static int CREATE_FAKE_MP_GAMER_TAG(Ped ped, const char* username, BOOL pointedClanTag, BOOL isRockstarClan, const char* clanTag, int clanFlag) { return invoke<int>(0xBFEFE3321A3F5015, ped, username, pointedClanTag, isRockstarClan, clanTag, clanFlag); } // 0xBFEFE3321A3F5015 0xF5CD2AA4 b323
 	static void REMOVE_MP_GAMER_TAG(int gamerTagId) { invoke<Void>(0x31698AA80E0223F8, gamerTagId); } // 0x31698AA80E0223F8 0x3D081FE4 b323
 	static BOOL IS_MP_GAMER_TAG_ACTIVE(int gamerTagId) { return invoke<BOOL>(0x4E929E7A5796FD26, gamerTagId); } // 0x4E929E7A5796FD26 0x60118951 b323
 	static BOOL IS_MP_GAMER_TAG_FREE(int gamerTagId) { return invoke<BOOL>(0x595B5178E412E199, gamerTagId); } // 0x595B5178E412E199 0x63959059 b323
@@ -4702,20 +5081,22 @@ namespace HUD {
 	// 	MP_TAG_BOMB
 	// };
 	static void SET_MP_GAMER_TAG_VISIBILITY(int gamerTagId, int component, BOOL toggle, Any p3) { invoke<Void>(0x63BB75ABEDC1F6A0, gamerTagId, component, toggle, p3); } // 0x63BB75ABEDC1F6A0 0xD41DF479 b323
-	// SET_A*
-	static void _0xEE76FF7E6A0166B0(int gamerTagId, BOOL p1) { invoke<Void>(0xEE76FF7E6A0166B0, gamerTagId, p1); } // 0xEE76FF7E6A0166B0 0x767DED29 b323
+	static void _SET_MP_GAMER_TAG_ENABLED(int gamerTagId, BOOL toggle) { invoke<Void>(0xEE76FF7E6A0166B0, gamerTagId, toggle); } // 0xEE76FF7E6A0166B0 0x767DED29 b323
 	// Displays a bunch of icons above the players name, and level, and their name twice
-	static void _SET_MP_GAMER_TAG_ICONS(int gamerTagId, BOOL p1) { invoke<Void>(0xA67F9C46D612B6F1, gamerTagId, p1); } // 0xA67F9C46D612B6F1 0xB01A5434 b323
-	static void _SET_MP_GAMER_HEALTH_BAR_DISPLAY(Any p0, Any p1) { invoke<Void>(0xD29EC58C2F6B5014, p0, p1); } // 0xD29EC58C2F6B5014 b1365
-	static void _SET_MP_GAMER_HEALTH_BAR_MAX(Any p0, Any p1, Any p2) { invoke<Void>(0x1563FE35E9928E67, p0, p1, p2); } // 0x1563FE35E9928E67 b1365
+	static void _SET_MP_GAMER_TAG_ICONS(int gamerTagId, BOOL toggle) { invoke<Void>(0xA67F9C46D612B6F1, gamerTagId, toggle); } // 0xA67F9C46D612B6F1 0xB01A5434 b323
+	static void _SET_MP_GAMER_HEALTH_BAR_DISPLAY(int gamerTagId, BOOL toggle) { invoke<Void>(0xD29EC58C2F6B5014, gamerTagId, toggle); } // 0xD29EC58C2F6B5014 b1365
+	static void _SET_MP_GAMER_HEALTH_BAR_MAX(int gamerTagId, int value, int maximumValue) { invoke<Void>(0x1563FE35E9928E67, gamerTagId, value, maximumValue); } // 0x1563FE35E9928E67 b1365
+	// Sets a gamer tag's component colour
+	// 
+	// gamerTagId is obtained using for example CREATE_FAKE_MP_GAMER_TAG
 	// Ranges from 0 to 255. 0 is grey health bar, ~50 yellow, 200 purple.
-	static void SET_MP_GAMER_TAG_COLOUR(int gamerTagId, int flag, int color) { invoke<Void>(0x613ED644950626AE, gamerTagId, flag, color); } // 0x613ED644950626AE 0x7E3AA40A b323
+	static void SET_MP_GAMER_TAG_COLOUR(int gamerTagId, int component, int hudColorIndex) { invoke<Void>(0x613ED644950626AE, gamerTagId, component, hudColorIndex); } // 0x613ED644950626AE 0x7E3AA40A b323
 	// Ranges from 0 to 255. 0 is grey health bar, ~50 yellow, 200 purple.
 	// Should be enabled as flag (2). Has 0 opacity by default.
 	// 
 	// - This was _SET_MP_GAMER_TAG_HEALTH_BAR_COLOR,
 	// -> Rockstar use the EU spelling of 'color' so I hashed the same name with COLOUR and it came back as the correct hash, so it has been corrected above.
-	static void SET_MP_GAMER_TAG_HEALTH_BAR_COLOUR(int headDisplayId, int color) { invoke<Void>(0x3158C77A7E888AB4, headDisplayId, color); } // 0x3158C77A7E888AB4 0x5777EC77 b323
+	static void SET_MP_GAMER_TAG_HEALTH_BAR_COLOUR(int gamerTagId, int hudColorIndex) { invoke<Void>(0x3158C77A7E888AB4, gamerTagId, hudColorIndex); } // 0x3158C77A7E888AB4 0x5777EC77 b323
 	// Sets flag's sprite transparency. 0-255.
 	static void SET_MP_GAMER_TAG_ALPHA(int gamerTagId, int component, int alpha) { invoke<Void>(0xD48FE545CD46F857, gamerTagId, component, alpha); } // 0xD48FE545CD46F857 0xF4418611 b323
 	// displays wanted star above head
@@ -4727,31 +5108,94 @@ namespace HUD {
 	static void SET_MP_GAMER_TAG_BIG_TEXT(int gamerTagId, const char* string) { invoke<Void>(0x7B7723747CCB55B6, gamerTagId, string); } // 0x7B7723747CCB55B6 0x939218AB b323
 	static int GET_CURRENT_WEBPAGE_ID() { return invoke<int>(0x01A358D9128B7A86); } // 0x01A358D9128B7A86 0xAB5B7C18 b323
 	static int GET_CURRENT_WEBSITE_ID() { return invoke<int>(0x97D47996FC48CBAD); } // 0x97D47996FC48CBAD 0x42A55B14 b323
-	// GET_G*
-	static Any _0xE3B05614DCE1D014(Any p0) { return invoke<Any>(0xE3B05614DCE1D014, p0); } // 0xE3B05614DCE1D014 0xD217EE7E b323
-	// RESET_*
-	static void _0xB99C4E4D9499DF29(int p0) { invoke<Void>(0xB99C4E4D9499DF29, p0); } // 0xB99C4E4D9499DF29 b323
+	// Returns the ActionScript flagValue.
+	// ActionScript flags are global flags that scaleforms use
+	// Flags found during testing
+	// 0: Returns 1 if the web_browser keyboard is open, otherwise 0
+	// 1: Returns 1 if the player has clicked back twice on the opening page, otherwise 0 (web_browser)
+	// 2: Returns how many links the player has clicked in the web_browser scaleform, returns 0 when the browser gets closed
+	// 9: Returns the current selection on the mobile phone scaleform
+	// 
+	// There are 20 flags in total.
+	static int GET_GLOBAL_ACTIONSCRIPT_FLAG(int flagIndex) { return invoke<int>(0xE3B05614DCE1D014, flagIndex); } // 0xE3B05614DCE1D014 0xD217EE7E b323
+	static void RESET_GLOBAL_ACTIONSCRIPT_FLAG(int flagIndex) { invoke<Void>(0xB99C4E4D9499DF29, flagIndex); } // 0xB99C4E4D9499DF29 0x4C4C10CF b323
 	// IS_WARNING_MESSAGE_*
 	static BOOL _IS_WARNING_MESSAGE_ACTIVE_2() { return invoke<BOOL>(0xAF42195A42C63BBA); } // 0xAF42195A42C63BBA b323
 	// You can only use text entries. No custom text.
 	// 
 	// Example: SET_WARNING_MESSAGE("t20", 3, "adder", false, -1, 0, 0, true);
-	static void SET_WARNING_MESSAGE(const char* titleMsg, int flags, const char* promptMsg, BOOL p3, int p4, const char* p5, const char* p6, BOOL showBg, Any p8) { invoke<Void>(0x7B1776B3B53F8D74, titleMsg, flags, promptMsg, p3, p4, p5, p6, showBg, p8); } // 0x7B1776B3B53F8D74 0xBE699BDE b323
-	// You can only use text entries. No custom text.
-	// 
-	// [24/03/2017] by ins1de :
-	// 
-	// C# Example :
-	// Function.Call(Hash._SET_WARNING_MESSAGE_2, "HUD_QUIT", "HUD_CGIGNORE", 2, "HUD_CGINVITE", 0, -1, 0, 0, 1);
-	// 
-	// @unknown, you can recreate this easily with scaleforms
-	static void SET_WARNING_MESSAGE_WITH_HEADER(const char* titleMsg, const char* p1, int flags, const char* promptMsg, BOOL p4, Any p5, Any* p6, Any* p7, BOOL showBg, Any p9) { invoke<Void>(0xDC38CC1E35B6A5D7, titleMsg, p1, flags, promptMsg, p4, p5, p6, p7, showBg, p9); } // 0xDC38CC1E35B6A5D7 0x2DB9EAB5 b323
+	static void SET_WARNING_MESSAGE(const char* titleMsg, int flags, const char* promptMsg, BOOL p3, int p4, const char* p5, const char* p6, BOOL showBackground, Any p8) { invoke<Void>(0x7B1776B3B53F8D74, titleMsg, flags, promptMsg, p3, p4, p5, p6, showBackground, p8); } // 0x7B1776B3B53F8D74 0xBE699BDE b323
+	// Shows a warning message on screen with a header.
+	// Note: You can only use text entries. No custom text. You can recreate this easily with scaleforms.
+	// Example: https://i.imgur.com/ITJt8bJ.png
+	static void SET_WARNING_MESSAGE_WITH_HEADER(const char* entryHeader, const char* entryLine1, int instructionalKey, const char* entryLine2, BOOL p4, Any p5, Any* showBackground, Any* p7, BOOL p8, Any p9) { invoke<Void>(0xDC38CC1E35B6A5D7, entryHeader, entryLine1, instructionalKey, entryLine2, p4, p5, showBackground, p7, p8, p9); } // 0xDC38CC1E35B6A5D7 0x2DB9EAB5 b323
 	// You can only use text entries. No custom text.
 	static void SET_WARNING_MESSAGE_WITH_HEADER_AND_SUBSTRING_FLAGS(const char* entryHeader, const char* entryLine1, Any instructionalKey, const char* entryLine2, BOOL p4, Any p5, Any p6, Any* p7, Any* p8, BOOL p9, Any p10) { invoke<Void>(0x701919482C74B5AB, entryHeader, entryLine1, instructionalKey, entryLine2, p4, p5, p6, p7, p8, p9, p10); } // 0x701919482C74B5AB 0x749929D3 b323
 	static void _SET_WARNING_MESSAGE_WITH_HEADER_UNK(const char* entryHeader, const char* entryLine1, int flags, const char* entryLine2, BOOL p4, Any p5, Any* p6, Any* p7, BOOL showBg, Any p9, Any p10) { invoke<Void>(0x38B55259C2E078ED, entryHeader, entryLine1, flags, entryLine2, p4, p5, p6, p7, showBg, p9, p10); } // 0x38B55259C2E078ED b1493
-	static void _SET_WARNING_MESSAGE_4(const char* p0, const char* p1, int p2, int p3, const char* p4, BOOL p5, int p6, int p7, const char* p8, const char* p9, BOOL p10, Any p11) { invoke<Void>(0x15803FEC3B9A872B, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11); } // 0x15803FEC3B9A872B b573
+	// labelTitle: Label of the alert's title.
+	// labelMsg: Label of the alert's message.
+	// p2: This is an enum, check the description for a list.
+	// p3: This is an enum, check the description for a list.
+	// labelMsg2: Label of another message line
+	// p5: usually 0
+	// p6: usually -1
+	// p7: usually 0
+	// p8: unknown label
+	// p9: unknown label
+	// background: Set to anything other than 0 or false (even any string) and it will draw a background. Setting it to 0 or false will draw no background.
+	// errorCode: Error code, shown at the bottom left if set to value other than 0.
+	// 
+	// instructionalKey enum list:
+	// Buttons = {
+	//       Empty = 0,
+	//       Select = 1, -- (RETURN)
+	//       Ok = 2, -- (RETURN)
+	//       Yes = 4, -- (RETURN)
+	//       Back = 8, -- (ESC)
+	//       Cancel = 16, -- (ESC)
+	//       No = 32, -- (ESC)
+	//       RetrySpace = 64, -- (SPACE)
+	//       Restart = 128, -- (SPACE)
+	//       Skip = 256, -- (SPACE)
+	//       Quit = 512, -- (ESC)
+	//       Adjust = 1024, -- (ARROWS)
+	//       SpaceKey = 2048, -- (SPACE)
+	//       Share = 4096, -- (SPACE)
+	//       SignIn = 8192, -- (SPACE)
+	//       Continue = 16384, -- (RETURN)
+	//       AdjustLeftRight = 32768, -- (SCROLL L/R)
+	//       AdjustUpDown = 65536, -- (SCROLL U/D)
+	//       Overwrite = 131072, -- (SPACE)
+	//       SocialClubSignup = 262144, -- (RETURN)
+	//       Confirm = 524288, -- (RETURN)
+	//       Queue = 1048576, -- (RETURN)
+	//       RetryReturn = 2097152, -- (RETURN)
+	//       BackEsc = 4194304, -- (ESC)
+	//       SocialClub = 8388608, -- (RETURN)
+	//       Spectate = 16777216, -- (SPACE)
+	//       OkEsc = 33554432, -- (ESC)
+	//       CancelTransfer = 67108864, -- (ESC)
+	//       LoadingSpinner = 134217728,
+	//       NoReturnToGTA = 268435456, -- (ESC)
+	//       CancelEsc = 536870912, -- (ESC)
+	// }
+	// 
+	// Alt = {
+	//       Empty = 0,
+	//       No = 1, -- (SPACE)
+	//       Host = 2, -- (ESC)
+	//       SearchForJob = 4, -- (RETURN)
+	//       ReturnKey = 8, -- (TURN)
+	//       Freemode = 16, -- (ESC)
+	// }
+	// 
+	// Example: https://i.imgur.com/TvmNF4k.png
+	static void _SET_WARNING_MESSAGE_WITH_ALERT(const char* labelTitle, const char* labelMessage, int p2, int p3, const char* labelMessage2, BOOL p5, int p6, int p7, const char* p8, const char* p9, BOOL background, int errorCode) { invoke<Void>(0x15803FEC3B9A872B, labelTitle, labelMessage, p2, p3, labelMessage2, p5, p6, p7, p8, p9, background, errorCode); } // 0x15803FEC3B9A872B b573
+	// Has to do with the confirmation overlay (E.g. confirm exit)
 	static Hash _GET_WARNING_MESSAGE_TITLE_HASH() { return invoke<Hash>(0x81DF9ABA6C83DFF9); } // 0x81DF9ABA6C83DFF9 b1290
-	// Param names copied from the corresponding scaleform function "SET_LIST_ROW"
+	// Some sort of list displayed in a warning message. Yet unknown how to prevent repeating.
+	// Param names copied from the corresponding scaleform function "SET_LIST_ROW".
+	// Example: https://i.imgur.com/arKvOYx.png
 	static BOOL _SET_WARNING_MESSAGE_LIST_ROW(int index, const char* name, int cash, int rp, int lvl, int colour) { return invoke<BOOL>(0x0C5A80A9E096D529, index, name, cash, rp, lvl, colour); } // 0x0C5A80A9E096D529 b323
 	static BOOL _0xDAF87174BE7454FF(Any p0) { return invoke<BOOL>(0xDAF87174BE7454FF, p0); } // 0xDAF87174BE7454FF b323
 	static void _REMOVE_WARNING_MESSAGE_LIST_ITEMS() { invoke<Void>(0x6EF54AB721DC6242); } // 0x6EF54AB721DC6242 b323
@@ -4760,13 +5204,20 @@ namespace HUD {
 	// If toggle is true, the map is shown in full screen
 	// If toggle is false, the map is shown in normal mode
 	static void _RACE_GALLERY_FULLSCREEN(BOOL toggle) { invoke<Void>(0x5354C5BA2EA868A4, toggle); } // 0x5354C5BA2EA868A4 0xE4FD20D8 b323
-	static void _RACE_GALLERY_NEXT_BLIP_SPRITE(Any p0) { invoke<Void>(0x1EAE6DD17B7A5EFA, p0); } // 0x1EAE6DD17B7A5EFA 0x13E7A5A9 b323
-	static Any _RACE_GALLERY_ADD_BLIP(float p0, float p1, float p2) { return invoke<Any>(0x551DF99658DB6EE8, p0, p1, p2); } // 0x551DF99658DB6EE8 0x786CA0A2 b323
+	// Sets the sprite of the next BLIP_GALLERY blip, values used in the native scripts: 143 (ObjectiveBlue), 144 (ObjectiveGreen), 145 (ObjectiveRed), 146 (ObjectiveYellow).
+	static void _RACE_GALLERY_NEXT_BLIP_SPRITE(int spriteId) { invoke<Void>(0x1EAE6DD17B7A5EFA, spriteId); } // 0x1EAE6DD17B7A5EFA 0x13E7A5A9 b323
+	// Add a BLIP_GALLERY at the specific coordinate. Used in fm_maintain_transition_players to display race track points.
+	static Any _RACE_GALLERY_ADD_BLIP(float x, float y, float z) { return invoke<Any>(0x551DF99658DB6EE8, x, y, z); } // 0x551DF99658DB6EE8 0x786CA0A2 b323
 	static void _CLEAR_RACE_GALLERY_BLIPS() { invoke<Void>(0x2708FC083123F9FF); } // 0x2708FC083123F9FF 0xCBEC9369 b323
 	// Doesn't actually return anything.
 	static Any FORCE_SONAR_BLIPS_THIS_FRAME() { return invoke<Any>(0x1121BFA1A1A522A8); } // 0x1121BFA1A1A522A8 0x3F4AFB13 b323
 	static Blip _GET_NORTH_RADAR_BLIP() { return invoke<Blip>(0x3F0CF9CB7E589B88); } // 0x3F0CF9CB7E589B88 b463
-	static void _0x82CEDC33687E1F50(BOOL p0) { invoke<Void>(0x82CEDC33687E1F50, p0); } // 0x82CEDC33687E1F50 0x2F28F0A6 b323
+	// Toggles whether or not name labels are shown on the expanded minimap next to player blips, like in GTA:O.
+	// Doesn't need to be called every frame.
+	// Preview: https://i.imgur.com/DfqKWfJ.png
+	// 
+	// Make sure to call SET_BLIP_CATEGORY with index 7 for this to work on the desired blip.
+	static void DISPLAY_PLAYER_NAME_TAGS_ON_BLIPS(BOOL toggle) { invoke<Void>(0x82CEDC33687E1F50, toggle); } // 0x82CEDC33687E1F50 0x2F28F0A6 b323
 	// This native does absolutely nothing, just a nullsub
 	static void _0x211C4EF450086857() { invoke<Void>(0x211C4EF450086857); } // 0x211C4EF450086857 0x801D0D86 b323
 	static void _0xBF4F34A85CA2970C() { invoke<Void>(0xBF4F34A85CA2970C); } // 0xBF4F34A85CA2970C 0x317775DF b323
@@ -4785,7 +5236,32 @@ namespace HUD {
 	// the int p2 is actually a component variable. When the pause menu is visible, it opens the tab related to it.
 	// 
 	// Example : Function.Call(Hash.ACTIVATE_FRONTEND_MENU,-1171018317, 0, 42);
-	// Result : Opens the "Online" tab without pausing the menu, with -1 it opens the map.
+	// Result : Opens the "Online" tab without pausing the menu, with -1 it opens the map.Below is a list of all known Frontend Menu Hashes.
+	// - FE_MENU_VERSION_SP_PAUSE
+	// - FE_MENU_VERSION_MP_PAUSE
+	// - FE_MENU_VERSION_CREATOR_PAUSE
+	// - FE_MENU_VERSION_CUTSCENE_PAUSE
+	// - FE_MENU_VERSION_SAVEGAME
+	// - FE_MENU_VERSION_PRE_LOBBY
+	// - FE_MENU_VERSION_LOBBY
+	// - FE_MENU_VERSION_MP_CHARACTER_SELECT
+	// - FE_MENU_VERSION_MP_CHARACTER_CREATION
+	// - FE_MENU_VERSION_EMPTY
+	// - FE_MENU_VERSION_EMPTY_NO_BACKGROUND
+	// - FE_MENU_VERSION_TEXT_SELECTION
+	// - FE_MENU_VERSION_CORONA
+	// - FE_MENU_VERSION_CORONA_LOBBY
+	// - FE_MENU_VERSION_CORONA_JOINED_PLAYERS
+	// - FE_MENU_VERSION_CORONA_INVITE_PLAYERS
+	// - FE_MENU_VERSION_CORONA_INVITE_FRIENDS
+	// - FE_MENU_VERSION_CORONA_INVITE_CREWS
+	// - FE_MENU_VERSION_CORONA_INVITE_MATCHED_PLAYERS
+	// - FE_MENU_VERSION_CORONA_INVITE_LAST_JOB_PLAYERS
+	// - FE_MENU_VERSION_CORONA_RACE
+	// - FE_MENU_VERSION_CORONA_BETTING
+	// - FE_MENU_VERSION_JOINING_SCREEN
+	// - FE_MENU_VERSION_LANDING_MENU
+	// - FE_MENU_VERSION_LANDING_KEYMAPPING_MENU
 	static void ACTIVATE_FRONTEND_MENU(Hash menuhash, BOOL togglePause, int component) { invoke<Void>(0xEF01D36B9C9D0C7B, menuhash, togglePause, component); } // 0xEF01D36B9C9D0C7B 0x01D83872 b323
 	// Before using this native click the native above and look at the decription.
 	// 
@@ -4804,6 +5280,7 @@ namespace HUD {
 	static void SET_PAUSE_MENU_ACTIVE(BOOL toggle) { invoke<Void>(0xDF47FC56C71569CF, toggle); } // 0xDF47FC56C71569CF 0x1DCD878E b323
 	static void DISABLE_FRONTEND_THIS_FRAME() { invoke<Void>(0x6D3465A73092F0E6); } // 0x6D3465A73092F0E6 0xD86A029E b323
 	static void SUPPRESS_FRONTEND_RENDERING_THIS_FRAME() { invoke<Void>(0xBA751764F0821256); } // 0xBA751764F0821256 0x7F349900 b323
+	// Allows opening the pause menu this frame, when the player is dead.
 	static void _ALLOW_PAUSE_MENU_WHEN_DEAD_THIS_FRAME() { invoke<Void>(0xCC3FDDED67BCFC63); } // 0xCC3FDDED67BCFC63 0x630CD8EE b323
 	static void SET_FRONTEND_ACTIVE(BOOL active) { invoke<Void>(0x745711A75AB09277, active); } // 0x745711A75AB09277 0x81E1AD32 b323
 	static BOOL IS_PAUSE_MENU_ACTIVE() { return invoke<BOOL>(0xB0034A223497FFCB); } // 0xB0034A223497FFCB 0xD3600591 b323
@@ -4834,46 +5311,90 @@ namespace HUD {
 	static void _0x77F16B447824DA6C(Any p0) { invoke<Void>(0x77F16B447824DA6C, p0); } // 0x77F16B447824DA6C 0x0A89336C b323
 	static void _0xCDCA26E80FAECB8F() { invoke<Void>(0xCDCA26E80FAECB8F); } // 0xCDCA26E80FAECB8F 0xC84BE309 b323
 	static void _0x2DE6C5E2E996F178(Any p0) { invoke<Void>(0x2DE6C5E2E996F178, p0); } // 0x2DE6C5E2E996F178 b372
+	// Activates the specified frontend menu context.
+	// pausemenu.xml defines some specific menu options using 'context'. Context is basically a 'condition'. 
+	// The `*ALL*` part of the context means that whatever is being defined, will be active when any or all of those conditions after `*ALL*` are met.
+	// The `*NONE*` part of the context section means that whatever is being defined, will NOT be active if any or all of the conditions after `*NONE*` are met.
+	// This basically allows you to hide certain menu sections, or things like instructional buttons.
 	static void PAUSE_MENU_ACTIVATE_CONTEXT(Hash contextHash) { invoke<Void>(0xDD564BDD0472C936, contextHash); } // 0xDD564BDD0472C936 0x9FE8FD5E b323
 	static void PAUSE_MENU_DEACTIVATE_CONTEXT(Hash contextHash) { invoke<Void>(0x444D8CF241EC25C5, contextHash); } // 0x444D8CF241EC25C5 0x0029046E b323
 	static BOOL PAUSE_MENU_IS_CONTEXT_ACTIVE(Hash contextHash) { return invoke<BOOL>(0x84698AB38D0C6636, contextHash); } // 0x84698AB38D0C6636 0xC51BC42F b323
-	static Any _0x2A25ADC48F87841F() { return invoke<Any>(0x2A25ADC48F87841F); } // 0x2A25ADC48F87841F 0x016D7AF9 b323
+	static Any PAUSE_MENU_IS_CONTEXT_MENU_ACTIVE() { return invoke<Any>(0x2A25ADC48F87841F); } // 0x2A25ADC48F87841F 0x016D7AF9 b323
 	static Any _0xDE03620F8703A9DF() { return invoke<Any>(0xDE03620F8703A9DF); } // 0xDE03620F8703A9DF b323
 	static Any _0x359AF31A4B52F5ED() { return invoke<Any>(0x359AF31A4B52F5ED); } // 0x359AF31A4B52F5ED b323
 	static Any _0x13C4B962653A5280() { return invoke<Any>(0x13C4B962653A5280); } // 0x13C4B962653A5280 b323
 	static BOOL _0xC8E1071177A23BE5(Any* p0, Any* p1, Any* p2) { return invoke<BOOL>(0xC8E1071177A23BE5, p0, p1, p2); } // 0xC8E1071177A23BE5 b323
 	static void _0x4895BDEA16E7C080(int p0) { invoke<Void>(0x4895BDEA16E7C080, p0); } // 0x4895BDEA16E7C080 0x15B24768 b323
-	static void _0xC78E239AC5B2DDB9(BOOL p0, Any p1, Any p2) { invoke<Void>(0xC78E239AC5B2DDB9, p0, p1, p2); } // 0xC78E239AC5B2DDB9 0x6C67131A b323
+	static void PAUSE_MENU_SET_BUSY_SPINNER(BOOL p0, Any p1, Any p2) { invoke<Void>(0xC78E239AC5B2DDB9, p0, p1, p2); } // 0xC78E239AC5B2DDB9 0x6C67131A b323
 	static void _0xF06EBB91A81E09E3(BOOL p0) { invoke<Void>(0xF06EBB91A81E09E3, p0); } // 0xF06EBB91A81E09E3 0x11D09737 b323
 	static BOOL IS_FRONTEND_READY_FOR_CONTROL() { return invoke<BOOL>(0x3BAB9A4E4F2FF5C7); } // 0x3BAB9A4E4F2FF5C7 0xD3BF3ABD b323
-	static void _0xEC9264727EEC0F28() { invoke<Void>(0xEC9264727EEC0F28); } // 0xEC9264727EEC0F28 0xC06B763D b323
-	static void _0x14621BB1DF14E2B2() { invoke<Void>(0x14621BB1DF14E2B2); } // 0x14621BB1DF14E2B2 0xB9392CE7 b323
+	// Disables frontend (works in custom frontends, not sure about regular pause menu) navigation keys on keyboard. Not sure about controller. Does not disable mouse controls. No need to call this every tick.
+	// 
+	// To enable the keys again, use `0x14621BB1DF14E2B2`.
+	static void TAKE_CONTROL_OF_FRONTEND() { invoke<Void>(0xEC9264727EEC0F28); } // 0xEC9264727EEC0F28 0xC06B763D b323
+	// Enables frontend (works in custom frontends, not sure about regular pause menu) navigation keys on keyboard if they were disabled using the native below.
+	// To disable the keys, use `0xEC9264727EEC0F28`
+	static void RELEASE_CONTROL_OF_FRONTEND() { invoke<Void>(0x14621BB1DF14E2B2); } // 0x14621BB1DF14E2B2 0xB9392CE7 b323
 	static Any _0x66E7CB63C97B7D20() { return invoke<Any>(0x66E7CB63C97B7D20); } // 0x66E7CB63C97B7D20 0x92DAFA78 b323
 	static Any _0x593FEAE1F73392D4() { return invoke<Any>(0x593FEAE1F73392D4); } // 0x593FEAE1F73392D4 0x22CA9F2A b323
-	static Any _0x4E3CD0EF8A489541() { return invoke<Any>(0x4E3CD0EF8A489541); } // 0x4E3CD0EF8A489541 0xDA7951A2 b323
+	static Any IS_NAVIGATING_MENU_CONTENT() { return invoke<Any>(0x4E3CD0EF8A489541); } // 0x4E3CD0EF8A489541 0xDA7951A2 b323
 	static Any _0xF284AC67940C6812() { return invoke<Any>(0xF284AC67940C6812); } // 0xF284AC67940C6812 0x7D95AFFF b323
-	static Any _0x2E22FEFA0100275E() { return invoke<Any>(0x2E22FEFA0100275E); } // 0x2E22FEFA0100275E 0x96863460 b323
+	// Returns true when the menu state(?) changed this frame.
+	// HAS_*? _GET_MENU_STATE_CHANGED_THIS_FRAME?
+	static BOOL _0x2E22FEFA0100275E() { return invoke<BOOL>(0x2E22FEFA0100275E); } // 0x2E22FEFA0100275E 0x96863460 b323
 	static void _0x0CF54F20DE43879C(Any p0) { invoke<Void>(0x0CF54F20DE43879C, p0); } // 0x0CF54F20DE43879C b323
-	static void _0x36C1451A88A09630(Any* p0, Any* p1) { invoke<Void>(0x36C1451A88A09630, p0, p1); } // 0x36C1451A88A09630 0x8543AAC8 b323
-	static void _0x7E17BE53E1AAABAF(Any* p0, Any* p1, Any* p2) { invoke<Void>(0x7E17BE53E1AAABAF, p0, p1, p2); } // 0x7E17BE53E1AAABAF 0x6025AA2F b323
+	static void _GET_PAUSE_MENU_SELECTION(int* lastItemMenuId, int* selectedItemUniqueId) { invoke<Void>(0x36C1451A88A09630, lastItemMenuId, selectedItemUniqueId); } // 0x36C1451A88A09630 0x8543AAC8 b323
+	// lastItemMenuId: this is the menuID of the last selected item minus 1000 (lastItem.menuID - 1000)
+	// selectedItemMenuId: same as lastItemMenuId except for the currently selected menu item
+	// selectedItemUniqueId: this is uniqueID of the currently selected menu item
+	// 
+	// when the pausemenu is closed:
+	// lastItemMenuId = -1
+	// selectedItemMenuId = -1
+	// selectedItemUniqueId = 0
+	// 
+	// when the header gains focus:
+	// lastItemMenuId updates as normal or 0 if the pausemenu was just opened
+	// selectedItemMenuId becomes a unique id for the pausemenu page that focus was taken from (?) or 0 if the pausemenu was just opened
+	// selectedItemUniqueId = -1
+	// 
+	// when focus is moved from the header to a pausemenu page:
+	// lastItemMenuId becomes a unique id for the pausemenu page that focus was moved to (?)
+	// selectedItemMenuId = -1
+	// selectedItemUniqueId updates as normal
+	static void _GET_PAUSE_MENU_SELECTION_DATA(int* lastItemMenuId, int* selectedItemMenuId, int* selectedItemUniqueId) { invoke<Void>(0x7E17BE53E1AAABAF, lastItemMenuId, selectedItemMenuId, selectedItemUniqueId); } // 0x7E17BE53E1AAABAF 0x6025AA2F b323
 	static BOOL _0xA238192F33110615(int* p0, int* p1, int* p2) { return invoke<BOOL>(0xA238192F33110615, p0, p1, p2); } // 0xA238192F33110615 0x46794EB2 b323
-	static BOOL _0xEF4CED81CEBEDC6D(Any p0, Any* p1) { return invoke<BOOL>(0xEF4CED81CEBEDC6D, p0, p1); } // 0xEF4CED81CEBEDC6D 0x4370999E b323
+	static BOOL GET_MENU_PED_INT_STAT(Any p0, Any* p1) { return invoke<BOOL>(0xEF4CED81CEBEDC6D, p0, p1); } // 0xEF4CED81CEBEDC6D 0x4370999E b323
 	static BOOL _0xCA6B2F7CE32AB653(Any p0, Any* p1, Any p2) { return invoke<BOOL>(0xCA6B2F7CE32AB653, p0, p1, p2); } // 0xCA6B2F7CE32AB653 b323
-	static BOOL _0x90A6526CF0381030(Any p0, Any* p1, Any p2, Any p3) { return invoke<BOOL>(0x90A6526CF0381030, p0, p1, p2, p3); } // 0x90A6526CF0381030 0xD6CC4766 b323
+	static BOOL GET_MENU_PED_MASKED_INT_STAT(Any p0, Any* p1, Any p2, Any p3) { return invoke<BOOL>(0x90A6526CF0381030, p0, p1, p2, p3); } // 0x90A6526CF0381030 0xD6CC4766 b323
 	static BOOL _0x24A49BEAF468DC90(Any p0, Any* p1, Any p2, Any p3, Any p4) { return invoke<BOOL>(0x24A49BEAF468DC90, p0, p1, p2, p3, p4); } // 0x24A49BEAF468DC90 b323
-	static BOOL _0x5FBD7095FE7AE57F(Any p0, float* p1) { return invoke<BOOL>(0x5FBD7095FE7AE57F, p0, p1); } // 0x5FBD7095FE7AE57F 0x51972B04 b323
+	static BOOL GET_MENU_PED_FLOAT_STAT(Any p0, float* p1) { return invoke<BOOL>(0x5FBD7095FE7AE57F, p0, p1); } // 0x5FBD7095FE7AE57F 0x51972B04 b323
 	static BOOL _0x8F08017F9D7C47BD(Any p0, Any* p1, Any p2) { return invoke<BOOL>(0x8F08017F9D7C47BD, p0, p1, p2); } // 0x8F08017F9D7C47BD b323
 	// p0 was always 0xAE2602A3.
-	static BOOL _0x052991E59076E4E4(Hash p0, Any* p1) { return invoke<BOOL>(0x052991E59076E4E4, p0, p1); } // 0x052991E59076E4E4 0xD43BB56D b323
+	static BOOL GET_MENU_PED_BOOL_STAT(Hash p0, Any* p1) { return invoke<BOOL>(0x052991E59076E4E4, p0, p1); } // 0x052991E59076E4E4 0xD43BB56D b323
 	static void CLEAR_PED_IN_PAUSE_MENU() { invoke<Void>(0x5E62BE5DC58E9E06); } // 0x5E62BE5DC58E9E06 0x28058ACF b323
 	// p1 is either 1 or 2 in the PC scripts.
 	static void GIVE_PED_TO_PAUSE_MENU(Ped ped, int p1) { invoke<Void>(0xAC0BFBDC3BE00E14, ped, p1); } // 0xAC0BFBDC3BE00E14 0x2AD2C9CE b323
-	static void SET_PAUSE_MENU_PED_LIGHTING(BOOL p0) { invoke<Void>(0x3CA6050692BC61B0, p0); } // 0x3CA6050692BC61B0 0x127310EB b323
+	// Toggles the light state for the pause menu ped in frontend menus.
+	// 
+	// This is used by R* in combination with `SET_PAUSE_MENU_PED_SLEEP_STATE` to toggle the "offline" or "online" state in the "friends" tab of the pause menu in GTA Online.
+	// 
+	// 
+	// Example:
+	// Lights On: https://vespura.com/hi/i/2019-04-01_16-09_540ee_1015.png
+	// Lights Off: https://vespura.com/hi/i/2019-04-01_16-10_8b5e7_1016.png
+	static void SET_PAUSE_MENU_PED_LIGHTING(BOOL state) { invoke<Void>(0x3CA6050692BC61B0, state); } // 0x3CA6050692BC61B0 0x127310EB b323
+	// Toggles the pause menu ped sleep state for frontend menus.
+	// 
+	// Example: https://vespura.com/hi/i/2019-04-01_15-51_8ed38_1014.gif
+	// 
+	// `state` 0 will make the ped slowly fall asleep, 1 will slowly wake the ped up.
 	static void SET_PAUSE_MENU_PED_SLEEP_STATE(BOOL state) { invoke<Void>(0xECF128344E9FF9F1, state); } // 0xECF128344E9FF9F1 0x8F45D327 b323
 	static void OPEN_ONLINE_POLICIES_MENU() { invoke<Void>(0x805D7CBB36FD6C4C); } // 0x805D7CBB36FD6C4C 0x19FCBBB2 b323
 	static BOOL _0xF13FE2A80C05C561() { return invoke<BOOL>(0xF13FE2A80C05C561); } // 0xF13FE2A80C05C561 0x850690FF b323
 	// Returns the same as IS_SOCIAL_CLUB_ACTIVE
 	static BOOL IS_ONLINE_POLICIES_MENU_ACTIVE() { return invoke<BOOL>(0x6F72CD94F7B5B68C); } // 0x6F72CD94F7B5B68C 0x9D4934F4 b323
+	// Uses the `SOCIAL_CLUB2` scaleform.
 	static void OPEN_SOCIAL_CLUB_MENU() { invoke<Void>(0x75D3691713C3B05A); } // 0x75D3691713C3B05A 0x57218529 b323
 	static void CLOSE_SOCIAL_CLUB_MENU() { invoke<Void>(0xD2B32BE3FC1626C6); } // 0xD2B32BE3FC1626C6 0x5F86AA39 b323
 	// HUD::SET_SOCIAL_CLUB_TOUR("Gallery");
@@ -4886,14 +5407,12 @@ namespace HUD {
 	static void _0x1185A8087587322C(BOOL p0) { invoke<Void>(0x1185A8087587322C, p0); } // 0x1185A8087587322C b323
 	static void _FORCE_CLOSE_TEXT_INPUT_BOX() { invoke<Void>(0x8817605C2BA76200); } // 0x8817605C2BA76200 b323
 	static void _0x577599CCED639CA2(Any p0) { invoke<Void>(0x577599CCED639CA2, p0); } // 0x577599CCED639CA2 b505
-	static void _OVERRIDE_MULTIPLAYER_CHAT_PREFIX(Any p0) { invoke<Void>(0x6A1738B4323FE2D9, p0); } // 0x6A1738B4323FE2D9 b573
+	static void _OVERRIDE_MULTIPLAYER_CHAT_PREFIX(Hash gxtEntryHash) { invoke<Void>(0x6A1738B4323FE2D9, gxtEntryHash); } // 0x6A1738B4323FE2D9 b573
 	// Returns whether or not the text chat (MULTIPLAYER_CHAT Scaleform component) is active.
-	// 
-	// -- NTAuthority (http://fivem.net)
 	static BOOL _IS_MULTIPLAYER_CHAT_ACTIVE() { return invoke<BOOL>(0xB118AF58B5F332A1); } // 0xB118AF58B5F332A1 b323
 	static void _CLOSE_MULTIPLAYER_CHAT() { invoke<Void>(0x1AC8F4AD40E22127); } // 0x1AC8F4AD40E22127 b323
 	static void _0x7C226D5346D4D10A(Any p0) { invoke<Void>(0x7C226D5346D4D10A, p0); } // 0x7C226D5346D4D10A b372
-	static void _OVERRIDE_MULTIPLAYER_CHAT_COLOUR(Any p0, Any p1) { invoke<Void>(0xF47E567B3630DD12, p0, p1); } // 0xF47E567B3630DD12 b678
+	static void _OVERRIDE_MULTIPLAYER_CHAT_COLOUR(int p0, int hudColor) { invoke<Void>(0xF47E567B3630DD12, p0, hudColor); } // 0xF47E567B3630DD12 b678
 	// Sets an unknown boolean value in the text chat.
 	static void _SET_TEXT_CHAT_UNK(BOOL p0) { invoke<Void>(0x1DB21A44B09E8BA3, p0); } // 0x1DB21A44B09E8BA3 b323
 	static void FLAG_PLAYER_CONTEXT_IN_TOURNAMENT(BOOL toggle) { invoke<Void>(0xCEF214315D276FD1, toggle); } // 0xCEF214315D276FD1 0xFF06772A b323
@@ -4923,9 +5442,11 @@ namespace HUD {
 	static void _SET_PLAYER_IS_IN_DIRECTOR_MODE(BOOL toggle) { invoke<Void>(0x808519373FD336A3, toggle); } // 0x808519373FD336A3 b323
 	// SET_*
 	static void _0x04655F9D075D0AE5(BOOL toggle) { invoke<Void>(0x04655F9D075D0AE5, toggle); } // 0x04655F9D075D0AE5 b323
+	static void _0x243296A510B562B6() { invoke<Void>(0x243296A510B562B6); } // 0x243296A510B562B6 b2060
 }
 
-namespace INTERIOR {
+namespace INTERIOR
+{
 	// GET_INTERIOR_*
 	static float _GET_INTERIOR_HEADING(Interior interior) { return invoke<float>(0xF49B58631D9E22D9, interior); } // 0xF49B58631D9E22D9 b1493
 	// GET_INTERIOR_*
@@ -4945,6 +5466,8 @@ namespace INTERIOR {
 	// Returns the handle of the interior that the entity is in. Returns 0 if outside.
 	static Interior GET_INTERIOR_FROM_ENTITY(Entity entity) { return invoke<Interior>(0x2107BA504071A6BB, entity); } // 0x2107BA504071A6BB 0x5C644614 b323
 	static void _0x82EBB79E258FA2B7(Entity entity, Interior interior) { invoke<Void>(0x82EBB79E258FA2B7, entity, interior); } // 0x82EBB79E258FA2B7 0xE645E162 b323
+	// Immediately removes entity from an interior. Like sets entity to `limbo` room.
+	static void _CLEAR_INTERIOR_FOR_ENTITY(Entity entity) { invoke<Void>(0x85D5422B2039A70D, entity); } // 0x85D5422B2039A70D b2189
 	static void _0x38C1CB1CB119A016(Any p0, Any p1) { invoke<Void>(0x38C1CB1CB119A016, p0, p1); } // 0x38C1CB1CB119A016 b1493
 	static void FORCE_ROOM_FOR_GAME_VIEWPORT(int interiorID, Hash roomHashKey) { invoke<Void>(0x920D853F3E17F1DA, interiorID, roomHashKey); } // 0x920D853F3E17F1DA 0xD79803B5 b323
 	// Exemple of use(carmod_shop.c4)
@@ -4954,7 +5477,8 @@ namespace INTERIOR {
 	static void _0x405DC2AEF6AF95B9(Hash roomHashKey) { invoke<Void>(0x405DC2AEF6AF95B9, roomHashKey); } // 0x405DC2AEF6AF95B9 0x0E9529CC b323
 	static Hash GET_ROOM_KEY_FOR_GAME_VIEWPORT() { return invoke<Hash>(0xA6575914D2A0B450); } // 0xA6575914D2A0B450 0x4FF3D3F5 b323
 	static void CLEAR_ROOM_FOR_GAME_VIEWPORT() { invoke<Void>(0x23B59D8912F94246); } // 0x23B59D8912F94246 0x617DC75D b323
-	static Any _0xE7D267EC6CA966C3() { return invoke<Any>(0xE7D267EC6CA966C3); } // 0xE7D267EC6CA966C3 b1604
+	// Returns the current interior id from gameplay camera
+	static Interior _GET_INTERIOR_FROM_GAMEPLAY_CAM() { return invoke<Interior>(0xE7D267EC6CA966C3); } // 0xE7D267EC6CA966C3 b1604
 	// Returns interior ID from specified coordinates. If coordinates are outside, then it returns 0.
 	// 
 	// Example for VB.NET
@@ -4986,16 +5510,21 @@ namespace INTERIOR {
 	static int GET_INTERIOR_FROM_COLLISION(float x, float y, float z) { return invoke<int>(0xEC4CF9FCB29A4424, x, y, z); } // 0xEC4CF9FCB29A4424 0x7ED33DC1 b323
 	static void _0x7ECDF98587E92DEC(Any p0) { invoke<Void>(0x7ECDF98587E92DEC, p0); } // 0x7ECDF98587E92DEC b1604
 	// More info: http://gtaforums.com/topic/836367-adding-props-to-interiors/
+	// 
+	// Full list of IPLs and interior entity sets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/ipls.json
 	static void ACTIVATE_INTERIOR_ENTITY_SET(Interior interior, const char* entitySetName) { invoke<Void>(0x55E86AF2712B36A1, interior, entitySetName); } // 0x55E86AF2712B36A1 0xC80A5DDF b323
+	// Full list of IPLs and interior entity sets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/ipls.json
 	static void DEACTIVATE_INTERIOR_ENTITY_SET(Interior interior, const char* entitySetName) { invoke<Void>(0x420BD37289EEE162, interior, entitySetName); } // 0x420BD37289EEE162 0xDBA768A1 b323
+	// Full list of IPLs and interior entity sets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/ipls.json
 	static BOOL IS_INTERIOR_ENTITY_SET_ACTIVE(Interior interior, const char* entitySetName) { return invoke<BOOL>(0x35F7DD45E8C0A16D, interior, entitySetName); } // 0x35F7DD45E8C0A16D 0x39A3CC6F b323
+	// Full list of IPLs and interior entity sets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/ipls.json
 	static void _SET_INTERIOR_ENTITY_SET_COLOR(Interior interior, const char* entitySetName, int color) { invoke<Void>(0xC1F1920BAF281317, interior, entitySetName, color); } // 0xC1F1920BAF281317 b877
 	static void REFRESH_INTERIOR(Interior interior) { invoke<Void>(0x41F37C3427C75AE0, interior); } // 0x41F37C3427C75AE0 0x9A29ACE6 b323
 	// This is the native that is used to hide the exterior of GTA Online apartment buildings when you are inside an apartment.
 	// 
 	// More info: http://gtaforums.com/topic/836301-hiding-gta-online-apartment-exteriors/
 	static void ENABLE_EXTERIOR_CULL_MODEL_THIS_FRAME(Hash mapObjectHash) { invoke<Void>(0xA97F257D0151A6AB, mapObjectHash); } // 0xA97F257D0151A6AB 0x1F375B4C b323
-	static void _ENABLE_SCRIPT_CULL_MODEL_THIS_FRAME(Any p0) { invoke<Void>(0x50C375537449F369, p0); } // 0x50C375537449F369 b757
+	static void _ENABLE_SCRIPT_CULL_MODEL_THIS_FRAME(Hash mapObjectHash) { invoke<Void>(0x50C375537449F369, mapObjectHash); } // 0x50C375537449F369 b757
 	// Example: 
 	// This removes the interior from the strip club and when trying to walk inside the player just falls:
 	// 
@@ -5011,7 +5540,8 @@ namespace INTERIOR {
 	static void _0x7241CCB7D020DB69(Entity entity, BOOL toggle) { invoke<Void>(0x7241CCB7D020DB69, entity, toggle); } // 0x7241CCB7D020DB69 b791
 }
 
-namespace ITEMSET {
+namespace ITEMSET
+{
 	static Vehicle CREATE_ITEMSET(BOOL p0) { return invoke<Vehicle>(0x35AD299F50D91B24, p0); } // 0x35AD299F50D91B24 0x0A113B2C b323
 	static void DESTROY_ITEMSET(Any p0) { invoke<Void>(0xDE18220B1C183EDA, p0); } // 0xDE18220B1C183EDA 0x83CE1A4C b323
 	static BOOL IS_ITEMSET_VALID(Any p0) { return invoke<BOOL>(0xB1B1EA596344DFAB, p0); } // 0xB1B1EA596344DFAB 0xD201FC29 b323
@@ -5023,7 +5553,8 @@ namespace ITEMSET {
 	static void CLEAN_ITEMSET(Any p0) { invoke<Void>(0x41BC0D722FC04221, p0); } // 0x41BC0D722FC04221 0x919A4858 b323
 }
 
-namespace LOADINGSCREEN {
+namespace LOADINGSCREEN
+{
 	// MulleDK19: This function is hard-coded to always return 0.
 	static int _0xF2CA003F167E21D2() { return invoke<int>(0xF2CA003F167E21D2); } // 0xF2CA003F167E21D2 0x106C8317 b323
 	static BOOL _LOADINGSCREEN_GET_LOAD_FREEMODE() { return invoke<BOOL>(0xEF7D17BC6C85264C); } // 0xEF7D17BC6C85264C 0xD87F3A9E b323
@@ -5035,7 +5566,8 @@ namespace LOADINGSCREEN {
 	static void _0xFA1E0E893D915215(BOOL toggle) { invoke<Void>(0xFA1E0E893D915215, toggle); } // 0xFA1E0E893D915215 0x5C350D78 b323
 }
 
-namespace LOCALIZATION {
+namespace LOCALIZATION
+{
 	// Same return values as GET_CURRENT_LANGUAGE
 	static int _LOCALIZATION_GET_SYSTEM_LANGUAGE() { return invoke<int>(0x497420E022796B3F); } // 0x497420E022796B3F b877
 	// 0 = american (en-US)
@@ -5053,11 +5585,11 @@ namespace LOCALIZATION {
 	// 12 = chinesesimp (zh-CN)
 	static int GET_CURRENT_LANGUAGE() { return invoke<int>(0x2BDD44CC428A7EAE); } // 0x2BDD44CC428A7EAE 0x761BE00B b323
 	// Possible return values: 0, 1, 2
-	// It's used to check the user's date format.
-	static int _LOCALIZATION_GET_USER_LANGUAGE() { return invoke<int>(0xA8AE43AEC1A61314); } // 0xA8AE43AEC1A61314 b323
+	static int _LOCALIZATION_GET_SYSTEM_DATE_FORMAT() { return invoke<int>(0xA8AE43AEC1A61314); } // 0xA8AE43AEC1A61314 b323
 }
 
-namespace MISC {
+namespace MISC
+{
 	static int GET_ALLOCATED_STACK_SIZE() { return invoke<int>(0x8B3CA62B1EF19B62); } // 0x8B3CA62B1EF19B62 0x4E9CA30A b323
 	static int GET_NUMBER_OF_FREE_STACKS_OF_THIS_SIZE(int stackSize) { return invoke<int>(0xFEAD16FC8F9DFC0F, stackSize); } // 0xFEAD16FC8F9DFC0F 0x11A178B8 b323
 	static void SET_RANDOM_SEED(int seed) { invoke<Void>(0x444D98F98C11F3EC, seed); } // 0x444D98F98C11F3EC 0xDB3FEB5C b323
@@ -5093,12 +5625,16 @@ namespace MISC {
 	// Does nothing (it's a nullsub). Seems to be PS4 specific.
 	static void _0x97E7E2C04245115B(Any p0) { invoke<Void>(0x97E7E2C04245115B, p0); } // 0x97E7E2C04245115B b323
 	// Does nothing (it's a nullsub). Seems to be PS4 specific.
+	static void _0x916CA67D26FD1E37(const char* p0) { invoke<Void>(0x916CA67D26FD1E37, p0); } // 0x916CA67D26FD1E37 b2060
+	// Does nothing (it's a nullsub). Seems to be PS4 specific.
 	static void _0xEB078CA2B5E82ADD(const char* p0, const char* p1) { invoke<Void>(0xEB078CA2B5E82ADD, p0, p1); } // 0xEB078CA2B5E82ADD b323
 	// Does nothing (it's a nullsub). Seems to be PS4 specific.
 	static void _0x703CC7F60CBB2B57(const char* p0) { invoke<Void>(0x703CC7F60CBB2B57, p0); } // 0x703CC7F60CBB2B57 b323
 	// Does nothing (it's a nullsub). Seems to be PS4 specific.
 	static void _0x8951EB9C6906D3C8() { invoke<Void>(0x8951EB9C6906D3C8); } // 0x8951EB9C6906D3C8 b323
 	// Does nothing (it's a nullsub). Seems to be PS4 specific.
+	// 
+	// Used only once in the scripts (ingamehud) with p0 = "AF_GAMEMODE"
 	static void _0xBA4B8D83BDC75551(const char* p0) { invoke<Void>(0xBA4B8D83BDC75551, p0); } // 0xBA4B8D83BDC75551 b323
 	// Hardcoded to return false.
 	static BOOL _HAS_RESUMED_FROM_SUSPEND() { return invoke<BOOL>(0xE8B9C0EC9E183F35); } // 0xE8B9C0EC9E183F35 b323
@@ -5164,7 +5700,11 @@ namespace MISC {
 	static void SET_WEATHER_TYPE_OVERTIME_PERSIST(const char* weatherType, float time) { invoke<Void>(0xFB5045B7C42B75BF, weatherType, time); } // 0xFB5045B7C42B75BF 0x386F0D25 b323
 	static void SET_RANDOM_WEATHER_TYPE() { invoke<Void>(0x8B05F884CF7E8020); } // 0x8B05F884CF7E8020 0xE7AA1BC9 b323
 	static void CLEAR_WEATHER_TYPE_PERSIST() { invoke<Void>(0xCCC39339BEF76CF5); } // 0xCCC39339BEF76CF5 0x6AB757D8 b323
-	static void _0x0CF97F497FE7D048(Any p0) { invoke<Void>(0x0CF97F497FE7D048, p0); } // 0x0CF97F497FE7D048 b1103
+	// 0 as param = weird black and green screen
+	// 0.1 - 0.99 = Prevent rain effect from falling (still sound and effects on puddles) and prevent puddles from increase/decrease, seems than it prevent any weather change too
+	// 1 and more = "Unfreeze" rain puddles but clear weather too
+	// When 'freezing' is enabled, it seem to also freeze value getted with GetRainLevel
+	static void _0x0CF97F497FE7D048(float p0) { invoke<Void>(0x0CF97F497FE7D048, p0); } // 0x0CF97F497FE7D048 b1103
 	static void _GET_WEATHER_TYPE_TRANSITION(Hash* weatherType1, Hash* weatherType2, float* percentWeather2) { invoke<Void>(0xF3BBE884A14BB413, weatherType1, weatherType2, percentWeather2); } // 0xF3BBE884A14BB413 0x9A5C1D56 b323
 	// Mixes two weather types. If percentWeather2 is set to 0.0f, then the weather will be entirely of weatherType1, if it is set to 1.0f it will be entirely of weatherType2. If it's set somewhere in between, there will be a mixture of weather behaviors. To test, try this in the RPH console, and change the float to different values between 0 and 1:
 	// 
@@ -5200,35 +5740,42 @@ namespace MISC {
 	// 
 	// If you pass true, something will be set to zero.
 	static void SET_OVERRIDE_WEATHER(const char* weatherType) { invoke<Void>(0xA43D5C6FE51ADBEF, weatherType); } // 0xA43D5C6FE51ADBEF 0xD9082BB5 b323
+	static void _0x1178E104409FE58C(Any p0, Any p1) { invoke<Void>(0x1178E104409FE58C, p0, p1); } // 0x1178E104409FE58C b2189
 	static void CLEAR_OVERRIDE_WEATHER() { invoke<Void>(0x338D2E3477711050); } // 0x338D2E3477711050 0x7740EA4E b323
-	static void _0xB8F87EAD7533B176(float p0) { invoke<Void>(0xB8F87EAD7533B176, p0); } // 0xB8F87EAD7533B176 0x625181DC b323
-	static void _0xC3EAD29AB273ECE8(float p0) { invoke<Void>(0xC3EAD29AB273ECE8, p0); } // 0xC3EAD29AB273ECE8 0xBEBBFDC8 b323
-	static void _0xA7A1127490312C36(float p0) { invoke<Void>(0xA7A1127490312C36, p0); } // 0xA7A1127490312C36 0x6926AB03 b323
-	static void _0x31727907B2C43C55(float p0) { invoke<Void>(0x31727907B2C43C55, p0); } // 0x31727907B2C43C55 0xD447439D b323
-	static void _0x405591EC8FD9096D(float p0) { invoke<Void>(0x405591EC8FD9096D, p0); } // 0x405591EC8FD9096D 0x584E9C59 b323
-	static void _0xF751B16FB32ABC1D(float p0) { invoke<Void>(0xF751B16FB32ABC1D, p0); } // 0xF751B16FB32ABC1D 0x5656D578 b323
-	static void _0xB3E6360DDE733E82(float p0) { invoke<Void>(0xB3E6360DDE733E82, p0); } // 0xB3E6360DDE733E82 0x0DE40C28 b323
-	static void _0x7C9C0B1EEB1F9072(float p0) { invoke<Void>(0x7C9C0B1EEB1F9072, p0); } // 0x7C9C0B1EEB1F9072 0x98C9138B b323
-	static void _0x6216B116083A7CB4(float p0) { invoke<Void>(0x6216B116083A7CB4, p0); } // 0x6216B116083A7CB4 0xFB1A9CDE b323
-	static void _0x9F5E6BB6B34540DA(float p0) { invoke<Void>(0x9F5E6BB6B34540DA, p0); } // 0x9F5E6BB6B34540DA 0x1C0CAE89 b323
-	static void _0xB9854DFDE0D833D6(float p0) { invoke<Void>(0xB9854DFDE0D833D6, p0); } // 0xB9854DFDE0D833D6 0x4671AC2E b323
+	static void WATER_OVERRIDE_SET_SHOREWAVEAMPLITUDE(float amplitude) { invoke<Void>(0xB8F87EAD7533B176, amplitude); } // 0xB8F87EAD7533B176 0x625181DC b323
+	static void WATER_OVERRIDE_SET_SHOREWAVEMINAMPLITUDE(float minAmplitude) { invoke<Void>(0xC3EAD29AB273ECE8, minAmplitude); } // 0xC3EAD29AB273ECE8 0xBEBBFDC8 b323
+	static void WATER_OVERRIDE_SET_SHOREWAVEMAXAMPLITUDE(float maxAmplitude) { invoke<Void>(0xA7A1127490312C36, maxAmplitude); } // 0xA7A1127490312C36 0x6926AB03 b323
+	static void WATER_OVERRIDE_SET_OCEANNOISEMINAMPLITUDE(float minAmplitude) { invoke<Void>(0x31727907B2C43C55, minAmplitude); } // 0x31727907B2C43C55 0xD447439D b323
+	static void WATER_OVERRIDE_SET_OCEANWAVEAMPLITUDE(float amplitude) { invoke<Void>(0x405591EC8FD9096D, amplitude); } // 0x405591EC8FD9096D 0x584E9C59 b323
+	static void WATER_OVERRIDE_SET_OCEANWAVEMINAMPLITUDE(float minAmplitude) { invoke<Void>(0xF751B16FB32ABC1D, minAmplitude); } // 0xF751B16FB32ABC1D 0x5656D578 b323
+	static void WATER_OVERRIDE_SET_OCEANWAVEMAXAMPLITUDE(float maxAmplitude) { invoke<Void>(0xB3E6360DDE733E82, maxAmplitude); } // 0xB3E6360DDE733E82 0x0DE40C28 b323
+	static void WATER_OVERRIDE_SET_RIPPLEBUMPINESS(float bumpiness) { invoke<Void>(0x7C9C0B1EEB1F9072, bumpiness); } // 0x7C9C0B1EEB1F9072 0x98C9138B b323
+	static void WATER_OVERRIDE_SET_RIPPLEMINBUMPINESS(float minBumpiness) { invoke<Void>(0x6216B116083A7CB4, minBumpiness); } // 0x6216B116083A7CB4 0xFB1A9CDE b323
+	static void WATER_OVERRIDE_SET_RIPPLEMAXBUMPINESS(float maxBumpiness) { invoke<Void>(0x9F5E6BB6B34540DA, maxBumpiness); } // 0x9F5E6BB6B34540DA 0x1C0CAE89 b323
+	static void WATER_OVERRIDE_SET_RIPPLEDISTURB(float disturb) { invoke<Void>(0xB9854DFDE0D833D6, disturb); } // 0xB9854DFDE0D833D6 0x4671AC2E b323
 	// This seems to edit the water wave, intensity around your current location.
 	// 
 	// 0.0f = Normal
 	// 1.0f = So Calm and Smooth, a boat will stay still.
 	// 3.0f = Really Intense.
-	static void _0xC54A08C85AE4D410(float p0) { invoke<Void>(0xC54A08C85AE4D410, p0); } // 0xC54A08C85AE4D410 0xDA02F415 b323
-	static void _0xA8434F1DFF41D6E7(float p0) { invoke<Void>(0xA8434F1DFF41D6E7, p0); } // 0xA8434F1DFF41D6E7 0x5F3DDEC0 b323
-	static void _0xC3C221ADDDE31A11(float p0) { invoke<Void>(0xC3C221ADDDE31A11, p0); } // 0xC3C221ADDDE31A11 0x63A89684 b323
+	static void WATER_OVERRIDE_SET_STRENGTH(float strength) { invoke<Void>(0xC54A08C85AE4D410, strength); } // 0xC54A08C85AE4D410 0xDA02F415 b323
+	static void WATER_OVERRIDE_FADE_IN(float p0) { invoke<Void>(0xA8434F1DFF41D6E7, p0); } // 0xA8434F1DFF41D6E7 0x5F3DDEC0 b323
+	static void WATER_OVERRIDE_FADE_OUT(float p0) { invoke<Void>(0xC3C221ADDDE31A11, p0); } // 0xC3C221ADDDE31A11 0x63A89684 b323
 	// Sets the the raw wind speed value.
 	static void SET_WIND(float speed) { invoke<Void>(0xAC3A74E8384A9919, speed); } // 0xAC3A74E8384A9919 0xC6294698 b323
 	// Using this native will clamp the wind speed value to a range of 0.0- 12.0. Using SET_WIND sets the same value but without the restriction.
 	static void SET_WIND_SPEED(float speed) { invoke<Void>(0xEE09ECEDBABE47FC, speed); } // 0xEE09ECEDBABE47FC 0x45705F94 b323
 	static float GET_WIND_SPEED() { return invoke<float>(0xA8CF1CC0AFCD3F12); } // 0xA8CF1CC0AFCD3F12 0x098F0F3C b323
+	// The wind direction in radians
+	// 180 degrees, wind will blow from the south
 	static void SET_WIND_DIRECTION(float direction) { invoke<Void>(0xEB0F4468467B4528, direction); } // 0xEB0F4468467B4528 0x381AEEE9 b323
 	static Vector3 GET_WIND_DIRECTION() { return invoke<Vector3>(0x1F400FEF721170DA); } // 0x1F400FEF721170DA 0x89499A0D b323
-	static void _SET_RAIN_FX_INTENSITY(float intensity) { invoke<Void>(0x643E26EA6E024D92, intensity); } // 0x643E26EA6E024D92 b323
+	// With an `intensity` higher than `0.5f`, only the creation of puddles gets faster, rain and rain sound won't increase after that.
+	// With an `intensity` of `0.0f` rain and rain sounds are disabled and there won't be any new puddles.
+	// To use the rain intensity of the current weather, call this native with `-1f` as `intensity`.
+	static void _SET_RAIN_LEVEL(float intensity) { invoke<Void>(0x643E26EA6E024D92, intensity); } // 0x643E26EA6E024D92 b323
 	static float GET_RAIN_LEVEL() { return invoke<float>(0x96695E368AD855F3); } // 0x96695E368AD855F3 0xC9F67F28 b323
+	static void _SET_SNOW_LEVEL(float level) { invoke<Void>(0x7F06937B0CDCBC1A, level); } // 0x7F06937B0CDCBC1A b1868
 	static float GET_SNOW_LEVEL() { return invoke<float>(0xC5868A966E5BE3AE); } // 0xC5868A966E5BE3AE 0x1B09184F b323
 	// creates single lightning+thunder at random position
 	static void FORCE_LIGHTNING_FLASH() { invoke<Void>(0xF6062E089251C898); } // 0xF6062E089251C898 0xDF38165E b323
@@ -5240,6 +5787,28 @@ namespace MISC {
 	// 
 	// MISC::_11B56FBBF7224868("CONTRAILS");
 	static void PRELOAD_CLOUD_HAT(const char* name) { invoke<Void>(0x11B56FBBF7224868, name); } // 0x11B56FBBF7224868 0x8727A4C5 b323
+	// The following cloudhats are useable:
+	// altostratus
+	// Cirrus
+	// cirrocumulus
+	// Clear 01
+	// Cloudy 01
+	// Contrails
+	// Horizon
+	// horizonband1
+	// horizonband2
+	// horizonband3
+	// horsey
+	// Nimbus
+	// Puffs
+	// RAIN
+	// Snowy 01
+	// Stormy 01
+	// stratoscumulus
+	// Stripey
+	// shower
+	// Wispy
+	// 
 	static void LOAD_CLOUD_HAT(const char* name, float transitionTime) { invoke<Void>(0xFC4842A34657BFCB, name, transitionTime); } // 0xFC4842A34657BFCB 0xED88FC61 b323
 	// Called 4 times in the b617d scripts:
 	// MISC::_A74802FB8D0B7814("CONTRAILS", 0);
@@ -5260,15 +5829,18 @@ namespace MISC {
 	// y: Position on the Y-axis to get ground elevation at.
 	// z: Position on the Z-axis to get ground elevation at.
 	// groundZ: The ground elevation at the specified position.
-	// unk: Nearly always 0, very rarely 1 in the scripts.
-	static BOOL GET_GROUND_Z_FOR_3D_COORD(float x, float y, float z, float* groundZ, BOOL unk, BOOL p5) { return invoke<BOOL>(0xC906A7DAB05C8D2B, x, y, z, groundZ, unk, p5); } // 0xC906A7DAB05C8D2B 0xA1BFD5E0 b323
+	// ignoreWater: Nearly always 0, very rarely 1 in the scripts: https://gfycat.com/NiftyTatteredCricket
+	// 
+	// Bear in mind this native can only calculate the elevation when the coordinates are within the client's render distance.
+	static BOOL GET_GROUND_Z_FOR_3D_COORD(float x, float y, float z, float* groundZ, BOOL ignoreWater, BOOL p5) { return invoke<BOOL>(0xC906A7DAB05C8D2B, x, y, z, groundZ, ignoreWater, p5); } // 0xC906A7DAB05C8D2B 0xA1BFD5E0 b323
 	static BOOL GET_GROUND_Z_AND_NORMAL_FOR_3D_COORD(float x, float y, float z, float* groundZ, Vector3* normal) { return invoke<BOOL>(0x8BDC7BFC57A81E76, x, y, z, groundZ, normal); } // 0x8BDC7BFC57A81E76 0x64D91CED b323
-	static Any _GET_GROUND_Z_FOR_3D_COORD_2(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { return invoke<Any>(0x9E82F0F362881B29, p0, p1, p2, p3, p4, p5); } // 0x9E82F0F362881B29 b505
+	static BOOL _GET_GROUND_Z_FOR_3D_COORD_2(float x, float y, float z, float* groundZ, BOOL p4, BOOL p5) { return invoke<BOOL>(0x9E82F0F362881B29, x, y, z, groundZ, p4, p5); } // 0x9E82F0F362881B29 b505
 	static float ASIN(float p0) { return invoke<float>(0xC843060B5765DCE7, p0); } // 0xC843060B5765DCE7 0x998E5CAD b323
 	static float ACOS(float p0) { return invoke<float>(0x1D08B970013C34B6, p0); } // 0x1D08B970013C34B6 0xF4038776 b323
 	static float TAN(float p0) { return invoke<float>(0x632106CC96E82E91, p0); } // 0x632106CC96E82E91 0xD320CE5E b323
 	static float ATAN(float p0) { return invoke<float>(0xA9D1795CD5043663, p0); } // 0xA9D1795CD5043663 0x7A03CC8E b323
 	static float ATAN2(float p0, float p1) { return invoke<float>(0x8927CBF9D22261A4, p0, p1); } // 0x8927CBF9D22261A4 0x2508AC81 b323
+	// Returns the distance between two three-dimensional points, optionally ignoring the Z values.
 	// If useZ is false, only the 2D plane (X-Y) will be considered for calculating the distance.
 	// 
 	// Consider using this faster native instead: SYSTEM::VDIST - DVIST always takes in consideration the 3D coordinates.
@@ -5281,6 +5853,7 @@ namespace MISC {
 	// GET_C*
 	static Vector3 _0x21C235BC64831E5A(float p0, float p1, float p2, float p3, float p4, float p5, float p6, float p7, float p8, BOOL p9) { return invoke<Vector3>(0x21C235BC64831E5A, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); } // 0x21C235BC64831E5A 0xCAECF37E b323
 	static BOOL _0xF56DFB7B61BE7276(float p0, float p1, float p2, float p3, float p4, float p5, float p6, float p7, float p8, float p9, float p10, float p11, float* p12) { return invoke<BOOL>(0xF56DFB7B61BE7276, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12); } // 0xF56DFB7B61BE7276 0xC6CC812C b323
+	static Any _0xA0AD167E4B39D9A2(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9, Any p10, Any p11, Any p12, Any p13) { return invoke<Any>(0xA0AD167E4B39D9A2, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13); } // 0xA0AD167E4B39D9A2 b2189
 	// This sets bit [offset] of [address] to on.
 	// 
 	// The offsets used are different bits to be toggled on and off, typically there is only one address used in a script.
@@ -5303,18 +5876,28 @@ namespace MISC {
 	static void CLEAR_BIT(int* address, int offset) { invoke<Void>(0xE80492A9AC099A93, address, offset); } // 0xE80492A9AC099A93 0x8BC9E618 b323
 	// This native converts its past string to hash. It is hashed using jenkins one at a time method.
 	static Hash GET_HASH_KEY(const char* string) { return invoke<Hash>(0xD24D37CC275948CC, string); } // 0xD24D37CC275948CC 0x98EFF6F1 b323
-	static void SLERP_NEAR_QUATERNION(float p0, float p1, float p2, float p3, float p4, float p5, float p6, float p7, float p8, float* p9, float* p10, float* p11, float* p12) { invoke<Void>(0xF2F6A2FA49278625, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12); } // 0xF2F6A2FA49278625 0x87B92190 b323
+	// This native always come right before SET_ENTITY_QUATERNION where its final 4 parameters are SLERP_NEAR_QUATERNION p9 to p12
+	static void SLERP_NEAR_QUATERNION(float t, float x, float y, float z, float w, float x1, float y1, float z1, float w1, float* outX, float* outY, float* outZ, float* outW) { invoke<Void>(0xF2F6A2FA49278625, t, x, y, z, w, x1, y1, z1, w1, outX, outY, outZ, outW); } // 0xF2F6A2FA49278625 0x87B92190 b323
 	static BOOL IS_AREA_OCCUPIED(float p0, float p1, float p2, float p3, float p4, float p5, BOOL p6, BOOL p7, BOOL p8, BOOL p9, BOOL p10, Any p11, BOOL p12) { return invoke<BOOL>(0xA61B4DF533DCB56E, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12); } // 0xA61B4DF533DCB56E 0xC013972F b323
-	static BOOL IS_POSITION_OCCUPIED(float x, float y, float z, float range, BOOL p4, BOOL p5, BOOL p6, BOOL p7, BOOL p8, Any p9, BOOL p10) { return invoke<BOOL>(0xADCDE75E1C60F32D, x, y, z, range, p4, p5, p6, p7, p8, p9, p10); } // 0xADCDE75E1C60F32D 0x452E8D9E b323
+	static Any _0x39455BF4F4F55186(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9, Any p10, Any p11, Any p12) { return invoke<Any>(0x39455BF4F4F55186, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12); } // 0x39455BF4F4F55186 b1868
+	// `range`: The range, seems to not be very accurate during testing.
+	// `p4`: Unknown, when set to true it seems to always return true no matter what I try.
+	// `checkVehicle`: Check for any vehicles in that area.
+	// `checkPeds`: Check for any peds in that area.
+	// `ignoreEntity`: This entity will be ignored if it's in the area. Set to 0 if you don't want to exclude any entities.
+	// The BOOL parameters that are documented have not been confirmed. They are just documented from what I've found during testing. They may not work as expected in all cases.
+	// 
+	// Returns true if there is anything in that location matching the provided parameters.
+	static BOOL IS_POSITION_OCCUPIED(float x, float y, float z, float range, BOOL p4, BOOL checkVehicles, BOOL checkPeds, BOOL p7, BOOL p8, Entity ignoreEntity, BOOL p10) { return invoke<BOOL>(0xADCDE75E1C60F32D, x, y, z, range, p4, checkVehicles, checkPeds, p7, p8, ignoreEntity, p10); } // 0xADCDE75E1C60F32D 0x452E8D9E b323
 	static BOOL IS_POINT_OBSCURED_BY_A_MISSION_ENTITY(float p0, float p1, float p2, float p3, float p4, float p5, Any p6) { return invoke<BOOL>(0xE54E209C35FFA18D, p0, p1, p2, p3, p4, p5, p6); } // 0xE54E209C35FFA18D 0xC161558D b323
 	// Example: CLEAR_AREA(0, 0, 0, 30, true, false, false, false);
 	static void CLEAR_AREA(float X, float Y, float Z, float radius, BOOL p4, BOOL ignoreCopCars, BOOL ignoreObjects, BOOL p7) { invoke<Void>(0xA56F01F3765B93A0, X, Y, Z, radius, p4, ignoreCopCars, ignoreObjects, p7); } // 0xA56F01F3765B93A0 0x854E9AB8 b323
 	// MISC::_0x957838AAF91BD12D(x, y, z, radius, false, false, false, false); seem to make all objects go away, peds, vehicles etc. All booleans set to true doesn't seem to change anything. 
-	static void _CLEAR_AREA_OF_EVERYTHING(float x, float y, float z, float radius, BOOL p4, BOOL p5, BOOL p6, BOOL p7) { invoke<Void>(0x957838AAF91BD12D, x, y, z, radius, p4, p5, p6, p7); } // 0x957838AAF91BD12D 0x20E4FFD9 b323
+	static void CLEAR_AREA_LEAVE_VEHICLE_HEALTH(float x, float y, float z, float radius, BOOL p4, BOOL p5, BOOL p6, BOOL p7) { invoke<Void>(0x957838AAF91BD12D, x, y, z, radius, p4, p5, p6, p7); } // 0x957838AAF91BD12D 0x20E4FFD9 b323
 	// Example:
 	// CLEAR_AREA_OF_VEHICLES(0.0f, 0.0f, 0.0f, 10000.0f, false, false, false, false, false, false);
 	static void CLEAR_AREA_OF_VEHICLES(float x, float y, float z, float radius, BOOL p4, BOOL p5, BOOL p6, BOOL p7, BOOL p8, BOOL p9) { invoke<Void>(0x01C7B9B38428AEB6, x, y, z, radius, p4, p5, p6, p7, p8, p9); } // 0x01C7B9B38428AEB6 0x63320F3C b323
-	static void CLEAR_ANGLED_AREA_OF_VEHICLES(float p0, float p1, float p2, float p3, float p4, float p5, float p6, BOOL p7, BOOL p8, BOOL p9, BOOL p10, BOOL p11, Any p12) { invoke<Void>(0x11DB3500F042A8AA, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12); } // 0x11DB3500F042A8AA 0xF11A3018 b323
+	static void CLEAR_ANGLED_AREA_OF_VEHICLES(float x1, float y1, float z1, float x2, float y2, float z2, float width, BOOL p7, BOOL p8, BOOL p9, BOOL p10, BOOL p11, Any p12) { invoke<Void>(0x11DB3500F042A8AA, x1, y1, z1, x2, y2, z2, width, p7, p8, p9, p10, p11, p12); } // 0x11DB3500F042A8AA 0xF11A3018 b323
 	// I looked through the PC scripts that this site provides you with a link to find. It shows the last param mainly uses, (0, 2, 6, 16, and 17) so I am going to assume it is a type of flag. 
 	static void CLEAR_AREA_OF_OBJECTS(float x, float y, float z, float radius, int flags) { invoke<Void>(0xDD9B9B385AAC7F5B, x, y, z, radius, flags); } // 0xDD9B9B385AAC7F5B 0xBB720FE7 b323
 	// Example:       CLEAR_AREA_OF_PEDS(0, 0, 0, 10000, 1);
@@ -5385,16 +5968,18 @@ namespace MISC {
 	static int GET_REPLAY_STAT_COUNT() { return invoke<int>(0xDC9274A7EF6B2867); } // 0xDC9274A7EF6B2867 0xC7BD1AF0 b323
 	static int GET_REPLAY_STAT_AT_INDEX(int index) { return invoke<int>(0x8098C8D6597AAE18, index); } // 0x8098C8D6597AAE18 0x22BE2423 b323
 	static void CLEAR_REPLAY_STATS() { invoke<Void>(0x1B1AB132A16FDA55); } // 0x1B1AB132A16FDA55 0xC47DFF02 b323
-	static Any _0x72DE52178C291CB5() { return invoke<Any>(0x72DE52178C291CB5); } // 0x72DE52178C291CB5 0xF62B3C48 b323
-	static Any _0x44A0BDC559B35F6E() { return invoke<Any>(0x44A0BDC559B35F6E); } // 0x44A0BDC559B35F6E 0x3589452B b323
+	static BOOL QUEUE_MISSION_REPEAT_LOAD() { return invoke<BOOL>(0x72DE52178C291CB5); } // 0x72DE52178C291CB5 0xF62B3C48 b323
+	// Shows the screen which is visible before you redo a mission? The game will make a restoration point where you will cameback when the mission is over.
+	// Returns 1 if the message isn't currently on screen
+	static BOOL QUEUE_MISSION_REPEAT_SAVE() { return invoke<BOOL>(0x44A0BDC559B35F6E); } // 0x44A0BDC559B35F6E 0x3589452B b323
 	static Any _0xEB2104E905C6F2E9() { return invoke<Any>(0xEB2104E905C6F2E9); } // 0xEB2104E905C6F2E9 b323
-	static Any _0x2B5E102E4A42F2BF() { return invoke<Any>(0x2B5E102E4A42F2BF); } // 0x2B5E102E4A42F2BF 0x144AAF22 b323
+	static int GET_STATUS_OF_MISSION_REPEAT_SAVE() { return invoke<int>(0x2B5E102E4A42F2BF); } // 0x2B5E102E4A42F2BF 0x144AAF22 b323
 	static BOOL IS_MEMORY_CARD_IN_USE() { return invoke<BOOL>(0x8A75CE2956274ADD); } // 0x8A75CE2956274ADD 0x40CE4DFD b323
 	static void SHOOT_SINGLE_BULLET_BETWEEN_COORDS(float x1, float y1, float z1, float x2, float y2, float z2, int damage, BOOL p7, Hash weaponHash, Ped ownerPed, BOOL isAudible, BOOL isInvisible, float speed) { invoke<Void>(0x867654CBC7606F2C, x1, y1, z1, x2, y2, z2, damage, p7, weaponHash, ownerPed, isAudible, isInvisible, speed); } // 0x867654CBC7606F2C 0xCB7415AC b323
 	// entity - entity to ignore
 	static void SHOOT_SINGLE_BULLET_BETWEEN_COORDS_IGNORE_ENTITY(float x1, float y1, float z1, float x2, float y2, float z2, int damage, BOOL p7, Hash weaponHash, Ped ownerPed, BOOL isAudible, BOOL isInvisible, float speed, Entity entity, Any p14) { invoke<Void>(0xE3A7742E0B7A2F8B, x1, y1, z1, x2, y2, z2, damage, p7, weaponHash, ownerPed, isAudible, isInvisible, speed, entity, p14); } // 0xE3A7742E0B7A2F8B 0x52ACCB7B b323
 	// entity - entity to ignore
-	static void SHOOT_SINGLE_BULLET_BETWEEN_COORDS_IGNORE_ENTITY_NEW(float x1, float y1, float z1, float x2, float y2, float z2, int damage, BOOL p7, Hash weaponHash, Ped ownerPed, BOOL isAudible, BOOL isInvisible, float speed, Entity entity, BOOL p14, BOOL p15, BOOL p16, BOOL p17, Any p18, Any p19) { invoke<Void>(0xBFE5756E7407064A, x1, y1, z1, x2, y2, z2, damage, p7, weaponHash, ownerPed, isAudible, isInvisible, speed, entity, p14, p15, p16, p17, p18, p19); } // 0xBFE5756E7407064A 0xCCDC33CC b323
+	static void SHOOT_SINGLE_BULLET_BETWEEN_COORDS_IGNORE_ENTITY_NEW(float x1, float y1, float z1, float x2, float y2, float z2, int damage, BOOL p7, Hash weaponHash, Ped ownerPed, BOOL isAudible, BOOL isInvisible, float speed, Entity entity, BOOL p14, BOOL p15, BOOL p16, BOOL p17, Any p18, Any p19, Any p20) { invoke<Void>(0xBFE5756E7407064A, x1, y1, z1, x2, y2, z2, damage, p7, weaponHash, ownerPed, isAudible, isInvisible, speed, entity, p14, p15, p16, p17, p18, p19, p20); } // 0xBFE5756E7407064A 0xCCDC33CC b323
 	// Gets the dimensions of a model.
 	// 
 	// Calculate (maximum - minimum) to get the size, in which case, Y will be how long the model is.
@@ -5422,7 +6007,7 @@ namespace MISC {
 	static BOOL IS_THIS_A_MINIGAME_SCRIPT() { return invoke<BOOL>(0x7B30F65D7B710098); } // 0x7B30F65D7B710098 0x7605EF6F b323
 	// This function is hard-coded to always return 0.
 	static BOOL IS_SNIPER_INVERTED() { return invoke<BOOL>(0x61A23B7EDA9BDA24); } // 0x61A23B7EDA9BDA24 0x5C3BF51B b323
-	// Returns whether the game's measurement system is set to metric (profile setting 227).
+	// Returns true if the game is using the metric measurement system (profile setting 227), false if imperial is used.
 	static BOOL SHOULD_USE_METRIC_MEASUREMENTS() { return invoke<BOOL>(0xD3D15555431AB793); } // 0xD3D15555431AB793 0xBAF17315 b323
 	static int GET_PROFILE_SETTING(int profileSetting) { return invoke<int>(0xC488FF2356EA7791, profileSetting); } // 0xC488FF2356EA7791 0xD374BEBC b323
 	static BOOL ARE_STRINGS_EQUAL(const char* string1, const char* string2) { return invoke<BOOL>(0x0C515FAB3FF9EA92, string1, string2); } // 0x0C515FAB3FF9EA92 0x877C0BC5 b323
@@ -5453,9 +6038,7 @@ namespace MISC {
 	static int COMPARE_STRINGS(const char* str1, const char* str2, BOOL matchCase, int maxLength) { return invoke<int>(0x1E34710ECD4AB0EB, str1, str2, matchCase, maxLength); } // 0x1E34710ECD4AB0EB 0xFE25A58F b323
 	static int ABSI(int value) { return invoke<int>(0xF0D31AD191A74F87, value); } // 0xF0D31AD191A74F87 0xB44677C5 b323
 	static float ABSF(float value) { return invoke<float>(0x73D57CFFDD12C355, value); } // 0x73D57CFFDD12C355 0xAF6F6E0B b323
-	// Determines whether there is a sniper bullet within the specified coordinates. The coordinates form a rectangle.
-	// 
-	// - Nacorpio
+	// Determines whether there is a sniper bullet within the specified coordinates. The coordinates form an axis-aligned bounding box.
 	static BOOL IS_SNIPER_BULLET_IN_AREA(float x1, float y1, float z1, float x2, float y2, float z2) { return invoke<BOOL>(0xFEFCF11B01287125, x1, y1, z1, x2, y2, z2); } // 0xFEFCF11B01287125 0x0483715C b323
 	// Determines whether there is a projectile within the specified coordinates. The coordinates form a rectangle.
 	// 
@@ -5464,21 +6047,21 @@ namespace MISC {
 	// 
 	// ownedByPlayer = only projectiles fired by the player will be detected.
 	static BOOL IS_PROJECTILE_IN_AREA(float x1, float y1, float z1, float x2, float y2, float z2, BOOL ownedByPlayer) { return invoke<BOOL>(0x5270A8FBC098C3F8, x1, y1, z1, x2, y2, z2, ownedByPlayer); } // 0x5270A8FBC098C3F8 0x78E1A557 b323
-	// Determines whether there is a projectile of a specific type within the specified coordinates. The coordinates form a rectangle.
-	// 
-	// Note: This native hasn't been tested yet.
-	// 
-	// - Nacorpio
-	static BOOL IS_PROJECTILE_TYPE_IN_AREA(float x1, float y1, float z1, float x2, float y2, float z2, int type, BOOL p7) { return invoke<BOOL>(0x2E0DC353342C4A6D, x1, y1, z1, x2, y2, z2, type, p7); } // 0x2E0DC353342C4A6D 0x2B73BCF6 b323
-	static BOOL IS_PROJECTILE_TYPE_IN_ANGLED_AREA(float p0, float p1, float p2, float p3, float p4, float p5, float p6, Any p7, BOOL p8) { return invoke<BOOL>(0xF0BC12401061DEA0, p0, p1, p2, p3, p4, p5, p6, p7, p8); } // 0xF0BC12401061DEA0 0xD1AE2681 b323
-	static BOOL IS_PROJECTILE_TYPE_WITHIN_DISTANCE(float p0, float p1, float p2, Any p3, float p4, BOOL p5) { return invoke<BOOL>(0x34318593248C8FB2, p0, p1, p2, p3, p4, p5); } // 0x34318593248C8FB2 0xBE81F1E2 b323
-	static Vector3 GET_COORDS_OF_PROJECTILE_TYPE_IN_AREA(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8) { return invoke<Vector3>(0x8D7A43EC6A5FEA45, p0, p1, p2, p3, p4, p5, p6, p7, p8); } // 0x8D7A43EC6A5FEA45 0x1A40454B b323
-	static Vector3 GET_COORDS_OF_PROJECTILE_TYPE_WITHIN_DISTANCE(Ped ped, Hash weaponHash, float radius, Entity* entity, BOOL p4) { return invoke<Vector3>(0xDFB4138EEFED7B81, ped, weaponHash, radius, entity, p4); } // 0xDFB4138EEFED7B81 0x6BDE5CE4 b323
+	// Determines whether there is a projectile of a specific type within the specified coordinates. The coordinates form a axis-aligned bounding box.
+	static BOOL IS_PROJECTILE_TYPE_IN_AREA(float x1, float y1, float z1, float x2, float y2, float z2, int type, BOOL ownedByPlayer) { return invoke<BOOL>(0x2E0DC353342C4A6D, x1, y1, z1, x2, y2, z2, type, ownedByPlayer); } // 0x2E0DC353342C4A6D 0x2B73BCF6 b323
+	// See IS_POINT_IN_ANGLED_AREA for the definition of an angled area.
+	static BOOL IS_PROJECTILE_TYPE_IN_ANGLED_AREA(float x1, float y1, float z1, float x2, float y2, float z2, float width, Any p7, BOOL ownedByPlayer) { return invoke<BOOL>(0xF0BC12401061DEA0, x1, y1, z1, x2, y2, z2, width, p7, ownedByPlayer); } // 0xF0BC12401061DEA0 0xD1AE2681 b323
+	static BOOL IS_PROJECTILE_TYPE_WITHIN_DISTANCE(float x, float y, float z, Hash projectileHash, float radius, BOOL ownedByPlayer) { return invoke<BOOL>(0x34318593248C8FB2, x, y, z, projectileHash, radius, ownedByPlayer); } // 0x34318593248C8FB2 0xBE81F1E2 b323
+	static BOOL GET_COORDS_OF_PROJECTILE_TYPE_IN_AREA(float x1, float y1, float z1, float x2, float y2, float z2, Hash projectileHash, Vector3* projectilePos, BOOL ownedByPlayer) { return invoke<BOOL>(0x8D7A43EC6A5FEA45, x1, y1, z1, x2, y2, z2, projectileHash, projectilePos, ownedByPlayer); } // 0x8D7A43EC6A5FEA45 0x1A40454B b323
+	static Vector3 GET_COORDS_OF_PROJECTILE_TYPE_WITHIN_DISTANCE(Ped ped, Hash weaponHash, float radius, Entity* entity, BOOL ownedByPlayer) { return invoke<Vector3>(0xDFB4138EEFED7B81, ped, weaponHash, radius, entity, ownedByPlayer); } // 0xDFB4138EEFED7B81 0x6BDE5CE4 b323
 	// GET_PROJECTILE_*
 	static BOOL _GET_PROJECTILE_NEAR_PED(Ped ped, Hash weaponhash, float p2, float p3, float p4, BOOL p5) { return invoke<BOOL>(0x82FDE6A57EE4EE44, ped, weaponhash, p2, p3, p4, p5); } // 0x82FDE6A57EE4EE44 0x507BC6F7 b323
-	static BOOL IS_BULLET_IN_ANGLED_AREA(float p0, float p1, float p2, float p3, float p4, float p5, float p6, BOOL p7) { return invoke<BOOL>(0x1A8B5F3C01E2B477, p0, p1, p2, p3, p4, p5, p6, p7); } // 0x1A8B5F3C01E2B477 0xE2DB58F7 b323
-	static BOOL IS_BULLET_IN_AREA(float p0, float p1, float p2, float p3, BOOL p4) { return invoke<BOOL>(0x3F2023999AD51C1F, p0, p1, p2, p3, p4); } // 0x3F2023999AD51C1F 0xB54F46CA b323
-	static BOOL IS_BULLET_IN_BOX(float p0, float p1, float p2, float p3, float p4, float p5, BOOL p6) { return invoke<BOOL>(0xDE0F6D7450D37351, p0, p1, p2, p3, p4, p5, p6); } // 0xDE0F6D7450D37351 0xAB73ED26 b323
+	// For projectiles, see: IS_PROJECTILE_TYPE_IN_ANGLED_AREA
+	// See IS_POINT_IN_ANGLED_AREA for the definition of an angled area.
+	// Returns True if a bullet, as maintained by a pool within CWeaponManager, has been fired into the defined angled area.
+	static BOOL IS_BULLET_IN_ANGLED_AREA(float x1, float y1, float z1, float x2, float y2, float z2, float width, BOOL ownedByPlayer) { return invoke<BOOL>(0x1A8B5F3C01E2B477, x1, y1, z1, x2, y2, z2, width, ownedByPlayer); } // 0x1A8B5F3C01E2B477 0xE2DB58F7 b323
+	static BOOL IS_BULLET_IN_AREA(float x, float y, float z, float radius, BOOL ownedByPlayer) { return invoke<BOOL>(0x3F2023999AD51C1F, x, y, z, radius, ownedByPlayer); } // 0x3F2023999AD51C1F 0xB54F46CA b323
+	static BOOL IS_BULLET_IN_BOX(float x1, float y1, float z1, float x2, float y2, float z2, BOOL ownedByPlayer) { return invoke<BOOL>(0xDE0F6D7450D37351, x1, y1, z1, x2, y2, z2, ownedByPlayer); } // 0xDE0F6D7450D37351 0xAB73ED26 b323
 	// p3 - possibly radius?
 	static BOOL HAS_BULLET_IMPACTED_IN_AREA(float x, float y, float z, float p3, BOOL p4, BOOL p5) { return invoke<BOOL>(0x9870ACFB89A90995, x, y, z, p3, p4, p5); } // 0x9870ACFB89A90995 0x902BC7D9 b323
 	static BOOL HAS_BULLET_IMPACTED_IN_BOX(float p0, float p1, float p2, float p3, float p4, float p5, BOOL p6, BOOL p7) { return invoke<BOOL>(0xDC8C5D7CFEAB8394, p0, p1, p2, p3, p4, p5, p6, p7); } // 0xDC8C5D7CFEAB8394 0x2C2618CC b323
@@ -5505,8 +6088,38 @@ namespace MISC {
 	static BOOL STRING_TO_INT(const char* string, int* outInteger) { return invoke<BOOL>(0x5A5F40FE637EB584, string, outInteger); } // 0x5A5F40FE637EB584 0x590A8160 b323
 	static void SET_BITS_IN_RANGE(int* var, int rangeStart, int rangeEnd, int p3) { invoke<Void>(0x8EF07E15701D61ED, var, rangeStart, rangeEnd, p3); } // 0x8EF07E15701D61ED 0x32094719 b323
 	static int GET_BITS_IN_RANGE(int var, int rangeStart, int rangeEnd) { return invoke<int>(0x53158863FCC0893A, var, rangeStart, rangeEnd); } // 0x53158863FCC0893A 0xCA03A1E5 b323
-	static int ADD_STUNT_JUMP(float p0, float p1, float p2, float p3, float p4, float p5, float p6, float p7, float p8, float p9, float p10, float p11, float p12, float p13, float p14, Any p15, Any p16, Any p17) { return invoke<int>(0x1A992DA297A4630C, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17); } // 0x1A992DA297A4630C 0xB630E5FF b323
-	static int ADD_STUNT_JUMP_ANGLED(float p0, float p1, float p2, float p3, float p4, float p5, float p6, float p7, float p8, float p9, float p10, float p11, float p12, float p13, float p14, float p15, float p16, Any p17, Any p18, Any p19) { return invoke<int>(0xBBE5D803A5360CBF, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19); } // 0xBBE5D803A5360CBF 0xB9B7E777 b323
+	// See description of `ADD_STUNT_JUMP_ANGLED` for detailed info. The only difference really is this one does not have the radius (or angle, not sure) floats parameters for entry and landing zones.
+	static int ADD_STUNT_JUMP(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4, float camX, float camY, float camZ, int p15, int p16, int p17) { return invoke<int>(0x1A992DA297A4630C, x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, camX, camY, camZ, p15, p16, p17); } // 0x1A992DA297A4630C 0xB630E5FF b323
+	// Creates a new stunt jump.
+	// 
+	// The radius1 and radius2 might actually not be a radius at all, but that's what it seems to me testing them in-game. But they may be 'angle' floats instead, considering this native is named ADD_STUNT_JUMP_**ANGLED**.
+	// 
+	// Info about the specific 'parameter sections':
+	// 
+	// 
+	// **x1, y1, z1, x2, y2, z2 and radius1:**
+	// 
+	// First coordinates are for the jump entry area, and the radius that will be checked around that area. So if you're not exactly within the coordinates, but you are within the outter radius limit then it will still register as entering the stunt jump. Note as mentioned above, the radius is just a guess, I'm not really sure about it's exact purpose.
+	// 
+	// 
+	// **x3, y3, z3, x4, y4, z4 and radius2:**
+	// 
+	// Next part is the landing area, again starting with the left bottom (nearest to the stunt jump entry zone) coordinate, and the second one being the top right furthest away part of the landing area. Followed by another (most likely) radius float, this is usually slightly larger than the entry zone 'radius' float value, just because you have quite a lot of places where you can land (I'm guessing).
+	// 
+	// 
+	// **camX, camY and camZ:**
+	// 
+	// The final coordinate in this native is the Camera position. Rotation and zoom/FOV is managed by the game itself, you just need to provide the camera location.
+	// 
+	// 
+	// **unk1, unk2 and unk3:**
+	// 
+	// Not sure what these are for, but they're always `150, 0, 0` in decompiled scripts.
+	// 
+	// Visualized example in-game: https://d.fivem.dev/2019-03-15_18-24_c7802_846.png
+	// 
+	// Here is a list of almost all of the stunt jumps from GTA V (taken from decompiled scripts): https://pastebin.com/EW1jBPkY
+	static int ADD_STUNT_JUMP_ANGLED(float x1, float y1, float z1, float x2, float y2, float z2, float radius1, float x3, float y3, float z3, float x4, float y4, float z4, float radius2, float camX, float camY, float camZ, int p17, int p18, int p19) { return invoke<int>(0xBBE5D803A5360CBF, x1, y1, z1, x2, y2, z2, radius1, x3, y3, z3, x4, y4, z4, radius2, camX, camY, camZ, p17, p18, p19); } // 0xBBE5D803A5360CBF 0xB9B7E777 b323
 	// Toggles some stunt jump stuff.
 	static void _0xFB80AB299D2EE1BD(BOOL toggle) { invoke<Void>(0xFB80AB299D2EE1BD, toggle); } // 0xFB80AB299D2EE1BD b757
 	static void DELETE_STUNT_JUMP(int p0) { invoke<Void>(0xDC518000E39DAE1F, p0); } // 0xDC518000E39DAE1F 0x840CB5DA b323
@@ -5540,14 +6153,13 @@ namespace MISC {
 	// Calling this will also set the last saved string hash to zero.
 	// 
 	static BOOL _HAS_CHEAT_STRING_JUST_BEEN_ENTERED(Hash hash) { return invoke<BOOL>(0x557E43C447E700A8, hash); } // 0x557E43C447E700A8 b323
+	static void _0xFA3FFB0EEBC288A3(BOOL p0) { invoke<Void>(0xFA3FFB0EEBC288A3, p0); } // 0xFA3FFB0EEBC288A3 b2060
 	// Formerly known as _LOWER_MAP_PROP_DENSITY and wrongly due to idiots as _ENABLE_MP_DLC_MAPS.
 	// Sets the maximum prop density and changes a loading screen flag from 'loading story mode' to 'loading GTA Online'. Does not touch DLC map data at all.
 	// 
 	// In fact, I doubt this changes the flag whatsoever, that's the OTHER native idiots use together with this that does so, this one only causes a loading screen to show as it reloads map data.
 	static void SET_INSTANCE_PRIORITY_MODE(int p0) { invoke<Void>(0x9BAE5AD2508DF078, p0); } // 0x9BAE5AD2508DF078 0x721B2492 b323
-	// Sets an unknown flag used by CScene in determining which entities from CMapData scene nodes to draw, similar to 9BAE5AD2508DF078.
-	// 
-	// Documented by NTAuthority (http://fivem.net/).
+	// Sets an unknown flag used by CScene in determining which entities from CMapData scene nodes to draw, similar to SET_INSTANCE_PRIORITY_MODE.
 	static void SET_INSTANCE_PRIORITY_HINT(int flag) { invoke<Void>(0xC5F0A8EBD3F361CE, flag); } // 0xC5F0A8EBD3F361CE 0xE202879D b323
 	// This function is hard-coded to always return 0.
 	static BOOL IS_FRONTEND_FADING() { return invoke<BOOL>(0x7EA2B6AF97ECA6ED); } // 0x7EA2B6AF97ECA6ED 0x8FF6232C b323
@@ -5564,8 +6176,7 @@ namespace MISC {
 	static void SET_GRAVITY_LEVEL(int level) { invoke<Void>(0x740E14FAD5842351, level); } // 0x740E14FAD5842351 0x2D833F4A b323
 	static void START_SAVE_DATA(Any* p0, Any p1, BOOL p2) { invoke<Void>(0xA9575F812C6A7997, p0, p1, p2); } // 0xA9575F812C6A7997 0x881A694D b323
 	static void STOP_SAVE_DATA() { invoke<Void>(0x74E20C9145FB66FD); } // 0x74E20C9145FB66FD 0x3B1C07C8 b323
-	// GET_S*
-	static int _0xA09F896CE912481F(BOOL p0) { return invoke<int>(0xA09F896CE912481F, p0); } // 0xA09F896CE912481F 0x9EF0BC64 b323
+	static int GET_SIZE_OF_SAVE_DATA(BOOL p0) { return invoke<int>(0xA09F896CE912481F, p0); } // 0xA09F896CE912481F 0x9EF0BC64 b323
 	static void REGISTER_INT_TO_SAVE(Any* p0, const char* name) { invoke<Void>(0x34C9EE5986258415, p0, name); } // 0x34C9EE5986258415 0xB930956F b323
 	static void _REGISTER_INT64_TO_SAVE(Any* p0, const char* name) { invoke<Void>(0xA735353C77334EA0, p0, name); } // 0xA735353C77334EA0 b323
 	static void REGISTER_ENUM_TO_SAVE(Any* p0, const char* name) { invoke<Void>(0x10C2FA78D0E128A1, p0, name); } // 0x10C2FA78D0E128A1 0x9B38374A b323
@@ -5662,12 +6273,15 @@ namespace MISC {
 	static BOOL DOES_POP_MULTIPLIER_AREA_EXIST(int id) { return invoke<BOOL>(0x1327E2FE9746BAEE, id); } // 0x1327E2FE9746BAEE 0xE933B34A b323
 	static void REMOVE_POP_MULTIPLIER_AREA(int id, BOOL p1) { invoke<Void>(0xB129E447A2EDA4BF, id, p1); } // 0xB129E447A2EDA4BF 0xFBDBE374 b323
 	static BOOL _IS_POP_MULTIPLIER_AREA_UNK(int id) { return invoke<BOOL>(0x1312F4B242609CE3, id); } // 0x1312F4B242609CE3 b1290
-	static int ADD_POP_MULTIPLIER_SPHERE(float p0, float p1, float p2, float p3, float p4, float p5, BOOL p6, BOOL p7) { return invoke<int>(0x32C7A7E8C43A1F80, p0, p1, p2, p3, p4, p5, p6, p7); } // 0x32C7A7E8C43A1F80 0xCE4A3D20 b323
+	// This native is adding a zone, where you can change density settings. For example, you can add a zone on 0.0, 0.0, 0.0 with radius 900.0 and vehicleMultiplier 0.0, and you will not see any new population vehicle spawned in a radius of 900.0 from 0.0, 0.0, 0.0. Returns the id. You can have only 15 zones at the same time. You can remove zone using REMOVE_POP_MULTIPLIER_SPHERE
+	static int ADD_POP_MULTIPLIER_SPHERE(float x, float y, float z, float radius, float pedMultiplier, float vehicleMultiplier, BOOL p6, BOOL p7) { return invoke<int>(0x32C7A7E8C43A1F80, x, y, z, radius, pedMultiplier, vehicleMultiplier, p6, p7); } // 0x32C7A7E8C43A1F80 0xCE4A3D20 b323
 	static BOOL DOES_POP_MULTIPLIER_SPHERE_EXIST(int id) { return invoke<BOOL>(0x171BAFB3C60389F4, id); } // 0x171BAFB3C60389F4 0xD2B7A5A0 b791
+	// Removes population multiplier sphere
 	static void REMOVE_POP_MULTIPLIER_SPHERE(int id, BOOL p1) { invoke<Void>(0xE6869BECDD8F2403, id, p1); } // 0xE6869BECDD8F2403 0x92E7E4EB b323
 	// Makes the ped jump around like they're in a tennis match
 	static void ENABLE_TENNIS_MODE(Ped ped, BOOL toggle, BOOL p2) { invoke<Void>(0x28A04B411933F8A6, ped, toggle, p2); } // 0x28A04B411933F8A6 0x0BD3F9EC b323
 	static BOOL IS_TENNIS_MODE(Ped ped) { return invoke<BOOL>(0x5D5479D115290C3F, ped); } // 0x5D5479D115290C3F 0x04A947BA b323
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static void PLAY_TENNIS_SWING_ANIM(Ped ped, const char* animDict, const char* animName, float p3, float p4, BOOL p5) { invoke<Void>(0xE266ED23311F24D4, ped, animDict, animName, p3, p4, p5); } // 0xE266ED23311F24D4 0xC20A7D2B b323
 	static BOOL GET_TENNIS_SWING_ANIM_COMPLETE(Ped ped) { return invoke<BOOL>(0x17DF68D720AA77F8, ped); } // 0x17DF68D720AA77F8 0x8501E727 b323
 	// Related to tennis mode.
@@ -5687,23 +6301,28 @@ namespace MISC {
 	// 
 	// SET_*
 	static void _0x54F157E0336A3822(Ped ped, const char* p1, float p2) { invoke<Void>(0x54F157E0336A3822, ped, p1, p2); } // 0x54F157E0336A3822 0x49F977A9 b323
+	static void _RESET_DISPATCH_SPAWN_LOCATION() { invoke<Void>(0x5896F2BD5683A4E1); } // 0x5896F2BD5683A4E1 b1868
 	static void SET_DISPATCH_SPAWN_LOCATION(float x, float y, float z) { invoke<Void>(0xD10F442036302D50, x, y, z); } // 0xD10F442036302D50 0x6F009E33 b323
 	static void RESET_DISPATCH_IDEAL_SPAWN_DISTANCE() { invoke<Void>(0x77A84429DD9F0A15); } // 0x77A84429DD9F0A15 0xDA65ECAA b323
 	static void SET_DISPATCH_IDEAL_SPAWN_DISTANCE(float p0) { invoke<Void>(0x6FE601A64180D423, p0); } // 0x6FE601A64180D423 0x6283BE32 b323
 	static void RESET_DISPATCH_TIME_BETWEEN_SPAWN_ATTEMPTS(Any p0) { invoke<Void>(0xEB2DB0CAD13154B3, p0); } // 0xEB2DB0CAD13154B3 0x1479E85A b323
 	static void SET_DISPATCH_TIME_BETWEEN_SPAWN_ATTEMPTS(Any p0, float p1) { invoke<Void>(0x44F7CBC1BEB3327D, p0, p1); } // 0x44F7CBC1BEB3327D 0xABADB709 b323
 	static void SET_DISPATCH_TIME_BETWEEN_SPAWN_ATTEMPTS_MULTIPLIER(Any p0, float p1) { invoke<Void>(0x48838ED9937A15D1, p0, p1); } // 0x48838ED9937A15D1 0x1C996BCD b323
-	static Any _ADD_DISPATCH_SPAWN_BLOCKING_ANGLED_AREA(float p0, float p1, float p2, float p3, float p4, float p5, float p6) { return invoke<Any>(0x918C7B2D2FF3928B, p0, p1, p2, p3, p4, p5, p6); } // 0x918C7B2D2FF3928B 0xF557BAF9 b323
-	static Any _ADD_DISPATCH_SPAWN_BLOCKING_AREA(float p0, float p1, float p2, float p3) { return invoke<Any>(0x2D4259F1FEB81DA9, p0, p1, p2, p3); } // 0x2D4259F1FEB81DA9 b323
+	// To remove, see: REMOVE_DISPATCH_SPAWN_BLOCKING_AREA
+	// See IS_POINT_IN_ANGLED_AREA for the definition of an angled area.
+	static Any _ADD_DISPATCH_SPAWN_BLOCKING_ANGLED_AREA(float x1, float y1, float z1, float x2, float y2, float z2, float width) { return invoke<Any>(0x918C7B2D2FF3928B, x1, y1, z1, x2, y2, z2, width); } // 0x918C7B2D2FF3928B 0xF557BAF9 b323
+	static Any _ADD_DISPATCH_SPAWN_BLOCKING_AREA(float x1, float y1, float x2, float y2) { return invoke<Any>(0x2D4259F1FEB81DA9, x1, y1, x2, y2); } // 0x2D4259F1FEB81DA9 b323
 	static void REMOVE_DISPATCH_SPAWN_BLOCKING_AREA(Any p0) { invoke<Void>(0x264AC28B01B353A5, p0); } // 0x264AC28B01B353A5 0xA8D2FB92 b323
 	static void RESET_DISPATCH_SPAWN_BLOCKING_AREAS() { invoke<Void>(0xAC7BFD5C1D83EA75); } // 0xAC7BFD5C1D83EA75 0x9A17F835 b323
 	// RESET_*
 	static void _0xD9F692D349249528() { invoke<Void>(0xD9F692D349249528); } // 0xD9F692D349249528 0xE0C9307E b323
 	// SET_*
 	static void _0xE532EC1A63231B4F(int p0, int p1) { invoke<Void>(0xE532EC1A63231B4F, p0, p1); } // 0xE532EC1A63231B4F 0xA0D8C749 b323
-	static void _ADD_TACTICAL_ANALYSIS_POINT(Any p0, Any p1, Any p2) { invoke<Void>(0xB8721407EE9C3FF6, p0, p1, p2); } // 0xB8721407EE9C3FF6 0x24A4E0B2 b323
+	// Adds a point related to CTacticalAnalysis
+	static void _ADD_TACTICAL_ANALYSIS_POINT(float x, float y, float z) { invoke<Void>(0xB8721407EE9C3FF6, x, y, z); } // 0xB8721407EE9C3FF6 0x24A4E0B2 b323
 	static void _CLEAR_TACTICAL_ANALYSIS_POINTS() { invoke<Void>(0xB3CD58CCA6CDA852); } // 0xB3CD58CCA6CDA852 0x66C3C59C b323
-	static void _0x2587A48BC88DFADF(BOOL p0) { invoke<Void>(0x2587A48BC88DFADF, p0); } // 0x2587A48BC88DFADF 0xD9660339 b323
+	// Activates (usused?) riot mode. All NPCs are being hostile to each other (including player). Also the game will give weapons (pistols, smgs) to random NPCs.
+	static void SET_RIOT_MODE_ENABLED(BOOL toggle) { invoke<Void>(0x2587A48BC88DFADF, toggle); } // 0x2587A48BC88DFADF 0xD9660339 b323
 	static void DISPLAY_ONSCREEN_KEYBOARD_WITH_LONGER_INITIAL_STRING(int p0, const char* windowTitle, Any* p2, const char* defaultText, const char* defaultConcat1, const char* defaultConcat2, const char* defaultConcat3, const char* defaultConcat4, const char* defaultConcat5, const char* defaultConcat6, const char* defaultConcat7, int maxInputLength) { invoke<Void>(0xCA78CFA0366592FE, p0, windowTitle, p2, defaultText, defaultConcat1, defaultConcat2, defaultConcat3, defaultConcat4, defaultConcat5, defaultConcat6, defaultConcat7, maxInputLength); } // 0xCA78CFA0366592FE 0xD2688412 b323
 	// sfink: note, p0 is set to 6 for PC platform in at least 1 script, or to `unk::_get_ui_language_id() == 0` otherwise.
 	// 
@@ -5742,10 +6361,10 @@ namespace MISC {
 	// 
 	// Status Codes:
 	// 
-	// 0 - User still editing
-	// 1 - User has finished editing
-	// 2 - User has canceled editing
-	// 3 - Keyboard isn't active
+	// -1: Keyboard isn't active
+	// 0: User still editing
+	// 1: User has finished editing
+	// 2: User has canceled editing
 	static int UPDATE_ONSCREEN_KEYBOARD() { return invoke<int>(0x0CF2B696BBF945AE); } // 0x0CF2B696BBF945AE 0x23D0A1CE b323
 	// Returns NULL unless UPDATE_ONSCREEN_KEYBOARD() returns 1 in the same tick.
 	static const char* GET_ONSCREEN_KEYBOARD_RESULT() { return invoke<const char*>(0x8362B09B91893647); } // 0x8362B09B91893647 0x44828FB3 b323
@@ -5756,7 +6375,7 @@ namespace MISC {
 	static void _CANCEL_ONSCREEN_KEYBOARD() { invoke<Void>(0x58A39BE597CE99CD); } // 0x58A39BE597CE99CD 0x196444BB b757
 	// p0 was always 2 in R* scripts.
 	// Called before calling DISPLAY_ONSCREEN_KEYBOARD if the input needs to be saved.
-	static void _0x3ED1438C1F5C6612(int p0) { invoke<Void>(0x3ED1438C1F5C6612, p0); } // 0x3ED1438C1F5C6612 0x3301EA47 b323
+	static void NEXT_ONSCREEN_KEYBOARD_RESULT_WILL_DISPLAY_USING_THESE_FONTS(int p0) { invoke<Void>(0x3ED1438C1F5C6612, p0); } // 0x3ED1438C1F5C6612 0x3301EA47 b323
 	// Appears to remove stealth kill action from memory
 	static void _REMOVE_STEALTH_KILL(Hash hash, BOOL p1) { invoke<Void>(0xA6A12939F16D85BE, hash, p1); } // 0xA6A12939F16D85BE 0x42B484ED b323
 	// Unsure about the use of this native but here's an example:
@@ -5781,8 +6400,8 @@ namespace MISC {
 	static void SET_FIRE_AMMO_THIS_FRAME(Player player) { invoke<Void>(0x11879CDD803D30F4, player); } // 0x11879CDD803D30F4 0x7C18FC8A b323
 	static void SET_EXPLOSIVE_MELEE_THIS_FRAME(Player player) { invoke<Void>(0xFF1BED81BFDC0FE0, player); } // 0xFF1BED81BFDC0FE0 0x96663D56 b323
 	static void SET_SUPER_JUMP_THIS_FRAME(Player player) { invoke<Void>(0x57FFF03E423A4C0B, player); } // 0x57FFF03E423A4C0B 0x86745EF3 b323
-	static void _0x438822C279B73B93(Any p0) { invoke<Void>(0x438822C279B73B93, p0); } // 0x438822C279B73B93 b573
-	static void _0xA1183BCFEE0F93D1(Any p0) { invoke<Void>(0xA1183BCFEE0F93D1, p0); } // 0xA1183BCFEE0F93D1 b1180
+	static void _SET_BEAST_MODE_ACTIVE(Player player) { invoke<Void>(0x438822C279B73B93, player); } // 0x438822C279B73B93 b573
+	static void _SET_FORCE_PLAYER_TO_JUMP(Player player) { invoke<Void>(0xA1183BCFEE0F93D1, player); } // 0xA1183BCFEE0F93D1 b1180
 	// HAS_*
 	// 
 	// Probably something like "has game been started for the first time".
@@ -5828,6 +6447,7 @@ namespace MISC {
 	static int _GET_BENCHMARK_ITERATIONS_FROM_COMMAND_LINE() { return invoke<int>(0x4750FC27570311EC); } // 0x4750FC27570311EC b323
 	// Returns value of the '-benchmarkPass' command line option.
 	static int _GET_BENCHMARK_PASS_FROM_COMMAND_LINE() { return invoke<int>(0x1B2366C3F2A5C8DF); } // 0x1B2366C3F2A5C8DF b323
+	// In singleplayer it does exactly what the name implies. In FiveM / GTA:Online it shows `Disconnecting from GTA Online` HUD and then quits the game.
 	static void _RESTART_GAME() { invoke<Void>(0xE574A662ACAEFBB1); } // 0xE574A662ACAEFBB1 b372
 	// Exits the game and downloads a fresh social club update on next restart.
 	static void _FORCE_SOCIAL_CLUB_UPDATE() { invoke<Void>(0xEB6891F03362FB12); } // 0xEB6891F03362FB12 b323
@@ -5851,7 +6471,8 @@ namespace MISC {
 	static void _0x693478ACBD7F18E7() { invoke<Void>(0x693478ACBD7F18E7); } // 0x693478ACBD7F18E7 b1103
 }
 
-namespace MOBILE {
+namespace MOBILE
+{
 	// Creates a mobile phone of the specified type.
 	// 
 	// Possible phone types:
@@ -5922,7 +6543,8 @@ namespace MOBILE {
 	static void GET_MOBILE_PHONE_RENDER_ID(int* renderId) { invoke<Void>(0xB4A53E05F68B6FA1, renderId); } // 0xB4A53E05F68B6FA1 0x88E4FECE b323
 }
 
-namespace MONEY {
+namespace MONEY
+{
 	static void NETWORK_INITIALIZE_CASH(int wallet, int bank) { invoke<Void>(0x3DA5ECD1A56CBA6D, wallet, bank); } // 0x3DA5ECD1A56CBA6D 0x66DA9935 b323
 	// Note the 2nd parameters are always 1, 0. I have a feeling it deals with your money, wallet, bank. So when you delete the character it of course wipes the wallet cash at that time. So if that was the case, it would be eg, NETWORK_DELETE_CHARACTER(characterIndex, deleteWalletCash, deleteBankCash);
 	static void NETWORK_DELETE_CHARACTER(int characterSlot, BOOL p1, BOOL p2) { invoke<Void>(0x05A50AF38947EB8D, characterSlot, p1, p2); } // 0x05A50AF38947EB8D 0xA9F7E9C3 b323
@@ -6030,29 +6652,29 @@ namespace MONEY {
 	static void NETWORK_EARN_FROM_DAILY_OBJECTIVES(int p0, const char* p1, int p2) { invoke<Void>(0x6EA318C91C1A8786, p0, p1, p2); } // 0x6EA318C91C1A8786 0xAB6BD72F b323
 	// Example for p1: "AM_DISTRACT_COPS"
 	static void NETWORK_EARN_FROM_AMBIENT_JOB(int p0, const char* p1, Any* p2) { invoke<Void>(0xFB6DB092FBAE29E6, p0, p1, p2); } // 0xFB6DB092FBAE29E6 0xA14CC95D b323
-	static void _0xD20D79671A598594(Any p0, Any p1, Any p2) { invoke<Void>(0xD20D79671A598594, p0, p1, p2); } // 0xD20D79671A598594 b1290
 	static void NETWORK_EARN_FROM_JOB_BONUS(Any p0, Any* p1, Any* p2) { invoke<Void>(0x6816FB4416760775, p0, p1, p2); } // 0x6816FB4416760775 0xBEE23713 b323
-	static void _0x9D4FDBB035229669(Any p0, Any p1, Any p2) { invoke<Void>(0x9D4FDBB035229669, p0, p1, p2); } // 0x9D4FDBB035229669 b1290
-	static void _0x11B0A20C493F7E36(Any p0, Any p1, Any p2) { invoke<Void>(0x11B0A20C493F7E36, p0, p1, p2); } // 0x11B0A20C493F7E36 b1290
-	static void _0xCDA1C62BE2777802(Any p0, Any p1, Any p2) { invoke<Void>(0xCDA1C62BE2777802, p0, p1, p2); } // 0xCDA1C62BE2777802 b573
-	static void _0x08B0CA7A6AB3AC32(Any p0, Any p1, Any p2) { invoke<Void>(0x08B0CA7A6AB3AC32, p0, p1, p2); } // 0x08B0CA7A6AB3AC32 b573
-	static void _0x0CB1BE0633C024A8(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x0CB1BE0633C024A8, p0, p1, p2, p3); } // 0x0CB1BE0633C024A8 b573
+	static void _NETWORK_EARN_FROM_CRIMINAL_MASTERMIND_BONUS(Any p0, Any p1, Any p2) { invoke<Void>(0xFA009A62990671D4, p0, p1, p2); } // 0xFA009A62990671D4 b1290
+	static void _NETWORK_EARN_JOB_BONUS_HEIST_AWARD(Any p0, Any p1, Any p2) { invoke<Void>(0x9D4FDBB035229669, p0, p1, p2); } // 0x9D4FDBB035229669 b1290
+	static void _NETWORK_EARN_JOB_BONUS_FIRST_TIME_BONUS(Any p0, Any p1, Any p2) { invoke<Void>(0x11B0A20C493F7E36, p0, p1, p2); } // 0x11B0A20C493F7E36 b1290
+	static void _NETWORK_EARN_GOON(Any p0, Any p1, Any p2) { invoke<Void>(0xCDA1C62BE2777802, p0, p1, p2); } // 0xCDA1C62BE2777802 b573
+	static void _NETWORK_EARN_BOSS(Any p0, Any p1, Any p2) { invoke<Void>(0x08B0CA7A6AB3AC32, p0, p1, p2); } // 0x08B0CA7A6AB3AC32 b573
+	static void _NETWORK_EARN_BOSS_AGENCY(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x0CB1BE0633C024A8, p0, p1, p2, p3); } // 0x0CB1BE0633C024A8 b573
 	static void _NETWORK_EARN_FROM_WAREHOUSE(int amount, int id) { invoke<Void>(0x3E4ADAFF1830F146, amount, id); } // 0x3E4ADAFF1830F146 b757
 	static void _NETWORK_EARN_FROM_CONTRABAND(int amount, Any p1) { invoke<Void>(0xECA658CE2A4E5A72, amount, p1); } // 0xECA658CE2A4E5A72 b757
-	static void _0x84C0116D012E8FC2(Any p0) { invoke<Void>(0x84C0116D012E8FC2, p0); } // 0x84C0116D012E8FC2 b757
+	static void _NETWORK_EARN_FROM_DESTROYING_CONTRABAND(Any p0) { invoke<Void>(0x84C0116D012E8FC2, p0); } // 0x84C0116D012E8FC2 b757
 	static void _0x6B7E4FB50D5F3D65(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0x6B7E4FB50D5F3D65, p0, p1, p2, p3, p4); } // 0x6B7E4FB50D5F3D65 b1180
 	static void _0x31BA138F6304FB9F(Any p0, Any p1) { invoke<Void>(0x31BA138F6304FB9F, p0, p1); } // 0x31BA138F6304FB9F b1180
 	static void _0x55A1E095DB052FA5(Any p0, Any p1) { invoke<Void>(0x55A1E095DB052FA5, p0, p1); } // 0x55A1E095DB052FA5 b877
 	static void _NETWORK_EARN_FROM_BUSINESS_PRODUCT(int amount, Any p1, Any p2, Any p3) { invoke<Void>(0x8586789730B10CAF, amount, p1, p2, p3); } // 0x8586789730B10CAF b877
 	static void _NETWORK_EARN_FROM_VEHICLE_EXPORT(int amount, Any p1, Any p2) { invoke<Void>(0xEDEAD9A91EC768B3, amount, p1, p2); } // 0xEDEAD9A91EC768B3 b944
 	static void _NETWORK_EARN_FROM_SMUGGLING(int amount, Any p1, Any p2, Any p3) { invoke<Void>(0xDEE612F2D71B0308, amount, p1, p2, p3); } // 0xDEE612F2D71B0308 b1180
-	static void _0xF6B170F9A02E9E87(Any p0) { invoke<Void>(0xF6B170F9A02E9E87, p0); } // 0xF6B170F9A02E9E87 b1493
-	static void _0x42FCE14F50F27291(Any p0) { invoke<Void>(0x42FCE14F50F27291, p0); } // 0x42FCE14F50F27291 b1493
-	static void _0xA75EAC69F59E96E7(Any p0) { invoke<Void>(0xA75EAC69F59E96E7, p0); } // 0xA75EAC69F59E96E7 b1493
-	static void _0xC5156361F26E2212(Any p0) { invoke<Void>(0xC5156361F26E2212, p0); } // 0xC5156361F26E2212 b1493
-	static void _0x0B39CF0D53F1C883(Any p0, Any p1, Any p2) { invoke<Void>(0x0B39CF0D53F1C883, p0, p1, p2); } // 0x0B39CF0D53F1C883 b1493
-	static void _0x1FDA0AA679C9919B(Any p0) { invoke<Void>(0x1FDA0AA679C9919B, p0); } // 0x1FDA0AA679C9919B b1493
-	static void _0xFFFBA1B1F7C0B6F4(Any p0) { invoke<Void>(0xFFFBA1B1F7C0B6F4, p0); } // 0xFFFBA1B1F7C0B6F4 b1493
+	static void _NETWORK_EARN_BOUNTY_HUNTER_REWARD(Any p0) { invoke<Void>(0xF6B170F9A02E9E87, p0); } // 0xF6B170F9A02E9E87 b1493
+	static void _NETWORK_EARN_FROM_BUSINESS_BATTLE(Any p0) { invoke<Void>(0x42FCE14F50F27291, p0); } // 0x42FCE14F50F27291 b1493
+	static void _NETWORK_EARN_FROM_CLUB_MANAGEMENT_PARTICIPATION(Any p0) { invoke<Void>(0xA75EAC69F59E96E7, p0); } // 0xA75EAC69F59E96E7 b1493
+	static void _NETWORK_EARN_FROM_FMBB_PHONECALL_MISSION(Any p0) { invoke<Void>(0xC5156361F26E2212, p0); } // 0xC5156361F26E2212 b1493
+	static void _NETWORK_EARN_FROM_BUSINESS_HUB_SELL(Any p0, Any p1, Any p2) { invoke<Void>(0x0B39CF0D53F1C883, p0, p1, p2); } // 0x0B39CF0D53F1C883 b1493
+	static void _NETWORK_EARN_FROM_FMBB_BOSS_WORK(Any p0) { invoke<Void>(0x1FDA0AA679C9919B, p0); } // 0x1FDA0AA679C9919B b1493
+	static void _NETWORK_EARN_FMBB_WAGE_BONUS(Any p0) { invoke<Void>(0xFFFBA1B1F7C0B6F4, p0); } // 0xFFFBA1B1F7C0B6F4 b1493
 	static BOOL NETWORK_CAN_SPEND_MONEY(Any p0, BOOL p1, BOOL p2, BOOL p3, Any p4, Any p5) { return invoke<BOOL>(0xAB3CAA6B422164DA, p0, p1, p2, p3, p4, p5); } // 0xAB3CAA6B422164DA 0x5AA379D9 b323
 	// NETWORK_CAN_R??? or NETWORK_CAN_S???
 	static BOOL _NETWORK_CAN_SPEND_MONEY_2(Any p0, BOOL p1, BOOL p2, BOOL p3, Any* p4, Any p5, Any p6) { return invoke<BOOL>(0x7303E27CC6532080, p0, p1, p2, p3, p4, p5, p6); } // 0x7303E27CC6532080 b323
@@ -6108,7 +6730,7 @@ namespace MONEY {
 	// The fourth parameter is a bool that returns true/false depending on if your bank balance is greater then 0.
 	// 
 	// The fifth and last parameter is a bool that returns true/false depending on if you have the money for the car based on the cost returned by func_5749. In the freemode script eg,
-	// bool hasTheMoney = NETWORKCASH::_GET_BANK_BALANCE() < carCost.
+	// bool hasTheMoney = MONEY::_GET_BANK_BALANCE() < carCost.
 	static void NETWORK_SPENT_PAY_VEHICLE_INSURANCE_PREMIUM(int amount, Hash vehicleModel, int* networkHandle, BOOL notBankrupt, BOOL hasTheMoney) { invoke<Void>(0x9FF28D88C766E3E8, amount, vehicleModel, networkHandle, notBankrupt, hasTheMoney); } // 0x9FF28D88C766E3E8 0x4E665BB2 b323
 	static void NETWORK_SPENT_CALL_PLAYER(Any p0, Any* p1, BOOL p2, BOOL p3) { invoke<Void>(0xACDE7185B374177C, p0, p1, p2, p3); } // 0xACDE7185B374177C 0x1A89B5FC b323
 	static void NETWORK_SPENT_BOUNTY(Any p0, BOOL p1, BOOL p2) { invoke<Void>(0x29B260B84947DFCC, p0, p1, p2); } // 0x29B260B84947DFCC 0x3401FC96 b323
@@ -6117,6 +6739,7 @@ namespace MONEY {
 	static Any _0x9B5016A6433A68C5() { return invoke<Any>(0x9B5016A6433A68C5); } // 0x9B5016A6433A68C5 0xBD64F1B7 b323
 	// This isn't a hash collision.
 	static const char* PROCESS_CASH_GIFT(int* p0, int* p1, const char* p2) { return invoke<const char*>(0x20194D48EAEC9A41, p0, p1, p2); } // 0x20194D48EAEC9A41 0xC5D8B1E9 b323
+	static void _0xCD4D66B43B1DD28D(Any p0, Any p1, Any p2) { invoke<Void>(0xCD4D66B43B1DD28D, p0, p1, p2); } // 0xCD4D66B43B1DD28D b2189
 	static void NETWORK_SPENT_PLAYER_HEALTHCARE(int p0, int p1, BOOL p2, BOOL p3) { invoke<Void>(0x7C99101F7FCE2EE5, p0, p1, p2, p3); } // 0x7C99101F7FCE2EE5 0x3D96A21C b323
 	static void NETWORK_SPENT_NO_COPS(Any p0, BOOL p1, BOOL p2) { invoke<Void>(0xD5BB406F4E04019F, p0, p1, p2); } // 0xD5BB406F4E04019F 0x2E51C61C b323
 	static void NETWORK_SPENT_REQUEST_JOB(Any p0, BOOL p1, BOOL p2) { invoke<Void>(0x8204DA7934DF3155, p0, p1, p2); } // 0x8204DA7934DF3155 0xD57A5125 b323
@@ -6133,17 +6756,17 @@ namespace MONEY {
 	static void _NETWORK_SPENT_JOB_SKIP(int amount, const char* matchId, BOOL p2, BOOL p3) { invoke<Void>(0x28F174A67B8D0C2F, amount, matchId, p2, p3); } // 0x28F174A67B8D0C2F b323
 	static BOOL _NETWORK_SPENT_BOSS(int amount, BOOL p1, BOOL p2) { return invoke<BOOL>(0xFFBE02CD385356BD, amount, p1, p2); } // 0xFFBE02CD385356BD b573
 	static void _NETWORK_SPENT_PAY_GOON(int p0, int p1, int amount) { invoke<Void>(0x08A1B82B91900682, p0, p1, amount); } // 0x08A1B82B91900682 b573
-	static void _0xDBC966A01C02BCA7(Any p0, Any p1, Any p2) { invoke<Void>(0xDBC966A01C02BCA7, p0, p1, p2); } // 0xDBC966A01C02BCA7 b573
+	static void _NETWORK_SPENT_PAY_BOSS(Any p0, Any p1, Any p2) { invoke<Void>(0xDBC966A01C02BCA7, p0, p1, p2); } // 0xDBC966A01C02BCA7 b573
 	static void _NETWORK_SPENT_MOVE_YACHT(int amount, BOOL p1, BOOL p2) { invoke<Void>(0xE7DF4E0545DFB56E, amount, p1, p2); } // 0xE7DF4E0545DFB56E b573
-	static void _0xFC4EE00A7B3BFB76(Any p0, Any p1, Any p2) { invoke<Void>(0xFC4EE00A7B3BFB76, p0, p1, p2); } // 0xFC4EE00A7B3BFB76 b573
+	static void _NETWORK_SPENT_RENAME_ORGANIZATION(Any p0, Any p1, Any p2) { invoke<Void>(0xFC4EE00A7B3BFB76, p0, p1, p2); } // 0xFC4EE00A7B3BFB76 b573
 	static void _NETWORK_BUY_CONTRABAND(int p0, int p1, Hash p2, BOOL p3, BOOL p4) { invoke<Void>(0x30FD873ECE50E9F6, p0, p1, p2, p3, p4); } // 0x30FD873ECE50E9F6 b757
 	static void _NETWORK_SPENT_VIP_UTILITY_CHARGES(Any p0, Any p1, Any p2) { invoke<Void>(0x5182A339A3474510, p0, p1, p2); } // 0x5182A339A3474510 b757
 	static void _0x112209CE0290C03A(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x112209CE0290C03A, p0, p1, p2, p3); } // 0x112209CE0290C03A b757
 	static void _0xED5FD7AF10F5E262(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0xED5FD7AF10F5E262, p0, p1, p2, p3); } // 0xED5FD7AF10F5E262 b757
 	static void _0x0D30EB83668E63C5(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x0D30EB83668E63C5, p0, p1, p2, p3); } // 0x0D30EB83668E63C5 b757
-	static void _0xB49ECA122467D05F(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0xB49ECA122467D05F, p0, p1, p2, p3); } // 0xB49ECA122467D05F b757
+	static void _NETWORK_SPENT_PA_SERVICE_DANCER(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0xB49ECA122467D05F, p0, p1, p2, p3); } // 0xB49ECA122467D05F b757
 	static void _0xE23ADC6FCB1F29AE(Any p0, Any p1, Any p2) { invoke<Void>(0xE23ADC6FCB1F29AE, p0, p1, p2); } // 0xE23ADC6FCB1F29AE b757
-	static void _0x0FE8E1FCD2B86B33(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x0FE8E1FCD2B86B33, p0, p1, p2, p3); } // 0x0FE8E1FCD2B86B33 b757
+	static void _NETWORK_SPENT_PA_SERVICE_HELI_PICKUP(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x0FE8E1FCD2B86B33, p0, p1, p2, p3); } // 0x0FE8E1FCD2B86B33 b757
 	static void _0x69EF772B192614C1(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x69EF772B192614C1, p0, p1, p2, p3); } // 0x69EF772B192614C1 b757
 	static void _0x8E243837643D9583(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x8E243837643D9583, p0, p1, p2, p3); } // 0x8E243837643D9583 b757
 	static void _0xBD0EFB25CCA8F97A(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0xBD0EFB25CCA8F97A, p0, p1, p2, p3); } // 0xBD0EFB25CCA8F97A b757
@@ -6151,18 +6774,18 @@ namespace MONEY {
 	static void _NETWORK_SPENT_PURCHASE_WAREHOUSE(int amount, Any* data, BOOL p2, BOOL p3) { invoke<Void>(0x33981D6804E62F49, amount, data, p2, p3); } // 0x33981D6804E62F49 b944
 	static void _0x4128464231E3CA0B(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x4128464231E3CA0B, p0, p1, p2, p3); } // 0x4128464231E3CA0B b944
 	static void _0x2FAB6614CE22E196(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x2FAB6614CE22E196, p0, p1, p2, p3); } // 0x2FAB6614CE22E196 b944
-	static void _0x05F04155A226FBBF(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x05F04155A226FBBF, p0, p1, p2, p3); } // 0x05F04155A226FBBF b757
-	static void _0xE8B0B270B6E7C76E(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0xE8B0B270B6E7C76E, p0, p1, p2, p3); } // 0xE8B0B270B6E7C76E b757
-	static void _0x5BCDE0F640C773D2(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x5BCDE0F640C773D2, p0, p1, p2, p3); } // 0x5BCDE0F640C773D2 b877
+	static void _NETWORK_SPENT_ORDER_WAREHOUSE_VEHICLE(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x05F04155A226FBBF, p0, p1, p2, p3); } // 0x05F04155A226FBBF b757
+	static void _NETWORK_SPENT_ORDER_BODYGUARD_VEHICLE(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0xE8B0B270B6E7C76E, p0, p1, p2, p3); } // 0xE8B0B270B6E7C76E b757
+	static void _NETWORK_SPENT_JUKEBOX(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x5BCDE0F640C773D2, p0, p1, p2, p3); } // 0x5BCDE0F640C773D2 b877
 	static void _0x998E18CEB44487FC(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x998E18CEB44487FC, p0, p1, p2, p3); } // 0x998E18CEB44487FC b877
 	static void _0xFA07759E6FDDD7CF(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0xFA07759E6FDDD7CF, p0, p1, p2, p3); } // 0xFA07759E6FDDD7CF b877
 	static void _0x6FD97159FE3C971A(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x6FD97159FE3C971A, p0, p1, p2, p3); } // 0x6FD97159FE3C971A b877
 	static void _0x675D19C6067CAE08(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x675D19C6067CAE08, p0, p1, p2, p3); } // 0x675D19C6067CAE08 b877
 	static void _0xA51B086B0B2C0F7A(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0xA51B086B0B2C0F7A, p0, p1, p2, p3); } // 0xA51B086B0B2C0F7A b877
-	static void _0xD7CCCBA28C4ECAF0(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0xD7CCCBA28C4ECAF0, p0, p1, p2, p3, p4); } // 0xD7CCCBA28C4ECAF0 b877
-	static void _0x0035BB914316F1E3(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x0035BB914316F1E3, p0, p1, p2, p3); } // 0x0035BB914316F1E3 b877
+	static void _NETWORK_SPENT_BA_SERVICE(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0xD7CCCBA28C4ECAF0, p0, p1, p2, p3, p4); } // 0xD7CCCBA28C4ECAF0 b877
+	static void _NETWORK_SPENT_BUSINESS(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x0035BB914316F1E3, p0, p1, p2, p3); } // 0x0035BB914316F1E3 b877
 	static void _0x5F456788B05FAEAC(Any p0, Any p1, Any p2) { invoke<Void>(0x5F456788B05FAEAC, p0, p1, p2); } // 0x5F456788B05FAEAC b944
-	static void _0xA75CCF58A60A5FD1(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9) { invoke<Void>(0xA75CCF58A60A5FD1, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); } // 0xA75CCF58A60A5FD1 b944
+	static void _NETWORK_SPENT_VEHICLE_EXPORT_MODS(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9) { invoke<Void>(0xA75CCF58A60A5FD1, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); } // 0xA75CCF58A60A5FD1 b944
 	static void _0xB4C2EC463672474E(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0xB4C2EC463672474E, p0, p1, p2, p3); } // 0xB4C2EC463672474E b944
 	static void _0x2AFC2D19B50797F2(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x2AFC2D19B50797F2, p0, p1, p2, p3); } // 0x2AFC2D19B50797F2 b944
 	static void _NETWORK_SPENT_IMPORT_EXPORT_REPAIR(Any p0, Any p1, Any p2) { invoke<Void>(0xC1952F3773BA18FE, p0, p1, p2); } // 0xC1952F3773BA18FE b944
@@ -6186,6 +6809,7 @@ namespace MONEY {
 	static void _NETWORK_SPENT_EMPLOY_ASSASSINS(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x5BBBD92186E1F1C5, p0, p1, p2, p3); } // 0x5BBBD92186E1F1C5 b1290
 	static void _NETWORK_SPENT_GANGOPS_CANNON(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x771ADB0E7635B7BF, p0, p1, p2, p3); } // 0x771ADB0E7635B7BF b1290
 	static void _NETWORK_SPENT_GANGOPS_START_MISSION(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0xDA947AE8880D5C18, p0, p1, p2, p3); } // 0xDA947AE8880D5C18 b1290
+	static void _NETWORK_SPENT_CASINO_HEIST_SKIP_MISSION(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x487009DD91D93429, p0, p1, p2, p3); } // 0x487009DD91D93429 b1868
 	static void _NETWORK_EARN_FROM_SELL_BASE(int amount, Hash baseNameHash) { invoke<Void>(0x0E1E2FF3F4EC11AA, amount, baseNameHash); } // 0x0E1E2FF3F4EC11AA b1290
 	static void _NETWORK_EARN_FROM_TARGET_REFUND(int amount, int p1) { invoke<Void>(0x5B669CF2299A271F, amount, p1); } // 0x5B669CF2299A271F b1290
 	static void _NETWORK_EARN_FROM_GANGOPS_WAGES(int amount, int p1) { invoke<Void>(0x2DCB19ABAB0380A8, amount, p1); } // 0x2DCB19ABAB0380A8 b1290
@@ -6236,7 +6860,6 @@ namespace MONEY {
 	static void _NETWORK_SPENT_UPGRADE_CASINO(int amount, BOOL p1, BOOL p2, Any* data) { invoke<Void>(0x4740D62BC1B4EBEA, amount, p1, p2, data); } // 0x4740D62BC1B4EBEA b1734
 	static void _NETWORK_SPENT_CASINO_GENERIC(int amount, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0x88BF9B612B84D3C3, amount, p1, p2, p3, p4); } // 0x88BF9B612B84D3C3 b1734
 	static void _NETWORK_EARN_FROM_TIME_TRIAL_WIN(int amount) { invoke<Void>(0x0819DB99FD2FBBD8, amount); } // 0x0819DB99FD2FBBD8 b1734
-	static void _NETWORK_EARN_FROM_COLLECTION_ITEM(int amount) { invoke<Void>(0x84FF63BD4966F33D, amount); } // 0x84FF63BD4966F33D b1734
 	static void _NETWORK_EARN_FROM_COLLECTABLES_ACTION_FIGURES(int amount) { invoke<Void>(0x5517F90043466049, amount); } // 0x5517F90043466049 b1734
 	static void _NETWORK_EARN_FROM_COMPLETE_COLLECTION(int amount) { invoke<Void>(0x83AD64F53F4E9483, amount); } // 0x83AD64F53F4E9483 b1734
 	static void _NETWORK_EARN_FROM_SELLING_VEHICLE(int amount) { invoke<Void>(0x8BCB27A057DF7B7F, amount); } // 0x8BCB27A057DF7B7F b1734
@@ -6244,6 +6867,31 @@ namespace MONEY {
 	static void _NETWORK_EARN_FROM_CASINO_STORY_MISSION_REWARD(int amount) { invoke<Void>(0xAC95ED552157E092, amount); } // 0xAC95ED552157E092 b1734
 	static void _NETWORK_EARN_FROM_CASINO_MISSION_PARTICIPATION(int amount) { invoke<Void>(0x09E8F18641BE2575, amount); } // 0x09E8F18641BE2575 b1734
 	static void _NETWORK_EARN_FROM_CASINO_AWARD(int amount, Hash hash) { invoke<Void>(0x973A9781A34F8DEB, amount, hash); } // 0x973A9781A34F8DEB b1734
+	static void _0x870289A558348378(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x870289A558348378, p0, p1, p2, p3); } // 0x870289A558348378 b1868
+	static void _0x5574637681911FDA(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x5574637681911FDA, p0, p1, p2, p3); } // 0x5574637681911FDA b1868
+	static void _NETWORK_SPENT_CASINO_HEIST(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9, Any p10) { invoke<Void>(0xD30E8392F407C328, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10); } // 0xD30E8392F407C328 b1868
+	static void _0xB5B58E24868CB09E(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0xB5B58E24868CB09E, p0, p1, p2, p3, p4); } // 0xB5B58E24868CB09E b1868
+	static void _NETWORK_SPENT_ARCADE_GAME(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0xEAD3D81F2C3A1458, p0, p1, p2, p3, p4); } // 0xEAD3D81F2C3A1458 b1868
+	static void _NETWORK_SPENT_ARCADE_GENERIC(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0x43AA7FAC4E6D6687, p0, p1, p2, p3, p4); } // 0x43AA7FAC4E6D6687 b1868
+	static void _NETWORK_EARN_CASINO_HEIST(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6) { invoke<Void>(0x72E7C7B9615FA3C3, p0, p1, p2, p3, p4, p5, p6); } // 0x72E7C7B9615FA3C3 b1868
+	static void _0x4C3B75694F7E0D9C(Any p0, Any p1, Any p2) { invoke<Void>(0x4C3B75694F7E0D9C, p0, p1, p2); } // 0x4C3B75694F7E0D9C b1868
+	static void _0xD29334ED1A256DBF(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0xD29334ED1A256DBF, p0, p1, p2, p3, p4); } // 0xD29334ED1A256DBF b1868
+	static void _0xA95CFB4E02390842(Any p0, Any p1, Any p2) { invoke<Void>(0xA95CFB4E02390842, p0, p1, p2); } // 0xA95CFB4E02390842 b1868
+	static void _0x0DD362F14F18942A(int amount, Any p1, Any p2) { invoke<Void>(0x0DD362F14F18942A, amount, p1, p2); } // 0x0DD362F14F18942A b1868
+	static void _NETWORK_EARN_CASINO_HEIST_BONUS(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0x3EC7471E6909798A, p0, p1, p2, p3, p4); } // 0x3EC7471E6909798A b1868
+	static void _NETWORK_EARN_FROM_COLLECTION_ITEM(int amount, Any p1) { invoke<Void>(0x84FF63BD4966F33D, amount, p1); } // 0x84FF63BD4966F33D b1734
+	static void _NETWORK_EARN_COLLECTABLE_COMPLETED_COLLECTION(int amount, Any p1) { invoke<Void>(0x5C9B198AF5A54FA6, amount, p1); } // 0x5C9B198AF5A54FA6 b2060
+	static void _0xDE68E30D89F97132(int amount, Any p1) { invoke<Void>(0xDE68E30D89F97132, amount, p1); } // 0xDE68E30D89F97132 b2060
+	static void _0xE2E244AB823B4483(int amount, Any p1) { invoke<Void>(0xE2E244AB823B4483, amount, p1); } // 0xE2E244AB823B4483 b2060
+	static void _NETWORK_SPENT_BEACH_PARTY_GENERIC(Any p0) { invoke<Void>(0x54ABA22FA6371249, p0); } // 0x54ABA22FA6371249 b2189
+	static void _NETWORK_SPENT_SUBMARINE(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { invoke<Void>(0x6C8BC1488527AAAB, p0, p1, p2, p3, p4, p5); } // 0x6C8BC1488527AAAB b2189
+	static void _NETWORK_SPENT_CASINO_CLUB_GENERIC(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8) { invoke<Void>(0xC991C255AA6D90B2, p0, p1, p2, p3, p4, p5, p6, p7, p8); } // 0xC991C255AA6D90B2 b2189
+	static void _0x90CD7C6871FBF1B4(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x90CD7C6871FBF1B4, p0, p1, p2, p3); } // 0x90CD7C6871FBF1B4 b2189
+	static void _0x89049A84065CE68E(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x89049A84065CE68E, p0, p1, p2, p3); } // 0x89049A84065CE68E b2189
+	static void _NETWORK_SPENT_ISLAND_HEIST(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0xE86689E5F82DE429, p0, p1, p2, p3); } // 0xE86689E5F82DE429 b2189
+	static void _NETWORK_EARN_ISLAND_HEIST(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { invoke<Void>(0xD21D111C46BA9F15, p0, p1, p2, p3, p4, p5); } // 0xD21D111C46BA9F15 b2189
+	static void _0xA51338E0DCCD4065(Any p0, Any p1, Any p2) { invoke<Void>(0xA51338E0DCCD4065, p0, p1, p2); } // 0xA51338E0DCCD4065 b2189
+	static void _0xE2BB399D90942091(Any p0, Any p1) { invoke<Void>(0xE2BB399D90942091, p0, p1); } // 0xE2BB399D90942091 b2189
 	static int NETWORK_GET_VC_BANK_BALANCE() { return invoke<int>(0x76EF28DA05EA395A); } // 0x76EF28DA05EA395A 0x16184FB5 b323
 	static int NETWORK_GET_VC_WALLET_BALANCE(int characterSlot) { return invoke<int>(0xA40F9C2623F6A8B5, characterSlot); } // 0xA40F9C2623F6A8B5 0x4F5B781C b323
 	static int NETWORK_GET_VC_BALANCE() { return invoke<int>(0x5CBAD97E059E1B94); } // 0x5CBAD97E059E1B94 0xADF8F882 b323
@@ -6275,7 +6923,8 @@ namespace MONEY {
 	static BOOL _0x6FCF8DDEA146C45B(Any p0) { return invoke<BOOL>(0x6FCF8DDEA146C45B, p0); } // 0x6FCF8DDEA146C45B 0xB96C7ABE b323
 }
 
-namespace NETSHOPPING {
+namespace NETSHOPPING
+{
 	static BOOL _NET_GAMESERVER_USE_SERVER_TRANSACTIONS() { return invoke<BOOL>(0x7D2708796355B20B); } // 0x7D2708796355B20B b1290
 	static BOOL _NET_GAMESERVER_CATALOG_ITEM_EXISTS(const char* name) { return invoke<BOOL>(0xBD4D7EAF8A30F637, name); } // 0xBD4D7EAF8A30F637 b323
 	static BOOL _NET_GAMESERVER_CATALOG_ITEM_EXISTS_HASH(Hash hash) { return invoke<BOOL>(0x247F0F73A182EA0B, hash); } // 0x247F0F73A182EA0B b323
@@ -6308,14 +6957,6 @@ namespace NETSHOPPING {
 	static BOOL NET_GAMESERVER_BASKET_IS_FULL() { return invoke<BOOL>(0x27F76CC6C55AD30E); } // 0x27F76CC6C55AD30E b323
 	static BOOL NET_GAMESERVER_BASKET_APPLY_SERVER_DATA(Any p0, Any* p1) { return invoke<BOOL>(0xE1A0450ED46A7812, p0, p1); } // 0xE1A0450ED46A7812 b323
 	static BOOL NET_GAMESERVER_CHECKOUT_START(int transactionId) { return invoke<BOOL>(0x39BE7CEA8D9CC8E6, transactionId); } // 0x39BE7CEA8D9CC8E6 b323
-	// NET_GAMESERVER_*
-	// 
-	// Checks if the transaction status is equal to 1.
-	static BOOL _0xC830417D630A50F9(int transactionId) { return invoke<BOOL>(0xC830417D630A50F9, transactionId); } // 0xC830417D630A50F9 b1365
-	// NET_GAMESERVER_*
-	// 
-	// Checks if the transaction status is equal to 3.
-	static BOOL _0x79EDAC677CA62F81(int transactionId) { return invoke<BOOL>(0x79EDAC677CA62F81, transactionId); } // 0x79EDAC677CA62F81 b1365
 	static BOOL NET_GAMESERVER_BEGIN_SERVICE(int* transactionId, Hash categoryHash, Hash itemHash, Hash actionTypeHash, int value, int flags) { return invoke<BOOL>(0x3C5FD37B5499582E, transactionId, categoryHash, itemHash, actionTypeHash, value, flags); } // 0x3C5FD37B5499582E b323
 	static BOOL NET_GAMESERVER_END_SERVICE(int transactionId) { return invoke<BOOL>(0xE2A99A9B524BEFFF, transactionId); } // 0xE2A99A9B524BEFFF b323
 	static BOOL _NET_GAMESERVER_DELETE_CHARACTER_SLOT(int slot, BOOL transfer, Hash reason) { return invoke<BOOL>(0x51F1A8E48C3D2F6D, slot, transfer, reason); } // 0x51F1A8E48C3D2F6D b323
@@ -6332,7 +6973,8 @@ namespace NETSHOPPING {
 	static BOOL NET_GAMESERVER_SET_TELEMETRY_NONCE_SEED(int p0) { return invoke<BOOL>(0x9507D4271988E1AE, p0); } // 0x9507D4271988E1AE b323
 }
 
-namespace NETWORK {
+namespace NETWORK
+{
 	// Online version is defined here: update\update.rpf\common\data\version.txt
 	// 
 	// Example:
@@ -6352,8 +6994,21 @@ namespace NETWORK {
 	static BOOL _0xBD545D44CCE70597() { return invoke<BOOL>(0xBD545D44CCE70597); } // 0xBD545D44CCE70597 b323
 	// MulleDK19: This function is hard-coded to always return 1.
 	static Any _0xEBCAB9E5048434F4() { return invoke<Any>(0xEBCAB9E5048434F4); } // 0xEBCAB9E5048434F4 b323
-	// MulleDK19: This function is hard-coded to always return 0.
-	static Any _0x74FB3E29E6D10FA9() { return invoke<Any>(0x74FB3E29E6D10FA9); } // 0x74FB3E29E6D10FA9 b323
+	// Hardcoded to return zero.
+	// 
+	// ==== PS4 specific info ====
+	// 
+	// Returns some sort of unavailable reason:
+	// -1 = REASON_INVALID
+	//  0 = REASON_OTHER
+	//  1 = REASON_SYSTEM_UPDATE
+	//  2 = REASON_GAME_UPDATE
+	//  3 = REASON_SIGNED_OUT
+	//  4 = REASON_AGE
+	//  5 = REASON_CONNECTION
+	// 
+	// =================================
+	static int _0x74FB3E29E6D10FA9() { return invoke<int>(0x74FB3E29E6D10FA9); } // 0x74FB3E29E6D10FA9 b323
 	// MulleDK19: This function is hard-coded to always return 1.
 	static Any _0x7808619F31FF22DB() { return invoke<Any>(0x7808619F31FF22DB); } // 0x7808619F31FF22DB b323
 	// MulleDK19: This function is hard-coded to always return 0.
@@ -6366,22 +7021,21 @@ namespace NETWORK {
 	static BOOL _0x8D11E61A4ABF49CC() { return invoke<BOOL>(0x8D11E61A4ABF49CC); } // 0x8D11E61A4ABF49CC 0xBDC8F63E b323
 	static BOOL NETWORK_IS_CLOUD_AVAILABLE() { return invoke<BOOL>(0x9A4CF4F48AD77302); } // 0x9A4CF4F48AD77302 0xC7FF5AFC b323
 	static BOOL NETWORK_HAS_SOCIAL_CLUB_ACCOUNT() { return invoke<BOOL>(0x67A5589628E0CFF6); } // 0x67A5589628E0CFF6 0x66EC713F b323
-	static Any _0xBA9775570DB788CF() { return invoke<Any>(0xBA9775570DB788CF); } // 0xBA9775570DB788CF 0x358D1D77 b323
+	static BOOL NETWORK_ARE_SOCIAL_CLUB_POLICIES_CURRENT() { return invoke<BOOL>(0xBA9775570DB788CF); } // 0xBA9775570DB788CF 0x358D1D77 b323
 	// If you are host, returns true else returns false.
 	static BOOL NETWORK_IS_HOST() { return invoke<BOOL>(0x8DB296B814EDDA07); } // 0x8DB296B814EDDA07 0xE46AC10F b323
-	static Player _NETWORK_GET_HOST() { return invoke<Player>(0x39EEE6E1039A3517); } // 0x39EEE6E1039A3517 b1734
 	static BOOL _0x4237E822315D8BA9() { return invoke<BOOL>(0x4237E822315D8BA9); } // 0x4237E822315D8BA9 b323
 	static BOOL NETWORK_HAVE_ONLINE_PRIVILEGES() { return invoke<BOOL>(0x25CB5A9F37BFD063); } // 0x25CB5A9F37BFD063 0xEF63BFDF b323
 	static BOOL _NETWORK_HAS_AGE_RESTRICTED_PROFILE() { return invoke<BOOL>(0x1353F87E89946207); } // 0x1353F87E89946207 b323
-	static BOOL NETWORK_HAVE_USER_CONTENT_PRIVILEGES(Any p0) { return invoke<BOOL>(0x72D918C99BCACC54, p0); } // 0x72D918C99BCACC54 0x1F88819D b323
-	static BOOL _0xAEEF48CDF5B6CE7C(Any p0, Any p1) { return invoke<BOOL>(0xAEEF48CDF5B6CE7C, p0, p1); } // 0xAEEF48CDF5B6CE7C 0x2D817A5E b323
+	static BOOL NETWORK_HAVE_USER_CONTENT_PRIVILEGES(int p0) { return invoke<BOOL>(0x72D918C99BCACC54, p0); } // 0x72D918C99BCACC54 0x1F88819D b323
+	static BOOL NETWORK_HAVE_COMMUNICATION_PRIVILEGES(int p0, Player player) { return invoke<BOOL>(0xAEEF48CDF5B6CE7C, p0, player); } // 0xAEEF48CDF5B6CE7C 0x2D817A5E b323
 	static BOOL _0x78321BEA235FD8CD(Any p0, BOOL p1) { return invoke<BOOL>(0x78321BEA235FD8CD, p0, p1); } // 0x78321BEA235FD8CD b323
-	static BOOL _0x595F028698072DD9(Any p0, Any p1, BOOL p2) { return invoke<BOOL>(0x595F028698072DD9, p0, p1, p2); } // 0x595F028698072DD9 0xBB54AA3D b323
-	static BOOL _0x83F28CE49FBBFFBA(Any p0, Any p1, BOOL p2) { return invoke<BOOL>(0x83F28CE49FBBFFBA, p0, p1, p2); } // 0x83F28CE49FBBFFBA b323
+	static BOOL NETWORK_CHECK_USER_CONTENT_PRIVILEGES(int p0, int p1, BOOL p2) { return invoke<BOOL>(0x595F028698072DD9, p0, p1, p2); } // 0x595F028698072DD9 0xBB54AA3D b323
+	static BOOL NETWORK_CHECK_COMMUNICATION_PRIVILEGES(int p0, int p1, BOOL p2) { return invoke<BOOL>(0x83F28CE49FBBFFBA, p0, p1, p2); } // 0x83F28CE49FBBFFBA 0xA79E5B05 b323
 	static Any _0x07EAB372C8841D99(Any p0, Any p1, Any p2) { return invoke<Any>(0x07EAB372C8841D99, p0, p1, p2); } // 0x07EAB372C8841D99 b1011
 	static Any _0x906CA41A4B74ECA4() { return invoke<Any>(0x906CA41A4B74ECA4); } // 0x906CA41A4B74ECA4 b1493
 	static Any _0x023ACAB2DC9DC4A4() { return invoke<Any>(0x023ACAB2DC9DC4A4); } // 0x023ACAB2DC9DC4A4 b1493
-	static Any _0x76BF03FADBF154F5() { return invoke<Any>(0x76BF03FADBF154F5); } // 0x76BF03FADBF154F5 b323
+	static BOOL NETWORK_HAS_SOCIAL_NETWORKING_SHARING_PRIV() { return invoke<BOOL>(0x76BF03FADBF154F5); } // 0x76BF03FADBF154F5 0xEB864288 b323
 	static int NETWORK_GET_AGE_GROUP() { return invoke<int>(0x9614B71F8ADB982B); } // 0x9614B71F8ADB982B 0xAB07CBBE b323
 	static Any _0x0CF6CC51AA18F0F8(Any p0, Any p1, Any p2) { return invoke<Any>(0x0CF6CC51AA18F0F8, p0, p1, p2); } // 0x0CF6CC51AA18F0F8 b1180
 	// Hardcoded to return false.
@@ -6432,32 +7086,13 @@ namespace NETWORK {
 	// NETWORK_SESSION_END(0, 0)
 	// Results in: "Connection to session lost due to an unknown network error. Please return to Grand Theft Auto V and try again later."
 	static BOOL NETWORK_SESSION_END(BOOL p0, BOOL p1) { return invoke<BOOL>(0xA02E59562D711006, p0, p1); } // 0xA02E59562D711006 0xBCACBEA2 b323
+	static Any _0xB9351A07A0D458B1(Any p0) { return invoke<Any>(0xB9351A07A0D458B1, p0); } // 0xB9351A07A0D458B1 b2060
 	// Only works as host.
 	static void NETWORK_SESSION_KICK_PLAYER(Player player) { invoke<Void>(0xFA8904DC5F304220, player); } // 0xFA8904DC5F304220 0x1E20138A b323
 	static BOOL NETWORK_SESSION_GET_KICK_VOTE(Player player) { return invoke<BOOL>(0xD6D09A6F32F49EF1, player); } // 0xD6D09A6F32F49EF1 0x8A559D26 b323
 	static Any _0x041C7F2A6C9894E6(Any p0, Any p1, Any p2) { return invoke<Any>(0x041C7F2A6C9894E6, p0, p1, p2); } // 0x041C7F2A6C9894E6 b463
-	// sfink: related to: NETWORK_BAIL
-	// NETWORK_BAIL_TRANSITION
-	// NETWORK_JOIN_GROUP_ACTIVITY
-	// NETWORK_JOIN_TRANSITION
-	// NETWORK_LAUNCH_TRANSITION
-	// NETWORK_SESSION_HOST
-	// NETWORK_SESSION_HOST_CLOSED
-	// NETWORK_SESSION_HOST_FRIENDS_ONLY
-	// NETWORK_SESSION_HOST_SINGLE_PLAYER
-	// NETWORK_SESSION_VOICE_LEAVE
-	static Any _0x59DF79317F85A7E0() { return invoke<Any>(0x59DF79317F85A7E0); } // 0x59DF79317F85A7E0 b323
-	// related to: NETWORK_BAIL
-	// NETWORK_BAIL_TRANSITION
-	// NETWORK_JOIN_GROUP_ACTIVITY
-	// NETWORK_JOIN_TRANSITION
-	// NETWORK_LAUNCH_TRANSITION
-	// NETWORK_SESSION_HOST
-	// NETWORK_SESSION_HOST_CLOSED
-	// NETWORK_SESSION_HOST_FRIENDS_ONLY
-	// NETWORK_SESSION_HOST_SINGLE_PLAYER
-	// NETWORK_SESSION_VOICE_LEAVE
-	static Any _0xFFE1E5B792D92B34() { return invoke<Any>(0xFFE1E5B792D92B34); } // 0xFFE1E5B792D92B34 b323
+	static BOOL NETWORK_JOIN_PREVIOUSLY_FAILED_SESSION() { return invoke<BOOL>(0x59DF79317F85A7E0); } // 0x59DF79317F85A7E0 0x6CDAA7D2 b323
+	static BOOL NETWORK_JOIN_PREVIOUSLY_FAILED_TRANSITION() { return invoke<BOOL>(0xFFE1E5B792D92B34); } // 0xFFE1E5B792D92B34 0xBF21818E b323
 	static void NETWORK_SESSION_SET_MATCHMAKING_GROUP(int matchmakingGroup) { invoke<Void>(0x49EC8030F5015F8B, matchmakingGroup); } // 0x49EC8030F5015F8B 0x3C3E2AB6 b323
 	// playerTypes:
 	// 0 = regular joiner
@@ -6478,25 +7113,24 @@ namespace NETWORK {
 	static void _0x5ECD378EE64450AB(Any p0) { invoke<Void>(0x5ECD378EE64450AB, p0); } // 0x5ECD378EE64450AB b573
 	static void _0x59D421683D31835A(Any p0) { invoke<Void>(0x59D421683D31835A, p0); } // 0x59D421683D31835A b573
 	static void _0x1153FA02A659051C() { invoke<Void>(0x1153FA02A659051C); } // 0x1153FA02A659051C 0x57F9BC83 b323
-	static void _NETWORK_SESSION_HOSTED(BOOL p0) { invoke<Void>(0xC19F6C8E7865A6FF, p0); } // 0xC19F6C8E7865A6FF 0xF3768F90 b323
+	static void NETWORK_SESSION_VALIDATE_JOIN(BOOL p0) { invoke<Void>(0xC19F6C8E7865A6FF, p0); } // 0xC19F6C8E7865A6FF 0xF3768F90 b323
 	// ..
 	static void NETWORK_ADD_FOLLOWERS(int* p0, int p1) { invoke<Void>(0x236406F60CF216D6, p0, p1); } // 0x236406F60CF216D6 0x0EC62629 b323
 	static void NETWORK_CLEAR_FOLLOWERS() { invoke<Void>(0x058F43EC59A8631A); } // 0x058F43EC59A8631A 0x5E557307 b323
 	static void NETWORK_GET_GLOBAL_MULTIPLAYER_CLOCK(int* hours, int* minutes, int* seconds) { invoke<Void>(0x6D03BFBD643B2A02, hours, minutes, seconds); } // 0x6D03BFBD643B2A02 0x74E8C53E b323
 	static void _0x600F8CB31C7AAB6E(Any p0) { invoke<Void>(0x600F8CB31C7AAB6E, p0); } // 0x600F8CB31C7AAB6E 0x959E43A3 b323
 	static int _NETWORK_GET_TARGETING_MODE() { return invoke<int>(0xDFFA5BE8381C3314); } // 0xDFFA5BE8381C3314 b463
-	static BOOL _0xE532D6811B3A4D2A(Any p0) { return invoke<BOOL>(0xE532D6811B3A4D2A, p0); } // 0xE532D6811B3A4D2A 0x7771AB83 b323
+	static BOOL NETWORK_FIND_GAMERS_IN_CREW(Any p0) { return invoke<BOOL>(0xE532D6811B3A4D2A, p0); } // 0xE532D6811B3A4D2A 0x7771AB83 b323
 	static BOOL NETWORK_FIND_MATCHED_GAMERS(Any p0, float p1, float p2, float p3) { return invoke<BOOL>(0xF7B2CFDE5C9F700D, p0, p1, p2, p3); } // 0xF7B2CFDE5C9F700D 0xA13045D4 b323
 	static BOOL NETWORK_IS_FINDING_GAMERS() { return invoke<BOOL>(0xDDDF64C91BFCF0AA); } // 0xDDDF64C91BFCF0AA 0xA6DAA79F b323
-	static Any _0xF9B83B77929D8863() { return invoke<Any>(0xF9B83B77929D8863); } // 0xF9B83B77929D8863 0xBEDC4503 b323
+	static BOOL NETWORK_DID_FIND_GAMERS_SUCCEED() { return invoke<BOOL>(0xF9B83B77929D8863); } // 0xF9B83B77929D8863 0xBEDC4503 b323
 	static int NETWORK_GET_NUM_FOUND_GAMERS() { return invoke<int>(0xA1B043EE79A916FB); } // 0xA1B043EE79A916FB 0xF4B80C7E b323
 	static BOOL NETWORK_GET_FOUND_GAMER(Any* p0, Any p1) { return invoke<BOOL>(0x9DCFF2AFB68B3476, p0, p1); } // 0x9DCFF2AFB68B3476 0xA08C9141 b323
 	static void NETWORK_CLEAR_FOUND_GAMERS() { invoke<Void>(0x6D14CCEE1B40381A); } // 0x6D14CCEE1B40381A 0x6AA9A154 b323
-	static BOOL _NETWORK_GET_GAMER_STATUS(Any* p0) { return invoke<BOOL>(0x85A0EF54A500882C, p0); } // 0x85A0EF54A500882C 0x42BD0780 b323
-	static Any _0x2CC848A861D01493() { return invoke<Any>(0x2CC848A861D01493); } // 0x2CC848A861D01493 0xBEB98840 b323
-	// NETWORK_IS_*
-	static Any _0x94A8394D150B013A() { return invoke<Any>(0x94A8394D150B013A); } // 0x94A8394D150B013A 0x08029970 b323
-	static Any _0x5AE17C6B0134B7F1() { return invoke<Any>(0x5AE17C6B0134B7F1); } // 0x5AE17C6B0134B7F1 0xC871E745 b323
+	static BOOL NETWORK_QUEUE_GAMER_FOR_STATUS(Any* p0) { return invoke<BOOL>(0x85A0EF54A500882C, p0); } // 0x85A0EF54A500882C 0x42BD0780 b323
+	static BOOL NETWORK_GET_GAMER_STATUS_FROM_QUEUE() { return invoke<BOOL>(0x2CC848A861D01493); } // 0x2CC848A861D01493 0xBEB98840 b323
+	static BOOL NETWORK_IS_GETTING_GAMER_STATUS() { return invoke<BOOL>(0x94A8394D150B013A); } // 0x94A8394D150B013A 0x08029970 b323
+	static BOOL NETWORK_DID_GET_GAMER_STATUS_SUCCEED() { return invoke<BOOL>(0x5AE17C6B0134B7F1); } // 0x5AE17C6B0134B7F1 0xC871E745 b323
 	static BOOL NETWORK_GET_GAMER_STATUS_RESULT(Any* p0, Any p1) { return invoke<BOOL>(0x02A8BEC6FD9AF660, p0, p1); } // 0x02A8BEC6FD9AF660 0xB5ABC4B4 b323
 	static void NETWORK_CLEAR_GET_GAMER_STATUS() { invoke<Void>(0x86E0660E4F5C956D); } // 0x86E0660E4F5C956D 0x3F7EDBBD b323
 	static void NETWORK_SESSION_JOIN_INVITE() { invoke<Void>(0xC6F8AB8A4189CF3A); } // 0xC6F8AB8A4189CF3A 0x3D6360B5 b323
@@ -6519,7 +7153,7 @@ namespace NETWORK {
 	static void NETWORK_BLOCK_JOIN_QUEUE_INVITES(BOOL toggle) { invoke<Void>(0xCFEB8AF24FC1D0BB, toggle); } // 0xCFEB8AF24FC1D0BB 0x8AB4890B b323
 	static void _0xF814FEC6A19FD6E0() { invoke<Void>(0xF814FEC6A19FD6E0); } // 0xF814FEC6A19FD6E0 0x32B7A076 b323
 	static void _NETWORK_BLOCK_KICKED_PLAYERS(BOOL p0) { invoke<Void>(0x6B07B9CE4D390375, p0); } // 0x6B07B9CE4D390375 0x0FCE995D b323
-	static void _0x7AC752103856FB20(BOOL p0) { invoke<Void>(0x7AC752103856FB20, p0); } // 0x7AC752103856FB20 0xA639DCA2 b323
+	static void NETWORK_SET_SCRIPT_READY_FOR_EVENTS(BOOL toggle) { invoke<Void>(0x7AC752103856FB20, toggle); } // 0x7AC752103856FB20 0xA639DCA2 b323
 	static BOOL NETWORK_IS_OFFLINE_INVITE_PENDING() { return invoke<BOOL>(0x74698374C45701D2); } // 0x74698374C45701D2 0x70ED476A b323
 	static void _0x140E6A44870A11CE() { invoke<Void>(0x140E6A44870A11CE); } // 0x140E6A44870A11CE 0x50507BED b323
 	// Loads up the map that is loaded when beeing in mission creator
@@ -6537,6 +7171,7 @@ namespace NETWORK {
 	static BOOL NETWORK_IS_SESSION_STARTED() { return invoke<BOOL>(0x9DE624D2FC4B603F); } // 0x9DE624D2FC4B603F 0x9D854A37 b323
 	static BOOL NETWORK_IS_SESSION_BUSY() { return invoke<BOOL>(0xF4435D66A8E2905E); } // 0xF4435D66A8E2905E 0x8592152D b323
 	static BOOL NETWORK_CAN_SESSION_END() { return invoke<BOOL>(0x4EEBC3694E49C572); } // 0x4EEBC3694E49C572 0xE1FCCDBA b323
+	static Any _0x4C9034162368E206() { return invoke<Any>(0x4C9034162368E206); } // 0x4C9034162368E206 b2060
 	static void NETWORK_SESSION_MARK_VISIBLE(BOOL toggle) { invoke<Void>(0x271CC6AB59EBF9A5, toggle); } // 0x271CC6AB59EBF9A5 0x7017257D b323
 	static BOOL NETWORK_SESSION_IS_VISIBLE() { return invoke<BOOL>(0xBA416D68C631496A); } // 0xBA416D68C631496A 0x4977AC28 b323
 	static void NETWORK_SESSION_BLOCK_JOIN_REQUESTS(BOOL toggle) { invoke<Void>(0xA73667484D7037C3, toggle); } // 0xA73667484D7037C3 0xE6EEF8AF b323
@@ -6563,9 +7198,8 @@ namespace NETWORK {
 	// 
 	// Contains string "NETWORK_VOICE_CONNECT_TO_PLAYER" in ida
 	static void NETWORK_SESSION_VOICE_CONNECT_TO_PLAYER(Any* p0) { invoke<Void>(0xABD5E88B8A2D3DB2, p0); } // 0xABD5E88B8A2D3DB2 0x9DFD89E6 b323
-	// hash collision???
-	static void NETWORK_SET_KEEP_FOCUSPOINT(BOOL p0, Any p1) { invoke<Void>(0x7F8413B7FC2AA6B9, p0, p1); } // 0x7F8413B7FC2AA6B9 0x075321B5 b323
-	static void _0x5B8ED3DB018927B1(Any p0) { invoke<Void>(0x5B8ED3DB018927B1, p0); } // 0x5B8ED3DB018927B1 0x6EFC2FD0 b323
+	static void NETWORK_SESSION_VOICE_RESPOND_TO_REQUEST(BOOL p0, int p1) { invoke<Void>(0x7F8413B7FC2AA6B9, p0, p1); } // 0x7F8413B7FC2AA6B9 0x075321B5 b323
+	static void NETWORK_SESSION_VOICE_SET_TIMEOUT(int timeout) { invoke<Void>(0x5B8ED3DB018927B1, timeout); } // 0x5B8ED3DB018927B1 0x6EFC2FD0 b323
 	static BOOL NETWORK_SESSION_IS_IN_VOICE_SESSION() { return invoke<BOOL>(0x855BC38818F6F684); } // 0x855BC38818F6F684 0x60AA4AA1 b323
 	static Any _0xB5D3453C98456528() { return invoke<Any>(0xB5D3453C98456528); } // 0xB5D3453C98456528 b323
 	static BOOL NETWORK_SESSION_IS_VOICE_SESSION_BUSY() { return invoke<BOOL>(0xEF0912DDF7C4CB4B); } // 0xEF0912DDF7C4CB4B 0x132CA01E b323
@@ -6577,7 +7211,21 @@ namespace NETWORK {
 	static void NETWORK_SET_ACTIVITY_SPECTATOR_MAX(int maxSpectators) { invoke<Void>(0x9D277B76D1D12222, maxSpectators); } // 0x9D277B76D1D12222 0x74E0BC0A b323
 	static int NETWORK_GET_ACTIVITY_PLAYER_NUM(BOOL p0) { return invoke<int>(0x73E2B500410DA5A2, p0); } // 0x73E2B500410DA5A2 0x31F951FD b323
 	static BOOL NETWORK_IS_ACTIVITY_SPECTATOR_FROM_HANDLE(int* networkHandle) { return invoke<BOOL>(0x2763BBAA72A7BCB9, networkHandle); } // 0x2763BBAA72A7BCB9 0x58F1DF7D b323
-	static Any NETWORK_HOST_TRANSITION(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9) { return invoke<Any>(0xA60BB5CE242BB254, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); } // 0xA60BB5CE242BB254 0x146764FB b323
+	// p0: Unknown int
+	// p1: Unknown int
+	// p2: Unknown int
+	// p3: Unknown int
+	// p4: Unknown always 0 in decompiled scripts
+	// p5: BOOL purpose unknown, both 0 and 1 are used in decompiled scripts.
+	// p6: BOOL purpose unknown, both 0 and 1 are used in decompiled scripts.
+	// p7: Unknown int, it's an int according to decompiled scripts, however the value is always 0 or 1.
+	// p8: Unknown int, it's an int according to decompiled scripts, however the value is always 0 or 1.
+	// p9: Unknown int, sometimes 0, but also 32768 or 16384 appear in decompiled scripst, maybe a flag of some sort?
+	// 
+	// From what I can tell it looks like it does the following:
+	// Creates/hosts a new transition to another online session, using this in FiveM will result in other players being disconencted from the server/preventing them from joining. This is most likely because I entered the wrong session parameters since they're pretty much all unknown right now.
+	// You also need to use `NetworkJoinTransition(Player player)` and `NetworkLaunchTransition()`.
+	static BOOL NETWORK_HOST_TRANSITION(int p0, int p1, int p2, int p3, Any p4, BOOL p5, BOOL p6, int p7, Any p8, int p9) { return invoke<BOOL>(0xA60BB5CE242BB254, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); } // 0xA60BB5CE242BB254 0x146764FB b323
 	static BOOL NETWORK_DO_TRANSITION_QUICKMATCH(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { return invoke<BOOL>(0x71FB0EBCD4915D56, p0, p1, p2, p3, p4, p5); } // 0x71FB0EBCD4915D56 0x2FF65C0B b323
 	static BOOL NETWORK_DO_TRANSITION_QUICKMATCH_ASYNC(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { return invoke<BOOL>(0xA091A5E44F0072E5, p0, p1, p2, p3, p4, p5); } // 0xA091A5E44F0072E5 0x47D61C99 b323
 	static BOOL NETWORK_DO_TRANSITION_QUICKMATCH_WITH_GROUP(Any p0, Any p1, Any p2, Any p3, Any* p4, Any p5, Any p6, Any p7) { return invoke<BOOL>(0x9C4AB58491FDC98A, p0, p1, p2, p3, p4, p5, p6, p7); } // 0x9C4AB58491FDC98A 0x5CE60A11 b323
@@ -6649,11 +7297,12 @@ namespace NETWORK {
 	// nothing doin.
 	static BOOL NETWORK_JOIN_TRANSITION(Player player) { return invoke<BOOL>(0x9D060B08CD63321A, player); } // 0x9D060B08CD63321A 0xB054EC4B b323
 	static BOOL NETWORK_HAS_INVITED_GAMER_TO_TRANSITION(Any* p0) { return invoke<BOOL>(0x7284A47B3540E6CF, p0); } // 0x7284A47B3540E6CF 0x4F41DF6B b323
-	static BOOL _0x3F9990BF5F22759C(Any* p0) { return invoke<BOOL>(0x3F9990BF5F22759C, p0); } // 0x3F9990BF5F22759C b323
+	// NETWORK_HAS_*
+	static BOOL _0x3F9990BF5F22759C(Any* p0) { return invoke<BOOL>(0x3F9990BF5F22759C, p0); } // 0x3F9990BF5F22759C 0x00F26CDC b323
 	static BOOL NETWORK_IS_ACTIVITY_SESSION() { return invoke<BOOL>(0x05095437424397FA); } // 0x05095437424397FA 0x577DAA8A b323
 	// Does nothing. It's just a nullsub.
 	static void _0x4A9FDE3A5A6D0437(BOOL toggle) { invoke<Void>(0x4A9FDE3A5A6D0437, toggle); } // 0x4A9FDE3A5A6D0437 0x18F03AFD b323
-	static BOOL _NETWORK_SEND_PRESENCE_INVITE(int* networkHandle, Any* p1, Any p2, Any p3) { return invoke<BOOL>(0xC3C7A6AFDB244624, networkHandle, p1, p2, p3); } // 0xC3C7A6AFDB244624 0x8B99B72B b323
+	static BOOL NETWORK_SEND_INVITE_VIA_PRESENCE(int* networkHandle, Any* p1, Any p2, Any p3) { return invoke<BOOL>(0xC3C7A6AFDB244624, networkHandle, p1, p2, p3); } // 0xC3C7A6AFDB244624 0x8B99B72B b323
 	// String "NETWORK_SEND_PRESENCE_TRANSITION_INVITE" is contained in the function in ida so this one is correct.
 	static BOOL _NETWORK_SEND_PRESENCE_TRANSITION_INVITE(Any* p0, Any* p1, Any p2, Any p3) { return invoke<BOOL>(0xC116FF9B4D488291, p0, p1, p2, p3); } // 0xC116FF9B4D488291 0x877C0E1C b323
 	static BOOL _0x1171A97A3D3981B6(Any* p0, Any* p1, Any p2, Any p3) { return invoke<BOOL>(0x1171A97A3D3981B6, p0, p1, p2, p3); } // 0x1171A97A3D3981B6 b323
@@ -6666,10 +7315,10 @@ namespace NETWORK {
 	static BOOL NETWORK_GET_PRESENCE_INVITE_HANDLE(Any p0, Any* p1) { return invoke<BOOL>(0x38D5B0FEBB086F75, p0, p1); } // 0x38D5B0FEBB086F75 0xB2451429 b323
 	static Any NETWORK_GET_PRESENCE_INVITE_SESSION_ID(Any p0) { return invoke<Any>(0x26E1CD96B0903D60, p0); } // 0x26E1CD96B0903D60 0xC5E0C989 b323
 	static Any NETWORK_GET_PRESENCE_INVITE_CONTENT_ID(Any p0) { return invoke<Any>(0x24409FC4C55CB22D, p0); } // 0x24409FC4C55CB22D 0xA4302183 b323
-	static Any _0xD39B3FFF8FFDD5BF(Any p0) { return invoke<Any>(0xD39B3FFF8FFDD5BF, p0); } // 0xD39B3FFF8FFDD5BF 0x51B2D848 b323
-	static Any _0x728C4CC7920CD102(Any p0) { return invoke<Any>(0x728C4CC7920CD102, p0); } // 0x728C4CC7920CD102 0x4677C656 b323
+	static Any NETWORK_GET_PRESENCE_INVITE_PLAYLIST_LENGTH(Any p0) { return invoke<Any>(0xD39B3FFF8FFDD5BF, p0); } // 0xD39B3FFF8FFDD5BF 0x51B2D848 b323
+	static Any NETWORK_GET_PRESENCE_INVITE_PLAYLIST_CURRENT(Any p0) { return invoke<Any>(0x728C4CC7920CD102, p0); } // 0x728C4CC7920CD102 0x4677C656 b323
 	static BOOL NETWORK_GET_PRESENCE_INVITE_FROM_ADMIN(Any p0) { return invoke<BOOL>(0x3DBF2DF0AEB7D289, p0); } // 0x3DBF2DF0AEB7D289 0xF5E3401C b323
-	static BOOL _0x8806CEBFABD3CE05(Any p0) { return invoke<BOOL>(0x8806CEBFABD3CE05, p0); } // 0x8806CEBFABD3CE05 0x7D593B4C b323
+	static BOOL NETWORK_GET_PRESENCE_INVITE_IS_TOURNAMENT(Any p0) { return invoke<BOOL>(0x8806CEBFABD3CE05, p0); } // 0x8806CEBFABD3CE05 0x7D593B4C b323
 	static BOOL NETWORK_HAS_FOLLOW_INVITE() { return invoke<BOOL>(0x76D9B976C4C09FDE); } // 0x76D9B976C4C09FDE 0xE96CFE7D b323
 	static Any NETWORK_ACTION_FOLLOW_INVITE() { return invoke<Any>(0xC88156EBB786F8D5); } // 0xC88156EBB786F8D5 0xAB969F00 b323
 	static Any NETWORK_CLEAR_FOLLOW_INVITE() { return invoke<Any>(0x439BFDE3CD0610F6); } // 0x439BFDE3CD0610F6 0x3242F952 b323
@@ -6710,7 +7359,7 @@ namespace NETWORK {
 	static void _0x6CE50E47F5543D0C() { invoke<Void>(0x6CE50E47F5543D0C); } // 0x6CE50E47F5543D0C b573
 	static void _0xFA2888E3833C8E96() { invoke<Void>(0xFA2888E3833C8E96); } // 0xFA2888E3833C8E96 0x7F70C15A b323
 	static void _0x25D990F8E0E3F13C() { invoke<Void>(0x25D990F8E0E3F13C); } // 0x25D990F8E0E3F13C b323
-	static void _0xF1B84178F8674195(Any p0) { invoke<Void>(0xF1B84178F8674195, p0); } // 0xF1B84178F8674195 0x41702C8A b323
+	static void NETWORK_SEED_RANDOM_NUMBER_GENERATOR(int seed) { invoke<Void>(0xF1B84178F8674195, seed); } // 0xF1B84178F8674195 0x41702C8A b323
 	static int NETWORK_GET_RANDOM_INT() { return invoke<int>(0x599E4FA1F87EB5FF); } // 0x599E4FA1F87EB5FF 0x208DD848 b323
 	// Same as GET_RANDOM_INT_IN_RANGE
 	static int NETWORK_GET_RANDOM_INT_RANGED(int rangeStart, int rangeEnd) { return invoke<int>(0xE30CF56F1EFA5F43, rangeStart, rangeEnd); } // 0xE30CF56F1EFA5F43 0xF9B6426D b323
@@ -6740,9 +7389,10 @@ namespace NETWORK {
 	static int NETWORK_GET_SCRIPT_STATUS() { return invoke<int>(0x57D158647A6BFABF); } // 0x57D158647A6BFABF 0x2BE9235A b323
 	static void NETWORK_REGISTER_HOST_BROADCAST_VARIABLES(int* vars, int numVars) { invoke<Void>(0x3E9B2F01C50DF595, vars, numVars); } // 0x3E9B2F01C50DF595 0xDAF3B0AE b323
 	static void NETWORK_REGISTER_PLAYER_BROADCAST_VARIABLES(int* vars, int numVars) { invoke<Void>(0x3364AA97340CA215, vars, numVars); } // 0x3364AA97340CA215 0xBE3D32B4 b323
+	static void _0xEA8C0DDB10E2822A(Any p0, Any p1) { invoke<Void>(0xEA8C0DDB10E2822A, p0, p1); } // 0xEA8C0DDB10E2822A b1868
+	static void _0xD6D7478CA62B8D41(Any p0, Any p1) { invoke<Void>(0xD6D7478CA62B8D41, p0, p1); } // 0xD6D7478CA62B8D41 b1868
 	static void NETWORK_FINISH_BROADCASTING_DATA() { invoke<Void>(0x64F62AFB081E260D); } // 0x64F62AFB081E260D 0xA71A1D2A b323
-	// NETWORK_HAS_*
-	static BOOL _0x5D10B3795F3FC886() { return invoke<BOOL>(0x5D10B3795F3FC886); } // 0x5D10B3795F3FC886 0x0B739F53 b323
+	static BOOL NETWORK_HAS_RECEIVED_HOST_BROADCAST_DATA() { return invoke<BOOL>(0x5D10B3795F3FC886); } // 0x5D10B3795F3FC886 0x0B739F53 b323
 	static int NETWORK_GET_PLAYER_INDEX(Player player) { return invoke<int>(0x24FB80D107371267, player); } // 0x24FB80D107371267 0xBE1C1506 b323
 	static int NETWORK_GET_PARTICIPANT_INDEX(int index) { return invoke<int>(0x1B84DF6AF2A46938, index); } // 0x1B84DF6AF2A46938 0xC4D91094 b323
 	// Returns the Player associated to a given Ped when in an online session.
@@ -6765,10 +7415,11 @@ namespace NETWORK {
 	static Player NETWORK_GET_HOST_OF_SCRIPT(const char* scriptName, int p1, int p2) { return invoke<Player>(0x1D6A14F1F9A736FC, scriptName, p1, p2); } // 0x1D6A14F1F9A736FC 0x9C95D0BB b323
 	static void NETWORK_SET_MISSION_FINISHED() { invoke<Void>(0x3B3D11CD9FFCDFC9); } // 0x3B3D11CD9FFCDFC9 0x3083FAD7 b323
 	static BOOL NETWORK_IS_SCRIPT_ACTIVE(const char* scriptName, Player player, BOOL p2, Any p3) { return invoke<BOOL>(0x9D40DF90FAD26098, scriptName, player, p2, p3); } // 0x9D40DF90FAD26098 0x4A65250C b323
+	static BOOL NETWORK_IS_SCRIPT_ACTIVE_BY_HASH(Hash scriptHash, int p1, BOOL p2, int p3) { return invoke<BOOL>(0xDA7DE67F5FE5EE13, scriptHash, p1, p2, p3); } // 0xDA7DE67F5FE5EE13 b2245
 	static Any _0x560B423D73015E77(Any p0) { return invoke<Any>(0x560B423D73015E77, p0); } // 0x560B423D73015E77 b1604
 	static int NETWORK_GET_NUM_SCRIPT_PARTICIPANTS(Any* p0, Any p1, Any p2) { return invoke<int>(0x3658E8CD94FC121A, p0, p1, p2); } // 0x3658E8CD94FC121A 0x8F7D9F46 b323
 	static Any _0x638A3A81733086DB() { return invoke<Any>(0x638A3A81733086DB); } // 0x638A3A81733086DB 0xDB8B5D71 b323
-	static BOOL NETWORK_IS_PLAYER_A_PARTICIPANT_ON_SCRIPT(Player p0, Any* p1, Any p2) { return invoke<BOOL>(0x1AD5B71586B94820, p0, p1, p2); } // 0x1AD5B71586B94820 0xCEA55F4C b323
+	static BOOL NETWORK_IS_PLAYER_A_PARTICIPANT_ON_SCRIPT(Player player1, const char* script, Player player2) { return invoke<BOOL>(0x1AD5B71586B94820, player1, script, player2); } // 0x1AD5B71586B94820 0xCEA55F4C b323
 	static void _0x2302C0264EA58D31() { invoke<Void>(0x2302C0264EA58D31); } // 0x2302C0264EA58D31 0x8DCFE77D b323
 	// Has something to do with a host request.
 	// 
@@ -6791,8 +7442,7 @@ namespace NETWORK {
 	static BOOL NETWORK_IS_LOCAL_PLAYER_INVINCIBLE() { return invoke<BOOL>(0x8A8694B48715B000); } // 0x8A8694B48715B000 0x8DE13B36 b323
 	static void NETWORK_DISABLE_INVINCIBLE_FLASHING(Player player, BOOL toggle) { invoke<Void>(0x9DD368BF06983221, player, toggle); } // 0x9DD368BF06983221 0x8D27280E b323
 	static void NETWORK_SET_LOCAL_PLAYER_SYNC_LOOK_AT(BOOL toggle) { invoke<Void>(0x524FF0AEFF9C3973, toggle); } // 0x524FF0AEFF9C3973 0xB72F086D b323
-	// NETWORK_HAS_*
-	static BOOL _0xB07D3185E11657A5(Entity entity) { return invoke<BOOL>(0xB07D3185E11657A5, entity); } // 0xB07D3185E11657A5 0xEDA68956 b323
+	static BOOL NETWORK_HAS_ENTITY_BEEN_REGISTERED_WITH_THIS_THREAD(Entity entity) { return invoke<BOOL>(0xB07D3185E11657A5, entity); } // 0xB07D3185E11657A5 0xEDA68956 b323
 	static int NETWORK_GET_NETWORK_ID_FROM_ENTITY(Entity entity) { return invoke<int>(0xA11700682F3AD45C, entity); } // 0xA11700682F3AD45C 0x9E35DAB6 b323
 	static Entity NETWORK_GET_ENTITY_FROM_NETWORK_ID(int netId) { return invoke<Entity>(0xCE4E5D9B0A4FF560, netId); } // 0xCE4E5D9B0A4FF560 0x5B912C3F b323
 	static BOOL NETWORK_GET_ENTITY_IS_NETWORKED(Entity entity) { return invoke<BOOL>(0xC7827959479DCC78, entity); } // 0xC7827959479DCC78 0xD7F934F4 b323
@@ -6804,6 +7454,9 @@ namespace NETWORK {
 	static BOOL NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(int netId) { return invoke<BOOL>(0xA670B3662FAFFBD0, netId); } // 0xA670B3662FAFFBD0 0x9262A60A b323
 	static BOOL NETWORK_HAS_CONTROL_OF_NETWORK_ID(int netId) { return invoke<BOOL>(0x4D36070FE0215186, netId); } // 0x4D36070FE0215186 0x92E77D21 b323
 	// NETWORK_IS_*
+	// Probably a bool, returns true if the specified network id is controlled by someone else.
+	// Ff you have control over the entity corresponding to the netId then this will return false (0);
+	// Returns probably a bool, returns 1 if you don't have control over the netId entity.
 	static BOOL _0x7242F8B741CE1086(int netId) { return invoke<BOOL>(0x7242F8B741CE1086, netId); } // 0x7242F8B741CE1086 b678
 	static BOOL NETWORK_REQUEST_CONTROL_OF_ENTITY(Entity entity) { return invoke<BOOL>(0xB69317BF5E782347, entity); } // 0xB69317BF5E782347 0xA05FEBD7 b323
 	static BOOL NETWORK_REQUEST_CONTROL_OF_DOOR(int doorID) { return invoke<BOOL>(0x870DDFD5A4A796E4, doorID); } // 0x870DDFD5A4A796E4 0xF60DAAF6 b323
@@ -6862,9 +7515,10 @@ namespace NETWORK {
 	static BOOL NETWORK_GAMERTAG_FROM_HANDLE_PENDING() { return invoke<BOOL>(0xB071E27958EF4CF0); } // 0xB071E27958EF4CF0 0xF000828E b323
 	static BOOL NETWORK_GAMERTAG_FROM_HANDLE_SUCCEEDED() { return invoke<BOOL>(0xFD00798DBA7523DD); } // 0xFD00798DBA7523DD 0x89C2B5EA b323
 	static const char* NETWORK_GET_GAMERTAG_FROM_HANDLE(int* networkHandle) { return invoke<const char*>(0x426141162EBE5CDB, networkHandle); } // 0x426141162EBE5CDB 0xA18A1B26 b323
-	static int _0xD66C9E72B3CC4982(Any* p0, Any p1) { return invoke<int>(0xD66C9E72B3CC4982, p0, p1); } // 0xD66C9E72B3CC4982 b323
+	// Hardcoded to return -1.
+	static int NETWORK_DISPLAYNAMES_FROM_HANDLES_START(Any* p0, Any p1) { return invoke<int>(0xD66C9E72B3CC4982, p0, p1); } // 0xD66C9E72B3CC4982 b323
 	// MulleDK19: This function is hard-coded to always return 0.
-	static Any _0x58CC181719256197(Any p0, Any p1, Any p2) { return invoke<Any>(0x58CC181719256197, p0, p1, p2); } // 0x58CC181719256197 b323
+	static int NETWORK_GET_DISPLAYNAMES_FROM_HANDLES(Any p0, Any p1, Any p2) { return invoke<int>(0x58CC181719256197, p0, p1, p2); } // 0x58CC181719256197 b323
 	static BOOL NETWORK_ARE_HANDLES_THE_SAME(int* netHandle1, int* netHandle2) { return invoke<BOOL>(0x57DBA049E110F217, netHandle1, netHandle2); } // 0x57DBA049E110F217 0x45975AE3 b323
 	static BOOL NETWORK_IS_HANDLE_VALID(int* networkHandle, int bufferSize) { return invoke<BOOL>(0x6F79B93B0A8E4133, networkHandle, bufferSize); } // 0x6F79B93B0A8E4133 0xF0996C6E b323
 	static Player NETWORK_GET_PLAYER_FROM_GAMER_HANDLE(int* networkHandle) { return invoke<Player>(0xCE5F689CF5A0A49D, networkHandle); } // 0xCE5F689CF5A0A49D 0x2E96EF1E b323
@@ -6889,7 +7543,13 @@ namespace NETWORK {
 	static BOOL NETWORK_PLAYER_IS_ROCKSTAR_DEV(Player player) { return invoke<BOOL>(0x544ABDDA3B409B6D, player); } // 0x544ABDDA3B409B6D 0xF6659045 b323
 	static BOOL NETWORK_PLAYER_INDEX_IS_CHEATER(Player player) { return invoke<BOOL>(0x565E430DB3B05BEC, player); } // 0x565E430DB3B05BEC 0xD265B049 b323
 	static int _NETWORK_GET_ENTITY_NET_SCRIPT_ID(Entity entity) { return invoke<int>(0x815F18AD865F057F, entity); } // 0x815F18AD865F057F b463
-	static Any _0x37D5F739FD494675(Any p0) { return invoke<Any>(0x37D5F739FD494675, p0); } // 0x37D5F739FD494675 b505
+	// I've had this return the player's ped handle sometimes, but also other random entities.
+	// Whatever p0 is, it's at least not synced to other players.
+	// At least not all the time, some p0 values actually output the same entity, (different handle of course, but same entity).
+	// But another p0 value may return an entity for player x, but not for player y (it'll just return -1 even if the entity exists on both clients).
+	// 
+	// Returns an entity handle or -1, value changes based on p0's value.
+	static int _0x37D5F739FD494675(Any p0) { return invoke<int>(0x37D5F739FD494675, p0); } // 0x37D5F739FD494675 b505
 	static BOOL NETWORK_IS_INACTIVE_PROFILE(Any* p0) { return invoke<BOOL>(0x7E58745504313A2E, p0); } // 0x7E58745504313A2E 0x95481343 b323
 	static int NETWORK_GET_MAX_FRIENDS() { return invoke<int>(0xAFEBB0D5D8F687D2); } // 0xAFEBB0D5D8F687D2 0x048171BC b323
 	static int NETWORK_GET_FRIEND_COUNT() { return invoke<int>(0x203F1CFD823B27A4); } // 0x203F1CFD823B27A4 0xA396ACDE b323
@@ -6970,6 +7630,7 @@ namespace NETWORK {
 	// R* uses this to hear all player when spectating. 
 	// It allows you to hear other online players when their chat is on none, crew and or friends
 	static void NETWORK_OVERRIDE_RECEIVE_RESTRICTIONS(Player player, BOOL toggle) { invoke<Void>(0xDDF73E2B1FEC5AB4, player, toggle); } // 0xDDF73E2B1FEC5AB4 0x95F1C60D b323
+	// p0 is always false in scripts.
 	static void NETWORK_OVERRIDE_RECEIVE_RESTRICTIONS_ALL(BOOL toggle) { invoke<Void>(0x0FF2862B61A58AF9, toggle); } // 0x0FF2862B61A58AF9 0x1BCD3DDF b323
 	static void NETWORK_SET_VOICE_CHANNEL(int channel) { invoke<Void>(0xEF6212C2EFEF1A23, channel); } // 0xEF6212C2EFEF1A23 0x3974879F b323
 	static void NETWORK_CLEAR_VOICE_CHANNEL() { invoke<Void>(0xE036A705F989E049); } // 0xE036A705F989E049 0x9ECF722A b323
@@ -6981,13 +7642,19 @@ namespace NETWORK {
 	// NETWORK_SET_*
 	static void _0x8EF52ACAECC51D9C(BOOL toggle) { invoke<Void>(0x8EF52ACAECC51D9C, toggle); } // 0x8EF52ACAECC51D9C b1734
 	// Same as _IS_TEXT_CHAT_ACTIVE, except it does not check if the text chat HUD component is initialized, and therefore may crash.
-	// 
-	// -(http://fivem.net)
 	static BOOL _NETWORK_IS_TEXT_CHAT_ACTIVE() { return invoke<BOOL>(0x5FCF4D7069B09026); } // 0x5FCF4D7069B09026 b323
 	// Starts a new singleplayer game (at the prologue).
 	static void SHUTDOWN_AND_LAUNCH_SINGLE_PLAYER_GAME() { invoke<Void>(0x593850C16A36B692); } // 0x593850C16A36B692 0x92B7351C b323
+	// In singleplayer this will re-load your game.
+	// 
+	// In FiveM / GTA:Online this disconnects you from the session, and starts loading single player, however you still remain connected to the server (only if you're the host, if you're not then you also (most likely) get disconnected from the server) and other players will not be able to join until you exit the game.
+	// 
+	// You might need to DoScreenFadeIn and ShutdownLoadingScreen otherwise you probably won't end up loading into SP at all.
+	// 
+	// Somewhat related note: opening the pause menu after loading into this 'singleplayer' mode crashes the game.
 	static BOOL _SHUTDOWN_AND_LOAD_MOST_RECENT_SAVE() { return invoke<BOOL>(0x9ECA15ADFE141431); } // 0x9ECA15ADFE141431 b505
 	static void NETWORK_SET_FRIENDLY_FIRE_OPTION(BOOL toggle) { invoke<Void>(0xF808475FA571D823, toggle); } // 0xF808475FA571D823 0x6BAF95FA b323
+	// This native does absolutely nothing, just a nullsub
 	static void NETWORK_SET_RICH_PRESENCE(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x1DCCACDCFC569362, p0, p1, p2, p3); } // 0x1DCCACDCFC569362 0x932A6CED b323
 	// This native does absolutely nothing, just a nullsub
 	static void NETWORK_SET_RICH_PRESENCE_STRING(int p0, const char* textLabel) { invoke<Void>(0x3E200C2BCF4164EB, p0, textLabel); } // 0x3E200C2BCF4164EB 0x017E6777 b323
@@ -6997,6 +7664,7 @@ namespace NETWORK {
 	static void _0xBF22E0F32968E967(Player player, BOOL p1) { invoke<Void>(0xBF22E0F32968E967, player, p1); } // 0xBF22E0F32968E967 0x22E03AD0 b323
 	// entity must be a valid entity; ped can be NULL
 	static void REMOVE_ALL_STICKY_BOMBS_FROM_ENTITY(Entity entity, Ped ped) { invoke<Void>(0x715135F4B82AC90D, entity, ped); } // 0x715135F4B82AC90D 0xCEAE5AFC b323
+	static void _0x17C9E241111A674D(Any p0, Any p1) { invoke<Void>(0x17C9E241111A674D, p0, p1); } // 0x17C9E241111A674D b2060
 	static Any _0x2E4C123D1C8A710E(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6) { return invoke<Any>(0x2E4C123D1C8A710E, p0, p1, p2, p3, p4, p5, p6); } // 0x2E4C123D1C8A710E b505
 	static BOOL NETWORK_CLAN_SERVICE_IS_VALID() { return invoke<BOOL>(0x579CCED0265D4896); } // 0x579CCED0265D4896 0xF5F4BD95 b323
 	static BOOL NETWORK_CLAN_PLAYER_IS_ACTIVE(int* networkHandle) { return invoke<BOOL>(0xB124B57F571D8F18, networkHandle); } // 0xB124B57F571D8F18 0xAB8319A3 b323
@@ -7050,6 +7718,8 @@ namespace NETWORK {
 	static BOOL NETWORK_CLAN_GET_MEMBERSHIP(int* p0, int* clanMembership, int p2) { return invoke<BOOL>(0xC8BC2011F67B3411, p0, clanMembership, p2); } // 0xC8BC2011F67B3411 0xCDC4A590 b323
 	static BOOL NETWORK_CLAN_JOIN(int clanDesc) { return invoke<BOOL>(0x9FAAA4F4FC71F87F, clanDesc); } // 0x9FAAA4F4FC71F87F 0x79C916C5 b323
 	// Only documented...
+	// 
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static BOOL _NETWORK_CLAN_ANIMATION(const char* animDict, const char* animName) { return invoke<BOOL>(0x729E3401F0430686, animDict, animName); } // 0x729E3401F0430686 0xBDA90BAC b323
 	static BOOL _0x2B51EDBEFC301339(int p0, const char* p1) { return invoke<BOOL>(0x2B51EDBEFC301339, p0, p1); } // 0x2B51EDBEFC301339 0x8E952B12 b323
 	static Any _0xC32EA7A2F6CA7557() { return invoke<Any>(0xC32EA7A2F6CA7557); } // 0xC32EA7A2F6CA7557 0x966C90FD b323
@@ -7066,8 +7736,8 @@ namespace NETWORK {
 	// Whether or not another player is allowed to take control of the entity
 	static void SET_NETWORK_ID_CAN_MIGRATE(int netId, BOOL toggle) { invoke<Void>(0x299EEB23175895FC, netId, toggle); } // 0x299EEB23175895FC 0x47C8E5FF b323
 	static void SET_NETWORK_ID_EXISTS_ON_ALL_MACHINES(int netId, BOOL toggle) { invoke<Void>(0xE05E81A888FA63C8, netId, toggle); } // 0xE05E81A888FA63C8 0x68D486B2 b323
-	// not tested....
-	static void _SET_NETWORK_ID_SYNC_TO_PLAYER(int netId, Player player, BOOL toggle) { invoke<Void>(0xA8A024587329F36A, netId, player, toggle); } // 0xA8A024587329F36A 0x4D15FDB1 b323
+	static void SET_NETWORK_ID_ALWAYS_EXISTS_FOR_PLAYER(int netId, Player player, BOOL toggle) { invoke<Void>(0xA8A024587329F36A, netId, player, toggle); } // 0xA8A024587329F36A 0x4D15FDB1 b323
+	static void _0x9D724B400A7E8FFC(Any p0, Any p1) { invoke<Void>(0x9D724B400A7E8FFC, p0, p1); } // 0x9D724B400A7E8FFC b2189
 	static void NETWORK_SET_ENTITY_CAN_BLEND(Entity entity, BOOL toggle) { invoke<Void>(0xD830567D88A1E873, entity, toggle); } // 0xD830567D88A1E873 0xDE8C0DB8 b323
 	static void _0x0379DAF89BA09AA5(Any p0, Any p1) { invoke<Void>(0x0379DAF89BA09AA5, p0, p1); } // 0x0379DAF89BA09AA5 b944
 	// if set to true other network players can't see it
@@ -7081,8 +7751,7 @@ namespace NETWORK {
 	static void _NETWORK_SET_ENTITY_INVISIBLE_TO_NETWORK(Entity entity, BOOL toggle) { invoke<Void>(0xF1CA12B18AEF5298, entity, toggle); } // 0xF1CA12B18AEF5298 0x09CBC4B0 b323
 	static void SET_NETWORK_ID_VISIBLE_IN_CUTSCENE(int netId, BOOL p1, BOOL p2) { invoke<Void>(0xA6928482543022B4, netId, p1, p2); } // 0xA6928482543022B4 0x199E75EF b323
 	static void _0x32EBD154CB6B8B99(Any p0, Any p1, Any p2) { invoke<Void>(0x32EBD154CB6B8B99, p0, p1, p2); } // 0x32EBD154CB6B8B99 b505
-	// SET_PLAYER_*
-	static void _0x6540EDC4F45DA089(Player player) { invoke<Void>(0x6540EDC4F45DA089, player); } // 0x6540EDC4F45DA089 b1734
+	static void _0x76B3F29D3F967692(Any p0, Any p1) { invoke<Void>(0x76B3F29D3F967692, p0, p1); } // 0x76B3F29D3F967692 b2189
 	static void SET_NETWORK_CUTSCENE_ENTITIES(BOOL toggle) { invoke<Void>(0xAAA553E7DD28A457, toggle); } // 0xAAA553E7DD28A457 0xFD0F7EDD b323
 	static void _0x3FA36981311FA4FF(int netId, BOOL state) { invoke<Void>(0x3FA36981311FA4FF, netId, state); } // 0x3FA36981311FA4FF 0x00AE4E17 b323
 	static BOOL IS_NETWORK_ID_OWNED_BY_PARTICIPANT(int netId) { return invoke<BOOL>(0xA1607996431332DF, netId); } // 0xA1607996431332DF 0xEA5176C0 b323
@@ -7106,6 +7775,7 @@ namespace NETWORK {
 	static BOOL NETWORK_IS_ENTITY_FADING(Entity entity) { return invoke<BOOL>(0x422F32CC7E56ABAD, entity); } // 0x422F32CC7E56ABAD 0xB5087ACF b323
 	static BOOL IS_PLAYER_IN_CUTSCENE(Player player) { return invoke<BOOL>(0xE73092F4157CD126, player); } // 0xE73092F4157CD126 0xE0A619BD b323
 	static void SET_ENTITY_VISIBLE_IN_CUTSCENE(Any p0, BOOL p1, BOOL p2) { invoke<Void>(0xE0031D3C8F36AB82, p0, p1, p2); } // 0xE0031D3C8F36AB82 0xDBFB067B b323
+	// Makes the provided entity visible for yourself for the current frame.
 	static void SET_ENTITY_LOCALLY_INVISIBLE(Entity entity) { invoke<Void>(0xE135A9FF3F5D05D8, entity); } // 0xE135A9FF3F5D05D8 0x51ADCC5F b323
 	static void SET_ENTITY_LOCALLY_VISIBLE(Entity entity) { invoke<Void>(0x241E289B5C059EDC, entity); } // 0x241E289B5C059EDC 0x235A57B3 b323
 	static BOOL IS_DAMAGE_TRACKER_ACTIVE_ON_NETWORK_ID(int netID) { return invoke<BOOL>(0x6E192E33AD436366, netID); } // 0x6E192E33AD436366 0x597063BA b323
@@ -7117,9 +7787,9 @@ namespace NETWORK {
 	static void RESERVE_NETWORK_MISSION_OBJECTS(int amount) { invoke<Void>(0x4E5C93BD0C32FBF8, amount); } // 0x4E5C93BD0C32FBF8 0x391DF4F3 b323
 	static void RESERVE_NETWORK_MISSION_PEDS(int amount) { invoke<Void>(0xB60FEBA45333D36F, amount); } // 0xB60FEBA45333D36F 0x54998C37 b323
 	static void RESERVE_NETWORK_MISSION_VEHICLES(int amount) { invoke<Void>(0x76B02E21ED27A469, amount); } // 0x76B02E21ED27A469 0x5062875E b323
-	static void _RESERVE_NETWORK_LOCAL_OBJECTS(Any p0) { invoke<Void>(0x797F9C5E661D920E, p0); } // 0x797F9C5E661D920E b1290
-	static void _RESERVE_NETWORK_LOCAL_PEDS(Any p0) { invoke<Void>(0x2C8DF5D129595281, p0); } // 0x2C8DF5D129595281 b1493
-	static void _RESERVE_NETWORK_LOCAL_VEHICLES(Any p0) { invoke<Void>(0x42613035157E4208, p0); } // 0x42613035157E4208 b1103
+	static void _RESERVE_NETWORK_LOCAL_OBJECTS(int amount) { invoke<Void>(0x797F9C5E661D920E, amount); } // 0x797F9C5E661D920E b1290
+	static void _RESERVE_NETWORK_LOCAL_PEDS(int amount) { invoke<Void>(0x2C8DF5D129595281, amount); } // 0x2C8DF5D129595281 b1493
+	static void _RESERVE_NETWORK_LOCAL_VEHICLES(int amount) { invoke<Void>(0x42613035157E4208, amount); } // 0x42613035157E4208 b1103
 	static BOOL CAN_REGISTER_MISSION_OBJECTS(int amount) { return invoke<BOOL>(0x800DD4721A8B008B, amount); } // 0x800DD4721A8B008B 0x7F85DFDE b323
 	static BOOL CAN_REGISTER_MISSION_PEDS(int amount) { return invoke<BOOL>(0xBCBF4FEF9FA5D781, amount); } // 0xBCBF4FEF9FA5D781 0xCCAA5CE9 b323
 	static BOOL CAN_REGISTER_MISSION_VEHICLES(int amount) { return invoke<BOOL>(0x7277F1F2E085EE74, amount); } // 0x7277F1F2E085EE74 0x818B6830 b323
@@ -7141,7 +7811,10 @@ namespace NETWORK {
 	static int GET_MAX_NUM_NETWORK_VEHICLES() { return invoke<int>(0x0AFCE529F69B21FF); } // 0x0AFCE529F69B21FF 0xC3A12135 b323
 	static int GET_MAX_NUM_NETWORK_PICKUPS() { return invoke<int>(0xA72835064DD63E4C); } // 0xA72835064DD63E4C 0x6A036061 b323
 	static void _0xBA7F0B77D80A4EB7(Any p0, Any p1) { invoke<Void>(0xBA7F0B77D80A4EB7, p0, p1); } // 0xBA7F0B77D80A4EB7 b372
+	static void _0x0F1A4B45B7693B95(Any p0, Any p1) { invoke<Void>(0x0F1A4B45B7693B95, p0, p1); } // 0x0F1A4B45B7693B95 b2189
 	static int GET_NETWORK_TIME() { return invoke<int>(0x7A5487FE9FAA6B48); } // 0x7A5487FE9FAA6B48 0x998103C2 b323
+	// Returns the same value as GET_NETWORK_TIME in freemode, but as opposed to `GET_NETWORK_TIME` it always gets the most recent time, instead of once per tick.
+	// Could be used for benchmarking since it can return times in ticks.
 	static int GET_NETWORK_TIME_ACCURATE() { return invoke<int>(0x89023FBBF9200E9F); } // 0x89023FBBF9200E9F 0x98AA48E5 b323
 	static BOOL HAS_NETWORK_TIME_STARTED() { return invoke<BOOL>(0x46718ACEEDEAFC84); } // 0x46718ACEEDEAFC84 0x4538C4A2 b323
 	// Adds the first argument to the second.
@@ -7155,7 +7828,9 @@ namespace NETWORK {
 	// Subtracts the second argument from the first.
 	static int GET_TIME_DIFFERENCE(int timeA, int timeB) { return invoke<int>(0xA2C6FC031D46FFF0, timeA, timeB); } // 0xA2C6FC031D46FFF0 0x5666A837 b323
 	static const char* GET_TIME_AS_STRING(int time) { return invoke<const char*>(0x9E23B1777A927DAD, time); } // 0x9E23B1777A927DAD 0x8218944E b323
-	static Any _0xF12E6CD06C73D69E() { return invoke<Any>(0xF12E6CD06C73D69E); } // 0xF12E6CD06C73D69E b1103
+	// Same as GET_CLOUD_TIME_AS_INT but returns the value as a hex string (%I64X).
+	static const char* _GET_CLOUD_TIME_AS_STRING() { return invoke<const char*>(0xF12E6CD06C73D69E); } // 0xF12E6CD06C73D69E b1103
+	// Returns POSIX timestamp, an int representing the cloud time.
 	static int GET_CLOUD_TIME_AS_INT() { return invoke<int>(0x9A73240B49945C76); } // 0x9A73240B49945C76 0xF2FDF2E0 b323
 	// Takes the specified time and writes it to the structure specified in the second argument.
 	// 
@@ -7174,12 +7849,11 @@ namespace NETWORK {
 	//     int second;
 	//     int PADDING6;
 	// };
-	static void _GET_DATE_AND_TIME_FROM_UNIX_EPOCH(int unixEpoch, Any* timeStructure) { invoke<Void>(0xAC97AF97FA68E5D5, unixEpoch, timeStructure); } // 0xAC97AF97FA68E5D5 0xBB7CCE49 b323
+	static void CONVERT_POSIX_TIME(int posixTime, Any* timeStructure) { invoke<Void>(0xAC97AF97FA68E5D5, posixTime, timeStructure); } // 0xAC97AF97FA68E5D5 0xBB7CCE49 b323
 	static void NETWORK_SET_IN_SPECTATOR_MODE(BOOL toggle, Ped playerPed) { invoke<Void>(0x423DE3854BB50894, toggle, playerPed); } // 0x423DE3854BB50894 0x5C4C8458 b323
 	static void NETWORK_SET_IN_SPECTATOR_MODE_EXTENDED(BOOL toggle, Ped playerPed, BOOL p2) { invoke<Void>(0x419594E137637120, toggle, playerPed, p2); } // 0x419594E137637120 0x54058F5F b323
 	static void NETWORK_SET_IN_FREE_CAM_MODE(BOOL toggle) { invoke<Void>(0xFC18DB55AE19E046, toggle); } // 0xFC18DB55AE19E046 0xA7E36020 b323
-	// NETWORK_SET_*
-	static void _0x5C707A667DF8B9FA(BOOL toggle, Player player) { invoke<Void>(0x5C707A667DF8B9FA, toggle, player); } // 0x5C707A667DF8B9FA 0x64235620 b323
+	static void NETWORK_SET_CHOICE_MIGRATE_OPTIONS(BOOL toggle, Player player) { invoke<Void>(0x5C707A667DF8B9FA, toggle, player); } // 0x5C707A667DF8B9FA 0x64235620 b323
 	static BOOL NETWORK_IS_IN_SPECTATOR_MODE() { return invoke<BOOL>(0x048746E388762E11); } // 0x048746E388762E11 0x3EAD9DB8 b323
 	static void NETWORK_SET_IN_MP_CUTSCENE(BOOL p0, BOOL p1) { invoke<Void>(0x9CA5DE655269FEC4, p0, p1); } // 0x9CA5DE655269FEC4 0x8434CB43 b323
 	static BOOL NETWORK_IS_IN_MP_CUTSCENE() { return invoke<BOOL>(0x6CC27C9FA2040220); } // 0x6CC27C9FA2040220 0x4BB33316 b323
@@ -7189,24 +7863,28 @@ namespace NETWORK {
 	static void SET_NETWORK_VEHICLE_AS_GHOST(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x6274C4712850841E, vehicle, toggle); } // 0x6274C4712850841E 0xEA235081 b323
 	static void _0xA2A707979FE754DC(Any p0, Any p1) { invoke<Void>(0xA2A707979FE754DC, p0, p1); } // 0xA2A707979FE754DC b877
 	static void _0x838DA0936A24ED4D(Any p0, Any p1) { invoke<Void>(0x838DA0936A24ED4D, p0, p1); } // 0x838DA0936A24ED4D b944
-	static void USE_PLAYER_COLOUR_INSTEAD_OF_TEAM_COLOUR(BOOL toggle, BOOL p1) { invoke<Void>(0x5FFE9B4144F9712F, toggle, p1); } // 0x5FFE9B4144F9712F 0x4DD46DAE b323
-	// IS_*
-	static BOOL _0x21D04D7BC538C146(Entity entity) { return invoke<BOOL>(0x21D04D7BC538C146, entity); } // 0x21D04D7BC538C146 b323
+	static void _SET_LOCAL_PLAYER_AS_GHOST(BOOL toggle, BOOL p1) { invoke<Void>(0x5FFE9B4144F9712F, toggle, p1); } // 0x5FFE9B4144F9712F b323
+	static BOOL _IS_ENTITY_GHOSTED_TO_LOCAL_PLAYER(Entity entity) { return invoke<BOOL>(0x21D04D7BC538C146, entity); } // 0x21D04D7BC538C146 b323
 	// SET_NETWORK_*
 	static void _0x13F1FCB111B820B0(BOOL p0) { invoke<Void>(0x13F1FCB111B820B0, p0); } // 0x13F1FCB111B820B0 b877
-	static void _0xA7C511FA1C5BDA38(Any p0, Any p1) { invoke<Void>(0xA7C511FA1C5BDA38, p0, p1); } // 0xA7C511FA1C5BDA38 b463
-	static void _0x658500AE6D723A7E(Any p0) { invoke<Void>(0x658500AE6D723A7E, p0); } // 0x658500AE6D723A7E b791
-	static void _0x17330EBF2F2124A8() { invoke<Void>(0x17330EBF2F2124A8); } // 0x17330EBF2F2124A8 b791
-	static void _0x4BA166079D658ED4(Any p0, Any p1) { invoke<Void>(0x4BA166079D658ED4, p0, p1); } // 0x4BA166079D658ED4 b944
+	// Enables ghosting between specific players
+	static void _SET_RELATIONSHIP_TO_PLAYER(Player player, BOOL p1) { invoke<Void>(0xA7C511FA1C5BDA38, player, p1); } // 0xA7C511FA1C5BDA38 b463
+	// Must be a value between 1 and 254
+	static void _SET_GHOSTED_ENTITY_ALPHA(int alpha) { invoke<Void>(0x658500AE6D723A7E, alpha); } // 0x658500AE6D723A7E b791
+	// Resets the entity ghost alpha to the default value (128)
+	static void _RESET_GHOSTED_ENTITY_ALPHA() { invoke<Void>(0x17330EBF2F2124A8); } // 0x17330EBF2F2124A8 b791
+	static void _NETWORK_SET_ENTITY_GHOSTED_WITH_OWNER(Entity entity, BOOL p1) { invoke<Void>(0x4BA166079D658ED4, entity, p1); } // 0x4BA166079D658ED4 b944
 	static void _0xD7B6C73CAD419BCF(BOOL p0) { invoke<Void>(0xD7B6C73CAD419BCF, p0); } // 0xD7B6C73CAD419BCF b944
 	// IS_*
 	static BOOL _0x7EF7649B64D7FF10(Entity entity) { return invoke<BOOL>(0x7EF7649B64D7FF10, entity); } // 0x7EF7649B64D7FF10 b944
-	static void _0x77758139EC9B66C7(BOOL p0) { invoke<Void>(0x77758139EC9B66C7, p0); } // 0x77758139EC9B66C7 b323
-	static int NETWORK_CREATE_SYNCHRONISED_SCENE(float x, float y, float z, float xRot, float yRot, float zRot, int p6, BOOL p7, BOOL p8, float p9, float p10, float p11) { return invoke<int>(0x7CD6BC4C2BBDD526, x, y, z, xRot, yRot, zRot, p6, p7, p8, p9, p10, p11); } // 0x7CD6BC4C2BBDD526 0xB06FE3FE b323
+	static void USE_PLAYER_COLOUR_INSTEAD_OF_TEAM_COLOUR(BOOL toggle) { invoke<Void>(0x77758139EC9B66C7, toggle); } // 0x77758139EC9B66C7 0x4DD46DAE b323
+	static int NETWORK_CREATE_SYNCHRONISED_SCENE(float x, float y, float z, float xRot, float yRot, float zRot, int rotationOrder, BOOL useOcclusionPortal, BOOL looped, float p9, float animTime, float p11) { return invoke<int>(0x7CD6BC4C2BBDD526, x, y, z, xRot, yRot, zRot, rotationOrder, useOcclusionPortal, looped, p9, animTime, p11); } // 0x7CD6BC4C2BBDD526 0xB06FE3FE b323
 	static void NETWORK_ADD_PED_TO_SYNCHRONISED_SCENE(Ped ped, int netScene, const char* animDict, const char* animnName, float speed, float speedMultiplier, int duration, int flag, float playbackRate, Any p9) { invoke<Void>(0x742A637471BCECD9, ped, netScene, animDict, animnName, speed, speedMultiplier, duration, flag, playbackRate, p9); } // 0x742A637471BCECD9 0xB386713E b323
 	static void _0xA5EAFE473E45C442(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9) { invoke<Void>(0xA5EAFE473E45C442, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); } // 0xA5EAFE473E45C442 b1290
 	static void NETWORK_ADD_ENTITY_TO_SYNCHRONISED_SCENE(Entity entity, int netScene, const char* animDict, const char* animName, float speed, float speedMulitiplier, int flag) { invoke<Void>(0xF2404D68CBC855FA, entity, netScene, animDict, animName, speed, speedMulitiplier, flag); } // 0xF2404D68CBC855FA 0x10DD636C b323
 	// NETWORK_A*
+	// Similar structure as NETWORK_ADD_ENTITY_TO_SYNCHRONISED_SCENE but it includes this time a hash.
+	// In casino_slots it is used one time in a synced scene involving a ped and the slot machine?
 	static void _0x45F35C0EDC33B03B(int netScene, Hash modelHash, float x, float y, float z, float p5, const char* p6, float p7, float p8, int flags) { invoke<Void>(0x45F35C0EDC33B03B, netScene, modelHash, x, y, z, p5, p6, p7, p8, flags); } // 0x45F35C0EDC33B03B b1734
 	static void _NETWORK_FORCE_LOCAL_USE_OF_SYNCED_SCENE_CAMERA(int netScene, const char* animDict, const char* animName) { invoke<Void>(0xCF8BD3B0BD6D42D7, netScene, animDict, animName); } // 0xCF8BD3B0BD6D42D7 0xBFFE8B5C b323
 	static void NETWORK_ATTACH_SYNCHRONISED_SCENE_TO_ENTITY(int netScene, Entity entity, int bone) { invoke<Void>(0x478DCBD2A98B705A, netScene, entity, bone); } // 0x478DCBD2A98B705A 0x3FE5B222 b323
@@ -7218,13 +7896,18 @@ namespace NETWORK {
 	static void _0x144DA052257AE7D8(Any p0) { invoke<Void>(0x144DA052257AE7D8, p0); } // 0x144DA052257AE7D8 b1103
 	// p0 is always 0. p1 is pointing to a global.
 	static Any _0xFB1F9381E80FA13F(int p0, Any p1) { return invoke<Any>(0xFB1F9381E80FA13F, p0, p1); } // 0xFB1F9381E80FA13F 0x0679CE71 b323
-	static BOOL NETWORK_START_RESPAWN_SEARCH_FOR_PLAYER(Player player, float p1, float p2, float p3, float p4, float p5, float p6, float p7, int flags) { return invoke<BOOL>(0x5A6FFA2433E2F14C, player, p1, p2, p3, p4, p5, p6, p7, flags); } // 0x5A6FFA2433E2F14C 0xC62E77B3 b323
-	static BOOL NETWORK_START_RESPAWN_SEARCH_IN_ANGLED_AREA_FOR_PLAYER(Player player, float p1, float p2, float p3, float p4, float p5, float p6, float p7, float p8, float p9, float p10, int flags) { return invoke<BOOL>(0x4BA92A18502BCA61, player, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, flags); } // 0x4BA92A18502BCA61 0x74D6B13C b323
+	// One of the first things it does is get the players ped.
+	// Then it calls a function that is used in some tasks and ped based functions.
+	// p5, p6, p7 is another coordinate (or zero), often related to `GET_BLIP_COORDS, in the decompiled scripts.
+	static BOOL NETWORK_START_RESPAWN_SEARCH_FOR_PLAYER(Player player, float x, float y, float z, float radius, float p5, float p6, float p7, int flags) { return invoke<BOOL>(0x5A6FFA2433E2F14C, player, x, y, z, radius, p5, p6, p7, flags); } // 0x5A6FFA2433E2F14C 0xC62E77B3 b323
+	// p8, p9, p10 is another coordinate, or zero, often related to `GET_BLIP_COORDS in the decompiled scripts.
+	static BOOL NETWORK_START_RESPAWN_SEARCH_IN_ANGLED_AREA_FOR_PLAYER(Player player, float x1, float y1, float z1, float x2, float y2, float z2, float width, float p8, float p9, float p10, int flags) { return invoke<BOOL>(0x4BA92A18502BCA61, player, x1, y1, z1, x2, y2, z2, width, p8, p9, p10, flags); } // 0x4BA92A18502BCA61 0x74D6B13C b323
 	static Any NETWORK_QUERY_RESPAWN_RESULTS(Any* p0) { return invoke<Any>(0x3C891A251567DFCE, p0); } // 0x3C891A251567DFCE 0x90700C7D b323
 	static void NETWORK_CANCEL_RESPAWN_SEARCH() { invoke<Void>(0xFB8F2A6F3DF08CBE); } // 0xFB8F2A6F3DF08CBE 0x44BFB619 b323
 	// Based on scripts such as in freemode.c how they call their vars vVar and fVar the 2nd and 3rd param it a Vector3 and Float, but the first is based on get_random_int_in_range..
 	static void NETWORK_GET_RESPAWN_RESULT(int randomInt, Vector3* coordinates, float* heading) { invoke<Void>(0x371EA43692861CF1, randomInt, coordinates, heading); } // 0x371EA43692861CF1 0xDDFE9FBC b323
 	static Any NETWORK_GET_RESPAWN_RESULT_FLAGS(Any p0) { return invoke<Any>(0x6C34F1208B8923FD, p0); } // 0x6C34F1208B8923FD 0x03287FD2 b323
+	// *
 	static void NETWORK_START_SOLO_TUTORIAL_SESSION() { invoke<Void>(0x17E0198B3882C2CB); } // 0x17E0198B3882C2CB 0x408A9436 b323
 	static void _0xFB680D403909DC70(Any p0, Any p1) { invoke<Void>(0xFB680D403909DC70, p0, p1); } // 0xFB680D403909DC70 0xFFB2ADA1 b323
 	static void NETWORK_END_TUTORIAL_SESSION() { invoke<Void>(0xD0AFAFF5A51D72F7); } // 0xD0AFAFF5A51D72F7 0xBA57E53E b323
@@ -7240,22 +7923,26 @@ namespace NETWORK {
 	// Note: This only works for vehicles, which appears to be a bug (since the setter _does_ work for every entity type and the name is 99% correct).
 	static BOOL _NETWORK_IS_ENTITY_CONCEALED(Entity entity) { return invoke<BOOL>(0x71302EC70689052A, entity); } // 0x71302EC70689052A b877
 	// Works in Singleplayer too.
-	static void NETWORK_OVERRIDE_CLOCK_TIME(int Hours, int Minutes, int Seconds) { invoke<Void>(0xE679E3E06E363892, Hours, Minutes, Seconds); } // 0xE679E3E06E363892 0xC077BCD6 b323
+	// Passing wrong data (e.g. hours above 23) will cause the game to crash.
+	static void NETWORK_OVERRIDE_CLOCK_TIME(int hours, int minutes, int seconds) { invoke<Void>(0xE679E3E06E363892, hours, minutes, seconds); } // 0xE679E3E06E363892 0xC077BCD6 b323
+	static void _NETWORK_OVERRIDE_CLOCK_MILLISECONDS_PER_GAME_MINUTE(int ms) { invoke<Void>(0x42BF1D2E723B6D7E, ms); } // 0x42BF1D2E723B6D7E b2189
 	static void NETWORK_CLEAR_CLOCK_TIME_OVERRIDE() { invoke<Void>(0xD972DF67326F966E); } // 0xD972DF67326F966E 0xC4AEAF49 b323
 	static BOOL NETWORK_IS_CLOCK_TIME_OVERRIDDEN() { return invoke<BOOL>(0xD7C95D322FF57522); } // 0xD7C95D322FF57522 0x2465296D b323
 	static Any NETWORK_ADD_ENTITY_AREA(float p0, float p1, float p2, float p3, float p4, float p5) { return invoke<Any>(0x494C8FB299290269, p0, p1, p2, p3, p4, p5); } // 0x494C8FB299290269 0x51030E5B b323
-	static Any NETWORK_ADD_ENTITY_ANGLED_AREA(float p0, float p1, float p2, float p3, float p4, float p5, float p6) { return invoke<Any>(0x376C6375BA60293A, p0, p1, p2, p3, p4, p5, p6); } // 0x376C6375BA60293A 0xCD69BEA1 b323
+	// To remove, see: NETWORK_REMOVE_ENTITY_AREA
+	// See IS_POINT_IN_ANGLED_AREA for the definition of an angled area.
+	static Any NETWORK_ADD_ENTITY_ANGLED_AREA(float x1, float y1, float z1, float x2, float y2, float z2, float width) { return invoke<Any>(0x376C6375BA60293A, x1, y1, z1, x2, y2, z2, width); } // 0x376C6375BA60293A 0xCD69BEA1 b323
 	static Any NETWORK_ADD_ENTITY_DISPLAYED_BOUNDARIES(float p0, float p1, float p2, float p3, float p4, float p5) { return invoke<Any>(0x25B99872D588A101, p0, p1, p2, p3, p4, p5); } // 0x25B99872D588A101 0x4C2C2B12 b323
 	static Any _0x2B1C623823DB0D9D(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6) { return invoke<Any>(0x2B1C623823DB0D9D, p0, p1, p2, p3, p4, p5, p6); } // 0x2B1C623823DB0D9D b1103
 	static BOOL NETWORK_REMOVE_ENTITY_AREA(Any p0) { return invoke<BOOL>(0x93CF869BAA0C4874, p0); } // 0x93CF869BAA0C4874 0xEAB97F25 b323
-	static BOOL NETWORK_ENTITY_AREA_DOES_EXIST(Any p0) { return invoke<BOOL>(0xE64A3CA08DFA37A9, p0); } // 0xE64A3CA08DFA37A9 0x69956127 b323
+	static BOOL NETWORK_ENTITY_AREA_DOES_EXIST(int areaHandle) { return invoke<BOOL>(0xE64A3CA08DFA37A9, areaHandle); } // 0xE64A3CA08DFA37A9 0x69956127 b323
 	static BOOL _0x4DF7CFFF471A7FB1(Any p0) { return invoke<BOOL>(0x4DF7CFFF471A7FB1, p0); } // 0x4DF7CFFF471A7FB1 0xCB1CD6D3 b323
-	static BOOL NETWORK_ENTITY_AREA_IS_OCCUPIED(Any p0) { return invoke<BOOL>(0x4A2D4E8BF4265B0F, p0); } // 0x4A2D4E8BF4265B0F 0xC6D53AA0 b323
+	static BOOL NETWORK_ENTITY_AREA_IS_OCCUPIED(int areaHandle) { return invoke<BOOL>(0x4A2D4E8BF4265B0F, areaHandle); } // 0x4A2D4E8BF4265B0F 0xC6D53AA0 b323
 	static void _NETWORK_SET_NETWORK_ID_DYNAMIC(int netID, BOOL toggle) { invoke<Void>(0x2B1813ABA29016C5, netID, toggle); } // 0x2B1813ABA29016C5 0x155465EE b323
 	static void _0xA6FCECCF4721D679(Any p0) { invoke<Void>(0xA6FCECCF4721D679, p0); } // 0xA6FCECCF4721D679 b1604
 	static void _0x95BAF97C82464629(Any p0, Any p1) { invoke<Void>(0x95BAF97C82464629, p0, p1); } // 0x95BAF97C82464629 b1604
-	static BOOL NETWORK_REQUEST_CLOUD_BACKGROUND_SCRIPTS() { return invoke<BOOL>(0x924426BFFD82E915); } // 0x924426BFFD82E915 0x29532731 b323
-	static BOOL _NETWORK_IS_CLOUD_BACKGROUND_SCRIPTS_REQUEST_PENDING() { return invoke<BOOL>(0x8132C0EB8B2B3293); } // 0x8132C0EB8B2B3293 0x29532731 b323
+	static BOOL NETWORK_REQUEST_CLOUD_BACKGROUND_SCRIPTS() { return invoke<BOOL>(0x924426BFFD82E915); } // 0x924426BFFD82E915 0x98EFB921 b323
+	static BOOL NETWORK_IS_CLOUD_BACKGROUND_SCRIPT_REQUEST_PENDING() { return invoke<BOOL>(0x8132C0EB8B2B3293); } // 0x8132C0EB8B2B3293 0x20AB933A b323
 	static void NETWORK_REQUEST_CLOUD_TUNABLES() { invoke<Void>(0x42FB3B532D526E6C); } // 0x42FB3B532D526E6C 0xD760CAD5 b323
 	static BOOL NETWORK_IS_TUNABLE_CLOUD_REQUEST_PENDING() { return invoke<BOOL>(0x0467C11ED88B7D28); } // 0x0467C11ED88B7D28 0x47978D7F b323
 	// Actually returns the version (TUNABLE_VERSION)
@@ -7288,8 +7975,11 @@ namespace NETWORK {
 	static int _NETWORK_GET_NUM_BODY_TRACKERS() { return invoke<int>(0xD38C4A6D047C019D); } // 0xD38C4A6D047C019D 0x17CBC608 b323
 	static BOOL _0x2E0BF682CC778D49(Any p0) { return invoke<BOOL>(0x2E0BF682CC778D49, p0); } // 0x2E0BF682CC778D49 0xBFAA349B b323
 	static BOOL _0x0EDE326D47CD0F3E(Ped ped, Player player) { return invoke<BOOL>(0x0EDE326D47CD0F3E, ped, player); } // 0x0EDE326D47CD0F3E 0xBEB7281A b323
-	static void _NETWORK_SET_VEHICLE_WHEELS_DESTRUCTIBLE(Any p0, Any p1) { invoke<Void>(0x890E2C5ABED7236D, p0, p1); } // 0x890E2C5ABED7236D b1365
+	// Allows vehicle wheels to be destructible even when the vehicle entity is invincible.
+	static void _NETWORK_SET_VEHICLE_WHEELS_DESTRUCTIBLE(Entity entity, BOOL toggle) { invoke<Void>(0x890E2C5ABED7236D, entity, toggle); } // 0x890E2C5ABED7236D b1365
 	static void _0x38B7C51AB1EDC7D8(Entity entity, BOOL toggle) { invoke<Void>(0x38B7C51AB1EDC7D8, entity, toggle); } // 0x38B7C51AB1EDC7D8 b1734
+	// nullsub, doesn't do anything
+	static void _0x3FC795691834481D(Any p0, Any p1) { invoke<Void>(0x3FC795691834481D, p0, p1); } // 0x3FC795691834481D b1868
 	// In the console script dumps, this is only referenced once. 
 	// NETWORK::NETWORK_EXPLODE_VEHICLE(vehicle, 1, 0, 0);
 	// 
@@ -7314,7 +8004,7 @@ namespace NETWORK {
 	static void NETWORK_EXPLODE_VEHICLE(Vehicle vehicle, BOOL isAudible, BOOL isInvisible, BOOL p3) { invoke<Void>(0x301A42153C9AD707, vehicle, isAudible, isInvisible, p3); } // 0x301A42153C9AD707 0x0E1B38AE b323
 	static void _0x2A5E0621DD815A9A(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x2A5E0621DD815A9A, p0, p1, p2, p3); } // 0x2A5E0621DD815A9A b463
 	static void _0xCD71A4ECAB22709E(Entity entity) { invoke<Void>(0xCD71A4ECAB22709E, entity); } // 0xCD71A4ECAB22709E 0xBC54371B b323
-	static void NETWORK_OVERRIDE_COORDS_AND_HEADING(Ped ped, float x, float y, float z, float heading) { invoke<Void>(0xA7E30DE9272B6D49, ped, x, y, z, heading); } // 0xA7E30DE9272B6D49 0x644141C5 b323
+	static void NETWORK_OVERRIDE_COORDS_AND_HEADING(Entity entity, float x, float y, float z, float heading) { invoke<Void>(0xA7E30DE9272B6D49, entity, x, y, z, heading); } // 0xA7E30DE9272B6D49 0x644141C5 b323
 	static void _0xE6717E652B8C8D8A(Any p0, Any p1) { invoke<Void>(0xE6717E652B8C8D8A, p0, p1); } // 0xE6717E652B8C8D8A b617
 	static void NETWORK_DISABLE_PROXIMITY_MIGRATION(int netID) { invoke<Void>(0x407091CF6037118E, netID); } // 0x407091CF6037118E 0x9F82917F b323
 	// value must be < 255
@@ -7337,13 +8027,13 @@ namespace NETWORK {
 	static int GET_COMMERCE_ITEM_NUM_CATS(int index) { return invoke<int>(0x2A7776C709904AB0, index); } // 0x2A7776C709904AB0 0x1CF89DA5 b323
 	// index2 is unused
 	static const char* GET_COMMERCE_ITEM_CAT(int index, int index2) { return invoke<const char*>(0x6F44CBF56D79FAC0, index, index2); } // 0x6F44CBF56D79FAC0 0x16E53875 b323
-	static void _0x58C21165F6545892(const char* p0, const char* p1, int p2) { invoke<Void>(0x58C21165F6545892, p0, p1, p2); } // 0x58C21165F6545892 0x365C50EE b323
+	static void OPEN_COMMERCE_STORE(const char* p0, const char* p1, int p2) { invoke<Void>(0x58C21165F6545892, p0, p1, p2); } // 0x58C21165F6545892 0x365C50EE b323
 	static BOOL IS_COMMERCE_STORE_OPEN() { return invoke<BOOL>(0x2EAC52B4019E2782); } // 0x2EAC52B4019E2782 0x25E2DBA9 b323
 	// Access to the store for shark cards etc...
 	static void SET_STORE_ENABLED(BOOL toggle) { invoke<Void>(0x9641A9FF718E9C5E, toggle); } // 0x9641A9FF718E9C5E 0xC1F6443B b323
 	static BOOL REQUEST_COMMERCE_ITEM_IMAGE(int index) { return invoke<BOOL>(0xA2F952104FC6DD4B, index); } // 0xA2F952104FC6DD4B 0x1FDC75DC b323
 	static void RELEASE_ALL_COMMERCE_ITEM_IMAGES() { invoke<Void>(0x72D0706CD6CCDB58); } // 0x72D0706CD6CCDB58 0xCA7A0A49 b323
-	static Any _0x722F5D28B61C5EA8(Any p0) { return invoke<Any>(0x722F5D28B61C5EA8, p0); } // 0x722F5D28B61C5EA8 0x44A58B0A b323
+	static const char* GET_COMMERCE_ITEM_TEXTURENAME(int index) { return invoke<const char*>(0x722F5D28B61C5EA8, index); } // 0x722F5D28B61C5EA8 0x44A58B0A b323
 	static BOOL IS_STORE_AVAILABLE_TO_USER() { return invoke<BOOL>(0x883D79C4071E18B3); } // 0x883D79C4071E18B3 0xD32FA11F b323
 	static void _0x265635150FB0D82E() { invoke<Void>(0x265635150FB0D82E); } // 0x265635150FB0D82E 0xA7FA70AE b323
 	// RESET_*
@@ -7367,12 +8057,12 @@ namespace NETWORK {
 	// Checks some commerce stuff
 	static int _0x155467ACA0F55705() { return invoke<int>(0x155467ACA0F55705); } // 0x155467ACA0F55705 b1290
 	static int CLOUD_DELETE_MEMBER_FILE(const char* p0) { return invoke<int>(0xC64DED7EF0D2FE37, p0); } // 0xC64DED7EF0D2FE37 0x2B7B57B3 b323
-	static BOOL CLOUD_HAS_REQUEST_COMPLETED(Any p0) { return invoke<BOOL>(0x4C61B39930D045DA, p0); } // 0x4C61B39930D045DA 0xBAF52DD8 b323
-	static BOOL _0x3A3D5568AF297CD5(Any p0) { return invoke<BOOL>(0x3A3D5568AF297CD5, p0); } // 0x3A3D5568AF297CD5 0x9B9AFFF1 b323
+	static BOOL CLOUD_HAS_REQUEST_COMPLETED(int handle) { return invoke<BOOL>(0x4C61B39930D045DA, handle); } // 0x4C61B39930D045DA 0xBAF52DD8 b323
+	static BOOL CLOUD_DID_REQUEST_SUCCEED(int handle) { return invoke<BOOL>(0x3A3D5568AF297CD5, handle); } // 0x3A3D5568AF297CD5 0x9B9AFFF1 b323
 	// Downloads prod.cloud.rockstargames.com/titles/gta5/[platform]/check.json
 	static void CLOUD_CHECK_AVAILABILITY() { invoke<Void>(0x4F18196C8D38768D); } // 0x4F18196C8D38768D 0xC38E9DB0 b323
-	static Any _0xC7ABAC5DE675EE3B() { return invoke<Any>(0xC7ABAC5DE675EE3B); } // 0xC7ABAC5DE675EE3B 0x32A4EB22 b323
-	static Any CLOUD_GET_AVAILABILITY_CHECK_RESULT() { return invoke<Any>(0x0B0CC10720653F3B); } // 0x0B0CC10720653F3B 0x9262744C b323
+	static BOOL CLOUD_IS_CHECKING_AVAILABILITY() { return invoke<BOOL>(0xC7ABAC5DE675EE3B); } // 0xC7ABAC5DE675EE3B 0x32A4EB22 b323
+	static BOOL CLOUD_GET_AVAILABILITY_CHECK_RESULT() { return invoke<BOOL>(0x0B0CC10720653F3B); } // 0x0B0CC10720653F3B 0x9262744C b323
 	// MulleDK19: This function is hard-coded to always return 0.
 	static Any _0x8B0C2964BA471961() { return invoke<Any>(0x8B0C2964BA471961); } // 0x8B0C2964BA471961 b323
 	// MulleDK19: This function is hard-coded to always return 0.
@@ -7380,7 +8070,7 @@ namespace NETWORK {
 	// MulleDK19: This function is hard-coded to always return 0.
 	static Any _0x67FC09BC554A75E5() { return invoke<Any>(0x67FC09BC554A75E5); } // 0x67FC09BC554A75E5 b323
 	// This native does absolutely nothing, just a nullsub
-	static void _0x966DD84FB6A46017() { invoke<Void>(0x966DD84FB6A46017); } // 0x966DD84FB6A46017 b323
+	static void _CLEAR_LAUNCH_PARAMS() { invoke<Void>(0x966DD84FB6A46017); } // 0x966DD84FB6A46017 b323
 	static BOOL UGC_COPY_CONTENT(Any* p0, Any* p1) { return invoke<BOOL>(0x152D90E4C1B4738A, p0, p1); } // 0x152D90E4C1B4738A 0x08243B79 b323
 	static Any _0x9FEDF86898F100E9() { return invoke<Any>(0x9FEDF86898F100E9); } // 0x9FEDF86898F100E9 0x798D6C27 b323
 	static BOOL UGC_HAS_CREATE_FINISHED() { return invoke<BOOL>(0x5E24341A7F92A74B); } // 0x5E24341A7F92A74B 0xE69E8D0D b323
@@ -7406,7 +8096,7 @@ namespace NETWORK {
 	static void UGC_CANCEL_QUERY() { invoke<Void>(0xE9B99B6853181409); } // 0xE9B99B6853181409 0x021D5A94 b323
 	static BOOL UGC_IS_GETTING() { return invoke<BOOL>(0xD53ACDBEF24A46E8); } // 0xD53ACDBEF24A46E8 0x4908A514 b323
 	static BOOL UGC_HAS_GET_FINISHED() { return invoke<BOOL>(0x02ADA21EA2F6918F); } // 0x02ADA21EA2F6918F 0x50296140 b323
-	static Any _0x941E5306BCD7C2C7() { return invoke<Any>(0x941E5306BCD7C2C7); } // 0x941E5306BCD7C2C7 0x3970B0DA b323
+	static Any UGC_DID_GET_SUCCEED() { return invoke<Any>(0x941E5306BCD7C2C7); } // 0x941E5306BCD7C2C7 0x3970B0DA b323
 	static Any _0xC87E740D9F3872CC() { return invoke<Any>(0xC87E740D9F3872CC); } // 0xC87E740D9F3872CC 0xC1487110 b323
 	static Any UGC_GET_QUERY_RESULT() { return invoke<Any>(0xEDF7F927136C224B); } // 0xEDF7F927136C224B 0xCC2356E3 b323
 	static Any UGC_GET_CONTENT_NUM() { return invoke<Any>(0xE0A6138401BCB837); } // 0xE0A6138401BCB837 0x2DE69817 b323
@@ -7418,7 +8108,7 @@ namespace NETWORK {
 	static BOOL _0x8C8D2739BA44AF0F(Any p0) { return invoke<BOOL>(0x8C8D2739BA44AF0F, p0); } // 0x8C8D2739BA44AF0F b323
 	static Any UGC_GET_CONTENT_USER_NAME(Any p0) { return invoke<Any>(0x703F12425ECA8BF5, p0); } // 0x703F12425ECA8BF5 0xB9137BA7 b323
 	static BOOL _0xAEAB987727C5A8A4(Any p0) { return invoke<BOOL>(0xAEAB987727C5A8A4, p0); } // 0xAEAB987727C5A8A4 0x9FEEAA9C b323
-	static int _GET_CONTENT_CATEGORY(int p0) { return invoke<int>(0xA7BAB11E7C9C6C5A, p0); } // 0xA7BAB11E7C9C6C5A 0x5E8A7559 b323
+	static int UGC_GET_CONTENT_CATEGORY(int p0) { return invoke<int>(0xA7BAB11E7C9C6C5A, p0); } // 0xA7BAB11E7C9C6C5A 0x5E8A7559 b323
 	// Return the mission id of a job.
 	static const char* UGC_GET_CONTENT_ID(int p0) { return invoke<const char*>(0x55AA95F481D694D2, p0); } // 0x55AA95F481D694D2 0x331AEABF b323
 	// Return the root content id of a job.
@@ -7462,7 +8152,7 @@ namespace NETWORK {
 	static Any UGC_GET_CREATOR_NUM() { return invoke<Any>(0x597F8DBA9B206FC7); } // 0x597F8DBA9B206FC7 0x410C61D1 b323
 	static BOOL UGC_POLICIES_MAKE_PRIVATE(Any p0) { return invoke<BOOL>(0x5CAE833B0EE0C500, p0); } // 0x5CAE833B0EE0C500 0x0D4F845D b323
 	static void UGC_CLEAR_OFFLINE_QUERY() { invoke<Void>(0x61A885D3F7CFEE9A); } // 0x61A885D3F7CFEE9A 0xE13C1F7F b323
-	static void _0xF98DDE0A8ED09323(BOOL p0) { invoke<Void>(0xF98DDE0A8ED09323, p0); } // 0xF98DDE0A8ED09323 0x213C6D36 b323
+	static void UGC_SET_QUERY_DATA_FROM_OFFLINE(BOOL p0) { invoke<Void>(0xF98DDE0A8ED09323, p0); } // 0xF98DDE0A8ED09323 0x213C6D36 b323
 	static void _0xFD75DABC0957BF33(BOOL p0) { invoke<Void>(0xFD75DABC0957BF33, p0); } // 0xFD75DABC0957BF33 0x511E6F50 b323
 	static BOOL UGC_IS_LANGUAGE_SUPPORTED(Any p0) { return invoke<BOOL>(0xF53E48461B71EECB, p0); } // 0xF53E48461B71EECB 0xB4668B23 b323
 	static BOOL _FACEBOOK_SET_HEIST_COMPLETE(const char* heistName, int cashEarned, int xpEarned) { return invoke<BOOL>(0x098AB65B9ED9A9EC, heistName, cashEarned, xpEarned); } // 0x098AB65B9ED9A9EC 0x30B51753 b323
@@ -7472,7 +8162,7 @@ namespace NETWORK {
 	static BOOL _FACEBOOK_DO_UNK_CHECK() { return invoke<BOOL>(0xA75E2B6733DA5142); } // 0xA75E2B6733DA5142 0x11E8B5CD b323
 	static BOOL _FACEBOOK_IS_AVAILABLE() { return invoke<BOOL>(0x43865688AE10F0D7); } // 0x43865688AE10F0D7 0x429AEAB3 b323
 	static int TEXTURE_DOWNLOAD_REQUEST(int* PlayerHandle, const char* FilePath, const char* Name, BOOL p3) { return invoke<int>(0x16160DA74A8E74A2, PlayerHandle, FilePath, Name, p3); } // 0x16160DA74A8E74A2 0xAD546CC3 b323
-	static Any _0x0B203B4AFDE53A4F(Any* p0, Any* p1, BOOL p2) { return invoke<Any>(0x0B203B4AFDE53A4F, p0, p1, p2); } // 0x0B203B4AFDE53A4F 0x1856D008 b323
+	static int TITLE_TEXTURE_DOWNLOAD_REQUEST(const char* FilePath, const char* Name, BOOL p2) { return invoke<int>(0x0B203B4AFDE53A4F, FilePath, Name, p2); } // 0x0B203B4AFDE53A4F 0x1856D008 b323
 	static Any UGC_TEXTURE_DOWNLOAD_REQUEST(Any* p0, Any p1, Any p2, Any p3, Any* p4, BOOL p5) { return invoke<Any>(0x308F96458B7087CC, p0, p1, p2, p3, p4, p5); } // 0x308F96458B7087CC 0x68C9AF69 b323
 	static void TEXTURE_DOWNLOAD_RELEASE(int p0) { invoke<Void>(0x487EB90B98E9FB19, p0); } // 0x487EB90B98E9FB19 0xEE8D9E70 b323
 	static BOOL TEXTURE_DOWNLOAD_HAS_FAILED(int p0) { return invoke<BOOL>(0x5776ED562C134687, p0); } // 0x5776ED562C134687 0xE4547765 b323
@@ -7480,9 +8170,7 @@ namespace NETWORK {
 	// 0 = succeeded
 	// 1 = pending
 	// 2 = failed
-	// 
-	// GET_ST*
-	static int _GET_STATUS_OF_TEXTURE_DOWNLOAD(int p0) { return invoke<int>(0x8BD6C6DEA20E82C6, p0); } // 0x8BD6C6DEA20E82C6 0x03225BA3 b323
+	static int GET_STATUS_OF_TEXTURE_DOWNLOAD(int p0) { return invoke<int>(0x8BD6C6DEA20E82C6, p0); } // 0x8BD6C6DEA20E82C6 0x03225BA3 b323
 	// Returns true if profile setting 901 is set to true and sets it to false.
 	// 
 	// NETWORK_C*
@@ -7491,23 +8179,19 @@ namespace NETWORK {
 	static BOOL _NETWORK_SHOULD_SHOW_CONNECTIVITY_TROUBLESHOOTING() { return invoke<BOOL>(0x82A2B386716608F1); } // 0x82A2B386716608F1 b393
 	static BOOL NETWORK_IS_CABLE_CONNECTED() { return invoke<BOOL>(0xEFFB25453D8600F9); } // 0xEFFB25453D8600F9 0x5C065D55 b323
 	static BOOL _NETWORK_GET_ROS_PRIVILEGE_9() { return invoke<BOOL>(0x66B59CFFD78467AF); } // 0x66B59CFFD78467AF 0x0CA1167F b323
-	static BOOL _NETWORK_GET_ROS_PRIVILEGE_10() { return invoke<BOOL>(0x606E4D3E3CCCF3EB); } // 0x606E4D3E3CCCF3EB 0x424C6E27 b323
-	// Returns ROS privilege 7 ("Has player been banned").
-	// 
-	// NETWORK_HAVE_*
-	static BOOL _NETWORK_HAS_PLAYER_BEEN_BANNED() { return invoke<BOOL>(0x8020A73847E0CA7D); } // 0x8020A73847E0CA7D 0xD3BBE42F b323
-	// NETWORK_HAVE_*
-	static BOOL _NETWORK_HAVE_SOCIAL_CLUB_PRIVILEGE() { return invoke<BOOL>(0xA0AD7E2AF5349F61); } // 0xA0AD7E2AF5349F61 0xBDBB5948 b323
-	static BOOL _NETWORK_GET_ROS_PRIVILEGE_3() { return invoke<BOOL>(0x5F91D5D0B36AA310); } // 0x5F91D5D0B36AA310 0x97287D68 b323
-	// NETWORK_HAVE_*
-	static BOOL _NETWORK_GET_ROS_PRIVILEGE_4() { return invoke<BOOL>(0x422D396F80A96547); } // 0x422D396F80A96547 0xC6EA802E b323
+	static BOOL NETWORK_HAVE_ROS_SOCIAL_CLUB_PRIV() { return invoke<BOOL>(0x606E4D3E3CCCF3EB); } // 0x606E4D3E3CCCF3EB 0x424C6E27 b323
+	static BOOL NETWORK_HAVE_ROS_BANNED_PRIV() { return invoke<BOOL>(0x8020A73847E0CA7D); } // 0x8020A73847E0CA7D 0xD3BBE42F b323
+	static BOOL NETWORK_HAVE_ROS_CREATE_TICKET_PRIV() { return invoke<BOOL>(0xA0AD7E2AF5349F61); } // 0xA0AD7E2AF5349F61 0xBDBB5948 b323
+	static BOOL NETWORK_HAVE_ROS_MULTIPLAYER_PRIV() { return invoke<BOOL>(0x5F91D5D0B36AA310); } // 0x5F91D5D0B36AA310 0x97287D68 b323
+	static BOOL NETWORK_HAVE_ROS_LEADERBOARD_WRITE_PRIV() { return invoke<BOOL>(0x422D396F80A96547); } // 0x422D396F80A96547 0xC6EA802E b323
 	// index is always 18 in scripts
 	static BOOL NETWORK_HAS_ROS_PRIVILEGE(int index) { return invoke<BOOL>(0xA699957E60D80214, index); } // 0xA699957E60D80214 0xFD261E30 b323
-	static BOOL NETWORK_HAS_ROS_PRIVILEGE_END_DATE(int privilege, int* type, Any* endData) { return invoke<BOOL>(0xC22912B1D85F26B1, privilege, type, endData); } // 0xC22912B1D85F26B1 0x8570DD34 b323
+	static BOOL NETWORK_HAS_ROS_PRIVILEGE_END_DATE(int privilege, int* banType, Any* timeData) { return invoke<BOOL>(0xC22912B1D85F26B1, privilege, banType, timeData); } // 0xC22912B1D85F26B1 0x8570DD34 b323
 	static BOOL _NETWORK_GET_ROS_PRIVILEGE_24() { return invoke<BOOL>(0x593570C289A77688); } // 0x593570C289A77688 b323
 	static BOOL _NETWORK_GET_ROS_PRIVILEGE_25() { return invoke<BOOL>(0x91B87C55093DE351); } // 0x91B87C55093DE351 b323
 	static Any _0x36391F397731595D(Any p0) { return invoke<Any>(0x36391F397731595D, p0); } // 0x36391F397731595D b323
-	static Any _0xDEB2B99A1AF1A2A6(Any p0) { return invoke<Any>(0xDEB2B99A1AF1A2A6, p0); } // 0xDEB2B99A1AF1A2A6 b323
+	// Always returns -1. Seems to be XB1 specific.
+	static int NETWORK_START_USER_CONTENT_PERMISSIONS_CHECK(Any* netHandle) { return invoke<int>(0xDEB2B99A1AF1A2A6, netHandle); } // 0xDEB2B99A1AF1A2A6 b323
 	static void _0x9465E683B12D3F6B() { invoke<Void>(0x9465E683B12D3F6B); } // 0x9465E683B12D3F6B 0x273C6180 b323
 	// NETWORK_S*
 	static void _0xCA59CCAE5D01E4CE() { invoke<Void>(0xCA59CCAE5D01E4CE); } // 0xCA59CCAE5D01E4CE b1734
@@ -7515,11 +8199,8 @@ namespace NETWORK {
 	// You will get following error message if that is true: "You are attempting to access GTA Online servers with an altered version of the game."
 	static BOOL _NETWORK_HAS_GAME_BEEN_ALTERED() { return invoke<BOOL>(0x659CF2EF7F550C4F); } // 0x659CF2EF7F550C4F b1011
 	static void _NETWORK_UPDATE_PLAYER_SCARS() { invoke<Void>(0xB7C7F6AD6424304B); } // 0xB7C7F6AD6424304B 0x371BBA08 b323
-	// NETWORK_D*
-	// 
-	// Probably NETWORK_DISABLE_*
-	static void _0xC505036A35AFD01B(BOOL toggle) { invoke<Void>(0xC505036A35AFD01B, toggle); } // 0xC505036A35AFD01B 0xA100CC97 b323
-	static void _0x267C78C60E806B9A(Any p0, BOOL p1) { invoke<Void>(0x267C78C60E806B9A, p0, p1); } // 0x267C78C60E806B9A 0xBB2D33D3 b323
+	static void NETWORK_DISABLE_LEAVE_REMOTE_PED_BEHIND(BOOL toggle) { invoke<Void>(0xC505036A35AFD01B, toggle); } // 0xC505036A35AFD01B 0xA100CC97 b323
+	static void _NETWORK_ALLOW_LOCAL_ENTITY_ATTACHMENT(Entity entity, BOOL toggle) { invoke<Void>(0x267C78C60E806B9A, entity, toggle); } // 0x267C78C60E806B9A 0xBB2D33D3 b323
 	// Does nothing (it's a nullsub).
 	static void _0x6BFF5F84102DF80A(Player player) { invoke<Void>(0x6BFF5F84102DF80A, player); } // 0x6BFF5F84102DF80A b323
 	// This native does absolutely nothing, just a nullsub
@@ -7527,21 +8208,21 @@ namespace NETWORK {
 	// MulleDK19: This function is hard-coded to always return 0.
 	static Any _0x6FB7BB3607D27FA2() { return invoke<Any>(0x6FB7BB3607D27FA2); } // 0x6FB7BB3607D27FA2 b323
 	static void _0x45A83257ED02D9BC() { invoke<Void>(0x45A83257ED02D9BC); } // 0x45A83257ED02D9BC b323
-	// NETWORK_IS_*
-	static BOOL _0x16D3D49902F697BB(Player player) { return invoke<BOOL>(0x16D3D49902F697BB, player); } // 0x16D3D49902F697BB b323
-	static float _0xD414BE129BB81B32(Player player) { return invoke<float>(0xD414BE129BB81B32, player); } // 0xD414BE129BB81B32 b323
-	static float _0x0E3A041ED6AC2B45(Player player) { return invoke<float>(0x0E3A041ED6AC2B45, player); } // 0x0E3A041ED6AC2B45 b323
+	static BOOL _NETWORK_IS_CONNECTION_ENDPOINT_RELAY_SERVER(Player player) { return invoke<BOOL>(0x16D3D49902F697BB, player); } // 0x16D3D49902F697BB b323
+	static float _NETWORK_GET_AVERAGE_LATENCY_FOR_PLAYER(Player player) { return invoke<float>(0xD414BE129BB81B32, player); } // 0xD414BE129BB81B32 b323
+	// Same as _NETWORK_GET_AVERAGE_LATENCY_FOR_PLAYER (0xD414BE129BB81B32)
+	static float _NETWORK_GET_AVERAGE_LATENCY_FOR_PLAYER_2(Player player) { return invoke<float>(0x0E3A041ED6AC2B45, player); } // 0x0E3A041ED6AC2B45 b323
 	// NETWORK_GET_*
 	static float _0x350C23949E43686C(Player player) { return invoke<float>(0x350C23949E43686C, player); } // 0x350C23949E43686C b323
 	static int _NETWORK_GET_NUM_UNACKED_FOR_PLAYER(Player player) { return invoke<int>(0xFF8FCF9FFC458A1C, player); } // 0xFF8FCF9FFC458A1C b323
-	// NETWORK_*
-	static int _0x3765C3A3E8192E10(Player player) { return invoke<int>(0x3765C3A3E8192E10, player); } // 0x3765C3A3E8192E10 b323
+	static int _NETWORK_GET_UNRELIABLE_RESEND_COUNT_FOR_PLAYER(Player player) { return invoke<int>(0x3765C3A3E8192E10, player); } // 0x3765C3A3E8192E10 b323
 	// NETWORK_GET_*
 	static int _NETWORK_GET_OLDEST_RESEND_COUNT_FOR_PLAYER(Player player) { return invoke<int>(0x52C1EADAF7B10302, player); } // 0x52C1EADAF7B10302 b323
 	static void _NETWORK_REPORT_MYSELF() { invoke<Void>(0x5626D9D6810730D5); } // 0x5626D9D6810730D5 b350
 	// NETWORK_GET_*
 	static Vector3 _0x64D779659BC37B19(Entity entity) { return invoke<Vector3>(0x64D779659BC37B19, entity); } // 0x64D779659BC37B19 b393
-	// NETWORK_GET_*
+	// Returns the coordinates of another player.
+	// Does not work if you enter your own player id as p0 (will return `(0.0, 0.0, 0.0)` in that case).
 	static Vector3 _NETWORK_GET_PLAYER_COORDS(Player player) { return invoke<Vector3>(0x125E6D638B8605D4, player); } // 0x125E6D638B8605D4 b393
 	// NETWORK_GET_*
 	static Vector3 _0x33DE49EDF4DDE77A(Entity entity) { return invoke<Vector3>(0x33DE49EDF4DDE77A, entity); } // 0x33DE49EDF4DDE77A b1103
@@ -7556,9 +8237,10 @@ namespace NETWORK {
 	static int _0xDB663CC9FF3407A9(Player player) { return invoke<int>(0xDB663CC9FF3407A9, player); } // 0xDB663CC9FF3407A9 b1734
 }
 
-namespace OBJECT {
-	static Object CREATE_OBJECT(Object modelHash, float x, float y, float z, BOOL isNetwork, BOOL netMissionEntity, BOOL dynamic) { return invoke<Object>(0x509D5878EB39E842, modelHash, x, y, z, isNetwork, netMissionEntity, dynamic); } // 0x509D5878EB39E842 0x2F7AA05C b323
-	static Object CREATE_OBJECT_NO_OFFSET(Hash modelHash, float x, float y, float z, BOOL isNetwork, BOOL netMissionEntity, BOOL dynamic) { return invoke<Object>(0x9A294B2138ABB884, modelHash, x, y, z, isNetwork, netMissionEntity, dynamic); } // 0x9A294B2138ABB884 0x58040420 b323
+namespace OBJECT
+{
+	static Object CREATE_OBJECT(Hash modelHash, float x, float y, float z, BOOL isNetwork, BOOL bScriptHostObj, BOOL dynamic) { return invoke<Object>(0x509D5878EB39E842, modelHash, x, y, z, isNetwork, bScriptHostObj, dynamic); } // 0x509D5878EB39E842 0x2F7AA05C b323
+	static Object CREATE_OBJECT_NO_OFFSET(Hash modelHash, float x, float y, float z, BOOL isNetwork, BOOL bScriptHostObj, BOOL dynamic) { return invoke<Object>(0x9A294B2138ABB884, modelHash, x, y, z, isNetwork, bScriptHostObj, dynamic); } // 0x9A294B2138ABB884 0x58040420 b323
 	// Deletes the specified object, then sets the handle pointed to by the pointer to NULL.
 	static void DELETE_OBJECT(Object* object) { invoke<Void>(0x539E0AE3E6634B9F, object); } // 0x539E0AE3E6634B9F 0xD6EF9DA7 b323
 	static BOOL PLACE_OBJECT_ON_GROUND_PROPERLY(Object object) { return invoke<BOOL>(0x58A850EAEE20FAA3, object); } // 0x58A850EAEE20FAA3 0x8F95A20B b323
@@ -7568,9 +8250,8 @@ namespace OBJECT {
 	// 
 	// If false, moves the object towards the specified X, Y and Z coordinates with the specified X, Y and Z speed.
 	// 
-	// See also: gtag.gtagaming.com/opcode-database/opcode/034E/
-	// 
-	// -- also see (fivem.net/)
+	// See also: https://gtagmodding.com/opcode-database/opcode/034E/
+	// Has to be looped until it returns true.
 	static BOOL SLIDE_OBJECT(Object object, float toX, float toY, float toZ, float speedX, float speedY, float speedZ, BOOL collision) { return invoke<BOOL>(0x2FDFF4107B8C1147, object, toX, toY, toZ, speedX, speedY, speedZ, collision); } // 0x2FDFF4107B8C1147 0x63BFA7A0 b323
 	static void SET_OBJECT_TARGETTABLE(Object object, BOOL targettable) { invoke<Void>(0x8A7391690F5AFD81, object, targettable); } // 0x8A7391690F5AFD81 0x3F88CD86 b323
 	static void _SET_OBJECT_SOMETHING(Object object, BOOL p1) { invoke<Void>(0x77F33F2CCF64B3AA, object, p1); } // 0x77F33F2CCF64B3AA 0x483C5C88 b323
@@ -7580,10 +8261,10 @@ namespace OBJECT {
 	static Object GET_CLOSEST_OBJECT_OF_TYPE(float x, float y, float z, float radius, Hash modelHash, BOOL isMission, BOOL p6, BOOL p7) { return invoke<Object>(0xE143FA2249364369, x, y, z, radius, modelHash, isMission, p6, p7); } // 0xE143FA2249364369 0x45619B33 b323
 	static BOOL HAS_OBJECT_BEEN_BROKEN(Object object, Any p1) { return invoke<BOOL>(0x8ABFB70C49CC43E2, object, p1); } // 0x8ABFB70C49CC43E2 0xFE21F891 b323
 	static BOOL HAS_CLOSEST_OBJECT_OF_TYPE_BEEN_BROKEN(float p0, float p1, float p2, float p3, Hash modelHash, Any p5) { return invoke<BOOL>(0x761B0E69AC4D007E, p0, p1, p2, p3, modelHash, p5); } // 0x761B0E69AC4D007E 0x6FC0353D b323
-	static BOOL HAS_CLOSEST_OBJECT_OF_TYPE_BEEN_COMPLETELY_DESTROYED(float p0, float p1, float p2, float p3, Hash modelHash, BOOL p5) { return invoke<BOOL>(0x46494A2475701343, p0, p1, p2, p3, modelHash, p5); } // 0x46494A2475701343 0x7DB578DD b323
+	static BOOL HAS_CLOSEST_OBJECT_OF_TYPE_BEEN_COMPLETELY_DESTROYED(float x, float y, float z, float radius, Hash modelHash, BOOL p5) { return invoke<BOOL>(0x46494A2475701343, x, y, z, radius, modelHash, p5); } // 0x46494A2475701343 0x7DB578DD b323
 	static Any _0x2542269291C6AC84(Any p0) { return invoke<Any>(0x2542269291C6AC84, p0); } // 0x2542269291C6AC84 b1180
 	static Vector3 _GET_OBJECT_OFFSET_FROM_COORDS(float xPos, float yPos, float zPos, float heading, float xOffset, float yOffset, float zOffset) { return invoke<Vector3>(0x163E252DE035A133, xPos, yPos, zPos, heading, xOffset, yOffset, zOffset); } // 0x163E252DE035A133 0x87A42A12 b323
-	static Any GET_COORDS_AND_ROTATION_OF_CLOSEST_OBJECT_OF_TYPE(Object object, float radius, Hash modelHash, float x, float y, float z, Vector3* p6, int p7) { return invoke<Any>(0x163F8B586BC95F2A, object, radius, modelHash, x, y, z, p6, p7); } // 0x163F8B586BC95F2A 0x65213FC3 b323
+	static Any GET_COORDS_AND_ROTATION_OF_CLOSEST_OBJECT_OF_TYPE(float x, float y, float z, float radius, Hash modelHash, Vector3* outPosition, Vector3* outRotation, int rotationOrder) { return invoke<Any>(0x163F8B586BC95F2A, x, y, z, radius, modelHash, outPosition, outRotation, rotationOrder); } // 0x163F8B586BC95F2A 0x65213FC3 b323
 	// Hardcoded to not work in multiplayer.
 	// 
 	// 
@@ -7609,40 +8290,56 @@ namespace OBJECT {
 	// -------------
 	// the locked bool is either 0(unlocked)(false) or 1(locked)(true)
 	static void GET_STATE_OF_CLOSEST_DOOR_OF_TYPE(Hash type, float x, float y, float z, BOOL* locked, float* heading) { invoke<Void>(0xEDC1A5B84AEF33FF, type, x, y, z, locked, heading); } // 0xEDC1A5B84AEF33FF 0x4B44A83D b323
-	// when you set locked to 0 the door open and to 1 the door close
+	// Hardcoded not to work in multiplayer environments.
+	// When you set locked to 0 the door open and to 1 the door close
 	// OBJECT::_9B12F9A24FABEDB0(${prop_gate_prison_01}, 1845.0, 2605.0, 45.0, 0, 0.0, 50.0, 0);  //door open
 	// 
 	// OBJECT::_9B12F9A24FABEDB0(${prop_gate_prison_01}, 1845.0, 2605.0, 45.0, 1, 0.0, 50.0, 0);  //door close
+	static void _DOOR_CONTROL(Hash modelHash, float x, float y, float z, BOOL locked, float xRotMult, float yRotMult, float zRotMult) { invoke<Void>(0x9B12F9A24FABEDB0, modelHash, x, y, z, locked, xRotMult, yRotMult, zRotMult); } // 0x9B12F9A24FABEDB0 0x4E0A260B b323
+	static void _0x006E4B040ED37EC3(Any p0) { invoke<Void>(0x006E4B040ED37EC3, p0); } // 0x006E4B040ED37EC3 b1868
+	// doorHash has to be unique. scriptDoor false; relies upon getNetworkGameScriptHandler. isLocal On true disables the creation CRequestDoorEvent's in DOOR_SYSTEM_SET_DOOR_STATE.
+	// p5 only set to true in single player native scripts.
+	// If scriptDoor is true, register the door on the script handler host (note: there's a hardcap on the number of script IDs that can be added to the system at a given time). If scriptDoor and isLocal are both false, the door is considered to be in a "Persists w/o netobj" state.
 	// 
-	// p5-7 - Rot?
+	// door hashes normally look like PROP_[int]_DOOR_[int] for interior doors and PROP_BUILDING_[int]_DOOR_[int] exterior doors but you can just make up your own hash if you want
+	// All doors need to be registered with ADD_DOOR_TO_SYSTEM before they can be manipulated with the door natives and the easiest way to get door models is just find the door in codewalker.
 	// 
-	// SET_*
-	static void _DOOR_CONTROL(Hash doorHash, float x, float y, float z, BOOL locked, float xRotMult, float yRotMult, float zRotMult) { invoke<Void>(0x9B12F9A24FABEDB0, doorHash, x, y, z, locked, xRotMult, yRotMult, zRotMult); } // 0x9B12F9A24FABEDB0 0x4E0A260B b323
-	static void ADD_DOOR_TO_SYSTEM(Hash doorHash, Hash modelHash, float x, float y, float z, BOOL p5, BOOL p6, BOOL p7) { invoke<Void>(0x6F8838D03D1DC226, doorHash, modelHash, x, y, z, p5, p6, p7); } // 0x6F8838D03D1DC226 0x9D2D778D b323
+	// Example: AddDoorToSystem("PROP_43_DOOR_0", "hei_v_ilev_fh_heistdoor2", -1456.818, -520.5037, 69.67043, 0, 0, 0)
+	static void ADD_DOOR_TO_SYSTEM(Hash doorHash, Hash modelHash, float x, float y, float z, BOOL p5, BOOL scriptDoor, BOOL isLocal) { invoke<Void>(0x6F8838D03D1DC226, doorHash, modelHash, x, y, z, p5, scriptDoor, isLocal); } // 0x6F8838D03D1DC226 0x9D2D778D b323
+	// CDoor and CDoorSystemData still internally allocated (and their associations between doorHash, modelHash, and coordinates).
+	// Only its NetObj removed and flag ``*(v2 + 192) |= 8u`` (1604 retail) toggled.
 	static void REMOVE_DOOR_FROM_SYSTEM(Hash doorHash) { invoke<Void>(0x464D8E1427156FE4, doorHash); } // 0x464D8E1427156FE4 0x00253286 b323
-	// Sets the acceleration limit of a door.
-	// How fast it can open, or the inverse hinge resistance.
-	// 
-	// A limit of 0 seems to lock doors.
-	// 
-	// p2 is always 0, p3 is always 1.
-	// 
-	// 
-	static void DOOR_SYSTEM_SET_DOOR_STATE(Hash doorHash, int limit, BOOL p2, BOOL p3) { invoke<Void>(0x6BAB9442830C7F53, doorHash, limit, p2, p3); } // 0x6BAB9442830C7F53 0xDF83DB47 b323
+	// Lockstates not applied and CNetObjDoor's not created until DOOR_SYSTEM_GET_IS_PHYSICS_LOADED returns true.
+	// `requestDoor` on true, and when door system is configured to, i.e., "persists w/o netobj", generate a CRequestDoorEvent.
+	// `forceUpdate` on true, forces an update on the door system (same path as netObjDoor_applyDoorStuff)
+	// Door lock states:
+	// 0: UNLOCKED
+	// 1: LOCKED
+	// 2: DOORSTATE_FORCE_LOCKED_UNTIL_OUT_OF_AREA
+	// 3: DOORSTATE_FORCE_UNLOCKED_THIS_FRAME
+	// 4: DOORSTATE_FORCE_LOCKED_THIS_FRAME
+	// 5: DOORSTATE_FORCE_OPEN_THIS_FRAME
+	// 6: DOORSTATE_FORCE_CLOSED_THIS_FRAME
+	static void DOOR_SYSTEM_SET_DOOR_STATE(Hash doorHash, int state, BOOL requestDoor, BOOL forceUpdate) { invoke<Void>(0x6BAB9442830C7F53, doorHash, state, requestDoor, forceUpdate); } // 0x6BAB9442830C7F53 0xDF83DB47 b323
 	static int DOOR_SYSTEM_GET_DOOR_STATE(Hash doorHash) { return invoke<int>(0x160AA1B32F6139B8, doorHash); } // 0x160AA1B32F6139B8 0xD42A41C2 b323
 	static int DOOR_SYSTEM_GET_DOOR_PENDING_STATE(Hash doorHash) { return invoke<int>(0x4BC2854478F3A749, doorHash); } // 0x4BC2854478F3A749 0xD649B7E1 b323
-	static void DOOR_SYSTEM_SET_AUTOMATIC_RATE(Hash doorHash, float p1, BOOL p2, BOOL p3) { invoke<Void>(0x03C27E13B42A0E82, doorHash, p1, p2, p3); } // 0x03C27E13B42A0E82 0x4F44AF21 b323
-	static void DOOR_SYSTEM_SET_AUTOMATIC_DISTANCE(Hash doorHash, float heading, BOOL p2, BOOL p3) { invoke<Void>(0x9BA001CB45CBF627, doorHash, heading, p2, p3); } // 0x9BA001CB45CBF627 0x47531446 b323
+	// Includes networking check: ownership vs. or the door itself **isn't** networked.
+	// `forceUpdate` on true invokes DOOR_SYSTEM_SET_DOOR_STATE otherwise requestDoor is unused.
+	static void DOOR_SYSTEM_SET_AUTOMATIC_RATE(Hash doorHash, float rate, BOOL requestDoor, BOOL forceUpdate) { invoke<Void>(0x03C27E13B42A0E82, doorHash, rate, requestDoor, forceUpdate); } // 0x03C27E13B42A0E82 0x4F44AF21 b323
+	// `forceUpdate` on true invokes DOOR_SYSTEM_SET_DOOR_STATE otherwise requestDoor is unused.
+	static void DOOR_SYSTEM_SET_AUTOMATIC_DISTANCE(Hash doorHash, float distance, BOOL requestDoor, BOOL forceUpdate) { invoke<Void>(0x9BA001CB45CBF627, doorHash, distance, requestDoor, forceUpdate); } // 0x9BA001CB45CBF627 0x47531446 b323
 	// Sets the ajar angle of a door.
 	// Ranges from -1.0 to 1.0, and 0.0 is closed / default.
-	// 
-	// p2 is always 0, p3 is always 1.
-	// 
-	// 
-	static void DOOR_SYSTEM_SET_OPEN_RATIO(Hash doorHash, float ajar, BOOL p2, BOOL p3) { invoke<Void>(0xB6E6FBA95C7324AC, doorHash, ajar, p2, p3); } // 0xB6E6FBA95C7324AC 0x34883DE3 b323
+	// `forceUpdate` on true invokes DOOR_SYSTEM_SET_DOOR_STATE otherwise requestDoor is unused.
+	static void DOOR_SYSTEM_SET_OPEN_RATIO(Hash doorHash, float ajar, BOOL requestDoor, BOOL forceUpdate) { invoke<Void>(0xB6E6FBA95C7324AC, doorHash, ajar, requestDoor, forceUpdate); } // 0xB6E6FBA95C7324AC 0x34883DE3 b323
+	static Any _0xE851471AEFC3374F(Any p0) { return invoke<Any>(0xE851471AEFC3374F, p0); } // 0xE851471AEFC3374F b1868
 	static float DOOR_SYSTEM_GET_OPEN_RATIO(Hash doorHash) { return invoke<float>(0x65499865FCA6E5EC, doorHash); } // 0x65499865FCA6E5EC 0xB74C3BD7 b323
-	static void DOOR_SYSTEM_SET_SPRING_REMOVED(Hash doorHash, BOOL p1, BOOL p2, BOOL p3) { invoke<Void>(0xC485E07E4F0B7958, doorHash, p1, p2, p3); } // 0xC485E07E4F0B7958 0xB4A9A558 b323
+	// Includes networking check: ownership vs. or the door itself **isn't** networked.
+	// `forceUpdate` on true invokes DOOR_SYSTEM_SET_DOOR_STATE otherwise requestDoor is unused.
+	static void DOOR_SYSTEM_SET_SPRING_REMOVED(Hash doorHash, BOOL removed, BOOL requestDoor, BOOL forceUpdate) { invoke<Void>(0xC485E07E4F0B7958, doorHash, removed, requestDoor, forceUpdate); } // 0xC485E07E4F0B7958 0xB4A9A558 b323
+	// Includes networking check: ownership vs. or the door itself **isn't** networked.
 	static void DOOR_SYSTEM_SET_HOLD_OPEN(Hash doorHash, BOOL toggle) { invoke<Void>(0xD9B71952F78A2640, doorHash, toggle); } // 0xD9B71952F78A2640 0xECE58AE0 b323
+	// Some property related to gates. Native name between ``DOOR_SYSTEM_SET_AUTOMATIC_RATE`` and ``DOOR_SYSTEM_SET_DOOR_STATE``.
 	static void _0xA85A21582451E951(Hash doorHash, BOOL p1) { invoke<Void>(0xA85A21582451E951, doorHash, p1); } // 0xA85A21582451E951 0xF736227C b323
 	// if (OBJECT::IS_DOOR_REGISTERED_WITH_SYSTEM(doorHash)) 
 	// {
@@ -7651,9 +8348,12 @@ namespace OBJECT {
 	static BOOL IS_DOOR_REGISTERED_WITH_SYSTEM(Hash doorHash) { return invoke<BOOL>(0xC153C43EA202C8C1, doorHash); } // 0xC153C43EA202C8C1 0x5AFCD8A1 b323
 	static BOOL IS_DOOR_CLOSED(Hash doorHash) { return invoke<BOOL>(0xC531EE8A1145A149, doorHash); } // 0xC531EE8A1145A149 0x48659CD7 b323
 	static void _0xC7F29CA00F46350E(BOOL p0) { invoke<Void>(0xC7F29CA00F46350E, p0); } // 0xC7F29CA00F46350E 0x9BF33E41 b323
+	// Clears the fields sets by 0xC7F29CA00F46350E (1604 retail: 0x1424A7A10, 0x1424A7A11) and iterates over the global CDoor's bucket-list.
+	// Related to its "Pre-networked state"?
 	static void _0x701FDA1E82076BA4() { invoke<Void>(0x701FDA1E82076BA4); } // 0x701FDA1E82076BA4 0xF592AD10 b323
 	static BOOL DOOR_SYSTEM_GET_IS_PHYSICS_LOADED(Any p0) { return invoke<BOOL>(0xDF97CDD4FC08FD34, p0); } // 0xDF97CDD4FC08FD34 0x17FF9393 b323
-	static BOOL DOOR_SYSTEM_FIND_EXISTING_DOOR(float p0, float p1, float p2, Any p3, Any* p4) { return invoke<BOOL>(0x589F80B325CC82C5, p0, p1, p2, p3, p4); } // 0x589F80B325CC82C5 0xE9AE494F b323
+	// Search radius: 0.5
+	static BOOL DOOR_SYSTEM_FIND_EXISTING_DOOR(float x, float y, float z, Hash modelHash, Hash* outDoorHash) { return invoke<BOOL>(0x589F80B325CC82C5, x, y, z, modelHash, outDoorHash); } // 0x589F80B325CC82C5 0xE9AE494F b323
 	static BOOL IS_GARAGE_EMPTY(Hash garageHash, BOOL p1, int p2) { return invoke<BOOL>(0x90E47239EA1980B8, garageHash, p1, p2); } // 0x90E47239EA1980B8 0xA8B37DEA b323
 	static BOOL IS_PLAYER_ENTIRELY_INSIDE_GARAGE(Hash garageHash, Player player, float p2, int p3) { return invoke<BOOL>(0x024A60DEB0EA69F0, garageHash, player, p2, p3); } // 0x024A60DEB0EA69F0 0xC33ED360 b323
 	static BOOL IS_PLAYER_PARTIALLY_INSIDE_GARAGE(Hash garageHash, Player player, int p2) { return invoke<BOOL>(0x1761DC5D8471CBAA, garageHash, player, p2); } // 0x1761DC5D8471CBAA 0x41924877 b323
@@ -7665,15 +8365,25 @@ namespace OBJECT {
 	static BOOL IS_OBJECT_PARTIALLY_INSIDE_GARAGE(Hash garageHash, Entity entity, int p2) { return invoke<BOOL>(0xF0EED5A6BC7B237A, garageHash, entity, p2); } // 0xF0EED5A6BC7B237A 0x95A9AB2B b323
 	// CLEAR_*
 	static void _CLEAR_GARAGE_AREA(Hash garageHash, BOOL isNetwork) { invoke<Void>(0xDA05194260CDCDF9, garageHash, isNetwork); } // 0xDA05194260CDCDF9 b678
-	// CLEAR_*
-	static void _0x190428512B240692(Hash garageHash, BOOL vehicles, BOOL peds, BOOL objects, BOOL isNetwork) { invoke<Void>(0x190428512B240692, garageHash, vehicles, peds, objects, isNetwork); } // 0x190428512B240692 0xA565E27E b323
-	static void _0x659F9D71F52843F8(Any p0, Any p1) { invoke<Void>(0x659F9D71F52843F8, p0, p1); } // 0x659F9D71F52843F8 b1290
+	static void CLEAR_OBJECTS_INSIDE_GARAGE(Hash garageHash, BOOL vehicles, BOOL peds, BOOL objects, BOOL isNetwork) { invoke<Void>(0x190428512B240692, garageHash, vehicles, peds, objects, isNetwork); } // 0x190428512B240692 0xA565E27E b323
+	// Sets a flag. A valid id is 0x157DC10D
+	// SET_FLAG_??
+	static void _0x659F9D71F52843F8(int id, BOOL toggle) { invoke<Void>(0x659F9D71F52843F8, id, toggle); } // 0x659F9D71F52843F8 b1290
 	static void ENABLE_SAVING_IN_GARAGE(Hash garageHash, BOOL toggle) { invoke<Void>(0xF2E1A7133DD356A6, garageHash, toggle); } // 0xF2E1A7133DD356A6 0x43BB7E48 b323
 	static void _0x66A49D021870FE88() { invoke<Void>(0x66A49D021870FE88); } // 0x66A49D021870FE88 0x6158959E b323
 	// p5 is usually 0.
 	static BOOL DOES_OBJECT_OF_TYPE_EXIST_AT_COORDS(float x, float y, float z, float radius, Hash hash, BOOL p5) { return invoke<BOOL>(0xBFA48E2FF417213F, x, y, z, radius, hash, p5); } // 0xBFA48E2FF417213F 0x23FF2BA4 b323
-	static BOOL IS_POINT_IN_ANGLED_AREA(float p0, float p1, float p2, float p3, float p4, float p5, float p6, float p7, float p8, float p9, BOOL p10, BOOL p11) { return invoke<BOOL>(0x2A70BAE8883E4C81, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11); } // 0x2A70BAE8883E4C81 0x73BCFFDC b323
-	static void _SET_OBJECT_CAN_CLIMB_ON(Object object, BOOL toggle) { invoke<Void>(0x4D89D607CB3DD1D2, object, toggle); } // 0x4D89D607CB3DD1D2 0x19B17769 b323
+	// An angled area is an X-Z oriented rectangle with three parameters:
+	// 1. origin: the mid-point along a base edge of the rectangle;
+	// 2. extent: the mid-point of opposite base edge on the other Z;
+	// 3. width: the length of the base edge; (named derived from logging strings ``CNetworkRoadNodeWorldStateData``).
+	// 
+	// The oriented rectangle can then be derived from the direction of the two points (``norm(origin - extent)``), its orthonormal, and the width, e.g:
+	// 1. golf_mp https://i.imgur.com/JhsQAK9.png
+	// 2. am_taxi https://i.imgur.com/TJWCZaT.jpg
+	static BOOL IS_POINT_IN_ANGLED_AREA(float xPos, float yPos, float zPos, float x1, float y1, float z1, float x2, float y2, float z2, float width, BOOL debug, BOOL includeZ) { return invoke<BOOL>(0x2A70BAE8883E4C81, xPos, yPos, zPos, x1, y1, z1, x2, y2, z2, width, debug, includeZ); } // 0x2A70BAE8883E4C81 0x73BCFFDC b323
+	// Overrides the climbing/blocking flags of the object, used in the native scripts mostly for "prop_dock_bouy_*"
+	static void SET_OBJECT_ALLOW_LOW_LOD_BUOYANCY(Object object, BOOL toggle) { invoke<Void>(0x4D89D607CB3DD1D2, object, toggle); } // 0x4D89D607CB3DD1D2 0x19B17769 b323
 	// Adjust the physics parameters of a prop, or otherwise known as "object". This is useful for simulated gravity.
 	// 
 	// Other parameters seem to be unknown.
@@ -7688,7 +8398,7 @@ namespace OBJECT {
 	static BOOL IS_ANY_OBJECT_NEAR_POINT(float x, float y, float z, float range, BOOL p4) { return invoke<BOOL>(0x397DC58FF00298D1, x, y, z, range, p4); } // 0x397DC58FF00298D1 0xE9E46941 b323
 	static BOOL IS_OBJECT_NEAR_POINT(Hash objectHash, float x, float y, float z, float range) { return invoke<BOOL>(0x8C90FE4B381BA60A, objectHash, x, y, z, range); } // 0x8C90FE4B381BA60A 0x50A62C43 b323
 	static void REMOVE_OBJECT_HIGH_DETAIL_MODEL(Object object) { invoke<Void>(0x4A39DB43E47CF3AA, object); } // 0x4A39DB43E47CF3AA 0xE3261B35 b323
-	static void _0xE7E4C198B0185900(Object p0, Any p1, BOOL p2) { invoke<Void>(0xE7E4C198B0185900, p0, p1, p2); } // 0xE7E4C198B0185900 0x1E82C2AE b323
+	static void BREAK_OBJECT_FRAGMENT_CHILD(Object p0, Any p1, BOOL p2) { invoke<Void>(0xE7E4C198B0185900, p0, p1, p2); } // 0xE7E4C198B0185900 0x1E82C2AE b323
 	static void _0xE05F6AEEFEB0BB02(Any p0, Any p1, Any p2) { invoke<Void>(0xE05F6AEEFEB0BB02, p0, p1, p2); } // 0xE05F6AEEFEB0BB02 b1180
 	static void _0xF9C1681347C8BD15(Object object) { invoke<Void>(0xF9C1681347C8BD15, object); } // 0xF9C1681347C8BD15 b323
 	static void TRACK_OBJECT_VISIBILITY(Object object) { invoke<Void>(0xB252BC036B525623, object); } // 0xB252BC036B525623 0x46D06B9A b323
@@ -7696,37 +8406,61 @@ namespace OBJECT {
 	static void _0xC6033D32241F6FB5(Object object, BOOL toggle) { invoke<Void>(0xC6033D32241F6FB5, object, toggle); } // 0xC6033D32241F6FB5 0xF4A1A14A b323
 	static void _0xEB6F1A9B5510A5D2(Any p0, BOOL p1) { invoke<Void>(0xEB6F1A9B5510A5D2, p0, p1); } // 0xEB6F1A9B5510A5D2 0xAF016CC1 b323
 	static void _SET_UNK_GLOBAL_BOOL_RELATED_TO_DAMAGE(BOOL value) { invoke<Void>(0xABDABF4E1EDECBFA, value); } // 0xABDABF4E1EDECBFA b1365
-	static void _SET_CREATE_WEAPON_OBJECT_LIGHT_SOURCE(Any p0, BOOL p1) { invoke<Void>(0xBCE595371A5FBAAF, p0, p1); } // 0xBCE595371A5FBAAF 0x3A68AA46 b323
+	// Requires a component_at_*_flsh to be attached to the weapon object
+	static void _SET_CREATE_WEAPON_OBJECT_LIGHT_SOURCE(Object object, BOOL toggle) { invoke<Void>(0xBCE595371A5FBAAF, object, toggle); } // 0xBCE595371A5FBAAF 0x3A68AA46 b323
 	// Example:
 	// OBJECT::GET_RAYFIRE_MAP_OBJECT(-809.9619750976562, 170.919, 75.7406997680664, 3.0, "des_tvsmash");
 	static Object GET_RAYFIRE_MAP_OBJECT(float x, float y, float z, float radius, const char* name) { return invoke<Object>(0xB48FCED898292E52, x, y, z, radius, name); } // 0xB48FCED898292E52 0xA286DE96 b323
+	// Defines the state of a destructible object.
+	// Use the GET_RAYFIRE_MAP_OBJECT native to find an object's handle with its name / coords.
+	// State 2 == object just spawned
+	// State 4 == Beginning of the animation
+	// State 6 == Start animation
+	// State 9 == End of the animation
 	static void SET_STATE_OF_RAYFIRE_MAP_OBJECT(Object object, int state) { invoke<Void>(0x5C29F698D404C5E1, object, state); } // 0x5C29F698D404C5E1 0x21F51560 b323
+	// Get a destructible object's state.
+	// Substract 1 to get the real state.
+	// See SET_STATE_OF_RAYFIRE_MAP_OBJECT to see the different states
+	// For example, if the object just spawned (state 2), the native will return 3.
 	static int GET_STATE_OF_RAYFIRE_MAP_OBJECT(Object object) { return invoke<int>(0x899BA936634A322E, object); } // 0x899BA936634A322E 0xF1B8817A b323
+	// Returns true if a destructible object with this handle exists, false otherwise.  
 	static BOOL DOES_RAYFIRE_MAP_OBJECT_EXIST(Object object) { return invoke<BOOL>(0x52AF537A0C5B8AAD, object); } // 0x52AF537A0C5B8AAD 0xE08C834D b323
+	// `object`: The des-object handle to get the animation progress from.
+	// Return value is a float between 0.0 and 1.0, 0.0 is the beginning of the animation, 1.0 is the end. Value resets to 0.0 instantly after reaching 1.0.
 	static float GET_RAYFIRE_MAP_OBJECT_ANIM_PHASE(Object object) { return invoke<float>(0x260EE4FDBDF4DB01, object); } // 0x260EE4FDBDF4DB01 0x020497DE b323
 	// Pickup hashes: pastebin.com/8EuSv2r1
+	// 
+	// Full list of pickup types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pickupTypes.json
 	static Pickup CREATE_PICKUP(Hash pickupHash, float posX, float posY, float posZ, int p4, int value, BOOL p6, Hash modelHash) { return invoke<Pickup>(0xFBA08C503DD5FA58, pickupHash, posX, posY, posZ, p4, value, p6, modelHash); } // 0xFBA08C503DD5FA58 0x5E14DF68 b323
 	// Pickup hashes: pastebin.com/8EuSv2r1
 	// 
 	// flags:
 	// 8 (1 << 3): place on ground
 	// 512 (1 << 9): spin around
+	// 
+	// Full list of pickup types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pickupTypes.json
 	static Pickup CREATE_PICKUP_ROTATE(Hash pickupHash, float posX, float posY, float posZ, float rotX, float rotY, float rotZ, int flag, int amount, Any p9, BOOL p10, Hash modelHash) { return invoke<Pickup>(0x891804727E0A98B7, pickupHash, posX, posY, posZ, rotX, rotY, rotZ, flag, amount, p9, p10, modelHash); } // 0x891804727E0A98B7 0xF015BFE2 b323
 	static void _0x394CD08E31313C28() { invoke<Void>(0x394CD08E31313C28); } // 0x394CD08E31313C28 b944
 	static void _0x826D1EE4D1CAFC78(Any p0, Any p1) { invoke<Void>(0x826D1EE4D1CAFC78, p0, p1); } // 0x826D1EE4D1CAFC78 b505
 	// Used for doing money drop
 	// Pickup hashes: pastebin.com/8EuSv2r1
+	// 
+	// Full list of pickup types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pickupTypes.json
 	static Pickup CREATE_AMBIENT_PICKUP(Hash pickupHash, float posX, float posY, float posZ, int flags, int value, Hash modelHash, BOOL p7, BOOL p8) { return invoke<Pickup>(0x673966A0C0FD7171, pickupHash, posX, posY, posZ, flags, value, modelHash, p7, p8); } // 0x673966A0C0FD7171 0x17B99CE7 b323
 	static void _0x1E3F1B1B891A2AAA(Any p0, Any p1) { invoke<Void>(0x1E3F1B1B891A2AAA, p0, p1); } // 0x1E3F1B1B891A2AAA b573
 	// Pickup hashes: pastebin.com/8EuSv2r1
+	// 
+	// Full list of pickup types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pickupTypes.json
 	static Object CREATE_PORTABLE_PICKUP(Hash pickupHash, float x, float y, float z, BOOL placeOnGround, Hash modelHash) { return invoke<Object>(0x2EAF1FDB2FB55698, pickupHash, x, y, z, placeOnGround, modelHash); } // 0x2EAF1FDB2FB55698 0x8C886BE5 b323
 	// CREATE_*
+	// 
+	// Full list of pickup types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pickupTypes.json
 	static Object _CREATE_PORTABLE_PICKUP_2(Hash pickupHash, float x, float y, float z, BOOL placeOnGround, Hash modelHash) { return invoke<Object>(0x125494B98A21AAF7, pickupHash, x, y, z, placeOnGround, modelHash); } // 0x125494B98A21AAF7 0x56A02502 b323
 	static void ATTACH_PORTABLE_PICKUP_TO_PED(Object pickupObject, Ped ped) { invoke<Void>(0x8DC39368BDD57755, pickupObject, ped); } // 0x8DC39368BDD57755 0x184F6AB3 b323
 	static void DETACH_PORTABLE_PICKUP_FROM_PED(Object pickupObject) { invoke<Void>(0xCF463D1E9A0AECB1, pickupObject); } // 0xCF463D1E9A0AECB1 0x1D094562 b323
 	static void _HIDE_PICKUP(Object pickupObject, BOOL toggle) { invoke<Void>(0x867458251D47CCB2, pickupObject, toggle); } // 0x867458251D47CCB2 b463
-	static void _0x0BF3B3BD47D79C08(Hash modelHash, int p1) { invoke<Void>(0x0BF3B3BD47D79C08, modelHash, p1); } // 0x0BF3B3BD47D79C08 0x7EFBA039 b323
-	static void _0x78857FC65CADB909(BOOL p0) { invoke<Void>(0x78857FC65CADB909, p0); } // 0x78857FC65CADB909 0xA3CDF152 b323
+	static void SET_MAX_NUM_PORTABLE_PICKUPS_CARRIED_BY_PLAYER(Hash modelHash, int p1) { invoke<Void>(0x0BF3B3BD47D79C08, modelHash, p1); } // 0x0BF3B3BD47D79C08 0x7EFBA039 b323
+	static void SET_LOCAL_PLAYER_CAN_COLLECT_PORTABLE_PICKUPS(BOOL p0) { invoke<Void>(0x78857FC65CADB909, p0); } // 0x78857FC65CADB909 0xA3CDF152 b323
 	static Vector3 GET_SAFE_PICKUP_COORDS(float x, float y, float z, float p3, float p4) { return invoke<Vector3>(0x6E16BC2503FF1FF0, x, y, z, p3, p4); } // 0x6E16BC2503FF1FF0 0x618B5F67 b323
 	// Adds an area that seems to be related to pickup physics behavior.
 	// Max amount of areas is 10. Only works in multiplayer.
@@ -7740,6 +8474,8 @@ namespace OBJECT {
 	static Vector3 GET_PICKUP_COORDS(Pickup pickup) { return invoke<Vector3>(0x225B8B35C88029B3, pickup); } // 0x225B8B35C88029B3 0xC2E1E2C5 b323
 	static void _0x8DCA505A5C196F05(Any p0, Any p1) { invoke<Void>(0x8DCA505A5C196F05, p0, p1); } // 0x8DCA505A5C196F05 b1180
 	// Pickup hashes: pastebin.com/8EuSv2r1
+	// 
+	// Full list of pickup types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pickupTypes.json
 	static void REMOVE_ALL_PICKUPS_OF_TYPE(Hash pickupHash) { invoke<Void>(0x27F9D613092159CF, pickupHash); } // 0x27F9D613092159CF 0x40062C53 b323
 	static BOOL HAS_PICKUP_BEEN_COLLECTED(Pickup pickup) { return invoke<BOOL>(0x80EC48E6679313F9, pickup); } // 0x80EC48E6679313F9 0x0BE5CCED b323
 	static void REMOVE_PICKUP(Pickup pickup) { invoke<Void>(0x3288D8ACAECD2AB2, pickup); } // 0x3288D8ACAECD2AB2 0x64A7A0E0 b323
@@ -7764,13 +8500,15 @@ namespace OBJECT {
 	static BOOL DOES_PICKUP_EXIST(Pickup pickup) { return invoke<BOOL>(0xAFC1CA75AD4074D1, pickup); } // 0xAFC1CA75AD4074D1 0x9C6DA0B3 b323
 	static BOOL DOES_PICKUP_OBJECT_EXIST(Object pickupObject) { return invoke<BOOL>(0xD9EFB6DBF7DAAEA3, pickupObject); } // 0xD9EFB6DBF7DAAEA3 0xE0B32108 b323
 	static Object GET_PICKUP_OBJECT(Pickup pickup) { return invoke<Object>(0x5099BC55630B25AE, pickup); } // 0x5099BC55630B25AE 0x6052E62E b323
-	static Any _0xFC481C641EBBD27D(Any p0) { return invoke<Any>(0xFC481C641EBBD27D, p0); } // 0xFC481C641EBBD27D b1365
-	static BOOL _0x0378C08504160D0D(Any p0) { return invoke<BOOL>(0x0378C08504160D0D, p0); } // 0x0378C08504160D0D b323
+	static BOOL IS_OBJECT_A_PORTABLE_PICKUP(Object object) { return invoke<BOOL>(0xFC481C641EBBD27D, object); } // 0xFC481C641EBBD27D 0x0F0E94FF b1365
+	static BOOL IS_OBJECT_A_PICKUP(Object object) { return invoke<BOOL>(0x0378C08504160D0D, object); } // 0x0378C08504160D0D 0x93D23399 b323
 	// Pickup hashes: pastebin.com/8EuSv2r1
+	// 
+	// Full list of pickup types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pickupTypes.json
 	static BOOL DOES_PICKUP_OF_TYPE_EXIST_IN_AREA(Hash pickupHash, float x, float y, float z, float radius) { return invoke<BOOL>(0xF9C36251F6E48E33, pickupHash, x, y, z, radius); } // 0xF9C36251F6E48E33 0xF139681B b323
 	static void SET_PICKUP_REGENERATION_TIME(Pickup pickup, int duration) { invoke<Void>(0x78015C9B4B3ECC9D, pickup, duration); } // 0x78015C9B4B3ECC9D 0xAB11267D b323
 	static void FORCE_PICKUP_REGENERATE(Any p0) { invoke<Void>(0x758A5C1B3B1E1990, p0); } // 0x758A5C1B3B1E1990 b1011
-	// From the scripts:
+	// Disabling/enabling a player from getting pickups. From the scripts:
 	// 
 	// OBJECT::_616093EC6B139DD9(PLAYER::PLAYER_ID(), ${pickup_portable_package}, 0);
 	// OBJECT::_616093EC6B139DD9(PLAYER::PLAYER_ID(), ${pickup_portable_package}, 0);
@@ -7780,15 +8518,19 @@ namespace OBJECT {
 	// OBJECT::_616093EC6B139DD9(PLAYER::PLAYER_ID(), ${pickup_armour_standard}, 1);
 	// 
 	// SET_PLAYER_*
-	static void _0x616093EC6B139DD9(Player player, Hash pickupHash, BOOL toggle) { invoke<Void>(0x616093EC6B139DD9, player, pickupHash, toggle); } // 0x616093EC6B139DD9 0x7FADB4B9 b323
+	// 
+	// Full list of pickup types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pickupTypes.json
+	static void _TOGGLE_USE_PICKUPS_FOR_PLAYER(Player player, Hash pickupHash, BOOL toggle) { invoke<Void>(0x616093EC6B139DD9, player, pickupHash, toggle); } // 0x616093EC6B139DD9 0x7FADB4B9 b323
 	// Maximum amount of pickup models that can be disallowed is 30.
 	// 
 	// SET_LOCAL_PLAYER_*
 	static void _SET_LOCAL_PLAYER_CAN_USE_PICKUPS_WITH_THIS_MODEL(Hash modelHash, BOOL toggle) { invoke<Void>(0x88EAEC617CD26926, modelHash, toggle); } // 0x88EAEC617CD26926 0x3A8F1BF7 b323
 	// A*
+	// 
+	// Full list of pickup types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pickupTypes.json
 	static void _0xFDC07C58E8AAB715(Hash pickupHash) { invoke<Void>(0xFDC07C58E8AAB715, pickupHash); } // 0xFDC07C58E8AAB715 b1734
 	static void SET_TEAM_PICKUP_OBJECT(Object object, Any p1, BOOL p2) { invoke<Void>(0x53E0DF1A2A3CF0CA, object, p1, p2); } // 0x53E0DF1A2A3CF0CA 0x77687DC5 b323
-	static void _0x92AEFB5F6E294023(Object object, BOOL p1, BOOL p2) { invoke<Void>(0x92AEFB5F6E294023, object, p1, p2); } // 0x92AEFB5F6E294023 0xCBB5F9B6 b323
+	static void PREVENT_COLLECTION_OF_PORTABLE_PICKUP(Object object, BOOL p1, BOOL p2) { invoke<Void>(0x92AEFB5F6E294023, object, p1, p2); } // 0x92AEFB5F6E294023 0xCBB5F9B6 b323
 	static void _0x0596843B34B95CE5(Any p0, Any p1) { invoke<Void>(0x0596843B34B95CE5, p0, p1); } // 0x0596843B34B95CE5 b505
 	static void _0xA08FE5E49BDC39DD(Any p0, float p1, BOOL p2) { invoke<Void>(0xA08FE5E49BDC39DD, p0, p1, p2); } // 0xA08FE5E49BDC39DD 0x276A7807 b323
 	static void _0x62454A641B41F3C5(Any p0) { invoke<Void>(0x62454A641B41F3C5, p0); } // 0x62454A641B41F3C5 b678
@@ -7804,8 +8546,12 @@ namespace OBJECT {
 	static void _0x8CFF648FBD7330F1(Any p0) { invoke<Void>(0x8CFF648FBD7330F1, p0); } // 0x8CFF648FBD7330F1 b757
 	static void _0x46F3ADD1E2D5BAF2(Any p0, Any p1) { invoke<Void>(0x46F3ADD1E2D5BAF2, p0, p1); } // 0x46F3ADD1E2D5BAF2 b877
 	static void _0x641F272B52E2F0F8(Any p0, Any p1) { invoke<Void>(0x641F272B52E2F0F8, p0, p1); } // 0x641F272B52E2F0F8 b877
-	static void _0x4C134B4DF76025D0(Any p0, Any p1) { invoke<Void>(0x4C134B4DF76025D0, p0, p1); } // 0x4C134B4DF76025D0 b1180
-	static void _0xAA059C615DE9DD03(Any p0, Any p1) { invoke<Void>(0xAA059C615DE9DD03, p0, p1); } // 0xAA059C615DE9DD03 b1180
+	// Sets some bit of pickup
+	// SET_PICKUP_*
+	static void _0x4C134B4DF76025D0(Pickup pickup, BOOL toggle) { invoke<Void>(0x4C134B4DF76025D0, pickup, toggle); } // 0x4C134B4DF76025D0 b1180
+	// Sets some value of pickup
+	// SET_PICKUP_*
+	static void _0xAA059C615DE9DD03(Pickup pickup, BOOL toggle) { invoke<Void>(0xAA059C615DE9DD03, pickup, toggle); } // 0xAA059C615DE9DD03 b1180
 	static void _0xF92099527DB8E2A7(Any p0, Any p1) { invoke<Void>(0xF92099527DB8E2A7, p0, p1); } // 0xF92099527DB8E2A7 0xA7E936FD b323
 	// CLEAR_*
 	static void _0xA2C1F5E92AFE49ED() { invoke<Void>(0xA2C1F5E92AFE49ED); } // 0xA2C1F5E92AFE49ED 0xB241806C b323
@@ -7818,14 +8564,20 @@ namespace OBJECT {
 	// 3 = green larger
 	// 4 = nothing
 	// 5 = green small
-	static void _HIGHLIGHT_PLACEMENT_COORDS(float x, float y, float z, int colorIndex) { invoke<Void>(0x3430676B11CDF21D, x, y, z, colorIndex); } // 0x3430676B11CDF21D 0x63B02FAD b323
+	static void RENDER_FAKE_PICKUP_GLOW(float x, float y, float z, int colorIndex) { invoke<Void>(0x3430676B11CDF21D, x, y, z, colorIndex); } // 0x3430676B11CDF21D 0x63B02FAD b323
 	// SET_PICKUP_*
 	static void _0x7813E8B8C4AE4799(Pickup pickup) { invoke<Void>(0x7813E8B8C4AE4799, pickup); } // 0x7813E8B8C4AE4799 b1734
-	static void _0xBFFE53AE7E67FCDC(Any p0, Any p1) { invoke<Void>(0xBFFE53AE7E67FCDC, p0, p1); } // 0xBFFE53AE7E67FCDC b1290
-	static void _0xD05A3241B9A86F19(Any p0, Any p1) { invoke<Void>(0xD05A3241B9A86F19, p0, p1); } // 0xD05A3241B9A86F19 b1180
+	// Sets some pickup flag?
+	// SET_PICKUP_*
+	static void _0xBFFE53AE7E67FCDC(Pickup pickup, BOOL toggle) { invoke<Void>(0xBFFE53AE7E67FCDC, pickup, toggle); } // 0xBFFE53AE7E67FCDC b1290
+	// Sets entity+38 to C (when false) or 0xFF3f (when true)
+	// SET_ENTITY_??
+	static void _0xD05A3241B9A86F19(Entity entity, BOOL toggle) { invoke<Void>(0xD05A3241B9A86F19, entity, toggle); } // 0xD05A3241B9A86F19 b1180
 	static void _0xB2D0BDE54F0E8E5A(Object object, BOOL toggle) { invoke<Void>(0xB2D0BDE54F0E8E5A, object, toggle); } // 0xB2D0BDE54F0E8E5A 0x132B6D92 b323
+	// Full list of pickup types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pickupTypes.json
 	static Hash GET_WEAPON_TYPE_FROM_PICKUP_TYPE(Hash pickupHash) { return invoke<Hash>(0x08F96CA6C551AD51, pickupHash); } // 0x08F96CA6C551AD51 0xEDD01937 b323
-	static Any _0xD6429A016084F1A5(Any p0) { return invoke<Any>(0xD6429A016084F1A5, p0); } // 0xD6429A016084F1A5 b1290
+	// Returns the pickup hash for the given weapon hash
+	static Hash _GET_PICKUP_HASH_FROM_WEAPON(Hash weaponHash) { return invoke<Hash>(0xD6429A016084F1A5, weaponHash); } // 0xD6429A016084F1A5 b1290
 	static BOOL IS_PICKUP_WEAPON_OBJECT_VALID(Object object) { return invoke<BOOL>(0x11D1E53A726891FE, object); } // 0x11D1E53A726891FE 0x883DAB2D b323
 	static int _GET_OBJECT_TEXTURE_VARIATION(Object object) { return invoke<int>(0xE84EB93729C5F36A, object); } // 0xE84EB93729C5F36A b757
 	// enum ObjectPaintVariants
@@ -7848,39 +8600,57 @@ namespace OBJECT {
 	//     Voyager = 15
 	// };
 	static void _SET_OBJECT_TEXTURE_VARIATION(Object object, int textureVariation) { invoke<Void>(0x971DA0055324D033, object, textureVariation); } // 0x971DA0055324D033 b323
-	static Any _0xF12E33034D887F66(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { return invoke<Any>(0xF12E33034D887F66, p0, p1, p2, p3, p4, p5); } // 0xF12E33034D887F66 b1103
+	static BOOL _SET_TEXTURE_VARIATION_OF_CLOSEST_OBJECT_OF_TYPE(float x, float y, float z, float radius, Hash modelHash, int textureVariation) { return invoke<BOOL>(0xF12E33034D887F66, x, y, z, radius, modelHash, textureVariation); } // 0xF12E33034D887F66 b1103
+	static void _0x31574B1B41268673(Any p0, Any p1) { invoke<Void>(0x31574B1B41268673, p0, p1); } // 0x31574B1B41268673 b2189
 	static Any _SET_OBJECT_LIGHT_COLOR(Object object, BOOL p1, int r, int g, int b) { return invoke<Any>(0x5F048334B4A4E774, object, p1, r, g, b); } // 0x5F048334B4A4E774 b1493
-	static Any _0xADF084FB8F075D06(Any p0) { return invoke<Any>(0xADF084FB8F075D06, p0); } // 0xADF084FB8F075D06 b1604
+	// GET_OBJECT_??
+	static BOOL _0xADF084FB8F075D06(Object object) { return invoke<BOOL>(0xADF084FB8F075D06, object); } // 0xADF084FB8F075D06 b1604
 	// SET_OBJECT_*
 	static void _0x3B2FD68DB5F8331C(Object object, BOOL toggle) { invoke<Void>(0x3B2FD68DB5F8331C, object, toggle); } // 0x3B2FD68DB5F8331C b757
-	static void _SET_OBJECT_STUNT_PROP_SPEEDUP(Any p0, Any p1) { invoke<Void>(0x96EE0EBA0163DF80, p0, p1); } // 0x96EE0EBA0163DF80 b791
-	static void _SET_OBJECT_STUNT_PROP_DURATION(Any p0, Any p1) { invoke<Void>(0xDF6CA0330F2E737B, p0, p1); } // 0xDF6CA0330F2E737B b791
+	static void _SET_OBJECT_STUNT_PROP_SPEEDUP(Object object, Any p1) { invoke<Void>(0x96EE0EBA0163DF80, object, p1); } // 0x96EE0EBA0163DF80 b791
+	static void _SET_OBJECT_STUNT_PROP_DURATION(Object object, float duration) { invoke<Void>(0xDF6CA0330F2E737B, object, duration); } // 0xDF6CA0330F2E737B b791
 	// returns pickup hash.
+	// 
+	// Full list of pickup types by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pickupTypes.json
 	static Hash _GET_PICKUP_HASH(Hash pickupHash) { return invoke<Hash>(0x5EAAD83F8CFB4575, pickupHash); } // 0x5EAAD83F8CFB4575 0x6AE36192 b323
 	static void SET_FORCE_OBJECT_THIS_FRAME(float x, float y, float z, float p3) { invoke<Void>(0xF538081986E49E9D, x, y, z, p3); } // 0xF538081986E49E9D 0x3DA41C1A b323
 	// is this like setting is as no longer needed?
 	static void _MARK_OBJECT_FOR_DELETION(Object object) { invoke<Void>(0xADBE4809F19F927A, object); } // 0xADBE4809F19F927A 0x2048A7DD b323
 	static void _0x8CAAB2BD3EA58BD4(Any p0) { invoke<Void>(0x8CAAB2BD3EA58BD4, p0); } // 0x8CAAB2BD3EA58BD4 b1011
 	static void _0x63ECF581BC70E363(Any p0, Any p1) { invoke<Void>(0x63ECF581BC70E363, p0, p1); } // 0x63ECF581BC70E363 b1365
-	static void _SET_ENABLE_ARENA_PROP_PHYSICS(Any p0, Any p1, Any p2) { invoke<Void>(0x911024442F4898F0, p0, p1, p2); } // 0x911024442F4898F0 b1604
-	static void _SET_ENABLE_ARENA_PROP_PHYSICS_ON_PED(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0xB20834A7DD3D8896, p0, p1, p2, p3); } // 0xB20834A7DD3D8896 b1604
-	static void _0x734E1714D077DA9A(Any p0, Any p1) { invoke<Void>(0x734E1714D077DA9A, p0, p1); } // 0x734E1714D077DA9A b1604
-	static void _0x1A6CBB06E2D0D79D(Any p0, Any p1) { invoke<Void>(0x1A6CBB06E2D0D79D, p0, p1); } // 0x1A6CBB06E2D0D79D b1604
-	static Any _GET_IS_ARENA_PROP_PHYSICS_DISABLED(Any p0, Any p1) { return invoke<Any>(0x43C677F1E1158005, p0, p1); } // 0x43C677F1E1158005 b1604
+	// Activate the physics to: "xs_prop_arena_{flipper,wall,bollard,turntable,pit}"
+	static void _SET_ENABLE_ARENA_PROP_PHYSICS(Object object, BOOL toggle, int p2) { invoke<Void>(0x911024442F4898F0, object, toggle, p2); } // 0x911024442F4898F0 b1604
+	static void _SET_ENABLE_ARENA_PROP_PHYSICS_ON_PED(Object object, BOOL toggle, int p2, Ped ped) { invoke<Void>(0xB20834A7DD3D8896, object, toggle, p2, ped); } // 0xB20834A7DD3D8896 b1604
+	// Sets some bit of object
+	// SET_OBJECT_*
+	static void _0x734E1714D077DA9A(Object object, BOOL toggle) { invoke<Void>(0x734E1714D077DA9A, object, toggle); } // 0x734E1714D077DA9A b1604
+	// Sets some bit of object
+	// SET_OBJECT_*
+	static void _0x1A6CBB06E2D0D79D(Object object, BOOL p1) { invoke<Void>(0x1A6CBB06E2D0D79D, object, p1); } // 0x1A6CBB06E2D0D79D b1604
+	static BOOL _GET_IS_ARENA_PROP_PHYSICS_DISABLED(Object object, Any p1) { return invoke<BOOL>(0x43C677F1E1158005, object, p1); } // 0x43C677F1E1158005 b1604
 	static Any _0x3BD770D281982DB5(Any p0, Any p1) { return invoke<Any>(0x3BD770D281982DB5, p0, p1); } // 0x3BD770D281982DB5 b1604
-	static void _0x1C57C94A6446492A(Any p0, Any p1) { invoke<Void>(0x1C57C94A6446492A, p0, p1); } // 0x1C57C94A6446492A b1604
-	static void _0xB5B7742424BD4445(Any p0, Any p1) { invoke<Void>(0xB5B7742424BD4445, p0, p1); } // 0xB5B7742424BD4445 b1604
+	// Sets some flag of object
+	// SET_OBJECT_*
+	static void _0x1C57C94A6446492A(Object object, BOOL toggle) { invoke<Void>(0x1C57C94A6446492A, object, toggle); } // 0x1C57C94A6446492A b1604
+	// Sets some bit of object
+	// SET_OBJECT_*
+	static void _0xB5B7742424BD4445(Object object, BOOL toggle) { invoke<Void>(0xB5B7742424BD4445, object, toggle); } // 0xB5B7742424BD4445 b1604
 }
 
-namespace PAD {
+namespace PAD
+{
 	// padIndex: 0 (PLAYER_CONTROL), 1 (unk) and 2 (unk) used in the scripts.
 	static BOOL IS_CONTROL_ENABLED(int padIndex, int control) { return invoke<BOOL>(0x1CEA6BFDF248E5D9, padIndex, control); } // 0x1CEA6BFDF248E5D9 0x9174AF84 b323
+	// Returns whether a control is currently pressed.
 	// padIndex: 0 (PLAYER_CONTROL), 1 (unk) and 2 (unk) used in the scripts.
 	static BOOL IS_CONTROL_PRESSED(int padIndex, int control) { return invoke<BOOL>(0xF3A21BCD95725A4A, padIndex, control); } // 0xF3A21BCD95725A4A 0x517A4384 b323
+	// Returns whether a control is currently _not_ pressed.
 	// padIndex: 0 (PLAYER_CONTROL), 1 (unk) and 2 (unk) used in the scripts.
 	static BOOL IS_CONTROL_RELEASED(int padIndex, int control) { return invoke<BOOL>(0x648EE3E7F38877DD, padIndex, control); } // 0x648EE3E7F38877DD 0x1F91A06E b323
+	// Returns whether a control was newly pressed since the last check.
 	// padIndex: 0 (PLAYER_CONTROL), 1 (unk) and 2 (unk) used in the scripts.
 	static BOOL IS_CONTROL_JUST_PRESSED(int padIndex, int control) { return invoke<BOOL>(0x580417101DDB492F, padIndex, control); } // 0x580417101DDB492F 0x4487F579 b323
+	// Returns whether a control was newly released since the last check.
 	// padIndex: 0 (PLAYER_CONTROL), 1 (unk) and 2 (unk) used in the scripts.
 	static BOOL IS_CONTROL_JUST_RELEASED(int padIndex, int control) { return invoke<BOOL>(0x50F940259D3841E6, padIndex, control); } // 0x50F940259D3841E6 0x2314444B b323
 	// padIndex: 0 (PLAYER_CONTROL), 1 (unk) and 2 (unk) used in the scripts.
@@ -7918,19 +8688,12 @@ namespace PAD {
 	static int _0xD7D22F5592AED8BA(int p0) { return invoke<int>(0xD7D22F5592AED8BA, p0); } // 0xD7D22F5592AED8BA 0x0E8EF929 b323
 	// padIndex: 0 (PLAYER_CONTROL), 1 (unk) and 2 (unk) used in the scripts.
 	// 
-	// Seems to return true if the input is currently disabled. "_GET_LAST_INPUT_METHOD" didn't seem very accurate, but I've left the original description below.
-	// 
-	// --
-	// 
-	// index usually 2
-	// 
-	// returns true if the last input method was made with mouse + keyboard, false if it was made with a gamepad
-	static BOOL _IS_INPUT_DISABLED(int padIndex) { return invoke<BOOL>(0xA571D46727E2B718, padIndex); } // 0xA571D46727E2B718 b323
+	// Used to be known as _GET_LAST_INPUT_METHOD & _IS_INPUT_DISABLED
+	static BOOL _IS_USING_KEYBOARD(int padIndex) { return invoke<BOOL>(0xA571D46727E2B718, padIndex); } // 0xA571D46727E2B718 b323
 	// padIndex: 0 (PLAYER_CONTROL), 1 (unk) and 2 (unk) used in the scripts.
 	// 
-	// I may be wrong with this one, but from the looks of the scripts, it sets keyboard related stuff as soon as this returns true.
-	static BOOL _IS_INPUT_JUST_DISABLED(int padIndex) { return invoke<BOOL>(0x13337B38DB572509, padIndex); } // 0x13337B38DB572509 b323
-	// Renamed to _SET_CURSOR_LOCATION (I previously named it _SET_CURSOR_POSTION) which is the correct name as far as I can tell.
+	// Used to be known as _IS_INPUT_JUST_DISABLED
+	static BOOL _IS_USING_KEYBOARD_2(int padIndex) { return invoke<BOOL>(0x13337B38DB572509, padIndex); } // 0x13337B38DB572509 b323
 	static BOOL _SET_CURSOR_LOCATION(float x, float y) { return invoke<BOOL>(0xFC695459D4D0E219, x, y); } // 0xFC695459D4D0E219 b323
 	// padIndex: 0 (PLAYER_CONTROL), 1 (unk) and 2 (unk) used in the scripts.
 	// 
@@ -7955,7 +8718,7 @@ namespace PAD {
 	// padIndex: 0 (PLAYER_CONTROL), 1 (unk) and 2 (unk) used in the scripts.
 	static const char* GET_CONTROL_GROUP_INSTRUCTIONAL_BUTTON(int padIndex, int controlGroup, BOOL p2) { return invoke<const char*>(0x80C2FD58D720C801, padIndex, controlGroup, p2); } // 0x80C2FD58D720C801 0x3EE71F6A b323
 	// padIndex: 0 (PLAYER_CONTROL), 1 (unk) and 2 (unk) used in the scripts.
-	static void _SET_CONTROL_GROUP_COLOR(int padIndex, int red, int green, int blue) { invoke<Void>(0x8290252FFF36ACB5, padIndex, red, green, blue); } // 0x8290252FFF36ACB5 b323
+	static void SET_CONTROL_LIGHT_EFFECT_COLOR(int padIndex, int red, int green, int blue) { invoke<Void>(0x8290252FFF36ACB5, padIndex, red, green, blue); } // 0x8290252FFF36ACB5 b323
 	static void _0xCB0360EFEFB2580D(int padIndex) { invoke<Void>(0xCB0360EFEFB2580D, padIndex); } // 0xCB0360EFEFB2580D b323
 	// padIndex always seems to be 0
 	// duration in milliseconds 
@@ -7988,6 +8751,7 @@ namespace PAD {
 	//     }
 	// }
 	static BOOL _0xE1615EC03B3BB4FD() { return invoke<BOOL>(0xE1615EC03B3BB4FD); } // 0xE1615EC03B3BB4FD b323
+	// Returns the local player's targeting mode. See PLAYER::SET_PLAYER_TARGETING_MODE.
 	static int GET_LOCAL_PLAYER_AIM_STATE() { return invoke<int>(0xBB41AFBBBC0A0287); } // 0xBB41AFBBBC0A0287 0x81802053 b323
 	// Same behavior as GET_LOCAL_PLAYER_AIM_STATE but only used on the PC version.
 	static int _GET_LOCAL_PLAYER_AIM_STATE_2() { return invoke<int>(0x59B9A7AF4C95133C); } // 0x59B9A7AF4C95133C b323
@@ -8086,11 +8850,22 @@ namespace PAD {
 	static void _0x7F4724035FDCA1DD(int padIndex) { invoke<Void>(0x7F4724035FDCA1DD, padIndex); } // 0x7F4724035FDCA1DD 0x2CEDE6C5 b323
 }
 
-namespace PATHFIND {
-	static void SET_ROADS_IN_AREA(float x1, float y1, float z1, float x2, float y2, float z2, BOOL unknown1, BOOL unknown2) { invoke<Void>(0xBF1A602B5BA52FEE, x1, y1, z1, x2, y2, z2, unknown1, unknown2); } // 0xBF1A602B5BA52FEE 0xEBC7B918 b323
-	// /* Corrected conflicting parameter names */
-	static void SET_ROADS_IN_ANGLED_AREA(float x1, float y1, float z1, float x2, float y2, float z2, float angle, BOOL unknown1, BOOL unknown2, BOOL unknown3) { invoke<Void>(0x1A5AA1208AF5DB59, x1, y1, z1, x2, y2, z2, angle, unknown1, unknown2, unknown3); } // 0x1A5AA1208AF5DB59 0xBD088F4B b323
+namespace PATHFIND
+{
+	// When nodeEnabled is set to false, all nodes in the area get disabled.
+	// `GET_VEHICLE_NODE_IS_SWITCHED_OFF` returns true afterwards.
+	// If it's true, `GET_VEHICLE_NODE_IS_SWITCHED_OFF` returns false.
+	static void SET_ROADS_IN_AREA(float x1, float y1, float z1, float x2, float y2, float z2, BOOL nodeEnabled, BOOL unknown2) { invoke<Void>(0xBF1A602B5BA52FEE, x1, y1, z1, x2, y2, z2, nodeEnabled, unknown2); } // 0xBF1A602B5BA52FEE 0xEBC7B918 b323
+	// unknown3 is related to `SEND_SCRIPT_WORLD_STATE_EVENT > CNetworkRoadNodeWorldStateData` in networked environments.
+	// See IS_POINT_IN_ANGLED_AREA for the definition of an angled area.
+	static void SET_ROADS_IN_ANGLED_AREA(float x1, float y1, float z1, float x2, float y2, float z2, float width, BOOL unknown1, BOOL unknown2, BOOL unknown3) { invoke<Void>(0x1A5AA1208AF5DB59, x1, y1, z1, x2, y2, z2, width, unknown1, unknown2, unknown3); } // 0x1A5AA1208AF5DB59 0xBD088F4B b323
 	static void SET_PED_PATHS_IN_AREA(float x1, float y1, float z1, float x2, float y2, float z2, BOOL unknown, Any p7) { invoke<Void>(0x34F060F4BF92E018, x1, y1, z1, x2, y2, z2, unknown, p7); } // 0x34F060F4BF92E018 0x2148EA84 b323
+	// Flags are:
+	// 1 = 1 = B02_IsFootpath
+	// 2 = 4 = !B15_InteractionUnk
+	// 4 = 0x20 = !B14_IsInterior
+	// 8 = 0x40 = !B07_IsWater
+	// 16 = 0x200 = B17_IsFlatGround
 	// When onGround == true outPosition is a position located on the nearest pavement.
 	// 
 	// When a safe coord could not be found the result of a function is false and outPosition == Vector3.Zero.
@@ -8152,13 +8927,13 @@ namespace PATHFIND {
 	// Returns the id.
 	static int GET_NTH_CLOSEST_VEHICLE_NODE_ID(float x, float y, float z, int nth, int nodetype, float p5, float p6) { return invoke<int>(0x22D7275A79FE8215, x, y, z, nth, nodetype, p5, p6); } // 0x22D7275A79FE8215 0x3F358BEA b323
 	// Get the nth closest vehicle node and its heading. (unknown2 = 9, unknown3 = 3.0, unknown4 = 2.5)
-	static BOOL GET_NTH_CLOSEST_VEHICLE_NODE_WITH_HEADING(float x, float y, float z, int nthClosest, Vector3* outPosition, float* heading, Any* unknown1, int unknown2, float unknown3, float unknown4) { return invoke<BOOL>(0x80CA6A8B6C094CC4, x, y, z, nthClosest, outPosition, heading, unknown1, unknown2, unknown3, unknown4); } // 0x80CA6A8B6C094CC4 0x7349C856 b323
-	static BOOL GET_NTH_CLOSEST_VEHICLE_NODE_ID_WITH_HEADING(float x, float y, float z, int nthClosest, Vector3* outPosition, float outHeading, Any p6, float p7, float p8) { return invoke<BOOL>(0x6448050E9C2A7207, x, y, z, nthClosest, outPosition, outHeading, p6, p7, p8); } // 0x6448050E9C2A7207 0xC1AEB88D b323
+	static BOOL GET_NTH_CLOSEST_VEHICLE_NODE_WITH_HEADING(float x, float y, float z, int nthClosest, Vector3* outPosition, float* outHeading, Any* unknown1, int unknown2, float unknown3, float unknown4) { return invoke<BOOL>(0x80CA6A8B6C094CC4, x, y, z, nthClosest, outPosition, outHeading, unknown1, unknown2, unknown3, unknown4); } // 0x80CA6A8B6C094CC4 0x7349C856 b323
+	static int GET_NTH_CLOSEST_VEHICLE_NODE_ID_WITH_HEADING(float x, float y, float z, int nthClosest, Vector3* outPosition, float* outHeading, Any p6, float p7, float p8) { return invoke<int>(0x6448050E9C2A7207, x, y, z, nthClosest, outPosition, outHeading, p6, p7, p8); } // 0x6448050E9C2A7207 0xC1AEB88D b323
 	// See gtaforums.com/topic/843561-pathfind-node-types for node type info. 0 = paved road only, 1 = any road, 3 = water
 	// 
-	// p10 always equal 0x40400000
-	// p11 always equal 0
-	static BOOL GET_NTH_CLOSEST_VEHICLE_NODE_FAVOUR_DIRECTION(float x, float y, float z, float desiredX, float desiredY, float desiredZ, int nthClosest, Vector3* outPosition, float* outHeading, int nodetype, Any p10, Any p11) { return invoke<BOOL>(0x45905BE8654AE067, x, y, z, desiredX, desiredY, desiredZ, nthClosest, outPosition, outHeading, nodetype, p10, p11); } // 0x45905BE8654AE067 0x928A4DEC b323
+	// p10 always equals 3.0
+	// p11 always equals 0
+	static BOOL GET_NTH_CLOSEST_VEHICLE_NODE_FAVOUR_DIRECTION(float x, float y, float z, float desiredX, float desiredY, float desiredZ, int nthClosest, Vector3* outPosition, float* outHeading, int nodetype, float p10, Any p11) { return invoke<BOOL>(0x45905BE8654AE067, x, y, z, desiredX, desiredY, desiredZ, nthClosest, outPosition, outHeading, nodetype, p10, p11); } // 0x45905BE8654AE067 0x928A4DEC b323
 	// MulleDK19: Gets the density and flags of the closest node to the specified position.
 	// Density is a value between 0 and 15, indicating how busy the road is.
 	// Flags is a bit field.
@@ -8178,15 +8953,19 @@ namespace PATHFIND {
 	static BOOL GET_VEHICLE_NODE_IS_SWITCHED_OFF(int nodeID) { return invoke<BOOL>(0x4F5070AA58F69279, nodeID); } // 0x4F5070AA58F69279 0x56737A3C b323
 	// p1 seems to be always 1.0f in the scripts
 	static Any GET_CLOSEST_ROAD(float x, float y, float z, float p3, int p4, Vector3* p5, Vector3* p6, Any* p7, Any* p8, float* p9, BOOL p10) { return invoke<Any>(0x132F52BBA570FE92, x, y, z, p3, p4, p5, p6, p7, p8, p9, p10); } // 0x132F52BBA570FE92 0x567B0E11 b323
-	// SET_ALL_PATHS_CACHE_BOUNDINGSTRUCT ?
-	static void _0x228E5C6AD4D74BFD(BOOL toggle) { invoke<Void>(0x228E5C6AD4D74BFD, toggle); } // 0x228E5C6AD4D74BFD 0xD6A3B458 b323
+	// Toggles a global boolean, name is probably a hash collision but describes its functionality.
+	static void _SET_ALL_PATHS_CACHE_BOUNDINGSTRUCT(BOOL toggle) { invoke<Void>(0x228E5C6AD4D74BFD, toggle); } // 0x228E5C6AD4D74BFD 0xD6A3B458 b323
+	// Activates Cayo Perico path nodes if passed `1`. GPS navigation will start working, maybe more stuff will change, not sure. It seems if you try to unload (pass `0`) when close to the island, your game might crash.
+	static void _SET_AI_GLOBAL_PATH_NODES_TYPE(int type) { invoke<Void>(0xF74B1FFA4A15FBEA, type); } // 0xF74B1FFA4A15FBEA b2189
 	// ARE_*
-	static BOOL _ARE_PATH_NODES_LOADED_IN_AREA(float x1, float y1, float x2, float y2) { return invoke<BOOL>(0xF7B79A50B905A30D, x1, y1, x2, y2); } // 0xF7B79A50B905A30D 0x86E80A17 b323
-	static BOOL _0x07FB139B592FA687(float p0, float p1, float p2, float p3) { return invoke<BOOL>(0x07FB139B592FA687, p0, p1, p2, p3); } // 0x07FB139B592FA687 0x2CDA5012 b323
+	static BOOL ARE_NODES_LOADED_FOR_AREA(float x1, float y1, float x2, float y2) { return invoke<BOOL>(0xF7B79A50B905A30D, x1, y1, x2, y2); } // 0xF7B79A50B905A30D 0x86E80A17 b323
+	// Used internally for long range tasks
+	static BOOL _REQUEST_PATHS_PREFER_ACCURATE_BOUNDINGSTRUCT(float x1, float y1, float x2, float y2) { return invoke<BOOL>(0x07FB139B592FA687, x1, y1, x2, y2); } // 0x07FB139B592FA687 0x2CDA5012 b323
 	// missing a last parameter int p6 
 	static void SET_ROADS_BACK_TO_ORIGINAL(float p0, float p1, float p2, float p3, float p4, float p5, Any p6) { invoke<Void>(0x1EE7063B80FFC77C, p0, p1, p2, p3, p4, p5, p6); } // 0x1EE7063B80FFC77C 0x86AC4A85 b323
+	// See IS_POINT_IN_ANGLED_AREA for the definition of an angled area.
 	// bool p7 - always 1
-	static void SET_ROADS_BACK_TO_ORIGINAL_IN_ANGLED_AREA(float x1, float y1, float z1, float x2, float y2, float z2, float p6, Any p7) { invoke<Void>(0x0027501B9F3B407E, x1, y1, z1, x2, y2, z2, p6, p7); } // 0x0027501B9F3B407E 0x9DB5D209 b323
+	static void SET_ROADS_BACK_TO_ORIGINAL_IN_ANGLED_AREA(float x1, float y1, float z1, float x2, float y2, float z2, float width, Any p7) { invoke<Void>(0x0027501B9F3B407E, x1, y1, z1, x2, y2, z2, width, p7); } // 0x0027501B9F3B407E 0x9DB5D209 b323
 	static void SET_AMBIENT_PED_RANGE_MULTIPLIER_THIS_FRAME(float multiplier) { invoke<Void>(0x0B919E1FB47CC4E0, multiplier); } // 0x0B919E1FB47CC4E0 0x3C5085E4 b323
 	static void _0xAA76052DDA9BFC3E(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6) { invoke<Void>(0xAA76052DDA9BFC3E, p0, p1, p2, p3, p4, p5, p6); } // 0xAA76052DDA9BFC3E 0xD0F51299 b323
 	static void SET_PED_PATHS_BACK_TO_ORIGINAL(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6) { invoke<Void>(0xE04B48F2CC926253, p0, p1, p2, p3, p4, p5, p6); } // 0xE04B48F2CC926253 0x3F1ABDA4 b323
@@ -8199,46 +8978,47 @@ namespace PATHFIND {
 	// 
 	// Note: the names are returned as hashes, the strings can be returned using the function HUD::GET_STREET_NAME_FROM_HASH_KEY.
 	static void GET_STREET_NAME_AT_COORD(float x, float y, float z, Hash* streetName, Hash* crossingRoad) { invoke<Void>(0x2EB41072B4C1E4C0, x, y, z, streetName, crossingRoad); } // 0x2EB41072B4C1E4C0 0xDEBEEFCF b323
-	// Usage example:
+	// p3 is 0 in the only game script occurrence (trevor3) but 1 doesn't seem to make a difference
 	// 
-	// Public Function GenerateDirectionsToCoord(Pos As Vector3) As Tuple(Of String, Single, Single)
-	//         Dim f4, f5, f6 As New OutputArgument()
-	//         Native.Function.Call(Hash.GENERATE_DIRECTIONS_TO_COORD, Pos.X, Pos.Y, Pos.Z, True, f4, f5, f6)
-	//         Dim direction As String = f4.GetResult(Of Single)()
-	//         Return New Tuple(Of String, Single, Single)(direction.Substring(0, 1), f5.GetResult(Of Single)(), f6.GetResult(Of Single)())
-	//     End Function
-	// 
-	// p3 I use 1
+	// distToNxJunction seems to be the distance in metres * 10.0f
 	// 
 	// direction:
-	// 0 = You Have Arrive
-	// 1 = Recalculating Route, Please make a u-turn where safe
+	// 0 = This happens randomly during the drive for seemingly no reason but if you consider that this native is only used in trevor3, it seems to mean "Next frame, stop whatever's being said and tell the player the direction."
+	// 1 = Route is being calculated or the player is going in the wrong direction
 	// 2 = Please Proceed the Highlighted Route
-	// 3 = Keep Left (unsure)
-	// 4 = In (distToNxJunction) Turn Left
-	// 5 = In (distToNxJunction) Turn Right
-	// 6 = Keep Right (unsure)
-	// 7 = In (distToNxJunction) Go Straight Ahead
-	// 8 = In (distToNxJunction) Join the freeway
-	// 9 = In (distToNxJunction) Exit Freeway
+	// 3 = In (distToNxJunction) Turn Left
+	// 4 = In (distToNxJunction) Turn Right
+	// 5 = In (distToNxJunction) Keep Straight
+	// 6 = In (distToNxJunction) Turn Sharply To The Left
+	// 7 = In (distToNxJunction) Turn Sharply To The Right
+	// 8 = Route is being recalculated or the navmesh is confusing. This happens randomly during the drive but consistently at {2044.0358, 2996.6116, 44.9717} if you face towards the bar and the route needs you to turn right. In that particular case, it could be a bug with how the turn appears to be 270 deg. CCW instead of "right." Either way, this seems to be the engine saying "I don't know the route right now."
 	// 
 	// return value set to 0 always
 	static int GENERATE_DIRECTIONS_TO_COORD(float x, float y, float z, BOOL p3, int* direction, float* p5, float* distToNxJunction) { return invoke<int>(0xF90125F1F79ECDF8, x, y, z, p3, direction, p5, distToNxJunction); } // 0xF90125F1F79ECDF8 0xED35C094 b323
 	static void SET_IGNORE_NO_GPS_FLAG(BOOL toggle) { invoke<Void>(0x72751156E7678833, toggle); } // 0x72751156E7678833 0xB72CF194 b323
+	// See: SET_BLIP_ROUTE
 	static void _SET_IGNORE_SECONDARY_ROUTE_NODES(BOOL toggle) { invoke<Void>(0x1FC289A0C3FF470F, toggle); } // 0x1FC289A0C3FF470F 0x90DF7A4C b323
 	static void SET_GPS_DISABLED_ZONE(float x1, float y1, float z1, float x2, float y2, float z3) { invoke<Void>(0xDC20483CD3DD5201, x1, y1, z1, x2, y2, z3); } // 0xDC20483CD3DD5201 0x720B8073 b323
 	static int GET_GPS_BLIP_ROUTE_LENGTH() { return invoke<int>(0xBBB45C3CF5C8AA85); } // 0xBBB45C3CF5C8AA85 0x4B770634 b323
 	static Any _0xF3162836C28F9DA5(Any p0, Any p1, Any p2, Any p3) { return invoke<Any>(0xF3162836C28F9DA5, p0, p1, p2, p3); } // 0xF3162836C28F9DA5 b505
 	static BOOL GET_GPS_BLIP_ROUTE_FOUND() { return invoke<BOOL>(0x869DAACBBE9FA006); } // 0x869DAACBBE9FA006 0x286F82CC b323
-	static Any _GET_ROAD_SIDE_POINT_WITH_HEADING(Any p0, Any p1, Any p2, Any p3, Any p4) { return invoke<Any>(0xA0F8A7517A273C05, p0, p1, p2, p3, p4); } // 0xA0F8A7517A273C05 b463
-	static Any _GET_POINT_ON_ROAD_SIDE(Any p0, Any p1, Any p2, Any p3, Any p4) { return invoke<Any>(0x16F46FB18C8009E4, p0, p1, p2, p3, p4); } // 0x16F46FB18C8009E4 0xF6422F9A b323
+	static BOOL _GET_ROAD_SIDE_POINT_WITH_HEADING(float x, float y, float z, float heading, Vector3* outPosition) { return invoke<BOOL>(0xA0F8A7517A273C05, x, y, z, heading, outPosition); } // 0xA0F8A7517A273C05 b463
+	static BOOL _GET_POINT_ON_ROAD_SIDE(float x, float y, float z, int p3, Vector3* outPosition) { return invoke<BOOL>(0x16F46FB18C8009E4, x, y, z, p3, outPosition); } // 0x16F46FB18C8009E4 0xF6422F9A b323
 	// Gets a value indicating whether the specified position is on a road.
 	// The vehicle parameter is not implemented (ignored).
 	// 
 	// -MulleDK19
 	static BOOL IS_POINT_ON_ROAD(float x, float y, float z, Vehicle vehicle) { return invoke<BOOL>(0x125BF4ABFC536B09, x, y, z, vehicle); } // 0x125BF4ABFC536B09 0xCF198055 b323
+	// Gets the next zone that has been disabled using SET_GPS_DISABLED_ZONE_AT_INDEX.
 	static int GET_NEXT_GPS_DISABLED_ZONE_INDEX() { return invoke<int>(0xD3A6A0EF48823A8C); } // 0xD3A6A0EF48823A8C 0xBE92551F b323
+	// Disables the GPS route displayed on the minimap while within a certain zone (area). When in a disabled zone and creating a waypoint, the GPS route is not shown on the minimap until you are outside of the zone. When disabled, the direct distance is shown on minimap opposed to distance to travel. Seems to only work before setting a waypoint.
+	// You can clear the disabled zone with CLEAR_GPS_DISABLED_ZONE_AT_INDEX.
+	// 
+	// **Setting a waypoint at the same coordinate:**
+	// Disabled Zone: https://i.imgur.com/P9VUuxM.png
+	// Enabled Zone (normal): https://i.imgur.com/BPi24aw.png
 	static void SET_GPS_DISABLED_ZONE_AT_INDEX(float x1, float y1, float z1, float x2, float y2, float z2, int index) { invoke<Void>(0xD0BC1C6FB18EE154, x1, y1, z1, x2, y2, z2, index); } // 0xD0BC1C6FB18EE154 0x98BDB311 b323
+	// Clears a disabled GPS route area from a certain index previously set using `SET_GPS_DISABLED_ZONE_AT_INDEX`.
 	static void CLEAR_GPS_DISABLED_ZONE_AT_INDEX(int index) { invoke<Void>(0x2801D0012266DF07, index); } // 0x2801D0012266DF07 0x59090745 b323
 	static void ADD_NAVMESH_REQUIRED_REGION(float x, float y, float radius) { invoke<Void>(0x387EAD7EE42F6685, x, y, radius); } // 0x387EAD7EE42F6685 0x12B086EA b323
 	static void REMOVE_NAVMESH_REQUIRED_REGIONS() { invoke<Void>(0x916F0A3CDEC3445E); } // 0x916F0A3CDEC3445E 0x637BB680 b323
@@ -8255,25 +9035,34 @@ namespace PATHFIND {
 	static void UPDATE_NAVMESH_BLOCKING_OBJECT(Any p0, float p1, float p2, float p3, float p4, float p5, float p6, float p7, Any p8) { invoke<Void>(0x109E99373F290687, p0, p1, p2, p3, p4, p5, p6, p7, p8); } // 0x109E99373F290687 0x4E9776D0 b323
 	static void REMOVE_NAVMESH_BLOCKING_OBJECT(Any p0) { invoke<Void>(0x46399A7895957C0E, p0); } // 0x46399A7895957C0E 0x098602B0 b323
 	static BOOL DOES_NAVMESH_BLOCKING_OBJECT_EXIST(Any p0) { return invoke<BOOL>(0x0EAEB0DB4B132399, p0); } // 0x0EAEB0DB4B132399 0x4B67D7EE b323
-	static float _GET_HEIGHTMAP_TOP_Z_FOR_POSITION(float p0, float p1) { return invoke<float>(0x29C24BFBED8AB8FB, p0, p1); } // 0x29C24BFBED8AB8FB 0x3FE8C5A0 b323
-	static float _GET_HEIGHTMAP_TOP_Z_FOR_AREA(float p0, float p1, float p2, float p3) { return invoke<float>(0x8ABE8608576D9CE3, p0, p1, p2, p3); } // 0x8ABE8608576D9CE3 0x3ED21C90 b323
-	static float _GET_HEIGHTMAP_BOTTOM_Z_FOR_POSITION(float left, float right) { return invoke<float>(0x336511A34F2E5185, left, right); } // 0x336511A34F2E5185 0xA07C5B7D b323
-	static float _GET_HEIGHTMAP_BOTTOM_Z_FOR_AREA(float p0, float p1, float p2, float p3) { return invoke<float>(0x3599D741C9AC6310, p0, p1, p2, p3); } // 0x3599D741C9AC6310 0x76751DD4 b323
+	// Returns CGameWorldHeightMap's maximum Z value at specified point (grid node).
+	static float _GET_HEIGHTMAP_TOP_Z_FOR_POSITION(float x, float y) { return invoke<float>(0x29C24BFBED8AB8FB, x, y); } // 0x29C24BFBED8AB8FB 0x3FE8C5A0 b323
+	// Returns CGameWorldHeightMap's maximum Z among all grid nodes that intersect with the specified rectangle.
+	static float _GET_HEIGHTMAP_TOP_Z_FOR_AREA(float x1, float y1, float x2, float y2) { return invoke<float>(0x8ABE8608576D9CE3, x1, y1, x2, y2); } // 0x8ABE8608576D9CE3 0x3ED21C90 b323
+	// Returns CGameWorldHeightMap's minimum Z value at specified point (grid node).
+	static float _GET_HEIGHTMAP_BOTTOM_Z_FOR_POSITION(float x, float y) { return invoke<float>(0x336511A34F2E5185, x, y); } // 0x336511A34F2E5185 0xA07C5B7D b323
+	// Returns CGameWorldHeightMap's minimum Z among all grid nodes that intersect with the specified rectangle.
+	static float _GET_HEIGHTMAP_BOTTOM_Z_FOR_AREA(float x1, float y1, float x2, float y2) { return invoke<float>(0x3599D741C9AC6310, x1, y1, x2, y2); } // 0x3599D741C9AC6310 0x76751DD4 b323
 	// Calculates the travel distance between a set of points.
 	// 
 	// Doesn't seem to correlate with distance on gps sometimes.
+	// This function returns the value 100000.0 over long distances, seems to be a failure mode result, potentially occurring when not all path nodes are loaded into pathfind.
 	static float CALCULATE_TRAVEL_DISTANCE_BETWEEN_POINTS(float x1, float y1, float z1, float x2, float y2, float z2) { return invoke<float>(0xADD95C7005C4A197, x1, y1, z1, x2, y2, z2); } // 0xADD95C7005C4A197 0xB114489B b323
 }
 
-namespace PED {
+namespace PED
+{
 	// https://alloc8or.re/gta5/doc/enums/ePedType.txt
-	static Ped CREATE_PED(int pedType, Hash modelHash, float x, float y, float z, float heading, BOOL isNetwork, BOOL netMissionEntity) { return invoke<Ped>(0xD49F9B0955C367DE, pedType, modelHash, x, y, z, heading, isNetwork, netMissionEntity); } // 0xD49F9B0955C367DE 0x0389EF71 b323
+	// 
+	// Full list of peds by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/peds.json
+	static Ped CREATE_PED(int pedType, Hash modelHash, float x, float y, float z, float heading, BOOL isNetwork, BOOL bScriptHostPed) { return invoke<Ped>(0xD49F9B0955C367DE, pedType, modelHash, x, y, z, heading, isNetwork, bScriptHostPed); } // 0xD49F9B0955C367DE 0x0389EF71 b323
 	// Deletes the specified ped, then sets the handle pointed to by the pointer to NULL.
 	static void DELETE_PED(Ped* ped) { invoke<Void>(0x9614299DCB53E54B, ped); } // 0x9614299DCB53E54B 0x13EFB9A0 b323
 	// Example of Cloning Your Player:
 	// CLONE_PED(PLAYER_PED_ID(), GET_ENTITY_HEADING(PLAYER_PED_ID()), 0, 1);
-	static Ped CLONE_PED(Ped ped, float heading, BOOL isNetwork, BOOL netMissionEntity) { return invoke<Ped>(0xEF29A16337FACADB, ped, heading, isNetwork, netMissionEntity); } // 0xEF29A16337FACADB 0x8C8A8D6E b323
-	static Ped _CLONE_PED_EX(Ped ped, float heading, BOOL isNetwork, BOOL netMissionEntity, Any p4) { return invoke<Ped>(0x668FD40BCBA5DE48, ped, heading, isNetwork, netMissionEntity, p4); } // 0x668FD40BCBA5DE48 b463
+	static Ped CLONE_PED(Ped ped, float heading, BOOL isNetwork, BOOL bScriptHostPed) { return invoke<Ped>(0xEF29A16337FACADB, ped, heading, isNetwork, bScriptHostPed); } // 0xEF29A16337FACADB 0x8C8A8D6E b323
+	// Used one time in fmmc_launcher.c instead of CLONE_PED because ?
+	static Ped _CLONE_PED_EX(Ped ped, float heading, BOOL isNetwork, BOOL bScriptHostPed, Any p4) { return invoke<Ped>(0x668FD40BCBA5DE48, ped, heading, isNetwork, bScriptHostPed, p4); } // 0x668FD40BCBA5DE48 b463
 	// Copies ped's components and props to targetPed.
 	static void CLONE_PED_TO_TARGET(Ped ped, Ped targetPed) { invoke<Void>(0xE952D6431689AD9A, ped, targetPed); } // 0xE952D6431689AD9A 0xFC70EEC7 b323
 	static void _CLONE_PED_TO_TARGET_EX(Ped ped, Ped targetPed, Any p2) { invoke<Void>(0x148B08C2D2ACB884, ped, targetPed, p2); } // 0x148B08C2D2ACB884 b463
@@ -8314,7 +9103,9 @@ namespace PED {
 	// Returns true if the given ped has a valid pointer to CPlayerInfo in its CPed class. That's all.
 	static BOOL IS_PED_A_PLAYER(Ped ped) { return invoke<BOOL>(0x12534C348C6CB68B, ped); } // 0x12534C348C6CB68B 0x404794CA b323
 	// pedType: see CREATE_PED
-	static Ped CREATE_PED_INSIDE_VEHICLE(Vehicle vehicle, int pedType, Hash modelHash, int seat, BOOL isNetwork, BOOL netMissionEntity) { return invoke<Ped>(0x7DD959874C1FD534, vehicle, pedType, modelHash, seat, isNetwork, netMissionEntity); } // 0x7DD959874C1FD534 0x3000F092 b323
+	// 
+	// Full list of peds by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/peds.json
+	static Ped CREATE_PED_INSIDE_VEHICLE(Vehicle vehicle, int pedType, Hash modelHash, int seat, BOOL isNetwork, BOOL bScriptHostPed) { return invoke<Ped>(0x7DD959874C1FD534, vehicle, pedType, modelHash, seat, isNetwork, bScriptHostPed); } // 0x7DD959874C1FD534 0x3000F092 b323
 	static void SET_PED_DESIRED_HEADING(Ped ped, float heading) { invoke<Void>(0xAA5A7ECE2AA8FE70, ped, heading); } // 0xAA5A7ECE2AA8FE70 0x961458F9 b323
 	static void _FREEZE_PED_CAMERA_ROTATION(Ped ped) { invoke<Void>(0xFF287323B0E2C69A, ped); } // 0xFF287323B0E2C69A 0x290421BE b323
 	// angle is ped's view cone
@@ -8390,8 +9181,7 @@ namespace PED {
 	static BOOL IS_PED_MALE(Ped ped) { return invoke<BOOL>(0x6D9F5FAA7488BA46, ped); } // 0x6D9F5FAA7488BA46 0x90950455 b323
 	// Returns true/false if the ped is/isn't humanoid.
 	static BOOL IS_PED_HUMAN(Ped ped) { return invoke<BOOL>(0xB980061DA992779D, ped); } // 0xB980061DA992779D 0x194BB7B0 b323
-	// Gets the vehicle the specified Ped is in.
-	// 
+	// Gets the vehicle the specified Ped is in. Returns 0 if the ped is/was not in a vehicle.
 	// If the Ped is not in a vehicle and includeLastVehicle is true, the vehicle they were last in is returned.
 	static Vehicle GET_VEHICLE_PED_IS_IN(Ped ped, BOOL includeLastVehicle) { return invoke<Vehicle>(0x9A9112A0FE9A4713, ped, includeLastVehicle); } // 0x9A9112A0FE9A4713 0xAFE92319 b323
 	// Resets the value for the last vehicle driven by the Ped.
@@ -8403,8 +9193,7 @@ namespace PED {
 	// The distance between these points, is the diagonal of a box (remember it's 3D).
 	static void SET_PED_NON_CREATION_AREA(float x1, float y1, float z1, float x2, float y2, float z2) { invoke<Void>(0xEE01041D559983EA, x1, y1, z1, x2, y2, z2); } // 0xEE01041D559983EA 0x7A97283F b323
 	static void CLEAR_PED_NON_CREATION_AREA() { invoke<Void>(0x2E05208086BA0651); } // 0x2E05208086BA0651 0x6F7043A3 b323
-	// Something regarding ped population.
-	static void _0x4759CC730F947C81() { invoke<Void>(0x4759CC730F947C81); } // 0x4759CC730F947C81 0x8C555ADD b323
+	static void INSTANTLY_FILL_PED_POPULATION() { invoke<Void>(0x4759CC730F947C81); } // 0x4759CC730F947C81 0x8C555ADD b323
 	// Same function call as PED::GET_MOUNT, aka just returns 0
 	static BOOL IS_PED_ON_MOUNT(Ped ped) { return invoke<BOOL>(0x460BC76A0E10655E, ped); } // 0x460BC76A0E10655E 0x43103006 b323
 	// 
@@ -8432,10 +9221,12 @@ namespace PED {
 	// Maximum amount that a ped can theoretically have is 65535 (0xFFFF) since the amount is stored as an unsigned short (uint16_t) value.
 	static void SET_PED_MONEY(Ped ped, int amount) { invoke<Void>(0xA9C8960E8684C1B5, ped, amount); } // 0xA9C8960E8684C1B5 0x40D90BF2 b323
 	static int GET_PED_MONEY(Ped ped) { return invoke<int>(0x3F69145BBA87BAE7, ped); } // 0x3F69145BBA87BAE7 0xEB3C4C7E b323
+	// Related to Peds dropping pickup_health_snack; p0 is a value between [0.0, 1.0] that corresponds to drop rate
 	static void _0xFF4803BC019852D9(float p0, Any p1) { invoke<Void>(0xFF4803BC019852D9, p0, p1); } // 0xFF4803BC019852D9 0xD41C9AED b323
-	static void _0x6B0E6172C9A4D902(BOOL p0) { invoke<Void>(0x6B0E6172C9A4D902, p0); } // 0x6B0E6172C9A4D902 0x30B98369 b323
+	static void SET_AMBIENT_PEDS_DROP_MONEY(BOOL p0) { invoke<Void>(0x6B0E6172C9A4D902, p0); } // 0x6B0E6172C9A4D902 0x30B98369 b323
 	static void _0x9911F4A24485F653(BOOL p0) { invoke<Void>(0x9911F4A24485F653, p0); } // 0x9911F4A24485F653 0x02A080C8 b323
-	// ped cannot be headshot if this is set to false
+	// Ped no longer takes critical damage modifiers if set to FALSE.
+	// Example: Headshotting a player no longer one shots them. Instead they will take the same damage as a torso shot.
 	static void SET_PED_SUFFERS_CRITICAL_HITS(Ped ped, BOOL toggle) { invoke<Void>(0xEBD76F2359F190AC, ped, toggle); } // 0xEBD76F2359F190AC 0x6F6FC7E6 b323
 	// SET_PED_*
 	static void _0xAFC976FD0580C7B3(Ped ped, BOOL toggle) { invoke<Void>(0xAFC976FD0580C7B3, ped, toggle); } // 0xAFC976FD0580C7B3 0x1572022A b323
@@ -8505,7 +9296,7 @@ namespace PED {
 	static void SET_PED_PARACHUTE_TINT_INDEX(Ped ped, int tintIndex) { invoke<Void>(0x333FC8DB079B7186, ped, tintIndex); } // 0x333FC8DB079B7186 0x5AEFEC3A b323
 	static void GET_PED_PARACHUTE_TINT_INDEX(Ped ped, int* outTintIndex) { invoke<Void>(0xEAF5F7E5AE7C6C9D, ped, outTintIndex); } // 0xEAF5F7E5AE7C6C9D 0xE9E7FAC5 b323
 	static void SET_PED_RESERVE_PARACHUTE_TINT_INDEX(Ped ped, Any p1) { invoke<Void>(0xE88DA0751C22A2AD, ped, p1); } // 0xE88DA0751C22A2AD 0x177EFC79 b323
-	static Object _CREATE_PARACHUTE_OBJECT(Ped ped, BOOL p1, BOOL p2) { return invoke<Object>(0x8C4F3BF23B6237DB, ped, p1, p2); } // 0x8C4F3BF23B6237DB 0x19198A16 b323
+	static Object CREATE_PARACHUTE_BAG_OBJECT(Ped ped, BOOL p1, BOOL p2) { return invoke<Object>(0x8C4F3BF23B6237DB, ped, p1, p2); } // 0x8C4F3BF23B6237DB 0x19198A16 b323
 	// This is the SET_CHAR_DUCKING from GTA IV, that makes Peds duck. This function does nothing in GTA V. It cannot set the ped as ducking in vehicles, and IS_PED_DUCKING will always return false.
 	static void SET_PED_DUCKING(Ped ped, BOOL toggle) { invoke<Void>(0x030983CA930B692D, ped, toggle); } // 0x030983CA930B692D 0xB90353D7 b323
 	static BOOL IS_PED_DUCKING(Ped ped) { return invoke<BOOL>(0xD125AE748725C6BC, ped); } // 0xD125AE748725C6BC 0x9199C77D b323
@@ -8623,7 +9414,7 @@ namespace PED {
 	// Can't select void. This function returns nothing. The hash of the created relationship group is output in the second parameter.
 	static Any ADD_RELATIONSHIP_GROUP(const char* name, Hash* groupHash) { return invoke<Any>(0xF372BC22FCB88606, name, groupHash); } // 0xF372BC22FCB88606 0x8B635546 b323
 	static void REMOVE_RELATIONSHIP_GROUP(Hash groupHash) { invoke<Void>(0xB6BA2444AB393DA2, groupHash); } // 0xB6BA2444AB393DA2 0x4A1DC59A b323
-	static Any _DOES_RELATIONSHIP_GROUP_EXIST(Any p0) { return invoke<Any>(0xCC6E3B6BB69501F1, p0); } // 0xCC6E3B6BB69501F1 b505
+	static BOOL _DOES_RELATIONSHIP_GROUP_EXIST(Hash groupHash) { return invoke<BOOL>(0xCC6E3B6BB69501F1, groupHash); } // 0xCC6E3B6BB69501F1 b505
 	// Gets the relationship between two peds. This should be called twice (once for each ped).
 	// 
 	// Relationship types:
@@ -8657,11 +9448,13 @@ namespace PED {
 	// PED::GET_RELATIONSHIP_BETWEEN_GROUPS(l_1017, 0xA49E591C);
 	// PED::GET_RELATIONSHIP_BETWEEN_GROUPS(0xA49E591C, l_1017);
 	static int GET_RELATIONSHIP_BETWEEN_GROUPS(Hash group1, Hash group2) { return invoke<int>(0x9E6B70061662AE5C, group1, group2); } // 0x9E6B70061662AE5C 0x4E372FE2 b323
-	static void _0x5615E0C5EB2BC6E2(Any p0, Any p1) { invoke<Void>(0x5615E0C5EB2BC6E2, p0, p1); } // 0x5615E0C5EB2BC6E2 b877
-	static void _0xAD27D957598E49E9(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { invoke<Void>(0xAD27D957598E49E9, p0, p1, p2, p3, p4, p5); } // 0xAD27D957598E49E9 b1290
+	static void _SET_RELATIONSHIP_GROUP_DONT_AFFECT_WANTED_LEVEL(Hash group, BOOL p1) { invoke<Void>(0x5615E0C5EB2BC6E2, group, p1); } // 0x5615E0C5EB2BC6E2 b877
+	// Does something with ped relationships
+	static void _0xAD27D957598E49E9(Ped ped, Any p1, float p2, Hash hash, Any p4, Any p5) { invoke<Void>(0xAD27D957598E49E9, ped, p1, p2, hash, p4, p5); } // 0xAD27D957598E49E9 b1290
 	static void SET_PED_CAN_BE_TARGETED_WITHOUT_LOS(Ped ped, BOOL toggle) { invoke<Void>(0x4328652AE5769C71, ped, toggle); } // 0x4328652AE5769C71 0x7FDDC0A6 b323
 	static void SET_PED_TO_INFORM_RESPECTED_FRIENDS(Ped ped, float radius, int maxFriends) { invoke<Void>(0x112942C6E708F70B, ped, radius, maxFriends); } // 0x112942C6E708F70B 0xD78AC46C b323
 	static BOOL IS_PED_RESPONDING_TO_EVENT(Ped ped, Any event) { return invoke<BOOL>(0x625B774D75C87068, ped, event); } // 0x625B774D75C87068 0x7A877554 b323
+	static BOOL _GET_PED_EVENT_DATA(Ped ped, int eventType, Any* outData) { return invoke<BOOL>(0xBA656A3BB01BDEA3, ped, eventType, outData); } // 0xBA656A3BB01BDEA3 b2189
 	// FIRING_PATTERN_BURST_FIRE = 0xD6FF6D61 ( 1073727030 )
 	// FIRING_PATTERN_BURST_FIRE_IN_COVER = 0x026321F1 ( 40051185 )
 	// FIRING_PATTERN_BURST_FIRE_DRIVEBY = 0xD31265F2 ( -753768974 )
@@ -8746,32 +9539,7 @@ namespace PED {
 	static int _GET_TIME_OF_LAST_PED_WEAPON_DAMAGE(Ped ped, Hash weaponHash) { return invoke<int>(0x36B77BB84687C318, ped, weaponHash); } // 0x36B77BB84687C318 0x0170C6E1 b323
 	static void SET_PED_ALLOWED_TO_DUCK(Ped ped, BOOL toggle) { invoke<Void>(0xDA1F1B7BE1A8766F, ped, toggle); } // 0xDA1F1B7BE1A8766F 0xC4D122F8 b323
 	static void SET_PED_NEVER_LEAVES_GROUP(Ped ped, BOOL toggle) { invoke<Void>(0x3DBFC55D5C9BB447, ped, toggle); } // 0x3DBFC55D5C9BB447 0x0E038813 b323
-	// Ped Types: (ordered by return priority)
-	// 
-	// Michael = 0
-	// Franklin = 1
-	// Trevor = 2
-	// 
-	// Army = 29
-	// Animal = 28
-	// SWAT = 27
-	// LSFD = 21
-	// Paramedic = 20
-	// 
-	// Cop = 6
-	// 
-	// Male = 4
-	// Female = 5 
-	// 
-	// Human = 26
-	// 
-	// Note/Exception
-	// hc_gunman : 4 // Mix male and female
-	// hc_hacker : 4 // Mix male and female
-	// mp_f_misty_01 : 4 // Female character
-	// s_f_y_ranger_01 : 5 // Ranger
-	// s_m_y_ranger_01 : 4 // Ranger
-	// s_m_y_uscg_01 : 6 // US Coast Guard
+	// https://alloc8or.re/gta5/doc/enums/ePedType.txt
 	static int GET_PED_TYPE(Ped ped) { return invoke<int>(0xFF059E1E4C01E63C, ped); } // 0xFF059E1E4C01E63C 0xB1460D43 b323
 	// Turns the desired ped into a cop. If you use this on the player ped, you will become almost invisible to cops dispatched for you. You will also report your own crimes, get a generic cop voice, get a cop-vision-cone on the radar, and you will be unable to shoot at other cops. SWAT and Army will still shoot at you. Toggling ped as "false" has no effect; you must change p0's ped model to disable the effect.
 	static void SET_PED_AS_COP(Ped ped, BOOL toggle) { invoke<Void>(0xBB03C38DD3FB7FFD, ped, toggle); } // 0xBB03C38DD3FB7FFD 0x84E7DE9F b323
@@ -8784,14 +9552,11 @@ namespace PED {
 	static void SET_PED_MAX_TIME_UNDERWATER(Ped ped, float value) { invoke<Void>(0x6BA428C528D9E522, ped, value); } // 0x6BA428C528D9E522 0x082EF240 b323
 	static void _0x2735233A786B1BEF(Ped ped, float p1) { invoke<Void>(0x2735233A786B1BEF, ped, p1); } // 0x2735233A786B1BEF 0x373CC405 b323
 	// seatIndex must be <= 2
-	static void SET_PED_VEHICLE_FORCED_SEAT_USAGE(Ped ped, Vehicle vehicle, int seatIndex, int flags) { invoke<Void>(0x952F06BEECD775CC, ped, vehicle, seatIndex, flags); } // 0x952F06BEECD775CC 0x79CA237B b323
+	static void SET_PED_VEHICLE_FORCED_SEAT_USAGE(Ped ped, Vehicle vehicle, int seatIndex, int flags, Any p4) { invoke<Void>(0x952F06BEECD775CC, ped, vehicle, seatIndex, flags, p4); } // 0x952F06BEECD775CC 0x79CA237B b323
 	static void CLEAR_ALL_PED_VEHICLE_FORCED_SEAT_USAGE(Ped ped) { invoke<Void>(0xE6CA85E7259CE16B, ped); } // 0xE6CA85E7259CE16B 0xCC1D8F66 b323
 	// This native does absolutely nothing, just a nullsub
 	static void _0xB282749D5E028163(Any p0, Any p1) { invoke<Void>(0xB282749D5E028163, p0, p1); } // 0xB282749D5E028163 b877
-	// 0 = can (bike)
-	// 1 = can't (bike)
-	// 2 = unk 
-	// 3 = unk
+	// state: https://alloc8or.re/gta5/doc/enums/eKnockOffVehicle.txt
 	static void SET_PED_CAN_BE_KNOCKED_OFF_VEHICLE(Ped ped, int state) { invoke<Void>(0x7A6535691B477C48, ped, state); } // 0x7A6535691B477C48 0x8A251612 b323
 	static BOOL CAN_KNOCK_PED_OFF_VEHICLE(Ped ped) { return invoke<BOOL>(0x51AC07A44D4F5B8A, ped); } // 0x51AC07A44D4F5B8A 0xC9D098B3 b323
 	static void KNOCK_PED_OFF_VEHICLE(Ped ped) { invoke<Void>(0x45BBCBA77C29A841, ped); } // 0x45BBCBA77C29A841 0xACDD0674 b323
@@ -8825,6 +9590,7 @@ namespace PED {
 	static BOOL IS_PED_TRYING_TO_ENTER_A_LOCKED_VEHICLE(Ped ped) { return invoke<BOOL>(0x44D28D5DDFE5F68C, ped); } // 0x44D28D5DDFE5F68C 0x46828B4E b323
 	// ped can not pull out a weapon when true
 	static void SET_ENABLE_HANDCUFFS(Ped ped, BOOL toggle) { invoke<Void>(0xDF1AF8B5D56542FA, ped, toggle); } // 0xDF1AF8B5D56542FA 0xAC9BBA23 b323
+	// Used with SET_ENABLE_HANDCUFFS in decompiled scripts. From my observations, I have noticed that while being ragdolled you are not able to get up but you can still run. Your legs can also bend.
 	static void SET_ENABLE_BOUND_ANKLES(Ped ped, BOOL toggle) { invoke<Void>(0xC52E0F855C58FC2E, ped, toggle); } // 0xC52E0F855C58FC2E 0x9208D689 b323
 	// Enables diving motion when underwater.
 	static void SET_ENABLE_SCUBA(Ped ped, BOOL toggle) { invoke<Void>(0xF99F62004024D506, ped, toggle); } // 0xF99F62004024D506 0x7BF61471 b323
@@ -8849,10 +9615,7 @@ namespace PED {
 	// value ranges from 0 to 3.
 	static void SET_PED_ALERTNESS(Ped ped, int value) { invoke<Void>(0xDBA71115ED9941A6, ped, value); } // 0xDBA71115ED9941A6 0x2C32D9AE b323
 	static void SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE(Ped ped, BOOL toggle) { invoke<Void>(0xBC0ED94165A48BC2, ped, toggle); } // 0xBC0ED94165A48BC2 0x89AD49FF b323
-	// p2 is usually 1.0f
-	// 
-	// EDIT 12/24/16: 
-	// p2 does absolutely nothing no matter what the value is. 
+	// transitionSpeed is the time in seconds it takes to transition from one movement clipset to another.	ransitionSpeed is usually 1.0f
 	// 
 	// List of movement clipsets:
 	// Thanks to elsewhat for list.
@@ -8904,13 +9667,16 @@ namespace PED {
 	//  "MOVE_F@TOUGH_GUY@"
 	// 
 	// ~ NotCrunchyTaco
-	static void SET_PED_MOVEMENT_CLIPSET(Ped ped, const char* clipSet, float p2) { invoke<Void>(0xAF8A94EDE7712BEF, ped, clipSet, p2); } // 0xAF8A94EDE7712BEF 0xA817CDEB b323
+	// 
+	// Full list of movement clipsets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/movementClipsetsCompact.json
+	static void SET_PED_MOVEMENT_CLIPSET(Ped ped, const char* clipSet, float transitionSpeed) { invoke<Void>(0xAF8A94EDE7712BEF, ped, clipSet, transitionSpeed); } // 0xAF8A94EDE7712BEF 0xA817CDEB b323
 	// If p1 is 0.0, I believe you are back to normal. 
 	// If p1 is 1.0, it looks like you can only rotate the ped, not walk.
 	// 
 	// Using the following code to reset back to normal
 	// PED::RESET_PED_MOVEMENT_CLIPSET(PLAYER::PLAYER_PED_ID(), 0.0);
 	static void RESET_PED_MOVEMENT_CLIPSET(Ped ped, float p1) { invoke<Void>(0xAA74EC0CB0AAEA2C, ped, p1); } // 0xAA74EC0CB0AAEA2C 0xB83CEE93 b323
+	// Full list of movement clipsets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/movementClipsetsCompact.json
 	static void SET_PED_STRAFE_CLIPSET(Ped ped, const char* clipSet) { invoke<Void>(0x29A28F3F8CF6D854, ped, clipSet); } // 0x29A28F3F8CF6D854 0x0BACF010 b323
 	static void RESET_PED_STRAFE_CLIPSET(Ped ped) { invoke<Void>(0x20510814175EA477, ped); } // 0x20510814175EA477 0xF1967A12 b323
 	static void SET_PED_WEAPON_MOVEMENT_CLIPSET(Ped ped, const char* clipSet) { invoke<Void>(0x2622E35B77D3ACA2, ped, clipSet); } // 0x2622E35B77D3ACA2 0xF8BE54DC b323
@@ -8936,8 +9702,11 @@ namespace PED {
 	// PED::SET_PED_IN_VEHICLE_CONTEXT(PLAYER::PLAYER_PED_ID(), MISC::GET_HASH_KEY("MISSFBI5_TREVOR_DRIVING"));
 	static void SET_PED_IN_VEHICLE_CONTEXT(Ped ped, Hash context) { invoke<Void>(0x530071295899A8C6, ped, context); } // 0x530071295899A8C6 0x27F25C0E b323
 	static void RESET_PED_IN_VEHICLE_CONTEXT(Ped ped) { invoke<Void>(0x22EF8FF8778030EB, ped); } // 0x22EF8FF8778030EB 0x3C94D88A b323
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static BOOL IS_SCRIPTED_SCENARIO_PED_USING_CONDITIONAL_ANIM(Ped ped, const char* animDict, const char* anim) { return invoke<BOOL>(0x6EC47A344923E1ED, ped, animDict, anim); } // 0x6EC47A344923E1ED 0x3C30B447 b323
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
+	// 
+	// Full list of movement clipsets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/movementClipsetsCompact.json
 	static void SET_PED_ALTERNATE_WALK_ANIM(Ped ped, const char* animDict, const char* animName, float p3, BOOL p4) { invoke<Void>(0x6C60394CB4F75E9A, ped, animDict, animName, p3, p4); } // 0x6C60394CB4F75E9A 0x895E1D67 b323
 	static void CLEAR_PED_ALTERNATE_WALK_ANIM(Ped ped, float p1) { invoke<Void>(0x8844BBFCE30AA9E9, ped, p1); } // 0x8844BBFCE30AA9E9 0x5736FB23 b323
 	// stance:
@@ -8947,7 +9716,9 @@ namespace PED {
 	// 
 	// p5 = usually set to true
 	// 
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
+	// 
+	// Full list of movement clipsets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/movementClipsetsCompact.json
 	static void SET_PED_ALTERNATE_MOVEMENT_ANIM(Ped ped, int stance, const char* animDictionary, const char* animationName, float p4, BOOL p5) { invoke<Void>(0x90A43CC281FFAB46, ped, stance, animDictionary, animationName, p4, p5); } // 0x90A43CC281FFAB46 0xBA84FD8C b323
 	static void CLEAR_PED_ALTERNATE_MOVEMENT_ANIM(Ped ped, int stance, float p2) { invoke<Void>(0xD8D19675ED5FBDCE, ped, stance, p2); } // 0xD8D19675ED5FBDCE 0x7A7F5BC3 b323
 	// From the scripts:
@@ -8956,7 +9727,9 @@ namespace PED {
 	// PED::SET_PED_GESTURE_GROUP(PLAYER::PLAYER_PED_ID(),
 	// "ANIM_GROUP_GESTURE_MISS_DocksSetup1");
 	static void SET_PED_GESTURE_GROUP(Ped ped, const char* animGroupGesture) { invoke<Void>(0xDDF803377F94AAA8, ped, animGroupGesture); } // 0xDDF803377F94AAA8 0x170DA109 b323
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static Vector3 GET_ANIM_INITIAL_OFFSET_POSITION(const char* animDict, const char* animName, float x, float y, float z, float xRot, float yRot, float zRot, float p8, int p9) { return invoke<Vector3>(0xBE22B26DD764C040, animDict, animName, x, y, z, xRot, yRot, zRot, p8, p9); } // 0xBE22B26DD764C040 0xC59D4268 b323
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static Vector3 GET_ANIM_INITIAL_OFFSET_ROTATION(const char* animDict, const char* animName, float x, float y, float z, float xRot, float yRot, float zRot, float p8, int p9) { return invoke<Vector3>(0x4B805E6046EE9E47, animDict, animName, x, y, z, xRot, yRot, zRot, p8, p9); } // 0x4B805E6046EE9E47 0x5F7789E6 b323
 	// Ids
 	// 0 - Head
@@ -9008,6 +9781,8 @@ namespace PED {
 	// 
 	// List of component/props ID
 	// gtaxscripting.blogspot.com/2016/04/gta-v-peds-component-and-props.html
+	// 
+	// Full list of ped components by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pedComponentVariations.json
 	static BOOL IS_PED_COMPONENT_VARIATION_VALID(Ped ped, int componentId, int drawableId, int textureId) { return invoke<BOOL>(0xE825F6B6CEA7671D, ped, componentId, drawableId, textureId); } // 0xE825F6B6CEA7671D 0x952ABD9A b323
 	// paletteId/palletColor -  0 to 3. 
 	// enum PedVariationData
@@ -9030,6 +9805,8 @@ namespace PED {
 	// 
 	// List of component/props ID
 	// gtaxscripting.blogspot.com/2016/04/gta-v-peds-component-and-props.html
+	// 
+	// Full list of ped components by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pedComponentVariations.json
 	static void SET_PED_COMPONENT_VARIATION(Ped ped, int componentId, int drawableId, int textureId, int paletteId) { invoke<Void>(0x262B14F48D29DE80, ped, componentId, drawableId, textureId, paletteId); } // 0x262B14F48D29DE80 0xD4F7B05C b323
 	// p1 is always 0 in R* scripts.
 	// 
@@ -9073,8 +9850,40 @@ namespace PED {
 	// Used for freemode (online) characters.
 	// 
 	// For some reason, the scripts use a rounded float for the index.
+	// Indexes:
+	// 1. black
+	// 2. very light blue/green
+	// 3. dark blue
+	// 4. brown
+	// 5. darker brown
+	// 6. light brown
+	// 7. blue
+	// 8. light blue
+	// 9. pink
+	// 10. yellow
+	// 11. purple
+	// 12. black
+	// 13. dark green
+	// 14. light brown
+	// 15. yellow/black pattern
+	// 16. light colored spiral pattern
+	// 17. shiny red
+	// 18. shiny half blue/half red
+	// 19. half black/half light blue
+	// 20. white/red perimter
+	// 21. green snake
+	// 22. red snake
+	// 23. dark blue snake
+	// 24. dark yellow
+	// 25. bright yellow
+	// 26. all black
+	// 28. red small pupil
+	// 29. devil blue/black
+	// 30. white small pupil
+	// 31. glossed over
 	static void _SET_PED_EYE_COLOR(Ped ped, int index) { invoke<Void>(0x50B56988B170AFDF, ped, index); } // 0x50B56988B170AFDF b323
-	static Any _0x76BBA2CEE66D47E9(Any p0) { return invoke<Any>(0x76BBA2CEE66D47E9, p0); } // 0x76BBA2CEE66D47E9 b1011
+	// A getter for _SET_PED_EYE_COLOR. Returns -1 if fails to get.
+	static int _GET_PED_EYE_COLOR(Ped ped) { return invoke<int>(0x76BBA2CEE66D47E9, ped); } // 0x76BBA2CEE66D47E9 b1011
 	// OverlayID ranges from 0 to 12, index from 0 to _GET_NUM_OVERLAY_VALUES(overlayID)-1, and opacity from 0.0 to 1.0. 
 	// 
 	// overlayID       Part                  Index, to disable
@@ -9109,30 +9918,83 @@ namespace PED {
 	// Used for freemode (online) characters.
 	static int _GET_NUM_HAIR_COLORS() { return invoke<int>(0xE5C0CF872C2AD150); } // 0xE5C0CF872C2AD150 b323
 	static int _GET_NUM_MAKEUP_COLORS() { return invoke<int>(0xD1F7CA1535D22818); } // 0xD1F7CA1535D22818 b323
-	// GET_PED_*
-	static void _GET_PED_HAIR_RGB_COLOR(int p0, int* r, int* g, int* b) { invoke<Void>(0x4852FC386E2E1BB5, p0, r, g, b); } // 0x4852FC386E2E1BB5 b323
-	// GET_PED_*
-	static void _GET_PED_MAKEUP_RGB_COLOR(int p0, int* r, int* g, int* b) { invoke<Void>(0x013E5CFC38CD5387, p0, r, g, b); } // 0x013E5CFC38CD5387 b323
-	static BOOL _IS_PED_HAIR_COLOR_VALID_2(Any p0) { return invoke<BOOL>(0xED6D8E27A43B8CDE, p0); } // 0xED6D8E27A43B8CDE b323
+	// Input: Haircolor index, value between 0 and 63 (inclusive).
+	// Output: RGB values for the haircolor specified in the input.
+	// 
+	// This is used with the hair color swatches scaleform.
+	// Use `_0x013E5CFC38CD5387` to get the makeup colors.
+	static void _GET_PED_HAIR_RGB_COLOR(int hairColorIndex, int* outR, int* outG, int* outB) { invoke<Void>(0x4852FC386E2E1BB5, hairColorIndex, outR, outG, outB); } // 0x4852FC386E2E1BB5 b323
+	// Input: Makeup color index, value between 0 and 63 (inclusive).
+	// Output: RGB values for the makeup color specified in the input.
+	// 
+	// This is used with the makeup color swatches scaleform.
+	// Use `_0x4852FC386E2E1BB5` to get the hair colors.
+	static void _GET_PED_MAKEUP_RGB_COLOR(int makeupColorIndex, int* outR, int* outG, int* outB) { invoke<Void>(0x013E5CFC38CD5387, makeupColorIndex, outR, outG, outB); } // 0x013E5CFC38CD5387 b323
+	static BOOL _IS_PED_HAIR_COLOR_VALID_2(int colorId) { return invoke<BOOL>(0xED6D8E27A43B8CDE, colorId); } // 0xED6D8E27A43B8CDE b323
 	static int _0xEA9960D07DADCF10(Any p0) { return invoke<int>(0xEA9960D07DADCF10, p0); } // 0xEA9960D07DADCF10 b323
-	static BOOL _IS_PED_LIPSTICK_COLOR_VALID_2(Any p0) { return invoke<BOOL>(0x3E802F11FBE27674, p0); } // 0x3E802F11FBE27674 b323
-	static BOOL _IS_PED_BLUSH_COLOR_VALID_2(Any p0) { return invoke<BOOL>(0xF41B5D290C99A3D6, p0); } // 0xF41B5D290C99A3D6 b323
+	static BOOL _IS_PED_LIPSTICK_COLOR_VALID_2(int colorId) { return invoke<BOOL>(0x3E802F11FBE27674, colorId); } // 0x3E802F11FBE27674 b323
+	static BOOL _IS_PED_BLUSH_COLOR_VALID_2(int colorId) { return invoke<BOOL>(0xF41B5D290C99A3D6, colorId); } // 0xF41B5D290C99A3D6 b323
 	static BOOL _IS_PED_HAIR_COLOR_VALID(int colorID) { return invoke<BOOL>(0xE0D36E5D9E99CC21, colorID); } // 0xE0D36E5D9E99CC21 b323
 	static Any _0xAAA6A3698A69E048(Any p0) { return invoke<Any>(0xAAA6A3698A69E048, p0); } // 0xAAA6A3698A69E048 b323
 	static BOOL _IS_PED_LIPSTICK_COLOR_VALID(int colorID) { return invoke<BOOL>(0x0525A2C2562F3CD4, colorID); } // 0x0525A2C2562F3CD4 b323
 	static BOOL _IS_PED_BLUSH_COLOR_VALID(int colorID) { return invoke<BOOL>(0x604E810189EE3A59, colorID); } // 0x604E810189EE3A59 b323
-	static Any _0x09E7ECA981D9B210(Any p0) { return invoke<Any>(0x09E7ECA981D9B210, p0); } // 0x09E7ECA981D9B210 b1290
+	static BOOL _IS_PED_BODY_BLEMISH_VALID(int colorId) { return invoke<BOOL>(0x09E7ECA981D9B210, colorId); } // 0x09E7ECA981D9B210 b1290
 	static Any _0xC56FBF2F228E1DAC(Hash modelHash, Any p1, Any p2) { return invoke<Any>(0xC56FBF2F228E1DAC, modelHash, p1, p2); } // 0xC56FBF2F228E1DAC b323
 	// Sets the various freemode face features, e.g. nose length, chin shape. Scale ranges from -1.0 to 1.0.
 	// 
 	// Index can be 0 - 19
 	// 
-	// SET_PED_M*
+	// SET_PED_M* 
+	// 
+	// Here is the list of names. It starts at 0 and runs in sequence 
+	// 
+	// Face_Feature 
+	// 
+	// Nose_Width
+	// 
+	// Nose_Peak_Hight
+	// 
+	// Nose_Peak_Lenght
+	// 
+	// Nose_Bone_High
+	// 
+	// Nose_Peak_Lowering
+	// 
+	// Nose_Bone_Twist
+	// 
+	// EyeBrown_High
+	// 
+	// EyeBrown_Forward
+	// 
+	// Cheeks_Bone_High
+	// 
+	// Cheeks_Bone_Width 
+	// 
+	// Cheeks_Width
+	// 
+	// Eyes_Openning 
+	// 
+	// Lips_Thickness
+	// 
+	// Jaw_Bone_Width: Bone size to sides 
+	// 
+	// Jaw_Bone_Back_Lenght: Bone size to back 
+	// 
+	// Chimp_Bone_Lowering: Go Down
+	// 
+	// Chimp_Bone_Lenght: Go forward
+	// 
+	// Chimp_Bone_Width
+	// 
+	// Chimp_Hole
+	// 
+	// Neck_Thikness
 	static void _SET_PED_FACE_FEATURE(Ped ped, int index, float scale) { invoke<Void>(0x71A5C1DBA060049E, ped, index, scale); } // 0x71A5C1DBA060049E b323
 	static BOOL HAS_PED_HEAD_BLEND_FINISHED(Ped ped) { return invoke<BOOL>(0x654CD0A825161131, ped); } // 0x654CD0A825161131 0x2B1BD9C5 b323
-	static void _0x4668D80430D6C299(Ped ped) { invoke<Void>(0x4668D80430D6C299, ped); } // 0x4668D80430D6C299 0x894314A4 b323
+	static void FINALIZE_HEAD_BLEND(Ped ped) { invoke<Void>(0x4668D80430D6C299, ped); } // 0x4668D80430D6C299 0x894314A4 b323
 	// p4 seems to vary from 0 to 3.
-	static void SET_HEAD_BLEND_PALETTE_COLOR(Ped ped, int r, int g, int b, int p4) { invoke<Void>(0xCC9682B8951C5229, ped, r, g, b, p4); } // 0xCC9682B8951C5229 0x57E5B3F9 b323
+	// Preview: https://gfycat.com/MaleRareAmazonparrot
+	static void SET_HEAD_BLEND_PALETTE_COLOR(Ped ped, int r, int g, int b, int id) { invoke<Void>(0xCC9682B8951C5229, ped, r, g, b, id); } // 0xCC9682B8951C5229 0x57E5B3F9 b323
 	static void DISABLE_HEAD_BLEND_PALETTE_COLOR(Ped ped) { invoke<Void>(0xA21C118553BBDF02, ped); } // 0xA21C118553BBDF02 0xC6F36292 b323
 	// Type equals 0 for male non-dlc, 1 for female non-dlc, 2 for male dlc, and 3 for female dlc.
 	// 
@@ -9181,12 +10043,13 @@ namespace PED {
 	// List of component/props ID
 	// gtaxscripting.blogspot.com/2016/04/gta-v-peds-component-and-props.html
 	static int GET_PED_PROP_TEXTURE_INDEX(Ped ped, int componentId) { return invoke<int>(0xE131A28626F81AB2, ped, componentId); } // 0xE131A28626F81AB2 0x922A6653 b323
-	static void CLEAR_PED_PARACHUTE_PACK_VARIATION(Any p0) { invoke<Void>(0x1280804F7CFD2D6C, p0); } // 0x1280804F7CFD2D6C 0x7BCD8991 b323
-	// when player character is used plays remove scuba gear animation
-	static void _0x36C6984C3ED0C911(Any p0) { invoke<Void>(0x36C6984C3ED0C911, p0); } // 0x36C6984C3ED0C911 b323
+	static void CLEAR_PED_PARACHUTE_PACK_VARIATION(Ped ped) { invoke<Void>(0x1280804F7CFD2D6C, ped); } // 0x1280804F7CFD2D6C 0x7BCD8991 b323
+	// This native sets a scuba mask for freemode models and an oxygen bottle for player_* models. It works on freemode and player_* models.
+	static void _SET_PED_SCUBA_GEAR_VARIATION(Ped ped) { invoke<Void>(0x36C6984C3ED0C911, ped); } // 0x36C6984C3ED0C911 b323
+	// Removes the scubagear (for mp male: component id: 8, drawableId: 123, textureId: any) from peds. Does not play the 'remove scuba gear' animation, but instantly removes it.
 	static void CLEAR_PED_SCUBA_GEAR_VARIATION(Ped ped) { invoke<Void>(0xB50EB4CCB29704AC, ped); } // 0xB50EB4CCB29704AC 0x080275EE b323
 	static BOOL _0xFEC9A3B1820F3331(Any p0) { return invoke<BOOL>(0xFEC9A3B1820F3331, p0); } // 0xFEC9A3B1820F3331 b323
-	// works with AI::TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS to make a ped completely oblivious to all events going on around him
+	// works with TASK::TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS to make a ped completely oblivious to all events going on around him
 	static void SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(Ped ped, BOOL toggle) { invoke<Void>(0x9F8AA94D6D97DBF4, ped, toggle); } // 0x9F8AA94D6D97DBF4 0xDFE34E4A b323
 	static void SET_PED_BOUNDS_ORIENTATION(Ped ped, float p1, float p2, float p3, float p4, float p5) { invoke<Void>(0x4F5F651ACCC9C4CF, ped, p1, p2, p3, p4, p5); } // 0x4F5F651ACCC9C4CF 0xCFA20D68 b323
 	// PED::REGISTER_TARGET(l_216, PLAYER::PLAYER_PED_ID()); from re_prisonbreak.txt.
@@ -9256,7 +10119,12 @@ namespace PED {
 	// 
 	// [Example: Can prevent peds from falling when standing on moving vehicles.]
 	static BOOL CAN_PED_RAGDOLL(Ped ped) { return invoke<BOOL>(0x128F79EDCECE4FD5, ped); } // 0x128F79EDCECE4FD5 0xC0EFB7A3 b323
-	// time1- Time Ped is in ragdoll mode(ms)
+	// p4/p5: Unused in TU27
+	// Ragdoll Types:
+	// **0**: CTaskNMRelax
+	// **1**: CTaskNMScriptControl: Hardcoded not to work in networked environments.
+	// **Else**: CTaskNMBalance
+	// time1- Time(ms) Ped is in ragdoll mode; only applies to ragdoll types 0 and not 1.
 	// 
 	// time2- Unknown time, in milliseconds
 	// 
@@ -9480,7 +10348,10 @@ namespace PED {
 	// 
 	// Code:
 	// PED::_0x5F5D1665E352A839(PLAYER::PLAYER_PED_ID(), MISC::GET_HASH_KEY("mpbeach_overlays"), MISC::GET_HASH_KEY("fm_hair_fuzz"))
+	// 
+	// Full list of ped overlays / decorations by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pedOverlayCollections.json
 	static void ADD_PED_DECORATION_FROM_HASHES(Ped ped, Hash collection, Hash overlay) { invoke<Void>(0x5F5D1665E352A839, ped, collection, overlay); } // 0x5F5D1665E352A839 0x70559AC7 b323
+	// Full list of ped overlays / decorations by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pedOverlayCollections.json
 	static void ADD_PED_DECORATION_FROM_HASHES_IN_CORONA(Ped ped, Hash collection, Hash overlay) { invoke<Void>(0x5619BFA07CFD7833, ped, collection, overlay); } // 0x5619BFA07CFD7833 0x8CD3E487 b323
 	// Returns the zoneID for the overlay if it is a member of collection.
 	// enum ePedDecorationZone
@@ -9494,6 +10365,8 @@ namespace PED {
 	// 	ZONE_UNKNOWN = 6,
 	// 	ZONE_NONE = 7
 	// };
+	// 
+	// Full list of ped overlays / decorations by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/pedOverlayCollections.json
 	static int GET_PED_DECORATION_ZONE_FROM_HASHES(Hash collection, Hash overlay) { return invoke<int>(0x9FD452BFBE7A7A8B, collection, overlay); } // 0x9FD452BFBE7A7A8B 0x3543019E b323
 	static void CLEAR_PED_DECORATIONS(Ped ped) { invoke<Void>(0x0E5173C163976E38, ped); } // 0x0E5173C163976E38 0xD4496BF3 b323
 	static void CLEAR_PED_DECORATIONS_LEAVE_SCARS(Ped ped) { invoke<Void>(0xE3B27E70CEAB9F0C, ped); } // 0xE3B27E70CEAB9F0C 0xEFD58EB9 b323
@@ -9539,20 +10412,35 @@ namespace PED {
 	static void REMOVE_SCENARIO_BLOCKING_AREA(Any p0, BOOL p1) { invoke<Void>(0x31D16B74C6E29D66, p0, p1); } // 0x31D16B74C6E29D66 0x4483EF06 b323
 	static void SET_SCENARIO_PEDS_SPAWN_IN_SPHERE_AREA(float x, float y, float z, float range, int p4) { invoke<Void>(0x28157D43CF600981, x, y, z, range, p4); } // 0x28157D43CF600981 0x80EAD297 b323
 	static BOOL _DOES_SCENARIO_BLOCKING_AREA_EXIST(float x1, float y1, float z1, float x2, float y2, float z2) { return invoke<BOOL>(0x8A24B067D175A7BD, x1, y1, z1, x2, y2, z2); } // 0x8A24B067D175A7BD b678
+	// Full list of ped scenarios by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/scenariosCompact.json
 	static BOOL IS_PED_USING_SCENARIO(Ped ped, const char* scenario) { return invoke<BOOL>(0x1BF094736DD62C2E, ped, scenario); } // 0x1BF094736DD62C2E 0x0F65B0D4 b323
 	static BOOL IS_PED_USING_ANY_SCENARIO(Ped ped) { return invoke<BOOL>(0x57AB4A3080F85143, ped); } // 0x57AB4A3080F85143 0x195EF5B7 b323
 	static Any SET_PED_PANIC_EXIT_SCENARIO(Any p0, Any p1, Any p2, Any p3) { return invoke<Any>(0xFE07FF6495D52E2A, p0, p1, p2, p3); } // 0xFE07FF6495D52E2A 0x59DE73AC b323
 	static void _0x9A77DFD295E29B09(Any p0, BOOL p1) { invoke<Void>(0x9A77DFD295E29B09, p0, p1); } // 0x9A77DFD295E29B09 0xC08FE5F6 b323
 	static Any _0x25361A96E0F7E419(Any p0, Any p1, Any p2, Any p3) { return invoke<Any>(0x25361A96E0F7E419, p0, p1, p2, p3); } // 0x25361A96E0F7E419 0x58C0F6CF b323
 	static Any _0xEC6935EBE0847B90(Any p0, Any p1, Any p2, Any p3) { return invoke<Any>(0xEC6935EBE0847B90, p0, p1, p2, p3); } // 0xEC6935EBE0847B90 0x761F8F48 b323
-	static void _0xA3A9299C4F2ADB98(Any p0) { invoke<Void>(0xA3A9299C4F2ADB98, p0); } // 0xA3A9299C4F2ADB98 0x033F43FA b323
-	static void _0xF1C03A5352243A30(Any p0) { invoke<Void>(0xF1C03A5352243A30, p0); } // 0xF1C03A5352243A30 0x4C684C81 b323
-	static Any _0xEEED8FAFEC331A70(Any p0, Any p1, Any p2, Any p3) { return invoke<Any>(0xEEED8FAFEC331A70, p0, p1, p2, p3); } // 0xEEED8FAFEC331A70 0x7B4C3E6F b323
+	static void SET_PED_SHOULD_PLAY_NORMAL_SCENARIO_EXIT(Ped ped) { invoke<Void>(0xA3A9299C4F2ADB98, ped); } // 0xA3A9299C4F2ADB98 0x033F43FA b323
+	static void SET_PED_SHOULD_PLAY_IMMEDIATE_SCENARIO_EXIT(Ped ped) { invoke<Void>(0xF1C03A5352243A30, ped); } // 0xF1C03A5352243A30 0x4C684C81 b323
+	static Any SET_PED_SHOULD_PLAY_FLEE_SCENARIO_EXIT(Ped ped, Any p1, Any p2, Any p3) { return invoke<Any>(0xEEED8FAFEC331A70, ped, p1, p2, p3); } // 0xEEED8FAFEC331A70 0x7B4C3E6F b323
 	static void _0x425AECF167663F48(Ped ped, BOOL p1) { invoke<Void>(0x425AECF167663F48, ped, p1); } // 0x425AECF167663F48 0x5BC276AE b323
 	static void _0x5B6010B3CBC29095(Any p0, BOOL p1) { invoke<Void>(0x5B6010B3CBC29095, p0, p1); } // 0x5B6010B3CBC29095 b323
 	static void _0xCEDA60A74219D064(Any p0, BOOL p1) { invoke<Void>(0xCEDA60A74219D064, p0, p1); } // 0xCEDA60A74219D064 b323
+	static Any _0xC30BDAEE47256C13(Any p0) { return invoke<Any>(0xC30BDAEE47256C13, p0); } // 0xC30BDAEE47256C13 b1868
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static void PLAY_FACIAL_ANIM(Ped ped, const char* animName, const char* animDict) { invoke<Void>(0xE1E65CA8AC9C00ED, ped, animName, animDict); } // 0xE1E65CA8AC9C00ED 0x1F6CCDDE b323
-	static void _0x5687C7F05B39E401(Ped ped, const char* animDict) { invoke<Void>(0x5687C7F05B39E401, ped, animDict); } // 0x5687C7F05B39E401 b1493
+	// Clipsets:
+	// facials@gen_female@base
+	// facials@gen_male@base
+	// facials@p_m_zero@base
+	// 
+	// Typically followed with SET_FACIAL_IDLE_ANIM_OVERRIDE:
+	// mood_drunk_1
+	// mood_stressed_1
+	// mood_happy_1
+	// mood_talking_1
+	// 
+	static void _SET_FACIAL_CLIPSET_OVERRIDE(Ped ped, const char* animDict) { invoke<Void>(0x5687C7F05B39E401, ped, animDict); } // 0x5687C7F05B39E401 b1493
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static void SET_FACIAL_IDLE_ANIM_OVERRIDE(Ped ped, const char* animName, const char* animDict) { invoke<Void>(0xFFC24B988B938B38, ped, animName, animDict); } // 0xFFC24B988B938B38 0x9BA19C13 b323
 	static void CLEAR_FACIAL_IDLE_ANIM_OVERRIDE(Ped ped) { invoke<Void>(0x726256CC1EEB182F, ped); } // 0x726256CC1EEB182F 0x5244F4E2 b323
 	static void SET_PED_CAN_PLAY_GESTURE_ANIMS(Ped ped, BOOL toggle) { invoke<Void>(0xBAF20C5432058024, ped, toggle); } // 0xBAF20C5432058024 0xE131E3B3 b323
@@ -9632,6 +10520,8 @@ namespace PED {
 	// 
 	static void SET_PED_CONFIG_FLAG(Ped ped, int flagId, BOOL value) { invoke<Void>(0x1913FE4CBF41C463, ped, flagId, value); } // 0x1913FE4CBF41C463 0x9CFBE10D b323
 	// PED::SET_PED_RESET_FLAG(PLAYER::PLAYER_PED_ID(), 240, 1);
+	// Known values:
+	// PRF_PreventGoingIntoStillInVehicleState = 236 *(fanatic2.c)*
 	static void SET_PED_RESET_FLAG(Ped ped, int flagId, BOOL doReset) { invoke<Void>(0xC1E8A365BF3B29F2, ped, flagId, doReset); } // 0xC1E8A365BF3B29F2 0xCFF6FF66 b323
 	// p2 is always 1 in the scripts.
 	// 
@@ -9648,11 +10538,12 @@ namespace PED {
 	//         if (ENTITY::IS_ENTITY_A_VEHICLE(num3) != 0)
 	static BOOL IS_PED_EVASIVE_DIVING(Ped ped, Entity* evadingEntity) { return invoke<BOOL>(0x414641C26E105898, ped, evadingEntity); } // 0x414641C26E105898 0xD82829DC b323
 	static void SET_PED_SHOOTS_AT_COORD(Ped ped, float x, float y, float z, BOOL toggle) { invoke<Void>(0x96A05E4FB321B1BA, ped, x, y, z, toggle); } // 0x96A05E4FB321B1BA 0xFD64EAE5 b323
+	// Full list of peds by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/peds.json
 	static void SET_PED_MODEL_IS_SUPPRESSED(Hash modelHash, BOOL toggle) { invoke<Void>(0xE163A4BCE4DE6F11, modelHash, toggle); } // 0xE163A4BCE4DE6F11 0x7820CA43 b323
 	static void STOP_ANY_PED_MODEL_BEING_SUPPRESSED() { invoke<Void>(0xB47BD05FA66B40CF); } // 0xB47BD05FA66B40CF 0x5AD7DC55 b323
 	static void SET_PED_CAN_BE_TARGETED_WHEN_INJURED(Ped ped, BOOL toggle) { invoke<Void>(0x638C03B0F9878F57, ped, toggle); } // 0x638C03B0F9878F57 0x6FD9A7CD b323
 	static void SET_PED_GENERATES_DEAD_BODY_EVENTS(Ped ped, BOOL toggle) { invoke<Void>(0x7FB17BA2E7DECA5B, ped, toggle); } // 0x7FB17BA2E7DECA5B 0xE9B97A2B b323
-	static void _BLOCK_PED_DEAD_BODY_SHOCKING_EVENTS(Ped ped, BOOL p1) { invoke<Void>(0xE43A13C9E4CCCBCF, ped, p1); } // 0xE43A13C9E4CCCBCF 0xFF1F6AEB b323
+	static void _BLOCK_PED_DEAD_BODY_SHOCKING_EVENTS(Ped ped, BOOL toggle) { invoke<Void>(0xE43A13C9E4CCCBCF, ped, toggle); } // 0xE43A13C9E4CCCBCF 0xFF1F6AEB b323
 	static void _0x3E9679C1DFCF422C(Any p0, Any p1) { invoke<Void>(0x3E9679C1DFCF422C, p0, p1); } // 0x3E9679C1DFCF422C b877
 	static void SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(Ped ped, BOOL toggle) { invoke<Void>(0xDF993EE5E90ABA25, ped, toggle); } // 0xDF993EE5E90ABA25 0xE9BD733A b323
 	// PoliceMotorcycleHelmet   1024    
@@ -9664,8 +10555,7 @@ namespace PED {
 	// p2 is generally 4096 or 16384 in the scripts. p1 varies between 1 and 0.
 	static void GIVE_PED_HELMET(Ped ped, BOOL cannotRemove, int helmetFlag, int textureIndex) { invoke<Void>(0x54C7C4A94367717E, ped, cannotRemove, helmetFlag, textureIndex); } // 0x54C7C4A94367717E 0x1862A461 b323
 	static void REMOVE_PED_HELMET(Ped ped, BOOL instantly) { invoke<Void>(0xA7B2458D0AD6DED8, ped, instantly); } // 0xA7B2458D0AD6DED8 0x2086B1F0 b323
-	// IS_PED_*
-	static BOOL _0x14590DDBEDB1EC85(Ped ped) { return invoke<BOOL>(0x14590DDBEDB1EC85, ped); } // 0x14590DDBEDB1EC85 0xA1008E0E b323
+	static BOOL IS_PED_TAKING_OFF_HELMET(Ped ped) { return invoke<BOOL>(0x14590DDBEDB1EC85, ped); } // 0x14590DDBEDB1EC85 0xA1008E0E b323
 	static void SET_PED_HELMET(Ped ped, BOOL canWearHelmet) { invoke<Void>(0x560A43136EB58105, ped, canWearHelmet); } // 0x560A43136EB58105 0xED366E53 b323
 	static void SET_PED_HELMET_FLAG(Ped ped, int helmetFlag) { invoke<Void>(0xC0E78D5C2CE3EB25, ped, helmetFlag); } // 0xC0E78D5C2CE3EB25 0x12677780 b323
 	// List of component/props ID
@@ -9676,10 +10566,9 @@ namespace PED {
 	static void SET_PED_HELMET_TEXTURE_INDEX(Ped ped, int textureIndex) { invoke<Void>(0xF1550C4BD22582E2, ped, textureIndex); } // 0xF1550C4BD22582E2 0x5F6C3328 b323
 	// Returns true if the ped passed through the parenthesis is wearing a helmet.
 	static BOOL IS_PED_WEARING_HELMET(Ped ped) { return invoke<BOOL>(0xF33BDFE19B309B19, ped); } // 0xF33BDFE19B309B19 0x0D680D49 b323
-	// CLEAR_PED_*
-	static void _0x687C0B594907D2E8(Ped ped) { invoke<Void>(0x687C0B594907D2E8, ped); } // 0x687C0B594907D2E8 0x24A1284E b323
-	static Any _0x451294E859ECC018(Any p0) { return invoke<Any>(0x451294E859ECC018, p0); } // 0x451294E859ECC018 0x8A3A3116 b323
-	static Any _0x9D728C1E12BF5518(Any p0) { return invoke<Any>(0x9D728C1E12BF5518, p0); } // 0x9D728C1E12BF5518 0x74EB662D b323
+	static void CLEAR_PED_STORED_HAT_PROP(Ped ped) { invoke<Void>(0x687C0B594907D2E8, ped); } // 0x687C0B594907D2E8 0x24A1284E b323
+	static Any GET_PED_HELMET_STORED_HAT_PROP_INDEX(Ped ped) { return invoke<Any>(0x451294E859ECC018, ped); } // 0x451294E859ECC018 0x8A3A3116 b323
+	static Any GET_PED_HELMET_STORED_HAT_TEX_INDEX(Ped ped) { return invoke<Any>(0x9D728C1E12BF5518, ped); } // 0x9D728C1E12BF5518 0x74EB662D b323
 	static BOOL _0xF2385935BFFD4D92(Any p0) { return invoke<BOOL>(0xF2385935BFFD4D92, p0); } // 0xF2385935BFFD4D92 0xFFF149FE b323
 	static void SET_PED_TO_LOAD_COVER(Ped ped, BOOL toggle) { invoke<Void>(0x332B562EEDA62399, ped, toggle); } // 0x332B562EEDA62399 0xCF94BA97 b323
 	// It simply makes the said ped to cower behind cover object(wall, desk, car)
@@ -9767,12 +10656,7 @@ namespace PED {
 	static void SET_PED_BLOCKS_PATHING_WHEN_DEAD(Ped ped, BOOL toggle) { invoke<Void>(0x576594E8D64375E2, ped, toggle); } // 0x576594E8D64375E2 0x1D87DDC1 b323
 	static void _0xA52D5247A4227E14(Any p0) { invoke<Void>(0xA52D5247A4227E14, p0); } // 0xA52D5247A4227E14 0xB52BA5F5 b323
 	static BOOL IS_ANY_PED_NEAR_POINT(float x, float y, float z, float radius) { return invoke<BOOL>(0x083961498679DC9F, x, y, z, radius); } // 0x083961498679DC9F 0xFBD9B050 b323
-	// Function.Call(Hash._0x2208438012482A1A, ped, 0, 0);
-	// 
-	// This makes the ped have faster animations
-	// 
-	// FORCE_*
-	static void _0x2208438012482A1A(Ped ped, BOOL p1, BOOL p2) { invoke<Void>(0x2208438012482A1A, ped, p1, p2); } // 0x2208438012482A1A 0x187B9070 b323
+	static void FORCE_PED_AI_AND_ANIMATION_UPDATE(Ped ped, BOOL p1, BOOL p2) { invoke<Void>(0x2208438012482A1A, ped, p1, p2); } // 0x2208438012482A1A 0x187B9070 b323
 	static BOOL IS_PED_HEADING_TOWARDS_POSITION(Ped ped, float x, float y, float z, float p4) { return invoke<BOOL>(0xFCF37A457CB96DC0, ped, x, y, z, p4); } // 0xFCF37A457CB96DC0 0x45037B9B b323
 	static void REQUEST_PED_VISIBILITY_TRACKING(Ped ped) { invoke<Void>(0x7D7A2E43E74E2EB8, ped); } // 0x7D7A2E43E74E2EB8 0x840D24D3 b323
 	static void REQUEST_PED_VEHICLE_VISIBILITY_TRACKING(Ped ped, BOOL p1) { invoke<Void>(0x2BC338A7B21F4608, ped, p1); } // 0x2BC338A7B21F4608 0x31C31DAA b323
@@ -9919,14 +10803,22 @@ namespace PED {
 	// Something related to the environmental effects natives.
 	// In the "agency_heist3b" script, p1 - p3 are always under 100 - usually they are {87, 81, 68}. If SET_PED_ENVEFF_SCALE is set to 0.65 (instead of the usual 1.0), they use {74, 69, 60}
 	static void SET_PED_ENVEFF_COLOR_MODULATOR(Ped ped, int p1, int p2, int p3) { invoke<Void>(0xD69411AA0CEBF9E9, ped, p1, p2, p3); } // 0xD69411AA0CEBF9E9 0x87A0C174 b323
-	static void _SET_PED_REFLECTION_INTENSITY(Ped ped, float intensity) { invoke<Void>(0x4E90D746056E273D, ped, intensity); } // 0x4E90D746056E273D b944
-	static float _GET_PED_REFLECTION_INTENSITY(Ped ped) { return invoke<float>(0x1461B28A06717D68, ped); } // 0x1461B28A06717D68 b944
+	// intensity: 0.0f - 1.0f
+	// 
+	// This native sets the emissive intensity for the given ped. It is used for different 'glow' levels on illuminated clothing.
+	// 
+	// Old name: _SET_PED_REFLECTION_INTENSITY
+	static void _SET_PED_EMISSIVE_INTENSITY(Ped ped, float intensity) { invoke<Void>(0x4E90D746056E273D, ped, intensity); } // 0x4E90D746056E273D b944
+	// Old name: _GET_PED_REFLECTION_INTENSITY
+	// Use 0x4E90D746056E273D to set the illuminated clothing glow intensity for a specific ped.
+	// Returns a float between 0.0 and 1.0 representing the current illuminated clothing glow intensity.
+	static float _GET_PED_EMISSIVE_INTENSITY(Ped ped) { return invoke<float>(0x1461B28A06717D68, ped); } // 0x1461B28A06717D68 b944
 	static BOOL _IS_PED_SHADER_EFFECT_VALID(Ped ped) { return invoke<BOOL>(0x81AA517FBBA05D39, ped); } // 0x81AA517FBBA05D39 b944
 	static void _0xE906EC930F5FE7C8(Any p0, Any p1) { invoke<Void>(0xE906EC930F5FE7C8, p0, p1); } // 0xE906EC930F5FE7C8 b791
 	// This native does absolutely nothing, just a nullsub
 	static void _0x1216E0BFA72CC703(Any p0, Any p1) { invoke<Void>(0x1216E0BFA72CC703, p0, p1); } // 0x1216E0BFA72CC703 0x7BD26837 b323
-	static void _0x2B5AA717A181FB4C(Any p0, BOOL p1) { invoke<Void>(0x2B5AA717A181FB4C, p0, p1); } // 0x2B5AA717A181FB4C 0x98E29ED0 b323
-	// if (!$B8B52E498014F5B0(PLAYER::PLAYER_PED_ID())) {
+	// Enable/disable ped shadow (ambient occlusion). https://gfycat.com/thankfulesteemedgecko
+	static void SET_PED_AO_BLOB_RENDERING(Ped ped, BOOL toggle) { invoke<Void>(0x2B5AA717A181FB4C, ped, toggle); } // 0x2B5AA717A181FB4C 0x98E29ED0 b323
 	static BOOL _0xB8B52E498014F5B0(Ped ped) { return invoke<BOOL>(0xB8B52E498014F5B0, ped); } // 0xB8B52E498014F5B0 b323
 	// p6 always 2 (but it doesnt seem to matter...)
 	// 
@@ -9943,9 +10835,8 @@ namespace PED {
 	static float GET_SYNCHRONIZED_SCENE_RATE(int sceneID) { return invoke<float>(0xD80932D577274D40, sceneID); } // 0xD80932D577274D40 0x89365F0D b323
 	static void SET_SYNCHRONIZED_SCENE_LOOPED(int sceneID, BOOL toggle) { invoke<Void>(0xD9A897A4C6C2974F, sceneID, toggle); } // 0xD9A897A4C6C2974F 0x32ED9F82 b323
 	static BOOL IS_SYNCHRONIZED_SCENE_LOOPED(int sceneID) { return invoke<BOOL>(0x62522002E0C391BA, sceneID); } // 0x62522002E0C391BA 0x47D87A84 b323
-	static void _SET_SYNCHRONIZED_SCENE_OCCLUSION_PORTAL(Any sceneID, BOOL p1) { invoke<Void>(0x394B9CD12435C981, sceneID, p1); } // 0x394B9CD12435C981 0x2DE48DA1 b323
-	// IS_S*
-	static BOOL _0x7F2F4F13AC5257EF(Any p0) { return invoke<BOOL>(0x7F2F4F13AC5257EF, p0); } // 0x7F2F4F13AC5257EF 0x72CF2514 b323
+	static void SET_SYNCHRONIZED_SCENE_HOLD_LAST_FRAME(int sceneID, BOOL toggle) { invoke<Void>(0x394B9CD12435C981, sceneID, toggle); } // 0x394B9CD12435C981 0x2DE48DA1 b323
+	static BOOL IS_SYNCHRONIZED_SCENE_HOLD_LAST_FRAME(int sceneID) { return invoke<BOOL>(0x7F2F4F13AC5257EF, sceneID); } // 0x7F2F4F13AC5257EF 0x72CF2514 b323
 	static void ATTACH_SYNCHRONIZED_SCENE_TO_ENTITY(int sceneID, Entity entity, int boneIndex) { invoke<Void>(0x272E4723B56A3B96, sceneID, entity, boneIndex); } // 0x272E4723B56A3B96 0xE9BA6189 b323
 	static void DETACH_SYNCHRONIZED_SCENE(int sceneID) { invoke<Void>(0x6D38F1F04CBB37EA, sceneID); } // 0x6D38F1F04CBB37EA 0x52A1CAB2 b323
 	static void _DISPOSE_SYNCHRONIZED_SCENE(int scene) { invoke<Void>(0xCD9CC7E200A52A6F, scene); } // 0xCD9CC7E200A52A6F 0xBF7F9035 b323
@@ -9975,7 +10866,7 @@ namespace PED {
 	//             Unknown2 = -633298724,
 	//         }
 	static BOOL FORCE_PED_MOTION_STATE(Ped ped, Hash motionStateHash, BOOL p2, int p3, BOOL p4) { return invoke<BOOL>(0xF28965D04F570DCA, ped, motionStateHash, p2, p3, p4); } // 0xF28965D04F570DCA 0x164DDEFF b323
-	static BOOL _0xF60165E1D2C5370B(Ped ped, Any* p1, Any* p2) { return invoke<BOOL>(0xF60165E1D2C5370B, ped, p1, p2); } // 0xF60165E1D2C5370B b323
+	static BOOL _GET_PED_CURRENT_MOVEMENT_SPEED(Ped ped, float* speedX, float* speedY) { return invoke<BOOL>(0xF60165E1D2C5370B, ped, speedX, speedY); } // 0xF60165E1D2C5370B b323
 	static void SET_PED_MAX_MOVE_BLEND_RATIO(Ped ped, float value) { invoke<Void>(0x433083750C5E064A, ped, value); } // 0x433083750C5E064A 0xEAD0269A b323
 	static void SET_PED_MIN_MOVE_BLEND_RATIO(Ped ped, float value) { invoke<Void>(0x01A898D26E2333DD, ped, value); } // 0x01A898D26E2333DD 0x383EC364 b323
 	// Min: 0.00
@@ -9987,7 +10878,7 @@ namespace PED {
 	// Sprinting without fast run cheat: 66 m/s
 	// Sprinting with fast run cheat: 77 m/s
 	// 
-	// Does not need to be looped!
+	// Needs to be looped!
 	// 
 	// Note: According to IDA for the Xbox360 xex, when they check bgt they seem to have the min to 0.0f, but the max set to 1.15f not 10.0f.
 	static void SET_PED_MOVE_RATE_OVERRIDE(Ped ped, float value) { invoke<Void>(0x085BF80FA50A39D1, ped, value); } // 0x085BF80FA50A39D1 0x900008C6 b323
@@ -10040,8 +10931,7 @@ namespace PED {
 	// 
 	// Example: gtaforums.com/topic/789788-function-args-to-pedget-ped-nearby-peds/?p=1067386687
 	static int GET_PED_NEARBY_PEDS(Ped ped, int* sizeAndPeds, int ignore) { return invoke<int>(0x23F8F5FC7E8C4A6B, ped, sizeAndPeds, ignore); } // 0x23F8F5FC7E8C4A6B 0x4D3325F4 b323
-	// HAS_*
-	static BOOL _HAS_STREAMED_PED_ASSETS_LOADED(Ped ped) { return invoke<BOOL>(0x7350823473013C02, ped); } // 0x7350823473013C02 0xF9FB4B71 b323
+	static BOOL HAVE_ALL_STREAMING_REQUESTS_COMPLETED(Ped ped) { return invoke<BOOL>(0x7350823473013C02, ped); } // 0x7350823473013C02 0xF9FB4B71 b323
 	static BOOL IS_PED_USING_ACTION_MODE(Ped ped) { return invoke<BOOL>(0x00E73468D085F745, ped); } // 0x00E73468D085F745 0x5AE7EDA2 b323
 	// p2 is usually -1 in the scripts. action is either 0 or "DEFAULT_ACTION".
 	static void SET_PED_USING_ACTION_MODE(Ped ped, BOOL p1, int p2, const char* action) { invoke<Void>(0xD75ACCF5E0FB5367, ped, p1, p2, action); } // 0xD75ACCF5E0FB5367 0x8802F696 b323
@@ -10055,6 +10945,7 @@ namespace PED {
 	// gtaforums.com/topic/885580-ped-headshotmugshot-txd/
 	static int REGISTER_PEDHEADSHOT(Ped ped) { return invoke<int>(0x4462658788425076, ped); } // 0x4462658788425076 0xFFE2667B b323
 	static int _REGISTER_PEDHEADSHOT_3(Ped ped) { return invoke<int>(0xBA8805A1108A2515, ped); } // 0xBA8805A1108A2515 b877
+	// Similar to REGISTER_PEDHEADSHOT but creates a transparent background instead of black. Example: https://i.imgur.com/iHz8ztn.png
 	static int REGISTER_PEDHEADSHOT_TRANSPARENT(Ped ped) { return invoke<int>(0x953563CE563143AF, ped); } // 0x953563CE563143AF 0x4DD03628 b323
 	// gtaforums.com/topic/885580-ped-headshotmugshot-txd/
 	static void UNREGISTER_PEDHEADSHOT(int id) { invoke<Void>(0x96B1361D9B24C2FF, id); } // 0x96B1361D9B24C2FF 0x0879AE45 b323
@@ -10070,16 +10961,16 @@ namespace PED {
 	static BOOL HAS_PEDHEADSHOT_IMG_UPLOAD_FAILED() { return invoke<BOOL>(0x876928DDDFCCC9CD); } // 0x876928DDDFCCC9CD 0x05023F8F b323
 	static BOOL HAS_PEDHEADSHOT_IMG_UPLOAD_SUCCEEDED() { return invoke<BOOL>(0xE8A169E666CBC541); } // 0xE8A169E666CBC541 0xAA39FD6C b323
 	static void SET_PED_HEATSCALE_OVERRIDE(Ped ped, float heatScale) { invoke<Void>(0xC1F6EBF9A3D55538, ped, heatScale); } // 0xC1F6EBF9A3D55538 0xEF9142DB b323
-	static void DISABLE_PED_HEATSCALE_OVERRIDE(Any p0) { invoke<Void>(0x600048C60D5C2C51, p0); } // 0x600048C60D5C2C51 0x0688DE64 b323
-	static void _0x2DF9038C90AD5264(float p0, float p1, float p2, float p3, float p4, int interiorFlags, float scale, int duration) { invoke<Void>(0x2DF9038C90AD5264, p0, p1, p2, p3, p4, interiorFlags, scale, duration); } // 0x2DF9038C90AD5264 0x909A1D76 b323
-	static void _0xB2AFF10216DEFA2F(float x, float y, float z, float p3, float p4, float p5, float p6, int interiorFlags, float scale, int duration) { invoke<Void>(0xB2AFF10216DEFA2F, x, y, z, p3, p4, p5, p6, interiorFlags, scale, duration); } // 0xB2AFF10216DEFA2F 0x4AAD0ECB b323
-	static void _0xFEE4A5459472A9F8() { invoke<Void>(0xFEE4A5459472A9F8); } // 0xFEE4A5459472A9F8 0x492C9E46 b323
-	static Any _0x3C67506996001F5E() { return invoke<Any>(0x3C67506996001F5E); } // 0x3C67506996001F5E 0x814A28F4 b323
-	static Any _0xA586FBEB32A53DBB() { return invoke<Any>(0xA586FBEB32A53DBB); } // 0xA586FBEB32A53DBB 0x0B60D2BA b323
-	static Any _0xF445DE8DA80A1792() { return invoke<Any>(0xF445DE8DA80A1792); } // 0xF445DE8DA80A1792 0x6B83ABDF b323
-	static Any _0xA635C11B8C44AFC2() { return invoke<Any>(0xA635C11B8C44AFC2); } // 0xA635C11B8C44AFC2 0xF46B4DC8 b323
-	static void _0x280C7E3AC7F56E90(Any p0, Any* p1, Any* p2, Any* p3) { invoke<Void>(0x280C7E3AC7F56E90, p0, p1, p2, p3); } // 0x280C7E3AC7F56E90 0x36A4AC65 b323
-	static void _0xB782F8238512BAD5(Any p0, Any* p1) { invoke<Void>(0xB782F8238512BAD5, p0, p1); } // 0xB782F8238512BAD5 0xBA699DDF b323
+	static void DISABLE_PED_HEATSCALE_OVERRIDE(Ped ped) { invoke<Void>(0x600048C60D5C2C51, ped); } // 0x600048C60D5C2C51 0x0688DE64 b323
+	static void SPAWNPOINTS_START_SEARCH(float p0, float p1, float p2, float p3, float p4, int interiorFlags, float scale, int duration) { invoke<Void>(0x2DF9038C90AD5264, p0, p1, p2, p3, p4, interiorFlags, scale, duration); } // 0x2DF9038C90AD5264 0x909A1D76 b323
+	static void SPAWNPOINTS_START_SEARCH_IN_ANGLED_AREA(float x, float y, float z, float p3, float p4, float p5, float p6, int interiorFlags, float scale, int duration) { invoke<Void>(0xB2AFF10216DEFA2F, x, y, z, p3, p4, p5, p6, interiorFlags, scale, duration); } // 0xB2AFF10216DEFA2F 0x4AAD0ECB b323
+	static void SPAWNPOINTS_CANCEL_SEARCH() { invoke<Void>(0xFEE4A5459472A9F8); } // 0xFEE4A5459472A9F8 0x492C9E46 b323
+	static BOOL SPAWNPOINTS_IS_SEARCH_ACTIVE() { return invoke<BOOL>(0x3C67506996001F5E); } // 0x3C67506996001F5E 0x814A28F4 b323
+	static BOOL SPAWNPOINTS_IS_SEARCH_COMPLETE() { return invoke<BOOL>(0xA586FBEB32A53DBB); } // 0xA586FBEB32A53DBB 0x0B60D2BA b323
+	static BOOL SPAWNPOINTS_IS_SEARCH_FAILED() { return invoke<BOOL>(0xF445DE8DA80A1792); } // 0xF445DE8DA80A1792 0x6B83ABDF b323
+	static int SPAWNPOINTS_GET_NUM_SEARCH_RESULTS() { return invoke<int>(0xA635C11B8C44AFC2); } // 0xA635C11B8C44AFC2 0xF46B4DC8 b323
+	static void SPAWNPOINTS_GET_SEARCH_RESULT(int randomInt, float* x, float* y, float* z) { invoke<Void>(0x280C7E3AC7F56E90, randomInt, x, y, z); } // 0x280C7E3AC7F56E90 0x36A4AC65 b323
+	static void SPAWNPOINTS_GET_SEARCH_RESULT_FLAGS(Any p0, Any* p1) { invoke<Void>(0xB782F8238512BAD5, p0, p1); } // 0xB782F8238512BAD5 0xBA699DDF b323
 	static void SET_IK_TARGET(Ped ped, int ikIndex, Entity entityLookAt, int boneLookAt, float offsetX, float offsetY, float offsetZ, Any p7, int blendInDuration, int blendOutDuration) { invoke<Void>(0xC32779C16FCEECD9, ped, ikIndex, entityLookAt, boneLookAt, offsetX, offsetY, offsetZ, p7, blendInDuration, blendOutDuration); } // 0xC32779C16FCEECD9 0x6FE5218C b323
 	// FORCE_*
 	static void _0xED3C76ADFA6D07C4(Ped ped) { invoke<Void>(0xED3C76ADFA6D07C4, ped); } // 0xED3C76ADFA6D07C4 0xFB4000DC b323
@@ -10097,23 +10988,24 @@ namespace PED {
 	static BOOL IS_ANY_HOSTILE_PED_NEAR_POINT(Ped ped, float x, float y, float z, float radius) { return invoke<BOOL>(0x68772DB2B2526F9F, ped, x, y, z, radius); } // 0x68772DB2B2526F9F 0x1A464167 b323
 	static void _0x820E9892A77E97CD(Any p0, Any p1) { invoke<Void>(0x820E9892A77E97CD, p0, p1); } // 0x820E9892A77E97CD b877
 	static BOOL _0x06087579E7AA85A9(Any p0, Any p1, float p2, float p3, float p4, float p5) { return invoke<BOOL>(0x06087579E7AA85A9, p0, p1, p2, p3, p4, p5); } // 0x06087579E7AA85A9 0xD0567D41 b323
-	static void SET_POP_CONTROL_SPHERE_THIS_FRAME(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0xD8C3BE3EE94CAF2D, p0, p1, p2, p3, p4); } // 0xD8C3BE3EE94CAF2D 0x4BBE5E2C b323
+	// Min and max are usually 100.0 and 200.0
+	static void SET_POP_CONTROL_SPHERE_THIS_FRAME(float x, float y, float z, float min, float max) { invoke<Void>(0xD8C3BE3EE94CAF2D, x, y, z, min, max); } // 0xD8C3BE3EE94CAF2D 0x4BBE5E2C b323
 	static void _0xD33DAA36272177C4(Ped ped) { invoke<Void>(0xD33DAA36272177C4, ped); } // 0xD33DAA36272177C4 0xA89A53F2 b323
 	static void _0x711794453CFD692B(Any p0, Any p1) { invoke<Void>(0x711794453CFD692B, p0, p1); } // 0x711794453CFD692B b463
 	static void _0x83A169EABCDB10A2(Any p0, Any p1) { invoke<Void>(0x83A169EABCDB10A2, p0, p1); } // 0x83A169EABCDB10A2 b323
 	static void _0x288DF530C92DAD6F(Any p0, float p1) { invoke<Void>(0x288DF530C92DAD6F, p0, p1); } // 0x288DF530C92DAD6F b323
-	// IS_PED_*
-	static BOOL _0x3795688A307E1EB6(Ped Ped) { return invoke<BOOL>(0x3795688A307E1EB6, Ped); } // 0x3795688A307E1EB6 b505
+	static BOOL _IS_PED_SWAPPING_WEAPON(Ped Ped) { return invoke<BOOL>(0x3795688A307E1EB6, Ped); } // 0x3795688A307E1EB6 b505
 	static void _0x0F62619393661D6E(Any p0, Any p1, Any p2) { invoke<Void>(0x0F62619393661D6E, p0, p1, p2); } // 0x0F62619393661D6E b877
-	static void _0xDFE68C4B787E1BFB(Any p0) { invoke<Void>(0xDFE68C4B787E1BFB, p0); } // 0xDFE68C4B787E1BFB b1180
+	static void _0xDFE68C4B787E1BFB(Ped ped) { invoke<Void>(0xDFE68C4B787E1BFB, ped); } // 0xDFE68C4B787E1BFB b1180
 	static void _SET_ENABLE_SCUBA_GEAR_LIGHT(Ped ped, BOOL toggle) { invoke<Void>(0xEE2476B9EE4A094F, ped, toggle); } // 0xEE2476B9EE4A094F b1493
 	static BOOL _IS_SCUBA_GEAR_LIGHT_ENABLED(Ped ped) { return invoke<BOOL>(0x88274C11CF0D866D, ped); } // 0x88274C11CF0D866D b1493
-	static void _0x637822DC2AFEEBF8(Any p0) { invoke<Void>(0x637822DC2AFEEBF8, p0); } // 0x637822DC2AFEEBF8 b1493
+	static void _CLEAR_FACIAL_CLIPSET_OVERRIDE(Ped ped) { invoke<Void>(0x637822DC2AFEEBF8, ped); } // 0x637822DC2AFEEBF8 b1493
 	// SET_A*
 	static void _0xFAB944D4D481ACCB(Ped ped, BOOL toggle) { invoke<Void>(0xFAB944D4D481ACCB, ped, toggle); } // 0xFAB944D4D481ACCB b1734
 }
 
-namespace PHYSICS {
+namespace PHYSICS
+{
 	// Creates a rope at the specific position, that extends in the specified direction when not attached to any entities.
 	// __
 	// 
@@ -10128,6 +11020,8 @@ namespace PHYSICS {
 	// 0 crashes the game
 	// 
 	// Max_length - Rope is forced to this length, generally best to keep this the same as your rope length.
+	// 
+	// windingSpeed - Speed the Rope is being winded, using native START_ROPE_WINDING. Set positive for winding and negative for unwinding.
 	// 
 	// Rigid - If max length is zero, and this is set to false the rope will become rigid (it will force a specific distance, what ever length is, between the objects).
 	// 
@@ -10146,10 +11040,12 @@ namespace PHYSICS {
 	// Rope does NOT interact with anything you attach it to, in some cases it make interact with the world AFTER it breaks (seems to occur if you set the type to -1).
 	// 
 	// Rope will sometimes contract and fall to the ground like you'd expect it to, but since it doesn't interact with the world the effect is just jaring.
-	static int ADD_ROPE(float x, float y, float z, float rotX, float rotY, float rotZ, float length, int ropeType, float maxLength, float minLength, float p10, BOOL p11, BOOL p12, BOOL rigid, float p14, BOOL breakWhenShot, Any* unkPtr) { return invoke<int>(0xE832D760399EB220, x, y, z, rotX, rotY, rotZ, length, ropeType, maxLength, minLength, p10, p11, p12, rigid, p14, breakWhenShot, unkPtr); } // 0xE832D760399EB220 0xA592EC74 b323
+	static int ADD_ROPE(float x, float y, float z, float rotX, float rotY, float rotZ, float length, int ropeType, float maxLength, float minLength, float windingSpeed, BOOL p11, BOOL p12, BOOL rigid, float p14, BOOL breakWhenShot, Any* unkPtr) { return invoke<int>(0xE832D760399EB220, x, y, z, rotX, rotY, rotZ, length, ropeType, maxLength, minLength, windingSpeed, p11, p12, rigid, p14, breakWhenShot, unkPtr); } // 0xE832D760399EB220 0xA592EC74 b323
 	static void DELETE_ROPE(int* ropeId) { invoke<Void>(0x52B4829281364649, ropeId); } // 0x52B4829281364649 0x748D72AF b323
 	static void DELETE_CHILD_ROPE(int ropeId) { invoke<Void>(0xAA5D6B1888E4DB20, ropeId); } // 0xAA5D6B1888E4DB20 0xB19B4706 b323
 	static BOOL DOES_ROPE_EXIST(int* ropeId) { return invoke<BOOL>(0xFD5448BE3111ED96, ropeId); } // 0xFD5448BE3111ED96 0x66E4A3AC b323
+	// ROPE_*
+	static void _0xA1AE736541B0FCA3(int* ropeId, BOOL p1) { invoke<Void>(0xA1AE736541B0FCA3, ropeId, p1); } // 0xA1AE736541B0FCA3 b1868
 	static void ROPE_DRAW_SHADOW_ENABLED(int* ropeId, BOOL toggle) { invoke<Void>(0xF159A63806BB5BA8, ropeId, toggle); } // 0xF159A63806BB5BA8 0x51523B8C b323
 	// Rope presets can be found in the gamefiles. One example is "ropeFamily3", it is NOT a hash but rather a string.
 	static void LOAD_ROPE_DATA(int ropeId, const char* rope_preset) { invoke<Void>(0xCBB203C04D1ABD27, ropeId, rope_preset); } // 0xCBB203C04D1ABD27 0x9E8F1644 b323
@@ -10210,10 +11106,13 @@ namespace PHYSICS {
 	static void _SET_LAUNCH_CONTROL_ENABLED(BOOL toggle) { invoke<Void>(0xAA6A6098851C396F, toggle); } // 0xAA6A6098851C396F b1604
 }
 
-namespace PLAYER {
+namespace PLAYER
+{
+	// Gets the ped for a specified player index.
 	static Ped GET_PLAYER_PED(Player player) { return invoke<Ped>(0x43A66C31C68491C0, player); } // 0x43A66C31C68491C0 0x6E31E993 b323
 	// Does the same like PLAYER::GET_PLAYER_PED
 	static Ped GET_PLAYER_PED_SCRIPT_INDEX(Player player) { return invoke<Ped>(0x50FAC3A3E030A6E1, player); } // 0x50FAC3A3E030A6E1 0x6AC64990 b323
+	// Set the model for a specific Player. Be aware that this will destroy the current Ped for the Player and create a new one, any reference to the old ped should be reset
 	// Make sure to request the model first and wait until it has loaded.
 	static void SET_PLAYER_MODEL(Player player, Hash model) { invoke<Void>(0x00A1CADD00108836, player, model); } // 0x00A1CADD00108836 0x774A4C54 b323
 	static void CHANGE_PLAYER_PED(Player player, Ped ped, BOOL p2, BOOL resetDamage) { invoke<Void>(0x048189FAC643DEEE, player, ped, p2, resetDamage); } // 0x048189FAC643DEEE 0xBE515485 b323
@@ -10267,7 +11166,21 @@ namespace PLAYER {
 	static void CLEAR_PLAYER_WANTED_LEVEL(Player player) { invoke<Void>(0xB302540597885499, player); } // 0xB302540597885499 0x54EA5BCC b323
 	static BOOL IS_PLAYER_DEAD(Player player) { return invoke<BOOL>(0x424D4687FA1E5652, player); } // 0x424D4687FA1E5652 0x140CA5A8 b323
 	static BOOL IS_PLAYER_PRESSING_HORN(Player player) { return invoke<BOOL>(0xFA1E2BF8B10598F9, player); } // 0xFA1E2BF8B10598F9 0xED1D1662 b323
-	// https://alloc8or.re/gta5/doc/enums/eSetPlayerControlFlag.txt
+	// Flags:
+	// SPC_AMBIENT_SCRIPT = (1 << 1),
+	// SPC_CLEAR_TASKS = (1 << 2),
+	// SPC_REMOVE_FIRES = (1 << 3),
+	// SPC_REMOVE_EXPLOSIONS = (1 << 4),
+	// SPC_REMOVE_PROJECTILES = (1 << 5),
+	// SPC_DEACTIVATE_GADGETS = (1 << 6),
+	// SPC_REENABLE_CONTROL_ON_DEATH = (1 << 7),
+	// SPC_LEAVE_CAMERA_CONTROL_ON = (1 << 8),
+	// SPC_ALLOW_PLAYER_DAMAGE = (1 << 9),
+	// SPC_DONT_STOP_OTHER_CARS_AROUND_PLAYER = (1 << 10),
+	// SPC_PREVENT_EVERYBODY_BACKOFF = (1 << 11),
+	// SPC_ALLOW_PAD_SHAKE = (1 << 12)
+	// 
+	// See: https://alloc8or.re/gta5/doc/enums/eSetPlayerControlFlag.txt
 	static void SET_PLAYER_CONTROL(Player player, BOOL bHasControl, int flags) { invoke<Void>(0x8D32347D6D4C40A2, player, bHasControl, flags); } // 0x8D32347D6D4C40A2 0xD17AFCD8 b323
 	static int GET_PLAYER_WANTED_LEVEL(Player player) { return invoke<int>(0xE28E54788CE8F12D, player); } // 0xE28E54788CE8F12D 0xBDCDD163 b323
 	static void SET_MAX_WANTED_LEVEL(int maxWantedLevel) { invoke<Void>(0xAA5F02DB48D704B9, maxWantedLevel); } // 0xAA5F02DB48D704B9 0x665A06F5 b323
@@ -10294,6 +11207,8 @@ namespace PLAYER {
 	// Max value is 1.0
 	static void SET_WANTED_LEVEL_DIFFICULTY(Player player, float difficulty) { invoke<Void>(0x9B0BB33B04405E7A, player, difficulty); } // 0x9B0BB33B04405E7A 0xB552626C b323
 	static void RESET_WANTED_LEVEL_DIFFICULTY(Player player) { invoke<Void>(0xB9D0DD990DC141DD, player); } // 0xB9D0DD990DC141DD 0xA64C378D b323
+	static void _0x49B856B1360C47C7(Any p0, Any p1, Any p2) { invoke<Void>(0x49B856B1360C47C7, p0, p1, p2); } // 0x49B856B1360C47C7 b2060
+	static void _0x823EC8E82BA45986(Any p0) { invoke<Void>(0x823EC8E82BA45986, p0); } // 0x823EC8E82BA45986 b2060
 	static void START_FIRING_AMNESTY(int duration) { invoke<Void>(0xBF9BD71691857E48, duration); } // 0xBF9BD71691857E48 0x5F8A22A6 b323
 	// PLAYER::REPORT_CRIME(PLAYER::PLAYER_ID(), 37, PLAYER::GET_WANTED_LEVEL_THRESHOLD(1));
 	// 
@@ -10373,10 +11288,7 @@ namespace PLAYER {
 	// This has been found in use in the decompiled files.
 	static void _0xAD73CE5A09E42D12(Player player) { invoke<Void>(0xAD73CE5A09E42D12, player); } // 0xAD73CE5A09E42D12 0x85725848 b323
 	static void _0x36F1B38855F2A8DF(Player player) { invoke<Void>(0x36F1B38855F2A8DF, player); } // 0x36F1B38855F2A8DF 0x3A7E5FB6 b323
-	// Has something to do with police.
-	// 
-	// RE*
-	static void _0xDC64D2C53493ED12(Player player) { invoke<Void>(0xDC64D2C53493ED12, player); } // 0xDC64D2C53493ED12 0xD15C4B1C b323
+	static void REPORT_POLICE_SPOTTED_PLAYER(Player player) { invoke<Void>(0xDC64D2C53493ED12, player); } // 0xDC64D2C53493ED12 0xD15C4B1C b323
 	// PLAYER::0xBF6993C7(rPtr((&l_122) + 71)); // Found in decompilation
 	// 
 	// ***
@@ -10424,7 +11336,7 @@ namespace PLAYER {
 	static float GET_PLAYER_SPRINT_STAMINA_REMAINING(Player player) { return invoke<float>(0x3F9F16F8E65A7ED7, player); } // 0x3F9F16F8E65A7ED7 0x47017C90 b323
 	static float GET_PLAYER_SPRINT_TIME_REMAINING(Player player) { return invoke<float>(0x1885BC9B108B4C99, player); } // 0x1885BC9B108B4C99 0x40E80543 b323
 	static float GET_PLAYER_UNDERWATER_TIME_REMAINING(Player player) { return invoke<float>(0xA1FCF8E6AF40B731, player); } // 0xA1FCF8E6AF40B731 0x1317125A b323
-	static Any _0xA0D3E4F7AAFB7E78(Any p0, Any p1) { return invoke<Any>(0xA0D3E4F7AAFB7E78, p0, p1); } // 0xA0D3E4F7AAFB7E78 b757
+	static Any _SET_PLAYER_UNDERWATER_TIME_REMAINING(Player player, float time) { return invoke<Any>(0xA0D3E4F7AAFB7E78, player, time); } // 0xA0D3E4F7AAFB7E78 b757
 	// Returns the group ID the player is member of.
 	static int GET_PLAYER_GROUP(Player player) { return invoke<int>(0x0D127585F77030AF, player); } // 0x0D127585F77030AF 0xA5EDCDE8 b323
 	static int GET_PLAYER_MAX_ARMOUR(Player player) { return invoke<int>(0x92659B4CE1863CB3, player); } // 0x92659B4CE1863CB3 0x02A50657 b323
@@ -10527,6 +11439,8 @@ namespace PLAYER {
 	// 
 	// 
 	static BOOL GET_PLAYER_INVINCIBLE(Player player) { return invoke<BOOL>(0xB721981B2B939E07, player); } // 0xB721981B2B939E07 0x680C90EE b323
+	// Always returns false.
+	static BOOL _0xDCC07526B8EC45AF(Player player) { return invoke<BOOL>(0xDCC07526B8EC45AF, player); } // 0xDCC07526B8EC45AF b1868
 	static void _SET_PLAYER_INVINCIBLE_KEEP_RAGDOLL_ENABLED(Player player, BOOL toggle) { invoke<Void>(0x6BC97F4F4BB3C04B, player, toggle); } // 0x6BC97F4F4BB3C04B b463
 	// Found in "director_mode", "fm_bj_race_controler", "fm_deathmatch_controler", "fm_impromptu_dm_controler", "fm_race_controler", "gb_deathmatch".
 	static void _0xCAC57395B151135F(Player player, BOOL p1) { invoke<Void>(0xCAC57395B151135F, player, p1); } // 0xCAC57395B151135F 0x00563E0D b323
@@ -10541,9 +11455,10 @@ namespace PLAYER {
 	// No need to confirm it says PLAYER_ID() so it uses PLAYER_ID() lol.
 	static void SET_PLAYER_LOCKON(Player player, BOOL toggle) { invoke<Void>(0x5C8B2F450EE4328E, player, toggle); } // 0x5C8B2F450EE4328E 0x0B270E0F b323
 	// Sets your targeting mode.
-	// 0 = Traditional GTA
-	// 1 = Assisted Aiming
-	// 2 = Free Aim
+	// 0 = Assisted Aim - Full
+	// 1 = Assisted Aim - Partial
+	// 2 = Free Aim - Assisted
+	// 3 = Free Aim
 	static void SET_PLAYER_TARGETING_MODE(int targetMode) { invoke<Void>(0xB1906895227793F3, targetMode); } // 0xB1906895227793F3 0x61CAE253 b323
 	static void SET_PLAYER_TARGET_LEVEL(int targetLevel) { invoke<Void>(0x5702B917B99DB1CD, targetLevel); } // 0x5702B917B99DB1CD 0x772DA539 b323
 	// Returns profile setting 237.
@@ -10613,52 +11528,55 @@ namespace PLAYER {
 	static void SET_DISABLE_AMBIENT_MELEE_MOVE(Player player, BOOL toggle) { invoke<Void>(0x2E8AABFA40A84F8C, player, toggle); } // 0x2E8AABFA40A84F8C 0xCCD937E7 b323
 	// Default is 100. Use player id and not ped id. For instance: PLAYER::SET_PLAYER_MAX_ARMOUR(PLAYER::PLAYER_ID(), 100); // main_persistent.ct4
 	static void SET_PLAYER_MAX_ARMOUR(Player player, int value) { invoke<Void>(0x77DFCCF5948B8C71, player, value); } // 0x77DFCCF5948B8C71 0xC6C3C53B b323
-	static void _SPECIAL_ABILITY_ACTIVATE(Any p0) { invoke<Void>(0x821FDC827D6F4090, p0); } // 0x821FDC827D6F4090 b678
-	static void _SET_SPECIAL_ABILITY(Player player, int p1) { invoke<Void>(0xB214D570EAD7F81A, player, p1); } // 0xB214D570EAD7F81A b678
-	static void _SPECIAL_ABILITY_DEPLETE(Any p0) { invoke<Void>(0x17F7471EACA78290, p0); } // 0x17F7471EACA78290 b678
-	static void SPECIAL_ABILITY_DEACTIVATE(Player player) { invoke<Void>(0xD6A953C6D1492057, player); } // 0xD6A953C6D1492057 0x80C2AB09 b323
-	static void SPECIAL_ABILITY_DEACTIVATE_FAST(Player player) { invoke<Void>(0x9CB5CE07A3968D5A, player); } // 0x9CB5CE07A3968D5A 0x0751908A b323
-	static void SPECIAL_ABILITY_RESET(Player player) { invoke<Void>(0x375F0E738F861A94, player); } // 0x375F0E738F861A94 0xA7D8BCD3 b323
-	static void SPECIAL_ABILITY_CHARGE_ON_MISSION_FAILED(Player player) { invoke<Void>(0xC9A763D8FE87436A, player); } // 0xC9A763D8FE87436A 0x4136829A b323
+	static void _SPECIAL_ABILITY_ACTIVATE(Any p0, Any p1) { invoke<Void>(0x821FDC827D6F4090, p0, p1); } // 0x821FDC827D6F4090 b678
+	static void _SET_SPECIAL_ABILITY(Player player, int p1, Any p2) { invoke<Void>(0xB214D570EAD7F81A, player, p1, p2); } // 0xB214D570EAD7F81A b678
+	static void _SPECIAL_ABILITY_DEPLETE(Any p0, Any p1) { invoke<Void>(0x17F7471EACA78290, p0, p1); } // 0x17F7471EACA78290 b678
+	static void SPECIAL_ABILITY_DEACTIVATE(Player player, Any p1) { invoke<Void>(0xD6A953C6D1492057, player, p1); } // 0xD6A953C6D1492057 0x80C2AB09 b323
+	static void SPECIAL_ABILITY_DEACTIVATE_FAST(Player player, Any p1) { invoke<Void>(0x9CB5CE07A3968D5A, player, p1); } // 0x9CB5CE07A3968D5A 0x0751908A b323
+	static void SPECIAL_ABILITY_RESET(Player player, Any p1) { invoke<Void>(0x375F0E738F861A94, player, p1); } // 0x375F0E738F861A94 0xA7D8BCD3 b323
+	static void SPECIAL_ABILITY_CHARGE_ON_MISSION_FAILED(Player player, Any p1) { invoke<Void>(0xC9A763D8FE87436A, player, p1); } // 0xC9A763D8FE87436A 0x4136829A b323
 	// Every occurrence of p1 & p2 were both true.
-	static void SPECIAL_ABILITY_CHARGE_SMALL(Player player, BOOL p1, BOOL p2) { invoke<Void>(0x2E7B9B683481687D, player, p1, p2); } // 0x2E7B9B683481687D 0x6F463F56 b323
+	static void SPECIAL_ABILITY_CHARGE_SMALL(Player player, BOOL p1, BOOL p2, Any p3) { invoke<Void>(0x2E7B9B683481687D, player, p1, p2, p3); } // 0x2E7B9B683481687D 0x6F463F56 b323
 	// Only 1 match. Both p1 & p2 were true.
-	static void SPECIAL_ABILITY_CHARGE_MEDIUM(Player player, BOOL p1, BOOL p2) { invoke<Void>(0xF113E3AA9BC54613, player, p1, p2); } // 0xF113E3AA9BC54613 0xAB55D8F3 b323
+	static void SPECIAL_ABILITY_CHARGE_MEDIUM(Player player, BOOL p1, BOOL p2, Any p3) { invoke<Void>(0xF113E3AA9BC54613, player, p1, p2, p3); } // 0xF113E3AA9BC54613 0xAB55D8F3 b323
 	// 2 matches. p1 was always true.
-	static void SPECIAL_ABILITY_CHARGE_LARGE(Player player, BOOL p1, BOOL p2) { invoke<Void>(0xF733F45FA4497D93, player, p1, p2); } // 0xF733F45FA4497D93 0xF440C04D b323
+	static void SPECIAL_ABILITY_CHARGE_LARGE(Player player, BOOL p1, BOOL p2, Any p3) { invoke<Void>(0xF733F45FA4497D93, player, p1, p2, p3); } // 0xF733F45FA4497D93 0xF440C04D b323
 	// p1 appears to always be 1 (only comes up twice)
-	static void SPECIAL_ABILITY_CHARGE_CONTINUOUS(Player player, Ped p2) { invoke<Void>(0xED481732DFF7E997, player, p2); } // 0xED481732DFF7E997 0x5FEE98A2 b323
+	static void SPECIAL_ABILITY_CHARGE_CONTINUOUS(Player player, Ped p1, Any p2) { invoke<Void>(0xED481732DFF7E997, player, p1, p2); } // 0xED481732DFF7E997 0x5FEE98A2 b323
 	// p1 appears as 5, 10, 15, 25, or 30. p2 is always true.
-	static void SPECIAL_ABILITY_CHARGE_ABSOLUTE(Player player, int p1, BOOL p2) { invoke<Void>(0xB7B0870EB531D08D, player, p1, p2); } // 0xB7B0870EB531D08D 0x72429998 b323
+	static void SPECIAL_ABILITY_CHARGE_ABSOLUTE(Player player, int p1, BOOL p2, Any p3) { invoke<Void>(0xB7B0870EB531D08D, player, p1, p2, p3); } // 0xB7B0870EB531D08D 0x72429998 b323
 	// 
 	// normalizedValue is from 0.0 - 1.0
 	// p2 is always 1
-	static void SPECIAL_ABILITY_CHARGE_NORMALIZED(Player player, float normalizedValue, BOOL p2) { invoke<Void>(0xA0696A65F009EE18, player, normalizedValue, p2); } // 0xA0696A65F009EE18 0x8C7E68C1 b323
+	static void SPECIAL_ABILITY_CHARGE_NORMALIZED(Player player, float normalizedValue, BOOL p2, Any p3) { invoke<Void>(0xA0696A65F009EE18, player, normalizedValue, p2, p3); } // 0xA0696A65F009EE18 0x8C7E68C1 b323
 	// Also known as _RECHARGE_SPECIAL_ABILITY
-	static void SPECIAL_ABILITY_FILL_METER(Player player, BOOL p1) { invoke<Void>(0x3DACA8DDC6FD4980, player, p1); } // 0x3DACA8DDC6FD4980 0xB71589DA b323
+	static void SPECIAL_ABILITY_FILL_METER(Player player, BOOL p1, Any p2) { invoke<Void>(0x3DACA8DDC6FD4980, player, p1, p2); } // 0x3DACA8DDC6FD4980 0xB71589DA b323
 	// p1 was always true.
-	static void SPECIAL_ABILITY_DEPLETE_METER(Player player, BOOL p1) { invoke<Void>(0x1D506DBBBC51E64B, player, p1); } // 0x1D506DBBBC51E64B 0x9F80F6DF b323
-	static void SPECIAL_ABILITY_LOCK(Hash playerModel) { invoke<Void>(0x6A09D0D590A47D13, playerModel); } // 0x6A09D0D590A47D13 0x1B7BB388 b323
-	static void SPECIAL_ABILITY_UNLOCK(Hash playerModel) { invoke<Void>(0xF145F3BE2EFA9A3B, playerModel); } // 0xF145F3BE2EFA9A3B 0x1FDB2919 b323
+	static void SPECIAL_ABILITY_DEPLETE_METER(Player player, BOOL p1, Any p2) { invoke<Void>(0x1D506DBBBC51E64B, player, p1, p2); } // 0x1D506DBBBC51E64B 0x9F80F6DF b323
+	static void SPECIAL_ABILITY_LOCK(Hash playerModel, Any p1) { invoke<Void>(0x6A09D0D590A47D13, playerModel, p1); } // 0x6A09D0D590A47D13 0x1B7BB388 b323
+	static void SPECIAL_ABILITY_UNLOCK(Hash playerModel, Any p1) { invoke<Void>(0xF145F3BE2EFA9A3B, playerModel, p1); } // 0xF145F3BE2EFA9A3B 0x1FDB2919 b323
 	static BOOL IS_SPECIAL_ABILITY_UNLOCKED(Hash playerModel) { return invoke<BOOL>(0xC6017F6A6CDFA694, playerModel); } // 0xC6017F6A6CDFA694 0xC9C75E82 b323
-	static BOOL IS_SPECIAL_ABILITY_ACTIVE(Player player) { return invoke<BOOL>(0x3E5F7FC85D854E15, player); } // 0x3E5F7FC85D854E15 0x1B17E334 b323
-	static BOOL IS_SPECIAL_ABILITY_METER_FULL(Player player) { return invoke<BOOL>(0x05A1FE504B7F2587, player); } // 0x05A1FE504B7F2587 0x2E19D7F6 b323
-	static void ENABLE_SPECIAL_ABILITY(Player player, BOOL toggle) { invoke<Void>(0x181EC197DAEFE121, player, toggle); } // 0x181EC197DAEFE121 0xC86C1B4E b323
-	static BOOL IS_SPECIAL_ABILITY_ENABLED(Player player) { return invoke<BOOL>(0xB1D200FE26AEF3CB, player); } // 0xB1D200FE26AEF3CB 0xC01238CC b323
+	static BOOL IS_SPECIAL_ABILITY_ACTIVE(Player player, Any p1) { return invoke<BOOL>(0x3E5F7FC85D854E15, player, p1); } // 0x3E5F7FC85D854E15 0x1B17E334 b323
+	static BOOL IS_SPECIAL_ABILITY_METER_FULL(Player player, Any p1) { return invoke<BOOL>(0x05A1FE504B7F2587, player, p1); } // 0x05A1FE504B7F2587 0x2E19D7F6 b323
+	static void ENABLE_SPECIAL_ABILITY(Player player, BOOL toggle, Any p2) { invoke<Void>(0x181EC197DAEFE121, player, toggle, p2); } // 0x181EC197DAEFE121 0xC86C1B4E b323
+	static BOOL IS_SPECIAL_ABILITY_ENABLED(Player player, Any p1) { return invoke<BOOL>(0xB1D200FE26AEF3CB, player, p1); } // 0xB1D200FE26AEF3CB 0xC01238CC b323
 	static void SET_SPECIAL_ABILITY_MULTIPLIER(float multiplier) { invoke<Void>(0xA49C426ED0CA4AB7, multiplier); } // 0xA49C426ED0CA4AB7 0xFF1BC556 b323
-	static void _0xFFEE8FA29AB9A18E(Player player) { invoke<Void>(0xFFEE8FA29AB9A18E, player); } // 0xFFEE8FA29AB9A18E 0x5D0FE25B b323
+	static void _0xFFEE8FA29AB9A18E(Player player, Any p1) { invoke<Void>(0xFFEE8FA29AB9A18E, player, p1); } // 0xFFEE8FA29AB9A18E 0x5D0FE25B b323
 	// Appears once in "re_dealgonewrong"
 	static BOOL _0x5FC472C501CCADB3(Player player) { return invoke<BOOL>(0x5FC472C501CCADB3, player); } // 0x5FC472C501CCADB3 0x46E7E31D b323
 	// Only 1 occurrence. p1 was 2.
 	static BOOL _0xF10B44FD479D69F3(Player player, int p1) { return invoke<BOOL>(0xF10B44FD479D69F3, player, p1); } // 0xF10B44FD479D69F3 0x1E359CC8 b323
 	// 2 occurrences in agency_heist3a. p1 was 0.7f then 0.4f.
 	static BOOL _0xDD2620B7B9D16FF1(Player player, float p1) { return invoke<BOOL>(0xDD2620B7B9D16FF1, player, p1); } // 0xDD2620B7B9D16FF1 0x8CB53C9F b323
-	static void START_PLAYER_TELEPORT(Player player, float x, float y, float z, float heading, BOOL p5, BOOL p6, BOOL p7) { invoke<Void>(0xAD15F075A4DA0FDE, player, x, y, z, heading, p5, p6, p7); } // 0xAD15F075A4DA0FDE 0xC552E06C b323
-	static BOOL _HAS_PLAYER_TELEPORT_FINISHED(Player player) { return invoke<BOOL>(0xE23D5873C2394C61, player); } // 0xE23D5873C2394C61 b323
+	// `findCollisionLand`: This teleports the player to land when set to true and will not consider the Z coordinate parameter provided by you. It will automatically put the Z coordinate so that you don't fall from sky.
+	static void START_PLAYER_TELEPORT(Player player, float x, float y, float z, float heading, BOOL p5, BOOL findCollisionLand, BOOL p7) { invoke<Void>(0xAD15F075A4DA0FDE, player, x, y, z, heading, p5, findCollisionLand, p7); } // 0xAD15F075A4DA0FDE 0xC552E06C b323
+	static BOOL UPDATE_PLAYER_TELEPORT(Player player) { return invoke<BOOL>(0xE23D5873C2394C61, player); } // 0xE23D5873C2394C61 b323
 	// Disables the player's teleportation
 	static void STOP_PLAYER_TELEPORT() { invoke<Void>(0xC449EDED9D73009C); } // 0xC449EDED9D73009C 0x86AB8DBB b323
 	static BOOL IS_PLAYER_TELEPORT_ACTIVE() { return invoke<BOOL>(0x02B15662D7F8886F); } // 0x02B15662D7F8886F 0x3A11D118 b323
 	static float GET_PLAYER_CURRENT_STEALTH_NOISE(Player player) { return invoke<float>(0x2F395D61F3A1F877, player); } // 0x2F395D61F3A1F877 0xC3B02362 b323
+	// `regenRate`: The recharge multiplier, a value between 0.0 and 1.0.
+	// Use 1.0 to reset it back to normal
 	static void SET_PLAYER_HEALTH_RECHARGE_MULTIPLIER(Player player, float regenRate) { invoke<Void>(0x5DB660B38DD98A31, player, regenRate); } // 0x5DB660B38DD98A31 0x45514731 b323
 	static float _GET_PLAYER_HEALTH_RECHARGE_LIMIT(Player player) { return invoke<float>(0x8BC515BAE4AAF8FF, player); } // 0x8BC515BAE4AAF8FF b617
 	static void _SET_PLAYER_HEALTH_RECHARGE_LIMIT(Player player, float limit) { invoke<Void>(0xC388A0F065F5BC34, player, limit); } // 0xC388A0F065F5BC34 b573
@@ -10797,8 +11715,7 @@ namespace PLAYER {
 	static BOOL _0x690A61A6D13583F6(Player player) { return invoke<BOOL>(0x690A61A6D13583F6, player); } // 0x690A61A6D13583F6 0x1D371529 b323
 	static void _0x9EDD76E87D5D51BA(Player player) { invoke<Void>(0x9EDD76E87D5D51BA, player); } // 0x9EDD76E87D5D51BA 0xE30A64DC b323
 	static void SET_PLAYER_SIMULATE_AIMING(Player player, BOOL toggle) { invoke<Void>(0xC54C95DA968EC5B5, player, toggle); } // 0xC54C95DA968EC5B5 0xF1E0CAFC b323
-	// Every occurrence of p1 I found was true.1.0.335.2, 1.0.350.1/2, 1.0.372.2, 1.0.393.2, 1.0.393.4, 1.0.463.1;
-	static void SET_PLAYER_CLOTH_PIN_FRAMES(Player player, BOOL toggle) { invoke<Void>(0x749FADDF97DFE930, player, toggle); } // 0x749FADDF97DFE930 0xF7A0F00F b323
+	static void SET_PLAYER_CLOTH_PIN_FRAMES(Player player, int p1) { invoke<Void>(0x749FADDF97DFE930, player, p1); } // 0x749FADDF97DFE930 0xF7A0F00F b323
 	// Every occurrence was either 0 or 2.
 	static void SET_PLAYER_CLOTH_PACKAGE_INDEX(int index) { invoke<Void>(0x9F7BBA2EA6372500, index); } // 0x9F7BBA2EA6372500 0xB8209F16 b323
 	// 6 matches across 4 scripts. 5 occurrences were 240. The other was 255.
@@ -10888,14 +11805,24 @@ namespace PLAYER {
 	static void _0x55FCC0C390620314(Any p0, Any p1, Any p2) { invoke<Void>(0x55FCC0C390620314, p0, p1, p2); } // 0x55FCC0C390620314 b573
 	static void _0x2382AB11450AE7BA(Any p0, Any p1) { invoke<Void>(0x2382AB11450AE7BA, p0, p1); } // 0x2382AB11450AE7BA b877
 	static Any _0x6E4361FF3E8CD7CA(Any p0) { return invoke<Any>(0x6E4361FF3E8CD7CA, p0); } // 0x6E4361FF3E8CD7CA b1011
+	// Unsets playerPed+330 if the current weapon has certain flags.
 	static void _0x237440E46D918649(Any p0) { invoke<Void>(0x237440E46D918649, p0); } // 0x237440E46D918649 b1290
 	static void _SET_PLAYER_HOMING_ROCKET_DISABLED(Any p0, Any p1) { invoke<Void>(0xEE4EBDD2593BA844, p0, p1); } // 0xEE4EBDD2593BA844 b1180
+	// ADD_*
+	static void _0x9097EB6D4BB9A12A(Player player, Entity entity) { invoke<Void>(0x9097EB6D4BB9A12A, player, entity); } // 0x9097EB6D4BB9A12A b1868
+	// REMOVE_*
+	static void _0x9F260BFB59ADBCA3(Player player, Entity entity) { invoke<Void>(0x9F260BFB59ADBCA3, player, entity); } // 0x9F260BFB59ADBCA3 b1868
 	static void _0x7BAE68775557AE0B(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { invoke<Void>(0x7BAE68775557AE0B, p0, p1, p2, p3, p4, p5); } // 0x7BAE68775557AE0B b1290
+	// Resets values set by 0x70A382ADEC069DD3
+	// _RESET_VOIP_*
 	static void _0x7148E0F43D11F0D9() { invoke<Void>(0x7148E0F43D11F0D9); } // 0x7148E0F43D11F0D9 b1604
-	static void _0x70A382ADEC069DD3(Any p0, Any p1, Any p2) { invoke<Void>(0x70A382ADEC069DD3, p0, p1, p2); } // 0x70A382ADEC069DD3 b1604
+	// Might be voip related
+	// _SET_VOIP_*
+	static void _0x70A382ADEC069DD3(float coordX, float coordY, float coordZ) { invoke<Void>(0x70A382ADEC069DD3, coordX, coordY, coordZ); } // 0x70A382ADEC069DD3 b1604
 }
 
-namespace RECORDING {
+namespace RECORDING
+{
 	static void _0x48621C9FCA3EBD28(int p0) { invoke<Void>(0x48621C9FCA3EBD28, p0); } // 0x48621C9FCA3EBD28 b323
 	static void _0x81CBAE94390F9F89() { invoke<Void>(0x81CBAE94390F9F89); } // 0x81CBAE94390F9F89 b323
 	static void _0x13B350B8AD0EEE10() { invoke<Void>(0x13B350B8AD0EEE10); } // 0x13B350B8AD0EEE10 b323
@@ -10907,6 +11834,7 @@ namespace RECORDING {
 	// p1 was always 0.
 	// 
 	static void _0x208784099002BC30(const char* missionNameLabel, Any p1) { invoke<Void>(0x208784099002BC30, missionNameLabel, p1); } // 0x208784099002BC30 b323
+	// This disable the recording feature and has to be called every frame.
 	static void _STOP_RECORDING_THIS_FRAME() { invoke<Void>(0xEB2D525B57F42B40); } // 0xEB2D525B57F42B40 b323
 	static void _0xF854439EFBB3B583() { invoke<Void>(0xF854439EFBB3B583); } // 0xF854439EFBB3B583 b323
 	// This will disable the ability to make camera changes in R* Editor.
@@ -10935,7 +11863,8 @@ namespace RECORDING {
 	static BOOL _0x33D47E85B476ABCD(BOOL p0) { return invoke<BOOL>(0x33D47E85B476ABCD, p0); } // 0x33D47E85B476ABCD b323
 }
 
-namespace REPLAY {
+namespace REPLAY
+{
 	// Does nothing (it's a nullsub).
 	static void _0x7E2BD3EF6C205F09(const char* p0, BOOL p1) { invoke<Void>(0x7E2BD3EF6C205F09, p0, p1); } // 0x7E2BD3EF6C205F09 b323
 	// Returns a bool if interior rendering is disabled, if yes, all "normal" rendered interiors are invisible
@@ -10949,7 +11878,8 @@ namespace REPLAY {
 	static void _ACTIVATE_ROCKSTAR_EDITOR() { invoke<Void>(0x49DA8145672B2725); } // 0x49DA8145672B2725 b323
 }
 
-namespace SCRIPT {
+namespace SCRIPT
+{
 	static void REQUEST_SCRIPT(const char* scriptName) { invoke<Void>(0x6EB5F71AA68F2E8E, scriptName); } // 0x6EB5F71AA68F2E8E 0xE26B2666 b323
 	static void SET_SCRIPT_AS_NO_LONGER_NEEDED(const char* scriptName) { invoke<Void>(0xC90D2DCACD56184C, scriptName); } // 0xC90D2DCACD56184C 0x6FCB7795 b323
 	// Returns if a script has been loaded into the game. Used to see if a script was loaded after requesting.
@@ -10986,9 +11916,15 @@ namespace SCRIPT {
 	// eventGroup: 0 = SCRIPT_EVENT_QUEUE_AI (CEventGroupScriptAI), 1 = SCRIPT_EVENT_QUEUE_NETWORK (CEventGroupScriptNetwork)
 	static int GET_EVENT_AT_INDEX(int eventGroup, int eventIndex) { return invoke<int>(0xD8F66A3A60C62153, eventGroup, eventIndex); } // 0xD8F66A3A60C62153 0xB49C1442 b323
 	// eventGroup: 0 = SCRIPT_EVENT_QUEUE_AI (CEventGroupScriptAI), 1 = SCRIPT_EVENT_QUEUE_NETWORK (CEventGroupScriptNetwork)
-	static BOOL GET_EVENT_DATA(int eventGroup, int eventIndex, int* argStruct, int argStructSize) { return invoke<BOOL>(0x2902843FCD2B2D79, eventGroup, eventIndex, argStruct, argStructSize); } // 0x2902843FCD2B2D79 0x4280F92F b323
+	// 
+	// Note: eventDataSize is NOT the size in bytes, it is the size determined by the SIZE_OF operator (RAGE Script operator, not C/C++ sizeof). That is, the size in bytes divided by 8 (script variables are always 8-byte aligned!).
+	static BOOL GET_EVENT_DATA(int eventGroup, int eventIndex, Any* eventData, int eventDataSize) { return invoke<BOOL>(0x2902843FCD2B2D79, eventGroup, eventIndex, eventData, eventDataSize); } // 0x2902843FCD2B2D79 0x4280F92F b323
 	// eventGroup: 0 = SCRIPT_EVENT_QUEUE_AI (CEventGroupScriptAI), 1 = SCRIPT_EVENT_QUEUE_NETWORK (CEventGroupScriptNetwork)
-	static void TRIGGER_SCRIPT_EVENT(int eventGroup, int* args, int argCount, int bit) { invoke<Void>(0x5AE99C571D5BBE5D, eventGroup, args, argCount, bit); } // 0x5AE99C571D5BBE5D 0x54763B35 b323
+	// 
+	// Note: eventDataSize is NOT the size in bytes, it is the size determined by the SIZE_OF operator (RAGE Script operator, not C/C++ sizeof). That is, the size in bytes divided by 8 (script variables are always 8-byte aligned!).
+	// 
+	// playerBits (also known as playersToBroadcastTo) is a bitset that indicates which players this event should be sent to. In order to send the event to specific players only, use (1 << playerIndex). Set all bits if it should be broadcast to all players.
+	static void TRIGGER_SCRIPT_EVENT(int eventGroup, Any* eventData, int eventDataSize, int playerBits) { invoke<Void>(0x5AE99C571D5BBE5D, eventGroup, eventData, eventDataSize, playerBits); } // 0x5AE99C571D5BBE5D 0x54763B35 b323
 	static void SHUTDOWN_LOADING_SCREEN() { invoke<Void>(0x078EBE9809CCD637); } // 0x078EBE9809CCD637 0xA2826D17 b323
 	static void SET_NO_LOADING_SCREEN(BOOL toggle) { invoke<Void>(0x5262CC1995D07E09, toggle); } // 0x5262CC1995D07E09 0xC8055034 b323
 	static BOOL GET_NO_LOADING_SCREEN() { return invoke<BOOL>(0x18C1270EA7F199BC); } // 0x18C1270EA7F199BC 0x27512BA0 b323
@@ -11015,42 +11951,22 @@ namespace SCRIPT {
 	static int _0x22E21FBCFC88C149(int scriptIndex, const char* p1) { return invoke<int>(0x22E21FBCFC88C149, scriptIndex, p1); } // 0x22E21FBCFC88C149 0x682CB7E1 b323
 	// BG_*
 	static int _0x829CD22E043A2577(Hash p0) { return invoke<int>(0x829CD22E043A2577, p0); } // 0x829CD22E043A2577 0xC515E735 b323
-	// eventGroup: 0 = SCRIPT_EVENT_QUEUE_AI (CEventGroupScriptAI), 1 = SCRIPT_EVENT_QUEUE_NETWORK (CEventGroupScriptNetwork)
-	static void _TRIGGER_SCRIPT_EVENT_2(int eventGroup, int* args, int argCount, int bit) { invoke<Void>(0xA40CC53DF8E50837, eventGroup, args, argCount, bit); } // 0xA40CC53DF8E50837 b1103
+	// See TRIGGER_SCRIPT_EVENT
+	static void _TRIGGER_SCRIPT_EVENT_2(int eventGroup, Any* eventData, int eventDataSize, int playerBits) { invoke<Void>(0xA40CC53DF8E50837, eventGroup, eventData, eventDataSize, playerBits); } // 0xA40CC53DF8E50837 b1103
 }
 
-namespace SHAPETEST {
-	// Returns a ray (?) going from x1, y1, z1 to x2, y2, z2.
-	// entity = 0 most of the time.
-	// p8 = 7 most of the time.
+namespace SHAPETEST
+{
+	// Asynchronously starts a line-of-sight (raycast) world probe shape test.
 	// 
-	// Result of this function is passed to WORLDPROBE::_GET_RAYCAST_RESULT as a first argument.
+	// Use the handle with 0x3D87450E15D98694 or 0x65287525D951F6BE until it returns 0 or 2.
+	// 
+	// p8 is a bit mask with bits 1, 2 and/or 4, relating to collider types; 4 should usually be used.
 	static int START_SHAPE_TEST_LOS_PROBE(float x1, float y1, float z1, float x2, float y2, float z2, int flags, Entity entity, int p8) { return invoke<int>(0x7EE9F5D83DD4F90E, x1, y1, z1, x2, y2, z2, flags, entity, p8); } // 0x7EE9F5D83DD4F90E 0xEFAF4BA6 b323
-	// Not sure how or why this differs from 0x7EE9F5D83DD4F90E, but it does.
-	// 
-	// This function casts a ray from Point1 to Point2 and returns it's ray handle.  A simple ray cast will 'shoot' a line from point A to point B, and return whether or not the ray reached it's destination or if it hit anything and if it did hit anything, will return the handle of what it hit (entity handle) and coordinates of where the ray reached.
-	// 
-	// You can use _GET_RAYCAST_RESULT to get the result of the raycast
-	// 
-	// Entity is an entity to ignore, such as the player.
-	// 
-	// Flags are intersection bit flags.  They tell the ray what to care about and what not to care about when casting. Passing -1 will intersect with everything, presumably.
-	// 
-	// Flags:
-	// 1: Intersect with map
-	// 2: Intersect with vehicles (used to be mission entities?) (includes train)
-	// 4: Intersect with peds? (same as 8)
-	// 8: Intersect with peds? (same as 4)
-	// 16: Intersect with objects
-	// 32: Unknown
-	// 64: Unknown
-	// 128: Unknown
-	// 256: Intersect with vegetation (plants, coral. trees not included)
-	// 
-	// NOTE: Raycasts that intersect with mission_entites (flag = 2) has limited range and will not register for far away entites. The range seems to be about 30 metres. 
-	static int _START_SHAPE_TEST_RAY(float x1, float y1, float z1, float x2, float y2, float z2, int flags, Entity entity, int p8) { return invoke<int>(0x377906D8A31E5586, x1, y1, z1, x2, y2, z2, flags, entity, p8); } // 0x377906D8A31E5586 0x8251485D b323
+	// Does the same as 0x7EE9F5D83DD4F90E, except blocking until the shape test completes.
+	static int START_EXPENSIVE_SYNCHRONOUS_SHAPE_TEST_LOS_PROBE(float x1, float y1, float z1, float x2, float y2, float z2, int flags, Entity entity, int p8) { return invoke<int>(0x377906D8A31E5586, x1, y1, z1, x2, y2, z2, flags, entity, p8); } // 0x377906D8A31E5586 0x8251485D b323
 	static int START_SHAPE_TEST_BOUNDING_BOX(Entity entity, int flags1, int flags2) { return invoke<int>(0x052837721A854EC7, entity, flags1, flags2); } // 0x052837721A854EC7 0xCEEAD94B b323
-	static int START_SHAPE_TEST_BOX(float x, float y, float z, float x1, float y2, float z2, float rotX, float rotY, float rotZ, Any p9, Any p10, Any entity, Any p12) { return invoke<int>(0xFE466162C4401D18, x, y, z, x1, y2, z2, rotX, rotY, rotZ, p9, p10, entity, p12); } // 0xFE466162C4401D18 0x249BC876 b323
+	static int START_SHAPE_TEST_BOX(float x, float y, float z, float x1, float y2, float z2, float rotX, float rotY, float rotZ, Any p9, int flags, Entity entity, Any p12) { return invoke<int>(0xFE466162C4401D18, x, y, z, x1, y2, z2, rotX, rotY, rotZ, p9, flags, entity, p12); } // 0xFE466162C4401D18 0x249BC876 b323
 	static int START_SHAPE_TEST_BOUND(Entity entity, int flags1, int flags2) { return invoke<int>(0x37181417CE7C8900, entity, flags1, flags2); } // 0x37181417CE7C8900 0x13BC46C0 b323
 	// Raycast from point to point, where the ray has a radius. 
 	// 
@@ -11069,27 +11985,22 @@ namespace SHAPETEST {
 	// 
 	// In its only usage in game scripts its called with flag set to 511, entity to player_ped_id and flag2 set to 7
 	static int _START_SHAPE_TEST_SURROUNDING_COORDS(Vector3* pVec1, Vector3* pVec2, int flag, Entity entity, int flag2) { return invoke<int>(0xFF6BE494C7987F34, pVec1, pVec2, flag, entity, flag2); } // 0xFF6BE494C7987F34 b323
-	// Parameters:
-	// rayHandle - Ray Handle from a casted ray, as returned by CAST_RAY_POINT_TO_POINT
-	// hit - Where to store whether or not it hit anything. False is when the ray reached its destination.
-	// endCoords - Where to store the world-coords of where the ray was stopped (by hitting its desired max range or by colliding with an entity/the map)
-	// surfaceNormal - Where to store the surface-normal coords (NOT relative to the game world) of where the entity was hit by the ray
-	// entityHit - Where to store the handle of the entity hit by the ray
+	// Returns the result of a shape test: 0 if the handle is invalid, 1 if the shape test is still pending, or 2 if the shape test has completed, and the handle should be invalidated.
 	// 
-	// Returns:
-	// Result? Some type of enum.
+	// When used with an asynchronous shape test, this native should be looped until returning 0 or 2, after which the handle is invalidated.
+	static int GET_SHAPE_TEST_RESULT(int shapeTestHandle, BOOL* hit, Vector3* endCoords, Vector3* surfaceNormal, Entity* entityHit) { return invoke<int>(0x3D87450E15D98694, shapeTestHandle, hit, endCoords, surfaceNormal, entityHit); } // 0x3D87450E15D98694 0xF3C2875A b323
+	// Returns the result of a shape test, also returning the material of any touched surface.
 	// 
-	// NOTE: To get the offset-coords of where the ray hit relative to the entity that it hit (which is NOT the same as surfaceNormal), you can use these two natives:
-	// Vector3 offset = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(entityHit, endCoords.x, endCoords.y, endCoords.z);
-	// Vector3 entitySpotCoords = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(entityHit, offset.x, offset.y, offset.z);
+	// When used with an asynchronous shape test, this native should be looped until returning 0 or 2, after which the handle is invalidated.
 	// 
-	// Use ENTITY::GET_ENTITY_TYPE(entityHit) to quickly distinguish what type of entity you hit (ped/vehicle/object - 1/2/3)
-	static int GET_SHAPE_TEST_RESULT(int rayHandle, BOOL* hit, Vector3* endCoords, Vector3* surfaceNormal, Entity* entityHit) { return invoke<int>(0x3D87450E15D98694, rayHandle, hit, endCoords, surfaceNormal, entityHit); } // 0x3D87450E15D98694 0xF3C2875A b323
-	static int GET_SHAPE_TEST_RESULT_INCLUDING_MATERIAL(int rayHandle, BOOL* hit, Vector3* endCoords, Vector3* surfaceNormal, Hash* materialHash, Entity* entityHit) { return invoke<int>(0x65287525D951F6BE, rayHandle, hit, endCoords, surfaceNormal, materialHash, entityHit); } // 0x65287525D951F6BE 0x4301E10C b323
-	static void _SHAPE_TEST_RESULT_ENTITY(Entity entityHit) { invoke<Void>(0x2B3334BCA57CD799, entityHit); } // 0x2B3334BCA57CD799 0xEC2AAF06 b323
+	// Unless the return value is 2, the other return values are undefined.
+	static int GET_SHAPE_TEST_RESULT_INCLUDING_MATERIAL(int shapeTestHandle, BOOL* hit, Vector3* endCoords, Vector3* surfaceNormal, Hash* materialHash, Entity* entityHit) { return invoke<int>(0x65287525D951F6BE, shapeTestHandle, hit, endCoords, surfaceNormal, materialHash, entityHit); } // 0x65287525D951F6BE 0x4301E10C b323
+	// Invalidates the entity handle passed by removing the fwScriptGuid from the entity. This should be used when receiving an ambient entity from shape testing natives, but can also be used for other natives returning an 'irrelevant' entity handle.
+	static void RELEASE_SCRIPT_GUID_FROM_ENTITY(Entity entityHit) { invoke<Void>(0x2B3334BCA57CD799, entityHit); } // 0x2B3334BCA57CD799 0xEC2AAF06 b323
 }
 
-namespace SOCIALCLUB {
+namespace SOCIALCLUB
+{
 	static int SC_INBOX_GET_TOTAL_NUM_MESSAGES() { return invoke<int>(0x03A93FF1A2CA0864); } // 0x03A93FF1A2CA0864 0x6BE5DF29 b323
 	static Hash _SC_INBOX_MESSAGE_INIT(int p0) { return invoke<Hash>(0xBB8EA16ECBC976C4, p0); } // 0xBB8EA16ECBC976C4 0x5ECF955D b323
 	static BOOL _IS_SC_INBOX_VALID(int p0) { return invoke<BOOL>(0x93028F1DB42BFD08, p0); } // 0x93028F1DB42BFD08 0xD1ED1D48 b323
@@ -11175,7 +12086,8 @@ namespace SOCIALCLUB {
 	static BOOL _0x92DA6E70EF249BD1(const char* p0, int* p1) { return invoke<BOOL>(0x92DA6E70EF249BD1, p0, p1); } // 0x92DA6E70EF249BD1 0xAED95A6F b323
 	static void _0x675721C9F644D161() { invoke<Void>(0x675721C9F644D161); } // 0x675721C9F644D161 0x486867E6 b323
 	static Any _0xE4F6E8D07A2F0F51(Any p0) { return invoke<Any>(0xE4F6E8D07A2F0F51, p0); } // 0xE4F6E8D07A2F0F51 b1290
-	static Any _0x8A4416C0DB05FA66(Any p0) { return invoke<Any>(0x8A4416C0DB05FA66, p0); } // 0x8A4416C0DB05FA66 b1290
+	// Fills some 0x30 sized struct
+	static BOOL _0x8A4416C0DB05FA66(Any p0) { return invoke<BOOL>(0x8A4416C0DB05FA66, p0); } // 0x8A4416C0DB05FA66 b1290
 	static void _0xEA95C0853A27888E() { invoke<Void>(0xEA95C0853A27888E); } // 0xEA95C0853A27888E b1290
 	// Returns the nickname of the logged-in Rockstar Social Club account.
 	static const char* _SC_GET_NICKNAME() { return invoke<const char*>(0x198D161F458ECC7F); } // 0x198D161F458ECC7F b323
@@ -11184,10 +12096,8 @@ namespace SOCIALCLUB {
 	static BOOL _SC_GET_HAS_ACHIEVEMENT_BEEN_PASSED(int achievement) { return invoke<BOOL>(0x418DC16FAE452C1C, achievement); } // 0x418DC16FAE452C1C b323
 }
 
-namespace STATS {
-	// Please change to "void"!
-	// ---------------------------------
-	// 
+namespace STATS
+{
 	// Example:
 	// 
 	// for (v_2 = 0; v_2 <= 4; v_2 += 1) {
@@ -11195,7 +12105,7 @@ namespace STATS {
 	// }
 	static Any STAT_CLEAR_SLOT_FOR_RELOAD(int statSlot) { return invoke<Any>(0xEB0A72181D4AA4AD, statSlot); } // 0xEB0A72181D4AA4AD 0x84BDD475 b323
 	static BOOL STAT_LOAD(int p0) { return invoke<BOOL>(0xA651443F437B1CE6, p0); } // 0xA651443F437B1CE6 0x9E5629F4 b323
-	static BOOL STAT_SAVE(int p0, BOOL p1, int p2) { return invoke<BOOL>(0xE07BCA305B82D2FD, p0, p1, p2); } // 0xE07BCA305B82D2FD 0xE10A7CA4 b323
+	static BOOL STAT_SAVE(int p0, BOOL p1, int p2, Any p3) { return invoke<BOOL>(0xE07BCA305B82D2FD, p0, p1, p2, p3); } // 0xE07BCA305B82D2FD 0xE10A7CA4 b323
 	// STAT_SET_*
 	static void _0x5688585E6D563CD8(int p0) { invoke<Void>(0x5688585E6D563CD8, p0); } // 0x5688585E6D563CD8 0xC62406A6 b323
 	static BOOL STAT_LOAD_PENDING(Any p0) { return invoke<BOOL>(0xA1750FFAFA181661, p0); } // 0xA1750FFAFA181661 0x4E9AC983 b323
@@ -11205,27 +12115,22 @@ namespace STATS {
 	static BOOL STAT_SLOT_IS_LOADED(Any p0) { return invoke<BOOL>(0x0D0A9F0E7BD91E3C, p0); } // 0x0D0A9F0E7BD91E3C 0x7A299C13 b323
 	static BOOL _0x7F2C4CDF2E82DF4C(Any p0) { return invoke<BOOL>(0x7F2C4CDF2E82DF4C, p0); } // 0x7F2C4CDF2E82DF4C 0x0BF0F4B2 b323
 	static Any _0xE496A53BA5F50A56(Any p0) { return invoke<Any>(0xE496A53BA5F50A56, p0); } // 0xE496A53BA5F50A56 0xCE6B62B5 b323
-	// STAT_S*
-	static void _0xF434A10BA01C37D0(BOOL toggle) { invoke<Void>(0xF434A10BA01C37D0, toggle); } // 0xF434A10BA01C37D0 0xCE7A2411 b323
+	static void STAT_SET_BLOCK_SAVES(BOOL toggle) { invoke<Void>(0xF434A10BA01C37D0, toggle); } // 0xF434A10BA01C37D0 0xCE7A2411 b323
+	static BOOL _0x6A7F19756F1A9016() { return invoke<BOOL>(0x6A7F19756F1A9016); } // 0x6A7F19756F1A9016 b2060
 	static BOOL _0x7E6946F68A38B74F(Any p0) { return invoke<BOOL>(0x7E6946F68A38B74F, p0); } // 0x7E6946F68A38B74F 0x22804C20 b323
 	static void _0xA8733668D1047B51(Any p0) { invoke<Void>(0xA8733668D1047B51, p0); } // 0xA8733668D1047B51 0x395D18B1 b323
 	// STAT_LOAD_*
 	static BOOL _0xECB41AC6AB754401() { return invoke<BOOL>(0xECB41AC6AB754401); } // 0xECB41AC6AB754401 0xED7000C8 b323
 	static void _0x9B4BD21D69B1E609() { invoke<Void>(0x9B4BD21D69B1E609); } // 0x9B4BD21D69B1E609 b323
 	static Any _0xC0E0D686DDFC6EAE() { return invoke<Any>(0xC0E0D686DDFC6EAE); } // 0xC0E0D686DDFC6EAE 0x099FCC86 b323
-	// Add Cash example:
-	// for (int i = 0; i < 3; i++)
-	// {
-	// char statNameFull[32];
-	// sprintf_s(statNameFull, "SP%d_TOTAL_CASH", i);
-	// Hash hash = MISC::GET_HASH_KEY(statNameFull);
-	// int val;
-	// STATS::STAT_GET_INT(hash, &val, -1);
-	// val += 1000000;
-	// STATS::STAT_SET_INT(hash, val, 1);
-	// }
+	// Example:
+	//  STATS::STAT_SET_INT(MISC::GET_HASH_KEY("MPPLY_KILLS_PLAYERS"), 1337, true);
 	static BOOL STAT_SET_INT(Hash statName, int value, BOOL save) { return invoke<BOOL>(0xB3271D7AB655B441, statName, value, save); } // 0xB3271D7AB655B441 0xC9CC1C5C b323
+	// Example:
+	//  STATS::STAT_SET_FLOAT(MISC::GET_HASH_KEY("MP0_WEAPON_ACCURACY"), 66.6f, true);
 	static BOOL STAT_SET_FLOAT(Hash statName, float value, BOOL save) { return invoke<BOOL>(0x4851997F37FE9B3C, statName, value, save); } // 0x4851997F37FE9B3C 0x6CEA96F2 b323
+	// Example:
+	//  STATS::STAT_SET_BOOL(MISC::GET_HASH_KEY("MPPLY_MELEECHLENGECOMPLETED"), trur, true);
 	static BOOL STAT_SET_BOOL(Hash statName, BOOL value, BOOL save) { return invoke<BOOL>(0x4B33C4243DE0C432, statName, value, save); } // 0x4B33C4243DE0C432 0x55D79DFB b323
 	// The following values have been found in the decompiled scripts:
 	// "RC_ABI1"
@@ -11358,26 +12263,49 @@ namespace STATS {
 	// profileSetting seems to only be 936, 937 and 938 in scripts
 	static void STAT_SET_PROFILE_SETTING_VALUE(int profileSetting, int value) { invoke<Void>(0x68F01422BE1D838F, profileSetting, value); } // 0x68F01422BE1D838F 0x24DD4929 b323
 	// Needs more research. Possibly used to calculate the "mask" when calling "STAT_SET_BOOL_MASKED"?
-	static int _0xF4D8E7AC2A27758C(int p0) { return invoke<int>(0xF4D8E7AC2A27758C, p0); } // 0xF4D8E7AC2A27758C 0xDFC25D66 b323
+	static int _STAT_GET_PACKED_BOOL_MASK(int p0) { return invoke<int>(0xF4D8E7AC2A27758C, p0); } // 0xF4D8E7AC2A27758C 0xDFC25D66 b323
 	// Needs more research. Possibly used to calculate the "mask" when calling "STAT_SET_MASKED_INT"?
-	static int _0x94F12ABF9C79E339(int p0) { return invoke<int>(0x94F12ABF9C79E339, p0); } // 0x94F12ABF9C79E339 0xCA160BCC b323
+	static int _STAT_GET_PACKED_INT_MASK(int p0) { return invoke<int>(0x94F12ABF9C79E339, p0); } // 0x94F12ABF9C79E339 0xCA160BCC b323
 	static Hash GET_PACKED_BOOL_STAT_KEY(int index, BOOL spStat, BOOL charStat, int character) { return invoke<Hash>(0x80C75307B1C42837, index, spStat, charStat, character); } // 0x80C75307B1C42837 0xB5BF87B2 b323
 	static Hash GET_PACKED_INT_STAT_KEY(int index, BOOL spStat, BOOL charStat, int character) { return invoke<Hash>(0x61E111E323419E07, index, spStat, charStat, character); } // 0x61E111E323419E07 0x1F938864 b323
-	static Hash _GET_PACKED_TITLE_UPDATE_BOOL_STAT_KEY(int index, BOOL spStat, BOOL charStat, int character) { return invoke<Hash>(0xC4BB08EE7907471E, index, spStat, charStat, character); } // 0xC4BB08EE7907471E 0x3F8E893B b323
-	static Hash _GET_PACKED_TITLE_UPDATE_INT_STAT_KEY(int index, BOOL spStat, BOOL charStat, int character) { return invoke<Hash>(0xD16C2AD6B8E32854, index, spStat, charStat, character); } // 0xD16C2AD6B8E32854 0xFB93C5A2 b323
+	static Hash GET_PACKED_TU_BOOL_STAT_KEY(int index, BOOL spStat, BOOL charStat, int character) { return invoke<Hash>(0xC4BB08EE7907471E, index, spStat, charStat, character); } // 0xC4BB08EE7907471E 0x3F8E893B b323
+	static Hash GET_PACKED_TU_INT_STAT_KEY(int index, BOOL spStat, BOOL charStat, int character) { return invoke<Hash>(0xD16C2AD6B8E32854, index, spStat, charStat, character); } // 0xD16C2AD6B8E32854 0xFB93C5A2 b323
 	// Needs more research. Gets the stat name of a masked bool?
 	// 
-	// p4 - Usually "_NGPSTAT_BOOL" or "_NGTATPSTAT_BOOL". There may be more that I missed.
+	// section - values used in the decompiled scripts:
+	// "_NGPSTAT_BOOL"
+	// "_NGTATPSTAT_BOOL"
+	// "_NGDLCPSTAT_BOOL"
+	// "_DLCBIKEPSTAT_BOOL"
+	// "_DLCGUNPSTAT_BOOL"
+	// "_GUNTATPSTAT_BOOL"
+	// "_DLCSMUGCHARPSTAT_BOOL"
+	// "_GANGOPSPSTAT_BOOL"
+	// "_BUSINESSBATPSTAT_BOOL"
+	// "_ARENAWARSPSTAT_BOOL"
+	// "_CASINOPSTAT_BOOL"
+	// "_CASINOHSTPSTAT_BOOL"
+	// "_HEIST3TATTOOSTAT_BOOL"
 	static Hash _GET_NGSTAT_BOOL_HASH(int index, BOOL spStat, BOOL charStat, int character, const char* section) { return invoke<Hash>(0xBA52FF538ED2BC71, index, spStat, charStat, character, section); } // 0xBA52FF538ED2BC71 b323
 	// Needs more research. Gets the stat name of a masked int?
 	// 
-	// p4 - Usually one of the following (there may be more that I missed):
-	// -----> "_APAPSTAT_INT"
-	// -----> "_LRPSTAT_INT"
-	// -----> "_NGPSTAT_INT"
-	// -----> "_MP_APAPSTAT_INT"
-	// -----> "_MP_LRPSTAT_INT"
-	// -----> "_MP_NGPSTAT_INT"
+	// section - values used in the decompiled scripts:
+	// "_NGPSTAT_INT"
+	// "_MP_NGPSTAT_INT"
+	// "_MP_LRPSTAT_INT"
+	// "_MP_APAPSTAT_INT"
+	// "_MP_LR2PSTAT_INT"
+	// "_MP_BIKEPSTAT_INT"
+	// "_MP_IMPEXPPSTAT_INT"
+	// "_MP_GUNRPSTAT_INT"
+	// "_NGDLCPSTAT_INT"
+	// "_MP_NGDLCPSTAT_INT"
+	// "_DLCSMUGCHARPSTAT_INT"
+	// "_GANGOPSPSTAT_INT"
+	// "_BUSINESSBATPSTAT_INT"
+	// "_ARENAWARSPSTAT_INT"
+	// "_CASINOPSTAT_INT"
+	// "_CASINOHSTPSTAT_INT"
 	static Hash _GET_NGSTAT_INT_HASH(int index, BOOL spStat, BOOL charStat, int character, const char* section) { return invoke<Hash>(0x2B4CDCA6F07FF3DA, index, spStat, charStat, character, section); } // 0x2B4CDCA6F07FF3DA b323
 	// p2 - Default value? Seems to be -1 most of the time.
 	static BOOL STAT_GET_BOOL_MASKED(Hash statName, int mask, int p2) { return invoke<BOOL>(0x10FE3F1B79F9B071, statName, mask, p2); } // 0x10FE3F1B79F9B071 0x6ACE1B7D b323
@@ -11386,9 +12314,10 @@ namespace STATS {
 	static void PLAYSTATS_NPC_INVITE(Any* p0) { invoke<Void>(0x93054C88E6AA7C44, p0); } // 0x93054C88E6AA7C44 0x598C06F3 b323
 	static void PLAYSTATS_AWARD_XP(int amount, Hash type, Hash category) { invoke<Void>(0x46F917F6B4128FE4, amount, type, category); } // 0x46F917F6B4128FE4 0x8770017B b323
 	static void PLAYSTATS_RANK_UP(int rank) { invoke<Void>(0xC7F2DE41D102BFB4, rank); } // 0xC7F2DE41D102BFB4 0x56AFB9F5 b323
+	// PLAYSTATS_START_INVITE_DESPAWNING?
 	static void _PLAYSTATS_START_OFFLINE_MODE() { invoke<Void>(0x098760C7461724CD); } // 0x098760C7461724CD 0x896CDF8D b323
-	static void _0xA071E0ED98F91286(Any p0, Any p1) { invoke<Void>(0xA071E0ED98F91286, p0, p1); } // 0xA071E0ED98F91286 0x1A66945F b323
-	static void _0xC5BE134EC7BA96A0(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0xC5BE134EC7BA96A0, p0, p1, p2, p3, p4); } // 0xC5BE134EC7BA96A0 0xC960E161 b323
+	static void PLAYSTATS_ACTIVITY_DONE(Any p0, Any p1) { invoke<Void>(0xA071E0ED98F91286, p0, p1); } // 0xA071E0ED98F91286 0x1A66945F b323
+	static void PLAYSTATS_LEAVE_JOB_CHAIN(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0xC5BE134EC7BA96A0, p0, p1, p2, p3, p4); } // 0xC5BE134EC7BA96A0 0xC960E161 b323
 	static void PLAYSTATS_MISSION_STARTED(Any* p0, Any p1, Any p2, BOOL p3) { invoke<Void>(0xC19A2925C34D2231, p0, p1, p2, p3); } // 0xC19A2925C34D2231 0x3AAB699C b323
 	static void PLAYSTATS_MISSION_OVER(Any* p0, Any p1, Any p2, BOOL p3, BOOL p4, BOOL p5) { invoke<Void>(0x7C4BB33A8CED7324, p0, p1, p2, p3, p4, p5); } // 0x7C4BB33A8CED7324 0x5B90B5FF b323
 	static void PLAYSTATS_MISSION_CHECKPOINT(Any* p0, Any p1, Any p2, Any p3) { invoke<Void>(0xC900596A63978C1D, p0, p1, p2, p3); } // 0xC900596A63978C1D 0xCDC52280 b323
@@ -11399,11 +12328,11 @@ namespace STATS {
 	static BOOL _0x6DEE77AFF8C21BD1(int* playerAccountId, int* posixTime) { return invoke<BOOL>(0x6DEE77AFF8C21BD1, playerAccountId, posixTime); } // 0x6DEE77AFF8C21BD1 0x489E27E7 b323
 	static void PLAYSTATS_MATCH_STARTED(Any p0, Any p1, Any p2) { invoke<Void>(0xBC80E22DED931E3D, p0, p1, p2); } // 0xBC80E22DED931E3D 0x2BDE85C1 b323
 	static void PLAYSTATS_SHOP_ITEM(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0x176852ACAAC173D1, p0, p1, p2, p3, p4); } // 0x176852ACAAC173D1 0xA4746384 b323
-	static void _PLAYSTATS_CRATE_DROP(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7) { invoke<Void>(0x1CAE5D2E3F9A07F0, p0, p1, p2, p3, p4, p5, p6, p7); } // 0x1CAE5D2E3F9A07F0 0x6602CED6 b323
-	static void _PLAYSTATS_CRATE_CREATED(float p0, float p1, float p2) { invoke<Void>(0xAFC7E5E075A96F46, p0, p1, p2); } // 0xAFC7E5E075A96F46 b323
-	static void _PLAYSTATS_HOLD_UP(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0xCB00196B31C39EB1, p0, p1, p2, p3); } // 0xCB00196B31C39EB1 0x759E0EC9 b323
-	static void _PLAYSTATS_IMP_EXP(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x2B69F5074C894811, p0, p1, p2, p3); } // 0x2B69F5074C894811 0x62073DF7 b323
-	static void _PLAYSTATS_RACE_TO_POINT(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9) { invoke<Void>(0xADDD1C754E2E2914, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); } // 0xADDD1C754E2E2914 0x06CE3692 b323
+	static void PLAYSTATS_CRATE_DROP_MISSION_DONE(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7) { invoke<Void>(0x1CAE5D2E3F9A07F0, p0, p1, p2, p3, p4, p5, p6, p7); } // 0x1CAE5D2E3F9A07F0 0x6602CED6 b323
+	static void _PLAYSTATS_CRATE_CREATED_MISSION_DONE(float p0, float p1, float p2) { invoke<Void>(0xAFC7E5E075A96F46, p0, p1, p2); } // 0xAFC7E5E075A96F46 b323
+	static void PLAYSTATS_HOLD_UP_MISSION_DONE(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0xCB00196B31C39EB1, p0, p1, p2, p3); } // 0xCB00196B31C39EB1 0x759E0EC9 b323
+	static void PLAYSTATS_IMPORT_EXPORT_MISSION_DONE(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x2B69F5074C894811, p0, p1, p2, p3); } // 0x2B69F5074C894811 0x62073DF7 b323
+	static void PLAYSTATS_RACE_TO_POINT_MISSION_DONE(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9) { invoke<Void>(0xADDD1C754E2E2914, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); } // 0xADDD1C754E2E2914 0x06CE3692 b323
 	static void PLAYSTATS_ACQUIRED_HIDDEN_PACKAGE(Any p0) { invoke<Void>(0x79AB33F0FBFAC40C, p0); } // 0x79AB33F0FBFAC40C 0x8D5C7B37 b323
 	static void PLAYSTATS_WEBSITE_VISITED(Hash scaleformHash, int p1) { invoke<Void>(0xDDF24D535060F811, scaleformHash, p1); } // 0xDDF24D535060F811 0x37D152BB b323
 	static void PLAYSTATS_FRIEND_ACTIVITY(Any p0, Any p1) { invoke<Void>(0x0F71DE29AB2258F1, p0, p1); } // 0x0F71DE29AB2258F1 0xD1FA1BDB b323
@@ -11484,7 +12413,7 @@ namespace STATS {
 	//         }
 	static BOOL _0x5EAD2BF6484852E4() { return invoke<BOOL>(0x5EAD2BF6484852E4); } // 0x5EAD2BF6484852E4 0x23D70C39 b323
 	static void _0xC141B8917E0017EC() { invoke<Void>(0xC141B8917E0017EC); } // 0xC141B8917E0017EC 0x0AD43306 b323
-	static void _0xB475F27C6A994D65() { invoke<Void>(0xB475F27C6A994D65); } // 0xB475F27C6A994D65 0xC7DE5C30 b323
+	static void SET_PROFILE_SETTING_PROLOGUE_COMPLETE() { invoke<Void>(0xB475F27C6A994D65); } // 0xB475F27C6A994D65 0xC7DE5C30 b323
 	// Sets profile setting 939
 	static void _0xC67E2DA1CBE759E2() { invoke<Void>(0xC67E2DA1CBE759E2); } // 0xC67E2DA1CBE759E2 b1734
 	// Sets profile setting 933
@@ -11496,7 +12425,7 @@ namespace STATS {
 	static void _0x723C1CE13FBFDB67(Any p0, Any p1) { invoke<Void>(0x723C1CE13FBFDB67, p0, p1); } // 0x723C1CE13FBFDB67 0x4C39CF10 b323
 	static void _0x0D01D20616FC73FB(Any p0, Any p1) { invoke<Void>(0x0D01D20616FC73FB, p0, p1); } // 0x0D01D20616FC73FB 0x2180AE13 b323
 	static void _0x428EAF89E24F6C36(Any p0, float p1) { invoke<Void>(0x428EAF89E24F6C36, p0, p1); } // 0x428EAF89E24F6C36 0xEE292B91 b323
-	static void _0x047CBED6F6F8B63C() { invoke<Void>(0x047CBED6F6F8B63C); } // 0x047CBED6F6F8B63C 0xA063CABD b323
+	static void STAT_SET_CHEAT_IS_ACTIVE() { invoke<Void>(0x047CBED6F6F8B63C); } // 0x047CBED6F6F8B63C 0xA063CABD b323
 	static BOOL LEADERBOARDS2_WRITE_DATA_FOR_EVENT_TYPE(Any* p0, Any* p1) { return invoke<BOOL>(0xC980E62E33DF1D5C, p0, p1); } // 0xC980E62E33DF1D5C 0x62C19A3D b323
 	static void _0x6F361B8889A792A3() { invoke<Void>(0x6F361B8889A792A3); } // 0x6F361B8889A792A3 0x3B4EF322 b323
 	static void _0xC847B43F369AC0B5() { invoke<Void>(0xC847B43F369AC0B5); } // 0xC847B43F369AC0B5 b323
@@ -11561,10 +12490,10 @@ namespace STATS {
 	static void _0x53CAE13E9B426993(Any p0) { invoke<Void>(0x53CAE13E9B426993, p0); } // 0x53CAE13E9B426993 b757
 	static void _0x7D36291161859389(Any p0) { invoke<Void>(0x7D36291161859389, p0); } // 0x7D36291161859389 b757
 	static void _PLAYSTATS_SPENT_PI_CUSTOM_LOADOUT(int amount) { invoke<Void>(0xBE509B0A3693DE8B, amount); } // 0xBE509B0A3693DE8B b757
-	static void _0xD6781E42755531F7(Any p0) { invoke<Void>(0xD6781E42755531F7, p0); } // 0xD6781E42755531F7 b757
-	static void _0xC729991A9065376E(Any p0) { invoke<Void>(0xC729991A9065376E, p0); } // 0xC729991A9065376E b757
-	static void _0x2605663BD4F23B5D(Any p0) { invoke<Void>(0x2605663BD4F23B5D, p0); } // 0x2605663BD4F23B5D b757
-	static void _0x04D90BA8207ADA2D(Any p0) { invoke<Void>(0x04D90BA8207ADA2D, p0); } // 0x04D90BA8207ADA2D b757
+	static void _PLAYSTATS_BUY_CONTRABAND(Any* data) { invoke<Void>(0xD6781E42755531F7, data); } // 0xD6781E42755531F7 b757
+	static void _PLAYSTATS_SELL_CONTRABAND(Any* data) { invoke<Void>(0xC729991A9065376E, data); } // 0xC729991A9065376E b757
+	static void _PLAYSTATS_DEFEND_CONTRABAND(Any* data) { invoke<Void>(0x2605663BD4F23B5D, data); } // 0x2605663BD4F23B5D b757
+	static void _PLAYSTATS_RECOVER_CONTRABAND(Any* data) { invoke<Void>(0x04D90BA8207ADA2D, data); } // 0x04D90BA8207ADA2D b757
 	static void _0x60EEDC12AF66E846(Any p0) { invoke<Void>(0x60EEDC12AF66E846, p0); } // 0x60EEDC12AF66E846 b757
 	static void _0x3EBEAC6C3F81F6BD(Any p0) { invoke<Void>(0x3EBEAC6C3F81F6BD, p0); } // 0x3EBEAC6C3F81F6BD b573
 	static void _0x96E6D5150DBF1C09(Any p0, Any p1, Any p2) { invoke<Void>(0x96E6D5150DBF1C09, p0, p1, p2); } // 0x96E6D5150DBF1C09 b573
@@ -11601,8 +12530,8 @@ namespace STATS {
 	static void _0x316DB59CD14C1774(Any p0) { invoke<Void>(0x316DB59CD14C1774, p0); } // 0x316DB59CD14C1774 b1493
 	static void _0x2D7A9B577E72385E(Any p0) { invoke<Void>(0x2D7A9B577E72385E, p0); } // 0x2D7A9B577E72385E b1493
 	static void _0x830C3A44EB3F2CF9(Any p0) { invoke<Void>(0x830C3A44EB3F2CF9, p0); } // 0x830C3A44EB3F2CF9 b1493
-	static void _0xB26F670685631727(Any p0) { invoke<Void>(0xB26F670685631727, p0); } // 0xB26F670685631727 b1493
-	static void _0xC14BD9F5337219B2(Any p0) { invoke<Void>(0xC14BD9F5337219B2, p0); } // 0xC14BD9F5337219B2 b1493
+	static void _0xB26F670685631727(Any p0, Any p1) { invoke<Void>(0xB26F670685631727, p0, p1); } // 0xB26F670685631727 b1493
+	static void _0xC14BD9F5337219B2(Any p0, Any p1) { invoke<Void>(0xC14BD9F5337219B2, p0, p1); } // 0xC14BD9F5337219B2 b1493
 	static void _PLAYSTATS_STONE_HATCHET_END(Any* data) { invoke<Void>(0x35E39E5570358630, data); } // 0x35E39E5570358630 b1493
 	static void _PLAYSTATS_SMUG_MISSION_ENDED(Any* data) { invoke<Void>(0x320C35147D5B5DDD, data); } // 0x320C35147D5B5DDD b1180
 	static void _PLAYSTATS_H2_FMPREP_END(Any* data) { invoke<Void>(0xD8AFB345A9C5CCBB, data); } // 0xD8AFB345A9C5CCBB b1290
@@ -11629,18 +12558,36 @@ namespace STATS {
 	static void _PLAYSTATS_CASINO_SLOTMACHINE_LIGHT(Any p0) { invoke<Void>(0xE60054A0FAE8227F, p0); } // 0xE60054A0FAE8227F b1734
 	static void _PLAYSTATS_CASINO_INSIDETRACK_LIGHT(Any p0) { invoke<Void>(0x23A3CBCD50D54E47, p0); } // 0x23A3CBCD50D54E47 b1734
 	static void _PLAYSTATS_ARCADEGAME(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { invoke<Void>(0x533A7D1EA58DF958, p0, p1, p2, p3, p4, p5); } // 0x533A7D1EA58DF958 b1734
+	static void _0x4FCDBD3F0A813C25(Any p0, Any p1) { invoke<Void>(0x4FCDBD3F0A813C25, p0, p1); } // 0x4FCDBD3F0A813C25 b1868
 	static void _PLAYSTATS_CASINO_MISSION_ENDED(Any* data) { invoke<Void>(0x1A0D4A6C336B7BC5, data); } // 0x1A0D4A6C336B7BC5 b1734
+	static void _0xDFBD93BF2943E29B(Any p0) { invoke<Void>(0xDFBD93BF2943E29B, p0); } // 0xDFBD93BF2943E29B b1868
+	static void _0x92FC0EEDFAC04A14(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { invoke<Void>(0x92FC0EEDFAC04A14, p0, p1, p2, p3, p4, p5); } // 0x92FC0EEDFAC04A14 b1868
+	static void _0x0077F15613D36993(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x0077F15613D36993, p0, p1, p2, p3); } // 0x0077F15613D36993 b1868
+	static void _0xF9096193DF1F99D4(Any p0) { invoke<Void>(0xF9096193DF1F99D4, p0); } // 0xF9096193DF1F99D4 b1868
+	static void _0x2E0259BABC27A327(Any p0) { invoke<Void>(0x2E0259BABC27A327, p0); } // 0x2E0259BABC27A327 b1868
+	static void _0x53C31853EC9531FF(Any p0) { invoke<Void>(0x53C31853EC9531FF, p0); } // 0x53C31853EC9531FF b1868
+	static void _0x810B5FCC52EC7FF0(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x810B5FCC52EC7FF0, p0, p1, p2, p3); } // 0x810B5FCC52EC7FF0 b1868
+	static void _0x5BF29846C6527C54(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0x5BF29846C6527C54, p0, p1, p2, p3, p4); } // 0x5BF29846C6527C54 b1868
+	static void _0xC03FAB2C2F92289B(Any p0) { invoke<Void>(0xC03FAB2C2F92289B, p0); } // 0xC03FAB2C2F92289B b1868
+	static void _0x5CDAED54B34B0ED0(Any p0) { invoke<Void>(0x5CDAED54B34B0ED0, p0); } // 0x5CDAED54B34B0ED0 b1868
+	static void _0x4AFF7E02E485E92B() { invoke<Void>(0x4AFF7E02E485E92B); } // 0x4AFF7E02E485E92B b1868
+	static void _0xDFCDB14317A9B361(Any p0) { invoke<Void>(0xDFCDB14317A9B361, p0); } // 0xDFCDB14317A9B361 b2189
+	static void _0xC1E963C58664B556(Any p0) { invoke<Void>(0xC1E963C58664B556, p0); } // 0xC1E963C58664B556 b2189
+	static void _0x2FA3173480008493(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0x2FA3173480008493, p0, p1, p2, p3, p4); } // 0x2FA3173480008493 b2189
+	static void _0xD4367D310F079DB0(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0xD4367D310F079DB0, p0, p1, p2, p3); } // 0xD4367D310F079DB0 b2189
+	static void _0x4DC416F246A41FC8(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0x4DC416F246A41FC8, p0, p1, p2, p3, p4); } // 0x4DC416F246A41FC8 b2189
+	static void _0x2818FF6638CB09DE(Any p0) { invoke<Void>(0x2818FF6638CB09DE, p0); } // 0x2818FF6638CB09DE b2189
+	static void _0xD6CA58B3B53A0F22(Any p0) { invoke<Void>(0xD6CA58B3B53A0F22, p0); } // 0xD6CA58B3B53A0F22 b2189
 }
 
-namespace STREAMING {
+namespace STREAMING
+{
 	static void LOAD_ALL_OBJECTS_NOW() { invoke<Void>(0xBD6E84632DD4CB3F); } // 0xBD6E84632DD4CB3F 0xC9DBDA90 b323
 	static void LOAD_SCENE(float x, float y, float z) { invoke<Void>(0x4448EB75B4904BDB, x, y, z); } // 0x4448EB75B4904BDB 0xB72403F5 b323
 	static BOOL NETWORK_UPDATE_LOAD_SCENE() { return invoke<BOOL>(0xC4582015556D1C46); } // 0xC4582015556D1C46 0xC76E023C b323
 	static BOOL IS_NETWORK_LOADING_SCENE() { return invoke<BOOL>(0x41CA5A33160EA4AB); } // 0x41CA5A33160EA4AB 0x6DCFC021 b323
 	static void SET_INTERIOR_ACTIVE(int interiorID, BOOL toggle) { invoke<Void>(0xE37B76C387BE28ED, interiorID, toggle); } // 0xE37B76C387BE28ED 0xE1013910 b323
-	// Request a model to be loaded into memory
-	// 
-	// Looking it the disassembly, it seems like it actually returns the model if it's already loaded.
+	// Request a model to be loaded into memory.
 	// 
 	static void REQUEST_MODEL(Hash model) { invoke<Void>(0x963D27A58DF860AC, model); } // 0x963D27A58DF860AC 0xFFF1B500 b323
 	static void REQUEST_MENU_PED_MODEL(Hash model) { invoke<Void>(0xA0261AEF7ACFC51E, model); } // 0xA0261AEF7ACFC51E 0x48CEB6B4 b323
@@ -11667,31 +12614,59 @@ namespace STREAMING {
 	static BOOL HAS_COLLISION_FOR_MODEL_LOADED(Hash model) { return invoke<BOOL>(0x22CCA434E368F03A, model); } // 0x22CCA434E368F03A 0x41A094F8 b323
 	// MulleDK19: Alias of REQUEST_COLLISION_AT_COORD.
 	static void REQUEST_ADDITIONAL_COLLISION_AT_COORD(float x, float y, float z) { invoke<Void>(0xC9156DC11411A9EA, x, y, z); } // 0xC9156DC11411A9EA 0xC2CC1DF2 b323
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static BOOL DOES_ANIM_DICT_EXIST(const char* animDict) { return invoke<BOOL>(0x2DA49C3B79856961, animDict); } // 0x2DA49C3B79856961 0xCD31C872 b323
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static void REQUEST_ANIM_DICT(const char* animDict) { invoke<Void>(0xD3BD40951412FEF6, animDict); } // 0xD3BD40951412FEF6 0xDCA96950 b323
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static BOOL HAS_ANIM_DICT_LOADED(const char* animDict) { return invoke<BOOL>(0xD031A9162D01088C, animDict); } // 0xD031A9162D01088C 0x05E6763C b323
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static void REMOVE_ANIM_DICT(const char* animDict) { invoke<Void>(0xF66A602F829E2A06, animDict); } // 0xF66A602F829E2A06 0x0AE050B5 b323
 	// Starts loading the specified animation set. An animation set provides movement animations for a ped. See SET_PED_MOVEMENT_CLIPSET.
+	// 
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
+	// 
+	// Full list of movement clipsets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/movementClipsetsCompact.json
 	static void REQUEST_ANIM_SET(const char* animSet) { invoke<Void>(0x6EA47DAE7FAD0EED, animSet); } // 0x6EA47DAE7FAD0EED 0x2988B3FC b323
 	// Gets whether the specified animation set has finished loading. An animation set provides movement animations for a ped. See SET_PED_MOVEMENT_CLIPSET.
 	// 
 	// Animation set and clip set are synonymous.
+	// 
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
+	// 
+	// Full list of movement clipsets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/movementClipsetsCompact.json
 	static BOOL HAS_ANIM_SET_LOADED(const char* animSet) { return invoke<BOOL>(0xC4EA073D86FB29B0, animSet); } // 0xC4EA073D86FB29B0 0x4FFF397D b323
 	// Unloads the specified animation set. An animation set provides movement animations for a ped. See SET_PED_MOVEMENT_CLIPSET.
 	// 
 	// Animation set and clip set are synonymous.
+	// 
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
+	// 
+	// Full list of movement clipsets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/movementClipsetsCompact.json
 	static void REMOVE_ANIM_SET(const char* animSet) { invoke<Void>(0x16350528F93024B3, animSet); } // 0x16350528F93024B3 0xD04A817A b323
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
+	// 
+	// Full list of movement clipsets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/movementClipsetsCompact.json
 	static void REQUEST_CLIP_SET(const char* clipSet) { invoke<Void>(0xD2A71E1A77418A49, clipSet); } // 0xD2A71E1A77418A49 0x546C627A b323
 	// Alias for HAS_ANIM_SET_LOADED.
+	// 
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
+	// 
+	// Full list of movement clipsets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/movementClipsetsCompact.json
 	static BOOL HAS_CLIP_SET_LOADED(const char* clipSet) { return invoke<BOOL>(0x318234F4F3738AF3, clipSet); } // 0x318234F4F3738AF3 0x230D5455 b323
 	// Alias for REMOVE_ANIM_SET.
+	// 
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
+	// 
+	// Full list of movement clipsets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/movementClipsetsCompact.json
 	static void REMOVE_CLIP_SET(const char* clipSet) { invoke<Void>(0x01F73A131C18CD94, clipSet); } // 0x01F73A131C18CD94 0x1E21F7AA b323
 	// Exemple: REQUEST_IPL("TrevorsTrailerTrash");
 	// 
-	// IPL + Coords: http://pastebin.com/FyV5mMma
+	// Full list of IPLs and interior entity sets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/ipls.json
 	static void REQUEST_IPL(const char* iplName) { invoke<Void>(0x41B4893843BBDB74, iplName); } // 0x41B4893843BBDB74 0x3B70D1DB b323
 	// Removes an IPL from the map.
-	// IPL List: pastebin.com/pwkh0uRP 
+	// 
+	// Full list of IPLs and interior entity sets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/ipls.json
 	// 
 	// Example:
 	// C#:
@@ -11702,8 +12677,13 @@ namespace STREAMING {
 	// 
 	// iplName = Name of IPL you want to remove.
 	static void REMOVE_IPL(const char* iplName) { invoke<Void>(0xEE6C5AD3ECE0A82D, iplName); } // 0xEE6C5AD3ECE0A82D 0xDF7CBD36 b323
+	// Full list of IPLs and interior entity sets by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/ipls.json
 	static BOOL IS_IPL_ACTIVE(const char* iplName) { return invoke<BOOL>(0x88A741E44A2B3495, iplName); } // 0x88A741E44A2B3495 0xB2C33714 b323
 	static void SET_STREAMING(BOOL toggle) { invoke<Void>(0x6E0C692677008888, toggle); } // 0x6E0C692677008888 0x27EF6CB2 b323
+	// 0 - default
+	// 1 - HeistIsland
+	static void _LOAD_GLOBAL_WATER_TYPE(int waterType) { invoke<Void>(0x7E3F55ED251B76D3, waterType); } // 0x7E3F55ED251B76D3 b2189
+	static int _GET_GLOBAL_WATER_TYPE() { return invoke<int>(0xF741BD853611592D); } // 0xF741BD853611592D b2189
 	static void SET_GAME_PAUSES_FOR_STREAMING(BOOL toggle) { invoke<Void>(0x717CD6E6FAEBBEDC, toggle); } // 0x717CD6E6FAEBBEDC 0x9211A28A b323
 	static void SET_REDUCE_PED_MODEL_BUDGET(BOOL toggle) { invoke<Void>(0x77B5F9A36BF96710, toggle); } // 0x77B5F9A36BF96710 0xAFCB2B86 b323
 	static void SET_REDUCE_VEHICLE_MODEL_BUDGET(BOOL toggle) { invoke<Void>(0x80C527893080CCF3, toggle); } // 0x80C527893080CCF3 0xCDB4FB7E b323
@@ -11733,6 +12713,8 @@ namespace STREAMING {
 	static BOOL HAS_NAMED_PTFX_ASSET_LOADED(const char* fxName) { return invoke<BOOL>(0x8702416E512EC454, fxName); } // 0x8702416E512EC454 0x9ACC6446 b323
 	static void REMOVE_NAMED_PTFX_ASSET(const char* fxName) { invoke<Void>(0x5F61EBBE1A00F96D, fxName); } // 0x5F61EBBE1A00F96D 0xC44762A1 b323
 	static void SET_VEHICLE_POPULATION_BUDGET(int p0) { invoke<Void>(0xCB9E1EB3BE2AF4E9, p0); } // 0xCB9E1EB3BE2AF4E9 0x1D56993C b323
+	// Control how many new (ambient?) peds will spawn in the game world.
+	// Range for p0 seems to be 0-3, where 0 is none and 3 is the normal level.
 	static void SET_PED_POPULATION_BUDGET(int p0) { invoke<Void>(0x8C95333CFC3340F3, p0); } // 0x8C95333CFC3340F3 0xD2D026CD b323
 	static void CLEAR_FOCUS() { invoke<Void>(0x31B73D1EA9F01DA2); } // 0x31B73D1EA9F01DA2 0x34D91E7A b323
 	// Override the area where the camera will render the terrain.
@@ -11750,14 +12732,20 @@ namespace STREAMING {
 	static void SET_MAPDATACULLBOX_ENABLED(const char* name, BOOL toggle) { invoke<Void>(0xAF12610C644A35C9, name, toggle); } // 0xAF12610C644A35C9 0x403CD434 b323
 	// This native does absolutely nothing, just a nullsub
 	static void _0x4E52E752C76E7E7A(Any p0) { invoke<Void>(0x4E52E752C76E7E7A, p0); } // 0x4E52E752C76E7E7A 0xA07BAEB9 b323
-	static Any FORMAT_FOCUS_HEADING(float x, float y, float z, float rad, Any p4, Any p5) { return invoke<Any>(0x219C7B8D53E429FD, x, y, z, rad, p4, p5); } // 0x219C7B8D53E429FD 0x10B6AB36 b323
-	static Any _0x1F3F018BC3AFA77C(float p0, float p1, float p2, float p3, float p4, float p5, float p6, Any p7, Any p8) { return invoke<Any>(0x1F3F018BC3AFA77C, p0, p1, p2, p3, p4, p5, p6, p7, p8); } // 0x1F3F018BC3AFA77C 0x72344191 b323
-	static Any _0x0AD9710CEE2F590F(float p0, float p1, float p2, float p3, float p4, float p5, Any p6) { return invoke<Any>(0x0AD9710CEE2F590F, p0, p1, p2, p3, p4, p5, p6); } // 0x0AD9710CEE2F590F 0xC0157255 b323
-	static void _0x1EE7D8DF4425F053(Any p0) { invoke<Void>(0x1EE7D8DF4425F053, p0); } // 0x1EE7D8DF4425F053 0xE80F8ABE b323
-	static Any _0x7D41E9D2D17C5B2D(Any p0) { return invoke<Any>(0x7D41E9D2D17C5B2D, p0); } // 0x7D41E9D2D17C5B2D 0x1B3521F4 b323
-	static Any _0x07C313F94746702C(Any p0) { return invoke<Any>(0x07C313F94746702C, p0); } // 0x07C313F94746702C 0x42CFE9C0 b323
-	static Any _0xBC9823AB80A3DCAC() { return invoke<Any>(0xBC9823AB80A3DCAC); } // 0xBC9823AB80A3DCAC 0x56253356 b323
-	static BOOL NEW_LOAD_SCENE_START(float p0, float p1, float p2, float p3, float p4, float p5, float p6, Any p7) { return invoke<BOOL>(0x212A8D0D2BABFAC2, p0, p1, p2, p3, p4, p5, p6, p7); } // 0x212A8D0D2BABFAC2 0xDF9C38B6 b323
+	// Always returns zero.
+	static Any STREAMVOL_CREATE_SPHERE(float x, float y, float z, float rad, Any p4, Any p5) { return invoke<Any>(0x219C7B8D53E429FD, x, y, z, rad, p4, p5); } // 0x219C7B8D53E429FD 0x10B6AB36 b323
+	// Always returns zero.
+	static Any STREAMVOL_CREATE_FRUSTUM(float p0, float p1, float p2, float p3, float p4, float p5, float p6, Any p7, Any p8) { return invoke<Any>(0x1F3F018BC3AFA77C, p0, p1, p2, p3, p4, p5, p6, p7, p8); } // 0x1F3F018BC3AFA77C 0x72344191 b323
+	// Always returns zero.
+	static Any STREAMVOL_CREATE_LINE(float p0, float p1, float p2, float p3, float p4, float p5, Any p6) { return invoke<Any>(0x0AD9710CEE2F590F, p0, p1, p2, p3, p4, p5, p6); } // 0x0AD9710CEE2F590F 0xC0157255 b323
+	static void STREAMVOL_DELETE(Any unused) { invoke<Void>(0x1EE7D8DF4425F053, unused); } // 0x1EE7D8DF4425F053 0xE80F8ABE b323
+	static BOOL STREAMVOL_HAS_LOADED(Any unused) { return invoke<BOOL>(0x7D41E9D2D17C5B2D, unused); } // 0x7D41E9D2D17C5B2D 0x1B3521F4 b323
+	static BOOL STREAMVOL_IS_VALID(Any unused) { return invoke<BOOL>(0x07C313F94746702C, unused); } // 0x07C313F94746702C 0x42CFE9C0 b323
+	static BOOL IS_STREAMVOL_ACTIVE() { return invoke<BOOL>(0xBC9823AB80A3DCAC); } // 0xBC9823AB80A3DCAC 0x56253356 b323
+	// `radius` value is usually between `3f` and `7000f` in original 1868 scripts.
+	// `p7` is 0, 1, 2, 3 or 4 used in decompiled scripts, 0 is by far the most common.
+	// Returns True if success, used only 7 times in decompiled scripts of 1868
+	static BOOL NEW_LOAD_SCENE_START(float posX, float posY, float posZ, float offsetX, float offsetY, float offsetZ, float radius, int p7) { return invoke<BOOL>(0x212A8D0D2BABFAC2, posX, posY, posZ, offsetX, offsetY, offsetZ, radius, p7); } // 0x212A8D0D2BABFAC2 0xDF9C38B6 b323
 	// if (!sub_8f12("START LOAD SCENE SAFE")) {
 	//     if (CUTSCENE::GET_CUTSCENE_TIME() > 4178) {
 	//         STREAMING::_ACCFB4ACF53551B0(1973.845458984375, 3818.447265625, 32.43629837036133, 15.0, 2);
@@ -11809,39 +12797,60 @@ namespace STREAMING {
 	// SET_PLAYER_*
 	static void _0x5F2013F8BC24EE69(int p0) { invoke<Void>(0x5F2013F8BC24EE69, p0); } // 0x5F2013F8BC24EE69 0xF0BD420D b323
 	static int GET_PLAYER_SWITCH_JUMP_CUT_INDEX() { return invoke<int>(0x78C0D93253149435); } // 0x78C0D93253149435 0x02BA7AC2 b323
-	static void SET_PLAYER_SWITCH_OUTRO(float p0, float p1, float p2, float p3, float p4, float p5, float p6, float p7, Any p8) { invoke<Void>(0xC208B673CE446B61, p0, p1, p2, p3, p4, p5, p6, p7, p8); } // 0xC208B673CE446B61 0x47352E14 b323
+	static void SET_PLAYER_SWITCH_OUTRO(float cameraCoordX, float cameraCoordY, float cameraCoordZ, float camRotationX, float camRotationY, float camRotationZ, float camFov, float camFarClip, int rotationOrder) { invoke<Void>(0xC208B673CE446B61, cameraCoordX, cameraCoordY, cameraCoordZ, camRotationX, camRotationY, camRotationZ, camFov, camFarClip, rotationOrder); } // 0xC208B673CE446B61 0x47352E14 b323
 	// All names can be found in playerswitchestablishingshots.meta
 	static void SET_PLAYER_SWITCH_ESTABLISHING_SHOT(const char* name) { invoke<Void>(0x0FDE9DBFC0A6BC65, name); } // 0x0FDE9DBFC0A6BC65 0x279077B0 b323
-	static void _0x43D1680C6D19A8E9() { invoke<Void>(0x43D1680C6D19A8E9); } // 0x43D1680C6D19A8E9 0x55CB21F9 b323
-	static void _0x74DE2E8739086740() { invoke<Void>(0x74DE2E8739086740); } // 0x74DE2E8739086740 0x1084F2F4 b323
-	static void _0x8E2A065ABDAE6994() { invoke<Void>(0x8E2A065ABDAE6994); } // 0x8E2A065ABDAE6994 0x5B1E995D b323
-	static void _0xAD5FDF34B81BFE79() { invoke<Void>(0xAD5FDF34B81BFE79); } // 0xAD5FDF34B81BFE79 0x4B4B9A13 b323
+	static void ALLOW_PLAYER_SWITCH_PAN() { invoke<Void>(0x43D1680C6D19A8E9); } // 0x43D1680C6D19A8E9 0x55CB21F9 b323
+	static void ALLOW_PLAYER_SWITCH_OUTRO() { invoke<Void>(0x74DE2E8739086740); } // 0x74DE2E8739086740 0x1084F2F4 b323
+	static void ALLOW_PLAYER_SWITCH_ASCENT() { invoke<Void>(0x8E2A065ABDAE6994); } // 0x8E2A065ABDAE6994 0x5B1E995D b323
+	static void ALLOW_PLAYER_SWITCH_DESCENT() { invoke<Void>(0xAD5FDF34B81BFE79); } // 0xAD5FDF34B81BFE79 0x4B4B9A13 b323
 	static BOOL IS_SWITCH_READY_FOR_DESCENT() { return invoke<BOOL>(0xDFA80CB25D0A19B3); } // 0xDFA80CB25D0A19B3 0x408F7148 b323
 	static void ENABLE_SWITCH_PAUSE_BEFORE_DESCENT() { invoke<Void>(0xD4793DFF3AF2ABCD); } // 0xD4793DFF3AF2ABCD 0x4062FF73 b323
 	static void DISABLE_SWITCH_OUTRO_FX() { invoke<Void>(0xBD605B8E0E18B3BB); } // 0xBD605B8E0E18B3BB 0x59CC312D b323
-	// fucks up on mount chilliad
-	static void _SWITCH_OUT_PLAYER(Ped ped, int flags, int unknown) { invoke<Void>(0xAAB3200ED59016BC, ped, flags, unknown); } // 0xAAB3200ED59016BC 0xFB4D062D b323
+	// doesn't act normally when used on mount chilliad
+	// Flags is a bitflag:
+	// 2^n - Enabled Functionality:
+	// 0 - Skip camera rotate up
+	// 3 - Wait for SET_PLAYER_SWITCH_ESTABLISHING_SHOT / hang at last step. You will still need to run 0x74DE2E8739086740 to exit "properly" and then STOP_PLAYER_SWITCH
+	// 6 - Invert Switch Direction (false = out, true = in)
+	// 8 - Hang above ped
+	// 
+	// switchType: 0 - 3
+	// 0: 1 step towards ped
+	// 1: 3 steps out from ped
+	// 2: 1 step out from ped
+	// 3: 1 step towards ped
+	static void _SWITCH_OUT_PLAYER(Ped ped, int flags, int switchType) { invoke<Void>(0xAAB3200ED59016BC, ped, flags, switchType); } // 0xAAB3200ED59016BC 0xFB4D062D b323
 	static void _SWITCH_IN_PLAYER(Ped ped) { invoke<Void>(0xD8295AF639FD9CB8, ped); } // 0xD8295AF639FD9CB8 0x2349373B b323
 	// Probably IS_SWITCH_*
 	static BOOL _0x933BBEEB8C61B5F4() { return invoke<BOOL>(0x933BBEEB8C61B5F4); } // 0x933BBEEB8C61B5F4 0x74C16879 b323
 	static int GET_PLAYER_SWITCH_INTERP_OUT_DURATION() { return invoke<int>(0x08C2D6C52A3104BB); } // 0x08C2D6C52A3104BB 0x569847E3 b323
-	static Any _0x5B48A06DD0E792A5() { return invoke<Any>(0x5B48A06DD0E792A5); } // 0x5B48A06DD0E792A5 0xC7A3D279 b323
+	static Any GET_PLAYER_SWITCH_INTERP_OUT_CURRENT_TIME() { return invoke<Any>(0x5B48A06DD0E792A5); } // 0x5B48A06DD0E792A5 0xC7A3D279 b323
 	static BOOL IS_SWITCH_SKIPPING_DESCENT() { return invoke<BOOL>(0x5B74EA8CFD5E3E7E); } // 0x5B74EA8CFD5E3E7E 0x90F64284 b323
 	static void _0x1E9057A74FD73E23() { invoke<Void>(0x1E9057A74FD73E23); } // 0x1E9057A74FD73E23 b323
-	static float _0x0C15B0E443B2349D() { return invoke<float>(0x0C15B0E443B2349D); } // 0x0C15B0E443B2349D 0x7154B6FD b323
-	static void _0xA76359FC80B2438E(float p0) { invoke<Void>(0xA76359FC80B2438E, p0); } // 0xA76359FC80B2438E 0xE5612C1A b323
+	static float GET_LODSCALE() { return invoke<float>(0x0C15B0E443B2349D); } // 0x0C15B0E443B2349D 0x7154B6FD b323
+	// This allows you to override "extended distance scaling" setting. Needs to be called each frame.
+	// Max scaling seems to be 200.0, normal is 1.0
+	// See https://gfycat.com/DetailedHauntingIncatern
+	static void OVERRIDE_LODSCALE_THIS_FRAME(float scaling) { invoke<Void>(0xA76359FC80B2438E, scaling); } // 0xA76359FC80B2438E 0xE5612C1A b323
 	static void _0xBED8CA5FF5E04113(float p0, float p1, float p2, float p3) { invoke<Void>(0xBED8CA5FF5E04113, p0, p1, p2, p3); } // 0xBED8CA5FF5E04113 0x9CD6A451 b323
 	static void _0x472397322E92A856() { invoke<Void>(0x472397322E92A856); } // 0x472397322E92A856 0x4267DA87 b323
-	static void _0x40AEFD1A244741F2(BOOL p0) { invoke<Void>(0x40AEFD1A244741F2, p0); } // 0x40AEFD1A244741F2 0x9FA4AF99 b323
+	static void SET_RENDER_HD_ONLY(BOOL toggle) { invoke<Void>(0x40AEFD1A244741F2, toggle); } // 0x40AEFD1A244741F2 0x9FA4AF99 b323
 	static void _0x03F1A106BDA7DD3E() { invoke<Void>(0x03F1A106BDA7DD3E); } // 0x03F1A106BDA7DD3E b323
 	static void _0x95A7DABDDBB78AE7(const char* iplName1, const char* iplName2) { invoke<Void>(0x95A7DABDDBB78AE7, iplName1, iplName2); } // 0x95A7DABDDBB78AE7 0x9EF0A9CF b323
 	static void _0x63EB2B972A218CAC() { invoke<Void>(0x63EB2B972A218CAC); } // 0x63EB2B972A218CAC 0xF2CDD6A8 b323
 	static BOOL _0xFB199266061F820A() { return invoke<BOOL>(0xFB199266061F820A); } // 0xFB199266061F820A 0x17B0A1CD b323
 	static void _0xF4A0DADB70F57FA6() { invoke<Void>(0xF4A0DADB70F57FA6); } // 0xF4A0DADB70F57FA6 0x3DA7AA5D b323
 	static Any _0x5068F488DDB54DD8() { return invoke<Any>(0x5068F488DDB54DD8); } // 0x5068F488DDB54DD8 0xDAB4BAC0 b323
+	// This native is used to attribute the SRL that BEGIN_SRL is going to load. This is usually used for 'in-game' cinematics (not cutscenes but camera stuff) instead of SET_FOCUS_POS_AND_VEL because it loads a specific area of the map which is pretty useful when the camera moves from distant areas.
+	// For instance, GTA:O opening cutscene.
+	// https://pastebin.com/2EeKVeLA : a list of SRL found in srllist.meta
+	// https://pastebin.com/zd9XYUWY here is the content of a SRL file opened with codewalker.
 	static void PREFETCH_SRL(const char* srl) { invoke<Void>(0x3D245789CE12982C, srl); } // 0x3D245789CE12982C 0x37BE2FBB b323
+	// Returns true when the srl from BEGIN_SRL is loaded.
 	static BOOL IS_SRL_LOADED() { return invoke<BOOL>(0xD0263801A4C5B0BB); } // 0xD0263801A4C5B0BB 0x670FA2A6 b323
 	static void BEGIN_SRL() { invoke<Void>(0x9BADDC94EF83B823); } // 0x9BADDC94EF83B823 0x24F49427 b323
+	// Clear the current srl and stop rendering the area selected by PREFETCH_SRL and started with BEGIN_SRL.
 	static void END_SRL() { invoke<Void>(0x0A41540E63C9EE17); } // 0x0A41540E63C9EE17 0x1977C56A b323
 	static void SET_SRL_TIME(float p0) { invoke<Void>(0xA74A541C6884E7B8, p0); } // 0xA74A541C6884E7B8 0x30F8A487 b323
 	static void _0xEF39EE20C537E98C(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { invoke<Void>(0xEF39EE20C537E98C, p0, p1, p2, p3, p4, p5); } // 0xEF39EE20C537E98C 0x814D0752 b323
@@ -11861,9 +12870,12 @@ namespace STREAMING {
 	// 
 	// GET_*
 	static float _GET_USED_CREATOR_MODEL_MEMORY_PERCENTAGE() { return invoke<float>(0x3D3D8B3BE5A83D35); } // 0x3D3D8B3BE5A83D35 0x3E9C4CBE b323
+	// Enables the specified island. For more information, see islandhopper.meta
+	static void _SET_ISLAND_HOPPER_ENABLED(const char* name, BOOL toggle) { invoke<Void>(0x9A9D1BA639675CF1, name, toggle); } // 0x9A9D1BA639675CF1 b2189
 }
 
-namespace TASK {
+namespace TASK
+{
 	// Stand still (?)
 	static void TASK_PAUSE(Ped ped, int ms) { invoke<Void>(0xE73A266DB0CA9042, ped, ms); } // 0xE73A266DB0CA9042 0x17A64668 b323
 	// Makes the specified ped stand still for (time) milliseconds.
@@ -11968,7 +12980,7 @@ namespace TASK {
 	// 
 	// Note: I've only tested it on entity -> ped and target -> vehicle. It could work differently on other entities, didn't try it yet.
 	// 
-	// Example: AI::TASK_GO_TO_ENTITY(pedHandle, vehicleHandle, 5000, 4.0, 100, 1073741824, 0)
+	// Example: TASK::TASK_GO_TO_ENTITY(pedHandle, vehicleHandle, 5000, 4.0, 100, 1073741824, 0)
 	// 
 	// Ped will run towards the vehicle for 5 seconds and stop when time is over or when he gets 4 meters(?) around the vehicle (with duration = -1, the task duration will be ignored).
 	static void TASK_GO_TO_ENTITY(Entity entity, Entity target, int duration, float distance, float speed, float p5, int p6) { invoke<Void>(0x6A071245EB0D1882, entity, target, duration, distance, speed, p5, p6); } // 0x6A071245EB0D1882 0x374827C2 b323
@@ -11986,6 +12998,7 @@ namespace TASK {
 	// 
 	// set p1 to 10.0f and p2 to 10 if you want the ped to walk anywhere without a duration.
 	static void TASK_WANDER_STANDARD(Ped ped, float p1, int p2) { invoke<Void>(0xBB9CE077274F6A1B, ped, p1, p2); } // 0xBB9CE077274F6A1B 0xAF59151A b323
+	static void TASK_WANDER_SPECIFIC(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x6919A2F136426098, p0, p1, p2, p3); } // 0x6919A2F136426098 b1868
 	// Modes:
 	// 0 - ignore heading
 	// 1 - park forward
@@ -12004,32 +13017,33 @@ namespace TASK {
 	static void SET_PED_PATH_CAN_USE_CLIMBOVERS(Ped ped, BOOL Toggle) { invoke<Void>(0x8E06A6FE76C9EFF4, ped, Toggle); } // 0x8E06A6FE76C9EFF4 0xB7B7D442 b323
 	static void SET_PED_PATH_CAN_USE_LADDERS(Ped ped, BOOL Toggle) { invoke<Void>(0x77A5B103C87F476E, ped, Toggle); } // 0x77A5B103C87F476E 0x53A879EE b323
 	static void SET_PED_PATH_CAN_DROP_FROM_HEIGHT(Ped ped, BOOL Toggle) { invoke<Void>(0xE361C5C71C431A4F, ped, Toggle); } // 0xE361C5C71C431A4F 0x394B7AC9 b323
-	// SET_PED_PATH_*
-	// 
-	// Could be the move speed on the path. Needs testing.
-	// 
-	// Default is 1.0 and maximum is 10.0
-	// 
-	// SET_PED_PATH_CLIMB_COST_MODIFIER ?
-	static void _0x88E32DB8C1A4AA4B(Ped ped, float p1) { invoke<Void>(0x88E32DB8C1A4AA4B, ped, p1); } // 0x88E32DB8C1A4AA4B 0x55E06443 b323
+	// Default modifier is 1.0, minimum is 0.0 and maximum is 10.0.
+	static void SET_PED_PATH_CLIMB_COST_MODIFIER(Ped ped, float modifier) { invoke<Void>(0x88E32DB8C1A4AA4B, ped, modifier); } // 0x88E32DB8C1A4AA4B 0x55E06443 b323
 	static void SET_PED_PATH_MAY_ENTER_WATER(Ped ped, BOOL mayEnterWater) { invoke<Void>(0xF35425A4204367EC, ped, mayEnterWater); } // 0xF35425A4204367EC 0x9C606EE3 b323
 	static void SET_PED_PATH_PREFER_TO_AVOID_WATER(Ped ped, BOOL avoidWater) { invoke<Void>(0x38FE1EC73743793C, ped, avoidWater); } // 0x38FE1EC73743793C 0x0EA39A29 b323
 	static void SET_PED_PATH_AVOID_FIRE(Ped ped, BOOL avoidFire) { invoke<Void>(0x4455517B28441E60, ped, avoidFire); } // 0x4455517B28441E60 0xDCC5B934 b323
 	// Needs to be looped! And yes, it does work and is not a hash collision.
 	// Birds will try to reach the given height.
 	static void SET_GLOBAL_MIN_BIRD_FLIGHT_HEIGHT(float height) { invoke<Void>(0x6C6B148586F934F7, height); } // 0x6C6B148586F934F7 0x2AFB14B8 b323
-	static Any GET_NAVMESH_ROUTE_DISTANCE_REMAINING(Ped ped, Any* p1, Any* p2) { return invoke<Any>(0xC6F5C0BCDC74D62D, ped, p1, p2); } // 0xC6F5C0BCDC74D62D 0xD9281778 b323
+	// Looks like the last parameter returns true if the path has been calculated, while the first returns the remaining distance to the end of the path.
+	// Return value of native is the same as GET_NAVMESH_ROUTE_RESULT
+	// Looks like the native returns an int for the path's state:
+	// 1 - ???
+	// 2 - ???
+	// 3 - Finished Generating 
+	static int GET_NAVMESH_ROUTE_DISTANCE_REMAINING(Ped ped, float* distanceRemaining, BOOL* isPathReady) { return invoke<int>(0xC6F5C0BCDC74D62D, ped, distanceRemaining, isPathReady); } // 0xC6F5C0BCDC74D62D 0xD9281778 b323
+	// See GET_NAVMESH_ROUTE_DISTANCE_REMAINING for more details.
 	static int GET_NAVMESH_ROUTE_RESULT(Ped ped) { return invoke<int>(0x632E831F382A0FA8, ped); } // 0x632E831F382A0FA8 0x96491602 b323
 	// IS_*
 	static BOOL _0x3E38E28A1D80DDF6(Ped ped) { return invoke<BOOL>(0x3E38E28A1D80DDF6, ped); } // 0x3E38E28A1D80DDF6 0x54856309 b323
 	// example from fm_mission_controller
 	// 
-	// AI::TASK_GO_TO_COORD_ANY_MEANS(l_649, sub_f7e86(-1, 0), 1.0, 0, 0, 786603, 0xbf800000);
+	// TASK::TASK_GO_TO_COORD_ANY_MEANS(l_649, sub_f7e86(-1, 0), 1.0, 0, 0, 786603, 0xbf800000);
 	//  
 	static void TASK_GO_TO_COORD_ANY_MEANS(Ped ped, float x, float y, float z, float speed, Any p5, BOOL p6, int walkingStyle, float p8) { invoke<Void>(0x5BC448CB78FA3E88, ped, x, y, z, speed, p5, p6, walkingStyle, p8); } // 0x5BC448CB78FA3E88 0xF91DF93B b323
 	static void TASK_GO_TO_COORD_ANY_MEANS_EXTRA_PARAMS(Ped ped, float x, float y, float z, float speed, Any p5, BOOL p6, int walkingStyle, float p8, Any p9, Any p10, Any p11, Any p12) { invoke<Void>(0x1DD45F9ECFDB1BC9, ped, x, y, z, speed, p5, p6, walkingStyle, p8, p9, p10, p11, p12); } // 0x1DD45F9ECFDB1BC9 0x094B75EF b323
 	static void TASK_GO_TO_COORD_ANY_MEANS_EXTRA_PARAMS_WITH_CRUISE_SPEED(Ped ped, float x, float y, float z, float speed, Any p5, BOOL p6, int walkingStyle, float p8, Any p9, Any p10, Any p11, Any p12, Any p13) { invoke<Void>(0xB8ECD61F531A7B02, ped, x, y, z, speed, p5, p6, walkingStyle, p8, p9, p10, p11, p12, p13); } // 0xB8ECD61F531A7B02 0x86DC03F9 b323
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	// 
 	// float speed > normal speed is 8.0f
 	// ----------------------
@@ -12091,13 +13105,12 @@ namespace TASK {
 	// 
 	//     0 for single player 
 	//     Can be 1 but only for MP 
-	static void TASK_PLAY_ANIM(Ped ped, const char* animDictionary, const char* animationName, float speed, float speedMultiplier, int duration, int flag, float playbackRate, BOOL lockX, BOOL lockY, BOOL lockZ) { invoke<Void>(0xEA47FE3719165B94, ped, animDictionary, animationName, speed, speedMultiplier, duration, flag, playbackRate, lockX, lockY, lockZ); } // 0xEA47FE3719165B94 0x5AB552C6 b323
-	// It's similar to the one above, except the first 6 floats let you specify the initial position and rotation of the task. (Ped gets teleported to the position). animTime is a float from 0.0 -> 1.0, lets you start an animation from given point. The rest as in AI::TASK_PLAY_ANIM. 
+	static void TASK_PLAY_ANIM(Ped ped, const char* animDictionary, const char* animationName, float blendInSpeed, float blendOutSpeed, int duration, int flag, float playbackRate, BOOL lockX, BOOL lockY, BOOL lockZ) { invoke<Void>(0xEA47FE3719165B94, ped, animDictionary, animationName, blendInSpeed, blendOutSpeed, duration, flag, playbackRate, lockX, lockY, lockZ); } // 0xEA47FE3719165B94 0x5AB552C6 b323
+	// It's similar to TASK_PLAY_ANIM, except the first 6 floats let you specify the initial position and rotation of the task. (Ped gets teleported to the position).
 	// 
-	// Rotation information : rotX and rotY don't seem to have any effect, only rotZ works.
-	// 
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
-	static void TASK_PLAY_ANIM_ADVANCED(Ped ped, const char* animDict, const char* animName, float posX, float posY, float posZ, float rotX, float rotY, float rotZ, float speed, float speedMultiplier, int duration, Any flag, float animTime, Any p14, Any p15) { invoke<Void>(0x83CDB10EA29B370B, ped, animDict, animName, posX, posY, posZ, rotX, rotY, rotZ, speed, speedMultiplier, duration, flag, animTime, p14, p15); } // 0x83CDB10EA29B370B 0x3DDEB0E6 b323
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
+	static void TASK_PLAY_ANIM_ADVANCED(Ped ped, const char* animDict, const char* animName, float posX, float posY, float posZ, float rotX, float rotY, float rotZ, float animEnterSpeed, float animExitSpeed, int duration, Any flag, float animTime, Any p14, Any p15) { invoke<Void>(0x83CDB10EA29B370B, ped, animDict, animName, posX, posY, posZ, rotX, rotY, rotZ, animEnterSpeed, animExitSpeed, duration, flag, animTime, p14, p15); } // 0x83CDB10EA29B370B 0x3DDEB0E6 b323
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static void STOP_ANIM_TASK(Ped ped, const char* animDictionary, const char* animationName, float p3) { invoke<Void>(0x97FF36A1D40EA00A, ped, animDictionary, animationName, p3); } // 0x97FF36A1D40EA00A 0x2B520A57 b323
 	// From fm_mission_controller.c:
 	// reserve_network_mission_objects(get_num_reserved_mission_objects(0) + 1);
@@ -12135,12 +13148,13 @@ namespace TASK {
 	//             remove_anim_dict("anim@heists@biolab@");
 	static void TASK_SCRIPTED_ANIMATION(Ped ped, Any* p1, Any* p2, Any* p3, float p4, float p5) { invoke<Void>(0x126EF75F1E17ABE5, ped, p1, p2, p3, p4, p5); } // 0x126EF75F1E17ABE5 0xFC2DCF47 b323
 	static void PLAY_ENTITY_SCRIPTED_ANIM(Any p0, Any* p1, Any* p2, Any* p3, float p4, float p5) { invoke<Void>(0x77A1EEC547E7FCF1, p0, p1, p2, p3, p4, p5); } // 0x77A1EEC547E7FCF1 0x02F72AE5 b323
+	// Looks like p1 may be a flag, still need to do some research, though.
 	static void STOP_ANIM_PLAYBACK(Ped ped, int p1, BOOL p2) { invoke<Void>(0xEE08C992D238C5D1, ped, p1, p2); } // 0xEE08C992D238C5D1 0xE5F16398 b323
 	static void SET_ANIM_WEIGHT(Any p0, float p1, Any p2, Any p3, BOOL p4) { invoke<Void>(0x207F1A47C0342F48, p0, p1, p2, p3, p4); } // 0x207F1A47C0342F48 0x17229D98 b323
 	static void SET_ANIM_RATE(Any p0, float p1, Any p2, BOOL p3) { invoke<Void>(0x032D49C5E359C847, p0, p1, p2, p3); } // 0x032D49C5E359C847 0x6DB46584 b323
 	static void SET_ANIM_LOOPED(Any p0, BOOL p1, Any p2, BOOL p3) { invoke<Void>(0x70033C3CC29A1FF4, p0, p1, p2, p3); } // 0x70033C3CC29A1FF4 0x095D61A4 b323
 	// Example from the scripts:
-	// AI::TASK_PLAY_PHONE_GESTURE_ANIMATION(PLAYER::PLAYER_PED_ID(), v_3, v_2, v_4, 0.25, 0.25, 0, 0);
+	// TASK::TASK_PLAY_PHONE_GESTURE_ANIMATION(PLAYER::PLAYER_PED_ID(), v_3, v_2, v_4, 0.25, 0.25, 0, 0);
 	// 
 	// =========================================================
 	// ^^ No offense, but Idk how that would really help anyone.
@@ -12160,6 +13174,8 @@ namespace TASK {
 	// 
 	// The values found above, I found within the 5 scripts this is ever called in. (fmmc_launcher, fm_deathmatch_controller, fm_impromptu_dm_controller, fm_mission_controller, and freemode).
 	// =========================================================
+	// 
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static void TASK_PLAY_PHONE_GESTURE_ANIMATION(Ped ped, const char* animDict, const char* animation, const char* boneMaskType, float p4, float p5, BOOL p6, BOOL p7) { invoke<Void>(0x8FBB6758B3B3E9EC, ped, animDict, animation, boneMaskType, p4, p5, p6, p7); } // 0x8FBB6758B3B3E9EC 0x1582162C b323
 	static void TASK_STOP_PHONE_GESTURE_ANIMATION(Ped ped, Any p1) { invoke<Void>(0x3FA00D4F4641BFAE, ped, p1); } // 0x3FA00D4F4641BFAE 0x5A32D4B4 b323
 	static BOOL IS_PLAYING_PHONE_GESTURE_ANIM(Ped ped) { return invoke<BOOL>(0xB8EBB1E9D3588C10, ped); } // 0xB8EBB1E9D3588C10 0x500B6805 b323
@@ -12169,14 +13185,14 @@ namespace TASK {
 	// 
 	// Here's how its used - 
 	// 
-	// AI::TASK_VEHICLE_PLAY_ANIM(l_325, "rcmnigel1b", "idle_speedo");
+	// TASK::TASK_VEHICLE_PLAY_ANIM(l_325, "rcmnigel1b", "idle_speedo");
 	// 
-	// AI::TASK_VEHICLE_PLAY_ANIM(l_556[0/*1*/], "missfra0_chop_drhome", "InCar_GetOutofBack_Speedo");
+	// TASK::TASK_VEHICLE_PLAY_ANIM(l_556[0/*1*/], "missfra0_chop_drhome", "InCar_GetOutofBack_Speedo");
 	// 
 	// FYI : Speedo is the name of van in which chop was put in the mission.
-	static void TASK_VEHICLE_PLAY_ANIM(Vehicle vehicle, const char* animation_set, const char* animation_name) { invoke<Void>(0x69F5C3BD0F3EBD89, vehicle, animation_set, animation_name); } // 0x69F5C3BD0F3EBD89 0x2B28F598 b323
+	static void TASK_VEHICLE_PLAY_ANIM(Vehicle vehicle, const char* animationSet, const char* animationName) { invoke<Void>(0x69F5C3BD0F3EBD89, vehicle, animationSet, animationName); } // 0x69F5C3BD0F3EBD89 0x2B28F598 b323
 	// p5 = 0, p6 = 2
-	static void TASK_LOOK_AT_COORD(Entity entity, float x, float y, float z, float duration, Any p5, Any p6) { invoke<Void>(0x6FA46612594F7973, entity, x, y, z, duration, p5, p6); } // 0x6FA46612594F7973 0x7B784DD8 b323
+	static void TASK_LOOK_AT_COORD(Entity entity, float x, float y, float z, int duration, Any p5, Any p6) { invoke<Void>(0x6FA46612594F7973, entity, x, y, z, duration, p5, p6); } // 0x6FA46612594F7973 0x7B784DD8 b323
 	// param3: duration in ms, use -1 to look forever
 	// param4: using 2048 is fine
 	// param5: using 3 is fine
@@ -12187,16 +13203,16 @@ namespace TASK {
 	// {
 	//  if(ENTITY::DOES_ENTITY_EXIST(PLAYER::PLAYER_PED_ID()))
 	//     {
-	//      AI::TASK_CLEAR_LOOK_AT(PLAYER::PLAYER_PED_ID());
+	//      TASK::TASK_CLEAR_LOOK_AT(PLAYER::PLAYER_PED_ID());
 	//   }
 	//  ...
 	// }
 	// 
 	// Another one where it doesn't "look" at current player - 
 	// 
-	// AI::TASK_PLAY_ANIM(l_3ED, "missheist_agency2aig_2", "look_at_phone_a", 1000.0, -2.0, -1, 48, v_2, 0, 0, 0);
+	// TASK::TASK_PLAY_ANIM(l_3ED, "missheist_agency2aig_2", "look_at_phone_a", 1000.0, -2.0, -1, 48, v_2, 0, 0, 0);
 	// PED::_2208438012482A1A(l_3ED, 0, 0);
-	// AI::TASK_CLEAR_LOOK_AT(l_3ED);
+	// TASK::TASK_CLEAR_LOOK_AT(l_3ED);
 	static void TASK_CLEAR_LOOK_AT(Ped ped) { invoke<Void>(0x0F804F1DB19B9689, ped); } // 0x0F804F1DB19B9689 0x60EB4054 b323
 	static void OPEN_SEQUENCE_TASK(int* taskSequenceId) { invoke<Void>(0xE8854A4326B9E12B, taskSequenceId); } // 0xE8854A4326B9E12B 0xABA6923E b323
 	static void CLOSE_SEQUENCE_TASK(int taskSequenceId) { invoke<Void>(0x39E72BC99E6360CB, taskSequenceId); } // 0x39E72BC99E6360CB 0x1A7CEBD0 b323
@@ -12208,13 +13224,15 @@ namespace TASK {
 	// 0 to 7 = task that's currently in progress, 0 meaning the first one.
 	// -1 no task sequence in progress.
 	static int GET_SEQUENCE_PROGRESS(Ped ped) { return invoke<int>(0x00A9010CFE1E3533, ped); } // 0x00A9010CFE1E3533 0xA3419909 b323
-	// Task index enum: https://pastebin.com/K5t9T3ky
+	// Task index enum: https://alloc8or.re/gta5/doc/enums/eTaskTypeIndex.txt
 	static BOOL GET_IS_TASK_ACTIVE(Ped ped, int taskIndex) { return invoke<BOOL>(0xB0760331C7AA4155, ped, taskIndex); } // 0xB0760331C7AA4155 0x86FDDF55 b323
 	// Gets the status of a script-assigned task.
 	// taskHash: https://alloc8or.re/gta5/doc/enums/eScriptTaskHash.txt
 	static int GET_SCRIPT_TASK_STATUS(Ped ped, Hash taskHash) { return invoke<int>(0x77F1BEB8863288D5, ped, taskHash); } // 0x77F1BEB8863288D5 0xB2477B23 b323
+	// https://alloc8or.re/gta5/doc/enums/eVehicleMissionType.txt
 	static int GET_ACTIVE_VEHICLE_MISSION_TYPE(Vehicle vehicle) { return invoke<int>(0x534AEBA6E5ED4CAB, vehicle); } // 0x534AEBA6E5ED4CAB 0xAFA914EF b323
-	static void TASK_LEAVE_ANY_VEHICLE(Ped ped, int p1, int p2) { invoke<Void>(0x504D54DF3F6F2247, ped, p1, p2); } // 0x504D54DF3F6F2247 0xDBDD79FA b323
+	// Flags are the same flags used in TASK_LEAVE_VEHICLE
+	static void TASK_LEAVE_ANY_VEHICLE(Ped ped, int p1, int flags) { invoke<Void>(0x504D54DF3F6F2247, ped, p1, flags); } // 0x504D54DF3F6F2247 0xDBDD79FA b323
 	static void TASK_AIM_GUN_SCRIPTED(Ped ped, Hash scriptTask, BOOL p2, BOOL p3) { invoke<Void>(0x7A192BE16D373D00, ped, scriptTask, p2, p3); } // 0x7A192BE16D373D00 0x9D296BCD b323
 	static void TASK_AIM_GUN_SCRIPTED_WITH_TARGET(Any p0, Any p1, float p2, float p3, float p4, Any p5, BOOL p6, BOOL p7) { invoke<Void>(0x8605AF0DE8B3A5AC, p0, p1, p2, p3, p4, p5, p6, p7); } // 0x8605AF0DE8B3A5AC 0xFD517CE3 b323
 	static void UPDATE_TASK_AIM_GUN_SCRIPTED_TARGET(Ped p0, Ped p1, float p2, float p3, float p4, BOOL p5) { invoke<Void>(0x9724FB59A3E72AD0, p0, p1, p2, p3, p4, p5); } // 0x9724FB59A3E72AD0 0x67E73525 b323
@@ -12226,6 +13244,7 @@ namespace TASK {
 	// 
 	// 
 	static void TASK_AIM_GUN_AT_COORD(Ped ped, float x, float y, float z, int time, BOOL p5, BOOL p6) { invoke<Void>(0x6671F3EEC681BDA1, ped, x, y, z, time, p5, p6); } // 0x6671F3EEC681BDA1 0xFBF44AD3 b323
+	// Firing Pattern Hash Information: https://pastebin.com/Px036isB
 	static void TASK_SHOOT_AT_COORD(Ped ped, float x, float y, float z, int duration, Hash firingPattern) { invoke<Void>(0x46A6CC01E0826106, ped, x, y, z, duration, firingPattern); } // 0x46A6CC01E0826106 0x601C22E3 b323
 	// Makes the specified ped shuffle to the next vehicle seat.
 	// The ped MUST be in a vehicle and the vehicle parameter MUST be the ped's current vehicle.
@@ -12269,22 +13288,12 @@ namespace TASK {
 	// Seems to be this:
 	// Works on NPCs, but overrides their current task. If inside a task sequence (and not being the last task), "time" will work, otherwise the task will be performed forever until tasked with something else
 	static void TASK_VEHICLE_TEMP_ACTION(Ped driver, Vehicle vehicle, int action, int time) { invoke<Void>(0xC429DCEEB339E129, driver, vehicle, action, time); } // 0xC429DCEEB339E129 0x0679DFB8 b323
-	static void TASK_VEHICLE_MISSION(int p0, int p1, Vehicle veh, Any p3, float p4, Any p5, float p6, float p7, BOOL p8) { invoke<Void>(0x659427E0EF36BCDE, p0, p1, veh, p3, p4, p5, p6, p7, p8); } // 0x659427E0EF36BCDE 0x20609E56 b323
-	// Modes:
-	// 8= flees
-	// 1=drives around the ped
-	// 4=drives and stops near
-	// 7=follows
-	// 10=follows to the left
-	// 11=follows to the  right
-	// 12 = follows behind
-	// 13=follows ahead
-	// 14=follows, stop when near
-	static void TASK_VEHICLE_MISSION_PED_TARGET(Ped ped, Vehicle vehicle, Ped pedTarget, int mode, float maxSpeed, int drivingStyle, float minDistance, float p7, BOOL p8) { invoke<Void>(0x9454528DF15D657A, ped, vehicle, pedTarget, mode, maxSpeed, drivingStyle, minDistance, p7, p8); } // 0x9454528DF15D657A 0xC81C4677 b323
-	// Example from fm_mission_controller.c4:
-	// AI::TASK_VEHICLE_MISSION_COORS_TARGET(l_65E1, l_65E2, 324.84588623046875, 325.09619140625, 104.3525, 4, 15.0, 802987, 5.0, 5.0, 0);
-	// 
-	static void TASK_VEHICLE_MISSION_COORS_TARGET(Ped ped, Vehicle vehicle, float x, float y, float z, int p5, int p6, int p7, float p8, float p9, BOOL p10) { invoke<Void>(0xF0AF20AA7731F8C3, ped, vehicle, x, y, z, p5, p6, p7, p8, p9, p10); } // 0xF0AF20AA7731F8C3 0x6719C109 b323
+	// missionType: https://alloc8or.re/gta5/doc/enums/eVehicleMissionType.txt
+	static void TASK_VEHICLE_MISSION(Ped driver, Vehicle vehicle, Vehicle vehicleTarget, int missionType, float p4, Any p5, float p6, float p7, BOOL DriveAgainstTraffic) { invoke<Void>(0x659427E0EF36BCDE, driver, vehicle, vehicleTarget, missionType, p4, p5, p6, p7, DriveAgainstTraffic); } // 0x659427E0EF36BCDE 0x20609E56 b323
+	// See TASK_VEHICLE_MISSION
+	static void TASK_VEHICLE_MISSION_PED_TARGET(Ped ped, Vehicle vehicle, Ped pedTarget, int missionType, float maxSpeed, int drivingStyle, float minDistance, float p7, BOOL DriveAgainstTraffic) { invoke<Void>(0x9454528DF15D657A, ped, vehicle, pedTarget, missionType, maxSpeed, drivingStyle, minDistance, p7, DriveAgainstTraffic); } // 0x9454528DF15D657A 0xC81C4677 b323
+	// See TASK_VEHICLE_MISSION
+	static void TASK_VEHICLE_MISSION_COORS_TARGET(Ped ped, Vehicle vehicle, float x, float y, float z, int p5, int p6, int p7, float p8, float p9, BOOL DriveAgainstTraffic) { invoke<Void>(0xF0AF20AA7731F8C3, ped, vehicle, x, y, z, p5, p6, p7, p8, p9, DriveAgainstTraffic); } // 0xF0AF20AA7731F8C3 0x6719C109 b323
 	// Makes a ped follow the targetVehicle with <minDistance> in between.
 	// 
 	// note: minDistance is ignored if drivingstyle is avoiding traffic, but Rushed is fine.
@@ -12323,6 +13332,11 @@ namespace TASK {
 	// 
 	// NOTE: If the pilot finds enemies, it will engage them until it kills them, but will return to protect the ped/vehicle given shortly thereafter.
 	static void TASK_VEHICLE_HELI_PROTECT(Ped pilot, Vehicle vehicle, Entity entityToFollow, float targetSpeed, int p4, float radius, int altitude, int p7) { invoke<Void>(0x1E09C32048FEFD1C, pilot, vehicle, entityToFollow, targetSpeed, p4, radius, altitude, p7); } // 0x1E09C32048FEFD1C 0x0CB415EE b323
+	// Flag 8: Medium-aggressive boxing tactic with a bit of PIT
+	// Flag 1: Aggressive ramming of suspect
+	// Flag 2: Ram attempts
+	// Flag 32: Stay back from suspect, no tactical contact. Convoy-like.
+	// Flag 16: Ramming, seems to be slightly less aggressive than 1-2.
 	static void SET_TASK_VEHICLE_CHASE_BEHAVIOR_FLAG(Ped ped, int flag, BOOL set) { invoke<Void>(0xCC665AAC360D31E7, ped, flag, set); } // 0xCC665AAC360D31E7 0x2A83083F b323
 	static void SET_TASK_VEHICLE_CHASE_IDEAL_PURSUIT_DISTANCE(Ped ped, float distance) { invoke<Void>(0x639B642FACBE4EDD, ped, distance); } // 0x639B642FACBE4EDD 0x04FD3EE7 b323
 	// Ped pilot should be in a heli.
@@ -12335,34 +13349,67 @@ namespace TASK {
 	static void TASK_HELI_CHASE(Ped pilot, Entity entityToFollow, float x, float y, float z) { invoke<Void>(0xAC83B1DB38D0ADA0, pilot, entityToFollow, x, y, z); } // 0xAC83B1DB38D0ADA0 0xAC290A21 b323
 	static void TASK_PLANE_CHASE(Ped pilot, Entity entityToFollow, float x, float y, float z) { invoke<Void>(0x2D2386F273FF7A25, pilot, entityToFollow, x, y, z); } // 0x2D2386F273FF7A25 0x12FA1C28 b323
 	static void TASK_PLANE_LAND(Ped pilot, Vehicle plane, float runwayStartX, float runwayStartY, float runwayStartZ, float runwayEndX, float runwayEndY, float runwayEndZ) { invoke<Void>(0xBF19721FA34D32C0, pilot, plane, runwayStartX, runwayStartY, runwayStartZ, runwayEndX, runwayEndY, runwayEndZ); } // 0xBF19721FA34D32C0 0x5F7E23EA b323
-	// CLEAR_*
-	static void _0xDBBC7A2432524127(Vehicle vehicle) { invoke<Void>(0xDBBC7A2432524127, vehicle); } // 0xDBBC7A2432524127 b1290
+	static void _0x6100B3CEFD43452E(Any p0) { invoke<Void>(0x6100B3CEFD43452E, p0); } // 0x6100B3CEFD43452E b2189
+	// Seems to stop the engine
+	static void _CLEAR_VEHICLE_TASKS(Vehicle vehicle) { invoke<Void>(0xDBBC7A2432524127, vehicle); } // 0xDBBC7A2432524127 b1290
 	// CLEAR_*
 	static void _0x53DDC75BC3AC0A90(Vehicle vehicle) { invoke<Void>(0x53DDC75BC3AC0A90, vehicle); } // 0x53DDC75BC3AC0A90 b1290
-	static void TASK_PLANE_GOTO_PRECISE_VTOL(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9) { invoke<Void>(0xF7F9DCCA89E7505B, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); } // 0xF7F9DCCA89E7505B b1290
-	// Needs more research.
+	static void TASK_PLANE_GOTO_PRECISE_VTOL(Ped ped, Vehicle vehicle, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9) { invoke<Void>(0xF7F9DCCA89E7505B, ped, vehicle, p2, p3, p4, p5, p6, p7, p8, p9); } // 0xF7F9DCCA89E7505B b1290
+	// Used in am_vehicle_spawn.ysc and am_mp_submarine.ysc.
 	// 
-	// Default value of p13 is -1.0 or 0xBF800000.
-	// Default value of p14 is 0.
+	// p0 is always 0, p5 is always 1
 	// 
-	// Modified examples from "fm_mission_controller.ysc", line ~203551:
-	// AI::TASK_HELI_MISSION(ped, vehicle, 0, 0, posX, posY, posZ, 4, 1.0, -1.0, -1.0, 10, 10, 5.0, 0);
-	// AI::TASK_HELI_MISSION(ped, vehicle, 0, 0, posX, posY, posZ, 4, 1.0, -1.0, -1.0, 0, ?, 5.0, 4096);
+	// p1 is the vehicle handle of the submarine. Submarine must have a driver, but the ped handle is not passed to the native.
 	// 
-	// int mode seams to set mission type 4 = coords target, 23 = ped target.
-	// int 14 set to 32 = ped will land at destination.
+	// Speed can be set by calling SET_DRIVE_TASK_CRUISE_SPEED after
+	static void TASK_SUBMARINE_GOTO_AND_STOP(Any p0, Vehicle submarine, float x, float y, float z, Any p5) { invoke<Void>(0xC22B40579A498CA4, p0, submarine, x, y, z, p5); } // 0xC22B40579A498CA4 b2189
+	// Must have targetVehicle, targetPed, OR destination X/Y/Z set
+	// Will follow targeted vehicle/ped, or fly to destination
+	// Set whichever is not being used to 0
 	// 
-	// My findings:
-	// mode 4 or 7 forces heli to snap to the heading set
-	// 8 makes the heli flee from the ped.
-	// 9 circles around ped with angle set
-	// 10, 11 normal + imitate ped heading
-	// 20 makes the heli land when he's near the ped. It won't resume chasing.
-	// 21 emulates an helicopter crash
-	// 23 makes the heli circle erratically around ped
 	// 
-	// I change p2 to 'vehicleToFollow' as it seems to work like the task natives to set targets. In the heli_taxi script where as the merryweather heli takes you to your waypoint it has no need to follow a vehicle or a ped, so of course both have 0 set.
-	static void TASK_HELI_MISSION(Ped pilot, Vehicle aircraft, Vehicle targetVehicle, Ped targetPed, float destinationX, float destinationY, float destinationZ, int missionFlag, float maxSpeed, float landingRadius, float targetHeading, int unk1, int unk2, Hash unk3, int landingFlags) { invoke<Void>(0xDAD029E187A2BEB4, pilot, aircraft, targetVehicle, targetPed, destinationX, destinationY, destinationZ, missionFlag, maxSpeed, landingRadius, targetHeading, unk1, unk2, unk3, landingFlags); } // 0xDAD029E187A2BEB4 0x0C143E97 b323
+	// Mission mode type:
+	//  - 4, 7: Forces heli to snap to the heading if set, flies to destination or tracks specified entity (mode 4 only works for coordinates, 7 works for coordinates OR ped/vehicle)
+	//  - 6: Attacks the target ped/vehicle with mounted weapons. If radius is set, will maintain that distance from target.
+	//  - 8: Makes the heli flee from the ped/vehicle/coordinate
+	//  - 9: Circles around target ped/vehicle, snaps to angle if set. Behavior flag (last parameter) of 2048 switches from counter-clockwise to clockwise circling. Does not work with coordinate destination.
+	//  - 10, 11: Follows ped/vehicle target and imitates target heading. Only works with ped/vehicle target, not coord target
+	//  - 19: Heli lands at specified coordinate, ignores heading (lands facing whatever direction it is facing when the task is started)
+	//  - 20: Makes the heli land when near target ped. It won't resume chasing.
+	//  - 21: Emulates a helicopter crash
+	//  - 23: makes the heli circle erratically around ped
+	// 
+	// 
+	// Heli will fly at maxSpeed (up to actual maximum speed defined by the model's handling config)
+	// You can use SET_DRIVE_TASK_CRUISE_SPEED to modulate the speed based on distance to the target without having to re-invoke the task native. Setting to 8.0 when close to the destination results in a much smoother approach.
+	// 
+	// If minHeight and maxHeight are set, heli will fly between those specified elevations, relative to ground level and any obstructions/buildings below. You can specify -1 for either if you only want to specify one. Usually it is easiest to leave maxHeight at -1, and specify a reasonable minHeight to ensure clearance over any obstacles. Note this MUST be passed as an INT, not a FLOAT. 
+	// 
+	// Radius affects how closely the heli will follow tracked ped/vehicle, and when circling (mission type 9) sets the radius (in meters) that it will circle the target from
+	// 
+	// Heading is -1.0 for default behavior, which will point the nose of the helicopter towards the destination. Set a heading and the heli will lock to that direction when near its destination/target, but may still turn towards the destination when flying at higher speed from a further distance.
+	// 
+	// Behavior Flags is a bitwise value that modifies the AI behavior. Not clear what all flags do, but here are some guesses/notes:
+	//    1: Forces heading to face E
+	//    2: Unknown
+	//    4: Tight circles around coordinate destination
+	//    8: Unknown
+	//   16: Circles around coordinate destination facing towards destination
+	//   32: Flys to normally, then lands at coordinate destination and stays on the ground (using mission type 4)
+	//   64: Ignores obstacles when flying, will follow at specified minHeight above ground level but will not avoid buildings, vehicles, etc.
+	//  128: Unknown
+	//  256: Unknown
+	//  512: Unknown
+	// 1024: Unknown 
+	// 2048: Reverses direction of circling (mission type 9) to clockwise
+	// 4096: Hugs closer to the ground, maintains minHeight from ground generally, but barely clears buildings and dips down more between buildings instead of taking a more efficient/safe route
+	// 8192: Unknown
+	// 
+	// Unk3 is a float value, you may see -1082130432 for this value in decompiled native scripts, this is the equivalent to -1.0f. Seems to affect acceleration/aggressiveness, but not sure exactly how it works. Higher value seems to result in lower acceleration/less aggressive flying. Almost always -1.0 in native scripts, occasionally 20.0 or 50.0. Setting to 400.0 seems to work well for making the pilot not overshoot the destination when using coordinate destination.
+	// 
+	// Notes updated by PNWParksFan, May 2021
+	// 
+	static void TASK_HELI_MISSION(Ped pilot, Vehicle aircraft, Vehicle targetVehicle, Ped targetPed, float destinationX, float destinationY, float destinationZ, int missionFlag, float maxSpeed, float radius, float targetHeading, int maxHeight, int minHeight, float unk3, int behaviorFlags) { invoke<Void>(0xDAD029E187A2BEB4, pilot, aircraft, targetVehicle, targetPed, destinationX, destinationY, destinationZ, missionFlag, maxSpeed, radius, targetHeading, maxHeight, minHeight, unk3, behaviorFlags); } // 0xDAD029E187A2BEB4 0x0C143E97 b323
 	static void TASK_HELI_ESCORT_HELI(Ped pilot, Vehicle heli1, Vehicle heli2, float p3, float p4, float p5) { invoke<Void>(0xB385523325077210, pilot, heli1, heli2, p3, p4, p5); } // 0xB385523325077210 b1290
 	// EXAMPLE USAGE:
 	// 
@@ -12417,14 +13464,14 @@ namespace TASK {
 	// 
 	// Working example
 	// float vehicleMaxSpeed = VEHICLE::_GET_VEHICLE_MAX_SPEED(ENTITY::GET_ENTITY_MODEL(pedVehicle));
-	// AI::TASK_BOAT_MISSION(pedDriver, pedVehicle, 0, 0, waypointCoord.x, waypointCoord.y, waypointCoord.z, 4, vehicleMaxSpeed, 786469, -1.0, 7);
+	// TASK::TASK_BOAT_MISSION(pedDriver, pedVehicle, 0, 0, waypointCoord.x, waypointCoord.y, waypointCoord.z, 4, vehicleMaxSpeed, 786469, -1.0, 7);
 	// PED::SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(pedDriver, 1);
 	// 
 	// P8 appears to be driving style flag - see gtaforums.com/topic/822314-guide-driving-styles/ for documentation
 	static void TASK_BOAT_MISSION(Ped pedDriver, Vehicle boat, Any p2, Any p3, float x, float y, float z, Any p7, float maxSpeed, int drivingStyle, float p10, Any p11) { invoke<Void>(0x15C86013127CE63F, pedDriver, boat, p2, p3, x, y, z, p7, maxSpeed, drivingStyle, p10, p11); } // 0x15C86013127CE63F 0x5865B031 b323
 	// Example:
 	// 
-	// AI::TASK_DRIVE_BY(l_467[1/*22*/], PLAYER::PLAYER_PED_ID(), 0, 0.0, 0.0, 2.0, 300.0, 100, 0, ${firing_pattern_burst_fire_driveby});
+	// TASK::TASK_DRIVE_BY(l_467[1/*22*/], PLAYER::PLAYER_PED_ID(), 0, 0.0, 0.0, 2.0, 300.0, 100, 0, ${firing_pattern_burst_fire_driveby});
 	// 
 	// 
 	// 
@@ -12470,13 +13517,17 @@ namespace TASK {
 	// PLAYER::_GET_AIMED_ENTITY(player, &aimedentity);
 	// 
 	// //bg is an array of peds
-	// AI::TASK_SHOOT_AT_ENTITY(bg[i], aimedentity, 5000, MISC::GET_HASH_KEY("FIRING_PATTERN_FULL_AUTO"));
+	// TASK::TASK_SHOOT_AT_ENTITY(bg[i], aimedentity, 5000, MISC::GET_HASH_KEY("FIRING_PATTERN_FULL_AUTO"));
 	// 
 	// in practical usage, getting the entity the player is aiming at and then task the peds to shoot at the entity, at a button press event would be better.
+	// 
+	// Firing Pattern Hash Information: https://pastebin.com/Px036isB
 	static void TASK_SHOOT_AT_ENTITY(Entity entity, Entity target, int duration, Hash firingPattern) { invoke<Void>(0x08DA95E8298AE772, entity, target, duration, firingPattern); } // 0x08DA95E8298AE772 0xAC0631C9 b323
 	// Climbs or vaults the nearest thing.
 	static void TASK_CLIMB(Ped ped, BOOL unused) { invoke<Void>(0x89D9FCC2435112F1, ped, unused); } // 0x89D9FCC2435112F1 0x90847790 b323
 	static void TASK_CLIMB_LADDER(Ped ped, int p1) { invoke<Void>(0xB6C987F9285A3814, ped, p1); } // 0xB6C987F9285A3814 0x35BB4EE0 b323
+	static void TASK_RAPPEL_DOWN_WALL(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9, Any p10) { invoke<Void>(0xEAF66ACDDC794793, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10); } // 0xEAF66ACDDC794793 b1868
+	static Any _0x9D252648778160DF(Any p0) { return invoke<Any>(0x9D252648778160DF, p0); } // 0x9D252648778160DF b1868
 	// Immediately stops the pedestrian from whatever it's doing. They stop fighting, animations, etc. they forget what they were doing.
 	static void CLEAR_PED_TASKS_IMMEDIATELY(Ped ped) { invoke<Void>(0xAAA34F8A7CB32098, ped); } // 0xAAA34F8A7CB32098 0xBC045625 b323
 	static void TASK_PERFORM_SEQUENCE_FROM_PROGRESS(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x89221B16730234F0, p0, p1, p2, p3); } // 0x89221B16730234F0 0xFA60601B b323
@@ -12486,7 +13537,7 @@ namespace TASK {
 	static float GET_PED_DESIRED_MOVE_BLEND_RATIO(Ped ped) { return invoke<float>(0x8517D4A6CA8513ED, ped); } // 0x8517D4A6CA8513ED 0x5FEFAB72 b323
 	// eg
 	// 
-	//  AI::TASK_GOTO_ENTITY_AIMING(v_2, PLAYER::PLAYER_PED_ID(), 5.0, 25.0);
+	//  TASK::TASK_GOTO_ENTITY_AIMING(v_2, PLAYER::PLAYER_PED_ID(), 5.0, 25.0);
 	// 
 	// ped = Ped you want to perform this task.
 	// target = the Entity they should aim at.
@@ -12513,18 +13564,18 @@ namespace TASK {
 	static void TASK_SEEK_COVER_FROM_PED(Ped ped, Ped target, int duration, BOOL p3) { invoke<Void>(0x84D32B3BEC531324, ped, target, duration, p3); } // 0x84D32B3BEC531324 0xC1EC907E b323
 	static void TASK_SEEK_COVER_TO_COVER_POINT(Any p0, Any p1, float p2, float p3, float p4, Any p5, BOOL p6) { invoke<Void>(0xD43D95C7A869447F, p0, p1, p2, p3, p4, p5, p6); } // 0xD43D95C7A869447F 0x3D026B29 b323
 	// from michael2:
-	// AI::TASK_SEEK_COVER_TO_COORDS(ped, 967.5164794921875, -2121.603515625, 30.479299545288086, 978.94677734375, -2125.84130859375, 29.4752, -1, 1);
+	// TASK::TASK_SEEK_COVER_TO_COORDS(ped, 967.5164794921875, -2121.603515625, 30.479299545288086, 978.94677734375, -2125.84130859375, 29.4752, -1, 1);
 	// 
 	// 
 	// appears to be shorter variation
 	// from michael3:
-	// AI::TASK_SEEK_COVER_TO_COORDS(ped, -2231.011474609375, 263.6326599121094, 173.60195922851562, -1, 0);
+	// TASK::TASK_SEEK_COVER_TO_COORDS(ped, -2231.011474609375, 263.6326599121094, 173.60195922851562, -1, 0);
 	static void TASK_SEEK_COVER_TO_COORDS(Ped ped, float x1, float y1, float z1, float x2, float y2, float z2, Any p7, BOOL p8) { invoke<Void>(0x39246A6958EF072C, ped, x1, y1, z1, x2, y2, z2, p7, p8); } // 0x39246A6958EF072C 0xFFFE754E b323
 	static void TASK_PUT_PED_DIRECTLY_INTO_COVER(Ped ped, float x, float y, float z, Any timeout, BOOL p5, float p6, BOOL p7, BOOL p8, Any p9, BOOL p10) { invoke<Void>(0x4172393E6BE1FECE, ped, x, y, z, timeout, p5, p6, p7, p8, p9, p10); } // 0x4172393E6BE1FECE 0xC9F00E68 b323
 	static void TASK_EXIT_COVER(Any p0, Any p1, float p2, float p3, float p4) { invoke<Void>(0x79B258E397854D29, p0, p1, p2, p3, p4); } // 0x79B258E397854D29 0xC829FAC9 b323
 	// from armenian3.c4
 	// 
-	// AI::TASK_PUT_PED_DIRECTLY_INTO_MELEE(PlayerPed, armenianPed, 0.0, -1.0, 0.0, 0);
+	// TASK::TASK_PUT_PED_DIRECTLY_INTO_MELEE(PlayerPed, armenianPed, 0.0, -1.0, 0.0, 0);
 	// 
 	static void TASK_PUT_PED_DIRECTLY_INTO_MELEE(Ped ped, Ped meleeTarget, float p2, float p3, float p4, BOOL p5) { invoke<Void>(0x1C6CD14A876FFE39, ped, meleeTarget, p2, p3, p4, p5); } // 0x1C6CD14A876FFE39 0x79E1D27D b323
 	// used in sequence task
@@ -12533,7 +13584,7 @@ namespace TASK {
 	static void TASK_TOGGLE_DUCK(BOOL p0, BOOL p1) { invoke<Void>(0xAC96609B9995EDF8, p0, p1); } // 0xAC96609B9995EDF8 0x61CFBCBF b323
 	// From re_prisonvanbreak:
 	// 
-	// AI::TASK_GUARD_CURRENT_POSITION(l_DD, 35.0, 35.0, 1);
+	// TASK::TASK_GUARD_CURRENT_POSITION(l_DD, 35.0, 35.0, 1);
 	static void TASK_GUARD_CURRENT_POSITION(Ped p0, float p1, float p2, BOOL p3) { invoke<Void>(0x4A58A47A72E3FCB4, p0, p1, p2, p3); } // 0x4A58A47A72E3FCB4 0x2FB099E9 b323
 	static void TASK_GUARD_ASSIGNED_DEFENSIVE_AREA(Any p0, float p1, float p2, float p3, float p4, float p5, Any p6) { invoke<Void>(0xD2A207EEBDF9889B, p0, p1, p2, p3, p4, p5, p6); } // 0xD2A207EEBDF9889B 0x7AF0133D b323
 	// p0 - Guessing PedID
@@ -12571,7 +13622,7 @@ namespace TASK {
 	// 
 	// From "am_hold_up.ysc.c4" at line 339:
 	// 
-	// AI::TASK_START_SCENARIO_IN_PLACE(NETWORK::NET_TO_PED(l_8D._f4), sub_adf(), 0, 1);
+	// TASK::TASK_START_SCENARIO_IN_PLACE(NETWORK::NET_TO_PED(l_8D._f4), sub_adf(), 0, 1);
 	// 
 	// I'm unsure of what the last two parameters are, however sub_adf() randomly returns 1 of 3 scenarios, those being:
 	// WORLD_HUMAN_SMOKING
@@ -12603,10 +13654,12 @@ namespace TASK {
 	// WORLD_VEHICLE_POLICE_NEXT_TO_CAR
 	// WORLD_VEHICLE_SALTON_DIRT_BIKE
 	// WORLD_VEHICLE_TRUCK_LOGS
-	static void TASK_START_SCENARIO_IN_PLACE(Ped ped, const char* scenarioName, int unkDelay, BOOL playEnterAnim) { invoke<Void>(0x142A02425FF02BD9, ped, scenarioName, unkDelay, playEnterAnim); } // 0x142A02425FF02BD9 0xE50D6DDE b323
-	// List of scenarioNames: pastebin.com/6mrYTdQv
 	// 
-	// Also a few more listed at AI::TASK_START_SCENARIO_IN_PLACE just above.
+	// Full list of ped scenarios by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/scenariosCompact.json
+	static void TASK_START_SCENARIO_IN_PLACE(Ped ped, const char* scenarioName, int unkDelay, BOOL playEnterAnim) { invoke<Void>(0x142A02425FF02BD9, ped, scenarioName, unkDelay, playEnterAnim); } // 0x142A02425FF02BD9 0xE50D6DDE b323
+	// Full list of ped scenarios by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/scenariosCompact.json
+	// 
+	// Also a few more listed at TASK::TASK_START_SCENARIO_IN_PLACE just above.
 	// ---------------
 	// The first parameter in every scenario has always been a Ped of some sort. The second like TASK_START_SCENARIO_IN_PLACE is the name of the scenario. 
 	// 
@@ -12626,7 +13679,7 @@ namespace TASK {
 	static void TASK_START_SCENARIO_AT_POSITION(Ped ped, const char* scenarioName, float x, float y, float z, float heading, int duration, BOOL sittingScenario, BOOL teleport) { invoke<Void>(0xFA4EFC79F69D4F07, ped, scenarioName, x, y, z, heading, duration, sittingScenario, teleport); } // 0xFA4EFC79F69D4F07 0xAA2C4AC2 b323
 	// Updated variables
 	// 
-	// An alternative to AI::TASK_USE_NEAREST_SCENARIO_TO_COORD_WARP. Makes the ped walk to the scenario instead.
+	// An alternative to TASK::TASK_USE_NEAREST_SCENARIO_TO_COORD_WARP. Makes the ped walk to the scenario instead.
 	static void TASK_USE_NEAREST_SCENARIO_TO_COORD(Ped ped, float x, float y, float z, float distance, int duration) { invoke<Void>(0x277F471BA9DB000B, ped, x, y, z, distance, duration); } // 0x277F471BA9DB000B 0x9C50FBF0 b323
 	static void TASK_USE_NEAREST_SCENARIO_TO_COORD_WARP(Ped ped, float x, float y, float z, float radius, Any p5) { invoke<Void>(0x58E2E0F23F6B76C3, ped, x, y, z, radius, p5); } // 0x58E2E0F23F6B76C3 0x1BE9D65C b323
 	static void TASK_USE_NEAREST_SCENARIO_CHAIN_TO_COORD(Any p0, float p1, float p2, float p3, float p4, Any p5) { invoke<Void>(0x9FDA1B3D7E7028B3, p0, p1, p2, p3, p4, p5); } // 0x9FDA1B3D7E7028B3 0xE32FFB22 b323
@@ -12635,7 +13688,7 @@ namespace TASK {
 	static BOOL DOES_SCENARIO_OF_TYPE_EXIST_IN_AREA(float p0, float p1, float p2, Any* p3, float p4, BOOL p5) { return invoke<BOOL>(0x0A9D0C2A3BBC86C1, p0, p1, p2, p3, p4, p5); } // 0x0A9D0C2A3BBC86C1 0x0FB138A5 b323
 	static BOOL IS_SCENARIO_OCCUPIED(float p0, float p1, float p2, float p3, BOOL p4) { return invoke<BOOL>(0x788756D73AC2E07C, p0, p1, p2, p3, p4); } // 0x788756D73AC2E07C 0x697FC008 b323
 	static BOOL PED_HAS_USE_SCENARIO_TASK(Ped ped) { return invoke<BOOL>(0x295E3CCEC879CCD7, ped); } // 0x295E3CCEC879CCD7 0x9BE9C691 b323
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static void PLAY_ANIM_ON_RUNNING_SCENARIO(Ped ped, const char* animDict, const char* animName) { invoke<Void>(0x748040460F8DF5DC, ped, animDict, animName); } // 0x748040460F8DF5DC 0x1984A5D1 b323
 	// Occurrences in the b617d scripts:
 	// 
@@ -12669,8 +13722,8 @@ namespace TASK {
 	// "Triathlon_3_Start"
 	// 
 	// Sometimes used with IS_SCENARIO_GROUP_ENABLED:
-	// if (AI::DOES_SCENARIO_GROUP_EXIST("Observatory_Bikers") && (!AI::IS_SCENARIO_GROUP_ENABLED("Observatory_Bikers"))) {
-	// else if (AI::IS_SCENARIO_GROUP_ENABLED("BLIMP")) {
+	// if (TASK::DOES_SCENARIO_GROUP_EXIST("Observatory_Bikers") && (!TASK::IS_SCENARIO_GROUP_ENABLED("Observatory_Bikers"))) {
+	// else if (TASK::IS_SCENARIO_GROUP_ENABLED("BLIMP")) {
 	// 
 	static BOOL DOES_SCENARIO_GROUP_EXIST(const char* scenarioGroup) { return invoke<BOOL>(0xF9034C136C9E00D3, scenarioGroup); } // 0xF9034C136C9E00D3 0x5F072EB9 b323
 	//  Occurrences in the b617d scripts: 
@@ -12700,8 +13753,8 @@ namespace TASK {
 	//  "SOLOMON_GATE"
 	// 
 	// Sometimes used with DOES_SCENARIO_GROUP_EXIST:
-	// if (AI::DOES_SCENARIO_GROUP_EXIST("Observatory_Bikers") &&   (!AI::IS_SCENARIO_GROUP_ENABLED("Observatory_Bikers"))) {
-	// else if (AI::IS_SCENARIO_GROUP_ENABLED("BLIMP")) {
+	// if (TASK::DOES_SCENARIO_GROUP_EXIST("Observatory_Bikers") &&   (!TASK::IS_SCENARIO_GROUP_ENABLED("Observatory_Bikers"))) {
+	// else if (TASK::IS_SCENARIO_GROUP_ENABLED("BLIMP")) {
 	static BOOL IS_SCENARIO_GROUP_ENABLED(const char* scenarioGroup) { return invoke<BOOL>(0x367A09DED4E05B99, scenarioGroup); } // 0x367A09DED4E05B99 0x90991122 b323
 	// Occurrences in the b617d scripts: pastebin.com/Tvg2PRHU
 	static void SET_SCENARIO_GROUP_ENABLED(const char* scenarioGroup, BOOL p1) { invoke<Void>(0x02C8E5B49848664E, scenarioGroup, p1); } // 0x02C8E5B49848664E 0x116997B1 b323
@@ -12725,7 +13778,7 @@ namespace TASK {
 	// 
 	// Sometimes used together with MISC::IS_STRING_NULL_OR_EMPTY in the scripts.
 	// 
-	// scenarioType could be the same as scenarioName, used in for example AI::TASK_START_SCENARIO_AT_POSITION.
+	// scenarioType could be the same as scenarioName, used in for example TASK::TASK_START_SCENARIO_AT_POSITION.
 	// 
 	static BOOL IS_SCENARIO_TYPE_ENABLED(const char* scenarioType) { return invoke<BOOL>(0x3A815DB3EA088722, scenarioType); } // 0x3A815DB3EA088722 0xAE37E969 b323
 	// seems to enable/disable specific scenario-types from happening in the game world.
@@ -12761,7 +13814,7 @@ namespace TASK {
 	// "WORLD_VEHICLE_TRUCK_LOGS" 
 	// -alphazolam
 	// 
-	// scenarioType could be the same as scenarioName, used in for example AI::TASK_START_SCENARIO_AT_POSITION.
+	// scenarioType could be the same as scenarioName, used in for example TASK::TASK_START_SCENARIO_AT_POSITION.
 	static void SET_SCENARIO_TYPE_ENABLED(const char* scenarioType, BOOL toggle) { invoke<Void>(0xEB47EC4E34FB7EE1, scenarioType, toggle); } // 0xEB47EC4E34FB7EE1 0xDB18E5DE b323
 	static void RESET_SCENARIO_TYPES_ENABLED() { invoke<Void>(0x0D40EE2A7F2B2D6D); } // 0x0D40EE2A7F2B2D6D 0xF58FDEB4 b323
 	static BOOL IS_PED_ACTIVE_IN_SCENARIO(Ped ped) { return invoke<BOOL>(0xAA135F9482C82CC3, ped); } // 0xAA135F9482C82CC3 0x05038F1A b323
@@ -12770,9 +13823,7 @@ namespace TASK {
 	// ped was PLAYER_PED_ID()
 	// 
 	// Related to CTaskAmbientClips.
-	// 
-	// IS_PED_*
-	static BOOL _0x621C6E4729388E41(Ped ped) { return invoke<BOOL>(0x621C6E4729388E41, ped); } // 0x621C6E4729388E41 0xA0DA6B1D b323
+	static BOOL IS_PED_PLAYING_BASE_CLIP_IN_SCENARIO(Ped ped) { return invoke<BOOL>(0x621C6E4729388E41, ped); } // 0x621C6E4729388E41 0xA0DA6B1D b323
 	// Appears only in fm_mission_controller and used only 3 times.
 	// 
 	// ped was always PLAYER_PED_ID()
@@ -12802,8 +13853,8 @@ namespace TASK {
 	// 
 	// The only occurrence I found in a R* script ("assassin_construction.ysc.c4"):
 	// 
-	//             if (((v_3 < v_4) && (AI::GET_SCRIPT_TASK_STATUS(PLAYER::PLAYER_PED_ID(), 0x6a67a5cc) != 1)) && (v_5 > v_3)) {
-	//                 AI::TASK_RELOAD_WEAPON(PLAYER::PLAYER_PED_ID(), 1);
+	//             if (((v_3 < v_4) && (TASK::GET_SCRIPT_TASK_STATUS(PLAYER::PLAYER_PED_ID(), 0x6a67a5cc) != 1)) && (v_5 > v_3)) {
+	//                 TASK::TASK_RELOAD_WEAPON(PLAYER::PLAYER_PED_ID(), 1);
 	//             }
 	static void TASK_RELOAD_WEAPON(Ped ped, BOOL unused) { invoke<Void>(0x62D2916F56B9CD2D, ped, unused); } // 0x62D2916F56B9CD2D 0xCA6E91FD b323
 	static BOOL IS_PED_GETTING_UP(Ped ped) { return invoke<BOOL>(0x2A74E1D5F2F00EEC, ped); } // 0x2A74E1D5F2F00EEC 0x320813E6 b323
@@ -12815,7 +13866,8 @@ namespace TASK {
 	// 
 	// MulleDK19: Third parameter does not appear to be time. The last parameter is not implemented (It's not used, regardless of value).
 	static void TASK_WRITHE(Ped ped, Ped target, int time, int p3, Any p4, Any p5) { invoke<Void>(0xCDDC2B77CE54AC6E, ped, target, time, p3, p4, p5); } // 0xCDDC2B77CE54AC6E 0x0FDC54FC b323
-	// returns true is the ped is on the ground whining like a little female dog from a gunshot wound
+	// This native checks if a ped is on the ground, in pain from a (gunshot) wound.
+	// Returns `true` if the ped is in writhe, `false` otherwise.
 	static BOOL IS_PED_IN_WRITHE(Ped ped) { return invoke<BOOL>(0xDEB6D52126E7D640, ped); } // 0xDEB6D52126E7D640 0x09E61921 b323
 	//  patrolRoutes found in the b617d scripts:
 	//  "miss_Ass0",
@@ -12841,7 +13893,7 @@ namespace TASK {
 	static void OPEN_PATROL_ROUTE(const char* patrolRoute) { invoke<Void>(0xA36BFB5EE89F3D82, patrolRoute); } // 0xA36BFB5EE89F3D82 0xF33F83CA b323
 	static void CLOSE_PATROL_ROUTE() { invoke<Void>(0xB043ECA801B8CBC1); } // 0xB043ECA801B8CBC1 0x67305E59 b323
 	// Example: 
-	// AI::ADD_PATROL_ROUTE_NODE(2, "WORLD_HUMAN_GUARD_STAND", -193.4915, -2378.864990234375, 10.9719, -193.4915, -2378.864990234375, 10.9719, 3000);
+	// TASK::ADD_PATROL_ROUTE_NODE(2, "WORLD_HUMAN_GUARD_STAND", -193.4915, -2378.864990234375, 10.9719, -193.4915, -2378.864990234375, 10.9719, 3000);
 	// 
 	// p0 is between 0 and 4 in the scripts.
 	// 
@@ -12849,9 +13901,9 @@ namespace TASK {
 	// 
 	// p2, p3 and p4 is only one parameter sometimes in the scripts. Most likely a Vector3 hence p2, p3 and p4 are coordinates. 
 	// Examples: 
-	// AI::ADD_PATROL_ROUTE_NODE(1, "WORLD_HUMAN_GUARD_STAND", l_739[7/*3*/], 0.0, 0.0, 0.0, 0);
+	// TASK::ADD_PATROL_ROUTE_NODE(1, "WORLD_HUMAN_GUARD_STAND", l_739[7/*3*/], 0.0, 0.0, 0.0, 0);
 	// 
-	// AI::ADD_PATROL_ROUTE_NODE(1, "WORLD_HUMAN_GUARD_STAND", l_B0[17/*44*/]._f3, l_B0[17/*44*/]._f3, 2000);
+	// TASK::ADD_PATROL_ROUTE_NODE(1, "WORLD_HUMAN_GUARD_STAND", l_B0[17/*44*/]._f3, l_B0[17/*44*/]._f3, 2000);
 	// 
 	// p5, p6 and p7 are for example set to: 1599.0406494140625, 2713.392578125, 44.4309.
 	// 
@@ -12861,10 +13913,10 @@ namespace TASK {
 	static void CREATE_PATROL_ROUTE() { invoke<Void>(0xAF8A443CCC8018DC); } // 0xAF8A443CCC8018DC 0x0A6C7864 b323
 	// From the b617d scripts:
 	// 
-	// AI::DELETE_PATROL_ROUTE("miss_merc0");
-	// AI::DELETE_PATROL_ROUTE("miss_merc1");
-	// AI::DELETE_PATROL_ROUTE("miss_merc2");
-	// AI::DELETE_PATROL_ROUTE("miss_dock");
+	// TASK::DELETE_PATROL_ROUTE("miss_merc0");
+	// TASK::DELETE_PATROL_ROUTE("miss_merc1");
+	// TASK::DELETE_PATROL_ROUTE("miss_merc2");
+	// TASK::DELETE_PATROL_ROUTE("miss_dock");
 	static void DELETE_PATROL_ROUTE(const char* patrolRoute) { invoke<Void>(0x7767DD9D65E91319, patrolRoute); } // 0x7767DD9D65E91319 0x2A4E6706 b323
 	// After looking at some scripts the second parameter seems to be an id of some kind. Here are some I found from some R* scripts:
 	// 
@@ -12878,15 +13930,15 @@ namespace TASK {
 	// As far as I can see the patrol routes names such as "miss_Ass0" have been defined earlier in the scripts. This leads me to believe we can defined our own new patrol routes by following the same approach. 
 	// From the scripts
 	// 
-	//     AI::OPEN_PATROL_ROUTE("miss_Ass0");
-	//     AI::ADD_PATROL_ROUTE_NODE(0, "WORLD_HUMAN_GUARD_STAND", l_738[0/*3*/], -139.4076690673828, -993.4732055664062, 26.2754, MISC::GET_RANDOM_INT_IN_RANGE(5000, 10000));
-	//     AI::ADD_PATROL_ROUTE_NODE(1, "WORLD_HUMAN_GUARD_STAND", l_738[1/*3*/], -116.1391830444336, -987.4984130859375, 26.38541030883789, MISC::GET_RANDOM_INT_IN_RANGE(5000, 10000));
-	//     AI::ADD_PATROL_ROUTE_NODE(2, "WORLD_HUMAN_GUARD_STAND", l_738[2/*3*/], -128.46847534179688, -979.0340576171875, 26.2754, MISC::GET_RANDOM_INT_IN_RANGE(5000, 10000));
-	//     AI::ADD_PATROL_ROUTE_LINK(0, 1);
-	//     AI::ADD_PATROL_ROUTE_LINK(1, 2);
-	//     AI::ADD_PATROL_ROUTE_LINK(2, 0);
-	//     AI::CLOSE_PATROL_ROUTE();
-	//     AI::CREATE_PATROL_ROUTE();
+	//     TASK::OPEN_PATROL_ROUTE("miss_Ass0");
+	//     TASK::ADD_PATROL_ROUTE_NODE(0, "WORLD_HUMAN_GUARD_STAND", l_738[0/*3*/], -139.4076690673828, -993.4732055664062, 26.2754, MISC::GET_RANDOM_INT_IN_RANGE(5000, 10000));
+	//     TASK::ADD_PATROL_ROUTE_NODE(1, "WORLD_HUMAN_GUARD_STAND", l_738[1/*3*/], -116.1391830444336, -987.4984130859375, 26.38541030883789, MISC::GET_RANDOM_INT_IN_RANGE(5000, 10000));
+	//     TASK::ADD_PATROL_ROUTE_NODE(2, "WORLD_HUMAN_GUARD_STAND", l_738[2/*3*/], -128.46847534179688, -979.0340576171875, 26.2754, MISC::GET_RANDOM_INT_IN_RANGE(5000, 10000));
+	//     TASK::ADD_PATROL_ROUTE_LINK(0, 1);
+	//     TASK::ADD_PATROL_ROUTE_LINK(1, 2);
+	//     TASK::ADD_PATROL_ROUTE_LINK(2, 0);
+	//     TASK::CLOSE_PATROL_ROUTE();
+	//     TASK::CREATE_PATROL_ROUTE();
 	// 
 	// 
 	static void TASK_PATROL(Ped ped, const char* p1, Any p2, BOOL p3, BOOL p4) { invoke<Void>(0xBDA5DF49D080FE4E, ped, p1, p2, p3, p4); } // 0xBDA5DF49D080FE4E 0xB92E5AF6 b323
@@ -12956,10 +14008,10 @@ namespace TASK {
 	// Vector3 focusLocation = { 994.3478f, 0, -2136.118f, 0, 29.2463f, 0 }; // the coord z should be a little higher, around +1.0f to avoid aiming at the ground
 	// 
 	// // 1st example
-	// AI::TASK_GO_TO_COORD_AND_AIM_AT_HATED_ENTITIES_NEAR_COORD(pedHandle, goToLocation1.x, goToLocation1.y, goToLocation1.z, focusLocation.x, focusLocation.y, focusLocation.z, 2.0f /*run*/, true /*shoot*/, 3.0f /*stop at*/, 0.0f /*noRoadsDistance*/, true /*always true*/, 0 /*possible flag*/, AimFlag::AimAtGoToLocation, -957453492 /*FullAuto pattern*/);
+	// TASK::TASK_GO_TO_COORD_AND_AIM_AT_HATED_ENTITIES_NEAR_COORD(pedHandle, goToLocation1.x, goToLocation1.y, goToLocation1.z, focusLocation.x, focusLocation.y, focusLocation.z, 2.0f /*run*/, true /*shoot*/, 3.0f /*stop at*/, 0.0f /*noRoadsDistance*/, true /*always true*/, 0 /*possible flag*/, AimFlag::AimAtGoToLocation, -957453492 /*FullAuto pattern*/);
 	// 
 	// // 2nd example
-	// AI::TASK_GO_TO_COORD_AND_AIM_AT_HATED_ENTITIES_NEAR_COORD(pedHandle, goToLocation2.x, goToLocation2.y, goToLocation2.z, focusLocation.x, focusLocation.y, focusLocation.z, 1.0f /*walk*/, false /*don't shoot*/, 3.0f /*stop at*/, 0.0f /*noRoadsDistance*/, true /*always true*/, 0 /*possible flag*/, AimFlag::AimAtFocusLocation, -957453492 /*FullAuto pattern*/);
+	// TASK::TASK_GO_TO_COORD_AND_AIM_AT_HATED_ENTITIES_NEAR_COORD(pedHandle, goToLocation2.x, goToLocation2.y, goToLocation2.z, focusLocation.x, focusLocation.y, focusLocation.z, 1.0f /*walk*/, false /*don't shoot*/, 3.0f /*stop at*/, 0.0f /*noRoadsDistance*/, true /*always true*/, 0 /*possible flag*/, AimFlag::AimAtFocusLocation, -957453492 /*FullAuto pattern*/);
 	// 
 	// 
 	// 1st example: The ped (pedhandle) will run towards goToLocation1. While running and aiming towards goToLocation1, the ped will shoot on sight to any enemy in his path, using "FullAuto" firing pattern. The ped will stop once he is closer than distanceToStopAt to goToLocation1.
@@ -12973,23 +14025,24 @@ namespace TASK {
 	static void TASK_GO_TO_ENTITY_WHILE_AIMING_AT_ENTITY(Ped ped, Entity entityToWalkTo, Entity entityToAimAt, float speed, BOOL shootatEntity, float p5, float p6, BOOL p7, BOOL p8, Hash firingPattern) { invoke<Void>(0x97465886D35210E9, ped, entityToWalkTo, entityToAimAt, speed, shootatEntity, p5, p6, p7, p8, firingPattern); } // 0x97465886D35210E9 0x68E36B7A b323
 	// Makes the ped ragdoll like when falling from a great height
 	static void SET_HIGH_FALL_TASK(Ped ped, Any p1, Any p2, Any p3) { invoke<Void>(0x8C825BDC7741D37C, ped, p1, p2, p3); } // 0x8C825BDC7741D37C 0xBBB26172 b323
-	// For a full list, see here: pastebin.com/Tp0XpBMN
+	// Full list of waypoint recordings by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/waypointRecordings.json
 	// For a full list of the points, see here: goo.gl/wIH0vn
 	// 
 	// Max number of loaded recordings is 32.
 	static void REQUEST_WAYPOINT_RECORDING(const char* name) { invoke<Void>(0x9EEFB62EB27B5792, name); } // 0x9EEFB62EB27B5792 0xAFABFB5D b323
-	// For a full list, see here: pastebin.com/Tp0XpBMN
+	// Full list of waypoint recordings by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/waypointRecordings.json
 	static BOOL GET_IS_WAYPOINT_RECORDING_LOADED(const char* name) { return invoke<BOOL>(0xCB4E8BE8A0063C5D, name); } // 0xCB4E8BE8A0063C5D 0x87125F5D b323
-	// For a full list, see here: pastebin.com/Tp0XpBMN
+	// Full list of waypoint recordings by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/waypointRecordings.json
 	static void REMOVE_WAYPOINT_RECORDING(const char* name) { invoke<Void>(0xFF1B8B4AA1C25DC8, name); } // 0xFF1B8B4AA1C25DC8 0x624530B0 b323
-	// For a full list, see here: pastebin.com/Tp0XpBMN
+	// Full list of waypoint recordings by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/waypointRecordings.json
 	// For a full list of the points, see here: goo.gl/wIH0vn
 	static BOOL WAYPOINT_RECORDING_GET_NUM_POINTS(const char* name, int* points) { return invoke<BOOL>(0x5343532C01A07234, name, points); } // 0x5343532C01A07234 0xF5F9B71E b323
-	// For a full list, see here: pastebin.com/Tp0XpBMN
+	// Full list of waypoint recordings by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/waypointRecordings.json
 	// For a full list of the points, see here: goo.gl/wIH0vn
 	static BOOL WAYPOINT_RECORDING_GET_COORD(const char* name, int point, Vector3* coord) { return invoke<BOOL>(0x2FB897405C90B361, name, point, coord); } // 0x2FB897405C90B361 0x19266913 b323
+	// Full list of waypoint recordings by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/waypointRecordings.json
 	static float WAYPOINT_RECORDING_GET_SPEED_AT_POINT(const char* name, int point) { return invoke<float>(0x005622AEBC33ACA9, name, point); } // 0x005622AEBC33ACA9 0xC765633A b323
-	// For a full list, see here: pastebin.com/Tp0XpBMN
+	// Full list of waypoint recordings by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/waypointRecordings.json
 	// For a full list of the points, see here: goo.gl/wIH0vn
 	static BOOL WAYPOINT_RECORDING_GET_CLOSEST_WAYPOINT(const char* name, float x, float y, float z, int* point) { return invoke<BOOL>(0xB629A298081F876F, name, x, y, z, point); } // 0xB629A298081F876F 0xC4CD35AF b323
 	static void TASK_FOLLOW_WAYPOINT_RECORDING(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0x0759591819534F7B, p0, p1, p2, p3, p4); } // 0x0759591819534F7B 0xADF9904D b323
@@ -13003,7 +14056,7 @@ namespace TASK {
 	static void WAYPOINT_PLAYBACK_RESUME(Any p0, BOOL p1, Any p2, Any p3) { invoke<Void>(0x244F70C84C547D2D, p0, p1, p2, p3); } // 0x244F70C84C547D2D 0x50F392EF b323
 	static void WAYPOINT_PLAYBACK_OVERRIDE_SPEED(Any p0, float p1, BOOL p2) { invoke<Void>(0x7D7D2B47FA788E85, p0, p1, p2); } // 0x7D7D2B47FA788E85 0x23E6BA96 b323
 	static void WAYPOINT_PLAYBACK_USE_DEFAULT_SPEED(Any p0) { invoke<Void>(0x6599D834B12D0800, p0); } // 0x6599D834B12D0800 0x1BBB2CAC b323
-	static void USE_WAYPOINT_RECORDING_AS_ASSISTED_MOVEMENT_ROUTE(Any* p0, BOOL p1, float p2, float p3) { invoke<Void>(0x5A353B8E6B1095B5, p0, p1, p2, p3); } // 0x5A353B8E6B1095B5 0x4DFD5FEC b323
+	static void USE_WAYPOINT_RECORDING_AS_ASSISTED_MOVEMENT_ROUTE(const char* name, BOOL p1, float p2, float p3) { invoke<Void>(0x5A353B8E6B1095B5, name, p1, p2, p3); } // 0x5A353B8E6B1095B5 0x4DFD5FEC b323
 	static void WAYPOINT_PLAYBACK_START_AIMING_AT_PED(Any p0, Any p1, BOOL p2) { invoke<Void>(0x20E330937C399D29, p0, p1, p2); } // 0x20E330937C399D29 0x75E60CF6 b323
 	static void WAYPOINT_PLAYBACK_START_AIMING_AT_COORD(Any p0, float p1, float p2, float p3, BOOL p4) { invoke<Void>(0x8968400D900ED8B3, p0, p1, p2, p3, p4); } // 0x8968400D900ED8B3 0xF120A34E b323
 	static void WAYPOINT_PLAYBACK_START_SHOOTING_AT_PED(Any p0, Any p1, BOOL p2, Any p3) { invoke<Void>(0xE70BA7B90F8390DC, p0, p1, p2, p3); } // 0xE70BA7B90F8390DC 0xBD5F0EB8 b323
@@ -13027,6 +14080,8 @@ namespace TASK {
 	// p11 = 1073741824
 	// 
 	// -khorio
+	// 
+	// Full list of waypoint recordings by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/waypointRecordings.json
 	static void TASK_VEHICLE_FOLLOW_WAYPOINT_RECORDING(Ped ped, Vehicle vehicle, const char* WPRecording, int p3, int p4, int p5, int p6, float p7, BOOL p8, float p9) { invoke<Void>(0x3123FAA6DB1CF7ED, ped, vehicle, WPRecording, p3, p4, p5, p6, p7, p8, p9); } // 0x3123FAA6DB1CF7ED 0x959818B6 b323
 	static BOOL IS_WAYPOINT_PLAYBACK_GOING_ON_FOR_VEHICLE(Vehicle vehicle) { return invoke<BOOL>(0xF5134943EA29868C, vehicle); } // 0xF5134943EA29868C 0x80DD15DB b323
 	static int GET_VEHICLE_WAYPOINT_PROGRESS(Vehicle vehicle) { return invoke<int>(0x9824CFF8FC66E159, vehicle); } // 0x9824CFF8FC66E159 0xD3CCF64E b323
@@ -13055,6 +14110,7 @@ namespace TASK {
 	static void TASK_MOVE_NETWORK_ADVANCED_BY_NAME(Ped ped, const char* p1, float p2, float p3, float p4, float p5, float p6, float p7, Any p8, float p9, BOOL p10, const char* animDict, int flags) { invoke<Void>(0xD5B35BEA41919ACB, ped, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, animDict, flags); } // 0xD5B35BEA41919ACB 0x71A5C5DB b323
 	// Used only once in the scripts (am_mp_nightclub)
 	static void _TASK_MOVE_NETWORK_BY_NAME_WITH_INIT_PARAMS(Ped ped, const char* p1, Any* data, float p3, BOOL p4, const char* animDict, int flags) { invoke<Void>(0x3D45B0B355C5E0C9, ped, p1, data, p3, p4, animDict, flags); } // 0x3D45B0B355C5E0C9 b1493
+	static void _0x29682E2CCF21E9B5(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8, Any p9, Any p10, Any p11, Any p12, Any p13) { invoke<Void>(0x29682E2CCF21E9B5, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13); } // 0x29682E2CCF21E9B5 b1868
 	static BOOL IS_TASK_MOVE_NETWORK_ACTIVE(Ped ped) { return invoke<BOOL>(0x921CE12C489C4C41, ped); } // 0x921CE12C489C4C41 0x902656EB b323
 	static BOOL IS_TASK_MOVE_NETWORK_READY_FOR_TRANSITION(Ped ped) { return invoke<BOOL>(0x30ED88D5E0C56A37, ped); } // 0x30ED88D5E0C56A37 0x92FDBAE6 b323
 	static BOOL REQUEST_TASK_MOVE_NETWORK_STATE_TRANSITION(Ped ped, const char* name) { return invoke<BOOL>(0xD01015C7316AE176, ped, name); } // 0xD01015C7316AE176 0x885724DE b323
@@ -13072,7 +14128,7 @@ namespace TASK {
 	// 
 	// -LcGamingHD
 	// 
-	// Example: AI::_D5BB4025AE449A4E(PLAYER::PLAYER_PED_ID(), "Phase", 0.5);
+	// Example: TASK::_D5BB4025AE449A4E(PLAYER::PLAYER_PED_ID(), "Phase", 0.5);
 	static void SET_TASK_MOVE_NETWORK_SIGNAL_FLOAT(Ped ped, const char* signalName, float value) { invoke<Void>(0xD5BB4025AE449A4E, ped, signalName, value); } // 0xD5BB4025AE449A4E 0xA79BE783 b323
 	static void _SET_TASK_MOVE_NETWORK_SIGNAL_FLOAT_2(Ped ped, const char* signalName, float value) { invoke<Void>(0x373EF409B82697A3, ped, signalName, value); } // 0x373EF409B82697A3 b1493
 	static void _0x8634CEF2522D987B(Ped ped, const char* p1, float value) { invoke<Void>(0x8634CEF2522D987B, ped, p1, value); } // 0x8634CEF2522D987B b1493
@@ -13080,6 +14136,8 @@ namespace TASK {
 	static float _GET_TASK_MOVE_NETWORK_SIGNAL_FLOAT(Ped ped, const char* signalName) { return invoke<float>(0x44AB0B3AFECCE242, ped, signalName); } // 0x44AB0B3AFECCE242 b1493
 	static BOOL GET_TASK_MOVE_NETWORK_SIGNAL_BOOL(Ped ped, const char* signalName) { return invoke<BOOL>(0xA7FFBA498E4AAF67, ped, signalName); } // 0xA7FFBA498E4AAF67 0x1EBB6F3D b323
 	static BOOL GET_TASK_MOVE_NETWORK_EVENT(Ped ped, const char* eventName) { return invoke<BOOL>(0xB4F47213DF45A64C, ped, eventName); } // 0xB4F47213DF45A64C 0x72FA5EF2 b323
+	// Doesn't actually return anything.
+	static Any _0x0FFB3C758E8C07B9(Ped ped, BOOL p1) { return invoke<Any>(0x0FFB3C758E8C07B9, ped, p1); } // 0x0FFB3C758E8C07B9 b2060
 	static BOOL IS_MOVE_BLEND_RATIO_STILL(Ped ped) { return invoke<BOOL>(0x349CE7B56DAFD95C, ped); } // 0x349CE7B56DAFD95C 0xE9DAF877 b323
 	static BOOL IS_MOVE_BLEND_RATIO_WALKING(Ped ped) { return invoke<BOOL>(0xF133BBBE91E1691F, ped); } // 0xF133BBBE91E1691F 0xD21639A8 b323
 	static BOOL IS_MOVE_BLEND_RATIO_RUNNING(Ped ped) { return invoke<BOOL>(0xD4D8636C0199A939, ped); } // 0xD4D8636C0199A939 0xE76A2353 b323
@@ -13090,9 +14148,9 @@ namespace TASK {
 	static BOOL IS_PED_SPRINTING(Ped ped) { return invoke<BOOL>(0x57E457CD2C0FC168, ped); } // 0x57E457CD2C0FC168 0x4F3E0633 b323
 	// What's strafing?
 	static BOOL IS_PED_STRAFING(Ped ped) { return invoke<BOOL>(0xE45B7F222DE47E09, ped); } // 0xE45B7F222DE47E09 0xEFEED13C b323
-	//  AI::TASK_SYNCHRONIZED_SCENE(ped, scene, "creatures@rottweiler@in_vehicle@std_car", "get_in", 1000.0, -8.0, 4, 0, 0x447a0000, 0);
+	//  TASK::TASK_SYNCHRONIZED_SCENE(ped, scene, "creatures@rottweiler@in_vehicle@std_car", "get_in", 1000.0, -8.0, 4, 0, 0x447a0000, 0);
 	// 
-	// Animations List : www.ls-multiplayer.com/dev/index.php?section=3
+	// Full list of animation dictionaries and anims by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/animDictsCompact.json
 	static void TASK_SYNCHRONIZED_SCENE(Ped ped, int scene, const char* animDictionary, const char* animationName, float speed, float speedMultiplier, int duration, int flag, float playbackRate, Any p9) { invoke<Void>(0xEEA929141F699854, ped, scene, animDictionary, animationName, speed, speedMultiplier, duration, flag, playbackRate, p9); } // 0xEEA929141F699854 0x4F217E7B b323
 	static void TASK_AGITATED_ACTION(Ped ped, Ped ped2) { invoke<Void>(0x19D1B791CB3670FE, ped, ped2); } // 0x19D1B791CB3670FE b877
 	// This function is called on peds in vehicles.
@@ -13105,11 +14163,11 @@ namespace TASK {
 	static void TASK_SWEEP_AIM_POSITION(Any p0, Any* p1, Any* p2, Any* p3, Any* p4, Any p5, float p6, float p7, float p8, float p9, float p10) { invoke<Void>(0x7AFE8FDC10BC07D2, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10); } // 0x7AFE8FDC10BC07D2 0x1683FE66 b323
 	static void UPDATE_TASK_SWEEP_AIM_POSITION(Any p0, float p1, float p2, float p3) { invoke<Void>(0xBB106883F5201FC4, p0, p1, p2, p3); } // 0xBB106883F5201FC4 0x6345EC80 b323
 	// Example from "me_amanda1.ysc.c4":
-	// AI::TASK_ARREST_PED(l_19F /* This is a Ped */ , PLAYER::PLAYER_PED_ID());
+	// TASK::TASK_ARREST_PED(l_19F /* This is a Ped */ , PLAYER::PLAYER_PED_ID());
 	// 
 	// Example from "armenian1.ysc.c4":
 	// if (!PED::IS_PED_INJURED(l_B18[0/*1*/])) {
-	//     AI::TASK_ARREST_PED(l_B18[0/*1*/], PLAYER::PLAYER_PED_ID());
+	//     TASK::TASK_ARREST_PED(l_B18[0/*1*/], PLAYER::PLAYER_PED_ID());
 	// }
 	// 
 	// I would love to have time to experiment to see if a player Ped can arrest another Ped. Might make for a good cop mod.
@@ -13124,8 +14182,11 @@ namespace TASK {
 	static BOOL IS_PED_CUFFED(Ped ped) { return invoke<BOOL>(0x74E559B3BC910685, ped); } // 0x74E559B3BC910685 0x511CE741 b323
 }
 
-namespace VEHICLE {
-	static Vehicle CREATE_VEHICLE(Hash modelHash, float x, float y, float z, float heading, BOOL isNetwork, BOOL netMissionEntity, BOOL p7) { return invoke<Vehicle>(0xAF35D0D2583051B0, modelHash, x, y, z, heading, isNetwork, netMissionEntity, p7); } // 0xAF35D0D2583051B0 0xDD75460A b323
+namespace VEHICLE
+{
+	// p7 when set to true allows you to spawn vehicles under -100 z.
+	// Full list of vehicles by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicles.json
+	static Vehicle CREATE_VEHICLE(Hash modelHash, float x, float y, float z, float heading, BOOL isNetwork, BOOL bScriptHostVeh, BOOL p7) { return invoke<Vehicle>(0xAF35D0D2583051B0, modelHash, x, y, z, heading, isNetwork, bScriptHostVeh, p7); } // 0xAF35D0D2583051B0 0xDD75460A b323
 	// Deletes a vehicle.
 	// The vehicle must be a mission entity to delete, so call this before deleting: SET_ENTITY_AS_MISSION_ENTITY(vehicle, true, true);
 	// 
@@ -13141,8 +14202,11 @@ namespace VEHICLE {
 	static void _SET_VEHICLE_CAN_BE_LOCKED_ON(Vehicle vehicle, BOOL canBeLockedOn, BOOL unk) { invoke<Void>(0x1DDA078D12879EEE, vehicle, canBeLockedOn, unk); } // 0x1DDA078D12879EEE b463
 	// Makes the vehicle accept no passengers.
 	static void SET_VEHICLE_ALLOW_NO_PASSENGERS_LOCKON(Vehicle veh, BOOL toggle) { invoke<Void>(0x5D14D4154BFE7B2C, veh, toggle); } // 0x5D14D4154BFE7B2C 0x8BAAC437 b323
-	// GET_VEHICLE_*
-	static int _0xE6B0E8CFC3633BF0(Vehicle vehicle) { return invoke<int>(0xE6B0E8CFC3633BF0, vehicle); } // 0xE6B0E8CFC3633BF0 0xFBDE9FD8 b323
+	// Returns a value depending on the lock-on state of vehicle weapons.
+	// 0: not locked on
+	// 1: locking on
+	// 2: locked on
+	static int GET_VEHICLE_HOMING_LOCKON_STATE(Vehicle vehicle) { return invoke<int>(0xE6B0E8CFC3633BF0, vehicle); } // 0xE6B0E8CFC3633BF0 0xFBDE9FD8 b323
 	static Any _0x6EAAEFC76ACC311F(Any p0) { return invoke<Any>(0x6EAAEFC76ACC311F, p0); } // 0x6EAAEFC76ACC311F b757
 	static void _0x407DC5E97DB1A4D3(Any p0, Any p1) { invoke<Void>(0x407DC5E97DB1A4D3, p0, p1); } // 0x407DC5E97DB1A4D3 b1493
 	static BOOL IS_VEHICLE_MODEL(Vehicle vehicle, Hash model) { return invoke<BOOL>(0x423E8DE37D934D89, vehicle, model); } // 0x423E8DE37D934D89 0x013B10B6 b323
@@ -13195,12 +14259,16 @@ namespace VEHICLE {
 	static int GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(Vehicle vehicle) { return invoke<int>(0xA7C4F2C6E744A550, vehicle); } // 0xA7C4F2C6E744A550 0x0A2FC08C b323
 	// Returns max number of passengers (including the driver) for the specified vehicle model.
 	// 
-	// For a full list, see here: pastebin.com/MdETCS1j
+	// Full list of vehicles by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicles.json
 	static int GET_VEHICLE_MODEL_NUMBER_OF_SEATS(Hash modelHash) { return invoke<int>(0x2AD93716F184EDA4, modelHash); } // 0x2AD93716F184EDA4 0x838F7BF7 b323
 	static BOOL IS_SEAT_WARP_ONLY(Vehicle vehicle, int seatIndex) { return invoke<BOOL>(0xF7F203E31F96F6A1, vehicle, seatIndex); } // 0xF7F203E31F96F6A1 0x769E5CF2 b323
 	static BOOL IS_TURRET_SEAT(Vehicle vehicle, int seatIndex) { return invoke<BOOL>(0xE33FFA906CE74880, vehicle, seatIndex); } // 0xE33FFA906CE74880 0x7C43D32A b323
 	// Returns true if the vehicle has the FLAG_ALLOWS_RAPPEL flag set.
 	static BOOL _DOES_VEHICLE_ALLOW_RAPPEL(Vehicle vehicle) { return invoke<BOOL>(0x4E417C547182C84D, vehicle); } // 0x4E417C547182C84D b757
+	// Use this native inside a looped function.
+	// Values:
+	// - `0.0` = no vehicles on streets
+	// - `1.0` = normal vehicles on streets
 	static void SET_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME(float multiplier) { invoke<Void>(0x245A6883D966D537, multiplier); } // 0x245A6883D966D537 0xF4187E51 b323
 	static void SET_RANDOM_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME(float multiplier) { invoke<Void>(0xB3B3359379FE77D3, multiplier); } // 0xB3B3359379FE77D3 0x543F712B b323
 	static void SET_PARKED_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME(float multiplier) { invoke<Void>(0xEAE6DCC7EEE3DB1D, multiplier); } // 0xEAE6DCC7EEE3DB1D 0xDD46CEBE b323
@@ -13224,7 +14292,7 @@ namespace VEHICLE {
 	// They use 10 in am_mp_property_int, don't know what it does atm.
 	static void SET_VEHICLE_DOORS_LOCKED(Vehicle vehicle, int doorLockStatus) { invoke<Void>(0xB664292EAECF7FA6, vehicle, doorLockStatus); } // 0xB664292EAECF7FA6 0x4CDD35D0 b323
 	// destroyType is 1 for opens on damage, 2 for breaks on damage.
-	static void _SET_VEHICLE_DOOR_DESTROY_TYPE(Vehicle vehicle, int doorIndex, int destroyType) { invoke<Void>(0xBE70724027F85BCD, vehicle, doorIndex, destroyType); } // 0xBE70724027F85BCD 0xD61D182D b323
+	static void SET_VEHICLE_INDIVIDUAL_DOORS_LOCKED(Vehicle vehicle, int doorIndex, int destroyType) { invoke<Void>(0xBE70724027F85BCD, vehicle, doorIndex, destroyType); } // 0xBE70724027F85BCD 0xD61D182D b323
 	// if set to true, prevents vehicle sirens from having sound, leaving only the lights.
 	static void SET_VEHICLE_HAS_MUTED_SIRENS(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xD8050E0EB60CF274, vehicle, toggle); } // 0xD8050E0EB60CF274 0xC54156A9 b323
 	static void SET_VEHICLE_DOORS_LOCKED_FOR_PLAYER(Vehicle vehicle, Player player, BOOL toggle) { invoke<Void>(0x517AAF684BB50CD1, vehicle, player, toggle); } // 0x517AAF684BB50CD1 0x49829236 b323
@@ -13270,13 +14338,15 @@ namespace VEHICLE {
 	static BOOL IS_TAXI_LIGHT_ON(Vehicle vehicle) { return invoke<BOOL>(0x7504C0F113AB50FC, vehicle); } // 0x7504C0F113AB50FC 0x6FC4924A b323
 	// garageName example "Michael - Beverly Hills"
 	// 
-	// For a full list, see here: pastebin.com/73VfwsmS
+	// Full list of garages by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/garages.json
 	static BOOL IS_VEHICLE_IN_GARAGE_AREA(const char* garageName, Vehicle vehicle) { return invoke<BOOL>(0xCEE4490CD57BB3C2, garageName, vehicle); } // 0xCEE4490CD57BB3C2 0xA90EC257 b323
 	// colorPrimary & colorSecondary are the paint index for the vehicle.
 	// For a list of valid paint indexes, view: pastebin.com/pwHci0xK
 	// -------------------------------------------------------------------------
 	// Use this to get the number of color indices: pastebin.com/RQEeqTSM
 	// Note: minimum color index is 0, maximum color index is (numColorIndices - 1)
+	// 
+	// Full list of vehicle colors by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicleColors.json
 	static void SET_VEHICLE_COLOURS(Vehicle vehicle, int colorPrimary, int colorSecondary) { invoke<Void>(0x4F1D4BE3A7F24601, vehicle, colorPrimary, colorSecondary); } // 0x4F1D4BE3A7F24601 0x57F24253 b323
 	// It switch to highbeam when p1 is set to true.
 	static void SET_VEHICLE_FULLBEAM(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x8B7FD87F0DDB421E, vehicle, toggle); } // 0x8B7FD87F0DDB421E 0x9C49CC15 b323
@@ -13309,7 +14379,10 @@ namespace VEHICLE {
 	// SET_*
 	static void _0x1B212B26DD3C04DF(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x1B212B26DD3C04DF, vehicle, toggle); } // 0x1B212B26DD3C04DF b757
 	static void FORCE_SUBMARINE_SURFACE_MODE(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x33506883545AC0DF, vehicle, toggle); } // 0x33506883545AC0DF 0x54E9EE75 b323
+	static void _0xC67DB108A9ADE3BE(Any p0, Any p1) { invoke<Void>(0xC67DB108A9ADE3BE, p0, p1); } // 0xC67DB108A9ADE3BE b2189
 	static void SET_SUBMARINE_CRUSH_DEPTHS(Vehicle vehicle, BOOL p1, float depth1, float depth2, float depth3) { invoke<Void>(0xC59872A5134879C7, vehicle, p1, depth1, depth2, depth3); } // 0xC59872A5134879C7 0x4A46E814 b323
+	static BOOL _GET_SUBMARINE_IS_BELOW_FIRST_CRUSH_DEPTH(Vehicle submarine) { return invoke<BOOL>(0x3E71D0B300B7AA79, submarine); } // 0x3E71D0B300B7AA79 b2189
+	static int _GET_SUBMARINE_CRUSH_DEPTH_WARNING_STATE(Vehicle submarine) { return invoke<int>(0x093D6DDCA5B8FBAE, submarine); } // 0x093D6DDCA5B8FBAE b2189
 	static void _0xED5EDE9E676643C9(Any p0, Any p1) { invoke<Void>(0xED5EDE9E676643C9, p0, p1); } // 0xED5EDE9E676643C9 b944
 	static void SET_BOAT_ANCHOR(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x75DBEC174AEEAD10, vehicle, toggle); } // 0x75DBEC174AEEAD10 0xA3906284 b323
 	static BOOL CAN_ANCHOR_BOAT_HERE(Vehicle vehicle) { return invoke<BOOL>(0x26C10ECBDA5D043B, vehicle); } // 0x26C10ECBDA5D043B 0xE97A4F5E b323
@@ -13330,14 +14403,25 @@ namespace VEHICLE {
 	static void SET_VEHICLE_STRONG(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x3E8C8727991A8A0B, vehicle, toggle); } // 0x3E8C8727991A8A0B 0xC758D19F b323
 	static void REMOVE_VEHICLE_STUCK_CHECK(Vehicle vehicle) { invoke<Void>(0x8386BFB614D06749, vehicle); } // 0x8386BFB614D06749 0x81594917 b323
 	static void GET_VEHICLE_COLOURS(Vehicle vehicle, int* colorPrimary, int* colorSecondary) { invoke<Void>(0xA19435F193E081AC, vehicle, colorPrimary, colorSecondary); } // 0xA19435F193E081AC 0x40D82D88 b323
-	// Has an additional BOOL parameter since version [???].
-	// 
 	// Check if a vehicle seat is free.
-	// -1 being the driver seat.
+	// 
+	// seatIndex  = -1 being the driver seat.
 	// Use GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(vehicle) - 1 for last seat index.
-	static BOOL IS_VEHICLE_SEAT_FREE(Vehicle vehicle, int seatIndex, BOOL p2) { return invoke<BOOL>(0x22AC59A870E6A669, vehicle, seatIndex, p2); } // 0x22AC59A870E6A669 0xDAF42B02 b323
-	// -1 (driver) <= index < GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(vehicle)
-	static Ped GET_PED_IN_VEHICLE_SEAT(Vehicle vehicle, int index, Any p2) { return invoke<Ped>(0xBB40DD2270B65366, vehicle, index, p2); } // 0xBB40DD2270B65366 0x388FDE9A b323
+	// isTaskRunning = on true the function returns already false while a task on the target seat is running (TASK_ENTER_VEHICLE/TASK_SHUFFLE_TO_NEXT_VEHICLE_SEAT) - on false only when a ped is finally sitting in the seat.
+	static BOOL IS_VEHICLE_SEAT_FREE(Vehicle vehicle, int seatIndex, BOOL isTaskRunning) { return invoke<BOOL>(0x22AC59A870E6A669, vehicle, seatIndex, isTaskRunning); } // 0x22AC59A870E6A669 0xDAF42B02 b323
+	// If there is no ped in the seat, and the game considers the vehicle as ambient population, this will create a random occupant ped in the seat, which may be cleaned up by the game fairly soon if not marked as script-owned mission entity.
+	// 
+	// Seat indexes:
+	// -1 = Driver
+	// 0 = Front Right Passenger
+	// 1 = Back Left Passenger
+	// 2 = Back Right Passenger
+	// 3 = Further Back Left Passenger (vehicles > 4 seats)
+	// 4 = Further Back Right Passenger (vehicles > 4 seats)
+	// etc.
+	// 
+	// If p2 is true it uses a different GetOccupant function.
+	static Ped GET_PED_IN_VEHICLE_SEAT(Vehicle vehicle, int seatIndex, BOOL p2) { return invoke<Ped>(0xBB40DD2270B65366, vehicle, seatIndex, p2); } // 0xBB40DD2270B65366 0x388FDE9A b323
 	static Ped GET_LAST_PED_IN_VEHICLE_SEAT(Vehicle vehicle, int seatIndex) { return invoke<Ped>(0x83F969AA1EE2A664, vehicle, seatIndex); } // 0x83F969AA1EE2A664 0xF7C6792D b323
 	static BOOL GET_VEHICLE_LIGHTS_STATE(Vehicle vehicle, BOOL* lightsOn, BOOL* highbeamsOn) { return invoke<BOOL>(0xB91B4C20085BD12F, vehicle, lightsOn, highbeamsOn); } // 0xB91B4C20085BD12F 0x7C278621 b323
 	// wheelID used for 4 wheelers seem to be (0, 1, 4, 5)
@@ -13365,14 +14449,20 @@ namespace VEHICLE {
 	// 
 	// . If killEngine is set to 1, you cannot resume driving the vehicle once it stops. This looks like is a bitmapped integer.
 	static void BRING_VEHICLE_TO_HALT(Vehicle vehicle, float distance, int duration, BOOL unknown) { invoke<Void>(0x260BE8F09E326A20, vehicle, distance, duration, unknown); } // 0x260BE8F09E326A20 0xCBC7D3C8 b323
-	static void _0xDCE97BDF8A0EABC8(Any p0, Any p1) { invoke<Void>(0xDCE97BDF8A0EABC8, p0, p1); } // 0xDCE97BDF8A0EABC8 b1103
-	static void _0x9849DE24FCF23CCC(Any p0, Any p1) { invoke<Void>(0x9849DE24FCF23CCC, p0, p1); } // 0x9849DE24FCF23CCC b1604
-	static void _0x7C06330BFDDA182E(Any p0) { invoke<Void>(0x7C06330BFDDA182E, p0); } // 0x7C06330BFDDA182E b1103
-	static Any _0xC69BB1D832A710EF(Any p0) { return invoke<Any>(0xC69BB1D832A710EF, p0); } // 0xC69BB1D832A710EF b1493
+	static void _0xDCE97BDF8A0EABC8(Vehicle vehicle, Any p1) { invoke<Void>(0xDCE97BDF8A0EABC8, vehicle, p1); } // 0xDCE97BDF8A0EABC8 b1103
+	// Sets some bit of vehicle.
+	// _SET_VEHICLE_*
+	static void _0x9849DE24FCF23CCC(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x9849DE24FCF23CCC, vehicle, toggle); } // 0x9849DE24FCF23CCC b1604
+	static void _0x8664170EF165C4A6(Any p0, Any p1) { invoke<Void>(0x8664170EF165C4A6, p0, p1); } // 0x8664170EF165C4A6 b2189
+	// Stops CTaskBringVehicleToHalt
+	static void _STOP_BRING_VEHICLE_TO_HALT(Vehicle vehicle) { invoke<Void>(0x7C06330BFDDA182E, vehicle); } // 0x7C06330BFDDA182E b1103
+	// Returns true if vehicle is halted by BRING_VEHICLE_TO_HALT
+	// _IS_VEHICLE_*
+	static BOOL _IS_VEHICLE_BEING_HALTED(Vehicle vehicle) { return invoke<BOOL>(0xC69BB1D832A710EF, vehicle); } // 0xC69BB1D832A710EF b1493
 	// 0.0 = Lowest 1.0 = Highest. This is best to be used if you wanna pick-up a car since un-realistically on GTA V forklifts can't pick up much of anything due to vehicle mass. If you put this under a car then set it above 0.0 to a 'lifted-value' it will raise the car with no issue lol
 	static void SET_FORKLIFT_FORK_HEIGHT(Vehicle vehicle, float height) { invoke<Void>(0x37EBBF3117BD6A25, vehicle, height); } // 0x37EBBF3117BD6A25 0x943A6CFC b323
 	static BOOL IS_ENTITY_ATTACHED_TO_HANDLER_FRAME(Vehicle vehicle, Entity entity) { return invoke<BOOL>(0x57715966069157AD, vehicle, entity); } // 0x57715966069157AD 0x7FB25568 b323
-	static BOOL _0x62CA17B74C435651(Vehicle vehicle) { return invoke<BOOL>(0x62CA17B74C435651, vehicle); } // 0x62CA17B74C435651 0x593143B9 b323
+	static BOOL IS_ANY_ENTITY_ATTACHED_TO_HANDLER_FRAME(Vehicle vehicle) { return invoke<BOOL>(0x62CA17B74C435651, vehicle); } // 0x62CA17B74C435651 0x593143B9 b323
 	// Finds the vehicle that is carrying this entity with a handler frame.
 	// The model of the entity must be prop_contr_03b_ld or the function will return 0.
 	static Vehicle _FIND_VEHICLE_CARRYING_THIS_ENTITY(Entity entity) { return invoke<Vehicle>(0x375E7FC44F21C8AB, entity); } // 0x375E7FC44F21C8AB 0x70DD5E25 b323
@@ -13382,7 +14472,8 @@ namespace VEHICLE {
 	static void _0x8AA9180DE2FEDD45(Vehicle vehicle, BOOL p1) { invoke<Void>(0x8AA9180DE2FEDD45, vehicle, p1); } // 0x8AA9180DE2FEDD45 0xAE040377 b323
 	static void SET_BOAT_DISABLE_AVOIDANCE(Vehicle vehicle, BOOL p1) { invoke<Void>(0x0A6A279F3AA4FD70, vehicle, p1); } // 0x0A6A279F3AA4FD70 0x4C0E4031 b323
 	static BOOL IS_HELI_LANDING_AREA_BLOCKED(Vehicle vehicle) { return invoke<BOOL>(0x634148744F385576, vehicle); } // 0x634148744F385576 0x6346B7CC b323
-	static void _0x107A473D7A6647A9(Any p0) { invoke<Void>(0x107A473D7A6647A9, p0); } // 0x107A473D7A6647A9 b1290
+	// Used on helicopters and blimps during the CTaskVehicleLand task. Sets a value on the task to 10f
+	static void _0x107A473D7A6647A9(Vehicle vehicle) { invoke<Void>(0x107A473D7A6647A9, vehicle); } // 0x107A473D7A6647A9 b1290
 	static void SET_HELI_TURBULENCE_SCALAR(Vehicle vehicle, float p1) { invoke<Void>(0xE6F13851780394DA, vehicle, p1); } // 0xE6F13851780394DA 0xCCB41A55 b323
 	// Initially used in Max Payne 3, that's why we know the name.
 	static void SET_CAR_BOOT_OPEN(Vehicle vehicle) { invoke<Void>(0xFC40CBF7B90CA77C, vehicle); } // 0xFC40CBF7B90CA77C b877
@@ -13416,13 +14507,18 @@ namespace VEHICLE {
 	// 6 = Back
 	// 7 = Back2
 	static void SET_VEHICLE_DOOR_OPEN(Vehicle vehicle, int doorIndex, BOOL loose, BOOL openInstantly) { invoke<Void>(0x7C65DAC73C35C862, vehicle, doorIndex, loose, openInstantly); } // 0x7C65DAC73C35C862 0xBB75D38B b323
-	static void _0x3B458DDB57038F08(Any p0, Any p1, Any p2) { invoke<Void>(0x3B458DDB57038F08, p0, p1, p2); } // 0x3B458DDB57038F08 b877
+	// Usually used alongside other vehicle door natives.
+	static void _0x3B458DDB57038F08(Vehicle vehicle, int doorIndex, BOOL toggle) { invoke<Void>(0x3B458DDB57038F08, vehicle, doorIndex, toggle); } // 0x3B458DDB57038F08 b877
 	static void _0xA247F9EF01D8082E(Any p0) { invoke<Void>(0xA247F9EF01D8082E, p0); } // 0xA247F9EF01D8082E b1103
 	// windowIndex:
 	// 0 = Front Right Window
 	// 1 = Front Left Window
 	// 2 = Back Right Window
 	// 3 = Back Left Window
+	// 4 = Unknown
+	// 5 = Unknown
+	// 6 = Windscreen
+	// 7 = Rear Windscreen
 	static void REMOVE_VEHICLE_WINDOW(Vehicle vehicle, int windowIndex) { invoke<Void>(0xA711568EEDB43069, vehicle, windowIndex); } // 0xA711568EEDB43069 0xBB8104A3 b323
 	// Roll down all the windows of the vehicle passed through the first parameter.
 	static void ROLL_DOWN_WINDOWS(Vehicle vehicle) { invoke<Void>(0x85796B0549DDE156, vehicle); } // 0x85796B0549DDE156 0x51A16DC6 b323
@@ -13432,16 +14528,53 @@ namespace VEHICLE {
 	// 2 = Back Right Window
 	// 3 = Back Left Window
 	static void ROLL_DOWN_WINDOW(Vehicle vehicle, int windowIndex) { invoke<Void>(0x7AD9E6CE657D69E3, vehicle, windowIndex); } // 0x7AD9E6CE657D69E3 0xF840134C b323
-	// 0 = Front Right Window
-	// 1 = Front Left Window
-	// 2 = Back Right Window
-	// 3 = Back Left Window
+	// Window indexes:
+	// 0 = Front Left Window
+	// 1 = Front Right Window
+	// 2 = Back Left Window
+	// 3 = Back Right Window
 	static void ROLL_UP_WINDOW(Vehicle vehicle, int windowIndex) { invoke<Void>(0x602E548F46E24D59, vehicle, windowIndex); } // 0x602E548F46E24D59 0x83B7E06A b323
+	// `index` = 0 to 13
+	// 0 = front right window
+	// 1 = front left window
+	// 2 = rear right window
+	// 3 = rear left window
+	// 4 = unsure
+	// 5 = unsure
+	// 6 = windowscreen
+	// 7 = rear windowscreen
+	// 8 = unsure
+	// 9 = unsure
+	// 10 = unsure
+	// 11 = unsure
+	// 12 = unsure
+	// 13 = unsure
 	static void SMASH_VEHICLE_WINDOW(Vehicle vehicle, int index) { invoke<Void>(0x9E5B5E4D2CCD2259, vehicle, index); } // 0x9E5B5E4D2CCD2259 0xDDD9A8C2 b323
+	// `index` = 0 to 13
+	// 0 = front right window
+	// 1 = front left window
+	// 2 = rear right window
+	// 3 = rear left window
+	// 4 = unsure
+	// 5 = unsure
+	// 6 = windowscreen
+	// 7 = rear windowscreen
+	// 8 = unsure
+	// 9 = unsure
+	// 10 = unsure
+	// 11 = unsure
+	// 12 = unsure
+	// 13 = unsure
+	// 
+	// Additional information: FIX_VEHICLE_WINDOW (0x140D0BB88) references an array of bone vehicle indices (0x141D4B3E0) { 2Ah, 2Bh, 2Ch, 2Dh, 2Eh, 2Fh, 28h, 29h } that correspond to: window_lf, window_rf, window_lr, window_rr, window_lm, window_rm, windscreen, windscreen_r. This array is used by most vehwindow natives.
+	// 
+	// Also, this function is coded to not work on vehicles of type: CBike, Bmx, CBoat, CTrain, and CSubmarine.
 	static void FIX_VEHICLE_WINDOW(Vehicle vehicle, int index) { invoke<Void>(0x772282EBEB95E682, vehicle, index); } // 0x772282EBEB95E682 0x6B8E990D b323
 	// Detaches the vehicle's windscreen.
 	// For further information, see : gtaforums.com/topic/859570-glass/#entry1068894566
-	static void _DETACH_VEHICLE_WINDSCREEN(Vehicle vehicle) { invoke<Void>(0x6D645D59FB5F5AD3, vehicle); } // 0x6D645D59FB5F5AD3 0xCC95C96B b323
+	// 
+	// Old name: _DETACH_VEHICLE_WINDSCREEN
+	static void POP_OUT_VEHICLE_WINDSCREEN(Vehicle vehicle) { invoke<Void>(0x6D645D59FB5F5AD3, vehicle); } // 0x6D645D59FB5F5AD3 0xCC95C96B b323
 	static void _EJECT_JB700_ROOF(Vehicle vehicle, float x, float y, float z) { invoke<Void>(0xE38CB9D7D39FDBCC, vehicle, x, y, z); } // 0xE38CB9D7D39FDBCC 0xFDA7B6CA b323
 	// set's if the vehicle has lights or not.
 	// not an on off toggle.
@@ -13453,7 +14586,7 @@ namespace VEHICLE {
 	// but at night it's lowbeam,lowbeam,highbeam
 	// note2: when using =0 it's affected by day or night for highbeams don't exist in daytime.
 	static void SET_VEHICLE_LIGHTS(Vehicle vehicle, int state) { invoke<Void>(0x34E710FF01247C5A, vehicle, state); } // 0x34E710FF01247C5A 0xE8930226 b323
-	static void _SET_VEHICLE_USE_PLAYER_LIGHT_SETTINGS(Vehicle vehicle, BOOL p1) { invoke<Void>(0xC45C27EF50F36ADC, vehicle, p1); } // 0xC45C27EF50F36ADC 0x4221E435 b323
+	static void SET_VEHICLE_USE_PLAYER_LIGHT_SETTINGS(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xC45C27EF50F36ADC, vehicle, toggle); } // 0xC45C27EF50F36ADC 0x4221E435 b323
 	// p1 can be either 0, 1 or 2.
 	// 
 	// Determines how vehicle lights behave when toggled.
@@ -13466,7 +14599,9 @@ namespace VEHICLE {
 	static void START_VEHICLE_ALARM(Vehicle vehicle) { invoke<Void>(0xB8FF7AB45305C345, vehicle); } // 0xB8FF7AB45305C345 0x5B451FF7 b323
 	static BOOL IS_VEHICLE_ALARM_ACTIVATED(Vehicle vehicle) { return invoke<BOOL>(0x4319E335B71FFF34, vehicle); } // 0x4319E335B71FFF34 0xF2630A4C b323
 	static void SET_VEHICLE_INTERIORLIGHT(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xBC2042F090AF6AD3, vehicle, toggle); } // 0xBC2042F090AF6AD3 0x9AD1FE1E b323
-	static void _0x8821196D91FA2DE5(Any p0, Any p1) { invoke<Void>(0x8821196D91FA2DE5, p0, p1); } // 0x8821196D91FA2DE5 b1290
+	// Sets some bit of vehicle
+	// _SET_VEHICLE_*
+	static void _0x8821196D91FA2DE5(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x8821196D91FA2DE5, vehicle, toggle); } // 0x8821196D91FA2DE5 b1290
 	// multiplier = brightness of head lights.
 	// this value isn't capped afaik.
 	// 
@@ -13475,7 +14610,8 @@ namespace VEHICLE {
 	// 
 	static void SET_VEHICLE_LIGHT_MULTIPLIER(Vehicle vehicle, float multiplier) { invoke<Void>(0xB385454F8791F57C, vehicle, multiplier); } // 0xB385454F8791F57C 0x48039D6A b323
 	static void ATTACH_VEHICLE_TO_TRAILER(Vehicle vehicle, Vehicle trailer, float radius) { invoke<Void>(0x3C7D42D58F770B54, vehicle, trailer, radius); } // 0x3C7D42D58F770B54 0x2133977F b323
-	static void ATTACH_VEHICLE_ON_TO_TRAILER(Vehicle vehicle, Vehicle trailer, float p2, float p3, float p4, float p5, float p6, float p7, float p8, float p9, float p10, float p11) { invoke<Void>(0x16B5E274BDE402F8, vehicle, trailer, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11); } // 0x16B5E274BDE402F8 0x12AC1A16 b323
+	// This is the proper way of attaching vehicles to the car carrier, it's what Rockstar uses. Video Demo: https://www.youtube.com/watch?v=2lVEIzf7bgo
+	static void ATTACH_VEHICLE_ON_TO_TRAILER(Vehicle vehicle, Vehicle trailer, float offsetX, float offsetY, float offsetZ, float coordsX, float coordsY, float coordsZ, float rotationX, float rotationY, float rotationZ, float disableCollisions) { invoke<Void>(0x16B5E274BDE402F8, vehicle, trailer, offsetX, offsetY, offsetZ, coordsX, coordsY, coordsZ, rotationX, rotationY, rotationZ, disableCollisions); } // 0x16B5E274BDE402F8 0x12AC1A16 b323
 	static void STABILISE_ENTITY_ATTACHED_TO_HELI(Vehicle vehicle, Entity entity, float p2) { invoke<Void>(0x374706271354CB18, vehicle, entity, p2); } // 0x374706271354CB18 0x40C4763F b323
 	static void DETACH_VEHICLE_FROM_TRAILER(Vehicle vehicle) { invoke<Void>(0x90532EDF0D2BDD86, vehicle); } // 0x90532EDF0D2BDD86 0xB5DBF91D b323
 	static BOOL IS_VEHICLE_ATTACHED_TO_TRAILER(Vehicle vehicle) { return invoke<BOOL>(0xE7CF3C4F9F489F0C, vehicle); } // 0xE7CF3C4F9F489F0C 0xE142BBCC b323
@@ -13535,7 +14671,25 @@ namespace VEHICLE {
 	// 
 	// 
 	static Vehicle CREATE_MISSION_TRAIN(int variation, float x, float y, float z, BOOL direction) { return invoke<Vehicle>(0x63C6CCA8E68AE8C8, variation, x, y, z, direction); } // 0x63C6CCA8E68AE8C8 0xD4C2EAFD b323
-	static void SWITCH_TRAIN_TRACK(int intersectionId, BOOL state) { invoke<Void>(0xFD813BB7DB977F20, intersectionId, state); } // 0xFD813BB7DB977F20 0x68BFDD61 b323
+	// Toggles whether ambient trains can spawn on the specified track or not
+	// 
+	// `trackId` is the internal id of the train track to switch.
+	// `state` is whether ambient trains can spawn or not
+	// 
+	// trackIds
+	// 0 (`trains1.dat`) Main track around SA
+	// 1 (`trains2.dat`) Davis Quartz Quarry branch
+	// 2 (`trains3.dat`) Second track alongside live track along Roy Lewenstein Blv.
+	// 3 (`trains4.dat`) Metro track circuit
+	// 4 (`trains5.dat`) Branch in Mirror Park Railyard
+	// 5 (`trains6.dat`) Branch in Mirror Park Railyard
+	// 6 (`trains7.dat`) LS branch to Mirror Park Railyard
+	// 7 (`trains8.dat`) Overground part of metro track along Forum Dr.
+	// 8 (`trains9.dat`) Branch to Mirror Park Railyard
+	// 9 (`trains10.dat`) Yankton train
+	// 10 (`trains11.dat`) Part of metro track near mission row
+	// 11 (`trains12.dat`) Yankton prologue mission train
+	static void SWITCH_TRAIN_TRACK(int trackId, BOOL state) { invoke<Void>(0xFD813BB7DB977F20, trackId, state); } // 0xFD813BB7DB977F20 0x68BFDD61 b323
 	// Only called once inside main_persitant with the parameters p0 = 0, p1 = 120000
 	// 
 	// trackIndex: 0 - 26
@@ -13570,6 +14724,7 @@ namespace VEHICLE {
 	static float GET_TOTAL_DURATION_OF_VEHICLE_RECORDING_ID(int id) { return invoke<float>(0x102D125411A7B6E6, id); } // 0x102D125411A7B6E6 0x7116785E b323
 	// See REQUEST_VEHICLE_RECORDING
 	static float GET_TOTAL_DURATION_OF_VEHICLE_RECORDING(int recording, const char* script) { return invoke<float>(0x0E48D1C262390950, recording, script); } // 0x0E48D1C262390950 0x5B35EEB7 b323
+	// Distance traveled in the vehicles current recording.
 	static float GET_POSITION_IN_RECORDING(Vehicle vehicle) { return invoke<float>(0x2DACD605FC681475, vehicle); } // 0x2DACD605FC681475 0x7DCD644C b323
 	// Can be used with GET_TOTAL_DURATION_OF_VEHICLE_RECORDING{_ID} to compute a percentage.
 	static float GET_TIME_POSITION_IN_RECORDING(Vehicle vehicle) { return invoke<float>(0x5746F3A7AB7FE544, vehicle); } // 0x5746F3A7AB7FE544 0xF8C3E4A2 b323
@@ -13599,6 +14754,7 @@ namespace VEHICLE {
 	static void SKIP_TIME_IN_PLAYBACK_RECORDED_VEHICLE(Vehicle vehicle, float time) { invoke<Void>(0x9438F7AD68771A20, vehicle, time); } // 0x9438F7AD68771A20 0xCF3EFA4B b323
 	// Identical to SET_PLAYBACK_TO_USE_AI_TRY_TO_REVERT_BACK_LATER with 0 as arguments for p1 and p3.
 	static void SET_PLAYBACK_TO_USE_AI(Vehicle vehicle, int drivingStyle) { invoke<Void>(0xA549C3B37EA28131, vehicle, drivingStyle); } // 0xA549C3B37EA28131 0xB536CCD7 b323
+	// Time is number of milliseconds before reverting, zero for indefinitely.
 	static void SET_PLAYBACK_TO_USE_AI_TRY_TO_REVERT_BACK_LATER(Vehicle vehicle, int time, int drivingStyle, BOOL p3) { invoke<Void>(0x6E63860BBB190730, vehicle, time, drivingStyle, p3); } // 0x6E63860BBB190730 0x0C8ABAA4 b323
 	static void _0x5845066D8A1EA7F7(Vehicle vehicle, float x, float y, float z, Any p4) { invoke<Void>(0x5845066D8A1EA7F7, vehicle, x, y, z, p4); } // 0x5845066D8A1EA7F7 0x943A58EB b323
 	static void _0x796A877E459B99EA(Any p0, float p1, float p2, float p3) { invoke<Void>(0x796A877E459B99EA, p0, p1, p2, p3); } // 0x796A877E459B99EA 0x5C9F477C b323
@@ -13623,6 +14779,8 @@ namespace VEHICLE {
 	// radius: The radius of the sphere. Max is 9999.9004.
 	// modelHash: The vehicle model to limit the selection to. Pass 0 for any model.
 	// flags: The bitwise flags that modifies the behaviour of this function.
+	// 
+	// Full list of vehicles by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicles.json
 	static Vehicle GET_RANDOM_VEHICLE_IN_SPHERE(float x, float y, float z, float radius, Hash modelHash, int flags) { return invoke<Vehicle>(0x386F6CE5BAF6091C, x, y, z, radius, modelHash, flags); } // 0x386F6CE5BAF6091C 0x57216D03 b323
 	static Vehicle GET_RANDOM_VEHICLE_FRONT_BUMPER_IN_SPHERE(float p0, float p1, float p2, float p3, int p4, int p5, int p6) { return invoke<Vehicle>(0xC5574E0AEB86BA68, p0, p1, p2, p3, p4, p5, p6); } // 0xC5574E0AEB86BA68 0xDCADEB66 b323
 	static Vehicle GET_RANDOM_VEHICLE_BACK_BUMPER_IN_SPHERE(float p0, float p1, float p2, float p3, int p4, int p5, int p6) { return invoke<Vehicle>(0xB50807EABE20A8DC, p0, p1, p2, p3, p4, p5, p6); } // 0xB50807EABE20A8DC 0xD6343F6B b323
@@ -13652,6 +14810,8 @@ namespace VEHICLE {
 	// -------------------------------------------------------------------------
 	// 
 	// Conclusion: This native is not worth trying to use. Use something like this instead: pastebin.com/xiFdXa7h
+	// 
+	// Full list of vehicles by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicles.json
 	static Vehicle GET_CLOSEST_VEHICLE(float x, float y, float z, float radius, Hash modelHash, int flags) { return invoke<Vehicle>(0xF73EB622C4F1689B, x, y, z, radius, modelHash, flags); } // 0xF73EB622C4F1689B 0xD7E26B2C b323
 	// Corrected p1. it's basically the 'carriage/trailer number'. So if the train has 3 trailers you'd call the native once with a var or 3 times with 1, 2, 3.
 	static Entity GET_TRAIN_CARRIAGE(Vehicle train, int trailerNumber) { return invoke<Entity>(0x08AAFD0814722BC3, train, trailerNumber); } // 0x08AAFD0814722BC3 0x2544E7A6 b323
@@ -13693,7 +14853,7 @@ namespace VEHICLE {
 	// -->VEHICLE::_DBC631F109350B8C(a_0, 1);
 	static void _0xDBC631F109350B8C(Vehicle vehicle, BOOL p1) { invoke<Void>(0xDBC631F109350B8C, vehicle, p1); } // 0xDBC631F109350B8C 0x486C1280 b323
 	static void SET_VEHICLE_CAN_BE_VISIBLY_DAMAGED(Vehicle vehicle, BOOL state) { invoke<Void>(0x4C7028F78FFD3681, vehicle, state); } // 0x4C7028F78FFD3681 0xC5D94017 b323
-	static void _SET_VEHICLE_LIGHTS_CAN_BE_VISIBLY_DAMAGED(Vehicle vehicle, BOOL p1) { invoke<Void>(0x1AA8A837D2169D94, vehicle, p1); } // 0x1AA8A837D2169D94 0x009AB49E b323
+	static void SET_VEHICLE_HAS_UNBREAKABLE_LIGHTS(Vehicle vehicle, BOOL p1) { invoke<Void>(0x1AA8A837D2169D94, vehicle, p1); } // 0x1AA8A837D2169D94 0x009AB49E b323
 	static void _0x2311DD7159F00582(Vehicle vehicle, BOOL p1) { invoke<Void>(0x2311DD7159F00582, vehicle, p1); } // 0x2311DD7159F00582 0x758C5E2E b323
 	static void _0x065D03A9D6B2C6B5(Any p0, Any p1) { invoke<Void>(0x065D03A9D6B2C6B5, p0, p1); } // 0x065D03A9D6B2C6B5 b463
 	// Dirt level 0..15
@@ -13721,12 +14881,10 @@ namespace VEHICLE {
 	// vehicle: The vehicle to start or stop the engine on.
 	// value: true to turn the vehicle on; false to turn it off.
 	// instantly: if true, the vehicle will be set to the state immediately; otherwise, the current driver will physically turn on or off the engine.
+	// disableAutoStart: If true, the system will prevent the engine from starting when the player got into it.
 	// 
-	// --------------------------------------
 	// from what I've tested when I do this to a helicopter the propellers turn off after the engine has started. so is there any way to keep the heli propellers on?
-	// --------------------------------------
-	// And what's with BOOL otherwise, what does it do???
-	static void SET_VEHICLE_ENGINE_ON(Vehicle vehicle, BOOL value, BOOL instantly, BOOL noAutoTurnOn) { invoke<Void>(0x2497C4717C8B881E, vehicle, value, instantly, noAutoTurnOn); } // 0x2497C4717C8B881E 0x7FBC86F1 b323
+	static void SET_VEHICLE_ENGINE_ON(Vehicle vehicle, BOOL value, BOOL instantly, BOOL disableAutoStart) { invoke<Void>(0x2497C4717C8B881E, vehicle, value, instantly, disableAutoStart); } // 0x2497C4717C8B881E 0x7FBC86F1 b323
 	static void SET_VEHICLE_UNDRIVEABLE(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x8ABA6AF54B942B95, vehicle, toggle); } // 0x8ABA6AF54B942B95 0x48D02A4E b323
 	static void SET_VEHICLE_PROVIDES_COVER(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x5AFEEDD9BB2899D7, vehicle, toggle); } // 0x5AFEEDD9BB2899D7 0xEFC01CA9 b323
 	// doorIndex:
@@ -13791,9 +14949,19 @@ namespace VEHICLE {
 	static BOOL IS_BIG_VEHICLE(Vehicle vehicle) { return invoke<BOOL>(0x9F243D3919F442FE, vehicle); } // 0x9F243D3919F442FE 0x9CDBA8DE b323
 	// Actually number of color combinations
 	static int GET_NUMBER_OF_VEHICLE_COLOURS(Vehicle vehicle) { return invoke<int>(0x3B963160CD65D41E, vehicle); } // 0x3B963160CD65D41E 0xF2442EE2 b323
+	// Sets the selected vehicle's colors to their default value (specific variant specified using the colorCombination parameter).
+	// Range of possible values for colorCombination is currently unknown, I couldn't find where these values are stored either (Disquse's guess was vehicles.meta but I haven't seen it in there.)
 	static void SET_VEHICLE_COLOUR_COMBINATION(Vehicle vehicle, int colorCombination) { invoke<Void>(0x33E8CD3322E2FE31, vehicle, colorCombination); } // 0x33E8CD3322E2FE31 0xA557AEAD b323
 	static int GET_VEHICLE_COLOUR_COMBINATION(Vehicle vehicle) { return invoke<int>(0x6A842D197F845D56, vehicle); } // 0x6A842D197F845D56 0x77AC1B4C b323
+	// `color`: is the paint index for the vehicle.
+	// Paint index goes from 0 to 12.
+	// Be aware that it only works on xenon lights. Example: https://i.imgur.com/yV3cpG9.png
 	static void _SET_VEHICLE_XENON_LIGHTS_COLOR(Vehicle vehicle, int colorIndex) { invoke<Void>(0xE41033B25D003A07, vehicle, colorIndex); } // 0xE41033B25D003A07 b1604
+	// Returns the headlight color index from the vehicle. Value between 0, 12.
+	// Use _SET_VEHICLE_HEADLIGHTS_COLOUR to set the headlights color for the vehicle.
+	// Must enable xenon headlights before it'll take affect.
+	// 
+	// Returns an int, value between 0-12 or 255 if no color is set.
 	static int _GET_VEHICLE_XENON_LIGHTS_COLOR(Vehicle vehicle) { return invoke<int>(0x3DFF319A831E0CDB, vehicle); } // 0x3DFF319A831E0CDB b1604
 	// Setting this to false, makes the specified vehicle to where if you press Y your character doesn't even attempt the animation to enter the vehicle. Hence it's not considered aka ignored.
 	static void SET_VEHICLE_IS_CONSIDERED_BY_PLAYER(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x31B927BBC44156CD, vehicle, toggle); } // 0x31B927BBC44156CD 0x14413319 b323
@@ -13806,9 +14974,19 @@ namespace VEHICLE {
 	// p0 always true (except in one case)
 	// successIndicator: 0 if success, -1 if failed
 	static void GET_RANDOM_VEHICLE_MODEL_IN_MEMORY(BOOL p0, Hash* modelHash, int* successIndicator) { invoke<Void>(0x055BF0AC0C34F4FD, p0, modelHash, successIndicator); } // 0x055BF0AC0C34F4FD 0xE2C45631 b323
-	// 2 seems to disable getting vehicle in modshop
+	// enum VehicleLockStatus = {
+	//     None = 0,
+	//     Unlocked = 1,
+	//     Locked = 2,
+	//     LockedForPlayer = 3,
+	//     StickPlayerInside = 4, -- Doesn't allow players to exit the vehicle with the exit vehicle key.
+	//     CanBeBrokenInto = 7, -- Can be broken into the car. If the glass is broken, the value will be set to 1
+	//     CanBeBrokenIntoPersist = 8, -- Can be broken into persist
+	//     CannotBeTriedToEnter = 10, -- Cannot be tried to enter (Nothing happens when you press the vehicle enter key).
+	// }
 	static int GET_VEHICLE_DOOR_LOCK_STATUS(Vehicle vehicle) { return invoke<int>(0x25BC98A59C2EA962, vehicle); } // 0x25BC98A59C2EA962 0x0D72CEF2 b323
-	static Any _0xCA4AC3EAAE46EC7B(Any p0, Any p1) { return invoke<Any>(0xCA4AC3EAAE46EC7B, p0, p1); } // 0xCA4AC3EAAE46EC7B b1103
+	// Returns vehicle door destroy type previously set with _SET_VEHICLE_DOOR_DESTROY_TYPE
+	static int _GET_VEHICLE_DOOR_DESTROY_TYPE(Vehicle vehicle, int doorIndex) { return invoke<int>(0xCA4AC3EAAE46EC7B, vehicle, doorIndex); } // 0xCA4AC3EAAE46EC7B b1103
 	// doorID starts at 0, not seeming to skip any numbers. Four door vehicles intuitively range from 0 to 3.
 	static BOOL IS_VEHICLE_DOOR_DAMAGED(Vehicle veh, int doorID) { return invoke<BOOL>(0xB8E181E559464527, veh, doorID); } // 0xB8E181E559464527 0x4999E3C3 b323
 	// Keeps Vehicle Doors/Hood/Trunk from breaking off
@@ -13827,7 +15005,8 @@ namespace VEHICLE {
 	//     End Function
 	// 
 	static BOOL IS_VEHICLE_ON_ALL_WHEELS(Vehicle vehicle) { return invoke<BOOL>(0xB104CD1BABF302E2, vehicle); } // 0xB104CD1BABF302E2 0x10089F8E b323
-	static Any _0x5873C14A52D74236(Any p0) { return invoke<Any>(0x5873C14A52D74236, p0); } // 0x5873C14A52D74236 b463
+	// Returns `nMonetaryValue` from handling.meta for specific model.
+	static int _GET_VEHICLE_MODEL_MONETARY_VALUE(Hash vehicleModel) { return invoke<int>(0x5873C14A52D74236, vehicleModel); } // 0x5873C14A52D74236 b463
 	static Hash GET_VEHICLE_LAYOUT_HASH(Vehicle vehicle) { return invoke<Hash>(0x28D37D4F71AC5C58, vehicle); } // 0x28D37D4F71AC5C58 0xE0B35187 b323
 	static Any _0xA01BC64DD4BFBBAC(Vehicle vehicle, int p1) { return invoke<Any>(0xA01BC64DD4BFBBAC, vehicle, p1); } // 0xA01BC64DD4BFBBAC b323
 	// makes the train all jumbled up and derailed as it moves on the tracks (though that wont stop it from its normal operations)
@@ -13892,7 +15071,8 @@ namespace VEHICLE {
 	static void SET_VEHICLE_EXTRA(Vehicle vehicle, int extraId, BOOL disable) { invoke<Void>(0x7EE3A3C5E4A40CC9, vehicle, extraId, disable); } // 0x7EE3A3C5E4A40CC9 0x642D065C b323
 	// Checks via CVehicleModelInfo
 	static BOOL DOES_EXTRA_EXIST(Vehicle vehicle, int extraId) { return invoke<BOOL>(0x1262D55792428154, vehicle, extraId); } // 0x1262D55792428154 0x409411CC b323
-	static Any _0x534E36D4DB9ECC5D(Any p0, Any p1) { return invoke<Any>(0x534E36D4DB9ECC5D, p0, p1); } // 0x534E36D4DB9ECC5D b1493
+	// Checks if vehicle tyre at index exists. Also returns false if tyre was removed.
+	static BOOL _DOES_VEHICLE_TYRE_EXIST(Vehicle vehicle, int tyreIndex) { return invoke<BOOL>(0x534E36D4DB9ECC5D, vehicle, tyreIndex); } // 0x534E36D4DB9ECC5D b1493
 	static void SET_CONVERTIBLE_ROOF(Vehicle vehicle, BOOL p1) { invoke<Void>(0xF39C4F538B5124C2, vehicle, p1); } // 0xF39C4F538B5124C2 0xC87B6A51 b323
 	static void LOWER_CONVERTIBLE_ROOF(Vehicle vehicle, BOOL instantlyLower) { invoke<Void>(0xDED51F703D0FA83D, vehicle, instantlyLower); } // 0xDED51F703D0FA83D 0xC5F72EAE b323
 	static void RAISE_CONVERTIBLE_ROOF(Vehicle vehicle, BOOL instantlyRaise) { invoke<Void>(0x8F5FB35D7E88FC70, vehicle, instantlyRaise); } // 0x8F5FB35D7E88FC70 0xA4E4CBA3 b323
@@ -13905,15 +15085,18 @@ namespace VEHICLE {
 	// 
 	// However, in launcher_carwash/carwash1/carwash2 scripts, p1 is true and is accompanied by DOES_VEHICLE_HAVE_ROOF 
 	static BOOL IS_VEHICLE_A_CONVERTIBLE(Vehicle vehicle, BOOL p1) { return invoke<BOOL>(0x52F357A30698BCCE, vehicle, p1); } // 0x52F357A30698BCCE 0x6EF54490 b323
+	// Transforms the `stormberg` to its "water vehicle" variant. If the vehicle is already in that state then the vehicle transformation audio will still play, but the vehicle won't change at all.
 	static void _TRANSFORM_VEHICLE_TO_SUBMARINE(Vehicle vehicle, BOOL noAnimation) { invoke<Void>(0xBE4C854FFDB6EEBE, vehicle, noAnimation); } // 0xBE4C854FFDB6EEBE b1365
+	// Transforms the `stormberg` to its "road vehicle" variant. If the vehicle is already in that state then the vehicle transformation audio will still play, but the vehicle won't change at all.
 	static void _TRANSFORM_SUBMARINE_TO_VEHICLE(Vehicle vehicle, BOOL noAnimation) { invoke<Void>(0x2A69FFD1B42BFF9E, vehicle, noAnimation); } // 0x2A69FFD1B42BFF9E b1290
 	static BOOL _GET_IS_SUBMARINE_VEHICLE_TRANSFORMED(Vehicle vehicle) { return invoke<BOOL>(0xA77DC70BD689A1E5, vehicle); } // 0xA77DC70BD689A1E5 b1290
-	// is this for red lights only?  more testing required.
+	// Is this for red lights only?  more testing required.
 	static BOOL IS_VEHICLE_STOPPED_AT_TRAFFIC_LIGHTS(Vehicle vehicle) { return invoke<BOOL>(0x2959F696AE390A99, vehicle); } // 0x2959F696AE390A99 0x69200FA4 b323
 	// Apply damage to vehicle at a location. Location is relative to vehicle model (not world).
 	// 
 	// Radius of effect damage applied in a sphere at impact location
-	static void SET_VEHICLE_DAMAGE(Vehicle vehicle, float xOffset, float yOffset, float zOffset, float damage, float radius, BOOL p6) { invoke<Void>(0xA1DD317EA8FD4F29, vehicle, xOffset, yOffset, zOffset, damage, radius, p6); } // 0xA1DD317EA8FD4F29 0x21B458B2 b323
+	// When `focusOnModel` set to `true`, the damage sphere will travel towards the vehicle from the given point, thus guaranteeing an impact
+	static void SET_VEHICLE_DAMAGE(Vehicle vehicle, float xOffset, float yOffset, float zOffset, float damage, float radius, BOOL focusOnModel) { invoke<Void>(0xA1DD317EA8FD4F29, vehicle, xOffset, yOffset, zOffset, damage, radius, focusOnModel); } // 0xA1DD317EA8FD4F29 0x21B458B2 b323
 	static void _0x35BB21DE06784373(Any p0, Any p1) { invoke<Void>(0x35BB21DE06784373, p0, p1); } // 0x35BB21DE06784373 b463
 	// Returns 1000.0 if the function is unable to get the address of the specified vehicle or if it's not a vehicle.
 	// 
@@ -13938,7 +15121,8 @@ namespace VEHICLE {
 	// 300: Engine is smoking and losing functionality
 	// 1000: Engine is perfect
 	static void SET_VEHICLE_ENGINE_HEALTH(Vehicle vehicle, float health) { invoke<Void>(0x45F6D8EEF34ABEF1, vehicle, health); } // 0x45F6D8EEF34ABEF1 0x1B760FB5 b323
-	static void _0x2A86A0475B6A1434(Any p0, Any p1) { invoke<Void>(0x2A86A0475B6A1434, p0, p1); } // 0x2A86A0475B6A1434 b1103
+	// Works just like SET_VEHICLE_ENGINE_HEALTH, didn't saw any difference. But this native works only for planes.
+	static void _SET_PLANE_ENGINE_HEALTH(Vehicle vehicle, float health) { invoke<Void>(0x2A86A0475B6A1434, vehicle, health); } // 0x2A86A0475B6A1434 b1103
 	// 1000 is max health
 	// Begins leaking gas at around 650 health
 	// -999.90002441406 appears to be minimum health, although nothing special occurs
@@ -14004,10 +15188,13 @@ namespace VEHICLE {
 	// 
 	// Using HUD::_GET_LABEL_TEXT, you can get the localized name.
 	// 
-	// For a full list, see here: pastebin.com/wvpyS4kS (pastebin.com/dA3TbkZw)
-	// 
-	// 
+	// Full list of vehicles by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicles.json
 	static const char* GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(Hash modelHash) { return invoke<const char*>(0xB215AAC32D25D019, modelHash); } // 0xB215AAC32D25D019 0xEC86DF39 b323
+	// Will return a vehicle's manufacturer display label.
+	// Returns "CARNOTFOUND" if the hash doesn't match a vehicle hash.
+	// 
+	// Full list of vehicles by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicles.json
+	static const char* _GET_MAKE_NAME_FROM_VEHICLE_MODEL(Hash modelHash) { return invoke<const char*>(0xF7AF4F159FF99F97, modelHash); } // 0xF7AF4F159FF99F97 b1868
 	// The only example I can find of this function in the scripts, is this:
 	// 
 	// struct _s = VEHICLE::GET_VEHICLE_DEFORMATION_AT_POS(rPtr((A_0) + 4), 1.21f, 6.15f, 0.3f);
@@ -14017,15 +15204,30 @@ namespace VEHICLE {
 	// 
 	// v_5/*{3}*/ = VEHICLE::GET_VEHICLE_DEFORMATION_AT_POS(a_0._f1, 1.21, 6.15, 0.3);
 	static Vector3 GET_VEHICLE_DEFORMATION_AT_POS(Vehicle vehicle, float offsetX, float offsetY, float offsetZ) { return invoke<Vector3>(0x4EC6CFBC7B2E9536, vehicle, offsetX, offsetY, offsetZ); } // 0x4EC6CFBC7B2E9536 0xABF02075 b323
-	// Note: Only seems to work on Emergency Vehicles
-	static void SET_VEHICLE_LIVERY(Vehicle vehicle, Hash livery) { invoke<Void>(0x60BF608F1B8CD1B6, vehicle, livery); } // 0x60BF608F1B8CD1B6 0x7AD87059 b323
+	static void SET_VEHICLE_LIVERY(Vehicle vehicle, int livery) { invoke<Void>(0x60BF608F1B8CD1B6, vehicle, livery); } // 0x60BF608F1B8CD1B6 0x7AD87059 b323
 	// -1 = no livery
-	static Vehicle GET_VEHICLE_LIVERY(Vehicle trailers2) { return invoke<Vehicle>(0x2BB9230590DA5E8A, trailers2); } // 0x2BB9230590DA5E8A 0xEC82A51D b323
+	static int GET_VEHICLE_LIVERY(Vehicle vehicle) { return invoke<int>(0x2BB9230590DA5E8A, vehicle); } // 0x2BB9230590DA5E8A 0xEC82A51D b323
 	// Returns -1 if the vehicle has no livery
 	static int GET_VEHICLE_LIVERY_COUNT(Vehicle vehicle) { return invoke<int>(0x87B63E25A529D526, vehicle); } // 0x87B63E25A529D526 0xFB0CA947 b323
+	// Used to set the tornado custom (convertible) rooftop livery.
+	// 
+	// Livery value that works for tornado custom is between 0 and 9 from what i can tell. Maybe 0-8 even.
+	// 
+	// Might work on other custom vehicles but im not sure what those might be, only confirmed it working with the tornado custom.
 	static void _SET_VEHICLE_ROOF_LIVERY(Vehicle vehicle, int livery) { invoke<Void>(0xA6D3A8750DC73270, vehicle, livery); } // 0xA6D3A8750DC73270 b505
+	// Returns index of the current vehicle's rooftop livery. A getter for _SET_VEHICLE_ROOF_LIVERY.
 	static int _GET_VEHICLE_ROOF_LIVERY(Vehicle vehicle) { return invoke<int>(0x60190048C0764A26, vehicle); } // 0x60190048C0764A26 b505
+	// Returns a number of available rooftop liveries, or -1 if vehicle has no rooftop liveries available.
 	static int _GET_VEHICLE_ROOF_LIVERY_COUNT(Vehicle vehicle) { return invoke<int>(0x5ECB40269053C0D4, vehicle); } // 0x5ECB40269053C0D4 b505
+	// This will return false if the window is broken, or rolled down.
+	// Window indexes:
+	// 0 = Front Right Window
+	// 1 = Front Left Window
+	// 2 = Back Right Window
+	// 3 = Back Left Window
+	// 
+	// 
+	// Those numbers go on for vehicles that have more than 4 doors with windows.
 	static BOOL IS_VEHICLE_WINDOW_INTACT(Vehicle vehicle, int windowIndex) { return invoke<BOOL>(0x46E571A0E20D01F1, vehicle, windowIndex); } // 0x46E571A0E20D01F1 0xAC4EF23D b323
 	// Appears to return false if any window is broken.
 	static BOOL ARE_ALL_VEHICLE_WINDOWS_INTACT(Vehicle vehicle) { return invoke<BOOL>(0x11D862A3E977A9EF, vehicle); } // 0x11D862A3E977A9EF 0xBB619744 b323
@@ -14042,8 +15244,8 @@ namespace VEHICLE {
 	// Max 1000.
 	// At -100 both helicopter rotors will stall.
 	static float GET_HELI_TAIL_BOOM_HEALTH(Vehicle vehicle) { return invoke<float>(0xAC51915D27E4A5F7, vehicle); } // 0xAC51915D27E4A5F7 0x8A68388F b323
-	static void _0x4056EA1105F5ABD7(Any p0, Any p1) { invoke<Void>(0x4056EA1105F5ABD7, p0, p1); } // 0x4056EA1105F5ABD7 b463
-	static void _SET_HELI_TAIL_ROTOR_HEALTH(Any p0, Any p1) { invoke<Void>(0xFE205F38AAA58E5B, p0, p1); } // 0xFE205F38AAA58E5B b463
+	static void _SET_HELI_MAIN_ROTOR_HEALTH(Vehicle vehicle, float health) { invoke<Void>(0x4056EA1105F5ABD7, vehicle, health); } // 0x4056EA1105F5ABD7 b463
+	static void _SET_HELI_TAIL_ROTOR_HEALTH(Vehicle vehicle, float health) { invoke<Void>(0xFE205F38AAA58E5B, vehicle, health); } // 0xFE205F38AAA58E5B b463
 	static void SET_HELI_TAIL_EXPLODE_THROW_DASHBOARD(Vehicle vehicle, BOOL p1) { invoke<Void>(0x3EC8BF18AA453FE9, vehicle, p1); } // 0x3EC8BF18AA453FE9 0x2916D69B b323
 	// NOTE: Debugging functions are not present in the retail version of the game.
 	static void SET_VEHICLE_NAME_DEBUG(Vehicle vehicle, const char* name) { invoke<Void>(0xBFDF984E2C22B94F, vehicle, name); } // 0xBFDF984E2C22B94F 0xA712FF5C b323
@@ -14064,12 +15266,15 @@ namespace VEHICLE {
 	// 
 	// what can I use to make the hydra thing forward?
 	static void CONTROL_LANDING_GEAR(Vehicle vehicle, int state) { invoke<Void>(0xCFC8BE9A5E1FE575, vehicle, state); } // 0xCFC8BE9A5E1FE575 0x24F873FB b323
-	// landing gear states:
+	// Landing gear states:
 	// 
 	// 0: Deployed
-	// 1: Closing
-	// 2: Opening
-	// 3: Retracted
+	// 1: Closing (Retracting)
+	// 2:(Landing gear state 2 is never used.)
+	// 3: Opening (Deploying)
+	// 4: Retracted
+	// 
+	// Returns the current state of the vehicles landing gear.
 	static int GET_LANDING_GEAR_STATE(Vehicle vehicle) { return invoke<int>(0x9B0F3DCA3DB0F4CD, vehicle); } // 0x9B0F3DCA3DB0F4CD 0xA6F02670 b323
 	static BOOL IS_ANY_VEHICLE_NEAR_POINT(float x, float y, float z, float radius) { return invoke<BOOL>(0x61E1DD6125A3EEE6, x, y, z, radius); } // 0x61E1DD6125A3EEE6 0x2867A834 b323
 	static void REQUEST_VEHICLE_HIGH_DETAIL_MODEL(Vehicle vehicle) { invoke<Void>(0xA6E9FDCB2C76785E, vehicle); } // 0xA6E9FDCB2C76785E 0x9DA21956 b323
@@ -14094,18 +15299,19 @@ namespace VEHICLE {
 	// Scripts verify that towTruck is the first parameter, not the second.
 	static BOOL IS_VEHICLE_ATTACHED_TO_TOW_TRUCK(Vehicle towTruck, Vehicle vehicle) { return invoke<BOOL>(0x146DF9EC4C4B9FD4, towTruck, vehicle); } // 0x146DF9EC4C4B9FD4 0x9699CFDC b323
 	static Entity GET_ENTITY_ATTACHED_TO_TOW_TRUCK(Vehicle towTruck) { return invoke<Entity>(0xEFEA18DCF10F8F75, towTruck); } // 0xEFEA18DCF10F8F75 0x11EC7844 b323
-	// Please change to void.
 	static Any SET_VEHICLE_AUTOMATICALLY_ATTACHES(Vehicle vehicle, BOOL p1, Any p2) { return invoke<Any>(0x8BA6F76BC53A1493, vehicle, p1, p2); } // 0x8BA6F76BC53A1493 0x4273A8D3 b323
+	// Sets the arm position of a bulldozer. Position must be a value between 0.0 and 1.0. Ignored when `p2` is set to false, instead incrementing arm position by 0.1 (or 10%).
 	static void SET_VEHICLE_BULLDOZER_ARM_POSITION(Vehicle vehicle, float position, BOOL p2) { invoke<Void>(0xF8EBCCC96ADB9FB7, vehicle, position, p2); } // 0xF8EBCCC96ADB9FB7 0xED23C8A3 b323
 	static void SET_VEHICLE_TANK_TURRET_POSITION(Vehicle vehicle, float position, BOOL p2) { invoke<Void>(0x56B94C6D7127DFBA, vehicle, position, p2); } // 0x56B94C6D7127DFBA 0xB1A52EF7 b323
 	static void _0x0581730AB9380412(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { invoke<Void>(0x0581730AB9380412, p0, p1, p2, p3, p4, p5); } // 0x0581730AB9380412 b1103
 	static void _0x737E398138550FFF(Any p0, Any p1) { invoke<Void>(0x737E398138550FFF, p0, p1); } // 0x737E398138550FFF b944
-	static void _0x1093408B4B9D1146(Any p0, float p1) { invoke<Void>(0x1093408B4B9D1146, p0, p1); } // 0x1093408B4B9D1146 0xF30C566F b323
-	static void _DISABLE_VEHICLE_TURRET_MOVEMENT_THIS_FRAME(Any p0) { invoke<Void>(0x32CAEDF24A583345, p0); } // 0x32CAEDF24A583345 b463
+	static void SET_VEHICLE_TURRET_SPEED_THIS_FRAME(Vehicle vehicle, float speed) { invoke<Void>(0x1093408B4B9D1146, vehicle, speed); } // 0x1093408B4B9D1146 0xF30C566F b323
+	static void _DISABLE_VEHICLE_TURRET_MOVEMENT_THIS_FRAME(Vehicle vehicle) { invoke<Void>(0x32CAEDF24A583345, vehicle); } // 0x32CAEDF24A583345 b463
 	static void SET_VEHICLE_FLIGHT_NOZZLE_POSITION(Vehicle vehicle, float angleRatio) { invoke<Void>(0x30D779DE7C4F6DD3, vehicle, angleRatio); } // 0x30D779DE7C4F6DD3 0xA7DF64D7 b323
 	static void SET_VEHICLE_FLIGHT_NOZZLE_POSITION_IMMEDIATE(Vehicle vehicle, float angle) { invoke<Void>(0x9AA47FFF660CB932, vehicle, angle); } // 0x9AA47FFF660CB932 0xDD7936F5 b323
 	static float _GET_VEHICLE_FLIGHT_NOZZLE_POSITION(Vehicle plane) { return invoke<float>(0xDA62027C8BDB326E, plane); } // 0xDA62027C8BDB326E b1180
-	static void _SET_DISABLE_VEHICLE_FLIGHT_NOZZLE_POSITION(Any p0, Any p1) { invoke<Void>(0xCE2B43770B655F8F, p0, p1); } // 0xCE2B43770B655F8F b1290
+	// True stops vtols from switching modes. Doesn't stop the sound though.
+	static void _SET_DISABLE_VEHICLE_FLIGHT_NOZZLE_POSITION(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xCE2B43770B655F8F, vehicle, toggle); } // 0xCE2B43770B655F8F b1290
 	static BOOL _0xA4822F1CF23F4810(Vector3* outVec, Any p1, Vector3* outVec1, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8) { return invoke<BOOL>(0xA4822F1CF23F4810, outVec, p1, outVec1, p3, p4, p5, p6, p7, p8); } // 0xA4822F1CF23F4810 0x34E02FCD b323
 	// On accelerating, spins the driven wheels with the others braked, so you don't go anywhere.
 	static void SET_VEHICLE_BURNOUT(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xFB8794444A7D60FB, vehicle, toggle); } // 0xFB8794444A7D60FB 0x9B6EF0EA b323
@@ -14119,23 +15325,25 @@ namespace VEHICLE {
 	static BOOL IS_VEHICLE_IN_BURNOUT(Vehicle vehicle) { return invoke<BOOL>(0x1297A88E081430EB, vehicle); } // 0x1297A88E081430EB 0x6632BC12 b323
 	// Reduces grip significantly so it's hard to go anywhere.
 	static void SET_VEHICLE_REDUCE_GRIP(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x222FF6A823D122E2, vehicle, toggle); } // 0x222FF6A823D122E2 0x90D3A0D9 b323
-	static void _0x6DEE944E1EE90CFB(Any p0, Any p1) { invoke<Void>(0x6DEE944E1EE90CFB, p0, p1); } // 0x6DEE944E1EE90CFB b1604
+	// val is 0-3
+	// Often used in conjunction with: SET_VEHICLE_REDUCE_GRIP
+	static void _SET_VEHICLE_REDUCE_TRACTION(Vehicle vehicle, int val) { invoke<Void>(0x6DEE944E1EE90CFB, vehicle, val); } // 0x6DEE944E1EE90CFB b1604
 	// Sets the turn signal enabled for a vehicle.
 	// Set turnSignal to 1 for left light, 0 for right light.
 	static void SET_VEHICLE_INDICATOR_LIGHTS(Vehicle vehicle, int turnSignal, BOOL toggle) { invoke<Void>(0xB5D45264751B7DF0, vehicle, turnSignal, toggle); } // 0xB5D45264751B7DF0 0xA6073B5D b323
 	static void SET_VEHICLE_BRAKE_LIGHTS(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x92B35082E0B42F66, vehicle, toggle); } // 0x92B35082E0B42F66 0x6D9BA11E b323
 	static void SET_VEHICLE_HANDBRAKE(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x684785568EF26A22, vehicle, toggle); } // 0x684785568EF26A22 0xBA729A25 b323
 	static void SET_VEHICLE_BRAKE(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xE4E2FD323574965C, vehicle, toggle); } // 0xE4E2FD323574965C 0x5A36BC37 b757
-	// INIT_VISIBLE_LATCH_POPULATION?
-	static void _0x48ADC8A773564670() { invoke<Void>(0x48ADC8A773564670); } // 0x48ADC8A773564670 0x37BC6ACB b323
+	static void INSTANTLY_FILL_VEHICLE_POPULATION() { invoke<Void>(0x48ADC8A773564670); } // 0x48ADC8A773564670 0x37BC6ACB b323
 	// HAS_*
-	static BOOL _0x91D6DD290888CBAB() { return invoke<BOOL>(0x91D6DD290888CBAB); } // 0x91D6DD290888CBAB 0x71D898EF b323
+	static BOOL _HAS_FILLED_VEHICLE_POPULATION() { return invoke<BOOL>(0x91D6DD290888CBAB); } // 0x91D6DD290888CBAB 0x71D898EF b323
 	static void _0x51DB102F4A3BA5E0(BOOL toggle) { invoke<Void>(0x51DB102F4A3BA5E0, toggle); } // 0x51DB102F4A3BA5E0 0x0B0523B0 b323
-	static void _0xA4A9A4C40E615885(Any p0) { invoke<Void>(0xA4A9A4C40E615885, p0); } // 0xA4A9A4C40E615885 b1604
+	// Default:1000||This sets a value which is used when _0x51db102f4a3ba5e0(true) is called each frame.
+	static void _0xA4A9A4C40E615885(int p0) { invoke<Void>(0xA4A9A4C40E615885, p0); } // 0xA4A9A4C40E615885 b1604
 	// Gets the trailer of a vehicle and puts it into the trailer parameter.
 	static BOOL GET_VEHICLE_TRAILER_VEHICLE(Vehicle vehicle, Vehicle* trailer) { return invoke<BOOL>(0x1CDD6BADC297830D, vehicle, trailer); } // 0x1CDD6BADC297830D 0xAE84D758 b323
-	// SET_VEHICLE_*
-	static void _0xCAC66558B944DA67(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xCAC66558B944DA67, vehicle, toggle); } // 0xCAC66558B944DA67 0x0B200CE2 b323
+	// vehicle must be a plane
+	static void SET_VEHICLE_USES_LARGE_REAR_RAMP(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xCAC66558B944DA67, vehicle, toggle); } // 0xCAC66558B944DA67 0x0B200CE2 b323
 	static void SET_VEHICLE_RUDDER_BROKEN(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x09606148B6C71DEF, vehicle, toggle); } // 0x09606148B6C71DEF 0x3FAC3CD4 b323
 	static void SET_CONVERTIBLE_ROOF_LATCH_STATE(Vehicle vehicle, BOOL state) { invoke<Void>(0x1A78AD3D8240536F, vehicle, state); } // 0x1A78AD3D8240536F 0x0858678C b323
 	static float GET_VEHICLE_ESTIMATED_MAX_SPEED(Vehicle vehicle) { return invoke<float>(0x53AF99BAA671CA47, vehicle); } // 0x53AF99BAA671CA47 0x7D1A0616 b323
@@ -14144,37 +15352,51 @@ namespace VEHICLE {
 	// static - max acceleration
 	static float GET_VEHICLE_ACCELERATION(Vehicle vehicle) { return invoke<float>(0x5DD35C8D074E57AE, vehicle); } // 0x5DD35C8D074E57AE 0x00478321 b323
 	// Returns max speed (without mods) of the specified vehicle model in m/s.
+	// 
+	// Full list of vehicles by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicles.json
 	static float GET_VEHICLE_MODEL_ESTIMATED_MAX_SPEED(Hash modelHash) { return invoke<float>(0xF417C2502FFFED43, modelHash); } // 0xF417C2502FFFED43 0x8F291C4A b323
 	// Returns max braking of the specified vehicle model.
+	// 
+	// Full list of vehicles by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicles.json
 	static float GET_VEHICLE_MODEL_MAX_BRAKING(Hash modelHash) { return invoke<float>(0xDC53FD41B4ED944C, modelHash); } // 0xDC53FD41B4ED944C 0x7EF02883 b323
+	// Full list of vehicles by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicles.json
 	static float GET_VEHICLE_MODEL_MAX_BRAKING_MAX_MODS(Hash modelHash) { return invoke<float>(0xBFBA3BA79CFF7EBF, modelHash); } // 0xBFBA3BA79CFF7EBF 0xF3A7293F b323
 	// Returns max traction of the specified vehicle model.
+	// 
+	// Full list of vehicles by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicles.json
 	static float GET_VEHICLE_MODEL_MAX_TRACTION(Hash modelHash) { return invoke<float>(0x539DE94D44FDFD0D, modelHash); } // 0x539DE94D44FDFD0D 0x7F985597 b323
 	// Returns the acceleration of the specified model.
+	// 
+	// Full list of vehicles by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicles.json
 	static float GET_VEHICLE_MODEL_ACCELERATION(Hash modelHash) { return invoke<float>(0x8C044C5C84505B6A, modelHash); } // 0x8C044C5C84505B6A 0x29CB3537 b323
 	// GET_VEHICLE_MODEL_*
 	// 
 	// 9.8 * thrust if air vehicle, else 0.38 + drive force?
+	// 
+	// Full list of vehicles by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicles.json
 	static float _GET_VEHICLE_MODEL_ESTIMATED_AGILITY(Hash modelHash) { return invoke<float>(0x53409B5163D5B846, modelHash); } // 0x53409B5163D5B846 0x37FBA7BC b323
 	// GET_VEHICLE_MODEL_*
 	// 
 	// Function pertains only to aviation vehicles.
+	// 
+	// Full list of vehicles by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicles.json
 	static float _GET_VEHICLE_MODEL_MAX_KNOTS(Hash modelHash) { return invoke<float>(0xC6AD107DDC9054CC, modelHash); } // 0xC6AD107DDC9054CC 0x95BB67EB b323
 	// GET_VEHICLE_MODEL_*
 	// 
 	// called if the vehicle is a boat -- returns vecMoveResistanceX?
+	// 
+	// Full list of vehicles by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicles.json
 	static float _GET_VEHICLE_MODEL_MOVE_RESISTANCE(Hash modelHash) { return invoke<float>(0x5AA3F878A178C4FC, modelHash); } // 0x5AA3F878A178C4FC 0x87C5D271 b323
 	static float GET_VEHICLE_CLASS_ESTIMATED_MAX_SPEED(int vehicleClass) { return invoke<float>(0x00C09F246ABEDD82, vehicleClass); } // 0x00C09F246ABEDD82 0xCE67162C b323
 	static float GET_VEHICLE_CLASS_MAX_TRACTION(int vehicleClass) { return invoke<float>(0xDBC86D85C5059461, vehicleClass); } // 0xDBC86D85C5059461 0x5B4FDC16 b323
 	static float GET_VEHICLE_CLASS_MAX_AGILITY(int vehicleClass) { return invoke<float>(0x4F930AD022D6DE3B, vehicleClass); } // 0x4F930AD022D6DE3B 0x45F2BD83 b323
 	static float GET_VEHICLE_CLASS_MAX_ACCELERATION(int vehicleClass) { return invoke<float>(0x2F83E7E45D9EA7AE, vehicleClass); } // 0x2F83E7E45D9EA7AE 0x3E220A9B b323
 	static float GET_VEHICLE_CLASS_MAX_BRAKING(int vehicleClass) { return invoke<float>(0x4BF54C16EC8FEC03, vehicleClass); } // 0x4BF54C16EC8FEC03 0xD08CC1A5 b323
-	// ADD_*
-	static int _ADD_SPEED_ZONE_FOR_COORD(float x, float y, float z, float radius, float speed, BOOL p5) { return invoke<int>(0x2CE544C68FB812A0, x, y, z, radius, speed, p5); } // 0x2CE544C68FB812A0 0xD6685803 b323
-	// REMOVE_*
-	static BOOL _REMOVE_SPEED_ZONE(int speedzone) { return invoke<BOOL>(0x1033371FC8E842A7, speedzone); } // 0x1033371FC8E842A7 0x0C0332A6 b323
+	static int ADD_ROAD_NODE_SPEED_ZONE(float x, float y, float z, float radius, float speed, BOOL p5) { return invoke<int>(0x2CE544C68FB812A0, x, y, z, radius, speed, p5); } // 0x2CE544C68FB812A0 0xD6685803 b323
+	static BOOL REMOVE_ROAD_NODE_SPEED_ZONE(int speedzone) { return invoke<BOOL>(0x1033371FC8E842A7, speedzone); } // 0x1033371FC8E842A7 0x0C0332A6 b323
 	static void OPEN_BOMB_BAY_DOORS(Vehicle vehicle) { invoke<Void>(0x87E7F24270732CB1, vehicle); } // 0x87E7F24270732CB1 0x6574041D b323
 	static void CLOSE_BOMB_BAY_DOORS(Vehicle vehicle) { invoke<Void>(0x3556041742A0DC74, vehicle); } // 0x3556041742A0DC74 0xF8EC5751 b323
+	// Returns true when the bomb bay doors of this plane are open. False if they're closed.
 	static BOOL _ARE_BOMB_BAY_DOORS_OPEN(Vehicle aircraft) { return invoke<BOOL>(0xD0917A423314BBA8, aircraft); } // 0xD0917A423314BBA8 b1180
 	// Possibly: Returns whether the searchlight (found on police vehicles) is toggled on.
 	// 
@@ -14182,11 +15404,20 @@ namespace VEHICLE {
 	static BOOL IS_VEHICLE_SEARCHLIGHT_ON(Vehicle vehicle) { return invoke<BOOL>(0xC0F97FCE55094987, vehicle); } // 0xC0F97FCE55094987 0xADAF3513 b323
 	// Only works during nighttime.
 	static void SET_VEHICLE_SEARCHLIGHT(Vehicle heli, BOOL toggle, BOOL canBeUsedByAI) { invoke<Void>(0x14E85C5EE7A4D542, heli, toggle, canBeUsedByAI); } // 0x14E85C5EE7A4D542 0xE2C0DD8A b323
-	static BOOL _0x639431E895B9AA57(Ped ped, Vehicle vehicle, BOOL p2, BOOL p3, BOOL p4) { return invoke<BOOL>(0x639431E895B9AA57, ped, vehicle, p2, p3, p4); } // 0x639431E895B9AA57 0xAB0E79EB b323
+	static BOOL _DOES_VEHICLE_HAVE_SEARCHLIGHT(Vehicle vehicle) { return invoke<BOOL>(0x99015ED7DBEA5113, vehicle); } // 0x99015ED7DBEA5113 b2189
+	// Check if a vehicle seat is accessible. If you park your vehicle near a wall and the ped cannot enter/exit this side, the return value toggles from true (not blocked) to false (blocked).
+	// 
+	// seatIndex  = -1 being the driver seat.
+	// Use GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(vehicle) - 1 for last seat index.
+	// side = only relevant for bikes/motorcycles to check if the left (false)/right (true) side is blocked.
+	// onEnter = check if you can enter (true) or exit (false) a vehicle.
+	static BOOL _IS_VEHICLE_SEAT_ACCESSIBLE(Ped ped, Vehicle vehicle, int seatIndex, BOOL side, BOOL onEnter) { return invoke<BOOL>(0x639431E895B9AA57, ped, vehicle, seatIndex, side, onEnter); } // 0x639431E895B9AA57 0xAB0E79EB b323
 	static Vector3 _GET_ENTRY_POSITION_OF_DOOR(Vehicle vehicle, int doorIndex) { return invoke<Vector3>(0xC0572928C0ABFDA3, vehicle, doorIndex); } // 0xC0572928C0ABFDA3 b944
-	static BOOL CAN_SHUFFLE_SEAT(Vehicle vehicle, Any p1) { return invoke<BOOL>(0x30785D90C956BF35, vehicle, p1); } // 0x30785D90C956BF35 0xB3EB01ED b323
+	static BOOL CAN_SHUFFLE_SEAT(Vehicle vehicle, int seatIndex) { return invoke<BOOL>(0x30785D90C956BF35, vehicle, seatIndex); } // 0x30785D90C956BF35 0xB3EB01ED b323
 	static int GET_NUM_MOD_KITS(Vehicle vehicle) { return invoke<int>(0x33F2E3FE70EAAE1D, vehicle); } // 0x33F2E3FE70EAAE1D 0xE4903AA0 b323
 	// Set modKit to 0 if you plan to call SET_VEHICLE_MOD. That's what the game does. Most body modifications through SET_VEHICLE_MOD will not take effect until this is set to 0.
+	// 
+	// Full list of vehicle mod kits and mods by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicleModKits.json
 	static void SET_VEHICLE_MOD_KIT(Vehicle vehicle, int modKit) { invoke<Void>(0x1F2AA07F00B3217A, vehicle, modKit); } // 0x1F2AA07F00B3217A 0xB8132158 b323
 	static int GET_VEHICLE_MOD_KIT(Vehicle vehicle) { return invoke<int>(0x6325D1A044AE510D, vehicle); } // 0x6325D1A044AE510D 0x9FE60927 b323
 	static int GET_VEHICLE_MOD_KIT_TYPE(Vehicle vehicle) { return invoke<int>(0xFC058F5121E54C32, vehicle); } // 0xFC058F5121E54C32 0xE5F76765 b323
@@ -14213,7 +15444,14 @@ namespace VEHICLE {
 	// 6: Bike Wheels
 	// 7: High End
 	static void SET_VEHICLE_WHEEL_TYPE(Vehicle vehicle, int WheelType) { invoke<Void>(0x487EB21CC7295BA1, vehicle, WheelType); } // 0x487EB21CC7295BA1 0x64BDAAAD b323
-	static int GET_NUM_MOD_COLORS(int p0, BOOL p1) { return invoke<int>(0xA551BE18C11A476D, p0, p1); } // 0xA551BE18C11A476D 0x73722CD9 b323
+	// paintType:
+	// 0: Normal
+	// 1: Metallic
+	// 2: Pearl
+	// 3: Matte
+	// 4: Metal
+	// 5: Chrome
+	static int GET_NUM_MOD_COLORS(int paintType, BOOL p1) { return invoke<int>(0xA551BE18C11A476D, paintType, p1); } // 0xA551BE18C11A476D 0x73722CD9 b323
 	// paintType:
 	// 0: Normal
 	// 1: Metallic
@@ -14225,7 +15463,9 @@ namespace VEHICLE {
 	// color: number of the color.
 	// 
 	// p3 seems to always be 0.
-	static void SET_VEHICLE_MOD_COLOR_1(Vehicle vehicle, int paintType, int color, int p3) { invoke<Void>(0x43FEB945EE7F85B8, vehicle, paintType, color, p3); } // 0x43FEB945EE7F85B8 0xCBE9A54D b323
+	// 
+	// Full list of vehicle colors and vehicle plates by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicleColors.json
+	static void SET_VEHICLE_MOD_COLOR_1(Vehicle vehicle, int paintType, int color, int pearlescentColor) { invoke<Void>(0x43FEB945EE7F85B8, vehicle, paintType, color, pearlescentColor); } // 0x43FEB945EE7F85B8 0xCBE9A54D b323
 	// Changes the secondary paint type and color
 	// paintType:
 	// 0: Normal
@@ -14236,8 +15476,10 @@ namespace VEHICLE {
 	// 5: Chrome
 	// 
 	// color: number of the color
+	// 
+	// Full list of vehicle colors and vehicle plates by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicleColors.json
 	static void SET_VEHICLE_MOD_COLOR_2(Vehicle vehicle, int paintType, int color) { invoke<Void>(0x816562BADFDEC83E, vehicle, paintType, color); } // 0x816562BADFDEC83E 0xC32613C2 b323
-	static void GET_VEHICLE_MOD_COLOR_1(Vehicle vehicle, int* paintType, int* color, int* p3) { invoke<Void>(0xE8D65CA700C9A693, vehicle, paintType, color, p3); } // 0xE8D65CA700C9A693 0xE625510A b323
+	static void GET_VEHICLE_MOD_COLOR_1(Vehicle vehicle, int* paintType, int* color, int* pearlescentColor) { invoke<Void>(0xE8D65CA700C9A693, vehicle, paintType, color, pearlescentColor); } // 0xE8D65CA700C9A693 0xE625510A b323
 	static void GET_VEHICLE_MOD_COLOR_2(Vehicle vehicle, int* paintType, int* color) { invoke<Void>(0x81592BE4E3878728, vehicle, paintType, color); } // 0x81592BE4E3878728 0x9B76BB8E b323
 	// returns a string which is the codename of the vehicle's currently selected primary color
 	// 
@@ -14245,10 +15487,7 @@ namespace VEHICLE {
 	static const char* GET_VEHICLE_MOD_COLOR_1_NAME(Vehicle vehicle, BOOL p1) { return invoke<const char*>(0xB45085B721EFD38C, vehicle, p1); } // 0xB45085B721EFD38C 0x9A0840FD b323
 	// returns a string which is the codename of the vehicle's currently selected secondary color
 	static const char* GET_VEHICLE_MOD_COLOR_2_NAME(Vehicle vehicle) { return invoke<const char*>(0x4967A516ED23A5A1, vehicle); } // 0x4967A516ED23A5A1 0x9BDC0B49 b323
-	// Returns whether or not the vehicle has a CVehicleStreamRequestGfx that's trying to load mods.
-	// 
-	// True if it isn't loading mods, false if it is.
-	static BOOL _IS_VEHICLE_MOD_LOAD_DONE(Vehicle vehicle) { return invoke<BOOL>(0x9A83F5F9963775EF, vehicle); } // 0x9A83F5F9963775EF 0x112D637A b323
+	static BOOL HAVE_VEHICLE_MODS_STREAMED_IN(Vehicle vehicle) { return invoke<BOOL>(0x9A83F5F9963775EF, vehicle); } // 0x9A83F5F9963775EF 0x112D637A b323
 	// In b944, there are 50 (0 - 49) mod types.
 	// 
 	// Sets the vehicle mod.
@@ -14335,6 +15574,8 @@ namespace VEHICLE {
 	// 
 	// 
 	// Use _GET_LABEL_TEXT, to get the localized livery name.
+	// 
+	// Full list of vehicle mod kits and mods by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicleModKits.json
 	static const char* GET_LIVERY_NAME(Vehicle vehicle, int liveryIndex) { return invoke<const char*>(0xB4C7A93837C91A1F, vehicle, liveryIndex); } // 0xB4C7A93837C91A1F 0xED80B5BE b323
 	static float GET_VEHICLE_MOD_MODIFIER_VALUE(Vehicle vehicle, int modType, int modIndex) { return invoke<float>(0x90A38E9838E0A8C1, vehicle, modType, modIndex); } // 0x90A38E9838E0A8C1 0x73AE5505 b323
 	// Can be used for IS_DLC_VEHICLE_MOD and _0xC098810437312FFF
@@ -14383,15 +15624,26 @@ namespace VEHICLE {
 	static BOOL GET_IS_LEFT_VEHICLE_HEADLIGHT_DAMAGED(Vehicle vehicle) { return invoke<BOOL>(0x5EF77C9ADD3B11A3, vehicle); } // 0x5EF77C9ADD3B11A3 0xA0777943 b323
 	// From the driver's perspective, is the right headlight broken.
 	static BOOL GET_IS_RIGHT_VEHICLE_HEADLIGHT_DAMAGED(Vehicle vehicle) { return invoke<BOOL>(0xA7ECB73355EB2F20, vehicle); } // 0xA7ECB73355EB2F20 0xF178390B b323
+	// Only ever used once in decompiled scripts: **am_pi_menu**:
+	// Returns true if the engine is on fire, or if the vehicle engine health is < 0 and it **has been** on fire.
+	// 
+	// It sometimes doesn't return true when the vehicle engine has been on fire, and has since been fixed. I'm not really sure what the exact conditions are.
+	// 
+	// This usually returns true even if there are no visible flames yet (engine health > 0). However if you monitor engine health you'll see that it starts decreasing as soon as this returns true.
 	static BOOL _IS_VEHICLE_ENGINE_ON_FIRE(Vehicle vehicle) { return invoke<BOOL>(0xEC69ADF931AAE0C3, vehicle); } // 0xEC69ADF931AAE0C3 b505
 	static void MODIFY_VEHICLE_TOP_SPEED(Vehicle vehicle, float value) { invoke<Void>(0x93A3996368C94158, vehicle, value); } // 0x93A3996368C94158 0xE943B09C b323
+	// To reset the max speed, set the `speed` value to `0.0` or lower.
 	static void _SET_VEHICLE_MAX_SPEED(Vehicle vehicle, float speed) { invoke<Void>(0xBAA045B4E42F3C06, vehicle, speed); } // 0xBAA045B4E42F3C06 b1103
+	// Has something to do with trains. Always precedes SET_MISSION_TRAIN_AS_NO_LONGER_NEEDED.
+	// May be true that it can be used with trains not sure, but not specifically for trains. Go find Xbox360 decompiled scripts and search for 'func_1333' in freemode.c it isn't used just for trains. Thanks for the info tho.
 	static void _0x1CF38D529D7441D9(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x1CF38D529D7441D9, vehicle, toggle); } // 0x1CF38D529D7441D9 0xDF594D8D b323
 	static void _0x1F9FB66F3A3842D2(Vehicle vehicle, BOOL p1) { invoke<Void>(0x1F9FB66F3A3842D2, vehicle, p1); } // 0x1F9FB66F3A3842D2 0x4D840FC4 b323
-	static void _0x59C3757B3B7408E8(Any p0, Any p1, Any p2) { invoke<Void>(0x59C3757B3B7408E8, p0, p1, p2); } // 0x59C3757B3B7408E8 b1493
+	// Sets some bit and float of vehicle. float is >= 0
+	// SET_VEHICLE_*
+	static void _0x59C3757B3B7408E8(Vehicle vehicle, BOOL toggle, float p2) { invoke<Void>(0x59C3757B3B7408E8, vehicle, toggle, p2); } // 0x59C3757B3B7408E8 b1493
 	static Any ADD_VEHICLE_COMBAT_ANGLED_AVOIDANCE_AREA(float p0, float p1, float p2, float p3, float p4, float p5, float p6) { return invoke<Any>(0x54B0F614960F4A5F, p0, p1, p2, p3, p4, p5, p6); } // 0x54B0F614960F4A5F 0x5AB26C2B b323
 	static void REMOVE_VEHICLE_COMBAT_AVOIDANCE_AREA(Any p0) { invoke<Void>(0xE30524E1871F481D, p0); } // 0xE30524E1871F481D 0xEF05F807 b323
-	static BOOL _IS_ANY_PASSENGER_RAPPELING_FROM_VEHICLE(Vehicle vehicle) { return invoke<BOOL>(0x291E373D483E7EE7, vehicle); } // 0x291E373D483E7EE7 0xD656E7E5 b323
+	static BOOL IS_ANY_PED_RAPPELLING_FROM_HELI(Vehicle vehicle) { return invoke<BOOL>(0x291E373D483E7EE7, vehicle); } // 0x291E373D483E7EE7 0xD656E7E5 b323
 	// <1.0 - Decreased torque
 	// =1.0 - Default torque
 	// >1.0 - Increased torque
@@ -14406,10 +15658,13 @@ namespace VEHICLE {
 	// Sets the wanted state of this vehicle.
 	// 
 	static void SET_VEHICLE_IS_WANTED(Vehicle vehicle, BOOL state) { invoke<Void>(0xF7EC25A3EBEEC726, vehicle, state); } // 0xF7EC25A3EBEEC726 0xDAA388E8 b323
-	static void _0xF488C566413B4232(Any p0, float p1) { invoke<Void>(0xF488C566413B4232, p0, p1); } // 0xF488C566413B4232 0xA25CCB8C b323
-	// same call as VEHICLE::_0x0F3B4D4E43177236
-	static void _0xC1F981A6F74F0C23(Vehicle vehicle, BOOL p1) { invoke<Void>(0xC1F981A6F74F0C23, vehicle, p1); } // 0xC1F981A6F74F0C23 0x00966934 b323
-	static void _0x0F3B4D4E43177236(Any p0, BOOL p1) { invoke<Void>(0x0F3B4D4E43177236, p0, p1); } // 0x0F3B4D4E43177236 0x113DF5FD b323
+	// Sets the boat boom position for the `TR3` trailer.
+	// Ratio value is between `0.0` and `1.0`, where `0.0` is 90 degrees to the left of the boat, and `1.0` is just slightly to the right/back of the boat.
+	// To get the current boom position ratio, use GET_BOAT_BOOM_POSITION_RATIO
+	static void _SET_BOAT_BOOM_POSITION_RATIO(Vehicle vehicle, float ratio) { invoke<Void>(0xF488C566413B4232, vehicle, ratio); } // 0xF488C566413B4232 0xA25CCB8C b323
+	// Same call as VEHICLE::_0x0F3B4D4E43177236
+	static void _GET_BOAT_BOOM_POSITION_RATIO_2(Vehicle vehicle, BOOL p1) { invoke<Void>(0xC1F981A6F74F0C23, vehicle, p1); } // 0xC1F981A6F74F0C23 0x00966934 b323
+	static void _GET_BOAT_BOOM_POSITION_RATIO_3(Vehicle vehicle, BOOL p1) { invoke<Void>(0x0F3B4D4E43177236, vehicle, p1); } // 0x0F3B4D4E43177236 0x113DF5FD b323
 	static float GET_BOAT_BOOM_POSITION_RATIO(Vehicle vehicle) { return invoke<float>(0x6636C535F6CC2725, vehicle); } // 0x6636C535F6CC2725 0x7C8D6464 b323
 	static void DISABLE_PLANE_AILERON(Vehicle vehicle, BOOL p1, BOOL p2) { invoke<Void>(0x23428FC53C60919C, vehicle, p1, p2); } // 0x23428FC53C60919C 0x7E84C45C b323
 	// Returns true when in a vehicle, false whilst entering/exiting.
@@ -14461,6 +15716,7 @@ namespace VEHICLE {
 	// it's not instant so probabilly must pass an 'update' to see correct result.
 	static BOOL IS_VEHICLE_VISIBLE(Vehicle vehicle) { return invoke<BOOL>(0xAA0A52D24FB98293, vehicle); } // 0xAA0A52D24FB98293 0x7E0D6056 b323
 	static void SET_VEHICLE_GRAVITY(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x89F149B6131E57DA, vehicle, toggle); } // 0x89F149B6131E57DA 0x07B2A6DC b323
+	// Enable/Disables global slipstream physics
 	static void SET_ENABLE_VEHICLE_SLIPSTREAMING(BOOL toggle) { invoke<Void>(0xE6C0C80B8C867537, toggle); } // 0xE6C0C80B8C867537 0xD2B8ACBD b323
 	static void _0xF051D9BFB6BA39C0(Any p0) { invoke<Void>(0xF051D9BFB6BA39C0, p0); } // 0xF051D9BFB6BA39C0 b877
 	// Returns a float value between 0.0 and 3.0 related to its slipstream draft (boost/speedup).
@@ -14477,21 +15733,22 @@ namespace VEHICLE {
 	// Adds some kind of shadow to the vehicle.
 	// 
 	// -1 disables the effect.
-	// 
 	// DISABLE_*
-	static void _0xF0E4BA16D1DB546C(Vehicle vehicle, int p1, int p2) { invoke<Void>(0xF0E4BA16D1DB546C, vehicle, p1, p2); } // 0xF0E4BA16D1DB546C 0x5BD8D82D b323
+	static void _SET_VEHICLE_SHADOW_EFFECT(Vehicle vehicle, int p1, int p2) { invoke<Void>(0xF0E4BA16D1DB546C, vehicle, p1, p2); } // 0xF0E4BA16D1DB546C 0x5BD8D82D b323
+	// Remove the weird shadow applied by _SET_VEHICLE_SHADOW_EFFECT.
 	// ENABLE_*
-	static void _0xF87D9F2301F7D206(Vehicle vehicle) { invoke<Void>(0xF87D9F2301F7D206, vehicle); } // 0xF87D9F2301F7D206 0x450AD03A b323
+	static void _REMOVE_VEHICLE_SHADOW_EFFECT(Vehicle vehicle) { invoke<Void>(0xF87D9F2301F7D206, vehicle); } // 0xF87D9F2301F7D206 0x450AD03A b323
 	static BOOL IS_PLANE_LANDING_GEAR_INTACT(Vehicle plane) { return invoke<BOOL>(0x4198AB0022B15F87, plane); } // 0x4198AB0022B15F87 0xBD085DCA b323
 	static BOOL ARE_PLANE_PROPELLERS_INTACT(Vehicle plane) { return invoke<BOOL>(0x755D6D5267CBBD7E, plane); } // 0x755D6D5267CBBD7E 0xABBDD5C6 b323
-	static Any _0x4C815EB175086F84(Any p0, Any p1) { return invoke<Any>(0x4C815EB175086F84, p0, p1); } // 0x4C815EB175086F84 b1103
+	static void _SET_PLANE_PROPELLERS_HEALTH(Vehicle plane, float health) { invoke<Void>(0x4C815EB175086F84, plane, health); } // 0x4C815EB175086F84 b1103
 	static void SET_VEHICLE_CAN_DEFORM_WHEELS(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x0CDDA42F9E360CA6, vehicle, toggle); } // 0x0CDDA42F9E360CA6 0x9B581DE7 b323
 	static BOOL IS_VEHICLE_STOLEN(Vehicle vehicle) { return invoke<BOOL>(0x4AF9BD80EEBEB453, vehicle); } // 0x4AF9BD80EEBEB453 0x20B61DDE b323
 	static void SET_VEHICLE_IS_STOLEN(Vehicle vehicle, BOOL isStolen) { invoke<Void>(0x67B2C79AA7FF5738, vehicle, isStolen); } // 0x67B2C79AA7FF5738 0x70912E42 b323
-	// For planes only!
-	// 
-	// value can be 1.0 or lower (higher values will automatically result in 1.0).
-	static void SET_PLANE_TURBULENCE_MULTIPLIER(Vehicle vehicle, float value) { invoke<Void>(0xAD2D28A1AFDFF131, vehicle, value); } // 0xAD2D28A1AFDFF131 0xED159AE6 b323
+	// This native sets the turbulence multiplier. It only works for planes.
+	// 0.0 = no turbulence at all.
+	// 1.0 = heavy turbulence.
+	// Works by just calling it once, does not need to be called every tick.
+	static void SET_PLANE_TURBULENCE_MULTIPLIER(Vehicle vehicle, float multiplier) { invoke<Void>(0xAD2D28A1AFDFF131, vehicle, multiplier); } // 0xAD2D28A1AFDFF131 0xED159AE6 b323
 	// ADD_A_MARKER_OVER_VEHICLE was a hash collision!!!
 	// 
 	// Can be used for planes only!
@@ -14509,8 +15766,8 @@ namespace VEHICLE {
 	static Any _GET_ENTITY_ATTACHED_TO_CARGOBOB(Any p0) { return invoke<Any>(0x99093F60746708CA, p0); } // 0x99093F60746708CA b1103
 	static void ATTACH_VEHICLE_TO_CARGOBOB(Vehicle vehicle, Vehicle cargobob, int p2, float x, float y, float z) { invoke<Void>(0x4127F1D84E347769, vehicle, cargobob, p2, x, y, z); } // 0x4127F1D84E347769 0x607DC9D5 b323
 	static void _ATTACH_ENTITY_TO_CARGOBOB(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5) { invoke<Void>(0xA1DD82F3CCF9A01E, p0, p1, p2, p3, p4, p5); } // 0xA1DD82F3CCF9A01E b944
-	// consoel hash 0xAEB29F98
-	static void _0x571FEB383F629926(Vehicle cargobob, BOOL p1) { invoke<Void>(0x571FEB383F629926, cargobob, p1); } // 0x571FEB383F629926 b323
+	// Stops cargobob from beeing able to detach the attached vehicle.
+	static void _SET_CARGOBOB_HOOK_CAN_DETACH(Vehicle cargobob, BOOL toggle) { invoke<Void>(0x571FEB383F629926, cargobob, toggle); } // 0x571FEB383F629926 0xAEB29F98 b323
 	static void _0x1F34B0626C594380(Any p0, Any p1) { invoke<Void>(0x1F34B0626C594380, p0, p1); } // 0x1F34B0626C594380 b757
 	static Any _0x2C1D8B3B19E517CC(Any p0, Any p1) { return invoke<Any>(0x2C1D8B3B19E517CC, p0, p1); } // 0x2C1D8B3B19E517CC b757
 	// Gets the position of the cargobob hook, in world coords.
@@ -14530,9 +15787,8 @@ namespace VEHICLE {
 	// 
 	// Note: after you retract it the natives for dropping the hook no longer work
 	static void REMOVE_PICK_UP_ROPE_FOR_CARGOBOB(Vehicle cargobob) { invoke<Void>(0x9768CF648F54C804, cargobob); } // 0x9768CF648F54C804 0xA8211EE9 b323
-	// For now, I changed the last one from bool to int.
-	// According to scripts specifically 'fm_mission_controller' this last parameter is 'false/0' when its called after the create rope native above is called for the magnet and 'true/1' after the create rope native above is called for the hook.
-	static void _SET_CARGOBOB_HOOK_POSITION(Any p0, float p1, float p2, int state) { invoke<Void>(0x877C1EAEAC531023, p0, p1, p2, state); } // 0x877C1EAEAC531023 0x3A8AB081 b323
+	// min: 1.9f, max: 100.0f
+	static void SET_PICKUP_ROPE_LENGTH_FOR_CARGOBOB(Vehicle cargobob, float length1, float length2, BOOL p3) { invoke<Void>(0x877C1EAEAC531023, cargobob, length1, length2, p3); } // 0x877C1EAEAC531023 0x3A8AB081 b323
 	static void _0xC0ED6438E6D39BA8(Any p0, Any p1, Any p2) { invoke<Void>(0xC0ED6438E6D39BA8, p0, p1, p2); } // 0xC0ED6438E6D39BA8 b944
 	static void SET_CARGOBOB_PICKUP_ROPE_DAMPING_MULTIPLIER(Any p0, Any p1) { invoke<Void>(0xCF1182F682F65307, p0, p1); } // 0xCF1182F682F65307 0x7D927E1B b323
 	static void SET_CARGOBOB_PICKUP_ROPE_TYPE(Any p0, Any p1) { invoke<Void>(0x0D5F65A8F4EBDAB5, p0, p1); } // 0x0D5F65A8F4EBDAB5 0xF258ADA1 b1103
@@ -14554,9 +15810,9 @@ namespace VEHICLE {
 	static void _0x2C4A1590ABF43E8B(Vehicle vehicle, BOOL p1) { invoke<Void>(0x2C4A1590ABF43E8B, vehicle, p1); } // 0x2C4A1590ABF43E8B 0x2EC19A8B b323
 	// how does this work?
 	static void DISABLE_VEHICLE_WEAPON(BOOL disabled, Hash weaponHash, Vehicle vehicle, Ped owner) { invoke<Void>(0xF4FC6A6F67D8D856, disabled, weaponHash, vehicle, owner); } // 0xF4FC6A6F67D8D856 0xA688B7D1 b323
-	static Any _IS_VEHICLE_WEAPON_DISABLED(Any p0, Any p1, Any p2) { return invoke<Any>(0x563B65A643ED072E, p0, p1, p2); } // 0x563B65A643ED072E b1011
+	static BOOL _IS_VEHICLE_WEAPON_DISABLED(Hash weaponHash, Vehicle vehicle, Ped owner) { return invoke<BOOL>(0x563B65A643ED072E, weaponHash, vehicle, owner); } // 0x563B65A643ED072E b1011
 	static void _0xE05DD0E9707003A3(Any p0, BOOL p1) { invoke<Void>(0xE05DD0E9707003A3, p0, p1); } // 0xE05DD0E9707003A3 0x123E5B90 b323
-	static void _SET_VEHICLE_CLOSE_DOOR_DEFERED_ACTION(Any p0, BOOL p1) { invoke<Void>(0x21115BCD6E44656A, p0, p1); } // 0x21115BCD6E44656A 0xEBC225C1 b323
+	static void SET_VEHICLE_ACTIVE_FOR_PED_NAVIGATION(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x21115BCD6E44656A, vehicle, toggle); } // 0x21115BCD6E44656A 0xEBC225C1 b323
 	// Returns an int
 	// 
 	// Vehicle Classes:
@@ -14594,6 +15850,8 @@ namespace VEHICLE {
 	// std::sprintf(buffer, "VEH_CLASS_%i", VEHICLE::GET_VEHICLE_CLASS_FROM_NAME (hash));
 	// 
 	// const char* className = HUD::_GET_LABEL_TEXT(buffer);
+	// 
+	// Full list of vehicles by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicles.json
 	static int GET_VEHICLE_CLASS_FROM_NAME(Hash modelHash) { return invoke<int>(0xDEDF1C8BD47C2200, modelHash); } // 0xDEDF1C8BD47C2200 0xEA469980 b323
 	static void SET_PLAYERS_LAST_VEHICLE(Vehicle vehicle) { invoke<Void>(0xBCDF8BAF56C87B6A, vehicle); } // 0xBCDF8BAF56C87B6A 0xDE86447D b323
 	static void SET_VEHICLE_CAN_BE_USED_BY_FLEEING_PEDS(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x300504B23BD3B711, vehicle, toggle); } // 0x300504B23BD3B711 0x5130DB1E b323
@@ -14607,7 +15865,8 @@ namespace VEHICLE {
 	// i.imgur.com/7XA14pX.png
 	// Certain planes got jet engines.
 	static void _SET_VEHICLE_JET_ENGINE_ON(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xB8FBC8B1330CA9B4, vehicle, toggle); } // 0xB8FBC8B1330CA9B4 0x51E0064F b323
-	static void _0x6A973569BA094650(Any p0, Any p1) { invoke<Void>(0x6A973569BA094650, p0, p1); } // 0x6A973569BA094650 b1604
+	// Seems to copy some values in vehicle
+	static void _0x6A973569BA094650(Vehicle vehicle, Any p1) { invoke<Void>(0x6A973569BA094650, vehicle, p1); } // 0x6A973569BA094650 b1604
 	// Use the "AIHandling" string found in handling.meta
 	static void _SET_VEHICLE_HANDLING_HASH_FOR_AI(Vehicle vehicle, Hash hash) { invoke<Void>(0x10655FAB9915623D, vehicle, hash); } // 0x10655FAB9915623D b323
 	// Max value is 32767
@@ -14627,15 +15886,29 @@ namespace VEHICLE {
 	static void _0x5E569EC46EC21CAE(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x5E569EC46EC21CAE, vehicle, toggle); } // 0x5E569EC46EC21CAE 0xBC649C49 b323
 	static void CLEAR_VEHICLE_ROUTE_HISTORY(Vehicle vehicle) { invoke<Void>(0x6D6AF961B72728AE, vehicle); } // 0x6D6AF961B72728AE 0x8DD9AA0C b323
 	static BOOL DOES_VEHICLE_EXIST_WITH_DECORATOR(const char* decorator) { return invoke<BOOL>(0x956B409B984D9BF7, decorator); } // 0x956B409B984D9BF7 0x39E68EDD b323
-	static void SET_VEHICLE_EXCLUSIVE_DRIVER(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x41062318F23ED854, vehicle, toggle); } // 0x41062318F23ED854 0xAA8BD440 b323
+	// Used to be incorrectly named SET_VEHICLE_EXCLUSIVE_DRIVER
+	// 
+	// Likely SET_VEHICLE_ALLOW_*
+	// 
+	// Jenkins hash may be wrong, unsure at this time.
+	// Toggles a flag related to SET_VEHICLE_EXCLUSIVE_DRIVER, however, doesn't enable that feature (or trigger script events related to it).
+	static void _0x41062318F23ED854(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x41062318F23ED854, vehicle, toggle); } // 0x41062318F23ED854 0xFF62D324 b323
 	// index: 0 - 1
-	static void _SET_VEHICLE_EXCLUSIVE_DRIVER_2(Vehicle vehicle, Ped ped, int index) { invoke<Void>(0xB5C51B5502E85E83, vehicle, ped, index); } // 0xB5C51B5502E85E83 0xFF62D324 b323
-	static Any _0xB09D25E77C33EB3F(Any p0, Any p1, Any p2) { return invoke<Any>(0xB09D25E77C33EB3F, p0, p1, p2); } // 0xB09D25E77C33EB3F b463
+	// 
+	// Used to be incorrectly named _SET_VEHICLE_EXCLUSIVE_DRIVER_2
+	static void SET_VEHICLE_EXCLUSIVE_DRIVER(Vehicle vehicle, Ped ped, int index) { invoke<Void>(0xB5C51B5502E85E83, vehicle, ped, index); } // 0xB5C51B5502E85E83 0xAA8BD440 b323
+	static BOOL _IS_PED_EXCLUSIVE_DRIVER_OF_VEHICLE(Ped ped, Vehicle vehicle, int* outIndex) { return invoke<BOOL>(0xB09D25E77C33EB3F, ped, vehicle, outIndex); } // 0xB09D25E77C33EB3F b463
 	static void _DISABLE_PLANE_PROPELLER(Vehicle vehicle, Any p1) { invoke<Void>(0x500873A45724C863, vehicle, p1); } // 0x500873A45724C863 0x004926A3 b323
 	static void SET_VEHICLE_FORCE_AFTERBURNER(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xB055A34527CB8FD7, vehicle, toggle); } // 0xB055A34527CB8FD7 0xC195803B b323
-	static void _SET_DISABLE_VEHICLE_WINDOW_COLLISIONS(Any p0, Any p1) { invoke<Void>(0x1087BC8EC540DAEB, p0, p1); } // 0x1087BC8EC540DAEB b1103
-	static void _0xB68CFAF83A02768D(Any p0, Any p1) { invoke<Void>(0xB68CFAF83A02768D, p0, p1); } // 0xB68CFAF83A02768D b1290
-	static void _0x0205F5365292D2EB(Any p0, Any p1) { invoke<Void>(0x0205F5365292D2EB, p0, p1); } // 0x0205F5365292D2EB b1290
+	// R* used it to "remove" vehicle windows when "nightshark" had some mod, which adding some kind of armored windows. When enabled, you can't break vehicles glass. All your bullets wiil shoot through glass. You also will not able to break the glass with any other way (hitting and etc)
+	static void _SET_DISABLE_VEHICLE_WINDOW_COLLISIONS(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x1087BC8EC540DAEB, vehicle, toggle); } // 0x1087BC8EC540DAEB b1103
+	static void _0x4AD280EB48B2D8E6(Vehicle vehicle, BOOL togle) { invoke<Void>(0x4AD280EB48B2D8E6, vehicle, togle); } // 0x4AD280EB48B2D8E6 b1868
+	// Sets value for vehicle. Vehicle is a helicopter?
+	// _SET_HELICOPTER_*
+	static void _0xB68CFAF83A02768D(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xB68CFAF83A02768D, vehicle, toggle); } // 0xB68CFAF83A02768D b1290
+	// Sets some float for vehicle (def -1f)
+	// SET_VEHICLE_*
+	static void _0x0205F5365292D2EB(Vehicle vehicle, float p1) { invoke<Void>(0x0205F5365292D2EB, vehicle, p1); } // 0x0205F5365292D2EB b1290
 	static void _0xCF9159024555488C(Any p0) { invoke<Void>(0xCF9159024555488C, p0); } // 0xCF9159024555488C b944
 	// Toggles to render distant vehicles. They may not be vehicles but images to look like vehicles.
 	static void SET_DISTANT_CARS_ENABLED(BOOL toggle) { invoke<Void>(0xF796359A959DF65D, toggle); } // 0xF796359A959DF65D 0xB5CC548B b323
@@ -14643,7 +15916,9 @@ namespace VEHICLE {
 	// 
 	// More info: pastebin.com/G49gqy8b
 	static void _SET_VEHICLE_NEON_LIGHTS_COLOUR(Vehicle vehicle, int r, int g, int b) { invoke<Void>(0x8E0A582209A62695, vehicle, r, g, b); } // 0x8E0A582209A62695 b323
-	static void _0xB93B2867F7B479D1(Any p0, Any p1) { invoke<Void>(0xB93B2867F7B479D1, p0, p1); } // 0xB93B2867F7B479D1 b1493
+	// Sets some value for vehicle from array based on index
+	// _SET_VEHICLE_*
+	static void _0xB93B2867F7B479D1(Vehicle vehicle, int index) { invoke<Void>(0xB93B2867F7B479D1, vehicle, index); } // 0xB93B2867F7B479D1 b1493
 	// Gets the color of the neon lights of the specified vehicle.
 	// 
 	// See _SET_VEHICLE_NEON_LIGHTS_COLOUR (0x8E0A582209A62695) for more information
@@ -14664,7 +15939,7 @@ namespace VEHICLE {
 	static BOOL _IS_VEHICLE_NEON_LIGHT_ENABLED(Vehicle vehicle, int index) { return invoke<BOOL>(0x8C4B92553E4766A5, vehicle, index); } // 0x8C4B92553E4766A5 b323
 	static void _0x35E0654F4BAD7971(BOOL p0) { invoke<Void>(0x35E0654F4BAD7971, p0); } // 0x35E0654F4BAD7971 b323
 	static void _DISABLE_VEHICLE_NEON_LIGHTS(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x83F813570FF519DE, vehicle, toggle); } // 0x83F813570FF519DE b573
-	static void _0xB088E9A47AE6EDD5(Vehicle vehicle, BOOL p1) { invoke<Void>(0xB088E9A47AE6EDD5, vehicle, p1); } // 0xB088E9A47AE6EDD5 b323
+	static void _SET_DISABLE_SUPERDUMMY_MODE(Vehicle vehicle, BOOL p1) { invoke<Void>(0xB088E9A47AE6EDD5, vehicle, p1); } // 0xB088E9A47AE6EDD5 b323
 	// REQUEST_VEHICLE_*
 	static void _REQUEST_VEHICLE_DASHBOARD_SCALEFORM_MOVIE(Vehicle vehicle) { invoke<Void>(0xDBA3C090E3D74690, vehicle); } // 0xDBA3C090E3D74690 b323
 	// Seems related to vehicle health, like the one in IV.
@@ -14712,7 +15987,7 @@ namespace VEHICLE {
 	//         NETWORK::NETWORK_EXPLODE_VEHICLE(v_3, 1, 1, -1);
 	//     }
 	// }
-	static float _GET_VEHICLE_BODY_HEALTH_2(Vehicle vehicle, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6) { return invoke<float>(0xB8EF61207C2393A9, vehicle, p1, p2, p3, p4, p5, p6); } // 0xB8EF61207C2393A9 b323
+	static float _GET_VEHICLE_BODY_HEALTH_2(Vehicle vehicle, float maxEngineHealth, float maxPetrolTankHealth, float maxBodyHealth, float maxMainRotorHealth, float maxTailRotorHealth, float maxUnkHealth) { return invoke<float>(0xB8EF61207C2393A9, vehicle, maxEngineHealth, maxPetrolTankHealth, maxBodyHealth, maxMainRotorHealth, maxTailRotorHealth, maxUnkHealth); } // 0xB8EF61207C2393A9 b323
 	// Only used like this:
 	// 
 	// if (VEHICLE::_D4C4642CB7F50B5D(ENTITY::GET_VEHICLE_INDEX_FROM_ENTITY_INDEX(v_3))) {
@@ -14721,13 +15996,19 @@ namespace VEHICLE {
 	static BOOL _0xD4C4642CB7F50B5D(Vehicle vehicle) { return invoke<BOOL>(0xD4C4642CB7F50B5D, vehicle); } // 0xD4C4642CB7F50B5D b323
 	static void _0xC361AA040D6637A8(Vehicle vehicle, BOOL p1) { invoke<Void>(0xC361AA040D6637A8, vehicle, p1); } // 0xC361AA040D6637A8 b323
 	static void SET_VEHICLE_KERS_ALLOWED(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x99C82F8A139F3E4E, vehicle, toggle); } // 0x99C82F8A139F3E4E 0x71CDD52F b323
+	// Returns true if the vehicle has a kers boost (for instance the lectro or the vindicator)
 	static BOOL GET_VEHICLE_HAS_KERS(Vehicle vehicle) { return invoke<BOOL>(0x50634E348C8D44EF, vehicle); } // 0x50634E348C8D44EF 0x0761E635 b372
 	static void _0xE16142B94664DEFD(Vehicle vehicle, BOOL p1) { invoke<Void>(0xE16142B94664DEFD, vehicle, p1); } // 0xE16142B94664DEFD b323
 	static void _0x26D99D5A82FD18E8(Any p0) { invoke<Void>(0x26D99D5A82FD18E8, p0); } // 0x26D99D5A82FD18E8 b463
-	static void _SET_HYDRAULIC_STATE(Any p0, Any p1, Any p2) { invoke<Void>(0x84EA99C62CB3EF0C, p0, p1, p2); } // 0x84EA99C62CB3EF0C b505
+	// Works only on vehicles that support hydraulic.
+	static void _SET_HYDRAULIC_WHEEL_VALUE(Vehicle vehicle, int wheelId, float value) { invoke<Void>(0x84EA99C62CB3EF0C, vehicle, wheelId, value); } // 0x84EA99C62CB3EF0C b505
 	static void _SET_CAMBERED_WHEELS_DISABLED(Any p0, Any p1) { invoke<Void>(0x1201E8A3290A3B98, p0, p1); } // 0x1201E8A3290A3B98 b505
 	static void _SET_HYDRAULIC_WHEEL_STATE(Any p0, Any p1) { invoke<Void>(0x8EA86DF356801C7D, p0, p1); } // 0x8EA86DF356801C7D b505
-	static void _SET_HYDRAULIC_WHEEL_STATE_TRANSITION(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0xC24075310A8B9CD1, p0, p1, p2, p3, p4); } // 0xC24075310A8B9CD1 b505
+	// Sets vehicle wheel hydraulic states transition. Known states:
+	// 0 - reset
+	// 1 - raise wheel (uses value arg, works just like _SET_VEHICLE_HYDRAULIC_WHEEL_VALUE)
+	// 2 - jump using wheel
+	static void _SET_HYDRAULIC_WHEEL_STATE_TRANSITION(Vehicle vehicle, int wheelId, int state, float value, Any p4) { invoke<Void>(0xC24075310A8B9CD1, vehicle, wheelId, state, value, p4); } // 0xC24075310A8B9CD1 b505
 	static Any _0x5BA68A0840D546AC(Any p0, Any p1) { return invoke<Any>(0x5BA68A0840D546AC, p0, p1); } // 0x5BA68A0840D546AC b463
 	// CLEAR_VEHICLE_*
 	static void _0x4419966C9936071A(Vehicle vehicle) { invoke<Void>(0x4419966C9936071A, vehicle); } // 0x4419966C9936071A b463
@@ -14739,6 +16020,8 @@ namespace VEHICLE {
 	static Any _0xD4196117AF7BB974(Any p0, Any p1) { return invoke<Any>(0xD4196117AF7BB974, p0, p1); } // 0xD4196117AF7BB974 b757
 	static void _0xBB2333BB87DDD87F(Any p0, Any p1) { invoke<Void>(0xBB2333BB87DDD87F, p0, p1); } // 0xBB2333BB87DDD87F b757
 	static void _0x73561D4425A021A2(Any p0, Any p1) { invoke<Void>(0x73561D4425A021A2, p0, p1); } // 0x73561D4425A021A2 b791
+	// Inverts vehicle's controls. So INPUT_VEH_ACCELERATE will be INPUT_VEH_BRAKE and vise versa (same for A/D controls)
+	// Doesn't work for planes/helis.
 	static void _SET_VEHICLE_CONTROLS_INVERTED(Vehicle vehicle, BOOL state) { invoke<Void>(0x5B91B229243351A8, vehicle, state); } // 0x5B91B229243351A8 b791
 	static void _0x7BBE7FF626A591FE(Any p0) { invoke<Void>(0x7BBE7FF626A591FE, p0); } // 0x7BBE7FF626A591FE b877
 	static void _0x65B080555EA48149(Any p0) { invoke<Void>(0x65B080555EA48149, p0); } // 0x65B080555EA48149 b1011
@@ -14762,10 +16045,13 @@ namespace VEHICLE {
 	static void _LOWER_RETRACTABLE_WHEELS(Vehicle vehicle) { invoke<Void>(0x5335BE58C083E74E, vehicle); } // 0x5335BE58C083E74E b1011
 	// Returns true if the vehicle has the FLAG_JUMPING_CAR flag set.
 	static BOOL _GET_CAN_VEHICLE_JUMP(Vehicle vehicle) { return invoke<BOOL>(0x9078C0C5EF8C19E9, vehicle); } // 0x9078C0C5EF8C19E9 b944
-	// Allows vehicles with the FLAG_JUMPING_CAR flag to jump higher.
+	// Allows vehicles with the FLAG_JUMPING_CAR flag to jump higher (i.e. Ruiner 2000).
 	static void _SET_USE_HIGHER_VEHICLE_JUMP_FORCE(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xF06A16CA55D138D8, vehicle, toggle); } // 0xF06A16CA55D138D8 b944
 	// SET_C*
 	static void _0xB2E0C0D6922D31F2(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xB2E0C0D6922D31F2, vehicle, toggle); } // 0xB2E0C0D6922D31F2 b944
+	// Set vehicle's primary mounted weapon 2 ammo. For example, use it on APC.
+	// For example, you can "remove" any vehicle weapon from any vehicle.
+	// ammoAmount -1 = infinite ammo (default value for any spawned vehicle tho)
 	static void _SET_VEHICLE_WEAPON_CAPACITY(Vehicle vehicle, int weaponIndex, int capacity) { invoke<Void>(0x44CD1F493DB2A0A6, vehicle, weaponIndex, capacity); } // 0x44CD1F493DB2A0A6 b944
 	static int _GET_VEHICLE_WEAPON_CAPACITY(Vehicle vehicle, int weaponIndex) { return invoke<int>(0x8181CE2F25CB9BB7, vehicle, weaponIndex); } // 0x8181CE2F25CB9BB7 b1011
 	static BOOL _GET_VEHICLE_HAS_PARACHUTE(Vehicle vehicle) { return invoke<BOOL>(0xBC9CFF381338CB4F, vehicle); } // 0xBC9CFF381338CB4F b944
@@ -14793,35 +16079,83 @@ namespace VEHICLE {
 	static void _0x26E13D440E7F6064(Vehicle vehicle, float value) { invoke<Void>(0x26E13D440E7F6064, vehicle, value); } // 0x26E13D440E7F6064 b1290
 	static void _0x2FA2494B47FDD009(Any p0, Any p1) { invoke<Void>(0x2FA2494B47FDD009, p0, p1); } // 0x2FA2494B47FDD009 b1103
 	static void _SET_VEHICLE_ROCKET_BOOST_PERCENTAGE(Vehicle vehicle, float percentage) { invoke<Void>(0xFEB2DDED3509562E, vehicle, percentage); } // 0xFEB2DDED3509562E b1103
-	static void _0x544996C0081ABDEB(Any p0, Any p1) { invoke<Void>(0x544996C0081ABDEB, p0, p1); } // 0x544996C0081ABDEB b1103
+	// Set state to true to extend the wings, false to retract them.
+	static void _SET_OPPRESSOR_TRANSFORM_STATE(Vehicle vehicle, BOOL state) { invoke<Void>(0x544996C0081ABDEB, vehicle, state); } // 0x544996C0081ABDEB b1103
 	static void _0x78CEEE41F49F421F(Any p0, Any p1) { invoke<Void>(0x78CEEE41F49F421F, p0, p1); } // 0x78CEEE41F49F421F b1103
 	static void _0xAF60E6A2936F982A(Any p0, Any p1) { invoke<Void>(0xAF60E6A2936F982A, p0, p1); } // 0xAF60E6A2936F982A b1103
 	static void _0x430A7631A84C9BE7(Any p0) { invoke<Void>(0x430A7631A84C9BE7, p0); } // 0x430A7631A84C9BE7 b1180
-	static void _0x75627043C6AA90AD(Any p0) { invoke<Void>(0x75627043C6AA90AD, p0); } // 0x75627043C6AA90AD b1180
-	static void _0x8235F1BEAD557629(Any p0, Any p1) { invoke<Void>(0x8235F1BEAD557629, p0, p1); } // 0x8235F1BEAD557629 b1180
-	static void _0x9640E30A7F395E4B(Any p0, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0x9640E30A7F395E4B, p0, p1, p2, p3, p4); } // 0x9640E30A7F395E4B b1290
+	// Disables collision for this vehicle (maybe it also supports other entities, not sure).
+	// Only world/building/fixed world objects will have their collisions disabled, props, peds, or any other entity still collides with the vehicle.
+	// Example: https://streamable.com/6n45d5
+	// Not sure if there is a native (and if so, which one) that resets the collisions.
+	static void _DISABLE_VEHICLE_WORLD_COLLISION(Vehicle vehicle) { invoke<Void>(0x75627043C6AA90AD, vehicle); } // 0x75627043C6AA90AD b1180
+	// Sets some value for vehicle
+	// SET_VEHICLE_*
+	static void _0x8235F1BEAD557629(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x8235F1BEAD557629, vehicle, toggle); } // 0x8235F1BEAD557629 b1180
+	static void _0x9640E30A7F395E4B(Vehicle vehicle, Any p1, Any p2, Any p3, Any p4) { invoke<Void>(0x9640E30A7F395E4B, vehicle, p1, p2, p3, p4); } // 0x9640E30A7F395E4B b1290
 	static void _0x0BBB9A7A8FFE931B(Any p0, Any p1, Any p2) { invoke<Void>(0x0BBB9A7A8FFE931B, p0, p1, p2); } // 0x0BBB9A7A8FFE931B b1290
-	static void _0x94A68DA412C4007D(Any p0, Any p1) { invoke<Void>(0x94A68DA412C4007D, p0, p1); } // 0x94A68DA412C4007D b1180
+	// Stops the cargobob from being able to attach any vehicle
+	static void _SET_CARGOBOB_HOOK_CAN_ATTACH(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x94A68DA412C4007D, vehicle, toggle); } // 0x94A68DA412C4007D b1180
+	// Sets the amount of bombs that this vehicle has. As far as I know, this does _not_ impact vehicle weapons or the ammo of those weapons in any way, it is just a way to keep track of the amount of bombs in a specific plane. 
 	static void _SET_VEHICLE_BOMB_COUNT(Vehicle vehicle, int bombCount) { invoke<Void>(0xF4B2ED59DEB5D774, vehicle, bombCount); } // 0xF4B2ED59DEB5D774 b1180
+	// Gets the amount of bombs that this vehicle has. As far as I know, this does _not_ impact vehicle weapons or the ammo of those weapons in any way, it is just a way to keep track of the amount of bombs in a specific plane. 
 	static int _GET_VEHICLE_BOMB_COUNT(Vehicle vehicle) { return invoke<int>(0xEA12BD130D7569A1, vehicle); } // 0xEA12BD130D7569A1 b1180
+	// Similar to 0xF4B2ED59DEB5D774, this sets the amount of countermeasures that are present on this vehicle.
+	// Use 0xF846AA63DF56B804 to get the current amount.
 	static void _SET_VEHICLE_COUNTERMEASURE_COUNT(Vehicle vehicle, int counterMeasureCount) { invoke<Void>(0x9BDA23BF666F0855, vehicle, counterMeasureCount); } // 0x9BDA23BF666F0855 b1180
+	// Similar to `0xEA12BD130D7569A1`, this gets the amount of countermeasures that are present on this vehicle.
+	// Use 0x9BDA23BF666F0855 to set the current amount.
 	static int _GET_VEHICLE_COUNTERMEASURE_COUNT(Vehicle vehicle) { return invoke<int>(0xF846AA63DF56B804, vehicle); } // 0xF846AA63DF56B804 b1180
-	static void _0x0A3F820A9A9A9AC5(Any p0, Any p1, Any p2, Any p3) { invoke<Void>(0x0A3F820A9A9A9AC5, p0, p1, p2, p3); } // 0x0A3F820A9A9A9AC5 b1180
-	static Any _0x51F30DB60626A20E(Any p0, Any p1, Any p2, Any p3, Any p4, Any p5, Any p6, Any p7, Any p8) { return invoke<Any>(0x51F30DB60626A20E, p0, p1, p2, p3, p4, p5, p6, p7, p8); } // 0x51F30DB60626A20E b1180
-	static void _0x97841634EF7DF1D6(Any p0, Any p1) { invoke<Void>(0x97841634EF7DF1D6, p0, p1); } // 0x97841634EF7DF1D6 b1180
+	// Used on helicopters
+	// SET_HELICOPTER_??
+	static void _0x0A3F820A9A9A9AC5(Vehicle vehicle, float x, float y, float z) { invoke<Void>(0x0A3F820A9A9A9AC5, vehicle, x, y, z); } // 0x0A3F820A9A9A9AC5 b1180
+	// Used in decompiled scripts in combination with _GET_VEHICLE_SUSPENSION_BOUNDS
+	// p7 is usually 2
+	// p8 is usually 1
+	static BOOL _0x51F30DB60626A20E(Vehicle vehicle, float x, float y, float z, float rotX, float rotY, float rotZ, int p7, Any p8) { return invoke<BOOL>(0x51F30DB60626A20E, vehicle, x, y, z, rotX, rotY, rotZ, p7, p8); } // 0x51F30DB60626A20E b1180
+	// Sets a flag on heli and another vehicle type.
+	// _SET_VEHICLE_??
+	static void _0x97841634EF7DF1D6(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x97841634EF7DF1D6, vehicle, toggle); } // 0x97841634EF7DF1D6 b1180
 	static void _SET_VEHICLE_HOVER_TRANSFORM_RATIO(Vehicle vehicle, float ratio) { invoke<Void>(0xD138FA15C9776837, vehicle, ratio); } // 0xD138FA15C9776837 b1290
+	// According to decompiled scripts this should work with the `deluxo` and `oppressor2` vehicles.
+	// I've only seen this work for `deluxo` though, can't figure out what it's supposed to do on `oppressor2`.
+	// 
+	// For the deluxo:
+	// - Set `state` to `0.0`: Fully transform to a 'road' vehicle (non-hover mode).
+	// - Set `state` to `1.0`: Fully transform to a 'flying' vehicle (hover mode).
+	// 
+	// If you set it to something like 0.5, then something [weird happens](https://streamable.com/p6wmr), you end up in some 50% hover mode, 50% not hover mode.
+	// 
+	// This doesn't need to be called every tick, just once and the vehicle will transform to that state at the usual transform speed. It'll just stop transforming when it reaches the state you provided.
+	// 
+	// Once this native is used then players will just be able to hit the vehicle transform key to toggle the transformation cycle; it won't block users from using the key.
 	static void _SET_VEHICLE_HOVER_TRANSFORM_PERCENTAGE(Vehicle vehicle, float percentage) { invoke<Void>(0x438B3D7CA026FE91, vehicle, percentage); } // 0x438B3D7CA026FE91 b1290
-	static void _SET_VEHICLE_HOVER_TRANSFORM_ENABLED(Any p0, Any p1) { invoke<Void>(0xF1211889DF15A763, p0, p1); } // 0xF1211889DF15A763 b1290
+	// It will override the ability to transform deluxo. For oppressor it will work just like 0x2D55FE374D5FDB91
+	static void _SET_VEHICLE_HOVER_TRANSFORM_ENABLED(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xF1211889DF15A763, vehicle, toggle); } // 0xF1211889DF15A763 b1290
+	// Disables "wings" for some flying vehicles. Works only for oppressor _2_ and deluxo.
+	// For deluxo it just immediately removes vehicle's "wings" and you will be not able to fly up.
+	// For oppressor 2 it will remove wings right after you land. And you will not able to fly up anymore too.
+	// But for opressor 2 you still can fly if you somehow get back in the air.
 	static void _SET_VEHICLE_HOVER_TRANSFORM_ACTIVE(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x2D55FE374D5FDB91, vehicle, toggle); } // 0x2D55FE374D5FDB91 b1290
 	static Any _0x3A9128352EAC9E85(Any p0) { return invoke<Any>(0x3A9128352EAC9E85, p0); } // 0x3A9128352EAC9E85 b1290
-	static Any _0x8DC9675797123522(Any p0) { return invoke<Any>(0x8DC9675797123522, p0); } // 0x8DC9675797123522 b1290
-	static void _0xB251E0B33E58B424(Any p0, Any p1, Any p2) { invoke<Void>(0xB251E0B33E58B424, p0, p1, p2); } // 0xB251E0B33E58B424 b1290
-	static Any _0xAEF12960FA943792(Any p0) { return invoke<Any>(0xAEF12960FA943792, p0); } // 0xAEF12960FA943792 b1290
-	static void _0xAA653AE61924B0A0(Any p0, Any p1) { invoke<Void>(0xAA653AE61924B0A0, p0, p1); } // 0xAA653AE61924B0A0 b1290
-	static void _0xC60060EB0D8AC7B1(Any p0, Any p1, Any p2) { invoke<Void>(0xC60060EB0D8AC7B1, p0, p1, p2); } // 0xC60060EB0D8AC7B1 b1290
+	// Native is significantly more complicated than simply generating a random vector & length.
+	// The 'point' is either 400.0 or 250.0 units away from the Ped's current coordinates; and paths into functions like rage::grcViewport___IsSphereVisible
+	static Vector3 _FIND_RANDOM_POINT_IN_SPACE(Ped ped) { return invoke<Vector3>(0x8DC9675797123522, ped); } // 0x8DC9675797123522 b1290
+	// Only used with the "akula" and "annihilator2" in the decompiled native scripts.
+	static void _SET_DEPLOY_HELI_STUB_WINGS(Vehicle vehicle, BOOL deploy, BOOL p2) { invoke<Void>(0xB251E0B33E58B424, vehicle, deploy, p2); } // 0xB251E0B33E58B424 b1290
+	// Only used with the "akula" and "annihilator2" in the decompiled native scripts.
+	static BOOL _ARE_HELI_STUB_WINGS_DEPLOYED(Vehicle vehicle) { return invoke<BOOL>(0xAEF12960FA943792, vehicle); } // 0xAEF12960FA943792 b1290
+	// Sets some vehicle value
+	// _SET_VEHICLE_?
+	static void _0xAA653AE61924B0A0(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xAA653AE61924B0A0, vehicle, toggle); } // 0xAA653AE61924B0A0 b1290
+	// Toggles specific flag on turret
+	static void _SET_VEHICLE_TURRET_UNK(Vehicle vehicle, int index, BOOL toggle) { invoke<Void>(0xC60060EB0D8AC7B1, vehicle, index, toggle); } // 0xC60060EB0D8AC7B1 b1290
 	static void _SET_SPECIALFLIGHT_WING_RATIO(Vehicle vehicle, float ratio) { invoke<Void>(0x70A252F60A3E036B, vehicle, ratio); } // 0x70A252F60A3E036B b1365
-	static void _0xE615BB7A7752C76A(Any p0, Any p1) { invoke<Void>(0xE615BB7A7752C76A, p0, p1); } // 0xE615BB7A7752C76A b1365
-	static void _0x887FA38787DE8C72(Any p0) { invoke<Void>(0x887FA38787DE8C72, p0); } // 0x887FA38787DE8C72 b1365
+	// Disables turret movement when called in a loop. You can still fire and aim. You cannot shoot backwards though.
+	static void _SET_DISABLE_TURRET_MOVEMENT_THIS_FRAME(Vehicle vehicle, int turretId) { invoke<Void>(0xE615BB7A7752C76A, vehicle, turretId); } // 0xE615BB7A7752C76A b1365
+	// Sets some vehicle value to 1
+	// SET_VEHICLE_??
+	static void _0x887FA38787DE8C72(Vehicle vehicle) { invoke<Void>(0x887FA38787DE8C72, vehicle); } // 0x887FA38787DE8C72 b1365
 	static void _SET_UNK_FLOAT_0x104_FOR_SUBMARINE_VEHICLE_TASK(Vehicle vehicle, float value) { invoke<Void>(0x498218259FB7C72D, vehicle, value); } // 0x498218259FB7C72D b1365
 	static void _SET_UNK_BOOL_0x102_FOR_SUBMARINE_VEHICLE_TASK(Vehicle vehicle, BOOL value) { invoke<Void>(0x41B9FB92EDED32A6, vehicle, value); } // 0x41B9FB92EDED32A6 b1365
 	// Does nothing. It's a nullsub.
@@ -14836,18 +16170,91 @@ namespace VEHICLE {
 	// Returns last vehicle that was rammed by the given vehicle using the shunt boost.
 	static Vehicle _GET_LAST_RAMMED_VEHICLE(Vehicle vehicle) { return invoke<Vehicle>(0x04F2FA6E234162F7, vehicle); } // 0x04F2FA6E234162F7 b1604
 	static void _SET_DISABLE_VEHICLE_UNK(BOOL toggle) { invoke<Void>(0x143921E45EC44D62, toggle); } // 0x143921E45EC44D62 b1604
-	static void _SET_VEHICLE_NITRO_ENABLED(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xC8E9B6B71B8E660D, vehicle, toggle); } // 0xC8E9B6B71B8E660D b1604
+	static void _SET_VEHICLE_NITRO_ENABLED(Vehicle vehicle, BOOL toggle, float level, float power, float rechargeTime, BOOL disableSound) { invoke<Void>(0xC8E9B6B71B8E660D, vehicle, toggle, level, power, rechargeTime, disableSound); } // 0xC8E9B6B71B8E660D b1604
 	static void _SET_VEHICLE_WHEELS_DEAL_DAMAGE(Vehicle vehicle, BOOL toggle) { invoke<Void>(0x2970EAA18FD5E42F, vehicle, toggle); } // 0x2970EAA18FD5E42F b1604
+	// Sets some global vehicle related bool
 	static void _SET_DISABLE_VEHICLE_UNK_2(BOOL toggle) { invoke<Void>(0x211E95CE9903940C, toggle); } // 0x211E95CE9903940C b1604
 	static void _0x5BBCF35BF6E456F7(BOOL toggle) { invoke<Void>(0x5BBCF35BF6E456F7, toggle); } // 0x5BBCF35BF6E456F7 b1604
 	static BOOL _GET_DOES_VEHICLE_HAVE_TOMBSTONE(Vehicle vehicle) { return invoke<BOOL>(0x71AFB258CCED3A27, vehicle); } // 0x71AFB258CCED3A27 b1604
+	// Disables detachable bumber from domnator4, dominator5, dominator6, see https://gfycat.com/SecondUnluckyGosling
 	static void _HIDE_VEHICLE_TOMBSTONE(Vehicle vehicle, BOOL toggle) { invoke<Void>(0xAE71FB656C600587, vehicle, toggle); } // 0xAE71FB656C600587 b1604
 	// Returns whether this vehicle is currently disabled by an EMP mine.
 	static BOOL _GET_IS_VEHICLE_EMP_DISABLED(Vehicle vehicle) { return invoke<BOOL>(0x0506ED94363AD905, vehicle); } // 0x0506ED94363AD905 b1604
 	static void _0x8F0D5BA1C2CC91D7(BOOL toggle) { invoke<Void>(0x8F0D5BA1C2CC91D7, toggle); } // 0x8F0D5BA1C2CC91D7 b1604
+	// Usable wheels:
+	// 0: wheel_lf
+	// 1: wheel_rf
+	// 2: wheel_lm1
+	// 3: wheel_rm1
+	// 4: wheel_lr
+	// 5: wheel_rr
+	static float _GET_TYRE_HEALTH(Vehicle vehicle, int wheelIndex) { return invoke<float>(0x55EAB010FAEE9380, vehicle, wheelIndex); } // 0x55EAB010FAEE9380 b1868
+	// _SET_TYRE_WEAR_MULTIPLIER must be active, otherwise values set to <1000.0f will default to 350.0f
+	// 
+	// Usable wheels:
+	// 0: wheel_lf
+	// 1: wheel_rf
+	// 2: wheel_lm1
+	// 3: wheel_rm1
+	// 4: wheel_lr
+	// 5: wheel_rr
+	static void _SET_TYRE_HEALTH(Vehicle vehicle, int wheelIndex, float health) { invoke<Void>(0x74C68EF97645E79D, vehicle, wheelIndex, health); } // 0x74C68EF97645E79D b1868
+	// Returns the multiplier value from _SET_TYRE_WEAR_MULTIPLIER
+	// 
+	// Usable wheels:
+	// 0: wheel_lf
+	// 1: wheel_rf
+	// 2: wheel_lm1
+	// 3: wheel_rm1
+	// 4: wheel_lr
+	// 5: wheel_rr
+	static float _GET_TYRE_WEAR_MULTIPLIER(Vehicle vehicle, int wheelIndex) { return invoke<float>(0x6E387895952F4F71, vehicle, wheelIndex); } // 0x6E387895952F4F71 b2060
+	// Needs to be run for tire wear to work. Multiplier affects the downforce and how fast the tires will wear out, higher values essentially make the vehicle slower on straights and its tires will wear down quicker when cornering. Value must be >0f.
+	// Default value in Rockstar's Open Wheel Race JSON's ("owrtws", "owrtwm", "owrtwh") is 1.0
+	// 
+	// Usable wheels:
+	// 0: wheel_lf
+	// 1: wheel_rf
+	// 2: wheel_lm1
+	// 3: wheel_rm1
+	// 4: wheel_lr
+	// 5: wheel_rr
+	static void _SET_TYRE_WEAR_MULTIPLIER(Vehicle vehicle, int wheelIndex, float multiplier) { invoke<Void>(0x01894E2EDE923CA2, vehicle, wheelIndex, multiplier); } // 0x01894E2EDE923CA2 b1868
+	// Controls how fast the tires wear out.
+	// 
+	// Default values from Rockstar's Open Wheel Race JSON's:
+	// "owrtss" (Soft): 2.2
+	// "owrtsm" (Medium): 1.7
+	// "owrtsh" (Hard): 1.2
+	// 
+	// Usable wheels:
+	// 0: wheel_lf
+	// 1: wheel_rf
+	// 2: wheel_lm1
+	// 3: wheel_rm1
+	// 4: wheel_lr
+	// 5: wheel_rr
+	static void _SET_TYRE_SOFTNESS_MULTIPLIER(Vehicle vehicle, int wheelIndex, float multiplier) { invoke<Void>(0x392183BB9EA57697, vehicle, wheelIndex, multiplier); } // 0x392183BB9EA57697 b2060
+	// Controls how much traction the wheel loses.
+	// 
+	// Default values from Rockstar's Open Wheel Race JSON's:
+	// "owrtds" (Soft): 0.05
+	// "owrtdm" (Medium): 0.45
+	// "owrtdh" (Hard): 0.8
+	// 
+	// Usable wheels:
+	// 0: wheel_lf
+	// 1: wheel_rf
+	// 2: wheel_lm1
+	// 3: wheel_rm1
+	// 4: wheel_lr
+	// 5: wheel_rr
+	static void _SET_TYRE_TRACTION_LOSS_MULTIPLIER(Vehicle vehicle, int wheelIndex, float multiplier) { invoke<Void>(0xC970D0E0FC31D768, vehicle, wheelIndex, multiplier); } // 0xC970D0E0FC31D768 b2060
+	static void _0xF8B49F5BA7F850E7(Vehicle vehicle, int p1) { invoke<Void>(0xF8B49F5BA7F850E7, vehicle, p1); } // 0xF8B49F5BA7F850E7 b2060
 }
 
-namespace WATER {
+namespace WATER
+{
 	// This function set height to the value of z-axis of the water surface.
 	// 
 	// This function works with sea and lake. However it does not work with shallow rivers (e.g. raton canyon will return -100000.0f)
@@ -14878,7 +16285,8 @@ namespace WATER {
 	static void RESET_DEEP_OCEAN_SCALER() { invoke<Void>(0x5E5E99285AE812DB); } // 0x5E5E99285AE812DB 0x4AD23212 b323
 }
 
-namespace WEAPON {
+namespace WEAPON
+{
 	// Enables laser sight on any weapon.
 	// 
 	// It doesn't work. Neither on tick nor OnKeyDown
@@ -14896,7 +16304,7 @@ namespace WEAPON {
 	static int _GET_WEAPON_COMPONENT_VARIANT_EXTRA_COMPONENT_COUNT(Hash componentHash) { return invoke<int>(0x6558AC7C17BFEF58, componentHash); } // 0x6558AC7C17BFEF58 b372
 	// Returns the model hash of the extra component at specified index.
 	static Hash _GET_WEAPON_COMPONENT_VARIANT_EXTRA_COMPONENT_MODEL(Hash componentHash, int extraComponentIndex) { return invoke<Hash>(0x4D1CB8DC40208A17, componentHash, extraComponentIndex); } // 0x4D1CB8DC40208A17 b372
-	static void SET_CURRENT_PED_WEAPON(Ped ped, Hash weaponHash, BOOL equipNow) { invoke<Void>(0xADF692B254977C0C, ped, weaponHash, equipNow); } // 0xADF692B254977C0C 0xB8278882 b323
+	static void SET_CURRENT_PED_WEAPON(Ped ped, Hash weaponHash, BOOL bForceInHand) { invoke<Void>(0xADF692B254977C0C, ped, weaponHash, bForceInHand); } // 0xADF692B254977C0C 0xB8278882 b323
 	// The return value seems to indicate returns true if the hash of the weapon object weapon equals the weapon hash.
 	// p2 seems to be 1 most of the time.
 	// 
@@ -14909,7 +16317,7 @@ namespace WEAPON {
 	// disassembly said that?
 	// 
 	static BOOL GET_CURRENT_PED_WEAPON(Ped ped, Hash* weaponHash, BOOL p2) { return invoke<BOOL>(0x3A87E44BB9A01D54, ped, weaponHash, p2); } // 0x3A87E44BB9A01D54 0xB0237302 b323
-	static Entity GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Ped ped) { return invoke<Entity>(0x3B390A939AF0B5FC, ped); } // 0x3B390A939AF0B5FC 0x5D73CD20 b323
+	static Entity GET_CURRENT_PED_WEAPON_ENTITY_INDEX(Ped ped, Any p1) { return invoke<Entity>(0x3B390A939AF0B5FC, ped, p1); } // 0x3B390A939AF0B5FC 0x5D73CD20 b323
 	// p1 is always 0 in the scripts.
 	static Hash GET_BEST_PED_WEAPON(Ped ped, BOOL p1) { return invoke<Hash>(0x8483E98E8B888AE2, ped, p1); } // 0x8483E98E8B888AE2 0xB998D444 b323
 	static BOOL SET_CURRENT_PED_VEHICLE_WEAPON(Ped ped, Hash weaponHash) { return invoke<BOOL>(0x75C55983C2C39DAA, ped, weaponHash); } // 0x75C55983C2C39DAA 0x8E6F2AF1 b323
@@ -14927,9 +16335,14 @@ namespace WEAPON {
 	static BOOL GET_CURRENT_PED_VEHICLE_WEAPON(Ped ped, Hash* weaponHash) { return invoke<BOOL>(0x1017582BCD3832DC, ped, weaponHash); } // 0x1017582BCD3832DC 0xF26C5D65 b323
 	// SET_PED_*
 	static void _0x50276EF8172F5F12(Ped ped) { invoke<Void>(0x50276EF8172F5F12, ped); } // 0x50276EF8172F5F12 b1734
-	// p1 is anywhere from 4 to 7 in the scripts. Might be a weapon wheel group?
+	// Checks if the ped is currently equipped with a weapon matching a bit specified using a bitwise-or in typeFlags.
 	// 
-	// ^It's kinda like that. 
+	// Type flag bit values:
+	// 1 = Melee weapons
+	// 2 = Explosive weapons
+	// 4 = Any other weapons
+	// 
+	// Not specifying any bit will lead to the native *always* returning 'false', and for example specifying '4 | 2' will check for any weapon except fists and melee weapons.
 	// 7 returns true if you are equipped with any weapon except your fists.
 	// 6 returns true if you are equipped with any weapon except melee weapons.
 	// 5 returns true if you are equipped with any weapon except the Explosives weapon group.
@@ -14940,7 +16353,7 @@ namespace WEAPON {
 	// 0 never returns true.
 	// 
 	// Note: When I say "Explosives weapon group", it does not include the Jerry can and Fire Extinguisher.
-	static BOOL IS_PED_ARMED(Ped ped, int p1) { return invoke<BOOL>(0x475768A975D5AD17, ped, p1); } // 0x475768A975D5AD17 0x0BFC892C b323
+	static BOOL IS_PED_ARMED(Ped ped, int typeFlags) { return invoke<BOOL>(0x475768A975D5AD17, ped, typeFlags); } // 0x475768A975D5AD17 0x0BFC892C b323
 	static BOOL IS_WEAPON_VALID(Hash weaponHash) { return invoke<BOOL>(0x937C71165CF334B3, weaponHash); } // 0x937C71165CF334B3 0x38CA2954 b323
 	// p2 should be FALSE, otherwise it seems to always return FALSE
 	// 
@@ -14960,40 +16373,12 @@ namespace WEAPON {
 	static void SET_PED_AMMO(Ped ped, Hash weaponHash, int ammo, BOOL p3) { invoke<Void>(0x14E56BC5B5DB6A19, ped, weaponHash, ammo, p3); } // 0x14E56BC5B5DB6A19 0xBF90DF1A b323
 	static void SET_PED_INFINITE_AMMO(Ped ped, BOOL toggle, Hash weaponHash) { invoke<Void>(0x3EDCB0505123623B, ped, toggle, weaponHash); } // 0x3EDCB0505123623B 0x9CB8D278 b323
 	static void SET_PED_INFINITE_AMMO_CLIP(Ped ped, BOOL toggle) { invoke<Void>(0x183DADC6AA953186, ped, toggle); } // 0x183DADC6AA953186 0x5A5E3B67 b323
-	// isHidden - ????
-	// 
-	// All weapon names (add to the list if something is missing), use MISC::GET_HASH_KEY((char *)weaponNames[i]) to get get the hash:
-	// 
-	// static LPCSTR weaponNames[] = {
-	//  "WEAPON_KNIFE", "WEAPON_NIGHTSTICK", "WEAPON_HAMMER", "WEAPON_BAT", "WEAPON_GOLFCLUB",
-	//   "WEAPON_CROWBAR", "WEAPON_PISTOL", "WEAPON_COMBATPISTOL", "WEAPON_APPISTOL", "WEAPON_PISTOL50",
-	//  "WEAPON_MICROSMG", "WEAPON_SMG", "WEAPON_ASSAULTSMG", "WEAPON_ASSAULTRIFLE",
-	//   "WEAPON_CARBINERIFLE", "WEAPON_ADVANCEDRIFLE", "WEAPON_MG", "WEAPON_COMBATMG", "WEAPON_PUMPSHOTGUN",
-	//     "WEAPON_SAWNOFFSHOTGUN", "WEAPON_ASSAULTSHOTGUN", "WEAPON_BULLPUPSHOTGUN", "WEAPON_STUNGUN", "WEAPON_SNIPERRIFLE",
-	//   "WEAPON_HEAVYSNIPER", "WEAPON_GRENADELAUNCHER", "WEAPON_GRENADELAUNCHER_SMOKE", "WEAPON_RPG", "WEAPON_MINIGUN",
-	//  "WEAPON_GRENADE", "WEAPON_STICKYBOMB", "WEAPON_SMOKEGRENADE", "WEAPON_BZGAS", "WEAPON_MOLOTOV",
-	//  "WEAPON_FIREEXTINGUISHER", "WEAPON_PETROLCAN", "WEAPON_FLARE", "WEAPON_SNSPISTOL", "WEAPON_SPECIALCARBINE",
-	//  "WEAPON_HEAVYPISTOL", "WEAPON_BULLPUPRIFLE", "WEAPON_HOMINGLAUNCHER", "WEAPON_PROXMINE", "WEAPON_SNOWBALL",
-	//  "WEAPON_VINTAGEPISTOL", "WEAPON_DAGGER", "WEAPON_FIREWORK", "WEAPON_MUSKET", "WEAPON_MARKSMANRIFLE",
-	//     "WEAPON_HEAVYSHOTGUN", "WEAPON_GUSENBERG", "WEAPON_HATCHET", "WEAPON_RAILGUN", "WEAPON_COMBATPDW",
-	//   "WEAPON_KNUCKLE", "WEAPON_MARKSMANPISTOL", "WEAPON_FLASHLIGHT", "WEAPON_MACHETE", "WEAPON_MACHINEPISTOL",
-	//    "WEAPON_SWITCHBLADE", "WEAPON_REVOLVER", "WEAPON_COMPACTRIFLE", "WEAPON_DBSHOTGUN", "WEAPON_FLAREGUN",
-	//   "WEAPON_AUTOSHOTGUN", "WEAPON_BATTLEAXE", "WEAPON_COMPACTLAUNCHER", "WEAPON_MINISMG", "WEAPON_PIPEBOMB",
-	//     "WEAPON_POOLCUE", "WEAPON_SWEEPER", "WEAPON_WRENCH"
-	// };
-	// ----------------------------------------------------------------------------------------------------------------------------------------
-	// Translation table:
-	// pastebin.com/a39K8Nz8
-	static void GIVE_WEAPON_TO_PED(Ped ped, Hash weaponHash, int ammoCount, BOOL isHidden, BOOL equipNow) { invoke<Void>(0xBF0FD6E56C964FCB, ped, weaponHash, ammoCount, isHidden, equipNow); } // 0xBF0FD6E56C964FCB 0xC4D88A85 b323
+	static void _0x24C024BA8379A70A(Any p0, Any p1) { invoke<Void>(0x24C024BA8379A70A, p0, p1); } // 0x24C024BA8379A70A b1868
+	static void GIVE_WEAPON_TO_PED(Ped ped, Hash weaponHash, int ammoCount, BOOL isHidden, BOOL bForceInHand) { invoke<Void>(0xBF0FD6E56C964FCB, ped, weaponHash, ammoCount, isHidden, bForceInHand); } // 0xBF0FD6E56C964FCB 0xC4D88A85 b323
 	// Gives a weapon to PED with a delay, example:
 	// 
 	// WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PED::PLAYER_PED_ID(), MISC::GET_HASH_KEY("WEAPON_PISTOL"), 1000, false)
-	// ----------------------------------------------------------------------------------------------------------------------------------------
-	// Translation table:
-	// pastebin.com/a39K8Nz8
-	// 
-	// 
-	static void GIVE_DELAYED_WEAPON_TO_PED(Ped ped, Hash weaponHash, int ammoCount, BOOL equipNow) { invoke<Void>(0xB282DC6EBD803C75, ped, weaponHash, ammoCount, equipNow); } // 0xB282DC6EBD803C75 0x5868D20D b323
+	static void GIVE_DELAYED_WEAPON_TO_PED(Ped ped, Hash weaponHash, int ammoCount, BOOL bForceInHand) { invoke<Void>(0xB282DC6EBD803C75, ped, weaponHash, ammoCount, bForceInHand); } // 0xB282DC6EBD803C75 0x5868D20D b323
 	// setting the last params to false it does that same so I would suggest its not a toggle
 	static void REMOVE_ALL_PED_WEAPONS(Ped ped, BOOL p1) { invoke<Void>(0xF25DF915FA38C5F3, ped, p1); } // 0xF25DF915FA38C5F3 0xA44CE817 b323
 	// This native removes a specified weapon from your selected ped.
@@ -15019,10 +16404,11 @@ namespace WEAPON {
 	// If you want to define any melee weapon, second parameter=0, third parameter=1.
 	// If you want to identify any weapon (firearms, melee, rockets, etc.), second parameter=0, third parameter=2.
 	static BOOL HAS_PED_BEEN_DAMAGED_BY_WEAPON(Ped ped, Hash weaponHash, int weaponType) { return invoke<BOOL>(0x2D343D2219CD027A, ped, weaponHash, weaponType); } // 0x2D343D2219CD027A 0xCDFBBCC6 b323
+	// Does NOT seem to work with HAS_PED_BEEN_DAMAGED_BY_WEAPON. Use CLEAR_ENTITY_LAST_WEAPON_DAMAGE and HAS_ENTITY_BEEN_DAMAGED_BY_WEAPON instead.
 	static void CLEAR_PED_LAST_WEAPON_DAMAGE(Ped ped) { invoke<Void>(0x0E98F88A24C5F4B8, ped); } // 0x0E98F88A24C5F4B8 0x52C68832 b323
 	// It determines what weapons caused damage:
 	// 
-	// If youu want to define only a specific weapon, second parameter=weapon hash code, third parameter=0
+	// If you want to define only a specific weapon, second parameter=weapon hash code, third parameter=0
 	// If you want to define any melee weapon, second parameter=0, third parameter=1.
 	// If you want to identify any weapon (firearms, melee, rockets, etc.), second parameter=0, third parameter=2.
 	static BOOL HAS_ENTITY_BEEN_DAMAGED_BY_WEAPON(Entity entity, Hash weaponHash, int weaponType) { return invoke<BOOL>(0x131D401334815E94, entity, weaponHash, weaponType); } // 0x131D401334815E94 0x6DAABB39 b323
@@ -15034,7 +16420,7 @@ namespace WEAPON {
 	static BOOL GET_AMMO_IN_CLIP(Ped ped, Hash weaponHash, int* ammo) { return invoke<BOOL>(0x2E1202248937775C, ped, weaponHash, ammo); } // 0x2E1202248937775C 0x73C100C3 b323
 	static BOOL SET_AMMO_IN_CLIP(Ped ped, Hash weaponHash, int ammo) { return invoke<BOOL>(0xDCD2A934D65CB497, ped, weaponHash, ammo); } // 0xDCD2A934D65CB497 0xA54B0B10 b323
 	static BOOL GET_MAX_AMMO(Ped ped, Hash weaponHash, int* ammo) { return invoke<BOOL>(0xDC16122C7A20C933, ped, weaponHash, ammo); } // 0xDC16122C7A20C933 0x0B294796 b323
-	// Ammo types: https://gist.github.com/root-cause/faf41f59f7a6d818b7db0b839bd147c1
+	// Returns the max ammo for an ammo type. Ammo types: https://gist.github.com/root-cause/faf41f59f7a6d818b7db0b839bd147c1
 	static BOOL _GET_MAX_AMMO_BY_TYPE(Ped ped, Hash ammoTypeHash, int* ammo) { return invoke<BOOL>(0x585847C5E4E11709, ped, ammoTypeHash, ammo); } // 0x585847C5E4E11709 b1103
 	// Ammo types: https://gist.github.com/root-cause/faf41f59f7a6d818b7db0b839bd147c1
 	static void _ADD_AMMO_TO_PED_BY_TYPE(Ped ped, Hash ammoTypeHash, int ammo) { invoke<Void>(0x2472622CE1F2D45F, ped, ammoTypeHash, ammo); } // 0x2472622CE1F2D45F b1103
@@ -15042,7 +16428,7 @@ namespace WEAPON {
 	static void SET_PED_AMMO_BY_TYPE(Ped ped, Hash ammoTypeHash, int ammo) { invoke<Void>(0x5FD1E1F011E76D7E, ped, ammoTypeHash, ammo); } // 0x5FD1E1F011E76D7E 0x311C52BB b323
 	static int GET_PED_AMMO_BY_TYPE(Ped ped, Hash ammoTypeHash) { return invoke<int>(0x39D22031557946C1, ped, ammoTypeHash); } // 0x39D22031557946C1 0x54077C4D b323
 	static void SET_PED_AMMO_TO_DROP(Ped ped, int p1) { invoke<Void>(0xA4EFEF9440A5B0EF, ped, p1); } // 0xA4EFEF9440A5B0EF 0x2386A307 b323
-	static void _0xE620FD3512A04F18(float p0) { invoke<Void>(0xE620FD3512A04F18, p0); } // 0xE620FD3512A04F18 0xD6460EA2 b323
+	static void SET_PICKUP_AMMO_AMOUNT_SCALER(float p0) { invoke<Void>(0xE620FD3512A04F18, p0); } // 0xE620FD3512A04F18 0xD6460EA2 b323
 	// Returns the current ammo type of the specified ped's specified weapon.
 	// MkII magazines will change the return value, like Pistol MkII returning AMMO_PISTOL without any components and returning AMMO_PISTOL_TRACER after Tracer Rounds component is attached.
 	// Use 0xF489B44DD5AF4BD9 if you always want AMMO_PISTOL.
@@ -15075,8 +16461,8 @@ namespace WEAPON {
 	static Hash GET_SELECTED_PED_WEAPON(Ped ped) { return invoke<Hash>(0x0A6DB4965674D243, ped); } // 0x0A6DB4965674D243 0xD240123E b323
 	//              WEAPON::EXPLODE_PROJECTILES(PLAYER::PLAYER_PED_ID(), func_221(0x00000003), 0x00000001);
 	static void EXPLODE_PROJECTILES(Ped ped, Hash weaponHash, BOOL p2) { invoke<Void>(0xFC4BD125DE7611E4, ped, weaponHash, p2); } // 0xFC4BD125DE7611E4 0x35A0B955 b323
-	// p1 seems always to be 0
-	static void REMOVE_ALL_PROJECTILES_OF_TYPE(Hash weaponHash, BOOL p1) { invoke<Void>(0xFC52E0F37E446528, weaponHash, p1); } // 0xFC52E0F37E446528 0xA5F89919 b323
+	// If `explode` true, then removal is done through exploding the projectile. Basically the same as EXPLODE_PROJECTILES but without defining the owner ped.
+	static void REMOVE_ALL_PROJECTILES_OF_TYPE(Hash weaponHash, BOOL explode) { invoke<Void>(0xFC52E0F37E446528, weaponHash, explode); } // 0xFC52E0F37E446528 0xA5F89919 b323
 	static float GET_LOCKON_DISTANCE_OF_CURRENT_PED_WEAPON(Ped ped) { return invoke<float>(0x840F03E9041E2C9C, ped); } // 0x840F03E9041E2C9C 0x3612110D b323
 	static float GET_MAX_RANGE_OF_CURRENT_PED_WEAPON(Ped ped) { return invoke<float>(0x814C9D19DFD69679, ped); } // 0x814C9D19DFD69679 0xB2B2BBAA b323
 	// Third Parameter = unsure, but pretty sure it is weapon hash
@@ -15088,14 +16474,9 @@ namespace WEAPON {
 	static void REMOVE_WEAPON_COMPONENT_FROM_PED(Ped ped, Hash weaponHash, Hash componentHash) { invoke<Void>(0x1E8BE90C74FB4C09, ped, weaponHash, componentHash); } // 0x1E8BE90C74FB4C09 0x412AA00D b323
 	static BOOL HAS_PED_GOT_WEAPON_COMPONENT(Ped ped, Hash weaponHash, Hash componentHash) { return invoke<BOOL>(0xC593212475FAE340, ped, weaponHash, componentHash); } // 0xC593212475FAE340 0xDC0FC145 b323
 	static BOOL IS_PED_WEAPON_COMPONENT_ACTIVE(Ped ped, Hash weaponHash, Hash componentHash) { return invoke<BOOL>(0x0D78DE0572D3969E, ped, weaponHash, componentHash); } // 0x0D78DE0572D3969E 0x7565FB19 b323
-	// [23.03.2017 19:08] by ins1de :
-	// 
-	// "_IS_PED_RELOADING" is totally a wrong name...
-	// 
-	// This native actually disables the reloading animation and script for the specified ped. Native renamed.
-	// 
-	// R*
-	static BOOL _PED_SKIP_NEXT_RELOADING(Ped ped) { return invoke<BOOL>(0x8C0D57EA686FAD87, ped); } // 0x8C0D57EA686FAD87 0x82EEAF0F b323
+	// Old name: _PED_SKIP_NEXT_RELOADING
+	static BOOL REFILL_AMMO_INSTANTLY(Ped ped) { return invoke<BOOL>(0x8C0D57EA686FAD87, ped); } // 0x8C0D57EA686FAD87 0x82EEAF0F b323
+	// Forces a ped to reload only if they are able to; if they have a full magazine, they will not reload.
 	static BOOL MAKE_PED_RELOAD(Ped ped) { return invoke<BOOL>(0x20AE33F3AC9C0033, ped); } // 0x20AE33F3AC9C0033 0x515292C2 b323
 	// Nearly every instance of p1 I found was 31. Nearly every instance of p2 I found was 0.
 	// 
@@ -15104,7 +16485,7 @@ namespace WEAPON {
 	static BOOL HAS_WEAPON_ASSET_LOADED(Hash weaponHash) { return invoke<BOOL>(0x36E353271F0E90EE, weaponHash); } // 0x36E353271F0E90EE 0x1891D5BB b323
 	static void REMOVE_WEAPON_ASSET(Hash weaponHash) { invoke<Void>(0xAA08EF13F341C8FC, weaponHash); } // 0xAA08EF13F341C8FC 0x2C0DFE3C b323
 	// Now has 8 params.
-	static Object CREATE_WEAPON_OBJECT(Hash weaponHash, int ammoCount, float x, float y, float z, BOOL showWorldModel, float heading, Any p7, Any p8, Any p9) { return invoke<Object>(0x9541D3CF0D398F36, weaponHash, ammoCount, x, y, z, showWorldModel, heading, p7, p8, p9); } // 0x9541D3CF0D398F36 0x62F5987F b323
+	static Object CREATE_WEAPON_OBJECT(Hash weaponHash, int ammoCount, float x, float y, float z, BOOL showWorldModel, float scale, Any p7, Any p8, Any p9) { return invoke<Object>(0x9541D3CF0D398F36, weaponHash, ammoCount, x, y, z, showWorldModel, scale, p7, p8, p9); } // 0x9541D3CF0D398F36 0x62F5987F b323
 	// addonHash:
 	// (use WEAPON::GET_WEAPON_COMPONENT_TYPE_MODEL() to get hash value)
 	// ${component_at_ar_flsh}, ${component_at_ar_supp}, ${component_at_pi_flsh}, ${component_at_scope_large}, ${component_at_ar_supp_02}
@@ -15232,6 +16613,7 @@ namespace WEAPON {
 	// }
 	static BOOL GET_WEAPON_HUD_STATS(Hash weaponHash, Any* outData) { return invoke<BOOL>(0xD92C739EE34C9EBA, weaponHash, outData); } // 0xD92C739EE34C9EBA 0xA9AD3D98 b323
 	static BOOL GET_WEAPON_COMPONENT_HUD_STATS(Hash componentHash, int* outData) { return invoke<BOOL>(0xB3CAF387AE12E9F8, componentHash, outData); } // 0xB3CAF387AE12E9F8 0xBB5498F4 b323
+	// This native does not return damages of weapons from the melee and explosive group.
 	static float GET_WEAPON_DAMAGE(Hash weaponHash, Hash componentHash) { return invoke<float>(0x3133B907D8B32053, weaponHash, componentHash); } // 0x3133B907D8B32053 0xE81649C0 b323
 	// // Returns the size of the default weapon component clip.
 	// 
@@ -15255,13 +16637,16 @@ namespace WEAPON {
 	// Returns handle of the projectile.
 	static Object SET_PED_SHOOT_ORDNANCE_WEAPON(Ped ped, float p1) { return invoke<Object>(0xB4C8D77C80C0421E, ped, p1); } // 0xB4C8D77C80C0421E 0xEC2E5304 b323
 	static void REQUEST_WEAPON_HIGH_DETAIL_MODEL(Entity weaponObject) { invoke<Void>(0x48164DBB970AC3F0, weaponObject); } // 0x48164DBB970AC3F0 0xE3BD00F9 b323
-	static void _SET_WEAPON_DAMAGE_MODIFIER(Hash weaponHash, float damageAmount) { invoke<Void>(0x4757F00BC6323CFE, weaponHash, damageAmount); } // 0x4757F00BC6323CFE b505
+	// Changes the weapon damage output by the given multiplier value. Must be run every frame.
+	static void _SET_WEAPON_DAMAGE_MODIFIER_THIS_FRAME(Hash weaponHash, float damageMultiplier) { invoke<Void>(0x4757F00BC6323CFE, weaponHash, damageMultiplier); } // 0x4757F00BC6323CFE b505
 	// This native returns a true or false value.
 	// 
 	// Ped ped = The ped whose weapon you want to check.
 	static BOOL IS_PED_CURRENT_WEAPON_SILENCED(Ped ped) { return invoke<BOOL>(0x65F0C5AE05943EC7, ped); } // 0x65F0C5AE05943EC7 0xBAF7BFBE b323
 	static BOOL IS_FLASH_LIGHT_ON(Ped ped) { return invoke<BOOL>(0x4B7620C47217126C, ped); } // 0x4B7620C47217126C 0x76876154 b323
 	static Any SET_FLASH_LIGHT_FADE_DISTANCE(float distance) { return invoke<Any>(0xCEA66DAD478CD39B, distance); } // 0xCEA66DAD478CD39B 0xB0127EA7 b323
+	// Enables/disables flashlight on ped's weapon.
+	static void _SET_FLASH_LIGHT_ENABLED(Ped ped, BOOL toggle) { invoke<Void>(0x988DB6FE9B3AC000, ped, toggle); } // 0x988DB6FE9B3AC000 b2060
 	// Changes the selected ped aiming animation style. 
 	// Note : You must use GET_HASH_KEY!
 	// 
@@ -15315,21 +16700,23 @@ namespace WEAPON {
 	static void _0xE4DCEC7FD5B739A5(Ped ped) { invoke<Void>(0xE4DCEC7FD5B739A5, ped); } // 0xE4DCEC7FD5B739A5 0x64646F1D b323
 	// this returns if you can use the weapon while using a parachute
 	static BOOL CAN_USE_WEAPON_ON_PARACHUTE(Hash weaponHash) { return invoke<BOOL>(0xBC7BE5ABC0879F74, weaponHash); } // 0xBC7BE5ABC0879F74 0x135E7AD4 b323
-	static int _CREATE_AIR_DEFENSE_SPHERE(float p0, float p1, float p2, float radius, float p4, float p5, float p6, Hash weaponHash) { return invoke<int>(0x91EF34584710BE99, p0, p1, p2, radius, p4, p5, p6, weaponHash); } // 0x91EF34584710BE99 b573
+	// Both coordinates are from objects in the decompiled scripts. Native related to 0xECDC202B25E5CF48 p1 value. The only weapon hash used in the decompiled scripts is weapon_air_defence_gun. These two natives are used by the yacht script, decompiled scripts suggest it and the weapon hash used (valkyrie's rockets) are also used by yachts.
+	static int _CREATE_AIR_DEFENSE_SPHERE(float x, float y, float z, float radius, float p4, float p5, float p6, Hash weaponHash) { return invoke<int>(0x91EF34584710BE99, x, y, z, radius, p4, p5, p6, weaponHash); } // 0x91EF34584710BE99 b573
 	static int _CREATE_AIR_DEFENSE_AREA(float p0, float p1, float p2, float p3, float p4, float p5, float p6, float p7, float p8, float p9, Hash weaponHash) { return invoke<int>(0x9DA58CDBF6BDBC08, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, weaponHash); } // 0x9DA58CDBF6BDBC08 b1011
 	static BOOL _REMOVE_AIR_DEFENSE_ZONE(int zoneId) { return invoke<BOOL>(0x0ABF535877897560, zoneId); } // 0x0ABF535877897560 b573
 	static void _REMOVE_ALL_AIR_DEFENSE_ZONES() { invoke<Void>(0x1E45B34ADEBEE48E); } // 0x1E45B34ADEBEE48E b573
 	static void _SET_PLAYER_AIR_DEFENSE_ZONE_FLAG(Player player, int zoneId, BOOL enable) { invoke<Void>(0xECDC202B25E5CF48, player, zoneId, enable); } // 0xECDC202B25E5CF48 b573
-	static BOOL _IS_AIR_DEFENSE_ZONE_INSIDE_SPHERE(float x, float y, float z, float radius, int zoneId) { return invoke<BOOL>(0xDAB963831DBFD3F4, x, y, z, radius, zoneId); } // 0xDAB963831DBFD3F4 b1103
+	static BOOL _IS_ANY_AIR_DEFENSE_ZONE_INSIDE_SPHERE(float x, float y, float z, float radius, int* outZoneId) { return invoke<BOOL>(0xDAB963831DBFD3F4, x, y, z, radius, outZoneId); } // 0xDAB963831DBFD3F4 b1103
 	static void _FIRE_AIR_DEFENSE_WEAPON(int zoneId, float x, float y, float z) { invoke<Void>(0x44F1012B69313374, zoneId, x, y, z); } // 0x44F1012B69313374 b573
 	static BOOL _DOES_AIR_DEFENSE_ZONE_EXIST(int zoneId) { return invoke<BOOL>(0xCD79A550999D7D4F, zoneId); } // 0xCD79A550999D7D4F b678
-	// For the player ped this will also gray out the weapon in the weapon wheel.
+	// Disables selecting the given weapon. Ped isn't forced to put the gun away. However you can't reselect the weapon if you holster then unholster. Weapon is also grayed out on the weapon wheel.
 	static void _SET_CAN_PED_EQUIP_WEAPON(Ped ped, Hash weaponHash, BOOL toggle) { invoke<Void>(0xB4771B9AAF4E68E4, ped, weaponHash, toggle); } // 0xB4771B9AAF4E68E4 b1103
-	// Does the same as 0xB4771B9AAF4E68E4 except for all weapons.
+	// Disable all weapons. Does the same as 0xB4771B9AAF4E68E4 except for all weapons.
 	static void _SET_CAN_PED_EQUIP_ALL_WEAPONS(Ped ped, BOOL toggle) { invoke<Void>(0xEFF296097FF1E509, ped, toggle); } // 0xEFF296097FF1E509 b1103
 }
 
-namespace ZONE {
+namespace ZONE
+{
 	static int GET_ZONE_AT_COORDS(float x, float y, float z) { return invoke<int>(0x27040C25DE6CB2F4, x, y, z); } // 0x27040C25DE6CB2F4 0xC9018181 b323
 	// 'zoneName' corresponds to an entry in 'popzone.ipl'.
 	// 
@@ -15423,6 +16810,7 @@ namespace ZONE {
 	// ZP_ORT = Port of South Los Santos
 	// ZQ_UAR = Davis Quartz
 	// 
+	// Full list of zones by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/zones.json
 	static int GET_ZONE_FROM_NAME_ID(const char* zoneName) { return invoke<int>(0x98CD1D2934B76CC1, zoneName); } // 0x98CD1D2934B76CC1 0x8EC68304 b323
 	static int GET_ZONE_POPSCHEDULE(int zoneId) { return invoke<int>(0x4334BC40AA0CB4BB, zoneId); } // 0x4334BC40AA0CB4BB 0x20AB2FC9 b323
 	// AIRP = Los Santos International Airport
@@ -15515,6 +16903,7 @@ namespace ZONE {
 	// ZP_ORT = Port of South Los Santos
 	// ZQ_UAR = Davis Quartz
 	// 
+	// Full list of zones by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/zones.json
 	static const char* GET_NAME_OF_ZONE(float x, float y, float z) { return invoke<const char*>(0xCD90657D4C30E1CA, x, y, z); } // 0xCD90657D4C30E1CA 0x7875CE91 b323
 	static void SET_ZONE_ENABLED(int zoneId, BOOL toggle) { invoke<Void>(0xBA5ECEEA120E5611, zoneId, toggle); } // 0xBA5ECEEA120E5611 0x04E21B03 b323
 	// cellphone range 1- 5 used for signal bar in iFruit phone

@@ -165,7 +165,7 @@ void FPVCam::Update() {
         updateWheelLook(lookingIntoGlass);
     }
     // Mouse look
-    else if (PAD::_IS_INPUT_DISABLED(2) == TRUE) {
+    else if (PAD::_IS_USING_KEYBOARD(2) == TRUE) {
         updateMouseLook(lookingIntoGlass);
     }
     // Controller look

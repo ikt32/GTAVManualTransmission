@@ -51,8 +51,8 @@ SRayResult RayCast(Vehicle vehicle, float range, Vector3 startOffset, Vector3 en
     auto rayOrg = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, startOffset.x, startOffset.y, startOffset.z);
     auto rayEnd = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, endOffset.x, endOffset.y + range, endOffset.z);
 
-    // START_EXPENSIVE_SYNCHRONOUS_SHAPE_TEST_LOS_PROBE or START_SHAPE_TEST_LOS_PROBE
-    int ray = SHAPETEST::_START_SHAPE_TEST_RAY(
+    // or START_SHAPE_TEST_LOS_PROBE
+    int ray = SHAPETEST::START_EXPENSIVE_SYNCHRONOUS_SHAPE_TEST_LOS_PROBE(
         rayOrg.x, rayOrg.y, rayOrg.z,
         rayEnd.x, rayEnd.y, rayEnd.z, 10, vehicle, 7);
 
