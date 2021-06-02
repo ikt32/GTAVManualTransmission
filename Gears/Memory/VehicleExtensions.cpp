@@ -55,7 +55,7 @@ namespace {
     int vehicleModelInfoOffset = 0x020;
     int vehicleFlagsOffset = 0;
 
-    int steeringMultOffset = 0;
+    int wheelSteerMultOffset = 0;
 
     // Wheel stuff
     int wheelHealthOffset = 0;
@@ -249,8 +249,8 @@ void VehicleExtensions::Init() {
 
     addr = mem::FindPattern("\x0F\xBA\xAB\xEC\x01\x00\x00\x09\x0F\x2F\xB3\x40\x01\x00\x00\x48\x8B\x83\x20\x01\x00\x00", 
                             "xx?????xxx???xxxx?????");
-    steeringMultOffset = addr == 0 ? 0 : *(int*)(addr + 11);
-    logger.Write(steeringMultOffset == 0 ? WARN : DEBUG, "Steering Multiplier Offset: 0x%X", steeringMultOffset);
+    wheelSteerMultOffset = addr == 0 ? 0 : *(int*)(addr + 11);
+    logger.Write(wheelSteerMultOffset == 0 ? WARN : DEBUG, "Wheel Steering Multiplier Offset: 0x%X", wheelSteerMultOffset);
 
     addr = mem::FindPattern("\x75\x11\x48\x8b\x01\x8b\x88", "xxxxxxx");
     wheelFlagsOffset = addr == 0 ? 0 : *(int*)(addr + 7);
@@ -754,7 +754,7 @@ float VehicleExtensions::GetSteeringMultiplier(Vehicle handle) {
 
     if (numWheels > 1) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * 1);
-        return abs(*reinterpret_cast<float*>(wheelAddr + steeringMultOffset));
+        return abs(*reinterpret_cast<float*>(wheelAddr + wheelSteerMultOffset));
     }
     return 1.0f;
 }
@@ -765,8 +765,8 @@ void VehicleExtensions::SetSteeringMultiplier(Vehicle handle, float value) {
 
     for (int i = 0; i<numWheels; i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-        float sign = Sign(*reinterpret_cast<float*>(wheelAddr + steeringMultOffset));
-        *reinterpret_cast<float*>(wheelAddr + steeringMultOffset) = value * sign;
+        float sign = Sign(*reinterpret_cast<float*>(wheelAddr + wheelSteerMultOffset));
+        *reinterpret_cast<float*>(wheelAddr + wheelSteerMultOffset) = value * sign;
     }
 }
 
