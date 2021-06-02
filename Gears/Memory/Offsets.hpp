@@ -355,7 +355,7 @@ public:
     char pad_0x0B1C[0x24];                                  // 0x0B1C
     unsigned char btOpenableDoors;                          // 0x0B40
     char pad_0x0B41[0x4B];                                  // 0x0B41
-    float fGravity;                                         // 0x0B8C
+    float fGravity;                                         // 0x0B8C // 0xC5C on b2245
     char pad_0x0B90[0x8];                                   // 0x0B90
     CPed PedsInSeats[15];                                   // 0x0B98
     char pad_0x0C10[0x798];                                 // 0x0C10

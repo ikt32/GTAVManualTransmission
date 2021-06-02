@@ -57,6 +57,8 @@ namespace {
 
     int wheelSteerMultOffset = 0;
 
+    int gravityOffset = 0;
+
     // Wheel stuff
     int wheelHealthOffset = 0;
     int wheelSuspensionCompressionOffset = 0;
@@ -246,6 +248,11 @@ void VehicleExtensions::Init() {
     addr = mem::FindPattern("\x48\x85\xC0\x74\x3C\x8B\x80\x00\x00\x00\x00\xC1\xE8\x0F", "xxxxxxx????xxx");
     vehicleFlagsOffset = addr == 0 ? 0 : *(int*)(addr + 7);
     logger.Write(vehicleFlagsOffset == 0 ? WARN : DEBUG, "Vehicle Flags Offset: 0x%X", vehicleFlagsOffset);
+    addr = mem::FindPattern("F3 0F 59 BF ? ? ? ? 4D 85 E4 0F 8E ? ? ? ?");
+    gravityOffset = addr = 0 ? 0 : *(int*)(addr + 4);
+    logger.Write(gravityOffset == 0 ? WARN : DEBUG, "Gravity Offset: 0x%X", gravityOffset);
+
+    // Wheel stuff offset from here
 
     addr = mem::FindPattern("\x0F\xBA\xAB\xEC\x01\x00\x00\x09\x0F\x2F\xB3\x40\x01\x00\x00\x48\x8B\x83\x20\x01\x00\x00", 
                             "xx?????xxx???xxxx?????");
@@ -553,6 +560,18 @@ bool VehicleExtensions::GetIndicatorHigh(Vehicle handle, int gameTime) {
     a = a >> 9;
     a = a & 1;
     return a == 1;
+}
+
+float VehicleExtensions::GetGravity(Vehicle handle) {
+    if (gravityOffset == 0) return 0.0f;
+    auto address = GetAddress(handle);
+    return *reinterpret_cast<float*>(address + gravityOffset);
+}
+
+void VehicleExtensions::SetGravity(Vehicle handle, float value) {
+    if (gravityOffset == 0) return;
+    auto address = GetAddress(handle);
+    *reinterpret_cast<float*>(address + gravityOffset) = value;
 }
 
 float VehicleExtensions::GetSteeringInputAngle(Vehicle handle) {
