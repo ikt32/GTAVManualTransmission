@@ -101,10 +101,10 @@ bool WheelDirectInput::InitWheel() {
     foundGuids.clear();
     for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
         auto device = DIDeviceFactory::Get().GetEntry(i);
-        std::wstring wDevName = device->diDeviceInstance.tszInstanceName;
+        std::string devName = device->diDeviceInstance.tszInstanceName;
         GUID guid = device->diDeviceInstance.guidInstance;
         
-        logger.Write(INFO, "[Wheel]     Name:   %s", StrUtil::utf8_encode(wDevName).c_str());
+        logger.Write(INFO, "[Wheel]     Name:   %s", devName.c_str());
         logger.Write(INFO, "[Wheel]     GUID:   %s", GUID2String(guid).c_str());
         foundGuids.push_back(guid);
 
@@ -416,12 +416,15 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
     const int numAxes = 1;
     DIEFFECT cfEffect;
     createConstantForceEffect(axis, numAxes, cfEffect);
+    logger.Write(DEBUG, "[Wheel] Created Constant Force Effect struct");
 
     DIEFFECT damperEffect;
     createDamperEffect(axis, numAxes, damperEffect);
+    logger.Write(DEBUG, "[Wheel] Created Damper Effect struct");
 
     DIEFFECT collisionEffect;
     createCollisionEffect(axis, numAxes, collisionEffect);
+    logger.Write(DEBUG, "[Wheel] Created Collision Effect struct");
 
     // Call to this crashes? (G920 + SHVDN)
     __try {
@@ -432,6 +435,7 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
         }
         else {
             createdEffects++;
+            logger.Write(DEBUG, "[Wheel] Created Constant Force Effect on device");
         }
 
         currentEffectAttempt = "damper";
@@ -441,6 +445,7 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
         }
         else {
             createdEffects++;
+            logger.Write(DEBUG, "[Wheel] Created Damper Effect on device");
         }
 
         currentEffectAttempt = "collision";
@@ -450,6 +455,7 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
         }
         else {
             createdEffects++;
+            logger.Write(DEBUG, "[Wheel] Created Collision Effect on device");
         }
 
         currentEffectAttempt = "";

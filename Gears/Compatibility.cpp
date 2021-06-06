@@ -36,7 +36,7 @@ T CheckAddr(HMODULE lib, const std::string& funcName) {
 
 void setupTrainerV() {
     logger.Write(INFO, "[Compat] Setting up TrainerV");
-    g_TrainerVModule = GetModuleHandle(L"trainerv.asi");
+    g_TrainerVModule = GetModuleHandle("trainerv.asi");
     if (!g_TrainerVModule) {
         logger.Write(INFO, "[Compat] TrainerV.asi not found");
         return;
@@ -47,7 +47,7 @@ void setupTrainerV() {
 void setupDashHook() {
     logger.Write(INFO, "[Compat] Setting up DashHook");
     const std::string dashHookPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + "\\DashHook.dll";
-    g_DashHookModule = LoadLibraryA(dashHookPath.c_str());
+    g_DashHookModule = LoadLibrary(dashHookPath.c_str());
     if (!g_DashHookModule) {
         logger.Write(INFO, "DashHook.dll not found");
         return;
@@ -59,7 +59,7 @@ void setupDashHook() {
 
 void setupDismemberment() {
     logger.Write(INFO, "[Compat] Setting up DismembermentASI");
-    g_DismembermentModule = GetModuleHandle(L"DismembermentASI.asi");
+    g_DismembermentModule = GetModuleHandle("DismembermentASI.asi");
     if (!g_DismembermentModule) {
         logger.Write(INFO, "[Compat] DismembermentASI.asi not found");
         return;
@@ -71,7 +71,7 @@ void setupDismemberment() {
 
 void setupHandlingReplacement() {
     logger.Write(INFO, "[Compat] Setting up HandlingReplacement");
-    g_HandlingReplacementModule = GetModuleHandle(L"HandlingReplacement.asi");
+    g_HandlingReplacementModule = GetModuleHandle("HandlingReplacement.asi");
     if (!g_HandlingReplacementModule) {
         logger.Write(INFO, "[Compat] HandlingReplacement.asi not found");
         return;

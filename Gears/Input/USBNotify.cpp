@@ -49,7 +49,7 @@ LRESULT message_handler(HWND__* hwnd, UINT uint, WPARAM wparam, LPARAM lparam) {
             PDEV_BROADCAST_DEVICEINTERFACE lpdbv = (PDEV_BROADCAST_DEVICEINTERFACE)lpdb;
             std::string path;
             if (lpdb->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) {
-                path = std::string(StrUtil::utf8_encode(lpdbv->dbcc_name));
+                path = std::string((lpdbv->dbcc_name));
                 switch (wparam) {
                     case DBT_DEVICEARRIVAL:
                         logger.Write(INFO, "[ USB ] New device connected: %s", path.c_str());
@@ -79,12 +79,12 @@ void USB::Init(const std::function<void()>& func) {
     wx.style = CS_HREDRAW | CS_VREDRAW;
     wx.hInstance = GetModuleHandle(0);
     wx.hbrBackground = (HBRUSH)(COLOR_WINDOW);
-    wx.lpszClassName = StrUtil::utf8_decode(CLS_NAME).c_str();
+    wx.lpszClassName = CLS_NAME;
 
     GUID guid = HID_CLASSGUID;
 
     if (RegisterClassEx(&wx)) {
-        hWnd = CreateWindowA(CLS_NAME, "DevNotifWnd", WS_ICONIC,
+        hWnd = CreateWindow(CLS_NAME, "DevNotifWnd", WS_ICONIC,
             0, 0, CW_USEDEFAULT, 0, HWND_MESSAGE,
             NULL, GetModuleHandle(0), (void*)&guid);
     }

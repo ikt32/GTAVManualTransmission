@@ -893,8 +893,7 @@ void update_wheelmenu() {
     auto deviceEntry = g_controls.GetWheel().FindEntryFromGUID(wheelGuid);
     std::string wheelName = "No wheel in use";
     if (deviceEntry) {
-        std::wstring wDevName = deviceEntry->diDeviceInstance.tszInstanceName;
-        wheelName = StrUtil::utf8_encode(wDevName);
+        wheelName = deviceEntry->diDeviceInstance.tszInstanceName;
     }
     g_menu.Subtitle(wheelName);
 
@@ -2440,11 +2439,11 @@ void update_debugmenu() {
 
             for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
                 const auto* device = DIDeviceFactory::Get().GetEntry(i);
-                std::wstring wDevName = device->diDeviceInstance.tszInstanceName;
+                std::string devName = device->diDeviceInstance.tszInstanceName;
                 GUID guid = device->diDeviceInstance.guidInstance;
 
                 // Name
-                diDevicesInfo_.push_back(fmt::format("{}", StrUtil::utf8_encode(wDevName)));
+                diDevicesInfo_.push_back(fmt::format("{}", devName));
                 diDevicesInfo_.push_back(fmt::format("    GUID: {}", GUID2String(guid)));
                 diDevicesInfo_.push_back(fmt::format("    Type: 0x{:X}", device->diDevCaps.dwDevType));
                 diDevicesInfo_.push_back(fmt::format("    FFB: {}", device->diDevCaps.dwFlags & DIDC_FORCEFEEDBACK));

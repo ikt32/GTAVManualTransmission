@@ -64,7 +64,7 @@ SVersion getExeInfo() {
     std::string currExe = Paths::GetRunningExecutablePath();
     logger.Write(INFO, "Running executable: %s", currExe.c_str());
 
-    HMODULE citizenGameHandle = GetModuleHandle(L"CitizenGame.dll");
+    HMODULE citizenGameHandle = GetModuleHandle("CitizenGame.dll");
 
     if (citizenGameHandle != nullptr) {
         FiveM = true;

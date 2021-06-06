@@ -211,8 +211,7 @@ bool getConfigAxisWithValues(
 }
 
 void saveAxis(const std::string& confTag, GUID devGUID, const std::string& axis, int min, int max) {
-	std::wstring wDevName = controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
-	std::string devName = StrUtil::utf8_encode(wDevName);
+	std::string devName = controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
 	auto index = g_settings.SteeringAppendDevice(devGUID, devName);
 	g_settings.SteeringSaveAxis(confTag, index, axis, min, max);
 	g_settings.Read(&controls);
@@ -231,8 +230,7 @@ void clearHShifter() {
 }
 
 void saveHShifter(const std::string& confTag, GUID devGUID, const std::vector<int>& buttonArray) {
-	std::wstring wDevName = controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
-	std::string devName = StrUtil::utf8_encode(wDevName);
+	std::string devName = controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
 	auto index = g_settings.SteeringAppendDevice(devGUID, devName);
 	for (uint8_t i = 0; i < buttonArray.size(); ++i) {
 		g_settings.SteeringSaveButton(fmt::format("HPATTERN_{}", i), index, buttonArray[i]);
@@ -378,8 +376,7 @@ void configDynamicAxes(char c) {
 		for (SAxisState& axisState : axisStates) {
 			if (abs(axisState.ValueStart - axisState.ValueEnd) > hyst) {
 				std::string axisName = controls.GetWheel().DIAxisHelper[axisState.Axis];
-				std::wstring wDevName = controls.GetWheel().FindEntryFromGUID(axisState.Guid)->diDeviceInstance.tszInstanceName;
-				std::string devName = StrUtil::utf8_encode(wDevName);
+				std::string devName = controls.GetWheel().FindEntryFromGUID(axisState.Guid)->diDeviceInstance.tszInstanceName;
 				probableInput = "using " + axisName + " on " + devName;
 			}
 		}
@@ -507,8 +504,7 @@ void configDynamicButtons(char c) {
 		printf("Button for %s: ", gameButton.c_str());
 
 		for (auto guid : controls.GetWheel().GetGuids()) {
-			std::wstring wDevName = controls.GetWheel().FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
-			std::string devName = StrUtil::utf8_encode(wDevName);
+			std::string devName = controls.GetWheel().FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
 			for (int i = 0; i < 255; i++) {
 				if (controls.GetWheel().IsButtonPressed(i, guid)) {
 					printf("%d @ %s", i, devName.c_str());
@@ -592,7 +588,6 @@ void configHShift(char c) {
 	std::vector<int> buttonArray(g_numGears);
 	std::fill(buttonArray.begin(), buttonArray.end(), -1);
 	std::string devName;
-	std::wstring wDevName;
 	cls();
 	int progress = 0;
 
@@ -664,8 +659,7 @@ void configHShift(char c) {
 				setCursorPosition(0, 0);
 				int devNumber = 0;
 				for (auto guid : controls.GetWheel().GetGuids()) {
-					wDevName = controls.GetWheel().FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
-					devName = StrUtil::utf8_encode(wDevName);
+					devName = controls.GetWheel().FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
 					std::cout << devNumber << ": " << devName << "\n";
 					devNumber++;
 				}
@@ -689,7 +683,6 @@ void configHShift(char c) {
 				setCursorPosition(0, 1);
 				for (int i = 0; i < 255; i++) {
 					if (controls.GetWheel().IsButtonPressed(i, devGUID)) {
-						devName = StrUtil::utf8_encode(wDevName);
 						printf("%d @ %s", i, devName.c_str());
 						buttonsActive++;
 						buttonArray[progress] = i;
@@ -710,7 +703,6 @@ void configHShift(char c) {
 				setCursorPosition(0, 1);
 				for (int i = 0; i < 255; i++) {
 					if (controls.GetWheel().IsButtonPressed(i, devGUID)) {
-						devName = StrUtil::utf8_encode(wDevName);
 						printf("%d @ %s", i, devName.c_str());
 						buttonsActive++;
 						buttonArray[0] = i;
@@ -810,8 +802,7 @@ int main() {
 			int xCursorPos = devWidth * guidIt;
 			setCursorPosition(xCursorPos, pRow);
 			pRow++;
-			std::wstring wDevName = controls.GetWheel().FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
-			std::string devName = StrUtil::utf8_encode(wDevName);
+			std::string devName = controls.GetWheel().FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
 			if (devName.length() > devWidth) {
 				devName.replace(devWidth - 4, 3, "...");
 				devName[devWidth - 1] = '\0';

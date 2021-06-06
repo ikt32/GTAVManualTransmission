@@ -14,6 +14,7 @@
 #include "Util/Paths.h"
 
 #include <inc/main.h>
+#include <fmt/format.h>
 #include <Psapi.h>
 #include <filesystem>
 
@@ -72,6 +73,23 @@ void resolveVersion() {
     VehicleExtensions::SetVersion(shvVersion);
 }
 
+std::string GetTimestampReadable(unsigned long long unixTimestampMs) {
+    const auto durationSinceEpoch = std::chrono::milliseconds(unixTimestampMs);
+    const std::chrono::time_point<std::chrono::system_clock> tp_after_duration(durationSinceEpoch);
+    time_t time_after_duration = std::chrono::system_clock::to_time_t(tp_after_duration);
+
+    std::stringstream timess;
+    struct tm newtime {};
+    auto err = localtime_s(&newtime, &time_after_duration);
+
+    if (err != 0) {
+        return "Invalid timestamp";
+    }
+
+    timess << std::put_time(&newtime, "%Y %m %d, %H:%M:%S");
+    return fmt::format("{}", timess.str());
+}
+
 BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
     const std::string modPath = Paths::GetModuleFolder(hInstance) + Constants::ModDir;
     const std::string logFile = modPath + "\\" + Paths::GetModuleNameWithoutExtension(hInstance) + ".log";
@@ -88,7 +106,9 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             logger.Clear();
             logger.Write(INFO, "Manual Transmission %s (built %s %s) (%s)",
                 Constants::DisplayVersion, __DATE__, __TIME__, GIT_HASH GIT_DIFF);
-
+            logger.Write(INFO, "%s",
+                GetTimestampReadable(std::chrono::duration_cast<std::chrono::milliseconds>
+                    (std::chrono::system_clock::now().time_since_epoch()).count()).c_str());
             resolveVersion();
 
             scriptRegister(hInstance, ScriptMain);

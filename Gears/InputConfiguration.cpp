@@ -40,8 +40,7 @@ namespace {
 
 void saveAxis(const std::string& confTag, GUID devGUID, const std::string& axis, int min, int max) {
     saveAllSettings();
-    std::wstring wDevName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
-    std::string devName = StrUtil::utf8_encode(wDevName);
+    std::string devName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     auto index = g_settings.SteeringAppendDevice(devGUID, devName);
     g_settings.SteeringSaveAxis(confTag, index, axis, min, max);
     g_settings.Read(&g_controls);
@@ -49,8 +48,7 @@ void saveAxis(const std::string& confTag, GUID devGUID, const std::string& axis,
 
 void saveButton(const std::string& confTag, GUID devGUID, int button) {
     saveAllSettings();
-    std::wstring wDevName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
-    std::string devName = StrUtil::utf8_encode(wDevName);
+    std::string devName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     auto index = g_settings.SteeringAppendDevice(devGUID, devName);
     g_settings.SteeringSaveButton(confTag, index, button);
     g_settings.Read(&g_controls);
@@ -58,8 +56,7 @@ void saveButton(const std::string& confTag, GUID devGUID, int button) {
 
 void addWheelToKey(const std::string& confTag, GUID devGUID, int button, const std::string& keyName) {
     saveAllSettings();
-    std::wstring wDevName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
-    std::string devName = StrUtil::utf8_encode(wDevName);
+    std::string devName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     auto index = g_settings.SteeringAppendDevice(devGUID, devName);
     g_settings.SteeringAddWheelToKey(confTag, index, button, keyName);
     g_settings.Read(&g_controls);
@@ -67,8 +64,7 @@ void addWheelToKey(const std::string& confTag, GUID devGUID, int button, const s
 
 void saveHShifter(const std::string& confTag, GUID devGUID, const std::vector<int>& buttonArray) {
     saveAllSettings();
-    std::wstring wDevName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
-    std::string devName = StrUtil::utf8_encode(wDevName);
+    std::string devName = g_controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
     auto index = g_settings.SteeringAppendDevice(devGUID, devName);
 
     for (uint8_t i = 0; i < buttonArray.size(); ++i) {

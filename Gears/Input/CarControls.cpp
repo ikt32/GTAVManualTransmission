@@ -458,9 +458,8 @@ void CarControls::CheckGUIDs(const std::vector<_GUID> & guids) {
         for (auto g : missingFnd) {
             auto entry = mWheelInput.FindEntryFromGUID(g);
             if (entry == nullptr) continue;
-            std::wstring wDevName = entry->diDeviceInstance.tszInstanceName;
-            auto devName = StrUtil::utf8_encode(wDevName);
-            logger.Write(INFO, "[Wheel] Device: %s", devName.c_str());
+            auto devName = entry->diDeviceInstance.tszInstanceName;
+            logger.Write(INFO, "[Wheel] Device: %s", devName);
             logger.Write(INFO, "[Wheel] GUID:   %s", GUID2String(g).c_str());
             if (isSupportedDrivingDevice(entry->diDeviceInstance.dwDevType)) {
                 FreeDevices.push_back(Device(devName, g));
