@@ -13,3 +13,6 @@
 [submodule "thirdparty/yaml-cpp"]
 	path = thirdparty/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp
+[submodule "thirdparty/fmt"]
+	path = thirdparty/fmt
+	url = https://github.com/fmtlib/fmt
