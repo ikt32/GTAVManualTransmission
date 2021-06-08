@@ -69,10 +69,10 @@ public:
     bool InitDI();
 
     bool InitWheel();
-
+    // Call directly after InitWheel to reinit FFB (devices), since we rediscovered
     bool InitFFB(GUID guid, DIAxis ffAxis);
     void UpdateCenterSteering(GUID guid, DIAxis steerAxis);
-    const DIDevice *FindEntryFromGUID(GUID guid);
+    DIDevice* FindEntryFromGUID(GUID guid);
 
     // Should be called every update()
     void Update();
@@ -98,9 +98,9 @@ public:
 
 private:
     void updateAxisSpeed();
-    void createConstantForceEffect(DWORD axis, int numAxes, DIEFFECT &diEffect);
-    void createDamperEffect(DWORD axis, int numAxes, DIEFFECT &diEffect);
-    void createCollisionEffect(DWORD axis, int numAxes, DIEFFECT &diEffect);
+    void createConstantForceEffect(GUID device, DIAxis axis, DWORD rawAxis);
+    void createDamperEffect(GUID device, DIAxis axis, DWORD rawAxis);
+    void createCollisionEffect(GUID device, DIAxis axis, DWORD rawAxis);
     bool createEffects(GUID device, DIAxis ffAxis);
     int povDirectionToIndex(int povDirection);
 
@@ -108,15 +108,22 @@ private:
 
     LPDIRECTINPUT lpDi = nullptr;
 
-    // TODO: Group these effects in classes?
-    LPDIRECTINPUTEFFECT m_cfEffect = nullptr;
-    DICONSTANTFORCE m_constantForceParams;
+    struct FFBEffects {
+        ~FFBEffects();
+        bool Enabled = false;
 
-    LPDIRECTINPUTEFFECT m_dEffect = nullptr;
-    DICONDITION m_damperParams;
+        DIEFFECT ConstantForceEffect{};
+        DICONSTANTFORCE ConstantForceParams{};
+        LPDIRECTINPUTEFFECT ConstantForceEffectInterface = nullptr;
 
-    LPDIRECTINPUTEFFECT m_colEffect = nullptr;
-    DIPERIODIC m_collisionParams;
+        DIEFFECT DamperEffect{};
+        DICONDITION DamperParams{};
+        LPDIRECTINPUTEFFECT DamperEffectInterface = nullptr;
+
+        DIEFFECT CollisionEffect{};
+        DIPERIODIC CollisionParams{};
+        LPDIRECTINPUTEFFECT CollisionEffectInterface = nullptr;
+    };
 
     std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbPressTime   { 0 };
     std::unordered_map<GUID, std::array<__int64, MAX_RGBBUTTONS>> rgbReleaseTime { 0 };
@@ -132,7 +139,7 @@ private:
     std::unordered_map<GUID, std::array<std::array<float, AVGSAMPLES>, SIZEOF_DIAxis>> samples { 0 };
 
     std::unordered_map<GUID, std::array<int, SIZEOF_DIAxis>> averageIndex { 0 };
-    std::unordered_map<GUID, std::array<bool, SIZEOF_DIAxis>> hasForceFeedback { false };
+    std::unordered_map<GUID, std::array<FFBEffects, SIZEOF_DIAxis>> ffbEffectInfo;
 };
 
 bool isSupportedDrivingDevice(DWORD dwDevType);

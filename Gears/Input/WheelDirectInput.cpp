@@ -31,14 +31,12 @@ std::string formatError(HRESULT hr) {
     case E_HANDLE:                  return "E_HANDLE";
     case DIERR_DEVICEFULL:          return "DIERR_DEVICEFULL";
     case DIERR_DEVICENOTREG:        return "DIERR_DEVICENOTREG";
+    case DIERR_NOTEXCLUSIVEACQUIRED:return "DIERR_NOTEXCLUSIVEACQUIRED";
     default:                        return "UNKNOWN";
     }
 }
 
-WheelDirectInput::WheelDirectInput()
-    : m_constantForceParams()
-    , m_damperParams()
-    , m_collisionParams() { }
+WheelDirectInput::WheelDirectInput() {}
 
 WheelDirectInput::~WheelDirectInput() {
     for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
@@ -54,9 +52,7 @@ WheelDirectInput::~WheelDirectInput() {
         }
     }
     
-    SAFE_RELEASE(m_cfEffect);
-    SAFE_RELEASE(m_dEffect);
-    SAFE_RELEASE(m_colEffect);
+    ffbEffectInfo.clear();
     SAFE_RELEASE(lpDi);
 }
 
@@ -99,6 +95,8 @@ bool WheelDirectInput::InitWheel() {
     povButtonPrev.clear();
 
     foundGuids.clear();
+    ffbEffectInfo.clear();
+
     for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
         auto device = DIDeviceFactory::Get().GetEntry(i);
         std::string devName = device->diDeviceInstance.tszInstanceName;
@@ -148,14 +146,15 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
     }
     else {
         logger.Write(INFO, "[Wheel] Initializing FFB effects (axis: %s)", DIAxisHelper[ffAxis].c_str());
+
         if (!createEffects(guid, ffAxis)) {
             logger.Write(ERROR, "[Wheel] Init FFB effect failed, disabling force feedback");
-            hasForceFeedback[guid][ffAxis] = false;
+            ffbEffectInfo[guid][ffAxis].Enabled = false;
             return false;
         }
     }
     logger.Write(INFO, "[Wheel] Initializing force feedback success");
-    hasForceFeedback[guid][ffAxis] = true;
+    ffbEffectInfo[guid][ffAxis].Enabled = true;
     return true;
 }
 
@@ -169,7 +168,7 @@ void WheelDirectInput::UpdateCenterSteering(GUID guid, DIAxis steerAxis) {
 /*
  * Return NULL when device isn't found
  */
-const DIDevice *WheelDirectInput::FindEntryFromGUID(GUID guid) {
+DIDevice* WheelDirectInput::FindEntryFromGUID(GUID guid) {
     if (DIDeviceFactory::Get().GetEntryCount() > 0) {
         if (guid == GUID_NULL) {
             return nullptr;
@@ -178,7 +177,7 @@ const DIDevice *WheelDirectInput::FindEntryFromGUID(GUID guid) {
         for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
             auto tempEntry = DIDeviceFactory::Get().GetEntry(i);
             if (guid == tempEntry->diDeviceInstance.guidInstance) {
-                return tempEntry;
+                return const_cast<DIDevice*>(tempEntry);
             }
         }
     }
@@ -308,11 +307,12 @@ int filterException(int code, PEXCEPTION_POINTERS ex) {
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
-void WheelDirectInput::createConstantForceEffect(DWORD axis, int numAxes, DIEFFECT &diEffect) {
-    DWORD rgdwAxes[1] = { axis };
+void WheelDirectInput::createConstantForceEffect(GUID device, DIAxis axis, DWORD rawAxis) {
+    DWORD rgdwAxes[1] = { rawAxis };
     LONG rglDirection[1] = { 0 };
-    m_constantForceParams.lMagnitude = 0;
+    ffbEffectInfo[device][axis].ConstantForceParams.lMagnitude = 0;
 
+    DIEFFECT& diEffect = ffbEffectInfo[device][axis].ConstantForceEffect;
     ZeroMemory(&diEffect, sizeof(diEffect));
     diEffect.dwSize = sizeof(DIEFFECT);
     diEffect.rgdwAxes = rgdwAxes;
@@ -324,25 +324,27 @@ void WheelDirectInput::createConstantForceEffect(DWORD axis, int numAxes, DIEFFE
     diEffect.dwTriggerButton = DIEB_NOTRIGGER;
     diEffect.dwTriggerRepeatInterval = 0;
 
-    diEffect.cAxes = numAxes;
+    diEffect.cAxes = 1;
     diEffect.lpEnvelope = nullptr;
-    diEffect.cbTypeSpecificParams = diEffect.cAxes * sizeof(DICONSTANTFORCE);
-    diEffect.lpvTypeSpecificParams = &m_constantForceParams;
+    diEffect.cbTypeSpecificParams = 1 * sizeof(DICONSTANTFORCE);
+    diEffect.lpvTypeSpecificParams = &ffbEffectInfo[device][axis].ConstantForceParams;
     diEffect.dwStartDelay = 0;
 }
 
-void WheelDirectInput::createDamperEffect(DWORD axis, int numAxes, DIEFFECT &diEffect) {
-    DWORD rgdwAxes[1] = { axis };
+void WheelDirectInput::createDamperEffect(GUID device, DIAxis axis, DWORD rawAxis) {
+    DWORD rgdwAxes[1] = { rawAxis };
     LONG rglDirection[1] = { 0 };
 
-    m_damperParams.lDeadBand = 0;
-    m_damperParams.lOffset = 0;
-    m_damperParams.lPositiveCoefficient = 0;
-    m_damperParams.lNegativeCoefficient = 0;
-    m_damperParams.dwPositiveSaturation = DI_FFNOMINALMAX;
-    m_damperParams.dwNegativeSaturation = DI_FFNOMINALMAX;
+    auto& damperParams = ffbEffectInfo[device][axis].DamperParams;
+    damperParams.lDeadBand = 0;
+    damperParams.lOffset = 0;
+    damperParams.lPositiveCoefficient = 0;
+    damperParams.lNegativeCoefficient = 0;
+    damperParams.dwPositiveSaturation = DI_FFNOMINALMAX;
+    damperParams.dwNegativeSaturation = DI_FFNOMINALMAX;
 
-    ZeroMemory(&diEffect, sizeof(DIEFFECT));
+    auto& diEffect = ffbEffectInfo[device][axis].DamperEffect;
+    ZeroMemory(&diEffect, sizeof(diEffect));
     diEffect.dwSize = sizeof(DIEFFECT);
     diEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
     diEffect.dwDuration = 500 * 1000; // 500ms
@@ -351,23 +353,25 @@ void WheelDirectInput::createDamperEffect(DWORD axis, int numAxes, DIEFFECT &diE
     diEffect.dwTriggerButton = DIEB_NOTRIGGER;
     diEffect.dwTriggerRepeatInterval = 0;
 
-    diEffect.cAxes = numAxes;
+    diEffect.cAxes = 1;
     diEffect.rgdwAxes = rgdwAxes;
     diEffect.rglDirection = rglDirection;
     diEffect.lpEnvelope = nullptr;
     diEffect.cbTypeSpecificParams = sizeof(DICONDITION);
-    diEffect.lpvTypeSpecificParams = &m_damperParams;
+    diEffect.lpvTypeSpecificParams = &ffbEffectInfo[device][axis].DamperParams;
 }
 
-void WheelDirectInput::createCollisionEffect(DWORD axis, int numAxes, DIEFFECT &diEffect) {
-    DWORD rgdwAxes[1] = { axis };
+void WheelDirectInput::createCollisionEffect(GUID device, DIAxis axis, DWORD rawAxis) {
+    DWORD rgdwAxes[1] = { rawAxis };
     LONG rglDirection[1] = { 0 };
 
-    m_collisionParams.dwMagnitude = 0;
-    m_collisionParams.dwPeriod = static_cast<DWORD>(0.100 * DI_SECONDS);
-    m_collisionParams.dwPhase = 0;
-    m_collisionParams.lOffset = 0;
+    auto& collisionParams = ffbEffectInfo[device][axis].CollisionParams;
+    collisionParams.dwMagnitude = 0;
+    collisionParams.dwPeriod = static_cast<DWORD>(0.100 * DI_SECONDS);
+    collisionParams.dwPhase = 0;
+    collisionParams.lOffset = 0;
 
+    auto& diEffect = ffbEffectInfo[device][axis].CollisionEffect;
     ZeroMemory(&diEffect, sizeof(diEffect));
     diEffect.dwSize = sizeof(DIEFFECT);
     diEffect.rgdwAxes = rgdwAxes;
@@ -378,11 +382,11 @@ void WheelDirectInput::createCollisionEffect(DWORD axis, int numAxes, DIEFFECT &
     diEffect.dwTriggerButton = DIEB_NOTRIGGER;
     diEffect.dwTriggerRepeatInterval = 0;
 
-    diEffect.cAxes = numAxes;
+    diEffect.cAxes = 1;
     diEffect.dwDuration = static_cast<ULONG>(200 * 1000);
     diEffect.lpEnvelope = nullptr;
-    diEffect.cbTypeSpecificParams = diEffect.cAxes * sizeof(DIPERIODIC);
-    diEffect.lpvTypeSpecificParams = &m_collisionParams;
+    diEffect.cbTypeSpecificParams = ffbEffectInfo[device][axis].CollisionEffect.cAxes * sizeof(DIPERIODIC);
+    diEffect.lpvTypeSpecificParams = &ffbEffectInfo[device][axis].CollisionParams;
 }
 
 /*
@@ -398,50 +402,46 @@ void logCreateEffectException(const DIDevice *e) {
  * Deal with stl stuff in __try
  */
 void logCreateEffectError(HRESULT hr, const char *which) {
-    logger.Write(ERROR, "[Wheel] CreateEffect [] failed: [0x%08X] %s (%s)", hr, formatError(hr).c_str(), which);
+    logger.Write(ERROR, "[Wheel] CreateEffect failed: [0x%08X] %s (%s)", hr, formatError(hr).c_str(), which);
 }
 
 bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
-    if (hasForceFeedback[device][ffAxis]) {
-        logger.Write(INFO, "[Wheel] Skipping FFB effect init, device already has FFB on this axis.");
-        return true;
-    }
-
     int createdEffects = 0;
     auto e = FindEntryFromGUID(device);
 
     if (!e)
         return false;
 
-    DWORD axis;
-    if		(ffAxis == lX)	{ axis = DIJOFS_X; }
-    else if (ffAxis == lY)	{ axis = DIJOFS_Y; }
-    else if (ffAxis == lZ)	{ axis = DIJOFS_Z; }
-    else if (ffAxis == lRx) { axis = DIJOFS_RX; }
-    else if (ffAxis == lRy) { axis = DIJOFS_RY; }
-    else if (ffAxis == lRz) { axis = DIJOFS_RZ; }
+    DWORD axisOffset;
+    if (ffAxis == lX) { axisOffset = DIJOFS_X; }
+    else if (ffAxis == lY) { axisOffset = DIJOFS_Y; }
+    else if (ffAxis == lZ) { axisOffset = DIJOFS_Z; }
+    else if (ffAxis == lRx) { axisOffset = DIJOFS_RX; }
+    else if (ffAxis == lRy) { axisOffset = DIJOFS_RY; }
+    else if (ffAxis == lRz) { axisOffset = DIJOFS_RZ; }
     else { return false; }
 
-    // TODO: Make joystickable
-    // I'm focusing on steering wheels, so you get one axis.
-    const int numAxes = 1;
-    DIEFFECT cfEffect;
-    createConstantForceEffect(axis, numAxes, cfEffect);
+    //DIEFFECT cfEffect;
+    createConstantForceEffect(device, ffAxis, axisOffset);
+    //createConstantForceEffect(device, ffAxis, axisOffset);
     logger.Write(DEBUG, "[Wheel] Created Constant Force Effect struct");
 
-    DIEFFECT damperEffect;
-    createDamperEffect(axis, numAxes, damperEffect);
+    createDamperEffect(device, ffAxis, axisOffset);
     logger.Write(DEBUG, "[Wheel] Created Damper Effect struct");
 
-    DIEFFECT collisionEffect;
-    createCollisionEffect(axis, numAxes, collisionEffect);
+    createCollisionEffect(device, ffAxis, axisOffset);
     logger.Write(DEBUG, "[Wheel] Created Collision Effect struct");
 
     // Call to this crashes? (G920 + SHVDN)
     __try {
         currentEffectAttempt = "constant force";
-        HRESULT hr = e->diDevice->CreateEffect(GUID_ConstantForce, &cfEffect, &m_cfEffect, nullptr);
-        if (FAILED(hr) || !m_cfEffect) {
+        HRESULT hr = e->diDevice->CreateEffect(
+            GUID_ConstantForce,
+            &ffbEffectInfo[device][ffAxis].ConstantForceEffect,
+            &ffbEffectInfo[device][ffAxis].ConstantForceEffectInterface,
+            nullptr);
+
+        if (FAILED(hr) || !ffbEffectInfo[device][ffAxis].ConstantForceEffectInterface) {
             logCreateEffectError(hr, "constant force");
         }
         else {
@@ -450,18 +450,26 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
         }
 
         currentEffectAttempt = "damper";
-        hr = e->diDevice->CreateEffect(GUID_Damper, &damperEffect, &m_dEffect, nullptr);
-        if (FAILED(hr) || !m_dEffect) {
+        hr = e->diDevice->CreateEffect(
+            GUID_Damper,
+            &ffbEffectInfo[device][ffAxis].DamperEffect,
+            &ffbEffectInfo[device][ffAxis].DamperEffectInterface,
+            nullptr);
+        if (FAILED(hr) || !ffbEffectInfo[device][ffAxis].DamperEffectInterface) {
             logCreateEffectError(hr, "damper");
         }
         else {
             createdEffects++;
             logger.Write(DEBUG, "[Wheel] Created Damper Effect on device");
         }
-
+        
         currentEffectAttempt = "collision";
-        hr = e->diDevice->CreateEffect(GUID_Square, &collisionEffect, &m_colEffect, nullptr);
-        if (FAILED(hr) || !m_colEffect) {
+        hr = e->diDevice->CreateEffect(
+            GUID_Square,
+            &ffbEffectInfo[device][ffAxis].CollisionEffect,
+            &ffbEffectInfo[device][ffAxis].CollisionEffectInterface,
+            nullptr);
+        if (FAILED(hr) || !ffbEffectInfo[device][ffAxis].CollisionEffectInterface) {
             logCreateEffectError(hr, "collision");
         }
         else {
@@ -485,81 +493,81 @@ void WheelDirectInput::SetConstantForce(GUID device, DIAxis ffAxis, int force) {
     // Modifying an effect is basically the same as creating a new one, except
     // you need only specify the parameters you are modifying
     auto e = FindEntryFromGUID(device);
-    if (!e || !m_cfEffect || !hasForceFeedback[device][ffAxis])
+    if (!e || !ffbEffectInfo[device][ffAxis].Enabled)
         return;
 
     LONG rglDirection[1] = { 0 };
 
-    m_constantForceParams.lMagnitude = force;
+    ffbEffectInfo[device][ffAxis].ConstantForceParams.lMagnitude = force;
 
-    DIEFFECT effect;
-    ZeroMemory(&effect, sizeof(effect));
+    auto& effect = ffbEffectInfo[device][ffAxis].ConstantForceEffect;
     effect.dwSize = sizeof(DIEFFECT);
     effect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
     effect.cAxes = 1;
     effect.rglDirection = rglDirection;
     effect.lpEnvelope = nullptr;
     effect.cbTypeSpecificParams = effect.cAxes * sizeof(DICONSTANTFORCE);
-    effect.lpvTypeSpecificParams = &m_constantForceParams;
+    effect.lpvTypeSpecificParams = &ffbEffectInfo[device][ffAxis].ConstantForceParams;
     effect.dwStartDelay = 0;
 
     e->diDevice->Acquire();
-    m_cfEffect->SetParameters(&effect,
+    ffbEffectInfo[device][ffAxis].ConstantForceEffectInterface->SetParameters(
+        &ffbEffectInfo[device][ffAxis].ConstantForceEffect,
         DIEP_DIRECTION | DIEP_TYPESPECIFICPARAMS | DIEP_START);
-    m_cfEffect->Start(1, 0);
+    ffbEffectInfo[device][ffAxis].ConstantForceEffectInterface->Start(1, 0);
 }
 
 void WheelDirectInput::SetDamper(GUID device, DIAxis ffAxis, int force) {
     auto e = FindEntryFromGUID(device);
-    if (!e || !m_dEffect || !hasForceFeedback[device][ffAxis])
+    if (!e || !ffbEffectInfo[device][ffAxis].Enabled)
         return;
 
     LONG rglDirection[1] = { 0 };
 
-    m_damperParams.lPositiveCoefficient = force;
-    m_damperParams.lNegativeCoefficient = force;
+    ffbEffectInfo[device][ffAxis].DamperParams.lPositiveCoefficient = force;
+    ffbEffectInfo[device][ffAxis].DamperParams.lNegativeCoefficient = force;
 
-    DIEFFECT effect;
-    ZeroMemory(&effect, sizeof(DIEFFECT));
+    auto& effect = ffbEffectInfo[device][ffAxis].DamperEffect;
     effect.dwSize = sizeof(DIEFFECT);
     effect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
     effect.cAxes = 1;
     effect.rglDirection = rglDirection;
     effect.lpEnvelope = nullptr;
     effect.cbTypeSpecificParams = sizeof(DICONDITION);
-    effect.lpvTypeSpecificParams = &m_damperParams;
+    effect.lpvTypeSpecificParams = &ffbEffectInfo[device][ffAxis].DamperParams;
     effect.dwStartDelay = 0;
 
     e->diDevice->Acquire();
-    m_dEffect->SetParameters(&effect,
+    ffbEffectInfo[device][ffAxis].DamperEffectInterface->SetParameters(
+        &ffbEffectInfo[device][ffAxis].DamperEffect,
         DIEP_DIRECTION | DIEP_TYPESPECIFICPARAMS | DIEP_START);
-    m_dEffect->Start(1, 0);
+    ffbEffectInfo[device][ffAxis].DamperEffectInterface->Start(1, 0);
 }
 
 void WheelDirectInput::SetCollision(GUID device, DIAxis ffAxis, int force) {
     auto e = FindEntryFromGUID(device);
-    if (!e || !m_colEffect || !hasForceFeedback[device][ffAxis])
+    if (!e || !ffbEffectInfo[device][ffAxis].Enabled)
         return;
 
     LONG rglDirection[1] = { 0 };
 
-    m_collisionParams.dwMagnitude = force;
+    ffbEffectInfo[device][ffAxis].CollisionParams.dwMagnitude = force;
 
-    DIEFFECT effect;
-    ZeroMemory(&effect, sizeof(effect));
+    auto& effect = ffbEffectInfo[device][ffAxis].CollisionEffect;
     effect.dwSize = sizeof(DIEFFECT);
     effect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
     effect.cAxes = 1;
     effect.rglDirection = rglDirection;
     effect.lpEnvelope = nullptr;
     effect.cbTypeSpecificParams = effect.cAxes * sizeof(DIPERIODIC);
-    effect.lpvTypeSpecificParams = &m_collisionParams;
+    effect.lpvTypeSpecificParams = &ffbEffectInfo[device][ffAxis].CollisionParams;
     effect.dwStartDelay = 0;
 
     e->diDevice->Acquire();
-    m_colEffect->SetParameters(&effect,
+    ffbEffectInfo[device][ffAxis].CollisionEffectInterface->SetParameters(
+        &ffbEffectInfo[device][ffAxis].CollisionEffect,
         DIEP_DIRECTION | DIEP_TYPESPECIFICPARAMS | DIEP_START);
-    m_colEffect->Start(1, 0);
+    ffbEffectInfo[device][ffAxis].CollisionEffectInterface->Start(1, 0);
 }
 
 WheelDirectInput::DIAxis WheelDirectInput::StringToAxis(std::string &axisString) {
@@ -707,5 +715,24 @@ bool isSupportedDrivingDevice(DWORD dwDevType) {
             return true;
         default:
             return false;
+    }
+}
+
+WheelDirectInput::FFBEffects::~FFBEffects() {
+    if (ConstantForceEffectInterface) {
+        ConstantForceEffectInterface->Stop();
+        ConstantForceEffectInterface->Unload();
+        ConstantForceEffectInterface->Release();
+    }
+
+    if (DamperEffectInterface) {
+        DamperEffectInterface->Stop();
+        DamperEffectInterface->Unload();
+        DamperEffectInterface->Release();
+    }
+
+    if (CollisionEffectInterface) {
+        CollisionEffectInterface->Unload();
+        CollisionEffectInterface->Release();
     }
 }
