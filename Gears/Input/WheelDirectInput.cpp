@@ -142,12 +142,18 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
         logger.Write(ERROR, "[Wheel]     HWND =    %X", GetForegroundWindow());
         return false;
     }
-    logger.Write(INFO, "[Wheel] Initializing FFB effects (axis: %s)", DIAxisHelper[ffAxis].c_str());
-    if (!createEffects(guid, ffAxis)) {
-        logger.Write(ERROR, "[Wheel] Init FFB effect failed, disabling force feedback");
-        hasForceFeedback[guid][ffAxis] = false;
-        return false;
-    } 
+
+    if (ffAxis >= UNKNOWN_AXIS) {
+        logger.Write(INFO, "[Wheel] Skipping FFB initialization (unknown axis: %d)", ffAxis);
+    }
+    else {
+        logger.Write(INFO, "[Wheel] Initializing FFB effects (axis: %s)", DIAxisHelper[ffAxis].c_str());
+        if (!createEffects(guid, ffAxis)) {
+            logger.Write(ERROR, "[Wheel] Init FFB effect failed, disabling force feedback");
+            hasForceFeedback[guid][ffAxis] = false;
+            return false;
+        }
+    }
     logger.Write(INFO, "[Wheel] Initializing force feedback success");
     hasForceFeedback[guid][ffAxis] = true;
     return true;
