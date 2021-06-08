@@ -1064,6 +1064,21 @@ bool isUIActive() {
  * 5. Done shifting
  */
 void updateShifting() {
+    // How long it takes to fully press the clutch, as ratio of 1/shiftrate.
+    const float upshiftClutchPressTiming = 0.1f; 
+    // How soon it fully lifts the clutch. Keep higher than the press timing.
+    const float upshiftClutchLiftTiming = 0.1f;
+    // On lifting clutch, how far to initially skip ahead. Larger = faster re-engage. Vanilla uses 0.9.
+    // Keep larger than 0.4 since that's where throttle is reapplied again - smaller and there's no upshift cut.
+    const float upshiftClutchLiftRange = 0.8f;
+    // How long it takes to fully press the clutch, as ratio of 1/shiftrate.
+    const float downshiftClutchPressTiming = 0.1f;
+    // How soon it fully lifts the clutch. Keep higher than the press timing.
+    const float downshiftClutchLiftTiming = 0.9f;
+    // On lifting clutch, how far to initially skip ahead. Larger = faster re-engage. Vanilla uses 0.9.
+    // Keep larger than 0.4 since that's where throttle is reapplied again - smaller and there's no downshift blip.
+    const float downshiftClutchLiftRange = 1.0f;
+
     if (!g_gearStates.Shifting)
         return;
 
@@ -1079,10 +1094,12 @@ void updateShifting() {
     float shiftProgress = static_cast<float>(MISC::GET_GAME_TIMER() - g_gearStates.ShiftStart) / g_gearStates.ShiftTime;
 
     // ClutchLift @ shiftProgress timing
-    float cl = g_gearStates.ShiftDirection == ShiftDirection::Up ? 0.1f : 0.9f;
+    float clutchPressTiming = g_gearStates.ShiftDirection == ShiftDirection::Up ? upshiftClutchPressTiming : downshiftClutchPressTiming;
+    float clutchLiftTiming = g_gearStates.ShiftDirection == ShiftDirection::Up ? upshiftClutchLiftTiming : downshiftClutchLiftTiming;
+    float clutchLiftRange = g_gearStates.ShiftDirection == ShiftDirection::Up ? upshiftClutchLiftRange : downshiftClutchLiftRange;
 
-    if (shiftProgress <= 0.1f) {
-        g_gearStates.ClutchVal = map(shiftProgress, 0.0f, 0.1f, 0.0f, 1.0f);
+    if (shiftProgress <= clutchPressTiming) {
+        g_gearStates.ClutchVal = map(shiftProgress, 0.0f, clutchPressTiming, 0.0f, 1.0f);
         g_gearStates.ShiftState = ShiftState::PressingClutch;
     }
     else if (g_gearStates.LockGear != g_gearStates.NextGear) {
@@ -1091,8 +1108,9 @@ void updateShifting() {
         g_gearStates.ShiftState = ShiftState::FullClutch;
     }
 
-    if (shiftProgress > cl) {
-        g_gearStates.ClutchVal = map(shiftProgress, cl, 1.0f, 1.0f, 0.0f);
+    if (shiftProgress > clutchLiftTiming) {
+        // g_ClutchLiftRange = 0.9: Skip first 0.1 to match game
+        g_gearStates.ClutchVal = map(shiftProgress, clutchLiftTiming, 1.0f, clutchLiftRange, 0.0f);
         g_gearStates.ShiftState = ShiftState::ReleasingClutch;
     }
     if (shiftProgress >= 1.0f) {
@@ -1825,6 +1843,12 @@ void handleBrakePatch() {
             if (g_gearStates.ShiftDirection == ShiftDirection::Up &&
                 g_settings().ShiftOptions.UpshiftCut) {
                 float cutThrottleVal = 0.0f;
+
+                if (g_gearStates.ShiftState == ShiftState::PressingClutch) {
+                    cutThrottleVal = map(g_gearStates.ClutchVal, 0.0f, 1.0f, g_controls.ThrottleVal, 0.0f);
+                    cutThrottleVal = std::clamp(cutThrottleVal, 0.0f, 1.0f);
+                    fakeRev(true, cutThrottleVal);
+                }
 
                 if (g_gearStates.ShiftState == ShiftState::ReleasingClutch) {
                     if (g_gearStates.ClutchVal < 0.4f) {
