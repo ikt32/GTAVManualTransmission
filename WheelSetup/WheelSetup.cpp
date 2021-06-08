@@ -419,13 +419,13 @@ void configDynamicAxes(char c) {
 		int min = foundAxis.ValueEnd > foundAxis.ValueStart ? 0 : 65535;
 		int max = foundAxis.ValueEnd > foundAxis.ValueStart ? 65535 : 0;
 		saveAxis(confTag, foundAxis.Guid, axisName, min, max);
-		return;
+	}
+	else {
+		int min = foundAxis.ValueStart;
+		int max = foundAxis.ValueEnd;
+		saveAxis(confTag, foundAxis.Guid, axisName, min, max);
 	}
 
-	int min = foundAxis.ValueStart;
-	int max = foundAxis.ValueEnd;
-	saveAxis(confTag, foundAxis.Guid, axisName, min, max);
-	
 	cls();
 	setCursorPosition(0, csbi.srWindow.Bottom);
 	printf("Saved changes");
