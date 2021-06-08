@@ -813,7 +813,7 @@ void WheelInput::PlayFFBGround() {
     int totalForce = satForce + detailForce;
     calculateSoftLock(totalForce, damperForce);
 
-    lastConstantForce = totalForce;
+    lastConstantForce = static_cast<float>(totalForce);
     g_controls.PlayFFBDynamics(std::clamp(totalForce, -10000, 10000), std::clamp(damperForce, -10000, 10000));
 
     const float minGforce = 5.0f;
@@ -864,7 +864,7 @@ void WheelInput::PlayFFBWater() {
 
     int totalForce = satForce + detailForce;
     calculateSoftLock(totalForce, damperForce);
-    lastConstantForce = totalForce;
+    lastConstantForce = static_cast<float>(totalForce);
     g_controls.PlayFFBDynamics(totalForce, damperForce);
 
     if (g_settings.Debug.DisplayInfo) {
