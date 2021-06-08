@@ -123,7 +123,6 @@
     <ClCompile Include="..\thirdparty\GTAVMenuBase\menusettings.cpp" />
     <ClCompile Include="..\thirdparty\GTAVMenuBase\menuutils.cpp" />
     <ClCompile Include="..\thirdparty\fmt\src\format.cc" />
-    <ClCompile Include="..\thirdparty\fmt\src\posix.cc" />
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp" />
     <ClCompile Include="..\thirdparty\yaml-cpp\src\binary.cpp" />
     <ClCompile Include="..\thirdparty\yaml-cpp\src\contrib\graphbuilder.cpp" />

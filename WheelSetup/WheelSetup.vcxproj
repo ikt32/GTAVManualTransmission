@@ -127,7 +127,6 @@
     <ClCompile Include="..\Gears\Util\SysUtils.cpp" />
     <ClCompile Include="..\Gears\VehicleConfig.cpp" />
     <ClCompile Include="..\thirdparty\fmt\src\format.cc" />
-    <ClCompile Include="..\thirdparty\fmt\src\posix.cc" />
     <ClCompile Include="WheelSetup.cpp" />
   </ItemGroup>
   <ItemGroup>

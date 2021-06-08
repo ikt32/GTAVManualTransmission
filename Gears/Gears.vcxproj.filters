@@ -74,9 +74,6 @@
     <ClCompile Include="Compatibility.cpp">
       <Filter>Lib</Filter>
     </ClCompile>
-    <ClCompile Include="..\thirdparty\fmt\src\posix.cc">
-      <Filter>Thirdparty\fmt</Filter>
-    </ClCompile>
     <ClCompile Include="..\thirdparty\fmt\src\format.cc">
       <Filter>Thirdparty\fmt</Filter>
     </ClCompile>

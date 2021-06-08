@@ -100,9 +100,6 @@
     <ClCompile Include="..\Gears\Input\DIDeviceFactory.cpp">
       <Filter>Gears\Input</Filter>
     </ClCompile>
-    <ClCompile Include="..\thirdparty\fmt\src\posix.cc">
-      <Filter>Lib</Filter>
-    </ClCompile>
     <ClCompile Include="..\thirdparty\fmt\src\format.cc">
       <Filter>Lib</Filter>
     </ClCompile>
