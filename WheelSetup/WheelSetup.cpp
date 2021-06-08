@@ -878,7 +878,7 @@ int main() {
 		std::string gear = "N";
 		if (controls.ButtonIn(CarControls::WheelControlType::HR)) gear = "R";
 		for (uint32_t i = 1; i < 11; ++i) {
-			if (controls.ButtonIn(CarControls::WheelControlType::H1)) gear = std::to_string(i);
+			if (controls.ButtonIn(static_cast<CarControls::WheelControlType>(i))) gear = std::to_string(i);
 		}
 
 		std::cout << "Gear      " << gear;
