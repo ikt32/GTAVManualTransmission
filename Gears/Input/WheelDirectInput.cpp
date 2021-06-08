@@ -158,7 +158,7 @@ void WheelDirectInput::UpdateCenterSteering(GUID guid, DIAxis steerAxis) {
     DIDeviceFactory::Get().Update(); // Otherwise the wheel keeps turning/value is not updated?
     prevTime[guid][steerAxis] = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
     prevPosition[guid][steerAxis] = GetAxisValue(steerAxis, guid);
-}																																						
+}
 
 /*
  * Return NULL when device isn't found
@@ -396,9 +396,14 @@ void logCreateEffectError(HRESULT hr, const char *which) {
 }
 
 bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
+    if (hasForceFeedback[device][ffAxis]) {
+        logger.Write(INFO, "[Wheel] Skipping FFB effect init, device already has FFB on this axis.");
+        return true;
+    }
+
     int createdEffects = 0;
     auto e = FindEntryFromGUID(device);
-    
+
     if (!e)
         return false;
 
