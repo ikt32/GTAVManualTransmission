@@ -736,8 +736,8 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     scriptControl->ControlXbox[GET_CT(SteerLeft)]  = parseControllerItem<std::string>(ini, "SteerLeft", "LeftThumbLeft", "Steer left", "Usage: analog");
     scriptControl->ControlXbox[GET_CT(SteerRight)] = parseControllerItem<std::string>(ini, "SteerRight", "LeftThumbRight", "Steer right", "Usage: analog");
 
-    scriptControl->ControlXboxBlocks[GET_CT(ShiftUp)]   = ini.GetLongValue("CONTROLLER", "ShiftUpBlocks", -1);
-    scriptControl->ControlXboxBlocks[GET_CT(ShiftDown)] = ini.GetLongValue("CONTROLLER", "ShiftDownBlocks", -1);
+    scriptControl->ControlXboxBlocks[GET_CT(ShiftUp)]   = ini.GetLongValue("CONTROLLER", "ShiftUpBlocks", ControlVehicleDuck);
+    scriptControl->ControlXboxBlocks[GET_CT(ShiftDown)] = ini.GetLongValue("CONTROLLER", "ShiftDownBlocks", ControlVehicleSelectNextWeapon);
     scriptControl->ControlXboxBlocks[GET_CT(Clutch)]    = ini.GetLongValue("CONTROLLER", "ClutchBlocks", -1);
 
     // [CONTROLLER_NATIVE]
@@ -756,8 +756,8 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     scriptControl->LegacyControls[GET_LT(Brake)]        = parseControllerItem<eControl>(ini, "Brake", ControlFrontendLt      , "Brake", "Usage: analog");
     scriptControl->LegacyControls[GET_LT(Clutch)]       = parseControllerItem<eControl>(ini, "Clutch", ControlFrontendAxisY  , "Clutch", "Usage: hold/analog");
 
-    scriptControl->ControlNativeBlocks[GET_LT(ShiftUp)]   = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", -1);
-    scriptControl->ControlNativeBlocks[GET_LT(ShiftDown)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftDownBlocks", -1);
+    scriptControl->ControlNativeBlocks[GET_LT(ShiftUp)]   = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftUpBlocks", ControlVehicleDuck);
+    scriptControl->ControlNativeBlocks[GET_LT(ShiftDown)] = ini.GetLongValue("CONTROLLER_NATIVE", "ShiftDownBlocks", ControlVehicleSelectNextWeapon);
     scriptControl->ControlNativeBlocks[GET_LT(Clutch)]    = ini.GetLongValue("CONTROLLER_NATIVE", "ClutchBlocks", -1);
 
     // [KEYBOARD]
