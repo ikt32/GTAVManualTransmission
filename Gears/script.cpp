@@ -1845,8 +1845,8 @@ void handleBrakePatch() {
                 float cutThrottleVal = 0.0f;
 
                 if (g_gearStates.ShiftState == ShiftState::PressingClutch) {
-                    cutThrottleVal = map(g_gearStates.ClutchVal, 0.0f, 1.0f, g_controls.ThrottleVal, 0.0f);
-                    cutThrottleVal = std::clamp(cutThrottleVal, 0.0f, 1.0f);
+                    cutThrottleVal = map(g_gearStates.ClutchVal, 0.0f, 0.4f, g_controls.ThrottleVal, 0.0f);
+                    cutThrottleVal = std::clamp(cutThrottleVal, 0.0f, g_controls.ThrottleVal);
                     fakeRev(true, cutThrottleVal);
                 }
 
