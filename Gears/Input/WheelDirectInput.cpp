@@ -74,6 +74,9 @@ bool WheelDirectInput::InitDI() {
 bool WheelDirectInput::InitWheel() {
     logger.Write(INFO, "[Wheel] Initializing input devices"); 
     logger.Write(INFO, "[Wheel] Setting up DirectInput interface");
+
+    // Clears and should deregister effects from the directinput interface they were made with.
+    ffbEffectInfo.clear();
     if (!InitDI()) {
         return false;
     }
@@ -95,7 +98,6 @@ bool WheelDirectInput::InitWheel() {
     povButtonPrev.clear();
 
     foundGuids.clear();
-    ffbEffectInfo.clear();
 
     for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
         auto device = DIDeviceFactory::Get().GetEntry(i);
