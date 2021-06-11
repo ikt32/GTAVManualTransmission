@@ -1,4 +1,5 @@
 #include "script.h"
+#include "GitInfo.h"
 
 #include "ScriptSettings.hpp"
 #include "VehicleData.hpp"
@@ -2588,7 +2589,12 @@ void readSettings() {
     g_settings.Read(&g_controls);
     if (g_settings.Debug.LogLevel > 4)
         g_settings.Debug.LogLevel = 1;
-    logger.SetMinLevel(static_cast<LogLevel>(g_settings.Debug.LogLevel));
+
+    auto logLevel = static_cast<LogLevel>(g_settings.Debug.LogLevel);
+    if (!std::string(GIT_DIFF).empty())
+        logLevel = LogLevel::DEBUG;
+
+    logger.SetMinLevel(logLevel);
 
     g_gearStates.FakeNeutral = g_settings.GameAssists.DefaultNeutral;
     g_menu.ReadSettings();
