@@ -85,14 +85,11 @@ bool WheelDirectInput::InitWheel() {
     povButtonCurr.clear();
     povButtonPrev.clear();
 
-    foundGuids.clear();
-
     for (const auto& [guid, device] : mDirectInputDeviceInstances) {
         std::string devName = device.DeviceInstance.tszInstanceName;
         
         logger.Write(INFO, "[Wheel]     Name:   %s", devName.c_str());
         logger.Write(INFO, "[Wheel]     GUID:   %s", GUID2String(guid).c_str());
-        foundGuids.push_back(guid); // TODO: Get rid of this somehow
 
         rgbPressTime.insert(	std::pair<GUID, std::array<__int64, MAX_RGBBUTTONS>>(guid, {}));
         rgbReleaseTime.insert(	std::pair<GUID, std::array<__int64, MAX_RGBBUTTONS>>(guid, {}));
@@ -289,14 +286,14 @@ bool WheelDirectInput::WasButtonHeldForMs(int buttonType, GUID device, int milli
 }
 
 void WheelDirectInput::UpdateButtonChangeStates() {
-    for (auto device : foundGuids) {
+    for (const auto& [guid, device] : mDirectInputDeviceInstances) {
         for (int i = 0; i < MAX_RGBBUTTONS; i++) {
-            rgbButtonPrev[device][i] = rgbButtonCurr[device][i];
+            rgbButtonPrev[guid][i] = rgbButtonCurr[guid][i];
         }
         for (auto pov : POVDirections) {
             int povIndex = povDirectionToIndex(pov);
             if (povIndex == -1) continue;
-            povButtonPrev[device][povIndex] = povButtonCurr[device][povIndex];
+            povButtonPrev[guid][povIndex] = povButtonCurr[guid][povIndex];
         }
     }
 }
@@ -709,19 +706,19 @@ BOOL WheelDirectInput::enumerateDevicesCallback(const DIDEVICEINSTANCE* instance
 }
 
 void WheelDirectInput::updateAxisSpeed() {
-    for (GUID device : foundGuids) {
+    for (auto& [guid, device] : mDirectInputDeviceInstances) {
         for (int i = 0; i < SIZEOF_DIAxis; i++) {
             DIAxis axis = static_cast<DIAxis>(i);
 
             auto time = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
-            auto position = GetAxisValue(axis, device);
-            auto result = (position - prevPosition[device][i]) / ((time - prevTime[device][i]) / 1e9f);
+            auto position = GetAxisValue(axis, guid);
+            auto result = (position - prevPosition[guid][i]) / ((time - prevTime[guid][i]) / 1e9f);
 
-            prevTime[device][i] = time;
-            prevPosition[device][i] = position;
+            prevTime[guid][i] = time;
+            prevPosition[guid][i] = position;
 
-            samples[device][i][averageIndex[device][i]] = result;
-            averageIndex[device][i] = (averageIndex[device][i] + 1) % (AVGSAMPLES - 1);
+            samples[guid][i][averageIndex[guid][i]] = result;
+            averageIndex[guid][i] = (averageIndex[guid][i] + 1) % (AVGSAMPLES - 1);
         }
     }
 }
@@ -733,10 +730,6 @@ float WheelDirectInput::GetAxisSpeed(DIAxis axis, GUID device) {
         sum += samples[device][axis][i];
     }
     return sum / AVGSAMPLES;
-}
-
-std::vector<GUID> WheelDirectInput::GetGuids() {
-    return foundGuids;
 }
 
 CONST DWORD ESCAPE_COMMAND_LEDS = 0;

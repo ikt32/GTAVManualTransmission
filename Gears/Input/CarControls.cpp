@@ -421,7 +421,11 @@ void CarControls::updateKeyInputEvents(int button, const std::vector<int>& keys)
 }
 
 void CarControls::CheckGUIDs(const std::vector<_GUID> & guids) {
-    auto foundGuids = mWheelInput.GetGuids();
+    auto keySelector = [](auto pair) {return pair.first; };
+    const auto& devices = mWheelInput.GetDevices();
+    std::vector<GUID> foundGuids(devices.size());
+    transform(devices.begin(), devices.end(), foundGuids.begin(), keySelector);
+
     auto reggdGuids = guids;
     // We're only checking for devices that should be used but aren't found
     std::sort(foundGuids.begin(), foundGuids.end());

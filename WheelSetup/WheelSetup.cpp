@@ -132,7 +132,7 @@ void init() {
 	controls.CheckGUIDs(g_settings.Wheel.InputDevices.RegisteredGUIDs);
 	
 	int totalWidth = 0;
-	for (auto guid : controls.GetWheel().GetGuids()) {
+	for (const auto& [guid, device] : controls.GetWheel().GetDevices()) {
 		//std::wstring wDevName = controls.GetWheel().FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
 		totalWidth += devWidth;//static_cast<int>(wDevName.length()) + 4;
 	}
@@ -184,7 +184,7 @@ bool getConfigAxisWithValues(
 	std::tuple<GUID, std::string> &selectedDevice,
 	int hyst,
 	bool &positive, int &startValue_) {
-	for (auto guid : controls.GetWheel().GetGuids()) {
+	for (const auto& [guid, device] : controls.GetWheel().GetDevices()) {
 		for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
 			for (auto startState : startStates) {
 				std::string axisName = controls.GetWheel().DIAxisHelper[i];
@@ -296,7 +296,7 @@ void configDynamicAxes(char c) {
 	
 	// Save current state
 	std::vector<SAxisState> axisStates;
-	for (auto guid : controls.GetWheel().GetGuids()) {
+	for (const auto& [guid, device] : controls.GetWheel().GetDevices()) {
 		for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
 			auto axis = static_cast<WheelDirectInput::DIAxis>(i);
 			int axisValue = controls.GetWheel().GetAxisValue(axis, guid);
@@ -330,7 +330,7 @@ void configDynamicAxes(char c) {
 		}
 		controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
-		for (auto guid : controls.GetWheel().GetGuids()) {
+		for (const auto& [guid, device] : controls.GetWheel().GetDevices()) {
 			for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
 				auto axis = static_cast<WheelDirectInput::DIAxis>(i);
 				for (auto& axisState : axisStates) {
@@ -457,7 +457,7 @@ void configDynamicButtons(char c) {
 	// Check whether any buttons had been pressed already
 	controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
-	for (auto guid : controls.GetWheel().GetGuids()) {
+	for (const auto& [guid, device] : controls.GetWheel().GetDevices()) {
 		for (int i = 0; i < 255; i++) {
 			if (controls.GetWheel().IsButtonPressed(i, guid)) {
 				buttonsActive++;
@@ -503,8 +503,8 @@ void configDynamicButtons(char c) {
 		setCursorPosition(0, 0);
 		printf("Button for %s: ", gameButton.c_str());
 
-		for (auto guid : controls.GetWheel().GetGuids()) {
-			std::string devName = controls.GetWheel().GetDeviceInfo(guid)->DeviceInstance.tszInstanceName;
+		for (const auto& [guid, device] : controls.GetWheel().GetDevices()) {
+			std::string devName = device.DeviceInstance.tszInstanceName;
 			for (int i = 0; i < 255; i++) {
 				if (controls.GetWheel().IsButtonPressed(i, guid)) {
 					printf("%d @ %s", i, devName.c_str());
@@ -612,11 +612,11 @@ void configHShift(char c) {
 			}
 			if (progress == 0) { // Device selection
 
-				for (int i = 0; i < controls.GetWheel().GetGuids().size(); i++) {
+				for (int i = 0; i < controls.GetWheel().GetDevices().size(); i++) {
 					if (c == i + '0') {
 						devEntry = i;
 						int devNumber = 0;
-						for (auto guid : controls.GetWheel().GetGuids()) {
+						for (const auto& [guid, device] : controls.GetWheel().GetDevices()) {
 							if (devNumber == devEntry) {
 								devGUID = guid;
 							}
@@ -658,8 +658,8 @@ void configHShift(char c) {
 			case 0: { // Device selection
 				setCursorPosition(0, 0);
 				int devNumber = 0;
-				for (auto guid : controls.GetWheel().GetGuids()) {
-					std::string devName = controls.GetWheel().GetDeviceInfo(devGUID)->DeviceInstance.tszInstanceName;
+				for (const auto& [guid, device] : controls.GetWheel().GetDevices()) {
+					std::string devName = device.DeviceInstance.tszInstanceName;
 					std::cout << devNumber << ": " << devName << "\n";
 					devNumber++;
 				}
@@ -792,7 +792,7 @@ int main() {
 
 		int guidIt = 0;
 		int pRowMax = 0;
-		for (auto guid : controls.GetWheel().GetGuids()) {
+		for (const auto& [guid, device] : controls.GetWheel().GetDevices()) {
 			if (!controls.GetWheel().GetDeviceInfo(guid)) {
 				init();
 				break;
@@ -802,7 +802,7 @@ int main() {
 			int xCursorPos = devWidth * guidIt;
 			setCursorPosition(xCursorPos, pRow);
 			pRow++;
-			std::string devName = controls.GetWheel().GetDeviceInfo(guid)->DeviceInstance.tszInstanceName;
+			std::string devName = device.DeviceInstance.tszInstanceName;
 			if (devName.length() > devWidth) {
 				devName.replace(devWidth - 4, 3, "...");
 				devName[devWidth - 1] = '\0';

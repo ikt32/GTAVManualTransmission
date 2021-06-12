@@ -204,7 +204,7 @@ bool configAxis(const std::string& confTag) {
     g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
     // Save current state
     std::vector<SAxisState> axisStates;
-    for (auto guid : g_controls.GetWheel().GetGuids()) {
+    for (const auto& [guid, device] : g_controls.GetWheel().GetDevices()) {
         for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
             auto axis = static_cast<WheelDirectInput::DIAxis>(i);
             int axisValue = g_controls.GetWheel().GetAxisValue(axis, guid);
@@ -222,7 +222,7 @@ bool configAxis(const std::string& confTag) {
         }
         g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
-        for (auto guid : g_controls.GetWheel().GetGuids()) {
+        for (const auto& [guid, device] : g_controls.GetWheel().GetDevices()) {
             for (int i = 0; i < WheelDirectInput::SIZEOF_DIAxis - 1; i++) {
                 auto axis = static_cast<WheelDirectInput::DIAxis>(i);
                 for (auto& axisState : axisStates) {
@@ -315,7 +315,7 @@ bool configWheelToKey() {
         g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
         if (progress == 0) {
-            for (auto guid : g_controls.GetWheel().GetGuids()) {
+            for (const auto& [guid, device] : g_controls.GetWheel().GetDevices()) {
                 for (int i = 0; i < MAX_RGBBUTTONS; i++) {
                     if (g_controls.GetWheel().IsButtonJustReleased(i, guid)) {
                         selectedGuid = guid;
@@ -373,7 +373,7 @@ bool configButton(const std::string& confTag) {
         }
         g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
-        for (auto guid : g_controls.GetWheel().GetGuids()) {
+        for (const auto& [guid, device] : g_controls.GetWheel().GetDevices()) {
             for (int i = 0; i < MAX_RGBBUTTONS; i++) {
                 if (g_controls.GetWheel().IsButtonJustReleased(i, guid)) {
                     saveButton(confTag, guid, i);
@@ -413,7 +413,7 @@ bool configHPattern() {
 
         g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
-        for (auto guid : g_controls.GetWheel().GetGuids()) {
+        for (const auto& [guid, device] : g_controls.GetWheel().GetDevices()) {
             for (int i = 0; i < MAX_RGBBUTTONS; i++) {
                 // only find unregistered buttons
                 if (g_controls.GetWheel().IsButtonJustPressed(i, guid) &&
@@ -462,7 +462,7 @@ bool configASelect() {
 
         g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
-        for (auto guid : g_controls.GetWheel().GetGuids()) {
+        for (const auto& [guid, device] : g_controls.GetWheel().GetDevices()) {
             for (int i = 0; i < MAX_RGBBUTTONS; i++) {
                 // only find unregistered buttons
                 if (g_controls.GetWheel().IsButtonJustPressed(i, guid) &&

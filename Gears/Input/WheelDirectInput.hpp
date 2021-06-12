@@ -99,8 +99,6 @@ public:
 
     int GetAxisValue(DIAxis axis, GUID device);
     float GetAxisSpeed(DIAxis axis, GUID device);
-
-    std::vector<GUID> GetGuids();
     void PlayLedsDInput(GUID guid, float currentRPM, float rpmFirstLedTurnsOn, float rpmRedLine);
 
 private:
@@ -116,8 +114,6 @@ private:
     void createCollisionEffect(GUID device, DIAxis axis, DWORD rawAxis);
     bool createEffects(GUID device, DIAxis ffAxis);
     int povDirectionToIndex(int povDirection);
-
-    std::vector<GUID> foundGuids {};
 
     LPDIRECTINPUT lpDi = nullptr;
 
