@@ -211,7 +211,7 @@ bool getConfigAxisWithValues(
 }
 
 void saveAxis(const std::string& confTag, GUID devGUID, const std::string& axis, int min, int max) {
-	std::string devName = controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
+	std::string devName = controls.GetWheel().GetDeviceInfo(devGUID)->DeviceInstance.tszInstanceName;
 	auto index = g_settings.SteeringAppendDevice(devGUID, devName);
 	g_settings.SteeringSaveAxis(confTag, index, axis, min, max);
 	g_settings.Read(&controls);
@@ -230,7 +230,7 @@ void clearHShifter() {
 }
 
 void saveHShifter(const std::string& confTag, GUID devGUID, const std::vector<int>& buttonArray) {
-	std::string devName = controls.GetWheel().FindEntryFromGUID(devGUID)->diDeviceInstance.tszInstanceName;
+	std::string devName = controls.GetWheel().GetDeviceInfo(devGUID)->DeviceInstance.tszInstanceName;
 	auto index = g_settings.SteeringAppendDevice(devGUID, devName);
 	for (uint8_t i = 0; i < buttonArray.size(); ++i) {
 		g_settings.SteeringSaveButton(fmt::format("HPATTERN_{}", i), index, buttonArray[i]);
@@ -376,7 +376,7 @@ void configDynamicAxes(char c) {
 		for (SAxisState& axisState : axisStates) {
 			if (abs(axisState.ValueStart - axisState.ValueEnd) > hyst) {
 				std::string axisName = controls.GetWheel().DIAxisHelper[axisState.Axis];
-				std::string devName = controls.GetWheel().FindEntryFromGUID(axisState.Guid)->diDeviceInstance.tszInstanceName;
+				std::string devName = controls.GetWheel().GetDeviceInfo(axisState.Guid)->DeviceInstance.tszInstanceName;
 				probableInput = "using " + axisName + " on " + devName;
 			}
 		}
@@ -504,7 +504,7 @@ void configDynamicButtons(char c) {
 		printf("Button for %s: ", gameButton.c_str());
 
 		for (auto guid : controls.GetWheel().GetGuids()) {
-			std::string devName = controls.GetWheel().FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
+			std::string devName = controls.GetWheel().GetDeviceInfo(guid)->DeviceInstance.tszInstanceName;
 			for (int i = 0; i < 255; i++) {
 				if (controls.GetWheel().IsButtonPressed(i, guid)) {
 					printf("%d @ %s", i, devName.c_str());
@@ -659,7 +659,7 @@ void configHShift(char c) {
 				setCursorPosition(0, 0);
 				int devNumber = 0;
 				for (auto guid : controls.GetWheel().GetGuids()) {
-					devName = controls.GetWheel().FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
+					std::string devName = controls.GetWheel().GetDeviceInfo(devGUID)->DeviceInstance.tszInstanceName;
 					std::cout << devNumber << ": " << devName << "\n";
 					devNumber++;
 				}
@@ -793,7 +793,7 @@ int main() {
 		int guidIt = 0;
 		int pRowMax = 0;
 		for (auto guid : controls.GetWheel().GetGuids()) {
-			if (!controls.GetWheel().FindEntryFromGUID(guid)) {
+			if (!controls.GetWheel().GetDeviceInfo(guid)) {
 				init();
 				break;
 			}
@@ -802,7 +802,7 @@ int main() {
 			int xCursorPos = devWidth * guidIt;
 			setCursorPosition(xCursorPos, pRow);
 			pRow++;
-			std::string devName = controls.GetWheel().FindEntryFromGUID(guid)->diDeviceInstance.tszInstanceName;
+			std::string devName = controls.GetWheel().GetDeviceInfo(guid)->DeviceInstance.tszInstanceName;
 			if (devName.length() > devWidth) {
 				devName.replace(devWidth - 4, 3, "...");
 				devName[devWidth - 1] = '\0';

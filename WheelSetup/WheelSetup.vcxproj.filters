@@ -31,9 +31,6 @@
     <ClInclude Include="..\Gears\Input\CarControls.hpp">
       <Filter>Gears\Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\Gears\Input\DiJoyStick.h">
-      <Filter>Gears\Input</Filter>
-    </ClInclude>
     <ClInclude Include="..\Gears\Input\keyboard.h">
       <Filter>Gears\Input</Filter>
     </ClInclude>
@@ -50,9 +47,6 @@
       <Filter>Gears\Util</Filter>
     </ClInclude>
     <ClInclude Include="..\Gears\Input\NativeController.h">
-      <Filter>Gears\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Gears\Input\DIDeviceFactory.h">
       <Filter>Gears\Input</Filter>
     </ClInclude>
     <ClInclude Include="..\Gears\Util\SysUtils.h">
@@ -95,9 +89,6 @@
       <Filter>Gears\Util</Filter>
     </ClCompile>
     <ClCompile Include="..\Gears\Input\NativeController.cpp">
-      <Filter>Gears\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Gears\Input\DIDeviceFactory.cpp">
       <Filter>Gears\Input</Filter>
     </ClCompile>
     <ClCompile Include="..\thirdparty\fmt\src\format.cc">

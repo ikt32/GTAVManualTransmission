@@ -39,51 +39,39 @@ std::string formatError(HRESULT hr) {
 WheelDirectInput::WheelDirectInput() {}
 
 WheelDirectInput::~WheelDirectInput() {
-    for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
-        auto device = DIDeviceFactory::Get().GetEntry(i);
-        if (device) {
-            HRESULT hr = device->diDevice->Unacquire();
-            if (FAILED(hr)) {
-                logger.Write(ERROR, "[Wheel] Failed unacquiring device: %s", 
-                    formatError(hr).c_str());
-                logger.Write(ERROR, "[Wheel]     GUID: %s",
-                    GUID2String(device->diDeviceInstance.guidInstance).c_str());
-            }
-        }
-    }
-    
     ffbEffectInfo.clear();
+    
+    for (auto instance : mDirectInputDeviceInstances) {
+        instance.second.Device->Unacquire();
+    }
+
     SAFE_RELEASE(lpDi);
 }
 
-bool WheelDirectInput::InitDI() {
-    HRESULT result = DirectInput8Create(GetModuleHandle(nullptr),
-                                        DIRECTINPUT_VERSION,
-                                        IID_IDirectInput8,
-                                        reinterpret_cast<void**>(&lpDi),
-                                        nullptr);
+std::optional<DirectInputDeviceInfo> WheelDirectInput::GetDeviceInfo(GUID guid) {
+    auto it = mDirectInputDeviceInstances.find(guid);
 
-    if (FAILED(result)) {
-        logger.Write(ERROR, "[Wheel] Failed setting up DirectInput interface");
-        return false;
-    }
-    DIDeviceFactory::Get().Enumerate(lpDi);
-    return true;
+    if (it != mDirectInputDeviceInstances.end())
+        return it->second;
+    return {};
+}
+
+const std::unordered_map<GUID, DirectInputDeviceInfo>& WheelDirectInput::GetDevices() {
+    return mDirectInputDeviceInstances;
 }
 
 bool WheelDirectInput::InitWheel() {
     logger.Write(INFO, "[Wheel] Initializing input devices"); 
     logger.Write(INFO, "[Wheel] Setting up DirectInput interface");
 
-    // Clears and should deregister effects from the directinput interface they were made with.
-    ffbEffectInfo.clear();
-    if (!InitDI()) {
+    if (!initDirectInput()) {
         return false;
     }
 
-    logger.Write(INFO, "[Wheel] Found %d device(s)", DIDeviceFactory::Get().GetEntryCount());
+    enumerateDevices();
+    logger.Write(INFO, "[Wheel] Found %d device(s)", mDirectInputDeviceInstances.size());
 
-    if (DIDeviceFactory::Get().GetEntryCount() < 1) {
+    if (mDirectInputDeviceInstances.size() < 1) {
         logger.Write(INFO, "[Wheel] No devices detected");
         return false;
     }
@@ -99,14 +87,12 @@ bool WheelDirectInput::InitWheel() {
 
     foundGuids.clear();
 
-    for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
-        auto device = DIDeviceFactory::Get().GetEntry(i);
-        std::string devName = device->diDeviceInstance.tszInstanceName;
-        GUID guid = device->diDeviceInstance.guidInstance;
+    for (const auto& [guid, device] : mDirectInputDeviceInstances) {
+        std::string devName = device.DeviceInstance.tszInstanceName;
         
         logger.Write(INFO, "[Wheel]     Name:   %s", devName.c_str());
         logger.Write(INFO, "[Wheel]     GUID:   %s", GUID2String(guid).c_str());
-        foundGuids.push_back(guid);
+        foundGuids.push_back(guid); // TODO: Get rid of this somehow
 
         rgbPressTime.insert(	std::pair<GUID, std::array<__int64, MAX_RGBBUTTONS>>(guid, {}));
         rgbReleaseTime.insert(	std::pair<GUID, std::array<__int64, MAX_RGBBUTTONS>>(guid, {}));
@@ -123,81 +109,96 @@ bool WheelDirectInput::InitWheel() {
 
 bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
     logger.Write(INFO, "[Wheel] Initializing force feedback");
+    logger.Write(INFO, "    GUID: %s", GUID2String(guid).c_str());
 
-    auto e = FindEntryFromGUID(guid);
-    
-    if (!e) {
-        logger.Write(WARN, "[Wheel] FFB device not found");
+    if (ffAxis >= UNKNOWN_AXIS) {
+        logger.Write(ERROR, "[Wheel] Skipping FFB initialization (unknown axis: %d)", ffAxis);
         return false;
     }
 
-    e->diDevice->Unacquire();
+    logger.Write(INFO, "    Axis: %s", DIAxisHelper[ffAxis].c_str());
+
+    auto e = GetDeviceInfo(guid);
+    
+    if (!e) {
+        logger.Write(WARN, "[Wheel] Device assigned to FFB not found (%s)", GUID2String(guid).c_str());
+        return false;
+    }
+
+    e->Device->Unacquire();
     HRESULT hr;
-    if (FAILED(hr = e->diDevice->SetCooperativeLevel(GetForegroundWindow(),
-                                                     DISCL_EXCLUSIVE | 
-                                                     DISCL_FOREGROUND))) {
-        logger.Write(ERROR, "[Wheel] Acquire FFB device error");
+    if (FAILED(hr = e->Device->SetCooperativeLevel(GetForegroundWindow(), DISCL_EXCLUSIVE | DISCL_FOREGROUND))) {
+        logger.Write(ERROR, "[Wheel] SetCooperativeLevel FFB device error");
         logger.Write(ERROR, "[Wheel]     HRESULT = %s", formatError(hr).c_str());
         logger.Write(ERROR, "[Wheel]     ERRCODE = %X", hr);
         logger.Write(ERROR, "[Wheel]     HWND =    %X", GetForegroundWindow());
         return false;
     }
 
-    if (ffAxis >= UNKNOWN_AXIS) {
-        logger.Write(INFO, "[Wheel] Skipping FFB initialization (unknown axis: %d)", ffAxis);
-    }
-    else {
-        logger.Write(INFO, "[Wheel] Initializing FFB effects (axis: %s)", DIAxisHelper[ffAxis].c_str());
-
-        if (!createEffects(guid, ffAxis)) {
-            logger.Write(ERROR, "[Wheel] Init FFB effect failed, disabling force feedback");
-            ffbEffectInfo[guid][ffAxis].Enabled = false;
-            return false;
-        }
+    logger.Write(INFO, "[Wheel] Initializing FFB effects");
+    if (!createEffects(guid, ffAxis)) {
+        logger.Write(ERROR, "[Wheel] Init FFB effect failed, disabling force feedback");
+        ffbEffectInfo[guid][ffAxis].Enabled = false;
+        return false;
     }
     logger.Write(INFO, "[Wheel] Initializing force feedback success");
     ffbEffectInfo[guid][ffAxis].Enabled = true;
     return true;
 }
 
-void WheelDirectInput::UpdateCenterSteering(GUID guid, DIAxis steerAxis) {
-    DIDeviceFactory::Get().Update(); // TODO: Figure out why this needs to be called TWICE
-    DIDeviceFactory::Get().Update(); // Otherwise the wheel keeps turning/value is not updated?
-    prevTime[guid][steerAxis] = std::chrono::steady_clock::now().time_since_epoch().count(); // 1ns
-    prevPosition[guid][steerAxis] = GetAxisValue(steerAxis, guid);
-}
-
-/*
- * Return NULL when device isn't found
- */
-DIDevice* WheelDirectInput::FindEntryFromGUID(GUID guid) {
-    if (DIDeviceFactory::Get().GetEntryCount() > 0) {
-        if (guid == GUID_NULL) {
-            return nullptr;
+void WheelDirectInput::Acquire() {
+    for (auto [guid, instance] : mDirectInputDeviceInstances) {
+        HRESULT hr = instance.Device->Unacquire();
+        if (FAILED(hr)) {
+            logger.Write(ERROR, "[Wheel] Unacquire failed with %x for %s", hr, GUID2String(guid).c_str());
+            continue;
+        }
+        else {
+            logger.Write(DEBUG, "[Wheel] Unacquire success for %s", GUID2String(guid).c_str());
         }
 
-        for (int i = 0; i < DIDeviceFactory::Get().GetEntryCount(); i++) {
-            auto tempEntry = DIDeviceFactory::Get().GetEntry(i);
-            if (guid == tempEntry->diDeviceInstance.guidInstance) {
-                return const_cast<DIDevice*>(tempEntry);
-            }
+        hr = instance.Device->SetCooperativeLevel(GetForegroundWindow(),
+            DISCL_EXCLUSIVE | DISCL_FOREGROUND);
+        if (FAILED(hr)) {
+            logger.Write(ERROR, "[Wheel] SetCooperativeLevel FFB device error");
+            logger.Write(ERROR, "[Wheel]     HRESULT = %s", formatError(hr).c_str());
+            logger.Write(ERROR, "[Wheel]     ERRCODE = %X", hr);
+            logger.Write(ERROR, "[Wheel]     HWND =    %X", GetForegroundWindow());
+            continue;
+        }
+
+        hr = instance.Device->Acquire();
+        if (FAILED(hr)) {
+            logger.Write(ERROR, "[Wheel] Re-acquire failed with %x for %s", hr, GUID2String(guid).c_str());
+            continue;
+        }
+        else {
+            logger.Write(DEBUG, "[Wheel] Re-acquire success for %s", GUID2String(guid).c_str());
         }
     }
-    return nullptr;
 }
 
 void WheelDirectInput::Update() {
-    DIDeviceFactory::Get().Update();
+    for (auto& [guid, device] : mDirectInputDeviceInstances) {
+        if (FAILED(device.Device->Poll())) {
+            HRESULT hr = device.Device->Acquire();
+            while (hr == DIERR_INPUTLOST) {
+                hr = device.Device->Acquire();
+            }
+        }
+        else {
+            device.Device->GetDeviceState(sizeof(DIJOYSTATE2), &device.Joystate);
+        }
+    }
     updateAxisSpeed();
 }
 
 bool WheelDirectInput::IsConnected(GUID device) {
-    auto e = FindEntryFromGUID(device);
-    return e != nullptr;
+    return (GetDeviceInfo(device) != std::nullopt);
 }
 
 bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
-    auto e = FindEntryFromGUID(device);
+    auto e = GetDeviceInfo(device);
     if (!e) {
         return false;
     }
@@ -205,7 +206,7 @@ bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
     if (buttonType >= MAX_RGBBUTTONS) {
         switch (buttonType) {
             case N:
-                if (e->joystate.rgdwPOV[0] == 0) {
+                if (e->Joystate.rgdwPOV[0] == 0) {
                     return true;
                 }
             case NE:
@@ -215,13 +216,13 @@ bool WheelDirectInput::IsButtonPressed(int buttonType, GUID device) {
             case SW:
             case W:
             case NW:
-                if (buttonType == e->joystate.rgdwPOV[0])
+                if (buttonType == e->Joystate.rgdwPOV[0])
                     return true;
             default:
                 return false;
         }
     }
-    return e->joystate.rgbButtons[buttonType] != 0;
+    return e->Joystate.rgbButtons[buttonType] != 0;
 }
 
 bool WheelDirectInput::IsButtonJustPressed(int buttonType, GUID device) {
@@ -395,9 +396,9 @@ void WheelDirectInput::createCollisionEffect(GUID device, DIAxis axis, DWORD raw
  * Deal with stl stuff in __try
  */
 std::string currentEffectAttempt = "";
-void logCreateEffectException(const DIDevice *e) {
+void logCreateEffectException(const DirectInputDeviceInfo& e) {
     logger.Write(FATAL, "[Wheel] CreateEffect (%s) caused an exception!", currentEffectAttempt.c_str());
-    logger.Write(FATAL, "[Wheel]     GUID: %s", GUID2String(e->diDeviceInstance.guidInstance).c_str());
+    logger.Write(FATAL, "[Wheel]     GUID: %s", GUID2String(e.DeviceInstance.guidInstance).c_str());
 }
 
 /*
@@ -409,10 +410,15 @@ void logCreateEffectError(HRESULT hr, const char *which) {
 
 bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
     int createdEffects = 0;
-    auto e = FindEntryFromGUID(device);
+    auto e = GetDeviceInfo(device);
 
     if (!e)
         return false;
+
+    if (ffbEffectInfo[device][ffAxis].Enabled) {
+        logger.Write(DEBUG, "[Wheel] FFB already exists on this axis");
+        return true;
+    }
 
     DWORD axisOffset;
     if (ffAxis == lX) { axisOffset = DIJOFS_X; }
@@ -437,7 +443,7 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
     // Call to this crashes? (G920 + SHVDN)
     __try {
         currentEffectAttempt = "constant force";
-        HRESULT hr = e->diDevice->CreateEffect(
+        HRESULT hr = e->Device->CreateEffect(
             GUID_ConstantForce,
             &ffbEffectInfo[device][ffAxis].ConstantForceEffect,
             &ffbEffectInfo[device][ffAxis].ConstantForceEffectInterface,
@@ -452,7 +458,7 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
         }
 
         currentEffectAttempt = "damper";
-        hr = e->diDevice->CreateEffect(
+        hr = e->Device->CreateEffect(
             GUID_Damper,
             &ffbEffectInfo[device][ffAxis].DamperEffect,
             &ffbEffectInfo[device][ffAxis].DamperEffectInterface,
@@ -466,7 +472,7 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
         }
         
         currentEffectAttempt = "collision";
-        hr = e->diDevice->CreateEffect(
+        hr = e->Device->CreateEffect(
             GUID_Square,
             &ffbEffectInfo[device][ffAxis].CollisionEffect,
             &ffbEffectInfo[device][ffAxis].CollisionEffectInterface,
@@ -482,7 +488,7 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
         currentEffectAttempt = "";
     }
     __except (filterException(GetExceptionCode(), GetExceptionInformation())) {
-        logCreateEffectException(e);
+        logCreateEffectException(*e);
         currentEffectAttempt = "";
         return false;
     }
@@ -494,7 +500,7 @@ void WheelDirectInput::SetConstantForce(GUID device, DIAxis ffAxis, int force) {
     // As per Microsoft's DirectInput example:
     // Modifying an effect is basically the same as creating a new one, except
     // you need only specify the parameters you are modifying
-    auto e = FindEntryFromGUID(device);
+    auto e = GetDeviceInfo(device);
     if (!e || !ffbEffectInfo[device][ffAxis].Enabled)
         return;
 
@@ -512,7 +518,7 @@ void WheelDirectInput::SetConstantForce(GUID device, DIAxis ffAxis, int force) {
     effect.lpvTypeSpecificParams = &ffbEffectInfo[device][ffAxis].ConstantForceParams;
     effect.dwStartDelay = 0;
 
-    e->diDevice->Acquire();
+    //e->diDevice->Acquire();
     ffbEffectInfo[device][ffAxis].ConstantForceEffectInterface->SetParameters(
         &ffbEffectInfo[device][ffAxis].ConstantForceEffect,
         DIEP_DIRECTION | DIEP_TYPESPECIFICPARAMS | DIEP_START);
@@ -520,7 +526,7 @@ void WheelDirectInput::SetConstantForce(GUID device, DIAxis ffAxis, int force) {
 }
 
 void WheelDirectInput::SetDamper(GUID device, DIAxis ffAxis, int force) {
-    auto e = FindEntryFromGUID(device);
+    auto e = GetDeviceInfo(device);
     if (!e || !ffbEffectInfo[device][ffAxis].Enabled)
         return;
 
@@ -539,7 +545,7 @@ void WheelDirectInput::SetDamper(GUID device, DIAxis ffAxis, int force) {
     effect.lpvTypeSpecificParams = &ffbEffectInfo[device][ffAxis].DamperParams;
     effect.dwStartDelay = 0;
 
-    e->diDevice->Acquire();
+    //e->diDevice->Acquire();
     ffbEffectInfo[device][ffAxis].DamperEffectInterface->SetParameters(
         &ffbEffectInfo[device][ffAxis].DamperEffect,
         DIEP_DIRECTION | DIEP_TYPESPECIFICPARAMS | DIEP_START);
@@ -547,7 +553,7 @@ void WheelDirectInput::SetDamper(GUID device, DIAxis ffAxis, int force) {
 }
 
 void WheelDirectInput::SetCollision(GUID device, DIAxis ffAxis, int force) {
-    auto e = FindEntryFromGUID(device);
+    auto e = GetDeviceInfo(device);
     if (!e || !ffbEffectInfo[device][ffAxis].Enabled)
         return;
 
@@ -565,7 +571,7 @@ void WheelDirectInput::SetCollision(GUID device, DIAxis ffAxis, int force) {
     effect.lpvTypeSpecificParams = &ffbEffectInfo[device][ffAxis].CollisionParams;
     effect.dwStartDelay = 0;
 
-    e->diDevice->Acquire();
+    //e->diDevice->Acquire();
     ffbEffectInfo[device][ffAxis].CollisionEffectInterface->SetParameters(
         &ffbEffectInfo[device][ffAxis].CollisionEffect,
         DIEP_DIRECTION | DIEP_TYPESPECIFICPARAMS | DIEP_START);
@@ -586,20 +592,120 @@ int WheelDirectInput::GetAxisValue(DIAxis axis, GUID device) {
     if (!IsConnected(device)) {
         return -1;
     }
-    auto e = FindEntryFromGUID(device);
+    auto e = GetDeviceInfo(device);
     if (!e)
         return -1;
     switch (axis) {
-        case lX: return  e->joystate.lX;
-        case lY: return  e->joystate.lY;
-        case lZ: return  e->joystate.lZ;
-        case lRx: return e->joystate.lRx;
-        case lRy: return e->joystate.lRy;
-        case lRz: return e->joystate.lRz;
-        case rglSlider0: return e->joystate.rglSlider[0];
-        case rglSlider1: return e->joystate.rglSlider[1];
+        case lX: return  e->Joystate.lX;
+        case lY: return  e->Joystate.lY;
+        case lZ: return  e->Joystate.lZ;
+        case lRx: return e->Joystate.lRx;
+        case lRy: return e->Joystate.lRy;
+        case lRz: return e->Joystate.lRz;
+        case rglSlider0: return e->Joystate.rglSlider[0];
+        case rglSlider1: return e->Joystate.rglSlider[1];
         default: return 0;
     }
+}
+
+bool WheelDirectInput::initDirectInput() {
+    if (isDirectInputInitialized()) {
+        logger.Write(DEBUG, "[Wheel] DirectInput interface already exists");
+        return true;
+    }
+
+    HRESULT result = DirectInput8Create(GetModuleHandle(nullptr), DIRECTINPUT_VERSION,
+        IID_IDirectInput8, reinterpret_cast<void**>(&mDirectInput), nullptr);
+
+    if (FAILED(result)) {
+        logger.Write(ERROR, "[Wheel] Failed setting up DirectInput interface");
+        return false;
+    }
+
+    return true;
+}
+
+bool WheelDirectInput::isDirectInputInitialized() {
+    return mDirectInput != nullptr;
+}
+
+bool WheelDirectInput::enumerateDevices() {
+    if (!isDirectInputInitialized()) {
+        logger.Write(DEBUG, "[Wheel] DirectInput interface not ready for enumeration");
+        return false;
+    }
+    const DWORD devType = DI8DEVCLASS_GAMECTRL;
+    const DWORD flags = DIEDFL_ATTACHEDONLY;
+
+    mDirectInputDeviceInstancesNew.clear();
+    HRESULT result = mDirectInput->EnumDevices(devType, enumerateDevicesCallbackS,
+        this, flags);
+
+    if (FAILED(result)) {
+        logger.Write(ERROR, "[Wheel] Failed to enumerate devices");
+        return false;
+    }
+
+    std::erase_if(mDirectInputDeviceInstances, [&](const auto& instanceOld) {
+        auto it = std::find_if(mDirectInputDeviceInstancesNew.begin(), mDirectInputDeviceInstancesNew.end(), [&](const auto& instanceNew) {
+            return instanceNew.first == instanceOld.first;
+            });
+
+        if (it == mDirectInputDeviceInstancesNew.end()) {
+            // TODO: De-init and release associated FFB?
+            logger.Write(DEBUG, "[Wheel] Removing stale device with GUID %s",
+                GUID2String(instanceOld.first).c_str());
+        }
+
+        return it == mDirectInputDeviceInstancesNew.end();
+        });
+
+    for (auto& instanceNew : mDirectInputDeviceInstancesNew) {
+        auto existingInstanceIt = std::find_if(mDirectInputDeviceInstances.begin(), mDirectInputDeviceInstances.end(),
+            [&](const auto& instanceOld) {
+                return instanceNew.first == instanceOld.first;
+            });
+
+        if (existingInstanceIt == mDirectInputDeviceInstances.end()) {
+            auto hr = mDirectInput->CreateDevice(
+                instanceNew.first,
+                reinterpret_cast<LPDIRECTINPUTDEVICE*>(&instanceNew.second.Device),
+                nullptr);
+
+            if (FAILED(hr)) {
+                logger.Write(ERROR, "[Wheel] Failed to create device with GUID %s",
+                    GUID2String(instanceNew.first).c_str());
+                continue;
+            }
+
+            hr = instanceNew.second.Device->SetDataFormat(&c_dfDIJoystick2);
+
+            if (FAILED(hr)) {
+                logger.Write(ERROR, "[Wheel] Failed to set data format for device with GUID %s",
+                    GUID2String(instanceNew.first).c_str());
+                continue;
+            }
+
+            mDirectInputDeviceInstances.emplace(instanceNew);
+            logger.Write(DEBUG, "[Wheel] Added new device with GUID %s",
+                GUID2String(instanceNew.first).c_str());
+        }
+    }
+
+    return true;
+}
+
+BOOL WheelDirectInput::enumerateDevicesCallbackS(const DIDEVICEINSTANCE* instance, VOID* context) {
+    return reinterpret_cast<WheelDirectInput*>(context)->enumerateDevicesCallback(instance, context);
+}
+
+BOOL WheelDirectInput::enumerateDevicesCallback(const DIDEVICEINSTANCE* instance, VOID* context) {
+    logger.Write(DEBUG, "[Wheel] Callback for %s", GUID2String(instance->guidInstance).c_str());
+    DirectInputDeviceInfo deviceInfo{};
+    deviceInfo.DeviceInstance = *instance;
+    deviceInfo.DeviceCapabilities.dwSize = sizeof(deviceInfo.DeviceCapabilities);
+    mDirectInputDeviceInstancesNew.emplace(instance->guidInstance, deviceInfo);
+    return DIENUM_CONTINUE;
 }
 
 void WheelDirectInput::updateAxisSpeed() {
@@ -649,7 +755,7 @@ struct WheelData {
 };
 
 void WheelDirectInput::PlayLedsDInput(GUID guid, float currentRPM, float rpmFirstLedTurnsOn, float rpmRedLine) {
-    auto e = FindEntryFromGUID(guid);
+    auto e = GetDeviceInfo(guid);
 
     if (!e)
         return;
@@ -673,7 +779,7 @@ void WheelDirectInput::PlayLedsDInput(GUID guid, float currentRPM, float rpmFirs
     data_.lpvInBuffer = &wheelData_;
     data_.cbInBuffer = sizeof(wheelData_);
 
-    e->diDevice->Escape(&data_);
+    e->Device->Escape(&data_);
 }
 
 int WheelDirectInput::povDirectionToIndex(int povDirection) {

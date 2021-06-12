@@ -47,9 +47,6 @@
     </ClCompile>
     <ClCompile Include="ScriptHUD.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
-    <ClCompile Include="Input\DIDeviceFactory.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
     <ClCompile Include="Input\CarControls.cpp">
       <Filter>Input</Filter>
     </ClCompile>
@@ -330,9 +327,6 @@
       <Filter>Thirdparty</Filter>
     </ClInclude>
     <ClInclude Include="newNatives.h" />
-    <ClInclude Include="Input\DIDeviceFactory.h">
-      <Filter>Input</Filter>
-    </ClInclude>
     <ClInclude Include="Input\CarControls.hpp">
       <Filter>Input</Filter>
     </ClInclude>

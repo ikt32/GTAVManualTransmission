@@ -1,14 +1,14 @@
 #pragma once
 
-#include "DIDeviceFactory.h"
+#include <dinput.h>
 #include <array>
 #include <vector>
 #include <unordered_map>
+#include <optional>
 
 // https://stackoverflow.com/questions/24113864/what-is-the-right-way-to-use-a-guid-as-the-key-in-stdhash-map
 namespace std {
-    template<> struct hash<GUID>
-    {
+    template<> struct hash<GUID> {
         size_t operator()(const GUID& guid) const noexcept {
             const std::uint64_t* p = reinterpret_cast<const std::uint64_t*>(&guid);
             std::hash<std::uint64_t> hash;
@@ -16,6 +16,13 @@ namespace std {
         }
     };
 }
+
+struct DirectInputDeviceInfo {
+    DIDEVICEINSTANCE DeviceInstance;
+    DIDEVCAPS DeviceCapabilities;
+    LPDIRECTINPUTDEVICE8 Device;
+    DIJOYSTATE2 Joystate;
+};
 
 const int MAX_RGBBUTTONS = 128;
 const int AVGSAMPLES = 2;
@@ -66,13 +73,13 @@ public:
 
     WheelDirectInput();
     ~WheelDirectInput();
-    bool InitDI();
+
+    std::optional<DirectInputDeviceInfo> GetDeviceInfo(GUID guid);
+    const std::unordered_map<GUID, DirectInputDeviceInfo>& GetDevices();
 
     bool InitWheel();
-    // Call directly after InitWheel to reinit FFB (devices), since we rediscovered
     bool InitFFB(GUID guid, DIAxis ffAxis);
-    void UpdateCenterSteering(GUID guid, DIAxis steerAxis);
-    DIDevice* FindEntryFromGUID(GUID guid);
+    void Acquire();
 
     // Should be called every update()
     void Update();
@@ -97,6 +104,12 @@ public:
     void PlayLedsDInput(GUID guid, float currentRPM, float rpmFirstLedTurnsOn, float rpmRedLine);
 
 private:
+    bool initDirectInput();
+    bool isDirectInputInitialized();
+    bool enumerateDevices();
+    static BOOL CALLBACK enumerateDevicesCallbackS(const DIDEVICEINSTANCE* instance, VOID* context);
+    BOOL enumerateDevicesCallback(const DIDEVICEINSTANCE* instance, VOID* context);
+
     void updateAxisSpeed();
     void createConstantForceEffect(GUID device, DIAxis axis, DWORD rawAxis);
     void createDamperEffect(GUID device, DIAxis axis, DWORD rawAxis);
@@ -140,6 +153,11 @@ private:
 
     std::unordered_map<GUID, std::array<int, SIZEOF_DIAxis>> averageIndex { 0 };
     std::unordered_map<GUID, std::array<FFBEffects, SIZEOF_DIAxis>> ffbEffectInfo;
+
+    LPDIRECTINPUT mDirectInput = nullptr;
+
+    std::unordered_map<GUID, DirectInputDeviceInfo> mDirectInputDeviceInstances;
+    std::unordered_map<GUID, DirectInputDeviceInfo> mDirectInputDeviceInstancesNew;
 };
 
 bool isSupportedDrivingDevice(DWORD dwDevType);

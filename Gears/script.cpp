@@ -350,7 +350,7 @@ void update_inputs() {
     g_focused = SysUtil::IsWindowFocused();
 
     if (g_wheelInitDelayTimer.Expired() && g_wheelInitDelayTimer.Period() > 0) {
-        initWheel();
+        g_controls.GetWheel().Acquire();
         g_wheelInitDelayTimer.Reset(0);
     }
 

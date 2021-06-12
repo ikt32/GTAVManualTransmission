@@ -51,20 +51,15 @@ CarControls::~CarControls() = default;
 
 void CarControls::InitWheel() {
     if (!mWheelInput.InitWheel()) {
-        // Initialization failed somehow, so we skip
+        logger.Write(INFO, "[Wheel] Wheel not initialized, skipping FFB initialization");
         return;
     }
-
-    InitFFB();
-}
-
-void CarControls::InitFFB() {
 
     auto steerGUID = WheelAxes[static_cast<int>(WheelAxisType::Steer)].Guid;
     auto ffAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)].Control);
 
     if (mWheelInput.InitFFB(steerGUID, ffAxis)) {
-        mWheelInput.UpdateCenterSteering(steerGUID, ffAxis);
+        logger.Write(INFO, "[Wheel] Force feedback initialization failed");
     }
 }
 
@@ -455,14 +450,15 @@ void CarControls::CheckGUIDs(const std::vector<_GUID> & guids) {
 
     if (!missingFnd.empty()) {
         logger.Write(INFO, "[Wheel] Not set up in .ini: ");
-        for (auto g : missingFnd) {
-            auto entry = mWheelInput.FindEntryFromGUID(g);
-            if (entry == nullptr) continue;
-            auto devName = entry->diDeviceInstance.tszInstanceName;
+        for (auto guid : missingFnd) {
+            auto entry = mWheelInput.GetDeviceInfo(guid);
+            if (!entry)
+                continue;
+            auto devName = entry->DeviceInstance.tszInstanceName;
             logger.Write(INFO, "[Wheel] Device: %s", devName);
-            logger.Write(INFO, "[Wheel] GUID:   %s", GUID2String(g).c_str());
-            if (isSupportedDrivingDevice(entry->diDeviceInstance.dwDevType)) {
-                FreeDevices.push_back(Device(devName, g));
+            logger.Write(INFO, "[Wheel] GUID:   %s", GUID2String(guid).c_str());
+            if (isSupportedDrivingDevice(entry->DeviceInstance.dwDevType)) {
+                FreeDevices.push_back(Device(devName, guid));
             }
         }
     }
