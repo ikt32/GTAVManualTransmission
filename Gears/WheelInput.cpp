@@ -693,11 +693,29 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     satForce = static_cast<float>(satForce) * (1.0f - wheelsOffGroundRatio);
 
     if (g_vehData.mClass == VehicleClass::Car || g_vehData.mClass == VehicleClass::Quad) {
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 0, true)) {
-            satForce = satForce / 4.0f;
+        const float satLim = static_cast<float>(g_settings.Wheel.FFB.SATMax);
+        int wheelsFlat =
+            VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 0, false) ? 1 : 0 +
+            VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 1, false) ? 1 : 0;
+        if (wheelsFlat == 1) {
+            satForce = satForce * (2.0f / 3.0f);
         }
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 1, true)) {
-            satForce = satForce / 4.0f;
+        else if (wheelsFlat == 2) {
+            satForce = satForce * (1.0f / 3.0f);
+        }
+
+        int wheelsBurst =
+            VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 0, true) ? 1 : 0 +
+            VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 1, true) ? 1 : 0;
+        if (wheelsBurst == 1) {
+            float reduction = (3.0f / 6.0f);
+            satForce = satForce * reduction;
+            satForce = std::clamp(satForce, -satLim * reduction, satLim * reduction);
+        }
+        else if (wheelsBurst == 2) {
+            float reduction = (1.0f / 6.0f);
+            satForce = satForce * reduction;
+            satForce = std::clamp(satForce, -satLim * reduction, satLim * reduction);
         }
     }
     else if (g_vehData.mClass == VehicleClass::Bike) {
