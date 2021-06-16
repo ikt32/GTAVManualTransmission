@@ -1202,35 +1202,52 @@ void update_forcefeedbackmenu() {
     g_menu.FloatOption("Damper min speed", g_settings.Wheel.FFB.DamperMinSpeed, 0.0f, 40.0f, 0.2f,
         { "Speed where the damper strength should be minimal.", "In m/s." });
 
-    if (g_menu.Option("Tune FFB anti-deadzone")) {
-        g_controls.PlayFFBCollision(0);
-        g_controls.PlayFFBDynamics(0, 0);
-        while (true) {
-            if (IsKeyJustUp(str2key(escapeKey))) {
-                break;
-            }
-
-            if (IsKeyJustUp(str2key("LEFT"))) {
-                g_settings.Wheel.FFB.AntiDeadForce -= 100;
-                if (g_settings.Wheel.FFB.AntiDeadForce < 100) {
-                    g_settings.Wheel.FFB.AntiDeadForce = 0;
-                }
-            }
-
-            if (IsKeyJustUp(str2key("RIGHT"))) {
-                g_settings.Wheel.FFB.AntiDeadForce += 100;
-                if (g_settings.Wheel.FFB.AntiDeadForce > 10000 - 100) {
-                    g_settings.Wheel.FFB.AntiDeadForce = 10000;
-                }
-            }
-            g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
-
-            g_controls.PlayFFBDynamics(g_settings.Wheel.FFB.AntiDeadForce, 0);
-            
-            UI::ShowHelpText(fmt::format("Press [Left] and [Right] to decrease and increase force feedback anti-deadzone. "
-                "Use the highest value before your wheel starts moving. Currently [{}]. Press [{}] to exit.", g_settings.Wheel.FFB.AntiDeadForce, escapeKey));
-            WAIT(0);
+    if (g_settings.Wheel.FFB.LUTFile.empty()) {
+        if (g_menu.Option("FFB LUT inactive", {
+            "Use an FFB lookup table (LUT) to customize FFB response, and correct the non-linear response of your wheels' motors.",
+            "Select to open the readme on how to activate this."
+        })) {
+            WAIT(20);
+            PAD::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
+            ShellExecuteA(0, 0, "https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md#wheel-ffb-lut", 0, 0, SW_SHOW);
         }
+
+        if (g_menu.Option("Tune FFB anti-deadzone")) {
+            g_controls.PlayFFBCollision(0);
+            g_controls.PlayFFBDynamics(0, 0);
+            while (true) {
+                if (IsKeyJustUp(str2key(escapeKey))) {
+                    break;
+                }
+
+                if (IsKeyJustUp(str2key("LEFT"))) {
+                    g_settings.Wheel.FFB.AntiDeadForce -= 100;
+                    if (g_settings.Wheel.FFB.AntiDeadForce < 100) {
+                        g_settings.Wheel.FFB.AntiDeadForce = 0;
+                    }
+                }
+
+                if (IsKeyJustUp(str2key("RIGHT"))) {
+                    g_settings.Wheel.FFB.AntiDeadForce += 100;
+                    if (g_settings.Wheel.FFB.AntiDeadForce > 10000 - 100) {
+                        g_settings.Wheel.FFB.AntiDeadForce = 10000;
+                    }
+                }
+                g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
+
+                g_controls.PlayFFBDynamics(g_settings.Wheel.FFB.AntiDeadForce, 0);
+
+                UI::ShowHelpText(fmt::format("Press [Left] and [Right] to decrease and increase force feedback anti-deadzone. "
+                    "Use the highest value before your wheel starts moving. Currently [{}]. Press [{}] to exit.", g_settings.Wheel.FFB.AntiDeadForce, escapeKey));
+                WAIT(0);
+            }
+        }
+    }
+    else {
+        g_menu.Option("FFB LUT active", {
+            fmt::format("Using LUT: {}", g_settings.Wheel.FFB.LUTFile),
+            "FFB anti-deadzone disabled."
+        });
     }
 }
 

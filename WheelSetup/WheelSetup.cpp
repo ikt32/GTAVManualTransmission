@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <iostream>
 #include <thread>
+#include <fstream>
 #include <fmt/format.h>
 #include "../Gears/Input/WheelDirectInput.hpp"
 #include "../Gears/ScriptSettings.hpp"
@@ -120,6 +121,30 @@ void blankBlock(int x, int y, int lines, int rows) {
 	}
 }
 
+void loadLut(const std::string& lutPath) {
+	auto fullLutPath = fmt::format("{}/{}", Paths::GetRunningExecutableFolder(), lutPath);
+	std::ifstream lut(fullLutPath);
+
+	if (!lut.is_open()) {
+		logger.Write(ERROR, "[Wheel] Failed to open LUT file '%s'", fullLutPath.c_str());
+		return;
+	}
+
+	std::map<float, float> lutMap;
+	std::string line;
+	while (lut >> line) {
+		float in, out;
+		auto scanned = sscanf_s(line.c_str(), "%f|%f", &in, &out);
+		if (scanned != 2) {
+			logger.Write(ERROR, "[Wheel] Failed to read line in LUT file '%s'", line.c_str());
+			continue;
+		}
+		lutMap.emplace(in, out);
+	}
+
+	controls.GetWheel().AssignLut(lutMap);
+}
+
 /*
  * Similar to reInit() in Gears but with console stuff
  */
@@ -130,6 +155,12 @@ void init() {
 
 	controls.InitWheel();
 	controls.CheckGUIDs(g_settings.Wheel.InputDevices.RegisteredGUIDs);
+
+	if (!g_settings.Wheel.FFB.LUTFile.empty()) {
+		logger.Write(INFO, "[Wheel] Using LUT file for FFB: '%s'",
+			g_settings.Wheel.FFB.LUTFile.c_str());
+		loadLut(g_settings.Wheel.FFB.LUTFile);
+	}
 	
 	int totalWidth = 0;
 	for (const auto& [guid, device] : controls.GetWheel().GetDevices()) {

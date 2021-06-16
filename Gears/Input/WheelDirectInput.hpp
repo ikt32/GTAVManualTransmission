@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include <optional>
+#include <map>
 
 // https://stackoverflow.com/questions/24113864/what-is-the-right-way-to-use-a-guid-as-the-key-in-stdhash-map
 namespace std {
@@ -73,6 +74,8 @@ public:
 
     WheelDirectInput();
     ~WheelDirectInput();
+    void ClearLut();
+    void AssignLut(const std::map<float, float>& rawLut);
 
     std::optional<DirectInputDeviceInfo> GetDeviceInfo(GUID guid);
     const std::unordered_map<GUID, DirectInputDeviceInfo>& GetDevices();
@@ -154,6 +157,8 @@ private:
 
     std::unordered_map<GUID, DirectInputDeviceInfo> mDirectInputDeviceInstances;
     std::unordered_map<GUID, DirectInputDeviceInfo> mDirectInputDeviceInstancesNew;
+
+    std::vector<int> mLut;
 };
 
 bool isSupportedDrivingDevice(DWORD dwDevType);

@@ -730,12 +730,14 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
         UI::ShowText(0.85, 0.225, 0.4, fmt::format("Error:\t\t{:.3f}", error), 4);
         UI::ShowText(0.85, 0.250, 0.4, fmt::format("{}Under:\t\t{:.3f}~w~", understeering ? "~b~" : "~w~", understeer), 4);
     }
-    float adf = static_cast<float>(g_settings.Wheel.FFB.AntiDeadForce);
-    if (satForce > 0.0f) {
-        satForce = map(satForce, 0.0f, 10000.0f, adf, 10000.0f);
-    }
-    if (satForce < 0.0f) {
-        satForce = map(satForce, -10000.0f, -0.0f, -10000.0f, -adf);
+    if (g_settings.Wheel.FFB.LUTFile.empty()) {
+        float adf = static_cast<float>(g_settings.Wheel.FFB.AntiDeadForce);
+        if (satForce > 0.0f) {
+            satForce = map(satForce, 0.0f, 10000.0f, adf, 10000.0f);
+        }
+        if (satForce < 0.0f) {
+            satForce = map(satForce, -10000.0f, -0.0f, -10000.0f, -adf);
+        }
     }
     float satMax = static_cast<float>(g_settings.Wheel.FFB.SATMax);
     satForce = std::clamp(satForce, -satMax, satMax);

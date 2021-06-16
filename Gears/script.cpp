@@ -57,6 +57,7 @@
 #include <mutex>
 #include <filesystem>
 #include <numeric>
+#include <fstream>
 
 namespace fs = std::filesystem;
 using VExt = VehicleExtensions;
@@ -2585,6 +2586,31 @@ void initTimers() {
     }
 }
 
+void loadLut(const std::string& lutPath) {
+    const std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
+    auto fullLutPath = fmt::format("{}/{}", absoluteModPath, lutPath);
+    std::ifstream lut(fullLutPath);
+
+    if (!lut.is_open()) {
+        logger.Write(ERROR, "[Wheel] Failed to open LUT file '%s'", fullLutPath.c_str());
+        return;
+    }
+
+    std::map<float, float> lutMap;
+    std::string line;
+    while (lut >> line) {
+        float in, out;
+        auto scanned = sscanf_s(line.c_str(), "%f|%f", &in, &out);
+        if (scanned != 2) {
+            logger.Write(ERROR, "[Wheel] Failed to read line in LUT file '%s'", line.c_str());
+            continue;
+        }
+        lutMap.emplace(in, out);
+    }
+
+    g_controls.GetWheel().AssignLut(lutMap);
+}
+
 void readSettings() {
     g_settings.Read(&g_controls);
     if (g_settings.Debug.LogLevel > 4)
@@ -2601,6 +2627,15 @@ void readSettings() {
     initTimers();
 
     SteeringAnimation::Load();
+
+    if (!g_settings.Wheel.FFB.LUTFile.empty()) {
+        logger.Write(INFO, "[Wheel] Using LUT file for FFB: '%s'",
+            g_settings.Wheel.FFB.LUTFile.c_str());
+        loadLut(g_settings.Wheel.FFB.LUTFile);
+    }
+    else {
+        g_controls.GetWheel().ClearLut();
+    }
 
     logger.Write(INFO, "Settings read");
 }

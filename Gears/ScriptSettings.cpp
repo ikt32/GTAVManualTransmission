@@ -836,6 +836,7 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     LOAD_VAL("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
     LOAD_VAL("FORCE_FEEDBACK", "Gamma", Wheel.FFB.Gamma);
     LOAD_VAL("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
+    Wheel.FFB.LUTFile = ini.GetValue("FORCE_FEEDBACK", "LUTFile", "");
 
     // [INPUT_DEVICES]
     int it = 0;

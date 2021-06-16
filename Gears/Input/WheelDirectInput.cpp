@@ -3,6 +3,7 @@
 #include "../Util/Logger.hpp"
 #include "../Util/Strings.hpp"
 #include "../Util/GUID.h"
+#include "../Util/MathExt.h"
 
 #ifdef _DEBUG
 #include "../Dump.h"
@@ -18,6 +19,9 @@
 #pragma comment(lib, "dxguid.lib")
 
 #define SAFE_RELEASE(p) { if(p) { (p)->Release(); (p)=nullptr; } }
+
+// 0 - 10000 (inclusive)
+constexpr uint32_t outputLutSize = 10001;
 
 std::string formatError(HRESULT hr) {
     switch (hr) {
@@ -46,6 +50,62 @@ WheelDirectInput::~WheelDirectInput() {
     }
 
     SAFE_RELEASE(lpDi);
+}
+
+void WheelDirectInput::ClearLut() {
+    mLut = std::vector<int>(outputLutSize);
+}
+
+void WheelDirectInput::AssignLut(const std::map<float, float>& rawLut) {
+    ClearLut();
+
+    if (rawLut.size() == 0) {
+        logger.Write(WARN, "[Wheel] Empty LUT, skipping");
+        return;
+    }
+
+    if (!Math::Near(rawLut.begin()->second, 0.0f, 0.01f)) {
+        logger.Write(WARN, "[Wheel] LUT[0] is %f, should be 0.0, skipping", rawLut.begin()->second);
+        return;
+    }
+
+    if (!Math::Near(rawLut.rbegin()->second, 1.0f, 0.01f)) {
+        logger.Write(WARN, "[Wheel] LUT[back] is %f, should be 1.0, skipping", rawLut.begin()->second);
+        return;
+    }
+
+    for (const auto& [inputRaw, outputRaw] : rawLut) {
+        uint32_t input = (int)(inputRaw * 10000.0f);
+        int output = (int)(outputRaw * 10000.0f);
+        mLut[input] = output;
+    }
+
+    uint32_t prevNonZeroIdx = 0;
+    for (uint32_t i = 1; i < outputLutSize; ++i) {
+        if (mLut[i] != 0) {
+            prevNonZeroIdx = i;
+        }
+        if (mLut[i] == 0) {
+            int prevVal = mLut[prevNonZeroIdx];
+
+            // Find next non-zero value
+            uint32_t nextIndex = i + 1;
+            for (; nextIndex < outputLutSize; ++nextIndex) {
+                if (mLut[nextIndex] != 0) {
+                    break;
+                }
+            }
+            int nextVal = mLut[nextIndex];
+            mLut[i] = static_cast<int>(
+                map(static_cast<float>(i),
+                    static_cast<float>(prevNonZeroIdx),
+                    static_cast<float>(nextIndex),
+                    static_cast<float>(prevVal),
+                    static_cast<float>(nextVal)));
+        }
+    }
+
+    logger.Write(DEBUG, "[Wheel] Expanded LUT with %d values to %d values", rawLut.size(), outputLutSize);
 }
 
 std::optional<DirectInputDeviceInfo> WheelDirectInput::GetDeviceInfo(GUID guid) {
@@ -494,6 +554,12 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
 }
 
 void WheelDirectInput::SetConstantForce(GUID device, DIAxis ffAxis, int force) {
+    force = std::clamp(force, -10000, 10000);
+
+    if (mLut.size() == outputLutSize) {
+        force = mLut[abs(force)] * sgn(force);
+    }
+
     // As per Microsoft's DirectInput example:
     // Modifying an effect is basically the same as creating a new one, except
     // you need only specify the parameters you are modifying

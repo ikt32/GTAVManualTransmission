@@ -364,6 +364,7 @@ public:
             float CollisionMult = 2.5f;
             float Gamma = 0.75f;
             float MaxSpeed = 80.0f;
+            std::string LUTFile;
         } FFB;
 
         // [STEER]
