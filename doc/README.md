@@ -2,7 +2,7 @@
 
 # Manual Transmission and Steering Wheel Support for GTA V
 
-Version 5.0.0
+Version 5.4.0
 
 ![5mods Thumbnail](MTThumb.jpg)
 
