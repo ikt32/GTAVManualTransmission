@@ -1,8 +1,19 @@
 # Changelog
 
-## 5.3.1
+## 5.4.0
 
-A bunch of minor changes, mostly improves wheel experience.
+A mostly wheel-focused update to improve wheel experience.
+
+Wheel:
+
+* Rework wheel initialization, which should fix G920 + SHVDN and G29 + G Hub issues, finally!
+* Add FFB LUT for better, more consistent FFB. Check the new [README section](https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md#wheel-ffb-lut)!
+* Add FFB setting for understeer effect multiplier
+* Add FFB strength UI element
+* Fix FFB loss during lagspikes (up to 500ms)
+* Fix FFB damper transition for soft lock
+* Fix unclamped soft lock steering angles when engine off
+* Slightly improve popped tyres feeling
 
 Non-wheel:
 
@@ -10,19 +21,13 @@ Non-wheel:
 * Improve shifting duration calculations, same as game now
 * Improve automatic gearbox downshift, jumps multiple gears now
 * Improve throttle cut duration on upshifts
+* Improve electric vehicles and vehicles with CVT clutch exception handling
 * Fix throttle blip on downshifts
 * Fix CustomSteering not using remapped keyboard settings
 * Fix shifting affecting cruise control too much
 * Allow user-defined colors for launch control in RPM bar
+* Set defaults for ducking/switching weapons blocking and shifting controls
 * Various bug fixes and improvements
-
-Wheel:
-
-* Fix FFB loss during lagspikes (up to 500ms)
-* Fix FFB damper transition for soft lock
-* Fix unclamped soft lock steering angles when engine off
-* Add FFB setting for understeer effect multiplier
-* Add FFB strength UI element
 
 ## 5.3.0
 
