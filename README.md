@@ -39,7 +39,7 @@ Check [the user readme](doc/README.md) for more information.
 
 ## Building requirements
 
-* VS2019 16.9+
+* VS2019 16.10+
 * [DirectX SDK (June 2010)](https://www.microsoft.com/en-us/download/details.aspx?id=6812) for XInput 1.3 ([see doc](doc/notes.md))
 
 Remember to (recursively) init/update your submodules after cloning!
