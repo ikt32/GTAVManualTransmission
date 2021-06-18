@@ -53,7 +53,7 @@ WheelDirectInput::~WheelDirectInput() {
 }
 
 void WheelDirectInput::ClearLut() {
-    mLut = std::vector<int>(outputLutSize);
+    mLut.clear();
 }
 
 void WheelDirectInput::AssignLut(const std::map<float, float>& rawLut) {
@@ -73,6 +73,8 @@ void WheelDirectInput::AssignLut(const std::map<float, float>& rawLut) {
         logger.Write(WARN, "[Wheel] LUT[back] is %f, should be 1.0, skipping", rawLut.begin()->second);
         return;
     }
+
+    mLut = std::vector<int>(outputLutSize);
 
     for (const auto& [inputRaw, outputRaw] : rawLut) {
         uint32_t input = (int)(inputRaw * 10000.0f);
