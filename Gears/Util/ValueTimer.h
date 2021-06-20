@@ -21,12 +21,12 @@ public:
 
         bool triggeredNow = false;
         if (mLimA < mLimB) {
-            if (newVal > mLimB && !mTriggered) {
+            if (newVal >= mLimB && !mTriggered) {
                 triggeredNow = true;
             }
         }
         else {
-            if (newVal < mLimB && !mTriggered) {
+            if (newVal <= mLimB && !mTriggered) {
                 triggeredNow = true;
             }
         }
@@ -45,6 +45,6 @@ public:
     bool mTriggered;
     std::string mUnit;
 protected:
-    Timer mTimer;
+    GameTimer mTimer;
     std::function<void(const std::string&)> mFunc;
 };

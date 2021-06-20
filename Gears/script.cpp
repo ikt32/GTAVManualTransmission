@@ -321,13 +321,13 @@ void update_vehicle() {
             float speed;
             switch(joaat(valueTimer.mUnit.c_str())) {
                 case (joaat("kph")):
-                    speed = g_vehData.mVelocity.y * 3.6f;
+                    speed = Length(g_vehData.mVelocity) * 3.6f;
                     break;
                 case (joaat("mph")):
-                    speed = g_vehData.mVelocity.y / 0.44704f;
+                    speed = Length(g_vehData.mVelocity) / 0.44704f;
                     break;
                 default:
-                    speed = g_vehData.mVelocity.y;
+                    speed = Length(g_vehData.mVelocity);
             }
             valueTimer.Update(speed);
         }

@@ -1,4 +1,9 @@
 #include "Timer.h"
+
+#ifndef NO_NATIVES
+#include <inc/natives.h>
+#endif
+
 #include <chrono>
 
 inline auto now() {
@@ -32,3 +37,35 @@ int64_t Timer::Elapsed() const {
 int64_t Timer::Period() const {
     return mPeriod;
 }
+
+#ifndef NO_NATIVES
+inline auto gameNow() {
+    return MISC::GET_GAME_TIMER();
+}
+
+GameTimer::GameTimer(int64_t timeout) :
+    mPeriod(timeout),
+    mPreviousTime(now()) {
+}
+
+void GameTimer::Reset() {
+    mPreviousTime = now();
+}
+
+void GameTimer::Reset(int64_t newTimeout) {
+    mPeriod = newTimeout;
+    mPreviousTime = now();
+}
+
+bool GameTimer::Expired() const {
+    return now() > mPreviousTime + mPeriod;
+}
+
+int64_t GameTimer::Elapsed() const {
+    return now() - mPreviousTime;
+}
+
+int64_t GameTimer::Period() const {
+    return mPeriod;
+}
+#endif
