@@ -556,6 +556,9 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
 }
 
 void WheelDirectInput::SetConstantForce(GUID device, DIAxis ffAxis, int force) {
+    if (ffAxis >= UNKNOWN_AXIS)
+        return;
+
     force = std::clamp(force, -10000, 10000);
 
     if (mLut.size() == outputLutSize) {
@@ -591,6 +594,9 @@ void WheelDirectInput::SetConstantForce(GUID device, DIAxis ffAxis, int force) {
 }
 
 void WheelDirectInput::SetDamper(GUID device, DIAxis ffAxis, int force) {
+    if (ffAxis >= UNKNOWN_AXIS)
+        return;
+
     auto e = GetDeviceInfo(device);
     if (!e || !ffbEffectInfo[device][ffAxis].Enabled)
         return;
@@ -618,6 +624,9 @@ void WheelDirectInput::SetDamper(GUID device, DIAxis ffAxis, int force) {
 }
 
 void WheelDirectInput::SetCollision(GUID device, DIAxis ffAxis, int force) {
+    if (ffAxis >= UNKNOWN_AXIS)
+        return;
+
     auto e = GetDeviceInfo(device);
     if (!e || !ffbEffectInfo[device][ffAxis].Enabled)
         return;
