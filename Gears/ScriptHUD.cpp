@@ -718,12 +718,12 @@ void drawInputWheelInfo() {
 std::vector<Vector3> GetWheelCoords(Vehicle handle) {
     std::vector<Vector3> worldCoords;
     std::vector<Vector3> positions = VExt::GetWheelOffsets(handle);
-    Vector3 position = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
-    Vector3 rotation = ENTITY::GET_ENTITY_ROTATION(g_playerVehicle, 0);
+    Vector3 position = ENTITY::GET_ENTITY_COORDS(handle, true);
+    Vector3 rotation = ENTITY::GET_ENTITY_ROTATION(handle, 0);
     rotation.x = deg2rad(rotation.x);
     rotation.y = deg2rad(rotation.y);
     rotation.z = deg2rad(rotation.z);
-    Vector3 direction = ENTITY::GET_ENTITY_FORWARD_VECTOR(g_playerVehicle);
+    Vector3 direction = ENTITY::GET_ENTITY_FORWARD_VECTOR(handle);
 
     worldCoords.reserve(positions.size());
     for (Vector3 wheelPos : positions) {
