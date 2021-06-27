@@ -1417,6 +1417,8 @@ void update_speedodisplaymenu() {
     if (newPos != oldPos) {
         g_settings.HUD.Speedo.Speedo = speedoTypes.at(newPos);
     }
+    g_menu.BoolOption("Use drivetrain speed", g_settings.HUD.Speedo.UseDrivetrain,
+        { "Uses speed from the driven wheels or dashboard if selected, otherwise uses physics speed." });
     g_menu.BoolOption("Show units", g_settings.HUD.Speedo.ShowUnit);
 
     g_menu.FloatOption("Speedometer X", g_settings.HUD.Speedo.XPos, 0.0f, 1.0f, 0.005f);

@@ -163,6 +163,7 @@ void ScriptSettings::SaveGeneral() {
 
     SAVE_VAL("HUD", "Speedo", HUD.Speedo.Speedo);
     SAVE_VAL("HUD", "SpeedoShowUnit", HUD.Speedo.ShowUnit);
+    SAVE_VAL("HUD", "SpeedoUseDrivetrain", HUD.Speedo.UseDrivetrain);
     SAVE_VAL("HUD", "SpeedoXpos", HUD.Speedo.XPos);
     SAVE_VAL("HUD", "SpeedoYpos", HUD.Speedo.YPos);
     SAVE_VAL("HUD", "SpeedoSize", HUD.Speedo.Size);
@@ -484,6 +485,7 @@ void ScriptSettings::parseSettingsGeneral() {
 
     LOAD_VAL("HUD", "Speedo", HUD.Speedo.Speedo);
     LOAD_VAL("HUD", "SpeedoShowUnit", HUD.Speedo.ShowUnit);
+    LOAD_VAL("HUD", "SpeedoUseDrivetrain", HUD.Speedo.UseDrivetrain);
     LOAD_VAL("HUD", "SpeedoXpos", HUD.Speedo.XPos);
     LOAD_VAL("HUD", "SpeedoYpos", HUD.Speedo.YPos);
     LOAD_VAL("HUD", "SpeedoSize", HUD.Speedo.Size);

@@ -125,6 +125,7 @@ public:
             // can be kph, mph, or ms
             std::string Speedo = "kph";
             bool ShowUnit = true;
+            bool UseDrivetrain = true;
             float XPos = 0.860f;
             float YPos = 0.885f;
             float Size = 0.700f;

@@ -462,7 +462,13 @@ std::string formatSpeedo(std::string units, float speed, bool showUnit, int hudF
 }
 
 void drawSpeedoMeter() {
-    float dashms = g_vehData.mHasSpeedo ? VExt::GetDashSpeed(g_playerVehicle) : abs(g_vehData.mDiffSpeed);
+    float speedms;
+    
+    if (g_settings.HUD.Speedo.UseDrivetrain)
+        speedms = g_vehData.mHasSpeedo ? VExt::GetDashSpeed(g_playerVehicle) : abs(g_vehData.mDiffSpeed);
+    else
+        speedms = Length(g_vehData.mVelocity);
+
     const Util::ColorI color {
         g_settings.HUD.Speedo.ColorR,
         g_settings.HUD.Speedo.ColorG,
@@ -470,7 +476,7 @@ void drawSpeedoMeter() {
         255
     };
     UI::ShowText(g_settings.HUD.Speedo.XPos, g_settings.HUD.Speedo.YPos, g_settings.HUD.Speedo.Size,
-        formatSpeedo(g_settings.HUD.Speedo.Speedo, dashms, g_settings.HUD.Speedo.ShowUnit, g_settings.HUD.Font),
+        formatSpeedo(g_settings.HUD.Speedo.Speedo, speedms, g_settings.HUD.Speedo.ShowUnit, g_settings.HUD.Font),
         g_settings.HUD.Font, color, g_settings.HUD.Outline);
 }
 
