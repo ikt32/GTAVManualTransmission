@@ -971,7 +971,15 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 
     // [LIGHTS]
     scriptControl->WheelButton[GET_WT(Lights)] =
-        parseWheelItem<int>(ini, "LIGHTS", -1);
+        parseWheelItem<int>(ini, "LIGHTS", -1, "Lights (Cycle)");
+
+    // [LIGHTS_LOW]
+    scriptControl->WheelButton[GET_WT(LightsLow)] =
+        parseWheelItem<int>(ini, "LIGHTS_LOW", -1, "Lights (Toggle low beams)");
+
+    // [LIGHTS_HIGH]
+    scriptControl->WheelButton[GET_WT(LightsHigh)] =
+        parseWheelItem<int>(ini, "LIGHTS_HIGH", -1, "Lights (Toggle high beams)");
 
     // [HORN]
     scriptControl->WheelButton[GET_WT(Horn)] =

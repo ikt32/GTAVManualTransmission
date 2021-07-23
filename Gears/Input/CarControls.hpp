@@ -105,6 +105,8 @@ public:
         Handbrake,
         Horn,
         Lights,
+        LightsLow,
+        LightsHigh,
         LookBack,
         LookLeft,
         LookRight,

@@ -436,6 +436,20 @@ void checkVehicleInputButtons() {
     if (g_controls.ButtonJustPressed(CarControls::WheelControlType::Lights)) {
         PAD::_SET_CONTROL_NORMAL(0, ControlVehicleHeadlight, 1.0f);
     }
+
+    BOOL areLowBeamsOn = FALSE;
+    BOOL areHighBeamsOn = FALSE;
+    VEHICLE::GET_VEHICLE_LIGHTS_STATE(g_playerVehicle, &areLowBeamsOn, &areHighBeamsOn);
+    bool areLowBeamsOn_ = areLowBeamsOn == TRUE;
+    bool areHighBeamsOn_ = areHighBeamsOn == TRUE;
+
+    if (g_controls.ButtonJustPressed(CarControls::WheelControlType::LightsLow)) {
+        VEHICLE::SET_VEHICLE_LIGHTS(g_playerVehicle, !areLowBeamsOn_ ? 3 : 4);
+    }
+    if (g_controls.ButtonJustPressed(CarControls::WheelControlType::LightsHigh)) {
+        if (areLowBeamsOn_)
+            VEHICLE::SET_VEHICLE_FULLBEAM(g_playerVehicle, !areHighBeamsOn_);
+    }
 }
 
 void WheelInput::CheckButtons() {
