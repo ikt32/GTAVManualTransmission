@@ -71,6 +71,8 @@ namespace WheelInput {
     float GetFFBConstantForce() {
         return lastConstantForce / 10000.0f;
     }
+
+    bool toggledLowBeamsForFlash = false;
 }
 
 // Check for "alternative" movement methods for cars.
@@ -449,6 +451,26 @@ void checkVehicleInputButtons() {
     if (g_controls.ButtonJustPressed(CarControls::WheelControlType::LightsHigh)) {
         if (areLowBeamsOn_)
             VEHICLE::SET_VEHICLE_FULLBEAM(g_playerVehicle, !areHighBeamsOn_);
+    }
+
+    if (g_controls.ButtonJustPressed(CarControls::WheelControlType::LightsHighFlash)) {
+        if (!areLowBeamsOn_) {
+            VEHICLE::SET_VEHICLE_LIGHTS(g_playerVehicle, 3);
+            WheelInput::toggledLowBeamsForFlash = true;
+            auto brokenLights = VExt::GetLightsBroken(g_playerVehicle);
+            VExt::SetLightsBroken(g_playerVehicle, (uint32_t)(brokenLights | LeftTailLight | RightTailLight));
+        }
+        VEHICLE::SET_VEHICLE_FULLBEAM(g_playerVehicle, true);
+    }
+    if (g_controls.ButtonReleased(CarControls::WheelControlType::LightsHighFlash)) {
+        if (WheelInput::toggledLowBeamsForFlash) {
+            VEHICLE::SET_VEHICLE_LIGHTS(g_playerVehicle, 4);
+            WheelInput::toggledLowBeamsForFlash = false;
+
+            auto brokenLights = VExt::GetLightsBroken(g_playerVehicle);
+            VExt::SetLightsBroken(g_playerVehicle, VExt::GetLightsBrokenVisual(g_playerVehicle));
+        }
+        VEHICLE::SET_VEHICLE_FULLBEAM(g_playerVehicle, false);
     }
 }
 

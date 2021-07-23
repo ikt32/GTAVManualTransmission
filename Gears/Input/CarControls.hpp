@@ -107,6 +107,7 @@ public:
         Lights,
         LightsLow,
         LightsHigh,
+        LightsHighFlash,
         LookBack,
         LookLeft,
         LookRight,
