@@ -26,6 +26,8 @@ namespace {
     int hoverTransformRatioOffset = 0;
     int hoverTransformRatioLerpOffset = 0;
     int fuelLevelOffset = 0;
+    int lightsBrokenOffset = 0;
+    int lightsBrokenVisuallyOffset = 0;
     int nextGearOffset = 0;
     int currentGearOffset = 0;
     int topGearOffset = 0;
@@ -131,6 +133,15 @@ void VehicleExtensions::Init() {
     addr = mem::FindPattern("\x74\x26\x0F\x57\xC9", "xxxxx");
     fuelLevelOffset = addr == 0 ? 0 : *(int*)(addr + 8);
     logger.Write(fuelLevelOffset == 0 ? WARN : DEBUG, "Fuel Level Offset: 0x%X", fuelLevelOffset);
+
+    // 86C -> bulb
+    addr = mem::FindPattern("F6 87 ? ? ? ? 02 75 06 C6 45 80 01");
+    lightsBrokenOffset = addr == 0 ? 0 : *(int*)(addr + 2);;
+    logger.Write(lightsBrokenOffset == 0 ? WARN : DEBUG, "Lights Broken Offset: 0x%X", lightsBrokenOffset);
+
+    // 874 -> visibly
+    lightsBrokenVisuallyOffset = addr == 0 ? 0 : lightsBrokenOffset + 8;
+    logger.Write(lightsBrokenVisuallyOffset == 0 ? WARN : DEBUG, "Lights Visually Broken Offset: 0x%X", lightsBrokenVisuallyOffset);
 
     addr = mem::FindPattern("\x48\x8D\x8F\x00\x00\x00\x00\x4C\x8B\xC3\xF3\x0F\x11\x7C\x24",
                             "xxx????xxxxxxxx");
@@ -383,6 +394,30 @@ float VehicleExtensions::GetFuelLevel(Vehicle handle) {
 void VehicleExtensions::SetFuelLevel(Vehicle handle, float value) {
     if (fuelLevelOffset == 0) return;
     *reinterpret_cast<float *>(GetAddress(handle) + fuelLevelOffset) = value;
+}
+
+uint32_t VehicleExtensions::GetLightsBroken(Vehicle handle) {
+    if (lightsBrokenOffset == 0) return 0;
+    auto address = GetAddress(handle);
+    return *reinterpret_cast<uint32_t*>(address + lightsBrokenOffset);
+}
+
+void VehicleExtensions::SetLightsBroken(Vehicle handle, uint32_t value) {
+    if (lightsBrokenOffset == 0) return;
+    auto address = GetAddress(handle);
+    *reinterpret_cast<uint32_t*>(address + lightsBrokenOffset) = value;
+}
+
+uint32_t VehicleExtensions::GetLightsBrokenVisual(Vehicle handle) {
+    if (lightsBrokenVisuallyOffset == 0) return 0;
+    auto address = GetAddress(handle);
+    return *reinterpret_cast<uint32_t*>(address + lightsBrokenVisuallyOffset);
+}
+
+void VehicleExtensions::SetLightsBrokenVisual(Vehicle handle, uint32_t value) {
+    if (lightsBrokenVisuallyOffset == 0) return;
+    auto address = GetAddress(handle);
+    *reinterpret_cast<uint32_t*>(address + lightsBrokenVisuallyOffset) = value;
 }
 
 uint16_t VehicleExtensions::GetGearNext(Vehicle handle) {

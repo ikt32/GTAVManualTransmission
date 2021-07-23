@@ -39,7 +39,11 @@ public:
     static float GetFuelLevel(Vehicle handle);
     static void SetFuelLevel(Vehicle handle, float value);
 
-    // TODO: CVeh + 0x84c (1604 - 1868) (Lights damaged)
+    static uint32_t GetLightsBroken(Vehicle handle);
+    static void SetLightsBroken(Vehicle handle, uint32_t value);
+
+    static uint32_t GetLightsBrokenVisual(Vehicle handle);
+    static void SetLightsBrokenVisual(Vehicle handle, uint32_t value);
 
     static uint16_t GetGearNext(Vehicle handle);
     static void SetGearNext(Vehicle handle, uint16_t value);
