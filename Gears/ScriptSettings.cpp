@@ -766,6 +766,10 @@ void ScriptSettings::parseSettingsControls(CarControls* scriptControl) {
     scriptControl->KBControl[GET_KT(Toggle)] = parseKeyboardItem(ini, "Toggle", "VK_OEM_5", "Toggle MT");
     scriptControl->KBControl[GET_KT(ToggleH)] = parseKeyboardItem(ini, "ToggleH", "VK_OEM_6", "Switch shift mode");
 
+    scriptControl->KBControl[GET_KT(IndicatorLeft)] = parseKeyboardItem(ini, "IndicatorLeft", "UNKNOWN", "Indicator left");
+    scriptControl->KBControl[GET_KT(IndicatorRight)] = parseKeyboardItem(ini, "IndicatorRight", "UNKNOWN", "Indicator right");
+    scriptControl->KBControl[GET_KT(IndicatorHazard)] = parseKeyboardItem(ini, "IndicatorHazard", "UNKNOWN", "Hazard lights");
+
     scriptControl->KBControl[GET_KT(CycleAssists)] = parseKeyboardItem(ini, "CycleAssists", "UNKNOWN", "Cycle assists");
     scriptControl->KBControl[GET_KT(ToggleABS)] = parseKeyboardItem(ini, "ToggleABS", "UNKNOWN", "Toggle ABS");
     scriptControl->KBControl[GET_KT(ToggleESC)] = parseKeyboardItem(ini, "ToggleESC", "UNKNOWN", "Toggle ESC");

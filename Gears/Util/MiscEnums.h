@@ -47,4 +47,17 @@ enum EVehicleLight : uint32_t {
     LeftBrakeLight = 1 << 8,
     RightBrakeLight = 1 << 9,
     MiddleBrakeLight = 1 << 10,
+
+    LeftReverseLight = 1 << 11,
+    RightReverseLight = 1 << 12,
+};
+
+enum EVehicleLightState : uint32_t {
+    LightStateIndicatorLeft = 1 << 8,
+    LightStateIndicatorRight = 1 << 9,
+};
+
+enum EIndicators {
+    IndicatorRight = 0,
+    IndicatorLeft = 1,
 };

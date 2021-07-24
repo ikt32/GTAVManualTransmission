@@ -41,6 +41,7 @@
 #include "Util/GameSound.h"
 #include "Util/SysUtils.h"
 #include "Util/Strings.hpp"
+#include "Util/MiscEnums.h"
 
 #include <GTAVDashHook/DashHook/DashHook.h>
 #include <menu.h>
@@ -548,6 +549,49 @@ void update_manual_transmission() {
         g_controls.ButtonHeld(CarControls::ControllerControlType::ToggleH) ||
         g_controls.PrevInput == CarControls::Controller	&& g_controls.ButtonHeld(CarControls::LegacyControlType::ToggleH)) {
         setShiftMode(Next(g_settings().MTOptions.ShiftMode));
+    }
+
+    auto lightStates = VExt::GetLightStates(g_playerVehicle);
+
+    bool indicatorRight = (lightStates & EVehicleLightState::LightStateIndicatorRight) > 0;
+    bool indicatorLeft = (lightStates & EVehicleLightState::LightStateIndicatorLeft) > 0;
+    bool indicatorHazards = indicatorLeft && indicatorRight;
+
+    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::IndicatorLeft)) {
+        if (!indicatorHazards) {
+            if (indicatorLeft) {
+                VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, EIndicators::IndicatorRight, false);
+                VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, EIndicators::IndicatorLeft, false);
+            }
+            else {
+                VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, EIndicators::IndicatorRight, false);
+                VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, EIndicators::IndicatorLeft, true);
+            }
+        }
+    }
+
+    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::IndicatorRight)) {
+        if (!indicatorHazards) {
+            if (indicatorRight) {
+                VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, EIndicators::IndicatorRight, false);
+                VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, EIndicators::IndicatorLeft, false);
+            }
+            else {
+                VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, EIndicators::IndicatorRight, true);
+                VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, EIndicators::IndicatorLeft, false);
+            }
+        }
+    }
+
+    if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::IndicatorHazard)) {
+        if (!indicatorHazards) {
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, EIndicators::IndicatorRight, true);
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, EIndicators::IndicatorLeft, true);
+        }
+        else {
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, EIndicators::IndicatorRight, false);
+            VEHICLE::SET_VEHICLE_INDICATOR_LIGHTS(g_playerVehicle, EIndicators::IndicatorLeft, false);
+        }
     }
 
     if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::CycleAssists) || 
