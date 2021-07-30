@@ -564,6 +564,7 @@
     <ClInclude Include="Util\Materials.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
@@ -628,5 +629,8 @@
     <Library Include="..\thirdparty\curl\libcurl.lib">
       <Filter>Thirdparty\curl</Filter>
     </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Gears.rc" />
   </ItemGroup>
 </Project>

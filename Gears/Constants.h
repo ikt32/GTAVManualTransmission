@@ -6,8 +6,10 @@
 #define VERSION_MINOR 4
 #define VERSION_PATCH 1
 
+#define VERSION_DISPLAY STR(VERSION_MAJOR) "."  STR(VERSION_MINOR) "." STR(VERSION_PATCH)
+
 namespace Constants {
-    static const char* const DisplayVersion = "v" STR(VERSION_MAJOR) "."  STR(VERSION_MINOR) "." STR(VERSION_PATCH);
+    static const char* const DisplayVersion = "v" VERSION_DISPLAY;
     static const char* const ModDir = "\\ManualTransmission";
     static const char* const NotificationPrefix =  "~b~Manual Transmission~w~";
 }
