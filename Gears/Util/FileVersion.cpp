@@ -11,10 +11,6 @@
 
 namespace fs = std::filesystem;
 
-namespace {
-    bool FiveM = false;
-}
-
 bool operator==(const SVersion& a, const SVersion& b) {
     return a.Minor == b.Minor && a.Build == b.Build;
 }
@@ -63,27 +59,5 @@ SVersion getExeVersion(const std::string & exe) {
 SVersion getExeInfo() {
     std::string currExe = Paths::GetRunningExecutablePath();
     logger.Write(INFO, "Running executable: %s", currExe.c_str());
-
-    HMODULE citizenGameHandle = GetModuleHandle("CitizenGame.dll");
-
-    if (citizenGameHandle != nullptr) {
-        FiveM = true;
-        logger.Write(INFO, "FiveM detected");
-
-        FARPROC funcGetGameVersion = GetProcAddress(citizenGameHandle, "GetGameVersion");
-        if (!funcGetGameVersion) {
-            logger.Write(INFO, "No GetGameVersion in CitizenGame.dll, using default b1604");
-            return { 1604, 0 };
-        }
-
-        int(*GetGameVersion)() = reinterpret_cast<int(*)()>(funcGetGameVersion);
-        return { GetGameVersion(), 0 };
-    }
-    else {
-        return getExeVersion(currExe);
-    }
-}
-
-bool FileVersion::IsFiveM() {
-    return FiveM;
+    return getExeVersion(currExe);
 }
