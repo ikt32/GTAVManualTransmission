@@ -1,5 +1,15 @@
 # Changelog
 
+## 5.4.1
+
+* Add option to use physical speed instead of drivetrain speed for speedometer
+* Add toggleable low/high beams
+* Add high beam flasher
+* Add indicator controls for keyboard
+* Fix FFB initialization logging error
+* Fix FFB applied to invalid axes
+* Remove FiveM-specific adaptions
+
 ## 5.4.0
 
 A mostly wheel-focused update to improve wheel experience.
