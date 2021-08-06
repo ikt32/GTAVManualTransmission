@@ -59,7 +59,7 @@ void CarControls::InitWheel() {
     auto ffAxis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(WheelAxisType::ForceFeedback)].Control);
 
     if (!mWheelInput.InitFFB(steerGUID, ffAxis)) {
-        logger.Write(INFO, "[Wheel] Force feedback initialization failed");
+        logger.Write(ERROR, "[Wheel] Force feedback initialization failed");
     }
 }
 
