@@ -49,7 +49,7 @@ void setupDashHook() {
     const std::string dashHookPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + "\\DashHook.dll";
     g_DashHookModule = LoadLibrary(dashHookPath.c_str());
     if (!g_DashHookModule) {
-        logger.Write(INFO, "DashHook.dll not found");
+        logger.Write(INFO, "[Compat] DashHook.dll not found");
         return;
     }
 
