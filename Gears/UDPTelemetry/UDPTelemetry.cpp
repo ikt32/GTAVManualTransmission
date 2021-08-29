@@ -7,6 +7,10 @@ using VExt = VehicleExtensions;
 
 extern VehicleGearboxStates g_gearStates;
 
+namespace {
+    const float RPMScale = 8000.0f;
+}
+
 void UDPTelemetry::UpdatePacket(Socket& socket, Vehicle vehicle, const VehicleData& vehData,
                                 const CarControls& controls) {
     TelemetryPacket packet{};
@@ -60,9 +64,9 @@ void UDPTelemetry::UpdatePacket(Socket& socket, Vehicle vehicle, const VehicleDa
     packet.LateralAcceleration = vehData.mAcceleration.x;
     packet.LongitudinalAcceleration = vehData.mAcceleration.y;
 
-    //packet.MaxRpm = 1.0f;
-    //packet.IdleRpm = 0.2f;
-    packet.EngineRevs = vehData.mRPM * 600.0f;
+    packet.MaxRpm = RPMScale;
+    packet.IdleRpm = 0.2f * RPMScale;
+    packet.EngineRevs = vehData.mRPM * RPMScale;
     packet.MaxGears = static_cast<float>(vehData.mGearTop);
 
     packet.FuelCapacity = 65.0f;
