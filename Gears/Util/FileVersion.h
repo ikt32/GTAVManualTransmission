@@ -12,7 +12,3 @@ bool operator<=(const SVersion& a, const SVersion& b);
 
 SVersion getExeVersion(const std::string& exe);
 SVersion getExeInfo();
-
-namespace FileVersion {
-    bool IsFiveM();
-}

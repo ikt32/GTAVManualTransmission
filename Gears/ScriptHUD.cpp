@@ -692,7 +692,7 @@ void drawInputWheelInfo() {
         rotation = 90.0f * -VExt::GetSteeringInputAngle(g_playerVehicle);
     }
 
-    float rotDiv = FileVersion::IsFiveM() ? -1.0f : 360.0f;
+    float rotDiv = 360.0f;
 
     drawTexture(g_textureWheelId, 0, -9998, 100,
         g_settings.HUD.Wheel.ImgSize, g_settings.HUD.Wheel.ImgSize,
