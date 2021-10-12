@@ -15577,7 +15577,7 @@ namespace VEHICLE
 	// 
 	// Full list of vehicle mod kits and mods by DurtyFree: https://github.com/DurtyFree/gta-v-data-dumps/blob/master/vehicleModKits.json
 	static const char* GET_LIVERY_NAME(Vehicle vehicle, int liveryIndex) { return invoke<const char*>(0xB4C7A93837C91A1F, vehicle, liveryIndex); } // 0xB4C7A93837C91A1F 0xED80B5BE b323
-	static float GET_VEHICLE_MOD_MODIFIER_VALUE(Vehicle vehicle, int modType, int modIndex) { return invoke<float>(0x90A38E9838E0A8C1, vehicle, modType, modIndex); } // 0x90A38E9838E0A8C1 0x73AE5505 b323
+	static int GET_VEHICLE_MOD_MODIFIER_VALUE(Vehicle vehicle, int modType, int modIndex) { return invoke<int>(0x90A38E9838E0A8C1, vehicle, modType, modIndex); } // 0x90A38E9838E0A8C1 0x73AE5505 b323
 	// Can be used for IS_DLC_VEHICLE_MOD and _0xC098810437312FFF
 	static Hash GET_VEHICLE_MOD_IDENTIFIER_HASH(Vehicle vehicle, int modType, int modIndex) { return invoke<Hash>(0x4593CF82AA179706, vehicle, modType, modIndex); } // 0x4593CF82AA179706 0x94850968 b323
 	static void PRELOAD_VEHICLE_MOD(Any p0, int modType, Any p2) { invoke<Void>(0x758F49C24925568A, p0, modType, p2); } // 0x758F49C24925568A 0x6EA5F4A8 b323
