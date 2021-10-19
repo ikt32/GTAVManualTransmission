@@ -190,4 +190,5 @@ bool CTM_GetPlayerRPMInfo(CTM_RPMInfo* rpmInfo) {
     if (g_CTM_GetPlayerRPMInfo) {
         return g_CTM_GetPlayerRPMInfo(rpmInfo);
     }
+    return false;
 }
