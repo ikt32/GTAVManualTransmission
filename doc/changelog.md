@@ -6,6 +6,7 @@
 * Fix broken telemetry since a recent SimHub update
   * RPM is mapped between 0 and 8000 RPM by default
   * Paired with Custom Torque Map 1.0.1, actual RPMs are used instead
+* Add 2189 and 2372 for FX_ASI_BUILD in FiveM
 
 ## 5.4.1
 
