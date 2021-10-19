@@ -1,6 +1,7 @@
 #include "UDPTelemetry.h"
 #include "TelemetryPacket.h"
 
+#include <GTAVCustomTorqueMap/GTAVCustomTorqueMap/CustomTorqueMap.hpp>
 #include <inc/natives.h>
 
 using VExt = VehicleExtensions;
@@ -8,7 +9,7 @@ using VExt = VehicleExtensions;
 extern VehicleGearboxStates g_gearStates;
 
 namespace {
-    const float RPMScale = 8000.0f;
+    const float DefaultRPMScale = 8000.0f;
 }
 
 void UDPTelemetry::UpdatePacket(Socket& socket, Vehicle vehicle, const VehicleData& vehData,
@@ -64,9 +65,17 @@ void UDPTelemetry::UpdatePacket(Socket& socket, Vehicle vehicle, const VehicleDa
     packet.LateralAcceleration = vehData.mAcceleration.x;
     packet.LongitudinalAcceleration = vehData.mAcceleration.y;
 
-    packet.MaxRpm = RPMScale;
-    packet.IdleRpm = 0.2f * RPMScale;
-    packet.EngineRevs = vehData.mRPM * RPMScale;
+    CTM_RPMInfo rpmInfo;
+    if (CTM_GetPlayerRPMInfo(&rpmInfo)) {
+        packet.MaxRpm = rpmInfo.RevLimitRPM;
+        packet.IdleRpm = rpmInfo.IdleRPM;
+        packet.EngineRevs = rpmInfo.ActualRPM;
+    }
+    else {
+        packet.MaxRpm = DefaultRPMScale;
+        packet.IdleRpm = 0.2f * DefaultRPMScale;
+        packet.EngineRevs = vehData.mRPM * DefaultRPMScale;
+    }
     packet.MaxGears = static_cast<float>(vehData.mGearTop);
 
     packet.FuelCapacity = 65.0f;

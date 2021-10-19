@@ -565,6 +565,9 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="..\thirdparty\GTAVCustomTorqueMap\GTAVCustomTorqueMap\CustomTorqueMap.hpp">
+      <Filter>Lib\External Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

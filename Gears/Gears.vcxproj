@@ -62,7 +62,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
       <AdditionalIncludeDirectories>$(SolutionDir)thirdparty\ScriptHookV_SDK;$(SolutionDir)thirdparty\GTAVMenuBase;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\fmt\include;$(SolutionDir)thirdparty\yaml-cpp\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>MT_EXPORTS;DASHHOOK_RUNTIME;CURL_STATICLIB;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;_USE_MATH_DEFINES;DIRECTINPUT_VERSION=0x0800;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MT_EXPORTS;DASHHOOK_RUNTIME;CTM_RUNTIME;CURL_STATICLIB;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;_USE_MATH_DEFINES;DIRECTINPUT_VERSION=0x0800;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -211,6 +211,7 @@
     <ClCompile Include="WheelInput.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\thirdparty\GTAVCustomTorqueMap\GTAVCustomTorqueMap\CustomTorqueMap.hpp" />
     <ClInclude Include="..\thirdparty\GTAVDashHook\DashHook\DashHook.h" />
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menu.h" />
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menucontrols.h" />
