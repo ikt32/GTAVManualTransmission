@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.4.2
+
+* Fix shift rate modifier not adhering to carcols modifiers
+* Fix broken telemetry since a recent SimHub update
+  * RPM is mapped between 0 and 8000 RPM by default
+  * Paired with Custom Torque Map 1.0.1, actual RPMs are used instead
+
 ## 5.4.1
 
 * Add option to use physical speed instead of drivetrain speed for speedometer
