@@ -3,6 +3,7 @@
 #include "Util/Paths.h"
 
 #include <GTAVDashHook/DashHook/DashHook.h>
+#include <GTAVCustomTorqueMap/GTAVCustomTorqueMap/CustomTorqueMap.hpp>
 
 #include <Windows.h>
 #include <string>
@@ -22,6 +23,9 @@ HMODULE g_HandlingReplacementModule = nullptr;
 bool(*g_HR_Enable)(int handle, void** pHandlingData) = nullptr;
 bool(*g_HR_Disable)(int handle, void** pHandlingData) = nullptr;
 bool(*g_HR_GetHandlingData)(int handle, void** pHandlingDataOriginal, void** pHandlingDataReplaced) = nullptr;
+
+HMODULE g_CustomTorqueMapModule = nullptr;
+bool(*g_CTM_GetPlayerRPMInfo)(CTM_RPMInfo* rpmInfo) = nullptr;
 
 template <typename T>
 T CheckAddr(HMODULE lib, const std::string& funcName) {
@@ -82,11 +86,23 @@ void setupHandlingReplacement() {
     g_HR_GetHandlingData = CheckAddr<bool(*)(int, void**, void**)>(g_HandlingReplacementModule, "HR_GetHandlingData");
 }
 
+void setupCustomTorqueMap() {
+    logger.Write(INFO, "[Compat] Setting up CustomTorqueMap");
+    g_CustomTorqueMapModule = GetModuleHandle("CustomTorqueMap.asi");
+    if (!g_CustomTorqueMapModule) {
+        logger.Write(INFO, "[Compat] CustomTorqueMap.asi not found");
+        return;
+    }
+
+    g_CTM_GetPlayerRPMInfo = CheckAddr<bool(*)(CTM_RPMInfo*)>(g_CustomTorqueMapModule, "CTM_GetPlayerRPMInfo");
+}
+
 void setupCompatibility() {
     setupTrainerV();
     setupDashHook();
     setupDismemberment();
     setupHandlingReplacement();
+    setupCustomTorqueMap();
 }
 
 void releaseCompatibility() {
@@ -170,3 +186,8 @@ bool HandlingReplacement::GetHandlingData(int vehicle, void** pHandlingDataOrigi
     return false;
 }
 
+bool CTM_GetPlayerRPMInfo(CTM_RPMInfo* rpmInfo) {
+    if (g_CTM_GetPlayerRPMInfo) {
+        return g_CTM_GetPlayerRPMInfo(rpmInfo);
+    }
+}
