@@ -326,7 +326,6 @@
     <ClInclude Include="..\thirdparty\MiniPID\MiniPID.h">
       <Filter>Thirdparty</Filter>
     </ClInclude>
-    <ClInclude Include="newNatives.h" />
     <ClInclude Include="Input\CarControls.hpp">
       <Filter>Input</Filter>
     </ClInclude>

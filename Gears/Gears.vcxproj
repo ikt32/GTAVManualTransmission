@@ -278,7 +278,6 @@
     <ClInclude Include="Memory\VehicleFlags.h" />
     <ClInclude Include="Memory\Versions.h" />
     <ClInclude Include="Misc.h" />
-    <ClInclude Include="newNatives.h" />
     <ClInclude Include="Compatibility.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ScriptHUD.h" />
