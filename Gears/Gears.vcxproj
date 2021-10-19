@@ -278,8 +278,8 @@
     <ClInclude Include="Memory\VehicleFlags.h" />
     <ClInclude Include="Memory\Versions.h" />
     <ClInclude Include="Misc.h" />
-    <ClInclude Include="newNatives.h" />
     <ClInclude Include="Compatibility.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="ScriptHUD.h" />
     <ClInclude Include="SettingsCommon.h" />
     <ClInclude Include="SpeedLimiter.h" />
@@ -323,6 +323,9 @@
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\thirdparty\curl\libcurl.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Gears.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

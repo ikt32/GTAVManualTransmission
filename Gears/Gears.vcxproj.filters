@@ -326,7 +326,6 @@
     <ClInclude Include="..\thirdparty\MiniPID\MiniPID.h">
       <Filter>Thirdparty</Filter>
     </ClInclude>
-    <ClInclude Include="newNatives.h" />
     <ClInclude Include="Input\CarControls.hpp">
       <Filter>Input</Filter>
     </ClInclude>
@@ -564,6 +563,7 @@
     <ClInclude Include="Util\Materials.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="..\thirdparty\GTAVCustomTorqueMap\GTAVCustomTorqueMap\CustomTorqueMap.hpp">
       <Filter>Lib\External Headers</Filter>
     </ClInclude>
@@ -631,5 +631,8 @@
     <Library Include="..\thirdparty\curl\libcurl.lib">
       <Filter>Thirdparty\curl</Filter>
     </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Gears.rc" />
   </ItemGroup>
 </Project>
