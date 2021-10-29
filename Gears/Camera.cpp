@@ -55,19 +55,18 @@ namespace {
 
     // forward camera movement
     float accelMoveFwd = 0.0f;
-    std::vector<float> accelAvg;
+    float accelPitchDeg = 0.0f;
 }
 
 namespace FPVCam {
     void initCam();
+    void updateControllerLook(bool& lookingIntoGlass);
+    void updateMouseLook(bool& lookingIntoGlass);
+    void updateWheelLook(bool& lookingIntoGlass);
+    void updateRotationCameraMovement(VehicleConfig::SMovement& movement);
+    void updateLongitudinalCameraMovement(VehicleConfig::SMovement& movement);
+    void updatePitchCameraMovement(VehicleConfig::SMovement& movement);
 }
-
-void updateControllerLook(bool& lookingIntoGlass);
-void updateMouseLook(bool& lookingIntoGlass);
-void updateWheelLook(bool& lookingIntoGlass);
-void updateRotationCameraMovement(VehicleConfig::SMovement& movement);
-void updateLongitudinalCameraMovement(VehicleConfig::SMovement& movement);
-
 void FPVCam::InitOffsets() {
     if (g_gameVersion < G_VER_1_0_1290_1_STEAM) {
         fpvCamOffsetXOffset = 0x450 - 40;
@@ -87,7 +86,6 @@ void FPVCam::CancelCam() {
     }
     directionLookAngle = 0.0f;
     accelMoveFwd = 0.0f;
-    accelAvg.clear();
 }
 
 void FPVCam::HideHead(bool remove) {
@@ -192,6 +190,7 @@ void FPVCam::Update() {
         if (pMovement->Follow) {
             updateRotationCameraMovement(*pMovement);
             updateLongitudinalCameraMovement(*pMovement);
+            updatePitchCameraMovement(*pMovement);
         }
     }
 
@@ -332,7 +331,7 @@ void FPVCam::Update() {
 
     CAM::SET_CAM_ROT(
         cameraHandle,
-        rot.x + camRot.x + pitch + pitchLookComp + rollPitchComp,
+        rot.x + camRot.x + pitch + pitchLookComp + rollPitchComp + accelPitchDeg,
         rot.y + rollLookComp,
         rot.z + camRot.z - directionLookAngle,
         0);
@@ -346,7 +345,7 @@ void FPVCam::Update() {
     HUD::LOCK_MINIMAP_ANGLE(static_cast<int>(minimapAngle));
 }
 
-void updateControllerLook(bool& lookingIntoGlass) {
+void FPVCam::updateControllerLook(bool& lookingIntoGlass) {
     float lookLeftRight = PAD::GET_CONTROL_NORMAL(0, eControl::ControlLookLeftRight);
     float lookUpDown = PAD::GET_CONTROL_NORMAL(0, eControl::ControlLookUpDown);
 
@@ -384,7 +383,7 @@ void updateControllerLook(bool& lookingIntoGlass) {
     }
 }
 
-void updateMouseLook(bool& lookingIntoGlass) {
+void FPVCam::updateMouseLook(bool& lookingIntoGlass) {
     float lookLeftRight = 
         PAD::GET_CONTROL_NORMAL(0, eControl::ControlLookLeftRight) * g_settings().Misc.Camera.MouseSensitivity;
     float lookUpDown = 
@@ -451,7 +450,7 @@ void updateMouseLook(bool& lookingIntoGlass) {
     }
 }
 
-void updateWheelLook(bool& lookingIntoGlass) {
+void FPVCam::updateWheelLook(bool& lookingIntoGlass) {
     if (MT_LookingLeft() && MT_LookingRight()) {
         if (g_vehData.mIsRhd && g_peripherals.LookBackRShoulder) {
             lookingIntoGlass = true;
@@ -478,7 +477,7 @@ void updateWheelLook(bool& lookingIntoGlass) {
     }
 }
 
-void updateRotationCameraMovement(VehicleConfig::SMovement& movement) {
+void FPVCam::updateRotationCameraMovement(VehicleConfig::SMovement& movement) {
     Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
 
     Vector3 target = Normalize(speedVector);
@@ -519,15 +518,10 @@ void updateRotationCameraMovement(VehicleConfig::SMovement& movement) {
         1.0f - pow(0.000001f, MISC::GET_FRAME_TIME()));
 }
 
-void updateLongitudinalCameraMovement(VehicleConfig::SMovement& movement) {
-    accelAvg.push_back(g_vehData.mAcceleration.y);
-    while (accelAvg.size() > 4) {
-        accelAvg.erase(accelAvg.begin());
-    }
+void FPVCam::updateLongitudinalCameraMovement(VehicleConfig::SMovement& movement) {
+    float lerpF = 1.0f - pow(0.001f, MISC::GET_FRAME_TIME());
 
-    float lerpF = 1.0f - pow(0.000001f, MISC::GET_FRAME_TIME());
-
-    float gForce = avg(accelAvg) / 9.81f;
+    float gForce = g_vehData.mAcceleration.y / 9.81f;
 
     //gForce = abs(pow(gForce, g_settings().Misc.Camera.Movement.LongGamma)) * sgn(gForce);
 
@@ -552,4 +546,31 @@ void updateLongitudinalCameraMovement(VehicleConfig::SMovement& movement) {
             -longBwLim,
             longFwLim);
     accelMoveFwd = lerp(accelMoveFwd, accelVal, lerpF); // just for smoothness
+}
+
+void FPVCam::updatePitchCameraMovement(VehicleConfig::SMovement& movement) {
+    float lerpF = 1.0f - pow(0.001f, MISC::GET_FRAME_TIME());
+
+    float gForce = g_vehData.mAcceleration.y / 9.81f;
+
+    float mappedAccel = 0.0f;
+    float deadzone = movement.PitchDeadzone;
+
+    float mult = 0.0f;
+    // Accelerate
+    if (gForce > deadzone) {
+        mappedAccel = map(gForce, deadzone, 10.0f, 0.0f, 10.0f);
+        mult = movement.PitchUpMult;
+    }
+    // Decelerate
+    if (gForce < -deadzone) {
+        mappedAccel = map(gForce, -deadzone, -10.0f, 0.0f, -10.0f);
+        mult = movement.PitchDownMult;
+    }
+    float pitchUpLim = movement.PitchUpMaxAngle;
+    float pitchDownLim = movement.PitchDownMaxAngle;
+    float pitchVal =
+        std::clamp(mappedAccel * mult,
+            -pitchDownLim, pitchUpLim);
+    accelPitchDeg = lerp(accelPitchDeg, pitchVal, lerpF); // just for smoothness
 }

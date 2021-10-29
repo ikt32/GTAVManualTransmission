@@ -22,6 +22,42 @@
 #define LOAD_VAL(section, key, option) \
     option.Set(GetValue(ini, section, key, baseConfig.option))
 
+#define SAVE_VAL_MOVEMENT(prefix, source) { \
+    SAVE_VAL("CAM", prefix "FollowMovement",    ##source.Follow); \
+    SAVE_VAL("CAM", prefix "MovementMultVel",   ##source.RotationDirectionMult); \
+    SAVE_VAL("CAM", prefix "MovementMultRot",   ##source.RotationRotationMult); \
+    SAVE_VAL("CAM", prefix "MovementCap",       ##source.RotationMaxAngle); \
+    SAVE_VAL("CAM", prefix "LongForwardMult",   ##source.LongForwardMult); \
+    SAVE_VAL("CAM", prefix "LongBackwardMult",  ##source.LongBackwardMult); \
+    SAVE_VAL("CAM", prefix "LongDeadzone",      ##source.LongDeadzone); \
+    SAVE_VAL("CAM", prefix "LongGamma",         ##source.LongGamma); \
+    SAVE_VAL("CAM", prefix "LongForwardLimit",  ##source.LongForwardLimit); \
+    SAVE_VAL("CAM", prefix "LongBackwardLimit", ##source.LongBackwardLimit); \
+    SAVE_VAL("CAM", prefix "PitchUpMult",       ##source.PitchUpMult); \
+    SAVE_VAL("CAM", prefix "PitchDownMult",     ##source.PitchDownMult); \
+    SAVE_VAL("CAM", prefix "PitchDeadzone",     ##source.PitchDeadzone); \
+    SAVE_VAL("CAM", prefix "PitchUpMaxAngle",   ##source.PitchUpMaxAngle); \
+    SAVE_VAL("CAM", prefix "PitchDownMaxAngle", ##source.PitchDownMaxAngle); \
+}
+
+#define LOAD_VAL_MOVEMENT(prefix, source) { \
+    LOAD_VAL("CAM", prefix "FollowMovement",    ##source.Follow); \
+    LOAD_VAL("CAM", prefix "MovementMultVel",   ##source.RotationDirectionMult); \
+    LOAD_VAL("CAM", prefix "MovementMultRot",   ##source.RotationRotationMult); \
+    LOAD_VAL("CAM", prefix "MovementCap",       ##source.RotationMaxAngle); \
+    LOAD_VAL("CAM", prefix "LongForwardMult",   ##source.LongForwardMult); \
+    LOAD_VAL("CAM", prefix "LongBackwardMult",  ##source.LongBackwardMult); \
+    LOAD_VAL("CAM", prefix "LongDeadzone",      ##source.LongDeadzone); \
+    LOAD_VAL("CAM", prefix "LongGamma",         ##source.LongGamma); \
+    LOAD_VAL("CAM", prefix "LongForwardLimit",  ##source.LongForwardLimit); \
+    LOAD_VAL("CAM", prefix "LongBackwardLimit", ##source.LongBackwardLimit); \
+    LOAD_VAL("CAM", prefix "PitchUpMult",       ##source.PitchUpMult); \
+    LOAD_VAL("CAM", prefix "PitchDownMult",     ##source.PitchDownMult); \
+    LOAD_VAL("CAM", prefix "PitchDeadzone",     ##source.PitchDeadzone); \
+    LOAD_VAL("CAM", prefix "PitchUpMaxAngle",   ##source.PitchUpMaxAngle); \
+    LOAD_VAL("CAM", prefix "PitchDownMaxAngle", ##source.PitchDownMaxAngle); \
+}
+
 EShiftMode Next(EShiftMode mode) {
     return static_cast<EShiftMode>((static_cast<int>(mode) + 1) % 3);
 }
@@ -198,16 +234,7 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("CAM", "PedOffsetSide", Misc.Camera.Ped.OffsetSide);
     LOAD_VAL("CAM", "PedPitch", Misc.Camera.Ped.Pitch);
 
-    LOAD_VAL("CAM", "PedFollowMovement", Misc.Camera.Ped.Movement.Follow);
-    LOAD_VAL("CAM", "PedMovementMultVel", Misc.Camera.Ped.Movement.RotationDirectionMult);
-    LOAD_VAL("CAM", "PedMovementMultRot", Misc.Camera.Ped.Movement.RotationRotationMult);
-    LOAD_VAL("CAM", "PedMovementCap", Misc.Camera.Ped.Movement.RotationMaxAngle);
-    LOAD_VAL("CAM", "PedLongForwardMult", Misc.Camera.Ped.Movement.LongForwardMult);
-    LOAD_VAL("CAM", "PedLongBackwardMult", Misc.Camera.Ped.Movement.LongBackwardMult);
-    LOAD_VAL("CAM", "PedLongDeadzone", Misc.Camera.Ped.Movement.LongDeadzone);
-    LOAD_VAL("CAM", "PedLongGamma", Misc.Camera.Ped.Movement.LongGamma);
-    LOAD_VAL("CAM", "PedLongForwardLimit", Misc.Camera.Ped.Movement.LongForwardLimit);
-    LOAD_VAL("CAM", "PedLongBackwardLimit", Misc.Camera.Ped.Movement.LongBackwardLimit);
+    LOAD_VAL_MOVEMENT("Ped", Misc.Camera.Ped.Movement);
 
     LOAD_VAL("CAM", "Vehicle1FOV", Misc.Camera.Vehicle1.FOV);
     LOAD_VAL("CAM", "Vehicle1OffsetHeight", Misc.Camera.Vehicle1.OffsetHeight);
@@ -215,16 +242,7 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("CAM", "Vehicle1OffsetSide", Misc.Camera.Vehicle1.OffsetSide);
     LOAD_VAL("CAM", "Vehicle1Pitch", Misc.Camera.Vehicle1.Pitch);
 
-    LOAD_VAL("CAM", "Vehicle1FollowMovement", Misc.Camera.Vehicle1.Movement.Follow);
-    LOAD_VAL("CAM", "Vehicle1MovementMultVel", Misc.Camera.Vehicle1.Movement.RotationDirectionMult);
-    LOAD_VAL("CAM", "Vehicle1MovementMultRot", Misc.Camera.Vehicle1.Movement.RotationRotationMult);
-    LOAD_VAL("CAM", "Vehicle1MovementCap", Misc.Camera.Vehicle1.Movement.RotationMaxAngle);
-    LOAD_VAL("CAM", "Vehicle1LongForwardMult", Misc.Camera.Vehicle1.Movement.LongForwardMult);
-    LOAD_VAL("CAM", "Vehicle1LongBackwardMult", Misc.Camera.Vehicle1.Movement.LongBackwardMult);
-    LOAD_VAL("CAM", "Vehicle1LongDeadzone", Misc.Camera.Vehicle1.Movement.LongDeadzone);
-    LOAD_VAL("CAM", "Vehicle1LongGamma", Misc.Camera.Vehicle1.Movement.LongGamma);
-    LOAD_VAL("CAM", "Vehicle1LongForwardLimit", Misc.Camera.Vehicle1.Movement.LongForwardLimit);
-    LOAD_VAL("CAM", "Vehicle1LongBackwardLimit", Misc.Camera.Vehicle1.Movement.LongBackwardLimit);
+    LOAD_VAL_MOVEMENT("Vehicle1", Misc.Camera.Vehicle1.Movement);
 
     LOAD_VAL("CAM", "Vehicle2FOV", Misc.Camera.Vehicle2.FOV);
     LOAD_VAL("CAM", "Vehicle2OffsetHeight", Misc.Camera.Vehicle2.OffsetHeight);
@@ -232,16 +250,7 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("CAM", "Vehicle2OffsetSide", Misc.Camera.Vehicle2.OffsetSide);
     LOAD_VAL("CAM", "Vehicle2Pitch", Misc.Camera.Vehicle2.Pitch);
 
-    LOAD_VAL("CAM", "Vehicle2FollowMovement", Misc.Camera.Vehicle2.Movement.Follow);
-    LOAD_VAL("CAM", "Vehicle2MovementMultVel", Misc.Camera.Vehicle2.Movement.RotationDirectionMult);
-    LOAD_VAL("CAM", "Vehicle2MovementMultRot", Misc.Camera.Vehicle2.Movement.RotationRotationMult);
-    LOAD_VAL("CAM", "Vehicle2MovementCap", Misc.Camera.Vehicle2.Movement.RotationMaxAngle);
-    LOAD_VAL("CAM", "Vehicle2LongForwardMult", Misc.Camera.Vehicle2.Movement.LongForwardMult);
-    LOAD_VAL("CAM", "Vehicle2LongBackwardMult", Misc.Camera.Vehicle2.Movement.LongBackwardMult);
-    LOAD_VAL("CAM", "Vehicle2LongDeadzone", Misc.Camera.Vehicle2.Movement.LongDeadzone);
-    LOAD_VAL("CAM", "Vehicle2LongGamma", Misc.Camera.Vehicle2.Movement.LongGamma);
-    LOAD_VAL("CAM", "Vehicle2LongForwardLimit", Misc.Camera.Vehicle2.Movement.LongForwardLimit);
-    LOAD_VAL("CAM", "Vehicle2LongBackwardLimit", Misc.Camera.Vehicle2.Movement.LongBackwardLimit);
+    LOAD_VAL_MOVEMENT("Vehicle2", Misc.Camera.Vehicle2.Movement);
 
     LOAD_VAL("CAM", "BikeDisable", Misc.Camera.Bike.Disable);
     LOAD_VAL("CAM", "BikeAttachId", Misc.Camera.Bike.AttachId);
@@ -251,16 +260,7 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("CAM", "BikeOffsetSide", Misc.Camera.Bike.OffsetSide);
     LOAD_VAL("CAM", "BikePitch", Misc.Camera.Bike.Pitch);
 
-    LOAD_VAL("CAM", "BikeFollowMovement", Misc.Camera.Bike.Movement.Follow);
-    LOAD_VAL("CAM", "BikeMovementMultVel", Misc.Camera.Bike.Movement.RotationDirectionMult);
-    LOAD_VAL("CAM", "BikeMovementMultRot", Misc.Camera.Bike.Movement.RotationRotationMult);
-    LOAD_VAL("CAM", "BikeMovementCap", Misc.Camera.Bike.Movement.RotationMaxAngle);
-    LOAD_VAL("CAM", "BikeLongForwardMult", Misc.Camera.Bike.Movement.LongForwardMult);
-    LOAD_VAL("CAM", "BikeLongBackwardMult", Misc.Camera.Bike.Movement.LongBackwardMult);
-    LOAD_VAL("CAM", "BikeLongDeadzone", Misc.Camera.Bike.Movement.LongDeadzone);
-    LOAD_VAL("CAM", "BikeLongGamma", Misc.Camera.Bike.Movement.LongGamma);
-    LOAD_VAL("CAM", "BikeLongForwardLimit", Misc.Camera.Bike.Movement.LongForwardLimit);
-    LOAD_VAL("CAM", "BikeLongBackwardLimit", Misc.Camera.Bike.Movement.LongBackwardLimit);
+    LOAD_VAL_MOVEMENT("Bike", Misc.Camera.Bike.Movement);
 }
 
 void VehicleConfig::SaveSettings() {
@@ -423,16 +423,7 @@ void VehicleConfig::saveGeneral() {
     SAVE_VAL("CAM", "PedOffsetSide", Misc.Camera.Ped.OffsetSide);
     SAVE_VAL("CAM", "PedPitch", Misc.Camera.Ped.Pitch);
 
-    SAVE_VAL("CAM", "PedFollowMovement", Misc.Camera.Ped.Movement.Follow);
-    SAVE_VAL("CAM", "PedMovementMultVel", Misc.Camera.Ped.Movement.RotationDirectionMult);
-    SAVE_VAL("CAM", "PedMovementMultRot", Misc.Camera.Ped.Movement.RotationRotationMult);
-    SAVE_VAL("CAM", "PedMovementCap", Misc.Camera.Ped.Movement.RotationMaxAngle);
-    SAVE_VAL("CAM", "PedLongForwardMult", Misc.Camera.Ped.Movement.LongForwardMult);
-    SAVE_VAL("CAM", "PedLongBackwardMult", Misc.Camera.Ped.Movement.LongBackwardMult);
-    SAVE_VAL("CAM", "PedLongDeadzone", Misc.Camera.Ped.Movement.LongDeadzone);
-    SAVE_VAL("CAM", "PedLongGamma", Misc.Camera.Ped.Movement.LongGamma);
-    SAVE_VAL("CAM", "PedLongForwardLimit", Misc.Camera.Ped.Movement.LongForwardLimit);
-    SAVE_VAL("CAM", "PedLongBackwardLimit", Misc.Camera.Ped.Movement.LongBackwardLimit);
+    SAVE_VAL_MOVEMENT("Ped", Misc.Camera.Ped.Movement);
 
     SAVE_VAL("CAM", "Vehicle1FOV", Misc.Camera.Vehicle1.FOV);
     SAVE_VAL("CAM", "Vehicle1OffsetHeight", Misc.Camera.Vehicle1.OffsetHeight);
@@ -440,16 +431,7 @@ void VehicleConfig::saveGeneral() {
     SAVE_VAL("CAM", "Vehicle1OffsetSide", Misc.Camera.Vehicle1.OffsetSide);
     SAVE_VAL("CAM", "Vehicle1Pitch", Misc.Camera.Vehicle1.Pitch);
 
-    SAVE_VAL("CAM", "Vehicle1FollowMovement", Misc.Camera.Vehicle1.Movement.Follow);
-    SAVE_VAL("CAM", "Vehicle1MovementMultVel", Misc.Camera.Vehicle1.Movement.RotationDirectionMult);
-    SAVE_VAL("CAM", "Vehicle1MovementMultRot", Misc.Camera.Vehicle1.Movement.RotationRotationMult);
-    SAVE_VAL("CAM", "Vehicle1MovementCap", Misc.Camera.Vehicle1.Movement.RotationMaxAngle);
-    SAVE_VAL("CAM", "Vehicle1LongForwardMult", Misc.Camera.Vehicle1.Movement.LongForwardMult);
-    SAVE_VAL("CAM", "Vehicle1LongBackwardMult", Misc.Camera.Vehicle1.Movement.LongBackwardMult);
-    SAVE_VAL("CAM", "Vehicle1LongDeadzone", Misc.Camera.Vehicle1.Movement.LongDeadzone);
-    SAVE_VAL("CAM", "Vehicle1LongGamma", Misc.Camera.Vehicle1.Movement.LongGamma);
-    SAVE_VAL("CAM", "Vehicle1LongForwardLimit", Misc.Camera.Vehicle1.Movement.LongForwardLimit);
-    SAVE_VAL("CAM", "Vehicle1LongBackwardLimit", Misc.Camera.Vehicle1.Movement.LongBackwardLimit);
+    SAVE_VAL_MOVEMENT("Vehicle1", Misc.Camera.Vehicle1.Movement);
 
     SAVE_VAL("CAM", "Vehicle2FOV", Misc.Camera.Vehicle2.FOV);
     SAVE_VAL("CAM", "Vehicle2OffsetHeight", Misc.Camera.Vehicle2.OffsetHeight);
@@ -457,16 +439,7 @@ void VehicleConfig::saveGeneral() {
     SAVE_VAL("CAM", "Vehicle2OffsetSide", Misc.Camera.Vehicle2.OffsetSide);
     SAVE_VAL("CAM", "Vehicle2Pitch", Misc.Camera.Vehicle2.Pitch);
 
-    SAVE_VAL("CAM", "Vehicle2FollowMovement", Misc.Camera.Vehicle2.Movement.Follow);
-    SAVE_VAL("CAM", "Vehicle2MovementMultVel", Misc.Camera.Vehicle2.Movement.RotationDirectionMult);
-    SAVE_VAL("CAM", "Vehicle2MovementMultRot", Misc.Camera.Vehicle2.Movement.RotationRotationMult);
-    SAVE_VAL("CAM", "Vehicle2MovementCap", Misc.Camera.Vehicle2.Movement.RotationMaxAngle);
-    SAVE_VAL("CAM", "Vehicle2LongForwardMult", Misc.Camera.Vehicle2.Movement.LongForwardMult);
-    SAVE_VAL("CAM", "Vehicle2LongBackwardMult", Misc.Camera.Vehicle2.Movement.LongBackwardMult);
-    SAVE_VAL("CAM", "Vehicle2LongDeadzone", Misc.Camera.Vehicle2.Movement.LongDeadzone);
-    SAVE_VAL("CAM", "Vehicle2LongGamma", Misc.Camera.Vehicle2.Movement.LongGamma);
-    SAVE_VAL("CAM", "Vehicle2LongForwardLimit", Misc.Camera.Vehicle2.Movement.LongForwardLimit);
-    SAVE_VAL("CAM", "Vehicle2LongBackwardLimit", Misc.Camera.Vehicle2.Movement.LongBackwardLimit);
+    SAVE_VAL_MOVEMENT("Vehicle2", Misc.Camera.Vehicle2.Movement);
 
     SAVE_VAL("CAM", "BikeDisable", Misc.Camera.Bike.Disable);
     SAVE_VAL("CAM", "BikeAttachId", Misc.Camera.Bike.AttachId);
@@ -476,16 +449,7 @@ void VehicleConfig::saveGeneral() {
     SAVE_VAL("CAM", "BikeOffsetSide", Misc.Camera.Bike.OffsetSide);
     SAVE_VAL("CAM", "BikePitch", Misc.Camera.Bike.Pitch);
 
-    SAVE_VAL("CAM", "BikeFollowMovement", Misc.Camera.Bike.Movement.Follow);
-    SAVE_VAL("CAM", "BikeMovementMultVel", Misc.Camera.Bike.Movement.RotationDirectionMult);
-    SAVE_VAL("CAM", "BikeMovementMultRot", Misc.Camera.Bike.Movement.RotationRotationMult);
-    SAVE_VAL("CAM", "BikeMovementCap", Misc.Camera.Bike.Movement.RotationMaxAngle);
-    SAVE_VAL("CAM", "BikeLongForwardMult", Misc.Camera.Bike.Movement.LongForwardMult);
-    SAVE_VAL("CAM", "BikeLongBackwardMult", Misc.Camera.Bike.Movement.LongBackwardMult);
-    SAVE_VAL("CAM", "BikeLongDeadzone", Misc.Camera.Bike.Movement.LongDeadzone);
-    SAVE_VAL("CAM", "BikeLongGamma", Misc.Camera.Bike.Movement.LongGamma);
-    SAVE_VAL("CAM", "BikeLongForwardLimit", Misc.Camera.Bike.Movement.LongForwardLimit);
-    SAVE_VAL("CAM", "BikeLongBackwardLimit", Misc.Camera.Bike.Movement.LongBackwardLimit);
+    SAVE_VAL_MOVEMENT("Bike", Misc.Camera.Bike.Movement);
 
     result = ini.SaveFile(mFile.c_str());
     CHECK_LOG_SI_ERROR(result, fmt::format("save {}", mFile).c_str());

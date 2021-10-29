@@ -58,6 +58,12 @@ public:
         Tracked<float> LongGamma = 1.0f;
         Tracked<float> LongForwardLimit = 0.10f;
         Tracked<float> LongBackwardLimit = 0.12f;
+
+        Tracked<float> PitchUpMult = 5.0f;
+        Tracked<float> PitchDownMult = 5.0f;
+        Tracked<float> PitchDeadzone = 0.0f;
+        Tracked<float> PitchUpMaxAngle = 30.0f;
+        Tracked<float> PitchDownMaxAngle = 30.0f;
     };
 
     // [MT_OPTIONS]
@@ -282,6 +288,8 @@ public:
 
 public:
     void saveGeneral();
+
+    void saveValMovement(const std::string& prefix, const VehicleConfig::SMovement& movement);
 
     std::string mFile;
 
