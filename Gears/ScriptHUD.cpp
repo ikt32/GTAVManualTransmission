@@ -85,6 +85,14 @@ void updateDashLights() {
         esp |= g_vehData.mWheelsEspO[i] || g_vehData.mWheelsEspU[i];
     }
 
+    if (g_vehData.mHasABS) {
+        for (int i = 0; i < g_vehData.mWheelCount; ++i) {
+            abs |= g_vehData.mWheelTyreSpeeds[i] == 0.0f &&
+                VExt::GetBrakeP(g_playerVehicle) > 0.0f &&
+                g_vehData.mVelocity.y > 3.0f;
+        }
+    }
+
     // ABS
     // Turn on
     if (DashLights::LastAbsTrigger == 0 && abs) {
@@ -119,14 +127,6 @@ void updateDashLights() {
         currentTime > DashLights::LastEspTime + DashLights::LightDuration) {
         DashLights::LastEspTrigger = 0;
         DashLights::EspBulbState = false;
-    }
-
-    if (g_vehData.mHasABS) {
-        for (int i = 0; i < g_vehData.mWheelCount; ++i) {
-            abs |= g_vehData.mWheelTyreSpeeds[i] == 0.0f &&
-                VExt::GetBrakeP(g_playerVehicle) > 0.0f &&
-                g_vehData.mVelocity.y > 3.0f;
-        }
     }
 
     if (abs)
