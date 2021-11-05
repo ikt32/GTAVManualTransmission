@@ -9,7 +9,7 @@
 #include "Util/Logger.hpp"
 #include "Util/MathExt.h"
 #include "Util/Timer.h"
-#include "Util/Files.h"
+#include "Util/Paths.h"
 #include "Util/UIUtils.h"
 #include "Util/ScriptUtils.h"
 
@@ -133,7 +133,7 @@ void SteeringAnimation::Update() {
 }
 
 void SteeringAnimation::Load() {
-    if (!FileExists(animFile)) {
+    if (!Paths::FileExists(animFile)) {
         logger.Write(ERROR, fmt::format("Animation: File \"{}\" not found, skipping animations", animFile));
         fileProblem = true;
         return;

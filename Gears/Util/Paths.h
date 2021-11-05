@@ -14,4 +14,8 @@ std::string	GetModuleNameWithoutExtension(HMODULE module);
 
 void SetOurModuleHandle(HMODULE module);
 HMODULE GetOurModuleHandle();
+
+bool FileExists(const std::string& name);
+
+std::wstring GetDocumentsFolder();
 }

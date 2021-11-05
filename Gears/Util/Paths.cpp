@@ -1,5 +1,7 @@
 #include "Paths.h"
 
+#include <ShlObj.h>
+
 static HMODULE ourModule;
 
 std::string Paths::GetRunningExecutablePath() {
@@ -72,4 +74,18 @@ void Paths::SetOurModuleHandle(const HMODULE module) {
 
 HMODULE Paths::GetOurModuleHandle() {
     return ourModule;
+}
+
+bool Paths::FileExists(const std::string& name) {
+    struct stat buffer;
+    return (stat(name.c_str(), &buffer) == 0);
+}
+
+std::wstring Paths::GetDocumentsFolder() {
+    PWSTR path;
+    SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &path);
+    std::wstring strPath(path);
+    CoTaskMemFree(path);
+
+    return strPath;
 }

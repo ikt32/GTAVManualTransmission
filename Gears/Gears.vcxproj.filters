@@ -59,9 +59,6 @@
     <ClCompile Include="Util\UIUtils.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Util\Files.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
     <ClCompile Include="Util\GameSound.cpp">
       <Filter>Util</Filter>
     </ClCompile>
@@ -343,9 +340,6 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="Util\Color.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="Util\Files.h">
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="Util\GameSound.h">

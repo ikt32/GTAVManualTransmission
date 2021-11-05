@@ -34,7 +34,7 @@
 #include "Util/Logger.hpp"
 #include "Util/Paths.h"
 #include "Util/MathExt.h"
-#include "Util/Files.h"
+#include "Util/Paths.h"
 #include "Util/UIUtils.h"
 #include "Util/Timer.h"
 #include "Util/ValueTimer.h"
@@ -2764,7 +2764,7 @@ void InitTextures() {
     std::string textureESPFile = absoluteModPath + "\\texture_esp.png";
     std::string textureBRKFile = absoluteModPath + "\\texture_handbrake.png";
 
-    if (FileExists(textureWheelFile)) {
+    if (Paths::FileExists(textureWheelFile)) {
         g_textureWheelId = createTexture(textureWheelFile.c_str());
     }
     else {
@@ -2772,7 +2772,7 @@ void InitTextures() {
         g_textureWheelId = -1;
     }
 
-    if (FileExists(textureABSFile)) {
+    if (Paths::FileExists(textureABSFile)) {
         g_textureAbsId = createTexture(textureABSFile.c_str());
     }
     else {
@@ -2780,7 +2780,7 @@ void InitTextures() {
         g_textureAbsId = -1;
     }
 
-    if (FileExists(textureTCSFile)) {
+    if (Paths::FileExists(textureTCSFile)) {
         g_textureTcsId = createTexture(textureTCSFile.c_str());
     }
     else {
@@ -2788,7 +2788,7 @@ void InitTextures() {
         g_textureTcsId = -1;
     }
 
-    if (FileExists(textureESPFile)) {
+    if (Paths::FileExists(textureESPFile)) {
         g_textureEspId = createTexture(textureESPFile.c_str());
     }
     else {
@@ -2796,7 +2796,7 @@ void InitTextures() {
         g_textureEspId = -1;
     }
 
-    if (FileExists(textureBRKFile)) {
+    if (Paths::FileExists(textureBRKFile)) {
         g_textureBrkId = createTexture(textureBRKFile.c_str());
     }
     else {
