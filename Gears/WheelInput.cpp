@@ -556,8 +556,6 @@ void WheelInput::DoSteering() {
 }
 
 int calculateDamper(float gain, float wheelsOffGroundRatio) {
-    Vector3 accelValsAvg = g_vehData.mAcceleration; //TODO: Avg/dampen later
-
     // Just to use floats everywhere here
     float damperMax = static_cast<float>(g_settings.Wheel.FFB.DamperMax);
     float damperMin = static_cast<float>(g_settings.Wheel.FFB.DamperMin);
@@ -568,12 +566,7 @@ int calculateDamper(float gain, float wheelsOffGroundRatio) {
     damperFactorSpeed = fmaxf(damperFactorSpeed, damperMin);
     // already clamped on the upper bound by abs(vel) in map()
 
-    // 2G of deceleration causes addition of damperMin. Heavier feeling steer when braking!
-    float damperFactorAccel = map(-accelValsAvg.y / 9.81f, -2.0f, 2.0f, -damperMin, damperMin);
-    damperFactorAccel = fmaxf(damperFactorAccel, -damperMin);
-    damperFactorAccel = fminf(damperFactorAccel, damperMin);
-
-    float damperForce = damperFactorSpeed + damperFactorAccel;
+    float damperForce = damperFactorSpeed;
 
     damperForce = damperForce * (1.0f - wheelsOffGroundRatio);
 
