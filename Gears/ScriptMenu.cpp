@@ -447,6 +447,9 @@ void update_shiftingoptionsmenu() {
     g_menu.BoolOption("Blip throttle on downshift", g_settings().ShiftOptions.DownshiftBlip,
         { "Helps rev matching.",
             "Only applies to sequential mode." });
+    g_menu.BoolOption("Downshift protection", g_settings().ShiftOptions.DownshiftProtect,
+        { "Prevents downshifting causing overrevving.",
+            "Only applies to sequential mode." });
     g_menu.FloatOption("Clutch rate multiplier", g_settings().ShiftOptions.ClutchRateMult, 0.05f, 20.0f, 0.05f,
         { "Change how fast clutching is. Below 1 is slower, higher than 1 is faster.",
             "Applies to sequential and automatic mode." });

@@ -198,6 +198,7 @@ public:
     struct {
         Tracked<bool> UpshiftCut = true;
         Tracked<bool> DownshiftBlip = true;
+        Tracked<bool> DownshiftProtect = false;
         Tracked<float> ClutchRateMult = 1.0f;
         Tracked<float> RPMTolerance = 0.2f;
     } ShiftOptions;

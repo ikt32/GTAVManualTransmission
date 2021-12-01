@@ -1904,9 +1904,15 @@ void handleBrakePatch() {
                 fakeRev(true, g_controls.ThrottleVal);
             }
 
+            float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.NextGear]);
             if (g_gearStates.ShiftDirection == ShiftDirection::Down &&
+                g_settings().ShiftOptions.DownshiftProtect &&
+                expectedRPM > 1.0f) {
+                // TODO: Notify, beep, flash something, or something
+                UI::Notify(INFO, "Downshift Protection");
+            }
+            else if (g_gearStates.ShiftDirection == ShiftDirection::Down &&
                 g_settings().ShiftOptions.DownshiftBlip) {
-                float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.NextGear]);
                 bool clutchOK = g_gearStates.ShiftState == ShiftState::FullClutch || g_gearStates.ShiftState == ShiftState::ReleasingClutch;
                 if (g_vehData.mRPM < expectedRPM * 1.15f && clutchOK) {
                     float blipThrottleVal;
