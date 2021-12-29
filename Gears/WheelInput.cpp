@@ -715,14 +715,14 @@ std::vector<SSlipInfo> calculateSlipInfo() {
             angle = 0.0f;
         }
 
-        GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
-            wheelCoords[i].x + vel1v.x, wheelCoords[i].y + vel1v.y, wheelCoords[i].z + vel1v.z, 255, 0, 0, 255);
-
-        GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
-            wheelCoords[i].x + vel2v.x, wheelCoords[i].y + vel2v.y, wheelCoords[i].z + vel2v.z, 0, 255, 0, 255);
-
-        UI::DrawSphere(wheelCoords[i] + vel1v, 0.05f, Util::ColorI{ 255, 0, 0, 255 });
-        UI::DrawSphere(wheelCoords[i] + vel2v, 0.05f, Util::ColorI{ 0, 255, 0, 255 });
+        // GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
+        //     wheelCoords[i].x + vel1v.x, wheelCoords[i].y + vel1v.y, wheelCoords[i].z + vel1v.z, 255, 0, 0, 255);
+        // 
+        // GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
+        //     wheelCoords[i].x + vel2v.x, wheelCoords[i].y + vel2v.y, wheelCoords[i].z + vel2v.z, 0, 255, 0, 255);
+        // 
+        // UI::DrawSphere(wheelCoords[i] + vel1v, 0.05f, Util::ColorI{ 255, 0, 0, 255 });
+        // UI::DrawSphere(wheelCoords[i] + vel2v, 0.05f, Util::ColorI{ 0, 255, 0, 255 });
 
         auto v1Coord = wheelCoords[i] + vel1v;
         auto v2Coord = wheelCoords[i] + vel2v;
@@ -752,19 +752,19 @@ float calcSlipRatio(float slip, float slipOpt,
     // Understeer just based on slip
     if (abs(slip) > slipOpt * slipMultB) {
         slipRatio = std::clamp(slipRatio, outMultB, 1.0f);
-        UI::ShowText(0.500f, 0.325f + d, 0.5f, fmt::format("Clamp: {:.3f}", slipRatio));
+        //UI::ShowText(0.500f, 0.325f + d, 0.5f, fmt::format("Clamp: {:.3f}", slipRatio));
     }
     else if (abs(slip) > slipOpt * slipMultA) {
         slipRatio = map(abs(slip), slipOpt * slipMultA, slipOpt * slipMultB, outMultA, outMultB);
-        UI::ShowText(0.500f, 0.325f + d, 0.5f, fmt::format("B: {:.3f}", slipRatio));
+        //UI::ShowText(0.500f, 0.325f + d, 0.5f, fmt::format("B: {:.3f}", slipRatio));
     }
     else if (abs(slip) > slipOpt) {
         slipRatio = map(abs(slip), slipOpt, slipOpt * slipMultA, 1.0f, outMultA);
-        UI::ShowText(0.500f, 0.325f + d, 0.5f, fmt::format("A: {:.3f}", slipRatio));
+        //UI::ShowText(0.500f, 0.325f + d, 0.5f, fmt::format("A: {:.3f}", slipRatio));
     }
     else {
         slipRatio = map(abs(slip), 0.0f, slipOpt, 0.0f, 1.0f);
-        UI::ShowText(0.500f, 0.325f + d, 0.5f, fmt::format("Normal: {:.3f}", slipRatio));
+        //UI::ShowText(0.500f, 0.325f + d, 0.5f, fmt::format("Normal: {:.3f}", slipRatio));
 
         // Apply gamma
         //slipRatio = pow(slipRatio, g_settings.Wheel.FFB.Gamma);
@@ -878,7 +878,7 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     
     float longSlipMult = map(longSlip, 1.0f, 2.0f, 1.0f, 0.0f);
     longSlipMult = std::clamp(longSlipMult, 0.2f, 1.0f);
-    UI::ShowText(0.500f, 0.450f, 0.5f, fmt::format("LongSlipLoss: {:.3f}", longSlipMult));
+    //UI::ShowText(0.500f, 0.450f, 0.5f, fmt::format("LongSlipLoss: {:.3f}", longSlipMult));
 
     float velFac = std::clamp(ENTITY::GET_ENTITY_SPEED(g_playerVehicle), 0.0f, 1.0f);//std::clamp(10.0f * abs(lenL + lenR), 0.0f, 1.5f);
 
@@ -895,16 +895,16 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
 
     // front bias
     float comBiasFront = map(comOffset.Y, rearAxleOffset, frontAxleOffset, 0.0f, 1.0f);
-    UI::ShowText(0.500f, 0.300f, 0.5f, fmt::format("ComBiasFront: {:.3f}", comBiasFront));
+    //UI::ShowText(0.500f, 0.300f, 0.5f, fmt::format("ComBiasFront: {:.3f}", comBiasFront));
 
     float frontAxleDesignWeight = mass * comBiasFront;
 
     float weightTransferFactor = (satValues[0].Weight + satValues[1].Weight) / frontAxleDesignWeight;
 
     float satForce = g_settings.Wheel.FFB.SATAmpMult * 10000.0f * slipRatio * velFac * weightTransferFactor * longSlipMult;
-    UI::ShowText(0.500f, 0.375f, 0.5f, fmt::format("SlipRatio: {:.3f}", slipRatio));
-    UI::ShowText(0.500f, 0.400f, 0.5f, fmt::format("WT: {:.3f}", weightTransferFactor));
-    UI::ShowText(0.500f, 0.425f, 0.5f, fmt::format("SAT: {:.3f}", satForce));
+    //UI::ShowText(0.500f, 0.375f, 0.5f, fmt::format("SlipRatio: {:.3f}", slipRatio));
+    //UI::ShowText(0.500f, 0.400f, 0.5f, fmt::format("WT: {:.3f}", weightTransferFactor));
+    //UI::ShowText(0.500f, 0.425f, 0.5f, fmt::format("SAT: {:.3f}", satForce));
 
     //float satForce = g_settings.Wheel.FFB.SATAmpMult * 10000.0f * slipRatio;
     //float satForce = g_settings.Wheel.FFB.SATAmpMult * 10000.0f * satValues.Delta;
