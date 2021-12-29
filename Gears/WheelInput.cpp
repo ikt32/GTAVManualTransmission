@@ -740,6 +740,10 @@ std::vector<SSlipInfo> calculateSlipInfo() {
 }
 
 uint64_t xxxx = 0;
+
+// The downside of this method based on slip angle, is that high-slip-ratio
+// handlings are very weak and need a low FFB.Gamma to ramp up the "early" force with
+// "low" steering angles.
 float calcSlipRatio(float slip, float slipOpt,
                     float slipMultA, float slipMultB,
                     float outMultA, float outMultB) {
@@ -763,8 +767,41 @@ float calcSlipRatio(float slip, float slipOpt,
         UI::ShowText(0.500f, 0.325f + d, 0.5f, fmt::format("Normal: {:.3f}", slipRatio));
 
         // Apply gamma
-        slipRatio = pow(slipRatio, g_settings.Wheel.FFB.Gamma);
-        UI::ShowText(0.650f, 0.325f + d, 0.5f, fmt::format("{:.3f}", slipRatio));
+        //slipRatio = pow(slipRatio, g_settings.Wheel.FFB.Gamma);
+         
+        // Apply fancy bezier
+        float x = slipRatio;
+
+        // Not sure if this is actually bezier, but it works wonderfully.
+        // Not adjustable though!
+        slipRatio = x + (1.0f - x) * x;
+
+        // fancier bezier... adjustment thing?
+        float g = g_settings.Wheel.FFB.Gamma;
+        //slipRatio = x + (1.0f - x) * (pow(x, g) * ((g + 1.0f) - g * x));
+
+        // TODO: What if g_base = 1 is "correct" for "realistic" optimal slip ratios
+        // and more slip ratio -> less g?
+
+        //  5   deg ~ 2.0
+        //  7.5 deg ~ 1.333...
+        // 10   deg ~ 1.0
+        // 20   deg ~ 0.5
+
+        // g_adj normalizes the force due to different fTractionCurveLateral values
+        // Tested from 5 degrees to 30 degrees
+        // Results in similar force at a similar lock (< fTractionCurveLateral).
+        // Increasing g weak
+        // Decreasing g strong
+        float g_adj = g * (deg2rad(12.0f) / slipOpt);
+
+        // Increase the force quick, then rise towards 1.
+        // x + (1 - x) * (the rest): Make the initial part steeper than linear y=x
+        // x^g * ((g+1)-g*x): Gently ramp up, then rise, then gently ramp off
+        // Put together: Linear ramp up, rise, quickly ramp off towards 1.0
+        slipRatio = x + (1.0f - x) * (pow(x, g_adj) * ((g_adj + 1.0f) - g_adj * x));
+        
+        //UI::ShowText(0.650f, 0.325f + d, 0.5f, fmt::format("{:.3f}", slipRatio));
 
     }
     slipRatio = slipRatio * sgn(slip);
