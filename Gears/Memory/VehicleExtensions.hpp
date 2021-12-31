@@ -166,6 +166,9 @@ public:
     /*
      * Wheel struct
      */	
+    static std::vector<Vector3> GetWheelBoneVelocity(Vehicle handle);
+    static std::vector<Vector3> GetWheelTractionVector(Vehicle handle);
+
     static std::vector<float> GetWheelHealths(Vehicle handle);
     static void SetWheelsHealth(Vehicle handle, float health);
     

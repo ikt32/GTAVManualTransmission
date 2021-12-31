@@ -777,6 +777,38 @@ void VehicleExtensions::SetVisualHeight(Vehicle handle, float height) {
     *reinterpret_cast<float *>(wheelPtr + offset) = height;
 }
 
+std::vector<Vector3> VehicleExtensions::GetWheelBoneVelocity(Vehicle handle) {
+    auto wheels = GetWheelPtrs(handle);
+    std::vector<Vector3> values;
+
+    values.reserve(wheels.size());
+    for (auto wheelAddr : wheels) {
+        values.emplace_back(Vector3{
+            *reinterpret_cast<float*>(wheelAddr + 0xB0), 0,
+            *reinterpret_cast<float*>(wheelAddr + 0xB4), 0,
+            *reinterpret_cast<float*>(wheelAddr + 0xB8), 0,
+        });
+    }
+
+    return values;
+}
+
+std::vector<Vector3> VehicleExtensions::GetWheelTractionVector(Vehicle handle) {
+    auto wheels = GetWheelPtrs(handle);
+    std::vector<Vector3> values;
+
+    values.reserve(wheels.size());
+    for (auto wheelAddr : wheels) {
+        values.emplace_back(Vector3{
+            *reinterpret_cast<float*>(wheelAddr + 0xC0), 0,
+            *reinterpret_cast<float*>(wheelAddr + 0xC4), 0,
+            *reinterpret_cast<float*>(wheelAddr + 0xC8), 0,
+            });
+    }
+
+    return values;
+}
+
 std::vector<float> VehicleExtensions::GetWheelHealths(Vehicle handle) {
     auto wheelPtr = GetWheelsPtr(handle);
     auto numWheels = GetNumWheels(handle);
