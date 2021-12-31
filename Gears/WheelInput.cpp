@@ -652,43 +652,10 @@ struct SSlipInfo {
     float VelocityAmplitude; // Relative?
 };
 
-struct Vec3 {
-    float X;
-    float Y;
-    float Z;
-};
 std::vector<SSlipInfo> calculateSlipInfo() {
-
-
-    // Wheel + 0xB0 - Velocity @ bone?
-    auto GetWheelVelocities1 = [](Vehicle handle) -> std::vector<Vec3> {
-        auto numWheels = VExt::GetNumWheels(handle);
-        std::vector<Vec3> values(numWheels);
-        auto wheelPtr = VExt::GetWheelsPtr(handle);
-
-        for (auto i = 0; i < numWheels; i++) {
-            auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * i);
-            values[i] = (*reinterpret_cast<Vec3*>(wheelAddr + 0xB0));
-        }
-        return values;
-    };
-
-    // Wheel + 0xC0 - Traction vector?
-    auto GetWheelVelocities2 = [](Vehicle handle) -> std::vector<Vec3> {
-        auto numWheels = VExt::GetNumWheels(handle);
-        std::vector<Vec3> values(numWheels);
-        auto wheelPtr = VExt::GetWheelsPtr(handle);
-
-        for (auto i = 0; i < numWheels; i++) {
-            auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * i);
-            values[i] = (*reinterpret_cast<Vec3*>(wheelAddr + 0xC0));
-        }
-        return values;
-    };
-
     auto loads = VExt::GetWheelLoads(g_playerVehicle);
-    auto vel1s = GetWheelVelocities1(g_playerVehicle);
-    auto vel2s = GetWheelVelocities2(g_playerVehicle);
+    auto boneVels = VExt::GetWheelBoneVelocity(g_playerVehicle);
+    auto tracVels = VExt::GetWheelTractionVector(g_playerVehicle);
     auto angles = VExt::GetWheelSteeringAngles(g_playerVehicle);
 
     auto velWorld = ENTITY::GET_ENTITY_VELOCITY(g_playerVehicle);
@@ -702,15 +669,13 @@ std::vector<SSlipInfo> calculateSlipInfo() {
     auto wheelSpeeds = VExt::GetTyreSpeeds(g_playerVehicle);
 
     for (; i < numWheels; ) {
-        auto vel1 = vel1s[i];
-        auto vel2 = vel2s[i];
-        Vector3 vel1v{ vel1.X, 0, vel1.Y, 0, vel1.Z, 0 };
-        Vector3 vel2v{ -vel2.X, 0, -vel2.Y, 0, -vel2.Z, 0 };
-        float angle = GetAngleBetween(vel2v, vel1v);
+        Vector3 boneVel = boneVels[i];
+        Vector3 tracVel = tracVels[i] * -1.0f;
+        float angle = GetAngleBetween(tracVel, boneVel);
 
         if (std::isnan(angle) || Length(velWorld) == 0.0f) {
-            vel1v = Vector3();
-            vel2v = Vector3();
+            boneVel = Vector3();
+            tracVel = Vector3();
             angle = 0.0f;
         }
 
@@ -723,8 +688,8 @@ std::vector<SSlipInfo> calculateSlipInfo() {
         // UI::DrawSphere(wheelCoords[i] + vel1v, 0.05f, Util::ColorI{ 255, 0, 0, 255 });
         // UI::DrawSphere(wheelCoords[i] + vel2v, 0.05f, Util::ColorI{ 0, 255, 0, 255 });
 
-        auto v1Coord = wheelCoords[i] + vel1v;
-        auto v2Coord = wheelCoords[i] + vel2v;
+        auto v1Coord = wheelCoords[i] + boneVel;
+        auto v2Coord = wheelCoords[i] + tracVel;
 
         auto off1 = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(g_playerVehicle, v1Coord.x, v1Coord.y, v1Coord.z);
         auto off2 = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(g_playerVehicle, v2Coord.x, v2Coord.y, v2Coord.z);
@@ -811,7 +776,7 @@ float calcSlipRatio(float slip, float slipOpt,
 int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRatio, bool isCar) {
     // in radians
     const float latSlipOpt = *(float*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets1604.fTractionCurveLateral);
-    const auto comOffset = *(Vec3*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets1604.vecCentreOfMass.X);
+    const auto comOffset = *(V3F*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets1604.vecCentreOfMass.X);
     // in kg
     const float mass = *(float*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets1604.fMass);
 
@@ -893,7 +858,7 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     float wheelbase = frontAxleOffset - rearAxleOffset;
 
     // front bias
-    float comBiasFront = map(comOffset.Y, rearAxleOffset, frontAxleOffset, 0.0f, 1.0f);
+    float comBiasFront = map(comOffset.y, rearAxleOffset, frontAxleOffset, 0.0f, 1.0f);
     //UI::ShowText(0.500f, 0.300f, 0.5f, fmt::format("ComBiasFront: {:.3f}", comBiasFront));
 
     float frontAxleDesignWeight = mass * comBiasFront;
