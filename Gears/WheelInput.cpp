@@ -39,6 +39,12 @@ extern WheelPatchStates g_wheelPatchStates;
 
 namespace {
     MiniPID pid(1.0, 0.0, 0.0);
+
+    struct SSlipInfo {
+        float Angle;
+        float Weight;            // kg
+        float VelocityAmplitude; // Relative, m/s
+    };
 }
 
 namespace WheelInput {
@@ -645,13 +651,6 @@ void calculateSoftLock(int& totalForce, int& damperForce) {
     }
 }
 
-struct SSlipInfo {
-    float Angle;
-    float Length;
-    float Weight;
-    float VelocityAmplitude; // Relative?
-};
-
 std::vector<SSlipInfo> calculateSlipInfo() {
     auto loads = VExt::GetWheelLoads(g_playerVehicle);
     auto boneVels = VExt::GetWheelBoneVelocity(g_playerVehicle);
@@ -679,31 +678,16 @@ std::vector<SSlipInfo> calculateSlipInfo() {
             angle = 0.0f;
         }
 
-        // GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
-        //     wheelCoords[i].x + vel1v.x, wheelCoords[i].y + vel1v.y, wheelCoords[i].z + vel1v.z, 255, 0, 0, 255);
-        // 
-        // GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
-        //     wheelCoords[i].x + vel2v.x, wheelCoords[i].y + vel2v.y, wheelCoords[i].z + vel2v.z, 0, 255, 0, 255);
-        // 
-        // UI::DrawSphere(wheelCoords[i] + vel1v, 0.05f, Util::ColorI{ 255, 0, 0, 255 });
-        // UI::DrawSphere(wheelCoords[i] + vel2v, 0.05f, Util::ColorI{ 0, 255, 0, 255 });
-
         auto v1Coord = wheelCoords[i] + boneVel;
-        auto v2Coord = wheelCoords[i] + tracVel;
+        auto boneVelRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(g_playerVehicle, v1Coord.x, v1Coord.y, v1Coord.z);
 
-        auto off1 = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(g_playerVehicle, v1Coord.x, v1Coord.y, v1Coord.z);
-        auto off2 = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(g_playerVehicle, v2Coord.x, v2Coord.y, v2Coord.z);
-        float length = (off2.x - off1.x);
-
-        slipAngles.push_back({ angle, length, loads[i], Length(off1)});
+        slipAngles.push_back({ angle, loads[i], Length(boneVelRel)});
 
         ++i;
     }
 
     return slipAngles;
 }
-
-uint64_t xxxx = 0;
 
 // The downside of this method based on slip angle, is that high-slip-ratio
 // handlings are very weak and need a low FFB.Gamma to ramp up the "early" force with
@@ -712,65 +696,38 @@ float calcSlipRatio(float slip, float slipOpt,
                     float slipMultA, float slipMultB,
                     float outMultA, float outMultB) {
     float slipRatio = 0.0f;
-    float d = xxxx % 2 == 0 ? 0.0f : 0.025f;
+
     // Understeer just based on slip
     if (abs(slip) > slipOpt * slipMultB) {
         slipRatio = std::clamp(slipRatio, outMultB, 1.0f);
-        //UI::ShowText(0.500f, 0.325f + d, 0.5f, fmt::format("Clamp: {:.3f}", slipRatio));
     }
     else if (abs(slip) > slipOpt * slipMultA) {
         slipRatio = map(abs(slip), slipOpt * slipMultA, slipOpt * slipMultB, outMultA, outMultB);
-        //UI::ShowText(0.500f, 0.325f + d, 0.5f, fmt::format("B: {:.3f}", slipRatio));
     }
     else if (abs(slip) > slipOpt) {
         slipRatio = map(abs(slip), slipOpt, slipOpt * slipMultA, 1.0f, outMultA);
-        //UI::ShowText(0.500f, 0.325f + d, 0.5f, fmt::format("A: {:.3f}", slipRatio));
     }
     else {
+        // Normalize slip to ratio
         slipRatio = map(abs(slip), 0.0f, slipOpt, 0.0f, 1.0f);
-        //UI::ShowText(0.500f, 0.325f + d, 0.5f, fmt::format("Normal: {:.3f}", slipRatio));
-
-        // Apply gamma
-        //slipRatio = pow(slipRatio, g_settings.Wheel.FFB.Gamma);
-         
-        // Apply fancy bezier
         float x = slipRatio;
-
-        // Not sure if this is actually bezier, but it works wonderfully.
-        // Not adjustable though!
-        slipRatio = x + (1.0f - x) * x;
-
-        // fancier bezier... adjustment thing?
-        float g = g_settings.Wheel.FFB.Gamma;
-        //slipRatio = x + (1.0f - x) * (pow(x, g) * ((g + 1.0f) - g * x));
-
-        // TODO: What if g_base = 1 is "correct" for "realistic" optimal slip ratios
-        // and more slip ratio -> less g?
-
-        //  5   deg ~ 2.0
-        //  7.5 deg ~ 1.333...
-        // 10   deg ~ 1.0
-        // 20   deg ~ 0.5
 
         // g_adj normalizes the force due to different fTractionCurveLateral values
         // Tested from 5 degrees to 30 degrees
         // Results in similar force at a similar lock (< fTractionCurveLateral).
         // Increasing g weak
         // Decreasing g strong
-        float g_adj = g * (deg2rad(12.0f) / slipOpt);
+        // TODO: Not "gamma", call it something else
+        float g_adj = g_settings.Wheel.FFB.Gamma * (deg2rad(12.0f) / slipOpt);
 
         // Increase the force quick, then rise towards 1.
         // x + (1 - x) * (the rest): Make the initial part steeper than linear y=x
         // x^g * ((g+1)-g*x): Gently ramp up, then rise, then gently ramp off
         // Put together: Linear ramp up, rise, quickly ramp off towards 1.0
         slipRatio = x + (1.0f - x) * (pow(x, g_adj) * ((g_adj + 1.0f) - g_adj * x));
-        
-        //UI::ShowText(0.650f, 0.325f + d, 0.5f, fmt::format("{:.3f}", slipRatio));
-
     }
-    slipRatio = slipRatio * sgn(slip);
-    ++xxxx;
-    return slipRatio;
+
+    return slipRatio * sgn(slip);
 }
 
 int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRatio, bool isCar) {
@@ -791,48 +748,17 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
         return 0;
 
     float slipL = satValues[0].Angle;
-    float lenL = satValues[0].Length;
     float slipR = satValues[1].Angle;
-    float lenR = satValues[1].Length;
-
-    //float lenRatio = (lenL+lenR) * 0.5f;
 
     const float maxSlipMultA = 1.050f;
     const float maxSlipMultB = 1.075f;
+    const float outMultA = 0.50f;
+    const float outMultB = 0.35f;
 
-    //float slipRatioL;
-    //// Understeer just based on slip
-    //if (abs(slipL) > latSlipOpt) {
-    //    slipRatioL = map(abs(slipL), latSlipOpt * maxSlipMultA, latSlipOpt * maxSlipMultB, 1.0f, minMult);
-    //    slipRatioL = std::clamp(slipRatioL, minMult, 1.0f);
-    //}
-    //else
-    //{
-    //    slipRatioL = map(abs(slipL), 0.0f, latSlipOpt, 0.0f, 1.0f);
-    //    slipRatioL = std::clamp(slipRatioL, 0.0f, 1.0f);
-    //}
-    //slipRatioL = slipRatioL * sgn(slipL);
-    //
-    //float slipRatioR;
-    //// Understeer just based on slip
-    //if (abs(slipR) > latSlipOpt) {
-    //    slipRatioR = map(abs(slipR), latSlipOpt * maxSlipMultA, latSlipOpt * maxSlipMultB, 1.0f, minMult);
-    //    slipRatioR = std::clamp(slipRatioR, minMult, 1.0f);
-    //}
-    //else
-    //{
-    //    slipRatioR = map(abs(slipR), 0.0f, latSlipOpt, 0.0f, 1.0f);
-    //    slipRatioR = std::clamp(slipRatioR, 0.0f, 1.0f);
-    //}
-    //slipRatioR = slipRatioR * sgn(slipR);
-    
-    //                                                                              outMultA outMultB
-    float slipRatioL = calcSlipRatio(slipL, latSlipOpt, maxSlipMultA, maxSlipMultB, 0.50f, 0.35f);
-    float slipRatioR = calcSlipRatio(slipR, latSlipOpt, maxSlipMultA, maxSlipMultB, 0.50f, 0.35f);
+    float slipRatioL = calcSlipRatio(slipL, latSlipOpt, maxSlipMultA, maxSlipMultB, outMultA, outMultB);
+    float slipRatioR = calcSlipRatio(slipR, latSlipOpt, maxSlipMultA, maxSlipMultB, outMultA, outMultB);
 
     float slipRatio = (slipRatioL + slipRatioR) / 2.0f;
-    
-    //float satForce = g_settings.Wheel.FFB.SATAmpMult * 10000.0f * slipRatio * lenRatio;
 
     // std::max so we ignore divide-by-almost-zero stuff
     float longSlipL = wheelVels[0] / std::max(1.0f, satValues[0].VelocityAmplitude);
@@ -842,16 +768,11 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     
     float longSlipMult = map(longSlip, 1.0f, 2.0f, 1.0f, 0.0f);
     longSlipMult = std::clamp(longSlipMult, 0.2f, 1.0f);
-    //UI::ShowText(0.500f, 0.450f, 0.5f, fmt::format("LongSlipLoss: {:.3f}", longSlipMult));
 
-    float velFac = std::clamp(ENTITY::GET_ENTITY_SPEED(g_playerVehicle), 0.0f, 1.0f);//std::clamp(10.0f * abs(lenL + lenR), 0.0f, 1.5f);
+    float velFac = std::clamp(ENTITY::GET_ENTITY_SPEED(g_playerVehicle), 0.0f, 1.0f);
 
     // Heavier under braking, lighter under no braking, zero when airborne. 1 when stopped, but this defaults to 0 which is also fine.
     float weightTransferMult = 2.0f;
-    // First bias it around 0.0, then apply the mult, and move back bias to 1.0
-    //float weightTransferL = (((satValues[0].Weight / weightWheelAvg) - 1.0f) * weightTransferMult) + 1.0f;
-    //float weightTransferR = (((satValues[1].Weight / weightWheelAvg) - 1.0f) * weightTransferMult) + 1.0f;
-    //float weightTransferFactor = (std::max(0.0f, weightTransferL) + std::max(0.0f, weightTransferR)) / 2.0f;
 
     float frontAxleOffset = wheelOffsets[0].y;
     float rearAxleOffset = wheelOffsets[2].y;
@@ -859,19 +780,12 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
 
     // front bias
     float comBiasFront = map(comOffset.y, rearAxleOffset, frontAxleOffset, 0.0f, 1.0f);
-    //UI::ShowText(0.500f, 0.300f, 0.5f, fmt::format("ComBiasFront: {:.3f}", comBiasFront));
 
     float frontAxleDesignWeight = mass * comBiasFront;
 
     float weightTransferFactor = (satValues[0].Weight + satValues[1].Weight) / frontAxleDesignWeight;
 
     float satForce = g_settings.Wheel.FFB.SATAmpMult * 10000.0f * slipRatio * velFac * weightTransferFactor * longSlipMult;
-    //UI::ShowText(0.500f, 0.375f, 0.5f, fmt::format("SlipRatio: {:.3f}", slipRatio));
-    //UI::ShowText(0.500f, 0.400f, 0.5f, fmt::format("WT: {:.3f}", weightTransferFactor));
-    //UI::ShowText(0.500f, 0.425f, 0.5f, fmt::format("SAT: {:.3f}", satForce));
-
-    //float satForce = g_settings.Wheel.FFB.SATAmpMult * 10000.0f * slipRatio;
-    //float satForce = g_settings.Wheel.FFB.SATAmpMult * 10000.0f * satValues.Delta;
 
     if (g_settings.Wheel.FFB.LUTFile.empty()) {
         float adf = static_cast<float>(g_settings.Wheel.FFB.AntiDeadForce);
