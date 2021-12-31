@@ -389,7 +389,7 @@ void ScriptSettings::SaveWheel() const {
     SAVE_VAL("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin);
     SAVE_VAL("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
     SAVE_VAL("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
-    SAVE_VAL("FORCE_FEEDBACK", "Gamma", Wheel.FFB.Gamma);
+    SAVE_VAL("FORCE_FEEDBACK", "ResponseCurve", Wheel.FFB.ResponseCurve);
     SAVE_VAL("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
     
     // [INPUT_DEVICES]
@@ -840,7 +840,7 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     LOAD_VAL("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
     LOAD_VAL("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
     LOAD_VAL("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
-    LOAD_VAL("FORCE_FEEDBACK", "Gamma", Wheel.FFB.Gamma);
+    LOAD_VAL("FORCE_FEEDBACK", "ResponseCurve", Wheel.FFB.ResponseCurve);
     LOAD_VAL("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
     Wheel.FFB.LUTFile = ini.GetValue("FORCE_FEEDBACK", "LUTFile", "");
 

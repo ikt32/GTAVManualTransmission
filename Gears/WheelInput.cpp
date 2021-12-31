@@ -712,19 +712,16 @@ float calcSlipRatio(float slip, float slipOpt,
         slipRatio = map(abs(slip), 0.0f, slipOpt, 0.0f, 1.0f);
         float x = slipRatio;
 
-        // g_adj normalizes the force due to different fTractionCurveLateral values
+        // rNorm normalizes the response curve for different fTractionCurveLateral values
         // Tested from 5 degrees to 30 degrees
         // Results in similar force at a similar lock (< fTractionCurveLateral).
-        // Increasing g weak
-        // Decreasing g strong
-        // TODO: Not "gamma", call it something else
-        float g_adj = g_settings.Wheel.FFB.Gamma * (deg2rad(12.0f) / slipOpt);
+        float rNorm = g_settings.Wheel.FFB.ResponseCurve * (deg2rad(12.0f) / slipOpt);
 
         // Increase the force quick, then rise towards 1.
         // x + (1 - x) * (the rest): Make the initial part steeper than linear y=x
-        // x^g * ((g+1)-g*x): Gently ramp up, then rise, then gently ramp off
+        // x^rNorm * ((rNorm+1)-rNorm*x): Gently ramp up, then rise, then gently ramp off
         // Put together: Linear ramp up, rise, quickly ramp off towards 1.0
-        slipRatio = x + (1.0f - x) * (pow(x, g_adj) * ((g_adj + 1.0f) - g_adj * x));
+        slipRatio = x + (1.0f - x) * (pow(x, rNorm) * ((rNorm + 1.0f) - rNorm * x));
     }
 
     return slipRatio * sgn(slip);
@@ -801,7 +798,6 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     return static_cast<int>(satForce);
 }
 
-// Despite being scientifically inaccurate, "self-aligning torque" is the best description.
 void WheelInput::DrawDebugLines() {
     float steeringAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * VExt::GetSteeringMultiplier(g_playerVehicle);
     Vector3 velocityWorld = ENTITY::GET_ENTITY_VELOCITY(g_playerVehicle);

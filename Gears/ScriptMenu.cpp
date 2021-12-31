@@ -32,6 +32,7 @@
 #include "AWD.h"
 #include "DrivingAssists.h"
 #include "CruiseControl.h"
+#include "WheelInput.h"
 
 #include <menu.h>
 #include <inc/main.h>
@@ -191,6 +192,22 @@ namespace {
         if (g_settings.ConfigActive())
             cfgName = g_settings().Name;
         return fmt::format("CFG: [{}]", cfgName);
+    }
+
+    void incVal(float& gamma, float max, float step) {
+        if (gamma + step > max) {
+            gamma = max;
+            return;
+        }
+        gamma += step;
+    }
+
+    void decVal(float& gamma, float min, float step) {
+        if (gamma - step < min) {
+            gamma = min;
+            return;
+        }
+        gamma -= step;
     }
 }
 
@@ -997,16 +1014,6 @@ void update_anglemenu() {
         { "Soft lock for boats. (degrees)" });
 }
 
-void incGamma(float& gamma, float max, float step) {
-    if (gamma + step > max) return;
-    gamma += step;
-}
-
-void decGamma(float& gamma, float min, float step) {
-    if (gamma - step < min) return;
-    gamma -= step;
-}
-
 std::vector<std::string> showGammaCurve(const std::string& axis, const float input, const float gamma) {
 
     std::string larr = "< ";
@@ -1113,8 +1120,8 @@ void update_axesmenu() {
     bool showBrakeGammaBox = false;
     std::vector<std::string> extras = {};
     g_menu.OptionPlus("Brake gamma", extras, &showBrakeGammaBox,
-        [=] { return incGamma(g_settings.Wheel.Brake.Gamma, 5.0f, 0.01f); },
-        [=] { return decGamma(g_settings.Wheel.Brake.Gamma, 0.1f, 0.01f); },
+        [=] { return incVal(g_settings.Wheel.Brake.Gamma, 5.0f, 0.01f); },
+        [=] { return decVal(g_settings.Wheel.Brake.Gamma, 0.1f, 0.01f); },
         "Brake gamma",
         { "Linearity of the brake pedal. Values over 1.0 feel more real if you have progressive springs." });
 
@@ -1126,8 +1133,8 @@ void update_axesmenu() {
     bool showThrottleGammaBox = false;
     extras = {};
     g_menu.OptionPlus("Throttle gamma", extras, &showThrottleGammaBox,
-        [=] { return incGamma(g_settings.Wheel.Throttle.Gamma, 5.0f, 0.01f); },
-        [=] { return decGamma(g_settings.Wheel.Throttle.Gamma, 0.1f, 0.01f); },
+        [=] { return incVal(g_settings.Wheel.Throttle.Gamma, 5.0f, 0.01f); },
+        [=] { return decVal(g_settings.Wheel.Throttle.Gamma, 0.1f, 0.01f); },
         "Throttle gamma",
         { "Linearity of the throttle pedal." });
 
@@ -1139,8 +1146,8 @@ void update_axesmenu() {
     bool showSteeringGammaBox = false;
     extras = {};
     g_menu.OptionPlus("Steering gamma", extras, &showSteeringGammaBox,
-        [=] { return incGamma(g_settings.Wheel.Steering.Gamma, 5.0f, 0.01f); },
-        [=] { return decGamma(g_settings.Wheel.Steering.Gamma, 0.1f, 0.01f); },
+        [=] { return incVal(g_settings.Wheel.Steering.Gamma, 5.0f, 0.01f); },
+        [=] { return decVal(g_settings.Wheel.Steering.Gamma, 0.1f, 0.01f); },
         "Steering gamma",
         { "Linearity of the steering wheel." });
 
@@ -1151,6 +1158,64 @@ void update_axesmenu() {
         extras = showGammaCurve("Steering", steerVal, g_settings.Wheel.Steering.Gamma);
         g_menu.OptionPlusPlus(extras, "Steering gamma");
     }
+}
+
+std::vector<std::string> showDynamicFfbCurve(float input, float gamma) {
+    // From WheelInput.cpp:calcSlipRatio
+    auto func = [](float x, float gamma) {
+        return x + (1.0f - x) * (pow(x, gamma) * ((gamma + 1.0f) - gamma * x));
+    };
+
+    std::string larr = "< ";
+    std::string rarr = " >";
+    if (gamma >= 5.0f - 0.01f) rarr = "";
+    if (gamma <= 0.1f + 0.01f) larr = "";
+
+    std::string printVar = fmt::format("{:.{}f}", gamma, 2);
+
+    std::vector<std::string> info{
+        "FFB response curve:",
+        fmt::format("{}{}{}", larr, printVar, rarr)
+    };
+
+    const int max_samples = 100;
+    std::vector<std::pair<float, float>> points;
+    for (int i = 0; i < max_samples; i++) {
+        float x = static_cast<float>(i) / static_cast<float>(max_samples);
+        float y = func(x, gamma);
+        points.emplace_back(x, y);
+    }
+
+    float rectX = 0.5f;
+    float rectY = 0.5f;
+    float rectW = 0.40f / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+    float rectH = 0.40f;
+    float blockW = rectW / max_samples;//0.001f * (16.0f / 9.0f) / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+    float blockH = blockW * GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+
+    GRAPHICS::DRAW_RECT(rectX, rectY,
+        rectW + 3.0f * blockW, rectH + 3.0f * blockH,
+        255, 255, 255, 191, 0);
+    GRAPHICS::DRAW_RECT(rectX, rectY,
+        rectW + blockW / 2.0f, rectH + blockH / 2.0f,
+        0, 0, 0, 239, 0);
+
+    for (auto point : points) {
+        float pointX = rectX - 0.5f * rectW + point.first * rectW;
+        float pointY = rectY + 0.5f * rectH - point.second * rectH;
+        GRAPHICS::DRAW_RECT(pointX, pointY,
+            blockW, blockH,
+            255, 255, 255, 255, 0);
+    }
+
+    std::pair<float, float> currentPoint = { input, func(input, gamma) };
+    float pointX = rectX - 0.5f * rectW + currentPoint.first * rectW;
+    float pointY = rectY + 0.5f * rectH - currentPoint.second * rectH;
+    GRAPHICS::DRAW_RECT(pointX, pointY,
+        3.0f * blockW, 3.0f * blockH,
+        255, 0, 0, 255, 0);
+
+    return info;
 }
 
 void update_forcefeedbackmenu() {
@@ -1171,13 +1236,24 @@ void update_forcefeedbackmenu() {
         { "Reactive force offset/multiplier, when not going straight.",
           "Depending on wheel strength, a larger value helps reaching countersteer faster or reduce overcorrection."});
 
-    g_menu.FloatOptionCb("Self aligning torque gamma", g_settings.Wheel.FFB.Gamma, 0.01f, 5.0f, 0.01f, getKbEntry,
-        { 
-          "Something!"
-          //"< 1.0: More FFB at low speeds, FFB tapers off towards speed cap.",
-          //"> 1.0: Less FFB at low speeds, FFB increases towards speed cap.",
-          //"Keep at 1.0 for linear response. ~h~Not~h~ recommended to go higher than 1.0!"
-        });
+    bool showDynamicFfbCurveBox = false;
+    if (g_menu.OptionPlus("FFB response curve", {}, &showDynamicFfbCurveBox,
+            [=] { return incVal(g_settings.Wheel.FFB.ResponseCurve, 5.00f, 0.01f); },
+            [=] { return decVal(g_settings.Wheel.FFB.ResponseCurve, 0.01f, 0.01f); },
+            "Response curve", {
+                "Response curve of the self-aligning torque.",
+                "Decrease to ramp up force earlier.",
+                "Increase to get a more linear force buildup." })) {
+        float val = g_settings.Wheel.FFB.ResponseCurve;
+        if (getKbEntry(val)) {
+            g_settings.Wheel.FFB.ResponseCurve = val;
+        }
+    }
+
+    if (showDynamicFfbCurveBox) {
+        auto extras = showDynamicFfbCurve(abs(WheelInput::GetFFBConstantForce()), g_settings.Wheel.FFB.ResponseCurve);
+        g_menu.OptionPlusPlus(extras, "Response Curve");
+    }
 
     g_menu.FloatOption("Self aligning torque speed cap", g_settings.Wheel.FFB.MaxSpeed, 10.0f, 1000.0f, 1.0f,
         { "Speed where FFB stops increasing. Helpful against too strong FFB at extreme speeds.",

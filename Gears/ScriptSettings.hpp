@@ -363,7 +363,7 @@ public:
             int DetailLim = 5000;
             int DetailMAW = 3;
             float CollisionMult = 2.5f;
-            float Gamma = 0.75f;
+            float ResponseCurve = 0.75f;
             float MaxSpeed = 80.0f;
             std::string LUTFile;
         } FFB;
