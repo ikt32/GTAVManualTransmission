@@ -652,7 +652,6 @@ struct SSlipInfo {
     float VelocityAmplitude; // Relative?
 };
 
-std::vector<Vector3> GetWheelCoords(Vehicle handle);
 struct Vec3 {
     float X;
     float Y;
@@ -699,7 +698,7 @@ std::vector<SSlipInfo> calculateSlipInfo() {
     uint32_t i = 0;
     auto numWheels = VExt::GetNumWheels(g_playerVehicle);
     auto wheelOffs = VExt::GetWheelOffsets(g_playerVehicle);
-    auto wheelCoords = GetWheelCoords(g_playerVehicle);
+    auto wheelCoords = Util::GetWheelCoords(g_playerVehicle);
     auto wheelSpeeds = VExt::GetTyreSpeeds(g_playerVehicle);
 
     for (; i < numWheels; ) {

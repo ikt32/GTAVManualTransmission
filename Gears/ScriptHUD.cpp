@@ -14,6 +14,7 @@
 #include "Util/MathExt.h"
 #include "Util/UIUtils.h"
 #include "Util/Materials.h"
+#include "Util/ScriptUtils.h"
 
 #include "Input/CarControls.hpp"
 #include "VehicleData.hpp"
@@ -721,29 +722,12 @@ void drawInputWheelInfo() {
         drawSteeringFfb();
 }
 
-std::vector<Vector3> GetWheelCoords(Vehicle handle) {
-    std::vector<Vector3> worldCoords;
-    std::vector<Vector3> positions = VExt::GetWheelOffsets(handle);
-    Vector3 position = ENTITY::GET_ENTITY_COORDS(handle, true);
-    Vector3 rotation = ENTITY::GET_ENTITY_ROTATION(handle, 0);
-    rotation.x = deg2rad(rotation.x);
-    rotation.y = deg2rad(rotation.y);
-    rotation.z = deg2rad(rotation.z);
-    Vector3 direction = ENTITY::GET_ENTITY_FORWARD_VECTOR(handle);
-
-    worldCoords.reserve(positions.size());
-    for (Vector3 wheelPos : positions) {
-        worldCoords.emplace_back(GetOffsetInWorldCoords(position, rotation, direction, wheelPos));
-    }
-    return worldCoords;
-}
-
 void drawVehicleWheelTractionVector() {
     auto numWheels = VExt::GetNumWheels(g_playerVehicle);
     auto wheelOffs = VExt::GetWheelOffsets(g_playerVehicle);
     auto wheelTVLYs = VExt::GetWheelTractionVectorY(g_playerVehicle);
     auto wheelTVLXs = VExt::GetWheelTractionVectorX(g_playerVehicle);
-    auto wheelCoords = GetWheelCoords(g_playerVehicle);
+    auto wheelCoords = Util::GetWheelCoords(g_playerVehicle);
     for (int i = 0; i < numWheels; i++) {
         const float div = 1.0f;
 
@@ -761,7 +745,7 @@ void drawVehicleWheelTractionVector() {
 
 void drawVehicleWheelMaterialInfo() {
     auto numWheels = VExt::GetNumWheels(g_playerVehicle);
-    auto wheelCoords = GetWheelCoords(g_playerVehicle);
+    auto wheelCoords = Util::GetWheelCoords(g_playerVehicle);
 
     auto materialIndex = VExt::GetTireContactMaterial(g_playerVehicle);
     auto tyreGrips = VExt::GetTyreGrips(g_playerVehicle);
@@ -791,7 +775,7 @@ void drawVehicleWheelInfo() {
     auto wheelsContactCoords = VExt::GetWheelLastContactCoords(g_playerVehicle);
     auto wheelsOnGround = VExt::GetWheelsOnGround(g_playerVehicle);
 
-    auto wheelCoords = GetWheelCoords(g_playerVehicle);
+    auto wheelCoords = Util::GetWheelCoords(g_playerVehicle);
     auto wheelsPower = VExt::GetWheelPower(g_playerVehicle);
     auto wheelsBrake = VExt::GetWheelBrakePressure(g_playerVehicle);
     auto wheelDims = VExt::GetWheelDimensions(g_playerVehicle);
