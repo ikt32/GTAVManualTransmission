@@ -1,1 +1,4 @@
 thirdparty/
+.git/
+.github/
+.vs/
