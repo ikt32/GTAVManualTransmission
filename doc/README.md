@@ -8,29 +8,36 @@ Version 5.4.0
 
 ## Description
 
-This mod adds manual transmission support, with loads of customization options
-for the drivetrain and handling.
-
-Fully supports steering wheels: It adds force feedback, works with about all
-driving hardware, and every imaginable setting is customizable to fit
-your wheel and driving style.
+This project aims to expand the driving immersion and experience in Grand Theft Auto V,
+with a custom transmission, wheel support and much more.
 
 ## Features
 
-* Steering wheel, gamepad and keyboard support
-* Seamless input switching
-* Easy in-game configuration menu, with many options
-* Per-vehicle settings
-* Sequential, H-pattern and custom automatic transmissions
-* Engine and transmission mechanics:
+* Complete steering wheel support
+  * DirectInput interfacing
+  * Force feedback from scratch
+  * Multiple devices supported
+* Transmission replacement with custom modes and more
+  * Manual sequential
+  * Manual H-pattern
+  * Automatic
   * Working clutch
-  * Engine braking, engine damage, stalling
-  * Engine damage
-  * Engine stalling
+  * Engine braking, stalling, damage
+* Tunable driving assists
+  * Launch control
+  * Traction control
+  * Stability control
+  * Custom anti-lock braking
+* Synchronized steering wheel and animations
+  * Match your actual wheel 1:1
+  * First person hand-over-hand animations
+* Custom first person camera
+  * With inertia effects
+* Seamless input switching between steering wheel, gamepad and keyboard
+* Completely in-game configuration menu
+* Vehicle specific settings/presets
 * Customizable steering assists
-* Custom realistic Stability Control, Traction Control, Anti-Lock Brakes
-* Supports UDP telemetry (DiRT 4 format) for SimHub and similar tools
-* Syncronized steering animations
+* Expose UDP telemetry (DiRT 4 format) for motion platforms, dashboard apps and more
 
 ## Downloads
 
