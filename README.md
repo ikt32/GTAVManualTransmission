@@ -10,11 +10,11 @@ This project aims to expand the driving immersion of Grand Theft Auto V, with ma
   * DirectInput interfacing
   * Force feedback from scratch
   * Multiple devices supported
-* Transmission replacement with custom modes
-  * Working clutch
+* Transmission replacement with custom modes and more
   * Manual sequential
   * Manual H-pattern
   * Automatic
+  * Working clutch
 * Tunable driving assists
   * Launch control
   * Traction control

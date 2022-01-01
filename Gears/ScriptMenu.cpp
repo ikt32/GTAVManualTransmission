@@ -1708,8 +1708,9 @@ void update_tcssettingsmenu() {
     g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.StringArray("Traction control mode", tcsStrings, g_settings().DriveAssists.TCS.Mode,
-        { "Brakes: Uses the brakes to stop a wheel from losing traction.",
-          "Throttle: Reduce throttle to stop the wheels from losing traction." });
+        { "Different methods to stop wheels from losing traction.",
+          "Brakes: Applies brakes for slipping wheels.",
+          "Throttle: Reduce throttle when any slip is detected." });
 
     g_menu.FloatOption("Minimum slip", g_settings().DriveAssists.TCS.SlipMin, 0.0f, 20.0f, 0.1f,
         { "Wheel slip in m/s where traction control starts to reduce throttle, or apply the brakes." });
@@ -1718,6 +1719,13 @@ void update_tcssettingsmenu() {
     g_menu.FloatOption("Maximum slip", g_settings().DriveAssists.TCS.SlipMax, min, 20.0f, 0.1f,
         { "Wheel slip in m/s where traction control stops applying throttle, or brake application is max.",
           "Has to be higher than 'Minimum slip'." });
+
+    g_menu.FloatOption("Brake multiplier", g_settings().DriveAssists.TCS.BrakeMult, 0.0f, 5.0f, 0.05f,
+        { "How much traction control may brake a wheel at most.",
+          "Only applies for Brake-mode traction control.",
+          "0.5:  50% braking force applied.",
+          "1.0: 100% braking force applied.",
+          "2.0: 200% braking force applied." });
 }
 
 void update_espsettingsmenu() {

@@ -38,25 +38,36 @@ DrivingAssists::ABSData DrivingAssists::GetABS() {
 }
 
 DrivingAssists::TCSData DrivingAssists::GetTCS() {
-    std::vector<bool> slipped(g_vehData.mWheelCount);
+    std::vector<float> slips(g_vehData.mWheelCount);
     bool tractionLoss = false;
     float averageLoss = 0.0f;
     float numLoss = 0.0f;
     float minLoss = std::min(g_settings().DriveAssists.TCS.SlipMin, g_settings().DriveAssists.LaunchControl.SlipMin);
     auto pows = VExt::GetWheelPower(g_playerVehicle);
+
+    auto posWorld = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, 0);
+    auto boneVels = VExt::GetWheelBoneVelocity(g_playerVehicle);
+    auto steeringAngles = VExt::GetWheelSteeringAngles(g_playerVehicle);
+
     for (int i = 0; i < g_vehData.mWheelCount; i++) {
-        if (g_vehData.mWheelTyreSpeeds[i] > g_vehData.mVelocity.y + g_settings().DriveAssists.TCS.SlipMin &&
-            g_vehData.mSuspensionTravel[i] > 0.0f &&
+        auto boneVelProjection = posWorld + boneVels[i];
+        auto boneVelRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(
+            g_playerVehicle, boneVelProjection.x, boneVelProjection.y, boneVelProjection.z);
+
+        float rotatedY = boneVelRel.y / cos(steeringAngles[i]);
+        slips[i] = g_vehData.mWheelTyreSpeeds[i] - rotatedY;
+
+        bool shouldCheck = g_vehData.mSuspensionTravel[i] > 0.0f &&
             g_vehData.mWheelsDriven[i] &&
-            pows[i] > 0.1f) {
+            pows[i] > 0.1f;
+
+        if (shouldCheck &&
+            slips[i] > g_settings().DriveAssists.TCS.SlipMin) {
             tractionLoss = true;
-            slipped[i] = true;
         }
-        if (g_vehData.mWheelTyreSpeeds[i] > g_vehData.mVelocity.y + minLoss &&
-            g_vehData.mSuspensionTravel[i] > 0.0f &&
-            g_vehData.mWheelsDriven[i] &&
-            pows[i] > 0.1f) {
-            averageLoss += g_vehData.mWheelTyreSpeeds[i] - g_vehData.mVelocity.y;
+        if (shouldCheck &&
+            slips[i] > minLoss) {
+            averageLoss += slips[i];
             numLoss += 1.0f;
         }
     }
@@ -69,7 +80,7 @@ DrivingAssists::TCSData DrivingAssists::GetTCS() {
 
     return {
         g_settings().DriveAssists.TCS.Enable && tractionLoss,
-        slipped,
+        slips,
         averageLoss
     };
 }
@@ -275,6 +286,7 @@ std::vector<float> DrivingAssists::GetTCSBrakes(TCSData tcsData, LSDData lsdData
 
     float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
     float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
+    float fullBrakePower = handlingBrakeForce * g_settings().DriveAssists.TCS.BrakeMult;
 
     if (g_vehData.mWheelCount == 4) {
         lsdVals = {
@@ -289,19 +301,18 @@ std::vector<float> DrivingAssists::GetTCSBrakes(TCSData tcsData, LSDData lsdData
     float tcsSlipMax = g_settings().DriveAssists.TCS.SlipMax;
 
     for (int i = 0; i < g_vehData.mWheelCount; i++) {
-        if (tcsData.SlippingWheels[i]) {
+        if (tcsData.LinearSlip[i] > tcsSlipMin &&
+            g_vehData.mWheelTyreSpeeds[i] > 0.0f) {
             float mappedVal = map(
-                tcsData.AverageSlip,
+                tcsData.LinearSlip[i],
                 tcsSlipMin, tcsSlipMax,
-                0.0f, 1.0f);
-            mappedVal = std::clamp(mappedVal, 0.0f, 1.0f);
+                0.0f, fullBrakePower);
+            mappedVal = std::clamp(mappedVal, 0.0f, fullBrakePower);
 
-            brakeVals[i] = mappedVal + lsdVals[i];
-            g_vehData.mWheelsTcs[i] = true;
+            brakeVals[i] = inpBrakeForce + mappedVal + lsdVals[i];
         }
         else {
             brakeVals[i] = inpBrakeForce + lsdVals[i];
-            g_vehData.mWheelsTcs[i] = false;
         }
     }
 

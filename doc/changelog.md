@@ -1,5 +1,24 @@
 # Changelog
 
+## 5.x.x
+
+Rework force feedback:
+
+* Force feedback is now based on slip angle of each wheel
+* Force feedback takes weight transfer in account now
+* Add response curve visualizer in FFB setup
+
+Rework traction control (brake mode):
+
+* Use more accurate data sources
+* Fix brake force not scaled to handling brake force
+* Fix TCS UI elements lingering when no throttle applied, if other throttle effects are active
+
+Misc:
+
+* Add downshift protection
+* Allow more wheel rotation, up to 2880 degrees
+
 ## 5.4.2
 
 * Fix shift rate modifier not adhering to carcols modifiers

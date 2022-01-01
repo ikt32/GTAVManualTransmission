@@ -784,6 +784,8 @@ void drawVehicleWheelInfo() {
     auto wheelLoads = VExt::GetWheelLoads(g_playerVehicle);
     //auto wheelHots = VExt::GetWheelOverheats(g_playerVehicle);
 
+    auto wheelsTcs = DrivingAssists::GetTCS();
+
     UI::ShowText(0.60f, 0.200f, 0.25f, fmt::format("Average load: {:.0f} kg", avg(wheelLoads)));
     UI::ShowText(0.60f, 0.225f, 0.25f, fmt::format("Total load: {:.0f} kg", sum(wheelLoads)));
 
@@ -830,7 +832,8 @@ void drawVehicleWheelInfo() {
                         : g_vehData.mWheelsEspU[i] ? "_U" : ""
                     ),
                 fmt::format("DF: {:.3f}", wheelDfs[i]),
-                fmt::format("TVL: {:.3f}", wheelTVLs[i]),
+                //fmt::format("TVL: {:.3f}", wheelTVLs[i]),
+                fmt::format("Slip (L): {:.3f}", wheelsTcs.LinearSlip[i]),
                 fmt::format("Load: {:.0f} kg", wheelLoads[i]),
                 //fmt::format("Heat?: {:.1f}", wheelHots[i]),
             },

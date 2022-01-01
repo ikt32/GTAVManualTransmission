@@ -147,6 +147,7 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("DRIVING_ASSISTS", "TCSMode", DriveAssists.TCS.Mode);
     LOAD_VAL("DRIVING_ASSISTS", "TCSSlipMin", DriveAssists.TCS.SlipMin);
     LOAD_VAL("DRIVING_ASSISTS", "TCSSlipMax", DriveAssists.TCS.SlipMax);
+    LOAD_VAL("DRIVING_ASSISTS", "TCSBrakeMult", DriveAssists.TCS.BrakeMult);
 
     LOAD_VAL("DRIVING_ASSISTS", "ESP", DriveAssists.ESP.Enable);
     LOAD_VAL("DRIVING_ASSISTS", "ESPOverMin", DriveAssists.ESP.OverMin);
@@ -333,7 +334,8 @@ void VehicleConfig::saveGeneral() {
     SAVE_VAL("DRIVING_ASSISTS", "TCSMode", DriveAssists.TCS.Mode);
     SAVE_VAL("DRIVING_ASSISTS", "TCSSlipMin", DriveAssists.TCS.SlipMin);
     SAVE_VAL("DRIVING_ASSISTS", "TCSSlipMax", DriveAssists.TCS.SlipMax);
-    
+    SAVE_VAL("DRIVING_ASSISTS", "TCSBrakeMult", DriveAssists.TCS.BrakeMult);
+
     SAVE_VAL("DRIVING_ASSISTS", "ESP", DriveAssists.ESP.Enable);
     SAVE_VAL("DRIVING_ASSISTS", "ESPOverMin", DriveAssists.ESP.OverMin);
     SAVE_VAL("DRIVING_ASSISTS", "ESPOverMax", DriveAssists.ESP.OverMax);

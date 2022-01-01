@@ -110,6 +110,8 @@ public:
             // tyre speed threshold, m/s
             Tracked<float> SlipMin = 1.0f;
             Tracked<float> SlipMax = 2.0f;
+            // Multiplier for fBrakeForce for how hard TCS may brake a wheel.
+            Tracked<float> BrakeMult = 1.0f;
         } TCS;
 
         struct {
