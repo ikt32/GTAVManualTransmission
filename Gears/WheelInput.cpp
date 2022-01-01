@@ -658,13 +658,13 @@ std::vector<SSlipInfo> calculateSlipInfo() {
     auto angles = VExt::GetWheelSteeringAngles(g_playerVehicle);
 
     auto velWorld = ENTITY::GET_ENTITY_VELOCITY(g_playerVehicle);
+    auto posWorld = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, 0);
 
     std::vector<SSlipInfo> slipAngles;
 
     uint32_t i = 0;
     auto numWheels = VExt::GetNumWheels(g_playerVehicle);
     auto wheelOffs = VExt::GetWheelOffsets(g_playerVehicle);
-    auto wheelCoords = Util::GetWheelCoords(g_playerVehicle);
     auto wheelSpeeds = VExt::GetTyreSpeeds(g_playerVehicle);
 
     for (; i < numWheels; ) {
@@ -678,8 +678,10 @@ std::vector<SSlipInfo> calculateSlipInfo() {
             angle = 0.0f;
         }
 
-        auto v1Coord = wheelCoords[i] + boneVel;
-        auto boneVelRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(g_playerVehicle, v1Coord.x, v1Coord.y, v1Coord.z);
+        // Translate absolute bone velocity to relative velocity
+        auto boneVelProjection = posWorld + boneVel;
+        auto boneVelRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(
+            g_playerVehicle, boneVelProjection.x, boneVelProjection.y, boneVelProjection.z);
 
         slipAngles.push_back({ angle, loads[i], Length(boneVelRel)});
 
