@@ -1784,18 +1784,6 @@ void handleBrakePatch() {
     auto espData = DrivingAssists::GetESP();
     auto lsdData = DrivingAssists::GetLSD();
 
-    if (tcsData.Use) {
-        for (int i = 0; i < g_vehData.mWheelCount; i++) {
-            g_vehData.mWheelsTcs[i] = tcsData.LinearSlip[i] > g_settings().DriveAssists.TCS.SlipMin &&
-                g_vehData.mWheelTyreSpeeds[i] > 0.0f;
-        }
-    }
-    else {
-        for (int i = 0; i < g_vehData.mWheelCount; i++) {
-            g_vehData.mWheelsTcs[i] = false;
-        }
-    }
-
     // tcs & lc
     bool tcsThrottle = tcsData.Use && g_settings().DriveAssists.TCS.Mode == 1;
     bool lcThrottle = g_settings().DriveAssists.LaunchControl.Enable &&
@@ -1819,6 +1807,7 @@ void handleBrakePatch() {
         if (lcThrottle) {
             slipMin = lcSlipMin;
             slipMax = lcSlipMax;
+            tcsData.Use = false;
         }
         else {
             slipMin = tcsSlipMin;
@@ -1831,6 +1820,18 @@ void handleBrakePatch() {
         tractionThrottle = std::clamp(tractionThrottle, 0.0f, g_controls.ThrottleVal);
 
         finalThrottle = tractionThrottle;
+    }
+
+    if (tcsData.Use) {
+        for (int i = 0; i < g_vehData.mWheelCount; i++) {
+            g_vehData.mWheelsTcs[i] = tcsData.LinearSlip[i] > g_settings().DriveAssists.TCS.SlipMin &&
+                g_vehData.mWheelTyreSpeeds[i] > 0.0f;
+        }
+    }
+    else {
+        for (int i = 0; i < g_vehData.mWheelCount; i++) {
+            g_vehData.mWheelsTcs[i] = false;
+        }
     }
 
     // Cruise control
