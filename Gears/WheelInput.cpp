@@ -800,29 +800,6 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     return static_cast<int>(satForce);
 }
 
-void WheelInput::DrawDebugLines() {
-    float steeringAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * VExt::GetSteeringMultiplier(g_playerVehicle);
-    Vector3 velocityWorld = ENTITY::GET_ENTITY_VELOCITY(g_playerVehicle);
-    Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, 1);
-    Vector3 travelWorld = velocityWorld + positionWorld;
-    Vector3 travelRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(g_playerVehicle, travelWorld.x, travelWorld.y, travelWorld.z);
-
-    Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
-    Vector3 turnWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, ENTITY::GET_ENTITY_SPEED(g_playerVehicle) * -sin(rotationVelocity.z), ENTITY::GET_ENTITY_SPEED(g_playerVehicle) * cos(rotationVelocity.z), 0.0f);
-    Vector3 turnRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(g_playerVehicle, turnWorld.x, turnWorld.y, turnWorld.z);
-    float turnRelativeNormX = (travelRelative.x + turnRelative.x) / 2.0f;
-    float turnRelativeNormY = (travelRelative.y + turnRelative.y) / 2.0f;
-    Vector3 turnWorldNorm = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, turnRelativeNormX, turnRelativeNormY, 0.0f);
-
-    float steeringAngleRelX = ENTITY::GET_ENTITY_SPEED(g_playerVehicle) * -sin(steeringAngle);
-    float steeringAngleRelY = ENTITY::GET_ENTITY_SPEED(g_playerVehicle) * cos(steeringAngle);
-    Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, steeringAngleRelX, steeringAngleRelY, 0.0f);
-
-    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, travelWorld.x, travelWorld.y, travelWorld.z, 0, 255, 0, 255);
-    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, turnWorldNorm.x, turnWorldNorm.y, turnWorldNorm.z, 255, 0, 0, 255);
-    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, steeringWorld.x, steeringWorld.y, steeringWorld.z, 255, 0, 255, 255);
-}
-
 float getFloatingSteeredWheelsRatio(Vehicle v) {
     auto suspensionStates = g_vehData.mWheelsOnGround;
     auto angles = g_vehData.mWheelSteeringAngles;

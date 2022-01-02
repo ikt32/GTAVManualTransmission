@@ -26,7 +26,5 @@ void DoSteering();
 //                        Script-specific utils ????
 ///////////////////////////////////////////////////////////////////////////////
 
-void DrawDebugLines();
-
 float GetFFBConstantForce();
 }

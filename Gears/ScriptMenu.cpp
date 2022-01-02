@@ -2494,9 +2494,6 @@ void update_debugmenu() {
         { "Show traction/force vectors (?). Green = forward, red = backward." });
     g_menu.BoolOption("Display gearing info", g_settings.Debug.DisplayGearingInfo,
         { "Show gear ratios and shift points from auto mode." });
-    g_menu.BoolOption("Display force feedback lines", g_settings.Debug.DisplayFFBInfo,
-        { "Show lines detailing force feedback direction and force.",
-            "Green: Vehicle velocity","Red: Vehicle rotation","Purple: Steering direction" });
     g_menu.BoolOption("Show NPC info", g_settings.Debug.DisplayNPCInfo,
         { "Show vehicle info of NPC vehicles near you." });
 

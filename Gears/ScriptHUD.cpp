@@ -599,10 +599,6 @@ void MTHUD::UpdateHUD() {
         drawInputWheelInfo();
     }
 
-    if (g_settings.Debug.DisplayFFBInfo) {
-        WheelInput::DrawDebugLines();
-    }
-
     // debug stuff
     if (g_settings.Debug.DisplayInfo) {
         drawDebugInfo();

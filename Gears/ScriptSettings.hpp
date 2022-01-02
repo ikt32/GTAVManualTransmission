@@ -315,7 +315,6 @@ public:
         bool DisplayWheelInfo = false;
         bool DisplayMaterialInfo = false;
         bool DisplayTractionInfo = false;
-        bool DisplayFFBInfo = false;
         bool DisplayNPCInfo = false;
 
         bool DisableInputDetect = false;
