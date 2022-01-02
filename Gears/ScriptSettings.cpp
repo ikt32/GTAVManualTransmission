@@ -264,6 +264,10 @@ void ScriptSettings::SaveGeneral() {
     SAVE_VAL("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
     SAVE_VAL("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
 
+    SAVE_VAL("HUD", "DsProtXpos", HUD.DsProt.XPos);
+    SAVE_VAL("HUD", "DsProtYpos", HUD.DsProt.YPos);
+    SAVE_VAL("HUD", "DsProtSize", HUD.DsProt.Size);
+
     SAVE_VAL("HUD", "MouseEnable", HUD.MouseSteering.Enable);
     SAVE_VAL("HUD", "MouseXPos", HUD.MouseSteering.XPos);
     SAVE_VAL("HUD", "MouseYPos", HUD.MouseSteering.YPos);
@@ -585,6 +589,10 @@ void ScriptSettings::parseSettingsGeneral() {
     LOAD_VAL("HUD", "DashIndicatorsXpos", HUD.DashIndicators.XPos);
     LOAD_VAL("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
     LOAD_VAL("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
+
+    LOAD_VAL("HUD", "DsProtXpos", HUD.DsProt.XPos);
+    LOAD_VAL("HUD", "DsProtYpos", HUD.DsProt.YPos);
+    LOAD_VAL("HUD", "DsProtSize", HUD.DsProt.Size);
 
     LOAD_VAL("HUD", "MouseEnable", HUD.MouseSteering.Enable);
     LOAD_VAL("HUD", "MouseXPos", HUD.MouseSteering.XPos);

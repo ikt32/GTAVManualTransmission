@@ -32,6 +32,7 @@ extern int g_textureAbsId;
 extern int g_textureTcsId;
 extern int g_textureEspId;
 extern int g_textureBrkId;
+extern int g_textureDsProtId;
 
 extern VehicleGearboxStates g_gearStates;
 extern Vehicle g_playerVehicle;
@@ -69,8 +70,12 @@ namespace DashLights {
     int LastEspTrigger = 0;
     bool EspBulbState = false;
 
+    int LastDsProtTrigger = 0;
+    bool DsProtBulbState = false;
+
     const int LightDuration = 300; // milliseconds
     const int FlashDuration = 100; // milliseconds
+    const int DsProtDuration = 500; // milliseconds
 }
 
 void updateDashLights() {
@@ -79,6 +84,7 @@ void updateDashLights() {
     bool abs = false;
     bool tcs = false;
     bool esp = false;
+    bool dsProt = g_gearStates.DownshiftProtection;
 
     for (int i = 0; i < g_vehData.mWheelCount; ++i) {
         abs |= g_vehData.mWheelsAbs[i];
@@ -130,6 +136,18 @@ void updateDashLights() {
         DashLights::EspBulbState = false;
     }
 
+    // Downshift protection
+    if (DashLights::LastDsProtTrigger == 0 && dsProt) {
+        DashLights::LastDsProtTrigger = currentTime;
+        DashLights::DsProtBulbState = true;
+    }
+    // Turn off
+    if (DashLights::LastDsProtTrigger != 0 && !dsProt &&
+        currentTime > DashLights::LastDsProtTrigger + DashLights::DsProtDuration) {
+        DashLights::LastDsProtTrigger = 0;
+        DashLights::DsProtBulbState = false;
+    }
+
     if (abs)
         DashLights::LastAbsTime = currentTime;
     if (tcs)
@@ -151,6 +169,7 @@ void drawDashLights() {
     bool abs = DashLights::AbsBulbState;
     bool tcs = DashLights::TcsBulbState;
     bool esp = DashLights::EspBulbState;
+    bool dsProt = DashLights::DsProtBulbState;
 
     if (g_peripherals.IgnitionState == IgnitionState::Stall) {
         abs = true;
@@ -241,9 +260,19 @@ void drawDashLights() {
         XPos + 0.045f * size, YPos,
         0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), brkColor.R, brkColor.G, brkColor.B, brkColor.A);
 
+    // Background
     GRAPHICS::DRAW_RECT(XPos, YPos,
         rectSzX, rectSzY,
         0, 0, 0, 127, 0);
+
+    // Downshift protection is in the center of the screen.
+    if (dsProt) {
+        drawTexture(g_textureDsProtId, 0, -9998, 100,
+            g_settings.HUD.DsProt.Size, g_settings.HUD.DsProt.Size,
+            0.5f, 0.5f, // center of texture
+            g_settings.HUD.DsProt.XPos, g_settings.HUD.DsProt.YPos,
+            0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
+    }
 }
 
 Vector3 GetAccelVector() {

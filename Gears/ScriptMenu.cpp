@@ -1457,6 +1457,8 @@ void update_hudmenu() {
     g_menu.MenuOption("Wheel & Pedal info", "wheelinfomenu");
     g_menu.MenuOption("Dashboard indicators", "dashindicatormenu", 
         { "Indicator icons for ABS, TCS, ESC and the hand brake." });
+    g_menu.MenuOption("Downshift protection", "dsprotmenu",
+        { "Where the downshift protection notification should appear." });
     g_menu.MenuOption("Mouse steering", "mousehudmenu");
 }
 
@@ -1616,6 +1618,22 @@ void update_dashindicatormenu() {
     g_menu.FloatOption("Position X", g_settings.HUD.DashIndicators.XPos, 0.0f, 1.0f, 0.005f);
     g_menu.FloatOption("Position Y", g_settings.HUD.DashIndicators.YPos, 0.0f, 1.0f, 0.005f);
     g_menu.FloatOption("Size", g_settings.HUD.DashIndicators.Size, 0.25f, 4.0f, 0.05f);
+}
+
+void update_dsprotmenu() {
+    g_menu.Title("Downshift protection");
+    g_menu.Subtitle("");
+
+    extern int g_textureDsProtId;
+    drawTexture(g_textureDsProtId, 0, -9998, 100,
+        g_settings.HUD.DsProt.Size, g_settings.HUD.DsProt.Size,
+        0.5f, 0.5f, // center of texture
+        g_settings.HUD.DsProt.XPos, g_settings.HUD.DsProt.YPos,
+        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
+
+    g_menu.FloatOption("Position X", g_settings.HUD.DsProt.XPos, 0.0f, 1.0f, 0.005f);
+    g_menu.FloatOption("Position Y", g_settings.HUD.DsProt.YPos, 0.0f, 1.0f, 0.005f);
+    g_menu.FloatOption("Size", g_settings.HUD.DsProt.Size, 0.01f, 1.0f, 0.01f);
 }
 
 void update_mousehudmenu() {
@@ -2703,6 +2721,9 @@ void update_menu() {
 
     /* mainmenu -> hudmenu -> dashindicatormenu*/
     if (g_menu.CurrentMenu("dashindicatormenu")) { update_dashindicatormenu(); }
+
+    /* mainmenu -> hudmenu -> dsprotmenu*/
+    if (g_menu.CurrentMenu("dsprotmenu")) { update_dsprotmenu(); }
 
     /* mainmenu -> hudmenu -> mousehudmenu*/
     if (g_menu.CurrentMenu("mousehudmenu")) { update_mousehudmenu(); }

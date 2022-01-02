@@ -79,6 +79,7 @@ int g_textureAbsId;
 int g_textureTcsId;
 int g_textureEspId;
 int g_textureBrkId;
+int g_textureDsProtId;
 
 NativeMenu::Menu g_menu;
 CarControls g_controls;
@@ -2771,6 +2772,7 @@ void InitTextures() {
     std::string textureTCSFile = absoluteModPath + "\\texture_tcs.png";
     std::string textureESPFile = absoluteModPath + "\\texture_esp.png";
     std::string textureBRKFile = absoluteModPath + "\\texture_handbrake.png";
+    std::string textureDsProtFile = absoluteModPath + "\\texture_downshift_protection.png";
 
     if (Paths::FileExists(textureWheelFile)) {
         g_textureWheelId = createTexture(textureWheelFile.c_str());
@@ -2810,6 +2812,14 @@ void InitTextures() {
     else {
         logger.Write(ERROR, textureBRKFile + " does not exist.");
         g_textureBrkId = -1;
+    }
+
+    if (Paths::FileExists(textureDsProtFile)) {
+        g_textureDsProtId = createTexture(textureDsProtFile.c_str());
+    }
+    else {
+        logger.Write(ERROR, textureDsProtFile + " does not exist.");
+        g_textureDsProtId = -1;
     }
 }
 

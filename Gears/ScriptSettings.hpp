@@ -237,6 +237,12 @@ public:
         } DashIndicators;
 
         struct {
+            float XPos = 0.500f;
+            float YPos = 0.300f;
+            float Size = 0.050f;
+        } DsProt;
+
+        struct {
             bool Enable = false;
             float XPos = 0.5f;
             float YPos = 0.95f;
