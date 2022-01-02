@@ -1171,6 +1171,9 @@ void functionSShift() {
     bool allowKeyboard = g_controls.PrevInput == CarControls::Keyboard || 
         g_controls.PrevInput == CarControls::Controller;
 
+    // Reset warning this tick
+    g_gearStates.DownshiftProtection = false;
+
     // Shift up
     if (g_controls.PrevInput == CarControls::Controller	&& xcTapStateUp == XInputController::TapState::Tapped ||
         g_controls.PrevInput == CarControls::Controller	&& ncTapStateUp == NativeController::TapState::Tapped ||
@@ -1241,6 +1244,13 @@ void functionSShift() {
         if (g_vehData.mGearCurr == 1 && g_gearStates.FakeNeutral) {
             shiftTo(0, false);
             g_gearStates.FakeNeutral = false;
+            return;
+        }
+
+        float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.LockGear - 1]);
+        if (g_settings().ShiftOptions.DownshiftProtect &&
+            expectedRPM > 1.0f) {
+            g_gearStates.DownshiftProtection = true;
             return;
         }
 
@@ -1910,12 +1920,6 @@ void handleBrakePatch() {
 
             float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.NextGear]);
             if (g_gearStates.ShiftDirection == ShiftDirection::Down &&
-                g_settings().ShiftOptions.DownshiftProtect &&
-                expectedRPM > 1.0f) {
-                // TODO: Notify, beep, flash something, or something
-                UI::Notify(INFO, "Downshift Protection");
-            }
-            else if (g_gearStates.ShiftDirection == ShiftDirection::Down &&
                 g_settings().ShiftOptions.DownshiftBlip) {
                 bool clutchOK = g_gearStates.ShiftState == ShiftState::FullClutch || g_gearStates.ShiftState == ShiftState::ReleasingClutch;
                 if (g_vehData.mRPM < expectedRPM * 1.15f && clutchOK) {
@@ -2208,9 +2212,7 @@ void handleRPM() {
 void functionLimiter() {
     g_gearStates.HitRPMLimiter = g_vehData.mRPM > 1.0f;
 
-    auto ratios = g_vehData.mGearRatios;
-    float DriveMaxFlatVel = g_vehData.mDriveMaxFlatVel;
-    float maxSpeed = DriveMaxFlatVel / ratios[g_vehData.mGearCurr];
+    float maxSpeed = g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr];
 
     if (g_vehData.mEstimatedSpeed > maxSpeed && g_vehData.mRPM >= 1.0f) {
         g_gearStates.HitRPMSpeedLimiter = true;
