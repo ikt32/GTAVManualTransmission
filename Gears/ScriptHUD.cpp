@@ -628,14 +628,12 @@ void MTHUD::UpdateHUD() {
 void drawDebugInfo() {
     if (!g_menu.IsThisOpen()) {
         UI::ShowText(0.01, 0.250, 0.3, fmt::format("Address: 0x{:X}", reinterpret_cast<uintptr_t>(VExt::GetAddress(g_playerVehicle))));
-        UI::ShowText(0.01, 0.275, 0.3, fmt::format("Mod Enabled:\t\t{}" , g_settings.MTOptions.Enable));
-        UI::ShowText(0.01, 0.300, 0.3, fmt::format("RPM:\t\t\t{:.3f}", g_vehData.mRPM));
-        //UI::ShowText(0.25, 0.300, 0.3, fmt::format("Time:{}", MISC::GET_GAME_TIMER()));
-        UI::ShowText(0.01, 0.325, 0.3, fmt::format("Current Gear:\t\t{}", VExt::GetGearCurr(g_playerVehicle)));
-        UI::ShowText(0.01, 0.350, 0.3, fmt::format("Next Gear:\t\t{}", VExt::GetGearNext(g_playerVehicle)));
-        UI::ShowText(0.01, 0.375, 0.3, fmt::format("Clutch:\t\t\t{:.2f}", VExt::GetClutch(g_playerVehicle)));
-        UI::ShowText(0.01, 0.400, 0.3, fmt::format("Throttle:\t\t\t{:.2f}", VExt::GetThrottle(g_playerVehicle)));
-        UI::ShowText(0.01, 0.425, 0.3, fmt::format("Turbo:\t\t\t{:.2f}", VExt::GetTurbo(g_playerVehicle)));
+        UI::ShowText(0.01, 0.275, 0.3, fmt::format("Mod Enabled: {}" , g_settings.MTOptions.Enable));
+        UI::ShowText(0.01, 0.300, 0.3, fmt::format("RPM: {:.3f}", g_vehData.mRPM));
+        UI::ShowText(0.01, 0.325, 0.3, fmt::format("Gear: C[{}] N[{}]", VExt::GetGearCurr(g_playerVehicle), VExt::GetGearNext(g_playerVehicle)));
+        UI::ShowText(0.01, 0.375, 0.3, fmt::format("Clutch: {:.2f}", VExt::GetClutch(g_playerVehicle)));
+        UI::ShowText(0.01, 0.400, 0.3, fmt::format("Throttle: {:.2f}", VExt::GetThrottle(g_playerVehicle)));
+        UI::ShowText(0.01, 0.425, 0.3, fmt::format("Turbo: {:.2f}", VExt::GetTurbo(g_playerVehicle)));
         UI::ShowText(0.01, 0.450, 0.3, fmt::format("{}Speedo", g_vehData.mHasSpeedo ? "~g~" : "~r~"));
         UI::ShowText(0.01, 0.475, 0.3, fmt::format("{}E {}CVT -> {}Clutch",
             g_vehData.mIsElectric ? "~g~" : "~r~", g_vehData.mIsCVT ? "~g~" : "~r~",
@@ -645,8 +643,7 @@ void drawDebugInfo() {
 
         UI::ShowText(0.01, 0.550, 0.3, fmt::format("{}Shifting", g_gearStates.Shifting ? "~g~" : "~r~"));
         UI::ShowText(0.01, 0.575, 0.3, fmt::format("Clutch: {}" ,g_gearStates.ClutchVal));
-        UI::ShowText(0.01, 0.600, 0.3, fmt::format("Lock: {}" ,g_gearStates.LockGear));
-        UI::ShowText(0.01, 0.625, 0.3, fmt::format("Next: {}" ,g_gearStates.NextGear));
+        UI::ShowText(0.01, 0.600, 0.3, fmt::format("Gear L[{}] N[{}]" ,g_gearStates.LockGear, g_gearStates.NextGear));
 
         // Old automatic gearbox
         if (!g_settings().AutoParams.UsingATCU) {
@@ -669,7 +666,6 @@ void drawDebugInfo() {
 
     if (g_settings.Wheel.Options.Enable)
         UI::ShowText(0.85, 0.150, 0.4, fmt::format("Wheel {} present", g_controls.WheelAvailable() ? "" : " not"), 4);
-    
 
     if (g_settings.Debug.DisplayGearingInfo) {
         auto ratios = VExt::GetGearRatios(g_playerVehicle);
