@@ -241,7 +241,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
         VExt::SetThrottleP(g_playerVehicle, -0.1f);
 
         // We're reversing
-        if (g_vehData.mDiffSpeed < -speedThreshold) {
+        if (g_vehData.mVelocity.y < -speedThreshold) {
             //UI::ShowText(0.3, 0.0, 1.0, "We are reversing");
             // Throttle Pedal Reverse
             if (wheelThrottleVal > 0.01f) {
@@ -251,12 +251,12 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             if (wheelBrakeVal > 0.01f) {
                 Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone);
                 VExt::SetThrottleP(g_playerVehicle, -wheelBrakeVal);
-                VExt::SetBrakeP(g_playerVehicle, 1.0f);
+                VExt::SetBrakeP(g_playerVehicle, wheelBrakeVal);
             }
         }
 
         // Standing still
-        if (g_vehData.mDiffSpeed < speedThreshold && g_vehData.mDiffSpeed >= -speedThreshold) {
+        if (g_vehData.mVelocity.y < speedThreshold && g_vehData.mVelocity.y >= -speedThreshold) {
             //UI::ShowText(0.3, 0.0, 1.0, "We are stopped");
 
             if (wheelThrottleVal > 0.01f) {
@@ -271,11 +271,11 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
         }
 
         // We're rolling forwards
-        if (g_vehData.mDiffSpeed > speedThreshold) {
+        if (g_vehData.mVelocity.y > speedThreshold) {
             //UI::ShowText(0.3, 0.0, 1.0, "We are rolling forwards");
             //bool brakelights = false;
 
-            if (g_vehData.mDiffSpeed > reverseThreshold) {
+            if (g_vehData.mVelocity.y > reverseThreshold) {
                 if (!isClutchPressed()) {
                     PAD::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
                 }
@@ -283,7 +283,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
                 if (wheelBrakeVal > 0.01f) {
                     Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone);
                     VExt::SetThrottleP(g_playerVehicle, -wheelBrakeVal);
-                    VExt::SetBrakeP(g_playerVehicle, 1.0f);
+                    VExt::SetBrakeP(g_playerVehicle, wheelBrakeVal);
                 }
             }
 
