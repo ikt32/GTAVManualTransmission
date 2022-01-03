@@ -17,6 +17,7 @@ Rework traction control (brake mode):
 Misc:
 
 * Add downshift protection option
+* Use more accurate data source for Stability Control understeer
 * Allow more wheel rotation, up to 2880 degrees
 * Fix ineffective braking when reversing when using wheel
 

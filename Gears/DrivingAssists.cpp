@@ -1,16 +1,16 @@
 #include "DrivingAssists.h"
 #include "ScriptSettings.hpp"
 #include "VehicleData.hpp"
+#include "WheelInput.h"
 
 #include "Memory/Offsets.hpp"
 #include "Memory/VehicleExtensions.hpp"
 
 #include "Util/MathExt.h"
+#include "Util/UIUtils.h"
 
 #include <inc/natives.h>
 #include <fmt/format.h>
-
-#include "Util/UIUtils.h"
 
 using VExt = VehicleExtensions;
 
@@ -100,6 +100,8 @@ DrivingAssists::ESPData DrivingAssists::GetESP() {
 
     // understeer
     {
+        auto slipInfos = WheelInput::CalculateSlipInfo();
+
         Vector3 vecNextRot = (vecNextSpd + rotRelative) * 0.5f;
         Vector3 vecPredStr{
             speed * -sin(avgAngle), 0,
@@ -107,13 +109,38 @@ DrivingAssists::ESPData DrivingAssists::GetESP() {
             0, 0
         };
 
-        espData.UndersteerAngle = GetAngleBetween(vecNextRot, vecPredStr);
+        float div = 0.0f;
+        float avgSlip = 0.0f;
 
-        if (vecNextSpd.y > 5.0f &&
-            sgn(avgAngle) == sgn(espData.UndersteerAngle) &&
-            rad2deg(abs(abs(avgAngle) - abs(espData.UndersteerAngle))) > g_settings().DriveAssists.ESP.UnderMax &&
-            abs(rad2deg(avgAngle)) > g_settings().DriveAssists.ESP.UnderMin &&
-            abs(rad2deg(espData.UndersteerAngle)) > g_settings().DriveAssists.ESP.UnderMin) {
+        const float latSlipOpt = *(float*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets1604.fTractionCurveLateral);
+
+        for (uint8_t i = 0; i < slipInfos.size(); ++i) {
+            // Current slip, relative to optimal slip angle.
+            float slipRatio = map(abs(slipInfos[i].Angle),
+                0.0f, latSlipOpt,
+                0.0f, 1.0f);
+
+            float understeerAngle;
+            if (slipRatio > 1.0f) {
+                understeerAngle = (slipInfos[i].Angle - sgn(slipInfos[i].Angle) * latSlipOpt);
+            }
+            else {
+                understeerAngle = 0.0f;
+            }
+            
+            if (abs(g_vehData.mWheelSteeringAngles[i]) > 0.0f) {
+                avgSlip += understeerAngle;
+                div += 1.0f;
+            }
+        }
+        if (div != 0.0f) {
+            avgSlip /= div;
+        }
+
+        espData.UndersteerAngle = avgSlip;
+
+        if (div != 0.0f && vecNextSpd.y > 5.0f &&
+            rad2deg(abs(avgSlip)) > g_settings().DriveAssists.ESP.UnderMin) {
             espData.Understeer = true;
         }
     }
