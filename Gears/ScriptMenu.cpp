@@ -1663,53 +1663,53 @@ void update_driveassistmenu() {
     g_menu.Title("Driving assists");
     g_menu.Subtitle(MenuSubtitleConfig());
 
-    g_menu.BoolOption("Enable ABS", g_settings().DriveAssists.ABS.Enable,
-        { "Custom script-driven anti-lock braking system.",
+    g_menu.BoolOption("Anti-lock Braking", g_settings().DriveAssists.ABS.Enable,
+        { "Custom script-driven anti-lock braking system (ABS).",
           "Prevent wheels from locking up during braking." });
 
     g_menu.MenuOption("ABS settings", "abssettingsmenu",
         { "Change how the anti-lock braking system works." });
 
-    g_menu.BoolOption("Enable TCS", g_settings().DriveAssists.TCS.Enable,
-        { "Script-driven traction control system.",
+    g_menu.BoolOption("Traction Control", g_settings().DriveAssists.TCS.Enable,
+        { "Script-driven traction control system (TCS).",
           "Prevent traction loss under acceleration." });
 
     g_menu.MenuOption("TCS settings", "tcssettingsmenu",
         { "Change how and when the traction control system works." });
 
-    g_menu.BoolOption("Enable ESC", g_settings().DriveAssists.ESP.Enable,
-        { "Script-driven electronic stability control system.",
+    g_menu.BoolOption("Stability Control", g_settings().DriveAssists.ESP.Enable,
+        { "Script-driven stability control system (ESC).",
           "Prevent excessive over- and understeer." });
 
     g_menu.MenuOption("ESC settings", "espsettingsmenu", 
         { "Change the behaviour and tolerances of the stability control system." });
 
-    g_menu.BoolOption("Enable Launch control", g_settings().DriveAssists.LaunchControl.Enable,
+    g_menu.BoolOption("Launch Control", g_settings().DriveAssists.LaunchControl.Enable,
         { "Keeps a stable RPM and manages throttle in first gear, for maximum launch performance." });
 
-    g_menu.MenuOption("Launch control settings", "lcssettings",
+    g_menu.MenuOption("Launch Control settings", "lcssettings",
         { "Change how and when the launch control works." });
 
-    g_menu.BoolOption("Enable LSD", g_settings().DriveAssists.LSD.Enable,
-        { "Simulate a viscous limited slip differential.",
+    g_menu.BoolOption("Limited Slip Differential", g_settings().DriveAssists.LSD.Enable,
+        { "Simulate a viscous limited slip differential (LSD).",
           "Thanks to any333!"});
 
     g_menu.MenuOption("LSD settings", "lsdsettingsmenu",
         { "Change how the limited slip differential works." });
 
-    g_menu.BoolOption("Enable Adaptive AWD", g_settings().DriveAssists.AWD.Enable,
+    g_menu.BoolOption("Adaptive AWD", g_settings().DriveAssists.AWD.Enable,
         { "Transfers torque to stabilize the car. See Nissans' ATTESA, Audis' Quattro, etc.",
           "Only works on AWD cars. Recommended to use only in vehicle-specific configurations!"});
 
     g_menu.MenuOption("Adaptive AWD settings", "awdsettingsmenu");
 
-    g_menu.BoolOption("Enable cruise control", g_settings().DriveAssists.CruiseControl.Enable);
+    g_menu.BoolOption("Cruise Control", g_settings().DriveAssists.CruiseControl.Enable);
 
-    g_menu.MenuOption("Cruise control settings", "cruisecontrolsettingsmenu");
+    g_menu.MenuOption("Cruise Control settings", "cruisecontrolsettingsmenu");
 }
 
 void update_abssettingsmenu() {
-    g_menu.Title("ABS settings");
+    g_menu.Title("Anti-lock Braking");
     g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.BoolOption("Only enable ABS when missing", g_settings().DriveAssists.ABS.Filter,
@@ -1722,7 +1722,7 @@ void update_abssettingsmenu() {
 }
 
 void update_tcssettingsmenu() {
-    g_menu.Title("TCS settings");
+    g_menu.Title("Traction Control");
     g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.StringArray("Traction control mode", tcsStrings, g_settings().DriveAssists.TCS.Mode,
@@ -1747,7 +1747,7 @@ void update_tcssettingsmenu() {
 }
 
 void update_espsettingsmenu() {
-    g_menu.Title("ESC settings");
+    g_menu.Title("Stability Control");
     g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.FloatOption("Oversteer starting angle", g_settings().DriveAssists.ESP.OverMin, 0.0f, 90.0f, 0.1f,
@@ -1759,7 +1759,6 @@ void update_espsettingsmenu() {
     g_menu.FloatOption("Oversteer max correction", g_settings().DriveAssists.ESP.OverMaxComp, 0.0f, 10.0f, 0.1f,
         { "Max ESC oversteer correction value. Additional braking force for the affected wheel." });
 
-    // TODO: Understeer detection needs looking at.
     g_menu.FloatOption("Understeer starting angle", g_settings().DriveAssists.ESP.UnderMin, 0.0f, 90.0f, 0.1f,
         { "Angle (degrees) where ESC starts correcting for understeer." });
     g_menu.FloatOption("Understeer starting correction", g_settings().DriveAssists.ESP.UnderMinComp, 0.0f, 10.0f, 0.1f,
@@ -1771,7 +1770,7 @@ void update_espsettingsmenu() {
 }
 
 void update_lcssettingsmenu() {
-    g_menu.Title("Launch control settings");
+    g_menu.Title("Launch Control");
     g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.FloatOption("Launch control RPM", g_settings().DriveAssists.LaunchControl.RPM, 0.3f, 0.9f, 0.025f,
@@ -1798,7 +1797,7 @@ void update_lcssettingsmenu() {
 }
 
 void update_lsdsettingsmenu() {
-    g_menu.Title("LSD settings");
+    g_menu.Title("Limited Slip Differential");
     g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.FloatOption("LSD viscosity", g_settings().DriveAssists.LSD.Viscosity, 0.0f, 100.0f, 1.0f,

@@ -642,7 +642,7 @@ void drawDebugInfo() {
             g_vehData.mHasABS ? "~g~" : "~r~"));
 
         UI::ShowText(0.01, 0.550, 0.3, fmt::format("{}Shifting", g_gearStates.Shifting ? "~g~" : "~r~"));
-        UI::ShowText(0.01, 0.575, 0.3, fmt::format("Clutch: {}" ,g_gearStates.ClutchVal));
+        UI::ShowText(0.01, 0.575, 0.3, fmt::format("Clutch: {:.3f}" ,g_gearStates.ClutchVal));
         UI::ShowText(0.01, 0.600, 0.3, fmt::format("Gear L[{}] N[{}]" ,g_gearStates.LockGear, g_gearStates.NextGear));
 
         // Old automatic gearbox
