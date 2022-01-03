@@ -39,12 +39,6 @@ extern WheelPatchStates g_wheelPatchStates;
 
 namespace {
     MiniPID pid(1.0, 0.0, 0.0);
-
-    struct SSlipInfo {
-        float Angle;
-        float Weight;            // kg
-        float VelocityAmplitude; // Relative, m/s
-    };
 }
 
 namespace WheelInput {
@@ -651,7 +645,8 @@ void calculateSoftLock(int& totalForce, int& damperForce) {
     }
 }
 
-std::vector<SSlipInfo> calculateSlipInfo() {
+// TODO: Probably move this to some less-wheel related place.
+std::vector<WheelInput::SSlipInfo> WheelInput::CalculateSlipInfo() {
     auto loads = VExt::GetWheelLoads(g_playerVehicle);
     auto boneVels = VExt::GetWheelBoneVelocity(g_playerVehicle);
     auto tracVels = VExt::GetWheelTractionVector(g_playerVehicle);
@@ -739,7 +734,7 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     auto wheelOffsets = VExt::GetWheelOffsets(g_playerVehicle);
     auto wheelVels = VExt::GetTyreSpeeds(g_playerVehicle);
 
-    auto satValues = calculateSlipInfo();
+    auto satValues = WheelInput::CalculateSlipInfo();
     const float weightWheelAvg = mass / (float)satValues.size();
 
     // TODO: Just car

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 namespace WheelInput {
 ///////////////////////////////////////////////////////////////////////////////
 //                   Mod functions: Reverse/Pedal handling
@@ -27,4 +29,11 @@ void DoSteering();
 ///////////////////////////////////////////////////////////////////////////////
 
 float GetFFBConstantForce();
+
+struct SSlipInfo {
+    float Angle;
+    float Weight;            // kg
+    float VelocityAmplitude; // Relative, m/s
+};
+std::vector<SSlipInfo> CalculateSlipInfo();
 }
