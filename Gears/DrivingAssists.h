@@ -45,8 +45,8 @@ namespace DrivingAssists {
     // doesn't apply, but putting it here anyway since we negative-brake to simulate power transfer.
     LSDData GetLSD();
 
-    std::vector<float> GetESPBrakes(ESPData espData, LSDData lsdData);
-    std::vector<float> GetTCSBrakes(TCSData tcsData, LSDData lsdData);
-    std::vector<float> GetABSBrakes(ABSData absData, LSDData lsdData);
+    std::vector<float> GetESPBrakes(ESPData espData);
+    std::vector<float> GetTCSBrakes(TCSData tcsData);
+    std::vector<float> GetABSBrakes(ABSData absData);
     std::vector<float> GetLSDBrakes(LSDData lsdData);
 }

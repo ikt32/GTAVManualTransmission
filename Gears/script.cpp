@@ -2002,28 +2002,27 @@ void handleBrakePatch() {
             }
         }
 
-        // LSD is used in all assists, but this case if for when no other
-        // assists are active.
-        if (lsdData.Use) {
+        // Only use LSD if no other assists are working, as LSD would just reduce brake force.
+        if (lsdData.Use && !espData.Use && !tcsData.Use && !absData.Use) {
             auto brakeVals = DrivingAssists::GetLSDBrakes(lsdData);
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
                 VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVals[i]);
             }
         }
         if (espData.Use) {
-            auto brakeVals = DrivingAssists::GetESPBrakes(espData, lsdData);
+            auto brakeVals = DrivingAssists::GetESPBrakes(espData);
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
                 VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVals[i]);
             }
         }
         if (tcsData.Use && g_settings().DriveAssists.TCS.Mode == 0) {
-            auto brakeVals = DrivingAssists::GetTCSBrakes(tcsData, lsdData);
+            auto brakeVals = DrivingAssists::GetTCSBrakes(tcsData);
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
                 VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVals[i]);
             }
         }
         if (absData.Use) {
-            auto brakeVals = DrivingAssists::GetABSBrakes(absData, lsdData);
+            auto brakeVals = DrivingAssists::GetABSBrakes(absData);
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
                 VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVals[i]);
             }

@@ -232,7 +232,7 @@ DrivingAssists::LSDData DrivingAssists::GetLSD() {
     return lsdData;
 }
 
-std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData, LSDData lsdData) {
+std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData) {
     std::vector<float> brakeVals(g_vehData.mWheelCount); // only works for 4 wheels but ok
 
     float steerMult = g_settings().Steering.CustomSteering.SteeringMult;
@@ -283,8 +283,8 @@ std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData, LSDData lsdData
     float understeerAdd = handlingBrakeForce * understeerComp;
 
     float brkFBase = inpBrakeForce * bbalF;
-    brakeVals[0] = brkFBase + (avgAngle_ < 0.0f && espData.Oversteer ? oversteerAdd : 0.0f) + lsdData.BrakeLF;
-    brakeVals[1] = brkFBase + (avgAngle_ > 0.0f && espData.Oversteer ? oversteerAdd : 0.0f) + lsdData.BrakeRF;
+    brakeVals[0] = brkFBase + (avgAngle_ < 0.0f && espData.Oversteer ? oversteerAdd : 0.0f);
+    brakeVals[1] = brkFBase + (avgAngle_ > 0.0f && espData.Oversteer ? oversteerAdd : 0.0f);
 
     float brkRBase = inpBrakeForce * bbalR;
     float brkRUnderL = (avgAngle > 0.0f && espData.Understeer ? understeerAdd : 0.0f);
@@ -293,8 +293,8 @@ std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData, LSDData lsdData
     float brkROverL = (avgAngle_ < 0.0f && espData.Oversteer ? oversteerRearAdd : 0.0f);
     float brkROverR = (avgAngle_ > 0.0f && espData.Oversteer ? oversteerRearAdd : 0.0f);
 
-    brakeVals[2] = brkRBase + brkRUnderL + brkROverL + lsdData.BrakeLR;
-    brakeVals[3] = brkRBase + brkRUnderR + brkROverR + lsdData.BrakeRR;
+    brakeVals[2] = brkRBase + brkRUnderL + brkROverL;
+    brakeVals[3] = brkRBase + brkRUnderR + brkROverR;
 
     g_vehData.mWheelsEspO[0] = avgAngle_ < 0.0f && espData.Oversteer ? true : false;
     g_vehData.mWheelsEspO[1] = avgAngle_ > 0.0f && espData.Oversteer ? true : false;
@@ -307,22 +307,12 @@ std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData, LSDData lsdData
     return brakeVals;
 }
 
-std::vector<float> DrivingAssists::GetTCSBrakes(TCSData tcsData, LSDData lsdData) {
+std::vector<float> DrivingAssists::GetTCSBrakes(TCSData tcsData) {
     std::vector<float> brakeVals(g_vehData.mWheelCount);
-    std::vector<float> lsdVals(g_vehData.mWheelCount);
 
     float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
     float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
     float fullBrakePower = handlingBrakeForce * g_settings().DriveAssists.TCS.BrakeMult;
-
-    if (g_vehData.mWheelCount == 4) {
-        lsdVals = {
-           lsdData.BrakeLF,
-           lsdData.BrakeRF,
-           lsdData.BrakeLR,
-           lsdData.BrakeRR,
-        };
-    }
 
     float tcsSlipMin = g_settings().DriveAssists.TCS.SlipMin;
     float tcsSlipMax = g_settings().DriveAssists.TCS.SlipMax;
@@ -336,39 +326,29 @@ std::vector<float> DrivingAssists::GetTCSBrakes(TCSData tcsData, LSDData lsdData
                 0.0f, fullBrakePower);
             mappedVal = std::clamp(mappedVal, 0.0f, fullBrakePower);
 
-            brakeVals[i] = inpBrakeForce + mappedVal + lsdVals[i];
+            brakeVals[i] = inpBrakeForce + mappedVal;
         }
         else {
-            brakeVals[i] = inpBrakeForce + lsdVals[i];
+            brakeVals[i] = inpBrakeForce;
         }
     }
 
     return brakeVals;
 }
 
-std::vector<float> DrivingAssists::GetABSBrakes(ABSData absData, LSDData lsdData) {
+std::vector<float> DrivingAssists::GetABSBrakes(ABSData absData) {
     std::vector<float> brakeVals(g_vehData.mWheelCount);
-    std::vector<float> lsdVals(g_vehData.mWheelCount);
 
     float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
     float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
 
-    if (g_vehData.mWheelCount == 4) {
-        lsdVals = {
-            lsdData.BrakeLF,
-            lsdData.BrakeRF,
-            lsdData.BrakeLR,
-            lsdData.BrakeRR,
-        };
-    }
-
     for (uint8_t i = 0; i < g_vehData.mWheelsLockedUp.size(); i++) {
         if (g_vehData.mWheelsLockedUp[i]) {
-            brakeVals[i] = 0.0f + lsdVals[i];
+            brakeVals[i] = 0.0f;
             g_vehData.mWheelsAbs[i] = true;
         }
         else {
-            brakeVals[i] = inpBrakeForce + lsdVals[i];
+            brakeVals[i] = inpBrakeForce;
             g_vehData.mWheelsAbs[i] = false;
         }
     }
