@@ -1317,6 +1317,16 @@ std::vector<uint32_t> VehicleExtensions::GetVehicleFlags(Vehicle handle) {
     return offs;
 }
 
+float VehicleExtensions::GetMaxSteeringWheelAngle(Vehicle handle) {
+    auto address = GetAddress(handle);
+
+    if (!address)
+        return 109.0f;
+    
+    auto pCVehicleModelInfo = *(uint64_t*)(address + vehicleModelInfoOffset);
+    return *(float*)(pCVehicleModelInfo + 0x54C);
+}
+
 
 // These apply to b1103
 // 0x7f8 to 0x814 are gear ratios!

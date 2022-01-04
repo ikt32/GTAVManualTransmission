@@ -232,6 +232,8 @@ public:
     static void SetWheelHandlingPtr(Vehicle handle, uint8_t index, uint64_t value);
 
     static std::vector<uint32_t> GetVehicleFlags(Vehicle handle);
+    // In degrees. Defaults to 109?
+    static float GetMaxSteeringWheelAngle(Vehicle handle);
 private:
     VehicleExtensions() = default;
 };
