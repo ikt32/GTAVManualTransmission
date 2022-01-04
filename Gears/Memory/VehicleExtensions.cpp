@@ -3,6 +3,9 @@
 #include "NativeMemory.hpp"
 #include "Versions.h"
 #include "Offsets.hpp"
+
+#include "VehicleFlags.h"
+
 #include "../Util/Logger.hpp"
 
 #include <inc/main.h>
@@ -1202,6 +1205,16 @@ void VehicleExtensions::SetWheelBrakePressure(Vehicle handle, uint8_t index, flo
     *reinterpret_cast<float *>(wheelAddr + wheelBrakeOffset) = value;
 }
 
+bool VehicleExtensions::IsWheelSteered(Vehicle handle, uint8_t index) {
+    if (index > GetNumWheels(handle)) return false;
+    if (wheelFlagsOffset == 0) return false;
+
+    auto wheelPtr = GetWheelsPtr(handle);
+    auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * index);
+    auto wheelFlags = *reinterpret_cast<uint32_t*>(wheelAddr + wheelFlagsOffset);
+    return wheelFlags & eWheelFlag::FLAG_IS_STEERED;
+}
+
 bool VehicleExtensions::IsWheelPowered(Vehicle handle, uint8_t index) {
     if (index > GetNumWheels(handle)) return false;
     if (wheelFlagsOffset == 0) return false;
@@ -1209,19 +1222,19 @@ bool VehicleExtensions::IsWheelPowered(Vehicle handle, uint8_t index) {
     auto wheelPtr = GetWheelsPtr(handle);
     auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
     auto wheelFlags = *reinterpret_cast<uint32_t *>(wheelAddr + wheelFlagsOffset);
-    return wheelFlags & 0x10;
+    return wheelFlags & eWheelFlag::FLAG_IS_DRIVEN;
 }
 
-std::vector<uint16_t> VehicleExtensions::GetWheelFlags(Vehicle handle) {
+std::vector<uint32_t> VehicleExtensions::GetWheelFlags(Vehicle handle) {
     const auto numWheels = GetNumWheels(handle);
-    std::vector<uint16_t> flags(numWheels);
+    std::vector<uint32_t> flags(numWheels);
     auto wheelPtr = GetWheelsPtr(handle);
 
     if (wheelFlagsOffset == 0) return flags;
 
     for (auto i = 0; i < numWheels; ++i) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-        flags[i] = *reinterpret_cast<uint16_t *>(wheelAddr + wheelFlagsOffset);
+        flags[i] = *reinterpret_cast<uint32_t *>(wheelAddr + wheelFlagsOffset);
     }
     return flags;
 }
