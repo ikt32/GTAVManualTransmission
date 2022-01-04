@@ -123,7 +123,8 @@ void VehicleData::Update() {
 
     mSteeringInput = VExt::GetSteeringInputAngle(mVehicle);
     mSteeringAngle = VExt::GetSteeringAngle(mVehicle);
-    mSteeringMult = VExt::GetSteeringMultiplier(mVehicle);
+    auto steeringMults = VExt::GetWheelSteeringMultipliers(mVehicle);
+    mSteeringMult = steeringMults.size() > 0 ? steeringMults[0] : 1.0f;
 
     mGearCurr = static_cast<uint8_t>(VExt::GetGearCurr(mVehicle));
     mGearNext = static_cast<uint8_t>(VExt::GetGearNext(mVehicle));

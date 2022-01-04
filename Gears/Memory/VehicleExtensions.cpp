@@ -959,22 +959,24 @@ float VehicleExtensions::GetWheelLargestAngle(Vehicle handle) {
 
 float VehicleExtensions::GetWheelAverageAngle(Vehicle handle) {
     auto angles = GetWheelSteeringAngles(handle);
+    auto mults = GetWheelSteeringMultipliers(handle);
     float wheelsSteered = 0.0f;
     float avgAngle = 0.0f;
 
     for (int i = 0; i < GetNumWheels(handle); i++) {
-        if (i < 3 && angles[i] != 0.0f) {
+        if (IsWheelSteered(handle, i)) {
             wheelsSteered += 1.0f;
-            avgAngle += angles[i];
+
+            float angle = angles[i];
+
+            // Flip the sign, otherwise we get 0 average steering
+            if (mults[i] < 0.0f)
+                angle = -angle;
+            avgAngle += angle;
         }
     }
 
-    if (wheelsSteered > 0.5f && wheelsSteered < 2.5f) { // bikes, cars, quads
-        avgAngle /= wheelsSteered;
-    }
-    else {
-        avgAngle = GetSteeringAngle(handle) * GetSteeringMultiplier(handle); // tank, forklift
-    }
+    avgAngle /= wheelsSteered;
     return avgAngle;
 }
 

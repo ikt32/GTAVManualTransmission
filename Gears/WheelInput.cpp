@@ -650,7 +650,6 @@ std::vector<WheelInput::SSlipInfo> WheelInput::CalculateSlipInfo() {
     auto loads = VExt::GetWheelLoads(g_playerVehicle);
     auto boneVels = VExt::GetWheelBoneVelocity(g_playerVehicle);
     auto tracVels = VExt::GetWheelTractionVector(g_playerVehicle);
-    auto angles = VExt::GetWheelSteeringAngles(g_playerVehicle);
 
     auto velWorld = ENTITY::GET_ENTITY_VELOCITY(g_playerVehicle);
     auto posWorld = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, 0);
@@ -797,14 +796,13 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
 
 float getFloatingSteeredWheelsRatio(Vehicle v) {
     auto suspensionStates = g_vehData.mWheelsOnGround;
-    auto angles = g_vehData.mWheelSteeringAngles;
 
     float wheelsOffGroundRatio = 0.0f;
     float wheelsInAir = 0.0f;
     float wheelsSteered = 0.0f;
 
     for (int i = 0; i < g_vehData.mWheelCount; i++) {
-        if (angles[i] != 0.0f) {
+        if (VExt::IsWheelSteered(v, i)) {
             wheelsSteered += 1.0f;
             if (suspensionStates[i] == false) {
                 wheelsInAir += 1.0f;
@@ -893,9 +891,6 @@ void WheelInput::PlayFFBWater() {
     if (g_settings.Wheel.Options.LogiLEDs) {
         g_controls.PlayLEDs(g_vehData.mRPM, 0.45f, 0.95f);
     }
-
-    auto suspensionStates = g_vehData.mWheelsOnGround;
-    auto angles = g_vehData.mWheelSteeringAngles;
 
     bool isInWater = ENTITY::GET_ENTITY_SUBMERGED_LEVEL(g_playerVehicle) > 0.10f;
     int damperForce = calculateDamper(50.0f, isInWater ? 0.25f : 1.0f);

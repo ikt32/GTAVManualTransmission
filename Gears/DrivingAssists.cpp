@@ -128,7 +128,7 @@ DrivingAssists::ESPData DrivingAssists::GetESP() {
                 understeerAngle = 0.0f;
             }
             
-            if (abs(g_vehData.mWheelSteeringAngles[i]) > 0.0f) {
+            if (VExt::IsWheelSteered(g_playerVehicle, i)) {
                 avgSlip += understeerAngle;
                 div += 1.0f;
             }
