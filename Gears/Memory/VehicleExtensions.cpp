@@ -839,25 +839,24 @@ void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) {
     }
 }
 
-float VehicleExtensions::GetSteeringMultiplier(Vehicle handle) {
+std::vector<float> VehicleExtensions::GetWheelSteeringMultipliers(Vehicle handle) {
     auto wheelPtr = GetWheelsPtr(handle);
-    auto numWheels = GetNumWheels(handle);
+    std::vector<float> mults(GetNumWheels(handle));
 
-    if (numWheels > 1) {
-        auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * 1);
-        return abs(*reinterpret_cast<float*>(wheelAddr + wheelSteerMultOffset));
+    for (uint8_t i = 0; i < mults.size(); ++i) {
+        auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * i);
+        mults[i] = *reinterpret_cast<float*>(wheelAddr + wheelSteerMultOffset);
     }
-    return 1.0f;
+
+    return mults;
 }
 
-void VehicleExtensions::SetSteeringMultiplier(Vehicle handle, float value) {
+void VehicleExtensions::SetWheelSteeringMultipliers(Vehicle handle, const std::vector<float>& values) {
     auto wheelPtr = GetWheelsPtr(handle);
-    auto numWheels = GetNumWheels(handle);
 
-    for (int i = 0; i<numWheels; i++) {
+    for (uint8_t i = 0; i < values.size(); i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-        float sign = Sign(*reinterpret_cast<float*>(wheelAddr + wheelSteerMultOffset));
-        *reinterpret_cast<float*>(wheelAddr + wheelSteerMultOffset) = value * sign;
+        *reinterpret_cast<float*>(wheelAddr + wheelSteerMultOffset) = values[i];
     }
 }
 

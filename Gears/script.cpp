@@ -880,12 +880,25 @@ void updateSteeringMultiplier() {
     else {
         mult = g_settings().Steering.CustomSteering.SteeringMult;
     }
-    VExt::SetSteeringMultiplier(g_playerVehicle, mult);
+
+    auto oldMults = VExt::GetWheelSteeringMultipliers(g_playerVehicle);
+    auto numWheels = VExt::GetNumWheels(g_playerVehicle);
+    std::vector<float> newMults(numWheels);
+    for (uint32_t i = 0; i < numWheels; ++i) {
+        newMults[i] = sgn(oldMults[i]) * mult;
+    }
+    VExt::SetWheelSteeringMultipliers(g_playerVehicle, newMults);
 }
 
 void resetSteeringMultiplier() {
     if (g_playerVehicle != 0) {
-        VExt::SetSteeringMultiplier(g_playerVehicle, 1.0f);
+        auto oldMults = VExt::GetWheelSteeringMultipliers(g_playerVehicle);
+        auto numWheels = VExt::GetNumWheels(g_playerVehicle);
+        std::vector<float> newMults(numWheels);
+        for (uint32_t i = 0; i < numWheels; ++i) {
+            newMults[i] = sgn(oldMults[i]) * 1.0f;
+        }
+        VExt::SetWheelSteeringMultipliers(g_playerVehicle, newMults);
     }
 }
 

@@ -172,8 +172,8 @@ public:
     static std::vector<float> GetWheelHealths(Vehicle handle);
     static void SetWheelsHealth(Vehicle handle, float health);
     
-    static float GetSteeringMultiplier(Vehicle handle);
-    static void SetSteeringMultiplier(Vehicle handle, float value);
+    static std::vector<float> GetWheelSteeringMultipliers(Vehicle handle);
+    static void SetWheelSteeringMultipliers(Vehicle handle, const std::vector<float>& values);
 
     static std::vector<Vector3> GetWheelOffsets(Vehicle handle);
     static std::vector<Vector3> GetWheelLastContactCoords(Vehicle handle);
