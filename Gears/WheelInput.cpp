@@ -656,30 +656,51 @@ std::vector<WheelInput::SSlipInfo> WheelInput::CalculateSlipInfo() {
 
     std::vector<SSlipInfo> slipAngles;
 
-    uint32_t i = 0;
     auto numWheels = VExt::GetNumWheels(g_playerVehicle);
-    auto wheelOffs = VExt::GetWheelOffsets(g_playerVehicle);
-    auto wheelSpeeds = VExt::GetTyreSpeeds(g_playerVehicle);
 
-    for (; i < numWheels; ) {
+    auto wheelCoords = Util::GetWheelCoords(g_playerVehicle);
+    auto wheelOffs = VExt::GetWheelOffsets(g_playerVehicle);
+
+    for (uint32_t i = 0; i < numWheels; ++i) {
         Vector3 boneVel = boneVels[i];
         Vector3 tracVel = tracVels[i] * -1.0f;
-        float angle = GetAngleBetween(tracVel, boneVel);
-
-        if (std::isnan(angle) || Length(velWorld) == 0.0f) {
-            boneVel = Vector3();
-            tracVel = Vector3();
-            angle = 0.0f;
-        }
 
         // Translate absolute bone velocity to relative velocity
         auto boneVelProjection = posWorld + boneVel;
         auto boneVelRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(
             g_playerVehicle, boneVelProjection.x, boneVelProjection.y, boneVelProjection.z);
 
+        auto tracVelProjection = posWorld + tracVel;
+        auto tracVelRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(
+            g_playerVehicle, tracVelProjection.x, tracVelProjection.y, tracVelProjection.z);
+
+        auto tracVelRelIgnoreZ = tracVelRel;
+        tracVelRelIgnoreZ.z = boneVelRel.z;
+
+        float angle = GetAngleBetween(tracVelRelIgnoreZ, boneVelRel);
+
+        if (std::isnan(angle) || Length(velWorld) == 0.0f) {
+            boneVel = Vector3();
+            boneVelRel = Vector3();
+            tracVel = Vector3();
+            angle = 0.0f;
+        }
+
         slipAngles.push_back({ angle, loads[i], Length(boneVelRel)});
 
-        ++i;
+        if (g_settings.Debug.DisplayInfo) {
+            Vector3 boneVelProjection2 = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle,
+                wheelOffs[i].x + boneVelRel.x, wheelOffs[i].y + boneVelRel.y, wheelOffs[i].z + boneVelRel.z);
+            UI::DrawSphere(boneVelProjection2, 0.05f, Util::ColorI{ 255, 255, 255, 255 });
+            GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
+                boneVelProjection2.x, boneVelProjection2.y, boneVelProjection2.z, 255, 255, 255, 255);
+
+            Vector3 tracVelProjection2 = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle,
+                wheelOffs[i].x + tracVelRelIgnoreZ.x, wheelOffs[i].y + tracVelRelIgnoreZ.y, wheelOffs[i].z + tracVelRelIgnoreZ.z);
+            UI::DrawSphere(tracVelProjection2, 0.05f, Util::ColorI{ 255, 0, 0, 255 });
+            GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
+                tracVelProjection2.x, tracVelProjection2.y, tracVelProjection2.z, 255, 0, 0, 255);
+        }
     }
 
     return slipAngles;
