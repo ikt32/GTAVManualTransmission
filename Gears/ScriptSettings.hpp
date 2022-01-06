@@ -355,27 +355,35 @@ public:
 
         // [FORCE_FEEDBACK]
         struct {
+            // Global options
             bool Enable = true;
-            int AntiDeadForce = 0;
+
             float SATAmpMult = 1.00f;
             int SATMax = 10000;
-            float SATFactor = 0.80f;
-            float SATUndersteerMult = 1.0f;
+
             int DamperMax = 100;
             int DamperMin = 40;
             float DamperMinSpeed = 6.4f; // TargetSpeed in m/s
+
             float DetailMult = 4.0f;
             int DetailLim = 5000;
             int DetailMAW = 3;
             float CollisionMult = 2.5f;
-            float ResponseCurve = 0.75f;
-            float MaxSpeed = 80.0f;
+
+            int AntiDeadForce = 0;
             std::string LUTFile;
 
-            float SlipOptMin = 7.5f;
-            float SlipOptMinMult = 1.6f;
-            float SlipOptMax = 25.0f;
-            float SlipOptMaxMult = 1.0f;
+            // Ground physics
+            float ResponseCurve = 0.75f;
+            float SlipOptMin = 7.5f;        // Advanced
+            float SlipOptMinMult = 1.6f;    // Advanced
+            float SlipOptMax = 25.0f;       // Advanced
+            float SlipOptMaxMult = 1.0f;    // Advanced
+
+            // Alternative/legacy
+            float SATFactor = 0.80f;
+            float Gamma = 0.75f;
+            float MaxSpeed = 80.0f;
         } FFB;
 
         // [STEER]

@@ -1232,10 +1232,6 @@ void update_forcefeedbackmenu() {
     g_menu.IntOption("Self aligning torque limit", g_settings.Wheel.FFB.SATMax, 0, 10000, 100,
         { "Clamp effect amplitude to this value. 10000 is the technical limit." });
 
-    g_menu.FloatOption("Self aligning torque factor", g_settings.Wheel.FFB.SATFactor, 0.0f, 1.0f, 0.01f,
-        { "Reactive force offset/multiplier, when not going straight.",
-          "Depending on wheel strength, a larger value helps reaching countersteer faster or reduce overcorrection."});
-
     bool showDynamicFfbCurveBox = false;
     if (g_menu.OptionPlus(fmt::format("FFB response curve: < {:.2f} >", g_settings.Wheel.FFB.ResponseCurve), {}, &showDynamicFfbCurveBox,
             [=] { return incVal(g_settings.Wheel.FFB.ResponseCurve, 5.00f, 0.01f); },
@@ -1254,16 +1250,6 @@ void update_forcefeedbackmenu() {
         auto extras = showDynamicFfbCurve(abs(WheelInput::GetFFBConstantForce()), g_settings.Wheel.FFB.ResponseCurve);
         g_menu.OptionPlusPlus(extras, "Response Curve");
     }
-
-    g_menu.MenuOption("FFB normalization options", "ffbnormalizationmenu",
-        { "Different fTractionCurveLateral values affect FFB response, these values are used to normalize steering forces." });
-
-    g_menu.FloatOption("Self aligning torque speed cap", g_settings.Wheel.FFB.MaxSpeed, 10.0f, 1000.0f, 1.0f,
-        { "Speed where FFB stops increasing. Helpful against too strong FFB at extreme speeds.",
-          fmt::format("{} kph / {} mph", g_settings.Wheel.FFB.MaxSpeed * 3.6f, g_settings.Wheel.FFB.MaxSpeed * 2.23694f)});
-
-    g_menu.FloatOption("Understeer loss", g_settings.Wheel.FFB.SATUndersteerMult, 0.0f, 10.0f, 0.1f,
-        { "How much the force feedback is reduced when understeering." });
 
     g_menu.FloatOption("Detail effect multiplier", g_settings.Wheel.FFB.DetailMult, 0.0f, 10.0f, 0.1f,
         { "Force feedback effects caused by the suspension. This effect is muxed with the main effect." });
@@ -1333,6 +1319,28 @@ void update_forcefeedbackmenu() {
             fmt::format("Using LUT: {}", g_settings.Wheel.FFB.LUTFile),
             "FFB anti-deadzone disabled."
         });
+    }
+
+    if (g_settings.Debug.DisplayInfo) {
+        g_menu.MenuOption("FFB normalization options", "ffbnormalizationmenu",
+            { "Different fTractionCurveLateral values affect FFB response, these values are used to normalize steering forces." });
+
+        g_menu.OptionPlus("Legacy FFB options:",
+            { "Used to adjust FFB for non-ground vehicle controls.",
+              "This is based on movement versus steering inputs, instead of tyre/wheel data." });
+
+        g_menu.FloatOption("SAT factor", g_settings.Wheel.FFB.SATFactor, 0.0f, 1.0f, 0.01f,
+            { "Reactive force offset/multiplier, when not going straight.",
+              "Depending on wheel strength, a larger value helps reaching countersteer faster or reduce overcorrection." });
+
+        g_menu.FloatOption("SAT gamma", g_settings.Wheel.FFB.Gamma, 0.01f, 2.0f, 0.01f,
+            { "< 1.0: More FFB at low speeds, FFB tapers off towards speed cap.",
+              "> 1.0: Less FFB at low speeds, FFB increases towards speed cap.",
+              "Keep at 1.0 for linear response. ~h~Not~h~ recommended to go higher than 1.0!" });
+
+        g_menu.FloatOption("SAT max speed", g_settings.Wheel.FFB.MaxSpeed, 10.0f, 1000.0f, 1.0f,
+            { "Speed where FFB stops increasing. Helpful against too strong FFB at extreme speeds.",
+              fmt::format("{} kph / {} mph", g_settings.Wheel.FFB.MaxSpeed * 3.6f, g_settings.Wheel.FFB.MaxSpeed * 2.23694f) });
     }
 }
 

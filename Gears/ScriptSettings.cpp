@@ -380,25 +380,26 @@ void ScriptSettings::SaveWheel() const {
 
     // [FORCE_FEEDBACK]
     SAVE_VAL("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
-    SAVE_VAL("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
     SAVE_VAL("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
     SAVE_VAL("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
-    SAVE_VAL("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
-    SAVE_VAL("FORCE_FEEDBACK", "SATUndersteerMult", Wheel.FFB.SATUndersteerMult);
-    SAVE_VAL("FORCE_FEEDBACK", "DetailMult", Wheel.FFB.DetailMult);
-    SAVE_VAL("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
-    SAVE_VAL("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
     SAVE_VAL("FORCE_FEEDBACK", "DamperMax", Wheel.FFB.DamperMax);
     SAVE_VAL("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin);
     SAVE_VAL("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
+    SAVE_VAL("FORCE_FEEDBACK", "DetailMult", Wheel.FFB.DetailMult);
+    SAVE_VAL("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
+    SAVE_VAL("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
     SAVE_VAL("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
-    SAVE_VAL("FORCE_FEEDBACK", "ResponseCurve", Wheel.FFB.ResponseCurve);
-    SAVE_VAL("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
+    SAVE_VAL("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
 
+    SAVE_VAL("FORCE_FEEDBACK", "ResponseCurve", Wheel.FFB.ResponseCurve);
     SAVE_VAL("FORCE_FEEDBACK", "SlipOptMin", Wheel.FFB.SlipOptMin);
     SAVE_VAL("FORCE_FEEDBACK", "SlipOptMinMult", Wheel.FFB.SlipOptMinMult);
     SAVE_VAL("FORCE_FEEDBACK", "SlipOptMax", Wheel.FFB.SlipOptMax);
     SAVE_VAL("FORCE_FEEDBACK", "SlipOptMaxMult", Wheel.FFB.SlipOptMaxMult);
+
+    SAVE_VAL("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
+    SAVE_VAL("FORCE_FEEDBACK", "Gamma", Wheel.FFB.Gamma);
+    SAVE_VAL("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
 
     // [INPUT_DEVICES]
     ini.SetValue("INPUT_DEVICES", nullptr, nullptr);
@@ -839,26 +840,27 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 
     // [FORCE_FEEDBACK]
     LOAD_VAL("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
-    LOAD_VAL("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
     LOAD_VAL("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
     LOAD_VAL("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
-    LOAD_VAL("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
-    LOAD_VAL("FORCE_FEEDBACK", "SATUndersteerMult", Wheel.FFB.SATUndersteerMult);
     LOAD_VAL("FORCE_FEEDBACK", "DamperMax", Wheel.FFB.DamperMax);
-    LOAD_VAL("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin); ;
+    LOAD_VAL("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin);
     LOAD_VAL("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
     LOAD_VAL("FORCE_FEEDBACK", "DetailMult", Wheel.FFB.DetailMult);
     LOAD_VAL("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
     LOAD_VAL("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
     LOAD_VAL("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
-    LOAD_VAL("FORCE_FEEDBACK", "ResponseCurve", Wheel.FFB.ResponseCurve);
-    LOAD_VAL("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
+    LOAD_VAL("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
     Wheel.FFB.LUTFile = ini.GetValue("FORCE_FEEDBACK", "LUTFile", "");
 
+    LOAD_VAL("FORCE_FEEDBACK", "ResponseCurve", Wheel.FFB.ResponseCurve);
     LOAD_VAL("FORCE_FEEDBACK", "SlipOptMin", Wheel.FFB.SlipOptMin);
     LOAD_VAL("FORCE_FEEDBACK", "SlipOptMinMult", Wheel.FFB.SlipOptMinMult);
     LOAD_VAL("FORCE_FEEDBACK", "SlipOptMax", Wheel.FFB.SlipOptMax);
     LOAD_VAL("FORCE_FEEDBACK", "SlipOptMaxMult", Wheel.FFB.SlipOptMaxMult);
+
+    LOAD_VAL("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
+    LOAD_VAL("FORCE_FEEDBACK", "Gamma", Wheel.FFB.Gamma);
+    LOAD_VAL("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
 
     // [INPUT_DEVICES]
     int it = 0;

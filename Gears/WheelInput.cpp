@@ -912,6 +912,63 @@ int calculateSat() {
     return static_cast<int>(satForce);
 }
 
+int calculateSatNonWheel(int defaultGain, float steeringAngle) {
+    float speed = ENTITY::GET_ENTITY_SPEED(g_playerVehicle);
+
+    const float maxSpeed = g_settings.Wheel.FFB.MaxSpeed;
+    // gamma: should be < 1 for tapering off force when reaching maxSpeed
+    //float spdMap = pow(std::min(speed, maxSpeed) / maxSpeed, g_settings.Wheel.FFB.Gamma) * maxSpeed / 2.0f;
+    float spdMap = pow(std::min(speed, maxSpeed * 2.0f) / (maxSpeed * 2.0f), g_settings.Wheel.FFB.Gamma) * maxSpeed;
+    float spdRatio = spdMap / speed;
+
+    if (speed == 0.0f)
+        spdRatio = 1.0f;
+
+    Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
+    Vector3 speedVectorMapped = speedVector;
+    speedVectorMapped.x = speedVector.x * (spdRatio);
+    Vector3 rotVector = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
+    Vector3 rotRelative{
+        speed * -sin(rotVector.z), 0,
+        speed * cos(rotVector.z), 0,
+        0, 0
+    };
+
+    Vector3 expectedVectorMapped{
+        spdMap * -sin(steeringAngle / g_settings().Steering.Wheel.SteeringMult), 0,
+        spdMap * cos(steeringAngle / g_settings().Steering.Wheel.SteeringMult), 0,
+        0, 0
+    };
+
+    Vector3 expectedVector{
+        speed * -sin(steeringAngle / g_settings().Steering.Wheel.SteeringMult), 0,
+        speed * cos(steeringAngle / g_settings().Steering.Wheel.SteeringMult), 0,
+        0, 0
+    };
+
+    float error = static_cast<float>(pid.getOutput(
+        expectedVectorMapped.x,
+        static_cast<double>(speedVectorMapped.x) * g_settings.Wheel.FFB.SATFactor));
+
+    float satForce = g_settings.Wheel.FFB.SATAmpMult * static_cast<float>(defaultGain) * -error;
+
+    if (g_settings.Wheel.FFB.LUTFile.empty()) {
+        float adf = static_cast<float>(g_settings.Wheel.FFB.AntiDeadForce);
+        if (satForce > 0.0f) {
+            satForce = map(satForce, 0.0f, 10000.0f, adf, 10000.0f);
+        }
+        if (satForce < 0.0f) {
+            satForce = map(satForce, -10000.0f, -0.0f, -10000.0f, -adf);
+        }
+    }
+    float satMax = static_cast<float>(g_settings.Wheel.FFB.SATMax);
+    satForce = std::clamp(satForce, -satMax, satMax);
+    if (Math::Near(speed, 0.0f, 0.1f)) {
+        satForce *= speed;
+    }
+    return static_cast<int>(satForce);
+}
+
 float getFloatingSteeredWheelsRatio(Vehicle v) {
     auto suspensionStates = g_vehData.mWheelsOnGround;
 
@@ -941,16 +998,6 @@ void WheelInput::PlayFFBGround() {
 
     if (g_settings.Wheel.Options.LogiLEDs) {
         g_controls.PlayLEDs(g_vehData.mRPM, 0.45f, 0.95f);
-    }
-
-    // avgAngle: left is positive
-    // steerVal: left is negative
-    // Rear-wheel steered cars don't match, so this needs to be flipped in that case.
-    float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * g_settings().Steering.Wheel.SteeringMult;
-
-    float steerVal = map(g_controls.SteerVal, 0.0f, 1.0f, -1.0f, 1.0f);    
-    if (sgn(avgAngle) == sgn(steerVal)) {
-        avgAngle = -avgAngle;
     }
 
     float wheelsOffGroundRatio = getFloatingSteeredWheelsRatio(g_playerVehicle);
@@ -1013,7 +1060,7 @@ void WheelInput::PlayFFBWater() {
     bool isInWater = ENTITY::GET_ENTITY_SUBMERGED_LEVEL(g_playerVehicle) > 0.10f;
     int damperForce = calculateDamper(50.0f, isInWater ? 0.25f : 1.0f);
     int detailForce = calculateDetail();
-    int satForce = calculateSat();
+    int satForce = calculateSatNonWheel(750, ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle).z);
 
     if (!isInWater) {
         satForce = 0;
