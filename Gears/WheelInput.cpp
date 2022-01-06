@@ -39,6 +39,18 @@ extern WheelPatchStates g_wheelPatchStates;
 
 namespace {
     MiniPID pid(1.0, 0.0, 0.0);
+
+    // https://forums.gta5-mods.com/topic/14244/how-to-get-a-wheel-address-from-wheel-id
+    std::unordered_map<uint8_t, uint8_t> wheelIdReverseLookupMap {
+        { 11, 0 }, // 0 - wheel_lf / bike, plane or jet front
+        { 12, 1 }, // 1 - wheel_rf
+        { 15, 2 }, // 2 - wheel_lm / in 6 wheels trailer, plane or jet is first one on left
+        { 16, 3 }, // 3 - wheel_rm / in 6 wheels trailer, plane or jet is first one on right
+        { 13, 4 }, // 4 - wheel_lr / bike rear / in 6 wheels trailer, plane or jet is last one on left
+        { 14, 5 }, // 5 - wheel_rr / in 6 wheels trailer, plane or jet is last one on right
+        { 11, 6 }, // 45 - 6 wheels trailer mid wheel left
+        { 13, 7 }, // 45 - 6 wheels trailer mid wheel right
+    };
 }
 
 namespace WheelInput {
@@ -789,6 +801,21 @@ int calculateSat() {
 
     auto calculateSlip = [&](uint32_t i) {
         float thisSlipRatio = calcSlipRatio(satValues[i].Angle, latSlipOpt, maxSlipMultA, maxSlipMultB, outMultA, outMultB);
+
+        auto wheelIdMem = VExt::GetWheelIdMem(g_playerVehicle, i);
+        auto wheelId = wheelIdReverseLookupMap.find(wheelIdMem);
+        if (wheelId != wheelIdReverseLookupMap.end()) {
+            bool deflated = VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, wheelId->second, false);
+            bool completely = VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, wheelId->second, true);
+
+            if (deflated) {
+                thisSlipRatio *= 0.25f;
+            }
+            else if (completely) {
+                thisSlipRatio *= 0.10f;
+            }
+        }
+
         slipRatio += thisSlipRatio;
 
         // std::max so we ignore divide-by-almost-zero stuff
@@ -798,7 +825,13 @@ int calculateSat() {
 
         steeredWheelsDiv += 1.0f;
         if (g_settings.Debug.DisplayInfo) {
-            UI::ShowText(0.0f + static_cast<float>(i) * 0.075f, 0.75f, 0.3f, fmt::format("[{}]Angle: {:.2f}\nSlipRatio:{:.2f}\nLongSlip: {:.2f}", i, rad2deg(satValues[i].Angle), thisSlipRatio, thisLongSlip));
+            UI::ShowText(0.0f + static_cast<float>(i) * 0.075f, 0.75f, 0.3f,
+                fmt::format("[{}]Angle: {:.2f}\nSlipRatio:{:.2f}\nLongSlip: {:.2f}\n{}/{}",
+                    i, rad2deg(satValues[i].Angle),
+                    thisSlipRatio,
+                    thisLongSlip,
+                    wheelIdMem, wheelId != wheelIdReverseLookupMap.end() ?
+                                    fmt::format("{}", wheelId->second) : "N/A"));
         }
     };
 

@@ -780,6 +780,15 @@ void VehicleExtensions::SetVisualHeight(Vehicle handle, float height) {
     *reinterpret_cast<float *>(wheelPtr + offset) = height;
 }
 
+uint8_t VehicleExtensions::GetWheelIdMem(Vehicle handle, uint8_t index) {
+    auto wheelPtr = GetWheelsPtr(handle);
+    if (index > GetNumWheels(handle))
+        return 0xFF; // Hope this doesn't backfire LMAO
+
+    auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * index);
+    return *reinterpret_cast<uint8_t*>(wheelAddr + 0x108); // pray to R* devs this doesn't change
+}
+
 std::vector<Vector3> VehicleExtensions::GetWheelBoneVelocity(Vehicle handle) {
     auto wheels = GetWheelPtrs(handle);
     std::vector<Vector3> values;

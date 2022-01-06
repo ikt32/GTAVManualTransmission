@@ -166,6 +166,8 @@ public:
     /*
      * Wheel struct
      */	
+    static uint8_t GetWheelIdMem(Vehicle handle, uint8_t index);
+
     static std::vector<Vector3> GetWheelBoneVelocity(Vehicle handle);
     static std::vector<Vector3> GetWheelTractionVector(Vehicle handle);
 
