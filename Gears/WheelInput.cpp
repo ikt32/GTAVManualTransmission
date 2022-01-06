@@ -582,6 +582,9 @@ int calculateDamper(float gain, float wheelsOffGroundRatio) {
 
     damperForce = damperForce * (1.0f - wheelsOffGroundRatio);
 
+    auto tyreGrips = VExt::GetTyreGrips(g_playerVehicle);
+    auto wetGrips = VExt::GetWetGrips(g_playerVehicle);
+
     for (uint32_t i = 0; i < VExt::GetNumWheels(g_playerVehicle); ++i) {
         if (VExt::IsWheelSteered(g_playerVehicle, i)) {
             auto wheelIdMem = VExt::GetWheelIdMem(g_playerVehicle, i);
@@ -597,6 +600,9 @@ int calculateDamper(float gain, float wheelsOffGroundRatio) {
                     damperForce *= 0.50f;
                 }
             }
+
+            damperForce *= tyreGrips[i];
+            damperForce *= wetGrips[i];
         }
     }
 
@@ -800,6 +806,9 @@ int calculateSat() {
     float steeredWheelsDiv = 0.0f;
     float steeredAxleWeight = 0.0f;
 
+    auto tyreGrips = VExt::GetTyreGrips(g_playerVehicle);
+    auto wetGrips = VExt::GetWetGrips(g_playerVehicle);
+
     auto calculateSlip = [&](uint32_t i) {
         float thisSlipRatio = calcSlipRatio(satValues[i].Angle, latSlipOpt, maxSlipMultA, maxSlipMultB, outMultA, outMultB);
 
@@ -816,6 +825,9 @@ int calculateSat() {
                 thisSlipRatio *= 0.10f;
             }
         }
+
+        thisSlipRatio *= tyreGrips[i];
+        thisSlipRatio *= wetGrips[i];
 
         slipRatio += thisSlipRatio;
 
