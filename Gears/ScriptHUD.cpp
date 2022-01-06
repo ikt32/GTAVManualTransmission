@@ -750,10 +750,8 @@ void drawVehicleWheelTractionVector() {
     auto wheelTVLXs = VExt::GetWheelTractionVectorX(g_playerVehicle);
     auto wheelCoords = Util::GetWheelCoords(g_playerVehicle);
     for (int i = 0; i < numWheels; i++) {
-        const float div = 1.0f;
-
         Vector3 tractionVectorWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle,
-            wheelOffs[i].x + -wheelTVLXs[i] / div, wheelOffs[i].y + wheelTVLYs[i] / div, wheelOffs[i].z);
+            wheelOffs[i].x + -wheelTVLXs[i], wheelOffs[i].y + wheelTVLYs[i], wheelOffs[i].z);
 
         int red = wheelTVLYs[i] > 0.0f ? 0 : 255;
         int green = wheelTVLYs[i] > 0.0f ? 255 : 0;
@@ -837,7 +835,7 @@ void drawVehicleWheelInfo() {
         float tyreAr = 100.0f * ((wheelDims[i].TyreRadius - wheelDims[i].RimRadius) / wheelDims[i].TyreWidth);
         float rimSize = 2.0f * wheelDims[i].RimRadius * 39.3701f; // inches
         UI::ShowText3D(wheelCoords[i], {
-                fmt::format("[{}] {}Powered", i, VExt::IsWheelPowered(g_playerVehicle, i) ? "~g~" : "~r~"),
+                fmt::format("[{}] {}Drive {}Steer", i, VExt::IsWheelPowered(g_playerVehicle, i) ? "~g~" : "~r~", VExt::IsWheelSteered(g_playerVehicle, i) ? "~g~" : "~r~"),
                 fmt::format("Speed: \t{:.3f}", wheelsSpeed[i]),
                 //fmt::format("Compr: \t{:.3f}", wheelsCompr[i]),
                 //fmt::format("Health: \t{:.3f}", wheelsHealt[i]),
