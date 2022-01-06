@@ -744,7 +744,16 @@ float calcSlipRatio(float slip, float slipOpt,
     return slipRatio * sgn(slip);
 }
 
-int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRatio, bool isCar) {
+int calculateSat() {
+    auto numWheels = VExt::GetNumWheels(g_playerVehicle);
+    if (numWheels < 1)
+        return 0;
+
+    const float maxSlipMultA = 1.050f;
+    const float maxSlipMultB = 1.075f;
+    const float outMultA = 0.50f;
+    const float outMultB = 0.35f;
+
     // in radians
     const float latSlipOpt = *(float*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets1604.fTractionCurveLateral);
     const auto comOffset = *(V3F*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets1604.vecCentreOfMass.X);
@@ -753,31 +762,53 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
 
     auto wheelOffsets = VExt::GetWheelOffsets(g_playerVehicle);
     auto wheelVels = VExt::GetTyreSpeeds(g_playerVehicle);
+    auto wheelSteeringMults = VExt::GetWheelSteeringMultipliers(g_playerVehicle);
 
     auto satValues = WheelInput::CalculateSlipInfo();
     const float weightWheelAvg = mass / (float)satValues.size();
 
-    // TODO: Just car
-    if (satValues.size() != 4)
-        return 0;
+    uint32_t numSteeredWheelsTotal = 0;
+    for (uint32_t i = 0; i < satValues.size(); ++i) {
+        if (VExt::IsWheelSteered(g_playerVehicle, i)) {
+            numSteeredWheelsTotal++;
+        }
+    }
 
-    float slipL = satValues[0].Angle;
-    float slipR = satValues[1].Angle;
+    float longSlip = 0.0f;
+    float slipRatio = 0.0f;
+    float steeredWheelsDiv = 0.0f;
+    float steeredAxleWeight = 0.0f;
 
-    const float maxSlipMultA = 1.050f;
-    const float maxSlipMultB = 1.075f;
-    const float outMultA = 0.50f;
-    const float outMultB = 0.35f;
+    auto calculateSlip = [&](uint32_t i) {
+        float thisSlipRatio = calcSlipRatio(satValues[i].Angle, latSlipOpt, maxSlipMultA, maxSlipMultB, outMultA, outMultB);
+        slipRatio += thisSlipRatio;
 
-    float slipRatioL = calcSlipRatio(slipL, latSlipOpt, maxSlipMultA, maxSlipMultB, outMultA, outMultB);
-    float slipRatioR = calcSlipRatio(slipR, latSlipOpt, maxSlipMultA, maxSlipMultB, outMultA, outMultB);
+        // std::max so we ignore divide-by-almost-zero stuff
+        float thisLongSlip = wheelVels[i] / std::max(1.0f, satValues[i].VelocityAmplitude);
+        longSlip += thisLongSlip;
+        steeredAxleWeight += satValues[i].Weight;
 
-    float slipRatio = (slipRatioL + slipRatioR) / 2.0f;
+        steeredWheelsDiv += 1.0f;
+        //UI::ShowText(0.0f + steeredWheels * 0.10f, 0.25f, 0.5f, fmt::format("[{}]Angle: {:.2f}\nSlipRatio:{:.2f}\nLongSlip: {:.2f}", i, rad2deg(satValues[i].Angle), thisSlipRatio, thisLongSlip));
+    };
 
-    // std::max so we ignore divide-by-almost-zero stuff
-    float longSlipL = wheelVels[0] / std::max(1.0f, satValues[0].VelocityAmplitude);
-    float longSlipR = wheelVels[1] / std::max(1.0f, satValues[1].VelocityAmplitude);
-    float longSlip = (longSlipL + longSlipR) / 2.0f;
+    // Bikes have the front wheel index 1 instead of 0
+    if (numWheels == 2) {
+        calculateSlip(1);
+    }
+    // E.g. Chimera has 1 steered wheel (and is a quad)
+    else if (numWheels == 1 || numSteeredWheelsTotal == 1) {
+        calculateSlip(0);
+    }
+    // Assume 2 front steered wheels for all other vehicles
+    // Even 4+-wheel or rear-wheel steered vehicles
+    else {
+        calculateSlip(0);
+        calculateSlip(1);
+    }
+
+    slipRatio /= steeredWheelsDiv;
+    longSlip /= steeredWheelsDiv;
     longSlip = std::clamp(longSlip, 1.0f, 10.0f);
     
     float longSlipMult = map(longSlip, 1.0f, 2.0f, 1.0f, 0.0f);
@@ -786,18 +817,28 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
     float velFac = std::clamp(ENTITY::GET_ENTITY_SPEED(g_playerVehicle), 0.0f, 1.0f);
 
     // Heavier under braking, lighter under no braking, zero when airborne. 1 when stopped, but this defaults to 0 which is also fine.
-    float weightTransferMult = 2.0f;
 
-    float frontAxleOffset = wheelOffsets[0].y;
-    float rearAxleOffset = wheelOffsets[2].y;
+    float frontAxleOffset = -1.0f;
+    float rearAxleOffset = 1.0f;
+
+    // Bikes
+    if (numWheels == 2) {
+        frontAxleOffset = wheelOffsets[1].y;
+        rearAxleOffset = wheelOffsets[0].y;
+    }
+    // The rest
+    else {
+        frontAxleOffset = wheelOffsets[0].y;
+        rearAxleOffset = wheelOffsets[numWheels-1].y;
+    }
     float wheelbase = frontAxleOffset - rearAxleOffset;
 
-    // front bias
+    // front bias - except for bikes but we stealthily swapped it anyway.
     float comBiasFront = map(comOffset.y, rearAxleOffset, frontAxleOffset, 0.0f, 1.0f);
 
     float frontAxleDesignWeight = mass * comBiasFront;
 
-    float weightTransferFactor = (satValues[0].Weight + satValues[1].Weight) / frontAxleDesignWeight;
+    float weightTransferFactor = steeredAxleWeight / frontAxleDesignWeight;
 
     float satForce = g_settings.Wheel.FFB.SATAmpMult * 10000.0f * slipRatio * velFac * weightTransferFactor * longSlipMult;
 
@@ -859,7 +900,7 @@ void WheelInput::PlayFFBGround() {
     float wheelsOffGroundRatio = getFloatingSteeredWheelsRatio(g_playerVehicle);
 
     int detailForce = std::clamp(calculateDetail(), -g_settings.Wheel.FFB.DetailLim, g_settings.Wheel.FFB.DetailLim);
-    int satForce = calculateSat(2500, avgAngle, wheelsOffGroundRatio, g_vehData.mClass == VehicleClass::Car);
+    int satForce = calculateSat();
     int damperForce = calculateDamper(50.0f, wheelsOffGroundRatio);
 
     // Decrease damper if sat rises, so constantForce doesn't fight against damper
@@ -916,7 +957,7 @@ void WheelInput::PlayFFBWater() {
     bool isInWater = ENTITY::GET_ENTITY_SUBMERGED_LEVEL(g_playerVehicle) > 0.10f;
     int damperForce = calculateDamper(50.0f, isInWater ? 0.25f : 1.0f);
     int detailForce = calculateDetail();
-    int satForce = calculateSat(750, ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle).z, 1.0f, false);
+    int satForce = calculateSat();
 
     if (!isInWater) {
         satForce = 0;
