@@ -689,17 +689,22 @@ std::vector<WheelInput::SSlipInfo> WheelInput::CalculateSlipInfo() {
         slipAngles.push_back({ angle, loads[i], Length(boneVelRel)});
 
         if (g_settings.Debug.DisplayInfo) {
+            int alpha = 255;
+            if (!VExt::IsWheelSteered(g_playerVehicle, i)) {
+                alpha = 63;
+            }
+
             Vector3 boneVelProjection2 = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle,
                 wheelOffs[i].x + boneVelRel.x, wheelOffs[i].y + boneVelRel.y, wheelOffs[i].z + boneVelRel.z);
-            UI::DrawSphere(boneVelProjection2, 0.05f, Util::ColorI{ 255, 255, 255, 255 });
+            UI::DrawSphere(boneVelProjection2, 0.05f, Util::ColorI{ 255, 255, 255, alpha });
             GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
-                boneVelProjection2.x, boneVelProjection2.y, boneVelProjection2.z, 255, 255, 255, 255);
+                boneVelProjection2.x, boneVelProjection2.y, boneVelProjection2.z, 255, 255, 255, alpha);
 
             Vector3 tracVelProjection2 = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle,
                 wheelOffs[i].x + tracVelRelIgnoreZ.x, wheelOffs[i].y + tracVelRelIgnoreZ.y, wheelOffs[i].z + tracVelRelIgnoreZ.z);
-            UI::DrawSphere(tracVelProjection2, 0.05f, Util::ColorI{ 255, 0, 0, 255 });
+            UI::DrawSphere(tracVelProjection2, 0.05f, Util::ColorI{ 255, 0, 0, alpha });
             GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
-                tracVelProjection2.x, tracVelProjection2.y, tracVelProjection2.z, 255, 0, 0, 255);
+                tracVelProjection2.x, tracVelProjection2.y, tracVelProjection2.z, 255, 0, 0, alpha);
         }
     }
 
@@ -732,7 +737,10 @@ float calcSlipRatio(float slip, float slipOpt,
         // rNorm normalizes the response curve for different fTractionCurveLateral values
         // Tested from 5 degrees to 30 degrees
         // Results in similar force at a similar lock (< fTractionCurveLateral).
-        float rNorm = g_settings.Wheel.FFB.ResponseCurve * (deg2rad(12.0f) / slipOpt);
+        float rNorm = g_settings.Wheel.FFB.ResponseCurve * 
+            map(rad2deg(slipOpt), 
+                g_settings.Wheel.FFB.SlipOptMin, g_settings.Wheel.FFB.SlipOptMax,
+                g_settings.Wheel.FFB.SlipOptMinMult, g_settings.Wheel.FFB.SlipOptMaxMult);
 
         // Increase the force quick, then rise towards 1.
         // x + (1 - x) * (the rest): Make the initial part steeper than linear y=x
@@ -789,7 +797,9 @@ int calculateSat() {
         steeredAxleWeight += satValues[i].Weight;
 
         steeredWheelsDiv += 1.0f;
-        //UI::ShowText(0.0f + steeredWheels * 0.10f, 0.25f, 0.5f, fmt::format("[{}]Angle: {:.2f}\nSlipRatio:{:.2f}\nLongSlip: {:.2f}", i, rad2deg(satValues[i].Angle), thisSlipRatio, thisLongSlip));
+        if (g_settings.Debug.DisplayInfo) {
+            UI::ShowText(0.0f + static_cast<float>(i) * 0.075f, 0.75f, 0.3f, fmt::format("[{}]Angle: {:.2f}\nSlipRatio:{:.2f}\nLongSlip: {:.2f}", i, rad2deg(satValues[i].Angle), thisSlipRatio, thisLongSlip));
+        }
     };
 
     // Bikes have the front wheel index 1 instead of 0
@@ -797,7 +807,7 @@ int calculateSat() {
         calculateSlip(1);
     }
     // E.g. Chimera has 1 steered wheel (and is a quad)
-    else if (numWheels == 1 || numSteeredWheelsTotal == 1) {
+    else if (numSteeredWheelsTotal == 1) {
         calculateSlip(0);
     }
     // Assume 2 front steered wheels for all other vehicles

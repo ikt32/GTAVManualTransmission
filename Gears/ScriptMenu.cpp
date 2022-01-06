@@ -1237,7 +1237,7 @@ void update_forcefeedbackmenu() {
           "Depending on wheel strength, a larger value helps reaching countersteer faster or reduce overcorrection."});
 
     bool showDynamicFfbCurveBox = false;
-    if (g_menu.OptionPlus("FFB response curve", {}, &showDynamicFfbCurveBox,
+    if (g_menu.OptionPlus(fmt::format("FFB response curve: < {:.2f} >", g_settings.Wheel.FFB.ResponseCurve), {}, &showDynamicFfbCurveBox,
             [=] { return incVal(g_settings.Wheel.FFB.ResponseCurve, 5.00f, 0.01f); },
             [=] { return decVal(g_settings.Wheel.FFB.ResponseCurve, 0.01f, 0.01f); },
             "Response curve", {
@@ -1254,6 +1254,9 @@ void update_forcefeedbackmenu() {
         auto extras = showDynamicFfbCurve(abs(WheelInput::GetFFBConstantForce()), g_settings.Wheel.FFB.ResponseCurve);
         g_menu.OptionPlusPlus(extras, "Response Curve");
     }
+
+    g_menu.MenuOption("FFB normalization options", "ffbnormalizationmenu",
+        { "Different fTractionCurveLateral values affect FFB response, these values are used to normalize steering forces." });
 
     g_menu.FloatOption("Self aligning torque speed cap", g_settings.Wheel.FFB.MaxSpeed, 10.0f, 1000.0f, 1.0f,
         { "Speed where FFB stops increasing. Helpful against too strong FFB at extreme speeds.",
@@ -1331,6 +1334,27 @@ void update_forcefeedbackmenu() {
             "FFB anti-deadzone disabled."
         });
     }
+}
+
+void update_ffbnormalizationmenu() {
+    g_menu.Title("FFB Normalization");
+    g_menu.Subtitle("");
+
+    g_menu.OptionPlus("Description", 
+        { "These values affect the usage of 'FFB response curve' value, relative to the fTractionCurveLateral (optimal slip angle) value of the vehicle.",
+          "Higher optimal slip angles cause FFB to respond slowly to small changes, lower optimal slip angles cause FFB to respond quick to small changes.",
+          "These values normalize this, to make the high slip values used by default GTA V handlings to respond quickly.",
+          "For the best experience, use a custom handling with low fTractionCurveMin/Max and low fTractionCurveLateral values.",
+          "Defaults: 7.5/1.6, 20.0/1.0"});
+
+    g_menu.FloatOptionCb("Optimal slip low", g_settings.Wheel.FFB.SlipOptMin, 0.0f, 90.0f, 0.1f, getKbEntry);
+    g_menu.FloatOptionCb("Optimal slip low mult", g_settings.Wheel.FFB.SlipOptMinMult, 0.0f, 10.0f, 0.1f, getKbEntry,
+        { "Higher values give weaker FFB at low steering angles.",
+          "For low optimal slip angles, this value should be high." });
+    g_menu.FloatOptionCb("Optimal slip high", g_settings.Wheel.FFB.SlipOptMax, 0.0f, 90.0f, 0.1f, getKbEntry);
+    g_menu.FloatOptionCb("Optimal slip high mult", g_settings.Wheel.FFB.SlipOptMaxMult, 0.0f, 10.0f, 0.1f, getKbEntry,
+        { "Higher values give weaker FFB at low steering angles.",
+          "For high optimal slip angles, this value should be low." });
 }
 
 void update_buttonsmenu() {
@@ -2244,7 +2268,7 @@ void update_cameraoptionsmenu() {
     }
 
     g_menu.MenuOption("Motorcycle camera options", "bikecameraoptionsmenu",
-        { "The FPV camera for 2-wheelers, quads and every between behaves differently,"
+        { "The FPV camera for 2-wheelers, quads and every between behaves differently, "
             "so these have their own options." });
 
     g_menu.MenuOption("Camera movement options", "cameramovementoptionsmenu",
@@ -2693,6 +2717,9 @@ void update_menu() {
 
     /* mainmenu -> controlsmenu -> wheelmenu -> forcefeedbackmenu */
     if (g_menu.CurrentMenu("forcefeedbackmenu")) { update_forcefeedbackmenu(); }
+
+    /* mainmenu -> controlsmenu -> wheelmenu -> forcefeedbackmenu */
+    if (g_menu.CurrentMenu("ffbnormalizationmenu")) { update_ffbnormalizationmenu(); }
 
     /* mainmenu -> controlsmenu -> wheelmenu -> buttonsmenu */
     if (g_menu.CurrentMenu("buttonsmenu")) { update_buttonsmenu(); }

@@ -394,7 +394,12 @@ void ScriptSettings::SaveWheel() const {
     SAVE_VAL("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
     SAVE_VAL("FORCE_FEEDBACK", "ResponseCurve", Wheel.FFB.ResponseCurve);
     SAVE_VAL("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
-    
+
+    SAVE_VAL("FORCE_FEEDBACK", "SlipOptMin", Wheel.FFB.SlipOptMin);
+    SAVE_VAL("FORCE_FEEDBACK", "SlipOptMinMult", Wheel.FFB.SlipOptMinMult);
+    SAVE_VAL("FORCE_FEEDBACK", "SlipOptMax", Wheel.FFB.SlipOptMax);
+    SAVE_VAL("FORCE_FEEDBACK", "SlipOptMaxMult", Wheel.FFB.SlipOptMaxMult);
+
     // [INPUT_DEVICES]
     ini.SetValue("INPUT_DEVICES", nullptr, nullptr);
 
@@ -849,6 +854,11 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     LOAD_VAL("FORCE_FEEDBACK", "ResponseCurve", Wheel.FFB.ResponseCurve);
     LOAD_VAL("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
     Wheel.FFB.LUTFile = ini.GetValue("FORCE_FEEDBACK", "LUTFile", "");
+
+    LOAD_VAL("FORCE_FEEDBACK", "SlipOptMin", Wheel.FFB.SlipOptMin);
+    LOAD_VAL("FORCE_FEEDBACK", "SlipOptMinMult", Wheel.FFB.SlipOptMinMult);
+    LOAD_VAL("FORCE_FEEDBACK", "SlipOptMax", Wheel.FFB.SlipOptMax);
+    LOAD_VAL("FORCE_FEEDBACK", "SlipOptMaxMult", Wheel.FFB.SlipOptMaxMult);
 
     // [INPUT_DEVICES]
     int it = 0;

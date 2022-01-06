@@ -371,6 +371,11 @@ public:
             float ResponseCurve = 0.75f;
             float MaxSpeed = 80.0f;
             std::string LUTFile;
+
+            float SlipOptMin = 7.5f;
+            float SlipOptMinMult = 1.6f;
+            float SlipOptMax = 25.0f;
+            float SlipOptMaxMult = 1.0f;
         } FFB;
 
         // [STEER]
