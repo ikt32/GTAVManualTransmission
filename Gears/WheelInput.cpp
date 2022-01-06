@@ -582,30 +582,31 @@ int calculateDamper(float gain, float wheelsOffGroundRatio) {
 
     damperForce = damperForce * (1.0f - wheelsOffGroundRatio);
 
-    if (g_vehData.mClass == VehicleClass::Car || g_vehData.mClass == VehicleClass::Quad) {
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 0, true)) {
-            damperForce /= 2.0f;
-        }
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 1, true)) {
-            damperForce /= 2.0f;
+    for (uint32_t i = 0; i < VExt::GetNumWheels(g_playerVehicle); ++i) {
+        if (VExt::IsWheelSteered(g_playerVehicle, i)) {
+            auto wheelIdMem = VExt::GetWheelIdMem(g_playerVehicle, i);
+            auto wheelId = wheelIdReverseLookupMap.find(wheelIdMem);
+            if (wheelId != wheelIdReverseLookupMap.end()) {
+                bool deflated = VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, wheelId->second, false);
+                bool completely = VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, wheelId->second, true);
+
+                if (deflated) {
+                    damperForce *= 0.75f;
+                }
+                else if (completely) {
+                    damperForce *= 0.50f;
+                }
+            }
         }
     }
-    else if (g_vehData.mClass == VehicleClass::Bike) {
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 0, true)) {
-            damperForce /= 4.0f;
-        }
-    }
+
+    damperForce = std::clamp(damperForce, damperMin, damperMax * 2.0f);
 
     if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle)) {
         damperForce *= 2.0f;
     }
 
-    // clamp
-    damperForce = fmaxf(damperForce, damperMin / 4.0f);
-    damperForce = fminf(damperForce, damperMax * 2.0f);
-
     damperForce *= gain;
-
     return static_cast<int>(damperForce);
 }
 
