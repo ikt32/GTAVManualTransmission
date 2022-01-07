@@ -793,10 +793,13 @@ float calcSlipRatio(float slip, float slipOpt,
         // rNorm normalizes the response curve for different fTractionCurveLateral values
         // Tested from 5 degrees to 30 degrees
         // Results in similar force at a similar lock (< fTractionCurveLateral).
-        float rNorm = g_settings.Wheel.FFB.ResponseCurve * 
-            map(rad2deg(slipOpt), 
-                g_settings.Wheel.FFB.SlipOptMin, g_settings.Wheel.FFB.SlipOptMax,
-                g_settings.Wheel.FFB.SlipOptMinMult, g_settings.Wheel.FFB.SlipOptMaxMult);
+        float normVal = map(rad2deg(slipOpt),
+            g_settings.Wheel.FFB.SlipOptMin, g_settings.Wheel.FFB.SlipOptMax,
+            g_settings.Wheel.FFB.SlipOptMinMult, g_settings.Wheel.FFB.SlipOptMaxMult);
+        normVal = std::clamp(normVal, g_settings.Wheel.FFB.SlipOptMinMult, g_settings.Wheel.FFB.SlipOptMaxMult);
+
+        float rNorm = g_settings.Wheel.FFB.ResponseCurve * normVal;
+
 
         // Increase the force quick, then rise towards 1.
         // x + (1 - x) * (the rest): Make the initial part steeper than linear y=x
