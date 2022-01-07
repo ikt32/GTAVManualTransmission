@@ -386,7 +386,8 @@ void wheelControlRoad() {
         WheelInput::HandlePedalsArcade(g_controls.ThrottleVal, g_controls.BrakeVal);
     }
     WheelInput::DoSteering();
-    if (g_vehData.mIsAmphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(g_playerVehicle) > 0.10f) {
+    if (g_vehData.mIsAmphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(g_playerVehicle) > 0.10f ||
+        VExt::GetHoverTransformRatio(g_playerVehicle) >= 0.5f) {
         WheelInput::PlayFFBWater();
     }
     else {

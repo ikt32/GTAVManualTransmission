@@ -84,6 +84,9 @@ namespace WheelInput {
         return lastConstantForce / 10000.0f;
     }
 
+    void HandlePedalsGround(float wheelThrottleVal, float wheelBrakeVal);
+    void HandlePedalsAlt(float wheelThrottleVal, float wheelBrakeVal);
+
     bool toggledLowBeamsForFlash = false;
 }
 
@@ -129,11 +132,29 @@ bool hasAltInputs(Vehicle vehicle) {
 // Forward gear: Throttle accelerates, Brake brakes (exclusive)
 // Reverse gear: Throttle reverses, Brake brakes (exclusive)
 void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
-    bool altInput = hasAltInputs(g_playerVehicle);
-
+    // No altInput, as only Stromberg needs custom assignments
+    
     wheelThrottleVal = pow(wheelThrottleVal, g_settings.Wheel.Throttle.Gamma);
     wheelBrakeVal = pow(wheelBrakeVal, g_settings.Wheel.Brake.Gamma);
 
+    if (VExt::GetModelType(g_playerVehicle) == 5) {
+        HandlePedalsAlt(wheelThrottleVal, wheelBrakeVal);
+    }
+    else {
+        HandlePedalsGround(wheelThrottleVal, wheelBrakeVal);
+    }
+}
+
+void WheelInput::HandlePedalsAlt(float wheelThrottleVal, float wheelBrakeVal) {
+    if (wheelThrottleVal > 0.01f) {
+        SetControlADZAlt(ControlVehicleAccelerate, wheelThrottleVal, g_settings.Wheel.Throttle.AntiDeadZone, true);
+    }
+    if (wheelBrakeVal > 0.01f) {
+        SetControlADZAlt(ControlVehicleBrake, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone, true);
+    }
+}
+
+void WheelInput::HandlePedalsGround(float wheelThrottleVal, float wheelBrakeVal) {
     float speedThreshold = 0.5f;
     const float reverseThreshold = 2.0f;
 
@@ -1040,6 +1061,7 @@ void WheelInput::PlayFFBGround() {
     }
 
     if (g_settings.Debug.DisplayInfo) {
+        UI::ShowText(0.85, 0.250, 0.4, "Ground FFB");
         UI::ShowText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > g_settings.Wheel.FFB.SATMax ? "~r~" : "~w~", satForce), 4);
         UI::ShowText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
         UI::ShowText(0.85, 0.325, 0.4, fmt::format("Damper:\t\t{}", damperForce), 4);
@@ -1060,9 +1082,18 @@ void WheelInput::PlayFFBWater() {
     bool isInWater = ENTITY::GET_ENTITY_SUBMERGED_LEVEL(g_playerVehicle) > 0.10f;
     int damperForce = calculateDamper(50.0f, isInWater ? 0.25f : 1.0f);
     int detailForce = calculateDetail();
-    int satForce = calculateSatNonWheel(750, ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle).z);
 
-    if (!isInWater) {
+    int defaultGain;
+    if (VExt::GetHoverTransformRatio(g_playerVehicle) >= 0.5f) {
+        defaultGain = 100;
+    }
+    else {
+        defaultGain = 750;
+    }
+
+    int satForce = calculateSatNonWheel(defaultGain, ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle).z);
+
+    if (!isInWater && VExt::GetHoverTransformRatio(g_playerVehicle) < 0.5f) {
         satForce = 0;
     }
 
@@ -1072,6 +1103,7 @@ void WheelInput::PlayFFBWater() {
     g_controls.PlayFFBDynamics(totalForce, damperForce);
 
     if (g_settings.Debug.DisplayInfo) {
+        UI::ShowText(0.85, 0.250, 0.4, "Alt FFB");
         UI::ShowText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
         UI::ShowText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
         UI::ShowText(0.85, 0.325, 0.4, fmt::format("Damper:\t{}", damperForce), 4);
