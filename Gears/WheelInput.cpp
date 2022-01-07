@@ -701,6 +701,12 @@ std::vector<WheelInput::SSlipInfo> WheelInput::CalculateSlipInfo() {
     auto wheelCoords = Util::GetWheelCoords(g_playerVehicle);
     auto wheelOffs = VExt::GetWheelOffsets(g_playerVehicle);
 
+    // Only used for when locked up
+    auto wheelAngles = VExt::GetWheelSteeringAngles(g_playerVehicle);
+    auto worldVelAbs = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, false);
+    auto vehForwardVec = ENTITY::GET_ENTITY_FORWARD_VECTOR(g_playerVehicle);
+    float slideAngle = GetAngleBetween(vehForwardVec, worldVelAbs);
+
     for (uint32_t i = 0; i < numWheels; ++i) {
         Vector3 boneVel = boneVels[i];
         Vector3 tracVel = tracVels[i] * -1.0f;
@@ -717,7 +723,17 @@ std::vector<WheelInput::SSlipInfo> WheelInput::CalculateSlipInfo() {
         auto tracVelRelIgnoreZ = tracVelRel;
         tracVelRelIgnoreZ.z = boneVelRel.z;
 
-        float angle = GetAngleBetween(tracVelRelIgnoreZ, boneVelRel);
+        float angle;
+        if (Length(tracVel) == 0.0f && Length(boneVelRel) > 0.0f) {
+            // Locked up: Angle becomes difference between steering and velocity vector
+            angle = slideAngle - wheelAngles[i];
+            // UI::ShowText(0.35f + 0.1f * (float)i, 0.25f, 0.4f,
+            //     fmt::format("Locked up\nSlideAngle: {:.2f}\nWheelAngle[{}]: {:.2f}",
+            //         rad2deg(slideAngle), i, rad2deg(wheelAngles[i])));
+        }
+        else {
+            angle = GetAngleBetween(tracVelRelIgnoreZ, boneVelRel);
+        }
 
         if (std::isnan(angle) || Length(velWorld) == 0.0f) {
             boneVel = Vector3();
@@ -852,8 +868,14 @@ int calculateSat() {
 
         slipRatio += thisSlipRatio;
 
-        // std::max so we ignore divide-by-almost-zero stuff
-        float thisLongSlip = wheelVels[i] / std::max(1.0f, satValues[i].VelocityAmplitude);
+        // std::max to keep thisLongSlip >= 1
+        float thisLongSlip;
+        if (wheelVels[i] >= satValues[i].VelocityAmplitude) {
+            thisLongSlip = wheelVels[i] / std::max(1.0f, satValues[i].VelocityAmplitude);
+        }
+        else {
+            thisLongSlip = satValues[i].VelocityAmplitude / std::max(1.0f, wheelVels[i]);
+        }
         longSlip += thisLongSlip;
         steeredAxleWeight += satValues[i].Weight;
 
