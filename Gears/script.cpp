@@ -1681,10 +1681,27 @@ void functionEngDamage() {
 }
 
 void functionEngLock() {
+    // Checks enough suspension compression and sensible speeds
+    bool use = true;
+    float minSpeed = (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
+
+    for (uint32_t i = 0; i < g_vehData.mWheelCount; ++i) {
+        if (g_vehData.mSuspensionTravel[i] == 0.0f &&
+            VExt::IsWheelPowered(g_playerVehicle, i)) {
+            use = false;
+            break;
+        }
+        if (g_vehData.mWheelTyreSpeeds[i] < minSpeed) {
+            use = false;
+            break;
+        }
+    }
+
     if (g_settings().MTOptions.ShiftMode == EShiftMode::Automatic ||
         g_vehData.mGearCurr == g_vehData.mGearTop ||
         g_gearStates.FakeNeutral ||
-        g_wheelPatchStates.InduceBurnout) {
+        g_wheelPatchStates.InduceBurnout ||
+        !use) {
         g_wheelPatchStates.EngLockActive = false;
         return;
     }
@@ -1761,8 +1778,23 @@ void functionEngLock() {
 }
 
 void functionEngBrake() {
-    // When you let go of the throttle at high RPMs
-    float activeBrakeThreshold = g_settings().MTParams.EngBrakeThreshold;
+    const float activeBrakeThreshold = g_settings().MTParams.EngBrakeThreshold;
+
+    // Checks enough suspension compression and sensible speeds
+    bool use = true;
+    float minSpeed = (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]) * activeBrakeThreshold;
+
+    for (uint32_t i = 0; i < g_vehData.mWheelCount; ++i) {
+        if (g_vehData.mSuspensionTravel[i] == 0.0f &&
+            VExt::IsWheelPowered(g_playerVehicle, i)){
+            use = false;
+            break;
+        }
+        if (g_vehData.mWheelTyreSpeeds[i] < minSpeed) {
+            use = false;
+            break;
+        }
+    }
 
     float throttleMultiplier = 1.0f - g_controls.ThrottleVal;
     float clutchMultiplier = 1.0f - g_controls.ClutchVal;
@@ -1776,7 +1808,7 @@ void functionEngBrake() {
     if (g_wheelPatchStates.EngLockActive || 
         g_wheelPatchStates.InduceBurnout || 
         g_gearStates.FakeNeutral ||
-        g_vehData.mDiffSpeed < 5.0f ||
+        !use ||
         g_vehData.mRPM < activeBrakeThreshold || 
         inputMultiplier < 0.05f) {
         g_wheelPatchStates.EngBrakeActive = false;
