@@ -636,8 +636,8 @@ void update_vehconfigmenu() {
 
     if (g_menu.Option("Create configuration...", 
         { "Create a new, empty current configuration file.",
-          "Changes made within a configuration are saved to that configuration only."
-          "The submenu subtitles indicate what configuration is being edited." })) {
+          "Changes made within a configuration are saved to that configuration only.",
+          "The submenu subtitles indicate which configuration is being edited." })) {
         saveVehicleConfig();
     }
 
@@ -2659,7 +2659,7 @@ void update_compatmenu() {
 
     g_menu.BoolOption("Disable player hiding", g_settings.Debug.DisablePlayerHide,
         { "Disables toggling player visibility by script.",
-            "Useful when another script hide the player." });
+            "Useful when another script hides the player." });
 
     g_menu.BoolOption("Disable FPV camera", g_settings.Debug.DisableFPVCam,
         { "Disables the FPV camera for all cars.",
