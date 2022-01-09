@@ -916,7 +916,9 @@ int calculateSat() {
     float longSlipMult = map(longSlip, 1.0f, 2.0f, 1.0f, 0.0f);
     longSlipMult = std::clamp(longSlipMult, 0.2f, 1.0f);
 
-    float velFac = std::clamp(ENTITY::GET_ENTITY_SPEED(g_playerVehicle), 0.0f, 1.0f);
+    // longSlip gets unstable under ~5 km/h, so dampen it.
+    float mappedSpeed = map(ENTITY::GET_ENTITY_SPEED(g_playerVehicle), 0.5f, 2.0f, 0.0f, 1.0f);
+    float velFac = std::clamp(mappedSpeed, 0.0f, 1.0f);
 
     // Heavier under braking, lighter under no braking, zero when airborne. 1 when stopped, but this defaults to 0 which is also fine.
 
