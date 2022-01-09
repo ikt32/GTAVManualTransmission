@@ -1055,8 +1055,8 @@ void WheelInput::PlayFFBGround() {
     int damperForce = calculateDamper(50.0f, wheelsOffGroundRatio);
 
     // Decrease damper if sat rises, so constantForce doesn't fight against damper
-    float damperMult = 1.0f - std::min(fabs((float)satForce), 10000.0f) / 10000.0f;
-    damperForce = (int)(damperMult * (float)damperForce);
+    //float damperMult = 1.0f - std::min(fabs((float)satForce), 10000.0f) / 10000.0f;
+    //damperForce = (int)(damperMult * (float)damperForce);
 
     // Dampen suspension, minimize damper, minimize SAT
     if (hasAltInputs(g_playerVehicle)) {
