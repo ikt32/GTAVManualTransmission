@@ -59,6 +59,7 @@
 #include <filesystem>
 #include <numeric>
 #include <fstream>
+#include "Memory/VehicleBone.h"
 
 namespace fs = std::filesystem;
 using VExt = VehicleExtensions;
@@ -186,15 +187,17 @@ void functionDash() {
             // battery voltage uses data.temp
         }
         else if (g_settings().DriveAssists.AWD.SpecialFlags & AWD::AWD_REMAP_DIAL_WANTED188_R32) {
-            // oil temperature doesn't remember value set here, so keep track of it ourselves
-            // also reduce range.
+            auto boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "needle_torque");
+            if (boneIdx != -1) {
+                Vector3 rotAxis{};
+                rotAxis.y = 1.0f;
 
-            AWD::GetDisplayValue() = lerp(
-                AWD::GetDisplayValue(),
-                map(AWD::GetTransferValue(), 0.0f, 1.0f, 0.27f, 0.70f),
-                1.0f - pow(0.0001f, MISC::GET_FRAME_TIME()));
+                AWD::GetDisplayValue() = lerp(
+                    AWD::GetDisplayValue(), AWD::GetTransferValue(),
+                    1.0f - pow(0.0001f, MISC::GET_FRAME_TIME()));
 
-            data.oilTemperature = AWD::GetDisplayValue();
+                VehicleBones::RotateAxisAbsolute(g_playerVehicle, boneIdx, rotAxis, AWD::GetDisplayValue());
+            }
         }
     }
 
