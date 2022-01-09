@@ -808,6 +808,9 @@ void clearPatches() {
 }
 
 void toggleManual(bool enable) {
+    g_gearRattle1.Stop();
+    g_gearRattle2.Stop();
+
     // Don't need to do anything
     if (g_settings.MTOptions.Enable == enable)
         return;
