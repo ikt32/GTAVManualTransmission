@@ -518,7 +518,7 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
 
         currentEffectAttempt = "damper";
         hr = e->Device->CreateEffect(
-            GUID_Damper,
+            GUID_Friction,
             &ffbEffectInfo[device][ffAxis].DamperEffect,
             &ffbEffectInfo[device][ffAxis].DamperEffectInterface,
             nullptr);
