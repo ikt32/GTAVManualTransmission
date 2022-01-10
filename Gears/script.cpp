@@ -300,6 +300,14 @@ void update_vehicle() {
         g_gearRattle1.Stop();
         g_gearRattle2.Stop();
         updateActiveSteeringAnim(g_playerVehicle);
+
+        if (g_playerVehicle != 0) {
+            VExt::SetSteeringAngle(g_playerVehicle, 0.0f);
+            VExt::SetSteeringInputAngle(g_playerVehicle, 0.0f);
+
+            VehicleBones::RegisterMatrix(g_playerVehicle, "needle_torque");
+            VehicleBones::RegisterMatrix(g_playerVehicle, "steeringwheel");
+        }
     }
 
     if (vehAvail) {

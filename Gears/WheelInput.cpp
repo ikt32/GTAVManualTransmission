@@ -566,10 +566,6 @@ void WheelInput::DoSteering() {
             if (abs(rotRad) > steerClamp / 2.0f) {
                 rotRad = std::clamp(rotRad, -steerClamp / 2.0f, steerClamp / 2.0f);
             }
-            float rotRadRaw = rotRad;
-            // Setting angle using the VExt:: calls above causes the angle to overshoot the "real" coords
-            // Not sure if this is the best solution, but hey, it works!
-            rotRad -= 2.0f * std::clamp(effSteer, -1.0f, 1.0f) * VExt::GetMaxSteeringAngle(g_playerVehicle);
 
             Vector3 scale{ 1.0f, 0, 1.0f, 0, 1.0f, 0 };
             if (g_settings.Misc.HideWheelInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4) {
@@ -578,9 +574,9 @@ void WheelInput::DoSteering() {
                 scale.z = 0.0f;
             }
 
-            VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotRad);
+            VehicleBones::RotateAxisAbsolute(g_playerVehicle, boneIdx, rotAxis, rotRad);
             VehicleBones::Scale(g_playerVehicle, boneIdx, scale);
-            SteeringAnimation::SetRotation(rotRadRaw);
+            SteeringAnimation::SetRotation(rotRad);
         }
     }
     if (g_vehData.mClass != VehicleClass::Car || altInputs){

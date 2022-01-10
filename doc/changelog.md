@@ -1,8 +1,8 @@
 # Changelog
 
-## 5.x.x
+## 5.5.0
 
-Rework force feedback:
+Overhaul force feedback (again):
 
 * Force feedback is now based on slip angle of each wheel
 * Force feedback takes weight transfer in account now
@@ -20,6 +20,8 @@ Misc:
 * Use more accurate data source for Stability Control understeer
 * Allow more wheel rotation, up to 2880 degrees
 * Fix ineffective braking when reversing when using wheel
+* Improve wheel bone rotation precision
+* Update support for Wanted188's R32
 
 ## 5.4.2
 
