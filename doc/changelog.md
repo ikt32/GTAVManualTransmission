@@ -8,16 +8,15 @@ Overhaul force feedback (again):
 * Force feedback takes weight transfer in account now
 * Add response curve visualizer in FFB setup
 
-Rework traction control (brake mode):
+Improve driving assists:
 
-* Use more accurate data sources
+* Use more accurate data sources to determine slip
 * Fix brake force not scaled to handling brake force
 * Fix TCS UI elements lingering when no throttle applied, if other throttle effects are active
 
 Misc:
 
 * Add downshift protection option
-* Use more accurate data source for Stability Control understeer
 * Allow more wheel rotation, up to 2880 degrees
 * Fix ineffective braking when reversing when using wheel
 * Improve wheel bone rotation precision
