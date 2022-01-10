@@ -109,6 +109,9 @@ GameSound g_gearRattle1("DAMAGED_TRUCK_IDLE", "", "");
 // primitively double the volume...
 GameSound g_gearRattle2("DAMAGED_TRUCK_IDLE", "", "");
 
+// TODO: Move to own file
+float g_lastSpeedoRotation = 0.0f;
+
 void updateShifting();
 void blockButtons();
 void startStopEngine();
@@ -197,6 +200,25 @@ void functionDash() {
                     1.0f - pow(0.0001f, MISC::GET_FRAME_TIME()));
 
                 VehicleBones::RotateAxisAbsolute(g_playerVehicle, boneIdx, rotAxis, AWD::GetDisplayValue());
+            }
+
+            boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "needle_speedo");
+            if (boneIdx != -1) {
+                Vector3 rotAxis{};
+                rotAxis.y = 1.0f; 
+
+                float rotation = map(abs(g_vehData.mDiffSpeed), 0.0f, 51.0f, 0.0f, deg2rad(240.0f));
+
+                float maxDelta = MISC::GET_FRAME_TIME() * 1.0f;
+
+                if (abs(rotation - g_lastSpeedoRotation) > maxDelta)
+                    rotation = g_lastSpeedoRotation + maxDelta * sgn(rotation - g_lastSpeedoRotation);
+
+                g_lastSpeedoRotation = rotation;
+
+                rotation = std::clamp(g_lastSpeedoRotation, 0.0f, deg2rad(240.0f));
+
+                VehicleBones::RotateAxisAbsolute(g_playerVehicle, boneIdx, rotAxis, rotation);
             }
         }
     }
@@ -305,6 +327,7 @@ void update_vehicle() {
             VExt::SetSteeringAngle(g_playerVehicle, 0.0f);
             VExt::SetSteeringInputAngle(g_playerVehicle, 0.0f);
 
+            VehicleBones::RegisterMatrix(g_playerVehicle, "needle_speedo");
             VehicleBones::RegisterMatrix(g_playerVehicle, "needle_torque");
             VehicleBones::RegisterMatrix(g_playerVehicle, "steeringwheel");
         }
