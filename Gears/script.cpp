@@ -104,10 +104,9 @@ Timer g_wheelInitDelayTimer(0);
 
 std::vector<ValueTimer<float>> g_speedTimers;
 
-// sadly there's no initial BONK, but the sound works.
-GameSound g_gearRattle1("DAMAGED_TRUCK_IDLE", "", "");
-// primitively double the volume...
-GameSound g_gearRattle2("DAMAGED_TRUCK_IDLE", "", "");
+GameSound g_gearRattle1("DAMAGED_TRUCK_IDLE", "", ""); // sadly there's no initial BONK, but the sound works.
+GameSound g_gearRattle2("DAMAGED_TRUCK_IDLE", "", ""); // primitively double the volume...
+GameSound g_downshiftProtectSfx("CONFIRM_BEEP", "HUD_MINI_GAME_SOUNDSET", "");
 
 // TODO: Move to own file
 float g_lastSpeedoRotation = 0.0f;
@@ -1303,6 +1302,9 @@ void functionSShift() {
         if (g_settings().ShiftOptions.DownshiftProtect &&
             expectedRPM > 1.0f) {
             g_gearStates.DownshiftProtection = true;
+
+            if (g_settings.HUD.DsProt.Enable)
+                g_downshiftProtectSfx.Play();
             return;
         }
 
