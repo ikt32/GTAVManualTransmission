@@ -237,6 +237,7 @@ public:
         } DashIndicators;
 
         struct {
+            bool Enable = true;
             float XPos = 0.500f;
             float YPos = 0.300f;
             float Size = 0.050f;

@@ -465,8 +465,8 @@ void update_shiftingoptionsmenu() {
         { "Helps rev matching.",
             "Only applies to sequential mode." });
     g_menu.BoolOption("Downshift protection", g_settings().ShiftOptions.DownshiftProtect,
-        { "Prevents downshifting causing overrevving.",
-            "Only applies to sequential mode." });
+        { "Prevents downshifting causing overrevving. Only applies to sequential mode.",
+            "Customize protection warning in the HUD options." });
     g_menu.FloatOption("Clutch rate multiplier", g_settings().ShiftOptions.ClutchRateMult, 0.05f, 20.0f, 0.05f,
         { "Change how fast clutching is. Below 1 is slower, higher than 1 is faster.",
             "Applies to sequential and automatic mode." });
@@ -1490,7 +1490,7 @@ void update_hudmenu() {
     g_menu.MenuOption("Dashboard indicators", "dashindicatormenu", 
         { "Indicator icons for ABS, TCS, ESC and the hand brake." });
     g_menu.MenuOption("Downshift protection", "dsprotmenu",
-        { "Where the downshift protection notification should appear." });
+        { "If and where the downshift protection notification should appear." });
     g_menu.MenuOption("Mouse steering", "mousehudmenu");
 }
 
@@ -1662,6 +1662,9 @@ void update_dsprotmenu() {
         0.5f, 0.5f, // center of texture
         g_settings.HUD.DsProt.XPos, g_settings.HUD.DsProt.YPos,
         0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
+
+    g_menu.BoolOption("Enable", g_settings.HUD.DsProt.Enable,
+        { "When enabled, a warning flashes and a warning sound plays." });
 
     g_menu.FloatOption("Position X", g_settings.HUD.DsProt.XPos, 0.0f, 1.0f, 0.005f);
     g_menu.FloatOption("Position Y", g_settings.HUD.DsProt.YPos, 0.0f, 1.0f, 0.005f);

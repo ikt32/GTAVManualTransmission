@@ -264,6 +264,7 @@ void ScriptSettings::SaveGeneral() {
     SAVE_VAL("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
     SAVE_VAL("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
 
+    SAVE_VAL("HUD", "DsProtEnable", HUD.DsProt.Enable);
     SAVE_VAL("HUD", "DsProtXpos", HUD.DsProt.XPos);
     SAVE_VAL("HUD", "DsProtYpos", HUD.DsProt.YPos);
     SAVE_VAL("HUD", "DsProtSize", HUD.DsProt.Size);
@@ -595,6 +596,7 @@ void ScriptSettings::parseSettingsGeneral() {
     LOAD_VAL("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
     LOAD_VAL("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
 
+    LOAD_VAL("HUD", "DsProtEnable", HUD.DsProt.Enable);
     LOAD_VAL("HUD", "DsProtXpos", HUD.DsProt.XPos);
     LOAD_VAL("HUD", "DsProtYpos", HUD.DsProt.YPos);
     LOAD_VAL("HUD", "DsProtSize", HUD.DsProt.Size);

@@ -266,7 +266,7 @@ void drawDashLights() {
         0, 0, 0, 127, 0);
 
     // Downshift protection is in the center of the screen.
-    if (dsProt) {
+    if (g_settings.HUD.DsProt.Enable && dsProt) {
         drawTexture(g_textureDsProtId, 0, -9998, 100,
             g_settings.HUD.DsProt.Size, g_settings.HUD.DsProt.Size,
             0.5f, 0.5f, // center of texture
