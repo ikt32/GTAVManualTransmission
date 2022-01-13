@@ -110,10 +110,15 @@ namespace {
         "None"
     };
 
-    std::vector<std::string> camAttachPoints {
+    const std::vector<std::string> camAttachPoints {
         "Player head",
         "Vehicle (1)",
         "Vehicle (2)"
+    };
+
+    const std::vector<std::string> ffbCurveTypes{
+        "Gamma",
+        "Boosted",
     };
 
     std::vector<std::string> diDevicesInfo{ "Press Enter to refresh." };
@@ -713,6 +718,10 @@ void update_controlsvehconfmenu() {
     g_menu.FloatOptionCb("ES: Steering multiplier", g_settings().Steering.CustomSteering.SteeringMult, 0.01f, 2.0f, 0.01f, getKbEntry,
         { "Enhanced Steering: Increase or decrease actual max steering angle." });
 
+    if (g_menu.FloatOptionCb("Wheel: FFB SAT mult", g_settings().Steering.Wheel.SATMult, 0.05f, 10.0f, 0.05f, getKbEntry,
+        { "Vehicle-specific SAT adjustment. Same comments apply as in the FFB section." })) {
+    }
+
     g_menu.FloatOptionCb("Wheel: Soft lock", g_settings().Steering.Wheel.SoftLock, 180.0f, 2880.0f, 30.0f, getKbEntry,
         { "Steering range for your real wheel, in degrees. Reduce for quicker steering." });
 
@@ -1160,12 +1169,7 @@ void update_axesmenu() {
     }
 }
 
-std::vector<std::string> showDynamicFfbCurve(float input, float gamma) {
-    // From WheelInput.cpp:calcSlipRatio
-    auto func = [](float x, float gamma) {
-        return x + (1.0f - x) * (pow(x, gamma) * ((gamma + 1.0f) - gamma * x));
-    };
-
+std::vector<std::string> showDynamicFfbCurve(float input, float gamma, int responseType) {
     std::string larr = "< ";
     std::string rarr = " >";
     if (gamma >= 5.0f - 0.01f) rarr = "";
@@ -1182,7 +1186,7 @@ std::vector<std::string> showDynamicFfbCurve(float input, float gamma) {
     std::vector<std::pair<float, float>> points;
     for (int i = 0; i < max_samples; i++) {
         float x = static_cast<float>(i) / static_cast<float>(max_samples);
-        float y = func(x, gamma);
+        float y = WheelInput::GetProfiledFFBValue(x, gamma, responseType);
         points.emplace_back(x, y);
     }
 
@@ -1208,7 +1212,10 @@ std::vector<std::string> showDynamicFfbCurve(float input, float gamma) {
             255, 255, 255, 255, 0);
     }
 
-    std::pair<float, float> currentPoint = { input, func(input, gamma) };
+    std::pair<float, float> currentPoint = {
+        input,
+        WheelInput::GetProfiledFFBValue(input, gamma, responseType)
+    };
     float pointX = rectX - 0.5f * rectW + currentPoint.first * rectW;
     float pointY = rectY + 0.5f * rectH - currentPoint.second * rectH;
     GRAPHICS::DRAW_RECT(pointX, pointY,
@@ -1225,12 +1232,16 @@ void update_forcefeedbackmenu() {
     g_menu.BoolOption("Enable", g_settings.Wheel.FFB.Enable,
         { "Enable or disable force feedback entirely." });
 
-    g_menu.FloatOption("Self aligning torque multiplier", g_settings.Wheel.FFB.SATAmpMult, 0.1f, 10.0f, 0.05f,
-        { "Force feedback strength for steering. Increase for weak wheels, decrease for strong/fast wheels.",
-        "Putting this too high clips force feedback. Too low and the car doesn't feel responsive." });
+    g_menu.FloatOption("FFB SAT scale", g_settings.Wheel.FFB.SATAmpMult, 0.05f, 10.0f, 0.05f,
+        { "Overall FFB scaling for self-aligning torque.",
+            "Recommended to leave at 1.0 and use FFB response to tune FFB.",
+            "Values over 1.0 clips FFB. Lower values decrease overall SAT FFB strength.",
+            "Use 'Vehicle specific' in main Controls section to decrease FFB for specific vehicles if desired." });
 
-    g_menu.IntOption("Self aligning torque limit", g_settings.Wheel.FFB.SATMax, 0, 10000, 100,
-        { "Clamp effect amplitude to this value. 10000 is the technical limit." });
+    g_menu.StringArray("FFB linearity type", { ffbCurveTypes }, g_settings.Wheel.FFB.FFBProfile,
+        { "Both types allow modifying the FFB response.",
+            "Gamma normally adjusts the curve.",
+            "Boosted has a default initial ramp-up." });
 
     bool showDynamicFfbCurveBox = false;
     if (g_menu.OptionPlus(fmt::format("FFB response curve: < {:.2f} >", g_settings.Wheel.FFB.ResponseCurve), {}, &showDynamicFfbCurveBox,
@@ -1247,7 +1258,9 @@ void update_forcefeedbackmenu() {
     }
 
     if (showDynamicFfbCurveBox) {
-        auto extras = showDynamicFfbCurve(abs(WheelInput::GetFFBConstantForce()), g_settings.Wheel.FFB.ResponseCurve);
+        auto extras = showDynamicFfbCurve(abs(WheelInput::GetFFBConstantForce()),
+                                          g_settings.Wheel.FFB.ResponseCurve,
+                                          g_settings.Wheel.FFB.FFBProfile);
         g_menu.OptionPlusPlus(extras, "Response Curve");
     }
 
@@ -1321,13 +1334,13 @@ void update_forcefeedbackmenu() {
         });
     }
 
-    if (g_settings.Debug.DisplayInfo) {
+    if (g_settings.Debug.ShowAdvancedFFBOptions) {
         g_menu.MenuOption("FFB normalization options", "ffbnormalizationmenu",
             { "Different fTractionCurveLateral values affect FFB response, these values are used to normalize steering forces." });
 
         g_menu.OptionPlus("Legacy FFB options:",
-            { "Used to adjust FFB for non-ground vehicle controls.",
-              "This is based on movement versus steering inputs, instead of tyre/wheel data." });
+            { "This is an old FFB implementation, based on movement versus steering inputs.",
+              "Road vehicles use better FFB with wheel data, but old FFB is still used for non-road vehicles." });
 
         g_menu.FloatOption("SAT factor", g_settings.Wheel.FFB.SATFactor, 0.0f, 1.0f, 0.01f,
             { "Reactive force offset/multiplier, when not going straight.",
@@ -1353,7 +1366,8 @@ void update_ffbnormalizationmenu() {
           "Higher optimal slip angles cause FFB to respond slowly to small changes, lower optimal slip angles cause FFB to respond quick to small changes.",
           "These values normalize this, to make the high slip values used by default GTA V handlings to respond quickly.",
           "For the best experience, use a custom handling with low fTractionCurveMin/Max and low fTractionCurveLateral values.",
-          "Defaults: 7.5/1.6, 20.0/1.0"});
+          "Defaults: 7.5/1.6, 20.0/1.0",
+          "No correction: 10.0/1.0, 20.0/1.0"});
 
     g_menu.FloatOptionCb("Optimal slip low", g_settings.Wheel.FFB.SlipOptMin, 0.0f, 90.0f, 0.1f, getKbEntry);
     g_menu.FloatOptionCb("Optimal slip low mult", g_settings.Wheel.FFB.SlipOptMinMult, 0.0f, 10.0f, 0.1f, getKbEntry,
@@ -2516,6 +2530,8 @@ void update_debugmenu() {
     g_menu.Title("Debug settings");
     g_menu.Subtitle("Under the hood");
 
+    g_menu.BoolOption("Show advanced FFB options", g_settings.Debug.ShowAdvancedFFBOptions,
+        { "Show advanced and legacy options in FFB menu." });
     g_menu.BoolOption("Display debug info", g_settings.Debug.DisplayInfo,
         { "Show all detailed technical info of the gearbox and inputs calculations." });
     g_menu.BoolOption("Display wheel drive info", g_settings.Debug.DisplayWheelInfo,

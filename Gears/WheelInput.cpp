@@ -796,12 +796,7 @@ float calcSlipRatio(float slip, float slipOpt,
 
         float rNorm = g_settings.Wheel.FFB.ResponseCurve * normVal;
 
-
-        // Increase the force quick, then rise towards 1.
-        // x + (1 - x) * (the rest): Make the initial part steeper than linear y=x
-        // x^rNorm * ((rNorm+1)-rNorm*x): Gently ramp up, then rise, then gently ramp off
-        // Put together: Linear ramp up, rise, quickly ramp off towards 1.0
-        slipRatio = x + (1.0f - x) * (pow(x, rNorm) * ((rNorm + 1.0f) - rNorm * x));
+        slipRatio = WheelInput::GetProfiledFFBValue(x, rNorm, g_settings.Wheel.FFB.FFBProfile);
     }
 
     return slipRatio * sgn(slip);
@@ -940,7 +935,10 @@ int calculateSat() {
 
     float weightTransferFactor = steeredAxleWeight / frontAxleDesignWeight;
 
-    float satForce = g_settings.Wheel.FFB.SATAmpMult * 10000.0f * slipRatio * velFac * weightTransferFactor * longSlipMult;
+    float satForce = 
+        g_settings.Wheel.FFB.SATAmpMult *
+        g_settings().Steering.Wheel.SATMult * 
+        10000.0f * slipRatio * velFac * weightTransferFactor * longSlipMult;
 
     if (g_settings.Wheel.FFB.LUTFile.empty()) {
         float adf = static_cast<float>(g_settings.Wheel.FFB.AntiDeadForce);
@@ -951,8 +949,7 @@ int calculateSat() {
             satForce = map(satForce, -10000.0f, -0.0f, -10000.0f, -adf);
         }
     }
-    float satMax = static_cast<float>(g_settings.Wheel.FFB.SATMax);
-    satForce = std::clamp(satForce, -satMax, satMax);
+
     return static_cast<int>(satForce);
 }
 
@@ -1005,8 +1002,7 @@ int calculateSatNonWheel(int defaultGain, float steeringAngle) {
             satForce = map(satForce, -10000.0f, -0.0f, -10000.0f, -adf);
         }
     }
-    float satMax = static_cast<float>(g_settings.Wheel.FFB.SATMax);
-    satForce = std::clamp(satForce, -satMax, satMax);
+
     if (Math::Near(speed, 0.0f, 0.1f)) {
         satForce *= speed;
     }
@@ -1085,7 +1081,7 @@ void WheelInput::PlayFFBGround() {
 
     if (g_settings.Debug.DisplayInfo) {
         UI::ShowText(0.85, 0.250, 0.4, "Ground FFB");
-        UI::ShowText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > g_settings.Wheel.FFB.SATMax ? "~r~" : "~w~", satForce), 4);
+        UI::ShowText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
         UI::ShowText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
         UI::ShowText(0.85, 0.325, 0.4, fmt::format("Damper:\t\t{}", damperForce), 4);
         UI::ShowText(0.85, 0.350, 0.4, fmt::format("Detail:\t\t{}", detailForce), 4);
@@ -1130,5 +1126,19 @@ void WheelInput::PlayFFBWater() {
         UI::ShowText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
         UI::ShowText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
         UI::ShowText(0.85, 0.325, 0.4, fmt::format("Damper:\t{}", damperForce), 4);
+    }
+}
+
+float WheelInput::GetProfiledFFBValue(float x, float gamma, int profileMode) {
+    if (profileMode == 0) {
+        // Increase the force quick, then rise towards 1.
+        // x + (1 - x) * (the rest): Make the initial part steeper than linear y=x
+        // x^rNorm * ((rNorm+1)-rNorm*x): Gently ramp up, then rise, then gently ramp off
+        // Put together: Linear ramp up, rise, quickly ramp off towards 1.0
+        return x + (1.0f - x) * (pow(x, gamma) * ((gamma + 1.0f) - gamma * x));
+    }
+    else {
+        // Simple gamma
+        return pow(x, gamma);
     }
 }

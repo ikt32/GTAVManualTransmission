@@ -307,6 +307,7 @@ void ScriptSettings::SaveGeneral() {
     SAVE_VAL("DEBUG", "DisplayTractionInfo", Debug.DisplayTractionInfo);
     SAVE_VAL("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
     SAVE_VAL("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
+    SAVE_VAL("DEBUG", "ShowAdvancedFFBOptions", Debug.ShowAdvancedFFBOptions);
 
     SAVE_VAL("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
     SAVE_VAL("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
@@ -382,7 +383,6 @@ void ScriptSettings::SaveWheel() const {
     // [FORCE_FEEDBACK]
     SAVE_VAL("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
     SAVE_VAL("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
-    SAVE_VAL("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
     SAVE_VAL("FORCE_FEEDBACK", "DamperMax", Wheel.FFB.DamperMax);
     SAVE_VAL("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin);
     SAVE_VAL("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
@@ -392,6 +392,7 @@ void ScriptSettings::SaveWheel() const {
     SAVE_VAL("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
     SAVE_VAL("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
 
+    SAVE_VAL("FORCE_FEEDBACK", "FFBProfile", Wheel.FFB.FFBProfile);
     SAVE_VAL("FORCE_FEEDBACK", "ResponseCurve", Wheel.FFB.ResponseCurve);
     SAVE_VAL("FORCE_FEEDBACK", "SlipOptMin", Wheel.FFB.SlipOptMin);
     SAVE_VAL("FORCE_FEEDBACK", "SlipOptMinMult", Wheel.FFB.SlipOptMinMult);
@@ -639,6 +640,7 @@ void ScriptSettings::parseSettingsGeneral() {
     LOAD_VAL("DEBUG", "DisplayTractionInfo", Debug.DisplayTractionInfo);
     LOAD_VAL("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
     LOAD_VAL("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
+    LOAD_VAL("DEBUG", "ShowAdvancedFFBOptions", Debug.ShowAdvancedFFBOptions);
 
     LOAD_VAL("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
     LOAD_VAL("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
@@ -843,7 +845,6 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     // [FORCE_FEEDBACK]
     LOAD_VAL("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
     LOAD_VAL("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
-    LOAD_VAL("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
     LOAD_VAL("FORCE_FEEDBACK", "DamperMax", Wheel.FFB.DamperMax);
     LOAD_VAL("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin);
     LOAD_VAL("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
@@ -854,6 +855,7 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     LOAD_VAL("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
     Wheel.FFB.LUTFile = ini.GetValue("FORCE_FEEDBACK", "LUTFile", "");
 
+    SAVE_VAL("FORCE_FEEDBACK", "FFBProfile", Wheel.FFB.FFBProfile);
     LOAD_VAL("FORCE_FEEDBACK", "ResponseCurve", Wheel.FFB.ResponseCurve);
     LOAD_VAL("FORCE_FEEDBACK", "SlipOptMin", Wheel.FFB.SlipOptMin);
     LOAD_VAL("FORCE_FEEDBACK", "SlipOptMinMult", Wheel.FFB.SlipOptMinMult);

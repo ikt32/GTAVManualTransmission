@@ -317,6 +317,7 @@ public:
         bool DisplayMaterialInfo = false;
         bool DisplayTractionInfo = false;
         bool DisplayNPCInfo = false;
+        bool ShowAdvancedFFBOptions = false;
 
         bool DisableInputDetect = false;
         bool DisablePlayerHide = false;
@@ -360,7 +361,6 @@ public:
             bool Enable = true;
 
             float SATAmpMult = 1.00f;
-            int SATMax = 10000;
 
             int DamperMax = 100;
             int DamperMin = 40;
@@ -375,6 +375,7 @@ public:
             std::string LUTFile;
 
             // Ground physics
+            int FFBProfile = 0;
             float ResponseCurve = 0.75f;
             float SlipOptMin = 7.5f;        // Advanced
             float SlipOptMinMult = 1.6f;    // Advanced

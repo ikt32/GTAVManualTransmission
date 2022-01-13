@@ -29,6 +29,7 @@ void DoSteering();
 ///////////////////////////////////////////////////////////////////////////////
 
 float GetFFBConstantForce();
+float GetProfiledFFBValue(float x, float gamma, int profileMode);
 
 struct SSlipInfo {
     float Angle;
