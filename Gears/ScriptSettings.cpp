@@ -288,6 +288,8 @@ void ScriptSettings::SaveGeneral() {
 
     // [MISC]
     SAVE_VAL("MISC", "UDPTelemetry", Misc.UDPTelemetry);
+    SAVE_VAL("MISC", "UDPAddres", Misc.UDPAddres);
+    SAVE_VAL("MISC", "UDPPort", Misc.UDPPort);
     SAVE_VAL("MISC", "DashExtensions", Misc.DashExtensions);
     SAVE_VAL("MISC", "SyncAnimations", Misc.SyncAnimations);
     SAVE_VAL("MISC", "HidePlayerInFPV", Misc.HidePlayerInFPV);
@@ -621,6 +623,8 @@ void ScriptSettings::parseSettingsGeneral() {
 
     // [MISC]
     LOAD_VAL("MISC", "UDPTelemetry", Misc.UDPTelemetry);
+    LOAD_VAL("MISC", "UDPAddres", Misc.UDPAddres);
+    LOAD_VAL("MISC", "UDPPort", Misc.UDPPort);
     LOAD_VAL("MISC", "DashExtensions", Misc.DashExtensions);
     LOAD_VAL("MISC", "SyncAnimations", Misc.SyncAnimations);
     LOAD_VAL("MISC", "HidePlayerInFPV", Misc.HidePlayerInFPV);

@@ -4,13 +4,16 @@
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <string>
 
 class Socket {
 public:
     Socket() = default;
 
-    void Start(u_short destPort) {
-        logger.Write(INFO, "[Telemetry] Starting UDP on 127.0.0.1:20777");
+    void Start(const std::string& address, u_short destPort) {
+        const char* addressStr = address.c_str();
+
+        logger.Write(INFO, "[Telemetry] Starting UDP on %s:%d", addressStr, destPort);
         mStarted = false;
         WSAData data{};
         int result = WSAStartup(MAKEWORD(2, 2), &data);
@@ -21,7 +24,7 @@ public:
         }
 
         mLocal.sin_family = AF_INET;
-        result = inet_pton(AF_INET, "127.0.0.1", &mLocal.sin_addr);
+        result = inet_pton(AF_INET, addressStr, &mLocal.sin_addr);
         if (result != 1) {
             logger.Write(ERROR, "[Telemetry] inet_pton result was [%d]", result);
             logger.Write(ERROR, "[Telemetry] inet_pton error was [%d]", WSAGetLastError());
@@ -31,7 +34,7 @@ public:
         mLocal.sin_port = 0; // choose any
 
         mDest.sin_family = AF_INET;
-        inet_pton(AF_INET, "127.0.0.1", &mDest.sin_addr);
+        inet_pton(AF_INET, addressStr, &mDest.sin_addr);
         if (result != 1) {
             logger.Write(ERROR, "[Telemetry] inet_pton result was [%d]", result);
             logger.Write(ERROR, "[Telemetry] inet_pton error was [%d]", WSAGetLastError());

@@ -2231,8 +2231,10 @@ void update_miscoptionsmenu() {
         { "If DashHook is installed, the script controls some dashboard lights such as the ABS light." });
 
     if (g_menu.BoolOption("Enable UDP telemetry", g_settings.Misc.UDPTelemetry,
-        { "Allows programs like SimHub to use data from this script."
-            "This script uses DIRT 4 format for telemetry data." })) {
+        { "Allows programs like SimHub to use data from this script.",
+            "This script uses the DIRT 4 format for telemetry data.",
+            fmt::format("{}:{}", g_settings.Misc.UDPAddres, g_settings.Misc.UDPPort),
+            "Restart the game if the endpoints are changed." })) {
         StartUDPTelemetry();
     }
 }

@@ -2653,7 +2653,7 @@ void functionAudioFX() {
 void StartUDPTelemetry() {
     if (g_settings.Misc.UDPTelemetry)
         if (!g_socket.Started())
-            g_socket.Start(20777);
+            g_socket.Start(g_settings.Misc.UDPAddres, g_settings.Misc.UDPPort);
 }
 
 void update_UDPTelemetry() {
