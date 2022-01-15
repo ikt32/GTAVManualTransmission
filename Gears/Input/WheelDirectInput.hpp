@@ -77,7 +77,7 @@ public:
     void ClearLut();
     void AssignLut(const std::map<float, float>& rawLut);
 
-    std::optional<DirectInputDeviceInfo> GetDeviceInfo(GUID guid);
+    DirectInputDeviceInfo* GetDeviceInfo(GUID guid);
     const std::unordered_map<GUID, DirectInputDeviceInfo>& GetDevices();
 
     bool InitWheel();
@@ -151,7 +151,10 @@ private:
     std::unordered_map<GUID, std::array<std::array<float, AVGSAMPLES>, SIZEOF_DIAxis>> samples { 0 };
 
     std::unordered_map<GUID, std::array<int, SIZEOF_DIAxis>> averageIndex { 0 };
-    std::unordered_map<GUID, std::array<FFBEffects, SIZEOF_DIAxis>> ffbEffectInfo;
+
+    GUID ffbDevice = GUID_NULL;
+    DIAxis ffbAxis = DIAxis::UNKNOWN_AXIS;
+    FFBEffects ffbEffectInfo{};
 
     LPDIRECTINPUT mDirectInput = nullptr;
 

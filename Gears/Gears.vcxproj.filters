@@ -561,6 +561,9 @@
     <ClInclude Include="..\thirdparty\GTAVCustomTorqueMap\GTAVCustomTorqueMap\CustomTorqueMap.hpp">
       <Filter>Lib\External Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Input\DirectInputError.h">
+      <Filter>Input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

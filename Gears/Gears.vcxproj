@@ -265,6 +265,7 @@
     <ClInclude Include="CustomSteering.h" />
     <ClInclude Include="DrivingAssists.h" />
     <ClInclude Include="InputConfiguration.h" />
+    <ClInclude Include="Input\DirectInputError.h" />
     <ClInclude Include="Input\NativeInput.h" />
     <ClInclude Include="Input\USBNotify.h" />
     <ClInclude Include="LaunchControl.h" />
