@@ -836,6 +836,7 @@ int calculateSat() {
     float slipRatio = 0.0f;
     float steeredWheelsDiv = 0.0f;
     float steeredAxleWeight = 0.0f;
+    float maxSteeredWheelWeight = 0.0f;
 
     auto tyreGrips = VExt::GetTyreGrips(g_playerVehicle);
     auto wetGrips = VExt::GetWetGrips(g_playerVehicle);
@@ -872,6 +873,9 @@ int calculateSat() {
         }
         longSlip += thisLongSlip;
         steeredAxleWeight += satValues[i].Weight;
+
+        if (satValues[i].Weight > maxSteeredWheelWeight)
+            maxSteeredWheelWeight = satValues[i].Weight;
 
         steeredWheelsDiv += 1.0f;
         if (g_settings.Debug.DisplayInfo) {
@@ -933,7 +937,8 @@ int calculateSat() {
 
     float frontAxleDesignWeight = mass * comBiasFront;
 
-    float weightTransferFactor = steeredAxleWeight / frontAxleDesignWeight;
+    //float weightTransferFactor = steeredAxleWeight / frontAxleDesignWeight;
+    float weightTransferFactor = maxSteeredWheelWeight / (frontAxleDesignWeight/2.0f);
 
     float satForce = 
         g_settings.Wheel.FFB.SATAmpMult *
