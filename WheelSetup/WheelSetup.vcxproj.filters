@@ -64,6 +64,9 @@
     <ClInclude Include="..\Gears\SettingsCommon.h">
       <Filter>Gears</Filter>
     </ClInclude>
+    <ClInclude Include="..\Gears\Util\Timer.h">
+      <Filter>Gears\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Gears\ScriptSettings.cpp">
@@ -106,6 +109,9 @@
     <ClCompile Include="..\Gears\VehicleConfig.cpp" />
     <ClCompile Include="..\Gears\SettingsCommon.cpp">
       <Filter>Gears</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Gears\Util\Timer.cpp">
+      <Filter>Gears\Util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
