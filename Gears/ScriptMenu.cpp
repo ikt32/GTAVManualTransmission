@@ -117,8 +117,8 @@ namespace {
     };
 
     const std::vector<std::string> ffbCurveTypes{
-        "Gamma",
         "Boosted",
+        "Gamma/Linear",
     };
 
     std::vector<std::string> diDevicesInfo{ "Press Enter to refresh." };

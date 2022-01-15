@@ -855,7 +855,7 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
     LOAD_VAL("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
     Wheel.FFB.LUTFile = ini.GetValue("FORCE_FEEDBACK", "LUTFile", "");
 
-    SAVE_VAL("FORCE_FEEDBACK", "FFBProfile", Wheel.FFB.FFBProfile);
+    LOAD_VAL("FORCE_FEEDBACK", "FFBProfile", Wheel.FFB.FFBProfile);
     LOAD_VAL("FORCE_FEEDBACK", "ResponseCurve", Wheel.FFB.ResponseCurve);
     LOAD_VAL("FORCE_FEEDBACK", "SlipOptMin", Wheel.FFB.SlipOptMin);
     LOAD_VAL("FORCE_FEEDBACK", "SlipOptMinMult", Wheel.FFB.SlipOptMinMult);
