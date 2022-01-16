@@ -753,14 +753,13 @@ void update_wheelmenu() {
     g_menu.Title("Wheel & pedals");
     auto wheelGuid = g_controls.WheelAxes[static_cast<int>(CarControls::WheelAxisType::Steer)].Guid;
     auto deviceEntry = g_controls.GetWheel().GetDeviceInfo(wheelGuid);
-    std::string wheelName = "No wheel in use";
+    std::string wheelName = "No wheel set up";
     if (deviceEntry) {
         wheelName = deviceEntry->DeviceInstance.tszInstanceName;
     }
     g_menu.Subtitle(wheelName);
 
-    if (!g_controls.FreeDevices.empty())
-    {
+    if (!g_controls.FreeDevices.empty()) {
         for (const auto& device : g_controls.FreeDevices) {
             if (g_menu.Option(device.name, NativeMenu::solidGreen,
                 { "~r~<b>This device can be used as input device!</b>~w~",
@@ -781,7 +780,8 @@ void update_wheelmenu() {
     }
 
     if (g_menu.BoolOption("Logitech RPM LEDs", g_settings.Wheel.Options.LogiLEDs,
-        { "Show the RPM LEDs on Logitech steering wheels. If the wheel doesn't have compatible RPM LEDs, this might crash." })) {
+        { "Show the RPM LEDs on Logitech steering wheels.",
+            "If the wheel doesn't have compatible RPM LEDs, this might crash." })) {
         g_settings.SaveWheel();
     }
 
@@ -841,19 +841,24 @@ void update_anglemenu() {
     g_menu.Subtitle("");
     float minLock = 180.0f;
     if (g_menu.FloatOption("Physical degrees", g_settings.Wheel.Steering.AngleMax, minLock, 1440.0, 30.0,
-        { "How many degrees your wheel can physically turn." })) {
+        { "How many degrees your physical steering steering wheel turns.",
+            "Set this to whatever matches the setting in the wheel driver." })) {
         if (g_settings.Wheel.Steering.AngleCar > g_settings.Wheel.Steering.AngleMax) { g_settings.Wheel.Steering.AngleCar = g_settings.Wheel.Steering.AngleMax; }
         if (g_settings.Wheel.Steering.AngleBike > g_settings.Wheel.Steering.AngleMax) { g_settings.Wheel.Steering.AngleBike = g_settings.Wheel.Steering.AngleMax; }
         if (g_settings.Wheel.Steering.AngleBoat > g_settings.Wheel.Steering.AngleMax) { g_settings.Wheel.Steering.AngleBoat = g_settings.Wheel.Steering.AngleMax; }
     }
+
     g_menu.FloatOption("Car soft lock", g_settings.Wheel.Steering.AngleCar, minLock, g_settings.Wheel.Steering.AngleMax, 30.0,
-        { "Soft lock for cars and trucks. (degrees)" });
+        { "Soft lock for generic cars and trucks. (degrees)",
+            "Overridden by vehicle-specific soft lock." });
 
     g_menu.FloatOption("Bike soft lock", g_settings.Wheel.Steering.AngleBike, minLock, g_settings.Wheel.Steering.AngleMax, 30.0,
-        { "Soft lock for bikes and quads. (degrees)" });
+        { "Soft lock for generic bikes and quads. (degrees)",
+            "Overridden by vehicle-specific soft lock." });
 
     g_menu.FloatOption("Boat soft lock", g_settings.Wheel.Steering.AngleBoat, minLock, g_settings.Wheel.Steering.AngleMax, 30.0,
-        { "Soft lock for boats. (degrees)" });
+        { "Soft lock for generic boats. (degrees)",
+            "Overridden by vehicle-specific soft lock." });
 }
 
 void update_axesmenu() {

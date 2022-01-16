@@ -799,7 +799,6 @@ BOOL WheelDirectInput::enumerateDevicesCallbackS(const DIDEVICEINSTANCE* instanc
 }
 
 BOOL WheelDirectInput::enumerateDevicesCallback(const DIDEVICEINSTANCE* instance, VOID* context) {
-    logger.Write(DEBUG, "[Wheel] Callback for %s", GUID2String(instance->guidInstance).c_str());
     DirectInputDeviceInfo deviceInfo{};
     deviceInfo.DeviceInstance = *instance;
     deviceInfo.DeviceCapabilities.dwSize = sizeof(deviceInfo.DeviceCapabilities);
