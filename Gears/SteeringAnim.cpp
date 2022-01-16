@@ -191,8 +191,6 @@ void playAnimTime(const SteeringAnimation::Animation& anim, float time) {
     if (!playing) {
         cancelAnim(lastAnimation);
 
-        Timer t(500);
-
         if (!STREAMING::DOES_ANIM_DICT_EXIST(dict)) {
             UI::Notify(ERROR, fmt::format("Animation: dictionary does not exist [{}]", dict), false);
             logger.Write(ERROR, fmt::format("Animation: dictionary does not exist [{}]", dict));
@@ -202,15 +200,8 @@ void playAnimTime(const SteeringAnimation::Animation& anim, float time) {
         }
 
         STREAMING::REQUEST_ANIM_DICT(dict);
-        while (!STREAMING::HAS_ANIM_DICT_LOADED(dict)) {
-            if (t.Expired()) {
-                UI::Notify(ERROR, fmt::format("Failed to load animation dictionary [{}]", dict), false);
-                logger.Write(ERROR, fmt::format("Animation: Failed to load dictionary [{}]", dict));
-                // Clear dict so we don't keep loading it
-                steeringAnimations[steeringAnimIdx].Dictionary = std::string();
-                return;
-            }
-            WAIT(0);
+        if (!STREAMING::HAS_ANIM_DICT_LOADED(dict)) {
+            return;
         }
 
         constexpr int flag = ANIM_FLAG_ENABLE_PLAYER_CONTROL;
