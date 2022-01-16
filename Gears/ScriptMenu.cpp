@@ -2,6 +2,7 @@
 
 #include "GitInfo.h"
 #include "InputConfiguration.h"
+#include "ScriptMenuUtils.h"
 #include "ScriptSettings.hpp"
 
 #include "Constants.h"
@@ -123,75 +124,6 @@ namespace {
 
     std::vector<std::string> diDevicesInfo{ "Press Enter to refresh." };
 
-    bool getKbEntry(float& val) {
-        UI::Notify(INFO, "Enter value");
-        MISC::DISPLAY_ONSCREEN_KEYBOARD(LOCALIZATION::GET_CURRENT_LANGUAGE() == 0, "FMMC_KEY_TIP8", "",
-            fmt::format("{:f}", val).c_str(), "", "", "", 64);
-        while (MISC::UPDATE_ONSCREEN_KEYBOARD() == 0) {
-            WAIT(0);
-        }
-        if (!MISC::GET_ONSCREEN_KEYBOARD_RESULT()) {
-            UI::Notify(INFO, "Cancelled value entry");
-            return false;
-        }
-
-        std::string floatStr = MISC::GET_ONSCREEN_KEYBOARD_RESULT();
-        if (floatStr.empty()) {
-            UI::Notify(INFO, "Cancelled value entry");
-            return false;
-        }
-
-        char* pEnd;
-        float parsedValue = strtof(floatStr.c_str(), &pEnd);
-
-        if (parsedValue == 0.0f && *pEnd != 0) {
-            UI::Notify(INFO, "Failed to parse entry.");
-            return false;
-        }
-
-        val = parsedValue;
-        return true;
-    }
-
-    std::string GetKbEntryStr(const std::string& existingString) {
-        std::string val;
-        UI::Notify(INFO, "Enter value");
-        MISC::DISPLAY_ONSCREEN_KEYBOARD(LOCALIZATION::GET_CURRENT_LANGUAGE() == 0, "FMMC_KEY_TIP8", "",
-            existingString.c_str(), "", "", "", 64);
-        while (MISC::UPDATE_ONSCREEN_KEYBOARD() == 0) {
-            WAIT(0);
-        }
-        if (!MISC::GET_ONSCREEN_KEYBOARD_RESULT()) {
-            UI::Notify(INFO, "Cancelled value entry");
-            return {};
-        }
-
-        std::string enteredVal = MISC::GET_ONSCREEN_KEYBOARD_RESULT();
-        if (enteredVal.empty()) {
-            UI::Notify(INFO, "Cancelled value entry");
-            return {};
-        }
-
-        return enteredVal;
-    }
-
-    void SetFlags(unsigned& flagArea, std::string& newFlags) {
-        if (!newFlags.empty()) {
-            try {
-                flagArea = std::stoul(newFlags, nullptr, 16);
-            }
-            catch (std::invalid_argument&) {
-                UI::Notify(ERROR, "Error: Couldn't convert entered value to int.");
-            }
-            catch (std::out_of_range&) {
-                UI::Notify(ERROR, "Error: Entered value out of range.");
-            }
-        }
-        else {
-            UI::Notify(ERROR, "Error: No flags entered.");
-        }
-    }
-
     std::string MenuSubtitleConfig() {
         std::string cfgName = "Base";
         if (g_settings.ConfigActive())
@@ -199,20 +131,20 @@ namespace {
         return fmt::format("CFG: [{}]", cfgName);
     }
 
-    void incVal(float& gamma, float max, float step) {
-        if (gamma + step > max) {
-            gamma = max;
+    void incVal(float& value, float max, float step) {
+        if (value + step > max) {
+            value = max;
             return;
         }
-        gamma += step;
+        value += step;
     }
 
-    void decVal(float& gamma, float min, float step) {
-        if (gamma - step < min) {
-            gamma = min;
+    void decVal(float& value, float min, float step) {
+        if (value - step < min) {
+            value = min;
             return;
         }
-        gamma -= step;
+        value -= step;
     }
 }
 
@@ -513,128 +445,6 @@ void update_finetuneautooptionsmenu() {
           "ATCU is configurationless, the above settings are ignored." });
 }
 
-std::vector<std::string> formatVehicleConfig(const VehicleConfig& config) {
-    std::string modelNames;
-    for (auto it = config.ModelNames.begin(); it != config.ModelNames.end(); ++it) {
-        modelNames += fmt::format("[{}]", *it);
-        if (std::next(it) != config.ModelNames.end())
-            modelNames += " ";
-    }
-    if (config.ModelNames.empty())
-        modelNames = "None";
-
-    std::string plates;
-    for (auto it = config.Plates.begin(); it != config.Plates.end(); ++it) {
-        plates += fmt::format("[{}]", *it);
-        if (std::next(it) != config.Plates.end())
-            plates += " ";
-    }
-    if (config.Plates.empty())
-        plates = "None";
-
-    std::string shiftAssist;
-    if (config.ShiftOptions.UpshiftCut)
-        shiftAssist += "Up";
-    if (config.ShiftOptions.DownshiftBlip)
-        shiftAssist += " & Down";
-    if (shiftAssist.empty())
-        shiftAssist = "None";
-
-    EShiftMode shiftMode = config.MTOptions.ShiftMode;
-    bool clutchCreep = config.MTOptions.ClutchCreep;
-
-    bool absEn = config.DriveAssists.ABS.Enable;
-    bool tcsEn = config.DriveAssists.TCS.Enable;
-    bool espEn = config.DriveAssists.ESP.Enable;
-
-    bool lsdEn = config.DriveAssists.LSD.Enable;
-    bool lcEn = config.DriveAssists.LaunchControl.Enable;
-
-    std::vector<std::string> extras{
-        fmt::format("{}", config.Description),
-        "Compatible cars:",
-        fmt::format("\tModels: {}", modelNames),
-        fmt::format("\tPlates: {}", plates),
-        "Shifting options:",
-        fmt::format("\tShift mode: {}", gearboxModes[shiftMode]),
-        fmt::format("\tClutch creep: {}", clutchCreep),
-        fmt::format("\tSequential assist: {}", shiftAssist),
-        "Driving assists:",
-        fmt::format("\t{}ABS {}TCS {}ESP",
-            absEn ? "~g~" : "~r~",
-            tcsEn ? "~g~" : "~r~",
-            espEn ? "~g~" : "~r~"),
-        fmt::format("\t{}LSD {}Launch",
-            lsdEn ? "~g~" : "~r~",
-            lcEn ? "~g~" : "~r~"),
-        "Steering wheel:",
-        fmt::format("\tSoft lock: {:.0f}", config.Steering.Wheel.SoftLock)
-    };
-    return extras;
-}
-
-std::string getASCachedModelName(Hash model) {
-    std::unordered_map<Hash, std::string> cache = ASCache::Get();
-    if (!cache.empty()) {
-        auto bla = cache.find(model);
-        if (bla != cache.end())
-            return bla->second;
-    }
-    return {};
-}
-
-void saveVehicleConfig() {
-    const std::string vehConfigDir = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir + "\\Vehicles";
-
-    // Amazing, I haven't referred to this ever since throwing a menu in...
-    extern Vehicle g_playerVehicle;
-    // Pre-fill with actual model name, if Add-on Spawner is present.
-    const std::string modelName = getASCachedModelName(ENTITY::GET_ENTITY_MODEL(g_playerVehicle));
-
-    UI::ShowHelpText("Enter configuration name.");
-    std::string fileName = GetKbEntryStr(modelName);
-    if (fileName.empty()) {
-        UI::Notify(INFO, "Cancelled configuration save.");
-        return;
-    }
-
-    uint32_t saveFileSuffix = 0;
-    std::string saveFile = fileName;
-    bool duplicate;
-    do {
-        duplicate = false;
-        for (const auto& p : std::filesystem::directory_iterator(vehConfigDir)) {
-            if (p.path().stem() == saveFile) {
-                duplicate = true;
-                saveFile = fmt::format("{}_{:02d}", fileName.c_str(), saveFileSuffix++);
-            }
-        }
-    } while (duplicate);
-
-    if (saveFile != fileName) {
-        UI::Notify(WARN, fmt::format("Duplicate filename(s) detected. Actual filename: {}", saveFile.c_str()));
-    }
-
-    std::string finalFile = fmt::format("{}\\{}.ini", vehConfigDir, saveFile);
-
-    UI::ShowHelpText("Enter model name. Multiple models can be entered, separated by a space.");
-
-    std::string userModels = GetKbEntryStr(modelName);
-
-    if (userModels.empty()) {
-        UI::Notify(INFO, "Cancelled configuration save.");
-        return;
-    }
-
-    VehicleConfig config;
-    config.SetFiles(&g_settings(), finalFile);
-    config.LoadSettings();
-    config.ModelNames = StrUtil::split(userModels, ' ');
-    config.SaveSettings();
-    loadConfigs();
-    UI::Notify(INFO, fmt::format("Stored new configuration as {}", finalFile.c_str()));
-}
-
 void update_vehconfigmenu() {
     g_menu.Title("Custom vehicle settings");
     g_menu.Subtitle(MenuSubtitleConfig());
@@ -643,7 +453,7 @@ void update_vehconfigmenu() {
         { "Create a new, empty current configuration file.",
           "Changes made within a configuration are saved to that configuration only.",
           "The submenu subtitles indicate which configuration is being edited." })) {
-        saveVehicleConfig();
+        SaveVehicleConfig();
     }
 
     if (g_menu.Option("Reload configurations", 
@@ -658,7 +468,7 @@ void update_vehconfigmenu() {
               "When multiple configurations work with the same model, the configuration that comes first "
               "alphabetically is used." });
         if (sel) {
-            auto extras = formatVehicleConfig(g_settings());
+            auto extras = FormatVehicleConfig(g_settings(), gearboxModes);
             g_menu.OptionPlusPlus(extras, "Configuration overview");
         }
     }
@@ -674,7 +484,7 @@ void update_vehconfigmenu() {
         };
         g_menu.OptionPlus(vehConfig.Name, {}, &sel, nullptr, nullptr, "", descr);
         if (sel) {
-            auto extras = formatVehicleConfig(vehConfig);
+            auto extras = FormatVehicleConfig(vehConfig, gearboxModes);
             g_menu.OptionPlusPlus(extras, "Configuration overview");
         }
     }
@@ -693,41 +503,64 @@ void update_controlsmenu() {
     g_menu.Title("Controls");
     g_menu.Subtitle("");
 
-    g_menu.MenuOption("Controller", "controllermenu");
+    g_menu.MenuOption("Controller", "controllermenu",
+        { "Modify bindings and adjustments for controller input." });
 
-    g_menu.MenuOption("Keyboard", "keyboardmenu");
+    g_menu.MenuOption("Keyboard", "keyboardmenu",
+        { "Modify bindings for keyboard input." });
 
-    g_menu.MenuOption("Wheel & pedals", "wheelmenu");
+    g_menu.MenuOption("Wheel & pedals", "wheelmenu",
+        { "Create and modify bindings and adjustments for steering wheels and pedals." });
 
     g_menu.MenuOption("Steering assists", "steeringassistmenu",
         { "Customize steering input for keyboards and controllers." });
 
-    g_menu.MenuOption("Vehicle specific", "vehiclecontroladjustsmenu");
+    g_menu.MenuOption("Vehicle specific", "controlsvehconfmenu",
+        { "Override and adjust input behavior for specific vehicle configurations." });
 }
 
 void update_controlsvehconfmenu() {
-    g_menu.Title("Controls");
+    g_menu.Title("Vehicle specific");
     g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.BoolOption("ES: Override wheel rotation", g_settings().Steering.CustomSteering.UseCustomLock,
         { "Enhanced Steering: Override the default 180 degree steering wheel rotation." });
 
-    g_menu.FloatOptionCb("ES: Wheel rotation", g_settings().Steering.CustomSteering.SoftLock, 180.0f, 2880.0f, 30.0f, getKbEntry,
+    g_menu.FloatOptionCb("ES: Wheel rotation", g_settings().Steering.CustomSteering.SoftLock, 180.0f, 2880.0f, 30.0f, GetKbEntryFloat,
         { "Enhanced Steering: Degrees of rotation for the vehicle steering wheel. Does not change max steering angle." });
 
-    g_menu.FloatOptionCb("ES: Steering multiplier", g_settings().Steering.CustomSteering.SteeringMult, 0.01f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("ES: Steering multiplier", g_settings().Steering.CustomSteering.SteeringMult, 0.01f, 2.0f, 0.01f, GetKbEntryFloat,
         { "Enhanced Steering: Increase or decrease actual max steering angle." });
 
-    if (g_menu.FloatOptionCb("Wheel: FFB SAT mult", g_settings().Steering.Wheel.SATMult, 0.05f, 10.0f, 0.05f, getKbEntry,
-        { "Vehicle-specific SAT adjustment. Same comments apply as in the FFB section." })) {
+    g_menu.FloatOptionCb("Wheel: FFB SAT mult", g_settings().Steering.Wheel.SATMult, 0.05f, 10.0f, 0.05f, GetKbEntryFloat,
+        { "Vehicle-specific FFB SAT adjustment. Same comments apply as in the FFB section.",
+          "Increase to make steering heavier, decrease to make it lighter." });
+
+    bool showDynamicFfbCurveBox = false;
+    if (g_menu.OptionPlus(fmt::format("Wheel: FFB response curve mult: < {:.2f} >", g_settings().Steering.Wheel.CurveMult), {}, &showDynamicFfbCurveBox,
+        [=] { return incVal(g_settings().Steering.Wheel.CurveMult, 5.00f, 0.01f); },
+        [=] { return decVal(g_settings().Steering.Wheel.CurveMult, 0.01f, 0.01f); },
+        "Response curve", {
+            "Vehicle-specific FFB curve adjustment. Same comments apply as in the FFB section.",
+            "Increase to make response more linear, decrease to make it quicker." })) {
+        float val = g_settings.Wheel.FFB.ResponseCurve;
+        if (GetKbEntryFloat(val)) {
+            g_settings.Wheel.FFB.ResponseCurve = val;
+        }
     }
 
-    g_menu.FloatOptionCb("Wheel: Soft lock", g_settings().Steering.Wheel.SoftLock, 180.0f, 2880.0f, 30.0f, getKbEntry,
+    if (showDynamicFfbCurveBox) {
+        auto extras = ShowDynamicFfbCurve(abs(WheelInput::GetFFBConstantForce()),
+            g_settings.Wheel.FFB.ResponseCurve * g_settings().Steering.Wheel.CurveMult,
+            g_settings.Wheel.FFB.FFBProfile);
+        g_menu.OptionPlusPlus(extras, "Response Curve");
+    }
+
+    g_menu.FloatOptionCb("Wheel: Soft lock", g_settings().Steering.Wheel.SoftLock, 180.0f, 2880.0f, 30.0f, GetKbEntryFloat,
         { "Steering range for your real wheel, in degrees. Reduce for quicker steering." });
 
-    if (g_menu.FloatOptionCb("Wheel: Steering multiplier", g_settings().Steering.Wheel.SteeringMult, 0.1f, 2.0f, 0.01f, getKbEntry,
-        { "Increase or decrease actual steering lock. Increase for faster steering and more angle." })) {
-    }
+    g_menu.FloatOptionCb("Wheel: Steering multiplier", g_settings().Steering.Wheel.SteeringMult, 0.1f, 2.0f, 0.01f, GetKbEntryFloat,
+        { "Increase or decrease actual steering lock. Increase for faster steering and more angle." });
 }
 
 void update_controllermenu() {
@@ -775,14 +608,14 @@ void update_controllermenu() {
 
         if (g_settings.Controller.CustomDeadzone) {
             float ljVal = static_cast<float>(g_settings.Controller.DeadzoneLeftThumb);
-            if (g_menu.FloatOptionCb("Deadzone left thumb", ljVal, 0.0f, 32767.0f, 1.0f, getKbEntry,
+            if (g_menu.FloatOptionCb("Deadzone left thumb", ljVal, 0.0f, 32767.0f, 1.0f, GetKbEntryFloat,
                 { "Deadzone for left thumb joystick. Works for XInput mode only!",
                   fmt::format("Default value: {}", XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) })) {
                 g_settings.Controller.DeadzoneLeftThumb = static_cast<int>(ljVal);
             }
 
             float rjVal = static_cast<float>(g_settings.Controller.DeadzoneRightThumb);
-            if (g_menu.FloatOptionCb("Deadzone right thumb", rjVal, 0.0f, 32767.0f, 1.0f, getKbEntry,
+            if (g_menu.FloatOptionCb("Deadzone right thumb", rjVal, 0.0f, 32767.0f, 1.0f, GetKbEntryFloat,
                 { "Deadzone for right thumb joystick. Works for XInput mode only!",
                   fmt::format("Default value: {}", XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE) })) {
                 g_settings.Controller.DeadzoneRightThumb = static_cast<int>(rjVal);
@@ -1023,60 +856,6 @@ void update_anglemenu() {
         { "Soft lock for boats. (degrees)" });
 }
 
-std::vector<std::string> showGammaCurve(const std::string& axis, const float input, const float gamma) {
-
-    std::string larr = "< ";
-    std::string rarr = " >";
-    if (gamma >= 5.0f - 0.01f) rarr = "";
-    if (gamma <= 0.1f + 0.01f) larr = "";
-
-    std::string printVar = fmt::format("{:.{}f}", gamma, 2);
-
-    std::vector<std::string> info{
-        fmt::format("{} gamma:", axis),
-        fmt::format("{}{}{}", larr, printVar, rarr)
-    };
-
-    const int max_samples = 100;
-    std::vector<std::pair<float, float>> points;
-    for (int i = 0; i < max_samples; i++) {
-        float x = static_cast<float>(i) / static_cast<float>(max_samples);
-        float y = pow(x, gamma);
-        points.emplace_back(x, y);
-    }
-
-    float rectX = 0.5f;
-    float rectY = 0.5f;
-    float rectW = 0.40f / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
-    float rectH = 0.40f;
-    float blockW = rectW / max_samples;//0.001f * (16.0f / 9.0f) / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
-    float blockH = blockW * GRAPHICS::_GET_ASPECT_RATIO(FALSE);
-
-    GRAPHICS::DRAW_RECT(rectX, rectY,
-        rectW + 3.0f*blockW, rectH + 3.0f*blockH,
-        255, 255, 255, 191, 0);
-    GRAPHICS::DRAW_RECT(rectX, rectY,
-        rectW + blockW / 2.0f, rectH + blockH / 2.0f,
-        0, 0, 0, 239, 0);
-
-    for (auto point : points) {
-        float pointX = rectX - 0.5f*rectW + point.first *rectW;
-        float pointY = rectY + 0.5f*rectH - point.second *rectH;
-        GRAPHICS::DRAW_RECT(pointX, pointY,
-            blockW, blockH,
-            255, 255, 255, 255, 0);
-    }
-
-    std::pair<float, float> currentPoint = { input, pow(input, gamma) };
-    float pointX = rectX - 0.5f*rectW + currentPoint.first * rectW;
-    float pointY = rectY + 0.5f*rectH - currentPoint.second * rectH;
-    GRAPHICS::DRAW_RECT(pointX, pointY,
-        3.0f*blockW, 3.0f*blockH,
-        255, 0, 0, 255, 0);
-
-    return info;
-}
-
 void update_axesmenu() {
     g_menu.Title("Analog inputs");
     g_menu.Subtitle("");
@@ -1135,7 +914,7 @@ void update_axesmenu() {
         { "Linearity of the brake pedal. Values over 1.0 feel more real if you have progressive springs." });
 
     if (showBrakeGammaBox) {
-        extras = showGammaCurve("Brake", g_controls.BrakeVal, g_settings.Wheel.Brake.Gamma);
+        extras = ShowGammaCurve("Brake", g_controls.BrakeVal, g_settings.Wheel.Brake.Gamma);
         g_menu.OptionPlusPlus(extras, "Brake gamma");
     }
 
@@ -1148,7 +927,7 @@ void update_axesmenu() {
         { "Linearity of the throttle pedal." });
 
     if (showThrottleGammaBox) {
-        extras = showGammaCurve("Throttle", g_controls.ThrottleVal, g_settings.Wheel.Throttle.Gamma);
+        extras = ShowGammaCurve("Throttle", g_controls.ThrottleVal, g_settings.Wheel.Throttle.Gamma);
         g_menu.OptionPlusPlus(extras, "Throttle gamma");
     }
 
@@ -1164,65 +943,9 @@ void update_axesmenu() {
         float steerValL = map(g_controls.SteerVal, 0.0f, 0.5f, 1.0f, 0.0f);
         float steerValR = map(g_controls.SteerVal, 0.5f, 1.0f, 0.0f, 1.0f);
         float steerVal = g_controls.SteerVal < 0.5f ? steerValL : steerValR;
-        extras = showGammaCurve("Steering", steerVal, g_settings.Wheel.Steering.Gamma);
+        extras = ShowGammaCurve("Steering", steerVal, g_settings.Wheel.Steering.Gamma);
         g_menu.OptionPlusPlus(extras, "Steering gamma");
     }
-}
-
-std::vector<std::string> showDynamicFfbCurve(float input, float gamma, int responseType) {
-    std::string larr = "< ";
-    std::string rarr = " >";
-    if (gamma >= 5.0f - 0.01f) rarr = "";
-    if (gamma <= 0.1f + 0.01f) larr = "";
-
-    std::string printVar = fmt::format("{:.{}f}", gamma, 2);
-
-    std::vector<std::string> info{
-        "FFB response curve:",
-        fmt::format("{}{}{}", larr, printVar, rarr)
-    };
-
-    const int max_samples = 100;
-    std::vector<std::pair<float, float>> points;
-    for (int i = 0; i < max_samples; i++) {
-        float x = static_cast<float>(i) / static_cast<float>(max_samples);
-        float y = WheelInput::GetProfiledFFBValue(x, gamma, responseType);
-        points.emplace_back(x, y);
-    }
-
-    float rectX = 0.5f;
-    float rectY = 0.5f;
-    float rectW = 0.40f / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
-    float rectH = 0.40f;
-    float blockW = rectW / max_samples;//0.001f * (16.0f / 9.0f) / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
-    float blockH = blockW * GRAPHICS::_GET_ASPECT_RATIO(FALSE);
-
-    GRAPHICS::DRAW_RECT(rectX, rectY,
-        rectW + 3.0f * blockW, rectH + 3.0f * blockH,
-        255, 255, 255, 191, 0);
-    GRAPHICS::DRAW_RECT(rectX, rectY,
-        rectW + blockW / 2.0f, rectH + blockH / 2.0f,
-        0, 0, 0, 239, 0);
-
-    for (auto point : points) {
-        float pointX = rectX - 0.5f * rectW + point.first * rectW;
-        float pointY = rectY + 0.5f * rectH - point.second * rectH;
-        GRAPHICS::DRAW_RECT(pointX, pointY,
-            blockW, blockH,
-            255, 255, 255, 255, 0);
-    }
-
-    std::pair<float, float> currentPoint = {
-        input,
-        WheelInput::GetProfiledFFBValue(input, gamma, responseType)
-    };
-    float pointX = rectX - 0.5f * rectW + currentPoint.first * rectW;
-    float pointY = rectY + 0.5f * rectH - currentPoint.second * rectH;
-    GRAPHICS::DRAW_RECT(pointX, pointY,
-        3.0f * blockW, 3.0f * blockH,
-        255, 0, 0, 255, 0);
-
-    return info;
 }
 
 void update_forcefeedbackmenu() {
@@ -1236,7 +959,7 @@ void update_forcefeedbackmenu() {
         { "Overall FFB scaling for self-aligning torque.",
             "Recommended to leave at 1.0 and use FFB response to tune FFB.",
             "Values over 1.0 clips FFB. Lower values decrease overall SAT FFB strength.",
-            "Use 'Vehicle specific' in main Controls section to decrease FFB for specific vehicles if desired." });
+            "Note: Final SAT scale affected by vehicle-specific multiplier." });
 
     g_menu.StringArray("FFB linearity type", { ffbCurveTypes }, g_settings.Wheel.FFB.FFBProfile,
         { "Both types allow modifying the FFB response.",
@@ -1249,16 +972,17 @@ void update_forcefeedbackmenu() {
             [=] { return decVal(g_settings.Wheel.FFB.ResponseCurve, 0.01f, 0.01f); },
             "Response curve", {
                 "Response curve of the self-aligning torque.",
-                "Decrease to ramp up force earlier.",
-                "Increase to get a more linear force buildup." })) {
+                "Decrease to ramp up force quicker.",
+                "Increase to get a more linear force buildup.",
+                "Note: Final force curve affected by vehicle-specific multiplier." })) {
         float val = g_settings.Wheel.FFB.ResponseCurve;
-        if (getKbEntry(val)) {
+        if (GetKbEntryFloat(val)) {
             g_settings.Wheel.FFB.ResponseCurve = val;
         }
     }
 
     if (showDynamicFfbCurveBox) {
-        auto extras = showDynamicFfbCurve(abs(WheelInput::GetFFBConstantForce()),
+        auto extras = ShowDynamicFfbCurve(abs(WheelInput::GetFFBConstantForce()),
                                           g_settings.Wheel.FFB.ResponseCurve,
                                           g_settings.Wheel.FFB.FFBProfile);
         g_menu.OptionPlusPlus(extras, "Response Curve");
@@ -1369,12 +1093,12 @@ void update_ffbnormalizationmenu() {
           "Defaults: 7.5/1.6, 20.0/1.0",
           "No correction: 10.0/1.0, 20.0/1.0"});
 
-    g_menu.FloatOptionCb("Optimal slip low", g_settings.Wheel.FFB.SlipOptMin, 0.0f, 90.0f, 0.1f, getKbEntry);
-    g_menu.FloatOptionCb("Optimal slip low mult", g_settings.Wheel.FFB.SlipOptMinMult, 0.0f, 10.0f, 0.1f, getKbEntry,
+    g_menu.FloatOptionCb("Optimal slip low", g_settings.Wheel.FFB.SlipOptMin, 0.0f, 90.0f, 0.1f, GetKbEntryFloat);
+    g_menu.FloatOptionCb("Optimal slip low mult", g_settings.Wheel.FFB.SlipOptMinMult, 0.0f, 10.0f, 0.1f, GetKbEntryFloat,
         { "Higher values give weaker FFB at low steering angles.",
           "For low optimal slip angles, this value should be high." });
-    g_menu.FloatOptionCb("Optimal slip high", g_settings.Wheel.FFB.SlipOptMax, 0.0f, 90.0f, 0.1f, getKbEntry);
-    g_menu.FloatOptionCb("Optimal slip high mult", g_settings.Wheel.FFB.SlipOptMaxMult, 0.0f, 10.0f, 0.1f, getKbEntry,
+    g_menu.FloatOptionCb("Optimal slip high", g_settings.Wheel.FFB.SlipOptMax, 0.0f, 90.0f, 0.1f, GetKbEntryFloat);
+    g_menu.FloatOptionCb("Optimal slip high mult", g_settings.Wheel.FFB.SlipOptMaxMult, 0.0f, 10.0f, 0.1f, GetKbEntryFloat,
         { "Higher values give weaker FFB at low steering angles.",
           "For high optimal slip angles, this value should be low." });
 }
@@ -1888,76 +1612,6 @@ void update_lsdsettingsmenu() {
     }
 }
 
-std::vector<std::string> GetAWDInfo(Vehicle vehicle) {
-    namespace HR = HandlingReplacement;
-
-    void* handlingDataOrig = nullptr;
-    void* handlingDataReplace = nullptr;
-
-    if (!HR::Available()) {
-        return { "HandlingReplacement.asi missing" };
-    }
-
-    bool replaced = HR::GetHandlingData(vehicle, &handlingDataOrig, &handlingDataReplace);
-
-    if (handlingDataOrig == nullptr) {
-        return {
-            "Could not find handling data.",
-            "Something went wrong within HandlingReplacement.asi.",
-            "You shouldn't even be able to see this message."
-        };
-    }
-
-    float driveBiasFOriginal = AWD::GetDriveBiasFront(handlingDataOrig);
-    float driveBiasFCustom = g_settings().DriveAssists.AWD.CustomBaseBias;
-
-    if (VExt::GetNumWheels(vehicle) != 4) {
-        return { "Only vehicles with 4 wheels are supported." };
-    }
-
-    if (driveBiasFOriginal <= 0.0f || driveBiasFOriginal >= 1.0f) {
-        return {
-            (fmt::format("Drive layout: {}", driveBiasFOriginal == 0.0f ? "RWD" : "FWD")),
-            "Not AWD compatible.",
-            "Set fDriveBiasFront in handling data to between 0.10 and 0.90 for AWD support."
-        };
-    }
-
-    if (driveBiasFCustom <= 0.0f || driveBiasFCustom >= 1.0f) {
-        return {
-            (fmt::format("Custom drive layout corrupt: Full {}", driveBiasFOriginal == 0.0f ? "RWD" : "FWD")),
-            "This shouldn't happen.",
-            "Reset custom drive layout to between 0.01 and 0.99."
-        };
-    }
-
-    std::vector<std::string> awdInfo;
-
-    float driveBiasFrontBase;
-    float driveBiasFrontLive;
-    if (replaced) {
-        driveBiasFrontBase = g_settings().DriveAssists.AWD.UseCustomBaseBias ? driveBiasFCustom : driveBiasFOriginal;
-        driveBiasFrontLive = AWD::GetDriveBiasFront(handlingDataReplace);
-    }
-    else {
-        driveBiasFrontBase = driveBiasFOriginal;
-    }
-
-    awdInfo.emplace_back("Drive layout: AWD");
-    std::string baseDistrStr = fmt::format("Base distribution: F{:.0f}/R{:.0f}", driveBiasFrontBase * 100.0f, (1.0f - driveBiasFrontBase) * 100.0f);
-    if (replaced) {
-        awdInfo.emplace_back("AWD mode: Adaptive");
-        awdInfo.push_back(baseDistrStr);
-        awdInfo.push_back(fmt::format("Live distribution: F{:.0f}/R{:.0f}", driveBiasFrontLive * 100.0f, (1.0f - driveBiasFrontLive) * 100.0f));
-        awdInfo.push_back(fmt::format("Live transfer percentage: {:.0f}%", AWD::GetTransferValue() * 100.0f));
-    }
-    else {
-        awdInfo.emplace_back("AWD mode: Static");
-        awdInfo.push_back(baseDistrStr);
-    }
-    return awdInfo;
-}
-
 void update_awdsettingsmenu() {
     g_menu.Title("Adaptive AWD");
     g_menu.Subtitle(MenuSubtitleConfig());
@@ -2049,46 +1703,46 @@ void update_cruisecontrolsettingsmenu() {
     float speedValUnit = speedValRaw * speedValMul;
 
     if (g_menu.FloatOptionCb(fmt::format("Speed ({})", speedNameUnit), speedValUnit, 0.0f, 500.0f, 5.0f,
-        getKbEntry,
+        GetKbEntryFloat,
         { "Speed for cruise control. Speeds higher than vehicle top speed are ignored.",
           "Can also be changed with hotkeys or wheel buttons." })) {
 
         g_settings().DriveAssists.CruiseControl.Speed = speedValUnit / speedValMul;
     }
 
-    g_menu.FloatOptionCb("Max acceleration", g_settings().DriveAssists.CruiseControl.MaxAcceleration, 0.5f, 40.0f, 0.5f, getKbEntry,
+    g_menu.FloatOptionCb("Max acceleration", g_settings().DriveAssists.CruiseControl.MaxAcceleration, 0.5f, 40.0f, 0.5f, GetKbEntryFloat,
         { "How quickly cruise control accelerates or slows down to the desired speed.",
           "In m/s^2. 9.8 m/s^2 is 1G." });
 
     g_menu.BoolOption("Adaptive", g_settings().DriveAssists.CruiseControl.Adaptive,
         { "Adapts the speed to the car in front, if there is one." });
 
-    g_menu.FloatOptionCb("Minimum distance", g_settings().DriveAssists.CruiseControl.MinFollowDistance, 1.0f, 50.0f, 1.0f, getKbEntry,
+    g_menu.FloatOptionCb("Minimum distance", g_settings().DriveAssists.CruiseControl.MinFollowDistance, 1.0f, 50.0f, 1.0f, GetKbEntryFloat,
         { "Minimum distance to the car ahead, when stopped. In meters.",
           "Default: 5m" });
 
-    g_menu.FloatOptionCb("Maximum distance", g_settings().DriveAssists.CruiseControl.MaxFollowDistance, 50.0f, 200.0f, 0.5f, getKbEntry,
+    g_menu.FloatOptionCb("Maximum distance", g_settings().DriveAssists.CruiseControl.MaxFollowDistance, 50.0f, 200.0f, 0.5f, GetKbEntryFloat,
         { "Maximum distance where adaptive cruise control starts working. In meters.",
           "Default: 100m." });
 
-    g_menu.FloatOptionCb("Follow distance", g_settings().DriveAssists.CruiseControl.MinDistanceSpeedMult, 0.1f, 10.0f, 0.1f, getKbEntry,
+    g_menu.FloatOptionCb("Follow distance", g_settings().DriveAssists.CruiseControl.MinDistanceSpeedMult, 0.1f, 10.0f, 0.1f, GetKbEntryFloat,
         { "How close to follow the car in front.",
           "Approximates 'seconds between cars'.",
           "Lower: follows closer.",
           "Default: 1.0." });
 
-    g_menu.FloatOptionCb("Lifting distance", g_settings().DriveAssists.CruiseControl.MaxDistanceSpeedMult, 0.1f, 10.0f, 0.1f, getKbEntry,
+    g_menu.FloatOptionCb("Lifting distance", g_settings().DriveAssists.CruiseControl.MaxDistanceSpeedMult, 0.1f, 10.0f, 0.1f, GetKbEntryFloat,
         { "How close to the car in front to start reducing speed.",
           "Approximates 'seconds between cars'.",
           "Lower: starts matching closer while driving.",
           "Default: 2.0." });
 
-    g_menu.FloatOptionCb("Start brake speed margin", g_settings().DriveAssists.CruiseControl.MinDeltaBrakeMult, 0.1f, 10.0f, 0.1f, getKbEntry,
+    g_menu.FloatOptionCb("Start brake speed margin", g_settings().DriveAssists.CruiseControl.MinDeltaBrakeMult, 0.1f, 10.0f, 0.1f, GetKbEntryFloat,
         { "How soon to start braking for the car in front.",
           "Higher: Brake for a smaller speed difference.",
           "Default: 2.4." });
 
-    g_menu.FloatOptionCb("Full brake speed margin", g_settings().DriveAssists.CruiseControl.MaxDeltaBrakeMult, 0.1f, 10.0f, 0.1f, getKbEntry,
+    g_menu.FloatOptionCb("Full brake speed margin", g_settings().DriveAssists.CruiseControl.MaxDeltaBrakeMult, 0.1f, 10.0f, 0.1f, GetKbEntryFloat,
         { "How soon to fully brake for the car in front.",
           "Higher: Brake harder for a smaller speed difference.",
           "Keep lower than the above option.",
@@ -2105,7 +1759,7 @@ void update_speedlimitersettingsmenu() {
     float speedValUnit = speedValRaw * speedValMul;
 
     if (g_menu.FloatOptionCb(fmt::format("Max speed ({})", speedNameUnit), speedValUnit, 0.0f, 500.0f, 5.0f,
-        getKbEntry,
+        GetKbEntryFloat,
         { "Electronically limit speed to this." })) {
 
         g_settings().MTOptions.SpeedLimiter.Speed = speedValUnit / speedValMul;
@@ -2171,11 +1825,11 @@ void update_steeringassistmenu() {
     g_menu.FloatOption("Steering gamma", g_settings.CustomSteering.Gamma, 0.01f, 5.0f, 0.01f,
         { "Change linearity of steering input." });
     g_menu.FloatOptionCb("Steering time", g_settings.CustomSteering.SteerTime, 0.000001f, 0.90f, 0.000001f,
-        getKbEntry,
+        GetKbEntryFloat,
         { "The lower the value, the faster the steering is.",
           "Press Enter to enter a value manually." });
     g_menu.FloatOptionCb("Centering time", g_settings.CustomSteering.CenterTime, 0.000001f, 0.99f, 0.000001f,
-        getKbEntry,
+        GetKbEntryFloat,
         { "The lower the value, the faster the wheels return to center after letting go.",
           "Press Enter to enter a value manually." });
 
@@ -2340,27 +1994,27 @@ void update_cameraoptionsmenu() {
         }
     }
 
-    g_menu.FloatOptionCb("Field of view", *pFov, 1.0f, 120.0f, 0.5f, getKbEntry,
+    g_menu.FloatOptionCb("Field of view", *pFov, 1.0f, 120.0f, 0.5f, GetKbEntryFloat,
         { "In degrees." });
 
-    g_menu.FloatOptionCb("Offset height", *pOffsetHeight, -2.0f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("Offset height", *pOffsetHeight, -2.0f, 2.0f, 0.01f, GetKbEntryFloat,
         { "Distance in meters." });
 
-    g_menu.FloatOptionCb("Offset forward", *pOffsetForward, -2.0f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("Offset forward", *pOffsetForward, -2.0f, 2.0f, 0.01f, GetKbEntryFloat,
         { "Distance in meters." });
 
-    g_menu.FloatOptionCb("Offset side", *pOffsetSide, -2.0f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("Offset side", *pOffsetSide, -2.0f, 2.0f, 0.01f, GetKbEntryFloat,
         { "Distance in meters." });
 
     g_menu.FloatOption("Pitch", *pPitch, -20.0f, 20.0f, 0.1f,
         { "In degrees." });
 
-    g_menu.FloatOptionCb("Controller smoothing", g_settings().Misc.Camera.LookTime, 0.0f, 0.5f, 0.000001f, getKbEntry,
+    g_menu.FloatOptionCb("Controller smoothing", g_settings().Misc.Camera.LookTime, 0.0f, 0.5f, 0.000001f, GetKbEntryFloat,
         { "How smooth the camera moves.", "Press enter to enter a value manually. Range: 0.0 to 0.5." });
 
     g_menu.FloatOption("Mouse sensitivity", g_settings().Misc.Camera.MouseSensitivity, 0.05f, 2.0f, 0.05f);
 
-    g_menu.FloatOptionCb("Mouse smoothing", g_settings().Misc.Camera.MouseLookTime, 0.0f, 0.5f, 0.000001f, getKbEntry,
+    g_menu.FloatOptionCb("Mouse smoothing", g_settings().Misc.Camera.MouseLookTime, 0.0f, 0.5f, 0.000001f, GetKbEntryFloat,
         { "How smooth the camera moves.", "Press enter to enter a value manually. Range: 0.0 to 0.5." });
 
     g_menu.IntOption("Mouse center timeout", g_settings().Misc.Camera.MouseCenterTimeout, 0, 120000, 500,
@@ -2441,22 +2095,22 @@ void update_cameramovementoptionsmenu(bool bike) {
           "Less than 1: Camera moves a lot with small Gs but tops out quickly.",
           "More than 1: Camera moves little with small Gs but increases exponentially with more Gs." });
 
-    g_menu.FloatOptionCb("Pitch: Minimum Gs", movement.PitchDeadzone, 0.0f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("Pitch: Minimum Gs", movement.PitchDeadzone, 0.0f, 2.0f, 0.01f, GetKbEntryFloat,
         { "How hard the car should accelerate or decelerate for the camera to start moving.",
           "Unit in Gs." });
 
-    g_menu.FloatOptionCb("Pitch: Up scale", movement.PitchUpMult, 0.0f, 90.0f, 1.0f, getKbEntry,
+    g_menu.FloatOptionCb("Pitch: Up scale", movement.PitchUpMult, 0.0f, 90.0f, 1.0f, GetKbEntryFloat,
         { "How much to move the camera with, depending on how hard you acceleration.",
           "A scale of 15.0 makes the camera pitch up 15 degrees at 1G acceleration." });
 
-    g_menu.FloatOptionCb("Pitch: Down scale", movement.PitchDownMult, 0.0f, 90.0f, 1.0f, getKbEntry,
+    g_menu.FloatOptionCb("Pitch: Down scale", movement.PitchDownMult, 0.0f, 90.0f, 1.0f, GetKbEntryFloat,
         { "How much to move the camera with, depending on how hard you deceleration.",
           "A scale of 15.0 makes the camera pitch down 15 degrees at 1G deceleration." });
 
-    g_menu.FloatOptionCb("Pitch: Up limit", movement.PitchUpMaxAngle, 0.0f, 90.0f, 1.0f, getKbEntry,
+    g_menu.FloatOptionCb("Pitch: Up limit", movement.PitchUpMaxAngle, 0.0f, 90.0f, 1.0f, GetKbEntryFloat,
         { "Degrees the camera can pitch up (under acceleration)." });
 
-    g_menu.FloatOptionCb("Pitch: Down limit", movement.PitchDownMaxAngle, 0.0f, 90.0f, 1.0f, getKbEntry,
+    g_menu.FloatOptionCb("Pitch: Down limit", movement.PitchDownMaxAngle, 0.0f, 90.0f, 1.0f, GetKbEntryFloat,
         { "Degrees the camera can pitch down (under deceleration)." });
 }
 
@@ -2471,16 +2125,16 @@ void update_bikecameraoptionsmenu() {
         FPVCam::CancelCam();
     }
 
-    g_menu.FloatOptionCb("Field of view", g_settings().Misc.Camera.Bike.FOV, 1.0f, 120.0f, 0.5f, getKbEntry,
+    g_menu.FloatOptionCb("Field of view", g_settings().Misc.Camera.Bike.FOV, 1.0f, 120.0f, 0.5f, GetKbEntryFloat,
         { "In degrees." });
 
-    g_menu.FloatOptionCb("Offset height", g_settings().Misc.Camera.Bike.OffsetHeight, -2.0f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("Offset height", g_settings().Misc.Camera.Bike.OffsetHeight, -2.0f, 2.0f, 0.01f, GetKbEntryFloat,
         { "Distance in meters." });
 
-    g_menu.FloatOptionCb("Offset forward", g_settings().Misc.Camera.Bike.OffsetForward, -2.0f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("Offset forward", g_settings().Misc.Camera.Bike.OffsetForward, -2.0f, 2.0f, 0.01f, GetKbEntryFloat,
         { "Distance in meters." });
 
-    g_menu.FloatOptionCb("Offset side", g_settings().Misc.Camera.Bike.OffsetSide, -2.0f, 2.0f, 0.01f, getKbEntry,
+    g_menu.FloatOptionCb("Offset side", g_settings().Misc.Camera.Bike.OffsetSide, -2.0f, 2.0f, 0.01f, GetKbEntryFloat,
         { "Distance in meters." });
 
     g_menu.FloatOption("Pitch", g_settings().Misc.Camera.Bike.Pitch, -20.0f, 20.0f, 0.1f,
@@ -2754,7 +2408,7 @@ void update_menu() {
     if (g_menu.CurrentMenu("buttonsmenu")) { update_buttonsmenu(); }
 
     /* mainmenu -> controlsmenu -> update_controlsvehconfmenu */
-    if (g_menu.CurrentMenu("vehiclecontroladjustsmenu")) { update_controlsvehconfmenu(); }
+    if (g_menu.CurrentMenu("controlsvehconfmenu")) { update_controlsvehconfmenu(); }
 
     /* mainmenu -> hudmenu */
     if (g_menu.CurrentMenu("hudmenu")) { update_hudmenu(); }

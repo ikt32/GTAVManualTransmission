@@ -379,7 +379,7 @@ public:
 
             // Ground physics
             int FFBProfile = 0;
-            float ResponseCurve = 0.75f;
+            float ResponseCurve = 1.0f;
             float SlipOptMin = 7.5f;        // Advanced
             float SlipOptMinMult = 1.6f;    // Advanced
             float SlipOptMax = 25.0f;       // Advanced

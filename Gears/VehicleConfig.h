@@ -235,6 +235,7 @@ public:
 
         struct {
             Tracked<float> SATMult = 1.0f;
+            Tracked<float> CurveMult = 1.0f;
             Tracked<float> SoftLock = 720.0f;
             Tracked<float> SteeringMult = 1.0f;
         } Wheel;
