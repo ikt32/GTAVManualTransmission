@@ -1171,7 +1171,7 @@ void ScriptSettings::SteeringSaveAxis(const std::string &confTag, ptrdiff_t inde
     CHECK_LOG_SI_ERROR(result, "load");
 
     ini.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
-    ini.SetValue(confTag.c_str(), "AXLE", axis.c_str());
+    ini.SetValue(confTag.c_str(), "AXIS", axis.c_str());
     ini.SetValue(confTag.c_str(), "MIN", std::to_string(minVal).c_str());
     ini.SetValue(confTag.c_str(), "MAX", std::to_string(maxVal).c_str());
 
@@ -1292,9 +1292,14 @@ CarControls::SInput<T> ScriptSettings::parseWheelItem(CSimpleIniA& ini, const ch
             ini.GetLongValue(section, "BUTTON", defaultValue), nameFmt.c_str(), "");
     }
     else if constexpr (std::is_same<T, std::string>::value) {
+        auto axisValue = ini.GetValue(section, "AXIS", defaultValue.c_str());
+        if (defaultValue == axisValue) {
+            axisValue = ini.GetValue(section, "AXLE", defaultValue.c_str());
+        }
+
         return CarControls::SInput<T>(section,
             DeviceIndexToGUID(ini.GetLongValue(section, "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
-            ini.GetValue(section, "AXLE", defaultValue.c_str()), nameFmt.c_str(), "");
+            axisValue, nameFmt.c_str(), "");
     }
     else {
         static_assert(false, "Type must be string or int.");
