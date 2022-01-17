@@ -356,6 +356,7 @@ public:
         // [INPUT_DEVICES]
         struct {
             std::vector<GUID> RegisteredGUIDs;
+            std::vector<Device> RegisteredDevices;
         } InputDevices;
 
         // [FORCE_FEEDBACK]
@@ -441,6 +442,7 @@ public:
      */
     ptrdiff_t SteeringAppendDevice(const GUID & dev_guid, const std::string& dev_name);
     int GUIDToDeviceIndex(GUID guid);
+    std::string GUIDToDeviceName(GUID guid);
 
     void SteeringSaveAxis(const std::string &confTag, ptrdiff_t index, const std::string &axis, int minVal, int maxVal);
     void SteeringSaveButton(const std::string &confTag, ptrdiff_t index, int button);

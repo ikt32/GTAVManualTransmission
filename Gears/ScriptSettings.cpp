@@ -887,6 +887,7 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
         GUID guid = String2GUID(currGuid);
         if (guid != GUID()) {
             Wheel.InputDevices.RegisteredGUIDs.push_back(guid);
+            Wheel.InputDevices.RegisteredDevices.push_back(Device(currDevice, guid));
         }
         else {
             logger.Write(ERROR, "[Settings] Failed to parse GUID. GUID [%s] @ [%s]", currGuid.c_str(), currDevice.c_str());
@@ -1281,6 +1282,15 @@ int ScriptSettings::GUIDToDeviceIndex(GUID guidToFind) {
         i++;
     }
     return -1;
+}
+
+std::string ScriptSettings::GUIDToDeviceName(GUID guidToFind) {
+    for (auto device : Wheel.InputDevices.RegisteredDevices) {
+        if (device.guid == guidToFind) {
+            return device.name;
+        }
+    }
+    return "Device not found";
 }
 
 template <typename T>

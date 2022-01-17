@@ -131,6 +131,18 @@ namespace {
         return fmt::format("CFG: [{}]", cfgName);
     }
 
+    std::string FormatDeviceGuidName(GUID guid) {
+        std::string deviceNameCfg = g_settings.GUIDToDeviceName(guid);
+        DirectInputDeviceInfo* deviceEntry = g_controls.GetWheel().GetDeviceInfo(guid);
+        int index = g_settings.GUIDToDeviceIndex(g_controls.WheelToKeyGUID);
+        if (deviceEntry) {
+            return fmt::format("[{}] {}", index, deviceNameCfg);
+        }
+        else {
+            return fmt::format("[{}] {} (Disconnected)", index, deviceNameCfg);
+        }
+    }
+
     void incVal(float& value, float max, float step) {
         if (value + step > max) {
             value = max;
@@ -752,12 +764,7 @@ void update_keyboardmenu() {
 void update_wheelmenu() {
     g_menu.Title("Wheel & pedals");
     auto wheelGuid = g_controls.WheelAxes[static_cast<int>(CarControls::WheelAxisType::Steer)].Guid;
-    auto deviceEntry = g_controls.GetWheel().GetDeviceInfo(wheelGuid);
-    std::string wheelName = "No wheel set up";
-    if (deviceEntry) {
-        wheelName = deviceEntry->DeviceInstance.tszInstanceName;
-    }
-    g_menu.Subtitle(wheelName);
+    g_menu.Subtitle(FormatDeviceGuidName(wheelGuid));
 
     if (!g_controls.FreeDevices.empty()) {
         for (const auto& device : g_controls.FreeDevices) {
@@ -882,10 +889,12 @@ void update_axesmenu() {
         if (input.ConfigTag == "FFB")
             continue;
 
+        bool selected = false;
+
         if (g_menu.OptionPlus(
             fmt::format("Configure {}", input.Name),
-            info, 
-            nullptr,
+            {},
+            &selected,
             [&input] { return clearAxis(input.ConfigTag); }, 
             nullptr, 
             "Input values")) {
@@ -895,6 +904,19 @@ void update_axesmenu() {
                 fmt::format("[{}] cancelled", input.Name));
             if (result)
                 initWheel();
+        }
+
+        if (selected) {
+            if (!input.Control.empty() && input.Guid != GUID_NULL) {
+                info.push_back(fmt::format("{} assigned to", input.Name));
+                info.push_back(fmt::format("Device: {}", FormatDeviceGuidName(input.Guid)));
+                info.push_back(fmt::format("Axis: {}", input.Control));
+            }
+            else {
+                info.push_back(fmt::format("{} unassigned", input.Name));
+            }
+
+            g_menu.OptionPlusPlus(info, "Input values");
         }
     }
 
@@ -1115,7 +1137,7 @@ void update_buttonsmenu() {
     std::vector<std::string> wheelToKeyInfo = {
         "Active wheel-to-key options:",
         "Press RIGHT to clear all keys bound to button",
-        fmt::format("Device: {}", g_settings.GUIDToDeviceIndex(g_controls.WheelToKeyGUID))
+        fmt::format("Assigned to {}", FormatDeviceGuidName(g_controls.WheelToKeyGUID))
     };
 
     for (int i = 0; i < MAX_RGBBUTTONS; i++) {
@@ -1173,7 +1195,15 @@ void update_buttonsmenu() {
             input.ConfigTag.empty())
             continue;
 
-        buttonInfo.push_back(fmt::format("Assigned to {}", input.Control));
+        bool popTwo = false;
+        if (input.Control != -1) {
+            buttonInfo.push_back(fmt::format("Device: {}", FormatDeviceGuidName(input.Guid)));
+            buttonInfo.push_back(fmt::format("Button: {}", input.Control));
+            popTwo = true;
+        }
+        else {
+            buttonInfo.push_back(fmt::format("{} unassigned", input.Name));
+        }
         if (g_menu.OptionPlus(
             fmt::format("Assign [{}]", input.Name),
             buttonInfo,
@@ -1189,6 +1219,8 @@ void update_buttonsmenu() {
                 initWheel();
         }
         buttonInfo.pop_back();
+        if (popTwo)
+            buttonInfo.pop_back();
     }
 }
 
