@@ -1,5 +1,6 @@
 #include "VehicleConfig.h"
 
+#include "ScriptSettings.hpp"
 #include "SettingsCommon.h"
 #include "Util/Logger.hpp"
 #include "Util/Strings.hpp"
@@ -14,7 +15,7 @@
     }
 
 #define SAVE_VAL(section, key, option) \
-    if (mBaseConfig == this || option != mBaseConfig->option || option.Changed()) { \
+    if (mBaseConfig == this || option != mBaseConfig->option || option.Changed() || g_settings.Misc.SaveFullConfig) { \
         SetValue(ini, section, key, option); \
         option.Reset(); \
     }
@@ -57,6 +58,8 @@
     LOAD_VAL("CAM", prefix "PitchUpMaxAngle",   ##source.PitchUpMaxAngle); \
     LOAD_VAL("CAM", prefix "PitchDownMaxAngle", ##source.PitchDownMaxAngle); \
 }
+
+extern ScriptSettings g_settings;
 
 EShiftMode Next(EShiftMode mode) {
     return static_cast<EShiftMode>((static_cast<int>(mode) + 1) % 3);

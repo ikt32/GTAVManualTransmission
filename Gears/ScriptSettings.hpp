@@ -302,6 +302,8 @@ public:
 
         bool HidePlayerInFPV = false;
         bool HideWheelInFPV = false;
+
+        bool SaveFullConfig = true;
     } Misc;
 
     // [UPDATE]

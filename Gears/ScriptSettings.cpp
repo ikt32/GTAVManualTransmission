@@ -294,6 +294,7 @@ void ScriptSettings::SaveGeneral() {
     SAVE_VAL("MISC", "SyncAnimations", Misc.SyncAnimations);
     SAVE_VAL("MISC", "HidePlayerInFPV", Misc.HidePlayerInFPV);
     SAVE_VAL("MISC", "HideWheelInFPV", Misc.HideWheelInFPV);
+    SAVE_VAL("MISC", "SaveFullConfig", Misc.SaveFullConfig);
 
     // [UPDATE]
     SAVE_VAL("UPDATE", "EnableUpdate", Update.EnableUpdate);
@@ -629,6 +630,7 @@ void ScriptSettings::parseSettingsGeneral() {
     LOAD_VAL("MISC", "SyncAnimations", Misc.SyncAnimations);
     LOAD_VAL("MISC", "HidePlayerInFPV", Misc.HidePlayerInFPV);
     LOAD_VAL("MISC", "HideWheelInFPV", Misc.HideWheelInFPV);
+    LOAD_VAL("MISC", "SaveFullConfig", Misc.SaveFullConfig);
 
     // [UPDATE]
     LOAD_VAL("UPDATE", "EnableUpdate", Update.EnableUpdate);

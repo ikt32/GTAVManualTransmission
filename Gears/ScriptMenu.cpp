@@ -488,6 +488,10 @@ void update_vehconfigmenu() {
         g_menu.Option("No active configuration");
     }
 
+    g_menu.BoolOption("Save entire configuration", g_settings.Misc.SaveFullConfig,
+        { "Enabled: Writes the full configuration for all configurations.",
+            "Disabled: Only write difference between specific and base configuration." });
+
     for (const auto& vehConfig : g_vehConfigs) {
         bool sel = false;
         std::vector<std::string> descr = {
