@@ -101,6 +101,10 @@ std::vector<VehicleConfig> g_vehConfigs;
 
 bool g_focused;
 Timer g_wheelInitDelayTimer(0);
+Timer g_lastUpdateTimer(0);
+
+std::atomic<long long> g_pauseTimer = 0;
+std::atomic<bool> g_shouldCheck = false;
 
 std::vector<ValueTimer<float>> g_speedTimers;
 
@@ -371,13 +375,27 @@ void update_vehicle() {
     g_lastPlayerVehicle = g_playerVehicle;
 }
 
+inline auto now() {
+    using namespace std::chrono;
+    auto tEpoch = steady_clock::now().time_since_epoch();
+    return duration_cast<milliseconds>(tEpoch).count();
+}
+
 // Read inputs
 void update_inputs() {
+    if (g_lastUpdateTimer.Elapsed() > 1000) {
+        // It's been >0.1 second between messages, the game probably has been resumed after pause.
+        // Let's reset the wheel.
+        logger.Write(DEBUG, "[Wheel] %d millis since last update, re-init FFB", g_lastUpdateTimer.Elapsed());
+        g_wheelInitDelayTimer.Reset(1);
+    }
+    g_lastUpdateTimer.Reset();
+
     if (g_focused != SysUtil::IsWindowFocused()) {
         // no focus -> focus
         if (!g_focused) {
             logger.Write(DEBUG, "[Wheel] Window focus gained: re-initializing FFB");
-            g_wheelInitDelayTimer.Reset(1000);
+            g_wheelInitDelayTimer.Reset(500);
         }
         else {
             logger.Write(DEBUG, "[Wheel] Window focus lost");
@@ -386,6 +404,8 @@ void update_inputs() {
     g_focused = SysUtil::IsWindowFocused();
 
     if (g_wheelInitDelayTimer.Expired() && g_wheelInitDelayTimer.Period() > 0) {
+        g_controls.PlayFFBDynamics(0, 0);
+        g_controls.PlayFFBCollision(0);
         g_controls.GetWheel().Acquire();
         g_wheelInitDelayTimer.Reset(0);
     }
@@ -2909,6 +2929,9 @@ void InitTextures() {
 
 void ScriptTick() {
     while (true) {
+        g_shouldCheck = true;
+        g_pauseTimer = now();
+
         update_player();
         update_vehicle();
         Misc::UpdateEngineOnOff();
@@ -2930,7 +2953,24 @@ void ScriptTick() {
 
 bool initialized = false;
 
+std::atomic<bool> g_cancelThread = false;
+
 void ScriptMain() {
+    g_cancelThread = false;
+    auto pauseCheckFunc = []() {
+        while (!g_cancelThread) {
+            if (g_shouldCheck && now() > g_pauseTimer + 500) {
+                logger.Write(DEBUG, "[Wheel] Pause detected, stopping wheel");
+                // Thread-unsafe as heck
+                g_controls.PlayFFBDynamics(0, 0);
+                g_controls.PlayFFBCollision(0);
+                g_shouldCheck = false;
+            }
+            Sleep(500);
+        }
+    };
+    std::thread pauseCheckThread(pauseCheckFunc);
+
     if (!initialized) {
         logger.Write(INFO, "Script started");
         ScriptInit();

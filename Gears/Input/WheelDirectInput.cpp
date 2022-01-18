@@ -231,7 +231,7 @@ void WheelDirectInput::Acquire() {
     
     hr = e->Device->GetDeviceState(sizeof(DIJOYSTATE2), &e->Joystate);
     if (FAILED(hr)) {
-        logger.Write(ERROR, "[Wheel] Failed GetDeviceState: %x %s", hr, GetDIError(hr).c_str());
+        logger.Write(DEBUG, "[Wheel] Failed GetDeviceState: %x %s", hr, GetDIError(hr).c_str());
 
         /*HRESULT */hr = e->Device->Acquire();
         if (hr == DI_OK) {

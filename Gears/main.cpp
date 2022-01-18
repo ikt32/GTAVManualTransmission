@@ -19,6 +19,7 @@
 #include <filesystem>
 
 namespace fs = std::filesystem;
+extern std::atomic<bool> g_cancelThread;
 
 void resolveVersion() {
     int shvVersion = getGameVersion();
@@ -146,6 +147,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             releaseCompatibility();
 
             SteeringAnimation::CancelAnimation();
+            g_cancelThread = true;
 
             scriptUnregister(hInstance);
             break;
