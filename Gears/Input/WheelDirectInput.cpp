@@ -219,7 +219,6 @@ void WheelDirectInput::Acquire() {
         return;
     }
 
-    logger.Write(DEBUG, "[Wheel] Unacquiring for god knows what");
     HRESULT hr = e->Device->Unacquire();
     if (FAILED(hr)) {
         logger.Write(ERROR, "[Wheel] Unacquire failed with %x for %s", hr, guidStr);
@@ -398,7 +397,7 @@ void WheelDirectInput::createConstantForceEffect(GUID device, DIAxis axis, DWORD
     diEffect.rgdwAxes = rgdwAxes;
     diEffect.rglDirection = rglDirection;
     diEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
-    diEffect.dwDuration = 500 * 1000; // 500ms
+    diEffect.dwDuration = INFINITE;
     diEffect.dwSamplePeriod = 0;
     diEffect.dwGain = DI_FFNOMINALMAX;
     diEffect.dwTriggerButton = DIEB_NOTRIGGER;
@@ -427,7 +426,7 @@ void WheelDirectInput::createDamperEffect(GUID device, DIAxis axis, DWORD rawAxi
     ZeroMemory(&diEffect, sizeof(diEffect));
     diEffect.dwSize = sizeof(DIEFFECT);
     diEffect.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
-    diEffect.dwDuration = 500 * 1000; // 500ms
+    diEffect.dwDuration = INFINITE;
     diEffect.dwSamplePeriod = 0;
     diEffect.dwGain = DI_FFNOMINALMAX;
     diEffect.dwTriggerButton = DIEB_NOTRIGGER;

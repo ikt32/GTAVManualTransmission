@@ -13,14 +13,21 @@ Improve driving assists:
 * Use more accurate data sources to determine slip
 * Fix brake force not scaled to handling brake force
 * Fix TCS UI elements lingering when no throttle applied, if other throttle effects are active
+* Fix ABS UI not coming up for GTA's ABS
 
 Misc:
 
 * Add downshift protection option
+* Add pitch to camera movement
 * Allow more wheel rotation, up to 2880 degrees
 * Fix ineffective braking when reversing when using wheel
 * Improve wheel bone rotation precision
 * Update support for Wanted188's R32
+* Allow configuring telemetry endpoint (IP and port in settings_general.ini \[Misc\])
+* Fix steering animation sometimes not loaded on initial game start
+* Add currently assigned device display to wheel control assignments
+* Clarify whether a device is disconnected or not configured
+* Allow saving full vehicle config instead of just empty/delta from base config
 
 ## 5.4.2
 

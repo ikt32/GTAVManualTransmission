@@ -377,7 +377,7 @@ void update_inputs() {
         // no focus -> focus
         if (!g_focused) {
             logger.Write(DEBUG, "[Wheel] Window focus gained: re-initializing FFB");
-            g_wheelInitDelayTimer.Reset(100);
+            g_wheelInitDelayTimer.Reset(1000);
         }
         else {
             logger.Write(DEBUG, "[Wheel] Window focus lost");
