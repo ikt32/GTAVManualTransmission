@@ -968,6 +968,11 @@ void updateLastInputDevice() {
 
     if (g_controls.PrevInput != g_controls.GetLastInputDevice(g_controls.PrevInput,g_settings.Wheel.Options.Enable)) {
         g_controls.PrevInput = g_controls.GetLastInputDevice(g_controls.PrevInput, g_settings.Wheel.Options.Enable);
+        if (g_controls.PrevInput != CarControls::Wheel) {
+            g_controls.PlayFFBDynamics(0, 0);
+            g_controls.PlayFFBCollision(0);
+        }
+
         std::string message = "Input: ";
         switch (g_controls.PrevInput) {
             case CarControls::Keyboard:
