@@ -303,7 +303,8 @@ void update_mainmenu() {
             activeInputName = "Wheel";
             break;
         }
-        g_menu.StringArray("Active input", { activeInputName }, activeIndex, { "Active input is automatically detected and can't be changed." });
+        g_menu.StringArray("Active input", { activeInputName }, activeIndex, 
+            { "Active input is automatically detected when throttle, brake or clutch is pressed on a configured device." });
     }
 }
 
@@ -1020,14 +1021,16 @@ void update_forcefeedbackmenu() {
     }
 
     g_menu.FloatOption("Detail effect multiplier", g_settings.Wheel.FFB.DetailMult, 0.0f, 10.0f, 0.1f,
-        { "Force feedback effects caused by the suspension. This effect is muxed with the main effect." });
+        { "Force feedback caused by the suspension.",
+          "This force stacks on top of the main SAT force." });
 
     g_menu.IntOption("Detail effect limit", g_settings.Wheel.FFB.DetailLim, 0, 20000, 100, 
-        { "Clamp effect amplitude to this value. 20000 allows muxing with the main effect." });
+        { "Clamp detail force to this value.",
+          "20000 allows maxing out detail force in the other direction the SAT is acting on." });
 
     g_menu.IntOption("Detail effect averaging", g_settings.Wheel.FFB.DetailMAW, 1, 100, 1,
-        { "Averages the detail effect to prevent force feedback spikes.",
-        "Recommended to keep as low as possible, as higher values delay more."});
+        { "Averages the detail force to prevent force feedback spikes.",
+        "Recommended to keep as low as possible, as detail is lost with higher values."});
 
     g_menu.FloatOption("Collision effect multiplier", g_settings.Wheel.FFB.CollisionMult, 0.0f, 10.0f, 0.1f,
         { "Force feedback effect caused by frontal/rear collisions." });
@@ -1090,8 +1093,8 @@ void update_forcefeedbackmenu() {
     }
 
     g_menu.MenuOption("FFB normalization options", "ffbnormalizationmenu",
-        { "Different fTractionCurveLateral values affect FFB response,"
-          "these values are used to normalize steering forces across different handlings." });
+        { "Different fTractionCurveLateral values affect FFB response.",
+          "These values normalize the steering forces across different handlings." });
 
     if (g_settings.Debug.ShowAdvancedFFBOptions) {
         g_menu.OptionPlus("Legacy FFB options:",
@@ -1724,6 +1727,7 @@ void update_awdsettingsmenu() {
     {
         "Flags for extra features. Current flags:",
         "Bit 0: Enable torque transfer dial on y97y's BNR32",
+        "Bit 1: Enable torque transfer dial on Wanted188's GT-R R32 (Remember to disable VehFuncs for torque dial)"
     };
     std::string specialFlagsStr = fmt::format("{:08X}", g_settings().DriveAssists.AWD.SpecialFlags);
     if (g_menu.Option(fmt::format("Special flags (hex): {}", specialFlagsStr), specialFlagsDescr)) {
@@ -1838,7 +1842,7 @@ void update_gameassistmenu() {
         { "Automatically look back whenever in reverse gear." });
 
     g_menu.BoolOption("Clutch & throttle start", g_settings.GameAssists.ThrottleStart,
-        { "Allow to start the engine by pressing clutch and throttle." });
+        { "Allow starting the engine by pressing clutch and throttle simultaneously." });
 }
 
 void update_steeringassistmenu() {
@@ -1914,7 +1918,7 @@ void update_miscoptionsmenu() {
         g_menu.BoolOption("Sync steering animation", g_settings.Misc.SyncAnimations,
             { "Synchronize animations with wheel rotation using third-person animations.",
               "Only active for synced steering wheel rotation or custom controller wheel rotation.",
-              "FPV camera angle is limited, consider enabling the custom FPV camera.",
+              "Limits FPV camera angle, recommended to enable custom FPV camera.",
               "Check animations.yml for more details!" });
     }
 
@@ -1933,7 +1937,7 @@ void update_miscoptionsmenu() {
     if (g_menu.BoolOption("Enable UDP telemetry", g_settings.Misc.UDPTelemetry,
         { "Allows programs like SimHub to use data from this script.",
             "This script uses the DIRT 4 format for telemetry data.",
-            fmt::format("{}:{}", g_settings.Misc.UDPAddres, g_settings.Misc.UDPPort),
+            fmt::format("Endpoint: {}:{}", g_settings.Misc.UDPAddres, g_settings.Misc.UDPPort),
             "Restart the game if the endpoints are changed." })) {
         StartUDPTelemetry();
     }
