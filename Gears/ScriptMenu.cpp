@@ -134,7 +134,7 @@ namespace {
     std::string FormatDeviceGuidName(GUID guid) {
         std::string deviceNameCfg = g_settings.GUIDToDeviceName(guid);
         DirectInputDeviceInfo* deviceEntry = g_controls.GetWheel().GetDeviceInfo(guid);
-        int index = g_settings.GUIDToDeviceIndex(g_controls.WheelToKeyGUID);
+        int index = g_settings.GUIDToDeviceIndex(guid);
         if (deviceEntry) {
             return fmt::format("[{}] {}", index, deviceNameCfg);
         }
