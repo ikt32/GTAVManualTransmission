@@ -1089,10 +1089,11 @@ void update_forcefeedbackmenu() {
         });
     }
 
-    if (g_settings.Debug.ShowAdvancedFFBOptions) {
-        g_menu.MenuOption("FFB normalization options", "ffbnormalizationmenu",
-            { "Different fTractionCurveLateral values affect FFB response, these values are used to normalize steering forces." });
+    g_menu.MenuOption("FFB normalization options", "ffbnormalizationmenu",
+        { "Different fTractionCurveLateral values affect FFB response,"
+          "these values are used to normalize steering forces across different handlings." });
 
+    if (g_settings.Debug.ShowAdvancedFFBOptions) {
         g_menu.OptionPlus("Legacy FFB options:",
             { "This is an old FFB implementation, based on movement versus steering inputs.",
               "Road vehicles use better FFB with wheel data, but old FFB is still used for non-road vehicles." });
@@ -1116,13 +1117,30 @@ void update_ffbnormalizationmenu() {
     g_menu.Title("FFB Normalization");
     g_menu.Subtitle("");
 
-    g_menu.OptionPlus("Description", 
-        { "These values affect the usage of 'FFB response curve' value, relative to the fTractionCurveLateral (optimal slip angle) value of the vehicle.",
-          "Higher optimal slip angles cause FFB to respond slowly to small changes, lower optimal slip angles cause FFB to respond quick to small changes.",
-          "These values normalize this, to make the high slip values used by default GTA V handlings to respond quickly.",
-          "For the best experience, use a custom handling with low fTractionCurveMin/Max and low fTractionCurveLateral values.",
-          "Defaults: 7.5/1.6, 20.0/1.0",
-          "No correction: 10.0/1.0, 20.0/1.0"});
+    g_menu.OptionPlus("Description",
+        {
+            "These values affect the usage of 'FFB response curve' value, relative to the fTractionCurveLateral (optimal slip angle) value of the vehicle.",
+            "Higher optimal slip angles cause FFB to respond slowly to small changes, lower optimal slip angles cause FFB to respond quick to small changes.",
+            "These values normalize this, to make the high slip values used by default GTA V handlings to respond quickly.",
+            "For the best experience, use a custom handling with low fTractionCurveMin/Max and low fTractionCurveLateral values.",
+            "No normalization: 5.0/1.0, 20.0/1.0",
+            "Default normalization: 7.5/1.6, 20.0/1.0"
+        }
+    );
+
+    if (g_menu.Option("No normalization", { "Use this option to quickly disable normalization." })) {
+        g_settings.Wheel.FFB.SlipOptMin = 5.0f;
+        g_settings.Wheel.FFB.SlipOptMinMult = 1.0f;
+        g_settings.Wheel.FFB.SlipOptMax = 20.0f;
+        g_settings.Wheel.FFB.SlipOptMaxMult = 1.0f;
+    }
+
+    if (g_menu.Option("Default normalization", { "Use this option to quickly apply default normalization." })) {
+        g_settings.Wheel.FFB.SlipOptMin = 7.5f;
+        g_settings.Wheel.FFB.SlipOptMinMult = 1.6f;
+        g_settings.Wheel.FFB.SlipOptMax = 20.0f;
+        g_settings.Wheel.FFB.SlipOptMaxMult = 1.0f;
+    }
 
     g_menu.FloatOptionCb("Optimal slip low", g_settings.Wheel.FFB.SlipOptMin, 0.0f, 90.0f, 0.1f, GetKbEntryFloat);
     g_menu.FloatOptionCb("Optimal slip low mult", g_settings.Wheel.FFB.SlipOptMinMult, 0.0f, 10.0f, 0.1f, GetKbEntryFloat,
@@ -2214,8 +2232,8 @@ void update_debugmenu() {
     g_menu.Title("Debug settings");
     g_menu.Subtitle("Under the hood");
 
-    g_menu.BoolOption("Show advanced FFB options", g_settings.Debug.ShowAdvancedFFBOptions,
-        { "Show advanced and legacy options in FFB menu." });
+    g_menu.BoolOption("Show legacy FFB options", g_settings.Debug.ShowAdvancedFFBOptions,
+        { "Show legacy options in FFB menu." });
     g_menu.BoolOption("Display debug info", g_settings.Debug.DisplayInfo,
         { "Show all detailed technical info of the gearbox and inputs calculations." });
     g_menu.BoolOption("Display wheel drive info", g_settings.Debug.DisplayWheelInfo,
