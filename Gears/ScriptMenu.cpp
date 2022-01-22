@@ -1141,35 +1141,22 @@ void update_buttonsmenu() {
     std::vector<std::string> wheelToKeyInfo = {
         "Active wheel-to-key options:",
         "Press RIGHT to clear all keys bound to button",
-        fmt::format("Assigned to {}", FormatDeviceGuidName(g_controls.WheelToKeyGUID))
     };
 
-    for (int i = 0; i < MAX_RGBBUTTONS; i++) {
-        if (g_controls.WheelToKey[i].empty())
-            continue;
-        
-        for (const auto& keyval : g_controls.WheelToKey[i]) {
-            wheelToKeyInfo.push_back(fmt::format("{} = {}", i, key2str(keyval)));
-            if (g_controls.GetWheel().IsButtonPressed(i, g_controls.WheelToKeyGUID)) {
-                wheelToKeyInfo.back() = fmt::format("{} (Pressed)", wheelToKeyInfo.back());
-            }
-        }
+    if (g_controls.WheelToKey.empty()) {
+        wheelToKeyInfo.push_back("No keys assigned");
     }
-
-    for (const auto w2kBindingPov : g_controls.WheelToKeyPov) {
-        if (w2kBindingPov.second.empty())
-            continue;
-        auto i = w2kBindingPov.first;
-        for (const auto& keyval : w2kBindingPov.second) {
-            wheelToKeyInfo.push_back(fmt::format("{} = {}", i, key2str(keyval)));
-            if (g_controls.GetWheel().IsButtonPressed(i, g_controls.WheelToKeyGUID)) {
-                wheelToKeyInfo.back() = fmt::format("{} (Pressed)", wheelToKeyInfo.back());
-            }
+    for (const auto& input : g_controls.WheelToKey) {
+        int index = g_settings.GUIDToDeviceIndex(input.Guid);
+        std::string name = g_settings.GUIDToDeviceName(input.Guid);
+        wheelToKeyInfo.push_back(fmt::format("DEV{}BUTTON{} = {} ({})", index, input.Control, input.ConfigTag, name));
+        if (g_controls.GetWheel().IsButtonPressed(input.Control, input.Guid)) {
+            wheelToKeyInfo.back() = fmt::format("{} (Pressed)", wheelToKeyInfo.back());
         }
     }
 
     if (g_menu.OptionPlus("Set up WheelToKey", wheelToKeyInfo, nullptr, clearWheelToKey, nullptr, "Info",
-        { "Set up wheel buttons that press a keyboard key. Only one device can be used for this." })) {
+        { "Set up wheel buttons that press a keyboard key." })) {
         bool result = configWheelToKey();
         UI::Notify(WARN, result ? "Entry added" : "Cancelled entry addition");
     }

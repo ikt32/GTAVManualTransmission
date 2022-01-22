@@ -452,7 +452,7 @@ public:
     void ControllerSaveButton(const std::string &confTag, const std::string &button);
     void LControllerSaveButton(const std::string & confTag, int button);
     void SteeringAddWheelToKey(const std::string & conftag, ptrdiff_t index, int button, const std::string & keyName);
-    bool SteeringClearWheelToKey(int button);
+    bool SteeringClearWheelToKey(const std::string& assignment);
 private:
     void parseSettingsGeneral();
     void parseSettingsControls(CarControls* scriptControl);
