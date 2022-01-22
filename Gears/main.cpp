@@ -28,7 +28,7 @@ void resolveVersion() {
     // Also prints the other stuff, annoyingly.
     SVersion exeVersion = getExeInfo();
 
-    if (shvVersion < G_VER_1_0_877_1_STEAM) {
+    if (shvVersion < G_VER_1_0_1604_0_STEAM) {
         logger.Write(WARN, "Outdated game version! Update your game.");
     }
 

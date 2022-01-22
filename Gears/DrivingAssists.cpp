@@ -112,7 +112,7 @@ DrivingAssists::ESPData DrivingAssists::GetESP() {
         float div = 0.0f;
         float avgSlip = 0.0f;
 
-        const float latSlipOpt = *(float*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets1604.fTractionCurveLateral);
+        const float latSlipOpt = *(float*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets.fTractionCurveLateral);
 
         for (uint8_t i = 0; i < slipInfos.size(); ++i) {
             // Current slip, relative to optimal slip angle.

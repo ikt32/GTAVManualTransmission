@@ -395,9 +395,9 @@ Something don't work? Read this first.
 
 ### Game compatibility
 
-The current version of the mod has been tested with GTA V version v1.0.1604.0
-through v1.0.2245.1. Limited support runs back to v1.0.877.1, but new features
-have been added since.
+The current version of the mod has been tested with the latest GTA V version
+during development, which is v1.0.2545.0.
+Limited support runs back to v1.0.1604.0, but new features might be unstable.
 
 ### Compatibility options
 

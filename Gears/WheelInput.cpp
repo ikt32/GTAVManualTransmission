@@ -813,10 +813,10 @@ int calculateSat() {
     const float outMultB = 0.35f;
 
     // in radians
-    const float latSlipOpt = *(float*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets1604.fTractionCurveLateral);
-    const auto comOffset = *(V3F*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets1604.vecCentreOfMass.X);
+    const float latSlipOpt = *(float*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets.fTractionCurveLateral);
+    const auto comOffset = *(V3F*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets.vecCentreOfMass.X);
     // in kg
-    const float mass = *(float*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets1604.fMass);
+    const float mass = *(float*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets.fMass);
 
     auto wheelOffsets = VExt::GetWheelOffsets(g_playerVehicle);
     auto wheelVels = VExt::GetTyreSpeeds(g_playerVehicle);

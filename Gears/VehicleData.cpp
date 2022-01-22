@@ -69,16 +69,9 @@ void VehicleData::SetVehicle(Vehicle v) {
 
         mFlags = VExt::GetVehicleFlags(mVehicle);
 
-        extern eGameVersion g_gameVersion;
-        if (g_gameVersion >= G_VER_1_0_1604_0_STEAM) {
-            mModelFlags = *reinterpret_cast<uint32_t*>(mHandlingPtr + hOffsets1604.dwStrModelFlags);
-            mHandlingFlags = *reinterpret_cast<uint32_t*>(mHandlingPtr + hOffsets1604.dwStrHandlingFlags);
-        }
-        else {
-            mModelFlags = *reinterpret_cast<uint32_t*>(mHandlingPtr + hOffsets.dwStrModelFlags);
-            mHandlingFlags = *reinterpret_cast<uint32_t*>(mHandlingPtr + hOffsets.dwStrHandlingFlags);
-        }
-
+        mModelFlags = *reinterpret_cast<uint32_t*>(mHandlingPtr + hOffsets.dwStrModelFlags);
+        mHandlingFlags = *reinterpret_cast<uint32_t*>(mHandlingPtr + hOffsets.dwStrHandlingFlags);
+        
         mIsElectric = mFlags[1] & eVehicleFlag2::FLAG_IS_ELECTRIC;
         mIsCVT = mHandlingFlags & 0x00001000; // CVT accelerates while clutch is in?
         mHasClutch = !mIsElectric && !mIsCVT;

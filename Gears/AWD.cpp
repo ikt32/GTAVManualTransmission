@@ -55,8 +55,8 @@ float AWD::GetDriveBiasFront(void* pHandlingDataOrig) {
     if (!pHandlingDataOrig)
         return -1.0f;
 
-    float fDriveBiasFront = *(float*)((uint8_t*)pHandlingDataOrig + hOffsets1604.fDriveBiasFront);
-    float fDriveBiasRear = *(float*)((uint8_t*)pHandlingDataOrig + hOffsets1604.fDriveBiasRear);
+    float fDriveBiasFront = *(float*)((uint8_t*)pHandlingDataOrig + hOffsets.fDriveBiasFront);
+    float fDriveBiasRear = *(float*)((uint8_t*)pHandlingDataOrig + hOffsets.fDriveBiasRear);
 
     float fDriveBiasFrontNorm;
 
@@ -158,8 +158,8 @@ void AWD::Update() {
     auto handlingAddr = VExt::GetHandlingPtr(g_playerVehicle);
 
     // Don't care about 0.0 or 1.0, as it never occurs.
-    *(float*)(handlingAddr + hOffsets1604.fDriveBiasFront) = driveBiasF * 2.0f;
-    *(float*)(handlingAddr + hOffsets1604.fDriveBiasRear) = 2.0f * (1.0f - (driveBiasF));
+    *(float*)(handlingAddr + hOffsets.fDriveBiasFront) = driveBiasF * 2.0f;
+    *(float*)(handlingAddr + hOffsets.fDriveBiasRear) = 2.0f * (1.0f - (driveBiasF));
 }
 
 float AWD::GetTransferValue() {
