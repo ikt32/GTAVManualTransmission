@@ -11,6 +11,7 @@ Overhaul force feedback (again):
 * Response normalized for excessive fTractionCurve values GTA uses normally
   * (can be disabled/made linear to feel more difference)
 * Fix intermittent FFB loss for Fanatec wheels after alt-tabbing
+* Fix script crash on trying to call unavailable FFB effect
 
 Most prominent FFB settings (SATFactor, MaxSpeed, Gamma) are now obsolete for
 ground vehicles, but are still used in amphibious/flying modes. They're hidden
