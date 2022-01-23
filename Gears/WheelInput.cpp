@@ -767,37 +767,35 @@ std::vector<WheelInput::SSlipInfo> WheelInput::CalculateSlipInfo() {
 // handlings are very weak and need a low FFB.Gamma to ramp up the "early" force with
 // "low" steering angles.
 float calcSlipRatio(float slip, float slipOpt,
-                    float slipMultA, float slipMultB,
-                    float outMultA, float outMultB) {
+                    float postSlipOptRatio, float postOptSlipMin) {
     float slipRatio = 0.0f;
 
-    // Understeer just based on slip
-    if (abs(slip) > slipOpt * slipMultB) {
-        slipRatio = std::clamp(slipRatio, outMultB, 1.0f);
-    }
-    else if (abs(slip) > slipOpt * slipMultA) {
-        slipRatio = map(abs(slip), slipOpt * slipMultA, slipOpt * slipMultB, outMultA, outMultB);
-    }
-    else if (abs(slip) > slipOpt) {
-        slipRatio = map(abs(slip), slipOpt, slipOpt * slipMultA, 1.0f, outMultA);
+    // Normalize slip to ratio
+    if (abs(slip) <= slipOpt) {
+        slipRatio = map(abs(slip), 0.0f, slipOpt, 0.0f, 1.0f);
     }
     else {
-        // Normalize slip to ratio
-        slipRatio = map(abs(slip), 0.0f, slipOpt, 0.0f, 1.0f);
-        float x = slipRatio;
+        if (abs(slip) <= postSlipOptRatio * slipOpt) {
+            slipRatio = map(abs(slip), slipOpt, postSlipOptRatio * slipOpt, 1.0f, postOptSlipMin);
+        }
+        else {
+            slipRatio = postOptSlipMin;
+        }
+    }   
 
-        // rNorm normalizes the response curve for different fTractionCurveLateral values
-        // Tested from 5 degrees to 30 degrees
-        // Results in similar force at a similar lock (< fTractionCurveLateral).
-        float normVal = map(rad2deg(slipOpt),
-            g_settings.Wheel.FFB.SlipOptMin, g_settings.Wheel.FFB.SlipOptMax,
-            g_settings.Wheel.FFB.SlipOptMinMult, g_settings.Wheel.FFB.SlipOptMaxMult);
-        normVal = std::clamp(normVal, g_settings.Wheel.FFB.SlipOptMinMult, g_settings.Wheel.FFB.SlipOptMaxMult);
+    float x = slipRatio;
 
-        float rNorm = g_settings.Wheel.FFB.ResponseCurve * normVal;
+    // rNorm normalizes the response curve for different fTractionCurveLateral values
+    // Tested from 5 degrees to 30 degrees
+    // Results in similar force at a similar lock (< fTractionCurveLateral).
+    float normVal = map(rad2deg(slipOpt),
+        g_settings.Wheel.FFB.SlipOptMin, g_settings.Wheel.FFB.SlipOptMax,
+        g_settings.Wheel.FFB.SlipOptMinMult, g_settings.Wheel.FFB.SlipOptMaxMult);
+    normVal = std::clamp(normVal, g_settings.Wheel.FFB.SlipOptMinMult, g_settings.Wheel.FFB.SlipOptMaxMult);
 
-        slipRatio = WheelInput::GetProfiledFFBValue(x, rNorm, g_settings.Wheel.FFB.FFBProfile);
-    }
+    float rNorm = g_settings.Wheel.FFB.ResponseCurve * normVal;
+
+    slipRatio = WheelInput::GetProfiledFFBValue(x, rNorm, g_settings.Wheel.FFB.FFBProfile);
 
     return slipRatio * sgn(slip);
 }
@@ -807,10 +805,8 @@ int calculateSat() {
     if (numWheels < 1)
         return 0;
 
-    const float maxSlipMultA = 1.050f;
-    const float maxSlipMultB = 1.075f;
-    const float outMultA = 0.50f;
-    const float outMultB = 0.35f;
+    const float postOptSlipRatio = 2.5f;
+    const float postOptSlipMin = 0.0f;
 
     // in radians
     const float latSlipOpt = *(float*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets.fTractionCurveLateral);
@@ -842,7 +838,7 @@ int calculateSat() {
     auto wetGrips = VExt::GetWetGrips(g_playerVehicle);
 
     auto calculateSlip = [&](uint32_t i) {
-        float thisSlipRatio = calcSlipRatio(satValues[i].Angle, latSlipOpt, maxSlipMultA, maxSlipMultB, outMultA, outMultB);
+        float thisSlipRatio = calcSlipRatio(satValues[i].Angle, latSlipOpt, postOptSlipRatio, postOptSlipMin);
 
         auto wheelIdMem = VExt::GetWheelIdMem(g_playerVehicle, i);
         auto wheelId = wheelIdReverseLookupMap.find(wheelIdMem);
