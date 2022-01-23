@@ -191,14 +191,13 @@ bool WheelDirectInput::InitFFB(GUID guid, DIAxis ffAxis) {
 
     logger.Write(INFO, "[Wheel] Initializing FFB effects");
     if (!createEffects(guid, ffAxis)) {
-        logger.Write(ERROR, "[Wheel] Init FFB effect failed, disabling force feedback");
+        logger.Write(ERROR, "[Wheel] FFB effect initialization failed");
         return false;
     }
     logger.Write(INFO, "[Wheel] Initializing force feedback success");
 
     ffbDevice = guid;
     ffbAxis = ffAxis;
-    ffbEffectInfo.Enabled = true;
     return true;
 }
 
@@ -244,9 +243,14 @@ void WheelDirectInput::Acquire() {
             logger.Write(ERROR, "[Wheel] Re-acquire failed with %x (%s) for %s", hr, GetDIError(hr).c_str(), guidStr);
         }
 
-        ffbEffectInfo.CollisionEffectInterface->Start(1, 0);
-        ffbEffectInfo.DamperEffectInterface->Start(1, 0);
-        ffbEffectInfo.ConstantForceEffectInterface->Start(1, 0);
+        if (ffbEffectInfo.CollisionEffectInterface)
+            ffbEffectInfo.CollisionEffectInterface->Start(1, 0);
+
+        if (ffbEffectInfo.DamperEffectInterface)
+            ffbEffectInfo.DamperEffectInterface->Start(1, 0);
+
+        if (ffbEffectInfo.ConstantForceEffectInterface)
+            ffbEffectInfo.ConstantForceEffectInterface->Start(1, 0);
     }
     else {
         logger.Write(DEBUG, "[Wheel] No need to reacquire %s", guidStr);
@@ -573,7 +577,8 @@ bool WheelDirectInput::createEffects(GUID device, DIAxis ffAxis) {
 }
 
 void WheelDirectInput::SetConstantForce(GUID device, DIAxis ffAxis, int force) {
-    if (ffAxis >= UNKNOWN_AXIS)
+    if (ffAxis >= UNKNOWN_AXIS ||
+        !ffbEffectInfo.ConstantForceEffectInterface)
         return;
 
     force = std::clamp(force, -10000, 10000);
@@ -581,13 +586,6 @@ void WheelDirectInput::SetConstantForce(GUID device, DIAxis ffAxis, int force) {
     if (mLut.size() == outputLutSize) {
         force = mLut[abs(force)] * sgn(force);
     }
-
-    // As per Microsoft's DirectInput example:
-    // Modifying an effect is basically the same as creating a new one, except
-    // you need only specify the parameters you are modifying
-    auto e = GetDeviceInfo(device);
-    if (!e || !ffbEffectInfo.Enabled)
-        return;
 
     LONG rglDirection[1] = { 0 };
 
@@ -609,11 +607,8 @@ void WheelDirectInput::SetConstantForce(GUID device, DIAxis ffAxis, int force) {
 }
 
 void WheelDirectInput::SetDamper(GUID device, DIAxis ffAxis, int force) {
-    if (ffAxis >= UNKNOWN_AXIS)
-        return;
-
-    auto e = GetDeviceInfo(device);
-    if (!e || !ffbEffectInfo.Enabled)
+    if (ffAxis >= UNKNOWN_AXIS ||
+        !ffbEffectInfo.DamperEffectInterface)
         return;
 
     LONG rglDirection[1] = { 0 };
@@ -637,11 +632,8 @@ void WheelDirectInput::SetDamper(GUID device, DIAxis ffAxis, int force) {
 }
 
 void WheelDirectInput::SetCollision(GUID device, DIAxis ffAxis, int force) {
-    if (ffAxis >= UNKNOWN_AXIS)
-        return;
-
-    auto e = GetDeviceInfo(device);
-    if (!e || !ffbEffectInfo.Enabled)
+    if (ffAxis >= UNKNOWN_AXIS ||
+        !ffbEffectInfo.CollisionEffectInterface)
         return;
 
     LONG rglDirection[1] = { 0 };

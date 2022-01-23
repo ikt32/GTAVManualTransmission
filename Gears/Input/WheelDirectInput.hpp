@@ -122,8 +122,6 @@ private:
 
     struct FFBEffects {
         ~FFBEffects();
-        bool Enabled = false;
-
         DIEFFECT ConstantForceEffect{};
         DICONSTANTFORCE ConstantForceParams{};
         LPDIRECTINPUTEFFECT ConstantForceEffectInterface = nullptr;
