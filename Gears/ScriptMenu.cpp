@@ -852,7 +852,7 @@ void update_anglemenu() {
     g_menu.Title("Soft lock");
     g_menu.Subtitle("");
     float minLock = 180.0f;
-    if (g_menu.FloatOption("Physical degrees", g_settings.Wheel.Steering.AngleMax, minLock, 1440.0, 30.0,
+    if (g_menu.FloatOption("Physical degrees", g_settings.Wheel.Steering.AngleMax, minLock, 2880.0f, 30.0f,
         { "How many degrees your physical steering steering wheel turns.",
             "Set this to whatever matches the setting in the wheel driver." })) {
         if (g_settings.Wheel.Steering.AngleCar > g_settings.Wheel.Steering.AngleMax) { g_settings.Wheel.Steering.AngleCar = g_settings.Wheel.Steering.AngleMax; }
