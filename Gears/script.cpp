@@ -325,6 +325,9 @@ void update_vehicle() {
         g_gearRattle1.Stop();
         g_gearRattle2.Stop();
         updateActiveSteeringAnim(g_playerVehicle);
+        
+        g_controls.PlayFFBDynamics(0, 0);
+        g_controls.PlayFFBCollision(0);
 
         if (g_playerVehicle != 0) {
             VExt::SetSteeringAngle(g_playerVehicle, 0.0f);
@@ -404,9 +407,9 @@ void update_inputs() {
     g_focused = SysUtil::IsWindowFocused();
 
     if (g_wheelInitDelayTimer.Expired() && g_wheelInitDelayTimer.Period() > 0) {
+        g_controls.GetWheel().Acquire();
         g_controls.PlayFFBDynamics(0, 0);
         g_controls.PlayFFBCollision(0);
-        g_controls.GetWheel().Acquire();
         g_wheelInitDelayTimer.Reset(0);
     }
 
@@ -2986,4 +2989,5 @@ void ScriptMain() {
     }
     InitTextures();
     ScriptTick();
+    g_cancelThread = true;
 }
