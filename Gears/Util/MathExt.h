@@ -4,6 +4,11 @@
 #include <cmath>
 #include <vector>
 
+// Not sure why M_PI no exist in Debug builds.
+#ifndef M_PI
+#define M_PI       3.14159265358979323846   // pi
+#endif // !M_PI
+
 // Vector3 but no padding. 
 struct V3F {
     float x;
