@@ -955,9 +955,12 @@ int calculateSat() {
     float comBiasFront = map(comOffset.y, rearAxleOffset, frontAxleOffset, 0.0f, 1.0f);
 
     float frontAxleDesignWeight = mass * comBiasFront;
-
-    //float weightTransferFactor = steeredAxleWeight / frontAxleDesignWeight;
-    float weightTransferFactor = maxSteeredWheelWeight / (frontAxleDesignWeight/2.0f);
+    float frontWheelDesignWeight = frontAxleDesignWeight * 0.5f;
+    float weightTransferFactor = maxSteeredWheelWeight / frontWheelDesignWeight;
+    
+    if (weightTransferFactor < 1.0f) {
+        weightTransferFactor = pow(weightTransferFactor, 2.5f);
+    }
 
     float satForce = 
         g_settings.Wheel.FFB.SATAmpMult *
