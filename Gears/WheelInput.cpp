@@ -51,6 +51,8 @@ namespace {
         { 11, 6 }, // 45 - 6 wheels trailer mid wheel left
         { 13, 7 }, // 45 - 6 wheels trailer mid wheel right
     };
+
+    float lastLongSlip = 0.0f;
 }
 
 namespace WheelInput {
@@ -903,7 +905,17 @@ int calculateSat() {
     slipRatio /= steeredWheelsDiv;
     longSlip /= steeredWheelsDiv;
     longSlip = std::clamp(longSlip, 1.0f, 10.0f);
-    
+
+    // Don't allow force to decrease too fast.
+    if (longSlip > lastLongSlip) {
+        // Drop rate 1.0 responds quickly but smoothens GTA's ABS jerks
+        // 10.0 is too fast
+        // 0.1 is too slow, feel nearly nothing and takes too long to respond to lockups.
+        longSlip = lerp(lastLongSlip, longSlip, 1.0f * MISC::GET_FRAME_TIME());
+    }
+
+    lastLongSlip = longSlip;
+
     float longSlipMult = map(longSlip, 1.0f, 2.0f, 1.0f, 0.0f);
     longSlipMult = std::clamp(longSlipMult, 0.2f, 1.0f);
 
