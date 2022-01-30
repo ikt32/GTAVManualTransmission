@@ -725,12 +725,23 @@ std::vector<WheelInput::SSlipInfo> WheelInput::CalculateSlipInfo() {
         if (Length(tracVel) == 0.0f && Length(boneVelRel) > 0.0f) {
             // Locked up: Angle becomes difference between steering and velocity vector
             angle = slideAngle - wheelAngles[i];
-            // UI::ShowText(0.35f + 0.1f * (float)i, 0.25f, 0.4f,
-            //     fmt::format("Locked up\nSlideAngle: {:.2f}\nWheelAngle[{}]: {:.2f}",
-            //         rad2deg(slideAngle), i, rad2deg(wheelAngles[i])));
+            if (g_settings.Debug.DisplayInfo) {
+                UI::ShowText(0.35f + 0.1f * (float)i, 0.15f, 0.4f,
+                    fmt::format("[{}]Locked up\nAngle: {:.2f}\nSlideAngle: {:.2f}\nWheelAngle: {:.2f}",
+                        i,
+                        rad2deg(angle),
+                        rad2deg(slideAngle),
+                        rad2deg(wheelAngles[i])));
+            }
         }
         else {
             angle = GetAngleBetween(tracVelRelIgnoreZ, boneVelRel);
+            if (g_settings.Debug.DisplayInfo) {
+                UI::ShowText(0.35f + 0.1f * (float)i, 0.15f, 0.4f,
+                    fmt::format("[{}]Grip\nAngle: {:.2f}",
+                        i,
+                        rad2deg(angle)));
+            }
         }
 
         if (std::isnan(angle) || Length(velWorld) == 0.0f) {
