@@ -274,7 +274,7 @@ std::vector<std::string> FormatVehicleConfig(const VehicleConfig& config, const 
 }
 
 void SaveVehicleConfig() {
-    const std::string vehConfigDir = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir + "\\Vehicles";
+    const std::string vehConfigDir = Paths::GetModPath() + "\\Vehicles";
 
     // Amazing, I haven't referred to this ever since throwing a menu in...
     extern Vehicle g_playerVehicle;

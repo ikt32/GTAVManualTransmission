@@ -11,6 +11,7 @@
 
 namespace Constants {
     static const char* const DisplayVersion = "v" VERSION_DISPLAY;
-    static const char* const ModDir = "\\ManualTransmission";
+    static const char* const iktDir = "ikt";
+    static const char* const ModDir = "ManualTransmission";
     static const char* const NotificationPrefix =  "~b~Manual Transmission~w~";
 }

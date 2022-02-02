@@ -1,8 +1,18 @@
 #pragma once
 #include <Windows.h>
+#include <filesystem>
 #include <string>
 
 namespace Paths {
+std::filesystem::path GetLocalAppDataPath();
+
+void SetModPath(std::string path);
+std::string GetModPath();
+std::string GetInitialModPath();
+
+void SetModPathChanged();
+bool GetModPathChanged();
+
 std::string GetRunningExecutablePath();
 std::string	GetRunningExecutableFolder();
 std::string	GetRunningExecutableName();

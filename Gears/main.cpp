@@ -91,20 +91,72 @@ std::string GetTimestampReadable(unsigned long long unixTimestampMs) {
     return fmt::format("{}", timess.str());
 }
 
-BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
-    const std::string modPath = Paths::GetModuleFolder(hInstance) + Constants::ModDir;
-    const std::string logFile = modPath + "\\" + Paths::GetModuleNameWithoutExtension(hInstance) + ".log";
+void InitializePaths(HMODULE hInstance) {
+    Paths::SetOurModuleHandle(hInstance);
+
+    auto localAppDataPath = Paths::GetLocalAppDataPath();
+    auto localAppDataModPath = localAppDataPath / Constants::iktDir / Constants::ModDir;
+    std::string originalModPath = Paths::GetModuleFolder(hInstance) + std::string("\\") + Constants::ModDir;
+    Paths::SetModPath(originalModPath);
+
+    bool useAltModPath = false;
+    if (std::filesystem::exists(localAppDataModPath)) {
+        useAltModPath = true;
+    }
+
+    std::string modPath;
+    std::string logFile;
+
+    // Use LocalAppData if it already exists.
+    if (useAltModPath) {
+        modPath = localAppDataModPath.string();
+        logFile = (localAppDataModPath / (Paths::GetModuleNameWithoutExtension(hInstance) + ".log")).string();
+    }
+    else {
+        modPath = originalModPath;
+        logFile = modPath + std::string("\\") + Paths::GetModuleNameWithoutExtension(hInstance) + ".log";
+    }
+
+    Paths::SetModPath(modPath);
 
     if (!fs::is_directory(modPath) || !fs::exists(modPath)) {
-        fs::create_directory(modPath);
+        fs::create_directories(modPath);
     }
 
     logger.SetFile(logFile);
-    Paths::SetOurModuleHandle(hInstance);
+    logger.Clear();
 
+    if (logger.Error()) {
+        modPath = localAppDataModPath.string();
+        logFile = (localAppDataModPath / (Paths::GetModuleNameWithoutExtension(hInstance) + ".log")).string();
+        fs::create_directories(modPath);
+
+        Paths::SetModPath(modPath);
+        logger.SetFile(logFile);
+
+        fs::copy(fs::path(originalModPath), localAppDataModPath,
+            fs::copy_options::update_existing | fs::copy_options::recursive);
+
+        // Fix perms
+        for (auto& path : fs::recursive_directory_iterator(localAppDataModPath)) {
+            try {
+                fs::permissions(path, fs::perms::all);
+            }
+            catch (std::exception& e) {
+                logger.Write(ERROR, "Failed to set permissions on [%s]: %s.", path.path().string().c_str(), e.what());
+            }
+        }
+
+        logger.ClearError();
+        logger.Clear();
+        logger.Write(WARN, "Copied to [%s] from [%s] due to read/write issues.", modPath.c_str(), originalModPath.c_str());
+    }
+}
+
+BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
     switch (reason) {
         case DLL_PROCESS_ATTACH: {
-            logger.Clear();
+            InitializePaths(hInstance);
             logger.Write(INFO, "Manual Transmission %s (built %s %s) (%s)",
                 Constants::DisplayVersion, __DATE__, __TIME__, GIT_HASH GIT_DIFF);
             logger.Write(INFO, "%s",

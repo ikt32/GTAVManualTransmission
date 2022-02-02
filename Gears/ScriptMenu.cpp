@@ -182,6 +182,14 @@ void update_mainmenu() {
     g_menu.Title("Manual Transmission");
     g_menu.Subtitle(fmt::format("~b~{}{}", Constants::DisplayVersion, GIT_DIFF));
 
+    if (Paths::GetModPathChanged()) {
+        g_menu.Option("Warning: Mod path moved!", NativeMenu::solidRed,
+            { "Script failed writing log file in the original location.",
+              "Entire ManualTransmission folder moved to AppData folder.",
+              fmt::format("Old path: {}", Paths::GetInitialModPath()),
+              fmt::format("New path: {}", Paths::GetModPath()) });
+    }
+
     if (g_settings.Error()) {
         g_menu.Option("Settings load/save error", NativeMenu::solidRed,
             { "Script failed to read or write the settings file(s).",
@@ -2210,7 +2218,7 @@ void update_devoptionsmenu() {
     if (g_menu.Option("Export base VehicleConfig", 
         { "Exports the base configuration to the Vehicles folder. If you lost it, or something." })) {
         const std::string saveFile = "baseVehicleConfig";
-        const std::string vehConfigDir = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir + "\\Vehicles";
+        const std::string vehConfigDir = Paths::GetModPath() + "\\Vehicles";
         const std::string finalFile = fmt::format("{}\\{}.ini", vehConfigDir, saveFile);
 
         VehicleConfig config;
@@ -2230,6 +2238,11 @@ void update_devoptionsmenu() {
 
         threadCheckUpdate(0);
     }
+
+    bool altModPathUsed = Paths::GetInitialModPath() != Paths::GetModPath();
+    g_menu.Option("Mod path",
+        { "This script currently uses the following folder to store data:",
+          fmt::format("New path: {}", Paths::GetModPath()) });
 }
 
 void update_debugmenu() {

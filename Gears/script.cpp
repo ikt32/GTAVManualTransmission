@@ -2697,7 +2697,7 @@ void update_UDPTelemetry() {
 void loadConfigs() {
     logger.Write(DEBUG, "Clearing and reloading vehicle configs...");
     g_vehConfigs.clear();
-    const std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
+    const std::string absoluteModPath = Paths::GetModPath();
     const std::string vehConfigsPath = absoluteModPath + "\\Vehicles";
 
     if (!(fs::exists(fs::path(vehConfigsPath)) && fs::is_directory(fs::path(vehConfigsPath)))) {
@@ -2742,7 +2742,7 @@ void initTimers() {
 }
 
 void loadLut(const std::string& lutPath) {
-    const std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
+    const std::string absoluteModPath = Paths::GetModPath();
     auto fullLutPath = fmt::format("{}/{}", absoluteModPath, lutPath);
     std::ifstream lut(fullLutPath);
 
@@ -2836,7 +2836,7 @@ void update_update_notification() {
 }
 
 void ScriptInit() {
-    std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
+    std::string absoluteModPath = Paths::GetModPath();
     std::string settingsGeneralFile = absoluteModPath + "\\settings_general.ini";
     std::string settingsControlsFile = absoluteModPath + "\\settings_controls.ini";
     std::string settingsWheelFile = absoluteModPath + "\\settings_wheel.ini";
@@ -2878,7 +2878,7 @@ void ScriptInit() {
 }
 
 void InitTextures() {
-    std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
+    std::string absoluteModPath = Paths::GetModPath();
     std::string textureWheelFile = absoluteModPath + "\\texture_wheel.png";
     std::string textureABSFile = absoluteModPath + "\\texture_abs.png";
     std::string textureTCSFile = absoluteModPath + "\\texture_tcs.png";

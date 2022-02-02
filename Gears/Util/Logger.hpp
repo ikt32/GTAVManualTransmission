@@ -21,6 +21,7 @@ public:
     void Write(LogLevel level, const std::string& text) const;
     void Write(LogLevel level, const char *fmt, ...) const;
     bool Error();
+    void ClearError();
 
 private:
     mutable bool mError;

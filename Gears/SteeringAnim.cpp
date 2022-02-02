@@ -28,7 +28,7 @@ extern ScriptSettings g_settings;
 extern CarControls g_controls;
 
 namespace {
-    std::string animFile = std::string(Constants::ModDir) + "\\animations.yml";
+    std::string animFile = Paths::GetModPath() + "\\animations.yml";
     enum eAnimationFlags {
         ANIM_FLAG_NORMAL = 0,
         ANIM_FLAG_REPEAT = 1,
