@@ -56,3 +56,5 @@ namespace StrUtil {
 }
 
 std::string GetSpeedUnitMultiplier(const std::string& unit, float& speedValMul);
+
+std::string GetTimestampReadable(unsigned long long unixTimestampMs);

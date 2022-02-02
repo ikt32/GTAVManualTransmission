@@ -74,23 +74,6 @@ void resolveVersion() {
     VehicleExtensions::SetVersion(shvVersion);
 }
 
-std::string GetTimestampReadable(unsigned long long unixTimestampMs) {
-    const auto durationSinceEpoch = std::chrono::milliseconds(unixTimestampMs);
-    const std::chrono::time_point<std::chrono::system_clock> tp_after_duration(durationSinceEpoch);
-    time_t time_after_duration = std::chrono::system_clock::to_time_t(tp_after_duration);
-
-    std::stringstream timess;
-    struct tm newtime {};
-    auto err = localtime_s(&newtime, &time_after_duration);
-
-    if (err != 0) {
-        return "Invalid timestamp";
-    }
-
-    timess << std::put_time(&newtime, "%Y %m %d, %H:%M:%S");
-    return fmt::format("{}", timess.str());
-}
-
 void InitializePaths(HMODULE hInstance) {
     Paths::SetOurModuleHandle(hInstance);
 

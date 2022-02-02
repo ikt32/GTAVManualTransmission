@@ -19,6 +19,7 @@
 // Versions only tested for SP.
 FX_ASI_BUILD 2189 BEGIN "\0" END
 FX_ASI_BUILD 2372 BEGIN "\0" END
+FX_ASI_BUILD 2545 BEGIN "\0" END
 
 /////////////////////////////////////////////////////////////////////////////
 // English (United States) resources
@@ -79,7 +80,7 @@ BEGIN
             VALUE "FileDescription", "Manual Transmission script for GTA V"
             VALUE "FileVersion", VERSION_DISPLAY " (" GIT_HASH GIT_DIFF ")"
             VALUE "InternalName", "Gears.asi"
-            VALUE "LegalCopyright", "Copyright ikt (C) 2021"
+            VALUE "LegalCopyright", "Copyright ikt (C) 2022"
             VALUE "OriginalFilename", "Gears.asi"
             VALUE "ProductName", "Manual Transmission"
             VALUE "ProductVersion", VERSION_DISPLAY " (" GIT_HASH GIT_DIFF ")"
