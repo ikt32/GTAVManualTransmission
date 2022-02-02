@@ -1326,7 +1326,7 @@ void functionSShift() {
             return;
         }
 
-        float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.LockGear - 1]);
+        float expectedRPM = g_vehData.mEstimatedSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.LockGear - 1]);
         if (g_settings().ShiftOptions.DownshiftProtect &&
             expectedRPM > 1.0f) {
             g_gearStates.DownshiftProtection = true;
