@@ -271,7 +271,7 @@ void drawDashLights() {
             g_settings.HUD.DsProt.Size, g_settings.HUD.DsProt.Size,
             0.5f, 0.5f, // center of texture
             g_settings.HUD.DsProt.XPos, g_settings.HUD.DsProt.YPos,
-            0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
+            0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 0.93f, 0.83f, 0.01f, 1.0f);
     }
 }
 
