@@ -154,7 +154,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             break;
         }
         case DLL_PROCESS_DETACH: {
-            logger.Write(INFO, "PATCH: Init shutdown");
+            logger.Write(INFO, "[Patch] Init shutdown");
             const uint8_t expected = 6;
             uint8_t actual = 0;
 
@@ -172,16 +172,22 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
                 actual++;
 
             if (actual == expected) {
-                logger.Write(INFO, "PATCH: Script shut down cleanly");
+                logger.Write(INFO, "[Patch] Script shut down cleanly");
             }
             else {
-                logger.Write(ERROR, "PATCH: Script shut down with unrestored patches!");
+                logger.Write(ERROR, "[Patch] Script shut down with unrestored patches!");
             }
 
             resetSteeringMultiplier();
+            logger.Write(DEBUG, "[Misc] Reset steering wheel multipliers");
             releaseCompatibility();
+            logger.Write(DEBUG, "[Compat] Released libraries");
 
             SteeringAnimation::CancelAnimation();
+            logger.Write(DEBUG, "[Anim] Cancelled custom animations");
+
+            // This is where wheel stuff should've been explicitly shut down,
+            // but due to GTA5.exe hanging, it's just left as-is.
 
             scriptUnregister(hInstance);
             break;
