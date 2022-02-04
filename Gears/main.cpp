@@ -182,7 +182,6 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             releaseCompatibility();
 
             SteeringAnimation::CancelAnimation();
-            g_cancelThread = true;
 
             scriptUnregister(hInstance);
             break;

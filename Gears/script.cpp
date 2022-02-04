@@ -103,9 +103,6 @@ bool g_focused;
 Timer g_wheelInitDelayTimer(0);
 Timer g_lastUpdateTimer(0);
 
-std::atomic<long long> g_pauseTimer = 0;
-std::atomic<bool> g_shouldCheck = false;
-
 std::vector<ValueTimer<float>> g_speedTimers;
 
 GameSound g_gearRattle1("DAMAGED_TRUCK_IDLE", "", ""); // sadly there's no initial BONK, but the sound works.
@@ -2937,9 +2934,6 @@ void InitTextures() {
 
 void ScriptTick() {
     while (true) {
-        g_shouldCheck = true;
-        g_pauseTimer = now();
-
         update_player();
         update_vehicle();
         Misc::UpdateEngineOnOff();
@@ -2961,24 +2955,7 @@ void ScriptTick() {
 
 bool initialized = false;
 
-std::atomic<bool> g_cancelThread = false;
-
 void ScriptMain() {
-    g_cancelThread = false;
-    auto pauseCheckFunc = []() {
-        while (!g_cancelThread) {
-            if (g_shouldCheck && now() > g_pauseTimer + 500) {
-                logger.Write(DEBUG, "[Wheel] Pause detected, stopping wheel");
-                // Thread-unsafe as heck
-                g_controls.PlayFFBDynamics(0, 0);
-                g_controls.PlayFFBCollision(0);
-                g_shouldCheck = false;
-            }
-            Sleep(500);
-        }
-    };
-    std::thread pauseCheckThread(pauseCheckFunc);
-
     if (!initialized) {
         logger.Write(INFO, "Script started");
         ScriptInit();
@@ -2989,5 +2966,4 @@ void ScriptMain() {
     }
     InitTextures();
     ScriptTick();
-    g_cancelThread = true;
 }
