@@ -28,12 +28,46 @@ HWND g_windowHandle;
 WheelDirectInput::WheelDirectInput() {}
 
 WheelDirectInput::~WheelDirectInput() {
-    ffbEffectInfo = FFBEffects();
+    FreeDirectInput();
+}
+
+void WheelDirectInput::FreeDirectInput() {
+    logger.Write(DEBUG, "[Wheel] Freeing DirectInput");
+
+    // GTAV.exe does not close when this is called during unload,
+    // when the effects' dwDuration is INFINITE. (Could be Fanatec-specific)
+    // Workaround: Leave the mess around. DLL is successfully unloaded without
+    // all this.
+    return;
+
+    // Here, have some unreachable code.
     for (auto& instance : mDirectInputDeviceInstances) {
+        logger.Write(DEBUG, "[Wheel] Processing %s", GUID2String(instance.first).c_str());
+        logger.Write(DEBUG, "[Wheel] Sending FFB Reset");
+        instance.second.Device->SendForceFeedbackCommand(DISFFC_RESET);
+        logger.Write(DEBUG, "[Wheel] Unacquire device");
         instance.second.Device->Unacquire();
     }
 
-    SAFE_RELEASE(lpDi);
+    logger.Write(DEBUG, "[Wheel] Releasing ConstantForceEffect");
+    SAFE_RELEASE(ffbEffectInfo.ConstantForceEffectInterface);
+    logger.Write(DEBUG, "[Wheel] Releasing DamperEffect");
+    SAFE_RELEASE(ffbEffectInfo.DamperEffectInterface);
+    logger.Write(DEBUG, "[Wheel] Releasing CollisionEffect");
+    SAFE_RELEASE(ffbEffectInfo.CollisionEffectInterface);
+
+    for (auto& instance : mDirectInputDeviceInstances) {
+        logger.Write(DEBUG, "[Wheel] Releasing %s", GUID2String(instance.first).c_str());
+        SAFE_RELEASE(instance.second.Device);
+    }
+
+    logger.Write(DEBUG, "[Wheel] Clearing mDirectInputDeviceInstances");
+    mDirectInputDeviceInstances.clear();
+
+    logger.Write(DEBUG, "[Wheel] Releasing mDirectInput");
+    SAFE_RELEASE(mDirectInput);
+
+    logger.Write(DEBUG, "[Wheel] Finished freeing DirectInput resources");
 }
 
 void WheelDirectInput::ClearLut() {
@@ -908,24 +942,5 @@ bool isSupportedDrivingDevice(DWORD dwDevType) {
             return true;
         default:
             return false;
-    }
-}
-
-WheelDirectInput::FFBEffects::~FFBEffects() {
-    if (ConstantForceEffectInterface) {
-        ConstantForceEffectInterface->Stop();
-        ConstantForceEffectInterface->Unload();
-        ConstantForceEffectInterface->Release();
-    }
-
-    if (DamperEffectInterface) {
-        DamperEffectInterface->Stop();
-        DamperEffectInterface->Unload();
-        DamperEffectInterface->Release();
-    }
-
-    if (CollisionEffectInterface) {
-        CollisionEffectInterface->Unload();
-        CollisionEffectInterface->Release();
     }
 }

@@ -74,6 +74,8 @@ public:
 
     WheelDirectInput();
     ~WheelDirectInput();
+    void FreeDirectInput();
+
     void ClearLut();
     void AssignLut(const std::map<float, float>& rawLut);
 
@@ -118,10 +120,7 @@ private:
     bool createEffects(GUID device, DIAxis ffAxis);
     int povDirectionToIndex(int povDirection);
 
-    LPDIRECTINPUT lpDi = nullptr;
-
     struct FFBEffects {
-        ~FFBEffects();
         DIEFFECT ConstantForceEffect{};
         DICONSTANTFORCE ConstantForceParams{};
         LPDIRECTINPUTEFFECT ConstantForceEffectInterface = nullptr;
