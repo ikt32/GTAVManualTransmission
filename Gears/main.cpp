@@ -154,6 +154,8 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             break;
         }
         case DLL_PROCESS_DETACH: {
+            scriptUnregister(hInstance);
+
             logger.Write(INFO, "[Patch] Init shutdown");
             const uint8_t expected = 6;
             uint8_t actual = 0;
@@ -188,8 +190,8 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 
             // This is where wheel stuff should've been explicitly shut down,
             // but due to GTA5.exe hanging, it's just left as-is.
-
-            scriptUnregister(hInstance);
+            extern CarControls g_controls;
+            g_controls.GetWheel().FreeDirectInput();
             break;
         }
         default:

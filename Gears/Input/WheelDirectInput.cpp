@@ -25,15 +25,10 @@
 constexpr uint32_t outputLutSize = 10001;
 HWND g_windowHandle;
 
-WheelDirectInput::WheelDirectInput() {}
-
-WheelDirectInput::~WheelDirectInput() {
-    FreeDirectInput();
-}
+WheelDirectInput::WheelDirectInput() = default;
+WheelDirectInput::~WheelDirectInput() = default;
 
 void WheelDirectInput::FreeDirectInput() {
-    logger.Write(DEBUG, "[Wheel] Freeing DirectInput");
-
     // GTAV.exe does not close when this is called during unload,
     // when the effects' dwDuration is INFINITE. (Could be Fanatec-specific)
     // Workaround: Leave the mess around. DLL is successfully unloaded without
@@ -41,6 +36,8 @@ void WheelDirectInput::FreeDirectInput() {
     return;
 
     // Here, have some unreachable code.
+
+    logger.Write(DEBUG, "[Wheel] Freeing DirectInput");
     for (auto& instance : mDirectInputDeviceInstances) {
         logger.Write(DEBUG, "[Wheel] Processing %s", GUID2String(instance.first).c_str());
         logger.Write(DEBUG, "[Wheel] Sending FFB Reset");
