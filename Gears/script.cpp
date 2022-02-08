@@ -24,6 +24,7 @@
 #include "UDPTelemetry/Socket.h"
 #include "UDPTelemetry/UDPTelemetry.h"
 
+#include "Memory/CTimer.h"
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/Offsets.hpp"
 #include "Memory/VehicleFlags.h"
@@ -2955,6 +2956,30 @@ void ScriptTick() {
 
 bool initialized = false;
 
+void CheckPause() {
+    bool lastPauseState = false;
+    
+    while (true) {
+        bool pauseState = CTimer::m_UserPause || CTimer::m_CodePause;
+        if (lastPauseState != pauseState) {
+            logger.Write(DEBUG, "[Pause] State changed. Was %d, is %d", lastPauseState, pauseState);
+            logger.Write(DEBUG, "    User: %d, Code: %d", CTimer::m_UserPause, CTimer::m_CodePause);
+
+            if (pauseState) {
+                g_controls.PlayFFBCollision(0);
+                g_controls.PlayFFBDynamics(0, 0);
+            }
+            else {
+
+            }
+
+            lastPauseState = pauseState;
+        }
+
+        Sleep(50);
+    }
+}
+
 void ScriptMain() {
     if (!initialized) {
         logger.Write(INFO, "Script started");
@@ -2965,5 +2990,10 @@ void ScriptMain() {
         logger.Write(INFO, "Script restarted");
     }
     InitTextures();
+
+    std::thread([]() {
+        CheckPause();
+    }).detach();
+
     ScriptTick();
 }

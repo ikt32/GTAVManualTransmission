@@ -274,8 +274,10 @@
     <ClInclude Include="Input\NativeInput.h" />
     <ClInclude Include="Input\USBNotify.h" />
     <ClInclude Include="LaunchControl.h" />
+    <ClInclude Include="Memory\CTimer.h" />
     <ClInclude Include="Memory\NativeMatrix.h" />
     <ClInclude Include="Memory\NativeVectors.h" />
+    <ClInclude Include="Memory\NewAddressSet.h" />
     <ClInclude Include="Memory\VehicleBone.h" />
     <ClInclude Include="ManualTransmission.h" />
     <ClInclude Include="Memory\Patcher.h" />

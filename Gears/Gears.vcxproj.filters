@@ -566,6 +566,12 @@
       <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="ScriptMenuUtils.h" />
+    <ClInclude Include="Memory\CTimer.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\NewAddressSet.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">
