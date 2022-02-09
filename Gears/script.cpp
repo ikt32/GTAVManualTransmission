@@ -656,8 +656,8 @@ void update_manual_transmission() {
         g_controls.PrevInput == CarControls::Controller && g_controls.ButtonHeld(CarControls::LegacyControlType::CycleAssists)) {
 
         uint8_t currMode = 0;
-        // 3: ABS + ESC + TCS
-        // 2: ABS + ESC || TCS
+        // 3: ABS + TC + SC
+        // 2: ABS + TC
         // 1: ABS
         // 0: None!
 
@@ -674,16 +674,16 @@ void update_manual_transmission() {
 
         switch(currMode) {
             case 3:
-                UI::Notify(INFO, "Assists: ABS + ESC + TCS");
+                UI::Notify(INFO, "Assists: ABS, ESC, TCS");
                 g_settings().DriveAssists.ABS.Enable = true;
                 g_settings().DriveAssists.ESP.Enable = true;
                 g_settings().DriveAssists.TCS.Enable = true;
                 break;
             case 2:
-                UI::Notify(INFO, "Assists: ABS + ESC");
+                UI::Notify(INFO, "Assists: ABS + TCS");
                 g_settings().DriveAssists.ABS.Enable = true;
-                g_settings().DriveAssists.ESP.Enable = true;
-                g_settings().DriveAssists.TCS.Enable = false;
+                g_settings().DriveAssists.ESP.Enable = false;
+                g_settings().DriveAssists.TCS.Enable = true;
                 break;
             case 1:
                 UI::Notify(INFO, "Assists: ABS only");
