@@ -219,6 +219,7 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("STEERING", "CSUseCustomLock", Steering.CustomSteering.UseCustomLock);
     LOAD_VAL("STEERING", "CSSoftLock", Steering.CustomSteering.SoftLock);
     LOAD_VAL("STEERING", "CSSteeringMult", Steering.CustomSteering.SteeringMult);
+    LOAD_VAL("STEERING", "CSSteeringReduction", Steering.CustomSteering.SteeringReduction);
 
     LOAD_VAL("STEERING", "WSATMult", Steering.Wheel.SATMult);
     LOAD_VAL("STEERING", "WCurveMult", Steering.Wheel.CurveMult);
@@ -395,6 +396,7 @@ void VehicleConfig::saveGeneral() {
     SAVE_VAL("STEERING", "CSUseCustomLock", Steering.CustomSteering.UseCustomLock);
     SAVE_VAL("STEERING", "CSSoftLock", Steering.CustomSteering.SoftLock);
     SAVE_VAL("STEERING", "CSSteeringMult", Steering.CustomSteering.SteeringMult);
+    SAVE_VAL("STEERING", "CSSteeringReduction", Steering.CustomSteering.SteeringReduction);
 
     SAVE_VAL("STEERING", "WSATMult", Steering.Wheel.SATMult);
     SAVE_VAL("STEERING", "WCurveMult", Steering.Wheel.CurveMult);

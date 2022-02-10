@@ -549,16 +549,27 @@ void update_controlsvehconfmenu() {
     g_menu.Subtitle(MenuSubtitleConfig());
 
     g_menu.BoolOption("ES: Override wheel rotation", g_settings().Steering.CustomSteering.UseCustomLock,
-        { "Enhanced Steering: Override the default 180 degree steering wheel rotation." });
+        { "Enhanced Steering",
+          "Override the default 180 degree steering wheel rotation." });
 
     g_menu.FloatOptionCb("ES: Wheel rotation", g_settings().Steering.CustomSteering.SoftLock, 180.0f, 2880.0f, 30.0f, GetKbEntryFloat,
-        { "Enhanced Steering: Degrees of rotation for the vehicle steering wheel. Does not change max steering angle." });
+        { "Enhanced Steering",
+          "Degrees of rotation for the vehicle steering wheel. Does not change max steering angle." });
 
     g_menu.FloatOptionCb("ES: Steering multiplier", g_settings().Steering.CustomSteering.SteeringMult, 0.01f, 2.0f, 0.01f, GetKbEntryFloat,
-        { "Enhanced Steering: Increase or decrease actual max steering angle." });
+        { "Enhanced Steering",
+          "Increase or decrease actual max steering angle." });
+
+    g_menu.FloatOptionCb("ES: Steering reduction", g_settings().Steering.CustomSteering.SteeringReduction, 0.0f, 2.0f, 0.01f, GetKbEntryFloat,
+        { "Enhanced Steering",
+          "From InfamousSabre's Custom Steering.",
+          "Reduce steering input at higher speeds.",
+          "Increase for vehicles with low optimum slip angle.",
+          "Decrease for vehicles with high optimum slip angle."});
 
     g_menu.FloatOptionCb("Wheel: FFB SAT mult", g_settings().Steering.Wheel.SATMult, 0.05f, 10.0f, 0.05f, GetKbEntryFloat,
-        { "Vehicle-specific FFB SAT adjustment. Same comments apply as in the FFB section.",
+        { "Wheel",
+          "Vehicle-specific FFB SAT adjustment. Same comments apply as in the FFB section.",
           "Increase to make steering heavier, decrease to make it lighter." });
 
     bool showDynamicFfbCurveBox = false;
@@ -566,6 +577,7 @@ void update_controlsvehconfmenu() {
         [=] { return incVal(g_settings().Steering.Wheel.CurveMult, 5.00f, 0.01f); },
         [=] { return decVal(g_settings().Steering.Wheel.CurveMult, 0.01f, 0.01f); },
         "Response curve", {
+            "Wheel",
             "Vehicle-specific FFB curve adjustment. Same comments apply as in the FFB section.",
             "Increase to make response more linear, decrease to make it quicker." })) {
         float val = g_settings.Wheel.FFB.ResponseCurve;
@@ -1876,8 +1888,6 @@ void update_steeringassistmenu() {
         { "How much countersteer should be given." });
     g_menu.FloatOptionCb("Countersteer limit", g_settings.CustomSteering.CountersteerLimit, 0.0f, 360.0f, 1.0f, GetKbEntryFloat,
         { "Maximum angle in degrees for automatic countersteering. Game default is 15 degrees." });
-    g_menu.FloatOptionCb("Steering reduction", g_settings.CustomSteering.SteeringReduction, 0.0f, 2.0f, 0.01f, GetKbEntryFloat,
-        { "Reduce steering input at higher speeds.", "From InfamousSabre's Custom Steering." });
     g_menu.BoolOption("No reduction on handbrake", g_settings.CustomSteering.NoReductionHandbrake,
         { "Disable reduction when the handbrake is used." });
     g_menu.FloatOptionCb("Steering gamma", g_settings.CustomSteering.Gamma, 0.01f, 5.0f, 0.01f, GetKbEntryFloat,

@@ -64,7 +64,6 @@ public:
         float CountersteerMult = 1.0f;
         // In Degrees
         float CountersteerLimit = 15.0f;
-        float SteeringReduction = 0.9f;
         bool NoReductionHandbrake = false;
         float Gamma = 1.0f;
         float CenterTime = 0.01f;

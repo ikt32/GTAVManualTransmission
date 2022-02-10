@@ -55,7 +55,7 @@ float CustomSteering::calculateReduction() {
         if (mult != 0) { mult = floorf(mult * 1000) / 1000; }
         if (mult > 1) { mult = 1; }
     }
-    mult = (1 + (mult - 1) * g_settings.CustomSteering.SteeringReduction);
+    mult = (1 + (mult - 1) * g_settings().Steering.CustomSteering.SteeringReduction);
     return mult;
 }
 

@@ -231,6 +231,7 @@ public:
             Tracked<bool> UseCustomLock = true;
             Tracked<float> SoftLock = 720.0f;
             Tracked<float> SteeringMult = 1.0f;
+            Tracked<float> SteeringReduction = 0.9f;
         } CustomSteering;
 
         struct {
