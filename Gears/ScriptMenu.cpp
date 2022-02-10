@@ -1872,15 +1872,15 @@ void update_steeringassistmenu() {
     }
     g_menu.StringArray("Steering mode", { "Default", "Enhanced" }, g_settings.CustomSteering.Mode, 
         steeringModeDescription);
-    g_menu.FloatOption("Countersteer multiplier", g_settings.CustomSteering.CountersteerMult, 0.0f, 2.0f, 0.05f,
+    g_menu.FloatOptionCb("Countersteer multiplier", g_settings.CustomSteering.CountersteerMult, 0.0f, 2.0f, 0.05f, GetKbEntryFloat,
         { "How much countersteer should be given." });
-    g_menu.FloatOption("Countersteer limit", g_settings.CustomSteering.CountersteerLimit, 0.0f, 360.0f, 1.0f, 
+    g_menu.FloatOptionCb("Countersteer limit", g_settings.CustomSteering.CountersteerLimit, 0.0f, 360.0f, 1.0f, GetKbEntryFloat,
         { "Maximum angle in degrees for automatic countersteering. Game default is 15 degrees." });
-    g_menu.FloatOption("Steering reduction", g_settings.CustomSteering.SteeringReduction, 0.0f, 1.0f, 0.01f,
+    g_menu.FloatOptionCb("Steering reduction", g_settings.CustomSteering.SteeringReduction, 0.0f, 2.0f, 0.01f, GetKbEntryFloat,
         { "Reduce steering input at higher speeds.", "From InfamousSabre's Custom Steering." });
     g_menu.BoolOption("No reduction on handbrake", g_settings.CustomSteering.NoReductionHandbrake,
         { "Disable reduction when the handbrake is used." });
-    g_menu.FloatOption("Steering gamma", g_settings.CustomSteering.Gamma, 0.01f, 5.0f, 0.01f,
+    g_menu.FloatOptionCb("Steering gamma", g_settings.CustomSteering.Gamma, 0.01f, 5.0f, 0.01f, GetKbEntryFloat,
         { "Change linearity of steering input." });
     g_menu.FloatOptionCb("Steering time", g_settings.CustomSteering.SteerTime, 0.000001f, 0.90f, 0.000001f,
         GetKbEntryFloat,
@@ -1901,7 +1901,7 @@ void update_mousesteeringoptionsmenu() {
     g_menu.BoolOption("Enable mouse steering", g_settings.CustomSteering.Mouse.Enable,
         { "When enabled, hold the mouse steering override button to use mouse steering." });
 
-    g_menu.FloatOption("Mouse sensitivity", g_settings.CustomSteering.Mouse.Sensitivity, 0.05f, 2.0f, 0.05f,
+    g_menu.FloatOptionCb("Mouse sensitivity", g_settings.CustomSteering.Mouse.Sensitivity, 0.05f, 2.0f, 0.05f, GetKbEntryFloat,
         { "Sensitivity for mouse steering." });
 
     g_menu.BoolOption("Disable countersteer", g_settings.CustomSteering.Mouse.DisableSteerAssist,
