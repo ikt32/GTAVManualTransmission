@@ -142,10 +142,11 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             InitializePaths(hInstance);
             logger.Write(INFO, "Manual Transmission %s (built %s %s) (%s)",
                 Constants::DisplayVersion, __DATE__, __TIME__, GIT_HASH GIT_DIFF);
-            logger.Write(INFO, "%s",
+            logger.Write(INFO, "Date: %s",
                 GetTimestampReadable(std::chrono::duration_cast<std::chrono::milliseconds>
                     (std::chrono::system_clock::now().time_since_epoch()).count()).c_str());
             resolveVersion();
+            logger.Write(INFO, "Data path: %s", Paths::GetModPath().c_str());
 
             scriptRegister(hInstance, ScriptMain);
             scriptRegisterAdditionalThread(hInstance, NPCMain);
