@@ -2249,10 +2249,9 @@ void update_devoptionsmenu() {
         threadCheckUpdate(0);
     }
 
-    bool altModPathUsed = Paths::GetInitialModPath() != Paths::GetModPath();
     g_menu.Option("Mod path",
         { "This script currently uses the following folder to store data:",
-          fmt::format("New path: {}", Paths::GetModPath()) });
+          fmt::format("{}", Paths::GetModPath()) });
 }
 
 void update_debugmenu() {
