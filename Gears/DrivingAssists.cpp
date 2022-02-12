@@ -309,8 +309,12 @@ std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData) {
 
 std::vector<float> DrivingAssists::GetTCSBrakes(TCSData tcsData) {
     std::vector<float> brakeVals(g_vehData.mWheelCount);
+    const auto offsets = VExt::GetWheelOffsets(g_playerVehicle);
 
-    float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
+    const float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
+    const float bbalF = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasFront);
+    const float bbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasRear);
+
     float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
     float fullBrakePower = handlingBrakeForce * g_settings().DriveAssists.TCS.BrakeMult;
 
@@ -318,6 +322,8 @@ std::vector<float> DrivingAssists::GetTCSBrakes(TCSData tcsData) {
     float tcsSlipMax = g_settings().DriveAssists.TCS.SlipMax;
 
     for (int i = 0; i < g_vehData.mWheelCount; i++) {
+        float bbal = offsets[i].y > 0.0f ? bbalF : bbalR;
+
         if (tcsData.LinearSlip[i] > tcsSlipMin &&
             g_vehData.mWheelTyreSpeeds[i] > 0.0f) {
             float mappedVal = map(
@@ -326,10 +332,10 @@ std::vector<float> DrivingAssists::GetTCSBrakes(TCSData tcsData) {
                 0.0f, fullBrakePower);
             mappedVal = std::clamp(mappedVal, 0.0f, fullBrakePower);
 
-            brakeVals[i] = inpBrakeForce + mappedVal;
+            brakeVals[i] = std::max(inpBrakeForce * bbal, mappedVal * bbal);
         }
         else {
-            brakeVals[i] = inpBrakeForce;
+            brakeVals[i] = inpBrakeForce * bbal;
         }
     }
 
@@ -338,17 +344,23 @@ std::vector<float> DrivingAssists::GetTCSBrakes(TCSData tcsData) {
 
 std::vector<float> DrivingAssists::GetABSBrakes(ABSData absData) {
     std::vector<float> brakeVals(g_vehData.mWheelCount);
+    const auto offsets = VExt::GetWheelOffsets(g_playerVehicle);
 
-    float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
+    const float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
+    const float bbalF = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasFront);
+    const float bbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasRear);
+
     float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
 
     for (uint8_t i = 0; i < g_vehData.mWheelsLockedUp.size(); i++) {
+        float bbal = offsets[i].y > 0.0f ? bbalF : bbalR;
+
         if (g_vehData.mWheelsLockedUp[i]) {
             brakeVals[i] = 0.0f;
             g_vehData.mWheelsAbs[i] = true;
         }
         else {
-            brakeVals[i] = inpBrakeForce;
+            brakeVals[i] = inpBrakeForce * bbal;
             g_vehData.mWheelsAbs[i] = false;
         }
     }
