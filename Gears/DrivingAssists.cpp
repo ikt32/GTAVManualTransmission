@@ -325,7 +325,8 @@ std::vector<float> DrivingAssists::GetTCSBrakes(TCSData tcsData) {
         float bbal = offsets[i].y > 0.0f ? bbalF : bbalR;
 
         if (tcsData.LinearSlip[i] > tcsSlipMin &&
-            g_vehData.mWheelTyreSpeeds[i] > 0.0f) {
+            g_vehData.mWheelTyreSpeeds[i] > 0.0f &&
+            g_vehData.mSuspensionTravel[i] > 0.0f) {
             float mappedVal = map(
                 tcsData.LinearSlip[i],
                 tcsSlipMin, tcsSlipMax,
