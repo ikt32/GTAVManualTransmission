@@ -2120,22 +2120,28 @@ void handleBrakePatch() {
                 VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVals[i]);
             }
         }
-        if (espData.Use) {
-            auto brakeVals = DrivingAssists::GetESPBrakes(espData);
+
+        if (espData.Use ||
+            tcsData.Use && g_settings().DriveAssists.TCS.Mode == 0 ||
+            absData.Use) {
+
+            auto espBrakeVals = DrivingAssists::GetESPBrakes(espData);
+            auto tcsBrakeVals = DrivingAssists::GetTCSBrakes(tcsData);
+            auto absBrakeVals = DrivingAssists::GetABSBrakes(absData);
+
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
-                VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVals[i]);
-            }
-        }
-        if (tcsData.Use && g_settings().DriveAssists.TCS.Mode == 0) {
-            auto brakeVals = DrivingAssists::GetTCSBrakes(tcsData);
-            for (int i = 0; i < g_vehData.mWheelCount; i++) {
-                VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVals[i]);
-            }
-        }
-        if (absData.Use) {
-            auto brakeVals = DrivingAssists::GetABSBrakes(absData);
-            for (int i = 0; i < g_vehData.mWheelCount; i++) {
-                VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVals[i]);
+                float brakeVal = 0.0f;
+                if (espData.Use) {
+                    brakeVal = espBrakeVals[i];
+                }
+                if (tcsData.Use && g_settings().DriveAssists.TCS.Mode == 0) {
+                    brakeVal = std::max(brakeVal, tcsBrakeVals[i]);
+                }
+                if (absData.Use && g_vehData.mWheelsAbs[i]) {
+                    brakeVal = std::min(brakeVal, absBrakeVals[i]);
+                }
+
+                VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVal);
             }
         }
     }
