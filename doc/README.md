@@ -2,9 +2,9 @@
 
 # Manual Transmission and Steering Wheel Support for GTA V
 
-Version 5.4.0
+Version 5.5.0
 
-![5mods Thumbnail](MTThumb.jpg)
+![Pic](MTThumb.jpg)
 
 ## Description
 
@@ -20,9 +20,9 @@ with a custom transmission, wheel support and much more.
 * Transmission replacement with custom modes and more
   * Manual sequential
   * Manual H-pattern
-  * Automatic
+  * Custom Automatic
   * Working clutch
-  * Engine braking, stalling, damage
+  * Engine braking/stalling/damage
 * Tunable driving assists
   * Launch control
   * Traction control
@@ -34,8 +34,8 @@ with a custom transmission, wheel support and much more.
 * Custom first person camera
   * With inertia effects
 * Seamless input switching between steering wheel, gamepad and keyboard
-* Completely in-game configuration menu
-* Vehicle specific settings/presets
+* Complete in-game configuration menu
+* Vehicle-specific configurations
 * Customizable steering assists
 * Expose UDP telemetry (DiRT 4 format) for motion platforms, dashboard apps and more
 
@@ -71,7 +71,7 @@ Mods that counter the power loss when sliding sideways (Also partially mitigated
 * [Stop!Powercutting](https://www.gta5-mods.com/scripts/stop-powercutting): InversePower alternative
 * [InverseTorque](https://www.gta5-mods.com/scripts/inversetorque): InversePower alternative
 
-Recommended handling mods
+#### Recommended handling mods
 
 The default grip levels cause the wheel to bounce left and right because they're too grippy.
 These handlings have reduced grip to realistic levels, and are essential for playing with a wheel. Mix and match all you need, as these don't overlap much.
@@ -131,16 +131,21 @@ Optional: (Downloads)
 Put `Gears.asi` and the folder `ManualTransmission` in your GTA V folder
  (overwrite when asked).
 
-__Make sure the folder is writeable! (not `Read Only`)__
+__Make sure the folder is writeable! (not `Read Only`)__. If the folder is found
+to be inaccessible, it will automatically be copied to
+`%localappdata%\ikt\ManualTransmission`.
 
 Open the menu using the `mtmenu` cheat or the `\|` hotkey, and start
 customizing things.
+
+__The hotkey may be changed in `settings_menu.ini` -> `[MENU]` -> `MenuKey`__.
+__`Keyboard_Keys.txt` contains special keys you can use, on top of the default alphanumeric keys__.
 
 ### Wheel setup
 
 1. Remove or disable any XInput or DirectInput input hook configurations for
 your wheel for GTA V (x360ce, for example).
-2. Open the menu, navigate to `Controls`, `Wheel & pedals`.
+2. Open the menu, navigate to `Controls` -> `Wheel & pedals`.
 3. Set up your analog inputs in `Analog input setup` and set up your analog inputs (throttle, brakes, steering).
 4. Go back to the `Wheel & pedals` menu and go through __all__ options. __Read the description of each option.__
 
@@ -154,8 +159,11 @@ FiveM is not supported. You can try to use it as user plugin, but don't expect a
 You can also just copy-paste the `ManualTransmission` folder if you have
 configured the mod for singleplayer already.
 
+If the `%localappdata%\ikt\ManualTransmission` folder exists, it will use that
+instead.
+
 The script works in servers that allow user plugins (ScriptHookV scripts). Last
-checked to work with MT v5.0.0 and FiveM using the 1604 version of the game.
+checked to work with MT v5.5.0 and FiveM using the 2545 version of the game.
 
 No plans exist to port this into FiveM or "convert" it to server-script, but
 if you have solid plans to do so, feel free to contact me if you have questions.
@@ -168,7 +176,7 @@ implements the code discussed above.
 
 ### Updating
 
-Replace `Gears.asi` and copy the `ManualTransmission` folder. You do **not**
+Replace `Gears.asi` and copy the `ManualTransmission` folder. You do __not__
 need to overwrite changes in the `ManualTransmission` folder, the script will
 write new settings in the file when saving.
 
@@ -210,7 +218,10 @@ By default, `RightTrigger` is throttle and `LeftTrigger` is brake.
 
 ### Wheel defaults
 
-**There are no defaults.** Use the menu to assign your controls.
+__There are no defaults.__
+
+Use the menu to assign throttle/brake/clutch and other actions, such as
+shifting, changing gearbox mode and game controls.
 
 ## Usage and setup
 
@@ -245,7 +256,7 @@ input to accelerate in reverse.
 
 __Wheel-specific:__ While Manual Transmission is active, the pedals behave
 like real pedals. When the manual transmission part of the mod is turned off,
-the throttle and the brake work like the left or right triggers on a controller.
+the throttle and brake pedals work like the left and right trigger on a controller.
 
 ### Input switching
 
