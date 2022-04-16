@@ -29,6 +29,12 @@
 #define LOAD_VAL(section, key, option) \
     option = GetValue(ini, section, key, option)
 
+namespace detail
+{
+    template<typename>
+    constexpr bool always_false = false;
+}
+
 namespace {
     VehicleConfig* activeConfig = nullptr;
 
@@ -1299,7 +1305,7 @@ CarControls::SInput<T> ScriptSettings::parseWheelItem(CSimpleIniA& ini, const ch
             axisValue, nameFmt.c_str(), "");
     }
     else {
-        static_assert(false, "Type must be string or int.");
+        static_assert(detail::always_false<T>, "Type must be string or int.");
     }
 }
 
@@ -1321,7 +1327,7 @@ CarControls::SInput<T> ScriptSettings::parseControllerItem(CSimpleIniA& ini, con
             name, description);
     }
     else {
-        static_assert(false, "Type must be string or eControl.");
+        static_assert(detail::always_false<T>, "Type must be string or eControl.");
     }
 }
 
