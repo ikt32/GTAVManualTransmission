@@ -1955,7 +1955,7 @@ void update_miscoptionsmenu() {
     if (g_menu.BoolOption("Enable UDP telemetry", g_settings.Misc.UDPTelemetry,
         { "Allows programs like SimHub to use data from this script.",
             "This script uses the DIRT 4 format for telemetry data.",
-            fmt::format("Endpoint: {}:{}", g_settings.Misc.UDPAddres, g_settings.Misc.UDPPort),
+            fmt::format("Endpoint: {}:{}", g_settings.Misc.UDPAddress, g_settings.Misc.UDPPort),
             "Restart the game if the endpoints are changed." })) {
         StartUDPTelemetry();
     }

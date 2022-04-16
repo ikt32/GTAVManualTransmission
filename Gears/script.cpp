@@ -2685,7 +2685,7 @@ void functionAudioFX() {
 void StartUDPTelemetry() {
     if (g_settings.Misc.UDPTelemetry)
         if (!g_socket.Started())
-            g_socket.Start(g_settings.Misc.UDPAddres, g_settings.Misc.UDPPort);
+            g_socket.Start(g_settings.Misc.UDPAddress, g_settings.Misc.UDPPort);
 }
 
 void update_UDPTelemetry() {

@@ -293,7 +293,7 @@ public:
     // [MISC]
     struct {
         bool UDPTelemetry = true;
-        std::string UDPAddres = "127.0.0.1";
+        std::string UDPAddress = "127.0.0.1";
         int UDPPort = 20777;
 
         bool DashExtensions = true;
