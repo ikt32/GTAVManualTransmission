@@ -106,6 +106,7 @@ These handlings have reduced grip to realistic levels, and are essential for pla
     * [Custom camera](#custom-camera)
     * [Animations](#animations)
     * [Wheel FFB LUT](#wheel-ffb-lut)
+    * [Force feedback](#force-feedback)
   * [Troubleshooting](#troubleshooting)
     * [Game compatibility](#game-compatibility)
     * [Compatibility options](#compatibility-options)
@@ -148,6 +149,7 @@ your wheel for GTA V (x360ce, for example).
 2. Open the menu, navigate to `Controls` -> `Wheel & pedals`.
 3. Set up your analog inputs in `Analog input setup` and set up your analog inputs (throttle, brakes, steering).
 4. Go back to the `Wheel & pedals` menu and go through __all__ options. __Read the description of each option.__
+5. Read the [force feedback section](#force-feedback).
 
 ### FiveM
 
@@ -400,6 +402,103 @@ If you're hand-rolling your own LUT or changing the forces, make sure the first
 entry is `0|0` and the last line is `1|1`. The `Gears.log` file will also output
 warnings or errors if something is wrong.
 
+### Force feedback
+
+The force feedback in 5.5.0 takes its data from observed slip angles of the
+steered wheels, so it's important that the data fed to it is somewhat accurate.
+
+#### Handling for force feedback
+
+The force generated is proportional to the optimal wheel slip angle, as defined
+in by `fTractionCurveLateral` in a vehicles' `handling.meta` entry.
+
+This value is in degrees. It dictates how quickly the car responds to steering
+inputs, and massively affects force feedback feel. Small values make it respond
+quite quickly, large values make the force feedback sluggish and vague.
+
+* street tires: 9.3~8.5 degrees
+* semi-slicks: 7.5 degrees
+* slicks: 6.0 degrees
+
+GTA V uses pretty high values by default, as do many vehicle authors,
+so most handlings feel sluggish and need adjustment to feel accurate.
+
+I recommend using realistic values, and to not exceed 12.5 degrees.
+Otherwise it will feel sluggish and vague.
+
+The `fTractionCurveMax`/`fTractionCurveMin` values dictate how much grip
+the tires have, roughly expressed in g-force for neutral load (no downforce).
+
+Most handlings use a high value (sometimes paired with flags that increase
+gravity), but this makes the car feel too responsive. I recommend running
+`strHandlingFlags` with `20100`, which does not enable gravity-modifying flags,
+adds some tire squish (less harsh FFB on uneven terrain), and stops the car from
+slowing down very quickly off-throttle (unrelated to FFB, but still a
+must-have).
+
+With realistic traction values, the force feedback behavior is much more
+natural.
+
+Here are a few numbers from Assetto Corsa, where minor differences can make
+quite some difference.
+
+* old street tires: 1.21 g's
+* modern eco tires: 1.22 g's
+* modern street tires: 1.25 g's
+* semi-slicks: 1.32 g's
+* slicks (hard): 1.54 g's
+* slicks (medium): 1.56 g's
+* slicks (soft): 1.58 g's
+
+#### Force feedback settings and other notes
+
+Firstly - take a look at the [Wheel FFB LUT](#wheel-ffb-lut) section!
+For non-direct drive wheels, it's a vast improvement in detail and
+lower-level force. Direct drive wheels won't need it.
+
+Version 5.5.0 was developed with a Logitech G27, and later a Fanatec CSL DD.
+Both wheels differ vastly in feel, but similar (default) settings work fine.
+
+For the settings: The descriptions ought to be descriptive enough. Following
+is just general advice, but for the best results just try stuff yourself.
+
+* FFB SAT scale: Increase or decrease if the force feels overwhelmingly off.
+  For wheels like the G27/29/923, it may be increased at the cost of clipping.
+  For direct drive wheels, it may be decreased.
+* FFB Linearity type: How the slip angle is mapped to the force.
+  The option displays a graph of the force mapping.
+  Using "Boosted" is recommended on all wheels.
+  * "Gamma": Adjust between:
+    * Less than 1.0: Initially less force, full force at end.
+    * 1.0: Linear force.
+    * More than 1.0: Initially more force, tapers off at the end.
+    * If chosen, should be less than 1.0.
+  * "Boosted": Has a steep rise by default and tapers off at the end.
+    * The ramp-up can be decreased or increased.
+    * If chosen, can usually be left at 1.0.
+* Effect multipliers: Set to whatever you're comfortable with.
+* Detail averaging: Use ~3 samples to prevent excessive jerks, but keep detail.
+* Damper: Wheel friction.
+  * "Damper max" can be set to preference. (Low for strong power steering)
+  * "Damper min" should be set lower than "Damper max", but as high as possible
+    without feeling friction. It should feel like the natural friction of the
+    steering linkage, as this is the constant friction when driving at speed
+    when disregarding the "centering forces".
+
+The "FFB normalization options" are to make high `fTractionCurveLateral` cars
+feel somewhat responsive. If you're going for realistic, very low
+`fTractionCurveLateral` handlings, it might be useful to use the "No normalization"
+values, otherwise the difference in feeling between minute handling changes is
+diminished.
+
+Finally:
+GTA V's physics and scripting engine is coupled to the frame rate. Playing
+the game at a higher framerate results in more accurate force feedback.
+
+This has one trade-off: Some tracks have small gaps in their collision surface,
+so with high frame rates, these can be felt. There is no way to filter these
+out, so consider appealing the track author to fix their collisions.
+
 ## Troubleshooting
 
 Something don't work? Read this first.
@@ -419,25 +518,52 @@ Check the `Developer options` -> `Compatibility settings`.
 
 ### Known issues
 
-* __x360ce__ will conflict with input detection if throttle, brake, clutch or steering axes are mapped in x360ce. Assigning inputs without overlap is no problem.
-* [__Strapped__](https://www.gta5-mods.com/scripts/pull-out-strap) will conflict with inputs.
-* [__CustomSteering__](https://www.gta5-mods.com/scripts/custom-steering) will conflict with steering patching.
-* [__Smooth Driving V__](https://www.gta5-mods.com/scripts/smooth-driving-v-lieutenant-dan) will conflict with inputs and gearbox.
-* Wheel not detected at all when using Steam.
-  * Fix: Uncheck `Generic Gamepad Configuration Support` in Steam Big Picture settings, Controller settings. (Found by Kaerali)
-  * Fix: Check your wheel drivers and software (Logitech)
+* Conflicting inputs:
+  * __x360ce__ will conflict with input detection if throttle, brake, clutch or steering axes are mapped in x360ce. Assigning inputs without overlap is no problem.
+* Conflicting mods:
+  * [__Strapped__](https://www.gta5-mods.com/scripts/pull-out-strap) will conflict with inputs.
+  * [__CustomSteering__](https://www.gta5-mods.com/scripts/custom-steering) will conflict with steering patching.
+  * [__Smooth Driving V__](https://www.gta5-mods.com/scripts/smooth-driving-v-lieutenant-dan) will conflict with inputs and gearbox.
+* Gears.asi doesn't load (in asiloader.log, or indicated otherwise):
+  * Make sure you're using the latest [Microsoft Visual C++ Redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe).
+* Camera doesn't behave as expected in VR:
+  * Developer options -> Compatibility settings -> Disable FPV camera.
+* No traffic light textures in first person, just faint coronas:
+  * Caused by custom first person camera. Disable it in Misc options.
+  * Disabling custom FPV reduces FP camera movement if synced animations are enabled.
+    * Disable synced animations if this bothers you.
 
 ### Steering wheel issues
 
-#### Strange values reported
-
-Check if your wheel is recognized correctly, an issue with the steering wheel
-drivers can cause issues with reading the correct values.
-
-#### Steering wheel not detected
-
-* Try toggling the mod (|\ key)
-* Ensure you have removed xinput dlls from the GTA V directory
+* Wheel not detected:
+  * Ensure you've (tried to) set up the wheel by assigning the axes and buttons.
+  * When using Steam:
+    * Fix: Uncheck `Generic Gamepad Configuration Support` in Steam Big Picture settings,
+      Controller settings. (Found by Kaerali)
+    * Fix: Check your wheel drivers and software (Logitech)
+  * Try toggling the mod (`|\` key or toggle Enable Manual Transmission)
+  * Ensure you have removed xinput dlls from the GTA V directory
+  * Check if your drivers are up to date and the wheel works for other games
+  * Check if some other program isn't using your wheel (x360ce, etc)
+  * Check if the wheel is detected in Gears.log (in the ManualTransmission folder)
+  * Try another USB port!
+* Wheel throttle causing aiming or shooting, or switches away from wheel to controller:
+  Your wheel pretends to be a controller.
+  * Check if you can make it not do that.
+  * In `Developer options` -> `Compatibility settings`,
+    check `Disable input detection` to disable constant input switching.
+  * Plug in another XInput controller before plugging in your wheel.
+    Sadly, no way for the mod to block GTA from detecting it as controller.
+* Logitech G920 (NOT G29) crashing game while using ScriptHookVDotNet:
+  * Caused by XInput somehow. Unknown if there is a solution.
+  * Remove ScriptHookVDotNet, or
+  * Use RagePluginHook to launch, or
+  * Remove/Downgrade/Upgrade G-Hub, or
+  * Buy another wheel that doesn't do XInput voodoo 🥲
+* Wheel oscillates a lot:
+  * Use 5.5.0 or newer.
+  * Increase damper force.
+  * Get a faster wheel.
 
 ## Credits
 
