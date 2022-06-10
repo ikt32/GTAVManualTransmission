@@ -131,9 +131,15 @@ Optional: (Downloads)
 
 Put `Gears.asi` and the folder `ManualTransmission` in your GTA V folder
  (overwrite when asked).
+ 
+Optionally, also put `DismemberbemtASI.asi` in your GTA V folder. This
+is only used to hide the player head when using the custom FPV camera.
 
-__Make sure the folder is writeable! (not `Read Only`)__. If the folder is found
-to be inaccessible, it will automatically be copied to
+__Make sure the `ManualTransmission` folder is writeable! (not `Read Only`)__.
+If the folder is not writeable, it will automatically be copied to
+`%localappdata%\ikt\ManualTransmission`.
+
+You may also directly place the `ManualTransmission` folder in
 `%localappdata%\ikt\ManualTransmission`.
 
 Open the menu using the `mtmenu` cheat or the `\|` hotkey, and start
