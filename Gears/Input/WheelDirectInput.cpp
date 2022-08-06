@@ -720,6 +720,7 @@ bool WheelDirectInput::enumerateDevices() {
         return false;
     }
 
+#if __cplusplus > 201703L
     std::erase_if(mDirectInputDeviceInstances, [&](const auto& instanceOld) {
         auto it = std::find_if(mDirectInputDeviceInstancesNew.begin(), mDirectInputDeviceInstancesNew.end(), [&](const auto& instanceNew) {
             return instanceNew.first == instanceOld.first;
@@ -733,6 +734,27 @@ bool WheelDirectInput::enumerateDevices() {
 
         return it == mDirectInputDeviceInstancesNew.end();
         });
+#else
+    auto pred = [&](const auto& instanceOld) {
+            auto it = std::find_if(mDirectInputDeviceInstancesNew.begin(), mDirectInputDeviceInstancesNew.end(), [&](const auto& instanceNew) 
+            { return instanceNew.first == instanceOld.first; });
+
+            if (it == mDirectInputDeviceInstancesNew.end()) {
+                // TODO: De-init and release associated FFB?
+                logger.Write(DEBUG, "[Wheel] Removing stale device with GUID %s", GUID2String(instanceOld.first).c_str());
+            }
+
+            return it == mDirectInputDeviceInstancesNew.end();
+        };
+
+    for (auto i = mDirectInputDeviceInstances.begin(), last = mDirectInputDeviceInstances.end(); i != last;) {
+        if (pred(*i)) {
+            i = mDirectInputDeviceInstances.erase(i);
+        } else {
+            ++i;
+        }
+    }
+#endif
 
     for (auto& instanceNew : mDirectInputDeviceInstancesNew) {
         auto existingInstanceIt = std::find_if(mDirectInputDeviceInstances.begin(), mDirectInputDeviceInstances.end(),

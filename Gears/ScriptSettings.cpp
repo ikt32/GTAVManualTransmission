@@ -1,5 +1,7 @@
 #include "ScriptSettings.hpp"
 
+#include <cctype>
+
 #include "VehicleConfig.h"
 
 #include "SettingsCommon.h"
