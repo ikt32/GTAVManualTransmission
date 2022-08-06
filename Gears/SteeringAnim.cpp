@@ -9,7 +9,7 @@
 #include "Util/Logger.hpp"
 #include "Util/MathExt.h"
 #include "Util/Timer.h"
-#include "Util/Files.h"
+#include "Util/Paths.h"
 #include "Util/UIUtils.h"
 #include "Util/ScriptUtils.h"
 
@@ -28,7 +28,7 @@ extern ScriptSettings g_settings;
 extern CarControls g_controls;
 
 namespace {
-    std::string animFile = std::string(Constants::ModDir) + "\\animations.yml";
+    std::string animFile = Paths::GetModPath() + "\\animations.yml";
     enum eAnimationFlags {
         ANIM_FLAG_NORMAL = 0,
         ANIM_FLAG_REPEAT = 1,
@@ -133,7 +133,7 @@ void SteeringAnimation::Update() {
 }
 
 void SteeringAnimation::Load() {
-    if (!FileExists(animFile)) {
+    if (!Paths::FileExists(animFile)) {
         logger.Write(ERROR, fmt::format("Animation: File \"{}\" not found, skipping animations", animFile));
         fileProblem = true;
         return;
@@ -191,8 +191,6 @@ void playAnimTime(const SteeringAnimation::Animation& anim, float time) {
     if (!playing) {
         cancelAnim(lastAnimation);
 
-        Timer t(500);
-
         if (!STREAMING::DOES_ANIM_DICT_EXIST(dict)) {
             UI::Notify(ERROR, fmt::format("Animation: dictionary does not exist [{}]", dict), false);
             logger.Write(ERROR, fmt::format("Animation: dictionary does not exist [{}]", dict));
@@ -202,15 +200,8 @@ void playAnimTime(const SteeringAnimation::Animation& anim, float time) {
         }
 
         STREAMING::REQUEST_ANIM_DICT(dict);
-        while (!STREAMING::HAS_ANIM_DICT_LOADED(dict)) {
-            if (t.Expired()) {
-                UI::Notify(ERROR, fmt::format("Failed to load animation dictionary [{}]", dict), false);
-                logger.Write(ERROR, fmt::format("Animation: Failed to load dictionary [{}]", dict));
-                // Clear dict so we don't keep loading it
-                steeringAnimations[steeringAnimIdx].Dictionary = std::string();
-                return;
-            }
-            WAIT(0);
+        if (!STREAMING::HAS_ANIM_DICT_LOADED(dict)) {
+            return;
         }
 
         constexpr int flag = ANIM_FLAG_ENABLE_PLAYER_CONTROL;

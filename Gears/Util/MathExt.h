@@ -4,24 +4,16 @@
 #include <cmath>
 #include <vector>
 
-// Vector3 but double and no padding. 
-struct V3D {
-    V3D(Vector3 v3f)
-        : x(v3f.x), y(v3f.y), z(v3f.z) { }
-    V3D(double x, double y, double z)
-        : x(x), y(y), z(z) { }
-    V3D() = default;
-    Vector3 to_v3f() {
-        Vector3 v{
-            static_cast<float>(x), 0,
-            static_cast<float>(y), 0,
-            static_cast<float>(z), 0
-        };
-        return v;
-    }
-    double x;
-    double y;
-    double z;
+// Not sure why M_PI no exist in Debug builds.
+#ifndef M_PI
+#define M_PI       3.14159265358979323846   // pi
+#endif // !M_PI
+
+// Vector3 but no padding. 
+struct V3F {
+    float x;
+    float y;
+    float z;
 };
 
 template <typename T>

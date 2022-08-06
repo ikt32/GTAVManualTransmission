@@ -1,5 +1,6 @@
 #include "VehicleConfig.h"
 
+#include "ScriptSettings.hpp"
 #include "SettingsCommon.h"
 #include "Util/Logger.hpp"
 #include "Util/Strings.hpp"
@@ -15,7 +16,7 @@
     }
 
 #define SAVE_VAL(section, key, option) \
-    if (mBaseConfig == this || option != mBaseConfig->option || option.Changed()) { \
+    if (mBaseConfig == this || option != mBaseConfig->option || option.Changed() || g_settings.Misc.SaveFullConfig) { \
         SetValue(ini, section, key, option); \
         option.Reset(); \
     }
@@ -58,6 +59,8 @@
     LOAD_VAL("CAM", prefix "PitchUpMaxAngle",   ##source.PitchUpMaxAngle); \
     LOAD_VAL("CAM", prefix "PitchDownMaxAngle", ##source.PitchDownMaxAngle); \
 }
+
+extern ScriptSettings g_settings;
 
 EShiftMode Next(EShiftMode mode) {
     return static_cast<EShiftMode>((static_cast<int>(mode) + 1) % 3);
@@ -148,6 +151,7 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("DRIVING_ASSISTS", "TCSMode", DriveAssists.TCS.Mode);
     LOAD_VAL("DRIVING_ASSISTS", "TCSSlipMin", DriveAssists.TCS.SlipMin);
     LOAD_VAL("DRIVING_ASSISTS", "TCSSlipMax", DriveAssists.TCS.SlipMax);
+    LOAD_VAL("DRIVING_ASSISTS", "TCSBrakeMult", DriveAssists.TCS.BrakeMult);
 
     LOAD_VAL("DRIVING_ASSISTS", "ESP", DriveAssists.ESP.Enable);
     LOAD_VAL("DRIVING_ASSISTS", "ESPOverMin", DriveAssists.ESP.OverMin);
@@ -198,6 +202,7 @@ void VehicleConfig::LoadSettings() {
     // [SHIFT_OPTIONS]
     LOAD_VAL("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
     LOAD_VAL("SHIFT_OPTIONS", "DownshiftBlip", ShiftOptions.DownshiftBlip);
+    LOAD_VAL("SHIFT_OPTIONS", "DownshiftProtect", ShiftOptions.DownshiftProtect);
     LOAD_VAL("SHIFT_OPTIONS", "ClutchRateMult", ShiftOptions.ClutchRateMult);
     LOAD_VAL("SHIFT_OPTIONS", "RPMTolerance", ShiftOptions.RPMTolerance);
 
@@ -215,7 +220,10 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("STEERING", "CSUseCustomLock", Steering.CustomSteering.UseCustomLock);
     LOAD_VAL("STEERING", "CSSoftLock", Steering.CustomSteering.SoftLock);
     LOAD_VAL("STEERING", "CSSteeringMult", Steering.CustomSteering.SteeringMult);
+    LOAD_VAL("STEERING", "CSSteeringReduction", Steering.CustomSteering.SteeringReduction);
 
+    LOAD_VAL("STEERING", "WSATMult", Steering.Wheel.SATMult);
+    LOAD_VAL("STEERING", "WCurveMult", Steering.Wheel.CurveMult);
     LOAD_VAL("STEERING", "WSoftLock", Steering.Wheel.SoftLock);
     LOAD_VAL("STEERING", "WSteeringMult", Steering.Wheel.SteeringMult);
 
@@ -333,7 +341,8 @@ void VehicleConfig::saveGeneral() {
     SAVE_VAL("DRIVING_ASSISTS", "TCSMode", DriveAssists.TCS.Mode);
     SAVE_VAL("DRIVING_ASSISTS", "TCSSlipMin", DriveAssists.TCS.SlipMin);
     SAVE_VAL("DRIVING_ASSISTS", "TCSSlipMax", DriveAssists.TCS.SlipMax);
-    
+    SAVE_VAL("DRIVING_ASSISTS", "TCSBrakeMult", DriveAssists.TCS.BrakeMult);
+
     SAVE_VAL("DRIVING_ASSISTS", "ESP", DriveAssists.ESP.Enable);
     SAVE_VAL("DRIVING_ASSISTS", "ESPOverMin", DriveAssists.ESP.OverMin);
     SAVE_VAL("DRIVING_ASSISTS", "ESPOverMax", DriveAssists.ESP.OverMax);
@@ -388,13 +397,17 @@ void VehicleConfig::saveGeneral() {
     SAVE_VAL("STEERING", "CSUseCustomLock", Steering.CustomSteering.UseCustomLock);
     SAVE_VAL("STEERING", "CSSoftLock", Steering.CustomSteering.SoftLock);
     SAVE_VAL("STEERING", "CSSteeringMult", Steering.CustomSteering.SteeringMult);
+    SAVE_VAL("STEERING", "CSSteeringReduction", Steering.CustomSteering.SteeringReduction);
 
+    SAVE_VAL("STEERING", "WSATMult", Steering.Wheel.SATMult);
+    SAVE_VAL("STEERING", "WCurveMult", Steering.Wheel.CurveMult);
     SAVE_VAL("STEERING", "WSoftLock", Steering.Wheel.SoftLock);
     SAVE_VAL("STEERING", "WSteeringMult", Steering.Wheel.SteeringMult);
 
     // [SHIFT_OPTIONS]
     SAVE_VAL("SHIFT_OPTIONS", "UpshiftCut", ShiftOptions.UpshiftCut);
     SAVE_VAL("SHIFT_OPTIONS", "DownshiftBlip", ShiftOptions.DownshiftBlip);
+    SAVE_VAL("SHIFT_OPTIONS", "DownshiftProtect", ShiftOptions.DownshiftProtect);
     SAVE_VAL("SHIFT_OPTIONS", "ClutchRateMult", ShiftOptions.ClutchRateMult);
     SAVE_VAL("SHIFT_OPTIONS", "RPMTolerance", ShiftOptions.RPMTolerance);
 

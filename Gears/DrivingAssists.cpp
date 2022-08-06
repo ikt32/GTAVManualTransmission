@@ -1,16 +1,16 @@
 #include "DrivingAssists.h"
 #include "ScriptSettings.hpp"
 #include "VehicleData.hpp"
+#include "WheelInput.h"
 
 #include "Memory/Offsets.hpp"
 #include "Memory/VehicleExtensions.hpp"
 
 #include "Util/MathExt.h"
+#include "Util/UIUtils.h"
 
 #include <inc/natives.h>
 #include <fmt/format.h>
-
-#include "Util/UIUtils.h"
 
 using VExt = VehicleExtensions;
 
@@ -38,25 +38,36 @@ DrivingAssists::ABSData DrivingAssists::GetABS() {
 }
 
 DrivingAssists::TCSData DrivingAssists::GetTCS() {
-    std::vector<bool> slipped(g_vehData.mWheelCount);
+    std::vector<float> slips(g_vehData.mWheelCount);
     bool tractionLoss = false;
     float averageLoss = 0.0f;
     float numLoss = 0.0f;
     float minLoss = std::min(g_settings().DriveAssists.TCS.SlipMin, g_settings().DriveAssists.LaunchControl.SlipMin);
     auto pows = VExt::GetWheelPower(g_playerVehicle);
+
+    auto posWorld = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, 0);
+    auto boneVels = VExt::GetWheelBoneVelocity(g_playerVehicle);
+    auto steeringAngles = VExt::GetWheelSteeringAngles(g_playerVehicle);
+
     for (int i = 0; i < g_vehData.mWheelCount; i++) {
-        if (g_vehData.mWheelTyreSpeeds[i] > g_vehData.mVelocity.y + g_settings().DriveAssists.TCS.SlipMin &&
-            g_vehData.mSuspensionTravel[i] > 0.0f &&
+        auto boneVelProjection = posWorld + boneVels[i];
+        auto boneVelRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(
+            g_playerVehicle, boneVelProjection.x, boneVelProjection.y, boneVelProjection.z);
+
+        float rotatedY = boneVelRel.y / cos(steeringAngles[i]);
+        slips[i] = g_vehData.mWheelTyreSpeeds[i] - rotatedY;
+
+        bool shouldCheck = g_vehData.mSuspensionTravel[i] > 0.0f &&
             g_vehData.mWheelsDriven[i] &&
-            pows[i] > 0.1f) {
+            pows[i] > 0.1f;
+
+        if (shouldCheck &&
+            slips[i] > g_settings().DriveAssists.TCS.SlipMin) {
             tractionLoss = true;
-            slipped[i] = true;
         }
-        if (g_vehData.mWheelTyreSpeeds[i] > g_vehData.mVelocity.y + minLoss &&
-            g_vehData.mSuspensionTravel[i] > 0.0f &&
-            g_vehData.mWheelsDriven[i] &&
-            pows[i] > 0.1f) {
-            averageLoss += g_vehData.mWheelTyreSpeeds[i] - g_vehData.mVelocity.y;
+        if (shouldCheck &&
+            slips[i] > minLoss) {
+            averageLoss += slips[i];
             numLoss += 1.0f;
         }
     }
@@ -69,7 +80,7 @@ DrivingAssists::TCSData DrivingAssists::GetTCS() {
 
     return {
         g_settings().DriveAssists.TCS.Enable && tractionLoss,
-        slipped,
+        slips,
         averageLoss
     };
 }
@@ -89,6 +100,8 @@ DrivingAssists::ESPData DrivingAssists::GetESP() {
 
     // understeer
     {
+        auto slipInfos = WheelInput::CalculateSlipInfo();
+
         Vector3 vecNextRot = (vecNextSpd + rotRelative) * 0.5f;
         Vector3 vecPredStr{
             speed * -sin(avgAngle), 0,
@@ -96,13 +109,38 @@ DrivingAssists::ESPData DrivingAssists::GetESP() {
             0, 0
         };
 
-        espData.UndersteerAngle = GetAngleBetween(vecNextRot, vecPredStr);
+        float div = 0.0f;
+        float avgSlip = 0.0f;
 
-        if (vecNextSpd.y > 5.0f &&
-            sgn(avgAngle) == sgn(espData.UndersteerAngle) &&
-            rad2deg(abs(abs(avgAngle) - abs(espData.UndersteerAngle))) > g_settings().DriveAssists.ESP.UnderMax &&
-            abs(rad2deg(avgAngle)) > g_settings().DriveAssists.ESP.UnderMin &&
-            abs(rad2deg(espData.UndersteerAngle)) > g_settings().DriveAssists.ESP.UnderMin) {
+        const float latSlipOpt = *(float*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets.fTractionCurveLateral);
+
+        for (uint8_t i = 0; i < slipInfos.size(); ++i) {
+            // Current slip, relative to optimal slip angle.
+            float slipRatio = map(abs(slipInfos[i].Angle),
+                0.0f, latSlipOpt,
+                0.0f, 1.0f);
+
+            float understeerAngle;
+            if (slipRatio > 1.0f) {
+                understeerAngle = (slipInfos[i].Angle - sgn(slipInfos[i].Angle) * latSlipOpt);
+            }
+            else {
+                understeerAngle = 0.0f;
+            }
+            
+            if (VExt::IsWheelSteered(g_playerVehicle, i)) {
+                avgSlip += understeerAngle;
+                div += 1.0f;
+            }
+        }
+        if (div != 0.0f) {
+            avgSlip /= div;
+        }
+
+        espData.UndersteerAngle = avgSlip;
+
+        if (div != 0.0f && vecNextSpd.y > 5.0f &&
+            rad2deg(abs(avgSlip)) > g_settings().DriveAssists.ESP.UnderMin) {
             espData.Understeer = true;
         }
     }
@@ -194,7 +232,7 @@ DrivingAssists::LSDData DrivingAssists::GetLSD() {
     return lsdData;
 }
 
-std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData, LSDData lsdData) {
+std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData) {
     std::vector<float> brakeVals(g_vehData.mWheelCount); // only works for 4 wheels but ok
 
     float steerMult = g_settings().Steering.CustomSteering.SteeringMult;
@@ -245,8 +283,8 @@ std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData, LSDData lsdData
     float understeerAdd = handlingBrakeForce * understeerComp;
 
     float brkFBase = inpBrakeForce * bbalF;
-    brakeVals[0] = brkFBase + (avgAngle_ < 0.0f && espData.Oversteer ? oversteerAdd : 0.0f) + lsdData.BrakeLF;
-    brakeVals[1] = brkFBase + (avgAngle_ > 0.0f && espData.Oversteer ? oversteerAdd : 0.0f) + lsdData.BrakeRF;
+    brakeVals[0] = brkFBase + (avgAngle_ < 0.0f && espData.Oversteer ? oversteerAdd : 0.0f);
+    brakeVals[1] = brkFBase + (avgAngle_ > 0.0f && espData.Oversteer ? oversteerAdd : 0.0f);
 
     float brkRBase = inpBrakeForce * bbalR;
     float brkRUnderL = (avgAngle > 0.0f && espData.Understeer ? understeerAdd : 0.0f);
@@ -255,8 +293,8 @@ std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData, LSDData lsdData
     float brkROverL = (avgAngle_ < 0.0f && espData.Oversteer ? oversteerRearAdd : 0.0f);
     float brkROverR = (avgAngle_ > 0.0f && espData.Oversteer ? oversteerRearAdd : 0.0f);
 
-    brakeVals[2] = brkRBase + brkRUnderL + brkROverL + lsdData.BrakeLR;
-    brakeVals[3] = brkRBase + brkRUnderR + brkROverR + lsdData.BrakeRR;
+    brakeVals[2] = brkRBase + brkRUnderL + brkROverL;
+    brakeVals[3] = brkRBase + brkRUnderR + brkROverR;
 
     g_vehData.mWheelsEspO[0] = avgAngle_ < 0.0f && espData.Oversteer ? true : false;
     g_vehData.mWheelsEspO[1] = avgAngle_ > 0.0f && espData.Oversteer ? true : false;
@@ -269,68 +307,61 @@ std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData, LSDData lsdData
     return brakeVals;
 }
 
-std::vector<float> DrivingAssists::GetTCSBrakes(TCSData tcsData, LSDData lsdData) {
+std::vector<float> DrivingAssists::GetTCSBrakes(TCSData tcsData) {
     std::vector<float> brakeVals(g_vehData.mWheelCount);
-    std::vector<float> lsdVals(g_vehData.mWheelCount);
+    const auto offsets = VExt::GetWheelOffsets(g_playerVehicle);
 
-    float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
+    const float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
+    const float bbalF = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasFront);
+    const float bbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasRear);
+
     float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
-
-    if (g_vehData.mWheelCount == 4) {
-        lsdVals = {
-           lsdData.BrakeLF,
-           lsdData.BrakeRF,
-           lsdData.BrakeLR,
-           lsdData.BrakeRR,
-        };
-    }
+    float fullBrakePower = handlingBrakeForce * g_settings().DriveAssists.TCS.BrakeMult;
 
     float tcsSlipMin = g_settings().DriveAssists.TCS.SlipMin;
     float tcsSlipMax = g_settings().DriveAssists.TCS.SlipMax;
 
     for (int i = 0; i < g_vehData.mWheelCount; i++) {
-        if (tcsData.SlippingWheels[i]) {
-            float mappedVal = map(
-                tcsData.AverageSlip,
-                tcsSlipMin, tcsSlipMax,
-                0.0f, 1.0f);
-            mappedVal = std::clamp(mappedVal, 0.0f, 1.0f);
+        float bbal = offsets[i].y > 0.0f ? bbalF : bbalR;
 
-            brakeVals[i] = mappedVal + lsdVals[i];
-            g_vehData.mWheelsTcs[i] = true;
+        if (tcsData.LinearSlip[i] > tcsSlipMin &&
+            g_vehData.mWheelTyreSpeeds[i] > 0.0f &&
+            g_vehData.mSuspensionTravel[i] > 0.0f) {
+            float mappedVal = map(
+                tcsData.LinearSlip[i],
+                tcsSlipMin, tcsSlipMax,
+                0.0f, fullBrakePower);
+            mappedVal = std::clamp(mappedVal, 0.0f, fullBrakePower);
+
+            brakeVals[i] = std::max(inpBrakeForce * bbal, mappedVal * bbal);
         }
         else {
-            brakeVals[i] = inpBrakeForce + lsdVals[i];
-            g_vehData.mWheelsTcs[i] = false;
+            brakeVals[i] = inpBrakeForce * bbal;
         }
     }
 
     return brakeVals;
 }
 
-std::vector<float> DrivingAssists::GetABSBrakes(ABSData absData, LSDData lsdData) {
+std::vector<float> DrivingAssists::GetABSBrakes(ABSData absData) {
     std::vector<float> brakeVals(g_vehData.mWheelCount);
-    std::vector<float> lsdVals(g_vehData.mWheelCount);
+    const auto offsets = VExt::GetWheelOffsets(g_playerVehicle);
 
-    float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
+    const float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
+    const float bbalF = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasFront);
+    const float bbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasRear);
+
     float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
 
-    if (g_vehData.mWheelCount == 4) {
-        lsdVals = {
-            lsdData.BrakeLF,
-            lsdData.BrakeRF,
-            lsdData.BrakeLR,
-            lsdData.BrakeRR,
-        };
-    }
-
     for (uint8_t i = 0; i < g_vehData.mWheelsLockedUp.size(); i++) {
+        float bbal = offsets[i].y > 0.0f ? bbalF : bbalR;
+
         if (g_vehData.mWheelsLockedUp[i]) {
-            brakeVals[i] = 0.0f + lsdVals[i];
+            brakeVals[i] = 0.0f;
             g_vehData.mWheelsAbs[i] = true;
         }
         else {
-            brakeVals[i] = inpBrakeForce + lsdVals[i];
+            brakeVals[i] = inpBrakeForce * bbal;
             g_vehData.mWheelsAbs[i] = false;
         }
     }

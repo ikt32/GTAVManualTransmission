@@ -31,6 +31,12 @@
 #define LOAD_VAL(section, key, option) \
     option = GetValue(ini, section, key, option)
 
+namespace detail
+{
+    template<typename>
+    constexpr bool always_false = false;
+}
+
 namespace {
     VehicleConfig* activeConfig = nullptr;
 
@@ -126,7 +132,6 @@ void ScriptSettings::SaveGeneral() {
     SAVE_VAL("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
     SAVE_VAL("CUSTOM_STEERING", "CountersteerMult", CustomSteering.CountersteerMult);
     SAVE_VAL("CUSTOM_STEERING", "CountersteerLimit", CustomSteering.CountersteerLimit);
-    SAVE_VAL("CUSTOM_STEERING", "SteeringReduction", CustomSteering.SteeringReduction);
     SAVE_VAL("CUSTOM_STEERING", "NoReductionHandbrake", CustomSteering.NoReductionHandbrake);
     SAVE_VAL("CUSTOM_STEERING", "Gamma", CustomSteering.Gamma);
     SAVE_VAL("CUSTOM_STEERING", "SteerTime", CustomSteering.SteerTime);
@@ -266,6 +271,11 @@ void ScriptSettings::SaveGeneral() {
     SAVE_VAL("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
     SAVE_VAL("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
 
+    SAVE_VAL("HUD", "DsProtEnable", HUD.DsProt.Enable);
+    SAVE_VAL("HUD", "DsProtXpos", HUD.DsProt.XPos);
+    SAVE_VAL("HUD", "DsProtYpos", HUD.DsProt.YPos);
+    SAVE_VAL("HUD", "DsProtSize", HUD.DsProt.Size);
+
     SAVE_VAL("HUD", "MouseEnable", HUD.MouseSteering.Enable);
     SAVE_VAL("HUD", "MouseXPos", HUD.MouseSteering.XPos);
     SAVE_VAL("HUD", "MouseYPos", HUD.MouseSteering.YPos);
@@ -285,10 +295,13 @@ void ScriptSettings::SaveGeneral() {
 
     // [MISC]
     SAVE_VAL("MISC", "UDPTelemetry", Misc.UDPTelemetry);
+    SAVE_VAL("MISC", "UDPAddress", Misc.UDPAddress);
+    SAVE_VAL("MISC", "UDPPort", Misc.UDPPort);
     SAVE_VAL("MISC", "DashExtensions", Misc.DashExtensions);
     SAVE_VAL("MISC", "SyncAnimations", Misc.SyncAnimations);
     SAVE_VAL("MISC", "HidePlayerInFPV", Misc.HidePlayerInFPV);
     SAVE_VAL("MISC", "HideWheelInFPV", Misc.HideWheelInFPV);
+    SAVE_VAL("MISC", "SaveFullConfig", Misc.SaveFullConfig);
 
     // [UPDATE]
     SAVE_VAL("UPDATE", "EnableUpdate", Update.EnableUpdate);
@@ -302,9 +315,9 @@ void ScriptSettings::SaveGeneral() {
     SAVE_VAL("DEBUG", "DisplayWheelInfo", Debug.DisplayWheelInfo);
     SAVE_VAL("DEBUG", "DisplayMaterialInfo", Debug.DisplayMaterialInfo);
     SAVE_VAL("DEBUG", "DisplayTractionInfo", Debug.DisplayTractionInfo);
-    SAVE_VAL("DEBUG", "DisplayFFBInfo", Debug.DisplayFFBInfo);
     SAVE_VAL("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
     SAVE_VAL("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
+    SAVE_VAL("DEBUG", "ShowAdvancedFFBOptions", Debug.ShowAdvancedFFBOptions);
 
     SAVE_VAL("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
     SAVE_VAL("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
@@ -379,21 +392,27 @@ void ScriptSettings::SaveWheel() const {
 
     // [FORCE_FEEDBACK]
     SAVE_VAL("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
-    SAVE_VAL("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
     SAVE_VAL("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
-    SAVE_VAL("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
-    SAVE_VAL("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
-    SAVE_VAL("FORCE_FEEDBACK", "SATUndersteerMult", Wheel.FFB.SATUndersteerMult);
-    SAVE_VAL("FORCE_FEEDBACK", "DetailMult", Wheel.FFB.DetailMult);
-    SAVE_VAL("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
-    SAVE_VAL("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
     SAVE_VAL("FORCE_FEEDBACK", "DamperMax", Wheel.FFB.DamperMax);
     SAVE_VAL("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin);
     SAVE_VAL("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
+    SAVE_VAL("FORCE_FEEDBACK", "DetailMult", Wheel.FFB.DetailMult);
+    SAVE_VAL("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
+    SAVE_VAL("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
     SAVE_VAL("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
+    SAVE_VAL("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
+
+    SAVE_VAL("FORCE_FEEDBACK", "FFBProfile", Wheel.FFB.FFBProfile);
+    SAVE_VAL("FORCE_FEEDBACK", "ResponseCurve", Wheel.FFB.ResponseCurve);
+    SAVE_VAL("FORCE_FEEDBACK", "SlipOptMin", Wheel.FFB.SlipOptMin);
+    SAVE_VAL("FORCE_FEEDBACK", "SlipOptMinMult", Wheel.FFB.SlipOptMinMult);
+    SAVE_VAL("FORCE_FEEDBACK", "SlipOptMax", Wheel.FFB.SlipOptMax);
+    SAVE_VAL("FORCE_FEEDBACK", "SlipOptMaxMult", Wheel.FFB.SlipOptMaxMult);
+
+    SAVE_VAL("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
     SAVE_VAL("FORCE_FEEDBACK", "Gamma", Wheel.FFB.Gamma);
     SAVE_VAL("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
-    
+
     // [INPUT_DEVICES]
     ini.SetValue("INPUT_DEVICES", nullptr, nullptr);
 
@@ -448,7 +467,6 @@ void ScriptSettings::parseSettingsGeneral() {
     LOAD_VAL("CUSTOM_STEERING", "Mode", CustomSteering.Mode);
     LOAD_VAL("CUSTOM_STEERING", "CountersteerMult", CustomSteering.CountersteerMult);
     LOAD_VAL("CUSTOM_STEERING", "CountersteerLimit", CustomSteering.CountersteerLimit);
-    LOAD_VAL("CUSTOM_STEERING", "SteeringReduction", CustomSteering.SteeringReduction);
     LOAD_VAL("CUSTOM_STEERING", "NoReductionHandbrake", CustomSteering.NoReductionHandbrake);
     LOAD_VAL("CUSTOM_STEERING", "Gamma", CustomSteering.Gamma);
     LOAD_VAL("CUSTOM_STEERING", "SteerTime", CustomSteering.SteerTime);
@@ -588,6 +606,11 @@ void ScriptSettings::parseSettingsGeneral() {
     LOAD_VAL("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
     LOAD_VAL("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
 
+    LOAD_VAL("HUD", "DsProtEnable", HUD.DsProt.Enable);
+    LOAD_VAL("HUD", "DsProtXpos", HUD.DsProt.XPos);
+    LOAD_VAL("HUD", "DsProtYpos", HUD.DsProt.YPos);
+    LOAD_VAL("HUD", "DsProtSize", HUD.DsProt.Size);
+
     LOAD_VAL("HUD", "MouseEnable", HUD.MouseSteering.Enable);
     LOAD_VAL("HUD", "MouseXPos", HUD.MouseSteering.XPos);
     LOAD_VAL("HUD", "MouseYPos", HUD.MouseSteering.YPos);
@@ -607,10 +630,13 @@ void ScriptSettings::parseSettingsGeneral() {
 
     // [MISC]
     LOAD_VAL("MISC", "UDPTelemetry", Misc.UDPTelemetry);
+    LOAD_VAL("MISC", "UDPAddress", Misc.UDPAddress);
+    LOAD_VAL("MISC", "UDPPort", Misc.UDPPort);
     LOAD_VAL("MISC", "DashExtensions", Misc.DashExtensions);
     LOAD_VAL("MISC", "SyncAnimations", Misc.SyncAnimations);
     LOAD_VAL("MISC", "HidePlayerInFPV", Misc.HidePlayerInFPV);
     LOAD_VAL("MISC", "HideWheelInFPV", Misc.HideWheelInFPV);
+    LOAD_VAL("MISC", "SaveFullConfig", Misc.SaveFullConfig);
 
     // [UPDATE]
     LOAD_VAL("UPDATE", "EnableUpdate", Update.EnableUpdate);
@@ -625,8 +651,8 @@ void ScriptSettings::parseSettingsGeneral() {
     LOAD_VAL("DEBUG", "DisplayMaterialInfo", Debug.DisplayMaterialInfo);
     LOAD_VAL("DEBUG", "DisplayTractionInfo", Debug.DisplayTractionInfo);
     LOAD_VAL("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
-    LOAD_VAL("DEBUG", "DisplayFFBInfo", Debug.DisplayFFBInfo);
     LOAD_VAL("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
+    LOAD_VAL("DEBUG", "ShowAdvancedFFBOptions", Debug.ShowAdvancedFFBOptions);
 
     LOAD_VAL("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
     LOAD_VAL("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
@@ -830,21 +856,27 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
 
     // [FORCE_FEEDBACK]
     LOAD_VAL("FORCE_FEEDBACK", "Enable", Wheel.FFB.Enable);
-    LOAD_VAL("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
     LOAD_VAL("FORCE_FEEDBACK", "SATAmpMult", Wheel.FFB.SATAmpMult);
-    LOAD_VAL("FORCE_FEEDBACK", "SATMax", Wheel.FFB.SATMax);
-    LOAD_VAL("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
-    LOAD_VAL("FORCE_FEEDBACK", "SATUndersteerMult", Wheel.FFB.SATUndersteerMult);
     LOAD_VAL("FORCE_FEEDBACK", "DamperMax", Wheel.FFB.DamperMax);
-    LOAD_VAL("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin); ;
+    LOAD_VAL("FORCE_FEEDBACK", "DamperMin", Wheel.FFB.DamperMin);
     LOAD_VAL("FORCE_FEEDBACK", "DamperMinSpeed", Wheel.FFB.DamperMinSpeed);
     LOAD_VAL("FORCE_FEEDBACK", "DetailMult", Wheel.FFB.DetailMult);
     LOAD_VAL("FORCE_FEEDBACK", "DetailLim", Wheel.FFB.DetailLim);
     LOAD_VAL("FORCE_FEEDBACK", "DetailMaw", Wheel.FFB.DetailMAW);
     LOAD_VAL("FORCE_FEEDBACK", "CollisionMult", Wheel.FFB.CollisionMult);
+    LOAD_VAL("FORCE_FEEDBACK", "AntiDeadForce", Wheel.FFB.AntiDeadForce);
+    Wheel.FFB.LUTFile = ini.GetValue("FORCE_FEEDBACK", "LUTFile", "");
+
+    LOAD_VAL("FORCE_FEEDBACK", "FFBProfile", Wheel.FFB.FFBProfile);
+    LOAD_VAL("FORCE_FEEDBACK", "ResponseCurve", Wheel.FFB.ResponseCurve);
+    LOAD_VAL("FORCE_FEEDBACK", "SlipOptMin", Wheel.FFB.SlipOptMin);
+    LOAD_VAL("FORCE_FEEDBACK", "SlipOptMinMult", Wheel.FFB.SlipOptMinMult);
+    LOAD_VAL("FORCE_FEEDBACK", "SlipOptMax", Wheel.FFB.SlipOptMax);
+    LOAD_VAL("FORCE_FEEDBACK", "SlipOptMaxMult", Wheel.FFB.SlipOptMaxMult);
+
+    LOAD_VAL("FORCE_FEEDBACK", "SATFactor", Wheel.FFB.SATFactor);
     LOAD_VAL("FORCE_FEEDBACK", "Gamma", Wheel.FFB.Gamma);
     LOAD_VAL("FORCE_FEEDBACK", "MaxSpeed", Wheel.FFB.MaxSpeed);
-    Wheel.FFB.LUTFile = ini.GetValue("FORCE_FEEDBACK", "LUTFile", "");
 
     // [INPUT_DEVICES]
     int it = 0;
@@ -863,6 +895,7 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
         GUID guid = String2GUID(currGuid);
         if (guid != GUID()) {
             Wheel.InputDevices.RegisteredGUIDs.push_back(guid);
+            Wheel.InputDevices.RegisteredDevices.push_back(Device(currDevice, guid));
         }
         else {
             logger.Write(ERROR, "[Settings] Failed to parse GUID. GUID [%s] @ [%s]", currGuid.c_str(), currDevice.c_str());
@@ -1088,26 +1121,19 @@ void ScriptSettings::parseSettingsWheel(CarControls *scriptControl) {
         parseWheelItem<int>(ini, "CC_DEC", -1, "Cruise control -5");
 
     // [TO_KEYBOARD]
-    scriptControl->WheelToKeyGUID = 
-        DeviceIndexToGUID(ini.GetLongValue("TO_KEYBOARD", "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs);
-    for (int i = 0; i < MAX_RGBBUTTONS; i++) {
-        scriptControl->WheelToKey[i].clear();
-        CSimpleIniA::TNamesDepend values;
-        if (ini.GetAllValues("TO_KEYBOARD", std::to_string(i).c_str(), values)) {
-            values.sort(CSimpleIniA::Entry::LoadOrder());
-            for (const auto& entry : values) {
-                scriptControl->WheelToKey[i].push_back(str2key(entry.pItem));
+    scriptControl->WheelToKey.clear();
+    for (const GUID& guid : Wheel.InputDevices.RegisteredGUIDs) {
+        int index = GUIDToDeviceIndex(guid);
+        for (int i = 0; i < MAX_RGBBUTTONS; ++i) {
+            const char* value = ini.GetValue("TO_KEYBOARD", fmt::format("DEV{}BUTTON{}", index, i).c_str(), nullptr);
+            if (value) {
+                scriptControl->WheelToKey.push_back(CarControls::SInput<int>(value, guid, i, "", ""));
             }
         }
-    }
-
-    for (const auto& pov : WheelDirectInput::POVDirections) {
-        scriptControl->WheelToKeyPov[pov].clear();
-        CSimpleIniA::TNamesDepend values;
-        if (ini.GetAllValues("TO_KEYBOARD", std::to_string(pov).c_str(), values)) {
-            values.sort(CSimpleIniA::Entry::LoadOrder());
-            for (const auto& entry : values) {
-                scriptControl->WheelToKeyPov[pov].push_back(str2key(entry.pItem));
+        for (const auto& pov : WheelDirectInput::POVDirections) {
+            const char* value = ini.GetValue("TO_KEYBOARD", fmt::format("DEV{}BUTTON{}", index, pov).c_str(), nullptr);
+            if (value) {
+                scriptControl->WheelToKey.push_back(CarControls::SInput<int>(value, guid, pov, "", ""));
             }
         }
     }
@@ -1147,7 +1173,7 @@ void ScriptSettings::SteeringSaveAxis(const std::string &confTag, ptrdiff_t inde
     CHECK_LOG_SI_ERROR(result, "load");
 
     ini.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
-    ini.SetValue(confTag.c_str(), "AXLE", axis.c_str());
+    ini.SetValue(confTag.c_str(), "AXIS", axis.c_str());
     ini.SetValue(confTag.c_str(), "MIN", std::to_string(minVal).c_str());
     ini.SetValue(confTag.c_str(), "MAX", std::to_string(maxVal).c_str());
 
@@ -1177,28 +1203,22 @@ void ScriptSettings::SteeringAddWheelToKey(const std::string &confTag, ptrdiff_t
     SI_Error result = ini.LoadFile(settingsWheelFile.c_str());
     CHECK_LOG_SI_ERROR(result, "load");
 
-    std::string device = ini.GetValue(confTag.c_str(), "DEVICE", "");
-    if (device.empty()) {
-        ini.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
-    }
-    else if (device != std::to_string(index)) {
-        ini.Delete(confTag.c_str(), "DEVICE");
-        ini.SetValue(confTag.c_str(), "DEVICE", std::to_string(index).c_str());
-    }
+    std::string inputName = fmt::format("DEV{}BUTTON{}", index, button);
 
-    ini.SetValue(confTag.c_str(), std::to_string(button).c_str(), keyName.c_str());
+    ini.SetValue(confTag.c_str(), inputName.c_str(), keyName.c_str());
+
     result = ini.SaveFile(settingsWheelFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
 }
 
-bool ScriptSettings::SteeringClearWheelToKey(int button) {
+bool ScriptSettings::SteeringClearWheelToKey(const std::string& assignment) {
     CSimpleIniA ini;
     ini.SetUnicode();
     ini.SetMultiKey();
     SI_Error result = ini.LoadFile(settingsWheelFile.c_str());
     CHECK_LOG_SI_ERROR(result, "load");
 
-    bool deleted = ini.Delete("TO_KEYBOARD", std::to_string(button).c_str(), true);
+    bool deleted = ini.Delete("TO_KEYBOARD", assignment.c_str(), true);
     result = ini.SaveFile(settingsWheelFile.c_str());
     CHECK_LOG_SI_ERROR(result, "save");
     return deleted;
@@ -1259,6 +1279,15 @@ int ScriptSettings::GUIDToDeviceIndex(GUID guidToFind) {
     return -1;
 }
 
+std::string ScriptSettings::GUIDToDeviceName(GUID guidToFind) {
+    for (auto device : Wheel.InputDevices.RegisteredDevices) {
+        if (device.guid == guidToFind) {
+            return device.name;
+        }
+    }
+    return "Device not found";
+}
+
 template <typename T>
 CarControls::SInput<T> ScriptSettings::parseWheelItem(CSimpleIniA& ini, const char* section, T defaultValue, const char* name) {
     std::string nameFmt = formatInputName(section, name);
@@ -1268,12 +1297,17 @@ CarControls::SInput<T> ScriptSettings::parseWheelItem(CSimpleIniA& ini, const ch
             ini.GetLongValue(section, "BUTTON", defaultValue), nameFmt.c_str(), "");
     }
     else if constexpr (std::is_same<T, std::string>::value) {
+        auto axisValue = ini.GetValue(section, "AXIS", defaultValue.c_str());
+        if (defaultValue == axisValue) {
+            axisValue = ini.GetValue(section, "AXLE", defaultValue.c_str());
+        }
+
         return CarControls::SInput<T>(section,
             DeviceIndexToGUID(ini.GetLongValue(section, "DEVICE", -1), Wheel.InputDevices.RegisteredGUIDs),
-            ini.GetValue(section, "AXLE", defaultValue.c_str()), nameFmt.c_str(), "");
+            axisValue, nameFmt.c_str(), "");
     }
     else {
-        static_assert(false, "Type must be string or int.");
+        static_assert(detail::always_false<T>, "Type must be string or int.");
     }
 }
 
@@ -1295,7 +1329,7 @@ CarControls::SInput<T> ScriptSettings::parseControllerItem(CSimpleIniA& ini, con
             name, description);
     }
     else {
-        static_assert(false, "Type must be string or eControl.");
+        static_assert(detail::always_false<T>, "Type must be string or eControl.");
     }
 }
 

@@ -83,6 +83,7 @@ void clearAxis(const std::string& confTag) {
 }
 
 void clearWheelToKey() {
+    UI::Notify(INFO, "Type the device and button you want to delete, like ~h~~r~DEV2BUTTON32~s~.");
     MISC::DISPLAY_ONSCREEN_KEYBOARD(1, "VEUI_ENTER_TEXT", "", "", "", "", "", 30);
     while (MISC::UPDATE_ONSCREEN_KEYBOARD() == 0) {
         PAD::DISABLE_ALL_CONTROL_ACTIONS(0);
@@ -91,19 +92,14 @@ void clearWheelToKey() {
     if (!MISC::GET_ONSCREEN_KEYBOARD_RESULT()) return;
     std::string result = MISC::GET_ONSCREEN_KEYBOARD_RESULT();
 
-    int button;
-    if (str2int(button, result.c_str(), 10) != STR2INT_SUCCESS) {
-        UI::Notify(WARN, fmt::format("Invalid input: {} is not a valid number!", result));
-        return;
-    }
-    bool found = g_settings.SteeringClearWheelToKey(button);
+    bool found = g_settings.SteeringClearWheelToKey(result);
     if (found) {
         saveAllSettings();
-        UI::Notify(WARN, fmt::format("Removed button {}", result));
+        UI::Notify(WARN, fmt::format("Removed input {}", result));
         g_settings.Read(&g_controls);
     }
     else {
-        UI::Notify(WARN, fmt::format("Button {} not found.", result));
+        UI::Notify(WARN, fmt::format("Input {} not found.", result));
     }
 }
 

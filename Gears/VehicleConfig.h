@@ -110,6 +110,8 @@ public:
             // tyre speed threshold, m/s
             Tracked<float> SlipMin = 1.0f;
             Tracked<float> SlipMax = 2.0f;
+            // Multiplier for fBrakeForce for how hard TCS may brake a wheel.
+            Tracked<float> BrakeMult = 1.0f;
         } TCS;
 
         struct {
@@ -198,6 +200,7 @@ public:
     struct {
         Tracked<bool> UpshiftCut = true;
         Tracked<bool> DownshiftBlip = true;
+        Tracked<bool> DownshiftProtect = false;
         Tracked<float> ClutchRateMult = 1.0f;
         Tracked<float> RPMTolerance = 0.2f;
     } ShiftOptions;
@@ -228,9 +231,12 @@ public:
             Tracked<bool> UseCustomLock = true;
             Tracked<float> SoftLock = 720.0f;
             Tracked<float> SteeringMult = 1.0f;
+            Tracked<float> SteeringReduction = 0.9f;
         } CustomSteering;
 
         struct {
+            Tracked<float> SATMult = 1.0f;
+            Tracked<float> CurveMult = 1.0f;
             Tracked<float> SoftLock = 720.0f;
             Tracked<float> SteeringMult = 1.0f;
         } Wheel;

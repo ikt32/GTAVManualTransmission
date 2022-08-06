@@ -14,6 +14,7 @@
 #include "Util/MathExt.h"
 #include "Util/UIUtils.h"
 #include "Util/Materials.h"
+#include "Util/ScriptUtils.h"
 
 #include "Input/CarControls.hpp"
 #include "VehicleData.hpp"
@@ -31,6 +32,7 @@ extern int g_textureAbsId;
 extern int g_textureTcsId;
 extern int g_textureEspId;
 extern int g_textureBrkId;
+extern int g_textureDsProtId;
 
 extern VehicleGearboxStates g_gearStates;
 extern Vehicle g_playerVehicle;
@@ -68,8 +70,12 @@ namespace DashLights {
     int LastEspTrigger = 0;
     bool EspBulbState = false;
 
+    int LastDsProtTrigger = 0;
+    bool DsProtBulbState = false;
+
     const int LightDuration = 300; // milliseconds
     const int FlashDuration = 100; // milliseconds
+    const int DsProtDuration = 500; // milliseconds
 }
 
 void updateDashLights() {
@@ -78,6 +84,7 @@ void updateDashLights() {
     bool abs = false;
     bool tcs = false;
     bool esp = false;
+    bool dsProt = g_gearStates.DownshiftProtection;
 
     for (int i = 0; i < g_vehData.mWheelCount; ++i) {
         abs |= g_vehData.mWheelsAbs[i];
@@ -129,6 +136,18 @@ void updateDashLights() {
         DashLights::EspBulbState = false;
     }
 
+    // Downshift protection
+    if (DashLights::LastDsProtTrigger == 0 && dsProt) {
+        DashLights::LastDsProtTrigger = currentTime;
+        DashLights::DsProtBulbState = true;
+    }
+    // Turn off
+    if (DashLights::LastDsProtTrigger != 0 && !dsProt &&
+        currentTime > DashLights::LastDsProtTrigger + DashLights::DsProtDuration) {
+        DashLights::LastDsProtTrigger = 0;
+        DashLights::DsProtBulbState = false;
+    }
+
     if (abs)
         DashLights::LastAbsTime = currentTime;
     if (tcs)
@@ -150,6 +169,7 @@ void drawDashLights() {
     bool abs = DashLights::AbsBulbState;
     bool tcs = DashLights::TcsBulbState;
     bool esp = DashLights::EspBulbState;
+    bool dsProt = DashLights::DsProtBulbState;
 
     if (g_peripherals.IgnitionState == IgnitionState::Stall) {
         abs = true;
@@ -240,9 +260,19 @@ void drawDashLights() {
         XPos + 0.045f * size, YPos,
         0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), brkColor.R, brkColor.G, brkColor.B, brkColor.A);
 
+    // Background
     GRAPHICS::DRAW_RECT(XPos, YPos,
         rectSzX, rectSzY,
         0, 0, 0, 127, 0);
+
+    // Downshift protection is in the center of the screen.
+    if (g_settings.HUD.DsProt.Enable && dsProt) {
+        drawTexture(g_textureDsProtId, 0, -9998, 100,
+            g_settings.HUD.DsProt.Size, g_settings.HUD.DsProt.Size,
+            0.5f, 0.5f, // center of texture
+            g_settings.HUD.DsProt.XPos, g_settings.HUD.DsProt.YPos,
+            0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 0.93f, 0.83f, 0.01f, 1.0f);
+    }
 }
 
 Vector3 GetAccelVector() {
@@ -569,10 +599,6 @@ void MTHUD::UpdateHUD() {
         drawInputWheelInfo();
     }
 
-    if (g_settings.Debug.DisplayFFBInfo) {
-        WheelInput::DrawDebugLines();
-    }
-
     // debug stuff
     if (g_settings.Debug.DisplayInfo) {
         drawDebugInfo();
@@ -602,14 +628,12 @@ void MTHUD::UpdateHUD() {
 void drawDebugInfo() {
     if (!g_menu.IsThisOpen()) {
         UI::ShowText(0.01, 0.250, 0.3, fmt::format("Address: 0x{:X}", reinterpret_cast<uintptr_t>(VExt::GetAddress(g_playerVehicle))));
-        UI::ShowText(0.01, 0.275, 0.3, fmt::format("Mod Enabled:\t\t{}" , g_settings.MTOptions.Enable));
-        UI::ShowText(0.01, 0.300, 0.3, fmt::format("RPM:\t\t\t{:.3f}", g_vehData.mRPM));
-        //UI::ShowText(0.25, 0.300, 0.3, fmt::format("Time:{}", MISC::GET_GAME_TIMER()));
-        UI::ShowText(0.01, 0.325, 0.3, fmt::format("Current Gear:\t\t{}", VExt::GetGearCurr(g_playerVehicle)));
-        UI::ShowText(0.01, 0.350, 0.3, fmt::format("Next Gear:\t\t{}", VExt::GetGearNext(g_playerVehicle)));
-        UI::ShowText(0.01, 0.375, 0.3, fmt::format("Clutch:\t\t\t{:.2f}", VExt::GetClutch(g_playerVehicle)));
-        UI::ShowText(0.01, 0.400, 0.3, fmt::format("Throttle:\t\t\t{:.2f}", VExt::GetThrottle(g_playerVehicle)));
-        UI::ShowText(0.01, 0.425, 0.3, fmt::format("Turbo:\t\t\t{:.2f}", VExt::GetTurbo(g_playerVehicle)));
+        UI::ShowText(0.01, 0.275, 0.3, fmt::format("Mod Enabled: {}" , g_settings.MTOptions.Enable));
+        UI::ShowText(0.01, 0.300, 0.3, fmt::format("RPM: {:.3f}", g_vehData.mRPM));
+        UI::ShowText(0.01, 0.325, 0.3, fmt::format("Gear: C[{}] N[{}]", VExt::GetGearCurr(g_playerVehicle), VExt::GetGearNext(g_playerVehicle)));
+        UI::ShowText(0.01, 0.375, 0.3, fmt::format("Clutch: {:.2f}", VExt::GetClutch(g_playerVehicle)));
+        UI::ShowText(0.01, 0.400, 0.3, fmt::format("Throttle: {:.2f}", VExt::GetThrottle(g_playerVehicle)));
+        UI::ShowText(0.01, 0.425, 0.3, fmt::format("Turbo: {:.2f}", VExt::GetTurbo(g_playerVehicle)));
         UI::ShowText(0.01, 0.450, 0.3, fmt::format("{}Speedo", g_vehData.mHasSpeedo ? "~g~" : "~r~"));
         UI::ShowText(0.01, 0.475, 0.3, fmt::format("{}E {}CVT -> {}Clutch",
             g_vehData.mIsElectric ? "~g~" : "~r~", g_vehData.mIsCVT ? "~g~" : "~r~",
@@ -618,9 +642,8 @@ void drawDebugInfo() {
             g_vehData.mHasABS ? "~g~" : "~r~"));
 
         UI::ShowText(0.01, 0.550, 0.3, fmt::format("{}Shifting", g_gearStates.Shifting ? "~g~" : "~r~"));
-        UI::ShowText(0.01, 0.575, 0.3, fmt::format("Clutch: {}" ,g_gearStates.ClutchVal));
-        UI::ShowText(0.01, 0.600, 0.3, fmt::format("Lock: {}" ,g_gearStates.LockGear));
-        UI::ShowText(0.01, 0.625, 0.3, fmt::format("Next: {}" ,g_gearStates.NextGear));
+        UI::ShowText(0.01, 0.575, 0.3, fmt::format("Clutch: {:.3f}" ,g_gearStates.ClutchVal));
+        UI::ShowText(0.01, 0.600, 0.3, fmt::format("Gear L[{}] N[{}]" ,g_gearStates.LockGear, g_gearStates.NextGear));
 
         // Old automatic gearbox
         if (!g_settings().AutoParams.UsingATCU) {
@@ -643,7 +666,6 @@ void drawDebugInfo() {
 
     if (g_settings.Wheel.Options.Enable)
         UI::ShowText(0.85, 0.150, 0.4, fmt::format("Wheel {} present", g_controls.WheelAvailable() ? "" : " not"), 4);
-    
 
     if (g_settings.Debug.DisplayGearingInfo) {
         auto ratios = VExt::GetGearRatios(g_playerVehicle);
@@ -721,34 +743,15 @@ void drawInputWheelInfo() {
         drawSteeringFfb();
 }
 
-std::vector<Vector3> GetWheelCoords(Vehicle handle) {
-    std::vector<Vector3> worldCoords;
-    std::vector<Vector3> positions = VExt::GetWheelOffsets(handle);
-    Vector3 position = ENTITY::GET_ENTITY_COORDS(handle, true);
-    Vector3 rotation = ENTITY::GET_ENTITY_ROTATION(handle, 0);
-    rotation.x = deg2rad(rotation.x);
-    rotation.y = deg2rad(rotation.y);
-    rotation.z = deg2rad(rotation.z);
-    Vector3 direction = ENTITY::GET_ENTITY_FORWARD_VECTOR(handle);
-
-    worldCoords.reserve(positions.size());
-    for (Vector3 wheelPos : positions) {
-        worldCoords.emplace_back(GetOffsetInWorldCoords(position, rotation, direction, wheelPos));
-    }
-    return worldCoords;
-}
-
 void drawVehicleWheelTractionVector() {
     auto numWheels = VExt::GetNumWheels(g_playerVehicle);
     auto wheelOffs = VExt::GetWheelOffsets(g_playerVehicle);
     auto wheelTVLYs = VExt::GetWheelTractionVectorY(g_playerVehicle);
     auto wheelTVLXs = VExt::GetWheelTractionVectorX(g_playerVehicle);
-    auto wheelCoords = GetWheelCoords(g_playerVehicle);
+    auto wheelCoords = Util::GetWheelCoords(g_playerVehicle);
     for (int i = 0; i < numWheels; i++) {
-        const float div = 1.0f;
-
         Vector3 tractionVectorWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle,
-            wheelOffs[i].x + -wheelTVLXs[i] / div, wheelOffs[i].y + wheelTVLYs[i] / div, wheelOffs[i].z);
+            wheelOffs[i].x + -wheelTVLXs[i], wheelOffs[i].y + wheelTVLYs[i], wheelOffs[i].z);
 
         int red = wheelTVLYs[i] > 0.0f ? 0 : 255;
         int green = wheelTVLYs[i] > 0.0f ? 255 : 0;
@@ -761,7 +764,7 @@ void drawVehicleWheelTractionVector() {
 
 void drawVehicleWheelMaterialInfo() {
     auto numWheels = VExt::GetNumWheels(g_playerVehicle);
-    auto wheelCoords = GetWheelCoords(g_playerVehicle);
+    auto wheelCoords = Util::GetWheelCoords(g_playerVehicle);
 
     auto materialIndex = VExt::GetTireContactMaterial(g_playerVehicle);
     auto tyreGrips = VExt::GetTyreGrips(g_playerVehicle);
@@ -791,7 +794,7 @@ void drawVehicleWheelInfo() {
     auto wheelsContactCoords = VExt::GetWheelLastContactCoords(g_playerVehicle);
     auto wheelsOnGround = VExt::GetWheelsOnGround(g_playerVehicle);
 
-    auto wheelCoords = GetWheelCoords(g_playerVehicle);
+    auto wheelCoords = Util::GetWheelCoords(g_playerVehicle);
     auto wheelsPower = VExt::GetWheelPower(g_playerVehicle);
     auto wheelsBrake = VExt::GetWheelBrakePressure(g_playerVehicle);
     auto wheelDims = VExt::GetWheelDimensions(g_playerVehicle);
@@ -799,6 +802,8 @@ void drawVehicleWheelInfo() {
     auto wheelTVLs = VExt::GetWheelTractionVectorLength(g_playerVehicle);
     auto wheelLoads = VExt::GetWheelLoads(g_playerVehicle);
     //auto wheelHots = VExt::GetWheelOverheats(g_playerVehicle);
+
+    auto wheelsTcs = DrivingAssists::GetTCS();
 
     UI::ShowText(0.60f, 0.200f, 0.25f, fmt::format("Average load: {:.0f} kg", avg(wheelLoads)));
     UI::ShowText(0.60f, 0.225f, 0.25f, fmt::format("Total load: {:.0f} kg", sum(wheelLoads)));
@@ -830,7 +835,7 @@ void drawVehicleWheelInfo() {
         float tyreAr = 100.0f * ((wheelDims[i].TyreRadius - wheelDims[i].RimRadius) / wheelDims[i].TyreWidth);
         float rimSize = 2.0f * wheelDims[i].RimRadius * 39.3701f; // inches
         UI::ShowText3D(wheelCoords[i], {
-                fmt::format("[{}] {}Powered", i, VExt::IsWheelPowered(g_playerVehicle, i) ? "~g~" : "~r~"),
+                fmt::format("[{}] {}Drive {}Steer", i, VExt::IsWheelPowered(g_playerVehicle, i) ? "~g~" : "~r~", VExt::IsWheelSteered(g_playerVehicle, i) ? "~g~" : "~r~"),
                 fmt::format("Speed: \t{:.3f}", wheelsSpeed[i]),
                 //fmt::format("Compr: \t{:.3f}", wheelsCompr[i]),
                 //fmt::format("Health: \t{:.3f}", wheelsHealt[i]),
@@ -846,7 +851,8 @@ void drawVehicleWheelInfo() {
                         : g_vehData.mWheelsEspU[i] ? "_U" : ""
                     ),
                 fmt::format("DF: {:.3f}", wheelDfs[i]),
-                fmt::format("TVL: {:.3f}", wheelTVLs[i]),
+                //fmt::format("TVL: {:.3f}", wheelTVLs[i]),
+                fmt::format("Slip (L): {:.3f}", wheelsTcs.LinearSlip[i]),
                 fmt::format("Load: {:.0f} kg", wheelLoads[i]),
                 //fmt::format("Heat?: {:.1f}", wheelHots[i]),
             },

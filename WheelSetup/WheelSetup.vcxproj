@@ -45,7 +45,6 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
     <OutDir>bin\dbg\</OutDir>
     <IntDir>obj\dbg\</IntDir>
   </PropertyGroup>
@@ -70,6 +69,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <AdditionalDependencies>$(DXSDK_DIR)Lib\x64\XInput.lib;$(DXSDK_DIR)Lib\x64\dinput8.lib;$(DXSDK_DIR)Lib\x64\dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -107,6 +107,7 @@
     <ClInclude Include="..\Gears\Util\Strings.hpp" />
     <ClInclude Include="..\Gears\Util\SysUtils.h" />
     <ClInclude Include="..\Gears\Util\TimeHelper.hpp" />
+    <ClInclude Include="..\Gears\Util\Timer.h" />
     <ClInclude Include="..\Gears\VehicleConfig.h" />
   </ItemGroup>
   <ItemGroup>
@@ -122,6 +123,7 @@
     <ClCompile Include="..\Gears\Util\Paths.cpp" />
     <ClCompile Include="..\Gears\Util\Strings.cpp" />
     <ClCompile Include="..\Gears\Util\SysUtils.cpp" />
+    <ClCompile Include="..\Gears\Util\Timer.cpp" />
     <ClCompile Include="..\Gears\VehicleConfig.cpp" />
     <ClCompile Include="..\thirdparty\fmt\src\format.cc" />
     <ClCompile Include="WheelSetup.cpp" />

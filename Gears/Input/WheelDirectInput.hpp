@@ -74,10 +74,12 @@ public:
 
     WheelDirectInput();
     ~WheelDirectInput();
+    void FreeDirectInput();
+
     void ClearLut();
     void AssignLut(const std::map<float, float>& rawLut);
 
-    std::optional<DirectInputDeviceInfo> GetDeviceInfo(GUID guid);
+    DirectInputDeviceInfo* GetDeviceInfo(GUID guid);
     const std::unordered_map<GUID, DirectInputDeviceInfo>& GetDevices();
 
     bool InitWheel();
@@ -118,12 +120,7 @@ private:
     bool createEffects(GUID device, DIAxis ffAxis);
     int povDirectionToIndex(int povDirection);
 
-    LPDIRECTINPUT lpDi = nullptr;
-
     struct FFBEffects {
-        ~FFBEffects();
-        bool Enabled = false;
-
         DIEFFECT ConstantForceEffect{};
         DICONSTANTFORCE ConstantForceParams{};
         LPDIRECTINPUTEFFECT ConstantForceEffectInterface = nullptr;
@@ -151,7 +148,10 @@ private:
     std::unordered_map<GUID, std::array<std::array<float, AVGSAMPLES>, SIZEOF_DIAxis>> samples { 0 };
 
     std::unordered_map<GUID, std::array<int, SIZEOF_DIAxis>> averageIndex { 0 };
-    std::unordered_map<GUID, std::array<FFBEffects, SIZEOF_DIAxis>> ffbEffectInfo;
+
+    GUID ffbDevice = GUID_NULL;
+    DIAxis ffbAxis = DIAxis::UNKNOWN_AXIS;
+    FFBEffects ffbEffectInfo{};
 
     LPDIRECTINPUT mDirectInput = nullptr;
 

@@ -4,7 +4,9 @@
 #include <Windows.h>
 #include <fstream>
 
-Logger::Logger() = default;
+Logger::Logger()
+    : mError(false) {
+}
 
 void Logger::SetFile(const std::string &fileName) {
     file = fileName;
@@ -17,6 +19,9 @@ void Logger::SetMinLevel(LogLevel level) {
 void Logger::Clear() const {
     std::lock_guard lock(mutex);
     std::ofstream logFile(file, std::ofstream::out | std::ofstream::trunc);
+    logFile.close();
+    if (logFile.fail())
+        mError = true;
 }
 
 void Logger::Write(LogLevel level, const std::string& text) const {
@@ -35,7 +40,8 @@ void Logger::Write(LogLevel level, const std::string& text) const {
         "[" << levelText(level) << "] " <<
         text << "\n";
 
-    if (logFile.bad())
+    logFile.close();
+    if (logFile.fail())
         mError = true;
 }
 
@@ -49,7 +55,13 @@ void Logger::Write(LogLevel level, const char *fmt, ...) const {
     Write(level, std::string(buff));
 }
 
-bool Logger::Error() { return mError; }
+bool Logger::Error() {
+    return mError;
+}
+
+void Logger::ClearError() {
+    mError = false;
+}
 
 std::string Logger::levelText(LogLevel level) const {
     return levelStrings[level];

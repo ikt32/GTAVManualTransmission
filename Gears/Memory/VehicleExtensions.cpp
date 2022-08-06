@@ -3,6 +3,9 @@
 #include "NativeMemory.hpp"
 #include "Versions.h"
 #include "Offsets.hpp"
+
+#include "VehicleFlags.h"
+
 #include "../Util/Logger.hpp"
 
 #include <inc/main.h>
@@ -777,6 +780,47 @@ void VehicleExtensions::SetVisualHeight(Vehicle handle, float height) {
     *reinterpret_cast<float *>(wheelPtr + offset) = height;
 }
 
+uint8_t VehicleExtensions::GetWheelIdMem(Vehicle handle, uint8_t index) {
+    auto wheelPtr = GetWheelsPtr(handle);
+    if (index > GetNumWheels(handle))
+        return 0xFF; // Hope this doesn't backfire LMAO
+
+    auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * index);
+    return *reinterpret_cast<uint8_t*>(wheelAddr + 0x108); // pray to R* devs this doesn't change
+}
+
+std::vector<Vector3> VehicleExtensions::GetWheelBoneVelocity(Vehicle handle) {
+    auto wheels = GetWheelPtrs(handle);
+    std::vector<Vector3> values;
+
+    values.reserve(wheels.size());
+    for (auto wheelAddr : wheels) {
+        values.emplace_back(Vector3{
+            *reinterpret_cast<float*>(wheelAddr + 0xB0), 0,
+            *reinterpret_cast<float*>(wheelAddr + 0xB4), 0,
+            *reinterpret_cast<float*>(wheelAddr + 0xB8), 0,
+        });
+    }
+
+    return values;
+}
+
+std::vector<Vector3> VehicleExtensions::GetWheelTractionVector(Vehicle handle) {
+    auto wheels = GetWheelPtrs(handle);
+    std::vector<Vector3> values;
+
+    values.reserve(wheels.size());
+    for (auto wheelAddr : wheels) {
+        values.emplace_back(Vector3{
+            *reinterpret_cast<float*>(wheelAddr + 0xC0), 0,
+            *reinterpret_cast<float*>(wheelAddr + 0xC4), 0,
+            *reinterpret_cast<float*>(wheelAddr + 0xC8), 0,
+            });
+    }
+
+    return values;
+}
+
 std::vector<float> VehicleExtensions::GetWheelHealths(Vehicle handle) {
     auto wheelPtr = GetWheelsPtr(handle);
     auto numWheels = GetNumWheels(handle);
@@ -804,25 +848,24 @@ void VehicleExtensions::SetWheelsHealth(Vehicle handle, float health) {
     }
 }
 
-float VehicleExtensions::GetSteeringMultiplier(Vehicle handle) {
+std::vector<float> VehicleExtensions::GetWheelSteeringMultipliers(Vehicle handle) {
     auto wheelPtr = GetWheelsPtr(handle);
-    auto numWheels = GetNumWheels(handle);
+    std::vector<float> mults(GetNumWheels(handle));
 
-    if (numWheels > 1) {
-        auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * 1);
-        return abs(*reinterpret_cast<float*>(wheelAddr + wheelSteerMultOffset));
+    for (uint8_t i = 0; i < mults.size(); ++i) {
+        auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * i);
+        mults[i] = *reinterpret_cast<float*>(wheelAddr + wheelSteerMultOffset);
     }
-    return 1.0f;
+
+    return mults;
 }
 
-void VehicleExtensions::SetSteeringMultiplier(Vehicle handle, float value) {
+void VehicleExtensions::SetWheelSteeringMultipliers(Vehicle handle, const std::vector<float>& values) {
     auto wheelPtr = GetWheelsPtr(handle);
-    auto numWheels = GetNumWheels(handle);
 
-    for (int i = 0; i<numWheels; i++) {
+    for (uint8_t i = 0; i < values.size(); i++) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-        float sign = Sign(*reinterpret_cast<float*>(wheelAddr + wheelSteerMultOffset));
-        *reinterpret_cast<float*>(wheelAddr + wheelSteerMultOffset) = value * sign;
+        *reinterpret_cast<float*>(wheelAddr + wheelSteerMultOffset) = values[i];
     }
 }
 
@@ -924,22 +967,24 @@ float VehicleExtensions::GetWheelLargestAngle(Vehicle handle) {
 
 float VehicleExtensions::GetWheelAverageAngle(Vehicle handle) {
     auto angles = GetWheelSteeringAngles(handle);
+    auto mults = GetWheelSteeringMultipliers(handle);
     float wheelsSteered = 0.0f;
     float avgAngle = 0.0f;
 
     for (int i = 0; i < GetNumWheels(handle); i++) {
-        if (i < 3 && angles[i] != 0.0f) {
+        if (IsWheelSteered(handle, i)) {
             wheelsSteered += 1.0f;
-            avgAngle += angles[i];
+
+            float angle = angles[i];
+
+            // Flip the sign, otherwise we get 0 average steering
+            if (mults[i] < 0.0f)
+                angle = -angle;
+            avgAngle += angle;
         }
     }
 
-    if (wheelsSteered > 0.5f && wheelsSteered < 2.5f) { // bikes, cars, quads
-        avgAngle /= wheelsSteered;
-    }
-    else {
-        avgAngle = GetSteeringAngle(handle) * GetSteeringMultiplier(handle); // tank, forklift
-    }
+    avgAngle /= wheelsSteered;
     return avgAngle;
 }
 
@@ -1170,6 +1215,16 @@ void VehicleExtensions::SetWheelBrakePressure(Vehicle handle, uint8_t index, flo
     *reinterpret_cast<float *>(wheelAddr + wheelBrakeOffset) = value;
 }
 
+bool VehicleExtensions::IsWheelSteered(Vehicle handle, uint8_t index) {
+    if (index > GetNumWheels(handle)) return false;
+    if (wheelFlagsOffset == 0) return false;
+
+    auto wheelPtr = GetWheelsPtr(handle);
+    auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * index);
+    auto wheelFlags = *reinterpret_cast<uint32_t*>(wheelAddr + wheelFlagsOffset);
+    return wheelFlags & eWheelFlag::FLAG_IS_STEERED;
+}
+
 bool VehicleExtensions::IsWheelPowered(Vehicle handle, uint8_t index) {
     if (index > GetNumWheels(handle)) return false;
     if (wheelFlagsOffset == 0) return false;
@@ -1177,19 +1232,19 @@ bool VehicleExtensions::IsWheelPowered(Vehicle handle, uint8_t index) {
     auto wheelPtr = GetWheelsPtr(handle);
     auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
     auto wheelFlags = *reinterpret_cast<uint32_t *>(wheelAddr + wheelFlagsOffset);
-    return wheelFlags & 0x10;
+    return wheelFlags & eWheelFlag::FLAG_IS_DRIVEN;
 }
 
-std::vector<uint16_t> VehicleExtensions::GetWheelFlags(Vehicle handle) {
+std::vector<uint32_t> VehicleExtensions::GetWheelFlags(Vehicle handle) {
     const auto numWheels = GetNumWheels(handle);
-    std::vector<uint16_t> flags(numWheels);
+    std::vector<uint32_t> flags(numWheels);
     auto wheelPtr = GetWheelsPtr(handle);
 
     if (wheelFlagsOffset == 0) return flags;
 
     for (auto i = 0; i < numWheels; ++i) {
         auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * i);
-        flags[i] = *reinterpret_cast<uint16_t *>(wheelAddr + wheelFlagsOffset);
+        flags[i] = *reinterpret_cast<uint32_t *>(wheelAddr + wheelFlagsOffset);
     }
     return flags;
 }
@@ -1270,6 +1325,16 @@ std::vector<uint32_t> VehicleExtensions::GetVehicleFlags(Vehicle handle) {
         offs[i] = *(uint32_t*)(pCVehicleModelInfo + vehicleFlagsOffset + sizeof(uint32_t) * i);
     }
     return offs;
+}
+
+float VehicleExtensions::GetMaxSteeringWheelAngle(Vehicle handle) {
+    auto address = GetAddress(handle);
+
+    if (!address)
+        return 109.0f;
+    
+    auto pCVehicleModelInfo = *(uint64_t*)(address + vehicleModelInfoOffset);
+    return *(float*)(pCVehicleModelInfo + 0x54C);
 }
 
 

@@ -98,6 +98,10 @@ struct CVehicle {
 #pragma pack(pop)
 static_assert(offsetof(CVehicle, Inst) == 0x30, "bad alignment");
 
+void RotateAxisAbsolute(Vehicle vehicle, int index, Vector3 axis, float radians);
 void RotateAxis(Vehicle vehicle, int index, Vector3 axis, float radians);
 void Scale(Vehicle vehicle, int boneIndex, Vector3 scalar);
+
+void RegisterMatrix(Vehicle vehicle, const char* boneName);
+void RegisterMatrix(Vehicle vehicle, int boneIndex);
 }

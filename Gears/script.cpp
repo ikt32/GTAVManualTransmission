@@ -24,6 +24,7 @@
 #include "UDPTelemetry/Socket.h"
 #include "UDPTelemetry/UDPTelemetry.h"
 
+#include "Memory/CTimer.h"
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/Offsets.hpp"
 #include "Memory/VehicleFlags.h"
@@ -34,7 +35,7 @@
 #include "Util/Logger.hpp"
 #include "Util/Paths.h"
 #include "Util/MathExt.h"
-#include "Util/Files.h"
+#include "Util/Paths.h"
 #include "Util/UIUtils.h"
 #include "Util/Timer.h"
 #include "Util/ValueTimer.h"
@@ -59,6 +60,7 @@
 #include <filesystem>
 #include <numeric>
 #include <fstream>
+#include "Memory/VehicleBone.h"
 
 namespace fs = std::filesystem;
 using VExt = VehicleExtensions;
@@ -79,6 +81,7 @@ int g_textureAbsId;
 int g_textureTcsId;
 int g_textureEspId;
 int g_textureBrkId;
+int g_textureDsProtId;
 
 NativeMenu::Menu g_menu;
 CarControls g_controls;
@@ -99,13 +102,16 @@ std::vector<VehicleConfig> g_vehConfigs;
 
 bool g_focused;
 Timer g_wheelInitDelayTimer(0);
+Timer g_lastUpdateTimer(0);
 
 std::vector<ValueTimer<float>> g_speedTimers;
 
-// sadly there's no initial BONK, but the sound works.
-GameSound g_gearRattle1("DAMAGED_TRUCK_IDLE", "", "");
-// primitively double the volume...
-GameSound g_gearRattle2("DAMAGED_TRUCK_IDLE", "", "");
+GameSound g_gearRattle1("DAMAGED_TRUCK_IDLE", "", ""); // sadly there's no initial BONK, but the sound works.
+GameSound g_gearRattle2("DAMAGED_TRUCK_IDLE", "", ""); // primitively double the volume...
+GameSound g_downshiftProtectSfx("CONFIRM_BEEP", "HUD_MINI_GAME_SOUNDSET", "");
+
+// TODO: Move to own file
+float g_lastSpeedoRotation = 0.0f;
 
 void updateShifting();
 void blockButtons();
@@ -185,15 +191,36 @@ void functionDash() {
             // battery voltage uses data.temp
         }
         else if (g_settings().DriveAssists.AWD.SpecialFlags & AWD::AWD_REMAP_DIAL_WANTED188_R32) {
-            // oil temperature doesn't remember value set here, so keep track of it ourselves
-            // also reduce range.
+            auto boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "needle_torque");
+            if (boneIdx != -1) {
+                Vector3 rotAxis{};
+                rotAxis.y = 1.0f;
 
-            AWD::GetDisplayValue() = lerp(
-                AWD::GetDisplayValue(),
-                map(AWD::GetTransferValue(), 0.0f, 1.0f, 0.27f, 0.70f),
-                1.0f - pow(0.0001f, MISC::GET_FRAME_TIME()));
+                AWD::GetDisplayValue() = lerp(
+                    AWD::GetDisplayValue(), AWD::GetTransferValue(),
+                    1.0f - pow(0.0001f, MISC::GET_FRAME_TIME()));
 
-            data.oilTemperature = AWD::GetDisplayValue();
+                VehicleBones::RotateAxisAbsolute(g_playerVehicle, boneIdx, rotAxis, AWD::GetDisplayValue());
+            }
+
+            boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "needle_speedo");
+            if (boneIdx != -1) {
+                Vector3 rotAxis{};
+                rotAxis.y = 1.0f; 
+
+                float rotation = map(abs(g_vehData.mDiffSpeed), 0.0f, 51.0f, 0.0f, deg2rad(240.0f));
+
+                float maxDelta = MISC::GET_FRAME_TIME() * 1.0f;
+
+                if (abs(rotation - g_lastSpeedoRotation) > maxDelta)
+                    rotation = g_lastSpeedoRotation + maxDelta * sgn(rotation - g_lastSpeedoRotation);
+
+                g_lastSpeedoRotation = rotation;
+
+                rotation = std::clamp(g_lastSpeedoRotation, 0.0f, deg2rad(240.0f));
+
+                VehicleBones::RotateAxisAbsolute(g_playerVehicle, boneIdx, rotAxis, rotation);
+            }
         }
     }
 
@@ -296,6 +323,18 @@ void update_vehicle() {
         g_gearRattle1.Stop();
         g_gearRattle2.Stop();
         updateActiveSteeringAnim(g_playerVehicle);
+        
+        g_controls.PlayFFBDynamics(0, 0);
+        g_controls.PlayFFBCollision(0);
+
+        if (g_playerVehicle != 0) {
+            VExt::SetSteeringAngle(g_playerVehicle, 0.0f);
+            VExt::SetSteeringInputAngle(g_playerVehicle, 0.0f);
+
+            VehicleBones::RegisterMatrix(g_playerVehicle, "needle_speedo");
+            VehicleBones::RegisterMatrix(g_playerVehicle, "needle_torque");
+            VehicleBones::RegisterMatrix(g_playerVehicle, "steeringwheel");
+        }
     }
 
     if (vehAvail) {
@@ -337,13 +376,27 @@ void update_vehicle() {
     g_lastPlayerVehicle = g_playerVehicle;
 }
 
+inline auto now() {
+    using namespace std::chrono;
+    auto tEpoch = steady_clock::now().time_since_epoch();
+    return duration_cast<milliseconds>(tEpoch).count();
+}
+
 // Read inputs
 void update_inputs() {
+    if (g_lastUpdateTimer.Elapsed() > 1000) {
+        // It's been >0.1 second between messages, the game probably has been resumed after pause.
+        // Let's reset the wheel.
+        logger.Write(DEBUG, "[Wheel] %d millis since last update, re-init FFB", g_lastUpdateTimer.Elapsed());
+        g_wheelInitDelayTimer.Reset(1);
+    }
+    g_lastUpdateTimer.Reset();
+
     if (g_focused != SysUtil::IsWindowFocused()) {
         // no focus -> focus
         if (!g_focused) {
             logger.Write(DEBUG, "[Wheel] Window focus gained: re-initializing FFB");
-            g_wheelInitDelayTimer.Reset(100);
+            g_wheelInitDelayTimer.Reset(500);
         }
         else {
             logger.Write(DEBUG, "[Wheel] Window focus lost");
@@ -353,6 +406,8 @@ void update_inputs() {
 
     if (g_wheelInitDelayTimer.Expired() && g_wheelInitDelayTimer.Period() > 0) {
         g_controls.GetWheel().Acquire();
+        g_controls.PlayFFBDynamics(0, 0);
+        g_controls.PlayFFBCollision(0);
         g_wheelInitDelayTimer.Reset(0);
     }
 
@@ -385,7 +440,8 @@ void wheelControlRoad() {
         WheelInput::HandlePedalsArcade(g_controls.ThrottleVal, g_controls.BrakeVal);
     }
     WheelInput::DoSteering();
-    if (g_vehData.mIsAmphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(g_playerVehicle) > 0.10f) {
+    if (g_vehData.mIsAmphibious && ENTITY::GET_ENTITY_SUBMERGED_LEVEL(g_playerVehicle) > 0.10f ||
+        VExt::GetHoverTransformRatio(g_playerVehicle) >= 0.5f) {
         WheelInput::PlayFFBWater();
     }
     else {
@@ -600,8 +656,8 @@ void update_manual_transmission() {
         g_controls.PrevInput == CarControls::Controller && g_controls.ButtonHeld(CarControls::LegacyControlType::CycleAssists)) {
 
         uint8_t currMode = 0;
-        // 3: ABS + ESC + TCS
-        // 2: ABS + ESC || TCS
+        // 3: ABS + TC + SC
+        // 2: ABS + TC
         // 1: ABS
         // 0: None!
 
@@ -618,16 +674,16 @@ void update_manual_transmission() {
 
         switch(currMode) {
             case 3:
-                UI::Notify(INFO, "Assists: ABS + ESC + TCS");
+                UI::Notify(INFO, "Assists: ABS, ESC, TCS");
                 g_settings().DriveAssists.ABS.Enable = true;
                 g_settings().DriveAssists.ESP.Enable = true;
                 g_settings().DriveAssists.TCS.Enable = true;
                 break;
             case 2:
-                UI::Notify(INFO, "Assists: ABS + ESC");
+                UI::Notify(INFO, "Assists: ABS + TCS");
                 g_settings().DriveAssists.ABS.Enable = true;
-                g_settings().DriveAssists.ESP.Enable = true;
-                g_settings().DriveAssists.TCS.Enable = false;
+                g_settings().DriveAssists.ESP.Enable = false;
+                g_settings().DriveAssists.TCS.Enable = true;
                 break;
             case 1:
                 UI::Notify(INFO, "Assists: ABS only");
@@ -806,6 +862,9 @@ void clearPatches() {
 }
 
 void toggleManual(bool enable) {
+    g_gearRattle1.Stop();
+    g_gearRattle2.Stop();
+
     // Don't need to do anything
     if (g_settings.MTOptions.Enable == enable)
         return;
@@ -879,12 +938,25 @@ void updateSteeringMultiplier() {
     else {
         mult = g_settings().Steering.CustomSteering.SteeringMult;
     }
-    VExt::SetSteeringMultiplier(g_playerVehicle, mult);
+
+    auto oldMults = VExt::GetWheelSteeringMultipliers(g_playerVehicle);
+    auto numWheels = VExt::GetNumWheels(g_playerVehicle);
+    std::vector<float> newMults(numWheels);
+    for (uint32_t i = 0; i < numWheels; ++i) {
+        newMults[i] = sgn(oldMults[i]) * mult;
+    }
+    VExt::SetWheelSteeringMultipliers(g_playerVehicle, newMults);
 }
 
 void resetSteeringMultiplier() {
     if (g_playerVehicle != 0) {
-        VExt::SetSteeringMultiplier(g_playerVehicle, 1.0f);
+        auto oldMults = VExt::GetWheelSteeringMultipliers(g_playerVehicle);
+        auto numWheels = VExt::GetNumWheels(g_playerVehicle);
+        std::vector<float> newMults(numWheels);
+        for (uint32_t i = 0; i < numWheels; ++i) {
+            newMults[i] = sgn(oldMults[i]) * 1.0f;
+        }
+        VExt::SetWheelSteeringMultipliers(g_playerVehicle, newMults);
     }
 }
 
@@ -897,6 +969,11 @@ void updateLastInputDevice() {
 
     if (g_controls.PrevInput != g_controls.GetLastInputDevice(g_controls.PrevInput,g_settings.Wheel.Options.Enable)) {
         g_controls.PrevInput = g_controls.GetLastInputDevice(g_controls.PrevInput, g_settings.Wheel.Options.Enable);
+        if (g_controls.PrevInput != CarControls::Wheel) {
+            g_controls.PlayFFBDynamics(0, 0);
+            g_controls.PlayFFBCollision(0);
+        }
+
         std::string message = "Input: ";
         switch (g_controls.PrevInput) {
             case CarControls::Keyboard:
@@ -1171,6 +1248,9 @@ void functionSShift() {
     bool allowKeyboard = g_controls.PrevInput == CarControls::Keyboard || 
         g_controls.PrevInput == CarControls::Controller;
 
+    // Reset warning this tick
+    g_gearStates.DownshiftProtection = false;
+
     // Shift up
     if (g_controls.PrevInput == CarControls::Controller	&& xcTapStateUp == XInputController::TapState::Tapped ||
         g_controls.PrevInput == CarControls::Controller	&& ncTapStateUp == NativeController::TapState::Tapped ||
@@ -1241,6 +1321,16 @@ void functionSShift() {
         if (g_vehData.mGearCurr == 1 && g_gearStates.FakeNeutral) {
             shiftTo(0, false);
             g_gearStates.FakeNeutral = false;
+            return;
+        }
+
+        float expectedRPM = g_vehData.mEstimatedSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.LockGear - 1]);
+        if (g_settings().ShiftOptions.DownshiftProtect &&
+            expectedRPM > 1.0f) {
+            g_gearStates.DownshiftProtection = true;
+
+            if (g_settings.HUD.DsProt.Enable)
+                g_downshiftProtectSfx.Play();
             return;
         }
 
@@ -1656,10 +1746,27 @@ void functionEngDamage() {
 }
 
 void functionEngLock() {
+    // Checks enough suspension compression and sensible speeds
+    bool use = true;
+    float minSpeed = (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
+
+    for (uint32_t i = 0; i < g_vehData.mWheelCount; ++i) {
+        if (g_vehData.mSuspensionTravel[i] == 0.0f &&
+            VExt::IsWheelPowered(g_playerVehicle, i)) {
+            use = false;
+            break;
+        }
+        if (g_vehData.mWheelTyreSpeeds[i] < minSpeed) {
+            use = false;
+            break;
+        }
+    }
+
     if (g_settings().MTOptions.ShiftMode == EShiftMode::Automatic ||
         g_vehData.mGearCurr == g_vehData.mGearTop ||
         g_gearStates.FakeNeutral ||
-        g_wheelPatchStates.InduceBurnout) {
+        g_wheelPatchStates.InduceBurnout ||
+        !use) {
         g_wheelPatchStates.EngLockActive = false;
         return;
     }
@@ -1736,8 +1843,23 @@ void functionEngLock() {
 }
 
 void functionEngBrake() {
-    // When you let go of the throttle at high RPMs
-    float activeBrakeThreshold = g_settings().MTParams.EngBrakeThreshold;
+    const float activeBrakeThreshold = g_settings().MTParams.EngBrakeThreshold;
+
+    // Checks enough suspension compression and sensible speeds
+    bool use = true;
+    float minSpeed = (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]) * activeBrakeThreshold;
+
+    for (uint32_t i = 0; i < g_vehData.mWheelCount; ++i) {
+        if (g_vehData.mSuspensionTravel[i] == 0.0f &&
+            VExt::IsWheelPowered(g_playerVehicle, i)){
+            use = false;
+            break;
+        }
+        if (g_vehData.mWheelTyreSpeeds[i] < minSpeed) {
+            use = false;
+            break;
+        }
+    }
 
     float throttleMultiplier = 1.0f - g_controls.ThrottleVal;
     float clutchMultiplier = 1.0f - g_controls.ClutchVal;
@@ -1751,7 +1873,7 @@ void functionEngBrake() {
     if (g_wheelPatchStates.EngLockActive || 
         g_wheelPatchStates.InduceBurnout || 
         g_gearStates.FakeNeutral ||
-        g_vehData.mDiffSpeed < 5.0f ||
+        !use ||
         g_vehData.mRPM < activeBrakeThreshold || 
         inputMultiplier < 0.05f) {
         g_wheelPatchStates.EngBrakeActive = false;
@@ -1807,6 +1929,7 @@ void handleBrakePatch() {
         if (lcThrottle) {
             slipMin = lcSlipMin;
             slipMax = lcSlipMax;
+            tcsData.Use = false;
         }
         else {
             slipMin = tcsSlipMin;
@@ -1816,17 +1939,20 @@ void handleBrakePatch() {
         tractionThrottle = map(tcsData.AverageSlip,
             slipMin, slipMax,
             g_controls.ThrottleVal, 0.0f);
-        tractionThrottle = std::clamp(tractionThrottle, 0.0f, 1.0f);
+        tractionThrottle = std::clamp(tractionThrottle, 0.0f, g_controls.ThrottleVal);
 
         finalThrottle = tractionThrottle;
+    }
 
+    if (tcsData.Use) {
         for (int i = 0; i < g_vehData.mWheelCount; i++) {
-            if (tcsData.SlippingWheels[i]) {
-                g_vehData.mWheelsTcs[i] = true;
-            }
-            else {
-                g_vehData.mWheelsTcs[i] = false;
-            }
+            g_vehData.mWheelsTcs[i] = tcsData.LinearSlip[i] > g_settings().DriveAssists.TCS.SlipMin &&
+                g_vehData.mWheelTyreSpeeds[i] > 0.0f;
+        }
+    }
+    else {
+        for (int i = 0; i < g_vehData.mWheelCount; i++) {
+            g_vehData.mWheelsTcs[i] = false;
         }
     }
 
@@ -1904,9 +2030,9 @@ void handleBrakePatch() {
                 fakeRev(true, g_controls.ThrottleVal);
             }
 
+            float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.NextGear]);
             if (g_gearStates.ShiftDirection == ShiftDirection::Down &&
                 g_settings().ShiftOptions.DownshiftBlip) {
-                float expectedRPM = g_vehData.mDiffSpeed / (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_gearStates.NextGear]);
                 bool clutchOK = g_gearStates.ShiftState == ShiftState::FullClutch || g_gearStates.ShiftState == ShiftState::ReleasingClutch;
                 if (g_vehData.mRPM < expectedRPM * 1.15f && clutchOK) {
                     float blipThrottleVal;
@@ -1987,30 +2113,35 @@ void handleBrakePatch() {
             }
         }
 
-        // LSD is used in all assists, but this case if for when no other
-        // assists are active.
-        if (lsdData.Use) {
+        // Only use LSD if no other assists are working, as LSD would just reduce brake force.
+        if (lsdData.Use && !espData.Use && !tcsData.Use && !absData.Use) {
             auto brakeVals = DrivingAssists::GetLSDBrakes(lsdData);
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
                 VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVals[i]);
             }
         }
-        if (espData.Use) {
-            auto brakeVals = DrivingAssists::GetESPBrakes(espData, lsdData);
+
+        if (espData.Use ||
+            tcsData.Use && g_settings().DriveAssists.TCS.Mode == 0 ||
+            absData.Use) {
+
+            auto espBrakeVals = DrivingAssists::GetESPBrakes(espData);
+            auto tcsBrakeVals = DrivingAssists::GetTCSBrakes(tcsData);
+            auto absBrakeVals = DrivingAssists::GetABSBrakes(absData);
+
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
-                VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVals[i]);
-            }
-        }
-        if (tcsData.Use && g_settings().DriveAssists.TCS.Mode == 0) {
-            auto brakeVals = DrivingAssists::GetTCSBrakes(tcsData, lsdData);
-            for (int i = 0; i < g_vehData.mWheelCount; i++) {
-                VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVals[i]);
-            }
-        }
-        if (absData.Use) {
-            auto brakeVals = DrivingAssists::GetABSBrakes(absData, lsdData);
-            for (int i = 0; i < g_vehData.mWheelCount; i++) {
-                VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVals[i]);
+                float brakeVal = 0.0f;
+                if (espData.Use) {
+                    brakeVal = espBrakeVals[i];
+                }
+                if (tcsData.Use && g_settings().DriveAssists.TCS.Mode == 0) {
+                    brakeVal = std::max(brakeVal, tcsBrakeVals[i]);
+                }
+                if (absData.Use && g_vehData.mWheelsAbs[i]) {
+                    brakeVal = std::min(brakeVal, absBrakeVals[i]);
+                }
+
+                VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVal);
             }
         }
     }
@@ -2037,10 +2168,6 @@ void handleBrakePatch() {
                 }
             }
             MemoryPatcher::RestoreThrottle();
-        }
-        for (int i = 0; i < g_vehData.mWheelCount; i++) {
-            if (!tcsData.Use)
-                g_vehData.mWheelsTcs[i] = false;
         }
     }
 
@@ -2202,9 +2329,7 @@ void handleRPM() {
 void functionLimiter() {
     g_gearStates.HitRPMLimiter = g_vehData.mRPM > 1.0f;
 
-    auto ratios = g_vehData.mGearRatios;
-    float DriveMaxFlatVel = g_vehData.mDriveMaxFlatVel;
-    float maxSpeed = DriveMaxFlatVel / ratios[g_vehData.mGearCurr];
+    float maxSpeed = g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr];
 
     if (g_vehData.mEstimatedSpeed > maxSpeed && g_vehData.mRPM >= 1.0f) {
         g_gearStates.HitRPMSpeedLimiter = true;
@@ -2560,7 +2685,7 @@ void functionAudioFX() {
 void StartUDPTelemetry() {
     if (g_settings.Misc.UDPTelemetry)
         if (!g_socket.Started())
-            g_socket.Start(20777);
+            g_socket.Start(g_settings.Misc.UDPAddress, g_settings.Misc.UDPPort);
 }
 
 void update_UDPTelemetry() {
@@ -2576,7 +2701,7 @@ void update_UDPTelemetry() {
 void loadConfigs() {
     logger.Write(DEBUG, "Clearing and reloading vehicle configs...");
     g_vehConfigs.clear();
-    const std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
+    const std::string absoluteModPath = Paths::GetModPath();
     const std::string vehConfigsPath = absoluteModPath + "\\Vehicles";
 
     if (!(fs::exists(fs::path(vehConfigsPath)) && fs::is_directory(fs::path(vehConfigsPath)))) {
@@ -2621,7 +2746,7 @@ void initTimers() {
 }
 
 void loadLut(const std::string& lutPath) {
-    const std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
+    const std::string absoluteModPath = Paths::GetModPath();
     auto fullLutPath = fmt::format("{}/{}", absoluteModPath, lutPath);
     std::ifstream lut(fullLutPath);
 
@@ -2715,7 +2840,7 @@ void update_update_notification() {
 }
 
 void ScriptInit() {
-    std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
+    std::string absoluteModPath = Paths::GetModPath();
     std::string settingsGeneralFile = absoluteModPath + "\\settings_general.ini";
     std::string settingsControlsFile = absoluteModPath + "\\settings_controls.ini";
     std::string settingsWheelFile = absoluteModPath + "\\settings_wheel.ini";
@@ -2757,14 +2882,15 @@ void ScriptInit() {
 }
 
 void InitTextures() {
-    std::string absoluteModPath = Paths::GetModuleFolder(Paths::GetOurModuleHandle()) + Constants::ModDir;
+    std::string absoluteModPath = Paths::GetModPath();
     std::string textureWheelFile = absoluteModPath + "\\texture_wheel.png";
     std::string textureABSFile = absoluteModPath + "\\texture_abs.png";
     std::string textureTCSFile = absoluteModPath + "\\texture_tcs.png";
     std::string textureESPFile = absoluteModPath + "\\texture_esp.png";
     std::string textureBRKFile = absoluteModPath + "\\texture_handbrake.png";
+    std::string textureDsProtFile = absoluteModPath + "\\texture_downshift_protection.png";
 
-    if (FileExists(textureWheelFile)) {
+    if (Paths::FileExists(textureWheelFile)) {
         g_textureWheelId = createTexture(textureWheelFile.c_str());
     }
     else {
@@ -2772,7 +2898,7 @@ void InitTextures() {
         g_textureWheelId = -1;
     }
 
-    if (FileExists(textureABSFile)) {
+    if (Paths::FileExists(textureABSFile)) {
         g_textureAbsId = createTexture(textureABSFile.c_str());
     }
     else {
@@ -2780,7 +2906,7 @@ void InitTextures() {
         g_textureAbsId = -1;
     }
 
-    if (FileExists(textureTCSFile)) {
+    if (Paths::FileExists(textureTCSFile)) {
         g_textureTcsId = createTexture(textureTCSFile.c_str());
     }
     else {
@@ -2788,7 +2914,7 @@ void InitTextures() {
         g_textureTcsId = -1;
     }
 
-    if (FileExists(textureESPFile)) {
+    if (Paths::FileExists(textureESPFile)) {
         g_textureEspId = createTexture(textureESPFile.c_str());
     }
     else {
@@ -2796,12 +2922,20 @@ void InitTextures() {
         g_textureEspId = -1;
     }
 
-    if (FileExists(textureBRKFile)) {
+    if (Paths::FileExists(textureBRKFile)) {
         g_textureBrkId = createTexture(textureBRKFile.c_str());
     }
     else {
         logger.Write(ERROR, textureBRKFile + " does not exist.");
         g_textureBrkId = -1;
+    }
+
+    if (Paths::FileExists(textureDsProtFile)) {
+        g_textureDsProtId = createTexture(textureDsProtFile.c_str());
+    }
+    else {
+        logger.Write(ERROR, textureDsProtFile + " does not exist.");
+        g_textureDsProtId = -1;
     }
 }
 
@@ -2828,6 +2962,30 @@ void ScriptTick() {
 
 bool initialized = false;
 
+void CheckPause() {
+    bool lastPauseState = false;
+    
+    while (true) {
+        bool pauseState = CTimer::m_UserPause || CTimer::m_CodePause;
+        if (lastPauseState != pauseState) {
+            logger.Write(DEBUG, "[Pause] State changed. Was %d, is %d", lastPauseState, pauseState);
+            logger.Write(DEBUG, "    User: %d, Code: %d", CTimer::m_UserPause, CTimer::m_CodePause);
+
+            if (pauseState) {
+                g_controls.PlayFFBCollision(0);
+                g_controls.PlayFFBDynamics(0, 0);
+            }
+            else {
+
+            }
+
+            lastPauseState = pauseState;
+        }
+
+        Sleep(50);
+    }
+}
+
 void ScriptMain() {
     if (!initialized) {
         logger.Write(INFO, "Script started");
@@ -2838,5 +2996,10 @@ void ScriptMain() {
         logger.Write(INFO, "Script restarted");
     }
     InitTextures();
+
+    std::thread([]() {
+        CheckPause();
+    }).detach();
+
     ScriptTick();
 }

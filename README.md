@@ -1,33 +1,35 @@
 [comment]: # (GitHub README.md)
 
-GTA V Manual Transmission
-=========================
+# Manual Transmission and Wheel Support for Grand Theft Auto V
+
 [![Build status](https://ci.appveyor.com/api/projects/status/gy6yh17lp5l1k48d?svg=true)](https://ci.appveyor.com/project/E66666666/gtavmanualtransmission) [![GitHub total downloads](https://img.shields.io/github/downloads/E66666666/GTAVManualTransmission/total.svg?label=downloads&logo=GitHub)](https://github.com/E66666666/GTAVManualTransmission/releases) [![Discord](https://img.shields.io/discord/848493320433827851.svg?logo=discord)](https://discord.gg/VrrAEV4j4b)
 
-This mod for Grand Theft Auto V enables manual transmission and offers various gearbox modes:
-  * Sequential 
-  * H-pattern
-  * Custom automatic
-  
-Along with clutch simulation, engine effects, realistic throttle/brake input schemes and driving assists.
+This project aims to expand the driving immersion of Grand Theft Auto V, with many features and options:
 
-Additionally, this mod offers racing wheel support with the following features: 
-  * Analog throttle, brake and clutch pedals
-  * Proper force feedback with LUT support
-  * 1:1 steering
-  * Support for sequential shifter and H-pattern shifters
-  * Support for multiple different devices for each input
-  * Many more assignable controls
-  
-Other features:
-  * Seamless switching between keyboard, controller and steering wheel
-  * Extremely customizable experience
-  * User friendly in-game configuration menu
-  * Various HUD elements for vehicle info and input info
+* Complete steering wheel support
+  * DirectInput interfacing
+  * Force feedback from scratch
+  * Multiple devices supported
+* Transmission replacement with custom modes and more
+  * Manual sequential
+  * Manual H-pattern
+  * Automatic
+  * Working clutch
+* Tunable driving assists
+  * Launch control
+  * Traction control
+  * Stability control
+  * Custom anti-lock braking
+* Synchronized steering wheel and animations
+  * Match your actual wheel 1:1
+  * First person hand-over-hand animations
+* Custom first person camera
+  * With inertia effects
 
-Check [the user readme](doc/README.md) for more information.
+And much more. The [user README.md](doc/README.md) has a more complete overview.
 
-## Requirements
+## Game requirements
+
 * Grand Theft Auto V (build 1604+)
 * [ScriptHookV by Alexander Blade](http://www.dev-c.com/gtav/scripthookv/)
 
@@ -39,10 +41,13 @@ Check [the user readme](doc/README.md) for more information.
 
 ## Building requirements
 
-* VS2019 16.10+
+* Visual Studio 2022
 * [DirectX SDK (June 2010)](https://www.microsoft.com/en-us/download/details.aspx?id=6812) for XInput 1.3 ([see doc](doc/notes.md))
 
-Remember to (recursively) init/update your submodules after cloning!
+The solution builds two files:
+
+* `Gears.asi`, the actual script. This goes in Grand Theft Auto V's root folder.
+* `WheelSetup.exe`, which is a companion program for debugging wheel inputs. Can also write configurations.
 
 ## Scripting API  
 
@@ -53,7 +58,7 @@ Check [ManualTransmission.h](https://github.com/E66666666/GTAVManualTransmission
 * [C# Example](https://gist.github.com/E66666666/d11cdbd9800ad73efeff612374349347)
 * [C++ Example](https://gist.github.com/E66666666/59390733b366cad4638901ae5fcfd046)
 
-If you have any questions, don't hesitate to ask me on one of the channels below.
+If you have any questions about using these, don't hesitate to ask on one of the channels below.
 
 ## Bug reporting and support
 

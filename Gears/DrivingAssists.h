@@ -8,7 +8,8 @@ namespace DrivingAssists {
 
     struct TCSData {
         bool Use;
-        std::vector<bool> SlippingWheels;
+        // How much it spins faster/slower than the suspension component. In m/s.
+        std::vector<float> LinearSlip;
         float AverageSlip;
     };
 
@@ -44,8 +45,8 @@ namespace DrivingAssists {
     // doesn't apply, but putting it here anyway since we negative-brake to simulate power transfer.
     LSDData GetLSD();
 
-    std::vector<float> GetESPBrakes(ESPData espData, LSDData lsdData);
-    std::vector<float> GetTCSBrakes(TCSData tcsData, LSDData lsdData);
-    std::vector<float> GetABSBrakes(ABSData absData, LSDData lsdData);
+    std::vector<float> GetESPBrakes(ESPData espData);
+    std::vector<float> GetTCSBrakes(TCSData tcsData);
+    std::vector<float> GetABSBrakes(ABSData absData);
     std::vector<float> GetLSDBrakes(LSDData lsdData);
 }

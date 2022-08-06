@@ -9,6 +9,7 @@
 #include "../Gears/Input/CarControls.hpp"
 #include "../Gears/Util/Paths.h"
 #include "../Gears/Util/Strings.hpp"
+#include "../Gears/Util/Timer.h"
 #include "../Gears/Constants.h"
 #include "../Gears/GitInfo.h"
 
@@ -789,6 +790,9 @@ int main() {
 	
 	init();
 	bool justPeeking = true;
+
+	Timer ffbDelay(1000);
+
 	while (true)
 	{
 		if (_kbhit()) {
@@ -934,8 +938,11 @@ int main() {
 		if (controls.ButtonIn(CarControls::WheelControlType::Toggle)) std::cout << "ToggleMod ";
 		if (controls.ButtonIn(CarControls::WheelControlType::ToggleH)) std::cout << "ChangeShiftMode ";
 
-		if (controls.GetWheel().IsConnected(controls.WheelAxes[static_cast<int>(CarControls::WheelAxisType::ForceFeedback)].Guid))
-			playWheelEffects(effSteer);
+		if (controls.GetWheel().IsConnected(controls.WheelAxes[static_cast<int>(CarControls::WheelAxisType::ForceFeedback)].Guid)) {
+			if (ffbDelay.Expired()) {
+				playWheelEffects(effSteer);
+			}
+		}
 		
 		setCursorPosition(0, csbi.srWindow.Bottom - 9);
 		std::cout << "Press a key to assign a button:";

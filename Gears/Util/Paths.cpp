@@ -1,6 +1,50 @@
 #include "Paths.h"
 
-static HMODULE ourModule;
+#include <ShlObj.h>
+
+namespace {
+    HMODULE ourModule;
+    std::string modPath;
+    std::string initialModPath;
+    bool modPathChangedThisRun = false;
+}
+
+std::filesystem::path Paths::GetLocalAppDataPath() {
+    std::filesystem::path fsPath;
+    PWSTR path = NULL;
+    HRESULT result = SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &path);
+    
+    if (path != NULL) {
+        fsPath = std::filesystem::path(path);
+    }
+
+    CoTaskMemFree(path);
+
+    return fsPath;
+}
+
+void Paths::SetModPath(std::string path) {
+    if (initialModPath.empty()) {
+        initialModPath = path;
+    }
+    modPath = path;
+}
+
+std::string Paths::GetModPath() {
+    return modPath;
+}
+
+std::string Paths::GetInitialModPath() {
+    return initialModPath;
+}
+
+void Paths::SetModPathChanged() {
+    modPathChangedThisRun = true;
+}
+
+bool Paths::GetModPathChanged() {
+    return modPathChangedThisRun;
+}
 
 std::string Paths::GetRunningExecutablePath() {
     char fileName[MAX_PATH];
@@ -72,4 +116,18 @@ void Paths::SetOurModuleHandle(const HMODULE module) {
 
 HMODULE Paths::GetOurModuleHandle() {
     return ourModule;
+}
+
+bool Paths::FileExists(const std::string& name) {
+    struct stat buffer;
+    return (stat(name.c_str(), &buffer) == 0);
+}
+
+std::wstring Paths::GetDocumentsFolder() {
+    PWSTR path;
+    SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &path);
+    std::wstring strPath(path);
+    CoTaskMemFree(path);
+
+    return strPath;
 }

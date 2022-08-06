@@ -1,8 +1,10 @@
 #include "Strings.hpp"
 
-#include "Windows.h"
-
+#include <fmt/format.h>
+#include <Windows.h>
 #include <algorithm>
+#include <chrono>
+#include <iomanip>
 
 STR2INT_ERROR str2int(int &i, char const *s, int base) {
     char *end;
@@ -78,4 +80,21 @@ std::string GetSpeedUnitMultiplier(const std::string& unit, float& speedValMul) 
     }
 
     return speedNameUnit;
+}
+
+std::string GetTimestampReadable(unsigned long long unixTimestampMs) {
+    const auto durationSinceEpoch = std::chrono::milliseconds(unixTimestampMs);
+    const std::chrono::time_point<std::chrono::system_clock> tp_after_duration(durationSinceEpoch);
+    time_t time_after_duration = std::chrono::system_clock::to_time_t(tp_after_duration);
+
+    std::stringstream timess;
+    struct tm newtime {};
+    auto err = localtime_s(&newtime, &time_after_duration);
+
+    if (err != 0) {
+        return "Invalid timestamp";
+    }
+
+    timess << std::put_time(&newtime, "%Y %m %d, %H:%M:%S");
+    return fmt::format("{}", timess.str());
 }

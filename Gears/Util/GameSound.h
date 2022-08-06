@@ -8,6 +8,7 @@ public:
     GameSound(std::string sound, std::string soundSet, std::string audioBank);
     ~GameSound();
 
+    void Play();
     void Play(Entity ent);
     void Stop();
     bool Playing();

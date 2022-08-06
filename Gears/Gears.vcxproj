@@ -96,8 +96,8 @@
       <AdditionalIncludeDirectories>$(SolutionDir)thirdparty\ScriptHookV_SDK;$(SolutionDir)thirdparty\GTAVMenuBase;$(SolutionDir)thirdparty;$(SolutionDir)thirdparty\fmt\include;$(SolutionDir)thirdparty\yaml-cpp\include</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <ExceptionHandling>Async</ExceptionHandling>
-      <PreprocessorDefinitions>MT_EXPORTS;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;CURL_STATICLIB;NODEFAULTLIB:library;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <PreprocessorDefinitions>MT_EXPORTS;DASHHOOK_RUNTIME;CTM_RUNTIME;CURL_STATICLIB;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;_USE_MATH_DEFINES;DIRECTINPUT_VERSION=0x0800;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -106,7 +106,8 @@
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalDependencies>$(DXSDK_DIR)Lib\x64\XInput.lib;$(DXSDK_DIR)Lib\x64\dinput8.lib;$(DXSDK_DIR)Lib\x64\dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)thirdparty\DirectX_SDK_June2010\Lib\x64\XInput.lib;$(SolutionDir)thirdparty\ScriptHookV_SDK\lib\ScriptHookV.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
     <BuildLog>
       <Path>$(IntDir)$(MSBuildProjectName).log</Path>
@@ -114,6 +115,9 @@
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>Prebuild.bat $(ProjectDir)</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\thirdparty\GTAVMenuBase\menu.cpp" />
@@ -174,6 +178,7 @@
     <ClCompile Include="Memory\VehicleBone.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="ScriptHUD.cpp" />
+    <ClCompile Include="ScriptMenuUtils.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
     <ClCompile Include="SettingsCommon.cpp" />
     <ClCompile Include="SpeedLimiter.cpp" />
@@ -183,7 +188,6 @@
     <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="Util\AddonSpawnerCache.cpp" />
     <ClCompile Include="Util\Color.cpp" />
-    <ClCompile Include="Util\Files.cpp" />
     <ClCompile Include="Util\FileVersion.cpp" />
     <ClCompile Include="Util\GameSound.cpp" />
     <ClCompile Include="ScriptMenu.cpp" />
@@ -266,11 +270,14 @@
     <ClInclude Include="CustomSteering.h" />
     <ClInclude Include="DrivingAssists.h" />
     <ClInclude Include="InputConfiguration.h" />
+    <ClInclude Include="Input\DirectInputError.h" />
     <ClInclude Include="Input\NativeInput.h" />
     <ClInclude Include="Input\USBNotify.h" />
     <ClInclude Include="LaunchControl.h" />
+    <ClInclude Include="Memory\CTimer.h" />
     <ClInclude Include="Memory\NativeMatrix.h" />
     <ClInclude Include="Memory\NativeVectors.h" />
+    <ClInclude Include="Memory\NewAddressSet.h" />
     <ClInclude Include="Memory\VehicleBone.h" />
     <ClInclude Include="ManualTransmission.h" />
     <ClInclude Include="Memory\Patcher.h" />
@@ -281,6 +288,7 @@
     <ClInclude Include="Compatibility.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ScriptHUD.h" />
+    <ClInclude Include="ScriptMenuUtils.h" />
     <ClInclude Include="SettingsCommon.h" />
     <ClInclude Include="SpeedLimiter.h" />
     <ClInclude Include="StartingAnimation.h" />
@@ -291,7 +299,6 @@
     <ClInclude Include="UpdateChecker.h" />
     <ClInclude Include="Util\AddonSpawnerCache.h" />
     <ClInclude Include="Util\Color.h" />
-    <ClInclude Include="Util\Files.h" />
     <ClInclude Include="Util\FileVersion.h" />
     <ClInclude Include="Util\GameSound.h" />
     <ClInclude Include="Util\GUID.h" />

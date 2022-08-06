@@ -372,50 +372,46 @@ void CarControls::CheckCustomButtons() {
     if (!mWheelInput.IsConnected(WheelAxes[static_cast<int>(WheelAxisType::Steer)].Guid)) {
         return;
     }
-    for (int i = 0; i < MAX_RGBBUTTONS; i++) {
-        updateKeyInputEvents(i, WheelToKey[i]);
-    }
-    for (const auto& buttonKeys : WheelToKeyPov) {
-        updateKeyInputEvents(buttonKeys.first, buttonKeys.second);
+
+    for (const auto& input : WheelToKey) {
+        updateKeyInputEvents(input.Guid, input.Control, str2key(input.ConfigTag));
     }
 }
 
-void CarControls::updateKeyInputEvents(int button, const std::vector<int>& keys) {
-    for (const auto& keyval : keys) {
-        // Mouse (VK 0x01 through 0x06 are mouse)
-        if (keyval >= 1 && keyval <= 6) {
-            INPUT input;
-            input.type = INPUT_MOUSE;
+void CarControls::updateKeyInputEvents(GUID guid, int button, int keyCode) {
+    // Mouse (VK 0x01 through 0x06 are mouse)
+    if (keyCode >= 1 && keyCode <= 6) {
+        INPUT input;
+        input.type = INPUT_MOUSE;
 
-            if (mWheelInput.IsButtonJustPressed(button, WheelToKeyGUID)) {
-                input.mi = MouseButton2Event(keyval, false);
-                if (input.mi.dwFlags != 0) {
-                    SendInput(1, &input, sizeof(INPUT));
-                }
-            }
-            if (mWheelInput.IsButtonJustReleased(button, WheelToKeyGUID)) {
-                input.mi = MouseButton2Event(keyval, true);
-                if (input.mi.dwFlags != 0) {
-                    SendInput(1, &input, sizeof(INPUT));
-                }
+        if (mWheelInput.IsButtonJustPressed(button, guid)) {
+            input.mi = MouseButton2Event(keyCode, false);
+            if (input.mi.dwFlags != 0) {
+                SendInput(1, &input, sizeof(INPUT));
             }
         }
-        // Keyboard
-        else {
-            INPUT input;
-            input.type = INPUT_KEYBOARD;
-            input.ki.dwExtraInfo = 0;
-            input.ki.wVk = 0;
-            input.ki.wScan = MapVirtualKey(keyval, MAPVK_VK_TO_VSC);
+        if (mWheelInput.IsButtonJustReleased(button, guid)) {
+            input.mi = MouseButton2Event(keyCode, true);
+            if (input.mi.dwFlags != 0) {
+                SendInput(1, &input, sizeof(INPUT));
+            }
+        }
+    }
+    // Keyboard
+    else {
+        INPUT input;
+        input.type = INPUT_KEYBOARD;
+        input.ki.dwExtraInfo = 0;
+        input.ki.wVk = 0;
+        input.ki.wScan = MapVirtualKey(keyCode, MAPVK_VK_TO_VSC);
 
-            if (mWheelInput.IsButtonJustPressed(button, WheelToKeyGUID)) {
-                input.ki.dwFlags = KEYEVENTF_SCANCODE;
-                SendInput(1, &input, sizeof(INPUT));
-            }
-            if (mWheelInput.IsButtonJustReleased(button, WheelToKeyGUID)) {
-                input.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
-                SendInput(1, &input, sizeof(INPUT));
-            }
+        if (mWheelInput.IsButtonJustPressed(button, guid)) {
+            input.ki.dwFlags = KEYEVENTF_SCANCODE;
+            SendInput(1, &input, sizeof(INPUT));
+        }
+        if (mWheelInput.IsButtonJustReleased(button, guid)) {
+            input.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
+            SendInput(1, &input, sizeof(INPUT));
         }
     }
 }

@@ -19,6 +19,7 @@
 #include <filesystem>
 
 namespace fs = std::filesystem;
+extern std::atomic<bool> g_cancelThread;
 
 void resolveVersion() {
     int shvVersion = getGameVersion();
@@ -27,7 +28,7 @@ void resolveVersion() {
     // Also prints the other stuff, annoyingly.
     SVersion exeVersion = getExeInfo();
 
-    if (shvVersion < G_VER_1_0_877_1_STEAM) {
+    if (shvVersion < G_VER_1_0_1604_0_STEAM) {
         logger.Write(WARN, "Outdated game version! Update your game.");
     }
 
@@ -73,43 +74,79 @@ void resolveVersion() {
     VehicleExtensions::SetVersion(shvVersion);
 }
 
-std::string GetTimestampReadable(unsigned long long unixTimestampMs) {
-    const auto durationSinceEpoch = std::chrono::milliseconds(unixTimestampMs);
-    const std::chrono::time_point<std::chrono::system_clock> tp_after_duration(durationSinceEpoch);
-    time_t time_after_duration = std::chrono::system_clock::to_time_t(tp_after_duration);
+void InitializePaths(HMODULE hInstance) {
+    Paths::SetOurModuleHandle(hInstance);
 
-    std::stringstream timess;
-    struct tm newtime {};
-    auto err = localtime_s(&newtime, &time_after_duration);
+    auto localAppDataPath = Paths::GetLocalAppDataPath();
+    auto localAppDataModPath = localAppDataPath / Constants::iktDir / Constants::ModDir;
+    std::string originalModPath = Paths::GetModuleFolder(hInstance) + std::string("\\") + Constants::ModDir;
+    Paths::SetModPath(originalModPath);
 
-    if (err != 0) {
-        return "Invalid timestamp";
+    bool useAltModPath = false;
+    if (std::filesystem::exists(localAppDataModPath)) {
+        useAltModPath = true;
     }
 
-    timess << std::put_time(&newtime, "%Y %m %d, %H:%M:%S");
-    return fmt::format("{}", timess.str());
-}
+    std::string modPath;
+    std::string logFile;
 
-BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
-    const std::string modPath = Paths::GetModuleFolder(hInstance) + Constants::ModDir;
-    const std::string logFile = modPath + "\\" + Paths::GetModuleNameWithoutExtension(hInstance) + ".log";
+    // Use LocalAppData if it already exists.
+    if (useAltModPath) {
+        modPath = localAppDataModPath.string();
+        logFile = (localAppDataModPath / (Paths::GetModuleNameWithoutExtension(hInstance) + ".log")).string();
+    }
+    else {
+        modPath = originalModPath;
+        logFile = modPath + std::string("\\") + Paths::GetModuleNameWithoutExtension(hInstance) + ".log";
+    }
+
+    Paths::SetModPath(modPath);
 
     if (!fs::is_directory(modPath) || !fs::exists(modPath)) {
-        fs::create_directory(modPath);
+        fs::create_directories(modPath);
     }
 
     logger.SetFile(logFile);
-    Paths::SetOurModuleHandle(hInstance);
+    logger.Clear();
 
+    if (logger.Error()) {
+        modPath = localAppDataModPath.string();
+        logFile = (localAppDataModPath / (Paths::GetModuleNameWithoutExtension(hInstance) + ".log")).string();
+        fs::create_directories(modPath);
+
+        Paths::SetModPath(modPath);
+        logger.SetFile(logFile);
+
+        fs::copy(fs::path(originalModPath), localAppDataModPath,
+            fs::copy_options::update_existing | fs::copy_options::recursive);
+
+        // Fix perms
+        for (auto& path : fs::recursive_directory_iterator(localAppDataModPath)) {
+            try {
+                fs::permissions(path, fs::perms::all);
+            }
+            catch (std::exception& e) {
+                logger.Write(ERROR, "Failed to set permissions on [%s]: %s.", path.path().string().c_str(), e.what());
+            }
+        }
+
+        logger.ClearError();
+        logger.Clear();
+        logger.Write(WARN, "Copied to [%s] from [%s] due to read/write issues.", modPath.c_str(), originalModPath.c_str());
+    }
+}
+
+BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
     switch (reason) {
         case DLL_PROCESS_ATTACH: {
-            logger.Clear();
+            InitializePaths(hInstance);
             logger.Write(INFO, "Manual Transmission %s (built %s %s) (%s)",
                 Constants::DisplayVersion, __DATE__, __TIME__, GIT_HASH GIT_DIFF);
-            logger.Write(INFO, "%s",
+            logger.Write(INFO, "Date: %s",
                 GetTimestampReadable(std::chrono::duration_cast<std::chrono::milliseconds>
                     (std::chrono::system_clock::now().time_since_epoch()).count()).c_str());
             resolveVersion();
+            logger.Write(INFO, "Data path: %s", Paths::GetModPath().c_str());
 
             scriptRegister(hInstance, ScriptMain);
             scriptRegisterAdditionalThread(hInstance, NPCMain);
@@ -118,7 +155,9 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             break;
         }
         case DLL_PROCESS_DETACH: {
-            logger.Write(INFO, "PATCH: Init shutdown");
+            scriptUnregister(hInstance);
+
+            logger.Write(INFO, "[Patch] Init shutdown");
             const uint8_t expected = 6;
             uint8_t actual = 0;
 
@@ -136,18 +175,24 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
                 actual++;
 
             if (actual == expected) {
-                logger.Write(INFO, "PATCH: Script shut down cleanly");
+                logger.Write(INFO, "[Patch] Script shut down cleanly");
             }
             else {
-                logger.Write(ERROR, "PATCH: Script shut down with unrestored patches!");
+                logger.Write(ERROR, "[Patch] Script shut down with unrestored patches!");
             }
 
             resetSteeringMultiplier();
+            logger.Write(DEBUG, "[Misc] Reset steering wheel multipliers");
             releaseCompatibility();
+            logger.Write(DEBUG, "[Compat] Released libraries");
 
             SteeringAnimation::CancelAnimation();
+            logger.Write(DEBUG, "[Anim] Cancelled custom animations");
 
-            scriptUnregister(hInstance);
+            // This is where wheel stuff should've been explicitly shut down,
+            // but due to GTA5.exe hanging, it's just left as-is.
+            extern CarControls g_controls;
+            g_controls.GetWheel().FreeDirectInput();
             break;
         }
         default:

@@ -73,6 +73,7 @@ struct VehicleGearboxStates {
     bool HitRPMSpeedLimiter = false; // Limit speed at top RPM
     bool HitRPMLimiter = false; // Limit RPM so it doesn't >1.0f
     int LastRedline = 0;
+    bool DownshiftProtection = false;
 
     // Delayed shifting
     bool Shifting = false; 

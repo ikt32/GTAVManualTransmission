@@ -1,5 +1,48 @@
 # Changelog
 
+## 5.5.0
+
+Overhaul force feedback (again):
+
+* FFB is now based on slip angle of each wheel
+* FFB takes weight transfer/tyre loads in account now
+* FFB scales with terrain grip levels
+* Includes general response curve visualization in FFB setup
+* Response normalized for excessive fTractionCurve values GTA uses normally
+  * (can be disabled/made linear to feel more difference)
+* Fix intermittent FFB loss for Fanatec wheels after alt-tabbing
+* Fix script crash on trying to call unavailable FFB effect
+
+Most prominent FFB settings (SATFactor, MaxSpeed, Gamma) are now obsolete for
+ground vehicles, but are still used in amphibious/flying modes. They're hidden
+away in an advanced menu.
+
+Other wheel stuff:
+
+* Improve WheelToKeyboard, now maps multiple input devices to any key
+* Increase wheel rotation range up to 2880 degrees
+* Improve device assignment menu
+  * Display currently assigned device to a control
+  * Display whether a device is disconnected or not configured
+* Fix ineffective braking when reversing when using wheel
+
+Improve driving assists:
+
+* Use more accurate data sources to determine slip
+* Fix brake force not scaled to handling brake force
+* Fix TCS UI elements lingering when no throttle applied, if other throttle effects are active
+* Fix ABS UI not coming up for GTA's ABS
+
+Misc:
+
+* Add vehicle-optional downshift protection with visual and audio cues
+* Add pitch to g-force based camera movement
+* Improve wheel bone rotation precision
+* Update support for Wanted188's R32
+* Allow configuring telemetry endpoint (IP and port in settings_general.ini \[Misc\])
+* Allow saving full vehicle config instead of just empty/delta from base config
+* Fix steering animation sometimes not loaded on initial game start
+
 ## 5.4.2
 
 * Fix shift rate modifier not adhering to carcols modifiers

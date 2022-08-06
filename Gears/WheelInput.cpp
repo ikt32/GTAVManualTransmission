@@ -39,6 +39,20 @@ extern WheelPatchStates g_wheelPatchStates;
 
 namespace {
     MiniPID pid(1.0, 0.0, 0.0);
+
+    // https://forums.gta5-mods.com/topic/14244/how-to-get-a-wheel-address-from-wheel-id
+    std::unordered_map<uint8_t, uint8_t> wheelIdReverseLookupMap {
+        { 11, 0 }, // 0 - wheel_lf / bike, plane or jet front
+        { 12, 1 }, // 1 - wheel_rf
+        { 15, 2 }, // 2 - wheel_lm / in 6 wheels trailer, plane or jet is first one on left
+        { 16, 3 }, // 3 - wheel_rm / in 6 wheels trailer, plane or jet is first one on right
+        { 13, 4 }, // 4 - wheel_lr / bike rear / in 6 wheels trailer, plane or jet is last one on left
+        { 14, 5 }, // 5 - wheel_rr / in 6 wheels trailer, plane or jet is last one on right
+        { 11, 6 }, // 45 - 6 wheels trailer mid wheel left
+        { 13, 7 }, // 45 - 6 wheels trailer mid wheel right
+    };
+
+    float lastLongSlip = 0.0f;
 }
 
 namespace WheelInput {
@@ -71,6 +85,9 @@ namespace WheelInput {
     float GetFFBConstantForce() {
         return lastConstantForce / 10000.0f;
     }
+
+    void HandlePedalsGround(float wheelThrottleVal, float wheelBrakeVal);
+    void HandlePedalsAlt(float wheelThrottleVal, float wheelBrakeVal);
 
     bool toggledLowBeamsForFlash = false;
 }
@@ -117,11 +134,29 @@ bool hasAltInputs(Vehicle vehicle) {
 // Forward gear: Throttle accelerates, Brake brakes (exclusive)
 // Reverse gear: Throttle reverses, Brake brakes (exclusive)
 void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
-    bool altInput = hasAltInputs(g_playerVehicle);
-
+    // No altInput, as only Stromberg needs custom assignments
+    
     wheelThrottleVal = pow(wheelThrottleVal, g_settings.Wheel.Throttle.Gamma);
     wheelBrakeVal = pow(wheelBrakeVal, g_settings.Wheel.Brake.Gamma);
 
+    if (VExt::GetModelType(g_playerVehicle) == 5) {
+        HandlePedalsAlt(wheelThrottleVal, wheelBrakeVal);
+    }
+    else {
+        HandlePedalsGround(wheelThrottleVal, wheelBrakeVal);
+    }
+}
+
+void WheelInput::HandlePedalsAlt(float wheelThrottleVal, float wheelBrakeVal) {
+    if (wheelThrottleVal > 0.01f) {
+        SetControlADZAlt(ControlVehicleAccelerate, wheelThrottleVal, g_settings.Wheel.Throttle.AntiDeadZone, true);
+    }
+    if (wheelBrakeVal > 0.01f) {
+        SetControlADZAlt(ControlVehicleBrake, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone, true);
+    }
+}
+
+void WheelInput::HandlePedalsGround(float wheelThrottleVal, float wheelBrakeVal) {
     float speedThreshold = 0.5f;
     const float reverseThreshold = 2.0f;
 
@@ -235,7 +270,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
         VExt::SetThrottleP(g_playerVehicle, -0.1f);
 
         // We're reversing
-        if (g_vehData.mDiffSpeed < -speedThreshold) {
+        if (g_vehData.mVelocity.y < -speedThreshold) {
             //UI::ShowText(0.3, 0.0, 1.0, "We are reversing");
             // Throttle Pedal Reverse
             if (wheelThrottleVal > 0.01f) {
@@ -245,12 +280,12 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
             if (wheelBrakeVal > 0.01f) {
                 Controls::SetControlADZ(ControlVehicleAccelerate, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone);
                 VExt::SetThrottleP(g_playerVehicle, -wheelBrakeVal);
-                VExt::SetBrakeP(g_playerVehicle, 1.0f);
+                VExt::SetBrakeP(g_playerVehicle, wheelBrakeVal);
             }
         }
 
         // Standing still
-        if (g_vehData.mDiffSpeed < speedThreshold && g_vehData.mDiffSpeed >= -speedThreshold) {
+        if (g_vehData.mVelocity.y < speedThreshold && g_vehData.mVelocity.y >= -speedThreshold) {
             //UI::ShowText(0.3, 0.0, 1.0, "We are stopped");
 
             if (wheelThrottleVal > 0.01f) {
@@ -265,11 +300,11 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
         }
 
         // We're rolling forwards
-        if (g_vehData.mDiffSpeed > speedThreshold) {
+        if (g_vehData.mVelocity.y > speedThreshold) {
             //UI::ShowText(0.3, 0.0, 1.0, "We are rolling forwards");
             //bool brakelights = false;
 
-            if (g_vehData.mDiffSpeed > reverseThreshold) {
+            if (g_vehData.mVelocity.y > reverseThreshold) {
                 if (!isClutchPressed()) {
                     PAD::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
                 }
@@ -277,7 +312,7 @@ void WheelInput::HandlePedals(float wheelThrottleVal, float wheelBrakeVal) {
                 if (wheelBrakeVal > 0.01f) {
                     Controls::SetControlADZ(ControlVehicleBrake, wheelBrakeVal, g_settings.Wheel.Brake.AntiDeadZone);
                     VExt::SetThrottleP(g_playerVehicle, -wheelBrakeVal);
-                    VExt::SetBrakeP(g_playerVehicle, 1.0f);
+                    VExt::SetBrakeP(g_playerVehicle, wheelBrakeVal);
                 }
             }
 
@@ -533,10 +568,6 @@ void WheelInput::DoSteering() {
             if (abs(rotRad) > steerClamp / 2.0f) {
                 rotRad = std::clamp(rotRad, -steerClamp / 2.0f, steerClamp / 2.0f);
             }
-            float rotRadRaw = rotRad;
-            // Setting angle using the VExt:: calls above causes the angle to overshoot the "real" coords
-            // Not sure if this is the best solution, but hey, it works!
-            rotRad -= 2.0f * std::clamp(effSteer, -1.0f, 1.0f) * VExt::GetMaxSteeringAngle(g_playerVehicle);
 
             Vector3 scale{ 1.0f, 0, 1.0f, 0, 1.0f, 0 };
             if (g_settings.Misc.HideWheelInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4) {
@@ -545,9 +576,9 @@ void WheelInput::DoSteering() {
                 scale.z = 0.0f;
             }
 
-            VehicleBones::RotateAxis(g_playerVehicle, boneIdx, rotAxis, rotRad);
+            VehicleBones::RotateAxisAbsolute(g_playerVehicle, boneIdx, rotAxis, rotRad);
             VehicleBones::Scale(g_playerVehicle, boneIdx, scale);
-            SteeringAnimation::SetRotation(rotRadRaw);
+            SteeringAnimation::SetRotation(rotRad);
         }
     }
     if (g_vehData.mClass != VehicleClass::Car || altInputs){
@@ -556,8 +587,6 @@ void WheelInput::DoSteering() {
 }
 
 int calculateDamper(float gain, float wheelsOffGroundRatio) {
-    Vector3 accelValsAvg = g_vehData.mAcceleration; //TODO: Avg/dampen later
-
     // Just to use floats everywhere here
     float damperMax = static_cast<float>(g_settings.Wheel.FFB.DamperMax);
     float damperMin = static_cast<float>(g_settings.Wheel.FFB.DamperMin);
@@ -568,39 +597,41 @@ int calculateDamper(float gain, float wheelsOffGroundRatio) {
     damperFactorSpeed = fmaxf(damperFactorSpeed, damperMin);
     // already clamped on the upper bound by abs(vel) in map()
 
-    // 2G of deceleration causes addition of damperMin. Heavier feeling steer when braking!
-    float damperFactorAccel = map(-accelValsAvg.y / 9.81f, -2.0f, 2.0f, -damperMin, damperMin);
-    damperFactorAccel = fmaxf(damperFactorAccel, -damperMin);
-    damperFactorAccel = fminf(damperFactorAccel, damperMin);
-
-    float damperForce = damperFactorSpeed + damperFactorAccel;
+    float damperForce = damperFactorSpeed;
 
     damperForce = damperForce * (1.0f - wheelsOffGroundRatio);
 
-    if (g_vehData.mClass == VehicleClass::Car || g_vehData.mClass == VehicleClass::Quad) {
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 0, true)) {
-            damperForce /= 2.0f;
-        }
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 1, true)) {
-            damperForce /= 2.0f;
+    auto tyreGrips = VExt::GetTyreGrips(g_playerVehicle);
+    auto wetGrips = VExt::GetWetGrips(g_playerVehicle);
+
+    for (uint32_t i = 0; i < VExt::GetNumWheels(g_playerVehicle); ++i) {
+        if (VExt::IsWheelSteered(g_playerVehicle, i)) {
+            auto wheelIdMem = VExt::GetWheelIdMem(g_playerVehicle, i);
+            auto wheelId = wheelIdReverseLookupMap.find(wheelIdMem);
+            if (wheelId != wheelIdReverseLookupMap.end()) {
+                bool deflated = VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, wheelId->second, false);
+                bool completely = VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, wheelId->second, true);
+
+                if (deflated) {
+                    damperForce *= 0.75f;
+                }
+                else if (completely) {
+                    damperForce *= 0.50f;
+                }
+            }
+
+            damperForce *= tyreGrips[i];
+            damperForce *= wetGrips[i];
         }
     }
-    else if (g_vehData.mClass == VehicleClass::Bike) {
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 0, true)) {
-            damperForce /= 4.0f;
-        }
-    }
+
+    damperForce = std::clamp(damperForce, damperMin, damperMax * 2.0f);
 
     if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle)) {
         damperForce *= 2.0f;
     }
 
-    // clamp
-    damperForce = fmaxf(damperForce, damperMin / 4.0f);
-    damperForce = fminf(damperForce, damperMax * 2.0f);
-
     damperForce *= gain;
-
     return static_cast<int>(damperForce);
 }
 
@@ -652,8 +683,304 @@ void calculateSoftLock(int& totalForce, int& damperForce) {
     }
 }
 
-// Despite being scientifically inaccurate, "self-aligning torque" is the best description.
-int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRatio, bool isCar) {
+// TODO: Probably move this to some less-wheel related place.
+std::vector<WheelInput::SSlipInfo> WheelInput::CalculateSlipInfo() {
+    auto loads = VExt::GetWheelLoads(g_playerVehicle);
+    auto boneVels = VExt::GetWheelBoneVelocity(g_playerVehicle);
+    auto tracVels = VExt::GetWheelTractionVector(g_playerVehicle);
+
+    auto velWorld = ENTITY::GET_ENTITY_VELOCITY(g_playerVehicle);
+    auto posWorld = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, 0);
+
+    std::vector<SSlipInfo> slipAngles;
+
+    auto numWheels = VExt::GetNumWheels(g_playerVehicle);
+
+    auto wheelCoords = Util::GetWheelCoords(g_playerVehicle);
+    auto wheelOffs = VExt::GetWheelOffsets(g_playerVehicle);
+
+    // Only used for when locked up
+    auto wheelAngles = VExt::GetWheelSteeringAngles(g_playerVehicle);
+    auto worldVelAbs = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, false);
+    auto vehForwardVec = ENTITY::GET_ENTITY_FORWARD_VECTOR(g_playerVehicle);
+    float slideAngle = GetAngleBetween(vehForwardVec, worldVelAbs);
+
+    for (uint32_t i = 0; i < numWheels; ++i) {
+        Vector3 boneVel = boneVels[i];
+        Vector3 tracVel = tracVels[i] * -1.0f;
+
+        // Translate absolute bone velocity to relative velocity
+        auto boneVelProjection = posWorld + boneVel;
+        auto boneVelRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(
+            g_playerVehicle, boneVelProjection.x, boneVelProjection.y, boneVelProjection.z);
+
+        auto tracVelProjection = posWorld + tracVel;
+        auto tracVelRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(
+            g_playerVehicle, tracVelProjection.x, tracVelProjection.y, tracVelProjection.z);
+
+        auto tracVelRelIgnoreZ = tracVelRel;
+        tracVelRelIgnoreZ.z = boneVelRel.z;
+
+        float angle;
+        if (Length(tracVel) == 0.0f && Length(boneVelRel) > 0.0f) {
+            // Locked up: Angle becomes difference between steering and velocity vector
+            angle = slideAngle - wheelAngles[i];
+            if (g_settings.Debug.DisplayInfo) {
+                UI::ShowText(0.35f + 0.1f * (float)i, 0.15f, 0.4f,
+                    fmt::format("[{}]Locked up\nAngle: {:.2f}\nSlideAngle: {:.2f}\nWheelAngle: {:.2f}",
+                        i,
+                        rad2deg(angle),
+                        rad2deg(slideAngle),
+                        rad2deg(wheelAngles[i])));
+            }
+        }
+        else {
+            angle = GetAngleBetween(tracVelRelIgnoreZ, boneVelRel);
+            if (g_settings.Debug.DisplayInfo) {
+                UI::ShowText(0.35f + 0.1f * (float)i, 0.15f, 0.4f,
+                    fmt::format("[{}]Grip\nAngle: {:.2f}",
+                        i,
+                        rad2deg(angle)));
+            }
+        }
+
+        if (std::isnan(angle) || Length(velWorld) == 0.0f) {
+            boneVel = Vector3();
+            boneVelRel = Vector3();
+            tracVel = Vector3();
+            angle = 0.0f;
+        }
+
+        slipAngles.push_back({ angle, loads[i], Length(boneVelRel)});
+
+        if (g_settings.Debug.DisplayInfo) {
+            int alpha = 255;
+            if (!VExt::IsWheelSteered(g_playerVehicle, i)) {
+                alpha = 63;
+            }
+
+            Vector3 boneVelProjection2 = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle,
+                wheelOffs[i].x + boneVelRel.x, wheelOffs[i].y + boneVelRel.y, wheelOffs[i].z + boneVelRel.z);
+            UI::DrawSphere(boneVelProjection2, 0.05f, Util::ColorI{ 255, 255, 255, alpha });
+            GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
+                boneVelProjection2.x, boneVelProjection2.y, boneVelProjection2.z, 255, 255, 255, alpha);
+
+            Vector3 tracVelProjection2 = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle,
+                wheelOffs[i].x + tracVelRelIgnoreZ.x, wheelOffs[i].y + tracVelRelIgnoreZ.y, wheelOffs[i].z + tracVelRelIgnoreZ.z);
+            UI::DrawSphere(tracVelProjection2, 0.05f, Util::ColorI{ 255, 0, 0, alpha });
+            GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
+                tracVelProjection2.x, tracVelProjection2.y, tracVelProjection2.z, 255, 0, 0, alpha);
+        }
+    }
+
+    return slipAngles;
+}
+
+// The downside of this method based on slip angle, is that high-slip-ratio
+// handlings are very weak and need a low FFB.Gamma to ramp up the "early" force with
+// "low" steering angles.
+float calcSlipRatio(float slip, float slipOpt,
+                    float postSlipOptRatio, float postOptSlipMin) {
+    float slipRatio = 0.0f;
+
+    // Normalize slip to ratio
+    if (abs(slip) <= slipOpt) {
+        slipRatio = map(abs(slip), 0.0f, slipOpt, 0.0f, 1.0f);
+    }
+    else {
+        if (abs(slip) <= postSlipOptRatio * slipOpt) {
+            slipRatio = map(abs(slip), slipOpt, postSlipOptRatio * slipOpt, 1.0f, postOptSlipMin);
+        }
+        else {
+            slipRatio = postOptSlipMin;
+        }
+    }   
+
+    float x = slipRatio;
+
+    // rNorm normalizes the response curve for different fTractionCurveLateral values
+    // Tested from 5 degrees to 30 degrees
+    // Results in similar force at a similar lock (< fTractionCurveLateral).
+    float normVal = map(rad2deg(slipOpt),
+        g_settings.Wheel.FFB.SlipOptMin, g_settings.Wheel.FFB.SlipOptMax,
+        g_settings.Wheel.FFB.SlipOptMinMult, g_settings.Wheel.FFB.SlipOptMaxMult);
+    normVal = std::clamp(normVal, g_settings.Wheel.FFB.SlipOptMinMult, g_settings.Wheel.FFB.SlipOptMaxMult);
+
+    float rNorm = g_settings.Wheel.FFB.ResponseCurve * normVal;
+
+    slipRatio = WheelInput::GetProfiledFFBValue(x, rNorm, g_settings.Wheel.FFB.FFBProfile);
+
+    return slipRatio * sgn(slip);
+}
+
+int calculateSat() {
+    auto numWheels = VExt::GetNumWheels(g_playerVehicle);
+    if (numWheels < 1)
+        return 0;
+
+    const float postOptSlipRatio = 2.5f;
+    const float postOptSlipMin = 0.0f;
+
+    // in radians
+    const float latSlipOpt = *(float*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets.fTractionCurveLateral);
+    const auto comOffset = *(V3F*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets.vecCentreOfMass.X);
+    // in kg
+    const float mass = *(float*)(VExt::GetHandlingPtr(g_playerVehicle) + hOffsets.fMass);
+
+    auto wheelOffsets = VExt::GetWheelOffsets(g_playerVehicle);
+    auto wheelVels = VExt::GetTyreSpeeds(g_playerVehicle);
+    auto wheelSteeringMults = VExt::GetWheelSteeringMultipliers(g_playerVehicle);
+
+    auto satValues = WheelInput::CalculateSlipInfo();
+    const float weightWheelAvg = mass / (float)satValues.size();
+
+    uint32_t numSteeredWheelsTotal = 0;
+    for (uint32_t i = 0; i < satValues.size(); ++i) {
+        if (VExt::IsWheelSteered(g_playerVehicle, i)) {
+            numSteeredWheelsTotal++;
+        }
+    }
+
+    float longSlip = 0.0f;
+    float slipRatio = 0.0f;
+    float steeredWheelsDiv = 0.0f;
+    float steeredAxleWeight = 0.0f;
+    float maxSteeredWheelWeight = 0.0f;
+
+    auto tyreGrips = VExt::GetTyreGrips(g_playerVehicle);
+    auto wetGrips = VExt::GetWetGrips(g_playerVehicle);
+
+    auto calculateSlip = [&](uint32_t i) {
+        float thisSlipRatio = calcSlipRatio(satValues[i].Angle, latSlipOpt, postOptSlipRatio, postOptSlipMin);
+
+        auto wheelIdMem = VExt::GetWheelIdMem(g_playerVehicle, i);
+        auto wheelId = wheelIdReverseLookupMap.find(wheelIdMem);
+        if (wheelId != wheelIdReverseLookupMap.end()) {
+            bool deflated = VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, wheelId->second, false);
+            bool completely = VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, wheelId->second, true);
+
+            if (deflated) {
+                thisSlipRatio *= 0.25f;
+            }
+            else if (completely) {
+                thisSlipRatio *= 0.10f;
+            }
+        }
+
+        thisSlipRatio *= tyreGrips[i];
+        thisSlipRatio *= wetGrips[i];
+
+        slipRatio += thisSlipRatio;
+
+        // std::max to keep thisLongSlip >= 1
+        float thisLongSlip;
+        if (wheelVels[i] >= satValues[i].VelocityAmplitude) {
+            thisLongSlip = wheelVels[i] / std::max(1.0f, satValues[i].VelocityAmplitude);
+        }
+        else {
+            thisLongSlip = satValues[i].VelocityAmplitude / std::max(1.0f, wheelVels[i]);
+        }
+        longSlip += thisLongSlip;
+        steeredAxleWeight += satValues[i].Weight;
+
+        if (satValues[i].Weight > maxSteeredWheelWeight)
+            maxSteeredWheelWeight = satValues[i].Weight;
+
+        steeredWheelsDiv += 1.0f;
+        if (g_settings.Debug.DisplayInfo) {
+            UI::ShowText(0.0f + static_cast<float>(i) * 0.075f, 0.75f, 0.3f,
+                fmt::format("[{}]Angle: {:.2f}\nSlipRatio:{:.2f}\nLongSlip: {:.2f}\n{}/{}",
+                    i, rad2deg(satValues[i].Angle),
+                    thisSlipRatio,
+                    thisLongSlip,
+                    wheelIdMem, wheelId != wheelIdReverseLookupMap.end() ?
+                                    fmt::format("{}", wheelId->second) : "N/A"));
+        }
+    };
+
+    // Bikes have the front wheel index 1 instead of 0
+    if (numWheels == 2) {
+        calculateSlip(1);
+    }
+    // E.g. Chimera has 1 steered wheel (and is a quad)
+    else if (numSteeredWheelsTotal == 1) {
+        calculateSlip(0);
+    }
+    // Assume 2 front steered wheels for all other vehicles
+    // Even 4+-wheel or rear-wheel steered vehicles
+    else {
+        calculateSlip(0);
+        calculateSlip(1);
+    }
+
+    slipRatio /= steeredWheelsDiv;
+    longSlip /= steeredWheelsDiv;
+    longSlip = std::clamp(longSlip, 1.0f, 10.0f);
+
+    // Don't allow force to decrease too fast.
+    if (longSlip > lastLongSlip) {
+        // Drop rate 1.0 responds quickly but smoothens GTA's ABS jerks
+        // 10.0 is too fast
+        // 0.1 is too slow, feel nearly nothing and takes too long to respond to lockups.
+        longSlip = lerp(lastLongSlip, longSlip, 1.0f * MISC::GET_FRAME_TIME());
+    }
+
+    lastLongSlip = longSlip;
+
+    float longSlipMult = map(longSlip, 1.0f, 2.0f, 1.0f, 0.0f);
+    longSlipMult = std::clamp(longSlipMult, 0.2f, 1.0f);
+
+    // longSlip gets unstable under ~5 km/h, so dampen it.
+    float mappedSpeed = map(ENTITY::GET_ENTITY_SPEED(g_playerVehicle), 0.5f, 2.0f, 0.0f, 1.0f);
+    float velFac = std::clamp(mappedSpeed, 0.0f, 1.0f);
+
+    // Heavier under braking, lighter under no braking, zero when airborne. 1 when stopped, but this defaults to 0 which is also fine.
+
+    float frontAxleOffset = -1.0f;
+    float rearAxleOffset = 1.0f;
+
+    // Bikes
+    if (numWheels == 2) {
+        frontAxleOffset = wheelOffsets[1].y;
+        rearAxleOffset = wheelOffsets[0].y;
+    }
+    // The rest
+    else {
+        frontAxleOffset = wheelOffsets[0].y;
+        rearAxleOffset = wheelOffsets[numWheels-1].y;
+    }
+    float wheelbase = frontAxleOffset - rearAxleOffset;
+
+    // front bias - except for bikes but we stealthily swapped it anyway.
+    float comBiasFront = map(comOffset.y, rearAxleOffset, frontAxleOffset, 0.0f, 1.0f);
+
+    float frontAxleDesignWeight = mass * comBiasFront;
+    float frontWheelDesignWeight = frontAxleDesignWeight * 0.5f;
+    float weightTransferFactor = maxSteeredWheelWeight / frontWheelDesignWeight;
+    
+    if (weightTransferFactor < 1.0f) {
+        weightTransferFactor = pow(weightTransferFactor, 2.5f);
+    }
+
+    float satForce = 
+        g_settings.Wheel.FFB.SATAmpMult *
+        g_settings().Steering.Wheel.SATMult * 
+        10000.0f * slipRatio * velFac * weightTransferFactor * longSlipMult;
+
+    if (g_settings.Wheel.FFB.LUTFile.empty()) {
+        float adf = static_cast<float>(g_settings.Wheel.FFB.AntiDeadForce);
+        if (satForce > 0.0f) {
+            satForce = map(satForce, 0.0f, 10000.0f, adf, 10000.0f);
+        }
+        if (satForce < 0.0f) {
+            satForce = map(satForce, -10000.0f, -0.0f, -10000.0f, -adf);
+        }
+    }
+
+    return static_cast<int>(satForce);
+}
+
+int calculateSatNonWheel(int defaultGain, float steeringAngle) {
     float speed = ENTITY::GET_ENTITY_SPEED(g_playerVehicle);
 
     const float maxSpeed = g_settings.Wheel.FFB.MaxSpeed;
@@ -677,95 +1004,22 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
 
     Vector3 expectedVectorMapped{
         spdMap * -sin(steeringAngle / g_settings().Steering.Wheel.SteeringMult), 0,
-        spdMap * cos(steeringAngle /  g_settings().Steering.Wheel.SteeringMult), 0,
+        spdMap * cos(steeringAngle / g_settings().Steering.Wheel.SteeringMult), 0,
         0, 0
     };
 
     Vector3 expectedVector{
         speed * -sin(steeringAngle / g_settings().Steering.Wheel.SteeringMult), 0,
-        speed * cos(steeringAngle /  g_settings().Steering.Wheel.SteeringMult), 0,
+        speed * cos(steeringAngle / g_settings().Steering.Wheel.SteeringMult), 0,
         0, 0
     };
-    
+
     float error = static_cast<float>(pid.getOutput(
         expectedVectorMapped.x,
         static_cast<double>(speedVectorMapped.x) * g_settings.Wheel.FFB.SATFactor));
 
     float satForce = g_settings.Wheel.FFB.SATAmpMult * static_cast<float>(defaultGain) * -error;
 
-    // "Reduction" effects - those that affect already calculated things
-    bool understeering = false;
-    float understeer = 0.0f;
-
-    // understeer
-    if (isCar)  {
-        float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * g_settings().Steering.Wheel.SteeringMult;
-
-        Vector3 vecPredStr{
-            speed * -sin(avgAngle / g_settings().Steering.Wheel.SteeringMult), 0,
-            speed * cos(avgAngle /  g_settings().Steering.Wheel.SteeringMult), 0,
-            0, 0
-        };
-
-        Vector3 vecNextSpd = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
-        Vector3 vecNextRot = (vecNextSpd + rotRelative) * 0.5f;
-        float understeerAngle = GetAngleBetween(vecNextRot, vecPredStr);
-
-        float dSpdStr = Distance(vecNextSpd, vecPredStr);
-        float aSpdRot = GetAngleBetween(vecNextSpd, vecNextRot);
-
-        float dSpdRot = Distance(vecNextSpd, vecNextRot);
-        float aSpdStr = GetAngleBetween(vecNextSpd, vecPredStr);
-
-        if (dSpdStr > dSpdRot&& sgn(aSpdRot) == sgn(aSpdStr)) {
-            if (g_vehData.mVelocity.y > 10.0f && abs(avgAngle) > deg2rad(2.0f)) {
-                understeer = sgn(speedVector.x - expectedVector.x) * (vecNextRot.x - expectedVector.x);
-                understeering = true;
-                satForce = static_cast<float>(satForce) / std::max(1.0f, 3.3f * (understeer * g_settings.Wheel.FFB.SATUndersteerMult) + 1.0f);
-            }
-        }
-    }
-
-    satForce = static_cast<float>(satForce) * (1.0f - wheelsOffGroundRatio);
-
-    if (g_vehData.mClass == VehicleClass::Car || g_vehData.mClass == VehicleClass::Quad) {
-        const float satLim = static_cast<float>(g_settings.Wheel.FFB.SATMax);
-        int wheelsFlat =
-            VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 0, false) ? 1 : 0 +
-            VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 1, false) ? 1 : 0;
-        if (wheelsFlat == 1) {
-            satForce = satForce * (2.0f / 3.0f);
-        }
-        else if (wheelsFlat == 2) {
-            satForce = satForce * (1.0f / 3.0f);
-        }
-
-        int wheelsBurst =
-            VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 0, true) ? 1 : 0 +
-            VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 1, true) ? 1 : 0;
-        if (wheelsBurst == 1) {
-            float reduction = (3.0f / 6.0f);
-            satForce = satForce * reduction;
-            satForce = std::clamp(satForce, -satLim * reduction, satLim * reduction);
-        }
-        else if (wheelsBurst == 2) {
-            float reduction = (1.0f / 6.0f);
-            satForce = satForce * reduction;
-            satForce = std::clamp(satForce, -satLim * reduction, satLim * reduction);
-        }
-    }
-    else if (g_vehData.mClass == VehicleClass::Bike) {
-        if (VEHICLE::IS_VEHICLE_TYRE_BURST(g_playerVehicle, 0, true)) {
-            satForce = satForce / 10.0f;
-        }
-    }
-
-    if (g_settings.Debug.DisplayInfo) {
-        //UI::ShowText(0.85, 0.175, 0.4, fmt::format("RelSteer:\t{:.3f}", steeringRelative.x), 4);
-        //UI::ShowText(0.85, 0.200, 0.4, fmt::format("SetPoint:\t{:.3f}", travelRelative.x), 4);
-        UI::ShowText(0.85, 0.225, 0.4, fmt::format("Error:\t\t{:.3f}", error), 4);
-        UI::ShowText(0.85, 0.250, 0.4, fmt::format("{}Under:\t\t{:.3f}~w~", understeering ? "~b~" : "~w~", understeer), 4);
-    }
     if (g_settings.Wheel.FFB.LUTFile.empty()) {
         float adf = static_cast<float>(g_settings.Wheel.FFB.AntiDeadForce);
         if (satForce > 0.0f) {
@@ -775,48 +1029,22 @@ int calculateSat(int defaultGain, float steeringAngle, float wheelsOffGroundRati
             satForce = map(satForce, -10000.0f, -0.0f, -10000.0f, -adf);
         }
     }
-    float satMax = static_cast<float>(g_settings.Wheel.FFB.SATMax);
-    satForce = std::clamp(satForce, -satMax, satMax);
+
     if (Math::Near(speed, 0.0f, 0.1f)) {
         satForce *= speed;
     }
     return static_cast<int>(satForce);
 }
 
-// Despite being scientifically inaccurate, "self-aligning torque" is the best description.
-void WheelInput::DrawDebugLines() {
-    float steeringAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * VExt::GetSteeringMultiplier(g_playerVehicle);
-    Vector3 velocityWorld = ENTITY::GET_ENTITY_VELOCITY(g_playerVehicle);
-    Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, 1);
-    Vector3 travelWorld = velocityWorld + positionWorld;
-    Vector3 travelRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(g_playerVehicle, travelWorld.x, travelWorld.y, travelWorld.z);
-
-    Vector3 rotationVelocity = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
-    Vector3 turnWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, ENTITY::GET_ENTITY_SPEED(g_playerVehicle) * -sin(rotationVelocity.z), ENTITY::GET_ENTITY_SPEED(g_playerVehicle) * cos(rotationVelocity.z), 0.0f);
-    Vector3 turnRelative = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(g_playerVehicle, turnWorld.x, turnWorld.y, turnWorld.z);
-    float turnRelativeNormX = (travelRelative.x + turnRelative.x) / 2.0f;
-    float turnRelativeNormY = (travelRelative.y + turnRelative.y) / 2.0f;
-    Vector3 turnWorldNorm = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, turnRelativeNormX, turnRelativeNormY, 0.0f);
-
-    float steeringAngleRelX = ENTITY::GET_ENTITY_SPEED(g_playerVehicle) * -sin(steeringAngle);
-    float steeringAngleRelY = ENTITY::GET_ENTITY_SPEED(g_playerVehicle) * cos(steeringAngle);
-    Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, steeringAngleRelX, steeringAngleRelY, 0.0f);
-
-    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, travelWorld.x, travelWorld.y, travelWorld.z, 0, 255, 0, 255);
-    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, turnWorldNorm.x, turnWorldNorm.y, turnWorldNorm.z, 255, 0, 0, 255);
-    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, steeringWorld.x, steeringWorld.y, steeringWorld.z, 255, 0, 255, 255);
-}
-
 float getFloatingSteeredWheelsRatio(Vehicle v) {
     auto suspensionStates = g_vehData.mWheelsOnGround;
-    auto angles = g_vehData.mWheelSteeringAngles;
 
     float wheelsOffGroundRatio = 0.0f;
     float wheelsInAir = 0.0f;
     float wheelsSteered = 0.0f;
 
     for (int i = 0; i < g_vehData.mWheelCount; i++) {
-        if (angles[i] != 0.0f) {
+        if (VExt::IsWheelSteered(v, i)) {
             wheelsSteered += 1.0f;
             if (suspensionStates[i] == false) {
                 wheelsInAir += 1.0f;
@@ -839,25 +1067,15 @@ void WheelInput::PlayFFBGround() {
         g_controls.PlayLEDs(g_vehData.mRPM, 0.45f, 0.95f);
     }
 
-    // avgAngle: left is positive
-    // steerVal: left is negative
-    // Rear-wheel steered cars don't match, so this needs to be flipped in that case.
-    float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle) * g_settings().Steering.Wheel.SteeringMult;
-
-    float steerVal = map(g_controls.SteerVal, 0.0f, 1.0f, -1.0f, 1.0f);    
-    if (sgn(avgAngle) == sgn(steerVal)) {
-        avgAngle = -avgAngle;
-    }
-
     float wheelsOffGroundRatio = getFloatingSteeredWheelsRatio(g_playerVehicle);
 
     int detailForce = std::clamp(calculateDetail(), -g_settings.Wheel.FFB.DetailLim, g_settings.Wheel.FFB.DetailLim);
-    int satForce = calculateSat(2500, avgAngle, wheelsOffGroundRatio, g_vehData.mClass == VehicleClass::Car);
+    int satForce = calculateSat();
     int damperForce = calculateDamper(50.0f, wheelsOffGroundRatio);
 
     // Decrease damper if sat rises, so constantForce doesn't fight against damper
-    float damperMult = 1.0f - std::min(fabs((float)satForce), 10000.0f) / 10000.0f;
-    damperForce = (int)(damperMult * (float)damperForce);
+    //float damperMult = 1.0f - std::min(fabs((float)satForce), 10000.0f) / 10000.0f;
+    //damperForce = (int)(damperMult * (float)damperForce);
 
     // Dampen suspension, minimize damper, minimize SAT
     if (hasAltInputs(g_playerVehicle)) {
@@ -889,7 +1107,8 @@ void WheelInput::PlayFFBGround() {
     }
 
     if (g_settings.Debug.DisplayInfo) {
-        UI::ShowText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > g_settings.Wheel.FFB.SATMax ? "~r~" : "~w~", satForce), 4);
+        UI::ShowText(0.85, 0.250, 0.4, "Ground FFB");
+        UI::ShowText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
         UI::ShowText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
         UI::ShowText(0.85, 0.325, 0.4, fmt::format("Damper:\t\t{}", damperForce), 4);
         UI::ShowText(0.85, 0.350, 0.4, fmt::format("Detail:\t\t{}", detailForce), 4);
@@ -906,15 +1125,21 @@ void WheelInput::PlayFFBWater() {
         g_controls.PlayLEDs(g_vehData.mRPM, 0.45f, 0.95f);
     }
 
-    auto suspensionStates = g_vehData.mWheelsOnGround;
-    auto angles = g_vehData.mWheelSteeringAngles;
-
     bool isInWater = ENTITY::GET_ENTITY_SUBMERGED_LEVEL(g_playerVehicle) > 0.10f;
     int damperForce = calculateDamper(50.0f, isInWater ? 0.25f : 1.0f);
     int detailForce = calculateDetail();
-    int satForce = calculateSat(750, ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle).z, 1.0f, false);
 
-    if (!isInWater) {
+    int defaultGain;
+    if (VExt::GetHoverTransformRatio(g_playerVehicle) >= 0.5f) {
+        defaultGain = 100;
+    }
+    else {
+        defaultGain = 750;
+    }
+
+    int satForce = calculateSatNonWheel(defaultGain, ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle).z);
+
+    if (!isInWater && VExt::GetHoverTransformRatio(g_playerVehicle) < 0.5f) {
         satForce = 0;
     }
 
@@ -924,8 +1149,23 @@ void WheelInput::PlayFFBWater() {
     g_controls.PlayFFBDynamics(totalForce, damperForce);
 
     if (g_settings.Debug.DisplayInfo) {
+        UI::ShowText(0.85, 0.250, 0.4, "Alt FFB");
         UI::ShowText(0.85, 0.275, 0.4, fmt::format("{}FFBSat:\t\t{}~w~", abs(satForce) > 10000 ? "~r~" : "~w~", satForce), 4);
         UI::ShowText(0.85, 0.300, 0.4, fmt::format("{}FFBFin:\t\t{}~w~", abs(totalForce) > 10000 ? "~r~" : "~w~", totalForce), 4);
         UI::ShowText(0.85, 0.325, 0.4, fmt::format("Damper:\t{}", damperForce), 4);
+    }
+}
+
+float WheelInput::GetProfiledFFBValue(float x, float gamma, int profileMode) {
+    if (profileMode == 0) {
+        // Increase the force quick, then rise towards 1.
+        // x + (1 - x) * (the rest): Make the initial part steeper than linear y=x
+        // x^rNorm * ((rNorm+1)-rNorm*x): Gently ramp up, then rise, then gently ramp off
+        // Put together: Linear ramp up, rise, quickly ramp off towards 1.0
+        return x + (1.0f - x) * (pow(x, gamma) * ((gamma + 1.0f) - gamma * x));
+    }
+    else {
+        // Simple gamma
+        return pow(x, gamma);
     }
 }
