@@ -81,7 +81,6 @@ void SetPatterns(int version) {
         { 0xE9, 0x00, 0x00, 0x00, 0x00, 0x90 });
 
     // Valid for 877 to 1868, in 2060 last byte changed to 0xC4
-    // ProtectScan("10 83 b0 09 00 00 f3 0f 58").add(-0xa)
     steeringControl = PatternInfo("\xF3\x0F\x11\x8B\xFC\x08\x00\x00" "\xF3\x0F\x10\x83\x00\x09\x00\x00" "\xF3\x0F\x58\x83\xFC\x08\x00\x00" "\x41\x0F\x2F\xC3",
         "xxxx??xx" "xxxx??xx" "xxxx??xx" "xxx?", 
         { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
@@ -112,7 +111,6 @@ void SetPatterns(int version) {
             { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D });
         clutchRevLimit = PatternInfo("\xC7\x43\x40\xCD\xCC\xCC\x3D\x44\x89\x6B\x6C\x44\x89\x73\x68", "xx?xxxxxx??xx??",
             { 0xC7, 0x43, 0x40, 0xCD, 0xCC, 0xCC, 0x3D });
-        // ProtectScan("45 84 ed 0f 84 ?? ?? ?? ?? 0f 28 4f").add(3) 66 0F 1F 44 00 00
         steeringAssist = PatternInfo("\x45\x84\xED\x0F\x84\xD0\x01\x00\x00\x0F\x28\x4B\x70"
             "\xF3\x0F\x10\x25\x00\x00\x00\x00\xF3\x0F\x10\x1D\x00\x00\x00\x00\x0F\x28\xC1\x0F\x28\xD1", 
             "xxxxx????xx??xxx?????xxx?????xx?xx?",
