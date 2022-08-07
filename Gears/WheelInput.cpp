@@ -569,7 +569,7 @@ void WheelInput::DoSteering() {
                 rotRad = std::clamp(rotRad, -steerClamp / 2.0f, steerClamp / 2.0f);
             }
 
-            Vector3 scale{ 1.0f, 0, 1.0f, 0, 1.0f, 0 };
+            Vector3 scale{ 1 };
             if (g_settings.Misc.HideWheelInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4) {
                 scale.x = 0.0f;
                 scale.y = 0.0f;
@@ -997,21 +997,21 @@ int calculateSatNonWheel(int defaultGain, float steeringAngle) {
     speedVectorMapped.x = speedVector.x * (spdRatio);
     Vector3 rotVector = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
     Vector3 rotRelative{
-        speed * -sin(rotVector.z), 0,
-        speed * cos(rotVector.z), 0,
-        0, 0
+        speed * -sin(rotVector.z),
+        speed * cos(rotVector.z),
+        0,
     };
 
     Vector3 expectedVectorMapped{
-        spdMap * -sin(steeringAngle / g_settings().Steering.Wheel.SteeringMult), 0,
-        spdMap * cos(steeringAngle / g_settings().Steering.Wheel.SteeringMult), 0,
-        0, 0
+        spdMap * -sin(steeringAngle / g_settings().Steering.Wheel.SteeringMult),
+        spdMap * cos(steeringAngle / g_settings().Steering.Wheel.SteeringMult),
+        0,
     };
 
     Vector3 expectedVector{
-        speed * -sin(steeringAngle / g_settings().Steering.Wheel.SteeringMult), 0,
-        speed * cos(steeringAngle / g_settings().Steering.Wheel.SteeringMult), 0,
-        0, 0
+        speed * -sin(steeringAngle / g_settings().Steering.Wheel.SteeringMult),
+        speed * cos(steeringAngle / g_settings().Steering.Wheel.SteeringMult),
+        0,
     };
 
     float error = static_cast<float>(pid.getOutput(

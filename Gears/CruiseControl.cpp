@@ -75,9 +75,9 @@ SRayResult MultiCast(Vehicle vehicle, float range) {
 
     Vector3 rotVel = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
     Vector3 rotRelative{
-        120.0f * -sin(rotVel.z), 0,
-        120.0f * cos(rotVel.z), 0,
-        0, 0
+        120.0f * -sin(rotVel.z),
+        120.0f * cos(rotVel.z),
+        0
     };
 
     float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle);
@@ -86,57 +86,57 @@ SRayResult MultiCast(Vehicle vehicle, float range) {
     std::vector<Vector3> offsets{
         // centercenter
         Vector3 {
-            0.0f, 0,
-            dimMax.y, 0,
-            0.0f, 0
+            0.0f,
+            dimMax.y,
+            0.0f,
         },
         // centertop / 2
         Vector3 {
-            0.0f, 0,
-            dimMax.y, 0,
-            dimMax.z / 2.0f, 0
+            0.0f,
+            dimMax.y,
+            dimMax.z / 2.0f,
         },
         // centertop
         Vector3 {
-            0.0f, 0,
-            dimMax.y, 0,
-            dimMax.z, 0
+            0.0f,
+            dimMax.y,
+            dimMax.z,
         },
         // centerbot / 2
         Vector3 {
-            0.0f, 0,
-            dimMax.y, 0,
-            dimMin.z / 2.0f, 0
+            0.0f,
+            dimMax.y,
+            dimMin.z / 2.0f,
         },
         // centerbot
         Vector3 {
-            0.0f, 0,
-            dimMax.y, 0,
-            dimMin.z, 0
+            0.0f,
+            dimMax.y,
+            dimMin.z,
         },
         // leftcenter / 2
         Vector3 {
-            dimMin.x / 2.0f, 0,
-            dimMax.y, 0,
-            0.0f, 0
+            dimMin.x / 2.0f,
+            dimMax.y,
+            0.0f,
         },
         // leftcenter
         Vector3 {
-            dimMin.x, 0,
-            dimMax.y, 0,
-            0.0f, 0
+            dimMin.x,
+            dimMax.y,
+            0.0f,
         },
         // rightcenter / 2
         Vector3 {
-            dimMax.x / 2.0f, 0,
-            dimMax.y, 0,
-            0.0f, 0
+            dimMax.x / 2.0f,
+            dimMax.y,
+            0.0f,
         },
         // rightcenter
         Vector3 {
-            dimMax.x, 0,
-            dimMax.y, 0,
-            0.0f, 0
+            dimMax.x,
+            dimMax.y,
+            0.0f,
         },
     };
 

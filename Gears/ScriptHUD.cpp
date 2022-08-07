@@ -284,9 +284,9 @@ Vector3 GetAccelVector() {
     Vector3 rightVec = Cross(fwdVec, upVec);
 
     Vector3 relVelDelta{
-        -Dot(worldVelDelta, rightVec), 0,
-        Dot(worldVelDelta, fwdVec), 0,
-        Dot(worldVelDelta, upVec), 0,
+        -Dot(worldVelDelta, rightVec),
+        Dot(worldVelDelta, fwdVec),
+        Dot(worldVelDelta, upVec),
     };
 
     GForce::PrevWorldVel = worldVel;

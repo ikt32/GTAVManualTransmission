@@ -91,9 +91,9 @@ DrivingAssists::ESPData DrivingAssists::GetESP() {
     Vector3 vecNextSpd = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
     Vector3 rotVel = ENTITY::GET_ENTITY_ROTATION_VELOCITY(g_playerVehicle);
     Vector3 rotRelative{
-        speed * -sin(rotVel.z), 0,
-        speed * cos(rotVel.z), 0,
-        0, 0
+        speed * -sin(rotVel.z),
+        speed * cos(rotVel.z),
+        0,
     };
 
     float avgAngle = VExt::GetWheelAverageAngle(g_playerVehicle);
@@ -104,9 +104,9 @@ DrivingAssists::ESPData DrivingAssists::GetESP() {
 
         Vector3 vecNextRot = (vecNextSpd + rotRelative) * 0.5f;
         Vector3 vecPredStr{
-            speed * -sin(avgAngle), 0,
-            speed * cos(avgAngle), 0,
-            0, 0
+            speed * -sin(avgAngle),
+            speed * cos(avgAngle),
+            0,
         };
 
         float div = 0.0f;

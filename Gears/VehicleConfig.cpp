@@ -7,6 +7,7 @@
 #include <fmt/format.h>
 #include <simpleini/SimpleIni.h>
 #include <filesystem>
+#include <cctype>
 
 #define CHECK_LOG_SI_ERROR(result, operation) \
     if (result < 0) { \

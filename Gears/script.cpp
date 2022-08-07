@@ -360,10 +360,10 @@ void update_vehicle() {
         for(auto& valueTimer : g_speedTimers) {
             float speed;
             switch(joaat(valueTimer.mUnit.c_str())) {
-                case (joaat("kph")):
+                case joaat("kph"):
                     speed = Length(g_vehData.mVelocity) * 3.6f;
                     break;
-                case (joaat("mph")):
+                case joaat("mph"):
                     speed = Length(g_vehData.mVelocity) / 0.44704f;
                     break;
                 default:
@@ -1741,14 +1741,14 @@ void functionEngDamage() {
         g_vehData.mRPM > 0.98f &&
         g_controls.ThrottleVal > 0.98f) {
         VEHICLE::SET_VEHICLE_ENGINE_HEALTH(g_playerVehicle, 
-                                           VEHICLE::GET_VEHICLE_ENGINE_HEALTH(g_playerVehicle) - (g_settings().MTParams.RPMDamage));
+                                           VEHICLE::GET_VEHICLE_ENGINE_HEALTH(g_playerVehicle) - g_settings().MTParams.RPMDamage);
     }
 }
 
 void functionEngLock() {
     // Checks enough suspension compression and sensible speeds
     bool use = true;
-    float minSpeed = (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]);
+    float minSpeed = g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr];
 
     for (uint32_t i = 0; i < g_vehData.mWheelCount; ++i) {
         if (g_vehData.mSuspensionTravel[i] == 0.0f &&
@@ -1779,8 +1779,8 @@ void functionEngLock() {
     float DriveMaxFlatVel = g_vehData.mDriveMaxFlatVel;
     float maxSpeed = DriveMaxFlatVel / ratios[g_vehData.mGearCurr];
 
-    float inputMultiplier = (1.0f - g_controls.ClutchVal);
-    auto wheelsSpeed = g_vehData.mDiffSpeed;
+    float inputMultiplier = 1.0f - g_controls.ClutchVal;
+    auto wheelsSpeed      = g_vehData.mDiffSpeed;
 
     bool wrongDirection = false;
     if (VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle)) {
@@ -1847,7 +1847,7 @@ void functionEngBrake() {
 
     // Checks enough suspension compression and sensible speeds
     bool use = true;
-    float minSpeed = (g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr]) * activeBrakeThreshold;
+    float minSpeed = g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr] * activeBrakeThreshold;
 
     for (uint32_t i = 0; i < g_vehData.mWheelCount; ++i) {
         if (g_vehData.mSuspensionTravel[i] == 0.0f &&
