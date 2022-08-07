@@ -569,7 +569,7 @@ void WheelInput::DoSteering() {
                 rotRad = std::clamp(rotRad, -steerClamp / 2.0f, steerClamp / 2.0f);
             }
 
-            Vector3 scale{ 1 };
+            Vector3 scale { 1.0f, 1.0f, 1.0f };
             if (g_settings.Misc.HideWheelInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4) {
                 scale.x = 0.0f;
                 scale.y = 0.0f;

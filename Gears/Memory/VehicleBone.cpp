@@ -26,11 +26,8 @@ void VehicleBones::RotateAxisAbsolute(Vehicle vehicle, int index, Vector3 axis, 
     auto inst = reinterpret_cast<fragInstGta*>(fragInstGtaPtr);
 
     NativeMatrix4x4* matrix = &(inst->CacheEntry->Skeleton->ObjectMatrices[index]);
-
     NativeMatrix4x4 o = originalMatrix->second;
-
-    Vector3 scalar {0.0f};
-
+    Vector3 scalar { 1.0f, 1.0f, 1.0f };
     o = Scaling(scalar) * RotationAxis(axis, radians) * o;
 
     *matrix = o;
@@ -42,10 +39,7 @@ void VehicleBones::RotateAxis(Vehicle vehicle, int index, Vector3 axis, float ra
     auto inst = reinterpret_cast<fragInstGta*>(fragInstGtaPtr);
 
     NativeMatrix4x4* matrix = &(inst->CacheEntry->Skeleton->ObjectMatrices[index]);
-    Vector3 scalar{};
-    scalar.x = 1.0f;
-    scalar.y = 1.0f;
-    scalar.z = 1.0f;
+    Vector3 scalar { 1.0f, 1.0f, 1.0f };
     NativeMatrix4x4 newMatrix = Scaling(scalar) * RotationAxis(axis, radians) * (*matrix);
     *matrix = newMatrix;
 }

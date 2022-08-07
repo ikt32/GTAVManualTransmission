@@ -276,7 +276,7 @@ void CustomSteering::Update() {
         float corrDesiredHeading = -VExt::GetSteeringAngle(g_playerVehicle) * (1.0f / limitRadians);
         float rotRad = deg2rad(g_settings().Steering.CustomSteering.SoftLock) / 2.0f * corrDesiredHeading;
 
-        Vector3 scale { 1.0f };
+        Vector3 scale { 1.0f, 1.0f, 1.0f };
         if (g_settings.Misc.HideWheelInFPV && CAM::GET_FOLLOW_PED_CAM_VIEW_MODE() == 4) {
             scale.x = 0.0f;
             scale.y = 0.0f;
