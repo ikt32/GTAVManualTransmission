@@ -235,6 +235,21 @@ DrivingAssists::LSDData DrivingAssists::GetLSD() {
 std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData) {
     std::vector<float> brakeVals(g_vehData.mWheelCount); // only works for 4 wheels but ok
 
+    if (g_vehData.mWheelCount != 4) {
+        const float bbalF = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasFront);
+        const float bbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasRear);
+        const auto offsets = VExt::GetWheelOffsets(g_playerVehicle);
+        const float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
+        float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
+        for (uint8_t i = 0; i < g_vehData.mWheelCount; i++) {
+            float bbal = offsets[i].y > 0.0f ? bbalF : bbalR;
+
+            brakeVals[i] = inpBrakeForce * bbal;
+        }
+
+        return brakeVals;
+    }
+
     float steerMult = g_settings().Steering.CustomSteering.SteeringMult;
     if (g_controls.PrevInput == CarControls::InputDevices::Wheel)
         steerMult = g_settings().Steering.Wheel.SteeringMult;
@@ -371,6 +386,21 @@ std::vector<float> DrivingAssists::GetABSBrakes(ABSData absData) {
 
 std::vector<float> DrivingAssists::GetLSDBrakes(LSDData lsdData) {
     std::vector<float> brakeVals(g_vehData.mWheelCount); // only works for 4 wheels but ok
+
+    if (g_vehData.mWheelCount != 4) {
+        const float bbalF = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasFront);
+        const float bbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasRear);
+        const auto offsets = VExt::GetWheelOffsets(g_playerVehicle);
+        const float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
+        float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
+        for (uint8_t i = 0; i < g_vehData.mWheelCount; i++) {
+            float bbal = offsets[i].y > 0.0f ? bbalF : bbalR;
+
+            brakeVals[i] = inpBrakeForce * bbal;
+        }
+
+        return brakeVals;
+    }
 
     float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
     float bbalF = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasFront);
