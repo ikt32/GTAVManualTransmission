@@ -796,9 +796,9 @@ std::vector<Vector3> VehicleExtensions::GetWheelBoneVelocity(Vehicle handle) {
     values.reserve(wheels.size());
     for (auto wheelAddr : wheels) {
         values.emplace_back(Vector3{
-            *reinterpret_cast<float*>(wheelAddr + 0xB0), 0,
-            *reinterpret_cast<float*>(wheelAddr + 0xB4), 0,
-            *reinterpret_cast<float*>(wheelAddr + 0xB8), 0,
+            *reinterpret_cast<float*>(wheelAddr + 0xB0),
+            *reinterpret_cast<float*>(wheelAddr + 0xB4),
+            *reinterpret_cast<float*>(wheelAddr + 0xB8),
         });
     }
 
@@ -812,9 +812,9 @@ std::vector<Vector3> VehicleExtensions::GetWheelTractionVector(Vehicle handle) {
     values.reserve(wheels.size());
     for (auto wheelAddr : wheels) {
         values.emplace_back(Vector3{
-            *reinterpret_cast<float*>(wheelAddr + 0xC0), 0,
-            *reinterpret_cast<float*>(wheelAddr + 0xC4), 0,
-            *reinterpret_cast<float*>(wheelAddr + 0xC8), 0,
+            *reinterpret_cast<float*>(wheelAddr + 0xC0),
+            *reinterpret_cast<float*>(wheelAddr + 0xC4),
+            *reinterpret_cast<float*>(wheelAddr + 0xC8),
             });
     }
 
@@ -880,9 +880,9 @@ std::vector<Vector3> VehicleExtensions::GetWheelOffsets(Vehicle handle) {
     positions.reserve(wheels.size());
     for (auto wheelAddr : wheels) {
         positions.emplace_back(Vector3 {
-            *reinterpret_cast<float *>(wheelAddr + offPosX), 0,
-            *reinterpret_cast<float *>(wheelAddr + offPosY), 0,
-            *reinterpret_cast<float *>(wheelAddr + offPosZ), 0,
+            *reinterpret_cast<float *>(wheelAddr + offPosX),
+            *reinterpret_cast<float *>(wheelAddr + offPosY),
+            *reinterpret_cast<float *>(wheelAddr + offPosZ),
         });
     }
     return positions;
@@ -905,9 +905,9 @@ std::vector<Vector3> VehicleExtensions::GetWheelLastContactCoords(Vehicle handle
     positions.reserve(wheels.size());
     for (auto wheelAddr : wheels) {
         positions.emplace_back(Vector3{
-            *reinterpret_cast<float *>(wheelAddr + offPosX), 0,
-            *reinterpret_cast<float *>(wheelAddr + offPosY), 0,
-            *reinterpret_cast<float *>(wheelAddr + offPosZ), 0,
+            *reinterpret_cast<float *>(wheelAddr + offPosX),
+            *reinterpret_cast<float *>(wheelAddr + offPosY),
+            *reinterpret_cast<float *>(wheelAddr + offPosZ),
             });
     }
     return positions;

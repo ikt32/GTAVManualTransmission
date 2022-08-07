@@ -144,7 +144,7 @@ Vector3T GetOffsetInWorldCoords(Vector3T position, Vector3T rotation, Vector3T f
     float x = num1 * cosf(-rotation.z);
     float y = num1 * sinf(rotation.z);
     float z = sinf(-rotation.y);
-    Vector3 right = { x, 0, y, 0, z, 0 };
+    Vector3 right = { x, y, z };
     Vector3 up = Cross(right, forward);
     return position + (right * offset.x) + (forward * offset.y) + (up * offset.z);
 }

@@ -29,11 +29,7 @@ void VehicleBones::RotateAxisAbsolute(Vehicle vehicle, int index, Vector3 axis, 
 
     NativeMatrix4x4 o = originalMatrix->second;
 
-    Vector3 scalar{
-        .x = 1.0f,
-        .y = 1.0f,
-        .z = 1.0f
-    };
+    Vector3 scalar {0.0f};
 
     o = Scaling(scalar) * RotationAxis(axis, radians) * o;
 
