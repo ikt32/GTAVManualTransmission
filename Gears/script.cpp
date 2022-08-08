@@ -2534,12 +2534,9 @@ void startStopEngine() {
     bool keyboardActive = prevKeyboard && pressedKeyboard;
     bool wheelActive = prevWheel && pressedWheel;
 
-    bool throttleStart = false;
-    if (g_settings.GameAssists.ThrottleStart) {
-        bool clutchedIn = isClutchPressed();
-        bool freeGear = clutchedIn || g_gearStates.FakeNeutral;
-        throttleStart = g_controls.ThrottleVal > 0.75f && freeGear;
-    }
+    bool throttleStart = g_settings.GameAssists.ThrottleStart &&
+        g_controls.ThrottleVal > 0.90f &&
+        g_controls.ClutchVal > 1.0f - g_settings().MTParams.ClutchThreshold;
 
     if (!VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle) &&
         (controllerActive || keyboardActive || wheelActive || throttleStart)) {
