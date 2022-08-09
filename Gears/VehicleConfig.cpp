@@ -60,6 +60,24 @@
     LOAD_VAL("CAM", prefix "PitchDownMaxAngle", ##source.PitchDownMaxAngle); \
 }
 
+#define SAVE_VAL_CAMERA(prefix, source) { \
+    SAVE_VAL("CAM", prefix "FOV",               ##source.FOV); \
+    SAVE_VAL("CAM", prefix "OffsetHeight",      ##source.OffsetHeight); \
+    SAVE_VAL("CAM", prefix "OffsetForward",     ##source.OffsetForward); \
+    SAVE_VAL("CAM", prefix "OffsetSide",        ##source.OffsetSide); \
+    SAVE_VAL("CAM", prefix "Pitch",             ##source.Pitch); \
+    SAVE_VAL("CAM", prefix "LockHorizon",       ##source.LockHorizon); \
+}
+
+#define LOAD_VAL_CAMERA(prefix, source) { \
+    LOAD_VAL("CAM", prefix "FOV",               ##source.FOV); \
+    LOAD_VAL("CAM", prefix "OffsetHeight",      ##source.OffsetHeight); \
+    LOAD_VAL("CAM", prefix "OffsetForward",     ##source.OffsetForward); \
+    LOAD_VAL("CAM", prefix "OffsetSide",        ##source.OffsetSide); \
+    LOAD_VAL("CAM", prefix "Pitch",             ##source.Pitch); \
+    LOAD_VAL("CAM", prefix "LockHorizon",       ##source.LockHorizon); \
+}
+
 extern ScriptSettings g_settings;
 
 EShiftMode Next(EShiftMode mode) {
@@ -237,38 +255,18 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("CAM", "MouseCenterTimeout", Misc.Camera.MouseCenterTimeout);
     LOAD_VAL("CAM", "MouseSensitivity", Misc.Camera.MouseSensitivity);
 
-    LOAD_VAL("CAM", "PedFOV", Misc.Camera.Ped.FOV);
-    LOAD_VAL("CAM", "PedOffsetHeight", Misc.Camera.Ped.OffsetHeight);
-    LOAD_VAL("CAM", "PedOffsetForward", Misc.Camera.Ped.OffsetForward);
-    LOAD_VAL("CAM", "PedOffsetSide", Misc.Camera.Ped.OffsetSide);
-    LOAD_VAL("CAM", "PedPitch", Misc.Camera.Ped.Pitch);
-
+    LOAD_VAL_CAMERA("Ped", Misc.Camera.Ped);
     LOAD_VAL_MOVEMENT("Ped", Misc.Camera.Ped.Movement);
 
-    LOAD_VAL("CAM", "Vehicle1FOV", Misc.Camera.Vehicle1.FOV);
-    LOAD_VAL("CAM", "Vehicle1OffsetHeight", Misc.Camera.Vehicle1.OffsetHeight);
-    LOAD_VAL("CAM", "Vehicle1OffsetForward", Misc.Camera.Vehicle1.OffsetForward);
-    LOAD_VAL("CAM", "Vehicle1OffsetSide", Misc.Camera.Vehicle1.OffsetSide);
-    LOAD_VAL("CAM", "Vehicle1Pitch", Misc.Camera.Vehicle1.Pitch);
-
+    LOAD_VAL_CAMERA("Vehicle1", Misc.Camera.Vehicle1);
     LOAD_VAL_MOVEMENT("Vehicle1", Misc.Camera.Vehicle1.Movement);
 
-    LOAD_VAL("CAM", "Vehicle2FOV", Misc.Camera.Vehicle2.FOV);
-    LOAD_VAL("CAM", "Vehicle2OffsetHeight", Misc.Camera.Vehicle2.OffsetHeight);
-    LOAD_VAL("CAM", "Vehicle2OffsetForward", Misc.Camera.Vehicle2.OffsetForward);
-    LOAD_VAL("CAM", "Vehicle2OffsetSide", Misc.Camera.Vehicle2.OffsetSide);
-    LOAD_VAL("CAM", "Vehicle2Pitch", Misc.Camera.Vehicle2.Pitch);
-
+    LOAD_VAL_CAMERA("Vehicle2", Misc.Camera.Vehicle2);
     LOAD_VAL_MOVEMENT("Vehicle2", Misc.Camera.Vehicle2.Movement);
 
     LOAD_VAL("CAM", "BikeDisable", Misc.Camera.Bike.Disable);
     LOAD_VAL("CAM", "BikeAttachId", Misc.Camera.Bike.AttachId);
-    LOAD_VAL("CAM", "BikeFOV", Misc.Camera.Bike.FOV);
-    LOAD_VAL("CAM", "BikeOffsetHeight", Misc.Camera.Bike.OffsetHeight);
-    LOAD_VAL("CAM", "BikeOffsetForward", Misc.Camera.Bike.OffsetForward);
-    LOAD_VAL("CAM", "BikeOffsetSide", Misc.Camera.Bike.OffsetSide);
-    LOAD_VAL("CAM", "BikePitch", Misc.Camera.Bike.Pitch);
-
+    LOAD_VAL_CAMERA("Bike", Misc.Camera.Bike);
     LOAD_VAL_MOVEMENT("Bike", Misc.Camera.Bike.Movement);
 }
 
@@ -431,38 +429,18 @@ void VehicleConfig::saveGeneral() {
     SAVE_VAL("CAM", "MouseCenterTimeout", Misc.Camera.MouseCenterTimeout);
     SAVE_VAL("CAM", "MouseSensitivity", Misc.Camera.MouseSensitivity);
 
-    SAVE_VAL("CAM", "PedFOV", Misc.Camera.Ped.FOV);
-    SAVE_VAL("CAM", "PedOffsetHeight", Misc.Camera.Ped.OffsetHeight);
-    SAVE_VAL("CAM", "PedOffsetForward", Misc.Camera.Ped.OffsetForward);
-    SAVE_VAL("CAM", "PedOffsetSide", Misc.Camera.Ped.OffsetSide);
-    SAVE_VAL("CAM", "PedPitch", Misc.Camera.Ped.Pitch);
-
+    SAVE_VAL_CAMERA("Ped", Misc.Camera.Ped);
     SAVE_VAL_MOVEMENT("Ped", Misc.Camera.Ped.Movement);
 
-    SAVE_VAL("CAM", "Vehicle1FOV", Misc.Camera.Vehicle1.FOV);
-    SAVE_VAL("CAM", "Vehicle1OffsetHeight", Misc.Camera.Vehicle1.OffsetHeight);
-    SAVE_VAL("CAM", "Vehicle1OffsetForward", Misc.Camera.Vehicle1.OffsetForward);
-    SAVE_VAL("CAM", "Vehicle1OffsetSide", Misc.Camera.Vehicle1.OffsetSide);
-    SAVE_VAL("CAM", "Vehicle1Pitch", Misc.Camera.Vehicle1.Pitch);
-
+    SAVE_VAL_CAMERA("Vehicle1", Misc.Camera.Vehicle1);
     SAVE_VAL_MOVEMENT("Vehicle1", Misc.Camera.Vehicle1.Movement);
 
-    SAVE_VAL("CAM", "Vehicle2FOV", Misc.Camera.Vehicle2.FOV);
-    SAVE_VAL("CAM", "Vehicle2OffsetHeight", Misc.Camera.Vehicle2.OffsetHeight);
-    SAVE_VAL("CAM", "Vehicle2OffsetForward", Misc.Camera.Vehicle2.OffsetForward);
-    SAVE_VAL("CAM", "Vehicle2OffsetSide", Misc.Camera.Vehicle2.OffsetSide);
-    SAVE_VAL("CAM", "Vehicle2Pitch", Misc.Camera.Vehicle2.Pitch);
-
+    SAVE_VAL_CAMERA("Vehicle2", Misc.Camera.Vehicle2);
     SAVE_VAL_MOVEMENT("Vehicle2", Misc.Camera.Vehicle2.Movement);
 
     SAVE_VAL("CAM", "BikeDisable", Misc.Camera.Bike.Disable);
     SAVE_VAL("CAM", "BikeAttachId", Misc.Camera.Bike.AttachId);
-    SAVE_VAL("CAM", "BikeFOV", Misc.Camera.Bike.FOV);
-    SAVE_VAL("CAM", "BikeOffsetHeight", Misc.Camera.Bike.OffsetHeight);
-    SAVE_VAL("CAM", "BikeOffsetForward", Misc.Camera.Bike.OffsetForward);
-    SAVE_VAL("CAM", "BikeOffsetSide", Misc.Camera.Bike.OffsetSide);
-    SAVE_VAL("CAM", "BikePitch", Misc.Camera.Bike.Pitch);
-
+    SAVE_VAL_CAMERA("Bike", Misc.Camera.Bike);
     SAVE_VAL_MOVEMENT("Bike", Misc.Camera.Bike.Movement);
 
     result = ini.SaveFile(mFile.c_str());

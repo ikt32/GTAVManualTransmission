@@ -2029,6 +2029,7 @@ void update_cameraoptionsmenu() {
     Tracked<float>* pOffsetForward = &g_settings().Misc.Camera.Ped.OffsetForward;
     Tracked<float>* pOffsetSide =    &g_settings().Misc.Camera.Ped.OffsetSide;
     Tracked<float>* pPitch =         &g_settings().Misc.Camera.Ped.Pitch;
+    Tracked<bool>* pLockHorizon =    &g_settings().Misc.Camera.Ped.LockHorizon;
 
     switch (g_settings().Misc.Camera.AttachId) {
         case 0: {
@@ -2037,6 +2038,7 @@ void update_cameraoptionsmenu() {
             pOffsetForward = &g_settings().Misc.Camera.Ped.OffsetForward;
             pOffsetSide =    &g_settings().Misc.Camera.Ped.OffsetSide;
             pPitch =         &g_settings().Misc.Camera.Ped.Pitch;
+            pLockHorizon =   &g_settings().Misc.Camera.Ped.LockHorizon;
             break;
         }
         case 1: {
@@ -2045,6 +2047,7 @@ void update_cameraoptionsmenu() {
             pOffsetForward = &g_settings().Misc.Camera.Vehicle1.OffsetForward;
             pOffsetSide =    &g_settings().Misc.Camera.Vehicle1.OffsetSide;
             pPitch =         &g_settings().Misc.Camera.Vehicle1.Pitch;
+            pLockHorizon =   &g_settings().Misc.Camera.Vehicle1.LockHorizon;
             break;
         }
         case 2: {
@@ -2053,6 +2056,7 @@ void update_cameraoptionsmenu() {
             pOffsetForward = &g_settings().Misc.Camera.Vehicle2.OffsetForward;
             pOffsetSide =    &g_settings().Misc.Camera.Vehicle2.OffsetSide;
             pPitch =         &g_settings().Misc.Camera.Vehicle2.Pitch;
+            pLockHorizon =   &g_settings().Misc.Camera.Vehicle2.LockHorizon;
             break;
         }
         default: {
@@ -2074,18 +2078,21 @@ void update_cameraoptionsmenu() {
     g_menu.FloatOptionCb("Offset side", *pOffsetSide, -2.0f, 2.0f, 0.01f, GetKbEntryFloat,
         { "Distance in meters." });
 
-    g_menu.FloatOption("Pitch", *pPitch, -20.0f, 20.0f, 0.1f,
+    g_menu.FloatOptionCb("Pitch", *pPitch, -20.0f, 20.0f, 0.1f, GetKbEntryFloat,
         { "In degrees." });
+
+    g_menu.BoolOption("Lock to horizon", *pLockHorizon,
+        { "Lock camera to horizon." });
 
     g_menu.FloatOptionCb("Controller smoothing", g_settings().Misc.Camera.LookTime, 0.0f, 0.5f, 0.000001f, GetKbEntryFloat,
         { "How smooth the camera moves.", "Press enter to enter a value manually. Range: 0.0 to 0.5." });
 
-    g_menu.FloatOption("Mouse sensitivity", g_settings().Misc.Camera.MouseSensitivity, 0.05f, 2.0f, 0.05f);
+    g_menu.FloatOptionCb("Mouse sensitivity", g_settings().Misc.Camera.MouseSensitivity, 0.05f, 2.0f, 0.05f, GetKbEntryFloat);
 
     g_menu.FloatOptionCb("Mouse smoothing", g_settings().Misc.Camera.MouseLookTime, 0.0f, 0.5f, 0.000001f, GetKbEntryFloat,
         { "How smooth the camera moves.", "Press enter to enter a value manually. Range: 0.0 to 0.5." });
 
-    g_menu.IntOption("Mouse center timeout", g_settings().Misc.Camera.MouseCenterTimeout, 0, 120000, 500,
+    g_menu.IntOptionCb("Mouse center timeout", g_settings().Misc.Camera.MouseCenterTimeout, 0, 120000, 500, GetKbEntryInt,
         { "Milliseconds before centering the camera after looking with the mouse." });
 }
 

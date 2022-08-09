@@ -66,6 +66,29 @@ public:
         Tracked<float> PitchDownMaxAngle = 30.0f;
     };
 
+    struct SCameraSettings {
+        Tracked<float> FOV = 55.0f;
+        Tracked<float> OffsetHeight = 0.04f;
+        Tracked<float> OffsetForward = 0.05f;
+        Tracked<float> OffsetSide = 0.0f;
+        Tracked<float> Pitch = 0.0f;
+        Tracked<bool> LockHorizon = false;
+        SMovement Movement;
+    };
+
+    struct SCameraSettingsBike : SCameraSettings {
+        SCameraSettingsBike() :
+            SCameraSettings { 
+                .FOV = 55.0f,
+                .OffsetHeight = -0.05f,
+                .OffsetForward = -0.08f,
+                .OffsetSide = 0.0f,
+                .Pitch = -11.0f
+            } {}
+        Tracked<bool> Disable = false;
+        Tracked<int> AttachId = 0; // 0: Head, 1: Vehicle, 2: FPV Offset?
+    };
+
     // [MT_OPTIONS]
     struct {
         Tracked<EShiftMode> ShiftMode = EShiftMode::Sequential;
@@ -255,40 +278,10 @@ public:
             Tracked<int> MouseCenterTimeout = 750;
             Tracked<float> MouseSensitivity = 0.3f;
 
-            struct {
-                Tracked<float> FOV = 55.0f;
-                Tracked<float> OffsetHeight = 0.04f;
-                Tracked<float> OffsetForward = 0.05f;
-                Tracked<float> OffsetSide = 0.0f;
-                Tracked<float> Pitch = 0.0f;
-                SMovement Movement;
-            } Ped;
-            struct {
-                Tracked<float> FOV = 55.0f;
-                Tracked<float> OffsetHeight = 0.00f;
-                Tracked<float> OffsetForward = 0.00f;
-                Tracked<float> OffsetSide = 0.0f;
-                Tracked<float> Pitch = 0.0f;
-                SMovement Movement;
-            } Vehicle1;
-            struct {
-                Tracked<float> FOV = 55.0f;
-                Tracked<float> OffsetHeight = 0.00f;
-                Tracked<float> OffsetForward = 0.00f;
-                Tracked<float> OffsetSide = 0.0f;
-                Tracked<float> Pitch = 0.0f;
-                SMovement Movement;
-            } Vehicle2;
-            struct {
-                Tracked<bool> Disable = false;
-                Tracked<int> AttachId = 0; // 0: Head, 1: Vehicle, 2: FPV Offset?
-                Tracked<float> FOV = 55.0f;
-                Tracked<float> OffsetHeight = -0.05f;
-                Tracked<float> OffsetForward = -0.08f;
-                Tracked<float> OffsetSide = 0.0f;
-                Tracked<float> Pitch = -11.0f;
-                SMovement Movement;
-            } Bike;
+            SCameraSettings Ped;
+            SCameraSettings Vehicle1;
+            SCameraSettings Vehicle2;
+            SCameraSettingsBike Bike;
         } Camera;
     } Misc;
 

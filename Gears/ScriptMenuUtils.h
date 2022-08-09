@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+bool GetKbEntryInt(int& val);
 bool GetKbEntryFloat(float& val);
 std::string GetKbEntryStr(const std::string& existingString);
 

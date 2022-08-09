@@ -243,6 +243,8 @@ void FPVCam::Update() {
     auto attachId = g_settings().Misc.Camera.AttachId;
     float pitch;
     float fov;
+    float horizonLockPitch;
+    float horizonLockRoll;
     Vector3 additionalOffset{};
 
     if (bikeSeat) {
@@ -329,10 +331,26 @@ void FPVCam::Update() {
     float rollLookComp = -rot.y * 2.0f * abs(camRot.z) / 180.0f;
     float rollPitchComp = sin(deg2rad(camRot.z)) * rot.y;
 
+    if (attachId == 2 && g_settings().Misc.Camera.Vehicle2.LockHorizon ||
+        attachId == 1 && g_settings().Misc.Camera.Vehicle1.LockHorizon ||
+        attachId == 0 && g_settings().Misc.Camera.Bike.LockHorizon) {
+        pitchLookComp = 0;
+        rollPitchComp = 0;
+        auto vehPitch = ENTITY::GET_ENTITY_PITCH(g_playerVehicle);
+        auto vehRoll = ENTITY::GET_ENTITY_ROLL(g_playerVehicle);
+        
+        horizonLockPitch = abs(camRot.z) <= 90.0f ?
+            map(abs(camRot.z), 0.0f, 90.0f, vehPitch, 0.0f) :
+            map(abs(camRot.z), 90.0f, 180.0f, 0.0f, vehPitch);
+        horizonLockRoll = abs(camRot.z) <= 90.0f ?
+            map(abs(camRot.z), 0.0f, 90.0f, vehRoll, 0.0f) :
+            map(abs(camRot.z), 90.0f, 180.0f, 0.0f, vehRoll);
+    }
+
     CAM::SET_CAM_ROT(
         cameraHandle,
-        rot.x + camRot.x + pitch + pitchLookComp + rollPitchComp + accelPitchDeg,
-        rot.y + rollLookComp,
+        rot.x + camRot.x + pitch + pitchLookComp + rollPitchComp + accelPitchDeg - horizonLockPitch,
+        rot.y + rollLookComp + horizonLockRoll,
         rot.z + camRot.z - directionLookAngle,
         0);
 
