@@ -20,7 +20,6 @@
 #include <atomic>
 
 namespace fs = std::filesystem;
-extern std::atomic<bool> g_cancelThread;
 
 void resolveVersion() {
     int shvVersion = getGameVersion();

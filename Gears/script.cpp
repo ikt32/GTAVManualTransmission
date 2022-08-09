@@ -158,6 +158,8 @@ void functionAutoGear1();
 void functionHillGravity();
 void functionAudioFX();
 
+void UpdatePause();
+
 void functionDash() {
     if (!g_settings.Misc.DashExtensions)
         return;
@@ -2953,33 +2955,24 @@ void ScriptTick() {
         SteeringAnimation::Update();
         StartingAnimation::Update();
         FPVCam::Update();
+        UpdatePause();
         WAIT(0);
     }
 }
 
 bool initialized = false;
 
-void CheckPause() {
-    bool lastPauseState = false;
-    
-    while (true) {
-        bool pauseState = CTimer::m_UserPause || CTimer::m_CodePause;
-        if (lastPauseState != pauseState) {
-            logger.Write(DEBUG, "[Pause] State changed. Was %d, is %d", lastPauseState, pauseState);
-            logger.Write(DEBUG, "    User: %d, Code: %d", CTimer::m_UserPause, CTimer::m_CodePause);
+uint64_t lastPauseTrigger = 0;
+void UpdatePause() {
+    if (PAD::IS_CONTROL_PRESSED(0, eControl::ControlFrontendPause) ||
+        PAD::IS_CONTROL_PRESSED(0, eControl::ControlFrontendPauseAlternate)) {
+        lastPauseTrigger = GetTickCount64();
+    }
 
-            if (pauseState) {
-                g_controls.PlayFFBCollision(0);
-                g_controls.PlayFFBDynamics(0, 0);
-            }
-            else {
-
-            }
-
-            lastPauseState = pauseState;
-        }
-
-        Sleep(50);
+    // Probably unpaused
+    if (lastPauseTrigger + 750 > GetTickCount64()) {
+        g_controls.PlayFFBCollision(0);
+        g_controls.PlayFFBDynamics(0, 0);
     }
 }
 
@@ -2993,10 +2986,6 @@ void ScriptMain() {
         logger.Write(INFO, "Script restarted");
     }
     InitTextures();
-
-    std::thread([]() {
-        CheckPause();
-    }).detach();
 
     ScriptTick();
 }
