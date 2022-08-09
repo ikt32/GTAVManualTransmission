@@ -241,10 +241,6 @@ void FPVCam::Update() {
     CAM::SET_CAM_FAR_CLIP(cameraHandle, 12500.0f);
 
     auto attachId = g_settings().Misc.Camera.AttachId;
-    float pitch;
-    float fov;
-    float horizonLockPitch;
-    float horizonLockRoll;
     Vector3 additionalOffset{};
 
     if (bikeSeat) {
@@ -288,6 +284,10 @@ void FPVCam::Update() {
         camSeatOffset = camSeatOffset + offHead;
     }
 
+    float pitch;
+    float fov;
+    float horizonLockPitch = 0.0f;
+    float horizonLockRoll = 0.0f;
     switch(attachId) {
         case 2: {
             fov = g_settings().Misc.Camera.Vehicle2.FOV;
@@ -333,7 +333,8 @@ void FPVCam::Update() {
 
     if (attachId == 2 && g_settings().Misc.Camera.Vehicle2.LockHorizon ||
         attachId == 1 && g_settings().Misc.Camera.Vehicle1.LockHorizon ||
-        attachId == 0 && g_settings().Misc.Camera.Bike.LockHorizon) {
+        attachId == 0 && g_settings().Misc.Camera.Ped.LockHorizon ||
+        bikeSeat && g_settings().Misc.Camera.Bike.LockHorizon) {
         pitchLookComp = 0;
         rollPitchComp = 0;
         auto vehPitch = ENTITY::GET_ENTITY_PITCH(g_playerVehicle);

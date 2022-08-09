@@ -2215,6 +2215,9 @@ void update_bikecameraoptionsmenu() {
     g_menu.FloatOption("Pitch", g_settings().Misc.Camera.Bike.Pitch, -20.0f, 20.0f, 0.1f,
         { "In degrees." });
 
+    g_menu.BoolOption("Lock to horizon", g_settings().Misc.Camera.Ped.LockHorizon,
+        { "Lock camera to horizon." });
+
     g_menu.MenuOption("Camera movement options", "bikecameramovementoptionsmenu",
         { "Enable and tweak the movement of the first person camera.",
           "Movement options applies to all bike attach options. (Not unique per attach option)" });
