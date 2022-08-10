@@ -24,7 +24,6 @@
 #include "UDPTelemetry/Socket.h"
 #include "UDPTelemetry/UDPTelemetry.h"
 
-#include "Memory/CTimer.h"
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/Offsets.hpp"
 #include "Memory/VehicleFlags.h"
