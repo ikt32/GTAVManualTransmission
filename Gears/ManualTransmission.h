@@ -72,6 +72,14 @@ MT_API float        MT_GetAutoEcoRate();
  */
 MT_API void         MT_SetAutoEcoRate(float rate);
 
+/**
+ * \brief           Enables or disables the custom steering animation.
+ *                  When disabled, stays so until function is called again
+ *                  with enable = true.
+ * \param [in] enable True to (re-)enable animation, false to disable animation.
+ */
+MT_API void         MT_ToggleSteeringAnimation(bool enable);
+
 /*
  * AI shifting override
  */

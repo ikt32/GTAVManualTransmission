@@ -48,6 +48,7 @@ namespace {
     size_t steeringAnimIdx = 0;
     float setAngle = 0.0f;
     bool fileProblem = false;
+    bool skipThisFrame = false;
 }
 
 namespace YAML {
@@ -73,6 +74,10 @@ void SteeringAnimation::SetFile(const std::string& cs) {
 
 bool SteeringAnimation::FileProblem() {
     return fileProblem;
+}
+
+void SteeringAnimation::Toggle(bool enable) {
+    skipThisFrame = !enable;
 }
 
 void SteeringAnimation::CancelAnimation() {
@@ -122,6 +127,7 @@ void SteeringAnimation::Update() {
         StartingAnimation::Playing() ||
         PED::IS_PED_RUNNING_MOBILE_PHONE_TASK(g_playerPed) ||
         TASK::GET_IS_TASK_ACTIVE(g_playerPed, eTaskTypeIndex::CTaskCloseVehicleDoorFromInside) ||
+        skipThisFrame ||
         steeringAnimIdx >= steeringAnimations.size()) {
         cancelAnim(lastAnimation);
         return;

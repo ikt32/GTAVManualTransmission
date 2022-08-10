@@ -21,6 +21,8 @@ namespace SteeringAnimation {
     void SetFile(const std::string& cs);
     bool FileProblem();
 
+    void Toggle(bool enable);
+
     // Only call on detach
     void CancelAnimation();
 }

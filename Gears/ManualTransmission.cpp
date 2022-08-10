@@ -4,6 +4,7 @@
 #include "Constants.h"
 #include "ScriptSettings.hpp"
 #include "VehicleData.hpp"
+#include "SteeringAnim.h"
 #include "Memory/MemoryPatcher.hpp"
 #include "Input/CarControls.hpp"
 #include "Util/MathExt.h"
@@ -76,6 +77,10 @@ float MT_GetAutoEcoRate() {
 
 void MT_SetAutoEcoRate(float rate) {
     g_settings().AutoParams.EcoRate = rate;
+}
+
+void MT_ToggleSteeringAnimation(bool enable) {
+    SteeringAnimation::Toggle(enable);
 }
 
 void MT_AddIgnoreVehicle(int vehicle) {
