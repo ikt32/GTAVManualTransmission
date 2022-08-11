@@ -2394,6 +2394,16 @@ void update_metricsmenu() {
         g_settings.Read(&g_controls);
         initTimers();
     }
+
+    if (g_settings.Debug.Metrics.EnableTimers) {
+        for (const auto& timerParams : g_settings.Debug.Metrics.Timers) {
+            g_menu.Option(fmt::format("Timer {}-{} {} (+/- {})",
+                timerParams.LimA,
+                timerParams.LimB,
+                timerParams.Unit,
+                timerParams.Tolerance));
+        }
+    }
 }
 
 void update_compatmenu() {
