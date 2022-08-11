@@ -2174,18 +2174,18 @@ void update_cameramovementoptionsmenu(bool bike) {
         { "How hard the car should accelerate or decelerate for the camera to start moving.",
           "Unit in Gs." });
 
-    g_menu.FloatOptionCb("Pitch: Up scale", movement.PitchUpMult, 0.0f, 90.0f, 1.0f, GetKbEntryFloat,
+    g_menu.FloatOptionCb("Pitch: Up scale", movement.PitchUpMult, 0.0f, 90.0f, 0.5f, GetKbEntryFloat,
         { "How much to move the camera with, depending on how hard you acceleration.",
           "A scale of 15.0 makes the camera pitch up 15 degrees at 1G acceleration." });
 
-    g_menu.FloatOptionCb("Pitch: Down scale", movement.PitchDownMult, 0.0f, 90.0f, 1.0f, GetKbEntryFloat,
+    g_menu.FloatOptionCb("Pitch: Down scale", movement.PitchDownMult, 0.0f, 90.0f, 0.5f, GetKbEntryFloat,
         { "How much to move the camera with, depending on how hard you deceleration.",
           "A scale of 15.0 makes the camera pitch down 15 degrees at 1G deceleration." });
 
-    g_menu.FloatOptionCb("Pitch: Up limit", movement.PitchUpMaxAngle, 0.0f, 90.0f, 1.0f, GetKbEntryFloat,
+    g_menu.FloatOptionCb("Pitch: Up limit", movement.PitchUpMaxAngle, 0.0f, 90.0f, 0.5f, GetKbEntryFloat,
         { "Degrees the camera can pitch up (under acceleration)." });
 
-    g_menu.FloatOptionCb("Pitch: Down limit", movement.PitchDownMaxAngle, 0.0f, 90.0f, 1.0f, GetKbEntryFloat,
+    g_menu.FloatOptionCb("Pitch: Down limit", movement.PitchDownMaxAngle, 0.0f, 90.0f, 0.5f, GetKbEntryFloat,
         { "Degrees the camera can pitch down (under deceleration)." });
 }
 
