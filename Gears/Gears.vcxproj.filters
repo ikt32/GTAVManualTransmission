@@ -24,20 +24,20 @@
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="..\thirdparty\GTAVMenuBase\menu.cpp">
-      <Filter>Menu</Filter>
+      <Filter>Thirdparty\Menu</Filter>
     </ClCompile>
     <ClCompile Include="..\thirdparty\GTAVMenuBase\menucontrols.cpp">
-      <Filter>Menu</Filter>
+      <Filter>Thirdparty\Menu</Filter>
     </ClCompile>
     <ClCompile Include="..\thirdparty\GTAVMenuBase\menukeyboard.cpp">
-      <Filter>Menu</Filter>
+      <Filter>Thirdparty\Menu</Filter>
     </ClCompile>
     <ClCompile Include="ScriptMenu.cpp" />
     <ClCompile Include="..\thirdparty\GTAVMenuBase\menuutils.cpp">
-      <Filter>Menu</Filter>
+      <Filter>Thirdparty\Menu</Filter>
     </ClCompile>
     <ClCompile Include="..\thirdparty\GTAVMenuBase\menusettings.cpp">
-      <Filter>Menu</Filter>
+      <Filter>Thirdparty\Menu</Filter>
     </ClCompile>
     <ClCompile Include="Util\Paths.cpp">
       <Filter>Util</Filter>
@@ -75,7 +75,7 @@
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="..\thirdparty\GTAVMenuBase\menumemutils.cpp">
-      <Filter>Menu</Filter>
+      <Filter>Thirdparty\Menu</Filter>
     </ClCompile>
     <ClCompile Include="VehicleConfig.cpp" />
     <ClCompile Include="Input\USBNotify.cpp">
@@ -260,16 +260,16 @@
   <ItemGroup>
     <ClInclude Include="script.h" />
     <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\main.h">
-      <Filter>include</Filter>
+      <Filter>Thirdparty\ScriptHookV</Filter>
     </ClInclude>
     <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\enums.h">
-      <Filter>include</Filter>
+      <Filter>Thirdparty\ScriptHookV</Filter>
     </ClInclude>
     <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\natives.h">
-      <Filter>include</Filter>
+      <Filter>Thirdparty\ScriptHookV</Filter>
     </ClInclude>
     <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\types.h">
-      <Filter>include</Filter>
+      <Filter>Thirdparty\ScriptHookV</Filter>
     </ClInclude>
     <ClInclude Include="ScriptSettings.hpp" />
     <ClInclude Include="VehicleData.hpp" />
@@ -292,22 +292,22 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menu.h">
-      <Filter>Menu</Filter>
+      <Filter>Thirdparty\Menu</Filter>
     </ClInclude>
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menucontrols.h">
-      <Filter>Menu</Filter>
+      <Filter>Thirdparty\Menu</Filter>
     </ClInclude>
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menukeyboard.h">
-      <Filter>Menu</Filter>
+      <Filter>Thirdparty\Menu</Filter>
     </ClInclude>
     <ClInclude Include="..\thirdparty\simpleini\SimpleIni.h">
       <Filter>Thirdparty</Filter>
     </ClInclude>
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menuutils.h">
-      <Filter>Menu</Filter>
+      <Filter>Thirdparty\Menu</Filter>
     </ClInclude>
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menusettings.h">
-      <Filter>Menu</Filter>
+      <Filter>Thirdparty\Menu</Filter>
     </ClInclude>
     <ClInclude Include="Memory\Offsets.hpp">
       <Filter>Memory</Filter>
@@ -392,7 +392,7 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menumemutils.hpp">
-      <Filter>Menu</Filter>
+      <Filter>Thirdparty\Menu</Filter>
     </ClInclude>
     <ClInclude Include="VehicleConfig.h" />
     <ClInclude Include="Input\USBNotify.h">
@@ -414,7 +414,7 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\thirdparty\GTAVDashHook\DashHook\DashHook.h">
-      <Filter>Lib\External Headers</Filter>
+      <Filter>Thirdparty\ExtScriptDependencies</Filter>
     </ClInclude>
     <ClInclude Include="UDPTelemetry\TelemetryPacket.h">
       <Filter>Features\UDP Telemetry</Filter>
@@ -560,7 +560,7 @@
     </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="..\thirdparty\GTAVCustomTorqueMap\GTAVCustomTorqueMap\CustomTorqueMap.hpp">
-      <Filter>Lib\External Headers</Filter>
+      <Filter>Thirdparty\ExtScriptDependencies</Filter>
     </ClInclude>
     <ClInclude Include="Input\DirectInputError.h">
       <Filter>Input</Filter>
@@ -574,9 +574,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="include">
-      <UniqueIdentifier>{01012e73-37b7-4874-b66a-9390e9a83264}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Memory">
       <UniqueIdentifier>{09af856a-dd6f-4abb-aa1d-57e413924122}</UniqueIdentifier>
     </Filter>
@@ -585,9 +582,6 @@
     </Filter>
     <Filter Include="Input">
       <UniqueIdentifier>{b0a5ce99-5818-4a5c-8c45-00ae3b8148c4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Menu">
-      <UniqueIdentifier>{d318979d-d544-4b16-9e26-6bec9234be3e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Thirdparty">
       <UniqueIdentifier>{d0a967a3-e709-4563-beec-8bb1bc9d1711}</UniqueIdentifier>
@@ -622,14 +616,20 @@
     <Filter Include="API">
       <UniqueIdentifier>{4f7ab765-680d-4dea-97a5-76c12b1f5444}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Lib\External Headers">
-      <UniqueIdentifier>{3bca7d29-ffa2-4bd2-9d7c-d6a61e15c7d9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Features\UDP Telemetry">
       <UniqueIdentifier>{84c60810-1f1b-46a9-a810-08f9629ad9a6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Features\Assists">
       <UniqueIdentifier>{5e2df4c6-f8bf-478a-acb8-d56a2a71eb54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thirdparty\Menu">
+      <UniqueIdentifier>{d318979d-d544-4b16-9e26-6bec9234be3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thirdparty\ScriptHookV">
+      <UniqueIdentifier>{01012e73-37b7-4874-b66a-9390e9a83264}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thirdparty\ExtScriptDependencies">
+      <UniqueIdentifier>{3bca7d29-ffa2-4bd2-9d7c-d6a61e15c7d9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
