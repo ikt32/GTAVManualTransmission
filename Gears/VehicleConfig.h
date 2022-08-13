@@ -298,10 +298,8 @@ public:
         } Camera;
     } Misc;
 
-public:
+private:
     void saveGeneral();
-
-    void saveValMovement(const std::string& prefix, const VehicleConfig::SMovement& movement);
 
     std::string mFile;
 
