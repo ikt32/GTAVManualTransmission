@@ -16,6 +16,8 @@
 #include <inc/natives.h>
 #include <fmt/format.h>
 
+#include "Util/UIUtils.h"
+
 using VExt = VehicleExtensions;
 
 extern Vehicle g_playerVehicle;
@@ -56,6 +58,8 @@ namespace {
     // forward camera movement
     float accelMoveFwd = 0.0f;
     float accelPitchDeg = 0.0f;
+
+    float lowpassPitch = 0.0f;
 }
 
 namespace FPVCam {
@@ -331,21 +335,76 @@ void FPVCam::Update() {
     float rollLookComp = -rot.y * 2.0f * abs(camRot.z) / 180.0f;
     float rollPitchComp = sin(deg2rad(camRot.z)) * rot.y;
 
-    if (attachId == 2 && g_settings().Misc.Camera.Vehicle2.LockHorizon ||
-        attachId == 1 && g_settings().Misc.Camera.Vehicle1.LockHorizon ||
-        attachId == 0 && g_settings().Misc.Camera.Ped.LockHorizon ||
-        bikeSeat && g_settings().Misc.Camera.Bike.LockHorizon) {
+    bool horLock = false;
+    int horPitchMode;
+    float horCenterSpeed;
+    float horPitchLim;
+    float horRollLim;
+
+    if (attachId == 2 && g_settings().Misc.Camera.Vehicle2.HorizonLock.Lock) {
+        horLock = true;
+        horPitchMode = g_settings().Misc.Camera.Vehicle2.HorizonLock.PitchMode;
+        horCenterSpeed = g_settings().Misc.Camera.Vehicle2.HorizonLock.CenterSpeed;
+        horPitchLim = g_settings().Misc.Camera.Vehicle2.HorizonLock.PitchLim;
+        horRollLim = g_settings().Misc.Camera.Vehicle2.HorizonLock.RollLim;
+    }
+    else if (attachId == 1 && g_settings().Misc.Camera.Vehicle1.HorizonLock.Lock) {
+        horLock = true;
+        horPitchMode = g_settings().Misc.Camera.Vehicle1.HorizonLock.PitchMode;
+        horCenterSpeed = g_settings().Misc.Camera.Vehicle1.HorizonLock.CenterSpeed;
+        horPitchLim = g_settings().Misc.Camera.Vehicle1.HorizonLock.PitchLim;
+        horRollLim = g_settings().Misc.Camera.Vehicle1.HorizonLock.RollLim;
+    }
+    else if (attachId == 0 && g_settings().Misc.Camera.Ped.HorizonLock.Lock) {
+        horLock = true;
+        horPitchMode = g_settings().Misc.Camera.Ped.HorizonLock.PitchMode;
+        horCenterSpeed = g_settings().Misc.Camera.Ped.HorizonLock.CenterSpeed;
+        horPitchLim = g_settings().Misc.Camera.Ped.HorizonLock.PitchLim;
+        horRollLim = g_settings().Misc.Camera.Ped.HorizonLock.RollLim;
+    }
+    else if (bikeSeat && g_settings().Misc.Camera.Bike.HorizonLock.Lock) {
+        horLock = true;
+        horPitchMode = g_settings().Misc.Camera.Bike.HorizonLock.PitchMode;
+        horCenterSpeed = g_settings().Misc.Camera.Bike.HorizonLock.CenterSpeed;
+        horPitchLim = g_settings().Misc.Camera.Bike.HorizonLock.PitchLim;
+        horRollLim = g_settings().Misc.Camera.Bike.HorizonLock.RollLim;
+    }
+
+    if (horLock) {
         pitchLookComp = 0;
         rollPitchComp = 0;
         auto vehPitch = ENTITY::GET_ENTITY_PITCH(g_playerVehicle);
         auto vehRoll = ENTITY::GET_ENTITY_ROLL(g_playerVehicle);
-        
+        float dynamicPitch = 0.0f;
+
+        vehPitch = std::clamp(vehPitch, -horPitchLim, horPitchLim);
+        vehRoll = std::clamp(vehRoll, -horRollLim, horRollLim);
+
+        switch (horPitchMode) {
+            case 2: {
+                float rate = MISC::GET_FRAME_TIME() * horCenterSpeed;
+                lowpassPitch = rate * (vehPitch)+(1.0f - rate) * lowpassPitch;
+                dynamicPitch = vehPitch - lowpassPitch;
+                dynamicPitch = std::clamp(dynamicPitch, -horPitchLim, horPitchLim);
+                lowpassPitch = std::clamp(lowpassPitch, -horPitchLim, horPitchLim);
+                break;
+            }
+            case 1: {
+                dynamicPitch = 0.0f;
+                break;
+            }
+            case 0: [[fallthrough]];
+            default: {
+                dynamicPitch = vehPitch;
+            }
+        }
+
         horizonLockPitch = abs(camRot.z) <= 90.0f ?
-            map(abs(camRot.z), 0.0f, 90.0f, vehPitch, 0.0f) :
-            map(abs(camRot.z), 90.0f, 180.0f, 0.0f, vehPitch);
+            map(abs(camRot.z), 0.0f, 90.0f, dynamicPitch, 0.0f) :
+            map(abs(camRot.z), 90.0f, 180.0f, 0.0f, -dynamicPitch);
         horizonLockRoll = abs(camRot.z) <= 90.0f ?
             map(abs(camRot.z), 0.0f, 90.0f, vehRoll, 0.0f) :
-            map(abs(camRot.z), 90.0f, 180.0f, 0.0f, vehRoll);
+            map(abs(camRot.z), 90.0f, 180.0f, 0.0f, -vehRoll);
     }
 
     CAM::SET_CAM_ROT(

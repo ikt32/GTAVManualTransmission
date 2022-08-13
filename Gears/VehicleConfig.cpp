@@ -60,13 +60,28 @@
     LOAD_VAL("CAM", prefix "PitchDownMaxAngle", ##source.PitchDownMaxAngle); \
 }
 
+#define SAVE_VAL_HORIZON(prefix, source) { \
+    SAVE_VAL("CAM", prefix "HorLock",           ##source.Lock); \
+    SAVE_VAL("CAM", prefix "HorPitchMode",      ##source.PitchMode); \
+    SAVE_VAL("CAM", prefix "HorCenterSpeed",    ##source.CenterSpeed); \
+    SAVE_VAL("CAM", prefix "HorPitchLim",       ##source.PitchLim); \
+    SAVE_VAL("CAM", prefix "HorRollLim",        ##source.RollLim); \
+}
+
+#define LOAD_VAL_HORIZON(prefix, source) { \
+    LOAD_VAL("CAM", prefix "HorLock",           ##source.Lock); \
+    LOAD_VAL("CAM", prefix "HorPitchMode",      ##source.PitchMode); \
+    SAVE_VAL("CAM", prefix "HorCenterSpeed",    ##source.CenterSpeed); \
+    LOAD_VAL("CAM", prefix "HorPitchLim",       ##source.PitchLim); \
+    LOAD_VAL("CAM", prefix "HorRollLim",        ##source.RollLim); \
+}
+
 #define SAVE_VAL_CAMERA(prefix, source) { \
     SAVE_VAL("CAM", prefix "FOV",               ##source.FOV); \
     SAVE_VAL("CAM", prefix "OffsetHeight",      ##source.OffsetHeight); \
     SAVE_VAL("CAM", prefix "OffsetForward",     ##source.OffsetForward); \
     SAVE_VAL("CAM", prefix "OffsetSide",        ##source.OffsetSide); \
     SAVE_VAL("CAM", prefix "Pitch",             ##source.Pitch); \
-    SAVE_VAL("CAM", prefix "LockHorizon",       ##source.LockHorizon); \
 }
 
 #define LOAD_VAL_CAMERA(prefix, source) { \
@@ -75,7 +90,6 @@
     LOAD_VAL("CAM", prefix "OffsetForward",     ##source.OffsetForward); \
     LOAD_VAL("CAM", prefix "OffsetSide",        ##source.OffsetSide); \
     LOAD_VAL("CAM", prefix "Pitch",             ##source.Pitch); \
-    LOAD_VAL("CAM", prefix "LockHorizon",       ##source.LockHorizon); \
 }
 
 extern ScriptSettings g_settings;
@@ -257,17 +271,21 @@ void VehicleConfig::LoadSettings() {
 
     LOAD_VAL_CAMERA("Ped", Misc.Camera.Ped);
     LOAD_VAL_MOVEMENT("Ped", Misc.Camera.Ped.Movement);
+    LOAD_VAL_HORIZON("Ped", Misc.Camera.Ped.HorizonLock);
 
     LOAD_VAL_CAMERA("Vehicle1", Misc.Camera.Vehicle1);
     LOAD_VAL_MOVEMENT("Vehicle1", Misc.Camera.Vehicle1.Movement);
+    LOAD_VAL_HORIZON("Vehicle1", Misc.Camera.Vehicle1.HorizonLock);
 
     LOAD_VAL_CAMERA("Vehicle2", Misc.Camera.Vehicle2);
     LOAD_VAL_MOVEMENT("Vehicle2", Misc.Camera.Vehicle2.Movement);
+    LOAD_VAL_HORIZON("Vehicle2", Misc.Camera.Vehicle2.HorizonLock);
 
     LOAD_VAL("CAM", "BikeDisable", Misc.Camera.Bike.Disable);
     LOAD_VAL("CAM", "BikeAttachId", Misc.Camera.Bike.AttachId);
     LOAD_VAL_CAMERA("Bike", Misc.Camera.Bike);
     LOAD_VAL_MOVEMENT("Bike", Misc.Camera.Bike.Movement);
+    LOAD_VAL_HORIZON("Bike", Misc.Camera.Bike.HorizonLock);
 }
 
 void VehicleConfig::SaveSettings() {
@@ -431,17 +449,21 @@ void VehicleConfig::saveGeneral() {
 
     SAVE_VAL_CAMERA("Ped", Misc.Camera.Ped);
     SAVE_VAL_MOVEMENT("Ped", Misc.Camera.Ped.Movement);
+    SAVE_VAL_HORIZON("Ped", Misc.Camera.Ped.HorizonLock);
 
     SAVE_VAL_CAMERA("Vehicle1", Misc.Camera.Vehicle1);
     SAVE_VAL_MOVEMENT("Vehicle1", Misc.Camera.Vehicle1.Movement);
+    SAVE_VAL_HORIZON("Vehicle1", Misc.Camera.Vehicle1.HorizonLock);
 
     SAVE_VAL_CAMERA("Vehicle2", Misc.Camera.Vehicle2);
     SAVE_VAL_MOVEMENT("Vehicle2", Misc.Camera.Vehicle2.Movement);
+    SAVE_VAL_HORIZON("Vehicle2", Misc.Camera.Vehicle2.HorizonLock);
 
     SAVE_VAL("CAM", "BikeDisable", Misc.Camera.Bike.Disable);
     SAVE_VAL("CAM", "BikeAttachId", Misc.Camera.Bike.AttachId);
     SAVE_VAL_CAMERA("Bike", Misc.Camera.Bike);
     SAVE_VAL_MOVEMENT("Bike", Misc.Camera.Bike.Movement);
+    SAVE_VAL_HORIZON("Bike", Misc.Camera.Bike.HorizonLock);
 
     result = ini.SaveFile(mFile.c_str());
     CHECK_LOG_SI_ERROR(result, fmt::format("save {}", mFile).c_str());

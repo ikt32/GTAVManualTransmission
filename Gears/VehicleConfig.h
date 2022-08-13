@@ -66,13 +66,26 @@ public:
         Tracked<float> PitchDownMaxAngle = 5.0f;
     };
 
+    struct SHorizonLock {
+        Tracked<bool> Lock = false;
+        // 0: Lock camera pitch with horizon
+        // 1: Lock camera pitch with car
+        // 2: Dynamic camera pitch
+        Tracked<int> PitchMode = 0;
+        // 0.01: Quick
+        // 1.00: Slow
+        Tracked<float> CenterSpeed = 1.0f;
+        Tracked<float> PitchLim = 30.0f;
+        Tracked<float> RollLim = 60.0f;
+    };
+
     struct SCameraSettings {
         Tracked<float> FOV = 55.0f;
         Tracked<float> OffsetHeight = 0.04f;
         Tracked<float> OffsetForward = 0.05f;
         Tracked<float> OffsetSide = 0.0f;
         Tracked<float> Pitch = 0.0f;
-        Tracked<bool> LockHorizon = false;
+        SHorizonLock HorizonLock;
         SMovement Movement;
     };
 

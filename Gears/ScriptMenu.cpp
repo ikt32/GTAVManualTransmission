@@ -122,6 +122,12 @@ namespace {
         "Gamma/Linear",
     };
 
+    const std::vector<std::string> PitchModeNames {
+        "Horizon",
+        "Vehicle",
+        "Dynamic"
+    };
+
     std::vector<std::string> diDevicesInfo{ "Press Enter to refresh." };
 
     std::string MenuSubtitleConfig() {
@@ -2023,13 +2029,15 @@ void update_cameraoptionsmenu() {
     g_menu.MenuOption("Camera movement options", "cameramovementoptionsmenu",
         { "Enable and tweak the movement of the first person camera." });
 
+    g_menu.MenuOption("Horizon lock options", "horizonlockoptionsmenu",
+        { "Enable and tweak the movement of the first person camera." });
+
     // Might as well initialize with valid pointers.
     Tracked<float>* pFov =           &g_settings().Misc.Camera.Ped.FOV;
     Tracked<float>* pOffsetHeight =  &g_settings().Misc.Camera.Ped.OffsetHeight;
     Tracked<float>* pOffsetForward = &g_settings().Misc.Camera.Ped.OffsetForward;
     Tracked<float>* pOffsetSide =    &g_settings().Misc.Camera.Ped.OffsetSide;
     Tracked<float>* pPitch =         &g_settings().Misc.Camera.Ped.Pitch;
-    Tracked<bool>* pLockHorizon =    &g_settings().Misc.Camera.Ped.LockHorizon;
 
     switch (g_settings().Misc.Camera.AttachId) {
         case 0: {
@@ -2038,7 +2046,6 @@ void update_cameraoptionsmenu() {
             pOffsetForward = &g_settings().Misc.Camera.Ped.OffsetForward;
             pOffsetSide =    &g_settings().Misc.Camera.Ped.OffsetSide;
             pPitch =         &g_settings().Misc.Camera.Ped.Pitch;
-            pLockHorizon =   &g_settings().Misc.Camera.Ped.LockHorizon;
             break;
         }
         case 1: {
@@ -2047,7 +2054,6 @@ void update_cameraoptionsmenu() {
             pOffsetForward = &g_settings().Misc.Camera.Vehicle1.OffsetForward;
             pOffsetSide =    &g_settings().Misc.Camera.Vehicle1.OffsetSide;
             pPitch =         &g_settings().Misc.Camera.Vehicle1.Pitch;
-            pLockHorizon =   &g_settings().Misc.Camera.Vehicle1.LockHorizon;
             break;
         }
         case 2: {
@@ -2056,7 +2062,6 @@ void update_cameraoptionsmenu() {
             pOffsetForward = &g_settings().Misc.Camera.Vehicle2.OffsetForward;
             pOffsetSide =    &g_settings().Misc.Camera.Vehicle2.OffsetSide;
             pPitch =         &g_settings().Misc.Camera.Vehicle2.Pitch;
-            pLockHorizon =   &g_settings().Misc.Camera.Vehicle2.LockHorizon;
             break;
         }
         default: {
@@ -2080,9 +2085,6 @@ void update_cameraoptionsmenu() {
 
     g_menu.FloatOptionCb("Pitch", *pPitch, -20.0f, 20.0f, 0.1f, GetKbEntryFloat,
         { "In degrees." });
-
-    g_menu.BoolOption("Lock to horizon", *pLockHorizon,
-        { "Lock camera to horizon." });
 
     g_menu.FloatOptionCb("Controller smoothing", g_settings().Misc.Camera.LookTime, 0.0f, 0.5f, 0.000001f, GetKbEntryFloat,
         { "How smooth the camera moves.", "Press enter to enter a value manually. Range: 0.0 to 0.5." });
@@ -2189,6 +2191,57 @@ void update_cameramovementoptionsmenu(bool bike) {
         { "Degrees the camera can pitch down (under deceleration)." });
 }
 
+void update_horizonlockoptionsmenu(bool bike) {
+    g_menu.Title("Camera movement");
+    VehicleConfig::SHorizonLock* pHorLck = nullptr;
+    std::string modeName;
+
+    if (!bike) {
+        switch (g_settings().Misc.Camera.AttachId) {
+        case 0: pHorLck = &g_settings().Misc.Camera.Ped.HorizonLock; break;
+        case 1: pHorLck = &g_settings().Misc.Camera.Vehicle1.HorizonLock; break;
+        case 2: pHorLck = &g_settings().Misc.Camera.Vehicle2.HorizonLock; break;
+        default:
+            break;
+        }
+    }
+    else {
+        pHorLck = &g_settings().Misc.Camera.Bike.HorizonLock;
+    }
+
+    if (pHorLck == nullptr) {
+        g_menu.Subtitle("Invalid configuration");
+        g_menu.Option("Invalid configuration");
+        return;
+    }
+
+    if (!bike)
+        modeName = camAttachPoints[g_settings().Misc.Camera.AttachId];
+    else
+        modeName = "Bike";
+
+    g_menu.Subtitle(fmt::format("{} - {}", MenuSubtitleConfig(), modeName));
+
+    VehicleConfig::SHorizonLock& horLck = *pHorLck;
+
+    g_menu.BoolOption("Lock to horizon", horLck.Lock,
+        { "Lock the pitch and roll to the horizon." });
+
+    g_menu.FloatOptionCb("Pitch limit", horLck.PitchLim, 0.0f, 90.0f, 1.0f, GetKbEntryFloat,
+        { "How much the pitch may differ between the camera and vehicle." });
+
+    g_menu.FloatOptionCb("Roll limit", horLck.RollLim, 0.0f, 180.0f, 1.0f, GetKbEntryFloat,
+        { "How much the roll may differ between the camera and vehicle." });
+
+    g_menu.StringArray("Lock pitch to", PitchModeNames, horLck.PitchMode,
+        { "Lock pitch with horizon, car or center on vehicle dynamically." });
+
+    g_menu.FloatOptionCb("Pitch center speed", horLck.CenterSpeed, 0.1f, 10.0f, 0.1f, GetKbEntryFloat,
+        { "How quickly the camera centers on the vehicle pitch.",
+          "Low value: Slowly centers onto the vehicle.",
+          "High value: Quickly centers onto the vehicle." });
+}
+
 void update_bikecameraoptionsmenu() {
     g_menu.Title("Camera (bikes)");
     g_menu.Subtitle(MenuSubtitleConfig());
@@ -2199,6 +2252,14 @@ void update_bikecameraoptionsmenu() {
     if (g_menu.StringArray("Attach to", camAttachPoints, g_settings().Misc.Camera.Bike.AttachId)) {
         FPVCam::CancelCam();
     }
+
+    g_menu.MenuOption("Camera movement options", "bikecameramovementoptionsmenu",
+        { "Enable and tweak the movement of the first person camera.",
+          "Movement options apply to all bike attach options." });
+
+    g_menu.MenuOption("Horizon lock options", "bikehorizonlockoptionsmenu",
+        { "Enable and tweak the movement of the first person camera.",
+          "Horizon lock options apply to all bike attach options." });
 
     g_menu.FloatOptionCb("Field of view", g_settings().Misc.Camera.Bike.FOV, 1.0f, 120.0f, 0.5f, GetKbEntryFloat,
         { "In degrees." });
@@ -2214,13 +2275,6 @@ void update_bikecameraoptionsmenu() {
 
     g_menu.FloatOption("Pitch", g_settings().Misc.Camera.Bike.Pitch, -20.0f, 20.0f, 0.1f,
         { "In degrees." });
-
-    g_menu.BoolOption("Lock to horizon", g_settings().Misc.Camera.Ped.LockHorizon,
-        { "Lock camera to horizon." });
-
-    g_menu.MenuOption("Camera movement options", "bikecameramovementoptionsmenu",
-        { "Enable and tweak the movement of the first person camera.",
-          "Movement options applies to all bike attach options. (Not unique per attach option)" });
 }
 
 void update_devoptionsmenu() {
@@ -2567,6 +2621,12 @@ void update_menu() {
 
     /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> bikecameraoptionsmenu -> bikecameramovementoptionsmenu*/
     if (g_menu.CurrentMenu("bikecameramovementoptionsmenu")) { update_cameramovementoptionsmenu(true); }
+
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> horizonlockoptionsmenu*/
+    if (g_menu.CurrentMenu("horizonlockoptionsmenu")) { update_horizonlockoptionsmenu(false); }
+
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> bikecameraoptionsmenu -> bikehorizonlockoptionsmenu*/
+    if (g_menu.CurrentMenu("bikehorizonlockoptionsmenu")) { update_horizonlockoptionsmenu(true); }
 
     /* mainmenu -> devoptionsmenu */
     if (g_menu.CurrentMenu("devoptionsmenu")) { update_devoptionsmenu(); }
