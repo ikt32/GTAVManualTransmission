@@ -1,5 +1,33 @@
 # Changelog
 
+## 5.5.1
+
+New features:
+
+* Horizon lock camera feature
+  * Pitch may be locked to horizon, vehicle or dynamic
+* Add `MT_ToggleSteeringAnimation` to the API
+  * So other scripts can pause the steering animation, to play other animations
+
+Bug fixes and other stuff:
+
+* Fix typo in `settings_general.ini` -> \[Misc\] -> "UDPAddress" was mistyped as "UDPAddres"
+* Fix custom ABS crashing on vehicles with more than or less than four wheels
+* Fix clutch check skipped with Clutch & Throttle Start feature when in neutral
+* Fix crash on reloading script with ScriptHookV, caused by pause detection for FFB cancelling
+* Fix crash on loading in FiveM due to unused-but-initialized code
+* Fix infinite loading in FiveM SP due to menu initialization code
+* Active speed timers are now listed in the debug menu
+* Add 2699 for FX_ASI_BUILD in FiveM
+
+Known issues:
+
+* Vehicles start when pressing throttle, regardless of settings
+  * This happens since GTA V build 2545. Previous versions are unaffected.
+  * No fix on mod side, I'd rather have Rockstar revert this change.
+
+Thanks sfinktah for internal improvements in this update!
+
 ## 5.5.0
 
 Overhaul force feedback (again):
