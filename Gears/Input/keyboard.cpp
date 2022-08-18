@@ -1,4 +1,5 @@
 #include "keyboard.h"
+#include "../Util/SysUtils.h"
 #include <map>
 
 const int sKeysSize = 255;
@@ -7,8 +8,8 @@ const int sMaxDown = 30000;
 
 const std::unordered_map<std::string, int> sKeyMap = {
     // CTRL/SHIFT already have their left and right variants mapped
-    //keymap["SHIFT"] = VK_SHIFT;
-    //keymap["CTRL"] = VK_CONTROL;
+    { "SHIFT", VK_SHIFT },
+    { "CTRL", VK_CONTROL },
     { "XB1" , VK_XBUTTON1 },
     { "XB2" , VK_XBUTTON2 },
     { "LMB" , VK_LBUTTON },
@@ -109,10 +110,10 @@ const std::unordered_map<std::string, int> sKeyMap = {
     { "VK_F24" , VK_F24 },
     { "NUMLOCK" , VK_NUMLOCK },
     { "SCROLL" , VK_SCROLL },
-    { "LSHIFT" , VK_LSHIFT },
-    { "RSHIFT" , VK_RSHIFT },
-    { "LCTRL" , VK_LCONTROL },
-    { "RCTRL" , VK_RCONTROL },
+    { "LSHIFT" , VK_SHIFT },                // No keycode difference with SHV Keyboard callback
+    { "RSHIFT" , VK_SHIFT },                // Map L/RSHIFT, L/RCTRL to SHIFT/CTRL to keep old
+    { "LCTRL" , VK_CONTROL },               // configs compatible.
+    { "RCTRL" , VK_CONTROL },
     { "LMENU" , VK_LMENU },
     { "RMENU" , VK_RMENU },
     { "BROWSER_BACK" , VK_BROWSER_BACK },
@@ -155,6 +156,8 @@ struct {
     BOOL isWithAlt;
     BOOL wasDownBefore;
     BOOL isUpNow;
+    BOOL curr;
+    BOOL prev;
 } keyStates[sKeysSize];
 
 // http://stackoverflow.com/questions/2333728/stdmap-default-value
@@ -166,9 +169,12 @@ V GetWithDef(const C<K, V, Args...>& m, K const& key, const V& defval) {
     return it->second;
 }
 
-void ResetKeyState(DWORD key) {
-    if (key < sKeysSize)
-        memset(&keyStates[key], 0, sizeof(keyStates[0]));
+void InitializeAllKeys() {
+    for (int i = 0; i < sKeysSize; ++i) {
+        keyStates[i].isUpNow = true;
+        keyStates[i].curr = false;
+        keyStates[i].prev = false;
+    }
 }
 
 void OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BOOL isExtended, BOOL isWithAlt, BOOL wasDownBefore, BOOL isUpNow) {
@@ -181,18 +187,20 @@ void OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BOOL isExtended, 
 }
 
 bool IsKeyDown(DWORD key) {
+    if (!SysUtil::IsWindowFocused()) return false;
     return (key < sKeysSize) ?
-        ((GetTickCount() < keyStates[key].time + sMaxDown) && !keyStates[key].isUpNow) :
+        !keyStates[key].isUpNow :
         false;
 }
 
-bool IsKeyJustUp(DWORD key, bool exclusive) {
-    bool b = (key < sKeysSize) ?
-        (GetTickCount() < keyStates[key].time + sMaxDown && keyStates[key].isUpNow) :
-        false;
-    if (b && exclusive)
-        ResetKeyState(key);
-    return b;
+bool IsKeyJustUp(DWORD key) {
+    keyStates[key].curr = IsKeyDown(key);
+    if (!keyStates[key].curr && keyStates[key].prev) {
+        keyStates[key].prev = keyStates[key].curr;
+        return true;
+    }
+    keyStates[key].prev = keyStates[key].curr;
+    return false;
 }
 
 DWORD GetKeyFromName(const std::string& name) {

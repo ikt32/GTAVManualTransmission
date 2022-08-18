@@ -29,6 +29,7 @@
 #include "Memory/VehicleFlags.h"
 
 #include "Input/CarControls.hpp"
+#include "Input/keyboard.h"
 
 #include "Util/ScriptUtils.h"
 #include "Util/Logger.hpp"
@@ -2985,6 +2986,7 @@ void ScriptMain() {
         logger.Write(INFO, "Script restarted");
     }
     InitTextures();
+    InitializeAllKeys();
 
     ScriptTick();
 }
