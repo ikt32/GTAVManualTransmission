@@ -14,7 +14,6 @@
 #include "Util/Logger.hpp"
 #include "Util/Paths.h"
 
-#include <GTAVMenuBase/menukeyboard.h>
 #include <inc/main.h>
 #include <fmt/format.h>
 #include <Psapi.h>
@@ -139,17 +138,12 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             logger.Write(INFO, "Data path: %s", Paths::GetModPath().c_str());
 
             scriptRegister(hInstance, ScriptMain);
-            scriptRegisterAdditionalThread(hInstance, NPCMain);
-            keyboardHandlerRegister(NativeMenu::OnKeyboardMessage);
-            keyboardHandlerRegister(OnKeyboardMessage);
 
             logger.Write(INFO, "Script registered");
             break;
         }
         case DLL_PROCESS_DETACH: {
             scriptUnregister(hInstance);
-            keyboardHandlerUnregister(NativeMenu::OnKeyboardMessage);
-            keyboardHandlerUnregister(OnKeyboardMessage);
 
             logger.Write(INFO, "[Patch] Init shutdown");
             const uint8_t expected = 6;

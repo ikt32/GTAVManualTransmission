@@ -3,13 +3,11 @@
 #include <map>
 
 const int sKeysSize = 255;
-const int sNowPeriod = 100;
-const int sMaxDown = 30000;
 
 const std::unordered_map<std::string, int> sKeyMap = {
     // CTRL/SHIFT already have their left and right variants mapped
-    { "SHIFT", VK_SHIFT },
-    { "CTRL", VK_CONTROL },
+    // { "SHIFT", VK_SHIFT },
+    // { "CTRL", VK_CONTROL },
     { "XB1" , VK_XBUTTON1 },
     { "XB2" , VK_XBUTTON2 },
     { "LMB" , VK_LBUTTON },
@@ -110,10 +108,10 @@ const std::unordered_map<std::string, int> sKeyMap = {
     { "VK_F24" , VK_F24 },
     { "NUMLOCK" , VK_NUMLOCK },
     { "SCROLL" , VK_SCROLL },
-    { "LSHIFT" , VK_SHIFT },                // No keycode difference with SHV Keyboard callback
-    { "RSHIFT" , VK_SHIFT },                // Map L/RSHIFT, L/RCTRL to SHIFT/CTRL to keep old
-    { "LCTRL" , VK_CONTROL },               // configs compatible.
-    { "RCTRL" , VK_CONTROL },
+    { "LSHIFT" , VK_LSHIFT },
+    { "RSHIFT" , VK_RSHIFT },
+    { "LCTRL" , VK_LCONTROL },
+    { "RCTRL" , VK_RCONTROL },
     { "LMENU" , VK_LMENU },
     { "RMENU" , VK_RMENU },
     { "BROWSER_BACK" , VK_BROWSER_BACK },
@@ -152,10 +150,6 @@ const std::unordered_map<std::string, int> sKeyMap = {
 };
 
 struct {
-    DWORD time;
-    BOOL isWithAlt;
-    BOOL wasDownBefore;
-    BOOL isUpNow;
     BOOL curr;
     BOOL prev;
 } keyStates[sKeysSize];
@@ -169,28 +163,9 @@ V GetWithDef(const C<K, V, Args...>& m, K const& key, const V& defval) {
     return it->second;
 }
 
-void InitializeAllKeys() {
-    for (int i = 0; i < sKeysSize; ++i) {
-        keyStates[i].isUpNow = true;
-        keyStates[i].curr = false;
-        keyStates[i].prev = false;
-    }
-}
-
-void OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BOOL isExtended, BOOL isWithAlt, BOOL wasDownBefore, BOOL isUpNow) {
-    if (key < sKeysSize) {
-        keyStates[key].time = GetTickCount();
-        keyStates[key].isWithAlt = isWithAlt;
-        keyStates[key].wasDownBefore = wasDownBefore;
-        keyStates[key].isUpNow = isUpNow;
-    }
-}
-
 bool IsKeyDown(DWORD key) {
     if (!SysUtil::IsWindowFocused()) return false;
-    return (key < sKeysSize) ?
-        !keyStates[key].isUpNow :
-        false;
+    return (GetAsyncKeyState(key) & 0x8000) != 0;
 }
 
 bool IsKeyJustUp(DWORD key) {
