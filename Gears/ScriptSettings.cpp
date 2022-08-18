@@ -1313,7 +1313,7 @@ CarControls::SInput<T> ScriptSettings::parseWheelItem(CSimpleIniA& ini, const ch
 
 CarControls::SInput<int> ScriptSettings::parseKeyboardItem(CSimpleIniA& ini, const char* key, const char* defaultValue, const char* name) {
     std::string nameFmt = formatInputName(key, name);
-    return CarControls::SInput<int>(key, {}, str2key(ini.GetValue("KEYBOARD", key, defaultValue)), nameFmt, "");
+    return CarControls::SInput<int>(key, {}, GetKeyFromName(ini.GetValue("KEYBOARD", key, defaultValue)), nameFmt, "");
 }
 
 template <typename T>

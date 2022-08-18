@@ -213,7 +213,7 @@ bool configAxis(const std::string& confTag) {
 
     bool found = false;
     while (!found) {
-        if (IsKeyJustUp(str2key(escapeKey))) {
+        if (IsKeyJustUp(GetKeyFromName(escapeKey))) {
             return false;
         }
         g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
@@ -305,7 +305,7 @@ bool configWheelToKey() {
     std::string keyName;
 
     while (true) {
-        if (IsKeyJustUp(str2key(escapeKey))) {
+        if (IsKeyJustUp(GetKeyFromName(escapeKey))) {
             return false;
         }
         g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
@@ -333,7 +333,7 @@ bool configWheelToKey() {
             }
         }
         if (progress == 1) {
-            for (auto key : NativeMenu::KeyMap) {
+            for (const auto& key : GetKeyMap()) {
                 if (key.first != "ESC" && IsKeyJustUp(key.second)) {
                     keyName = key.first;
                     progress++;
@@ -343,7 +343,7 @@ bool configWheelToKey() {
                 if (letter > 0x39 && letter < 0x41)
                     continue;
                 std::string letter_ = std::string(1, letter);
-                if (IsKeyJustUp(str2key(letter_))) {
+                if (IsKeyJustUp(GetKeyFromName(letter_))) {
                     keyName = letter_;
                     progress++;
                 }
@@ -364,7 +364,7 @@ bool configButton(const std::string& confTag) {
     g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
 
     while (true) {
-        if (IsKeyJustUp(str2key(escapeKey))) {
+        if (IsKeyJustUp(GetKeyFromName(escapeKey))) {
             return false;
         }
         g_controls.UpdateValues(CarControls::InputDevices::Wheel, true);
@@ -400,10 +400,10 @@ bool configHPattern() {
     int progress = 0;
 
     while (true) {
-        if (IsKeyJustUp(str2key(escapeKey))) {
+        if (IsKeyJustUp(GetKeyFromName(escapeKey))) {
             return false;
         }
-        if (IsKeyJustUp(str2key(skipKey))) {
+        if (IsKeyJustUp(GetKeyFromName(skipKey))) {
             progress++;
         }
 
@@ -452,7 +452,7 @@ bool configASelect() {
     int progress = 0;
 
     while (true) {
-        if (IsKeyJustUp(str2key(escapeKey))) {
+        if (IsKeyJustUp(GetKeyFromName(escapeKey))) {
             return false;
         }
 
@@ -497,7 +497,7 @@ bool configASelect() {
 
         if (progress == 2) {
             std::string additionalInfoN = fmt::format("Press {} to skip Neutral assignment. No input becomes Neutral. {}", skipKey, additionalInfo);
-            if (IsKeyJustUp(str2key(skipKey))) {
+            if (IsKeyJustUp(GetKeyFromName(skipKey))) {
                 progress++;
                 saveButton("AUTO_N", devGUID, -1);
             }
@@ -521,10 +521,10 @@ bool isMenuControl(int control) {
 bool configKeyboardKey(const std::string& confTag) {
     std::string additionalInfo = fmt::format("Press [{}] to exit.", escapeKey);
     while (true) {
-        if (IsKeyJustUp(str2key(escapeKey))) {
+        if (IsKeyJustUp(GetKeyFromName(escapeKey))) {
             return false;
         }
-        for (auto k : NativeMenu::KeyMap) {
+        for (const auto& k : GetKeyMap()) {
             if (IsKeyJustUp(k.second)) {
                 if (isMenuControl(k.second)) {
                     UI::Notify(WARN, "Can't use menu controls!");
@@ -538,8 +538,8 @@ bool configKeyboardKey(const std::string& confTag) {
             if (letter > 0x39 && letter < 0x41)
                 continue;
             std::string letter_ = std::string(1, letter);
-            if (IsKeyJustUp(str2key(letter_))) {
-                if (isMenuControl(str2key(letter_))) {
+            if (IsKeyJustUp(GetKeyFromName(letter_))) {
+                if (isMenuControl(GetKeyFromName(letter_))) {
                     UI::Notify(WARN, "Can't use menu controls!");
                     continue;
                 }
@@ -559,7 +559,7 @@ bool configControllerButton(const std::string& confTag) {
     XInputController& controller = g_controls.GetController();
 
     while (true) {
-        if (IsKeyJustUp(str2key(escapeKey))) {
+        if (IsKeyJustUp(GetKeyFromName(escapeKey))) {
             return false;
         }
         g_controls.UpdateValues(CarControls::InputDevices::Controller, true);
@@ -579,7 +579,7 @@ bool configLControllerButton(const std::string& confTag) {
     std::string additionalInfo = fmt::format("Press [{}] to exit", escapeKey);
 
     while (true) {
-        if (IsKeyJustUp(str2key(escapeKey))) {
+        if (IsKeyJustUp(GetKeyFromName(escapeKey))) {
             return false;
         }
         g_controls.UpdateValues(CarControls::InputDevices::Controller, true);

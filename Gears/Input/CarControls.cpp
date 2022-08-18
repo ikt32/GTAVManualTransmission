@@ -374,7 +374,7 @@ void CarControls::CheckCustomButtons() {
     }
 
     for (const auto& input : WheelToKey) {
-        updateKeyInputEvents(input.Guid, input.Control, str2key(input.ConfigTag));
+        updateKeyInputEvents(input.Guid, input.Control, GetKeyFromName(input.ConfigTag));
     }
 }
 

@@ -779,7 +779,7 @@ void update_keyboardmenu() {
         keyboardInfo.emplace_back("None");
 
     for (const auto& input : g_controls.KBControl) {
-        keyboardInfo.push_back(fmt::format("Assigned to {}", key2str(input.Control)));
+        keyboardInfo.push_back(fmt::format("Assigned to {}", GetNameFromKey(input.Control)));
         if (g_menu.OptionPlus(fmt::format("Assign {}", input.Name), keyboardInfo, nullptr, std::bind(clearKeyboardKey, input.ConfigTag), nullptr, "Current setting")) {
             WAIT(500);
             bool result = configKeyboardKey(input.ConfigTag);
@@ -1084,18 +1084,18 @@ void update_forcefeedbackmenu() {
             g_controls.PlayFFBCollision(0);
             g_controls.PlayFFBDynamics(0, 0);
             while (true) {
-                if (IsKeyJustUp(str2key(escapeKey))) {
+                if (IsKeyJustUp(GetKeyFromName(escapeKey))) {
                     break;
                 }
 
-                if (IsKeyJustUp(str2key("LEFT"))) {
+                if (IsKeyJustUp(GetKeyFromName("LEFT"))) {
                     g_settings.Wheel.FFB.AntiDeadForce -= 100;
                     if (g_settings.Wheel.FFB.AntiDeadForce < 100) {
                         g_settings.Wheel.FFB.AntiDeadForce = 0;
                     }
                 }
 
-                if (IsKeyJustUp(str2key("RIGHT"))) {
+                if (IsKeyJustUp(GetKeyFromName("RIGHT"))) {
                     g_settings.Wheel.FFB.AntiDeadForce += 100;
                     if (g_settings.Wheel.FFB.AntiDeadForce > 10000 - 100) {
                         g_settings.Wheel.FFB.AntiDeadForce = 10000;

@@ -6,6 +6,7 @@
 #include "SteeringAnim.h"
 
 #include "Compatibility.h"
+#include "Input/keyboard.h"
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/VehicleExtensions.hpp"
 #include "Memory/Versions.h"
@@ -13,6 +14,7 @@
 #include "Util/Logger.hpp"
 #include "Util/Paths.h"
 
+#include <GTAVMenuBase/menukeyboard.h>
 #include <inc/main.h>
 #include <fmt/format.h>
 #include <Psapi.h>
@@ -138,12 +140,16 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
 
             scriptRegister(hInstance, ScriptMain);
             scriptRegisterAdditionalThread(hInstance, NPCMain);
+            keyboardHandlerRegister(NativeMenu::OnKeyboardMessage);
+            keyboardHandlerRegister(OnKeyboardMessage);
 
             logger.Write(INFO, "Script registered");
             break;
         }
         case DLL_PROCESS_DETACH: {
             scriptUnregister(hInstance);
+            keyboardHandlerUnregister(NativeMenu::OnKeyboardMessage);
+            keyboardHandlerUnregister(OnKeyboardMessage);
 
             logger.Write(INFO, "[Patch] Init shutdown");
             const uint8_t expected = 6;

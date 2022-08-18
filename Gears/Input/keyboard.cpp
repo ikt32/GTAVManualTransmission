@@ -1,25 +1,20 @@
 #include "keyboard.h"
-#include "../Util/SysUtils.h"
 #include <map>
 
-const int KEYS_SIZE = 255;
+const int sKeysSize = 255;
+const int sNowPeriod = 100;
+const int sMaxDown = 30000;
 
-struct {
-    BOOL curr;
-    BOOL prev;
-} _keyStates[KEYS_SIZE];
-
-
-const std::unordered_map<std::string, int> keyMap = {
+const std::unordered_map<std::string, int> sKeyMap = {
     // CTRL/SHIFT already have their left and right variants mapped
     //keymap["SHIFT"] = VK_SHIFT;
     //keymap["CTRL"] = VK_CONTROL;
-    { "XB1" , VK_XBUTTON1 }, // Back
-    { "XB2" , VK_XBUTTON2 }, // Forward
+    { "XB1" , VK_XBUTTON1 },
+    { "XB2" , VK_XBUTTON2 },
     { "LMB" , VK_LBUTTON },
     { "RMB" , VK_RBUTTON },
-    { "MMB" , VK_MBUTTON },
     { "CANCEL" , VK_CANCEL },
+    { "MMB" , VK_MBUTTON },
     { "BACKSPACE" , VK_BACK },
     { "TAB" , VK_TAB },
     { "CLEAR" , VK_CLEAR },
@@ -140,53 +135,89 @@ const std::unordered_map<std::string, int> keyMap = {
     { "LAUNCH_APP2" , VK_LAUNCH_APP2 },
     { "PLAY" , VK_PLAY },
     { "ZOOM" , VK_ZOOM },
-    { "VK_OEM_1" , VK_OEM_1 },			    // ';:'     for US
-    { "VK_OEM_PLUS" , VK_OEM_PLUS },		// '+' any country
-    { "VK_OEM_COMMA" , VK_OEM_COMMA },	    // ',' any country
-    { "VK_OEM_MINUS" , VK_OEM_MINUS },	    // '-' any country
+    { "VK_OEM_1" , VK_OEM_1 },              // ';:' for US
+    { "VK_OEM_PLUS" , VK_OEM_PLUS },        // '+' any country
+    { "VK_OEM_COMMA" , VK_OEM_COMMA },      // ',' any country
+    { "VK_OEM_MINUS" , VK_OEM_MINUS },      // '-' any country
     { "VK_OEM_PERIOD" , VK_OEM_PERIOD },    // '.' any country
-    { "VK_OEM_2" , VK_OEM_2 },			    // '/?'     for US
-    { "VK_OEM_3" , VK_OEM_3 },			    // '`~'     for US
-    { "VK_OEM_4" , VK_OEM_4 },			    // '{'      for US
-    { "VK_OEM_5" , VK_OEM_5 },			    // '\|'     for US
-    { "VK_OEM_6" , VK_OEM_6 },			    // '}'      for US
-    { "VK_OEM_7" , VK_OEM_7 },			    // ''"'     for US
-    { "VK_OEM_8" , VK_OEM_8 },			    // § !
-    { "VK_OEM_102" , VK_OEM_102 },		    // > <	
+    { "VK_OEM_2" , VK_OEM_2 },              // '/?' for US
+    { "VK_OEM_3" , VK_OEM_3 },              // '`~' for US
+    { "VK_OEM_4" , VK_OEM_4 },              // '{' for US
+    { "VK_OEM_5" , VK_OEM_5 },              // '\|' for US
+    { "VK_OEM_6" , VK_OEM_6 },              // '}' for US
+    { "VK_OEM_7" , VK_OEM_7 },              // ''"' for US
+    { "VK_OEM_8" , VK_OEM_8 },              // § !
+    { "VK_OEM_102" , VK_OEM_102 },          // > <
 };
 
+struct {
+    DWORD time;
+    BOOL isWithAlt;
+    BOOL wasDownBefore;
+    BOOL isUpNow;
+} keyStates[sKeysSize];
+
+// http://stackoverflow.com/questions/2333728/stdmap-default-value
+template <template<class, class, class...> class C, typename K, typename V, typename... Args>
+V GetWithDef(const C<K, V, Args...>& m, K const& key, const V& defval) {
+    auto it = m.find(key);
+    if (it == m.end())
+        return defval;
+    return it->second;
+}
+
+void ResetKeyState(DWORD key) {
+    if (key < sKeysSize)
+        memset(&keyStates[key], 0, sizeof(keyStates[0]));
+}
+
+void OnKeyboardMessage(DWORD key, WORD repeats, BYTE scanCode, BOOL isExtended, BOOL isWithAlt, BOOL wasDownBefore, BOOL isUpNow) {
+    if (key < sKeysSize) {
+        keyStates[key].time = GetTickCount();
+        keyStates[key].isWithAlt = isWithAlt;
+        keyStates[key].wasDownBefore = wasDownBefore;
+        keyStates[key].isUpNow = isUpNow;
+    }
+}
+
 bool IsKeyDown(DWORD key) {
-    if (!SysUtil::IsWindowFocused()) return false;
-    return (GetAsyncKeyState(key) & 0x8000) != 0;
+    return (key < sKeysSize) ?
+        ((GetTickCount() < keyStates[key].time + sMaxDown) && !keyStates[key].isUpNow) :
+        false;
 }
 
 bool IsKeyJustUp(DWORD key, bool exclusive) {
-    _keyStates[key].curr = IsKeyDown(key);
-    if (!_keyStates[key].curr && _keyStates[key].prev) {
-        _keyStates[key].prev = _keyStates[key].curr;
-        return true;
-    }
-    _keyStates[key].prev = _keyStates[key].curr;
-    return false;
+    bool b = (key < sKeysSize) ?
+        (GetTickCount() < keyStates[key].time + sMaxDown && keyStates[key].isUpNow) :
+        false;
+    if (b && exclusive)
+        ResetKeyState(key);
+    return b;
 }
 
-DWORD str2key(const std::string& humanReadableKey) {
-    if (humanReadableKey.length() == 1) {
-        char letter = humanReadableKey.c_str()[0];
+DWORD GetKeyFromName(const std::string& name) {
+    if (name.length() == 1) {
+        char letter = name.c_str()[0];
         if ((letter >= 0x30 && letter <= 0x39) || (letter >= 0x41 && letter <= 0x5A)) {
             return static_cast<int>(letter);
         }
     }
-    return GetWithDef(keyMap, humanReadableKey, -1);
+    return GetWithDef(sKeyMap, name, -1);
 }
 
-std::string key2str(DWORD key) {
-    if (key == -1) return "UNKNOWN";
+std::string GetNameFromKey(DWORD key) {
+    if (key == -1)
+        return "UNKNOWN";
     if ((key >= 0x30 && key <= 0x39) || (key >= 0x41 && key <= 0x5A)) {
-        return std::string(1, static_cast<char>(key));
+        return { static_cast<char>(key) };
     }
-    for (const auto& k : keyMap) {
-        if (k.second == key) return k.first;
+    for (const auto& k : sKeyMap) {
+        if (k.second == key)
+            return k.first;
     }
     return "UNKNOWN";
+}
+
+const std::unordered_map<std::string, int>& GetKeyMap() {
+    return sKeyMap;
 }
