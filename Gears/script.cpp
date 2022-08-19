@@ -588,8 +588,8 @@ void update_manual_transmission() {
 
     if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::Toggle) ||
         g_controls.ButtonHeld(CarControls::WheelControlType::Toggle, 500) ||
-        g_controls.ButtonHeld(CarControls::ControllerControlType::Toggle) ||
-        g_controls.PrevInput == CarControls::Controller	&& g_controls.ButtonHeld(CarControls::LegacyControlType::Toggle)) {
+        g_controls.PrevInput == CarControls::Controller && g_controls.ButtonHeld(CarControls::ControllerControlType::Toggle) ||
+        g_controls.PrevInput == CarControls::Controller && g_controls.ButtonHeld(CarControls::LegacyControlType::Toggle)) {
         toggleManual(!g_settings.MTOptions.Enable);
         return;
     }
@@ -603,8 +603,8 @@ void update_manual_transmission() {
 
     if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ToggleH) ||
         g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleH) ||
-        g_controls.ButtonHeld(CarControls::ControllerControlType::ToggleH) ||
-        g_controls.PrevInput == CarControls::Controller	&& g_controls.ButtonHeld(CarControls::LegacyControlType::ToggleH)) {
+        g_controls.PrevInput == CarControls::Controller && g_controls.ButtonHeld(CarControls::ControllerControlType::ToggleH) ||
+        g_controls.PrevInput == CarControls::Controller && g_controls.ButtonHeld(CarControls::LegacyControlType::ToggleH)) {
         setShiftMode(Next(g_settings().MTOptions.ShiftMode));
     }
 
@@ -1246,17 +1246,14 @@ void functionSShift() {
         ncTapStateUp = ncTapStateDn = NativeController::TapState::ButtonUp;
     }
 
-    bool allowKeyboard = g_controls.PrevInput == CarControls::Keyboard || 
-        g_controls.PrevInput == CarControls::Controller;
-
     // Reset warning this tick
     g_gearStates.DownshiftProtection = false;
 
     // Shift up
-    if (g_controls.PrevInput == CarControls::Controller	&& xcTapStateUp == XInputController::TapState::Tapped ||
-        g_controls.PrevInput == CarControls::Controller	&& ncTapStateUp == NativeController::TapState::Tapped ||
-        allowKeyboard && g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftUp) ||
-        g_controls.PrevInput == CarControls::Wheel			&& g_controls.ButtonJustPressed(CarControls::WheelControlType::ShiftUp)) {
+    if (g_controls.PrevInput == CarControls::Controller && xcTapStateUp == XInputController::TapState::Tapped ||
+        g_controls.PrevInput == CarControls::Controller && ncTapStateUp == NativeController::TapState::Tapped ||
+        g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftUp) ||
+        g_controls.ButtonJustPressed(CarControls::WheelControlType::ShiftUp)) {
         if (g_vehData.mIsCVT) {
             if (g_vehData.mGearCurr < g_vehData.mGearTop) {
                 shiftTo(g_gearStates.LockGear + 1, true);
@@ -1294,10 +1291,10 @@ void functionSShift() {
 
     // Shift down
 
-    if (g_controls.PrevInput == CarControls::Controller	&& xcTapStateDn == XInputController::TapState::Tapped ||
-        g_controls.PrevInput == CarControls::Controller	&& ncTapStateDn == NativeController::TapState::Tapped ||
-        allowKeyboard && g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftDown) ||
-        g_controls.PrevInput == CarControls::Wheel			&& g_controls.ButtonJustPressed(CarControls::WheelControlType::ShiftDown)) {
+    if (g_controls.PrevInput == CarControls::Controller && xcTapStateDn == XInputController::TapState::Tapped ||
+        g_controls.PrevInput == CarControls::Controller && ncTapStateDn == NativeController::TapState::Tapped ||
+        g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftDown) ||
+        g_controls.ButtonJustPressed(CarControls::WheelControlType::ShiftDown)) {
         if (g_vehData.mIsCVT) {
             if (g_vehData.mGearCurr > 0) {
                 shiftTo(g_gearStates.LockGear - 1, false);
@@ -1359,14 +1356,11 @@ bool subAutoShiftSequential() {
         ncTapStateUp = ncTapStateDn = NativeController::TapState::ButtonUp;
     }
 
-    bool allowKeyboard = g_controls.PrevInput == CarControls::Keyboard ||
-        g_controls.PrevInput == CarControls::Controller;
-
     // Shift up
-    if (g_controls.PrevInput == CarControls::Controller	&& xcTapStateUp == XInputController::TapState::Tapped ||
-        g_controls.PrevInput == CarControls::Controller	&& ncTapStateUp == NativeController::TapState::Tapped ||
-        allowKeyboard  && g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftUp) ||
-        g_controls.PrevInput == CarControls::Wheel			&& g_controls.ButtonJustPressed(CarControls::WheelControlType::ShiftUp)) {
+    if (g_controls.PrevInput == CarControls::Controller && xcTapStateUp == XInputController::TapState::Tapped ||
+        g_controls.PrevInput == CarControls::Controller && ncTapStateUp == NativeController::TapState::Tapped ||
+        g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftUp) ||
+        g_controls.ButtonJustPressed(CarControls::WheelControlType::ShiftUp)) {
         if (g_vehData.mIsCVT) {
             if (g_vehData.mGearCurr < g_vehData.mGearTop) {
                 shiftTo(g_gearStates.LockGear + 1, true);
@@ -1397,10 +1391,10 @@ bool subAutoShiftSequential() {
     }
 
     // Shift down
-    if (g_controls.PrevInput == CarControls::Controller	&& xcTapStateDn == XInputController::TapState::Tapped ||
-        g_controls.PrevInput == CarControls::Controller	&& ncTapStateDn == NativeController::TapState::Tapped ||
-        allowKeyboard && g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftDown) ||
-        g_controls.PrevInput == CarControls::Wheel			&& g_controls.ButtonJustPressed(CarControls::WheelControlType::ShiftDown)) {
+    if (g_controls.PrevInput == CarControls::Controller && xcTapStateDn == XInputController::TapState::Tapped ||
+        g_controls.PrevInput == CarControls::Controller && ncTapStateDn == NativeController::TapState::Tapped ||
+        g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ShiftDown) ||
+        g_controls.ButtonJustPressed(CarControls::WheelControlType::ShiftDown)) {
         if (g_vehData.mIsCVT) {
             if (g_vehData.mGearCurr > 0) {
                 shiftTo(g_gearStates.LockGear - 1, false);
@@ -2522,8 +2516,6 @@ void blockButtons() {
 
 void startStopEngine() {
     bool prevController = g_controls.PrevInput == CarControls::Controller;
-    bool prevKeyboard = g_controls.PrevInput == CarControls::Keyboard;
-    bool prevWheel = g_controls.PrevInput == CarControls::Wheel;
 
     bool heldControllerXinput = g_controls.ButtonReleasedAfter(CarControls::ControllerControlType::Engine, g_settings.Controller.HoldTimeMs);
     bool heldControllerNative = g_controls.ButtonReleasedAfter(CarControls::LegacyControlType::Engine, g_settings.Controller.HoldTimeMs);
@@ -2532,8 +2524,8 @@ void startStopEngine() {
     bool pressedWheel = g_controls.ButtonJustPressed(CarControls::WheelControlType::Engine);
 
     bool controllerActive = prevController && heldControllerXinput || prevController && heldControllerNative;
-    bool keyboardActive = prevKeyboard && pressedKeyboard;
-    bool wheelActive = prevWheel && pressedWheel;
+    bool keyboardActive = pressedKeyboard;
+    bool wheelActive = pressedWheel;
 
     bool throttleStart = g_settings.GameAssists.ThrottleStart &&
         g_controls.ThrottleVal > 0.90f &&
