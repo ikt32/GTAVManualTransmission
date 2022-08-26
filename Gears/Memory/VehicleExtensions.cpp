@@ -29,6 +29,7 @@ namespace {
     int hoverTransformRatioOffset = 0;
     int hoverTransformRatioLerpOffset = 0;
     int fuelLevelOffset = 0;
+    int oilLevelOffset = 0;
     int lightsBrokenOffset = 0;
     int lightsBrokenVisuallyOffset = 0;
     int nextGearOffset = 0;
@@ -136,6 +137,9 @@ void VehicleExtensions::Init() {
     addr = mem::FindPattern("\x74\x26\x0F\x57\xC9", "xxxxx");
     fuelLevelOffset = addr == 0 ? 0 : *(int*)(addr + 8);
     logger.Write(fuelLevelOffset == 0 ? WARN : DEBUG, "Fuel Level Offset: 0x%X", fuelLevelOffset);
+
+    oilLevelOffset = addr == 0 ? 0 : *(int*)(addr + 8) + 4;
+    logger.Write(oilLevelOffset == 0 ? WARN : DEBUG, "Oil Level Offset: 0x%X", oilLevelOffset);
 
     // 86C -> bulb
     addr = mem::FindPattern("F6 87 ? ? ? ? 02 75 06 C6 45 80 01");
@@ -397,6 +401,16 @@ float VehicleExtensions::GetFuelLevel(Vehicle handle) {
 void VehicleExtensions::SetFuelLevel(Vehicle handle, float value) {
     if (fuelLevelOffset == 0) return;
     *reinterpret_cast<float *>(GetAddress(handle) + fuelLevelOffset) = value;
+}
+
+float VehicleExtensions::GetOilLevel(Vehicle handle) {
+    if (fuelLevelOffset == 0) return 0.0f;
+    return *reinterpret_cast<float*>(GetAddress(handle) + oilLevelOffset);
+}
+
+void VehicleExtensions::SetOilLevel(Vehicle handle, float value) {
+    if (fuelLevelOffset == 0) return;
+    *reinterpret_cast<float*>(GetAddress(handle) + oilLevelOffset) = value;
 }
 
 uint32_t VehicleExtensions::GetLightsBroken(Vehicle handle) {

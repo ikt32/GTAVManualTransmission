@@ -39,6 +39,9 @@ public:
     static float GetFuelLevel(Vehicle handle);
     static void SetFuelLevel(Vehicle handle, float value);
 
+    static float GetOilLevel(Vehicle handle);
+    static void SetOilLevel(Vehicle handle, float value);
+
     static uint32_t GetLightsBroken(Vehicle handle);
     static void SetLightsBroken(Vehicle handle, uint32_t value);
 

@@ -627,8 +627,8 @@ void MTHUD::UpdateHUD() {
 
 void drawDebugInfo() {
     if (!g_menu.IsThisOpen()) {
-        UI::ShowText(0.01, 0.250, 0.3, fmt::format("Address: 0x{:X}", reinterpret_cast<uintptr_t>(VExt::GetAddress(g_playerVehicle))));
-        UI::ShowText(0.01, 0.275, 0.3, fmt::format("Mod Enabled: {}" , g_settings.MTOptions.Enable));
+        UI::ShowText(0.01, 0.250, 0.3, fmt::format("0x{:X}", reinterpret_cast<uintptr_t>(VExt::GetAddress(g_playerVehicle))));
+        UI::ShowText(0.01, 0.275, 0.3, fmt::format("MT: {}" , g_settings.MTOptions.Enable));
         UI::ShowText(0.01, 0.300, 0.3, fmt::format("RPM: {:.3f}", g_vehData.mRPM));
         UI::ShowText(0.01, 0.325, 0.3, fmt::format("Gear: C[{}] N[{}]", VExt::GetGearCurr(g_playerVehicle), VExt::GetGearNext(g_playerVehicle)));
         UI::ShowText(0.01, 0.375, 0.3, fmt::format("Clutch: {:.2f}", VExt::GetClutch(g_playerVehicle)));
@@ -640,7 +640,9 @@ void drawDebugInfo() {
             g_vehData.mHasClutch ? "~g~" : "~r~"));
         UI::ShowText(0.01, 0.500, 0.3, fmt::format("{}ABS",
             g_vehData.mHasABS ? "~g~" : "~r~"));
-
+        UI::ShowText(0.01, 0.525, 0.3, fmt::format("F: {:.2f}/{:.2f} | O: {:.2f}/{:.2f}", 
+            VExt::GetFuelLevel(g_playerVehicle), VExt::GetPetrolTankVolume(g_playerVehicle),
+            VExt::GetOilLevel(g_playerVehicle), VExt::GetOilVolume(g_playerVehicle)));
         UI::ShowText(0.01, 0.550, 0.3, fmt::format("{}Shifting", g_gearStates.Shifting ? "~g~" : "~r~"));
         UI::ShowText(0.01, 0.575, 0.3, fmt::format("Clutch: {:.3f}" ,g_gearStates.ClutchVal));
         UI::ShowText(0.01, 0.600, 0.3, fmt::format("Gear L[{}] N[{}]" ,g_gearStates.LockGear, g_gearStates.NextGear));
