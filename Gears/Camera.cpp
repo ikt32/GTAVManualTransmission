@@ -401,7 +401,8 @@ void FPVCam::Update() {
 
         horizonLockPitch = abs(camRot.z) <= 90.0f ?
             map(abs(camRot.z), 0.0f, 90.0f, dynamicPitch, 0.0f) :
-            map(abs(camRot.z), 90.0f, 180.0f, 0.0f, -dynamicPitch);
+            map(abs(camRot.z), 90.0f, 180.0f, 0.0f, -dynamicPitch + rot.x * 2.0f * abs(camRot.z) / 180.0f);
+
         horizonLockRoll = abs(camRot.z) <= 90.0f ?
             map(abs(camRot.z), 0.0f, 90.0f, vehRoll, 0.0f) :
             map(abs(camRot.z), 90.0f, 180.0f, 0.0f, -vehRoll);
