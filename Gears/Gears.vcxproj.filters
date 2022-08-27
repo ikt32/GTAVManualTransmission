@@ -256,6 +256,9 @@
       <Filter>Features</Filter>
     </ClCompile>
     <ClCompile Include="ScriptMenuUtils.cpp" />
+    <ClCompile Include="Dashboard.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -566,6 +569,9 @@
       <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="ScriptMenuUtils.h" />
+    <ClInclude Include="Dashboard.h">
+      <Filter>Features</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Memory">

@@ -20,6 +20,7 @@
 #include "LaunchControl.h"
 #include "CruiseControl.h"
 #include "SpeedLimiter.h"
+#include "Dashboard.h"
 
 #include "UDPTelemetry/Socket.h"
 #include "UDPTelemetry/UDPTelemetry.h"
@@ -43,7 +44,6 @@
 #include "Util/Strings.hpp"
 #include "Util/MiscEnums.h"
 
-#include <GTAVDashHook/DashHook/DashHook.h>
 #include <menu.h>
 
 #include <inc/natives.h>
@@ -109,9 +109,6 @@ GameSound g_gearRattle1("DAMAGED_TRUCK_IDLE", "", ""); // sadly there's no initi
 GameSound g_gearRattle2("DAMAGED_TRUCK_IDLE", "", ""); // primitively double the volume...
 GameSound g_downshiftProtectSfx("CONFIRM_BEEP", "HUD_MINI_GAME_SOUNDSET", "");
 
-// TODO: Move to own file
-float g_lastSpeedoRotation = 0.0f;
-
 void updateShifting();
 void blockButtons();
 void startStopEngine();
@@ -158,75 +155,6 @@ void functionHillGravity();
 void functionAudioFX();
 
 void UpdatePause();
-
-void functionDash() {
-    if (!g_settings.Misc.DashExtensions)
-        return;
-
-    VehicleDashboardData data{};
-    DashHook_GetData(&data);
-
-    data.ABSLight |= DashLights::AbsBulbState && DashLights::AbsNotify;
-
-    if (g_peripherals.IgnitionState == IgnitionState::Stall) {
-        // data.indicator_left = true;
-        // data.indicator_right = true;
-        // data.handbrakeLight = true;
-        data.engineLight = true;
-        data.ABSLight = true;
-        data.petrolLight = true;
-        data.oilLight = true;
-        // data.headlights = true;
-        // data.fullBeam = true;
-        data.batteryLight = true;
-    }
-
-    if (g_settings().DriveAssists.AWD.Enable) {
-        if (g_settings().DriveAssists.AWD.SpecialFlags & AWD::AWD_REMAP_DIAL_Y97Y_R32) {
-            data.oilPressure = lerp(
-                data.oilPressure,
-                AWD::GetTransferValue(),
-                1.0f - pow(0.0001f, MISC::GET_FRAME_TIME()));
-            // https://www.gta5-mods.com/vehicles/nissan-skyline-gt-r-bnr32
-            // oil pressure gauge uses data.temp
-            // battery voltage uses data.temp
-        }
-        else if (g_settings().DriveAssists.AWD.SpecialFlags & AWD::AWD_REMAP_DIAL_WANTED188_R32) {
-            auto boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "needle_torque");
-            if (boneIdx != -1) {
-                Vector3 rotAxis{};
-                rotAxis.y = 1.0f;
-
-                AWD::GetDisplayValue() = lerp(
-                    AWD::GetDisplayValue(), AWD::GetTransferValue(),
-                    1.0f - pow(0.0001f, MISC::GET_FRAME_TIME()));
-
-                VehicleBones::RotateAxisAbsolute(g_playerVehicle, boneIdx, rotAxis, AWD::GetDisplayValue());
-            }
-
-            boneIdx = ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(g_playerVehicle, "needle_speedo");
-            if (boneIdx != -1) {
-                Vector3 rotAxis{};
-                rotAxis.y = 1.0f; 
-
-                float rotation = map(abs(g_vehData.mDiffSpeed), 0.0f, 51.0f, 0.0f, deg2rad(240.0f));
-
-                float maxDelta = MISC::GET_FRAME_TIME() * 1.0f;
-
-                if (abs(rotation - g_lastSpeedoRotation) > maxDelta)
-                    rotation = g_lastSpeedoRotation + maxDelta * sgn(rotation - g_lastSpeedoRotation);
-
-                g_lastSpeedoRotation = rotation;
-
-                rotation = std::clamp(g_lastSpeedoRotation, 0.0f, deg2rad(240.0f));
-
-                VehicleBones::RotateAxisAbsolute(g_playerVehicle, boneIdx, rotAxis, rotation);
-            }
-        }
-    }
-
-    DashHook_SetData(data);
-}
 
 void setVehicleConfig(Vehicle vehicle) {
     std::string oldName;
@@ -348,7 +276,6 @@ void update_vehicle() {
             // Engine off, but not stalled
             g_peripherals.IgnitionState = IgnitionState::Off;
         }
-        functionDash();
     }
     if (g_playerVehicle != g_lastPlayerVehicle && vehAvail) {
         if (g_vehData.mIsCVT)
@@ -2927,6 +2854,7 @@ void ScriptTick() {
     while (true) {
         update_player();
         update_vehicle();
+        Dashboard::Update();
         Misc::UpdateEngineOnOff();
         update_inputs();
         update_steering();

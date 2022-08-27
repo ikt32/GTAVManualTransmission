@@ -167,6 +167,7 @@
     <ClCompile Include="Compatibility.cpp" />
     <ClCompile Include="CruiseControl.cpp" />
     <ClCompile Include="CustomSteering.cpp" />
+    <ClCompile Include="Dashboard.cpp" />
     <ClCompile Include="DrivingAssists.cpp" />
     <ClCompile Include="InputConfiguration.cpp" />
     <ClCompile Include="Input\NativeInput.cpp" />
@@ -268,6 +269,7 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="CruiseControl.h" />
     <ClInclude Include="CustomSteering.h" />
+    <ClInclude Include="Dashboard.h" />
     <ClInclude Include="DrivingAssists.h" />
     <ClInclude Include="InputConfiguration.h" />
     <ClInclude Include="Input\DirectInputError.h" />
