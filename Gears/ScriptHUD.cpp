@@ -34,6 +34,9 @@ extern int g_textureEspId;
 extern int g_textureBrkId;
 extern int g_textureDsProtId;
 
+extern Player g_player;
+extern Ped g_playerPed;
+
 extern VehicleGearboxStates g_gearStates;
 extern Vehicle g_playerVehicle;
 extern VehicleData g_vehData;
@@ -560,6 +563,11 @@ void drawGearIndicator() {
 }
 
 void MTHUD::UpdateHUD() {
+    if (!Util::PlayerAvailable(g_player, g_playerPed) ||
+        !Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
+        return;
+    }
+
     updateDashLights();
 
     // main HUD elements

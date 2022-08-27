@@ -328,14 +328,6 @@ void update_inputs() {
     g_controls.UpdateValues(g_controls.PrevInput, false);
 }
 
-void update_hud() {
-    if (!Util::PlayerAvailable(g_player, g_playerPed) || !Util::VehicleAvailable(g_playerVehicle, g_playerPed)) {
-        return;
-    }
-
-    MTHUD::UpdateHUD();
-}
-
 void wheelControlWater() {
     WheelInput::CheckButtons();
     WheelInput::HandlePedalsArcade(g_controls.ThrottleVal, g_controls.BrakeVal);
@@ -2725,7 +2717,7 @@ void ScriptTick() {
         Misc::UpdateEngineOnOff();
         update_inputs();
         update_steering();
-        update_hud();
+        MTHUD::UpdateHUD();
         update_input_controls();
         update_manual_transmission();
         update_misc_features();
