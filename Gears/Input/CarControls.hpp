@@ -222,6 +222,9 @@ public:
     bool WheelAvailable();
     WheelDirectInput& GetWheel();
 
+    bool IsHShifterJustNeutral();
+    bool IsHShifterInGear();
+
     InputDevices PrevInput = Controller;
 
     float ThrottleVal = 0.0f;
@@ -230,6 +233,8 @@ public:
     float SteerVal = 0.5f;
     float SteerValRaw = 0.0f;   // For readout purposes. SteerVal is used for gameplay.
     float HandbrakeVal = 0.0f;
+
+    bool IsClutchPressed();
 
     std::array<SInput<std::string>, static_cast<int>(ControllerControlType::SIZEOF)> ControlXbox = {};
     std::array<int, static_cast<int>(ControllerControlType::SIZEOF)> ControlXboxBlocks = {};

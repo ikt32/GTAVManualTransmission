@@ -496,3 +496,33 @@ bool CarControls::WheelAvailable() {
 WheelDirectInput& CarControls::GetWheel() {
     return mWheelInput;
 }
+
+bool CarControls::IsHShifterJustNeutral() {
+    constexpr auto minGear = static_cast<uint32_t>(CarControls::WheelControlType::HR);
+    constexpr auto topGear = static_cast<uint32_t>(CarControls::WheelControlType::H10);
+    for (auto gear = minGear; gear <= topGear; ++gear) {
+        if (ButtonReleased(static_cast<CarControls::WheelControlType>(gear)))
+            return true;
+    }
+    return false;
+}
+
+bool CarControls::IsHShifterInGear() {
+    return ButtonIn(CarControls::WheelControlType::HR) ||
+        ButtonIn(CarControls::WheelControlType::H1) ||
+        ButtonIn(CarControls::WheelControlType::H2) ||
+        ButtonIn(CarControls::WheelControlType::H3) ||
+        ButtonIn(CarControls::WheelControlType::H4) ||
+        ButtonIn(CarControls::WheelControlType::H5) ||
+        ButtonIn(CarControls::WheelControlType::H6) ||
+        ButtonIn(CarControls::WheelControlType::H7) ||
+        ButtonIn(CarControls::WheelControlType::H8) ||
+        ButtonIn(CarControls::WheelControlType::H9) ||
+        ButtonIn(CarControls::WheelControlType::H10);
+}
+
+bool CarControls::IsClutchPressed() {
+    if (g_settings().MTOptions.ShiftMode == EShiftMode::Automatic)
+        return false;
+    return ClutchVal > 1.0f - g_settings().MTParams.ClutchThreshold;
+}

@@ -20,7 +20,9 @@
 #include "LaunchControl.h"
 #include "CruiseControl.h"
 #include "SpeedLimiter.h"
+
 #include "Dashboard.h"
+#include "GearRattle.h"
 
 #include "UDPTelemetry/Socket.h"
 #include "UDPTelemetry/UDPTelemetry.h"
@@ -105,8 +107,6 @@ Timer g_lastUpdateTimer(0);
 
 std::vector<ValueTimer<float>> g_speedTimers;
 
-GameSound g_gearRattle1("DAMAGED_TRUCK_IDLE", "", ""); // sadly there's no initial BONK, but the sound works.
-GameSound g_gearRattle2("DAMAGED_TRUCK_IDLE", "", ""); // primitively double the volume...
 GameSound g_downshiftProtectSfx("CONFIRM_BEEP", "HUD_MINI_GAME_SOUNDSET", "");
 
 void updateShifting();
@@ -249,8 +249,7 @@ void update_vehicle() {
         g_vehData.SetVehicle(g_playerVehicle); // assign new vehicle;
         functionHidePlayerInFPV(true);
         setVehicleConfig(g_playerVehicle);
-        g_gearRattle1.Stop();
-        g_gearRattle2.Stop();
+        GearRattle::Stop();
         updateActiveSteeringAnim(g_playerVehicle);
         
         g_controls.PlayFFBDynamics(0, 0);
@@ -429,7 +428,6 @@ void update_misc_features() {
     }
 
     functionHidePlayerInFPV(false);
-    functionAudioFX();
 
     if (g_settings().DriveAssists.ABS.Flash && g_controls.BrakeVal > 0.0f && DashLights::AbsNotify) {
         // Don't flash the initial 500ms
@@ -784,8 +782,7 @@ void clearPatches() {
 }
 
 void toggleManual(bool enable) {
-    g_gearRattle1.Stop();
-    g_gearRattle2.Stop();
+    GearRattle::Stop();
 
     // Don't need to do anything
     if (g_settings.MTOptions.Enable == enable)
@@ -951,12 +948,6 @@ void setShiftMode(EShiftMode shiftMode) {
     UI::Notify(INFO, mode);
 }
 
-bool isClutchPressed() {
-    if (g_settings().MTOptions.ShiftMode == EShiftMode::Automatic)
-        return false;
-    return g_controls.ClutchVal > 1.0f - g_settings().MTParams.ClutchThreshold;
-}
-
 float getShiftTime(Vehicle vehicle, ShiftDirection shiftDirection) {
     auto handlingPtr = VExt::GetHandlingPtr(vehicle);
 
@@ -1019,7 +1010,7 @@ void functionHShiftTo(int i) {
         shiftPass = true;
     else if (rpmInRange)
         shiftPass = true;
-    else if (isClutchPressed())
+    else if (g_controls.IsClutchPressed())
         shiftPass = true;
     else
         shiftPass = false;
@@ -1053,16 +1044,6 @@ void functionHShiftKeyboard() {
     }
 }
 
-bool isHShifterJustNeutral() {
-    auto minGear = CarControls::WheelControlType::HR;
-    auto topGear = CarControls::WheelControlType::H10;
-    for (auto gear = static_cast<uint32_t>(minGear); gear <= static_cast<uint32_t>(topGear); ++gear) {
-        if (g_controls.ButtonReleased(static_cast<CarControls::WheelControlType>(gear)))
-            return true;
-    }
-    return false;
-}
-
 void functionHShiftWheel() {
     int clamp = VExt::GearsAvailable() - 1;
     if (g_vehData.mGearTop <= clamp) {
@@ -1074,7 +1055,7 @@ void functionHShiftWheel() {
         }
     }
 
-    if (isHShifterJustNeutral()) {
+    if (g_controls.IsHShifterJustNeutral()) {
         g_gearStates.FakeNeutral = !g_vehData.mIsCVT;
     }
 
@@ -1185,7 +1166,7 @@ void functionSShift() {
 
         // Shift block /w clutch shifting for seq.
         if (g_settings().MTOptions.ClutchShiftS && 
-            !isClutchPressed()) {
+            !g_controls.IsClutchPressed()) {
             return;
         }
 
@@ -1226,7 +1207,7 @@ void functionSShift() {
 
         // Shift block /w clutch shifting for seq.
         if (g_settings().MTOptions.ClutchShiftS &&
-            !isClutchPressed()) {
+            !g_controls.IsClutchPressed()) {
             return;
         }
 
@@ -1541,7 +1522,7 @@ void functionClutchCatch() {
     float clutchRatio = map(g_controls.ClutchVal, 1.0f - g_settings().MTParams.ClutchThreshold, 0.0f, 0.0f, 1.0f);
     clutchRatio = std::clamp(clutchRatio, 0.0f, 1.0f);
 
-    bool clutchEngaged = !isClutchPressed() && !g_gearStates.FakeNeutral;
+    bool clutchEngaged = !g_controls.IsClutchPressed() && !g_gearStates.FakeNeutral;
 
     // Always do the thing for automatic cars
     if (g_settings().MTOptions.ShiftMode == EShiftMode::Automatic) {
@@ -1601,7 +1582,7 @@ void functionEngStall() {
     float speedDiffRatio = map(abs(minSpeed) - abs(actualSpeed), 0.0f, abs(minSpeed), 0.0f, 1.0f);
     speedDiffRatio = std::clamp(speedDiffRatio, 0.0f, 1.0f);
 
-    bool clutchEngaged = !isClutchPressed() && !g_gearStates.FakeNeutral;
+    bool clutchEngaged = !g_controls.IsClutchPressed() && !g_gearStates.FakeNeutral;
 
     float clutchRatio = map(g_controls.ClutchVal, 1.0f - g_settings().MTParams.ClutchThreshold, 0.0f, 0.0f, 1.0f);
 
@@ -1713,7 +1694,7 @@ void functionEngLock() {
     }
 
     // Wheels are locking up due to bad (down)shifts
-    if ((speed > abs(maxSpeed * 1.15f) + 3.334f || wrongDirection) && !isClutchPressed()) {
+    if ((speed > abs(maxSpeed * 1.15f) + 3.334f || wrongDirection) && !g_controls.IsClutchPressed()) {
         g_wheelPatchStates.EngLockActive = true;
         float lockingForce = 60.0f * inputMultiplier;
         auto wheelsToLock = g_vehData.mWheelsDriven;//getDrivenWheels();
@@ -2286,7 +2267,7 @@ void functionRealReverse() {
             VExt::SetBrakeP(g_playerVehicle, 1.0f);
         }
         // RT behavior when rolling back: Burnout
-        if (!g_gearStates.FakeNeutral && g_controls.ThrottleVal > 0.5f && !isClutchPressed() &&
+        if (!g_gearStates.FakeNeutral && g_controls.ThrottleVal > 0.5f && !g_controls.IsClutchPressed() &&
             roadSpeed < -1.0f ) {
             //UI::ShowText(0.3, 0.3, 0.5, "functionRealReverse: Throttle @ Rollback");
             //PAD::_SET_CONTROL_NORMAL(0, ControlVehicleBrake, carControls.ThrottleVal);
@@ -2542,54 +2523,6 @@ void functionHidePlayerInFPV(bool optionToggled) {
     }
     if (!visible && !shouldHide) {
         ENTITY::SET_ENTITY_VISIBLE(g_playerPed, true, false);
-    }
-}
-
-bool isHShifterInAnySlot() {
-    return g_controls.ButtonIn(CarControls::WheelControlType::HR) ||
-        g_controls.ButtonIn(CarControls::WheelControlType::H1) ||
-        g_controls.ButtonIn(CarControls::WheelControlType::H2) ||
-        g_controls.ButtonIn(CarControls::WheelControlType::H3) ||
-        g_controls.ButtonIn(CarControls::WheelControlType::H4) ||
-        g_controls.ButtonIn(CarControls::WheelControlType::H5) ||
-        g_controls.ButtonIn(CarControls::WheelControlType::H6) ||
-        g_controls.ButtonIn(CarControls::WheelControlType::H7) ||
-        g_controls.ButtonIn(CarControls::WheelControlType::H8) ||
-        g_controls.ButtonIn(CarControls::WheelControlType::H9) ||
-        g_controls.ButtonIn(CarControls::WheelControlType::H10);
-}
-
-void functionAudioFX() {
-    if (!g_gearRattle1.Playing()) {
-        // play on misshift in wheel
-        if (g_controls.PrevInput == CarControls::Wheel && g_settings().MTOptions.ShiftMode == EShiftMode::HPattern) {
-            // When the shifter is in a slot, but the gearbox is neutral.
-            // Also grinds for nonexisting gears on that car, but you shouldn't be shifting in there anyway.
-            if (g_gearStates.FakeNeutral && isHShifterInAnySlot() && !isClutchPressed()) {
-                g_gearRattle1.Play(g_playerVehicle);
-                g_gearRattle2.Play(g_playerVehicle);
-            }
-        }
-        // No keeb support, as I'd need to mutilate the code even more to jam it in.
-    }
-    else {
-        // no control check, since we wanna be able to cancel easily
-        if (g_settings().MTOptions.ShiftMode == EShiftMode::HPattern) {
-            // Stop when popping out of any gear
-            // Stop when engine is off
-            // Stop when clutch is pressed
-            if (isHShifterJustNeutral() ||
-                !VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(g_playerVehicle) || 
-                isClutchPressed()) {
-                g_gearRattle1.Stop();
-                g_gearRattle2.Stop();
-            }
-        }
-        else {
-            // Stop when switching gearboxes
-            g_gearRattle1.Stop();
-            g_gearRattle2.Stop();
-        }
     }
 }
 
@@ -2862,6 +2795,7 @@ void ScriptTick() {
         update_input_controls();
         update_manual_transmission();
         update_misc_features();
+        GearRattle::Update();
         update_menu();
         update_update_notification();
         update_UDPTelemetry();
