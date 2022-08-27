@@ -64,8 +64,8 @@ public:
     }
 
 private:
-    sockaddr_in mDest;
-    sockaddr_in mLocal;
-    SOCKET mSocket;
+    sockaddr_in mDest{};
+    sockaddr_in mLocal{};
+    SOCKET mSocket{};
     bool mStarted = false;
 };

@@ -474,5 +474,5 @@ private:
     std::string settingsWheelFile;
     std::string settingsMenuFile;
     VehicleConfig baseConfig;
-    mutable bool mError;
+    mutable bool mError{ false };
 };

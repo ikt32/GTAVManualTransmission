@@ -3,7 +3,9 @@
 
 std::string GUID2String(GUID guid) {
     wchar_t szGuidW[40] = { 0 };
-    StringFromGUID2(guid, szGuidW, 40);
+    auto sz = StringFromGUID2(guid, szGuidW, 40);
+    if (sz == 0)
+        return "BUFFER_TOO_SMALL";
     std::wstring wGuid = szGuidW;
     return StrUtil::utf8_encode(wGuid);
 }

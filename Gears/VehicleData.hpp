@@ -110,47 +110,47 @@ struct WheelPatchStates {
 // all the damn time.
 class VehicleData {
 public:
-    VehicleData();
+    VehicleData() = default;
 
     void SetVehicle(Vehicle v);
     void Update();
 
     // These should be read-only, but I cba to write getters for all of these.    
     // Vehicle this data is valid for
-    Vehicle mVehicle;
-    uint64_t mHandlingPtr;
+    Vehicle mVehicle{};
+    uint64_t mHandlingPtr{};
 
-    Vector3 mVelocity;
-    Vector3 mAcceleration;
+    Vector3 mVelocity{};
+    Vector3 mAcceleration{};
 
-    float mRPM;
-    float mRPMPrev;
-    float mClutch;
-    float mThrottle;
-    float mTurbo;
-    bool mHandbrake;
+    float mRPM{};
+    float mRPMPrev{};
+    float mClutch{};
+    float mThrottle{};
+    float mTurbo{};
+    bool mHandbrake{};
 
-    float mSteeringInput; // -1.0f to 1.0f
-    float mSteeringAngle; // in radians
-    float mSteeringMult;
+    float mSteeringInput{}; // -1.0f to 1.0f
+    float mSteeringAngle{}; // in radians
+    float mSteeringMult{};
 
-    uint8_t mGearCurr;
-    uint8_t mGearNext;
-    uint8_t mGearTop;
+    uint8_t mGearCurr{};
+    uint8_t mGearNext{};
+    uint8_t mGearTop{};
     std::vector<float> mGearRatios;
 
-    float mDriveMaxFlatVel;
-    float mInitialDriveMaxFlatVel;
+    float mDriveMaxFlatVel{};
+    float mInitialDriveMaxFlatVel{};
 
-    uint8_t mWheelCount;
+    uint8_t mWheelCount{};
     std::vector<bool> mWheelsDriven;
     std::vector<float> mWheelTyreSpeeds;
-    float mDiffSpeed; // Data: Wheels connected to the engine output.
-    float mNonLockSpeed; // Data: All wheels, except those at 0.0f.
-    float mLastNonLockSpeed;
-    float mEstimatedSpeed; // Data: mNonLockSpeed, but filtered for dips.
-    float mLastEstimatedSpeed;
-    bool mEstimatedSpeedUsed;
+    float mDiffSpeed{}; // Data: Wheels connected to the engine output.
+    float mNonLockSpeed{}; // Data: All wheels, except those at 0.0f.
+    float mLastNonLockSpeed{};
+    float mEstimatedSpeed{}; // Data: mNonLockSpeed, but filtered for dips.
+    float mLastEstimatedSpeed{};
+    bool mEstimatedSpeedUsed{};
 
     std::vector<bool> mWheelsLockedUp;
     std::vector<bool> mWheelsOnGround;
@@ -167,31 +167,31 @@ public:
     std::vector<bool> mWheelsEspO;
     std::vector<bool> mWheelsEspU;
     // Workaround
-    bool mHasSpeedo;
+    bool mHasSpeedo{};
 
     // Note: Size == 6
     std::vector<uint32_t> mFlags;
 
-    uint32_t mHandlingFlags;
-    uint32_t mModelFlags;
+    uint32_t mHandlingFlags{};
+    uint32_t mModelFlags{};
     
-    bool mIsElectric;
-    bool mIsCVT;
-    bool mHasClutch;
-    bool mHasABS;
-    ABSType mABSType;
+    bool mIsElectric{};
+    bool mIsCVT{};
+    bool mHasClutch{};
+    bool mHasABS{};
+    ABSType mABSType{};
 
     //VehicleInfo mInfo;
 
     // Non-changing for instance
-    VehicleClass mClass;
-    VehicleDomain mDomain;
-    bool mIsAmphibious;
-    bool mIsRhd;
+    VehicleClass mClass{};
+    VehicleDomain mDomain{};
+    bool mIsAmphibious{};
+    bool mIsRhd{};
 
-    Hash mModel;
-    Vector3 mDimMax;
-    Vector3 mDimMin;
+    Hash mModel{};
+    Vector3 mDimMax{};
+    Vector3 mDimMin{};
 private:
     std::vector<bool> getDrivenWheels();
     float getAverageDrivenWheelTyreSpeeds();
@@ -208,5 +208,5 @@ private:
     std::vector<float> mPrevSuspensionTravel;
     std::vector<std::vector<float>> mSuspensionTravelSpeedsHistory;
 
-    Vector3 mPrevVelocity;
+    Vector3 mPrevVelocity{};
 };

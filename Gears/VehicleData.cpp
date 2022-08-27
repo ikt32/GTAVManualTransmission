@@ -29,23 +29,6 @@ namespace {
     }
 }
 
-VehicleData::VehicleData()
-    : mVehicle(0), mHandlingPtr(0)
-    , mVelocity(), mAcceleration(), mRPM(0), mRPMPrev(0)
-    , mClutch(0), mThrottle(0), mTurbo(0), mHandbrake(false)
-    , mSteeringInput(0), mSteeringAngle(0), mSteeringMult(0)
-    , mGearCurr(0), mGearNext(0), mGearTop(0)
-    , mDriveMaxFlatVel(0), mInitialDriveMaxFlatVel(0)
-    , mWheelCount(0), mDiffSpeed(0)
-    , mNonLockSpeed(0), mLastNonLockSpeed(0)
-    , mEstimatedSpeed(0), mLastEstimatedSpeed(0), mEstimatedSpeedUsed(false)
-    , mHasSpeedo(false)
-    , mHandlingFlags(0), mModelFlags(0)
-    , mIsElectric(false), mIsCVT(false), mHasClutch(false)
-    , mHasABS(false), mABSType()
-    , mClass(), mDomain(), mIsAmphibious(false), mIsRhd(false)
-    , mPrevVelocity() {}
-
 void VehicleData::SetVehicle(Vehicle v) {
     mVehicle = v;
     if (ENTITY::DOES_ENTITY_EXIST(mVehicle)) {

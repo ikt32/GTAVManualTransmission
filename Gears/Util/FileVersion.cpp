@@ -31,7 +31,7 @@ SVersion getExeVersion(const std::string & exe) {
     DWORD  verSize = GetFileVersionInfoSizeA(exe.c_str(), &verHandle);
     if (verSize != 0) {
         std::vector<char> verData(verSize);
-        if (GetFileVersionInfoA(exe.c_str(), verHandle, verSize, verData.data())) {
+        if (GetFileVersionInfoA(exe.c_str(), NULL, verSize, verData.data())) {
             if (VerQueryValueA(verData.data(), "\\", (VOID FAR * FAR*) & lpBuffer, &size)) {
                 if (size) {
                     VS_FIXEDFILEINFO* verInfo = (VS_FIXEDFILEINFO*)lpBuffer;

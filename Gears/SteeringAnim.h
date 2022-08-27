@@ -6,7 +6,7 @@ namespace SteeringAnimation {
     struct Animation {
         std::string Dictionary;
         std::string Name;
-        float Rotation;
+        float Rotation{ 0.0f };
         std::vector<std::string> Layouts;
     };
 

@@ -377,12 +377,6 @@ void update_vehicle() {
     g_lastPlayerVehicle = g_playerVehicle;
 }
 
-inline auto now() {
-    using namespace std::chrono;
-    auto tEpoch = steady_clock::now().time_since_epoch();
-    return duration_cast<milliseconds>(tEpoch).count();
-}
-
 // Read inputs
 void update_inputs() {
     if (g_lastUpdateTimer.Elapsed() > 1000) {
