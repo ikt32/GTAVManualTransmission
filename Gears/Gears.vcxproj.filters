@@ -262,6 +262,9 @@
     <ClCompile Include="GearRattle.cpp">
       <Filter>Features</Filter>
     </ClCompile>
+    <ClCompile Include="Textures.cpp">
+      <Filter>Features</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -576,6 +579,9 @@
       <Filter>Features</Filter>
     </ClInclude>
     <ClInclude Include="GearRattle.h">
+      <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="Textures.h">
       <Filter>Features</Filter>
     </ClInclude>
   </ItemGroup>

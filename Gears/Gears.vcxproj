@@ -186,6 +186,7 @@
     <ClCompile Include="SpeedLimiter.cpp" />
     <ClCompile Include="StartingAnimation.cpp" />
     <ClCompile Include="SteeringAnim.cpp" />
+    <ClCompile Include="Textures.cpp" />
     <ClCompile Include="UDPTelemetry\UDPTelemetry.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="Util\AddonSpawnerCache.cpp" />
@@ -295,6 +296,7 @@
     <ClInclude Include="SpeedLimiter.h" />
     <ClInclude Include="StartingAnimation.h" />
     <ClInclude Include="SteeringAnim.h" />
+    <ClInclude Include="Textures.h" />
     <ClInclude Include="UDPTelemetry\UDPTelemetry.h" />
     <ClInclude Include="UDPTelemetry\Socket.h" />
     <ClInclude Include="UDPTelemetry\TelemetryPacket.h" />

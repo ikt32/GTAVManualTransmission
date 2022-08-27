@@ -23,12 +23,14 @@
 
 #include "Dashboard.h"
 #include "GearRattle.h"
+#include "Textures.h"
 
 #include "UDPTelemetry/Socket.h"
 #include "UDPTelemetry/UDPTelemetry.h"
 
 #include "Memory/MemoryPatcher.hpp"
 #include "Memory/Offsets.hpp"
+#include "Memory/VehicleBone.h"
 #include "Memory/VehicleFlags.h"
 
 #include "Input/CarControls.hpp"
@@ -37,7 +39,6 @@
 #include "Util/Logger.hpp"
 #include "Util/Paths.h"
 #include "Util/MathExt.h"
-#include "Util/Paths.h"
 #include "Util/UIUtils.h"
 #include "Util/Timer.h"
 #include "Util/ValueTimer.h"
@@ -61,7 +62,6 @@
 #include <filesystem>
 #include <numeric>
 #include <fstream>
-#include "Memory/VehicleBone.h"
 
 namespace fs = std::filesystem;
 using VExt = VehicleExtensions;
@@ -76,13 +76,6 @@ bool g_checkUpdateDone;
 std::mutex g_checkUpdateDoneMutex;
 
 Socket g_socket;
-
-int g_textureWheelId;
-int g_textureAbsId;
-int g_textureTcsId;
-int g_textureEspId;
-int g_textureBrkId;
-int g_textureDsProtId;
 
 NativeMenu::Menu g_menu;
 CarControls g_controls;
@@ -152,7 +145,6 @@ void functionLimiter();
 void functionAutoLookback();
 void functionAutoGear1();
 void functionHillGravity();
-void functionAudioFX();
 
 void UpdatePause();
 
@@ -2725,64 +2717,6 @@ void ScriptInit() {
     StartUDPTelemetry();
 }
 
-void InitTextures() {
-    std::string absoluteModPath = Paths::GetModPath();
-    std::string textureWheelFile = absoluteModPath + "\\texture_wheel.png";
-    std::string textureABSFile = absoluteModPath + "\\texture_abs.png";
-    std::string textureTCSFile = absoluteModPath + "\\texture_tcs.png";
-    std::string textureESPFile = absoluteModPath + "\\texture_esp.png";
-    std::string textureBRKFile = absoluteModPath + "\\texture_handbrake.png";
-    std::string textureDsProtFile = absoluteModPath + "\\texture_downshift_protection.png";
-
-    if (Paths::FileExists(textureWheelFile)) {
-        g_textureWheelId = createTexture(textureWheelFile.c_str());
-    }
-    else {
-        logger.Write(ERROR, textureWheelFile + " does not exist.");
-        g_textureWheelId = -1;
-    }
-
-    if (Paths::FileExists(textureABSFile)) {
-        g_textureAbsId = createTexture(textureABSFile.c_str());
-    }
-    else {
-        logger.Write(ERROR, textureABSFile + " does not exist.");
-        g_textureAbsId = -1;
-    }
-
-    if (Paths::FileExists(textureTCSFile)) {
-        g_textureTcsId = createTexture(textureTCSFile.c_str());
-    }
-    else {
-        logger.Write(ERROR, textureTCSFile + " does not exist.");
-        g_textureTcsId = -1;
-    }
-
-    if (Paths::FileExists(textureESPFile)) {
-        g_textureEspId = createTexture(textureESPFile.c_str());
-    }
-    else {
-        logger.Write(ERROR, textureESPFile + " does not exist.");
-        g_textureEspId = -1;
-    }
-
-    if (Paths::FileExists(textureBRKFile)) {
-        g_textureBrkId = createTexture(textureBRKFile.c_str());
-    }
-    else {
-        logger.Write(ERROR, textureBRKFile + " does not exist.");
-        g_textureBrkId = -1;
-    }
-
-    if (Paths::FileExists(textureDsProtFile)) {
-        g_textureDsProtId = createTexture(textureDsProtFile.c_str());
-    }
-    else {
-        logger.Write(ERROR, textureDsProtFile + " does not exist.");
-        g_textureDsProtId = -1;
-    }
-}
-
 void ScriptTick() {
     while (true) {
         update_player();
@@ -2832,7 +2766,7 @@ void ScriptMain() {
     else {
         logger.Write(INFO, "Script restarted");
     }
-    InitTextures();
+    Textures::Init();
 
     ScriptTick();
 }
