@@ -815,6 +815,7 @@ void drawVehicleWheelInfo() {
 
     auto wheelsTcs = DrivingAssists::GetTCS();
 
+    UI::ShowText(0.60f, 0.175f, 0.25f, fmt::format("Gravity constant: {:.3f} m/s2", VExt::GetGravity(g_playerVehicle)));
     UI::ShowText(0.60f, 0.200f, 0.25f, fmt::format("Average load: {:.0f} kg", avg(wheelLoads)));
     UI::ShowText(0.60f, 0.225f, 0.25f, fmt::format("Total load: {:.0f} kg", sum(wheelLoads)));
 
