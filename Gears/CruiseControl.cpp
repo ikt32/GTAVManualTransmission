@@ -48,13 +48,13 @@ bool CruiseControl::GetAdaptiveActive() {
 }
 
 SRayResult RayCast(Vehicle vehicle, float range, Vector3 startOffset, Vector3 endOffset) {
-    auto rayOrg = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, startOffset.x, startOffset.y, startOffset.z);
-    auto rayEnd = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, endOffset.x, endOffset.y + range, endOffset.z);
+    auto rayOrg = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, startOffset);
+    auto rayEnd = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, endOffset);
 
     // or START_SHAPE_TEST_LOS_PROBE
     int ray = SHAPETEST::START_EXPENSIVE_SYNCHRONOUS_SHAPE_TEST_LOS_PROBE(
-        rayOrg.x, rayOrg.y, rayOrg.z,
-        rayEnd.x, rayEnd.y, rayEnd.z, 10, vehicle, 7);
+        rayOrg, rayEnd,
+        10, vehicle, 7);
 
     BOOL hit = false;
     Vector3 hitCoord, surfaceNormal;

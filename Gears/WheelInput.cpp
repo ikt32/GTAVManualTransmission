@@ -306,7 +306,7 @@ void WheelInput::HandlePedalsGround(float wheelThrottleVal, float wheelBrakeVal)
 
             if (g_vehData.mVelocity.y > reverseThreshold) {
                 if (!g_controls.IsClutchPressed()) {
-                    PAD::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
+                    PAD::SET_CONTROL_VALUE_NEXT_FRAME(0, ControlVehicleHandbrake, 1.0f);
                 }
                 // Brake Pedal Reverse
                 if (wheelBrakeVal > 0.01f) {
@@ -412,20 +412,20 @@ void checkRadioButtons() {
             AUDIO::SET_RADIO_TO_STATION_INDEX(g_peripherals.RadioStationIndex);
             return;
         }
-        AUDIO::_0xFF266D1D0EB1195D(); // Next radio station
+        AUDIO::SET_RADIO_RETUNE_UP(); // Next radio station
     }
     if (g_controls.ButtonReleased(CarControls::WheelControlType::RadioPrev)) {
         if (AUDIO::GET_PLAYER_RADIO_STATION_INDEX() == RadioOff) {
             AUDIO::SET_RADIO_TO_STATION_INDEX(g_peripherals.RadioStationIndex);
             return;
         }
-        AUDIO::_0xDD6BCF9E94425DF9(); // Prev radio station
+        AUDIO::SET_RADIO_RETUNE_DOWN(); // Prev radio station
     }
 }
 
 void checkCameraButtons() {
     if (g_controls.ButtonIn(CarControls::WheelControlType::LookBack)) {
-        PAD::_SET_CONTROL_NORMAL(0, ControlVehicleLookBehind, 1.0f);
+        PAD::SET_CONTROL_VALUE_NEXT_FRAME(0, ControlVehicleLookBehind, 1.0f);
     }
 
     // who was first?
@@ -456,22 +456,22 @@ void checkCameraButtons() {
     }
 
     if (g_controls.ButtonJustPressed(CarControls::WheelControlType::Camera)) {
-        PAD::_SET_CONTROL_NORMAL(0, ControlNextCamera, 1.0f);
+        PAD::SET_CONTROL_VALUE_NEXT_FRAME(0, ControlNextCamera, 1.0f);
     }
 }
 
 void checkVehicleInputButtons() {
     if (g_controls.HandbrakeVal > 0.1f) {
-        PAD::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, g_controls.HandbrakeVal);
+        PAD::SET_CONTROL_VALUE_NEXT_FRAME(0, ControlVehicleHandbrake, g_controls.HandbrakeVal);
     }
     if (g_controls.ButtonIn(CarControls::WheelControlType::Handbrake)) {
-        PAD::_SET_CONTROL_NORMAL(0, ControlVehicleHandbrake, 1.0f);
+        PAD::SET_CONTROL_VALUE_NEXT_FRAME(0, ControlVehicleHandbrake, 1.0f);
     }
     if (g_controls.ButtonIn(CarControls::WheelControlType::Horn)) {
-        PAD::_SET_CONTROL_NORMAL(0, ControlVehicleHorn, 1.0f);
+        PAD::SET_CONTROL_VALUE_NEXT_FRAME(0, ControlVehicleHorn, 1.0f);
     }
     if (g_controls.ButtonJustPressed(CarControls::WheelControlType::Lights)) {
-        PAD::_SET_CONTROL_NORMAL(0, ControlVehicleHeadlight, 1.0f);
+        PAD::SET_CONTROL_VALUE_NEXT_FRAME(0, ControlVehicleHeadlight, 1.0f);
     }
 
     BOOL areLowBeamsOn = FALSE;
@@ -712,11 +712,11 @@ std::vector<WheelInput::SSlipInfo> WheelInput::CalculateSlipInfo() {
         // Translate absolute bone velocity to relative velocity
         auto boneVelProjection = posWorld + boneVel;
         auto boneVelRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(
-            g_playerVehicle, boneVelProjection.x, boneVelProjection.y, boneVelProjection.z);
+            g_playerVehicle, boneVelProjection);
 
         auto tracVelProjection = posWorld + tracVel;
         auto tracVelRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(
-            g_playerVehicle, tracVelProjection.x, tracVelProjection.y, tracVelProjection.z);
+            g_playerVehicle, tracVelProjection);
 
         auto tracVelRelIgnoreZ = tracVelRel;
         tracVelRelIgnoreZ.z = boneVelRel.z;
@@ -760,16 +760,16 @@ std::vector<WheelInput::SSlipInfo> WheelInput::CalculateSlipInfo() {
             }
 
             Vector3 boneVelProjection2 = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle,
-                wheelOffs[i].x + boneVelRel.x, wheelOffs[i].y + boneVelRel.y, wheelOffs[i].z + boneVelRel.z);
+                { wheelOffs[i].x + boneVelRel.x, wheelOffs[i].y + boneVelRel.y, wheelOffs[i].z + boneVelRel.z });
             UI::DrawSphere(boneVelProjection2, 0.05f, Util::ColorI{ 255, 255, 255, alpha });
-            GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
-                boneVelProjection2.x, boneVelProjection2.y, boneVelProjection2.z, 255, 255, 255, alpha);
+            GRAPHICS::DRAW_LINE(wheelCoords[i],
+                boneVelProjection2, 255, 255, 255, alpha);
 
             Vector3 tracVelProjection2 = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle,
-                wheelOffs[i].x + tracVelRelIgnoreZ.x, wheelOffs[i].y + tracVelRelIgnoreZ.y, wheelOffs[i].z + tracVelRelIgnoreZ.z);
+                { wheelOffs[i].x + tracVelRelIgnoreZ.x, wheelOffs[i].y + tracVelRelIgnoreZ.y, wheelOffs[i].z + tracVelRelIgnoreZ.z });
             UI::DrawSphere(tracVelProjection2, 0.05f, Util::ColorI{ 255, 0, 0, alpha });
-            GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
-                tracVelProjection2.x, tracVelProjection2.y, tracVelProjection2.z, 255, 0, 0, alpha);
+            GRAPHICS::DRAW_LINE(wheelCoords[i],
+                tracVelProjection2, 255, 0, 0, alpha);
         }
     }
 

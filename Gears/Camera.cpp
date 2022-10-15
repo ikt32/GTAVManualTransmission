@@ -106,16 +106,16 @@ void FPVCam::HideHead(bool remove) {
 }
 
 void FPVCam::initCam() {
-    auto cV = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, 0.0f, 2.0f, 0.5f);
+    auto cV = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, { 0.0f, 2.0f, 0.5f });
     cameraHandle = CAM::CREATE_CAM_WITH_PARAMS(
         "DEFAULT_SCRIPTED_CAMERA",
-        cV.x, cV.y, cV.z,
-        0, 0, 0,
+        cV,
+        {},
         g_settings().Misc.Camera.Ped.FOV, 1, 2);
 
     // This should be named something else, like "_SET_VEHICLE_SPEED_JITTER" or something.
     // Thanks for finding it, Jitnaught!
-    VEHICLE::_SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(0.0f);
+    VEHICLE::SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(0.0f);
 
     if (g_settings().Misc.Camera.RemoveHead && Dismemberment::Available()) {
         HideHead(true);
@@ -167,7 +167,7 @@ void FPVCam::Update() {
         updateWheelLook(lookingIntoGlass);
     }
     // Mouse look
-    else if (PAD::_IS_USING_KEYBOARD(2) == TRUE) {
+    else if (PAD::IS_USING_KEYBOARD_AND_MOUSE(2) == TRUE) {
         updateMouseLook(lookingIntoGlass);
     }
     // Controller look
@@ -273,16 +273,16 @@ void FPVCam::Update() {
         g_playerVehicle, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(
             g_playerVehicle, bikeSeat ? "seat_f" : "seat_dside_f"));
     Vector3 seatOffset = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(
-        g_playerVehicle, seatCoords.x, seatCoords.y, seatCoords.z);
+        g_playerVehicle, seatCoords);
 
     if (bikeSeat) {
-        Vector3 headBoneCoord = PED::GET_PED_BONE_COORDS(g_playerPed, 0x796E, 0.0f, 0.0f, 0.0f);
+        Vector3 headBoneCoord = PED::GET_PED_BONE_COORDS(g_playerPed, 0x796E, {});
         Vector3 headBoneOff = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(
-            g_playerPed, headBoneCoord.x, headBoneCoord.y, headBoneCoord.z);
+            g_playerPed, headBoneCoord);
         // SKEL_Spine_Root
-        Vector3 spinebaseCoord = PED::GET_PED_BONE_COORDS(g_playerPed, 0xe0fd, 0.0f, 0.0f, 0.0f);
+        Vector3 spinebaseCoord = PED::GET_PED_BONE_COORDS(g_playerPed, 0xe0fd, {});
         Vector3 spinebaseOff = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(
-            g_playerPed, spinebaseCoord.x, spinebaseCoord.y, spinebaseCoord.z);
+            g_playerPed, spinebaseCoord);
         Vector3 offHead = headBoneOff - spinebaseOff;
 
         camSeatOffset = camSeatOffset + offHead;
@@ -295,19 +295,21 @@ void FPVCam::Update() {
     switch(attachId) {
         case 2: {
             fov = g_settings().Misc.Camera.Vehicle2.FOV;
-            CAM::ATTACH_CAM_TO_ENTITY(cameraHandle, g_playerVehicle,
+            CAM::ATTACH_CAM_TO_ENTITY(cameraHandle, g_playerVehicle, {
                 seatOffset.x + camSeatOffset.x + additionalOffset.x + g_settings().Misc.Camera.Vehicle2.OffsetSide + offsetX,
                 seatOffset.y + camSeatOffset.y + additionalOffset.y + g_settings().Misc.Camera.Vehicle2.OffsetForward + offsetY + accelMoveFwd,
-                seatOffset.z + camSeatOffset.z + additionalOffset.z + g_settings().Misc.Camera.Vehicle2.OffsetHeight + offsetZ + rollbarOffset, true);
+                seatOffset.z + camSeatOffset.z + additionalOffset.z + g_settings().Misc.Camera.Vehicle2.OffsetHeight + offsetZ + rollbarOffset
+                }, true);
             pitch = g_settings().Misc.Camera.Vehicle2.Pitch;
             break;
         }
         case 1: {
             fov = g_settings().Misc.Camera.Vehicle1.FOV;
-            CAM::ATTACH_CAM_TO_ENTITY(cameraHandle, g_playerVehicle,
+            CAM::ATTACH_CAM_TO_ENTITY(cameraHandle, g_playerVehicle, {
                 seatOffset.x + camSeatOffset.x + additionalOffset.x + g_settings().Misc.Camera.Vehicle1.OffsetSide + offsetX,
                 seatOffset.y + camSeatOffset.y + additionalOffset.y + g_settings().Misc.Camera.Vehicle1.OffsetForward + offsetY + accelMoveFwd,
-                seatOffset.z + camSeatOffset.z + additionalOffset.z + g_settings().Misc.Camera.Vehicle1.OffsetHeight + offsetZ + rollbarOffset, true);
+                seatOffset.z + camSeatOffset.z + additionalOffset.z + g_settings().Misc.Camera.Vehicle1.OffsetHeight + offsetZ + rollbarOffset
+                }, true);
             pitch = g_settings().Misc.Camera.Vehicle1.Pitch;
             break;
         }
@@ -315,10 +317,11 @@ void FPVCam::Update() {
         case 0: {
             fov = g_settings().Misc.Camera.Ped.FOV;
             // 0x796E skel_head id
-            CAM::ATTACH_CAM_TO_PED_BONE(cameraHandle, g_playerPed, 0x796E,
+            CAM::ATTACH_CAM_TO_PED_BONE(cameraHandle, g_playerPed, 0x796E, {
                 additionalOffset.x + g_settings().Misc.Camera.Ped.OffsetSide + offsetX,
                 additionalOffset.y + g_settings().Misc.Camera.Ped.OffsetForward + offsetY + accelMoveFwd,
-                additionalOffset.z + g_settings().Misc.Camera.Ped.OffsetHeight + offsetZ, true);
+                additionalOffset.z + g_settings().Misc.Camera.Ped.OffsetHeight + offsetZ
+                }, true);
             pitch = g_settings().Misc.Camera.Ped.Pitch;
             break;
         }
@@ -409,10 +412,11 @@ void FPVCam::Update() {
     }
 
     CAM::SET_CAM_ROT(
-        cameraHandle,
-        rot.x + camRot.x + pitch + pitchLookComp + rollPitchComp + accelPitchDeg - horizonLockPitch,
-        rot.y + rollLookComp + horizonLockRoll,
-        rot.z + camRot.z - directionLookAngle,
+        cameraHandle, {
+            rot.x + camRot.x + pitch + pitchLookComp + rollPitchComp + accelPitchDeg - horizonLockPitch,
+            rot.y + rollLookComp + horizonLockRoll,
+            rot.z + camRot.z - directionLookAngle
+        },
         0);
 
     CAM::SET_CAM_FOV(cameraHandle, fov);
@@ -587,7 +591,7 @@ void FPVCam::updateRotationCameraMovement(VehicleConfig::SMovement& movement) {
     bool isHover = VExt::GetHoverTransformRatio(g_playerVehicle) > 0.0f;
     // 0.0f: Forward, 1.0f: Vertical
     bool isAirHover = g_gameVersion >= G_VER_1_0_1180_2_STEAM && g_vehData.mDomain == VehicleDomain::Air &&
-        VEHICLE::_GET_VEHICLE_FLIGHT_NOZZLE_POSITION(g_playerVehicle) > 0.5f;
+        VEHICLE::GET_VEHICLE_FLIGHT_NOZZLE_POSITION(g_playerVehicle) > 0.5f;
 
     if (isHeli || isHover || isAirHover) {
         newAngle = 0.0f;

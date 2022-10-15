@@ -26,7 +26,7 @@ Quaternion GetQuaternion(NativeVector4 value) {
 }
 
 NativeVector4 GetNativeVector4(Vector4 value) {
-    return NativeVector4{value.X, value.Y, value.Z, value.W};
+    return NativeVector4{value.x, value.y, value.z, value.w};
 }
 
 NativeVector4 GetNativeVector4(Quaternion value) {

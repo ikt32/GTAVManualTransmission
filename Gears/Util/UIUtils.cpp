@@ -30,11 +30,11 @@ void showNotification(const std::string& message, int* prevNotification) {
 }
 
 float UI::GetStringWidth(const std::string& text, float scale, int font) {
-    HUD::_BEGIN_TEXT_COMMAND_GET_WIDTH("STRING");
+    HUD::BEGIN_TEXT_COMMAND_GET_SCREEN_WIDTH_OF_DISPLAY_TEXT("STRING");
     HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text.c_str());
     HUD::SET_TEXT_FONT(font);
     HUD::SET_TEXT_SCALE(scale, scale);
-    return HUD::_END_TEXT_COMMAND_GET_WIDTH(true);
+    return HUD::END_TEXT_COMMAND_GET_SCREEN_WIDTH_OF_DISPLAY_TEXT(true);
 }
 
 void UI::Notify(int level, const std::string& message) {
@@ -62,14 +62,14 @@ void UI::ShowText(float x, float y, float scale, const std::string &text,
     if (outline) HUD::SET_TEXT_OUTLINE();
     HUD::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
     HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text.c_str());
-    HUD::END_TEXT_COMMAND_DISPLAY_TEXT(x, y, 0);
+    HUD::END_TEXT_COMMAND_DISPLAY_TEXT({ x, y }, 0);
 }
 
 void UI::ShowText3D(Vector3 location, const std::vector<std::string> &textLines,
     const Util::ColorI& backgroundColor, const Util::ColorI& fontColor) {
     float height = 0.0125f;
 
-    GRAPHICS::SET_DRAW_ORIGIN(location.x, location.y, location.z, 0);
+    GRAPHICS::SET_DRAW_ORIGIN({ location.x, location.y, location.z }, 0);
     int i = 0;
 
     float szX = 0.060f;
@@ -83,7 +83,7 @@ void UI::ShowText3D(Vector3 location, const std::vector<std::string> &textLines,
     }
 
     float szY = (height * static_cast<float>(i)) + 0.02f;
-    GRAPHICS::DRAW_RECT(0.027f, (height * static_cast<float>(i)) / 2.0f, szX, szY,
+    GRAPHICS::DRAW_RECT({ 0.027f, (height * static_cast<float>(i)) / 2.0f }, szX, szY,
         backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A, 0);
     GRAPHICS::CLEAR_DRAW_ORIGIN();
 }
@@ -92,7 +92,7 @@ void UI::ShowText3DColors(Vector3 location, const std::vector<std::pair<std::str
     const Util::ColorI& backgroundColor) {
     float height = 0.0125f;
 
-    GRAPHICS::SET_DRAW_ORIGIN(location.x, location.y, location.z, 0);
+    GRAPHICS::SET_DRAW_ORIGIN({ location.x, location.y, location.z }, 0);
     int i = 0;
 
     float szX = 0.060f;
@@ -109,7 +109,7 @@ void UI::ShowText3DColors(Vector3 location, const std::vector<std::pair<std::str
     }
 
     float szY = (height * static_cast<float>(i)) + 0.01f;
-    GRAPHICS::DRAW_RECT(szX * 0.5f, (height * static_cast<float>(i)) / 2.0f, szX + 0.01f, szY,
+    GRAPHICS::DRAW_RECT({ szX * 0.5f, (height * static_cast<float>(i)) / 2.0f }, szX + 0.01f, szY,
         backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A, 0);
     GRAPHICS::CLEAR_DRAW_ORIGIN();
 }
@@ -138,10 +138,10 @@ void UI::ShowHelpText(const std::string& message) {
 
 void UI::DrawSphere(Vector3 p, float scale, const Util::ColorI& c) {
     GRAPHICS::DRAW_MARKER(eMarkerType::MarkerTypeDebugSphere,
-                          p.x, p.y, p.z,
-                          0.0f, 0.0f, 0.0f,
-                          0.0f, 0.0f, 0.0f,
-                          scale, scale, scale,
+                          p,
+                          { 0.0f, 0.0f, 0.0f },
+                          { 0.0f, 0.0f, 0.0f },
+                          { scale, scale, scale },
                           c.R, c.G, c.B, c.A,
                           false, false, 2, false, nullptr, nullptr, false);
 }
@@ -150,8 +150,8 @@ void UI::DrawBar(float x, float y, float width, float height, Util::ColorI fg, U
     float bgpaddingx = 0.00f;
     float bgpaddingy = 0.01f;
     // background
-    GRAPHICS::DRAW_RECT(x, y, width + bgpaddingx, height + bgpaddingy, bg.R, bg.G, bg.B, bg.A, 0);
+    GRAPHICS::DRAW_RECT({ x, y }, width + bgpaddingx, height + bgpaddingy, bg.R, bg.G, bg.B, bg.A, 0);
 
     // rpm bar
-    GRAPHICS::DRAW_RECT(x - width * 0.5f + value * width * 0.5f, y, width * value, height, fg.R, fg.G, fg.B, fg.A, 0);
+    GRAPHICS::DRAW_RECT({ x - width * 0.5f + value * width * 0.5f, y }, width * value, height, fg.R, fg.G, fg.B, fg.A, 0);
 }

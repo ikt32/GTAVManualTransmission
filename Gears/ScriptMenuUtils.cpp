@@ -58,22 +58,22 @@ std::vector<std::string> ShowDynamicFfbCurve(float input, float gamma, int respo
 
     float rectX = 0.5f;
     float rectY = 0.5f;
-    float rectW = 0.40f / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+    float rectW = 0.40f / GRAPHICS::GET_ASPECT_RATIO(FALSE);
     float rectH = 0.40f;
-    float blockW = rectW / max_samples;//0.001f * (16.0f / 9.0f) / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
-    float blockH = blockW * GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+    float blockW = rectW / max_samples;//0.001f * (16.0f / 9.0f) / GRAPHICS::GET_ASPECT_RATIO(FALSE);
+    float blockH = blockW * GRAPHICS::GET_ASPECT_RATIO(FALSE);
 
-    GRAPHICS::DRAW_RECT(rectX, rectY,
+    GRAPHICS::DRAW_RECT({ rectX, rectY },
         rectW + 3.0f * blockW, rectH + 3.0f * blockH,
         255, 255, 255, 191, 0);
-    GRAPHICS::DRAW_RECT(rectX, rectY,
+    GRAPHICS::DRAW_RECT({ rectX, rectY },
         rectW + blockW / 2.0f, rectH + blockH / 2.0f,
         0, 0, 0, 239, 0);
 
     for (auto point : points) {
         float pointX = rectX - 0.5f * rectW + point.first * rectW;
         float pointY = rectY + 0.5f * rectH - point.second * rectH;
-        GRAPHICS::DRAW_RECT(pointX, pointY,
+        GRAPHICS::DRAW_RECT({ pointX, pointY },
             blockW, blockH,
             255, 255, 255, 255, 0);
     }
@@ -84,7 +84,7 @@ std::vector<std::string> ShowDynamicFfbCurve(float input, float gamma, int respo
     };
     float pointX = rectX - 0.5f * rectW + currentPoint.first * rectW;
     float pointY = rectY + 0.5f * rectH - currentPoint.second * rectH;
-    GRAPHICS::DRAW_RECT(pointX, pointY,
+    GRAPHICS::DRAW_RECT({ pointX, pointY },
         3.0f * blockW, 3.0f * blockH,
         255, 0, 0, 255, 0);
 
@@ -114,22 +114,22 @@ std::vector<std::string> ShowGammaCurve(const std::string& axis, const float inp
 
     float rectX = 0.5f;
     float rectY = 0.5f;
-    float rectW = 0.40f / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+    float rectW = 0.40f / GRAPHICS::GET_ASPECT_RATIO(FALSE);
     float rectH = 0.40f;
-    float blockW = rectW / max_samples;//0.001f * (16.0f / 9.0f) / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
-    float blockH = blockW * GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+    float blockW = rectW / max_samples;//0.001f * (16.0f / 9.0f) / GRAPHICS::GET_ASPECT_RATIO(FALSE);
+    float blockH = blockW * GRAPHICS::GET_ASPECT_RATIO(FALSE);
 
-    GRAPHICS::DRAW_RECT(rectX, rectY,
+    GRAPHICS::DRAW_RECT({ rectX, rectY },
         rectW + 3.0f * blockW, rectH + 3.0f * blockH,
         255, 255, 255, 191, 0);
-    GRAPHICS::DRAW_RECT(rectX, rectY,
+    GRAPHICS::DRAW_RECT({ rectX, rectY },
         rectW + blockW / 2.0f, rectH + blockH / 2.0f,
         0, 0, 0, 239, 0);
 
     for (auto point : points) {
         float pointX = rectX - 0.5f * rectW + point.first * rectW;
         float pointY = rectY + 0.5f * rectH - point.second * rectH;
-        GRAPHICS::DRAW_RECT(pointX, pointY,
+        GRAPHICS::DRAW_RECT({ pointX, pointY },
             blockW, blockH,
             255, 255, 255, 255, 0);
     }
@@ -137,7 +137,7 @@ std::vector<std::string> ShowGammaCurve(const std::string& axis, const float inp
     std::pair<float, float> currentPoint = { input, pow(input, gamma) };
     float pointX = rectX - 0.5f * rectW + currentPoint.first * rectW;
     float pointY = rectY + 0.5f * rectH - currentPoint.second * rectH;
-    GRAPHICS::DRAW_RECT(pointX, pointY,
+    GRAPHICS::DRAW_RECT({ pointX, pointY },
         3.0f * blockW, 3.0f * blockH,
         255, 0, 0, 255, 0);
 

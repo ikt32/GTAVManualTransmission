@@ -48,8 +48,7 @@ float CustomSteering::calculateReduction() {
     float mult = 1;
     Vector3 vel = ENTITY::GET_ENTITY_VELOCITY(mVehicle);
     Vector3 pos = ENTITY::GET_ENTITY_COORDS(mVehicle, 1);
-    Vector3 motion = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(mVehicle, pos.x + vel.x, pos.y + vel.y,
-        pos.z + vel.z);
+    Vector3 motion = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(mVehicle, pos + vel);
     if (motion.y > 3) {
         mult = 0.15f + powf(0.9f, abs(motion.y) - 7.2f);
         if (mult != 0) { mult = floorf(mult * 1000) / 1000; }
@@ -103,17 +102,17 @@ void CustomSteering::DrawDebug() {
 
     Vector3 speedVector = ENTITY::GET_ENTITY_SPEED_VECTOR(g_playerVehicle, true);
     Vector3 positionWorld = ENTITY::GET_ENTITY_COORDS(g_playerVehicle, 1);
-    Vector3 travelRelative = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, speedVector.x, speedVector.y, speedVector.z);
+    Vector3 travelRelative = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, speedVector);
 
     float steeringAngleRelX = ENTITY::GET_ENTITY_SPEED(g_playerVehicle) * -sin(steeringAngle);
     float steeringAngleRelY = ENTITY::GET_ENTITY_SPEED(g_playerVehicle) * cos(steeringAngle);
-    Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, steeringAngleRelX, steeringAngleRelY, 0.0f);
+    Vector3 steeringWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, { steeringAngleRelX, steeringAngleRelY, 0.0f });
 
     //showText(0.3f, 0.15f, 0.5f, fmt::format("Angle: {}", rad2deg(steeringAngle)));
 
-    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, travelRelative.x, travelRelative.y, travelRelative.z, 0, 255, 0, 255);
+    GRAPHICS::DRAW_LINE(positionWorld, travelRelative, 0, 255, 0, 255);
     UI::DrawSphere(travelRelative, 0.25f, { 0, 255, 0, 255 });
-    GRAPHICS::DRAW_LINE(positionWorld.x, positionWorld.y, positionWorld.z, steeringWorld.x, steeringWorld.y, steeringWorld.z, 255, 0, 255, 255);
+    GRAPHICS::DRAW_LINE(positionWorld, steeringWorld, 255, 0, 255, 255);
     UI::DrawSphere(steeringWorld, 0.25f, { 255, 0, 255, 255 });
 }
 

@@ -206,7 +206,7 @@ void drawDashLights() {
         txSz, txSz,
         0.5f, 0.5f, // center of texture
         XPos - 0.045f * size, YPos,
-        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), absColor.R, absColor.G, absColor.B, absColor.A);
+        0.0f, GRAPHICS::GET_ASPECT_RATIO(FALSE), absColor.R, absColor.G, absColor.B, absColor.A);
 
     Util::ColorF tcsColor{};
     if (g_settings().DriveAssists.TCS.Enable) {
@@ -228,7 +228,7 @@ void drawDashLights() {
         txSz, txSz,
         0.5f, 0.5f, // center of texture
         XPos - 0.015f * size, YPos,
-        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), tcsColor.R, tcsColor.G, tcsColor.B, tcsColor.A);
+        0.0f, GRAPHICS::GET_ASPECT_RATIO(FALSE), tcsColor.R, tcsColor.G, tcsColor.B, tcsColor.A);
 
     Util::ColorF espColor{};
     if (g_settings().DriveAssists.ESP.Enable) {
@@ -247,7 +247,7 @@ void drawDashLights() {
         txSz, txSz,
         0.5f, 0.5f, // center of texture
         XPos + 0.015f * size, YPos,
-        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), espColor.R, espColor.G, espColor.B, espColor.A);
+        0.0f, GRAPHICS::GET_ASPECT_RATIO(FALSE), espColor.R, espColor.G, espColor.B, espColor.A);
 
     Util::ColorF brkColor;
     if (brk) {
@@ -261,10 +261,10 @@ void drawDashLights() {
         txSz, txSz,
         0.5f, 0.5f, // center of texture
         XPos + 0.045f * size, YPos,
-        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), brkColor.R, brkColor.G, brkColor.B, brkColor.A);
+        0.0f, GRAPHICS::GET_ASPECT_RATIO(FALSE), brkColor.R, brkColor.G, brkColor.B, brkColor.A);
 
     // Background
-    GRAPHICS::DRAW_RECT(XPos, YPos,
+    GRAPHICS::DRAW_RECT({ XPos, YPos },
         rectSzX, rectSzY,
         0, 0, 0, 127, 0);
 
@@ -274,7 +274,7 @@ void drawDashLights() {
             g_settings.HUD.DsProt.Size, g_settings.HUD.DsProt.Size,
             0.5f, 0.5f, // center of texture
             g_settings.HUD.DsProt.XPos, g_settings.HUD.DsProt.YPos,
-            0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 0.93f, 0.83f, 0.01f, 1.0f);
+            0.0f, GRAPHICS::GET_ASPECT_RATIO(FALSE), 0.93f, 0.83f, 0.01f, 1.0f);
     }
 }
 
@@ -283,7 +283,7 @@ Vector3 GetAccelVector() {
     Vector3 worldVelDelta = (worldVel - GForce::PrevWorldVel);
 
     Vector3 fwdVec = ENTITY::GET_ENTITY_FORWARD_VECTOR(g_playerVehicle);
-    Vector3 upVec = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, 0.0f, 0.0f, 1.0f) - ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
+    Vector3 upVec = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, { 0.0f, 0.0f, 1.0f }) - ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
     Vector3 rightVec = Cross(fwdVec, upVec);
 
     Vector3 relVelDelta{
@@ -301,7 +301,7 @@ void drawGForces() {
     using namespace GForce;
     float locX = g_settings.Debug.Metrics.GForce.PosX;
     float locY = g_settings.Debug.Metrics.GForce.PosY;
-    float szX = g_settings.Debug.Metrics.GForce.Size / GRAPHICS::_GET_ASPECT_RATIO(FALSE);
+    float szX = g_settings.Debug.Metrics.GForce.Size / GRAPHICS::GET_ASPECT_RATIO(FALSE);
     float szY = g_settings.Debug.Metrics.GForce.Size;
 
     // menu width = 0.225f
@@ -331,15 +331,15 @@ void drawGForces() {
         CoordTrails.erase(CoordTrails.begin());
     }
 
-    GRAPHICS::DRAW_RECT(locX, locY, szX, szY, 0, 0, 0, 127, 0);
-    GRAPHICS::DRAW_RECT(locX, locY, 0.001f, szY, 255, 255, 255, 127, 0);
-    GRAPHICS::DRAW_RECT(locX, locY, szX, 0.001f, 255, 255, 255, 127, 0);
+    GRAPHICS::DRAW_RECT({ locX, locY }, szX, szY, 0, 0, 0, 127, 0);
+    GRAPHICS::DRAW_RECT({ locX, locY }, 0.001f, szY, 255, 255, 255, 127, 0);
+    GRAPHICS::DRAW_RECT({ locX, locY }, szX, 0.001f, 255, 255, 255, 127, 0);
 
-    GRAPHICS::DRAW_RECT(locX + 0.25f * szX, locY, 0.001f, szY, 127, 127, 127, 127, 0);
-    GRAPHICS::DRAW_RECT(locX, locY + 0.25f * szY, szX, 0.001f, 127, 127, 127, 127, 0);
+    GRAPHICS::DRAW_RECT({ locX + 0.25f * szX, locY }, 0.001f, szY, 127, 127, 127, 127, 0);
+    GRAPHICS::DRAW_RECT({ locX, locY + 0.25f * szY }, szX, 0.001f, 127, 127, 127, 127, 0);
 
-    GRAPHICS::DRAW_RECT(locX - 0.25f * szX, locY, 0.001f, szY, 127, 127, 127, 127, 0);
-    GRAPHICS::DRAW_RECT(locX, locY - 0.25f * szY, szX, 0.001f, 127, 127, 127, 127, 0);
+    GRAPHICS::DRAW_RECT({ locX - 0.25f * szX, locY }, 0.001f, szY, 127, 127, 127, 127, 0);
+    GRAPHICS::DRAW_RECT({ locX, locY - 0.25f * szY }, szX, 0.001f, 127, 127, 127, 127, 0);
 
     std::vector<float> allX;
     std::vector<float> allY;
@@ -348,29 +348,29 @@ void drawGForces() {
     for (auto it = CoordTrails.begin(); it != CoordTrails.end(); ++it) {
         auto c = *it;
         if (std::next(it) == CoordTrails.end()) {
-            GRAPHICS::DRAW_RECT(locX + c.first, locY + c.second, szX * 0.025f, szY * 0.025f, 255, 255, 255, 255, 0);
+            GRAPHICS::DRAW_RECT({ locX + c.first, locY + c.second }, szX * 0.025f, szY * 0.025f, 255, 255, 255, 255, 0);
             allX.push_back(locX + c.first);
             allY.push_back(locY + c.second);
         }
         else {
-            GRAPHICS::DRAW_RECT(locX + c.first, locY + c.second, szX * 0.025f, szY * 0.025f, 127, 127, 127, alpha, 0);
+            GRAPHICS::DRAW_RECT({ locX + c.first, locY + c.second }, szX * 0.025f, szY * 0.025f, 127, 127, 127, alpha, 0);
             allX.push_back(locX + c.first);
             allY.push_back(locY + c.second);
         }
         alpha += 255 / static_cast<int>(CoordTrails.size());
     }
 
-    GRAPHICS::DRAW_RECT(avg(allX), avg(allY), szX * 0.020f, szY * 0.020f, 255, 0, 0, 255, 0);
+    GRAPHICS::DRAW_RECT({ avg(allX), avg(allY) }, szX * 0.020f, szY * 0.020f, 255, 0, 0, 255, 0);
 }
 
 void drawRPMIndicator(float x, float y, float width, float height, Util::ColorI fg, Util::ColorI bg, float rpm) {
     float bgpaddingx = 0.00f;
     float bgpaddingy = 0.01f;
     // background
-    GRAPHICS::DRAW_RECT(x, y, width + bgpaddingx, height + bgpaddingy, bg.R, bg.G, bg.B, bg.A, 0);
+    GRAPHICS::DRAW_RECT({ x, y }, width + bgpaddingx, height + bgpaddingy, bg.R, bg.G, bg.B, bg.A, 0);
 
     // rpm bar
-    GRAPHICS::DRAW_RECT(x - width*0.5f + rpm*width*0.5f, y, width*rpm, height, fg.R, fg.G, fg.B, fg.A, 0);
+    GRAPHICS::DRAW_RECT({ x - width * 0.5f + rpm * width * 0.5f, y }, width * rpm, height, fg.R, fg.G, fg.B, fg.A, 0);
 }
 
 void drawRPMIndicator() {
@@ -730,22 +730,23 @@ void drawInputWheelInfo() {
         g_settings.HUD.Wheel.ImgSize, g_settings.HUD.Wheel.ImgSize,
         0.5f, 0.5f, // center of texture
         g_settings.HUD.Wheel.ImgXPos, g_settings.HUD.Wheel.ImgYPos,
-        rotation / rotDiv, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
+        rotation / rotDiv, GRAPHICS::GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
 
     // Pedals
     float barWidth = g_settings.HUD.Wheel.PedalXSz / 3.0f;
 
     float barYBase = (g_settings.HUD.Wheel.PedalYPos + g_settings.HUD.Wheel.PedalYSz * 0.5f);
 
-    GRAPHICS::DRAW_RECT(g_settings.HUD.Wheel.PedalXPos, g_settings.HUD.Wheel.PedalYPos, 3.0f * barWidth + g_settings.HUD.Wheel.PedalXPad, g_settings.HUD.Wheel.PedalYSz + g_settings.HUD.Wheel.PedalYPad, 
+    GRAPHICS::DRAW_RECT({ g_settings.HUD.Wheel.PedalXPos, g_settings.HUD.Wheel.PedalYPos },
+        3.0f * barWidth + g_settings.HUD.Wheel.PedalXPad, g_settings.HUD.Wheel.PedalYSz + g_settings.HUD.Wheel.PedalYPad,
         0, 0, 0, g_settings.HUD.Wheel.PedalBgA, 0);
-    GRAPHICS::DRAW_RECT(g_settings.HUD.Wheel.PedalXPos + 1.0f * barWidth, barYBase - g_controls.ThrottleVal * g_settings.HUD.Wheel.PedalYSz * 0.5f,
+    GRAPHICS::DRAW_RECT({ g_settings.HUD.Wheel.PedalXPos + 1.0f * barWidth, barYBase - g_controls.ThrottleVal * g_settings.HUD.Wheel.PedalYSz * 0.5f },
         barWidth, g_controls.ThrottleVal * g_settings.HUD.Wheel.PedalYSz, 
         g_settings.HUD.Wheel.PedalThrottleR, g_settings.HUD.Wheel.PedalThrottleG, g_settings.HUD.Wheel.PedalThrottleB, g_settings.HUD.Wheel.PedalThrottleA, 0);
-    GRAPHICS::DRAW_RECT(g_settings.HUD.Wheel.PedalXPos + 0.0f * barWidth, barYBase - g_controls.BrakeVal * g_settings.HUD.Wheel.PedalYSz * 0.5f,
+    GRAPHICS::DRAW_RECT({ g_settings.HUD.Wheel.PedalXPos + 0.0f * barWidth, barYBase - g_controls.BrakeVal * g_settings.HUD.Wheel.PedalYSz * 0.5f },
         barWidth, g_controls.BrakeVal * g_settings.HUD.Wheel.PedalYSz,
         g_settings.HUD.Wheel.PedalBrakeR, g_settings.HUD.Wheel.PedalBrakeG, g_settings.HUD.Wheel.PedalBrakeB, g_settings.HUD.Wheel.PedalBrakeA, 0);
-    GRAPHICS::DRAW_RECT(g_settings.HUD.Wheel.PedalXPos - 1.0f * barWidth, barYBase - g_controls.ClutchVal * g_settings.HUD.Wheel.PedalYSz * 0.5f,
+    GRAPHICS::DRAW_RECT({ g_settings.HUD.Wheel.PedalXPos - 1.0f * barWidth, barYBase - g_controls.ClutchVal * g_settings.HUD.Wheel.PedalYSz * 0.5f },
         barWidth, g_controls.ClutchVal * g_settings.HUD.Wheel.PedalYSz,
         g_settings.HUD.Wheel.PedalClutchR, g_settings.HUD.Wheel.PedalClutchG, g_settings.HUD.Wheel.PedalClutchB, g_settings.HUD.Wheel.PedalClutchA, 0);
 
@@ -761,12 +762,14 @@ void drawVehicleWheelTractionVector() {
     auto wheelCoords = Util::GetWheelCoords(g_playerVehicle);
     for (int i = 0; i < numWheels; i++) {
         Vector3 tractionVectorWorld = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle,
-            wheelOffs[i].x + -wheelTVLXs[i], wheelOffs[i].y + wheelTVLYs[i], wheelOffs[i].z);
+            { wheelOffs[i].x + -wheelTVLXs[i], wheelOffs[i].y + wheelTVLYs[i], wheelOffs[i].z });
 
         int red = wheelTVLYs[i] > 0.0f ? 0 : 255;
         int green = wheelTVLYs[i] > 0.0f ? 255 : 0;
-        GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
-            tractionVectorWorld.x, tractionVectorWorld.y, tractionVectorWorld.z, red, green, 0, 255);
+        GRAPHICS::DRAW_LINE(
+            wheelCoords[i],
+            tractionVectorWorld,
+            red, green, 0, 255);
 
         UI::DrawSphere(tractionVectorWorld, 0.05f, Util::ColorI{ red, green, 0, 255 });
     }
@@ -868,8 +871,10 @@ void drawVehicleWheelInfo() {
                 //fmt::format("Heat?: {:.1f}", wheelHots[i]),
             },
             color);
-        GRAPHICS::DRAW_LINE(wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z,
-            wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z + 1.0f + 2.5f * wheelsCompr[i], 255, 0, 0, 255);
+        GRAPHICS::DRAW_LINE(
+            wheelCoords[i],
+            { wheelCoords[i].x, wheelCoords[i].y, wheelCoords[i].z + 1.0f + 2.5f * wheelsCompr[i] },
+            255, 0, 0, 255);
     }
 }
 
@@ -894,23 +899,13 @@ void drawLSDInfo() {
 
 void drawMouseSteering() {
     GRAPHICS::DRAW_RECT(
-        g_settings.HUD.MouseSteering.XPos,
-        g_settings.HUD.MouseSteering.YPos,
-        g_settings.HUD.MouseSteering.XSz,
-        g_settings.HUD.MouseSteering.YSz,
-        g_settings.HUD.MouseSteering.BgR,
-        g_settings.HUD.MouseSteering.BgG,
-        g_settings.HUD.MouseSteering.BgB,
-        g_settings.HUD.MouseSteering.BgA, 0);
+        { g_settings.HUD.MouseSteering.XPos, g_settings.HUD.MouseSteering.YPos },
+        g_settings.HUD.MouseSteering.XSz, g_settings.HUD.MouseSteering.YSz,
+        g_settings.HUD.MouseSteering.BgR, g_settings.HUD.MouseSteering.BgG, g_settings.HUD.MouseSteering.BgB, g_settings.HUD.MouseSteering.BgA, 0);
     GRAPHICS::DRAW_RECT(
-        g_settings.HUD.MouseSteering.XPos + CustomSteering::GetMouseX() * g_settings.HUD.MouseSteering.XSz * 0.5f,
-        g_settings.HUD.MouseSteering.YPos,
-        g_settings.HUD.MouseSteering.MarkerXSz,
-        g_settings.HUD.MouseSteering.YSz,
-        g_settings.HUD.MouseSteering.FgR,
-        g_settings.HUD.MouseSteering.FgG,
-        g_settings.HUD.MouseSteering.FgB,
-        g_settings.HUD.MouseSteering.FgA, 0);
+        { g_settings.HUD.MouseSteering.XPos + CustomSteering::GetMouseX() * g_settings.HUD.MouseSteering.XSz * 0.5f, g_settings.HUD.MouseSteering.YPos },
+        g_settings.HUD.MouseSteering.MarkerXSz, g_settings.HUD.MouseSteering.YSz,
+        g_settings.HUD.MouseSteering.FgR, g_settings.HUD.MouseSteering.FgG, g_settings.HUD.MouseSteering.FgB, g_settings.HUD.MouseSteering.FgA, 0);
 }
 
 void drawSteeringFfb() {
@@ -969,11 +964,11 @@ void drawSteeringFfb() {
     }
 
     // background
-    GRAPHICS::DRAW_RECT(x, y, width + bgpaddingx, height + bgpaddingy, bg.R, bg.G, bg.B, bg.A, 0);
+    GRAPHICS::DRAW_RECT({ x, y }, width + bgpaddingx, height + bgpaddingy, bg.R, bg.G, bg.B, bg.A, 0);
 
     // rpm bar
     GRAPHICS::DRAW_RECT(
-        x + val * width * 0.25f, y,
+        { x + val * width * 0.25f, y },
         0.5f * width * val, height,
         fg.R, fg.G, fg.B, fg.A, 0);
 }

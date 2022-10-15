@@ -243,7 +243,7 @@ void update_mainmenu() {
                     { "Press Select/Enter to check GTA5-Mods.com.",
                         "Press right to ignore the current update." })) {
                     WAIT(20);
-                    PAD::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
+                    PAD::SET_CONTROL_VALUE_NEXT_FRAME(0, ControlFrontendPause, 1.0f);
                     ShellExecuteA(0, 0, modUrl.c_str(), 0, 0, SW_SHOW);
                 }
             }
@@ -1076,7 +1076,7 @@ void update_forcefeedbackmenu() {
             "Select to open the readme on how to activate this."
         })) {
             WAIT(20);
-            PAD::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
+            PAD::SET_CONTROL_VALUE_NEXT_FRAME(0, ControlFrontendPause, 1.0f);
             ShellExecuteA(0, 0, "https://github.com/E66666666/GTAVManualTransmission/blob/master/doc/README.md#wheel-ffb-lut", 0, 0, SW_SHOW);
         }
 
@@ -1474,7 +1474,7 @@ void update_dsprotmenu() {
         g_settings.HUD.DsProt.Size, g_settings.HUD.DsProt.Size,
         0.5f, 0.5f, // center of texture
         g_settings.HUD.DsProt.XPos, g_settings.HUD.DsProt.YPos,
-        0.0f, GRAPHICS::_GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
+        0.0f, GRAPHICS::GET_ASPECT_RATIO(FALSE), 1.0f, 1.0f, 1.0f, 1.0f);
 
     g_menu.BoolOption("Enable", g_settings.HUD.DsProt.Enable,
         { "When enabled, a warning flashes and a warning sound plays." });
@@ -1695,7 +1695,7 @@ void update_awdsettingsmenu() {
         if (g_menu.Option("HandlingReplacement.asi missing",
             { "Adaptive AWD needs HandlingReplacement. Press Select to go to the download page." })) {
             WAIT(20);
-            PAD::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
+            PAD::SET_CONTROL_VALUE_NEXT_FRAME(0, ControlFrontendPause, 1.0f);
             ShellExecuteA(0, 0, "https://www.gta5-mods.com/tools/handling-replacement-library", 0, 0, SW_SHOW);
         }
     }
@@ -2017,7 +2017,7 @@ void update_cameraoptionsmenu() {
               "DismembermentASI.asi by CamxxCore from Jedijosh' dismemberment mod is "
               "needed to hide the player head." })) {
             WAIT(20);
-            PAD::_SET_CONTROL_NORMAL(0, ControlFrontendPause, 1.0f);
+            PAD::SET_CONTROL_VALUE_NEXT_FRAME(0, ControlFrontendPause, 1.0f);
             ShellExecuteA(0, 0, "https://www.gta5-mods.com/scripts/dismemberment", 0, 0, SW_SHOW);
         }
     }

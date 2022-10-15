@@ -7,7 +7,7 @@
 #include <fmt/format.h>
 
 void Controls::SetControlADZ(eControl control, float value, float adz) {
-    PAD::_SET_CONTROL_NORMAL(0, control, sgn(value) * adz + (1.0f - adz) * value);
+    PAD::SET_CONTROL_VALUE_NEXT_FRAME(0, control, sgn(value) * adz + (1.0f - adz) * value);
 }
 
 bool Util::PlayerAvailable(Player player, Ped playerPed) {

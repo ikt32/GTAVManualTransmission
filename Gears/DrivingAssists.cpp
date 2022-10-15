@@ -51,8 +51,7 @@ DrivingAssists::TCSData DrivingAssists::GetTCS() {
 
     for (int i = 0; i < g_vehData.mWheelCount; i++) {
         auto boneVelProjection = posWorld + boneVels[i];
-        auto boneVelRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(
-            g_playerVehicle, boneVelProjection.x, boneVelProjection.y, boneVelProjection.z);
+        auto boneVelRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(g_playerVehicle, boneVelProjection);
 
         float rotatedY = boneVelRel.y / cos(steeringAngles[i]);
         slips[i] = g_vehData.mWheelTyreSpeeds[i] - rotatedY;

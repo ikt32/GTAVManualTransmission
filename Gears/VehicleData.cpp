@@ -15,8 +15,7 @@ namespace {
     bool GetIsRhd(Vehicle v) {
         Vector3 driverSeatPos = 
             ENTITY::GET_WORLD_POSITION_OF_ENTITY_BONE(v, ENTITY::GET_ENTITY_BONE_INDEX_BY_NAME(v, "seat_dside_f"));
-        Vector3 driverSeatPosRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(v,
-            driverSeatPos.x, driverSeatPos.y, driverSeatPos.z);
+        Vector3 driverSeatPosRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(v, driverSeatPos);
 
         //Vector3 dimMin, dimMax;
         //MISC::GET_MODEL_DIMENSIONS(ENTITY::GET_ENTITY_MODEL(v), &dimMin, &dimMax);

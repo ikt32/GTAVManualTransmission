@@ -19,13 +19,6 @@ Vector3 GetVector3(NativeVector3 value);
 
 NativeVector3 GetNativeVector3(Vector3 value);
 
-struct Vector4 {
-    float X;
-    float Y;
-    float Z;
-    float W;
-};
-
 struct Quaternion {
     float X;
     float Y;
