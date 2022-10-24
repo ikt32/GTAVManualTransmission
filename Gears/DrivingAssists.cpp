@@ -54,7 +54,7 @@ DrivingAssists::TCSData DrivingAssists::GetTCS() {
         auto boneVelRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(g_playerVehicle, boneVelProjection);
 
         float rotatedY = boneVelRel.y / cos(steeringAngles[i]);
-        slips[i] = g_vehData.mWheelTyreSpeeds[i] - rotatedY;
+        slips[i] = g_vehData.mWheelTyreSpeeds[i] / rotatedY;
 
         bool shouldCheck = g_vehData.mSuspensionTravel[i] > 0.0f &&
             g_vehData.mWheelsDriven[i] &&
@@ -338,11 +338,11 @@ std::vector<float> DrivingAssists::GetTCSBrakes(TCSData tcsData) {
     for (int i = 0; i < g_vehData.mWheelCount; i++) {
         float bbal = offsets[i].y > 0.0f ? bbalF : bbalR;
 
-        if (tcsData.LinearSlip[i] > tcsSlipMin &&
+        if (tcsData.LinearSlipRatio[i] > tcsSlipMin &&
             g_vehData.mWheelTyreSpeeds[i] > 0.0f &&
             g_vehData.mSuspensionTravel[i] > 0.0f) {
             float mappedVal = map(
-                tcsData.LinearSlip[i],
+                tcsData.LinearSlipRatio[i],
                 tcsSlipMin, tcsSlipMax,
                 0.0f, fullBrakePower);
             mappedVal = std::clamp(mappedVal, 0.0f, fullBrakePower);

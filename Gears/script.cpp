@@ -1817,7 +1817,7 @@ void handleBrakePatch() {
             slipMax = tcsSlipMax;
         }
         
-        tractionThrottle = map(tcsData.AverageSlip,
+        tractionThrottle = map(tcsData.AverageSlipRatio,
             slipMin, slipMax,
             g_controls.ThrottleVal, 0.0f);
         tractionThrottle = std::clamp(tractionThrottle, 0.0f, g_controls.ThrottleVal);
@@ -1827,7 +1827,7 @@ void handleBrakePatch() {
 
     if (tcsData.Use) {
         for (int i = 0; i < g_vehData.mWheelCount; i++) {
-            g_vehData.mWheelsTcs[i] = tcsData.LinearSlip[i] > g_settings().DriveAssists.TCS.SlipMin &&
+            g_vehData.mWheelsTcs[i] = tcsData.LinearSlipRatio[i] > g_settings().DriveAssists.TCS.SlipMin &&
                 g_vehData.mWheelTyreSpeeds[i] > 0.0f;
         }
     }
@@ -2069,7 +2069,7 @@ void handleBrakePatch() {
         UI::ShowText(0.60f, 0.100f, 0.25f, fmt::format("{}TCS~s~ / {}LC",
             tcsThrottle ? "~g~" : "", lcThrottle ? "~g~" : ""));
         std::string controlledThrottle = tcsThrottle || lcThrottle ? fmt::format("{:.2f}", tractionThrottle) : "N/A";
-        UI::ShowText(0.60f, 0.125f, 0.25f, fmt::format("Average slip: {:.2f} m/s", tcsData.AverageSlip));
+        UI::ShowText(0.60f, 0.125f, 0.25f, fmt::format("Average slip: {:.2f}", tcsData.AverageSlipRatio));
         UI::ShowText(0.60f, 0.150f, 0.25f, fmt::format("Throttle: {}", controlledThrottle));
 
         if (cutThrottle) {

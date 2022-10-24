@@ -866,7 +866,7 @@ void drawVehicleWheelInfo() {
                     ),
                 fmt::format("DF: {:.3f}", wheelDfs[i]),
                 //fmt::format("TVL: {:.3f}", wheelTVLs[i]),
-                fmt::format("Slip (L): {:.3f}", wheelsTcs.LinearSlip[i]),
+                fmt::format("Slip (L): {:.3f}", wheelsTcs.LinearSlipRatio[i]),
                 fmt::format("Load: {:.0f} kg", wheelLoads[i]),
                 //fmt::format("Heat?: {:.1f}", wheelHots[i]),
             },

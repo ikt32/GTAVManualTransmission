@@ -8,9 +8,9 @@ namespace DrivingAssists {
 
     struct TCSData {
         bool Use;
-        // How much it spins faster/slower than the suspension component. In m/s.
-        std::vector<float> LinearSlip;
-        float AverageSlip;
+        // How much it spins faster/slower than the suspension component. Ratio.
+        std::vector<float> LinearSlipRatio;
+        float AverageSlipRatio;
     };
 
     struct ESPData {

@@ -137,15 +137,21 @@ public:
             // true: only applied to abs-less vehicles
             Tracked<bool> Filter = true;
             Tracked<bool> Flash = false;
+
+            // tyre speed threshold, ratio with actual speed
+            // Should be < 1.0
+            Tracked<float> SlipMin = 0.9f;
+            Tracked<float> SlipMax = 0.8f;
         } ABS;
 
         struct {
             Tracked<bool> Enable = false;
             // 0 Brake, 1 Throttle 
             Tracked<int> Mode = 1;
-            // tyre speed threshold, m/s
-            Tracked<float> SlipMin = 1.0f;
-            Tracked<float> SlipMax = 2.0f;
+            // tyre speed threshold, ratio with actual speed
+            // Should be > 1.0
+            Tracked<float> SlipMin = 1.15f;
+            Tracked<float> SlipMax = 1.25f;
             // Multiplier for fBrakeForce for how hard TCS may brake a wheel.
             Tracked<float> BrakeMult = 1.0f;
         } TCS;
