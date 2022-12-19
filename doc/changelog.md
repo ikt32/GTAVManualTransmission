@@ -1,5 +1,19 @@
 # Changelog
 
+## 5.5.2
+
+Massive thank you to **fingaweg** and **Disquse** for the required changes for b2802! 
+
+* Compatibility fixes for b2802 (Los Santos Drug Wars)
+
+Other fixes/minor features:
+
+* Always allow wheel and keyboard to trigger a shift
+* Custom FPV camera: Fix horizon lock for looking backwards
+* Custom FPV camera: Fix visual glitches (no traffic light green/yellow/red textures)
+* Custom FPV camera: Fix audio mismatch (incorrect interior sound)
+* Minor bug fixes and improvements (Thanks **Zolika** for the improved performance for the string pattern search!)
+
 ## 5.5.1
 
 New features:
