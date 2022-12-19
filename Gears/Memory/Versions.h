@@ -116,6 +116,21 @@ static std::vector<std::string> GameVersionString = {
 
     "VER_1_0_2545_0_STEAM",     // 71
     "VER_1_0_2545_0_NOSTEAM",   // 72
+    "G_VER_1_0_2612_1_STEAM",   // 73
+    "G_VER_1_0_2612_1_NOSTEAM", // 75
+
+    "G_VER_1_0_2628_2_STEAM",   // 75
+    "G_VER_1_0_2628_2_NOSTEAM", // 76
+
+    "G_VER_1_0_2699_0_STEAM",   // 77
+    "G_VER_1_0_2699_0_NOSTEAM", // 78
+
+    "G_VER_1_0_2699_16",        // 79
+
+    "G_VER_1_0_2802_0",         // 80
+
+    "G_VER_SIZE",               // 81
+    "G_VER_UNK"                 // -1
 };
 
 enum G_GameVersion : int {
@@ -196,7 +211,7 @@ enum G_GameVersion : int {
 
     //G_VER_1_0_1734_0_STEAM,   // XX
     //G_VER_1_0_1734_0_NOSTEAM, // XX
-    
+
     G_VER_1_0_1737_0_STEAM,     // 50
     G_VER_1_0_1737_0_NOSTEAM,   // 51
 
@@ -231,6 +246,22 @@ enum G_GameVersion : int {
 
     G_VER_1_0_2545_0_STEAM,     // 71
     G_VER_1_0_2545_0_NOSTEAM,   // 72
+    
+    G_VER_1_0_2612_1_STEAM,     // 73
+    G_VER_1_0_2612_1_NOSTEAM,   // 75
+    
+    G_VER_1_0_2628_2_STEAM,     // 75
+    G_VER_1_0_2628_2_NOSTEAM,   // 76
+    
+    G_VER_1_0_2699_0_STEAM,     // 77
+    G_VER_1_0_2699_0_NOSTEAM,   // 78
+    
+    G_VER_1_0_2699_16,          // 79
+
+    G_VER_1_0_2802_0,           // 80
+    
+    G_VER_SIZE,                 // 81
+    G_VER_UNK = -1              // -1
 };
 
 static std::vector<std::pair<SVersion, std::vector<int>>> ExeVersionMap = {
@@ -273,6 +304,11 @@ static std::vector<std::pair<SVersion, std::vector<int>>> ExeVersionMap = {
     { { 2245, 0 },  { G_VER_1_0_2245_0_STEAM, G_VER_1_0_2245_0_NOSTEAM} },
     { { 2372, 0 },  { G_VER_1_0_2372_0_STEAM, G_VER_1_0_2372_0_NOSTEAM} },
     { { 2545, 0 },  { G_VER_1_0_2545_0_STEAM, G_VER_1_0_2545_0_NOSTEAM} },
+    { { 2612, 1 },  { G_VER_1_0_2612_1_STEAM, G_VER_1_0_2612_1_NOSTEAM} },
+    { { 2628, 2 },  { G_VER_1_0_2628_2_STEAM, G_VER_1_0_2628_2_NOSTEAM} },
+    { { 2699, 0 },  { G_VER_1_0_2699_0_STEAM, G_VER_1_0_2699_0_NOSTEAM} },
+    { { 2699, 16 },  { G_VER_1_0_2699_16} },
+    { { 2802, 0 },  { G_VER_1_0_2802_0} },
 };
 
 static std::string eGameVersionToString(int version) {

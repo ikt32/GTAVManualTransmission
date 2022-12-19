@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <optional>
 #include <map>
+#include <string>
 
 // https://stackoverflow.com/questions/24113864/what-is-the-right-way-to-use-a-guid-as-the-key-in-stdhash-map
 namespace std {
