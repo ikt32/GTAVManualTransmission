@@ -116,6 +116,20 @@ void SetPatterns(int version) {
             "xxxxx????xx??xxx?????xxx?????xx?xx?",
             { 0xE9, 0x00, 0x00, 0x00, 0x00, 0x90 }, 3);
     }
+    if (version >= G_VER_1_0_2802_0) {
+        // compiler changed some stuff around this patch, but not this specific instruction
+        shiftUp = PatternInfo("\x66\x89\x0B\xB8\x05\x00\x00\x00", "xxxxxxxx",
+            { 0x66, 0x89, 0x0B });
+        // just a better pattern mask, offset changed
+        shiftDown = PatternInfo("\x66\x89\x13\x44\x89\x73\x68\xeb", "xxxxx?xx",
+            { 0x66, 0x89, 0x13 });
+        // register has changed, making a better pattern
+        clutchLow = PatternInfo("\xC7\x43\x40\xCD\xCC\xCC\x3D\x66", "xx?xxxxx",
+            { 0xC7, 0x43, 0x4C, 0xCD, 0xCC, 0xCC, 0x3D });
+        // instruction in the end of the pattern has changed, changed mask
+        throttleLift = PatternInfo("\x44\x89\x77\x50\xf3\x0f\x11", "xxxxxxx",
+            { 0x90, 0x90, 0x90, 0x90 });
+    }
 }
 
 bool Test() {
