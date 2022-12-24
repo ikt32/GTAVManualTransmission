@@ -8,6 +8,7 @@ Compatibility with b2802 (Los Santos Drug Wars) wholle thanks to **fingaweg** an
 
 Other fixes/minor features:
 
+* Add support for proportional analog handbrakes (still broken with ABS...)
 * Change traction control/launch control to use relative slip
 * Always allow wheel and keyboard to trigger a shift
 * Custom FPV camera: Fix horizon lock for looking backwards

@@ -461,9 +461,6 @@ void checkCameraButtons() {
 }
 
 void checkVehicleInputButtons() {
-    if (g_controls.HandbrakeVal > 0.1f) {
-        PAD::SET_CONTROL_VALUE_NEXT_FRAME(0, ControlVehicleHandbrake, g_controls.HandbrakeVal);
-    }
     if (g_controls.ButtonIn(CarControls::WheelControlType::Handbrake)) {
         PAD::SET_CONTROL_VALUE_NEXT_FRAME(0, ControlVehicleHandbrake, 1.0f);
     }

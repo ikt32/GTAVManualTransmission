@@ -136,6 +136,21 @@ void CarControls::updateWheel() {
     SteerValRaw = getInputValue(WheelAxisType::Steer, WheelControlType::UNKNOWN, 
         static_cast<float>(g_settings.Wheel.Steering.Min), static_cast<float>(g_settings.Wheel.Steering.Max));
     SteerVal = filterDeadzone(SteerValRaw, g_settings.Wheel.Steering.DeadZone, g_settings.Wheel.Steering.DeadZoneOffset);
+
+    auto canUseAxis = [this](WheelAxisType axisType) -> bool {
+        auto axis = mWheelInput.StringToAxis(WheelAxes[static_cast<int>(axisType)].Control);
+        auto axisGUID = WheelAxes[static_cast<int>(axisType)].Guid;
+        int axisValue = mWheelInput.GetAxisValue(axis, axisGUID);
+
+        if (axisValue != -1) {
+            return true;
+        }
+        return false;
+    };
+
+    if (canUseAxis(WheelAxisType::Handbrake)) {
+        UseAnalogHandbrake = true;
+    }
 }
 
 void CarControls::UpdateValues(InputDevices prevInput, bool skipKeyboardInput) {

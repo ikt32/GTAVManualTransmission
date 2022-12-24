@@ -1781,6 +1781,28 @@ void functionEngBrake() {
 //                       Mod functions: Gearbox control
 ///////////////////////////////////////////////////////////////////////////////
 
+// TODO: Move somewhere else, some day...
+std::vector<float> GetHandBrakeVals(float handbrakeValInput){
+    std::vector<float> brakeVals(g_vehData.mWheelCount);
+    const auto offsets = VExt::GetWheelOffsets(g_playerVehicle);
+
+    const float handlingHandbrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fHandBrakeForce);
+
+    float inpBrakeForce = handlingHandbrakeForce * handbrakeValInput;
+
+    for (uint8_t i = 0; i < g_vehData.mWheelCount; i++) {
+        if (offsets[i].y > 0.0f) {
+            // front
+            brakeVals[i] = 0.0f;
+        }
+        else {
+            // rear
+            brakeVals[i] = inpBrakeForce;
+        }
+    }
+    return brakeVals;
+}
+
 void handleBrakePatch() {
     auto absData = DrivingAssists::GetABS();
     auto tcsData = DrivingAssists::GetTCS();
@@ -1952,6 +1974,7 @@ void handleBrakePatch() {
         g_wheelPatchStates.EngBrakeActive;
 
     bool patchBrake =
+        g_controls.UseAnalogHandbrake && g_controls.HandbrakeVal > 0.01f ||
         absData.Use ||
         espData.Use ||
         tcsData.Use && g_settings().DriveAssists.TCS.Mode == 0;
@@ -2002,10 +2025,11 @@ void handleBrakePatch() {
             }
         }
 
-        if (espData.Use ||
+        if (g_controls.UseAnalogHandbrake && g_controls.HandbrakeVal > 0.01f || 
+            espData.Use ||
             tcsData.Use && g_settings().DriveAssists.TCS.Mode == 0 ||
             absData.Use) {
-
+            auto hbVals = GetHandBrakeVals(g_controls.HandbrakeVal);
             auto espBrakeVals = DrivingAssists::GetESPBrakes(espData);
             auto tcsBrakeVals = DrivingAssists::GetTCSBrakes(tcsData);
             auto absBrakeVals = DrivingAssists::GetABSBrakes(absData);
@@ -2020,6 +2044,9 @@ void handleBrakePatch() {
                 }
                 if (absData.Use && g_vehData.mWheelsAbs[i]) {
                     brakeVal = std::min(brakeVal, absBrakeVals[i]);
+                }
+                if (hbVals[i] > 0.0f) {
+                    brakeVal = brakeVal + hbVals[i];
                 }
 
                 VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVal);

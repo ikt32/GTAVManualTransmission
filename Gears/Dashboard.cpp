@@ -50,6 +50,10 @@ void Dashboard::Update() {
         data.batteryLight = true;
     }
 
+    if (g_controls.UseAnalogHandbrake && g_controls.HandbrakeVal > 0.01f) {
+        data.handbrakeLight = true;
+    }
+
     if (g_settings().DriveAssists.AWD.Enable) {
         if (g_settings().DriveAssists.AWD.SpecialFlags & AWD::AWD_REMAP_DIAL_Y97Y_R32) {
             data.oilPressure = lerp(

@@ -233,6 +233,7 @@ public:
     float SteerVal = 0.5f;
     float SteerValRaw = 0.0f;   // For readout purposes. SteerVal is used for gameplay.
     float HandbrakeVal = 0.0f;
+    bool UseAnalogHandbrake = false;
 
     bool IsClutchPressed();
 

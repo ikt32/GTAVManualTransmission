@@ -180,7 +180,8 @@ void drawDashLights() {
         esp = true;
     }
 
-    bool brk = VExt::GetHandbrake(g_playerVehicle);
+    bool brk = VExt::GetHandbrake(g_playerVehicle) ||
+        g_controls.UseAnalogHandbrake && g_controls.HandbrakeVal > 0.01f;
 
     const float size = g_settings.HUD.DashIndicators.Size;
     const float txSz = 0.025f * size;

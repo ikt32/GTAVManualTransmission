@@ -234,7 +234,8 @@ DrivingAssists::LSDData DrivingAssists::GetLSD() {
 std::vector<float> DrivingAssists::GetESPBrakes(ESPData espData) {
     std::vector<float> brakeVals(g_vehData.mWheelCount); // only works for 4 wheels but ok
 
-    if (g_vehData.mWheelCount != 4) {
+    if (g_vehData.mWheelCount != 4 ||
+        ENTITY::GET_ENTITY_SPEED(g_playerVehicle) < 1.0f) {
         const float bbalF = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasFront);
         const float bbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasRear);
         const auto offsets = VExt::GetWheelOffsets(g_playerVehicle);
