@@ -1578,15 +1578,18 @@ void update_tcssettingsmenu() {
           "Brakes: Applies brakes for slipping wheels.",
           "Throttle: Reduce throttle when any slip is detected." });
 
-    g_menu.FloatOption("Minimum slip", g_settings().DriveAssists.TCS.SlipMin, 0.0f, 20.0f, 0.1f,
-        { "Wheel slip in m/s where traction control starts to reduce throttle, or apply the brakes." });
+    g_menu.FloatOption("Minimum slip", g_settings().DriveAssists.TCS.SlipMin, 1.0f, 20.0f, 0.05f,
+        { "Wheel speed relative to actual speed, where traction control starts to intervene.",
+          "Recommended value: 1.20x.",
+          "Should be higher than 1.00x." });
 
     float min = g_settings().DriveAssists.TCS.SlipMin;
-    g_menu.FloatOption("Maximum slip", g_settings().DriveAssists.TCS.SlipMax, min, 20.0f, 0.1f,
-        { "Wheel slip in m/s where traction control stops applying throttle, or brake application is max.",
+    g_menu.FloatOption("Maximum slip", g_settings().DriveAssists.TCS.SlipMax, min, 20.0f, 0.05f,
+        { "Wheel speed relative to actual speed, where traction control intervention is maximum.",
+          "Recommended value: 1.40x.",
           "Has to be higher than 'Minimum slip'." });
 
-    g_menu.FloatOption("Brake multiplier", g_settings().DriveAssists.TCS.BrakeMult, 0.0f, 5.0f, 0.05f,
+    g_menu.FloatOptionCb("Brake multiplier", g_settings().DriveAssists.TCS.BrakeMult, 0.0f, 10.0f, 0.05f, GetKbEntryFloat,
         { "How much traction control may brake a wheel at most.",
           "Only applies for Brake-mode traction control.",
           "0.5:  50% braking force applied.",
@@ -1625,11 +1628,14 @@ void update_lcssettingsmenu() {
         { "When staged, hold this RPM." });
 
     g_menu.FloatOption("Minimum slip", g_settings().DriveAssists.LaunchControl.SlipMin, 0.0f, 20.0f, 0.1f,
-        { "Wheel slip in m/s where launch control starts to reduce throttle." });
+        { "Wheel speed relative to actual speed, where launch control starts to intervene (reduce throttle).",
+          "Recommended value: 1.20x.",
+          "Should be higher than 1.00x." });
 
     float min = g_settings().DriveAssists.LaunchControl.SlipMin;
     g_menu.FloatOption("Maximum slip", g_settings().DriveAssists.LaunchControl.SlipMax, min, 20.0f, 0.1f,
-        { "Wheel slip in m/s where launch control reduces throttle to 0.",
+        { "Wheel speed relative to actual speed, where launch control intervention is maximum (zero throttle).",
+          "Recommended value: 1.40x.",
           "Has to be higher than 'Minimum slip'." });
 
     const std::vector<std::string> instructions{

@@ -185,6 +185,13 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("DRIVING_ASSISTS", "TCSSlipMax", DriveAssists.TCS.SlipMax);
     LOAD_VAL("DRIVING_ASSISTS", "TCSBrakeMult", DriveAssists.TCS.BrakeMult);
 
+    if (DriveAssists.TCS.SlipMin <= 1.0f) {
+        logger.Write(WARN, "[VehicleConfig] [%s] TCSSlipMin is %.1f (<= 1.0), correcting to 1.2 (TCSSlipMax corrected to 1.4)",
+            Name.c_str(), DriveAssists.TCS.SlipMin.Value());
+        DriveAssists.TCS.SlipMin = 1.2f;
+        DriveAssists.TCS.SlipMax = 1.4f;
+    }
+
     LOAD_VAL("DRIVING_ASSISTS", "ESP", DriveAssists.ESP.Enable);
     LOAD_VAL("DRIVING_ASSISTS", "ESPOverMin", DriveAssists.ESP.OverMin);
     LOAD_VAL("DRIVING_ASSISTS", "ESPOverMax", DriveAssists.ESP.OverMax);
@@ -219,6 +226,13 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("DRIVING_ASSISTS", "LaunchControlRPM", DriveAssists.LaunchControl.RPM);
     LOAD_VAL("DRIVING_ASSISTS", "LaunchControlSlipMin", DriveAssists.LaunchControl.SlipMin);
     LOAD_VAL("DRIVING_ASSISTS", "LaunchControlSlipMax", DriveAssists.LaunchControl.SlipMax);
+
+    if (DriveAssists.LaunchControl.SlipMin <= 1.0f) {
+        logger.Write(WARN, "[VehicleConfig] [%s] LaunchControlSlipMin is %.1f (<= 1.0), correcting to 1.2 (LaunchControlSlipMax corrected to 1.4)",
+            Name.c_str(), DriveAssists.LaunchControl.SlipMin.Value());
+        DriveAssists.LaunchControl.SlipMin = 1.2f;
+        DriveAssists.LaunchControl.SlipMax = 1.4f;
+    }
 
     LOAD_VAL("DRIVING_ASSISTS", "CruiseControl", DriveAssists.CruiseControl.Enable);
     LOAD_VAL("DRIVING_ASSISTS", "CruiseControlSpeed", DriveAssists.CruiseControl.Speed);

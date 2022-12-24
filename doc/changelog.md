@@ -2,12 +2,13 @@
 
 ## 5.5.2
 
-Massive thank you to **fingaweg** and **Disquse** for the required changes for b2802! 
+Compatibility with b2802 (Los Santos Drug Wars) wholle thanks to **fingaweg** and **Disquse**!
 
 * Compatibility fixes for b2802 (Los Santos Drug Wars)
 
 Other fixes/minor features:
 
+* Change traction control/launch control to use relative slip
 * Always allow wheel and keyboard to trigger a shift
 * Custom FPV camera: Fix horizon lock for looking backwards
 * Custom FPV camera: Fix visual glitches (no traffic light green/yellow/red textures)

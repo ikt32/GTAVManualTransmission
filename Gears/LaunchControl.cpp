@@ -46,7 +46,7 @@ void LaunchControl::Update(float& clutchVal) {
                 if (g_controls.BrakeVal == 0.0f && g_controls.ThrottleVal == 0.0f) {
                     launchState = ELCState::Inactive;
                 }
-                else if (!Math::Near(Length(g_vehData.mVelocity), 0.0f, 0.1f)) {
+                else if (!Math::Near(Length(g_vehData.mVelocity), 0.0f, 2.5f)) {
                     launchState = ELCState::Controlling;
                 }
                 else if (g_controls.BrakeVal > 0.1f && g_controls.ThrottleVal > 0.1f) {

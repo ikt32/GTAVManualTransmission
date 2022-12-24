@@ -19,6 +19,8 @@ public:
     Tracked(T val) : mValue(val), mInitialValue(val), mChanged(false) { }
     Tracked& operator=(T v) { mChanged = true; mValue = v; return *this; }
  
+    T Value() const { return mValue; }
+
     operator T() const { return mValue; }
     operator T&() { if (mValue != mInitialValue) { mChanged = true; } return mValue; }
 
@@ -150,8 +152,8 @@ public:
             Tracked<int> Mode = 1;
             // tyre speed threshold, ratio with actual speed
             // Should be > 1.0
-            Tracked<float> SlipMin = 1.15f;
-            Tracked<float> SlipMax = 1.25f;
+            Tracked<float> SlipMin = 1.20f;
+            Tracked<float> SlipMax = 1.40f;
             // Multiplier for fBrakeForce for how hard TCS may brake a wheel.
             Tracked<float> BrakeMult = 1.0f;
         } TCS;
