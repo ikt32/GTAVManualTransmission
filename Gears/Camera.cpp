@@ -28,6 +28,18 @@ extern VehicleData g_vehData;
 extern eGameVersion g_gameVersion;
 extern VehiclePeripherals g_peripherals;
 
+enum class ePedPropPosition {
+    AnchorHead = 0,
+    AnchorEyes,
+    AnchorEars,
+    AnchorMouth,
+    AnchorLeftHand,
+    AnchorRightHand,
+    AnchorLeftWrist,
+    AnchorRightWrist,
+    AnchorHip
+};
+
 namespace {
     Cam cameraHandle = -1;
     Vector3 camRot{};
@@ -229,7 +241,11 @@ void FPVCam::Update() {
         offsetZ += upPeek;
     }
 
-    bool wearingHelmet = PED::IS_PED_WEARING_HELMET(g_playerPed);
+    bool wearingHelmet =
+        PED::IS_PED_WEARING_HELMET(g_playerPed) ||
+        PED::IS_CURRENT_HEAD_PROP_A_HELMET(g_playerPed) ||
+        PED::GET_PED_PROP_INDEX(g_playerPed, static_cast<int>(ePedPropPosition::AnchorHead)) > -1 ||
+        PED::GET_PED_PROP_INDEX(g_playerPed, static_cast<int>(ePedPropPosition::AnchorEyes)) > -1;
 
     if (wearingHelmet) {
         CAM::SET_CAM_NEAR_CLIP(cameraHandle, 0.200f);
