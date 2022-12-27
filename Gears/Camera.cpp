@@ -72,6 +72,11 @@ namespace {
     float accelPitchDeg = 0.0f;
 
     float lowpassPitch = 0.0f;
+
+    int savedHeadProp = -1;
+    int savedHeadPropTx = -1;
+    int savedEyesProp = -1;
+    int savedEyesPropTx = -1;
 }
 
 namespace FPVCam {
@@ -95,10 +100,11 @@ void FPVCam::CancelCam() {
         CAM::SET_CAM_ACTIVE(cameraHandle, false);
         CAM::DESTROY_CAM(cameraHandle, false);
         cameraHandle = -1;
-        if (g_settings().Misc.Camera.RemoveHead) {
+        if (!g_settings.Debug.FPVCam.DisableRemoveHead) {
             HideHead(false);
         }
         HUD::UNLOCK_MINIMAP_ANGLE();
+        GRAPHICS::SET_PARTICLE_FX_CAM_INSIDE_VEHICLE(false);
     }
     directionLookAngle = 0.0f;
     accelMoveFwd = 0.0f;
@@ -115,6 +121,25 @@ void FPVCam::HideHead(bool remove) {
             headRemoved = false;
         }
     }
+
+    if (!g_settings.Debug.FPVCam.DisableRemoveProps) {
+        if (remove) {
+            savedHeadProp = PED::GET_PED_PROP_INDEX(g_playerPed, static_cast<int>(ePedPropPosition::AnchorHead));
+            savedHeadPropTx = PED::GET_PED_PROP_TEXTURE_INDEX(g_playerPed, static_cast<int>(ePedPropPosition::AnchorHead));
+
+            savedEyesProp = PED::GET_PED_PROP_INDEX(g_playerPed, static_cast<int>(ePedPropPosition::AnchorEyes));
+            savedEyesPropTx = PED::GET_PED_PROP_TEXTURE_INDEX(g_playerPed, static_cast<int>(ePedPropPosition::AnchorEyes));
+
+            PED::CLEAR_PED_PROP(g_playerPed, static_cast<int>(ePedPropPosition::AnchorHead));
+            PED::CLEAR_PED_PROP(g_playerPed, static_cast<int>(ePedPropPosition::AnchorEyes));
+        }
+        else {
+            if (savedHeadProp != -1)
+                PED::SET_PED_PROP_INDEX(g_playerPed, static_cast<int>(ePedPropPosition::AnchorHead), savedHeadProp, savedHeadPropTx, true);
+            if (savedEyesProp != -1)
+                PED::SET_PED_PROP_INDEX(g_playerPed, static_cast<int>(ePedPropPosition::AnchorEyes), savedEyesProp, savedEyesPropTx, true);
+        }
+    }
 }
 
 void FPVCam::initCam() {
@@ -129,13 +154,13 @@ void FPVCam::initCam() {
     // Thanks for finding it, Jitnaught!
     VEHICLE::SET_CAR_HIGH_SPEED_BUMP_SEVERITY_MULTIPLIER(0.0f);
 
-    if (g_settings().Misc.Camera.RemoveHead && Dismemberment::Available()) {
+    if (!g_settings.Debug.FPVCam.DisableRemoveHead) {
         HideHead(true);
     }
 }
 
 void FPVCam::Update() {
-    if (g_settings.Debug.DisableFPVCam) {
+    if (g_settings.Debug.FPVCam.Disable) {
         CancelCam();
         return;
     }
@@ -248,7 +273,10 @@ void FPVCam::Update() {
         PED::GET_PED_PROP_INDEX(g_playerPed, static_cast<int>(ePedPropPosition::AnchorHead)) > -1 ||
         PED::GET_PED_PROP_INDEX(g_playerPed, static_cast<int>(ePedPropPosition::AnchorEyes)) > -1;
 
-    if (wearingHelmet) {
+    if (g_settings.Debug.FPVCam.OverrideNearClip) {
+        CAM::SET_CAM_NEAR_CLIP(cameraHandle, g_settings.Debug.FPVCam.NearClip);
+    }
+    else if (wearingHelmet) {
         CAM::SET_CAM_NEAR_CLIP(cameraHandle, 0.200f);
     }
     else if (!headRemoved) {

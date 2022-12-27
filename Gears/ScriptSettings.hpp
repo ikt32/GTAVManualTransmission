@@ -327,7 +327,14 @@ public:
         bool DisablePlayerHide = false;
         bool DisableNPCGearbox = false;
         bool DisableNPCBrake = false;
-        bool DisableFPVCam = false;
+
+        struct {
+            bool Disable = false;
+            bool DisableRemoveHead = false;
+            bool DisableRemoveProps = false;
+            bool OverrideNearClip = false;
+            float NearClip = 0.05f;
+        } FPVCam;
 
         struct {
             bool EnableTimers = false;

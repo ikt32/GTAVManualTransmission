@@ -292,7 +292,6 @@ public:
         struct {
             Tracked<bool> Enable = true;
             Tracked<int> AttachId = 0; // 0: Head, 1: Vehicle (1), 2: Vehicle (2)
-            Tracked<bool> RemoveHead = true;
 
             Tracked<float> LookTime = 0.000010f;
             Tracked<float> MouseLookTime = 0.000001f;

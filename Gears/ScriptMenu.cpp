@@ -1977,7 +1977,7 @@ void update_cameraoptionsmenu() {
     g_menu.Title("Camera options");
     g_menu.Subtitle(MenuSubtitleConfig());
 
-    if (g_settings.Debug.DisableFPVCam) {
+    if (g_settings.Debug.FPVCam.Disable) {
         g_menu.Option("Warning: Custom camera disabled", NativeMenu::solidRed, 
             { "The custom FPV camera is disabled. Check the debug options to enable it again.",
               "Changing options is still possible, but they will not do anything while the camera is disabled." });
@@ -2008,24 +2008,6 @@ void update_cameraoptionsmenu() {
     if (g_menu.StringArray("Attach to", camAttachPoints, g_settings().Misc.Camera.AttachId, 
         { camInfo, "Vehicle (1) and (2) work the same. The (2) is provided to quickly switch different settings." })) {
         FPVCam::CancelCam(); // it'll re-acquire next tick with the correct position.
-    }
-
-    if (Dismemberment::Available()) {
-        if (g_menu.BoolOption("Hide head", g_settings().Misc.Camera.RemoveHead,
-            { "Using DismembermentASI by CamxxCore from Jedijosh' dismemberment mod, "
-              "the player head can be hidden. This also turns on better near clipping." })) {
-            FPVCam::HideHead(g_settings().Misc.Camera.RemoveHead);
-        }
-    }
-    else {
-        if (g_menu.Option("Hide head (download needed)", NativeMenu::solidRed,
-            { "Press Select/Enter to open Dismemberment on GTA5-Mods.com.",
-              "DismembermentASI.asi by CamxxCore from Jedijosh' dismemberment mod is "
-              "needed to hide the player head." })) {
-            WAIT(20);
-            PAD::SET_CONTROL_VALUE_NEXT_FRAME(0, ControlFrontendPause, 1.0f);
-            ShellExecuteA(0, 0, "https://www.gta5-mods.com/scripts/dismemberment", 0, 0, SW_SHOW);
-        }
     }
 
     g_menu.MenuOption("Motorcycle camera options", "bikecameraoptionsmenu",
@@ -2488,9 +2470,23 @@ void update_compatmenu() {
         { "Disables toggling player visibility by script.",
             "Useful when another script hides the player." });
 
-    g_menu.BoolOption("Disable FPV camera", g_settings.Debug.DisableFPVCam,
+    g_menu.BoolOption("Disable FPV camera", g_settings.Debug.FPVCam.Disable,
         { "Disables the FPV camera for all cars.",
             "Useful when another script customizes the camera." });
+
+    if (g_menu.BoolOption("Disable FPV head hiding", g_settings.Debug.FPVCam.DisableRemoveHead,
+        { "Disables hiding player head with CamxxCore's DismembermentASI.asi present." })) {
+        FPVCam::HideHead(!g_settings.Debug.FPVCam.DisableRemoveHead);
+    }
+
+    g_menu.BoolOption("Disable FPV props removal", g_settings.Debug.FPVCam.DisableRemoveProps,
+        { "Disables removing temporarily removing props (head, eyes) from the player's head.",
+          "Toggle when not in custom FPV, otherwise props may be lost." });
+
+    g_menu.BoolOption("Override FPV near clip", g_settings.Debug.FPVCam.OverrideNearClip,
+        { "Overrides near clip to always use the value below." });
+
+    g_menu.FloatOptionCb("FPV near clip", g_settings.Debug.FPVCam.NearClip, 0.0f, 10.0f, 0.05f, GetKbEntryFloat);
 }
 
 void update_menu() {

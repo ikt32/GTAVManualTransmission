@@ -277,7 +277,6 @@ void VehicleConfig::LoadSettings() {
     LOAD_VAL("CAM", "Enable", Misc.Camera.Enable);
     LOAD_VAL("CAM", "AttachId", Misc.Camera.AttachId);
 
-    LOAD_VAL("CAM", "RemoveHead", Misc.Camera.RemoveHead);
     LOAD_VAL("CAM", "LookTime", Misc.Camera.LookTime);
     LOAD_VAL("CAM", "MouseLookTime", Misc.Camera.MouseLookTime);
     LOAD_VAL("CAM", "MouseCenterTimeout", Misc.Camera.MouseCenterTimeout);
@@ -455,7 +454,6 @@ void VehicleConfig::saveGeneral() {
     SAVE_VAL("CAM", "Enable", Misc.Camera.Enable);
     SAVE_VAL("CAM", "AttachId", Misc.Camera.AttachId);
 
-    SAVE_VAL("CAM", "RemoveHead", Misc.Camera.RemoveHead);
     SAVE_VAL("CAM", "LookTime", Misc.Camera.LookTime);
     SAVE_VAL("CAM", "MouseLookTime", Misc.Camera.MouseLookTime);
     SAVE_VAL("CAM", "MouseCenterTimeout", Misc.Camera.MouseCenterTimeout);
