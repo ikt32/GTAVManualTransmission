@@ -174,6 +174,7 @@ void FPVCam::Update() {
         CAM::SET_CAM_ACTIVE(cameraHandle, true);
         CAM::RENDER_SCRIPT_CAMS(true, false, 0, true, false, 0);
         CAM::SET_CAM_IS_INSIDE_VEHICLE(cameraHandle, true);
+        GRAPHICS::SET_PARTICLE_FX_CAM_INSIDE_VEHICLE(true);
     }
     CAM::SET_SCRIPTED_CAMERA_IS_FIRST_PERSON_THIS_FRAME(true);
 
