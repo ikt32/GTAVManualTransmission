@@ -368,8 +368,8 @@ void update_featuresmenu() {
     g_menu.BoolOption("Gear/RPM lockup", g_settings.MTOptions.EngLock,
         { "Simulate wheel lock-up when mis-shifting to a too low gear for the RPM range." });
 
-    g_menu.BoolOption("Hard rev limiter", g_settings.MTOptions.HardLimiter,
-        { "Enforce rev limiter for reverse and top speed. No more infinite speed!" });
+    g_menu.BoolOption("Final gear RPM limit", g_settings.MTOptions.FinalGearRPMLimit,
+        { "Limit accelerating beyond engine redline in top gear, or reverse." });
 
     g_menu.BoolOption("Enable speed limiter", g_settings().MTOptions.SpeedLimiter.Enable,
         { "Electronically limit speed." });
@@ -2416,6 +2416,9 @@ void update_debugmenu() {
             g_menu.OptionPlusPlus(diDevicesInfo, "DirectInput info");
         }
     }
+
+    g_menu.BoolOption("Disable general RPM limit", g_settings.Debug.DisableRPMLimit,
+        { "Disables redline RPM limit in all gears, allowing for unlimited acceleration in any gear." });
 }
 
 void update_metricsmenu() {

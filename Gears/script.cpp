@@ -726,10 +726,7 @@ void update_manual_transmission() {
         default: break;
     }
 
-    if (g_settings.MTOptions.HardLimiter && 
-        g_vehData.mHasClutch) {
-        functionLimiter();
-    }
+    functionLimiter();
 
     updateShifting();
 
@@ -2235,6 +2232,16 @@ void handleRPM() {
  * Custom limiter thing
  */
 void functionLimiter() {
+    if (g_settings.Debug.DisableRPMLimit)
+        return;
+
+    if (g_vehData.mGearCurr == g_vehData.mGearTop &&
+        !g_settings.MTOptions.FinalGearRPMLimit)
+        return;
+
+    if (!g_vehData.mHasClutch)
+        return;
+
     g_gearStates.HitRPMLimiter = g_vehData.mRPM > 1.0f;
 
     float maxSpeed = g_vehData.mDriveMaxFlatVel / g_vehData.mGearRatios[g_vehData.mGearCurr];

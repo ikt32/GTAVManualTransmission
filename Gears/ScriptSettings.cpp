@@ -116,7 +116,7 @@ void ScriptSettings::SaveGeneral() {
     SAVE_VAL("MT_OPTIONS", "EngineStallingS", MTOptions.EngStallS);
     SAVE_VAL("MT_OPTIONS", "EngineBraking", MTOptions.EngBrake);
     SAVE_VAL("MT_OPTIONS", "EngineLocking", MTOptions.EngLock);
-    SAVE_VAL("MT_OPTIONS", "HardLimiter", MTOptions.HardLimiter);
+    SAVE_VAL("MT_OPTIONS", "FinalGearRPMLimit", MTOptions.FinalGearRPMLimit);
 
     // [GAMEPLAY_ASSISTS]
     SAVE_VAL("GAMEPLAY_ASSISTS", "SimpleBike", GameAssists.SimpleBike);
@@ -318,6 +318,7 @@ void ScriptSettings::SaveGeneral() {
     SAVE_VAL("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
     SAVE_VAL("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
     SAVE_VAL("DEBUG", "ShowAdvancedFFBOptions", Debug.ShowAdvancedFFBOptions);
+    SAVE_VAL("DEBUG", "DisableRPMLimit", Debug.DisableRPMLimit);
 
     SAVE_VAL("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
     SAVE_VAL("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
@@ -457,7 +458,7 @@ void ScriptSettings::parseSettingsGeneral() {
     LOAD_VAL("MT_OPTIONS", "EngineStallingS", MTOptions.EngStallS);
     LOAD_VAL("MT_OPTIONS", "EngineBraking", MTOptions.EngBrake);
     LOAD_VAL("MT_OPTIONS", "EngineLocking", MTOptions.EngLock);
-    LOAD_VAL("MT_OPTIONS", "HardLimiter", MTOptions.HardLimiter);
+    LOAD_VAL("MT_OPTIONS", "FinalGearRPMLimit", MTOptions.FinalGearRPMLimit);
 
     LOAD_VAL("GAMEPLAY_ASSISTS", "DefaultNeutral", GameAssists.DefaultNeutral);
     LOAD_VAL("GAMEPLAY_ASSISTS", "SimpleBike", GameAssists.SimpleBike);
@@ -658,6 +659,7 @@ void ScriptSettings::parseSettingsGeneral() {
     LOAD_VAL("DEBUG", "DisplayGearingInfo", Debug.DisplayGearingInfo);
     LOAD_VAL("DEBUG", "DisplayNPCInfo", Debug.DisplayNPCInfo);
     LOAD_VAL("DEBUG", "ShowAdvancedFFBOptions", Debug.ShowAdvancedFFBOptions);
+    LOAD_VAL("DEBUG", "DisableRPMLimit", Debug.DisableRPMLimit);
 
     LOAD_VAL("DEBUG", "DisableInputDetect", Debug.DisableInputDetect);
     LOAD_VAL("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);

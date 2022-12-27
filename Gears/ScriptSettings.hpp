@@ -42,7 +42,7 @@ public:
         bool EngStallS = false;
         bool EngBrake = false;
         bool EngLock = false;
-        bool HardLimiter = true;
+        bool FinalGearRPMLimit = true;
     } MTOptions;
 
     // [GAMEPLAY_ASSISTS]
@@ -322,6 +322,7 @@ public:
         bool DisplayTractionInfo = false;
         bool DisplayNPCInfo = false;
         bool ShowAdvancedFFBOptions = false;
+        bool DisableRPMLimit = false;
 
         bool DisableInputDetect = false;
         bool DisablePlayerHide = false;
