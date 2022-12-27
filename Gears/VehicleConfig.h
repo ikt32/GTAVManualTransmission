@@ -50,8 +50,8 @@ public:
 
     struct SMovement {
         Tracked<bool> Follow = true;
-        Tracked<float> RotationDirectionMult = 0.750f;
-        Tracked<float> RotationRotationMult = 0.15f;
+        Tracked<float> RotationDirectionMult = 0.50f;
+        Tracked<float> RotationRotationMult = 0.10f;
         Tracked<float> RotationMaxAngle = 45.0f;
 
         Tracked<float> LongForwardMult = 0.05f;
@@ -76,9 +76,9 @@ public:
         Tracked<int> PitchMode = 0;
         // 0.01: Quick
         // 1.00: Slow
-        Tracked<float> CenterSpeed = 1.0f;
+        Tracked<float> CenterSpeed = 1.5f;
         Tracked<float> PitchLim = 30.0f;
-        Tracked<float> RollLim = 60.0f;
+        Tracked<float> RollLim = 45.0f;
     };
 
     struct SCameraSettings {
