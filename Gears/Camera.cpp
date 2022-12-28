@@ -69,6 +69,8 @@ namespace {
 
     // forward camera movement
     float accelMoveFwd = 0.0f;
+    float accelMoveLat = 0.0f;
+    float accelMoveVert = 0.0f;
     float accelPitchDeg = 0.0f;
 
     float lowpassPitch = 0.0f;
@@ -86,6 +88,8 @@ namespace FPVCam {
     void updateWheelLook(bool& lookingIntoGlass);
     void updateRotationCameraMovement(VehicleConfig::SMovement& movement);
     void updateLongitudinalCameraMovement(VehicleConfig::SMovement& movement);
+    void updateLateralCameraMovement(VehicleConfig::SMovement& movement);
+    void updateVerticalCameraMovement(VehicleConfig::SMovement& movement);
     void updatePitchCameraMovement(VehicleConfig::SMovement& movement);
 }
 void FPVCam::InitOffsets() {
@@ -108,6 +112,8 @@ void FPVCam::CancelCam() {
     }
     directionLookAngle = 0.0f;
     accelMoveFwd = 0.0f;
+    accelMoveLat = 0.0f;
+    accelMoveVert = 0.0f;
 }
 
 void FPVCam::HideHead(bool remove) {
@@ -199,6 +205,7 @@ void FPVCam::Update() {
         CAM::SET_CAM_ACTIVE(cameraHandle, true);
         CAM::SET_CAM_IS_INSIDE_VEHICLE(cameraHandle, true);
         GRAPHICS::SET_PARTICLE_FX_CAM_INSIDE_VEHICLE(true);
+        CAM::SET_CAM_MOTION_BLUR_STRENGTH(cameraHandle, 1.0f);
         CAM::RENDER_SCRIPT_CAMS(true, false, 0, true, false, 0);
     }
     CAM::SET_SCRIPTED_CAMERA_IS_FIRST_PERSON_THIS_FRAME(true);
@@ -234,6 +241,8 @@ void FPVCam::Update() {
         if (pMovement->Follow) {
             updateRotationCameraMovement(*pMovement);
             updateLongitudinalCameraMovement(*pMovement);
+            updateLateralCameraMovement(*pMovement);
+            updateVerticalCameraMovement(*pMovement);
             updatePitchCameraMovement(*pMovement);
         }
     }
@@ -343,9 +352,9 @@ void FPVCam::Update() {
         case 2: {
             fov = g_settings().Misc.Camera.Vehicle2.FOV;
             CAM::ATTACH_CAM_TO_ENTITY(cameraHandle, g_playerVehicle, {
-                seatOffset.x + camSeatOffset.x + additionalOffset.x + g_settings().Misc.Camera.Vehicle2.OffsetSide + offsetX,
+                seatOffset.x + camSeatOffset.x + additionalOffset.x + g_settings().Misc.Camera.Vehicle2.OffsetSide + offsetX + accelMoveLat,
                 seatOffset.y + camSeatOffset.y + additionalOffset.y + g_settings().Misc.Camera.Vehicle2.OffsetForward + offsetY + accelMoveFwd,
-                seatOffset.z + camSeatOffset.z + additionalOffset.z + g_settings().Misc.Camera.Vehicle2.OffsetHeight + offsetZ + rollbarOffset
+                seatOffset.z + camSeatOffset.z + additionalOffset.z + g_settings().Misc.Camera.Vehicle2.OffsetHeight + offsetZ + accelMoveVert + rollbarOffset
                 }, true);
             pitch = g_settings().Misc.Camera.Vehicle2.Pitch;
             break;
@@ -353,9 +362,9 @@ void FPVCam::Update() {
         case 1: {
             fov = g_settings().Misc.Camera.Vehicle1.FOV;
             CAM::ATTACH_CAM_TO_ENTITY(cameraHandle, g_playerVehicle, {
-                seatOffset.x + camSeatOffset.x + additionalOffset.x + g_settings().Misc.Camera.Vehicle1.OffsetSide + offsetX,
+                seatOffset.x + camSeatOffset.x + additionalOffset.x + g_settings().Misc.Camera.Vehicle1.OffsetSide + offsetX + accelMoveLat,
                 seatOffset.y + camSeatOffset.y + additionalOffset.y + g_settings().Misc.Camera.Vehicle1.OffsetForward + offsetY + accelMoveFwd,
-                seatOffset.z + camSeatOffset.z + additionalOffset.z + g_settings().Misc.Camera.Vehicle1.OffsetHeight + offsetZ + rollbarOffset
+                seatOffset.z + camSeatOffset.z + additionalOffset.z + g_settings().Misc.Camera.Vehicle1.OffsetHeight + offsetZ + accelMoveVert + rollbarOffset
                 }, true);
             pitch = g_settings().Misc.Camera.Vehicle1.Pitch;
             break;
@@ -365,9 +374,9 @@ void FPVCam::Update() {
             fov = g_settings().Misc.Camera.Ped.FOV;
             // 0x796E skel_head id
             CAM::ATTACH_CAM_TO_PED_BONE(cameraHandle, g_playerPed, 0x796E, {
-                additionalOffset.x + g_settings().Misc.Camera.Ped.OffsetSide + offsetX,
+                additionalOffset.x + g_settings().Misc.Camera.Ped.OffsetSide + offsetX + accelMoveLat,
                 additionalOffset.y + g_settings().Misc.Camera.Ped.OffsetForward + offsetY + accelMoveFwd,
-                additionalOffset.z + g_settings().Misc.Camera.Ped.OffsetHeight + offsetZ
+                additionalOffset.z + g_settings().Misc.Camera.Ped.OffsetHeight + offsetZ + accelMoveVert
                 }, true);
             pitch = g_settings().Misc.Camera.Ped.Pitch;
             break;
@@ -649,7 +658,10 @@ void FPVCam::updateRotationCameraMovement(VehicleConfig::SMovement& movement) {
 }
 
 void FPVCam::updateLongitudinalCameraMovement(VehicleConfig::SMovement& movement) {
-    float lerpF = 1.0f - pow(0.001f, MISC::GET_FRAME_TIME());
+    float baseRoughnessExp = -3.0f;
+    float roughnessExp = baseRoughnessExp - movement.Roughness;
+    float roughness = pow(10.0f, roughnessExp);
+    float lerpF = 1.0f - pow(roughness, MISC::GET_FRAME_TIME());
 
     float gForce = g_vehData.mAcceleration.y / 9.81f;
 
@@ -676,6 +688,66 @@ void FPVCam::updateLongitudinalCameraMovement(VehicleConfig::SMovement& movement
             -longBwLim,
             longFwLim);
     accelMoveFwd = lerp(accelMoveFwd, accelVal, lerpF); // just for smoothness
+}
+
+void FPVCam::updateLateralCameraMovement(VehicleConfig::SMovement& movement) {
+    float baseRoughnessExp = -3.0f;
+    float roughnessExp = baseRoughnessExp - movement.Roughness;
+    float roughness = pow(10.0f, roughnessExp);
+    float lerpF = 1.0f - pow(roughness, MISC::GET_FRAME_TIME());
+
+    auto accelVec = g_vehData.mAccelerationWithCentripetal;
+    float gForce = accelVec.x / 9.8f;
+
+    float mappedAccel = 0.0f;
+    const float deadzone = movement.LatDeadzone;
+
+    float mult = 0.0f;
+
+    if (abs(gForce) > deadzone) {
+        mappedAccel = map(gForce, deadzone, 10.0f, 0.0f, 10.0f);
+        mult = movement.LatMult;
+    }
+    float latLim = movement.LatLimit;
+
+    float accelVal =
+        std::clamp(mappedAccel * mult,
+            -latLim,
+            latLim);
+    accelMoveLat = lerp(accelMoveLat, accelVal, lerpF); // just for smoothness
+}
+
+void FPVCam::updateVerticalCameraMovement(VehicleConfig::SMovement& movement) {
+    float baseRoughnessExp = -3.0f;
+    float roughnessExp = baseRoughnessExp - movement.Roughness;
+    float roughness = pow(10.0f, roughnessExp);
+    float lerpF = 1.0f - pow(roughness, MISC::GET_FRAME_TIME());
+
+    auto accelVec = g_vehData.mAccelerationWithCentripetal;
+    float gForce = accelVec.z / 9.8f;
+
+    float mappedAccel = 0.0f;
+    const float deadzone = movement.VertDeadzone;
+
+    float mult = 0.0f;
+
+    // Up
+    if (gForce > deadzone) {
+        mappedAccel = map(gForce, deadzone, 10.0f, 0.0f, 10.0f);
+        mult = movement.VertUpMult;
+    }
+
+    // Down
+    if (gForce < -deadzone) {
+        mappedAccel = map(gForce, -deadzone, -10.0f, 0.0f, -10.0f);
+        mult = movement.VertDownMult;
+    }
+
+    float accelVal =
+        std::clamp(-mappedAccel * mult,
+            -movement.VertDownLimit.Value(),
+            movement.VertUpLimit.Value());
+    accelMoveVert = lerp(accelMoveVert, accelVal, lerpF); // just for smoothness
 }
 
 void FPVCam::updatePitchCameraMovement(VehicleConfig::SMovement& movement) {

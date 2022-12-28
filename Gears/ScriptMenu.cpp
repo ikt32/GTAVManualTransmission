@@ -2014,11 +2014,11 @@ void update_cameraoptionsmenu() {
         { "The FPV camera for 2-wheelers, quads and every between behaves differently, "
             "so these have their own options." });
 
-    g_menu.MenuOption("Camera movement options", "cameramovementoptionsmenu",
-        { "Enable and tweak the movement of the first person camera." });
+    g_menu.MenuOption("Camera inertia options", "cameramovementoptionsmenu",
+        { "Modify camera inertia and movement." });
 
     g_menu.MenuOption("Horizon lock options", "horizonlockoptionsmenu",
-        { "Enable and tweak the movement of the first person camera." });
+        { "Modify horizon lock." });
 
     // Might as well initialize with valid pointers.
     Tracked<float>* pFov =           &g_settings().Misc.Camera.Ped.FOV;
@@ -2086,8 +2086,7 @@ void update_cameraoptionsmenu() {
         { "Milliseconds before centering the camera after looking with the mouse." });
 }
 
-void update_cameramovementoptionsmenu(bool bike) {
-    g_menu.Title("Camera movement");
+std::pair<VehicleConfig::SMovement*, std::string> SelectMovement(bool bike) {
     VehicleConfig::SMovement* pMovement = nullptr;
     std::string modeName;
 
@@ -2105,9 +2104,7 @@ void update_cameramovementoptionsmenu(bool bike) {
     }
 
     if (pMovement == nullptr) {
-        g_menu.Subtitle("Invalid configuration");
-        g_menu.Option("Invalid configuration");
-        return;
+        return { nullptr, std::string() };
     }
 
     if (!bike)
@@ -2115,16 +2112,69 @@ void update_cameramovementoptionsmenu(bool bike) {
     else
         modeName = "Bike";
 
+    return { pMovement, modeName };
+}
+
+void update_cameramovementoptionsmenu(bool bike) {
+    g_menu.Title("Inertia & movement");
+    auto selectedMovement = SelectMovement(bike);
+    VehicleConfig::SMovement* pMovement = selectedMovement.first;
+    std::string modeName = selectedMovement.second;
+
+    if (pMovement == nullptr || modeName.empty()) {
+        g_menu.Subtitle("Invalid configuration");
+        g_menu.Option("Invalid configuration");
+        return;
+    }
+
     g_menu.Subtitle(fmt::format("{} - {}", MenuSubtitleConfig(), modeName));
 
     VehicleConfig::SMovement& movement = *pMovement;
 
-    if (g_menu.BoolOption("Follow movement", movement.Follow,
-        { "Camera moves with motion and rotation, somewhat like NFS Shift." })) {
+    if (g_menu.BoolOption("Enable inertia & movement", movement.Follow,
+        { "Enable to allow the camera to rotate and move around in response to physics.",
+          "When disabled, camera is rigidly mounted to vehicle or driver."})) {
         FPVCam::CancelCam();
     }
 
-    g_menu.FloatOption("Rotation: direction", movement.RotationDirectionMult, 0.0f, 4.0f, 0.01f,
+    g_menu.MenuOption("Rotation", "cameramovementrotoptionsmenu",
+        { "Options for how vehicle movement affects the camera.",
+          "Affects camera yaw." });
+
+    g_menu.MenuOption("Inertia: Longitudinal", "cameramovementlongoptionsmenu",
+        { "Options for how acceleration affect the camera.",
+          "Affects camera pitch and forward/backward movement." });
+
+    g_menu.MenuOption("Inertia: Lateral", "cameramovementlatoptionsmenu",
+        { "Options for how sideways acceleration affects the camera.",
+          "Affects camera left/right movement." });
+
+    g_menu.MenuOption("Inertia: Vertical", "cameramovementvertoptionsmenu",
+        { "Options for how vertical acceleration affects the camera.",
+          "Affects camera up/down movement." });
+
+    g_menu.FloatOptionCb("Movement roughness", movement.Roughness, 0.0f, 10.0f, 0.5f, GetKbEntryFloat,
+        { "Controls the jitteryness of camera movement.",
+          "Larger values make it more jittery." });
+}
+
+void update_cameramovementrotoptionsmenu(bool bike) {
+    g_menu.Title("Rotation");
+    auto selectedMovement = SelectMovement(bike);
+    VehicleConfig::SMovement* pMovement = selectedMovement.first;
+    std::string modeName = selectedMovement.second;
+
+    if (pMovement == nullptr || modeName.empty()) {
+        g_menu.Subtitle("Invalid configuration");
+        g_menu.Option("Invalid configuration");
+        return;
+    }
+
+    g_menu.Subtitle(fmt::format("{} - {}", MenuSubtitleConfig(), modeName));
+
+    VehicleConfig::SMovement& movement = *pMovement;
+
+    g_menu.FloatOption("Direction multiplier", movement.RotationDirectionMult, 0.0f, 4.0f, 0.01f,
         { "How much the direction of travel affects the camera." });
 
     g_menu.FloatOption("Rotation: rotation", movement.RotationRotationMult, 0.0f, 4.0f, 0.01f,
@@ -2132,51 +2182,141 @@ void update_cameramovementoptionsmenu(bool bike) {
 
     g_menu.FloatOption("Rotation: max angle", movement.RotationMaxAngle, 0.0f, 90.0f, 1.0f,
         { "To how many degrees camera movement is capped." });
+}
 
-    g_menu.FloatOption("Movement: Minimum Gs", movement.LongDeadzone, 0.0f, 2.0f, 0.01f,
+void update_cameramovementlongoptionsmenu(bool bike) {
+    g_menu.Title("Longitudinal");
+    auto selectedMovement = SelectMovement(bike);
+    VehicleConfig::SMovement* pMovement = selectedMovement.first;
+    std::string modeName = selectedMovement.second;
+
+    if (pMovement == nullptr || modeName.empty()) {
+        g_menu.Subtitle("Invalid configuration");
+        g_menu.Option("Invalid configuration");
+        return;
+    }
+
+    g_menu.Subtitle(fmt::format("{} - {}", MenuSubtitleConfig(), modeName));
+
+    VehicleConfig::SMovement& movement = *pMovement;
+
+    g_menu.FloatOption("Minimum force", movement.LongDeadzone, 0.0f, 2.0f, 0.01f,
         { "How hard the car should accelerate or decelerate for the camera to start moving.",
           "Unit in Gs." });
 
-    g_menu.FloatOption("Movement: Forward scale", movement.LongForwardMult, 0.0f, 2.0f, 0.01f,
-        { "How much to move the camera with, depending on how hard you decelerate.",
+    g_menu.FloatOption("Forward scale", movement.LongForwardMult, 0.0f, 2.0f, 0.01f,
+        { "How much the camera moves forwards when decelerating.",
           "A scale of 1.0 makes the camera move 1 meter at 1G deceleration.",
-          "A scale of 0.1 makes the camera move 10 centimeter at 1G deceleration." });
+          "A scale of 0.1 makes the camera move 10 centimeters at 1G deceleration.",
+          "0.0 disables forward movement." });
 
-    g_menu.FloatOption("Movement: Backward scale", movement.LongBackwardMult, 0.0f, 2.0f, 0.01f,
-        { "How much to move the camera with, depending on how hard you accelerate.",
+    g_menu.FloatOption("Backward scale", movement.LongBackwardMult, 0.0f, 2.0f, 0.01f,
+        { "How much the camera moves backwards when accelerating.",
           "A scale of 1.0 makes the camera move 1 meter at 1G acceleration.",
-          "A scale of 0.1 makes the camera move 10 centimeter at 1G acceleration." });
+          "A scale of 0.1 makes the camera move 10 centimeters at 1G acceleration.",
+          "0.0 disables backward movement." });
 
-    g_menu.FloatOption("Movement: Forward limit", movement.LongForwardLimit, 0.0f, 1.0f, 0.01f,
-        { "Distance the camera can move forward (under deceleration).",
+    g_menu.FloatOption("Forward limit", movement.LongForwardLimit, 0.0f, 1.0f, 0.01f,
+        { "How much the camera may move forwards during deceleration.",
           "Unit in meter." });
 
-    g_menu.FloatOption("Movement: Backward limit", movement.LongBackwardLimit, 0.0f, 1.0f, 0.01f,
-        { "Distance the camera can move backward (under acceleration).",
+    g_menu.FloatOption("Backward limit", movement.LongBackwardLimit, 0.0f, 1.0f, 0.01f,
+        { "How much the camera may move backwards during acceleration.",
           "Unit in meter." });
 
-    g_menu.FloatOption("Movement: Gamma", movement.LongGamma, 0.0f, 5.0f, 0.1f,
-        { "Linearity in movement response.",
-          "Less than 1: Camera moves a lot with small Gs but tops out quickly.",
-          "More than 1: Camera moves little with small Gs but increases exponentially with more Gs." });
-
-    g_menu.FloatOptionCb("Pitch: Minimum Gs", movement.PitchDeadzone, 0.0f, 2.0f, 0.01f, GetKbEntryFloat,
-        { "How hard the car should accelerate or decelerate for the camera to start moving.",
+    g_menu.FloatOptionCb("Pitch: Minimum force", movement.PitchDeadzone, 0.0f, 2.0f, 0.01f, GetKbEntryFloat,
+        { "How much the car should accelerate or decelerate for the camera to start moving.",
           "Unit in Gs." });
 
-    g_menu.FloatOptionCb("Pitch: Up scale", movement.PitchUpMult, 0.0f, 90.0f, 0.5f, GetKbEntryFloat,
-        { "How much to move the camera with, depending on how hard you acceleration.",
-          "A scale of 15.0 makes the camera pitch up 15 degrees at 1G acceleration." });
+    g_menu.FloatOptionCb("Pitch: Up scale", movement.PitchUpMult, 0.0f, 90.0f, 0.01f, GetKbEntryFloat,
+        { "How much the camera pitches up during acceleration.",
+          "A scale of 5.0 makes the camera pitch up 5 degrees at 1G acceleration.",
+          "0.0 disables pitch-up on acceleration." });
 
-    g_menu.FloatOptionCb("Pitch: Down scale", movement.PitchDownMult, 0.0f, 90.0f, 0.5f, GetKbEntryFloat,
-        { "How much to move the camera with, depending on how hard you deceleration.",
-          "A scale of 15.0 makes the camera pitch down 15 degrees at 1G deceleration." });
+    g_menu.FloatOptionCb("Pitch: Down scale", movement.PitchDownMult, 0.0f, 90.0f, 0.01f, GetKbEntryFloat,
+        { "How much the camera pitches down during deceleration.",
+          "A scale of 5.0 makes the camera pitch down 5 degrees at 1G deceleration.",
+          "0.0 disables pitch-down on deceleration." });
 
     g_menu.FloatOptionCb("Pitch: Up limit", movement.PitchUpMaxAngle, 0.0f, 90.0f, 0.5f, GetKbEntryFloat,
-        { "Degrees the camera can pitch up (under acceleration)." });
+        { "How much the camera may pitch up during acceleration.",
+          "Unit in degrees." });
 
     g_menu.FloatOptionCb("Pitch: Down limit", movement.PitchDownMaxAngle, 0.0f, 90.0f, 0.5f, GetKbEntryFloat,
-        { "Degrees the camera can pitch down (under deceleration)." });
+        { "How much the camera may pitch down during deceleration.",
+          "Unit in degrees." });
+}
+
+void update_cameramovementlatoptionsmenu(bool bike) {
+    g_menu.Title("Lateral");
+    auto selectedMovement = SelectMovement(bike);
+    VehicleConfig::SMovement* pMovement = selectedMovement.first;
+    std::string modeName = selectedMovement.second;
+
+    if (pMovement == nullptr || modeName.empty()) {
+        g_menu.Subtitle("Invalid configuration");
+        g_menu.Option("Invalid configuration");
+        return;
+    }
+
+    g_menu.Subtitle(fmt::format("{} - {}", MenuSubtitleConfig(), modeName));
+
+    VehicleConfig::SMovement& movement = *pMovement;
+
+    g_menu.FloatOption("Minimum force", movement.LatDeadzone, 0.0f, 2.0f, 0.01f,
+        { "How hard the car should turn or accelerate sideways for the camera to start moving.",
+          "Unit in Gs." });
+
+    g_menu.FloatOption("Scale", movement.LatMult, 0.0f, 2.0f, 0.01f,
+        { "How much the camera moves left or right.",
+          "A scale of 1.0 makes the camera move 1 meter at 1G.",
+          "A scale of 0.1 makes the camera move 10 centimeters at 1G.",
+          "0.0 disables lateral movement." });
+
+    g_menu.FloatOption("Limit", movement.LatLimit, 0.0f, 1.0f, 0.01f,
+        { "How much the camera may move left or right.",
+          "Unit in meter." });
+}
+
+void update_cameramovementvertoptionsmenu(bool bike) {
+    g_menu.Title("Vertical");
+    auto selectedMovement = SelectMovement(bike);
+    VehicleConfig::SMovement* pMovement = selectedMovement.first;
+    std::string modeName = selectedMovement.second;
+
+    if (pMovement == nullptr || modeName.empty()) {
+        g_menu.Subtitle("Invalid configuration");
+        g_menu.Option("Invalid configuration");
+        return;
+    }
+
+    g_menu.Subtitle(fmt::format("{} - {}", MenuSubtitleConfig(), modeName));
+
+    VehicleConfig::SMovement& movement = *pMovement;
+
+    g_menu.FloatOption("Minimum force", movement.VertDeadzone, 0.0f, 2.0f, 0.01f,
+        { "How hard the car goes up or down for the camera to start moving.",
+          "Unit in Gs." });
+
+    g_menu.FloatOption("Up scale", movement.VertUpMult, 0.0f, 2.0f, 0.01f,
+        { "How much the camera moves up when falling.",
+          "A scale of 1.0 makes the camera move 1 meter at 1G.",
+          "A scale of 0.1 makes the camera move 10 centimeters at 1G.",
+          "0.0 disables up movement." });
+
+    g_menu.FloatOption("Down scale", movement.VertDownMult, 0.0f, 2.0f, 0.01f,
+        { "How much the camera moves down when \"pushed down\".",
+          "A scale of 1.0 makes the camera move 1 meter at 1G.",
+          "A scale of 0.1 makes the camera move 10 centimeters at 1G.",
+          "0.0 disables down movement." });
+
+    g_menu.FloatOption("Up limit", movement.VertUpLimit, 0.0f, 1.0f, 0.01f,
+        { "How much the camera may move up.",
+          "Unit in meter." });
+
+    g_menu.FloatOption("Down limit", movement.VertDownLimit, 0.0f, 1.0f, 0.01f,
+        { "How much the camera may move down.",
+          "Unit in meter." });
 }
 
 void update_horizonlockoptionsmenu(bool bike) {
@@ -2618,14 +2758,38 @@ void update_menu() {
     /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu */
     if (g_menu.CurrentMenu("cameraoptionsmenu")) { update_cameraoptionsmenu(); }
 
-    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> bikecameraoptionsmenu*/
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> bikecameraoptionsmenu */
     if (g_menu.CurrentMenu("bikecameraoptionsmenu")) { update_bikecameraoptionsmenu(); }
 
-    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> cameramovementoptionsmenu*/
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> cameramovementoptionsmenu */
     if (g_menu.CurrentMenu("cameramovementoptionsmenu")) { update_cameramovementoptionsmenu(false); }
+
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> cameramovementoptionsmenu -> cameramovementrotoptionsmenu */
+    if (g_menu.CurrentMenu("cameramovementrotoptionsmenu")) { update_cameramovementrotoptionsmenu(false); }
+
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> cameramovementoptionsmenu -> cameramovementlongoptionsmenu */
+    if (g_menu.CurrentMenu("cameramovementlongoptionsmenu")) { update_cameramovementlongoptionsmenu(false); }
+
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> cameramovementoptionsmenu -> cameramovementlatoptionsmenu */
+    if (g_menu.CurrentMenu("cameramovementlatoptionsmenu")) { update_cameramovementlatoptionsmenu(false); }
+
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> cameramovementoptionsmenu -> cameramovementvertoptionsmenu */
+    if (g_menu.CurrentMenu("cameramovementvertoptionsmenu")) { update_cameramovementvertoptionsmenu(false); }
 
     /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> bikecameraoptionsmenu -> bikecameramovementoptionsmenu*/
     if (g_menu.CurrentMenu("bikecameramovementoptionsmenu")) { update_cameramovementoptionsmenu(true); }
+
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> bikecameraoptionsmenu -> cameramovementoptionsmenu -> cameramovementrotoptionsmenu */
+    if (g_menu.CurrentMenu("bikecameramovementrotoptionsmenu")) { update_cameramovementrotoptionsmenu(true); }
+
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> bikecameraoptionsmenu -> cameramovementoptionsmenu -> cameramovementlongoptionsmenu */
+    if (g_menu.CurrentMenu("bikecameramovementlongoptionsmenu")) { update_cameramovementlongoptionsmenu(true); }
+
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> bikecameraoptionsmenu -> cameramovementoptionsmenu -> cameramovementlatoptionsmenu */
+    if (g_menu.CurrentMenu("bikecameramovementlatoptionsmenu")) { update_cameramovementlatoptionsmenu(true); }
+
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> bikecameraoptionsmenu -> cameramovementoptionsmenu -> cameramovementvertoptionsmenu */
+    if (g_menu.CurrentMenu("bikecameramovementvertoptionsmenu")) { update_cameramovementvertoptionsmenu(true); }
 
     /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> horizonlockoptionsmenu*/
     if (g_menu.CurrentMenu("horizonlockoptionsmenu")) { update_horizonlockoptionsmenu(false); }

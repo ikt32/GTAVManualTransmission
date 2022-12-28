@@ -29,17 +29,25 @@
     SAVE_VAL("CAM", prefix "MovementMultVel",   ##source.RotationDirectionMult); \
     SAVE_VAL("CAM", prefix "MovementMultRot",   ##source.RotationRotationMult); \
     SAVE_VAL("CAM", prefix "MovementCap",       ##source.RotationMaxAngle); \
+    SAVE_VAL("CAM", prefix "LongDeadzone",      ##source.LongDeadzone); \
     SAVE_VAL("CAM", prefix "LongForwardMult",   ##source.LongForwardMult); \
     SAVE_VAL("CAM", prefix "LongBackwardMult",  ##source.LongBackwardMult); \
-    SAVE_VAL("CAM", prefix "LongDeadzone",      ##source.LongDeadzone); \
-    SAVE_VAL("CAM", prefix "LongGamma",         ##source.LongGamma); \
     SAVE_VAL("CAM", prefix "LongForwardLimit",  ##source.LongForwardLimit); \
     SAVE_VAL("CAM", prefix "LongBackwardLimit", ##source.LongBackwardLimit); \
+    SAVE_VAL("CAM", prefix "PitchDeadzone",     ##source.PitchDeadzone); \
     SAVE_VAL("CAM", prefix "PitchUpMult",       ##source.PitchUpMult); \
     SAVE_VAL("CAM", prefix "PitchDownMult",     ##source.PitchDownMult); \
-    SAVE_VAL("CAM", prefix "PitchDeadzone",     ##source.PitchDeadzone); \
     SAVE_VAL("CAM", prefix "PitchUpMaxAngle",   ##source.PitchUpMaxAngle); \
     SAVE_VAL("CAM", prefix "PitchDownMaxAngle", ##source.PitchDownMaxAngle); \
+    SAVE_VAL("CAM", prefix "LatDeadzone",       ##source.LatDeadzone); \
+    SAVE_VAL("CAM", prefix "LatMult",           ##source.LatMult); \
+    SAVE_VAL("CAM", prefix "LatLimit",          ##source.LatLimit); \
+    SAVE_VAL("CAM", prefix "VertDeadzone",      ##source.VertDeadzone); \
+    SAVE_VAL("CAM", prefix "VertUpMult",        ##source.VertUpMult); \
+    SAVE_VAL("CAM", prefix "VertDownMult",      ##source.VertDownMult); \
+    SAVE_VAL("CAM", prefix "VertUpLimit",       ##source.VertUpLimit); \
+    SAVE_VAL("CAM", prefix "VertDownLimit",     ##source.VertDownLimit); \
+    SAVE_VAL("CAM", prefix "Roughness",         ##source.Roughness); \
 }
 
 #define LOAD_VAL_MOVEMENT(prefix, source) { \
@@ -47,17 +55,25 @@
     LOAD_VAL("CAM", prefix "MovementMultVel",   ##source.RotationDirectionMult); \
     LOAD_VAL("CAM", prefix "MovementMultRot",   ##source.RotationRotationMult); \
     LOAD_VAL("CAM", prefix "MovementCap",       ##source.RotationMaxAngle); \
+    LOAD_VAL("CAM", prefix "LongDeadzone",      ##source.LongDeadzone); \
     LOAD_VAL("CAM", prefix "LongForwardMult",   ##source.LongForwardMult); \
     LOAD_VAL("CAM", prefix "LongBackwardMult",  ##source.LongBackwardMult); \
-    LOAD_VAL("CAM", prefix "LongDeadzone",      ##source.LongDeadzone); \
-    LOAD_VAL("CAM", prefix "LongGamma",         ##source.LongGamma); \
     LOAD_VAL("CAM", prefix "LongForwardLimit",  ##source.LongForwardLimit); \
     LOAD_VAL("CAM", prefix "LongBackwardLimit", ##source.LongBackwardLimit); \
+    LOAD_VAL("CAM", prefix "PitchDeadzone",     ##source.PitchDeadzone); \
     LOAD_VAL("CAM", prefix "PitchUpMult",       ##source.PitchUpMult); \
     LOAD_VAL("CAM", prefix "PitchDownMult",     ##source.PitchDownMult); \
-    LOAD_VAL("CAM", prefix "PitchDeadzone",     ##source.PitchDeadzone); \
     LOAD_VAL("CAM", prefix "PitchUpMaxAngle",   ##source.PitchUpMaxAngle); \
     LOAD_VAL("CAM", prefix "PitchDownMaxAngle", ##source.PitchDownMaxAngle); \
+    LOAD_VAL("CAM", prefix "LatDeadzone",       ##source.LatDeadzone); \
+    LOAD_VAL("CAM", prefix "LatMult",           ##source.LatMult); \
+    LOAD_VAL("CAM", prefix "LatLimit",          ##source.LatLimit); \
+    LOAD_VAL("CAM", prefix "VertDeadzone",      ##source.VertDeadzone); \
+    LOAD_VAL("CAM", prefix "VertUpMult",        ##source.VertUpMult); \
+    LOAD_VAL("CAM", prefix "VertDownMult",      ##source.VertDownMult); \
+    LOAD_VAL("CAM", prefix "VertUpLimit",       ##source.VertUpLimit); \
+    LOAD_VAL("CAM", prefix "VertDownLimit",     ##source.VertDownLimit); \
+    LOAD_VAL("CAM", prefix "Roughness",         ##source.Roughness); \
 }
 
 #define SAVE_VAL_HORIZON(prefix, source) { \

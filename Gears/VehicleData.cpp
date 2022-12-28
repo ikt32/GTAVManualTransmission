@@ -84,11 +84,13 @@ void VehicleData::Update() {
 
     // Set previous values
     mPrevVelocity = mVelocity;
+    mPrevWorldVelocity = mWorldVelocity;
     mRPMPrev = mRPM;
     mPrevSuspensionTravel = mSuspensionTravel;
 
     // Get current values
     mVelocity = ENTITY::GET_ENTITY_SPEED_VECTOR(mVehicle, true);
+    mWorldVelocity = ENTITY::GET_ENTITY_VELOCITY(mVehicle);
     mRPM = VEHICLE::GET_IS_VEHICLE_ENGINE_RUNNING(mVehicle) ?
         VExt::GetCurrentRPM(mVehicle) : 0.01f;
     mClutch = VExt::GetClutch(mVehicle);
@@ -129,6 +131,7 @@ void VehicleData::Update() {
     mNonLockSpeed = getAverageNonLockedWheelTyreSpeeds();
     mSuspensionTravelSpeeds = getSuspensionTravelSpeeds();
     mAcceleration = getAcceleration();
+    mAccelerationWithCentripetal = getAccelerationWithCentripetal();
     mEstimatedSpeed = getEstimatedForwardSpeed();
 
     mSuspensionTravelSpeedsHistory.push_back(mSuspensionTravelSpeeds);
@@ -276,6 +279,22 @@ Vector3 VehicleData::getAcceleration() {
     acceleration.z = (mVelocity.z - mPrevVelocity.z) / MISC::GET_FRAME_TIME();
 
     return acceleration;
+}
+
+Vector3 VehicleData::getAccelerationWithCentripetal() {
+    Vector3 worldVelDelta = (mWorldVelocity - mPrevWorldVelocity);
+
+    Vector3 fwdVec = ENTITY::GET_ENTITY_FORWARD_VECTOR(mVehicle);
+    Vector3 upVec = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(mVehicle, { 0.0f, 0.0f, 1.0f }) - ENTITY::GET_ENTITY_COORDS(mVehicle, true);
+    Vector3 rightVec = Cross(fwdVec, upVec);
+
+    Vector3 relVelDelta{
+        -Dot(worldVelDelta, rightVec),
+        Dot(worldVelDelta, fwdVec),
+        Dot(worldVelDelta, upVec),
+    };
+
+    return relVelDelta * (1.0f / MISC::GET_FRAME_TIME());
 }
 
 VehicleClass VehicleData::findClass(Hash model) {

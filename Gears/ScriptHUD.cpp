@@ -56,7 +56,6 @@ void drawSteeringFfb();
 
 namespace GForce {
     std::vector<std::pair<float, float>> CoordTrails;
-    Vector3 PrevWorldVel;
 }
 
 namespace DashLights {
@@ -279,25 +278,6 @@ void drawDashLights() {
     }
 }
 
-Vector3 GetAccelVector() {
-    Vector3 worldVel = ENTITY::GET_ENTITY_VELOCITY(g_playerVehicle);
-    Vector3 worldVelDelta = (worldVel - GForce::PrevWorldVel);
-
-    Vector3 fwdVec = ENTITY::GET_ENTITY_FORWARD_VECTOR(g_playerVehicle);
-    Vector3 upVec = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(g_playerVehicle, { 0.0f, 0.0f, 1.0f }) - ENTITY::GET_ENTITY_COORDS(g_playerVehicle, true);
-    Vector3 rightVec = Cross(fwdVec, upVec);
-
-    Vector3 relVelDelta{
-        -Dot(worldVelDelta, rightVec),
-        Dot(worldVelDelta, fwdVec),
-        Dot(worldVelDelta, upVec),
-    };
-
-    GForce::PrevWorldVel = worldVel;
-
-    return relVelDelta * (1.0f / MISC::GET_FRAME_TIME());
-}
-
 void drawGForces() {
     using namespace GForce;
     float locX = g_settings.Debug.Metrics.GForce.PosX;
@@ -313,7 +293,7 @@ void drawGForces() {
     if (g_menu.IsThisOpen() && screenLocationConflict)
         return;
 
-    Vector3 accel = GetAccelVector();
+    Vector3 accel = g_vehData.mAccelerationWithCentripetal;
 
     float GForceX = accel.x / 9.8f;
     float GForceY = accel.y / 9.8f;

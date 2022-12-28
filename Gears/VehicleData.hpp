@@ -121,7 +121,9 @@ public:
     uint64_t mHandlingPtr{};
 
     Vector3 mVelocity{};
+    Vector3 mWorldVelocity{};
     Vector3 mAcceleration{};
+    Vector3 mAccelerationWithCentripetal{};
 
     float mRPM{};
     float mRPMPrev{};
@@ -200,6 +202,7 @@ private:
     std::vector<bool> getWheelsLockedUp();
     std::vector<float> getSuspensionTravelSpeeds();
     Vector3 getAcceleration();
+    Vector3 getAccelerationWithCentripetal();
 
     VehicleClass findClass(Hash model);
     VehicleDomain findDomain(VehicleClass vehicleClass);
@@ -209,4 +212,5 @@ private:
     std::vector<std::vector<float>> mSuspensionTravelSpeedsHistory;
 
     Vector3 mPrevVelocity{};
+    Vector3 mPrevWorldVelocity{};
 };

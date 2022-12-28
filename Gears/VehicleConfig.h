@@ -51,21 +51,32 @@ public:
     struct SMovement {
         Tracked<bool> Follow = true;
         Tracked<float> RotationDirectionMult = 0.50f;
-        Tracked<float> RotationRotationMult = 0.10f;
+        Tracked<float> RotationRotationMult = 0.05f;
         Tracked<float> RotationMaxAngle = 45.0f;
 
+        Tracked<float> LongDeadzone = 0.0f;
         Tracked<float> LongForwardMult = 0.05f;
-        Tracked<float> LongBackwardMult = 0.10f;
-        Tracked<float> LongDeadzone = 0.95f;
-        Tracked<float> LongGamma = 1.0f;
-        Tracked<float> LongForwardLimit = 0.10f;
-        Tracked<float> LongBackwardLimit = 0.12f;
+        Tracked<float> LongBackwardMult = 0.05f;
+        Tracked<float> LongForwardLimit = 0.07f;
+        Tracked<float> LongBackwardLimit = 0.07f;
 
+        Tracked<float> PitchDeadzone = 0.0f;
         Tracked<float> PitchUpMult = 1.0f;
         Tracked<float> PitchDownMult = 1.0f;
-        Tracked<float> PitchDeadzone = 0.0f;
         Tracked<float> PitchUpMaxAngle = 5.0f;
         Tracked<float> PitchDownMaxAngle = 5.0f;
+
+        Tracked<float> LatDeadzone = 0.0f;
+        Tracked<float> LatMult = 0.04f;
+        Tracked<float> LatLimit = 0.02f;
+
+        Tracked<float> VertDeadzone = 0.0f;
+        Tracked<float> VertUpMult = 0.05f;
+        Tracked<float> VertDownMult = 0.10f;
+        Tracked<float> VertUpLimit = 0.05f;
+        Tracked<float> VertDownLimit = 0.06f;
+
+        Tracked<float> Roughness = 1.0f;
     };
 
     struct SHorizonLock {
