@@ -1,6 +1,7 @@
 #pragma once
 #include <inc/types.h>
 
+#include <algorithm>
 #include <cmath>
 #include <vector>
 
@@ -53,6 +54,14 @@ constexpr T deg2rad(T deg) {
 template <typename T>
 T map(T x, T in_min, T in_max, T out_min, T out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+template <typename T>
+T mapclamp(T x, T in_min, T in_max, T out_min, T out_max) {
+    return std::clamp(
+        map(x, in_min, in_max, out_min, out_max),
+        std::min(out_min, out_max),
+        std::max(out_min, out_max));
 }
 
 namespace Math {

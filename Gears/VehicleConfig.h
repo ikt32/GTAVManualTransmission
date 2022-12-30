@@ -92,6 +92,38 @@ public:
         Tracked<float> RollLim = 45.0f;
     };
 
+    struct SDoF {
+        Tracked<bool> Enable = false;
+
+        // Target speeds for DoF setpoints
+        Tracked<float> TargetSpeedMinDoF = 36.0f; // ~130 kph
+        Tracked<float> TargetSpeedMaxDoF = 72.0f; // ~260 kph
+
+        // Target acceleration for DoF setpoint modifiers
+        Tracked<float> TargetAccelMinDoF = 5.0f; // 0.5 G
+        Tracked<float> TargetAccelMaxDoF = 9.8f; // 1.0 G
+
+        Tracked<float> TargetAccelMinDoFMod = 0.1f; // accel <= targetAccelMinDoF: Move near plane closer, far plane farther
+        Tracked<float> TargetAccelMaxDoFMod = 1.0f; // accel >= targetAccelMaxDoF: Move near plane farther, far plane closer
+
+        // Near DoF: Close plane, max blur
+        Tracked<float> NearOutFocusMinSpeedDist = 0.0f;
+        Tracked<float> NearOutFocusMaxSpeedDist = 0.5f; // 50 cm for blurring dashboard
+
+        // Near DoF: Far plane, min blur
+        // Should be farther than close plane
+        Tracked<float> NearInFocusMinSpeedDist = 0.1f;
+        Tracked<float> NearInFocusMaxSpeedDist = 20.0f; // 20m for blurring front of car and road
+
+        // Far DoF: Close plane, min blur
+        Tracked<float> FarInFocusMinSpeedDist = 100000.0f; // Infinite focus (100km)
+        Tracked<float> FarInFocusMaxSpeedDist = 2000.0f;  // Start blurring beyond 2km
+
+        // Far DoF: Far plane, max blur
+        Tracked<float> FarOutFocusMinSpeedDist = 100000.0f; // Infinite focus
+        Tracked<float> FarOutFocusMaxSpeedDist = 10000.0f; // Max blur > 10km
+    };
+
     struct SCameraSettings {
         Tracked<float> FOV = 55.0f;
         Tracked<float> OffsetHeight = 0.04f;
@@ -100,6 +132,7 @@ public:
         Tracked<float> Pitch = 0.0f;
         SHorizonLock HorizonLock;
         SMovement Movement;
+        SDoF DoF;
     };
 
     struct SCameraSettingsBike : SCameraSettings {

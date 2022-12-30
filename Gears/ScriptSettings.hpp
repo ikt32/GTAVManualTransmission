@@ -335,6 +335,14 @@ public:
             bool DisableRemoveProps = false;
             bool OverrideNearClip = false;
             float NearClip = 0.05f;
+
+            struct {
+                bool Override = false;
+                float NearOutFocus = 0.00f;
+                float NearInFocus = 0.20f;
+                float FarInFocus = 5000.0f;
+                float FarOutFocus = 100000.0f;
+            } DoF; // Not saved or loaded
         } FPVCam;
 
         struct {

@@ -19,6 +19,7 @@
 #include "Util/UIUtils.h"
 
 using VExt = VehicleExtensions;
+using std::clamp;
 
 extern Vehicle g_playerVehicle;
 extern Ped g_playerPed;
@@ -79,6 +80,8 @@ namespace {
     int savedHeadPropTx = -1;
     int savedEyesProp = -1;
     int savedEyesPropTx = -1;
+
+    float avgAccel = 0.0f;
 }
 
 namespace FPVCam {
@@ -91,6 +94,7 @@ namespace FPVCam {
     void updateLateralCameraMovement(VehicleConfig::SMovement& movement);
     void updateVerticalCameraMovement(VehicleConfig::SMovement& movement);
     void updatePitchCameraMovement(VehicleConfig::SMovement& movement);
+    void updateDoF(const VehicleConfig::SDoF& dof);
 }
 void FPVCam::InitOffsets() {
     if (g_gameVersion < G_VER_1_0_1290_1_STEAM) {
@@ -114,6 +118,9 @@ void FPVCam::CancelCam() {
     accelMoveFwd = 0.0f;
     accelMoveLat = 0.0f;
     accelMoveVert = 0.0f;
+    accelPitchDeg = 0.0f;
+
+    avgAccel = 0.0f;
 }
 
 void FPVCam::HideHead(bool remove) {
@@ -205,7 +212,6 @@ void FPVCam::Update() {
         CAM::SET_CAM_ACTIVE(cameraHandle, true);
         CAM::SET_CAM_IS_INSIDE_VEHICLE(cameraHandle, true);
         GRAPHICS::SET_PARTICLE_FX_CAM_INSIDE_VEHICLE(true);
-        CAM::SET_CAM_MOTION_BLUR_STRENGTH(cameraHandle, 1.0f);
         CAM::RENDER_SCRIPT_CAMS(true, false, 0, true, false, 0);
     }
     CAM::SET_SCRIPTED_CAMERA_IS_FIRST_PERSON_THIS_FRAME(true);
@@ -223,18 +229,29 @@ void FPVCam::Update() {
     }
 
     VehicleConfig::SMovement* pMovement = nullptr;
+    VehicleConfig::SDoF* pDoF = nullptr;
 
     if (!bikeSeat) {
         switch (g_settings().Misc.Camera.AttachId) {
-            case 0: pMovement = &g_settings().Misc.Camera.Ped.Movement; break;
-            case 1: pMovement = &g_settings().Misc.Camera.Vehicle1.Movement; break;
-            case 2: pMovement = &g_settings().Misc.Camera.Vehicle2.Movement; break;
+            case 0:
+                pMovement = &g_settings().Misc.Camera.Ped.Movement;
+                pDoF = &g_settings().Misc.Camera.Ped.DoF;
+                break;
+            case 1:
+                pMovement = &g_settings().Misc.Camera.Vehicle1.Movement;
+                pDoF = &g_settings().Misc.Camera.Vehicle1.DoF;
+                break;
+            case 2:
+                pMovement = &g_settings().Misc.Camera.Vehicle2.Movement;
+                pDoF = &g_settings().Misc.Camera.Vehicle2.DoF;
+                break;
             default:
                 break;
         }
     }
     else {
         pMovement = &g_settings().Misc.Camera.Bike.Movement;
+        pDoF = &g_settings().Misc.Camera.Bike.DoF;
     }
 
     if (pMovement != nullptr) {
@@ -244,6 +261,12 @@ void FPVCam::Update() {
             updateLateralCameraMovement(*pMovement);
             updateVerticalCameraMovement(*pMovement);
             updatePitchCameraMovement(*pMovement);
+        }
+    }
+
+    if (pDoF != nullptr) {
+        if (pDoF->Enable) {
+            updateDoF(*pDoF);
         }
     }
 
@@ -775,4 +798,59 @@ void FPVCam::updatePitchCameraMovement(VehicleConfig::SMovement& movement) {
         std::clamp(mappedAccel * mult,
             -pitchDownLim, pitchUpLim);
     accelPitchDeg = lerp(accelPitchDeg, pitchVal, lerpF); // just for smoothness
+}
+
+void FPVCam::updateDoF(const VehicleConfig::SDoF& dof) {
+    CAM::SET_USE_HI_DOF(); // Call each frame
+    CAM::SET_CAM_USE_SHALLOW_DOF_MODE(cameraHandle, true); // Depends on SET_USE_HI_DOF, so also each frame?
+
+    // smooth out defocusing/focusing
+    auto lerpFactor = 1.0f - pow(0.01f, MISC::GET_FRAME_TIME());
+    avgAccel = lerp(avgAccel, Length(g_vehData.mAcceleration), lerpFactor);
+
+    float averageAcceleration =
+        clamp(avgAccel,dof.TargetAccelMinDoF.Value(), dof.TargetAccelMaxDoF.Value());
+
+    // Use air speed for this one
+    float speed = ENTITY::GET_ENTITY_SPEED(g_playerVehicle);
+
+    float nearDoF1 = mapclamp(speed,
+        dof.TargetSpeedMinDoF.Value(), dof.TargetSpeedMaxDoF.Value(),
+        dof.NearOutFocusMinSpeedDist.Value(), dof.NearOutFocusMaxSpeedDist.Value());
+
+    nearDoF1 = mapclamp(averageAcceleration,
+        dof.TargetAccelMinDoF.Value(), dof.TargetAccelMaxDoF.Value(),
+        nearDoF1 * dof.TargetAccelMinDoFMod, nearDoF1 * dof.TargetAccelMaxDoFMod);
+
+    float nearDoF2 = mapclamp(speed,
+        dof.TargetSpeedMinDoF.Value(), dof.TargetSpeedMaxDoF.Value(),
+        dof.NearInFocusMinSpeedDist.Value(), dof.NearInFocusMaxSpeedDist.Value());
+
+    nearDoF2 = mapclamp(averageAcceleration,
+        dof.TargetAccelMinDoF.Value(), dof.TargetAccelMaxDoF.Value(),
+        nearDoF2 * dof.TargetAccelMinDoFMod, nearDoF2 * dof.TargetAccelMaxDoFMod);
+
+    float farDoF1 = mapclamp(speed,
+        dof.TargetSpeedMinDoF.Value(), dof.TargetSpeedMaxDoF.Value(),
+        dof.FarInFocusMinSpeedDist.Value(), dof.FarInFocusMaxSpeedDist.Value());
+
+    farDoF1 = mapclamp(averageAcceleration,
+        dof.TargetAccelMinDoF.Value(), dof.TargetAccelMaxDoF.Value(),
+        farDoF1 / dof.TargetAccelMinDoFMod, farDoF1 / dof.TargetAccelMaxDoFMod);
+
+    float farDoF2 = mapclamp(speed,
+        dof.TargetSpeedMinDoF.Value(), dof.TargetSpeedMaxDoF.Value(),
+        dof.FarOutFocusMinSpeedDist.Value(), dof.FarOutFocusMaxSpeedDist.Value());
+
+    farDoF2 = mapclamp(averageAcceleration,
+        dof.TargetAccelMinDoF.Value(), dof.TargetAccelMaxDoF.Value(),
+        farDoF2 / dof.TargetAccelMinDoFMod, farDoF2 / dof.TargetAccelMaxDoFMod);
+
+    if (g_settings.Debug.FPVCam.DoF.Override) {
+        nearDoF1 = g_settings.Debug.FPVCam.DoF.NearOutFocus;
+        nearDoF2 = g_settings.Debug.FPVCam.DoF.NearInFocus;
+        farDoF1 = g_settings.Debug.FPVCam.DoF.FarInFocus;
+        farDoF2 = g_settings.Debug.FPVCam.DoF.FarOutFocus;
+    }
+    CAM::SET_CAM_DOF_PLANES(cameraHandle, nearDoF1, nearDoF2, farDoF1, farDoF2);
 }

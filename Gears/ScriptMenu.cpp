@@ -2020,6 +2020,9 @@ void update_cameraoptionsmenu() {
     g_menu.MenuOption("Horizon lock options", "horizonlockoptionsmenu",
         { "Modify horizon lock." });
 
+    g_menu.MenuOption("Depth of field options", "dofoptionsmenu",
+        { "Modify depth of field effects." });
+
     // Might as well initialize with valid pointers.
     Tracked<float>* pFov =           &g_settings().Misc.Camera.Ped.FOV;
     Tracked<float>* pOffsetHeight =  &g_settings().Misc.Camera.Ped.OffsetHeight;
@@ -2320,7 +2323,7 @@ void update_cameramovementvertoptionsmenu(bool bike) {
 }
 
 void update_horizonlockoptionsmenu(bool bike) {
-    g_menu.Title("Camera movement");
+    g_menu.Title("Horizon lock");
     VehicleConfig::SHorizonLock* pHorLck = nullptr;
     std::string modeName;
 
@@ -2370,6 +2373,134 @@ void update_horizonlockoptionsmenu(bool bike) {
           "High value: Quickly centers onto the vehicle." });
 }
 
+void update_dofoptionsmenu(bool bike) {
+    g_menu.Title("Depth of field");
+    VehicleConfig::SDoF* pDoF = nullptr;
+    std::string modeName;
+
+    if (!bike) {
+        switch (g_settings().Misc.Camera.AttachId) {
+            case 0: pDoF = &g_settings().Misc.Camera.Ped.DoF; break;
+            case 1: pDoF = &g_settings().Misc.Camera.Vehicle1.DoF; break;
+            case 2: pDoF = &g_settings().Misc.Camera.Vehicle2.DoF; break;
+            default:
+                break;
+        }
+    }
+    else {
+        pDoF = &g_settings().Misc.Camera.Bike.DoF;
+    }
+
+    if (pDoF == nullptr) {
+        g_menu.Subtitle("Invalid configuration");
+        g_menu.Option("Invalid configuration");
+        return;
+    }
+
+    if (!bike)
+        modeName = camAttachPoints[g_settings().Misc.Camera.AttachId];
+    else
+        modeName = "Bike";
+
+    g_menu.Subtitle(fmt::format("{} - {}", MenuSubtitleConfig(), modeName));
+
+    auto& dof = *pDoF;
+
+    g_menu.BoolOption("Enable", dof.Enable,
+        { "Enable or disable dynamic depth of field.",
+          "Unfocuses the car and very far distances at high speed, for extra sense of speed.",
+          "Very High post-processing required! May have significant performance impact.",
+          "All options below can be edited precisely, press <Enter> to enter a number." });
+
+    g_menu.FloatOptionCb("TargetSpeedMinDoF", dof.TargetSpeedMinDoF,
+        0.0f, 200.0f, 1.0f, GetKbEntryFloat,
+        { "Speed at which unfocusing starts, in m/s.",
+          std::format("({:.0f} kph, {:.0f} mph)",
+              dof.TargetSpeedMinDoF * 3.6f,
+              dof.TargetSpeedMinDoF * 2.23694f) });
+
+    g_menu.FloatOptionCb("TargetSpeedMaxDoF", dof.TargetSpeedMaxDoF,
+        0.0f, 400.0f, 1.0f, GetKbEntryFloat,
+        { "Speed at which unfocusing is largest, in m/s.",
+          std::format("({:.0f} kph, {:.0f} mph)",
+              dof.TargetSpeedMaxDoF * 3.6f,
+              dof.TargetSpeedMaxDoF * 2.23694f) });
+
+    g_menu.FloatOptionCb("NearOutFocusMinSpeedDist", dof.NearOutFocusMinSpeedDist,
+        0.0f, 10.0f, 0.01f, GetKbEntryFloat,
+        { "Distance of the plane that's out of focus, when traveling at or below 'TargetSpeedMinDoF'.",
+          "In meters.",
+          "Default: 0.00: nothing is blurred when going slow." });
+
+    g_menu.FloatOptionCb("NearOutFocusMaxSpeedDist", dof.NearOutFocusMaxSpeedDist,
+        0.0f, 10.0f, 0.01f, GetKbEntryFloat,
+        { "Distance of the plane that's out of focus, when traveling at or above 'TargetSpeedMaxDoF'.",
+          "In meters.",
+          "Default: 0.50: everything closer than 0.5 meters (1.6 feet) to the camera is blurred when going fast." });
+
+    g_menu.FloatOptionCb("NearInFocusMinSpeedDist", dof.NearInFocusMinSpeedDist,
+        0.1f, 100.0f, 0.1f, GetKbEntryFloat,
+        { "Distance of the plane that's in focus (when things stop being blurry), when traveling at or below 'TargetSpeedMinDoF'.",
+          "In meters.",
+          "Default: 0.10: Only objects closer than 0.1 meters (4 inches) to the camera are blurred when going slow.",
+          "Must be higher than 'NearOutFocusMinSpeedDist'." });
+
+    g_menu.FloatOptionCb("NearInFocusMaxSpeedDist", dof.NearInFocusMaxSpeedDist,
+        1.0f, 100.0f, 1.0f, GetKbEntryFloat,
+        { "Distance of the plane that's in focus (when things stop being blurry), when traveling at or above 'TargetSpeedMaxDoF'.",
+          "In meters.",
+          "Default: 20.0, where everything closer than 20 meters (65 feet) is blurred when going fast.",
+          "Must be much higher than 'NearOutFocusMaxSpeedDist'." });
+
+    g_menu.FloatOptionCb("FarInFocusMinSpeedDist", dof.FarInFocusMinSpeedDist,
+        100.0f, 100000.0f, 1.0f, GetKbEntryFloat,
+        { "Distance of the plane that's in focus (when things start being blurry), when traveling at or below 'TargetSpeedMinDoF'.",
+          "In meters.",
+          "Default: 100000: Practically infinite, no distant blur." });
+
+    g_menu.FloatOptionCb("FarInFocusMaxSpeedDist", dof.FarInFocusMaxSpeedDist,
+        100.0f, 100000.0f, 1.0f, GetKbEntryFloat,
+        { "Distance of the plane that's in focus (when things stop being blurry), when traveling at or above 'TargetSpeedMaxDoF'.",
+          "In meters.",
+          "Default: 2000.0: Everything farther than 2 km (1.2 miles) starts to get blurred when going fast." });
+
+    g_menu.FloatOptionCb("FarOutFocusMinSpeedDist", dof.FarOutFocusMinSpeedDist,
+        100.0f, 100000.0f, 0.01f, GetKbEntryFloat,
+        { "Distance of the plane that's out of focus, when traveling at or below 'TargetSpeedMinDoF'.",
+          "In meters.",
+          "Default: 100000: Practically infinite, no distant blur.",
+          "Must be higher or equal to 'FarInFocusMinSpeedDist'." });
+
+    g_menu.FloatOptionCb("FarOutFocusMaxSpeedDist", dof.FarOutFocusMaxSpeedDist,
+        100.0f, 100000.0f, 0.01f, GetKbEntryFloat,
+        { "Distance of the plane that's out of focus, when traveling at or above 'TargetSpeedMaxDoF'.",
+          "In meters.",
+          "Default: 10000: Everything farther than 10 km (6.2 miles) is as blurred can be, when going fast.",
+          "Must be higher than 'FarInFocusMaxSpeedDist'." });
+
+    g_menu.FloatOptionCb("TargetAccelMinDoF", dof.TargetAccelMinDoF,
+        0.0f, 200.0f, 0.05f, GetKbEntryFloat,
+        { "Acceleration where unfocusing is reduced, in m/s^2.",
+          std::format("({:.2f} G)", dof.TargetAccelMinDoF / 9.81f),
+          "Default: 0.5G, to reduce blur when not accelerating or coasting." });
+
+    g_menu.FloatOptionCb("TargetAccelMaxDoF", dof.TargetAccelMaxDoF,
+        0.0f, 200.0f, 0.05f, GetKbEntryFloat,
+        { "Acceleration where unfocusing is increased, in m/s^2.",
+          std::format("({:.2f} G)", dof.TargetAccelMaxDoF / 9.81f),
+          "Default: 1.0G, at which blur (for that speed) is maximized." });
+
+    g_menu.FloatOptionCb("TargetAccelMinDoFMod", dof.TargetAccelMinDoFMod,
+        0.0f, 10.0f, 0.01f, GetKbEntryFloat,
+        { "Modifier for blur reduction when at or below 'TargetAccelMinDoF' acceleration.",
+          "Default: 0.1, at low acceleration the near blur is moved closer to the camera, unblurring the dashboard and wheel." });
+
+    g_menu.FloatOptionCb("TargetAccelMaxDoFMod", dof.TargetAccelMaxDoFMod,
+        0.0f, 10.0f, 0.01f, GetKbEntryFloat,
+        { "Modifier for blur reduction when at or above 'TargetAccelMaxDoF' acceleration.",
+          "Default: 1.0, at high acceleration the near blur is as far forward as decided by the speed." });
+}
+
 void update_bikecameraoptionsmenu() {
     g_menu.Title("Camera (bikes)");
     g_menu.Subtitle(MenuSubtitleConfig());
@@ -2381,13 +2512,17 @@ void update_bikecameraoptionsmenu() {
         FPVCam::CancelCam();
     }
 
-    g_menu.MenuOption("Camera movement options", "bikecameramovementoptionsmenu",
-        { "Enable and tweak the movement of the first person camera.",
-          "Movement options apply to all bike attach options." });
+    g_menu.MenuOption("Camera inertia options", "bikecameramovementoptionsmenu",
+        { "Modify camera inertia and movement.",
+          "Options in here apply to all bike attach options." });
 
     g_menu.MenuOption("Horizon lock options", "bikehorizonlockoptionsmenu",
-        { "Enable and tweak the movement of the first person camera.",
-          "Horizon lock options apply to all bike attach options." });
+        { "Modify horizon lock.",
+          "Options in here apply to all bike attach options." });
+
+    g_menu.MenuOption("Depth of field options", "bikedofoptionsmenu",
+        { "Modify depth of field effects.",
+          "Options in here apply to all bike attach options." });
 
     g_menu.FloatOptionCb("Field of view", g_settings().Misc.Camera.Bike.FOV, 1.0f, 120.0f, 0.5f, GetKbEntryFloat,
         { "In degrees." });
@@ -2411,11 +2546,13 @@ void update_devoptionsmenu() {
 
     g_menu.MenuOption("Debug settings", "debugmenu");
 
-    g_menu.MenuOption("Metrics settings", "metricsmenu", 
+    g_menu.MenuOption("Metrics settings", "metricsmenu",
         { "Show the G-Force graph and speed timers." });
 
     g_menu.MenuOption("Compatibility settings", "compatmenu",
         { "Disable various features to improve compatibility." });
+
+    g_menu.MenuOption("Depth of field override", "dofoverridemenu");
 
     if (g_menu.Option("Export base VehicleConfig", 
         { "Exports the base configuration to the Vehicles folder. If you lost it, or something." })) {
@@ -2632,6 +2769,20 @@ void update_compatmenu() {
     g_menu.FloatOptionCb("FPV near clip", g_settings.Debug.FPVCam.NearClip, 0.0f, 10.0f, 0.05f, GetKbEntryFloat);
 }
 
+void update_dofoverridemenu() {
+    g_menu.Title("DoF override");
+    g_menu.Subtitle("");
+
+    g_menu.BoolOption("Override DoF", g_settings.Debug.FPVCam.DoF.Override,
+        { "When DoF is enabled for the FPV camera, temporarily override it with the values below.",
+          "May be useful to tweak distances for different vehicles." });
+
+    g_menu.FloatOptionCb("NearOutFocus", g_settings.Debug.FPVCam.DoF.NearOutFocus, 0.0f, 100000.0f, 0.05f, GetKbEntryFloat);
+    g_menu.FloatOptionCb("NearInFocus",  g_settings.Debug.FPVCam.DoF.NearInFocus,  0.0f, 100000.0f, 0.05f, GetKbEntryFloat);
+    g_menu.FloatOptionCb("FarInFocus",   g_settings.Debug.FPVCam.DoF.FarInFocus,   0.0f, 100000.0f, 1.00f, GetKbEntryFloat);
+    g_menu.FloatOptionCb("FarOutFocus",  g_settings.Debug.FPVCam.DoF.FarOutFocus,  0.0f, 100000.0f, 1.00f, GetKbEntryFloat);
+}
+
 void update_menu() {
     g_menu.CheckKeys();
 
@@ -2797,6 +2948,12 @@ void update_menu() {
     /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> bikecameraoptionsmenu -> bikehorizonlockoptionsmenu*/
     if (g_menu.CurrentMenu("bikehorizonlockoptionsmenu")) { update_horizonlockoptionsmenu(true); }
 
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> dofoptionsmenu*/
+    if (g_menu.CurrentMenu("dofoptionsmenu")) { update_dofoptionsmenu(false); }
+
+    /* mainmenu -> miscoptionsmenu -> cameraoptionsmenu -> bikecameraoptionsmenu -> bikedofoptionsmenu*/
+    if (g_menu.CurrentMenu("bikedofoptionsmenu")) { update_dofoptionsmenu(true); }
+
     /* mainmenu -> devoptionsmenu */
     if (g_menu.CurrentMenu("devoptionsmenu")) { update_devoptionsmenu(); }
 
@@ -2808,6 +2965,9 @@ void update_menu() {
 
     /* mainmenu -> devoptionsmenu -> compatmenu */
     if (g_menu.CurrentMenu("compatmenu")) { update_compatmenu(); }
+
+    /* mainmenu -> devoptionsmenu -> dofoverridemenu */
+    if (g_menu.CurrentMenu("dofoverridemenu")) { update_dofoverridemenu(); }
 
     g_menu.EndMenu();
 }
