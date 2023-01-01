@@ -757,13 +757,13 @@ void FPVCam::updateVerticalCameraMovement(VehicleConfig::SMovement& movement) {
     // Up
     if (gForce > deadzone) {
         mappedAccel = map(gForce, deadzone, 10.0f, 0.0f, 10.0f);
-        mult = movement.VertUpMult;
+        mult = movement.VertDownMult;
     }
 
     // Down
     if (gForce < -deadzone) {
         mappedAccel = map(gForce, -deadzone, -10.0f, 0.0f, -10.0f);
-        mult = movement.VertDownMult;
+        mult = movement.VertUpMult;
     }
 
     float accelVal =
