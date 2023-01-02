@@ -1800,6 +1800,27 @@ std::vector<float> GetHandBrakeVals(float handbrakeValInput){
     return brakeVals;
 }
 
+// TODO: I should really rework how brake values are mixed with the assists...
+// This just gets the correct value for all wheels during normal braking
+// TODO: Also probably refactor so NPC vehicles use this
+std::vector<float> GetInputBrakes() {
+    std::vector<float> brakeVals(g_vehData.mWheelCount);
+    const auto offsets = VExt::GetWheelOffsets(g_playerVehicle);
+
+    const float handlingBrakeForce = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeForce);
+    const float bbalF = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasFront);
+    const float bbalR = *reinterpret_cast<float*>(g_vehData.mHandlingPtr + hOffsets.fBrakeBiasRear);
+
+    float inpBrakeForce = handlingBrakeForce * g_controls.BrakeVal;
+
+    for (int i = 0; i < g_vehData.mWheelCount; i++) {
+        float bbal = offsets[i].y > 0.0f ? bbalF : bbalR;
+        brakeVals[i] = inpBrakeForce * bbal;
+    }
+
+    return brakeVals;
+}
+
 void handleBrakePatch() {
     auto absData = DrivingAssists::GetABS();
     auto tcsData = DrivingAssists::GetTCS();
@@ -1976,6 +1997,9 @@ void handleBrakePatch() {
         espData.Use ||
         tcsData.Use && g_settings().DriveAssists.TCS.Mode == 0;
 
+    bool patchAbs = g_vehData.mHasABS &&
+        g_controls.UseAnalogHandbrake && g_controls.HandbrakeVal > 0.01f;
+
     // LSD actively conflicts with brakes (applies negative brake)
     // So override LSD with the assist.
     if (patchBrake) {
@@ -2014,6 +2038,12 @@ void handleBrakePatch() {
             }
         }
 
+        if (patchAbs) {
+            if (!MemoryPatcher::AbsPatcher.Patched()) {
+                MemoryPatcher::AbsPatcher.Patch();
+            }
+        }
+
         // Only use LSD if no other assists are working, as LSD would just reduce brake force.
         if (lsdData.Use && !espData.Use && !tcsData.Use && !absData.Use) {
             auto brakeVals = DrivingAssists::GetLSDBrakes(lsdData);
@@ -2031,6 +2061,8 @@ void handleBrakePatch() {
             auto tcsBrakeVals = DrivingAssists::GetTCSBrakes(tcsData);
             auto absBrakeVals = DrivingAssists::GetABSBrakes(absData);
 
+            auto normalBrakeVals = GetInputBrakes();
+
             for (int i = 0; i < g_vehData.mWheelCount; i++) {
                 float brakeVal = 0.0f;
                 if (espData.Use) {
@@ -2044,6 +2076,13 @@ void handleBrakePatch() {
                 }
                 if (hbVals[i] > 0.0f) {
                     brakeVal = brakeVal + hbVals[i];
+                    VExt::SetIsABSActive(g_playerVehicle, i, false);
+                }
+                // aka only use analog handbrake
+                if (!espData.Use &&
+                    !(tcsData.Use && g_settings().DriveAssists.TCS.Mode == 0) &&
+                    !(absData.Use && g_vehData.mWheelsAbs[i])) {
+                    brakeVal += normalBrakeVals[i];
                 }
 
                 VExt::SetWheelBrakePressure(g_playerVehicle, i, brakeVal);
@@ -2073,6 +2112,11 @@ void handleBrakePatch() {
                 }
             }
             MemoryPatcher::RestoreThrottle();
+        }
+    }
+    if (!patchAbs) {
+        if (MemoryPatcher::AbsPatcher.Patched()) {
+            MemoryPatcher::AbsPatcher.Restore();
         }
     }
 

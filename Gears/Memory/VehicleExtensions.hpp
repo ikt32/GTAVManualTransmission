@@ -222,6 +222,10 @@ public:
     static std::vector<float> GetWheelBrakePressure(Vehicle handle);
     static void SetWheelBrakePressure(Vehicle handle, uint8_t index, float value);
 
+    static bool GetIsABSActive(Vehicle handle, uint8_t index);
+    static void SetIsABSActive(Vehicle handle, uint8_t index, bool value);
+    static std::vector<uint32_t> GetWheelDriveFlags(Vehicle handle);
+
     static bool IsWheelSteered(Vehicle handle, uint8_t index);
     static bool IsWheelPowered(Vehicle handle, uint8_t index);
     static std::vector<uint32_t> GetWheelFlags(Vehicle handle);

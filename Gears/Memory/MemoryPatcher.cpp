@@ -46,6 +46,10 @@ Patcher ThrottlePatcher("Wheel: Throttle", throttle);
 PatternInfo brake;
 Patcher BrakePatcher("Wheel: Brake", brake);
 
+// When disabled, ABS doesn't trigger (all vehicles/wheels (?))
+PatternInfo abs;
+Patcher AbsPatcher("Wheel: ABS", abs);
+
 // Disables countersteer/steering assist
 PatternInfo steeringAssist;
 PatcherJmp SteeringAssistPatcher("Steer: Steering assist", steeringAssist, true);
@@ -93,6 +97,12 @@ void SetPatterns(int version) {
     // movss [rbx+offThrottleP], xmm6
     throttleControl = PatternInfo("\x0F\x87\xA4\x00\x00\x00" "\xF3\x0F\x11\xB3\xBC\x09\x00\x00", "xx?xxx" "xxx???xx",
         { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 }, 6);
+
+    // Valid for 2372 (untested on others)
+    // or eax,[rbp+04] <- NOP this
+    // mov [rsi+wheelDriveFlagsOffset],eax
+    abs = PatternInfo("\x0B\x45\x04\x89\x86\x00\x02\x00\x00", "xxxxx??xx",
+        { 0x90, 0x90, 0x90 });
 
     if (version >= G_VER_1_0_1365_1_STEAM) {
         shiftUp = PatternInfo("\x66\x89\x0B\x8D\x46\x04\x66\x89\x43\04", "xx?xx?xxx?", 
@@ -144,6 +154,7 @@ bool Test() {
     success &= 0 != SteeringAssistPatcher.Test();
     success &= 0 != SteeringControlPatcher.Test();
     success &= 0 != ThrottleControlPatcher.Test();
+    success &= 0 != AbsPatcher.Test();
     return success;
 }
 

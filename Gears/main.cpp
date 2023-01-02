@@ -146,7 +146,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             scriptUnregister(hInstance);
 
             logger.Write(INFO, "[Patch] Init shutdown");
-            const uint8_t expected = 6;
+            const uint8_t expected = 7;
             uint8_t actual         = 0;
 
             if (MemoryPatcher::RevertGearboxPatches()) actual++;
@@ -155,6 +155,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             if (MemoryPatcher::RestoreBrake()) actual++;
             if (MemoryPatcher::RestoreThrottle()) actual++;
             if (MemoryPatcher::RestoreThrottleControl()) actual++;
+            if (MemoryPatcher::AbsPatcher.Restore()) actual++;
 
             if (actual == expected) {
                 logger.Write(INFO, "[Patch] Script shut down cleanly");

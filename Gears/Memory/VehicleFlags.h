@@ -211,3 +211,18 @@ enum eWheelFlag : uint32_t
     FLAG_IS_DRIVEN = 0x00000010,
 };
 DEFINE_ENUM_FLAG_OPERATORS(eWheelFlag);
+
+
+// 00001003    No ABS (Or using HB)
+// 00005003    ABS
+// 00005003    No throttle
+// 00005007    Semi throttle / reverse
+// 00205007    Full throttle / reverse
+
+enum eWheelDriveFlag : uint32_t
+{
+    FLAG_WD_SEMI_THROTTLE   = 0x00000004,
+    FLAG_WD_ABS             = 0x00004000,
+    FLAG_WD_FULL_THROTTLE   = 0x00200000,
+};
+DEFINE_ENUM_FLAG_OPERATORS(eWheelDriveFlag);

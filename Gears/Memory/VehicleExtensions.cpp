@@ -76,6 +76,7 @@ namespace {
     int wheelTractionVectorXOffset = 0;
     int wheelPowerOffset = 0;
     int wheelBrakeOffset = 0;
+    int wheelDriveFlagsOffset = 0;
     int wheelFlagsOffset = 0;
     int wheelDownforceOffset = 0;
     int wheelLoadOffset = 0;
@@ -338,6 +339,9 @@ void VehicleExtensions::Init() {
     // wheelHealthOffset + float = tyre health
 
     addr = mem::FindPattern("\x75\x11\x48\x8b\x01\x8b\x88", "xxxxxxx");
+    wheelDriveFlagsOffset = addr == 0 ? 0 : (*(int*)(addr + 7)) - 0x4;
+    logger.Write(wheelDriveFlagsOffset == 0 ? WARN : DEBUG, "Wheel Drive Flags Offset: 0x%X", wheelDriveFlagsOffset);
+
     wheelFlagsOffset = addr == 0 ? 0 : *(int*)(addr + 7);
     logger.Write(wheelFlagsOffset == 0 ? WARN : DEBUG, "Wheel Flags Offset: 0x%X", wheelFlagsOffset);
 
@@ -1227,6 +1231,46 @@ void VehicleExtensions::SetWheelBrakePressure(Vehicle handle, uint8_t index, flo
 
     auto wheelAddr = *reinterpret_cast<uint64_t *>(wheelPtr + 0x008 * index);
     *reinterpret_cast<float *>(wheelAddr + wheelBrakeOffset) = value;
+}
+
+bool VehicleExtensions::GetIsABSActive(Vehicle handle, uint8_t index) {
+    if (index > GetNumWheels(handle)) return false;
+    if (wheelDriveFlagsOffset == 0) return false;
+
+    auto wheelPtr = GetWheelsPtr(handle);
+    auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * index);
+    auto wheelFlags = *reinterpret_cast<uint32_t*>(wheelAddr + wheelDriveFlagsOffset);
+    return wheelFlags & eWheelDriveFlag::FLAG_WD_ABS;
+}
+
+void VehicleExtensions::SetIsABSActive(Vehicle handle, uint8_t index, bool value) {
+    if (index > GetNumWheels(handle)) return;
+    if (wheelDriveFlagsOffset == 0) return;
+
+    auto wheelPtr = GetWheelsPtr(handle);
+
+    auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * index);
+    auto wheelFlags = *reinterpret_cast<uint32_t*>(wheelAddr + wheelDriveFlagsOffset);
+    if (value) {
+        *reinterpret_cast<uint32_t*>(wheelAddr + wheelDriveFlagsOffset) = wheelFlags | eWheelDriveFlag::FLAG_WD_ABS;
+    }
+    else {
+        *reinterpret_cast<uint32_t*>(wheelAddr + wheelDriveFlagsOffset) = wheelFlags & ~eWheelDriveFlag::FLAG_WD_ABS;
+    }
+}
+
+std::vector<uint32_t> VehicleExtensions::GetWheelDriveFlags(Vehicle handle) {
+    const auto numWheels = GetNumWheels(handle);
+    std::vector<uint32_t> flags(numWheels);
+    auto wheelPtr = GetWheelsPtr(handle);
+
+    if (wheelDriveFlagsOffset == 0) return flags;
+
+    for (auto i = 0; i < numWheels; ++i) {
+        auto wheelAddr = *reinterpret_cast<uint64_t*>(wheelPtr + 0x008 * i);
+        flags[i] = *reinterpret_cast<uint32_t*>(wheelAddr + wheelDriveFlagsOffset);
+    }
+    return flags;
 }
 
 bool VehicleExtensions::IsWheelSteered(Vehicle handle, uint8_t index) {
