@@ -2270,10 +2270,11 @@ void update_cameramovementlatoptionsmenu(bool bike) {
         { "How hard the car should turn or accelerate sideways for the camera to start moving.",
           "Unit in Gs." });
 
-    g_menu.FloatOption("Scale", movement.LatMult, 0.0f, 2.0f, 0.01f,
+    g_menu.FloatOption("Scale", movement.LatMult, -2.0f, 2.0f, 0.01f,
         { "How much the camera moves left or right.",
           "A scale of 1.0 makes the camera move 1 meter at 1G.",
           "A scale of 0.1 makes the camera move 10 centimeters at 1G.",
+          "Negative values make the camera move \"against\" the force.",
           "0.0 disables lateral movement." });
 
     g_menu.FloatOption("Limit", movement.LatLimit, 0.0f, 1.0f, 0.01f,
