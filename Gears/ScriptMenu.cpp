@@ -2157,8 +2157,9 @@ void update_cameramovementoptionsmenu(bool bike) {
           "Affects camera up/down movement." });
 
     g_menu.FloatOptionCb("Movement roughness", movement.Roughness, 0.0f, 10.0f, 0.5f, GetKbEntryFloat,
-        { "Controls the jitteryness of camera movement.",
-          "Larger values make it more jittery." });
+        { "How rough the camera movement is, from inertia effects.",
+          "Larger values increase roughness, causing smaller bumps to be more noticeable.",
+          "Smaller values increase smoothness, but may cause the movement to be less responsive." });
 }
 
 void update_cameramovementrotoptionsmenu(bool bike) {
