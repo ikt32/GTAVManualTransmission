@@ -11,7 +11,6 @@
 #include "SteeringAnim.h"
 #include "VehicleConfig.h"
 #include "AtcuLogic.h"
-#include "Camera.h"
 #include "Misc.h"
 #include "StartingAnimation.h"
 #include "DrivingAssists.h"
@@ -2768,7 +2767,6 @@ void ScriptInit() {
         threadCheckUpdate(10000);
     }
 
-    FPVCam::InitOffsets();
     VExt::Init();
     if (!MemoryPatcher::Test()) {
         logger.Write(ERROR, "Patchability test failed!");
@@ -2805,7 +2803,6 @@ void ScriptTick() {
         update_UDPTelemetry();
         SteeringAnimation::Update();
         StartingAnimation::Update();
-        FPVCam::Update();
         UpdatePause();
         WAIT(0);
     }

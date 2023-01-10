@@ -3,12 +3,6 @@ namespace TrainerV {
     bool Active();
 }
 
-namespace Dismemberment {
-    bool Available();
-    void AddBoneDraw(int handle, int start, int end);
-    void RemoveBoneDraw(int handle);
-}
-
 namespace DashHook {
     bool Available();
 }

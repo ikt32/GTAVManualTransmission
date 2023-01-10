@@ -163,7 +163,6 @@
     <ClCompile Include="AtcuLogic.cpp" />
     <ClCompile Include="AWD.cpp" />
     <ClCompile Include="BlockableControls.cpp" />
-    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Compatibility.cpp" />
     <ClCompile Include="CruiseControl.cpp" />
     <ClCompile Include="CustomSteering.cpp" />
@@ -267,7 +266,6 @@
     <ClInclude Include="AtcuLogic.h" />
     <ClInclude Include="AWD.h" />
     <ClInclude Include="BlockableControls.h" />
-    <ClInclude Include="Camera.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="CruiseControl.h" />
     <ClInclude Include="CustomSteering.h" />

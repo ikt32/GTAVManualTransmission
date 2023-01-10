@@ -325,12 +325,6 @@ void ScriptSettings::SaveGeneral() {
     SAVE_VAL("DEBUG", "DisableNPCGearbox", Debug.DisableNPCGearbox);
     SAVE_VAL("DEBUG", "DisableNPCBrake", Debug.DisableNPCBrake);
 
-    SAVE_VAL("DEBUG", "FPVCamDisable", Debug.FPVCam.Disable);
-    SAVE_VAL("DEBUG", "FPVCamDisableRemoveHead", Debug.FPVCam.DisableRemoveHead);
-    SAVE_VAL("DEBUG", "FPVCamDisableRemoveProps", Debug.FPVCam.DisableRemoveProps);
-    SAVE_VAL("DEBUG", "FPVCamOverrideNearClip", Debug.FPVCam.OverrideNearClip);
-    SAVE_VAL("DEBUG", "FPVCamNearClip", Debug.FPVCam.NearClip);
-
     SAVE_VAL("DEBUG", "EnableTimers", Debug.Metrics.EnableTimers);
 
     SAVE_VAL("DEBUG", "EnableGForce", Debug.Metrics.GForce.Enable);
@@ -665,12 +659,6 @@ void ScriptSettings::parseSettingsGeneral() {
     LOAD_VAL("DEBUG", "DisablePlayerHide", Debug.DisablePlayerHide);
     LOAD_VAL("DEBUG", "DisableNPCGearbox", Debug.DisableNPCGearbox);
     LOAD_VAL("DEBUG", "DisableNPCBrake", Debug.DisableNPCBrake);
-
-    LOAD_VAL("DEBUG", "FPVCamDisable", Debug.FPVCam.Disable);
-    LOAD_VAL("DEBUG", "FPVCamDisableRemoveHead", Debug.FPVCam.DisableRemoveHead);
-    LOAD_VAL("DEBUG", "FPVCamDisableRemoveProps", Debug.FPVCam.DisableRemoveProps);
-    LOAD_VAL("DEBUG", "FPVCamOverrideNearClip", Debug.FPVCam.OverrideNearClip);
-    LOAD_VAL("DEBUG", "FPVCamNearClip", Debug.FPVCam.NearClip);
 
     LOAD_VAL("DEBUG", "EnableTimers", Debug.Metrics.EnableTimers);
 

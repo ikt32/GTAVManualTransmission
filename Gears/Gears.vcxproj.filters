@@ -232,9 +232,6 @@
     <ClCompile Include="StartingAnimation.cpp">
       <Filter>Features</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Features</Filter>
-    </ClCompile>
     <ClCompile Include="SteeringAnim.cpp">
       <Filter>Features</Filter>
     </ClCompile>
@@ -536,9 +533,6 @@
       <Filter>Features</Filter>
     </ClInclude>
     <ClInclude Include="Misc.h">
-      <Filter>Features</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
       <Filter>Features</Filter>
     </ClInclude>
     <ClInclude Include="StartingAnimation.h">
