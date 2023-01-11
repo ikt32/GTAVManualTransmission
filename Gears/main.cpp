@@ -138,6 +138,7 @@ BOOL APIENTRY DllMain(HMODULE hInstance, DWORD reason, LPVOID lpReserved) {
             logger.Write(INFO, "Data path: %s", Paths::GetModPath().c_str());
 
             scriptRegister(hInstance, ScriptMain);
+            scriptRegisterAdditionalThread(hInstance, NPCMain);
 
             logger.Write(INFO, "Script registered");
             break;
