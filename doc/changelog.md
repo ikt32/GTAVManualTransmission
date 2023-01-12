@@ -2,18 +2,11 @@
 
 ## 5.5.2
 
-Compatibility with b2802 (Los Santos Drug Wars) wholle thanks to **fingaweg** and **Disquse**!
-
-* Compatibility fixes for b2802 (Los Santos Drug Wars)
-
-Other fixes/minor features:
-
-* Add support for proportional analog handbrakes (still broken with ABS...)
-* Change traction control/launch control to use relative slip
+* Compatibility fixes for b2802 (Los Santos Drug Wars) thanks to **fingaweg** and **Disquse**!
+* Add support for proportional analog handbrakes
+* Change traction control/launch control to use relative slip: TC/LC settings need to be updated
 * Always allow wheel and keyboard to trigger a shift
-* Custom FPV camera: Fix horizon lock for looking backwards
-* Custom FPV camera: Fix visual glitches (no traffic light green/yellow/red textures)
-* Custom FPV camera: Fix audio mismatch (incorrect interior sound)
+* Remove custom FPV camera, it's split off into another script
 * Minor bug fixes and improvements (Thanks **Zolika** for the improved performance for the string pattern search!)
 
 ## 5.5.1
