@@ -31,8 +31,6 @@ with a custom transmission, wheel support and much more.
 * Synchronized steering wheel and animations
   * Match your actual wheel 1:1
   * First person hand-over-hand animations
-* Custom first person camera
-  * With inertia effects
 * Seamless input switching between steering wheel, gamepad and keyboard
 * Complete in-game configuration menu
 * Vehicle-specific configurations
@@ -87,31 +85,12 @@ These handlings have reduced grip to realistic levels, and are essential for pla
   * [Description](#description)
   * [Features](#features)
   * [Downloads](#downloads)
-    * [Recommended mods](#recommended-mods)
   * [Table of Contents](#table-of-contents)
   * [Requirements](#requirements)
   * [Installation](#installation)
-    * [Wheel setup](#wheel-setup)
-    * [FiveM](#fivem)
-    * [Updating](#updating)
   * [Default controls](#default-controls)
-    * [Keyboard defaults (US-ANSI)](#keyboard-defaults-us-ansi)
-    * [Controller defaults](#controller-defaults)
-    * [Wheel defaults](#wheel-defaults)
   * [Usage and setup](#usage-and-setup)
-    * [Driving basics](#driving-basics)
-    * [Input switching](#input-switching)
-    * [Vehicle Configurations](#vehicle-configurations)
-    * [Driving assists](#driving-assists)
-    * [Custom camera](#custom-camera)
-    * [Animations](#animations)
-    * [Wheel FFB LUT](#wheel-ffb-lut)
-    * [Force feedback](#force-feedback)
   * [Troubleshooting](#troubleshooting)
-    * [Game compatibility](#game-compatibility)
-    * [Compatibility options](#compatibility-options)
-    * [Known issues](#known-issues)
-    * [Steering wheel issues](#steering-wheel-issues)
   * [Credits](#credits)
   * [Source code](#source-code)
   * [Contact](#contact)
@@ -131,9 +110,6 @@ Optional: (Downloads)
 
 Put `Gears.asi` and the folder `ManualTransmission` in your GTA V folder
  (overwrite when asked).
- 
-Optionally, also put `DismemberbemtASI.asi` in your GTA V folder. This
-is only used to hide the player head when using the custom FPV camera.
 
 __Make sure the `ManualTransmission` folder is writeable! (not `Read Only`)__.
 If the folder is not writeable, it will automatically be copied to
@@ -320,19 +296,6 @@ is needed for this feature.
 * Launch Control: Keeps the RPMs steady at a custom level,
 to prevent too much wheelspin on launch.
 
-### Custom camera
-
-When animations are active, the stock first person vehicle camera is clamped
-to about 15 degrees. As a workaround, the mod has a custom camera feature.
-
-Aside from restoring the looking angles, it can also react to acceleration and
-turning forces. Make sure to take a look at the camera options and their
-descriptions in `Misc options` -> `Camera options`.
-
-To hide the player head, you'll need to install
-[CamxxCore](https://www.gta5-mods.com/users/CamxxCore)s' DismembermentASI,
-which is included with the mod.
-
 ### Animations
 
 The script now overrides the animations and matches the steering wheel
@@ -376,6 +339,9 @@ Useful resource:
 
 If the current steering angle is more than what the animation supports, it will
 just stay at the maximum.
+
+While synced animations are active the game limits the viewing angle to about 10 degrees left/right.
+Using an alternative camera mod is highly recommended.
 
 ### Wheel FFB LUT
 
@@ -519,7 +485,6 @@ Limited support runs back to v1.0.1604.0, but new features might be unstable.
 
 Check the `Developer options` -> `Compatibility settings`.
 
-* For the VR mod [R.E.A.L.](https://github.com/LukeRoss00/gta5-real-mod), check `Disable FPV camera`
 * For wheels recognized as gamepad, check `Disable input detection` and choose wheel input in main menu.
 
 ### Known issues
@@ -532,12 +497,6 @@ Check the `Developer options` -> `Compatibility settings`.
   * [__Smooth Driving V__](https://www.gta5-mods.com/scripts/smooth-driving-v-lieutenant-dan) will conflict with inputs and gearbox.
 * Gears.asi doesn't load (in asiloader.log, or indicated otherwise):
   * Make sure you're using the latest [Microsoft Visual C++ Redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe).
-* Camera doesn't behave as expected in VR:
-  * Developer options -> Compatibility settings -> Disable FPV camera.
-* No traffic light textures in first person, just faint coronas:
-  * Caused by custom first person camera. Disable it in Misc options.
-  * Disabling custom FPV reduces FP camera movement if synced animations are enabled.
-    * Disable synced animations if this bothers you.
 
 ### Steering wheel issues
 

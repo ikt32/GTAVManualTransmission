@@ -23,8 +23,6 @@ This project aims to expand the driving immersion of Grand Theft Auto V, with ma
 * Synchronized steering wheel and animations
   * Match your actual wheel 1:1
   * First person hand-over-hand animations
-* Custom first person camera
-  * With inertia effects
 
 And much more. The [user README.md](doc/README.md) has a more complete overview.
 
