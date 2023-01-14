@@ -1,6 +1,6 @@
 # Changelog
 
-## 5.5.2
+## 5.6.0
 
 * Compatibility fixes for b2802 (Los Santos Drug Wars) thanks to **fingaweg** and **Disquse**!
 * Add support for proportional analog handbrakes
