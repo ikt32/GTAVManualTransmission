@@ -189,79 +189,136 @@ void drawDashLights() {
     const float XPos = g_settings.HUD.DashIndicators.XPos;
     const float YPos = g_settings.HUD.DashIndicators.YPos;
 
+    const bool lite = g_settings.HUD.DashIndicators.Lite;
+    const float txtSz = 0.5f * size * g_settings.HUD.DashIndicators.TxtSzMod;
+    const float txtVOff = 0.033f * txtSz + g_settings.HUD.DashIndicators.TxtVOffset;
+
     Util::ColorF absColor{};
+    Util::ColorI absColorTxt{};
+
     if (g_settings().DriveAssists.ABS.Enable || g_vehData.mHasABS) {
         if (abs) {
             absColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+            absColorTxt = Util::ColorI{ 245, 166, 21, 255 };
         }
         else {
             absColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+            absColorTxt = Util::ColorI{ 0, 0, 0, 255 };
         }
     }
     else {
         absColor.A = 0.0f;
+        absColorTxt.A = 0;
     }
 
-    drawTexture(g_textureAbsId, 0, -9998, 100,
-        txSz, txSz,
-        0.5f, 0.5f, // center of texture
-        XPos - 0.045f * size, YPos,
-        0.0f, GRAPHICS::GET_ASPECT_RATIO(FALSE), absColor.R, absColor.G, absColor.B, absColor.A);
+    if (lite) {
+        UI::ShowText(
+            XPos - 0.045f * size, YPos - txtVOff,
+            txtSz,
+            "ABS", g_settings.HUD.Font,
+            absColorTxt, true, true);
+    }
+    else {
+        drawTexture(g_textureAbsId, 0, -9998, 100,
+            txSz, txSz,
+            0.5f, 0.5f, // center of texture
+            XPos - 0.045f * size, YPos,
+            0.0f, GRAPHICS::GET_ASPECT_RATIO(FALSE), absColor.R, absColor.G, absColor.B, absColor.A);
+    }
 
     Util::ColorF tcsColor{};
+    Util::ColorI tcsColorTxt{};
     if (g_settings().DriveAssists.TCS.Enable) {
         if (tcs) {
             tcsColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+            tcsColorTxt = Util::ColorI{ 245, 166, 21, 255 };
         }
         else {
             tcsColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+            tcsColorTxt = Util::ColorI{ 0, 0, 0, 255 };
         }
     }
     else if (LaunchControl::GetState() == LaunchControl::ELCState::Controlling) {
         tcsColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+        tcsColorTxt = Util::ColorI{ 245, 166, 21, 255 };
     }
     else {
         tcsColor.A = 0.0f;
+        tcsColorTxt.A = 0;
     }
 
-    drawTexture(g_textureTcsId, 0, -9998, 100,
-        txSz, txSz,
-        0.5f, 0.5f, // center of texture
-        XPos - 0.015f * size, YPos,
-        0.0f, GRAPHICS::GET_ASPECT_RATIO(FALSE), tcsColor.R, tcsColor.G, tcsColor.B, tcsColor.A);
+    if (lite) {
+        UI::ShowText(
+            XPos - 0.015f * size, YPos - txtVOff,
+            txtSz,
+            "TCS", g_settings.HUD.Font,
+            tcsColorTxt, true, true);
+    }
+    else {
+        drawTexture(g_textureTcsId, 0, -9998, 100,
+            txSz, txSz,
+            0.5f, 0.5f, // center of texture
+            XPos - 0.015f * size, YPos,
+            0.0f, GRAPHICS::GET_ASPECT_RATIO(FALSE), tcsColor.R, tcsColor.G, tcsColor.B, tcsColor.A);
+    }
 
     Util::ColorF espColor{};
+    Util::ColorI espColorTxt{};
     if (g_settings().DriveAssists.ESP.Enable) {
         if (esp) {
             espColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+            espColorTxt = Util::ColorI{ 245, 166, 21, 255 };
         }
         else {
             espColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+            espColorTxt = Util::ColorI{ 0, 0, 0, 255 };
         }
     }
     else {
         espColor.A = 0.0f;
+        espColorTxt.A = 0;
     }
 
-    drawTexture(g_textureEspId, 0, -9998, 100,
-        txSz, txSz,
-        0.5f, 0.5f, // center of texture
-        XPos + 0.015f * size, YPos,
-        0.0f, GRAPHICS::GET_ASPECT_RATIO(FALSE), espColor.R, espColor.G, espColor.B, espColor.A);
+    if (lite) {
+        UI::ShowText(
+            XPos + 0.015f * size, YPos - txtVOff,
+            txtSz,
+            "ESC", g_settings.HUD.Font,
+            espColorTxt, true, true);
+    }
+    else {
+        drawTexture(g_textureEspId, 0, -9998, 100,
+            txSz, txSz,
+            0.5f, 0.5f, // center of texture
+            XPos + 0.015f * size, YPos,
+            0.0f, GRAPHICS::GET_ASPECT_RATIO(FALSE), espColor.R, espColor.G, espColor.B, espColor.A);
+    }
 
     Util::ColorF brkColor;
+    Util::ColorI brkColorTxt;
     if (brk) {
         brkColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+        brkColorTxt = Util::ColorI{ 255, 0, 0, 255 };
     }
     else {
         brkColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+        brkColorTxt = Util::ColorI{ 0, 0, 0, 255 };
     }
 
-    drawTexture(g_textureBrkId, 0, -9998, 100,
-        txSz, txSz,
-        0.5f, 0.5f, // center of texture
-        XPos + 0.045f * size, YPos,
-        0.0f, GRAPHICS::GET_ASPECT_RATIO(FALSE), brkColor.R, brkColor.G, brkColor.B, brkColor.A);
+    if (lite) {
+        UI::ShowText(
+            XPos + 0.045f * size, YPos - txtVOff,
+            txtSz,
+            "BRK", g_settings.HUD.Font,
+            brkColorTxt, true, true);
+    }
+    else {
+        drawTexture(g_textureBrkId, 0, -9998, 100,
+            txSz, txSz,
+            0.5f, 0.5f, // center of texture
+            XPos + 0.045f * size, YPos,
+            0.0f, GRAPHICS::GET_ASPECT_RATIO(FALSE), brkColor.R, brkColor.G, brkColor.B, brkColor.A);
+    }
 
     // Background
     GRAPHICS::DRAW_RECT({ XPos, YPos },
@@ -270,11 +327,19 @@ void drawDashLights() {
 
     // Downshift protection is in the center of the screen.
     if (g_settings.HUD.DsProt.Enable && dsProt) {
-        drawTexture(g_textureDsProtId, 0, -9998, 100,
-            g_settings.HUD.DsProt.Size, g_settings.HUD.DsProt.Size,
-            0.5f, 0.5f, // center of texture
-            g_settings.HUD.DsProt.XPos, g_settings.HUD.DsProt.YPos,
-            0.0f, GRAPHICS::GET_ASPECT_RATIO(FALSE), 0.93f, 0.83f, 0.01f, 1.0f);
+        if (lite) {
+            UI::ShowText(g_settings.HUD.DsProt.XPos, g_settings.HUD.DsProt.YPos,
+                g_settings.HUD.DsProt.Size * 10.0f,
+                "DOWNSHIFT\nPROTECTION", g_settings.HUD.Font,
+                Util::ColorI{ 245, 166, 21, 255 }, true, true);
+        }
+        else {
+            drawTexture(g_textureDsProtId, 0, -9998, 100,
+                g_settings.HUD.DsProt.Size, g_settings.HUD.DsProt.Size,
+                0.5f, 0.5f, // center of texture
+                g_settings.HUD.DsProt.XPos, g_settings.HUD.DsProt.YPos,
+                0.0f, GRAPHICS::GET_ASPECT_RATIO(FALSE), 0.93f, 0.83f, 0.01f, 1.0f);
+        }
     }
 }
 

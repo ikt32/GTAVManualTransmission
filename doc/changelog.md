@@ -2,12 +2,20 @@
 
 ## 5.6.0
 
-* Compatibility fixes for b2802 (Los Santos Drug Wars) thanks to **fingaweg** and **Disquse**!
-* Add support for proportional analog handbrakes
+Big changes:
+
 * Change traction control/launch control to use relative slip: TC/LC settings need to be updated
-* Always allow wheel and keyboard to trigger a shift
 * Remove custom FPV camera, it's split off into another script
-* Minor bug fixes and improvements (Thanks **Zolika** for the improved performance for the string pattern search!)
+
+New stuff:
+
+* Add support for proportional analog handbrakes
+* Add option to use text instead of icons for assist indicators
+
+Fixes and minor changes:
+* Compatibility fixes for b2802 (Los Santos Drug Wars) thanks to **fingaweg** and **Disquse**!
+* Always allow wheel and keyboard to trigger a shift
+* Improve loading performance (Thanks **Zolika** for the improved string pattern search!)
 
 ## 5.5.1
 

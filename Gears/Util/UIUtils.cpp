@@ -53,12 +53,12 @@ void UI::Notify(int level, const std::string& message, bool removePrevious) {
 }
 
 void UI::ShowText(float x, float y, float scale, const std::string &text,
-    int font, const Util::ColorI &rgba, bool outline) {
+    int font, const Util::ColorI &rgba, bool outline, bool center) {
     HUD::SET_TEXT_FONT(font);
     HUD::SET_TEXT_SCALE(scale, scale);
     HUD::SET_TEXT_COLOUR(rgba.R, rgba.G, rgba.B, rgba.A);
     HUD::SET_TEXT_WRAP(0.0, 1.0);
-    HUD::SET_TEXT_CENTRE(0);
+    HUD::SET_TEXT_CENTRE(center);
     if (outline) HUD::SET_TEXT_OUTLINE();
     HUD::BEGIN_TEXT_COMMAND_DISPLAY_TEXT("STRING");
     HUD::ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text.c_str());

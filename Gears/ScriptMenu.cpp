@@ -1462,6 +1462,23 @@ void update_dashindicatormenu() {
     g_menu.FloatOption("Position X", g_settings.HUD.DashIndicators.XPos, 0.0f, 1.0f, 0.005f);
     g_menu.FloatOption("Position Y", g_settings.HUD.DashIndicators.YPos, 0.0f, 1.0f, 0.005f);
     g_menu.FloatOption("Size", g_settings.HUD.DashIndicators.Size, 0.25f, 4.0f, 0.05f);
+
+    g_menu.BoolOption("Lite", g_settings.HUD.DashIndicators.Lite,
+        { "Use text instead of PNG images.",
+          "Also applies for downshift protection notification." });
+    if (g_settings.HUD.DashIndicators.Lite) {
+        g_menu.FloatOptionCb("Vertical offset", g_settings.HUD.DashIndicators.TxtVOffset,
+            -1.0f, 1.0f, 0.005f, GetKbEntryFloat,
+            { "Different fonts have different vertical alignments.",
+              "Use this option to vertically center the text in the box.",
+              "(Manual input is possible)" });
+
+        g_menu.FloatOptionCb("Size multiplier", g_settings.HUD.DashIndicators.TxtSzMod,
+            0.0f, 10.0f, 0.05f, GetKbEntryFloat,
+            { "Different fonts are bigger/smaller.",
+              "Use this option to compensate Rockstar Games' consistent inconsistency.",
+              "(Manual input is possible)" });
+    }
 }
 
 void update_dsprotmenu() {

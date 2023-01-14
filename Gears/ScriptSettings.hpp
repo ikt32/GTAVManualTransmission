@@ -233,6 +233,10 @@ public:
             float XPos = 0.500f;
             float YPos = 0.035f;
             float Size = 1.000f;
+
+            bool Lite = false;
+            float TxtVOffset = 0.0f;
+            float TxtSzMod = 1.0f;
         } DashIndicators;
 
         struct {

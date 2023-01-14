@@ -270,6 +270,9 @@ void ScriptSettings::SaveGeneral() {
     SAVE_VAL("HUD", "DashIndicatorsXpos", HUD.DashIndicators.XPos);
     SAVE_VAL("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
     SAVE_VAL("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
+    SAVE_VAL("HUD", "DashIndicatorsLite", HUD.DashIndicators.Lite);
+    SAVE_VAL("HUD", "DashIndicatorsVOff", HUD.DashIndicators.TxtVOffset);
+    SAVE_VAL("HUD", "DashIndicatorsTMul", HUD.DashIndicators.TxtSzMod);
 
     SAVE_VAL("HUD", "DsProtEnable", HUD.DsProt.Enable);
     SAVE_VAL("HUD", "DsProtXpos", HUD.DsProt.XPos);
@@ -605,6 +608,9 @@ void ScriptSettings::parseSettingsGeneral() {
     LOAD_VAL("HUD", "DashIndicatorsXpos", HUD.DashIndicators.XPos);
     LOAD_VAL("HUD", "DashIndicatorsYpos", HUD.DashIndicators.YPos);
     LOAD_VAL("HUD", "DashIndicatorsSize", HUD.DashIndicators.Size);
+    LOAD_VAL("HUD", "DashIndicatorsLite", HUD.DashIndicators.Lite);
+    LOAD_VAL("HUD", "DashIndicatorsVOff", HUD.DashIndicators.TxtVOffset);
+    LOAD_VAL("HUD", "DashIndicatorsTMul", HUD.DashIndicators.TxtSzMod);
 
     LOAD_VAL("HUD", "DsProtEnable", HUD.DsProt.Enable);
     LOAD_VAL("HUD", "DsProtXpos", HUD.DsProt.XPos);

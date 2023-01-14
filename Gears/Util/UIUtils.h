@@ -18,7 +18,8 @@ namespace UI {
     void ShowText(float x, float y, float scale, const std::string& text,
         int font = 0,
         const Util::ColorI& rgba = Util::ColorsI::SolidWhite,
-        bool outline = true);
+        bool outline = true,
+        bool center = false);
 
     void ShowText3D(Vector3 location, const std::vector<std::string>& textLines,
         const Util::ColorI& backgroundColor = Util::ColorsI::TransparentGray,
