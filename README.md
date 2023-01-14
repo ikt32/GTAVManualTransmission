@@ -2,7 +2,7 @@
 
 # Manual Transmission and Wheel Support for Grand Theft Auto V
 
-[![Build status](https://ci.appveyor.com/api/projects/status/gy6yh17lp5l1k48d?svg=true)](https://ci.appveyor.com/project/E66666666/gtavmanualtransmission) [![GitHub total downloads](https://img.shields.io/github/downloads/E66666666/GTAVManualTransmission/total.svg?label=downloads&logo=GitHub)](https://github.com/E66666666/GTAVManualTransmission/releases) [![Discord](https://img.shields.io/discord/848493320433827851.svg?logo=discord)](https://discord.gg/VrrAEV4j4b)
+[![Build status](https://github.com/E66666666/GTAVManualTransmission/actions/workflows/msbuild.yml/badge.svg)](https://github.com/E66666666/GTAVManualTransmission/actions) [![GitHub total downloads](https://img.shields.io/github/downloads/E66666666/GTAVManualTransmission/total.svg?label=downloads&logo=GitHub)](https://github.com/E66666666/GTAVManualTransmission/releases) [![Discord](https://img.shields.io/discord/848493320433827851.svg?logo=discord)](https://discord.gg/VrrAEV4j4b)
 
 This project aims to expand the driving immersion of Grand Theft Auto V, with many features and options:
 
