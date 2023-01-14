@@ -2,7 +2,7 @@
 
 # Manual Transmission and Steering Wheel Support for GTA V
 
-Version 5.5.0
+Version 5.6.0
 
 ![Pic](MTThumb.jpg)
 
@@ -104,7 +104,6 @@ Optional: (Downloads)
 
 * [DashHook](https://www.gta5-mods.com/tools/dashhook)
 * [Handling Replacement](https://www.gta5-mods.com/tools/handling-replacement-library)
-* [CamxxCore's DismembermentASI](https://www.gta5-mods.com/scripts/dismemberment)
 
 ## Installation
 
@@ -329,7 +328,7 @@ be added.
 4. Make an educated guess what the dictionary is for your vehicle
 5. Check the dictionary in `clip_anim.rpf`
 6. Open the `.ycd` in notepad and hope you find a `steer_no_lean` or `pov_steer`
-7. Copy an `- Animation:` entry in `animations.yml` - **mind the indentation!**
+7. Copy an `- Animation:` entry in `animations.yml` - __mind the indentation!__
 8. Substitute the dictionary and animation name for your vehicle, replace
 layouts with your new layout and throw in an educated guess what the rotation
 degree is.
@@ -543,13 +542,16 @@ A massive *Thank You* to everyone who contributed!
 * [leftas](https://github.com/leftas/)
 * [kagikn](https://github.com/kagikn)
 * [zorg93](https://github.com/zorg93)
-* [Unknown Modder](https://github.com/UnknownModder)
+* [alloc8or](https://github.com/alloc8or)
 * [any333](https://www.gta5-mods.com/users/any333)
 * [Nyconing](https://github.com/Nyconing)
 * [CamxxCore](https://github.com/CamxxCore)
 * [guilhermelimak](https://github.com/guilhermelimak)
 * [Rbn3D](https://github.com/Rbn3D)
 * [LeeC2202](https://gtaforums.com/profile/1170715-leec22/)
+* [Dot.](https://github.com/DottieDot)
+* [Zolika1351](https://github.com/Zolika1351)
+* [fingaweg](https://github.com/fingaweg)
 * All others who helped :)
 
 ## Source code
