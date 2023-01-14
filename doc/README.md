@@ -552,6 +552,7 @@ A massive *Thank You* to everyone who contributed!
 * [Dot.](https://github.com/DottieDot)
 * [Zolika1351](https://github.com/Zolika1351)
 * [fingaweg](https://github.com/fingaweg)
+* [sfinktah](https://github.com/sfinktah)
 * All others who helped :)
 
 ## Source code
