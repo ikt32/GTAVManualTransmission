@@ -2675,6 +2675,10 @@ void loadLut(const std::string& lutPath) {
     g_controls.GetWheel().AssignLut(lutMap);
 }
 
+#include "ShakeData.hpp"
+
+std::shared_ptr<CShakeData> mShakeData;
+
 void readSettings() {
     g_settings.Read(&g_controls);
     if (g_settings.Debug.LogLevel > 4)
@@ -2700,6 +2704,9 @@ void readSettings() {
     else {
         g_controls.GetWheel().ClearLut();
     }
+
+    mShakeData->Load();
+
 
     logger.Write(INFO, "Settings read");
 }
@@ -2758,6 +2765,9 @@ void ScriptInit() {
     g_menu.SetFiles(settingsMenuFile);
     g_menu.Initialize();
 
+    const auto shakeDataPath = Paths::GetModPath() + "\\shake.ini";
+
+    mShakeData = std::make_shared<CShakeData>(shakeDataPath);
     SteeringAnimation::SetFile(animationsFile);
 
     readSettings();

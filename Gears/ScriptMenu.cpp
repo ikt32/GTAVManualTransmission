@@ -816,6 +816,9 @@ void update_wheelmenu() {
         initWheel();
     }
 
+    extern float g_ampBaseShake;
+    g_menu.FloatOptionCb("Shake", g_ampBaseShake, 0.0f, 10000.0f, 1.0f, GetKbEntryFloat);
+
     if (g_menu.BoolOption("Logitech RPM LEDs", g_settings.Wheel.Options.LogiLEDs,
         { "Show the RPM LEDs on Logitech steering wheels.",
             "If the wheel doesn't have compatible RPM LEDs, this might crash." })) {

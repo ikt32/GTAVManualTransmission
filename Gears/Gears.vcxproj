@@ -128,6 +128,7 @@
     <ClCompile Include="..\thirdparty\GTAVMenuBase\menuutils.cpp" />
     <ClCompile Include="..\thirdparty\fmt\src\format.cc" />
     <ClCompile Include="..\thirdparty\MiniPID\MiniPID.cpp" />
+    <ClCompile Include="..\thirdparty\Perlin_Noise\PerlinNoise.cpp" />
     <ClCompile Include="..\thirdparty\yaml-cpp\src\binary.cpp" />
     <ClCompile Include="..\thirdparty\yaml-cpp\src\contrib\graphbuilder.cpp" />
     <ClCompile Include="..\thirdparty\yaml-cpp\src\contrib\graphbuilderadapter.cpp" />
@@ -182,6 +183,7 @@
     <ClCompile Include="ScriptMenuUtils.cpp" />
     <ClCompile Include="ScriptNPC.cpp" />
     <ClCompile Include="SettingsCommon.cpp" />
+    <ClCompile Include="ShakeData.cpp" />
     <ClCompile Include="SpeedLimiter.cpp" />
     <ClCompile Include="StartingAnimation.cpp" />
     <ClCompile Include="SteeringAnim.cpp" />
@@ -225,6 +227,7 @@
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menumemutils.hpp" />
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menusettings.h" />
     <ClInclude Include="..\thirdparty\GTAVMenuBase\menuutils.h" />
+    <ClInclude Include="..\thirdparty\Perlin_Noise\PerlinNoise.h" />
     <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\enums.h" />
     <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\main.h" />
     <ClInclude Include="..\thirdparty\ScriptHookV_SDK\inc\natives.h" />
@@ -291,6 +294,7 @@
     <ClInclude Include="ScriptHUD.h" />
     <ClInclude Include="ScriptMenuUtils.h" />
     <ClInclude Include="SettingsCommon.h" />
+    <ClInclude Include="ShakeData.hpp" />
     <ClInclude Include="SpeedLimiter.h" />
     <ClInclude Include="StartingAnimation.h" />
     <ClInclude Include="SteeringAnim.h" />
@@ -329,6 +333,7 @@
     <ClInclude Include="VehicleData.hpp" />
     <ClInclude Include="VehicleConfig.h" />
     <ClInclude Include="WheelInput.h" />
+    <ClInclude Include="WheelShake.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\thirdparty\curl\libcurl.lib" />

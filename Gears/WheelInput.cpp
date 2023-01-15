@@ -37,6 +37,9 @@ extern VehiclePeripherals g_peripherals;
 extern VehicleGearboxStates g_gearStates;
 extern WheelPatchStates g_wheelPatchStates;
 
+#include <Perlin_Noise/PerlinNoise.h>
+std::unique_ptr<PerlinNoise> mPerlinNoise = std::make_unique<PerlinNoise>();
+
 namespace {
     MiniPID pid(1.0, 0.0, 0.0);
 
@@ -1054,6 +1057,83 @@ float getFloatingSteeredWheelsRatio(Vehicle v) {
     return wheelsOffGroundRatio;
 }
 
+double mCumTimeTerrain = 0.0;
+#include "Util/Enums.hpp"
+#include "ShakeData.hpp"
+
+extern std::shared_ptr<CShakeData> mShakeData;
+float g_ampBaseShake = 0.01f;
+float getShaky(Vehicle mVehicle) {
+    const float amplitudeBase = g_ampBaseShake;//mActiveConfig->Mount[mActiveConfig->CamIndex].Movement.ShakeTerrain;
+
+    const double sideZ = 3.3f;
+
+    const float minRateMod = mShakeData->MinRateModTrn;
+    const float maxRateMod = mShakeData->MaxRateModTrn;
+
+    const float vehMaxSpeed = VEHICLE::GET_VEHICLE_ESTIMATED_MAX_SPEED(mVehicle);
+    const float speed = ENTITY::GET_ENTITY_SPEED(mVehicle);
+
+    auto terrainTypes = VExt::GetTireContactMaterial(mVehicle);
+    auto suspensionCompressions = VExt::GetWheelCompressions(mVehicle);
+
+    float terrainAmplMod = 0.0f;
+    float terrainFreqMod = 1.0f;
+    float terrainMatchCount = 0.0f;
+    for (int i = 0; i < terrainTypes.size(); ++i) {
+        auto terrainType = terrainTypes[i];
+        auto foundMatIt = mShakeData->MaterialReactionMap.find(static_cast<eMaterial>(terrainType));
+        bool onGround = suspensionCompressions[i] > 0.0f;
+
+        if (onGround && foundMatIt != mShakeData->MaterialReactionMap.end()) {
+            terrainAmplMod += foundMatIt->second.Amplitude / static_cast<float>(terrainTypes.size());
+
+            terrainFreqMod += foundMatIt->second.Frequency;
+            terrainMatchCount += 1.0f;
+        }
+
+        if (g_settings.Debug.DisplayWheelInfo) {
+            std::string matName = "Unknown";
+            std::string matParams = "None";
+            if (terrainType < sMaterialNames.size()) {
+                matName = sMaterialNames[terrainType];
+            }
+
+            if (foundMatIt != mShakeData->MaterialReactionMap.end()) {
+                matParams = std::format("[A {:.2f} | F {:.2f}]",
+                    foundMatIt->second.Amplitude, foundMatIt->second.Frequency);
+            }
+
+            UI::ShowText(0.25f, 0.05f * i, 0.5f, std::format("[{}] {} @ {}{}",
+                i, matName, onGround ? "~g~" : "", matParams));
+        }
+    }
+
+    if (terrainMatchCount > 0.0f) {
+        terrainFreqMod /= terrainMatchCount;
+    }
+
+    float amplitude = mapclamp(speed,
+        0.0f,
+        vehMaxSpeed * 0.4f,
+        0.0f,
+        amplitudeBase * terrainAmplMod);
+
+    double x = cos(mCumTimeTerrain);
+    double y = sin(mCumTimeTerrain);
+
+    double sideNoise = mPerlinNoise->noise(x, y, sideZ + mCumTimeTerrain) - 0.5;
+
+    float shakeRate = mapclamp(speed, 0.0f, vehMaxSpeed, minRateMod, maxRateMod) * terrainFreqMod;
+    mCumTimeTerrain = mCumTimeTerrain + MISC::GET_FRAME_TIME() * /*Memory::GetTimeScale() **/ shakeRate;
+    UI::ShowText(0.5f, 0.15f, 0.5f, fmt::format("{:.2f}", sideNoise * amplitude));
+//    return Vector3{
+    return static_cast<float>(sideNoise * amplitude);// ,
+//      static_cast<float>(vertNoise * amplitude),
+  //    static_cast<float>(rollNoise * 5.0 * amplitude)
+  //};
+}
+
 void WheelInput::PlayFFBGround() {
     if (!g_settings.Wheel.FFB.Enable ||
         g_controls.PrevInput != CarControls::Wheel) {
@@ -1083,6 +1163,8 @@ void WheelInput::PlayFFBGround() {
 
     int totalForce = satForce + detailForce;
     calculateSoftLock(totalForce, damperForce);
+
+    totalForce += getShaky(g_playerVehicle);
 
     lastConstantForce = static_cast<float>(totalForce);
     g_controls.PlayFFBDynamics(std::clamp(totalForce, -10000, 10000), std::clamp(damperForce, -10000, 10000));

@@ -16,3 +16,6 @@
 [submodule "thirdparty/fmt"]
 	path = thirdparty/fmt
 	url = https://github.com/fmtlib/fmt
+[submodule "thirdparty/Perlin_Noise"]
+	path = thirdparty/Perlin_Noise
+	url = https://github.com/sol-prog/Perlin_Noise

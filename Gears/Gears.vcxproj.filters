@@ -262,6 +262,12 @@
     <ClCompile Include="Textures.cpp">
       <Filter>Features</Filter>
     </ClCompile>
+    <ClCompile Include="ShakeData.cpp">
+      <Filter>Features\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\Perlin_Noise\PerlinNoise.cpp">
+      <Filter>Thirdparty</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="script.h" />
@@ -577,6 +583,15 @@
     </ClInclude>
     <ClInclude Include="Textures.h">
       <Filter>Features</Filter>
+    </ClInclude>
+    <ClInclude Include="WheelShake.h">
+      <Filter>Features\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="ShakeData.hpp">
+      <Filter>Features\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\Perlin_Noise\PerlinNoise.h">
+      <Filter>Thirdparty</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
