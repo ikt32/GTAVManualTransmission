@@ -40,10 +40,18 @@ jobs:
       run: |
         cp Gears/bin/Gears.asi stage/Gears.asi
         cp Gears/bin/Gears.pdb stage/Gears.pdb
-    - name: Upload a Build Artifact
+
+    - name: Create build artifact archive
+      uses: TheDoctor0/zip-release@0.7.0
+      with:
+        filename: ${{ github.sha }}.zip
+        directory: stage/
+        custom: -p${{ secrets.ARCHIVE_PASSWORD }}
+
+    - name: Upload build artifact
       uses: actions/upload-artifact@v3.1.0
       with:
         # Artifact name
         name: Gears-${{ github.sha }}
         path: |
-          stage/
+          stage/${{ github.sha }}.zip
