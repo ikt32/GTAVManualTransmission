@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.6.1
+
+* Fix multiple wheel steering multipliers, affects vehicles that use rear-wheel steering with reduced angle:
+  * [james8646](https://www.gta5-mods.com/users/james8646)'s [2022 Mercedes-Benz S-class S500 W223](https://www.gta5-mods.com/vehicles/mercedes-benz-2022-s-class-s500-w223-amg-line-add-on)
+  * Chernobog
+
 ## 5.6.0
 
 Big changes:
