@@ -101,6 +101,8 @@ std::vector<ValueTimer<float>> g_speedTimers;
 
 GameSound g_downshiftProtectSfx("CONFIRM_BEEP", "HUD_MINI_GAME_SOUNDSET", "");
 
+std::map<Hash, std::vector<float>> g_SteeringMultMap;
+
 void updateShifting();
 void blockButtons();
 void startStopEngine();
@@ -829,6 +831,13 @@ void update_steering() {
 }
 
 void updateSteeringMultiplier() {
+    auto model = ENTITY::GET_ENTITY_MODEL(g_playerVehicle);
+    if (g_SteeringMultMap.find(model) == g_SteeringMultMap.end()) {
+        g_SteeringMultMap[model] = VExt::GetWheelSteeringMultipliers(g_playerVehicle);
+    }
+
+    const auto& origMults = g_SteeringMultMap[model];
+
     float mult;
 
     if (g_controls.PrevInput == CarControls::Wheel) {
@@ -838,24 +847,23 @@ void updateSteeringMultiplier() {
         mult = g_settings().Steering.CustomSteering.SteeringMult;
     }
 
-    auto oldMults = VExt::GetWheelSteeringMultipliers(g_playerVehicle);
-    auto numWheels = VExt::GetNumWheels(g_playerVehicle);
-    std::vector<float> newMults(numWheels);
-    for (uint32_t i = 0; i < numWheels; ++i) {
-        newMults[i] = sgn(oldMults[i]) * mult;
+    std::vector<float> newMults(origMults.size());
+    for (uint32_t i = 0; i < origMults.size(); ++i) {
+        newMults[i] = origMults[i] * mult;
     }
     VExt::SetWheelSteeringMultipliers(g_playerVehicle, newMults);
 }
 
 void resetSteeringMultiplier() {
     if (g_playerVehicle != 0) {
-        auto oldMults = VExt::GetWheelSteeringMultipliers(g_playerVehicle);
-        auto numWheels = VExt::GetNumWheels(g_playerVehicle);
-        std::vector<float> newMults(numWheels);
-        for (uint32_t i = 0; i < numWheels; ++i) {
-            newMults[i] = sgn(oldMults[i]) * 1.0f;
+        auto model = ENTITY::GET_ENTITY_MODEL(g_playerVehicle);
+        if (g_SteeringMultMap.find(model) == g_SteeringMultMap.end()) {
+            // steering was never updated for this vehicle, no undo needed
+            return;
         }
-        VExt::SetWheelSteeringMultipliers(g_playerVehicle, newMults);
+
+        const auto& origMults = g_SteeringMultMap[model];
+        VExt::SetWheelSteeringMultipliers(g_playerVehicle, origMults);
     }
 }
 
