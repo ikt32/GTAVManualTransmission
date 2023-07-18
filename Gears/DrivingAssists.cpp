@@ -41,6 +41,7 @@ DrivingAssists::TCSData DrivingAssists::GetTCS() {
     std::vector<float> slips(g_vehData.mWheelCount);
     bool tractionLoss = false;
     float averageLoss = 0.0f;
+    float maxWheelSpeed = 0.0f;
     float numLoss = 0.0f;
     float minLoss = std::min(g_settings().DriveAssists.TCS.SlipMin, g_settings().DriveAssists.LaunchControl.SlipMin);
     auto pows = VExt::GetWheelPower(g_playerVehicle);
@@ -50,24 +51,28 @@ DrivingAssists::TCSData DrivingAssists::GetTCS() {
     auto steeringAngles = VExt::GetWheelSteeringAngles(g_playerVehicle);
 
     for (int i = 0; i < g_vehData.mWheelCount; i++) {
+        if (!g_vehData.mWheelsDriven[i] ||
+            g_vehData.mSuspensionTravel[i] == 0.0f ||
+            pows[i] < 0.01f)
+            continue;
+
         auto boneVelProjection = posWorld + boneVels[i];
         auto boneVelRel = ENTITY::GET_OFFSET_FROM_ENTITY_GIVEN_WORLD_COORDS(g_playerVehicle, boneVelProjection);
 
         float rotatedY = boneVelRel.y / cos(steeringAngles[i]);
         slips[i] = g_vehData.mWheelTyreSpeeds[i] / rotatedY;
 
-        bool shouldCheck = g_vehData.mSuspensionTravel[i] > 0.0f &&
-            g_vehData.mWheelsDriven[i] &&
-            pows[i] > 0.1f;
-
-        if (shouldCheck &&
-            slips[i] > g_settings().DriveAssists.TCS.SlipMin) {
+        if (slips[i] > g_settings().DriveAssists.TCS.SlipMin) {
             tractionLoss = true;
         }
-        if (shouldCheck &&
-            slips[i] > minLoss) {
+
+        if (slips[i] > minLoss) {
             averageLoss += slips[i];
             numLoss += 1.0f;
+
+            if (g_vehData.mWheelTyreSpeeds[i] > maxWheelSpeed) {
+                maxWheelSpeed = g_vehData.mWheelTyreSpeeds[i];
+            }
         }
     }
     if (g_vehData.mHandbrake || VEHICLE::IS_VEHICLE_IN_BURNOUT(g_playerVehicle))
@@ -80,7 +85,8 @@ DrivingAssists::TCSData DrivingAssists::GetTCS() {
     return {
         g_settings().DriveAssists.TCS.Enable && tractionLoss,
         slips,
-        averageLoss
+        averageLoss,
+        maxWheelSpeed
     };
 }
 
@@ -340,7 +346,7 @@ std::vector<float> DrivingAssists::GetTCSBrakes(TCSData tcsData) {
         float bbal = offsets[i].y > 0.0f ? bbalF : bbalR;
 
         if (tcsData.LinearSlipRatio[i] > tcsSlipMin &&
-            g_vehData.mWheelTyreSpeeds[i] > 0.0f &&
+            g_vehData.mWheelTyreSpeeds[i] > 10.0f &&
             g_vehData.mSuspensionTravel[i] > 0.0f) {
             float mappedVal = map(
                 tcsData.LinearSlipRatio[i],

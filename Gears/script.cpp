@@ -1864,7 +1864,10 @@ void handleBrakePatch() {
             slipMax = tcsSlipMax;
         }
         
-        tractionThrottle = map(tcsData.AverageSlipRatio,
+        // map this so we don't do TC under 10 m/s wheel speed
+        float slipMap = mapclamp(tcsData.MaxWheelSpeed, 0.0f, 10.0f, 0.0f, tcsData.AverageSlipRatio);
+
+        tractionThrottle = map(slipMap,
             slipMin, slipMax,
             g_controls.ThrottleVal, 0.0f);
         tractionThrottle = std::clamp(tractionThrottle, 0.0f, g_controls.ThrottleVal);

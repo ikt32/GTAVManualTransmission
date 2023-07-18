@@ -11,6 +11,8 @@ namespace DrivingAssists {
         // How much it spins faster/slower than the suspension component. Ratio.
         std::vector<float> LinearSlipRatio;
         float AverageSlipRatio;
+
+        float MaxWheelSpeed;
     };
 
     struct ESPData {
