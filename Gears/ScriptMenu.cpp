@@ -1336,14 +1336,14 @@ void update_speedodisplaymenu() {
     g_menu.Subtitle("");
 
     int oldPos = 0;
-    auto speedoTypeIt = std::find(speedoTypes.begin(), speedoTypes.end(), g_settings.HUD.Speedo.Speedo);
+    auto speedoTypeIt = std::find(speedoTypes.begin(), speedoTypes.end(), g_settings.HUD.Speedo.Unit);
     if (speedoTypeIt != speedoTypes.end()) {
         oldPos = static_cast<int>(speedoTypeIt - speedoTypes.begin());
     }
     int newPos = oldPos;
     g_menu.StringArray("Speedometer", speedoTypes, newPos);
     if (newPos != oldPos) {
-        g_settings.HUD.Speedo.Speedo = speedoTypes.at(newPos);
+        g_settings.HUD.Speedo.Unit = speedoTypes.at(newPos);
     }
     g_menu.BoolOption("Use drivetrain speed", g_settings.HUD.Speedo.UseDrivetrain,
         { "Uses speed from the driven wheels or dashboard if selected, otherwise uses physics speed." });
@@ -1797,7 +1797,7 @@ void update_cruisecontrolsettingsmenu() {
 
     float speedValMul;
     float speedValRaw = g_settings().DriveAssists.CruiseControl.Speed;
-    std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Speedo, speedValMul);
+    std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Unit, speedValMul);
     float speedValUnit = speedValRaw * speedValMul;
 
     if (g_menu.FloatOptionCb(fmt::format("Speed ({})", speedNameUnit), speedValUnit, 0.0f, 500.0f, 5.0f,
@@ -1853,7 +1853,7 @@ void update_speedlimitersettingsmenu() {
 
     float speedValMul;
     float speedValRaw = g_settings().MTOptions.SpeedLimiter.Speed;
-    std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Speedo, speedValMul);
+    std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Unit, speedValMul);
     float speedValUnit = speedValRaw * speedValMul;
 
     if (g_menu.FloatOptionCb(fmt::format("Max speed ({})", speedNameUnit), speedValUnit, 0.0f, 500.0f, 5.0f,

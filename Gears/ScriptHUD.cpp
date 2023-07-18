@@ -555,7 +555,7 @@ void drawSpeedoMeter() {
         255
     };
     UI::ShowText(g_settings.HUD.Speedo.XPos, g_settings.HUD.Speedo.YPos, g_settings.HUD.Speedo.Size,
-        formatSpeedo(g_settings.HUD.Speedo.Speedo, speedms, g_settings.HUD.Speedo.ShowUnit, g_settings.HUD.Font),
+        formatSpeedo(g_settings.HUD.Speedo.Unit, speedms, g_settings.HUD.Speedo.ShowUnit, g_settings.HUD.Font),
         g_settings.HUD.Font, color, g_settings.HUD.Outline);
 }
 
@@ -625,9 +625,9 @@ void MTHUD::UpdateHUD() {
         if (g_settings.HUD.ShiftMode.Enable) {
             drawShiftModeIndicator();
         }
-        if (g_settings.HUD.Speedo.Speedo == "kph" ||
-            g_settings.HUD.Speedo.Speedo == "mph" ||
-            g_settings.HUD.Speedo.Speedo == "ms") {
+        if (g_settings.HUD.Speedo.Unit == "kph" ||
+            g_settings.HUD.Speedo.Unit == "mph" ||
+            g_settings.HUD.Speedo.Unit == "ms") {
             drawSpeedoMeter();
         }
         if (g_settings.HUD.RPMBar.Enable) {

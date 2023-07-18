@@ -647,7 +647,7 @@ void update_manual_transmission() {
         if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::CCInc) ||
             g_controls.ButtonJustPressed(CarControls::WheelControlType::CCInc)) {
             float speedValMul;
-            std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Speedo, speedValMul);
+            std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Unit, speedValMul);
             float speed = g_settings().DriveAssists.CruiseControl.Speed;
 
             float speedValUnit = speed * speedValMul;
@@ -659,7 +659,7 @@ void update_manual_transmission() {
         if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::CCDec) ||
             g_controls.ButtonJustPressed(CarControls::WheelControlType::CCDec)) {
             float speedValMul;
-            std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Speedo, speedValMul);
+            std::string speedNameUnit = GetSpeedUnitMultiplier(g_settings.HUD.Speedo.Unit, speedValMul);
             float speed = g_settings().DriveAssists.CruiseControl.Speed;
 
             float speedValUnit = speed * speedValMul;

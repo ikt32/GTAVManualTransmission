@@ -168,7 +168,7 @@ void ScriptSettings::SaveGeneral() {
     SAVE_VAL("HUD", "ShiftModeColorG", HUD.ShiftMode.ColorG);
     SAVE_VAL("HUD", "ShiftModeColorB", HUD.ShiftMode.ColorB);
 
-    SAVE_VAL("HUD", "Speedo", HUD.Speedo.Speedo);
+    SAVE_VAL("HUD", "SpeedoUnit", HUD.Speedo.Unit);
     SAVE_VAL("HUD", "SpeedoShowUnit", HUD.Speedo.ShowUnit);
     SAVE_VAL("HUD", "SpeedoUseDrivetrain", HUD.Speedo.UseDrivetrain);
     SAVE_VAL("HUD", "SpeedoXpos", HUD.Speedo.XPos);
@@ -506,7 +506,13 @@ void ScriptSettings::parseSettingsGeneral() {
     LOAD_VAL("HUD", "ShiftModeColorG", HUD.ShiftMode.ColorG);
     LOAD_VAL("HUD", "ShiftModeColorB", HUD.ShiftMode.ColorB);
 
-    LOAD_VAL("HUD", "Speedo", HUD.Speedo.Speedo);
+    auto unitStr = GetValue(ini, "HUD", "SpeedoUnit", std::string());
+    if (!unitStr.empty()) {
+        HUD.Speedo.Unit = unitStr;
+    }
+    else {
+        LOAD_VAL("HUD", "Speedo", HUD.Speedo.Unit);
+    }
     LOAD_VAL("HUD", "SpeedoShowUnit", HUD.Speedo.ShowUnit);
     LOAD_VAL("HUD", "SpeedoUseDrivetrain", HUD.Speedo.UseDrivetrain);
     LOAD_VAL("HUD", "SpeedoXpos", HUD.Speedo.XPos);

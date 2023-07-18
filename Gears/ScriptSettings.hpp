@@ -122,7 +122,7 @@ public:
 
         struct {
             // can be kph, mph, or ms
-            std::string Speedo = "kph";
+            std::string Unit = "kph";
             bool ShowUnit = true;
             bool UseDrivetrain = true;
             float XPos = 0.860f;
