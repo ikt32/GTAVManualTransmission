@@ -128,9 +128,9 @@ static std::vector<std::string> GameVersionString = {
 
     "VER_1_0_2699_16",          // 79
     "VER_1_0_2802_0",           // 80
-
-    "VER_SIZE",                 // 81
-    "VER_UNK"                   // -1
+    "VER_1_0_2824_0",           // 81
+    "VER_1_0_2845_0",           // 82
+    "VER_1_0_2944_0",           // 83
 };
 
 enum G_GameVersion : int {
@@ -257,11 +257,10 @@ enum G_GameVersion : int {
     G_VER_1_0_2699_0_NOSTEAM,   // 78
     
     G_VER_1_0_2699_16,          // 79
-
     G_VER_1_0_2802_0,           // 80
-    
-    G_VER_SIZE,                 // 81
-    G_VER_UNK = -1              // -1
+    G_VER_1_0_2824_0,           // 81
+    G_VER_1_0_2845_0,           // 82
+    G_VER_1_0_2944_0,           // 83
 };
 
 static std::vector<std::pair<SVersion, std::vector<int>>> ExeVersionMap = {
@@ -309,6 +308,9 @@ static std::vector<std::pair<SVersion, std::vector<int>>> ExeVersionMap = {
     { { 2699, 0 },  { G_VER_1_0_2699_0_STEAM, G_VER_1_0_2699_0_NOSTEAM} },
     { { 2699, 16 }, { G_VER_1_0_2699_16} },
     { { 2802, 0 },  { G_VER_1_0_2802_0} },
+    { { 2824, 0 },  { G_VER_1_0_2824_0} },
+    { { 2845, 0 },  { G_VER_1_0_2845_0} },
+    { { 2944, 0 },  { G_VER_1_0_2944_0} },
 };
 
 static std::string eGameVersionToString(int version) {
