@@ -637,7 +637,7 @@ void update_manual_transmission() {
     }
 
     if (g_settings().DriveAssists.CruiseControl.Enable) {
-            if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ToggleCC) ||
+        if (g_controls.ButtonJustPressed(CarControls::KeyboardControlType::ToggleCC) ||
             g_controls.ButtonJustPressed(CarControls::WheelControlType::ToggleCC) ||
             g_controls.ButtonHeld(CarControls::ControllerControlType::ToggleCC) ||
             g_controls.PrevInput == CarControls::Controller && g_controls.ButtonHeld(CarControls::LegacyControlType::ToggleCC)) {

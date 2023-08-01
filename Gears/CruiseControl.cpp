@@ -47,7 +47,7 @@ bool CruiseControl::GetAdaptiveActive() {
     return adaptiveActive;
 }
 
-SRayResult RayCast(Vehicle vehicle, float range, Vector3 startOffset, Vector3 endOffset) {
+SRayResult RayCast(Vehicle vehicle, Vector3 startOffset, Vector3 endOffset) {
     auto rayOrg = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, startOffset);
     auto rayEnd = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(vehicle, endOffset);
 
@@ -61,6 +61,19 @@ SRayResult RayCast(Vehicle vehicle, float range, Vector3 startOffset, Vector3 en
     Entity hitEntity;
     int rayResult = SHAPETEST::GET_SHAPE_TEST_RESULT(ray, &hit, &hitCoord, &surfaceNormal, &hitEntity);
     float distance = Distance(rayOrg, hitCoord);
+
+    if (g_settings.Debug.DisplayInfo) {
+        GRAPHICS::DRAW_LINE(rayOrg,
+                            rayEnd,
+                            hit ? 255 : 71,
+                            hit ? 255 : 71,
+                            hit ? 255 : 71,
+                            255);
+
+        if (hit) {
+            UI::DrawSphere(hitCoord, 0.10f, Util::ColorsI::SolidWhite);
+        }
+    }
 
     return {
         hit, hitCoord, hitEntity, distance
@@ -144,7 +157,8 @@ SRayResult MultiCast(Vehicle vehicle, float range) {
     for (const auto& offset : offsets) {
         Vector3 offVel = offset;
         offVel.x += vecNextRot.x;
-        auto result = RayCast(g_playerVehicle, 120.0f, offset, offVel);
+        offVel.y += 120.0f;
+        auto result = RayCast(g_playerVehicle, offset, offVel);
 
         if (result.Hit &&
             (minResult.HitEntity == 0 || result.Distance < minResult.Distance)) {
@@ -261,6 +275,13 @@ void UpdateAdaptive(float& targetSetpoint, float& brakeValue) {
         }
         else if (Math::Near(distMin, distMax, 0.1f)) {
             targetSetpoint = otherSpeed;
+        }
+
+        if (g_settings.Debug.DisplayInfo) {
+            auto entityCoords = ENTITY::GET_ENTITY_COORDS(hitEntity, true);
+            entityCoords.z += 2.0f;
+            UI::ShowText3D(entityCoords, { "Adaptive CC Target", std::format("Distance: {:.0f}", result.Distance) });
+            UI::DrawSphere(entityCoords, 0.25f, Util::ColorsI::SolidWhite);
         }
     }
     else {
