@@ -261,6 +261,8 @@ enum G_GameVersion : int {
     G_VER_1_0_2824_0,           // 81
     G_VER_1_0_2845_0,           // 82
     G_VER_1_0_2944_0,           // 83
+    G_VER_1_0_3028_0,           // 84
+    G_VER_1_0_3095_0,           // 85
 };
 
 static std::vector<std::pair<SVersion, std::vector<int>>> ExeVersionMap = {
