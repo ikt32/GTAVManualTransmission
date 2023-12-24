@@ -23,6 +23,17 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    - name: Check for Secret availability
+      id: secret-check
+      # perform secret check & put boolean result as an output
+      shell: bash
+      run: |
+        if [ "${{ secrets.ARCHIVE_PASSWORD }}" != '' ]; then
+          echo "available=true" >> $GITHUB_OUTPUT;
+        else
+          echo "available=false" >> $GITHUB_OUTPUT;
+        fi
+    
     - uses: actions/checkout@v3
       with:
         submodules: recursive
@@ -37,11 +48,13 @@ jobs:
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}} /p:Platform=x64 /p:PostBuildEventUseInBuild=false
 
     - name: Copy build result to stage dir
+      if: ${{ steps.secret-check.outputs.available == 'true' }}
       run: |
         cp Gears/bin/Gears.asi stage/Gears.asi
         cp Gears/bin/Gears.pdb stage/Gears.pdb
 
     - name: Create build artifact archive
+      if: ${{ steps.secret-check.outputs.available == 'true' }}
       uses: TheDoctor0/zip-release@0.7.0
       with:
         filename: ${{ github.sha }}.zip
@@ -49,6 +62,7 @@ jobs:
         custom: -p${{ secrets.ARCHIVE_PASSWORD }}
 
     - name: Upload build artifact
+      if: ${{ steps.secret-check.outputs.available == 'true' }}
       uses: actions/upload-artifact@v3.1.0
       with:
         # Artifact name
