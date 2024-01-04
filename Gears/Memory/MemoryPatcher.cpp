@@ -84,9 +84,9 @@ void SetPatterns(int version) {
         "xx????" "xxx?" "xxx?????" "xxx?????" "xx?" "xx?", 
         { 0xE9, 0x00, 0x00, 0x00, 0x00, 0x90 });
 
-    // Valid for 877 to 1868, in 2060 last byte changed to 0xC4
-    steeringControl = PatternInfo("\xF3\x0F\x11\x8B\xFC\x08\x00\x00" "\xF3\x0F\x10\x83\x00\x09\x00\x00" "\xF3\x0F\x58\x83\xFC\x08\x00\x00" "\x41\x0F\x2F\xC3",
-        "xxxx??xx" "xxxx??xx" "xxxx??xx" "xxx?", 
+    // Valid for 877 to 1868, in 2060 last byte changed to 0xC4, in 3095 general-purpose register changed to rdi
+    steeringControl = PatternInfo("\xF3\x0F\x11\x8B\xFC\x08\x00\x00" "\xF3\x0F\x10\x83\x00\x09\x00\x00" "\xF3\x0F\x58\x83\xFC\x08\x00\x00" "\x41\x0F\x2F\xC3" "\xF3\x0F\x11\x83\xFC\x08\x00\x00" "\x73\x06",
+        "xxx???xx" "xxx???xx" "xxx???xx" "xxx?" "xxx???xx" "xx",
         { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
 
     // Valid for 1604 (FiveM) to 1868+
@@ -139,6 +139,21 @@ void SetPatterns(int version) {
         // instruction in the end of the pattern has changed, changed mask
         throttleLift = PatternInfo("\x44\x89\x77\x50\xf3\x0f\x11", "xxxxxxx",
             { 0x90, 0x90, 0x90, 0x90 });
+    }
+    if (version >= G_VER_1_0_3095_0) {
+        // compiler changed how to increment the current gear value
+        shiftUp = PatternInfo("\x66\x01\x2B\xC7\x43\x54\xCD\xCC\xCC\x3D", "xxxxxxxxxx",
+            { 0x66, 0x01, 0x2B, });
+        // compiler changed how to decrement the current gear value
+        shiftDown = PatternInfo("\x66\xFF\x0B\xC7\x43\x54\xCD\xCC\xCC\x3D", "xxxxxxxxxx",
+            { 0x66, 0xFF, 0x0B });
+        // the 2 offsets of CTransmission was shifted to 0x80 and 0x84 and the 2 mov opcodes changed
+        clutchRevLimit = PatternInfo("\xC7\x43\x54\xCD\xCC\xCC\x3D\x44\x89\xB3\x84\x00\x00\x00\x44\x89\xA3\x80\x00\x00\x00",
+            "xx?xxxxxxx????xxx????",
+            { 0xC7, 0x43, 0x54, 0xCD, 0xCC, 0xCC, 0x3D });
+        // register has changed
+        throttleLift = PatternInfo("\x89\x4F\x58\xF3\x44\x0F\x11", "xx?xxxx",
+            { 0x90, 0x90, 0x90 });
     }
 }
 
